@@ -2045,7 +2045,8 @@ sect(How does zsh handle multibyte input and output?)
   be displayed within the same screen area as the base character.  As not
   all terminals handle this, even if they correctly display the base
   multibyte character, this option is not on by default.  The KDE terminal
-  emulator tt(konsole) is known to handle combining characters.
+  emulator tt(konsole), tt(rxvt-unicode), and the Unicode version of
+  xterm, tt(uxterm), are known to handle combining characters.
 
   The tt(COMBINING_CHARS) option only affects output; combining characters
   may always be input, but when the option is off will be displayed
@@ -2157,7 +2158,7 @@ url(http://www.unicode.org/charts/)(http://www.unicode.org/charts/).
   however, using UTF-8 massively extends the number of valid characters
   that can be produced.
 
-  See also url(http://www.cl.cam.ac.uk/~mgk25/unicode.html#input)http://www.cl.cam.ac.uk/~mgk25/unicode.html#input)
+  See also url(http://www.cl.cam.ac.uk/~mgk25/unicode.html#input)(http://www.cl.cam.ac.uk/~mgk25/unicode.html#input)
   for general information on entering Unicode characters from a keyboard.
 
 

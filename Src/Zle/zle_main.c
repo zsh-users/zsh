@@ -1344,6 +1344,12 @@ execzlefunc(Thingy func, char **args, int set_bindk)
     }
     if (set_bindk)
 	bindk = save_bindk;
+    /*
+     * Goodness knows where the user's left us; make sure
+     * it's not on a combining character that won't be displayed
+     * directly.
+     */
+    CCRIGHT();
     return ret;
 }
 

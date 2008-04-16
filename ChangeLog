@@ -1,6 +1,12 @@
+2008-04-16  Peter Stephenson  <pws@csr.com>
+
+	* 24821(?): Etc/FAQ.yo, Src/Zle/zle_main.c: updated notes plus
+	fix cursor position with combining characters after extra
+	from a user-defined widget.
+
 2008-04-15  Peter Stephenson  <pws@csr.com>
 
-	* : Src/Zle/zle.h, Src/Zle/zle_misc.c, Src/Zle/zle_move.c,
+	* 24819: Src/Zle/zle.h, Src/Zle/zle_misc.c, Src/Zle/zle_move.c,
 	Src/Zle/zle_utils.c: need to fix up combining character aligment
 	in case of sneaky combination generation; fix transposing
 	characters.
