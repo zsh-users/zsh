@@ -21,7 +21,7 @@
 2008-04-16  Peter Stephenson  <pws@csr.com>
 
 	* 24821: Etc/FAQ.yo, Src/Zle/zle_main.c: updated notes plus
-	fix cursor position with combining characters after extra
+	fix cursor position with combining characters after exit
 	from a user-defined widget.
 
 2008-04-15  Peter Stephenson  <pws@csr.com>
