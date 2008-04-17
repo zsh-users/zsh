@@ -12,12 +12,12 @@
 
 2008-04-16  Clint Adams  <clint@zsh.org>
 
-	* 248??: Completion/Unix/Command/_git: some fixes and updates for
+	* 24823: Completion/Unix/Command/_git: some fixes and updates for
 	git 1.5.5.
 
 2008-04-16  Peter Stephenson  <pws@csr.com>
 
-	* 24821(?): Etc/FAQ.yo, Src/Zle/zle_main.c: updated notes plus
+	* 24821: Etc/FAQ.yo, Src/Zle/zle_main.c: updated notes plus
 	fix cursor position with combining characters after extra
 	from a user-defined widget.
 
