@@ -35,6 +35,7 @@ diff_args=(
   '(--name-only --name-status -u -p --stat --patch-with-stat --patch-with-raw --raw --numstat --shortstat --summary)--numstat[generate a more machine-friendly diffstat]' \
   '(--name-only --name-status -u -p --stat --patch-with-stat --patch-with-raw --raw --numstat --shortstat --summary)--shortstat[generate a summary diffstat]' \
   '(--name-only --name-status -u -p --stat --patch-with-stat --patch-with-raw --raw --numstat --shortstat --summary)--summary[generate a condensed summary of extended header information]' \
+  '(--name-only --name-status -u -p --stat --patch-with-stat --patch-with-raw --raw --numstat --shortstat --summary)--dirstat[generate a dirstat]' \
   '-B-[break complete rewrite changes into pairs of given size]: :_guard "[[\:digit\:]]#" size'
   '-C-[detect copies as well as renames with given scope]: :_guard "[[\:digit\:]]#" size'
   $diff_l_arg
@@ -58,6 +59,7 @@ diff_args=(
   $nul_arg
   '--exit-code[report exit code 1 if differences, 0 otherwise]'
   '(--exit-code)--quiet[disable all output]'
+  '--relative=:path:_files -/'
 )
 
 pretty_arg='--pretty=-[pretty print commit messages]::pretty print:((raw\:"the raw commits"
@@ -1629,7 +1631,9 @@ _git-format-patch () {
 (( $+functions[_git-gc] )) ||
 _git-gc () {
   _arguments \
-    '--prune[remove unreferenced loose objects]' && ret=0
+    '--aggressive[more aggressively optimize]' \
+    '--auto[check whether housekeeping is required]' \
+    '--quiet[suppress all progress reports]' && ret=0
 }
 
 (( $+functions[_git-grep] )) ||
@@ -1658,7 +1662,7 @@ _git-grep () {
     '(-E --extended-regexp -G --basic-regexp)'{-E,--extended-regexp}'[use POSIX extended regexes]' \
     '(-E --extended-regexp -G --basic-regexp)'{-G,--basic-regexp}'[use POSIX basic regexes]' \
     '-n[prefix the line number to matching lines]' \
-    '(-l --files-with-matches -L --files-without-match)'{-l,--files-with-match}'[show only names of matching files]' \
+    '(-l --files-with-matches -L --files-without-match --name-only)'{-l,--files-with-matches,--name-only}'[show only names of matching files]' \
     '(-l --files-with-matches -L --files-without-match)'{-L,--files-without-match}'[show only names of non-matching files]' \
     '(-c --count)'{-c,--count}'[show number of matching lines in files]' \
     '-A[show trailing context]: :_guard "[[\:digit\:]]#" lines' \
@@ -2009,7 +2013,7 @@ _git-cvsimport () {
     '-i[do not perform a checkout after importing]' \
     '-k[remove keywords from source files in the CVS archive]' \
     '-m[attempt to detect merges based on the commit message]' \
-    '-M[attempt to detect merges based on the commit message with custom pattern]:pattern' \
+    '*-M[attempt to detect merges based on the commit message with custom pattern]:pattern' \
     '-o[specify the branch into which you wish to import]:branch:__git_branch_names' \
     '-P[read cvsps output file]:file:_files' \
     '-p[specify additionaly options for cvsps]:cvsps-options' \
@@ -2050,7 +2054,8 @@ _git-merge-one-file () {
 (( $+functions[_git-prune] )) ||
 _git-prune () {
   _arguments -S \
-    '-n[do not remove anything; just report what would have been removed]'
+    '-n[do not remove anything; just report what would have been removed]' \
+    '--expire:time:' \
     '*::heads:__git_heads' && ret=0
 }
 
