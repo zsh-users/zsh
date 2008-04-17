@@ -3082,12 +3082,13 @@ wcsitype(wchar_t c, int itype)
 	    if (iswalnum(c))
 		return 1;
 	    /*
-	     * If we are handling combining characters, anything
-	     * printable with zero width needs to be considered
-	     * part of a word.
+	     * If we are handling combining characters, any punctuation
+	     * characters with zero width needs to be considered part of
+	     * a word.  If we are not handling combining characters then
+	     * logically they are still part of the word, even if they
+	     * don't get displayed properly, so always do this.
 	     */
-	    if (isset(COMBININGCHARS) &&
-		iswprint(c) && wcwidth(c) == 0)
+	    if (iswpunct(c) && wcwidth(c) == 0)
 		return 1;
 	    return !!wmemchr(wordchars_wide.chars, c, wordchars_wide.len);
 

@@ -1,5 +1,9 @@
 2008-04-17  Peter Stephenson  <pws@csr.com>
 
+	* 24825: Src/utils.c, Src/Zle/zle_word.c: fix internal
+	word-boundary widgets and make zero-width punctuation
+	characters always part of a word.
+
 	* unposted: NEWS: list new features so far since 4.3.6.
 
 	* Vincent Lefevre: 24818: Doc/Zsh/options.yo (modified),
