@@ -135,6 +135,7 @@ static struct optname optns[] = {
 {{NULL, "histallowclobber",   0},			 HISTALLOWCLOBBER},
 {{NULL, "histbeep",	      OPT_ALL},			 HISTBEEP},
 {{NULL, "histexpiredupsfirst",0},			 HISTEXPIREDUPSFIRST},
+{{NULL, "histfcntllock",      0},			 HISTFCNTLLOCK},
 {{NULL, "histfindnodups",     0},			 HISTFINDNODUPS},
 {{NULL, "histignorealldups",  0},			 HISTIGNOREALLDUPS},
 {{NULL, "histignoredups",     0},			 HISTIGNOREDUPS},

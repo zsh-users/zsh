@@ -4,6 +4,22 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Major changes between versions 4.3.6 and 4.3.7
+----------------------------------------------
+
+The option COMBINING_CHARS has been added.  When it is set, the
+line editor assumes the terminal is capable of displaying zero-width
+combining characters (typically accents) correctly as modifications
+to the base character, and will act accordingly.
+
+The option HIST_FCNTL_LOCK has been added to provide locking of history
+files using the system call fcntl().  On recent NFS implementations this
+may provide better reliability.
+
+Highlighting of sections of the command line is now supported, controlled
+by the array parameter zle_highlight and the ZLE special parameter
+REGION_HIGHLIGHT.
+
 Major changes between versions 4.3.5 and 4.3.6
 ----------------------------------------------
 

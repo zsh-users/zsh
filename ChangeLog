@@ -1,3 +1,11 @@
+2008-04-17  Peter Stephenson  <pws@csr.com>
+
+	* unposted: NEWS: list new features so far since 4.3.6.
+
+	* Vincent Lefevre: 24818: Doc/Zsh/options.yo (modified),
+	Src/hist.c (with #ifdef HAVE_TRUNCATE), Src/options.c, Src/zsh.h:
+	history file locking using fcntl().
+
 2008-04-16  Clint Adams  <clint@zsh.org>
 
 	* 248??: Completion/Unix/Command/_git: some fixes and updates for

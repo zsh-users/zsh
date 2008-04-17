@@ -577,6 +577,15 @@ than tt(SAVEHIST) in order to give you some room for the duplicated
 events, otherwise this option will behave just like
 tt(HIST_IGNORE_ALL_DUPS) once the history fills up with unique events.
 )
+pindex(HIST_FCNTL_LOCK)
+item(tt(HIST_FCNTL_LOCK))(
+When writing out the history file, by default zsh uses ad-hoc file locking
+to avoid known problems with locking on some operating systems.  With this
+option locking is done by means of the system's tt(fcntl) call, where
+this method is available.  On recent operating systems this may
+provide better performance, in particular avoiding history corruption when
+files are stored on NFS.
+)
 pindex(HIST_FIND_NO_DUPS)
 cindex(history, ignoring duplicates in search)
 item(tt(HIST_FIND_NO_DUPS))(
