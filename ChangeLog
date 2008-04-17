@@ -1,5 +1,8 @@
 2008-04-17  Peter Stephenson  <pws@csr.com>
 
+	* 24829: Jun T.: Src/Zle/zle_vi.c: vi-replace-chars got broken
+	in the crossfire.
+
 	* 24825: Src/utils.c, Src/Zle/zle_word.c: fix internal
 	word-boundary widgets and make zero-width punctuation
 	characters always part of a word.

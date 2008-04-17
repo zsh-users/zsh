@@ -497,7 +497,7 @@ vireplacechars(UNUSED(char **args))
     int n = zmult, origcs = zlecs, fail = 0;
 
     if (n > 0) {
-	while (n > 0) {
+	while (n-- > 0) {
 	    if (zlecs == zlell || zleline[zlell] == ZWC('\n')) {
 		fail = 1;
 		break;
