@@ -464,14 +464,14 @@ backwardkillword(char **args)
 	while (x) {
 	    int pos = x;
 	    DECPOS(pos);
-	    if (ZC_iword(zleline[x]))
+	    if (ZC_iword(zleline[pos]))
 		break;
 	    x = pos;
 	}
 	while (x) {
 	    int pos = x;
 	    DECPOS(pos);
-	    if (!ZC_iword(zleline[x]))
+	    if (!ZC_iword(zleline[pos]))
 		break;
 	    x = pos;
 	}
