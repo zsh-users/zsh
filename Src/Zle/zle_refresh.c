@@ -289,7 +289,7 @@ static const REFRESH_ELEMENT zr_end_ellipsis[] = {
     { ZWC(' '), 0 },
 };
 #define ZR_END_ELLIPSIS_SIZE	\
-    (sizeof(zr_end_ellipsis)/sizeof(zr_end_ellipsis[0]))
+    ((int)(sizeof(zr_end_ellipsis)/sizeof(zr_end_ellipsis[0])))
 
 static const REFRESH_ELEMENT zr_mid_ellipsis1[] = {
     { ZWC(' '), 0 },
@@ -300,14 +300,14 @@ static const REFRESH_ELEMENT zr_mid_ellipsis1[] = {
     { ZWC('.'), 0 },
 };
 #define ZR_MID_ELLIPSIS1_SIZE	\
-    (sizeof(zr_mid_ellipsis1)/sizeof(zr_mid_ellipsis1[0]))
+    ((int)(sizeof(zr_mid_ellipsis1)/sizeof(zr_mid_ellipsis1[0])))
 
 static const REFRESH_ELEMENT zr_mid_ellipsis2[] = {
     { ZWC('>'), 0 },
     { ZWC(' '), 0 },
 };
 #define ZR_MID_ELLIPSIS2_SIZE	\
-    (sizeof(zr_mid_ellipsis2)/sizeof(zr_mid_ellipsis2[0]))
+    ((int)(sizeof(zr_mid_ellipsis2)/sizeof(zr_mid_ellipsis2[0])))
 
 static const REFRESH_ELEMENT zr_start_ellipsis[] = {
     { ZWC('>'), 0 },
@@ -317,7 +317,7 @@ static const REFRESH_ELEMENT zr_start_ellipsis[] = {
     { ZWC('.'), 0 },
 };
 #define ZR_START_ELLIPSIS_SIZE	\
-    (sizeof(zr_start_ellipsis)/sizeof(zr_start_ellipsis[0]))
+    ((int)(sizeof(zr_start_ellipsis)/sizeof(zr_start_ellipsis[0])))
 
 
 /* Defines the available types of highlighting */

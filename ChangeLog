@@ -1,3 +1,8 @@
+2008-04-18  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/Zle/zle_refresh.c: fixed compiler warnings
+	about signed/unsigned issues.
+
 2008-04-18  Peter Stephenson  <pws@csr.com>
 
 	* 24839: Src/Zle/zle_word.c: misuse of variable in 24825.
