@@ -29,6 +29,8 @@ if [[ $OSTYPE = (freebsd|dragonfly|darwin)* ]]; then
   flags=( $flags[@]
     '(nouunlnk)uunlnk[set the user undeletable flag]'
     '(uunlnk)nouunlnk[unset the user undeletable flag]'
+    '(nohidden)hidden[set the hidden flag]'
+    '(hidden)nohidden[unset the hidden flag]'
   )
   (( EUID )) || flags=( $flags[@]
     '(nosunlnk)sunlnk[set the system undeletable flag]'

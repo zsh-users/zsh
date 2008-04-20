@@ -1,3 +1,8 @@
+2008-04-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/12793: William Scott: Completion/BSD/Command/_chflags:
+	hidden/nohidden flags.
+
 2008-04-20  Andrey Borzenkov <bor@zsh.org>
 
 	* 24851: Doc/Zsh/mod_complist.yo, Src/Zle/complist.c: support
