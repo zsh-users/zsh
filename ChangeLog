@@ -1,5 +1,8 @@
 2008-04-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* users/12798: Etc/zsh-development-guide: passing NULL flags
+	to builtin definition.
+
 	* users/12793: William Scott: Completion/BSD/Command/_chflags:
 	hidden/nohidden flags.
 
