@@ -1051,7 +1051,7 @@ zlecore(void)
 	    /* for vi mode, make sure the cursor isn't somewhere illegal */
 	    if (invicmdmode() && zlecs > findbol() &&
 		(zlecs == zlell || zleline[zlecs] == ZWC('\n')))
-		zlecs--;
+		DECCS();
 	    if (undoing)
 		handleundo();
 	} else {

@@ -353,10 +353,14 @@ videletechar(char **args)
 	return 1;
     /* Put argument into the acceptable range -- it is not an error to  *
      * specify a greater count than the number of available characters. */
-    if (n > findeol() - zlecs)
+    /* HERE: we should do the test properly with INCPOS(). */
+    if (n > findeol() - zlecs) {
 	n = findeol() - zlecs;
-    /* do the deletion */
-    forekill(n, CUT_RAW);
+	/* do the deletion */
+	forekill(n, CUT_RAW);
+    } else {
+	forekill(n, 0);
+    }
     return 0;
 }
 
@@ -714,10 +718,13 @@ vibackwarddeletechar(char **args)
     }
     /* Put argument into the acceptable range -- it is not an error to  *
      * specify a greater count than the number of available characters. */
-    if (n > zlecs - findbol())
+    /* HERE: we should do the test properly with DECPOS(). */
+    if (n > zlecs - findbol()) {
 	n = zlecs - findbol();
-    /* do the deletion */
-    backkill(n, CUT_FRONT|CUT_RAW);
+	/* do the deletion */
+	backkill(n, CUT_FRONT|CUT_RAW);
+    } else
+	backkill(n, CUT_FRONT);
     return 0;
 }
 
