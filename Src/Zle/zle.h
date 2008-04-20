@@ -163,8 +163,8 @@ static inline int ZS_strncmp(ZLE_STRING_T s1, ZLE_STRING_T s2, size_t l)
 /* Combining character alignment: none in this mode */
 #define CCLEFT()
 #define CCRIGHT()
-#define CCLEFTPOS()
-#define CCRIGHTPOS()
+#define CCLEFTPOS(pos)
+#define CCRIGHTPOS(pos)
 /*
  * Increment or decrement the cursor position: simple in this case.
  */

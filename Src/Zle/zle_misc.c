@@ -921,9 +921,9 @@ executenamedcommand(char *prmt)
     /* prmt may be constant */
     prmt = ztrdup(prmt);
     l = strlen(prmt);
-    cmdbuf = (char *)zhalloc(l + NAMLEN + 2 +
+    cmdbuf = (char *)zhalloc(l + NAMLEN + 2
 #ifdef MULTIBYTE_SUPPORT
-			     2 * MB_CUR_MAX
+			     + 2 * MB_CUR_MAX
 #endif
 			     );
     strcpy(cmdbuf, prmt);

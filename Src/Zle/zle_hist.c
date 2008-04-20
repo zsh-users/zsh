@@ -454,7 +454,7 @@ downhistory(UNUSED(char **args))
  * srch_str is the metafied search string, as extracted from the start
  *   of zleline.
  */
-static int srch_hl, srch_cs = -1;
+static int histpos, srch_hl, srch_cs = -1;
 static char *srch_str;
 
 /**/
@@ -462,7 +462,7 @@ int
 historysearchbackward(char **args)
 {
     Histent he;
-    int n = zmult, histpos;
+    int n = zmult;
     char *str;
     struct zle_text zt;
 
@@ -520,7 +520,7 @@ int
 historysearchforward(char **args)
 {
     Histent he;
-    int n = zmult, histpos;
+    int n = zmult;
     char *str;
     struct zle_text zt;
 

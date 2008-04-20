@@ -169,11 +169,11 @@ decpos(int *pos)
 
 /**/
 char *
-backwardmetafiedchar(char *start, char *ptr, convchar_t *retchr)
+backwardmetafiedchar(char *start, char *endptr, convchar_t *retchr)
 {
 #ifdef MULTIBYTE_SUPPORT
     int charlen = 0;
-    char *last = NULL, *bufptr, *endptr = ptr;
+    char *last = NULL, *bufptr, *ptr = endptr;
     convchar_t lastc;
     mbstate_t mbs;
     size_t ret;

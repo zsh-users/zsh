@@ -148,8 +148,11 @@ zlecharasstring(ZLE_CHAR_T inchar, char *buf)
     if (imeta(inchar)) {
 	buf[0] = Meta;
 	buf[1] = inchar ^ 32;
-    } else
+	return 2;
+    } else {
 	buf[0] = inchar;
+	return 1;
+    }
 #endif
 }
 
