@@ -51,11 +51,31 @@ for block devices
 item(tt(cd 44;37))(
 for character devices
 )
-item(tt(ex 35))(
-for executable files
+item(tt(or) var(none))(
+for a symlink to nonexistent file (default is the value defined for tt(fi));
+this code is currently not used
 )
 item(tt(mi) var(none))(
-for a non-existent file (default is the value defined for tt(fi))
+for a non-existent file (default is the value defined for tt(fi)); this code
+is currently not used
+)
+item(tt(su 37;41))(
+for files with setuid bit set
+)
+item(tt(sg 30;43))(
+for files with setgid bit set
+)
+item(tt(tw 30;42))(
+for world writable directories with sticky bit set
+)
+item(tt(ow 34;43))(
+for world writable directories without sticky bit set
+)
+item(tt(st 37;44))(
+for directories with sticky bit set but not world writable
+)
+item(tt(ex 35))(
+for executable files
 )
 item(tt(lc \e[))(
 for the left code (see below)

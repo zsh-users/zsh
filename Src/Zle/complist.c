@@ -177,30 +177,38 @@ static Keymap mskeymap, lskeymap;
 #define COL_SO  5
 #define COL_BD  6
 #define COL_CD  7
-#define COL_EX  8
+#define COL_OR  8
 #define COL_MI  9
-#define COL_LC 10
-#define COL_RC 11
-#define COL_EC 12
-#define COL_TC 13
-#define COL_SP 14
-#define COL_MA 15
-#define COL_HI 16
-#define COL_DU 17
+#define COL_SU 10
+#define COL_SG 11
+#define COL_TW 12
+#define COL_OW 13
+#define COL_ST 14
+#define COL_EX 15
+#define COL_LC 16
+#define COL_RC 17
+#define COL_EC 18
+#define COL_TC 19
+#define COL_SP 20
+#define COL_MA 21
+#define COL_HI 22
+#define COL_DU 23
 
-#define NUM_COLS 18
+#define NUM_COLS 24
 
 /* Names of the terminal strings. */
 
 static char *colnames[] = {
-    "no", "fi", "di", "ln", "pi", "so", "bd", "cd", "ex", "mi",
+    "no", "fi", "di", "ln", "pi", "so", "bd", "cd", "or", "mi",
+    "su", "sg", "tw", "ow", "st", "ex",
     "lc", "rc", "ec", "tc", "sp", "ma", "hi", "du", NULL
 };
 
 /* Default values. */
 
 static char *defcols[] = {
-    "0", "0", "1;31", "1;36", "33", "1;35", "1;33", "1;33", "1;32", NULL,
+    "0", "0", "1;31", "1;36", "33", "1;35", "1;33", "1;33", NULL, NULL,
+    "37;41", "30;43", "30;42", "34;42", "37;44", "1;32", 
     "\033[", "m", NULL, "0", "0", "7", NULL, NULL
 };
 
@@ -507,7 +515,9 @@ getcols()
     lr_caplen = strlen(mcolors.files[COL_LC]->col) +
 	strlen(mcolors.files[COL_RC]->col);
 
-    /* Default for missing files. */
+    /* Default for orphans and missing files. Currently not used */
+    if (!mcolors.files[COL_OR] || !mcolors.files[COL_OR]->col)
+	mcolors.files[COL_OR] = mcolors.files[COL_FI];
     if (!mcolors.files[COL_MI] || !mcolors.files[COL_MI]->col)
 	mcolors.files[COL_MI] = mcolors.files[COL_FI];
 
@@ -872,9 +882,17 @@ putfilecol(char *group, char *n, mode_t m)
 	    return 0;
 	}
 
-    if (S_ISDIR(m))
-	colour = COL_DI;
-    else if (S_ISLNK(m))
+    if (S_ISDIR(m)) {
+	if (m & S_IWOTH)
+	    if (m & S_ISVTX)
+		colour = COL_TW;
+	    else
+		colour = COL_OW;
+	else if (m & S_ISVTX)
+	    colour = COL_ST;
+	else
+	    colour = COL_DI;
+    } else if (S_ISLNK(m))
 	colour = COL_LN;
     else if (S_ISFIFO(m))
 	colour = COL_PI;
@@ -884,6 +902,10 @@ putfilecol(char *group, char *n, mode_t m)
 	colour = COL_BD;
     else if (S_ISCHR(m))
 	colour = COL_CD;
+    else if (m & S_ISUID)
+	colour = COL_SU;
+    else if (m & S_ISGID)
+	colour = COL_SG;
     else if (S_ISREG(m) && (m & S_IXUGO))
 	colour = COL_EX;
     else

@@ -1,3 +1,8 @@
+2008-04-20  Andrey Borzenkov <bor@zsh.org>
+
+	* 24851: Doc/Zsh/mod_complist.yo, Src/Zle/complist.c: support
+	colour codes for from current GNU ls
+
 2008-04-18  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/Zle/zle_refresh.c: fixed compiler warnings
