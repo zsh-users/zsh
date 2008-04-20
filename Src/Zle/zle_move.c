@@ -158,6 +158,144 @@ decpos(int *pos)
 }
 #endif
 
+
+/* Size of buffer in the following function */
+#define BMC_BUFSIZE MB_CUR_MAX
+/*
+ * For a metafied string that starts at "start" and where the
+ * current position is "ptr", go back one full character,
+ * taking account of combining characters if necessary.
+ */
+
+/**/
+char *
+backwardmetafiedchar(char *start, char *ptr, convchar_t *retchr)
+{
+#ifdef MULTIBYTE_SUPPORT
+    int charlen = 0;
+    char *last = NULL, *bufptr, *endptr = ptr;
+    convchar_t lastc;
+    mbstate_t mbs;
+    size_t ret;
+    wchar_t wc;
+    VARARR(char, buf, BMC_BUFSIZE);
+
+    bufptr = buf + BMC_BUFSIZE;
+    while (ptr > start) {
+	ptr--;
+	/*
+	 * Scanning backwards we're not guaranteed ever to find a
+	 * valid character.  If we've looked as far as we should
+	 * need to, give up.
+	 */
+	if (bufptr-- == buf)
+	    break;
+	charlen++;
+	if (ptr > start && ptr[-1] == Meta)
+	    *bufptr = *ptr-- ^ 32;
+	else
+	    *bufptr = *ptr;
+
+	/* we always need to restart the character from scratch */
+	memset(&mbs, 0, sizeof(mbs));
+	ret = mbrtowc(&wc, bufptr, charlen, &mbs);
+	if (ret == 0) {
+	    /* NULL: unlikely, but handle anyway. */
+	    if (last) {
+		if (retchr)
+		    *retchr = lastc;
+		return last;
+	    } else {
+		if (retchr)
+		    *retchr = wc;
+		return ptr;
+	    }
+	}
+	if (ret >= 0) {
+	    if (ret < charlen) {
+		/* The last character didn't convert, so use it raw. */
+		break;
+	    }
+	    if (!isset(COMBININGCHARS)) {
+		if (retchr)
+		    *retchr = wc;
+		return ptr;
+	    }
+ 	    /* HERE: test for combining char, fix when test changes */
+	    if (!iswpunct(wc) || wcwidth(wc) != 0) {
+		/* not a combining character... */
+		if (last) {
+		    /*
+		     * ... but we were looking for a suitable base character,
+		     * test it.
+		     */
+		    /* HERE this test will change too */
+		    if (iwsalnum(wc) && wcwidth(wc) > 0) {
+			/*
+			 * Yes, this will do.
+			 */
+			if (retchr)
+			    *retchr = wc;
+			return ptr;
+		    } else {
+			/* No, just return the first character we found */
+			if (retchr)
+			    *retchr = lastc;
+			return last;
+		    }
+		}
+		/* This is the first character, so just return it. */
+		if (retchr)
+		    *retchr = wc;
+		return ptr;    
+	    }
+	    if (!last) {
+		/* still looking for the character immediately before ptr */
+		last = ptr;
+	    }
+	    /* searching for base character of combining character */
+	    charlen = 0;
+	    bufptr = buf + BMC_BUFSIZE;
+	}
+	/*
+	 * Else keep scanning this character even if MB_INVALID:  we can't
+	 * expect MB_INCOMPLETE to work when moving backwards.
+	 */
+    }
+    /*
+     * Found something we didn't like, was there a good character
+     * immediately before ptr?
+     */
+    if (last) {
+	if (retchr)
+	    *retchr = lastc;
+	return last;
+    }
+    /*
+     * No, we couldn't find any good character, so just treat
+     * the last unmetafied byte we found as a character.
+     */
+#endif
+    if (endptr > start) {
+	if (endptr > start - 1 && endptr[-2] == Meta)
+	{
+	    if (retchr)
+		*retchr = (convchar_t)(endptr[-1] ^ 32);
+	    return endptr - 2;
+	}
+	else
+	{
+	    if (retchr)
+		*retchr = (convchar_t)endptr[-1];
+	    return endptr - 1;
+	}
+    }
+    if (retchr)
+	*retchr = (convchar_t)0;
+    return endptr;
+}
+
+
 /**/
 int
 beginningofline(char **args)

@@ -1387,11 +1387,15 @@ zrefresh(void)
 	more_end = 1;
 
     if (statusline) {
+	int outll, outsz;
+	ZLE_STRING_T outputline =
+	    stringaszleline(statusline, 0, &outll, &outsz, NULL); 
+
 	rpms.tosln = rpms.ln + 1;
 	nbuf[rpms.ln][winw + 1] = zr_zr;	/* text not wrapped */
 	snextline(&rpms);
-	u = statusline;
-	for (; u < statusline + statusll; u++) {
+	u = outputline;
+	for (; u < outputline + outll; u++) {
 #ifdef MULTIBYTE_SUPPORT
 	    if (iswprint(*u)) {
 		int width = wcwidth(*u);
@@ -1449,6 +1453,7 @@ zrefresh(void)
 	     */
 	    snextline(&rpms);
 	}
+	zfree(outputline, outsz);
     }
     *rpms.s = zr_zr;
 

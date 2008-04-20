@@ -143,12 +143,10 @@ mod_export int lastcmd;
 /**/
 mod_export Widget compwidget;
 
-/* the status line, and its length */
+/* the status line, a null-terminated metafied string */
 
 /**/
-mod_export ZLE_STRING_T statusline;
-/**/
-mod_export int statusll;
+mod_export char *statusline;
 
 /* The current history line and cursor position for the top line *
  * on the buffer stack.                                          */
@@ -1240,12 +1238,16 @@ zleread(char **lp, char **rp, int flags, int context)
 int
 execzlefunc(Thingy func, char **args, int set_bindk)
 {
-    int r = 0, ret = 0;
+    int r = 0, ret = 0, remetafy = 0;
     Widget w;
     Thingy save_bindk = bindk;
 
     if (set_bindk)
 	bindk = func;
+    if (zlemetaline) {
+	unmetafy_line();
+	remetafy = 1;
+    }
 
     if(func->flags & DISABLED) {
 	/* this thingy is not the name of a widget */
@@ -1350,6 +1352,8 @@ execzlefunc(Thingy func, char **args, int set_bindk)
      * directly.
      */
     CCRIGHT();
+    if (remetafy)
+	metafy_line();
     return ret;
 }
 
@@ -1632,8 +1636,7 @@ describekeybriefly(UNUSED(char **args))
     if (statusline)
 	return 1;
     clearlist = 1;
-    statusline = ZWS("Describe key briefly: _");
-    statusll = ZS_strlen(statusline);
+    statusline = "Describe key briefly: _";
     zrefresh();
     seq = getkeymapcmd(curkeymap, &func, &str);
     statusline = NULL;

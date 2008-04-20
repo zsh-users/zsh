@@ -74,9 +74,21 @@ typedef wint_t   ZLE_INT_T;
 #define LASTFULLCHAR	lastchar_wide
 #define LASTFULLCHAR_T  ZLE_INT_T
 
-/* We may need to handle combining character alignment */
+/*
+ * We may need to handle combining character alignment.
+ * The following fix up the position of the cursor so that it
+ * never ends up over a zero-width punctuation character following
+ * an alphanumeric character.  The first is used if we were
+ * moving the cursor left, the second if we were moving right or
+ * if something under the cursor may have changed.
+ */
 #define CCLEFT()	alignmultiwordleft(&zlecs, 1)
 #define CCRIGHT()	alignmultiwordright(&zlecs, 1)
+/*
+ * Same for any other position
+ */
+#define CCLEFTPOS(pos)	alignmultiwordleft(&pos, 1)
+#define CCRIGHTPOS(pos)	alignmultiwordright(&pos, 1)
 /*
  * Increment or decrement the cursor position, skipping over
  * combining characters.
@@ -151,6 +163,8 @@ static inline int ZS_strncmp(ZLE_STRING_T s1, ZLE_STRING_T s2, size_t l)
 /* Combining character alignment: none in this mode */
 #define CCLEFT()
 #define CCRIGHT()
+#define CCLEFTPOS()
+#define CCRIGHTPOS()
 /*
  * Increment or decrement the cursor position: simple in this case.
  */
@@ -235,7 +249,13 @@ struct modifier {
 
 #define CUT_FRONT   (1<<0)   /* Text goes in front of cut buffer */
 #define CUT_REPLACE (1<<1)   /* Text replaces cut buffer */
-#define CUT_RAW     (1<<2)   /* Raw character counts (not used in cut itself) */
+#define CUT_RAW     (1<<2)   /*
+			      * Raw character counts (not used in cut itself).
+			      * This is used when the values are offsets
+			      * into the zleline array rather than numbers
+			      * of visible characters directly input by
+			      * the user.
+			      */
 
 /* undo system */
 

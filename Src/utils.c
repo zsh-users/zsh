@@ -3968,6 +3968,50 @@ nicedup(const char *s, int heap)
 
 
 /*
+ * The guts of mb_metacharlenconv().  This version assumes we are
+ * processing a true multibyte character string without tokens, and
+ * takes the shift state as an argument.
+ */
+
+/**/
+mod_export int
+mb_metacharlenconv_r(const char *s, wint_t *wcp, mbstate_t *mbsp)
+{
+    size_t ret = MB_INVALID;
+    char inchar;
+    const char *ptr;
+    wchar_t wc;
+
+    for (ptr = s; *ptr; ) {
+	if (*ptr == Meta) {
+	    inchar = *++ptr ^ 32;
+	    DPUTS(!*ptr,
+		  "BUG: unexpected end of string in mb_metacharlen()\n");
+	} else
+	    inchar = *ptr;
+	ptr++;
+	ret = mbrtowc(&wc, &inchar, 1, mbsp);
+
+	if (ret == MB_INVALID)
+	    break;
+	if (ret == MB_INCOMPLETE)
+	    continue;
+	if (wcp)
+	    *wcp = wc;
+	return ptr - s;
+    }
+
+    if (wcp)
+	*wcp = WEOF;
+    /* No valid multibyte sequence */
+    memset(mbsp, 0, sizeof(*mbsp));
+    if (ptr > s) {
+	return 1 + (*s == Meta);	/* Treat as single byte character */
+    } else
+	return 0;		/* Probably shouldn't happen */
+}
+
+/*
  * Length of metafied string s which contains the next multibyte
  * character; single (possibly metafied) character if string is not null
  * but character is not valid (e.g. possibly incomplete at end of string).
@@ -3982,11 +4026,6 @@ nicedup(const char *s, int heap)
 mod_export int
 mb_metacharlenconv(const char *s, wint_t *wcp)
 {
-    char inchar;
-    const char *ptr;
-    size_t ret;
-    wchar_t wc;
-
     if (!isset(MULTIBYTE)) {
 	/* treat as single byte, possibly metafied */
 	if (wcp)
@@ -4009,37 +4048,7 @@ mb_metacharlenconv(const char *s, wint_t *wcp)
 	return 1;
     }
 
-    ret = MB_INVALID;
-    for (ptr = s; *ptr; ) {
-	if (*ptr == Meta) {
-	    inchar = *++ptr ^ 32;
-#ifdef DEBUG
-	    if (!*ptr)
-		fprintf(stderr,
-			"BUG: unexpected end of string in mb_metacharlen()\n");
-#endif
-	} else
-	    inchar = *ptr;
-	ptr++;
-	ret = mbrtowc(&wc, &inchar, 1, &mb_shiftstate);
-
-	if (ret == MB_INVALID)
-	    break;
-	if (ret == MB_INCOMPLETE)
-	    continue;
-	if (wcp)
-	    *wcp = wc;
-	return ptr - s;
-    }
-
-    if (wcp)
-	*wcp = WEOF;
-    /* No valid multibyte sequence */
-    memset(&mb_shiftstate, 0, sizeof(mb_shiftstate));
-    if (ptr > s) {
-	return 1 + (*s == Meta);	/* Treat as single byte character */
-    } else
-	return 0;		/* Probably shouldn't happen */
+    return mb_metacharlenconv_r(s, wcp, &mb_shiftstate);
 }
 
 /*

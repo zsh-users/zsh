@@ -185,7 +185,6 @@ viforwardwordend(char **args)
 	return ret;
     }
     while (n--) {
-	/* HERE: the zlecs + 1 here is suspect */
 	int pos;
 	while (zlecs != zlell) {
 	    pos = zlecs;

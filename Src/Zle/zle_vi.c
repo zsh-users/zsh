@@ -853,8 +853,7 @@ vicapslockpanic(UNUSED(char **args))
 {
     clearlist = 1;
     zbeep();
-    statusline = ZWS("press a lowercase key to continue");
-    statusll = ZS_strlen(statusline);
+    statusline = "press a lowercase key to continue";
     zrefresh();
     while (!ZC_ilower(getfullchar(0)));
     statusline = NULL;

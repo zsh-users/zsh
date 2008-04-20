@@ -106,6 +106,54 @@ zleaddtoline(int chr)
 }
 
 /*
+ * Convert a line editor character to a possibly multibyte character
+ * in a metafied string.  To be safe buf should have space for at least
+ * 2 * MB_CUR_MAX chars for multibyte mode and 2 otherwise.  Returns the
+ * length of the string added.
+ */
+
+/**/
+int
+zlecharasstring(ZLE_CHAR_T inchar, char *buf)
+{
+#ifdef MULTIBYTE_SUPPORT
+    size_t ret;
+    char *ptr;
+
+    ret = wctomb(buf, inchar);
+    if (ret <= 0) {
+	/* Ick. */
+	buf[0] = '?';
+	return 1;
+    }
+    ptr = buf + ret - 1;
+    for (;;) {
+	if (imeta(*ptr)) {
+	    char *ptr2 = buf + ret - 1;
+	    for (;;) {
+		ptr2[1] = ptr2[0];
+		if (ptr2 == ptr)
+		    break;
+		ptr2--;
+	    }
+	    *ptr = Meta;
+	    ret++;
+	}
+
+	if (ptr == buf)
+	    return ret;
+	ptr--;
+    }
+#else
+    if (imeta(inchar)) {
+	buf[0] = Meta;
+	buf[1] = inchar ^ 32;
+    } else
+	buf[0] = inchar;
+#endif
+}
+
+/*
  * Input a line in internal zle format, possibly using wide characters,
  * possibly not, together with its length and the cursor position.
  * The length must be accurate and includes all characters (no NULL
@@ -621,7 +669,7 @@ void
 setline(char *s, int flags)
 {
     char *scp;
-
+	
     if (flags & ZSL_COPY)
 	scp = ztrdup(s);
     else
@@ -639,7 +687,6 @@ setline(char *s, int flags)
     else if (zlecs > zlell)
 	zlecs = zlell;
     CCRIGHT();
-
     if (flags & ZSL_COPY)
 	free(scp);
 }
