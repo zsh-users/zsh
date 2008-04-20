@@ -1,4 +1,7 @@
 2008-04-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+ 
+	* 24852: Src/zle_main.c (Jun T.), Src/Zle/zle_vi.c: more
+	combining chars fallout.
 
 	* users/12798: Etc/zsh-development-guide: passing NULL flags
 	to builtin definition.
