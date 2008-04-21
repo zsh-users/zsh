@@ -1,5 +1,8 @@
 2008-04-21  Peter Stephenson  <pws@csr.com>
 
+	* 24855: Src/Zle/zle_utils.c: tests for combining char aligments
+	should only be on metafied command line.
+
 	* unposted: Src/Zle/zle_move.c: missing assignment in new
 	backwardmetafiedchar().
 

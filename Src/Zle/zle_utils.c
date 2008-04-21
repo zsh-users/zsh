@@ -591,6 +591,7 @@ backkill(int ct, int flags)
 {
     int i;
 
+    UNMETACHECK();
     if (flags & CUT_RAW) {
 	i = (zlecs -= ct);
     } else {
@@ -611,6 +612,7 @@ forekill(int ct, int flags)
 {
     int i = zlecs;
 
+    UNMETACHECK();
     if (!(flags & CUT_RAW)) {
 	int n = ct;
 	while (n--)
@@ -633,6 +635,7 @@ backdel(int ct, int flags)
 	    shiftchars(zlemetacs -= ct, ct);
 	} else {
 	    shiftchars(zlecs -= ct, ct);
+	    CCRIGHT();
 	}
     } else {
 	int n = ct, origcs = zlecs;
@@ -640,8 +643,8 @@ backdel(int ct, int flags)
 	while (n--)
 	    DECCS();
 	shiftchars(zlecs, origcs - zlecs);
+	CCRIGHT();
     }
-    CCRIGHT();
 }
 
 /**/
@@ -653,6 +656,7 @@ foredel(int ct, int flags)
 	    shiftchars(zlemetacs, ct);
 	} else if (flags & CUT_RAW) {
 	    shiftchars(zlecs, ct);
+	    CCRIGHT();
 	}
     } else {
 	int origcs = zlecs;
@@ -663,8 +667,8 @@ foredel(int ct, int flags)
 	ct = zlecs - origcs;
 	zlecs = origcs;
 	shiftchars(zlecs, ct);
+	CCRIGHT();
     }
-    CCRIGHT();
 }
 
 /**/
@@ -672,7 +676,8 @@ void
 setline(char *s, int flags)
 {
     char *scp;
-	
+
+    UNMETACHECK();
     if (flags & ZSL_COPY)
 	scp = ztrdup(s);
     else
