@@ -441,7 +441,7 @@ vibackwardkillword(UNUSED(char **args))
 	    }
 	}
     }
-    backkill(zlecs - x, CUT_FRONT);
+    backkill(zlecs - x, CUT_FRONT|CUT_RAW);
     return 0;
 }
 
@@ -475,7 +475,7 @@ backwardkillword(char **args)
 	    x = pos;
 	}
     }
-    backkill(zlecs - x, CUT_FRONT);
+    backkill(zlecs - x, CUT_FRONT|CUT_RAW);
     return 0;
 }
 

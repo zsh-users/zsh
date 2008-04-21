@@ -498,18 +498,19 @@ int
 vireplacechars(UNUSED(char **args))
 {
     ZLE_INT_T ch;
-    int n = zmult, origcs = zlecs, fail = 0;
+    int n = zmult, fail = 0, newchars = 0;
 
     if (n > 0) {
+	int pos = zlecs;
 	while (n-- > 0) {
-	    if (zlecs == zlell || zleline[zlell] == ZWC('\n')) {
+	    if (pos == zlell || zleline[pos] == ZWC('\n')) {
 		fail = 1;
 		break;
 	    }
-	    INCCS();
+	    newchars++;
+	    INCPOS(pos);
 	}
-	n = zlecs - origcs;
-	zlecs = origcs;
+	n = pos - zlecs;
     }
     startvichange(1);
     /* check argument range */
@@ -535,8 +536,16 @@ vireplacechars(UNUSED(char **args))
 	backkill(n - 1, CUT_RAW);
 	zleline[zlecs++] = '\n';
     } else {
-	/* HERE: we shouldn't replace combining chars, we should delete them */
-	while (n--)
+	/*
+	 * Make sure we delete displayed characters, including
+	 * attach combining characters. n includes this as a raw
+	 * buffer offset.
+	 */
+	if (n > newchars)
+	    foredel(n - newchars, CUT_RAW);
+	else if (n < newchars)
+	    spaceinline(newchars - n);
+	while (newchars--)
 	    zleline[zlecs++] = ch;
 	zlecs--;
     }
@@ -792,14 +801,14 @@ viputafter(UNUSED(char **args))
 	vifirstnonblank(zlenoargs);
     } else {
 	if (zlecs != findeol())
-	    zlecs++;
+	    INCCS();
 	while (n--) {
 	    spaceinline(buf->len);
 	    ZS_memcpy(zleline + zlecs, buf->buf, buf->len);
 	    zlecs += buf->len;
 	}
 	if (zlecs)
-	    zlecs--;
+	    DECCS();
     }
     return 0;
 }

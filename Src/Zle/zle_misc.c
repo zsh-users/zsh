@@ -47,14 +47,27 @@ doinsert(ZLE_STRING_T zstr, int len)
     iremovesuffix(c1, 0);
     invalidatelist();
 
-    if(insmode)
+    if (insmode)
 	spaceinline(m * len);
-    else if(zlecs + m * len > zlell)
-	spaceinline(zlecs + m * len - zlell);
-    while(m--)
-	for(s = zstr, count = len; count; s++, count--)
+    else {
+	int pos = zlecs, count = m * len, i = count, diff;
+	/*
+	 * Ensure we replace a complete combining character
+	 * for each character we overwrite.
+	 */
+	while (pos < zlell && i--) {
+	    INCPOS(pos);
+	}
+	diff = pos - zlecs - count;
+	if (diff < 0) {
+	    spaceinline(-diff);
+	} else if (diff > 0)
+	    foredel(diff, CUT_RAW);
+    }
+    while (m--)
+	for (s = zstr, count = len; count; s++, count--)
 	    zleline[zlecs++] = *s;
-    if(neg)
+    if (neg)
 	zlecs += zmult * len;
     /* if we ended up on a combining character, skip over it */
     CCRIGHT();

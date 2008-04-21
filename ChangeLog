@@ -1,5 +1,9 @@
 2008-04-21  Peter Stephenson  <pws@csr.com>
 
+	* 24859: Src/Zle/zle_misc.c, Src/Zle/zle_vi.c, Src/Zle/zle_word.c:
+	overwriting combining characters and replacing them and appending
+	after them in vi mode.
+
 	* 24856: Src/utils.c, Src/zsh.h, Src/Zle/zle_move.c,
 	Src/Zle/zle_refresh.c: use IS_COMBINING() and IS_BASECHAR()
 	tests for combining characters.  Widen definitions of characters
