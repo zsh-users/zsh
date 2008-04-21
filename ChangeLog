@@ -1,5 +1,8 @@
 2008-04-21  Peter Stephenson  <pws@csr.com>
 
+	* 24860: Src/Zle/zle_misc.c, Src/Zle/zle_utils.c: better
+	overwrite mode.
+
 	* 24859: Src/Zle/zle_misc.c, Src/Zle/zle_vi.c, Src/Zle/zle_word.c:
 	overwriting combining characters and replacing them and appending
 	after them in vi mode.

@@ -50,19 +50,43 @@ doinsert(ZLE_STRING_T zstr, int len)
     if (insmode)
 	spaceinline(m * len);
     else {
-	int pos = zlecs, count = m * len, i = count, diff;
+	int pos = zlecs, diff, i;
+
+	/*
+	 * Calculate the number of character positions we are
+	 * going to be using.  The algorithm is that
+	 * anything that shows up as a logical single character
+	 * (i.e. even if control, or double width, or with combining
+	 * characters) is treated as 1 for the purpose of replacing
+	 * what's there already.
+	 */
+	for (i = 0, count = 0; i < len; i++) {
+	    int width = wcwidth(zstr[i]);
+	    count += (width != 0) ? 1 : 0;
+	}
 	/*
 	 * Ensure we replace a complete combining character
 	 * for each character we overwrite.
 	 */
-	while (pos < zlell && i--) {
+	for (i = count; pos < zlell && i--; ) {
 	    INCPOS(pos);
 	}
-	diff = pos - zlecs - count;
+	/*
+	 * Calculate how many raw line places we need.
+	 * pos - zlecs is the raw line distance we're replacing,
+	 * m * len the number we're inserting.
+	 */
+	diff = pos - zlecs - m * len;
 	if (diff < 0) {
 	    spaceinline(-diff);
-	} else if (diff > 0)
-	    foredel(diff, CUT_RAW);
+	} else if (diff > 0) {
+	    /*
+	     * We use shiftchars() here because we don't
+	     * want combining char alignment fixed up: we
+	     * are going to write over any that remain.
+	     */
+	    shiftchars(zlecs, diff);
+	}
     }
     while (m--)
 	for (s = zstr, count = len; count; s++, count--)

@@ -450,7 +450,7 @@ spaceinline(int ct)
 }
 
 /**/
-static void
+void
 shiftchars(int to, int cnt)
 {
     if (mark >= to + cnt)
