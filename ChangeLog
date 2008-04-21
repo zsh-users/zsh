@@ -1,5 +1,10 @@
 2008-04-21  Peter Stephenson  <pws@csr.com>
 
+	* 24856: Src/utils.c, Src/zsh.h, Src/Zle/zle_move.c,
+	Src/Zle/zle_refresh.c: use IS_COMBINING() and IS_BASECHAR()
+	tests for combining characters.  Widen definitions of characters
+	to least restrictive we think are likely to work.
+
 	* 24855: Src/Zle/zle_utils.c: tests for combining char aligments
 	should only be on metafied command line.
 

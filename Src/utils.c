@@ -3088,7 +3088,7 @@ wcsitype(wchar_t c, int itype)
 	     * logically they are still part of the word, even if they
 	     * don't get displayed properly, so always do this.
 	     */
-	    if (iswpunct(c) && wcwidth(c) == 0)
+	    if (IS_COMBINING(c))
 		return 1;
 	    return !!wmemchr(wordchars_wide.chars, c, wordchars_wide.len);
 

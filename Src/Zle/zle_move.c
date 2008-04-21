@@ -54,22 +54,20 @@ alignmultiwordleft(int *pos, int setpos)
     if (!isset(COMBININGCHARS) || loccs == zlell || loccs == 0)
 	return 0;
 
-    /* need to be on zero-width punctuation character */
-    if (!iswpunct(zleline[loccs]) || wcwidth(zleline[loccs]) != 0)
+    /* need to be on combining character */
+    if (!IS_COMBINING(zleline[loccs]))
 	 return 0;
 
     /* yes, go left */
     loccs--;
 
     for (;;) {
-	/* second test here is paranoia */
-	if (iswalnum(zleline[loccs]) && wcwidth(zleline[loccs]) > 0) {
+	if (IS_BASECHAR(zleline[loccs])) {
 	    /* found start position */
 	    if (setpos)
 		*pos = loccs;
 	    return 1;
-	} else if (!iswpunct(zleline[loccs]) ||
-		   wcwidth(zleline[loccs]) != 0) {
+	} else if (!IS_COMBINING(zleline[loccs])) {
 	    /* no go */
 	    return 0;
 	}
@@ -103,7 +101,7 @@ alignmultiwordright(int *pos, int setpos)
 
     while (loccs < zlell) {
 	/* Anything other than a combining char will do here */
-	if (!iswpunct(zleline[loccs]) || wcwidth(zleline[loccs]) != 0) {
+	if (!IS_COMBINING(zleline[loccs])) {
 	    if (setpos)
 		*pos = loccs;
 	    return 1;
@@ -221,16 +219,14 @@ backwardmetafiedchar(char *start, char *endptr, convchar_t *retchr)
 		    *retchr = wc;
 		return ptr;
 	    }
- 	    /* HERE: test for combining char, fix when test changes */
-	    if (!iswpunct(wc) || wcwidth(wc) != 0) {
+	    if (!IS_COMBINING(wc)) {
 		/* not a combining character... */
 		if (last) {
 		    /*
 		     * ... but we were looking for a suitable base character,
 		     * test it.
 		     */
-		    /* HERE this test will change too */
-		    if (iwsalnum(wc) && wcwidth(wc) > 0) {
+		    if (IS_BASECHAR(wc)) {
 			/*
 			 * Yes, this will do.
 			 */

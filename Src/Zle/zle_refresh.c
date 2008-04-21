@@ -1245,13 +1245,12 @@ zrefresh(void)
 		    rpms.nvcs = rpms.s - nbuf[rpms.nvln = rpms.ln];
 		}
 	    }
-	    if (isset(COMBININGCHARS) && iswalnum(*t)) {
+	    if (isset(COMBININGCHARS) && IS_BASECHAR(*t)) {
 		/*
-		 * Look for combining characters:  trailing punctuation
-		 * characters with printing width zero.
+		 * Look for combining characters.
 		 */
 		for (ichars = 1; tmppos + ichars < tmpll; ichars++) {
-		    if (!iswpunct(t[ichars]) || wcwidth(t[ichars]) != 0)
+		    if (!IS_COMBINING(t[ichars]))
 			break;
 		}
 	    } else
@@ -2267,9 +2266,8 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 #ifdef MULTIBYTE_SUPPORT
 	else if (iswprint(tmpline[t0]) && (width = wcwidth(tmpline[t0]) > 0)) {
 	    vsiz += width;
-	    if (isset(COMBININGCHARS) && iswalnum(tmpline[t0])) {
-		while (t0 < tmpll-1 && iswpunct(tmpline[t0+1]) &&
-		       wcwidth(tmpline[t0+1]) == 0)
+	    if (isset(COMBININGCHARS) && IS_BASECHAR(tmpline[t0])) {
+		while (t0 < tmpll-1 && IS_COMBINING(tmpline[t0+1]))
 		    t0++;
 	    }
 	}
@@ -2344,14 +2342,12 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	} else if (iswprint(tmpline[t0]) &&
 		   (width = wcwidth(tmpline[t0])) > 0) {
 	    int ichars;
-	    if (isset(COMBININGCHARS) && iswalnum(tmpline[t0])) {
+	    if (isset(COMBININGCHARS) && IS_BASECHAR(tmpline[t0])) {
 		/*
-		 * Look for combining characters:  trailing printable
-		 * characters with printing width zero.
+		 * Look for combining characters.
 		 */
 		for (ichars = 1; t0 + ichars < tmpll; ichars++) {
-		    if (!iswpunct(tmpline[t0+ichars]) ||
-			wcwidth(tmpline[t0+ichars]) != 0)
+		    if (!IS_COMBINING(tmpline[t0+ichars]))
 			break;
 		}
 	    } else

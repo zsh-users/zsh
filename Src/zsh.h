@@ -2281,7 +2281,34 @@ typedef wint_t convchar_t;
 #define ZWC(c)	L ## c
 #define ZWS(s)	L ## s
 
-#else
+/*
+ * Test for a combining character.
+ *
+ * wc is assumed to be a wchar_t (i.e. we don't need zwcwidth).
+ *
+ * This may need to be more careful if we import a wcwidth() for
+ * compatibility to try to avoid clashes with the system library.
+ *
+ * Pedantic note: in Unicode, a combining character need not be
+ * zero length.  However, we are concerned here about display;
+ * we simply need to know whether the character will be displayed
+ * on top of another one.  We use "combining character" in this
+ * sense throughout the shell.  I am not aware of a way of
+ * detecting the Unicode trait in standard libraries.
+ */
+#define IS_COMBINING(wc)	(wcwidth(wc) == 0)
+/*
+ * Test for the base of a combining character.
+ *
+ * We assume a combining character can be successfully displayed with
+ * any non-space printable character, which is what a graphic character
+ * is, as long as it has non-zero width.  We need to avoid all forms of
+ * space because the shell will split words on any whitespace.
+ */
+#define IS_BASECHAR(wc)		(iswgraph(wc) && wcwidth(wc) > 0)
+
+#else /* not MULTIBYTE_SUPPORT */
+
 #define MB_METACHARINIT()
 typedef int convchar_t;
 #define MB_METACHARLENCONV(str, cp)	metacharlenconv((str), (cp))
@@ -2296,4 +2323,4 @@ typedef int convchar_t;
 #define ZWC(c)	c
 #define ZWS(s)	s
 
-#endif
+#endif /* MULTIBYTE_SUPPORT */
