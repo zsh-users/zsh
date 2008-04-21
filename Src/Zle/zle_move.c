@@ -174,7 +174,7 @@ backwardmetafiedchar(char *start, char *endptr, convchar_t *retchr)
 #ifdef MULTIBYTE_SUPPORT
     int charlen = 0;
     char *last = NULL, *bufptr, *ptr = endptr;
-    convchar_t lastc;
+    convchar_t lastc = (convchar_t)0; /* not used, silence compiler */
     mbstate_t mbs;
     size_t ret;
     wchar_t wc;
@@ -247,11 +247,12 @@ backwardmetafiedchar(char *start, char *endptr, convchar_t *retchr)
 		/* This is the first character, so just return it. */
 		if (retchr)
 		    *retchr = wc;
-		return ptr;    
+		return ptr;
 	    }
 	    if (!last) {
 		/* still looking for the character immediately before ptr */
 		last = ptr;
+		lastc = wc;
 	    }
 	    /* searching for base character of combining character */
 	    charlen = 0;

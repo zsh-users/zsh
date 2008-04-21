@@ -1,3 +1,8 @@
+2008-04-21  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Src/Zle/zle_move.c: missing assignment in new
+	backwardmetafiedchar().
+
 2008-04-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24853: Src/utils.c, Src/zsh.h, Src/Zle/complist.c,
