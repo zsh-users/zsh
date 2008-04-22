@@ -1222,7 +1222,7 @@ zrefresh(void)
 	    }
 	}
 #ifdef MULTIBYTE_SUPPORT
-	else if (iswprint(*t) && (width = wcwidth(*t)) > 0) {
+	else if (iswprint(*t) && (width = WCWIDTH(*t)) > 0) {
 	    int ichars;
 	    if (width > rpms.sen - rpms.s) {
 		int started = 0;
@@ -1397,7 +1397,7 @@ zrefresh(void)
 	for (; u < outputline + outll; u++) {
 #ifdef MULTIBYTE_SUPPORT
 	    if (iswprint(*u)) {
-		int width = wcwidth(*u);
+		int width = WCWIDTH(*u);
 		/* Handle wide characters as above */
 		if (width > rpms.sen - rpms.s) {
 		    do {
@@ -2144,7 +2144,7 @@ tc_rightcurs(int ct)
    characters occupying more than one column.  We could flag that
    this has happened (since it's not that common to have characters
    wider than one column), but for now it's easier not to use the
-   trick if we are using wcwidth() on the prompt.  It's not that
+   trick if we are using WCWIDTH() on the prompt.  It's not that
    common to be editing in the middle of the prompt anyway, I would
    think.
    */
@@ -2264,7 +2264,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	if (tmpline[t0] == ZWC('\t'))
 	    vsiz = (vsiz | 7) + 2;
 #ifdef MULTIBYTE_SUPPORT
-	else if (iswprint(tmpline[t0]) && (width = wcwidth(tmpline[t0]) > 0)) {
+	else if (iswprint(tmpline[t0]) && (width = WCWIDTH(tmpline[t0]) > 0)) {
 	    vsiz += width;
 	    if (isset(COMBININGCHARS) && IS_BASECHAR(tmpline[t0])) {
 		while (t0 < tmpll-1 && IS_COMBINING(tmpline[t0+1]))
@@ -2340,7 +2340,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	    vp++;
 #ifdef MULTIBYTE_SUPPORT
 	} else if (iswprint(tmpline[t0]) &&
-		   (width = wcwidth(tmpline[t0])) > 0) {
+		   (width = WCWIDTH(tmpline[t0])) > 0) {
 	    int ichars;
 	    if (isset(COMBININGCHARS) && IS_BASECHAR(tmpline[t0])) {
 		/*

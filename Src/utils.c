@@ -548,7 +548,7 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
     }
 
     if (widthp) {
-	int wcw = wcwidth(c);
+	int wcw = WCWIDTH(c);
 	*widthp = (s - buf);
 	if (wcw >= 0)
 	    *widthp += wcw;
@@ -581,7 +581,7 @@ zwcwidth(wint_t wc)
     /* assume a single-byte character if not valid */
     if (wc == WEOF || unset(MULTIBYTE))
 	return 1;
-    wcw = wcwidth(wc);
+    wcw = WCWIDTH(wc);
     /* if not printable, assume width 1 */
     if (wcw < 0)
 	return 1;
@@ -4097,7 +4097,7 @@ mb_metastrlen(char *ptr, int width)
 		 * Returns -1 if not a printable character.  We
 		 * turn this into 1 for backward compatibility.
 		 */
-		int wcw = wcwidth(wc);
+		int wcw = WCWIDTH(wc);
 		if (wcw >= 0)
 		    num += wcw;
 		else

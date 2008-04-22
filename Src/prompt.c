@@ -960,10 +960,10 @@ countprompt(char *str, int *wp, int *hp, int overf)
 		break;
 	    default:
 		/*
-		 * If the character isn't printable, wcwidth() returns
+		 * If the character isn't printable, WCWIDTH() returns
 		 * -1.  We assume width 1.
 		 */
-		wcw = wcwidth(wc);
+		wcw = WCWIDTH(wc);
 		if (wcw >= 0)
 		    w += wcw;
 		else
@@ -1177,7 +1177,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 				remw--;
 				break;
 			    default:
-				wcw = wcwidth(cc);
+				wcw = WCWIDTH(cc);
 				if (wcw >= 0)
 				    remw -= wcw;
 				else
@@ -1249,7 +1249,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 				maxwidth--;
 				break;
 			    default:
-				wcw = wcwidth(cc);
+				wcw = WCWIDTH(cc);
 				if (wcw >= 0)
 				    maxwidth -= wcw;
 				else

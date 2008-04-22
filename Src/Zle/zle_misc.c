@@ -59,10 +59,16 @@ doinsert(ZLE_STRING_T zstr, int len)
 	 * (i.e. even if control, or double width, or with combining
 	 * characters) is treated as 1 for the purpose of replacing
 	 * what's there already.
+	 *
+	 * This can cause inserting of a combining character in
+	 * places where it should overwrite, such as the start
+	 * of a line.  However, combining characters aren't
+	 * useful there anyway and this doesn't cause any
+	 * particular harm.
 	 */
 	for (i = 0, count = 0; i < len; i++) {
-	    int width = wcwidth(zstr[i]);
-	    count += (width != 0) ? 1 : 0;
+	    if (!IS_COMBINING(zstr[i]))
+		count++;
 	}
 	/*
 	 * Ensure we replace a complete combining character

@@ -2266,8 +2266,63 @@ wmemcpy wmemmove wmemset; do
 ])
 AH_TEMPLATE([MULTIBYTE_SUPPORT],
 [Define to 1 if you want support for multibyte character sets.])
+AH_TEMPLATE([BROKEN_WCWIDTH],
+[Define to 1 if the wcwidth() function is present but broken.])
 if test x$zsh_cv_c_unicode_support = xyes; then
   AC_DEFINE(MULTIBYTE_SUPPORT)
+
+  dnl Test for a wcwidth() implementation that gives the wrong width for
+  dnl zero-width combining characters.
+  dnl For the test we use a combining acute accent (\u0301).
+  dnl We input it as UTF-8 since that is the standard we can rely
+  dnl upon most:  we can't rely on a wchar_t being stored as a
+  dnl Unicode code point on all systems.
+  dnl The programme returns 0 only if all the conditions for brokenness
+  dnl are met:
+  dnl - the programme compiled, linked and ran
+  dnl - we successfully set a UTF-8 locale
+  dnl - the locale we set plausibly converted the UTF-8 string
+  dnl   for a zero-width combining character (the only way to be
+  dnl   100% sure would be to output it and ask if it looked right)
+  dnl - the converted wide character gave a non-zero width.
+  dnl locale -a is a fallback; on most systems we should find en_US.UTF-8.
+  [locale_prog='char *my_locales[] = {
+  "en_US.UTF-8", "en_GB.UTF-8", "en.UTF-8", '
+  locale_prog="$locale_prog"`locale -a 2>/dev/null | \
+    sed -e 's/utf8/UTF-8/' | grep UTF-8 | \
+    while read line; do echo " \"$line\","; done;`
+  locale_prog="$locale_prog 0 };
+  #define _XOPEN_SOURCE
+  #include <stdlib.h>
+  #include <locale.h>
+  #include <wchar.h>
+
+  int main() {
+    char **localep;
+    char comb_acute_mb[] = { (char)0xcc, (char)0x81 };
+    wchar_t wc;
+
+    for (localep = my_locales; *localep; localep++)
+      if (setlocale(LC_ALL, *localep) &&
+          mbtowc(&wc, comb_acute_mb, 2) == 2)
+	  break;
+    if (!*localep)
+      return 1;
+    if (wcwidth(wc) == 0)
+      return 1;
+    return 0;
+  }
+  "]
+
+  AC_CACHE_CHECK(if the wcwidth() function is broken,
+  zsh_cv_c_broken_wcwidth,
+  [AC_TRY_RUN([$locale_prog],
+  zsh_cv_c_broken_wcwidth=yes,
+  zsh_cv_c_broken_wcwidth=no,
+  zsh_cv_c_broken_wcwidth=no)])
+  if test x$zsh_cv_c_broken_wcwdith = xyes; then
+    AC_DEFINE(BROKEN_WCWIDTH)
+  fi
 fi
 
 dnl

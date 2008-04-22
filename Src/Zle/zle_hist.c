@@ -1045,6 +1045,7 @@ doisearch(char **args, int dir)
 		free(last_line);
 	    last_line = ztrdup(zt.text);
 
+	    sbuf[sbptr] = '\0';
 	    for (;;) {
 		char *t;
 
@@ -1076,7 +1077,6 @@ doisearch(char **args, int dir)
 		 * First search for a(nother) match within the
 		 * current line, unless we've been told to skip it.
 		 */
-		sbuf[sbptr] = '\0';
 		if (!skip_line && ((sbuf[0] == '^') ?
 				   (t = (zlinecmp(zt.text, sbuf + 1) < sens
 					 ? zt.text : NULL)) :

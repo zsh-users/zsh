@@ -2256,12 +2256,21 @@ typedef wint_t convchar_t;
 #define MB_METASTRWIDTH(str)	mb_metastrlen(str, 1)
 #define MB_METASTRLEN2(str, widthp)	mb_metastrlen(str, widthp)
 
+#ifdef BROKEN_WCWIDTH
+#define WCWIDTH(wc)	wcwidth_mk(wc)
+#else
+#define WCWIDTH(wc)	wcwidth(wc)
+#endif
 /*
- * Note WCWIDTH() takes wint_t, typically as a convchar_t.
+ * Note WCWIDTH_WINT() takes wint_t, typically as a convchar_t.
  * It's written to use the wint_t from mb_metacharlenconv() without
  * further tests.
+ *
+ * This version has a non-multibyte definition that simply returns
+ * 1.  We never expose WCWIDTH() in the non-multibyte world since
+ * it's just a proxy for wcwidth() itself.
  */
-#define WCWIDTH(wc)	zwcwidth(wc)
+#define WCWIDTH_WINT(wc)	zwcwidth(wc)
 
 #define MB_INCOMPLETE	((size_t)-2)
 #define MB_INVALID	((size_t)-1)
@@ -2286,9 +2295,6 @@ typedef wint_t convchar_t;
  *
  * wc is assumed to be a wchar_t (i.e. we don't need zwcwidth).
  *
- * This may need to be more careful if we import a wcwidth() for
- * compatibility to try to avoid clashes with the system library.
- *
  * Pedantic note: in Unicode, a combining character need not be
  * zero length.  However, we are concerned here about display;
  * we simply need to know whether the character will be displayed
@@ -2296,7 +2302,15 @@ typedef wint_t convchar_t;
  * sense throughout the shell.  I am not aware of a way of
  * detecting the Unicode trait in standard libraries.
  */
-#define IS_COMBINING(wc)	(wcwidth(wc) == 0)
+#ifdef BROKEN_WCWIDTH
+/*
+ * We can't be quite sure the wcwidth we've provided is entirely
+ * in agreement with the system's, so be extra safe.
+ */
+#define IS_COMBINING(wc)	(WCWIDTH(wc) == 0 && !iswcntrl(wc))
+#else
+#define IS_COMBINING(wc)	(WCWIDTH(wc) == 0)
+#endif
 /*
  * Test for the base of a combining character.
  *
@@ -2305,7 +2319,7 @@ typedef wint_t convchar_t;
  * is, as long as it has non-zero width.  We need to avoid all forms of
  * space because the shell will split words on any whitespace.
  */
-#define IS_BASECHAR(wc)		(iswgraph(wc) && wcwidth(wc) > 0)
+#define IS_BASECHAR(wc)		(iswgraph(wc) && WCWIDTH(wc) > 0)
 
 #else /* not MULTIBYTE_SUPPORT */
 
@@ -2317,7 +2331,7 @@ typedef int convchar_t;
 #define MB_METASTRWIDTH(str)	ztrlen(str)
 #define MB_METASTRLEN2(str, widthp)	ztrlen(str)
 
-#define WCWIDTH(c)	(1)
+#define WCWIDTH_WINT(c)	(1)
 
 /* Leave character or string as is. */
 #define ZWC(c)	c

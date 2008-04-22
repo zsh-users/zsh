@@ -1017,7 +1017,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	}
 	else
 #endif
-	    width = WCWIDTH(cchar);
+	    width = WCWIDTH_WINT(cchar);
 
 	if (doesc && cchar == ZWC('%')) {
 	    p += len;

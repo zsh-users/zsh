@@ -3668,7 +3668,7 @@ bin_print(char *name, char **args, Options ops, int func)
 			width += l;
 			break;
 		    }
-		    wcw = wcwidth(wc);
+		    wcw = WCWIDTH(wc);
 		    /* treat unprintable as 0 */
 		    if (wcw > 0)
 			width += wcw;

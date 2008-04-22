@@ -2375,7 +2375,7 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		    }
 		} else
 		    p += clen;
-		cc += WCWIDTH(cchar);
+		cc += WCWIDTH_WINT(cchar);
 		if (dopr && !(cc % columns))
 			fputs(" \010", shout);
 	    }

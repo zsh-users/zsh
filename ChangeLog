@@ -1,3 +1,12 @@
+2008-04-22  Peter Stephenson  <pws@csr.com>
+
+	* 24861: configure.ac, Src/builtin.c, Src/compat.c, Src/prompt.c,
+	Src/utils.c, Src/zsh.h, Src/zle/complist.c, Src/Zle/zle_misc.c
+	(slightly rewritten), Src/zle/zle_refresh.c, Src/Zle/zle_tricky.c:
+	use alternative wcwidth() if configure suggests the library
+	version is returning non-zero when it shouldn't; also improve the
+	overwriting test for combining characters.
+
 2008-04-21  Peter Stephenson  <pws@csr.com>
 
 	* 24860: Src/Zle/zle_misc.c, Src/Zle/zle_utils.c: better
