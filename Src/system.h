@@ -53,7 +53,12 @@
 #endif
 
 #if defined(ZSH_CURSES_SOURCE) && defined(ZSH_CURSES_NEEDS_XOPEN)
-#define _XOPEN_SOURCE_EXTENDED 1
+# define _XOPEN_SOURCE_EXTENDED 1
+#else
+# ifdef MULTIBYTE_SUPPORT
+/* Needed for wcwidth() which is part of XSI */
+#  define _XOPEN_SOURCE 1
+# endif
 #endif
 
 /*

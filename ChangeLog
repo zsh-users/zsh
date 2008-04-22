@@ -1,5 +1,8 @@
 2008-04-22  Peter Stephenson  <pws@csr.com>
 
+	* 24862: Src/system.h: #define _XOPEN_SOURCE if needed to
+	get wcwidth().
+
 	* 24861: configure.ac, Src/builtin.c, Src/compat.c, Src/prompt.c,
 	Src/utils.c, Src/zsh.h, Src/zle/complist.c, Src/Zle/zle_misc.c
 	(slightly rewritten), Src/zle/zle_refresh.c, Src/Zle/zle_tricky.c:
