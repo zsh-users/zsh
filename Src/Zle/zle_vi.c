@@ -540,9 +540,11 @@ vireplacechars(UNUSED(char **args))
 	 * Make sure we delete displayed characters, including
 	 * attach combining characters. n includes this as a raw
 	 * buffer offset.
+	 * Use shiftchars so as not to adjust the cursor position;
+	 * we are overwriting anything that remains directly.
 	 */
 	if (n > newchars)
-	    foredel(n - newchars, CUT_RAW);
+	    shiftchars(zlecs, n - newchars);
 	else if (n < newchars)
 	    spaceinline(newchars - n);
 	while (newchars--)
