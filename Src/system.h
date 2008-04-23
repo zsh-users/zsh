@@ -56,8 +56,13 @@
 # define _XOPEN_SOURCE_EXTENDED 1
 #else
 # ifdef MULTIBYTE_SUPPORT
-/* Needed for wcwidth() which is part of XSI */
-#  define _XOPEN_SOURCE 1
+/*
+ * Needed for wcwidth() which is part of XSI.
+ * Various other uses of the interface mean we can't get away with just
+ * _XOPEN_SOURCE.
+ */
+/*#  define _XOPEN_SOURCE 1*/
+#  define _XOPEN_SOURCE_EXTENDED 1
 # endif
 #endif
 

@@ -1,5 +1,8 @@
 2008-04-23  Peter Stephenson  <pws@csr.com>
 
+	* 24867: Src/system.h: looks like we need _XOPEN_SOURCE_EXTENDED
+	instead of just _XOPEN_SOURCE.
+
 	* 24865: Src/zle_vi.c: bad character adjustment in
 	vireplacechars().
 
