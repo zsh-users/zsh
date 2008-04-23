@@ -1,3 +1,8 @@
+2008-04-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Src/Zle/zle_misc.c: overwrite mode without
+	MULTIBYTE_SUPPORT should be as before.
+
 2008-04-23  Peter Stephenson  <pws@csr.com>
 
 	* 24867: Src/system.h: looks like we need _XOPEN_SOURCE_EXTENDED

@@ -49,7 +49,9 @@ doinsert(ZLE_STRING_T zstr, int len)
 
     if (insmode)
 	spaceinline(m * len);
-    else {
+    else
+#ifdef MULTIBYTE_SUPPORT
+    {
 	int pos = zlecs, diff, i;
 
 	/*
@@ -94,6 +96,10 @@ doinsert(ZLE_STRING_T zstr, int len)
 	    shiftchars(zlecs, diff);
 	}
     }
+#else
+    if (zlecs + m * len > zlell)
+	spaceinline(zlecs + m * len - zlell);
+#endif
     while (m--)
 	for (s = zstr, count = len; count; s++, count--)
 	    zleline[zlecs++] = *s;
