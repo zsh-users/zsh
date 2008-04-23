@@ -2320,7 +2320,7 @@ if test x$zsh_cv_c_unicode_support = xyes; then
   zsh_cv_c_broken_wcwidth=yes,
   zsh_cv_c_broken_wcwidth=no,
   zsh_cv_c_broken_wcwidth=no)])
-  if test x$zsh_cv_c_broken_wcwdith = xyes; then
+  if test x$zsh_cv_c_broken_wcwidth = xyes; then
     AC_DEFINE(BROKEN_WCWIDTH)
   fi
 fi

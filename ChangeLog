@@ -1,3 +1,7 @@
+2008-04-23  Peter Stephenson  <pws@csr.com>
+
+	* 24864: Jun T.: configure.ac, Src/zsh.h: typos in 24861.
+
 2008-04-22  Peter Stephenson  <pws@csr.com>
 
 	* 24862: Src/system.h: #define _XOPEN_SOURCE if needed to

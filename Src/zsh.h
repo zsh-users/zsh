@@ -2257,7 +2257,7 @@ typedef wint_t convchar_t;
 #define MB_METASTRLEN2(str, widthp)	mb_metastrlen(str, widthp)
 
 #ifdef BROKEN_WCWIDTH
-#define WCWIDTH(wc)	wcwidth_mk(wc)
+#define WCWIDTH(wc)	mk_wcwidth(wc)
 #else
 #define WCWIDTH(wc)	wcwidth(wc)
 #endif
