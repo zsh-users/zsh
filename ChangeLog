@@ -1,3 +1,9 @@
+2008-04-24  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Jun T.: Src/Zle/zle_utils.c: backkill() in raw
+	mode didn't correctly calculate the number of characters to
+	kill.
+
 2008-04-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Src/Zle/zle_misc.c: overwrite mode without

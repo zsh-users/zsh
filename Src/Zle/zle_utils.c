@@ -589,20 +589,18 @@ cuttext(ZLE_STRING_T line, int ct, int flags)
 mod_export void
 backkill(int ct, int flags)
 {
-    int i;
-
     UNMETACHECK();
     if (flags & CUT_RAW) {
-	i = (zlecs -= ct);
+	zlecs -= ct;
     } else {
-	int n = ct;
-	while (n--)
+	int origcs = zlecs;
+	while (ct--)
 	    DECCS();
-	i = zlecs;
+	ct = origcs - zlecs;
     }
 
-    cut(i, ct, flags);
-    shiftchars(i, ct);
+    cut(zlecs, ct, flags);
+    shiftchars(zlecs, ct);
     CCRIGHT();
 }
 
