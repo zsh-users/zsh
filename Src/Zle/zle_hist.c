@@ -1179,8 +1179,10 @@ doisearch(char **args, int dir, int pattern)
 		if (patprog) {
 		    revert_patpos = 1;
 		} else {
-		    handlefeep(zlenoargs);
-		    nomatch = 2;
+		    if (nomatch != 2) {
+			handlefeep(zlenoargs);
+			nomatch = 2;
+		    }
 		    /* indicate "invalid" in status line */
 		    memcpy(ibuf, INVALID_TEXT, BAD_TEXT_LEN);
 		    statusline = ibuf;

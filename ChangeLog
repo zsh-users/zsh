@@ -1,5 +1,8 @@
 2008-04-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24881: Src/Zle/zle_hist.c: we kept feeping on an invalid
+	pattern; once is quite enough.
+
 	* 24880: Src/Zle/zle_hist.c: feeping on a failed match could
 	be mistimed.
 
