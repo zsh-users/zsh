@@ -1074,6 +1074,14 @@ doisearch(char **args, int dir, int pattern)
      */
     int revert_patpos = 0;
     /*
+     * Another nasty feature related to the above.  When
+     * we revert the position, we might advance the search to
+     * the same line again.  When we do this the test for ignoring
+     * duplicates may trigger.  This flag indicates that in this
+     * case it's OK.
+     */
+    int dup_ok = 0;
+    /*
      * savekeys records the unget buffer, so that if we have arguments
      * they don't pollute the input.
      * feep indicates we should feep.  This is a well-known word
@@ -1219,6 +1227,7 @@ doisearch(char **args, int dir, int pattern)
 				     * search started; see note above.
 				     */
 				    revert_patpos = 0;
+				    dup_ok = 1;
 				    he = quietgethist(hl = pat_hl);
 				    zt = GETZLETEXT(he);
 				    pos = pat_pos;
@@ -1322,10 +1331,14 @@ doisearch(char **args, int dir, int pattern)
 		hl = he->histnum;
 		zt = GETZLETEXT(he);
 		pos = (dir == 1) ? 0 : strlen(zt);
-		skip_line = isset(HISTFINDNODUPS)
-		    ? !!(he->node.flags & HIST_DUP)
-		    : !strcmp(zt, last_line);
+		if (dup_ok)
+		    skip_line = 0;
+		else
+		    skip_line = isset(HISTFINDNODUPS)
+			? !!(he->node.flags & HIST_DUP)
+			: !strcmp(zt, last_line);
 	    }
+	    dup_ok = 0;
 	    /*
 	     * If we matched above (t set), set the new line.
 	     * If we didn't, but are here because we are on a previous
