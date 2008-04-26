@@ -334,6 +334,19 @@ fi],
 [AC_DEFINE(MAX_FUNCTION_DEPTH, 1000)]
 )
 
+ifdef([default_readnullcmd],[undefine([default_readnullcmd])])dnl
+AH_TEMPLATE([DEFAULT_READNULLCMD],
+[Define default pager used by readnullcmd])
+AC_ARG_ENABLE(readnullcmd,
+AC_HELP_STRING([--enable-readnullcmd=PAGER], [pager used when READNULLCMD is not set]),
+[if test x$enableval = xyes; then
+  AC_DEFINE(DEFAULT_READNULLCMD,"more")
+elif test x$enableval != xno; then
+  AC_DEFINE_UNQUOTED(DEFAULT_READNULLCMD,"$enableval")
+fi],
+[AC_DEFINE(DEFAULT_READNULLCMD,"more")]
+)
+
 dnl Do you want to look for pcre support?
 AC_ARG_ENABLE(pcre,
 AC_HELP_STRING([--enable-pcre],

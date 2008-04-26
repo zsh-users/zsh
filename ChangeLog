@@ -1,3 +1,8 @@
+2008-04-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24869: Marc Chantreux: configure.ac, Src/init.c: make default
+	readnullcmd configurable.
+
 2008-04-24  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Jun T.: Src/Zle/zle_utils.c: backkill() in raw

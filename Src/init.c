@@ -806,7 +806,7 @@ setupvals(void)
     term  = ztrdup("");
 
     nullcmd     = ztrdup("cat");
-    readnullcmd = ztrdup("more");
+    readnullcmd = ztrdup(DEFAULT_READNULLCMD);
 
     /* We cache the uid so we know when to *
      * recheck the info for `USERNAME'     */
