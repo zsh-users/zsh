@@ -242,8 +242,15 @@ struct region_highlight {
  */
 struct region_highlight *region_highlights;
 /*
+ * Count of special uses of region highlighting, which account
+ * for the first few elements of region_highlights.
+ * 0: region between point and mark
+ * 1: isearch region
+ */
+#define N_SPECIAL_HIGHLIGHTS	(2)
+/*
  * Number of elements in region_highlights.
- * This includes the region between point and mark, element 0.
+ * This includes the special elements above.
  */
 int n_region_highlights;
 
@@ -380,12 +387,14 @@ void zle_set_highlight(void)
     char **atrs = getaparam("zle_highlight");
     int special_atr_on_set = 0;
     int region_atr_on_set = 0;
+    int isearch_atr_on_set = 0;
+    struct region_highlight *rhp;
 
     special_atr_on = 0;
     if (!region_highlights) {
 	region_highlights = (struct region_highlight *)
-	    zshcalloc(sizeof(struct region_highlight));
-	n_region_highlights = 1;
+	    zshcalloc(N_SPECIAL_HIGHLIGHTS*sizeof(struct region_highlight));
+	n_region_highlights = N_SPECIAL_HIGHLIGHTS;
     } else {
 	region_highlights->atr = 0;
     }
@@ -394,14 +403,23 @@ void zle_set_highlight(void)
 	for (; *atrs; atrs++) {
 	    if (!strcmp(*atrs, "none")) {
 		/* reset attributes for consistency... usually unnecessary */
-		special_atr_on = region_highlights->atr = 0;
-		special_atr_on_set = region_atr_on_set = 1;
+		special_atr_on = 0;
+		special_atr_on_set = region_atr_on_set =
+		    isearch_atr_on_set = 1;
+		for (rhp = region_highlights;
+		     rhp < region_highlights + N_SPECIAL_HIGHLIGHTS;
+		     rhp++) {
+		    rhp->atr = 0;
+		}
 	    } else if (strpfx("special:", *atrs)) {
 		match_highlight(*atrs + 8, &special_atr_on);
 		special_atr_on_set = 1;
 	    } else if (strpfx("region:", *atrs)) {
 		match_highlight(*atrs + 7, &region_highlights->atr);
 		region_atr_on_set = 1;
+	    } else if (strpfx("isearch:", *atrs)) {
+		match_highlight(*atrs + 8, &(region_highlights[1].atr));
+		isearch_atr_on_set = 1;
 	    }
 	}
     }
@@ -411,6 +429,8 @@ void zle_set_highlight(void)
 	special_atr_on = TXTSTANDOUT;
     if (!region_atr_on_set)
 	region_highlights->atr = TXTSTANDOUT;
+    if (!isearch_atr_on_set)
+	region_highlights[1].atr = TXTUNDERLINE;
     special_atr_off = special_atr_on << TXT_ATTR_OFF_ON_SHIFT;
 }
 
@@ -432,15 +452,17 @@ get_region_highlight(UNUSED(Param pm))
 
     /* region_highlights may not have been set yet */
     if (!arrsize)
-	arrsize = 1;
+	arrsize = N_SPECIAL_HIGHLIGHTS;
     arrp = retarr = (char **)zhalloc(arrsize*sizeof(char *));
     /* ignore NULL termination */
     arrsize--;
     if (arrsize) {
 	struct region_highlight *rhp;
 
-	/* ignore point/mark at start */
-	for (rhp = region_highlights+1; arrsize--; rhp++, arrp++) {
+	/* ignore special highlighting */
+	for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+	     arrsize--;
+	     rhp++, arrp++) {
 	    char digbuf1[DIGBUFSIZE], digbuf2[DIGBUFSIZE];
 	    int atrlen = 0, alloclen, done1;
 	    const struct highlight *hp;
@@ -503,9 +525,9 @@ set_region_highlight(UNUSED(Param pm), char **aval)
     struct region_highlight *rhp;
 
     len = aval ? arrlen(aval) : 0;
-    if (n_region_highlights != len + 1) {
-	/* no null termination, but include point/mark region at start */
-	n_region_highlights = len + 1;
+    if (n_region_highlights != len + N_SPECIAL_HIGHLIGHTS) {
+	/* no null termination, but include special highlighting at start */
+	n_region_highlights = len + N_SPECIAL_HIGHLIGHTS;
 	region_highlights = (struct region_highlight *)
 	    zrealloc(region_highlights,
 		     sizeof(struct region_highlight) * n_region_highlights);
@@ -514,7 +536,9 @@ set_region_highlight(UNUSED(Param pm), char **aval)
     if (!aval)
 	return;
 
-    for (rhp = region_highlights + 1; *aval; rhp++, aval++) {
+    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+	 *aval;
+	 rhp++, aval++) {
 	char *strp, *oldstrp;
 
 	oldstrp = *aval;
@@ -1049,6 +1073,13 @@ zrefresh(void)
 	}
     } else {
 	region_highlights->start = region_highlights->end = -1;
+    }
+    /* check for isearch string to highlight */
+    if (isearch_active) {
+	region_highlights[1].start = isearch_startpos;
+	region_highlights[1].end = isearch_endpos;
+    } else {
+	region_highlights[1].start = region_highlights[1].end = -1;
     }
 
     if (clearlist && listshown > 0) {

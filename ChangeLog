@@ -1,5 +1,11 @@
 2008-04-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: NEWS: note that COMBINING_CHARS is not on by
+	default.
+
+	* 24882: Doc/Zsh/zle.yo, Src/Zle/zle_hist.c, Src/Zle/zle_refresh.c:
+	highlighting of incremental search match.
+
 	* unposted because everyone's seen enough of my mistakes:
 	Src/pattern.c, Src/Zle/zle_hist.c: with pattern matching the
 	end position of the match wasn't calculated; we used the

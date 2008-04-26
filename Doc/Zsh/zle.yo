@@ -2064,6 +2064,10 @@ The contexts available for highlighting are the following:
 startitem()
 cindex(region, highlighting)
 cindex(highlighting, region)
+item(tt(isearch))(
+When one of the incremental history search widgets is active, the
+area of the command line matched by the search string or pattern.
+)
 item(tt(region))(
 The region between the cursor (point) and the mark as set with
 tt(set-mark-command).  The region is only highlighted if it is active,
@@ -2102,7 +2106,7 @@ mode.  The actual effect is specific to the terminal; on many terminals it
 is inverse video.  On some such terminals, where the cursor does not blink
 it appears with standout mode negated, making it less than clear where
 the cursor actually is.  On such terminals one of the other effects
-may be preferable for highlighting the region.
+may be preferable for highlighting the region and matched search string.
 )
 item(tt(underline))(
 The characters in the given context are shown underlined.  Some
@@ -2133,7 +2137,8 @@ enditem()
 If tt(zle_highlight) is not set or no value applies to a particular
 context, the defaults applied are equivalent to
 
-example(zle_highlight=LPAR()region:standout special:standout+RPAR())
+example(zle_highlight=LPAR()region:standout special:standout
+isearch:underline+RPAR())
 
 i.e. both the region and special characters are shown in standout mode.
 

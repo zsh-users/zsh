@@ -10,7 +10,8 @@ Major changes between versions 4.3.6 and 4.3.7
 The option COMBINING_CHARS has been added.  When it is set, the
 line editor assumes the terminal is capable of displaying zero-width
 combining characters (typically accents) correctly as modifications
-to the base character, and will act accordingly.
+to the base character, and will act accordingly.  Note it is not set
+by default owing to vagaries of terminals.
 
 The option HIST_FCNTL_LOCK has been added to provide locking of history
 files using the system call fcntl().  On recent NFS implementations this

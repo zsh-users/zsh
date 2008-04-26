@@ -907,6 +907,7 @@ static struct isrch_spot {
     int pat_hl;			/* histline where pattern search started */
     unsigned short pos;		/* The search position in our metafied str */
     unsigned short pat_pos;     /* pos where pattern search started */
+    unsigned short end_pos;	/* The position of the end of the matched str */
     unsigned short cs;		/* The visible search position to the user */
     unsigned short len;		/* The search string's length */
     unsigned short flags;	/* This spot's flags */
@@ -928,7 +929,7 @@ free_isrch_spots(void)
 /**/
 static void
 set_isrch_spot(int num, int hl, int pos, int pat_hl, int pat_pos,
-	       int cs, int len, int dir, int nomatch)
+	       int end_pos, int cs, int len, int dir, int nomatch)
 {
     if (num >= max_spot) {
 	if (!isrch_spots) {
@@ -944,6 +945,7 @@ set_isrch_spot(int num, int hl, int pos, int pat_hl, int pat_pos,
     isrch_spots[num].pos = (unsigned short)pos;
     isrch_spots[num].pat_hl = pat_hl;
     isrch_spots[num].pat_pos = (unsigned short)pat_pos;
+    isrch_spots[num].end_pos = (unsigned short)end_pos;
     isrch_spots[num].cs = (unsigned short)cs;
     isrch_spots[num].len = (unsigned short)len;
     isrch_spots[num].flags = (dir > 0? ISS_FORWARD : 0)
@@ -953,12 +955,13 @@ set_isrch_spot(int num, int hl, int pos, int pat_hl, int pat_pos,
 /**/
 static void
 get_isrch_spot(int num, int *hlp, int *posp, int *pat_hlp, int *pat_posp,
-	       int *csp, int *lenp, int *dirp, int *nomatch)
+	       int *end_posp, int *csp, int *lenp, int *dirp, int *nomatch)
 {
     *hlp = isrch_spots[num].hl;
     *posp = (int)isrch_spots[num].pos;
     *pat_hlp = isrch_spots[num].pat_hl;
     *pat_posp = (int)isrch_spots[num].pat_pos;
+    *end_posp = (int)isrch_spots[num].end_pos;
     *csp = (int)isrch_spots[num].cs;
     *lenp = (int)isrch_spots[num].len;
     *dirp = (isrch_spots[num].flags & ISS_FORWARD)? 1 : -1;
@@ -1009,6 +1012,9 @@ isearch_newpos(LinkList matchlist, int curpos, int dir,
 #define BAD_TEXT_LEN		7
 #define NORM_PROMPT_POS		(BAD_TEXT_LEN+1)
 #define FIRST_SEARCH_CHAR	(NORM_PROMPT_POS + 14)
+
+/**/
+int isearch_active, isearch_startpos, isearch_endpos;
 
 /**/
 static void
@@ -1088,6 +1094,12 @@ doisearch(char **args, int dir, int pattern)
      */
     int dup_ok = 0;
     /*
+     * End position of the match.
+     * When forward matching, this is the position for the cursor.
+     * When backward matching, the cursor position is pos.
+     */
+    int end_pos = 0;
+    /*
      * savekeys records the unget buffer, so that if we have arguments
      * they don't pollute the input.
      * feep indicates we should feep.  This is a well-known word
@@ -1138,7 +1150,7 @@ doisearch(char **args, int dir, int pattern)
     pat_pos = pos = zlemetacs;
     for (;;) {
 	/* Remember the current values in case search fails (doesn't push). */
-	set_isrch_spot(top_spot, hl, pos, pat_hl, pat_pos,
+	set_isrch_spot(top_spot, hl, pos, pat_hl, pat_pos, end_pos,
 		       zlemetacs, sbptr, dir, nomatch);
 	if (sbptr == 1 && sbuf[0] == '^') {
 	    zlemetacs = 0;
@@ -1147,11 +1159,6 @@ doisearch(char **args, int dir, int pattern)
 	} else if (sbptr > 0) {
 	    /* The matched text, used as flag that we matched */
 	    char *t = NULL;
-	    /*
-	     * When forward matching, position for the cursor.
-	     * When backward matching, the position is pos.
-	     */
-	    int forwardmatchpos = 0;
 	    last_line = zt;
 
 	    sbuf[sbptr] = '\0';
@@ -1233,7 +1240,7 @@ doisearch(char **args, int dir, int pattern)
 			     */
 			    if (!skip_pos &&
 				pattryrefs(patprog, zt, -1, -1, 0, NULL, NULL,
-					   &forwardmatchpos))
+					   &end_pos))
 				t = zt;
 			} else {
 			    if (!matchlist && !skip_pos) {
@@ -1268,7 +1275,7 @@ doisearch(char **args, int dir, int pattern)
 					newpos = pos + 1;
 				}
 				newpos = isearch_newpos(matchlist, newpos,
-							dir, &forwardmatchpos);
+							dir, &end_pos);
 				/* need a new list next time if off the end */
 				if (newpos < 0) {
 				    freematchlist(matchlist);
@@ -1316,7 +1323,7 @@ doisearch(char **args, int dir, int pattern)
 			} else
 			    t = zlinefind(zt, pos, sbuf, dir, sens);
 			if (t)
-			    forwardmatchpos = pos + sbptr - (sbuf[0] == '^');
+			    end_pos = pos + sbptr - (sbuf[0] == '^');
 		    }
 		}
 		if (t) {
@@ -1333,7 +1340,8 @@ doisearch(char **args, int dir, int pattern)
 		     && (isrch_spots[top_spot-1].flags >> ISS_NOMATCH_SHIFT))
 			top_spot--;
 		    get_isrch_spot(top_spot, &hl, &pos, &pat_hl, &pat_pos,
-				   &zlemetacs, &sbptr, &dir, &nomatch);
+				   &end_pos, &zlemetacs, &sbptr, &dir,
+				   &nomatch);
 		    if (!nomatch) {
 			feep = 1;
 			nomatch = 1;
@@ -1366,7 +1374,7 @@ doisearch(char **args, int dir, int pattern)
 	    if (t || (nosearch && !nomatch)) {
 		zle_setline(he);
 		if (dir == 1)
-		    zlemetacs = forwardmatchpos;
+		    zlemetacs = end_pos;
 		else
 		    zlemetacs = pos;
 		statusline = ibuf + NORM_PROMPT_POS;
@@ -1384,11 +1392,39 @@ doisearch(char **args, int dir, int pattern)
 	}
 	sbuf[sbptr] = '_';
 	sbuf[sbptr+1] = '\0';
+	if (!nomatch && sbptr && (sbptr > 1 || sbuf[0] != '^')) {
+#ifdef MULTIBYTE_SUPPORT
+	    int charpos = 0, charcount = 0, ret;
+	    wint_t wc;
+	    mbstate_t mbs;
+
+	    /*
+	     * Count unmetafied character positions for the
+	     * start and end of the match for the benefit of
+	     * highlighting.
+	     */
+	    memset(&mbs, 0, sizeof(mbs));
+	    while (charpos < end_pos) {
+		ret = mb_metacharlenconv_r(zlemetaline + charpos, &wc, &mbs);
+		if (charpos <= pos && pos < charpos + ret)
+		    isearch_startpos = charcount;
+		charcount++;
+		charpos += ret;
+	    }
+	    isearch_endpos = charcount;
+#else
+	    isearch_startpos = ztrsub(zlemetaline + pos, zlemetaline);
+	    isearch_endpos = ztrsub(zlemetaline + end_pos,
+				    zlemetaline);
+#endif
+	    isearch_active = 1;
+	} else
+	    isearch_active = 0;
     ref:
 	zrefresh();
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    int i;
-	    get_isrch_spot(0, &hl, &pos, &pat_hl, &pat_pos,
+	    get_isrch_spot(0, &hl, &pos, &pat_hl, &pat_pos, &end_pos,
 			   &i, &sbptr, &dir, &nomatch);
 	    he = quietgethist(hl);
 	    zle_setline(he);
@@ -1410,7 +1446,7 @@ doisearch(char **args, int dir, int pattern)
 	    	cmd == Th(z_backwarddeletechar)) {
 	    if (top_spot) {
 		get_isrch_spot(--top_spot, &hl, &pos, &pat_hl, &pat_pos,
-			       &zlemetacs, &sbptr, &dir, &nomatch);
+			       &end_pos, &zlemetacs, &sbptr, &dir, &nomatch);
 		patprog = NULL;
 		nosearch = 1;
 	    } else
@@ -1452,7 +1488,7 @@ doisearch(char **args, int dir, int pattern)
 		  cmd == Th(z_historyincrementalpatternsearchbackward)) {
 	    pat_hl = hl;
 	    pat_pos = pos;
-	    set_isrch_spot(top_spot++, hl, pos, pat_hl, pat_pos,
+	    set_isrch_spot(top_spot++, hl, pos, pat_hl, pat_pos, end_pos,
 			   zlemetacs, sbptr, dir, nomatch);
 	    if (dir != -1)
 		dir = -1;
@@ -1463,7 +1499,7 @@ doisearch(char **args, int dir, int pattern)
 		  cmd == Th(z_historyincrementalpatternsearchforward)) {
 	    pat_hl = hl;
 	    pat_pos = pos;
-	    set_isrch_spot(top_spot++, hl, pos, pat_hl, pat_pos,
+	    set_isrch_spot(top_spot++, hl, pos, pat_hl, pat_pos, end_pos,
 			   zlemetacs, sbptr, dir, nomatch);
 	    if (dir != 1)
 		dir = 1;
@@ -1473,7 +1509,7 @@ doisearch(char **args, int dir, int pattern)
 	} else if(cmd == Th(z_virevrepeatsearch)) {
 	    pat_hl = hl;
 	    pat_pos = pos;
-	    set_isrch_spot(top_spot++, hl, pos, pat_hl, pat_pos,
+	    set_isrch_spot(top_spot++, hl, pos, pat_hl, pat_pos, end_pos,
 			   zlemetacs, sbptr, dir, nomatch);
 	    dir = -odir;
 	    skip_pos = 1;
@@ -1481,7 +1517,7 @@ doisearch(char **args, int dir, int pattern)
 	} else if(cmd == Th(z_virepeatsearch)) {
 	    pat_hl = hl;
 	    pat_pos = pos;
-	    set_isrch_spot(top_spot++, hl, pos, pat_hl, pat_pos,
+	    set_isrch_spot(top_spot++, hl, pos, pat_hl, pat_pos, end_pos,
 			   zlemetacs, sbptr, dir, nomatch);
 	    dir = odir;
 	    skip_pos = 1;
@@ -1534,7 +1570,7 @@ doisearch(char **args, int dir, int pattern)
 		feep = 1;
 		continue;
 	    }
-	    set_isrch_spot(top_spot++, hl, pos, pat_hl, pat_pos,
+	    set_isrch_spot(top_spot++, hl, pos, pat_hl, pat_pos, end_pos,
 			   zlemetacs, sbptr, dir, nomatch);
 	    if (sbptr >= sibuf - FIRST_SEARCH_CHAR - 2 
 #ifdef MULTIBYTE_SUPPORT
@@ -1569,6 +1605,7 @@ doisearch(char **args, int dir, int pattern)
     zsfree(okeymap);
     if (matchlist)
 	freematchlist(matchlist);
+    isearch_active = 0;
     /*
      * Don't allow unused characters provided as a string to the
      * widget to overflow and be used as separated commands.
