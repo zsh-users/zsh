@@ -1,5 +1,12 @@
 2008-04-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted because everyone's seen enough of my mistakes:
+	Src/pattern.c, Src/Zle/zle_hist.c: with pattern matching the
+	end position of the match wasn't calculated; we used the
+	length of the uncompiled pattern which often had nothing
+	to do with it.  This made the position on forward pattern
+	searching wrong.
+
 	* 24881: Src/Zle/zle_hist.c: we kept feeping on an invalid
 	pattern; once is quite enough.
 

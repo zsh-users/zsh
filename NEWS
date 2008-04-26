@@ -18,7 +18,7 @@ may provide better reliability.
 
 Patterns can now be used in incremental searches with the new widgets
 history-incremental-pattern-search-backward and
-history-incremental-pattern-search-forkward.  These are not bound to
+history-incremental-pattern-search-forward.  These are not bound to
 keys by default.
 
 Highlighting of sections of the command line is now supported, controlled
