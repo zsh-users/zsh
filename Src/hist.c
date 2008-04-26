@@ -1567,10 +1567,8 @@ casemodify(char *str, int how)
 
 	    case CASMOD_CAPS:
 	    default:		/* shuts up compiler */
-#ifdef MULTIBYTE_SUPPORT
 		if (IS_COMBINING(wc))
 			break;
-#endif
 		if (!iswalnum(wc))
 		    nextupper = 1;
 		else if (nextupper) {
