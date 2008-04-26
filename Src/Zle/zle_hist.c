@@ -975,7 +975,8 @@ get_isrch_spot(int num, int *hlp, int *posp, int *pat_hlp, int *pat_posp,
  * never matches when searching forwards.
  */
 static int
-isearch_newpos(LinkList matchlist, int curpos, int dir)
+isearch_newpos(LinkList matchlist, int curpos, int dir,
+	       int *endmatchpos)
 {
     LinkNode node;
 
@@ -983,15 +984,19 @@ isearch_newpos(LinkList matchlist, int curpos, int dir)
 	for (node = lastnode(matchlist);
 	     node != (LinkNode)matchlist; decnode(node)) {
 	    Repldata rdata = (Repldata)getdata(node);
-	    if (rdata->b <= curpos)
+	    if (rdata->b <= curpos) {
+		*endmatchpos = rdata->e;
 		return rdata->b;
+	    }
 	}
     } else {
 	for (node = firstnode(matchlist);
 	     node; incnode(node)) {
 	    Repldata rdata = (Repldata)getdata(node);
-	    if (rdata->b >= curpos)
+	    if (rdata->b >= curpos) {
+		*endmatchpos = rdata->e;
 		return rdata->b;
+	    }
 	}
     }
 
@@ -1037,9 +1042,10 @@ doisearch(char **args, int dir, int pattern)
      */
     int odir = dir, sens = zmult == 1 ? 3 : 1;
     /*
-     * The number of the history line we are looking at and the
-     * character position into it, essentially the cursor position
-     * except we don't update that as frequently.
+     * hl: the number of the history line we are looking at
+     * pos: the character position into it.  On backward matches the
+     *      cursor will be set to this; on forward matches to the end
+     *      of the matched string
      */
     int hl = histline, pos;
     /*
@@ -1139,7 +1145,13 @@ doisearch(char **args, int dir, int pattern)
     	    nomatch = 0;
 	    statusline = ibuf + NORM_PROMPT_POS;
 	} else if (sbptr > 0) {
+	    /* The matched text, used as flag that we matched */
 	    char *t = NULL;
+	    /*
+	     * When forward matching, position for the cursor.
+	     * When backward matching, the position is pos.
+	     */
+	    int forwardmatchpos = 0;
 	    last_line = zt;
 
 	    sbuf[sbptr] = '\0';
@@ -1219,7 +1231,9 @@ doisearch(char **args, int dir, int pattern)
 			     * skip_pos applies to the whole line in
 			     * this mode.
 			     */
-			    if (!skip_pos && pattry(patprog, zt))
+			    if (!skip_pos &&
+				pattryrefs(patprog, zt, -1, -1, 0, NULL, NULL,
+					   &forwardmatchpos))
 				t = zt;
 			} else {
 			    if (!matchlist && !skip_pos) {
@@ -1254,13 +1268,14 @@ doisearch(char **args, int dir, int pattern)
 					newpos = pos + 1;
 				}
 				newpos = isearch_newpos(matchlist, newpos,
-							dir);
+							dir, &forwardmatchpos);
 				/* need a new list next time if off the end */
 				if (newpos < 0) {
 				    freematchlist(matchlist);
 				    matchlist = NULL;
-				} else
+				} else {
 				    t = zt + newpos;
+				}
 			    }
 			}
 		    }
@@ -1300,6 +1315,8 @@ doisearch(char **args, int dir, int pattern)
 				t = zt;
 			} else
 			    t = zlinefind(zt, pos, sbuf, dir, sens);
+			if (t)
+			    forwardmatchpos = pos + sbptr - (sbuf[0] == '^');
 		    }
 		}
 		if (t) {
@@ -1348,8 +1365,10 @@ doisearch(char **args, int dir, int pattern)
 	     */
 	    if (t || (nosearch && !nomatch)) {
 		zle_setline(he);
-		zlemetacs = pos +
-		    (dir == 1 ? sbptr - (sbuf[0] == '^') : 0);
+		if (dir == 1)
+		    zlemetacs = forwardmatchpos;
+		else
+		    zlemetacs = pos;
 		statusline = ibuf + NORM_PROMPT_POS;
 		nomatch = 0;
 	    }

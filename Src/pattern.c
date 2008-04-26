@@ -1861,6 +1861,9 @@ pattrylen(Patprog prog, char *string, int len, int unmetalen, int offset)
  * backreferences. On entry, *nump should contain the maximum number
  * of positions to report.  In this case the match, mbegin, mend
  * arrays are not altered.
+ *
+ * If nump is NULL but endp is not NULL, then *endp is set to the
+ * end position of the match, taking into account patinstart.
  */
 
 /**/
@@ -2220,6 +2223,13 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalen,
 		setaparam("match", matcharr);
 		setaparam("mbegin", mbeginarr);
 		setaparam("mend", mendarr);
+	    }
+
+	    if (!nump && endp) {
+		/*
+		 * We just need the overall end position.
+		 */
+		*endp = CHARSUB(patinstart, patinput) + patoffset;
 	    }
 
 	    ret = 1;
