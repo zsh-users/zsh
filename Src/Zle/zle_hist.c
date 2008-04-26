@@ -1357,6 +1357,10 @@ doisearch(char **args, int dir, int pattern)
 	    statusline = ibuf + NORM_PROMPT_POS;
 	}
 	nosearch = 0;
+	if (feep) {
+	    handlefeep(zlenoargs);
+	    feep = 0;
+	}
 	sbuf[sbptr] = '_';
 	sbuf[sbptr+1] = '\0';
     ref:
