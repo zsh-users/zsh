@@ -65,6 +65,8 @@
 "history-beginning-search-forward", historybeginningsearchforward, 0
 "history-incremental-search-backward", historyincrementalsearchbackward, 0
 "history-incremental-search-forward", historyincrementalsearchforward, 0
+"history-incremental-pattern-search-backward", historyincrementalpatternsearchbackward, 0
+"history-incremental-pattern-search-forward", historyincrementalpatternsearchforward, 0
 "history-search-backward", historysearchbackward, 0
 "history-search-forward", historysearchforward, 0
 "infer-next-history", infernexthistory, 0

@@ -2050,12 +2050,6 @@ matchpat(char *a, char *b)
 /* do the ${foo%%bar}, ${foo#bar} stuff */
 /* please do not laugh at this code. */
 
-struct repldata {
-    int b, e;			/* beginning and end of chunk to replace */
-    char *replstr;		/* replacement string to use */
-};
-typedef struct repldata *Repldata;
-
 /* Having found a match in getmatch, decide what part of string
  * to return.  The matched part starts b characters into string s
  * and finishes e characters in: 0 <= b <= e <= strlen(s)
@@ -2073,19 +2067,23 @@ get_match_ret(char *s, int b, int e, int fl, char *replstr,
     char buf[80], *r, *p, *rr;
     int ll = 0, l = strlen(s), bl = 0, t = 0, i;
 
-    if (replstr) {
+    if (replstr || (fl & SUB_LIST)) {
 	if (fl & SUB_DOSUBST) {
 	    replstr = dupstring(replstr);
 	    singsub(&replstr);
 	    untokenize(replstr);
 	}
-	if ((fl & SUB_GLOBAL) && repllist) {
+	if ((fl & (SUB_GLOBAL|SUB_LIST)) && repllist) {
 	    /* We are replacing the chunk, just add this to the list */
-	    Repldata rd = (Repldata) zhalloc(sizeof(*rd));
+	    Repldata rd = (Repldata)
+		((fl & SUB_LIST) ? zalloc(sizeof(*rd)) : zhalloc(sizeof(*rd)));
 	    rd->b = b;
 	    rd->e = e;
 	    rd->replstr = replstr;
-	    addlinknode(repllist, rd);
+	    if (fl & SUB_LIST)
+		zaddlinknode(repllist, rd);
+	    else
+		addlinknode(repllist, rd);
 	    return s;
 	}
 	ll += strlen(replstr);
@@ -2214,8 +2212,13 @@ getmatch(char **sp, char *pat, int fl, int n, char *replstr)
     if (!(p = compgetmatch(pat, &fl, &replstr)))
 	return 1;
 
-    return igetmatch(sp, p, fl, n, replstr);
+    return igetmatch(sp, p, fl, n, replstr, NULL);
 }
+
+/*
+ * This is the corresponding function for array variables.
+ * Matching is done with the same pattern on each element.
+ */
 
 /**/
 void
@@ -2229,8 +2232,45 @@ getmatcharr(char ***ap, char *pat, int fl, int n, char *replstr)
 
     *ap = pp = hcalloc(sizeof(char *) * (arrlen(arr) + 1));
     while ((*pp = *arr++))
-	if (igetmatch(pp, p, fl, n, replstr))
+	if (igetmatch(pp, p, fl, n, replstr, NULL))
 	    pp++;
+}
+
+/*
+ * Match against str using pattern pp; return a list of
+ * Repldata matches in the linked list *replistp; this is
+ * in permanent storage and to be freed by freematchlist()
+ */
+
+/**/
+mod_export int
+getmatchlist(char *str, Patprog p, LinkList *repllistp)
+{
+    char **sp = &str;
+
+    /*
+     * We don't care if we have longest or shortest match, but SUB_LONG
+     * is cheaper since the pattern code does that by default.
+     * We need SUB_GLOBAL to get all matches.
+     * We need SUB_SUBSTR to scan through for substrings.
+     * We need SUB_LIST to activate the special handling of the list
+     * passed in.
+     */
+    return igetmatch(sp, p, SUB_LONG|SUB_GLOBAL|SUB_SUBSTR|SUB_LIST,
+		     0, NULL, repllistp);
+}
+
+static void
+freerepldata(void *ptr)
+{
+    zfree(ptr, sizeof(struct repldata));
+}
+
+/**/
+mod_export void
+freematchlist(LinkList repllist)
+{
+    freelinklist(repllist, freerepldata);
 }
 
 /**/
@@ -2295,7 +2335,8 @@ static int iincchar(char **tp)
 
 /**/
 static int
-igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
+igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
+	  LinkList *repllistp)
 {
     char *s = *sp, *t, *tmatch;
     /*
@@ -2341,7 +2382,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 
     if (fl & SUB_ALL) {
 	int i = matched && pattry(p, s);
-	*sp = get_match_ret(*sp, 0, i ? l : 0, fl, i ? replstr : 0, repllist);
+	*sp = get_match_ret(*sp, 0, i ? l : 0, fl, i ? replstr : 0, NULL);
 	if (! **sp && (((fl & SUB_MATCH) && !i) || ((fl & SUB_REST) && i)))
 	    return 0;
 	return 1;
@@ -2387,7 +2428,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 			umlen += iincchar(&t);
 		    }
 		}
-		*sp = get_match_ret(*sp, 0, mlen, fl, replstr, repllist);
+		*sp = get_match_ret(*sp, 0, mlen, fl, replstr, NULL);
 		return 1;
 	    }
 	    break;
@@ -2414,11 +2455,11 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 		umlen -= iincchar(&t);
 	    }
 	    if (tmatch) {
-		*sp = get_match_ret(*sp, tmatch - s, l, fl, replstr, repllist);
+		*sp = get_match_ret(*sp, tmatch - s, l, fl, replstr, NULL);
 		return 1;
 	    }
 	    if (!(fl & SUB_START) && pattrylen(p, s + l, 0, 0, ioff)) {
-		*sp = get_match_ret(*sp, l, l, fl, replstr, repllist);
+		*sp = get_match_ret(*sp, l, l, fl, replstr, NULL);
 		return 1;
 	    }
 	    break;
@@ -2431,7 +2472,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    for (ioff = 0, t = s, umlen = umltot; t < s + l; ioff++) {
 		set_pat_start(p, t-s);
 		if (pattrylen(p, t, s + l - t, umlen, ioff)) {
-		    *sp = get_match_ret(*sp, t-s, l, fl, replstr, repllist);
+		    *sp = get_match_ret(*sp, t-s, l, fl, replstr, NULL);
 		    return 1;
 		}
 		if (fl & SUB_START)
@@ -2439,7 +2480,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 		umlen -= iincchar(&t);
 	    }
 	    if (!(fl & SUB_START) && pattrylen(p, s + l, 0, 0, ioff)) {
-		*sp = get_match_ret(*sp, l, l, fl, replstr, repllist);
+		*sp = get_match_ret(*sp, l, l, fl, replstr, NULL);
 		return 1;
 	    }
 	    break;
@@ -2448,14 +2489,17 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    /* Smallest at start, but matching substrings. */
 	    set_pat_start(p, l);
 	    if (!(fl & SUB_GLOBAL) && pattry(p, s + l) && !--n) {
-		*sp = get_match_ret(*sp, 0, 0, fl, replstr, repllist);
+		*sp = get_match_ret(*sp, 0, 0, fl, replstr, NULL);
 		return 1;
 	    } /* fall through */
 	case (SUB_SUBSTR|SUB_LONG):
 	    /* longest or smallest at start with substrings */
 	    t = s;
-	    if (fl & SUB_GLOBAL)
-		repllist = newlinklist();
+	    if (fl & SUB_GLOBAL) {
+		repllist = (fl & SUB_LIST) ? znewlinklist() : newlinklist();
+		if (repllistp)
+		     *repllistp = repllist;
+	    }
 	    ioff = 0;		/* offset into string */
 	    umlen = umltot;
 	    mb_metacharinit();
@@ -2539,7 +2583,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    if (!(fl & SUB_LONG)) {
 		set_pat_start(p, l);
 		if (pattrylen(p, s + l, 0, 0, umltot) && !--n) {
-		    *sp = get_match_ret(*sp, l, l, fl, replstr, repllist);
+		    *sp = get_match_ret(*sp, l, l, fl, replstr, NULL);
 		    return 1;
 		}
 	    }
@@ -2595,12 +2639,12 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 		    }
 		}
 		*sp = get_match_ret(*sp, tmatch-s, mpos-s, fl,
-				    replstr, repllist);
+				    replstr, NULL);
 		return 1;
 	    }
 	    set_pat_start(p, l);
 	    if ((fl & SUB_LONG) && pattrylen(p, s + l, 0, 0, umltot) && !--n) {
-		*sp = get_match_ret(*sp, l, l, fl, replstr, repllist);
+		*sp = get_match_ret(*sp, l, l, fl, replstr, NULL);
 		return 1;
 	    }
 	    break;
@@ -2611,34 +2655,39 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	/* Put all the bits of a global search and replace together. */
 	LinkNode nd;
 	Repldata rd;
-	int lleft = 0;		/* size of returned string */
+	int lleft;
 	char *ptr, *start;
 	int i;
 
-	i = 0;			/* start of last chunk we got from *sp */
-	for (nd = firstnode(repllist); nd; incnode(nd)) {
-	    rd = (Repldata) getdata(nd);
-	    lleft += rd->b - i; /* previous chunk of *sp */
-	    lleft += strlen(rd->replstr);	/* the replaced bit */
-	    i = rd->e;		/* start of next chunk of *sp */
+	if (!(fl & SUB_LIST)) {
+	    lleft = 0;		/* size of returned string */
+	    i = 0;			/* start of last chunk we got from *sp */
+	    for (nd = firstnode(repllist); nd; incnode(nd)) {
+		rd = (Repldata) getdata(nd);
+		lleft += rd->b - i; /* previous chunk of *sp */
+		lleft += strlen(rd->replstr);	/* the replaced bit */
+		i = rd->e;		/* start of next chunk of *sp */
+	    }
+	    lleft += l - i;	/* final chunk from *sp */
+	    start = t = zhalloc(lleft+1);
+	    i = 0;
+	    for (nd = firstnode(repllist); nd; incnode(nd)) {
+		rd = (Repldata) getdata(nd);
+		memcpy(t, s + i, rd->b - i);
+		t += rd->b - i;
+		ptr = rd->replstr;
+		while (*ptr)
+		    *t++ = *ptr++;
+		i = rd->e;
+	    }
+	    memcpy(t, s + i, l - i);
+	    start[lleft] = '\0';
+	    *sp = (char *)start;
 	}
-	lleft += l - i;	/* final chunk from *sp */
-	start = t = zhalloc(lleft+1);
-	i = 0;
-	for (nd = firstnode(repllist); nd; incnode(nd)) {
-	    rd = (Repldata) getdata(nd);
-	    memcpy(t, s + i, rd->b - i);
-	    t += rd->b - i;
-	    ptr = rd->replstr;
-	    while (*ptr)
-		*t++ = *ptr++;
-	    i = rd->e;
-	}
-	memcpy(t, s + i, l - i);
-	start[lleft] = '\0';
-	*sp = (char *)start;
 	return 1;
     }
+    if (fl & SUB_LIST)		/* safety: don't think this can happen */
+	return 0;
 
     /* munge the whole string: no match, so no replstr */
     *sp = get_match_ret(*sp, 0, 0, fl, 0, 0);
@@ -2656,7 +2705,8 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 
 /**/
 static int
-igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
+igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
+	  LinkList *replistp)
 {
     char *s = *sp, *t;
     /*
@@ -2695,7 +2745,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 
     if (fl & SUB_ALL) {
 	int i = matched && pattry(p, s);
-	*sp = get_match_ret(*sp, 0, i ? l : 0, fl, i ? replstr : 0, repllist);
+	*sp = get_match_ret(*sp, 0, i ? l : 0, fl, i ? replstr : 0, NULL);
 	if (! **sp && (((fl & SUB_MATCH) && !i) || ((fl & SUB_REST) && i)))
 	    return 0;
 	return 1;
@@ -2724,7 +2774,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 			}
 		    }
 		}
-		*sp = get_match_ret(*sp, 0, mlen, fl, replstr, repllist);
+		*sp = get_match_ret(*sp, 0, mlen, fl, replstr, NULL);
 		return 1;
 	    }
 	    break;
@@ -2739,7 +2789,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 		    t--;
 		set_pat_start(p, t-s);
 		if (pattrylen(p, t, s + l - t, umlen, ioff)) {
-		    *sp = get_match_ret(*sp, t - s, l, fl, replstr, repllist);
+		    *sp = get_match_ret(*sp, t - s, l, fl, replstr, NULL);
 		    return 1;
 		}
 		if (t > s+1 && t[-2] == Meta)
@@ -2755,7 +2805,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 		 ioff++, METAINC(t), umlen--) {
 		set_pat_start(p, t-s);
 		if (pattrylen(p, t, s + l - t, umlen, ioff)) {
-		    *sp = get_match_ret(*sp, t-s, l, fl, replstr, repllist);
+		    *sp = get_match_ret(*sp, t-s, l, fl, replstr, NULL);
 		    return 1;
 		}
 		if (*t == Meta)
@@ -2767,14 +2817,17 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    /* Smallest at start, but matching substrings. */
 	    set_pat_start(p, l);
 	    if (!(fl & SUB_GLOBAL) && pattry(p, s + l) && !--n) {
-		*sp = get_match_ret(*sp, 0, 0, fl, replstr, repllist);
+		*sp = get_match_ret(*sp, 0, 0, fl, replstr, NULL);
 		return 1;
 	    } /* fall through */
 	case (SUB_SUBSTR|SUB_LONG):
 	    /* longest or smallest at start with substrings */
 	    t = s;
-	    if (fl & SUB_GLOBAL)
+	    if (fl & SUB_GLOBAL) {
 		repllist = newlinklist();
+		if (repllistp)
+		    *repllistp = repllist;
+	    }
 	    ioff = 0;		/* offset into string */
 	    umlen = uml;
 	    do {
@@ -2849,7 +2902,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 	    if (!(fl & SUB_LONG)) {
 		set_pat_start(p, l);
 		if (pattrylen(p, s + l, 0, 0, uml) && !--n) {
-		    *sp = get_match_ret(*sp, l, l, fl, replstr, repllist);
+		    *sp = get_match_ret(*sp, l, l, fl, replstr, NULL);
 		    return 1;
 		}
 	    }
@@ -2874,13 +2927,13 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr)
 			}
 		    }
 		    *sp = get_match_ret(*sp, t-s, mpos-s, fl,
-					replstr, repllist);
+					replstr, NULL);
 		    return 1;
 		}
 	    }
 	    set_pat_start(p, l);
 	    if ((fl & SUB_LONG) && pattrylen(p, s + l, 0, 0, uml) && !--n) {
-		*sp = get_match_ret(*sp, l, l, fl, replstr, repllist);
+		*sp = get_match_ret(*sp, l, l, fl, replstr, NULL);
 		return 1;
 	    }
 	    break;

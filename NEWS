@@ -16,6 +16,11 @@ The option HIST_FCNTL_LOCK has been added to provide locking of history
 files using the system call fcntl().  On recent NFS implementations this
 may provide better reliability.
 
+Patterns can now be used in incremental searches with the new widgets
+history-incremental-pattern-search-backward and
+history-incremental-pattern-search-forkward.  These are not bound to
+keys by default.
+
 Highlighting of sections of the command line is now supported, controlled
 by the array parameter zle_highlight and the ZLE special parameter
 REGION_HIGHLIGHT.

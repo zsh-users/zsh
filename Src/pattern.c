@@ -504,6 +504,8 @@ patcompile(char *exp, int inflags, char **endexp)
 	else
 	    patglobflags = 0;
     }
+    if (patflags & PAT_LCMATCHUC)
+	patglobflags |= GF_LCMATCHUC;
     /*
      * Have to be set now, since they get updated during compilation.
      */

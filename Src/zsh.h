@@ -437,6 +437,7 @@ union linkroot {
 #define firstnode(X)        ((X)->list.first)
 #define lastnode(X)         ((X)->list.last)
 #define peekfirst(X)        (firstnode(X)->dat)
+#define peeklast(X)         (lastnode(X)->dat)
 #define addlinknode(X,Y)    insertlinknode(X,lastnode(X),Y)
 #define zaddlinknode(X,Y)   zinsertlinknode(X,lastnode(X),Y)
 #define uaddlinknode(X,Y)   uinsertlinknode(X,lastnode(X),Y)
@@ -450,6 +451,7 @@ union linkroot {
 #define pushnode(X,Y)       insertlinknode(X,&(X)->node,Y)
 #define zpushnode(X,Y)      zinsertlinknode(X,&(X)->node,Y)
 #define incnode(X)          (X = nextnode(X))
+#define decnode(X)          (X = prevnode(X))
 #define firsthist()         (hist_ring? hist_ring->down->histnum : curhist)
 #define setsizednode(X,Y,Z) (firstnode(X)[(Y)].dat = (void *) (Z))
 
@@ -1292,6 +1294,7 @@ struct patprog {
 #define PAT_NOTSTART	0x0200	/* Start of string is not real start */
 #define PAT_NOTEND	0x0400	/* End of string is not real end */
 #define PAT_HAS_EXCLUDP	0x0800	/* (internal): top-level path1~path2. */
+#define PAT_LCMATCHUC   0x1000  /* equivalent to setting (#l) */
 
 /* Globbing flags: lower 8 bits gives approx count */
 #define GF_LCMATCHUC	0x0100
@@ -1489,6 +1492,19 @@ struct tieddata {
 #define SUB_RETFAIL	0x0800  /* return status 0 if no match */
 #define SUB_START	0x1000  /* force match at start with SUB_END
 				 * and no SUB_SUBSTR */
+#define SUB_LIST	0x2000  /* no substitution, return list of matches */
+
+/*
+ * Structure recording multiple matches inside a test string.
+ * b and e are the beginning and end of the match.
+ * replstr is the replacement string, if any.
+ */
+struct repldata {
+    int b, e;			/* beginning and end of chunk to replace */
+    char *replstr;		/* replacement string to use */
+};
+typedef struct repldata *Repldata;
+
 
 /* Flags as the second argument to prefork */
 #define PF_TYPESET	0x01	/* argument handled like typeset foo=bar */

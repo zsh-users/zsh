@@ -1152,6 +1152,27 @@ numeric argument was given.  The string may begin with `tt(^)' to anchor the
 search to the beginning of the line.  The functions available in the
 mini-buffer are the same as for tt(history-incremental-search-backward).
 )
+tindex(history-incremental-pattern-search-backward)
+tindex(history-incremental-pattern-search-forward)
+xitem(tt(history-incremental-pattern-search-backward))
+item(tt(history-incremental-pattern-search-forward))(
+These widgets behave similarly to the corresponding widgets with
+no tt(-pattern), but the search string typed by the user is treated
+as a pattern, respecting the current settings of the various options
+affecting pattern matching.  See
+ifzman(FILENAME GENERATION in zmanref(zshexpn))\
+ifnzman(noderef(Filename Generation)) for a description of patterns.
+If no numeric argument was given lowercase letters in the search
+string may match uppercase letters in the history.  The string may begin
+with `tt(^)' to anchor the search to the beginning of the line.
+
+The prompt changes to indicate an invalid pattern; this may simply
+indicate the pattern is not yet complete.
+
+Note that only non-overlapping matches are reported, so an expression
+with wildcards may return fewer matches on a line than are visible
+by inspection.
+)
 tindex(history-search-backward)
 item(tt(history-search-backward) (ESC-P ESC-p) (unbound) (unbound))(
 Search backward in the history for a line beginning with the first
