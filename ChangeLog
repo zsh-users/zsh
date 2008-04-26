@@ -1,5 +1,7 @@
 2008-04-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24876: don't install manual pages if empty.
+
 	* 24872: Jun T.: Fix capitalization with combining characters.
 
 	* 24869: Marc Chantreux: configure.ac, Src/init.c: make default
