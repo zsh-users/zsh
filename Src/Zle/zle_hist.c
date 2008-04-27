@@ -1323,7 +1323,7 @@ doisearch(char **args, int dir, int pattern)
 			} else
 			    t = zlinefind(zt, pos, sbuf, dir, sens);
 			if (t)
-			    end_pos = pos + sbptr - (sbuf[0] == '^');
+			    end_pos = (t - zt) + sbptr - (sbuf[0] == '^');
 		    }
 		}
 		if (t) {
