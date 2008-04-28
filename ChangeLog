@@ -1,5 +1,8 @@
 2008-04-28  Peter Stephenson  <pws@csr.com>
 
+	* 24890: Matt Wozniski: Src/Zle/zle_hist.c: skip_pos was
+	staying set causing random failures on backtracking in isearch.
+
 	* 24887: Geoff: Src/glob.c: typo.
 
 2008-04-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>

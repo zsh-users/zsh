@@ -1442,20 +1442,21 @@ doisearch(char **args, int dir, int pattern)
 	    if(selectkeymap(invicmdmode() ? "main" : "vicmd", 0))
 		feep = 1;
 	    goto ref;
-	} else if(cmd == Th(z_vibackwarddeletechar) ||
-	    	cmd == Th(z_backwarddeletechar)) {
-	    if (top_spot) {
-		get_isrch_spot(--top_spot, &hl, &pos, &pat_hl, &pat_pos,
-			       &end_pos, &zlemetacs, &sbptr, &dir, &nomatch);
-		patprog = NULL;
-		nosearch = 1;
-	    } else
-		feep = 1;
-	    if (nomatch) {
-		memcpy(ibuf, nomatch == 2 ? INVALID_TEXT : FAILING_TEXT,
-		       BAD_TEXT_LEN);
-		statusline = ibuf;
-		skip_pos = 1;
+       } else if(cmd == Th(z_vibackwarddeletechar) ||
+               cmd == Th(z_backwarddeletechar)) {
+           if (top_spot) {
+               get_isrch_spot(--top_spot, &hl, &pos, &pat_hl, &pat_pos,
+                              &end_pos, &zlemetacs, &sbptr, &dir, &nomatch);
+               patprog = NULL;
+               nosearch = 1;
+               skip_pos = 0;
+           } else
+               feep = 1;
+           if (nomatch) {
+               memcpy(ibuf, nomatch == 2 ? INVALID_TEXT : FAILING_TEXT,
+                      BAD_TEXT_LEN);
+               statusline = ibuf;
+               skip_pos = 1;
 	    }
 	    he = quietgethist(hl);
 	    zt = GETZLETEXT(he);
