@@ -1,5 +1,10 @@
 2008-04-28  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Src/Zle/zle_hist.c: when anchoring a pattern
+	isearch to the start of the line the search line wasn't
+	reset on new input so when the first match of the new pattern
+	was earlier than that of the old pattern we skipped it.
+
 	* unposted: Src/Zle/zle_hist.c: more tweaks for failures with
 	isearch pattern matching.
 

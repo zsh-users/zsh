@@ -1214,6 +1214,19 @@ doisearch(char **args, int dir, int pattern)
 	     */
 	    while ((!pattern || patprog) && !nosearch) {
 		if (patprog) {
+		    if (revert_patpos) {
+			/*
+			 * Search from where the previous
+			 * search started; see note above.
+			 * This is down here within the loop because of
+			 * the "nosearch" optimisation.
+			 */
+			revert_patpos = 0;
+			dup_ok = 1;
+			he = quietgethist(hl = pat_hl);
+			zt = GETZLETEXT(he);
+			pos = pat_pos;
+		    }
 		    /*
 		     * We are pattern matching against the current
 		     * line.  If anchored at the start, this is
@@ -1245,17 +1258,6 @@ doisearch(char **args, int dir, int pattern)
 				t = zt;
 			} else {
 			    if (!matchlist && !skip_pos) {
-				if (revert_patpos) {
-				    /*
-				     * Search from where the previous
-				     * search started; see note above.
-				     */
-				    revert_patpos = 0;
-				    dup_ok = 1;
-				    he = quietgethist(hl = pat_hl);
-				    zt = GETZLETEXT(he);
-				    pos = pat_pos;
-				}
 				if (!getmatchlist(zt, patprog, &matchlist) ||
 				    !firstnode(matchlist)) {
 				    if (matchlist) {
