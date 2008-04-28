@@ -2238,7 +2238,7 @@ getmatcharr(char ***ap, char *pat, int fl, int n, char *replstr)
 
 /*
  * Match against str using pattern pp; return a list of
- * Repldata matches in the linked list *replistp; this is
+ * Repldata matches in the linked list *repllistp; this is
  * in permanent storage and to be freed by freematchlist()
  */
 

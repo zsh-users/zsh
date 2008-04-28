@@ -1,3 +1,7 @@
+2008-04-28  Peter Stephenson  <pws@csr.com>
+
+	* 24887: Geoff: Src/glob.c: typo.
+
 2008-04-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24886: Src/Zle/zle_hist.c: using unupdated pos to set end_pos
