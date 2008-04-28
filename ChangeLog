@@ -1,5 +1,8 @@
 2008-04-28  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Src/Zle/zle_hist.c: more tweaks for failures with
+	isearch pattern matching.
+
 	* 24890: Matt Wozniski: Src/Zle/zle_hist.c: skip_pos was
 	staying set causing random failures on backtracking in isearch.
 

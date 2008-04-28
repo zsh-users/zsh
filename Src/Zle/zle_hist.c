@@ -1197,6 +1197,7 @@ doisearch(char **args, int dir, int pattern)
 		}
 		if (patprog) {
 		    revert_patpos = 1;
+		    skip_pos = 0;
 		} else {
 		    if (nomatch != 2) {
 			handlefeep(zlenoargs);
@@ -1342,7 +1343,7 @@ doisearch(char **args, int dir, int pattern)
 		    get_isrch_spot(top_spot, &hl, &pos, &pat_hl, &pat_pos,
 				   &end_pos, &zlemetacs, &sbptr, &dir,
 				   &nomatch);
-		    if (!nomatch) {
+		    if (nomatch != 1) {
 			feep = 1;
 			nomatch = 1;
 		    }
