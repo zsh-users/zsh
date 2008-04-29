@@ -1,5 +1,7 @@
 2008-04-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24895: Matt Wozniski: Doc/Zsh/zle.yo: typo.
+
 	* unposted: Src/glob.c: oops.
 
 2008-04-29  Peter Stephenson  <pws@csr.com>
