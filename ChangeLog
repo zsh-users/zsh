@@ -1,3 +1,7 @@
+2008-04-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Src/glob.c: oops.
+
 2008-04-29  Peter Stephenson  <pws@csr.com>
 
 	* 24894: Doc/Zsh/zle.yo, Src/init.c, Src/zsh.h,

@@ -2706,7 +2706,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 /**/
 static int
 igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
-	  LinkList *replistp)
+	  LinkList *repllistp)
 {
     char *s = *sp, *t;
     /*
