@@ -1418,8 +1418,9 @@ zrefresh(void)
 
     if (statusline) {
 	int outll, outsz;
+	char *statusdup = ztrdup(statusline);
 	ZLE_STRING_T outputline =
-	    stringaszleline(statusline, 0, &outll, &outsz, NULL); 
+	    stringaszleline(statusdup, 0, &outll, &outsz, NULL); 
 
 	rpms.tosln = rpms.ln + 1;
 	nbuf[rpms.ln][winw + 1] = zr_zr;	/* text not wrapped */
@@ -1484,6 +1485,7 @@ zrefresh(void)
 	    snextline(&rpms);
 	}
 	zfree(outputline, outsz);
+	free(statusdup);
     }
     *rpms.s = zr_zr;
 
