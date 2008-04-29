@@ -1,5 +1,9 @@
 2008-04-29  Peter Stephenson  <pws@csr.com>
 
+	* 24894: Doc/Zsh/zle.yo, Src/init.c, Src/zsh.h,
+	Src/Zle/zle_refresh.c: enable colouring of highlighted text
+	in editor.
+
 	* 24893: Src/Zle/zle_refresh.c: duplicate statusline to avoid
 	crashes when it's passed from a constant string.
 

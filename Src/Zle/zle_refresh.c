@@ -207,7 +207,7 @@ int predisplaylen, postdisplaylen;
  * displayed on screen.
  */
 
-static int special_atr_on, special_atr_off;
+static int special_atr_on;
 
 /* Flags for the region_highlight structure */
 enum {
@@ -357,19 +357,41 @@ match_highlight(const char *teststr, int *on_var)
 	const struct highlight *hl;
 
 	found = 0;
-	for (hl = highlights; hl->name; hl++) {
-	    if (strpfx(hl->name, teststr)) {
-		const char *val = teststr + strlen(hl->name);
+	if (strpfx("fg=", teststr) || strpfx("bg=", teststr)) {
+	    int is_fg = (teststr[0] == 'f');
+	    int colour = (int)zstrtol(teststr+3, (char **)&teststr, 10);
+	    int shft, on;
+	    if (*teststr == ',')
+		teststr++;
+	    else if (*teststr)
+		break;
+	    found = 1;
+	    /* skip out of range colours but keep scanning attributes */
+	    if (colour >= 256)
+		continue;
+	    if (is_fg) {
+		shft = TXT_ATTR_FG_COL_SHIFT;
+		on = TXTFGCOLOUR;
+	    } else {
+		shft = TXT_ATTR_BG_COL_SHIFT;
+		on = TXTBGCOLOUR;
+	    }
+	    *on_var |= on | (colour << shft);
+	} else {
+	    for (hl = highlights; hl->name; hl++) {
+		if (strpfx(hl->name, teststr)) {
+		    const char *val = teststr + strlen(hl->name);
 
-		if (*val == ',')
-		    val++;
-		else if (*val)
-		    break;
+		    if (*val == ',')
+			val++;
+		    else if (*val)
+			break;
 
-		*on_var |= hl->mask_on;
-		*on_var &= ~hl->mask_off;
-		teststr = val;
-		found = 1;
+		    *on_var |= hl->mask_on;
+		    *on_var &= ~hl->mask_off;
+		    teststr = val;
+		    found = 1;
+		}
 	    }
 	}
     }
@@ -431,7 +453,6 @@ void zle_set_highlight(void)
 	region_highlights->atr = TXTSTANDOUT;
     if (!isearch_atr_on_set)
 	region_highlights[1].atr = TXTUNDERLINE;
-    special_atr_off = special_atr_on << TXT_ATTR_OFF_ON_SHIFT;
 }
 
 
@@ -610,19 +631,23 @@ zwcputc(const REFRESH_ELEMENT *c, int *curatrp)
 
     if (lastatr & ~c->atr) {
 	/* Stuff on we don't want, turn it off */
-	settextattributes((lastatr & ~c->atr) << TXT_ATTR_OFF_ON_SHIFT);
+	settextattributes(TXT_ATTR_OFF_FROM_ON(lastatr & ~c->atr));
 	lastatr = 0;
     }
 
     /*
      * Don't output "on" attributes in a string of characters with
-     * the same attributes.
+     * the same attributes.  Be careful in case a different colour
+     * needs setting.
      */
     if ((c->atr & TXT_ATTR_ON_MASK) &&
 	(!curatrp ||
-	 ((*curatrp & TXT_ATTR_ON_MASK) != (c->atr & TXT_ATTR_ON_MASK)))) {
+	 ((*curatrp & TXT_ATTR_ON_VALUES_MASK) !=
+	  (c->atr & TXT_ATTR_ON_VALUES_MASK)))) {
+	/* Record just the control flags we might need to turn off... */
 	lastatr = c->atr & TXT_ATTR_ON_MASK;
-	settextattributes(lastatr);
+	/* ...but set including the values for colour attributes */
+	settextattributes(c->atr & TXT_ATTR_ON_VALUES_MASK);
     }
 
 #ifdef MULTIBYTE_SUPPORT
@@ -656,9 +681,11 @@ zwcputc(const REFRESH_ELEMENT *c, int *curatrp)
     if (curatrp) {
 	/*
 	 * Remember the current attributes:  those that are turned
-	 * on, less those that are turned off again.
+	 * on, less those that are turned off again.  Include
+	 * colour attributes here in case the colour changes to
+	 * another non-default one.
 	 */
-	*curatrp = (c->atr & TXT_ATTR_ON_MASK) &
+	*curatrp = (c->atr & TXT_ATTR_ON_VALUES_MASK) &
 	    ~((c->atr & TXT_ATTR_OFF_MASK) >> TXT_ATTR_OFF_ON_SHIFT);
     }
 }
@@ -915,6 +942,54 @@ snextline(Rparams rpms)
     rpms->sen = rpms->s + winw;
 }
 
+/*
+ * HERE: these need to be made configurable, somehow.
+ * Ideally we need to make the complist stuff use the
+ * same system, but that may be too much tied to the GNU ls
+ * interface to make that possible.
+ */
+/* Start of escape sequence for foreground colour */
+#define TC_COL_FG_START	"\033[3"
+/* Start of escape sequence for background colour */
+#define TC_COL_BG_START	"\033[4"
+/* End of either escape sequence */
+#define TC_COL_END	"m"
+/* Numeric code (to be turned into ASCII) to reset default colour */
+#define TC_COL_DEFAULT	9
+
+static void
+setcolourattribute(int colour, char *start, int tc, int def,
+		   int use_termcap)
+{
+    char out[16], *ptr;
+    /*
+     * If we're not restoring the default, and either have a
+     * colour value that is too large for ANSI, or have been told
+     * to use the termcap sequence (which at the time of writing
+     * we never are), try to use the termcap sequence.
+     */
+    if (!def && (colour > 7 || use_termcap)) {
+	/*
+	 * We can if it's available, and either we couldn't get
+	 * the maximum number of colours, or the colour is in range.
+	 */
+	if (tccan(tc) && (tccolours < 0 || colour < tccolours))
+	    tcoutarg(tc, colour);
+	/* for 0 to 7 assume standard ANSI works, otherwise it won't. */
+	if (colour > 7)
+	    return;
+    }
+
+    strcpy(out, start);
+    if (def)
+	colour = TC_COL_DEFAULT;
+
+    ptr = out + strlen(start);
+    *ptr++ = colour + '0';
+    strcpy(ptr, TC_COL_END);
+    tputs(out, 1, putshout);
+}
+
 /**/
 static void
 settextattributes(int atr)
@@ -931,6 +1006,18 @@ settextattributes(int atr)
 	tsetcap(TCSTANDOUTBEG, 0);
     if (txtchangeisset(atr, TXTUNDERLINE))
 	tsetcap(TCUNDERLINEBEG, 0);
+    if (txtchangeisset(atr, TXTFGCOLOUR|TXTNOFGCOLOUR)) {
+	setcolourattribute(txtchangeget(atr, TXT_ATTR_FG_COL),
+			   TC_COL_FG_START, TCFGCOLOUR,
+			   txtchangeisset(atr, TXTNOFGCOLOUR),
+			   txtchangeisset(atr, TXT_ATTR_FG_TERMCAP));
+    }
+    if (txtchangeisset(atr, TXTBGCOLOUR|TXTNOBGCOLOUR)) {
+	setcolourattribute(txtchangeget(atr, TXT_ATTR_BG_COL),
+			   TC_COL_BG_START, TCBGCOLOUR,
+			   txtchangeisset(atr, TXTNOBGCOLOUR),
+			   txtchangeisset(atr, TXT_ATTR_BG_TERMCAP));
+    }
 }
 
 #ifdef MULTIBYTE_SUPPORT
@@ -1209,6 +1296,7 @@ zrefresh(void)
     rpms.sen = *nbuf + winw;
     for (t = tmpline, tmppos = 0; tmppos < tmpll; t++, tmppos++) {
 	int base_atr_on = 0, base_atr_off = 0, ireg;
+	int all_atr_on, all_atr_off;
 	struct region_highlight *rhp;
 	/*
 	 * Calculate attribute based on region.
@@ -1223,12 +1311,27 @@ zrefresh(void)
 		offset = predisplaylen; /* increment over it */
 	    if (rhp->start + offset <= tmppos &&
 		tmppos < rhp->end + offset) {
-		base_atr_on |= rhp->atr;
+		if (base_atr_on & (TXTFGCOLOUR|TXTBGCOLOUR)) {
+		    /* keep colour already set */
+		    base_atr_on |= rhp->atr & ~TXT_ATTR_COLOUR_ON_MASK;
+		} else {
+		    /* no colour set yet */
+		    base_atr_on |= rhp->atr;
+		}
 		if (tmppos == rhp->end + offset - 1 ||
 		    tmppos == tmpll - 1)
-		    base_atr_off |= rhp->atr << TXT_ATTR_OFF_ON_SHIFT;
+		    base_atr_off |= TXT_ATTR_OFF_FROM_ON(rhp->atr);
 	    }
 	}
+	if (special_atr_on & (TXTFGCOLOUR|TXTBGCOLOUR)) {
+	    /* keep colours from special attributes */
+	    all_atr_on = special_atr_on |
+		(base_atr_on & ~TXT_ATTR_COLOUR_ON_MASK);
+	} else {
+	    /* keep colours from standard attributes */
+	    all_atr_on = special_atr_on | base_atr_on;
+	}
+	all_atr_off = TXT_ATTR_OFF_FROM_ON(all_atr_on);
 
 	if (t == scs)			/* if cursor is here, remember it */
 	    rpms.nvcs = rpms.s - nbuf[rpms.nvln = rpms.ln];
@@ -1264,11 +1367,11 @@ zrefresh(void)
 		    rpms.s->chr = ZWC(' ');
 		    if (!started)
 			started = 1;
-		    rpms.s->atr = special_atr_on | base_atr_on;
+		    rpms.s->atr = all_atr_on;
 		    rpms.s++;
 		} while (rpms.s < rpms.sen);
 		if (started)
-		    rpms.s[-1].atr |= special_atr_off | base_atr_off;
+		    rpms.s[-1].atr |= all_atr_off;
 		if (nextline(&rpms, 1))
 		    break;
 		if (t == scs) {
@@ -1292,8 +1395,7 @@ zrefresh(void)
 		 * occurrence.
 		 */
 		rpms.s->chr = ZWC('?');
-		rpms.s->atr = special_atr_on | special_atr_off |
-		    base_atr_on | base_atr_off;
+		rpms.s->atr = all_atr_on | all_atr_off;
 		rpms.s++;
 	    } else {
 		/* We can fit it without reaching the end of the line. */
@@ -1334,18 +1436,17 @@ zrefresh(void)
 #endif
 	    ) {	/* other control character */
 	    rpms.s->chr = ZWC('^');
-	    rpms.s->atr = special_atr_on | base_atr_on;
+	    rpms.s->atr = all_atr_on;
 	    rpms.s++;
 	    if (rpms.s == rpms.sen) {
 		/* text wrapped */
-		rpms.s[-1].atr |= special_atr_off | base_atr_off;
+		rpms.s[-1].atr |= all_atr_off;
 		if (nextline(&rpms, 1))
 		    break;
 	    }
 	    rpms.s->chr = (((unsigned int)*t & ~0x80u) > 31) ?
 		ZWC('?') : (*t | ZWC('@'));
-	    rpms.s->atr = special_atr_on | special_atr_off |
-		base_atr_on | base_atr_off;
+	    rpms.s->atr = all_atr_on | all_atr_off;
 	    rpms.s++;
 	}
 #ifdef MULTIBYTE_SUPPORT
@@ -1370,12 +1471,12 @@ zrefresh(void)
 		    rpms.s->chr = wc;
 		    if (!started)
 			started = 1;
-		    rpms.s->atr = special_atr_on | base_atr_on;
+		    rpms.s->atr = all_atr_on;
 		    rpms.s++;
 		    if (rpms.s == rpms.sen) {
 			/* text wrapped */
 			if (started) {
-			    rpms.s[-1].atr |= special_atr_off | base_atr_off;
+			    rpms.s[-1].atr |= all_atr_off;
 			    started = 0;
 			}
 			if (nextline(&rpms, 1))
@@ -1385,7 +1486,7 @@ zrefresh(void)
 		dispptr++;
 	    }
 	    if (started)
-		rpms.s[-1].atr |= special_atr_off | base_atr_off;
+		rpms.s[-1].atr |= all_atr_off;
 	    if (*dispptr) /* nextline said stop processing */
 		break;
 	}
@@ -1417,10 +1518,13 @@ zrefresh(void)
 	more_end = 1;
 
     if (statusline) {
-	int outll, outsz;
+	int outll, outsz, all_atr_on, all_atr_off;
 	char *statusdup = ztrdup(statusline);
 	ZLE_STRING_T outputline =
 	    stringaszleline(statusdup, 0, &outll, &outsz, NULL); 
+
+	all_atr_on = special_atr_on;
+	all_atr_off = TXT_ATTR_OFF_FROM_ON(all_atr_on);
 
 	rpms.tosln = rpms.ln + 1;
 	nbuf[rpms.ln][winw + 1] = zr_zr;	/* text not wrapped */
@@ -1440,7 +1544,7 @@ zrefresh(void)
 		}
 		if (width > rpms.sen - rpms.s) {
 		    rpms.s->chr = ZWC('?');
-		    rpms.s->atr = special_atr_on | special_atr_off;
+		    rpms.s->atr = all_atr_on | all_atr_off;
 		    rpms.s++;
 		} else {
 		    rpms.s->chr = *u;
@@ -1457,7 +1561,7 @@ zrefresh(void)
 #endif
 	    if (ZC_icntrl(*u)) { /* simplified processing in the status line */
 		rpms.s->chr = ZWC('^');
-		rpms.s->atr = special_atr_on;
+		rpms.s->atr = all_atr_on;
 		rpms.s++;
 		if (rpms.s == rpms.sen) {
 		    nbuf[rpms.ln][winw + 1] = zr_nl;/* text wrapped */
@@ -1465,7 +1569,7 @@ zrefresh(void)
 		}
 		rpms.s->chr = (((unsigned int)*u & ~0x80u) > 31)
 		    ? ZWC('?') : (*u | ZWC('@'));
-		rpms.s->atr = special_atr_on | special_atr_off;
+		rpms.s->atr = all_atr_on | all_atr_off;
 		rpms.s++;
 	    } else {
 		rpms.s->chr = *u;
@@ -2037,7 +2141,7 @@ refreshline(int ln)
 	     */
 	    int now_off = ol->atr & ~nl->atr & TXT_ATTR_ON_MASK;
 	    if (now_off)
-		settextattributes(now_off << TXT_ATTR_OFF_ON_SHIFT);
+		settextattributes(TXT_ATTR_OFF_FROM_ON(now_off));
 
 	    zputc(nl);
 	    nl++, ol++;
@@ -2324,7 +2428,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
     if (tmpcs < 0) {
 #ifdef DEBUG
 	fprintf(stderr, "BUG: negative cursor position\n");
-	fflush(stderr); 
+	fflush(stderr);
 #endif
 	tmpcs = 0;
     }
@@ -2336,6 +2440,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 
     for (t0 = 0; t0 < tmpll; t0++) {
 	int base_atr_on = 0, base_atr_off = 0, ireg;
+	int all_atr_on, all_atr_off;
 	struct region_highlight *rhp;
 	/*
 	 * Calculate attribute based on region.
@@ -2350,12 +2455,27 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 		offset = predisplaylen; /* increment over it */
 	    if (rhp->start + offset <= t0 &&
 		t0 < rhp->end + offset) {
-		base_atr_on |= rhp->atr;
+		if (base_atr_on & (TXTFGCOLOUR|TXTBGCOLOUR)) {
+		    /* keep colour already set */
+		    base_atr_on |= rhp->atr & ~TXT_ATTR_COLOUR_ON_MASK;
+		} else {
+		    /* no colour set yet */
+		    base_atr_on |= rhp->atr;
+		}
 		if (t0 == rhp->end + offset - 1 ||
 		    t0 == tmpll - 1)
-		    base_atr_off |= rhp->atr << TXT_ATTR_OFF_ON_SHIFT;
+		    base_atr_off |= TXT_ATTR_OFF_FROM_ON(rhp->atr);
 	    }
 	}
+	if (special_atr_on & (TXTFGCOLOUR|TXTBGCOLOUR)) {
+	    /* keep colours from special attributes */
+	    all_atr_on = special_atr_on |
+		(base_atr_on & ~TXT_ATTR_COLOUR_ON_MASK);
+	} else {
+	    /* keep colours from standard attributes */
+	    all_atr_on = special_atr_on | base_atr_on;
+	}
+	all_atr_off = TXT_ATTR_OFF_FROM_ON(all_atr_on);
 
 	if (tmpline[t0] == ZWC('\t')) {
 	    REFRESH_ELEMENT sp = zr_sp;
@@ -2365,11 +2485,10 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	    vp[-1].atr |= base_atr_off;
 	} else if (tmpline[t0] == ZWC('\n')) {
 	    vp->chr = ZWC('\\');
-	    vp->atr = special_atr_on | base_atr_on;
+	    vp->atr = all_atr_on;
 	    vp++;
 	    vp->chr = ZWC('n');
-	    vp->atr = special_atr_on | special_atr_off |
-		base_atr_on | base_atr_off;
+	    vp->atr = all_atr_on | all_atr_off;
 	    vp++;
 #ifdef MULTIBYTE_SUPPORT
 	} else if (iswprint(tmpline[t0]) &&
@@ -2406,12 +2525,11 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	    ZLE_INT_T t = tmpline[++t0];
 
 	    vp->chr = ZWC('^');
-	    vp->atr = special_atr_on | base_atr_on;
+	    vp->atr = all_atr_on;
 	    vp++;
 	    vp->chr = (((unsigned int)t & ~0x80u) > 31) ?
 		ZWC('?') : (t | ZWC('@'));
-	    vp->atr = special_atr_on | special_atr_off | base_atr_on |
-		base_atr_off;
+	    vp->atr = all_atr_on | all_atr_off;
 	    vp++;
 	}
 #ifdef MULTIBYTE_SUPPORT
@@ -2431,13 +2549,13 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 		    vp->chr = wc;
 		    if (!started)
 			started = 1;
-		    vp->atr = special_atr_on | base_atr_on;
+		    vp->atr = all_atr_on;
 		    vp++;
 		}
 		dispptr++;
 	    }
 	    if (started)
-		vp[-1].atr |= special_atr_off | base_atr_off;
+		vp[-1].atr |= all_atr_off;
 	}
 #else
 	else {

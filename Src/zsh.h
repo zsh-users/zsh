@@ -1949,7 +1949,9 @@ struct ttyinfo {
 #define TCSAVECURSOR   29
 #define TCRESTRCURSOR  30
 #define TCBACKSPACE    31
-#define TC_COUNT       32
+#define TCFGCOLOUR     32
+#define TCBGCOLOUR     33
+#define TC_COUNT       34
 
 #define tccan(X) (tclen[X])
 
@@ -1957,32 +1959,63 @@ struct ttyinfo {
  * Text attributes for displaying in ZLE
  */
 
-#define TXTBOLDFACE   0x01
-#define TXTSTANDOUT   0x02
-#define TXTUNDERLINE  0x04
-#define TXTDIRTY      0x80
+#define TXTBOLDFACE   0x0001
+#define TXTSTANDOUT   0x0002
+#define TXTUNDERLINE  0x0004
+#define TXTFGCOLOUR   0x0008
+#define TXTBGCOLOUR   0x0010
+#define TXTDIRTY      0x0020
 
-#define TXT_ATTR_ON_MASK   0x07
+#define TXT_ATTR_ON_MASK   0x001F
 
 #define txtisset(X)  (txtattrmask & (X))
 #define txtset(X)    (txtattrmask |= (X))
 #define txtunset(X)  (txtattrmask &= ~(X))
 
-#define TXTNOBOLDFACE	0x10
-#define TXTNOSTANDOUT	0x20
-#define TXTNOUNDERLINE	0x40
+#define TXTNOBOLDFACE	0x0040
+#define TXTNOSTANDOUT	0x0080
+#define TXTNOUNDERLINE	0x0100
+#define TXTNOFGCOLOUR	0x0200
+#define TXTNOBGCOLOUR	0x0400
 
-#define TXT_ATTR_OFF_MASK  0x70
+#define TXT_ATTR_OFF_MASK  0x07C0
 /* Bits to shift off right to get on */
-#define TXT_ATTR_OFF_ON_SHIFT (4)
-
+#define TXT_ATTR_OFF_ON_SHIFT 6
+#define TXT_ATTR_OFF_FROM_ON(attr)	\
+    (((attr) & TXT_ATTR_ON_MASK) << TXT_ATTR_OFF_ON_SHIFT)
 /*
  * Indicates to zle_refresh.c that the character entry is an
  * index into the list of multiword symbols.
  */
-#define TXT_MULTIWORD_MASK  0x100
+#define TXT_MULTIWORD_MASK  0x0800
+
+/* Mask for colour to use in foreground */
+#define TXT_ATTR_FG_COL_MASK     0x000FF000
+/* Bits to shift the foreground colour */
+#define TXT_ATTR_FG_COL_SHIFT    (12)
+/* Mask for colour to use in background */
+#define TXT_ATTR_BG_COL_MASK     0x0FF00000
+/* Bits to shift the background colour */
+#define TXT_ATTR_BG_COL_SHIFT    (20)
+
+/* Flag to use termcap AF sequence to set colour, if available */
+#define TXT_ATTR_FG_TERMCAP      0x10000000
+/* Flag to use termcap AB sequence to set colour, if available */
+#define TXT_ATTR_BG_TERMCAP      0x20000000
+
+/* Things to turn on, including values for the colour elements */
+#define TXT_ATTR_ON_VALUES_MASK	\
+    (TXT_ATTR_ON_MASK|TXT_ATTR_FG_COL_MASK|TXT_ATTR_BG_COL_MASK|\
+     TXT_ATTR_FG_TERMCAP|TXT_ATTR_BG_TERMCAP)
+
+/* Mask out everything to do with activating colours */
+#define TXT_ATTR_COLOUR_ON_MASK			\
+    (TXTFGCOLOUR|TXTBGCOLOUR|			\
+     TXT_ATTR_FG_COL_MASK|TXT_ATTR_BG_COL_MASK| \
+     TXT_ATTR_FG_TERMCAP|TXT_ATTR_BG_TERMCAP)
 
 #define txtchangeisset(T,X)	((T) & (X))
+#define txtchangeget(T,A)	(((T) & A ## _MASK) >> A ## _SHIFT)
 #define txtchangeset(X, Y)	(txtchange |= (X), txtchange &= ~(Y))
 
 /****************************************/

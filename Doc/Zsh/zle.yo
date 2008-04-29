@@ -2097,6 +2097,25 @@ No highlighting is applied to the given context.  It is not useful for
 this to appear with other types of highlighting; it is used to override
 a default.
 )
+item(tt(fg=)var(colour))(
+The foreground colour should be set to var(colour), a decimal integer.  Not
+all terminals support this, and of those that do not all provide facilities
+to test the support, hence the user should decide based on the terminal
+type.  Most terminals with colour support accept the numbers 0 to 7, and
+may generate additional colours if the tt(bold) attributes is also present.
+On recent terminals and on systems with an up-to-date terminal database the
+number of colours supported may be tested by with the command `tt(echotc
+Co)'; if this succeeds, it indicates a limit on the number of colours which
+will be enforced by the line editor.  The number of colours is in case
+limited to 256 (i.e. the range 0 to 255).
+
+Colour is also known as color.
+)
+item(tt(bg=)var(colour))(
+The background colour should be set to var(colour), a decimal integer.
+This works similarly to the foreground colour, except the background is
+not usually affected by the bold attribute.
+)
 item(tt(bold))(
 The characters in the given context are shown in a bold font.
 )

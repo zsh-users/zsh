@@ -79,6 +79,11 @@ int tclines, tccolumns;
 /**/
 mod_export int hasam, hasxn;
 
+/* Value of the Co (max_colors) entry: may not be set */
+
+/**/
+mod_export int tccolours;
+
 /* Pointer to read-key function from zle */
 
 /**/
@@ -531,7 +536,7 @@ static char *tccapnams[TC_COUNT] = {
     "cl", "le", "LE", "nd", "RI", "up", "UP", "do",
     "DO", "dc", "DC", "ic", "IC", "cd", "ce", "al", "dl", "ta",
     "md", "so", "us", "me", "se", "ue", "ch",
-    "ku", "kd", "kl", "kr", "sc", "rc", "bc"
+    "ku", "kd", "kl", "kr", "sc", "rc", "bc", "AF", "AB"
 };
 
 /* Initialise termcap */
@@ -590,6 +595,7 @@ init_term(void)
 
 	tclines = tgetnum("li");
 	tccolumns = tgetnum("co");
+	tccolours = tgetnum("Co");
 
 	/* if there's no termcap entry for cursor up, use single line mode: *
 	 * this is flagged by termflags which is examined in zle_refresh.c  *
