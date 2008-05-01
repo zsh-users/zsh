@@ -1106,32 +1106,65 @@ A restricted set of editing functions
 is available in the mini-buffer.  An interrupt signal, as defined by the stty
 setting, will stop the search and go back to the original line.  An undefined
 key will have the same effect. The supported functions are:
-tt(backward-delete-char),
-tt(vi-backward-delete-char),
-tt(clear-screen),
-tt(redisplay),
-tt(quoted-insert),
-tt(vi-quoted-insert),
-tt(accept-and-hold),
-tt(accept-and-infer-next-history),
-tt(accept-line) and
-tt(accept-line-and-down-history).
 
-tt(magic-space) just inserts a space.
-tt(vi-cmd-mode) toggles between the `tt(main)' and `tt(vicmd)' keymaps;
+startitem()
+xitem(tt(accept-and-hold))
+xitem(tt(accept-and-infer-next-history))
+xitem(tt(accept-line))
+item(tt(accept-line-and-down-history))(
+Perform the usual function after exiting incremental search.
+The command line displayed is executed.
+)
+xitem(tt(backward-delete-char))
+item(tt(vi-backward-delete-char))(
+Back up one place in the search history.  If the search has been
+repeated this does not immediately erase a character in the
+minibuffer.
+)
+xitem(tt(backward-delete-word))
+xitem(tt(backward-kill-word))
+item(tt(vi-backward-kill-word))(
+Back up one character in the minibuffer; if multiple searches
+have been performed since the character was inserted the search
+history is rewound to the point just before the character was
+entered.  Hence this has the effect of repeating
+tt(backward-delete-char).
+)
+item(tt(clear-screen))(
+Clear the screen, remaining in incremental search mode.
+)
+item(tt(history-incremental-search-backward))(
+Find the next occurrence of the contents of the mini-buffer.
+)
+item(tt(history-incremental-search-forward))(
+Invert the sense of the search.
+)
+item(tt(magic-space))(
+Inserts a non-magical space.
+)
+xitem(tt(quoted-insert))
+item(tt(vi-quoted-insert))(
+Quote the character to insert into the minibuffer.
+)
+item(tt(redisplay))(
+Redisplay the command line, remaining in incremental search mode.
+)
+item(tt(vi-cmd-mode))(
+Toggle between the `tt(main)' and `tt(vicmd)' keymaps;
 the `tt(main)' keymap (insert mode) will be selected initially.
-tt(history-incremental-search-backward) will get the
-next occurrence of the contents of the mini-buffer.
-tt(history-incremental-search-forward) inverts the sense of the search.
-tt(vi-repeat-search) and tt(vi-rev-repeat-search) are similarly supported.
-The direction of the search is indicated in the mini-buffer.
+)
+xitem(tt(vi-repeat-search))
+item(tt(vi-rev-repeat-search))(
+Repeat the search.  The direction of the search is indicated in the
+mini-buffer.
+)
+enditem()
 
-Any multi-character string
-that is not bound to one of the above functions will beep and interrupt the
-search, leaving the last found line in the buffer. Any single character that
-is not bound to one of the above functions, or tt(self-insert) or
-tt(self-insert-unmeta), will have the same effect but the function will be
-executed.
+Any multi-character string that is not bound to one of the above functions
+will beep and interrupt the search, leaving the last found line in the
+buffer. Any single character that is not bound to one of the above
+functions, or tt(self-insert) or tt(self-insert-unmeta), will have the same
+effect but the function will be executed.
 
 When called from a widget function by the tt(zle) command, the incremental
 search commands can take a string argument.  This will be treated as a

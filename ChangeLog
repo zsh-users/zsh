@@ -1,5 +1,9 @@
 2008-05-01  Peter Stephenson  <pws@csr.com>
 
+	* 24900: Doc/Zsh/zle.yo, Src/Zle/zle_hist.c: add
+	backward-kill-word to delete previous character immediately
+	in isearch and document the isearch commands better.
+
 	* 24899: Doc/Zsh/zle.yo, Src/Zle/zle_main.c,
 	Src/Zle/zle_refresh.c: make colour escape sequences configurable
 	and allow ANSI colour names.

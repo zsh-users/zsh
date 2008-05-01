@@ -1445,26 +1445,37 @@ doisearch(char **args, int dir, int pattern)
 	    if(selectkeymap(invicmdmode() ? "main" : "vicmd", 0))
 		feep = 1;
 	    goto ref;
-       } else if(cmd == Th(z_vibackwarddeletechar) ||
-               cmd == Th(z_backwarddeletechar)) {
-           if (top_spot) {
-               get_isrch_spot(--top_spot, &hl, &pos, &pat_hl, &pat_pos,
-                              &end_pos, &zlemetacs, &sbptr, &dir, &nomatch);
-               patprog = NULL;
-               nosearch = 1;
-               skip_pos = 0;
-           } else
-               feep = 1;
-           if (nomatch) {
-               memcpy(ibuf, nomatch == 2 ? INVALID_TEXT : FAILING_TEXT,
-                      BAD_TEXT_LEN);
-               statusline = ibuf;
-               skip_pos = 1;
+       } else if (cmd == Th(z_vibackwarddeletechar) ||
+		  cmd == Th(z_backwarddeletechar) ||
+		  cmd == Th(z_vibackwardkillword) ||
+		  cmd == Th(z_backwardkillword) ||
+		  cmd == Th(z_backwarddeleteword)) {
+	    int only_one = (cmd == Th(z_vibackwarddeletechar) ||
+			    cmd == Th(z_backwarddeletechar));
+	    int old_sbptr = sbptr;
+	    if (top_spot) {
+		for (;;) {
+		    get_isrch_spot(--top_spot, &hl, &pos, &pat_hl,
+				   &pat_pos,  &end_pos, &zlemetacs,
+				   &sbptr, &dir, &nomatch);
+		    if (only_one || !top_spot || old_sbptr != sbptr)
+			break;
+		}
+		patprog = NULL;
+		nosearch = 1;
+		skip_pos = 0;
+	    } else
+		feep = 1;
+	    if (nomatch) {
+		memcpy(ibuf, nomatch == 2 ? INVALID_TEXT : FAILING_TEXT,
+		       BAD_TEXT_LEN);
+		statusline = ibuf;
+		skip_pos = 1;
 	    }
 	    he = quietgethist(hl);
 	    zt = GETZLETEXT(he);
 	    /*
-	     * Set the line for the cases where we won't go passed
+	     * Set the line for the cases where we won't go past
 	     * the usual line-setting logic:  if we're not on a match,
 	     * or if we don't have enough to search for.
 	     */
