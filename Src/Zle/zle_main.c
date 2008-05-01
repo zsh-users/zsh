@@ -1903,6 +1903,7 @@ boot_(Module m)
     addhookfunc("before_trap", (Hookfn) zlebeforetrap);
     addhookfunc("after_trap", (Hookfn) zleaftertrap);
     (void)addhookdefs(m, zlehooks, sizeof(zlehooks)/sizeof(*zlehooks));
+    zle_refresh_boot();
     return 0;
 }
 

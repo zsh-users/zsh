@@ -2088,6 +2088,39 @@ These characters are described below.
 )
 enditem()
 
+tt(zle_highlight) may contain additional fields for controlling how
+terminal sequences to change colours are output.  Each of the following is
+followed by a colon and a string in the same form as for key bindings.
+This will not be necessary for the vast majority of terminals as the
+defaults shown in parentheses are widely used.
+
+startitem()
+cindex(escape sequences, terminal, for highlighting)
+cindex(terminal escape sequences for highlighting)
+item(tt(fg_start_code) (tt(\e[3)))(
+The start of the escape sequence for the foreground colour.
+This is followed by an ASCII digit representing the colour.
+)
+item(tt(fg_default_code) (tt(9)))(
+The number to use instead of the colour to reset the default foreground
+colour.
+)
+item(tt(fg_end_code) (tt(m)))(
+The end of the escape sequence for the foreground colour.
+)
+item(tt(bg_start_code) (tt(\e[4)))(
+The start of the escape sequence for the background colour.
+This is followed by an ASCII digit representing the colour.
+)
+item(tt(bg_default_code) (tt(9)))(
+The number to use instead of the colour to reset the default
+background colour.
+)
+item(tt(bg_end_code) (tt(m)))(
+The end of the escape sequence for the background colour.
+)
+enditem()
+
 The available types of highlighting are the following.  Note that
 not all types of highlighting are available on all terminals:
 
@@ -2098,11 +2131,19 @@ this to appear with other types of highlighting; it is used to override
 a default.
 )
 item(tt(fg=)var(colour))(
-The foreground colour should be set to var(colour), a decimal integer.  Not
-all terminals support this, and of those that do not all provide facilities
-to test the support, hence the user should decide based on the terminal
-type.  Most terminals with colour support accept the numbers 0 to 7, and
-may generate additional colours if the tt(bold) attributes is also present.
+The foreground colour should be set to var(colour), a decimal integer
+or the name of one of the eight most widely-supported colours.
+
+Not all terminals support this and, of those that do, not all provide
+facilities to test the support, hence the user should decide based on the
+terminal type.  Most terminals with colour support accept the numbers 0 to
+7, and may generate additional colours if the tt(bold) attributes is also
+present.  Most terminals also have a standard range of colours for those
+numbers (though the interpretation of the colour can vary); these colours
+can be set by one of the names tt(black), tt(red), tt(green), tt(yellow),
+tt(blue), tt(magenta), tt(cyan) and tt(white).  Abbreviations are
+allowed; tt(b) or tt(bl) selects black.
+
 On recent terminals and on systems with an up-to-date terminal database the
 number of colours supported may be tested by with the command `tt(echotc
 Co)'; if this succeeds, it indicates a limit on the number of colours which
@@ -2112,7 +2153,7 @@ limited to 256 (i.e. the range 0 to 255).
 Colour is also known as color.
 )
 item(tt(bg=)var(colour))(
-The background colour should be set to var(colour), a decimal integer.
+The background colour should be set to var(colour).
 This works similarly to the foreground colour, except the background is
 not usually affected by the bold attribute.
 )
@@ -2144,12 +2185,18 @@ Control characters in the ASCII range are shown as
 `tt(^)' followed by the base character.
 )
 item(Unprintable multibyte characters)(
-If the tt(MULTIBYTE) option is in effect,
-multibyte characters not in the ASCII character set that are reported as
-having zero width are shown as a hexadecimal number between
-angle brackets.  The number is the code point of the character in
-the wide character set; this may or may not be Unicode, depending
-on the operating system.
+This item applies to control characters not in the ASCII range,
+plus other characters as follows.  If the tt(MULTIBYTE) option is in
+effect, multibyte characters not in the ASCII character set that are
+reported as having zero width are treated as combining characters when the
+option tt(COMBINING_CHARS) is on.  If the option is off, or if a character
+appears where a combining character is not valid, the character
+is treated as unprintable.
+
+Unprintable multibyte characters are shown as a hexadecimal number between
+angle brackets.  The number is the code point of the character in the wide
+character set; this may or may not be Unicode, depending on the operating
+system.
 )
 enditem()
 

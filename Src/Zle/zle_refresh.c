@@ -326,6 +326,11 @@ static const REFRESH_ELEMENT zr_start_ellipsis[] = {
 #define ZR_START_ELLIPSIS_SIZE	\
     ((int)(sizeof(zr_start_ellipsis)/sizeof(zr_start_ellipsis[0])))
 
+/* Defines standard ANSI colour names in index order */
+static const char *ansi_colours[] = {
+    "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white",
+    NULL
+};
 
 /* Defines the available types of highlighting */
 struct highlight {
@@ -341,6 +346,101 @@ static const struct highlight highlights[] = {
     { "underline", TXTUNDERLINE, 0 },
     { NULL, 0, 0 }
 };
+
+/* Structure and array for holding special colour terminal sequences */
+
+/* Start of escape sequence for foreground colour */
+#define TC_COL_FG_START	"\033[3"
+/* End of escape sequence for foreground colour */
+#define TC_COL_FG_END	"m"
+/* Code to reset foreground colour */
+#define TC_COL_FG_DEFAULT	"9"
+
+/* Start of escape sequence for background colour */
+#define TC_COL_BG_START	"\033[4"
+/* End of escape sequence for background colour */
+#define TC_COL_BG_END	"m"
+/* Code to reset background colour */
+#define TC_COL_BG_DEFAULT	"9"
+
+struct colour_sequences {
+    char *start;		/* Escape sequence start */
+    char *end;			/* Escape sequence terminator */
+    char *def;			/* Code to reset default colour */
+};
+struct colour_sequences fg_bg_sequences[2];
+
+#define COL_SEQ_FG	(0)
+#define COL_SEQ_BG	(1)
+#define COL_SEQ_COUNT	(2)
+
+/*
+ * We need a buffer for colour sequence compostion.  It may
+ * vary depending on the sequences set.  However, it's inefficient
+ * allocating it separately every time we send a colour sequence,
+ * so do it once per refresh.
+ */
+static char *colseq_buf;
+
+static void
+set_default_colour_sequences(void)
+{
+    fg_bg_sequences[COL_SEQ_FG].start = ztrdup(TC_COL_FG_START);
+    fg_bg_sequences[COL_SEQ_FG].end = ztrdup(TC_COL_FG_END);
+    fg_bg_sequences[COL_SEQ_FG].def = ztrdup(TC_COL_FG_DEFAULT);
+
+    fg_bg_sequences[COL_SEQ_BG].start = ztrdup(TC_COL_BG_START);
+    fg_bg_sequences[COL_SEQ_BG].end = ztrdup(TC_COL_BG_END);
+    fg_bg_sequences[COL_SEQ_BG].def = ztrdup(TC_COL_BG_DEFAULT);
+}
+
+static void
+free_colour_sequences(void)
+{
+    int i;
+
+    for (i = 0; i < COL_SEQ_COUNT; i++) {
+	zsfree(fg_bg_sequences[i].start);
+	zsfree(fg_bg_sequences[i].end);
+	zsfree(fg_bg_sequences[i].def);
+    }
+}
+
+/*
+ * Return index of ANSI colour for which *teststrp is an abbreviation.
+ * Any non-alphabetic character ends the abbreviation.
+ */
+
+static int
+match_colour(const char **teststrp)
+{
+    const char *teststr = *teststrp, *end, **cptr;
+    int len;
+
+    for (end = teststr; ialpha(*end); end++)
+	;
+    len = end - teststr;
+    *teststrp = end;
+
+    for (cptr = ansi_colours; *cptr; cptr++) {
+	if (!strncmp(teststr, *cptr, len))
+	    return cptr - ansi_colours;
+    }
+
+    return -1;
+}
+
+static void
+set_colour_code(char *str, char **var)
+{
+    char *keyseq;
+    int len;
+
+    zsfree(*var);
+    keyseq = getkeystring(str, &len, GETKEYS_BINDKEY, NULL);
+    *var = metafy(keyseq, len, META_DUP);
+}
+
 
 /*
  * Match a set of highlights in the given teststr.
@@ -359,15 +459,20 @@ match_highlight(const char *teststr, int *on_var)
 	found = 0;
 	if (strpfx("fg=", teststr) || strpfx("bg=", teststr)) {
 	    int is_fg = (teststr[0] == 'f');
-	    int colour = (int)zstrtol(teststr+3, (char **)&teststr, 10);
-	    int shft, on;
+	    int colour, shft, on;
+
+	    teststr += 3;
+	    if (ialpha(*teststr))
+		colour = match_colour(&teststr);
+	    else
+		colour = (int)zstrtol(teststr, (char **)&teststr, 10);
 	    if (*teststr == ',')
 		teststr++;
 	    else if (*teststr)
 		break;
 	    found = 1;
 	    /* skip out of range colours but keep scanning attributes */
-	    if (colour >= 256)
+	    if (colour < 0 || colour >= 256)
 		continue;
 	    if (is_fg) {
 		shft = TXT_ATTR_FG_COL_SHIFT;
@@ -404,12 +509,14 @@ match_highlight(const char *teststr, int *on_var)
  */
 
 /**/
-void zle_set_highlight(void)
+static void
+zle_set_highlight(void)
 {
     char **atrs = getaparam("zle_highlight");
     int special_atr_on_set = 0;
     int region_atr_on_set = 0;
     int isearch_atr_on_set = 0;
+    int lenfg, lenbg, len;
     struct region_highlight *rhp;
 
     special_atr_on = 0;
@@ -442,6 +549,18 @@ void zle_set_highlight(void)
 	    } else if (strpfx("isearch:", *atrs)) {
 		match_highlight(*atrs + 8, &(region_highlights[1].atr));
 		isearch_atr_on_set = 1;
+	    } else if (strpfx("fg_start_code:", *atrs)) {
+		set_colour_code(*atrs + 14, &fg_bg_sequences[COL_SEQ_FG].start);
+	    } else if (strpfx("fg_default_code:", *atrs)) {
+		set_colour_code(*atrs + 16, &fg_bg_sequences[COL_SEQ_FG].def);
+	    } else if (strpfx("fg_end_code:", *atrs)) {
+		set_colour_code(*atrs + 12, &fg_bg_sequences[COL_SEQ_FG].end);
+	    } else if (strpfx("bg_start_code:", *atrs)) {
+		set_colour_code(*atrs + 14, &fg_bg_sequences[COL_SEQ_BG].start);
+	    } else if (strpfx("bg_default_code:", *atrs)) {
+		set_colour_code(*atrs + 16, &fg_bg_sequences[COL_SEQ_BG].def);
+	    } else if (strpfx("bg_end_code:", *atrs)) {
+		set_colour_code(*atrs + 12, &fg_bg_sequences[COL_SEQ_BG].end);
 	    }
 	}
     }
@@ -453,8 +572,34 @@ void zle_set_highlight(void)
 	region_highlights->atr = TXTSTANDOUT;
     if (!isearch_atr_on_set)
 	region_highlights[1].atr = TXTUNDERLINE;
+
+    /* Allocate buffer for colour code composition */
+    lenfg = strlen(fg_bg_sequences[COL_SEQ_FG].def);
+    /* always need 1 character for non-default code */
+    if (lenfg < 1)
+	lenfg = 1;
+    lenfg += strlen(fg_bg_sequences[COL_SEQ_FG].start) +
+	strlen(fg_bg_sequences[COL_SEQ_FG].end);
+
+    lenbg = strlen(fg_bg_sequences[COL_SEQ_BG].def);
+    /* always need 1 character for non-default code */
+    if (lenbg < 1)
+	lenbg = 1;
+    lenbg += strlen(fg_bg_sequences[COL_SEQ_BG].start) +
+	strlen(fg_bg_sequences[COL_SEQ_BG].end);
+
+    len = lenfg > lenbg ? lenfg : lenbg;
+    colseq_buf = (char *)zalloc(len+1);
 }
 
+
+/**/
+static void
+zle_free_highlight(void)
+{
+    /* Free buffer for colour code composition */
+    free(colseq_buf);
+}
 
 /*
  * Interface to the region_highlight ZLE parameter.
@@ -942,26 +1087,12 @@ snextline(Rparams rpms)
     rpms->sen = rpms->s + winw;
 }
 
-/*
- * HERE: these need to be made configurable, somehow.
- * Ideally we need to make the complist stuff use the
- * same system, but that may be too much tied to the GNU ls
- * interface to make that possible.
- */
-/* Start of escape sequence for foreground colour */
-#define TC_COL_FG_START	"\033[3"
-/* Start of escape sequence for background colour */
-#define TC_COL_BG_START	"\033[4"
-/* End of either escape sequence */
-#define TC_COL_END	"m"
-/* Numeric code (to be turned into ASCII) to reset default colour */
-#define TC_COL_DEFAULT	9
 
 static void
-setcolourattribute(int colour, char *start, int tc, int def,
+setcolourattribute(int colour, int fg_bg, int tc, int def,
 		   int use_termcap)
 {
-    char out[16], *ptr;
+    char *ptr;
     /*
      * If we're not restoring the default, and either have a
      * colour value that is too large for ANSI, or have been told
@@ -980,14 +1111,17 @@ setcolourattribute(int colour, char *start, int tc, int def,
 	    return;
     }
 
-    strcpy(out, start);
-    if (def)
-	colour = TC_COL_DEFAULT;
+    strcpy(colseq_buf, fg_bg_sequences[fg_bg].start);
 
-    ptr = out + strlen(start);
-    *ptr++ = colour + '0';
-    strcpy(ptr, TC_COL_END);
-    tputs(out, 1, putshout);
+    ptr = colseq_buf + strlen(colseq_buf);
+    if (def) {
+	strcpy(ptr, fg_bg_sequences[fg_bg].def);
+	while (*ptr)
+	    ptr++;
+    } else
+	*ptr++ = colour + '0';
+    strcpy(ptr, fg_bg_sequences[fg_bg].end);
+    tputs(colseq_buf, 1, putshout);
 }
 
 /**/
@@ -1008,13 +1142,13 @@ settextattributes(int atr)
 	tsetcap(TCUNDERLINEBEG, 0);
     if (txtchangeisset(atr, TXTFGCOLOUR|TXTNOFGCOLOUR)) {
 	setcolourattribute(txtchangeget(atr, TXT_ATTR_FG_COL),
-			   TC_COL_FG_START, TCFGCOLOUR,
+			   COL_SEQ_FG, TCFGCOLOUR,
 			   txtchangeisset(atr, TXTNOFGCOLOUR),
 			   txtchangeisset(atr, TXT_ATTR_FG_TERMCAP));
     }
     if (txtchangeisset(atr, TXTBGCOLOUR|TXTNOBGCOLOUR)) {
 	setcolourattribute(txtchangeget(atr, TXT_ATTR_BG_COL),
-			   TC_COL_BG_START, TCBGCOLOUR,
+			   COL_SEQ_BG, TCBGCOLOUR,
 			   txtchangeisset(atr, TXTNOBGCOLOUR),
 			   txtchangeisset(atr, TXT_ATTR_BG_TERMCAP));
     }
@@ -1795,6 +1929,8 @@ singlelineout:
 
     if (tmpalloced)
 	zfree(tmpline, tmpll * sizeof(*tmpline));
+
+    zle_free_highlight();
 
     /* if we have a new list showing, note it; if part of the list has been
     overwritten, redisplay it. We have to metafy line back before calling
@@ -2711,6 +2847,15 @@ singmoveto(int pos)
     vcs = pos;
 }
 
+/* Provided for loading the module in a modular fashion */
+
+/**/
+void
+zle_refresh_boot(void)
+{
+    set_default_colour_sequences();
+}
+
 /* Provided for unloading the module in a modular fashion */
 
 /**/
@@ -2722,4 +2867,6 @@ zle_refresh_finish(void)
     if (region_highlights)
 	zfree(region_highlights,
 	      sizeof(struct region_highlight) * n_region_highlights);
+
+    free_colour_sequences();
 }
