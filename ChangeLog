@@ -1,3 +1,10 @@
+2008-05-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/12815: Src/jobs.c, Src/signals.c, Src/zsh.h:
+	fix bug that a previously defunct process could be taken as a
+	recently terminated process that needed marking as done, hence
+	causing the shell to wait for ever for the newly exited process.
+
 2008-05-01  Peter Stephenson  <pws@csr.com>
 
 	* 24900: Doc/Zsh/zle.yo, Src/Zle/zle_hist.c: add

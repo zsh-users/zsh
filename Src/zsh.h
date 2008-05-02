@@ -857,24 +857,24 @@ struct job {
     struct ttyinfo *ty;		/* the modes specified by STTY       */
 };
 
-#define STAT_CHANGED	(1<<0)	/* status changed and not reported      */
-#define STAT_STOPPED	(1<<1)	/* all procs stopped or exited          */
-#define STAT_TIMED	(1<<2)	/* job is being timed                   */
-#define STAT_DONE	(1<<3)	/* job is done                          */
-#define STAT_LOCKED	(1<<4)	/* shell is finished creating this job, */
-                                /*   may be deleted from job table      */
-#define STAT_NOPRINT	(1<<5)	/* job was killed internally,           */
-                                /*   we don't want to show that         */
-#define STAT_INUSE	(1<<6)	/* this job entry is in use             */
-#define STAT_SUPERJOB	(1<<7)	/* job has a subjob                     */
-#define STAT_SUBJOB	(1<<8)	/* job is a subjob                      */
-#define STAT_WASSUPER   (1<<9)  /* was a super-job, sub-job needs to be */
-				/* deleted */
-#define STAT_CURSH	(1<<10)	/* last command is in current shell     */
-#define STAT_NOSTTY	(1<<11)	/* the tty settings are not inherited   */
-				/* from this job when it exits.         */
-#define STAT_ATTACH	(1<<12)	/* delay reattaching shell to tty       */
-#define STAT_SUBLEADER  (1<<13) /* is super-job, but leader is sub-shell */
+#define STAT_CHANGED	(0x0001) /* status changed and not reported      */
+#define STAT_STOPPED	(0x0002) /* all procs stopped or exited          */
+#define STAT_TIMED	(0x0004) /* job is being timed                   */
+#define STAT_DONE	(0x0008) /* job is done                          */
+#define STAT_LOCKED	(0x0010) /* shell is finished creating this job, */
+                                 /*   may be deleted from job table      */
+#define STAT_NOPRINT	(0x0020) /* job was killed internally,           */
+                                 /*   we don't want to show that         */
+#define STAT_INUSE	(0x0040) /* this job entry is in use             */
+#define STAT_SUPERJOB	(0x0080) /* job has a subjob                     */
+#define STAT_SUBJOB	(0x0100) /* job is a subjob                      */
+#define STAT_WASSUPER   (0x0200) /* was a super-job, sub-job needs to be */
+				 /* deleted */
+#define STAT_CURSH	(0x0400) /* last command is in current shell     */
+#define STAT_NOSTTY	(0x0800) /* the tty settings are not inherited   */
+				 /* from this job when it exits.         */
+#define STAT_ATTACH	(0x1000) /* delay reattaching shell to tty       */
+#define STAT_SUBLEADER  (0x2000) /* is super-job, but leader is sub-shell */
 
 #define SP_RUNNING -1		/* fake status for jobs currently running */
 

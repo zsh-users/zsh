@@ -153,6 +153,15 @@ findproc(pid_t pid, Job *jptr, Process *pptr, int aux)
 
     for (i = 1; i <= maxjob; i++)
     {
+	/*
+	 * We are only interested in jobs with processes still
+	 * marked as live.  Careful in case there's an identical
+	 * process number in a job we haven't quite got around
+	 * to deleting.
+	 */
+	if (jobtab[i].stat & STAT_DONE)
+	    continue;
+
 	for (pn = aux ? jobtab[i].auxprocs : jobtab[i].procs;
 	     pn; pn = pn->next)
 	    if (pn->pid == pid) {

@@ -408,15 +408,21 @@ zhandler(int sig)
     signal_process(sig);
  
     sigfillset(&newmask);
-    oldmask = signal_block(newmask);        /* Block all signals temporarily           */
+    /* Block all signals temporarily           */
+    oldmask = signal_block(newmask);
  
 #if defined(NO_SIGNAL_BLOCKING)
-    do_jump = suspend_longjmp;              /* do we need to longjmp to signal_suspend */
-    suspend_longjmp = 0;                    /* In case a SIGCHLD somehow arrives       */
+    /* do we need to longjmp to signal_suspend */
+    do_jump = suspend_longjmp;
+    /* In case a SIGCHLD somehow arrives       */
+    suspend_longjmp = 0;
 
-    if (sig == SIGCHLD) {                   /* Traps can cause nested signal_suspend()  */
-        if (do_jump)
-            jump_to = suspend_jmp_buf;      /* Copy suspend_jmp_buf                    */
+    /* Traps can cause nested signal_suspend()  */
+    if (sig == SIGCHLD) {
+        if (do_jump) {
+	    /* Copy suspend_jmp_buf                    */
+            jump_to = suspend_jmp_buf;
+	}
     }
 #endif
 
@@ -425,30 +431,36 @@ zhandler(int sig)
         int temp_rear = ++queue_rear % MAX_QUEUE_SIZE;
 
 	DPUTS(temp_rear == queue_front, "BUG: signal queue full");
-        if (temp_rear != queue_front) { /* Make sure it's not full (extremely unlikely) */
-            queue_rear = temp_rear;                  /* ok, not full, so add to queue   */
-            signal_queue[queue_rear] = sig;          /* save signal caught              */
-            signal_mask_queue[queue_rear] = oldmask; /* save current signal mask        */
+	/* Make sure it's not full (extremely unlikely) */
+        if (temp_rear != queue_front) {
+	    /* ok, not full, so add to queue   */
+            queue_rear = temp_rear;
+	    /* save signal caught              */
+            signal_queue[queue_rear] = sig;
+	    /* save current signal mask        */
+            signal_mask_queue[queue_rear] = oldmask;
         }
         signal_reset(sig);
         return;
     }
  
-    signal_setmask(oldmask);          /* Reset signal mask, signal traps ok now */
+    /* Reset signal mask, signal traps ok now */
+    signal_setmask(oldmask);
  
     switch (sig) {
     case SIGCHLD:
 
 	/* keep WAITING until no more child processes to reap */
-	for (;;)
-	  cont: {
-            int old_errno = errno; /* save the errno, since WAIT may change it */
+	for (;;) {
+	    /* save the errno, since WAIT may change it */
+	    int old_errno = errno;
 	    int status;
 	    Job jn;
 	    Process pn;
-            pid_t pid;
+	    pid_t pid;
 	    pid_t *procsubpid = &cmdoutpid;
 	    int *procsubval = &cmdoutval;
+	    int cont = 0;
 	    struct execstack *es = exstack;
 
 	    /*
@@ -471,8 +483,8 @@ zhandler(int sig)
 # endif
 #endif
 
-            if (!pid)  /* no more children to reap */
-                break;
+	    if (!pid)  /* no more children to reap */
+		break;
 
 	    /* check if child returned was from process substitution */
 	    for (;;) {
@@ -483,7 +495,8 @@ zhandler(int sig)
 		    else
 			*procsubval = WEXITSTATUS(status);
 		    get_usage();
-		    goto cont;
+		    cont = 1;
+		    break;
 		}
 		if (!es)
 		    break;
@@ -491,16 +504,22 @@ zhandler(int sig)
 		procsubval = &es->cmdoutval;
 		es = es->next;
 	    }
+	    if (cont)
+		continue;
 
 	    /* check for WAIT error */
-            if (pid == -1) {
-                if (errno != ECHILD)
-                    zerr("wait failed: %e", errno);
-                errno = old_errno;    /* WAIT changed errno, so restore the original */
-                break;
-            }
+	    if (pid == -1) {
+		if (errno != ECHILD)
+		    zerr("wait failed: %e", errno);
+		/* WAIT changed errno, so restore the original */
+		errno = old_errno;
+		break;
+	    }
 
-	    /* Find the process and job containing this pid and update it. */
+	    /*
+	     * Find the process and job containing this pid and
+	     * update it.
+	     */
 	    if (findproc(pid, &jn, &pn, 0)) {
 #if defined(HAVE_WAIT3) && defined(HAVE_GETRUSAGE)
 		struct timezone dummy_tz;
@@ -517,11 +536,12 @@ zhandler(int sig)
 	    } else {
 		/* If not found, update the shell record of time spent by
 		 * children in sub processes anyway:  otherwise, this
-		 * will get added on to the next found process that terminates.
+		 * will get added on to the next found process that
+		 * terminates.
 		 */
 		get_usage();
 	    }
-        }
+	}
         break;
  
     case SIGHUP:
