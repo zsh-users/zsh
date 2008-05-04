@@ -247,6 +247,11 @@ upline(void)
 	    if (zlecs > findbol() && invicmdmode())
 		DECCS();
 	}
+#ifdef MULTIBYTE_SUPPORT
+	else
+	    CCRIGHT();
+#endif
+	    
     }
     return n;
 }
@@ -331,6 +336,10 @@ downline(void)
 	    if (zlecs > findbol() && invicmdmode())
 		DECCS();
 	}
+#ifdef MULTIBYTE_SUPPORT
+	else
+	    CCRIGHT();
+#endif
     }
     return n;
 }

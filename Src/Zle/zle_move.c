@@ -307,11 +307,19 @@ beginningofline(char **args)
 	return ret;
     }
     while (n--) {
+	int pos;
+
 	if (zlecs == 0)
 	    return 0;
-	if (zleline[zlecs - 1] == '\n')
-	    if (!--zlecs)
+	pos = zlecs;
+	DECPOS(pos);
+	if (zleline[pos] == '\n') {
+	    zlecs = pos;
+	    if (!zlecs)
 		return 0;
+	}
+
+	/* works OK with combining chars since '\n' must be on its own */
 	while (zlecs && zleline[zlecs - 1] != '\n')
 	    zlecs--;
     }
@@ -359,11 +367,19 @@ beginningoflinehist(char **args)
 	return ret;
     }
     while (n) {
+	int pos;
+
 	if (zlecs == 0)
 	    break;
-	if (zleline[zlecs - 1] == '\n')
-	    if (!--zlecs)
+	pos = zlecs;
+	DECPOS(pos);
+	if (zleline[pos] == '\n') {
+	    zlecs = pos;
+	    if (!pos)
 		break;
+	}
+
+	/* works OK with combining chars since '\n' must be on its own */
 	while (zlecs && zleline[zlecs - 1] != '\n')
 	    zlecs--;
 	n--;
@@ -554,12 +570,15 @@ vimatchbracket(UNUSED(char **args))
 	oth = '[';
 	break;
     default:
-	zlecs++;
+	INCCS();
 	goto otog;
     }
     ct = 1;
     while (zlecs >= 0 && zlecs < zlell && ct) {
-	zlecs += dir;
+	if (dir < 0)
+	    DECCS();
+	else
+	    INCCS();
 	if (zleline[zlecs] == oth)
 	    ct--;
 	else if (zleline[zlecs] == me)
@@ -634,7 +653,7 @@ viendofline(UNUSED(char **args))
 	}
 	zlecs = findeol() + 1;
     }
-    zlecs--;
+    DECCS();
     lastcol = 1<<30;
     return 0;
 }

@@ -262,7 +262,7 @@ dovilinerange(void)
 	    zlecs = pos;
 	    return 1;
 	}
-	zlecs--;
+	DECCS();
     } else {
 	while(n++ && zlecs >= 0)
 	    zlecs = findbol() - 1;
@@ -270,7 +270,7 @@ dovilinerange(void)
 	    zlecs = pos;
 	    return 1;
 	}
-	zlecs++;
+	INCCS();
     }
     virangeflag = 2;
     return 0;
@@ -281,7 +281,7 @@ int
 viaddnext(UNUSED(char **args))
 {
     if (zlecs != findeol())
-	zlecs++;
+	INCCS();
     startvitext(1);
     return 0;
 }
@@ -776,7 +776,7 @@ viputbefore(UNUSED(char **args))
 	    zlecs += buf->len;
 	}
 	if (zlecs)
-	    zlecs--;
+	    DECCS();
     }
     return 0;
 }
@@ -819,20 +819,27 @@ viputafter(UNUSED(char **args))
 int
 vijoin(UNUSED(char **args))
 {
-    int x;
+    int x, pos;
 
     startvichange(-1);
     if ((x = findeol()) == zlell)
 	return 1;
     zlecs = x + 1;
-    for (x = 1; zlecs != zlell && ZC_iblank(zleline[zlecs]); zlecs++, x++);
+    pos = zlecs;
+    for (; zlecs != zlell && ZC_iblank(zleline[zlecs]); INCPOS(zlecs))
+	;
+    x = 1 + (zlecs - pos);
     backdel(x, CUT_RAW);
-    if (zlecs && ZC_iblank(zleline[zlecs-1]))
-	zlecs--;
-    else {
-	spaceinline(1);
-	zleline[zlecs] = ZWC(' ');
+    if (zlecs) {
+	int pos = zlecs;
+	DECPOS(pos);
+	if (ZC_iblank(zleline[pos])) {
+	    zlecs = pos;
+	    return 0;
+	}
     }
+    spaceinline(1);
+    zleline[zlecs] = ZWC(' ');
     return 0;
 }
 
@@ -851,10 +858,10 @@ viswapcase(UNUSED(char **args))
 	    zleline[zlecs] = ZC_toupper(zleline[zlecs]);
 	else if (ZC_iupper(zleline[zlecs]))
 	    zleline[zlecs] = ZC_tolower(zleline[zlecs]);
-	zlecs++;
+	INCCS();
     }
     if (zlecs && zlecs == eol)
-	zlecs--;
+	DECCS();
     return 0;
 }
 
@@ -909,7 +916,7 @@ vikilleol(UNUSED(char **args))
 	return 1;
     }
     /* delete to end of line */
-    forekill(findeol() - zlecs, 0);
+    forekill(findeol() - zlecs, CUT_RAW);
     return 0;
 }
 
@@ -925,13 +932,17 @@ vipoundinsert(UNUSED(char **args))
 	spaceinline(1);
 	zleline[zlecs] = '#';
 	if(zlecs <= viinsbegin)
-	    viinsbegin++;
-	zlecs = oldcs + (zlecs <= oldcs);
+	    INCPOS(viinsbegin);
+	if (zlecs <= oldcs)
+	    INCPOS(oldcs);
+	zlecs = oldcs;
     } else {
 	foredel(1, 0);
 	if (zlecs < viinsbegin)
-	    viinsbegin--;
-	zlecs = oldcs - (zlecs < oldcs);
+	    DECPOS(viinsbegin);
+	if (zlecs < oldcs)
+	    DECPOS(oldcs);
+	zlecs = oldcs;
     }
     return 0;
 }

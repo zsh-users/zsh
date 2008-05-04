@@ -801,10 +801,20 @@ copyprevword(UNUSED(char **args))
 	for (;;) {
 	    t1 = t0;
 
-	    while (t0 && !ZC_iword(zleline[t0-1]))
-		t0--;
-	    while (t0 && ZC_iword(zleline[t0-1]))
-		t0--;
+	    while (t0) {
+		int prev = t0;
+		DECPOS(prev);
+		if (ZC_iword(zleline[prev]))
+		    break;
+		t0 = prev;
+	    }
+	    while (t0) {
+		int prev = t0;
+		DECPOS(prev);
+		if (!ZC_iword(zleline[prev]))
+		    break;
+		t0 = prev;
+	    }
 
 	    if (!--count)
 		break;
