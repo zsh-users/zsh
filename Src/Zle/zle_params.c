@@ -87,6 +87,8 @@ static const struct gsu_integer numeric_gsu =
 { get_numeric, set_numeric, unset_numeric };
 static const struct gsu_integer pending_gsu =
 { get_pending, NULL, zleunsetfn };
+static const struct gsu_integer region_active_gsu =
+{ get_region_active, set_region_active, zleunsetfn };
 
 static const struct gsu_array killring_gsu =
 { get_killring, set_killring, unset_killring };
@@ -123,6 +125,7 @@ static struct zleparam {
     { "PREBUFFER",  PM_SCALAR | PM_READONLY,  GSU(prebuffer_gsu), NULL },
     { "PREDISPLAY", PM_SCALAR, GSU(predisplay_gsu), NULL },
     { "RBUFFER", PM_SCALAR,  GSU(rbuffer_gsu), NULL },
+    { "REGION_ACTIVE", PM_INTEGER, GSU(region_active_gsu), NULL},
     { "region_highlight", PM_ARRAY, GSU(region_highlight_gsu), NULL },
     { "WIDGET", PM_SCALAR | PM_READONLY, GSU(widget_gsu), NULL },
     { "WIDGETFUNC", PM_SCALAR | PM_READONLY, GSU(widgetfunc_gsu), NULL },
@@ -245,6 +248,20 @@ static zlong
 get_mark(UNUSED(Param pm))
 {
     return mark;
+}
+
+/**/
+static void
+set_region_active(UNUSED(Param pm), zlong x)
+{
+    region_active = (int)!!x;
+}
+
+/**/
+static zlong
+get_region_active(UNUSED(Param pm))
+{
+    return region_active;
 }
 
 /**/
