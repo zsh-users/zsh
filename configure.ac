@@ -682,20 +682,20 @@ fi],
    termcap_curses_order="$ncursesw_test tinfo termcap $ncurses_test curses" ;;
 esac])dnl
 
-AH_TEMPLATE([ZSH_CURSES_NEEDS_XOPEN],
-[Define if the curses libraries need _XOPEN_SOURCE_EXTENDED defined])
-AC_CACHE_CHECK(if the curses library needs _XOPEN_SOURCE_EXTENDED,
-zsh_cv_curses_needs_xopen,
+AH_TEMPLATE([ZSH_NO_XOPEN],
+[Define if _XOPEN_SOURCE_EXTENDED should not be defined to avoid clashes])
+AC_CACHE_CHECK(if _XOPEN_SOURCE_EXTENDED should not be defined,
+zsh_cv_no_xopen,
 [case "$host_os" in
-  *openbsd*)
-  zsh_cv_curses_needs_xopen=no
+  *openbsd*|*freebsd*)
+  zsh_cv_no_xopen=yes
   ;;
   *)
-  zsh_cv_curses_needs_xopen=yes
+  zsh_cv_no_xopen=no
   ;;
 esac])
-if test x$zsh_cv_curses_needs_xopen = xyes; then
-  AC_DEFINE(ZSH_CURSES_NEEDS_XOPEN)
+if test x$zsh_cv_no_xopen = xyes; then
+  AC_DEFINE(ZSH_NO_XOPEN)
 fi
 
 dnl Check for tigetflag (terminfo) before tgetent (termcap).
