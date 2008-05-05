@@ -2330,8 +2330,10 @@ savehistfile(char *fn, int err, int writeflags)
 		} else {
 		    /* We renamed over the locked HISTFILE, so close fd.
 		     * If we do more writing, we'll get a lock then. */
-		    close(flock_fd);
-		    flock_fd = -1;
+		    if (flock_fd >= 0) {
+			close(flock_fd);
+			flock_fd = -1;
+		    }
 #endif
 		}
 	    }
