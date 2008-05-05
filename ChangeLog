@@ -1,3 +1,10 @@
+2008-05-04  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 24831 plus changes: Src/hist.c: simplified fcntl() locking.
+
+	* unposted: Src/Zle/zle_hist.c, Src/Zle/zle_misc.c: fixed
+	signed/unsigned warnings, including an always true "if".
+
 2008-05-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Phil Pennock: 24904 + 24916: configure.ac, Src/system.h: don't
@@ -5,7 +12,7 @@
 	if the standard says we need it for wcwidth().
 
 	* 24915: Src/Zle/zle_hist.c, Src/Zle/zle_misc.c,
-	Src/Zle/zle_move.c: Src/Zle/zle_vi.c: some more fix-ups for
+	Src/Zle/zle_move.c, Src/Zle/zle_vi.c: some more fix-ups for
 	combining characters.
 
 2008-05-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
@@ -195,7 +202,7 @@
 	* unposted: NEWS: list new features so far since 4.3.6.
 
 	* Vincent Lefevre: 24818: Doc/Zsh/options.yo (modified),
-	Src/hist.c (with #ifdef HAVE_TRUNCATE), Src/options.c, Src/zsh.h:
+	Src/hist.c (with #ifdef HAVE_FTRUNCATE), Src/options.c, Src/zsh.h:
 	history file locking using fcntl().
 
 2008-04-16  Clint Adams  <clint@zsh.org>

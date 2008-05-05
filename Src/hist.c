@@ -2023,20 +2023,6 @@ readhistfile(char *fn, int err, int readflags)
     else if (!lockhistfile(fn, 1))
 	return;
     if ((in = fopen(unmeta(fn), "r"))) {
-#ifdef HAVE_FCNTL_H
-	if (isset(HISTFCNTLLOCK)) {
-	    struct flock lck;
-
-	    lck.l_type = F_RDLCK;
-	    lck.l_whence = SEEK_SET;
-	    lck.l_start = 0;
-	    lck.l_len = 0;  /* lock the whole file */
-	    if (fcntl(fileno(in), F_SETLKW, &lck) == -1) {
-		fclose(in);
-		return;
-	    }
-	}
-#endif
 	nwordlist = 64;
 	wordlist = (short *)zalloc(nwordlist*sizeof(short));
 	bufsiz = 1024;
@@ -2166,66 +2152,34 @@ readhistfile(char *fn, int err, int readflags)
 }
 
 #ifdef HAVE_FCNTL_H
-/**/
+static int flock_fd = -1;
+
 static int
-wlockfile(int fd)
+flockhistfile(char *fn, int keep_trying)
 {
     struct flock lck;
-    int ctr = 8;
+    int ctr = keep_trying ? 9 : 0;
+
+    if ((flock_fd = open(unmeta(fn), O_RDWR | O_NOCTTY)) < 0)
+	return errno == ENOENT; /* "successfully" locked missing file */
 
     lck.l_type = F_WRLCK;
     lck.l_whence = SEEK_SET;
     lck.l_start = 0;
-    lck.l_len = 0;
-    while (fcntl(fd, F_SETLKW, &lck) == -1) {
-	if (--ctr < 0)
-	    return 1;
-	sleep (1);
-    }
-    return 0;
-}
-#endif
+    lck.l_len = 0;  /* lock the whole file */
 
-/**/
-static int
-safe_unlink(const char *pathname)
-{
-#ifdef HAVE_FCNTL_H
-    if (isset(HISTFCNTLLOCK)) {
-	int fd = open(pathname, O_WRONLY | O_NOCTTY, 0600);
-	if (fd >= 0) {
-	    int err = wlockfile(fd) || unlink(pathname);
-	    close(fd);
-	    return err;
-	} else {
-	    return errno != ENOENT;
+    while (fcntl(flock_fd, F_SETLKW, &lck) == -1) {
+	if (--ctr < 0) {
+	    close(flock_fd);
+	    flock_fd = -1;
+	    return 0;
 	}
+	sleep(1);
     }
-#endif
-    return unlink(pathname) && errno != ENOENT;
-}
 
-/**/
-static int
-safe_rename(const char *oldpath, const char *newpath)
-{
-#ifdef HAVE_FCNTL_H
-    if (isset(HISTFCNTLLOCK)) {
-	int fd = open(newpath, O_CREAT | O_WRONLY | O_NOCTTY, 0600);
-	if (fd < 0) {
-	    return 1;
-	} else if (wlockfile(fd)) {
-	    close(fd);
-	    return 1;
-	} else {
-	    int err = rename(oldpath, newpath);
-	    close(fd);
-	    return err;
-	}
-    }
-#endif
-    return rename(oldpath, newpath);
+    return 1;
 }
+#endif
 
 /**/
 void
@@ -2236,9 +2190,6 @@ savehistfile(char *fn, int err, int writeflags)
     Histent he;
     zlong xcurhist = curhist - !!(histactive & HA_ACTIVE);
     int extended_history = isset(EXTENDEDHISTORY);
-#ifdef HAVE_FTRUNCATE
-    int truncate_history = 0;
-#endif
     int ret;
 
     if (!interact || savehistsiz <= 0 || !hist_ring
@@ -2277,16 +2228,12 @@ savehistfile(char *fn, int err, int writeflags)
 	tmpfile = NULL;
 	out = fd >= 0 ? fdopen(fd, "a") : NULL;
     } else if (!isset(HISTSAVEBYCOPY)) {
-	int fd = open(unmeta(fn), O_CREAT | O_WRONLY | O_NOCTTY, 0600);
+	int fd = open(unmeta(fn), O_CREAT | O_WRONLY | O_TRUNC | O_NOCTTY, 0600);
 	tmpfile = NULL;
 	out = fd >= 0 ? fdopen(fd, "w") : NULL;
-#ifdef HAVE_FTRUNCATE
-	/* The file should be truncated after its locking. */
-	truncate_history = 1;
-#endif
     } else {
 	tmpfile = bicat(unmeta(fn), ".new");
-	if (safe_unlink(tmpfile))
+	if (unlink(tmpfile) < 0 && errno != ENOENT)
 	    out = NULL;
 	else {
 	    struct stat sb;
@@ -2324,18 +2271,7 @@ savehistfile(char *fn, int err, int writeflags)
 #endif
 	}
     }
-#ifdef HAVE_FCNTL_H
-    if (out && isset(HISTFCNTLLOCK) && wlockfile(fileno(out))) {
-	zerr("can't lock file (timeout) -- history %s not updated", fn);
-	err = 0; /* Don't report a generic error below. */
-	out = NULL;
-    }
-#endif
     if (out) {
-#ifdef HAVE_FTRUNCATE
-	if (truncate_history)
-	    ftruncate(fileno(out), 0);
-#endif
 	ret = 0;
 	for (; he && he->histnum <= xcurhist; he = down_histent(he)) {
 	    if ((writeflags & HFILE_SKIPDUPS && he->node.flags & HIST_DUP)
@@ -2381,21 +2317,26 @@ savehistfile(char *fn, int err, int writeflags)
 		zsfree(lasthist.text);
 		lasthist.text = ztrdup(start);
 	    }
-	} else if (ret >= 0 && fflush(out) < 0) {
-	    ret = -1;
 	}
+	if (fclose(out) < 0 && ret >= 0)
+	    ret = -1;
 	if (ret >= 0) {
 	    if (tmpfile) {
-		/* out has been flushed and the file must be renamed while
-		   being open so that the lock is still valid */
-		if (safe_rename(tmpfile, unmeta(fn)))
+		if (rename(tmpfile, unmeta(fn)) < 0) {
 		    zerr("can't rename %s.new to $HISTFILE", fn);
-		free(tmpfile);
-		tmpfile = NULL;
+		    ret = -1;
+		    err = 0;
+#ifdef HAVE_FCNTL_H
+		} else {
+		    /* We renamed over the locked HISTFILE, so close fd.
+		     * If we do more writing, we'll get a lock then. */
+		    close(flock_fd);
+		    flock_fd = -1;
+#endif
+		}
 	    }
-	    fclose(out);
 
-	    if (writeflags & HFILE_SKIPOLD
+	    if (ret >= 0 && writeflags & HFILE_SKIPOLD
 		&& !(writeflags & (HFILE_FAST | HFILE_NO_REWRITE))) {
 		int remember_histactive = histactive;
 
@@ -2413,8 +2354,6 @@ savehistfile(char *fn, int err, int writeflags)
 		pophiststack();
 		histactive = remember_histactive;
 	    }
-	} else {
-	    fclose(out);
 	}
     } else
 	ret = -1;
@@ -2441,6 +2380,12 @@ lockhistfile(char *fn, int keep_trying)
 
     if (!fn && !(fn = getsparam("HISTFILE")))
 	return 0;
+
+#ifdef HAVE_FCNTL_H
+    if (isset(HISTFCNTLLOCK) && flock_fd < 0 && !flockhistfile(fn, keep_trying))
+	return 0;
+#endif
+
     if (!lockhistct++) {
 	struct stat sb;
 	int fd;
@@ -2505,7 +2450,17 @@ lockhistfile(char *fn, int keep_trying)
 #endif /* not HAVE_LINK */
 	free(lockfile);
     }
-    return ct != lockhistct;
+
+    if (ct == lockhistct) {
+#ifdef HAVE_FCNTL_H
+	if (flock_fd >= 0) {
+	    close(flock_fd);
+	    flock_fd = -1;
+	}
+#endif
+	return 0;
+    }
+    return 1;
 }
 
 /* Unlock the history file if this corresponds to the last nested lock
@@ -2529,6 +2484,12 @@ unlockhistfile(char *fn)
 	sprintf(lockfile, "%s.LOCK", fn);
 	unlink(lockfile);
 	free(lockfile);
+#ifdef HAVE_FCNTL_H
+	if (flock_fd >= 0) {
+	    close(flock_fd);
+	    flock_fd = -1;
+	}
+#endif
     }
 }
 

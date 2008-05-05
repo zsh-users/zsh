@@ -1316,7 +1316,7 @@ doisearch(char **args, int dir, int pattern)
 							   zlemetaline + pos,
 							   NULL) - zlemetaline;
 			} else if (sbuf[0] != '^') {
-			    if (pos >= strlen(zt) - 1)
+			    if (pos >= (int)strlen(zt) - 1)
 				skip_line = 1;
 			    else
 				pos += 1;
@@ -1598,7 +1598,7 @@ doisearch(char **args, int dir, int pattern)
 			   zlemetacs, sbptr, dir, nomatch);
 	    if (sbptr >= sibuf - FIRST_SEARCH_CHAR - 2 
 #ifdef MULTIBYTE_SUPPORT
-		- 2 * MB_CUR_MAX
+		- 2 * (int)MB_CUR_MAX
 #endif
 		) {
 		ibuf = hrealloc(ibuf, sibuf, sibuf * 2);

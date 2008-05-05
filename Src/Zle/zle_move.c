@@ -209,8 +209,8 @@ backwardmetafiedchar(char *start, char *endptr, convchar_t *retchr)
 		return ptr;
 	    }
 	}
-	if (ret >= 0) {
-	    if (ret < charlen) {
+	if (ret != (size_t)-1) {
+	    if (ret < (size_t)charlen) {
 		/* The last character didn't convert, so use it raw. */
 		break;
 	    }
