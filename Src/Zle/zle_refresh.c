@@ -203,11 +203,12 @@ int predisplaylen, postdisplaylen;
 
 
 /*
- * Attributes used for highlighting special (unprintable) characters
+ * Attributes used by default on the command line, and
+ * attributes for highlighting special (unprintable) characters
  * displayed on screen.
  */
 
-static int special_atr_on;
+static int default_atr_on, special_atr_on;
 
 /* Flags for the region_highlight structure */
 enum {
@@ -503,6 +504,31 @@ match_highlight(const char *teststr, int *on_var)
 }
 
 
+/* Allocate buffer for colour code composition */
+
+static void
+set_colseq_buf(void)
+{
+    int lenfg, lenbg, len;
+
+    lenfg = strlen(fg_bg_sequences[COL_SEQ_FG].def);
+    /* always need 1 character for non-default code */
+    if (lenfg < 1)
+	lenfg = 1;
+    lenfg += strlen(fg_bg_sequences[COL_SEQ_FG].start) +
+	strlen(fg_bg_sequences[COL_SEQ_FG].end);
+
+    lenbg = strlen(fg_bg_sequences[COL_SEQ_BG].def);
+    /* always need 1 character for non-default code */
+    if (lenbg < 1)
+	lenbg = 1;
+    lenbg += strlen(fg_bg_sequences[COL_SEQ_BG].start) +
+	strlen(fg_bg_sequences[COL_SEQ_BG].end);
+
+    len = lenfg > lenbg ? lenfg : lenbg;
+    colseq_buf = (char *)zalloc(len+1);
+}
+
 /*
  * Parse the variable zle_highlight to decide how to highlight characters
  * and regions.  Set defaults for anything not explicitly covered.
@@ -516,30 +542,30 @@ zle_set_highlight(void)
     int special_atr_on_set = 0;
     int region_atr_on_set = 0;
     int isearch_atr_on_set = 0;
-    int lenfg, lenbg, len;
     struct region_highlight *rhp;
 
-    special_atr_on = 0;
+    special_atr_on = default_atr_on = 0;
     if (!region_highlights) {
 	region_highlights = (struct region_highlight *)
 	    zshcalloc(N_SPECIAL_HIGHLIGHTS*sizeof(struct region_highlight));
 	n_region_highlights = N_SPECIAL_HIGHLIGHTS;
     } else {
-	region_highlights->atr = 0;
+	for (rhp = region_highlights;
+	     rhp < region_highlights + N_SPECIAL_HIGHLIGHTS;
+	     rhp++) {
+	    rhp->atr = 0;
+	}
     }
 
     if (atrs) {
 	for (; *atrs; atrs++) {
 	    if (!strcmp(*atrs, "none")) {
 		/* reset attributes for consistency... usually unnecessary */
-		special_atr_on = 0;
+		special_atr_on = default_atr_on = 0;
 		special_atr_on_set = region_atr_on_set =
 		    isearch_atr_on_set = 1;
-		for (rhp = region_highlights;
-		     rhp < region_highlights + N_SPECIAL_HIGHLIGHTS;
-		     rhp++) {
-		    rhp->atr = 0;
-		}
+	    } else if (strpfx("default:", *atrs)) {
+		match_highlight(*atrs + 8, &default_atr_on);
 	    } else if (strpfx("special:", *atrs)) {
 		match_highlight(*atrs + 8, &special_atr_on);
 		special_atr_on_set = 1;
@@ -573,23 +599,7 @@ zle_set_highlight(void)
     if (!isearch_atr_on_set)
 	region_highlights[1].atr = TXTUNDERLINE;
 
-    /* Allocate buffer for colour code composition */
-    lenfg = strlen(fg_bg_sequences[COL_SEQ_FG].def);
-    /* always need 1 character for non-default code */
-    if (lenfg < 1)
-	lenfg = 1;
-    lenfg += strlen(fg_bg_sequences[COL_SEQ_FG].start) +
-	strlen(fg_bg_sequences[COL_SEQ_FG].end);
-
-    lenbg = strlen(fg_bg_sequences[COL_SEQ_BG].def);
-    /* always need 1 character for non-default code */
-    if (lenbg < 1)
-	lenbg = 1;
-    lenbg += strlen(fg_bg_sequences[COL_SEQ_BG].start) +
-	strlen(fg_bg_sequences[COL_SEQ_BG].end);
-
-    len = lenfg > lenbg ? lenfg : lenbg;
-    colseq_buf = (char *)zalloc(len+1);
+    set_colseq_buf();
 }
 
 
@@ -597,8 +607,10 @@ zle_set_highlight(void)
 static void
 zle_free_highlight(void)
 {
+    DPUTS(!colseq_buf, "Freeing colour sequence buffer without alloc");
     /* Free buffer for colour code composition */
     free(colseq_buf);
+    colseq_buf = NULL;
 }
 
 /*
@@ -615,63 +627,59 @@ get_region_highlight(UNUSED(Param pm))
 {
     int arrsize = n_region_highlights;
     char **retarr, **arrp;
+    struct region_highlight *rhp;
 
     /* region_highlights may not have been set yet */
-    if (!arrsize)
-	arrsize = N_SPECIAL_HIGHLIGHTS;
-    arrp = retarr = (char **)zhalloc(arrsize*sizeof(char *));
-    /* ignore NULL termination */
-    arrsize--;
-    if (arrsize) {
-	struct region_highlight *rhp;
+    if (arrsize)
+	arrsize -= N_SPECIAL_HIGHLIGHTS;
+    arrp = retarr = (char **)zhalloc((arrsize+1)*sizeof(char *));
 
-	/* ignore special highlighting */
-	for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
-	     arrsize--;
-	     rhp++, arrp++) {
-	    char digbuf1[DIGBUFSIZE], digbuf2[DIGBUFSIZE];
-	    int atrlen = 0, alloclen, done1;
-	    const struct highlight *hp;
+    /* ignore special highlighting */
+    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+	 arrsize--;
+	 rhp++, arrp++) {
+	char digbuf1[DIGBUFSIZE], digbuf2[DIGBUFSIZE];
+	int atrlen = 0, alloclen, done1;
+	const struct highlight *hp;
 
-	    sprintf(digbuf1, "%d", rhp->start);
-	    sprintf(digbuf2, "%d", rhp->end);
+	sprintf(digbuf1, "%d", rhp->start);
+	sprintf(digbuf2, "%d", rhp->end);
 
-	    for (hp = highlights; hp->name; hp++) {
+	for (hp = highlights; hp->name; hp++) {
+	    if (hp->mask_on & rhp->atr) {
+		if (atrlen)
+		    atrlen++; /* comma */
+		atrlen += strlen(hp->name);
+	    }
+	}
+	if (atrlen == 0)
+	    atrlen = 4; /* none */
+	alloclen = atrlen + strlen(digbuf1) + strlen(digbuf2) +
+	    3; /* 2 spaces, 1 0 */
+	if (rhp->flags & ZRH_PREDISPLAY)
+	    alloclen += 2; /* "P " */
+	*arrp = (char *)zhalloc(alloclen * sizeof(char));
+	/*
+	 * On input we allow a space after the flags.
+	 * I haven't put a space here because I think it's
+	 * marginally easier to have the output always split
+	 * into three words, and then check the first to
+	 * see if there are flags.  However, it's arguable.
+	 */
+	sprintf(*arrp, "%s%s %s ",
+		(rhp->flags & ZRH_PREDISPLAY) ? "P" : "",
+		digbuf1, digbuf2);
+	if (atrlen) {
+	    for (hp = highlights, done1 = 0; hp->name; hp++) {
 		if (hp->mask_on & rhp->atr) {
-		    if (atrlen)
-			atrlen++; /* comma */
-		    atrlen += strlen(hp->name);
+		    if (done1)
+			strcat(*arrp, ",");
+		    strcat(*arrp, hp->name);
+		    done1 = 1;
 		}
 	    }
-	    if (atrlen == 0)
-		atrlen = 4; /* none */
-	    alloclen = atrlen + strlen(digbuf1) + strlen(digbuf2) +
-		3; /* 2 spaces, 1 0 */
-	    if (rhp->flags & ZRH_PREDISPLAY)
-		alloclen += 2; /* "P " */
-	    *arrp = (char *)zhalloc(alloclen * sizeof(char));
-	    /*
-	     * On input we allow a space after the flags.
-	     * I haven't put a space here because I think it's
-	     * marginally easier to have the output always split
-	     * into three words, and then check the first to
-	     * see if there are flags.  However, it's arguable.
-	     */
-	    sprintf(*arrp, "%s%s %s ", 
-		    (rhp->flags & ZRH_PREDISPLAY) ? "P" : "",
-		    digbuf1, digbuf2);
-	    if (atrlen) {
-		for (hp = highlights, done1 = 0; hp->name; hp++) {
-		    if (hp->mask_on & rhp->atr) {
-			if (done1)
-			    strcat(*arrp, ",");
-			strcat(*arrp, hp->name);
-			done1 = 1;
-		    }
-		}
-	    } else
-		strcat(*arrp, "none");
-	}
+	} else
+	    strcat(*arrp, "none");
     }
     *arrp = '\0';
     return retarr;
@@ -748,6 +756,34 @@ unset_region_highlight(Param pm, int exp)
 }
 
 
+/* The last attributes that were on. */
+static int lastatr;
+
+/*
+ * Clear the last attributes that we set:  used when we're going
+ * to be outputting stuff that shouldn't show up as text.
+ */
+static void
+clearattributes(void)
+{
+    if (lastatr) {
+	settextattributes(TXT_ATTR_OFF_FROM_ON(lastatr));
+	lastatr = 0;
+    }
+}
+
+/*
+ * Output a termcap capability, clearing any text attributes so
+ * as not to mess up the display.
+ */
+
+static void
+tcoutclear(int cap)
+{
+    clearattributes();
+    tcout(cap);
+}
+
 /*
  * Output the character.  This must come from the new video
  * buffer, nbuf, since we access the multiword buffer nmwbuf
@@ -767,7 +803,6 @@ zwcputc(const REFRESH_ELEMENT *c, int *curatrp)
      * This differs from *curatrp, which is an optimisation for
      * writing lots of stuff at once.
      */
-    static int lastatr;
 #ifdef MULTIBYTE_SUPPORT
     mbstate_t mbstate;
     int i;
@@ -1093,6 +1128,12 @@ setcolourattribute(int colour, int fg_bg, int tc, int def,
 		   int use_termcap)
 {
     char *ptr;
+    int do_free;
+
+    if ((do_free = (colseq_buf == NULL))) {
+	/* This can happen when moving the cursor in trashzle() */
+	set_colseq_buf();
+    }
     /*
      * If we're not restoring the default, and either have a
      * colour value that is too large for ANSI, or have been told
@@ -1122,6 +1163,11 @@ setcolourattribute(int colour, int fg_bg, int tc, int def,
 	*ptr++ = colour + '0';
     strcpy(ptr, fg_bg_sequences[fg_bg].end);
     tputs(colseq_buf, 1, putshout);
+
+    if (do_free) {
+	free(colseq_buf);
+	colseq_buf = NULL;
+    }
 }
 
 /**/
@@ -1310,7 +1356,7 @@ zrefresh(void)
 
 	    nbuf[vln] = obuf[vln];
 	    moveto(nlnct, 0);
-	    tcout(TCCLEAREOD);
+	    tcoutclear(TCCLEAREOD);
 	    moveto(ovln, ovcs);
 	    nbuf[vln] = nb;
 	} else {
@@ -1370,7 +1416,7 @@ zrefresh(void)
 
         if (!clearflag) {
             if (tccan(TCCLEAREOD))
-                tcout(TCCLEAREOD);
+                tcoutclear(TCCLEAREOD);
             else
                 cleareol = 1;   /* request: clear to end of line */
 	    if (listshown > 0)
@@ -1429,7 +1475,7 @@ zrefresh(void)
     rpms.s = nbuf[rpms.ln = 0] + lpromptw;
     rpms.sen = *nbuf + winw;
     for (t = tmpline, tmppos = 0; tmppos < tmpll; t++, tmppos++) {
-	int base_atr_on = 0, base_atr_off = 0, ireg;
+	int base_atr_on = default_atr_on, base_atr_off = 0, ireg;
 	int all_atr_on, all_atr_off;
 	struct region_highlight *rhp;
 	/*
@@ -1445,9 +1491,10 @@ zrefresh(void)
 		offset = predisplaylen; /* increment over it */
 	    if (rhp->start + offset <= tmppos &&
 		tmppos < rhp->end + offset) {
-		if (base_atr_on & (TXTFGCOLOUR|TXTBGCOLOUR)) {
-		    /* keep colour already set */
-		    base_atr_on |= rhp->atr & ~TXT_ATTR_COLOUR_ON_MASK;
+		if (rhp->atr & (TXTFGCOLOUR|TXTBGCOLOUR)) {
+		    /* override colour with later entry */
+		    base_atr_on = (base_atr_on & ~TXT_ATTR_ON_VALUES_MASK) |
+			rhp->atr;
 		} else {
 		    /* no colour set yet */
 		    base_atr_on |= rhp->atr;
@@ -2021,7 +2068,7 @@ refreshline(int ln)
     if (cleareol && !nllen && !(hasam && ln < nlnct - 1)
 	&& tccan(TCCLEAREOL)) {
 	moveto(ln, 0);
-	tcout(TCCLEAREOL);
+	tcoutclear(TCCLEAREOL);
 	return;	
     }
 
@@ -2161,7 +2208,7 @@ refreshline(int ln)
 
 	    /* if we can finish quickly, do so */
 	    if ((col_cleareol >= 0) && (ccs >= col_cleareol)) {
-		tcout(TCCLEAREOL);
+		tcoutclear(TCCLEAREOL);
 		return;
 	    }
 
@@ -2195,7 +2242,7 @@ refreshline(int ln)
 		zwrite(nl, i);
 		vcs += i;
 		if (col_cleareol >= 0)
-		    tcout(TCCLEAREOL);
+		    tcoutclear(TCCLEAREOL);
 		return;
 	    }
 
@@ -2505,7 +2552,7 @@ tcoutarg(int cap, int arg)
 mod_export int
 clearscreen(UNUSED(char **args))
 {
-    tcout(TCCLEARSCREEN);
+    tcoutclear(TCCLEARSCREEN);
     resetneeded = 1;
     clearflag = 0;
     return 0;
@@ -2823,7 +2870,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	}
 	if (!vp->chr) {
 	    if (tccan(TCCLEAREOL))
-		tcout(TCCLEAREOL);
+		tcoutclear(TCCLEAREOL);
 	    else
 		for (; refreshop++->chr; vcs++)
 		    zputc(&zr_sp);

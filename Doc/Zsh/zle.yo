@@ -2097,6 +2097,10 @@ The contexts available for highlighting are the following:
 startitem()
 cindex(region, highlighting)
 cindex(highlighting, region)
+item(tt(default))(
+Any text within the command line not affected by any other highlighting.
+Text outside the editable area of the command line is not affected.
+)
 item(tt(isearch))(
 When one of the incremental history search widgets is active, the
 area of the command line matched by the search string or pattern.
