@@ -23,6 +23,7 @@ else
     '-profile[specify profile file]:profile file:_files' \
     '-v[show version]' \
     '-version[show version]' \
+    '-safe-mode[disable extensions and themes for this session]'
     )
   else
     mozopts=(
