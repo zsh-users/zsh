@@ -774,6 +774,13 @@ The part of the buffer that lies to the right of the cursor position.
 If it is assigned to, only that part of the buffer is replaced, and the
 cursor remains between the old tt($LBUFFER) and the new tt($RBUFFER).
 )
+vindex(REGION_ACTIVE)
+item(tt(REGION_ACTIVE) (integer))(
+Indicates if the region is currently active.  It can be assigned 0 or 1
+to deactivate and activate the region respectively;
+ifzman(see em(Character Highlighting) below)\
+ifnzman(noderef(Character Highlighting)).
+)
 vindex(region_highlight)
 item(tt(region_highlight) (array))(
 Each element of this array may be set to a string that describes
