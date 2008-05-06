@@ -1,3 +1,8 @@
+2008-05-06  Peter Stephenson  <pws@csr.com>
+
+	* 24927: Phil Pennock: configure.ac: Free BSD only doesn't need
+	_XOPEN_SOURCE_EXTENDED on Free BSD 6.
+
 2008-05-04  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 24831 plus changes: Src/hist.c: simplified fcntl() locking.
