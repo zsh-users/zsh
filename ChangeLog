@@ -5,6 +5,9 @@
 
 2008-05-06  Peter Stephenson  <pws@csr.com>
 
+	* 24951: Doc/Zsh/mod_complist, Src/Zle/comp.h, Src/Zle/compcore.c,
+	Src/Zle/complist.c: implement ZLS_COLORS ln=target.
+
 	* 24937, 24938: Dag-Erling Smørgrav <des@des.no>: configure.ac:
 	improved version of 24972.
 

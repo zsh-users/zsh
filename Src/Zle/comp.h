@@ -114,6 +114,8 @@ struct cmatch {
     int gnum;			/* global number */
     mode_t mode;                /* mode field of a stat */
     char modec;                 /* LIST_TYPE-character for mode or nul */
+    mode_t fmode;               /* mode field of a stat, following symlink */
+    char fmodec;                /* LIST_TYPE-character for fmode or nul */
 };
 
 #define CMF_FILE     (1<< 0)	/* this is a file */

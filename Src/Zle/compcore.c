@@ -2784,8 +2784,8 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 		 (complist ?
 		  ((strstr(complist, "packed") ? CMF_PACKED : 0) |
 		   (strstr(complist, "rows")   ? CMF_ROWS   : 0)) : 0));
-    cm->mode = 0;
-    cm->modec = '\0';
+    cm->mode = cm->fmode = 0;
+    cm->modec = cm->fmodec = '\0';
     if ((flags & CMF_FILE) && orig[0] && orig[strlen(orig) - 1] != '/') {
         struct stat buf;
 	char *pb;
@@ -2798,6 +2798,11 @@ add_match_data(int alt, char *str, char *orig, Cline line,
             cm->mode = buf.st_mode;
             if ((cm->modec = file_type(buf.st_mode)) == ' ')
                 cm->modec = '\0';
+        }
+        if (!ztat(pb, &buf, 0)) {
+            cm->fmode = buf.st_mode;
+            if ((cm->fmodec = file_type(buf.st_mode)) == ' ')
+                cm->fmodec = '\0';
         }
     }
     if ((*compqstack == QT_BACKSLASH && compqstack[1]) ||
@@ -3208,6 +3213,8 @@ dupmatch(Cmatch m, int nbeg, int nend)
     r->disp = ztrdup(m->disp);
     r->mode = m->mode;
     r->modec = m->modec;
+    r->fmode = m->fmode;
+    r->fmodec = m->fmodec;
 
     return r;
 }

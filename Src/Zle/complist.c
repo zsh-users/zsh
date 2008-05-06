@@ -108,12 +108,6 @@ static int mtab_been_reallocated;
  * as mtab and mmtabp.
  */
 static Cmgroup *mgtab, *mgtabp;
-/*
- * Contains information about the colours to be used for entries.
- * Sometimes mcolors is passed as an argument even though it's
- * available to all the functions.
- */
-static struct listcols mcolors;
 #ifdef DEBUG
 /*
  * Allow us to keep track of pointer arithmetic for mgtab; could
@@ -248,11 +242,25 @@ struct extcol {
 
 typedef struct listcols *Listcols;
 
+/* values for listcol flags */
+enum {
+    /* ln=target:  follow symlinks to determine highlighting */
+    LC_FOLLOW_SYMLINKS = 0x0001
+};
+
 struct listcols {
     Filecol files[NUM_COLS];	/* strings for file types */
     Patcol pats;		/* strings for patterns */
     Extcol exts;		/* strings for extensions */
+    int flags;			/* special settings, see above */
 };
+
+/*
+ * Contains information about the colours to be used for entries.
+ * Sometimes mcolors is passed as an argument even though it's
+ * available to all the functions.
+ */
+static struct listcols mcolors;
 
 /* Combined length of LC and RC, maximum length of capability strings. */
 
@@ -428,24 +436,33 @@ getcoldef(char *s)
 	for (i = 0, nn = colnames; *nn; i++, nn++)
 	    if (!strcmp(n, *nn))
 		break;
-	p = getcolval(s, 0);
-	if (*nn) {
-	    Filecol fc, fo;
+	/*
+	 * special case:  highlighting link targets
+	 */
+	if (i == COL_LN && strpfx("target", s) &&
+	    (s[6] == ':' || !s[6])) {
+	    mcolors.flags |= LC_FOLLOW_SYMLINKS;
+	    p = s + 6;
+	} else {
+	    p = getcolval(s, 0);
+	    if (*nn) {
+		Filecol fc, fo;
 
-	    fc = (Filecol) zhalloc(sizeof(*fc));
-	    fc->prog = (i == COL_EC || i == COL_LC || i == COL_RC ?
-			NULL : gprog);
-	    fc->col = s;
-	    fc->next = NULL;
-	    if ((fo = mcolors.files[i])) {
-		while (fo->next)
-		    fo = fo->next;
-		fo->next = fc;
-	    } else
-		mcolors.files[i] = fc;
+		fc = (Filecol) zhalloc(sizeof(*fc));
+		fc->prog = (i == COL_EC || i == COL_LC || i == COL_RC ?
+			    NULL : gprog);
+		fc->col = s;
+		fc->next = NULL;
+		if ((fo = mcolors.files[i])) {
+		    while (fo->next)
+			fo = fo->next;
+		    fo->next = fc;
+		} else
+		    mcolors.files[i] = fc;
+	    }
+	    if (*p)
+		*p++ = '\0';
 	}
-	if (*p)
-	    *p++ = '\0';
 	return p;
     }
 }
@@ -474,6 +491,7 @@ getcols()
     int i, l;
 
     max_caplen = lr_caplen = 0;
+    mcolors.flags = 0;
     queue_signals();
     if (!(s = getsparam("ZLS_COLORS")) &&
 	!(s = getsparam("ZLS_COLOURS"))) {
@@ -1685,7 +1703,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	}
 	zcoff();
     } else {
-	int mx;
+	int mx, modec;
 
 	if (g->widths) {
 	    int i;
@@ -1733,8 +1751,13 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	    zcputs(g->name, COL_HI);
 	else if (mselect >= 0 && (m->flags & (CMF_MULT | CMF_FMULT)))
 	    zcputs(g->name, COL_DU);
-	else if (m->mode)
-	    subcols = putfilecol(g->name, m->str, m->mode);
+	else if (m->mode) {
+	    if (mcolors.flags & LC_FOLLOW_SYMLINKS) {
+		subcols = putfilecol(g->name, m->str, m->fmode);
+	    } else {
+		subcols = putfilecol(g->name, m->str, m->mode);
+	    }
+	}
 	else
 	    subcols = putmatchcol(g->name, (m->disp ? m->disp : m->str));
 
@@ -1747,12 +1770,13 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	len = ZMB_nicewidth(m->disp ? m->disp : m->str);
 	mlprinted = len ? (len-1) / columns : 0;
 
-	if ((g->flags & CGF_FILES) && m->modec) {
+	modec = (mcolors.flags & LC_FOLLOW_SYMLINKS) ? m->fmodec : m->modec;
+	if ((g->flags & CGF_FILES) && modec) {
 	    if (m->gnum != mselect) {
 		zcoff();
 		zcputs(g->name, COL_TC);
 	    }
-	    putc(m->modec, shout);
+	    putc(modec, shout);
 	    len++;
         }
 	if ((len = width - len - 2) > 0) {
@@ -2556,6 +2580,15 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    s->origcs = origcs;
 	    s->origll = origll;
             s->status = dupstring(status);
+	    /*
+	     * with just the slightest hint of a note of infuriation:
+	     * mode here is the menu mode, not the file mode, despite
+	     * the fact we're in a file dealing with file highlighting;
+	     * but that's OK, because s is a menu stack entry, despite
+	     * the fact we're in a function declaring s as char *.
+	     * anyway, in functions we really mean *mode* it's
+	     * called m, to be clear.
+	     */
             s->mode = mode;
 	    menucmp = menuacc = hasoldlist = 0;
 	    minfo.cur = NULL;
@@ -2674,6 +2707,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    s->origcs = origcs;
 	    s->origll = origll;
             s->status = dupstring(status);
+	    /* see above */
             s->mode = mode;
 	    accept_last();
 	    handleundo();

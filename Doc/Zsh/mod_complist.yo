@@ -37,7 +37,9 @@ item(tt(di 32))(
 for directories
 )
 item(tt(ln 36))(
-for symbolic links
+for symbolic links.  If this has the special value tt(target),
+symbolic links are dereferenced and the target file used to
+determine the display format.
 )
 item(tt(pi 31))(
 for named pipes (FIFOs)
