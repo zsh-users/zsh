@@ -460,10 +460,10 @@ match_highlight(const char *teststr, int *on_var)
 	found = 0;
 	if (strpfx("fg=", teststr) || strpfx("bg=", teststr)) {
 	    int is_fg = (teststr[0] == 'f');
-	    int colour, shft, on;
+	    int colour, shft, on, named, tc;
 
 	    teststr += 3;
-	    if (ialpha(*teststr))
+	    if ((named = ialpha(*teststr)))
 		colour = match_colour(&teststr);
 	    else
 		colour = (int)zstrtol(teststr, (char **)&teststr, 10);
@@ -478,9 +478,33 @@ match_highlight(const char *teststr, int *on_var)
 	    if (is_fg) {
 		shft = TXT_ATTR_FG_COL_SHIFT;
 		on = TXTFGCOLOUR;
+		tc = TCFGCOLOUR;
 	    } else {
 		shft = TXT_ATTR_BG_COL_SHIFT;
 		on = TXTBGCOLOUR;
+		tc = TCBGCOLOUR;
+	    }
+	    /*
+	     * Try termcap for numbered characters if posible.
+	     * Don't for named characters, since our best bet
+	     * of getting the names right is with ANSI sequences.
+	     */
+	    if (!named && tccan(tc)) {
+		if (tccolours >= 0 && colour >= tccolours) {
+		    /*
+		     * Out of range of termcap colours.
+		     * Can we assume ANSI colours work?
+		     */
+		    if (colour > 7)
+			continue; /* No. */
+		} else {
+		    /*
+		     * We can handle termcap colours and the number
+		     * is in range, so use termcap.
+		     */
+		    *on_var |= is_fg ? TXT_ATTR_FG_TERMCAP :
+			TXT_ATTR_BG_TERMCAP;
+		}
 	    }
 	    *on_var |= on | (colour << shft);
 	} else {
@@ -1137,8 +1161,11 @@ setcolourattribute(int colour, int fg_bg, int tc, int def,
     /*
      * If we're not restoring the default, and either have a
      * colour value that is too large for ANSI, or have been told
-     * to use the termcap sequence (which at the time of writing
-     * we never are), try to use the termcap sequence.
+     * to use the termcap sequence, try to use the termcap sequence.
+     *
+     * We have already sanitised the values we allow from the
+     * highlighting variables, so much of this shouldn't be
+     * necessary at this point, but we might as well be safe.
      */
     if (!def && (colour > 7 || use_termcap)) {
 	/*

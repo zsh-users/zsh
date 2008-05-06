@@ -1,5 +1,9 @@
 2008-05-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24957: Doc/Zsh/zle.yo, Src/Zle/zle_refresh.c: better sanity
+	checking of colour ranges, always use termcap for numeric
+	colours where available.
+
 	* 24911 (tweaked): Doc/Zsh/zle.yo: missed this bit, somehow.
 
 2008-05-06  Peter Stephenson  <pws@csr.com>
