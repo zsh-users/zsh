@@ -1,5 +1,8 @@
 2008-05-06  Peter Stephenson  <pws@csr.com>
 
+	* 24932: Src/zsh.h, Src/Zle/zle_refresh.c: try to regularize
+	code that fixes up after right prompt.
+
 	* 24927: Phil Pennock: configure.ac: Free BSD only doesn't need
 	_XOPEN_SOURCE_EXTENDED on Free BSD 6.
 

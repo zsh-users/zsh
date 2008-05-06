@@ -1869,29 +1869,44 @@ zrefresh(void)
 
     /* output the right-prompt if appropriate */
 	if (put_rpmpt && !iln && !oput_rpmpt) {
+	    int attrchange;
+
 	    moveto(0, winw - 1 - rpromptw);
 	    zputs(rpromptbuf, shout);
 	    vcs = winw - 1;
 	/* reset character attributes to that set by the main prompt */
 	    txtchange = pmpt_attr;
-	    if (txtchangeisset(txtchange, TXTNOBOLDFACE) &&
-		(rpmpt_attr & TXTBOLDFACE))
-		tsetcap(TCALLATTRSOFF, 0);
-	    if (txtchangeisset(txtchange, TXTNOSTANDOUT) &&
-		(rpmpt_attr & TXTSTANDOUT))
-		tsetcap(TCSTANDOUTEND, 0);
-	    if (txtchangeisset(txtchange, TXTNOUNDERLINE) &&
-		(rpmpt_attr & TXTUNDERLINE))
-		tsetcap(TCUNDERLINEEND, 0);
-	    if (txtchangeisset(txtchange, TXTBOLDFACE) &&
-		(rpmpt_attr & TXTNOBOLDFACE))
-		tsetcap(TCBOLDFACEBEG, 0);
-	    if (txtchangeisset(txtchange, TXTSTANDOUT) &&
-		(rpmpt_attr & TXTNOSTANDOUT))
-		tsetcap(TCSTANDOUTBEG, 0);
-	    if (txtchangeisset(txtchange, TXTUNDERLINE) &&
-		(rpmpt_attr & TXTNOUNDERLINE))
-		tsetcap(TCUNDERLINEBEG, 0);
+	    /*
+	     * Keep attributes that have actually changed,
+	     * which are ones off in rpmpt_attr and on in
+	     * pmpt_attr, and vice versa.
+	     */
+	    attrchange = txtchange &
+		(TXT_ATTR_OFF_FROM_ON(rpmpt_attr) |
+		 TXT_ATTR_ON_FROM_OFF(rpmpt_attr));
+	    /*
+	     * Careful in case the colour changed.
+	     */
+	    if (txtchangeisset(txtchange, TXTFGCOLOUR) &&
+		(!txtchangeisset(rpmpt_attr, TXTFGCOLOUR) ||
+		 ((txtchange ^ rpmpt_attr) & TXT_ATTR_FG_COL_MASK)))
+	    {
+		attrchange |=
+		    txtchange & (TXTFGCOLOUR | TXT_ATTR_FG_COL_MASK);
+	    }
+	    if (txtchangeisset(txtchange, TXTBGCOLOUR) &&
+		(!txtchangeisset(rpmpt_attr, TXTBGCOLOUR) ||
+		 ((txtchange ^ rpmpt_attr) & TXT_ATTR_BG_COL_MASK)))
+	    {
+		attrchange |=
+		    txtchange & (TXTBGCOLOUR | TXT_ATTR_BG_COL_MASK);
+	    }
+	    /*
+	     * Now feed these changes into the usual function,
+	     * if necessary.
+	     */
+	    if (attrchange)
+		settextattributes(attrchange);
 	}
     }
 

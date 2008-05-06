@@ -1983,6 +1983,8 @@ struct ttyinfo {
 #define TXT_ATTR_OFF_ON_SHIFT 6
 #define TXT_ATTR_OFF_FROM_ON(attr)	\
     (((attr) & TXT_ATTR_ON_MASK) << TXT_ATTR_OFF_ON_SHIFT)
+#define TXT_ATTR_ON_FROM_OFF(attr)	\
+    (((attr) & TXT_ATTR_OFF_MASK) >> TXT_ATTR_OFF_ON_SHIFT)
 /*
  * Indicates to zle_refresh.c that the character entry is an
  * index into the list of multiword symbols.
