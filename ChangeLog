@@ -1,5 +1,8 @@
 2008-05-06  Peter Stephenson  <pws@csr.com>
 
+	* 24937: Dag-Erling Smørgrav <des@des.no>: configure.ac:
+	improved version of 24972.
+
 	* 24932: Src/zsh.h, Src/Zle/zle_refresh.c: try to regularize
 	code that fixes up after right prompt.
 

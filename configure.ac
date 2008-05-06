@@ -687,7 +687,7 @@ AH_TEMPLATE([ZSH_NO_XOPEN],
 AC_CACHE_CHECK(if _XOPEN_SOURCE_EXTENDED should not be defined,
 zsh_cv_no_xopen,
 [case "$host_os" in
-  *openbsd*|*freebsd6*)
+  *openbsd*|*freebsd5*|*freebsd6[012]*)
   zsh_cv_no_xopen=yes
   ;;
   *)
