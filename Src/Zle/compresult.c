@@ -1188,18 +1188,18 @@ do_menucmp(int lst)
 {
     int was_meta;
 
+    /* Just list the matches if the list was requested. */
+    if (lst == COMP_LIST_COMPLETE) {
+	showinglist = -2;
+	return;
+    }
+
     /* Already metafied when called from domenuselect already */
     if (zlemetaline == NULL) {
 	was_meta = 0;
 	metafy_line();
     } else
 	was_meta = 1;
-
-    /* Just list the matches if the list was requested. */
-    if (lst == COMP_LIST_COMPLETE) {
-	showinglist = -2;
-	return;
-    }
 
     /* Otherwise go to the next match in the array... */
     do {
