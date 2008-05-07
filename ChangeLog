@@ -1,3 +1,8 @@
+2008-05-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24962: Oliver: Functions/Prompts/prompt_oliver_setup:
+	update to use zle_highlight default highlighting.
+
 2008-05-07  Peter Stephenson  <pws@csr.com>
 
 	* 24959: Src/Zle/compresult.c: ^D's in compctl could cause a
