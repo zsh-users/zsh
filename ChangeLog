@@ -1,3 +1,9 @@
+2008-05-08  Peter Stephenson  <pws@csr.com>
+
+	* 24972: Phil Pennock: Doc/Zsh/mod_files.yo, Src/Modules/files.c,
+	Src/Modules/files.mdd:  Add zf_* commands for zsh/files modules
+	plus a few extra options.
+
 2008-05-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24962: Oliver: Functions/Prompts/prompt_oliver_setup:

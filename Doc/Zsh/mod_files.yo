@@ -2,7 +2,17 @@ COMMENT(!MOD!zsh/files
 Some basic file manipulation commands as builtins.
 !MOD!)
 cindex(files, manipulating)
-The tt(zsh/files) module makes some standard commands available as builtins:
+The tt(zsh/files) module makes available some common commands for file
+manipulation as builtins; these commands are probably not needed for
+many normal situations but can be useful in emergency recovery
+situations with constrained resources.  The commands do not implement
+all features now required by relevant standards committees.
+
+For all commands, a variant beginning tt(zf_) is also available and loaded
+automatically.  Using the features capability of zmodload will let you load
+only those names you want.
+
+The commands loaded by default are:
 
 startitem()
 findex(chgrp)
@@ -51,8 +61,8 @@ a deep directory tree can't end up recursively chowning tt(/usr) as
 a result of directories being moved up the tree.
 )
 findex(ln)
-xitem(tt(ln) [ tt(-dfis) ] var(filename) var(dest))
-item(tt(ln) [ tt(-dfis) ] var(filename) ... var(dir))(
+xitem(tt(ln) [ tt(-dfhins) ] var(filename) var(dest))
+item(tt(ln) [ tt(-dfhins) ] var(filename) ... var(dir))(
 Creates hard (or, with tt(-s), symbolic) links.  In the first form, the
 specified var(dest)ination is created, as a link to the specified
 var(filename).  In the second form, each of the var(filename)s is
@@ -69,6 +79,16 @@ By default, existing files cannot be replaced by links.
 The tt(-i) option causes the user to be queried about replacing
 existing files.  The tt(-f) option causes existing files to be
 silently deleted, without querying.  tt(-f) takes precedence.
+
+The tt(-h) and tt(-n) options are identical and both exist for
+compatibility; either one indicates that if the target is a symlink
+then it should not be dereferenced.
+Typically this is used in combination with tt(-sf) so that if an
+existing link points to a directory then it will be removed,
+instead of followed.
+If this option is used with multiple filenames and the target
+is a symbolic link pointing to a directory then the result is
+an error.
 )
 findex(mkdir)
 item(tt(mkdir) [ tt(-p) ] [ tt(-m) var(mode) ] var(dir) ...)(
