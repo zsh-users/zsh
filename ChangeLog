@@ -33,7 +33,7 @@
 	Src/Zle/complist.c: implement ZLS_COLORS ln=target.
 
 	* 24937, 24938: Dag-Erling Smørgrav <des@des.no>: configure.ac:
-	improved version of 24972.
+	improved version of 24927.
 
 	* 24932: Src/zsh.h, Src/Zle/zle_refresh.c: try to regularize
 	code that fixes up after right prompt.
