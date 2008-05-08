@@ -382,6 +382,7 @@ typedef struct cmdnam    *Cmdnam;
 typedef struct complist  *Complist;
 typedef struct conddef   *Conddef;
 typedef struct features  *Features;
+typedef struct feature_enables  *Feature_enables;
 typedef struct funcstack *Funcstack;
 typedef struct funcwrap  *FuncWrap;
 typedef struct hashnode  *HashNode;
@@ -1245,6 +1246,16 @@ struct features {
     int pd_size;
     /* Number of abstract features */
     int n_abstract;
+};
+
+/*
+ * Structure describing enables for one feature.
+ */
+struct feature_enables {
+    /* String feature to enable (N.B. no leading +/- allowed) */
+    char *str;
+    /* Optional compiled pattern for str sans +/-, NULL for string match */
+    Patprog pat;
 };
 
 /* C-function hooks */

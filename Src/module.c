@@ -1967,7 +1967,7 @@ finish_module(Module m)
 
 /**/
 static int
-do_module_features(Module m, char **enablesstr, int flags)
+do_module_features(Module m, Feature_enables enablesarr, int flags)
 {
     char **features;
     int ret = 0;
@@ -2019,19 +2019,26 @@ do_module_features(Module m, char **enablesstr, int flags)
 		    (void)autofeatures(NULL, m->node.nam, arg, 0,
 				       FEAT_IGNORE|FEAT_REMOVE);
 		    /*
-		     * don't want to try to enable *that*... 
+		     * don't want to try to enable *that*...
 		     * expunge it from the enable string.
 		     */
-		    if (enablesstr) {
-			for (ptr = enablesstr; *ptr; ptr++) {
-			    if (!strcmp(al, *ptr)) {
+		    if (enablesarr) {
+			Feature_enables fep;
+			for (fep = enablesarr; fep->str; fep++) {
+			    char *str = fep->str;
+			    if (*str == '+' || *str == '-')
+				str++;
+			    if (fep->pat ? pattry(fep->pat, al) :
+				!strcmp(al, str)) {
 				/* can't enable it after all, so return 1 */
 				ret = 1;
-				while (*ptr) {
-				    *ptr = ptr[1];
-				    ptr++;
+				while (fep->str) {
+				    fep->str = fep[1].str;
+				    fep->pat = fep[1].pat;
+				    fep++;
 				}
-				break;
+				if (!fep->pat)
+				    break;
 			    }
 			}
 		    }
@@ -2039,11 +2046,11 @@ do_module_features(Module m, char **enablesstr, int flags)
 	    }
 	}
 
-	if (enablesstr) {
-	    char **ep;
-	    for (ep = enablesstr; *ep; ep++) {
-		char **fp, *esp = *ep;
-		int on = 1;
+	if (enablesarr) {
+	    Feature_enables fep;
+	    for (fep = enablesarr; fep->str; fep++) {
+		char **fp, *esp = fep->str;
+		int on = 1, found = 0;
 		if (*esp == '+')
 		    esp++;
 		else if (*esp == '-') {
@@ -2051,13 +2058,17 @@ do_module_features(Module m, char **enablesstr, int flags)
 		    esp++;
 		}
 		for (fp = features; *fp; fp++)
-		    if (!strcmp(*fp, esp)) {
+		    if (fep->pat ? pattry(fep->pat, *fp) : !strcmp(*fp, esp)) {
 			enables[fp - features] = on;
-			break;
+			found++;
+			if (!fep->pat)
+			    break;
 		    }
-		if (!*fp) {
+		if (!found) {
 		    if (!(flags & FEAT_IGNORE))
-			zwarn("module `%s' has no such feature: `%s'",
+			zwarn(fep->pat ?
+			      "module `%s' has no feature matching: `%s'" :
+			      "module `%s' has no such feature: `%s'",
 			      m->node.nam, esp);
 		    return 1;
 		}
@@ -2075,7 +2086,7 @@ do_module_features(Module m, char **enablesstr, int flags)
 
 	if (enables_module(m, &enables))
 	    return 2;
-    } else if (enablesstr) {
+    } else if (enablesarr) {
 	if (!(flags & FEAT_IGNORE))
 	    zwarn("module `%s' does not support features", m->node.nam);
 	return 1;
@@ -2097,9 +2108,9 @@ do_module_features(Module m, char **enablesstr, int flags)
 
 /**/
 static int
-do_boot_module(Module m, char **enablesstr, int silent)
+do_boot_module(Module m, Feature_enables enablesarr, int silent)
 {
-    int ret = do_module_features(m, enablesstr,
+    int ret = do_module_features(m, enablesarr,
 				 silent ? FEAT_IGNORE|FEAT_CHECKAUTO :
 				 FEAT_CHECKAUTO);
 
@@ -2159,7 +2170,7 @@ modname_ok(char const *p)
 
 /**/
 mod_export int
-load_module(char const *name, char **enablesstr, int silent)
+load_module(char const *name, Feature_enables enablesarr, int silent)
 {
     Module m;
     void *handle = NULL;
@@ -2194,7 +2205,7 @@ load_module(char const *name, char **enablesstr, int silent)
 	modulestab->addnode(modulestab, ztrdup(name), m);
 
 	if ((set = setup_module(m)) ||
-	    (bootret = do_boot_module(m, enablesstr, silent)) == 1) {
+	    (bootret = do_boot_module(m, enablesarr, silent)) == 1) {
 	    if (!set)
 		do_cleanup_module(m);
 	    finish_module(m);
@@ -2263,7 +2274,7 @@ load_module(char const *name, char **enablesstr, int silent)
 	m->node.flags |= MOD_INIT_S;
     }
     m->node.flags |= MOD_SETUP;
-    if ((bootret = do_boot_module(m, enablesstr, silent)) == 1) {
+    if ((bootret = do_boot_module(m, enablesarr, silent)) == 1) {
 	do_cleanup_module(m);
 	finish_module(m);
 	if (m->node.flags & MOD_LINKED)
@@ -2301,7 +2312,7 @@ load_module(char const *name, char **enablesstr, int silent)
 
 /**/
 mod_export int
-require_module(const char *module, char **features)
+require_module(const char *module, Feature_enables features)
 {
     Module m = NULL;
     int ret = 0;
@@ -2962,7 +2973,10 @@ bin_zmodload_load(char *nam, char **args, Options ops)
 static int
 bin_zmodload_features(const char *nam, char **args, Options ops)
 {
+    int iarg;
     char *modname = *args;
+    Patprog *patprogs;
+    Feature_enables features, fep;
 
     if (modname)
 	args++;
@@ -2985,6 +2999,23 @@ bin_zmodload_features(const char *nam, char **args, Options ops)
 	zwarnnam(nam, "-F requires a module name");
 	return 1;
     }
+
+    if (OPT_ISSET(ops,'m')) {
+	char **argp;
+	Patprog *patprogp;
+
+	/* not NULL terminated */
+	patprogp = patprogs =
+	    (Patprog *)zhalloc(arrlen(args)*sizeof(Patprog));
+	for (argp = args; *argp; argp++, patprogp++) {
+	    char *arg = *argp;
+	    if (*arg == '+' || *arg == '-')
+		arg++;
+	    tokenize(arg);
+	    *patprogp = patcompile(arg, 0, 0);
+	}
+    } else
+	patprogs = NULL;
 
     if (OPT_ISSET(ops,'l') || OPT_ISSET(ops,'L') || OPT_ISSET(ops,'e')) {
 	/*
@@ -3063,9 +3094,9 @@ bin_zmodload_features(const char *nam, char **args, Options ops)
 		     m->node.nam);
 	    return 1;
 	}
-	for (arrp = args; *arrp; arrp++) {
+	for (arrp = args, iarg = 0; *arrp; arrp++, iarg++) {
 	    char *arg = *arrp;
-	    int on;
+	    int on, found = 0;
 	    if (*arg == '-') {
 		on = 0;
 		arg++;
@@ -3075,17 +3106,22 @@ bin_zmodload_features(const char *nam, char **args, Options ops)
 	    } else
 		on = -1;
 	    for (fp = features, ep = enables; *fp; fp++, ep++) {
-		if (!strcmp(arg, *fp)) {
+		if (patprogs ? pattry(patprogs[iarg], *fp) :
+		    !strcmp(arg, *fp)) {
 		    /* for -e, check given state, if any */
 		    if (OPT_ISSET(ops,'e') && on != -1 &&
 			on != (*ep & 1))
 			return 1;
-		    break;
+		    found++;
+		    if (!patprogs)
+			break;
 		}
 	    }
-	    if (!*fp) {
+	    if (!found) {
 		if (!OPT_ISSET(ops,'e'))
-		    zwarnnam(nam, "module `%s' has no such feature: `%s'",
+		    zwarnnam(nam, patprogs ?
+			     "module `%s' has no feature matching: `%s'" :
+			     "module `%s' has no such feature: `%s'",
 			     *arrp);
 		return 1;
 	    }
@@ -3100,12 +3136,13 @@ bin_zmodload_features(const char *nam, char **args, Options ops)
 		    continue;
 		if (*args) {
 		    char **argp;
-		    for (argp = args; *argp; argp++) {
+		    for (argp = args, iarg = 0; *argp; argp++, iarg++) {
 			char *arg = *argp;
 			/* ignore +/- for consistency */
 			if (*arg == '+' || *arg == '-')
 			    arg++;
-			if (!strcmp(*fp, arg))
+			if (patprogs ? pattry(patprogs[iarg], *fp) :
+			    !strcmp(*fp, arg))
 			    break;
 		    }
 		    if (!*argp)
@@ -3121,11 +3158,12 @@ bin_zmodload_features(const char *nam, char **args, Options ops)
 	    int term;
 	    if (*args) {
 		char **argp;
-		for (argp = args; *argp; argp++) {
+		for (argp = args, iarg = 0; *argp; argp++, iarg++) {
 		    char *arg = *argp;
 		    if (*arg == '+' || *arg == '-')
 			arg++;
-		    if (!strcmp(*fp, *argp))
+		    if (patprogs ? pattry(patprogs[iarg], *fp) :
+			!strcmp(*fp, *argp))
 			break;
 		}
 		if (!*argp)
@@ -3161,6 +3199,10 @@ bin_zmodload_features(const char *nam, char **args, Options ops)
 	zwarnnam(nam, "-P can only be used with -l or -L");
 	return 1;
     } else if (OPT_ISSET(ops,'a')) {
+	if (OPT_ISSET(ops,'m')) {
+	    zwarnnam(nam, "-m cannot be used with -a");
+	    return 1;
+	}
 	/*
 	 * With zmodload -aF, we always use the effect of -i.
 	 * The thinking is that marking a feature for
@@ -3175,7 +3217,18 @@ bin_zmodload_features(const char *nam, char **args, Options ops)
 	return autofeatures(nam, modname, args, 0, FEAT_IGNORE);
     }
 
-    return require_module(modname, args);
+    fep = features =
+	(Feature_enables)zhalloc((arrlen(args)+1)*sizeof(*fep));
+
+    while (*args) {
+	fep->str = *args++;
+	fep->pat = patprogs ? *patprogs++ : NULL;
+	fep++;
+    }
+    fep->str = NULL;
+    fep->pat = NULL;
+
+    return require_module(modname, features);
 }
 
 
@@ -3330,14 +3383,17 @@ handlefeatures(Module m, Features f, int **enables)
 mod_export int
 ensurefeature(const char *modname, const char *prefix, const char *feature)
 {
-    char *f, *features[2];
+    char *f;
+    struct feature_enables features[2];
 
     if (!feature)
 	return require_module(modname, NULL);
     f = dyncat(prefix, feature);
 
-    features[0] = f;
-    features[1] = NULL;
+    features[0].str = f;
+    features[0].pat = NULL;
+    features[1].str = NULL;
+    features[1].pat = NULL;
     return require_module(modname, features);
 }
 
@@ -3435,7 +3491,7 @@ autofeatures(const char *cmdnam, const char *module, char **features,
 	    zwarnnam(cmdnam, "%s: `/' is illegal in a %s", fnam, typnam);
 	    ret = 1;
 	    continue;
-	} 
+	}
 
 	if (!module) {
 	    /*

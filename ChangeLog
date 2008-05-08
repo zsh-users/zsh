@@ -1,5 +1,8 @@
 2008-05-08  Peter Stephenson  <pws@csr.com>
 
+	* 24980: Doc/Zsh/builtins.yo, Src/builtin.c, Src/module.c,
+	Src/zsh.h: add zmodload -mF to manipulate features by pattern.
+
 	* 24972: Phil Pennock: Doc/Zsh/mod_files.yo, Src/Modules/files.c,
 	Src/Modules/files.mdd:  Add zf_* commands for zsh/files modules
 	plus a few extra options.
