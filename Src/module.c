@@ -3122,7 +3122,7 @@ bin_zmodload_features(const char *nam, char **args, Options ops)
 		    zwarnnam(nam, patprogs ?
 			     "module `%s' has no feature matching: `%s'" :
 			     "module `%s' has no such feature: `%s'",
-			     *arrp);
+			     modname, *arrp);
 		return 1;
 	    }
 	}
