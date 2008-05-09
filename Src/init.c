@@ -909,6 +909,9 @@ setupvals(void)
     for (i = 0; i < 10; i++)
 	if (close_fds[i])
 	    close(i);
+
+    /* Colour sequences for outputting colours in prompts and zle */
+    set_default_colour_sequences();
 }
 
 /* Initialize signal handling */

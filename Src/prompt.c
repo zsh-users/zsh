@@ -423,38 +423,78 @@ putpromptchar(int doprint, int endchar)
 	    case 'S':
 		txtchangeset(TXTSTANDOUT, TXTNOSTANDOUT);
 		txtset(TXTSTANDOUT);
-		tsetcap(TCSTANDOUTBEG, 1);
+		tsetcap(TCSTANDOUTBEG, TSC_PROMPT);
 		break;
 	    case 's':
 		txtchangeset(TXTNOSTANDOUT, TXTSTANDOUT);
-		txtset(TXTDIRTY);
 		txtunset(TXTSTANDOUT);
-		tsetcap(TCSTANDOUTEND, 1);
+		tsetcap(TCSTANDOUTEND, TSC_PROMPT|TSC_DIRTY);
 		break;
 	    case 'B':
 		txtchangeset(TXTBOLDFACE, TXTNOBOLDFACE);
-		txtset(TXTDIRTY);
 		txtset(TXTBOLDFACE);
-		tsetcap(TCBOLDFACEBEG, 1);
+		tsetcap(TCBOLDFACEBEG, TSC_PROMPT|TSC_DIRTY);
 		break;
 	    case 'b':
 		txtchangeset(TXTNOBOLDFACE, TXTBOLDFACE);
 		txtchangeset(TXTNOSTANDOUT, TXTSTANDOUT);
 		txtchangeset(TXTNOUNDERLINE, TXTUNDERLINE);
-		txtset(TXTDIRTY);
 		txtunset(TXTBOLDFACE);
-		tsetcap(TCALLATTRSOFF, 1);
+		tsetcap(TCALLATTRSOFF, TSC_PROMPT|TSC_DIRTY);
 		break;
 	    case 'U':
 		txtchangeset(TXTUNDERLINE, TXTNOUNDERLINE);
 		txtset(TXTUNDERLINE);
-		tsetcap(TCUNDERLINEBEG, 1);
+		tsetcap(TCUNDERLINEBEG, TSC_PROMPT);
 		break;
 	    case 'u':
 		txtchangeset(TXTNOUNDERLINE, TXTUNDERLINE);
-		txtset(TXTDIRTY);
 		txtunset(TXTUNDERLINE);
-		tsetcap(TCUNDERLINEEND, 1);
+		tsetcap(TCUNDERLINEEND, TSC_PROMPT|TSC_DIRTY);
+		break;
+	    case 'F':
+		if (fm[1] == '{') {
+		    fm += 2;
+		    arg = match_colour((const char **)&fm, 1, 0);
+		    if (*fm != '}')
+			fm--;
+		} else
+		    arg = match_colour(NULL, 1, arg);
+		if (arg >= 0 && !(arg & TXTNOFGCOLOUR)) {
+		    txtchangeset(arg & TXT_ATTR_FG_ON_MASK,
+				 TXTNOFGCOLOUR);
+		    txtset(arg & TXT_ATTR_FG_ON_MASK);
+		    set_colour_attribute(arg, COL_SEQ_FG, TSC_PROMPT);
+		    break;
+		}
+		/* else FALLTHROUGH */
+		break;
+	    case 'f':
+		txtchangeset(TXTNOFGCOLOUR, TXT_ATTR_FG_ON_MASK);
+		txtunset(TXT_ATTR_FG_ON_MASK);
+		set_colour_attribute(TXTNOFGCOLOUR, COL_SEQ_FG, TSC_PROMPT);
+		break;
+	    case 'K':
+		if (fm[1] == '{') {
+		    fm += 2;
+		    arg = match_colour((const char **)&fm, 0, 0);
+		    if (*fm != '}')
+			fm--;
+		} else
+		    arg = match_colour(NULL, 0, arg);
+		if (arg >= 0 && !(arg & TXTNOBGCOLOUR)) {
+		    txtchangeset(arg & TXT_ATTR_BG_ON_MASK,
+				 TXTNOBGCOLOUR);
+		    txtset(arg & TXT_ATTR_BG_ON_MASK);
+		    set_colour_attribute(arg, COL_SEQ_BG, TSC_PROMPT);
+		    break;
+		}
+		/* else FALLTHROUGH */
+		break;
+	    case 'k':
+		txtchangeset(TXTNOBGCOLOUR, TXT_ATTR_BG_ON_MASK);
+		txtunset(TXT_ATTR_BG_ON_MASK);
+		set_colour_attribute(TXTNOBGCOLOUR, COL_SEQ_BG, TSC_PROMPT);
 		break;
 	    case '[':
 		if (idigit(*++fm))
@@ -610,7 +650,7 @@ putpromptchar(int doprint, int endchar)
 		    stradd(psvar[arg - 1]);
 		break;
 	    case 'E':
-                tsetcap(TCCLEAREOL, 1);
+                tsetcap(TCCLEAREOL, TSC_PROMPT);
 		break;
 	    case '^':
 		if (cmdsp) {
@@ -816,18 +856,19 @@ stradd(char *d)
 
 /**/
 mod_export void
-tsetcap(int cap, int flag)
+tsetcap(int cap, int flags)
 {
     if (tccan(cap) && !isset(SINGLELINEZLE) &&
         !(termflags & (TERM_NOUP|TERM_BAD|TERM_UNKNOWN))) {
-	switch(flag) {
-	case -1:
+	switch (flags & TSC_OUTPUT_MASK) {
+	case TSC_RAW:
 	    tputs(tcstr[cap], 1, putraw);
 	    break;
 	case 0:
+	default:
 	    tputs(tcstr[cap], 1, putshout);
 	    break;
-	case 1:
+	case TSC_PROMPT:
 	    if (!dontcount) {
 		addbufspc(1);
 		*bp++ = Inpar;
@@ -850,14 +891,14 @@ tsetcap(int cap, int flag)
 	    break;
 	}
 
-	if (txtisset(TXTDIRTY)) {
-	    txtunset(TXTDIRTY);
+	if (flags & TSC_DIRTY) {
+	    flags &= ~TSC_DIRTY;
 	    if (txtisset(TXTBOLDFACE) && cap != TCBOLDFACEBEG)
-		tsetcap(TCBOLDFACEBEG, flag);
+		tsetcap(TCBOLDFACEBEG, flags);
 	    if (txtisset(TXTSTANDOUT))
-		tsetcap(TCSTANDOUTBEG, flag);
+		tsetcap(TCSTANDOUTBEG, flags);
 	    if (txtisset(TXTUNDERLINE))
-		tsetcap(TCUNDERLINEBEG, flag);
+		tsetcap(TCUNDERLINEBEG, flags);
 	}
     }
 }
@@ -1360,4 +1401,482 @@ cmdpop(void)
 	fflush(stderr);
     } else
 	cmdsp--;
+}
+
+
+/*****************************************************************************
+ * Utilities dealing with colour and other forms of highlighting.
+ *
+ * These are shared by prompts and by zle, so it's easiest to have them
+ * in the main shell.
+ *****************************************************************************/
+
+/* Defines standard ANSI colour names in index order */
+static const char *ansi_colours[] = {
+    "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white",
+    "default", NULL
+};
+
+/* Defines the available types of highlighting */
+struct highlight {
+    const char *name;
+    int mask_on;
+    int mask_off;
+};
+
+static const struct highlight highlights[] = {
+    { "none", 0, TXT_ATTR_ON_MASK },
+    { "bold", TXTBOLDFACE, 0 },
+    { "standout", TXTSTANDOUT, 0 },
+    { "underline", TXTUNDERLINE, 0 },
+    { NULL, 0, 0 }
+};
+
+/*
+ * Return index of ANSI colour for which *teststrp is an abbreviation.
+ * Any non-alphabetic character ends the abbreviation.
+ * 8 is the special value for default (note this is *not* the
+ * right sequence for default which is typically 9).
+ * -1 is failure.
+ */
+
+static int
+match_named_colour(const char **teststrp)
+{
+    const char *teststr = *teststrp, *end, **cptr;
+    int len;
+
+    for (end = teststr; ialpha(*end); end++)
+	;
+    len = end - teststr;
+    *teststrp = end;
+
+    for (cptr = ansi_colours; *cptr; cptr++) {
+	if (!strncmp(teststr, *cptr, len))
+	    return cptr - ansi_colours;
+    }
+
+    return -1;
+}
+
+/*
+ * Match just the colour part of a highlight specification.
+ * If teststrp is NULL, use the already parsed numeric colour.
+ * Return the attributes to set in the attribute variable.
+ * Return -1 for out of range.  Does not check the character
+ * following the colour specification.
+ */
+
+/**/
+static int
+match_colour(const char **teststrp, int is_fg, int colour)
+{
+    int shft, on, named, tc;
+
+    if (teststrp) {
+	if ((named = ialpha(**teststrp))) {
+	    colour = match_named_colour(teststrp);
+	    if (colour == 8) {
+		/* default */
+		return is_fg ? TXTNOFGCOLOUR : TXTNOBGCOLOUR;
+	    }
+	}
+	else
+	    colour = (int)zstrtol(*teststrp, (char **)teststrp, 10);
+    }
+    if (colour < 0 || colour >= 256)
+	return -1;
+    if (is_fg) {
+	shft = TXT_ATTR_FG_COL_SHIFT;
+	on = TXTFGCOLOUR;
+	tc = TCFGCOLOUR;
+    } else {
+	shft = TXT_ATTR_BG_COL_SHIFT;
+	on = TXTBGCOLOUR;
+	tc = TCBGCOLOUR;
+    }
+    /*
+     * Try termcap for numbered characters if posible.
+     * Don't for named characters, since our best bet
+     * of getting the names right is with ANSI sequences.
+     */
+    if (!named && tccan(tc)) {
+	if (tccolours >= 0 && colour >= tccolours) {
+	    /*
+	     * Out of range of termcap colours.
+	     * Can we assume ANSI colours work?
+	     */
+	    if (colour > 7)
+		return -1; /* No. */
+	} else {
+	    /*
+	     * We can handle termcap colours and the number
+	     * is in range, so use termcap.
+	     */
+	    on |= is_fg ? TXT_ATTR_FG_TERMCAP :
+		TXT_ATTR_BG_TERMCAP;
+	}
+    }
+    return on | (colour << shft);
+}
+
+/*
+ * Match a set of highlights in the given teststr.
+ * Set *on_var to reflect the values found.
+ */
+
+/**/
+mod_export void
+match_highlight(const char *teststr, int *on_var)
+{
+    int found = 1;
+
+    *on_var = 0;
+    while (found && *teststr) {
+	const struct highlight *hl;
+
+	found = 0;
+	if (strpfx("fg=", teststr) || strpfx("bg=", teststr)) {
+	    int is_fg = (teststr[0] == 'f'), atr;
+
+	    teststr += 3;
+	    atr = match_colour(&teststr, is_fg, 0);
+	    if (*teststr == ',')
+		teststr++;
+	    else if (*teststr)
+		break;
+	    found = 1;
+	    /* skip out of range colours but keep scanning attributes */
+	    if (atr >= 0)
+		*on_var |= atr;
+	} else {
+	    for (hl = highlights; hl->name; hl++) {
+		if (strpfx(hl->name, teststr)) {
+		    const char *val = teststr + strlen(hl->name);
+
+		    if (*val == ',')
+			val++;
+		    else if (*val)
+			break;
+
+		    *on_var |= hl->mask_on;
+		    *on_var &= ~hl->mask_off;
+		    teststr = val;
+		    found = 1;
+		}
+	    }
+	}
+    }
+}
+
+/*
+ * Count or output a string for colour information: used
+ * by output_highlight().
+ */
+
+static int
+output_colour(int colour, int fg_bg, int use_tc, char *buf)
+{
+    int atrlen = 3, len;
+    char *ptr = buf;
+    if (buf) {
+	strcpy(ptr, fg_bg == COL_SEQ_FG ? "fg=" : "bg=");
+	ptr += 3;
+    }
+    /* colour should only be > 7 if using termcap but let's be safe */
+    if (use_tc || colour > 7) {
+	char digbuf[DIGBUFSIZE];
+	sprintf(digbuf, "%d", colour);
+	len = strlen(digbuf);
+	atrlen += len;
+	if (buf)
+	    strcpy(ptr, digbuf);
+    } else {
+	len = strlen(ansi_colours[colour]);
+	atrlen += len;
+	if (buf)
+	    strcpy(ptr, ansi_colours[colour]);
+    }
+
+    return atrlen;
+}
+
+/*
+ * Count the length needed for outputting highlighting information
+ * as a string based on the bits for the attributes.
+ *
+ * If buf is not NULL, output the strings into the buffer, too.
+ * As conventional with strings, the allocated length should be
+ * at least the returned value plus 1 for the NUL byte.
+ */
+
+/**/
+mod_export int
+output_highlight(int atr, char *buf)
+{
+    const struct highlight *hp;
+    int atrlen = 0, len;
+    char *ptr = buf;
+
+    if (atr & TXTFGCOLOUR) {
+	len = output_colour(txtchangeget(atr, TXT_ATTR_FG_COL),
+			    COL_SEQ_FG,
+			    (atr & TXT_ATTR_FG_TERMCAP),
+			    ptr);
+	atrlen += len;
+	if (buf)
+	    ptr += len;
+    }
+    if (atr & TXTBGCOLOUR) {
+	if (atrlen) {
+	    atrlen++;
+	    if (buf) {
+		strcpy(ptr, ",");
+		ptr++;
+	    }
+	}
+	len = output_colour(txtchangeget(atr, TXT_ATTR_BG_COL),
+			    COL_SEQ_BG,
+			    (atr & TXT_ATTR_BG_TERMCAP),
+			    ptr);
+	atrlen += len;
+	if (buf)
+	    ptr += len;
+    }
+    for (hp = highlights; hp->name; hp++) {
+	if (hp->mask_on & atr) {
+	    if (atrlen) {
+		atrlen++;
+		if (buf) {
+		    strcpy(ptr, ",");
+		    ptr++;
+		}
+	    }
+	    len = strlen(hp->name);
+	    atrlen += len;
+	    if (buf) {
+		strcpy(ptr, hp->name);
+		ptr += len;
+	    }
+	}
+    }
+
+    if (atrlen == 0) {
+	if (buf)
+	    strcpy(ptr, "none");
+	return 4;
+    }
+    return atrlen;
+}
+
+/* Structure and array for holding special colour terminal sequences */
+
+/* Start of escape sequence for foreground colour */
+#define TC_COL_FG_START	"\033[3"
+/* End of escape sequence for foreground colour */
+#define TC_COL_FG_END	"m"
+/* Code to reset foreground colour */
+#define TC_COL_FG_DEFAULT	"9"
+
+/* Start of escape sequence for background colour */
+#define TC_COL_BG_START	"\033[4"
+/* End of escape sequence for background colour */
+#define TC_COL_BG_END	"m"
+/* Code to reset background colour */
+#define TC_COL_BG_DEFAULT	"9"
+
+struct colour_sequences {
+    char *start;		/* Escape sequence start */
+    char *end;			/* Escape sequence terminator */
+    char *def;			/* Code to reset default colour */
+};
+struct colour_sequences fg_bg_sequences[2];
+
+/*
+ * We need a buffer for colour sequence compostion.  It may
+ * vary depending on the sequences set.  However, it's inefficient
+ * allocating it separately every time we send a colour sequence,
+ * so do it once per refresh.
+ */
+static char *colseq_buf;
+
+/**/
+void
+set_default_colour_sequences(void)
+{
+    fg_bg_sequences[COL_SEQ_FG].start = ztrdup(TC_COL_FG_START);
+    fg_bg_sequences[COL_SEQ_FG].end = ztrdup(TC_COL_FG_END);
+    fg_bg_sequences[COL_SEQ_FG].def = ztrdup(TC_COL_FG_DEFAULT);
+
+    fg_bg_sequences[COL_SEQ_BG].start = ztrdup(TC_COL_BG_START);
+    fg_bg_sequences[COL_SEQ_BG].end = ztrdup(TC_COL_BG_END);
+    fg_bg_sequences[COL_SEQ_BG].def = ztrdup(TC_COL_BG_DEFAULT);
+}
+
+static void
+set_colour_code(char *str, char **var)
+{
+    char *keyseq;
+    int len;
+
+    zsfree(*var);
+    keyseq = getkeystring(str, &len, GETKEYS_BINDKEY, NULL);
+    *var = metafy(keyseq, len, META_DUP);
+}
+
+/* Allocate buffer for colour code composition */
+
+/**/
+mod_export void
+allocate_colour_buffer(void)
+{
+    char **atrs = getaparam("zle_highlight");
+    int lenfg, lenbg, len;
+
+    if (atrs) {
+	for (; *atrs; atrs++) {
+	    if (strpfx("fg_start_code:", *atrs)) {
+		set_colour_code(*atrs + 14, &fg_bg_sequences[COL_SEQ_FG].start);
+	    } else if (strpfx("fg_default_code:", *atrs)) {
+		set_colour_code(*atrs + 16, &fg_bg_sequences[COL_SEQ_FG].def);
+	    } else if (strpfx("fg_end_code:", *atrs)) {
+		set_colour_code(*atrs + 12, &fg_bg_sequences[COL_SEQ_FG].end);
+	    } else if (strpfx("bg_start_code:", *atrs)) {
+		set_colour_code(*atrs + 14, &fg_bg_sequences[COL_SEQ_BG].start);
+	    } else if (strpfx("bg_default_code:", *atrs)) {
+		set_colour_code(*atrs + 16, &fg_bg_sequences[COL_SEQ_BG].def);
+	    } else if (strpfx("bg_end_code:", *atrs)) {
+		set_colour_code(*atrs + 12, &fg_bg_sequences[COL_SEQ_BG].end);
+	    }
+	}
+    }
+
+    lenfg = strlen(fg_bg_sequences[COL_SEQ_FG].def);
+    /* always need 1 character for non-default code */
+    if (lenfg < 1)
+	lenfg = 1;
+    lenfg += strlen(fg_bg_sequences[COL_SEQ_FG].start) +
+	strlen(fg_bg_sequences[COL_SEQ_FG].end);
+
+    lenbg = strlen(fg_bg_sequences[COL_SEQ_BG].def);
+    /* always need 1 character for non-default code */
+    if (lenbg < 1)
+	lenbg = 1;
+    lenbg += strlen(fg_bg_sequences[COL_SEQ_BG].start) +
+	strlen(fg_bg_sequences[COL_SEQ_BG].end);
+
+    len = lenfg > lenbg ? lenfg : lenbg;
+    colseq_buf = (char *)zalloc(len+1);
+}
+
+/* Free the colour buffer previously allocated. */
+
+/**/
+mod_export void
+free_colour_buffer(void)
+{
+    DPUTS(!colseq_buf, "Freeing colour sequence buffer without alloc");
+    /* Free buffer for colour code composition */
+    free(colseq_buf);
+    colseq_buf = NULL;
+}
+
+/*
+ * Handle outputting of a colour for prompts or zle.
+ * colour is the numeric colour, 0 to 255 (or less if termcap
+ * says fewer are supported).
+ * fg_bg indicates if we're changing the foreground or background.
+ * tc indicates the termcap code to use, if appropriate.
+ * def indicates if we're resetting the default colour.
+ * use_termcap indicates if we should use termcap to output colours.
+ * flags is either 0 or TSC_PROMPT.
+ */
+
+/**/
+mod_export void
+set_colour_attribute(int atr, int fg_bg, int flags)
+{
+    char *ptr;
+    int do_free, is_prompt = (flags & TSC_PROMPT) ? 1 : 0;
+    int colour, tc, def, use_termcap;
+
+    if (fg_bg == COL_SEQ_FG) {
+	colour = txtchangeget(atr, TXT_ATTR_FG_COL);
+	tc = TCFGCOLOUR;
+	def = txtchangeisset(atr, TXTNOFGCOLOUR);
+	use_termcap = txtchangeisset(atr, TXT_ATTR_FG_TERMCAP);
+    } else {
+	colour = txtchangeget(atr, TXT_ATTR_BG_COL);
+	tc = TCBGCOLOUR;
+	def = txtchangeisset(atr, TXTNOBGCOLOUR);
+	use_termcap = txtchangeisset(atr, TXT_ATTR_BG_TERMCAP);
+    }
+
+    /*
+     * If we're not restoring the default, and either have a
+     * colour value that is too large for ANSI, or have been told
+     * to use the termcap sequence, try to use the termcap sequence.
+     *
+     * We have already sanitised the values we allow from the
+     * highlighting variables, so much of this shouldn't be
+     * necessary at this point, but we might as well be safe.
+     */
+    if (!def && (colour > 7 || use_termcap)) {
+	/*
+	 * We can if it's available, and either we couldn't get
+	 * the maximum number of colours, or the colour is in range.
+	 */
+	if (tccan(tc) && (tccolours < 0 || colour < tccolours))
+	{
+	    if (is_prompt)
+	    {
+		if (!dontcount) {
+		    addbufspc(1);
+		    *bp++ = Inpar;
+		}
+		tputs(tgoto(tcstr[tc], colour, colour), 1, putstr);
+		if (!dontcount) {
+		    addbufspc(1);
+		    *bp++ = Outpar;
+		}
+	    } else {
+		tputs(tgoto(tcstr[tc], colour, colour), 1, putshout);
+	    }
+	}
+	/* for 0 to 7 assume standard ANSI works, otherwise it won't. */
+	if (colour > 7)
+	    return;
+    }
+
+    if ((do_free = (colseq_buf == NULL))) {
+	/* This can happen when moving the cursor in trashzle() */
+	allocate_colour_buffer();
+    }
+
+    strcpy(colseq_buf, fg_bg_sequences[fg_bg].start);
+
+    ptr = colseq_buf + strlen(colseq_buf);
+    if (def) {
+	strcpy(ptr, fg_bg_sequences[fg_bg].def);
+	while (*ptr)
+	    ptr++;
+    } else
+	*ptr++ = colour + '0';
+    strcpy(ptr, fg_bg_sequences[fg_bg].end);
+
+    if (is_prompt) {
+	if (!dontcount) {
+	    addbufspc(1);
+	    *bp++ = Inpar;
+	}
+	tputs(colseq_buf, 1, putstr);
+	if (!dontcount) {
+	    addbufspc(1);
+	    *bp++ = Outpar;
+	}
+    } else
+	tputs(colseq_buf, 1, putshout);
+
+    if (do_free)
+	free_colour_buffer();
 }

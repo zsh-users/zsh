@@ -1,3 +1,9 @@
+2008-05-09  Peter Stephenson  <pws@csr.com>
+
+	* 24986: Doc/Zsh/prompt.yo, Doc/Zsh/zle.yo, Src/init.c,
+	Src/prompt.c, Src/watch.c, Src/zsh.h, Src/Zle/zle_refresh.c:
+	prompt escapes for colouring.
+
 2008-05-08  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/modules.c: bad arguments to error message.

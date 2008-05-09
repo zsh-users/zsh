@@ -2182,9 +2182,10 @@ Not all terminals support this and, of those that do, not all provide
 facilities to test the support, hence the user should decide based on the
 terminal type.  Most terminals support the colours tt(black), tt(red),
 tt(green), tt(yellow), tt(blue), tt(magenta), tt(cyan) and tt(white),
-which can be set by name.  Abbreviations are allowed; tt(b) or tt(bl)
-selects black.  Some terminals may generate additional colours if the
-tt(bold) attribute is also present.
+which can be set by name.  In addition. tt(default) may be used to
+set the terminal's default foreground colour.  Abbreviations are allowed;
+tt(b) or tt(bl) selects black.  Some terminals may generate additional
+colours if the tt(bold) attribute is also present.
 
 On recent terminals and on systems with an up-to-date terminal database the
 number of colours supported may be tested by with the command `tt(echotc

@@ -338,31 +338,27 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 		    break;
 		case 'S':
 		    txtset(TXTSTANDOUT);
-		    tsetcap(TCSTANDOUTBEG, -1);
+		    tsetcap(TCSTANDOUTBEG, TSC_RAW);
 		    break;
 		case 's':
-		    txtset(TXTDIRTY);
 		    txtunset(TXTSTANDOUT);
-		    tsetcap(TCSTANDOUTEND, -1);
+		    tsetcap(TCSTANDOUTEND, TSC_RAW|TSC_DIRTY);
 		    break;
 		case 'B':
-		    txtset(TXTDIRTY);
 		    txtset(TXTBOLDFACE);
-		    tsetcap(TCBOLDFACEBEG, -1);
+		    tsetcap(TCBOLDFACEBEG, TSC_RAW|TSC_DIRTY);
 		    break;
 		case 'b':
-		    txtset(TXTDIRTY);
 		    txtunset(TXTBOLDFACE);
-		    tsetcap(TCALLATTRSOFF, -1);
+		    tsetcap(TCALLATTRSOFF, TSC_RAW|TSC_DIRTY);
 		    break;
 		case 'U':
 		    txtset(TXTUNDERLINE);
-		    tsetcap(TCUNDERLINEBEG, -1);
+		    tsetcap(TCUNDERLINEBEG, TSC_RAW);
 		    break;
 		case 'u':
-		    txtset(TXTDIRTY);
 		    txtunset(TXTUNDERLINE);
-		    tsetcap(TCUNDERLINEEND, -1);
+		    tsetcap(TCUNDERLINEEND, TSC_RAW|TSC_DIRTY);
 		    break;
 		default:
 		    putchar('%');

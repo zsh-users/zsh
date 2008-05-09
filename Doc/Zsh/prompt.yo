@@ -183,6 +183,20 @@ Start (stop) underline mode.
 item(tt(%S) LPAR()tt(%s)RPAR())(
 Start (stop) standout mode.
 )
+item(tt(%F) LPAR()tt(%f)RPAR())(
+Start (stop) using a different foreground colour, if supported
+by the terminal.  The colour may be specified two ways: either
+as a numeric argument, as normal, or by a sequence in braces
+following the tt(%F), for example tt(%F{red}).  In the latter case
+the values allowed are as described for the tt(fg) tt(zle_highlight)
+attribute;
+ifzman(see em(Character Highlighting) in zmanref(zshzle))\
+ifnzman(noderef(Character Highlighting)).
+)
+item(tt(%K) LPAR()tt(%k)RPAR())(
+Start (stop) using a different bacKground colour.  The syntax is
+identical to that for tt(%F) and tt(%f).
+)
 item(tt(%{)...tt(%}))(
 Include a string as a literal escape sequence.
 The string within the braces should not change the cursor
