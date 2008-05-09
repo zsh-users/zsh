@@ -4,6 +4,8 @@
 	Src/prompt.c, Src/watch.c, Src/zsh.h, Src/Zle/zle_refresh.c:
 	prompt escapes for colouring.
 
+	* users/12846: Etc/FAQ.yo: not so many Windows ports, these days.
+
 2008-05-08  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/modules.c: bad arguments to error message.
