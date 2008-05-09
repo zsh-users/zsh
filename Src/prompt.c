@@ -1471,7 +1471,7 @@ match_named_colour(const char **teststrp)
 static int
 match_colour(const char **teststrp, int is_fg, int colour)
 {
-    int shft, on, named, tc;
+    int shft, on, named = 0, tc;
 
     if (teststrp) {
 	if ((named = ialpha(**teststrp))) {
