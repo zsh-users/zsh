@@ -182,16 +182,16 @@ evalcond(Estate state, char *fromtest)
     }
     if (tracingcond) {
 	if (ctype < COND_MOD) {
-	    char *rt = (char *) right;
-	    if (ctype == COND_STREQ || ctype == COND_STRNEQ) {
-		rt = dupstring(ecrawstr(state->prog, state->pc, NULL));
-		singsub(&rt);
-		untokenize(rt);
-	    }
 	    fputc(' ',xtrerr);
 	    quotedzputs(left, xtrerr);
 	    fprintf(xtrerr, " %s ", condstr[ctype]);
-	    quotedzputs(rt, xtrerr);
+	    if (ctype == COND_STREQ || ctype == COND_STRNEQ) {
+		char *rt = dupstring(ecrawstr(state->prog, state->pc, NULL));
+		singsub(&rt);
+		quote_tokenized_output(rt, xtrerr);
+	    }
+	    else
+		quotedzputs((char *)right, xtrerr);
 	} else {
 	    fprintf(xtrerr, " -%c ", ctype);
 	    quotedzputs(left, xtrerr);

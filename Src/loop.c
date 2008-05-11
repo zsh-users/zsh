@@ -559,10 +559,10 @@ execcase(Estate state, int do_exec)
 	    save = (!(state->prog->flags & EF_HEAP) &&
 		    !strcmp(pat, opat) && *spprog != dummy_patprog2);
 
-	    pat2 = dupstring(pat);
-	    untokenize(pat2);
 	    printprompt4();
-	    fprintf(xtrerr, "case %s (%s)\n", word, pat2);
+	    fprintf(xtrerr, "case %s (", word);
+	    quote_tokenized_output(pat, xtrerr);
+	    fprintf(xtrerr, ")\n");
 	    fflush(xtrerr);
 	}
 	state->pc += 2;

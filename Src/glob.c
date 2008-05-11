@@ -2987,7 +2987,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 mod_export void
 tokenize(char *s)
 {
-    zshtokenize(s, 0, 0);
+    zshtokenize(s, 0);
 }
 
 /*
@@ -3004,12 +3004,15 @@ tokenize(char *s)
 mod_export void
 shtokenize(char *s)
 {
-    zshtokenize(s, 1, isset(SHGLOB));
+    int flags = ZSHTOK_SUBST;
+    if (isset(SHGLOB))
+	flags |= ZSHTOK_SHGLOB;
+    zshtokenize(s, flags);
 }
 
 /**/
 static void
-zshtokenize(char *s, int glbsbst, int shglob)
+zshtokenize(char *s, int flags)
 {
     char *t;
     int bslash = 0;
@@ -3021,16 +3024,16 @@ zshtokenize(char *s, int glbsbst, int shglob)
 	case Bnullkeep:
 	case '\\':
 	    if (bslash) {
-		s[-1] = glbsbst ? Bnullkeep : Bnull;
+		s[-1] = (flags & ZSHTOK_SUBST) ? Bnullkeep : Bnull;
 		break;
 	    }
 	    bslash = 1;
 	    continue;
 	case '<':
-	    if (shglob)
+	    if (flags & ZSHTOK_SHGLOB)
 		break;
 	    if (bslash) {
-		s[-1] = glbsbst ? Bnullkeep : Bnull;
+		s[-1] = (flags & ZSHTOK_SUBST) ? Bnullkeep : Bnull;
 		break;
 	    }
 	    t = s;
@@ -3046,7 +3049,7 @@ zshtokenize(char *s, int glbsbst, int shglob)
 	case '(':
 	case '|':
 	case ')':
-	    if (shglob)
+	    if (flags & ZSHTOK_SHGLOB)
 		break;
 	case '>':
 	case '^':
@@ -3060,7 +3063,7 @@ zshtokenize(char *s, int glbsbst, int shglob)
 	    for (t = ztokens; *t; t++)
 		if (*t == *s) {
 		    if (bslash)
-			s[-1] = glbsbst ? Bnullkeep : Bnull;
+			s[-1] = (flags & ZSHTOK_SUBST) ? Bnullkeep : Bnull;
 		    else
 			*s = (t - ztokens) + Pound;
 		    break;

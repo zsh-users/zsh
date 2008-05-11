@@ -1,5 +1,8 @@
 2008-05-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 24996: Src/cond.c, Src/exec.c, Src/glob.c, Src/loop.c,
+	Src/zsh.h: improve xtrace output for patterns.
+
 	* users/12848: Test/A01grammar.ztst, Src/loops.c: return, break
 	and continue are allowed in "always" block and will override
 	try block if set.

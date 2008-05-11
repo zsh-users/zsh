@@ -1609,6 +1609,66 @@ untokenize(char *s)
     }
 }
 
+
+/*
+ * Given a tokenized string, output it to standard output in
+ * such a way that it's clear which tokens are active.
+ * Hence Star becomes an unquoted "*", while a "*" becomes "\*".
+ *
+ * The code here is a kind of amalgamation of the tests in
+ * zshtokenize() and untokenize() with some outputting.
+ */
+
+/**/
+void
+quote_tokenized_output(char *str, FILE *file)
+{
+    char *s = str;
+
+    for (; *s; s++) {
+	switch (*s) {
+	case Meta:
+	    putc(*++s ^ 32, file);
+	    continue;
+
+	case Nularg:
+	    /* Do nothing.  I think. */
+	    continue;
+
+	case '\\':
+	case '<':
+	case '>':
+	case '(':
+	case '|':
+	case ')':
+	case '^':
+	case '#':
+	case '~':
+	case '[':
+	case ']':
+	case '*':
+	case '?':
+	case '$':
+	    putc('\\', file);
+	    break;
+
+	case '=':
+	    if (s == str)
+		putc('\\', file);
+	    break;
+
+	default:
+	    if (itok(*s)) {
+		putc(ztokens[*s - Pound], file);
+		continue;
+	    }
+	    break;
+	}
+
+	putc(*s, file);
+    }
+}
+
 /* Check that we can use a parameter for allocating a file descriptor. */
 
 static int

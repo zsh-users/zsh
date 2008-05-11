@@ -1516,6 +1516,15 @@ struct repldata {
 };
 typedef struct repldata *Repldata;
 
+/*
+ * Flags to zshtokenize.
+ */
+enum {
+    /* Do glob substitution */
+    ZSHTOK_SUBST = 0x0001,
+    /* Use sh-style globbing */
+    ZSHTOK_SHGLOB = 0x0002
+};
 
 /* Flags as the second argument to prefork */
 #define PF_TYPESET	0x01	/* argument handled like typeset foo=bar */
