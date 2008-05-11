@@ -128,12 +128,14 @@ local pat repl errstr fpat hasglobqual opat
 typeset -A from to
 integer stat
 
+myname=${(%):-%N}
+
 while getopts ":o:p:MCLfinqQsvwW" opt; do
   if [[ $opt = "?" ]]; then
-    print -P "%N: unrecognized option: -$OPTARG" >&2
+    print -r -- "$myname: unrecognized option: -$OPTARG" >&2
     return 1
   fi
-  eval "opt_$opt=${(q)OPTARG:--$opt}"
+  eval "opt_$opt=\${OPTARG:--\$opt}"
 done
 (( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
@@ -142,6 +144,15 @@ done
 [[ -n $opt_C ]] && action=cp
 [[ -n $opt_L ]] && action=ln
 [[ -n $opt_p ]] && action=$opt_p
+
+if [[ -z $action ]]; then
+  action=$myname[-2,-1]
+
+  if [[ $action != (cp|mv|ln) ]]; then
+    print -r "$myname: action $action not recognised: must be cp, mv or ln." >&2
+    return 1
+  fi
+fi
 
 if (( $# != 2 )); then
   print -P "Usage:
@@ -164,25 +175,8 @@ pat=$1
 repl=$2
 shift 2
 
-if [[ -z $action ]]; then
-  # We can't necessarily get the name of the function directly, because
-  # of no_function_argzero stupidity.
-  tmpf=${TMPPREFIX}zmv$$
-  print -P %N >$tmpf
-  myname=$(<$tmpf)
-  rm -f $tmpf
-
-  action=$myname[-2,-1]
-
-  if [[ $action != (cp|mv|ln) ]]; then
-    print "Action $action not recognised: must be cp, mv or ln." >&2
-    return 1
-  fi
-fi
-
-
 if [[ -n $opt_s && $action != ln ]]; then
-  print -P "%N: invalid option: -s" >&2
+  print -r -- "$myname: invalid option: -s" >&2
   return 1
 fi
 
@@ -193,10 +187,10 @@ if [[ -n $opt_w || -n $opt_W ]]; then
   # Well, this seems to work.
   # The tricky bit is getting all forms of [...] correct, but as long
   # as we require inactive bits to be backslashed its not so bad.
-  find='(#m)(\*\*#[/]|[*?]|\<[0-9]#-[0-9]#\>|\[(\[:[a-z]##:\]|\\\[|\\\]|[^\[\]]##)##\])\##'
+  find='(#m)((\*\*#/|[*?]|<[0-9]#-[0-9]#>|\[(^|)(\]|)(\[:[a-z]##:\]|\\?|[^\]])##\])\##|?\###)'
   tmp="${pat//${~find}/$[++cnt]}"
   if [[ $cnt = 0 ]]; then
-    print -P "%N: warning: no wildcards were found in search pattern" >&2
+    print -r -- "$myname: warning: no wildcards were found in search pattern" >&2
   else
     pat="${pat//${~find}/($MATCH)}"
   fi
@@ -252,26 +246,33 @@ for f in $files; do
   fi
   [[ -e $f && $f = (#b)${~pat} ]] || continue
   set -- "$match[@]"
-  g=${(e)repl}
+  { {
+    g=${(Xe)repl}
+  } 2> /dev/null } always {
+    if (( TRY_BLOCK_ERROR )); then
+      print -r -- "$myname: syntax error in replacement" >&2
+      return 1
+    fi
+  }
   if [[ -z $g ]]; then
-    errs=($errs "\`$f' expanded to an empty string")
+    errs+=("\`$f' expanded to an empty string")
   elif [[ $f = $g ]]; then
     # don't cause error: more useful just to skip
     #   errs=($errs "$f not altered by substitution")
-    [[ -n $opt_v ]] && print "$f not altered, ignored"
+    [[ -n $opt_v ]] && print -r -- "$f not altered, ignored"
     continue
   elif [[ -n $from[$g] && ! -d $g ]]; then
-    errs=($errs "$f and $from[$g] both map to $g")
+    errs+=("$f and $from[$g] both map to $g")
   elif [[ -f $g && -z $opt_f && ! ($f -ef $g && $action = mv) ]]; then
-    errs=($errs "file exists: $g")
+    errs+=("file exists: $g")
   fi
   from[$g]=$f
   to[$f]=$g
 done
 
 if (( $#errs )); then
-  print -P "%N: error(s) in substitution:" >&2
-  print -l $errs >&2
+  print -r -- "$myname: error(s) in substitution:" >&2
+  print -lr -- $errs >&2
   return 1
 fi
 

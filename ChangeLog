@@ -1,3 +1,8 @@
+2008-05-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 24990: Stephane Chazelas: Functions/Misc/zmv: fix
+	various little quirks in zmv.
+
 2008-05-09  Peter Stephenson  <pws@csr.com>
 
 	* 24986: Doc/Zsh/prompt.yo, Doc/Zsh/zle.yo, Src/init.c,
