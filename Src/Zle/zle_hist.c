@@ -111,7 +111,7 @@ zlinecmp(const char *histp, const char *inputp)
     mbstate_t hstate, istate;
 #endif
 
-    while (*hptr == *iptr) {
+    while (*iptr && *hptr == *iptr) {
 	hptr++;
 	iptr++;
     }
@@ -470,13 +470,15 @@ historysearchbackward(char **args)
     if (!(he = quietgethist(histline)))
 	return 1;
 
+    metafy_line();
     while ((he = movehistent(he, -1, hist_skip_flags))) {
 	if (isset(HISTFINDNODUPS) && he->node.flags & HIST_DUP)
 	    continue;
 	zt = GETZLETEXT(he);
 	if (zlinecmp(zt, str) < 0 &&
-	    (*args || strcmp(zt, str) != 0)) {
+	    (*args || strcmp(zt, zlemetaline) != 0)) {
 	    if (--n <= 0) {
+		unmetafy_line();
 		zle_setline(he);
 		srch_hl = histline;
 		srch_cs = zlecs;
@@ -484,6 +486,7 @@ historysearchbackward(char **args)
 	    }
 	}
     }
+    unmetafy_line();
     return 1;
 }
 
@@ -524,13 +527,15 @@ historysearchforward(char **args)
     if (!(he = quietgethist(histline)))
 	return 1;
 
+    metafy_line();
     while ((he = movehistent(he, 1, hist_skip_flags))) {
 	if (isset(HISTFINDNODUPS) && he->node.flags & HIST_DUP)
 	    continue;
 	zt = GETZLETEXT(he);
 	if (zlinecmp(zt, str) < (he->histnum == curhist) &&
-	    (*args || strcmp(zt, str) != 0)) {
+	    (*args || strcmp(zt, zlemetaline) != 0)) {
 	    if (--n <= 0) {
+		unmetafy_line();
 		zle_setline(he);
 		srch_hl = histline;
 		srch_cs = zlecs;
@@ -538,6 +543,7 @@ historysearchforward(char **args)
 	    }
 	}
     }
+    unmetafy_line();
     return 1;
 }
 
