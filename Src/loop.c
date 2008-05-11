@@ -631,7 +631,7 @@ exectry(Estate state, int do_exec)
 {
     Wordcode end, always;
     int endval;
-    int save_retflag, save_breaks, save_loops, save_contflag;
+    int save_retflag, save_breaks, save_contflag;
     zlong save_try_errflag, save_try_tryflag;
 
     end = state->pc + WC_TRY_SKIP(state->pc[-1]);
@@ -664,8 +664,6 @@ exectry(Estate state, int do_exec)
     retflag = 0;
     save_breaks = breaks;
     breaks = 0;
-    save_loops = loops;
-    loops = 0;
     save_contflag = contflag;
     contflag = 0;
 
@@ -674,10 +672,12 @@ exectry(Estate state, int do_exec)
 
     errflag = try_errflag ? 1 : 0;
     try_errflag = save_try_errflag;
-    retflag = save_retflag;
-    breaks = save_breaks;
-    loops = save_loops;
-    contflag = save_contflag;
+    if (!retflag)
+	retflag = save_retflag;
+    if (!breaks)
+	breaks = save_breaks;
+    if (!contflag)
+	contflag = save_contflag;
 
     cmdpop();
     popheap();

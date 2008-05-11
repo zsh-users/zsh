@@ -1,5 +1,9 @@
 2008-05-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* users/12848: Test/A01grammar.ztst, Src/loops.c: return, break
+	and continue are allowed in "always" block and will override
+	try block if set.
+
 	* 24994: Src/Zle/zle_hist.c: Fix problem with
 	up/down-line-or-search comparison, perhaps.
 
