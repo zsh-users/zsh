@@ -1,5 +1,9 @@
 2008-05-12  Peter Stephenson  <pws@csr.com>
 
+	* 25006, 25009: Src/Zle/complist.c: do "or" symlink orphan
+	highlighting; make stat-ed file types take precedence over
+	extensions and patterns.
+
 	* 25002: Src/builtin.c, Src/init.c, Src/input.c, Src/loop.c,
 	Src/prompt.c, Src/subst.c, Src/utils.c, Src/zsh.h,
 	Src/Zle/zle_main.c, Src/Zle/zle_refresh.c: only update

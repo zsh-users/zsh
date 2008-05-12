@@ -533,9 +533,10 @@ getcols()
     lr_caplen = strlen(mcolors.files[COL_LC]->col) +
 	strlen(mcolors.files[COL_RC]->col);
 
-    /* Default for orphans and missing files. Currently not used */
+    /* Default for orphan is same as link. */
     if (!mcolors.files[COL_OR] || !mcolors.files[COL_OR]->col)
-	mcolors.files[COL_OR] = mcolors.files[COL_FI];
+	mcolors.files[COL_OR] = mcolors.files[COL_LN];
+    /* Default for missing files:  currently not used */
     if (!mcolors.files[COL_MI] || !mcolors.files[COL_MI]->col)
 	mcolors.files[COL_MI] = mcolors.files[COL_FI];
 
@@ -871,36 +872,15 @@ putmatchcol(char *group, char *n)
  * file modes. */
 
 static int
-putfilecol(char *group, char *n, mode_t m)
+putfilecol(char *group, char *n, mode_t m, int special)
 {
-    int colour;
+    int colour = -1;
     Extcol ec;
     Patcol pc;
 
-    for (ec = mcolors.exts; ec; ec = ec->next)
-	if (strsfx(ec->ext, n) &&
-	    (!ec->prog || !group || pattry(ec->prog, group))) {
-	    zlrputs(ec->col);
-
-	    return 0;
-	}
-
-    nrefs = MAX_POS - 1;
-
-    for (pc = mcolors.pats; pc; pc = pc->next)
-	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
-	    pattryrefs(pc->pat, n, -1, -1, 0, &nrefs, begpos, endpos)) {
-	    if (pc->cols[1]) {
-		patcols = pc->cols;
-
-		return 1;
-	    }
-	    zlrputs(pc->cols[0]);
-
-	    return 0;
-	}
-
-    if (S_ISDIR(m)) {
+    if (special != -1) {
+	colour = special;
+    } else if (S_ISDIR(m)) {
 	if (m & S_IWOTH)
 	    if (m & S_ISVTX)
 		colour = COL_TW;
@@ -926,10 +906,36 @@ putfilecol(char *group, char *n, mode_t m)
 	colour = COL_SG;
     else if (S_ISREG(m) && (m & S_IXUGO))
 	colour = COL_EX;
-    else
-	colour = COL_FI;
 
-    zcputs(group, colour);
+    if (colour != -1) {
+	zcputs(group, colour);
+	return 0;
+    }
+
+    for (ec = mcolors.exts; ec; ec = ec->next)
+	if (strsfx(ec->ext, n) &&
+	    (!ec->prog || !group || pattry(ec->prog, group))) {
+	    zlrputs(ec->col);
+
+	    return 0;
+	}
+
+    nrefs = MAX_POS - 1;
+
+    for (pc = mcolors.pats; pc; pc = pc->next)
+	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
+	    pattryrefs(pc->pat, n, -1, -1, 0, &nrefs, begpos, endpos)) {
+	    if (pc->cols[1]) {
+		patcols = pc->cols;
+
+		return 1;
+	    }
+	    zlrputs(pc->cols[0]);
+
+	    return 0;
+	}
+
+    zcputs(group, COL_FI);
 
     return 0;
 }
@@ -1752,10 +1758,17 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	else if (mselect >= 0 && (m->flags & (CMF_MULT | CMF_FMULT)))
 	    zcputs(g->name, COL_DU);
 	else if (m->mode) {
+	    /*
+	     * Symlink is orphaned if we read the mode with lstat
+	     * but couldn't read one with stat.  That's the
+	     * only way they can be different so the following
+	     * test should be enough.
+	     */
+	    int orphan_colour = (m->mode && !m->fmode) ? COL_OR : -1;
 	    if (mcolors.flags & LC_FOLLOW_SYMLINKS) {
-		subcols = putfilecol(g->name, m->str, m->fmode);
+		subcols = putfilecol(g->name, m->str, m->fmode, orphan_colour);
 	    } else {
-		subcols = putfilecol(g->name, m->str, m->mode);
+		subcols = putfilecol(g->name, m->str, m->mode, orphan_colour);
 	    }
 	}
 	else

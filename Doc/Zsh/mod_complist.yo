@@ -54,8 +54,7 @@ item(tt(cd 44;37))(
 for character devices
 )
 item(tt(or) var(none))(
-for a symlink to nonexistent file (default is the value defined for tt(fi));
-this code is currently not used
+for a symlink to nonexistent file (default is the value defined for tt(ln)).
 )
 item(tt(mi) var(none))(
 for a non-existent file (default is the value defined for tt(fi)); this code
