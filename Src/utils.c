@@ -1176,7 +1176,7 @@ preprompt(void)
 	char *str;
 	int percents = opts[PROMPTPERCENT];
 	opts[PROMPTPERCENT] = 1;
-	str = promptexpand("%B%S%#%s%b", 0, NULL, NULL);
+	str = promptexpand("%B%S%#%s%b", 0, NULL, NULL, NULL);
 	opts[PROMPTPERCENT] = percents;
 	fprintf(shout, "%s%*s\r", str, (int)columns - 1 - !hasxn, "");
 	free(str);
@@ -1341,7 +1341,8 @@ printprompt4(void)
 
 	opts[XTRACE] = 0;
 	unmetafy(s, &l);
-	s = unmetafy(promptexpand(metafy(s, l, META_NOALLOC), 0, NULL, NULL), &l);
+	s = unmetafy(promptexpand(metafy(s, l, META_NOALLOC),
+				  0, NULL, NULL, NULL), &l);
 	opts[XTRACE] = t;
 
 	fprintf(xtrerr, "%s", s);
@@ -2310,7 +2311,7 @@ spckword(char **s, int hist, int cmd, int ask)
 		x = 'n';
 	    } else if (shout) {
 		char *pptbuf;
-		pptbuf = promptexpand(sprompt, 0, best, guess);
+		pptbuf = promptexpand(sprompt, 0, best, guess, NULL);
 		zputs(pptbuf, shout);
 		free(pptbuf);
 		fflush(shout);

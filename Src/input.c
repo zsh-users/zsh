@@ -256,7 +256,7 @@ inputline(void)
 	    char *pptbuf;
 	    int pptlen;
 	    pptbuf = unmetafy(promptexpand(ingetcpmptl ? *ingetcpmptl : NULL,
-					   0, NULL, NULL), &pptlen);
+					   0, NULL, NULL, NULL), &pptlen);
 	    write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
 	    free(pptbuf);
 	}

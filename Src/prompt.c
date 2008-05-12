@@ -35,11 +35,6 @@
 /**/
 mod_export unsigned txtattrmask;
 
-/* text change - attribute change made by prompts */
-
-/**/
-mod_export unsigned txtchange;
-
 /* the command stack for use with %_ in prompts */
 
 /**/
@@ -144,16 +139,22 @@ promptpath(char *p, int npath, int tilde)
 	zsfree(modp);
 }
 
-/* Perform prompt expansion on a string, putting the result in a *
- * permanently-allocated string.  If ns is non-zero, this string *
- * may have embedded Inpar and Outpar, which indicate a toggling *
- * between spacing and non-spacing parts of the prompt, and      *
- * Nularg, which (in a non-spacing sequence) indicates a         *
- * `glitch' space.                                               */
+/*
+ * Perform prompt expansion on a string, putting the result in a
+ * permanently-allocated string.  If ns is non-zero, this string
+ * may have embedded Inpar and Outpar, which indicate a toggling
+ * between spacing and non-spacing parts of the prompt, and
+ * Nularg, which (in a non-spacing sequence) indicates a
+ * `glitch' space.
+ *
+ * txtchangep gives an integer controlling the attributes of
+ * the prompt.  This is for use in zle to maintain the attributes
+ * consistenly.  Other parts of the shell should not need to use it.
+ */
 
 /**/
 mod_export char *
-promptexpand(char *s, int ns, char *rs, char *Rs)
+promptexpand(char *s, int ns, char *rs, char *Rs, unsigned int *txtchangep)
 {
     if(!s)
 	return ztrdup("");
@@ -180,7 +181,7 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
     bp = bufline = buf = zshcalloc(bufspc = 256);
     bp1 = NULL;
     truncwidth = 0;
-    putpromptchar(1, '\0');
+    putpromptchar(1, '\0', txtchangep);
     addbufspc(2);
     if(dontcount)
 	*bp++ = Outpar;
@@ -205,7 +206,7 @@ promptexpand(char *s, int ns, char *rs, char *Rs)
 
 /**/
 static int
-putpromptchar(int doprint, int endchar)
+putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 {
     char *ss, *hostnam;
     int t0, arg, test, sep, j, numjobs;
@@ -336,8 +337,10 @@ putpromptchar(int doprint, int endchar)
 		/* Don't do the current truncation until we get back */
 		otruncwidth = truncwidth;
 		truncwidth = 0;
-		if (!putpromptchar(test == 1 && doprint, sep) || !*++fm ||
-		    !putpromptchar(test == 0 && doprint, ')')) {
+		if (!putpromptchar(test == 1 && doprint, sep,
+				   txtchangep) || !*++fm ||
+		    !putpromptchar(test == 0 && doprint, ')',
+				   txtchangep)) {
 		    truncwidth = otruncwidth;
 		    return 0;
 		}
@@ -421,34 +424,34 @@ putpromptchar(int doprint, int endchar)
 		unqueue_signals();
 		break;
 	    case 'S':
-		txtchangeset(TXTSTANDOUT, TXTNOSTANDOUT);
+		txtchangeset(txtchangep, TXTSTANDOUT, TXTNOSTANDOUT);
 		txtset(TXTSTANDOUT);
 		tsetcap(TCSTANDOUTBEG, TSC_PROMPT);
 		break;
 	    case 's':
-		txtchangeset(TXTNOSTANDOUT, TXTSTANDOUT);
+		txtchangeset(txtchangep, TXTNOSTANDOUT, TXTSTANDOUT);
 		txtunset(TXTSTANDOUT);
 		tsetcap(TCSTANDOUTEND, TSC_PROMPT|TSC_DIRTY);
 		break;
 	    case 'B':
-		txtchangeset(TXTBOLDFACE, TXTNOBOLDFACE);
+		txtchangeset(txtchangep, TXTBOLDFACE, TXTNOBOLDFACE);
 		txtset(TXTBOLDFACE);
 		tsetcap(TCBOLDFACEBEG, TSC_PROMPT|TSC_DIRTY);
 		break;
 	    case 'b':
-		txtchangeset(TXTNOBOLDFACE, TXTBOLDFACE);
-		txtchangeset(TXTNOSTANDOUT, TXTSTANDOUT);
-		txtchangeset(TXTNOUNDERLINE, TXTUNDERLINE);
+		txtchangeset(txtchangep, TXTNOBOLDFACE, TXTBOLDFACE);
+		txtchangeset(txtchangep, TXTNOSTANDOUT, TXTSTANDOUT);
+		txtchangeset(txtchangep, TXTNOUNDERLINE, TXTUNDERLINE);
 		txtunset(TXTBOLDFACE);
 		tsetcap(TCALLATTRSOFF, TSC_PROMPT|TSC_DIRTY);
 		break;
 	    case 'U':
-		txtchangeset(TXTUNDERLINE, TXTNOUNDERLINE);
+		txtchangeset(txtchangep, TXTUNDERLINE, TXTNOUNDERLINE);
 		txtset(TXTUNDERLINE);
 		tsetcap(TCUNDERLINEBEG, TSC_PROMPT);
 		break;
 	    case 'u':
-		txtchangeset(TXTNOUNDERLINE, TXTUNDERLINE);
+		txtchangeset(txtchangep, TXTNOUNDERLINE, TXTUNDERLINE);
 		txtunset(TXTUNDERLINE);
 		tsetcap(TCUNDERLINEEND, TSC_PROMPT|TSC_DIRTY);
 		break;
@@ -461,7 +464,7 @@ putpromptchar(int doprint, int endchar)
 		} else
 		    arg = match_colour(NULL, 1, arg);
 		if (arg >= 0 && !(arg & TXTNOFGCOLOUR)) {
-		    txtchangeset(arg & TXT_ATTR_FG_ON_MASK,
+		    txtchangeset(txtchangep, arg & TXT_ATTR_FG_ON_MASK,
 				 TXTNOFGCOLOUR);
 		    txtset(arg & TXT_ATTR_FG_ON_MASK);
 		    set_colour_attribute(arg, COL_SEQ_FG, TSC_PROMPT);
@@ -470,7 +473,7 @@ putpromptchar(int doprint, int endchar)
 		/* else FALLTHROUGH */
 		break;
 	    case 'f':
-		txtchangeset(TXTNOFGCOLOUR, TXT_ATTR_FG_ON_MASK);
+		txtchangeset(txtchangep, TXTNOFGCOLOUR, TXT_ATTR_FG_ON_MASK);
 		txtunset(TXT_ATTR_FG_ON_MASK);
 		set_colour_attribute(TXTNOFGCOLOUR, COL_SEQ_FG, TSC_PROMPT);
 		break;
@@ -483,7 +486,7 @@ putpromptchar(int doprint, int endchar)
 		} else
 		    arg = match_colour(NULL, 0, arg);
 		if (arg >= 0 && !(arg & TXTNOBGCOLOUR)) {
-		    txtchangeset(arg & TXT_ATTR_BG_ON_MASK,
+		    txtchangeset(txtchangep, arg & TXT_ATTR_BG_ON_MASK,
 				 TXTNOBGCOLOUR);
 		    txtset(arg & TXT_ATTR_BG_ON_MASK);
 		    set_colour_attribute(arg, COL_SEQ_BG, TSC_PROMPT);
@@ -492,19 +495,19 @@ putpromptchar(int doprint, int endchar)
 		/* else FALLTHROUGH */
 		break;
 	    case 'k':
-		txtchangeset(TXTNOBGCOLOUR, TXT_ATTR_BG_ON_MASK);
+		txtchangeset(txtchangep, TXTNOBGCOLOUR, TXT_ATTR_BG_ON_MASK);
 		txtunset(TXT_ATTR_BG_ON_MASK);
 		set_colour_attribute(TXTNOBGCOLOUR, COL_SEQ_BG, TSC_PROMPT);
 		break;
 	    case '[':
 		if (idigit(*++fm))
 		    arg = zstrtol(fm, &fm, 10);
-		if (!prompttrunc(arg, ']', doprint, endchar))
+		if (!prompttrunc(arg, ']', doprint, endchar, txtchangep))
 		    return *fm;
 		break;
 	    case '<':
 	    case '>':
-		if (!prompttrunc(arg, *fm, doprint, endchar))
+		if (!prompttrunc(arg, *fm, doprint, endchar, txtchangep))
 		    return *fm;
 		break;
 	    case '{': /*}*/
@@ -1036,7 +1039,8 @@ countprompt(char *str, int *wp, int *hp, int overf)
 
 /**/
 static int
-prompttrunc(int arg, int truncchar, int doprint, int endchar)
+prompttrunc(int arg, int truncchar, int doprint, int endchar,
+	    unsigned int *txtchangep)
 {
     if (arg > 0) {
 	char ch = *fm, *ptr, *truncstr;
@@ -1083,7 +1087,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	w = bp - buf;
 	fm++;
 	trunccount = dontcount;
-	putpromptchar(doprint, endchar);
+	putpromptchar(doprint, endchar, txtchangep);
 	trunccount = 0;
 	ptr = buf + w;		/* putpromptchar() may have realloc()'d */
 	*bp = '\0';
@@ -1365,7 +1369,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar)
 	     * With truncwidth set to zero, we always reach endchar *
 	     * (or the terminating NULL) this time round.         *
 	     */
-	    if (!putpromptchar(doprint, endchar))
+	    if (!putpromptchar(doprint, endchar, txtchangep))
 		return 0;
 	}
 	/* Now we have to trick it into matching endchar again */

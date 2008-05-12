@@ -250,7 +250,7 @@ execselect(Estate state, UNUSED(int do_exec))
 			str = NULL;
 		    errflag = oef;
 	    	} else {
-		    str = promptexpand(prompt3, 0, NULL, NULL);
+		    str = promptexpand(prompt3, 0, NULL, NULL, NULL);
 		    zputs(str, stderr);
 		    free(str);
 		    fflush(stderr);
@@ -552,7 +552,7 @@ execcase(Estate state, int do_exec)
 	next = state->pc + WC_CASE_SKIP(code);
 
 	if (isset(XTRACE)) {
-	    char *pat2, *opat;
+	    char *opat;
 
 	    pat = dupstring(opat = ecrawstr(state->prog, state->pc, NULL));
 	    singsub(&pat);

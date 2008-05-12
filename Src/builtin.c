@@ -3571,8 +3571,10 @@ bin_print(char *name, char **args, Options ops, int func)
 	     * messy memory management, stick it on the heap
 	     * instead.
 	     */
-	    char *str = unmetafy(promptexpand(metafy(args[n], len[n],
-						     META_NOALLOC), 0, NULL, NULL), &len[n]);
+	    char *str = unmetafy(
+		promptexpand(metafy(args[n], len[n], META_NOALLOC),
+			     0, NULL, NULL, NULL),
+		&len[n]);
 	    args[n] = dupstrpfx(str, len[n]);
 	    free(str);
 	}

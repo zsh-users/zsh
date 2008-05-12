@@ -1,3 +1,10 @@
+2008-05-12  Peter Stephenson  <pws@csr.com>
+
+	* 25002: Src/builtin.c, Src/init.c, Src/input.c, Src/loop.c,
+	Src/prompt.c, Src/subst.c, Src/utils.c, Src/zsh.h,
+	Src/Zle/zle_main.c, Src/Zle/zle_refresh.c: only update
+	display attributes from prompts within zle.
+
 2008-05-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 24996: Src/cond.c, Src/exec.c, Src/glob.c, Src/loop.c,

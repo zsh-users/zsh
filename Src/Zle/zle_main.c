@@ -1115,7 +1115,8 @@ zleread(char **lp, char **rp, int flags, int context)
 	char *pptbuf;
 	int pptlen;
 
-	pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL),
+	pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL,
+				       &pmpt_attr),
 			  &pptlen);
 	write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
 	free(pptbuf);
@@ -1145,11 +1146,10 @@ zleread(char **lp, char **rp, int flags, int context)
     fetchttyinfo = 0;
     trashedzle = 0;
     raw_lp = lp;
-    lpromptbuf = promptexpand(lp ? *lp : NULL, 1, NULL, NULL);
-    pmpt_attr = txtchange;
+    lpromptbuf = promptexpand(lp ? *lp : NULL, 1, NULL, NULL, &pmpt_attr);
     raw_rp = rp;
-    rpromptbuf = promptexpand(rp ? *rp : NULL, 1, NULL, NULL);
-    rpmpt_attr = txtchange;
+    rpmpt_attr = pmpt_attr;
+    rpromptbuf = promptexpand(rp ? *rp : NULL, 1, NULL, NULL, &rpmpt_attr);
     free_prepostdisplay();
 
     zlereadflags = flags;
@@ -1725,11 +1725,12 @@ reexpandprompt(void)
 
     if (!reexpanding++) {
 	free(lpromptbuf);
-	lpromptbuf = promptexpand(raw_lp ? *raw_lp : NULL, 1, NULL, NULL);
-	pmpt_attr = txtchange;
+	lpromptbuf = promptexpand(raw_lp ? *raw_lp : NULL, 1, NULL, NULL,
+				  &pmpt_attr);
+	rpmpt_attr = pmpt_attr;
 	free(rpromptbuf);
-	rpromptbuf = promptexpand(raw_rp ? *raw_rp : NULL, 1, NULL, NULL);
-	rpmpt_attr = txtchange;
+	rpromptbuf = promptexpand(raw_rp ? *raw_rp : NULL, 1, NULL, NULL,
+				  &rpmpt_attr);
     }
     reexpanding--;
 }

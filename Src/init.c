@@ -1237,7 +1237,8 @@ fallback_zleread(char **lp, UNUSED(char **rp), UNUSED(int ha), UNUSED(int con))
     char *pptbuf;
     int pptlen;
 
-    pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL), &pptlen);
+    pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL, NULL),
+		      &pptlen);
     write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
     free(pptbuf);
 

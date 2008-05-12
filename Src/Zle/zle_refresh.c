@@ -990,12 +990,13 @@ zrefresh(void)
     int tmppos;			/* t - tmpline				     */
     int tmpalloced;		/* flag to free tmpline when finished	     */
     int remetafy;		/* flag that zle line is metafied	     */
+    int txtchange;		/* attributes set after prompts */
     struct rparams rpms;
 #ifdef MULTIBYTE_SUPPORT
     int width;			/* width of wide character		     */
 #endif
 
-    
+
     /* If this is called from listmatches() (indirectly via trashzle()), and *
      * that was called from the end of zrefresh(), then we don't need to do  *
      * anything.  All this `inlist' code is actually unnecessary, but it     *
