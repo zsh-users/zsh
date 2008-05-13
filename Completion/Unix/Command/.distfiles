@@ -9,6 +9,7 @@ _apm
 _arp
 _arping
 _attr
+_awk
 _baz
 _bison
 _bittorrent
@@ -88,6 +89,7 @@ _irssi
 _ispell
 _java
 _joe
+_join
 _killall
 _knock
 _kvno
@@ -169,6 +171,7 @@ _showmount
 _sisu
 _slrn
 _socket
+_sort
 _spamassassin
 _sqsh
 _ssh

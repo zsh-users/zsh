@@ -1,0 +1,21 @@
+#compdef awk
+
+# completions for awk
+# This only aims to complete POSIX awk options, as described in
+# awk(P). Most awk implementations, such as gawk and mawk, will have
+# additional options that this does not complete. Also, currently
+# this completion does not allow everything that POSIX allows. For
+# example, awk(P) states that the user may specify assignments
+# without using the -v option; this does not support that.
+#
+# In addition, the "program text" completion is not perfect. For
+# instance, type "awk -" and then hit tab. You will be presented
+# both with the dashed options and with the "program text" option.
+# Fixing this is beyond my current _arguments expertise--help
+# appreciated.
+
+_arguments -S -s '-F[define input field separator to be an extended regular expression]:extended regular expression:' \
+    '*-v[assign values to variables]:assignment:' \
+    '(1)-f[program file]:program file:_files' \
+    '1:program text:' \
+    '*:input files:_files'

@@ -1,0 +1,23 @@
+#compdef join
+
+# completions for GNU join version 5.97
+
+local arguments
+
+arguments=(
+    '-a+[print unpairable lines coming from file FILENUM, where FILENUM is 1 or 2, corresponding to FILE1 or FILE2]:file number:(1 2)'
+    '-e+[replace missing input fields with EMPTY]:replacement string:'
+    '(-i --ignore-case)'{-i,--ignore-case}'[ignore differences in case when comparing fields]'
+    "-j+[equivalent to '-1 FIELD -2 FIELD']:field number:"
+    '-o+[obey FORMAT while constructing output line]:format string:'
+    '-t+[use CHAR as input and output field separator]:separator:'
+    '-v+[like -a FILENUM, but suppress joined output lines]:file number:(1 2)'
+    '-1+[join on this FIELD of file 1]:field number:'
+    '-2+[join on this FIELD of file 2]:field number:'
+    --help'[display help and exit]'
+    --version'[output version information and exit]'
+    '1:file 1:_files'
+    '2:file 2:_files'
+    )
+
+_arguments -s $arguments

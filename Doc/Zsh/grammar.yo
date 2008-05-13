@@ -479,6 +479,19 @@ if an alias is defined for the word tt(foo), alias expansion
 may be avoided by quoting part of the word, e.g. tt(\foo).
 But there is nothing to prevent an alias being defined
 for tt(\foo) as well.
+
+There is a commonly encountered problem with aliases
+illustrated by the following code:
+
+example(alias echobar='echo bar'; echobar)
+
+This prints a message that the command tt(echobar) could not be found.
+This happens because aliases are expanded when the code is read in;
+the entire line is read in one go, so that when tt(echobar) is executed it
+is too late to expand the newly defined alias.  This is often
+a problem in shell scripts, functions, and code executed with `tt(source)'
+or `tt(.)'.  Consequently, use of functions rather than aliases is
+recommended in non-interactive code.
 texinode(Quoting)()(Aliasing)(Shell Grammar)
 sect(Quoting)
 cindex(quoting)

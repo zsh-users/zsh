@@ -1,0 +1,31 @@
+#compdef sort
+
+# zsh completions for GNU sort version 5.97
+# limitation: --key does not work exactly right
+local arguments
+
+arguments=(
+    '(-b --ignore-leading-blanks)'{-b,--ignore-leading-blanks}'[ignore leading blanks]'
+    '(-d --dictionary-order)'{-d,--dictionary-order}'[consider only blanks and alphanumeric characters]'
+    '(-f --ignore-case)'{-f,--ignore-case}'[fold lower case to upper case characters]'
+    '(-g --general-numeric-sort)'{-g,--general-numeric-sort}'[compare according to general numeric value]'
+    '(-i --ignore-nonprinting)'{-i,--ignore-nonprinting}'[consider only printable characters]'
+    '(-M --month-sort)'{-M,--month-sort}"[compare (unknown) < 'JAN' < ... < 'DEC']"
+    '(-n --numeric-sort)'{-n,--numeric-sort}'[compare according to string numerical value]'
+    '(-r --reverse)'{-r,--reverse}'[reverse the result of comparisons]'
+    '(-c --check)'{-c,--check}'[check whether input is sorted; do not sort]'
+    '(-k --key)'{-k+,--key=}'[start a key at POS1, end it as POS2 (origin 1)]:key:'
+    '(-m --merge)'{-m,--merge}'[merge already sorted files; do not sort]'
+    '(-o --output)'{-o+,--output=}'[write result to FILE instead of standard output]:filename:_files'
+    '(-s --stable)'{-s+,--stable=}'[stabilize sort by disabling last-resort comparison]'
+    '(-S --buffer-size)'{-S+,--buffer-size=}'[use SIZE for main memory buffer]:size:'
+    '(-t --field-separator)'{-t+,--field-separator=}'[use SEP instead of non-blank to blank transition]:separator:'
+    '(-T --temporary-directory)'{-T+,--temporary-directory=}'[use DIR for temporaries, not $TMPDIR or /tmp; multiple options specify multiple directories]:directory'
+    '(-u --unique)'{-u,--unique}'[with -c, check for strict ordering; without -c, output only the first of an equal run]'
+    '(-z --zero-terminated)'{-z,--zero-terminated}'[end lines with 0 byte, not newline]'
+    --help'[display help and exit]'
+    --version'[output version information and exit]'
+    '*:filename:_files'
+    )
+
+_arguments -s $arguments

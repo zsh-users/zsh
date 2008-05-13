@@ -1,3 +1,11 @@
+2008-05-13  Peter Stephenson  <pws@csr.com>
+
+	* 25018: Omari Norman: Completion/Unix/Command/{_awk,_cut,_join}:
+	new completions.
+
+	* unposted: Doc/Zsh/builtins.yo, Doc/Zsh/grammar.yo: comment
+	on aliases.
+
 2008-05-12  Peter Stephenson  <pws@csr.com>
 
 	* 25006, 25009: Src/Zle/complist.c: do "or" symlink orphan
