@@ -460,6 +460,10 @@ zzlex(void)
 		}
 		if(*ptr != ']')
 			goto bofs;
+		if (outputradix < 2 || outputradix > 36) {
+		    zerr("invalid base: %d", outputradix);
+		    return EOI;
+		}
 		ptr++;
 		break;
 	    }

@@ -1,3 +1,9 @@
+2008-05-14  Peter Stephenson  <pws@csr.com>
+
+	* 25025: Doc/Zsh/builtins.yo, Src/builtin.c, Src/math.c,
+	Src/utils.c: more checks to ensure radix for arithmetic
+	constants is between 2 and 36 inclusive.
+
 2008-05-13  Peter Stephenson  <pws@csr.com>
 
 	* 25018: Omari Norman: Completion/Unix/Command/{_awk,_cut,_join}:
