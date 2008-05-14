@@ -1,5 +1,8 @@
 2008-05-14  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Unix/Command/_perforce: also p4 sizes,
+	p4 license.
+
 	* unposted: Completion/Unix/Command/_perforce: handle
 	p4 protects.
 

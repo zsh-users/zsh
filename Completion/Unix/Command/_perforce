@@ -2006,6 +2006,14 @@ _perforce_cmd_labelsync() {
 }
 
 
+(( $+functions[_perforce_cmd_license] )) ||
+_perforce_cmd_license() {
+  _arguments -s : \
+    '-o[write license to stdout]' \
+    '-i[read license from stdin]'
+}
+
+
 (( $+functions[_perforce_cmd_lock] )) ||
 _perforce_cmd_lock() {
   _arguments -s : \
@@ -2204,6 +2212,16 @@ _perforce_cmd_set() {
     '-s[set for whole system]' \
     '-S[set for specified service]:service: ' \
     "*::environment variable:_perforce_variables"
+}
+
+
+(( $+functions[_perforce_cmd_sizes] )) ||
+_perforce_cmd_sizes() {
+  _arguments -s : \
+    '-a[show for all revisions]' \
+    '-b[set blocksize]:blocksize in bytes: ' \
+    '-s[sum the file sizes]' \
+    '*:file:_perforce_files -tR'
 }
 
 
