@@ -2127,6 +2127,18 @@ _perforce_cmd_protect() {
 }
 
 
+(( $+functions[_perforce_cmd_protects] )) ||
+_perforce_cmd_protects() {
+  _arguments -s : \
+    '(-g -u)-a[show for all users]' \
+    '(-a -u)-g[select by group]:perforce group:_perforce_groups' \
+    '(-a -g)-u[select by user]:perforce user:_perforce_users' \
+    '-h[limit to host]:host:_perforce_hosts' \
+    '-m[single word summary]' \
+    '*:file:_perforce_files'
+}
+
+
 (( $+functions[_perforce_cmd_reopen] )) ||
 _perforce_cmd_reopen() {
   _arguments -s : \

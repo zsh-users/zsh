@@ -1,5 +1,8 @@
 2008-05-14  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Unix/Command/_perforce: handle
+	p4 protects.
+
 	* 25025: Doc/Zsh/builtins.yo, Src/builtin.c, Src/math.c,
 	Src/utils.c: more checks to ensure radix for arithmetic
 	constants is between 2 and 36 inclusive.
