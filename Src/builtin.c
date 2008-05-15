@@ -4681,7 +4681,7 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
 /* eval: simple evaluation */
 
 /**/
-int ineval;
+mod_export int ineval;
 
 /**/
 int

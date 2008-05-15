@@ -290,22 +290,34 @@ static int
 newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 {
     Ptycmd p;
-    int master, slave, pid;
+    int master, slave, pid, oineval = ineval;
+    char *oscriptname = scriptname;
     Eprog prog;
+
+    /* code borrowed from bin_eval() */
+    ineval = !isset(EVALLINENO);
+    if (!ineval)
+	scriptname = "(zpty)";
 
     prog = parse_string(zjoin(args, ' ', 1));
     if (!prog) {
 	errflag = 0;
+	scriptname = oscriptname;
+	ineval = oineval;
 	return 1;
     }
 
     if (get_pty(1, &master)) {
 	zwarnnam(nam, "can't open pseudo terminal: %e", errno);
+	scriptname = oscriptname;
+	ineval = oineval;
 	return 1;
     }
     if ((pid = fork()) == -1) {
 	zwarnnam(nam, "can't create pty command %s: %e", pname, errno);
 	close(master);
+	scriptname = oscriptname;
+	ineval = oineval;
 	return 1;
     } else if (!pid) {
 	/* This code copied from the clone module, except for getting *
@@ -406,6 +418,8 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
     if (nblock)
 	ptynonblock(master);
 
+    scriptname = oscriptname;
+    ineval = oineval;
     return 0;
 }
 
