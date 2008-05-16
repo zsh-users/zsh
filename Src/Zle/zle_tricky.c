@@ -2272,7 +2272,10 @@ printfmt(char *fmt, int n, int dopr, int doesc)
     for (; *p; ) {
 	/* Handle the `%' stuff (%% == %, %n == <number of matches>). */
 	if (doesc && *p == '%') {
-	    if (*++p) {
+	    int arg = 0, is_fg;
+	    if (idigit(*++p))
+		arg = zstrtol(p, &p, 10);
+	    if (*p) {
 		m = 0;
 		switch (*p) {
 		case '%':
@@ -2316,11 +2319,33 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		    if (dopr)
 			tcout(TCUNDERLINEEND);
 		    break;
+		case 'F':
+		case 'K':
+		    is_fg = (*p == 'F');
+		    if (p[1] == '{') {
+			p += 2;
+			arg = match_colour((const char **)&p, is_fg, 0);
+			if (*p != '}')
+			    p--;
+		    } else
+			arg = match_colour(NULL, is_fg, arg);
+		    if (arg >= 0)
+			set_colour_attribute(arg, is_fg ? COL_SEQ_FG :
+					     COL_SEQ_BG, 0);
+		    break;
+		case 'f':
+		    set_colour_attribute(TXTNOFGCOLOUR, COL_SEQ_FG, 0);
+		    break;
+		case 'k':
+		    set_colour_attribute(TXTNOBGCOLOUR, COL_SEQ_BG, 0);
+		    break;
 		case '{':
+		    if (arg)
+			cc += arg;
 		    for (p++; *p && (*p != '%' || p[1] != '}'); p++) {
 			if (*p == Meta) {
 			    p++;
-			    if (dopr) 
+			    if (dopr)
 				putc(*p ^ 32, shout);
 			}
 			else if (dopr)

@@ -1046,12 +1046,17 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	if (doesc && cchar == ZWC('%')) {
 	    p += len;
 	    if (*p) {
+		int arg = 0, is_fg;
+
 		len = MB_METACHARLENCONV(p, &cchar);
 #ifdef MULTIBYTE_SUPPORT
 		if (cchar == WEOF)
 		    cchar = (wchar_t)(*p == Meta ? p[1] ^ 32 : *p);
 #endif
 		p += len;
+
+		if (idigit(*p))
+		    arg = zstrtol(p, &p, 10);
 
 		m = 0;
 		switch (cchar) {
@@ -1099,7 +1104,32 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    if (dopr)
 			tcout(TCUNDERLINEEND);
 		    break;
+		case ZWC('F'):
+		case ZWC('K'):
+		    is_fg = (cchar == ZWC('F'));
+		    /* colours must be ASCII */
+		    if (*p == '{') {
+			p++;
+			arg = match_colour((const char **)&p, is_fg, 0);
+			if (*p == '}')
+			    p++;
+		    } else
+			arg = match_colour(NULL, is_fg, arg);
+		    if (arg >= 0 && dopr)
+			set_colour_attribute(arg, is_fg ? COL_SEQ_FG :
+					     COL_SEQ_BG, 0);
+		    break;
+		case ZWC('f'):
+		    if (dopr)
+			set_colour_attribute(TXTNOFGCOLOUR, COL_SEQ_FG, 0);
+		    break;
+		case ZWC('k'):
+		    if (dopr)
+			set_colour_attribute(TXTNOBGCOLOUR, COL_SEQ_BG, 0);
+		    break;
 		case ZWC('{'):
+		    if (arg)
+			cc += arg;
 		    for (; *p && (*p != '%' || p[1] != '}'); p++)
 			if (dopr)
 			    putc(*p == Meta ? *++p ^ 32 : *p, shout);

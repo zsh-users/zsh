@@ -471,7 +471,6 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		    break;
 		}
 		/* else FALLTHROUGH */
-		break;
 	    case 'f':
 		txtchangeset(txtchangep, TXTNOFGCOLOUR, TXT_ATTR_FG_ON_MASK);
 		txtunset(TXT_ATTR_FG_ON_MASK);
@@ -493,7 +492,6 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		    break;
 		}
 		/* else FALLTHROUGH */
-		break;
 	    case 'k':
 		txtchangeset(txtchangep, TXTNOBGCOLOUR, TXT_ATTR_BG_ON_MASK);
 		txtunset(TXT_ATTR_BG_ON_MASK);
@@ -1472,7 +1470,7 @@ match_named_colour(const char **teststrp)
  */
 
 /**/
-static int
+mod_export int
 match_colour(const char **teststrp, int is_fg, int colour)
 {
     int shft, on, named = 0, tc;

@@ -1,3 +1,8 @@
+2008-05-16  Peter Stephenson  <pws@csr.com>
+
+	* 25051: Src/prompt.c, Src/complist.c, Src/zle_tricky.c:
+	add %F, %K, %f, %k handling to formatting strings for completion.
+
 2008-05-15  Peter Stephenson  <pws@csr.com>
 
 	* 25040: Src/builtin.c, Src/utils.c, Src/Modules/zpty.c:
