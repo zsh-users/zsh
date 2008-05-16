@@ -1,5 +1,9 @@
 2008-05-16  Peter Stephenson  <pws@csr.com>
 
+	* 25052: Doc/Zsh/compctl.yo, Doc/Zsh/compsys.yo,
+	Doc/Zsh/mod_complist.yo, Doc/Zsh/prompt.yo: update some
+	documentation for use of colour highlighting.
+
 	* unposted: Etc/CONTRIBUTORS: update main shell list; still
 	need to update list for functions.
 

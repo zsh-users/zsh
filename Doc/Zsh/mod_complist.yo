@@ -160,7 +160,8 @@ To enable scrolling through a completion list, the tt(LISTPROMPT)
 parameter must be set.  Its value will be used as the prompt; if it
 is the empty string, a default prompt will be used.  The value may
 contain escapes of the form `tt(%x)'.  It supports the escapes
-`tt(%B)', `tt(%b)', `tt(%S)', `tt(%s)', `tt(%U)', `tt(%u)' and
+`tt(%B)', `tt(%b)', `tt(%S)', `tt(%s)', `tt(%U)', `tt(%u)', `tt(%F)',
+`tt(%f)', `tt(%K)', `tt(%k)' and
 `tt(%{...%})' used also in shell prompts as well as three pairs of
 additional sequences: a `tt(%l)' or `tt(%L)' is replaced by the number
 of the last line shown and the total number of lines in the form

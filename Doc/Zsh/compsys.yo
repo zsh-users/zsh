@@ -1512,9 +1512,15 @@ item(tt(format))(
 If this is set for the tt(descriptions) tag, its value is used as a
 string to display above matches in completion lists.  The sequence
 `tt(%d)' in this string will be replaced with a short description of
-what these matches are.  This string may also contain the sequences to
-specify output attributes, such as `tt(%B)', `tt(%S)' and
-`tt(%{)...tt(%})'.
+what these matches are.  This string may also contain the following
+sequences to specify output attributes,
+ifnzman(noderef(Prompt Expansion))\
+ifzman(as described in the section PROMPT EXPANSION in zmanref(zshmisc)):
+`tt(%B)', `tt(%S)', `tt(%U)', `tt(%F)', `tt(%K)' and their lower case
+counterparts, as well as `tt(%{)...tt(%})'.  `tt(%F)', `tt(%K)' and
+`tt(%{)...tt(%})' take arguments in the same form as prompt
+expansion.  Note that the tt(%G) sequence is not available; an argument
+to `tt(%{)' should be used instead.
 
 The style is tested with each tag valid for the current completion
 before it is tested for the tt(descriptions) tag.  Hence different format 
@@ -1870,9 +1876,10 @@ width, padded to the  right with spaces, while the lowercase form will
 be replaced by a variable width string.  As in other prompt strings, the
 escape sequences `tt(%S)', `tt(%s)', `tt(%B)', `tt(%b)', `tt(%U)',
 `tt(%u)' for entering and leaving the display modes
-standout, bold and underline are also available, as is the form
+standout, bold and underline, and `tt(%F)', `tt(%f)', `tt(%K)', `tt(%k)' for
+changing the foreground background colour, are also available, as is the form
 `tt(%{)...tt(%})' for enclosing escape sequences which display with zero
-width.
+(or, with a numeric argument, some other) width.
 
 After deleting this prompt the variable tt(LISTPROMPT) should be unset for
 the the removal to take effect.

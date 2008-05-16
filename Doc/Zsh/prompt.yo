@@ -191,7 +191,8 @@ following the tt(%F), for example tt(%F{red}).  In the latter case
 the values allowed are as described for the tt(fg) tt(zle_highlight)
 attribute;
 ifzman(see em(Character Highlighting) in zmanref(zshzle))\
-ifnzman(noderef(Character Highlighting)).
+ifnzman(noderef(Character Highlighting)).  This means that numeric
+colours are allowed in the second format also.
 )
 item(tt(%K) LPAR()tt(%k)RPAR())(
 Start (stop) using a different bacKground colour.  The syntax is
