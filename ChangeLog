@@ -1,5 +1,8 @@
 2008-05-16  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Etc/CONTRIBUTORS: update main shell list; still
+	need to update list for functions.
+
 	* 25051: Src/prompt.c, Src/complist.c, Src/zle_tricky.c:
 	add %F, %K, %f, %k handling to formatting strings for completion.
 
