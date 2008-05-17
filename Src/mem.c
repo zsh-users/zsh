@@ -958,7 +958,7 @@ malloc(MALLOC_ARG_T size)
 	n = (size + M_HSIZE + M_ALLOC + m_pgsz - 1) & ~(m_pgsz - 1);
 
 	if (((char *)(m = (struct m_hdr *)sbrk(n))) == ((char *)-1)) {
-	    DPUTS(1, "MEM: allocation error at sbrk.");
+	    DPUTS1(1, "MEM: allocation error at sbrk, size %L.", n);
 	    unqueue_signals();
 	    return NULL;
 	}

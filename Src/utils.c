@@ -255,6 +255,7 @@ zerrmsg(FILE *file, const char *fmt, va_list ap)
 {
     const char *str;
     int num;
+    long lnum;
 #ifdef HAVE_STRERROR_R
 #define ERRBUFSIZE (80)
     int olderrno;
@@ -286,6 +287,12 @@ zerrmsg(FILE *file, const char *fmt, va_list ap)
 		nicezputs(s, file);
 		break;
 	    }
+#ifdef DEBUG
+	    case 'L':
+		lnum = va_arg(ap, long);
+		fprintf(file, "%ld", lnum);
+		break;
+#endif
 	    case 'd':
 		num = va_arg(ap, int);
 		fprintf(file, "%d", num);
