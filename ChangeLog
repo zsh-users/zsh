@@ -1,5 +1,11 @@
 2008-05-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 25059: Functions/Misc/add-zsh-hook and virtually every
+	function under Functions/Prompts, also new
+	Functions/Prompts/pws, also unposted addition to
+	Doc/Zsh/contrib.yo: thorough modernization of the prompt
+	theme system to use current shell facilities better.
+
 	* 25057: Src/mem.c, Src/utils.c: better debug info for memory
 	errors.
 
