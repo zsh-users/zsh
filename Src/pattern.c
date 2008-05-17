@@ -2547,7 +2547,6 @@ patmatch(Upat prog)
 	    save = patinput;
 
 	    if (patmatch(next)) {
-		DPUTS(!patendp, "patendp not set for backreferencing");
 		if (no && !(parsfound & (1 << (no + 15)))) {
 		    patendp[no-1] = save;
 		    parsfound |= 1 << (no + 15);

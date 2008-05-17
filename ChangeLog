@@ -1,3 +1,7 @@
+2008-05-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25055: Src/pattern.c: remove unnecessary debug test.
+
 2008-05-16  Peter Stephenson  <pws@csr.com>
 
 	* 25052: Doc/Zsh/compctl.yo, Doc/Zsh/compsys.yo,
