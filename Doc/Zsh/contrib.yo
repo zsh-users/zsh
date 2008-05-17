@@ -285,6 +285,37 @@ any prefix, even a single letter; thus tt(a) is the same as tt(aliases),
 tt(z) is the same as tt(zstyles), etc.
 enditem()
 
+subsect(Manipulating Hook Functions)
+cindex(hook function utility)
+
+startitem()
+findex(add-zsh-hook)
+item(tt(add-zsh-hook) [-dD] var(hook) var(function))(
+Several functions are special to the shell, as described in the section
+ifnzman(Special Functions, noderef(Functions))\
+ifzman(SPECIAL FUNCTIONS, see zmanref(zshmisc)),
+in that they are automatic called at a specific point during shell execution.
+Each has an associated array consisting of names of functions to be
+called at the same point; these are so-called `hook functions'.
+The shell function tt(add-zsh-hook) provides a simple way of adding or
+removing functions from the array.
+
+var(hook) is one of tt(chpwd), tt(periodic), tt(precmd) or tt(preexec),
+the special functions in question.
+
+var(functions) is name of an ordinary shell function.  If no options
+are given this will be added to the array of functions to be executed.
+in the given context.
+
+If the option tt(-d) is given, the var(function) is removed from
+the array of functions to be executed.
+
+If the option tt(-D) is given, the var(function) is treated as a pattern
+and any matching names of functions are removed from the array of
+functions to be executed.
+)
+enditem()
+
 texinode(Prompt Themes)(ZLE Functions)(Utilities)(User Contributions)
 sect(Prompt Themes)
 

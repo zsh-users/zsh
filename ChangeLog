@@ -1,5 +1,7 @@
 2008-05-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Src/utils.c: unused variable in 25057.
+
 	* 25059: Functions/Misc/add-zsh-hook and virtually every
 	function under Functions/Prompts, also new
 	Functions/Prompts/pws, also unposted addition to

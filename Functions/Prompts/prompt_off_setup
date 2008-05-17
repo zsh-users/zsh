@@ -4,8 +4,6 @@ prompt_off_setup () {
   PS2="> "
 
   prompt_opts=( cr percent )
-  precmd () { }
-  preexec () { }
 }
 
 prompt_off_setup "$@"

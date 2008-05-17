@@ -12,8 +12,8 @@ function prompt_zefram_setup {
   PS2='%(4_:... :)%3_> '
 
   prompt_opts=( cr subst percent )
-  precmd () { prompt_zefram_precmd }
-  preexec () { }
+
+  add-zsh-hook precmd prompt_zefram_precmd
 }
 
 prompt_zefram_setup "$@"

@@ -27,15 +27,14 @@ prompt_bigfade_setup () {
   local date=${3:-'white'}
   local cwd=${4:-'yellow'}
 
-  local char_333 char_262 char_261 char_260
+  local -A schars
   autoload -U prompt_special_chars
   prompt_special_chars
 
-  PS1="%{$bold_color$fg[$fadebar]$bold_color%}$char_333$char_262$char_261$char_260%{$bold_color$fg[$userhost]$bg[$fadebar]%}%n@%m%{$reset_color$fg[$fadebar]$bg[grey]%}$char_260$char_261$char_262$char_333%{$reset_color$fg[$fadebar]$bg[grey]%}$char_333$char_262$char_261$char_260%{$bold_color$fg[$date]$bg[grey]%} %D{%a %b %d} %D{%I:%M:%S%P}$prompt_newline%{$bold_color$fg[$cwd]$bg[grey]%}$PWD>%{$reset_color%} "
-  PS2="%{$bold_color$fg[$fadebar]$bold_color%}$char_333$char_262$char_261$char_260%{$reset_color$fg[$fadebar]$bg[grey]%}$char_260$char_261$char_262$char_333%{$reset_color$fg[$fadebar]$bg[grey]%}$char_333$char_262$char_261$char_260%{$bold_color$bold_color$fg[$fadebar]%}>%{$reset_color%} "
+  PS1="%B%F{$fadebar}$schars[333]$schars[262]$schars[261]$schars[260]%B%F{$userhost}%K{$fadebar}%n@%m%b%k%f%F{$fadebar}%K{black}$schars[260]$schars[261]$schars[262]$schars[333]%b%f%k%F{$fadebar}%K{black}$schars[333]$schars[262]$schars[261]$schars[260]%B%F{$date}%K{black} %D{%a %b %d} %D{%I:%M:%S%P}$prompt_newline%B%F{$cwd}%K{black}$PWD>%b%f%k "
+  PS2="%B%F{$fadebar}$schars[333]$schars[262]$schars[261]$schars[260]%b%F{$fadebar}%K{black}$schars[260]$schars[261]$schars[262]$schars[333]%F{$fadebar}%K{black}$schars[333]$schars[262]$schars[261]$schars[260]%B%F{$fadebar}>%b%f%k "
 
-  precmd () { setopt promptsubst }
-  preexec () { }
+  prompt_opts=(cr subst percent)
 }
 
 prompt_bigfade_preview () {

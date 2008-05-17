@@ -70,7 +70,7 @@ integer PSCOL=1
 
 prompt_bart_precmd () {
     setopt localoptions noxtrace noksharrays unset
-    local zero='%([BSUbsu]|{*%})' escape colno lineno
+    local zero='%([BSUbfksu]|FB{*})' escape colno lineno
 
     # Using psvar here protects against unwanted promptsubst expansions.
 
@@ -102,7 +102,7 @@ prompt_bart_ps1 () {
     setopt localoptions noxtrace noksharrays
 
     local -ah ps1
-    local -h host hist1 hist2 dir space date time rs="%{$reset_color%}"
+    local -h host hist1 hist2 dir space date time rs="%b%f%k"
     local -h eon="%(?.[.%20(?.[%U.%S[))" eoff="%(?.].%20(?.%u].]%s))"
 
     # Set up the components of the upper line
@@ -140,17 +140,19 @@ prompt_bart_winch () {
     setopt localoptions nolocaltraps noksharrays unset
 
     # Delete ourself from TRAPWINCH if not using our precmd insert.
-    [[ $functions[precmd] = *prompt_bart_precmd* ]] && prompt_bart_ps1 ||
+    [[ $precmd_functions = *prompt_bart_precmd* ]] && prompt_bart_ps1 ||
 	functions[TRAPWINCH]="${functions[TRAPWINCH]//prompt_bart_winch}"
 }
 
 prompt_bart_setup () {
     setopt localoptions nolocaltraps noksharrays unset
+    typeset -gA fg
 
     # A few extra niceties ...
     repeat 1 case "$1:l" in
       (off|disable)
-	functions[precmd]="${functions[precmd]//prompt_bart_precmd}"
+        precmd_functions[(r)prompt_*_precmd]=
+	precmd_functions=($precmd_functions)
 	functions[TRAPWINCH]="${functions[TRAPWINCH]//prompt_bart_winch}"
 	[[ $prompt_theme[1] = bart ]] && PS1=${${(f)PS1}[-1]}
 	return 1
@@ -161,22 +163,22 @@ prompt_bart_setup () {
 	;&
       (*)
 	# Abuse the fg assoc to hold our selected colors ...
-	fg[%m]=$fg[${1:-red}]
-	fg[%h]=$fg[${2:-blue}]
-	fg[%~]=$fg[${3:-none}]
-	fg[%D]=$fg[${4:-none}]
-	fg[%@]=$fg[${1:-red}]
+	fg[%m]="%F{${1:-red}}"
+	fg[%h]="%F{${2:-blue}}"
+	fg[%~]="%F{${3:-default}}"
+	fg[%D]="%F{${4:-default}}"
+	fg[%@]="%F{${1:-red}}"
 	;;
     esac
 
     prompt_bart_ps1
 
     # No RPS1 by default because prompt_off_setup doesn't fix it.
-    (($#RPS1 && $# > 4)) && RPS1="%{$fg[$5]%}$RPS1%{$reset_color%}"
+    (($#RPS1 && $# > 4)) && RPS1="%F{$5}$RPS1%f"
 
     # Paste our special commands into precmd and TRAPWINCH
-    functions[precmd]="${functions[precmd]//prompt_*_precmd}
-	prompt_bart_precmd"
+    
+    add-zsh-hook precmd prompt_bart_precmd
     functions[TRAPWINCH]="${functions[TRAPWINCH]//prompt_bart_winch}
 	prompt_bart_winch"
 

@@ -7,8 +7,6 @@ prompt_redhat_setup () {
   PS2="> "
 
   prompt_opts=( cr percent )
-  precmd () { }
-  preexec () { }
 }
 
 prompt_redhat_setup "$@"

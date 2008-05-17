@@ -6,13 +6,20 @@
 # We still provide them in that form if the current character
 # set isn't UTF-8.  We could in principle use iconv if available.
 
+typeset -gA schars
+
 if [[ ${LC_ALL:-${LC_CTYPE:-$LANG}} = *UTF-8* ]]; then
-  char_333=$'\xe2\x96\x88'
-  char_262=$'\xe2\x96\x93'
-  char_261=$'\xe2\x96\x92'
-  char_260=$'\xe2\x96\x91'
+  schars[300]=$'\xe2\x94\x94'
+  schars[304]=$'\xe2\x94\x8c'
+  schars[332]=$'\xe2\x94\x8c'
+  schars[333]=$'\xe2\x96\x88'
+  schars[371]=$'\xc2\xa8'
+  schars[372]=$'\xcb\x99'
+  schars[262]=$'\xe2\x96\x93'
+  schars[261]=$'\xe2\x96\x92'
+  schars[260]=$'\xe2\x96\x91'
 else
-  for code in 333 262 261 260; do
-    char_$code=$(echo -n "\\0$code")
+  for code in 300 304 332 333 371 372 262 261 260; do
+    eval "char[$code]=\$'\\$code'"
   done
 fi

@@ -27,15 +27,14 @@ prompt_fade_setup () {
   local userhost=${2:-'white'}
   local date=${3:-'white'}
 
-  local char_333 char_262 char_261 char_260
+  local -A schars
   autoload -U prompt_special_chars
   prompt_special_chars
 
-  PS1="%{$fg[$fadebar_cwd]$bg[$fadebar_cwd]$bold_color%}$char_333$char_262$char_261$char_260%{$fg[$userhost]$bg[$fadebar_cwd]$bold_color%}%n@%m%{$reset_color$fg[$fadebar_cwd]$bg[grey]%}$char_333$char_262$char_261$char_260%{$fg[$date]$bg[grey]$bold_color%} %D{%a %b %d} %D{%I:%M:%S%P} $prompt_newline%{$fg[$fadebar_cwd]$bg[grey]$bold_color%}%~/%{$reset_color%} "
-  PS2="%{$fg[$fadebar_cwd]$bg[grey]%}$char_333$char_262$char_261$char_260%{$reset_color%}>"
+  PS1="%F{$fadebar_cwd}%B%K{$fadebar_cwd}$schars[333]$schars[262]$schars[261]$schars[260]%F{$userhost}%K{$fadebar_cwd}%B%n@%m%b%F{$fadebar_cwd}%K{black}$schars[333]$schars[262]$schars[261]$schars[260]%F{$date}%K{black}%B %D{%a %b %d} %D{%I:%M:%S%P} $prompt_newline%F{fadebar_cwd}%K{black}%B%~/%b%k%f "
+  PS2="%F{$fadebar_cwd}%K{black}$schars[333]$schars[262]$schars[261]$schars[260]%f%k>"
 
-  precmd () { setopt promptsubst }
-  preexec () { }
+  prompt_opts=(cr subst percent)
 }
 
 prompt_fade_preview () {

@@ -21,15 +21,14 @@ prompt_elite_setup () {
   local text=${1:-'red'}
   local punctuation=${2:-'blue'}
 
-  local char_333 char_262 char_261 char_260
+  local -A schars
   autoload -U prompt_special_chars
   prompt_special_chars
 
-  PS1="%{$fg[$text]%}$char_332$char_304%{$fg[$punctuation]%}(%{$fg[$text]%}%n%{$fg[$punctuation]%}@%{$fg[$text]%}%m%{$fg[$punctuation]%})%{$fg[$text]%}-%{$fg[$punctuation]%}(%{$fg[$text]%}%D{%I:%M%P}%{$fg[$punctuation]%}-:-%{$fg[$text]%}%D{%m}%{$fg[$punctuation]$fg[$text]%}/%D{%d}%{$fg[$punctuation]%})%{$fg[$text]%}$char_304-%{$fg[$punctuation]]%}$char_371%{$fg[$text]%}-$char_371$char_371%{$fg[$punctuation]%}$char_372$prompt_newline%{$fg[$text]%}$char_300$char_304%{$fg[$punctuation]%}(%{$fg[$text]%}%1~%{$fg[$punctuation]%})%{$fg[$text]%}$char_304$char_371%{$fg[$punctuation]%}$char_372%{$reset_color%}"
+  PS1="%F{$text}$schars[332]$schars[304]%F{$punctuation}(%F{$text}%n%F{$punctuation}@%F{$text}%m%F{$punctuation})%F{$text}-%F{$punctuation}(%F{$text}%D{%I:%M%P}%F{$punctuation}-:-%F{$text}%D{%m}%F{$punctuation}%F{$text}/%D{%d}%F{$punctuation})%F{$text}$schars[304]-%F{$punctuation}$schars[371]%F{$text}-$schars[371]$schars[371]%F{$punctuation}$schars[372]$prompt_newline%F{$text}$schars[300]$schars[304]%F{$punctuation}(%F{$text}%1~%F{$punctuation})%F{$text}$schars[304]$schars[371]%F{$punctuation}$schars[372]%f"
   PS2="> "
 
-  precmd () { setopt promptsubst }
-  preexec () { }
+  prompt_opts=(cr subst percent)
 }
 
 prompt_elite_preview () {

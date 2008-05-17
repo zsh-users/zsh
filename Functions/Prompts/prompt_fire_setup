@@ -29,25 +29,24 @@ prompt_fire_setup () {
   local date=${5:-'white'}
   local cwd=${6:-'yellow'}
 
-  local char_333 char_262 char_261 char_260
+  local -a schars
   autoload -U prompt_special_chars
   prompt_special_chars
 
-  local GRAD1="%{$char_333$char_262$char_261$char_260%}"
-  local GRAD2="%{$char_260$char_261$char_262$char_333%}"
-  local COLOR1="%{$bold_color$fg[$fire1]$bg[$fire2]%}"
-  local COLOR2="%{$bold_color$fg[$userhost]$bg[$fire2]%}"
-  local COLOR3="%{$reset_color$fg[$fire3]$bg[$fire2]%}"
-  local COLOR4="%{$reset_color$fg[$fire3]$bg[grey]%}"
-  local COLOR5="%{$bold_color$fg[$cwd]$bg[grey]%}"
-  local COLOR6="%{$bold_color$fg[$date]$bg[grey]%}"
-  local GRAD0="%{$reset_color%}"
+  local GRAD1="%{$schars[333]$schars[262]$schars[261]$schars[260]%}"
+  local GRAD2="%{$schars[260]$schars[261]$schars[262]$schars[333]%}"
+  local COLOR1="%B%F{$fire1}%K{$fire2}"
+  local COLOR2="%B%F{$userhost}%K{$fire2}"
+  local COLOR3="%b%F{$fire3}%K{$fire2}"
+  local COLOR4="%b%F{$fire3}%K{black}"
+  local COLOR5="%B%F{$cwd}%K{black}"
+  local COLOR6="%B%F{$date}%K{black}"
+  local GRAD0="%b%f%k"
 
   PS1=$COLOR1$GRAD1$COLOR2'%n@%m'$COLOR3$GRAD2$COLOR4$GRAD1$COLOR6' %D{%a %b %d} %D{%I:%M:%S%P} '$prompt_newline$COLOR5'%~/'$GRAD0' '
   PS2=$COLOR1$GRAD1$COLOR3$GRAD2$COLOR4$GRAD1$COLOR5'>'$GRAD0' '
 
-  precmd () { setopt promptsubst }
-  preexec () { }
+  prompt_opts=(cr subst percent)
 }
 
 prompt_fire_preview () {

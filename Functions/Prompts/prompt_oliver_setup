@@ -24,18 +24,18 @@ prompt_oliver_setup() {
   [[ "${(t)pcolour}" != assoc* ]] && typeset -Ag pcolour
   [[ "${(t)tcolour}" != assoc* ]] && typeset -Ag tcolour
   local pcol=${1:-${pcolour[${HOST:=`hostname`}]:-bold}}
-  local pcolr=$fg[${pcol#bold}]
+  local pcolr="%F{${${pcol#bold}:-default}}"
   [[ $pcol = bold* ]] && pcolr=%B$pcolr
-  
+
   local tcol=${2:-${tcolour[$HOST]}}
-  local tcolr="fg=${tcol#bold}"
+  local tcolr="fg=${${tcol#bold}:-default}"
   [[ $tcol = bold* ]] && tcolr=bold,$tcolr
-  
+
   local a host="%m:" user="%n "
   [[ $HOST == (${(j(|))~normal_hosts}) ]] && host=""
   [[ $LOGNAME == (root|${(j(|))~normal_users}) ]] && user=""
 
-  PS1="%{$pcolr%}$user$host%~%"'$((COLUMNS-12))'"(l.$prompt_newline. )[%h%1(j.%%%j.)%0(?..:%?)]%# %{$reset_color%}"  RPS2='<%^'
+  PS1="$pcolr$user$host%~%"'$((COLUMNS-12))'"(l.$prompt_newline. )[%h%1(j.%%%j.)%0(?..:%?)]%# %b%f%k"  RPS2='<%^'
   PS2=''
   zle_highlight[(r)default:*]=default:$tcolr
 }

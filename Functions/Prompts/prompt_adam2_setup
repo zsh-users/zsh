@@ -49,42 +49,44 @@ prompt_adam2_setup () {
   prompt_adam2_color4=${4:-'white'}   # user input
 
   local prompt_gfx_bbox 
-  prompt_gfx_tbox="%{$fg_bold[$prompt_adam2_color1]%}${prompt_gfx_tlc}%{$fg_no_bold[$prompt_adam2_color1]%}${prompt_gfx_hyphen}"
-  prompt_gfx_bbox="%{$fg_bold[$prompt_adam2_color1]%}${prompt_gfx_blc}${prompt_gfx_hyphen}%{$fg_no_bold[$prompt_adam2_color1]%}"
+  prompt_gfx_tbox="%B%F{$prompt_adam2_color1}${prompt_gfx_tlc}%b%F{$prompt_adam2_color1}${prompt_gfx_hyphen}"
+  prompt_gfx_bbox="%B%F{$prompt_adam2_color1}${prompt_gfx_blc}${prompt_gfx_hyphen}%b%F{$prompt_adam2_color1}"
 
   # This is a cute hack.  Well I like it, anyway.
-  prompt_gfx_bbox_to_mbox=$'%{\e[A\r'"$fg_bold[$prompt_adam2_color1]${prompt_gfx_mlc}$fg_no_bold[$prompt_adam2_color1]${prompt_gfx_hyphen}"$'\e[B%}'
+  prompt_gfx_bbox_to_mbox=$'%{\e[A\r'"%}%B%F{$prompt_adam2_color1}${prompt_gfx_mlc}%b%F{$prompt_adam2_color1}${prompt_gfx_hyphen}%{"$'\e[B%}'
 
-  prompt_l_paren="%{$fg_bold[grey]%}("
-  prompt_r_paren="%{$fg_bold[grey]%})"
+  prompt_l_paren="%B%F{black}("
+  prompt_r_paren="%B%F{black})"
 
-  prompt_user_host="%{$fg_no_bold[$prompt_adam2_color3]%}%n%{$fg_bold[$prompt_adam2_color3]%}@%{$fg_no_bold[$prompt_adam2_color3]%}%m"
+  prompt_user_host="%b%F{$prompt_adam2_color3}%n%B%F{$prompt_adam2_color3}@%b%F{$prompt_adam2_color3}%m"
 
-  prompt_line_1a="$prompt_gfx_tbox$prompt_l_paren%{$fg_bold[$prompt_adam2_color2]%}%~$prompt_r_paren%{$fg_no_bold[$prompt_adam2_color1]%}"
-  prompt_line_1b="$prompt_l_paren$prompt_user_host$prompt_r_paren%{$fg_no_bold[$prompt_adam2_color1]%}${prompt_gfx_hyphen}"
+  prompt_line_1a="$prompt_gfx_tbox$prompt_l_paren%B%F{$prompt_adam2_color2}%~$prompt_r_paren%b%F{$prompt_adam2_color1}"
+  prompt_line_1b="$prompt_l_paren$prompt_user_host$prompt_r_paren%b%F{$prompt_adam2_color1}${prompt_gfx_hyphen}"
 
-  prompt_line_2="$prompt_gfx_bbox${prompt_gfx_hyphen}%{$fg_bold[white]%}"
+  prompt_line_2="$prompt_gfx_bbox${prompt_gfx_hyphen}%B%F{white}"
 
   prompt_char="%(!.#.>)"
 
-  precmd () { prompt_adam2_precmd; setopt promptsubst }
-  preexec () { prompt_adam2_preexec }
+  prompt_opts=(cr subst percent)
+
+  add-zsh-hook precmd prompt_adam2_precmd
 }
 
-prompt_adam2_precmd () {
+prompt_adam2_precmd() {
   setopt noxtrace localoptions extendedglob
   local prompt_line_1
 
   prompt_adam2_choose_prompt
 
-  PS1="$prompt_line_1$prompt_newline$prompt_line_2%{$fg_bold[white]%}$prompt_char %{$fg_bold[$prompt_adam2_color4]%}"
-  PS2="$prompt_line_2%{$prompt_gfx_bbox_to_mbox$fg_bold[white]%}%_> %{$fg_bold[$prompt_adam2_color4]%}"
-  PS3="$prompt_line_2%{$prompt_gfx_bbox_to_mbox$fg_bold[white]%}?# %{$fg_bold[$prompt_adam2_color4]%}"
+  PS1="$prompt_line_1$prompt_newline$prompt_line_2%B%F{white}$prompt_char %b%f%k"
+  PS2="$prompt_line_2$prompt_gfx_bbox_to_mbox%B%F{white}%_> %b%f%k"
+  PS3="$prompt_line_2$prompt_gfx_bbox_to_mbox%B%F{white}?# %b%f%k"
+  zle_highlight[(r)default:*]="default:fg=$prompt_adam2_color4,bold"
 }
 
 prompt_adam2_choose_prompt () {
-  local prompt_line_1a_width=${#${(S%%)prompt_line_1a//\%\{*\%\}}}
-  local prompt_line_1b_width=${#${(S%%)prompt_line_1b//\%\{*\%\}}}
+  local prompt_line_1a_width=${#${(S%%)prompt_line_1a//(\%([KF1]|)\{*\}|\%[Bbkf])}}
+  local prompt_line_1b_width=${#${(S%%)prompt_line_1b//(\%([KF1]|)\{*\}|\%[Bbkf])}}
 
   local prompt_padding_size=$(( COLUMNS
                                   - prompt_line_1a_width
@@ -110,11 +112,7 @@ prompt_adam2_choose_prompt () {
 
   # Still didn't fit; truncate 
   local prompt_pwd_size=$(( COLUMNS - 5 ))
-  prompt_line_1="$prompt_gfx_tbox$prompt_l_paren%{$fg_bold[$prompt_adam2_color2]%}%$prompt_pwd_size<...<%~%<<$prompt_r_paren%{$fg_no_bold[$prompt_adam2_color1]$prompt_gfx_hyphen%}"
-}
-
-prompt_adam2_preexec () {
-  print -n "$reset_color"
+  prompt_line_1="$prompt_gfx_tbox$prompt_l_paren%B%F{$prompt_adam2_color2}%$prompt_pwd_size<...<%~%<<$prompt_r_paren%b%F{$prompt_adam2_color1}$prompt_gfx_hyphen"
 }
 
 prompt_adam2_setup "$@"

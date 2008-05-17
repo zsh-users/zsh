@@ -24,14 +24,13 @@ prompt_adam1_setup () {
   prompt_adam1_color2=${2:-'cyan'}
   prompt_adam1_color3=${3:-'green'}
 
-  base_prompt="%{$bg_no_bold[$prompt_adam1_color1]%}%n@%m%{$reset_color%} "
-  post_prompt="%{$reset_color%}"
+  base_prompt="%K{$prompt_adam1_color1}%n@%m%k "
+  post_prompt="%b%f%k"
 
-  base_prompt_no_color=$(echo "$base_prompt" | perl -pe "s/%{.*?%}//g")
-  post_prompt_no_color=$(echo "$post_prompt" | perl -pe "s/%{.*?%}//g")
+  base_prompt_no_color=$(echo "$base_prompt" | perl -pe "s/%(K{.*?}|k)//g")
+  post_prompt_no_color=$(echo "$post_prompt" | perl -pe "s/%(K{.*?}|k)//g")
 
-  precmd  () { prompt_adam1_precmd }
-  preexec () { }
+  add-zsh-hook precmd prompt_adam1_precmd
 }
 
 prompt_adam1_precmd () {
@@ -43,10 +42,10 @@ prompt_adam1_precmd () {
   base_prompt_etc=$(print -P "$base_prompt%(4~|...|)%3~")
   prompt_length=${#base_prompt_etc}
   if [[ $prompt_length -lt 40 ]]; then
-    path_prompt="%{$fg_bold[$prompt_adam1_color2]%}%(4~|...|)%3~%{$fg_bold[white]%}"
+    path_prompt="%B%F{$prompt_adam1_color2}%(4~|...|)%3~%F{white}"
   else
     space_left=$(( $COLUMNS - $#base_prompt_expanded_no_color - 2 ))
-    path_prompt="%{$fg_bold[$prompt_adam1_color3]%}%${space_left}<...<%~$prompt_newline%{$fg_bold_white%}"
+    path_prompt="%B%F{$prompt_adam1_color3}%${space_left}<...<%~$prompt_newline%F{white}"
   fi
   PS1="$base_prompt$path_prompt %# $post_prompt"
   PS2="$base_prompt$path_prompt %_> $post_prompt"

@@ -15,11 +15,12 @@ prompt_walters_setup () {
 
 if [[ "$TERM" != "dumb" ]]; then
     export PROMPT='%B%(?..[%?] )%b%n@%U%m%u> '
-    export RPROMPT="%{$fg_no_bold[${1:-green}]%}%~%{$reset_color%}"
+    export RPROMPT="%F{${1:-green}}%~%f"
 else
     export PROMPT="%(?..[%?] )%n@%m:%~> "
 fi
 
+  prompt_opts=(cr percent)
 }
 
 prompt_walters_setup "$@"
