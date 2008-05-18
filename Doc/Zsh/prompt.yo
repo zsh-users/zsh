@@ -203,7 +203,7 @@ Include a string as a literal escape sequence.
 The string within the braces should not change the cursor
 position.  Brace pairs can nest.
 
-A positive numeric argument between the tt(%) and the %%({) is treated as
+A positive numeric argument between the tt(%) and the tt({) is treated as
 described for tt(%G) below.
 )
 item(tt(%G))(
