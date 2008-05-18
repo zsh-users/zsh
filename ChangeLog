@@ -1,5 +1,8 @@
 2008-05-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* users/12858: Doc/Zsh/compsys.yo,
+	Completion/Unix/Type/_path_files: add accept-exact-dirs style.
+
 	* unposted: Completion/compinit: fix unwanted output from
 	typeset.
 

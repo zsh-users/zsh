@@ -318,6 +318,29 @@ for prepath in "$prepaths[@]"; do
 
   skipped=
   cpre=
+
+  if zstyle -t ":completion:${curcontext}:paths" accept-exact-dirs &&
+    [[ $pre = (#b)(*)/([^/]#) ]]; then
+    # We've been told that we can accept an exact directory
+    # prefix immediately.  Try this with the longest path prefix
+    # first:  this saves stats in the simple case and may get around
+    # automount behaviour if early components don't yet exist.
+    tmp1=$match[1]
+    tpre=$match[2]
+    while true; do
+      if [[ -d $donepath$tmp1 ]]; then
+	donepath=$donepath$tmp1/
+	pre=$tpre
+	break
+      elif [[ $tmp1 = (#b)(*)/([^/]#) ]]; then
+	tmp1=$match[1]
+	tpre=$match[2]/$tpre
+      else
+	break
+      fi
+    done
+  fi
+
   tpre="$pre"
   tsuf="$suf"
   testpath="$donepath"
