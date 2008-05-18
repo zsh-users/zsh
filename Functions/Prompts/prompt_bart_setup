@@ -151,8 +151,7 @@ prompt_bart_setup () {
     # A few extra niceties ...
     repeat 1 case "$1:l" in
       (off|disable)
-        precmd_functions[(r)prompt_*_precmd]=
-	precmd_functions=($precmd_functions)
+        add-zsh-hook -D precmd "prompt_*_precmd"
 	functions[TRAPWINCH]="${functions[TRAPWINCH]//prompt_bart_winch}"
 	[[ $prompt_theme[1] = bart ]] && PS1=${${(f)PS1}[-1]}
 	return 1
@@ -162,7 +161,10 @@ prompt_bart_setup () {
 	[[ $prompt_theme[1] = bart ]] && break
 	;&
       (*)
-	# Abuse the fg assoc to hold our selected colors ...
+	# Use the fg assoc to hold our selected colors ...
+	# This used to be provided by the function colors, but is now
+	# set directly from here.  There should be no clash if both
+	# are in use.
 	fg[%m]="%F{${1:-red}}"
 	fg[%h]="%F{${2:-blue}}"
 	fg[%~]="%F{${3:-default}}"

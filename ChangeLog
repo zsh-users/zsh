@@ -1,5 +1,8 @@
 2008-05-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 25063: Functions/Prompts/prompt_bart_setup: minor
+	tweaks.
+
 	* Mikael: 25054: Doc/Zsh/prompt.yo: typo.
 
 2008-05-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
