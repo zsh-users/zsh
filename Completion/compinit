@@ -122,7 +122,7 @@ if [[ -n $_i_dumpfile ]]; then
   # Explicitly supplied dumpfile.
   typeset -g _comp_dumpfile="$_i_dumpfile"
 else
-  typeset -g comp_dumpfile="${ZDOTDIR:-$HOME}/.zcompdump"
+  typeset -g _comp_dumpfile="${ZDOTDIR:-$HOME}/.zcompdump"
 fi
 
 # The standard options set in completion functions.

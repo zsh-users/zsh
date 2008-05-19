@@ -1,3 +1,7 @@
+2008-05-19  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/compinit: typo in 25068.
+
 2008-05-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/12858: Doc/Zsh/compsys.yo,
