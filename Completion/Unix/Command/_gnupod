@@ -1,0 +1,91 @@
+#compdef gnupod_addsong gnupod_addsong.pl=gnupod_addsong gnupod_check gnupod_check.pl=gnupod_check gnupod_INIT gnupod_INIT.pl=gnupod_INIT gnupod_search gnupod_search.pl=gnupod_search mktunes mktunes.pl=mktunes tunes2pod tunes2pod.pl=tunes2pod
+
+local arguments
+
+case "$service" in
+  (gnupod_addsong)
+  arguments=(
+    '(-h --help)'{-h,--help}'[display help and exit]'
+    --version'[output version information and exit]'
+    '(-m --mount)'{-m,--mount=}'[iPod mountpoint, default is $IPOD_MOUNTPOINT]:mount point:_files'
+    '(-r --restore)'{-r,--restore}'[Restore the iPod (create a new GNUtunesDB from scratch)]'
+    '(-d --duplicate)'{-d,--duplicate}'[Allow duplicate files]'
+    '(-p --playlist)'{-p,--playlist=}'[Add songs to this playlist]:playlist:'
+    --disable-v1'[Do not read ID3v1 Tags (MP3 Only)]'
+    --disable-v2'[Do not read ID3v2 Tags (MP3 Only)]'
+    --decode='[Convert FLAC Files to WAVE/MP3 or AAC on-the-fly]:encoding:(pcm mp3 aac aacbm)'
+    '(-e --reencode)'{-e,--reencode=}'[Reencode MP3/AAC files with new quality on-the-fly]:quality number (0 = Good 9 = Bad):(1 2 3 4 5 6 7 8 9)'
+    --set-artist='[Set Artist (Override ID3 Tag)]:artist:'
+    --set-album='[Set Album (Override ID3 Tag)]:album:'
+    --set-genre='[Set Genre (Override ID3 Tag)]:genre:'
+    --set-rating='[Set Rating]:rating:'
+    --set-playcount='[Set Playcount]:play count:'
+    --set-songnum='[Override Songnum/Tracknum field]:song number:'
+    '*:file to add:_files'
+)
+  ;;
+
+  (gnupod_check)
+  arguments=(
+    '(-h --help)'{-h,--help}'[display help and exit]'
+    --version'[output version information and exit]'
+    '(-m --mount)'{-m,--mount=}'[iPod mountpoint (default is $IPOD_MOUNTPOINT)]:mount point:_files'
+    --fixit'[try to fixup some errors]'
+)
+  ;;
+
+  (gnupod_INIT)
+  arguments=(
+    '(-h --help)'{-h,--help}'[display help and exit]'
+    --version'[output version information and exit]'
+    '(-m --mount)'{-m,--mount=}'[iPod mountpoint (default is $IPOD_MOUNTPOINT)]:mount point:_files'
+    '(-d --disable-convert)'{-d,--disable-convert}'[do not try to convert an existing iTunesDB]'
+    '(-f --france)'{-f,--france}'[limit volume to 100dB, works only on very old iPods]'
+)
+  ;;
+
+  (gnupod_search)
+  arguments=(
+    --help'[display help and exit]'
+    --version'[display version information and exit]'
+    '(-m --mount)'{-m,--mount=}'[iPod mountpoint (default is $IPOD_MOUNTPOINT)]:mount point:_files'
+    '(-t --title)'{-t,--title=}'[search songs by title]:title string:'
+    '(-a --artist)'{-a,--artist=}'[search songs by artist]:artist string:'
+    '(-l --album)'{-l,--album=}'[search songs by album]:album string:'
+    '(-i --id)'{-i,--id=}'[search songs by ID]:ID integer:'
+    '(-g --genre)'{-g,--genre=}'[search songs by genre]:genre string:'
+    '(-c --playcount)'{-c,--playcount=}'[search songs by playcount]:playcount:'
+    '(-R --podcastrss)'{-R,--podcastrss=}'[search songs by RSS]:RSS:'
+    '(-G --podcastguid)'{-G,--podcastguid=}'[search songs by GUID]:GUID:'
+    '(-o --match-once)'{-o,--match-once}'[search does not need to match multiple times]'
+    --delete'[remove matched songs from the iPod]'
+    --view='[modify output (default is ialt)]:output string:'
+    --rename='[rename key into value for matched songs]:KEY=VALUE:'
+)
+  ;;
+
+  (mktunes)
+  arguments=(
+    '(-h --help)'{-h,--help}'[display help and exit]'
+    --version'[output version information and exit]'
+    '(-m --mount)'{-m,--mount=}'[iPod mountpoint (default is $IPOD_MOUNTPOINT)]:mount point:_files'
+    '(-n --ipod-name)'{-n,--ipod-name=}'[iPod Name (For unlabeled iPods)]:name:'
+    '(-v --volume)'{-v,--volume=}'[adjust volume +-VALUE%]:volume percent:'
+    '(-e --energy)'{-e,--energy}'[save energy (disable scrolling title)]'
+)
+  ;;
+
+  (tunes2pod)
+  arguments=(
+    '(-h --help)'{-h,--help}'[display help and exit]'
+    --version'[output version information and exit]'
+    '(-m --mount)'{-m,--mount=}'[iPod mountpoint (default is $IPOD_MOUNTPOINT)]:mount point:_files'
+    --force'[disable sync checking]'
+)
+  ;;
+  (*)
+  return 1
+  ;;
+esac
+
+_arguments : $arguments

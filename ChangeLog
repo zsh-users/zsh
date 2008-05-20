@@ -1,3 +1,8 @@
+2008-05-20  Clint Adams  <clint@zsh.org>
+
+	* 25077: Completion/Unix/Command/_gnupod: consolidation of GNUpod
+	script completion from Omari Norman in 25075.
+
 2008-05-20  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Functions/Prompts/.distfiles: add prompt_pws_setup.
