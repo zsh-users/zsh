@@ -1,3 +1,7 @@
+2008-05-20  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Functions/Prompts/.distfiles: add prompt_pws_setup.
+
 2008-05-19  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/compinit: typo in 25068.
