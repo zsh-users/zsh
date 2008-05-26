@@ -11,7 +11,7 @@ case $basename in
   ;;
 
   (locate)
-  input="$(_call_program locate $words[1] -V)"
+  input="$(_call_program locate $words[1] -V 2>&1)"
   case $input in
     (*mlocate*)
     ltype=mlocate
@@ -21,8 +21,16 @@ case $basename in
     ltype=slocate
     ;;
 
-    (*(#i)gnu locate*)
+    (*(#i)gnu locate*|*findutils*gnu*)
     ltype=gnu
+    ;;
+
+    (*illegal option*)
+    if [[ $OSTYPE == (freebsd|openbsd|dragonfly|darwin)* ]]; then
+      ltype=bsd
+    else
+      ltype=$best_guess
+    fi
     ;;
 
     # guess
@@ -43,7 +51,7 @@ case $ltype in
   # -r/--regexp mean no normal arguments, so shouldn't complete
   # -m and --mmap are ignored, so don't bother
   # -s and --stdio likewise
-  _arguments -s : \
+  _arguments -s -S : \
     {-b,--basename}'[Match only the basename of files in the database]' \
     {-c,--count}'[Output the number of matching entries]' \
     {-d,--database=}'[Use alternative database]:database:_files' \
@@ -67,7 +75,7 @@ case $ltype in
   # -d can take path
   # -e can take a comma-separated list of directories.
   # -f should complete list of file system types like mount
-  _arguments -s : \
+  _arguments -s -S : \
     -u'[Create slocate database starting at path /]' \
     -U'[Create slocate database starting at given path]:directory:_files -/' \
     -c'[Parse GNU locate updatedb with -u, -U]' \
@@ -106,6 +114,19 @@ case $ltype in
     --regextype='[Select type of regular expression]' \
     {-V,--version}'[Show version]' \
     --help'[Show help]' \
+    '*:pattern: '
+  ;;
+
+  (bsd)
+  _arguments -s -S -A '-*' \
+    '(-S)-0[Separate file names by NUL characters]' \
+    '(- *)-S[Show database statistics and exit]' \
+    '(-S)-c[Output the number of matching file names]' \
+    '(-S)*-d[Specify database to search]:database:_files' \
+    '(-S)-i[Ignore case distinctions in pattern and database]' \
+    '(-S)-l[Limit output to specified number of file names]:file limit: ' \
+    '(-S)-m[Use mmap(2) instead of stdio(3) (default)]' \
+    '(-S)-s[Use stdio(3) instead of mmap(2)]' \
     '*:pattern: '
   ;;
 esac
