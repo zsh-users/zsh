@@ -22,9 +22,20 @@ history-incremental-pattern-search-backward and
 history-incremental-pattern-search-forward.  These are not bound to
 keys by default.
 
-Highlighting of sections of the command line is now supported, controlled
-by the array parameter zle_highlight and the ZLE special parameter
-REGION_HIGHLIGHT.
+Highlighting and colouring of sections of the command line is now
+supported, controlled by the array parameter zle_highlight and the ZLE
+special parameter REGION_HIGHLIGHT.
+
+Colouring of prompts is now supported within the shell by prompt
+escapes.  The prompt theme system has been updated.
+
+The completion style accept-exact-dirs has been added.  When true, this
+suppresses attempts to complete non-final directory segments of a filename
+path when the directory exists.  (For example, /home/pws/src/zsh/<TAB>
+discovers that /home/pws/src/zsh exists and leaves the directory component
+alone, while /h/p/s/z/<TAB> completes to /home/pws/src/zsh/... as before.)
+This should improve completion behaviour noticeably in special cases, such
+as remote paths under Cygwin.
 
 Major changes between versions 4.3.5 and 4.3.6
 ----------------------------------------------

@@ -2176,12 +2176,13 @@ in brackets (`tt([...])').
 
 If a `tt(:)' appears in a qualifier list, the remainder of the expression in
 parenthesis is interpreted as a modifier (see noderef(Modifiers)
-in noderef(History Expansion)).  Note that
-each modifier must be introduced by a separate `tt(:)'.  Note also that the
-result after modification does not have to be an existing file.  The
-name of any existing file can be followed by a modifier of the form
-`tt((:..))' even if no actual filename generation is performed.
-Thus:
+in noderef(History Expansion)).  Each modifier must be introduced by a
+separate `tt(:)'.  Note also that the result after modification does not
+have to be an existing file.  The name of any existing file can be followed
+by a modifier of the form `tt((:..))' even if no actual filename generation
+is performed, although note that the presence of the parentheses
+causes the entire expression to be subjected to any global pattern matching
+options such as tt(NULL_GLOB). Thus:
 
 example(ls *(-/))
 
