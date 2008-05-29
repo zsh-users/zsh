@@ -1,3 +1,11 @@
+2008-05-29  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Doc/Zsh/tcpsys.yo, Functions/TCP/tcp_fd_handler:
+	add tcp_on_awol.
+
+	* Tomasz Pala <gotar@polanet.pl>: users/12884:
+	Completion/Unix/Command/{iftop,tcpdump}: new completions
+
 2008-05-27  Peter Stephenson  <pws@csr.com>
 
 	* users/12870: Doc/Zsh/expn.yo: modifiers in glob qualifiers

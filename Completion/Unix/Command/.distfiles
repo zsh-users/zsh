@@ -82,6 +82,7 @@ _gzip
 _iconv
 _id
 _ifconfig
+_iftop
 _imagemagick
 _init_d
 _ip
@@ -184,6 +185,7 @@ _surfraw
 _sysctl
 _tar
 _tardy
+_tcpdump
 _tcptraceroute
 _telnet
 _texinfo

@@ -454,6 +454,26 @@ item(tt(tcp_on_alias) var(alias) var(fd))(
 When an alias is defined, this function will be called with two arguments:
 the name of the alias, and the file descriptor of the corresponding session.
 )
+findex(tcp_on_awol)
+item(tt(tcp_on_awol) var(sess) var(fd))(
+If the function tt(tcp_fd_handler) is handling input from the line
+editor and detects that the file descriptor is no longer reusable,
+by default it removes it from the list of file descriptors handled
+by this method and prints a message.  If the function tt(tcp_on_awol)
+is defined it is called immediately before this point.  It may
+return status 100, which indicates that the normal handling should
+still be performed; any other return status indicates that no further
+action should be taken and the tt(tcp_fd_handler) should return
+immediately with the given status.  Typically the action of tt(tcp_on_awol)
+will be to close the session.
+
+The variable tt(TCP_INVALIDATE_ZLE) will be a non-empty string if it is
+necessary to invalidate the line editor display using `tt(zle -I)' before
+printing output from the function.
+
+(`AWOL' is military jargon for `absent without leave' or some
+variation.  It has no pre-existing technical meaning known to the author.)
+)
 findex(tcp_on_close)
 item(tt(tcp_on_close) var(sess) var(fd))(
 This is called with the name of a session being closed and the file
