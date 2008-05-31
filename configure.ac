@@ -375,7 +375,7 @@ dnl Any takers?
   if test "$host" = mips-sni-sysv4 && test -n "$GCC"; then
     : 
   else
-    zsh_LARGE_FILE_SUPPORT
+    AC_SYS_LARGEFILE
   fi
 fi
 

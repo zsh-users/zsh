@@ -1,3 +1,8 @@
+2008-05-31  Clint Adams  <clint@zsh.org>
+
+	* 25122: aczsh.m4, configure.ac: use AC_SYS_LARGEFILE for better
+	LFS detection.
+
 2008-05-29  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/tcpsys.yo, Functions/TCP/tcp_fd_handler:
