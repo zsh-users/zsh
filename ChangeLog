@@ -1,3 +1,8 @@
+2008-06-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25127: README: note the changes in 25124 and 25126 as
+	an incompatibility.
+
 2008-06-01  Clint Adams  <clint@zsh.org>
 
 	* 25124, 25126: INSTALL, MACHINES, configure.ac, Src/zsh.h: work

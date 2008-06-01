@@ -32,7 +32,14 @@ details, see the documentation.
 Possible incompatibilities
 ---------------------------
 
-Since 4.2:
+This section documents incompatibilities in the shell since the 4.2
+series of releases.
+
+The configuration option --enable-lfs to enable large file support has
+been replaced by autoconf's standard --enable-largefile mechanism.
+As this is usually used whenever necessary, this won't usually
+be noticeable; however, anyone configuring with --disable-lfs
+should configure with --disable-largefile instead.
 
 The configuration option --with-curses-terminfo has been replaced
 by the option --with-term-lib="LIBS" where LIBS is a space-separated
