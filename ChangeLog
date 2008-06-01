@@ -1,3 +1,9 @@
+2008-06-01  Clint Adams  <clint@zsh.org>
+
+	* 25124: INSTALL, MACHINES, configure.ac, Src/zsh.h: work with
+	--(disable|enable)-largefile instead of --(disable|enable)-lfs,
+	since the latter is no longer functional.
+
 2008-05-31  Clint Adams  <clint@zsh.org>
 
 	* 25122: aczsh.m4, configure.ac: use AC_SYS_LARGEFILE for better

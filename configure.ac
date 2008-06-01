@@ -210,12 +210,6 @@ AC_SUBST(zprofile)dnl
 AC_SUBST(zlogin)dnl
 AC_SUBST(zlogout)dnl
 
-dnl Do you want large file support, if available?
-ifdef([lfs],[undefine([lfs])])dnl
-AC_ARG_ENABLE(lfs,
-AC_HELP_STRING([--disable-lfs], [turn off support for large files]),
-[lfs="$enableval"], [lfs=yes])
-
 dnl Do you want dynamically loaded binary modules.
 ifdef([dynamic],[undefine([dynamic])])dnl
 AC_ARG_ENABLE(dynamic,
@@ -367,16 +361,14 @@ test -z "${LDFLAGS+set}" && LDFLAGS= auto_ldflags=1
 AC_PROG_CC
 
 dnl Check for large file support.
-dnl This needs to be done early to get the stuff into the flags.
-if test x$lfs != xno; then
+
 dnl Gross hack for ReliantUNIX - GCC does not understand getconf options
 dnl For now just disable LFS in this case
 dnl Any takers?
-  if test "$host" = mips-sni-sysv4 && test -n "$GCC"; then
-    : 
-  else
-    AC_SYS_LARGEFILE
-  fi
+if test "$host" = mips-sni-sysv4 && test -n "$GCC"; then
+  : 
+else
+  AC_SYS_LARGEFILE
 fi
 
 dnl if the user hasn't specified CFLAGS, then
@@ -913,26 +905,22 @@ main() { return sizeof(ino_t) < 8; }
     AC_DEFINE(INO_T_IS_64_BIT)
   fi
 
-  if test x$lfs != xno -o x$zsh_cv_off_t_is_64_bit = xyes \
+  if test x$enable_largefile != xno -o x$zsh_cv_off_t_is_64_bit = xyes \
   -o $zsh_cv_ino_t_is_64_bit = yes; then
     AC_CACHE_CHECK(if compiler has a 64 bit type, zsh_cv_64_bit_type,
-    [if test x$lfs != xyes && test x$lfs != xno; then
-      zsh_64_BIT_TYPE(${lfs}, zsh_cv_64_bit_type, force)
-     else
-       zsh_64_BIT_TYPE(long long, zsh_cv_64_bit_type)
-       if test "$zsh_cv_64_bit_type" = no; then
-         zsh_64_BIT_TYPE(quad_t, zsh_cv_64_bit_type)
-       fi
-       if test "$zsh_cv_64_bit_type" = no; then
-         zsh_64_BIT_TYPE(__int64_t, zsh_cv_64_bit_type)
-       fi
-       dnl As a last resort, if we know off_t has 64 bits, use that as
-       dnl the 64-bit integer type.  I don't dare try ino_t since there's
-       dnl probably nothing to stop that being unsigned.
-       if test "$zsh_cv_64_bit_type" = no &&
-          test "$zsh_cv_off_t_is_64_bit" = yes; then
-         zsh_64_BIT_TYPE(off_t, zsh_cv_64_bit_type)
-       fi
+    [zsh_64_BIT_TYPE(long long, zsh_cv_64_bit_type)
+     if test "$zsh_cv_64_bit_type" = no; then
+       zsh_64_BIT_TYPE(quad_t, zsh_cv_64_bit_type)
+     fi
+     if test "$zsh_cv_64_bit_type" = no; then
+       zsh_64_BIT_TYPE(__int64_t, zsh_cv_64_bit_type)
+     fi
+     dnl As a last resort, if we know off_t has 64 bits, use that as
+     dnl the 64-bit integer type.  I don't dare try ino_t since there's
+     dnl probably nothing to stop that being unsigned.
+     if test "$zsh_cv_64_bit_type" = no &&
+        test "$zsh_cv_off_t_is_64_bit" = yes; then
+       zsh_64_BIT_TYPE(off_t, zsh_cv_64_bit_type)
      fi])
     if test "$zsh_cv_64_bit_type" != no; then
       AC_DEFINE_UNQUOTED(ZSH_64_BIT_TYPE, $zsh_cv_64_bit_type)

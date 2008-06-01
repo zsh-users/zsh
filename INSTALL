@@ -469,21 +469,18 @@ Support for large files and integers
 ------------------------------------
 
 Some 32-bit systems allow special compilation modes to get around the 2GB
-file size barrier.  This is enabled by default; use --disable-lfs to turn
+file size barrier.  This is enabled by default; use --disable-largefile to turn
 it off.  Not all systems recognize the test used by zsh (via the getconf
 command), so flags may need to be set by hand.  On HP-UX 10.20, zsh has
 been successfully compiled with large file support by configuring with
   CC="cc -Ae" CPPFLAGS="-D_LARGEFILE_SOURCE -D_FILE64" configure \
-  --enable-lfs ...
-You can also specify --enable-lfs together with a value, which will be
-interpreted as the name of a 64-bit integer type, for example
---enable-lfs="long long" (although this type is checked for anyway).
+  --enable-largefile ...
 
-Furthermore, use of --enable-lfs will also enable 64-bit arithmetic for
+Furthermore, use of --enable-largefile will also enable 64-bit arithmetic for
 shell parameters, and anywhere they are used such as in mathematical
 formulae.  This depends only on the shell finding a suitable 64-bit integer
 type; it does not require that support for large files is actually
-enabled.  Hence --enable-lfs is useful on many 32-bit systems
+enabled.  Hence --enable-largefile is useful on many 32-bit systems
 with a suitable compiler such as gcc.
 
 Also note that if `configure' finds out that either of the types off_t or
@@ -577,6 +574,6 @@ site-fndir=directory # the directory where site-specific functions can go
                      # [DATADIR/zsh/site-functions]
 function-subdirs     # if functions will be installed into subdirectories [no]
 dynamic              # allow dynamically loaded binary modules [yes]
-lfs                  # allow configure check for large files [yes]
+largefile            # allow configure check for large files [yes]
 locale               # allow use of locale library [yes]
 

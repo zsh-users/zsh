@@ -33,7 +33,8 @@
 /*
  * Our longest integer type:  will be a 64 bit either if long already is,
  * or if we found some alternative such as long long.
- * Currently we only define this to be longer than a long if --enable-lfs
+ * Currently we only define this to be longer than a long if
+ * --enable-largefile
  * was given.  That enables internal use of 64-bit types even if
  * no actual large file support is present.
  */
