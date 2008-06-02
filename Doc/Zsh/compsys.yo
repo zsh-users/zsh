@@ -1098,6 +1098,20 @@ be allowed to complete tt($foo) to tt($foobar). If the style is set to
 `continue', _expand will add the expansion as a match and the completion
 system will also be allowed to continue.
 )
+kindex(accept-exact-dirs, completion style)
+item(tt(accept-exact-dirs))(
+This is used by filename completion.  Unlike tt(accept-exact) it is
+a boolean.  By default, filename completion examines all components
+of a path to see if there are completions of that component, even if
+the component matches an existing directory.  For example, when
+completion after tt(/usr/bin/), the function examines possible
+completions to tt(/usr).
+
+When this style is true, any prefix of a path that matches an existing
+directory is accepted without any attempt to complete it further.
+Hence, in the given example, the path tt(/usr/bin/) is accepted
+immediately and completion tried in that directory.
+)
 kindex(add-space, completion style)
 item(tt(add-space))(
 This style is used by the tt(_expand) completer.  If it is true (the

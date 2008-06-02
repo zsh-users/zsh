@@ -1,3 +1,8 @@
+2008-06-02  Peter Stephenson  <pws@csr.com>
+
+	* users/12858: Doc/Zsh/compsys.yo: this bit didn't
+	get committed.
+
 2008-06-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25127: README: note the changes in 25124 and 25126 as
