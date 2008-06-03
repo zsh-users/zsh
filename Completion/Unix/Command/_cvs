@@ -561,7 +561,7 @@ _cvs_watchers() {
 _cvs_loadstat() {
   (( $+_cvs_loadstat_status )) && return $_cvs_loadstat_status
 
-  zmodload -F zsh/stat zstat 2>/dev/null
+  zmodload -F zsh/stat b:zstat 2>/dev/null
   (( _cvs_loadstat_status = ! $+builtins[zstat] ))
   return $_cvs_loadstat_status
 }

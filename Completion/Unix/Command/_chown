@@ -50,7 +50,7 @@ case $state in
   files)
     (( $+opt_args[-h] || $+opt_args[--no-dereference] )) || deref="-"
     if (( $+opt_args[--reference] )); then
-      zmodload -F zsh/stat zstat 2>/dev/null
+      zmodload -F zsh/stat b:zstat 2>/dev/null
       usr=$(zstat +uid $opt_args[--reference])
       grp=$(zstat +gid $opt_args[--reference])
       _wanted files expl file _files -g "*($deref^u$usr,$deref^g$grp)" && ret=0

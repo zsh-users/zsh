@@ -46,7 +46,7 @@ done
 
 (( ok )) || return 1
 
-zmodload -F zsh/stat zstat 2>/dev/null || return 1
+zmodload -F zsh/stat b:zstat 2>/dev/null || return 1
 
 dir=${2:+$2/}
 dir=${(Q)dir}

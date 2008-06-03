@@ -1,3 +1,11 @@
+2008-06-03  Peter Stephenson  <pws@csr.com>
+
+	* 25131: Completion/Unix/Command/_chmod,
+	Completion/Unix/Command/_chown, Completion/Unix/Command/_cvs,
+	Completion/Unix/Type/_list_files,
+	Completion/Zsh/Type/_file_descriptors: need b:zstat to
+	get zstat with zmodload -F zsh/stat.
+
 2008-06-02  Peter Stephenson  <pws@csr.com>
 
 	* users/12858: Doc/Zsh/compsys.yo: this bit didn't
