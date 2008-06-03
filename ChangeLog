@@ -1,5 +1,8 @@
 2008-06-03  Peter Stephenson  <pws@csr.com>
 
+	* 25132: Completion/Zsh/Command/_zstyle: numerous still
+	highly incomplete updates.
+
 	* 25131: Completion/Unix/Command/_chmod,
 	Completion/Unix/Command/_chown, Completion/Unix/Command/_cvs,
 	Completion/Unix/Type/_list_files,

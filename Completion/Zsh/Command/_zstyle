@@ -21,10 +21,15 @@ _completers() {
 }
 
 # Assoc array of styles; the values give the possible top-level
-# contexts (currently c for completion, z for zftp or cz for both),
+# contexts:
+#   c   completion
+#   e   line editor
+#   z   zftp
+# or any combination of the above,
 # followed by a colon, followed by a state to enter, empty if none.
 styles=(
   accept-exact		 c:bool
+  accept-exact-dirs	 c:bool
   add-space		 c:bool
   ambiguous              c:bool
   assign-list            c:_parameters
@@ -45,6 +50,7 @@ styles=(
   expand		 c:
   fake-files		 c:fake-files
   fake-parameters	 c:fake-params
+  file-list              c:bool
   file-patterns		 c:filepat
   file-sort              c:fsort
   filter		 c:
@@ -66,7 +72,7 @@ styles=(
   insert-unambiguous	 c:insunambig
   keep-prefix		 c:keep-prefix
   last-prompt		 c:bool
-  list			 c:listwhen
+  list			 ce:listwhen
   list-colors		 c:
   list-grouped		 c:bool
   list-packed		 c:bool
@@ -121,8 +127,29 @@ styles=(
   users			 c:_users
   users-hosts		 c:user-host
   users-hosts-ports	 c:user-host-port
-  verbose		 c:bool
+  verbose		 ce:bool
   word			 c:bool
+
+  auto-previous          e:bool
+  break-keys             e:
+  cursor                 e:
+  edit-buffer            e:bool
+  edit-previous          e:bool
+  insert-kept            e:
+  leave-cursor           e:bool
+  match                  e:
+  prompt                 e:
+  stop-keys              e:
+  toggle                 e:bool
+  url-globbers           e:
+  url-local-schema       e:
+  url-metas              e:
+  url-other-schema       e:
+  url-seps               e:
+  whence                 e:
+  word-chars             e:
+  word-style             e:word-style
+  word-context           e:
 
   chpwd			 z:bool
   progress		 z:progress
@@ -148,14 +175,14 @@ taglist=(
 )
 
 _arguments -C \
-  '(: -)-L[output in form of zstyle commands]' \
+  '(-)-L[output in form of zstyle commands]' \
   '(: -)-d[delete style definitions]:context pattern:->patterns:*:styles:->pstyles' \
   '(-)-e[value is evaluated when style is looked up]' \
   ':context:->contexts' ':style:->styles' '*:argument:->style-arg'
 
 while (( $#state )); do
   case "$state[1]" in
-    contexts)
+    (contexts)
       if [[ ! -prefix :*: ]]; then
 	_wanted contexts expl context compadd -P : -S : completion zftp
       elif compset -P :completion:; then
@@ -174,75 +201,87 @@ while (( $#state )); do
       fi
       ;;
 
-    patterns)
+    (patterns)
       zstyle -g patterns
       _wanted contexts expl 'context pattern' compadd -a patterns
       ;;
-    
-    pstyles)
+
+    (pstyles)
       zstyle -g pstyles ${(Q)${(M)opt_args[-d]#*[^\\]:}%:}
       _wanted styles expl style compadd -a pstyles
     ;;
 
-    styles)
+    (styles)
       # Get the top-level context we're completing for, if any.
-      if [[ $line[1] = :(completion|zftp):* ]]; then
-	ctop=${line[1][2]}
-      else
-        ctop=cz
-      fi
+      case $line[1] in
+	(:completion:*)
+	ctop=c
+	;;
+
+	(:zftp:*)
+	ctop=z
+	;;
+
+	(:zle:*)
+	ctop=e
+	;;
+
+	(*)
+        ctop=cez
+	;;
+      esac
       _wanted styles expl style \
          compadd -M 'r:|-=* r:|=*' -k "styles[(R)[^:]#[$ctop][^:]#:*]"
       ;;
-      
-    style-arg)
+
+    (style-arg)
       state+=( "${styles[$line[2]]#*:}" )
       ;;
 
-    argument)
+    (argument)
       _message -e arguments argument
       ;;
-    
-    bool) 
+
+    (bool)
       _wanted values expl boolean compadd true false
       ;;
 
-    boolauto) 
+    (boolauto)
       _wanted values expl boolean \
           compadd true false auto select search search-backward interactive
       ;;
 
-    cmdorcont)
+    (cmdorcont)
       _alternative -O suf \
         'commands:command:_command ' \
         'contexts:context:(-array-value- -brace-parameter- -command- -condition- -math- -parameter- -redirect- -subscript- -value-)'
      ;;
 
-    cursor)
+    (cursor)
       _wanted values expl 'cursor positioning' compadd complete key default
       ;;
 
-    completer)
+    (completer)
       _wanted values expl completer _completers -p
       ;;
 
-    fsort)
+    (fsort)
       _wanted values expl 'how to sort files' \
 	compadd name size links time date modification access inode change reverse
       ;;
 
-    function)
+    (function)
       _wanted control-function expl 'control function' \
           compadd predict-on all-matches
       ;;
 
-    functions)
+    (functions)
       _wanted comp-widget expl 'completion widget' \
           compadd $suf - all-matches complete-debug complete-tag \
 	  correct-word expand-word expand-alias-word history-words
       ;;
 
-    user-host-port)
+    (user-host-port)
       if [[ $PREFIX != *[@:]* ]]; then
 	_users -S @
       elif [[ $PREFIX = *[@:]*[[@:]* ]]; then
@@ -254,7 +293,7 @@ while (( $#state )); do
       fi
       ;;
 
-    host-port)
+    (host-port)
       if [[ $PREFIX != *:* ]]; then
 	_hosts -S :
       else
@@ -263,36 +302,36 @@ while (( $#state )); do
       fi
       ;;
 
-    listwhen)
+    (listwhen)
       _wanted values expl 'when to list completions' \
 	compadd always never sometimes
       ;;
 
-    packageset)
+    (packageset)
       _wanted values expl 'default package set' \
         compadd available installed uninstalled
       ;;
 
-    progress)
+    (progress)
       _wanted values expl 'progress meter style' \
         compadd none bar percent
       ;;
 
-    sdirs)
+    (sdirs)
       _wanted values expl 'whether to complete . or ..' \
         compadd true false ..
       ;;
 
-    stop)
+    (stop)
       _wanted values expl 'when to insert matches' \
 	compadd true false verbose
       ;;
 
-    tag)
+    (tag)
       _wanted tags expl tag compadd $suf -a taglist
       ;;
 
-    tag-order)
+    (tag-order)
       if compset -P '*:*:'; then
         _message -e descriptions description
       elif compset -P '*:'; then
@@ -304,7 +343,7 @@ while (( $#state )); do
       fi
       ;;
 
-    filepat)
+    (filepat)
       if compset -P '*:*:'; then
         _message -e descriptions description
       elif compset -P '*:'; then
@@ -314,7 +353,7 @@ while (( $#state )); do
       fi
       ;;
 
-    user-host)
+    (user-host)
       if [[ $PREFIX = *[@:]* ]]; then
 	compset -P '*[@:]'
 	_hosts
@@ -323,32 +362,32 @@ while (( $#state )); do
       fi
       ;;
 
-    ignorepar)
+    (ignorepar)
       _wanted values expl 'which parents to ignore' \
         compadd parent pwd .. directory
       ;;
 
-    single-ignored)
+    (single-ignored)
       _wanted values expl 'how to handle a single ignored match' \
           compadd - show menu
       ;;
 
-    command)
+    (command)
       shift 3 words
       (( CURRENT -= 3 ))
       _normal
       ;;
 
-    insert-ids)
+    (insert-ids)
       _wanted values expl 'when to insert process IDs' \
           compadd - menu single longer
       ;;
 
-    fake-files)
+    (fake-files)
       _message -e fakes 'prefix and names'
       ;;
 
-    fake-params)
+    (fake-params)
       if compset -P '*:'; then
 	_wanted values expl 'parameter type' compadd scalar array integer
       else
@@ -358,43 +397,47 @@ while (( $#state )); do
       fi
       ;;
 
-    ignline) 
+    (ignline)
       _wanted values expl 'ignore strings on the line' compadd true false current current-shown other
       ;;
 
-    keep-prefix) 
+    (keep-prefix)
       _wanted values expl 'keep prefix' compadd true false changed
       ;;
 
-    match-orig) 
+    (match-orig)
       _wanted values expl "match without inserting \`*'" compadd only both
       ;;
 
-    oldmatches) 
+    (oldmatches)
       _wanted values expl 'use list of old matches' compadd true false only
       ;;
 
-    insunambig) 
+    (insunambig)
       _wanted values expl 'insert unambiguous string' compadd true false pattern
       ;;
 
-    preserve-prefix)
+    (preserve-prefix)
       _message -e prefixes 'pattern matching prefix to keep'
       ;;
 
-    separator)
+    (separator)
       _message -e separators 'separator string'
       ;;
 
-    max-matches-width)
+    (max-matches-width)
       _message -e numbers 'maximum display width for matches'
       ;;
 
-    urgh) 
+    (urgh)
       _wanted values expl no compadd no false off 0
       ;;
 
-    _*)
+    (word-style)
+      _wanted word-styles expl 'word style' compadd normal shell space
+      ;;
+
+    (_*)
       ${=state[1]} $suf
       ;;
   esac
