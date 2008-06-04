@@ -1,5 +1,7 @@
 2008-06-04  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Unix/Command/.distfiles: missing files.
+
 	* unposted: Completion/Unix/Type/_path_files: another typo.
 
 	* 25130 slightly tweaked for typos:

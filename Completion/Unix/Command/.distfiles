@@ -69,6 +69,7 @@ _getmail
 _git
 _global
 _gnu_generic
+_gnupod
 _gnutls
 _gpg
 _gphoto2
@@ -176,6 +177,7 @@ _sort
 _spamassassin
 _sqsh
 _ssh
+_stgit
 _strip
 _stty
 _su
