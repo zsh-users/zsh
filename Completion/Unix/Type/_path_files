@@ -595,7 +595,7 @@ for prepath in "$prepaths[@]"; do
 	    # back up the path.
 	    tmp1=("${(@)tmp1%%/*}")
 	    _list_files tmp1 "$prepath$realpath$testpath"
-	    compadd -U -Qf "$mopts[@]" -p "$IPREFIX$linepath$tmp2"
+	    compadd -U -Qf "$mopts[@]" -p "$IPREFIX$linepath$tmp2" \
 	            -s "/${tmp3#*/}$ISUFFIX" \
 	            -W "$prepath$realpath$testpath" \
 		    "$pfxsfx[@]" -M "r:|/=* r:|=*" \
