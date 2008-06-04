@@ -1,3 +1,10 @@
+2008-06-04  Peter Stephenson  <pws@csr.com>
+
+	* 25130 slightly tweaked for typos:
+	Completion/Unix/Type/_path_files: changes to use -U flag
+	to compadd so that spelling corrections in non-final
+	path segments are accepted.
+
 2008-06-03  Peter Stephenson  <pws@csr.com>
 
 	* 25132: Completion/Zsh/Command/_zstyle: numerous still
@@ -16,7 +23,7 @@
 
 2008-06-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 25127: README: note the changes in 25124 and 25126 as
+	* 25127: README: note the changes in 25122, 25124 and 25126 as
 	an incompatibility.
 
 2008-06-01  Clint Adams  <clint@zsh.org>
