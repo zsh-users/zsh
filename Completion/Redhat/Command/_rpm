@@ -160,7 +160,7 @@ _rpm () {
 	'(--replacepkgs --replacefiles --oldpackage)--force' \
 	'(--force)--'{replacefiles,replacepkgs} \
 	--{aid,allfiles,badreloc,excludedocs,ignorearch,ignoreos,ignoresize,includedocs,justdb,percent,repackage,test} \
-	--np{digest,signature,deps,suggest,order,pre,post,preun,postun,trigger{s,in,un,postun}} \
+	--no{digest,signature,deps,suggest,order,pre,post,preun,postun,trigger{s,in,un,postun}} \
 	'(--nopre --nopost --nopreun --nopostun)--noscripts' \
 	'*:pkg file:->package_file' && ret=0
       ;;
