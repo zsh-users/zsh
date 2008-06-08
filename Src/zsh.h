@@ -1307,6 +1307,48 @@ struct patprog {
 #define PAT_HAS_EXCLUDP	0x0800	/* (internal): top-level path1~path2. */
 #define PAT_LCMATCHUC   0x1000  /* equivalent to setting (#l) */
 
+/*
+ * Special match types used in character classes.  These
+ * are represented as tokens, with Meta added.  The character
+ * class is represented as a metafied string, with only these
+ * tokens special.  Note that an active leading "!" or "^" for
+ * negation is not part of the string but is flagged in the
+ * surrounding context.
+ *
+ * These types are also used in character and equivalence classes
+ * in completion matching.
+ *
+ * This must be kept ordered by the array colon_stuffs in pattern.c.
+ */
+/* Special value for first definition */
+#define PP_FIRST  1
+/* POSIX-defined types:  [:alpha:] etc. */
+#define PP_ALPHA  1
+#define PP_ALNUM  2
+#define PP_ASCII  3
+#define PP_BLANK  4
+#define PP_CNTRL  5
+#define PP_DIGIT  6
+#define PP_GRAPH  7
+#define PP_LOWER  8
+#define PP_PRINT  9
+#define PP_PUNCT  10
+#define PP_SPACE  11
+#define PP_UPPER  12
+#define PP_XDIGIT 13
+/* Zsh additions:  [:IDENT:] etc. */
+#define PP_IDENT  14
+#define PP_IFS    15
+#define PP_IFSSPACE   16
+#define PP_WORD   17
+/* Special value for last definition */
+#define PP_LAST   17
+
+/* Unknown type.  Not used in a valid token. */
+#define PP_UNKWN  18
+/* Range: token followed by the (possibly multibyte) start and end */
+#define PP_RANGE  19
+
 /* Globbing flags: lower 8 bits gives approx count */
 #define GF_LCMATCHUC	0x0100
 #define GF_IGNCASE	0x0200

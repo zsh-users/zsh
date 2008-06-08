@@ -162,11 +162,48 @@ struct cmatcher {
 #define CMF_RIGHT 4
 #define CMF_INTER 8
 
+/*
+ * Types of cpattern structure.
+ * Note freecpattern() assumes any <= CPAT_EQUIV have string.
+ */
+enum {
+    CPAT_CCLASS,		/* [...]: ordinary character class */
+    CPAT_NCLASS,		/* [!...]: ordinary character class, negated */
+    CPAT_EQUIV,			/* {...}: equivalence class */
+    CPAT_ANY,			/* ?: any character */
+    CPAT_CHAR			/* Single character given explicitly */
+};
+
+/*
+ * A pattern element in a matcher specification.
+ * Unlike normal patterns this only presents one character in
+ * either the test completion or the word on the command line.
+ */
 struct cpattern {
     Cpattern next;		/* next sub-pattern */
-    unsigned char tab[256];	/* table of matched characters */
-    int equiv;			/* if this is a {...} class */
+    int tp;			/* type of object as above */
+    union {
+	char *str;		/* if a character class, the objects
+				 * in it in a similar form to normal
+				 * pattern matching (a metafied string
+				 * with tokens).
+				 * Note the allocated length may be longer
+				 * than the null-terminated string.
+				 */
+	int chr;		/* if a single character, it
+				 * TODO: eventually should be a
+				 * convchar_t.
+				 */
+    } u;
 };
+
+/*
+ * For now this just handles single-byte characters.
+ * TODO: this will change.
+ */
+#define PATMATCHRANGE(r, c, ip, mtp)	patmatchrange(r, c, ip, mtp)
+#define PATMATCHINDEX(r, i, cp, mtp)	patmatchindex(r, i, cp, mtp)
+#define CONVCAST(c)	(c)
 
 /* This is a special return value for parse_cmatcher(), *
  * signalling an error. */

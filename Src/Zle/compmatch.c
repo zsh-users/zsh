@@ -30,37 +30,68 @@
 #include "complete.mdh"
 #include "compmatch.pro"
 
-/* This compares two cpattern lists and returns non-zero if they are
- * equal. */
+/*
+ * This compares two cpattern lists and returns non-zero if they are
+ * equal (N.B. opposite sense to usual *cmp()).
+ *
+ * The old version of this didn't worry about whether the lists
+ * were the same length.  This one does.  It's hard to see how
+ * that can be wrong even if it's unnecessary.
+ */
 
 /**/
 static int
-cmp_cpatterns(Cpattern a, Cpattern b)
+cpatterns_same(Cpattern a, Cpattern b)
 {
     while (a) {
-	if (a->equiv != b->equiv || memcmp(a->tab, b->tab, 256))
+	if (!b)
 	    return 0;
+	if (a->tp != b->tp)
+	    return 0;
+	switch (a->tp) {
+	case CPAT_CCLASS:
+	case CPAT_NCLASS:
+	case CPAT_EQUIV:
+	    /*
+	     * Patterns can actually match the same even if
+	     * the range strings don't compare differently, but
+	     * I don't think we need to handle that subtlety.
+	     */
+	    if (strcmp(a->u.str, b->u.str) != 0)
+		return 0;
+	    break;
+
+	case CPAT_CHAR:
+	    if (a->u.chr != b->u.chr)
+		return 0;
+	    break;
+
+	default:
+	    /* here to silence compiler */
+	    break;
+	}
+
 	a = a->next;
 	b = b->next;
     }
-    return 1;
+    return !b;
 }
 
 /* This compares two cmatchers and returns non-zero if they are equal. */
 
 /**/
 static int
-cmp_cmatchers(Cmatcher a, Cmatcher b)
+cmatchers_same(Cmatcher a, Cmatcher b)
 {
     return (a == b ||
 	    (a->flags == b->flags &&
 	     a->llen == b->llen && a->wlen == b->wlen &&
-	     (!a->llen || cmp_cpatterns(a->line, b->line)) &&
-	     (a->wlen <= 0 || cmp_cpatterns(a->word, b->word)) &&
+	     (!a->llen || cpatterns_same(a->line, b->line)) &&
+	     (a->wlen <= 0 || cpatterns_same(a->word, b->word)) &&
 	     (!(a->flags & (CMF_LEFT | CMF_RIGHT)) ||
 	      (a->lalen == b->lalen && a->ralen == b->ralen &&
-	       (!a->lalen || cmp_cpatterns(a->left, b->left)) &&
-	       (!a->ralen || cmp_cpatterns(a->right, b->right))))));
+	       (!a->lalen || cpatterns_same(a->left, b->left)) &&
+	       (!a->ralen || cpatterns_same(a->right, b->right))))));
 }
 
 /* Add the given matchers to the bmatcher list. */
@@ -97,7 +128,7 @@ update_bmatchers(void)
 	t = 0;
 	for (ms = mstack; ms && !t; ms = ms->next)
 	    for (mp = ms->matcher; mp && !t; mp = mp->next)
-		t = cmp_cmatchers(mp, p->matcher);
+		t = cmatchers_same(mp, p->matcher);
 
 	p = p->next;
 	if (!t) {
@@ -449,7 +480,7 @@ add_match_sub(Cmatcher m, char *l, int ll, char *w, int wl)
     }
 }
 
-/* This tests if the string from the line l matches the word w. In bp
+/* This tests if the string from the line l matches the word w. In *bpp
  * the offset for the brace is returned, in rwlp the length of the
  * matched prefix or suffix, not including the stuff before or after
  * the last anchor is given. When sfx is non-zero matching is done from
@@ -1113,53 +1144,328 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
     return r;
 }
 
-/* Check if the given pattern matches the given string.             *
- *  p and  s are either anchor or line pattern and string;
- * wp and ws are word (candidate) pattern and string
- *
- * If only one pattern is given, we just check if characters match
- * If both line and word are given, we check that characters match
- * for {...} classes by comparing relative numbers in sequence.
- *
- * Patterns and strings are always passed in pairs, so it is enough
- * to check for non-NULL wp. p should always be present.
+
+/*
+ * Guts of a single pattern for pattern_match().
+ * Return non-zero if match successful.
+ * If the class was an equivalence, return 1 + the index into
+ * the equivalence class (see pattern.c for how this is calculated).
  */
 
 /**/
 mod_export int
-pattern_match(Cpattern p, char *s, Cpattern wp, char *ws)
+pattern_match1(Cpattern p, int c, int *mtp)
 {
-    unsigned char c;
-    unsigned char wc;
+    /* TODO: should become convchar_t */
+    int ind;
 
-    while (p && wp && *s && *ws) {
-	c = p->tab[*((unsigned char *) s)];
-	wc = wp->tab[*((unsigned char *) ws)];
+    *mtp = 0;
+    switch (p->tp) {
+    case CPAT_CCLASS:
+	return PATMATCHRANGE(p->u.str, CONVCAST(c), NULL, NULL);
 
-	if (!c || !wc || c != wc)
+    case CPAT_NCLASS:
+	return !PATMATCHRANGE(p->u.str, CONVCAST(c), NULL, NULL);
+
+    case CPAT_EQUIV:
+	if (PATMATCHRANGE(p->u.str, CONVCAST(c), &ind, mtp))
+	    return ind + 1;
+	else
 	    return 0;
 
-	s++;
-	ws++;
+    case CPAT_ANY:
+	return 1;
+
+    case CPAT_CHAR:
+	return (p->u.chr == c);
+
+    default:
+	DPUTS(1, "bad matcher pattern type");
+	return 0;
+    }
+}
+
+
+/*
+ * Use an equivalence to deduce the line character from the word, or
+ * vice versa.  (If vice versa, then "line" and "word" are reversed
+ * in what follows.  The logic is symmetric.)
+ * lp is the line pattern.
+ * wind is the index returned by a pattern match on the word pattern,
+ * with type wmtp.
+ * wchr is the word character.
+ * Return -1 if no matching character, else the character.
+ *
+ * Only makes sense if lp->tp == CPAT_EQUIV and the (unseen) word
+ * pattern also has that type.
+ */
+static int
+pattern_match_equivalence(Cpattern lp, int wind, int wmtp, int wchr)
+{
+    int lchr, lmtp;
+
+    if (!PATMATCHINDEX(lp->u.str, wind-1, &lchr, &lmtp)) {
+	/*
+	 * No equivalent.  No possible match; give up.
+	 */
+	return -1;
+    }
+    /*
+     * If we matched an exact character rather than a range
+     * type, return it.
+     */
+    if (lchr != -1)
+	return lchr;
+
+    /*
+     * Check the match types.  We may want a case-changed
+     * version of the word character.
+     */
+    if (wmtp == PP_UPPER && lmtp == PP_LOWER)
+	return tulower(wchr);
+    else if (wmtp == PP_LOWER && lmtp == PP_UPPER)
+	return tuupper(wchr);
+    else if (wmtp == lmtp) {
+	/*
+	 * Be lenient and allow identical replacements
+	 * for character classes, although in fact this
+	 * doesn't give special functionality for equivalence
+	 * classes.
+	 */
+	return wchr;
+    } else {
+	/*
+	 * Non-matching generic types; this can't work.
+	 */
+	return -1;
+    }
+}
+
+/*
+ * Check if the given pattern matches the given string.
+ *  p and  s are either anchor or line pattern and string;
+ * wp and ws are word (candidate) pattern and string
+ *
+ * If only one pattern is given, we just check if characters match.
+ * If both line and word are given, we check that characters match
+ * for {...} classes by comparing positions in the strings.
+ *
+ * Patterns and strings are always passed in pairs, so it is enough
+ * to check for non-NULL wp. p should always be present.
+ *
+ * If prestrict is not NULL, it is a chain of patterns at least as long
+ * as the line string.  In this case we are still assembling the line at
+ * s (which has been allocated but doesn't yet contain anything useful)
+ * and must continue to do so as we go along; prestrict gives
+ * restrictions on the line character to be applied along side the other
+ * patterns.  In the simple case a restriction is a character to be put
+ * in place; otherwise it is a set of possible characters and we have to
+ * deduce an actual matching character.  Note prestrict is never an
+ * equivalence class.  In extreme cases we can't deduce a unique
+ * character; then the match fails.
+ */
+
+/**/
+mod_export int
+pattern_match_restrict(Cpattern p, char *s, Cpattern wp, char *ws,
+		       Cpattern prestrict)
+{
+    int c, ind;
+    int wc, wind;
+    int len, wlen, mt, wmt;
+
+    while (p && wp && *s && *ws) {
+	/* First test the word character */
+	if (*ws == Meta) {
+	    wc = STOUC(ws[1]) ^ 32;
+	    wlen = 2;
+	} else {
+	    wc = STOUC(*ws);
+	    wlen = 1;
+	}
+	wind = pattern_match1(wp, wc, &wmt);
+	if (!wind)
+	    return 0;
+
+	/*
+	 * Now the line character; deal with the case where
+	 * we don't yet have it, only a restriction on it.
+	 */
+	if (prestrict) {
+	    if (prestrict->tp == CPAT_CHAR) {
+		/*
+		 * Easy case: restricted to an exact character on
+		 * the line.  Procede as normal.
+		 */
+		c = prestrict->u.chr;
+	    } else {
+		if (p->tp == CPAT_CHAR) {
+		    /*
+		     * Normal line pattern is an exact character:  as
+		     * long as this matches prestrict, we can proceed
+		     * as usual.
+		     */
+		    c = p->u.chr;
+		} else if (p->tp == CPAT_EQUIV) {
+		    /*
+		     * An equivalence, so we can deduce the character
+		     * backwards from the word pattern and see if it
+		     * matches prestrict.
+		     */
+		    if ((c = pattern_match_equivalence(p, wind, wmt, wc)) == -1)
+			return 0;
+		} else {
+		    /*
+		     * Not an equivalence, so that means we must match
+		     * the word (not just the word pattern), so grab it
+		     * and make sure it fulfills our needs.  I think.
+		     * Not 100% sure about that, but what else can
+		     * we do?  We haven't actually been passed a string
+		     * from the command line.
+		     */
+		    c = wc;
+		}
+		/* Character so deduced must match the restriction. */
+		if (!pattern_match1(prestrict, c, &mt))
+		    return 0;
+	    }
+	    len = imeta(c) ? 2 : 1;
+	} else {
+	    /* We have the character itself. */
+	    if (*s == Meta) {
+		c = STOUC(s[1]) ^ 32;
+		len = 2;
+	    } else {
+		c = STOUC(*s);
+		len = 1;
+	    }
+	}
+	/*
+	 * If either is "?", they match each other; no further tests.
+	 * Apply this even if the character wasn't convertable;
+	 * there's no point trying to be clever in that case.
+	 */
+	if (p->tp != CPAT_ANY || wp->tp != CPAT_ANY)
+	{
+	    ind = pattern_match1(p, c, &mt);
+	    if (!ind)
+		return 0;
+	    if (ind != wind)
+		return 0;
+	    if (mt != wmt) {
+		/*
+		 * Special case if matching lower vs. upper or
+		 * vice versa.  The transformed characters must match.
+		 * We don't need to check the transformation is
+		 * the appropriate one for each character separately,
+		 * since that was done in pattern_match1(), so just
+		 * compare lower-cased versions of both.
+		 */
+		if ((mt == PP_LOWER || mt == PP_UPPER) &&
+		    (wmt == PP_LOWER || wmt == PP_UPPER)) {
+		    if (tulower(c) != tulower(wc))
+			return 0;
+		} else {
+		    /* Other different classes can't match. */
+		    return 0;
+		}
+	    }
+	}
+
+	if (prestrict) {
+	    /* We need to assemble the line */
+	    if (imeta(c)) {
+		*s++ = Meta;
+		*s++ = c ^ 32;
+	    } else {
+		*s++ = c;
+	    }
+	    prestrict = prestrict->next;
+	} else
+	    s += len;
+	ws += wlen;
 	p = p->next;
 	wp = wp->next;
     }
 
     while (p && *s) {
-	if (!p->tab[*((unsigned char *) s)])
+	if (prestrict) {
+	    /*
+	     * As above, but with even less info to go on.
+	     * (Can this happen?)  At least handle the cases where
+	     * one of our patterns has given us a specific character.
+	     */
+	    if (prestrict->tp == CPAT_CHAR) {
+		c = prestrict->u.chr;
+	    } else {
+		if (p->tp == CPAT_CHAR) {
+		    c = p->u.chr;
+		} else {
+		    /*
+		     * OK.  Here we are in a function with just a line
+		     * pattern and another pattern to restrict the
+		     * characters that can go on the line, and no actual
+		     * characters.  We're matching two patterns against
+		     * one another to generate a character to insert.
+		     * This is a bit too psychedelic, so I'm going to
+		     * bale out now.  See you on the ground.
+		     */
+		    return 0;
+		}
+		if (!pattern_match1(prestrict, c, &mt))
+		    return 0;
+	    }
+	} else {
+	    if (*s == Meta) {
+		c = STOUC(s[1]) ^ 32;
+		len = 2;
+	    } else {
+		c = STOUC(*s);
+		len = 1;
+	    }
+	}
+	if (!pattern_match1(p, c, &mt))
 	    return 0;
 	p = p->next;
-	s++;
+	if (prestrict) {
+	    if (imeta(c)) {
+		*s++ = Meta;
+		*s++ = c ^ 32;
+	    } else {
+		*s++ = c;
+	    }
+	    prestrict = prestrict->next;
+	} else
+	    s += len;
     }
 
     while (wp && *ws) {
-	if (!wp->tab[*((unsigned char *) ws)])
+	/* No funny business when we only have the word pattern. */
+	if (*ws == Meta) {
+	    wc = STOUC(ws[1]) ^ 32;
+	    wlen = 2;
+	} else {
+	    wc = STOUC(*ws);
+	    wlen = 1;
+	}
+	if (!pattern_match1(wp, wc, &wmt))
 	    return 0;
 	wp = wp->next;
-	ws++;
+	ws += wlen;
     }
 
     return 1;
+}
+
+/*
+ * The usual version of pattern matching, without the line string
+ * being handled by restriction.
+ */
+/**/
+mod_export int
+pattern_match(Cpattern p, char *s, Cpattern wp, char *ws)
+{
+    return pattern_match_restrict(p, s, wp, ws, NULL);
 }
 
 /* This splits the given string into a list of cline structs, separated
@@ -1256,11 +1562,11 @@ bld_parts(char *str, int len, int plen, Cline *lp, Cline *lprem)
     return ret;
 }
 
-/* This builds all the possible line patterns for the pattern pat in the
- * buffer line. Initially line is the same as lp, but during recursive
- * calls lp is incremented for storing successive characters. Whenever
- * a full possible string is build, we test if this line matches the
- * string given by wlen and word.
+
+/*
+ * This builds all the possible line patterns for the pattern pat in the
+ * buffer line.  Then we test if this line matches the string given by
+ * wlen and word.
  *
  * wpat contains pattern that matched previously
  * lpat contains the pattern for line we build
@@ -1269,91 +1575,297 @@ bld_parts(char *str, int len, int plen, Cline *lp, Cline *lprem)
  *
  * The return value is the length of the string matched in the word, it
  * is zero if we couldn't build a line that matches the word.
+ *
+ * TODO: a lot of the nastiness associated with variable string
+ * lengths can go when we switch to wide characters.  (Why didn't
+ * I just keep line unmetafied and metafy into place at the end?  Er...)
  */
-
 
 /**/
 static int
-bld_line(Cpattern wpat, Cpattern lpat, char *line, char *lp,
-	 char *mword, char *word, int wlen, int sfx)
+bld_line(Cmatcher mp, char **linep, char *mword, char *word, int wlen, int sfx)
 {
-    if (lpat) {
-	/* Still working on the pattern. */
+    Cpattern lpat = mp->line;
+    Cpattern wpat = mp->word;
+    Cpattern curgenpat;
+    VARARR(struct cpattern, genpatarr, mp->llen);
+    Cmlist ms;
+    int llen, rl;
+    char *oword = word, *line = *linep;
 
-	int i, l;
-	unsigned char c = 0;
-
-	/* Get the number of the character for a correspondence class
-	 * if it has a corresponding class. */
-	if (lpat->equiv)
-	    if (wpat && *mword) {
-		c = wpat->tab[STOUC(*mword)];
-		wpat = wpat->next;
-		mword++;
+    /*
+     * Loop over all characters.  At this stage, line is an empty
+     * space of length llen (not counting the null byte) which we assemble as
+     * we go along.
+     *
+     * However, first we need to know what characters can appear at each
+     * point in the line.  For this we assemble an list genpatarr of the
+     * same length as the line.  (It's convenient to store this as an
+     * array but it's linked as a list, too.)  If there are equivalences
+     * we use mword to derive the equivalent character; when we've
+     * reached the end of mword, equivalences are treated just like
+     * ordinary character classes.  For character classes we just attach
+     * the class to the genpatarr list and apply it as a restriction
+     * when we finally match the line against the set of matchers.
+     */
+    curgenpat = genpatarr;
+    while (lpat) {
+	int wchr = (*mword == Meta) ? STOUC(mword[1]) ^ 32 : STOUC(*mword);
+	int wmtp, wind;
+	/*
+	 * If the line pattern is an equivalence, query wpat to find the
+	 * word part of the equivalence.  If we don't find one we don't try
+	 * equivalencing but use lpat as an ordinary match.  (It's not
+	 * entirely clear to me this is the correct behaviour on a
+	 * failed character match within the equivalence, but that was
+	 * the behaviour of the old logic that this replaces.)
+	 */
+	if (lpat->tp == CPAT_EQUIV && wpat && *mword) {
+	    wind = pattern_match1(wpat, wchr, &wmtp);
+	    wpat = wpat->next;
+	    mword += (*mword == Meta) ? 2 : 1;
+	} else
+	    wind = 0;
+	if (wind) {
+	    /*
+	     * Successful match for word side of equivalence.
+	     * Find the line equivalent.
+	     */
+	    int lchr;
+	    if ((lchr = pattern_match_equivalence(lpat, wind, wmtp, wchr))
+		== -1) {
+		/*
+		 * No equivalent.  No possible match; give up.
+		 */
+		return 0;
 	    }
-
-
-	/* Walk through the table in the pattern and try the characters
-	 * that may appear in the current position. */
-	for (i = 0; i < 256; i++)
-	    if ((lpat->equiv && c) ? (c == lpat->tab[i]) : lpat->tab[i]) {
-		*lp = i;
-		/* We stored the character, now call ourselves to build
-		 * the rest. */
-		if ((l = bld_line(wpat, lpat->next, line, lp + 1,
-				  mword, word, wlen, sfx)))
-		    return l;
+	    /*
+	     * We now have an exact character to match,
+	     * so make up a pattern element for it.
+	     */
+	    curgenpat->tp = CPAT_CHAR;
+	    curgenpat->u.chr = lchr;
+	} else {
+	    /*
+	     * Not an equivalence class, so we just keep the
+	     * test in the lpat as it is.
+	     */
+	    curgenpat->tp = lpat->tp;
+	    if (lpat->tp == CPAT_CHAR)
+		curgenpat->u.chr = lpat->u.chr;
+	    else if (lpat->tp != CPAT_ANY) {
+		/*
+		 * The string isn't modified and is only needed in calls from
+		 * this function, so we don't even need to copy it.
+		 */
+		curgenpat->u.str = lpat->u.str;
 	    }
-    } else {
-	/* We reached the end, i.e. the line string is fully build, now
-	 * see if it matches the given word. */
+	}
+	lpat = lpat->next;
+	/*
+	 * This linked list is defined above as an array.
+	 * We could get away with just keeping it as an array
+	 * and passing it down as such, but that's a bit icky
+	 * since the generic linkage of Cpatterns is as a linked
+	 * list and we should keep our local memory management
+	 * problems to ourselvess.
+	 */
+	if (lpat)
+	    curgenpat->next = curgenpat+1;
+	else
+	    curgenpat->next = NULL;
+	curgenpat++;
+    }
 
-	Cmlist ms;
-	Cmatcher mp;
-	int l = lp - line, t, rl = 0, ind, add;
+    /*
+     * We now know how to match the word with the line patterns; let's
+     * see if it does.  We will use the information in curgenpat if we
+     * are successful to work out what character goes on the line.  This
+     * is a bit hairy, as in "the Yeti is a creature that is a bit
+     * hairy".
+     */
+    llen = mp->llen;
+    rl = 0;
 
-	/* Quick test if the strings are exactly the same. */
-	if (l == wlen && !strncmp(line, word, l))
-	    return l;
+    if (sfx)
+    {
+	/*
+	 * We need to work backwards from the end of both the
+	 * word and the line strings.
+	 *
+	 * Position at the end of the word by counting characters.
+	 */
+	int l = wlen;
+	while (l--)
+	    word += (*word == Meta) ? 2 : 1;
+
+	/*
+	 * We construct the line from the end.  We've left
+	 * enough space for possible Meta's.
+	 */
+	line += 2 * llen;
+	*line = '\0';
+	curgenpat = genpatarr + llen;
+    } else
+	curgenpat = genpatarr;
+
+    /* we now reuse mp, lpat, wpat for the global matchers */
+    while (llen && wlen) {
+	int wchr, wmtp;
+	char *wp;
+	Cpattern tmpgenpat;
 
 	if (sfx) {
-	    line = lp; word += wlen;
-	    ind = -1; add = -1;
-	} else {
-	    ind = 0; add = 1;
-	}
-	/* We loop through the whole line string built. */
-	while (l && wlen) {
-	    if (word[ind] == line[ind]) {
-		/* The same character in both strings, skip over. */
-		line += add; word += add;
-		l--; wlen--; rl++;
+	    if (word > oword + 1 && word[-2] == Meta)
+		wp = word - 2;
+	    else
+		wp = word - 1;
+	    curgenpat--;
+	} else
+	    wp = word;
+	if (*wp == Meta)
+	    wchr = STOUC(wp[1]) ^ 32;
+	else
+	    wchr = STOUC(*wp);
+	if (pattern_match1(curgenpat, wchr, &wmtp))
+	{
+	    int lchr;
+	    /*
+	     * We can match the line character directly with the word
+	     * character.  If the line character is a fixed one,
+	     * keep it, since we went to all that trouble above,
+	     * else if it's generic, keep the word character,
+	     * since we have no choice.
+	     */
+	    if (curgenpat->tp == CPAT_CHAR)
+		lchr = curgenpat->u.chr;
+	    else
+		lchr = wchr;
+	    if (imeta(lchr)) {
+		if (sfx)
+		    line -= 2;
+		line[0] = Meta;
+		line[1] = lchr ^ 32;
+		if (!sfx)
+		    line += 2;
 	    } else {
-		t = 0;
-		for (ms = bmatchers; ms && !t; ms = ms->next) {
-		    mp = ms->matcher;
-		    if (mp && !mp->flags && mp->wlen <= wlen && mp->llen <= l &&
-			pattern_match(mp->line, (sfx ? line - mp->llen : line),
-				      mp->word, (sfx ? word - mp->wlen : word))) {
-			/* Both the line and the word pattern matched,
-			 * now skip over the matched portions. */
-			if (sfx) {
-			    line -= mp->llen; word -= mp->wlen;
-			} else {
-			    line += mp->llen; word += mp->wlen;
-			}
-			l -= mp->llen; wlen -= mp->wlen; rl += mp->wlen;
-			t = 1;
-		    }
-		}
-		if (!t)
-		    /* Didn't match, give up. */
-		    return 0;
+		if (sfx)
+		    line--;
+		line[0] = lchr;
+		if (!sfx)
+		    line++;
+	    }
+
+	    llen--;
+	    wlen--;
+	    rl++;
+
+	    if (sfx)
+		word = wp;
+	    else {
+		if (llen)
+		    curgenpat++;
+		word += (*word == Meta) ? 2 : 1;
 	    }
 	}
-	if (!l)
-	    /* Unmatched portion in the line built, return matched length. */
-	    return rl;
+	else
+	{
+	    char *lp;
+	    /*
+	     * Need to loop over pattern matchers.
+	     */
+	    for (ms = bmatchers; ms; ms = ms->next) {
+		mp = ms->matcher;
+		/*
+		 * This is the nightmare case: we have line and
+		 * and word matchers and some pattern which restricts
+		 * the value on the line without us knowing exactly
+		 * what it is.  Despatch to the special function
+		 * for that.
+		 */
+		if (mp && !mp->flags && mp->wlen <= wlen &&
+		    mp->llen <= llen)
+		{
+		    if (sfx) {
+			/*
+			 * We haven't assembled the line yet, and with
+			 * Meta characters we don't yet know the length.
+			 * We'll fix this up later.
+			 */
+			lp = line - 2 * mp->llen;
+		    } else
+			lp = line;
+		    wp = word;
+		    if (sfx) {
+			int l = mp->wlen;
+			while (l--) {
+			    if (wp > oword + 1 && wp[-2] == Meta)
+				wp -= 2;
+			    else
+				wp--;
+			}
+
+			tmpgenpat = curgenpat - mp->llen;
+		    } else
+			tmpgenpat = curgenpat;
+		    if (pattern_match_restrict(mp->line, lp,
+					       mp->word, wp, tmpgenpat)) {
+			/*
+			 * Matched: advance over as many characters
+			 * of the patterns and strings as
+			 * we've done matches.
+			 */
+			if (sfx) {
+			    int imove = mp->llen, nchar;
+			    char *pmove = lp;
+			    word = wp;
+			    
+			    /* Close the gap we left in the line string */
+			    while (imove--)
+				pmove += (*pmove == Meta) ? 2 : 1;
+			    /* Number of bytes to move */
+			    nchar = (int)(pmove - lp);
+			    /* The size of the gap */
+			    imove = 2 * mp->llen - nchar;
+			    if (imove) {
+				lp = line - imove;
+				/* Moving up, so start at the top */
+				while (nchar--)
+				    *--line = *--lp;
+				/* line is at the start of the moved text */
+			    }
+
+			    curgenpat = tmpgenpat;
+			} else {
+			    int cnt = mp->llen;
+			    while (cnt--) {
+				line += (*line == Meta) ? 2 : 1;
+			    }
+
+			    cnt = mp->wlen;
+			    while (cnt--)
+				word += (*word == Meta) ? 2 : 1;
+
+			    curgenpat += mp->llen;
+			}
+			llen -= mp->llen;
+			wlen -= mp->wlen;
+			rl += mp->wlen;
+			break;
+		    }
+		}
+	    }
+	    if (!ms)
+		return 0;	/* Didn't match, give up */
+	}
+    }
+    if (!llen) {
+	/* Unmatched portion in the line built, return matched length. */
+	if (sfx)
+	    *linep = line;
+	else
+	    *line = '\0';
+	return rl;
     }
     return 0;
 }
@@ -1386,8 +1898,10 @@ join_strs(int la, char *sa, int lb, char *sb)
 		    if ((t = pattern_match(mp->word, sa, NULL, NULL)) ||
 			pattern_match(mp->word, sb, NULL, NULL)) {
 			/* It matched one of the strings, t says which one. */
-			VARARR(char, line, mp->llen + 1);
-			char **ap, **bp;
+			/* TODO: double to allow Meta, not necessary
+			   when properly unmetafied */
+			VARARR(char, linearr, 2*mp->llen + 1);
+			char **ap, **bp, *line = linearr;
 			int *alp, *blp;
 
 			if (t) {
@@ -1399,10 +1913,8 @@ join_strs(int la, char *sa, int lb, char *sb)
 			}
 			/* Now try to build a string that matches the other
 			 * string. */
-			if ((bl = bld_line(mp->word, mp->line, line, line,
-					   *ap, *bp, *blp, 0))) {
+			if ((bl = bld_line(mp, &line, *ap, *bp, *blp, 0))) {
 			    /* Found one, put it into the return string. */
-			    line[mp->llen] = '\0';
 			    if (rr <= mp->llen) {
 				char *or = rs;
 
@@ -1444,7 +1956,11 @@ join_strs(int la, char *sa, int lb, char *sb)
     return rs;
 }
 
-/* This compares the anchors stored in two top-level clines. */
+/*
+ * This compares the anchors stored in two top-level clines.
+ * It returns 1 if the anchors are the same, 2 if they are
+ * compatible (and have been combined in "o"), 0 otherwise.
+ */
 
 /**/
 static int
@@ -1591,9 +2107,11 @@ join_sub(Cmdata md, char *str, int len, int *mlen, int sfx, int join)
 				       NULL, NULL)) ||
 		     pattern_match(mp->word, nw - (sfx ? mp->wlen : 0),
 				   NULL, NULL))) {
-		    VARARR(char, line, mp->llen + 1);
+		    /* TODO: doubled to allow Meta, not necessary
+		     * when properly unmetafied */
+		    VARARR(char, linearr, 2*mp->llen + 1);
 		    int bl;
-		    char *mw;
+		    char *mw, *line = linearr;
 
 		    /* Then build all the possible lines and see
 		     * if one of them matches the other string. */
@@ -1602,11 +2120,10 @@ join_sub(Cmdata md, char *str, int len, int *mlen, int sfx, int join)
 		    else
 			mw = nw - (sfx ? mp->wlen : 0);
 
-		    if ((bl = bld_line(mp->word, mp->line, line, line,
-				       mw, (t ? nw : ow), (t ? nl : ol), sfx)))  {
+		    if ((bl = bld_line(mp, &line, mw, (t ? nw : ow),
+				       (t ? nl : ol), sfx)))  {
 			/* Yep, one of the lines matched the other
 			 * string. */
-			line[mp->llen] = '\0';
 
 			if (t) {
 			    ol = mp->wlen; nl = bl;

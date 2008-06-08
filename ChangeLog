@@ -1,3 +1,14 @@
+2008-06-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25138(?): Completion/compinstall, Doc/Zsh/compwid.yo,
+	Src/pattern.c, Src/zsh.h, Src/Zle/comp.h, Src/Zle/complete.c,
+	Src/Zle/compmatch.c, Src/Zle/computil.c: enhance completion
+	matching to make it possible to use wide characters (not yet
+	done); also allows named character ranges, so that
+	{[:lower:]}={[:upper:]} works (for now, just for single-byte
+	character sets).  Committing this while the mailing list
+	appears to be stuck.
+
 2008-06-05  Doug Kearns  <dougkearns@gmail.com>
 
 	* unposted: Completion/Redhat/Command/_rpm: fix typo

@@ -122,13 +122,15 @@ freecpattern(Cpattern p)
 
     while (p) {
 	n = p->next;
+	if (p->tp <= CPAT_EQUIV)
+	    free(p->u.str);
 	zfree(p, sizeof(struct cpattern));
 
 	p = n;
     }
 }
 
-/* Copy a completion matcher list. */
+/* Copy a completion matcher list into permanent storage. */
 
 /**/
 mod_export Cmatcher
@@ -157,22 +159,51 @@ cpcmatcher(Cmatcher m)
     return r;
 }
 
+/*
+ * Copy a single entry in a matcher pattern.
+ * If useheap is 1, it comes from the heap.
+ */
+
+/**/
+mod_export Cpattern
+cp_cpattern_element(Cpattern o)
+{
+    Cpattern n = zalloc(sizeof(struct cpattern));
+
+    n->next = NULL;
+
+    n->tp = o->tp;
+    switch (o->tp)
+    {
+    case CPAT_CCLASS:
+    case CPAT_NCLASS:
+    case CPAT_EQUIV:
+	n->u.str = ztrdup(o->u.str);
+	break;
+
+    case CPAT_CHAR:
+	n->u.chr = o->u.chr;
+	break;
+
+    default:
+	/* just to keep compiler quiet */
+	break;
+    }
+
+    return n;
+}
+
 /* Copy a completion matcher pattern. */
 
 /**/
 static Cpattern
 cpcpattern(Cpattern o)
 {
-    Cpattern r = NULL, *p = &r, n;
+    Cpattern r = NULL, *p = &r;
 
     while (o) {
-	*p = n = (Cpattern) zalloc(sizeof(struct cpattern));
-
-	n->next = NULL;
-	memcpy(n->tab, o->tab, 256);
-	n->equiv = o->equiv;
-
-	p = &(n->next);
+	*p = cp_cpattern_element(o);
+	p = &((*p)->next);
 	o = o->next;
     }
     return r;
@@ -331,14 +362,26 @@ parse_cmatcher(char *name, char *s)
     return ret;
 }
 
-/* Parse a pattern for matcher control. */
+/*
+ * Parse a pattern for matcher control. 
+ * name is the name of the builtin from which this is called, for errors.
+ * *sp is the input string and will be updated to the end of the parsed
+ *   pattern.
+ * *lp will be set to the number of characters (possibly multibyte)
+ *   that the pattern will match.  This must be deterministic, given
+ *   the syntax allowed here.
+ * e, if non-zero, is the ASCII end character to match; if zero,
+ *   stop on a blank.
+ * *err is set to 1 to indicate an error, else to 0.
+ */
 
 /**/
 static Cpattern
 parse_pattern(char *name, char **sp, int *lp, char e, int *err)
 {
     Cpattern ret = NULL, r = NULL, n;
-    unsigned char *s = (unsigned char *) *sp;
+    char *s = *sp;
+    int inchar;
     int l = 0;
 
     *err = 0;
@@ -346,25 +389,18 @@ parse_pattern(char *name, char **sp, int *lp, char e, int *err)
     while (*s && (e ? (*s != e) : !inblank(*s))) {
 	n = (Cpattern) hcalloc(sizeof(*n));
 	n->next = NULL;
-	n->equiv = 0;
 
-	if (*s == '[') {
-	    s = parse_class(n, s + 1, ']');
+	if (*s == '[' || *s == '{') {
+	    s = parse_class(n, s);
 	    if (!*s) {
 		*err = 1;
 		zwarnnam(name, "unterminated character class");
 		return NULL;
 	    }
-	} else if (*s == '{') {
-	    n->equiv = 1;
-	    s = parse_class(n, s + 1, '}');
-	    if (!*s) {
-		*err = 1;
-		zwarnnam(name, "unterminated character class");
-		return NULL;
-	    }
+	    s++;
 	} else if (*s == '?') {
-	    memset(n->tab, 1, 256);
+	    n->tp = CPAT_ANY;
+	    s++;
 	} else if (*s == '*' || *s == '(' || *s == ')' || *s == '=') {
 	    *err = 1;
 	    zwarnnam(name, "invalid pattern character `%c'", *s);
@@ -373,8 +409,13 @@ parse_pattern(char *name, char **sp, int *lp, char e, int *err)
 	    if (*s == '\\' && s[1])
 		s++;
 
-	    memset(n->tab, 0, 256);
-	    n->tab[*s] = 1;
+	    if (*s == Meta)
+		inchar = STOUC(*++s) ^ 32;
+	    else
+		inchar = STOUC(*s);
+	    s++;
+	    n->tp = CPAT_CHAR;
+	    n->u.chr = inchar;
 	}
 	if (ret)
 	    r->next = n;
@@ -384,7 +425,6 @@ parse_pattern(char *name, char **sp, int *lp, char e, int *err)
 	r = n;
 
 	l++;
-	s++;
     }
     *sp = (char *) s;
     *lp = l;
@@ -394,28 +434,86 @@ parse_pattern(char *name, char **sp, int *lp, char e, int *err)
 /* Parse a character class for matcher control. */
 
 /**/
-static unsigned char *
-parse_class(Cpattern p, unsigned char *s, unsigned char e)
+static char *
+parse_class(Cpattern p, char *iptr)
 {
-    int n = 0, i = 1, j, eq = (e == '}'), k = 1;
+    int endchar, firsttime = 1;
+    char *optr, *nptr;
 
-    if (!eq && (*s == '!' || *s == '^') && s[1] != e) { n = 1; s++; }
-
-    memset(p->tab, n, 256);
-
-    n = !n;
-    while (*s && (k || *s != e)) {
-	if (s[1] == '-' && s[2] && s[2] != e) {
-	    /* a run of characters */
-	    for (j = (int) *s; j <= (int) s[2]; j++)
-		p->tab[j] = (eq ? i++ : n);
-
-	    s += 3;
+    if (*iptr++ == '[') {
+	endchar = ']';
+	/* TODO: surely [^]] is valid? */
+	if ((*iptr == '!' || *iptr == '^') && iptr[1] != ']') {
+	    p->tp = CPAT_NCLASS;
+	    iptr++;
 	} else
-	    p->tab[*s++] = (eq ? i++ : n);
-	k = 0;
+	    p->tp = CPAT_CCLASS;
+    } else {
+	endchar = '}';
+	p->tp = CPAT_EQUIV;
     }
-    return s;
+
+    /* find end of class.  End character can appear literally first. */
+    for (optr = iptr; optr == iptr || *optr != endchar; optr++)
+	if (!*optr)
+	    return optr;
+    /*
+     * We can always fit the parsed class within the same length
+     * because of the tokenization (including a null byte).
+     *
+     * As the input string is metafied, but shouldn't contain shell
+     * tokens, we can just add our own tokens willy nilly.
+     */
+    optr = p->u.str = zalloc((optr-iptr) + 1);
+
+    while (firsttime || *iptr != endchar) {
+	int ch;
+
+	if (*iptr == '[' && iptr[1] == ':' &&
+	    (nptr = strchr((char *)iptr + 2, ':')) && nptr[1] == ']') {
+	    /* Range type */
+	    iptr += 2;
+	    ch = range_type((char *)iptr, nptr-iptr);
+	    iptr = nptr + 2;
+	    if (ch != PP_UNKWN)
+		*optr++ = STOUC(Meta) + ch;
+	} else {
+	    /* characters stay metafied */
+	    char *ptr1 = iptr;
+	    if (*iptr == Meta)
+		iptr++;
+	    iptr++;
+	    if (*iptr == '-' && iptr[1] && iptr[1] != endchar) {
+		/* a run of characters */
+		iptr++;
+		/* range token */
+		*optr++ = Meta + PP_RANGE;
+
+		/* start of range character */
+		if (*ptr1 == Meta) {
+		    *optr++ = Meta;
+		    *optr++ = ptr1[1] ^ 32;
+		} else
+		    *optr++ = *ptr1;
+
+		if (*iptr == Meta) {
+		    *optr++ = *iptr++;
+		    *optr++ = *iptr++;
+		} else
+		    *optr++ = *iptr++;
+	    } else {
+		if (*ptr1 == Meta) {
+		    *optr++ = Meta;
+		    *optr++ = ptr1[1] ^ 32;
+		} else
+		    *optr++ = *ptr1;
+	    }
+	}
+	firsttime = 0;
+    }
+
+    *optr = '\0';
+    return iptr;
 }
 
 /**/

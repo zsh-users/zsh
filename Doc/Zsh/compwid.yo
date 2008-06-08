@@ -577,7 +577,7 @@ the next character typed inserts one of the characters given in the
 var(remove-chars).  This string is parsed as a characters class and
 understands the backslash sequences used by the tt(print) command.  For
 example, `tt(-r "a-z\t")' removes the suffix if the next character typed
-inserts a lowercase character or a TAB, and `tt(-r "^0-9")' removes the
+inserts a lower case character or a TAB, and `tt(-r "^0-9")' removes the
 suffix if the next character typed inserts anything but a digit. One extra
 backslash sequence is understood in this string: `tt(\-)' stands for
 all characters that insert nothing. Thus `tt(-S "=" -q)' is the same
@@ -857,9 +857,9 @@ which character sequences in the trial completion.  Any sequence of
 characters not handled in this fashion must match exactly, as usual.
 
 The forms of var(match-spec) understood are as follows. In each case, the
-form with an uppercase initial character retains the string already
+form with an upper case initial character retains the string already
 typed on the command line as the final result of completion, while with
-a lowercase initial character the string on the command line is changed
+a lower case initial character the string on the command line is changed
 into the corresponding part of the trial completion.
 
 startitem()
@@ -918,14 +918,34 @@ are not allowed, so the characters tt(!) and tt(^) have no special
 meaning directly after the opening brace.  They indicate that a range of
 characters on the line match a range of characters in the trial
 completion, but (unlike ordinary character classes) paired according to
-the corresponding position in the sequence. For example, to make any
-lowercase letter on the line match the corresponding uppercase letter in
-the trial completion, you can use `tt(m:{a-z}={A-Z})'.  More than one
-pair of classes can occur, in which case the first class before the
-tt(=) corresponds to the first after it, and so on.  If one side has
+the corresponding position in the sequence.  For example, to make any
+ASCII lower case letter on the line match the corresponding upper case
+letter in the trial completion, you can use `tt(m:{a-z}={A-Z})'
+(however, see below for the recommended form for this).  More
+than one pair of classes can occur, in which case the first class before
+the tt(=) corresponds to the first after it, and so on.  If one side has
 more such classes than the other side, the superfluous classes behave
 like normal character classes.  In anchor patterns correspondence classes
 also behave like normal character classes.
+
+The standard `tt([:)var(name)tt(:])' forms described for standard shell
+patterns,
+ifnzman(noderef(Filename Generation))\
+ifzman(see the section FILENAME GENERATION in zmanref(zshexpn)),
+may appear in correspondence classes as well as normal character
+classes.  The only special behaviour in correspondence classes is if
+the form on the left and the form on the right are each one of
+tt([:upper:]), tt([:lower:]).  In these cases the
+character in the word and the character on the line must be the same up
+to a difference in case.  Hence to make any lower case character on the
+line match the corresponding upper case character in the trial
+completion you can use `tt(m:{[:lower:]}={[:upper:]})'.  Although the
+matching system does not yet handle multibyte characters, this is likely
+to be a future extension, at which point this syntax will handle
+arbitrary alphabets; hence this form, rather than the use of explicit
+ranges, is the recommended form.  In other cases
+`tt([:)var(name)tt(:])' forms are allowed, but imply no special
+constraint on the characters beyond that implied by the test itself.
 
 The pattern var(tpat) may also be one or two stars, `tt(*)' or
 `tt(**)'. This means that the pattern on the command line can match
@@ -939,16 +959,16 @@ anchor can be matched, too.
 Examples:
 
 The keys of the tt(options) association defined by the tt(parameter)
-module are the option names in all-lowercase form, without
+module are the option names in all-lower-case form, without
 underscores, and without the optional tt(no) at the beginning even
 though the builtins tt(setopt) and tt(unsetopt) understand option names
-with uppercase letters, underscores, and the optional tt(no).  The
+with upper case letters, underscores, and the optional tt(no).  The
 following alters the matching rules so that the prefix tt(no) and any
 underscore are ignored when trying to match the trial completions
-generated and uppercase letters on the line match the corresponding
-lowercase letters in the words:
+generated and upper case letters on the line match the corresponding
+lower case letters in the words:
 
-example(compadd -M 'L:|[nN][oO]= M:_= M:{A-Z}={a-z}' - \ 
+example(compadd -M 'L:|[nN][oO]= M:_= M:{[:upper:]}={[:lower:]}' - \ 
   ${(k)options} )
 
 The first part says that the pattern `tt([nN][oO])' at the beginning
@@ -957,8 +977,8 @@ line matches the empty string in the list of words generated by
 completion, so it will be ignored if present. The second part does the
 same for an underscore anywhere in the command line string, and the
 third part uses correspondence classes so that any
-uppercase letter on the line matches the corresponding lowercase
-letter in the word. The use of the uppercase forms of the
+upper case letter on the line matches the corresponding lower case
+letter in the word. The use of the upper case forms of the
 specification characters (tt(L) and tt(M)) guarantees that what has
 already been typed on the command line (in particular the prefix
 tt(no)) will not be deleted.
@@ -979,12 +999,12 @@ The second example makes completion case insensitive.  This is just
 the same as in the option example, except here we wish to retain the
 characters in the list of completions:
 
-example(compadd -M 'm:{a-z}={A-Z}' ... )
+example(compadd -M 'm:{[:lower:]}={[:upper:]}' ... )
 
-This makes lowercase letters match their uppercase counterparts.
-To make uppercase letters match the lowercase forms as well:
+This makes lower case letters match their upper case counterparts.
+To make upper case letters match the lower case forms as well:
 
-example(compadd -M 'm:{a-zA-Z}={A-Za-z}' ... )
+example(compadd -M 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' ... )
 
 A nice example for the use of tt(*) patterns is partial word
 completion. Sometimes you would like to make strings like `tt(c.s.u)'
@@ -1042,27 +1062,27 @@ The specifications with both a left and a right anchor are useful to
 complete partial words whose parts are not separated by some
 special character. For example, in some places strings have to be
 completed that are formed `tt(LikeThis)' (i.e. the separate parts are
-determined by a leading uppercase letter) or maybe one has to
+determined by a leading upper case letter) or maybe one has to
 complete strings with trailing numbers. Here one could use the simple
 form with only one anchor as in:
 
-example(compadd -M 'r:|[A-Z0-9]=* r:|=*' LikeTHIS FooHoo 5foo123 5bar234)
+example(compadd -M 'r:|[[:upper:]0-9]=* r:|=*' LikeTHIS FooHoo 5foo123 5bar234)
 
 But with this, the string `tt(H)' would neither complete to `tt(FooHoo)'
-nor to `tt(LikeTHIS)' because in each case there is an uppercase
+nor to `tt(LikeTHIS)' because in each case there is an upper case
 letter before the `tt(H)' and that is matched by the anchor. Likewise, 
 a `tt(2)' would not be completed. In both cases this could be changed
-by using `tt(r:|[A-Z0-9]=**)', but then `tt(H)' completes to both
+by using `tt(r:|[[:upper:]0-9]=**)', but then `tt(H)' completes to both
 `tt(LikeTHIS)' and `tt(FooHoo)' and a `tt(2)' matches the other
-strings because characters can be inserted before every uppercase
+strings because characters can be inserted before every upper case
 letter and digit. To avoid this one would use:
 
-example(compadd -M 'r:[^A-Z0-9]||[A-Z0-9]=** r:|=*' \ 
+example(compadd -M 'r:[^[:upper:]0-9]||[[:upper:]0-9]=** r:|=*' \ 
     LikeTHIS FooHoo foo123 bar234)
 
-By using these two anchors, a `tt(H)' matches only uppercase `tt(H)'s that 
+By using these two anchors, a `tt(H)' matches only upper case `tt(H)'s that 
 are immediately preceded by something matching the left anchor
-`tt([^A-Z0-9])'. The effect is, of course, that `tt(H)' matches only
+`tt([^[:upper:]0-9])'. The effect is, of course, that `tt(H)' matches only
 the string `tt(FooHoo)', a `tt(2)' matches only `tt(bar234)' and so on.
 
 When using the completion system (see
