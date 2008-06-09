@@ -1,3 +1,8 @@
+2008-06-09  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Src/Zle/compmatch.c: silence compiler (has no
+	other effect).
+
 2008-06-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25138(?): Completion/compinstall, Doc/Zsh/compwid.yo,

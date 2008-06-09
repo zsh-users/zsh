@@ -1272,7 +1272,7 @@ pattern_match_restrict(Cpattern p, char *s, Cpattern wp, char *ws,
 {
     int c, ind;
     int wc, wind;
-    int len, wlen, mt, wmt;
+    int len = 0, wlen, mt, wmt;
 
     while (p && wp && *s && *ws) {
 	/* First test the word character */
