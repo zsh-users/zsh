@@ -1199,7 +1199,9 @@ pattern_match1(Cpattern p, int c, int *mtp)
  * Only makes sense if lp->tp == CPAT_EQUIV and the (unseen) word
  * pattern also has that type.
  */
-static int
+
+/**/
+mod_export int
 pattern_match_equivalence(Cpattern lp, int wind, int wmtp, int wchr)
 {
     int lchr, lmtp;

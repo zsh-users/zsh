@@ -1,3 +1,8 @@
+2008-06-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Mikael: 25146: Src/Zle/compmatch.c:
+	pattern_match_equivalence() needs to be exported.
+
 2008-06-10  Peter Stephenson  <pws@csr.com>
 
 	* 25144: Src/builtin.c, Src/math.c, Src/utils.c plus unposted
