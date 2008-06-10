@@ -440,7 +440,7 @@ pattern matching, parameter values and various delimiters.
 The option is on by default if the shell was compiled with
 tt(MULTIBYTE_SUPPORT) except in tt(sh) emulation; otherwise it is off by
 default and has no effect if turned on.  The mode is off in tt(sh)
-emulation for compatibility but for interative use may need to be
+emulation for compatibility but for interactive use may need to be
 turned on if the terminal interprets multibyte characters.
 
 If the option is off a single byte is always treated as a single
@@ -1460,7 +1460,7 @@ cindex(Unicode combining characters)
 item(tt(COMBINING_CHARS))(
 Assume that the terminal displays combining characters correctly.
 Specifically, if a base alphanumeric character is followed by one or more
-zero-width punctuation characters, assume that the zero-width charaters
+zero-width punctuation characters, assume that the zero-width characters
 will be displayed as modifications to the base character within the
 same width.  Not all terminals handle this.  If this option is not
 set, zero-width characters are displayed separately with special

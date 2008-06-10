@@ -34,7 +34,7 @@ ifzman(see em(Character Highlighting) below)\
 ifnzman(noderef(Character Highlighting)).  Highlighting
 of special characters and the region between the cursor and the
 mark (as set with tt(set-mark-command) in Emacs mode) is enabled
-by default; consult this reference for more information.  Irrascible
+by default; consult this reference for more information.  Irascible
 conservatives will wish to know that all highlighting may be disabled by
 the following setting:
 

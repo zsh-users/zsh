@@ -1844,7 +1844,7 @@ zstrtol(const char *s, char **t, int base)
     }
     inp = s;
     if (base < 2 || base > 36) {
-	zerr("invalid base: %d", base);
+	zerr("invalid base (must be 2 to 36 inclusive): %d", base);
 	return (zlong)0;
     } else if (base <= 10)
 	for (; *s >= '0' && *s < ('0' + base); s++) {

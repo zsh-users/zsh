@@ -382,7 +382,7 @@ as a tt(start) time.
 item(tt(-s))(
 Use the shell's tt(sched) command to schedule a timed event that
 will warn the user when an event is due.  Note that the tt(sched) command
-only runs if the shell is at an interactive prompt; a foreground taks
+only runs if the shell is at an interactive prompt; a foreground task
 blocks the scheduled task from running until it is finished.
 
 The timed event usually runs the programme tt(calendar_show) to show

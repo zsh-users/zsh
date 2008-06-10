@@ -1242,7 +1242,7 @@ For these commands a tt(-) is used to introduce a directory stack entry
 and completion of these is far more common than completing options.
 Hence unless the value of this style is true options will not be
 completed, even after an initial tt(-).  If it is true, options will
-be completed after an initial tt(-) unless there is a preceeding
+be completed after an initial tt(-) unless there is a preceding
 tt(-)tt(-) on the command line.
 )
 kindex(completer, completion style)

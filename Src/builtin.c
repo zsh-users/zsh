@@ -1745,7 +1745,8 @@ typeset_setbase(const char *name, Param pm, Options ops, int on, int always)
 	    return 1;
 	}
 	if (pm->base < 2 || pm->base > 36) {
-	    zwarnnam(name, "invalid base: %d", pm->base);
+	    zwarnnam(name, "invalid base (must be 2 to 36 inclusive): %d",
+		     pm->base);
 	    return 1;
 	}
     } else if (always)

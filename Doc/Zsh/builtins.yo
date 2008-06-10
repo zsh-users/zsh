@@ -1613,7 +1613,7 @@ unit is printed before each value.
 
 When looping over multiple resources, the shell will abort immediately if
 it detects a badly formed argument.  However, if it fails to set a limit
-for some other reson it will continue trying to set the remaining limits.
+for some other reason it will continue trying to set the remaining limits.
 
 startsitem()
 sitem(tt(-a))(Lists all of the current resource limits.)

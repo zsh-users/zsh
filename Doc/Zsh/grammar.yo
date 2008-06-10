@@ -452,7 +452,7 @@ sect(Comments)
 cindex(comments)
 pindex(INTERACTIVE_COMMENTS, use of)
 vindex(histchars, use of)
-In noninteractive shells, or in interactive shells with the
+In non-interactive shells, or in interactive shells with the
 tt(INTERACTIVE_COMMENTS) option set, a word beginning
 with the third character of the tt(histchars) parameter
 (`tt(#)' by default) causes that word and all the following
