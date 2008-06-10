@@ -152,7 +152,7 @@
 
   print $(( 37#z ))
 1:bases beyond 36 don't work
-?(eval):1: invalid base: 37
+?(eval):1: invalid base (must be 2 to 36 inclusive): 37
 
   print $(( 3 + "fail" ))
 1:parse failure in arithmetic

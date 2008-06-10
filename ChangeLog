@@ -1,7 +1,7 @@
 2008-06-10  Peter Stephenson  <pws@csr.com>
 
-	* 25144: Src/builtin.c, Src/math.c, Src/utils.c: report the
-	supported bases on a base error.
+	* 25144: Src/builtin.c, Src/math.c, Src/utils.c plus unposted
+	C01arith.ztst: report the supported bases on a base error.
 
 	* 25143: Mikael: Doc/Zsh/builtins.yo, Doc/Zsh/calsys.yo,
 	Doc/Zsh/compsys.yo, Doc/Zsh/func.yo, Doc/Zsh/grammar.yo,
