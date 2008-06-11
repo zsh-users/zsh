@@ -2165,7 +2165,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
     LinkList redir;
     wordcode code;
     Wordcode beg = state->pc, varspc;
-    FILE *oxtrerr = xtrerr;
+    FILE *oxtrerr = xtrerr, *newxtrerr = NULL;
 
     doneps4 = 0;
     redir = (wc_code(*state->pc) == WC_REDIR ? ecgetredirs(state) : NULL);
@@ -2675,10 +2675,10 @@ execcmd(Estate state, int input, int output, int how, int last1)
     fflush(xtrerr);
     if (isset(XTRACE) && xtrerr == stderr &&
 	(type < WC_SUBSH || type == WC_TIMED)) {
-	if (!(xtrerr = fdopen(movefd(dup(fileno(stderr))), "w")))
-	    xtrerr = stderr;
-	else
+	if ((newxtrerr = fdopen(movefd(dup(fileno(stderr))), "w"))) {
+	    xtrerr = newxtrerr;
 	    fdtable[fileno(xtrerr)] = FDT_XTRACE;
+	}
     }
 
     /* Add pipeline input/output to mnodes */
@@ -2885,6 +2885,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	if (mfds[i] && mfds[i]->ct >= 2)
 	    closemn(mfds, i);
 
+    xtrerr = stderr;
     if (nullexec) {
 	if (nullexec == 1) {
 	    /*
@@ -3099,9 +3100,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
     fixfds(save);
 
  done:
-    if (xtrerr != oxtrerr) {
-	fil = fileno(xtrerr);
-	fclose(xtrerr);
+    if (newxtrerr) {
+	fil = fileno(newxtrerr);
+	fclose(newxtrerr);
 	xtrerr = oxtrerr;
 	zclose(fil);
     }
