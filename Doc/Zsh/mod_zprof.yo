@@ -22,7 +22,7 @@ other parts of the list in suffixes of the form
 `tt([)var(num)tt(])'), then the number of calls made to the function.
 The next three columns list the time in
 milliseconds spent in the function and its descendants, the average
-time in milliseconds spent in the function and its descendents per
+time in milliseconds spent in the function and its descendants per
 call and the percentage of time spent in all shell functions used in
 this function and its descendants.  The following three columns give
 the same information, but counting only the time spent in the function 

@@ -1,3 +1,7 @@
+2008-06-11  Peter Stephenson  <pws@csr.com>
+
+	* 25143: Mikael: Doc/Zsh/mod_zprof.yo: missing descendants.
+
 2008-06-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Mikael: 25146: Src/Zle/compmatch.c:
