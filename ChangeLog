@@ -1,3 +1,10 @@
+2008-06-12  Peter Stephenson  <pws@csr.com>
+
+	* 25149: Doc/Zsh/arith.yo, Doc/Zsh/options.yo, Src/math.c,
+	Src/options.c, Src/zsh.h, Test/C01arith.ztst:  add
+	C_PRECEDENCES option to make arithmetic operators have
+	C (or, where necessary, Perl) precedences.
+
 2008-06-11  Peter Stephenson  <pws@csr.com>
 
 	* 25145: Src/exec.c, Test/E02xtrace.ztst: make sure XTRACE output

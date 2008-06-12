@@ -43,6 +43,16 @@
 0:precedence (arithmetic)
 >1591
 
+  fn() {
+    setopt localoptions c_precedences
+    integer i
+    (( i = 4 - - 3 * 7 << 1 & 7 ^ 1 | 16 ** 2 ))
+    print $i
+  }
+  fn
+0:precedence (arithmetic, with C_PRECEDENCES)
+>259
+
   print $(( 1 < 2 || 2 < 2 && 3 > 4 ))
 0:precedence (logical)
 >1

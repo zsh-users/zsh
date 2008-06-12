@@ -159,25 +159,128 @@ static int unary = 1;
 #define FUNC 52
 #define TOKCOUNT 53
 
-/* precedences */
-
-static int prec[TOKCOUNT] =
+/*
+ * Opeator recedences: in reverse order, i.e. lower number, high precedence.
+ * These are the C precedences.
+ *
+ * 0   Non-operators: NUM (numeric constant), ID (identifier),
+ *                    CID (identifier with '#'), FUNC (math function)
+ * 1   Opening parenthesis: M_INPAR '('  (for convenience, not an operator)
+ * 2   Unary operators: PREPLUS/POSTPLUS '++', PREMINUS/POSTMINUS '--',
+ *                      NOT '!', COMP '~', UPLUS '+', UMINUS '-'
+ * 3   POWER '**' (not in C but at high precedence in Perl)
+ * 4   MUL '*', DIV '/', MOD '%'
+ * 5   PLUS '+', MINUS '-'
+ * 6   SHLEFT '<<', SHRIGHT '>>'
+ * 7   GRE '>', 'GEQ' '>=', LES '<', LEQ '<='
+ * 8   DEQ '==', NEQ '!='
+ * 9   AND '&'
+ * 10  XOR '^'
+ * 11  OR  '|'
+ * 12  DAND '&&'
+ * 13  DXOR '^^' (not in C)
+ * 14  DOR '||'
+ * 15  QUEST '?'
+ * 16  COLON ':'
+ * 17  EQ '=', PLUSEQ '+=', MINUSEQ '-=', MULEQ '*=', DIVEQ '/=',
+ *     MODEQ '%=', ANDEQ '&=', XOREQ '^=', OREQ '|=',
+ *     SHFLEFTEQ '<<=', SHRIGHTEQ '>>=', DANDEQ '&&=', DOREQ '||=',
+ *     DXOREQ '^^='
+ * 18 COMMA ','
+ * 137 M_OUTPAR ')' (for convenience, not an operator)
+ * 200 EOI (end of input:  for convenience, not an operator)
+ */
+static int c_prec[TOKCOUNT] =
 {
-     1, 137,  2,  2,   2,
-     2,   2,  2,  4,   5,
-     6,   8,  8,  8,   9,
-     9,   3,  3, 10,  10,
-    10,  10, 11, 11,  12,
-    13,  13, 14, 15,  16,
-    16,  16, 16, 16,  16,
-    16,  16, 16, 16,  16,
-    16,  16, 16, 17, 200,
-     2,   2,  0,  0,   7,
-     0,  16, 0
+/*        M_INPAR   M_OUTPAR     NOT       COMP     POSTPLUS */
+/*  0 */     1,       137,        2,        2,         2,
+/*        POSTMINUS   UPLUS     UMINUS     AND        XOR    */
+/*  5 */     2,         2,        2,        9,        10,
+/*          OR         MUL       DIV       MOD       PLUS    */
+/* 10 */    11,         4,        4,        4,         5,
+/*         MINUS      SHLEFT   SHRIGHT     LES        LEQ    */
+/* 15 */     5,         6,        6,        7,         7,
+/*          GRE        GEQ       DEQ       NEQ       DAND    */
+/* 20 */     7,         7,        8,        8,        12,
+/*          DOR        DXOR     QUEST     COLON       EQ     */
+/* 25 */    14,        13,       15,       16,        17,
+/*         PLUSEQ    MINUSEQ    MULEQ     DIVEQ      MODEQ   */
+/* 30 */    17,        17,       17,       17,        17,
+/*         ANDEQ      XOREQ     OREQ    SHLEFTEQ   SHRIGHTEQ */
+/* 35 */    17,        17,       17,       17,        17,
+/*        DANDEQ      DOREQ    DXOREQ    COMMA       EOI     */
+/* 40 */    17,        17,       17,       18,       200,
+/*       PREPLUS    PREMINUS     NUM        ID       POWER   */
+/* 45 */     2,         2,        0,        0,         3,
+/*          CID      POWEREQ     FUNC  */
+/* 50 */     0,        17,        0
 };
 
-#define TOPPREC 18
-#define ARGPREC 16
+/*
+ * Opeator recedences: in reverse order, i.e. lower number, high precedence.
+ * These are the default zsh precedences.
+ *
+ * 0   Non-operators: NUM (numeric constant), ID (identifier),
+ *                    CID (identifier with '#'), FUNC (math function)
+ * 1   Opening parenthesis: M_INPAR '('  (for convenience, not an operator)
+ * 2   Unary operators: PREPLUS/POSTPLUS '++', PREMINUS/POSTMINUS '--',
+ *                      NOT '!', COMP '~', UPLUS '+', UMINUS '-' 
+ * 3   SHLEFT '<<', SHRIGHT '>>'
+ * 4   AND '&'
+ * 5   XOR '^'
+ * 6   OR  '|'
+ * 7   POWER '**' (not in C but at high precedence in Perl)
+ * 8   MUL '*', DIV '/', MOD '%'
+ * 9   PLUS '+', MINUS '-'
+ * 10  GRE '>', 'GEQ' '>=', LES '<', LEQ '<='
+ * 11  DEQ '==', NEQ '!='
+ * 12  DAND '&&'
+ * 13  DOR '||', DXOR '^^' (not in C)
+ * 14  QUEST '?'
+ * 15  COLON ':'
+ * 16  EQ '=', PLUSEQ '+=', MINUSEQ '-=', MULEQ '*=', DIVEQ '/=',
+ *     MODEQ '%=', ANDEQ '&=', XOREQ '^=', OREQ '|=',
+ *     SHFLEFTEQ '<<=', SHRIGHTEQ '>>=', DANDEQ '&&=', DOREQ '||=',
+ *     DXOREQ '^^='
+ * 17 COMMA ','
+ * 137 M_OUTPAR ')' (for convenience, not an operator)
+ * 200 EOI (end of input:  for convenience, not an operator)
+ */
+static int z_prec[TOKCOUNT] =
+{
+/*        M_INPAR   M_OUTPAR     NOT       COMP     POSTPLUS */
+/*  0 */     1,       137,        2,        2,         2,
+/*        POSTMINUS   UPLUS     UMINUS     AND        XOR    */
+/*  5 */     2,         2,        2,        4,         5,
+/*          OR         MUL       DIV       MOD       PLUS    */
+/* 10 */     6,         8,        8,        8,         9,
+/*         MINUS      SHLEFT   SHRIGHT     LES        LEQ    */
+/* 15 */     9,         3,        3,       10,        10,
+/*          GRE        GEQ       DEQ       NEQ       DAND    */
+/* 20 */    10,        10,       11,       11,        12,
+/*          DOR        DXOR     QUEST     COLON       EQ     */
+/* 25 */    13,        13,       14,       15,        16,
+/*         PLUSEQ    MINUSEQ    MULEQ     DIVEQ      MODEQ   */
+/* 30 */    16,        16,       16,       16,        16,
+/*         ANDEQ      XOREQ     OREQ    SHLEFTEQ   SHRIGHTEQ */
+/* 35 */    16,        16,       16,       16,        16,
+/*        DANDEQ      DOREQ    DXOREQ    COMMA       EOI     */
+/* 40 */    16,        16,       16,       17,       200,
+/*       PREPLUS    PREMINUS     NUM        ID       POWER   */
+/* 45 */     2,         2,        0,        0,         7,
+/*          CID      POWEREQ     FUNC  */
+/* 50 */     0,        16,        0
+};
+
+/* Option-selectable preference table */
+static int *prec;
+
+/*
+ * Precedences for top and argument evaluation.  Careful:
+ * prec needs to be set before we use these.
+ */
+#define TOPPREC (prec[COMMA]+1)
+#define ARGPREC (prec[COMMA]-1)
 
 static int type[TOKCOUNT] =
 {
@@ -193,6 +296,113 @@ static int type[TOKCOUNT] =
 /* 45 */  RL, RL, LR|OP_OPF, LR|OP_OPF, RL|OP_A2,
 /* 50 */  LR|OP_OPF, RL|OP_E2, LR|OP_OPF
 };
+
+/* the value stack */
+
+#define STACKSZ 100
+static int mtok;			/* last token */
+static int sp = -1;			/* stack pointer */
+
+struct mathvalue {
+    char *lval;
+    mnumber val;
+};
+
+static struct mathvalue *stack;
+
+enum prec_type {
+    /* Evaluating a top-level expression */
+    MPREC_TOP,
+    /* Evaluating a function argument */
+    MPREC_ARG
+};
+
+static mnumber
+mathevall(char *s, enum prec_type prec_tp, char **ep)
+{
+    int xlastbase, xnoeval, xunary, *xprec;
+    char *xptr;
+    mnumber xyyval;
+    char *xyylval;
+    int xsp;
+    struct mathvalue *xstack = 0, nstack[STACKSZ];
+    mnumber ret;
+
+    if (mlevel >= MAX_MLEVEL) {
+	xyyval.type = MN_INTEGER;
+	xyyval.u.l = 0;
+
+	zerr("math recursion limit exceeded");
+
+	return xyyval;
+    }
+    if (mlevel++) {
+	xlastbase = lastbase;
+	xnoeval = noeval;
+	xunary = unary;
+	xptr = ptr;
+	xyyval = yyval;
+	xyylval = yylval;
+
+	xsp = sp;
+	xstack = stack;
+	xprec = prec;
+    } else {
+	xlastbase = xnoeval = xunary = xsp = 0;
+	xyyval.type = MN_INTEGER;
+	xyyval.u.l = 0;
+	xyylval = NULL;
+	xptr = NULL;
+	xprec = NULL;
+    }
+    prec = isset(CPRECEDENCES) ? c_prec : z_prec;
+    stack = nstack;
+    lastbase = -1;
+    ptr = s;
+    sp = -1;
+    unary = 1;
+    stack[0].val.type = MN_INTEGER;
+    stack[0].val.u.l = 0;
+    mathparse(prec_tp == MPREC_TOP ? TOPPREC : ARGPREC);
+    *ep = ptr;
+    DPUTS(!errflag && sp > 0,
+	  "BUG: math: wallabies roaming too freely in outback");
+
+    if (errflag) {
+	/*
+	 * This used to set the return value to errflag.
+	 * I don't understand how that could be useful; the
+	 * caller doesn't know that's what's happened and
+	 * may not get a value at all.
+	 * Worse, we reset errflag in execarith() and setting
+	 * this explicitly non-zero means a (( ... )) returns
+	 * status 0 if there's an error.  That surely can't
+	 * be right.  execarith() now detects an error and returns
+	 * status 2.
+	 */
+	ret.type = MN_INTEGER;
+	ret.u.l = 0;
+    } else {
+	if (stack[0].val.type == MN_UNSET)
+	    ret = getnparam(stack[0].lval);
+	else
+	    ret = stack[0].val;
+    }
+
+    if (--mlevel) {
+	lastbase = xlastbase;
+	noeval = xnoeval;
+	unary = xunary;
+	ptr = xptr;
+	yyval = xyyval;
+	yylval = xyylval;
+
+	sp = xsp;
+	stack = xstack;
+	prec = xprec;
+    }
+    return lastmathval = ret;
+}
 
 static int
 lexconstant(void)
@@ -521,19 +731,6 @@ zzlex(void)
 	}
 }
 
-/* the value stack */
-
-#define STACKSZ 100
-static int mtok;			/* last token */
-static int sp = -1;			/* stack pointer */
-
-struct mathvalue {
-    char *lval;
-    mnumber val;
-};
-
-static struct mathvalue *stack;
-
 /**/
 static void
 push(mnumber val, char *lval, int getme)
@@ -645,7 +842,7 @@ callmathfunc(char *o)
 		    if (f->flags & MFF_USERFUNC) {
 			/* need to pass strings */
 			char *str;
-			marg = mathevall(a, ARGPREC, &a);
+			marg = mathevall(a, MPREC_ARG, &a);
 			if (marg.type & MN_FLOAT) {
 			    /* convfloat is off the heap */
 			    str = convfloat(marg.u.d, 0, 0, NULL);
@@ -657,7 +854,7 @@ callmathfunc(char *o)
 			addlinknode(l, str);
 		    } else {
 			q = (mnumber *) zhalloc(sizeof(mnumber));
-			*q = mathevall(a, ARGPREC, &a);
+			*q = mathevall(a, MPREC_ARG, &a);
 			addlinknode(l, q);
 		    }
 		    if (errflag || mtok != COMMA)
@@ -1017,91 +1214,6 @@ bop(int tk)
 
 
 /**/
-static mnumber
-mathevall(char *s, int prek, char **ep)
-{
-    int xlastbase, xnoeval, xunary;
-    char *xptr;
-    mnumber xyyval;
-    char *xyylval;
-    int xsp;
-    struct mathvalue *xstack = 0, nstack[STACKSZ];
-    mnumber ret;
-
-    if (mlevel >= MAX_MLEVEL) {
-	xyyval.type = MN_INTEGER;
-	xyyval.u.l = 0;
-
-	zerr("math recursion limit exceeded");
-
-	return xyyval;
-    }
-    if (mlevel++) {
-	xlastbase = lastbase;
-	xnoeval = noeval;
-	xunary = unary;
-	xptr = ptr;
-	xyyval = yyval;
-	xyylval = yylval;
-
-	xsp = sp;
-	xstack = stack;
-    } else {
-	xlastbase = xnoeval = xunary = xsp = 0;
-	xyyval.type = MN_INTEGER;
-	xyyval.u.l = 0;
-	xyylval = NULL;
-	xptr = NULL;
-    }
-    stack = nstack;
-    lastbase = -1;
-    ptr = s;
-    sp = -1;
-    unary = 1;
-    stack[0].val.type = MN_INTEGER;
-    stack[0].val.u.l = 0;
-    mathparse(prek);
-    *ep = ptr;
-    DPUTS(!errflag && sp > 0,
-	  "BUG: math: wallabies roaming too freely in outback");
-
-    if (errflag) {
-	/*
-	 * This used to set the return value to errflag.
-	 * I don't understand how that could be useful; the
-	 * caller doesn't know that's what's happened and
-	 * may not get a value at all.
-	 * Worse, we reset errflag in execarith() and setting
-	 * this explicitly non-zero means a (( ... )) returns
-	 * status 0 if there's an error.  That surely can't
-	 * be right.  execarith() now detects an error and returns
-	 * status 2.
-	 */
-	ret.type = MN_INTEGER;
-	ret.u.l = 0;
-    } else {
-	if (stack[0].val.type == MN_UNSET)
-	    ret = getnparam(stack[0].lval);
-	else
-	    ret = stack[0].val;
-    }
-
-    if (--mlevel) {
-	lastbase = xlastbase;
-	noeval = xnoeval;
-	unary = xunary;
-	ptr = xptr;
-	yyval = xyyval;
-	yylval = xyylval;
-
-	sp = xsp;
-	stack = xstack;
-    }
-    return lastmathval = ret;
-}
-
-
-/**/
 mod_export mnumber
 matheval(char *s)
 {
@@ -1117,7 +1229,7 @@ matheval(char *s)
 	x.u.l = 0;
 	return x;
     }
-    x = mathevall(s, TOPPREC, &junk);
+    x = mathevall(s, MPREC_TOP, &junk);
     mtok = xmtok;
     if (*junk)
 	zerr("bad math expression: illegal character: %c", *junk);
@@ -1140,7 +1252,7 @@ mathevalarg(char *s, char **ss)
     mnumber x;
     int xmtok = mtok;
 
-    x = mathevall(s, ARGPREC, ss);
+    x = mathevall(s, MPREC_ARG, ss);
     if (mtok == COMMA)
 	(*ss)--;
     mtok = xmtok;
