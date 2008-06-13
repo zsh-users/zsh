@@ -1,0 +1,113 @@
+#compdef strace
+
+# TODO:
+#	- make _sys_calls system-dependent
+#	- allow negated calls (e.g. -e!write)
+_sys_calls () {
+	local expl
+
+	sys_calls=(_llseek _newselect _sysctl accept access acct
+		adjtimex afs_syscall alarm bdflush bind break brk cacheflush
+		capget capset chdir chmod chown chown32 chroot clone close connect
+		creat create_module delete_module dup dup2 execve exit fchdir
+		fchmod fchown fchown32 fcntl fcntl64 fdatasync flock fork fstat
+		fstat64 fstatfs fsync ftime ftruncate ftruncate64 get_kernel_syms
+		getcwd getdents getdents64 getegid getegid32 geteuid geteuid32
+		getgid getgid32 getgroups getgroups32 getitimer getpagesize getpeername
+		getpmsg getpgid getpgrp getpid getppid getpriority getresgid getresgid32
+		getresuid getresuid32 getrlimit getrusage getsid getsockname getsockopt
+		gettid gettimeofday getuid getuid32 gtty idle init_module ioctl ioperm
+		iopl ipc kill lchown lchown32 link listen lock lseek lstat lstat64
+		madvise mincore mkdir mknod mlock mlockall mmap modify_ldt mount mprotect
+		mpx mremap msync munlock munlockall munmap nanosleep nfsservctl nice
+		oldfstat oldlstat oldolduname oldstat oldumount olduname open pause
+		personality phys pipe pivot_root poll prctl pread prof profil ptrace
+		putpmsg pwrite query_module quotactl read readahead readdir readlink
+		readv reboot recv recvfrom recvmsg rename rmdir rt_sigaction
+		rt_sigpending rt_sigprocmask rt_sigqueueinfo rt_sigreturn rt_sigsuspend
+		rt_sigtimedwait sched_get_priority_max sched_get_priority_min
+		sched_getparam sched_getscheduler sched_rr_get_interval sched_setparam
+		sched_setscheduler sched_yield security select sendfile send sendmsg sendto
+		setdomainname setfsgid setfsgid32 setfsuid setfsuid32 setgid setgid32
+		setgroups setgroups32 sethostname setitimer setpgid setpriority setregid
+		setregid32 setresgid setresgid32 setresuid setresuid32 setreuid setreuid32
+		setrlimit setsid setsockopt settimeofday setuid setuid32 setup sgetmask
+		shutdown sigaction sigaltstack signal sigpending sigprocmask sigreturn
+		sigsuspend socket socketcall socketpair ssetmask stat stat64 statfs stime
+		stty swapoff swapon symlink sync sysfs sysinfo syslog time times truncate
+		truncate64 ulimit umask umount uname unlink uselib ustat utime vfork vhangup
+		vm86 vm86old wait4 waitpid write writev)
+
+	for t in ${(s:,:)${PREFIX}}; do
+		sys_calls=( ${sys_calls:#$t} )
+	done
+	compset -P '*,'
+	_wanted sys_calls expl 'System calls' compadd -qS , -a sys_calls
+}
+
+_sets () {
+	_alternative \
+		'special:Special values:(all none)' \
+		'calls::_sys_calls'
+}
+
+_traces () {
+	local expl
+	traces=('file:Trace all system calls which take a file name as an argument'
+		'process:Trace all system calls which involve process management'
+		'network:Trace all the network related system calls'
+		'signal:Trace all signal related system calls'
+		'ipc:Trace all IPC related system calls'
+		'desc:Trace all file descriptor related system calls')
+	compset -P '*,'
+	_describe -t traces 'Related system calls' traces -qS ,
+}
+
+_traces_sets () {
+	_alternative \
+		'traces::_traces' \
+		'sets::_sets'
+}
+
+_expression () {
+	_values -S = "Qualifying expression" \
+		'trace[Trace specified set of system calls only]:system calls:_traces_sets' \
+		'abbrev[Abbreviate the output from printing each member of large structures]:system calls:_sets' \
+		'verbose[Dereference structures for the specified set of system calls]:system calls:_sets' \
+		'raw[Print raw, undecoded arguments for the specified set of system calls]:system calls:_sets' \
+		'signal[Trace only the specified subset of signals]:signal:{compset -P "*,"; _signals -s -qS ,}' \
+		'read[Perform a full hex and ASCII dump of all the data read from listed file descriptors]:file descriptors:{compset -P "*,"; _file_descriptors -qS ,}' \
+		'write[Perform a full hex and ASCII dump of all the data written to listed file descriptors]:file descriptors:{compset -P "*,"; _file_descriptors -qS ,}'
+	if [[ -z "$words[CURRENT]" || -n "${words[CURRENT]:#*=*}" ]]; then
+		_traces_sets
+	fi
+}
+
+_arguments \
+	'()-c[Count time, calls, and errors for each system call and report a summary]' \
+	-d'[Show some debugging output of strace itself on the standard error]' \
+	-f'[Trace child processes as they are created by currently traced processes]' \
+	-ff'[Write each process trace to <filename>.<pid> (when using -o <filename>]' \
+	'(-c -d -f -ff -i -q -r -t -tt -ttt -T -v -V -x -xx -a -e -o -O -p -s -S -u -E)-h[Print help]' \
+	-i'[Print the instruction pointer at the time of the system call]' \
+	-q'[Suppress messages about attaching, detaching etc.]' \
+	-r'[Print a relative timestamp upon entry to each system call]' \
+	'(-ttt)-t[Prefix each line of the trace with the time of day]' \
+	'(-ttt -tt)-tt[Prefix each line of the trace with the time of day including the microseconds]' \
+	'(-tt -t)-ttt[Prefix each line of the trace with the number of seconds and microseconds since the epoch]' \
+	-T'[Show the time spent in system calls]' \
+	-v'[Print unabbreviated versions of environment, stat, termios, etc. calls]' \
+	'(-c -d -f -ff -h -i -q -r -t -tt -ttt -T -v -x -xx -a -e -o -O -p -s -S -u -E)-V[Print the version number of strace]' \
+	'(-xx)-x[Print all non-ASCII strings in hexadecimal string format]' \
+	'(-x)-xx[Print all strings in hexadecimal string format]' \
+	-a'[Align return values in a specific column (default 40)]:column number' \
+	'*-e[Select events to trace or how to trace]:system call:_expression' \
+	'-o[Write the trace output to the file]:output file:_files' \
+	'-O[Overhead for tracing system calls]:overhead microseconds' \
+	'(:)-p[Attach to the process with specified process ID and begin tracing]:Process ID:_pids' \
+	'-s[Specify the maximum string size to print (default 32)]:maximum string size' \
+	'-S[Sort the output of the histogram (-c option) by the specified criterion]:sort by:(time calls name nothing)' \
+	'-u[Run as specified user]:user:_users' \
+	'*-E[Remove variable from the inherited list of environment or define a value]:variable:_printenv' \
+	'(-):command name: _command_names -e' \
+	'*::arguments:_normal'

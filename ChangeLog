@@ -1,3 +1,9 @@
+2008-06-13  Peter Stephenson  <pws@csr.com>
+
+	* users/12911: Tomasz Pala <gotar@polanet.pl>:
+	Completion/Unix/Command/_strace,
+	Completion/Unix/Command/.distfiles: new completion
+
 2008-06-12  Peter Stephenson  <pws@csr.com>
 
 	* 25149: Doc/Zsh/arith.yo, Doc/Zsh/options.yo, Src/math.c,
