@@ -1,5 +1,11 @@
 2008-06-13  Peter Stephenson  <pws@csr.com>
 
+	* 25152: Completion/Zsh/Context/{.distfiles,_zcalc_line}
+	(moved from Type because this is where it should be),
+	Doc/Zsh/contrib.yo, Functions/Misc/zcalc: improved zcalc
+	escape commands with ":" including ":!" and ":raw"; more complete
+	zcalc completion with special context.
+
 	* unposted: Completion/{Unix,Linux}/Command/{strace,.distfiles}: move
 
 	* users/12911: Tomasz Pala <gotar@polanet.pl>:

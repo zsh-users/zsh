@@ -1825,8 +1825,8 @@ calculation is stored.  For example, the result of the calculation on the
 line preceded by `tt(4> )' is available as tt($4).  The last value
 calculated is available as tt(ans).  Full command line editing, including
 the history of previous calculations, is available; the history is saved in
-the file tt(~/.zcalc_history).  To exit, enter a blank line or type `tt(q)'
-on its own.
+the file tt(~/.zcalc_history).  To exit, enter a blank line or type `tt(:q)'
+on its own (`tt(q)' is allowed for historical compatibility).
 
 If arguments are given to tt(zcalc) on start up, they are used to prime the
 first few positional parameters.  A visual indication of this is given when
@@ -1846,37 +1846,51 @@ stored locally in the first element of the array tt(psvar), which can be
 referred to in tt(ZCALCPROMPT) as `tt(%1v)'.  The default prompt is
 `tt(%1v> )'.
 
+A few special commands are available; these are introduced by a colon.
+For backward compatibility, the colon may be omitted for certain
+commands.  Completion is available if tt(compinit) has been run.
+
 The output precision may be specified within zcalc by special commands
-familiar from many calculators:
+familiar from many calculators.
 startitem()
-item(tt(norm))(
+item(tt(:norm))(
 The default output format.  It corresponds to the printf tt(%g)
 specification.  Typically this shows six decimal digits.
 )
-item(tt(sci) var(digits))(
+item(tt(:sci) var(digits))(
 Scientific notation, corresponding to the printf tt(%g) output format with
 the precision given by var(digits).  This produces either fixed point or
 exponential notation depending on the value output.
 )
-item(tt(fix) var(digits))(
+item(tt(:fix) var(digits))(
 Fixed point notation, corresponding to the printf tt(%f) output format with
 the precision given by var(digits).
 )
-item(tt(eng) var(digits))(
+item(tt(:eng) var(digits))(
 Exponential notation, corresponding to the printf tt(%E) output format with
 the precision given by var(digits).
+)
+item(tt(:raw))(
+Raw output:  this is the default form of the output from a math
+evaluation.  This may show more precision than the number actually
+possesses.
 )
 enditem()
 
 Other special commands:
 startitem()
-item(tt(local) var(arg) ...)(
+item(tt(:!)var(line...))(
+Execute var(line...) as a normal shell command line.  Note that it
+is executed in the context of the function, i.e. with local variables.
+Space is optional after tt(:!).
+)
+item(tt(:local) var(arg) ...)(
 Declare variables local to the function.  Note that certain variables
 are used by the function for its own purposes.  Other variables
 may be used, too, but they will be taken from or put into the global
 scope.
 )
-item(tt(function) var(name) [ var(body) ])(
+item(tt(:function) var(name) [ var(body) ])(
 Define a mathematical function or (with no var(body)) delete it.
 The function is defined using tt(zmathfuncdef), see below.
 
@@ -1887,14 +1901,14 @@ example(function cube $1 * $1 * $1)
 defines a function to cube the sole argument.
 )
 item(tt([#)var(base)tt(]))(
-When this syntax appears on a line by itself, the default output radix
-is set to var(base).  Use, for example, `tt([#16])' to display hexadecimal
-output preceded by an indication of the base, or `tt([##16])' just to
-display the raw number in the given base.  Bases themselves are always
-specified in decimal. `tt([#])' restores the normal output format.  Note
-that setting an output base suppresses floating point output; use `tt([#])'
-to return to normal operation.
-
+This is not a special command, rather part of normal arithmetic
+syntax; however, when this form appears on a line by itself the default
+output radix is set to var(base).  Use, for example, `tt([#16])' to display
+hexadecimal output preceded by an indication of the base, or `tt([##16])'
+just to display the raw number in the given base.  Bases themselves are
+always specified in decimal. `tt([#])' restores the normal output format.
+Note that setting an output base suppresses floating point output; use
+`tt([#])' to return to normal operation.
 )
 enditem()
 

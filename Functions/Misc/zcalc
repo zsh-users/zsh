@@ -96,16 +96,16 @@ setopt extendedglob
 # TODO: make local variables that shouldn't be visible in expressions
 # begin with _.
 local line ans base defbase forms match mbegin mend psvar optlist opt arg
-local compcontext="-math-"
+local compcontext="-zcalc-line-"
 integer num outdigits outform=1
 
 # We use our own history file with an automatic pop on exit.
 history -ap "${ZDOTDIR:-$HOME}/.zcalc_history"
 
-forms=( '%2$g' '%.*g' '%.*f' '%.*E' )
+forms=( '%2$g' '%.*g' '%.*f' '%.*E' '')
 
 zmodload -i zsh/mathfunc 2>/dev/null
-autoload zmathfuncdef
+autoload -U zmathfuncdef
 
 : ${ZCALCPROMPT="%1v> "}
 
@@ -176,35 +176,62 @@ while vared -cehp "${(%)ZCALCPROMPT}" line; do
 
   print -s -- $line
 
-  case ${${line##[[:blank:]]#}%%[[:blank:]]#} in
-    (q) # Exit if `q' on its own.
-      return 0
+  line="${${line##[[:blank:]]#}%%[[:blank:]]#}"
+  case "$line" in
+    # Escapes begin with a colon
+    (:!*)
+    # shell escape
+    eval ${line##:\![[:blank:]]#}
+    line=
+    continue
     ;;
-    (norm) # restore output format to default
+
+    ((:|)q)
+    # Exit
+    return 0
+    ;;
+
+    ((:|)norm) # restore output format to default
       outform=1
     ;;
-    (sci[[:blank:]]#(#b)(<->)(#B))
+
+    ((:|)sci[[:blank:]]#(#b)(<->)(#B))
       outdigits=$match[1]
       outform=2
     ;;
-    (fix[[:blank:]]#(#b)(<->)(#B))
+
+    ((:|)fix[[:blank:]]#(#b)(<->)(#B))
       outdigits=$match[1]
       outform=3
     ;;
-    (eng[[:blank:]]#(#b)(<->)(#B))
+
+    ((:|)eng[[:blank:]]#(#b)(<->)(#B))
       outdigits=$match[1]
       outform=4
     ;;
-    (local([[:blank:]]##*|))
+
+    (:raw)
+    outform=5
+    ;;
+
+    ((:|)local([[:blank:]]##*|))
       eval $line
       line=
       continue
     ;;
-    (function[[:blank:]]##(#b)([^[:blank:]]##)(|[[:blank:]]##([^[:blank:]]*)))
+
+    ((:|)function[[:blank:]]##(#b)([^[:blank:]]##)(|[[:blank:]]##([^[:blank:]]*)))
       zmathfuncdef $match[1] $match[3]
       line=
       continue
     ;;
+
+    (:*)
+    print "Unrecognised escape"
+    line=
+    continue
+    ;;
+
     (*)
       # Latest value is stored as a string, because it might be floating
       # point or integer --- we don't know till after the evaluation, and
@@ -222,7 +249,11 @@ while vared -cehp "${(%)ZCALCPROMPT}" line; do
   if [[ -n $base ]]; then
     print -- $(( $base $ans ))
   elif [[ $ans = *.* ]] || (( outdigits )); then
-    printf "$forms[outform]\n" $outdigits $ans
+    if [[ -z $forms[outform] ]]; then
+      print -- $(( $ans ))
+    else
+      printf "$forms[outform]\n" $outdigits $ans
+    fi
   else
     printf "%d\n" $ans
   fi

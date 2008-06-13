@@ -1,7 +1,18 @@
 DISTFILES_SRC='
 .distfiles
-_assign           _autocd
-_brace_parameter  _equal            _math             _subscript
-_condition        _first            _parameter        _tilde
-_default          _in_vared         _redirect         _value
+_assign
+_autocd
+_brace_parameter
+_condition
+_default
+_equal
+_first
+_in_vared
+_math
+_parameter
+_redirect
+_subscript
+_tilde
+_value
+_zcalc_line
 '
