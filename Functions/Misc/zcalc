@@ -179,8 +179,8 @@ while vared -cehp "${(%)ZCALCPROMPT}" line; do
   line="${${line##[[:blank:]]#}%%[[:blank:]]#}"
   case "$line" in
     # Escapes begin with a colon
-    (:!*)
-    # shell escape
+    (:(\\|)!*)
+    # shell escape: handle completion's habit of quoting the !
     eval ${line##:\![[:blank:]]#}
     line=
     continue

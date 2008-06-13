@@ -1,5 +1,9 @@
 2008-06-13  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Zsh/Context/_zcalc_line,
+	Functions/Misc/zcalc: handle completion idiosyncracies when
+	completing in the same word as ":!".
+
 	* 25152: Completion/Zsh/Context/{.distfiles,_zcalc_line}
 	(moved from Type because this is where it should be),
 	Doc/Zsh/contrib.yo, Functions/Misc/zcalc: improved zcalc
