@@ -22,7 +22,7 @@ _zcalc_line_escapes() {
 _zcalc_line() {
   local expl
 
-  if [[ CURRENT -eq 1 && $words[1] != ":!"* ]]; then
+  if [[ CURRENT -eq 1 && $words[1] != ":"(\\|)"!"* ]]; then
     local -a alts
     if [[ $words[1] = (|:*) ]]; then
       alts=("command-escapes:command escape:_zcalc_line_escapes")
@@ -35,15 +35,13 @@ _zcalc_line() {
   fi
 
   case $words[1] in
-    (":!"*)
-    if [[ $words[1] = ":!" ]]; then
+    (":"(\\|)"!"*)
+    if [[ $words[1] = ":"(\\|)"!" && CURRENT -gt 1 ]]; then
       shift words
-      (( CURRENT >1 && CURRENT-- ))
+      (( CURRENT-- ))
     else
-      words[1]=${words[1]##:\!}
-      if (( CURRENT == 1 )); then
-	compset -P ":\!"
-      fi
+      words[1]=${words[1]##:(\\|)\!}
+      compset -P ':(\\|)!'
     fi
     _normal
     ;;
