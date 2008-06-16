@@ -37,7 +37,7 @@
 #endif
 #endif
 
-#ifdef __linux
+#if defined(__linux) || defined(__GLIBC__)
 /*
  * Turn on numerous extensions.
  * This is in order to get the functions for manipulating /dev/ptmx.
