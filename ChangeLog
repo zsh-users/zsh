@@ -1,3 +1,8 @@
+2008-06-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25159: Doc/Zsh/compwid.yo: expand documentation for
+	correspondence classes with [:...:].
+
 2008-06-13  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Zsh/Context/_zcalc_line,
