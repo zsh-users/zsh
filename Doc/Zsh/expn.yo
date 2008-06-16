@@ -1423,7 +1423,7 @@ The character is a decimal digit
 item(tt([:graph:]))(
 The character is a printable character other than whitespace
 )
-item(tt([:lower:]))(l
+item(tt([:lower:]))(
 The character is a lowercase letter
 )
 item(tt([:print:]))(

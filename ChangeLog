@@ -1,5 +1,7 @@
 2008-06-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Bart: 25164: Doc/Zsh/expn.yo: typo.
+
 	* 25159: Doc/Zsh/compwid.yo: expand documentation for
 	correspondence classes with [:...:].
 
