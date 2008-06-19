@@ -1,3 +1,7 @@
+2008-06-19  Peter Stephenson  <pws@csr.com>
+
+	* 25214, tweaked: add warning about exponentitation precedence.
+
 2008-06-16  Clint Adams  <clint@zsh.org>
 
 	* 25167: Src/system.h: patch from Petr Salinger to define

@@ -93,8 +93,9 @@ cindex(arithmetic operators)
 cindex(operators, arithmetic)
 An arithmetic expression uses nearly the same syntax and
 associativity of expressions as in C.
-The following operators are supported (listed in decreasing order
-of precedence):
+
+In the native mode of operation, the following operators are supported
+(listed in decreasing order of precedence):
 
 startsitem()
 sitem(tt(PLUS() - ! ~ PLUS()PLUS() --))(unary plus/minus, logical NOT, complement, {pre,post}{in,de}crement)
@@ -141,6 +142,11 @@ sitem(tt(? :))(ternary operator)
 sitem(tt(= PLUS()= -= *= /= %= &= ^= |= <<= >>= &&= ||= ^^= **=))(assignment)
 sitem(tt(,))(comma operator)
 endsitem()
+
+Note the precedence of exponentiation in both cases is below
+that of unary operators, hence `tt(-3**2)' evaluates as `tt(9)', not
+tt(-9).  Use parentheses where necessary: `tt(-(3**2))'.  This is
+for compatibility with other shells.
 
 cindex(mathematical functions, use of)
 cindex(functions, math, use of)
