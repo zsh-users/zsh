@@ -414,7 +414,7 @@ for prepath in "$prepaths[@]"; do
       fi
 
       if (( ! $#tmp1 )); then
-        tmp2=( ${^tmp2}/$PREFIX$SUFFIX )
+        tmp2=( ${^${tmp2:#/}}/$PREFIX$SUFFIX )
       elif [[ "$tmp1[1]" = */* ]]; then
         if [[ -n "$_comp_correct" ]]; then
           tmp2=( "$tmp1[@]" )

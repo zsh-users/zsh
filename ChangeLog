@@ -1,3 +1,8 @@
+2008-06-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25231: Completion/Unix/Type/_path_files: fix approximation
+	of absolute paths in root directory (/uzr -> /usr, etc.).
+
 2008-06-19  Peter Stephenson  <pws@csr.com>
 
 	* 25214, tweaked: add warning about exponentitation precedence.
