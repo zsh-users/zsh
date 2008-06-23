@@ -1504,7 +1504,7 @@ command to an appropriate viewer.
 startitem()
 findex(zsh-mime-setup)
 findex(zsh-mime-handler)
-xitem(tt(zsh-mime-setup [-flv]))
+xitem(tt(zsh-mime-setup) [ tt(-fv) ] [ tt(-l) [ var(suffix ...) ] ])
 item(tt(zsh-mime-handler))(
 These two functions use the files tt(~/.mime.types) and tt(/etc/mime.types),
 which associate types and extensions, as well as tt(~/.mailcap) and
@@ -1525,8 +1525,14 @@ Repeated calls to tt(zsh-mime-setup) do not override the existing
 mapping between suffixes and executable files unless the option tt(-f)
 is given.  Note, however, that this does not override existing suffix
 aliases assigned to handlers other than tt(zsh-mime-handler).
+
 Calling tt(zsh-mime-setup) with the option tt(-l) lists the existing
-mappings without altering them.  Calling tt(zsh-mime-setup) with the option
+mappings without altering them.  Suffixes to list (which may contain
+pattern characters that should be quoted from immediate interpretation
+on the command line) may be given as additional arguments, otherwise
+all suffixes are listed.
+
+Calling tt(zsh-mime-setup) with the option
 tt(-v) causes verbose output to be shown during the setup operation.
 
 The system respects the tt(mailcap) flags tt(needsterminal) and

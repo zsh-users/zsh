@@ -37,7 +37,13 @@ if [[ -n $o_list ]]; then
   # so we don't need to search styles for suffixes that aren't
   # handled.  Yet.
   local list_word
-  for suffix in ${(ko)zsh_mime_handlers}; do
+  local -a handlers
+  if (( $# )); then
+    handlers=(${(k)zsh_mime_handlers[(I)${(j.|.)*}]})
+  else
+    handlers=(${(k)zsh_mime_handlers})
+  fi
+  for suffix in ${(o)handlers}; do
       zstyle -s ":mime:.$suffix:" handler list_word ||
         list_word=${zsh_mime_handlers[$suffix]}
       print ${(r.10.)suffix}$list_word
