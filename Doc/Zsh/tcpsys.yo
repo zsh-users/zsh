@@ -71,6 +71,7 @@ alphanumerics or underscores, and certainly do include whitespace.
 In the second case, one or more sessions to be opened are given by name.
 A single session name is given after tt(-s) and a comma-separated list
 after tt(-l); both options may be repeated as many times as necessary.
+A failure to open any session causes tt(tcp_open) to abort.
 The host and port are read from the file tt(.ztcp_sessions) in the same
 directory as the user's zsh initialisation files, i.e. usually the home
 directory, but tt($ZDOTDIR) if that is set.  The file consists of lines
@@ -117,6 +118,9 @@ The first session to be opened becomes the current session and subsequent
 calls to tt(tcp_open) do not change it.  The current session is stored
 in the parameter tt($TCP_SESS); see below for more detail about the
 parameters used by the system.
+
+The function tt(tcp_on_open), if defined, is called when a session
+is opened.  See the description below.
 )
 findex(tcp_close)
 item(tt(tcp_close [-qn] [ -a | -l) var(sess)tt(,... |) var(sess) tt(... ]))(
@@ -483,7 +487,10 @@ the time the function is called.
 findex(tcp_on_open)
 item(tt(tcp_on_open) var(sess) var(fd))(
 This is called after a new session has been defined with the session name
-and file descriptor as arguments.
+and file descriptor as arguments.  If it returns a non-zero status,
+opening the session is assumed to fail and the session is closed
+again; however, tt(tcp_open) will continue to attempt to open any
+remaining sessions given on the command line.
 )
 findex(tcp_on_rename)
 item(tt(tcp_on_rename) var(oldsess) var(fd) var(newsess))(

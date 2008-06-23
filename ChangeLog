@@ -1,5 +1,8 @@
 2008-06-23  Peter Stephenson  <pws@csr.com>
 
+	* 25237: Doc/Zsh/tcpsys.yo, Functions/TCP/tcp_open: make
+	tcp_on_open return status significant.
+
 	* 25236: Doc/Zsh/contrib.yo, Functions/MIME/zsh-mime-setup:
 	zsh-mime-setup -l can take suffix arguments.
 

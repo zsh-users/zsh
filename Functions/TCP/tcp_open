@@ -180,20 +180,35 @@ for sess in $sessnames; do
     tcp_by_name[$sess]=$fd
 
     [[ -o zle && -z $nozle ]] && zle -F $fd tcp_fd_handler
+
+    # needed for new completion system, so I'm not too sanguine
+    # about requiring this here...
+    if zmodload -i zsh/parameter; then
+	if (( ${+functions[tcp_on_open]} )); then
+	    if ! tcp_on_open $sess $fd; then
+	        if [[ -z $quiet ]]; then
+		    if (( ${#sessargs} )); then
+		        print "Session $sess" \
+"(host $sessargs[1], port $sessargs[2] fd $fd): tcp_on_open FAILED."
+		    else
+		        print "Session $sess (fd $fd) tcp_on_open FAILED."
+		    fi
+		    tcp_close -- $sess
+		else
+		    tcp_close -q -- $sess
+	        fi
+		stat=1
+		continue
+	    fi
+	fi
+    fi
+
     if [[ -z $quiet ]]; then
 	if (( ${#sessargs} )); then
 	    print "Session $sess" \
 "(host $sessargs[1], port $sessargs[2] fd $fd) opened OK."
 	else
 	    print "Session $sess (fd $fd) opened OK."
-	fi
-    fi
-
-    # needed for new completion system, so I'm not too sanguine
-    # about requiring this here...
-    if zmodload -i zsh/parameter; then
-	if (( ${+functions[tcp_on_open]} )); then
-	    tcp_on_open $sess $fd
 	fi
     fi
 done
