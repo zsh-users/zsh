@@ -1,3 +1,8 @@
+2008-06-24  Clint Adams  <clint@zsh.org>
+
+	* 25243: Completion/X/Command/_xrandr: patch from Chris Lamb to add
+	--same-as for xrandr.
+
 2008-06-24  Peter Stephenson  <pws@csr.com>
 
 	* 25244: Doc/Zsh/contrib.yo, Functions/Zle/match-words-by-style,
