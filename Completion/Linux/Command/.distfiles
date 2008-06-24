@@ -4,7 +4,9 @@ _acpi
 _analyseplugin
 _acpitool
 _brctl
+_ethtool
 _fusermount
+_ipset
 _iptables
 _iwconfig
 _losetup

@@ -1,0 +1,141 @@
+#compdef ethtool
+
+local -a cmds
+
+if [[ $CURRENT -ge 4 ]]; then
+	case $words[CURRENT-1]; in
+	  rx|tx)
+		if [[ $words[2] = '-G' ]] && _message -e n 'number of ring entries' || _wanted -x onoff expl 'enabled' compadd off on
+	  ;;
+	  autoneg|adaptive-rx|adaptive-tx|raw|sg|tso)
+		_wanted -x onoff expl 'enabled' compadd off on
+	  ;;
+	  rx-usecs|rx-frames|rx-usecs-irq|rx-frames-irq|tx-usecs|tx-frames|tx-usecs-irq|tx-frames-irq|stats-block-usecs|pkt-rate-low|rx-usecs-low|rx-frames-low|tx-usecs-low|tx-frames-low|pkt-rate-high|rx-usecs-high|rx-frames-high|tx-usecs-high|tx-frames-high|sample-interval|rx-mini|rx-jumbo|offset|length|magic|value|phyad|msglvl)
+		_message -e n 'number'
+	  ;;
+	  speed)
+		_wanted -x speed expl 'speed' compadd 10 100 1000
+	  ;;
+	  duplex)
+		_wanted -x duplex expl 'duplex mode' compadd half full
+	  ;;
+	  port)
+		_wanted -x port expl 'device port' compadd tp aui bnc mii
+	  ;;
+	  xcvr)
+		_wanted -x xcvr expl 'transceiver type' compadd internal external
+	  ;;
+	  wol)
+		_values -s '' 'Wake-on-LAN options' \
+			'(d)p[Wake on phy activity]' \
+			'(d)u[Wake on unicast messages]' \
+			'(d)m[Wake on multicast messages]' \
+			'(d)b[Wake on broadcast messages]' \
+			'(d)a[Wake on ARP]' \
+			'(d)g[Wake on MagicPacket(tm)]' \
+			'(d)s[Enable SecureOn(tm) password for MagicPacket(tm)]' \
+			'(p u m b a g s)d[Disable (wake on nothing)]'
+	  ;;
+	  sopass)
+		_message -e secureon 'password - 6 bytes in ethernet MAC hex format (xx:yy:zz:aa:bb:cc)'
+	  ;;
+	  *)
+	case $words[2]; in
+	  -A)
+		_values -S ' ' -w 'pause options' \
+			'autoneg[Specify if pause autonegotiation is enabled]' \
+			'rx[Specify if RX pause is enabled]' \
+			'tx[Specify if TX pause is enabled]'
+	  ;;
+	  -C)
+		_values -S ' ' -w 'coalescing settings' \
+			'adaptive-rx' 'adaptive-tx' \
+			'rx-usecs' 'rx-frames' 'rx-usecs-irq' 'rx-frames-irq' \
+			'tx-usecs' 'tx-frames' 'tx-usecs-irq' 'tx-frames-irq' \
+			'stats-block-usecs' \
+			'pkt-rate-low' \
+			'rx-usecs-low' 'rx-frames-low' \
+			'tx-usecs-low' 'tx-frames-low' \
+			'pkt-rate-high' \
+			'rx-usecs-high' 'rx-frames-high' \
+			'tx-usecs-high' 'tx-frames-high' \
+			'sample-interval'
+	  ;;
+	  -G)
+		_values -S ' ' -w 'ring parameters' \
+			'rx[Change number of ring entries for the RX ring]' \
+			'rx-mini[Change number of ring entries for the RX Mini ring]' \
+			'rx-jumbo[Change number of ring entries for the RX Jumbo ring]' \
+			'tx[Change number of ring entries for the TX ring]'
+	  ;;
+	  -d)
+		_values -S ' ' -w 'register dump options' \
+			'raw[dump raw register data]'
+	  ;;
+	  -e)
+		_values -S ' ' -w 'EEPROM dump options' \
+			'raw[dump raw EEPROM data]' \
+			'offset[dump certain portions of the EEPROM]' \
+			'length[dump certain portions of the EEPROM]'
+	  ;;
+	  -E)
+		_values -S ' ' -w 'EEPROM values' \
+			'magic[device-specific key]' \
+			'offset[select byte]' \
+			'value[new value]'
+	  ;;
+	  -K)
+		_values -S ' ' -w 'offload options' \
+			'rx[Specify if RX checksumming is enabled]' \
+			'tx[Specify if TX checksumming is enabled]' \
+			'sg[Specify if scatter-gather is enabled]' \
+			'tso[Specify if tcp segmentation offload is enabled]'
+	  ;;
+	  -p)
+		if [[ $CURRENT -eq 4 ]] && _message -e length 'seconds'
+	  ;;
+	  -t)
+		_values -S ' ' -w 'selftest option' \
+			'(online)offline:perform full set of tests possibly causing normal operation interruption (default)]' \
+			'(offline)online:perform limited set of tests do not interrupting normal adapter operation]'
+	  ;;
+	  -s)
+		_values -S ' ' -w 'change setting' \
+			'speed[Set speed in Mb/s]' \
+			'duplex[Set full or half duplex mode]' \
+			'port[Select device port]' \
+			'autoneg[Specify if autonegotiation is enabled]' \
+			'phyad[PHY address]' \
+			'xcvr[Select transceiver type]' \
+			'wol[Set Wake-on-LAN options]' \
+			'sopass[Set the SecureOn(tm) password]' \
+			'msglvl[Set the driver message level]'
+	  ;;
+	esac
+	  ;;
+	esac
+fi
+
+cmds=(-h -a -A -c -C -g -G -i -d -e -E -k -K -p -r -S -t -s)
+
+_arguments \
+	"($cmds)1:interface:_net_interfaces" \
+	"($cmds 1)-h[shows a short help message]" \
+	"($cmds)-a[queries the specified ethernet device for pause parameter information]" \
+	"($cmds)-A[change the pause parameters of the specified ethernet device]" \
+	"($cmds)-c[queries the specified ethernet device for coalescing information]" \
+	"($cmds)-C[change the coalescing settings of the specified ethernet device]" \
+	"($cmds)-g[queries the specified ethernet device for RX/TX ring parameter information]" \
+	"($cmds)-G[change the RX/TX ring parameters of the specified ethernet device]" \
+	"($cmds)-i[queries the specified ethernet device for associated driver information]" \
+	"($cmds)-d[retrieves and prints a register dump for the specified ethernet device]" \
+	"($cmds)-e[retrieves and prints an EEPROM dump for the specified ethernet device]" \
+	"($cmds)-E[Changes EEPROM byte for the specified ethernet device]" \
+	"($cmds)-k[queries the specified ethernet device for offload information]" \
+	"($cmds)-K[change the offload parameters of the specified ethernet device]" \
+	"($cmds)-p[initiates adapter-specific action intended to identify the adapter by sight]" \
+	"($cmds)-r[restarts auto-negotiation on the specified ethernet device]" \
+	"($cmds)-S[queries the specified ethernet device for NIC- and driver-specific statistics]" \
+	"($cmds)-t[executes adapter selftest on the specified ethernet device]" \
+	"($cmds)-s[allows changing some or all settings of the specified ethernet device]" \
+	'*:' && ret=0

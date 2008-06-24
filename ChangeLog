@@ -1,5 +1,10 @@
 2008-06-24  Peter Stephenson  <pws@csr.com>
 
+	* users/12985, users/12986, users/12988: Tomasz Pala:
+	Completion/Linux/Command/_ethtool,
+	Completion/Linux/Command/_ipset, Completion/Unix/Command/_arp:
+	new and updated completions.
+
 	* users/12987: Doc/Zsh/contrib.yo,
 	Functions/Zle/match-words-by-style,
 	Functions/Zle/select-word-style: add subword matching to
