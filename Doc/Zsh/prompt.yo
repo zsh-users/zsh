@@ -274,6 +274,8 @@ sitem(tt(S))(True if the tt(SECONDS) parameter is at least var(n).)
 sitem(tt(T))(True if the time in hours is equal to var(n).)
 sitem(tt(t))(True if the time in minutes is equal to var(n).)
 sitem(tt(v))(True if the array tt(psvar) has at least var(n) elements.)
+sitem(tt(V))(True if element var(n) of the array tt(psvar) is set and
+non-empty.)
 sitem(tt(w))(True if the day of the week is equal to var(n) (Sunday = 0).)
 endsitem()
 )

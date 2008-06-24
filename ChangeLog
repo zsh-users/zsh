@@ -1,3 +1,8 @@
+2008-06-24  Peter Stephenson  <pws@csr.com>
+
+	* 25242: Mikael: Doc/Zsh/prompt.yo, Src/prompt.c: add V prompt
+	test for contents of psvar.
+
 2008-06-23  Peter Stephenson  <pws@csr.com>
 
 	* 25237: Doc/Zsh/tcpsys.yo, Functions/TCP/tcp_open: make

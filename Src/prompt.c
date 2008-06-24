@@ -321,6 +321,12 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		    if (arrlen(psvar) >= arg)
 			test = 1;
 		    break;
+		case 'V':
+		    if (arrlen(psvar) >= arg) {
+			if (*psvar[(arg ? arg : 1) - 1])
+			    test = 1;
+		    }
+		    break;
 		case '_':
 		    test = (cmdsp >= arg);
 		    break;
