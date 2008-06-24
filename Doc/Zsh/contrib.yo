@@ -459,11 +459,15 @@ Restore the default settings; this is usually the same as `tt(normal)'.
 )
 enditem()
 
-All but `tt(default)' can be input as an upper case character, which was
+All but `tt(default)' can be input as an upper case character, which has
 the same effect but with subword matching turned on.  In this case, words
 with upper case characters are treated specially: each separate run of
 upper case characters, or an upper case character followed by any number of
-other characters, is considered a word.
+other characters, is considered a word.  The style tt(subword-range)
+can supply an alternative character range to the default `tt([:upper:])';
+the value of the style is treated as the contents of a `tt([)var(...)tt(])'
+pattern (note that the outer brackets should not be supplied, only
+those surrounding named ranges).
 
 More control can be obtained using the tt(zstyle) command, as described in
 ifzman(zmanref(zshmodules))\
@@ -591,6 +595,7 @@ sitem(tt(-w))(var(word-style))
 sitem(tt(-s))(var(skip-chars))
 sitem(tt(-c))(var(word-class))
 sitem(tt(-C))(var(word-chars))
+sitem(tt(-r))(var(subword-range))
 endsitem()
 
 For example, tt(match-words-by-style -w shell -c 0) may be used to

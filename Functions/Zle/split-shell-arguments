@@ -7,9 +7,6 @@
 # Hence ${reply[$REPLY][$REPLY2]} is the character under the cursor.
 #
 # reply, REPLY, REPLY2 should therefore be local to the enclosing function.
-#
-# The following formula replaces the current shell word, or previous word
-# if the cursor is on whitespace, by uppercasing all characters.
 
 emulate -L zsh
 setopt extendedglob

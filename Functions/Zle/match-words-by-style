@@ -69,14 +69,14 @@ setopt extendedglob
 
 local wordstyle spacepat wordpat1 wordpat2 opt charskip wordchars wordclass
 local match mbegin mend pat1 pat2 word1 word2 ws1 ws2 ws3 skip
-local nwords MATCH MBEGIN MEND
+local nwords MATCH MBEGIN MEND subwordrange
 
 local curcontext=${curcontext:-:zle:match-words-by-style}
 
 autoload -U match-word-context
 match-word-context
 
-while getopts "w:s:c:C:" opt; do
+while getopts "w:s:c:C:r:" opt; do
   case $opt in
     (w)
     wordstyle=$OPTARG
@@ -92,6 +92,10 @@ while getopts "w:s:c:C:" opt; do
 
     (C)
     wordchars=$OPTARG
+    ;;
+
+    (r)
+    subwordrange=$OPTARG
     ;;
 
     (*)
@@ -190,6 +194,10 @@ word1=$match[1]
 ws1=$match[2]
 
 if [[ $wordstyle = *subword* ]]; then
+  if [[ -z $subwordrange ]] &&
+    ! zstyle -s $curcontext subword-range subwordrange; then
+    subwordrange='[:upper:]'
+  fi
   # The rule here is that a word boundary may be an upper case letter
   # followed by a lower case letter, or an upper case letter at
   # the start of a group of upper case letters.  To make
@@ -199,10 +207,10 @@ if [[ $wordstyle = *subword* ]]; then
   # Here the initial "*" will match greedily, so we get the
   # last such match, as we want.
   integer epos
-  if [[ $word1 = (#b)(*)([[:upper:]][^[:upper:]]*) ]]; then
+  if [[ $word1 = (#b)(*)([${~subwordrange}][^${~subwordrange}]*) ]]; then
     (( epos = ${#match[1]} ))
   fi
-  if [[ $word1 = (#b)(*[^[:upper:]])([[:upper:]]*) ]]; then
+  if [[ $word1 = (#b)(*[^${~subwordrange}])([${~subwordrange}]*) ]]; then
     (( ${#match[1]} > epos ))  &&  (( epos = ${#match[1]} ))
   fi
   if (( epos > 0 )); then
@@ -226,14 +234,15 @@ if [[ $wordstyle = *subword* ]]; then
   # Do we have a group of upper case characters at the start
   # of word2 (that don't form the entire word)?
   # Again, rely on greedy matching of first pattern.
-  if [[ $word2 = (#b)([[:upper:]][[:upper:]]##)(*) && -n $match[2] ]]; then
+  if [[ $word2 = (#b)([${~subwordrange}][${~subwordrange}]##)(*) &&
+	  -n $match[2] ]]; then
     # Yes, so the last one is new word boundary.
     (( epos = ${#match[1]} - 1 ))
     # Otherwise, do we have upper followed by non-upper not
     # at the start?  Ignore the initial character, we already
     # know it's a word boundary so it can be an upper case character
     # if it wants.
-  elif [[ $word2 = (#b)(?[^[:upper:]]##)[[:upper:]]* ]]; then
+  elif [[ $word2 = (#b)(?[^${~subwordrange}]##)[${~subwordrange}]* ]]; then
     (( epos = ${#match[1]} ))
   else
     (( epos = 0 ))

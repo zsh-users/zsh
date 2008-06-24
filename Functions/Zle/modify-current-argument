@@ -4,10 +4,10 @@
 # cursor with that.  Ensure the expression is suitable quoted.
 #
 # For example, to uppercase the entire shell argument:
-#   modify-current-word '${(U)ARG}'
+#   modify-current-argument '${(U)ARG}'
 # To strip the current quoting from the word (whether backslashes or
 # single, double or dollar quotes) and use single quotes instead:
-#   modify-current-word '${(qq)${(Q)ARG}}'
+#   modify-current-argument '${(qq)${(Q)ARG}}'
 
 # Retain most options from the calling function for the eval.
 # Reset some that might confuse things.
