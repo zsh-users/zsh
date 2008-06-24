@@ -459,6 +459,12 @@ Restore the default settings; this is usually the same as `tt(normal)'.
 )
 enditem()
 
+All but `tt(default)' can be input as an upper case character, which was
+the same effect but with subword matching turned on.  In this case, words
+with upper case characters are treated specially: each separate run of
+upper case characters, or an upper case character followed by any number of
+other characters, is considered a word.
+
 More control can be obtained using the tt(zstyle) command, as described in
 ifzman(zmanref(zshmodules))\
 ifnzman(noderef(The zsh/zutil Module)).  Each style is looked up in the
@@ -506,6 +512,9 @@ example, `tt(-:[:alnum:])' is a valid tt(word-class) to include all
 alphanumerics plus the characters `tt(-)' and `tt(:)'.  Be careful
 including `tt(])', `tt(^)' and `tt(-)' as these are special inside
 character classes.
+
+tt(word-style) may also have `tt(-subword)' appended to its value to
+turn on subword matching, as described above.
 
 The style tt(skip-chars) is mostly useful for
 tt(transpose-words) and similar functions.  If set, it gives a count of

@@ -10,7 +10,7 @@ word_functions=(backward-kill-word backward-word
 
 [[ -z $1 ]] && autoload read-from-minibuffer
 
-local REPLY detail f
+local REPLY detail f wordstyle
 
 if ! zle -l $word_functions[1]; then
     for f in $word_functions; do
@@ -25,6 +25,7 @@ while true; do
     if [[ -n $WIDGET && -z $1 ]]; then
 	read-from-minibuffer -k1 "Word styles (hit return for more detail):
 (b)ash (n)ormal (s)hell (w)hitespace (d)efault (q)uit
+(B), (N), (S), (W) as above with subword matching
 ${detail}? " || return 1
     else
 	REPLY=$1
@@ -33,31 +34,31 @@ ${detail}? " || return 1
     detail=
 
     case $REPLY in
-	(b*)
+	([bB]*)
 	# bash style
-	zstyle ':zle:*' word-style standard
+	wordstyle=standard
 	zstyle ':zle:*' word-chars ''
 	;;
 
-	(n*)
+	([nN]*)
 	# normal zsh style
-	zstyle ':zle:*' word-style standard
+	wordstyle=standard
 	zstyle ':zle:*' word-chars "$WORDCHARS"
 	;;
 
-	(s*)
+	([sS]*)
 	# shell command arguments or special tokens
-	zstyle ':zle:*' word-style shell
+	wordstyle=shell
 	;;
 
-	(w*)
+	([wW]*)
 	# whitespace-delimited
-	zstyle ':zle:*' word-style space
+	wordstyle=space
 	;;
 
 	(d*)
 	# default: could also return widgets to builtins here
-	zstyle -d ':zle:*' word-style
+	wordstyle=
 	zstyle -d ':zle:*' word-chars
 	;;
 
@@ -84,5 +85,12 @@ $detail" >&2
 	continue
 	;;
     esac
+
+    if [[ -n $wordstyle ]]; then
+      if [[ $REPLY = [[:upper:]]* ]]; then
+	wordstyle+=-subword
+      fi
+      zstyle ':zle:*' word-style $wordstyle
+    fi
     return
 done

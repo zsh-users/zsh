@@ -1,5 +1,10 @@
 2008-06-24  Peter Stephenson  <pws@csr.com>
 
+	* users/12987: Doc/Zsh/contrib.yo,
+	Functions/Zle/match-words-by-style,
+	Functions/Zle/select-word-style: add subword matching to
+	word-style capabilities.
+
 	* 25242: Mikael: Doc/Zsh/prompt.yo, Src/prompt.c: add V prompt
 	test for contents of psvar.
 

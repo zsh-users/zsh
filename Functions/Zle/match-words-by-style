@@ -105,7 +105,7 @@ done
 [[ -z $skip ]] && skip=0
 
 case $wordstyle in
-  (shell) local bufwords
+  (*shell*) local bufwords
 	  # This splits the line into words as the shell understands them.
 	  bufwords=(${(z)LBUFFER})
 	  nwords=${#bufwords}
@@ -133,7 +133,7 @@ case $wordstyle in
 	    wordpat2=${(q)wordpat2}
 	  fi
 	  ;;
-  (*space) spacepat='[[:space:]]#'
+  (*space*) spacepat='[[:space:]]#'
            wordpat1='[^[:space:]]##'
 	   wordpat2=$wordpat1
 	   ;;
@@ -160,8 +160,8 @@ case $wordstyle in
       fi
       # Quote $wc where necessary, because we don't want those
       # characters to be considered as pattern characters later on.
-      if [[ $wordstyle = *specified ]]; then
-        if [[ $wordstyle != un* ]]; then
+      if [[ $wordstyle = *specified* ]]; then
+        if [[ $wordstyle != *unspecified* ]]; then
 	  # The given set of characters are the word characters, nothing else
 	  wordpat1="[${wc}]##"
 	  # anything else is a space.
@@ -189,6 +189,28 @@ eval pat1='${LBUFFER%%(#b)('${wordpat1}')('${spacepat}')}'
 word1=$match[1]
 ws1=$match[2]
 
+if [[ $wordstyle = *subword* ]]; then
+  # The rule here is that a word boundary may be an upper case letter
+  # followed by a lower case letter, or an upper case letter at
+  # the start of a group of upper case letters.  To make
+  # it easier to be consistent, we just use anything that
+  # isn't an upper case characer instead of a lower case
+  # character.
+  # Here the initial "*" will match greedily, so we get the
+  # last such match, as we want.
+  integer epos
+  if [[ $word1 = (#b)(*)([[:upper:]][^[:upper:]]*) ]]; then
+    (( epos = ${#match[1]} ))
+  fi
+  if [[ $word1 = (#b)(*[^[:upper:]])([[:upper:]]*) ]]; then
+    (( ${#match[1]} > epos ))  &&  (( epos = ${#match[1]} ))
+  fi
+  if (( epos > 0 )); then
+    pat1+=$word1[1,epos]
+    word1=$word1[epos+1,-1]
+  fi
+fi
+
 match=()
 charskip=
 repeat $skip charskip+=\?
@@ -199,5 +221,31 @@ ${wordpat2}')('${spacepat}')}'
 ws2=$match[1]
 word2=$match[2]
 ws3=$match[3]
+
+if [[ $wordstyle = *subword* ]]; then
+  # Do we have a group of upper case characters at the start
+  # of word2 (that don't form the entire word)?
+  # Again, rely on greedy matching of first pattern.
+  if [[ $word2 = (#b)([[:upper:]][[:upper:]]##)(*) && -n $match[2] ]]; then
+    # Yes, so the last one is new word boundary.
+    (( epos = ${#match[1]} - 1 ))
+    # Otherwise, do we have upper followed by non-upper not
+    # at the start?  Ignore the initial character, we already
+    # know it's a word boundary so it can be an upper case character
+    # if it wants.
+  elif [[ $word2 = (#b)(?[^[:upper:]]##)[[:upper:]]* ]]; then
+    (( epos = ${#match[1]} ))
+  else
+    (( epos = 0 ))
+  fi
+  if (( epos )); then
+    # Careful: if we matched a subword there's no whitespace immediately
+    # after the matched word, so ws3 should be empty and any existing
+    # value tacked onto pat2.
+    pat2="${word2[epos+1,-1]}$ws3$pat2"
+    ws3=
+    word2=$word2[1,epos]
+  fi
+fi
 
 matched_words=("$pat1" "$word1" "$ws1" "$ws2" "$word2" "$ws3" "$pat2")
