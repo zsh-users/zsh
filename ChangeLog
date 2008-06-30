@@ -1,5 +1,8 @@
 2008-06-30  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Functions/Calendar/calendar_scandate: unlocalised
+	variable spotted with warncreateglobal.
+
 	* 25255: Doc/Zsh/func.yo, Src/exec.c, Test/C04funcdef.ztst:
 	anonymous functions using "() { ... }" and "function { ... }".
 

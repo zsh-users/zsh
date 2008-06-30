@@ -267,6 +267,7 @@ fi
 # We do this by minimal matching at the head, i.e. ${...#...}.
 # To use a case statement we'd need to be able to request non-greedy
 # matching for a pattern.
+local rest
 rest=${line#(#ibm)${~tspat}(<0-12>):(<0-59>)[.:]((<0-59>)(.<->|))[[:space:]]#([ap])(|.)[[:space:]]#m(.|[[:space:]]|(#e))}
 if [[ $rest != $line ]]; then
   hour=$match[2]
