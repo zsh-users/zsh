@@ -598,7 +598,7 @@ for prepath in "$prepaths[@]"; do
 	    compadd -U -Qf "$mopts[@]" -p "$IPREFIX$linepath$tmp2" \
 	            -s "/${tmp3#*/}$ISUFFIX" \
 	            -W "$prepath$realpath$testpath" \
-		    "$pfxsfx[@]" -M "r:|/=* r:|=*" \
+		    "$pfxsfx[@]" \
 		    $listopts \
 	            -a tmp1
           else
@@ -608,7 +608,7 @@ for prepath in "$prepaths[@]"; do
 	    compadd -U -Qf "$mopts[@]" -p "$IPREFIX$linepath$tmp2" \
 	            -s "$ISUFFIX" \
 	            -W "$prepath$realpath$testpath" \
-		    "$pfxsfx[@]" -M "r:|/=* r:|=*" \
+		    "$pfxsfx[@]" \
 	            $listopts \
 		    -a tmp1
           fi
@@ -617,7 +617,7 @@ for prepath in "$prepaths[@]"; do
 	  compadd -U -Qf "$mopts[@]" -p "$IPREFIX$linepath$tmp2" \
 	          -s "$ISUFFIX" \
 	          -W "$prepath$realpath$testpath" \
-		   "$pfxsfx[@]" -M "r:|/=* r:|=*" \
+		   "$pfxsfx[@]" \
 	           $listopts \
 		   -a tmp1
 	fi
@@ -627,7 +627,7 @@ for prepath in "$prepaths[@]"; do
 	  tmp4=( -U -Qf "$mopts[@]" -p "$IPREFIX$linepath$tmp2"
 	         -s "$ISUFFIX"
 	         -W "$prepath$realpath$testpath"
-	         "$pfxsfx[@]" -M "r:|/=* r:|=*" )
+	         "$pfxsfx[@]" )
 	  if [[ -z "$listsfx" ]]; then
             for i in "$tmp1[@]"; do
 	      tmpdisp=("${i%%/*}")
@@ -647,7 +647,7 @@ for prepath in "$prepaths[@]"; do
 	  compadd -U -Qf "$mopts[@]" -p "$IPREFIX$linepath$tmp2" \
 	          -s "$ISUFFIX" \
                   -W "$prepath$realpath$testpath" \
-		  "$pfxsfx[@]" -M "r:|/=* r:|=*" \
+		  "$pfxsfx[@]" \
                   $listopts \
 		  -a tmp1
         fi
@@ -716,7 +716,7 @@ for prepath in "$prepaths[@]"; do
         compadd -U -Qf "$mopts[@]" -p "$IPREFIX$linepath$tmp3/" \
 	        -s "/$tmp4$i$ISUFFIX" \
                 -W "$prepath$realpath${mid%/*/}/" \
-	        "$pfxsfx[@]" -M "r:|/=* r:|=*" $listopts - "$tmp2"
+	        "$pfxsfx[@]" $listopts - "$tmp2"
       done
     else
       if [[ "$osuf" = */* ]]; then
@@ -747,7 +747,7 @@ for prepath in "$prepaths[@]"; do
         compadd -U -Qf -p "$IPREFIX$linepath$tmp4" \
 	        -s "$ISUFFIX" \
 	        -W "$prepath$realpath$testpath" \
-	        "$pfxsfx[@]" "$mopts[@]" -M "r:|/=* r:|=*" $listopts -a tmp1
+	        "$pfxsfx[@]" "$mopts[@]" $listopts -a tmp1
       fi
     fi
   fi

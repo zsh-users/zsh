@@ -1,3 +1,8 @@
+2008-06-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25258(?): Completion/Unix/Type/_path_files: donʼt
+	use -M option with -U.
+
 2008-06-30  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Functions/Calendar/calendar_scandate: unlocalised
