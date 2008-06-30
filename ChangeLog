@@ -1,3 +1,8 @@
+2008-06-30  Peter Stephenson  <pws@csr.com>
+
+	* 25255: Doc/Zsh/func.yo, Src/exec.c, Test/C04funcdef.ztst:
+	anonymous functions using "() { ... }" and "function { ... }".
+
 2008-06-24  Clint Adams  <clint@zsh.org>
 
 	* 25243: Completion/X/Command/_xrandr: patch from Chris Lamb to add

@@ -3853,7 +3853,7 @@ static int
 execfuncdef(Estate state, UNUSED(int do_exec))
 {
     Shfunc shf;
-    char *s;
+    char *s = NULL;
     int signum, nprg, sbeg, nstrs, npats, len, plen, i, htok = 0;
     Wordcode beg = state->pc, end;
     Eprog prog;
@@ -3861,10 +3861,7 @@ execfuncdef(Estate state, UNUSED(int do_exec))
     LinkList names;
 
     end = beg + WC_FUNCDEF_SKIP(state->pc[-1]);
-    if (!(names = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok))) {
-	state->pc = end;
-	return 0;
-    }
+    names = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok);
     nprg = end - beg;
     sbeg = *state->pc++;
     nstrs = *state->pc++;
@@ -3874,21 +3871,32 @@ execfuncdef(Estate state, UNUSED(int do_exec))
     plen = nprg * sizeof(wordcode);
     len = plen + (npats * sizeof(Patprog)) + nstrs;
 
-    if (htok)
+    if (htok && names)
 	execsubst(names);
 
-    while ((s = (char *) ugetnode(names))) {
-	prog = (Eprog) zalloc(sizeof(*prog));
+    while (!names || (s = (char *) ugetnode(names))) {
+	if (!names) {
+	    prog = (Eprog) zhalloc(sizeof(*prog));
+	    prog->nref = -1; /* on the heap */
+	} else {
+	    prog = (Eprog) zalloc(sizeof(*prog));
+	    prog->nref = 1; /* allocated from permanent storage */
+	}
 	prog->npats = npats;
-	prog->nref = 1; /* allocated from permanent storage */
 	prog->len = len;
-	if (state->prog->dump) {
-	    prog->flags = EF_MAP;
-	    incrdumpcount(state->prog->dump);
-	    prog->pats = pp = (Patprog *) zalloc(npats * sizeof(Patprog));
+	if (state->prog->dump || !names) {
+	    if (!names) {
+		prog->flags = EF_HEAP;
+		prog->dump = NULL;
+		prog->pats = pp = (Patprog *) zhalloc(npats * sizeof(Patprog));
+	    } else {
+		prog->flags = EF_MAP;
+		incrdumpcount(state->prog->dump);
+		prog->dump = state->prog->dump;
+		prog->pats = pp = (Patprog *) zalloc(npats * sizeof(Patprog));
+	    }
 	    prog->prog = state->pc;
 	    prog->strs = state->strs + sbeg;
-	    prog->dump = state->prog->dump;
 	} else {
 	    prog->flags = EF_REAL;
 	    prog->pats = pp = (Patprog *) zalloc(len);
@@ -3906,23 +3914,37 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 	shf->funcdef = prog;
 	shf->node.flags = 0;
 
-	/* is this shell function a signal trap? */
-	if (!strncmp(s, "TRAP", 4) &&
-	    (signum = getsignum(s + 4)) != -1) {
-	    if (settrap(signum, NULL, ZSIG_FUNC)) {
-		freeeprog(shf->funcdef);
-		zfree(shf, sizeof(*shf));
-		state->pc = end;
-		return 1;
-	    }
-
+	if (!names) {
 	    /*
-	     * Remove the old node explicitly in case it has
-	     * an alternative name
+	     * Anonymous function, execute immediately.
+	     * Function name is "(anon)", parameter list is empty.
 	     */
-	    removetrapnode(signum);
+	    LinkList args = newlinklist();
+
+	    shf->node.nam = "(anon)";
+	    addlinknode(args, shf->node.nam);
+
+	    execshfunc(shf, args);
+	    break;
+	} else {
+	    /* is this shell function a signal trap? */
+	    if (!strncmp(s, "TRAP", 4) &&
+		(signum = getsignum(s + 4)) != -1) {
+		if (settrap(signum, NULL, ZSIG_FUNC)) {
+		    freeeprog(shf->funcdef);
+		    zfree(shf, sizeof(*shf));
+		    state->pc = end;
+		    return 1;
+		}
+
+		/*
+		 * Remove the old node explicitly in case it has
+		 * an alternative name
+		 */
+		removetrapnode(signum);
+	    }
+	    shfunctab->addnode(shfunctab, ztrdup(s), shf);
 	}
-	shfunctab->addnode(shfunctab, ztrdup(s), shf);
     }
     state->pc = end;
     return 0;

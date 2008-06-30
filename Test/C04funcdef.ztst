@@ -99,3 +99,82 @@
 ?ThisCommandDoesNotExistEither
 ?has gone down the tubes.  Sorry.
 ?(eval):7: command not found: ThisCommandDoesNotExistEither
+
+  local variable=outside
+  print "I am $variable"
+  function {
+    local variable=inside
+    print "I am $variable"
+  }
+  print "I am $variable"
+  () {
+    local variable="inside again"
+    print "I am $variable"
+  }
+  print "I am $variable"
+0:Anonymous function scope
+>I am outside
+>I am inside
+>I am outside
+>I am inside again
+>I am outside
+
+  integer i
+  for (( i = 0; i < 10; i++ )); do function {
+    case $i in
+    ([13579])
+    print $i is odd
+    ;|
+    ([2468])
+    print $i is even
+    ;|
+    ([2357])
+    print $i is prime
+    ;;
+    esac
+  }; done
+0:Anonymous function with patterns in loop
+>1 is odd
+>2 is even
+>2 is prime
+>3 is odd
+>3 is prime
+>4 is even
+>5 is odd
+>5 is prime
+>6 is even
+>7 is odd
+>7 is prime
+>8 is even
+>9 is odd
+
+  echo stuff in file >file.in
+  function {
+    sed 's/stuff/rubbish/'
+  } <file.in >file.out
+  cat file.out
+0:Anonymous function redirection
+>rubbish in file
+
+  variable="Do be do"
+  print $variable
+  function {
+     print $variable
+     local variable="Da de da"
+     print $variable
+     function {
+       print $variable
+       local variable="Dum da dum"
+       print $variable
+     }
+     print $variable
+  }
+  print $variable
+0:Nested anonymous functions
+>Do be do
+>Do be do
+>Da de da
+>Da de da
+>Dum da dum
+>Da de da
+>Do be do

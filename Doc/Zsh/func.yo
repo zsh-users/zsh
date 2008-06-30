@@ -150,6 +150,42 @@ executing tt(myfunc), use:
 
 example(autoload +X myfunc)
 
+sect(Anonymous Functions)
+cindex(anonymous functions)
+cindex(functions, anonymous)
+
+If no name is given for a function, it is `anonymous' and is handled
+specially.  Either form of function definition may be used: a `tt(())' with
+no preceding name, or a `tt(function)' with an immediately following open
+brace.  The function is executed immediately at the point of definition and
+is not stored for future use.  The function name is set to `tt((anon))' and
+the parameter list passed to the function is empty.  Note that this means
+the argument list of any enclosing script or function is hidden.
+Redirections may be applied to the anonymous function in the same manner as
+to a current-shell structure enclosed in braces.  The main use of anonymous
+functions is to provide a scope for local variables.  This is particularly
+convenient in start-up files as these do not provide their own local
+variable scope.
+
+For example,
+
+example(variable=outside
+function {
+  local variable=inside
+  print "I am $variable"
+}
+print "I am $variable")
+
+outputs the following:
+
+example(I am inside
+I am outside)
+
+Note that function definitions with arguments that expand to nothing,
+for example `tt(name=; function $name { )var(...)tt( })', are not
+treated as anonymous functions.  Instead, they are treated as normal
+function definitions where the definition is silently discarded.
+
 sect(Special Functions)
 Certain functions, if defined, have special meaning to the shell.
 
