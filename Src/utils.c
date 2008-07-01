@@ -2069,9 +2069,8 @@ checkrmall(char *s)
     return (getquery("ny", 1) == 'y');
 }
 
-/**/
-int
-read1char(void)
+static int
+read1char(int echo)
 {
     char c;
 
@@ -2079,6 +2078,8 @@ read1char(void)
 	if (errno != EINTR || errflag || retflag || breaks || contflag)
 	    return -1;
     }
+    if (echo)
+	write(SHTTY, &c, 1);
     return STOUC(c);
 }
 
@@ -2105,12 +2106,26 @@ noquery(int purge)
 int
 getquery(char *valid_chars, int purge)
 {
-    int c, d;
+    int c, d, nl = 0;
     int isem = !strcmp(term, "emacs");
+    struct ttyinfo ti;
 
     attachtty(mypgrp);
+
+    gettyinfo(&ti);
+#ifdef HAS_TIO
+    ti.tio.c_lflag &= ~ECHO;
+    if (!isem) {
+	ti.tio.c_lflag &= ~ICANON;
+	ti.tio.c_cc[VMIN] = 1;
+	ti.tio.c_cc[VTIME] = 0;
+    }
+#else
+    ti.sgttyb.sg_flags &= ~ECHO;
     if (!isem)
-	setcbreak();
+	ti.sgttyb.sg_flags |= CBREAK;
+#endif
+    settyinfo(&ti);
 
     if (noquery(purge)) {
 	if (!isem)
@@ -2119,7 +2134,7 @@ getquery(char *valid_chars, int purge)
 	return 'n';
     }
 
-    while ((c = read1char()) >= 0) {
+    while ((c = read1char(0)) >= 0) {
 	if (c == 'Y')
 	    c = 'y';
 	else if (c == 'N')
@@ -2131,17 +2146,18 @@ getquery(char *valid_chars, int purge)
 	    break;
 	}
 	if (strchr(valid_chars, c)) {
-	    write(SHTTY, "\n", 1);
+	    nl = 1;
 	    break;
 	}
 	zbeep();
-	if (icntrl(c))
-	    write(SHTTY, "\b \b", 3);
-	write(SHTTY, "\b \b", 3);
     }
+    write(SHTTY, &c, 1);
+    if (nl)
+	write(SHTTY, "\n", 1);
+
     if (isem) {
 	if (c != '\n')
-	    while ((d = read1char()) >= 0 && d != '\n');
+	    while ((d = read1char(1)) >= 0 && d != '\n');
     } else {
 	if (c != '\n' && !valid_chars) {
 #ifdef MULTIBYTE_SUPPORT
@@ -2159,19 +2175,17 @@ getquery(char *valid_chars, int purge)
 
 		    if (ret != MB_INCOMPLETE)
 			break;
-		    c = read1char();
+		    c = read1char(1);
 		    if (c < 0)
 			break;
 		    cc = (char)c;
 		}
 	    }
 #endif
-	    settyinfo(&shttyinfo);
 	    write(SHTTY, "\n", 1);
 	}
-	else
-	    settyinfo(&shttyinfo);
     }
+    settyinfo(&shttyinfo);
     return c;
 }
 

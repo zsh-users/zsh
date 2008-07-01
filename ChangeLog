@@ -1,6 +1,11 @@
+2008-07-01  Peter Stephenson  <pws@csr.com>
+
+	* 25259: Src/utils.c: make getquery() handle unhandled characters
+	better.
+
 2008-06-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 25258(?): Completion/Unix/Type/_path_files: donʼt
+	* 25258: Completion/Unix/Type/_path_files: donʼt
 	use -M option with -U.
 
 2008-06-30  Peter Stephenson  <pws@csr.com>
