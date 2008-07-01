@@ -1687,8 +1687,7 @@ par_simple(int *complex, int nr)
 		sl = ecadd(0);
 		pl = ecadd(WCB_PIPE(WC_PIPE_END, 0));
 
-		par_cmd(&c);
-		if (!c) {
+		if (!par_cmd(&c)) {
 		    cmdpop();
 		    YYERROR(oecused);
 		}
