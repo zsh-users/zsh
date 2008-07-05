@@ -100,7 +100,8 @@ Apart from these strings, the var(name) may also be an asterisk
 (`tt(*)') followed by any string. The var(value) given for such a
 string will be used for all files whose name ends with the string.
 The var(name) may also be an equals sign (`tt(=)') followed by a
-pattern.  The var(value) given for this pattern will be used for all
+pattern; the tt(EXTENDED_GLOB) option will be turned on for evaluation
+of the pattern.  The var(value) given for this pattern will be used for all
 matches (not just filenames) whose display string are matched by
 the pattern.  Definitions for both of these take precedence over the
 values defined for file types and the form with the leading asterisk 

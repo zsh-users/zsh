@@ -1,3 +1,8 @@
+2008-07-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25266: Doc/Zsh/mod_complist.yo, Src/Zle/complist.c: always use
+	EXTENDED_GLOB for patterns in ZLS_COLORS.
+
 2008-07-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25262: Src/parse.c: suspicious attempt to test errors

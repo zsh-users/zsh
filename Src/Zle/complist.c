@@ -1923,6 +1923,7 @@ static int
 complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 {
     static int onlnct = -1;
+    static int extendedglob;
 
     Cmgroup oamatches = amatches;
 
@@ -1945,6 +1946,8 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
      * useful outside.
      */
     pushheap();
+    extendedglob = opts[EXTENDEDGLOB];
+    opts[EXTENDEDGLOB] = 1;
 
     getcols();
 
@@ -1958,6 +1961,7 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 	noselect = 1;
 	amatches = oamatches;
 	popheap();
+	opts[EXTENDEDGLOB] = extendedglob;
 	return 1;
     }
     if (inselect || mlbeg >= 0)
@@ -1990,6 +1994,7 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 	if (asklist()) {
 	    amatches = oamatches;
 	    popheap();
+	    opts[EXTENDEDGLOB] = extendedglob;
 	    return (noselect = 1);
 	}
     }
@@ -2034,6 +2039,7 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
     amatches = oamatches;
 
     popheap();
+    opts[EXTENDEDGLOB] = extendedglob;
 
     return noselect;
 }
