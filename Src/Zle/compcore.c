@@ -2277,6 +2277,45 @@ addmatches(Cadata dat, char **argv)
 			haspattern = 1;
 		}
 	    }
+	} else {
+	    /*
+	     * (This is called a "comment".  Given you've been
+	     * spending your time reading the completion time, you
+	     * may have forgotten what one is.  It's used to deconfuse
+	     * the poor so-and-so who's landed up having to maintain
+	     * the code.)
+	     *
+	     * So what's going on here then?  I'm glad you asked.  To test
+	     * whether we should start menu completion, we test whether
+	     * compstate[insert] has been set to "menu", but only if we found
+	     * patterns in the code.  It's not clear to me from the
+	     * documentation why the second condition would apply, but sure
+	     * enough if I remove it the test suite falls over.  (Testing
+	     * comppatmatch at the later point doesn't work because compstate
+	     * is likely to have been reset by the point we actually insert
+	     * the completions, after all functions have exited; this is at
+	     * least part of the problem.)  In the present case, we are not
+	     * doing matching on the code because all the clever stuff has
+	     * been done over our heads and we've simply between told to
+	     * insert it.  However, we still need to take account of ambiguous
+	     * completions properly.  To do this, we rely on the caller to
+	     * pass down the same prefix/suffix with the patterns that we
+	     * would get if we were doing matching, and test those for
+	     * patterns.  This gets us out of the hole apparently without
+	     * breaking anything.  The particular case where this is needed is
+	     * approximate file completion: this does its own matching but
+	     * _approximate still sets the prefix to include the pattern.
+	     */
+	    if (comppatmatch && *comppatmatch) {
+		int pflen = strlen(compprefix);
+		char *tmp = zhalloc(pflen + strlen(compsuffix) + 1);
+		strcpy(tmp, compprefix);
+		strcpy(tmp + pflen, compsuffix);
+		tokenize(tmp);
+		remnulargs(tmp);
+		if (haswilds(tmp))
+		    haspattern = 1;
+	    }
 	}
 	if (*argv) {
 	    if (dat->pre)
