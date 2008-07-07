@@ -6,7 +6,9 @@
 # the current line.
 
 emulate -L zsh
+setopt typesetsilent
 
+typeset -g __copyword
 if (( ${NUMERIC:-0} )); then
   # 1 means last word, 2 second last, etc.
   (( __copyword = ${NUMERIC:-0} ))
@@ -15,7 +17,7 @@ elif [[ -n $__copyword && $WIDGET = $LASTWIDGET ]]; then
   (( __copyword-- ))
 elif [[ $LASTWIDGET = *insert-last-word ]]; then
   __copyword=-2
-  __copywidget=$LASTWIDGET
+  typeset -g __copywidget=$LASTWIDGET
 else
   __copyword=-1
   zstyle -s :$WIDGET widget __copywidget

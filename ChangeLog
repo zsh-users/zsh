@@ -1,5 +1,8 @@
 2008-07-07  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Functions/Zle/copy-earlier-word: avoid
+	warnings from WARN_CREATE_GLOBAL.
+
 	* 25269: Frank Terbeck: Src/Zle/compcore.c
 
 2008-07-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
