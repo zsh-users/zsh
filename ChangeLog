@@ -1,3 +1,13 @@
+2008-07-07  Peter Stephenson  <pws@csr.com>
+
+	* 25269: Frank Terbeck: Src/Zle/compcore.c
+
+2008-07-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25267: Src/Zle/compcore.c: Fix problem that menu completion
+	wasn't automatically started on a pattern match if matching
+	was done by the calling function.
+
 2008-07-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25266: Doc/Zsh/mod_complist.yo, Src/Zle/complist.c: always use

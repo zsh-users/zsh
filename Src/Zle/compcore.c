@@ -2280,7 +2280,7 @@ addmatches(Cadata dat, char **argv)
 	} else {
 	    /*
 	     * (This is called a "comment".  Given you've been
-	     * spending your time reading the completion time, you
+	     * spending your time reading the completion code, you
 	     * may have forgotten what one is.  It's used to deconfuse
 	     * the poor so-and-so who's landed up having to maintain
 	     * the code.)
