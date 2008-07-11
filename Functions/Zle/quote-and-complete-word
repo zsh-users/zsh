@@ -5,7 +5,7 @@
 # normal completion fails, the quotes are removed again.
 #
 # To use it:
-#   autoload -U quote-and-complete-word
+#   autoload -Uz quote-and-complete-word
 #   zle -N quote-and-complete-word
 #   bindkey '\t' quote-and-complete-word
 #

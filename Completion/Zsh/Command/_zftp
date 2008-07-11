@@ -28,13 +28,13 @@ fi
 case $subcom in
   *(cd|ls|dir))
     # complete remote directories
-    [[ -z ${functions[zfcd_match]} ]] && autoload -U zfcd_match
+    [[ -z ${functions[zfcd_match]} ]] && autoload -Uz zfcd_match
     _tags directories && zfcd_match $PREFIX $SUFFIX
     ;;
 
   *(get(|at)|gcp|delete|remote))
     # complete remote files
-    [[ -z ${functions[zfget_match]} ]] && autoload -U zfget_match
+    [[ -z ${functions[zfget_match]} ]] && autoload -Uz zfget_match
     _tags files && zfget_match $PREFIX $SUFFIX
     ;;
 

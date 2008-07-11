@@ -30,7 +30,7 @@ prompt_fire_setup () {
   local cwd=${6:-'yellow'}
 
   local -a schars
-  autoload -U prompt_special_chars
+  autoload -Uz prompt_special_chars
   prompt_special_chars
 
   local GRAD1="%{$schars[333]$schars[262]$schars[261]$schars[260]%}"

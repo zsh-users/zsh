@@ -22,7 +22,7 @@ prompt_elite_setup () {
   local punctuation=${2:-'blue'}
 
   local -A schars
-  autoload -U prompt_special_chars
+  autoload -Uz prompt_special_chars
   prompt_special_chars
 
   PS1="%F{$text}$schars[332]$schars[304]%F{$punctuation}(%F{$text}%n%F{$punctuation}@%F{$text}%m%F{$punctuation})%F{$text}-%F{$punctuation}(%F{$text}%D{%I:%M%P}%F{$punctuation}-:-%F{$text}%D{%m}%F{$punctuation}%F{$text}/%D{%d}%F{$punctuation})%F{$text}$schars[304]-%F{$punctuation}$schars[371]%F{$text}-$schars[371]$schars[371]%F{$punctuation}$schars[372]$prompt_newline%F{$text}$schars[300]$schars[304]%F{$punctuation}(%F{$text}%1~%F{$punctuation})%F{$text}$schars[304]$schars[371]%F{$punctuation}$schars[372]%f"

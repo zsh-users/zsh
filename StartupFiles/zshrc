@@ -117,7 +117,7 @@ bindkey '^I' complete-word # complete on tab, leave expansion to _expand
 # Setup new style completion system. To see examples of the old style (compctl
 # based) programmable completion, check Misc/compctl-examples in the zsh
 # distribution.
-autoload -U compinit
+autoload -Uz compinit
 compinit
 
 # Completion Styles

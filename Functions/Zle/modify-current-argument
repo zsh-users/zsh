@@ -16,7 +16,7 @@ setopt localoptions noksharrays multibyte
 local -a reply
 integer REPLY REPLY2
 
-autoload -U split-shell-arguments
+autoload -Uz split-shell-arguments
 split-shell-arguments
 
 # Can't do this unless there's some text under or left of us.

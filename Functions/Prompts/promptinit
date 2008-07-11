@@ -2,7 +2,7 @@
 ## zsh prompt themes extension
 ## by Adam Spiers <adam@spiers.net>
 ##
-## Load with `autoload -U promptinit; promptinit'.
+## Load with `autoload -Uz promptinit; promptinit'.
 ## Type `prompt -h' for help.
 ##
 

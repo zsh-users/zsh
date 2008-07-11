@@ -1,6 +1,6 @@
 #compdef tla
 
-autoload is-at-least
+autoload -z is-at-least
 local TLA=$words[1]
 local tla_version
 local hide_short

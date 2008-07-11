@@ -1,6 +1,6 @@
 # Shell function to increment an integer either under the cursor or just
 # to the left of it.  Use
-#   autoload -U incarg
+#   autoload -Uz incarg
 #   zle -N incarg
 #   bindkey "..." incarg
 # to define it.  For example,

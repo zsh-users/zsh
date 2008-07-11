@@ -22,7 +22,7 @@ prompt_elite2_setup () {
   local parens_col=${2:-$text_col}
 
   local -A schars
-  autoload -U prompt_special_chars
+  autoload -Uz prompt_special_chars
   prompt_special_chars
 
   local text="%b%F{$text_col}"

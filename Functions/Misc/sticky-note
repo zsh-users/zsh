@@ -4,7 +4,7 @@
 # $HOME/.zsticky).  The number of notes stored is STICKYSIZE (1000).
 #
 # Load this file as a function:
-#    autoload -U sticky-note
+#    autoload -Uz sticky-note
 #
 # It may then be bound as a widget:
 #    zle -N sticky-note

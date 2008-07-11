@@ -1,6 +1,6 @@
 #compdef baz
 
-autoload is-at-least
+autoload -z is-at-least
 local BAZ=$words[1]
 local baz_version
 local hide_short

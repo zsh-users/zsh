@@ -15,7 +15,7 @@
 # with RETURN, without needing to move the cursor to the end first.
 #
 # To use it:
-#   autoload -U predict-on
+#   autoload -Uz predict-on
 #   zle -N predict-on
 #   zle -N predict-off
 #   bindkey '...' predict-on

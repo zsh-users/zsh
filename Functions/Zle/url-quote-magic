@@ -5,7 +5,7 @@
 # the input character.
 
 # Setup:
-#       autoload -U url-quote-magic
+#       autoload -Uz url-quote-magic
 #       zle -N self-insert url-quote-magic
 
 # A number of zstyles may be set to control the quoting behavior.

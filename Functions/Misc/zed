@@ -56,7 +56,7 @@ if (( bind )) || ! bindkey -M zed >&/dev/null; then
 
   # Make zed-set-file-name available.
   # Assume it's in fpath; there's no error at this point if it isn't
-  autoload -U zed-set-file-name
+  autoload -Uz zed-set-file-name
   zle -N zed-set-file-name
 fi
 if (( bind )) || ! bindkey -M zed-vicmd >&/dev/null; then
@@ -74,7 +74,7 @@ if ((fun)) then
   var="$(functions $1)"
   # If function is undefined but autoloadable, load it
   if [[ $var = *\#\ undefined* ]] then
-      var="$(autoload +X $1; functions $1)"
+      ar="$(autoload +X $1; functions $1)"
   elif [[ -z $var ]] then
     var="$1() {
 }"

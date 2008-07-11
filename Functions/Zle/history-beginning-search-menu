@@ -3,7 +3,7 @@
 # the entire history is searched.
 #
 # Configuration:
-#   autoload -U history-beginning-search-menu
+#   autoload -Uz history-beginning-search-menu
 #   zle -N history-beginning-search-menu
 #   bindkey '\eP' history-beginning-search-menu
 #

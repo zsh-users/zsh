@@ -1,7 +1,7 @@
 # Put standard xterm/dtterm window control codes in shell parameters for
 # easy use.  Note that some terminals do not support all combinations.
 
-# autoload -U xtermctl ; xtermctl
+# autoload -Uz xtermctl ; xtermctl
 # xtermctl --explain
 
 # Run once to set up; implements two functions:

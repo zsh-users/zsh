@@ -6,7 +6,7 @@ setopt EXTENDED_GLOB
 local DARCS=$words[1]
 
 # test whether to hide short options from completion
-autoload is-at-least
+autoload -z is-at-least
 local hide_short
 if zstyle -s ":completion:${curcontext}" hide-shortopts hide_short; then
   case $hide_short in

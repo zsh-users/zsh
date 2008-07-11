@@ -1,7 +1,7 @@
 # Someone once accused zsh of not being as complete as Emacs, because it
 # lacks Tetris and an adventure game.
 #
-# autoload -U tetris
+# autoload -Uz tetris
 # zle -N tetris
 # bindkey '...' tetris
 

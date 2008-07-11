@@ -1,3 +1,25 @@
+2008-07-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Phil Pennock: 25276:
+	Completion/Darwin/Type/_retrieve_mac_apps,
+	Completion/Unix/Command/_baz, Completion/Unix/Command/_darcs,
+	Completion/Unix/Command/_tar, Completion/Unix/Command/_tla,
+	Completion/Zsh/Command/_zftp, Functions/Misc/sticky-note,
+	Functions/Misc/tetris, Functions/Misc/xtermctl,
+	Functions/Misc/zed, Functions/Prompts/prompt_bigfade_setup,
+	Functions/Prompts/prompt_elite2_setup,
+	Functions/Prompts/prompt_elite_setup,
+	Functions/Prompts/prompt_fade_setup,
+	Functions/Prompts/prompt_fire_setup,
+	Functions/Prompts/promptinit, Functions/Zle/edit-command-line,
+	Functions/Zle/history-beginning-search-menu,
+	Functions/Zle/incarg, Functions/Zle/modify-current-argument,
+	Functions/Zle/narrow-to-region-invisible,
+	Functions/Zle/predict-on, Functions/Zle/quote-and-complete-word,
+	Functions/Zle/transpose-words-match,
+	Functions/Zle/url-quote-magic, StartupFiles/zshrc:
+	use autoload -z to load zsh functions.
+
 2008-07-07  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Functions/Zle/copy-earlier-word: avoid
