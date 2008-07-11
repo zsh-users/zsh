@@ -1,5 +1,9 @@
 2008-07-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Phil Pennock: 25275: Completion/Base/Utility/_store_cache,
+	StartupFiles/zshrc: restrict permissions on cache directories
+	and use zstat in example zshrc.
+
 	* Phil Pennock: 25276:
 	Completion/Darwin/Type/_retrieve_mac_apps,
 	Completion/Unix/Command/_baz, Completion/Unix/Command/_darcs,
