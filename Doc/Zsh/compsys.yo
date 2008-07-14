@@ -1956,16 +1956,16 @@ item(tt(matcher))(
 This style is tested separately for each tag valid in the current
 context.  Its value is added to any match specifications given by the 
 tt(matcher-list) style.  It should be in the form described in
-ifzman(the section `Matching Control' in zmanref(zshcompwid))\
-ifnzman(noderef(Matching Control))\
+ifzman(the section `Completion Matching Control' in zmanref(zshcompwid))\
+ifnzman(noderef(Completion Matching Control))\
 .
 )
 kindex(matcher-list, completion style)
 item(tt(matcher-list))(
 This style can be set to a list of match specifications that are to
 be applied everywhere. Match specifications are described in
-ifzman(the section `Matching Control' in zmanref(zshcompwid))\
-ifnzman(noderef(Matching Control))\
+ifzman(the section `Completion Matching Control' in zmanref(zshcompwid))\
+ifnzman(noderef(Completion Matching Control))\
 .
 The completion system will try them one after another for each completer
 selected.  For example, to try first simple completion and, if that

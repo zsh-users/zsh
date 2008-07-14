@@ -115,10 +115,10 @@ menu(Miscellaneous)
 
 Completion Widgets
 
-menu(Special Parameters)
-menu(Builtin Commands)
-menu(Condition Codes)
-menu(Matching Control)
+menu(Completion Special Parameters)
+menu(Completion Builtin Commands)
+menu(Completion Condition Codes)
+menu(Completion Matching Control)
 menu(Completion Widget Example)
 
 Completion System

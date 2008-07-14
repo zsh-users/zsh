@@ -48,15 +48,15 @@ and treats the matches in the same manner as the specified builtin
 widget, in this case tt(expand-or-complete).
 
 startmenu()
-menu(Special Parameters)
-menu(Builtin Commands)
-menu(Condition Codes)
-menu(Matching Control)
+menu(Completion Special Parameters)
+menu(Completion Builtin Commands)
+menu(Completion Condition Codes)
+menu(Completion Matching Control)
 menu(Completion Widget Example)
 endmenu()
 
-texinode(Special Parameters)(Builtin Commands)()(Completion Widgets)
-sect(Special Parameters)
+texinode(Completion Special Parameters)(Completion Builtin Commands)()(Completion Widgets)
+sect(Completion Special Parameters)
 
 Inside completion widgets, and any functions called from them, some
 parameters have special meaning; outside these functions they are not
@@ -432,8 +432,8 @@ edited.
 )
 enditem()
 
-texinode(Builtin Commands)(Condition Codes)(Special Parameters)(Completion Widgets)
-sect(Builtin Commands)
+texinode(Completion Builtin Commands)(Completion Condition Codes)(Completion Special Parameters)(Completion Widgets)
+sect(Completion Builtin Commands)
 startitem()
 findex(compadd)
 cindex(completion widgets, adding specified matches)
@@ -634,8 +634,8 @@ into the command line.
 )
 item(tt(-M) var(match-spec))(
 This gives local match specifications as described below in
-noderef(Matching Control). This option may be given more than once. In 
-this case all var(match-spec)s given are concatenated with spaces
+noderef(Completion Matching Control). This option may be given more than once.
+In this case all var(match-spec)s given are concatenated with spaces
 between them to form the specification string to use.
 Note that they will only be used if the tt(-U) option is not given.
 )
@@ -809,8 +809,8 @@ Note that this builtin is defined by the tt(zsh/compctl) module.
 )
 enditem()
 
-texinode(Condition Codes)(Matching Control)(Builtin Commands)(Completion Widgets)
-sect(Condition Codes)
+texinode(Completion Condition Codes)(Completion Matching Control)(Completion Builtin Commands)(Completion Widgets)
+sect(Completion Condition Codes)
 cindex(completion widgets, condition codes)
 
 The following additional condition codes for use within the tt([[ ... ]])
@@ -835,8 +835,8 @@ true if the test for the tt(-N) option with both patterns would succeed.
 )
 enditem()
 
-texinode(Matching Control)(Completion Widget Example)(Condition Codes)(Completion Widgets)
-sect(Matching Control)
+texinode(Completion Matching Control)(Completion Widget Example)(Completion Condition Codes)(Completion Widgets)
+sect(Completion Matching Control)
 
 It is possible by use of the
 tt(-M) option of the tt(compadd) builtin command to specify how the
@@ -848,8 +848,8 @@ the tt(GLOB_COMPLETE) option is set or the tt(pattern_match) of the
 tt(compstate) special association is set to a non-empty string.
 
 The var(match-spec) given as the argument to the tt(-M) option (see
-ifzman(`Builtin Commands' above)\
-ifnzman(noderef(Builtin Commands))\
+ifzman(`Completion Builtin Commands' above)\
+ifnzman(noderef(Completion Builtin Commands))\
 ) consists of one or more matching descriptions separated by
 whitespace.  Each description consists of a letter followed by a colon
 and then the patterns describing which character sequences on the line match
@@ -1096,7 +1096,7 @@ ifnzman(noderef(Completion System))\
 specific contexts by using the tt(matcher) and tt(matcher-list)
 styles. The values for the latter will be used everywhere.
 
-texinode(Completion Widget Example)()(Matching Control)(Completion Widgets)
+texinode(Completion Widget Example)()(Completion Matching Control)(Completion Widgets)
 sect(Completion Widget Example)
 cindex(completion widgets, example)
 

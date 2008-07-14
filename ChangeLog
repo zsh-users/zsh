@@ -1,3 +1,10 @@
+2008-07-14  Peter Stephenson  <pws@csr.com>
+
+	* 25278: Doc/Zsh/compctl.yo, Doc/Zsh/compsys.yo,
+	Doc/Zsh/compwid.yo, Doc/Zsh/manual.yo: rename sections in the
+	completion widget manual to avoid confusion with sections
+	elsewhere.
+
 2008-07-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Phil Pennock: 25275: Completion/Base/Utility/_store_cache,
