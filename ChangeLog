@@ -1,3 +1,8 @@
+2008-07-15  Peter Stephenson  <pws@csr.com>
+
+	* users/13036: Src/utils.c: "." is a valid character in
+	a user name.
+
 2008-07-14  Peter Stephenson  <pws@csr.com>
 
 	* 25278: Doc/Zsh/compctl.yo, Doc/Zsh/compsys.yo,

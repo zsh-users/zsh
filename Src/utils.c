@@ -2981,7 +2981,7 @@ inittyptab(void)
 	typtab[t0] = IALPHA | IALNUM | IIDENT | IUSER | IWORD;
 #endif
     typtab['_'] = IIDENT | IUSER;
-    typtab['-'] = IUSER;
+    typtab['-'] = typtab['.'] = IUSER;
     typtab[' '] |= IBLANK | INBLANK;
     typtab['\t'] |= IBLANK | INBLANK;
     typtab['\n'] |= INBLANK;
