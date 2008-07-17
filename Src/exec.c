@@ -4093,6 +4093,16 @@ loadautofn(Shfunc shf, int fksh, int autol)
 /*
  * execute a shell function
  *
+ * name is the name of the function
+ *
+ * prog is the code to execute
+ *
+ * doshargs, if set, are parameters to pass to the function,
+ * in which the first element is the function name (even if
+ * FUNCTIONARGZERO is set as this is handled inside this function).
+ *
+ * flags are a set of the PM_ flags associated with the function.
+ *
  * If noreturnval is nonzero, then reset the current return
  * value (lastval) to its value before the shell function
  * was executed.  However, in any case return the status value
@@ -4160,6 +4170,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 	    oargv0 = argzero;
 	    argzero = ztrdup(getdata(node));
 	}
+	/* first node contains name regardless of option */
 	node = node->next;
 	for (; node; node = node->next, x++)
 	    *x = ztrdup(getdata(node));

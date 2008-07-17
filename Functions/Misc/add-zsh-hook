@@ -1,27 +1,27 @@
 # Add to HOOK the given FUNCTION.
-# HOOK is one of chpwd, precmd, preexec, periodic, zshexit (the
-# _functions subscript is not required).
+# HOOK is one of chpwd, precmd, preexec, periodic, zshaddhistory,
+# zshexit (the _functions subscript is not required).
 #
 # With -d, remove the function from the hook instead; delete the hook
 # variable if it is empty.
-# 
+#
 # -D behaves like -d, but pattern characters are active in the
 # function name, so any matching function will be deleted from the hook.
 #
 # Without -d, the FUNCTION is marked for autoload; -U is passed down to
-# autoload if that is given.  (This is harmless if the function is actually
-# defined inline.)
+# autoload if that is given, as are -z and -k.  (This is harmless if the
+# function is actually defined inline.)
 
 emulate -L zsh
 
 local -a hooktypes
-hooktypes=(chpwd precmd preexec periodic zshexit)
+hooktypes=(chpwd precmd preexec periodic zshaddhistory zshexit)
 
 local opt
 local -a autoopts
 integer del
 
-while getopts "dDU" opt; do
+while getopts "dDUzk" opt; do
   case $opt in
     (d)
     del=1
@@ -31,7 +31,7 @@ while getopts "dDU" opt; do
     del=2
     ;;
 
-    (U)
+    ([Uzk])
     autoopts+=(-$opt)
     ;;
 
@@ -60,7 +60,9 @@ if (( del )); then
     fi
     # unset if no remaining entries --- this can give better
     # performance in some cases
-    (( ${(P)#hook} )) || unset $hook
+    if (( ! ${(P)#hook} )); then
+      unset $hook
+    fi
   fi
 else
   if (( ${(P)+hook} )); then

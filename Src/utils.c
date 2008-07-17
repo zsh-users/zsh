@@ -1117,25 +1117,31 @@ time_t lastwatch;
 
 /*
  * Call a function given by "name" with optional arguments
- * "lnklist".  If "arrayp" is not zero, we also look through
+ * "lnklist".  If these are present the first argument is the function name.
+ *
+ * If "arrayp" is not zero, we also look through
  * the array "name"_functions and execute functions found there.
+ *
+ * If "retval" is not NULL, the return value of the first hook function to
+ * return non-zero is stored in *"retval".  The return value is not otherwise
+ * available as the calling context is restored.
  */
 
 /**/
 mod_export int
-callhookfunc(char *name, LinkList lnklst, int arrayp)
+callhookfunc(char *name, LinkList lnklst, int arrayp, int *retval)
 {
     Eprog prog;
 	/*
 	 * Save stopmsg, since user doesn't get a chance to respond
 	 * to a list of jobs generated in a hook.
 	 */
-    int osc = sfcontext, osm = stopmsg, stat = 1;
+    int osc = sfcontext, osm = stopmsg, stat = 1, ret = 0;
 
     sfcontext = SFC_HOOK;
 
     if ((prog = getshfunc(name)) != &dummy_eprog) {
-	doshfunc(name, prog, lnklst, 0, 1);
+	ret = doshfunc(name, prog, lnklst, 0, 1);
 	stat = 0;
     }
 
@@ -1151,7 +1157,9 @@ callhookfunc(char *name, LinkList lnklst, int arrayp)
 	if ((arrptr = getaparam(arrnam))) {
 	    for (; *arrptr; arrptr++) {
 		if ((prog = getshfunc(*arrptr)) != &dummy_eprog) {
-		    doshfunc(arrnam, prog, lnklst, 0, 1);
+		    int newret = doshfunc(arrnam, prog, lnklst, 0, 1);
+		    if (!ret)
+			ret = newret;
 		    stat = 0;
 		}
 	    }
@@ -1161,6 +1169,8 @@ callhookfunc(char *name, LinkList lnklst, int arrayp)
     sfcontext = osc;
     stopmsg = osm;
 
+    if (retval)
+	*retval = ret;
     return stat;
 }
 
@@ -1200,7 +1210,7 @@ preprompt(void)
 
     /* If a shell function named "precmd" exists, *
      * then execute it.                           */
-    callhookfunc("precmd", NULL, 1);
+    callhookfunc("precmd", NULL, 1, NULL);
     if (errflag)
 	return;
 
@@ -1208,7 +1218,7 @@ preprompt(void)
      * "periodic" exists, 3) it's been greater than PERIOD since we *
      * executed any such hook, then execute it now.                 */
     if (period && (time(NULL) > lastperiodic + period) &&
-	!callhookfunc("periodic", NULL, 1))
+	!callhookfunc("periodic", NULL, 1, NULL))
 	lastperiodic = time(NULL);
     if (errflag)
 	return;

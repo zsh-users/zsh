@@ -241,6 +241,34 @@ size-limited version of the command (with things like function bodies
 elided); the third argument contains the full text that is being
 executed.
 )
+findex(zshaddhistory)
+vindex(zshaddhistory_functions)
+item(tt(zshaddhistory))(
+cindex(history, hook when line is saved)
+Executed when a history line has been read interactively, but
+before it is executed.  The sole argument is the complete history
+line (so that any terminating newline will still be present).
+
+If any of the hook functions return a non-zero value the history
+line will not be saved, although it lingers in the history until the
+next line is executed allow you to reuse or edit it immediately.
+
+A hook function may call `tt(fc -p) var(...)' to switch the history
+context so that the history is saved in a different file from the
+that in the global tt(HISTFILE) parameter.  This is handled specially:
+the history context is automatically restored after the processing
+of the history line is finished.
+
+The following example function first adds the history line to the normal
+history with the newline stripped,  which is usually the correct behaviour.
+Then it switches the history context so that the line will
+be written to a history file in the current directory.
+
+example(zshaddhistory() {
+  print -sr -- ${1%%$'\n'}
+  fc -p .zsh_local_history
+})
+)
 findex(zshexit)
 vindex(zshexit_functions)
 item(tt(zshexit))(

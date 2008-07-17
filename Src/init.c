@@ -175,7 +175,7 @@ loop(int toplevel, int justonce)
 		addlinknode(args, dupstring(getjobtext(prog, NULL)));
 		addlinknode(args, cmdstr = getpermtext(prog, NULL));
 
-		callhookfunc("preexec", args, 1);
+		callhookfunc("preexec", args, 1, NULL);
 
 		/* The only permanent storage is from getpermtext() */
 		zsfree(cmdstr);

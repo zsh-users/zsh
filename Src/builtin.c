@@ -1139,7 +1139,7 @@ cd_new_pwd(int func, LinkNode dir, int quiet)
     fflush(stdout);
     fflush(stderr);
     if (!quiet)
-	callhookfunc("chpwd", NULL, 1);
+	callhookfunc("chpwd", NULL, 1, NULL);
 
     dirstacksize = getiparam("DIRSTACKSIZE");
     /* handle directory stack sizes out of range */
@@ -4578,7 +4578,7 @@ zexit(int val, int from_where)
     lastval = val;
     if (sigtrapped[SIGEXIT])
 	dotrap(SIGEXIT);
-    callhookfunc("zshexit", NULL, 1);
+    callhookfunc("zshexit", NULL, 1, NULL);
     runhookdef(EXITHOOK, NULL);
     if (opts[MONITOR] && interact && (SHTTY != -1)) {
        release_pgrp();
