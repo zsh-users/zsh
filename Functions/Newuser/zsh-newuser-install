@@ -927,7 +927,8 @@ fi
 # skip initial screen if the function was deliberately run by the user.
 if [[ $1 != -f ]]; then
   clear
-  print -r "This is the Z Shell configuration function for new users, $myname.
+  print -r "This is the Z Shell configuration function for new users,
+$myname.
 You are seeing this message because you have no zsh startup files
 (the files .zshenv, .zprofile, .zshrc, .zlogin in the directory
 $zdmsg).  This function can help you with a few settings that should
