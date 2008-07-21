@@ -563,7 +563,7 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h \
 		 netinet/in_systm.h pcre.h langinfo.h wchar.h stddef.h \
 		 sys/stropts.h iconv.h ncurses.h ncursesw/ncurses.h \
-		 ncurses/ncurses.h)
+		 ncurses/ncurses.h gdbm.h)
 if test x$dynamic = xyes; then
   AC_CHECK_HEADERS(dlfcn.h)
   AC_CHECK_HEADERS(dl.h)
@@ -833,6 +833,8 @@ elif test x$zsh_cv_decl_ospeed_must_define = xyes; then
   AC_DEFINE(HAVE_OSPEED)
   AC_DEFINE(MUST_DEFINE_OSPEED)
 fi
+
+AC_CHECK_LIB(gdbm, gdbm_open)
 
 dnl --------------
 dnl CHECK TYPEDEFS
@@ -1130,7 +1132,8 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       wctomb iconv \
 	       grantpt unlockpt ptsname \
 	       htons ntohs \
-	       regcomp regexec regerror regfree)
+	       regcomp regexec regerror regfree \
+	       gdbm_open)
 AC_FUNC_STRCOLL
 
 if test x$enable_cap = xyes; then

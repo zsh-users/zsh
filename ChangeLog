@@ -1,3 +1,8 @@
+2008-07-20  Clint Adams  <clint@zsh.org>
+
+	* 25318: Src/Modules/db_gdbm.c, Src/Modules/db_gdbm.mdd,
+	configure.ac: allow parameter to be tied to a gdbm database.
+
 2008-07-18  Peter Stephenson  <pws@csr.com>
 
 	* 25304: Richard Hartmann: Functions/Newuser/zsh-newuser-install:
