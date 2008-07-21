@@ -1,3 +1,29 @@
+2008-07-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Src/Modules/.distfiles: add missing files.
+
+	* Danek Duvall: 25324: Completion/Solaris/Command/_coreadm,
+	Completion/Solaris/Command/_dhcpinfo,
+	Completion/Solaris/Command/_dumpadm,
+	Completion/Solaris/Command/_gcore,
+	Completion/Solaris/Command/_inetadm,
+	Completion/Solaris/Command/_pfexec,
+	Completion/Solaris/Command/_ptree,
+	Completion/Solaris/Command/_savecore,
+	Completion/Solaris/Command/_svcadm,
+	Completion/Solaris/Command/_svccfg,
+	Completion/Solaris/Command/_svcprop,
+	Completion/Solaris/Command/_svcs,
+	Completion/Solaris/Command/_zlogin,
+	Completion/Solaris/Type/_svcs_fmri,
+	Completion/Unix/Command/_pkg_instance,
+	Completion/Unix/Command/_pkgadd,
+	Completion/Unix/Command/_pkginfo,
+	Completion/Unix/Command/_pkgrm, Completion/Unix/Command/_zfs,
+	Completion/Unix/Command/_zpool,
+	Completion/Unix/Type/_zfs_dataset,
+	Completion/Unix/Type/_zfs_pool: new completions.
+
 2008-07-21  Clint Adams  <clint@zsh.org>
 
 	* 25322: Src/Modules/db_gdbm.c: fix printing of keys.

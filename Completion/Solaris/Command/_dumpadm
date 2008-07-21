@@ -1,0 +1,23 @@
+#compdef dumpadm
+
+_dumpadm() {
+	local -a content
+
+	content=(
+		"kernel"\:"Kernel memory pages only"
+		"all"\:"All memory pages"
+		"curproc"\:"Kernel memory pages plus curproc pages"
+	)
+
+	_arguments -s \
+		'-n[Dont run savecore on reboot]' \
+		'-u[Update dump configuration from dumpadm.conf]' \
+		'-y[Run savecore on reboot]' \
+		'-c[Set dump content]:dump content:(($content))' \
+		'-d[Set dump device]:block devices:_files -g "*(-%b)"' \
+		'-m[Set minfree size ]:' \
+		'-s[Set the savecore directory]:directory:_files -/' \
+		'-r[Alternate root directory]:directory:_files -/'
+}
+
+_dumpadm "$@"

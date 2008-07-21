@@ -1,0 +1,23 @@
+#compdef ptree
+
+_ptree() {
+	local curcontext="$curcontext" context state line ret=1
+	typeset -A opt_args
+
+	_arguments -s \
+		'-a[All processes]' \
+		'-c[Show contract memberships]' \
+		'-z[Show processes in zone]:zone:($(zoneadm list))' \
+		'*:pid or user:->pidoruser' && ret=0
+
+	if [[ $ret -ne 0 ]]; then
+		_alternative \
+			'users:logged-in user:(${$(who -q)\:#(users=*|\#)})' \
+			'pids:pid:_pids'
+		ret=$?
+	fi
+
+	return $ret
+}
+
+_ptree "$@"

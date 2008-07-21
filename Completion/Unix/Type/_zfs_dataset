@@ -1,0 +1,22 @@
+#autoload
+
+local -a type typearg list
+
+zparseopts -D -E -a type t+:
+
+[[ -n $type[(r)fs] ]]   && typearg=( filesystem )
+[[ -n $type[(r)vol] ]]  && typearg=( $typearg volume )
+[[ -n $type[(r)snap] ]] && typearg=( $typearg snapshot )
+[[ -n $typearg ]] && typearg=( -t ${(j:,:)typearg} )
+
+datasetlist=( ${="$(zfs list -H -o name $typearg)":#no datasets available} )
+
+expl_type=${typearg[2,-1]//,/\/}
+if [[ -n $type[(r)mtpt] ]]; then
+	mlist=( ${="$(zfs list -H -o mountpoint $typearg)":#no mountpoints available} )
+	datasetlist=( $datasetlist $mlist )
+	expl_type="$expl_type/mountpoint"
+fi
+
+# compadd "$@" - $list
+_wanted dataset expl "$expl_type" _multi_parts "$@" / datasetlist

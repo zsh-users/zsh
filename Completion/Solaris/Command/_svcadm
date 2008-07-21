@@ -1,0 +1,70 @@
+#compdef svcadm
+
+_svcadm() {
+	local context state line subcmds
+	typeset -A opt_args
+
+	subcmds=( enable disable restart refresh mark clear milestone )
+
+	if [[ $service == "svcadm" ]]; then
+		_arguments -C -A "-*" \
+			'-v[Print actions verbosely]' \
+			'*::command:->subcmd' && return 0
+
+		if (( CURRENT == 1 )); then
+			_wanted commands expl 'svcadm subcommand' compadd -a subcmds
+			return
+		fi
+		service="$words[1]"
+		curcontext="${curcontext%:*}=$service:"
+	fi
+
+	case $service in
+	(enable)
+		_arguments \
+			'-r[Recursively enable dependencies]' \
+			'-s[Wait for service to come online]' \
+			'-t[State change is temporary]' \
+			'*:instance FMRI:_svcs_fmri -i'
+		;;
+
+	(disable)
+		_arguments \
+			'-s[Wait for service to become disabled]' \
+			'-t[State change is temporary]' \
+			'*:instance FMRI:_svcs_fmri -i'
+		;;
+
+	(mark)
+		_arguments \
+			'-I[Change state immediately]' \
+			'-t[State change is temporary]' \
+			':state:(degraded maintenance)' \
+			':instance FMRI:_svcs_fmri -i'
+		;;
+
+	(restart|refresh|clear)
+		_arguments \
+			'*:instance FMRI:_svcs_fmri -i'
+		;;
+
+	(milestone)
+		_arguments \
+			'-d[Make milestone the default]' \
+			'*:milestone FMRI:_svcs_fmri -m'
+		;;
+
+# 	# The delegate subcommand has been removed, replaced by just using
+# 	# the restarter fmri
+# 	(delegate)
+# 		_arguments \
+# 			'1:restarter FMRI:_svcs_fmri -r' \
+# 			'*:instance FMRI:_svcs_fmri -i'
+# 		;;
+
+	(*)
+		_message "unknown svcadm subcommand: $service"
+	esac
+}
+
+_svcadm "$@"

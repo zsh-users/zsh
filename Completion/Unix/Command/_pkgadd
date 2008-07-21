@@ -1,0 +1,32 @@
+#compdef pkgadd
+
+_pkgadd_pass() {
+	_values -S : 'password descriptor' \
+	'(file env console)pass[Literal password]:password:' \
+	'(pass file console)env[Environment variable]:environment:_parameters -g "*export*"' \
+	'(pass env console)file[File]:file:_files' \
+	'(pass env file)console[From /dev/tty]'
+}
+
+_pkgadd() {
+	_arguments -s \
+	'-d[Device]:device file:_files' \
+	'-x[HTTP(S) proxy]:HTTP proxy: ' \
+	'-k[Keystore]:keystore:_files' \
+	'-P[Password to decrypt keystore]:password:_pkgadd_pass' \
+	'-Y[Select packages by category]:category: ' \
+	- set1 \
+	'-n[Non-interactive mode]' \
+	'-v[Trace all scripts]' \
+	'-a[Admin file]:admin file:_files' \
+	"-M[Don't use vfstab file]" \
+	'-R[Root path]:root path:_files -/' \
+	'-r[Response file]:response file:_files' \
+	'-V[Alternate vfstab file]:vfstab file:_files' \
+	'*:package instance:_pkg_instance --_opts uninstalled:-d' \
+	- set2 \
+	'-s[Spool package]:spool directory:_files -/' \
+	'*:package instance:_pkg_instance --_opts uninstalled:-d'
+}
+
+_pkgadd "$@"

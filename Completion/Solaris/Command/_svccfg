@@ -1,0 +1,58 @@
+#compdef svccfg
+
+_svccfg() {
+	local context state line subcmds
+
+	subcmds=( apply extract import validate export inventory delete addpropvalue delpropvalue )
+
+	if [[ $service == "svccfg" ]]; then
+		_arguments -s \
+			'-?[Help]' \
+			'-v[Verbose]' \
+			'-s[FMRI on which to operate]:fmri:_svcs_fmri -c' \
+			- set1 \
+			'-f[Read commands from file]:command file:_files' \
+			- set2 \
+			'*::command:->subcmd' && return 0
+
+		if (( CURRENT == 1 )); then
+			_wanted commands expl 'svccfg subcommand' compadd -a subcmds
+			return
+		fi
+		service="$words[1]"
+		curcontext="${curcontext%:*}=$service:"
+	fi
+
+	case $service in
+	(import)
+		_arguments \
+			'-V[Verify property updates]' \
+			':file:_files'
+		;;
+
+	(apply|validate|inventory)
+		_files
+		;;
+
+	(export)
+		_svcs_fmri -c
+		;;
+
+	(delete)
+		_arguments \
+			'-f[Force deletion if online or degraded]' \
+			'*:FMRI:_svcs_fmri -c'
+		;;
+
+	(extract)
+		;;
+
+	(*)
+		_message "unknown svccfg subcommand: $service"
+		;;
+	esac
+}
+
+_svccfg "$@"
+
+# vi:tw=0

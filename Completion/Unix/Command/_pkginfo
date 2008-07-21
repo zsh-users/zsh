@@ -1,0 +1,22 @@
+#compdef pkginfo
+
+_pkginfo() {
+	_arguments -s \
+	'(-q -r -x)-l[Long listing]' \
+	'(-l -r -x)-q[Quiet mode]' \
+	'(-l -q -x)-r[Relocation base]' \
+	'(-l -q -r)-x[Extracted listing]' \
+	'-c[Category]:category: ' \
+	'-a[Architecture]:architecture: ' \
+	'-v[Version]:version: ' \
+	- set1 \
+	'(-p)-i[Select completely installed packages]' \
+	'(-i)-p[Select partially installed packages]' \
+	'-R[Root path]:root path:_files -/' \
+	'*:package instance:_pkg_instance --_opts installed:set1--R' \
+	- set2 \
+	'-d[Device]:device file:_files' \
+	'*:package instance:_pkg_instance --_opts uninstalled:set2--d'
+}
+
+_pkginfo "$@"

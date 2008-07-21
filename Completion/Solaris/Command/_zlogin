@@ -1,0 +1,16 @@
+#compdef zlogin
+
+_zlogin() {
+	_arguments -s \
+		'-E[Disable escape character]' \
+		'-e[Specify escape character]:character:' \
+		'-l[Specify username]:username:_users' \
+		':zonename:' \
+		- set1 \
+		'-C[Connect to zone console]' \
+		- set2 \
+		'-S["Safe" login mode]' \
+		':utility'
+}
+
+_zlogin "$@"

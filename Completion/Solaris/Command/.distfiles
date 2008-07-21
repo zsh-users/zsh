@@ -1,0 +1,15 @@
+DISTFILES_SRC='
+_coreadm
+_dhcpinfo
+_dumpadm
+_gcore
+_inetadm
+_pfexec
+_ptree
+_savecore
+_svcadm
+_svccfg
+_svcprop
+_svcs
+_zlogin
+'

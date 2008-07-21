@@ -1,0 +1,31 @@
+#compdef gcore
+
+_gcore() {
+	local -a content
+
+	content=(
+		"anon[Anonymous private mappings]"
+		"ctf[CTF type information]"
+		"data[Writable private file mappings]"
+		"dism[DISM mappings]"
+		"heap[Process heap]"
+		"ism[ISM mappings]"
+		"rodata[Read-only private file mappings]"
+		"shanon[Anonymous shared mappings]"
+		"shfile[File-backed shared mappings]"
+		"shm[System V shared memory]"
+		"stack[Process stack]"
+		"symtab[Symbol table sections for loaded files]"
+		"text[Readable and executable private file mappings]"
+	)
+
+	_arguments -s \
+		'-p[Use per-process core file repository]' \
+		'-g[Use global core file repository]' \
+		'-F[Force grabbing the target process]' \
+		'-c[Set core file content]:_values -s + "content" $content' \
+		'-o[Set core file base name]:' \
+		'*:pids:_pids'
+}
+
+_gcore "$@"

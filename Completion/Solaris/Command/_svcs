@@ -1,0 +1,32 @@
+#compdef svcs
+
+_svcs() {
+	local -a cols
+
+	cols=(
+		ctid\:"Contract ID" desc\:"Description" fmri\:"FMRI"
+		inst\:"Instance name" nsta\:"Next state (abbr)" nstate\:"Next state"
+		scope\:"Scope name" svc\:"Service name" sta\:"State (abbr)"
+		state\:"State" stime\:"Start time"
+	)
+
+	_arguments -s \
+		'(-l -x -d -D)-a[List all instances]' \
+		'(-l -x -D -a -R)-d[List dependencies]' \
+		'(-l -x -d -a -R)-D[List dependents]' \
+		'(-l -x)-H[Suppress header line]' \
+		'(-)-l[Print detailed status about services and instances]' \
+		'(-l -x)-o[Display specific columns]:column:_values -s , "column" ${^cols/\:/[}\]' \
+		'(-l -x)-p[List processes]' \
+		'(-l -x -d -D)-R[List services with the given restarter]:instance FMRI:_svcs_fmri -i' \
+		'(-l -x)-s[Sort by a column]:column:(($cols))' \
+		'(-l -x)-S[Reverse sort by a column]:column:(($cols))' \
+		'(-l)-v[verbose columns]' \
+		'(-l)-x[Display explanation for service states]' \
+		'(-l -x)-\?[Print help]' \
+		'*:FMRI or pattern:_svcs_fmri -i'
+}
+
+_svcs "$@"
+
+# vi:tw=0

@@ -48,4 +48,6 @@ _urls
 _user_at_host
 _users
 _users_on
+_zfs_dataset
+_zfs_pool
 '

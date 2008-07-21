@@ -142,6 +142,10 @@ _php
 _pine
 _ping
 _pkg-config
+_pkg_instance
+_pkgadd
+_pkginfo
+_pkgrm
 _pon
 _postfix
 _prcs
@@ -223,5 +227,7 @@ _yodl
 _yp
 _zcat
 _zdump
+_zfs
 _zip
+_zpool
 '

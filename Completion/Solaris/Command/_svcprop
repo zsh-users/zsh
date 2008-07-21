@@ -1,0 +1,23 @@
+#compdef svcprop
+
+_svcprop() {
+	_arguments -s \
+		'-f[Designate properties by their FMRI]' \
+		'-q[Quiet]' \
+		'-t[Use multi-property output format]' \
+		'-v[Verbose]' \
+		- set1 \
+		'-w[Waits for the selected property or property group to change]' \
+		'-p[Prints values of named property or property group]' \
+		':FMRI:_svcs_fmri -i' \
+		- set2 \
+		'(-c -s)-C[Retrieve properties without composition]' \
+		'(-C -s)-c[Retrieve properties with composition]' \
+		'(-c -C)-s[Retrieve properties from snapshot]:snapshot:' \
+		'*-p[Prints values of named property or property group]' \
+		'*:FMRI:_svcs_fmri -i'
+}
+
+_svcprop "$@"
+
+# vi:tw=0
