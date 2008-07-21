@@ -132,7 +132,6 @@ gdbmsetfn(Param pm, char **val)
     datum key, content;
     int ret;
 
-
     key.dptr = pm->node.nam;
     key.dsize = strlen(key.dptr) + 1;
     content.dptr = val;
@@ -145,7 +144,13 @@ gdbmsetfn(Param pm, char **val)
 static void
 gdbmunsetfn(Param pm, int um)
 {
+    datum key;
+    int ret;
 
+    key.dptr = pm->node.nam;
+    key.dsize = strlen(key.dptr) + 1;
+
+    ret = gdbm_delete(dbf, key);
 }
 
 /**/

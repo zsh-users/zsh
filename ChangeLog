@@ -1,5 +1,8 @@
 2008-07-21  Clint Adams  <clint@zsh.org>
 
+	* 25321: Src/Modules/db_gdbm.c: delete gdbm node when
+	corresponding hash entry is unset.
+
 	* 25320: Src/Modules/db_gdbm.c: fix read and write of elements
 	by key.
 
