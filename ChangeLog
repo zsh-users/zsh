@@ -1,5 +1,8 @@
 2008-07-21  Clint Adams  <clint@zsh.org>
 
+	* 25320: Src/Modules/db_gdbm.c: fix read and write of elements
+	by key.
+
 	* 25319: Src/Modules/db_gdbm.c: fix zuntie, add -f option
 	to ztie.
 

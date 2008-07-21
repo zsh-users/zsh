@@ -39,7 +39,7 @@
 
 #include <gdbm.h>
 
-static const struct gsu_hash gdbm_gsu =
+static const struct gsu_scalar gdbm_gsu =
 { gdbmgetfn, gdbmsetfn, gdbmunsetfn };
 
 static struct builtin bintab[] = {
@@ -105,26 +105,47 @@ bin_zuntie(char *nam, char **args, Options ops, UNUSED(int func))
     return 0;
 }
 
-
 /**/
 static char *
 gdbmgetfn(Param pm)
 {
-return;
+    datum key, content;
+    int ret;
+
+    key.dptr = pm->node.nam;
+    key.dsize = strlen(key.dptr) + 1;
+
+    ret = gdbm_exists(dbf, key);
+    if(ret) {
+        content = gdbm_fetch(dbf, key);
+    } else {
+        content.dptr = dupstring("");
+    }
+
+    return content.dptr;
 }
 
 /**/
 static void
-gdbmsetfn(Param pm, char **key)
+gdbmsetfn(Param pm, char **val)
 {
-return;
+    datum key, content;
+    int ret;
+
+
+    key.dptr = pm->node.nam;
+    key.dsize = strlen(key.dptr) + 1;
+    content.dptr = val;
+    content.dsize = strlen(content.dptr) + 1;
+
+    ret = gdbm_store(dbf, key, content, GDBM_REPLACE);
 }
 
 /**/
 static void
 gdbmunsetfn(Param pm, int um)
 {
-return;
+
 }
 
 /**/
@@ -143,17 +164,8 @@ getgdbmnode(UNUSED(HashTable ht), const char *name)
     pm = (Param) hcalloc(sizeof(struct param));
     pm->node.nam = nameu;
     pm->node.flags = PM_SCALAR;
+    pm->gsu.s = &gdbm_gsu;
 
-    ret = gdbm_exists(dbf, key);
-    if(!ret) {
-	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
-    } else {
-	content = gdbm_fetch(dbf, key);
-
-	pm->u.str = content.dptr;
-	pm->gsu.s = &nullsetscalar_gsu;
-    }
     return &pm->node;
 }
 
