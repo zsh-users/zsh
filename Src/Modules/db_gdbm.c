@@ -191,6 +191,7 @@ scangdbmkeys(UNUSED(HashTable ht), ScanFunc func, int flags)
     while(key.dptr) {
 	content = gdbm_fetch(dbf, key);
 
+	pm->node.nam = key.dptr;
 	pm->u.str = content.dptr;
 	pm->gsu.s = &nullsetscalar_gsu;
 

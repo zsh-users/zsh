@@ -1,5 +1,7 @@
 2008-07-21  Clint Adams  <clint@zsh.org>
 
+	* 25322: Src/Modules/db_gdbm.c: fix printing of keys.
+
 	* 25321: Src/Modules/db_gdbm.c: delete gdbm node when
 	corresponding hash entry is unset.
 
