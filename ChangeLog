@@ -1,3 +1,8 @@
+2008-07-21  Clint Adams  <clint@zsh.org>
+
+	* 25319: Src/Modules/db_gdbm.c: fix zuntie, add -f option
+	to ztie.
+
 2008-07-20  Clint Adams  <clint@zsh.org>
 
 	* 25318: Src/Modules/db_gdbm.c, Src/Modules/db_gdbm.mdd,
