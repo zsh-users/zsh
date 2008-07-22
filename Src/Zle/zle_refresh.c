@@ -1118,7 +1118,7 @@ zrefresh(void)
 	/* cheat on attribute unset */
 	txtunset(TXTBOLDFACE|TXTSTANDOUT|TXTUNDERLINE);
 
-	if (trashedzle)
+	if (trashedzle && !clearflag)
 	    reexpandprompt(); 
 	resetvideo();
 	resetneeded = 0;	/* unset */
