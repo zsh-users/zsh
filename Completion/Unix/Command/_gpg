@@ -34,13 +34,13 @@ _arguments -C -s -S -A "-*" \
   '--gen-revoke[generate a revocation certificate]' \
   '--desig-revoke[generate a designated revocation certificate]' \
   '--export[export all key from all keyrings]' \
-  '--send-keys[send keys to a keyserver]:key attachment:->public-keys' \
+  '--send-keys[send keys to a keyserver]:key attachment:->public-keyids' \
   '--export-all[export all key and not OpenPGP compatible keys]' \
   '--export-secret-keys:key attachment:->secret-keys' \
   '--export-secret-subkeys:key attachment:->secret-keys' \
   '--import[import a gpg key from a file]:_files attachment:_files' \
   '--fast-import[import a file without build trustdb]:_files attachment:_files' \
-  '--recv-keys[receive a list of keys from a keyserver]:key attachment:->public-keys' \
+  '--recv-keys[receive a list of keys from a keyserver]:key attachment:->public-keyids' \
   '--refresh-keys[update all keys from a keyserver]' \
   '--search-keys[search for keys on a key server]' \
   '--update-trustdb[update the trust database]' \
@@ -169,6 +169,10 @@ case "$state" in
   ciphers)
     _wanted ciphers expl cipher compadd \
         ${${(s.,.)${(M)${(f)"$(_call_program ciphers gpg $needed --version)"}:#Cipher*}#*:}# } && return
+  ;;
+  (public-keyids)
+    _wanted public-keys expl 'public keyid' \
+	compadd ${${${(M)${(f)"$(_call_program public-keyids gpg $needed --list-public-keys --list-options no-show-photos 2>/dev/null)"}:%pub*}#pub */}%% *} && return
   ;;
 esac
 
