@@ -9,6 +9,11 @@
 	* 25328: Completion/Unix/Command/_gpg: fix --recv-keys and
 	--send-keys to complete key IDs instead of uid email addresses.
 
+2008-07-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25326: Src/Zle/zle_refresh.c: don't recalculate prompt
+	if not redisplaying.
+
 2008-07-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Src/Modules/.distfiles: add missing files.
