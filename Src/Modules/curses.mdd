@@ -1,5 +1,5 @@
 name=zsh/curses
-link='if test "x$ac_cv_func_initscr" = xyes -a "x$ac_cv_header_curses_h" = xyes; then echo dynamic; else echo no; fi'
+link='if test "x$ac_cv_func_initscr" = xyes && test "x$zsh_cv_path_curses_header" != x; then echo dynamic; else echo no; fi'
 load=no
 
 autobins="zcurses"

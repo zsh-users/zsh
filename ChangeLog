@@ -1,5 +1,8 @@
 2008-07-23  Clint Adams  <clint@zsh.org>
 
+	* 25329: Src/Modules/curses.mdd: build the curses module if
+	we've got any usable curses header, not just curses.h.
+
 	* 25328: Completion/Unix/Command/_gpg: fix --recv-keys and
 	--send-keys to complete key IDs instead of uid email addresses.
 
