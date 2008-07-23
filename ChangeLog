@@ -1,5 +1,8 @@
 2008-07-23  Clint Adams  <clint@zsh.org>
 
+	* 25330: Doc/Zsh/mod_curses.yo: fix description of
+	zcurses "position" (was documented as "location").
+
 	* 25329: Src/Modules/curses.mdd: build the curses module if
 	we've got any usable curses header, not just curses.h.
 

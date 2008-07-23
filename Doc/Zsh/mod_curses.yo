@@ -17,10 +17,10 @@ xitem(tt(zcurses) tt(refresh) [ var(targetwin) ... ] )
 xitem(tt(zcurses) tt(touch) var(targetwin) ...)
 xitem(tt(zcurses) tt(move) var(targetwin) var(new_y) var(new_x) )
 xitem(tt(zcurses) tt(clear) var(targetwin) [ tt(redraw) | tt(eol) | tt(bot) ])
-xitem(tt(zcurses) tt(location) var(targetwin) var(array))
+xitem(tt(zcurses) tt(position) var(targetwin) var(array))
 xitem(tt(zcurses) tt(char) var(targetwin) var(character) )
 xitem(tt(zcurses) tt(string) var(targetwin) var(string) )
-xitem(tt(zcurses) tt(border) var(targetwin) var(border) )(
+xitem(tt(zcurses) tt(border) var(targetwin) var(border) )
 xitem(tt(zcurses) tt(attr) var(targetwin) [ var({+/-}attribute) | var(fg_col)tt(/)var(bg_col) ] [...])
 xitem(tt(zcurses) tt(bg) var(targetwin) [ var({+/-}attribute) | var(fg_col)tt(/)var(bg_col) | tt(@)var(char) ] [...])
 xitem(tt(zcurses) tt(scroll) var(targetwin) [ tt(on) | tt(off) | {+/-}var(lines) ])
@@ -80,7 +80,7 @@ line.  With the option
 tt(bot), var(targetwin) is cleared to the end of the window, i.e
 everything to the right and below the cursor is cleared.
 
-The subcommand tt(location) writes various positions associated with
+The subcommand tt(position) writes various positions associated with
 var(targetwin) into the array named var(array).
 These are, in order:
 startsitem()
