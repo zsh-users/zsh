@@ -1446,6 +1446,20 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 	    unqueue_signals();
 	    zwarnnam("fc", "can't open temp file: %e", errno);
 	} else {
+	    /*
+	     * Nasty behaviour results if we use the current history
+	     * line here.  Treat it as if it doesn't exist, unless
+	     * that gives us an empty range.
+	     */
+	    if (last >= curhist) {
+		last = curhist - 1;
+		if (first > last) {
+		    unqueue_signals();
+		    zwarnnam("fc", "invalid use of current history line");
+		    unlink(fil);
+		    return 1;
+		}
+	    }
 	    ops->ind['n'] = 1;	/* No line numbers here. */
 	    if (!fclist(out, ops, first, last, asgf, pprog)) {
 		char *editor;

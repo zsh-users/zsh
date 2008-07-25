@@ -1,3 +1,9 @@
+2008-07-25  Peter Stephenson  <pws@csr.com>
+
+	* 25338: Src/builtin.c: disallow fc editing of the current
+	history line which has bad effects on stack usage and temporary
+	files.
+
 2008-07-23  Clint Adams  <clint@zsh.org>
 
 	* 25330: Doc/Zsh/mod_curses.yo: fix description of
