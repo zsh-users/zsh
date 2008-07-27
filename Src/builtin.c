@@ -1455,7 +1455,8 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 		last = curhist - 1;
 		if (first > last) {
 		    unqueue_signals();
-		    zwarnnam("fc", "invalid use of current history line");
+		    zwarnnam("fc",
+		      "current history line would recurse endlessly, aborted");
 		    unlink(fil);
 		    return 1;
 		}

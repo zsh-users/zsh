@@ -1,3 +1,8 @@
+2008-07-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* following discussion: Src/builtin.c: chnage error message in
+	25338.
+
 2008-07-25  Peter Stephenson  <pws@csr.com>
 
 	* 25338: Src/builtin.c: disallow fc editing of the current
