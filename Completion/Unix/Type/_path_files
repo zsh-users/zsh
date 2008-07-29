@@ -123,6 +123,7 @@ if zstyle -s ":completion:${curcontext}:" file-sort tmp1; then
   *)                  sort=on;;
   esac
   [[ "$tmp1" = *rev* ]] && sort[1]=O
+  [[ "$tmp1" = *follow* ]] && sort="-$sort"
 
   if [[ "$sort" = on ]]; then
     sort=

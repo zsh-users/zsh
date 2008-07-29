@@ -1494,7 +1494,10 @@ modification time; `tt(access)' to sort by the last access time; and
 `tt(inode)' (or `tt(change)') to sort by the last inode change
 time.  If the style is set to any other value, or is unset, files will be
 sorted alphabetically by name.  If the value contains the string
-`tt(reverse)', sorting is done in the opposite order.
+`tt(reverse)', sorting is done in the opposite order.  If the value
+contains the string `tt(follow)', timestamps are associated with the
+targets of symbolic links; the default is to use the timestamps
+of the links themselves.
 )
 kindex(filter, completion style)
 item(tt(filter))(

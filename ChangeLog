@@ -1,3 +1,8 @@
+2008-07-29  Peter Stephenson  <pws@csr.com>
+
+	* Max Mikhanosha: users/13072: add `follow' option to
+	file-sort style.
+
 2008-07-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* following discussion: Src/builtin.c: chnage error message in
