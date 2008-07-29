@@ -79,13 +79,13 @@ print >> $_d_file
 # argument to zle does not begin with a `_').
 
 _d_bks=()
-_d_complist=
+typeset _d_complist=
 zle -lL |
   while read -rA _d_line; do
     if [[ ${_d_line[3]} = _* && ${_d_line[5]} = _* ]]; then
       if [[ -z "$_d_complist" && ${_d_line[4]} = .menu-select ]]; then
         print 'zmodload -i zsh/complist'
-	d_complist=yes
+	_d_complist=yes
       fi
       print -r - ${_d_line}
       _d_bks+=(${_d_line[3]})
@@ -107,7 +107,7 @@ _d_als=(${(o)$(typeset +fm '_*')})
 
 # print them out:  about five to a line looks neat
 
-_i=5
+integer _i=5
 print -n autoload -Uz >> $_d_file
 while (( $#_d_als )); do
   if (( ! $+_compautos[$_d_als[1]] )); then
@@ -122,8 +122,9 @@ done >> $_d_file
 
 print >> $_d_file
 
-for _i in "${(ok@)_compautos}"; do
-  print "autoload -Uz $_compautos[$_i] $_i" >> $_d_file
+local _c
+for _c in "${(ok@)_compautos}"; do
+  print "autoload -Uz $_compautos[$_c] $_c" >> $_d_file
 done
 
 print >> $_d_file

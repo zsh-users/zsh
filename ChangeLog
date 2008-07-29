@@ -1,5 +1,7 @@
 2008-07-29  Peter Stephenson  <pws@csr.com>
 
+	* 25346: Completion/compdump: fix some variables.
+
 	* Max Mikhanosha: users/13072: add `follow' option to
 	file-sort style.
 
