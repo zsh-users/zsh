@@ -308,7 +308,8 @@ executed inside other traps.
 )
 findex(TRAPDEBUG)
 item(tt(TRAPDEBUG))(
-Executed after each command.
+Executed after each command.  If the option tt(DEBUG_BEFORE_CMD)
+is set, executed before each command instead.
 )
 findex(TRAPEXIT)
 item(tt(TRAPEXIT))(

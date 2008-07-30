@@ -1,3 +1,7 @@
+2008-07-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Doc/Zsh/func.yo: refer to DEBUG_BEFORE_CMD option.
+
 2008-07-30  Peter Stephenson  <pws@csr.com>
 
 	* Max Mikhanosha: users/13077: Completion/Unix/Type/_path_files:
@@ -12,7 +16,7 @@
 
 2008-07-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* following discussion: Src/builtin.c: chnage error message in
+	* following discussion: Src/builtin.c: change error message in
 	25338.
 
 2008-07-25  Peter Stephenson  <pws@csr.com>
