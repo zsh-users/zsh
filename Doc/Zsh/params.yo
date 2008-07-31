@@ -263,9 +263,10 @@ testing for values or keys that do not exist.
 item(tt(k))(
 If used in a subscript on an associative array, this flag causes the keys
 to be interpreted as patterns, and returns the value for the first key
-found where var(exp) is matched by the key.  This flag does not work on
-the left side of an assignment to an associative array element.  If used
-on another type of parameter, this behaves like `tt(r)'.
+found where var(exp) is matched by the key.  Note this could be any
+such key as no ordering of associative arrays is defined.
+This flag does not work on the left side of an assignment to an associative
+array element.  If used on another type of parameter, this behaves like `tt(r)'.
 )
 item(tt(K))(
 On an associative array this is like `tt(k)' but returns all values where

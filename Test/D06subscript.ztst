@@ -145,6 +145,16 @@
 >\2 backcbrack cbrack star
 >\\\4 \\\? star zounds
 
+# It doesn't matter which element we get, since we never guarantee
+# ordering of an associative array.  So just test the number of matches.
+  array=(${(o)A[(k)\]]})
+  print ${#array}
+  array=(${(o)A[(k)\\\]]})
+  print ${#array}
+0:Associative array keys interpreted as patterns, single match
+>1
+>1
+
   typeset -g "A[one\"two\"three\"quotes]"=QQQ
   typeset -g 'A[one\"two\"three\"quotes]'=qqq
   print -R "$A[one\"two\"three\"quotes]"

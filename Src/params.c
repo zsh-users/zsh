@@ -1127,7 +1127,11 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		v->isarr &= ~SCANPM_WANTVALS;
 	    } else if (rev)
 		v->isarr |= SCANPM_WANTVALS;
-	    if (!down && !keymatch && ishash)
+	    /*
+	     * This catches the case where we are using "k" (rather
+	     * than "K") on a hash.
+	     */
+	    if (!down && keymatch && ishash)
 		v->isarr &= ~SCANPM_MATCHMANY;
 	}
 	*inv = ind;
