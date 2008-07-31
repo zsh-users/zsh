@@ -1376,7 +1376,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    pipe(synch);
 
 		    if ((pid = zfork(&bgtime)) == -1) {
-			trashzleptr();
+			zleentry(ZLE_CMD_TRASH);
 			close(synch[0]);
 			close(synch[1]);
 			fprintf(stderr, "zsh: job can't be suspended\n");

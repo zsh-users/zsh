@@ -459,7 +459,7 @@ update_job(Job jn)
     if ((isset(NOTIFY) || job == thisjob) && (jn->stat & STAT_LOCKED)) {
 	if (printjob(jn, !!isset(LONGLISTJOBS), 0) &&
 	    zleactive)
-	    zrefreshptr();
+	    zleentry(ZLE_CMD_REFRESH);
     }
     if (sigtrapped[SIGCHLD] && job != thisjob)
 	dotrap(SIGCHLD);
@@ -895,7 +895,7 @@ printjob(Job jn, int lng, int synch)
 	Process qn;
 
 	if (!synch)
-	    trashzleptr();
+	    zleentry(ZLE_CMD_TRASH);
 	if (doputnl && !synch) {
 	    doneprint = 1;
 	    putc('\n', fout);

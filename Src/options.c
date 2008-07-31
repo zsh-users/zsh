@@ -724,7 +724,7 @@ dosetopt(int optno, int value, int force)
 	    return -1;
 #endif /* GETPWNAM_FAKED */
     } else if ((optno == EMACSMODE || optno == VIMODE) && value) {
-	(*zlesetkeymapptr)(optno);
+	zleentry(ZLE_CMD_SET_KEYMAP, optno);
 	opts[(optno == EMACSMODE) ? VIMODE : EMACSMODE] = 0;
     }
     opts[optno] = value;

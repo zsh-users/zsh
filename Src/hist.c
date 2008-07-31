@@ -243,7 +243,7 @@ iaddtoline(int c)
 	return;
     if (qbang && c == bangchar && stophist < 2) {
 	exlast--;
-	zleaddtolineptr('\\');
+	zleentry(ZLE_CMD_ADD_TO_LINE, '\\');
     }
     if (excs > zlemetacs) {
 	excs += 1 + inbufct - exlast;
@@ -253,7 +253,7 @@ iaddtoline(int c)
 	    excs = zlemetacs;
     }
     exlast = inbufct;
-    zleaddtolineptr(itok(c) ? ztokens[c - Pound] : c);
+    zleentry(ZLE_CMD_ADD_TO_LINE, itok(c) ? ztokens[c - Pound] : c);
 }
 
 
@@ -2565,12 +2565,7 @@ bufferwords(LinkList list, char *buf, int *index)
 	int ll, cs;
 	char *linein;
 
-	if (zlegetlineptr) {
-	    linein = (char *)zlegetlineptr(&ll, &cs);
-	} else {
-	    linein = ztrdup("");
-	    ll = cs = 0;
-	}
+	linein = zleentry(ZLE_CMD_GET_LINE, &ll, &cs);
 	zlemetall = ll + 1; /* length of line plus space added below */
 	zlemetacs = cs;
 

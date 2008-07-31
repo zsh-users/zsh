@@ -275,7 +275,8 @@ inputline(void)
 	int flags = ZLRF_HISTORY|ZLRF_NOSETTY;
 	if (isset(IGNOREEOF))
 	    flags |= ZLRF_IGNOREEOF;
-	ingetcline = zlereadptr(ingetcpmptl, ingetcpmptr, flags, context);
+	ingetcline = zleentry(ZLE_CMD_READ, ingetcpmptl, ingetcpmptr,
+			      flags, context);
 	histdone |= HISTFLAG_SETTY;
     }
     if (!ingetcline) {

@@ -4754,7 +4754,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     char *reply, *readpmpt;
     int bsiz, c = 0, gotnl = 0, al = 0, first, nchars = 1, bslash, keys = 0;
     int haso = 0;	/* true if /dev/tty has been opened specially */
-    int isem = !strcmp(term, "emacs"), izle = zleactive && getkeyptr;
+    int isem = !strcmp(term, "emacs"), izle = zleactive;
     char *buf, *bptr, *firstarg, *zbuforig;
     LinkList readll = newlinklist();
     FILE *oshout = NULL;
@@ -4964,7 +4964,8 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 
 	do {
 	    if (izle) {
-		if ((val = getkeyptr(izle_timeout, NULL)) < 0) {
+		zleentry(ZLE_CMD_GET_KEY, izle_timeout, NULL, &val);
+		if (val < 0) {
 		    eof = 1;
 		    break;
 		}
@@ -5069,9 +5070,13 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	if (izle) {
 #ifdef MULTIBYTE_SUPPORT
 	    int key;
+	    char c;
 
-	    while ((key = getkeyptr(izle_timeout, NULL)) >= 0) {
-		char c = (char)key;
+	    for (;;) {
+		zleentry(ZLE_CMD_GET_KEY, izle_timeout, NULL, &key);
+		if (key < 0)
+		    break;
+		c = (char)key;
 		/*
 		 * If multibyte, it can't be y, so we don't care
 		 * what key gets set to; just read to end of character.
@@ -5081,7 +5086,8 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		    break;
 	    }
 #else
-	    int key = getkeyptr(izle_timeout, NULL);
+	    int key;
+	    zleentry(ZLE_CMD_GET_KEY, izle_timeout, NULL, &key);
 #endif
 
 	    readbuf[0] = (key == 'y' ? 'y' : 'n');
@@ -5461,7 +5467,8 @@ zread(int izle, int *readchar, long izle_timeout)
     int ret;
 
     if (izle) {
-	int c = getkeyptr(izle_timeout, NULL);
+	int c;
+	zleentry(ZLE_CMD_GET_KEY, izle_timeout, NULL, &c);
 
 	return (c < 0 ? EOF : c);
     }

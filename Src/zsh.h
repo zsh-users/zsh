@@ -2373,12 +2373,22 @@ enum {
 
 typedef int (*CompctlReadFn) _((char *, char **, Options, char *));
 
-/* ZLE entry point pointers */
+/* ZLE entry point pointer */
 
-typedef void (*ZleVoidFn) _((void));
-typedef void (*ZleVoidIntFn) _((int));
-typedef char *(*ZleReadFn) _((char **, char **, int, int));
-typedef char *(*ZleGetLineFn) _((int *, int *));
+typedef char * (*ZleEntryPoint)(int cmd, va_list ap);
+
+/* Commands to pass to entry point */
+
+enum {
+    ZLE_CMD_GET_LINE,
+    ZLE_CMD_READ,
+    ZLE_CMD_ADD_TO_LINE,
+    ZLE_CMD_TRASH,
+    ZLE_CMD_RESET_PROMPT,
+    ZLE_CMD_REFRESH,
+    ZLE_CMD_SET_KEYMAP,
+    ZLE_CMD_GET_KEY
+};
 
 /***************************************/
 /* Hooks in core.                      */

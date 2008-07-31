@@ -108,7 +108,7 @@ static void
 zwarning(const char *cmd, const char *fmt, va_list ap)
 {
     if (isatty(2))
-	trashzleptr();
+	zleentry(ZLE_CMD_TRASH);
 
     if (cmd) {
 	if (unset(SHINSTDIN) || locallevel) {
@@ -1573,8 +1573,8 @@ adjustwinsize(int from)
 	winchanged =
 #endif /* TIOCGWINSZ */
 	    resetneeded = 1;
-	zrefreshptr();
-	zle_resetpromptptr();
+	zleentry(ZLE_CMD_REFRESH);
+	zleentry(ZLE_CMD_RESET_PROMPT);
     }
 }
 

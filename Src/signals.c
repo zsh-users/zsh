@@ -1213,7 +1213,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
      * need to restore the display.
      */
     if (zleactive && resetneeded)
-	zrefreshptr();
+	zleentry(ZLE_CMD_REFRESH);
 
     if (*sigtr != ZSIG_IGNORED)
 	*sigtr &= ~ZSIG_IGNORED;

@@ -245,7 +245,8 @@ execselect(Estate state, UNUSED(int do_exec))
 		    int oef = errflag;
 
 		    isfirstln = 1;
-		    str = zlereadptr(&prompt3, NULL, 0, ZLCON_SELECT);
+		    str = zleentry(ZLE_CMD_READ, &prompt3, NULL,
+				   0, ZLCON_SELECT);
 		    if (errflag)
 			str = NULL;
 		    errflag = oef;
@@ -313,7 +314,7 @@ selectlist(LinkList l, size_t start)
     size_t longest = 1, fct, fw = 0, colsz, t0, t1, ct;
     char **arr, **ap;
 
-    trashzleptr();
+    zleentry(ZLE_CMD_TRASH);
     arr = hlinklist2array(l, 0);
     for (ap = arr; *ap; ap++)
 	if (strlen(*ap) > longest)

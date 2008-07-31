@@ -1809,6 +1809,72 @@ zleaftertrap(UNUSED(Hookdef dummy), UNUSED(void *dat))
     return 0;
 }
 
+static char *
+zle_main_entry(int cmd, va_list ap)
+{
+    switch (cmd) {
+    case ZLE_CMD_GET_LINE:
+    {
+	int *ll, *cs;
+	ll = va_arg(ap, int *);
+	cs = va_arg(ap, int *);
+	return zlegetline(ll, cs);
+    }
+
+    case ZLE_CMD_READ:
+    {
+	char **lp, **rp;
+	int flags, context;
+
+	lp = va_arg(ap, char **);
+	rp = va_arg(ap, char **);
+	flags = va_arg(ap, int);
+	context = va_arg(ap, int);
+
+	return zleread(lp, rp, flags, context);
+    }
+
+    case ZLE_CMD_ADD_TO_LINE:
+	zleaddtoline(va_arg(ap, int));
+	break;
+
+    case ZLE_CMD_TRASH:
+	trashzle();
+	break;
+
+    case ZLE_CMD_RESET_PROMPT:
+	zle_resetprompt();
+	break;
+
+    case ZLE_CMD_REFRESH:
+	zrefresh();
+	break;
+
+    case ZLE_CMD_SET_KEYMAP:
+	zlesetkeymap(va_arg(ap, int));
+	break;
+
+    case ZLE_CMD_GET_KEY:
+    {
+	long do_keytmout;
+	int *timeout, *chrp;
+
+	do_keytmout = va_arg(ap, long);
+	timeout = va_arg(ap, int *);
+	chrp = va_arg(ap, int *);
+	*chrp = getbyte(do_keytmout, timeout);
+	break;
+    }
+
+    default:
+#ifdef DEBUG
+	    dputs("Bad command %d in zle_main_entry", cmd);
+#endif
+	    break;
+    }
+    return NULL;
+}
+
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaM:ldDANmrsLRp", NULL),
     BUILTIN("vared",   0, bin_vared,   1,  1, 0, "aAcehM:m:p:r:", NULL),
@@ -1849,15 +1915,8 @@ int
 setup_(UNUSED(Module m))
 {
     /* Set up editor entry points */
-    trashzleptr = trashzle;
-    zle_resetpromptptr = zle_resetprompt;
-    zrefreshptr = zrefresh;
-    zleaddtolineptr = zleaddtoline;
-    zlegetlineptr = zlegetline;
-    zlereadptr = zleread;
-    zlesetkeymapptr = zlesetkeymap;
-
-    getkeyptr = getbyte;
+    zle_entry_ptr = zle_main_entry;
+    zle_load_state = 1;
 
     /* initialise the thingies */
     init_thingies();
@@ -1949,15 +2008,8 @@ finish_(UNUSED(Module m))
 	zfree(vibuf[i].buf, vibuf[i].len);
 
     /* editor entry points */
-    trashzleptr = noop_function;
-    zle_resetpromptptr = noop_function;
-    zrefreshptr = noop_function;
-    zleaddtolineptr = noop_function_int;
-    zlegetlineptr = NULL;
-    zlereadptr = fallback_zleread;
-    zlesetkeymapptr= noop_function_int;
-
-    getkeyptr = NULL;
+    zle_entry_ptr = (ZleEntryPoint)0;
+    zle_load_state = 0;
 
     zfree(clwords, clwsize * sizeof(char *));
     zle_refresh_finish();

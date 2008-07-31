@@ -84,11 +84,6 @@ mod_export int hasam, hasxn;
 /**/
 mod_export int tccolours;
 
-/* Pointer to read-key function from zle */
-
-/**/
-mod_export int (*getkeyptr) _((long, int *));
-
 /* SIGCHLD mask */
 
 /**/
@@ -717,8 +712,6 @@ setupvals(void)
     zero_mnumber.type = MN_INTEGER;
     zero_mnumber.u.l = 0;
 
-    getkeyptr = NULL;
-
     lineno = 1;
     noeval = 0;
     curhist = 0;
@@ -1181,84 +1174,101 @@ noop_function_int(UNUSED(int nothing))
     /* do nothing */
 }
 
-/* ZLE entry point pointers.  They are defined here because the initial *
- * values depend on whether ZLE is linked in or not -- if it is, we     *
- * avoid wasting space with the fallback functions.  No other source    *
- * file needs to know which modules are linked in.                      */
+/*
+ * ZLE entry point pointer.
+ * No other source file needs to know which modules are linked in.
+ */
+/**/
+mod_export ZleEntryPoint zle_entry_ptr;
 
-#ifdef LINKED_XMOD_zshQszle
-
+/*
+ * State of loading of zle.
+ * 0 = Not loaded, not attempted.
+ * 1 = Loaded successfully
+ * 2 = Failed to load.
+ */
 /**/
-mod_export ZleVoidFn trashzleptr = noop_function;
-/**/
-mod_export ZleVoidFn zle_resetpromptptr = noop_function;
-/**/
-mod_export ZleVoidFn zrefreshptr = noop_function;
-/**/
-mod_export ZleVoidIntFn zleaddtolineptr = noop_function_int;
-/**/
-mod_export ZleGetLineFn zlegetlineptr = NULL;
-/**/
-mod_export ZleReadFn zlereadptr = autoload_zleread;
-/**/
-mod_export ZleVoidIntFn zlesetkeymapptr = noop_function_int;
-
-#else /* !LINKED_XMOD_zshQszle */
-
-mod_export ZleVoidFn trashzleptr = noop_function;
-mod_export ZleVoidFn zle_resetpromptptr = noop_function;
-mod_export ZleVoidFn zrefreshptr = noop_function;
-mod_export ZleVoidIntFn zleaddtolineptr = noop_function_int;
-mod_export ZleGetLineFn zlegetlineptr = NULL;
-# ifdef UNLINKED_XMOD_zshQszle
-mod_export ZleReadFn zlereadptr = autoload_zleread;
-mod_export ZleVoidIntFn zlesetkeymapptr = autoload_zlesetkeymap;
-# else /* !UNLINKED_XMOD_zshQszle */
-mod_export ZleReadFn zlereadptr = fallback_zleread;
-mod_export ZleVoidIntFn zlesetkeymapptr = noop_function_int;
-# endif /* !UNLINKED_XMOD_zshQszle */
-
-#endif /* !LINKED_XMOD_zshQszle */
-
-/**/
-char *
-autoload_zleread(char **lp, char **rp, int ha, int con)
-{
-    zlereadptr = fallback_zleread;
-    if (load_module("zsh/zle", NULL, 0) != 1)
-	(void)load_module("zsh/compctl", NULL, 0);
-    return zlereadptr(lp, rp, ha, con);
-}
+mod_export int zle_load_state;
 
 /**/
 mod_export char *
-fallback_zleread(char **lp, UNUSED(char **rp), UNUSED(int ha), UNUSED(int con))
+zleentry(VA_ALIST1(int cmd))
+VA_DCL
 {
-    char *pptbuf;
-    int pptlen;
+    char *ret = NULL;
+    va_list ap;
+    VA_DEF_ARG(int cmd);
 
-    pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL, NULL),
-		      &pptlen);
-    write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
-    free(pptbuf);
+    VA_START(ap, cmd);
+    VA_GET_ARG(ap, cmd, int);
 
-    return shingetline();
-}
+#if defined(LINKED_XMOD_zshQszle) || defined(UNLINKED_XMOD_zshQszle)
+    /* autoload */
+    switch (zle_load_state) {
+    case 0:
+	if (load_module("zsh/zle", NULL, 0) != 1) {
+	    (void)load_module("zsh/compctl", NULL, 0);
+	    ret = zle_entry_ptr(cmd, ap);
+	    /* Don't execute fallback code */
+	    cmd = -1;
+	} else {
+	    zle_load_state = 2;
+	    /* Execute fallback code below */
+	}
+	break;
 
-/**/
-#ifdef UNLINKED_XMOD_zshQszle
+    case 1:
+	ret = zle_entry_ptr(cmd, ap);
+	/* Don't execute fallback code */
+	cmd = -1;
+	break;
 
-/**/
-static void
-autoload_zlesetkeymap(int mode)
-{
-    zlesetkeymapptr = noop_function_int;
-    (void)load_module("zsh/zle", NULL, 0);
-    (*zlesetkeymapptr)(mode);
-}
-
-/**/
+    case 2:
+	/* Execute fallback code */
+	break;
+    }
 #endif
+
+    switch (cmd) {
+	/*
+	 * Only the read command really needs a fallback if zle
+	 * is not available.  ZLE_CMD_GET_LINE has traditionally
+	 * had local code in bufferwords() to do this, but that'
+	 * probably only because bufferwords() is part of completion
+	 * and so everything to do with it is horribly complicated.
+	 */
+    case ZLE_CMD_READ:
+    {
+	char *pptbuf, **lp;
+	int pptlen;
+
+	lp = va_arg(ap, char **);
+
+	pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL,
+				       NULL),
+			  &pptlen);
+	write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
+	free(pptbuf);
+
+	ret = shingetline();
+	break;
+    }
+
+    case ZLE_CMD_GET_LINE:
+    {
+	int *ll, *cs;
+
+	ll = va_arg(ap, int *);
+	cs = va_arg(ap, int *);
+	*ll = *cs = 0;
+	ret = ztrdup("");
+	break;
+    }
+    }
+
+    va_end(ap);
+    return ret;
+}
 
 /* compctl entry point pointers.  Similar to the ZLE ones. */
 
