@@ -72,30 +72,30 @@ local -a sessnames sessargs
 integer stat
 
 while getopts "a:f:l:qs:z" opt; do
-    case $opt in
-	(a) accept=$OPTARG
-            if [[ $accept != [[:digit:]]## ]]; then
-		print "option -a takes a file descriptor" >&2
-		return 1
-	    fi
-	    ;;
-	(f) fake=$OPTARG
-	    if [[ $fake != [[:digit:]]## ]]; then
-		print "option -f takes a file descriptor" >&2
-		return 1
-	    fi
-	    ;;
-	(l) sessnames+=(${(s.,.)OPTARG})
-            ;;
-	(q) quiet=1
-            ;;
-	(s) sessnames+=($OPTARG)
-            ;;
-	(z) nozle=1
-            ;;
-	(*) return 1
-            ;;
-    esac
+  case $opt in
+    (a) accept=$OPTARG
+    if [[ $accept != [[:digit:]]## ]]; then
+      print "option -a takes a file descriptor" >&2
+      return 1
+    fi
+    ;;
+    (f) fake=$OPTARG
+    if [[ $fake != [[:digit:]]## ]]; then
+      print "option -f takes a file descriptor" >&2
+      return 1
+    fi
+    ;;
+    (l) sessnames+=(${(s.,.)OPTARG})
+    ;;
+    (q) quiet=1
+    ;;
+    (s) sessnames+=($OPTARG)
+    ;;
+    (z) nozle=1
+    ;;
+    (*) return 1
+    ;;
+  esac
 done
 (( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
@@ -104,50 +104,50 @@ done
 typeset -A sessassoc
 
 if (( ${#sessnames} )); then
-    if [[ $# -ne 0 || -n $accept || -n $fake ]]; then
-	print "Incompatible arguments with \`-s' option." >&2
-	return 1
-    fi
-    for sess in ${sessnames}; do
-	sessassoc[$sess]=
-    done
+  if [[ $# -ne 0 || -n $accept || -n $fake ]]; then
+    print "Incompatible arguments with \`-s' option." >&2
+    return 1
+  fi
+  for sess in ${sessnames}; do
+    sessassoc[$sess]=
+  done
 
-    sessfile=${ZDOTDIR:-$HOME}/.ztcp_sessions
-    if [[ ! -r $sessfile ]]; then
-	print "No session file: $sessfile" >&2
-	return 1
+  sessfile=${ZDOTDIR:-$HOME}/.ztcp_sessions
+  if [[ ! -r $sessfile ]]; then
+    print "No session file: $sessfile" >&2
+    return 1
+  fi
+  while read -A sessargs; do
+    [[ ${sessargs[1]} = '#'* ]] && continue
+    if ((  ${+sessassoc[${sessargs[1]}]} )); then
+      sessassoc[${sessargs[1]}]="${sessargs[2,-1]}"
     fi
-    while read -A sessargs; do
-	[[ ${sessargs[1]} = '#'* ]] && continue
-	if ((  ${+sessassoc[${sessargs[1]}]} )); then
-	    sessassoc[${sessargs[1]}]="${sessargs[2,-1]}"
-	fi
-    done < $sessfile
-    for sess in ${sessnames}; do
-	if [[ -z $sessassoc[$sess] ]]; then
-	    print "Couldn't find session $sess in $sessfile." >&2
-	    return 1
-	fi
-    done
+  done < $sessfile
+  for sess in ${sessnames}; do
+    if [[ -z $sessassoc[$sess] ]]; then
+      print "Couldn't find session $sess in $sessfile." >&2
+      return 1
+    fi
+  done
 else
-    if [[ -z $accept && -z $fake ]]; then
-	if (( $# < 2 )); then
-	    set -- wrong number of arguments
-	else
-	    host=$1 port=$2
-	    shift $(( $# > 1 ? 2 : 1 ))
-	fi
-    fi
-    if [[ -n $1 ]]; then
-	sessnames=($1)
-	shift
+  if [[ -z $accept && -z $fake ]]; then
+    if (( $# < 2 )); then
+      set -- wrong number of arguments
     else
-	sessnames=($(( ${#tcp_by_fd} + 1 )))
-	while [[ -n $tcp_by_name[$sessnames[1]] ]]; do
-	    (( sessnames[1]++ ))
-	done
+      host=$1 port=$2
+      shift $(( $# > 1 ? 2 : 1 ))
     fi
-    sessassoc[$sessnames[1]]="$host $port"
+  fi
+  if [[ -n $1 ]]; then
+    sessnames=($1)
+    shift
+  else
+    sessnames=($(( ${#tcp_by_fd} + 1 )))
+    while [[ -n $tcp_by_name[$sessnames[1]] ]]; do
+      (( sessnames[1]++ ))
+    done
+  fi
+  sessassoc[$sessnames[1]]="$host $port"
 fi
 
 if (( $# )); then
@@ -158,64 +158,67 @@ fi
 
 local REPLY fd
 for sess in $sessnames; do
-    if [[ -n $tcp_by_name[$sess] ]]; then
-	print "Session \`$sess' already exists." >&2
-	return 1
-    fi
+  if [[ -n $tcp_by_name[$sess] ]]; then
+    print "Session \`$sess' already exists." >&2
+    return 1
+  fi
 
-    sessargs=()
-    if [[ -n $fake ]]; then
-	fd=$fake;
+  sessargs=()
+  if [[ -n $fake ]]; then
+    fd=$fake;
+  else
+    if [[ -n $accept ]]; then
+      ztcp -a $accept || return 1
     else
-	if [[ -n $accept ]]; then
-	    ztcp -a $accept || return 1
-	else
-	    sessargs=(${=sessassoc[$sess]})
-	    ztcp $sessargs || return 1
-	fi
-	fd=$REPLY
+      sessargs=(${=sessassoc[$sess]})
+      ztcp $sessargs || return 1
     fi
+    fd=$REPLY
+  fi
 
-    tcp_by_fd[$fd]=$sess
-    tcp_by_name[$sess]=$fd
+  tcp_by_fd[$fd]=$sess
+  tcp_by_name[$sess]=$fd
 
-    [[ -o zle && -z $nozle ]] && zle -F $fd tcp_fd_handler
+  [[ -o zle && -z $nozle ]] && zle -F $fd tcp_fd_handler
 
-    # needed for new completion system, so I'm not too sanguine
-    # about requiring this here...
-    if zmodload -i zsh/parameter; then
-	if (( ${+functions[tcp_on_open]} )); then
-	    if ! tcp_on_open $sess $fd; then
-	        if [[ -z $quiet ]]; then
-		    if (( ${#sessargs} )); then
-		        print "Session $sess" \
-"(host $sessargs[1], port $sessargs[2] fd $fd): tcp_on_open FAILED."
-		    else
-		        print "Session $sess (fd $fd) tcp_on_open FAILED."
-		    fi
-		    tcp_close -- $sess
-		else
-		    tcp_close -q -- $sess
-	        fi
-		stat=1
-		continue
-	    fi
-	fi
-    fi
-
-    if [[ -z $quiet ]]; then
-	if (( ${#sessargs} )); then
+  # needed for new completion system, so I'm not too sanguine
+  # about requiring this here...
+  if zmodload -i zsh/parameter; then
+    if (( ${+functions[tcp_on_open]} )); then
+      if ! tcp_on_open $sess $fd; then
+	if [[ -z $quiet ]]; then
+	  if (( ${#sessargs} )); then
 	    print "Session $sess" \
-"(host $sessargs[1], port $sessargs[2] fd $fd) opened OK."
+"(host $sessargs[1], port $sessargs[2] fd $fd): tcp_on_open FAILED."
+	  else
+	    print "Session $sess (fd $fd) tcp_on_open FAILED."
+	  fi
+	  tcp_close -- $sess
 	else
-	    print "Session $sess (fd $fd) opened OK."
+	  tcp_close -q -- $sess
 	fi
+	stat=1
+	continue
+      fi
     fi
+  fi
+
+  if [[ -z $quiet ]]; then
+    if (( ${#sessargs} )); then
+      print "Session $sess" \
+"(host $sessargs[1], port $sessargs[2] fd $fd) opened OK."
+    else
+      print "Session $sess (fd $fd) opened OK."
+    fi
+  fi
 done
 
-if [[ -z $TCP_SESS ]]; then
+if [[ -z $TCP_SESS || -z $tcp_by_name[$TCP_SESS] ]]; then
+  # careful in case we closed it again...
+  if [[ -n $tcp_by_name[$sessnames[1]] ]]; then
     [[ -z $quiet ]] && print "Setting default TCP session $sessnames[1]"
     typeset -g TCP_SESS=$sessnames[1]
+  fi
 fi
 
 return $stat

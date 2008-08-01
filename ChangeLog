@@ -1,4 +1,15 @@
+2008-08-01  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Functions/Misc/add-zsh-hook: testing for existence
+	of hook function when hook was already defined was broken.
+
+	* unposted: Functions/TCP/tcp_open, Functions/TCP/tcp_sess:
+	improve some variable handling and standardise some indentation.
+
 2008-07-31  Peter Stephenson  <pws@csr.com>
+
+	* 25364: Doc/Zsh/params.yo, Src/params.c, Test/D06subscript.ztst:
+	(k) hash subscript didn't work due to sense of test.
 
 	* 25345, 25347: Src/builtin.c, Src/exec.c, Src/hist.c, Src/init.c,
 	Src/input.c, Src/jobs.c, Src/loop.c, Src/options.c, Src/signals.c,
