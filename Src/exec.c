@@ -64,7 +64,23 @@ int nohistsave;
 /**/
 mod_export int errflag;
  
-/* Status of return from a trap */
+/*
+ * Status of return from a trap.
+ * This is only active if we are inside a trap, else its value
+ * is irrelevant.  It is initialised to -1 for a function trap and
+ * -2 for a non-function trap and if negative is decremented as
+ * we go deeper into functions and incremented as we come back up.
+ * The value is used to decide if an explicit "return" should cause
+ * a return from the caller of the trap; it does this by setting
+ * trapreturn to a status (i.e. a non-negative value).
+ *
+ * In summary, trapreturn is
+ * - zero unless we are in a trap
+ * - negative in a trap unless it has triggered.  Code uses this
+ *   to detect an active trap.
+ * - non-negative in a trap once it was triggered.  It should remain
+ *   non-negative until restored after execution of the trap.
+ */
  
 /**/
 int trapreturn;

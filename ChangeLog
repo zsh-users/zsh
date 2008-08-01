@@ -1,5 +1,9 @@
 2008-08-01  Peter Stephenson  <pws@csr.com>
 
+	* 25367: Src/exec.c, Src/init.c, Src/signals.c: bug with
+	trapreturn in a sourced file caused early return of parent;
+	add protection for nested traps; document trapreturn.
+
 	* unposted: Functions/Misc/add-zsh-hook: testing for existence
 	of hook function when hook was already defined was broken.
 

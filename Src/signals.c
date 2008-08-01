@@ -1085,6 +1085,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     int trapret = 0;
     int obreaks = breaks;
     int oretflag = retflag;
+    int otrapreturn = trapreturn;
     int isfunc;
     int traperr;
 
@@ -1183,6 +1184,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	trapret = trapreturn + 1;
     }
     traperr = errflag;
+    trapreturn = otrapreturn;
     execrestore();
     lexrestore();
 
