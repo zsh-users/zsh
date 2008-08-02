@@ -1,3 +1,8 @@
+2008-08-02  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 25373: Src/Builtins/sched.c: fix missed ZLE entry point (see
+	25347).
+
 2008-08-01  Peter Stephenson  <pws@csr.com>
 
 	* 25367: Src/exec.c, Src/init.c, Src/signals.c: bug with
