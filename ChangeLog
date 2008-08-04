@@ -1,3 +1,8 @@
+2008-08-04  Peter Stephenson  <pws@csr.com>
+
+	* users/13093: Src/module.c: HashNode changes didn't
+	get propagated to AIX-specific code.
+
 2008-08-02  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 25373: Src/Builtins/sched.c: fix missed ZLE entry point (see

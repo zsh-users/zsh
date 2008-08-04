@@ -1450,9 +1450,9 @@ load_and_bind(const char *fn)
 	int i, err = loadbind(0, (void *) addbuiltin, ret);
 	for (i = 0; i < modulestab->hsize && !err; i++) {
 	    for (m = (Module)modulestab->nodes[i]; m && !err;
-		 m = m->node.next) {
-		if (!(m->flags & MOD_ALIAS) &&
-		    m->u.handle && !(m->flags & MOD_LINKED))
+		 m = (Module)m->node.next) {
+		if (!(m->node.flags & MOD_ALIAS) &&
+		    m->u.handle && !(m->node.flags & MOD_LINKED))
 		    err |= loadbind(0, m->u.handle, ret);
 	    }
 	}
