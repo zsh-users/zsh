@@ -191,7 +191,7 @@ loop(int toplevel, int justonce)
 	    exit(lastval);
 	if (((!interact || sourcelevel) && errflag) || retflag)
 	    break;
-	if (trapreturn >= 0) {
+	if (intrap && trapreturn >= 0) {
 	    lastval = trapreturn;
 	    trapreturn = 0;
 	}
