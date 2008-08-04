@@ -1206,14 +1206,22 @@ VA_DCL
     /* autoload */
     switch (zle_load_state) {
     case 0:
-	if (load_module("zsh/zle", NULL, 0) != 1) {
-	    (void)load_module("zsh/compctl", NULL, 0);
-	    ret = zle_entry_ptr(cmd, ap);
-	    /* Don't execute fallback code */
-	    cmd = -1;
-	} else {
-	    zle_load_state = 2;
-	    /* Execute fallback code below */
+	/*
+	 * Some commands don't require us to load ZLE.
+	 * These also have no fallback.
+	 */
+	if (cmd != ZLE_CMD_TRASH && cmd != ZLE_CMD_RESET_PROMPT &&
+	    cmd != ZLE_CMD_REFRESH)
+	{
+	    if (load_module("zsh/zle", NULL, 0) != 1) {
+		(void)load_module("zsh/compctl", NULL, 0);
+		ret = zle_entry_ptr(cmd, ap);
+		/* Don't execute fallback code */
+		cmd = -1;
+	    } else {
+		zle_load_state = 2;
+		/* Execute fallback code below */
+	    }
 	}
 	break;
 

@@ -1,5 +1,8 @@
 2008-08-04  Peter Stephenson  <pws@csr.com>
 
+	* 25384: Src/init.c: fix problem with autoload of zsh/zle
+	for warning message at boot.
+
 	* users/13093: Src/module.c: HashNode changes didn't
 	get propagated to AIX-specific code.
 
