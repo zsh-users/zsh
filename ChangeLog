@@ -1,5 +1,8 @@
 2008-08-04  Peter Stephenson  <pws@csr.com>
 
+	* users/13095: configure.ac: we don't want that
+	_XOPEN_SOURCE_EXTENDED stuff on AIX, apparently.
+
 	* 25384: Src/init.c: fix problem with autoload of zsh/zle
 	for warning message at boot.
 
