@@ -350,6 +350,44 @@
 >trap
 >Working 0
 
+  debug-trap-bug1() {
+    setopt localtraps
+    print "print bug file here" >bug-file
+    print "print this is line one
+    print this is line two
+    print this is line three
+    print and this is line fifty-nine." >bug-file2
+    function debug_trap_handler {
+	print $functrace[1]
+	do_bug
+    }
+    function do_bug {
+       . ./bug-file
+    }
+    trap 'echo EXIT hit' EXIT
+    trap 'debug_trap_handler' DEBUG
+    . ./bug-file2
+  }
+  debug-trap-bug1
+0: Relationship between traps and sources
+>debug-trap-bug1:15
+>bug file here
+>this is line one
+>./bug-file2:1
+>bug file here
+>this is line two
+>./bug-file2:2
+>bug file here
+>this is line three
+>./bug-file2:3
+>bug file here
+>and this is line fifty-nine.
+>./bug-file2:4
+>bug file here
+>debug-trap-bug1:16
+>bug file here
+>EXIT hit
+
 %clean
 
   rm -f TRAPEXIT

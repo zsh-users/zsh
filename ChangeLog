@@ -1,3 +1,7 @@
+2008-08-05  Peter Stephenson  <pws@csr.com>
+
+	* 25392: Test/C03traps.ztst: test for 25367
+
 2008-08-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Src/init.c: 25385: extend 25367 to fix another bug
