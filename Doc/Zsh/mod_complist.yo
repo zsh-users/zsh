@@ -107,7 +107,7 @@ the pattern.  Definitions for the form with the leading equal sign take
 precedence over the values defined for file types, which in turn take
 precedence over the form with the leading asterisk (file extensions).
 
-The last form also allows different parts of the displayed
+The leading-equals form also allows different parts of the displayed
 strings to be colored differently.  For this, the pattern has to use the
 `tt((#b))' globbing flag and pairs of parentheses surrounding the
 parts of the strings that are to be colored differently.  In this case 
