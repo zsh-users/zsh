@@ -350,6 +350,7 @@
 >trap
 >Working 0
 
+  unsetopt DEBUG_BEFORE_CMD
   debug-trap-bug1() {
     setopt localtraps
     print "print bug file here" >bug-file
@@ -387,6 +388,19 @@
 >debug-trap-bug1:16
 >bug file here
 >EXIT hit
+
+  cat >zsh-trapreturn-bug2 <<-'HERE'
+	cmd='./fdasfsdafd'
+	[[ -x $cmd ]] && rm $cmd
+	set -o DEBUG_BEFORE_CMD
+	trap '[[ $? -ne 0 ]] && exit 0' DEBUG
+	$cmd  # invalid command
+	# Failure
+	exit 10
+	HERE
+  $ZTST_testdir/../Src/zsh -f ./zsh-trapreturn-bug2
+0: trapreturn handling bug is properly fixed
+?./zsh-trapreturn-bug2:5: no such file or directory: ./fdasfsdafd
 
 %clean
 

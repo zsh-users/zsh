@@ -1,3 +1,7 @@
+2008-08-06  Peter Stephenson  <pws@csr.com>
+
+	* 25400: Test/C03traps.ztst: Rocky's test for 25385
+
 2008-08-05  Peter Stephenson  <pws@csr.com>
 
 	* 25392: Test/C03traps.ztst: test for 25367
