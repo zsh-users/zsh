@@ -878,6 +878,21 @@ putfilecol(char *group, char *n, mode_t m, int special)
     Extcol ec;
     Patcol pc;
 
+    nrefs = MAX_POS - 1;
+
+    for (pc = mcolors.pats; pc; pc = pc->next)
+	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
+	    pattryrefs(pc->pat, n, -1, -1, 0, &nrefs, begpos, endpos)) {
+	    if (pc->cols[1]) {
+		patcols = pc->cols;
+
+		return 1;
+	    }
+	    zlrputs(pc->cols[0]);
+
+	    return 0;
+	}
+
     if (special != -1) {
 	colour = special;
     } else if (S_ISDIR(m)) {
@@ -916,21 +931,6 @@ putfilecol(char *group, char *n, mode_t m, int special)
 	if (strsfx(ec->ext, n) &&
 	    (!ec->prog || !group || pattry(ec->prog, group))) {
 	    zlrputs(ec->col);
-
-	    return 0;
-	}
-
-    nrefs = MAX_POS - 1;
-
-    for (pc = mcolors.pats; pc; pc = pc->next)
-	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
-	    pattryrefs(pc->pat, n, -1, -1, 0, &nrefs, begpos, endpos)) {
-	    if (pc->cols[1]) {
-		patcols = pc->cols;
-
-		return 1;
-	    }
-	    zlrputs(pc->cols[0]);
 
 	    return 0;
 	}

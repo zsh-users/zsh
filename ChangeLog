@@ -2,6 +2,12 @@
 
 	* 25392: Test/C03traps.ztst: test for 25367
 
+2008-08-05  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 25389: Doc/Zsh/mod_complist.yo, Src/Zle/complist.c: once again
+	rearrange precedence of ZLS_COLORS alternatives to make complex
+	coloring of file names possible.
+
 2008-08-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Src/init.c: 25385: extend 25367 to fix another bug
