@@ -382,7 +382,10 @@ findex(eval)
 cindex(evaluating arguments as commands)
 item(tt(eval) [ var(arg) ... ])(
 Read the arguments as input to the shell and execute the resulting
-command in the current shell process.
+command(s) in the current shell process.  The return status is the
+same as if the commands had been executed directly by the shell;
+if there are no var(args) or they contain no commands (i.e. are
+an empty string or whitespace) the return status is zero.
 )
 item(tt(exec) [ tt(-cl) ] [ tt(-a) var(argv0) ] var(simple command))(
 Replace the current shell with an external command rather than forking.

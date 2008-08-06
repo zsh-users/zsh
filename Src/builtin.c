@@ -4717,16 +4717,18 @@ bin_eval(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
 
     prog = parse_string(zjoin(argv, ' ', 1));
     if (prog) {
-	lastval = 0;
+	if (wc_code(*prog->prog) != WC_LIST) {
+	    /* No code to execute */
+	    lastval = 0;
+	} else {
+	    execode(prog, 1, 0);
 
-	execode(prog, 1, 0);
-
-	if (errflag)
-	    lastval = errflag;
+	    if (errflag)
+		lastval = errflag;
+	}
     } else {
 	lastval = 1;
     }
-
 
     errflag = 0;
     scriptname = oscriptname;

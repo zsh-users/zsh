@@ -11,6 +11,7 @@ B01cd.ztst
 B02typeset.ztst
 B03print.ztst
 B04read.ztst
+B05eval.ztst
 C01arith.ztst
 C02cond.ztst
 C03traps.ztst
