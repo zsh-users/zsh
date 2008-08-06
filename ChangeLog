@@ -1,5 +1,8 @@
 2008-08-06  Peter Stephenson  <pws@csr.com>
 
+	* 25405: Src/exec.c: return value was not set from anonymous
+	functions.
+
 	* 25400: Test/C03traps.ztst: Rocky's test for 25385
 
 2008-08-05  Peter Stephenson  <pws@csr.com>

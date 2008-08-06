@@ -3870,7 +3870,7 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 {
     Shfunc shf;
     char *s = NULL;
-    int signum, nprg, sbeg, nstrs, npats, len, plen, i, htok = 0;
+    int signum, nprg, sbeg, nstrs, npats, len, plen, i, htok = 0, ret = 0;
     Wordcode beg = state->pc, end;
     Eprog prog;
     Patprog *pp;
@@ -3941,6 +3941,7 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 	    addlinknode(args, shf->node.nam);
 
 	    execshfunc(shf, args);
+	    ret = lastval;
 	    break;
 	} else {
 	    /* is this shell function a signal trap? */
@@ -3963,7 +3964,7 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 	}
     }
     state->pc = end;
-    return 0;
+    return ret;
 }
 
 /* Main entry point to execute a shell function. */
