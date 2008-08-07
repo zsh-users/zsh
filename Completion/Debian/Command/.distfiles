@@ -15,5 +15,5 @@ _mergechanges         _module-assistant     _piuparts
 _reprepro             _schroot              _svn-buildpackage
 _toolchain-source     _update-alternatives  _update-rc.d
 _uscan                _wajig                _wanna-build
-_vim-addons
+_vim-addons _grep-excuses
 '

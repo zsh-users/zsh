@@ -1,5 +1,9 @@
 2008-08-07  Clint Adams  <clint@zsh.org>
 
+	* 25423: Chris Lamb: Completion/Debian/Command/.distfiles,
+	Completion/Debian/Command/_grep-excuses: completion for
+	grep-excuses.
+
 	* 25422: Chris Lamb: Completion/Debian/Command/_apt-show-versions:
 	apt-show-versions completion fix.
 
