@@ -1,5 +1,8 @@
 2008-08-07  Peter Stephenson  <pws@csr.com>
 
+	* 25418: Doc/Zsh/options.yo, Src/options.c: set PROMPT_SUBST
+	for all Bourne-style shells.
+
 	* 25415: README, Doc/Zsh/builtins.yo, Doc/Zsh/func.yo,
 	Doc/Zsh/options.yo, Src/builtin.c, Src/exec.c, Src/init.c,
 	Src/options.c, Src/signals.c, Src/zsh.h, Test/A05execution.ztst,

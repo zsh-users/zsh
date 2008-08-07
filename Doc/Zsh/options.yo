@@ -1009,7 +1009,7 @@ See noderef(Prompt Expansion).
 )
 pindex(PROMPT_SUBST)
 cindex(prompt, parameter expansion)
-item(tt(PROMPT_SUBST) <K>)(
+item(tt(PROMPT_SUBST) <K> <S>)(
 If set, em(parameter expansion), em(command substitution) and
 em(arithmetic expansion) are performed in prompts.  Substitutions
 within prompts do not affect the command status.

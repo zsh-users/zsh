@@ -198,7 +198,7 @@ static struct optname optns[] = {
 {{NULL, "promptcr",	      OPT_ALL},			 PROMPTCR},
 {{NULL, "promptpercent",      OPT_NONBOURNE},		 PROMPTPERCENT},
 {{NULL, "promptsp",	      OPT_ALL},			 PROMPTSP},
-{{NULL, "promptsubst",	      OPT_KSH},			 PROMPTSUBST},
+{{NULL, "promptsubst",	      OPT_BOURNE},		 PROMPTSUBST},
 {{NULL, "pushdignoredups",    OPT_EMULATE},		 PUSHDIGNOREDUPS},
 {{NULL, "pushdminus",	      OPT_EMULATE},		 PUSHDMINUS},
 {{NULL, "pushdsilent",	      0},			 PUSHDSILENT},
