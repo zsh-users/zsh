@@ -308,8 +308,12 @@ executed inside other traps.
 )
 findex(TRAPDEBUG)
 item(tt(TRAPDEBUG))(
-Executed after each command.  If the option tt(DEBUG_BEFORE_CMD)
-is set, executed before each command instead.
+If the option tt(DEBUG_BEFORE_CMD) is set (as it is by default), executed
+before each command; otherwise executed after each command.  In the former
+case it is possible to skip the next command; see the description of the
+tt(ERR_EXIT) option in
+ifzman(zmanref(zshoptions))\
+ifnzman(noderef(Description of Options)).
 )
 findex(TRAPEXIT)
 item(tt(TRAPEXIT))(

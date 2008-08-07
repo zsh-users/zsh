@@ -124,6 +124,7 @@
 0:TRAPEXIT
 >Exit
 
+  unsetopt DEBUG_BEFORE_CMD
   unfunction fn
   print 'TRAPDEBUG() {
       print Line $LINENO
@@ -138,6 +139,7 @@
 >Line 1
 >Line 1
 
+  unsetopt DEBUG_BEFORE_CMD
   unfunction fn
   print 'trap '\''print Line $LINENO'\'' DEBUG
     :

@@ -921,7 +921,9 @@ struct execstack {
     int badcshglob;
     pid_t cmdoutpid;
     int cmdoutval;
-    int trapreturn;
+    int trap_return;
+    int trap_state;
+    int trapisfunc;
     int noerrs;
     int subsh_close;
     char *underscore;
@@ -2224,6 +2226,24 @@ struct heap {
 /* No. of bits to shift local level when storing in sigtrapped */
 #define ZSIG_ALIAS	(1<<3)  /* Trap is stored under an alias */
 #define ZSIG_SHIFT	4
+
+/*
+ * State of traps, stored in trap_state.
+ */
+enum trap_state {
+    /* Traps are not active; trap_return is not useful. */
+    TRAP_STATE_INACTIVE,
+    /*
+     * Traps are set but haven't triggered; trap_return gives
+     * minus function depth.
+     */
+    TRAP_STATE_PRIMED,
+    /*
+     * Trap has triggered to force a return; trap_return givens
+     * return value.
+     */
+    TRAP_STATE_FORCE_RETURN
+};
 
 /***********/
 /* Sorting */

@@ -4462,8 +4462,10 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	    retflag = 1;
 	    breaks = loops;
 	    lastval = num;
-	    if (trapreturn == -2)
-		trapreturn = lastval;
+	    if (trap_state == TRAP_STATE_PRIMED && trap_return == -2) {
+		trap_state = TRAP_STATE_FORCE_RETURN;
+		trap_return = lastval;
+	    }
 	    return lastval;
 	}
 	zexit(num, 0);	/* else treat return as logout/exit */

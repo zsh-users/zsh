@@ -56,6 +56,12 @@ behaviour.)  Now it is treated identically to "$@".  The same change
 applies to expressions with forced splitting such as ${=1+"$@"}, but
 otherwise the case where SH_WORD_SPLIT is not set is unaffected.
 
+Debug traps (`trap ... DEBUG' or the function TRAPDEBUG) now run by default
+before the command to which they refer instead of after.  This is almost
+always the right behaviour for the intended purpose of debugging and is
+consistent with recent versions of other shells.  The option
+DEBUG_BEFORE_CMD can be unset to revert to the previous behaviour.
+
 In previous versions of the shell it was possible to use index 0 in an
 array or string subscript to refer to the same element as index 1 if the
 option KSH_ARRAYS was not in effect.  This was a limited approximation to

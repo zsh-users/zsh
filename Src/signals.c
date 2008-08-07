@@ -1082,12 +1082,10 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 {
     LinkList args;
     char *name, num[4];
-    int trapret = 0;
     int obreaks = breaks;
     int oretflag = retflag;
-    int otrapreturn = trapreturn;
     int isfunc;
-    int traperr;
+    int traperr, new_trap_state, new_trap_return;
 
     /* if signal is being ignored or the trap function		      *
      * is NULL, then return					      *
@@ -1123,6 +1121,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     *sigtr |= ZSIG_IGNORED;
 
     lexsave();
+    /* execsave will save the old trap_return and trap_state */
     execsave();
     breaks = retflag = 0;
     runhookdef(BEFORETRAPHOOK, NULL);
@@ -1148,7 +1147,8 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	sprintf(num, "%d", sig);
 	zaddlinknode(args, num);
 
-	trapreturn = -1;	/* incremented by doshfunc */
+	trap_return = -1;	/* incremented by doshfunc */
+	trap_state = TRAP_STATE_PRIMED;
 	trapisfunc = isfunc = 1;
 
 	sfcontext = SFC_SIGNAL;
@@ -1156,46 +1156,32 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	sfcontext = osc;
 	freelinklist(args, (FreeFunc) NULL);
 	zsfree(name);
-
     } else {
-	trapreturn = -2;	/* not incremented, used at current level */
+	trap_return = -2;	/* not incremented, used at current level */
+	trap_state = TRAP_STATE_PRIMED;
 	trapisfunc = isfunc = 0;
 
 	execode(sigfn, 1, 0);
     }
     runhookdef(AFTERTRAPHOOK, NULL);
 
-    if (trapreturn > 0 && isfunc) {
-	/*
-	 * Context was its own function.  We propagate the return
-	 * value specially.  Return value zero means don't do
-	 * anything special, so don't handle it.
-	 */
-	trapret = trapreturn;
-    } else if (trapreturn >= 0 && !isfunc) {
-	/*
-	 * Context was an inline trap.  If an explicit return value
-	 * was used, we need to set `lastval'.  Otherwise we use the
-	 * value restored by execrestore.  In this case, all return
-	 * values indicate an explicit return from the current function,
-	 * so always handle specially.  trapreturn is always restored by
-	 * execrestore.
-	 */
-	trapret = trapreturn + 1;
-    }
     traperr = errflag;
-    trapreturn = otrapreturn;
+
+    /* Grab values before they are restored */
+    new_trap_state = trap_state;
+    new_trap_return = trap_return;
+
     execrestore();
     lexrestore();
 
-    if (trapret > 0) {
+    if (new_trap_state == TRAP_STATE_FORCE_RETURN &&
+	/* zero return from function isn't special */
+	!(isfunc && new_trap_return == 0)) {
 	if (isfunc) {
 	    breaks = loops;
 	    errflag = 1;
-	    lastval = trapret;
-	} else {
-	    lastval = trapret-1;
 	}
+	lastval = new_trap_return;
 	/* return triggered */
 	retflag = 1;
     } else {

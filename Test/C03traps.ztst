@@ -402,6 +402,19 @@
 0: trapreturn handling bug is properly fixed
 ?./zsh-trapreturn-bug2:5: no such file or directory: ./fdasfsdafd
 
+  fn() {
+    setopt localtraps localoptions debugbeforecmd
+    trap '(( LINENO == 4 )) && setopt errexit' DEBUG
+    print $LINENO three
+    print $LINENO four
+    print $LINENO five
+    [[ -o errexit ]] && print "Hey, ERREXIT is set!"
+  }
+  fn
+1:Skip line from DEBUG trap
+>3 three
+>5 five
+
 %clean
 
   rm -f TRAPEXIT

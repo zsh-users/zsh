@@ -191,10 +191,6 @@ loop(int toplevel, int justonce)
 	    exit(lastval);
 	if (((!interact || sourcelevel) && errflag) || retflag)
 	    break;
-	if (intrap && trapreturn >= 0) {
-	    lastval = trapreturn;
-	    trapreturn = 0;
-	}
 	if (isset(SINGLECOMMAND) && toplevel) {
 	    if (sigtrapped[SIGEXIT])
 		dotrap(SIGEXIT);
@@ -880,7 +876,8 @@ setupvals(void)
     lastmailcheck = time(NULL);
     locallevel = sourcelevel = 0;
     sfcontext = SFC_NONE;
-    trapreturn = 0;
+    trap_return = 0;
+    trap_state = TRAP_STATE_INACTIVE;
     noerrexit = -1;
     nohistsave = 1;
     dirstack = znewlinklist();
@@ -1060,6 +1057,7 @@ source(char *s)
     char *old_scriptname = scriptname, *us;
     unsigned char *ocs;
     int ocsp;
+    int otrap_return = trap_return, otrap_state = trap_state;
 
     if (!s || 
 	(!(prog = try_source_file((us = unmeta(s)))) &&
@@ -1090,6 +1088,13 @@ source(char *s)
     dosetopt(SHINSTDIN, 0, 1);
     scriptname = s;
 
+    /*
+     * The special return behaviour of traps shouldn't
+     * trigger in files sourced from traps; the return
+     * is just a return from the file.
+     */
+    trap_state = TRAP_STATE_INACTIVE;
+
     sourcelevel++;
     if (prog) {
 	pushheap();
@@ -1099,6 +1104,9 @@ source(char *s)
     } else
 	loop(0, 0);		     /* loop through the file to be sourced  */
     sourcelevel--;
+
+    trap_state = otrap_state;
+    trap_return = otrap_return;
 
     /* restore the current shell state */
     if (prog)

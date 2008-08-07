@@ -65,16 +65,23 @@ int nohistsave;
 mod_export int errflag;
  
 /*
- * Status of return from a trap.
+ * State of trap return value.  Value is from enum trap_state.
+ */
+
+/**/
+int trap_state;
+
+/*
+ * Value associated with return from a trap.
  * This is only active if we are inside a trap, else its value
  * is irrelevant.  It is initialised to -1 for a function trap and
  * -2 for a non-function trap and if negative is decremented as
  * we go deeper into functions and incremented as we come back up.
  * The value is used to decide if an explicit "return" should cause
  * a return from the caller of the trap; it does this by setting
- * trapreturn to a status (i.e. a non-negative value).
+ * trap_return to a status (i.e. a non-negative value).
  *
- * In summary, trapreturn is
+ * In summary, trap_return is
  * - zero unless we are in a trap
  * - negative in a trap unless it has triggered.  Code uses this
  *   to detect an active trap.
@@ -83,7 +90,7 @@ mod_export int errflag;
  */
  
 /**/
-int trapreturn;
+int trap_return;
  
 /* != 0 if this is a subshell */
  
@@ -1061,6 +1068,10 @@ execlist(Estate state, int dont_change_job, int exiting)
 	}
 
 	if (sigtrapped[SIGDEBUG] && isset(DEBUGBEFORECMD)) {
+	    int oerrexit_opt = opts[ERREXIT];
+	    opts[ERREXIT] = 0;
+	    noerrexit = 1;
+
 	    exiting = donetrap;
 	    ret = lastval;
 	    dotrap(SIGDEBUG);
@@ -1071,7 +1082,8 @@ execlist(Estate state, int dont_change_job, int exiting)
 	     * Only execute the trap once per sublist, even
 	     * if the DEBUGBEFORECMD option changes.
 	     */
-	    donedebug = 1;
+	    donedebug = isset(ERREXIT) ? 2 : 1;
+	    opts[ERREXIT] = oerrexit_opt;
 	} else
 	    donedebug = 0;
 
@@ -1087,6 +1099,18 @@ execlist(Estate state, int dont_change_job, int exiting)
 
 	/* Loop through code followed by &&, ||, or end of sublist. */
 	code = *state->pc++;
+	if (donedebug == 2) {
+	    /* Skip sublist. */
+	    while (wc_code(code) == WC_SUBLIST) {
+		state->pc = state->pc + WC_SUBLIST_SKIP(code);
+		if (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END)
+		    break;
+		code = *state->pc++;
+	    }
+	    donetrap = 1;
+	    /* yucky but consistent... */
+	    goto sublist_done;
+	}
 	while (wc_code(code) == WC_SUBLIST) {
 	    next = state->pc + WC_SUBLIST_SKIP(code);
 	    if (!oldnoerrexit)
@@ -1177,12 +1201,20 @@ sublist_done:
 	noerrexit = oldnoerrexit;
 
 	if (sigtrapped[SIGDEBUG] && !isset(DEBUGBEFORECMD) && !donedebug) {
+	    /*
+	     * Save and restore ERREXIT for consistency with
+	     * DEBUGBEFORECMD, even though it's not used.
+	     */
+	    int oerrexit_opt = opts[ERREXIT];
+	    opts[ERREXIT] = 0;
+	    noerrexit = 1;
 	    exiting = donetrap;
 	    ret = lastval;
 	    dotrap(SIGDEBUG);
 	    lastval = ret;
 	    donetrap = exiting;
 	    noerrexit = oldnoerrexit;
+	    opts[ERREXIT] = oerrexit_opt;
 	}
 
 	cmdsp = csp;
@@ -4145,8 +4177,8 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 
     oargv0 = NULL;
     obreaks = breaks;;
-    if (trapreturn < 0)
-	trapreturn--;
+    if (trap_state == TRAP_STATE_PRIMED)
+	trap_return--;
     oldlastval = lastval;
     oldnumpipestats = numpipestats;
     if (noreturnval) {
@@ -4264,8 +4296,8 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 
     endtrapscope();
 
-    if (trapreturn < -1)
-	trapreturn++;
+    if (trap_state == TRAP_STATE_PRIMED)
+	trap_return++;
     ret = lastval;
     if (noreturnval) {
 	lastval = oldlastval;
@@ -4528,7 +4560,9 @@ execsave(void)
     es->badcshglob = badcshglob;
     es->cmdoutpid = cmdoutpid;
     es->cmdoutval = cmdoutval;
-    es->trapreturn = trapreturn;
+    es->trap_return = trap_return;
+    es->trap_state = trap_state;
+    es->trapisfunc = trapisfunc;
     es->noerrs = noerrs;
     es->subsh_close = subsh_close;
     es->underscore = ztrdup(underscore);
@@ -4555,7 +4589,9 @@ execrestore(void)
     badcshglob = exstack->badcshglob;
     cmdoutpid = exstack->cmdoutpid;
     cmdoutval = exstack->cmdoutval;
-    trapreturn = exstack->trapreturn;
+    trap_return = exstack->trap_return;
+    trap_state = exstack->trap_state;
+    trapisfunc = exstack->trapisfunc;
     noerrs = exstack->noerrs;
     subsh_close = exstack->subsh_close;
     setunderscore(exstack->underscore);
