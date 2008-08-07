@@ -9,4 +9,5 @@ _arguments \
    '(--allversions -a)'{--allversions,-a}'[print all available versions]' \
    '(--brief -b)'{--brief,-b}'[brief output]' \
    '(--verbose -v)'{--verbose,-v}'[verbose output]' \
-   '(--help -h)'{--help,-h}'[display help information]'
+   '(--help -h)'{--help,-h}'[display help information]' \
+   ':package:_deb_packages avail'

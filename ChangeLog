@@ -1,3 +1,8 @@
+2008-08-07  Clint Adams  <clint@zsh.org>
+
+	* 25422: Chris Lamb: Completion/Debian/Command/_apt-show-versions:
+	apt-show-versions completion fix.
+
 2008-08-07  Peter Stephenson  <pws@csr.com>
 
 	* 25418: Doc/Zsh/options.yo, Src/options.c: set PROMPT_SUBST
