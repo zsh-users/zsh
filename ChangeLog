@@ -11,6 +11,12 @@
 	be set to skip the next command (actually sublist); tidy
 	up code associated with trapreturn.
 
+2008-08-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25409: Doc/Zsh/builtins.yo, Src/builtin.c, Test/.distfiles,
+	Test/B05eval.ztst: eval shouldn't reset the status at the
+	start but should if the command was empty.
+
 2008-08-06  Peter Stephenson  <pws@csr.com>
 
 	* 25405: Src/exec.c: return value was not set from anonymous
