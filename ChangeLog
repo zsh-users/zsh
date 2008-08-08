@@ -1,3 +1,8 @@
+2008-08-08  Clint Adams  <clint@zsh.org>
+
+	* 25424: Chris Lamb: Completion/Debian/Command/_lintian:
+	completion for lintian-info.
+
 2008-08-07  Clint Adams  <clint@zsh.org>
 
 	* 25423: Chris Lamb: Completion/Debian/Command/.distfiles,
