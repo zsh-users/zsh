@@ -1,3 +1,8 @@
+2008-08-11  Peter Stephenson  <pws@csr.com>
+
+	* 25429: Rocky Bernstein: Test/E01options.ztst,
+	Test/E02xtrace.ztst: don't assume PS4 is set to the default.
+
 2008-08-08  Clint Adams  <clint@zsh.org>
 
 	* 25424: Chris Lamb: Completion/Debian/Command/_lintian:

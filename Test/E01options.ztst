@@ -1034,6 +1034,7 @@
 # This really just tests if XTRACE is egregiously broken.
 # To test it properly would need a full set of its own.
   fn() { print message; }
+  PS4='+%N:%i> '
   setopt xtrace
   fn
   unsetopt xtrace
@@ -1041,6 +1042,6 @@
 0:XTRACE option
 >message
 >message
-?+(eval):3> fn
+?+(eval):4> fn
 ?+fn:0> print message
-?+(eval):4> unsetopt xtrace
+?+(eval):5> unsetopt xtrace
