@@ -264,7 +264,7 @@ history with the newline stripped,  which is usually the correct behaviour.
 Then it switches the history context so that the line will
 be written to a history file in the current directory.
 
-example(zshaddhistory() {
+example(zshaddhistory+LPAR()RPAR() {
   print -sr -- ${1%%$'\n'}
   fc -p .zsh_local_history
 })
