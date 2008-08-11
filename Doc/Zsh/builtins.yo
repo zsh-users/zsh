@@ -382,8 +382,8 @@ findex(eval)
 cindex(evaluating arguments as commands)
 item(tt(eval) [ var(arg) ... ])(
 Read the arguments as input to the shell and execute the resulting
-command(s) in the current shell process.  The return status is the
-same as if the commands had been executed directly by the shell;
+command+LPAR()s+RPAR() in the current shell process.  The return status is
+the same as if the commands had been executed directly by the shell;
 if there are no var(args) or they contain no commands (i.e. are
 an empty string or whitespace) the return status is zero.
 )

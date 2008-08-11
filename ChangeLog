@@ -1,7 +1,7 @@
 2008-08-11  Peter Stephenson  <pws@csr.com>
 
-	* unposted: Doc/Zsh/func.yo: prevent zshaddhistory() looking
-	like a Yodl macro.
+	* unposted: Doc/Zsh/builtins.yo, Doc/Zsh/func.yo: prevent various
+	entries looking like Yodl macros.
 
 	* 25429: Rocky Bernstein: Test/E01options.ztst,
 	Test/E02xtrace.ztst: don't assume PS4 is set to the default.
