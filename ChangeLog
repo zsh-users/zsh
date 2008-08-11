@@ -1,5 +1,8 @@
 2008-08-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Test/V06parameter.ztst: fix load directory for
+	module from script.
+
 	* 25247 with further modifications: Doc/Zsh/mod_parameter.yo,
 	Src/exec.c, Src/hashtable.c, Src/init.c, Src/parse.c,
 	Src/signals.c, Src/utils.c, Src/zsh.h, Src/Modules/parameter.c,

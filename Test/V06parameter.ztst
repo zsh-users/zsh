@@ -1,11 +1,7 @@
-%prep
-
-  zmodload zsh/parameter
-
 %test
 
   print -r -- 'print Started functrace.zsh
-  :
+  module_path=(./Modules)
   print $LINENO + $functrace + $funcsourcetrace
   :
   fn() {
