@@ -268,7 +268,7 @@ parseargs(char **argv)
 		/* -c command */
 		cmd = *argv;
 		opts[INTERACTIVE] &= 1;
-		scriptname = ztrdup("zsh");
+		scriptname = scriptfilename = ztrdup("zsh");
 	    } else if (**argv == 'o') {
 		if (!*++*argv)
 		    argv++;
@@ -325,6 +325,7 @@ parseargs(char **argv)
 	    }
 	    opts[INTERACTIVE] &= 1;
 	    argzero = *argv;
+	    scriptfilename = argzero;
 	    argv++;
 	}
 	while (*argv)
@@ -1051,10 +1052,12 @@ mod_export int
 source(char *s)
 {
     Eprog prog;
-    int tempfd = -1, fd, cj, oldlineno;
+    int tempfd = -1, fd, cj;
+    zlong oldlineno;
     int oldshst, osubsh, oloops;
     FILE *obshin;
     char *old_scriptname = scriptname, *us;
+    char *old_scriptfilename = scriptfilename;
     unsigned char *ocs;
     int ocsp;
     int otrap_return = trap_return, otrap_state = trap_state;
@@ -1087,6 +1090,7 @@ source(char *s)
     loops  = 0;
     dosetopt(SHINSTDIN, 0, 1);
     scriptname = s;
+    scriptfilename = s;
 
     /*
      * The special return behaviour of traps shouldn't
@@ -1096,6 +1100,17 @@ source(char *s)
     trap_state = TRAP_STATE_INACTIVE;
 
     sourcelevel++;
+    /* { */
+    /*   struct funcstack fstack; */
+    /*   fstack.name = dupstring("source"); */
+    /*   fstack.caller = dupstring(scriptfilename); */
+    /*   fstack.flineno = oldlineno; */
+    /*   fstack.lineno = oldlineno; */
+    /*   fstack.filename = NULL; */
+    /*   fstack.prev = funcstack; */
+    /*   funcstack = &fstack; */
+    /* } */
+    
     if (prog) {
 	pushheap();
 	errflag = 0;
@@ -1103,6 +1118,7 @@ source(char *s)
 	popheap();
     } else
 	loop(0, 0);		     /* loop through the file to be sourced  */
+    /* funcstack = funcstack->prev; */
     sourcelevel--;
 
     trap_state = otrap_state;
@@ -1126,6 +1142,7 @@ source(char *s)
     if (!exit_pending)
 	retflag = 0;
     scriptname = old_scriptname;
+    scriptfilename = old_scriptfilename;
     free(cmdstack);
     cmdstack = ocs;
     cmdsp = ocsp;

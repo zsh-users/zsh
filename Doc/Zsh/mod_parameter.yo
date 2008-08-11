@@ -164,6 +164,16 @@ item(tt(userdirs))(
 This associative array maps user names to the pathnames of their home
 directories.
 )
+vindex(funcsourcetrace)
+item(tt(funcsourcetrace))(
+This array contains the file names and line numbers of the 
+points where the functions currently being executed were
+defined.  The line number is the line where the `tt(function) var(name)'
+or `var(name) tt(LPAR()RPAR())' started.  In the case of an autoloaded
+function in native zsh format where only the body of the function occurs
+in the file the line number is reported as zero.
+The format of each element is var(filename)tt(:)var(lineno).
+)
 vindex(funcstack)
 item(tt(funcstack))(
 This array contains the names of the functions currently being
@@ -174,6 +184,6 @@ vindex(functrace)
 item(tt(functrace))(
 This array contains the names and line numbers of the callers
 corresponding to the functions currently being executed.
-The format of each element is name:lineno.
+The format of each element is var(name)tt(:)var(lineno).
 )
 enditem()

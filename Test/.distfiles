@@ -33,6 +33,7 @@ V02zregexparse.ztst
 V03mathfunc.ztst
 V04features.ztst
 V05styles.ztst
+V06parameter.ztst
 Y01completion.ztst
 Y02compmatch.ztst
 Y03arguments.ztst

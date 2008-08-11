@@ -1,3 +1,12 @@
+2008-08-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25247 with further modifications: Doc/Zsh/mod_parameter.yo,
+	Src/exec.c, Src/hashtable.c, Src/init.c, Src/parse.c,
+	Src/signals.c, Src/utils.c, Src/zsh.h, Src/Modules/parameter.c,
+	Src/Modules/parameter.mdd, Test/.distfiles,
+	Test/V01zmodload.ztst, Test/V06parameter.ztst: add
+	$funcsourcetrace parameter to zsh/parameter.
+
 2008-08-11  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/builtins.yo, Doc/Zsh/func.yo: prevent various

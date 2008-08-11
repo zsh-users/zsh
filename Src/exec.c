@@ -191,7 +191,7 @@ mod_export Eprog
 parse_string(char *s)
 {
     Eprog p;
-    int oldlineno = lineno;
+    zlong oldlineno = lineno;
 
     lexsave();
     inpush(s, INP_LINENO, NULL);
@@ -1016,7 +1016,8 @@ execlist(Estate state, int dont_change_job, int exiting)
     Wordcode next;
     wordcode code;
     int ret, cj, csp, ltype;
-    int old_pline_level, old_list_pipe, oldlineno;
+    int old_pline_level, old_list_pipe;
+    zlong oldlineno;
     /*
      * ERREXIT only forces the shell to exit if the last command in a &&
      * or || fails.  This is the case even if an earlier command is a
@@ -3961,6 +3962,8 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 	shf = (Shfunc) zalloc(sizeof(*shf));
 	shf->funcdef = prog;
 	shf->node.flags = 0;
+	shf->filename = ztrdup(scriptfilename);
+	shf->lineno = lineno;
 
 	if (!names) {
 	    /*
@@ -4059,15 +4062,24 @@ static int
 execautofn(Estate state, UNUSED(int do_exec))
 {
     Shfunc shf;
-    char *oldscriptname;
+    char *oldscriptname, *oldscriptfilename;
 
     if (!(shf = loadautofn(state->prog->shf, 1, 0)))
 	return 1;
 
+    /*
+     * Probably we didn't know the filename where this function was
+     * defined yet.
+     */
+    if (funcstack && !funcstack->filename)
+	funcstack->filename = dupstring(shf->filename);
+
     oldscriptname = scriptname;
-    scriptname = dupstring(shf->node.nam);
+    oldscriptfilename = scriptfilename;
+    scriptname = scriptfilename = dupstring(shf->node.nam);
     execode(shf->funcdef, 1, 0);
     scriptname = oldscriptname;
+    scriptfilename = oldscriptfilename;
 
     return lastval;
 }
@@ -4078,11 +4090,12 @@ loadautofn(Shfunc shf, int fksh, int autol)
 {
     int noalias = noaliases, ksh = 1;
     Eprog prog;
+    char *fname;
 
     pushheap();
 
     noaliases = (shf->node.flags & PM_UNALIASED);
-    prog = getfpfunc(shf->node.nam, &ksh);
+    prog = getfpfunc(shf->node.nam, &ksh, &fname);
     noaliases = noalias;
 
     if (ksh == 1) {
@@ -4112,6 +4125,7 @@ loadautofn(Shfunc shf, int fksh, int autol)
 	    else
 		shf->funcdef = dupeprog(prog, 0);
 	    shf->node.flags &= ~PM_UNDEFINED;
+	    shf->filename = fname;
 	} else {
 	    VARARR(char, n, strlen(shf->node.nam) + 1);
 	    strcpy(n, shf->node.nam);
@@ -4123,6 +4137,7 @@ loadautofn(Shfunc shf, int fksh, int autol)
 		zwarn("%s: function not defined by file", n);
 		locallevel++;
 		popheap();
+		zsfree(fname);
 		return NULL;
 	    }
 	}
@@ -4133,6 +4148,7 @@ loadautofn(Shfunc shf, int fksh, int autol)
 	else
 	    shf->funcdef = dupeprog(stripkshdef(prog, shf->node.nam), 0);
 	shf->node.flags &= ~PM_UNDEFINED;
+	shf->filename = fname;
     }
     popheap();
 
@@ -4172,6 +4188,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 #ifdef MAX_FUNCTION_DEPTH
     static int funcdepth;
 #endif
+    Shfunc shf;
 
     pushheap();
 
@@ -4243,6 +4260,15 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     fstack.prev = funcstack;
     funcstack = &fstack;
 
+    if ((shf = (Shfunc) shfunctab->getnode(shfunctab, name))) {
+	fstack.flineno = shf->lineno;
+	fstack.filename = dupstring(shf->filename);
+    } else {
+	fstack.flineno = 0;
+	fstack.filename = dupstring(fstack.caller);
+    }
+    
+    
     if (prog->flags & EF_RUN) {
 	Shfunc shf;
 
@@ -4362,7 +4388,7 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
 
 /**/
 Eprog
-getfpfunc(char *s, int *ksh)
+getfpfunc(char *s, int *ksh, char **fname)
 {
     char **pp, buf[PATH_MAX];
     off_t len;
@@ -4396,6 +4422,9 @@ getfpfunc(char *s, int *ksh)
 		    scriptname = dupstring(s);
 		    r = parse_string(d);
 		    scriptname = oldscriptname;
+
+		    if (fname)
+			*fname = ztrdup(buf);
 
 		    zfree(d, len + 1);
 

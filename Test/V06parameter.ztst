@@ -1,0 +1,37 @@
+%prep
+
+  zmodload zsh/parameter
+
+%test
+
+  print -r -- 'print Started functrace.zsh
+  :
+  print $LINENO + $functrace + $funcsourcetrace
+  :
+  fn() {
+    print Inside function $0
+    print $LINENO + $functrace + $funcsourcetrace
+  }
+  :
+  fn
+  :
+  fpath=(. $fpath)
+  :
+  echo '\''print Inside $0
+    print $LINENO + $functrace + $funcsourcetrace
+  '\'' >autofn
+  :
+  autoload autofn
+  :
+  autofn
+  autofn' >functrace.zsh
+  $ZTST_testdir/../Src/zsh +Z -f ./functrace.zsh
+0:Function tracing
+>Started functrace.zsh
+>3 + +
+>Inside function fn
+>2 + ./functrace.zsh:10 + ./functrace.zsh:5
+>Inside autofn
+>2 + ./functrace.zsh:20 + ./autofn:0
+>Inside autofn
+>2 + ./functrace.zsh:21 + ./autofn:0

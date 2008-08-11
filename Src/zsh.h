@@ -1061,6 +1061,8 @@ struct cmdnam {
 
 struct shfunc {
     struct hashnode node;
+    char *filename;             /* Name of file located in */
+    int lineno;			/* line number in above file */
     Eprog funcdef;		/* function definition    */
 };
 
@@ -1079,8 +1081,10 @@ struct shfunc {
 struct funcstack {
     Funcstack prev;		/* previous in stack */
     char *name;			/* name of function called */
+    char *filename;		/* file function resides in */
     char *caller;		/* name of caller */
-    int lineno;			/* line number in file */
+    zlong flineno;		/* line number in file */
+    zlong lineno;		/* line offset from beginning of function */
 };
 
 /* node in list of function call wrappers */

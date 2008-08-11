@@ -33,7 +33,10 @@
 /* name of script being sourced */
 
 /**/
-mod_export char *scriptname;
+mod_export char *scriptname;     /* is sometimes a function name */
+
+/**/
+mod_export char *scriptfilename;
 
 #ifdef MULTIBYTE_SUPPORT
 struct widechar_array {

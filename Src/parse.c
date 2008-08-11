@@ -720,7 +720,8 @@ par_sublist2(int *complex)
 static int
 par_pline(int *complex)
 {
-    int p, line = lineno;
+    int p;
+    zlong line = lineno;
 
     p = ecadd(0);
 
@@ -1414,8 +1415,9 @@ par_subsh(int *complex)
 static void
 par_funcdef(void)
 {
-    int oecused = ecused, oldlineno = lineno, num = 0, onp, p, c = 0;
+    int oecused = ecused, num = 0, onp, p, c = 0;
     int so, oecssub = ecssub;
+    zlong oldlineno = lineno;
 
     lineno = 0;
     nocorrect = 1;
@@ -1646,7 +1648,8 @@ par_simple(int *complex, int nr)
 	    p += nrediradd;
 	    sr += nrediradd;
 	} else if (tok == INOUTPAR) {
-	    int oldlineno = lineno, onp, so, oecssub = ecssub;
+	    zlong oldlineno = lineno;
+	    int onp, so, oecssub = ecssub;
 
 	    *complex = c;
 	    lineno = 0;
@@ -2860,7 +2863,8 @@ cur_add_func(char *nam, Shfunc shf, LinkList names, LinkList progs,
 	    return 1;
 	}
 	noaliases = (shf->node.flags & PM_UNALIASED);
-	if (!(prog = getfpfunc(shf->node.nam, NULL)) || prog == &dummy_eprog) {
+	if (!(prog = getfpfunc(shf->node.nam, NULL, NULL)) ||
+	    prog == &dummy_eprog) {
 	    noaliases = ona;
 	    zwarnnam(nam, "can't load function: %s", shf->node.nam);
 	    return 1;

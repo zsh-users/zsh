@@ -705,6 +705,7 @@ dosavetrap(int sig, int level)
 	    newshf->node.nam = ztrdup(shf->node.nam);
 	    newshf->node.flags = shf->node.flags;
 	    newshf->funcdef = dupeprog(shf->funcdef, 0);
+	    newshf->filename = ztrdup(shf->filename);
 	    if (shf->node.flags & PM_UNDEFINED)
 		newshf->funcdef->shf = newshf;
 	}

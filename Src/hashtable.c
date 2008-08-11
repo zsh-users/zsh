@@ -852,6 +852,7 @@ freeshfuncnode(HashNode hn)
     zsfree(shf->node.nam);
     if (shf->funcdef)
 	freeeprog(shf->funcdef);
+    zsfree(shf->filename);
     zfree(shf, sizeof(struct shfunc));
 }
 
