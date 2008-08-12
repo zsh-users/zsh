@@ -12,6 +12,6 @@ _arguments -s \
     '-t[nit pick about use of spaces]' \
     '-N[writing a new port]' \
     '-V[print the version and exit]' \
-    '-M:set make variables to ENV (ex. PORTSDIR=/usr/ports.work):_guard ".#" "environment vars"' \
-    '-B:allow # contiguous blank lines:_guard "[0-9]#" "numeric value"' \
+    '-M[set make variables to ENV (ex. PORTSDIR=/usr/ports.work)]: :_guard ".#" "environment vars"' \
+    '-B[allow # contiguous blank lines]: :_guard "[0-9]#" "numeric value"' \
     ':port directory:_files -/'

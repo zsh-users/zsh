@@ -1,5 +1,14 @@
 DISTFILES_SRC='
 .distfiles
-_bsd_pkg  _cvsup    _kld  _chflags
-_csup     _portlint _portsnap
+_bsd_pkg
+_chflags
+_csup
+_cvsup
+_fetch
+_freebsd-update
+_kld
+_portaudit
+_portlint
+_portsnap
+_powerd
 '

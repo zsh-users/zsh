@@ -1,3 +1,12 @@
+2008-08-12  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Solaris/Command/.distfiles,
+	Completion/Solaris/Type/.distfiles: missed .distfiles entry.
+
+	* 25435: Baptiste Daroussin <baptiste.daroussin@gmail.com>:
+	Completion/BSD/{_fetch,_freebsd-update,_portaudit,_portsnap,
+	_csup,_portlint,_powerd}: new and improved FreeBSD completions.
+
 2008-08-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Test/V06parameter.ztst: fix load directory for
