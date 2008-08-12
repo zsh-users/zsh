@@ -1,5 +1,8 @@
 %test
 
+  print 'print In sourced file
+  print $LINENO + $functrace + $funcsourcetrace
+  ' >sourcedfile
   print -r -- 'print Started functrace.zsh
   module_path=(./Modules)
   print $LINENO + $functrace + $funcsourcetrace
@@ -20,7 +23,8 @@
   autoload autofn
   :
   autofn
-  autofn' >functrace.zsh
+  autofn
+  . ./sourcedfile' >functrace.zsh
   $ZTST_testdir/../Src/zsh +Z -f ./functrace.zsh
 0:Function tracing
 >Started functrace.zsh
@@ -31,3 +35,5 @@
 >2 + ./functrace.zsh:20 + ./autofn:0
 >Inside autofn
 >2 + ./functrace.zsh:21 + ./autofn:0
+>In sourced file
+>2 + ./functrace.zsh:22 + source:0

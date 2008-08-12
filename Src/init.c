@@ -1100,16 +1100,17 @@ source(char *s)
     trap_state = TRAP_STATE_INACTIVE;
 
     sourcelevel++;
-    /* { */
-    /*   struct funcstack fstack; */
-    /*   fstack.name = dupstring("source"); */
-    /*   fstack.caller = dupstring(scriptfilename); */
-    /*   fstack.flineno = oldlineno; */
-    /*   fstack.lineno = oldlineno; */
-    /*   fstack.filename = NULL; */
-    /*   fstack.prev = funcstack; */
-    /*   funcstack = &fstack; */
-    /* } */
+    {
+       struct funcstack fstack;
+       fstack.name = dupstring("source");
+       fstack.caller = dupstring(old_scriptfilename ? old_scriptfilename :
+				 "zsh");
+       fstack.flineno = 0;
+       fstack.lineno = oldlineno;
+       fstack.filename = fstack.name;
+       fstack.prev = funcstack;
+       funcstack = &fstack;
+    }
     
     if (prog) {
 	pushheap();
@@ -1118,7 +1119,7 @@ source(char *s)
 	popheap();
     } else
 	loop(0, 0);		     /* loop through the file to be sourced  */
-    /* funcstack = funcstack->prev; */
+    funcstack = funcstack->prev;
     sourcelevel--;
 
     trap_state = otrap_state;

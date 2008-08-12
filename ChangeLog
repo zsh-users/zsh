@@ -1,3 +1,9 @@
+2008-08-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25443 (tweaked): Doc/Zsh/mod_parameter.yo,
+	Src/Modules/parameter.c, Test/V06parameter.ztst: allow
+	$functrace to show sourced files.
+
 2008-08-12  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Solaris/Command/.distfiles,
