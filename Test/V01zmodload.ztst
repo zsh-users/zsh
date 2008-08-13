@@ -183,6 +183,7 @@
 >p:dis_galiases
 >p:dis_reswords
 >p:dis_saliases
+>p:funcfiletrace
 >p:funcsourcetrace
 >p:funcstack
 >p:functions

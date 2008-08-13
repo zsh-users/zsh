@@ -1,5 +1,8 @@
 2008-08-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Test/V01zmodload.ztst: change consequent on having
+	a new parameter in zsh/parameter.
+
 	* 25448: Doc/Zsh/mod_parameter.yo, Src/exec.c, Src/init.c,
 	Src/Modules/parameter.c, Src/zsh.h, Src/Modules/parameter.c
 	Src/Modules/parameter.mdd: add $funcfiletrace to show
