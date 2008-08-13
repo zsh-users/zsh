@@ -1,3 +1,10 @@
+2008-08-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25448: Doc/Zsh/mod_parameter.yo, Src/exec.c, Src/init.c,
+	Src/Modules/parameter.c, Src/zsh.h, Src/Modules/parameter.c
+	Src/Modules/parameter.mdd: add $funcfiletrace to show
+	absolute line number for caller.
+
 2008-08-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25443 (tweaked): Doc/Zsh/mod_parameter.yo,

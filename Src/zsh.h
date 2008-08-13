@@ -1080,11 +1080,12 @@ struct shfunc {
 
 struct funcstack {
     Funcstack prev;		/* previous in stack */
-    char *name;			/* name of function called */
+    char *name;			/* name of function/sourced file called */
     char *filename;		/* file function resides in */
     char *caller;		/* name of caller */
     zlong flineno;		/* line number in file */
     zlong lineno;		/* line offset from beginning of function */
+    int sourced;		/* type of entry is a sourced file */
 };
 
 /* node in list of function call wrappers */

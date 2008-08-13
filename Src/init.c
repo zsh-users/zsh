@@ -1109,6 +1109,7 @@ source(char *s)
        fstack.lineno = oldlineno;
        fstack.filename = fstack.name;
        fstack.prev = funcstack;
+       fstack.sourced = 1;
        funcstack = &fstack;
     }
     

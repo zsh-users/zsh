@@ -4258,6 +4258,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     fstack.caller = dupstring(oargv0 ? oargv0 : argzero);
     fstack.lineno = lineno;
     fstack.prev = funcstack;
+    fstack.sourced = 0;
     funcstack = &fstack;
 
     if ((shf = (Shfunc) shfunctab->getnode(shfunctab, name))) {

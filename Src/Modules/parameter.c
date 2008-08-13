@@ -566,6 +566,55 @@ funcsourcetracegetfn(UNUSED(Param pm))
     return ret;
 }
 
+/* Functions for the funcfiletrace special parameter. */
+
+/**/
+static char **
+funcfiletracegetfn(UNUSED(Param pm))
+{
+    Funcstack f;
+    int num;
+    char **ret, **p;
+
+    for (f = funcstack, num = 0; f; f = f->prev, num++);
+
+    ret = (char **) zhalloc((num + 1) * sizeof(char *));
+
+    for (f = funcstack, p = ret; f; f = f->prev, p++) {
+	char *colonpair, *fname;
+
+	if (!f->prev || f->prev->sourced) {
+	    /*
+	     * Calling context is a file---either the parent
+	     * script or interactive shell, or a sourced
+	     * script.  Just print the file information for the caller
+	     * (same as $functrace)
+	     */
+	    colonpair = zhalloc(strlen(f->caller) +
+				(f->lineno > 9999 ? 24 : 6));
+	    sprintf(colonpair, "%s:%ld", f->caller, (long)f->lineno);
+	} else {
+	    /*
+	     * Calling context is a function; we need to find the line number
+	     * in the file where that function was defined.  For this we need
+	     * the $funcsourcetrace information for the context above,
+	     * together with the $functrace line number for the current
+	     * context.
+	     */
+	    long flineno = (long)(f->prev->flineno + f->lineno);
+	    fname = f->prev->filename ? f->prev->filename : "";
+
+	    colonpair = zhalloc(strlen(fname) + (flineno > 9999 ? 24 : 6));
+	    sprintf(colonpair, "%s:%ld", fname, flineno);
+	}
+
+	*p = colonpair;
+    }
+    *p = NULL;
+
+    return ret;
+}
+
 /* Functions for the builtins special parameter. */
 
 /**/
@@ -1803,6 +1852,8 @@ static const struct gsu_array functrace_gsu =
 { functracegetfn, arrsetfn, stdunsetfn };
 static const struct gsu_array funcsourcetrace_gsu =
 { funcsourcetracegetfn, arrsetfn, stdunsetfn };
+static const struct gsu_array funcfiletrace_gsu =
+{ funcfiletracegetfn, arrsetfn, stdunsetfn };
 static const struct gsu_array reswords_gsu =
 { reswordsgetfn, arrsetfn, stdunsetfn };
 static const struct gsu_array disreswords_gsu =
@@ -1831,6 +1882,8 @@ static struct paramdef partab[] = {
 	    &disreswords_gsu, NULL, NULL),
     SPECIALPMDEF("dis_saliases", 0,
 	    &pmdissaliases_gsu, getpmdissalias, scanpmdissaliases),
+    SPECIALPMDEF("funcfiletrace", PM_ARRAY|PM_READONLY,
+	    &funcfiletrace_gsu, NULL, NULL),
     SPECIALPMDEF("funcsourcetrace", PM_ARRAY|PM_READONLY,
 	    &funcsourcetrace_gsu, NULL, NULL),
     SPECIALPMDEF("funcstack", PM_ARRAY|PM_READONLY,
