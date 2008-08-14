@@ -11,6 +11,6 @@ _arguments -C -s \
   ':dictionary file:_files' && ret=0
 
 [[ -n "$state" && ! -prefix - ]] && _wanted values expl 'word prefix' \
-    compadd - $(_call_program words $words[1] '"$PREFIX"') && return
+    compadd - $(_call_program words $words[1] '"$PREFIX"' 2>/dev/null) && return
 
 return ret
