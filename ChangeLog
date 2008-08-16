@@ -1,3 +1,8 @@
+2008-08-16  Clint Adams  <clint@zsh.org>
+
+	* Frank Terbeck: 24455: Completion/Unix/Command/_git: handle git
+	stashes.
+
 2008-08-14  Clint Adams  <clint@zsh.org>
 
 	* 25452: Completion/Unix/Command/_look: redirect stderr from look

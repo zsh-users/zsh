@@ -166,6 +166,7 @@ _git_commands () {
     'revert:revert existing commit'
     'rm:remove files from the working tree and from the index'
     'show-branch:show branches and their commits'
+    'stash:stash away changes to the working tree'
     'status:show working-tree'\''s status'
     'tag:create tag object signed with GPG'
     'verify-tag:check GPG signature of a tag')
@@ -1912,6 +1913,66 @@ _git-status () {
   _git-commit
 }
 __git_zstyle_default ':completion::complete:git-status:argument-rest:*' ignore-line yes
+
+
+(( $+functions[__git_stashes] )) ||
+__git_stashes () {
+  local expl
+  declare -a st_list
+
+  st_list=(${${(f)"$(_call_program stashes git stash list 2>/dev/null)"}/: */})
+  __git_command_successful || return
+
+  _wanted tags expl stash-list compadd $* - $st_list
+}
+
+(( $+functions[_git-stash] )) ||
+_git-stash () {
+  local expl
+  local -a stash_cmds
+
+  stash_cmds=(
+    apply:"restore the changes recorded in the stash"
+    branch:"branch off at the commit at which the stash was originally created"
+    clear:"remove all the stashed states"
+    drop:"remove a single stashed state from the stash list"
+    list:"list the stashes that you currently have"
+    pop:"remove and apply a single stashed state from the stash list"
+    save:"save your local modifications to a new stash"
+    show:"show the changes recorded in the stash as a diff"
+  )
+
+  if (( CURRENT == 2 )); then
+    _describe -t command "git-stash commands" stash_cmds && ret=0
+  else
+    case $words[2] in
+      (apply)
+        _arguments \
+          '--index[try to reinstate the index'\''s changes too]' \
+          '*:stash:__git_stashes' && ret=0
+        ;;
+      (branch)
+        _arguments \
+          '2:branch name:' \
+          '*:stash:__git_stashes' && ret=0
+        ;;
+      (drop|pop|show)
+        _arguments \
+          '*:stash:__git_stashes' && ret=0
+        ;;
+      (save)
+        _arguments \
+          '--keep-index[all changes already added to the index are left intact]' \
+          '*: :->end' && ret=0
+
+        [[ $state == 'end' ]] && _message 'message'
+        ;;
+      (*)
+        _nothing
+        ;;
+    esac
+  fi
+}
 
 (( $+functions[_git-verify-tag] )) ||
 _git-verify-tag () {
