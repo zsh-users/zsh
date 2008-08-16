@@ -1,5 +1,8 @@
 2008-08-16  Clint Adams  <clint@zsh.org>
 
+	* 25461: Completion/Unix/Command/_git: patch to add HEAD as
+	a completion for heads, from Mikael Magnusson.
+
 	* 25460: Completion/Unix/Command/_git: patch to add the
 	--branches/tags/remotes for rev-list to _git from Mikael
 	Magnusson.

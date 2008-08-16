@@ -2900,7 +2900,7 @@ __git_heads () {
   branch_names=(${${(f)"$(_call_program heads git branch --no-color -a 2>/dev/null)"}#[* ] })
   __git_command_successful || return
 
-  _wanted heads expl branch-name compadd $* - $branch_names
+  _wanted heads expl branch-name compadd $* - $branch_names HEAD
 }
 
 (( $+functions[__git_tags] )) ||
