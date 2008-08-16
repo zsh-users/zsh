@@ -1298,6 +1298,10 @@ _git-add () {
     '-v[show files as they are added]' \
     '-f[allow adding otherwise ignored files]' \
     '(-i --interactive : -)'{-i,--interactive}'[add contents interactively to the index]' \
+    '(-p --patch : -)'{-p,--patch}'[like -i but go directly into patch mode for specified files]' \
+    '-u[Update only files git already knows about]' \
+    '--refresh[do not add files, but refresh their stat() info in the index]' \
+    '--ignore-errors[continue adding if an error occurs]' \
     '*:file:->files' && ret=0
 
   case $state in
@@ -1506,6 +1510,9 @@ _git-checkout () {
       '-q[suppress feedback messages]' \
       '-f[force a complete re-read]' \
       '-b[create a new branch based at given branch]: :__git_guard_branch-name' \
+      {-t,--track}'[set up configuration so pull merges from the start point]' \
+      '--no-track[override the branch.autosetupmerge configuration variable]' \
+      '-l[create the branch'\''s reflog]' \
       $new_branch_reflog_arg \
       '-m[3way merge current branch, working tree and new branch]' \
       '::branch:__git_revisions' \

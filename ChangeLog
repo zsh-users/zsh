@@ -1,5 +1,8 @@
 2008-08-16  Clint Adams  <clint@zsh.org>
 
+	* 25465: Completion/Unix/Command/_git: patch from Mikael Magnusson
+	to add more git-add and git-checkout options.
+
 	* unposted: Completion/Unix/Command/_git: another typo fix.
 
 	* 25464: Completion/Unix/Command/_git: patch from Mikael Magnusson
