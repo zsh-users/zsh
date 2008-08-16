@@ -1,5 +1,9 @@
 2008-08-16  Clint Adams  <clint@zsh.org>
 
+	* 25463: Completion/Unix/Command/_git: patch to add git
+	completion for --base/-1, --ours/-2 and --theirs/-3, from
+	Mikael Magnusson.
+
 	* 25462: Completion/Unix/Command/_git: patch to add some -s -w
 	to _arguments and new options for revert, from Mikael Magnusson.
 

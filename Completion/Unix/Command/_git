@@ -55,6 +55,9 @@ diff_args=(
   '(-a --text)'{-a,--text}'[treat all files as text]'
   '(-b --ignore-space-change -w --ignore-all-space)'{-b,--ignore-space-change}'[ignore changes in amount of white space]'
   '(-b --ignore-space-change -w --ignore-all-space)'{-w,--ignore-all-space}'[ignore white space when comparing lines]'
+  '(-1 --base)'{-1,--base}'[diff against stage 1]'
+  '(-2 --ours)'{-2,--ours}'[diff against stage 2]'
+  '(-3 --theirs)'{-3,--theirs}'[diff against stage 3]'
   $abbrev_arg
   $nul_arg
   '--exit-code[report exit code 1 if differences, 0 otherwise]'
