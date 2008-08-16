@@ -1,5 +1,8 @@
 2008-08-16  Clint Adams  <clint@zsh.org>
 
+	* 25464: Completion/Unix/Command/_git: patch from Mikael Magnusson
+	to add --graph.
+
 	* 25463: Completion/Unix/Command/_git: patch to add git
 	completion for --base/-1, --ours/-2 and --theirs/-3, from
 	Mikael Magnusson.
