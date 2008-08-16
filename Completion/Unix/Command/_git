@@ -1818,7 +1818,7 @@ _git-rebase () {
 
 (( $+functions[_git-repack] )) ||
 _git-repack () {
-  _arguments \
+  _arguments -s -w \
     '-a[pack all objects into a single pack]' \
     '-d[remove redundant packs after packing]' \
     '-f[pass "--no-reuse-delta" option to "git pack-objects"]' \
@@ -1863,9 +1863,10 @@ _git-reset () {
 
 (( $+functions[_git-revert] )) ||
 _git-revert () {
-  _arguments \
-    '(-e --edit --no-edit)'{-e,--edit}'[edit the commit before committing the revert]' \
-    '(-e --edit --no-edit)--no-edit[do not start the commit message editor]' \
+  _arguments -s -w \
+    '(-e --edit)'{-e,--edit}'[edit the commit before committing the revert]' \
+    '-x[append commit name when cherry-picking]' \
+    '(-m --mainline)'{-m+,--mainline=}'[pick which parent is mainline]:parent number' \
     '(-n --no-commit)'{-n,--no-commit}'[do not commit the reversion]' \
     ':commit:__git_commits' && ret=0
 }

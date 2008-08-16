@@ -1,5 +1,8 @@
 2008-08-16  Clint Adams  <clint@zsh.org>
 
+	* 25462: Completion/Unix/Command/_git: patch to add some -s -w
+	to _arguments and new options for revert, from Mikael Magnusson.
+
 	* 25461: Completion/Unix/Command/_git: patch to add HEAD as
 	a completion for heads, from Mikael Magnusson.
 
