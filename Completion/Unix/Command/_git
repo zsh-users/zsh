@@ -2331,7 +2331,7 @@ _git-rev-parse () {
     '--git-dir[show "$GIT_DIR" if defined else show path to ".git" directory]' \
     '--short=-[show only handful hexdigits prefix]:: :_guard "[[\:digit\:]]#" number' \
     {--after=-,--since=-}'[show "--max-age=" parameter corresponding given date string]:datestring' \
-    {--berore=-,--until=-}'[show "--min-age=" parameter corresponding given date string]:datestring' \
+    {--before=-,--until=-}'[show "--min-age=" parameter corresponding given date string]:datestring' \
     '*:objects:__git_objects' && ret=0
 }
 

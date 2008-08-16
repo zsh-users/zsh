@@ -1,6 +1,9 @@
 2008-08-16  Clint Adams  <clint@zsh.org>
 
-	* Frank Terbeck: 24455: Completion/Unix/Command/_git: handle git
+	* Mikael Magnusson: 25456: Completion/Unix/Command/_git: fix typo
+	of "before".
+
+	* Frank Terbeck: 25455: Completion/Unix/Command/_git: handle git
 	stashes.
 
 2008-08-14  Clint Adams  <clint@zsh.org>
