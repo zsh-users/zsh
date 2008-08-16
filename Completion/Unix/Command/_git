@@ -2331,7 +2331,7 @@ _git-rev-parse () {
     '--branches[show branch refs found in $GIT_DIR/refs/heads]' \
     '--tags[show tag refs found in $GIT_DIR/refs/tags]' \
     '--remotes[show tag refs found in $GIT_DIR/refs/remotes]' \
-    '--show-prefix[show path of current directory relative to top-leve directory]' \
+    '--show-prefix[show path of current directory relative to top-level directory]' \
     '--show-cdup[show path of top-level directory relative to current directory]' \
     '--git-dir[show "$GIT_DIR" if defined else show path to ".git" directory]' \
     '--short=-[show only handful hexdigits prefix]:: :_guard "[[\:digit\:]]#" number' \
