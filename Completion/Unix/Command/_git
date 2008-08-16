@@ -1597,9 +1597,10 @@ _git-diff () {
   _arguments -S \
     $diff_args \
     '--cached[show diff between index and named commit]' \
-    '::original revision:__git_commits' \
-    '::new revision:__git_commits' \
-    '*::index file:__git_modified_files' && ret=0
+    '::commit range:__git_commit_ranges' \
+    '::original revision:__git_objects' \
+    '::new revision:__git_objects' \
+    '*::index file:__git_files' && ret=0
 }
 
 (( $+functions[_git-fetch] )) ||
@@ -1727,9 +1728,9 @@ _git-log () {
 
   case $state in
     (files)
-      _alternative \
-        'files:index file:__git_cached_files' \
-        'branches:branch:__git_branch_names' && ret=0
+      _arguments -S \
+        '::index file:__git_cached_files' \
+        '*::branch:__git_commit_ranges' && ret=0
       ;;
   esac
 }

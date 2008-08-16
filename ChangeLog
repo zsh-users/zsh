@@ -1,5 +1,8 @@
 2008-08-16  Clint Adams  <clint@zsh.org>
 
+	* 25457: Completion/Unix/Command/_git: improvements for git diff
+	and git log.
+
 	* Mikael Magnusson: 25456: Completion/Unix/Command/_git: fix typo
 	of "before".
 
