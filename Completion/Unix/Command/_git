@@ -69,6 +69,8 @@ pretty_arg='--pretty=-[pretty print commit messages]::pretty print:((raw\:"the r
                                                                      medium\:"most parts of the messages"
                                                                      short\:"few headers and only subject of messages"
                                                                      full\:"all parts of the commit messages"
+                                                                     fuller\:"like full and includes dates"
+                                                                     email\:"use email headers like From and Subject"
                                                                      oneline\:"commit-ids and subject of messages"))'
 
 exec_arg='--exec=-[specify path to git-upload-pack on remote side]:remote path'
@@ -84,9 +86,14 @@ fetch_args=(
 
 # TODO: Add descriptions to strategies (stupid is undocumented).
 merge_args=(
-  '(-n --no-summary)'{-n,--no-summary}'[do not show diffstat at the end of the merge]'
+  '(-n --no-stat)'{-n,--no-stat}'[do not show diffstat at the end of the merge]'
+  '--stat[show a diffstat at the end of the merge]'
   '--no-commit[perform the merge but do not autocommit]'
   '--squash[merge, but do not make a commit]'
+  '--log[fill in one-line descriptions of the commits being merged in the log message]'
+  '--no-log[do not list one-line descriptions of the commits being merged in the log message]'
+  '--no-ff[generate a merge commit even if the merge resolved as a fast-forward]'
+  '--ff[do not generate a merge commit if the merge resolved as a fast-forward]'
   '*'{-s,--strategy=-}'[use given merge strategy]:merge strategy:__git_merge_strategies'
 )
 
@@ -116,7 +123,9 @@ common_fetch_args=(
   $tags_fetch_arg
   '(-k --keep)'{-k,--keep}'[keep downloaded pack]'
   '(-u --update-head-ok)'{-u,--update-head-ok}'[allow updates of current branch head]'
-  '--depth=-[deepen the history of a shallow repository by the given number of commits]: :_guard "[[\:guard\:]]" "depth"'
+  '(-q --quiet)'{-q,--quiet}'[do not print any results to stdout]'
+  '(-v --verbose)'{-v,--verbose}'[output extra information]'
+  '--depth=[deepen the history of a shallow repository by the given number of commits]:depth'
 )
 
 common_apply_args=(
@@ -366,8 +375,8 @@ _git-annotate () {
     '-l[show long rev]' \
     '-t[show raw timestamp]' \
     '-S[use revs from revs-file]:revs-file:_files' \
-    '-M-[detect moving lines in the file as well]:: :_guard "[[\:digit\:]]" "number of characters"' \
-    '*-C-[detect copied lines from other files from same commit as well]:: :_guard "[[\:digit\:]]" "number of characters"' \
+    '-M-[detect moving lines in the file as well]:number of characters' \
+    '*-C-[detect copied lines from other files from same commit as well]:number of characters' \
     '-L[annotate only the given line range]:line range' \
     '--contents[annotate against the given file if no rev is specified]:file:_files' \
     '--incremental[show results incrementally for machine processing]' \
@@ -483,6 +492,8 @@ _git-index-pack () {
 (( $+functions[_git-init] )) ||
 _git-init () {
   _arguments \
+    '(-q --quiet)'{-q,--quiet}'[do not print any results to stdout]' \
+    '--bare[create a bare repository]' \
     $shared_arg \
     $template_arg && ret=0
 }
@@ -552,7 +563,7 @@ _git-pack-objects () {
     '(--revs)--all[include all refs as well as revisions already specified]' \
     '--all-progress[force progress output, even during write-out phase]' \
     '--delta-base-offset[use delta-base-offset packing]' \
-    '--depth=-[maximum delta depth]: :_guard "[[\:digit\:]]#" number' \
+    '--depth=[maximum delta depth]:number' \
     '--incremental[ignore objects that have already been packed]' \
     '--no-reuse-delta[do not reuse existing deltas, but compute them from scratch]' \
     '--non-empty[only create a package if it contains at least one object]' \
@@ -562,7 +573,7 @@ _git-pack-objects () {
     '(:)--stdout[write the pack to standard output]' \
     '-q[do not report progress]' \
     '(--revs)--unpacked[limit objects to pack to those not already packed]' \
-    '--window=-[number of objects to use per delta compression]: :_guard "[[\:digit\:]]#" number' \
+    '--window=[number of objects to use per delta compression]:number' \
     '(--stdout):base-name:_files' && ret=0
 }
 
@@ -602,6 +613,8 @@ _git-read-tree () {
     $aggressive_arg \
     $ui_args \
     $exclude_per_directory_arg \
+    '--trivial[restrict three-way merge to only happen if no file-level merging is required]'  \
+    '--index-output=[write index in the named file instead of $GIT_INDEX_FILE]:file:_files' \
     '1:first tree-ish to be read/merged:__git_tree_ishs' \
     '2:second tree-ish to be read/merged:__git_tree_ishs' \
     '3:third tree-ish to be read/merged:__git_tree_ishs' && ret=0
@@ -676,8 +689,15 @@ _git-remote () {
             ':branch name:__git_remotes' \
             ':url:_urls' && ret=0
           ;;
-        (show|name|prune)
-          __git_remotes && ret=0
+        (show)
+          _arguments \
+            '-n[do not contact the remote for a list of branches]' \
+            ':remote:__git_remotes' && ret=0
+          ;;
+        (prune)
+          _arguments \
+            '(--dry-run -n)'{-n,--dry-run}'[do not actually prune, only list what would be done]' \
+            ':remote:__git_remotes' && ret=0
           ;;
         (update)
           __git_remote-groups && ret=0
@@ -734,24 +754,31 @@ _git-write-tree () {
     '--prefix=-[write tree representing given sub-directory]:sub-directory:_directories -r ""' && ret=0
 }
 
+# shouldn't complete objects after --batch{,-check}...
 (( $+functions[_git-cat-file] )) ||
 _git-cat-file () {
   _arguments \
-    '(   -s -e -p 1)-t[show the type of the given object]' \
-    '(-t    -e -p 1)-s[show the size of the given object]' \
-    '(-t -s    -p 1)-e[exit with zero status if object exists]' \
-    '(-t -s -e    1)-p[pretty-print the given object]' \
-    '(-t -s -e -p  ):object type:(blob commit tag tree)' \
-    '(-t -s -e -p  ):object:__git_objects' && ret=0
+    '(-t -s -e -p --batch-check         1)--batch[print the SHA1, type, size, and contents of each object provided on stdin]' \
+    '(-t -s -e -p               --batch 1)--batch-check[print the SHA1, type, and size of each object provided on stdin]' \
+    '(   -s -e -p --batch-check --batch 1)-t[show the type of the given object]' \
+    '(-t    -e -p --batch-check --batch 1)-s[show the size of the given object]' \
+    '(-t -s    -p --batch-check --batch 1)-e[exit with zero status if object exists]' \
+    '(-t -s -e    --batch-check --batch 1)-p[pretty-print the given object]' \
+    '(-t -s -e -p --batch-check --batch  ):object type:(blob commit tag tree)' \
+    '(-t -s -e -p --batch-check --batch  ):object:__git_objects' && ret=0
 }
 
 (( $+functions[_git-describe] )) ||
 _git-describe () {
   _arguments \
-    $abbrev_arg \
     '--all[use any ref found in "$GIT_DIR/refs/"]' \
-    '--tags[use any tag found in "$GIT_DIR/refs/tags/"]' \
+    '(--contains)--tags[use any tag found in "$GIT_DIR/refs/tags/"]' \
     $abbrev_arg \
+    '--contains[find the tag after the commit instead of before]' \
+    '--exact-match[only output exact matches, same as --canditates=0]' \
+    '--always[show uniquely abbreviated commit object as fallback]' \
+    '--long[always show full format, even for exact matches]' \
+    '--match=[only consider tags matching glob pattern]:pattern' \
     '--candidates=-[consider up to given number of canditates]: :_guard "[[\:digit\:]]##" "number of canditates"' \
     '--debug[display information about the searching strategy]' \
     '*:committish:__git_committishs' && ret=0
@@ -960,6 +987,8 @@ _git-name-rev () {
   _arguments -S \
     '--tags[only use tags to name the commits]' \
     '--refs=-[only use refs matching given pattern]: :_guard "?#" "shell pattern"' \
+    '--always[show uniquely abbreviated commit object as fallback]' \
+    '--no-undefined[die with non-zero return when a reference is undefined]' \
     '(--stdin :)--all[list all commits reachable from all refs]' \
     '(--all :)--stdin[read from stdin and append revision-name]' \
     '(--stdin --all)*:commit-ish:__git_revisions' && ret=0
@@ -975,7 +1004,6 @@ _git-pack-redundant () {
 }
 
 # TODO: --timestamp undocumented.
-# TODO: __git_commits2 should be reworked/reworded.
 (( $+functions[_git-rev-list] )) ||
 _git-rev-list () {
   if (( words[(I)--] && words[(I)--] != CURRENT )); then
@@ -992,7 +1020,7 @@ _git-rev-list () {
       '(         --bisect-vars)--bisect[show only the middlemost commit object]' \
       '(--bisect              )--bisect-vars[same as --bisect, outputing shell-evalable code]' \
       '--stdin[read commit objects from standard input]' \
-      '*:commit id:__git_commits2' && ret=0
+      '*:commit id:__git_commit_ranges2' && ret=0
   fi
 }
 
@@ -1021,6 +1049,7 @@ _git-show () {
 
   _arguments -S \
     $revision_arguments \
+    '-s[do not show differences]' \
     '*:object:__git_objects' && ret=0
 }
 
@@ -1366,10 +1395,12 @@ _git-archive () {
 
   _arguments -C \
     '--format=-[format of the resulting archive]:archive format:__git_archive_formats' \
-    '(- :)--list[list available archive formats]' \
+    '(- :)'{-l,--list}'[list available archive formats]' \
+    '(-v --verbose)'{-v,--verbose}'[report progress to stderr]' \
     '--prefix=-[prepend the given path prefix to to each filename]:path prefix:_directories -r ""' \
     $backend_args \
     '--remote=-[archive remote repository]:remote repository:__git_any_repositories' \
+    '--exec=-[path to git-receive-pack on remote]:remote path:_files' \
     ':tree-ish:__git_tree_ishs' \
     '*:tree file:->files' && ret=0
 
@@ -1537,7 +1568,9 @@ _git-cherry-pick () {
     '(-e --edit)'{-e,--edit}'[edit commit before committing the revert]' \
     '(-n --no-commit)'{-n,--no-commit}'[do not make the actually commit]' \
     '(-r --replay)'{-r,--replay}'[use original commit message intact]' \
+    '(-m --mainline)'{-m,--mainline}'[specify mainline when cherry-picking a merge commit]:parent number' \
     '-x[append information about what commit was cherry-picked]' \
+    '(-s --signoff)'{-s,--signoff}'[add Signed-off-by line at the end of the commit message]' \
     ':commit:__git_revisions' && ret=0
 }
 
@@ -1546,6 +1579,7 @@ _git-clean () {
   _arguments -S \
     '-d[also remove untracked directories]' \
     '-n[do a dry run]' \
+    '-f[required when clean.requireForce is true (default)]' \
     '-q[run quietly]' \
     '(-X   )-x[also remove ignored files]' \
     '(   -x)-X[remove only ignored files]' \
@@ -1637,6 +1671,10 @@ _git-format-patch () {
     '--in-reply-to=[make the first mail a reply to the given message]:message id' \
     '--ignore-if-in-upstream[do not include a patch that matches a commit in the given range]' \
     '--suffix[use the given suffix for filenames]:filename suffix' \
+    '--subject-prefix=[use the given prefix instead of \[PATCH\]]:prefix' \
+    '--cc=[add a Cc: header, may be given multiple times]:email address' \
+    '--cover-letter[generate a cover letter template]' \
+    '--no-binary[do not output contents of changes in binary files, only note that they differ]' \
     ':commit range:__git_commit_ranges' && ret=0
 }
 
@@ -1734,13 +1772,14 @@ _git-log () {
 
   _arguments -S \
     $revision_arguments \
+    '--decorate[print out ref names of any commits that are shown.]' \
     '*:file-or-branch:->files' && ret=0
 
   case $state in
     (files)
       _arguments -S \
         '::index file:__git_cached_files' \
-        '*::branch:__git_commit_ranges' && ret=0
+        '*::branch:__git_commit_ranges2' && ret=0
       ;;
   esac
 }
@@ -1796,7 +1835,9 @@ _git-pull () {
 _git-push () {
   _arguments \
     $force_ref_arg \
-    '--all[fetch all refs]' \
+    '--all[push all refs under refs/heads/]' \
+    '--mirror[push all refs under refs/heads/ and refs/tags/ and delete non-existing refs]' \
+    '--dry-run[do everything except actually send the updates]' \
     '--tags[all tags under "$GIT_DIR/refs/tags" are pushed]' \
     '(--receive-pack --exec)'{--receive-pack=-,--exec=-}'[path to git-receive-pack on remote]:remote path:_files' \
     '--repo=-[default repository to use]:repository:__git_any_repositories' \
@@ -1813,14 +1854,16 @@ _git-rebase () {
     _message 'no more options'
   else
     _arguments \
-      '--onto[start new branch with HEAD equal to "newbase"]:newbase' \
+      '--onto[start new branch with HEAD equal to "newbase"]:newbase:__git_revisions' \
       '--continue[continue after failure]' \
       '--abort[abort current rebase]' \
       '--skip[skip the current patch]' \
-      '--merge[use merging strategies to rebase]' \
+      '--whitespace=-[detect a new or modified line that ends with trailing whitespaces]: :__git_apply_whitespace_strategies' \
+      '(-m --merge)'{-m,--merge}'[use merging strategies to rebase]' \
       '*'{-s,--strategy=-}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
       $verbose_arg \
       '-C-[ensure that given lines of surrounding context match]: :_guard "[[\:digit\:]]##" "lines of context"' \
+      '(-i --interactive)'{-i,--interactive}'[make a list of commits to be rebased and open in $EDITOR]' \
       ':upstream branch:__git_revisions' \
       '::working branch:__git_revisions' && ret=0
   fi
@@ -1829,14 +1872,17 @@ _git-rebase () {
 (( $+functions[_git-repack] )) ||
 _git-repack () {
   _arguments -s -w \
-    '-a[pack all objects into a single pack]' \
+    '(-A)-a[pack all objects into a single pack]' \
+    '(-a)-A[pack all objects into a single pack, but unreachable objects become loose]' \
     '-d[remove redundant packs after packing]' \
-    '-f[pass "--no-reuse-delta" option to "git pack-objects"]' \
+    '-f[pass "--no-reuse-objects" option to "git pack-objects"]' \
     '-l[pass "--local" option to "git pack-objects"]' \
     '-n[do not update server information]' \
     '-q[pass "-q" option to "git pack-objects"]' \
-    '--window=-[number of objects to consider when doing delta compression]' \
-    '--depth=-[maximum delta depth]' && ret=0
+    '--max-pack-size=-[maximum size of each output packfile]:MiB' \
+    '--window-memory=-[scale window size dynamically to not use more than N bytes of memory]:bytes' \
+    '--window=-[number of objects to consider when doing delta compression]:N' \
+    '--depth=-[maximum delta depth]:N' && ret=0
 }
 
 (( $+functions[_git-rerere] )) ||
@@ -1875,9 +1921,11 @@ _git-reset () {
 _git-revert () {
   _arguments -s -w \
     '(-e --edit)'{-e,--edit}'[edit the commit before committing the revert]' \
+    '--no-edit[do not edit the commit message]' \
     '-x[append commit name when cherry-picking]' \
     '(-m --mainline)'{-m+,--mainline=}'[pick which parent is mainline]:parent number' \
     '(-n --no-commit)'{-n,--no-commit}'[do not commit the reversion]' \
+    '(-s --signoff)'{-s,--signoff}'[add Signed-off-by line at the end of the commit message]' \
     ':commit:__git_commits' && ret=0
 }
 
@@ -2089,12 +2137,13 @@ _git-cvsimport () {
     '*-M[attempt to detect merges based on the commit message with custom pattern]:pattern' \
     '-o[specify the branch into which you wish to import]:branch:__git_branch_names' \
     '-P[read cvsps output file]:file:_files' \
-    '-p[specify additionaly options for cvsps]:cvsps-options' \
+    '-p[specify additional options for cvsps]:cvsps-options' \
+    '-r[the git remote to import into]:remote' \
     '-s[substitute the "/" character in branch names with given substitution]:substitute' \
     '-u[convert underscores in tag and branch names to dots]' \
     '-S[skip paths matching given regex]:regex' \
     '-a[import all commits, including recent ones]' \
-    '-L[limit the number of commits imported]: :_guard "[[\:digit\:]]" limit' \
+    '-L[limit the number of commits imported]:limit' \
     $verbose_arg \
     '-z[specify timestamp fuzz factor to cvsps]:fuzz-factor' \
     ':cvsmodule' && ret=0
@@ -2364,6 +2413,8 @@ _git-rm () {
     '-n[don'\''t actually remove the files, just show if they exist in the index]' \
     '-r[allow recursive removal when a leading directory-name is given]' \
     '--cached[only remove files from the index]' \
+    '--ignore-unmatch[exit with 0 status even if no files matched]' \
+    '(-q --quiet)'{-q,--quiet}'[do not output files deleted]' \
     '*:files:__git_cached_files' && ret=0
 }
 
@@ -2508,7 +2559,7 @@ _git-svn () {
 
       if [[ $line[1] == (dcommit|log|rebase) ]]; then
         arguments+=(
-          '(- --verbose)'{-v,--verbose}'[output extra information]')
+          '(-v --verbose)'{-v,--verbose}'[output extra information]')
       fi
 
       case $line[1] in
@@ -2786,6 +2837,13 @@ __git_commits2 () {
 __git_commit_ranges () {
   compset -P '*..'
   __git_commits $*
+}
+
+(( $+functions[__git_commit_ranges2] )) ||
+__git_commit_ranges2 () {
+  _alternative \
+    'commits::__git_commits2' \
+    'ranges::__git_commit_ranges'
 }
 
 # FIXME: these should be imported from _ssh
@@ -4155,6 +4213,7 @@ __git_setup_revision_arguments () {
     '(--dense         )--sparse[when paths are given, output only commits that changes any of them]'
     '--remove-empty[stop when a given path disappears from the tree]'
     '--no-merges[do not print commits with more than one parent]'
+    '--first-parent[follow only the first parent from merge commits]'
     '--boundary[output uninteresting commits at the boundary]'
     '--left-right[mark which side of a symmetric diff a commit is reachable from]'
     '(          --objects-edge)--objects[show object ids of objects referenced by the listed commits]'
@@ -4176,6 +4235,9 @@ __git_setup_revision_arguments () {
     '--relative-date[show dates relative to the current time]'
     '--date=-[format of date output]:date format:((relative\:"show dates relative to the current time"
                                                    local\:"show timestamps in user'\''s local timezone"
+                                                   iso\:"show timestamps in ISO 8601 format"
+                                                   rfc\:"show timestamps in RFC 2822 format"
+                                                   short\:"show only date but not time"
                                                    default\:"show timestamp in the original timezone"))'
     '--author=-[limit commits to those by the given author]:author'
     '--committer=-[limit commits to those by the given committer]:committer'
