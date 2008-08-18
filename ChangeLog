@@ -1,3 +1,9 @@
+2008-08-18  Clint Adams  <clint@zsh.org>
+
+	* 25475: Completion/Unix/Command/_git: determine heads, tags,
+	and branches through git for-each-ref instead of git tag and
+	git branch.
+
 2008-08-17  Clint Adams  <clint@zsh.org>
 
 	* 25469: Completion/Unix/Command/_git: assorted changes

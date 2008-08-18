@@ -2966,7 +2966,7 @@ __git_heads () {
   local expl
   declare -a branch_names
 
-  branch_names=(${${(f)"$(_call_program heads git branch --no-color -a 2>/dev/null)"}#[* ] })
+  branch_names=(${${(f)"$(_call_program headrefs git for-each-ref --format='%(refname)' refs/heads refs/remotes 2>/dev/null)"}#refs/(heads|remotes)/})
   __git_command_successful || return
 
   _wanted heads expl branch-name compadd $* - $branch_names HEAD
@@ -2977,7 +2977,7 @@ __git_tags () {
   local expl
   declare -a tag_names
 
-  tag_names=(${${(f)"$(_call_program tags git tag -l 2>/dev/null)"}#[* ] })
+  tag_names=(${${(f)"$(_call_program tagrefs git for-each-ref --format='%(refname)' refs/tags 2>/dev/null)"}#refs/tags/})
   __git_command_successful || return
 
   _wanted tags expl tag-name compadd $* - $tag_names
@@ -3030,7 +3030,7 @@ __git_branch_names () {
   local expl
   declare -a branch_names
 
-  branch_names=(${${(f)"$(_call_program branch-names git branch --no-color 2>/dev/null)"}#[* ] })
+  branch_names=(${${(f)"$(_call_program branchrefs git for-each-ref --format='%(refname)' refs/heads 2>/dev/null)"}#refs/heads/})
   __git_command_successful || return
 
   _wanted branch-names expl branch-name compadd $* - $branch_names
