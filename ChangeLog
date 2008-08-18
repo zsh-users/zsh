@@ -1,5 +1,8 @@
 2008-08-18  Clint Adams  <clint@zsh.org>
 
+	* Mikael Magnusson: 25473: Completion/Unix/Command/_git: add
+	missing parenthesis.
+
 	* unposted: Completion/Unix/Command/_git: additional git branch
 	options.
 

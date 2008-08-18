@@ -2577,7 +2577,8 @@ _git-svn () {
           arguments+=('--stdin[read list of commits to commit from stdin]')
           ;;
         (show-ignore)
-          arguments+=('-r --revision)'{-r,--revision)'[undocumented]:revision:->__git_svn_revisions'
+          arguments+=('-r --revision)'{-r,--revision}'[undocumented]:revision:->__git_svn_revisions')
+          ;;
         (dcommit)
           arguments+=(
             '(-n --dry-run)'{-n,--dry-run}'[output git-commands that would show diffs that would be committed]')
