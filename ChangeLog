@@ -1,5 +1,8 @@
 2008-08-18  Clint Adams  <clint@zsh.org>
 
+	* 25480: Completion/Unix/Command/_git: add more quotes to the
+	three _call_program invocations with git for-each-ref.
+
 	* Mikael Magnusson: 25473: Completion/Unix/Command/_git: add
 	missing parenthesis.
 
