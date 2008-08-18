@@ -1506,6 +1506,11 @@ _git-branch () {
     - create \
       '-l[create the branch'\''s reflog]' \
       '-f[force the creation of a new branch]' \
+      '--track[set up configuration so pull merges from the start point]' \
+      '--no-track[override the branch.autosetupmerge configuration variable]' \
+      '--contains=[only list branches which contain the specified commit]:commit:__git_committishs' \
+      '--merged[only list branches which are fully contained by HEAD]' \
+      '--no-merged[do not list branches which are fully contained by HEAD]' \
       ':branch-name:__git_branch_names' \
       '::start-point:__git_revisions' \
     - modify \

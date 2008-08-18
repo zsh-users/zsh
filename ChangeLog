@@ -1,5 +1,8 @@
 2008-08-18  Clint Adams  <clint@zsh.org>
 
+	* unposted: Completion/Unix/Command/_git: additional git branch
+	options.
+
 	* 25475: Completion/Unix/Command/_git: determine heads, tags,
 	and branches through git for-each-ref instead of git tag and
 	git branch.
