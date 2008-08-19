@@ -1,5 +1,8 @@
 2008-08-19  Clint Adams  <clint@zsh.org>
 
+	* 25488: Completion/Unix/Command/_git: patch to complete things
+	after "git bisect start", Mikael Magnusson.
+
 	* 25487: Completion/Unix/Command/_git: whitespace changes from
 	Mikael Magnusson.
 

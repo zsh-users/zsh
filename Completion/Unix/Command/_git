@@ -1464,6 +1464,16 @@ _git-bisect () {
         _arguments \
           '*::arguments: _normal' && ret=0
         ;;
+      (start)
+        if (( words[(I)--] < CURRENT && words[(I)--] > 0 )); then
+          _arguments \
+            '*:paths:_files' && ret=0
+        else
+          _arguments \
+            '2:bad revision:__git_commits' \
+            '*:good revision:__git_commits' && ret=0
+        fi
+        ;;
 
       (*)
         _nothing
