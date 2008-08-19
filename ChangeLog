@@ -1,3 +1,8 @@
+2008-08-19  Clint Adams  <clint@zsh.org>
+
+	* 25485: Completion/Unix/Command/_git: patch to allow --abbrev to
+	be completed before -v with git branch, from Mikael Magnusson.
+
 2008-08-18  Clint Adams  <clint@zsh.org>
 
 	* 25480: Completion/Unix/Command/_git: add more quotes to the

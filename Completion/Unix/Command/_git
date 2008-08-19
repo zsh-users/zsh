@@ -1475,11 +1475,6 @@ _git-bisect () {
 # TODO: complete branch names?
 (( $+functions[_git-branch] )) ||
 _git-branch () {
-  local my_abbrev_arg
-  if (( words[(I)-v] > 0 && words[(I)-v] < CURRENT )); then
-    my_abbrev_arg=$abbrev_arg
-  fi
-
   declare -a dependent_deletion_args
   if (( words[(I)-d] || words[(I)-D] )); then
     dependent_deletion_args=(
@@ -1502,7 +1497,8 @@ _git-branch () {
       '(   -a)-r[list only the remote-tracking branches]' \
       '(-r   )-a[list both remote-tracking branches and local branches]' \
       '-v[show SHA1 and commit subject line for each head]' \
-      $my_abbrev_arg \
+      $abbrev_arg \
+      '--no-abbrev[do not abbreviate sha1s]' \
     - create \
       '-l[create the branch'\''s reflog]' \
       '-f[force the creation of a new branch]' \
