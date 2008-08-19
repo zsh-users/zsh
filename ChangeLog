@@ -1,5 +1,8 @@
 2008-08-19  Clint Adams  <clint@zsh.org>
 
+	* 25490: Src/zsh.h, Src/Modules/db_gdbm.c: make zties dynamic so
+	there can be more than one gdbm handle in use at a time.
+
 	* 25489: Completion/Unix/Command/_git: remove cruft for "git
 	octopus/octupus".
 

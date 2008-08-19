@@ -39,6 +39,8 @@
 
 #include <gdbm.h>
 
+static char *backtype = "db/gdbm";
+
 static const struct gsu_scalar gdbm_gsu =
 { gdbmgetfn, gdbmsetfn, gdbmunsetfn };
 
@@ -47,14 +49,13 @@ static struct builtin bintab[] = {
     BUILTIN("zuntie", 0, bin_zuntie, 1, -1, 0, NULL, NULL),
 };
 
-GDBM_FILE dbf = NULL;
-Param tied_param;
-
 /**/
 static int
 bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 {
     char *resource_name, *pmname;
+    GDBM_FILE dbf = NULL;
+    Param tied_param;
 
     if(!OPT_ISSET(ops,'d')) {
         zwarnnam(nam, "you must pass `-d db/gdbm' to ztie", NULL);
@@ -69,16 +70,11 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
      * a registry.
      */
 
-    if(dbf) {
-        zwarnnam(nam, "something is already ztied and this implementation is flawed", NULL);
-	return 1;
-    }
-
     pmname = ztrdup(*args);
 
     resource_name = OPT_ARG(ops, 'f');
 
-    if (!(tied_param = createspecialhash(pmname, &getgdbmnode, &scangdbmkeys, PM_SPECIAL | PM_HASHED))) {
+    if (!(tied_param = createspecialhash(pmname, &getgdbmnode, &scangdbmkeys, 0))) {
         zwarnnam(nam, "cannot create the requested parameter name", NULL);
 	return 1;
     }
@@ -89,6 +85,8 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 	return 1;
     }
 
+    tied_param->u.hash->tmpdata = (void *)dbf;
+
     return 0;
 }
 
@@ -96,11 +94,19 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 static int
 bin_zuntie(char *nam, char **args, Options ops, UNUSED(int func))
 {
-    paramtab->removenode(paramtab, tied_param->node.nam);
-    free(tied_param);
-    tied_param = NULL;
+    Param pm;
+    GDBM_FILE dbf;
+
+    pm = (Param) paramtab->getnode(paramtab, args[0]);
+    if(!pm) {
+        zwarnnam(nam, "cannot untie %s", args[0]);
+	return 1;
+    }
+
+    dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
     gdbm_close(dbf);
-    dbf = NULL;
+/*    free(pm->u.hash->tmpdata); */
+    paramtab->removenode(paramtab, pm->node.nam);
 
     return 0;
 }
@@ -111,10 +117,12 @@ gdbmgetfn(Param pm)
 {
     datum key, content;
     int ret;
+    GDBM_FILE dbf;
 
     key.dptr = pm->node.nam;
     key.dsize = strlen(key.dptr) + 1;
 
+    dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
     ret = gdbm_exists(dbf, key);
     if(ret) {
         content = gdbm_fetch(dbf, key);
@@ -131,12 +139,14 @@ gdbmsetfn(Param pm, char **val)
 {
     datum key, content;
     int ret;
+    GDBM_FILE dbf;
 
     key.dptr = pm->node.nam;
     key.dsize = strlen(key.dptr) + 1;
     content.dptr = val;
     content.dsize = strlen(content.dptr) + 1;
 
+    dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
     ret = gdbm_store(dbf, key, content, GDBM_REPLACE);
 }
 
@@ -146,20 +156,22 @@ gdbmunsetfn(Param pm, int um)
 {
     datum key;
     int ret;
+    GDBM_FILE dbf;
 
     key.dptr = pm->node.nam;
     key.dsize = strlen(key.dptr) + 1;
 
+    dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
     ret = gdbm_delete(dbf, key);
 }
 
 /**/
 static HashNode
-getgdbmnode(UNUSED(HashTable ht), const char *name)
+getgdbmnode(HashTable ht, const char *name)
 {
-    int len, ret;
+    int len;
     char *nameu;
-    datum content, key;
+    datum key;
     Param pm = NULL;
 
     nameu = dupstring(name);
@@ -170,16 +182,20 @@ getgdbmnode(UNUSED(HashTable ht), const char *name)
     pm->node.nam = nameu;
     pm->node.flags = PM_SCALAR;
     pm->gsu.s = &gdbm_gsu;
+    pm->u.hash = ht;
 
     return &pm->node;
 }
 
 /**/
 static void
-scangdbmkeys(UNUSED(HashTable ht), ScanFunc func, int flags)
+scangdbmkeys(HashTable ht, ScanFunc func, int flags)
 {
     Param pm = NULL;
     datum key, content;
+    GDBM_FILE dbf;
+
+    dbf = (GDBM_FILE)(ht->tmpdata);
 
     pm = (Param) hcalloc(sizeof(struct param));
 

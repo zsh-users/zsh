@@ -979,6 +979,7 @@ struct hashtable {
     int hsize;			/* size of nodes[]  (number of hash values)   */
     int ct;			/* number of elements                         */
     HashNode *nodes;		/* array of size hsize                        */
+    void *tmpdata;
 
     /* HASHTABLE METHODS */
     HashFunc hash;		/* pointer to hash function for this table    */
