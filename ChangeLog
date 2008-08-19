@@ -1,5 +1,8 @@
 2008-08-19  Clint Adams  <clint@zsh.org>
 
+	* 25489: Completion/Unix/Command/_git: remove cruft for "git
+	octopus/octupus".
+
 	* 25488: Completion/Unix/Command/_git: patch to complete things
 	after "git bisect start", Mikael Magnusson.
 
