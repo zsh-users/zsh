@@ -1590,20 +1590,16 @@ _git-clean () {
 # TODO: The --no-checkout is undocumented.
 (( $+functions[_git-clone] )) ||
 _git-clone () {
-  local -a shared
-
-  if (( words[(I)(-l|--local)] )); then
-    shared=('(-s --shared)'{-s,--shared}'[share the objects with the source repository]')
-  fi
 
   _arguments \
     '--bare[make a bare GIT repository]' \
     '(-l --local)'{-l,--local}'[perform a local cloning of a repository]' \
-    $shared \
+    '(-s --shared)'{-s,--shared}'[share the objects with the source repository (warning: see man page)]'
     '--reference[reference repository]:repository:_directories' \
     '(-q --quiet)'{-q,--quiet}'[operate quietly]' \
-    '-n[do not checkout HEAD after clone is complete]' \
+    '(-n --no-checkout)'{-n,--no-checkout}'[do not checkout HEAD after clone is complete]' \
     '(-o --origin)'{-o,--origin}'[use given name instead of "origin" as branch name]:name:__git_guard_branch-name' \
+    '--no-hardlinks[copy files instead of hardlinking when doing a local clone]' \
     $upload_pack_arg \
     $template_arg \
     '--depth[create a shallow clone, given number of revisions deep]: :_guard "[[\:digit\:]]##" depth' \

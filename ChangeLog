@@ -1,5 +1,8 @@
 2008-08-19  Clint Adams  <clint@zsh.org>
 
+	* 25486: Completion/Unix/Command/_git: patch to allow --shared to
+	be completed without --local with git clone.
+
 	* 25485: Completion/Unix/Command/_git: patch to allow --abbrev to
 	be completed before -v with git branch, from Mikael Magnusson.
 
