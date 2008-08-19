@@ -4256,54 +4256,54 @@ __git_is_indexed () {
   [[ -n $(git ls-files $REPLY) ]]
 }
 
-  local curcontext=$curcontext ret=1
+local curcontext=$curcontext ret=1
 
-  # fun with $words[] and $CURRENT to enable completion for args
-  # to git aliases (eg. git co <TAB>)
-  local -A git_aliases
-  # TODO: filling git_aliases like this is ugly. I didn't get it working elegantly.
-  local oifs=$IFS
-  IFS=$'\0'
-  git_aliases=(${=${(0)${(@)${${${(f)"$(git config --get-regexp alias.\*)"}/(#s)alias./}/ /$'\0'}}}})
-  IFS=$oifs ; unset oifs
+# fun with $words[] and $CURRENT to enable completion for args
+# to git aliases (eg. git co <TAB>)
+local -A git_aliases
+# TODO: filling git_aliases like this is ugly. I didn't get it working elegantly.
+local oifs=$IFS
+IFS=$'\0'
+git_aliases=(${=${(0)${(@)${${${(f)"$(git config --get-regexp alias.\*)"}/(#s)alias./}/ /$'\0'}}}})
+IFS=$oifs ; unset oifs
 
-  if (( CURRENT >= 3 )) && [[ -n ${git_aliases[$words[2]]} ]] ; then
-    local -a tmpwords
-    tmpwords=(${words[1]} ${(z)git_aliases[$words[2]]})
-    if [[ -z "${words[3,-1]}" ]] ; then
-        tmpwords[$(( ${#tmpwords} + 1 ))]=""
-    else
-        tmpwords+=("${words[3,-1]}")
-    fi
-    words=("${tmpwords[@]}")
-    (( CURRENT += ${#${(z)git_aliases[$words[2]]}} - 1 ))
-    unset tmpwords
-  fi
-
-  if [[ $service == git ]]; then
-    local state line
-    declare -A opt_args
-    _arguments -C \
-      '(- :)--version[display version information]' \
-      '(- :)--help[display help message]' \
-      '--exec-path=-[path containing core git-programs]::directory:_directories' \
-      '(-p --paginate)'{-p,--paginate}'[pipe output into $PAGER]' \
-      '--git-dir=-[path to repository]:directory:_directories' \
-      '--bare[use $PWD as repository]' \
-      ':command:->command' \
-      '*::options:->options' && ret=0
-    case $state in
-      (command)
-        __git_aliases_and_commands
-        ;;
-      (options)
-        curcontext="${curcontext%:*:*}:git-$words[1]:"
-        _call_function ret _git-$words[1]
-        ;;
-    esac
+if (( CURRENT >= 3 )) && [[ -n ${git_aliases[$words[2]]} ]] ; then
+  local -a tmpwords
+  tmpwords=(${words[1]} ${(z)git_aliases[$words[2]]})
+  if [[ -z "${words[3,-1]}" ]] ; then
+      tmpwords[$(( ${#tmpwords} + 1 ))]=""
   else
-    _call_function ret _$service
+      tmpwords+=("${words[3,-1]}")
   fi
+  words=("${tmpwords[@]}")
+  (( CURRENT += ${#${(z)git_aliases[$words[2]]}} - 1 ))
+  unset tmpwords
+fi
+
+if [[ $service == git ]]; then
+  local state line
+  declare -A opt_args
+  _arguments -C \
+    '(- :)--version[display version information]' \
+    '(- :)--help[display help message]' \
+    '--exec-path=-[path containing core git-programs]::directory:_directories' \
+    '(-p --paginate)'{-p,--paginate}'[pipe output into $PAGER]' \
+    '--git-dir=-[path to repository]:directory:_directories' \
+    '--bare[use $PWD as repository]' \
+    ':command:->command' \
+    '*::options:->options' && ret=0
+  case $state in
+    (command)
+      __git_aliases_and_commands
+      ;;
+    (options)
+      curcontext="${curcontext%:*:*}:git-$words[1]:"
+      _call_function ret _git-$words[1]
+      ;;
+  esac
+else
+  _call_function ret _$service
+fi
 }
 
 _git
