@@ -1543,24 +1543,29 @@ _git-checkout () {
     new_branch_reflog_arg='-l[create the new branch'\''s reflog]'
   fi
 
-  # TODO: This isn’t quite correct in regards of the handling of the “--”
-  # option, as it should prevent us from seeing a branch, not stop matching
-  # options.
-  _arguments -C -S -A "-*" \
-    - switch-branch \
-      '-q[suppress feedback messages]' \
-      '-f[force a complete re-read]' \
-      '-b[create a new branch based at given branch]: :__git_guard_branch-name' \
-      {-t,--track}'[set up configuration so pull merges from the start point]' \
-      '--no-track[override the branch.autosetupmerge configuration variable]' \
-      '-l[create the branch'\''s reflog]' \
-      $new_branch_reflog_arg \
-      '-m[3way merge current branch, working tree and new branch]' \
-      '::branch:__git_revisions' \
-    - update-files \
-      '::tree-ish:__git_tree_ishs' \
-      '::file:->files' && ret=0
+  if (( words[(I)--] > 0 && words[(I)--] < CURRENT )); then
+    _arguments -C -S \
+      - update-files \
+        '*::file:->files' && ret=0
+  else
+    _arguments -C -S \
+      - switch-branch \
+        '-q[suppress feedback messages]' \
+        '-f[force a complete re-read]' \
+        '-b[create a new branch based at given branch]: :__git_guard_branch-name' \
+        {-t,--track}'[set up configuration so pull merges from the start point]' \
+        '--no-track[override the branch.autosetupmerge configuration variable]' \
+        '-l[create the branch'\''s reflog]' \
+        $new_branch_reflog_arg \
+        '-m[3way merge current branch, working tree and new branch]' \
+        '::branch:__git_revisions' \
+      - update-files \
+        '::tree-ish:__git_tree_ishs' \
+        '*::file:->files' && ret=0
+  fi
 
+  #XXX TODO and all that: $line[1] only works if you didn't write any options.
+  #What's the variable that holds the tree-ish argument? Is it even reliably possible?
   case $state in
     (files)
       if [[ -n $line[1] ]]; then

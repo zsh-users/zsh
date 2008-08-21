@@ -1,3 +1,8 @@
+2008-08-21  Clint Adams  <clint@zsh.org>
+
+	* 25491: Completion/Unix/Command/_git: patch to improve
+	"git checkout" completion, from Mikael Magnusson.
+
 2008-08-19  Clint Adams  <clint@zsh.org>
 
 	* 25490: Src/zsh.h, Src/Modules/db_gdbm.c: make zties dynamic so
