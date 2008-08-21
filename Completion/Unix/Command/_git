@@ -1543,10 +1543,8 @@ _git-checkout () {
     new_branch_reflog_arg='-l[create the new branch'\''s reflog]'
   fi
 
-  if (( words[(I)--] > 0 && words[(I)--] < CURRENT )); then
-    _arguments -C -S \
-      - update-files \
-        '*::file:->files' && ret=0
+  if compset -N '--'; then
+    __git_cached_files
   else
     _arguments -C -S \
         '-q[suppress feedback messages]' \
