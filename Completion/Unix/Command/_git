@@ -1549,8 +1549,8 @@ _git-checkout () {
         '*::file:->files' && ret=0
   else
     _arguments -C -S \
-      - switch-branch \
         '-q[suppress feedback messages]' \
+      - switch-branch \
         '-f[force a complete re-read]' \
         '-b[create a new branch based at given branch]: :__git_guard_branch-name' \
         {-t,--track}'[set up configuration so pull merges from the start point]' \

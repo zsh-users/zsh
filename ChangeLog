@@ -1,5 +1,8 @@
 2008-08-21  Clint Adams  <clint@zsh.org>
 
+	* 25493: Completion/Unix/Command/_git: allow -q to be used in all
+	git checkout contexts.
+
 	* 25491: Completion/Unix/Command/_git: patch to improve
 	"git checkout" completion, from Mikael Magnusson.
 
