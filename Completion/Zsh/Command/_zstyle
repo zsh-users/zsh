@@ -74,6 +74,7 @@ styles=(
   last-prompt		 c:bool
   list			 ce:listwhen
   list-colors		 c:
+  list-dirs-first	 c:bool
   list-grouped		 c:bool
   list-packed		 c:bool
   list-prompt            c:

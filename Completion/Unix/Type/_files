@@ -39,6 +39,23 @@ if zstyle -a ":completion:${curcontext}:" file-patterns tmp; then
       pats=( "$pats[@]" " ${i}:files " )
     fi
   done
+elif zstyle -t ":completion:${curcontext}:" list-dirs-first; then
+  if [[ "$type" = *g* ]]; then
+
+    # add `^-/' after `#q' glob qualifier if not there already
+    if [[ "$glob" = (#b)(*\(\#q)(*\)) ]]; then
+      [[ $match[2] != \^-/* ]] &&
+      glob="${match[1]}^-/,${match[2]}"
+    else
+      glob="$glob(#q^-/)"
+    fi
+
+    pats=( " *(-/):directories:directories ${glob//:/\\:}:globbed-files" )
+  elif [[ "$type" = */* ]] then
+    pats=( '*(-/):directories ' '*:all-files ' )
+  else
+    pats=( '*(-/):directories:directories *(^-/):other-files ' )
+  fi
 else
   if [[ "$type" = *g* ]]; then
 

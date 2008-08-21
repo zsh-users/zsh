@@ -928,6 +928,11 @@ kindex(other-accounts, completion tag)
 item(tt(other-accounts))(
 used to look up the tt(users-hosts) style
 )
+kindex(other-files, completion tag)
+item(tt(other-files))(
+for the names of any non-directory files.  This is used instead
+of tt(all-files) when the tt(list-dirs-first) style is in effect.
+)
 kindex(packages, completion tag)
 item(tt(packages))(
 for packages (e.g. tt(rpm) or installed tt(Debian) packages)
@@ -1853,6 +1858,14 @@ example(zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS})
 
 The default colors are the same as for the GNU tt(ls) command and can be
 obtained by setting the style to an empty string (i.e. tt('')).
+)
+kindex(list-dirs-first, completion style)
+item(tt(list-dirs-first))(
+This is used by file completion.  If set, directories to be completed
+are listed separately from and before completion for other files,
+regardless of tag ordering.  In addition, the tag tt(other-files)
+is used in place of tt(all-files) for the remaining files, to indicate
+that no directories are presented with that tag.
 )
 kindex(list-grouped, completion style)
 item(tt(list-grouped))(
