@@ -1529,6 +1529,13 @@ _git-branch () {
 }
 __git_zstyle_default ':completion::complete:git-branch:delete-argument-rest:*' ignore-line yes
 
+(( $+functions[__git_is_treeish] )) ||
+__git_is_treeish () {
+  local sha1
+  sha1="$(git rev-parse $1)"
+  [[ "$(git cat-file -t "${sha1}^{tree}" 2> /dev/null)" == tree ]]
+}
+
 # TODO: __git_tree_ishs is just stupid.  It should be giving us a list of tags
 # and perhaps also allow all that just with ^{tree} and so on.  Not quite sure
 # how to do that, though.
@@ -1566,7 +1573,7 @@ _git-checkout () {
   #What's the variable that holds the tree-ish argument? Is it even reliably possible?
   case $state in
     (files)
-      if [[ -n $line[1] ]]; then
+      if [[ -n $line[1] ]] && __git_is_treeish $line[1]; then
         __git_tree_files . $line[1] && ret=0
       else
         __git_cached_files && ret=0

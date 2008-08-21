@@ -1,5 +1,8 @@
 2008-08-21  Clint Adams  <clint@zsh.org>
 
+	* Mikael Magnusson: 25499: Completion/Unix/Command/_git: add
+	function to validate tree-ishs.
+
 	* 25495: Completion/Unix/Command/_git: always complete cached files
 	after git checkout --.
 
