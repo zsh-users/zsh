@@ -4406,8 +4406,11 @@ getfpfunc(char *s, int *ksh, char **fname)
 	    sprintf(buf, "%s/%s", *pp, s);
 	else
 	    strcpy(buf, s);
-	if ((r = try_dump_file(*pp, s, buf, ksh)))
+	if ((r = try_dump_file(*pp, s, buf, ksh))) {
+	    if (fname)
+		*fname = ztrdup(buf);
 	    return r;
+	}
 	unmetafy(buf, NULL);
 	if (!access(buf, R_OK) && (fd = open(buf, O_RDONLY | O_NOCTTY)) != -1) {
 	    if ((len = lseek(fd, 0, 2)) != -1) {
