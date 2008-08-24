@@ -1,3 +1,8 @@
+2008-08-24  Clint Adams  <clint@zsh.org>
+
+	* 25521: Completion/Unix/Command/_git: get merge strategies from
+	git merge in case the administrator has added custom strategies.
+
 2008-08-22  Peter Stephenson  <pws@csr.com>
 
 	* 25508: Src/exec.c: set file name if function came from

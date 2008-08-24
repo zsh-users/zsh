@@ -4039,12 +4039,14 @@ __git_gpg_secret_keys () {
 
 (( $+functions[__git_merge_strategies] )) ||
 __git_merge_strategies () {
-  declare -a merge_strategies_cache
-
-  merge_strategies_cache=(${${=${${(M)${(f)"$(<$(git --exec-path)/git-merge)"}:#all_strategies*}##all_strategies=\'}%%\'}:#recur})
-
   local expl
-  _wanted merge-strategies expl 'merge strategy' compadd - $merge_strategies_cache
+  local -a merge_strategies
+
+  if ! merge_strategies=(${=${${(M)${(f)"$(_call_program strategies git merge -s '' 2>&1)"}:#[Aa]vailable (custom )#strategies are: *}#[Aa]vailable (custom )#strategies are: }%.}); then
+    merge_strategies=(${=${${(M)${(f)"$(<$(git --exec-path)/git-merge)"}:#all_strategies*}##all_strategies=\'}%%\'})
+  fi
+
+  _wanted merge-strategies expl 'merge strategy' compadd -a merge_strategies "$@"
 }
 
 # TODO: Use this in more places.
