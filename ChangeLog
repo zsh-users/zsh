@@ -1,3 +1,9 @@
+2008-08-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25532, Src/exec.c, Test/C03traps.ztst: skipping next command
+	didn't work if it was an assignment or other form tagged as
+	"simple".
+
 2008-08-24  Clint Adams  <clint@zsh.org>
 
 	* 25521: Completion/Unix/Command/_git: get merge strategies from

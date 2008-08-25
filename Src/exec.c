@@ -1068,7 +1068,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 		lineno = lnp1 - 1;
 	}
 
-	if (sigtrapped[SIGDEBUG] && isset(DEBUGBEFORECMD)) {
+	if (sigtrapped[SIGDEBUG] && isset(DEBUGBEFORECMD) && !intrap) {
 	    int oerrexit_opt = opts[ERREXIT];
 	    opts[ERREXIT] = 0;
 	    noerrexit = 1;
@@ -1086,11 +1086,12 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    donedebug = isset(ERREXIT) ? 2 : 1;
 	    opts[ERREXIT] = oerrexit_opt;
 	} else
-	    donedebug = 0;
+	    donedebug = intrap ? 1 : 0;
 
 	if (ltype & Z_SIMPLE) {
 	    next = state->pc + WC_LIST_SKIP(code);
-	    execsimple(state);
+	    if (donedebug != 2)
+		execsimple(state);
 	    state->pc = next;
 	    goto sublist_done;
 	}
