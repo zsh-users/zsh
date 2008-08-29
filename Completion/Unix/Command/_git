@@ -1610,9 +1610,9 @@ _git-clean () {
 # TODO: The --no-checkout is undocumented.
 (( $+functions[_git-clone] )) ||
 _git-clone () {
-
-  _arguments \
+  _arguments -S \
     '--bare[make a bare GIT repository]' \
+    '--mirror[clone refs into refs/* instead of refs/remotes/origin/*]' \
     '(-l --local)'{-l,--local}'[perform a local cloning of a repository]' \
     '(-s --shared)'{-s,--shared}'[share the objects with the source repository (warning: see man page)]' \
     '--reference[reference repository]:repository:_directories' \
@@ -1624,7 +1624,7 @@ _git-clone () {
     $template_arg \
     '--depth[create a shallow clone, given number of revisions deep]: :_guard "[[\:digit\:]]##" depth' \
     ':repository:__git_any_repositories' \
-    '*:directory:_directories' && ret=0
+    ':directory:_directories' && ret=0
 }
 
 (( $+functions[_git-commit] )) ||

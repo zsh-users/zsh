@@ -1,5 +1,8 @@
 2008-08-29  Clint Adams  <clint@zsh.org>
 
+	* Mikael Magnusson: 25539: Completion/Unix/Command/_git: more
+	'git clone' fixes.
+
 	* Frank Terbeck: 25538: Completion/Unix/Command/_git: add missing
 	backslash.
 
