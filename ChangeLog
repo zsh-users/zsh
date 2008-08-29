@@ -1,3 +1,8 @@
+2008-08-29  Clint Adams  <clint@zsh.org>
+
+	* Frank Terbeck: 25537: Completion/Unix/Command/_git: add --abort
+	to options for 'git am'.
+
 2008-08-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25532, Src/exec.c, Test/C03traps.ztst: skipping next command
