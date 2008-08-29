@@ -1,5 +1,8 @@
 2008-08-29  Clint Adams  <clint@zsh.org>
 
+	* Frank Terbeck: 25538: Completion/Unix/Command/_git: add missing
+	backslash.
+
 	* Frank Terbeck: 25537: Completion/Unix/Command/_git: add --abort
 	to options for 'git am'.
 
