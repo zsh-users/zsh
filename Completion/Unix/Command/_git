@@ -1354,7 +1354,7 @@ __git_zstyle_default ':completion::complete:git-add:argument-rest:*' ignore-line
 _git-am () {
   _arguments \
     '--3way[use 3-way merge if patch does not apply cleanly]' \
-    '--abort[restore the original branch and abort the patching operation.]' \
+    '--abort[restore the original branch and abort the patching operation]' \
     '--binary[pass "--allow-binary-replacement" to "git-apply"]' \
     '--dotest=-[use given directory as working area instead of .dotest]:directory:_directories' \
     '--interactive[apply patches interactively]' \

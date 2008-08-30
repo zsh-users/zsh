@@ -1,3 +1,8 @@
+2008-08-30  Clint Adams  <clint@zsh.org>
+
+	* Frank Terbeck: 25551: Completion/Unix/Command/_git: remove
+	a stray period from a description.
+
 2008-08-29  Clint Adams  <clint@zsh.org>
 
 	* Mikael Magnusson: 25539: Completion/Unix/Command/_git: more
