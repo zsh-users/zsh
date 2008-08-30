@@ -1,5 +1,8 @@
 2008-08-30  Clint Adams  <clint@zsh.org>
 
+	* 25553: Completion/Zsh/Command/_precommand:
+	add aoss to compdef line.
+
 	* Frank Terbeck: 25551: Completion/Unix/Command/_git: remove
 	a stray period from a description.
 
