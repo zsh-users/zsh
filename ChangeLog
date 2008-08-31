@@ -1,5 +1,8 @@
 2008-08-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 25569: David Le Bourgeouis & pws: _ant completion was broken
+	by sed pattern change.
+
 	* 25568: Frank Terbeck & pws: Src/builtin.c, Test/.distfiles,
 	Test/A07control.ztst: break and continue arguments less than
 	1 are invalid (and hard errors); add some tests for control
