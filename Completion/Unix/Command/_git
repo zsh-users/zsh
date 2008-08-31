@@ -1533,7 +1533,7 @@ __git_zstyle_default ':completion::complete:git-branch:delete-argument-rest:*' i
 (( $+functions[__git_is_treeish] )) ||
 __git_is_treeish () {
   local sha1
-  sha1="$(git rev-parse $1)"
+  sha1="$(git rev-parse $1 -- 2> /dev/null)" &&
   [[ "$(git cat-file -t "${sha1}^{tree}" 2> /dev/null)" == tree ]]
 }
 

@@ -1,3 +1,8 @@
+2008-08-31  Clint Adams  <clint@zsh.org>
+
+	* Mikael Magnusson: 25564: Completion/Unix/Command/_git:
+	suppress error output in __git_is_treeish.
+
 2008-08-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25570: Src/exec.c, Src/zsh.h, Test/C03traps.ztst: line numbers
