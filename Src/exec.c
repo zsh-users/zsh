@@ -4184,7 +4184,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     int oldzoptind, oldlastval, oldoptcind, oldnumpipestats, ret;
     int *oldpipestats = NULL;
     char saveopts[OPT_SIZE], *oldscriptname = scriptname, *fname = dupstring(name);
-    int obreaks;
+    int obreaks, saveemulation ;
     struct funcstack fstack;
 #ifdef MAX_FUNCTION_DEPTH
     static int funcdepth;
@@ -4223,6 +4223,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
      * not currently set.  That's because if it gets set in the    *
      * function we need to restore the original options on exit.   */
     memcpy(saveopts, opts, sizeof(opts));
+    saveemulation = emulation;
 
     if (flags & PM_TAGGED)
 	opts[XTRACE] = 1;
@@ -4315,6 +4316,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 	saveopts[PRIVILEGED] = opts[PRIVILEGED];
 	saveopts[RESTRICTED] = opts[RESTRICTED];
 	memcpy(opts, saveopts, sizeof(opts));
+	emulation = saveemulation;
     } else {
 	/* just restore a couple. */
 	opts[XTRACE] = saveopts[XTRACE];

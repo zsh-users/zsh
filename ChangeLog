@@ -1,3 +1,10 @@
+2008-08-31  Andrey Borzenkov <bor@zsh.org>
+
+	* users/13169: Src/exec.c: really restore emulation mode when
+	exiting shell function if 'emulate -L' has been used (actually
+	if LOCAL_OPTIONS has been set). Fixed problem noticed in RedHat
+	bug https://bugzilla.redhat.com/show_bug.cgi?id=430665#c19.
+
 2008-08-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25569: David Le Bourgeouis & pws: _ant completion was broken
