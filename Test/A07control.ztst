@@ -1,0 +1,112 @@
+# Test control commands for loops and functions.
+
+%test
+
+  fn3() { return $1; print Error }
+  fn2() { fn3 $1 }
+  fn() {
+    print start $1
+    fn2 $1
+    return
+    print Error
+  }
+  for val in -1 0 1 255; do
+    fn $val; print $?
+  done
+0:Passing of return values back through functions
+>start -1
+>-1
+>start 0
+>0
+>start 1
+>1
+>start 255
+>255
+
+  fn() {
+    continue
+  }
+  fn
+1:continue outside loop
+?fn:continue:1 not in while, until, select, or repeat loop
+
+  for outer in 0 1 2 3; do
+    print outer $outer
+    for inner in 0 1 2 3; do
+      print inner $inner
+      continue $(( (outer & 1) ? 2 : 1 ))
+      print error
+    done
+    print outer end
+  done
+0:continue with valid argument
+>outer 0
+>inner 0
+>inner 1
+>inner 2
+>inner 3
+>outer end
+>outer 1
+>inner 0
+>outer 2
+>inner 0
+>inner 1
+>inner 2
+>inner 3
+>outer end
+>outer 3
+>inner 0
+
+  for outer in 0 1; do
+    continue 0
+    print -- $outer got here, status $?
+  done
+1:continue error case 0
+?(eval):continue:2: argument is not positive: 0
+
+  for outer in 0 1; do
+    continue -1
+    print -- $outer got here, status $?
+  done
+1:continue error case -1
+?(eval):continue:2: argument is not positive: -1
+
+  fn() {
+    break
+  }
+  for outer in 0 1; do
+    print $outer
+    fn
+  done
+0:break from within function (this is a feature, I disovered)
+>0
+
+  for outer in 0 1 2 3; do
+    print outer $outer
+    for inner in 0 1 2 3; do
+      print inner $inner
+      break $(( (outer & 1) ? 2 : 1 ))
+      print error
+    done
+    print outer end
+  done
+0:break with valid argument
+>outer 0
+>inner 0
+>outer end
+>outer 1
+>inner 0
+
+  for outer in 0 1; do
+    break 0
+    print -- $outer got here, status $?
+  done
+1:break error case 0
+?(eval):break:2: argument is not positive: 0
+
+  for outer in 0 1; do
+    break -1
+    print -- $outer got here, status $?
+  done
+1:break error case -1
+?(eval):break:2: argument is not positive: -1

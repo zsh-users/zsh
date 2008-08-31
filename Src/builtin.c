@@ -4443,6 +4443,11 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	nump = 1;
     }
 
+    if (nump > 0 && (func == BIN_CONTINUE || func == BIN_BREAK) && num <= 0) {
+	zerrnam(name, "argument is not positive: %d", num);
+	return 1;
+    }
+
     switch (func) {
     case BIN_CONTINUE:
 	if (!loops) {   /* continue is only permitted in loops */

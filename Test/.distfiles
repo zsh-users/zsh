@@ -7,6 +7,7 @@ A03quoting.ztst
 A04redirect.ztst
 A05execution.ztst
 A06assign.ztst
+A07control.ztst
 B01cd.ztst
 B02typeset.ztst
 B03print.ztst
