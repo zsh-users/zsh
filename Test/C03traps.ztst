@@ -429,6 +429,16 @@
 1:Skip assignment from DEBUG trap
 >5 three
 
+  fn() {
+    setopt localtraps localoptions debugbeforecmd
+    trap 'print $LINENO' DEBUG
+    [[ a = a ]] && print a is ok
+  }
+  fn
+0:line numbers of complex sublists
+>3
+>a is ok
+
 %clean
 
   rm -f TRAPEXIT

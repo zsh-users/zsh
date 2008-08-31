@@ -1060,7 +1060,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 		lnp1 = code2;
 	    } else if (wc_code(code2) == WC_SUBLIST) {
 		if (WC_SUBLIST_FLAGS(code2) == WC_SUBLIST_SIMPLE)
-		    lnp1 = state->pc[2];
+		    lnp1 = state->pc[1];
 		else
 		    lnp1 = WC_PIPE_LINENO(state->pc[1]);
 	    }

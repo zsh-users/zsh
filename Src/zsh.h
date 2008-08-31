@@ -1063,7 +1063,7 @@ struct cmdnam {
 struct shfunc {
     struct hashnode node;
     char *filename;             /* Name of file located in */
-    int lineno;			/* line number in above file */
+    zlong lineno;		/* line number in above file */
     Eprog funcdef;		/* function definition    */
 };
 

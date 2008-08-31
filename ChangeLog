@@ -1,3 +1,9 @@
+2008-08-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25570: Src/exec.c, Src/zsh.h, Test/C03traps.ztst: line numbers
+	of complex sublists were wrong, plus test; another place to make
+	lineno more consistent.
+
 2008-08-31  Andrey Borzenkov <bor@zsh.org>
 
 	* users/13169: Src/exec.c: really restore emulation mode when
