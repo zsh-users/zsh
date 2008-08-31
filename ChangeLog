@@ -1,3 +1,8 @@
+2008-08-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/13162: Completion/Unix/Command/_module: strip
+	"~" suffix from modules.
+
 2008-08-30  Clint Adams  <clint@zsh.org>
 
 	* 25553: Completion/Zsh/Command/_precommand:
