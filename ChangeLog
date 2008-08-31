@@ -1,5 +1,8 @@
 2008-08-31  Clint Adams  <clint@zsh.org>
 
+	* Frank Terbeck: 25561: Completion/Unix/Command/_git: fix quoting
+	with aliases.
+
 	* Mikael Magnusson: 25564: Completion/Unix/Command/_git:
 	suppress error output in __git_is_treeish.
 

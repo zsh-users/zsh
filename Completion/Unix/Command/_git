@@ -4290,7 +4290,7 @@ if (( CURRENT >= 3 )) && [[ -n ${git_aliases[$words[2]]} ]] ; then
   if [[ -z "${words[3,-1]}" ]] ; then
       tmpwords[$(( ${#tmpwords} + 1 ))]=""
   else
-      tmpwords+=("${words[3,-1]}")
+      tmpwords+=(${words[3,-1]})
   fi
   words=("${tmpwords[@]}")
   (( CURRENT += ${#${(z)git_aliases[$words[2]]}} - 1 ))
