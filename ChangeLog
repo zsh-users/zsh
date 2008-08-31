@@ -1,3 +1,10 @@
+2008-08-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25571: Src/lex.c, Src/parse.c, Test/.distfiles,
+	Test/C03traps.ztst, Test/C05debug.ztst: make line numbers when
+	parsing reflect the start of a parsed token rather than the end;
+	add a test and move debug trap tests to a separate file.
+
 2008-08-31  Clint Adams  <clint@zsh.org>
 
 	* Frank Terbeck: 25561: Completion/Unix/Command/_git: fix quoting

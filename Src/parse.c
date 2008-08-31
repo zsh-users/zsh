@@ -721,7 +721,7 @@ static int
 par_pline(int *complex)
 {
     int p;
-    zlong line = lineno;
+    zlong line = toklineno;
 
     p = ecadd(0);
 

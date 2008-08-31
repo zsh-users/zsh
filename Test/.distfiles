@@ -17,6 +17,7 @@ C01arith.ztst
 C02cond.ztst
 C03traps.ztst
 C04funcdef.ztst
+C05debug.ztst
 D01prompt.ztst
 D02glob.ztst
 D03procsubst.ztst

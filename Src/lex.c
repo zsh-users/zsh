@@ -46,6 +46,17 @@ mod_export int tok;
 /**/
 mod_export int tokfd;
 
+/*
+ * Line number at which the first character of a token was found.
+ * We always set this in gettok(), which is always called from
+ * yylex() unless we have reached an error.  So it is always
+ * valid when parsing.  It is not useful during execution
+ * of the parsed structure.
+ */
+
+/**/
+zlong toklineno;
+
 /* lexical analyzer error flag */
  
 /**/
@@ -211,6 +222,7 @@ struct lexstack {
 
     unsigned char *cstack;
     int csp;
+    zlong toklineno;
 };
 
 static struct lexstack *lstack = NULL;
@@ -269,6 +281,7 @@ lexsave(void)
     ls->ecsoffs = ecsoffs;
     ls->ecssub = ecssub;
     ls->ecnfunc = ecnfunc;
+    ls->toklineno = toklineno;
     cmdsp = 0;
     inredir = 0;
     hdocs = NULL;
@@ -333,6 +346,7 @@ lexrestore(void)
     ecssub = lstack->ecssub;
     ecnfunc = lstack->ecnfunc;
     hlinesz = lstack->hlinesz;
+    toklineno = lstack->toklineno;
     errflag = 0;
 
     ln = lstack->next;
@@ -661,6 +675,7 @@ gettok(void)
   beginning:
     tokstr = NULL;
     while (iblank(c = hgetc()) && !lexstop);
+    toklineno = lineno;
     if (lexstop)
 	return (errflag) ? LEXERR : ENDINPUT;
     isfirstln = 0;
