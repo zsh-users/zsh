@@ -4305,6 +4305,7 @@ if [[ $service == git ]]; then
     '(- :)--help[display help message]' \
     '--exec-path=-[path containing core git-programs]::directory:_directories' \
     '(-p --paginate)'{-p,--paginate}'[pipe output into $PAGER]' \
+    '--no-pager[do not pipe git output into a pager]' \
     '--git-dir=-[path to repository]:directory:_directories' \
     '--bare[use $PWD as repository]' \
     '*::arg:->cmd_or_options' && return
