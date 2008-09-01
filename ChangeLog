@@ -1,3 +1,8 @@
+2008-09-01  Peter Stephenson  <pws@csr.com>
+
+	* Jörg Sommer: 25572: Completion/Linux/Command/_modutils:
+	complete module parameters.
+
 2008-08-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25571: Src/lex.c, Src/parse.c, Test/.distfiles,

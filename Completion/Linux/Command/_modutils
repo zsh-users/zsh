@@ -85,7 +85,8 @@ case "$state" in
     if compset -P '*='; then
       _message -e value 'parameter value'
     else
-      _message -e parameter 'module parameter'
+      _values 'module parameter' \
+        ${(f)^"$(_call_program module_parameter modinfo -F parm "$words[2]" 2>/dev/null)"//:/\=[}\]
     fi
   ;;
 esac
