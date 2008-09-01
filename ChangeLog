@@ -1,5 +1,8 @@
 2008-09-01  Clint Adams  <clint@zsh.org>
 
+	* Mikael Magnusson: 25590: Completion/Unix/Command/_git:
+	update "git add" completion.
+
 	* Frank Terbeck: 25588: Completion/Unix/Command/_git: add
 	--no-pager option to git completion.
 

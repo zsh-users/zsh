@@ -1322,12 +1322,13 @@ _git-add () {
   declare -A opt_args
 
   _arguments -C -S \
-    '-n[do not actually add files; only show which ones would be added]' \
-    '-v[show files as they are added]' \
-    '-f[allow adding otherwise ignored files]' \
+    '(-n --dry-run)'{-n,--dry-run}'[do not actually add files; only show which ones would be added]' \
+    '(-v --verbose)'{-v,--verbose}'[show files as they are added]' \
+    '(-f --force)'{-f,--force}'[allow adding otherwise ignored files]' \
     '(-i --interactive : -)'{-i,--interactive}'[add contents interactively to the index]' \
     '(-p --patch : -)'{-p,--patch}'[like -i but go directly into patch mode for specified files]' \
-    '-u[Update only files git already knows about]' \
+    '(-u --update)'{-u,--update}'[update only files git already knows about]' \
+    '(-A --all)'{-A,--all}'[act as both add . and add -u]' \
     '--refresh[do not add files, but refresh their stat() info in the index]' \
     '--ignore-errors[continue adding if an error occurs]' \
     '*:file:->files' && ret=0
