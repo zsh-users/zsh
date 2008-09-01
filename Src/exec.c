@@ -2220,6 +2220,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
     doneps4 = 0;
     redir = (wc_code(*state->pc) == WC_REDIR ? ecgetredirs(state) : NULL);
     if (wc_code(*state->pc) == WC_ASSIGN) {
+	cmdoutval = 0;
 	varspc = state->pc;
 	while (wc_code((code = *state->pc)) == WC_ASSIGN)
 	    state->pc += (WC_ASSIGN_TYPE(code) == WC_ASSIGN_SCALAR ?
@@ -2236,6 +2237,12 @@ execcmd(Estate state, int input, int output, int how, int last1)
      * they don't modify their argument strings. */
     args = (type == WC_SIMPLE ?
 	    ecgetlist(state, WC_SIMPLE_ARGC(code), EC_DUP, &htok) : NULL);
+    /*
+     * If assignment but no command get the status from variable
+     * assignment.
+     */
+    if (!args && varspc)
+	lastval = errflag ? errflag : cmdoutval;
 
     for (i = 0; i < 10; i++) {
 	save[i] = -2;

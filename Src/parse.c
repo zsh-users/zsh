@@ -1567,6 +1567,18 @@ par_simple(int *complex, int nr)
 		str = p + 1;
 	    } else
 		equalsplit(tokstr, &str);
+	    for (p = str; *p; p++) {
+		/*
+		 * We can't treat this as "simple" if it contains
+		 * expansions that require process subsitution, since then
+		 * we need process handling.
+		 */
+		if (p[1] == Inpar &&
+		    (*p == Equals || *p == Inang || *p == Outang)) {
+		    *complex = 1;
+		    break;
+		}
+	    }
 	    ecstr(name);
 	    ecstr(str);
 	    isnull = 0;

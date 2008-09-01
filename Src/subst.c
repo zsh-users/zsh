@@ -66,6 +66,7 @@ prefork(LinkList list, int flags)
 	    else
 		setdata(node, (void *) getoutputfile(str));	/* =(...) */
 	    if (!getdata(node)) {
+		setdata(node, dupstring(""));
 		unqueue_signals();
 		return;
 	    }

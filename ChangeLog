@@ -1,3 +1,11 @@
+2008-09-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25587: Src/exec.c, Src/parse.c, Src/subst.c: foo==(stuff)
+	was mishandled owing to parse errors; mishandling it caused
+	a crash because of lack of care on failure of process
+	substitution; assignments that went through execcmd() failed
+	to set the status.
+
 2008-09-01  Clint Adams  <clint@zsh.org>
 
 	* 25585: Completion/Unix/Command/_git: fix git command completion
