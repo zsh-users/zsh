@@ -1,5 +1,8 @@
 2008-09-01  Clint Adams  <clint@zsh.org>
 
+	* 25585: Completion/Unix/Command/_git: fix git command completion
+	when there are arguments after the cursor position.
+
 	* Frank Terbeck: 25583: Completion/Unix/Command/_git: more git
 	alias fixes.
 

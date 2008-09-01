@@ -4307,15 +4307,15 @@ if [[ $service == git ]]; then
     '(-p --paginate)'{-p,--paginate}'[pipe output into $PAGER]' \
     '--git-dir=-[path to repository]:directory:_directories' \
     '--bare[use $PWD as repository]' \
-    ':command:->command' \
-    '*::options:->options' && ret=0
+    '*::arg:->cmd_or_options' && return
   case $state in
-    (command)
-      __git_aliases_and_commands
-      ;;
-    (options)
-      curcontext="${curcontext%:*:*}:git-$words[1]:"
-      _call_function ret _git-$words[1]
+    (cmd_or_options)
+      if (( CURRENT == 1 )); then
+        __git_aliases_and_commands
+      else
+        curcontext="${curcontext%:*:*}:git-$words[1]:"
+        _call_function ret _git-$words[1]
+      fi
       ;;
   esac
 else
