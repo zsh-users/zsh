@@ -7,7 +7,8 @@ local linepath realpath donepath prepath testpath exppath skips skipped
 local tmp1 tmp2 tmp3 tmp4 i orig eorig pre suf tpre tsuf opre osuf cpre
 local pats haspats ignore pfx pfxsfx sopt gopt opt sdirs ignpar cfopt listsfx
 local nm=$compstate[nmatches] menu matcher mopts sort mid accex fake
-local listfiles listopts tmpdisp
+local listfiles listopts tmpdisp origtmp1
+integer npathcheck
 local -a match mbegin mend
 
 typeset -U prepaths exppaths
@@ -351,8 +352,11 @@ for prepath in "$prepaths[@]"; do
 
   tmp1=( "$prepath$realpath$donepath$tmp2" )
 
+  # count of attemps for pws non-canonical hack
+  (( npathcheck = 0 ))
   while true; do
 
+    origtmp1=("${tmp1[@]}")
     # Get the prefix and suffix for matching.
 
     if [[ "$tpre" = */* ]]; then
@@ -403,15 +407,26 @@ for prepath in "$prepaths[@]"; do
       # something to match by explicit name.  This is for
       # `clever' filing systems where names pop into existence
       # when referenced.
-      if (( ! $#tmp1 )); then
-	  for tmp3 in "$tmp2[@]"; do
-	      if [[ -n $tmp3 && $tmp3 != */ ]]; then
-		  tmp3+=/
-	      fi
-	      if [[ -e "$tmp3${(Q)PREFIX}${(Q)SUFFIX}" ]] then
-		  tmp1+=("$tmp3${(Q)PREFIX}${(Q)SUFFIX}")
-	      fi
-	  done
+      #
+      # As suggested by Bart, to make sure the "compfiles" checks
+      # still work we repeat the tests above if we successfully
+      # find something that might need adding, but we make sure
+      # we only do this once for completion of each path segment.
+      if (( ! $#tmp1 && npathcheck == 0 )); then
+	(( npathcheck = 1 ))
+	for tmp3 in "$tmp2[@]"; do
+	  if [[ -n $tmp3 && $tmp3 != */ ]]; then
+	    tmp3+=/
+	  fi
+	  if [[ -e "$tmp3${(Q)PREFIX}${(Q)SUFFIX}" ]] then
+	    (( npathcheck = 2 ))
+	  fi
+	done
+	if (( npathcheck == 2 )); then
+	  # repeat loop with same arguments
+	  tmp1=("$origtmp1[@]")
+	  continue
+	fi
       fi
 
       if (( ! $#tmp1 )); then
@@ -518,6 +533,7 @@ for prepath in "$prepaths[@]"; do
     else
       skipped=/
     fi
+    (( npathcheck = 0 ))
   done
 
   # The next loop searches the first ambiguous component.

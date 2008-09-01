@@ -1,5 +1,9 @@
 2008-09-01  Peter Stephenson  <pws@csr.com>
 
+	* 25582: Completion/Unix/Type/_path_files: use suggestion
+	by Bart to get automatically appearing file system entries
+	added by completion to respect patterns.
+
 	* Jörg Sommer: 25572: Completion/Linux/Command/_modutils:
 	complete module parameters.
 
