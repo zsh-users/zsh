@@ -1,5 +1,8 @@
 2008-09-01  Clint Adams  <clint@zsh.org>
 
+	* Mikael Magnusson: 25591: Completion/Unix/Command/_git:
+	"git remote rm" completion.
+
 	* Mikael Magnusson: 25590: Completion/Unix/Command/_git:
 	update "git add" completion.
 
