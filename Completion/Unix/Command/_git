@@ -4285,16 +4285,16 @@ git_aliases=(${=${(0)${(@)${${${(f)"$(git config --get-regexp alias.\*)"}/(#s)al
 IFS=$oifs ; unset oifs
 
 if (( CURRENT >= 3 )) && [[ -n ${git_aliases[$words[2]]} ]] ; then
-  local -a tmpwords
-  tmpwords=(${words[1]} ${(z)git_aliases[$words[2]]})
-  if [[ -z "${words[3,-1]}" ]] ; then
-      tmpwords[$(( ${#tmpwords} + 1 ))]=""
-  else
+  local -a tmpwords expalias
+  expalias=(${(z)git_aliases[$words[2]]})
+  tmpwords=(${words[1]} ${expalias})
+  if [[ -n "${words[3,-1]}" ]] ; then
       tmpwords+=(${words[3,-1]})
   fi
+  tmpwords+=('')
+  (( CURRENT += ${#expalias} - 1 ))
   words=("${tmpwords[@]}")
-  (( CURRENT += ${#${(z)git_aliases[$words[2]]}} - 1 ))
-  unset tmpwords
+  unset tmpwords expalias
 fi
 
 if [[ $service == git ]]; then

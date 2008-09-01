@@ -1,3 +1,8 @@
+2008-09-01  Clint Adams  <clint@zsh.org>
+
+	* Frank Terbeck: 25583: Completion/Unix/Command/_git: more git
+	alias fixes.
+
 2008-09-01  Peter Stephenson  <pws@csr.com>
 
 	* 25582: Completion/Unix/Type/_path_files: use suggestion
