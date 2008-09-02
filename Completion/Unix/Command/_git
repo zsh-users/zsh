@@ -435,16 +435,6 @@ _git-checkout-index () {
     '*::file:__git_cached_files' && ret=0
 }
 
-(( $+functions[_git-clean] )) ||
-_git-clean () {
-  _arguments \
-    '-d[remove untracked directories]' \
-    '-n[just show what would be done]' \
-    '-q[be quiet, only report errors]' \
-    '(-X -x)-x[do use ignore rules]' \
-    '(-X -x)-X[remove only files ignored by git]' && ret=0
-}
-
 (( $+functions[_git-commit-tree] )) ||
 _git-commit-tree () {
   if (( CURRENT == 2 )); then
@@ -1601,7 +1591,7 @@ _git-cherry-pick () {
 
 (( $+functions[_git-clean] )) ||
 _git-clean () {
-  _arguments -S \
+  _arguments -S -s \
     '-d[also remove untracked directories]' \
     '-n[do a dry run]' \
     '-f[required when clean.requireForce is true (default)]' \
