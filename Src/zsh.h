@@ -1077,6 +1077,14 @@ struct shfunc {
 #define SFC_COMPLETE 5		/* called from completion code */
 #define SFC_CWIDGET  6		/* new style completion widget */
 
+/* tp in funcstack */
+
+enum {
+    FS_SOURCE,
+    FS_FUNC,
+    FS_EVAL
+};
+
 /* node in function stack */
 
 struct funcstack {
@@ -1086,7 +1094,7 @@ struct funcstack {
     char *caller;		/* name of caller */
     zlong flineno;		/* line number in file */
     zlong lineno;		/* line offset from beginning of function */
-    int sourced;		/* type of entry is a sourced file */
+    int tp;     		/* type of entry: sourced file, func, eval */
 };
 
 /* node in list of function call wrappers */

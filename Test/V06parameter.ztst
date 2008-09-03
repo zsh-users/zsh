@@ -36,4 +36,33 @@
 >Inside autofn
 >2 + ./functrace.zsh:21 + ./autofn:0
 >In sourced file
->2 + ./functrace.zsh:22 + source:0
+>2 + ./functrace.zsh:22 + ./sourcedfile:0
+
+  print -r -- 'module_path=(./Modules)
+  debug_hook() { print $funcfiletrace[1] $functrace[1]; }
+  set -o DEBUG_BEFORE_CMD
+  trap "debug_hook" DEBUG
+  fn() {
+    a=1
+    eval "b=2"
+    c=3
+  }
+  fn
+  w=5
+  eval "x=6
+  y=7"
+  z=8' >rocky3.zsh
+  $ZTST_testdir/../Src/zsh +Z -f ./rocky3.zsh
+0:Eval tracing
+>./rocky3.zsh:5 ./rocky3.zsh:5
+>./rocky3.zsh:10 ./rocky3.zsh:10
+>./rocky3.zsh:6 fn:1
+>./rocky3.zsh:7 fn:2
+>./rocky3.zsh:7 (eval):1
+>./rocky3.zsh:8 fn:3
+>./rocky3.zsh:11 ./rocky3.zsh:11
+>./rocky3.zsh:12 ./rocky3.zsh:12
+>./rocky3.zsh:12 (eval):1
+>./rocky3.zsh:13 (eval):2
+>./rocky3.zsh:14 ./rocky3.zsh:14
+

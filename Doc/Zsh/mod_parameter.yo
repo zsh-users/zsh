@@ -167,7 +167,8 @@ directories.
 vindex(funcfiletrace)
 item(tt(funcfiletrace))(
 This array contains the absolute line numbers and corresponding file
-names for the point where the current function or sourced file was
+names for the point where the current function, sourced file, or (if
+tt(EVAL_LINENO) is set) tt(eval) command was
 called.  The array is of the same length as tt(funcsourcetrace) and
 tt(functrace), but differs from tt(funcsourcetrace) in that the line and
 file are the point of call, not the point of definition, and differs
@@ -176,23 +177,25 @@ files, rather than relative to the start of a function, if any.
 )
 vindex(funcsourcetrace)
 item(tt(funcsourcetrace))(
-This array contains the file names and line numbers of the 
-points where the functions currently being executed were
+This array contains the file names and line numbers of the
+points where the functions, sourced files, and (if tt(EVAL_LINENO) is set)
+tt(eval) commands currently being executed were
 defined.  The line number is the line where the `tt(function) var(name)'
 or `var(name) tt(LPAR()RPAR())' started.  In the case of an autoloaded
-function in native zsh format where only the body of the function occurs
-in the file the line number is reported as zero.
+function  the line number is reported as zero.
 The format of each element is var(filename)tt(:)var(lineno).
-For files that have been executed by the tt(source) or tt(.) builtins
-(in which case there is no separate definition) the trace information is
-shown as tt(source:0).
+For functions autoloaded from a file in native zsh format, where only the
+body of the function occurs in the file, or for files that have been
+executed by the tt(source) or tt(.) builtins, the trace information is
+shown as var(filename)tt(:)var(0), since the entire file is the definition.
 
 Most users will be interested in the information in the
 tt(funcfiletrace) array instead.
 )
 vindex(funcstack)
 item(tt(funcstack))(
-This array contains the names of the functions currently being
+This array contains the names of the functions, sourced files,
+and (if tt(EVAL_LINENO) is set) tt(eval) commands. currently being
 executed. The first element is the name of the function using the
 parameter.
 )

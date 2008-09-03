@@ -583,7 +583,7 @@ funcfiletracegetfn(UNUSED(Param pm))
     for (f = funcstack, p = ret; f; f = f->prev, p++) {
 	char *colonpair, *fname;
 
-	if (!f->prev || f->prev->sourced) {
+	if (!f->prev || f->prev->tp == FS_SOURCE) {
 	    /*
 	     * Calling context is a file---either the parent
 	     * script or interactive shell, or a sourced
@@ -595,13 +595,20 @@ funcfiletracegetfn(UNUSED(Param pm))
 	    sprintf(colonpair, "%s:%ld", f->caller, (long)f->lineno);
 	} else {
 	    /*
-	     * Calling context is a function; we need to find the line number
-	     * in the file where that function was defined.  For this we need
-	     * the $funcsourcetrace information for the context above,
+	     * Calling context is a function or eval; we need to find
+	     * the line number in the file where that function was
+	     * defined or the eval was called.  For this we need the
+	     * $funcsourcetrace information for the context above,
 	     * together with the $functrace line number for the current
 	     * context.
 	     */
 	    long flineno = (long)(f->prev->flineno + f->lineno);
+	    /*
+	     * Line numbers in eval start from 1, not zero,
+	     * so offset by one to get line in file.
+	     */
+	    if (f->prev->tp == FS_EVAL)
+		flineno--;
 	    fname = f->prev->filename ? f->prev->filename : "";
 
 	    colonpair = zhalloc(strlen(fname) + (flineno > 9999 ? 24 : 6));

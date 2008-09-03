@@ -1,3 +1,11 @@
+2008-09-03  Peter Stephenson  <pws@csr.com>
+
+	* 25595: Doc/Zsh/mod_parameter.yo, Src/builtin.c, Src/exec.c,
+	Src/init.c, Src/zsh.h, Src/Modules/parameter.c,
+	Test/V06parameter.ztst: fix line numbers with EVAL_LINENO;
+	try to fix up oddities with funcstack for source files;
+	simplify use of caller element of funcstack.
+
 2008-09-02  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 25600: Functions/Prompts/prompt_bart_setup: fix pattern

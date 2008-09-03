@@ -4712,15 +4712,53 @@ bin_eval(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     Eprog prog;
     char *oscriptname = scriptname;
-    int oineval = ineval;
+    int oineval = ineval, fpushed;
+    struct funcstack fstack;
+
     /*
      * If EVALLINENO is not set, we use the line number of the
      * environment and must flag this up to exec.c.  Otherwise,
      * we use a special script name to indicate the special line number.
      */
     ineval = !isset(EVALLINENO);
-    if (!ineval)
+    if (!ineval) {
 	scriptname = "(eval)";
+	fstack.prev = funcstack;
+	fstack.name = scriptname;
+	fstack.caller = funcstack ? funcstack->name : dupstring(argzero);
+	fstack.lineno = lineno;
+	fstack.tp = FS_EVAL;
+
+	/*
+	 * To get file line numbers, we need to know if parent is
+	 * the original script/shell or a sourced file, in which
+	 * case we use the line number raw, or a function or eval,
+	 * in which case we need to deduce where that came from.
+	 *
+	 * This replicates the logic for working out the information
+	 * for $funcfiletrace---eval is similar to an inlined function
+	 * call from a tracing perspective.
+	 */
+	if (!funcstack || funcstack->tp == FS_SOURCE) {
+	    fstack.flineno = fstack.lineno;
+	    fstack.filename = fstack.caller;
+	} else {
+	    fstack.flineno = funcstack->flineno + lineno;
+	    /*
+	     * Line numbers in eval start from 1, not zero,
+	     * so offset by one to get line in file.
+	     */
+	    if (funcstack->tp == FS_EVAL)
+		fstack.flineno--;
+	    fstack.filename = funcstack->filename;
+	    if (!fstack.filename)
+		fstack.filename = "";
+	}
+	funcstack = &fstack;
+
+	fpushed = 1;
+    } else
+	fpushed = 0;
 
     prog = parse_string(zjoin(argv, ' ', 1));
     if (prog) {
@@ -4736,6 +4774,9 @@ bin_eval(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
     } else {
 	lastval = 1;
     }
+
+    if (fpushed)
+	funcstack = funcstack->prev;
 
     errflag = 0;
     scriptname = oscriptname;

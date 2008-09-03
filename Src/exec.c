@@ -4264,10 +4264,16 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     }
 #endif
     fstack.name = dupstring(name);
-    fstack.caller = dupstring(oargv0 ? oargv0 : argzero);
+    /*
+     * The caller is whatever is immediately before on the stack,
+     * unless we're at the top, in which case it's the script
+     * or interactive shell name.
+     */
+    fstack.caller = funcstack ? funcstack->name :
+	dupstring(oargv0 ? oargv0 : argzero);
     fstack.lineno = lineno;
     fstack.prev = funcstack;
-    fstack.sourced = 0;
+    fstack.tp = FS_FUNC;
     funcstack = &fstack;
 
     if ((shf = (Shfunc) shfunctab->getnode(shfunctab, name))) {
@@ -4277,8 +4283,7 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
 	fstack.flineno = 0;
 	fstack.filename = dupstring(fstack.caller);
     }
-    
-    
+
     if (prog->flags & EF_RUN) {
 	Shfunc shf;
 

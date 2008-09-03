@@ -1061,6 +1061,7 @@ source(char *s)
     unsigned char *ocs;
     int ocsp;
     int otrap_return = trap_return, otrap_state = trap_state;
+    struct funcstack fstack;
 
     if (!s || 
 	(!(prog = try_source_file((us = unmeta(s)))) &&
@@ -1100,19 +1101,17 @@ source(char *s)
     trap_state = TRAP_STATE_INACTIVE;
 
     sourcelevel++;
-    {
-       struct funcstack fstack;
-       fstack.name = dupstring("source");
-       fstack.caller = dupstring(old_scriptfilename ? old_scriptfilename :
-				 "zsh");
-       fstack.flineno = 0;
-       fstack.lineno = oldlineno;
-       fstack.filename = fstack.name;
-       fstack.prev = funcstack;
-       fstack.sourced = 1;
-       funcstack = &fstack;
-    }
-    
+
+    fstack.name = scriptfilename;
+    fstack.caller = funcstack ? funcstack->name :
+	dupstring(old_scriptfilename ? old_scriptfilename : "zsh");
+    fstack.flineno = 0;
+    fstack.lineno = oldlineno;
+    fstack.filename = scriptfilename;
+    fstack.prev = funcstack;
+    fstack.tp = FS_SOURCE;
+    funcstack = &fstack;
+
     if (prog) {
 	pushheap();
 	errflag = 0;
