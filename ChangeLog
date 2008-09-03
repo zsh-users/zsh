@@ -1,5 +1,7 @@
 2008-09-03  Peter Stephenson  <pws@csr.com>
 
+	* Jun T: 25603: Doc/Zsh/compsys.yo: format error.
+
 	* Jörg Sommer <joerg@alea.gnuu.de>: 25598/25599: should
 	auto-remove automatically added "=" suffix on alias completion,
 	else you can end up assigning an empty alias.

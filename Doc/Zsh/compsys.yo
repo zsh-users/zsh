@@ -2133,8 +2133,8 @@ Finally, it is possible to activate two special modes of menu selection.
 The word `tt(interactive)' in the value causes interactive mode
 to be entered immediately when menu selection is started; see
 ifzman(the description of the tt(zsh/complist) module in zmanref(zshmodules))\
-ifnzman(noderef(The zsh/complist Module))\
-) for a description of interactive mode.  Including the string
+ifnzman(noderef(The zsh/complist Module))
+for a description of interactive mode.  Including the string
 `tt(search)' does the same for incremental search mode.  To select backward
 incremental search, include the string `tt(search-backward)'.
 )
