@@ -70,7 +70,7 @@ integer PSCOL=1
 
 prompt_bart_precmd () {
     setopt localoptions noxtrace noksharrays unset
-    local zero='%([BSUbfksu]|FB{*})' escape colno lineno
+    local zero='%([BSUbfksu]|[FB]{*})' escape colno lineno
 
     # Using psvar here protects against unwanted promptsubst expansions.
 
