@@ -19,6 +19,6 @@ if [[ -n "$state" ]]; then
     compset -S '=*' || suf='='
     type=( ${opt_args[(i)[-+][grs]]#?} )
     (( $#type )) && type=( -s $type )
-    _wanted -x alias expl 'alias definition' _aliases -S "$suf" "$type[@]"
+    _wanted -x alias expl 'alias definition' _aliases -qS "$suf" "$type[@]"
   fi
 fi

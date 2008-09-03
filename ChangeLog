@@ -1,5 +1,9 @@
 2008-09-03  Peter Stephenson  <pws@csr.com>
 
+	* Jörg Sommer <joerg@alea.gnuu.de>: 25598/25599: should
+	auto-remove automatically added "=" suffix on alias completion,
+	else you can end up assigning an empty alias.
+
 	* 25595: Doc/Zsh/mod_parameter.yo, Src/builtin.c, Src/exec.c,
 	Src/init.c, Src/zsh.h, Src/Modules/parameter.c,
 	Test/V06parameter.ztst: fix line numbers with EVAL_LINENO;
