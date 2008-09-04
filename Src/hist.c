@@ -1935,10 +1935,6 @@ hdynread2(int stop)
 
     ptr = buf;
     while ((c = ingetc()) != stop && c != '\n' && !lexstop) {
-	if (c == '\n') {
-	    inungetc(c);
-	    break;
-	}
 	if (c == '\\')
 	    c = ingetc();
 	*ptr++ = c;
