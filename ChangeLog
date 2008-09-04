@@ -1,3 +1,7 @@
+2008-09-04  Clint Adams  <clint@zsh.org>
+
+	* 25609: Src/Modules/zftp.c: initialize sz variable.
+
 2008-09-03  Peter Stephenson  <pws@csr.com>
 
 	* Jun T: 25603: Doc/Zsh/compsys.yo: format error.

@@ -2568,7 +2568,7 @@ zftp_getput(char *name, char **args, int flags)
 	char *ln, *rest = NULL;
 	off_t startat = 0;
 	if (progress && (prog = getshfunc("zftp_progress")) != &dummy_eprog) {
-	    off_t sz;
+	    off_t sz = -1;
 	    /*
 	     * This calls the SIZE command to get the size for remote
 	     * files.  Some servers send the size with the reply to
