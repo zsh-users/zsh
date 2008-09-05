@@ -1,3 +1,9 @@
+2008-09-05  Peter Stephenson  <pws@csr.com>
+
+	* 25615: Doc/Zsh/builtins.yo, Doc/Zsh/func.yo, Src/exec.c,
+	Src/text.c, Test/C05debug.ztst: add $ZSH_DEBUG_CMD for
+	DEBUG traps.
+
 2008-09-04  Peter Stephenson  <pws@csr.com>
 
 	* 25608: Completion/compinit: unset CSH_JUNKIE_QUOTES during

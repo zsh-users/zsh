@@ -1307,11 +1307,19 @@ usual case).
 
 If var(sig) is tt(DEBUG) then var(arg) will be executed
 before each command if the option tt(DEBUG_BEFORE_CMD) is set
-(as it is by default), else after each command.  In the former
-case it is possible to skip the next command; see
-the description of the tt(ERR_EXIT) option in
+(as it is by default), else after each command.  Here, a `command' is
+what is described as a `sublist' in the shell grammar, see
+ifnzman(noderef(Simple Commands & Pipelines))\
+ifzman(the section SIMPLE COMMANDS & PIPELINES in zmanref(zshmisc)).
+If tt(DEBUG_BEFORE_CMD) is set various additional features are available.
+First, it is possible to skip the next command by setting the option
+tt(ERR_EXIT); see the description of the tt(ERR_EXIT) option in
 ifzman(zmanref(zshoptions))\
-ifnzman(noderef(Description of Options)).
+ifnzman(noderef(Description of Options)).  Also, the shell parameter
+tt(ZSH_DEBUG_CMD) is set to the string corresponding to the command
+to be executed following the trap.  Note that this string is reconstructed
+from the internal format and may not be formatted the same way as the
+original text.  The parameter is unset after the trap is executed.
 
 If var(sig) is tt(0) or tt(EXIT)
 and the tt(trap) statement is executed inside the body of a function,

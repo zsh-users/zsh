@@ -309,11 +309,11 @@ executed inside other traps.
 findex(TRAPDEBUG)
 item(tt(TRAPDEBUG))(
 If the option tt(DEBUG_BEFORE_CMD) is set (as it is by default), executed
-before each command; otherwise executed after each command.  In the former
-case it is possible to skip the next command; see the description of the
-tt(ERR_EXIT) option in
-ifzman(zmanref(zshoptions))\
-ifnzman(noderef(Description of Options)).
+before each command; otherwise executed after each command.  See
+the description of the tt(trap) builtin in
+ifnzman(noderef(Shell Builtin Commands))\
+ifzman(zmanref(zshbuiltins)) for details of additional features provided
+in debug traps.
 )
 findex(TRAPEXIT)
 item(tt(TRAPEXIT))(

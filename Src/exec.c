@@ -1069,9 +1069,14 @@ execlist(Estate state, int dont_change_job, int exiting)
 	}
 
 	if (sigtrapped[SIGDEBUG] && isset(DEBUGBEFORECMD) && !intrap) {
+	    Wordcode pc2 = state->pc;
 	    int oerrexit_opt = opts[ERREXIT];
+	    Param pm;
 	    opts[ERREXIT] = 0;
 	    noerrexit = 1;
+	    if (ltype & Z_SIMPLE) /* skip the line number */
+		pc2++;
+	    pm = setsparam("ZSH_DEBUG_CMD", getpermtext(state->prog, pc2));
 
 	    exiting = donetrap;
 	    ret = lastval;
@@ -1085,6 +1090,8 @@ execlist(Estate state, int dont_change_job, int exiting)
 	     */
 	    donedebug = isset(ERREXIT) ? 2 : 1;
 	    opts[ERREXIT] = oerrexit_opt;
+	    if (pm)
+		unsetparam_pm(pm, 0, 1);
 	} else
 	    donedebug = intrap ? 1 : 0;
 

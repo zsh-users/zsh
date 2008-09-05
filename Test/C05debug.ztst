@@ -112,3 +112,28 @@
 >    second
 >    third
 
+  fn() {
+    emulate -L zsh; setopt debugbeforecmd
+    trap 'print "$LINENO: '\''$ZSH_DEBUG_CMD'\''"' DEBUG
+    print foo &&
+    print bar ||
+    print rod
+    x=y
+    print $x
+    fn2() { echo wow }
+    fn2
+  }
+  fn
+0:ZSH_DEBUG_CMD in debug traps
+>3: 'print foo && print bar || print rod'
+>foo
+>bar
+>6: 'x=y '
+>7: 'print $x'
+>y
+>8: 'fn2 () {
+>	echo wow
+>}'
+>9: 'fn2'
+>0: 'echo wow'
+>wow

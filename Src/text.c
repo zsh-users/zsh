@@ -135,7 +135,6 @@ getpermtext(Eprog prog, Wordcode c)
     tbuf = (char *)zalloc(tsiz = 32);
     tptr = tbuf;
     tlim = tbuf + tsiz;
-    tindent = 1;
     tjob = 0;
     if (prog->len)
 	gettext2(&s);
@@ -167,7 +166,6 @@ getjobtext(Eprog prog, Wordcode c)
     tbuf = NULL;
     tptr = jbuf;
     tlim = tptr + JOBTEXTSIZE - 1;
-    tindent = 1;
     tjob = 1;
     gettext2(&s);
     *tptr = '\0';
@@ -246,6 +244,16 @@ gettext2(Estate state)
     Tstack s, n;
     int stack = 0;
     wordcode code;
+
+    /*
+     * Hack for parsing "simple" format of function definitions.
+     * In this case there is no surrounding context so the initial
+     * indent should be zero.
+     */
+    if (wc_code(*state->pc) == WC_FUNCDEF)
+	tindent = 0;
+    else
+	tindent = 1;
 
     while (1) {
 	if (stack) {
