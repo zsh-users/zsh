@@ -731,6 +731,13 @@ item(tt(zsh_scheduled_events))(
 See ifzman(the section `The zsh/sched Module' in zmanref(zshmodules))\
 ifnzman(noderef(The zsh/sched Module)).
 )
+vindex(ZSH_SUBSHELL <S>)
+item(tt(ZSH_SUBSHELL))(
+Readonly integer.  Initially zero, incremented each time the shell forks
+to create a subshell for executing code.  Hence `tt((print $ZSH_SUBSHELL))'
+and `tt(print $(print $ZSH_SUBSHELL))' output 1, while
+`tt(( (print $ZSH_SUBSHELL) ))' outputs 2.
+)
 vindex(ZSH_VERSION)
 item(tt(ZSH_VERSION))(
 The version number of this zsh.

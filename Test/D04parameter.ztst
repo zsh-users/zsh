@@ -1047,3 +1047,18 @@
 >and !that!
 >of *this*
 >or (the|other)
+
+  print $ZSH_SUBSHELL
+  (print $ZSH_SUBSHELL)
+  ( (print $ZSH_SUBSHELL) )
+  ( (print $ZSH_SUBSHELL); print $ZSH_SUBSHELL )
+  print $(print $ZSH_SUBSHELL)
+  cat =(print $ZSH_SUBSHELL)
+0:ZSH_SUBSHELL
+>0
+>1
+>2
+>2
+>1
+>1
+>1

@@ -910,6 +910,13 @@ entersubsh(int flags)
     }
     if (!(flags & ESUB_FAKE))
 	subsh = 1;
+    /*
+     * Increment the visible parameter ZSH_SUBSHELL even if this
+     * is a fake subshell because we are exec'ing at the end.
+     * Logically this should be equivalent to a real subshell so
+     * we don't hang out the dirty washing.
+     */
+    zsh_subshell++;
     if ((flags & ESUB_REVERTPGRP) && getpid() == mypgrp)
 	release_pgrp();
     if (SHTTY != -1) {

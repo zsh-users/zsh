@@ -85,7 +85,8 @@ zlong lastval,		/* $?           */
      lastpid,		/* $!           */
      columns,		/* $COLUMNS     */
      lines,		/* $LINES       */
-     ppid;		/* $PPID        */
+     ppid,		/* $PPID        */
+     zsh_subshell;	/* $ZSH_SUBSHELL */
 /**/
 zlong lineno,		/* $LINENO      */
      zoptind,		/* $OPTIND      */
@@ -291,6 +292,7 @@ IPDEF4("?", &lastval),
 IPDEF4("HISTCMD", &curhist),
 IPDEF4("LINENO", &lineno),
 IPDEF4("PPID", &ppid),
+IPDEF4("ZSH_SUBSHELL", &zsh_subshell),
 
 #define IPDEF5(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL},BR((void *)B),GSU(varinteger_gsu),10,0,NULL,NULL,NULL,0}
 IPDEF5("COLUMNS", &columns, zlevar_gsu),
