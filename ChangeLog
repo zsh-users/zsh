@@ -1,3 +1,8 @@
+2008-09-04  Peter Stephenson  <pws@csr.com>
+
+	* 25608: Completion/compinit: unset CSH_JUNKIE_QUOTES during
+	completion.
+
 2008-09-04  Clint Adams  <clint@zsh.org>
 
 	* 25611, 25613: Src/Modules/curses.c: protect against two possible
