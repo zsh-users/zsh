@@ -1,5 +1,7 @@
 2008-09-04  Clint Adams  <clint@zsh.org>
 
+	* 25612: Src/Zle/compmatch.c: remove dead code.
+
 	* 25610: Src/hist.c: remove dead code.
 
 	* 25609: Src/Modules/zftp.c: initialize sz variable.

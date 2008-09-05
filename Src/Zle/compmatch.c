@@ -120,7 +120,7 @@ add_bmatchers(Cmatcher m)
 mod_export void
 update_bmatchers(void)
 {
-    Cmlist p = bmatchers, q = NULL, ms;
+    Cmlist p = bmatchers, ms;
     Cmatcher mp;
     int t;
 
@@ -132,10 +132,7 @@ update_bmatchers(void)
 
 	p = p->next;
 	if (!t) {
-	    if (q)
-		q->next = p;
-	    else
-		bmatchers = p;
+	    bmatchers = p;
 	}
     }
 }
