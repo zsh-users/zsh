@@ -4272,11 +4272,12 @@ local curcontext=$curcontext ret=1
 # fun with $words[] and $CURRENT to enable completion for args
 # to git aliases (eg. git co <TAB>)
 local -A git_aliases
-# TODO: filling git_aliases like this is ugly. I didn't get it working elegantly.
-local oifs=$IFS
-IFS=$'\0'
-git_aliases=(${=${(0)${(@)${${${(f)"$(git config --get-regexp alias.\*)"}/(#s)alias./}/ /$'\0'}}}})
-IFS=$oifs ; unset oifs
+local -a git_aliases__
+git_aliases__=(${(f)${${${(f)"$(_call_program alias_expansion git config --get-regexp '\^alias\.')"}#alias.}/ /$'\n'}/(#e)/$'\n'})
+if (( ( ${#git_aliases__} % 2 ) == 0 )) ; then
+    git_aliases=(${git_aliases__})
+fi
+unset git_aliases__
 
 if (( CURRENT >= 3 )) && [[ -n ${git_aliases[$words[2]]} ]] ; then
   local -a tmpwords expalias
