@@ -2834,8 +2834,14 @@ expandcmdpath(UNUSED(char **args))
     noaliases = 1;
     s = getcurcmd();
     noaliases = na;
-    if (!s || cmdwb < 0 || cmdwe < cmdwb)
+    if (!s)
 	return 1;
+
+    if (cmdwb < 0 || cmdwe < cmdwb) {
+	zsfree(s);
+	return 1;
+    }
+
     str = findcmd(s, 1);
     zsfree(s);
     if (!str)

@@ -1,5 +1,8 @@
 2008-09-08  Clint Adams  <clint@zsh.org>
 
+	* 25636: Src/Zle/zle_tricky.c: free s before returning with an
+	error condition.
+
 	* 25634: Src/Zle/zle_main.c: free t before returning if both t and
 	errflag are set.
 
