@@ -1595,6 +1595,8 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 	/* error in editing */
 	errflag = 0;
 	breaks = obreaks;
+	if (t)
+	    zsfree(t);
 	return 1;
     }
     /* strip off trailing newline, if any */
