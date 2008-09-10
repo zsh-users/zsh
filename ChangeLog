@@ -1,5 +1,8 @@
 2008-09-10  Clint Adams  <clint@zsh.org>
 
+	* Frank Terbeck: 25640: Completion/Unix/Command/_git: another alias
+	handling fix.
+
 	* 25639: Src/hist.c: free ptr2 if hsubl is NULL.
 
 	* 25638: Src/Zle/compmatch.c: remove unnecessary ternary expression
