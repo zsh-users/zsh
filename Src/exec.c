@@ -4483,11 +4483,12 @@ getfpfunc(char *s, int *ksh, char **fname)
 Eprog
 stripkshdef(Eprog prog, char *name)
 {
-    Wordcode pc = prog->prog;
+    Wordcode pc;
     wordcode code;
 
     if (!prog)
 	return NULL;
+    pc = prog->prog;
     code = *pc++;
     if (wc_code(code) != WC_LIST ||
 	(WC_LIST_TYPE(code) & (Z_SYNC|Z_END|Z_SIMPLE)) != (Z_SYNC|Z_END|Z_SIMPLE))
