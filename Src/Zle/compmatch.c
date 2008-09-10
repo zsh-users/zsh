@@ -562,7 +562,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	    wexact += 1 + bslash;
 	    if (!test)
 		while (bp && bc >= (useqbr ? bp->qpos : bp->pos)) {
-		    bp->curpos = matchbufadded + (sfx ? (ow - w) : (w - ow)) + obc;
+		    bp->curpos = matchbufadded + (w - ow) + obc;
 		    bp = bp->next;
 		}
 	    lm = NULL;
