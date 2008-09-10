@@ -1,5 +1,7 @@
 2008-09-10  Clint Adams  <clint@zsh.org>
 
+	* 25639: Src/hist.c: free ptr2 if hsubl is NULL.
+
 	* 25638: Src/Zle/compmatch.c: remove unnecessary ternary expression
 	in match_str.
 
