@@ -153,9 +153,9 @@ old_heaps(Heap old)
 	n = h->next;
 	DPUTS(h->sp, "BUG: old_heaps() with pushed heaps");
 #ifdef USE_MMAP
-	munmap((void *) h, sizeof(*h));
+	munmap((void *) h, h->size);
 #else
-	zfree(h, sizeof(*h));
+	zfree(h, HEAPSIZE);
 #endif
     }
     heaps = old;

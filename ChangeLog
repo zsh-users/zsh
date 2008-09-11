@@ -1,3 +1,7 @@
+2008-09-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25632: xRaich[o]²x: Src/mem.c: munmap() argument was wrong.
+
 2008-09-11  Peter Stephenson  <pws@csr.com>
 
 	* 25651: Src/builtin.c, Src/exec.c, Src/hashtable.c, Src/init.c,
