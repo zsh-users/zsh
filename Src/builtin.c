@@ -5725,7 +5725,7 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		if (!siglists[sig])
 		    printf("trap -- '' %s\n", name);
 		else {
-		    s = getpermtext(siglists[sig], NULL);
+		    s = getpermtext(siglists[sig], NULL, 0);
 		    printf("trap -- ");
 		    quotedzputs(s, stdout);
 		    printf(" %s\n", name);

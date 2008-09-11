@@ -1,5 +1,9 @@
 2008-09-11  Peter Stephenson  <pws@csr.com>
 
+	* 25651: Src/builtin.c, Src/exec.c, Src/hashtable.c, Src/init.c,
+	Src/text.c, Src/Modules/parameter.c: make indentation for code
+	output by getpermtext() more logical.
+
 	* 25643: Doc/Zsh/builtins.yo, Src/exec.c: keep DEBUG and ZERR
 	traps in subshells.
 

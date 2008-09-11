@@ -118,7 +118,7 @@ taddnl(void)
 
 /**/
 mod_export char *
-getpermtext(Eprog prog, Wordcode c)
+getpermtext(Eprog prog, Wordcode c, int start_indent)
 {
     struct estate s;
 
@@ -131,6 +131,7 @@ getpermtext(Eprog prog, Wordcode c)
     s.pc = c;
     s.strs = prog->strs;
 
+    tindent = start_indent;
     tnewlins = 1;
     tbuf = (char *)zalloc(tsiz = 32);
     tptr = tbuf;
@@ -162,6 +163,7 @@ getjobtext(Eprog prog, Wordcode c)
     s.pc = c;
     s.strs = prog->strs;
 
+    tindent = 0;
     tnewlins = 0;
     tbuf = NULL;
     tptr = jbuf;
@@ -244,16 +246,6 @@ gettext2(Estate state)
     Tstack s, n;
     int stack = 0;
     wordcode code;
-
-    /*
-     * Hack for parsing "simple" format of function definitions.
-     * In this case there is no surrounding context so the initial
-     * indent should be zero.
-     */
-    if (wc_code(*state->pc) == WC_FUNCDEF)
-	tindent = 0;
-    else
-	tindent = 1;
 
     while (1) {
 	if (stack) {

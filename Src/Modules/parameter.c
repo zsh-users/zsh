@@ -390,7 +390,7 @@ getfunction(UNUSED(HashTable ht), const char *name, int dis)
 				((shf->node.flags & PM_TAGGED) ? "Ut" : "U") :
 				((shf->node.flags & PM_TAGGED) ? "t" : "")));
 	} else {
-	    char *t = getpermtext(shf->funcdef, NULL), *n, *h;
+	    char *t = getpermtext(shf->funcdef, NULL, 1), *n, *h;
 
 	    if (shf->funcdef->flags & EF_RUN) {
 		n = nicedupstring(name);
@@ -455,7 +455,8 @@ scanfunctions(UNUSED(HashTable ht), ScanFunc func, int flags, int dis)
 				    ((shf->node.flags & PM_TAGGED) ? "Ut" : "U") :
 				    ((shf->node.flags & PM_TAGGED) ? "t" : "")));
 		    } else {
-			char *t = getpermtext(((Shfunc) hn)->funcdef, NULL), *n;
+			char *t = getpermtext(((Shfunc) hn)->funcdef, NULL, 1);
+			char *n;
 
 			if (((Shfunc) hn)->funcdef->flags & EF_RUN) {
 			    n = nicedupstring(hn->nam);

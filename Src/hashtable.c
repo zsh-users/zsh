@@ -887,7 +887,7 @@ printshfuncnode(HashNode hn, int printflags)
 	if (f->node.flags & PM_UNDEFINED)
 	    printf("%c undefined\n\t", hashchar);
 	else
-	    t = getpermtext(f->funcdef, NULL);
+	    t = getpermtext(f->funcdef, NULL, 1);
 	if (f->node.flags & PM_TAGGED)
 	    printf("%c traced\n\t", hashchar);
 	if (!t) {

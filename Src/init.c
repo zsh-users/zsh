@@ -168,7 +168,7 @@ loop(int toplevel, int justonce)
 		else
 		    addlinknode(args, "");
 		addlinknode(args, dupstring(getjobtext(prog, NULL)));
-		addlinknode(args, cmdstr = getpermtext(prog, NULL));
+		addlinknode(args, cmdstr = getpermtext(prog, NULL, 0));
 
 		callhookfunc("preexec", args, 1, NULL);
 
