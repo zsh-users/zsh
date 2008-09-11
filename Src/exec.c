@@ -869,7 +869,8 @@ entersubsh(int flags)
 
     if (!(flags & ESUB_KEEPTRAP))
 	for (sig = 0; sig < VSIGCOUNT; sig++)
-	    if (!(sigtrapped[sig] & ZSIG_FUNC))
+	    if (!(sigtrapped[sig] & ZSIG_FUNC) &&
+		sig != SIGDEBUG && sig != SIGZERR)
 		unsettrap(sig);
     monitor = isset(MONITOR);
     if (flags & ESUB_NOMONITOR)

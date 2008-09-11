@@ -1330,7 +1330,9 @@ If var(sig) is tt(0) or tt(EXIT)
 and the tt(trap) statement is not executed inside the body of a function,
 then the command var(arg) is executed when the shell terminates.
 
-tt(ZERR), tt(DEBUG), and tt(EXIT) traps are not executed inside other traps.
+tt(ZERR), tt(DEBUG), and tt(EXIT) traps are not executed inside other
+traps.  tt(ZERR) and tt(DEBUG) traps are kept within subshells, while
+other traps are reset.
 
 Note that traps defined with the tt(trap) builtin are slightly different
 from those defined as `tt(TRAP)var(NAL) () { ... }', as the latter have

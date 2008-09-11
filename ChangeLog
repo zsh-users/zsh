@@ -1,5 +1,8 @@
 2008-09-11  Peter Stephenson  <pws@csr.com>
 
+	* 25643: Doc/Zsh/builtins.yo, Src/exec.c: keep DEBUG and ZERR
+	traps in subshells.
+
 	* 25641: add option (NO_)MULTI_FUNC_DEF to turn off "foo1
 	foo2...()" function definitions.
 
