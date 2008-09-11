@@ -1663,6 +1663,9 @@ par_simple(int *complex, int nr)
 	    zlong oldlineno = lineno;
 	    int onp, so, oecssub = ecssub;
 
+	    if (!isset(MULTIFUNCDEF) && argc > 1)
+		YYERROR(oecused);
+
 	    *complex = c;
 	    lineno = 0;
 	    incmdpos = 1;

@@ -181,6 +181,7 @@ static struct optname optns[] = {
 			      0
 #endif
 			      },			 MULTIBYTE},
+{{NULL, "multifuncdef",	      OPT_EMULATE|OPT_ZSH},	 MULTIFUNCDEF},
 {{NULL, "multios",	      OPT_EMULATE|OPT_ZSH},	 MULTIOS},
 {{NULL, "nomatch",	      OPT_EMULATE|OPT_NONBOURNE},NOMATCH},
 {{NULL, "notify",	      OPT_ZSH},			 NOTIFY},

@@ -1133,6 +1133,14 @@ fn+LPAR()RPAR() { setopt localtraps; trap '' INT; sleep 3; })
 
 will restore normally handling of tt(SIGINT) after the function exits.
 )
+pindex(MULTI_FUNC_DEF)
+item(tt(MULTI_FUNC_DEF) <Z>)(
+Allow definitions of multiple functions at once in the form `tt(fn1
+fn2)var(...)tt(LPAR()RPAR())'; if the option is not set, this causes
+a parse error.  Definition of multiple functions with the tt(function)
+keyword is always allowed.  Multiple function definitions are not often
+used and can cause obscure errors.
+)
 pindex(MULTIOS)
 item(tt(MULTIOS) <Z>)(
 Perform implicit bf(tee)s or bf(cat)s when multiple
