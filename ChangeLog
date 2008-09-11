@@ -152,7 +152,7 @@
 
 2008-08-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 25569: David Le Bourgeouis & pws: _ant completion was broken
+	* 25569: David Le Bourgeois & pws: _ant completion was broken
 	by sed pattern change.
 
 	* 25568: Frank Terbeck & pws: Src/builtin.c, Test/.distfiles,
