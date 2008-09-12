@@ -22,6 +22,7 @@ case "$service" in
       '(-l --unpack-level)'{-l,--unpack-level}'[unpack level]:default unpack level:(0 1 2 none basic contents)' \
       '(-o --no-override)'{-o,--no-override}'[do not use the overrides file]' \
       '--show-overrides[output tags that have been overridden]' \
+      '--color:when:(never always auto)' \
       '(-U --unpack-info)'{-U,--unpack-info}'[collect informations]:infos:_values -s , "collectibles" changelog-file copyright-file debfiles debian-readme diffstat doc-base-files file-info init.d md5sums menu-files objdump-info override-file scripts source-control-file' \
       '(-m --md5sums)'{-m,--md5sums}'[check md5sums when processing a .changes file]' \
       '--allow-root[override warning when run with superuser privileges]' \
@@ -37,7 +38,7 @@ case "$service" in
       '(-s --source)'{-s,--source}'[the following packages are source]' \
       '--udeb[the following packages are udebs]' \
       '(-p --packages-file)'{-p,--packages-file}'[process packages listed in file]:list:_files' \
-      ':package:_files -g "*.(changes|deb|dsc)"'
+      ':package:_files -g "*.(changes|deb|dsc)"' && return 0
       ;;
 
    (lintian-info)

@@ -1,3 +1,8 @@
+2008-09-12  Clint Adams  <clint@zsh.org>
+
+	* 25654: Completion/Debian/Command/_lintian: fix return bug and add
+	--color.
+
 2008-09-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25632: xRaich[o]²x: Src/mem.c: munmap() argument was wrong.
