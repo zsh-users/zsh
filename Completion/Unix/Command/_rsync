@@ -171,7 +171,6 @@ _arguments -s \
   '--ignore-existing[ignore files that already exist on receiving side]' \
   '(--existing --ignore-non-existing)'{--existing,--ignore-non-existing}'[ignore files that do not exist on receiving side]' \
   '--remove-source-files[synchronized files are removed from sending side]' \
-  '--remove-sent-files[transferred files/symlinks are removed from sending side]' \
   '(--delete-before --delete-during --delete-after --delete-delay)--del[an alias for --delete-during]' \
   '--delete[delete files that do not exist on the sending side]' \
   '(--del --delete-during --delete-after --delete-delay)--delete-before[receiver deletes before transfer]' \

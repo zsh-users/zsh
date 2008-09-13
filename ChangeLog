@@ -1,3 +1,8 @@
+2008-09-13  Clint Adams  <clint@zsh.org>
+
+	* 25655: Completion/Unix/Command/_rsync: remove completion for
+	--remove-sent-files option.
+
 2008-09-12  Clint Adams  <clint@zsh.org>
 
 	* 25654: Completion/Debian/Command/_lintian: fix return bug and add
