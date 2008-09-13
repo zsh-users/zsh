@@ -1,3 +1,8 @@
+2008-09-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25662: Src/builtin.c, Test/B02typeset.ztst: declare -p
+	should never create variables.
+
 2008-09-13  Clint Adams  <clint@zsh.org>
 
 	* 25656: Src/params.c: free val only after it may be passed to

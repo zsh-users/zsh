@@ -444,3 +444,12 @@
 0:Lower case conversion, does not apply to values used internally
 >lower
 >value of $lower
+
+ typeset -a array
+ array=(foo bar)
+ fn() { typeset -p array nonexistent; }
+ fn
+0:declare -p shouldn't create scoped values
+>typeset -a array
+>array=(foo bar)
+?fn:typeset: no such variable: nonexistent

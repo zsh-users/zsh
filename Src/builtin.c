@@ -2473,10 +2473,17 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 
     /* Take arguments literally.  Don't glob */
     while ((asg = getasg(*argv++))) {
-	if (!typeset_single(name, asg->name,
-			    (Param) (paramtab == realparamtab ?
-				     gethashnode2(paramtab, asg->name) :
-				     paramtab->getnode(paramtab, asg->name)),
+	HashNode hn = (paramtab == realparamtab ?
+		       gethashnode2(paramtab, asg->name) :
+		       paramtab->getnode(paramtab, asg->name));
+	if (OPT_ISSET(ops,'p')) {
+	    if (hn)
+		printparamnode(hn, printflags);
+	    else
+		zwarnnam(name, "no such variable: %s", asg->name);
+	    continue;
+	}
+	if (!typeset_single(name, asg->name, (Param)hn,
 			    func, on, off, roff, asg->value, NULL,
 			    ops, 0))
 	    returnval = 1;
