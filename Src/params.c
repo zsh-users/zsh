@@ -2235,10 +2235,10 @@ setstrvalue(Value v, char *val)
     case PM_INTEGER:
 	if (val) {
 	    v->pm->gsu.i->setfn(v->pm, mathevali(val));
-	    zsfree(val);
 	    if ((v->pm->node.flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) &&
 		!v->pm->width)
 		v->pm->width = strlen(val);
+	    zsfree(val);
 	}
 	if (!v->pm->base && lastbase != -1)
 	    v->pm->base = lastbase;

@@ -1,5 +1,8 @@
 2008-09-13  Clint Adams  <clint@zsh.org>
 
+	* 25656: Src/params.c: free val only after it may be passed to
+	strlen().
+
 	* 25655: Completion/Unix/Command/_rsync: remove completion for
 	--remove-sent-files option.
 
