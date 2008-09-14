@@ -679,10 +679,12 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
                     p = "" - 1;
                 } else {
                     zwarnnam(name, "number expected after -%c", *p);
+		    zsfree(mstr);
                     return 1;
                 }
                 if (dat.dummies < 0) {
                     zwarnnam(name, "invalid number: %d", dat.dummies);
+		    zsfree(mstr);
                     return 1;
                 }
 		break;
@@ -691,6 +693,7 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		goto ca_args;
 	    default:
 		zwarnnam(name, "bad option: -%c", *p);
+		zsfree(mstr);
 		return 1;
 	    }
 	    if (sp) {

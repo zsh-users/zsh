@@ -1,5 +1,8 @@
 2008-09-14  Clint Adams  <clint@zsh.org>
 
+	* 25667: Src/Zle/complete.c: free mstr before returning from
+	errors.
+
 	* 25666: Src/Zle/computil.c: free memory allocated for an
 	xor if the argument number is invalid.
 
