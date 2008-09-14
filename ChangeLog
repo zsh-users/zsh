@@ -1,3 +1,8 @@
+2008-09-14  Clint Adams  <clint@zsh.org>
+
+	* 25666: Src/Zle/computil.c: free memory allocated for an
+	xor if the argument number is invalid.
+
 2008-09-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25662: Src/builtin.c, Test/B02typeset.ztst: declare -p

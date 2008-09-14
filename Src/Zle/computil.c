@@ -1549,6 +1549,8 @@ parse_cadef(char *nam, char **args)
 	    if (*p != ':') {
 		freecadef(all);
 		zwarnnam(nam, "invalid argument: %s", *args);
+		if (xor)
+		    free(xor);
 		return NULL;
 	    }
 	    if (*++p == ':') {
