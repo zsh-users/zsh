@@ -1,5 +1,8 @@
 2008-09-15  Peter Stephenson  <pws@csr.com>
 
+	* 25672: prompt.c: Resolve string containing only a Nularg
+	to empty string to avoid interpretation as glitch space.
+
 	* 25671: Src/builtin.c, Test/B02typeset.ztst: non-existent
 	variable in typeset -p should cause status 1.
 

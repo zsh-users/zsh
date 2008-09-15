@@ -169,6 +169,12 @@ promptexpand(char *s, int ns, char *rs, char *Rs, unsigned int *txtchangep)
 	s = dupstring(s);
 	if (!parsestr(s))
 	    singsub(&s);
+	/*
+	 * We don't need the special Nularg hack here and we're
+	 * going to be using Nularg for other things.
+	 */
+	if (*s == Nularg && s[1] == '\0')
+	    *s = '\0';
 
 	/* Ignore errors and status change in prompt substitution */
 	errflag = olderr;
