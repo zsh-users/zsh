@@ -2479,8 +2479,10 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	if (OPT_ISSET(ops,'p')) {
 	    if (hn)
 		printparamnode(hn, printflags);
-	    else
+	    else {
 		zwarnnam(name, "no such variable: %s", asg->name);
+		returnval = 1;
+	    }
 	    continue;
 	}
 	if (!typeset_single(name, asg->name, (Param)hn,

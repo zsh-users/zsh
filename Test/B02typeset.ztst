@@ -449,7 +449,7 @@
  array=(foo bar)
  fn() { typeset -p array nonexistent; }
  fn
-0:declare -p shouldn't create scoped values
+1:declare -p shouldn't create scoped values
 >typeset -a array
 >array=(foo bar)
 ?fn:typeset: no such variable: nonexistent
