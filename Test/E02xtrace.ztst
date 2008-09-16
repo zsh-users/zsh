@@ -90,3 +90,18 @@
 >Tracing: function
 ?+xtf:1> local regression_test_dummy_variable
 ?+xtf:2> print 'Tracing: function'
+
+ echo 'PS4="+%x:%I> "
+ fn() {
+   print This is fn.
+ }
+ :
+ fn
+ ' >fnfile
+ $ZTST_testdir/../Src/zsh -fx ./fnfile
+0:Trace output with sourcefile and line number.
+>This is fn.
+?+./fnfile:1> PS4='+%x:%I> ' 
+?+./fnfile:5> :
+?+./fnfile:6> fn
+?+./fnfile:3> print This is fn.

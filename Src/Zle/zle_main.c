@@ -1304,9 +1304,8 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	r = 1;
     } else {
 	Shfunc shf = (Shfunc) shfunctab->getnode(shfunctab, w->u.fnnam);
-	Eprog prog = (shf ? shf->funcdef : &dummy_eprog);
 
-	if(prog == &dummy_eprog) {
+	if (!shf) {
 	    /* the shell function doesn't exist */
 	    char *nm = nicedup(w->u.fnnam, 0);
 	    char *msg = tricat("No such shell function `", nm, "'");
@@ -1330,7 +1329,7 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	    makezleparams(0);
 	    sfcontext = SFC_WIDGET;
 	    opts[XTRACE] = 0;
-	    ret = doshfunc(w->u.fnnam, prog, largs, shf->node.flags, 1);
+	    ret = doshfunc(shf, largs, shf->node.flags, 1);
 	    opts[XTRACE] = oxt;
 	    sfcontext = osc;
 	    endparamscope();

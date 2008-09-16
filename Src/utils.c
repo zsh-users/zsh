@@ -35,6 +35,8 @@
 /**/
 mod_export char *scriptname;     /* is sometimes a function name */
 
+/* filename of script or other file containing code source e.g. autoload */
+
 /**/
 mod_export char *scriptfilename;
 
@@ -1134,7 +1136,7 @@ time_t lastwatch;
 mod_export int
 callhookfunc(char *name, LinkList lnklst, int arrayp, int *retval)
 {
-    Eprog prog;
+    Shfunc shfunc;
 	/*
 	 * Save stopmsg, since user doesn't get a chance to respond
 	 * to a list of jobs generated in a hook.
@@ -1143,8 +1145,8 @@ callhookfunc(char *name, LinkList lnklst, int arrayp, int *retval)
 
     sfcontext = SFC_HOOK;
 
-    if ((prog = getshfunc(name)) != &dummy_eprog) {
-	ret = doshfunc(name, prog, lnklst, 0, 1);
+    if ((shfunc = getshfunc(name))) {
+	ret = doshfunc(shfunc, lnklst, 0, 1);
 	stat = 0;
     }
 
@@ -1159,8 +1161,8 @@ callhookfunc(char *name, LinkList lnklst, int arrayp, int *retval)
 
 	if ((arrptr = getaparam(arrnam))) {
 	    for (; *arrptr; arrptr++) {
-		if ((prog = getshfunc(*arrptr)) != &dummy_eprog) {
-		    int newret = doshfunc(arrnam, prog, lnklst, 0, 1);
+		if ((shfunc = getshfunc(*arrptr))) {
+		    int newret = doshfunc(shfunc, lnklst, 0, 1);
 		    if (!ret)
 			ret = newret;
 		    stat = 0;
@@ -2893,15 +2895,10 @@ sepsplit(char *s, char *sep, int allownull, int heap)
 /* Get the definition of a shell function */
 
 /**/
-mod_export Eprog
+mod_export Shfunc
 getshfunc(char *nam)
 {
-    Shfunc shf;
-
-    if (!(shf = (Shfunc) shfunctab->getnode(shfunctab, nam)))
-	return &dummy_eprog;
-
-    return shf->funcdef;
+    return (Shfunc) shfunctab->getnode(shfunctab, nam);
 }
 
 /**/

@@ -868,11 +868,11 @@ callmathfunc(char *o)
 					   argc <= f->maxargs)) {
 		    if (f->flags & MFF_USERFUNC) {
 			char *shfnam = f->module ? f->module : n;
-			Eprog prog = getshfunc(shfnam);
-			if (prog == &dummy_eprog)
+			Shfunc shfunc = getshfunc(shfnam);
+			if (!shfunc)
 			    zerr("no such function: %s", shfnam);
 			else {
-			    doshfunc(n, prog, l, 0, 1);
+			    doshfunc(shfunc, l, 0, 1);
 			    return lastmathval;
 			}
 		    } else {

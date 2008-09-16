@@ -3635,12 +3635,12 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     }
     if (cc->func) {
 	/* This handles the compctl -K flag. */
-	Eprog prog;
+	Shfunc shfunc;
 	char **r;
 	int lv = lastval;
 	    
 	/* Get the function. */
-	if ((prog = getshfunc(cc->func)) != &dummy_eprog) {
+	if ((shfunc = getshfunc(cc->func))) {
 	    /* We have it, so build a argument list. */
 	    LinkList args = newlinklist();
 	    int osc = sfcontext;
@@ -3664,7 +3664,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 		incompctlfunc = 1;
 	    sfcontext = SFC_COMPLETE;
 	    /* Call the function. */
-	    doshfunc(cc->func, prog, args, 0, 1);
+	    doshfunc(shfunc, args, 0, 1);
 	    sfcontext = osc;
 	    incompctlfunc = 0;
 	    /* And get the result from the reply parameter. */
@@ -3809,12 +3809,12 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	/* generate the user-defined display list: if anything fails, *
 	 * we silently allow the normal completion list to be used.   */
 	char **yaptr = NULL, *uv = NULL;
-	Eprog prog;
+	Shfunc shfunc;
 
 	if (cc->ylist[0] == '$' || cc->ylist[0] == '(') {
 	    /* from variable */
 	    uv = cc->ylist + (cc->ylist[0] == '$');
-	} else if ((prog = getshfunc(cc->ylist)) != &dummy_eprog) {
+	} else if ((shfunc = getshfunc(cc->ylist))) {
 	    /* from function:  pass completions as arg list */
 	    LinkList args = newlinklist();
 	    LinkNode ln;
@@ -3839,7 +3839,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    if (incompfunc != 1)
 		incompctlfunc = 1;
 	    sfcontext = SFC_COMPLETE;
-	    doshfunc(cc->ylist, prog, args, 0, 1);
+	    doshfunc(shfunc, args, 0, 1);
 	    sfcontext = osc;
 	    incompctlfunc = 0;
 	    uv = "reply";

@@ -1358,9 +1358,9 @@ mod_export void
 iremovesuffix(ZLE_INT_T c, int keep)
 {
     if (suffixfunc) {
-	Eprog prog = getshfunc(suffixfunc);
+	Shfunc shfunc = getshfunc(suffixfunc);
 
-	if (prog != &dummy_eprog) {
+	if (shfunc) {
 	    LinkList args = newlinklist();
 	    char buf[20];
 	    int osc = sfcontext;
@@ -1384,7 +1384,7 @@ iremovesuffix(ZLE_INT_T c, int keep)
 	    startparamscope();
 	    makezleparams(0);
 	    sfcontext = SFC_COMPLETE;
-	    doshfunc(suffixfunc, prog, args, 0, 1);
+	    doshfunc(shfunc, args, 0, 1);
 	    sfcontext = osc;
 	    endparamscope();
 

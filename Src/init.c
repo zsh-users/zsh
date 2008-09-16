@@ -149,7 +149,7 @@ loop(int toplevel, int justonce)
 	    int toksav = tok;
 
 	    if (toplevel &&
-		(getshfunc("preexec") != &dummy_eprog ||
+		(getshfunc("preexec") ||
 		 paramtab->getnode(paramtab, "preexec_functions"))) {
 		LinkList args;
 		char *cmdstr;

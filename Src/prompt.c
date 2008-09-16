@@ -725,10 +725,36 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		if(Rstring)
 		    stradd(Rstring);
 		break;
+	    case 'I':
+		if (funcstack && funcstack->tp != FS_SOURCE) {
+		    /*
+		     * We're in a function or an eval with
+		     * EVALLINENO.  Calculate the line number in
+		     * the file.
+		     */
+		    zlong flineno = lineno + funcstack->flineno;
+		    /* take account of eval line nos. starting at 1 */
+		    if (funcstack->tp == FS_EVAL)
+			lineno--;
+		    addbufspc(DIGBUFSIZE);
+		    sprintf(bp, "%ld", (long)flineno);
+		    bp += strlen(bp);
+		    break;
+		}
+		/* else we're in a file and lineno is already correct */
+		/* FALLTHROUGH */
 	    case 'i':
 		addbufspc(DIGBUFSIZE);
 		sprintf(bp, "%ld", (long)lineno);
 		bp += strlen(bp);
+		break;
+	    case 'x':
+		if (funcstack && funcstack->tp != FS_SOURCE)
+		    promptpath(funcstack->filename ? funcstack->filename : "",
+			       arg, 0);
+		else
+		    promptpath(scriptfilename ? scriptfilename : argzero,
+			       arg, 0);
 		break;
 	    case '\0':
 		return 0;

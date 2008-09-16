@@ -113,6 +113,11 @@ The line number currently being executed in the script, sourced file, or
 shell function given by tt(%N).  This is most useful for debugging as part
 of tt($PS4).
 )
+item(tt(%I))(
+The line number currently being executed in the file tt(%x).  This is
+similar to tt(%i), but the line number is always a line number in the
+file where the code was defined, even if the code is a shell function.
+)
 item(tt(%j))(
 The number of jobs.
 )
@@ -125,6 +130,11 @@ currently executing, whichever was started most recently.  If there is
 none, this is equivalent to the parameter tt($0).  An integer may follow
 the `tt(%)' to specify a number of trailing path components to show; zero
 means the full path.  A negative integer specifies leading components.
+)
+item(tt(%x))(
+The name of the file containing the source code currently being
+executed.  This behaves as tt(%N) except that function and eval command
+names are not shown, instead the file where they were defined.
 )
 xitem(tt(%c))
 xitem(tt(%.))

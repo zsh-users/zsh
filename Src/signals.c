@@ -963,8 +963,7 @@ endtrapscope(void)
     }
 
     if (exittr) {
-	dotrapargs(SIGEXIT, &exittr, (exittr & ZSIG_FUNC) ?
-		   ((Shfunc)exitfn)->funcdef : (Eprog) exitfn);
+	dotrapargs(SIGEXIT, &exittr, exitfn);
 	if (exittr & ZSIG_FUNC)
 	    shfunctab->freenode((HashNode)exitfn);
 	else
@@ -1077,8 +1076,16 @@ int intrap;
 /**/
 int trapisfunc;
 
+/*
+ * sig is the signal number.
+ * *sigtr is the value to be taken as the field in sigtrapped (since
+ *   that may have changed by this point if we are exiting).
+ * sigfn is an Eprog with a non-function eval list, or a Shfunc
+ *   with a function trap.  It may be NULL with an ignored signal.
+ */
+
 /**/
-void
+static void
 dotrapargs(int sig, int *sigtr, void *sigfn)
 {
     LinkList args;
@@ -1153,7 +1160,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	trapisfunc = isfunc = 1;
 
 	sfcontext = SFC_SIGNAL;
-	doshfunc(name, sigfn, args, 0, 1);
+	doshfunc((Shfunc)sigfn, args, 0, 1);
 	sfcontext = osc;
 	freelinklist(args, (FreeFunc) NULL);
 	zsfree(name);
@@ -1162,7 +1169,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	trap_state = TRAP_STATE_PRIMED;
 	trapisfunc = isfunc = 0;
 
-	execode(sigfn, 1, 0);
+	execode((Eprog)sigfn, 1, 0);
     }
     runhookdef(AFTERTRAPHOOK, NULL);
 
@@ -1215,12 +1222,12 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 void
 dotrap(int sig)
 {
-    Eprog funcprog;
+    void *funcprog;
 
     if (sigtrapped[sig] & ZSIG_FUNC) {
 	HashNode hn = gettrapnode(sig, 0);
 	if (hn)
-	    funcprog = ((Shfunc)hn)->funcdef;
+	    funcprog = hn;
 	else {
 #ifdef DEBUG
 	    dputs("BUG: running function trap which has escaped.");
@@ -1230,7 +1237,11 @@ dotrap(int sig)
     } else
 	funcprog = siglists[sig];
 
-    /* Copied from dotrapargs(). */
+    /*
+     * Copied from dotrapargs().
+     * (In fact, the gain from duplicating this appears to be virtually
+     * zero.  Not sure why it's here.)
+     */
     if ((sigtrapped[sig] & ZSIG_IGNORED) || !funcprog || errflag)
 	return;
 

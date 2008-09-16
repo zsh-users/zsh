@@ -540,13 +540,13 @@ static int parwb, parwe, paroffs;
 static void
 callcompfunc(char *s, char *fn)
 {
-    Eprog prog;
+    Shfunc shfunc;
     int lv = lastval;
     char buf[20];
 
     METACHECK();
 
-    if ((prog = getshfunc(fn)) != &dummy_eprog) {
+    if ((shfunc = getshfunc(fn))) {
 	char **p, *tmp;
 	int aadd = 0, usea = 1, icf = incompfunc, osc = sfcontext;
 	unsigned int rset, kset;
@@ -814,7 +814,7 @@ callcompfunc(char *s, char *fn)
 		while (*p)
 		    addlinknode(largs, dupstring(*p++));
 	    }
-	    doshfunc(fn, prog, largs, 0, 0);
+	    doshfunc(shfunc, largs, 0, 0);
 	    cfret = lastval;
 	    lastval = olv;
 	} OLDHEAPS;

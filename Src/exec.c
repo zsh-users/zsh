@@ -518,7 +518,7 @@ commandnotfound(char *arg0, LinkList args)
 	return 127;
 
     pushnode(args, arg0);
-    return doshfunc(shf->node.nam, shf->funcdef, args, shf->node.flags, 1);
+    return doshfunc(shf, args, shf->node.flags, 1);
 }
 
 /* execute an external command */
@@ -4064,7 +4064,7 @@ execshfunc(Shfunc shf, LinkList args)
     cmdsp = 0;
     if ((osfc = sfcontext) == SFC_NONE)
 	sfcontext = SFC_DIRECT;
-    doshfunc(shf->node.nam, shf->funcdef, args, shf->node.flags, 0);
+    doshfunc(shf, args, shf->node.flags, 0);
     sfcontext = osfc;
     free(cmdstack);
     cmdstack = ocs;
@@ -4200,18 +4200,20 @@ loadautofn(Shfunc shf, int fksh, int autol)
 
 /**/
 mod_export int
-doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
+doshfunc(Shfunc shfunc, LinkList doshargs, int flags, int noreturnval)
 {
     char **tab, **x, *oargv0;
     int oldzoptind, oldlastval, oldoptcind, oldnumpipestats, ret;
     int *oldpipestats = NULL;
-    char saveopts[OPT_SIZE], *oldscriptname = scriptname, *fname = dupstring(name);
+    char saveopts[OPT_SIZE], *oldscriptname = scriptname;
+    char *name = shfunc->node.nam;
+    char *fname = dupstring(name);
     int obreaks, saveemulation ;
+    Eprog prog;
     struct funcstack fstack;
 #ifdef MAX_FUNCTION_DEPTH
     static int funcdepth;
 #endif
-    Shfunc shf;
 
     pushheap();
 
@@ -4291,14 +4293,10 @@ doshfunc(char *name, Eprog prog, LinkList doshargs, int flags, int noreturnval)
     fstack.tp = FS_FUNC;
     funcstack = &fstack;
 
-    if ((shf = (Shfunc) shfunctab->getnode(shfunctab, name))) {
-	fstack.flineno = shf->lineno;
-	fstack.filename = dupstring(shf->filename);
-    } else {
-	fstack.flineno = 0;
-	fstack.filename = dupstring(fstack.caller);
-    }
+    fstack.flineno = shfunc->lineno;
+    fstack.filename = dupstring(shfunc->filename);
 
+    prog = shfunc->funcdef;
     if (prog->flags & EF_RUN) {
 	Shfunc shf;
 

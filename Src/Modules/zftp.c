@@ -1469,9 +1469,9 @@ zfsenddata(char *name, int recv, int progress, off_t startat)
     char lsbuf[ZF_BUFSIZE], *ascbuf = NULL, *optr;
     off_t sofar = 0, last_sofar = 0;
     readwrite_t read_ptr = zfread, write_ptr = zfwrite;
-    Eprog prog;
+    Shfunc shfunc;
 
-    if (progress && (prog = getshfunc("zftp_progress")) != &dummy_eprog) {
+    if (progress && (shfunc = getshfunc("zftp_progress"))) {
 	/*
 	 * progress to set up:  ZFTP_COUNT is zero.
 	 * We do this here in case we needed to wait for a RETR
@@ -1480,7 +1480,7 @@ zfsenddata(char *name, int recv, int progress, off_t startat)
 	int osc = sfcontext;
 
 	sfcontext = SFC_HOOK;
-	doshfunc("zftp_progress", prog, NULL, 0, 1);
+	doshfunc(shfunc, NULL, 0, 1);
 	sfcontext = osc;
 	/* Now add in the bit of the file we've got/sent already */
 	sofar = last_sofar = startat;
@@ -1608,12 +1608,12 @@ zfsenddata(char *name, int recv, int progress, off_t startat)
 	} else
 	    break;
 	if (!ret && sofar != last_sofar && progress &&
-	    (prog = getshfunc("zftp_progress")) != &dummy_eprog) {
+	    (shfunc = getshfunc("zftp_progress"))) {
 	    int osc = sfcontext;
 
 	    zfsetparam("ZFTP_COUNT", &sofar, ZFPM_READONLY|ZFPM_INTEGER);
 	    sfcontext = SFC_HOOK;
-	    doshfunc("zftp_progress", prog, NULL, 0, 1);
+	    doshfunc(shfunc, NULL, 0, 1);
 	    sfcontext = osc;
 	    last_sofar = sofar;
 	}
@@ -2364,7 +2364,7 @@ zfgetcwd(void)
 {
     char *ptr, *eptr;
     int endc;
-    Eprog prog;
+    Shfunc shfunc;
 
     if (zfprefs & ZFPF_DUMB)
 	return 1;
@@ -2391,11 +2391,11 @@ zfgetcwd(void)
      * front end.  By putting it here, and in close when ZFTP_PWD is unset,
      * we at least cover the bases.
      */
-    if ((prog = getshfunc("zftp_chpwd")) != &dummy_eprog) {
+    if ((shfunc = getshfunc("zftp_chpwd"))) {
 	int osc = sfcontext;
 
 	sfcontext = SFC_HOOK;
-	doshfunc("zftp_chpwd", prog, NULL, 0, 1);
+	doshfunc(shfunc, NULL, 0, 1);
 	sfcontext = osc;
     }
     return 0;
@@ -2549,7 +2549,7 @@ zftp_getput(char *name, char **args, int flags)
 {
     int ret = 0, recv = (flags & ZFTP_RECV), getsize = 0, progress = 1;
     char *cmd = recv ? "RETR " : (flags & ZFTP_APPE) ? "APPE " : "STOR ";
-    Eprog prog;
+    Shfunc shfunc;
 
     /*
      * At this point I'd like to set progress to 0 if we're
@@ -2567,7 +2567,7 @@ zftp_getput(char *name, char **args, int flags)
     for (; *args; args++) {
 	char *ln, *rest = NULL;
 	off_t startat = 0;
-	if (progress && (prog = getshfunc("zftp_progress")) != &dummy_eprog) {
+	if (progress && (shfunc = getshfunc("zftp_progress"))) {
 	    off_t sz = -1;
 	    /*
 	     * This calls the SIZE command to get the size for remote
@@ -2608,14 +2608,14 @@ zftp_getput(char *name, char **args, int flags)
 	 * if and only if we called zfsenddata();
 	 */
 	if (progress && ret != 2 &&
-	    (prog = getshfunc("zftp_progress")) != &dummy_eprog) {
+	    (shfunc = getshfunc("zftp_progress"))) {
 	    /* progress to finish: ZFTP_TRANSFER set to GF or PF */
 	    int osc = sfcontext;
 
 	    zfsetparam("ZFTP_TRANSFER", ztrdup(recv ? "GF" : "PF"),
 		       ZFPM_READONLY);
 	    sfcontext = SFC_HOOK;
-	    doshfunc("zftp_progress", prog, NULL, 0, 1);
+	    doshfunc(shfunc, NULL, 0, 1);
 	    sfcontext = osc;
 	}
 	if (rest) {
@@ -2715,7 +2715,7 @@ static void
 zfclose(int leaveparams)
 {
     char **aptr;
-    Eprog prog;
+    Shfunc shfunc;
 
     if (!zfsess->control)
 	return;
@@ -2766,11 +2766,11 @@ zfclose(int leaveparams)
 	    zfunsetparam(*aptr);
 
 	/* Now ZFTP_PWD is unset.  It's up to zftp_chpwd to notice. */
-	if ((prog = getshfunc("zftp_chpwd")) != &dummy_eprog) {
+	if ((shfunc = getshfunc("zftp_chpwd"))) {
 	    int osc = sfcontext;
 
 	    sfcontext = SFC_HOOK;
-	    doshfunc("zftp_chpwd", prog, NULL, 0, 1);
+	    doshfunc(shfunc, NULL, 0, 1);
 	    sfcontext = osc;
 	}
     }
