@@ -1,5 +1,8 @@
 2008-09-18  Peter Stephenson  <pws@csr.com>
 
+	* 25684: Src/prompt.c: respect trap line number rules in
+	%x, %I prompt escapes.
+
 	* users/13239: Doc/Zsh/mod_mapfile.yo: more useful comments.
 
 	* 25682: Src/hist.c: terminate history line string before passing
