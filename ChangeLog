@@ -1,3 +1,8 @@
+2008-09-18  Peter Stephenson  <pws@csr.com>
+
+	* 25682: Src/hist.c: terminate history line string before passing
+	down to zshaddhistory hook.
+
 2008-09-16  Peter Stephenson  <pws@csr.com>
 
 	* 25677: Doc/Zsh/prompt.yo, Src/exec.c, Src/init.c, Src/math.c,
