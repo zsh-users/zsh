@@ -1,5 +1,7 @@
 2008-09-18  Peter Stephenson  <pws@csr.com>
 
+	* users/13239: Doc/Zsh/mod_mapfile.yo: more useful comments.
+
 	* 25682: Src/hist.c: terminate history line string before passing
 	down to zshaddhistory hook.
 

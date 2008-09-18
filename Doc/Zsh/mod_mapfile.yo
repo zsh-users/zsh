@@ -25,15 +25,18 @@ every file in the current directory without the usual `tt(rm *)' test.
 
 The parameter tt(mapfile) may be made read-only; in that case, files
 referenced may not be written or deleted.
+
+A file may conveniently be read into an array as one line per element
+with the form `var(array)tt(=LPAR()${(f)mapfile[)var(filename)tt(]RPAR())'.
 )
 enditem()
 
 subsect(Limitations)
 
 Although reading and writing of the file in question is efficiently
-handled, zsh's internal memory management may be arbitrarily baroque.  Thus
-it should not automatically be assumed that use of tt(mapfile) represents a
-gain in efficiency over use of other mechanisms.  Note in particular that
+handled, zsh's internal memory management may be arbitrarily baroque;
+however, tt(mapfile) is usually very much more efficient than
+anything involving a loop.  Note in particular that
 the whole contents of the file will always reside physically in memory when
 accessed (possibly multiple times, due to standard parameter substitution
 operations).  In particular, this means handling of sufficiently long files
