@@ -599,7 +599,7 @@ insertlastword(char **args)
 
     static char *lastinsert;
     static int lasthist, lastpos, lastlen;
-    int evhist, save;
+    int evhist;
 
     /*
      * If we have at least one argument, the first is the history
@@ -722,10 +722,9 @@ insertlastword(char **args)
 	t = he->node.nam + he->words[2*n-1];
     }
 
-    save = *t;
-    *t = '\0';			/* ignore trailing whitespace */
     lasthist = evhist;
     lastpos = zlemetacs;
+    /* ignore trailing whitespace */
     lastlen = t - s;
     lastinsert = zalloc(t - s);
     memcpy(lastinsert, s, lastlen);
@@ -734,11 +733,10 @@ insertlastword(char **args)
 
     unmetafy_line();
 
-    zs = stringaszleline(s, 0, &len, NULL, NULL);
+    zs = stringaszleline(dupstrpfx(s, t - s), 0, &len, NULL, NULL);
     doinsert(zs, len);
     free(zs);
     zmult = n;
-    *t = save;
     return 0;
 }
 
