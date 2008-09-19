@@ -24,6 +24,8 @@ Matthias Kopferman, Mikael Magnusson, Dan Nelson, Phil Pennock, Toby
 Peterson, R. Ramkumar, Bart Schaefer, Joerg Sonnenberger, Peter Stephenson,
 Takimoto Jun, River Tarnell, Philippe Troin, Geoff Wing, Matt Wozniski.
 
+The VCS_Info function system was written by Frank Terbeck.
+
 Contributors to completion functions include those above plus Zack Cerza,
 Danek Duvall, Tobias Gruetzmacher, Dough Kearns, Hannu Koivisto, Henryk
 Konsek, Scott Murray, Tomasz Pala, Carlos Phillips, Haakon Riiser, Felix

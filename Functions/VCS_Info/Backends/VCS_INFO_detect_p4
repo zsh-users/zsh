@@ -1,0 +1,9 @@
+## vim:ft=zsh
+## perforce support by: Phil Pennock
+## Distributed under the same BSD-ish license as zsh itself.
+
+[[ -n ${P4CONFIG} ]] || return 1
+VCS_INFO_check_com p4 || return 1
+vcs_comm[detect_need_file]="${P4CONFIG}"
+VCS_INFO_bydir_detect .
+return $?

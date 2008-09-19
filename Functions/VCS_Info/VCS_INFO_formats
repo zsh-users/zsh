@@ -1,0 +1,23 @@
+## vim:ft=zsh
+## Written by Frank Terbeck <ft@bewatermyfriend.org>
+## Distributed under the same BSD-ish license as zsh itself.
+
+setopt localoptions noksharrays NO_shwordsplit
+local action=$1 branch=$2 base=$3
+local msg
+local -i i j
+
+if [[ -n ${action} ]] ; then
+    zstyle -a ":vcs_info:${vcs}:${usercontext}:${rrn}" actionformats msgs
+    (( ${#msgs} < 1 )) && msgs[1]=' (%s)-[%b|%a]-'
+else
+    zstyle -a ":vcs_info:${vcs}:${usercontext}:${rrn}" formats msgs
+    (( ${#msgs} < 1 )) && msgs[1]=' (%s)-[%b]-'
+fi
+
+(( ${#msgs} > maxexports )) && msgs[$(( maxexports + 1 )),-1]=()
+for i in {1..${#msgs}} ; do
+    zformat -f msg ${msgs[$i]} a:${action} b:${branch} s:${vcs} r:${base:t} R:${base} S:"$(VCS_INFO_reposub ${base})"
+    msgs[$i]=${msg}
+done
+return 0

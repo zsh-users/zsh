@@ -1,0 +1,14 @@
+## vim:ft=zsh
+## perforce support by: Phil Pennock
+## Distributed under the same BSD-ish license as zsh itself.
+
+# XXX: This soooo needs to be cached
+setopt localoptions extendedglob
+local p4base a b
+local -A p4info
+
+p4 info | while IFS=: read a b; do p4info[${a// /_}]="${b## #}"; done
+p4base=${vcs_comm[basedir]}
+
+# We'll use the client name as the branch; close enough
+VCS_INFO_formats '' "${p4info[Client_name]}" "${p4base}"

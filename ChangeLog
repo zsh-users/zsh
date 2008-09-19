@@ -1,5 +1,9 @@
 2008-09-19  Peter Stephenson  <pws@csr.com>
 
+	* users/13252 and others: Frank Terbeck (plus doc tweaks):
+	Functions/VCS_Info/**/*, Doc/Zsh/contrib.yo, Src/zsh.mdd:
+	add VCS_Info function system.
+
 	* Unposted, but see users/13251: Doc/Zsh/mod_mapfile.yo: update
 	users/13239.
 

@@ -1,0 +1,13 @@
+## vim:ft=zsh
+## Written by Frank Terbeck <ft@bewatermyfriend.org>
+## Distributed under the same BSD-ish license as zsh itself.
+
+setopt localoptions extendedglob NO_shwordsplit
+local base=${1%%/##}
+
+[[ ${PWD} == ${base}/* ]] || {
+    printf '.'
+    return 1
+}
+printf '%s' ${PWD#$base/}
+return 0

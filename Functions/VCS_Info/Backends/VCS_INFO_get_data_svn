@@ -1,0 +1,28 @@
+## vim:ft=zsh
+## subversion support by:
+##  + Frank Terbeck <ft@bewatermyfriend.org>
+##  + Phil Pennock
+## Distributed under the same BSD-ish license as zsh itself.
+
+setopt localoptions noksharrays extendedglob NO_shwordsplit
+local svnbase svnbranch a b rrn
+local -A svninfo parentinfo
+
+svnbase=".";
+svninfo=()
+svn info --non-interactive | while IFS=: read a b; do svninfo[${a// /_}]="${b## #}"; done
+while [[ -d "${svnbase}/../.svn" ]]; do
+    parentinfo=()
+    svn info --non-interactive "${svnbase}/.." | while IFS=: read a b; do parentinfo[${a// /_}]="${b## #}"; done
+    [[ ${parentinfo[Repository_UUID]} != ${svninfo[Repository_UUID]} ]] && break
+    svninfo=(${(kv)parentinfo})
+    svnbase="${svnbase}/.."
+done
+
+svnbase="$(VCS_INFO_realpath ${svnbase})"
+
+rrn=${svnbase:t}
+zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat svnbranch || svnbranch="%b:%r"
+zformat -f svnbranch "${svnbranch}" "b:${svninfo[URL]##*/}" "r:${svninfo[Revision]}"
+VCS_INFO_formats '' "${svnbranch}" "${svnbase}"
+return 0

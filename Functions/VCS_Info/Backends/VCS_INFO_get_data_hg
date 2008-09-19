@@ -1,0 +1,12 @@
+## vim:ft=zsh
+## mercurial support by: Frank Terbeck <ft@bewatermyfriend.org>
+## Distributed under the same BSD-ish license as zsh itself.
+
+setopt localoptions NO_shwordsplit
+local hgbranch hgbase
+
+hgbase=${vcs_comm[basedir]}
+rrn=${hgbase:t}
+hgbranch=$(< ${hgbase}/.hg/branch)
+VCS_INFO_formats '' "${hgbranch}" "${hgbase}"
+return 0

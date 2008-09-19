@@ -1,0 +1,16 @@
+## vim:ft=zsh
+## Written by Frank Terbeck <ft@bewatermyfriend.org>
+## Distributed under the same BSD-ish license as zsh itself.
+
+# a portable 'readlink -f'
+# forcing a subshell, to ensure chpwd() is not removed
+# from the calling shell (if VCS_INFO_realpath() is called
+# manually).
+
+setopt localoptions NO_shwordsplit
+
+(
+    (( ${+functions[chpwd]} )) && unfunction chpwd
+    setopt chaselinks
+    cd $1 2>/dev/null && pwd
+)

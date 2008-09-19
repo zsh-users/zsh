@@ -1,0 +1,26 @@
+## vim:ft=zsh
+## bazaar support by: Frank Terbeck <ft@bewatermyfriend.org>
+## Distributed under the same BSD-ish license as zsh itself.
+
+setopt localoptions noksharrays extendedglob NO_shwordsplit
+local bzrbase bzrbr
+local -a bzrinfo
+
+if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" "use-simple" ; then
+    bzrbase=${vcs_comm[basedir]}
+    bzrinfo[2]=${bzrbase:t}
+    if [[ -f ${bzrbase}/.bzr/branch/last-revision ]] ; then
+        bzrinfo[1]=$(< ${bzrbase}/.bzr/branch/last-revision)
+        bzrinfo[1]=${${bzrinfo[1]}%% *}
+    fi
+else
+    bzrbase=${${(M)${(f)"$( bzr info )"}:# ##branch\ root:*}/*: ##/}
+    bzrinfo=( ${${${(M)${(f)"$( bzr version-info )"}:#(#s)(revno|branch-nick)*}/*: /}/*\//} )
+    bzrbase="$(VCS_INFO_realpath ${bzrbase})"
+fi
+
+rrn=${bzrbase:t}
+zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat bzrbr || bzrbr="%b:%r"
+zformat -f bzrbr "${bzrbr}" "b:${bzrinfo[2]}" "r:${bzrinfo[1]}"
+VCS_INFO_formats '' "${bzrbr}" "${bzrbase}"
+return 0

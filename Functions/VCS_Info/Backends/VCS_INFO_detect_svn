@@ -1,0 +1,11 @@
+## vim:ft=zsh
+## subversion support by: Frank Terbeck <ft@bewatermyfriend.org>
+## Distributed under the same BSD-ish license as zsh itself.
+
+setopt localoptions NO_shwordsplit
+
+[[ $1 == '--flavours' ]] && return 1
+
+VCS_INFO_check_com svn || return 1
+[[ -d ".svn" ]] && return 0
+return 1

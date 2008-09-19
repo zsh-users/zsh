@@ -1,0 +1,8 @@
+## vim:ft=zsh
+## Written by Frank Terbeck <ft@bewatermyfriend.org>
+## Distributed under the same BSD-ish license as zsh itself.
+
+setopt localoptions NO_shwordsplit
+
+(( ${+commands[$1]} )) && [[ -x ${commands[$1]} ]] && return 0
+return 1

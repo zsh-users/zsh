@@ -11,6 +11,7 @@ such as shell functions, look for comments in the function source files.
 
 startmenu()
 menu(Utilities)
+menu(Version Control Information)
 menu(Prompt Themes)
 menu(ZLE Functions)
 menu(Exception Handling)
@@ -20,7 +21,7 @@ menu(User Configuration Functions)
 menu(Other Functions)
 endmenu()
 
-texinode(Utilities)(Prompt Themes)()(User Contributions)
+texinode(Utilities)(Version Control Information)()(User Contributions)
 sect(Utilities)
 
 subsect(Accessing On-Line Help)
@@ -316,7 +317,338 @@ functions to be executed.
 )
 enditem()
 
-texinode(Prompt Themes)(ZLE Functions)(Utilities)(User Contributions)
+texinode(Version Control Information)(Prompt Themes)(Utilities)(User Contributions)
+sect(Gathering information from version control systems)
+cindex(version control utility)
+
+In a lot of cases, it is nice to automatically retrieve information from
+version control systems (VCSs), such as subversion, CVS or git, to be able
+to provide it to the user; possibly in the user's prompt. So that you can
+instantly tell on which branch you are currently on,  for example.
+
+In order to do that, you may use the tt(vcs_info) function.
+
+The following VCSs are supported:
+startsitem()
+sitem(tt(bazaar))(http://bazaar-vcs.org/)
+sitem(tt(codeville))(http://codeville.org/)
+sitem(tt(cvs))(http://www.nongnu.org/cvs/)
+sitem(tt(darcs))(http://darcs.net/)
+sitem(tt(git))(http://git.or.cz/)
+sitem(tt(gnu arch))(http://www.gnu.org/software/gnu-arch/)
+sitem(tt(mercurial))(http://selenic.com/mercurial/)
+sitem(tt(monotone))(http://monotone.ca/)
+sitem(tt(perforce))(http://www.perforce.com/)
+sitem(tt(subversion))(http://subversion.tigris.org/)
+sitem(tt(svk))(http://svk.bestpractical.com/)
+endsitem()
+
+To load var(vcs_info):
+
+example(autoload -Uz vcs_info && vcs_info)
+
+If you plan to use the information from var(vcs_info) in your prompt (which
+is its primary use), you need to enable the tt(PROMPT_SUBST) option.
+
+It can be used in any existing prompt, because it does not require any
+tt($psvar) entries to be left available.
+
+subsect(Quickstart)
+
+To get this feature working quickly (including colors), you can do the
+following (assuming, you loaded var(vcs_info) properly - see above):
+
+example(zstyle ':vcs_info:*' actionformats \ 
+    '%F{5}(%f%s%F{5})%F{3}-%F{5}[%F{2}%b%F{3}|%F{1}%a%F{5}]%f '
+zstyle ':vcs_info:*' formats       \ 
+    '%F{5}(%f%s%F{5})%F{3}-%F{5}[%F{2}%b%F{5}]%f '
+zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
+precmd () { vcs_info }
+PS1='%F{5}[%F{2}%n%F{5}] %F{3}%3~ ${vcs_info_msg_0_}'"%f%# ')
+
+Obviously, the last two lines are there for demonstration: You need to
+call var(vcs_info) from your var(precmd) function. Once that is done you need
+a tt(single quoted) var('${vcs_info_msg_0_}') in your prompt.
+
+Now call the tt(vcs_info_printsys) utility from the command line:
+
+example(% vcs_info_printsys
+## list of supported version control backends:
+## disabled systems are prefixed by a hash sign (#)
+bzr
+cdv
+cvs
+darcs
+git
+hg
+mtn
+p4
+svk
+svn
+tla
+## flavours (cannot be used in the enable or disable styles; they
+## are enabled and disabled with their master [git-svn -> git])
+## they *can* be used contexts: ':vcs_info:git-svn:*'.
+git-p4
+git-svn)
+
+You may not want all of these because there is no point in running the
+code to detect systems you do not use.  So there is a way to disable
+some backends altogether:
+
+example(zstyle ':vcs_info:*' disable bzr cdv darcs mtn svk tla)
+
+You may also pick a few from that list and enable only those:
+
+example(zstyle ':vcs_info:*' enable git cvs svn)
+
+If you rerun tt(vcs_info_printsys) after one of these commands, you will
+see the backends listed in the var(disable) style (or backends not in the
+var(enable) style - if you used that) marked as disabled by a hash sign.
+That means the detection of these systems is skipped tt(completely). No
+wasted time there.
+
+subsect(Configuration)
+
+The var(vcs_info) feature can be configured via var(zstyle).
+
+First, the context in which we are working:
+example(:vcs_info:<vcs-string>:<user-context>:<repo-root-name>)
+
+startitem()
+item(tt(<vcs-string>))(
+is one of: git, git-svn, git-p4, hg, darcs, bzr,
+cdv, mtn, svn, cvs, svk, tla or p4.
+)
+item(tt(<user-context>))(
+is a freely configurable string, assignable by
+the user as the first argument to var(vcs_info) (see its description
+below).
+)
+item(tt(<repo-root-name>))(
+is the name of a repository in which you want a
+style to match. So, if you want a setting specific to var(/usr/src/zsh),
+with that being a cvs checkout, you can set tt(<repo-root-name>) to
+var(zsh) to make it so.
+)
+enditem()
+
+There are three special values for tt(<vcs-string>): The first is named
+var(-init-), that is in effect as long as there was no decision what vcs
+backend to use. The second is var(-preinit-); it is used tt(before)
+var(vcs_info) is run, when initializing the data exporting variables. The
+third special value is var(formats) and is used by the tt(vcs_info_lastmsg)
+for looking up its styles.
+
+The initial value of tt(<repo-root-name>) is var(-all-) and it is replaced
+with the actual name, as soon as it is known. Only use this part of the
+context for defining the var(formats), var(actionformats) or
+var(branchformat) styles. As it is guaranteed that tt(<repo-root-name>) is
+set up correctly for these only. For all other styles, just use tt('*')
+instead.
+
+There are two pre-defined values for tt(<user-context>):
+startsitem()
+sitem(tt(default))(the one used if none is specified)
+sitem(tt(command))(used by vcs_info_lastmsg to lookup its styles)
+endsitem()
+
+You can of course use tt(':vcs_info:*') to match all VCSs in all
+user-contexts at once.
+
+This is a description of all styles that are looked up.
+
+startitem()
+kindex(formats)
+item(tt(formats))(
+A list of formats, used when actionformats is not used
+(which is most of the time).
+)
+kindex(actionformats)
+item(tt(actionformats))(
+A list of formats, used if a there is a special
+action going on in your current repository; (like an interactive rebase or
+a merge conflict).
+)
+kindex(branchformat)
+item(tt(branchformat))(
+Some backends replace var(%b) in the formats and
+actionformats styles above, not only by a branch name but also by a
+revision number. This style let's you modify how that string should look
+like.
+)
+kindex(nvcsformats)
+item(tt(nvcsformats))(
+These "formats" are exported, when we didn't detect
+a version control system for the current directory. This is useful, if you
+want var(vcs_info) to completely take over the generation of your prompt.
+You would do something like tt(PS1='${vcs_info_msg_0_}') to accomplish
+that.
+)
+kindex(max-exports)
+item(tt(max-exports))(
+Defines the maximum number if
+var(vcs_info_msg_*_) variables var(vcs_info) will export.
+)
+kindex(enable)
+item(tt(enable))(
+A list of backends you want to use. Checked in the
+var(-init-) context. If this list contains an item called tt(NONE) no
+backend is used at all and var(vcs_info) will do nothing. If this list
+contains tt(ALL) var(vcs_info) will use all backends known to it. Only with
+tt(ALL) in tt(enable), the tt(disable) style has any effect. tt(ALL) and
+tt(NONE) are actually tested case insensitively.)
+sitem(tt(disable))(A list of VCSs, you don't want var(vcs_info) to test for
+repositories (checked in the var(-init-) context, too). Only used if
+tt(enable) contains tt(ALL).
+)
+kindex(use-simple)
+item(tt(use-simple))(
+If there are two different ways of gathering
+information, you can select the simpler one by setting this style to true;
+the default is to use the not-that-simple code, which is potentially a lot
+slower but might be more accurate in all possible cases. This style is only
+used by the tt(bzr) backend.
+)
+kindex(use-prompt-escapes)
+item(tt(use-prompt-escapes))(
+Determines if we assume that the assembled
+string from var(vcs_info) includes prompt escapes. (Used by
+tt(vcs_info_lastmsg).)
+)
+enditem()
+
+The default values for these styles in all contexts are:
+
+startsitem()
+sitem(tt(formats))(" (%s)-[%b|%a]-")
+sitem(tt(actionformats))(" (%s)-[%b]-")
+sitem(tt(branchformat))("%b:%r" (for bzr, svn and svk))
+sitem(tt(nvcsformats))("")
+sitem(tt(max-exports))(2)
+sitem(tt(enable))(ALL)
+sitem(tt(disable))((empty list))
+sitem(tt(use-simple))(false)
+sitem(tt(use-prompt-escapes))(true)
+endsitem()
+
+In normal tt(formats) and tt(actionformats), the following replacements are
+done:
+
+startsitem()
+sitem(tt(%s))(The vcs in use (git, hg, svn etc.))
+sitem(tt(%b))(Information about the current branch.)
+sitem(tt(%a))(An identifier, that describes the action. Only makes sense in
+actionformats.)
+sitem(tt(%R))(base directory of the repository.)
+sitem(tt(%r))(repository name. If tt(%R) is var(/foo/bar/repoXY), tt(%r) is
+var(repoXY).)
+sitem(tt(%S))(subdirectory within a repository. If tt($PWD) is
+var(/foo/bar/reposXY/beer/tasty), tt(%S) is var(beer/tasty).)
+endsitem()
+
+In tt(branchformat) these replacements are done:
+
+startsitem()
+sitem(tt(%b))(the branch name)
+sitem(tt(%r))(the current revision number)
+endsitem()
+
+Not all vcs backends have to support all replacements. For tt(nvcsformats)
+no replacements are performed at all. It is just a string.
+
+subsect(Oddities)
+
+If you want to use the tt(%b) (bold off) prompt expansion in var(formats),
+which expands tt(%b) itself, use tt(%%b). That will cause the var(vcs_info)
+expansion to replace tt(%%b) with tt(%b). So zsh's prompt expansion
+mechanism can handle it. Similarly, to hand down tt(%b) from
+var(branchformat), use tt(%%%%b). Sorry for this inconvenience, but it
+cannot be easily avoided. Luckily we do not clash with a lot of prompt
+expansions and this only needs to be done for those.
+
+
+subsect(Function descriptions (public API))
+
+startitem()
+findex(vcs_info)
+item(tt(vcs_info) [var(user-context)])(
+The main function, that runs all
+backends and assembles all data into var(${vcs_info_msg_*_}). This is the
+function you want to call from tt(precmd) if you want to include up-to-date
+information in your prompt (see Variable description below). If an argument
+is given, that string will be used instead of tt(default) in the
+user-context field of the style context.)
+sitem(tt(vcs_info_lastmsg))(Outputs the last var(${vcs_info_msg_*_}) value.
+Takes into account the value of the use-prompt-escapes style in
+var(':vcs_info:formats:command:-all-'). It also only prints tt(max-exports)
+values.
+)
+findex(vcs_info_printsys)
+item(tt(vcs_info_printsys) [var(user-context)])(
+Prints a list of all
+supported version control systems. Useful to find out possible contexts
+(and which of them are enabled) or values for the var(disable) style.)
+sitem(tt(vcs_info_setsys))(Initializes var(vcs_info)'s internal list of
+available backends. With this function, you can add support for new VCSs
+without restarting the shell.
+)
+enditem()
+
+All functions named VCS_INFO_* are for internal use only.
+
+subsect(Variable description)
+
+startitem()
+item(tt(${vcs_info_msg_N_}) (Note the trailing underscore))
+(
+Where var(N) is an integer, eg: var(vcs_info_msg_0_) These variables
+are the storage for the informational message the last var(vcs_info) call
+has assembled. These are strongly connected to the formats,
+tt(actionformats) and tt(nvcsformats) styles described above. Those styles
+are lists. The first member of that list gets expanded into
+var(${vcs_info_msg_0_}), the second into var(${vcs_info_msg_1_})
+and the Nth into var(${vcs_info_msg_N-1_}). These parameters are
+exported into the environment. (See the tt(max-exports) style above.)
+)
+enditem()
+
+All variables named VCS_INFO_* are for internal use only.
+
+subsect(Examples)
+
+Don't use tt(vcs_info) at all (even though it's in your prompt):
+example(zstyle ':vcs_info:*' enable NONE)
+
+Disable the backends for tt(bzr) and tt(svk):
+example(zstyle ':vcs_info:*' disable bzr svk)
+
+Disable everything em(but) tt(bzr) and tt(svk):
+example(zstyle ':vcs_info:*' enable bzr svk)
+
+Provide a special formats for tt(git):
+example(zstyle ':vcs_info:git:*' formats       ' GIT, BABY! [%b]'
+zstyle ':vcs_info:git:*' actionformats ' GIT ACTION! [%b|%a]')
+
+Use the quicker tt(bzr) backend
+example(zstyle ':vcs_info:bzr:*' use-simple true)
+
+If you do use tt(use-simple), please report if it does `the-right-thing[tm]'.
+
+Display the revision number in yellow for tt(bzr) and tt(svn):
+example(zstyle ':vcs_info:(svn|bzr):*' branchformat '%b%{'${fg[yellow]}'%}:%r')
+
+If you want colors, make sure you enclose the color codes in tt(%{...%}),
+if you want to use the string provided by tt(vcs_info) in prompts.
+
+Here is how to print the vcs infomation as a command (not in a prompt):
+example(alias vcsi='vcs_info command; vcs_info_lastmsg')
+
+This way, you can even define different formats for output via
+tt(vcs_info_lastmsg) in the ':vcs_info:formats:command:*' namespace.
+
+
+texinode(Prompt Themes)(ZLE Functions)(Version Control Information)(User Contributions)
 sect(Prompt Themes)
 
 subsect(Installation)

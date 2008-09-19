@@ -1,0 +1,104 @@
+## vim:ft=zsh
+## git support by: Frank Terbeck <ft@bewatermyfriend.org>
+## Distributed under the same BSD-ish license as zsh itself.
+
+setopt localoptions extendedglob NO_shwordsplit
+local gitdir gitbase gitbranch gitaction
+
+VCS_INFO_git_getaction () {
+    local gitaction='' gitdir=$1
+    local tmp
+
+    for tmp in "${gitdir}/rebase-apply" \
+               "${gitdir}/rebase"       \
+               "${gitdir}/../.dotest" ; do
+        if [[ -d ${tmp} ]] ; then
+            if   [[ -f "${tmp}/rebasing" ]] ; then
+                gitaction="rebase"
+            elif [[ -f "${tmp}/applying" ]] ; then
+                gitaction="am"
+            else
+                gitaction="am/rebase"
+            fi
+            printf '%s' ${gitaction}
+            return 0
+        fi
+    done
+
+    for tmp in "${gitdir}/rebase-merge/interactive" \
+               "${gitdir}/.dotest-merge/interactive" ; do
+        if [[ -f "${tmp}" ]] ; then
+            printf '%s' "rebase-i"
+            return 0
+        fi
+    done
+
+    for tmp in "${gitdir}/rebase-merge" \
+               "${gitdir}/.dotest-merge" ; do
+        if [[ -d "${tmp}" ]] ; then
+            printf '%s' "rebase-m"
+            return 0
+        fi
+    done
+
+    if [[ -f "${gitdir}/MERGE_HEAD" ]] ; then
+        printf '%s' "merge"
+        return 0
+    fi
+
+    if [[ -f "${gitdir}/BISECT_LOG" ]] ; then
+        printf '%s' "bisect"
+        return 0
+    fi
+    return 1
+}
+
+VCS_INFO_git_getbranch () {
+    local gitbranch gitdir=$1
+    local gitsymref='git symbolic-ref HEAD'
+
+    if    [[ -d "${gitdir}/rebase-apply" ]] \
+       || [[ -d "${gitdir}/rebase" ]]       \
+       || [[ -d "${gitdir}/../.dotest" ]]   \
+       || [[ -f "${gitdir}/MERGE_HEAD" ]] ; then
+        gitbranch="$(${(z)gitsymref} 2> /dev/null)"
+        [[ -z ${gitbranch} ]] && [[ -r ${gitdir}/rebase-apply/head-name ]] \
+            && gitbranch="$(< ${gitdir}/rebase-apply/head-name)"
+
+    elif   [[ -f "${gitdir}/rebase-merge/interactive" ]] \
+        || [[ -d "${gitdir}/rebase-merge" ]] ; then
+        gitbranch="$(< ${gitdir}/rebase-merge/head-name)"
+
+    elif   [[ -f "${gitdir}/.dotest-merge/interactive" ]] \
+        || [[ -d "${gitdir}/.dotest-merge" ]] ; then
+        gitbranch="$(< ${gitdir}/.dotest-merge/head-name)"
+
+    else
+        gitbranch="$(${(z)gitsymref} 2> /dev/null)"
+
+        if [[ $? -ne 0 ]] ; then
+            gitbranch="$(git describe --exact-match HEAD 2>/dev/null)"
+
+            if [[ $? -ne 0 ]] ; then
+                gitbranch="${${"$(< $gitdir/HEAD)"}[1,7]}..."
+            fi
+        fi
+    fi
+
+    printf '%s' "${gitbranch##refs/heads/}"
+    return 0
+}
+
+gitdir=${vcs_comm[gitdir]}
+gitbranch="$(VCS_INFO_git_getbranch ${gitdir})"
+
+if [[ -z ${gitdir} ]] || [[ -z ${gitbranch} ]] ; then
+    return 1
+fi
+
+VCS_INFO_adjust
+gitaction="$(VCS_INFO_git_getaction ${gitdir})"
+gitbase=${PWD%/${$( git rev-parse --show-prefix )%/##}}
+rrn=${gitbase:t}
+VCS_INFO_formats "${gitaction}" "${gitbranch}" "${gitbase}"
+return 0
