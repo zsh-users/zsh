@@ -497,8 +497,11 @@ var(-init-) context. If this list contains an item called tt(NONE) no
 backend is used at all and var(vcs_info) will do nothing. If this list
 contains tt(ALL) var(vcs_info) will use all backends known to it. Only with
 tt(ALL) in tt(enable), the tt(disable) style has any effect. tt(ALL) and
-tt(NONE) are actually tested case insensitively.)
-sitem(tt(disable))(A list of VCSs, you don't want var(vcs_info) to test for
+tt(NONE) are actually tested case insensitively.
+)
+kindex(disable)
+item(tt(disable))(
+A list of VCSs, you don't want var(vcs_info) to test for
 repositories (checked in the var(-init-) context, too). Only used if
 tt(enable) contains tt(ALL).
 )

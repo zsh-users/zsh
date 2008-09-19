@@ -1,5 +1,8 @@
 2008-09-19  Peter Stephenson  <pws@csr.com>
 
+	* users/13262: Frank Terbeck: Doc/Zsh/contrib.yo: another
+	formatting fix.
+
 	* users/13252 and others: Frank Terbeck (plus doc tweaks):
 	Functions/VCS_Info/**/*, Doc/Zsh/contrib.yo, Src/zsh.mdd:
 	add VCS_Info function system.
