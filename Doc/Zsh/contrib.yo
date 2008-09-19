@@ -581,8 +581,10 @@ backends and assembles all data into var(${vcs_info_msg_*_}). This is the
 function you want to call from tt(precmd) if you want to include up-to-date
 information in your prompt (see Variable description below). If an argument
 is given, that string will be used instead of tt(default) in the
-user-context field of the style context.)
-sitem(tt(vcs_info_lastmsg))(Outputs the last var(${vcs_info_msg_*_}) value.
+user-context field of the style context.
+)
+item(tt(vcs_info_lastmsg))(
+Outputs the last var(${vcs_info_msg_*_}) value.
 Takes into account the value of the use-prompt-escapes style in
 var(':vcs_info:formats:command:-all-'). It also only prints tt(max-exports)
 values.
@@ -591,8 +593,10 @@ findex(vcs_info_printsys)
 item(tt(vcs_info_printsys) [var(user-context)])(
 Prints a list of all
 supported version control systems. Useful to find out possible contexts
-(and which of them are enabled) or values for the var(disable) style.)
-sitem(tt(vcs_info_setsys))(Initializes var(vcs_info)'s internal list of
+(and which of them are enabled) or values for the var(disable) style.
+)
+item(tt(vcs_info_setsys))(
+Initializes var(vcs_info)'s internal list of
 available backends. With this function, you can add support for new VCSs
 without restarting the shell.
 )
