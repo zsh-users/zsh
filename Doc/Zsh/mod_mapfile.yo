@@ -27,7 +27,10 @@ The parameter tt(mapfile) may be made read-only; in that case, files
 referenced may not be written or deleted.
 
 A file may conveniently be read into an array as one line per element
-with the form `var(array)tt(=LPAR()${(f)mapfile[)var(filename)tt(]RPAR())'.
+with the form
+`var(array)tt(=LPAR()"${(f)mapfile[)var(filename)tt(]}"RPAR())'.
+The double quotes are necessary to prevent empty lines from being
+removed.
 )
 enditem()
 

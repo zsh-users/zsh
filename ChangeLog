@@ -1,3 +1,8 @@
+2008-09-19  Peter Stephenson  <pws@csr.com>
+
+	* Unposted, but see users/13251: Doc/Zsh/mod_mapfile.yo: update
+	users/13239.
+
 2008-09-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25690: Src/Zle/zle_hist.c: fix insertlastword not to
