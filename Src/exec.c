@@ -4177,7 +4177,6 @@ loadautofn(Shfunc shf, int fksh, int autol)
 	shf->filename = fname;
     }
     popheap();
-    zsfree(fname);
 
     return shf;
 }
