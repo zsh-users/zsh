@@ -1,5 +1,7 @@
 2008-09-21  Clint Adams  <clint@zsh.org>
 
+	* unposted: Completion/Linux/Command/.distfiles: update .distfiles.
+
 	* Jörg Sommer: 25702: Completion/Linux/Command/_chrt,
 	Completion/Linux/Command/_ionice: completions for chrt and ionice
 	commands.
