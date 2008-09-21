@@ -1,0 +1,23 @@
+#compdef ionice
+
+local context state line
+typeset -A opt_args
+
+_arguments \
+  '(* -)-h[display usage information]' \
+  '-p[interpret args as process ID]' \
+  '-c[scheduling class]:class:(( 1\:realtime 2\:best-effort 3\:idle ))' \
+  '-n[scheduling class priority]:class-pririty:((
+    0\:high\ priority
+    {1..6}\:
+    7\:low\ priority
+  ))' \
+  '*::command or pid:->cmd_or_pid' \
+  && return 0
+
+if (( $+opt_args[-p] ))
+then
+    _pids
+else
+    _normal
+fi

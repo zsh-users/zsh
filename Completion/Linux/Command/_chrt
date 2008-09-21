@@ -1,0 +1,61 @@
+#compdef chrt
+
+local context state line
+typeset -A opt_args
+
+_arguments \
+  '(* -)'{-h,--help}'[display usage information]' \
+  '(* -)'{-V,--version}'[output version information]' \
+  {-v,--verbose}'[display status information]' \
+  {-p,--pid}'[interpret args as process ID]' \
+  '(-b --batch -f --fifo -o --other -r --rr)'{-b,--batch}'[set scheduling policy to SCHED_BATCH]' \
+  '(-b --batch -f --fifo -o --other -r --rr)'{-f,--fifo}'[set scheduling policy to SCHED_FIFO]' \
+  '(-b --batch -f --fifo -o --other -r --rr)'{-o,--other}'[set policy scheduling policy to SCHED_OTHER]' \
+  '(-b --batch -f --fifo -o --other -r --rr)'{-r,--rr}'[set scheduling policy to SCHED_RR]' \
+  '(* -)'{-m,--max}'[show minimum and maximum valid priorities, then exit]' \
+  '*::command or priority:->cmd_or_prio' \
+  && return 0
+
+_chrt_priority()
+{
+    local ty
+    if (( $+opt_args[-b] || $+opt_args[--batch] ))
+    then
+        ty=BATCH
+    elif (( $+opt_args[-f] || $+opt_args[--fifo] ))
+    then
+        ty=FIFO
+    elif (( $+opt_args[-o] || $+opt_args[--other] ))
+    then
+        ty=OTHER
+    else
+        ty=RR
+    fi
+    local range
+    range=${${"$(_call_program priorities chrt --max)"#*SCHED_$ty*: }%$'\n'*}
+    if [[ $range = 0/0 ]]
+    then
+        compadd 0
+    else
+        _message -e priority "priority in the range $range"
+    fi
+}
+
+if (( $+opt_args[-p] || $+opt_args[--pid] ))
+then
+    if [[ $CURRENT -eq 1 ]]
+    then
+        _alternative \
+          'priority:priority:_chrt_priority' \
+          'processes:process IDs:_pids'
+    else
+        _pids
+    fi
+elif [[ $CURRENT -eq 1 ]]
+then
+    _chrt_priority
+else
+    shift words
+    (( CURRENT-- ))
+    _normal
+fi
