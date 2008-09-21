@@ -4134,10 +4134,13 @@ loadautofn(Shfunc shf, int fksh, int autol)
 	zwarn("%s: function definition file not found", shf->node.nam);
 	locallevel++;
 	popheap();
+	zsfree(fname);
 	return NULL;
     }
-    if (!prog)
+    if (!prog) {
+	zsfree(fname);
 	return NULL;
+    }
     if (ksh == 2 || (ksh == 1 && isset(KSHAUTOLOAD))) {
 	if (autol) {
 	    prog->flags |= EF_RUN;
@@ -4174,6 +4177,7 @@ loadautofn(Shfunc shf, int fksh, int autol)
 	shf->filename = fname;
     }
     popheap();
+    zsfree(fname);
 
     return shf;
 }

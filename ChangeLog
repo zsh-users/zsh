@@ -1,5 +1,7 @@
 2008-09-21  Clint Adams  <clint@zsh.org>
 
+	* 25701: Src/exec.c: fix memory leak in loadautofn.
+
 	* 25697: Functions/Prompts/prompt_clint_setup: drop git code and
 	switch to vcs_info.
 
