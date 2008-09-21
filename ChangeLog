@@ -1,3 +1,8 @@
+2008-09-21  Clint Adams  <clint@zsh.org>
+
+	* 25697: Functions/Prompts/prompt_clint_setup: drop git code and
+	switch to vcs_info.
+
 2008-09-19  Peter Stephenson  <pws@csr.com>
 
 	* 25693: Frank Terbeck: Doc/Zsh/contrib.yo: and another.
