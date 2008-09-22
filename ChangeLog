@@ -1,5 +1,8 @@
 2008-09-22  Peter Stephenson  <pws@csr.com>
 
+	* 25715: Frank Terbeck: Doc/Zsh/contrib.yo: vcs_info
+	now works straight away.
+
 	* 25710: Functions/VCS_Info/vcs_info,
 	Functions/VCS_Info/vcs_info_lastmsg,
 	Functions/VCS_Info/vcs_info_printsys,
