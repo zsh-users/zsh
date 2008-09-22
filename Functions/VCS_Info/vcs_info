@@ -88,3 +88,5 @@ vcs_info () {
     VCS_INFO_set
     return 0
 }
+
+vcs_info "$@"
