@@ -347,9 +347,6 @@ To load var(vcs_info):
 
 example(autoload -Uz vcs_info)
 
-If you plan to use the information from var(vcs_info) in your prompt (which
-is its primary use), you need to enable the tt(PROMPT_SUBST) option.
-
 It can be used in any existing prompt, because it does not require any
 tt($psvar) entries to be left available.
 
