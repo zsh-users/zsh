@@ -1,5 +1,7 @@
 2008-09-22  Clint Adams  <clint@zsh.org>
 
+	* 25721: Src/exec.c: revert another mistake of 25701.
+
 	* Jörg Sommer: 25718: Completion/Unix/Command/_git: add completion
 	of option --reverse.
 

@@ -4134,7 +4134,6 @@ loadautofn(Shfunc shf, int fksh, int autol)
 	zwarn("%s: function definition file not found", shf->node.nam);
 	locallevel++;
 	popheap();
-	zsfree(fname);
 	return NULL;
     }
     if (!prog) {
