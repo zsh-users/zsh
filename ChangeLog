@@ -1,5 +1,8 @@
 2008-09-22  Clint Adams  <clint@zsh.org>
 
+	* Jörg Sommer: 25718: Completion/Unix/Command/_git: add completion
+	of option --reverse.
+
 	* 25720: Doc/Zsh/contrib.yo: remove misleading vcs_info bit about
 	PROMPT_SUBST.
 
