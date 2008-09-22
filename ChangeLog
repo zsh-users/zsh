@@ -1,3 +1,12 @@
+2008-09-22  Peter Stephenson  <pws@csr.com>
+
+	* 25710: Functions/VCS_Info/vcs_info,
+	Functions/VCS_Info/vcs_info_lastmsg,
+	Functions/VCS_Info/vcs_info_printsys,
+	Functions/VCS_Info/vcs_info_setsys: use native zsh emulation;
+	make vcs_comm local in other functions; vcs_info_printsys
+	runs vcs_info_setsys if necessary.
+
 2008-09-22  Clint Adams  <clint@zsh.org>
 
 	* 25713: Functions/VCS_Info/vcs_info: ensure that vcs_info

@@ -2,12 +2,20 @@
 ## Written by Frank Terbeck <ft@bewatermyfriend.org>
 ## Distributed under the same BSD-ish license as zsh itself.
 
-setopt localoptions noksharrays extendedglob NO_shwordsplit
+emulate -L zsh
+setopt extendedglob
+
 local sys
 local -a disabled enabled
+local -Ax vcs_comm
 
 zstyle -a ":vcs_info:-init-:${1:-default}:-all-" "enable" enabled
 (( ${#enabled} == 0 )) && enabled=( all )
+
+if (( ${+VCS_INFO_backends} == 0 )); then
+  autoload -Uz vcs_info_setsys
+  vcs_info_setsys
+fi
 
 if [[ -n ${(M)enabled:#(#i)all} ]] ; then
     enabled=( ${VCS_INFO_backends} )

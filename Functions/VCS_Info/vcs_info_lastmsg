@@ -2,7 +2,8 @@
 ## Written by Frank Terbeck <ft@bewatermyfriend.org>
 ## Distributed under the same BSD-ish license as zsh itself.
 
-setopt localoptions NO_shwordsplit
+emulate -L zsh
+
 local -i i
 local -ix maxexports
 

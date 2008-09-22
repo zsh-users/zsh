@@ -2,7 +2,9 @@
 ## Written by Frank Terbeck <ft@bewatermyfriend.org>
 ## Distributed under the same BSD-ish license as zsh itself.
 
-setopt localoptions noksharrays extendedglob typeset_silent NO_shwordsplit
+emulate -L zsh
+setopt extendedglob typeset_silent
+
 local sys
 typeset -g VCS_INFO_backends
 

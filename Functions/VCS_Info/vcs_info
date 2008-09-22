@@ -37,7 +37,9 @@ vcs_info_setsys
 
 # and now, finally create the real vcs_info function
 vcs_info () {
-    setopt localoptions noksharrays extendedglob
+    emulate -L zsh
+    setopt extendedglob
+
     local -i found
     local -a enabled disabled
     local -x usercontext vcs rrn
