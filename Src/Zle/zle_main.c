@@ -1173,6 +1173,7 @@ zleread(char **lp, char **rp, int flags, int context)
 	    stackcs = -1;
 	    if (zlecs > zlell)
 		zlecs = zlell;
+	    CCLEFT();
 	}
 	if (stackhist != -1) {
 	    histline = stackhist;
