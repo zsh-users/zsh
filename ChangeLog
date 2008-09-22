@@ -1,3 +1,7 @@
+2008-09-22  Peter Stephenson  <pws@csr.com>
+
+	* Rocky Bernstein: 25696: Src/hist.c: fix crash on empty history.
+
 2008-09-21  Clint Adams  <clint@zsh.org>
 
 	* unposted: Completion/Linux/Command/.distfiles: update .distfiles.

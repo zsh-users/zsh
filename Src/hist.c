@@ -945,7 +945,7 @@ movehistent(Histent he, int n, int xflags)
 mod_export Histent
 up_histent(Histent he)
 {
-    return he->up == hist_ring? NULL : he->up;
+    return !he || he->up == hist_ring? NULL : he->up;
 }
 
 /**/
