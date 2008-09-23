@@ -1,5 +1,9 @@
 2008-09-23  Peter Stephenson  <pws@csr.com>
 
+	* 25732: Functions/VCS_Info/Backends/VCS_INFO_detect_p4,
+	Doc/Zsh/contrib.yo: make vcs_info detect Perforce from server
+	if style use-server is set.
+
 	* Rocky Bernstein: 25727: Src/hist.c, Test/B06fc.ztst: remove
 	restriction on interactive use of fc and test another problem.
 
