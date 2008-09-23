@@ -328,19 +328,20 @@ instantly tell on which branch you are currently on,  for example.
 
 In order to do that, you may use the tt(vcs_info) function.
 
-The following VCSs are supported:
+The following VCSs are supported, showing the abbreviated name by which
+they are referred to within the system:
 startsitem()
-sitem(tt(bazaar))(http://bazaar-vcs.org/)
-sitem(tt(codeville))(http://codeville.org/)
-sitem(tt(cvs))(http://www.nongnu.org/cvs/)
+sitem(Bazaar (tt(bzr)))(http://bazaar-vcs.org/)
+sitem(Codeville (tt(cdv)))(http://codeville.org/)
+sitem(Concurrent Versioning System (tt(cvs)))(http://www.nongnu.org/cvs/)
 sitem(tt(darcs))(http://darcs.net/)
 sitem(tt(git))(http://git.or.cz/)
-sitem(tt(gnu arch))(http://www.gnu.org/software/gnu-arch/)
-sitem(tt(mercurial))(http://selenic.com/mercurial/)
-sitem(tt(monotone))(http://monotone.ca/)
-sitem(tt(perforce))(http://www.perforce.com/)
-sitem(tt(subversion))(http://subversion.tigris.org/)
-sitem(tt(svk))(http://svk.bestpractical.com/)
+sitem(GNU arch (tt(tla)))(http://www.gnu.org/software/gnu-arch/)
+sitem(Mercurial (tt(hg)))(http://selenic.com/mercurial/)
+sitem(Monotone (tt(mtn)))(http://monotone.ca/)
+sitem(Perforce (tt(p4)))(http://www.perforce.com/)
+sitem(Subversion (tt(svn)))(http://subversion.tigris.org/)
+sitem(SVK (tt(svk)))(http://svk.bestpractical.com/)
 endsitem()
 
 To load var(vcs_info):
