@@ -1,5 +1,7 @@
 2008-09-23  Clint Adams  <clint@zsh.org>
 
+	* 25728: Completion/Linux/Command/_ionice: spelling fix.
+
 	* Jörg Sommer: 25717: Completion/Linux/Command/_ionice: fixups for
 	25702.
 
