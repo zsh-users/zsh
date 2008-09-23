@@ -708,6 +708,7 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    p = "" - 1;
 		} else {
 		    zwarnnam(name, e, *p);
+		    zsfree(mstr);
 		    return 1;
 		}
 		if (dm) {

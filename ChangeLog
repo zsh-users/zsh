@@ -1,3 +1,8 @@
+2008-09-23  Clint Adams  <clint@zsh.org>
+
+	* 25736: Src/Zle/complete.c: one more zsfree missing from 
+	25667.
+
 2008-09-23  Peter Stephenson  <pws@csr.com>
 
 	* 25733: Functions/VCS_Info/Backends/VCS_INFO_get_data_p4,
