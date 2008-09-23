@@ -4211,7 +4211,7 @@ __git_setup_revision_arguments () {
     '--cherry-pick[omit any same-change commits]'
     '--graph[draw a graphical representation of the commit history]'
     '--reflog[show all commits from reflogs]'
-    '(-g --walk-reflogs reverse)'{-g,--walk-reflogs}'[walk reflog entries from most recent to oldest]'
+    '(-g --walk-reflogs --reverse)'{-g,--walk-reflogs}'[walk reflog entries from most recent to oldest]'
     '*--not[reverses meaning of ^ prefix for revisions that follow]'
     '--default[use argument as default revision]:default revision:__git_revisions'
     '--merge[after a failed merge, show refs that touch files having a conflict]'
