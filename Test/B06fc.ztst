@@ -1,0 +1,11 @@
+# Tests of fc command
+%prep
+
+ mkdir fc.tmp 
+ cd fc.tmp
+ print 'fc -l foo' >fcl
+ 
+%test
+  $ZTST_testdir/../Src/zsh ./fcl
+1:Checking that fc -l foo doesn't core dump history is empty
+?./fcl:fc:1: event not found: foo

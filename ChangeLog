@@ -1,3 +1,8 @@
+2008-09-23  Peter Stephenson  <pws@csr.com>
+
+	* Rocky Bernstein: 25727: Src/hist.c, Test/B06fc.ztst: remove
+	restriction on interactive use of fc and test another problem.
+
 2008-09-23  Clint Adams  <clint@zsh.org>
 
 	* 25728: Completion/Linux/Command/_ionice: spelling fix.

@@ -1296,10 +1296,12 @@ bin_fc(char *nam, char **argv, Options ops, int func)
     Patprog pprog = NULL;
 
     /* fc is only permitted in interactive shells */
+#ifdef FACIST_INTERACTIVE
     if (!interact) {
 	zwarnnam(nam, "not interactive shell");
 	return 1;
     }
+#endif
     if (OPT_ISSET(ops,'p')) {
 	char *hf = "";
 	zlong hs = DEFAULT_HISTSIZE;
