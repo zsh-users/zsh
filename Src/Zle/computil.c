@@ -1874,13 +1874,10 @@ ca_parse_line(Cadef d, int multi, int first)
 
     if (first && ca_alloced) {
 	Castate s = &ca_laststate, ss;
-	int f = 1;
 
 	while (s) {
 	    ss = s->snext;
 	    freecastate(s);
-	    if (!f)
-		zfree(s, sizeof(*s));
 	    s = ss;
 	}
     }

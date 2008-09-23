@@ -1,5 +1,7 @@
 2008-09-23  Clint Adams  <clint@zsh.org>
 
+	* 25737: Src/Zle/computil.c: remove dead code in ca_parse_line.
+
 	* 25736: Src/Zle/complete.c: one more zsfree missing from 
 	25667.
 
