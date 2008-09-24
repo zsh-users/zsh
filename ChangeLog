@@ -1,3 +1,10 @@
+2008-09-24  Peter Stephenson  <pws@csr.com>
+
+	* 25739: configure.ac: warn about GPL in binary if libgdm
+	is linked.
+
+	* Rocky Bernstein: 25734: Test/B06fc.ztst: typo.
+
 2008-09-23  Clint Adams  <clint@zsh.org>
 
 	* 25737: Src/Zle/computil.c: remove dead code in ca_parse_line.
