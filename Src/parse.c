@@ -2205,12 +2205,14 @@ yyerror(int noerr)
     for (t0 = 0; t0 != 20; t0++)
 	if (!t || !t[t0] || t[t0] == '\n')
 	    break;
-    if (t0 == 20)
-	zwarn("parse error near `%l...'", t, 20);
-    else if (t0)
-	zwarn("parse error near `%l'", t, t0);
-    else
-	zwarn("parse error");
+    if (!(histdone & HISTFLAG_NOEXEC)) {
+	if (t0 == 20)
+	    zwarn("parse error near `%l...'", t, 20);
+	else if (t0)
+	    zwarn("parse error near `%l'", t, t0);
+	else
+	    zwarn("parse error");
+    }
     if (!noerr && noerrs != 2)
 	errflag = 1;
 }

@@ -1,3 +1,8 @@
+2008-09-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/13288: Src/parse.c: don't report parse errors if the
+	line was aborted by spell checking etc.
+
 2008-09-24  Peter Stephenson  <pws@csr.com>
 
 	* 25739: configure.ac: warn about GPL in binary if libgdm
