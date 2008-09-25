@@ -726,7 +726,8 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		    stradd(Rstring);
 		break;
 	    case 'I':
-		if (funcstack && funcstack->tp != FS_SOURCE) {
+		if (funcstack && funcstack->tp != FS_SOURCE &&
+		    (!intrap || trapisfunc)) {
 		    /*
 		     * We're in a function or an eval with
 		     * EVALLINENO.  Calculate the line number in
@@ -749,7 +750,8 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		bp += strlen(bp);
 		break;
 	    case 'x':
-		if (funcstack && funcstack->tp != FS_SOURCE)
+		if (funcstack && funcstack->tp != FS_SOURCE &&
+		    (!intrap || trapisfunc))
 		    promptpath(funcstack->filename ? funcstack->filename : "",
 			       arg, 0);
 		else
