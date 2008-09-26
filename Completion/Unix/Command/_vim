@@ -71,7 +71,8 @@ arguments=(
   '-i[use given viminfo file instead of default .viminfo]:viminfo file:_files'
   '(- *)'{-h,--help}'[print help and exit]'
   '(- *)--version[print version information and exit]'
-  '*:file:_vim_files'
+  '(*)-t[edit file where tag is defined]:tag:_complete_tag'
+  '(-t)*:file:_vim_files'
 )
 
 _arguments -S $arguments
