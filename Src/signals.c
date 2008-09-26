@@ -1160,7 +1160,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	trapisfunc = isfunc = 1;
 
 	sfcontext = SFC_SIGNAL;
-	doshfunc((Shfunc)sigfn, args, 0, 1);
+	doshfunc((Shfunc)sigfn, args, 1);
 	sfcontext = osc;
 	freelinklist(args, (FreeFunc) NULL);
 	zsfree(name);

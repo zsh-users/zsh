@@ -1480,7 +1480,7 @@ zfsenddata(char *name, int recv, int progress, off_t startat)
 	int osc = sfcontext;
 
 	sfcontext = SFC_HOOK;
-	doshfunc(shfunc, NULL, 0, 1);
+	doshfunc(shfunc, NULL, 1);
 	sfcontext = osc;
 	/* Now add in the bit of the file we've got/sent already */
 	sofar = last_sofar = startat;
@@ -1613,7 +1613,7 @@ zfsenddata(char *name, int recv, int progress, off_t startat)
 
 	    zfsetparam("ZFTP_COUNT", &sofar, ZFPM_READONLY|ZFPM_INTEGER);
 	    sfcontext = SFC_HOOK;
-	    doshfunc(shfunc, NULL, 0, 1);
+	    doshfunc(shfunc, NULL, 1);
 	    sfcontext = osc;
 	    last_sofar = sofar;
 	}
@@ -2395,7 +2395,7 @@ zfgetcwd(void)
 	int osc = sfcontext;
 
 	sfcontext = SFC_HOOK;
-	doshfunc(shfunc, NULL, 0, 1);
+	doshfunc(shfunc, NULL, 1);
 	sfcontext = osc;
     }
     return 0;
@@ -2615,7 +2615,7 @@ zftp_getput(char *name, char **args, int flags)
 	    zfsetparam("ZFTP_TRANSFER", ztrdup(recv ? "GF" : "PF"),
 		       ZFPM_READONLY);
 	    sfcontext = SFC_HOOK;
-	    doshfunc(shfunc, NULL, 0, 1);
+	    doshfunc(shfunc, NULL, 1);
 	    sfcontext = osc;
 	}
 	if (rest) {
@@ -2770,7 +2770,7 @@ zfclose(int leaveparams)
 	    int osc = sfcontext;
 
 	    sfcontext = SFC_HOOK;
-	    doshfunc(shfunc, NULL, 0, 1);
+	    doshfunc(shfunc, NULL, 1);
 	    sfcontext = osc;
 	}
     }

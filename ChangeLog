@@ -1,3 +1,13 @@
+2008-09-26  Peter Stephenson  <pws@csr.com>
+
+	* 25744: Doc/Zsh/expn.yo, Src/exec.c, Src/math.c, Src/signals.c,
+	Src/subst.c, Src/utils.c, Src/Modules/zftp.c, Src/Zle/compcore.c,
+	Src/Zle/compctl.c, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	Test/D01prompt.ztst: Add dynamic named directories using
+	~[<stuff>] which calls zsh_directory_name n <stuff> and
+	reverse call to look up names.  Also further simplify doshfunc()
+	interface to use flags directly from the Shfunc structure.
+
 2008-09-25  Peter Stephenson  <pws@csr.com>
 
 	* 25684: Src/prompt.c: make %x and %I consistent with

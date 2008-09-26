@@ -1308,8 +1308,73 @@ The tt(PUSHD_MINUS)
 option exchanges the effects of `tt(~PLUS())' and `tt(~-)' where they are
 followed by a number.
 
-cindex(directories, named)
-cindex(named directories)
+subsect(Dynamic named directories)
+cindex(directories, named, dynamic)
+cindex(named directories, dynamicic)
+cindex(dynamic named directories)
+
+The feature described here is only available if the shell function
+tt(zsh_directory_name) exists.
+
+A `tt(~)' followed by a string var(namstr) in unquoted square brackets is
+treated specially as a dynamic directory name.  Note that the first
+unquoted closing square bracket always terminates var(namstr).  The shell
+function is passed two arguments: the string tt(n) (for name) and
+var(namstr).  It should either set the array tt(reply) to a single element
+which is the directory corresponding to the name and return status zero
+(executing an assignment as the last statement is usually sufficient), or
+it should return status non-zero.  In the former case the element of reply
+is used as the directory; in the latter case the substitution is deemed to
+have failed and tt(NOMATCH) handling is applied if the option is set.
+
+The function tt(zsh_directory_name) is also used to see if a directory can
+be turned into a name, for example when printing the directory stack or
+when expanding tt(%~) in prompts.  In this case the function is passed two
+arguments: the string tt(d) (for directory) and the candidate for dynamic
+naming.  The function should either return non-zero status, if the
+directory cannot be named by the function, or it should set the array reply
+to consist of two elements: the first is the dynamic name for the directory
+(as would appear within `tt(~[)var(...)tt(])'), and the second is the
+prefix length of the directory to be replaced.  For example, if the trial
+directory is tt(/home/myname/src/zsh) and the dynamic name for
+tt(/home/myname/src) (which has 16 characters) is tt(s), then the function
+sets
+
+example(reply=(s 16))
+
+The directory name so returned is compared with possible static names for
+parts of the directory path, as described below; it is used if the prefix
+length matched (16 in the example) is longer than that matched by any
+static name.
+
+As a working example, here is a function that expands any dynamic names
+beginning with the string tt(p:) to directories below
+tt(/home/pws/perforce).  In this simple case a static name for the
+directory would be just as effective.
+
+example(zsh_directory_name() {
+  emulate -L zsh
+  setopt extendedglob
+  local -a match mbegin mend
+  if [[ $1 = d ]]; then
+    if [[ $2 = (#b)(/home/pws/perforce/)([^/]##)* ]]; then
+      typeset -ga reply
+      reply=(p:$match[2] $(( ${#match[1]} + ${#match[2]} )) )
+    else
+      return 1
+    fi
+  else
+    [[ $2 != (#b)p:(?*) ]] && return 1
+    typeset -ga reply
+    reply=(/home/pws/perforce/$match[1])
+  fi
+  return 0
+})
+
+subsect(Static named directories)
+cindex(directories, named, static)
+cindex(named directories, static)
+cindex(static named directories)
 A `tt(~)' followed by anything not already covered is looked up as a
 named directory, and replaced by the value of that named directory if found.
 Named directories are typically home directories for users on the system.
@@ -1329,12 +1394,16 @@ with ties broken in favour of using a named directory,
 except when the directory is tt(/) itself.  The parameters tt($PWD) and
 tt($OLDPWD) are never abbreviated in this fashion.
 
+subsect(`=' expansion)
+
 If a word begins with an unquoted `tt(=)'
 and the tt(EQUALS) option is set,
 the remainder of the word is taken as the
 name of a command.  If a command
 exists by that name, the word is replaced
 by the full pathname of the command.
+
+subsect(Notes)
 
 Filename expansion is performed on the right hand side of a parameter
 assignment, including those appearing after commands of the
@@ -1349,6 +1418,7 @@ If the option tt(MAGIC_EQUAL_SUBST) is set, any unquoted shell
 argument in the form `var(identifier)tt(=)var(expression)' becomes eligible
 for file expansion as described in the previous paragraph.  Quoting the
 first `tt(=)' also inhibits this.
+
 texinode(Filename Generation)()(Filename Expansion)(Expansion)
 sect(Filename Generation)
 cindex(filename generation)

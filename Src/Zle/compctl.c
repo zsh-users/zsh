@@ -3664,7 +3664,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 		incompctlfunc = 1;
 	    sfcontext = SFC_COMPLETE;
 	    /* Call the function. */
-	    doshfunc(shfunc, args, 0, 1);
+	    doshfunc(shfunc, args, 1);
 	    sfcontext = osc;
 	    incompctlfunc = 0;
 	    /* And get the result from the reply parameter. */
@@ -3839,7 +3839,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    if (incompfunc != 1)
 		incompctlfunc = 1;
 	    sfcontext = SFC_COMPLETE;
-	    doshfunc(shfunc, args, 0, 1);
+	    doshfunc(shfunc, args, 1);
 	    sfcontext = osc;
 	    incompctlfunc = 0;
 	    uv = "reply";

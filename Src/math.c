@@ -872,7 +872,7 @@ callmathfunc(char *o)
 			if (!shfunc)
 			    zerr("no such function: %s", shfnam);
 			else {
-			    doshfunc(shfunc, l, 0, 1);
+			    doshfunc(shfunc, l, 1);
 			    return lastmathval;
 			}
 		    } else {

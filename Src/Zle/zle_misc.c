@@ -1384,7 +1384,7 @@ iremovesuffix(ZLE_INT_T c, int keep)
 	    startparamscope();
 	    makezleparams(0);
 	    sfcontext = SFC_COMPLETE;
-	    doshfunc(shfunc, args, 0, 1);
+	    doshfunc(shfunc, args, 1);
 	    sfcontext = osc;
 	    endparamscope();
 

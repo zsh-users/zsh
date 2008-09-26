@@ -1,5 +1,7 @@
 %prep
 
+  mkdir prompt.tmp
+  cd prompt.tmp
   mydir=$PWD
   SHLVL=2
   setopt extendedglob
@@ -104,3 +106,44 @@
     print "Years do not agree in $date2, $date3"
   fi
 0:Dates produced by prompt escapes
+
+  mkdir foo
+  mkdir foo/bar
+  mkdir foo/bar/rod
+  (zsh_directory_name() {
+    emulate -L zsh
+    setopt extendedglob
+    local -a match mbegin mend
+    if [[ $1 = d ]]; then
+      if [[ $2 = (#b)(*bar)/rod ]]; then
+        reply=(barmy ${#match[1]})
+      else
+        return 1
+      fi
+    else
+      if [[ $2 = barmy ]]; then
+        reply=($mydir/foo/bar)
+      else
+        return 1
+      fi
+    fi
+  }
+  # success
+  print ~[barmy]/anything
+  cd foo/bar/rod
+  print -P %~
+  # failure
+  setopt nonomatch
+  print ~[scuzzy]/rubbish
+  cd ../..
+  print -P %~
+  # catastrophic failure
+  unsetopt nonomatch
+  print ~[scuzzy]/rubbish
+  )
+1q:Dynamic named directories
+>$mydir/foo/bar/anything
+>~[barmy]/rod
+>~[scuzzy]/rubbish
+>~mydir/foo
+?(eval):33: no directory expansion: ~[scuzzy]

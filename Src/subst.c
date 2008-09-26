@@ -528,7 +528,8 @@ filesubstr(char **namptr, int assign)
     char *str = *namptr;
 
     if (*str == Tilde && str[1] != '=' && str[1] != Equals) {
-	char *ptr;
+	Shfunc dirfunc;
+	char *ptr, *tmp, *res;
 	int val;
 
 	val = zstrtol(str + 1, &ptr, 10);
@@ -539,9 +540,23 @@ filesubstr(char **namptr, int assign)
 	    *namptr = dyncat(pwd, str + 2);
 	    return 1;
 	} else if (str[1] == '-' && isend(str[2])) {   /* ~- */
-	    char *tmp;
 	    *namptr = dyncat((tmp = oldpwd) ? tmp : pwd, str + 2);
 	    return 1;
+	} else if (str[1] == Inbrack &&
+		   (dirfunc = getshfunc("zsh_directory_name")) &&
+		   (ptr = strchr(str+2, Outbrack))) {
+	    char **arr;
+	    untokenize(tmp = dupstrpfx(str+2, ptr - (str+2)));
+	    remnulargs(tmp);
+	    arr = subst_string_by_func(dirfunc, "n", tmp);
+	    res = arr ? *arr : NULL;
+	    if (res) {
+		*namptr = dyncat(res, ptr+1);
+		return 1;
+	    }
+	    if (isset(NOMATCH))
+		zerr("no directory expansion: ~[%s]", tmp);
+	    return 0;
 	} else if (!inblank(str[1]) && isend(*ptr) &&
 		   (!idigit(str[1]) || (ptr - str < 4))) {
 	    char *ds;

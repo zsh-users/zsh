@@ -518,7 +518,7 @@ commandnotfound(char *arg0, LinkList args)
 	return 127;
 
     pushnode(args, arg0);
-    return doshfunc(shf, args, shf->node.flags, 1);
+    return doshfunc(shf, args, 1);
 }
 
 /* execute an external command */
@@ -4064,7 +4064,7 @@ execshfunc(Shfunc shf, LinkList args)
     cmdsp = 0;
     if ((osfc = sfcontext) == SFC_NONE)
 	sfcontext = SFC_DIRECT;
-    doshfunc(shf, args, shf->node.flags, 0);
+    doshfunc(shf, args, 0);
     sfcontext = osfc;
     free(cmdstack);
     cmdstack = ocs;
@@ -4191,8 +4191,6 @@ loadautofn(Shfunc shf, int fksh, int autol)
  * in which the first element is the function name (even if
  * FUNCTIONARGZERO is set as this is handled inside this function).
  *
- * flags are a set of the PM_ flags associated with the function.
- *
  * If noreturnval is nonzero, then reset the current return
  * value (lastval) to its value before the shell function
  * was executed.  However, in any case return the status value
@@ -4202,13 +4200,14 @@ loadautofn(Shfunc shf, int fksh, int autol)
 
 /**/
 mod_export int
-doshfunc(Shfunc shfunc, LinkList doshargs, int flags, int noreturnval)
+doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 {
     char **tab, **x, *oargv0;
     int oldzoptind, oldlastval, oldoptcind, oldnumpipestats, ret;
     int *oldpipestats = NULL;
     char saveopts[OPT_SIZE], *oldscriptname = scriptname;
     char *name = shfunc->node.nam;
+    int flags = shfunc->node.flags;
     char *fname = dupstring(name);
     int obreaks, saveemulation ;
     Eprog prog;

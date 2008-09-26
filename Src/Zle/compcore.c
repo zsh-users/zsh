@@ -814,7 +814,7 @@ callcompfunc(char *s, char *fn)
 		while (*p)
 		    addlinknode(largs, dupstring(*p++));
 	    }
-	    doshfunc(shfunc, largs, 0, 0);
+	    doshfunc(shfunc, largs, 0);
 	    cfret = lastval;
 	    lastval = olv;
 	} OLDHEAPS;

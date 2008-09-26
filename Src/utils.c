@@ -826,6 +826,7 @@ finddir(char *s)
 {
     static struct nameddir homenode = { {NULL, "", 0}, NULL, 0 };
     static int ffsz;
+    Shfunc func = getshfunc("zsh_directory_name");
 
     /* Invalidate directory cache if argument is NULL.  This is called *
      * whenever a node is added to or removed from the hash table, and *
@@ -841,7 +842,8 @@ finddir(char *s)
 	return finddir_last = NULL;
     }
 
-    if(!strcmp(s, finddir_full) && *finddir_full)
+    /* It's not safe to use the cache while we have function transformations.*/
+    if(!func && !strcmp(s, finddir_full) && *finddir_full)
 	return finddir_last;
 
     if ((int)strlen(s) >= ffsz) {
@@ -853,6 +855,21 @@ finddir(char *s)
     finddir_last=NULL;
     finddir_scan(&homenode.node, 0);
     scanhashtable(nameddirtab, 0, 0, 0, finddir_scan, 0);
+
+    if (func) {
+	char **ares = subst_string_by_func(func, "d", finddir_full);
+	int len;
+	if (ares && arrlen(ares) >= 2 &&
+	    (len = (int)zstrtol(ares[1], NULL, 10)) > finddir_best) {
+	    /* better duplicate this string since it's come from REPLY */
+	    finddir_last = (Nameddir)hcalloc(sizeof(struct nameddir));
+	    finddir_last->node.nam = tricat("[", dupstring(ares[0]), "]");
+	    finddir_last->dir = dupstrpfx(finddir_full, len);
+	    finddir_last->diff = len - strlen(finddir_last->node.nam);
+	    finddir_best = len;
+	}
+    }
+
     return finddir_last;
 }
 
@@ -1146,7 +1163,7 @@ callhookfunc(char *name, LinkList lnklst, int arrayp, int *retval)
     sfcontext = SFC_HOOK;
 
     if ((shfunc = getshfunc(name))) {
-	ret = doshfunc(shfunc, lnklst, 0, 1);
+	ret = doshfunc(shfunc, lnklst, 1);
 	stat = 0;
     }
 
@@ -1162,7 +1179,7 @@ callhookfunc(char *name, LinkList lnklst, int arrayp, int *retval)
 	if ((arrptr = getaparam(arrnam))) {
 	    for (; *arrptr; arrptr++) {
 		if ((shfunc = getshfunc(*arrptr))) {
-		    int newret = doshfunc(shfunc, lnklst, 0, 1);
+		    int newret = doshfunc(shfunc, lnklst, 1);
 		    if (!ret)
 			ret = newret;
 		    stat = 0;
@@ -2899,6 +2916,32 @@ mod_export Shfunc
 getshfunc(char *nam)
 {
     return (Shfunc) shfunctab->getnode(shfunctab, nam);
+}
+
+/*
+ * Call the function func to substitute string orig by setting
+ * the parameter reply.
+ * Return the array from reply, or NULL if the function returned
+ * non-zero status.
+ * The returned value comes directly from the parameter and
+ * so should be used before there is any chance of that
+ * being changed or unset.
+ * If arg1 is not NULL, it is used as an initial argument to
+ * the function, with the original string as the second argument.
+ */
+
+/**/
+char **
+subst_string_by_func(Shfunc func, char *arg1, char *orig)
+{
+    LinkList l = newlinklist();
+    addlinknode(l, func->node.nam);
+    if (arg1)
+	addlinknode(l, arg1);
+    addlinknode(l, orig);
+    if (doshfunc(func, l, 1))
+	return NULL;
+    return getaparam("reply");
 }
 
 /**/

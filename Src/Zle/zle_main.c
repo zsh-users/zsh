@@ -1330,7 +1330,7 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	    makezleparams(0);
 	    sfcontext = SFC_WIDGET;
 	    opts[XTRACE] = 0;
-	    ret = doshfunc(shf, largs, shf->node.flags, 1);
+	    ret = doshfunc(shf, largs, 1);
 	    opts[XTRACE] = oxt;
 	    sfcontext = osc;
 	    endparamscope();
