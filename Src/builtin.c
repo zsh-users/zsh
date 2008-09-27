@@ -3262,9 +3262,19 @@ bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
 		/* The argument is of the form foo=bar, *
 		 * so define an entry for the table.    */
 		if(OPT_ISSET(ops,'d')) {
-		    Nameddir nd = hn = zshcalloc(sizeof *nd);
-		    nd->node.flags = 0;
-		    nd->dir = ztrdup(asg->value);
+		    /* shouldn't return NULL if asg->name is not NULL */
+		    if (*itype_end(asg->name, IUSER, 0)) {
+			zwarnnam(name,
+				 "invalid character in directory name: %s",
+				 asg->name);
+			returnval = 1;
+			argv++;
+			continue;
+		    } else {
+			Nameddir nd = hn = zshcalloc(sizeof *nd);
+			nd->node.flags = 0;
+			nd->dir = ztrdup(asg->value);
+		    }
 		} else {
 		    Cmdnam cn = hn = zshcalloc(sizeof *cn);
 		    cn->node.flags = HASHED;

@@ -1,3 +1,14 @@
+2008-09-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Jörg Sommer: 25755, with tweak from 25756:
+	Completion/Linux/Command/_modutils (args): improved handling
+	of module arguments.
+
+	* 25759: Doc/Zsh/expn.yo, Src/builtin.c, Src/subst.c: fix crash
+	after failed dynamic named directory expansion; clarify the
+	fact that static named directories can contain only
+	alphanumerics, `_', `-' or `.'.
+
 2008-09-26  Clint Adams  <clint@zsh.org>
 
 	* Mikael Magnusson: 25617: Completion/Unix/Command/_vim:
