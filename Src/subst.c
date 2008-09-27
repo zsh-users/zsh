@@ -1232,6 +1232,27 @@ substevalchar(char *ptr)
     return metafy(ptr, len, META_USEHEAP);
 }
 
+/*
+ * Helper function for arguments to parameter flags which
+ * handles the (p) and (~) flags as escapes and tok_arg respectively.
+ */
+
+static char *
+untok_and_escape(char *s, int escapes, int tok_arg)
+{
+    int klen;
+    char *dst;
+
+    untokenize(dst = dupstring(s));
+    if (escapes) {
+	dst = getkeystring(dst, &klen, GETKEYS_SEP, NULL);
+	dst = metafy(dst, klen, META_HREALLOC);
+    }
+    if (tok_arg)
+	shtokenize(dst);
+    return dst;
+}
+
 /* parameter substitution */
 
 #define	isstring(c) ((c) == '$' || (char)(c) == String || (char)(c) == Qstring)
@@ -1501,23 +1522,16 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    int tt = 0;
 	    zlong num;
 	    /*
-	     * The (p) flag is (uniquely) only remembered within
+	     * The (p) flag is only remembered within
 	     * this block.  It says we do print-style handling
 	     * on the values for flags, but only on those.
-	     * This explains the ghastly macro, but why can't it
-	     * be a function?  UNTOK_AND_ESCAPE is defined
-	     * so that the argument must be an lvalue.
 	     */
 	    int escapes = 0;
-	    int klen;
-#define UNTOK(C)  (itok(C) ? ztokens[(C) - Pound] : (C))
-#define UNTOK_AND_ESCAPE(X, S) {\
-		untokenize(X = dupstring(S));\
-		if (escapes) {\
-		    X = getkeystring(X, &klen, GETKEYS_SEP, NULL);\
-		    X = metafy(X, klen, META_HREALLOC);\
-		}\
-	    }
+	    /*
+	     * '~' in parentheses caused tokenization of string arg:
+	     * similar to (p).
+	     */
+	    int tok_arg = 0;
 
 	    for (s++; (c = *s) != ')' && c != Outpar; s++, tt = 0) {
 		int arglen;	/* length of modifier argument */
@@ -1527,6 +1541,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		switch (c) {
 		case ')':
 		case Outpar:
+		    break;
+		case '~':
+		case Tilde:
+		    tok_arg = !tok_arg;
 		    break;
 		case 'A':
 		    ++arrasg;
@@ -1642,9 +1660,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			sav = *t;
 			*t = '\0';
 			if (tt)
-			    UNTOK_AND_ESCAPE(spsep, s + arglen)
+			    spsep = untok_and_escape(s + arglen,
+						     escapes, tok_arg);
 			else
-			    UNTOK_AND_ESCAPE(sep, s + arglen)
+			    sep = untok_and_escape(s + arglen,
+						   escapes, tok_arg);
 			*t = sav;
 			s = t + arglen - 1;
 		    } else
@@ -1677,9 +1697,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    sav = *t;
 		    *t = '\0';
 		    if (tt)
-			UNTOK_AND_ESCAPE(premul, s + arglen)
+			premul = untok_and_escape(s + arglen, escapes,
+						  tok_arg);
 		    else
-			UNTOK_AND_ESCAPE(postmul, s + arglen)
+			postmul = untok_and_escape(s + arglen, escapes,
+						   tok_arg);
 		    *t = sav;
 		    sav = *s;
 		    s = t + arglen;
@@ -1695,9 +1717,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    sav = *t;
 		    *t = '\0';
 		    if (tt)
-			UNTOK_AND_ESCAPE(preone, s + arglen)
+			preone = untok_and_escape(s + arglen,
+						  escapes, tok_arg);
 		    else
-			UNTOK_AND_ESCAPE(postone, s + arglen)
+			postone = untok_and_escape(s + arglen,
+						   escapes, tok_arg);
 		    *t = sav;
 		    /* -1 since loop will increment */
 		    s = t + arglen - 1;

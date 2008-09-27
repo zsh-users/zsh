@@ -1,4 +1,5 @@
 # Test parameter expansion.  Phew.
+# (By the way, did I say "phew"?)
 
 %prep
 
@@ -1062,3 +1063,26 @@
 >1
 >1
 >1
+
+  foo=("|" "?")
+  [[ "|" = ${(j.|.)foo} ]] && print yes || print no
+  [[ "|" = ${(j.|.)~foo} ]] && print yes || print no
+  [[ "|" = ${(~j.|.)foo} ]] && print yes || print no
+  [[ "|" = ${(~~j.|.)foo} ]] && print yes || print no
+  [[ "|" = ${(j.|.~)foo} ]] && print yes || print no
+  [[ "x" = ${(j.|.)foo} ]] && print yes || print no
+  [[ "x" = ${(j.|.)~foo} ]] && print yes || print no
+  [[ "x" = ${(~j.|.)foo} ]] && print yes || print no
+  [[ "x" = ${(~~j.|.)foo} ]] && print yes || print no
+  [[ "x" = ${(j.|.~)foo} ]] && print yes || print no
+0:GLOBSUBST only on parameter substitution arguments
+>no
+>yes
+>yes
+>no
+>no
+>no
+>yes
+>no
+>no
+>no

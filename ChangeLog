@@ -1,5 +1,9 @@
 2008-09-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 25760: Doc/Zsh/expn.yo, Src/subst.c, Test/D04parameter.ztst:
+	(~) tokenizes arguments to further parameter flags, but not
+	the rest of the parameter expansion.
+
 	* Jörg Sommer: 25755, with tweak from 25756:
 	Completion/Linux/Command/_modutils (args): improved handling
 	of module arguments.
