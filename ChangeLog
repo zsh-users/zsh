@@ -1,3 +1,8 @@
+2008-09-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Mikael Magnusson: Src/utils.c: newline in getquery() is
+	treated as n but should also behave like a newline. duh.
+
 2008-09-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25760: Doc/Zsh/expn.yo, Src/subst.c, Test/D04parameter.ztst:

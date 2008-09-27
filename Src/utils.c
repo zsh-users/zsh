@@ -2175,6 +2175,7 @@ getquery(char *valid_chars, int purge)
 	    break;
 	if (c == '\n') {
 	    c = *valid_chars;
+	    nl = 1;
 	    break;
 	}
 	if (strchr(valid_chars, c)) {
