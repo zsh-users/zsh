@@ -1,3 +1,9 @@
+2008-09-28  Clint Adams  <clint@zsh.org>
+
+	* 25764: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_django: completion for Django, from Chris
+	Lamb.
+
 2008-09-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Mikael Magnusson: Src/utils.c: newline in getquery() is
