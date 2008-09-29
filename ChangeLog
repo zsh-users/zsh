@@ -1,5 +1,10 @@
 2008-09-29  Peter Stephenson  <pws@csr.com>
 
+	* 25733: Completion/Zsh/Context/.distfiles,
+	Completion/Zsh/Context/_dynamic_directory_name,
+	Completion/Zsh/Context/_subscript: stub function for dynamic
+	directory name completion.
+
 	* 25772: Src/params.c: searching an associative array with
 	a bad pattern could cause a crash, seen in _expand following
 	"echo ~[]".

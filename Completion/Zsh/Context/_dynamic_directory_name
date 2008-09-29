@@ -1,0 +1,7 @@
+#autoload
+
+# The core libraries don't check for dynamic directory name expansion;
+# this gets called from _subscript.  This is a placeholder for
+# people to overload.
+
+_message 'dynamic directory name: redefine _dynamic_directory_name to use'

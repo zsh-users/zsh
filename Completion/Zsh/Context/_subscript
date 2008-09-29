@@ -10,7 +10,16 @@ fi
 
 compset -P '\(([^\(\)]|\(*\))##\)' # remove subscript flags
 
-if [[ "$PREFIX" = :* ]]; then
+# Look for a dynamic name expansion.  Completion only gives us
+# the stuff inside the square brackets; we need to find out what's
+# outside.  We ought to check for quoting, really, but given we've
+# got to the subscript code " ~[" is pretty likely to be a dynamic
+# name expansion.
+integer pos=$((CURSOR+1))
+while [[ pos > 1 && $BUFFER[pos-1] != '[' ]]; do (( pos-- )); done
+if [[ $BUFFER[1,pos] = *[[:space:]]##\~\[ ]]; then
+  _dynamic_directory_name
+elif [[ "$PREFIX" = :* ]]; then
   _wanted characters expl 'character class' \
       compadd -p: -S ':]' alnum alpha ascii blank cntrl digit graph \
                           lower print punct space upper xdigit
