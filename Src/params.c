@@ -1302,16 +1302,18 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 
 	if (v->isarr) {
 	    if (ishash) {
-		if (!pprog)
-		    return 1;
 		scanprog = pprog;
 		scanstr = s;
 		if (keymatch)
 		    v->isarr |= SCANPM_KEYMATCH;
-		else if (ind)
-		    v->isarr |= SCANPM_MATCHKEY;
-		else
-		    v->isarr |= SCANPM_MATCHVAL;
+		else {
+		    if (!pprog)
+			return 1;
+		    if (ind)
+			v->isarr |= SCANPM_MATCHKEY;
+		    else
+			v->isarr |= SCANPM_MATCHVAL;
+		}
 		if (down)
 		    v->isarr |= SCANPM_MATCHMANY;
 		if ((ta = getvaluearr(v)) &&

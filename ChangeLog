@@ -1,3 +1,7 @@
+2008-09-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25774: Src/params.c: fix in 25772 was applied too widely.
+
 2008-09-29  Peter Stephenson  <pws@csr.com>
 
 	* 25733: Completion/Zsh/Context/.distfiles,
