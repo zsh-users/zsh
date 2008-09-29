@@ -15,7 +15,7 @@ local p4branch change
 # We'll use the latest change number to which the hierarchy from
 # here down is synced as the revision.
 # I suppose the following might be slow on a tortuous client view.
-change="${${$(p4 changes -m 1 ...)##Change }%% *}"
+change="${${$(p4 changes -m 1 ...\#have)##Change }%% *}"
 zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat p4branch ||
 p4branch="%b:%r"
 zformat -f p4branch "${p4branch}" "b:${p4info[Client_name]}" \
