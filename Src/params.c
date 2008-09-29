@@ -1302,6 +1302,8 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 
 	if (v->isarr) {
 	    if (ishash) {
+		if (!pprog)
+		    return 1;
 		scanprog = pprog;
 		scanstr = s;
 		if (keymatch)

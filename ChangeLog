@@ -1,5 +1,9 @@
 2008-09-29  Peter Stephenson  <pws@csr.com>
 
+	* 25772: Src/params.c: searching an associative array with
+	a bad pattern could cause a crash, seen in _expand following
+	"echo ~[]".
+
 	* 25771: Src/utils.c, Src/zsh.h: shell function context
 	for substitution functions.
 
