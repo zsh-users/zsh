@@ -4781,7 +4781,7 @@ bin_eval(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
     } else
 	fpushed = 0;
 
-    prog = parse_string(zjoin(argv, ' ', 1));
+    prog = parse_string(zjoin(argv, ' ', 1), 1);
     if (prog) {
 	if (wc_code(*prog->prog) != WC_LIST) {
 	    /* No code to execute */
@@ -5781,7 +5781,7 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     arg = *argv++;
     if (!*arg)
 	prog = &dummy_eprog;
-    else if (!(prog = parse_string(arg))) {
+    else if (!(prog = parse_string(arg, 1))) {
 	zwarnnam(name, "couldn't parse trap command");
 	return 1;
     }

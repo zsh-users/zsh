@@ -279,7 +279,7 @@ setfunction(char *name, char *val, int dis)
 
     val = metafy(val, strlen(val), META_REALLOC);
 
-    prog = parse_string(val);
+    prog = parse_string(val, 1);
 
     if (!prog || prog == &dummy_eprog) {
 	zwarn("invalid function definition", value);

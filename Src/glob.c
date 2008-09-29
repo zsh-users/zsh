@@ -3329,7 +3329,7 @@ qualsheval(char *name, UNUSED(struct stat *buf), UNUSED(off_t days), char *str)
 {
     Eprog prog;
 
-    if ((prog = parse_string(str))) {
+    if ((prog = parse_string(str, 0))) {
 	int ef = errflag, lv = lastval, ret;
 
 	unsetparam("reply");

@@ -251,7 +251,7 @@ setstypat(Style s, char *pat, Patprog prog, char **vals, int eval)
     if (eval) {
 	int ef = errflag;
 
-	eprog = parse_string(zjoin(vals, ' ', 1));
+	eprog = parse_string(zjoin(vals, ' ', 1), 0);
 	errflag = ef;
 
 	if (!eprog)

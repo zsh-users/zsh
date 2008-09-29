@@ -1,3 +1,12 @@
+2008-09-29  Peter Stephenson  <pws@csr.com>
+
+	* users/13295 (with tweak always to keep old line numbers at
+	exit from parse_string()): Src/builtin.c, Src/exec.c, Src/glob.c,
+	Src/parse.c, Src/Modules/parameter.c, Src/Modules/zpty.c,
+	Src/Modules/zutil.c: don't reset $LINENO when parsing strings
+	unless the surrounding environment provides support (funcstack
+	etc.) for it.
+
 2008-09-28  Clint Adams  <clint@zsh.org>
 
 	* 25764: Completion/Unix/Command/.distfiles,

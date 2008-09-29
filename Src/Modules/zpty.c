@@ -299,7 +299,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
     if (!ineval)
 	scriptname = "(zpty)";
 
-    prog = parse_string(zjoin(args, ' ', 1));
+    prog = parse_string(zjoin(args, ' ', 1), 0);
     if (!prog) {
 	errflag = 0;
 	scriptname = oscriptname;

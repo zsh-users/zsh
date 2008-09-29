@@ -188,15 +188,17 @@ static struct builtin commandbn =
 
 /**/
 mod_export Eprog
-parse_string(char *s)
+parse_string(char *s, int reset_lineno)
 {
     Eprog p;
-    zlong oldlineno = lineno;
+    zlong oldlineno;
 
     lexsave();
     inpush(s, INP_LINENO, NULL);
     strinbeg(0);
-    lineno = 1;
+    oldlineno = lineno;
+    if (reset_lineno)
+	lineno = 1;
     p = parse_list();
     lineno = oldlineno;
     if (tok == LEXERR && !lastval)
@@ -954,7 +956,7 @@ execstring(char *s, int dont_change_job, int exiting)
     Eprog prog;
 
     pushheap();
-    if ((prog = parse_string(s)))
+    if ((prog = parse_string(s, 0)))
 	execode(prog, dont_change_job, exiting);
     popheap();
 }
@@ -3445,7 +3447,7 @@ getoutput(char *cmd, int qt)
     pid_t pid;
     char *s;
 
-    if (!(prog = parse_string(cmd)))
+    if (!(prog = parse_string(cmd, 0)))
 	return NULL;
 
     if ((s = simple_redir_name(prog, REDIR_READ))) {
@@ -3566,7 +3568,7 @@ parsecmd(char *cmd)
 	return NULL;
     }
     *str = '\0';
-    if (str[1] || !(prog = parse_string(cmd + 2))) {
+    if (str[1] || !(prog = parse_string(cmd + 2, 0))) {
 	zerr("parse error in process substitution");
 	return NULL;
     }
@@ -4453,7 +4455,7 @@ getfpfunc(char *s, int *ksh, char **fname)
 		    d = metafy(d, rlen, META_REALLOC);
 
 		    scriptname = dupstring(s);
-		    r = parse_string(d);
+		    r = parse_string(d, 1);
 		    scriptname = oldscriptname;
 
 		    if (fname)
