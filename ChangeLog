@@ -1,5 +1,11 @@
 2008-09-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 25775: Src/exec.c, Src/prompt.c, Src/signals.c, Src/zsh.h:
+	line numbering in functions inside eval-style traps on the
+	function stack was screwy.  Simplest fix is to restore normal
+	line numbering within the functions so that only the immediate
+	eval-style trap environment is special.
+
 	* 25774: Src/params.c: fix in 25772 was applied too widely.
 
 2008-09-29  Peter Stephenson  <pws@csr.com>

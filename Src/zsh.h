@@ -924,6 +924,7 @@ struct execstack {
     int trap_return;
     int trap_state;
     int trapisfunc;
+    int traplocallevel;
     int noerrs;
     int subsh_close;
     char *underscore;
@@ -2260,6 +2261,9 @@ enum trap_state {
      */
     TRAP_STATE_FORCE_RETURN
 };
+
+#define IN_EVAL_TRAP() \
+    (intrap && !trapisfunc && traplocallevel == locallevel)
 
 /***********/
 /* Sorting */

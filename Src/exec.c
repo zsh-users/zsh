@@ -992,7 +992,7 @@ execsimple(Estate state)
 	return (lastval = 1);
 
     /* In evaluated traps, don't modify the line number. */
-    if ((!intrap || trapisfunc) && !ineval && code)
+    if (!IN_EVAL_TRAP() && !ineval && code)
 	lineno = code - 1;
 
     code = wc_code(*state->pc++);
@@ -1053,7 +1053,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 	ltype = WC_LIST_TYPE(code);
 	csp = cmdsp;
 
-	if ((!intrap || trapisfunc) && !ineval) {
+	if (!IN_EVAL_TRAP() && !ineval) {
 	    /*
 	     * Ensure we have a valid line number for debugging,
 	     * unless we are in an evaluated trap in which case
@@ -1543,7 +1543,7 @@ execpline2(Estate state, wordcode pcode,
 	return;
 
     /* In evaluated traps, don't modify the line number. */
-    if ((!intrap || trapisfunc) && !ineval && WC_PIPE_LINENO(pcode))
+    if (!IN_EVAL_TRAP() && !ineval && WC_PIPE_LINENO(pcode))
 	lineno = WC_PIPE_LINENO(pcode) - 1;
 
     if (pline_level == 1) {
@@ -4628,6 +4628,7 @@ execsave(void)
     es->trap_return = trap_return;
     es->trap_state = trap_state;
     es->trapisfunc = trapisfunc;
+    es->traplocallevel = traplocallevel;
     es->noerrs = noerrs;
     es->subsh_close = subsh_close;
     es->underscore = ztrdup(underscore);
@@ -4657,6 +4658,7 @@ execrestore(void)
     trap_return = exstack->trap_return;
     trap_state = exstack->trap_state;
     trapisfunc = exstack->trapisfunc;
+    traplocallevel = exstack->traplocallevel;
     noerrs = exstack->noerrs;
     subsh_close = exstack->subsh_close;
     setunderscore(exstack->underscore);

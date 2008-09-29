@@ -727,7 +727,7 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		break;
 	    case 'I':
 		if (funcstack && funcstack->tp != FS_SOURCE &&
-		    (!intrap || trapisfunc)) {
+		    !IN_EVAL_TRAP()) {
 		    /*
 		     * We're in a function or an eval with
 		     * EVALLINENO.  Calculate the line number in
@@ -751,7 +751,7 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		break;
 	    case 'x':
 		if (funcstack && funcstack->tp != FS_SOURCE &&
-		    (!intrap || trapisfunc))
+		    !IN_EVAL_TRAP())
 		    promptpath(funcstack->filename ? funcstack->filename : "",
 			       arg, 0);
 		else

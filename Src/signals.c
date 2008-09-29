@@ -1077,6 +1077,13 @@ int intrap;
 int trapisfunc;
 
 /*
+ * If the current trap is not a function, at what function depth
+ * did the trap get called?
+ */
+/**/
+int traplocallevel;
+
+/*
  * sig is the signal number.
  * *sigtr is the value to be taken as the field in sigtrapped (since
  *   that may have changed by this point if we are exiting).
@@ -1132,6 +1139,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     /* execsave will save the old trap_return and trap_state */
     execsave();
     breaks = retflag = 0;
+    traplocallevel = locallevel;
     runhookdef(BEFORETRAPHOOK, NULL);
     if (*sigtr & ZSIG_FUNC) {
 	int osc = sfcontext;
