@@ -2935,14 +2935,23 @@ getshfunc(char *nam)
 char **
 subst_string_by_func(Shfunc func, char *arg1, char *orig)
 {
+    int osc = sfcontext;
     LinkList l = newlinklist();
+    char **ret;
+
     addlinknode(l, func->node.nam);
     if (arg1)
 	addlinknode(l, arg1);
     addlinknode(l, orig);
+    sfcontext = SFC_SUBST;
+
     if (doshfunc(func, l, 1))
-	return NULL;
-    return getaparam("reply");
+	ret = NULL;
+    else
+	ret = getaparam("reply");
+
+    sfcontext = osc;
+    return ret;
 }
 
 /**/

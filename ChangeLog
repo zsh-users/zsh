@@ -1,5 +1,8 @@
 2008-09-29  Peter Stephenson  <pws@csr.com>
 
+	* 25771: Src/utils.c, Src/zsh.h: shell function context
+	for substitution functions.
+
 	* users/13295 (with tweak always to keep old line numbers at
 	exit from parse_string()): Src/builtin.c, Src/exec.c, Src/glob.c,
 	Src/parse.c, Src/Modules/parameter.c, Src/Modules/zpty.c,

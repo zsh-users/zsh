@@ -1076,6 +1076,7 @@ struct shfunc {
 #define SFC_WIDGET   4		/* user defined widget */
 #define SFC_COMPLETE 5		/* called from completion code */
 #define SFC_CWIDGET  6		/* new style completion widget */
+#define SFC_SUBST    7          /* used to perform substitution task */
 
 /* tp in funcstack */
 
