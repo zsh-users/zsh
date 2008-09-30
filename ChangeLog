@@ -1,5 +1,8 @@
 2008-09-30  Peter Stephenson  <pws@csr.com>
 
+	* Frank Terbeck: 25778: Functions/VCS_Info/VCS_INFO_realpath: use
+	builtin cd.
+
 	* unposted: Completion/Zsh/Context/_subscript: recognise ~[...]
 	after = and :, too.
 

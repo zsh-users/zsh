@@ -12,5 +12,5 @@ setopt localoptions NO_shwordsplit
 (
     (( ${+functions[chpwd]} )) && unfunction chpwd
     setopt chaselinks
-    cd $1 2>/dev/null && pwd
+    builtin cd $1 2>/dev/null && pwd
 )
