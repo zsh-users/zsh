@@ -1,3 +1,10 @@
+2008-09-30  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Zsh/Context/_subscript: recognise ~[...]
+	after = and :, too.
+
+	* 25777: Src/Modules/db_gdbm.c: argument to gdbmsetfn.
+
 2008-09-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25775: Src/exec.c, Src/prompt.c, Src/signals.c, Src/zsh.h:
@@ -844,7 +851,7 @@
 
 2008-06-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 25258: Completion/Unix/Type/_path_files: donʼt
+	* 25258: Completion/Unix/Type/_path_files: don't
 	use -M option with -U.
 
 2008-06-30  Peter Stephenson  <pws@csr.com>

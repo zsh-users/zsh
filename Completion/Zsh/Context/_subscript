@@ -14,10 +14,11 @@ compset -P '\(([^\(\)]|\(*\))##\)' # remove subscript flags
 # the stuff inside the square brackets; we need to find out what's
 # outside.  We ought to check for quoting, really, but given we've
 # got to the subscript code " ~[" is pretty likely to be a dynamic
-# name expansion.
+# name expansion.  Also expand in anything that looks like an assignment
+# or colon list.
 integer pos=$((CURSOR+1))
 while [[ pos > 1 && $BUFFER[pos-1] != '[' ]]; do (( pos-- )); done
-if [[ $BUFFER[1,pos] = *[[:space:]]##\~\[ ]]; then
+if [[ $BUFFER[1,pos] = *[[:space:]:=]##\~\[ ]]; then
   _dynamic_directory_name
 elif [[ "$PREFIX" = :* ]]; then
   _wanted characters expl 'character class' \

@@ -135,7 +135,7 @@ gdbmgetfn(Param pm)
 
 /**/
 static void
-gdbmsetfn(Param pm, char **val)
+gdbmsetfn(Param pm, char *val)
 {
     datum key, content;
     int ret;
