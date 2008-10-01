@@ -1,3 +1,8 @@
+2008-10-01  Peter Stephenson  <pws@csr.com>
+
+	* 25791: Src/exec.c, Test/C05debug.ztst: force return from
+	eval-style DEBUG trap lost status.
+
 2008-09-30  Peter Stephenson  <pws@csr.com>
 
 	* Frank Terbeck: 25778: Functions/VCS_Info/VCS_INFO_realpath: use

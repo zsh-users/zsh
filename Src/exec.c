@@ -1091,7 +1091,8 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    exiting = donetrap;
 	    ret = lastval;
 	    dotrap(SIGDEBUG);
-	    lastval = ret;
+	    if (!retflag)
+		lastval = ret;
 	    donetrap = exiting;
 	    noerrexit = oldnoerrexit;
 	    /*
@@ -1230,7 +1231,8 @@ sublist_done:
 	    exiting = donetrap;
 	    ret = lastval;
 	    dotrap(SIGDEBUG);
-	    lastval = ret;
+	    if (!retflag)
+		lastval = ret;
 	    donetrap = exiting;
 	    noerrexit = oldnoerrexit;
 	    opts[ERREXIT] = oerrexit_opt;

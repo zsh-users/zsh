@@ -137,3 +137,13 @@
 >9: 'fn2'
 >0: 'echo wow'
 >wow
+
+  foo() {
+    emulate -L zsh; setopt debugbeforecmd
+    trap '[[ $ZSH_DEBUG_CMD == *bar* ]] && return 2' DEBUG
+    echo foo
+    echo bar
+  }
+  foo
+2:Status of forced return from eval-style DEBUG trap
+>foo
