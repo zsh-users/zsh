@@ -1,3 +1,8 @@
+2008-10-02  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Zsh/Context/_subscript: off-by-one
+	error in testing for dynamic directory name prefix.
+
 2008-10-01  Peter Stephenson  <pws@csr.com>
 
 	* 25791: Src/exec.c, Test/C05debug.ztst: force return from
