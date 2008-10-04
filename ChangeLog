@@ -1,3 +1,8 @@
+2008-10-04  Clint Adams  <clint@zsh.org>
+
+	* 25808: Completion/Debian/Command/_bts: handle bts claim and
+	unclaim subcommands.
+
 2008-10-02  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Zsh/Context/_subscript: off-by-one
