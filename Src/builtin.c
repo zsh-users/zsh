@@ -1416,7 +1416,19 @@ bin_fc(char *nam, char **argv, Options ops, int func)
     /* default values of first and last, and range checking */
     if (last == -1) {
 	if (OPT_ISSET(ops,'l') && first < curhist) {
-	    last = addhistnum(curline.histnum,-1,0);
+	    /*
+	     * When listing base our calculations on curhist,
+	     * to show anything added since the edited history line.
+	     * Also, in that case curhist will have been modified
+	     * past the current history line; then we want to
+	     * show everything, because the user expects to
+	     * see the result of "print -s".  Otherwise, we subtract
+	     * -1 from the line, because the user doesn't usually expect
+	     * to see the command line that caused history to be
+	     * listed.
+	     */
+	    last = (curline.histnum == curhist) ? addhistnum(curhist,-1,0)
+		: curhist;
 	    if (last < firsthist())
 		last = firsthist();
 	}
@@ -1424,7 +1436,15 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 	    last = first;
     }
     if (first == -1) {
-	first = OPT_ISSET(ops,'l')? addhistnum(curline.histnum,-16,0)
+	/*
+	 * When listing, we want to see everything that's been
+	 * added to the history, including by print -s, so use
+	 * curhist.
+	 * When reexecuting, we want to restrict to the last edited
+	 * command line to avoid giving the user a nasty turn
+	 * if some helpful soul ran "print -s 'rm -rf /'".
+	 */
+	first = OPT_ISSET(ops,'l')? addhistnum(curhist,-16,0)
 			: addhistnum(curline.histnum,-1,0);
 	if (first < 1)
 	    first = 1;
