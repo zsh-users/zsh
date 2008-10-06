@@ -125,7 +125,7 @@ in order not to use existing definitions."
     newifile=$PWD/$newifile
     print "[Not absolute path: updating to $newifile]"
   fi
-  [[ -z $newifile || ! -f $newfile ]] && foundold=false
+  [[ -z $newifile || ! -f $newifile ]] && foundold=false
 else
   print "I haven't found any existing completion definitions.
 If you have some already defined by compinstall, edit the name of the

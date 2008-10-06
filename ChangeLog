@@ -1,3 +1,8 @@
+2008-10-06  Clint Adams  <clint@zsh.org>
+
+	* 25818: Completion/compinstall: compinstall data loss typo fix
+	from Morita Sho.
+
 2008-10-04  Clint Adams  <clint@zsh.org>
 
 	* 25808: Completion/Debian/Command/_bts: handle bts claim and
