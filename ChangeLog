@@ -1,5 +1,8 @@
 2008-10-07  Clint Adams  <clint@zsh.org>
 
+	* Jörg Sommer: 25822: Completion/Linux/Command/_modutils: declare
+	val_args as local array.
+
 	* Jörg Sommer: 25821: Completion/Linux/Command/_modutils: return 0
 	if a modules parameter was completed.
 

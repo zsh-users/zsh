@@ -95,6 +95,8 @@ case "$state" in
     if compset -P '*='; then
       _message -e value 'parameter value'
     else
+      typeset -A val_args
+
       _values 'module parameter' \
         ${(f)^"$(_call_program module_parameter modinfo -F parm "$words[2]" 2>/dev/null)"//:/\=[}\] && ret=0
     fi
