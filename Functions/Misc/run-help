@@ -63,6 +63,7 @@ do
 	case ${what[(w)1]} in
 	(comp*) man zshcompsys;;
 	(zf*) man zshftpsys;;
+	(run-help) man zshcontrib;;
 	(*) builtin functions ${what[(w)1]} | ${=PAGER:-more};;
 	esac;;
     (*( is a * builtin))

@@ -1,5 +1,8 @@
 2008-10-07  Clint Adams  <clint@zsh.org>
 
+	* 25823: Functions/Misc/run-help: bring up zshcontrib man page if
+	run-help is run on run-help and run-help is a function.
+
 	* Jörg Sommer: 25819: Completion/Linux/Command/_modutils: improve
 	module parameter completion.
 
