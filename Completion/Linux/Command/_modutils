@@ -95,10 +95,17 @@ case "$state" in
     if compset -P '*='; then
       _message -e value 'parameter value'
     else
-      typeset -A val_args
+      local params
+      params=( ${${(M)${(f)"$(_call_program module_parameter modinfo "$words[2]" 2>/dev/null)"}:#parm:*}##parm:[[:space:]]##} )
+      if [[ $#params -eq 0 ]]; then
+        _message -e parameter "This modules doesn't have parameters"
+      else
+        typeset -A val_args
 
-      _values 'module parameter' \
-        ${(f)^"$(_call_program module_parameter modinfo -F parm "$words[2]" 2>/dev/null)"//:/\=[}\] && ret=0
+        _values -S = -C -w 'module parameter' \
+          ${${${(M)params:#*(:bool|\(bool\))}/:/[}/(bool| \(bool\))/]} \
+          ${^${params:#*(:bool|\(bool\))}/:/[}"]:auto added argument: " && ret=0
+      fi
     fi
   ;;
 esac
