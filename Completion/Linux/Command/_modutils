@@ -18,6 +18,8 @@ case "$service" in
       '(-)'{-l,--license}"[display the module's license]" \
       '(-)'{-n,--filename}"[display the module's filename]" \
       '(-)'{-p,--parameters}'[display the typed parameters that a module may support]' \
+      '(-)'{-F,--field}"[display only selected module's information]:module_field:(
+        alias author depends description filename license parm)" \
       '1:module file:->all_modules' && ret=0
   ;;
 

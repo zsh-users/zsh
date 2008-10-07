@@ -1,3 +1,8 @@
+2008-10-07  Clint Adams  <clint@zsh.org>
+
+	* Jörg Sommer: 25820: Completion/Linux/Command/_modutils: add the
+	option --field of modinfo.
+
 2008-10-06  Clint Adams  <clint@zsh.org>
 
 	* 25818: Completion/compinstall: compinstall data loss typo fix
