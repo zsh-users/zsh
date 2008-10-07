@@ -96,7 +96,7 @@ case "$state" in
       _message -e value 'parameter value'
     else
       _values 'module parameter' \
-        ${(f)^"$(_call_program module_parameter modinfo -F parm "$words[2]" 2>/dev/null)"//:/\=[}\]
+        ${(f)^"$(_call_program module_parameter modinfo -F parm "$words[2]" 2>/dev/null)"//:/\=[}\] && ret=0
     fi
   ;;
 esac

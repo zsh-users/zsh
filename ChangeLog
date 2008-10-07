@@ -1,5 +1,8 @@
 2008-10-07  Clint Adams  <clint@zsh.org>
 
+	* Jörg Sommer: 25821: Completion/Linux/Command/_modutils: return 0
+	if a modules parameter was completed.
+
 	* Jörg Sommer: 25820: Completion/Linux/Command/_modutils: add the
 	option --field of modinfo.
 
