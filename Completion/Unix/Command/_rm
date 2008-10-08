@@ -1,0 +1,41 @@
+#compdef rm
+
+declare -a opts args
+args=(
+  '(-f --force)'{-f,--force}'[ignore nonexistent files, never prompt]'
+  '(-I --interactive)-i[prompt before every removal]'
+  '(-r -R --recursive)'{-r,-R,--recursive}'[remove directories and their contents recursively]'
+  '*:files:->file'
+)
+if _pick_variant gnu=gnu unix --help; then
+  opts+=(-S)
+  args+=(
+    '(-i --interactive)-I[prompt when removing many files]'
+    '(-i -I)--interactive=-[prompt under given condition (defaulting to always)]::when:((once\:"prompt when removing many files"
+                                                                                         always\:"prompt before every removal"))'
+    '--one-file-system[stay within filesystems of files given as arguments]'
+    '(                   --preserve-root)--no-preserve-root[do not treat / specially]'
+    '(--no-preserve-root                )--preserve-root[do not remove / (default)]'
+    '(-v --verbose)'{-v,--verbose}'[explain what is being done]'
+    '(- *)--help[display help message and exit]'
+    '(- *)--version[output version information and exit]'
+  )
+else
+  args=(${args:#*--(force|recursive)\[*})
+fi
+
+local curcontext=$curcontext state line ret=1
+declare -A opt_args
+
+_arguments -C $opts \
+  $args && ret=0
+
+case $state in
+  (file)
+    declare -a ignored
+    ignored=(${line//(#m)[\[\]()\\*?#<>~\^]/\\$MATCH})
+    _path_files -F ignored && ret=0
+    ;;
+esac
+
+return $ret

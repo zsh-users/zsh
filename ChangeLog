@@ -1,3 +1,10 @@
+2008-10-08  Peter Stephenson  <pws@csr.com>
+
+	* Nikolai Weibull: 25828: Completion/Unix/Command/_rm,
+	Completion/Unix/Command/.distfiles: new completion.
+
+	* unposted: NEWS: note some new features.
+
 2008-10-07  Clint Adams  <clint@zsh.org>
 
 	* 25823: Functions/Misc/run-help: bring up zshcontrib man page if
