@@ -27,6 +27,12 @@
 	* 25818: Completion/compinstall: compinstall data loss typo fix
 	from Morita Sho.
 
+2008-10-06  Peter Stephenson  <pws@csr.com>
+
+	* 25817: Src/builtin.c: "fc -l" is now more careful to
+	list all history just added, however it got there.  Use
+	of fc for executing previous commands unchanged.
+
 2008-10-04  Clint Adams  <clint@zsh.org>
 
 	* 25808: Completion/Debian/Command/_bts: handle bts claim and
