@@ -2791,9 +2791,6 @@ __git_changed_files () {
 (( $+functions[__git_tree_files] )) ||
 __git_tree_files () {
   local multi_parts_opts
-
-  zparseopts -D -E -a multi_parts_opts M: J: V: 1 2 n F: X:
-
   local tree Path
   integer at_least_one_tree_added
   local -a tree_files

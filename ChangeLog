@@ -1,5 +1,8 @@
 2008-10-09  Clint Adams  <clint@zsh.org>
 
+	* 25833: Completion/Unix/Command/_git: remove zparseopts line
+	obsoleted by 25824.
+
 	* Jörg Sommer: 25824: Completion/Unix/Command/_git: make it
 	possible to use abbreviated paths for tree files.
 
