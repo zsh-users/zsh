@@ -1810,11 +1810,10 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	    /* Overload v->isarr as the flag bits for hashed arrays. */
 	    v->isarr = flags | (isvarat ? SCANPM_ISVAR_AT : 0);
 	    /* If no flags were passed, we need something to represent *
-	     * `true' yet differ from an explicit WANTVALS.  This is a *
-	     * bit of a hack, but makes some sense:  When no subscript *
-	     * is provided, all values are substituted.                */
+	     * `true' yet differ from an explicit WANTVALS.  Use a     *
+	     * special flag for this case.                             */
 	    if (!v->isarr)
-		v->isarr = SCANPM_MATCHMANY;
+		v->isarr = SCANPM_ARRONLY;
 	}
 	v->pm = pm;
 	v->flags = 0;
@@ -2188,7 +2187,8 @@ setstrvalue(Value v, char *val)
 	zsfree(val);
 	return;
     }
-    if ((v->pm->node.flags & PM_HASHED) && (v->isarr & SCANPM_MATCHMANY)) {
+    if ((v->pm->node.flags & PM_HASHED) &&
+	(v->isarr & (SCANPM_MATCHMANY|SCANPM_ARRONLY))) {
 	zerr("%s: attempt to set slice of associative array", v->pm->node.nam);
 	zsfree(val);
 	return;

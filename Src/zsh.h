@@ -1532,16 +1532,25 @@ struct tieddata {
 #define TYPESET_OPTNUM "LRZiEF"
 
 /* Flags for extracting elements of arrays and associative arrays */
-#define SCANPM_WANTVALS   (1<<0)
-#define SCANPM_WANTKEYS   (1<<1)
-#define SCANPM_WANTINDEX  (1<<2)
-#define SCANPM_MATCHKEY   (1<<3)
-#define SCANPM_MATCHVAL   (1<<4)
-#define SCANPM_MATCHMANY  (1<<5)
-#define SCANPM_ASSIGNING  (1<<6)
-#define SCANPM_KEYMATCH   (1<<7)
-#define SCANPM_DQUOTED    (1<<8)
-#define SCANPM_ISVAR_AT   ((-1)<<15)	/* Only sign bit is significant */
+#define SCANPM_WANTVALS   (1<<0) /* Return value includes hash values */
+#define SCANPM_WANTKEYS   (1<<1) /* Return value includes hash keys */
+#define SCANPM_WANTINDEX  (1<<2) /* Return value includes array index */
+#define SCANPM_MATCHKEY   (1<<3) /* Subscript matched against key */
+#define SCANPM_MATCHVAL   (1<<4) /* Subscript matched against value */
+#define SCANPM_MATCHMANY  (1<<5) /* Subscript matched repeatedly, return all */
+#define SCANPM_ASSIGNING  (1<<6) /* Assigning whole array/hash */
+#define SCANPM_KEYMATCH   (1<<7) /* keys of hash treated as patterns */
+#define SCANPM_DQUOTED    (1<<8) /* substitution was double-quoted
+				  * (only used for testing early end of
+				  * subscript)
+				  */
+#define SCANPM_ARRONLY    (1<<9) /* value is array but we don't
+				  * necessarily want to match multiple
+				  * elements
+				  */
+#define SCANPM_ISVAR_AT   ((-1)<<15)	/* "$foo[@]"-style substitution
+					 * Only sign bit is significant
+					 */
 
 /*
  * Flags for doing matches inside parameter substitutions, i.e.

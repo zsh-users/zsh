@@ -1,3 +1,11 @@
+2008-10-09  Peter Stephenson  <pws@csr.com>
+
+	* 25831: Doc/Zsh/expn.yo, Doc/Zsh/options.yo, Src/params.c,
+	Src/zsh.h, Test/D04parameter.ztst: ensure failed subscript matches
+	of a type that are documented as strings rather than arrays
+	return an empty string rather than an empty array to avoid
+	strange RC_EXPAND_PARAM behaviour.
+
 2008-10-08  Peter Stephenson  <pws@csr.com>
 
 	* Nikolai Weibull: 25828: Completion/Unix/Command/_rm,

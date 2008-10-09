@@ -611,7 +611,8 @@ var(foo)tt(${)var(xx)tt(})var(bar),
 where the parameter var(xx)
 is set to tt(LPAR())var(a b c)tt(RPAR()), are substituted with
 `var(fooabar foobbar foocbar)' instead of the default
-`var(fooa b cbar)'.
+`var(fooa b cbar)'.  Note that an empty array will therefore cause
+all arguments to be removed.
 
 Internally, each such expansion is converted into the
 equivalent list for brace expansion.  E.g., tt(${^var}) becomes

@@ -1086,3 +1086,37 @@
 >no
 >no
 >no
+
+  rcexbug() {
+    emulate -L zsh
+    setopt rcexpandparam
+    local -A hash
+    local -a full empty
+    full=(X x)
+    hash=(X x)
+    print ORDINARY ARRAYS
+    : The following behaves as documented in zshoptions
+    print FULL expand=$full
+    : Empty arrays remove the adjacent argument
+    print EMPTY expand=$empty
+    print ASSOCIATIVE ARRAY
+    print Subscript flags returning many values
+    print FOUND key=$hash[(I)X] val=$hash[(R)x]
+    : This should behave like $empty, and does
+    print LOST key=$hash[(I)y] val=$hash[(R)Y]
+    print Subscript flags returning single values
+    : Doc says "substitutes ... empty string"
+    : so must not behave like an empty array
+    print STRING key=$hash[(i)y] val=$hash[(r)Y]
+  }
+  rcexbug
+0:Lookup failures on elements of arrays with RC_EXPAND_PARAM
+>ORDINARY ARRAYS
+>FULL expand=X expand=x
+>EMPTY
+>ASSOCIATIVE ARRAY
+>Subscript flags returning many values
+>FOUND key=X val=x
+>LOST
+>Subscript flags returning single values
+>STRING key= val=
