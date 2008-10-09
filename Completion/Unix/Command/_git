@@ -2811,7 +2811,7 @@ __git_tree_files () {
   fi
 
   local expl
-  _wanted files expl 'tree file' compadd $multi_parts_opts -f -a tree_files
+  _wanted files expl 'tree file' _multi_parts -f $@ -- / tree_files
 }
 
 # TODO: deal with things that __git_heads and __git_tags has in common (i.e.,
