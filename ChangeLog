@@ -1,7 +1,9 @@
 2008-10-10  Peter Stephenson  <pws@csr.com>
 
+	* 25837: NEWS: add descriptions of new debugging features.
+
 	* unposted: Functions/Zftp/zffcache,
-	Functions/Zftp/zftp_progroess: silence some warnings when
+	Functions/Zftp/zftp_progress: silence some warnings when
 	WARN_CREATE_GLOBAL is set.
 
 	* unposted: Config/version.mk: 4.3.6-dev-1.

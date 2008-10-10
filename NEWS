@@ -37,6 +37,26 @@ special parameter REGION_HIGHLIGHT.
 Colouring of prompts is now supported within the shell by prompt
 escapes.  The prompt theme system has been updated.
 
+Various changes have been added to make debugging of shell code easier:
+  - As noted in README, the option DEBUG_BEFORE_CMD is now set by default.
+  - In DEBUG traps, $ZSH_DEBUG_CMD gives the code for which the trap is
+    called as a string.
+  - "setopt ERR_EXIT" in a DEBUG trap causes the code not to be executed.
+  - $ZSH_SUBSHELL indicates the subshell level at which code is being
+    executed.
+  - The zsh/parameter module has various additional arrays similar to
+    the existing $funcstack and $functrace, namely $funcsourcetrace
+    and $funcfiletrace.  The consistency and informativeness of
+    the output of all these arrays has been improved.
+  - Prompt escapes %x and %I show the source file and line number in
+    debug prompts (compare %N and %i which show names and line numbers
+    in the execution environment).
+  - The option NO_MULTI_FUNCDEF can turn off multiple definition of
+    functions at once, a rarely used feature that can cause problems
+    with misplaced "()".
+  - The "fc" builtin has been enhanced to make non-interactive use possible
+    and output consistent when the history is manipulated with "print -s".
+
 The completion style accept-exact-dirs has been added.  When true, this
 suppresses attempts to complete non-final directory segments of a filename
 path when the directory exists.  (For example, /home/pws/src/zsh/<TAB>
