@@ -1,5 +1,7 @@
 2008-10-10  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Doc/Zsh/expn.yo: protect () from macro expansion.
+
 	* unposted: Etc/CONTRIBUTORS: update.
 
 	* 25837: NEWS: add descriptions of new debugging features.

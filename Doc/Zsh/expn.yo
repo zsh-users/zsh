@@ -1365,7 +1365,7 @@ beginning with the string tt(p:) to directories below
 tt(/home/pws/perforce).  In this simple case a static name for the
 directory would be just as effective.
 
-example(zsh_directory_name() {
+example(zsh_directory_name+LPAR()RPAR() {
   emulate -L zsh
   setopt extendedglob
   local -a match mbegin mend
