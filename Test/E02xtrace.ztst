@@ -98,7 +98,8 @@
  :
  fn
  ' >fnfile
- $ZTST_testdir/../Src/zsh -fx ./fnfile
+ $ZTST_testdir/../Src/zsh -fx ./fnfile 2>errfile
+ grep '\./fnfile' errfile 1>&2
 0:Trace output with sourcefile and line number.
 >This is fn.
 ?+./fnfile:1> PS4='+%x:%I> ' 

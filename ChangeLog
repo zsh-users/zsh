@@ -1,5 +1,8 @@
 2008-10-10  Peter Stephenson  <pws@csr.com>
 
+	* users/13323: Test/E02xtrace.ztst: new test wasn't robust
+	about ignoring /etc/zshenv.
+
 	* users/13321: configure.ac: allow --disable-gdbm.
 
 	* unposted: Doc/Zsh/expn.yo: protect () from macro expansion.
