@@ -1317,7 +1317,7 @@ item(tt(environ))(
 The environ style is used when completing for `tt(sudo)'.  It is set to an
 array of `var(VAR)tt(=)var(value)' assignments to be exported into the
 local environment before the completion for the target command is invoked.
-example(zstyle :complete:sudo: environ \
+example(zstyle :complete:sudo: environ \ 
   PATH="/sbin:/usr/sbin:$PATH" HOME="/root")
 )
 kindex(expand, completion style)
