@@ -2812,10 +2812,11 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		else
 		    fil = getherestr(fn);
 		if (fil == -1) {
+		    if (errno && errno != EINTR)
+			zwarn("can't create temp file for here document: %e",
+			      errno);
 		    closemnodes(mfds);
 		    fixfds(save);
-		    if (errno && errno != EINTR)
-			zwarn("%e", errno);
 		    execerr();
 		}
 		addfd(forked, save, mfds, fn->fd1, fil, 0, fn->varid);
