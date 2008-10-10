@@ -1,3 +1,18 @@
+2008-10-10  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 25814: Functions/Misc/run-help: quote arguments to "eval".
+
+	* unposted (?): Functions/Prompts/promptinit: quote expansion of
+	prompt_opts in prompt() because zsh emulation is by necessity not
+	enforced there.
+
+	* 25140: Src/exec.c: improve error handling/reporting for
+	here-document temp files.
+
+	* 25029 (plus unposted doc): Completion/Unix/Command/_sudo,
+	Doc/Zsh/compsys.yo: "environ" style to allow a different search
+	path when completing as a different user.
+
 2008-10-09  Clint Adams  <clint@zsh.org>
 
 	* 25833: Completion/Unix/Command/_git: remove zparseopts line
