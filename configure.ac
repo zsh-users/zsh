@@ -351,6 +351,10 @@ AC_ARG_ENABLE(cap,
 AC_HELP_STRING([--enable-cap],
 [enable the search for POSIX capabilities (may require additional headers to be added by hand)]))
 
+AC_ARG_ENABLE(gdbm,
+AC_HELP_STRING([--disable-gdbm], [turn off search for gdbm library]),
+[gdbm="$enableval"], [gdbm=yes])
+
 dnl ------------------
 dnl CHECK THE COMPILER
 dnl ------------------
@@ -563,7 +567,7 @@ AC_CHECK_HEADERS(sys/time.h sys/times.h sys/select.h termcap.h termio.h \
 		 utmp.h utmpx.h sys/types.h pwd.h grp.h poll.h sys/mman.h \
 		 netinet/in_systm.h pcre.h langinfo.h wchar.h stddef.h \
 		 sys/stropts.h iconv.h ncurses.h ncursesw/ncurses.h \
-		 ncurses/ncurses.h gdbm.h)
+		 ncurses/ncurses.h)
 if test x$dynamic = xyes; then
   AC_CHECK_HEADERS(dlfcn.h)
   AC_CHECK_HEADERS(dl.h)
@@ -834,7 +838,10 @@ elif test x$zsh_cv_decl_ospeed_must_define = xyes; then
   AC_DEFINE(MUST_DEFINE_OSPEED)
 fi
 
-AC_CHECK_LIB(gdbm, gdbm_open)
+if test x$gdbm != xno; then
+  AC_CHECK_HEADERS(gdbm.h)
+  AC_CHECK_LIB(gdbm, gdbm_open)
+fi
 
 dnl --------------
 dnl CHECK TYPEDEFS
@@ -2938,6 +2945,7 @@ case x$LIBS in
   (*-lgdbm*)
   echo "WARNING: zsh has been linked against libgdbm.
 This means the binary is covered by the GNU General Public License.
-This does not affect the source code."
+This does not affect the source code.
+Run configure with --disable-gdbm if required."
   ;;
 esac

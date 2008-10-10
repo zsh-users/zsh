@@ -1,5 +1,7 @@
 2008-10-10  Peter Stephenson  <pws@csr.com>
 
+	* users/13321: configure.ac: allow --disable-gdbm.
+
 	* unposted: Doc/Zsh/expn.yo: protect () from macro expansion.
 
 	* unposted: Etc/CONTRIBUTORS: update.
