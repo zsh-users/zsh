@@ -1,5 +1,7 @@
 2008-10-10  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Config/version.mk: 4.3.6-dev-1.
+
 	* unposted: Test/B06fc.ztst: use -f flag to zsh to prevent
 	initialization scripts running.
 
