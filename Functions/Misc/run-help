@@ -101,7 +101,7 @@ do
 		do
 		    shift cmd_args
 		done
-		eval "run-help-$1:t ${(@)cmd_args[2,-1]}"
+		eval "run-help-$1:t ${(q@)cmd_args[2,-1]}"
 	    else
 		man $@:t
 	    fi
