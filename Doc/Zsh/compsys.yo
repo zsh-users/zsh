@@ -1312,6 +1312,14 @@ A list of names of network domains for completion.
 If this is not set, domain names will be taken from
 the file tt(/etc/resolv.conf).
 )
+kindex(environ, completion style)
+item(tt(environ))(
+The environ style is used when completing for `tt(sudo)'.  It is set to an
+array of `var(VAR)tt(=)var(value)' assignments to be exported into the
+local environment before the completion for the target command is invoked.
+example(zstyle :complete:sudo: environ \
+  PATH="/sbin:/usr/sbin:$PATH" HOME="/root")
+)
 kindex(expand, completion style)
 item(tt(expand))(
 This style is used when completing strings consisting of multiple
