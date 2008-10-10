@@ -170,7 +170,7 @@ prompt () {
   set_prompt "$@"
  
   (( $#prompt_opts )) &&
-      setopt noprompt{bang,cr,percent,subst} prompt${^prompt_opts[@]}
+      setopt noprompt{bang,cr,percent,subst} "prompt${^prompt_opts[@]}"
 
   true
 }
