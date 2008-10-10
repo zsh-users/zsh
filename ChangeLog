@@ -1,3 +1,8 @@
+2008-10-10  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Test/B06fc.ztst: use -f flag to zsh to prevent
+	initialization scripts running.
+
 2008-10-10  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 25814: Functions/Misc/run-help: quote arguments to "eval".
