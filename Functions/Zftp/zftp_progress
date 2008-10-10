@@ -48,7 +48,7 @@ if [[ -n $ZFTP_TRANSFER ]]; then
     unset zftpseconds
     print 1>&2
   else
-    zftpseconds=$SECONDS
+    typeset -g zftpseconds=$SECONDS
   fi
 fi
 # }

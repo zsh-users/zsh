@@ -1,5 +1,9 @@
 2008-10-10  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Functions/Zftp/zffcache,
+	Functions/Zftp/zftp_progroess: silence some warnings when
+	WARN_CREATE_GLOBAL is set.
+
 	* unposted: Config/version.mk: 4.3.6-dev-1.
 
 	* unposted: Test/B06fc.ztst: use -f flag to zsh to prevent

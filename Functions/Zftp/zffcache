@@ -2,6 +2,8 @@
 # storing it in fcache_name, then generate the cache for the current
 # directory, or with argument -d clear the cache.
 
+[[ $1 = -d ]] && local fcache_name
+
 fcache_name=$zfconfig[fcache_$ZFTP_SESSION]
 if [[ -z $fcache_name ]]; then
   local vals
