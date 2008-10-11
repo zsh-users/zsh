@@ -1,3 +1,8 @@
+2008-10-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25816: Marc Chantreux: Completion/Unix/Command/_ip:
+	add promiscuous link option.
+
 2008-10-11  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Src/Modules/curses.c: fixed a signed/unsigned

@@ -166,6 +166,7 @@ _regex_words \
   'do*wn:change state do down' \
   'ar*p:change ARP flag on device:$subcmd_onoff' \
   'mu*lticast:change MULTICAST flag on device:$subcmd_onoff' \
+  'pr*omisc:set promiscious mode:$subcmd_onoff' \
   'dy*namic:change DYNAMIC flag on device:$subcmd_onoff' \
   'n*ame:change name of device:$subcmd_string' \
   'txq*ueuelen:specify length of transmit queue:$subcmd_number' \
