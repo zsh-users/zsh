@@ -1,3 +1,8 @@
+2008-10-11  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/Modules/curses.c: fixed a signed/unsigned
+	compiler warning.
+
 2008-10-10  Peter Stephenson  <pws@csr.com>
 
 	* users/13323: Test/E02xtrace.ztst: new test wasn't robust

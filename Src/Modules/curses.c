@@ -1048,7 +1048,7 @@ zccmd_input(const char *nam, char **args)
 #ifdef NCURSES_MOUSE_VERSION
 	if (!(zcurses_flags & ZCF_MOUSE_ACTIVE) ||
 	    (zcurses_flags & ZCF_MOUSE_MASK_CHANGED)) {
-	    if (mousemask(zcurses_mouse_mask, NULL) == ERR) {
+	    if (mousemask(zcurses_mouse_mask, NULL) == (mmask_t)ERR) {
 		zwarnnam(nam, "current mouse mode is not supported");
 		return 1;
 	    }
