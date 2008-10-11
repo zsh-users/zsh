@@ -1,3 +1,9 @@
+2008-10-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25845: Src/pattern.c, Test/D07multibyte.ztst: combination of
+	backslashed characters and metafied characters confused pattern
+	test for pure string.
+
 2008-10-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25816: Marc Chantreux: Completion/Unix/Command/_ip:

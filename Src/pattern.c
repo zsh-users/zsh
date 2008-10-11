@@ -1446,7 +1446,13 @@ patcomppiece(int *flagp)
 	     * Marker for restoring a backslash in output:
 	     * does not match a character.
 	     */
-	    return patcomppiece(flagp);
+	    next = patcomppiece(flagp);
+	    /*
+	     * Can't match a pure string since we need to do this
+	     * as multiple chunks.
+	     */
+	    *flagp &= ~P_PURESTR;
+	    return next;
 	    break;
 #ifdef DEBUG
 	default:
