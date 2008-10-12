@@ -3,7 +3,6 @@
 	* unposted, c.f. 25848: Test/comptest: attempt to sanitize
 	the environment.
 
-=======
 2008-10-12  Clint Adams  <clint@zsh.org>
 
 	* 25859: Src/Zle/zle_tricky.c: avoid possible NULL dereferencing if
