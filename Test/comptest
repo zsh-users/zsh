@@ -25,6 +25,8 @@ comptestinit () {
   }
 
   comptesteval \
+"export LC_ALL=C" \
+"emulate -R zsh" \
 "export ZDOTDIR=$ZTST_testdir" \
 "module_path=( $module_path )" \
 "fpath=( $fpath )" \
