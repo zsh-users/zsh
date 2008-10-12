@@ -8,7 +8,7 @@ to be distributed as part of zsh to maintain a level of consistency.
 Coding style:
 
 * Use two spaces for indentation and four for continuation lines except
-  where there are many continutation lines such as `_arguments' or
+  where there are many continuation lines such as `_arguments' or
   `_values' specs. Lines tend to be longer than in C code so less
   indentation makes sense.
 
@@ -46,7 +46,7 @@ where default values or units are indicated. Do not put them in
 per-match descriptions; they are better placed in the group
 descriptions. Put the units in parentheses after the description. So
 for example, do not use:
-  '--timeout[specifiy connection timeout in milliseconds]:timeout'
+  '--timeout[specify connection timeout in milliseconds]:timeout'
 but use:
   '--timeout[specify connection timeout]:timeout (ms)'
   
@@ -63,7 +63,7 @@ tells _wanted where to put options specifying the `directory' description.
 
 Where two matches have identical meaning, give them the same
 description so that the completion system can group them together.
-Conventionally a brace exapansion of this form is used:
+Conventionally a brace expansion of this form is used:
   '(--context,-C)'{--context=,-C-}'[specify lines of context]:lines'
 You won't need the exclusion list if the option can be specified
 multiple times. It can also be useful to use the same description for
