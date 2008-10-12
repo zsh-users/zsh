@@ -1235,7 +1235,7 @@ get_comp_string(void)
 	    /* This is done when the lexer reached the word the cursor is on. */
 	    tt = tokstr ? dupstring(tokstr) : NULL;
 
-            if (isset(RCQUOTES)) {
+            if (isset(RCQUOTES) && tt) {
 		char *tt1, *e = tt + zlemetacs - wb;
 		for (tt1 = tt; *tt1; tt1++) {
 		    if (*tt1 == Snull) {
