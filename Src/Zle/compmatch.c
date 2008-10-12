@@ -1553,7 +1553,8 @@ bld_parts(char *str, int len, int plen, Cline *lp, Cline *lprem)
 	*lprem = NULL;
     }
 
-    n->next = NULL;
+    if (n)
+        n->next = NULL;
 
     if (lp)
 	*lp = n;
