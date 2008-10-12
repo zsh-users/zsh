@@ -1,3 +1,7 @@
+2008-10-12  Clint Adams  <clint@zsh.org>
+
+	* Mikael Magnusson: 25855: Etc/zsh-development-guide: typo fixes.
+
 2008-10-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25845: Src/pattern.c, Test/D07multibyte.ztst: combination of

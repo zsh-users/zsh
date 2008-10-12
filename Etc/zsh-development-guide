@@ -225,7 +225,7 @@ features.  Ensure you are familiar with the description of features under
 containing a list of all the features.  It should then return zero.
 It may return one to indicate features are not supported, but this is
 not recommended.  The function featuresarray conveniently interrogates
-the module's feature strctures for all standard features; space
+the module's feature structures for all standard features; space
 is left for abstract features at the end of the array and the names
 must be added by the module.  Note that heap memory should
 be used for this (zhalloc, etc.) as memory for the features array is not
@@ -258,7 +258,7 @@ particular they can be called before or after `boot_'.
 The function named `boot_' should register function wrappers, hooks and
 anything that will be visible to the user that is not handled by features_
 and enables_ (so features should not be turned on here).  It will be called
-after the `setup_'-function, and also after the intial set of features
+after the `setup_'-function, and also after the initial set of features
 have been set by calls to `features_' and `enables_'.
 
 The function named `cleanup_', is called when the user tries to unload
@@ -535,7 +535,7 @@ the `deleteparamdefs()' function described below.
 
 It is also possible to declare special parameters using
 the macro SPECIALPMDEF().  More care is required in this case.
-See, for example, many of the definitios in Src/Modules/parameter.c.
+See, for example, many of the definitions in Src/Modules/parameter.c.
 
 Math functions
 --------------
@@ -789,7 +789,7 @@ Documentation
       Saying `plugh' aloud doesn't have much effect, however.
 
   In this case, "zsh" is normal text (a name), "advent" is a command name
-  ocurring in the main text, "plugh" is a normal word that is being quoted
+  occurring in the main text, "plugh" is a normal word that is being quoted
   (it's the user that says `plugh', not the documentation), and "xyzzy"
   is some text to be typed literally that is being quoted.
 
