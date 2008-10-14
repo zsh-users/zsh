@@ -1,3 +1,10 @@
+2008-10-14  Peter Stephenson  <pws@csr.com>
+
+	* 25893: Doc/Zsh/compwid.yo: matcher "m:{a-z}={A-Z}" still
+	works better than "m:{[:lower:]}={[:upper:]}" in that the
+	latter can glitch on some multibyte characters with Meta in
+	(and doesn't yet work on non-ASCII characters anyway).
+
 2008-10-12  Clint Adams  <clint@zsh.org>
 
 	* 25860: Src/Zle/compmatch.c: avoid possible NULL dereferencing in
