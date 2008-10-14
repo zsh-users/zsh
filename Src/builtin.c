@@ -313,10 +313,7 @@ execbuiltin(LinkList args, Builtin bn)
 		*/
 		if (flags & BINF_SKIPINVALID) {
 		    char *p = arg;
-		    if (optstr)
-			while (*++p && strchr(optstr, (int) *p));
-		    else
-			p++;
+		    while (*++p && strchr(optstr, (int) *p));
 		    if (*p)
 			break;
 		}

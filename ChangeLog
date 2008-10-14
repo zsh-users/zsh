@@ -1,5 +1,8 @@
 2008-10-14  Clint Adams  <clint@zsh.org>
 
+	* 25896: Src/builtin.c: remove small bit of dead code in
+	execbuiltin.
+
 	* Jörg Sommer: 25882: Completion/Unix/Command/_ssh: run ssh with
 	-oBatchMode=yes.
 
