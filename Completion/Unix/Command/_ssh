@@ -10,7 +10,7 @@ _remote_files () {
     then rempat="${PREFIX%%[^./][^/]#}\*"
     else rempat="${(q)PREFIX%%[^./][^/]#}\*"
     fi
-    remfiles=(${(M)${(f)"$(_call_program files ssh $args -a -x ${IPREFIX%:} ls -d1FL "$rempat" 2>/dev/null)"}%%[^/]#(|/)})
+    remfiles=(${(M)${(f)"$(_call_program files ssh -o BatchMode=yes $args -a -x ${IPREFIX%:} ls -d1FL "$rempat" 2>/dev/null)"}%%[^/]#(|/)})
     compset -P '*/'
     compset -S '/*' || suf='remote file'
 
