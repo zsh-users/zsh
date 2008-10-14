@@ -1266,10 +1266,11 @@ getmathfunc(const char *name, int autol)
 	if (!strcmp(name, p->name)) {
 	    if (autol && p->module && !(p->flags & MFF_USERFUNC)) {
 		char *n = dupstring(p->module);
+		int flags = p->flags;
 
 		removemathfunc(q, p);
 
-		(void)ensurefeature(n, "f:", (p->flags & MFF_AUTOALL) ? NULL :
+		(void)ensurefeature(n, "f:", (flags & MFF_AUTOALL) ? NULL :
 				    name);
 
 		return getmathfunc(name, 0);

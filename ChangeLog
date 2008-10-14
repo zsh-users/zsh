@@ -1,5 +1,8 @@
 2008-10-14  Clint Adams  <clint@zsh.org>
 
+	* 25898: Src/module.c: avoid dereference of p after it is freed
+	in getmathfunc.
+
 	* 25897: Src/Zle/computil.c: remove small bit of dead code in
 	cfp_opt_pats.
 
