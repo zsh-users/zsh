@@ -4351,12 +4351,12 @@ cfp_opt_pats(char **pats, char *matcher)
 		    for (s = add; *s && !idigit(*s); s++);
 		    *s = '\0';
 		} else if (*q == '[') {
-		    int not, first = 1;
+		    int not;
 		    char *x = ++q;
 
 		    if ((not = (*x == '!' || *x == '^')))
 			x++;
-		    for (; *x && (first || *x != ']'); x++) {
+		    for (; *x; x++) {
 			if (x[1] == '-' && x[2]) {
 			    char c1 = *x, c2 = x[2];
 

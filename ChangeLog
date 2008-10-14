@@ -1,5 +1,8 @@
 2008-10-14  Clint Adams  <clint@zsh.org>
 
+	* 25897: Src/Zle/computil.c: remove small bit of dead code in
+	cfp_opt_pats.
+
 	* 25896: Src/builtin.c: remove small bit of dead code in
 	execbuiltin.
 
