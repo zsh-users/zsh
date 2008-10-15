@@ -1,3 +1,13 @@
+2008-10-14  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 25887: Completion/Unix/Type/_path_files: pass -U to compadd only
+	when _comp_correct is true; otherwise, completing subpatterns
+	inside braces tends to behave oddly.
+
+	* Jörg Sommer: 25883: Completion/Base/Utility/_multi_parts: quote
+	strings in the temporary variable tmp1 before joining them with
+	"|" to create an alternatives pattern.
+
 2008-10-14  Clint Adams  <clint@zsh.org>
 
 	* 25898: Src/module.c: avoid dereference of p after it is freed
