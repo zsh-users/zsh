@@ -8,6 +8,10 @@
 	strings in the temporary variable tmp1 before joining them with
 	"|" to create an alternatives pattern.
 
+	* Phil Pennock: 25854: Completion/Unix/Command/_perl,
+	Completion/Unix/Type/_perl_modules: fix module completion for
+	"perl -d:" (Devel modules).
+
 2008-10-14  Clint Adams  <clint@zsh.org>
 
 	* 25898: Src/module.c: avoid dereference of p after it is freed

@@ -10,7 +10,7 @@ _perl () {
     '-a[autosplit mode with -n or -p (splits $_ into @F)]' \
     "-c[check syntax only (runs BEGIN and END blocks)]" \
     '-d[run scripts under debugger]' \
-    '-d\:-[run under control of a debugging/tracing module]:debugging/tracing module:_perl_modules' \
+    '-d\:-[run under control of a debugging/tracing module]:debugging/tracing module:_perl_modules --strip-prefix --perl-hierarchy=Devel' \
     '-D-:set debugging flags (argument is a bit mask or flags): ' \
     "*-e+:one line of script. Several -e's allowed. Omit [programfile]." \
     "-F-:split() pattern for autosplit (-a). The //'s are optional.: " \

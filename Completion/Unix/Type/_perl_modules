@@ -12,6 +12,17 @@
 # -t[types]: indicate file types; currently the only one is -tP,
 # to include .pod files as well as modules.
 # 
+# --perl-hierarchy=...: restrict results to modules under this hierarchy.
+# Note that this does not affect the filesystem searching or caching,
+# which always collect all results on the premise that anyone using
+# completion of Perl modules will use the results in various contexts,
+# so this only affects the results compadd'd.
+#
+# --strip-prefix: when using --perl-hierarchy, strip off that prefix when
+# passing to compadd.
+#
+# All other options passed onto compadd.
+#
 # Available styles:
 #
 # * try-to-use-pminst
@@ -26,14 +37,25 @@ _perl_modules () {
   # Set a sensible default caching policy.  This has to be done inside
   # this function otherwise we wouldn't know the context for the style.
   local update_policy sufpat=".pm" with_pod
+  local restrict_hierarchy=''
+  local -i strip_perl_prefix
   zstyle -s ":completion:${curcontext}:" cache-policy update_policy
   if [[ -z "$update_policy" ]]; then
     zstyle ":completion:${curcontext}:" cache-policy \
       _perl_modules_caching_policy
   fi
 
-  if [[ $argv[-1] = -tP ]]; then
-    argv=("${(@)argv[1,-2]}")
+  if [[ -n $argv[(r)--perl-hierarchy=*] ]]; then
+    restrict_hierarchy="${argv[(r)--perl-hierarchy=*]#--perl-hierarchy=}"
+    restrict_hierarchy="${restrict_hierarchy%::}::"
+    argv[(r)--perl-hierarchy=*]=()
+  fi
+  if [[ -n $argv[(r)--strip-prefix] ]]; then
+    strip_perl_prefix=1
+    argv[(r)--strip-prefix]=()
+  fi
+  if [[ -n $argv[(r)-tP] ]]; then
+    argv[(r)-tP]=()
     sufpat="(.pm|.pod)"
     with_pod=_with_pod
   fi
@@ -93,8 +115,18 @@ _perl_modules () {
     _store_cache ${perl_modules#_} $perl_modules
   fi
 
-  local expl
+  # Nothing above here should have filtered the results per-caller, so that
+  # the cache is always complete.  From here on, it's safe to filter.
+  local -a perl_subset
+  if [[ -n $restrict_hierarchy ]]; then
+    perl_subset=( ${(PM)perl_modules:#${restrict_hierarchy}*} )
+    if (( strip_perl_prefix )); then
+      perl_subset=( ${perl_subset#$restrict_hierarchy} )
+    fi
+    perl_modules=perl_subset
+  fi
 
+  local expl
   _wanted modules expl 'Perl module' compadd "$@" -a - $perl_modules
 }
 
