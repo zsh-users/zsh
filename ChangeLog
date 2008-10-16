@@ -1,3 +1,8 @@
+2008-10-16  Peter Stephenson  <pws@csr.com>
+
+	* 25905: Src/math.c, Test/C01arith.ztst: fix and test doubled-hash
+	radix output syntax.
+
 2008-10-14  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 25887: Completion/Unix/Type/_path_files: pass -U to compadd only

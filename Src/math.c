@@ -670,7 +670,8 @@ zzlex(void)
 		}
 		if(*ptr != ']')
 			goto bofs;
-		if (outputradix < 2 || outputradix > 36) {
+		n = (outputradix < 0) ? -outputradix : outputradix;
+		if (n < 2 || n > 36) {
 		    zerr("invalid base (must be 2 to 36 inclusive): %d",
 			 outputradix);
 		    return EOI;

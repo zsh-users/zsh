@@ -172,3 +172,19 @@
   print $(( 3 + "OK"); echo "Worked")
 0:not a parse failure because not arithmetic
 >+ OK Worked
+
+  fn() {
+    emulate -L zsh
+    print $(( [#16] 255 ))
+    print $(( [##16] 255 ))
+    setopt cbases
+    print $(( [#16] 255 ))
+    print $(( [##16] 255 ))
+  }
+  fn
+0:doubled # in base removes radix
+>16#FF
+>FF
+>0xFF
+>FF
+
