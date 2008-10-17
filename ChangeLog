@@ -1,3 +1,8 @@
+2008-10-17  Peter Stephenson  <pws@csr.com>
+
+	* Rocky: 25907: Test/Makefile.in: makefile needs .exe
+	extension to run zsh on Cygwin.
+
 2008-10-16  Peter Stephenson  <pws@csr.com>
 
 	* 25905: Src/math.c, Test/C01arith.ztst: fix and test doubled-hash

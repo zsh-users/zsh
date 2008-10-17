@@ -48,8 +48,8 @@ check test:
 	if ZTST_testlist="`for f in $(sdir)/$(TESTNUM)*.ztst; \
            do echo $$f; done`" \
 	 ZTST_srcdir="$(sdir)" \
-	 ZTST_exe=$(dir_top)/Src/zsh \
-	 $(dir_top)/Src/zsh +Z -f $(sdir)/runtests.zsh; then \
+	 ZTST_exe=$(dir_top)/Src/zsh@EXEEXT@ \
+	 $(dir_top)/Src/zsh@EXEEXT@ +Z -f $(sdir)/runtests.zsh; then \
 	 stat=0; \
 	else \
 	 stat=1; \

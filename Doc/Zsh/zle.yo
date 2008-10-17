@@ -2188,7 +2188,7 @@ tt(b) or tt(bl) selects black.  Some terminals may generate additional
 colours if the tt(bold) attribute is also present.
 
 On recent terminals and on systems with an up-to-date terminal database the
-number of colours supported may be tested by with the command `tt(echotc
+number of colours supported may be tested by the command `tt(echotc
 Co)'; if this succeeds, it indicates a limit on the number of colours which
 will be enforced by the line editor.  The number of colours is in any case
 limited to 256 (i.e. the range 0 to 255).
