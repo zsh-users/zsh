@@ -4024,7 +4024,7 @@ cfp_matcher_range(Cmatcher *ms, char *add)
      * management is difficult.
      */
     for (;;) {
-	for (mp = ms; *add; add++, mp++) {
+	for (mp = ms; *add; ) {
 	    if (!(m = *mp)) {
 		/*
 		 * No matcher, so just match the character
@@ -4034,13 +4034,13 @@ cfp_matcher_range(Cmatcher *ms, char *add)
 		 * metacharacter?
 		 */
 		if (ret) {
-		    if (imeta(*add)) {
+		    if (*add == Meta) {
 			*p++ = Meta;
-			*p++ = *add ^ 32;
+			*p++ = add[1];
 		    } else
 			*p++ = *add;
 		} else
-		    len += imeta(*add) ? 2 : 1;
+		    len += (*add == Meta) ? 2 : 1;
 	    } else if (m->flags & CMF_RIGHT) {
 		/*
 		 * Right-anchored:  match anything followed
@@ -4049,15 +4049,16 @@ cfp_matcher_range(Cmatcher *ms, char *add)
 		if (ret) {
 		    *p++ = '*';
 		    /* TODO: quote again? */
-		    if (imeta(*add)) {
+		    if (*add == Meta) {
 			*p++ = Meta;
-			*p++ = *add ^ 32;
+			*p++ = add[1];
 		    } else
 			*p++ = *add;
 		} else
-		    len += imeta(*add) ? 3 : 2;
+		    len += (*add == Meta) ? 3 : 2;
 	    } else {
 		/* The usual set of matcher possibilities. */
+		int chr = (*add == Meta) ? add[1] ^ 32 : *add;
 		int ind;
 		if (m->line->tp == CPAT_EQUIV &&
 		    m->word->tp == CPAT_EQUIV) {
@@ -4072,21 +4073,21 @@ cfp_matcher_range(Cmatcher *ms, char *add)
 		     */
 		    if (ret) {
 			*p++ = '[';
-			if (imeta(*add)) {
+			if (*add == Meta) {
 			    *p++ = Meta;
-			    *p++ = *add ^ 32;
+			    *p++ = add[1];
 			} else
 			    *p++ = *add;
 		    } else
-			len += imeta(*add) ? 3 : 2;
-		    if (PATMATCHRANGE(m->line->u.str, CONVCAST(*add),
+			len += (*add == Meta) ? 3 : 2;
+		    if (PATMATCHRANGE(m->line->u.str, CONVCAST(chr),
 				      &ind, &mt)) {
 			/*
 			 * Find the equivalent match for ind in the
 			 * word pattern.
 			 */
 			if ((ind = pattern_match_equivalence
-			     (m->word, ind, mt, CONVCAST(*add))) != -1) {
+			     (m->word, ind, mt, CONVCAST(chr))) != -1) {
 			    if (ret) {
 				if (imeta(ind)) {
 				    *p++ = Meta;
@@ -4158,7 +4159,7 @@ cfp_matcher_range(Cmatcher *ms, char *add)
 			 * if *add is ] and ] is also the first
 			 * character in the range.
 			 */
-			addadd = !pattern_match1(m->word, CONVCAST(*add), &mt);
+			addadd = !pattern_match1(m->word, CONVCAST(chr), &mt);
 			if (addadd && *add == ']') {
 			    if (ret)
 				*p++ = *add;
@@ -4218,6 +4219,13 @@ cfp_matcher_range(Cmatcher *ms, char *add)
 		    }
 		}
 	    }
+	    if (*add == Meta) {
+		add += 2;
+		mp += 2;
+	    } else {
+		add++;
+		mp++;
+	    }
 	}
 	if (ret) {
 	    *p = '\0';
@@ -4236,19 +4244,19 @@ cfp_matcher_pats(char *matcher, char *add)
 
     if (m && m != pcm_err) {
 	char *tmp;
-	int al = strlen(add), tl;
-	VARARR(Cmatcher, ms, al);
+	int al = strlen(add), zl = ztrlen(add), tl, cl;
+	VARARR(Cmatcher, ms, zl);
 	Cmatcher *mp;
 	Cpattern stopp;
 	int stopl = 0;
 
-	memset(ms, 0, al * sizeof(Cmatcher));
+	memset(ms, 0, zl * sizeof(Cmatcher));
 
 	for (; m && *add; m = m->next) {
 	    stopp = NULL;
 	    if (!(m->flags & (CMF_LEFT|CMF_RIGHT))) {
 		if (m->llen == 1 && m->wlen == 1) {
-		    for (tmp = add, tl = al, mp = ms; tl; tl--, tmp++, mp++) {
+		    for (tmp = add, tl = al, mp = ms; tl; ) {
 			if (pattern_match(m->line, tmp, NULL, NULL)) {
 			    if (*mp) {
 				*tmp = '\0';
@@ -4257,6 +4265,10 @@ cfp_matcher_pats(char *matcher, char *add)
 			    } else
 				*mp = m;
 			}
+			cl = (*tmp == Meta) ? 2 : 1;
+			tl -= cl;
+			tmp += cl;
+			mp += cl;
 		    }
 		} else {
 		    stopp = m->line;
@@ -4264,7 +4276,7 @@ cfp_matcher_pats(char *matcher, char *add)
 		}
 	    } else if (m->flags & CMF_RIGHT) {
 		if (m->wlen < 0 && !m->llen && m->ralen == 1) {
-		    for (tmp = add, tl = al, mp = ms; tl; tl--, tmp++, mp++) {
+		    for (tmp = add, tl = al, mp = ms; tl; ) {
 			if (pattern_match(m->right, tmp, NULL, NULL)) {
 			    if (*mp || (tmp == add && *tmp == '.')) {
 				*tmp = '\0';
@@ -4273,6 +4285,10 @@ cfp_matcher_pats(char *matcher, char *add)
 			    } else
 				*mp = m;
 			}
+			cl = (*tmp == Meta) ? 2 : 1;
+			tl -= cl;
+			tmp += cl;
+			mp += cl;
 		    }
 		} else if (m->llen) {
 		    stopp = m->line;
@@ -4289,12 +4305,16 @@ cfp_matcher_pats(char *matcher, char *add)
 		stopl = m->lalen;
 	    }
 	    if (stopp)
-		for (tmp = add, tl = al; tl >= stopl; tl--, tmp++)
+		for (tmp = add, tl = al; tl >= stopl; ) {
 		    if (pattern_match(stopp, tmp, NULL, NULL)) {
 			*tmp = '\0';
 			al = tmp - add;
 			break;
 		    }
+		    cl = (*tmp == Meta) ? 2 : 1;
+		    tl -= cl;
+		    tmp += cl;
+		}
 	}
 	if (*add)
 	    return cfp_matcher_range(ms, add);

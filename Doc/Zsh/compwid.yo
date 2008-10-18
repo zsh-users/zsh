@@ -942,16 +942,14 @@ line match the corresponding upper case character in the trial
 completion you can use `tt(m:{[:lower:]}={[:upper:]})'.  Although the
 matching system does not yet handle multibyte characters, this is likely
 to be a future extension, at which point this syntax will handle
-arbitrary alphabets; until then it is safer to use the older syntax
-that only handles ASCII characters, `tt(m:{a-z}={A-Z}) as this does
-not have side effects in the case of multibyte characters.
-
-In other cases `tt([:)var(name)tt(:])' forms are allowed.  If the two forms
-on the left and right are the same, the characters must match exactly.  In
-remaining cases, the corresponding tests are applied to both characters,
-but they are not otherwise constrained; any matching character in one set
-goes with any matching character in the other set:  this is equivalent to
-the behaviour of ordinary character classes.
+arbitrary alphabets; hence this form, rather than the use of explicit
+ranges, is the recommended form.  In other cases
+`tt([:)var(name)tt(:])' forms are allowed.  If the two forms on the left
+and right are the same, the characters must match exactly.  In remaining
+cases, the corresponding tests are applied to both characters, but they
+are not otherwise constrained; any matching character in one set goes
+with any matching character in the other set:  this is equivalent to the
+behaviour of ordinary character classes.
 
 The pattern var(tpat) may also be one or two stars, `tt(*)' or
 `tt(**)'. This means that the pattern on the command line can match

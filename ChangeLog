@@ -1,5 +1,9 @@
 2008-10-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 25912: Doc/Zsh/compwid.yo, Src/Zle/computil.c: fix yet another
+	Meta bug in completion with matchers in compfiles; remove 25893
+	because that wasn't it at all.
+
 	* 25911: Test/D07multibyte.ztst: see if we can work around file
 	system idiosyncracies.
 
