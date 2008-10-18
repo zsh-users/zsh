@@ -1,3 +1,7 @@
+2008-10-18  Clint Adams  <clint@zsh.org>
+
+	* 25910: Src/builtin.c: avoid dangling file handle in bin_print.
+
 2008-10-17  Peter Stephenson  <pws@csr.com>
 
 	* Rocky: 25907: Test/Makefile.in: makefile needs .exe

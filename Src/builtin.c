@@ -3689,8 +3689,11 @@ bin_print(char *name, char **args, Options ops, int func)
     if (OPT_ISSET(ops,'o') || OPT_ISSET(ops,'O')) {
 	int flags;
 
-	if (fmt && !*args)
+	if (fmt && !*args) {
+	    if (fout != stdout)
+	        fclose(fout);
 	    return 0;
+	}
 	flags = OPT_ISSET(ops,'i') ? SORTIT_IGNORING_CASE : 0;
 	if (OPT_ISSET(ops,'O'))
 	    flags |= SORTIT_BACKWARDS;
