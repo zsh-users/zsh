@@ -1,3 +1,8 @@
+2008-10-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25911: Test/D07multibyte.ztst: see if we can work around file
+	system idiosyncracies.
+
 2008-10-18  Clint Adams  <clint@zsh.org>
 
 	* 25910: Src/builtin.c: avoid dangling file handle in bin_print.

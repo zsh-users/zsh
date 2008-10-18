@@ -396,13 +396,10 @@
 >OK
 >OK
 
-  mkdir glob
-  mkdir glob/'()Ą' glob/'()Ā'
-  mkdir glob/'()Ą'/foo glob/'()Ā'/bar
-  tmp1=('glob/\(\)Ą/*')
-  print $~tmp1
-  tmp1=('glob/\(\)Ā/*')
-  print $~tmp1
+  tmp1='glob/\(\)Ą/*'
+  [[ glob/'()Ą'/foo == $~tmp1 ]] && print "Matched against $tmp1"
+  tmp1='glob/\(\)Ā/*'
+  [[ glob/'()Ā'/bar == $~tmp1 ]] && print "Matched against $tmp1"
 0:Backslashes and metafied characters in patterns
->glob/()Ą/foo
->glob/()Ā/bar
+>Matched against glob/()Ą/*
+>Matched against glob/()Ā/*
