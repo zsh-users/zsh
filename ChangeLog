@@ -1,3 +1,7 @@
+2008-10-20  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/version.mk: 4.3.6-dev-2.
+
 2008-10-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25912: Doc/Zsh/compwid.yo, Src/Zle/computil.c: fix yet another
