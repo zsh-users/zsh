@@ -2253,10 +2253,10 @@ setstrvalue(Value v, char *val)
 	    mnumber mn = matheval(val);
 	    v->pm->gsu.f->setfn(v->pm, (mn.type & MN_FLOAT) ? mn.u.d :
 			       (double)mn.u.l);
-	    zsfree(val);
 	    if ((v->pm->node.flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) &&
 		!v->pm->width)
 		v->pm->width = strlen(val);
+	    zsfree(val);
 	}
 	break;
     case PM_ARRAY:

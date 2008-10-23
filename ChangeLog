@@ -1,3 +1,8 @@
+2008-10-23  Clint Adams  <clint@zsh.org>
+
+	* 25926: Src/params.c: free val only after it may be passed to
+	strlen (as in 25656).
+
 2008-10-20  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk: 4.3.6-dev-2.
