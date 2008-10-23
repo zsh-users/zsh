@@ -1,3 +1,8 @@
+2008-10-22  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 25927: Completion/Unix/Type/_path_files: include the ignored
+	prefix/suffix in the hidden prefix/suffix only for compadd -U.
+
 2008-10-23  Clint Adams  <clint@zsh.org>
 
 	* 25926: Src/params.c: free val only after it may be passed to
