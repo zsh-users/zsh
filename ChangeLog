@@ -1,3 +1,8 @@
+2008-10-23  Peter Stephenson  <pws@csr.com>
+
+	* users/13375: Src/Zle/zle_refresh.c: rewrite ternary expression
+	which caused problems with the Sun Studio 11 compiler.
+
 2008-10-22  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 25927: Completion/Unix/Type/_path_files: include the ignored

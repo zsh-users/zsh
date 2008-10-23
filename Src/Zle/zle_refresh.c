@@ -1793,7 +1793,10 @@ refreshline(int ln)
 	    ZR_memcpy(p1, nl, nllen);
 	ZR_memset(p1 + nllen, zr_sp, winw - nllen);
 	p1[winw] = zr_zr;
-	p1[winw + 1] = (nllen < winw) ? zr_zr : nl[winw + 1];
+	if (nllen < winw)
+	    p1[winw + 1] = zr_zr;
+	else
+	    p1[winw + 1] = nl[winw + 1];
 	if (ln && nbuf[ln])
 	    ZR_memcpy(nl, p1, winw + 2);	/* next time obuf will be up-to-date */
 	else
