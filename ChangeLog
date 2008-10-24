@@ -1,3 +1,9 @@
+2008-10-24  Peter Stephenson  <pws@csr.com>
+
+	* 25930: Src/prompt.c, Src/utils.c: dynamic directory names
+	may need recursive prompt expansion; memory leak with reverse
+	expansion of dynamic directory names.
+
 2008-10-23  Peter Stephenson  <pws@csr.com>
 
 	* users/13375: Src/Zle/zle_refresh.c: rewrite ternary expression

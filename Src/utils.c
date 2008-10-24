@@ -863,7 +863,7 @@ finddir(char *s)
 	    (len = (int)zstrtol(ares[1], NULL, 10)) > finddir_best) {
 	    /* better duplicate this string since it's come from REPLY */
 	    finddir_last = (Nameddir)hcalloc(sizeof(struct nameddir));
-	    finddir_last->node.nam = tricat("[", dupstring(ares[0]), "]");
+	    finddir_last->node.nam = zhtricat("[", dupstring(ares[0]), "]");
 	    finddir_last->dir = dupstrpfx(finddir_full, len);
 	    finddir_last->diff = len - strlen(finddir_last->node.nam);
 	    finddir_best = len;
