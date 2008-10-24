@@ -1515,6 +1515,12 @@ pindex(SINGLE_LINE_ZLE)
 cindex(editor, single line mode)
 item(tt(SINGLE_LINE_ZLE) (tt(-M)) <K>)(
 Use single-line command line editing instead of multi-line.
+
+Note that although this is on by default in ksh emulation it only
+provides superficial compatibility with the ksh line editor and
+reduces the effectiveness of the zsh line editor.  As it has no
+effect on shell syntax, many users may wish to disable this option
+when using ksh emulation interactively.
 )
 pindex(VI)
 item(tt(VI))(

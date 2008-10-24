@@ -1,5 +1,10 @@
 2008-10-24  Peter Stephenson  <pws@csr.com>
 
+	* users/13400: Doc/Zsh/options.yo, Etc/FAQ.yo: clarify some
+	aspects of ksh-like editing.
+
+	* 25931: Test/D01prompt.zsh: test fix in 25930.
+
 	* 25930: Src/prompt.c, Src/utils.c: dynamic directory names
 	may need recursive prompt expansion; memory leak with reverse
 	expansion of dynamic directory names.

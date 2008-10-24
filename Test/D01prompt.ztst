@@ -147,3 +147,57 @@
 >~[scuzzy]/rubbish
 >~mydir/foo
 ?(eval):33: no directory expansion: ~[scuzzy]
+
+  (
+  zsh_directory_name() {
+  emulate -L zsh
+  setopt extendedglob
+  local -a match mbegin mend
+  if [[ $1 = n ]]; then
+      if [[ $2 = *:l ]]; then
+	  reply=(${2%%:l}/very_long_directory_name)
+	  return 0
+      else
+	  return 1
+      fi
+  else
+      if [[ $2 = (#b)(*)/very_long_directory_name ]]; then
+	reply=(${match[1]}:l ${#2})
+	return 0
+      else
+	return 1
+      fi
+  fi
+  }
+  parent=$PWD
+  dir=$parent/very_long_directory_name
+  mkdir $dir
+  cd $dir
+  fn() {
+     PS4='+%N:%i> '
+     setopt localoptions xtrace
+     # The following is the key to the test.
+     # It invokes zsh_directory_name which does PS4 output stuff
+     # while we're doing prompt handling for the parameter
+     # substitution.  This checks recursion works OK.
+     local d=${(%):-%~}
+     print ${d//$parent/\<parent\>}
+  }
+  fn 2>stderr
+  # post process error to remove variable contents
+  while read line; do
+    # tricky: reply is set to include directory length which is variable
+    [[ $line = *reply* ]] && continue
+    print ${line//$parent/\<parent\>}
+  done <stderr >&2
+  )
+0:Recursive use of prompts
+>~[<parent>:l]
+?+zsh_directory_name:1> emulate -L zsh
+?+zsh_directory_name:2> setopt extendedglob
+?+zsh_directory_name:3> local -a match mbegin mend
+?+zsh_directory_name:4> [[ d == n ]]
+?+zsh_directory_name:12> [[ <parent>/very_long_directory_name == (#b)(*)/very_long_directory_name ]]
+?+zsh_directory_name:14> return 0
+?+fn:7> local 'd=~[<parent>:l]'
+?+fn:8> print '~[<parent>:l]'
