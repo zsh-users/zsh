@@ -1,3 +1,8 @@
+2008-10-26  Clint Adams  <clint@zsh.org>
+
+	* 25934: Completion/Debian/Command/_bts: handle bts subscribe,
+	unsubscribe, and fix owner.  Patches from Ansgar Burchardt.
+
 2008-10-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: NEWS: region_highlight is an array and so

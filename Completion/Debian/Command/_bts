@@ -25,7 +25,8 @@ if [[ CURRENT -eq 1 ]]; then
   _wanted cmd expl 'bts command' compadd show bugs close reopen retitle \
       reassign merge unmerge tag tags severity forwarded notforwarded help \
       clone submitter found notfound block unblock user usertag usertags \
-      package owner noowner reportspam cache cleancache claim unclaim
+      package owner noowner reportspam cache cleancache claim unclaim \
+      subscribe unsubscribe
   return
 fi
 
@@ -125,7 +126,7 @@ case "$words[1]" in
      _wanted sep expl 'separator' compadd -S ' ' , .
     fi
   ;;
-  (submitter|owner)
+  (submitter)
     if [[ CURRENT -eq 2 ]]; then
       _message -e bugnum 'bug number'
     else
@@ -133,6 +134,17 @@ case "$words[1]" in
        'bugnum:bug number:' \
        'email:email address:_email_addresses -c' \
        'bang:bang:compadd \!'
+    fi
+  ;;
+  (owner|subscribe|unsubscribe)
+    if [[ CURRENT -eq 2 ]]; then
+      _message -e bugnum 'bug number'
+    elif [[ CURRENT -eq 3 ]]; then
+      _alternative \
+        'email:email address:_email_addresses -c' \
+        'bang:bang:compadd \!'
+    else
+      _wanted sep expl 'separator' compadd -S ' ' , .
     fi
   ;;
   (found|notfound)
