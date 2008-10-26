@@ -1,5 +1,7 @@
 2008-10-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: README: update claimed version to 4.3.7.
+
 	* Mikael: 25933: Doc/Zsh/contrib.yo, Doc/Zsh/expn.yo,
 	Doc/Zsh/options.yo, NEWS: typos.
 
