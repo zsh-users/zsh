@@ -32,7 +32,7 @@ keys by default.
 
 Highlighting and colouring of sections of the command line is now
 supported, controlled by the array parameter zle_highlight and the ZLE
-special parameter REGION_HIGHLIGHT.
+special parameter region_highlight.
 
 Colouring of prompts is now supported within the shell by prompt
 escapes.  The prompt theme system has been updated.
