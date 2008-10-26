@@ -1,3 +1,8 @@
+2008-10-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Mikael: 25933: Doc/Zsh/contrib.yo, Doc/Zsh/expn.yo,
+	Doc/Zsh/options.yo, NEWS: typos.
+
 2008-10-24  Peter Stephenson  <pws@csr.com>
 
 	* users/13400: Doc/Zsh/options.yo, Etc/FAQ.yo: clarify some

@@ -1041,7 +1041,7 @@ pindex(C_PRECEDENCES)
 cindex(precedence, operator)
 cindex(operator precedence)
 item(tt(C_PRECEDENCES))(
-This alters the precedence of arithemtic operators to be more
+This alters the precedence of arithmetic operators to be more
 like C and other programming languages;
 ifnzman(Arithmetic Evaluation)\
 ifzman(the section ARITHMETIC EVALUATION in zmanref(zshmisc))

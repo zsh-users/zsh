@@ -661,7 +661,7 @@ example(zstyle ':vcs_info:(svn|bzr):*' branchformat '%b%{'${fg[yellow]}'%}:%r')
 If you want colors, make sure you enclose the color codes in tt(%{...%}),
 if you want to use the string provided by tt(vcs_info) in prompts.
 
-Here is how to print the vcs infomation as a command (not in a prompt):
+Here is how to print the vcs information as a command (not in a prompt):
 example(alias vcsi='vcs_info command; vcs_info_lastmsg')
 
 This way, you can even define different formats for output via

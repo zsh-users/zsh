@@ -206,7 +206,7 @@ Changes in 4.2 since version 4.2.0
 
 - A new zle widget reset-prompt has been added to re-expand the current
   prompt.  Changes to the variable in use as well as changes in its
-  expanions are both taken into account.  The same effect is now forced by
+  expansions are both taken into account.  The same effect is now forced by
   a job change notification, making the %j prompt escape and %(j..) ternary
   expression more useful.
 

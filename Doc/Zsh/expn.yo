@@ -1323,7 +1323,7 @@ followed by a number.
 
 subsect(Dynamic named directories)
 cindex(directories, named, dynamic)
-cindex(named directories, dynamicic)
+cindex(named directories, dynamic)
 cindex(dynamic named directories)
 
 The feature described here is only available if the shell function
