@@ -1,0 +1,16 @@
+Version 4.3.7 adds various new features plus numerous bugfixes.
+
+Development of multibyte support has continued with the addition
+of the COMBINING_CHARS option to support combining characters in the line
+editor on terminals that handle this.
+
+Various additions have been made to support shell code debugging better.
+
+There is now additional support for highlighting and colouring of parts of
+the command line in the lined editor as well as builtin support for
+colouring in prompts etc.
+
+The syntax ~[...] provides a dynamic form of directory naming, based on a
+shell function.
+
+See the NEWS file for more detailed information.

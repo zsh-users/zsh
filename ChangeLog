@@ -1,3 +1,8 @@
+2008-10-28  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/Version.mk, Etc/relnote_4.3.7.txt: Release
+	4.3.7
+
 2008-10-26  Clint Adams  <clint@zsh.org>
 
 	* 25934: Completion/Debian/Command/_bts: handle bts subscribe,
