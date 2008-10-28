@@ -391,6 +391,9 @@ execbuiltin(LinkList args, Builtin bn)
 		if (ops.ind['-'])
 		    break;
 	    }
+	} else if (*argv && !strcmp(*argv, "--")) {
+	    ops.ind['-'] = 1;
+	    argv++;
 	}
 
 	/* handle built-in options, for overloaded handler functions */

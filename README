@@ -35,6 +35,12 @@ Possible incompatibilities
 This section documents incompatibilities in the shell since the 4.2
 series of releases.
 
+In previous releases of the shell, builtin commands and precommand
+modifiers that did not accept options also did not recognize the
+argument "--" as marking the end of option processing without being
+considered an argument.  This was not documented and was incompatible
+with other shells.  All such commands now handle this syntax.
+
 The configuration option --enable-lfs to enable large file support has
 been replaced by autoconf's standard --enable-largefile mechanism.
 As this is usually used whenever necessary, this won't usually

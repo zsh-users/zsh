@@ -1,3 +1,8 @@
+2008-10-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25937: README, Src/builtins.c: builtins that don't have
+	options now ignore an initial "--" argument.
+
 2008-10-28  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/Version.mk, Etc/relnote_4.3.7.txt: Release
@@ -2997,7 +3002,7 @@
 2007-10-23  Peter Stephenson  <pws@csr.com>
 
 	* users/12087: Src/glob.c: fix a case where we doing globbing
-	unncessarily to find files case-insensitively in Cygwin.
+	unnecessarily to find files case-insensitively in Cygwin.
 
 2007-10-22  Peter Stephenson  <pws@csr.com>
 
