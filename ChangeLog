@@ -1,6 +1,9 @@
 2008-10-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 25937: README, Src/builtins.c: builtins that don't have
+	* 25938 (Mikael) + probably 25939, too:
+	Completion/Unix/Type/_path_files: IPREFIX missing $.
+
+	* 25937: README, Src/builtin.c: builtins that don't have
 	options now ignore an initial "--" argument.
 
 2008-10-28  Peter Stephenson  <pws@csr.com>

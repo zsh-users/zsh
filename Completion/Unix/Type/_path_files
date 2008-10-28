@@ -732,7 +732,7 @@ for prepath in "$prepaths[@]"; do
       compquote tmp4 tmp2 tmp1
       for i in "$tmp1[@]"; do
 	_list_files tmp2 "$prepath$realpath${mid%/*/}"
-        compadd $Uopt -Qf "$mopts[@]" -p "${Uopt:+IPREFIX}$linepath$tmp3/" \
+        compadd $Uopt -Qf "$mopts[@]" -p "${Uopt:+$IPREFIX}$linepath$tmp3/" \
 	        -s "/$tmp4$i${Uopt:+$ISUFFIX}" \
                 -W "$prepath$realpath${mid%/*/}/" \
 	        "$pfxsfx[@]" $listopts - "$tmp2"
@@ -763,7 +763,7 @@ for prepath in "$prepaths[@]"; do
       else
 	# Not a pattern match
 	_list_files tmp1 "$prepath$realpath$testpath"
-        compadd $Uopt -Qf -p "${Uopt:+IPREFIX}$linepath$tmp4" \
+        compadd $Uopt -Qf -p "${Uopt:+$IPREFIX}$linepath$tmp4" \
 	        -s "${Uopt:+$ISUFFIX}" \
 	        -W "$prepath$realpath$testpath" \
 	        "$pfxsfx[@]" "$mopts[@]" $listopts -a tmp1
