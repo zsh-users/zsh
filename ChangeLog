@@ -1,5 +1,7 @@
 2008-10-29  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Etc/relnote_4.3.8.txt: tiny typo.
+
 	* unposted: Completion/Zsh/Command/.distfiles, Etc/.distfiles,
 	Functions/VCS_Info/.distfiles,
 	Functions/VCS_Info/Backends/.distfiles:  belatedly sort out some
