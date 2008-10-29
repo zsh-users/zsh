@@ -1,3 +1,12 @@
+2008-10-29  Peter Stephenson  <pws@csr.com>
+
+	* unposted: NEWS, README, Config/version.mk, Etc/FAQ.yo,
+	Etc/relnote_4.3.7.txt, Etc/relnote_4.3.8.txt: update version
+	to 4.3.8.
+
+	* unposted: Functions/Zle/replace-string: use "typeset -g"
+	to avoid warnings with WARN_CREATE_GLOBAL.
+
 2008-10-29  Clint Adams  <clint@zsh.org>
 
 	* 25940: Src/Zle/computil.c: delay !multi memory allocation until

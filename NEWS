@@ -4,7 +4,7 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
-Major changes between versions 4.3.6 and 4.3.7
+Major changes between versions 4.3.6 and 4.3.8
 ----------------------------------------------
 
 The option COMBINING_CHARS has been added.  When it is set, the
