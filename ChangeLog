@@ -1,3 +1,8 @@
+2008-10-29  Clint Adams  <clint@zsh.org>
+
+	* 25940: Src/Zle/computil.c: delay !multi memory allocation until
+	after possibility to error out and return without freeing.
+
 2008-10-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25938 (Mikael) + probably 25939, too:

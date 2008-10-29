@@ -2905,13 +2905,6 @@ parse_cvdef(char *nam, char **args)
 	    zwarnnam(nam, "invalid value definition: %s", *args);
 	    return NULL;
 	}
-	if (!multi) {
-	    if (!xor) {
-		xor = (char **) zalloc(2 * sizeof(char *));
-		xor[1] = NULL;
-	    }
-	    xor[xnum] = ztrdup(name);
-	}
 	/* Get argument? */
 
 	if (c == ':') {
@@ -2929,6 +2922,13 @@ parse_cvdef(char *nam, char **args)
 	} else {
 	    vtype = CVV_NOARG;
 	    arg = NULL;
+	}
+	if (!multi) {
+	    if (!xor) {
+		xor = (char **) zalloc(2 * sizeof(char *));
+		xor[1] = NULL;
+	    }
+	    xor[xnum] = ztrdup(name);
 	}
 	*valp = val = (Cvval) zalloc(sizeof(*val));
 	valp = &((*valp)->next);
