@@ -1,5 +1,7 @@
 2008-10-29  Peter Stephenson  <pws@csr.com>
 
+	* Mikael: users/13412: Etc/relnote_4.3.7.txt: typo.
+
 	* c.f. users/13411: Config/version.mk: update archived release
 	number to 4.3.8-dev-0.
 
