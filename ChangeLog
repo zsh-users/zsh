@@ -1,5 +1,10 @@
 2008-10-29  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Zsh/Command/.distfiles, Etc/.distfiles,
+	Functions/VCS_Info/.distfiles,
+	Functions/VCS_Info/Backends/.distfiles:  belatedly sort out some
+	.distfiles
+
 	* unposted: NEWS, README, Config/version.mk, Etc/FAQ.yo,
 	Etc/relnote_4.3.7.txt, Etc/relnote_4.3.8.txt: update version
 	to 4.3.8.

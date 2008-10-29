@@ -1,4 +1,5 @@
 DISTFILES_SRC='
+.distfiles
 VCS_INFO_detect_bzr
 VCS_INFO_detect_cdv
 VCS_INFO_detect_cvs

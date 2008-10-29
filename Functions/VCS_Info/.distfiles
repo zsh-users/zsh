@@ -1,4 +1,5 @@
 DISTFILES_SRC='
+.distfiles
 vcs_info
 VCS_INFO_adjust
 VCS_INFO_bydir_detect

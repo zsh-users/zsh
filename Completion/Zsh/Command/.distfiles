@@ -1,10 +1,48 @@
 DISTFILES_SRC='
 .distfiles
-_alias	  _dirs     _hash	   _prompt  _trap      _wait	  _zmv
-_bindkey  _disable  _jobs_builtin  _read    _ttyctl    _which	  _zpty
-_builtin  _echotc   _kill	   _sched   _typeset   _zcompile  _zstyle
-_cd	  _echoti   _limit	   _set     _ulimit    _zed
-_command  _emulate  _mere	   _setopt  _unhash    _zftp
-_compdef  _enable   _precommand    _source  _unsetopt  _zle
-_fc       _print    _stat          _vared   _zmodload
+_alias
+_bindkey
+_builtin
+_cd
+_command
+_compdef
+_dirs
+_disable
+_echotc
+_echoti
+_emulate
+_enable
+_fc
+_hash
+_jobs_builtin
+_kill
+_limit
+_mere
+_precommand
+_print
+_prompt
+_read
+_sched
+_set
+_setopt
+_source
+_stat
+_tcpsys
+_trap
+_ttyctl
+_typeset
+_ulimit
+_unhash
+_unsetopt
+_vared
+_wait
+_which
+_zcompile
+_zed
+_zftp
+_zle
+_zmodload
+_zmv
+_zpty
+_zstyle
 '
