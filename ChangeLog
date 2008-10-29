@@ -1,3 +1,10 @@
+2008-10-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25945: Completion/Unix/Type/_path_files: need some extra
+	matcher options to compadd for completing abbreviated
+	directory hierarchies when -U is not present (i.e. not
+	correcting).
+
 2008-10-29  Peter Stephenson  <pws@csr.com>
 
 	* Mikael: users/13412: Etc/relnote_4.3.7.txt: typo.

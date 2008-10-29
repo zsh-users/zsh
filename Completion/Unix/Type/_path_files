@@ -9,7 +9,7 @@ local pats haspats ignore pfx pfxsfx sopt gopt opt sdirs ignpar cfopt listsfx
 local nm=$compstate[nmatches] menu matcher mopts sort mid accex fake
 local listfiles listopts tmpdisp origtmp1 Uopt
 integer npathcheck
-local -a match mbegin mend
+local -a match mbegin mend Mopts
 
 typeset -U prepaths exppaths
 
@@ -209,7 +209,12 @@ eorig="$orig"
 [[ $compstate[insert] = (*menu|[0-9]*) || -n "$_comp_correct" ||
    ( -n "$compstate[pattern_match]" &&
      "${orig#\~}" != (|*[^\\])[][*?#~^\|\<\>]* ) ]] && menu=yes
-[[ -n "$_comp_correct" ]] && cfopt=- Uopt=-U
+if [[ -n "$_comp_correct" ]]; then
+    cfopt=-
+    Uopt=-U
+else
+    Mopts=(-M "r:|/=* r:|=*")
+fi
 
 # Now let's have a closer look at the string to complete.
 
@@ -616,7 +621,7 @@ for prepath in "$prepaths[@]"; do
                     -p "${Uopt:+$IPREFIX}$linepath$tmp2" \
 	            -s "/${tmp3#*/}${Uopt:+$ISUFFIX}" \
 	            -W "$prepath$realpath$testpath" \
-		    "$pfxsfx[@]" \
+		    "$pfxsfx[@]" $Mopts \
 		    $listopts \
 	            -a tmp1
           else
@@ -627,7 +632,7 @@ for prepath in "$prepaths[@]"; do
                     -p "${Uopt:+$IPREFIX}$linepath$tmp2" \
 	            -s "${Uopt:+$ISUFFIX}" \
 	            -W "$prepath$realpath$testpath" \
-		    "$pfxsfx[@]" \
+		    "$pfxsfx[@]" $Mopts \
 	            $listopts \
 		    -a tmp1
           fi
@@ -636,7 +641,7 @@ for prepath in "$prepaths[@]"; do
 	  compadd $Uopt -Qf "$mopts[@]" -p "${Uopt:+$IPREFIX}$linepath$tmp2" \
 	          -s "${Uopt:+$ISUFFIX}" \
 	          -W "$prepath$realpath$testpath" \
-		   "$pfxsfx[@]" \
+		   "$pfxsfx[@]" $Mopts \
 	           $listopts \
 		   -a tmp1
 	fi
@@ -646,7 +651,7 @@ for prepath in "$prepaths[@]"; do
 	  tmp4=( $Uopt -Qf "$mopts[@]" -p "${Uopt:+$IPREFIX}$linepath$tmp2"
 	         -s "${Uopt:+$ISUFFIX}"
 	         -W "$prepath$realpath$testpath"
-	         "$pfxsfx[@]" )
+	         "$pfxsfx[@]" $Mopts )
 	  if [[ -z "$listsfx" ]]; then
             for i in "$tmp1[@]"; do
 	      tmpdisp=("${i%%/*}")
@@ -666,7 +671,7 @@ for prepath in "$prepaths[@]"; do
 	  compadd $Uopt -Qf "$mopts[@]" -p "${Uopt:+$IPREFIX}$linepath$tmp2" \
 	          -s "${Uopt:+$ISUFFIX}" \
                   -W "$prepath$realpath$testpath" \
-		  "$pfxsfx[@]" \
+		  "$pfxsfx[@]" $Mopts \
                   $listopts \
 		  -a tmp1
         fi
@@ -735,7 +740,7 @@ for prepath in "$prepaths[@]"; do
         compadd $Uopt -Qf "$mopts[@]" -p "${Uopt:+$IPREFIX}$linepath$tmp3/" \
 	        -s "/$tmp4$i${Uopt:+$ISUFFIX}" \
                 -W "$prepath$realpath${mid%/*/}/" \
-	        "$pfxsfx[@]" $listopts - "$tmp2"
+	        "$pfxsfx[@]" $Mopts $listopts - "$tmp2"
       done
     else
       if [[ "$osuf" = */* ]]; then
@@ -766,7 +771,7 @@ for prepath in "$prepaths[@]"; do
         compadd $Uopt -Qf -p "${Uopt:+$IPREFIX}$linepath$tmp4" \
 	        -s "${Uopt:+$ISUFFIX}" \
 	        -W "$prepath$realpath$testpath" \
-	        "$pfxsfx[@]" "$mopts[@]" $listopts -a tmp1
+	        "$pfxsfx[@]" "$mopts[@]" $Mopts $listopts -a tmp1
       fi
     fi
   fi
