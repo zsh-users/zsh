@@ -403,3 +403,10 @@
 0:Backslashes and metafied characters in patterns
 >Matched against glob/()Ą/*
 >Matched against glob/()Ā/*
+
+  mkdir 梶浦由記 'Пётр Ильич Чайковский'
+  (cd 梶浦由記; print ${${(%):-%~}:t})
+  (cd 'Пётр Ильич Чайковский'; print ${${(%):-%~}:t})
+0:Metafied characters in prompt expansion
+>梶浦由記
+>Пётр Ильич Чайковский

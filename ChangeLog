@@ -1,5 +1,9 @@
 2008-10-30  Peter Stephenson  <pws@csr.com>
 
+	* 25969: Src/subst.c, Src/utils.c, Test/D07multibyte.ztst:
+	bugs in metafication with prompt expansion called from parameter
+	expansion and with zsh_directory_name when called from finddir().
+
 	* 25963: Src/utils.c: Interrupt at spell check prompt output
 	garbage.
 

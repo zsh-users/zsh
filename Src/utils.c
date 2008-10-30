@@ -857,7 +857,9 @@ finddir(char *s)
     scanhashtable(nameddirtab, 0, 0, 0, finddir_scan, 0);
 
     if (func) {
-	char **ares = subst_string_by_func(func, "d", finddir_full);
+	char *dir_meta = metafy(finddir_full, strlen(finddir_full),
+				META_ALLOC);
+	char **ares = subst_string_by_func(func, "d", dir_meta);
 	int len;
 	if (ares && arrlen(ares) >= 2 &&
 	    (len = (int)zstrtol(ares[1], NULL, 10)) > finddir_best) {
@@ -868,6 +870,8 @@ finddir(char *s)
 	    finddir_last->diff = len - strlen(finddir_last->node.nam);
 	    finddir_best = len;
 	}
+	if (dir_meta != finddir_full)
+	    zsfree(dir_meta);
     }
 
     return finddir_last;

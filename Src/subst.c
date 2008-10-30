@@ -2738,8 +2738,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		char *tmps;
 		unmetafy(*ap, &len);
 		untokenize(*ap);
-		tmps = unmetafy(promptexpand(metafy(*ap, len, META_NOALLOC),
-					     0, NULL, NULL, NULL), &len);
+		tmps = promptexpand(metafy(*ap, len, META_NOALLOC),
+				    0, NULL, NULL, NULL);
 		*ap = dupstring(tmps);
 		free(tmps);
 	    }
@@ -2749,8 +2749,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		val = dupstring(val), copied = 1;
 	    unmetafy(val, &len);
 	    untokenize(val);
-	    tmps = unmetafy(promptexpand(metafy(val, len, META_NOALLOC),
-					0, NULL, NULL, NULL), &len);
+	    tmps = promptexpand(metafy(val, len, META_NOALLOC),
+					0, NULL, NULL, NULL);
 	    val = dupstring(tmps);
 	    free(tmps);
 	}
