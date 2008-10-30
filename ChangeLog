@@ -1,5 +1,8 @@
 2008-10-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 25972: Src/Zle/complete.c, Src/Zle/compmatch.c: leaked
+	and uninitialised memory found by valgrind.
+
 	* 25971: Src/builtin.c, Src/zsh.h: fix 25937 which broke some
 	builtins that handle options themselves.
 

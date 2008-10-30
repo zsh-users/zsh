@@ -1687,6 +1687,7 @@ bld_line(Cmatcher mp, char **linep, char *mword, char *word, int wlen, int sfx)
     llen = mp->llen;
     rl = 0;
 
+    *line = '\0';
     if (sfx)
     {
 	/*

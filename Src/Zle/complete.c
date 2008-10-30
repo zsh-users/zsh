@@ -464,7 +464,7 @@ parse_class(Cpattern p, char *iptr)
      * As the input string is metafied, but shouldn't contain shell
      * tokens, we can just add our own tokens willy nilly.
      */
-    optr = p->u.str = zalloc((optr-iptr) + 1);
+    optr = p->u.str = zhalloc((optr-iptr) + 1);
 
     while (firsttime || *iptr != endchar) {
 	int ch;
