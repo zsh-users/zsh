@@ -2184,7 +2184,8 @@ getquery(char *valid_chars, int purge)
 	}
 	zbeep();
     }
-    write(SHTTY, &c, 1);
+    if (c >= 0)
+	write(SHTTY, &c, 1);
     if (nl)
 	write(SHTTY, "\n", 1);
 

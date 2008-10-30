@@ -1,11 +1,15 @@
 2008-10-30  Peter Stephenson  <pws@csr.com>
 
+	* 25963: Src/utils.c: Interrupt at spell check prompt output
+	garbage.
+
 	* 25961: configure.ac: some sh's don't handle opening parentheses
 	in case.
 
 	* unposted: NEWS, README, Config/version.mk, Etc/FAQ.yo,
 	Etc/relnote_4.3.7.txt, Etc/relnote_4.3.8.txt,
-	Etc/relnote_4.3.9.txt: try again with 4.3.9.
+	Etc/relnote_4.3.9.txt: try again with 4.3.9 (N.B. not yet
+	released, CVS tag not finalised).
 
 	* 25958: INSTALL: Doc/Makefile.in, Doc/Zsh/filelist.yo,
 	Doc/Zsh/files.yo, Doc/Zsh/options.yo: make it possible to
