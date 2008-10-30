@@ -11,10 +11,11 @@ pindex(NO_RCS, use of)
 pindex(NO_GLOBAL_RCS, use of)
 vindex(ZDOTDIR, use of)
 cindex(zshenv)
-Commands are first read from tt(/etc/zshenv); this cannot be overridden.
+Commands are first read from tt(zshenv()); this cannot be overridden.
 Subsequent behaviour is modified by the tt(RCS) and
 tt(GLOBAL_RCS) options; the former affects all startup files, while the
-second only affects those in the tt(/etc) directory.  If one of the options
+second only affects global startup files (those shown here with an
+path starting with a tt(/)).  If one of the options
 is unset at any point, any subsequent startup file+LPAR()s+RPAR()
 of the corresponding
 type will not be read.  It is also possible for a file in tt($ZDOTDIR) to
@@ -25,17 +26,17 @@ Commands are then read from tt($ZDOTDIR/.zshenv).
 pindex(LOGIN, use of)
 cindex(zprofile)
 If the shell is a login shell, commands
-are read from tt(/etc/zprofile) and then tt($ZDOTDIR/.zprofile).
+are read from tt(zprofile()) and then tt($ZDOTDIR/.zprofile).
 cindex(zshrc)
 Then, if the shell is interactive,
-commands are read from tt(/etc/zshrc) and then tt($ZDOTDIR/.zshrc).
+commands are read from tt(zshrc()) and then tt($ZDOTDIR/.zshrc).
 cindex(zlogin)
-Finally, if the shell is a login shell, tt(/etc/zlogin) and
+Finally, if the shell is a login shell, tt(zlogin()) and
 tt($ZDOTDIR/.zlogin) are read.
 
 cindex(zlogout)
 When a login shell exits, the files tt($ZDOTDIR/.zlogout) and then
-tt(/etc/zlogout) are read.  This happens with either an explicit exit
+tt(zlogout()) are read.  This happens with either an explicit exit
 via the tt(exit) or tt(logout) commands, or an implicit exit by reading
 end-of-file from the terminal.  However, if the shell terminates due
 to tt(exec)'ing another process, the logout files are not read.
@@ -46,10 +47,10 @@ saved.
 
 vindex(HOME, use of)
 If tt(ZDOTDIR) is unset, tt(HOME) is used instead.
-Those files listed above as being in tt(/etc) may be in another
+Files listed above as being in tt(/etc) may be in another
 directory, depending on the installation.
 
-As tt(/etc/zshenv) is run for all instances of zsh, it is important that
+As tt(zshenv()) is run for all instances of zsh, it is important that
 it be kept as small as possible.  In particular, it is a good idea to
 put code that does not need to be run for every single shell behind
 a test of the form `tt(if [[ -o rcs ]]; then ...)' so that it will not

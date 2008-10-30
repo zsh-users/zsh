@@ -730,19 +730,19 @@ pindex(GLOBAL_RCS)
 cindex(startup files, global, inhibiting)
 cindex(files, global startup, inhibiting)
 item(tt(GLOBAL_RCS) (tt(-d)) <D>)(
-If this option is unset, the startup files tt(/etc/zprofile),
-tt(/etc/zshrc), tt(/etc/zlogin) and tt(/etc/zlogout) will not be run.  It
+If this option is unset, the startup files tt(zprofile()),
+tt(zshrc()), tt(zlogin()) and tt(zlogout()) will not be run.  It
 can be disabled and re-enabled at any time, including inside local startup
 files (tt(.zshrc), etc.).
 )
 pindex(RCS)
 cindex(startup files, sourcing)
 item(tt(RCS) (tt(PLUS()f)) <D>)(
-After tt(/etc/zshenv) is sourced on startup, source the
-tt(.zshenv), tt(/etc/zprofile), tt(.zprofile),
-tt(/etc/zshrc), tt(.zshrc), tt(/etc/zlogin), tt(.zlogin), and tt(.zlogout)
+After tt(zshenv()) is sourced on startup, source the
+tt(.zshenv), tt(zprofile()), tt(.zprofile),
+tt(zshrc()), tt(.zshrc), tt(zlogin()), tt(.zlogin), and tt(.zlogout)
 files, as described in noderef(Files).
-If this option is unset, the tt(/etc/zshenv) file is still sourced, but any
+If this option is unset, the tt(zshenv()) file is still sourced, but any
 of the others will not be; it can be set at any time to prevent the
 remaining startup files after the currently executing one from
 being sourced.

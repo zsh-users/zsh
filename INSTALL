@@ -407,6 +407,13 @@ Any startup/shutdown script can be disabled by giving the
 --disable-SCRIPTNAME option to "configure".  The --disable-etcdir option
 disables all startup/shutdown files which are not explicitly enabled.
 
+The precompiled documentation comes with startup files listed
+as being in the /etc directory.  If yodl is available, running
+"touch version.yo" and "make" in the Doc directory should produce
+correctly substituted documentation.  (This has to be run by hand
+to avoid introducing a dependency on yodl on systems where the precompiled
+documentation is sufficient.)
+
 Shell functions
 ---------------
 

@@ -210,11 +210,19 @@ zshzftpsys.1: Zsh/zftpsys.yo
 
 zshzle.1: Zsh/zle.yo
 
+# This should depend on config.status to get the /etc files right
+# but that would introduce a dependency on Yodl in shipped versions
+# of the shell that we want to avoid.
 version.yo: $(sdir_top)/Config/version.mk
 	( \
 	  echo 'IFDEF(INCWSLEVEL)(INCWSLEVEL())(STARTDEF())'; \
 	  echo 'def(version)(0)('$(VERSION)')'; \
 	  echo 'def(date)(0)('$(VERSION_DATE)')'; \
+	  echo 'def(zshenv)(0)(@zshenv@)'; \
+	  echo 'def(zprofile)(0)(@zprofile@)'; \
+	  echo 'def(zshrc)(0)(@zshrc@)'; \
+	  echo 'def(zlogin)(0)(@zlogin@)'; \
+	  echo 'def(zlogout)(0)(@zlogout@)'; \
 	  echo 'IFDEF(DECWSLEVEL)(DECWSLEVEL())(ENDDEF())#' | tr '#' '\\'; \
 	) > $(sdir)/version.yo
 
