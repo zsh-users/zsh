@@ -298,7 +298,7 @@ sect(On what machines will it run?)
 sect(What's the latest version?)
 
   Zsh 4.2.7 is the latest production version.  The latest development
-  version is 4.3.8; this contains support for multibyte character strings
+  version is 4.3.9; this contains support for multibyte character strings
   (such as UTF-8 locales).  All the main features for multibyte
   support are now in place, although there is some debugging work
   still to be done.
@@ -2032,7 +2032,7 @@ sect(How does zsh handle multibyte input and output?)
   set the tt(MULTIBYTE) option.
 
   The other option that affects multibyte support is tt(COMBINING_CHARS),
-  new in version 4.3.8.  When this is set, any zero-length punctuation
+  new in version 4.3.9.  When this is set, any zero-length punctuation
   characters that follow an alphanumeric character (the base character) are
   assumed to be modifications (accents etc.) to the base character and to
   be displayed within the same screen area as the base character.  As not

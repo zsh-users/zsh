@@ -1,5 +1,13 @@
 2008-10-30  Peter Stephenson  <pws@csr.com>
 
+	* unposted: NEWS, README, Config/version.mk, Etc/FAQ.yo,
+	Etc/relnote_4.3.7.txt, Etc/relnote_4.3.8.txt,
+	Etc/relnote_4.3.9.txt: try again with 4.3.9.
+
+	* 25958: INSTALL: Doc/Makefile.in, Doc/Zsh/filelist.yo,
+	Doc/Zsh/files.yo, Doc/Zsh/options.yo: make it possible to
+	get correctly named global startup files by remaking docs.
+
 	* Oliver (unposted): configure.ac: 25950 should use xyes, too.
 
 	* unposted: Completion/Zsh/Command/_tcpsys: added this since
