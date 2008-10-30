@@ -235,7 +235,7 @@ scantermcap(UNUSED(HashTable ht), ScanFunc func, int flags)
 #endif
 
 #ifndef HAVE_STRCODES
-    static char *strcodes[] = {
+    static char *zstrcodes[] = {
 	"ac", "bt", "bl", "cr", "ZA", "ZB", "ZC", "ZD", "cs", "rP", "ct",
 	"MC", "cl", "cb", "ce", "cd", "ch", "CC", "CW", "cm", "do", "ho",
 	"vi", "le", "CM", "ve", "nd", "ll", "up", "vs", "ZE", "dc", "dl",
@@ -302,7 +302,13 @@ scantermcap(UNUSED(HashTable ht), ScanFunc func, int flags)
     pm->node.flags = PM_READONLY | PM_SCALAR;
     pm->gsu.s = &nullsetscalar_gsu;
 
-    for (capcode = (char **)strcodes; *capcode; capcode++) {
+    for (capcode = (char **)
+#ifdef HAVE_STRCODES
+	     strcodes
+#else
+	     zstrcodes
+#endif
+	     ; *capcode; capcode++) {
 	if ((tcstr = (char *)tgetstr(*capcode,&u)) != NULL &&
 	    tcstr != (char *)-1) {
 	    pm->u.str = dupstring(tcstr);
