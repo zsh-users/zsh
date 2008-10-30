@@ -1198,6 +1198,12 @@ struct builtin {
 #define BINF_DASHDASHVALID	(1<<15) /* Handle `--' even if SKIPINVALD */
 #define BINF_CLEARENV		(1<<16) /* new process started with cleared env */
 #define BINF_AUTOALL		(1<<17) /* autoload all features at once */
+ /*
+  * Handles options itself.  This is only useful if the option string for a
+  * builtin with an empty option string.  It is used to indicate that "--"
+  * does not terminate options.
+  */
+#define BINF_HANDLES_OPTS	(1<<18)
 
 struct module {
     struct hashnode node;

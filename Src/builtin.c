@@ -42,7 +42,7 @@ static struct builtin builtins[] =
     BIN_PREFIX("command", BINF_COMMAND),
     BIN_PREFIX("exec", BINF_EXEC),
     BIN_PREFIX("noglob", BINF_NOGLOB),
-    BUILTIN("[", 0, bin_test, 0, -1, BIN_BRACKET, NULL, NULL),
+    BUILTIN("[", BINF_HANDLES_OPTS, bin_test, 0, -1, BIN_BRACKET, NULL, NULL),
     BUILTIN(".", BINF_PSPECIAL, bin_dot, 1, -1, 0, NULL, NULL),
     BUILTIN(":", BINF_PSPECIAL, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("alias", BINF_MAGICEQUALS | BINF_PLUSOPTS, bin_alias, 0, -1, 0, "Lgmrs", NULL),
@@ -84,7 +84,7 @@ static struct builtin builtins[] =
     BUILTIN("history", 0, bin_fc, 0, -1, BIN_FC, "nrdDfEimpPa", "l"),
     BUILTIN("integer", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "HL:%R:%Z:%ghi:%lprtux", "i"),
     BUILTIN("jobs", 0, bin_fg, 0, -1, BIN_JOBS, "dlpZrs", NULL),
-    BUILTIN("kill", 0, bin_kill, 0, -1, 0, NULL, NULL),
+    BUILTIN("kill", BINF_HANDLES_OPTS, bin_kill, 0, -1, 0, NULL, NULL),
     BUILTIN("let", 0, bin_let, 1, -1, 0, NULL, NULL),
     BUILTIN("local", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%ahi:%lprtux", NULL),
     BUILTIN("log", 0, bin_log, 0, 0, 0, NULL, NULL),
@@ -109,15 +109,15 @@ static struct builtin builtins[] =
     BUILTIN("readonly", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%lptux", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "df", "r"),
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
-    BUILTIN("set", BINF_PSPECIAL, bin_set, 0, -1, 0, NULL, NULL),
+    BUILTIN("set", BINF_PSPECIAL | BINF_HANDLES_OPTS, bin_set, 0, -1, 0, NULL, NULL),
     BUILTIN("setopt", 0, bin_setopt, 0, -1, BIN_SETOPT, NULL, NULL),
     BUILTIN("shift", BINF_PSPECIAL, bin_shift, 0, -1, 0, NULL, NULL),
     BUILTIN("source", BINF_PSPECIAL, bin_dot, 1, -1, 0, NULL, NULL),
     BUILTIN("suspend", 0, bin_suspend, 0, 0, 0, "f", NULL),
-    BUILTIN("test", 0, bin_test, 0, -1, BIN_TEST, NULL, NULL),
+    BUILTIN("test", BINF_HANDLES_OPTS, bin_test, 0, -1, BIN_TEST, NULL, NULL),
     BUILTIN("ttyctl", 0, bin_ttyctl, 0, 0, 0, "fu", NULL),
     BUILTIN("times", BINF_PSPECIAL, bin_times, 0, 0, 0, NULL, NULL),
-    BUILTIN("trap", BINF_PSPECIAL, bin_trap, 0, -1, 0, NULL, NULL),
+    BUILTIN("trap", BINF_PSPECIAL | BINF_HANDLES_OPTS, bin_trap, 0, -1, 0, NULL, NULL),
     BUILTIN("true", 0, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("type", 0, bin_whence, 0, -1, 0, "ampfsw", "v"),
     BUILTIN("typeset", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klprtuxmz", NULL),
@@ -391,7 +391,8 @@ execbuiltin(LinkList args, Builtin bn)
 		if (ops.ind['-'])
 		    break;
 	    }
-	} else if (*argv && !strcmp(*argv, "--")) {
+	} else if (!(flags & BINF_HANDLES_OPTS) && *argv &&
+		   !strcmp(*argv, "--")) {
 	    ops.ind['-'] = 1;
 	    argv++;
 	}

@@ -1,3 +1,8 @@
+2008-10-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25971: Src/builtin.c, Src/zsh.h: fix 25937 which broke some
+	builtins that handle options themselves.
+
 2008-10-30  Peter Stephenson  <pws@csr.com>
 
 	* 25969: Src/subst.c, Src/utils.c, Test/D07multibyte.ztst:
