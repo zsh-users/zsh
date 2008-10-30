@@ -1,5 +1,8 @@
 2008-10-30  Peter Stephenson  <pws@csr.com>
 
+	* 25950: configure.ac: need "x$dynamic" trick in two
+	more places.
+
 	* users/13418: Src/Modules/termcap.c: protect against
 	HAVE_STRCODES lying.
 

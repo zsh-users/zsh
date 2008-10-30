@@ -2919,13 +2919,13 @@ source code location      : ${srcdir}
 compiler                  : ${CC}
 preprocessor flags        : ${CPPFLAGS}
 executable compiler flags : ${CFLAGS}"
-if test "$dynamic" = yes; then
+if test "x$dynamic" = yes; then
   echo "\
 module compiler flags     : ${CFLAGS} ${DLCFLAGS}"
 fi
 echo "\
 executable linker flags   : ${LDFLAGS} ${EXELDFLAGS} ${EXTRA_LDFLAGS}"
-if test "$dynamic" = yes; then
+if test "x$dynamic" = yes; then
   echo "\
 module linker flags       : ${LDFLAGS} ${LIBLDFLAGS} ${DLLDFLAGS}"
 fi
