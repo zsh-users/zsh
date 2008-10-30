@@ -1748,12 +1748,8 @@ getvisrchstr(void)
 	    clearscreen(zlenoargs);
 	} else if(cmd == Th(z_acceptline) ||
 	    	cmd == Th(z_vicmdmode)) {
-	    if (sptr) {
-		sbuf[sptr] = ZWC('\0');
-		visrchstr = ztrdup(sbuf+1);
-	    } else {
-		visrchstr = ztrdup(vipenultsrchstr);
-	    }
+	    sbuf[sptr] = ZWC('\0');
+	    visrchstr = ztrdup(sbuf+1);
 	    ret = 1;
 	    sptr = 0;
 	} else if(cmd == Th(z_backwarddeletechar) ||
