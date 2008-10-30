@@ -1,5 +1,7 @@
 2008-10-30  Peter Stephenson  <pws@csr.com>
 
+	* Oliver (unposted): configure.ac: 25950 should use xyes, too.
+
 	* unposted: Completion/Zsh/Command/_tcpsys: added this since
 	it's already in .distfiles.  It's very limited in what it
 	does but it's better than nothing, I suppose.
