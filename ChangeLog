@@ -1,5 +1,9 @@
 2008-10-30  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Zsh/Command/_tcpsys: added this since
+	it's already in .distfiles.  It's very limited in what it
+	does but it's better than nothing, I suppose.
+
 	* 25950: configure.ac: need "x$dynamic" trick in two
 	more places.
 
