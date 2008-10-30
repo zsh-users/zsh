@@ -1,5 +1,8 @@
 2008-10-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 25975: Src/compmatch.c: bad tests for pattern match
+	when building up a line.
+
 	* 25972: Src/Zle/complete.c, Src/Zle/compmatch.c: leaked
 	and uninitialised memory found by valgrind.
 

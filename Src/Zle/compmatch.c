@@ -156,6 +156,7 @@ get_cline(char *l, int ll, char *w, int wl, char *o, int ol, int fl)
     r->next = NULL;
     r->line = l; r->llen = ll;
     r->word = w; r->wlen = wl;
+    DPUTS(wl > 0 && !*w, "Bad word");
     r->orig = o; r->olen = ol;
     r->slen = 0;
     r->flags = fl;
@@ -416,6 +417,7 @@ add_match_part(Cmatcher m, char *l, char *w, int wl,
     } else {
 	lp->line = l; lp->llen = wl;
 	lp->word = w; lp->wlen = wl;
+	DPUTS(wl > 0 && !*w, "Bad word");
 	lp->orig = o; lp->olen = ol;
     }
     if (o || ol)
@@ -1242,7 +1244,7 @@ pattern_match_equivalence(Cpattern lp, int wind, int wmtp, int wchr)
 
 /*
  * Check if the given pattern matches the given string.
- *  p and  s are either anchor or line pattern and string;
+ * p and  s are either anchor or line pattern and string;
  * wp and ws are word (candidate) pattern and string
  *
  * If only one pattern is given, we just check if characters match.
@@ -1273,7 +1275,7 @@ pattern_match_restrict(Cpattern p, char *s, Cpattern wp, char *ws,
     int wc, wind;
     int len = 0, wlen, mt, wmt;
 
-    while (p && wp && *s && *ws) {
+    while (p && wp && (prestrict || *s) && *ws) {
 	/* First test the word character */
 	if (*ws == Meta) {
 	    wc = STOUC(ws[1]) ^ 32;
@@ -1387,7 +1389,7 @@ pattern_match_restrict(Cpattern p, char *s, Cpattern wp, char *ws,
 	wp = wp->next;
     }
 
-    while (p && *s) {
+    while (p && (prestrict || *s)) {
 	if (prestrict) {
 	    /*
 	     * As above, but with even less info to go on.
@@ -1436,6 +1438,11 @@ pattern_match_restrict(Cpattern p, char *s, Cpattern wp, char *ws,
 	    prestrict = prestrict->next;
 	} else
 	    s += len;
+    }
+
+    if (prestrict) {
+	/* Restriction with nothing to match */
+	return 0;
     }
 
     while (wp && *ws) {
@@ -2057,6 +2064,7 @@ undo_cmdata(Cmdata md, int sfx)
     } else if (md->len != md->olen) {
 	r->wlen = md->len;
 	r->word = md->str - (sfx ? md->len : 0);
+	DPUTS(r->wlen > 0 && !*r->word, "Bad word");
     }
     return r;
 }
