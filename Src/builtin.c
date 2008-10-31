@@ -3262,7 +3262,7 @@ bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
     }
 
     queue_signals();
-    while (*argv) {
+    for (;*argv;++argv) {
 	void *hn;
 	if (OPT_ISSET(ops,'m')) {
 	    /* with the -m option, treat the argument as a glob pattern */
@@ -3275,7 +3275,12 @@ bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
 		zwarnnam(name, "bad pattern : %s", *argv);
 		returnval = 1;
 	    }
-	} else if ((asg = getasg(*argv)) && asg->value) {
+            continue;
+	}
+        if (!(asg = getasg(*argv))) {
+	    zwarnnam(name, "bad assignment");
+	    returnval = 1;
+        } else if (asg->value) {
 	    if(isset(RESTRICTED)) {
 		zwarnnam(name, "restricted: %s", asg->value);
 		returnval = 1;
@@ -3323,7 +3328,6 @@ bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
 		ht->printnode(hn, 0);
 	} else if(OPT_ISSET(ops,'v'))
 	    ht->printnode(hn, 0);
-	argv++;
     }
     unqueue_signals();
     return returnval;

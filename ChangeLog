@@ -1,3 +1,7 @@
+2008-10-31  Oliver Kiddle  <opk@zsh.org>
+
+	* 25983: Fix bug in hash builtin with empty hash entry name
+
 2008-10-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25975: Src/compmatch.c: bad tests for pattern match
