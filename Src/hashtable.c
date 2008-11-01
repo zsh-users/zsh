@@ -819,8 +819,10 @@ disableshfuncnode(HashNode hn, UNUSED(int flags))
     hn->flags |= DISABLED;
     if (!strncmp(hn->nam, "TRAP", 4)) {
 	int signum = getsignum(hn->nam + 4);
-	sigtrapped[signum] &= ~ZSIG_FUNC;
-	unsettrap(signum);
+	if (signum != -1) {
+	    sigtrapped[signum] &= ~ZSIG_FUNC;
+	    unsettrap(signum);
+	}
     }
 }
 

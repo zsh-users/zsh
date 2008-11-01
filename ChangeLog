@@ -1,3 +1,8 @@
+2008-11-01  Clint Adams  <clint@zsh.org>
+
+	* 25985: Src/hashtable.c: don't try to disable signal traps if
+	getsignum returns -1.
+
 2008-10-31  Oliver Kiddle  <opk@zsh.org>
 
 	* 25983: Fix bug in hash builtin with empty hash entry name
