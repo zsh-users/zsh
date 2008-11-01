@@ -570,7 +570,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 		    if (ztpeer)
 			remotename = ztpeer->h_name;
 		    else
-			remotename = ztrdup(inet_ntoa(sess->peer.in.sin_addr));
+			remotename = inet_ntoa(sess->peer.in.sin_addr);
 		    if (OPT_ISSET(ops,'L')) {
 			int schar;
 			if (sess->flags & ZTCP_ZFTP)

@@ -1,5 +1,8 @@
 2008-11-01  Clint Adams  <clint@zsh.org>
 
+	* 25987: Src/Modules/tcp.c: don't ztrdup the buffer returned by
+	inet_ntoa.
+
 	* 25985: Src/hashtable.c: don't try to disable signal traps if
 	getsignum returns -1.
 
