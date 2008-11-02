@@ -1,3 +1,8 @@
+2008-11-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 25989: Src/Zle/computil.c: Slight improvement for multibyte
+	characters in matching to prevent crash.
+
 2008-11-02  Clint Adams  <clint@zsh.org>
 
 	* 25988: Completion/Darwin/Command/_fink,
