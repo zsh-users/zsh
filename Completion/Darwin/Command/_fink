@@ -55,6 +55,7 @@ _fink_get_packages(){
 }
 
 _finkpkgs_caching_policy(){
+  local -a oldp
   oldp=( "$1"(Nmw+1) )
   (( $#oldp )) ||
     [[ /sw/var/cache/apt/pkgcache.bin -nt "$1" ]] ||

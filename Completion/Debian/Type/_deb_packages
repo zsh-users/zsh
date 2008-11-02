@@ -108,13 +108,14 @@ _deb_packages () {
   _tags packages && compadd "$expl[@]" - "${(@P)cachevar}"
 }
 
- _debs_caching_policy () {
-    # rebuild if cache is more than a week old
-      oldp=( "$1"(mw+1) )
-        (( $#oldp )) && return 0
+_debs_caching_policy () {
+  # rebuild if cache is more than a week old
+  local -a oldp
+  oldp=( "$1"(mw+1) )
+  (( $#oldp )) && return 0
 
-	  [[ /var/cache/apt/pkgcache.bin -nt "$1" ||
-	     /var/lib/dpkg/available -nt "$1" ]]
-	  }
+  [[ /var/cache/apt/pkgcache.bin -nt "$1" ||
+     /var/lib/dpkg/available -nt "$1" ]]
+}
 
 _deb_packages "$@"

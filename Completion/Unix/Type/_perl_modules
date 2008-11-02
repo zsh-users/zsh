@@ -132,6 +132,7 @@ _perl_modules () {
 
 _perl_modules_caching_policy () {
   local _perllocals
+  local -a oldp
 
   # rebuild if cache is more than a week old
   oldp=( "$1"(mw+1) )

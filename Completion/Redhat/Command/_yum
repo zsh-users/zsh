@@ -274,21 +274,22 @@ _yum_list_or_info()
 
 _yum_caching_policy() 
 {
-	local _yumrepomds
+  local _yumrepomds
+  local -a oldp
 
-  	# rebuild if cache is more than a week old
-  	oldp=( "$1"(mw+1) )
-  	(( $#oldp )) && return 0
+  # rebuild if cache is more than a week old
+  oldp=( "$1"(mw+1) )
+  (( $#oldp )) && return 0
 
-  	_yumrepomds=( /var/cache/yum/**/repomd.xml )
+  _yumrepomds=( /var/cache/yum/**/repomd.xml )
 
-  	if (( $#_yumrepomds )); then
-    	for repo in $_yumrepomds; do
-      		[[ "$repo" -nt "$1" ]] && return 0
-    	done
-  	fi
+  if (( $#_yumrepomds )); then
+    for repo in $_yumrepomds; do
+      [[ "$repo" -nt "$1" ]] && return 0
+    done
+  fi
 
-  	return 1
+  return 1
 }
 
 _yum "$@"

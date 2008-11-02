@@ -4,9 +4,10 @@
 # Used by _mac_applications and _mac_files_for_application.
 
 _mac_apps_caching_policy () {
-   # Rebuild if cache is more than a day old
-   oldp=( "$1"(Nmw+1) )
-   (( $#oldp ))
+  # Rebuild if cache is more than a day old
+  local -a oldp
+  oldp=( "$1"(Nmw+1) )
+  (( $#oldp ))
 }
 
 

@@ -314,6 +314,7 @@ fi
 
 _rpms_caching_policy () {
   # rebuild if cache is more than a week old
+  local -a oldp
   oldp=( "$1"(mw+1) )
   (( $#oldp )) && return 0
 

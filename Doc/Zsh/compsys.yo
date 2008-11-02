@@ -3906,6 +3906,7 @@ Example:
 
 example(_example_caching_policy () {
     # rebuild if cache is more than a week old
+    local -a oldp
     oldp=( "$1"(Nmw+1) )
     (( $#oldp ))
 })

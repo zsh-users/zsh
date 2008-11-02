@@ -3,6 +3,7 @@
 local expl ret bogotokens
 
 _bogoutil_caching_policy () {
+  local -a oldp
 
   # rebuild if cache is more than a week old
   oldp=( "$1"(mw+1) )

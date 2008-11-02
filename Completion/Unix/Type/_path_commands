@@ -3,8 +3,8 @@
 (( $+functions[_path_commands_caching_policy] )) ||
 _path_commands_caching_policy() {
 
-local oldp file
-typeset -a dbfiles
+local file
+local -a oldp dbfiles
 
 # rebuild if cache is more than a week old
 oldp=( "$1"(Nmw+1) )

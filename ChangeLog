@@ -1,3 +1,16 @@
+2008-11-02  Clint Adams  <clint@zsh.org>
+
+	* 25988: Completion/Darwin/Command/_fink,
+	Completion/Darwin/Type/_retrieve_mac_apps,
+	Completion/Debian/Command/_apt,
+	Completion/Debian/Type/_deb_packages,
+	Completion/Redhat/Command/_rpm, Completion/Redhat/Command/_yum,
+	Completion/Unix/Command/_bogofilter,
+	Completion/Unix/Type/_path_commands,
+	Completion/Unix/Type/_perl_modules, Doc/Zsh/compsys.yo: declare
+	temporary cache array as local, thanks to problem noticed by
+	Kazuhiro NISHIYAMA.
+
 2008-11-01  Clint Adams  <clint@zsh.org>
 
 	* 25987: Src/Modules/tcp.c: don't ztrdup the buffer returned by

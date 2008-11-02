@@ -571,14 +571,14 @@ _apt_releases () {
   _tags apt-releases && compadd -a _apt_releases
 }
 
- _apt_caching_policy () {
-    # rebuild if cache is more than a week old
-      oldp=( "$1"(mw+1) )
-        (( $#oldp )) && return 0
+_apt_caching_policy () {
+  local -a oldp
 
-          [[ /var/cache/apt/pkgcache.bin -nt "$1" ||
-             /var/lib/dpkg/available -nt "$1" ]]
-          }
+  oldp=( "$1"(mw+1) )
+  (( $#oldp )) && return 0
 
+  [[ /var/cache/apt/pkgcache.bin -nt "$1" ||
+     /var/lib/dpkg/available -nt "$1" ]]
+}
 
 _apt "$@"
