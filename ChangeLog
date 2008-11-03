@@ -1,3 +1,8 @@
+2008-11-03  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Etc/.distfiles: missing entry; 4.3.9 finally
+	released, perhaps.
+
 2008-11-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 25989: Src/Zle/computil.c: Slight improvement for multibyte
