@@ -1,5 +1,7 @@
 2008-11-03  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Config/version.mk: update version to 4.3.9-dev-0.
+
 	* unposted: Etc/.distfiles: missing entry; 4.3.9 finally
 	released, perhaps.
 
