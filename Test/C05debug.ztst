@@ -52,9 +52,15 @@
 	# Failure
 	exit 10
 	HERE
-  $ZTST_testdir/../Src/zsh -f ./zsh-trapreturn-bug2
+  $ZTST_testdir/../Src/zsh -f ./zsh-trapreturn-bug2 2>erroutput.dif
+  mystat=$?
+  (
+   setopt extendedglob
+   print ${"$(< erroutput.dif)"%%:[^:]#: ./fdasfsdafd}
+  )
+  (( mystat == 0 ))
 0: trapreturn handling bug is properly fixed
-?./zsh-trapreturn-bug2:5: no such file or directory: ./fdasfsdafd
+>./zsh-trapreturn-bug2:5
 
   fn() {
     setopt localtraps localoptions debugbeforecmd
