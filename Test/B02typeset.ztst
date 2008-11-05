@@ -453,3 +453,9 @@
 >typeset -a array
 >array=(foo bar)
 ?fn:typeset: no such variable: nonexistent
+
+ unsetopt typesetsilent
+ silent1(){ typeset -g silence; }
+ silent2(){ local silence; silent1; }
+ silent2
+0:typeset -g should be silent even without TYPESET_SILENT

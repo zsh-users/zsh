@@ -1,3 +1,8 @@
+2008-11-05  Peter Stephenson  <pws@csr.com>
+
+	* 26008, Src/builtin.c, Test/B02typeset.ztst: "typeset -g
+	<var...>" should be silent even if TYPESET_SILENT is not set.
+
 2008-11-04  Peter Stephenson  <pws@csr.com>
 
 	* 26006: Test/C05debug.ztst: remove dependence on system

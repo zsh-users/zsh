@@ -1951,7 +1951,8 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	if (!on && !roff && !value) {
 	    if (OPT_ISSET(ops,'p'))
 		paramtab->printnode(&pm->node, PRINT_TYPESET);
-	    else if (unset(TYPESETSILENT) || OPT_ISSET(ops,'m'))
+	    else if (!OPT_ISSET(ops,'g') &&
+		     (unset(TYPESETSILENT) || OPT_ISSET(ops,'m')))
 		paramtab->printnode(&pm->node, PRINT_INCLUDEVALUE);
 	    return pm;
 	}
