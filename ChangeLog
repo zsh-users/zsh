@@ -1,5 +1,8 @@
 2008-11-06  Clint Adams  <clint@zsh.org>
 
+	* 26014: Src/glob.c: don't allocate and leak a patprog if it's not
+	going to be used.
+
 	* 26013: Src/Modules/tcp.c: don't ztrdup the other buffer returned
 	by inet_ntoa.  cf. 25987.
 
