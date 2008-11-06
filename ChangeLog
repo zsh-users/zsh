@@ -1,3 +1,8 @@
+2008-11-06  Clint Adams  <clint@zsh.org>
+
+	* 26013: Src/Modules/tcp.c: don't ztrdup the other buffer returned
+	by inet_ntoa.  cf. 25987.
+
 2008-11-05  Peter Stephenson  <pws@csr.com>
 
 	* 26008, Src/builtin.c, Test/B02typeset.ztst: "typeset -g

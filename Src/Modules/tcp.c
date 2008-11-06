@@ -565,7 +565,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 		    if (zthost)
 			localname = zthost->h_name;
 		    else
-			localname = ztrdup(inet_ntoa(sess->sock.in.sin_addr));
+			localname = inet_ntoa(sess->sock.in.sin_addr);
 		    ztpeer = gethostbyaddr((const void *)&(sess->peer.in.sin_addr), sizeof(sess->peer.in.sin_addr), AF_INET);
 		    if (ztpeer)
 			remotename = ztpeer->h_name;
