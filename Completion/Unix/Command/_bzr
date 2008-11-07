@@ -86,7 +86,7 @@ case $cmd in
     fi
     ;;
 
-(checkout)
+(checkout|co)
     args+=(
 	'--lightweight[perform a lightweight checkout]'
 	'(-r --revision)'{--revision=,-r}'[the revision to get]:rev:'
