@@ -1,3 +1,7 @@
+2008-11-08  Clint Adams  <clint@zsh.org>
+
+	* unposted: Src/glob.c: revert 26014.
+
 2008-11-07  Clint Adams  <clint@zsh.org>
 
 	* 26016: Completion/Unix/Command/_bzr: treat "bzr co" as an alias

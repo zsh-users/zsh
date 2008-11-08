@@ -693,12 +693,10 @@ parsecomplist(char *instr)
     if (*(str = instr) == Inpar && !skipparens(Inpar, Outpar, (char **)&str) &&
         *str == Pound && isset(EXTENDEDGLOB) && str[-2] == '/') {
 	instr++;
-
+	if (!(p1 = patcompile(instr, compflags, &instr)))
+	    return NULL;
 	if (instr[0] == '/' && instr[1] == Outpar && instr[2] == Pound) {
 	    int pdflag = 0;
-
-	    if (!(p1 = patcompile(instr, compflags, &instr)))
-	        return NULL;
 
 	    instr += 3;
 	    if (*instr == Pound) {
