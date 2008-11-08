@@ -1,5 +1,30 @@
 #autoload
 
+local -a match mbegin mend
+
+# Look for glob qualifiers.  Do this first:  if we're really
+# in a glob qualifier, we don't actually want to expand
+# the earlier part of the path.  We can't expand inside
+# parentheses otherwise, so as we test that successfully
+# we should be able to commit to glob qualifiers here.
+#
+# Extra nastiness to be careful about a quoted parenthesis.
+# The initial tests look for parentheses with zero or an
+# even number of backslashes in front.  We also require that
+# there was at least one character before the parenthesis for
+# a bare glob qualifier.
+# The later test looks for an outstanding quote.
+if [[ ( -o bareglobqual && \
+           $PREFIX = (#b)((*[^\\]|)(\\\\)#\()([^\)]#) && \
+           ${#match[1]} -gt 1 || \
+        -o extendedglob && \
+	   $PREFIX = (#b)((*[^\\]|)(\\\\)#"(#q")([^\)]#) \
+      ) && -z $compstate[quote] ]]; then
+   compset -p ${#match[1]}
+   _globquals
+   return
+fi
+
 # Utility function for in-path completion. This allows `/u/l/b<TAB>'
 # to complete to `/usr/local/bin'.
 
@@ -9,7 +34,7 @@ local pats haspats ignore pfx pfxsfx sopt gopt opt sdirs ignpar cfopt listsfx
 local nm=$compstate[nmatches] menu matcher mopts sort mid accex fake
 local listfiles listopts tmpdisp origtmp1 Uopt
 integer npathcheck
-local -a match mbegin mend Mopts
+local -a Mopts
 
 typeset -U prepaths exppaths
 
@@ -383,19 +408,7 @@ for prepath in "$prepaths[@]"; do
 
     tmp2=( "$tmp1[@]" )
 
-    # Look for glob qualifiers.
-    # Extra nastiness to be careful about a quoted parenthesis.
-    # The initial tests look for parentheses with zero or an
-    # even number of backslashes in front.
-    # The later test looks for an outstanding quote.
-    if [[ ( -o bareglobqual && \
-	      "$tpre/$tsuf" = (#b)((*[^\\]|)(\\\\)#\()([^\)]#) || \
-            -o extendedglob && \
-		"$tpre/$tsuf" = (#b)((*[^\\]|)(\\\\)#"(#q")([^\)]#) \
-	  ) && -z $compstate[quote] ]]; then
-       compset -p ${#match[1]}
-       _globquals
-    elif [[ "$tpre$tsuf" = */* ]]; then
+    if [[ "$tpre$tsuf" = */* ]]; then
       compfiles -P$cfopt tmp1 accex "$skipped" "$_matcher $matcher[2]" "$sdirs" fake
     elif [[ "$sopt" = *[/f]* ]]; then
       compfiles -p$cfopt tmp1 accex "$skipped" "$_matcher $matcher[2]" "$sdirs" fake "$pats[@]"

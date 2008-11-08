@@ -1,3 +1,10 @@
+2008-11-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 26021: Completion/Unix/Type/_path_files: complete glob
+	qualifiers where they don't mess up the rest of the word,
+	don't complete a bare glob qualifier if there's nothing
+	before it.
+
 2008-11-08  Clint Adams  <clint@zsh.org>
 
 	* unposted: Src/glob.c: revert 26014.
