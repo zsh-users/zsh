@@ -1,5 +1,8 @@
 2008-11-08  Oliver Kiddle  <opk@zsh.org>
 
+	* 26022: Completion/Zsh/Type/_file_descriptors: fix on Solaris
+	where /proc/$$/fd exists but doesn't contain symlinks
+
 	* 26017: Completion/Unix/Type/_path_files, 
 	Completion/Zsh/Type/_globflags, Completion/Zsh/Type/_globquals:
 	add completion of globbing flags

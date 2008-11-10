@@ -2,9 +2,9 @@
 
 local i fds expl list link sep
 
-for i in {0..9}; [[ -e /dev/fd/$i ]] && fds+=( $i )
+fds=( /dev/fd/<0-9>(N:t) )
 
-if zstyle -T ":completion:${curcontext}:" verbose && [[ -e /proc/$$/fd ]]; then
+if zstyle -T ":completion:${curcontext}:" verbose && [[ -h /proc/$$/fd/$fds[1] ]]; then
   zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
 
   if zmodload -F zsh/stat b:zstat; then
