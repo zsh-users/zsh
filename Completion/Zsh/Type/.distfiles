@@ -7,6 +7,7 @@ _delimiters
 _directory_stack
 _file_descriptors
 _functions
+_globflags
 _globqual_delims
 _globquals
 _history_modifiers

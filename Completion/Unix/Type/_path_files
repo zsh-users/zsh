@@ -21,7 +21,11 @@ if [[ ( -o bareglobqual && \
 	   $PREFIX = (#b)((*[^\\]|)(\\\\)#"(#q")([^\)]#) \
       ) && -z $compstate[quote] ]]; then
    compset -p ${#match[1]}
-   _globquals
+   if [[ -o extendedglob ]] && compset -P '\#'; then
+     _globflags
+   else
+     _globquals
+   fi
    return
 fi
 

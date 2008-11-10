@@ -1,3 +1,9 @@
+2008-11-08  Oliver Kiddle  <opk@zsh.org>
+
+	* 26017: Completion/Unix/Type/_path_files, 
+	Completion/Zsh/Type/_globflags, Completion/Zsh/Type/_globquals:
+	add completion of globbing flags
+
 2008-11-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 26021: Completion/Unix/Type/_path_files: complete glob

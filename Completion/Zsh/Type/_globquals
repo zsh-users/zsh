@@ -25,7 +25,7 @@ while [[ -n $PREFIX ]]; do
 	return
       elif ! _globqual_delims; then
 	# still completing mode spec
-	_message "mode spec"
+	_message -e modes "mode spec"
 	return
       fi
     fi
@@ -57,7 +57,7 @@ while [[ -n $PREFIX ]]; do
     (d)
     # complete/skip device
     if ! compset -p '[[:digit:]]##'; then
-      _message "device ID"
+      _message -e device-ids "device ID"
       return
     fi
     ;;
@@ -65,7 +65,7 @@ while [[ -n $PREFIX ]]; do
     (l)
     # complete/skip link count
     if ! compset -P '([-+]|)[[:digit:]]##'; then
-      _message "link count"
+      _message -e numbers "link count"
       return
     fi
     ;;

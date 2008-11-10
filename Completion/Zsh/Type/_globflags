@@ -1,0 +1,33 @@
+local ret=1
+local -a flags
+
+if compset -P a; then
+  _message -e numbers 'errors'
+  return
+elif compset -P q; then
+  _globquals
+  return
+fi
+
+flags=(
+  'i:case insensitive'
+  'l:lower case characters match uppercase'
+  'I:case sensitive matching'
+  's:match start of string'
+  'e:match end of string'
+)
+[[ $compstate[context] = condition ]] && flags+=(
+  'b:activate backreferences'
+  'B:deactivate backreferences'
+  'm:set reference to entire matched data'
+  'M:deactivate m flag'
+)
+
+_describe -t globflags "glob flag" flags -Q -S ')' && ret=0
+flags=(
+  'a:approximate matching'
+  'q:introduce glob qualifier'
+)
+_describe -t globflags "glob flag" flags -Q -S '' && ret=0
+
+return ret
