@@ -3773,6 +3773,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    }
 	    he = up_histent(he);
 	}
+	freepatprog(pprogc);
     }
     if ((t = cc->mask & (CC_ARRAYS | CC_INTVARS | CC_ENVVARS | CC_SCALARS |
 			 CC_READONLYS | CC_SPECIALS | CC_PARAMS)))
