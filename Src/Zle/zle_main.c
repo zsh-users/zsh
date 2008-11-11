@@ -585,7 +585,7 @@ raw_getbyte(long do_keytmout, char *cptr)
 	    fds[i+1].events = POLLIN;
 	}
 # endif
-	do {
+	for (;;) {
 # ifdef HAVE_POLL
 	    int poll_timeout;
 
@@ -694,6 +694,19 @@ raw_getbyte(long do_keytmout, char *cptr)
 	    /* If error or unhandled timeout, give up. */
 	    if (selret < 0)
 		break;
+	    /*
+	     * If there's user input handle it straight away.
+	     * This improves the user's ability to handle exceptional
+	     * conditions like runaway output.
+	     */
+	    if (
+# ifdef HAVE_POLL
+		 (fds[0].revents & POLLIN)
+# else
+		 FD_ISSET(SHTTY, &foofd)
+# endif
+		 )
+		break;
 	    if (nwatch && !errtry) {
 		/*
 		 * Copy the details of the watch fds in case the
@@ -755,13 +768,7 @@ raw_getbyte(long do_keytmout, char *cptr)
 		zfree(lwatch_fds, lnwatch*sizeof(int));
 		freearray(lwatch_funcs);
 	    }
-	} while (!
-# ifdef HAVE_POLL
-		 (fds[0].revents & POLLIN)
-# else
-		 FD_ISSET(SHTTY, &foofd)
-# endif
-		 );
+	}
 # ifdef HAVE_POLL
 	zfree(fds, sizeof(struct pollfd) * nfds);
 # endif

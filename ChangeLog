@@ -1,3 +1,8 @@
+2008-11-11  Peter Stephenson  <pws@csr.com>
+
+	* 26025: Src/Zle/zle_main.c: prefer handling user input to
+	file installed with zle -F.
+
 2008-11-11  Clint Adams  <clint@zsh.org>
 
 	* 26023: Completion/Unix/Command/_topgit: skeletal completion for
