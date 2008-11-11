@@ -918,11 +918,12 @@ bin_bindkey_bind(char *name, char *kmname, Keymap km, char **argv, Options ops, 
 		    metafy(m, 1, META_NOALLOC);
 		    bindkey(km, m, refthingy(fn), str);
 		}
-		unrefthingy(fn);
 	    }
+	    unrefthingy(fn);
 	} else {
 	    if(bindkey(km, seq, fn, str)) {
 		zwarnnam(name, "cannot bind to an empty key sequence");
+		unrefthingy(fn);
 		ret = 1;
 	    }
 	}
