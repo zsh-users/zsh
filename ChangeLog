@@ -1,10 +1,15 @@
+2008-11-12  Peter Stephenson  <pws@csr.com>
+
+	* 26029: Test/A04redirect.ztst: add test for redirection operators
+	with no preceding whitespace.
+
 2008-11-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 26024: Src/Zle/zle_keymap.c: don't leave reference count
 	incremented when aborting bindkey with an error
 
 2008-11-11  Clint Adams  <clint@zsh.org>
-
+preceding
 	* 26027: Src/Zle/compctl.c: free pprogc before it goes out of
 	scope in makecomplistflags.
 

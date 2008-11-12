@@ -344,3 +344,21 @@
 0:Optimised here-string to filename
 >This string has been replaced
 >by a file containing it.
+
+  print This f$'\x69'le contains d$'\x61'ta. >redirfile
+  print redirection:
+  cat<redirfile>outfile
+  print output:
+  cat outfile
+  print append:
+  cat>>outfile<redirfile
+  print more output:
+  cat outfile
+0:Parsing of redirection operators (no space required before operators)
+>redirection:
+>output:
+>This file contains data.
+>append:
+>more output:
+>This file contains data.
+>This file contains data.
