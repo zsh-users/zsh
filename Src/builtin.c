@@ -1480,6 +1480,7 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 		    unqueue_signals();
 		    zwarnnam("fc",
 		      "current history line would recurse endlessly, aborted");
+		    fclose(out);
 		    unlink(fil);
 		    return 1;
 		}
@@ -1619,6 +1620,8 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
 	    zwarnnam("fc", "no such event: %s", buf);
 	} else
 	    zwarnnam("fc", "no events in that range");
+	if (f != stdout)
+	    fclose(f);
 	return 1;
     }
 

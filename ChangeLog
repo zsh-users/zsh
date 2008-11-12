@@ -1,3 +1,7 @@
+2008-11-12  Oliver Kiddle  <opk@zsh.org>
+
+	* 26028: Src/builtin.c: close temporary file when aborting fc
+
 2008-11-12  Peter Stephenson  <pws@csr.com>
 
 	* 26029: Test/A04redirect.ztst: add test for redirection operators
