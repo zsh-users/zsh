@@ -1562,6 +1562,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 	/* need to open /dev/tty specially */
 	if ((SHTTY = open("/dev/tty", O_RDWR|O_NOCTTY)) == -1) {
 	    zwarnnam(name, "can't access terminal");
+	    zsfree(s);
 	    return 1;
 	}
 	oshout = shout;
