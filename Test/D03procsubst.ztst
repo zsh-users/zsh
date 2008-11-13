@@ -36,3 +36,51 @@
 0:FDs remain open for external commands called from functions
 >First
 >Zweite
+
+  catfield2() {
+    local -a args
+    args=(${(s.,.)1})
+    print $args[1]
+    cat $args[2]
+    print $args[3]
+  }
+  catfield2 up,<(print $'\x64'own),sideways
+0:<(...) when embedded within an argument
+>up
+>down
+>sideways
+
+  outputfield2() {
+    local -a args
+    args=(${(s.,.)1})
+    print $args[1]
+    echo 'How sweet the moonlight sits upon the bank' >$args[2]
+    print $args[3]
+  }
+  outputfield2 muddy,>(sed -e s/s/th/g >outputfield2.txt),vesture
+  # yuk
+  while [[ ! -e outputfield2.txt || ! -s outputfield2.txt ]]; do :; done
+  cat outputfield2.txt
+0:>(...) when embedded within an argument
+>muddy
+>vesture
+>How thweet the moonlight thitth upon the bank
+
+  catfield1() {
+    local -a args
+    args=(${(s.,.)1})
+    cat $args[1]
+    print $args[2]
+  }
+  catfield1 =(echo s$'\x69't),jessica
+0:=(...) followed by something else without a break
+>sit
+>jessica
+
+  (
+  setopt nonomatch
+  # er... why is this treated as a glob?
+  print everything,=(here is left),alone
+  )
+0:=(...) preceded by other stuff has no special effect
+>everything,=(here is left),alone

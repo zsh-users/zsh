@@ -56,43 +56,27 @@ prefork(LinkList list, int flags)
 
     queue_signals();
     for (node = firstnode(list); node; incnode(node)) {
-	char *str, c;
-
-	str = (char *)getdata(node);
-	if (((c = *str) == Inang || c == Outang || c == Equals) &&
-	    str[1] == Inpar) {
-	    if (c == Inang || c == Outang)
-		setdata(node, (void *) getproc(str));	/* <(...) or >(...) */
-	    else
-		setdata(node, (void *) getoutputfile(str));	/* =(...) */
-	    if (!getdata(node)) {
-		setdata(node, dupstring(""));
-		unqueue_signals();
-		return;
-	    }
-	} else {
-	    if (isset(SHFILEEXPANSION)) {
-		/*
-		 * Here and below we avoid taking the address
-		 * of a void * and then pretending it's a char **
-		 * instead of a void ** by a little inefficiency.
-		 * This could be avoided with some extra linked list
-		 * machinery, but that would need quite a lot of work
-		 * to ensure consistency.  What we really need is
-		 * templates...
-		 */
-		char *cptr = (char *)getdata(node);
-		filesub(&cptr, flags & (PF_TYPESET|PF_ASSIGN));
-		/*
-		 * The assignment is so simple it's not worth
-		 * testing if cptr changed...
-		 */
-		setdata(node, cptr);
-	    }
-	    if (!(node = stringsubst(list, node, flags & PF_SINGLE, asssub))) {
-		unqueue_signals();
-		return;
-	    }
+	if (isset(SHFILEEXPANSION)) {
+	    /*
+	     * Here and below we avoid taking the address
+	     * of a void * and then pretending it's a char **
+	     * instead of a void ** by a little inefficiency.
+	     * This could be avoided with some extra linked list
+	     * machinery, but that would need quite a lot of work
+	     * to ensure consistency.  What we really need is
+	     * templates...
+	     */
+	    char *cptr = (char *)getdata(node);
+	    filesub(&cptr, flags & (PF_TYPESET|PF_ASSIGN));
+	    /*
+	     * The assignment is so simple it's not worth
+	     * testing if cptr changed...
+	     */
+	    setdata(node, cptr);
+	}
+	if (!(node = stringsubst(list, node, flags & PF_SINGLE, asssub))) {
+	    unqueue_signals();
+	    return;
 	}
     }
     for (node = firstnode(list); node; incnode(node)) {
@@ -168,7 +152,37 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
     char *str  = str3, c;
 
     while (!errflag && (c = *str)) {
-	if ((qt = c == Qstring) || c == String) {
+	if ((c == Inang || c == Outang || (str == str3 && c == Equals)) &&
+	    str[1] == Inpar) {
+	    char *subst, *rest, *snew, *sptr;
+	    int str3len = str - str3, sublen, restlen;
+
+	    if (c == Inang || c == Outang)
+		subst = getproc(str, &rest);	/* <(...) or >(...) */
+	    else
+		subst = getoutputfile(str, &rest);	/* =(...) */
+	    if (!subst)
+		subst = "";
+
+	    sublen = strlen(subst);
+	    restlen = strlen(rest);
+	    sptr = snew = hcalloc(str3len + sublen + restlen + 1);
+	    if (str3len) {
+		memcpy(sptr, str3, str3len);
+		sptr += str3len;
+	    }
+	    if (sublen) {
+		memcpy(sptr, subst, sublen);
+		sptr += sublen;
+	    }
+	    if (restlen)
+		memcpy(sptr, rest, restlen);
+	    sptr[restlen] = '\0';
+	    str3 = snew;
+	    str = snew + str3len + sublen;
+	    setdata(node, str3);
+	    continue;
+	} else if ((qt = c == Qstring) || c == String) {
 	    if ((c = str[1]) == Inpar) {
 		if (!qt)
 		    list->list.flags |= LF_ARRAY;

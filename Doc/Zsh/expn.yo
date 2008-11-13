@@ -353,12 +353,18 @@ texinode(Process Substitution)(Parameter Expansion)(History Expansion)(Expansion
 sect(Process Substitution)
 cindex(process substitution)
 cindex(substitution, process)
-Each command argument of the form
+Each part of a command argument that takes the form
 `tt(<LPAR())var(list)tt(RPAR())',
 `tt(>LPAR())var(list)tt(RPAR())' or
 `tt(=LPAR())var(list)tt(RPAR())'
-is subject to process substitution.
-In the case of the tt(<) or tt(>) forms, the shell runs process
+is subject to process substitution.  The expression may be preceeded
+or followed by other strings except that, to prevent clashes with
+commonly occurring strings and patterns, the last
+form must occur at the start of a command argument, and none of
+the forms may occur inside parentheses used for grouping of patterns or
+inside parameter substitutions.
+
+In the case of the tt(<) or tt(>) forms, the shell runs the commands in
 var(list) asynchronously.  If the system supports the tt(/dev/fd)
 mechanism, the command argument is the name of the device file
 corresponding to a file descriptor; otherwise, if the system supports named

@@ -835,7 +835,7 @@ gettok(void)
 	return OUTPAR;
     case LX1_INANG:
 	d = hgetc();
-	if (!incmdpos && d == '(') {
+	if (d == '(') {
 	    hungetc(d);
 	    lexstop = 0;
 	    unpeekfd:
@@ -1152,20 +1152,13 @@ gettokstr(int c, int sub)
 		c = Comma;
 	    break;
 	case LX2_OUTANG:
-	    if (!intpos) {
-		if (in_brace_param || sub)
-		    break;
-		else
-		    goto brk;
-	    }
+	    if (in_brace_param || sub)
+		break;
 	    e = hgetc();
 	    if (e != '(') {
 		hungetc(e);
 		lexstop = 0;
-		if (in_brace_param || sub)
-		    break;
-		else
-		    goto brk;
+		goto brk;
 	    }
 	    add(Outang);
 	    if (skipcomm()) {
@@ -1178,7 +1171,7 @@ gettokstr(int c, int sub)
 	    if (isset(SHGLOB) && sub)
 		break;
 	    e = hgetc();
-	    if(e == '(' && intpos) {
+	    if (!(in_brace_param || sub) && e == '(') {
 		add(Inang);
 		if (skipcomm()) {
 		    peek = LEXERR;

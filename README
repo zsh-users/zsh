@@ -69,6 +69,17 @@ always the right behaviour for the intended purpose of debugging and is
 consistent with recent versions of other shells.  The option
 DEBUG_BEFORE_CMD can be unset to revert to the previous behaviour.
 
+Previously, process substitutions of the form =(...), <(...) and >(...)
+were only handled if they appeared as separate command arguments.
+(However, the latter two forms caused the current argument to be
+terminated and a new one started even if they occurred in the middle of
+a string.)  Now all three may be followed by other strings, and the
+latter two may also be preceeded by other strings.  None may occur inside
+parameter substitutions, or inside parentheses used for grouping of
+patterns, in order to avoid clashes with cases where
+tt(<) or tt(>) where not treated specially in previous versions of the
+shell.
+
 In previous versions of the shell it was possible to use index 0 in an
 array or string subscript to refer to the same element as index 1 if the
 option KSH_ARRAYS was not in effect.  This was a limited approximation to

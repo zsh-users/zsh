@@ -3560,7 +3560,7 @@ readoutput(int in, int qt)
 
 /**/
 static Eprog
-parsecmd(char *cmd)
+parsecmd(char *cmd, char **eptr)
 {
     char *str;
     Eprog prog;
@@ -3571,7 +3571,9 @@ parsecmd(char *cmd)
 	return NULL;
     }
     *str = '\0';
-    if (str[1] || !(prog = parse_string(cmd + 2, 0))) {
+    if (eptr)
+	*eptr = str+1;
+    if (!(prog = parse_string(cmd + 2, 0))) {
 	zerr("parse error in process substitution");
 	return NULL;
     }
@@ -3582,7 +3584,7 @@ parsecmd(char *cmd)
 
 /**/
 char *
-getoutputfile(char *cmd)
+getoutputfile(char *cmd, char **eptr)
 {
     pid_t pid;
     char *nam;
@@ -3592,7 +3594,7 @@ getoutputfile(char *cmd)
 
     if (thisjob == -1)
 	return NULL;
-    if (!(prog = parsecmd(cmd)))
+    if (!(prog = parsecmd(cmd, eptr)))
 	return NULL;
     if (!(nam = gettempname(NULL, 0)))
 	return NULL;
@@ -3677,7 +3679,7 @@ namedpipe(void)
 
 /**/
 char *
-getproc(char *cmd)
+getproc(char *cmd, char **eptr)
 {
 #if !defined(HAVE_FIFOS) && !defined(PATH_DEV_FD)
     zerr("doesn't look like your system supports FIFOs.");
@@ -3696,7 +3698,7 @@ getproc(char *cmd)
 	return NULL;
     if (!(pnam = namedpipe()))
 	return NULL;
-    if (!(prog = parsecmd(cmd)))
+    if (!(prog = parsecmd(cmd, eptr)))
 	return NULL;
     if (!jobtab[thisjob].filelist)
 	jobtab[thisjob].filelist = znewlinklist();
@@ -3723,7 +3725,7 @@ getproc(char *cmd)
     if (thisjob == -1)
 	return NULL;
     pnam = hcalloc(strlen(PATH_DEV_FD) + 6);
-    if (!(prog = parsecmd(cmd)))
+    if (!(prog = parsecmd(cmd, eptr)))
 	return NULL;
     mpipe(pipes);
     if ((pid = zfork(&bgtime))) {
@@ -3772,7 +3774,7 @@ getpipe(char *cmd, int nullexec)
     pid_t pid;
     struct timeval bgtime;
 
-    if (!(prog = parsecmd(cmd)))
+    if (!(prog = parsecmd(cmd, NULL)))
 	return -1;
     mpipe(pipes);
     if ((pid = zfork(&bgtime))) {

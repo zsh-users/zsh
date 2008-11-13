@@ -1,3 +1,11 @@
+2008-11-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 26042 with some fixes from 26043 (Mikael): README,
+	Doc/Zsh/expn.yo, Src/exec.c, Src/lex.c, Src/subst.c,
+	Test/D03procsubst.zst: allow <(...) and >(...) to occur
+	in the middle of command arguments and =(...) to have
+	other strings following.
+
 2008-11-12  Oliver Kiddle  <opk@zsh.org>
 
 	* 26030: Src/Zle/zle_main.c: fix memory leak in vared
