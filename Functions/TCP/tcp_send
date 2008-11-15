@@ -74,6 +74,8 @@ while true; do
     if [[ $? -ne 0 || -n $TCP_FD_CLOSED ]]; then
       print "Session ${TCP_SESS}: fd $fd unusable." >&2
       unset TCP_FD_CLOSED
+      mystat=1
+      continue
     fi
     if [[ -n $TCP_OUTPUT ]]; then
       tcp_output -P "$TCP_OUTPUT" -S $TCP_SESS -F $fd -q "${(j. .)*}"
