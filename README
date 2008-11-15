@@ -77,7 +77,7 @@ a string.)  Now all three may be followed by other strings, and the
 latter two may also be preceeded by other strings.  None may occur inside
 parameter substitutions, or inside parentheses used for grouping of
 patterns, in order to avoid clashes with cases where
-tt(<) or tt(>) where not treated specially in previous versions of the
+tt(<) or tt(>) were not treated specially in previous versions of the
 shell.
 
 In previous versions of the shell it was possible to use index 0 in an
