@@ -190,10 +190,7 @@ struct cpattern {
 				 * Note the allocated length may be longer
 				 * than the null-terminated string.
 				 */
-	int chr;		/* if a single character, it
-				 * TODO: eventually should be a
-				 * convchar_t.
-				 */
+	convchar_t chr;		/* if a single character, it */
     } u;
 };
 
@@ -201,9 +198,17 @@ struct cpattern {
  * For now this just handles single-byte characters.
  * TODO: this will change.
  */
+#ifdef MULTIBYTE_SUPPORT
+#define PATMATCHRANGE(r, c, ip, mtp)	mb_patmatchrange(r, c, ip, mtp)
+#define PATMATCHINDEX(r, i, cp, mtp)	mb_patmatchindex(r, i, cp, mtp)
+#define CONVCAST(c)			((wchar_t)(c))
+#define CHR_INVALID			(WEOF)
+#else
 #define PATMATCHRANGE(r, c, ip, mtp)	patmatchrange(r, c, ip, mtp)
 #define PATMATCHINDEX(r, i, cp, mtp)	patmatchindex(r, i, cp, mtp)
-#define CONVCAST(c)	(c)
+#define CONVCAST(c)			(c)
+#define CHR_INVALID			(-1)
+#endif
 
 /* This is a special return value for parse_cmatcher(), *
  * signalling an error. */

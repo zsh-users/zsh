@@ -167,9 +167,10 @@ zlecharasstring(ZLE_CHAR_T inchar, char *buf)
  * instead of wide characters where appropriate and with the contents
  * metafied.
  *
- * If outll is non-NULL, assign the new length.  If outcs is non-NULL,
- * assign the new character position.  This is the conventional string
- * length, without the NULL byte.
+ * If outllp is non-NULL, assign the new length.  This is the conventional
+ * string length, without the NULL byte.
+ *
+ * If outcsp is non-NULL, assign the new character position.
  *
  * If useheap is 1, memory is returned from the heap, else is allocated
  * for later freeing.

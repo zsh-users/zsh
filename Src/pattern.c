@@ -3344,7 +3344,6 @@ mb_patmatchrange(char *range, wchar_t ch, wint_t *indptr, int *mtp)
 }
 
 
-#if 0
 /*
  * This is effectively the reverse of mb_patmatchrange().
  * Given a range descriptor of the same form, and an index into it,
@@ -3353,11 +3352,6 @@ mb_patmatchrange(char *range, wchar_t ch, wint_t *indptr, int *mtp)
  * return the type in mtp instead.  Return 1 if successful, 0 if
  * there was no corresponding index.  Note all pointer arguments
  * must be non-null.
- *
- * TODO: for now the completion matching code does not handle
- * multibyte.  When it does, we will need either this, or
- * patmatchindex(), but not both---unlike user-initiated pattern
- * matching, multibyte mode in the line editor is always on when available.
  */
 
 /**/
@@ -3438,10 +3432,9 @@ mb_patmatchindex(char *range, wint_t ind, wint_t *chr, int *mtp)
     /* No corresponding index. */
     return 0;
 }
-#endif
 
 /**/
-#endif
+#endif /* MULTIBYTE_SUPPORT */
 
 /*
  * Identical function to mb_patmatchrange() above for single-byte
@@ -3572,9 +3565,17 @@ patmatchrange(char *range, int ch, int *indptr, int *mtp)
     return 0;
 }
 
+
+/**/
+#ifndef MULTIBYTE_SUPPORT
+
 /*
  * Identical function to mb_patmatchindex() above for single-byte
  * characters.  Here -1 represents a character that needs a special type.
+ *
+ * Unlike patmatchrange, we only need this in ZLE, which always
+ * uses MULTIBYTE_SUPPORT if compiled in; hence we don't use
+ * this function in that case.
  */
 
 /**/
@@ -3657,6 +3658,9 @@ patmatchindex(char *range, int ind, int *chr, int *mtp)
     /* No corresponding index. */
     return 0;
 }
+
+/**/
+#endif /* MULTIBYTE_SUPPORT */
 
 /*
  * Repeatedly match something simple and say how many times.

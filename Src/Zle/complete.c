@@ -381,11 +381,12 @@ parse_pattern(char *name, char **sp, int *lp, char e, int *err)
 {
     Cpattern ret = NULL, r = NULL, n;
     char *s = *sp;
-    int inchar;
-    int l = 0;
+    convchar_t inchar;
+    int l = 0, inlen;
 
     *err = 0;
 
+    MB_METACHARINIT();
     while (*s && (e ? (*s != e) : !inblank(*s))) {
 	n = (Cpattern) hcalloc(sizeof(*n));
 	n->next = NULL;
@@ -409,11 +410,12 @@ parse_pattern(char *name, char **sp, int *lp, char e, int *err)
 	    if (*s == '\\' && s[1])
 		s++;
 
-	    if (*s == Meta)
-		inchar = STOUC(*++s) ^ 32;
-	    else
-		inchar = STOUC(*s);
-	    s++;
+	    inlen = MB_METACHARLENCONV(s, &inchar);
+#ifdef MULTIBYTE_SUPPORT
+	    if (inchar == WEOF)
+		inchar = (convchar_t)(*s == Meta ? s[1] ^ 32 : *s);
+#endif
+	    s += inlen;
 	    n->tp = CPAT_CHAR;
 	    n->u.chr = inchar;
 	}

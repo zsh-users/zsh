@@ -4062,7 +4062,7 @@ cfp_matcher_range(Cmatcher *ms, char *add)
 		    len += addlen + 1;
 	    } else {
 		/* The usual set of matcher possibilities. */
-		int ind;
+		convchar_t ind;
 		if (m->line->tp == CPAT_EQUIV &&
 		    m->word->tp == CPAT_EQUIV) {
 		    /*
@@ -4086,7 +4086,7 @@ cfp_matcher_range(Cmatcher *ms, char *add)
 			 * word pattern.
 			 */
 			if ((ind = pattern_match_equivalence
-			     (m->word, ind, mt, addc)) != -1) {
+			     (m->word, ind, mt, addc)) != CHR_INVALID) {
 			    if (ret) {
 				if (imeta(ind)) {
 				    *p++ = Meta;
