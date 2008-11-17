@@ -152,8 +152,8 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
     char *str  = str3, c;
 
     while (!errflag && (c = *str)) {
-	if ((c == Inang || c == Outang || (str == str3 && c == Equals)) &&
-	    str[1] == Inpar) {
+	if (((c = *str) == Inang || c == Outang || (str == str3 && c == Equals))
+	    && str[1] == Inpar) {
 	    char *subst, *rest, *snew, *sptr;
 	    int str3len = str - str3, sublen, restlen;
 
@@ -181,8 +181,13 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 	    str3 = snew;
 	    str = snew + str3len + sublen;
 	    setdata(node, str3);
-	    continue;
-	} else if ((qt = c == Qstring) || c == String) {
+	} else
+	    str++;
+    }
+    str = str3;
+
+    while (!errflag && (c = *str)) {
+	if ((qt = c == Qstring) || c == String) {
 	    if ((c = str[1]) == Inpar) {
 		if (!qt)
 		    list->list.flags |= LF_ARRAY;

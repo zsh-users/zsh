@@ -1,5 +1,9 @@
 2008-11-17  Peter Stephenson  <pws@csr.com>
 
+	* 26055: README, Doc/Zsh/expn.yo, Src/subst.c: ensure process
+	substitution is handled completely before parameter and
+	command substitution.
+
 	* 26053: Completion/Base/Utility/_arguments: handle
 	"<cmd> --help" output that includes optional parts of options
 	in square brackets.
