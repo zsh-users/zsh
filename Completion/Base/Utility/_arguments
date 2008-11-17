@@ -5,7 +5,7 @@
 
 local long cmd="$words[1]" descr odescr mesg subopts opt opt2 usecc autod
 local oldcontext="$curcontext" hasopts rawret optarg singopt alwopt
-local setnormarg
+local setnormarg start rest
 local -a match mbegin mend
 
 long=$argv[(I)--]
@@ -97,10 +97,19 @@ if (( long )); then
        # present.  Maybe the problem was that the intervening code
        # didn't.  If it's buggy without removing them, the problem
        # probably is later, not here.
-       if [[ -z ${tmp[(r)${match[1]%%[^a-zA-Z0-9_-]#}]} ]]; then
-	 tmp+=($match[1])
+       start=${match[1]}
+       rest=${match[2]}
+       if [[ -z ${tmp[(r)${start%%[^a-zA-Z0-9_-]#}]} ]]; then
+	 # variant syntax seen in fetchmail:
+	 # --[fetch]all  means --fetchall or --all.
+	 # maybe needs to be more general
+	 if [[ $start = (#b)(*)\[(*)\](*) ]]; then
+	   tmp+=("${match[1]}${match[2]}${match[3]}" "${match[1]}${match[3]}")
+	 else
+	   tmp+=($start)
+	 fi
        fi
-       opt=$match[2]
+       opt=$rest
      done
      # If there's left over text, assume it's a description; it
      # may be truncated but if it's too long it's no use anyway.

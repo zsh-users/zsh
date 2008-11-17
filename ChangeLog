@@ -1,3 +1,9 @@
+2008-11-17  Peter Stephenson  <pws@csr.com>
+
+	* 26053: Completion/Base/Utility/_arguments: handle
+	"<cmd> --help" output that includes optional parts of options
+	in square brackets.
+
 2008-11-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 26047: Src/pattern.c, Src/Zle/comp.h, Src/Zle/compmatch.c,
