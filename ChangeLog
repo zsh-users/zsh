@@ -1,5 +1,8 @@
 2008-11-17  Peter Stephenson  <pws@csr.com>
 
+	* 26056: Doc/Zsh/expn.yo, Src/exec.c:  < <(...)more_stuff is
+	an error and similarly for > >(...)yet_more_stuff.
+
 	* 26055: README, Doc/Zsh/expn.yo, Src/subst.c: ensure process
 	substitution is handled completely before parameter and
 	command substitution.

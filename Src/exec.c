@@ -3773,9 +3773,14 @@ getpipe(char *cmd, int nullexec)
     int pipes[2], out = *cmd == Inang;
     pid_t pid;
     struct timeval bgtime;
+    char *ends;
 
-    if (!(prog = parsecmd(cmd, NULL)))
+    if (!(prog = parsecmd(cmd, &ends)))
 	return -1;
+    if (*ends) {
+	zerr("invalid syntax for process substitution in redirection");
+	return -1;
+    }
     mpipe(pipes);
     if ((pid = zfork(&bgtime))) {
 	zclose(pipes[out]);

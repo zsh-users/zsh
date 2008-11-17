@@ -362,6 +362,8 @@ or followed by other strings except that, to prevent clashes with
 commonly occurring strings and patterns, the last
 form must occur at the start of a command argument, and the forms
 are only expanded when first parsing command or assignment arguments.
+Process substitutions may be used following redirection operators; in this
+case, the substitution must appear with no trailing string.
 
 In the case of the tt(<) or tt(>) forms, the shell runs the commands in
 var(list) asynchronously.  If the system supports the tt(/dev/fd)
