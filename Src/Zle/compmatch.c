@@ -1812,7 +1812,6 @@ bld_line(Cmatcher mp, ZLE_STRING_T line, char *mword, char *word,
     /* we now reuse mp, lpat, wpat for the global matchers */
     MB_METACHARINIT();
     while (llen && wlen) {
-	convchar_t wchr;
 	int wmtp;
 	convchar_t *wp;
 	Cpattern tmpgenpat;
@@ -1835,7 +1834,7 @@ bld_line(Cmatcher mp, ZLE_STRING_T line, char *mword, char *word,
 	    if (curgenpat->tp == CPAT_CHAR)
 		lchr = curgenpat->u.chr;
 	    else
-		lchr = wchr;
+		lchr = *wp;
 
 	    if (sfx)
 		*--line = lchr;

@@ -152,12 +152,13 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
     char *str  = str3, c;
 
     while (!errflag && (c = *str)) {
-	if (((c = *str) == Inang || c == Outang || (str == str3 && c == Equals))
+	if (((c = *str) == Inang || c == OutangProc ||
+	     (str == str3 && c == Equals))
 	    && str[1] == Inpar) {
 	    char *subst, *rest, *snew, *sptr;
 	    int str3len = str - str3, sublen, restlen;
 
-	    if (c == Inang || c == Outang)
+	    if (c == Inang || c == OutangProc)
 		subst = getproc(str, &rest);	/* <(...) or >(...) */
 	    else
 		subst = getoutputfile(str, &rest);	/* =(...) */

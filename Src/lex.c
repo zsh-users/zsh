@@ -33,7 +33,7 @@
 /* tokens */
 
 /**/
-mod_export char ztokens[] = "#$^*()$=|{}[]`<>?~`,'\"\\\\";
+mod_export char ztokens[] = "#$^*()$=|{}[]`<>>?~`,'\"\\\\";
 
 /* parts of the current token */
 
@@ -1160,7 +1160,7 @@ gettokstr(int c, int sub)
 		lexstop = 0;
 		goto brk;
 	    }
-	    add(Outang);
+	    add(OutangProc);
 	    if (skipcomm()) {
 		peek = LEXERR;
 		goto brk;

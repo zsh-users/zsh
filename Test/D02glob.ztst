@@ -386,3 +386,9 @@
  [[ foo = (#c0)foo ]]
 1:Misplaced (#c...) flag
 ?(eval):1: bad pattern: (#c0)foo
+
+ mkdir glob.tmp/dir5
+ touch glob.tmp/dir5/N123
+ print glob.tmp/dir5/N<->(N)
+0:Numeric glob is not usurped by process substitution.
+>glob.tmp/dir5/N123

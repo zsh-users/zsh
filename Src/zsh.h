@@ -147,28 +147,29 @@ struct mathfunc {
 #define Tick		((char) 0x91)
 #define Inang		((char) 0x92)
 #define Outang		((char) 0x93)
-#define Quest		((char) 0x94)
-#define Tilde		((char) 0x95)
-#define Qtick		((char) 0x96)
-#define Comma		((char) 0x97)
+#define OutangProc	((char) 0x94)
+#define Quest		((char) 0x95)
+#define Tilde		((char) 0x96)
+#define Qtick		((char) 0x97)
+#define Comma		((char) 0x98)
 /*
  * Null arguments: placeholders for single and double quotes
  * and backslashes.
  */
-#define Snull		((char) 0x98)
-#define Dnull		((char) 0x99)
-#define Bnull		((char) 0x9a)
+#define Snull		((char) 0x99)
+#define Dnull		((char) 0x9a)
+#define Bnull		((char) 0x9b)
 /*
  * Backslash which will be returned to "\" instead of being stripped
  * when we turn the string into a printable format.
  */
-#define Bnullkeep       ((char) 0x9b)
+#define Bnullkeep       ((char) 0x9c)
 /*
  * Null argument that does not correspond to any character.
  * This should be last as it does not appear in ztokens and
  * is used to initialise the IMETA type in inittyptab().
  */
-#define Nularg		((char) 0x9c)
+#define Nularg		((char) 0x9d)
 
 /*
  * Take care to update the use of IMETA appropriately when adding

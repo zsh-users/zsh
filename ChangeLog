@@ -1,3 +1,11 @@
+2008-11-18  Peter Stephenson  <pws@csr.com>
+
+	* 26062: Src/Zle/compmatch.c: missed change needed with 26047.
+
+	* 26061: Src/lex.c, Src/parse.c, Src/subst.c, Src/zsh.h,
+	Test/D02glob.ztst: fix clashes between numeric glob and
+	process substitution such as "<->(N)".
+
 2008-11-17  Peter Stephenson  <pws@csr.com>
 
 	* 26056: Doc/Zsh/expn.yo, Src/exec.c:  < <(...)more_stuff is

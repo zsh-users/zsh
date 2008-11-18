@@ -1574,7 +1574,7 @@ par_simple(int *complex, int nr)
 		 * we need process handling.
 		 */
 		if (p[1] == Inpar &&
-		    (*p == Equals || *p == Inang || *p == Outang)) {
+		    (*p == Equals || *p == Inang || *p == OutangProc)) {
 		    *complex = 1;
 		    break;
 		}
@@ -1833,7 +1833,7 @@ par_redir(int *rp, char *idstring)
     }
     case REDIR_WRITE:
     case REDIR_WRITENOW:
-	if (tokstr[0] == Outang && tokstr[1] == Inpar)
+	if (tokstr[0] == OutangProc && tokstr[1] == Inpar)
 	    /* > >(...) */
 	    type = REDIR_OUTPIPE;
 	else if (tokstr[0] == Inang && tokstr[1] == Inpar)
@@ -1843,11 +1843,12 @@ par_redir(int *rp, char *idstring)
 	if (tokstr[0] == Inang && tokstr[1] == Inpar)
 	    /* < <(...) */
 	    type = REDIR_INPIPE;
-	else if (tokstr[0] == Outang && tokstr[1] == Inpar)
+	else if (tokstr[0] == OutangProc && tokstr[1] == Inpar)
 	    YYERROR(ecused);
 	break;
     case REDIR_READWRITE:
-	if ((tokstr[0] == Inang || tokstr[0] == Outang) && tokstr[1] == Inpar)
+	if ((tokstr[0] == Inang || tokstr[0] == OutangProc) &&
+	    tokstr[1] == Inpar)
 	    type = tokstr[0] == Inang ? REDIR_INPIPE : REDIR_OUTPIPE;
 	break;
     }
