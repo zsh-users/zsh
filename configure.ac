@@ -745,6 +745,7 @@ if test x$enable_cap = xyes; then
 fi
 
 AC_CHECK_LIB(socket, socket)
+AC_CHECK_LIB(bind, gethostbyname2)
 
 dnl ---------------
 dnl CHECK FOR ICONV
@@ -2527,6 +2528,7 @@ char *argv[];
     aix*)         DLLDFLAGS="${DLLDFLAGS=-G -bexpall -lc}" ;;
     solaris*|sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G}" ;;
     darwin*)      DLLDFLAGS="${DLLDFLAGS=-bundle -flat_namespace -undefined suppress}" ;;
+    beos*|haiku*) DLLDFLAGS="${DLLDFLAGS=-nostart}" ;;
     openbsd*)
       if test x$zsh_cv_sys_elf = xyes; then
 	DLLDFLAGS="${DLLDFLAGS=-shared -fPIC}"
@@ -2567,6 +2569,15 @@ char *argv[];
          EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-LD-Blargedynsym}"
        ;;
       esac
+    ;;
+    *-beos*)
+      # gcc on BeOS doesn't like -rdynamic...
+      EXTRA_LDFLAGS="${EXTRA_LDFLAGS= }"
+      # also, dlopen() at least in Zeta respects $LIBRARY_PATH, so needs %A added to it.
+      export LIBRARY_PATH="$LIBRARY_PATH:%A/"
+    ;;
+    *-haiku*)
+      # 
     ;;
   esac
 

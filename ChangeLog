@@ -1,5 +1,8 @@
 2008-11-18  Peter Stephenson  <pws@csr.com>
 
+	* 26060: François Revol: configure.ac, Src/Module/zpty.c,
+	Src/Zle/zle_refresh.c: fixes for BeOS.
+
 	* 26062: Src/Zle/compmatch.c: missed change needed with 26047.
 
 	* 26061: Src/lex.c, Src/parse.c, Src/subst.c, Src/zsh.h,

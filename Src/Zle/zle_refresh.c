@@ -1879,6 +1879,8 @@ refreshline(int ln)
 /* 3: main display loop - write out the buffer using whatever tricks we can */
 
     for (;;) {
+	int now_off;
+
 #ifdef MULTIBYTE_SUPPORT
 	if ((!nl->chr || nl->chr != WEOF) && (!ol->chr || ol->chr != WEOF)) {
 #endif
@@ -2050,7 +2052,7 @@ refreshline(int ln)
 	     * If an attribute was on here but isn't any more,
 	     * output the sequence to turn it off.
 	     */
-	    int now_off = ol->atr & ~nl->atr & TXT_ATTR_ON_MASK;
+	    now_off = ol->atr & ~nl->atr & TXT_ATTR_ON_MASK;
 	    if (now_off)
 		settextattributes(TXT_ATTR_OFF_FROM_ON(now_off));
 

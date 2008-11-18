@@ -260,6 +260,9 @@ get_pty(int master, int *retfd)
 
     if (master) {
 	strcpy(name, "/dev/ptyxx");
+#if defined(__BEOS__) || defined(__HAIKU__)
+	name[7] = '/';
+#endif
 
 	for (p1 = char1; *p1; p1++) {
 	    name[8] = *p1;
