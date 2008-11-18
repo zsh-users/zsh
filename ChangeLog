@@ -1,5 +1,8 @@
 2008-11-18  Peter Stephenson  <pws@csr.com>
 
+	* 26065: Config/version.mk: update to 4.3.9-dev-1 because of
+	internal code changes.
+
 	* 26060: François Revol: configure.ac, Src/Module/zpty.c,
 	Src/Zle/zle_refresh.c: fixes for BeOS.
 
