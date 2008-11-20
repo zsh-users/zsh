@@ -1887,6 +1887,10 @@ user.
 The system works by setting up suffix aliases with `tt(alias -s)'.
 Suffix aliases already installed by the user will not be overwritten.
 
+For suffixes defined in lower case, upper case variants will also
+automatically be handled (e.g. tt(PDF) is automatically handled if
+handling for the suffix tt(pdf) is defined), but not vice versa.
+
 Repeated calls to tt(zsh-mime-setup) do not override the existing
 mapping between suffixes and executable files unless the option tt(-f)
 is given.  Note, however, that this does not override existing suffix

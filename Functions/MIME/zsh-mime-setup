@@ -327,6 +327,8 @@ zstyle -L | while read line; do
     suffix=$match[1]
     # Make sure there is a suffix alias set up for this.
     alias -s $suffix >&/dev/null || alias -s $suffix=zsh-mime-handler
+    # Also for upper case variant
+    alias -s ${(U)suffix} >&/dev/null || alias -s ${(U)suffix}=zsh-mime-handler
   fi
 done
 
@@ -364,6 +366,7 @@ for suffix line in ${(kv)suffix_type_map}; do
     # Install the zsh handler as an alias, but never override
     # existing suffix handling.
     alias -s $suffix >&/dev/null || alias -s $suffix=zsh-mime-handler
+    alias -s ${(U)suffix} >&/dev/null || alias -s ${(U)suffix}=zsh-mime-handler
 
     zsh_mime_handlers[$suffix]=$line2
     zsh_mime_flags[$suffix]=$type_flags_map[$type]

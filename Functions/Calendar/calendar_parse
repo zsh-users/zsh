@@ -28,6 +28,7 @@ setopt extendedglob
 
 local REPLY REPLY2
 local -a match mbegin mend
+integer now
 
 autoload -U calendar_scandate
 
@@ -70,6 +71,17 @@ while (( changed )); do
       reply[rpttime]=$REPLY
       reply[rptstr]=${match[2]%%"$REPLY2"}
       reply[text2]="${match[1]}${REPLY2##[[:space:]]#}"
+      (( now = EPOCHSECONDS ))
+      while (( ${reply[rpttime]} < now )); do
+	# let's hope the original appointment wasn't in 44 B.C.
+	if calendar_scandate -a -R ${reply[rpttime]} ${reply[rptstr]}; then
+	  if (( REPLY <= ${reply[rpttime]} )); then
+	    # pathological case
+	    break;
+	  fi
+	  reply[rpttime]=$REPLY
+	fi
+      done
     else
       # Just remove the keyword for further parsing
       reply[text2]="${match[1]}${match[2]##[[:space:]]#}"

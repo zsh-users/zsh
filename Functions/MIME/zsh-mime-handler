@@ -44,7 +44,7 @@ local suffix context
 local -a match mbegin mend
 
 [[ $1 = (#b)*.([^.]##) ]] || return 1
-suffix=$match[1]
+suffix=${(L)match[1]}
 context=":mime:.${suffix}:"
 
 local handler flags no_sh no_bg
