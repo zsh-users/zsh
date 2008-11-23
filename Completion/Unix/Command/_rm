@@ -34,7 +34,7 @@ case $state in
   (file)
     declare -a ignored
     ignored=(${line//(#m)[\[\]()\\*?#<>~\^]/\\$MATCH})
-    _path_files -F ignored && ret=0
+    _files -F ignored && ret=0
     ;;
 esac
 

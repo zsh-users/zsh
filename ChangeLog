@@ -1,3 +1,8 @@
+2008-11-23  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* users/13477: Completion/Unix/Command/_rm: call _files instead
+	of _path_files to correctly handle cycling through choices.
+
 2008-11-20  Peter Stephenson  <pws@csr.com>
 
 	* 26075: Functions/Calendar/calendar_parse: update repeated events
