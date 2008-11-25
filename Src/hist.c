@@ -1130,12 +1130,14 @@ hend(Eprog prog)
      && (hist_ignore_all_dups = isset(HISTIGNOREALLDUPS)) != 0)
 	histremovedups();
 
-    /*
-     * Added the following in case the test "hptr < chline + 1"
-     * is more than just paranoia.
-     */
-    DPUTS(hptr < chline, "History end pointer off start of line");
-    *hptr = '\0';
+    if (hptr) {
+	/*
+	 * Added the following in case the test "hptr < chline + 1"
+	 * is more than just paranoia.
+	 */
+	DPUTS(hptr < chline, "History end pointer off start of line");
+	*hptr = '\0';
+    }
     addlinknode(hookargs, "zshaddhistory");
     addlinknode(hookargs, chline);
     callhookfunc("zshaddhistory", hookargs, 1, &hookret);

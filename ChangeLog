@@ -1,3 +1,8 @@
+2008-11-25  Peter Stephenson  <pws@csr.com>
+
+	* 26091: Src/hist.c: crash at end of history line if history
+	not in use.
+
 2008-11-24  Peter Stephenson  <pws@csr.com>
 
 	* Frank Terbeck: users/13482: Doc/Zsh/contrib.yo: fix some prompt
