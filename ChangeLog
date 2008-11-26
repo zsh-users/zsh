@@ -1,3 +1,8 @@
+2008-11-25  Clint Adams  <clint@zsh.org>
+
+	* Brendan Cully: 26057: Completion/Unix/Command/_mercurial:
+	mercurial completion updates.
+
 2008-11-25  Peter Stephenson  <pws@csr.com>
 
 	* 26091: Src/hist.c: crash at end of history line if history
@@ -107,7 +112,7 @@
 	* 26022: Completion/Zsh/Type/_file_descriptors: fix on Solaris
 	where /proc/$$/fd exists but doesn't contain symlinks
 
-	* 26017: Completion/Unix/Type/_path_files, 
+	* 26017: Completion/Unix/Type/_path_files,
 	Completion/Zsh/Type/_globflags, Completion/Zsh/Type/_globquals:
 	add completion of globbing flags
 
@@ -620,7 +625,7 @@
 
 	* 25737: Src/Zle/computil.c: remove dead code in ca_parse_line.
 
-	* 25736: Src/Zle/complete.c: one more zsfree missing from 
+	* 25736: Src/Zle/complete.c: one more zsfree missing from
 	25667.
 
 2008-09-23  Peter Stephenson  <pws@csr.com>
