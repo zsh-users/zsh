@@ -94,6 +94,10 @@
   if (( EUID == 0 )); then
     print -u$ZTST_fd 'Warning: Not testing [[ ! -r file ]] (root reads anything)'
     [[ -r zerolength && -r unmodish ]]
+  elif [[ $OSTYPE = cygwin ]]; then
+    print -u$ZTST_fd 'Warning: Not testing [[ ! -r file ]]
+   (all files created by user may be readable)'
+   [[ -r zerolength ]]
   else
     [[ -r zerolength && ! -r unmodish ]]
   fi
