@@ -1534,8 +1534,10 @@ void
 adjustwinsize(int from)
 {
     static int getwinsz = 1;
+#ifdef TIOCGWINSZ
     int ttyrows = shttyinfo.winsize.ws_row;
     int ttycols = shttyinfo.winsize.ws_col;
+#endif
     int resetzle = 0;
 
     if (getwinsz || from == 1) {

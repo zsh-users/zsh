@@ -1,3 +1,8 @@
+2008-11-27  Peter Stephenson  <pws@csr.com>
+
+	* 26095: Src/utils.c: failed to compile if TIOCGWINSZ wasn't
+	defined.
+
 2008-11-26  Peter Stephenson  <pws@csr.com>
 
 	* 26090: Test/C02cond.ztst: [[ -r ... ]] on Cygwin succeeds
