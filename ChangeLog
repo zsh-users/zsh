@@ -1,3 +1,9 @@
+2008-12-01  Peter Stephenson  <pws@csr.com>
+
+	* (with some help from Peter A. Castro): 26103: configure.ac:
+	FIFOs seem to be more reliable than per-process FD files for
+	process substitution on current Cygwin.
+
 2008-11-27  Peter Stephenson  <pws@csr.com>
 
 	* 26095: Src/utils.c: failed to compile if TIOCGWINSZ wasn't
