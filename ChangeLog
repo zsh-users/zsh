@@ -1,5 +1,7 @@
 2008-12-02  Peter Stephenson  <pws@csr.com>
 
+	* Richard Hartmann: 26105: Completion/Unix/Type/_pdf: add okular.
+
 	* Frank Terbeck: 26194: Functions/Prompts/promptinit: eliminated
 	WARN_CREATE_GLOBAL warnings.
 
