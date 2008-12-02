@@ -1,3 +1,8 @@
+2008-12-02  Peter Stephenson  <pws@csr.com>
+
+	* Frank Terbeck: 26194: Functions/Prompts/promptinit: eliminated
+	WARN_CREATE_GLOBAL warnings.
+
 2008-12-01  Peter Stephenson  <pws@csr.com>
 
 	* (with some help from Peter A. Castro): 26103: configure.ac:

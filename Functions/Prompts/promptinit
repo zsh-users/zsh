@@ -6,9 +6,10 @@
 ## Type `prompt -h' for help.
 ##
 
+typeset -gaU prompt_themes
+typeset -ga prompt_theme
+typeset -g prompt_newline
 prompt_themes=()
-typeset -gU prompt_themes
-typeset -g prompt_theme >/dev/null
 
 promptinit () {
   emulate -L zsh
@@ -168,7 +169,7 @@ prompt () {
   local prompt_opts
 
   set_prompt "$@"
- 
+
   (( $#prompt_opts )) &&
       setopt noprompt{bang,cr,percent,subst} "prompt${^prompt_opts[@]}"
 
