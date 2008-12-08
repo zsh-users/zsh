@@ -23,7 +23,7 @@ A C0 E C8 I CC O D2 U D9 a E0 e E8 i EC o F2 u F9 N 1F8 n 1F9 \
 # acute
 a=\'
 z[$a]="\
-A C1 E C9 I CD O D3 U DA Y DD a E1 e E9 i EC o F3 u FA y FD C 106 c 107 \
+A C1 E C9 I CD O D3 U DA Y DD a E1 e E9 i ED o F3 u FA y FD C 106 c 107 \
 L 139 l 13A N 143 n 144 R 154 r 155 S 15A s 15B Z 179 z 17A \
 "
 # circumflex

@@ -1,3 +1,11 @@
+2008-12-08  Peter Stephenson  <pws@csr.com>
+
+	* Benjamin R. Haskell: users/13544:
+	Functions/Zle/define-composed-chars: accents for i were wrong.
+
+	* 26116: Src/Zle/deltochar.c: wasn't updated properly for
+	combining characters.
+
 2008-12-02  Peter Stephenson  <pws@csr.com>
 
 	* Richard Hartmann: 26105: Completion/Unix/Type/_pdf: add okular.
