@@ -1,3 +1,8 @@
+2008-12-09  Clint Adams  <clint@zsh.org>
+
+	* Richard Hartmann: 26114: Completion/Unix/Command/_git: add color
+	options.
+
 2008-12-08  Peter Stephenson  <pws@csr.com>
 
 	* Benjamin R. Haskell: users/13544:
