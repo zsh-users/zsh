@@ -1449,7 +1449,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
     Value v;
     Param pm = 0;
     int ifl;
-    int type = PM_SCALAR, obreaks = breaks, haso = 0;
+    int type = PM_SCALAR, obreaks = breaks, haso = 0, oSHTTY = 0;
     char *p1, *p2, *main_keymapname, *vicmd_keymapname;
     Keymap main_keymapsave = NULL, vicmd_keymapsave = NULL;
     FILE *oshout = NULL;
@@ -1558,10 +1558,19 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 	s = ztrdup(s);
     }
 
-    if (SHTTY == -1) {
+    if (SHTTY == -1 || OPT_ISSET(ops,'t')) {
 	/* need to open /dev/tty specially */
-	if ((SHTTY = open("/dev/tty", O_RDWR|O_NOCTTY)) == -1) {
+	oSHTTY = SHTTY;
+	if ((SHTTY = open(OPT_ISSET(ops,'t') ? OPT_ARG(ops,'t') : "/dev/tty",
+			  O_RDWR|O_NOCTTY)) == -1) {
 	    zwarnnam(name, "can't access terminal");
+	    zsfree(s);
+	    return 1;
+	}
+	if (!isatty(SHTTY)) {
+	    zwarnnam(name, "%s: not a terminal", OPT_ARG(ops,'t'));
+	    close(SHTTY);
+	    SHTTY = oSHTTY;
 	    zsfree(s);
 	    return 1;
 	}
@@ -1597,7 +1606,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
     if (haso) {
 	fclose(shout);	/* close(SHTTY) */
 	shout = oshout;
-	SHTTY = -1;
+	SHTTY = oSHTTY;
     }
     if (!t || errflag) {
 	/* error in editing */
@@ -1887,7 +1896,7 @@ zle_main_entry(int cmd, va_list ap)
 
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaM:ldDANmrsLRp", NULL),
-    BUILTIN("vared",   0, bin_vared,   1,  1, 0, "aAcehM:m:p:r:", NULL),
+    BUILTIN("vared",   0, bin_vared,   1,  1, 0, "aAcehM:m:p:r:t:", NULL),
     BUILTIN("zle",     0, bin_zle,     0, -1, 0, "aAcCDFgGIKlLmMNRU", NULL),
 };
 
