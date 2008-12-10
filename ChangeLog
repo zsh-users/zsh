@@ -1,5 +1,8 @@
 2008-12-10  Peter Stephenson  <pws@csr.com>
 
+	* 26121: Doc/Zsh/calsys.yo, Functions/Calendar/calendar: add
+	-B <lines> option to calendar.
+
 	* users/13566: Etc/FAQ.yo: note problem with unsetting elements
 	of regular arrays.
 

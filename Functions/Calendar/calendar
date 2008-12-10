@@ -60,7 +60,7 @@ while [[ ${argv[opti+1]} = -* ]]; do
       ########################
       # Options with arguments
       ########################
-      ([CnS])
+      ([BCnS])
       if [[ -n $optrest ]]; then
 	optarg=$optrest
 	optrest=
@@ -72,6 +72,15 @@ while [[ ${argv[opti+1]} = -* ]]; do
 	return 1
       fi
       case $opt in
+	(B)
+	# Brief, with number of lines to show.
+	brief=$optarg
+	if (( brief <= 0 )); then
+	  print -r "$0: option -$opt requires a positive integer." >&2
+	  return 1
+	fi
+	;;
+
 	(C)
 	# Pick the calendar file, overriding style and default.
 	calendar=$optarg
@@ -289,17 +298,17 @@ fi
     fi
     (( shown = 0 ))
     if (( brief )); then
-      showline=${line%%$'\n'*}
+      showline=${(F)${${(f)line}[1,brief]}}
     else
       showline=$line
-      match=()
-      # Strip continuation lines starting " #".
-      while [[ $showline = (#b)(*$'\n')[[:space:]]##\#[^$'\n']##(|$'\n'(*)) ]]; do
-	showline="$match[1]$match[3]"
-      done
-      # Strip trailing empty lines
-      showline=${showline%%[[:space:]]#}
     fi
+    match=()
+    # Strip continuation lines starting " #".
+    while [[ $showline = (#b)(*$'\n')[[:space:]]##\#[^$'\n']##(|$'\n'(*)) ]]; do
+	  showline="$match[1]$match[3]"
+    done
+    # Strip trailing empty lines
+    showline=${showline%%[[:space:]]#}
     if (( showall || (t >= start && (remaining || t <= stop || icount < showcount)) ))
     then
       $showprog $start $stop "$showline"

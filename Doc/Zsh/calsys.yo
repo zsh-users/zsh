@@ -357,6 +357,10 @@ item(tt(-b))(
 Brief:  don't display continuation lines (i.e. indented lines following
 the line with the date/time), just the first line.
 )
+item(tt(-B) var(lines))(
+Brief: display at most the first var(lines) lines of the calendar
+entry.  `tt(-B 1)' is equivalent to `tt(-b)'.
+)
 item(tt(-C) var(calfile))(
 Explicitly specify a calendar file instead of the value of
 the tt(calendar-file) style or the the default tt(~/calendar).
