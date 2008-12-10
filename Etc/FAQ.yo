@@ -541,6 +541,12 @@ tt(SH_OPTION_LETTERS),
         mytt($array) refers to the whole array, not tt($array[0]);
         braces are unnecessary: tt($a[1] == ${a[1]}), etc.
         Set the tt(KSH_ARRAYS) option for compatibility.
+    it()  Furthermore, individual elements of arrays in zsh are always
+        strings, not separate parameters.  This means, for example, you
+	can't `unset' an array element in zsh as you can in ksh; you
+	can only set it to the empty string, or shorten the array.
+	(You can unset elements of associative arrays in zsh because
+	those are a completely different type of object.)
     it()  Coprocesses are established by mytt(coproc); mytt(|&) behaves like
         csh.  Handling of coprocess file descriptors is also different.
     it()  In mytt(cmd1 && cmd2 &), only mytt(cmd2) instead of the whole
