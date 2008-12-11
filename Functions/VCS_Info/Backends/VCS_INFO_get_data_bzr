@@ -14,8 +14,8 @@ if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" "use-simple" ; then
         bzrinfo[1]=${${bzrinfo[1]}%% *}
     fi
 else
-    bzrbase=${${(M)${(f)"$( bzr info )"}:# ##branch\ root:*}/*: ##/}
-    bzrinfo=( ${${${(M)${(f)"$( bzr version-info )"}:#(#s)(revno|branch-nick)*}/*: /}/*\//} )
+    bzrbase=${${(M)${(f)"$( ${vcs_comm[cmd]} info )"}:# ##branch\ root:*}/*: ##/}
+    bzrinfo=( ${${${(M)${(f)"$( ${vcs_comm[cmd]} version-info )"}:#(#s)(revno|branch-nick)*}/*: /}/*\//} )
     bzrbase="$(VCS_INFO_realpath ${bzrbase})"
 fi
 

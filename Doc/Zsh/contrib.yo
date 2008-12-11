@@ -506,6 +506,25 @@ A list of VCSs, you don't want var(vcs_info) to test for
 repositories (checked in the var(-init-) context, too). Only used if
 tt(enable) contains tt(ALL).
 )
+kindex(command)
+item(tt(command))(
+This style causes var(vcs_info) to use the supplied string as the command
+to use as the vcs's binary. Note, that setting this in ':vcs_info:*' is
+not a good idea.
+
+If the value of this style is empty (which is the default), the used binary
+name is the name of the backend in use (e.g. var(svn) is used in a var(svn)
+repository).
+
+The var(repo-root-name) part in the context is always the default tt(-all-)
+when this style is looked up.
+
+For example, this style can be used to use binaries from non-default
+installation directories. Assume, var(git) is installed in /usr/bin, but
+your sysadmin installed a newer version in /usr/bin/local. Now, instead of
+changing the order of your tt($PATH) parameter, you can do this:
+example(zstyle ':vcs_info:git:*:-all-' command /usr/local/bin/git)
+)
 kindex(use-server)
 item(tt(use-server))(
 This is used by the Perforce backend (tt(p4)) to decide if it should
@@ -547,6 +566,7 @@ sitem(tt(nvcsformats))("")
 sitem(tt(max-exports))(2)
 sitem(tt(enable))(ALL)
 sitem(tt(disable))((empty list))
+sitem(tt(command))((empty string))
 sitem(tt(use-simple))(false)
 sitem(tt(use-prompt-escapes))(true)
 endsitem()

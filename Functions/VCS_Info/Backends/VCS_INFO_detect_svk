@@ -17,7 +17,7 @@ setopt localoptions noksharrays extendedglob
 local -i fhash
 fhash=0
 
-VCS_INFO_check_com svk || return 1
+VCS_INFO_check_com ${vcs_comm[cmd]} || return 1
 [[ -f ~/.svk/config ]] || return 1
 
 while IFS= read -r line ; do

@@ -17,6 +17,7 @@ static_functions=(
     VCS_INFO_bydir_detect
     VCS_INFO_check_com
     VCS_INFO_formats
+    VCS_INFO_get_cmd
     VCS_INFO_maxexports
     VCS_INFO_nvcsformats
     VCS_INFO_realpath
@@ -74,6 +75,7 @@ vcs_info () {
             continue
         fi
         vcs_comm=()
+        VCS_INFO_get_cmd
         VCS_INFO_detect_${vcs} && (( found = 1 )) && break
     done
 

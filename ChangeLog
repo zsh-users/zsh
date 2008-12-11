@@ -1,3 +1,27 @@
+2008-12-11  Peter Stephenson  <pws@csr.com>
+
+	* Frank Terbeck: 26125: Doc/Zsh/contrib.yo,
+	Functions/VCS_Info/.distfiles,
+	Functions/VCS_Info/VCS_INFO_check_com,
+	Functions/VCS_Info/VCS_INFO_get_cmd, Functions/VCS_Info/vcs_info,
+	Functions/VCS_Info/Backends/VCS_INFO_detect_cdv,
+	Functions/VCS_Info/Backends/VCS_INFO_detect_cvs,
+	Functions/VCS_Info/Backends/VCS_INFO_detect_darcs,
+	Functions/VCS_Info/Backends/VCS_INFO_detect_git,
+	Functions/VCS_Info/Backends/VCS_INFO_detect_hg,
+	Functions/VCS_Info/Backends/VCS_INFO_detect_mtn,
+	Functions/VCS_Info/Backends/VCS_INFO_detect_p4,
+	Functions/VCS_Info/Backends/VCS_INFO_detect_svk,
+	Functions/VCS_Info/Backends/VCS_INFO_detect_svn,
+	Functions/VCS_Info/Backends/VCS_INFO_detect_tla,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_bzr,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_mtn,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_p4,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_svn,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_tla: add
+	"command" style for VCS command to use.
+
 2008-12-10  Peter Stephenson  <pws@csr.com>
 
 	* 26121: Doc/Zsh/calsys.yo, Functions/Calendar/calendar: add

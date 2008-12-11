@@ -21,7 +21,7 @@ VCS_INFO_p4_get_server() {
   setopt extendedglob
 
   local -a settings
-  settings=(${(f)"$(p4 set)"})
+  settings=(${(f)"$(${vcs_comm[cmd]} set)"})
   serverport=${${settings[(r)P4PORT=*]##P4PORT=}%% *}
   case $serverport in
     (''|:)
@@ -54,7 +54,7 @@ VCS_INFO_detect_p4() {
       VCS_INFO_p4_get_server
       [[ -n $vcs_info_p4_dead_servers[$serverport] ]] && return 1
     fi
-    if p4where="$(p4 where 2>&1)"; then
+    if p4where="$(${vcs_comm[cmd]} where 2>&1)"; then
       return 0
     fi
     if [[ $p4where = *"Connect to server failed"* ]]; then
@@ -67,7 +67,7 @@ VCS_INFO_detect_p4() {
     return 1
   else
     [[ -n ${P4CONFIG} ]] || return 1
-    VCS_INFO_check_com p4 || return 1
+    VCS_INFO_check_com ${vcs_comm[cmd]} || return 1
     vcs_comm[detect_need_file]="${P4CONFIG}"
     VCS_INFO_bydir_detect .
     return $?
