@@ -1,3 +1,9 @@
+2008-12-16  Clint Adams  <clint@zsh.org>
+
+	* 26141: Functions/Zle/edit-command-line: word-split
+	EDITOR/VISUAL so users can have multi-argument
+	commands in those variables.
+
 2008-12-11  Peter Stephenson  <pws@csr.com>
 
 	* Frank Terbeck: 26125: Doc/Zsh/contrib.yo,
