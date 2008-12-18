@@ -1130,7 +1130,7 @@ alias(rehash)(hash -r)
 findex(return)
 cindex(functions, returning from)
 item(tt(return) [ var(n) ])(
-Causes a shell function or tt(.) script to return to
+Causes a shell function or `tt(.)' script to return to
 the invoking script with the return status specified by var(n).  If var(n)
 is omitted, the return status is that of the last command
 executed.
@@ -1237,7 +1237,7 @@ shifted instead of the positional parameters.
 )
 findex(source)
 item(tt(source) var(file) [ var(arg) ... ])(
-Same as tt(.), except that the current directory is always searched and
+Same as `tt(.)', except that the current directory is always searched and
 is always searched first, before directories in tt($path).
 )
 module(stat)(zsh/stat)

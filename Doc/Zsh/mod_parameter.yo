@@ -186,7 +186,7 @@ function  the line number is reported as zero.
 The format of each element is var(filename)tt(:)var(lineno).
 For functions autoloaded from a file in native zsh format, where only the
 body of the function occurs in the file, or for files that have been
-executed by the tt(source) or tt(.) builtins, the trace information is
+executed by the tt(source) or `tt(.)' builtins, the trace information is
 shown as var(filename)tt(:)var(0), since the entire file is the definition.
 
 Most users will be interested in the information in the
@@ -205,6 +205,6 @@ This array contains the names and line numbers of the callers
 corresponding to the functions currently being executed.
 The format of each element is var(name)tt(:)var(lineno).
 Callers are also shown for sourced files; the caller is the point
-where the tt(source) or tt(.) command was executed.
+where the tt(source) or `tt(.)' command was executed.
 )
 enditem()

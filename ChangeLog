@@ -1,3 +1,9 @@
+2008-12-18  Peter Stephenson  <pws@csr.com>
+
+	* Richard Hartmann: 26155: Doc/Zsh/builtins.yo,
+	Doc/Zsh/mod_parameter.yo, Doc/Zsh/options.yo: quote use of `.'
+	as a command in text.
+
 2008-12-16  Clint Adams  <clint@zsh.org>
 
 	* 26141: Functions/Zle/edit-command-line: word-split
