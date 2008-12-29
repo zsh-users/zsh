@@ -153,3 +153,7 @@
   foo
 2:Status of forced return from eval-style DEBUG trap
 >foo
+
+%clean
+
+ rm -f bug-file bug-file2 erroutput.dif zsh-trapreturn-bug2

@@ -178,3 +178,7 @@
 >Dum da dum
 >Da de da
 >Do be do
+
+%clean
+
+ rm -f file.in file.out

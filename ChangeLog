@@ -1,8 +1,12 @@
+2008-12-29  Geoff Wing  <gcw@zsh.org>
+
+	* unposted: Test/C04funcdef.ztst, Test/C05debug.ztst,
+	Test/V06parameter.ztst: clean up temporary files
+
 2008-12-29  Clint Adams  <clint@zsh.org>
 
 	* Richard Hartmann: 26175: Completion/Unix/Command/_vim: updates
 	for vim completion.
-	
 
 2008-12-18  Peter Stephenson  <pws@csr.com>
 

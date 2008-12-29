@@ -66,3 +66,6 @@
 >./rocky3.zsh:13 (eval):2
 >./rocky3.zsh:14 ./rocky3.zsh:14
 
+%clean
+
+ rm -f autofn functrace.zsh rocky3.zsh sourcedfile
