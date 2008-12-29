@@ -5,7 +5,7 @@ The tt(zsh/newuser) module is loaded at boot if it is
 available, the tt(RCS) option is set, and the tt(PRIVILEGED) option is not
 set (all three are true by default).  This takes
 place immediately after commands in the global tt(zshenv) file (typically
-tt(/etc/zshenv)), if any, have been executed.  If the module is not
+tt(zshenv())), if any, have been executed.  If the module is not
 available it is silently ignored by the shell; the module may safely be
 removed from tt($MODULE_PATH) by the administrator if it is not required.
 
@@ -34,7 +34,7 @@ files for the user, however any valid shell code will be executed.
 The tt(zsh/newuser) module is then unconditionally unloaded.
 
 Note that it is possible to achieve exactly the same effect as the
-tt(zsh/newuser) module by adding code to tt(/etc/zshenv).  The module
+tt(zsh/newuser) module by adding code to tt(zshenv()).  The module
 exists simply to allow the shell to make arrangements for new users without
 the need for intervention by package maintainers and system administrators.
 

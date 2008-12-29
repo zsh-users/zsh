@@ -5,6 +5,9 @@
 
 2008-12-29  Clint Adams  <clint@zsh.org>
 
+	* 26185: Doc/Zsh/mod_newuser.yo: fix two places where path to
+	global zshenv was specified statically.
+
 	* Richard Hartmann: 26175: Completion/Unix/Command/_vim: updates
 	for vim completion.
 
