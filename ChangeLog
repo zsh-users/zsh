@@ -1,3 +1,9 @@
+2008-12-30  Clint Adams  <clint@zsh.org>
+
+	* 26202: Functions/Misc/run-help: show zshmodules(1) for echotc,
+	echoti, sched, zprof, zpty, zsocket, zstyle, and ztcp builtins
+	as well.
+
 2008-12-29  Geoff Wing  <gcw@zsh.org>
 
 	* unposted: Test/C04funcdef.ztst, Test/C05debug.ztst,

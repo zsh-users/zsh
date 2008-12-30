@@ -76,7 +76,7 @@ do
 	(clone) ;&
 	(ln|mkdir|mv|rm|rmdir|sync) ;&
 	(sched) ;&
-	(stat) man zshmodules;;
+	(echotc|echoti|sched|stat|zprof|zpty|zsocket|zstyle|ztcp) man zshmodules;;
 	(zftp) man zshftpsys;;
 	(*) man zshbuiltins;;
 	esac
