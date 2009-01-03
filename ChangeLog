@@ -1,5 +1,8 @@
 2009-01-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Richard Hartmann: 26229: Doc/Zsh/mod_stat.yo: note that zstat
+	follows links by default.
+
 	* Frank Terbeck: 26215: Doc/Zsh/contrib.yo,
 	Functions/VCS_Info/vcs_info: disable-patterns style.
 
