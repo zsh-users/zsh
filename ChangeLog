@@ -1,3 +1,8 @@
+2009-01-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Greg Klanderman: 26159: Src/Zle/zle_utils.c: CUT_RAW should be
+	CUT_REPLACE for multiple kills to append.
+
 2008-12-30  Clint Adams  <clint@zsh.org>
 
 	* 26202: Functions/Misc/run-help: show zshmodules(1) for echotc,

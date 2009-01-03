@@ -546,7 +546,7 @@ cuttext(ZLE_STRING_T line, int ct, int flags)
 	cutbuf.buf = (ZLE_STRING_T)zalloc(ZLE_CHAR_SIZE);
 	cutbuf.buf[0] = ZWC('\0');
 	cutbuf.len = cutbuf.flags = 0;
-    } else if (!(lastcmd & ZLE_KILL) || (flags & CUT_RAW)) {
+    } else if (!(lastcmd & ZLE_KILL) || (flags & CUT_REPLACE)) {
 	Cutbuffer kptr;
 	if (!kring) {
 	    kringsize = KRINGCTDEF;
