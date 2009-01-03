@@ -41,8 +41,9 @@ vcs_info () {
     emulate -L zsh
     setopt extendedglob
 
+    local pat
     local -i found
-    local -a enabled disabled
+    local -a enabled disabled dps
     local -x usercontext vcs rrn
     local -ix maxexports
     local -ax msgs
@@ -63,6 +64,15 @@ vcs_info () {
         enabled=( ${VCS_INFO_backends} )
         zstyle -a ":vcs_info:${vcs}:${usercontext}:${rrn}" "disable" disabled
     fi
+
+    zstyle -a ":vcs_info:${vcs}:${usercontext}:${rrn}" "disable-patterns" dps
+
+    for pat in ${dps} ; do
+        if [[ ${PWD} == ${~pat} ]] ; then
+            [[ -n ${vcs_info_msg_0_} ]] && VCS_INFO_set --clear
+            return 0
+        fi
+    done
 
     VCS_INFO_maxexports
 

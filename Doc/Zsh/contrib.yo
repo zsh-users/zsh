@@ -506,6 +506,16 @@ A list of VCSs, you don't want var(vcs_info) to test for
 repositories (checked in the var(-init-) context, too). Only used if
 tt(enable) contains tt(ALL).
 )
+kindex(disable-patterns)
+item(tt(disable-patterns))(
+A list of patterns that are checked against tt($PWD). If the pattern
+matches, var(vcs_info) will is disabled. This style is checked in the
+var(:vcs_info:-init-:*:-all-) context.
+
+Say, tt(~/.zsh) is a directory under version control, in which you do
+not want var(vcs_info) to be active, do:
+example(zstyle ':vcs_info:*' disable-patterns "$HOME/.zsh+LPAR()|/*+RPAR()")
+)
 kindex(command)
 item(tt(command))(
 This style causes var(vcs_info) to use the supplied string as the command

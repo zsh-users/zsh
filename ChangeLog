@@ -1,5 +1,8 @@
 2009-01-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Frank Terbeck: 26215: Doc/Zsh/contrib.yo,
+	Functions/VCS_Info/vcs_info: disable-patterns style.
+
 	* Greg Klanderman: 26159: Src/Zle/zle_utils.c: CUT_RAW should be
 	CUT_REPLACE for multiple kills to append.
 
