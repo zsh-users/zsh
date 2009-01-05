@@ -12,7 +12,7 @@ local expl ext=''
 #  okular
 
 if [[ "$1" == '-z' ]]; then
-  ext='(|.gz|.bz2|.Z)'
+  ext='(|.bz2|.gz|.Z)'
   shift
 fi
 

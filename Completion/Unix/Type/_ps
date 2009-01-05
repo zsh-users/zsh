@@ -6,7 +6,7 @@ local expl ext=''
 #  ps2epsi ps2pdf ps2pdf12 ps2pdf13 ps2pdf14 ps2pdfwr ps2ps
 
 if [[ "$1" == '-z' ]]; then
-  ext='(|.gz|.Z)'
+  ext='(|.bz2|.gz|.Z)'
   shift
 fi
 
