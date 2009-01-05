@@ -1477,27 +1477,27 @@ if test x$zsh_cv_path_term_header != xnone; then
   fi
 
   AC_MSG_CHECKING(if boolcodes is available)
-  AC_TRY_LINK($term_includes, [char **test = boolcodes; printf(*test);],
+  AC_TRY_LINK($term_includes, [char **test = boolcodes; puts(*test);],
   AC_DEFINE(HAVE_BOOLCODES) boolcodes=yes, boolcodes=no)
   AC_MSG_RESULT($boolcodes)
   AC_MSG_CHECKING(if numcodes is available)
-  AC_TRY_LINK($term_includes, [char **test = numcodes; printf(*test);],
+  AC_TRY_LINK($term_includes, [char **test = numcodes; puts(*test);],
   AC_DEFINE(HAVE_NUMCODES) numcodes=yes, numcodes=no)
   AC_MSG_RESULT($numcodes)
   AC_MSG_CHECKING(if strcodes is available)
-  AC_TRY_LINK($term_includes, [char **test = strcodes; printf(*test);],
+  AC_TRY_LINK($term_includes, [char **test = strcodes; puts(*test);],
   AC_DEFINE(HAVE_STRCODES) strcodes=yes, strcodes=no)
   AC_MSG_RESULT($strcodes)
   AC_MSG_CHECKING(if boolnames is available)
-  AC_TRY_LINK($term_includes, [char **test = boolnames; printf(*test);],
+  AC_TRY_LINK($term_includes, [char **test = boolnames; puts(*test);],
   AC_DEFINE(HAVE_BOOLNAMES) boolnames=yes, boolnames=no)
   AC_MSG_RESULT($boolnames)
   AC_MSG_CHECKING(if numnames is available)
-  AC_TRY_LINK($term_includes, [char **test = numnames; printf(*test);],
+  AC_TRY_LINK($term_includes, [char **test = numnames; puts(*test);],
   AC_DEFINE(HAVE_NUMNAMES) numnames=yes, numnames=no)
   AC_MSG_RESULT($numnames)
   AC_MSG_CHECKING(if strnames is available)
-  AC_TRY_LINK($term_includes, [char **test = strnames; printf(*test);],
+  AC_TRY_LINK($term_includes, [char **test = strnames; puts(*test);],
   AC_DEFINE(HAVE_STRNAMES) strnames=yes, strnames=no)
   AC_MSG_RESULT($strnames)
 else

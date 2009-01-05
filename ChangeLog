@@ -1,3 +1,8 @@
+2009-01-05  Andrey Borzenkov <bor@zsh.org>
+
+	* 26247: configure.ac, Src/Zle/zle_tricky.c: fix compilation
+	with -Werror=format-security GCC option.
+
 2009-01-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Richard Hartmann: 26229: Doc/Zsh/mod_stat.yo: note that zstat

@@ -2286,7 +2286,7 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		case 'n':
 		    sprintf(nc, "%d", n);
 		    if (dopr)
-			fprintf(shout, nc);
+			fputs(nc, shout);
 		    cc += MB_METASTRWIDTH(nc);
 		    break;
 		case 'B':
