@@ -3704,26 +3704,67 @@ metalen(const char *s, int len)
     return mlen;
 }
 
-/* This function converts a zsh internal string to a form which can be *
- * passed to a system call as a filename.  The result is stored in a   *
- * single static area.  NULL returned if the result is longer than     *
- * 4 * PATH_MAX.                                                       */
+/*
+ * This function converts a zsh internal string to a form which can be
+ * passed to a system call as a filename.  The result is stored in a
+ * single static area, sized to fit.  If there is no Meta character
+ * the original string is returned.
+ */
 
 /**/
 mod_export char *
 unmeta(const char *file_name)
 {
-    static char fn[4 * PATH_MAX];
+    static char *fn;
+    static int sz;
     char *p;
     const char *t;
+    int newsz, meta;
+    
+    meta = 0;
+    for (t = file_name; *t; t++) {
+	if (*t == Meta)
+	    meta = 1;
+    }
+    if (!meta) {
+	/*
+	 * don't need allocation... free if it's long, see below
+	 */
+	if (sz > 4 * PATH_MAX) {
+	    zfree(fn, sz);
+	    fn = NULL;
+	    sz = 0;
+	}
+	return (char *) file_name;
+    }
 
-    for (t = file_name, p = fn; *t && p < fn + 4 * PATH_MAX - 1; p++)
+    newsz = (t - file_name) + 1;
+    /*
+     * Optimisation: don't resize if we don't have to.
+     * We need a new allocation if
+     * - nothing was allocated before
+     * - the new string is larger than the old one
+     * - the old string was larger than an arbitrary limit but the
+     *   new string isn't so that we free up significant space by resizing.
+     */
+    if (!fn || newsz > sz || (sz > 4 * PATH_MAX && newsz <= 4 * PATH_MAX))
+    {
+	if (fn)
+	    zfree(fn, sz);
+	sz = newsz;
+	fn = (char *)zalloc(sz);
+	if (!fn) {
+	    sz = 0;
+	    /*
+	     * will quite likely crash in the caller anyway...
+	     */
+	    return NULL;
+	}
+    }
+
+    for (t = file_name, p = fn; *t; p++)
 	if ((*p = *t++) == Meta)
 	    *p = *t++ ^ 32;
-    if (*t)
-	return NULL;
-    if (p - fn == t - file_name)
-	return (char *) file_name;
     *p = '\0';
     return fn;
 }

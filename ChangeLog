@@ -1,3 +1,8 @@
+2009-01-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 26249: Src/utils.c: remove arbitrary string length limit in
+	unmeta().
+
 2009-01-05  Peter Stephenson  <pws@csr.com>
 
 	* Richard Hartmann: 26170 (parts 1 and 2):
