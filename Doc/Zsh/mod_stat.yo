@@ -128,7 +128,8 @@ Perform an tt(lstat) (see manref(lstat)(2)) rather than a tt(stat)
 system call.  In this case, if the file is a link, information
 about the link itself rather than the target file is returned.
 This option is required to make the tt(link) element useful.
-It's important to note that this is the exact opposite from ls(1), etc.
+It's important to note that this is the exact opposite from manref(ls)(1),
+etc.
 )
 item(tt(-n))(
 Always show the names of files.  Usually these are
