@@ -1,3 +1,8 @@
+2009-01-08  Peter Stephenson  <pws@csr.com>
+
+	* 26260: Src/params.c: fix crash when failing to assign
+	scalar to special hash.
+
 2009-01-06  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/mod_stat.yo: fix yodl problem with 26229.

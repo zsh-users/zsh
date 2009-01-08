@@ -495,10 +495,10 @@ scancountparams(UNUSED(HashNode hn), int flags)
 static Patprog scanprog;
 static char *scanstr;
 static char **paramvals;
-static Param foundparam;     
+static Param foundparam;
 
 /**/
-void
+static void
 scanparamvals(HashNode hn, int flags)
 {
     struct value v;
@@ -538,6 +538,7 @@ scanparamvals(HashNode hn, int flags)
 	    --numparamvals;	/* Value didn't match, discard key */
     } else
 	++numparamvals;
+    foundparam = NULL;
 }
 
 /**/
@@ -2270,7 +2271,15 @@ setstrvalue(Value v, char *val)
 	break;
     case PM_HASHED:
         {
-	    foundparam->gsu.s->setfn(foundparam, val);
+	    if (foundparam == NULL)
+	    {
+		zerr("%s: attempt to set associative array to scalar",
+		     v->pm->node.nam);
+		zsfree(val);
+		return;
+	    }
+	    else
+		foundparam->gsu.s->setfn(foundparam, val);
         }
 	break;
     }
