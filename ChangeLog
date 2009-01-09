@@ -1,3 +1,9 @@
+2009-01-09  Andrey Borzenkov <bor@zsh.org>
+
+	* unposted: Completion/Mandriva/Command/.distfiles,
+	Completion/Mandriva/Command/_rebootin: add _rebootin completion
+	from Mandriva RPM (modified to allow spaces in GRUB menu titles)
+
 2009-01-09  Peter Stephenson  <pws@csr.com>
 
 	* Benjamin R. Haskell: 26265: Functions/Zle/define-composed-chars:

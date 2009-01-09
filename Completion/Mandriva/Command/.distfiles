@@ -1,4 +1,5 @@
 DISTFILES_SRC='
 .distfiles
 _urpmi
+_rebootin
 '
