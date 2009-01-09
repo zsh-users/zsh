@@ -33,11 +33,20 @@ init.o: bltinmods.list zshpaths.h zshxmods.h
 
 init.o params.o parse.o: version.h
 
+params.o: patchlevel.h
+
 # The main shell doesn't currently need zshcurses.h and zshterm.h,
 # but make sure these are built with the headers.
 # If it did need need them they would be in headers at the top instead.
 version.h: $(sdir_top)/Config/version.mk zshcurses.h zshterm.h
 	echo '#define ZSH_VERSION "'$(VERSION)'"' > $@
+
+patchlevel.h: $(sdir_top)/ChangeLog
+	{ \
+	  echo -n "#define ZSH_PATCHLEVEL "; \
+	  sed -ne 's/^\* *\$$Revision: 1.19 $$/"\1"/p' \
+	  $(sdir_top)/ChangeLog; \
+	} >patchlevel.h
 
 zshcurses.h: ../config.h
 	@if test x$(ZSH_CURSES_H) != x; then \

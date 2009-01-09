@@ -727,6 +727,14 @@ item(tt(ZSH_NAME))(
 Expands to the basename of the command used to invoke this instance
 of zsh.
 )
+vindex(ZSH_PATCHLEVEL)
+item(tt(ZSH_PATCHLEVEL))(
+The revision string for the version number of the ChangeLog file
+in the zsh distribution.  This is most useful in order to keep
+track of versions of the shell during development between releases;
+hence most users should not use it and should instead rely on
+tt($ZSH_VERSION).
+)
 item(tt(zsh_scheduled_events))(
 See ifzman(the section `The zsh/sched Module' in zmanref(zshmodules))\
 ifnzman(noderef(The zsh/sched Module)).
@@ -740,7 +748,7 @@ and `tt(print $(print $ZSH_SUBSHELL))' output 1, while
 )
 vindex(ZSH_VERSION)
 item(tt(ZSH_VERSION))(
-The version number of this zsh.
+The version number of the release of zsh.
 )
 enditem()
 texinode(Parameters Used By The Shell)()(Parameters Set By The Shell)(Parameters)

@@ -1,5 +1,7 @@
 2009-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 26272: Doc/Zsh/params.yo, Src/params.c, Src/zsh.mdd, 
+
 	* unposted: add RCS Revision tag for use in patchlevel
 	recording.
 
@@ -10874,5 +10876,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4497 $                         
+* $Revision: 1.4498 $                         
 *****************************************************

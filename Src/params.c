@@ -31,6 +31,7 @@
 #include "params.pro"
 
 #include "version.h"
+#include "patchlevel.h"
 
 /* what level of localness we are at */
  
@@ -748,6 +749,7 @@ createparamtable(void)
     setsparam("VENDOR", ztrdup(VENDOR));
     setsparam("ZSH_NAME", ztrdup(zsh_name));
     setsparam("ZSH_VERSION", ztrdup(ZSH_VERSION));
+    setsparam("ZSH_PATCHLEVEL", ztrdup(ZSH_PATCHLEVEL));
     setaparam("signals", sigptr = zalloc((SIGCOUNT+4) * sizeof(char *)));
     for (t = sigs; (*sigptr++ = ztrdup(*t++)); );
 
