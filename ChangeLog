@@ -1,5 +1,7 @@
 2009-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Doc/Zsh/compwid.yo: tweak doc for 26270.
+
 	* unposted: Src/zsh.mdd: fix the inevitable confusion with
 	using dollar Revision dollar.
 
@@ -10886,5 +10888,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4500 $                         
+* $Revision: 1.4501 $                         
 *****************************************************

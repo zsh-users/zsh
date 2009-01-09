@@ -285,6 +285,15 @@ tt(messages) both kinds of explanation strings will be listed.  It
 will be set appropriately on entry to a completion widget and may be
 changed there.
 )
+vindex(list_in_word, compstate)
+item(tt(list_in_word))(
+This controls how the tt(accept-and-menu-complete) widget handles
+suffixes.  If it is set to tt(0) (the default), the suffix is
+treated in accordance with the usual rules (typically being removed
+and replaced by a space, if marked for this treatment).  If set to
+tt(1), the suffix is preserved so that the next match will be inserted
+in the same word.
+)
 vindex(list_lines, compstate)
 item(tt(list_lines))(
 This gives the number of lines that are needed to display the full
