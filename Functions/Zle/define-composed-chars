@@ -35,7 +35,7 @@ H 124 h 125 J 134 j 135 S 15C s 15D W 174 w 175 Y 176 y 177 \
 # tilde
 a=\?
 z[$a]="\
-A C3 E CB N D1 O D5 a E3 n F1 o F5 I 128 i 129 U 168 u 169 \
+A C3 E 1EBC N D1 O D5 a E3 e 1EBD n F1 o F5 I 128 i 129 U 168 u 169 \
 "
 # macron (d-, D- give eth)
 a=-
@@ -55,7 +55,7 @@ C 10A c 10b E 116 e 117 G 120 g 121 I 130 i 131 L 13F l 140 Z 17B z 17C \
 # diaeresis / Umlaut
 a=:
 z[$a]="\
-A C4 I CF O D6 U DC a E4 e EB i EF o F6 u FC y FF Y 178 \
+A C4 E CB I CF O D6 U DC a E4 e EB i EF o F6 u FC y FF Y 178 \
 "
 # cedilla
 a=,

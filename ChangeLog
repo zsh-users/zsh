@@ -1,3 +1,8 @@
+2009-01-09  Peter Stephenson  <pws@csr.com>
+
+	* Benjamin R. Haskell: 26265: Functions/Zle/define-composed-chars:
+	fix some accented characters.
+
 2009-01-08  Peter Stephenson  <pws@csr.com>
 
 	* 26260: Src/params.c: fix crash when failing to assign
