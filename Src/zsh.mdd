@@ -44,7 +44,7 @@ version.h: $(sdir_top)/Config/version.mk zshcurses.h zshterm.h
 patchlevel.h: $(sdir_top)/ChangeLog
 	{ \
 	  echo -n "#define ZSH_PATCHLEVEL "; \
-	  sed -ne 's/^\* *\$$Revision: 1.19 $$/"\1"/p' \
+	  sed -ne 's/^\* *\$$''Revision: \(.*\) ''\$$/"\1"/p' \
 	  $(sdir_top)/ChangeLog; \
 	} >patchlevel.h
 

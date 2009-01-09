@@ -1,5 +1,8 @@
 2009-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Src/zsh.mdd: fix the inevitable confusion with
+	using dollar Revision dollar.
+
 	* 26272: Doc/Zsh/params.yo, Src/params.c, Src/zsh.mdd, 
 
 	* unposted: add RCS Revision tag for use in patchlevel
@@ -10876,5 +10879,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4498 $                         
+* $Revision: 1.4499 $                         
 *****************************************************
