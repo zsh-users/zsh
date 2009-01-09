@@ -10,6 +10,13 @@
 
 2009-01-09  Andrey Borzenkov <bor@zsh.org>
 
+	* 26270: Completion/Base/Utility/_values, Doc/Zsh/compwid.yo,
+	Src/Zle/compcore.c, Src/Zle/complete.c, Src/Zle/compresult.c:
+	allow accept-and-menu-complete to work also with _values.
+	Add compstate[list_in_word] flag to control, whether suffix
+	is replaced by space; when set, next match is added in the same
+	word.
+
 	* unposted: Completion/Mandriva/Command/.distfiles,
 	Completion/Mandriva/Command/_rebootin: add _rebootin completion
 	from Mandriva RPM (modified to allow spaces in GRUB menu titles)
@@ -10879,5 +10886,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4499 $                         
+* $Revision: 1.4500 $                         
 *****************************************************

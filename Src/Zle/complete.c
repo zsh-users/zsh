@@ -38,6 +38,7 @@ zlong compcurrent,
       complistmax;
 /**/
 zlong complistlines,
+      complistinword,
       compignored;
 
 /**/
@@ -1146,6 +1147,7 @@ static struct compparam compkparams[] = {
       GSU(unambig_pos_gsu) },
     { "insert_positions", PM_SCALAR | PM_READONLY, NULL,
       GSU(insert_pos_gsu) },
+    { "list_in_word", PM_INTEGER, VAL(complistinword), NULL },
     { "list_max", PM_INTEGER, VAL(complistmax), NULL },
     { "last_prompt", PM_SCALAR, VAL(complastprompt), NULL },
     { "to_end", PM_SCALAR, VAL(comptoend), NULL },
@@ -1596,7 +1598,7 @@ setup_(UNUSED(Module m))
 	compvared = compqstack = NULL;
     complastprefix = ztrdup("");
     complastsuffix = ztrdup("");
-    complistmax = 0;
+    complistmax = complistinword = 0;
     hascompmod = 1;
 
     return 0;

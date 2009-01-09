@@ -1309,21 +1309,23 @@ accept_last(void)
 	lastbrbeg->str[l] = ',';
 	lastbrbeg->str[l + 1] = '\0';
     } else {
-	int l;
-
 	zlemetacs = minfo.pos + minfo.len + minfo.insc;
-	iremovesuffix(' ', 1);
-	l = zlemetacs;
-	zlemetacs = minfo.pos + minfo.len + minfo.insc - (*(minfo.cur))->qisl;
-	if (zlemetacs < l)
-	    foredel(l - zlemetacs, CUT_RAW);
-	else if (zlemetacs > zlemetall)
-	    zlemetacs = zlemetall;
-	inststrlen(" ", 1, 1);
+	if (!complistinword) {
+	    int l;
+
+	    iremovesuffix(' ', 1);
+	    l = zlemetacs;
+	    zlemetacs = minfo.pos + minfo.len + minfo.insc - (*(minfo.cur))->qisl;
+	    if (zlemetacs < l)
+		foredel(l - zlemetacs, CUT_RAW);
+	    else if (zlemetacs > zlemetall)
+		zlemetacs = zlemetall;
+	    inststrlen(" ", 1, 1);
+	}
 	minfo.insc = minfo.len = 0;
 	minfo.pos = zlemetacs;
 	minfo.we = 1;
-    }
+	}
 
     if (!wasmeta)
 	unmetafy_line();
