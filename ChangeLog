@@ -1,3 +1,8 @@
+2009-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: add RCS Revision tag for use in patchlevel
+	recording.
+
 2009-01-09  Andrey Borzenkov <bor@zsh.org>
 
 	* unposted: Completion/Mandriva/Command/.distfiles,
@@ -10866,3 +10871,8 @@
 
 	* users/7172: Functions/Prompts/prompt_bart_setup: include "unset"
 	among the localoptions, as this relies on it.
+
+*****************************************************
+* This is used by the shell to define $ZSH_PATCHLEVEL
+* $Revision: 1.4497 $                         
+*****************************************************
