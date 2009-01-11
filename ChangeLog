@@ -5,8 +5,9 @@
 	* unposted: Src/zsh.mdd: fix the inevitable confusion with
 	using dollar Revision dollar.
 
-	* 26272: Doc/Zsh/params.yo, Src/params.c, Src/zsh.mdd, 
-
+	* 26272: Doc/Zsh/params.yo, Src/params.c, Src/zsh.mdd: extract
+	Revision from ChangeLog for use in $ZSH_PATCHLEVEL.	
+	
 	* unposted: add RCS Revision tag for use in patchlevel
 	recording.
 
@@ -10888,5 +10889,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4501 $                         
+* $Revision: 1.4502 $                         
 *****************************************************
