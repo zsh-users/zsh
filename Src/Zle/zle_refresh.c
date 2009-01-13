@@ -1973,8 +1973,18 @@ refreshline(int ln)
 		   eg. oldline: hifoobar \ hopefully cheaper here to delete two
 		   newline: foobar	 / characters, then we have six matches */
 		if (tccan(TCDEL)) {
+		    int first = 1;
 		    for (i = 1; ol[i].chr; i++)
 			if (tcdelcost(i) < wpfxlen(ol + i, nl)) {
+			    /*
+			     * Some terminals will output the current
+			     * attributes into cells added at the end by
+			     * deletions, so turn off text attributes.
+			     */
+			    if (first) {
+				clearattributes();
+				first = 0;
+			    }
 			    tc_delchars(i);
 			    ol += i;
 			    char_ins -= i;
@@ -1984,15 +1994,6 @@ refreshline(int ln)
 				char_ins--;
 			    }
 #endif
-			    /*
-			     * If the sequence we're deleting ended
-			     * by turning off an attribute, make sure
-			     * it stays turned off.  I don't think we
-			     * should need this.
-			     */
-			    if (ol[-1].atr & TXT_ATTR_OFF_MASK)
-				settextattributes(ol[-1].atr &
-						  TXT_ATTR_OFF_MASK);
 			    i = 0;
 			    break;
 			}
