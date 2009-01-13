@@ -1,5 +1,8 @@
 2009-01-13  Peter Stephenson  <pws@csr.com>
 
+	* 26304: Mikael Magnusson: configure.ac: logical correction
+	in link warning.
+
 	* 26393: Src/Zle/zle_refresh.c: turn off text attributes when
 	deleting text, to avoid them being used for inserted blanks.
 
@@ -10904,5 +10907,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4507 $                         
+* $Revision: 1.4508 $                         
 *****************************************************

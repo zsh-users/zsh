@@ -2965,7 +2965,7 @@ echo "See config.modules for installed modules and functions.
 
 case x$LIBS in
   *-lgdbm*)
-  echo "WARNING: zsh has been linked against libgdbm.
+  echo "WARNING: zsh will be linked against libgdbm.
 This means the binary is covered by the GNU General Public License.
 This does not affect the source code.
 Run configure with --disable-gdbm if required."
