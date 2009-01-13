@@ -42,11 +42,9 @@ version.h: $(sdir_top)/Config/version.mk zshcurses.h zshterm.h
 	echo '#define ZSH_VERSION "'$(VERSION)'"' > $@
 
 patchlevel.h: $(sdir_top)/ChangeLog
-	{ \
-	  echo -n "#define ZSH_PATCHLEVEL "; \
-	  sed -ne 's/^\* *\$$''Revision: \(.*\) ''\$$/"\1"/p' \
-	  $(sdir_top)/ChangeLog; \
-	} >patchlevel.h
+	sed -ne \
+	's/^\* *\$$''Revision: \(.*\) ''\$$/#define ZSH_PATCHLEVEL "\1"/p' \
+	$(sdir_top)/ChangeLog >patchlevel.h
 
 zshcurses.h: ../config.h
 	@if test x$(ZSH_CURSES_H) != x; then \
