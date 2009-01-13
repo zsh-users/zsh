@@ -1,5 +1,9 @@
 2009-01-13  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Base/Utility/_values, Doc/Zsh/compwid.yo,
+	Src/Zle/compcore.c, Src/Zle/complete.c, Src/Zle/compresult.c:
+	Back off 26270 and follow up; was causing memory corruption.
+
 	* Doc/Zsh/mod_zpty.yo, Src/Modules/zpty.c, Test/comptest:
 	make "zpty -r" exit more cleanly on read failures and add and
 	use option to ensure a pattern has been matched.
@@ -14,7 +18,7 @@
 	using dollar Revision dollar.
 
 	* 26272: Doc/Zsh/params.yo, Src/params.c, Src/zsh.mdd: extract
-	Revision from ChangeLog for use in $ZSH_PATCHLEVEL.	
+	Revision from ChangeLog for use in $ZSH_PATCHLEVEL.
 
 	* unposted: add RCS Revision tag for use in patchlevel
 	recording.
@@ -10897,5 +10901,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4505 $                         
+* $Revision: 1.4506 $                         
 *****************************************************

@@ -12,8 +12,6 @@ if compvalues -i "$@"; then
   local noargs args opts descr action expl sep argsep subc test='*'
   local oldcontext="$curcontext"
 
-  compstate[list_in_word]=1
-
   compvalues -S argsep
   compvalues -s sep && [[ -n "$sep" ]] && test="[^${(q)sep}]#"
 
