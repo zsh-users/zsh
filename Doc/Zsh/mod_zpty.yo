@@ -38,7 +38,7 @@ Note that the command under the pseudo-terminal sees this input as if it
 were typed, so beware when sending special tty driver characters such as
 word-erase, line-kill, and end-of-file.
 )
-item(tt(zpty) tt(-r) [ tt(-t) ] var(name) [ var(param) [ var(pattern) ] ])(
+item(tt(zpty) tt(-r) [ tt(-mt) ] var(name) [ var(param) [ var(pattern) ] ])(
 The tt(-r) option can be used to read the output of the command var(name).
 With only a var(name) argument, the output read is copied to the standard
 output.  Unless the pseudo-terminal is non-blocking, copying continues
@@ -54,10 +54,11 @@ one character is stored in var(param).
 If a var(pattern) is given as well, output is read until the whole string
 read matches the var(pattern), even in the non-blocking case.  The return
 status is zero if the string read matches the pattern, or if the command
-has exited but at least one character could still be read.  As of this
-writing, a maximum of one megabyte of output can be consumed this way; if
-a full megabyte is read without matching the pattern, the return status is
-non-zero.
+has exited but at least one character could still be read.  If the option
+tt(-m) is present, the return status is zero only if the pattern matches.
+As of this writing, a maximum of one megabyte of output can be consumed
+this way; if a full megabyte is read without matching the pattern, the
+return status is non-zero.
 
 In all cases, the return status is non-zero if nothing could be read, and
 is tt(2) if this is because the command has finished.

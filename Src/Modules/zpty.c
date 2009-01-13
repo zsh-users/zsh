@@ -485,9 +485,9 @@ checkptycmd(Ptycmd cmd)
 }
 
 static int
-ptyread(char *nam, Ptycmd cmd, char **args, int noblock)
+ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)
 {
-    int blen, used, seen = 0, ret = 0;
+    int blen, used, seen = 0, ret = 0, matchok = 0;
     char *buf;
     Patprog prog = NULL;
 
@@ -589,10 +589,24 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock)
 	}
 	buf[used] = '\0';
 
-	if (!prog && (ret <= 0 || (*args && buf[used - 1] == '\n')))
-	    break;
+	if (!prog) {
+	    if (ret <= 0 || (*args && buf[used - 1] == '\n'))
+		break;
+	} else {
+	    if (ret < 0
+#ifdef EWOULDBLOCK
+		&& errno != EWOULDBLOCK
+#else
+#ifdef EAGAIN
+		&& errno != EAGAIN
+#endif
+#endif
+		)
+		break;
+	}
     } while (!(errflag || breaks || retflag || contflag) &&
-	     used < READ_MAX && !(prog && ret && pattry(prog, buf)));
+	     used < READ_MAX &&
+	     !(prog && ret && (matchok = pattry(prog, buf))));
 
     if (prog && ret < 0 &&
 #ifdef EWOULDBLOCK
@@ -613,7 +627,9 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock)
     else if (used)
 	write(1, buf, used);
 
-    return (seen ? 0 : cmd->fin + 1);
+    if (seen && (!prog || matchok || !mustmatch))
+	return 0;
+    return cmd->fin + 1;
 }
 
 static int
@@ -679,16 +695,19 @@ static int
 bin_zpty(char *nam, char **args, Options ops, UNUSED(int func))
 {
     if ((OPT_ISSET(ops,'r') && OPT_ISSET(ops,'w')) ||
-	((OPT_ISSET(ops,'r') || OPT_ISSET(ops,'w')) && 
+	((OPT_ISSET(ops,'r') || OPT_ISSET(ops,'w')) &&
 	 (OPT_ISSET(ops,'d') || OPT_ISSET(ops,'e') ||
 	  OPT_ISSET(ops,'b') || OPT_ISSET(ops,'L'))) ||
-	(OPT_ISSET(ops,'w') && OPT_ISSET(ops,'t')) ||
+	(OPT_ISSET(ops,'w') && (OPT_ISSET(ops,'t') || OPT_ISSET(ops,'m'))) ||
 	(OPT_ISSET(ops,'n') && (OPT_ISSET(ops,'b') || OPT_ISSET(ops,'e') ||
 				OPT_ISSET(ops,'r') || OPT_ISSET(ops,'t') ||
-				OPT_ISSET(ops,'d') || OPT_ISSET(ops,'L'))) ||
+				OPT_ISSET(ops,'d') || OPT_ISSET(ops,'L') ||
+				OPT_ISSET(ops,'m'))) ||
 	(OPT_ISSET(ops,'d') && (OPT_ISSET(ops,'b') || OPT_ISSET(ops,'e') ||
-				OPT_ISSET(ops,'L') || OPT_ISSET(ops,'t'))) ||
-	(OPT_ISSET(ops,'L') && (OPT_ISSET(ops,'b') || OPT_ISSET(ops,'e')))) {
+				OPT_ISSET(ops,'L') || OPT_ISSET(ops,'t') ||
+				OPT_ISSET(ops,'m'))) ||
+	(OPT_ISSET(ops,'L') && (OPT_ISSET(ops,'b') || OPT_ISSET(ops,'e') ||
+				OPT_ISSET(ops,'m')))) {
 	zwarnnam(nam, "illegal option combination");
 	return 1;
     }
@@ -706,7 +725,8 @@ bin_zpty(char *nam, char **args, Options ops, UNUSED(int func))
 	    return 2;
 
 	return (OPT_ISSET(ops,'r') ?
-		ptyread(nam, p, args + 1, OPT_ISSET(ops,'t')) :
+		ptyread(nam, p, args + 1, OPT_ISSET(ops,'t'),
+			OPT_ISSET(ops, 'm')) :
 		ptywrite(p, args + 1, OPT_ISSET(ops,'n')));
     } else if (OPT_ISSET(ops,'d')) {
 	Ptycmd p;
@@ -780,7 +800,7 @@ ptyhook(UNUSED(Hookdef d), UNUSED(void *dummy))
 
 
 static struct builtin bintab[] = {
-    BUILTIN("zpty", 0, bin_zpty, 0, -1, 0, "ebdrwLnt", NULL),
+    BUILTIN("zpty", 0, bin_zpty, 0, -1, 0, "ebdmrwLnt", NULL),
 };
 
 static struct features module_features = {

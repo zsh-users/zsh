@@ -1,5 +1,9 @@
 2009-01-13  Peter Stephenson  <pws@csr.com>
 
+	* Doc/Zsh/mod_zpty.yo, Src/Modules/zpty.c, Test/comptest:
+	make "zpty -r" exit more cleanly on read failures and add and
+	use option to ensure a pattern has been matched.
+
 	* 26300: Src/zsh.mdd: don't use "echo -n" for $ZSH_PATCHLEVEL.
 
 2009-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
@@ -10893,5 +10897,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4504 $                         
+* $Revision: 1.4505 $                         
 *****************************************************
