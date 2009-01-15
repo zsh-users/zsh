@@ -8,9 +8,11 @@ startitem()
 findex(regex-match)
 item(var(expr) tt(-regex-match) var(regex))(
 Matches a string against a POSIX extended regular expression.
-The matched portion of the string will normally be placed in the tt(MATCH)
+On successful match,
+matched portion of the string will normally be placed in the tt(MATCH)
 variable.  If there are any capturing parentheses within the regex, then
 the tt(match) array variable will contain those.
+If the match is not successful, then the variables will not be altered.
 
 For example,
 

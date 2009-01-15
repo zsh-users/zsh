@@ -26,13 +26,15 @@ item(tt(pcre_match) [ tt(-v) var(var) ] [ tt(-a) var(arr) ] var(string))(
 Returns successfully if tt(string) matches the previously-compiled
 PCRE.
 
-If the expression captures substrings within parentheses,
+Upon successful match,
+if the expression captures substrings within parentheses,
 tt(pcre_match) will set the array var($match) to those
 substrings, unless the tt(-a) option is given, in which
 case it will set the array var(arr).  Similarly, the variable
 var(MATCH) will be set to the entire matched portion of the
 string, unless the tt(-v) option is given, in which case the variable
 var(var) will be set.
+No variables are altered if there is no successful match.
 )
 enditem()
 

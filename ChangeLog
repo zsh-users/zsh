@@ -1,3 +1,9 @@
+2009-01-15  Peter Stephenson  <pws@csr.com>
+
+	* 26312: Phil Pennock: Doc/Zsh/cond.yo, Doc/Zsh/mod_pcre.yo,
+	Doc/Zsh/mod_regex.yo: Document no variables altered on failed
+	match.
+
 2009-01-13  Peter Stephenson  <pws@csr.com>
 
 	* 26304: Mikael Magnusson: configure.ac: logical correction
@@ -10907,5 +10913,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4508 $                         
+* $Revision: 1.4509 $                         
 *****************************************************

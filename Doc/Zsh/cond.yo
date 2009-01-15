@@ -115,6 +115,8 @@ var(regexp).  If the option tt(RE_MATCH_PCRE) is set
 var(regexp) is tested as a PCRE regular expression using
 the tt(zsh/pcre) module, else it is tested as a POSIX
 extended regular expression using the tt(zsh/regex) module.
+Upon successful match, some variables will be updated; no variables
+are changed if the matching fails.
 If the option tt(BASH_REMATCH) is set the array
 tt(BASH_REMATCH) is set to the substring that matched the pattern
 followed by the substrings that matched parenthesised
