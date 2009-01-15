@@ -31,7 +31,11 @@
 #include "params.pro"
 
 #include "version.h"
+#ifdef CUSTOM_PATCHLEVEL
+#define ZSH_PATCHLEVEL	CUSTOM_PATCHLEVEL
+#else
 #include "patchlevel.h"
+#endif
 
 /* what level of localness we are at */
  

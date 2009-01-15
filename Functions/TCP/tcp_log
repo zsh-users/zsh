@@ -76,7 +76,7 @@ if (( $# != 1 )); then
 fi
 
 if [[ -n $sess ]]; then
-  TCP_LOG_SESS=$1
+  typeset -g TCP_LOG_SESS=$1
   if [[ -z $append ]]; then
     local sesslogs
     integer i
@@ -87,7 +87,7 @@ if [[ -n $sess ]]; then
     done
   fi
 else
-  TCP_LOG=$1
+  typeset -g TCP_LOG=$1
   [[ -z $append ]] && : >$TCP_LOG
 fi
 

@@ -304,6 +304,14 @@ fi], [sitescriptdir=${datadir}/${tzsh_name}/scripts])
 AC_SUBST(scriptdir)dnl
 AC_SUBST(sitescriptdir)dnl
 
+AH_TEMPLATE([CUSTOM_PATCHLEVEL],
+[Define to a custom value for the ZSH_PATCHLEVEL parameter])
+AC_ARG_ENABLE(custom-patchlevel,
+AC_HELP_STRING([--enable-custom-patchlevel], [set a custom ZSH_PATCHLEVEL value]),
+[if test x$enableval != x && test x$enableval != xno; then
+  AC_DEFINE_UNQUOTED([CUSTOM_PATCHLEVEL], ["$enableval"])
+fi])
+
 dnl Do you want maildir support?
 ifdef([maildir_support],[undefine([maildir_support])])dnl
 AH_TEMPLATE([MAILDIR_SUPPORT],

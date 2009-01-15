@@ -271,6 +271,19 @@ may wish not to install the zsh/newuser module.
 CONFIGURATION OPTIONS
 =====================
 
+Modified versions of zsh
+------------------------
+
+If you are making local modifications to zsh, you are strongly
+advised to configure with the option
+
+  --enable-local-patchlevel="<my-mod-string>"
+
+so that the variable $ZSH_PATCHLEVEL indicates this is not a standard
+version of the shell.  The argument is arbitrary, but should indicate
+the entity that is customizing the shell, for example the OS vendor
+or distributor.
+
 Multibyte Character Support
 ---------------------------
 

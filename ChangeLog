@@ -1,5 +1,11 @@
 2009-01-15  Peter Stephenson  <pws@csr.com>
 
+	* 26313: INSTALL, configure.ac, Src/params.c: add
+	--enable-custom-patchlevel for tweaked shells.
+
+	* Functions/TCP/tcp_log: unposted: suppress WARN_CREATE_GLOBAL
+	message.
+
 	* 26312: Phil Pennock: Doc/Zsh/cond.yo, Doc/Zsh/mod_pcre.yo,
 	Doc/Zsh/mod_regex.yo: Document no variables altered on failed
 	match.
@@ -10913,5 +10919,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4509 $                         
+* $Revision: 1.4510 $                         
 *****************************************************
