@@ -35,6 +35,11 @@
 #define ZSH_PATCHLEVEL	CUSTOM_PATCHLEVEL
 #else
 #include "patchlevel.h"
+
+/* If removed from the ChangeLog for some reason */
+#ifndef ZSH_PATCHLEVEL
+#define ZSH_PATCHLEVEL "unknown"
+#endif
 #endif
 
 /* what level of localness we are at */
