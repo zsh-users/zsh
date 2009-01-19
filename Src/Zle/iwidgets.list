@@ -13,6 +13,7 @@
 "accept-and-menu-complete", acceptandmenucomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "accept-line", acceptline, 0
 "accept-line-and-down-history", acceptlineanddownhistory, 0
+"accept-search", NULL, 0
 "argument-base", argumentbase, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND
 "auto-suffix-remove", handlesuffix, ZLE_NOTCOMMAND
 "auto-suffix-retain", handlesuffix, ZLE_KEEPSUFFIX | ZLE_NOTCOMMAND

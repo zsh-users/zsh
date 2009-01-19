@@ -1176,6 +1176,8 @@ default_bindings(void)
     char buf[3], *ed;
     int i;
 
+    isearch_keymap = newkeymap(NULL, "isearch");
+
     /* vi insert mode and emacs mode:  *
      *   0-31   taken from the tables  *
      *  32-126  self-insert            *
@@ -1273,6 +1275,8 @@ default_bindings(void)
 	linkkeymap(vmap, "main", 0);
     else
 	linkkeymap(emap, "main", 0);
+
+    linkkeymap(isearch_keymap, "isearch", 0);
 
     /* the .safe map cannot be modified or deleted */
     smap->flags |= KM_IMMUTABLE;

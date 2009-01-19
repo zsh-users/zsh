@@ -49,6 +49,10 @@ ZLE_STRING_T previous_search = NULL;
 /**/
 int previous_search_len = 0;
 
+/* Local keymap in isearch mode */
+
+/**/
+Keymap isearch_keymap;
 
 /*** History text manipulation utilities ***/
 
@@ -1141,6 +1145,8 @@ doisearch(char **args, int dir, int pattern)
     if (!(he = quietgethist(hl)))
 	return;
 
+    selectlocalmap(isearch_keymap);
+
     clearlist = 1;
 
     if (*args) {
@@ -1572,6 +1578,8 @@ doisearch(char **args, int dir, int pattern)
 		feep = 1;
 	    else
 		goto ins;
+	} else if (cmd == Th(z_acceptsearch)) {
+	    break;
 	} else {
 	    if(cmd == Th(z_selfinsertunmeta)) {
 		fixunmeta();
@@ -1640,6 +1648,8 @@ doisearch(char **args, int dir, int pattern)
      */
     if (savekeys >= 0 && kungetct > savekeys)
 	kungetct = savekeys;
+
+    selectlocalmap(NULL);
 }
 
 static Histent

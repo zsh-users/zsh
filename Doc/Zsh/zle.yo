@@ -60,12 +60,13 @@ or more names.  If all of a keymap's names are deleted, it disappears.
 findex(bindkey, use of)
 tt(bindkey) can be used to manipulate keymap names.
 
-Initially, there are four keymaps:
+Initially, there are five keymaps:
 
 startsitem()
 sitem(tt(emacs))(EMACS emulation)
 sitem(tt(viins))(vi emulation - insert mode)
 sitem(tt(vicmd))(vi emulation - command mode)
+sitem(tt(isearch))(incremental search mode)
 sitem(tt(.safe))(fallback keymap)
 endsitem()
 
@@ -76,7 +77,7 @@ avoid using names beginning with `tt(.)' for their own keymaps.
 
 vindex(VISUAL)
 vindex(EDITOR)
-In addition to these four names, either `tt(emacs)' or `tt(viins)' is
+In addition to these names, either `tt(emacs)' or `tt(viins)' is
 also linked to the name `tt(main)'.  If one of the tt(VISUAL) or
 tt(EDITOR) environment variables contain the string `tt(vi)' when the shell
 starts up then it will be `tt(viins)', otherwise it will be `tt(emacs)'.
@@ -1115,9 +1116,14 @@ numeric argument was given.  The string may begin with `tt(^)' to anchor the
 search to the beginning of the line.
 
 A restricted set of editing functions
-is available in the mini-buffer.  An interrupt signal, as defined by the stty
+is available in the mini-buffer.  Keys are looked up in the special
+tt(isearch) keymap, and if not found there in the main keymap (note
+that by default the tt(isearch) keymap is empty).
+An interrupt signal, as defined by the stty
 setting, will stop the search and go back to the original line.  An undefined
-key will have the same effect. The supported functions are:
+key will have the same effect.  Note that the following always
+perform the same task within incremental searches and cannot be
+replaced by user defined widgets.  The supported functions are:
 
 startitem()
 xitem(tt(accept-and-hold))
@@ -1132,6 +1138,11 @@ item(tt(vi-backward-delete-char))(
 Back up one place in the search history.  If the search has been
 repeated this does not immediately erase a character in the
 minibuffer.
+)
+item(tt(accept-search))(
+Exit incremental search, retaining the command line but performing no
+further action.  Note that this function is not bound by default
+and has no effect outside incremental search.
 )
 xitem(tt(backward-delete-word))
 xitem(tt(backward-kill-word))

@@ -1,5 +1,9 @@
 2009-01-19  Peter Stephenson  <pws@csr.com>
 
+	* 26366: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list,
+	Src/Zle/zle_hist.c, Src/Zle/zle_keymap.c: add "isearch"
+	keymap and "accept-search" function.
+
 	* Doug Kearns: 26365: Completion/Unix/Command/_python: new 3.0
 	options.
 
@@ -10948,5 +10952,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4517 $                         
+* $Revision: 1.4518 $                         
 *****************************************************
