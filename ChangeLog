@@ -1,9 +1,15 @@
 2009-01-19  Wayne Davison  <wayned@users.sourceforge.net>
 
-	* unposted: fixed compiler warnings in zcond_regex_match(),
-	including a (useless) warning about matchessz potentially
-	being used uninitialized, some signed/unsigned warnings
-	about re.re_nsub.  Split a couple compound lines too.
+	* 26362: Src/Modules/regex.c: avoid calling regfree() when the
+	regex_t "re" was not initialized.
+
+2009-01-19  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* unposted: Src/Modules/regex.c: fixed a few compiler warnings
+	in zcond_regex_match(), including a (useless) warning about
+	matchessz potentially being used uninitialized and some
+	signed/unsigned warnings about re.re_nsub.  Also split a
+	couple compound lines.
 
 2009-01-19  Doug Kearns  <dougkearns@gmail.com>
 
@@ -10937,5 +10943,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4515 $                         
+* $Revision: 1.4516 $                         
 *****************************************************

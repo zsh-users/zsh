@@ -120,7 +120,7 @@ zcond_regex_match(char **a, int id)
 	break;
     default:
 	DPUTS(1, "bad regex option");
-	break;
+	return 0; /* nothing to cleanup, especially not "re". */
     }
 
     if (matches)
