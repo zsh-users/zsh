@@ -1,4 +1,4 @@
-2008-06-05  Doug Kearns  <dougkearns@gmail.com>
+2009-01-19  Doug Kearns  <dougkearns@gmail.com>
 
 	* 26360: Completion/Unix/Command/_git: add --work-tree option.
 
@@ -10928,5 +10928,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4512 $                         
+* $Revision: 1.4513 $                         
 *****************************************************
