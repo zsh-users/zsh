@@ -55,7 +55,7 @@ zcond_regex_match(char **a, int id)
 {
     regex_t re;
     regmatch_t *m, *matches = NULL;
-    size_t matchessz;
+    size_t matchessz = 0;
     char *lhstr, *rhre, *s, **arr, **x;
     int r, n, return_value, rcflags, reflags, nelem, start;
 
@@ -77,15 +77,16 @@ zcond_regex_match(char **a, int id)
 	/* re.re_nsub is number of parenthesized groups, we also need
 	 * 1 for the 0 offset, which is the entire matched portion
 	 */
-	if (re.re_nsub < 0) {
+	if ((int)re.re_nsub < 0) {
 	    zwarn("INTERNAL ERROR: regcomp() returned "
-		    "negative subpattern count %d", re.re_nsub);
+		    "negative subpattern count %d", (int)re.re_nsub);
 	    break;
 	}
 	matchessz = (re.re_nsub + 1) * sizeof(regmatch_t);
 	matches = zalloc(matchessz);
 	r = regexec(&re, lhstr, re.re_nsub+1, matches, reflags);
-	if (r == REG_NOMATCH) /**/;
+	if (r == REG_NOMATCH)
+	    ; /* We do nothing when we fail to match. */
 	else if (r == 0) {
 	    return_value = 1;
 	    if (isset(BASHREMATCH)) {
@@ -99,7 +100,7 @@ zcond_regex_match(char **a, int id)
 	    /* entire matched portion + re_nsub substrings + NULL */
 	    if (nelem) {
 		arr = x = (char **) zalloc(sizeof(char *) * (nelem + 1));
-		for (m = matches + start, n = start; n <= re.re_nsub; ++n, ++m, ++x) {
+		for (m = matches + start, n = start; n <= (int)re.re_nsub; ++n, ++m, ++x) {
 		    *x = ztrduppfx(lhstr + m->rm_so, m->rm_eo - m->rm_so);
 		}
 		*x = NULL;
@@ -114,7 +115,8 @@ zcond_regex_match(char **a, int id)
 		    setaparam("match", arr);
 	    }
 	}
-	else zregex_regerrwarn(r, &re, "regex matching error");
+	else
+	    zregex_regerrwarn(r, &re, "regex matching error");
 	break;
     default:
 	DPUTS(1, "bad regex option");
