@@ -1,3 +1,8 @@
+2009-01-19  Peter Stephenson  <pws@csr.com>
+
+	* Doug Kearns: 26365: Completion/Unix/Command/_python: new 3.0
+	options.
+
 2009-01-19  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 26362: Src/Modules/regex.c: avoid calling regfree() when the
@@ -10943,5 +10948,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4516 $                         
+* $Revision: 1.4517 $                         
 *****************************************************
