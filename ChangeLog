@@ -1,3 +1,7 @@
+2008-06-05  Doug Kearns  <dougkearns@gmail.com>
+
+	* 26360: Completion/Unix/Command/_git: add --work-tree option.
+
 2009-01-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 26315: Src/params.c: define ZSH_PATCHLEVEL to "unknown" if
@@ -10924,5 +10928,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4511 $                         
+* $Revision: 1.4512 $                         
 *****************************************************

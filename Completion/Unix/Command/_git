@@ -4306,6 +4306,7 @@ if [[ $service == git ]]; then
     '(-p --paginate)'{-p,--paginate}'[pipe output into $PAGER]' \
     '--no-pager[do not pipe git output into a pager]' \
     '--git-dir=-[path to repository]:directory:_directories' \
+    '--work-tree=-[path to working tree]:directory:_directories' \
     '--bare[use $PWD as repository]' \
     '*::arg:->cmd_or_options' && return
   case $state in
