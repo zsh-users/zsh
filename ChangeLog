@@ -1,3 +1,9 @@
+2009-01-20  Peter Stephenson  <pws@csr.com>
+
+	* 26373: Src/Zle/complist.c: initialise variable in menu
+	completion in attempt to prevent crash when starting
+	a new completion.
+
 2009-01-20  Doug Kearns  <dougkearns@gmail.com>
 
 	* 26372: Completion/Unix/Command/_antiword: update for version
@@ -10957,5 +10963,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4519 $                         
+* $Revision: 1.4520 $                         
 *****************************************************

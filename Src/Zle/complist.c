@@ -2421,6 +2421,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     mlines = 999999;
     mlbeg = 0;
     molbeg = -42;
+    mtab_been_reallocated = 0;
     for (;;) {
 	METACHECK();
 
