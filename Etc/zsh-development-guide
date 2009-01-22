@@ -300,7 +300,7 @@ is generic information.
 
 `struct feature' contains a pointer to the array that declares each
 feature, followed by the number of entries in the array.  The pointer
-can be NULL and the the size zero for any feature that is not present in
+can be NULL and the size zero for any feature that is not present in
 the module.  For example, to register only builtins in zsh and thereby
 make them visible to the user, the structure should contain
 "bintab" where the array is declared as an array of struct builtin,
@@ -483,7 +483,7 @@ tokenized. There are three helper functions available:
   - int cond_match(args, num, str)
     Again, the first two arguments are the same as for the other
     functions. The third argument is any string. The result of the
-    function is non-zero if the the num'th string from the array taken 
+    function is non-zero if the num'th string from the array taken 
     as a glob pattern matches the given string.
 
 Parameters
@@ -528,7 +528,7 @@ see the description of the following functions in the `params.c' file:
 
 Note that if one defines parameters using the last two macros (for
 scalars and arrays), the variable holding the value should be
-initialized to either `NULL' or to a a piece of memory created with
+initialized to either `NULL' or to a piece of memory created with
 `zalloc()'. But this memory should *not* be freed in the
 finish-function of the module because that will be taken care of by
 the `deleteparamdefs()' function described below.

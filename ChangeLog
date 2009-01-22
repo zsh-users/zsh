@@ -1,3 +1,7 @@
+2009-01-22  Doug Kearns  <dougkearns@gmail.com>
+
+	* unposted: Etc/zsh-development-guide: fix some typos.
+
 2009-01-20  Peter Stephenson  <pws@csr.com>
 
 	* 26373: Src/Zle/complist.c: initialise variable in menu
@@ -10963,5 +10967,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4520 $                         
+* $Revision: 1.4521 $                         
 *****************************************************
