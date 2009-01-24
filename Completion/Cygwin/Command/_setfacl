@@ -1,0 +1,13 @@
+#compdef setfacl setfacl.exe
+
+# cygwin 1.5.25
+
+_arguments -s -S \
+  '(-d, --delete)'{-d,--delete}'[delete one or more specified ACL entries]:ACL entry:' \
+  '(-f, --file)'{-f,--file}'[set ACL entries for FILE to ACL entries read from a ACL_FILE]:ACL file:_files' \
+  '(-m, --modify)'{-m,--modify}'[modify one or more specified ACL entries]:ACL entry:' \
+  '(-r, --replace)'{-r,--replace}'[replace mask entry with maximum permissions needed for the file group class]' \
+  '(-s, --substitute)'{-s,--substitute}'[substitute specified ACL entries for the \[ACL of FILE\]]:ACL entry:' \
+  '(- *)'{-h,--help}'[output usage information and exit]' \
+  '(- *)'{-v,--version}'[output version information and exit]' \
+  '*: :_files'
