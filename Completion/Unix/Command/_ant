@@ -1,6 +1,6 @@
 #compdef ant -value-,ANT_ARGS,-default-
 
-# Apache Ant version 1.6.5
+# Apache Ant version 1.7.1
 
 local curcontext="$curcontext" state line expl ret=1
 typeset -A opt_args
@@ -52,6 +52,8 @@ _arguments -C \
   '-nice[specify a niceness value for the main thread]:niceness value (default 5):({1..10})' \
   '-nouserlib[run ant without using the jar files from ${user.home}/.ant/lib]' \
   '-noclasspath[run ant without using CLASSPATH]' \
+  '-autoproxy[Java1.5+: use the OS proxy settings]' \
+  "-main[override Ant's normal entry point]:class:->class" \
   $target && ret=0
 
 case $state in

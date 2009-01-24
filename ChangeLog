@@ -1,5 +1,7 @@
 2009-01-24  Doug Kearns  <dougkearns@gmail.com>
 
+	* 26413: Completion/Unix/Command/_ant: update for version 1.7.1.
+
 	* 26411: Completion/Cygwin/Command/.distfiles,
 	Completion/Cygwin/Command/_cygcheck,
 	Completion/Cygwin/Command/_cygpath,
@@ -10993,5 +10995,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4524 $                         
+* $Revision: 1.4525 $                         
 *****************************************************
