@@ -58,7 +58,7 @@ static struct builtin builtins[] =
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmrs", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
     BUILTIN("echo", BINF_SKIPINVALID, bin_print, 0, -1, BIN_ECHO, "neE", "-"),
-    BUILTIN("emulate", 0, bin_emulate, 1, 1, 0, "LR", NULL),
+    BUILTIN("emulate", 0, bin_emulate, 0, 3, 0, "LR", NULL),
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmrs", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
     BUILTIN("exit", BINF_PSPECIAL, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
@@ -4744,24 +4744,12 @@ bin_dot(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     return ret ? ret : lastval;
 }
 
-/**/
-int
-bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
-{
-    emulate(*argv, OPT_ISSET(ops,'R'));
-    if (OPT_ISSET(ops,'L'))
-	opts[LOCALOPTIONS] = opts[LOCALTRAPS] = 1;
-    return 0;
-}
+/*
+ * common for bin_emulate and bin_eval
+ */
 
-/* eval: simple evaluation */
-
-/**/
-mod_export int ineval;
-
-/**/
-int
-bin_eval(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
+static int
+eval(char **argv)
 {
     Eprog prog;
     char *oscriptname = scriptname;
@@ -4836,6 +4824,79 @@ bin_eval(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
     ineval = oineval;
 
     return lastval;
+}
+
+/* emulate: set emulation mode and optionally evaluate shell code */
+
+/**/
+int
+bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
+{
+    int opt_L = OPT_ISSET(ops, 'L');
+    int opt_R = OPT_ISSET(ops, 'R');
+    int saveemulation ;
+    int ret;
+    char saveopts[OPT_SIZE];
+
+    /* without arguments just print current emulation */
+    if (!*argv) {
+	if (opt_L || opt_R) {
+	    zwarnnam("emulate", "not enough arguments");
+	    return 1;
+	}
+
+	printf("%s\n", emulation == EMULATE_CSH ? "csh" :
+		       emulation == EMULATE_KSH ? "ksh" :
+		       emulation == EMULATE_SH  ? "sh" :
+		       "zsh");
+	return 0;
+    }
+
+    /* with single argument set current emulation */
+    if (!argv[1]) {
+	emulate(*argv, OPT_ISSET(ops,'R'));
+	if (OPT_ISSET(ops,'L'))
+	    opts[LOCALOPTIONS] = opts[LOCALTRAPS] = 1;
+	return 0;
+    }
+
+    /* If "-c command" is given, evaluate command using specified
+     * emulation mode.
+     */
+    if (strcmp(argv[1], "-c")) {
+	zwarnnam("emulate", "unknown argument %s", argv[1]);
+	return 1;
+    }
+
+    if (!argv[2]) {
+	zwarnnam("emulate", "not enough arguments");
+	return 1;
+    }
+
+    if (opt_L) {
+	zwarnnam("emulate", "option -L incompatible with -c");
+	return 1;
+    }
+
+    memcpy(saveopts, opts, sizeof(opts));
+    saveemulation = emulation;
+    emulate(*argv, OPT_ISSET(ops,'R'));
+    ret = eval(argv+2);
+    memcpy(opts, saveopts, sizeof(opts));
+    emulation = saveemulation;
+    return ret;
+}
+
+/* eval: simple evaluation */
+
+/**/
+mod_export int ineval;
+
+/**/
+int
+bin_eval(UNUSED(char *nam), char **argv, UNUSED(Options ops), UNUSED(int func))
+{
+    return eval(argv);
 }
 
 static char *zbuf;

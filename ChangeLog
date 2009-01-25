@@ -1,3 +1,10 @@
+2009-01-25  Andrey Borzenkov <bor@zsh.org>
+
+	* 26425: Doc/Zsh/builtins.yo Src/builtin.c:
+	"emulate csh -c command" will evaluate `command' after temporary
+	enable csh emulation. Note that `-c' is not actually an option,
+	but positional parameter.
+
 2009-01-24  Doug Kearns  <dougkearns@gmail.com>
 
 	* 26413: Completion/Unix/Command/_ant: update for version 1.7.1.
@@ -10995,5 +11002,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4525 $                         
+* $Revision: 1.4526 $                         
 *****************************************************

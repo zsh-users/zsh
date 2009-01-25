@@ -338,8 +338,11 @@ cindex(compatibility, csh)
 cindex(sh, compatibility)
 cindex(ksh, compatibility)
 cindex(csh, compatibility)
-item(tt(emulate) [ tt(-LR) ] {tt(zsh)|tt(sh)|tt(ksh)|tt(csh)})(
-Set up zsh options to emulate the specified shell as much as possible.
+item(tt(emulate) [ tt(-LR) ] [ {tt(zsh)|tt(sh)|tt(ksh)|tt(csh)} [ tt(-c) tt(arg) ] ])(
+Without any argument print current emulation mode.
+
+With single argument set up zsh options to emulate the specified shell
+as much as possible.
 bf(csh) will never be fully emulated.
 If the argument is not one of the shells listed above, tt(zsh)
 will be used as a default; more precisely, the tests performed on the
@@ -351,16 +354,21 @@ the section `Compatibility' in zmanref(zshmisc)
 ifnzman(\
 noderef(Compatibility)
 )\
-.  If the tt(-R) option is given, all options
+.
+
+If tt(-c) tt(arg) is given, evaluate tt(arg) after temporary setting
+requested emulation. Emulation will be restored before tt(emulate) returns.
+
+If the tt(-R) option is given, all options
 are reset to their default value corresponding to the specified emulation
 mode, except for certain options describing the interactive
 environment; otherwise, only those options likely to cause portability
-problems in scripts and functions are altered.  If the tt(-L) option
-is given, the options tt(LOCAL_OPTIONS) and tt(LOCAL_TRAPS) will be set as
+problems in scripts and functions are altered.  If the tt(-L) option is given,
+the options tt(LOCAL_OPTIONS) and tt(LOCAL_TRAPS) will be set as
 well, causing the effects of the tt(emulate) command and any tt(setopt) and
 tt(trap) commands to be local to the immediately surrounding shell
 function, if any; normally these options are turned off in all emulation
-modes except tt(ksh).
+modes except tt(ksh). The tt(-L) and tt(-c) are mutually exclusive.
 )
 findex(enable)
 cindex(enabling commands)
