@@ -4,7 +4,7 @@ A builtin interface to various low-level system features.
 The tt(zsh/system) module makes available three builtin commands and
 two parameters.
 
-sect(Builtins)
+subsect(Builtins)
 
 startitem()
 findex(syserror)
@@ -111,7 +111,7 @@ the error that occurred.
 )
 enditem()
 
-sect(Parameters)
+subsect(Parameters)
 
 startitem()
 vindex(errnos)

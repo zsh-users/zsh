@@ -1,3 +1,8 @@
+2009-01-26  Peter Stephenson  <pws@csr.com>
+
+	* Greg Klanderman: 26439: Doc/Zsh/mod_system.yo: convert sections
+	to subsections.
+
 2009-01-25  Andrey Borzenkov <bor@zsh.org>
 
 	* 26425: Doc/Zsh/builtins.yo Src/builtin.c:
@@ -11002,5 +11007,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4526 $                         
+* $Revision: 1.4527 $                         
 *****************************************************
