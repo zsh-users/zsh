@@ -42,6 +42,11 @@ typedef struct gmatch *Gmatch;
 
 struct gmatch {
     char *name;
+    /*
+     * Array of sort strings:  one for each GS_EXEC sort type in
+     * the glob qualifiers.
+     */
+    char **sortstrs;
     off_t size ALIGN64;
     long atime;
     long mtime;
@@ -68,8 +73,9 @@ struct gmatch {
 
 #define GS_NAME   1
 #define GS_DEPTH  2
+#define GS_EXEC	  4
 
-#define GS_SHIFT_BASE	4
+#define GS_SHIFT_BASE	8
 
 #define GS_SIZE  (GS_SHIFT_BASE)
 #define GS_ATIME (GS_SHIFT_BASE << 1)
@@ -135,6 +141,17 @@ struct qual {
 /**/
 mod_export char *glob_pre, *glob_suf;
 
+/* Element of a glob sort */
+struct globsort {
+    /* Sort type */
+    int tp;
+    /* Sort code to eval, if type is GS_EXEC */
+    char *exec;
+};
+
+/* Maximum entries in sort array */
+#define MAX_SORTS	(12)
+
 /* struct to easily save/restore current state */
 
 struct globdata {
@@ -157,7 +174,8 @@ struct globdata {
     int gd_range, gd_amc, gd_units;
     int gd_gf_nullglob, gd_gf_markdirs, gd_gf_noglobdots, gd_gf_listtypes;
     int gd_gf_numsort;
-    int gd_gf_follow, gd_gf_sorts, gd_gf_nsorts, gd_gf_sortlist[11];
+    int gd_gf_follow, gd_gf_sorts, gd_gf_nsorts;
+    struct globsort gd_gf_sortlist[MAX_SORTS];
 
     char *gd_glob_pre, *gd_glob_suf;
 };
@@ -880,11 +898,13 @@ qgetmodespec(char **s)
 static int
 gmatchcmp(Gmatch a, Gmatch b)
 {
-    int i, *s;
+    int i;
     off_t r = 0L;
+    struct globsort *s;
+    char **asortstrp = NULL, **bsortstrp = NULL;
 
     for (i = gf_nsorts, s = gf_sortlist; i; i--, s++) {
-	switch (*s & ~GS_DESC) {
+	switch (s->tp & ~GS_DESC) {
 	case GS_NAME:
 	    r = zstrcmp(b->name, a->name, gf_numsort ? SORTIT_NUMERICALLY : 0);
 	    break;
@@ -909,6 +929,17 @@ gmatchcmp(Gmatch a, Gmatch b)
 			}
 		r = slasha - slashb;
 	    }
+	    break;
+	case GS_EXEC:
+	    if (!asortstrp) {
+		asortstrp = a->sortstrs;
+		bsortstrp = b->sortstrs;
+	    } else {
+		asortstrp++;
+		bsortstrp++;
+	    }
+	    r = zstrcmp(*bsortstrp, *asortstrp,
+			gf_numsort ? SORTIT_NUMERICALLY : 0);
 	    break;
 	case GS_SIZE:
 	    r = b->size - a->size;
@@ -966,7 +997,7 @@ gmatchcmp(Gmatch a, Gmatch b)
 	    break;
 	}
 	if (r)
-	    return (int) ((*s & GS_DESC) ? -r : r);
+	    return (int) ((s->tp & GS_DESC) ? -r : r);
     }
     return 0;
 }
@@ -998,6 +1029,49 @@ static struct qual *dup_qual_list(struct qual *orig, struct qual **lastp)
     if (lastp)
 	*lastp = qlast;
     return qfirst;
+}
+
+
+/*
+ * Get a glob string for execution, following e or + qualifiers.
+ * Pointer is character after the e or +.
+ */
+
+/**/
+static char *
+glob_exec_string(char **sp)
+{
+    char sav, *tt, *sdata, *s = *sp;
+    int plus;
+
+    if (s[-1] == '+') {
+	plus = 0;
+	tt = itype_end(s, IIDENT, 0);
+	if (tt == s)
+	{
+	    zerr("missing identifier after `+'");
+	    return NULL;
+	}
+    } else {
+	tt = get_strarg(s, &plus);
+	if (!*tt)
+	{
+	    zerr("missing end of string");
+	    return NULL;
+	}
+    }
+
+    sav = *tt;
+    *tt = '\0';
+    sdata = dupstring(s + plus);
+    untokenize(sdata);
+    *tt = sav;
+    if (sav)
+	*sp = tt + plus;
+    else
+	*sp = tt;
+
+    return sdata;
 }
 
 /* Main entry point to the globbing code for filename globbing. *
@@ -1449,7 +1523,16 @@ zglob(LinkList list, LinkNode np, int nountok)
 		case 'O':
 		{
 		    int t;
+		    char *send;
 
+		    if (gf_nsorts == MAX_SORTS) {
+			zerr("too many glob sort specifiers");
+			restore_globstate(saved);
+			return;
+		    }
+
+		    /* usually just one character */
+		    send = s+1;
 		    switch (*s) {
 		    case 'n': t = GS_NAME; break;
 		    case 'L': t = GS_SIZE; break;
@@ -1459,60 +1542,50 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    case 'c': t = GS_CTIME; break;
 		    case 'd': t = GS_DEPTH; break;
 		    case 'N': t = GS_NONE; break;
+		    case 'e':
+		    case '+':
+		    {
+			t = GS_EXEC;
+			if ((gf_sortlist[gf_nsorts].exec =
+			     glob_exec_string(&send)) == NULL)
+			{
+			    restore_globstate(saved);
+			    return;
+			}
+			break;
+		    }
 		    default:
 			zerr("unknown sort specifier");
 			restore_globstate(saved);
 			return;
 		    }
-		    if ((sense & 2) && !(t & (GS_NAME|GS_DEPTH)))
-			t <<= GS_SHIFT;
-		    if (gf_sorts & t) {
-			zerr("doubled sort specifier");
-			restore_globstate(saved);
-			return;
+		    if (t != GS_EXEC) {
+			if ((sense & 2) && !(t & (GS_NAME|GS_DEPTH)))
+			    t <<= GS_SHIFT; /* HERE: GS_EXEC? */
+			if (gf_sorts & t) {
+			    zerr("doubled sort specifier");
+			    restore_globstate(saved);
+			    return;
+			}
 		    }
 		    gf_sorts |= t;
-		    gf_sortlist[gf_nsorts++] = t |
+		    gf_sortlist[gf_nsorts++].tp = t |
 			(((sense & 1) ^ (s[-1] == 'O')) ? GS_DESC : 0);
-		    s++;
+		    s = send;
 		    break;
 		}
 		case '+':
 		case 'e':
 		{
-		    char sav, *tt;
-		    int plus;
+		    char *tt;
 
-		    if (s[-1] == '+') {
-			plus = 0;
-			tt = itype_end(s, IIDENT, 0);
-			if (tt == s)
-			{
-			    zerr("missing identifier after `+'");
-			    tt = NULL;
-			}
-		    } else {
-			tt = get_strarg(s, &plus);
-			if (!*tt)
-			{
-			    zerr("missing end of string");
-			    tt = NULL;
-			}
-		    }
+		    tt = glob_exec_string(&s);
 
 		    if (tt == NULL) {
 			data = 0;
 		    } else {
-			sav = *tt;
-			*tt = '\0';
 			func = qualsheval;
-			sdata = dupstring(s + plus);
-			untokenize(sdata);
-			*tt = sav;
-			if (sav)
-			    s = tt + plus;
-			else
-			    s = tt;
+			sdata = tt;
 		    }
 		    break;
 		}
@@ -1632,7 +1705,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 	return;
     }
     if (!gf_nsorts) {
-	gf_sortlist[0] = gf_sorts = GS_NAME;
+	gf_sortlist[0].tp = gf_sorts = GS_NAME;
 	gf_nsorts = 1;
     }
     /* Initialise receptacle for matched files, *
@@ -1665,7 +1738,65 @@ zglob(LinkList list, LinkNode np, int nountok)
 	}
     }
 
-    if (!(gf_sortlist[0] & GS_NONE)) {
+    if (!(gf_sortlist[0].tp & GS_NONE)) {
+	/*
+	 * Get the strings to use for sorting by executing
+	 * the code chunk.  We allow more than one of these.
+	 */
+	int nexecs = 0;
+	struct globsort *sortp;
+	struct globsort *lastsortp = gf_sortlist + gf_nsorts;
+
+	/* First find out if there are any GS_EXECs, counting them. */
+	for (sortp = gf_sortlist; sortp < lastsortp; sortp++)
+	{
+	    if (sortp->tp & GS_EXEC)
+		nexecs++;
+	}
+
+	if (nexecs) {
+	    Gmatch tmpptr;
+	    int iexec = 0;
+
+	    /* Yes; allocate enough space for strings for each */
+	    for (tmpptr = matchbuf; tmpptr < matchptr; tmpptr++)
+		tmpptr->sortstrs = (char **)zhalloc(nexecs*sizeof(char*));
+
+	    /* Loop over each one, incrementing iexec */
+	    for (sortp = gf_sortlist; sortp < lastsortp; sortp++)
+	    {
+		/* Ignore unless this is a GS_EXEC */
+		if (sortp->tp & GS_EXEC) {
+		    Eprog prog;
+
+		    if ((prog = parse_string(sortp->exec, 0))) {
+			int ef = errflag, lv = lastval, ret;
+
+			/* Parsed OK, execute for each name */
+			for (tmpptr = matchbuf; tmpptr < matchptr; tmpptr++) {
+			    setsparam("REPLY", ztrdup(tmpptr->name));
+			    execode(prog, 1, 0);
+			    if (!errflag)
+				tmpptr->sortstrs[iexec] =
+				    dupstring(getsparam("REPLY"));
+			    else
+				tmpptr->sortstrs[iexec] = tmpptr->name;
+			}
+
+			ret = lastval;
+			errflag = ef;
+			lastval = lv;
+		    } else {
+			/* Failed, let's be safe */
+			for (tmpptr = matchbuf; tmpptr < matchptr; tmpptr++)
+			    tmpptr->sortstrs[iexec] = tmpptr->name;
+		    }
+
+		    iexec++;
+		}
+	    }
+	}
+
 	/* Sort arguments in to lexical (and possibly numeric) order. *
 	 * This is reversed to facilitate insertion into the list.    */
 	qsort((void *) & matchbuf[0], matchct, sizeof(struct gmatch),
@@ -1682,7 +1813,7 @@ zglob(LinkList list, LinkNode np, int nountok)
     else if (end > matchct)
 	end = matchct;
     if ((end -= first) > 0) {
-	if (gf_sortlist[0] & GS_NONE) {
+	if (gf_sortlist[0].tp & GS_NONE) {
 	    /* Match list was never reversed, so insert back to front. */
 	    matchptr = matchbuf + matchct - first - 1;
 	    while (end-- > 0) {

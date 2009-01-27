@@ -2229,7 +2229,7 @@ pindex(NUMERIC_GLOB_SORT, setting in pattern)
 item(tt(o)var(c))(
 specifies how the names of the files should be sorted. If var(c) is
 tt(n) they are sorted by name (the default); if it is tt(L) they
-are sorted depending on the size (length) of the files; if tt(l) 
+are sorted depending on the size (length) of the files; if tt(l)
 they are sorted by the number of links; if tt(a), tt(m), or tt(c)
 they are sorted by the time of the last access, modification, or
 inode change respectively; if tt(d), files in subdirectories appear before
@@ -2242,6 +2242,16 @@ youngest file. Also note that the modifiers tt(^) and tt(-) are used,
 so `tt(*(^-oL))' gives a list of all files sorted by file size in descending
 order, following any symbolic links.  Unless tt(oN) is used, multiple order
 specifiers may occur to resolve ties.
+
+tt(oe) and tt(o+) are special cases; they are each followed by shell code,
+delimited as for the tt(e) glob qualifier and the tt(+) glob qualifier
+respectively (see above).  The code is executed for each matched file with
+the parameter tt(REPLY) set to the name of the file on entry.  The code
+should modify the parameter tt(REPLY) in some fashion.  On return, the value
+of the parameter is used instead of the file name as the string on which to
+sort.  Unlike other sort operators, tt(oe) and tt(o+) may be repeated, but
+note that the maximum number of sort operators of any kind that may appear
+in any glob expression is 12.
 )
 item(tt(O)var(c))(
 like `tt(o)', but sorts in descending order; i.e. `tt(*(^oc))' is the

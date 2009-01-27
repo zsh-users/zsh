@@ -1,3 +1,8 @@
+2009-01-27  Peter Stephenson  <pws@csr.com>
+
+	* 26448: Doc/Zsh/expn.yo, Src/glob.c: glob sort operators
+	oe and o+ allow arbitrary code to pick name for sorting.
+
 2009-01-26  Peter Stephenson  <pws@csr.com>
 
 	* Greg Klanderman: 26439: Doc/Zsh/mod_system.yo: convert sections
@@ -11007,5 +11012,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4527 $                         
+* $Revision: 1.4528 $                         
 *****************************************************
