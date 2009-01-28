@@ -966,11 +966,19 @@ scancompcmd(HashNode hn, UNUSED(int flags))
 
 #define NAMLEN 60
 
+/*
+ * Local keymap used when reading a command name for the
+ * execute-named-command and where-is widgets.
+ */
+
+/**/
+Keymap command_keymap;
+
 /**/
 Thingy
 executenamedcommand(char *prmt)
 {
-    Thingy cmd;
+    Thingy cmd, retval = NULL;
     int l, len, feep = 0, listed = 0, curlist = 0;
     int ols = (listshown && validlist), olll = lastlistlen;
     char *cmdbuf, *ptr;
@@ -988,6 +996,7 @@ executenamedcommand(char *prmt)
     strcpy(cmdbuf, prmt);
     zsfree(prmt);
     statusline = cmdbuf;
+    selectlocalmap(command_keymap);
     selectkeymap("main", 1);
     ptr = cmdbuf += l;
     len = 0;
@@ -1005,7 +1014,8 @@ executenamedcommand(char *prmt)
 	    } else if (listed)
 		clearlist = listshown = 1;
 
-	    return NULL;
+	    retval = NULL;
+	    goto done;
 	}
 	if(cmd == Th(z_clearscreen)) {
 	    clearscreen(zlenoargs);
@@ -1090,7 +1100,9 @@ executenamedcommand(char *prmt)
 			lastlistlen = olll;
 		    } else if (listed)
 			clearlist = listshown = 1;
-		    return r;
+
+		    retval = r;
+		    goto done;
 		}
 		unrefthingy(r);
 	    }
@@ -1180,6 +1192,10 @@ executenamedcommand(char *prmt)
 	    handlefeep(zlenoargs);
 	feep = 0;
     }
+
+ done:
+    selectlocalmap(NULL);
+    return retval;
 }
 
 /*****************/

@@ -1212,6 +1212,19 @@ zleread(char **lp, char **rp, int flags, int context)
 
     zlecore();
 
+    if (done && !exit_pending && !errflag &&
+	(initthingy = rthingy_nocreate("zle-line-finish"))) {
+	int saverrflag = errflag;
+	int savretflag = retflag;
+	char *args[2];
+	args[0] = initthingy->nam;
+	args[1] = NULL;
+	execzlefunc(initthingy, args, 1);
+	unrefthingy(initthingy);
+	errflag = saverrflag;
+	retflag = savretflag;
+    }
+
     statusline = NULL;
     invalidatelist();
     trashzle();

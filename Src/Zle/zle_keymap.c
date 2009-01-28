@@ -1176,8 +1176,6 @@ default_bindings(void)
     char buf[3], *ed;
     int i;
 
-    isearch_keymap = newkeymap(NULL, "isearch");
-
     /* vi insert mode and emacs mode:  *
      *   0-31   taken from the tables  *
      *  32-126  self-insert            *
@@ -1276,10 +1274,19 @@ default_bindings(void)
     else
 	linkkeymap(emap, "main", 0);
 
-    linkkeymap(isearch_keymap, "isearch", 0);
-
     /* the .safe map cannot be modified or deleted */
     smap->flags |= KM_IMMUTABLE;
+
+    /* isearch keymap: initially empty */
+    isearch_keymap = newkeymap(NULL, "isearch");
+    linkkeymap(isearch_keymap, "isearch", 0);
+
+    /* command keymap: make sure accept-line and send-break are bound */
+    command_keymap = newkeymap(NULL, "command");
+    command_keymap->first['\n'] = refthingy(t_acceptline);
+    command_keymap->first['\r'] = refthingy(t_acceptline);
+    command_keymap->first['G'&0x1F] = refthingy(t_sendbreak);
+    linkkeymap(command_keymap, "command", 0);
 }
 
 /*************************/

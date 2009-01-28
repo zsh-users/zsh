@@ -1,3 +1,14 @@
+2009-01-28  Peter Stephenson  <pws@csr.com>
+
+	* Greg Klanderman: 26465: Doc/Zsh/zle.yo, Src/Zle/zle_keymap.c:
+	add command keymap for command execution.
+
+	* Greg Klanderman: 26464: Completion/Unix/Type/_pids: style
+	insert-ids=single was problematic with menu completion.
+
+	* Greg Klanderman: 26463: Doc/Zsh/zle.yo, Src/Zle/zle_main.c: add
+	zle-line-finish widget.
+
 2009-01-27  Peter Stephenson  <pws@csr.com>
 
 	* 26448: Doc/Zsh/expn.yo, Src/glob.c: glob sort operators
@@ -11012,5 +11023,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4528 $                         
+* $Revision: 1.4529 $                         
 *****************************************************

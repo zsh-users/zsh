@@ -60,13 +60,14 @@ or more names.  If all of a keymap's names are deleted, it disappears.
 findex(bindkey, use of)
 tt(bindkey) can be used to manipulate keymap names.
 
-Initially, there are five keymaps:
+Initially, there are six keymaps:
 
 startsitem()
 sitem(tt(emacs))(EMACS emulation)
 sitem(tt(viins))(vi emulation - insert mode)
 sitem(tt(vicmd))(vi emulation - command mode)
 sitem(tt(isearch))(incremental search mode)
+sitem(tt(command))(read a command name)
 sitem(tt(.safe))(fallback keymap)
 endsitem()
 
@@ -870,6 +871,11 @@ zle -N zle-line-init)
 
 (The command inside the function sets the keymap directly; it is
 equivalent to tt(zle vi-cmd-mode).)
+)
+tindex(zle-line-finish)
+item(tt(zle-line-finish))(
+This is similar to tt(zle-line-init) but is executed every time the
+line editor has finished reading a line of input.
 )
 tindex(zle-keymap-select)
 item(tt(zle-keymap-select))(
@@ -1862,7 +1868,9 @@ tindex(execute-named-cmd)
 item(tt(execute-named-cmd) (ESC-x) (unbound) (unbound))(
 Read the name of an editor command and
 execute it.  A restricted set of editing functions is available in the
-mini-buffer.  An interrupt signal, as defined by the stty setting, will
+mini-buffer.  Keys are looked up in the special
+tt(command) keymap, and if not found there in the main keymap.
+An interrupt signal, as defined by the stty setting, will
 abort the function. The allowed functions are:
 tt(backward-delete-char),
 tt(vi-backward-delete-char),
@@ -2087,6 +2095,9 @@ tindex(where-is)
 item(tt(where-is))(
 Read the name of an editor command and and print the listing of key
 sequences that invoke the specified command.
+A restricted set of editing functions is available in the
+mini-buffer.  Keys are looked up in the special
+tt(command) keymap, and if not found there in the main keymap.
 )
 tindex(which-command)
 item(tt(which-command) (ESC-?) (unbound) (unbound))(
