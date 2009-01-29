@@ -14,7 +14,6 @@ case "$service" in
     _arguments -s -C "$args[@]" \
       '(-)'{-a,--author}"[display the module's author]" \
       '(-)'{-d,--description}"[display the module's description]" \
-      '(-)'{-f+,--format}'[display module info in specified format]' \
       '(-)'{-l,--license}"[display the module's license]" \
       '(-)'{-n,--filename}"[display the module's filename]" \
       '(-)'{-p,--parameters}'[display the typed parameters that a module may support]' \

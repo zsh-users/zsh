@@ -10,6 +10,8 @@
 	* Jörg Sommer: 26451: Completion/Linux/Command/_modutils: use
 	globbing to find available modules, now that modprobe -l is
 	deprecated.
+	* Jörg Sommer: 26452: Completion/Linux/Command/_modutils: drop
+	completion of modinfo -f.
 
 2009-01-29  Peter Stephenson  <pws@csr.com>
 
@@ -11041,5 +11043,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4534 $                         
+* $Revision: 1.4535 $                         
 *****************************************************
