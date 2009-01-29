@@ -770,14 +770,15 @@ _git-cat-file () {
 _git-describe () {
   _arguments \
     '--all[use any ref found in "$GIT_DIR/refs/"]' \
+    '--tags[use any ref found in "$GIT_DIR/refs/tags"]' \
     '(--contains)--tags[use any tag found in "$GIT_DIR/refs/tags/"]' \
     $abbrev_arg \
     '--contains[find the tag after the commit instead of before]' \
-    '--exact-match[only output exact matches, same as --canditates=0]' \
+    '--exact-match[only output exact matches, same as --candidates=0]' \
     '--always[show uniquely abbreviated commit object as fallback]' \
     '--long[always show full format, even for exact matches]' \
     '--match=[only consider tags matching glob pattern]:pattern' \
-    '--candidates=-[consider up to given number of canditates]: :_guard "[[\:digit\:]]##" "number of canditates"' \
+    '--candidates=-[consider up to given number of candidates]: :_guard "[[\:digit\:]]##" "number of candidates"' \
     '--debug[display information about the searching strategy]' \
     '*:committish:__git_committishs' && ret=0
 }
