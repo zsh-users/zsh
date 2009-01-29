@@ -2457,8 +2457,6 @@ _git-send-email () {
     '*:file:_files' && ret=0
 }
 
-# TODO: -h, -H, and --help are undocumented.
-# TODO: -V and --version are undocumented.
 # TODO: --minimize-connections is undocumented.
 # TODO: --remote is undocumented.
 # TODO: --log-window-size is undocumented.
@@ -2471,7 +2469,6 @@ _git-send-email () {
 # TODO: migrate is undocumented.
 # TODO: --minimize for migrate is undocumented.
 # TODO: -r, --color, --pager, and --non-recursive for log are undocumented.
-# TODO: --local for rebase is undocumented.
 # TODO: --message, -m, --file, -F, --revision, and -r for commit-diff are
 # undocumented.
 (( $+functions[_git-svn] )) ||
@@ -2495,11 +2492,19 @@ _git-svn () {
         'clone:same as init, followed by fetch'
         'rebase:fetch revs from SVN parent of HEAD and rebase current work on it'
         'dcommit:commit diffs from given head onto SVN repository'
+        'branch:create a branch in the SVN repository'
+        'tag:create a tag in the SVN repository'
         'log:output SVN log-messages'
+        'blame:show what revision and author last modified each line of a file:'
         'find-rev:output git commit corresponding to the given SVN revision'\''s hash'
         'set-tree:commit given commit or tree to SVN repository'
-        'show-ignore:output corresponding .gitignore file of svn:ignore'
-        'commit-diff:commit diff of two tree-ishs')
+        'create-ignore:recursively finds the svn:ignore property and creates .gitignore files'
+        'show-ignore:output corresponding toplevel .gitignore file of svn:ignore'
+        'commit-diff:commit diff of two tree-ishs'
+        'info:show information about a file or directory'
+        'proplist:list the SVN properties stored for a file or directory'
+        'propget:get a given SVN property for a file'
+        'show-externals:show the subversion externals')
         _describe -t commands command commands && ret=0
       ;;
     (options)
@@ -2537,10 +2542,13 @@ _git-svn () {
           '(-T --trunk)'{-T-,--trunk=}'[set trunk sub-directory]:trunk sub-directory:->subdirectory'
           '(-t --tags)'{-t-,--tags=}'[set tags sub-directory]:tags sub-directory:->subdirectory'
           '(-b --branches)'{-b-,--branches=}'[set branches sub-directory]:branches sub-directory:->subdirectory'
+          '--stdlayout[shorthand for setting trunk,tags,branches as relative paths, the SVN default]'
           '--no-metadata[set svn-remote.X.noMetadata]'
           '--use-svm-props[set svn-remote.X.useSvmProps]'
           '--use-svnsync-props[set svn-remote.X.useSvnsyncProps]'
           '--rewrite-root=[set svn-remote.X.rewriteRoot]:new root'
+          '--use-log-author[use author from the first From: or Signed-Off-By: line, when fetching into git]'
+          '--add-author-from[when committing to svn, append a From: line based on the git commit'\''s author string]'
           '--prefix=[prefix to use for names of remotes]:path prefix:_directories -r ""')
       fi
 
@@ -2553,8 +2561,7 @@ _git-svn () {
           '(-C --copy-similarity)'{-C-,--copy-similarity=}'[undocumented]:number')
       fi
 
-      # FIXME: What arguments does clone actually take here?
-      if [[ $line[1] == (fetch|clone) ]]; then
+      if [[ $line[1] == (fetch|clone|log|create-ignore|info|propget|proplist|show-externals) ]]; then
         arguments+=(
           '(-r --revision)'{-r,--revision}'[only fetch given revision or revision range]:revision:->__git_svn_revisions'
           '::svn remote:__git_svn-remotes')
@@ -2562,17 +2569,13 @@ _git-svn () {
 
       if [[ $line[1] == (dcommit|rebase) ]]; then
         arguments+=(
-          '(-m --merge)'{-m,--merge}'[use merging strategies, if necessary]')
+          '(-m --merge)'{-m,--merge}'[use merging strategies, if necessary]'
+          '*'{-s,--strategy=-}'[use given merge strategy]:merge strategy:__git_merge_strategies')
       fi
 
       if [[ $line[1] == (fetch|dcommit|rebase) ]]; then
         arguments+=(
           '(--fetch-all --all)'{--fetch-all,--all}'[undocumented]')
-      fi
-
-      if [[ $line[1] == (dcommit|rebase) ]]; then
-        arguments+=(
-            '*'{-s,--strategy=-}'[use given merge strategy]:merge strategy:__git_merge_strategies')
       fi
 
       if [[ $line[1] == (dcommit|log|rebase) ]]; then
@@ -2594,7 +2597,14 @@ _git-svn () {
           ;;
         (dcommit)
           arguments+=(
-            '(-n --dry-run)'{-n,--dry-run}'[output git-commands that would show diffs that would be committed]')
+            '(-n --dry-run)'{-n,--dry-run}'[output git-commands that would show diffs that would be committed]'
+            '--no-rebase[do not rebase or reset after committing]'
+            '--commit-url[commit to a different SVN url]:SVN URL:_url')
+          ;;
+        (branch)
+          arguments+=(
+            '(-m --message)'{-m,--message}'[specify the commit message]:message'
+            '(-t --tag)'{-t,--tag}'[create a tag]')
           ;;
         (migrate)
           arguments+=(
@@ -2614,9 +2624,13 @@ _git-svn () {
             '--pager[undocumented]:pager:_files -g *(*)'
             '--non-recursive[undocumented]')
           ;;
+        (blame)
+          arguments+=(
+            '--git-format[produce output in git-blame format, with SVN revision numbers instead of git commit hashes]')
+          ;;
         (rebase)
           arguments+=(
-            '--local[undocumented]')
+            '--local[do not fetch remotely, rebase against the last fetched commit from SVN]')
           ;;
         (commit-diff)
           arguments+=(
