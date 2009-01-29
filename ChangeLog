@@ -12,6 +12,8 @@
 	deprecated.
 	* Jörg Sommer: 26452: Completion/Linux/Command/_modutils: drop
 	completion of modinfo -f.
+	* Jörg Sommer: 26453: Completion/Linux/Command/_modutils: complete
+	modinfo -k.
 
 2009-01-29  Peter Stephenson  <pws@csr.com>
 
@@ -11043,5 +11045,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4535 $                         
+* $Revision: 1.4536 $                         
 *****************************************************
