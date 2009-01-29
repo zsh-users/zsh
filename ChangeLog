@@ -2,6 +2,8 @@
 
 	* 26482: Completion/Unix/Command/_patch: complete patch -U,
 	--unified-reject-files, --global-reject-file.
+	* unposted: move _getfacl and _setfacl from Completion/Cygwin/Command
+	to Completion/Unix/Command.
 
 2009-01-29  Peter Stephenson  <pws@csr.com>
 
@@ -11033,5 +11035,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4531 $                         
+* $Revision: 1.4532 $                         
 *****************************************************

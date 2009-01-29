@@ -9,3 +9,19 @@ _arguments -s -S \
   '(- *)'{-h,--help}'[display help information]' \
   '(- *)'{-v,--version}'[display version information]' \
   '*: :_files'
+getfacl 2.2.47 -- get file access control lists
+Usage: getfacl [-dRLP] file ...
+      --access            display the file access control list only
+  -d, --default           display the default access control list only
+      --omit-header       do not display the comment header
+      --all-effective     print all effective rights
+      --no-effective      print no effective rights
+      --skip-base         skip files that only have the base entries
+  -R, --recursive         recurse into subdirectories
+  -L, --logical           logical walk, follow symbolic links
+  -P, --physical          physical walk, do not follow symbolic links
+      --tabular           use tabular output format
+      --numeric           print numeric user/group identifiers
+      --absolute-names    don't strip leading '/' in pathnames
+      --version           print version and exit
+      --help              this help text
