@@ -1,7 +1,7 @@
 #compdef getfacl getfacl.exe
 
+if _pick_variant cygwin=cygwin unix --version; then
 # cygwin 1.5.25
-
 _arguments -s -S \
   '(--all -a)'{-a,--all}'[display the filename, owner, group, and ACL of the file]' \
   '(--dir -d)'{-d,--dir}'[display the filename, owner, group, and default ACL of the directory]' \
@@ -9,3 +9,20 @@ _arguments -s -S \
   '(- *)'{-h,--help}'[display help information]' \
   '(- *)'{-v,--version}'[display version information]' \
   '*: :_files'
+else
+_arguments -s -S \
+  '--access[display the file access control list only]' \
+  '(-d --default)'{-d,--default}'[display the default access control list only]' \
+  '--omit-header[do not display the comment header]' \
+  '--all-effective[print all effective rights]' \
+  '--no-effective[print no effective rights] '\
+  '--skip-base[skip files that only have the base entries]' \
+  '(-R --recursive)'{-R,--recursive}'[recurse into subdirectories]' \
+  '(-L --logical)'{-L,--logical}'[logical walk, follow symbolic links]' \
+  '(-P --physical)'{-P,--physical}'[physical walk, do not follow symbolic links]' \
+  '--tabular[use tabular output format]' \
+  '--numeric[print numeric user/group identifiers]' \
+  '--absolute-names[don'"'"'t strip leading '"'"'/'"'"' in pathnames' \
+  '--version[print version and exit]' \
+  '--help[this help text]'
+fi

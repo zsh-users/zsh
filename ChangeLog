@@ -4,6 +4,9 @@
 	--unified-reject-files, --global-reject-file.
 	* unposted: move _getfacl and _setfacl from Completion/Cygwin/Command
 	to Completion/Unix/Command.
+	* 26483: Completion/Unix/Command/_getfacl,
+	Completion/Unix/Command/_setfacl: handle SGI's acl programs as well
+	as Cygwin's.
 
 2009-01-29  Peter Stephenson  <pws@csr.com>
 
@@ -11035,5 +11038,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4532 $                         
+* $Revision: 1.4533 $                         
 *****************************************************
