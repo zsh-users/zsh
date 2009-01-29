@@ -78,7 +78,7 @@ case "$state" in
   ;&
 
   all_modules)
-    modules=( ${${${${(f)"$(_call_program modules ${(M)words[1]##*/}modprobe -l 2>/dev/null)"}:#}##*/}%%.*} )
+    modules=( /lib/modules/$(uname -r)/(*~source)/**/*(.:t:r) )
 
     if [[ $state = loadable_modules ]]; then
         modules=( ${modules:#(${(j:|:)~${=loaded_modules//_/-}})} )

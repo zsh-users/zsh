@@ -7,6 +7,9 @@
 	* 26483: Completion/Unix/Command/_getfacl,
 	Completion/Unix/Command/_setfacl: handle SGI's acl programs as well
 	as Cygwin's.
+	* Jörg Sommer: 26451: Completion/Linux/Command/_modutils: use
+	globbing to find available modules, now that modprobe -l is
+	deprecated.
 
 2009-01-29  Peter Stephenson  <pws@csr.com>
 
@@ -11038,5 +11041,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4533 $                         
+* $Revision: 1.4534 $                         
 *****************************************************
