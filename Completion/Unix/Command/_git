@@ -1618,10 +1618,11 @@ _git-clone () {
   _arguments -S \
     '--bare[make a bare GIT repository]' \
     '--mirror[clone refs into refs/* instead of refs/remotes/origin/*]' \
-    '(-l --local)'{-l,--local}'[perform a local cloning of a repository]' \
+    '(-l --local)'{-l,--local}'[clone locally, hardlink refs and objects if possible]' \
     '(-s --shared)'{-s,--shared}'[share the objects with the source repository (warning: see man page)]' \
     '--reference[reference repository]:repository:_directories' \
     '(-q --quiet)'{-q,--quiet}'[operate quietly]' \
+    '(-v --verbose)'{-v,--verbose}'[always display the progressbar]' \
     '(-n --no-checkout)'{-n,--no-checkout}'[do not checkout HEAD after clone is complete]' \
     '(-o --origin)'{-o,--origin}'[use given name instead of "origin" as branch name]:name:__git_guard_branch-name' \
     '--no-hardlinks[copy files instead of hardlinking when doing a local clone]' \
