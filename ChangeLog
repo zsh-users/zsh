@@ -1,3 +1,8 @@
+2009-01-29  Peter Stephenson  <pws@csr.com>
+
+	* 26485: Completion/Unix/Type/_path_files: accept-exact-dirs could
+	rearrange directories into the wrong order.
+
 2009-01-29  Clint Adams  <clint@zsh.org>
 
 	* 26482: Completion/Unix/Command/_patch: complete patch -U,
@@ -11052,5 +11057,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4539 $                         
+* $Revision: 1.4540 $                         
 *****************************************************
