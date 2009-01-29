@@ -665,7 +665,8 @@ _git-remote () {
         'show:show information about a given remote'
         'prune:delete all stale tracking branches for a given remote'
         'update:fetch updates for a set of remotes'
-        'rm:remove a remote from .git/config and all associated tracking branches')
+        'rm:remove a remote from .git/config and all associated tracking branches'
+        'rename:rename a remote from .git/config and update all associated tracking branches')
 
       _describe -t commands 'sub-command' commands && ret=0
       ;;
@@ -694,6 +695,10 @@ _git-remote () {
           ;;
         (rm)
           __git_remotes && ret=0
+          ;;
+        (rename)
+          __git_remotes && ret=0
+          ;;
       esac
       ;;
   esac
