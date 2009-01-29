@@ -112,6 +112,9 @@ if (( ! $+_patch_args )); then
 
     '* --use-index-line *' '--use-index-line[deal with Index: line]'
     '* --patch-root=DIR *' '--patch-root=[restrict paths]:patch root:_files -/'
+
+    '* -U  --unified-reject-files *' '(-U --unified-reject-files)'{-U,--unified-reject-files}'[create unified reject files]'
+    '* --global-reject-file=file *' '--global-reject-file=[put all rejects into one file]:file:_files'
   )
   _patch_args=(
     ${arg:+"-s"}

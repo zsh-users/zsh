@@ -1,3 +1,8 @@
+2009-01-29  Clint Adams  <clint@zsh.org>
+
+	* 26482: Completion/Unix/Command/_patch: complete patch -U,
+	--unified-reject-files, --global-reject-file.
+
 2009-01-29  Peter Stephenson  <pws@csr.com>
 
 	* 26466: Src/Zle/compmatch.c: with suffix, bld_line() got
@@ -11028,5 +11033,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4530 $                         
+* $Revision: 1.4531 $                         
 *****************************************************
