@@ -178,6 +178,7 @@ _git_commands () {
     'revert:revert existing commit'
     'rm:remove files from the working tree and from the index'
     'show-branch:show branches and their commits'
+    'stage:add file contents to the staging area'
     'stash:stash away changes to the working tree'
     'status:show working-tree'\''s status'
     'tag:create tag object signed with GPG'
@@ -1349,6 +1350,11 @@ _git-add () {
 }
 __git_zstyle_default ':completion::complete:git-add:argument-rest:*' ignore-line yes
 
+(( $+functions[_git-stage] )) ||
+_git-stage () {
+  _git-add
+}
+
 (( $+functions[_git-am] )) ||
 _git-am () {
   _arguments \
@@ -1656,7 +1662,7 @@ __git_zstyle_default ':completion::complete:git-commit:argument-rest:*' ignore-l
 _git-diff () {
   _arguments -S \
     $diff_args \
-    '--cached[show diff between index and named commit]' \
+    '(--cached --staged)'{--cached,--staged}'[show diff between index and named commit]' \
     '::commit range:__git_commit_ranges' \
     '::original revision:__git_objects' \
     '::new revision:__git_objects' \

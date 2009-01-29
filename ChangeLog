@@ -16,6 +16,9 @@
 	modinfo -k.
 	* Ingmar Vanhassel: 26467: Completion/Unix/Command/_git: add "git
 	remote rename" completion.
+	* Ingmar Vanhassel: 26468: Completion/Unix/Command/_git: "git
+	stage" is now a synonym for "git add". git diff: --staged is a
+	synonym for --cached.
 
 2009-01-29  Peter Stephenson  <pws@csr.com>
 
@@ -11047,5 +11050,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4537 $                         
+* $Revision: 1.4538 $                         
 *****************************************************
