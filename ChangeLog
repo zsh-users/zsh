@@ -28,6 +28,8 @@
 	"git clone --verbose".
 	* Ingmar Vanhassel: 26470: Completion/Unix/Command/_git: update
 	"git svn" completion.
+	* Ingmar Vanhassel: 26471: Completion/Unix/Command/_git: update
+	"git rebase" completion.
 
 2009-01-29  Peter Stephenson  <pws@csr.com>
 
@@ -11059,5 +11061,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4541 $                         
+* $Revision: 1.4542 $                         
 *****************************************************

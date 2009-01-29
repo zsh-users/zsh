@@ -1880,8 +1880,10 @@ _git-rebase () {
       '(-m --merge)'{-m,--merge}'[use merging strategies to rebase]' \
       '*'{-s,--strategy=-}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
       $verbose_arg \
+      '--no-verify[bypass the pre-rebase hook]' \
       '-C-[ensure that given lines of surrounding context match]: :_guard "[[\:digit\:]]##" "lines of context"' \
       '(-i --interactive)'{-i,--interactive}'[make a list of commits to be rebased and open in $EDITOR]' \
+      '(-p --preserve-merges)'{-p,--preserve-merges}'[try to recreate merges instead of ignoring them]' \
       ':upstream branch:__git_revisions' \
       '::working branch:__git_revisions' && ret=0
   fi
