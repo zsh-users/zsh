@@ -1637,8 +1637,13 @@ _git-clone () {
 (( $+functions[_git-commit] )) ||
 _git-commit () {
   _arguments -S \
+    '--allow-empty[allow recording an empty commit]' \
     '(-a --all)'{-a,--all}'[update all paths in the index file]' \
     '--author[override the author name used in the commit]:author name' \
+    '--cleanup=-[specify how the commit message should be cleaned up]:mode:((verbatim\:"don'\''t change the commit message at all"
+                                                                             whitespace\:"remove leading and trailing whitespace lines"
+                                                                             strip\:"remove both whitespace and commentary lines"
+                                                                             default\:"act as '\''strip'\'' if the message is to be edited and as '\''whitespace'\'' otherwise"))' \
     '(-e --edit)'{-e,--edit}'[edit the commit message before committing]' \
     '(-o --only -i --include)'{-i,--include}'[update the given files and commit the whole index]' \
     '(-o --only -i --include)'{-o,--only}'[commit only the given files]' \
