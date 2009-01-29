@@ -30,6 +30,8 @@
 	"git svn" completion.
 	* Ingmar Vanhassel: 26471: Completion/Unix/Command/_git: update
 	"git rebase" completion.
+	* Ingmar Vanhassel: 26472: Completion/Unix/Command/_git: complete
+	"git add --intent-to-add".
 
 2009-01-29  Peter Stephenson  <pws@csr.com>
 
@@ -11061,5 +11063,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4542 $                         
+* $Revision: 1.4543 $                         
 *****************************************************
