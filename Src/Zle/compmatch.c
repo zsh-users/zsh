@@ -1818,10 +1818,12 @@ bld_line(Cmatcher mp, ZLE_STRING_T line, char *mword, char *word,
 
 	if (sfx) {
 	    wp = wordcp - 1;
-	    curgenpat--;
-	} else
+	    tmpgenpat = curgenpat - 1;
+	} else {
+	    tmpgenpat = curgenpat;
 	    wp = wordcp;
-	if (pattern_match1(curgenpat, *wp, &wmtp))
+	}
+	if (pattern_match1(tmpgenpat, *wp, &wmtp))
 	{
 	    convchar_t lchr;
 	    /*
@@ -1831,8 +1833,8 @@ bld_line(Cmatcher mp, ZLE_STRING_T line, char *mword, char *word,
 	     * else if it's generic, keep the word character,
 	     * since we have no choice.
 	     */
-	    if (curgenpat->tp == CPAT_CHAR)
-		lchr = curgenpat->u.chr;
+	    if (tmpgenpat->tp == CPAT_CHAR)
+		lchr = tmpgenpat->u.chr;
 	    else
 		lchr = *wp;
 
@@ -1845,9 +1847,10 @@ bld_line(Cmatcher mp, ZLE_STRING_T line, char *mword, char *word,
 	    wlen--;
 	    rl++;
 
-	    if (sfx)
+	    if (sfx) {
 		wordcp = wp;
-	    else {
+		curgenpat = tmpgenpat;
+	    } else {
 		if (llen)
 		    curgenpat++;
 		wordcp++;
