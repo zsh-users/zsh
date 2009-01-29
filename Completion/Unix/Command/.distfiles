@@ -66,6 +66,7 @@ _gdb
 _genisoimage
 _getconf
 _getent
+_getfacl
 _getmail
 _git
 _global
@@ -174,6 +175,7 @@ _samba
 _sccs
 _screen
 _sed
+_setfacl
 _sh
 _showmount
 _sisu
