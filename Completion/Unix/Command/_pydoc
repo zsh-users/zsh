@@ -1,0 +1,16 @@
+#compdef pydoc
+
+local context state line
+typeset -A opt_args
+
+_arguments \
+  '-k[keyword]:keyword:' \
+  '-p[port]:port:_ports' \
+  '-g[gui]' \
+  '-w[write out HTML]:file or dir:_files' \
+  ':keyword, topic, module, package, or dotted reference:->lookup' && return 0
+
+_alternative \
+  'keywords:keyword:compadd ${=${${(f)"$(pydoc keywords)"}[2,-1]}}' \
+  'topics:topic:compadd ${=${${(f)"$(pydoc topics)"}[2,-1]}}' \
+  'modules:module:'
