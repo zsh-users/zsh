@@ -1109,8 +1109,9 @@ temporarily to the name of the function/script.
 pindex(LOCAL_OPTIONS)
 item(tt(LOCAL_OPTIONS) <K>)(
 If this option is set at the point of return from a shell function,
-all the options (including this one) which were in force upon entry to
-the function are restored.  Otherwise, only this option and the
+most options (including this one) which were in force upon entry to
+the function are restored; options that are not restored are
+tt(PRIVILEGED) and tt(RESTRICTED).  Otherwise, only this option and the
 tt(XTRACE) and tt(PRINT_EXIT_VALUE) options are restored.  Hence
 if this is explicitly unset by a shell function the other options in
 force at the point of return will remain so.

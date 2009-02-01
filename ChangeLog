@@ -1,3 +1,8 @@
+2009-02-01  Andrey Borzenkov <bor@zsh.org>
+
+	* 26504: Doc/Zsh/options.yo: document that LOCAL_OPTIONS
+	does not restore PRIVILEGED and RESTRICTED
+
 2009-01-30  Clint Adams  <clint@zsh.org>
 
 	* 26494: Completion/Unix/Command/_pydoc: completion for pydoc.
@@ -11071,5 +11076,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4546 $                         
+* $Revision: 1.4547 $                         
 *****************************************************
