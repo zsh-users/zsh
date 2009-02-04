@@ -809,12 +809,10 @@ whitespace.)
 list(An end offset in the same units as tt(CURSOR), terminated by
 whitespace.)
 list(A highlight specification in the same format as
-used for the contexts tt(region) or tt(special)
-in the parameter tt(zle_highlight),
+used for contexts in the parameter tt(zle_highlight),
 ifnzman(noderef(Character Highlighting))\
-ifzman(see Character Highlighting below).
-Hence this should be a comma-separated list of any of the
-words tt(bold), tt(standout) or tt(underline).
+ifzman(see Character Highlighting below);
+for example, tt(standout) or tt(fg=red,bold)).
 endlist()
 
 For example, 
@@ -829,7 +827,6 @@ as soon as the line is accepted.  The line editor makes no attempt to
 keep the highlighting effect synchronised with the line as it is edited;
 hence region highlighting is best limited to static effects within
 user widgets.
-)
 )
 vindex(WIDGET)
 item(tt(WIDGET) (scalar))(
