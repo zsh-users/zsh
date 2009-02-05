@@ -1,5 +1,7 @@
 2009-02-05  Peter Stephenson  <pws@csr.com>
 
+	* unposted: fix number in foregoing.
+
 	* 26513: README: note that addition of ".." in completion
 	was broken.
 
@@ -11081,5 +11083,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4548 $                         
+* $Revision: 1.4549 $                         
 *****************************************************

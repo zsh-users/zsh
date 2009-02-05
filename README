@@ -33,7 +33,7 @@ details, see the documentation.
 Possible incompatibilities
 ---------------------------
 
-In some 4.2.X releases of zsh, the completion system added a ".."  as a
+In some 4.3.X releases of zsh, the completion system added a ".."  as a
 trial completion whenever completing directories.  This was a bug: as
 documented in the zshcompsys manual, this feature needs to be turned on by
 a style:
