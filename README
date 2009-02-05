@@ -33,8 +33,16 @@ details, see the documentation.
 Possible incompatibilities
 ---------------------------
 
-This section documents incompatibilities in the shell since the 4.2
-series of releases.
+In some 4.2.X releases of zsh, the completion system added a ".."  as a
+trial completion whenever completing directories.  This was a bug: as
+documented in the zshcompsys manual, this feature needs to be turned on by
+a style:
+
+  zstyle ':completion:*' special-dirs true
+
+
+The rest of this section documents incompatibilities in the shell since the
+4.2 series of releases.
 
 In previous releases of the shell, builtin commands and precommand
 modifiers that did not accept options also did not recognize the

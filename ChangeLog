@@ -1,3 +1,8 @@
+2009-02-05  Peter Stephenson  <pws@csr.com>
+
+	* 26513: README: note that addition of ".." in completion
+	was broken.
+
 2009-02-01  Andrey Borzenkov <bor@zsh.org>
 
 	* 26504: Doc/Zsh/options.yo: document that LOCAL_OPTIONS
@@ -11076,5 +11081,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4547 $                         
+* $Revision: 1.4548 $                         
 *****************************************************
