@@ -1,5 +1,8 @@
 2009-02-06  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Doc/Zsh/builtins.yo: typo in previous patch
+	spotted by Mikael.
+
 	* 26517: Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo,
 	Doc/Zsh/contrib.yo, Doc/Zsh/expn.yo, Doc/Zsh/options.yo,
 	Doc/Zsh/params.yo: prompt expansion section in Unix manual
@@ -11090,5 +11093,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4550 $                         
+* $Revision: 1.4551 $                         
 *****************************************************
