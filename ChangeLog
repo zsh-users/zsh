@@ -1,3 +1,8 @@
+2009-02-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Doc/Zsh/zle.yo: use of highlighting was out of
+	date.
+
 2009-02-06  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/builtins.yo: typo in previous patch
@@ -11093,5 +11098,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4551 $                         
+* $Revision: 1.4552 $                         
 *****************************************************
