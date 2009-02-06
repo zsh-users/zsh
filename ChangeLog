@@ -1,3 +1,10 @@
+2009-02-06  Peter Stephenson  <pws@csr.com>
+
+	* 26517: Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo,
+	Doc/Zsh/contrib.yo, Doc/Zsh/expn.yo, Doc/Zsh/options.yo,
+	Doc/Zsh/params.yo: prompt expansion section in Unix manual
+	is actually named EXPANSION OF PROMPT SEQUENCES.
+
 2009-02-05  Peter Stephenson  <pws@csr.com>
 
 	* unposted: fix number in foregoing.
@@ -11083,5 +11090,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4549 $                         
+* $Revision: 1.4550 $                         
 *****************************************************

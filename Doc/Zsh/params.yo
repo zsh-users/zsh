@@ -1031,7 +1031,9 @@ vindex(PS1)
 item(tt(PS1) <S>)(
 The primary prompt string, printed before a command is read.
 the default is `tt(%m%# )'.  It undergoes a special form of expansion
-before being displayed; see noderef(Prompt Expansion).
+before being displayed; see
+ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
+ifnzman(noderef(Prompt Expansion)).
 )
 vindex(PS2)
 item(tt(PS2) <S>)(

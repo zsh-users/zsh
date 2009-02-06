@@ -64,7 +64,7 @@ most recent command is always retained in any case.  Each saved command in
 the history list is called a history em(event) and is assigned a number,
 beginning with 1 (one) when the shell starts up.  The history number that
 you may see in your prompt (see
-ifzman(Prompt Expansion in zmanref(zshmisc))\
+ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
 ifnzman(noderef(Prompt Expansion))\
 ) is the number that is to be assigned to the em(next) command.
 
@@ -708,7 +708,9 @@ If the tt(MULTIBYTE) option is set and the number is greater than 127
 )
 item(tt(%))(
 Expand all tt(%) escapes in the resulting words in the same way as in
-prompts (see noderef(Prompt Expansion)). If this flag is given twice,
+prompts (see 
+ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
+ifnzman(noderef(Prompt Expansion))). If this flag is given twice,
 full prompt expansion is done on the resulting words, depending on the
 setting of the tt(PROMPT_PERCENT), tt(PROMPT_SUBST) and tt(PROMPT_BANG)
 options.

@@ -1545,7 +1545,8 @@ string to display above matches in completion lists.  The sequence
 what these matches are.  This string may also contain the following
 sequences to specify output attributes,
 ifnzman(noderef(Prompt Expansion))\
-ifzman(as described in the section PROMPT EXPANSION in zmanref(zshmisc)):
+ifzman(as described in the section EXPANSION OF PROMPT SEQUENCES in
+zmanref(zshmisc)):
 `tt(%B)', `tt(%S)', `tt(%U)', `tt(%F)', `tt(%K)' and their lower case
 counterparts, as well as `tt(%{)...tt(%})'.  `tt(%F)', `tt(%K)' and
 `tt(%{)...tt(%})' take arguments in the same form as prompt

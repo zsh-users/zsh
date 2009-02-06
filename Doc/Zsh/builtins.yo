@@ -897,7 +897,7 @@ Print the arguments to the input of the coprocess.
 )
 item(tt(-P))(
 Perform prompt expansion (see
-ifzman(zmanref(zshmisc))\
+ifzman(EXPANSION OF PROMPT SEQUENCES IN zmanref(zshmisc))\
 ifnzman(noderef(Prompt Expansion))\
 ).
 )

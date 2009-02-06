@@ -2770,7 +2770,7 @@ The tt(nslookup) function looks up this style in the context
 `tt(:nslookup)' to set the prompt and the right-side prompt, respectively.
 The usual expansions for the tt(PS1) and tt(RPS1) parameters may be used
 (see
-ifzman(zmanref(zshmisc))\
+ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
 ifnzman(noderef(Prompt Expansion))\
 ).
 )

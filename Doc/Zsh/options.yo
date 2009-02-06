@@ -977,7 +977,9 @@ pindex(PROMPT_BANG)
 cindex(prompt, ! expansion)
 item(tt(PROMPT_BANG) <K>)(
 If set, `tt(!)' is treated specially in prompt expansion.
-See noderef(Prompt Expansion).
+See
+ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
+ifnzman(noderef(Prompt Expansion)).
 )
 pindex(PROMPT_CR)
 cindex(prompt, with CR)
@@ -1006,7 +1008,9 @@ pindex(PROMPT_PERCENT)
 cindex(prompt, % expansion)
 item(tt(PROMPT_PERCENT) <C> <Z>)(
 If set, `tt(%)' is treated specially in prompt expansion.
-See noderef(Prompt Expansion).
+See
+ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
+ifnzman(noderef(Prompt Expansion)).
 )
 pindex(PROMPT_SUBST)
 cindex(prompt, parameter expansion)
