@@ -1,3 +1,8 @@
+2009-02-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Allan Caffee <allan.caffee@gmail.com>: 26532: index option
+	names without underscore, too.
+
 2009-02-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Doc/Zsh/zle.yo: use of highlighting was out of
@@ -11098,5 +11103,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4552 $                         
+* $Revision: 1.4553 $                         
 *****************************************************

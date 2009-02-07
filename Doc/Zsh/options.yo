@@ -55,6 +55,7 @@ are changed from the default.
 subsect(Changing Directories)
 startitem()
 pindex(AUTO_CD)
+pindex(AUTOCD)
 cindex(cd, automatic)
 item(tt(AUTO_CD) (tt(-J)))(
 If a command is issued that can't be executed as a normal command,
@@ -62,12 +63,14 @@ and the command is the name of a directory, perform the tt(cd)
 command to that directory.
 )
 pindex(AUTO_PUSHD)
+pindex(AUTOPUSHD)
 cindex(cd, behaving like pushd)
 cindex(pushd, making cd behave like)
 item(tt(AUTO_PUSHD) (tt(-N)))(
 Make tt(cd) push the old directory onto the directory stack.
 )
 pindex(CDABLE_VARS)
+pindex(CDABLEVARS)
 cindex(cd, to parameter)
 item(tt(CDABLE_VARS) (tt(-T)))(
 If the argument to a tt(cd) command (or an implied tt(cd) with the
@@ -76,6 +79,7 @@ slash, try to expand the expression as if it were preceded by a `tt(~)' (see
 noderef(Filename Expansion)).
 )
 pindex(CHASE_DOTS)
+pindex(CHASEDOTS)
 cindex(cd, with .. in argument)
 item(tt(CHASE_DOTS))(
 When changing to a directory containing a path segment `tt(..)' which would
@@ -92,6 +96,7 @@ is tt(/foo/bar) and `tt(cd ..)' is used.  Note that all other symbolic
 links in the path will also be resolved.
 )
 pindex(CHASE_LINKS)
+pindex(CHASELINKS)
 cindex(links, symbolic)
 cindex(symbolic links)
 item(tt(CHASE_LINKS) (tt(-w)))(
@@ -101,22 +106,26 @@ will be treated as referring to the physical parent, even if the preceding
 path segment is a symbolic link.
 )
 pindex(PUSHD_IGNORE_DUPS)
+pindex(PUSHDIGNOREDUPS)
 cindex(directory stack, ignoring duplicates)
 item(tt(PUSHD_IGNORE_DUPS))(
 Don't push multiple copies of the same directory onto the directory stack.
 )
 pindex(PUSHD_MINUS)
+pindex(PUSHDMINUS)
 cindex(directory stack, controlling syntax)
 item(tt(PUSHD_MINUS))(
 Exchanges the meanings of `tt(PLUS())' and `tt(-)'
 when used with a number to specify a directory in the stack.
 )
 pindex(PUSHD_SILENT)
+pindex(PUSHDSILENT)
 cindex(directory stack, silencing)
 item(tt(PUSHD_SILENT) (tt(-E)))(
 Do not print the directory stack after tt(pushd) or tt(popd).
 )
 pindex(PUSHD_TO_HOME)
+pindex(PUSHDTOHOME)
 cindex(pushd, to home)
 item(tt(PUSHD_TO_HOME) (tt(-D)))(
 Have tt(pushd) with no arguments act like `tt(pushd $HOME)'.
@@ -126,12 +135,14 @@ enditem()
 subsect(Completion)
 startitem()
 pindex(ALWAYS_LAST_PROMPT)
+pindex(ALWAYSLASTPROMPT)
 item(tt(ALWAYS_LAST_PROMPT) <D>)(
 If unset, key functions that list completions try to return to the last
 prompt if given a numeric argument. If set these functions try to
 return to the last prompt if given em(no) numeric argument.
 )
 pindex(ALWAYS_TO_END)
+pindex(ALWAYSTOEND)
 item(tt(ALWAYS_TO_END))(
 If a completion is performed with the cursor within a word, and a
 full completion is inserted, the cursor is moved to the end of the
@@ -139,11 +150,13 @@ word.  That is, the cursor is moved to the end of the word if either
 a single match is inserted or menu completion is performed.
 )
 pindex(AUTO_LIST)
+pindex(AUTOLIST)
 cindex(completion, listing choices)
 item(tt(AUTO_LIST) (tt(-9)) <D>)(
 Automatically list choices on an ambiguous completion.
 )
 pindex(AUTO_MENU)
+pindex(AUTOMENU)
 cindex(completion, menu)
 item(tt(AUTO_MENU) <D>)(
 Automatically use menu completion after the second consecutive request for
@@ -151,6 +164,7 @@ completion, for example by pressing the tab key repeatedly. This option
 is overridden by tt(MENU_COMPLETE).
 )
 pindex(AUTO_NAME_DIRS)
+pindex(AUTONAMEDIRS)
 cindex(directories, named)
 item(tt(AUTO_NAME_DIRS))(
 Any parameter that is set to the absolute name of a directory
@@ -161,6 +175,7 @@ is performed on a word starting with `tt(~)'.
 (Otherwise, the parameter must be used in the form `tt(~)var(param)' first.)
 )
 pindex(AUTO_PARAM_KEYS)
+pindex(AUTOPARAMKEYS)
 item(tt(AUTO_PARAM_KEYS) <D>)(
 If a parameter name was completed and a following character
 (normally a space) automatically
@@ -172,11 +187,13 @@ Completion in a brace expansion is affected similarly: the added character
 is a `tt(,)', which will be removed if `tt(})' is typed next.
 )
 pindex(AUTO_PARAM_SLASH)
+pindex(AUTOPARAMSLASH)
 item(tt(AUTO_PARAM_SLASH) <D>)(
 If a parameter is completed whose content is the name of a directory,
 then add a trailing slash instead of a space.
 )
 pindex(AUTO_REMOVE_SLASH)
+pindex(AUTOREMOVESLASH)
 cindex(slash, removing trailing)
 item(tt(AUTO_REMOVE_SLASH) <D>)(
 When the last character resulting from a completion is a slash and the next
@@ -184,6 +201,7 @@ character typed is a word delimiter, a slash, or a character that ends
 a command (such as a semicolon or an ampersand), remove the slash.
 )
 pindex(BASH_AUTO_LIST)
+pindex(BASHAUTOLIST)
 cindex(completion, listing choices, bash style)
 item(tt(BASH_AUTO_LIST))(
 On an ambiguous completion, automatically list choices when the
@@ -195,6 +213,7 @@ tt(MENU_COMPLETE), since repeated completion calls immediately cycle
 through the list in that case.
 )
 pindex(COMPLETE_ALIASES)
+pindex(COMPLETEALIASES)
 cindex(aliases, completion of)
 item(tt(COMPLETE_ALIASES))(
 Prevents aliases on the command line from being internally substituted
@@ -202,11 +221,13 @@ before completion is attempted.  The effect is to make the alias a
 distinct command for completion purposes.
 )
 pindex(COMPLETE_IN_WORD)
+pindex(COMPLETEINWORD)
 item(tt(COMPLETE_IN_WORD))(
 If unset, the cursor is set to the end of the word if completion is
 started. Otherwise it stays there and completion is done from both ends.
 )
 pindex(GLOB_COMPLETE)
+pindex(GLOBCOMPLETE)
 item(tt(GLOB_COMPLETE))(
 When the current word has a glob pattern, do not insert all the words
 resulting from the expansion but generate matches as for completion and
@@ -222,11 +243,13 @@ only applies when the current word contains a pattern; simply turning
 on the tt(GLOB_COMPLETE) option does not have this effect.
 )
 pindex(HASH_LIST_ALL)
+pindex(HASHLISTALL)
 item(tt(HASH_LIST_ALL) <D>)(
 Whenever a command completion is attempted, make sure the entire
 command path is hashed first.  This makes the first completion slower.
 )
 pindex(LIST_AMBIGUOUS)
+pindex(LISTAMBIGUOUS)
 cindex(ambiguous completion)
 cindex(completion, ambiguous)
 item(tt(LIST_AMBIGUOUS) <D>)(
@@ -238,6 +261,7 @@ inserted.  In the case of tt(BASH_AUTO_LIST), this means that the list
 will be delayed to the third call of the function.
 )
 pindex(LIST_BEEP)
+pindex(LISTBEEP)
 cindex(beep, ambiguous completion)
 cindex(completion, beep on ambiguous)
 item(tt(LIST_BEEP) <D>)(
@@ -247,12 +271,14 @@ causes the shell to beep if the option tt(BEEP) is also set; this may
 be modified if completion is called from a user-defined widget.
 )
 pindex(LIST_PACKED)
+pindex(LISTPACKED)
 cindex(completion, listing)
 item(tt(LIST_PACKED))(
 Try to make the completion list smaller (occupying less lines) by
 printing the matches in columns with different widths.
 )
 pindex(LIST_ROWS_FIRST)
+pindex(LISTROWSFIRST)
 cindex(completion, listing order)
 item(tt(LIST_ROWS_FIRST))(
 Lay out the matches in completion lists sorted horizontally, that is,
@@ -260,6 +286,7 @@ the second match is to the right of the first one, not under it as
 usual.
 )
 pindex(LIST_TYPES)
+pindex(LISTTYPES)
 cindex(marking file types)
 cindex(files, marking type of)
 item(tt(LIST_TYPES) (tt(-X)) <D>)(
@@ -267,6 +294,7 @@ When listing files that are possible completions, show the
 type of each file with a trailing identifying mark.
 )
 pindex(MENU_COMPLETE)
+pindex(MENUCOMPLETE)
 cindex(completion, menu)
 item(tt(MENU_COMPLETE) (tt(-Y)))(
 On an ambiguous completion, instead of listing possibilities or beeping,
@@ -277,6 +305,7 @@ tt(reverse-menu-complete) may be used to loop through the list
 in the other direction. This option overrides tt(AUTO_MENU).
 )
 pindex(REC_EXACT)
+pindex(RECEXACT)
 cindex(completion, exact matches)
 item(tt(REC_EXACT) (tt(-S)))(
 In completion, recognize exact matches even
@@ -287,6 +316,7 @@ enditem()
 subsect(Expansion and Globbing)
 startitem()
 pindex(BAD_PATTERN)
+pindex(BADPATTERN)
 cindex(globbing, bad pattern)
 cindex(filename generation, bad pattern)
 item(tt(BAD_PATTERN) (tt(PLUS()2)) <C> <Z>)(
@@ -294,6 +324,7 @@ If a pattern for filename generation is badly formed, print an error message.
 (If this option is unset, the pattern will be left unchanged.)
 )
 pindex(BARE_GLOB_QUAL)
+pindex(BAREGLOBQUAL)
 cindex(globbing qualifiers, enable)
 cindex(enable globbing qualifiers)
 item(tt(BARE_GLOB_QUAL) <Z>)(
@@ -302,6 +333,7 @@ list, if it contains no `tt(|)', `tt(LPAR())' or (if special) `tt(~)'
 characters.  See noderef(Filename Generation).
 )
 pindex(BRACE_CCL)
+pindex(BRACECCL)
 cindex(brace expansion, extending)
 cindex(expansion, brace, extending)
 item(tt(BRACE_CCL))(
@@ -310,6 +342,7 @@ expansion to a lexically ordered list of all the characters.  See
 noderef(Brace Expansion).
 )
 pindex(CASE_GLOB)
+pindex(CASEGLOB)
 cindex(case-insensitive globbing, option)
 item(tt(CASE_GLOB) <D>)(
 Make globbing (filename generation) sensitive to case.  Note that other
@@ -320,6 +353,7 @@ can match the directory tt(CVS) owing to the presence of the globbing flag
 (unless the option tt(BARE_GLOB_QUAL) is unset).
 )
 pindex(CASE_MATCH)
+pindex(CASEMATCH)
 cindex(case-insensitive regular expression matches, option)
 cindex(regular expressions, case-insensitive matching, option)
 item(tt(CASE_MATCH) <D>)(
@@ -327,6 +361,7 @@ Make regular expressions using the tt(zsh/regex) module (including
 matches with tt(=~)) sensitive to case.
 )
 pindex(CSH_NULL_GLOB)
+pindex(CSHNULLGLOB)
 cindex(csh, null globbing style)
 cindex(null globbing style, csh)
 cindex(globbing, null, style, csh)
@@ -344,6 +379,7 @@ Perform tt(=) filename expansion.
 (See noderef(Filename Expansion).)
 )
 pindex(EXTENDED_GLOB)
+pindex(EXTENDEDGLOB)
 cindex(globbing, extended)
 item(tt(EXTENDED_GLOB))(
 Treat the `tt(#)', `tt(~)' and `tt(^)' characters as part of patterns
@@ -358,6 +394,7 @@ Perform filename generation (globbing).
 (See noderef(Filename Generation).)
 )
 pindex(GLOB_ASSIGN)
+pindex(GLOBASSIGN)
 item(tt(GLOB_ASSIGN) <C>)(
 If this option is set, filename generation (globbing) is
 performed on the right hand side of scalar parameter assignments of
@@ -371,11 +408,13 @@ with this option set, it is not possible to predict whether the result
 will be an array or a scalar.
 )
 pindex(GLOB_DOTS)
+pindex(GLOBDOTS)
 cindex(globbing, of . files)
 item(tt(GLOB_DOTS) (tt(-4)))(
 Do not require a leading `tt(.)' in a filename to be matched explicitly.
 )
 pindex(GLOB_SUBST)
+pindex(GLOBSUBST)
 item(tt(GLOB_SUBST) <C> <K> <S>)(
 Treat any characters resulting from parameter expansion as being
 eligible for file expansion and filename generation, and any
@@ -384,6 +423,7 @@ filename generation.  Braces (and commas in between) do not become eligible
 for expansion.
 )
 pindex(HIST_SUBST_PATTERN)
+pindex(HISTSUBSTPATTERN)
 item(tt(HIST_SUBST_PATTERN))(
 Substitutions using the tt(:s) and tt(:&) history modifiers are performed
 with pattern matching instead of string matching.  This occurs wherever
@@ -393,6 +433,7 @@ ifzman(the section Modifiers in zmanref(zshexp))\
 ifnzman(noderef(Modifiers)).
 )
 pindex(IGNORE_BRACES)
+pindex(IGNOREBRACES)
 cindex(disabling brace expansion)
 cindex(brace expansion, disabling)
 cindex(expansion, brace, disabling)
@@ -400,12 +441,14 @@ item(tt(IGNORE_BRACES) (tt(-I)) <S>)(
 Do not perform brace expansion.
 )
 pindex(KSH_GLOB)
+pindex(KSHGLOB)
 item(tt(KSH_GLOB) <K>)(
 In pattern matching, the interpretation of parentheses is affected by
 a preceding `tt(@)', `tt(*)', `tt(+)', `tt(?)' or `tt(!)'.
 See noderef(Filename Generation).
 )
 pindex(MAGIC_EQUAL_SUBST)
+pindex(MAGICEQUALSUBST)
 item(tt(MAGIC_EQUAL_SUBST))(
 All unquoted arguments of the form `var(anything)tt(=)var(expression)'
 appearing after the command name have filename expansion (that is,
@@ -421,6 +464,7 @@ words, if both options are in effect, arguments looking like
 assignments will not undergo word splitting.
 )
 pindex(MARK_DIRS)
+pindex(MARKDIRS)
 cindex(directories, marking)
 cindex(marking directories)
 item(tt(MARK_DIRS) (tt(-8), ksh: tt(-X)))(
@@ -465,6 +509,7 @@ This also applies to file expansion
 of an initial `tt(~)' or `tt(=)'.
 )
 pindex(NULL_GLOB)
+pindex(NULLGLOB)
 cindex(globbing, no matches)
 item(tt(NULL_GLOB) (tt(-G)))(
 If a pattern for filename generation has no matches,
@@ -472,12 +517,14 @@ delete the pattern from the argument list instead
 of reporting an error.  Overrides tt(NOMATCH).
 )
 pindex(NUMERIC_GLOB_SORT)
+pindex(NUMERICGLOBSORT)
 cindex(globbing, sorting numerically)
 item(tt(NUMERIC_GLOB_SORT))(
 If numeric filenames are matched by a filename generation pattern,
 sort the filenames numerically rather than lexicographically.
 )
 pindex(RC_EXPAND_PARAM)
+pindex(RCEXPANDPARAM)
 cindex(rc, parameter expansion style)
 cindex(parameter expansion style, rc)
 item(tt(RC_EXPAND_PARAM) (tt(-P)))(
@@ -489,6 +536,7 @@ var(xx) is set to tt(LPAR())var(a b c)tt(RPAR()), are substituted with
 all arguments to be removed.
 )
 pindex(REMATCH_PCRE)
+pindex(REMATCHPCRE)
 cindex(regexp, PCRE)
 cindex(PCRE, regexp)
 item(tt(REMATCH_PCRE) <Z>)(
@@ -498,6 +546,7 @@ If not set, regular expressions will use the extended regexp syntax
 provided by the system libraries.
 )
 pindex(SH_GLOB)
+pindex(SHGLOB)
 cindex(sh, globbing style)
 cindex(globbing style, sh)
 item(tt(SH_GLOB) <K> <S>)(
@@ -515,6 +564,7 @@ Treat unset parameters as if they were empty when substituting.
 Otherwise they are treated as an error.
 )
 pindex(WARN_CREATE_GLOBAL)
+pindex(WARNCREATEGLOBAL)
 cindex(parameters, warning when created globally)
 item(tt(WARN_CREATE_GLOBAL))(
 Print a warning message when a global parameter is created in a function
@@ -529,6 +579,7 @@ enditem()
 subsect(History)
 startitem()
 pindex(APPEND_HISTORY)
+pindex(APPENDHISTORY)
 cindex(history, appending to a file)
 item(tt(APPEND_HISTORY) <D>)(
 If this is set, zsh sessions will append their history list to
@@ -540,6 +591,7 @@ number of lines grows 20% beyond the value specified by
 tt($SAVEHIST) (see also the HIST_SAVE_BY_COPY option).
 )
 pindex(BANG_HIST)
+pindex(BANGHIST)
 cindex(history, enable substitution)
 cindex(enable history substitution)
 item(tt(BANG_HIST) (tt(PLUS()K)) <C> <Z>)(
@@ -547,6 +599,7 @@ Perform textual history expansion, bf(csh)-style,
 treating the character `tt(!)' specially.
 )
 pindex(EXTENDED_HISTORY)
+pindex(EXTENDEDHISTORY)
 cindex(history, timestamping)
 item(tt(EXTENDED_HISTORY) <C>)(
 Save each command's beginning timestamp (in seconds since the epoch)
@@ -556,11 +609,13 @@ this prefixed data is:
 `tt(:)var(<beginning time>)tt(:)var(<elapsed seconds>)tt(:)var(<command>)'.
 )
 pindex(HIST_ALLOW_CLOBBER)
+pindex(HISTALLOWCLOBBER)
 item(tt(HIST_ALLOW_CLOBBER))(
 Add `tt(|)' to output redirections in the history.  This allows history
 references to clobber files even when tt(CLOBBER) is unset.
 )
 pindex(HIST_BEEP)
+pindex(HISTBEEP)
 cindex(history beeping)
 cindex(beep, history)
 item(tt(HIST_BEEP) <D>)(
@@ -568,6 +623,7 @@ Beep when an attempt is made to access a history entry which
 isn't there.
 )
 pindex(HIST_EXPIRE_DUPS_FIRST)
+pindex(HISTEXPIREDUPSFIRST)
 cindex(history, expiring duplicates)
 item(tt(HIST_EXPIRE_DUPS_FIRST))(
 If the internal history needs to be trimmed to add the current command line,
@@ -579,6 +635,7 @@ events, otherwise this option will behave just like
 tt(HIST_IGNORE_ALL_DUPS) once the history fills up with unique events.
 )
 pindex(HIST_FCNTL_LOCK)
+pindex(HISTFCNTLLOCK)
 item(tt(HIST_FCNTL_LOCK))(
 When writing out the history file, by default zsh uses ad-hoc file locking
 to avoid known problems with locking on some operating systems.  With this
@@ -588,6 +645,7 @@ provide better performance, in particular avoiding history corruption when
 files are stored on NFS.
 )
 pindex(HIST_FIND_NO_DUPS)
+pindex(HISTFINDNODUPS)
 cindex(history, ignoring duplicates in search)
 item(tt(HIST_FIND_NO_DUPS))(
 When searching for history entries in the line editor, do not display
@@ -595,6 +653,7 @@ duplicates of a line previously found, even if the duplicates are not
 contiguous.
 )
 pindex(HIST_IGNORE_ALL_DUPS)
+pindex(HISTIGNOREALLDUPS)
 cindex(history, ignoring all duplicates)
 item(tt(HIST_IGNORE_ALL_DUPS))(
 If a new command line being added to the history list duplicates an
@@ -602,12 +661,14 @@ older one, the older command is removed from the list (even if it is
 not the previous event).
 )
 pindex(HIST_IGNORE_DUPS)
+pindex(HISTIGNOREDUPS)
 cindex(history, ignoring duplicates)
 item(tt(HIST_IGNORE_DUPS) (tt(-h)))(
 Do not enter command lines into the history list
 if they are duplicates of the previous event.
 )
 pindex(HIST_IGNORE_SPACE)
+pindex(HISTIGNORESPACE)
 cindex(history, ignoring spaces)
 item(tt(HIST_IGNORE_SPACE) (tt(-g)))(
 Remove command lines from the history list when the first character on
@@ -619,6 +680,7 @@ or edit the line.  If you want to make it vanish right away without
 entering another command, type a space and press return.
 )
 pindex(HIST_NO_FUNCTIONS)
+pindex(HISTNOFUNCTIONS)
 item(tt(HIST_NO_FUNCTIONS))(
 Remove function definitions from the history list.
 Note that the function lingers in the internal history until the next
@@ -626,6 +688,7 @@ command is entered before it vanishes, allowing you to briefly reuse
 or edit the definition.
 )
 pindex(HIST_NO_STORE)
+pindex(HISTNOSTORE)
 item(tt(HIST_NO_STORE))(
 Remove the tt(history) (tt(fc -l)) command from the history list
 when invoked.
@@ -634,11 +697,13 @@ command is entered before it vanishes, allowing you to briefly reuse
 or edit the line.
 )
 pindex(HIST_REDUCE_BLANKS)
+pindex(HISTREDUCEBLANKS)
 item(tt(HIST_REDUCE_BLANKS))(
 Remove superfluous blanks from each command line
 being added to the history list.
 )
 pindex(HIST_SAVE_BY_COPY)
+pindex(HISTSAVEBYCOPY)
 item(tt(HIST_SAVE_BY_COPY) <D>)(
 When the history file is re-written, we normally write out a copy of
 the file named $HISTFILE.new and then rename it over the old one.
@@ -655,11 +720,13 @@ file's permissions and group information, but will refuse to write
 out a new file if it would change the history file's owner.
 )
 pindex(HIST_SAVE_NO_DUPS)
+pindex(HISTSAVENODUPS)
 item(tt(HIST_SAVE_NO_DUPS))(
 When writing out the history file, older commands that duplicate
 newer ones are omitted.
 )
 pindex(HIST_VERIFY)
+pindex(HISTVERIFY)
 cindex(history, verifying substitution)
 item(tt(HIST_VERIFY))(
 Whenever the user enters a line with history expansion,
@@ -667,6 +734,7 @@ don't execute the line directly; instead, perform
 history expansion and reload the line into the editing buffer.
 )
 pindex(INC_APPEND_HISTORY)
+pindex(INCAPPENDHISTORY)
 cindex(history, incremental appending to a file)
 item(tt(INC_APPEND_HISTORY))(
 This options works like tt(APPEND_HISTORY) except that new history lines
@@ -677,6 +745,7 @@ number of lines grows 20% beyond the value specified by
 tt($SAVEHIST) (see also the HIST_SAVE_BY_COPY option).
 )
 pindex(SHARE_HISTORY)
+pindex(SHAREHISTORY)
 cindex(share history)
 cindex(history, sharing)
 item(tt(SHARE_HISTORY) <K>)(
@@ -704,11 +773,13 @@ enditem()
 subsect(Initialisation)
 startitem()
 pindex(ALL_EXPORT)
+pindex(ALLEXPORT)
 cindex(export, automatic)
 item(tt(ALL_EXPORT) (tt(-a), ksh: tt(-a)))(
 All parameters subsequently defined are automatically exported.
 )
 pindex(GLOBAL_EXPORT)
+pindex(GLOBALEXPORT)
 cindex(environment, and local parameters)
 item(tt(GLOBAL_EXPORT) (tt(<Z>)))(
 If this option is set, passing the tt(-x) flag to the builtins tt(declare),
@@ -727,6 +798,7 @@ most portable way to achieve this behaviour.
 )
 cindex(exporting, and local parameters)
 pindex(GLOBAL_RCS)
+pindex(GLOBALRCS)
 cindex(startup files, global, inhibiting)
 cindex(files, global startup, inhibiting)
 item(tt(GLOBAL_RCS) (tt(-d)) <D>)(
@@ -775,6 +847,7 @@ directories in the path are not readable, this may falsely report spelling
 errors the first time some commands are used.
 )
 pindex(CORRECT_ALL)
+pindex(CORRECTALL)
 item(tt(CORRECT_ALL) (tt(-O)))(
 Try to correct the spelling of all arguments in a line.
 )
@@ -785,6 +858,7 @@ for examining spelling mistakes for the tt(CORRECT) and tt(CORRECT_ALL)
 options and the tt(spell-word) editor command.
 )
 pindex(FLOW_CONTROL)
+pindex(FLOWCONTROL)
 cindex(flow control)
 item(tt(FLOW_CONTROL) <D>)(
 If this option is unset,
@@ -792,6 +866,7 @@ output flow control via start/stop characters (usually assigned to
 ^S/^Q) is disabled in the shell's editor.
 )
 pindex(IGNORE_EOF)
+pindex(IGNOREEOF)
 cindex(EOF, ignoring)
 item(tt(IGNORE_EOF) (tt(-7)))(
 Do not exit on end-of-file.  Require the use
@@ -805,11 +880,13 @@ Control-D) without printing the normal warning message.  This works
 only for normal widgets, not for completion widgets.
 )
 pindex(INTERACTIVE_COMMENTS)
+pindex(INTERACTIVECOMMENTS)
 cindex(comments, in interactive shells)
 item(tt(INTERACTIVE_COMMENTS) (tt(-k)) <K> <S>)(
 Allow comments even in interactive shells.
 )
 pindex(HASH_CMDS)
+pindex(HASHCMDS)
 cindex(hashing, of commands)
 cindex(command hashing)
 item(tt(HASH_CMDS) <D>)(
@@ -822,6 +899,7 @@ the functions or aliases hash tables are hashed in order to avoid
 reporting them as spelling errors.
 )
 pindex(HASH_DIRS)
+pindex(HASHDIRS)
 cindex(hashing, of directories)
 cindex(directories, hashing)
 item(tt(HASH_DIRS) <D>)(
@@ -830,12 +908,14 @@ as well as all directories that occur earlier in the path.
 Has no effect if neither tt(HASH_CMDS) nor tt(CORRECT) is set.
 )
 pindex(MAIL_WARNING)
+pindex(MAILWARNING)
 cindex(mail, warning of reading)
 item(tt(MAIL_WARNING) (tt(-U)))(
 Print a warning message if a mail file has been
 accessed since the shell last checked.
 )
 pindex(PATH_DIRS)
+pindex(PATHDIRS)
 cindex(path search, extended)
 item(tt(PATH_DIRS) (tt(-Q)))(
 Perform a path search even on command names with slashes in them.
@@ -844,7 +924,7 @@ Thus if `tt(/usr/local/bin)' is in the user's path, and he or she types
 (assuming it exists).
 Commands explicitly beginning with `tt(/)', `tt(./)' or `tt(../)'
 are not subject to the path search.
-This also applies to the `tt(.)' builtin.
+This also applies to the tt(.) builtin.
 
 Note that subdirectories of the current directory are always searched for
 executables specified in this form.  This takes place before any search
@@ -852,6 +932,7 @@ indicated by this option, and regardless of whether `tt(.)' or the current
 directory appear in the command search path.
 )
 pindex(PRINT_EIGHT_BIT)
+pindex(PRINTEIGHTBIT)
 cindex(eight bit characters, printing)
 item(tt(PRINT_EIGHT_BIT))(
 Print eight bit characters literally in completion lists, etc.
@@ -859,11 +940,13 @@ This option is not necessary if your system correctly returns the
 printability of eight bit characters (see manref(ctype)(3)).
 )
 pindex(PRINT_EXIT_VALUE)
+pindex(PRINTEXITVALUE)
 cindex(exit status, printing)
 item(tt(PRINT_EXIT_VALUE) (tt(-1)))(
 Print the exit value of programs with non-zero exit status.
 )
 pindex(RC_QUOTES)
+pindex(RCQUOTES)
 cindex(rc, quoting style)
 cindex(quoting style, rc)
 item(tt(RC_QUOTES))(
@@ -873,12 +956,14 @@ using the format tt($')var(...)tt('), where a backslashed single quote can
 be used.
 )
 pindex(RM_STAR_SILENT)
+pindex(RMSTARSILENT)
 cindex(rm *, querying before)
 cindex(querying before rm *)
 item(tt(RM_STAR_SILENT) (tt(-H)) <K> <S>)(
 Do not query the user before executing `tt(rm *)' or `tt(rm path/*)'.
 )
 pindex(RM_STAR_WAIT)
+pindex(RMSTARWAIT)
 cindex(rm *, waiting before)
 cindex(waiting before rm *)
 item(tt(RM_STAR_WAIT))(
@@ -889,11 +974,13 @@ when one didn't really mean it.  The wait and query can always be
 avoided by expanding the `tt(*)' in ZLE (with tab).
 )
 pindex(SHORT_LOOPS)
+pindex(SHORTLOOPS)
 item(tt(SHORT_LOOPS) <C> <Z>)(
 Allow the short forms of tt(for), tt(repeat), tt(select),
 tt(if), and tt(function) constructs.
 )
 pindex(SUN_KEYBOARD_HACK)
+pindex(SUNKEYBOARDHACK)
 cindex(sun keyboard, annoying)
 cindex(annoying keyboard, sun)
 item(tt(SUN_KEYBOARD_HACK) (tt(-L)))(
@@ -907,6 +994,7 @@ enditem()
 subsect(Job Control)
 startitem()
 pindex(AUTO_CONTINUE)
+pindex(AUTOCONTINUE)
 cindex(jobs, continuing automatically)
 cindex(continuing jobs automatically)
 item(tt(AUTO_CONTINUE))(
@@ -915,6 +1003,7 @@ with the tt(disown) builtin command are automatically sent a tt(CONT)
 signal to make them running.
 )
 pindex(AUTO_RESUME)
+pindex(AUTORESUME)
 cindex(jobs, resuming automatically)
 cindex(resuming jobs automatically)
 item(tt(AUTO_RESUME) (tt(-W)))(
@@ -922,6 +1011,7 @@ Treat single word simple commands without redirection
 as candidates for resumption of an existing job.
 )
 pindex(BG_NICE)
+pindex(BGNICE)
 cindex(jobs, background priority)
 cindex(background jobs, priority of)
 cindex(priority of background jobs)
@@ -930,6 +1020,7 @@ Run all background jobs at a lower priority.  This option
 is set by default.
 )
 pindex(CHECK_JOBS)
+pindex(CHECKJOBS)
 cindex(exiting, checking jobs when)
 cindex(logging out, checking jobs when)
 item(tt(CHECK_JOBS) <Z>)(
@@ -953,6 +1044,7 @@ Send the tt(HUP) signal to running jobs when the
 shell exits.
 )
 pindex(LONG_LIST_JOBS)
+pindex(LONGLISTJOBS)
 cindex(jobs, list format)
 item(tt(LONG_LIST_JOBS) (tt(-R)))(
 List jobs in the long format by default.
@@ -974,6 +1066,7 @@ enditem()
 subsect(Prompting)
 startitem()
 pindex(PROMPT_BANG)
+pindex(PROMPTBANG)
 cindex(prompt, ! expansion)
 item(tt(PROMPT_BANG) <K>)(
 If set, `tt(!)' is treated specially in prompt expansion.
@@ -982,6 +1075,7 @@ ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
 ifnzman(noderef(Prompt Expansion)).
 )
 pindex(PROMPT_CR)
+pindex(PROMPTCR)
 cindex(prompt, with CR)
 item(tt(PROMPT_CR) (tt(PLUS()V)) <D>)(
 Print a carriage return just before printing
@@ -989,6 +1083,7 @@ a prompt in the line editor.  This is on by default as multi-line editing
 is only possible if the editor knows where the start of the line appears.
 )
 pindex(PROMPT_SP)
+pindex(PROMPTSP)
 cindex(prompt, save partial lines)
 item(tt(PROMPT_SP) <D>)(
 Attempt to preserve a partial line (i.e. a line that did not end with a
@@ -1005,6 +1100,7 @@ NOTE: if the PROMPT_CR option is not set, enabling this option will have no
 effect.  This option is on by default.
 )
 pindex(PROMPT_PERCENT)
+pindex(PROMPTPERCENT)
 cindex(prompt, % expansion)
 item(tt(PROMPT_PERCENT) <C> <Z>)(
 If set, `tt(%)' is treated specially in prompt expansion.
@@ -1013,6 +1109,7 @@ ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
 ifnzman(noderef(Prompt Expansion)).
 )
 pindex(PROMPT_SUBST)
+pindex(PROMPTSUBST)
 cindex(prompt, parameter expansion)
 item(tt(PROMPT_SUBST) <K> <S>)(
 If set, em(parameter expansion), em(command substitution) and
@@ -1020,6 +1117,7 @@ em(arithmetic expansion) are performed in prompts.  Substitutions
 within prompts do not affect the command status.
 )
 pindex(TRANSIENT_RPROMPT)
+pindex(TRANSIENTRPROMPT)
 item(tt(TRANSIENT_RPROMPT))(
 Remove any right prompt from display when accepting a command
 line.  This may be useful with terminals with other cut/paste methods.
@@ -1029,6 +1127,7 @@ enditem()
 subsect(Scripts and Functions)
 startitem()
 pindex(C_BASES)
+pindex(CBASES)
 cindex(bases, output in C format)
 cindex(hexadecimal, output in C format)
 cindex(octal, output in C format)
@@ -1042,6 +1141,7 @@ hexadecimal and octal.  Note that these formats will be understood on input
 irrespective of the setting of tt(C_BASES).
 )
 pindex(C_PRECEDENCES)
+pindex(CPRECEDENCES)
 cindex(precedence, operator)
 cindex(operator precedence)
 item(tt(C_PRECEDENCES))(
@@ -1060,6 +1160,7 @@ each command.  Setting this option mimics the behaviour of ksh 93; with
 the option unset the behaviour is that of ksh 88.
 )
 pindex(ERR_EXIT)
+pindex(ERREXIT)
 cindex(exit status, trapping)
 item(tt(ERR_EXIT) (tt(-e), ksh: tt(-e)))(
 If a command has a non-zero exit status, execute the tt(ZERR)
@@ -1074,6 +1175,7 @@ on exit, then the command for which the tt(DEBUG) trap is being executed is
 skipped.  The option is restored after the trap exits.
 )
 pindex(ERR_RETURN)
+pindex(ERRRETURN)
 cindex(function return, on error)
 cindex(return from function, on error)
 item(tt(ERR_RETURN))(
@@ -1084,6 +1186,7 @@ tt(exit).  This will trigger an exit at the outermost level of a
 non-interactive script.
 )
 pindex(EVAL_LINENO)
+pindex(EVALLINENO)
 cindex(line number, in evaluated expression)
 item(tt(EVAL_LINENO) <Z>)(
 If set, line numbers of expressions evaluated using the builtin tt(eval)
@@ -1105,12 +1208,14 @@ This option cannot be turned off in an interactive shell,
 except when `tt(-n)' is supplied to the shell at startup.
 )
 pindex(FUNCTION_ARGZERO)
+pindex(FUNCTIONARGZERO)
 cindex($0, setting)
 item(tt(FUNCTION_ARGZERO) <C> <Z>)(
 When executing a shell function or sourcing a script, set tt($0)
 temporarily to the name of the function/script.
 )
 pindex(LOCAL_OPTIONS)
+pindex(LOCALOPTIONS)
 item(tt(LOCAL_OPTIONS) <K>)(
 If this option is set at the point of return from a shell function,
 most options (including this one) which were in force upon entry to
@@ -1124,6 +1229,7 @@ with a formulation like `tt(emulate -L zsh)'; the tt(-L) activates
 tt(LOCAL_OPTIONS).
 )
 pindex(LOCAL_TRAPS)
+pindex(LOCALTRAPS)
 item(tt(LOCAL_TRAPS) <K>)(
 If this option is set when a signal trap is set inside a function, then the
 previous status of the trap for that signal will be restored when the
@@ -1140,6 +1246,7 @@ fn+LPAR()RPAR() { setopt localtraps; trap '' INT; sleep 3; })
 will restore normally handling of tt(SIGINT) after the function exits.
 )
 pindex(MULTI_FUNC_DEF)
+pindex(MULTIFUNCDEF)
 item(tt(MULTI_FUNC_DEF) <Z>)(
 Allow definitions of multiple functions at once in the form `tt(fn1
 fn2)var(...)tt(LPAR()RPAR())'; if the option is not set, this causes
@@ -1153,6 +1260,7 @@ Perform implicit bf(tee)s or bf(cat)s when multiple
 redirections are attempted (see noderef(Redirection)).
 )
 pindex(OCTAL_ZEROES)
+pindex(OCTALZEROES)
 cindex(octal, arithmetic expressions)
 item(tt(OCTAL_ZEROES) <S>)(
 Interpret any integer constant beginning with a 0 as octal, per IEEE Std
@@ -1165,6 +1273,7 @@ component in `tt(08#77)' are always interpreted as decimal, regardless
 of leading zeroes.
 )
 pindex(TYPESET_SILENT)
+pindex(TYPESETSILENT)
 item(tt(TYPESET_SILENT))(
 If this is unset, executing any of the `tt(typeset)' family of
 commands with no options and a list of parameters that have no values
@@ -1190,6 +1299,7 @@ enditem()
 subsect(Shell Emulation)
 startitem()
 pindex(BASH_REMATCH)
+pindex(BASHREMATCH)
 cindex(bash, BASH_REMATCH variable)
 cindex(regexp, bash BASH_REMATCH variable)
 item(tt(BASH_REMATCH))(
@@ -1204,6 +1314,7 @@ contains the entire matched text and the tt(match) array variable contains
 substrings.
 )
 pindex(BSD_ECHO)
+pindex(BSDECHO)
 cindex(echo, BSD compatible)
 item(tt(BSD_ECHO) <S>)(
 Make the tt(echo) builtin compatible with the BSD manref(echo)(1) command.
@@ -1211,6 +1322,7 @@ This disables backslashed escape sequences in echo strings unless the
 tt(-e) option is specified.
 )
 pindex(CSH_JUNKIE_HISTORY)
+pindex(CSHJUNKIEHISTORY)
 cindex(csh, history style)
 cindex(history style, csh)
 item(tt(CSH_JUNKIE_HISTORY) <C>)(
@@ -1220,6 +1332,7 @@ to the same event as the previous history reference, defaulting to the
 previous command.
 )
 pindex(CSH_JUNKIE_LOOPS)
+pindex(CSHJUNKIELOOPS)
 cindex(csh, loop style)
 cindex(loop style, csh)
 item(tt(CSH_JUNKIE_LOOPS) <C>)(
@@ -1227,6 +1340,7 @@ Allow loop bodies to take the form `var(list); tt(end)' instead of
 `tt(do) var(list); tt(done)'.
 )
 pindex(CSH_JUNKIE_QUOTES)
+pindex(CSHJUNKIEQUOTES)
 cindex(csh, quoting style)
 cindex(quoting style, csh)
 item(tt(CSH_JUNKIE_QUOTES) <C>)(
@@ -1238,6 +1352,7 @@ or `tt(")' (and `tt(\)' itself no longer needs escaping).
 Command substitutions are only expanded once, and cannot be nested.
 )
 pindex(CSH_NULLCMD)
+pindex(CSHNULLCMD)
 vindex(NULLCMD, ignoring)
 vindex(READNULLCMD, ignoring)
 cindex(redirections with no command, csh)
@@ -1248,6 +1363,7 @@ when running redirections with no command.  This make
 such redirections fail (see noderef(Redirection)).
 )
 pindex(KSH_ARRAYS)
+pindex(KSHARRAYS)
 cindex(arrays, ksh style)
 cindex(array style, ksh)
 cindex(ksh, array style)
@@ -1259,6 +1375,7 @@ and braces are required to delimit a subscript (`tt(${path[2]})' rather
 than just `tt($path[2])').
 )
 pindex(KSH_AUTOLOAD)
+pindex(KSHAUTOLOAD)
 item(tt(KSH_AUTOLOAD) <K> <S>)(
 Emulate bf(ksh) function autoloading.  This means that when a function is
 autoloaded, the corresponding file is merely executed, and must define
@@ -1268,6 +1385,7 @@ containing only a simple definition of the function - is always handled
 in the bf(ksh)-compatible manner.)
 )
 pindex(KSH_OPTION_PRINT)
+pindex(KSHOPTIONPRINT)
 cindex(option printing, ksh style)
 cindex(option printing style, ksh)
 cindex(ksh, option printing style)
@@ -1277,6 +1395,7 @@ set and unset options, all options are shown, marked `on' if
 they are in the non-default state, `off' otherwise.
 )
 pindex(KSH_TYPESET)
+pindex(KSHTYPESET)
 cindex(argument splitting, in typeset etc.)
 cindex(ksh, argument splitting in typeset)
 item(tt(KSH_TYPESET) <K>)(
@@ -1287,6 +1406,7 @@ word splitting after command and parameter expansion in arguments of an
 assignment; with it, word splitting does not take place in those cases.
 )
 pindex(KSH_ZERO_SUBSCRIPT)
+pindex(KSHZEROSUBSCRIPT)
 cindex(arrays, behaviour of index zero)
 item(tt(KSH_ZERO_SUBSCRIPT))(
 Treat use of a subscript of value zero in array or string expressions as a
@@ -1312,6 +1432,7 @@ This option is for compatibility with older versions of the shell and
 is not recommended in new code.
 )
 pindex(POSIX_BUILTINS)
+pindex(POSIXBUILTINS)
 item(tt(POSIX_BUILTINS) <K> <S>)(
 When this option is set the tt(command) builtin can be used to execute
 shell builtin commands.  Parameter assignments specified before shell
@@ -1338,6 +1459,7 @@ tt(trap) and
 tt(unset).
 )
 pindex(POSIX_IDENTIFIERS)
+pindex(POSIXIDENTIFIERS)
 cindex(identifiers, non-portable characters in)
 cindex(parameter names, non-portable characters in)
 item(tt(POSIX_IDENTIFIERS) <K> <S>)(
@@ -1359,6 +1481,7 @@ ignored; all octets with the top bit set may be used in identifiers.
 This is non-standard but is the traditional zsh behaviour.
 )
 pindex(SH_FILE_EXPANSION)
+pindex(SHFILEEXPANSION)
 cindex(sh, expansion style)
 cindex(expansion style, sh)
 item(tt(SH_FILE_EXPANSION) <K> <S>)(
@@ -1370,6 +1493,7 @@ brace expansion, so things like `tt(~$USERNAME)' and
 `tt(~{pfalstad,rc})' will work.
 )
 pindex(SH_NULLCMD)
+pindex(SHNULLCMD)
 vindex(NULLCMD, ignoring)
 vindex(READNULLCMD, ignoring)
 cindex(sh, redirections with no command)
@@ -1381,6 +1505,7 @@ Do not use the values of tt(NULLCMD) and tt(READNULLCMD)
 when doing redirections, use `tt(:)' instead (see noderef(Redirection)).
 )
 pindex(SH_OPTION_LETTERS)
+pindex(SHOPTIONLETTERS)
 cindex(sh, single letter options style)
 cindex(ksh, single letter options style)
 cindex(single letter options, ksh style)
@@ -1391,6 +1516,7 @@ If this option is set the shell tries to interpret single letter options
 This also affects the value of the tt(-) special parameter.
 )
 pindex(SH_WORD_SPLIT)
+pindex(SHWORDSPLIT)
 cindex(field splitting, sh style)
 cindex(sh, field splitting style)
 item(tt(SH_WORD_SPLIT) (tt(-y)) <K> <S>)(
@@ -1399,6 +1525,7 @@ Note that this option has nothing to do with word splitting.
 (See noderef(Parameter Expansion).)
 )
 pindex(TRAPS_ASYNC)
+pindex(TRAPSASYNC)
 cindex(traps, asynchronous)
 item(tt(TRAPS_ASYNC))(
 While waiting for a program to exit, handle signals and run traps
@@ -1450,6 +1577,7 @@ globally regardless of the tt(LOCAL_OPTIONS) option.  See
 noderef(Restricted Shell).
 )
 pindex(SHIN_STDIN)
+pindex(SHINSTDIN)
 item(tt(SHIN_STDIN) (tt(-s), ksh: tt(-s)))(
 Commands are being read from the standard input.
 Commands are read from standard input if no command is specified with
@@ -1466,6 +1594,7 @@ The value of this option cannot be changed anywhere other
 than the command line.
 )
 pindex(SINGLE_COMMAND)
+pindex(SINGLECOMMAND)
 cindex(single command)
 pindex(INTERACTIVE, use of)
 item(tt(SINGLE_COMMAND) (tt(-t), ksh: tt(-t)))(
@@ -1485,6 +1614,7 @@ item(tt(BEEP) (tt(PLUS()B)) <D>)(
 Beep on error in ZLE.
 )
 pindex(COMBINING_CHARS)
+pindex(COMBININGCHARS)
 cindex(characters, (Unicode) combining)
 cindex(combining characters (Unicode))
 cindex(Unicode combining characters)
@@ -1517,6 +1647,7 @@ item(tt(OVERSTRIKE))(
 Start up the line editor in overstrike mode.
 )
 pindex(SINGLE_LINE_ZLE)
+pindex(SINGLELINEZLE)
 cindex(editor, single line mode)
 item(tt(SINGLE_LINE_ZLE) (tt(-M)) <K>)(
 Use single-line command line editing instead of multi-line.
@@ -1553,26 +1684,31 @@ options to the shell.
 
 startitem()
 pindex(BRACE_EXPAND)
+pindex(BRACEEXPAND)
 item(tt(BRACE_EXPAND))(
 em(NO_)tt(IGNORE_BRACES)
 (ksh and bash compatibility)
 )
 pindex(DOT_GLOB)
+pindex(DOTGLOB)
 item(tt(DOT_GLOB))(
 tt(GLOB_DOTS)
 (bash compatibility)
 )
 pindex(HASH_ALL)
+pindex(HASHALL)
 item(tt(HASH_ALL))(
 tt(HASH_CMDS)
 (bash compatibility)
 )
 pindex(HIST_APPEND)
+pindex(HISTAPPEND)
 item(tt(HIST_APPEND))(
 tt(APPEND_HISTORY)
 (bash compatibility)
 )
 pindex(HIST_EXPAND)
+pindex(HISTEXPAND)
 item(tt(HIST_EXPAND))(
 tt(BANG_HIST)
 (bash compatibility)
@@ -1583,11 +1719,13 @@ em(NO_)tt(HIST_NO_FUNCTIONS)
 (ksh compatibility)
 )
 pindex(MAIL_WARN)
+pindex(MAILWARN)
 item(tt(MAIL_WARN))(
 tt(MAIL_WARNING)
 (bash compatibility)
 )
 pindex(ONE_CMD)
+pindex(ONECMD)
 item(tt(ONE_CMD))(
 tt(SINGLE_COMMAND)
 (bash compatibility)
@@ -1598,6 +1736,7 @@ tt(CHASE_LINKS)
 (ksh and bash compatibility)
 )
 pindex(PROMPT_VARS)
+pindex(PROMPTVARS)
 item(tt(PROMPT_VARS))(
 tt(PROMPT_SUBST)
 (bash compatibility)
@@ -1608,6 +1747,7 @@ tt(SHIN_STDIN)
 (ksh compatibility)
 )
 pindex(TRACK_ALL)
+pindex(TRACKALL)
 item(tt(TRACK_ALL))(
 tt(HASH_CMDS)
 (ksh compatibility)
