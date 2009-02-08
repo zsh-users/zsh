@@ -1,3 +1,9 @@
+2009-02-08  Andrey Borzenkov <bor@zsh.org>
+
+	* 26530: Doc/Zsh/builtins.yo: clarify that "emulate -c"
+	restores all options on return, not only those related
+	to emulation
+
 2009-02-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Allan Caffee <allan.caffee@gmail.com>: 26532: index option
@@ -11103,5 +11109,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4553 $                         
+* $Revision: 1.4554 $                         
 *****************************************************

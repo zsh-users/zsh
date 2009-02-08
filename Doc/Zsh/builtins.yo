@@ -357,7 +357,8 @@ noderef(Compatibility)
 .
 
 If tt(-c) tt(arg) is given, evaluate tt(arg) after temporary setting
-requested emulation. Emulation will be restored before tt(emulate) returns.
+requested emulation. Emulation and all options will be restored to their
+original values before tt(emulate) returns.
 
 If the tt(-R) option is given, all options
 are reset to their default value corresponding to the specified emulation
