@@ -1,5 +1,8 @@
 2009-02-09  Peter Stephenson  <pws@csr.com>
 
+	* Greg Klanderman: 26538: Completion/Base/Widget/_read_comp:
+	needs "nounset" option.
+
 	* Richard Hartmann: 26536: Doc/Zsh/options.yo: add index entries
 	for options that appear with "NO" in front.
 
@@ -11116,5 +11119,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4555 $                         
+* $Revision: 1.4556 $                         
 *****************************************************
