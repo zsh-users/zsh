@@ -1,3 +1,10 @@
+2009-02-09  Peter Stephenson  <pws@csr.com>
+
+	* Richard Hartmann: 26536: Doc/Zsh/options.yo: add index entries
+	for options that appear with "NO" in front.
+
+	* Richard Hartmann: 26535: Doc/Zsh/options.yo: remove typo.
+
 2009-02-08  Andrey Borzenkov <bor@zsh.org>
 
 	* 26530: Doc/Zsh/builtins.yo: clarify that "emulate -c"
@@ -11109,5 +11116,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4554 $                         
+* $Revision: 1.4555 $                         
 *****************************************************
