@@ -1,3 +1,8 @@
+2009-02-10  Clint Adams  <clint@zsh.org>
+
+	* 26544: Completion/Unix/Command/_lp: complete pdf files
+	as well as ps.
+
 2009-02-09  Peter Stephenson  <pws@csr.com>
 
 	* Greg Klanderman: 26538: Completion/Base/Widget/_read_comp:
@@ -11119,5 +11124,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4556 $                         
+* $Revision: 1.4557 $                         
 *****************************************************

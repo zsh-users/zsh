@@ -47,6 +47,6 @@ else
     fi
     return 1
   else
-    _ps
+    _pspdf
   fi
 fi
