@@ -1,0 +1,74 @@
+# Test the "emulate" builtin and related functions.
+
+%prep
+
+  isset() { 
+    if [[ -o $1 ]]; then print yes; else print no; fi
+  }
+  showopts() {
+      # Set for Bourne shell emulation
+      isset shwordsplit
+      # Set in native mode and unless "emulate -R" is in use
+      isset banghist
+  }
+
+%test
+
+  (showopts
+  fn() {
+     emulate sh
+  }
+  fn
+  showopts)
+0:Basic use of emulate
+>no
+>yes
+>yes
+>yes
+
+  fn() {
+    emulate -L sh
+    showopts
+  }
+  showopts
+  fn
+  showopts
+0:Use of emulate -L
+>no
+>yes
+>yes
+>yes
+>no
+>yes
+
+  (showopts
+  emulate -R sh
+  showopts)
+0:Use of emulate -R
+>no
+>yes
+>yes
+>no
+
+  showopts
+  emulate sh -c 'showopts'
+  showopts
+0:Use of emulate -c
+>no
+>yes
+>yes
+>yes
+>no
+>yes
+
+
+  showopts
+  emulate -R sh -c 'showopts'
+  showopts
+0:Use of emulate -R -c
+>no
+>yes
+>yes
+>no
+>no
+>yes
