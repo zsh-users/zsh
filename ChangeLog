@@ -1,5 +1,20 @@
 2009-02-11  Peter Stephenson  <pws@csr.com>
 
+	* Frank Terbeck: 26549: Doc/Zsh/contrib.yo,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_bzr,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_cdv,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_cvs,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_darcs,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_mtn,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_p4,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_svk,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_svn,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_tla,
+	Functions/VCS_Info/VCS_INFO_formats: improvements to VCS_Info:
+	check for changes in git.
+
 	* Richard Hartmann: 26547: Doc/Zsh/options.yo: further extension
 	to option indexing:  NOoptions without underscore.
 
@@ -11133,5 +11148,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4559 $                         
+* $Revision: 1.4560 $                         
 *****************************************************

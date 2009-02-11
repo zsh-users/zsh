@@ -516,6 +516,27 @@ Say, tt(~/.zsh) is a directory under version control, in which you do
 not want var(vcs_info) to be active, do:
 example(zstyle ':vcs_info:*' disable-patterns "$HOME/.zsh+LPAR()|/*+RPAR()")
 )
+kindex(check-for-changes)
+item(tt(check-for-changes))(
+If enabled, this style (currently only used by the tt(git) backend) causes the
+tt(%c) and tt(%u) format escapes to be filled with information. The strings
+filled into these escapes can be controlled via the var(stagedstr) and
+var(unstagedstr) styles.
+
+Note, that the actions taken if this style is enabled are potentially expensive
+(read: they take time, depending on how big the current repository is).
+Therefore, it is disabled by default.
+)
+kindex(stagedstr)
+item(tt(stagedstr))(
+This string will be used in the tt(%c) escape if there are staged changes in
+the repository.
+)
+kindex(unstagedstr)
+item(tt(unstagedstr))(
+This string will be used in the tt(%u) escape if there are unstaged changes in
+the repository.
+)
 kindex(command)
 item(tt(command))(
 This style causes var(vcs_info) to use the supplied string as the command
@@ -576,7 +597,12 @@ sitem(tt(nvcsformats))("")
 sitem(tt(max-exports))(2)
 sitem(tt(enable))(ALL)
 sitem(tt(disable))((empty list))
+sitem(tt(disable-patterns))((empty list))
+sitem(tt(check-for-changes))(false)
+sitem(tt(stagedstr))((string: "S"))
+sitem(tt(unstagedstr))((string: "U"))
 sitem(tt(command))((empty string))
+sitem(tt(use-server))(false)
 sitem(tt(use-simple))(false)
 sitem(tt(use-prompt-escapes))(true)
 endsitem()
@@ -589,6 +615,10 @@ sitem(tt(%s))(The vcs in use (git, hg, svn etc.))
 sitem(tt(%b))(Information about the current branch.)
 sitem(tt(%a))(An identifier, that describes the action. Only makes sense in
 actionformats.)
+sitem(tt(%c))(The string from the var(stagedstr) style if there are staged
+changes in the repository.)
+sitem(tt(%u))(The string from the var(unstagedstr) style if there are unstaged
+changes in the repository.)
 sitem(tt(%R))(base directory of the repository.)
 sitem(tt(%r))(repository name. If tt(%R) is var(/foo/bar/repoXY), tt(%r) is
 var(repoXY).)

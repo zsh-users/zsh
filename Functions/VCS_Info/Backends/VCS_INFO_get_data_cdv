@@ -7,5 +7,5 @@ local cdvbase
 
 cdvbase=${vcs_comm[basedir]}
 rrn=${cdvbase:t}
-VCS_INFO_formats '' "${cdvbase:t}" "${cdvbase}"
+VCS_INFO_formats '' "${cdvbase:t}" "${cdvbase}" '' ''
 return 0

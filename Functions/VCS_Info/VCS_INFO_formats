@@ -3,7 +3,7 @@
 ## Distributed under the same BSD-ish license as zsh itself.
 
 setopt localoptions noksharrays NO_shwordsplit
-local action=$1 branch=$2 base=$3
+local action=$1 branch=$2 base=$3 staged=$4 unstaged=$5
 local msg
 local -i i j
 
@@ -15,9 +15,27 @@ else
     (( ${#msgs} < 1 )) && msgs[1]=' (%s)-[%b]-'
 fi
 
+if [[ -n ${staged} ]] ; then
+    zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" stagedstr staged
+    [[ -z ${staged} ]] && staged='S'
+fi
+
+if [[ -n ${unstaged} ]] ; then
+    zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" unstagedstr unstaged
+    [[ -z ${unstaged} ]] && unstaged='U'
+fi
+
 (( ${#msgs} > maxexports )) && msgs[$(( maxexports + 1 )),-1]=()
 for i in {1..${#msgs}} ; do
-    zformat -f msg ${msgs[$i]} a:${action} b:${branch} s:${vcs} r:${base:t} R:${base} S:"$(VCS_INFO_reposub ${base})"
+    zformat -f msg ${msgs[$i]}                      \
+                    a:${action}                     \
+                    b:${branch}                     \
+                    c:${staged}                     \
+                    r:${base:t}                     \
+                    s:${vcs}                        \
+                    u:${unstaged}                   \
+                    R:${base}                       \
+                    S:"$(VCS_INFO_reposub ${base})"
     msgs[$i]=${msg}
 done
 return 0

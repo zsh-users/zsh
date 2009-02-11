@@ -8,5 +8,5 @@ local hgbranch hgbase
 hgbase=${vcs_comm[basedir]}
 rrn=${hgbase:t}
 hgbranch=$(< ${hgbase}/.hg/branch)
-VCS_INFO_formats '' "${hgbranch}" "${hgbase}"
+VCS_INFO_formats '' "${hgbranch}" "${hgbase}" '' ''
 return 0

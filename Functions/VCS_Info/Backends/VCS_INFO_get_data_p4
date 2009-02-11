@@ -21,4 +21,4 @@ p4branch="%b:%r"
 zformat -f p4branch "${p4branch}" "b:${p4info[Client_name]}" \
 "r:$change"
 
-VCS_INFO_formats '' "${p4branch}" "${p4base}"
+VCS_INFO_formats '' "${p4branch}" "${p4base}" '' ''
