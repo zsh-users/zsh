@@ -444,6 +444,7 @@ Overrides tt(NOMATCH).
 )
 pindex(EQUALS)
 pindex(NO_EQUALS)
+pindex(NOEQUALS)
 cindex(filename expansion, =)
 item(tt(EQUALS) <Z>)(
 Perform tt(=) filename expansion.
@@ -461,6 +462,7 @@ always produces named directory expansion.)
 )
 pindex(GLOB)
 pindex(NO_GLOB)
+pindex(NOGLOB)
 cindex(globbing, enabling)
 cindex(enabling globbing)
 item(tt(GLOB) (tt(PLUS()F), ksh: tt(PLUS()f)) <D>)(
@@ -563,6 +565,7 @@ names resulting from filename generation (globbing).
 )
 pindex(MULTIBYTE)
 pindex(NO_MULTIBYTE)
+pindex(NOMULTIBYTE)
 cindex(characters, multibyte, in expansion and globbing)
 cindex(multibyte characters, in expansion and globbing)
 item(tt(MULTIBYTE) <C> <K> <Z>)(
@@ -592,6 +595,7 @@ shell settings.
 )
 pindex(NOMATCH)
 pindex(NO_NOMATCH)
+pindex(NONOMATCH)
 cindex(globbing, no matches)
 item(tt(NOMATCH) (tt(PLUS()3)) <C> <Z>)(
 If a pattern for filename generation has no matches,
@@ -660,6 +664,7 @@ invoked as tt(sh) or tt(ksh).
 )
 pindex(UNSET)
 pindex(NO_UNSET)
+pindex(NOUNSET)
 cindex(parameters, substituting unset)
 cindex(unset parameters, substituting)
 item(tt(UNSET) (tt(PLUS()u), ksh: tt(PLUS()u)) <K> <S> <Z>)(
@@ -958,6 +963,7 @@ files (tt(.zshrc), etc.).
 )
 pindex(RCS)
 pindex(NO_RCS)
+pindex(NORCS)
 cindex(startup files, sourcing)
 item(tt(RCS) (tt(PLUS()f)) <D>)(
 After tt(zshenv()) is sourced on startup, source the
@@ -975,12 +981,14 @@ subsect(Input/Output)
 startitem()
 pindex(ALIASES)
 pindex(NO_ALIASES)
+pindex(NOALIASES)
 cindex(aliases, expansion)
 item(tt(ALIASES) <D>)(
 Expand aliases.
 )
 pindex(CLOBBER)
 pindex(NO_CLOBBER)
+pindex(NOCLOBBER)
 cindex(clobbering, of files)
 cindex(file clobbering, allowing)
 item(tt(CLOBBER) (tt(PLUS()C), ksh: tt(PLUS()C)) <D>)(
@@ -991,6 +999,7 @@ and `tt(>>!)' or `tt(>>|)' to create a file.
 )
 pindex(CORRECT)
 pindex(NO_CORRECT)
+pindex(NOCORRECT)
 cindex(correction, spelling)
 cindex(spelling correction)
 item(tt(CORRECT) (tt(-0)))(
@@ -1008,6 +1017,7 @@ Try to correct the spelling of all arguments in a line.
 )
 pindex(DVORAK)
 pindex(NO_DVORAK)
+pindex(NODVORAK)
 item(tt(DVORAK))(
 Use the Dvorak keyboard instead of the standard qwerty keyboard as a basis
 for examining spelling mistakes for the tt(CORRECT) and tt(CORRECT_ALL)
@@ -1231,6 +1241,7 @@ is not counted for this purpose.
 )
 pindex(HUP)
 pindex(NO_HUP)
+pindex(NOHUP)
 cindex(jobs, HUP)
 item(tt(HUP) <Z>)(
 Send the tt(HUP) signal to running jobs when the
@@ -1246,12 +1257,14 @@ List jobs in the long format by default.
 )
 pindex(MONITOR)
 pindex(NO_MONITOR)
+pindex(NOMONITOR)
 cindex(job control, allowing)
 item(tt(MONITOR) (tt(-m), ksh: tt(-m)))(
 Allow job control.  Set by default in interactive shells.
 )
 pindex(NOTIFY)
 pindex(NO_NOTIFY)
+pindex(NONOTIFY)
 cindex(background jobs, notification)
 cindex(notification of background jobs)
 item(tt(NOTIFY) (tt(-5), ksh: tt(-b)) <Z>)(
@@ -1423,6 +1436,7 @@ function is retained during the evaluation.
 )
 pindex(EXEC)
 pindex(NO_EXEC)
+pindex(NOEXEC)
 cindex(command execution, enabling)
 item(tt(EXEC) (tt(PLUS()n), ksh: tt(PLUS()n)) <D>)(
 Do execute commands.  Without this option, commands are
@@ -1487,6 +1501,7 @@ used and can cause obscure errors.
 )
 pindex(MULTIOS)
 pindex(NO_MULTIOS)
+pindex(NOMULTIOS)
 item(tt(MULTIOS) <Z>)(
 Perform implicit bf(tee)s or bf(cat)s when multiple
 redirections are attempted (see noderef(Redirection)).
@@ -1520,6 +1535,7 @@ the option is set.
 )
 pindex(VERBOSE)
 pindex(NO_VERBOSE)
+pindex(NOVERBOSE)
 cindex(tracing, of input lines)
 cindex(input, tracing)
 item(tt(VERBOSE) (tt(-v), ksh: tt(-v)))(
@@ -1527,6 +1543,7 @@ Print shell input lines as they are read.
 )
 pindex(XTRACE)
 pindex(NO_XTRACE)
+pindex(NOXTRACE)
 cindex(tracing, of commands)
 cindex(commands, tracing)
 item(tt(XTRACE) (tt(-x), ksh: tt(-x)))(
@@ -1813,6 +1830,7 @@ subsect(Shell State)
 startitem()
 pindex(INTERACTIVE)
 pindex(NO_INTERACTIVE)
+pindex(NOINTERACTIVE)
 item(tt(INTERACTIVE) (tt(-i), ksh: tt(-i)))(
 This is an interactive shell.  This option is set upon initialisation if
 the standard input is a tty and commands are being read from standard input.
@@ -1823,6 +1841,7 @@ The value of this option cannot be changed anywhere other than the command line.
 )
 pindex(LOGIN)
 pindex(NO_LOGIN)
+pindex(NOLOGIN)
 item(tt(LOGIN) (tt(-l), ksh: tt(-l)))(
 This is a login shell.
 If this option is not explicitly set, the shell is a login shell if
@@ -1830,6 +1849,7 @@ the first character of the tt(argv[0]) passed to the shell is a `tt(-)'.
 )
 pindex(PRIVILEGED)
 pindex(NO_PRIVILEGED)
+pindex(NOPRIVILEGED)
 cindex(privileged mode)
 cindex(mode, privileged)
 item(tt(PRIVILEGED) (tt(-p), ksh: tt(-p)))(
@@ -1847,6 +1867,7 @@ option.
 )
 pindex(RESTRICTED)
 pindex(NO_RESTRICTED)
+pindex(NORESTRICTED)
 cindex(restricted shell)
 item(tt(RESTRICTED) (tt(-r)))(
 Enables restricted mode.  This option cannot be changed using
@@ -1879,7 +1900,6 @@ pindex(SINGLECOMMAND)
 pindex(NOSINGLECOMMAND)
 cindex(single command)
 pindex(INTERACTIVE, use of)
-pindex(NO_INTERACTIVE, use of)
 item(tt(SINGLE_COMMAND) (tt(-t), ksh: tt(-t)))(
 If the shell is reading from standard input, it exits after a single command
 has been executed.  This also makes the shell non-interactive, unless the
@@ -1892,6 +1912,7 @@ subsect(Zle)
 startitem()
 pindex(BEEP)
 pindex(NO_BEEP)
+pindex(NOBEEP)
 cindex(beep, enabling)
 cindex(enabling the beep)
 item(tt(BEEP) (tt(PLUS()B)) <D>)(
@@ -1920,6 +1941,7 @@ Otherwise the base shell does not handle combining characters specially.
 )
 pindex(EMACS)
 pindex(NO_EMACS)
+pindex(NOEMACS)
 item(tt(EMACS))(
 If ZLE is loaded, turning on this option has the equivalent effect
 of `tt(bindkey -e)'.  In addition, the VI option is unset.
@@ -1929,6 +1951,7 @@ provided for compatibility; tt(bindkey) is the recommended interface.
 )
 pindex(OVERSTRIKE)
 pindex(NO_OVERSTRIKE)
+pindex(NOOVERSTRIKE)
 cindex(editor, overstrike mode)
 cindex(overstrike mode, of editor)
 item(tt(OVERSTRIKE))(
@@ -1950,6 +1973,7 @@ when using ksh emulation interactively.
 )
 pindex(VI)
 pindex(NO_VI)
+pindex(NOVI)
 item(tt(VI))(
 If ZLE is loaded, turning on this option has the equivalent effect
 of `tt(bindkey -v)'.  In addition, the EMACS option is unset.
@@ -1959,6 +1983,7 @@ provided for compatibility; tt(bindkey) is the recommended interface.
 )
 pindex(ZLE)
 pindex(NO_ZLE)
+pindex(NOZLE)
 cindex(editor, enabling)
 cindex(enabling the editor)
 item(tt(ZLE) (tt(-Z)))(
@@ -2017,6 +2042,7 @@ tt(BANG_HIST)
 )
 pindex(LOG)
 pindex(NO_LOG)
+pindex(NOLOG)
 item(tt(LOG))(
 em(NO_)tt(HIST_NO_FUNCTIONS)
 (ksh compatibility)
@@ -2039,6 +2065,7 @@ tt(SINGLE_COMMAND)
 )
 pindex(PHYSICAL)
 pindex(NO_PHYSICAL)
+pindex(NOPHYSICAL)
 item(tt(PHYSICAL))(
 tt(CHASE_LINKS)
 (ksh and bash compatibility)
@@ -2053,6 +2080,7 @@ tt(PROMPT_SUBST)
 )
 pindex(STDIN)
 pindex(NO_STDIN)
+pindex(NOSTDIN)
 item(tt(STDIN))(
 tt(SHIN_STDIN)
 (ksh compatibility)

@@ -1,3 +1,8 @@
+2009-02-11  Peter Stephenson  <pws@csr.com>
+
+	* Richard Hartmann: 26547: Doc/Zsh/options.yo: further extension
+	to option indexing:  NOoptions without underscore.
+
 2009-02-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 26545: Test/B07emulate.ztst: new test.
@@ -11128,5 +11133,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4558 $                         
+* $Revision: 1.4559 $                         
 *****************************************************
