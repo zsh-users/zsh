@@ -1,5 +1,11 @@
 2009-02-11  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Functions/Calendar/age: accidentally committed a
+	currently undocumented change that allows an age spec beginning
+	with a colon to be followed by a file name whose modification time
+	will be used as the date/time.  Probably needs improving but
+	not actually harmful since the syntax wasn't valid before.
+
 	* Richard Hartmann: 26550: Doc/Zsh/options.yo: make
 	it clear that various options can't be changed within the shell.
 
@@ -11151,5 +11157,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4561 $                         
+* $Revision: 1.4562 $                         
 *****************************************************
