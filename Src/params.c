@@ -642,7 +642,7 @@ createparamtable(void)
     /* Add the special parameters to the hash table */
     for (ip = special_params; ip->node.nam; ip++)
 	paramtab->addnode(paramtab, ztrdup(ip->node.nam), ip);
-    if (emulation != EMULATE_SH && emulation != EMULATE_KSH)
+    if (!EMULATION(EMULATE_SH|EMULATE_KSH))
 	while ((++ip)->node.nam)
 	    paramtab->addnode(paramtab, ztrdup(ip->node.nam), ip);
 
@@ -720,7 +720,7 @@ createparamtable(void)
 #endif
     opts[ALLEXPORT] = oae;
 
-    if (emulation == EMULATE_ZSH)
+    if (EMULATION(EMULATE_ZSH))
     {
 	/*
 	 * For native emulation we always set the variable home
@@ -1881,7 +1881,7 @@ getstrvalue(Value v)
     switch(PM_TYPE(v->pm->node.flags)) {
     case PM_HASHED:
 	/* (!v->isarr) should be impossible unless emulating ksh */
-	if (!v->isarr && emulation == EMULATE_KSH) {
+	if (!v->isarr && EMULATION(EMULATE_KSH)) {
 	    s = dupstring("[0]");
 	    if (getindex(&s, v, 0) == 0)
 		s = getstrvalue(v);
@@ -2164,7 +2164,7 @@ export_param(Param pm)
 
     if (PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)) {
 #if 0	/* Requires changes elsewhere in params.c and builtin.c */
-	if (emulation == EMULATE_KSH /* isset(KSHARRAYS) */) {
+	if (EMULATION(EMULATE_KSH) /* isset(KSHARRAYS) */) {
 	    struct value v;
 	    v.isarr = 1;
 	    v.flags = 0;

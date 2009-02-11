@@ -356,10 +356,6 @@ noderef(Compatibility)
 )\
 .
 
-If tt(-c) tt(arg) is given, evaluate tt(arg) after temporary setting
-requested emulation. Emulation and all options will be restored to their
-original values before tt(emulate) returns.
-
 If the tt(-R) option is given, all options
 are reset to their default value corresponding to the specified emulation
 mode, except for certain options describing the interactive
@@ -370,6 +366,62 @@ well, causing the effects of the tt(emulate) command and any tt(setopt) and
 tt(trap) commands to be local to the immediately surrounding shell
 function, if any; normally these options are turned off in all emulation
 modes except tt(ksh). The tt(-L) and tt(-c) are mutually exclusive.
+
+If tt(-c) tt(arg) is given, evaluate tt(arg) while the requested
+emulation is temporarily in effect.  The emulation and all options will
+be restored to their original values before tt(emulate) returns.  The
+tt(-R) flag may be used.
+
+Use of tt(-c) enables `sticky' emulation mode for functions defined
+within the evaluated expression:  the emulation mode is associated
+thereafter with the function so that whenever the function is executed
+the emulation (respecting the tt(-R) flag, if present) and all
+options are set before entry to the function, and restored after exit.
+If the function is called when the sticky emulation is already in
+effect, either within an `tt(emulate) var(shell) tt(-c)' expression or
+within another function with the same sticky emulation, entry and exit
+from the function do not cause options to be altered (except due to
+standard processing such as the tt(LOCAL_OPTIONS) option).
+
+For example:
+
+example(emulate sh -c 'fni+LPAR()RPAR() { setopt cshnullglob; }
+fno+LPAR()RPAR() { fni; }'
+fno
+)
+
+The two functions tt(fni) and tt(fno) are defined with sticky tt(sh)
+emulation.  tt(fno) is then executed, causing options associated
+with emulations to be set to their values in tt(sh).  tt(fni) then
+calls tt(fno); because tt(fno) is also marked for sticky tt(sh)
+emulation, no option changes take place on entry to or exit from it.
+Hence the option tt(cshnullglob), turned off by tt(sh) emulation, will
+be turned on within tt(fni) and remain on on return to tt(fno).  On exit
+from tt(fno), the emulation mode and all options will be restored to the
+state they were in before entry to the temporary emulation.
+
+The documentation above is typically sufficient for the intended
+purpose of executing code designed for other shells in a suitable
+environment.  More detailed rules follow.
+startsitem()
+sitem(1.)(The sticky emulation environment provided by `tt(emulate)
+var(shell) tt(-c)' is identical to that provided by entry to
+a function marked for sticky emulation as a consequence of being
+defined in such an environment.  Hence, for example, the sticky
+emulation is inherited by subfunctions defined within functions
+with sticky emulation.)
+sitem(2.)(No change of options takes place on entry to or exit from
+functions that are not marked for sticky emulation, other than those
+that would normally take place, even if those functions are called
+within sticky emulation.)
+sitem(3.)(No special handling is provided for functions marked for
+tt(autoload) nor for functions present in wordcode created by
+the tt(zcompile) command.)
+sitem(4.)(The presence or absence of the tt(-R) flag to tt(emulate)
+corresponds to different sticky emulation modes, so for example
+`tt(emulate sh -c)', `tt(emulate -R sh -c)' and `tt(emulate csh -c)'
+are treated as three distinct sticky emulations.)
+endsitem()
 )
 findex(enable)
 cindex(enabling commands)

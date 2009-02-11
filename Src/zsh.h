@@ -1067,6 +1067,7 @@ struct shfunc {
     char *filename;             /* Name of file located in */
     zlong lineno;		/* line number in above file */
     Eprog funcdef;		/* function definition    */
+    int emulation;		/* sticky emulation for function */
 };
 
 /* Shell function context types. */
@@ -1789,6 +1790,20 @@ struct histent {
 #define EMULATE_KSH  (1<<2) /* Korn shell */
 #define EMULATE_SH   (1<<3) /* Bourne shell */
 #define EMULATE_ZSH  (1<<4) /* `native' mode */
+
+/* Test for a shell emulation.  Use this rather than emulation directly. */
+#define EMULATION(X)	(emulation & (X))
+
+/* Return only base shell emulation field. */
+#define SHELL_EMULATION()	(emulation & ((1<<5)-1))
+
+/* Additional flags */
+
+#define EMULATE_FULLY (1<<5) /* "emulate -R" in effect */
+/*
+ * Higher bits are used in options.c, record lowest unused bit...
+ */
+#define EMULATE_UNUSED (1<<6)
 
 /* option indices */
 

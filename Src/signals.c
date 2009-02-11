@@ -706,6 +706,7 @@ dosavetrap(int sig, int level)
 	    newshf->node.flags = shf->node.flags;
 	    newshf->funcdef = dupeprog(shf->funcdef, 0);
 	    newshf->filename = ztrdup(shf->filename);
+	    newshf->emulation = shf->emulation;
 	    if (shf->node.flags & PM_UNDEFINED)
 		newshf->funcdef->shf = newshf;
 	}
@@ -1201,7 +1202,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	/* return triggered */
 	retflag = 1;
     } else {
-	if (traperr && emulation != EMULATE_SH)
+	if (traperr && !EMULATION(EMULATE_SH))
 	    lastval = 1;
 	if (try_tryflag)
 	    errflag = traperr;

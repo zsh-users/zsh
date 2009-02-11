@@ -3415,6 +3415,7 @@ dump_autoload(char *nam, char *file, int on, Options ops, int func)
 	shf = (Shfunc) zshcalloc(sizeof *shf);
 	shf->node.flags = on;
 	shf->funcdef = mkautofn(shf);
+	shf->emulation = 0;
 	shfunctab->addnode(shfunctab, ztrdup(fdname(n) + fdhtail(n)), shf);
 	if (OPT_ISSET(ops,'X') && eval_autoload(shf, shf->node.nam, ops, func))
 	    ret = 1;

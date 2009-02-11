@@ -35,6 +35,11 @@
 /**/
 mod_export int emulation;
  
+/* current sticky emulation:  0 means none */
+
+/**/
+mod_export int sticky_emulation;
+
 /* the options; e.g. if opts[SHGLOB] != 0, SH_GLOB is turned on */
  
 /**/
@@ -58,9 +63,12 @@ mod_export HashTable optiontab;
 #define OPT_NONBOURNE	(OPT_ALL & ~OPT_BOURNE)
 #define OPT_NONZSH	(OPT_ALL & ~OPT_ZSH)
 
-#define OPT_EMULATE	(1<<5)	/* option is relevant to emulation */
-#define OPT_SPECIAL	(1<<6)	/* option should never be set by emulate() */
-#define OPT_ALIAS	(1<<7)	/* option is an alias to an other option */
+/* option is relevant to emulation */
+#define OPT_EMULATE	(EMULATE_UNUSED)
+/* option should never be set by emulate() */
+#define OPT_SPECIAL	(EMULATE_UNUSED<<1)
+/* option is an alias to an other option */
+#define OPT_ALIAS	(EMULATE_UNUSED<<2)
 
 #define defset(X) (!!((X)->node.flags & emulation))
 
@@ -477,6 +485,14 @@ setemulate(HashNode hn, int fully)
 
 /**/
 void
+installemulation(void)
+{
+    scanhashtable(optiontab, 0, 0, 0, setemulate,
+		  !!(emulation & EMULATE_FULLY));
+}
+
+/**/
+void
 emulate(const char *zsh_name, int fully)
 {
     char ch = *zsh_name;
@@ -494,7 +510,9 @@ emulate(const char *zsh_name, int fully)
     else
 	emulation = EMULATE_ZSH;
 
-    scanhashtable(optiontab, 0, 0, 0, setemulate, fully);
+    if (fully)
+	emulation |= EMULATE_FULLY;
+    installemulation();
 }
 
 /* setopt, unsetopt */

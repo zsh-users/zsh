@@ -40,7 +40,7 @@ for x_mod in $x_mods; do
     unset moddeps autofeatures
     . $srcdir/../$modfile
     if test "x$autofeatures" != x; then
-	echo "  if (emulation == EMULATE_ZSH) {"
+	echo "  if (EMULATION(EMULATE_ZSH)) {"
 	echo "    char *features[] = { "
 	for feature in $autofeatures; do
 	    echo "      \"$feature\","

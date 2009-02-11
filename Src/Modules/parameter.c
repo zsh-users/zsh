@@ -289,6 +289,7 @@ setfunction(char *name, char *val, int dis)
     shf = (Shfunc) zshcalloc(sizeof(*shf));
     shf->funcdef = dupeprog(prog, 0);
     shf->node.flags = dis;
+    shf->emulation = sticky_emulation;
 
     if (!strncmp(name, "TRAP", 4) &&
 	(sn = getsignum(name + 4)) != -1) {

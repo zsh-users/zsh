@@ -3999,6 +3999,7 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 	shf->node.flags = 0;
 	shf->filename = ztrdup(scriptfilename);
 	shf->lineno = lineno;
+	shf->emulation = sticky_emulation;
 
 	if (!names) {
 	    /*
@@ -4221,7 +4222,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     char *name = shfunc->node.nam;
     int flags = shfunc->node.flags;
     char *fname = dupstring(name);
-    int obreaks, saveemulation ;
+    int obreaks, saveemulation, savesticky_emulation, restore_sticky;
     Eprog prog;
     struct funcstack fstack;
 #ifdef MAX_FUNCTION_DEPTH
@@ -4261,6 +4262,26 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
      * function we need to restore the original options on exit.   */
     memcpy(saveopts, opts, sizeof(opts));
     saveemulation = emulation;
+    savesticky_emulation = sticky_emulation;
+
+    if (shfunc->emulation && sticky_emulation != shfunc->emulation) {
+	/*
+	 * Function is marked for sticky emulation.
+	 * Enable it now.
+	 *
+	 * We deliberately do not do this if the sticky emulation
+	 * in effect is the same as that requested.  This enables
+	 * option setting naturally within emulation environments.
+	 * Note that a difference in EMULATE_FULLY (emulate with
+	 * or without -R) counts as a different environment.
+	 *
+	 * This propagates the sticky emulation to subfunctions.
+	 */
+	emulation = sticky_emulation = shfunc->emulation;
+	restore_sticky = 1;
+	installemulation();
+    } else
+	restore_sticky = 0;
 
     if (flags & PM_TAGGED)
 	opts[XTRACE] = 1;
@@ -4349,7 +4370,16 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     zoptind = oldzoptind;
     scriptname = oldscriptname;
 
-    if (isset(LOCALOPTIONS)) {
+    if (restore_sticky) {
+	/*
+	 * If we switched to an emulation environment just for
+	 * this function, we interpret the option and emulation
+	 * switch as being a firewall between environments.
+	 */
+	memcpy(opts, saveopts, sizeof(opts));
+	emulation = saveemulation;
+	sticky_emulation = savesticky_emulation;
+    } else if (isset(LOCALOPTIONS)) {
 	/* restore all shell options except PRIVILEGED and RESTRICTED */
 	saveopts[PRIVILEGED] = opts[PRIVILEGED];
 	saveopts[RESTRICTED] = opts[RESTRICTED];

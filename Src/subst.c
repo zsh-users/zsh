@@ -1534,7 +1534,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	 * doesn't have parameter flags it might be neater to
 	 * handle this with the ^, =, ~ stuff, below.
 	 */
-	if ((c = *s) == '!' && s[1] != Outbrace && emulation == EMULATE_KSH) {
+	if ((c = *s) == '!' && s[1] != Outbrace && EMULATION(EMULATE_KSH)) {
 	    hkeys = SCANPM_WANTKEYS;
 	    s++;
 	} else if (c == '(' || c == Inpar) {

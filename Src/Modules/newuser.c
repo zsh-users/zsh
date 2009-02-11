@@ -78,7 +78,7 @@ boot_(UNUSED(Module m))
 	0 };
     const char **sp;
 
-    if (emulation != EMULATE_ZSH)
+    if (!EMULATION(EMULATE_ZSH))
 	return 0;
 
     if (!dotdir) {

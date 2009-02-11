@@ -775,7 +775,7 @@ setupvals(void)
     if(unset(INTERACTIVE)) {
 	prompt = ztrdup("");
 	prompt2 = ztrdup("");
-    } else if (emulation == EMULATE_KSH || emulation == EMULATE_SH) {
+    } else if (EMULATION(EMULATE_KSH|EMULATE_SH)) {
 	prompt  = ztrdup(privasserted() ? "# " : "$ ");
 	prompt2 = ztrdup("> ");
     } else {
@@ -783,7 +783,7 @@ setupvals(void)
 	prompt2 = ztrdup("%_> ");
     }
     prompt3 = ztrdup("?# ");
-    prompt4 = (emulation == EMULATE_KSH || emulation == EMULATE_SH)
+    prompt4 = EMULATION(EMULATE_KSH|EMULATE_SH)
 	? ztrdup("+ ") : ztrdup("+%N:%i> ");
     sprompt = ztrdup("zsh: correct '%R' to '%r' [nyae]? ");
 
@@ -811,14 +811,14 @@ setupvals(void)
     /* Get password entry and set info for `USERNAME' */
 #ifdef USE_GETPWUID
     if ((pswd = getpwuid(cached_uid))) {
-	if (emulation == EMULATE_ZSH)
+	if (EMULATION(EMULATE_ZSH))
 	    home = metafy(pswd->pw_dir, -1, META_DUP);
 	cached_username = ztrdup(pswd->pw_name);
     }
     else
 #endif /* USE_GETPWUID */
     {
-	if (emulation == EMULATE_ZSH)
+	if (EMULATION(EMULATE_ZSH))
 	    home = ztrdup("/");
 	cached_username = ztrdup("");
     }
@@ -828,7 +828,7 @@ setupvals(void)
      * In non-native emulations HOME must come from the environment;
      * we're not allowed to set it locally.
      */
-    if (emulation == EMULATE_ZSH)
+    if (EMULATION(EMULATE_ZSH))
 	ptr = home;
     else
 	ptr = zgetenv("HOME");
@@ -954,7 +954,7 @@ run_init_scripts(void)
 {
     noerrexit = -1;
 
-    if (emulation == EMULATE_KSH || emulation == EMULATE_SH) {
+    if (EMULATION(EMULATE_KSH|EMULATE_SH)) {
 	if (islogin)
 	    source("/etc/profile");
 	if (unset(PRIVILEGED)) {
@@ -1160,8 +1160,7 @@ sourcehome(char *s)
     char *h;
 
     queue_signals();
-    if (emulation == EMULATE_SH || emulation == EMULATE_KSH ||
-	!(h = getsparam("ZDOTDIR"))) {
+    if (EMULATION(EMULATE_SH|EMULATE_KSH) || !(h = getsparam("ZDOTDIR"))) {
 	h = home;
 	if (!h)
 	    return;

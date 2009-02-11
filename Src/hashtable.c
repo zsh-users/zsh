@@ -588,7 +588,7 @@ mod_export HashTable cmdnamtab;
  
 /**/
 mod_export char **pathchecked;
- 
+
 /* Create a new command hash table */
  
 /**/

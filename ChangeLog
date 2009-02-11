@@ -1,3 +1,13 @@
+2009-02-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 26556: Doc/Zsh/builtins.yo: documentation for 26546.
+
+	* 26546: Src/builtin.c, Src/exec.c, Src/hashtable.c, Src/init.c,
+	Src/mkbltnmlst.sh, Src/options.c, Src/params.c, Src/parse.c,
+	Src/signals.c, Src/subst.c, Src/zsh.h, Src/Modules/newuser.c,
+	Src/Modules/parameter.c, Test/B07emulate.ztst: sticky emulation
+	for functions defined within emualate ... -c ... environments.
+
 2009-02-11  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Functions/Calendar/age: accidentally committed a
@@ -11157,5 +11167,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4562 $                         
+* $Revision: 1.4563 $                         
 *****************************************************

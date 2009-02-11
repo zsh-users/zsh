@@ -3,72 +3,176 @@
 %prep
 
   isset() { 
+    print -n "${1}: "
     if [[ -o $1 ]]; then print yes; else print no; fi
   }
   showopts() {
-      # Set for Bourne shell emulation
-      isset shwordsplit
-      # Set in native mode and unless "emulate -R" is in use
-      isset banghist
+    # Set for Bourne shell emulation
+    isset shwordsplit
+    # Set in native mode and unless "emulate -R" is in use
+    isset banghist
+  }
+  cshowopts() {
+    showopts
+    # Show a csh option, too
+    isset cshnullglob
   }
 
 %test
 
-  (showopts
+  (print Before
+  showopts
   fn() {
      emulate sh
   }
   fn
+   print After
   showopts)
 0:Basic use of emulate
->no
->yes
->yes
->yes
+>Before
+>shwordsplit: no
+>banghist: yes
+>After
+>shwordsplit: yes
+>banghist: yes
 
   fn() {
     emulate -L sh
+    print During
     showopts
   }
+  print Before
   showopts
   fn
+  print After
   showopts
 0:Use of emulate -L
->no
->yes
->yes
->yes
->no
->yes
+>Before
+>shwordsplit: no
+>banghist: yes
+>During
+>shwordsplit: yes
+>banghist: yes
+>After
+>shwordsplit: no
+>banghist: yes
 
-  (showopts
+  (print Before
+  showopts
   emulate -R sh
+  print After
   showopts)
 0:Use of emulate -R
->no
->yes
->yes
->no
+>Before
+>shwordsplit: no
+>banghist: yes
+>After
+>shwordsplit: yes
+>banghist: no
 
+  print Before
   showopts
-  emulate sh -c 'showopts'
+  emulate sh -c 'print During; showopts'
+  print After
   showopts
 0:Use of emulate -c
->no
->yes
->yes
->yes
->no
->yes
+>Before
+>shwordsplit: no
+>banghist: yes
+>During
+>shwordsplit: yes
+>banghist: yes
+>After
+>shwordsplit: no
+>banghist: yes
 
-
+  print Before
   showopts
-  emulate -R sh -c 'showopts'
+  emulate -R sh -c 'print During; showopts'
+  print After
   showopts
 0:Use of emulate -R -c
->no
->yes
->yes
->no
->no
->yes
+>Before
+>shwordsplit: no
+>banghist: yes
+>During
+>shwordsplit: yes
+>banghist: no
+>After
+>shwordsplit: no
+>banghist: yes
+
+  print Before
+  showopts
+  emulate -R sh -c 'shshowopts() { showopts; }'
+  print After definition
+  showopts
+  print In sticky emulation
+  shshowopts
+  print After sticky emulation
+  showopts
+0:Basic sticky function emulation
+>Before
+>shwordsplit: no
+>banghist: yes
+>After definition
+>shwordsplit: no
+>banghist: yes
+>In sticky emulation
+>shwordsplit: yes
+>banghist: no
+>After sticky emulation
+>shwordsplit: no
+>banghist: yes
+
+  print Before
+  cshowopts
+  emulate -R sh -c 'shshowopts() { cshowopts; }'
+  emulate csh -c 'cshshowopts() {
+    cshowopts
+    print In nested sh emulation
+    shshowopts
+  }'
+  print After definition
+  cshowopts
+  print In sticky csh emulation
+  cshshowopts
+  print After sticky emulation
+  cshowopts
+0:Basic sticky function emulation
+>Before
+>shwordsplit: no
+>banghist: yes
+>cshnullglob: no
+>After definition
+>shwordsplit: no
+>banghist: yes
+>cshnullglob: no
+>In sticky csh emulation
+>shwordsplit: no
+>banghist: yes
+>cshnullglob: yes
+>In nested sh emulation
+>shwordsplit: yes
+>banghist: no
+>cshnullglob: no
+>After sticky emulation
+>shwordsplit: no
+>banghist: yes
+>cshnullglob: no
+
+  isalp() { if [[ -o alwayslastprompt ]]; then print on; else print off; fi; }
+  emulate sh -c 'shfunc_inner() { setopt alwayslastprompt; }'
+  emulate csh -c 'cshfunc_inner() { setopt alwayslastprompt; }'
+  emulate sh -c 'shfunc_outer() {
+    unsetopt alwayslastprompt;
+    shfunc_inner;
+    isalp
+    unsetopt alwayslastprompt
+    cshfunc_inner
+    isalp
+  }'
+  shfunc_outer
+0:Sticky emulation not triggered if sticky emulation unchanged
+>on
+>off

@@ -536,7 +536,7 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
     /* Obsolescent sh compatibility: set - is the same as set +xv *
      * and set - args is the same as set +xv -- args              */
-    if (emulation != EMULATE_ZSH && *args && **args == '-' && !args[0][1]) {
+    if (!EMULATION(EMULATE_ZSH) && *args && **args == '-' && !args[0][1]) {
 	dosetopt(VERBOSE, 0, 0);
 	dosetopt(XTRACE, 0, 0);
 	if (!args[1])
@@ -2861,6 +2861,8 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    shf = (Shfunc) zshcalloc(sizeof *shf);
 	    shf->node.flags = on;
 	    shf->funcdef = mkautofn(shf);
+	    /* No sticky emulation for autoloaded functions */
+	    shf->emulation = 0;
 	    shfunctab->addnode(shfunctab, ztrdup(*argv), shf);
 
 	    if (signum != -1) {
@@ -4834,21 +4836,38 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
 {
     int opt_L = OPT_ISSET(ops, 'L');
     int opt_R = OPT_ISSET(ops, 'R');
-    int saveemulation ;
+    int saveemulation, savesticky_emulation;
     int ret;
     char saveopts[OPT_SIZE];
 
     /* without arguments just print current emulation */
     if (!*argv) {
+	const char *shname;
+
 	if (opt_L || opt_R) {
 	    zwarnnam("emulate", "not enough arguments");
 	    return 1;
 	}
 
-	printf("%s\n", emulation == EMULATE_CSH ? "csh" :
-		       emulation == EMULATE_KSH ? "ksh" :
-		       emulation == EMULATE_SH  ? "sh" :
-		       "zsh");
+	switch(SHELL_EMULATION()) {
+	case EMULATE_CSH:
+	    shname = "csh";
+	    break;
+
+	case EMULATE_KSH:
+	    shname = "ksh";
+	    break;
+
+	case EMULATE_SH:
+	    shname = "sh";
+	    break;
+
+	default:
+	    shname = "zsh";
+	    break;
+	}
+
+	printf("%s\n", shname);
 	return 0;
     }
 
@@ -4880,9 +4899,12 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
 
     memcpy(saveopts, opts, sizeof(opts));
     saveemulation = emulation;
+    savesticky_emulation = sticky_emulation;
     emulate(*argv, OPT_ISSET(ops,'R'));
+    sticky_emulation = emulation;
     ret = eval(argv+2);
     memcpy(opts, saveopts, sizeof(opts));
+    sticky_emulation = savesticky_emulation;
     emulation = saveemulation;
     return ret;
 }
