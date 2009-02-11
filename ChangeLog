@@ -1,5 +1,8 @@
 2009-02-11  Peter Stephenson  <pws@csr.com>
 
+	* Richard Hartmann: 26550: Doc/Zsh/options.yo: make
+	it clear that various options can't be changed within the shell.
+
 	* Frank Terbeck: 26549: Doc/Zsh/contrib.yo,
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_bzr,
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_cdv,
@@ -11148,5 +11151,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4560 $                         
+* $Revision: 1.4561 $                         
 *****************************************************

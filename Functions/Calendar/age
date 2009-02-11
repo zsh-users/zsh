@@ -33,19 +33,29 @@ zmodload -i zsh/parameter
 
 autoload -U calendar_scandate
 
-local -a vals
+local -a vals tmp
 
 [[ -e $REPLY ]] || return 1
 zstat -A vals +mtime $REPLY || return 1
 
 if (( $# >= 1 )); then
-  local AGEREF=$1
+  if [[ $1 = :* ]]; then
+    zstat -A tmp -F "%Y/%m/%d" +mtime ${1[2,-1]} || return 1
+    local AGEREF=$tmp[1]
+  else
+    local AGEREF=$1
+  fi
   # if 1 argument given, never use globally defined AGEREF2
-  local AGEREF2=$2
+  if [[ $2 = :* ]]; then
+    zstat -A tmp -F "%Y/%m/%d" +mtime ${2[2,-1]} || return 1
+    local AGEREF2=$tmp[1]
+  else
+    local AGEREF2=$2
+  fi
 fi
 
 integer mtime=$vals[1] date1 date2
-local REPLY
+local REPLY REPLY2
 
 # allow a time only (meaning today)
 if calendar_scandate -t $AGEREF; then
