@@ -131,6 +131,11 @@ ksh autoloading behaviour on the first call to the function.
 With the tt(-w) flag, the var(name)s are taken as names of files compiled
 with the tt(zcompile) builtin, and all functions defined in them are
 marked for autoloading.
+
+The flags tt(-z) and tt(-k) mark the function to be autoloaded in
+native or ksh emulation, as if the option tt(KSH_AUTOLOAD) were
+unset or were set, respectively.  The flags override the setting of
+the option at the time the function is loaded.
 )
 findex(bg)
 cindex(jobs, backgrounding)
