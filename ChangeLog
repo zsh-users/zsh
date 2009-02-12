@@ -1,3 +1,7 @@
+2009-02-12  Clint Adams  <clint@zsh.org>
+
+	* 26565: Completion/Unix/Command/_patch: fix breakage in 26482.
+
 2009-02-12  Peter Stephenson  <pws@csr.com>
 
 	* 26560: Doc/Zsh/builtins.yo: document autoload -z/-k (finally).
@@ -11171,5 +11175,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4564 $                         
+* $Revision: 1.4565 $                         
 *****************************************************
