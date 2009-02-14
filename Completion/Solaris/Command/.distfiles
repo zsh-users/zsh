@@ -2,6 +2,7 @@ DISTFILES_SRC='
 .distfiles
 _coreadm
 _dhcpinfo
+_dladm
 _dumpadm
 _gcore
 _inetadm

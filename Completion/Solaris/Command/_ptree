@@ -12,7 +12,7 @@ _ptree() {
 
 	if [[ $ret -ne 0 ]]; then
 		_alternative \
-			'users:logged-in user:(${$(who -q)\:#(users=*|\#)})' \
+			'users:logged-in user:compadd ${$(who -q)\:#(users=*|\#)}' \
 			'pids:pid:_pids'
 		ret=$?
 	fi

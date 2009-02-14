@@ -1,9 +1,27 @@
 #compdef svccfg
 
+_svccfg_properties() {
+	local -a props fmris
+	local fmri="$argv[$#]"
+
+	# If There's more than one possible FMRI, bail
+	fmris=( ${(f)"$(svcs -H -o fmri $fmri)"} )
+	if [[ $#fmris -gt 1 ]]; then
+		_message "'$fmri' is ambiguous"
+		return 1
+	fi
+
+	# Get all the property names for the FMRI
+	props=( ${${${(f)"$(svccfg -s $fmri describe)"}:# *}%% *} )
+
+	_multi_parts "$expl[@]" - / props
+}
+
 _svccfg() {
 	local context state line subcmds
+	typeset -A opt_args
 
-	subcmds=( apply extract import validate export inventory delete addpropvalue delpropvalue )
+	subcmds=( apply describe extract import validate export inventory delete addpropvalue delpropvalue )
 
 	if [[ $service == "svccfg" ]]; then
 		_arguments -s \
@@ -30,8 +48,12 @@ _svccfg() {
 			':file:_files'
 		;;
 
-	(apply|validate|inventory)
+	(apply|inventory)
 		_files
+		;;
+
+	(validate)
+		_alternative 'files:file:_files' 'fmris:fmri:_svc_fmri -c'
 		;;
 
 	(export)
@@ -42,6 +64,14 @@ _svccfg() {
 		_arguments \
 			'-f[Force deletion if online or degraded]' \
 			'*:FMRI:_svcs_fmri -c'
+		;;
+
+	(describe)
+		local fmri=$opt_args[-s]
+		_arguments -A "-*" \
+			'-v[Give all information]' \
+			'-t[Show only template data]' \
+			":property group or property:_svccfg_properties $fmri"
 		;;
 
 	(extract)

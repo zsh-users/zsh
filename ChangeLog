@@ -1,5 +1,13 @@
 2009-02-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Danek Duvall: 26571: Src/Zle/complete.mdd,
+	Completion/Solaris/Command/_dladm,
+	Completion/Solaris/Command/_ptree,
+	Completion/Solaris/Command/_svccfg,
+	Completion/Solaris/Command/_svcs, Completion/Unix/Command/_zfs,
+	Completion/Unix/Command/_zpool: additions for Solaris
+	support.
+
 	* Richard Hartmann: 26558: Doc/Zsh/options.yo: modification
 	of 2650.
 
@@ -11180,5 +11188,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4566 $                         
+* $Revision: 1.4567 $                         
 *****************************************************
