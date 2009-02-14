@@ -1837,7 +1837,8 @@ the standard input is a tty and commands are being read from standard input.
 (See the discussion of tt(SHIN_STDIN).)
 This heuristic may be overridden by specifying a state for this option
 on the command line.
-The value of this option can only be changed with command line parameters.
+The value of this option can only be changed via flags supplied at
+invocation of the shell.
 It cannot be changed once zsh is running.
 )
 pindex(LOGIN)
@@ -1892,7 +1893,8 @@ Note that setting or unsetting this option on the command line does not
 necessarily affect the state the option will have while the shell is
 running - that is purely an indicator of whether on not commands are
 em(actually) being read from standard input.
-The value of this option can only be changed with command line parameters.
+The value of this option can only be changed via flags supplied at
+invocation of the shell.
 It cannot be changed once zsh is running.
 )
 pindex(SINGLE_COMMAND)
@@ -1905,7 +1907,8 @@ item(tt(SINGLE_COMMAND) (tt(-t), ksh: tt(-t)))(
 If the shell is reading from standard input, it exits after a single command
 has been executed.  This also makes the shell non-interactive, unless the
 tt(INTERACTIVE) option is explicitly set on the command line.
-The value of this option can only be changed with command line parameters.
+The value of this option can only be changed via flags supplied at
+invocation of the shell.
 It cannot be changed once zsh is running.
 )
 enditem()

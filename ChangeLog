@@ -1,3 +1,8 @@
+2009-02-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Richard Hartmann: 26558: Doc/Zsh/options.yo: modification
+	of 2650.
+
 2009-02-12  Clint Adams  <clint@zsh.org>
 
 	* 26565: Completion/Unix/Command/_patch: fix breakage in 26482.
@@ -11175,5 +11180,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4565 $                         
+* $Revision: 1.4566 $                         
 *****************************************************
