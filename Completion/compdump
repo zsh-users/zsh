@@ -132,7 +132,7 @@ print >> $_d_file
 print "typeset -gUa _comp_assocs" >> $_d_file
 print "_comp_assocs=( ${(qq)_comp_assocs} )" >> $_d_file
 
-mv $_d_file ${_d_file%.$HOST.$$}
+mv -f $_d_file ${_d_file%.$HOST.$$}
 
 unfunction compdump
 autoload -Uz compdump

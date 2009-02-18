@@ -1,3 +1,9 @@
+2009-02-18  Peter Stephenson  <pws@csr.com>
+
+	* Arkadiusz Miskiewicz <arekm@maven.pl>: 26573:
+	Functions/Completion/compdump: force compdump to overwrite
+	dump file if mv is a bit dubious.
+
 2009-02-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Danek Duvall: 26571: Src/Zle/complete.mdd,
@@ -11188,5 +11194,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4567 $                         
+* $Revision: 1.4568 $                         
 *****************************************************
