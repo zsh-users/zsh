@@ -10,6 +10,7 @@ if _pick_variant gnu="Free Software Foundation" unix --version; then
     '-r[reference]:file:_files'
     '-R[rfc-2822]'
     '-s[set]:time string'
+    '--rfc-3339=-[output date and time in RFC 3339 format]:output type:(date seconds ns)'
     --
     '*=FILE*:file:_files'
     '*=DATEFILE*:date file:_files'
