@@ -189,19 +189,23 @@ function definitions where the definition is silently discarded.
 sect(Special Functions)
 Certain functions, if defined, have special meaning to the shell.
 
-In the case of tt(chpwd), tt(periodic), tt(precmd) and tt(preexec) it is
-possible to define an array that has the same name with `tt(_functions)'
-appended.  Any element in such an array is taken as the name of a function
-to execute; it is executed in the same context and with the same arguments
-as the basic function.  For example, if tt($chpwd_functions) is an array
-containing the values `tt(mychpwd)', `tt(chpwd_save_dirstack)', then the
-shell attempts to execute the functions `tt(chpwd)', `tt(mychpwd)' and
+subsect(Hook Functions)
+findex(functions, hook)
+findex(hook functions)
+
+For the functions below, it is possible to define an array that has the
+same name as the function with `tt(_functions)' appended.  Any element in
+such an array is taken as the name of a function to execute; it is executed
+in the same context and with the same arguments as the basic function.  For
+example, if tt($chpwd_functions) is an array containing the values
+`tt(mychpwd)', `tt(chpwd_save_dirstack)', then the shell attempts to
+execute the functions `tt(chpwd)', `tt(mychpwd)' and
 `tt(chpwd_save_dirstack)', in that order.  Any function that does not exist
 is silently ignored.  A function found by this mechanism is referred to
-elsewhere as a `hook function'.  An error in any function causes
-subsequent functions not to be run.  Note further that an error
-in a tt(precmd) hook causes an immediately following tt(periodic)
-function not to run (thought it may run at the next opportunity).
+elsewhere as a `hook function'.  An error in any function causes subsequent
+functions not to be run.  Note further that an error in a tt(precmd) hook
+causes an immediately following tt(periodic) function not to run (thought
+it may run at the next opportunity).
 
 startitem()
 findex(chpwd)
@@ -277,6 +281,14 @@ This is not called by exiting subshells, nor when the tt(exec)
 precommand modifier is used before an external command.  Also, unlike
 tt(TRAPEXIT), it is not called when functions exit.
 )
+enditem()
+
+subsect(Trap Functions)
+
+The functions below are treated specially but do not have corresponding
+hook arrays.
+
+startitem()
 item(tt(TRAP)var(NAL))(
 cindex(signals, trapping)
 cindex(trapping signals)
