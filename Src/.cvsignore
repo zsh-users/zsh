@@ -1,34 +1,35 @@
-Makefile
-Makemod.in Makemod
-*.export
-[_a-zA-Z0-9]*.pro
+*.dll
 *.epro
-*.syms
+*.export
+*.mdh
+*.mdh.tmp
+*.mdhi
+*.mdhs
 *.o
 *.o.c
 *.so
-*.mdh
-*.mdhi
-*.mdhs
-*.mdh.tmp
+*.swp
+*.syms
+Makefile
+Makemod.in Makemod
+[_a-zA-Z0-9]*.pro
+ansi2knr
+bltinmods.list
+cscope.out
+libzsh.so*
+modules-bltin
 modules.index
 modules.index.tmp
 modules.stamp
-modules-bltin
-stamp-modobjs
-stamp-modobjs.tmp
-ansi2knr
-zsh
-libzsh.so*
+patchlevel.h
 sigcount.h
 signames.c signames2.c
+stamp-modobjs
+stamp-modobjs.tmp
+tags TAGS
 version.h
+zsh
 zshcurses.h
 zshpaths.h
 zshterm.h
 zshxmods.h
-bltinmods.list
-tags TAGS
-cscope.out
-*.swp
-*.dll
