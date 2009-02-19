@@ -150,7 +150,7 @@ loop(int toplevel, int justonce)
 
 	    if (toplevel &&
 		(getshfunc("preexec") ||
-		 paramtab->getnode(paramtab, "preexec_functions"))) {
+		 paramtab->getnode(paramtab, "preexec" HOOK_SUFFIX))) {
 		LinkList args;
 		char *cmdstr;
 

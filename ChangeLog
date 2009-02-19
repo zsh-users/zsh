@@ -1,3 +1,8 @@
+2009-02-19  Peter Stephenson  <pws@csr.com>
+
+	* 26583: Src/init.c, Src/zsh.h: use HOOK_SUFFIX more widely
+	for "*_functions" arrays.
+
 2009-02-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Jörg Sommer: 26582: Completion/Unix/Command/_date: --rfc-3339
@@ -11205,5 +11210,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4572 $                         
+* $Revision: 1.4573 $                         
 *****************************************************

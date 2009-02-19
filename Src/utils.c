@@ -1174,8 +1174,6 @@ callhookfunc(char *name, LinkList lnklst, int arrayp, int *retval)
     if (arrayp) {
 	char **arrptr;
 	int namlen = strlen(name);
-#define HOOK_SUFFIX	"_functions"
-#define HOOK_SUFFIX_LEN	11	/* including NUL byte */
 	VARARR(char, arrnam, namlen + HOOK_SUFFIX_LEN);
 	memcpy(arrnam, name, namlen);
 	memcpy(arrnam + namlen, HOOK_SUFFIX, HOOK_SUFFIX_LEN);

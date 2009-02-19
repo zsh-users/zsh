@@ -1117,6 +1117,15 @@ struct funcwrap {
 #define WRAPDEF(func) \
     { NULL, 0, func, NULL }
 
+/*
+ * User-defined hook arrays
+ */
+
+/* Name appended to function name to get hook array */
+#define HOOK_SUFFIX	"_functions"
+/* Length of that including NUL byte */
+#define HOOK_SUFFIX_LEN	11
+
 /* node in builtin command hash table (builtintab) */
 
 /*
