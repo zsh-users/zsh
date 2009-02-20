@@ -37,7 +37,16 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+
+#ifdef HAVE_BIND_NETDB_H
+/*
+ * On systems where we're using -lbind, this has more definitions
+ * than the standard header.
+ */
+#include <bind/netdb.h>
+#else
 #include <netdb.h>
+#endif
 
 /*
  * For some reason, configure doesn't always detect netinet/in_systm.h.

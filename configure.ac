@@ -755,6 +755,12 @@ fi
 AC_CHECK_LIB(socket, socket)
 AC_CHECK_LIB(bind, gethostbyname2)
 
+case $LIBS in
+  *-lbind*)
+  AC_CHECK_HEADERS(bind/netdb.h)
+  ;;
+esac
+
 dnl ---------------
 dnl CHECK FOR ICONV
 dnl ---------------

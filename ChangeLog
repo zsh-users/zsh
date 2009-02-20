@@ -1,3 +1,8 @@
+2009-02-20  Peter Stephenson  <pws@csr.com>
+
+	* 26584: configure.ac, Src/Modules/tcp.h: use bind/netdb.h where
+	appropriate.
+
 2009-02-19  Peter Stephenson  <pws@csr.com>
 
 	* 26583: Src/init.c, Src/zsh.h: use HOOK_SUFFIX more widely
@@ -11210,5 +11215,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4573 $                         
+* $Revision: 1.4574 $                         
 *****************************************************
