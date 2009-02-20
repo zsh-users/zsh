@@ -2799,8 +2799,7 @@ processcmd(UNUSED(char **args))
     char *s;
     int m = zmult, na = noaliases;
 
-    if (!strcmp(bindk->nam, "which-command"))
-	noaliases = 1;
+    noaliases = 1;
     s = getcurcmd();
     noaliases = na;
     if (!s)

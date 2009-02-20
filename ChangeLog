@@ -1,3 +1,8 @@
+2009-02-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 26588: Src/Zle/zle_tricky.c: don't expand aliases in run-help
+	since the run-help function can do that.
+
 2009-02-20  Peter Stephenson  <pws@csr.com>
 
 	* 26584: configure.ac, Src/Modules/tcp.h: use bind/netdb.h where
@@ -11215,5 +11220,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4574 $                         
+* $Revision: 1.4575 $                         
 *****************************************************
