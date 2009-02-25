@@ -35,7 +35,8 @@ diff_args=(
   '(--name-only --name-status -u -p --stat --patch-with-stat --patch-with-raw --raw --numstat --shortstat --summary)--numstat[generate a more machine-friendly diffstat]' \
   '(--name-only --name-status -u -p --stat --patch-with-stat --patch-with-raw --raw --numstat --shortstat --summary)--shortstat[generate a summary diffstat]' \
   '(--name-only --name-status -u -p --stat --patch-with-stat --patch-with-raw --raw --numstat --shortstat --summary)--summary[generate a condensed summary of extended header information]' \
-  '(--name-only --name-status -u -p --stat --patch-with-stat --patch-with-raw --raw --numstat --shortstat --summary)--dirstat[generate a dirstat]' \
+  '(--name-only --name-status -u -p --stat --patch-with-stat --patch-with-raw --raw --numstat --shortstat --summary)--dirstat[generate a dirstat by amount of changes]' \
+  '(--name-only --name-status -u -p --stat --patch-with-stat --patch-with-raw --raw --numstat --shortstat --summary)--dirstat-by-file[generate a dirstat by number of files]' \
   '-B-[break complete rewrite changes into pairs of given size]: :_guard "[[\:digit\:]]#" size'
   '-C-[detect copies as well as renames with given scope]: :_guard "[[\:digit\:]]#" size'
   $diff_l_arg
@@ -61,6 +62,9 @@ diff_args=(
   $abbrev_arg
   $nul_arg
   '--exit-code[report exit code 1 if differences, 0 otherwise]'
+  '--unified=[generate diffs with n lines of context]:n'
+  '--inter-hunk-context=[combine hunks closer than n lines]:n'
+  '--patience[generate diffs with patience algorithm]'
   '(--exit-code)--quiet[disable all output]'
   '--relative=:path:_files -/'
 )
@@ -397,6 +401,7 @@ _git-apply () {
     '--apply[apply patches that would otherwise not be applied]' \
     '--cached[apply patches without touching the working tree]' \
     '--check[check if patches are applicable (turns off "apply")]' \
+    '--include=-[include files matching specified pattern]:pattern' \
     '--exclude=-[skip files matching specified pattern]:pattern' \
     '--inaccurate-eof[work around missing-new-line-at-EOF bugs]' \
     '--index[make sure that the patch is applicable to the index]' \
@@ -1744,6 +1749,7 @@ _git-grep () {
     '-n[prefix the line number to matching lines]' \
     '(-l --files-with-matches -L --files-without-match --name-only)'{-l,--files-with-matches,--name-only}'[show only names of matching files]' \
     '(-l --files-with-matches -L --files-without-match)'{-L,--files-without-match}'[show only names of non-matching files]' \
+    {-z,--null}'[output \0 after filenames]' \
     '(-c --count)'{-c,--count}'[show number of matching lines in files]' \
     '-A[show trailing context]: :_guard "[[\:digit\:]]#" lines' \
     '-B[show leading context]: :_guard "[[\:digit\:]]#" lines' \
@@ -1802,6 +1808,7 @@ _git-log () {
 
   _arguments -S \
     $revision_arguments \
+    '--source[show which ref each commit is reached from]' \
     '--decorate[print out ref names of any commits that are shown.]' \
     '*:file-or-branch:->files' && ret=0
 
@@ -1940,6 +1947,7 @@ _git-reset () {
     '(        --soft --hard)--mixed[like --soft but report what has not been updated (default)]' \
     '(--mixed        --hard)--soft[do not touch the index file nor the working tree]' \
     '(--mixed --soft       )--hard[match the working tree and index to the given tree]' \
+    '--merge[bring local changes along to new commit]' \
     $commit_arg \
     $path_arg && ret=0
 }
@@ -2272,6 +2280,7 @@ _git-tag () {
       '(-a -s   )-u[create a tag, annotated and signed with the given key]:secret key:__git_gpg_secret_keys' \
       '(   -v)-f[create a new tag even if one with the same name already exists]' \
       '(-f   )-v[verifies the gpg signutare of the given tag]' \
+      '--contains=[only list tags which contain the specified commit]:commit:__git_committishs' \
       $message_args \
       ':tag name:__git_tags' \
       '::head:__git_revisions' \
@@ -4279,7 +4288,9 @@ __git_setup_revision_arguments () {
     '--always[always show header]'
     $abbrev_arg
     '--abbrev-commit[undocumented]'
+    '--simplify-merges[milder version of --full-history]'
     '--full-history[undocumented]'
+    '--simplify-by-decoration[show only commits that are referenced by a ref]'
     '--relative-date[show dates relative to the current time]'
     '--date=-[format of date output]:date format:((relative\:"show dates relative to the current time"
                                                    local\:"show timestamps in user'\''s local timezone"

@@ -1,7 +1,10 @@
-2009-02-22  Clint Adams  <clint@zsh.org>
+2009-02-25  Clint Adams  <clint@zsh.org>
 
-	* 26593: Completion/Debian/Command/_lintian: complete multiple
-	files for lintian.
+	* Mikael Magnusson: 26596: Completion/Unix/Command/_git: new git
+	options.
+
+	* Jörg Sommer: 26593: Completion/Debian/Command/_lintian: complete
+	multiple files for lintian.
 
 2009-02-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
@@ -11225,5 +11228,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4576 $                         
+* $Revision: 1.4577 $                         
 *****************************************************
