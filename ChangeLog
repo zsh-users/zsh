@@ -1,3 +1,8 @@
+2009-02-25  Peter Stephenson  <pws@csr.com>
+
+	* Src/hist.c: 26602: history substitution buffer could overflow
+	with no test.
+
 2009-02-25  Clint Adams  <clint@zsh.org>
 
 	* Mikael Magnusson: 26596: Completion/Unix/Command/_git: new git
@@ -11232,5 +11237,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4578 $                         
+* $Revision: 1.4579 $                         
 *****************************************************

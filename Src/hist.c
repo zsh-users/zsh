@@ -394,9 +394,10 @@ histsubchar(int c)
     zlong ev;
     static int marg = -1;
     static zlong mev = -1;
-    char buf[256], *ptr;
+    char *buf, *ptr;
     char *sline;
     Histent ehist;
+    size_t buflen;
 
     /* look, no goto's */
     if (isfirstch && c == hatchar) {
@@ -445,7 +446,7 @@ histsubchar(int c)
 	    return bangchar;
 	}
 	cflag = 0;
-	ptr = buf;
+	ptr = buf = zhalloc(buflen = 265);
 
 	/* get event number */
 
@@ -455,8 +456,14 @@ histsubchar(int c)
 		c = ingetc();
 		if (c == '?' || c == '\n' || lexstop)
 		    break;
-		else
+		else {
 		    *ptr++ = c;
+		    if (ptr == buf + buflen) {
+			buf = hrealloc(buf, buflen, 2 * buflen);
+			ptr = buf + buflen;
+			buflen *= 2;
+		    }
+		}
 	    }
 	    if (c != '\n' && !lexstop)
 		c = ingetc();
@@ -484,6 +491,11 @@ histsubchar(int c)
 			break;
 		}
 		*ptr++ = c;
+		if (ptr == buf + buflen) {
+		    buf = hrealloc(buf, buflen, 2 * buflen);
+		    ptr = buf + buflen;
+		    buflen *= 2;
+		}
 		if (c == '#' || c == bangchar) {
 		    c = ingetc();
 		    break;
