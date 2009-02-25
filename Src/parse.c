@@ -448,7 +448,7 @@ parse_event(void)
     tok = ENDINPUT;
     incmdpos = 1;
     aliasspaceflag = 0;
-    yylex();
+    zshlex();
     init_parse();
 
     if (!par_event()) {
@@ -467,7 +467,7 @@ par_event(void)
     while (tok == SEPER) {
 	if (isnewlin > 0)
 	    return 0;
-	yylex();
+	zshlex();
     }
     if (tok == ENDINPUT)
 	return 0;
@@ -481,15 +481,15 @@ par_event(void)
 	} else if (tok == SEPER) {
 	    set_list_code(p, Z_SYNC, c);
 	    if (isnewlin <= 0)
-		yylex();
+		zshlex();
 	    r = 1;
 	} else if (tok == AMPER) {
 	    set_list_code(p, Z_ASYNC, c);
-	    yylex();
+	    zshlex();
 	    r = 1;
 	} else if (tok == AMPERBANG) {
 	    set_list_code(p, (Z_ASYNC | Z_DISOWN), c);
-	    yylex();
+	    zshlex();
 	    r = 1;
 	}
     }
@@ -525,7 +525,7 @@ parse_list(void)
 
     tok = ENDINPUT;
     incmdpos = 1;
-    yylex();
+    zshlex();
     init_parse();
     par_list(&c);
     if (tok != ENDINPUT) {
@@ -601,7 +601,7 @@ par_list(int *complex)
  rec:
 
     while (tok == SEPER)
-	yylex();
+	zshlex();
 
     p = ecadd(0);
     c = 0;
@@ -616,7 +616,7 @@ par_list(int *complex)
 			      (Z_ASYNC | Z_DISOWN)), c);
 	    incmdpos = 1;
 	    do {
-		yylex();
+		zshlex();
 	    } while (tok == SEPER);
 	    lp = p;
 	    goto rec;
@@ -669,9 +669,9 @@ par_sublist(int *complex)
 	    int qtok = tok, sl;
 
 	    cmdpush(tok == DBAR ? CS_CMDOR : CS_CMDAND);
-	    yylex();
+	    zshlex();
 	    while (tok == SEPER)
-		yylex();
+		zshlex();
 	    sl = par_sublist(complex);
 	    set_sublist_code(p, (sl ? (qtok == DBAR ?
 				       WC_SUBLIST_OR : WC_SUBLIST_AND) :
@@ -700,11 +700,11 @@ par_sublist2(int *complex)
     if (tok == COPROC) {
 	*complex = 1;
 	f |= WC_SUBLIST_COPROC;
-	yylex();
+	zshlex();
     } else if (tok == BANG) {
 	*complex = 1;
 	f |= WC_SUBLIST_NOT;
-	yylex();
+	zshlex();
     }
     if (!par_pline(complex) && !f)
 	return -1;
@@ -732,9 +732,9 @@ par_pline(int *complex)
     if (tok == BAR) {
 	*complex = 1;
 	cmdpush(CS_PIPE);
-	yylex();
+	zshlex();
 	while (tok == SEPER)
-	    yylex();
+	    zshlex();
 	ecbuf[p] = WCB_PIPE(WC_PIPE_MID, (line >= 0 ? line + 1 : 0));
 	ecispace(p + 1, 1);
 	ecbuf[p + 1] = ecused - 1 - p;
@@ -756,9 +756,9 @@ par_pline(int *complex)
 
 	*complex = 1;
 	cmdpush(CS_ERRPIPE);
-	yylex();
+	zshlex();
 	while (tok == SEPER)
-	    yylex();
+	    zshlex();
 	ecbuf[p] = WCB_PIPE(WC_PIPE_MID, (line >= 0 ? line + 1 : 0));
 	ecispace(p + 1, 1);
 	ecbuf[p + 1] = ecused - 1 - p;
@@ -856,7 +856,7 @@ par_cmd(int *complex)
     case DINPAR:
 	ecadd(WCB_ARITH());
 	ecstr(tokstr);
-	yylex();
+	zshlex();
 	break;
     case TIME:
 	{
@@ -917,23 +917,23 @@ par_for(int *complex)
 
     incmdpos = 0;
     infor = tok == FOR ? 2 : 0;
-    yylex();
+    zshlex();
     if (tok == DINPAR) {
-	yylex();
+	zshlex();
 	if (tok != DINPAR)
 	    YYERRORV(oecused);
 	ecstr(tokstr);
-	yylex();
+	zshlex();
 	if (tok != DINPAR)
 	    YYERRORV(oecused);
 	ecstr(tokstr);
-	yylex();
+	zshlex();
 	if (tok != DOUTPAR)
 	    YYERRORV(oecused);
 	ecstr(tokstr);
 	infor = 0;
 	incmdpos = 1;
-	yylex();
+	zshlex();
 	type = WC_FOR_COND;
     } else {
 	int np = 0, n, posix_in, ona = noaliases, onc = nocorrect;
@@ -948,7 +948,7 @@ par_for(int *complex)
 	for (;;) {
 	    n++;
 	    ecstr(tokstr);
-	    yylex();
+	    zshlex();
 	    if (tok != STRING || !strcmp(tokstr, "in") || sel)
 		break;
 	    if (!isident(tokstr) || errflag)
@@ -964,10 +964,10 @@ par_for(int *complex)
 	    ecbuf[np] = n;
 	posix_in = isnewlin;
 	while (isnewlin)
-	    yylex();
+	    zshlex();
         if (tok == STRING && !strcmp(tokstr, "in")) {
 	    incmdpos = 0;
-	    yylex();
+	    zshlex();
 	    np = ecadd(0);
 	    n = par_wordlist();
 	    if (tok != SEPER)
@@ -976,38 +976,38 @@ par_for(int *complex)
 	    type = (sel ? WC_SELECT_LIST : WC_FOR_LIST);
 	} else if (!posix_in && tok == INPAR) {
 	    incmdpos = 0;
-	    yylex();
+	    zshlex();
 	    np = ecadd(0);
 	    n = par_nl_wordlist();
 	    if (tok != OUTPAR)
 		YYERRORV(oecused);
 	    ecbuf[np] = n;
 	    incmdpos = 1;
-	    yylex();
+	    zshlex();
 	    type = (sel ? WC_SELECT_LIST : WC_FOR_LIST);
 	} else
 	    type = (sel ? WC_SELECT_PPARAM : WC_FOR_PPARAM);
     }
     incmdpos = 1;
     while (tok == SEPER)
-	yylex();
+	zshlex();
     if (tok == DOLOOP) {
-	yylex();
+	zshlex();
 	par_save_list(complex);
 	if (tok != DONE)
 	    YYERRORV(oecused);
-	yylex();
+	zshlex();
     } else if (tok == INBRACE) {
-	yylex();
+	zshlex();
 	par_save_list(complex);
 	if (tok != OUTBRACE)
 	    YYERRORV(oecused);
-	yylex();
+	zshlex();
     } else if (csh || isset(CSHJUNKIELOOPS)) {
 	par_save_list(complex);
 	if (tok != ZEND)
 	    YYERRORV(oecused);
-	yylex();
+	zshlex();
     } else if (unset(SHORTLOOPS)) {
 	YYERRORV(oecused);
     } else
@@ -1035,7 +1035,7 @@ par_case(int *complex)
     p = ecadd(0);
 
     incmdpos = 0;
-    yylex();
+    zshlex();
     if (tok != STRING)
 	YYERRORV(oecused);
     ecstr(tokstr);
@@ -1044,9 +1044,9 @@ par_case(int *complex)
     ona = noaliases;
     onc = nocorrect;
     noaliases = nocorrect = 1;
-    yylex();
+    zshlex();
     while (tok == SEPER)
-	yylex();
+	zshlex();
     if (!(tok == STRING && !strcmp(tokstr, "in")) && tok != INBRACE)
     {
 	noaliases = ona;
@@ -1058,17 +1058,17 @@ par_case(int *complex)
     incmdpos = 0;
     noaliases = ona;
     nocorrect = onc;
-    yylex();
+    zshlex();
 
     for (;;) {
 	char *str;
 
 	while (tok == SEPER)
-	    yylex();
+	    zshlex();
 	if (tok == OUTBRACE)
 	    break;
 	if (tok == INPAR)
-	    yylex();
+	    zshlex();
 	if (tok != STRING)
 	    YYERRORV(oecused);
 	if (!strcmp(tokstr, "esac"))
@@ -1078,11 +1078,11 @@ par_case(int *complex)
 	incmdpos = 1;
 	type = WC_CASE_OR;
 	for (;;) {
-	    yylex();
+	    zshlex();
 	    if (tok == OUTPAR) {
 		incasepat = 0;
 		incmdpos = 1;
-		yylex();
+		zshlex();
 		break;
 	    } else if (tok == BAR) {
 		char *str2;
@@ -1157,10 +1157,10 @@ par_case(int *complex)
 	    YYERRORV(oecused);
 	incasepat = 1;
 	incmdpos = 0;
-	yylex();
+	zshlex();
     }
     incmdpos = 1;
-    yylex();
+    zshlex();
 
     ecbuf[p] = WCB_CASE(WC_CASE_HEAD, ecused - 1 - p);
 }
@@ -1184,13 +1184,13 @@ par_if(int *complex)
     for (;;) {
 	xtok = tok;
 	cmdpush(xtok == IF ? CS_IF : CS_ELIF);
-	yylex();
+	zshlex();
 	if (xtok == FI)
 	    break;
 	if (xtok == ELSE)
 	    break;
 	while (tok == SEPER)
-	    yylex();
+	    zshlex();
 	if (!(xtok == IF || xtok == ELIF)) {
 	    cmdpop();
 	    YYERRORV(oecused);
@@ -1200,14 +1200,14 @@ par_if(int *complex)
 	par_save_list(complex);
 	incmdpos = 1;
 	while (tok == SEPER)
-	    yylex();
+	    zshlex();
 	xtok = FI;
 	nc = cmdstack[cmdsp - 1] == CS_IF ? CS_IFTHEN : CS_ELIFTHEN;
 	if (tok == THEN) {
 	    usebrace = 0;
 	    cmdpop();
 	    cmdpush(nc);
-	    yylex();
+	    zshlex();
 	    par_save_list(complex);
 	    ecbuf[pp] = WCB_IF(type, ecused - 1 - pp);
 	    incmdpos = 1;
@@ -1216,14 +1216,14 @@ par_if(int *complex)
 	    usebrace = 1;
 	    cmdpop();
 	    cmdpush(nc);
-	    yylex();
+	    zshlex();
 	    par_save_list(complex);
 	    if (tok != OUTBRACE) {
 		cmdpop();
 		YYERRORV(oecused);
 	    }
 	    ecbuf[pp] = WCB_IF(type, ecused - 1 - pp);
-	    yylex();
+	    zshlex();
 	    incmdpos = 1;
 	    if (tok == SEPER)
 		break;
@@ -1245,9 +1245,9 @@ par_if(int *complex)
 	pp = ecadd(0);
 	cmdpush(CS_ELSE);
 	while (tok == SEPER)
-	    yylex();
+	    zshlex();
 	if (tok == INBRACE && usebrace) {
-	    yylex();
+	    zshlex();
 	    par_save_list(complex);
 	    if (tok != OUTBRACE) {
 		cmdpop();
@@ -1261,7 +1261,7 @@ par_if(int *complex)
 	    }
 	}
 	ecbuf[pp] = WCB_IF(WC_IF_ELSE, ecused - 1 - pp);
-	yylex();
+	zshlex();
 	cmdpop();
     }
     ecbuf[p] = WCB_IF(WC_IF_HEAD, ecused - 1 - p);
@@ -1280,28 +1280,28 @@ par_while(int *complex)
     int type = (tok == UNTIL ? WC_WHILE_UNTIL : WC_WHILE_WHILE);
 
     p = ecadd(0);
-    yylex();
+    zshlex();
     par_save_list(complex);
     incmdpos = 1;
     while (tok == SEPER)
-	yylex();
+	zshlex();
     if (tok == DOLOOP) {
-	yylex();
+	zshlex();
 	par_save_list(complex);
 	if (tok != DONE)
 	    YYERRORV(oecused);
-	yylex();
+	zshlex();
     } else if (tok == INBRACE) {
-	yylex();
+	zshlex();
 	par_save_list(complex);
 	if (tok != OUTBRACE)
 	    YYERRORV(oecused);
-	yylex();
+	zshlex();
     } else if (isset(CSHJUNKIELOOPS)) {
 	par_save_list(complex);
 	if (tok != ZEND)
 	    YYERRORV(oecused);
-	yylex();
+	zshlex();
     } else
 	YYERRORV(oecused);
 
@@ -1321,31 +1321,31 @@ par_repeat(int *complex)
     p = ecadd(0);
 
     incmdpos = 0;
-    yylex();
+    zshlex();
     if (tok != STRING)
 	YYERRORV(oecused);
     ecstr(tokstr);
     incmdpos = 1;
-    yylex();
+    zshlex();
     while (tok == SEPER)
-	yylex();
+	zshlex();
     if (tok == DOLOOP) {
-	yylex();
+	zshlex();
 	par_save_list(complex);
 	if (tok != DONE)
 	    YYERRORV(oecused);
-	yylex();
+	zshlex();
     } else if (tok == INBRACE) {
-	yylex();
+	zshlex();
 	par_save_list(complex);
 	if (tok != OUTBRACE)
 	    YYERRORV(oecused);
-	yylex();
+	zshlex();
     } else if (isset(CSHJUNKIELOOPS)) {
 	par_save_list(complex);
 	if (tok != ZEND)
 	    YYERRORV(oecused);
-	yylex();
+	zshlex();
     } else if (unset(SHORTLOOPS)) {
 	YYERRORV(oecused);
     } else
@@ -1368,20 +1368,20 @@ par_subsh(int *complex)
     p = ecadd(0);
     /* Extra word only needed for always block */
     pp = ecadd(0);
-    yylex();
+    zshlex();
     par_list(complex);
     ecadd(WCB_END());
     if (tok != ((otok == INPAR) ? OUTPAR : OUTBRACE))
 	YYERRORV(oecused);
     incmdpos = 1;
-    yylex();
+    zshlex();
 
     /* Optional always block.  No intervening SEPERs allowed. */
     if (otok == INBRACE && tok == STRING && !strcmp(tokstr, "always")) {
 	ecbuf[pp] = WCB_TRY(ecused - 1 - pp);
 	incmdpos = 1;
 	do {
-	    yylex();
+	    zshlex();
 	} while (tok == SEPER);
 
 	if (tok != INBRACE)
@@ -1389,16 +1389,16 @@ par_subsh(int *complex)
 	cmdpop();
 	cmdpush(CS_ALWAYS);
 
-	yylex();
+	zshlex();
 	par_save_list(complex);
 	while (tok == SEPER)
-	    yylex();
+	    zshlex();
 
 	incmdpos = 1;
 
 	if (tok != OUTBRACE)
 	    YYERRORV(oecused);
-	yylex();
+	zshlex();
 	ecbuf[p] = WCB_TRY(ecused - 1 - p);
     } else {
 	ecbuf[p] = (otok == INPAR ? WCB_SUBSH(ecused - 1 - p) :
@@ -1422,7 +1422,7 @@ par_funcdef(void)
     lineno = 0;
     nocorrect = 1;
     incmdpos = 0;
-    yylex();
+    zshlex();
 
     p = ecadd(0);
     ecadd(0);
@@ -1435,7 +1435,7 @@ par_funcdef(void)
 	}
 	ecstr(tokstr);
 	num++;
-	yylex();
+	zshlex();
     }
     ecadd(0);
     ecadd(0);
@@ -1443,9 +1443,9 @@ par_funcdef(void)
 
     nocorrect = 0;
     if (tok == INOUTPAR)
-	yylex();
+	zshlex();
     while (tok == SEPER)
-	yylex();
+	zshlex();
 
     ecnfunc++;
     ecssub = so = ecsoffs;
@@ -1453,7 +1453,7 @@ par_funcdef(void)
     ecnpats = 0;
 
     if (tok == INBRACE) {
-	yylex();
+	zshlex();
 	par_list(&c);
 	if (tok != OUTBRACE) {
 	    lineno += oldlineno;
@@ -1461,7 +1461,7 @@ par_funcdef(void)
 	    ecssub = oecssub;
 	    YYERRORV(oecused);
 	}
-	yylex();
+	zshlex();
     } else if (unset(SHORTLOOPS)) {
 	lineno += oldlineno;
 	ecnpats = onp;
@@ -1494,7 +1494,7 @@ par_time(void)
 {
     int p, f, c = 0;
 
-    yylex();
+    zshlex();
 
     p = ecadd(0);
     ecadd(0);
@@ -1519,13 +1519,13 @@ par_dinbrack(void)
 
     incond = 1;
     incmdpos = 0;
-    yylex();
+    zshlex();
     par_cond();
     if (tok != DOUTBRACK)
 	YYERRORV(oecused);
     incond = 0;
     incmdpos = 1;
-    yylex();
+    zshlex();
 }
 
 /*
@@ -1594,7 +1594,7 @@ par_simple(int *complex, int nr)
 		type2 = WC_ASSIGN_NEW;
 	    ecstr(tokstr);
 	    cmdpush(CS_ARRAY);
-	    yylex();
+	    zshlex();
 	    n = par_nl_wordlist();
 	    ecbuf[p] = WCB_ASSIGN(WC_ASSIGN_ARRAY, type2, n);
 	    cmdpop();
@@ -1604,7 +1604,7 @@ par_simple(int *complex, int nr)
 	    isnull = 0;
 	} else
 	    break;
-	yylex();
+	zshlex();
     }
     if (tok == AMPER || tok == AMPERBANG)
 	YYERROR(oecused);
@@ -1630,7 +1630,7 @@ par_simple(int *complex, int nr)
 			char *toksave = tokstr;
 			char *idstring = dupstrpfx(tokstr+1, eptr-tokstr-1);
 			redir_var = 1;
-			yylex();
+			zshlex();
 
 			if (IS_REDIROP(tok) && tokfd == -1)
 			{
@@ -1652,7 +1652,7 @@ par_simple(int *complex, int nr)
 	    {
 		ecstr(tokstr);
 		argc++;
-		yylex();
+		zshlex();
 	    }
 	} else if (IS_REDIROP(tok)) {
 	    *complex = c = 1;
@@ -1670,9 +1670,9 @@ par_simple(int *complex, int nr)
 	    lineno = 0;
 	    incmdpos = 1;
 	    cmdpush(CS_FUNCDEF);
-	    yylex();
+	    zshlex();
 	    while (tok == SEPER)
-		yylex();
+		zshlex();
 
 	    ecispace(p + 1, 1);
 	    ecbuf[p + 1] = argc;
@@ -1688,7 +1688,7 @@ par_simple(int *complex, int nr)
 	    if (tok == INBRACE) {
 		int c = 0;
 
-		yylex();
+		zshlex();
 		par_list(&c);
 		if (tok != OUTBRACE) {
 		    cmdpop();
@@ -1697,7 +1697,7 @@ par_simple(int *complex, int nr)
 		    ecssub = oecssub;
 		    YYERROR(oecused);
 		}
-		yylex();
+		zshlex();
 	    } else {
 		int ll, sl, pl, c = 0;
 
@@ -1784,7 +1784,7 @@ par_redir(int *rp, char *idstring)
 	nocorrect = 1;
     type = redirtab[tok - OUTANG];
     fd1 = tokfd;
-    yylex();
+    zshlex();
     if (tok != STRING && tok != ENVSTRING)
 	YYERROR(ecused);
     incmdpos = oldcmdpos;
@@ -1828,7 +1828,7 @@ par_redir(int *rp, char *idstring)
 	(*hd)->pc = r;
 	(*hd)->str = tokstr;
 
-	yylex();
+	zshlex();
 	return ncodes;
     }
     case REDIR_WRITE:
@@ -1852,7 +1852,7 @@ par_redir(int *rp, char *idstring)
 	    type = tokstr[0] == Inang ? REDIR_INPIPE : REDIR_OUTPIPE;
 	break;
     }
-    yylex();
+    zshlex();
 
     /* If we ever to change the number of codes, we have to change
      * the definition of WC_REDIR_WORDS. */
@@ -1895,7 +1895,7 @@ par_wordlist(void)
     while (tok == STRING) {
 	ecstr(tokstr);
 	num++;
-	yylex();
+	zshlex();
     }
     return num;
 }
@@ -1915,18 +1915,18 @@ par_nl_wordlist(void)
 	    ecstr(tokstr);
 	    num++;
 	}
-	yylex();
+	zshlex();
     }
     return num;
 }
 
 /*
- * condlex is yylex for normal parsing, but is altered to allow
+ * condlex is zshlex for normal parsing, but is altered to allow
  * the test builtin to use par_cond.
  */
 
 /**/
-void (*condlex) _((void)) = yylex;
+void (*condlex) _((void)) = zshlex;
 
 /*
  * cond	: cond_1 { SEPER } [ DBAR { SEPER } cond ]
@@ -2200,7 +2200,7 @@ yyerror(int noerr)
     int t0;
     char *t;
 
-    if ((t = dupstring(yytext)))
+    if ((t = dupstring(zshlextext)))
 	untokenize(t);
 
     for (t0 = 0; t0 != 20; t0++)

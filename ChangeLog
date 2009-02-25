@@ -13,6 +13,10 @@
 
 2009-02-20  Peter Stephenson  <pws@csr.com>
 
+	* c.f. 26586: Src/builtin.c, Src/lex.c, Src/parse.c: rename yylex
+	to zshlex and yytext to zshlextext to avoid possible clashes
+	in linked libraries.
+
 	* 26584: configure.ac, Src/Modules/tcp.h: use bind/netdb.h where
 	appropriate.
 
@@ -11228,5 +11232,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4577 $                         
+* $Revision: 1.4578 $                         
 *****************************************************

@@ -38,7 +38,7 @@ mod_export char ztokens[] = "#$^*()$=|{}[]`<>>?~`,'\"\\\\";
 /* parts of the current token */
 
 /**/
-char *yytext;
+char *zshlextext;
 /**/
 mod_export char *tokstr;
 /**/
@@ -49,7 +49,7 @@ mod_export int tokfd;
 /*
  * Line number at which the first character of a token was found.
  * We always set this in gettok(), which is always called from
- * yylex() unless we have reached an error.  So it is always
+ * zshlex() unless we have reached an error.  So it is always
  * valid when parsing.  It is not useful during execution
  * of the parsed structure.
  */
@@ -198,7 +198,7 @@ struct lexstack {
     int tok;
     int isnewlin;
     char *tokstr;
-    char *yytext;
+    char *zshlextext;
     char *bptr;
     int bsiz;
     int len;
@@ -257,7 +257,7 @@ lexsave(void)
     ls->tok = tok;
     ls->isnewlin = isnewlin;
     ls->tokstr = tokstr;
-    ls->yytext = yytext;
+    ls->zshlextext = zshlextext;
     ls->bptr = bptr;
     ls->bsiz = bsiz;
     ls->len = len;
@@ -319,7 +319,7 @@ lexrestore(void)
     tok = lstack->tok;
     isnewlin = lstack->isnewlin;
     tokstr = lstack->tokstr;
-    yytext = lstack->yytext;
+    zshlextext = lstack->zshlextext;
     bptr = lstack->bptr;
     bsiz = lstack->bsiz;
     len = lstack->len;
@@ -356,7 +356,7 @@ lexrestore(void)
 
 /**/
 void
-yylex(void)
+zshlex(void)
 {
     if (tok == LEXERR)
 	return;
@@ -405,7 +405,7 @@ ctxtlex(void)
 {
     static int oldpos;
 
-    yylex();
+    zshlex();
     switch (tok) {
     case SEPER:
     case NEWLIN:
@@ -1720,7 +1720,7 @@ exalias(void)
 	spckword(&tokstr, 1, incmdpos, 1);
 
     if (!tokstr) {
-	yytext = tokstrings[tok];
+	zshlextext = tokstrings[tok];
 
 	return 0;
     } else {
@@ -1729,19 +1729,19 @@ exalias(void)
 	if (has_token(tokstr)) {
 	    char *p, *t;
 
-	    yytext = p = copy;
+	    zshlextext = p = copy;
 	    for (t = tokstr;
 		 (*p++ = itok(*t) ? ztokens[*t++ - Pound] : *t++););
 	} else
-	    yytext = tokstr;
+	    zshlextext = tokstr;
 
 	if (zleparse && !(inbufflags & INP_ALIAS)) {
 	    int zp = zleparse;
 
 	    gotword();
 	    if (zp == 1 && !zleparse) {
-		if (yytext == copy)
-		    yytext = tokstr;
+		if (zshlextext == copy)
+		    zshlextext = tokstr;
 		return 0;
 	    }
 	}
@@ -1751,47 +1751,47 @@ exalias(void)
 	    if (!noaliases && isset(ALIASESOPT)) {
 		char *suf;
 		
-		an = (Alias) aliastab->getnode(aliastab, yytext);
+		an = (Alias) aliastab->getnode(aliastab, zshlextext);
 		if (an && !an->inuse &&
 		    ((an->node.flags & ALIAS_GLOBAL) || incmdpos || inalmore)) {
 		    inpush(an->text, INP_ALIAS, an);
 		    if (an->text[0] == ' ')
 			aliasspaceflag = 1;
 		    lexstop = 0;
-		    if (yytext == copy)
-			yytext = tokstr;
+		    if (zshlextext == copy)
+			zshlextext = tokstr;
 		    return 1;
 		}
-		if ((suf = strrchr(yytext, '.')) && suf[1] &&
-		    suf > yytext && suf[-1] != Meta &&
+		if ((suf = strrchr(zshlextext, '.')) && suf[1] &&
+		    suf > zshlextext && suf[-1] != Meta &&
 		    (an = (Alias)sufaliastab->getnode(sufaliastab, suf+1)) &&
 		    !an->inuse && incmdpos) {
-		    inpush(dupstring(yytext), INP_ALIAS, NULL);
+		    inpush(dupstring(zshlextext), INP_ALIAS, NULL);
 		    inpush(" ", INP_ALIAS, NULL);
 		    inpush(an->text, INP_ALIAS, an);
 		    lexstop = 0;
-		    if (yytext == copy)
-			yytext = tokstr;
+		    if (zshlextext == copy)
+			zshlextext = tokstr;
 		    return 1;
 		}
 	    }
 
 	    /* Then check for a reserved word */
 	    if ((incmdpos ||
-		 (unset(IGNOREBRACES) && yytext[0] == '}' && !yytext[1])) &&
-		(rw = (Reswd) reswdtab->getnode(reswdtab, yytext))) {
+		 (unset(IGNOREBRACES) && zshlextext[0] == '}' && !zshlextext[1])) &&
+		(rw = (Reswd) reswdtab->getnode(reswdtab, zshlextext))) {
 		tok = rw->token;
 		if (tok == DINBRACK)
 		    incond = 1;
-	    } else if (incond && !strcmp(yytext, "]]")) {
+	    } else if (incond && !strcmp(zshlextext, "]]")) {
 		tok = DOUTBRACK;
 		incond = 0;
-	    } else if (incond == 1 && yytext[0] == '!' && !yytext[1])
+	    } else if (incond == 1 && zshlextext[0] == '!' && !zshlextext[1])
 		tok = BANG;
 	}
 	inalmore = 0;
-	if (yytext == copy)
-	    yytext = tokstr;
+	if (zshlextext == copy)
+	    zshlextext = tokstr;
     }
     return 0;
 }

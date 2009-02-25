@@ -5780,7 +5780,7 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
     condlex = testlex;
     testlex();
     prog = parse_cond();
-    condlex = yylex;
+    condlex = zshlex;
 
     if (errflag) {
 	errflag = 0;
