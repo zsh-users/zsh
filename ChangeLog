@@ -1,3 +1,8 @@
+2009-02-22  Clint Adams  <clint@zsh.org>
+
+	* 26593: Completion/Debian/Command/_lintian: complete multiple
+	files for lintian.
+
 2009-02-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 26588: Src/Zle/zle_tricky.c: don't expand aliases in run-help
@@ -11220,5 +11225,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4575 $                         
+* $Revision: 1.4576 $                         
 *****************************************************
