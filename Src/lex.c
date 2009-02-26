@@ -1802,16 +1802,18 @@ exalias(void)
 static int
 skipcomm(void)
 {
-    int pct = 1, c;
+    int pct = 1, c, start = 1;
 
     cmdpush(CS_CMDSUBST);
     SETPARBEGIN
     c = Inpar;
     do {
+	int iswhite;
 	add(c);
 	c = hgetc();
 	if (itok(c) || lexstop)
 	    break;
+	iswhite = isep(c);
 	switch (c) {
 	case '(':
 	    pct++;
@@ -1854,7 +1856,15 @@ skipcomm(void)
 		else
 		    add(c);
 	    break;
+	case '#':
+	    if (start) {
+		add(c);
+		while ((c = hgetc()) != '\n' && !lexstop)
+		    add(c);
+	    }
+	    break;
 	}
+	start = iswhite;
     }
     while (pct);
     if (!lexstop)

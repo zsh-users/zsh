@@ -1,3 +1,8 @@
+2009-02-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 26617, c.f. Tomáš Smetana, 26610: Src/lex.c: comments
+	weren't handled in $(...).
+
 2009-02-26  Peter Stephenson  <pws@csr.com>
 
 	* Frank Terbeck: 26612: Doc/Zsh/contrib.yo: VCS info documentation
@@ -11247,5 +11252,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4581 $                         
+* $Revision: 1.4582 $                         
 *****************************************************
