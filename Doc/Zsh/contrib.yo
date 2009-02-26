@@ -508,8 +508,8 @@ tt(enable) contains tt(ALL).
 )
 kindex(disable-patterns)
 item(tt(disable-patterns))(
-A list of patterns that are checked against tt($PWD). If the pattern
-matches, var(vcs_info) will is disabled. This style is checked in the
+A list of patterns that are checked against tt($PWD). If a pattern
+matches, var(vcs_info) will be disabled. This style is checked in the
 var(:vcs_info:-init-:*:-all-) context.
 
 Say, tt(~/.zsh) is a directory under version control, in which you do
