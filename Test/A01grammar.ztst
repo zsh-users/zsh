@@ -503,3 +503,15 @@
   $ZTST_testdir/../Src/zsh -f NonExistentScript
 127q:Non-existent script causes exit status 127
 ?$ZTST_testdir/../Src/zsh: can't open input file: NonExistentScript
+
+  (setopt nonomatch
+  # use this to get stuff at start of line
+  contents=$'# comment \'\necho value #with " stuff\n# comment\n#comment
+  echo not#comment\n'
+  eval 'VAR=$('"$contents"')'
+  print -l $VAR)
+0:comments within $(...)
+>value
+>not#comment
+
+  

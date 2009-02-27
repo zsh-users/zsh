@@ -1813,7 +1813,7 @@ skipcomm(void)
 	c = hgetc();
 	if (itok(c) || lexstop)
 	    break;
-	iswhite = isep(c);
+	iswhite = inblank(c);
 	switch (c) {
 	case '(':
 	    pct++;
@@ -1861,6 +1861,7 @@ skipcomm(void)
 		add(c);
 		while ((c = hgetc()) != '\n' && !lexstop)
 		    add(c);
+		iswhite = 1;
 	    }
 	    break;
 	}
