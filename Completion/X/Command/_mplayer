@@ -115,7 +115,7 @@ case "$state" in
     _tags files urls
     while _tags; do
       _requested files expl 'video file' _files -g \
-	  "*.(#i)(asf|asx|avi|flv|m1v|m2p|m2v|mjpg|mka|mkv|mov|mp3|mp4|mpe|mpeg|mpg|ogg|ogm|qt|rm|vob|wav|wma|wmv)(-.)" && ret=0
+	  "*.(#i)(asf|asx|avi|flac|flv|m1v|m2p|m2v|mjpg|mka|mkv|mov|mp3|mp4|mpe|mpeg|mpg|ogg|ogm|qt|rm|vob|wav|wma|wmv)(-.)" && ret=0
       if _requested urls; then
         while _next_label urls expl URL; do
           _urls "$expl[@]" && ret=0

@@ -1,3 +1,8 @@
+2009-02-28  Clint Adams  <clint@zsh.org>
+
+	* Daniel Friesel: 26636: Completion/X/Command/_mplayer: complete
+	.flac files for mplayer.
+
 2009-02-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 26609: Completion/Unix/Type/_path_files: further / different fix
@@ -11266,5 +11271,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4584 $                         
+* $Revision: 1.4585 $                         
 *****************************************************
