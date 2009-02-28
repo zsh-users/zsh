@@ -25,7 +25,7 @@ for cmd pat in "$var[@]"; do
   if [[ $output = *$~pat* ]]; then
     (( $+opts[-r] )) && eval "${opts[-r]}=$cmd"
     _cmd_variant[$opts[-c]]="$cmd"
-    return
+    return 0
   fi
 done
 

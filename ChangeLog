@@ -1,3 +1,12 @@
+2009-02-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 26609: Completion/Unix/Type/_path_files: further / different fix
+	for doubled -s in path completion, which only might be correct in
+	all cases but is more correct for the original failed example.
+
+	* unposted: Completion/Base/Utility/_pick_variant: be consistent
+	about explicitly returning 0 or 1, just because.
+
 2009-02-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 26622: Src/lex.c, Test/A01grammar.ztst: improve 26617 and add
@@ -11257,5 +11266,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4583 $                         
+* $Revision: 1.4584 $                         
 *****************************************************

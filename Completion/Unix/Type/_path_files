@@ -670,9 +670,9 @@ for prepath in "$prepaths[@]"; do
 	         "$pfxsfx[@]" $Mopts )
 	  if [[ -z "$listsfx" ]]; then
             for i in "$tmp1[@]"; do
-	      tmpdisp=("${i%%/*}")
+	      tmpdisp=("$i")
 	      _list_files tmpdisp "$prepath$realpath$testpath"
-	      compadd "$tmp4[@]" -s "/${i#*/}${Uopt:+$ISUFFIX}" $listopts - "$tmpdisp"
+	      compadd "$tmp4[@]" -s "${Uopt:+$ISUFFIX}" $listopts - "$tmpdisp"
 	    done
           else
             [[ -n "$compstate[pattern_match]" ]] && SUFFIX="${SUFFIX:s./.*/}*"
