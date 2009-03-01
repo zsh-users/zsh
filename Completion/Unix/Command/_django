@@ -57,6 +57,15 @@ case $state in
       "testserver:run a development server with data from the given fixture(s)"
       "validate:validate all installed modules"
     )
+
+    for cmd in $(./manage.py --help 2>&1 >/dev/null | \
+        awk -vdrop=1 '{ if (!drop) print substr($0, 3) } /^Available subcommands/ { drop=0 }')
+    do
+        if ! echo $subcommands | grep -qs "${cmd}:"
+        then
+            subcommands+=($cmd)
+        fi
+    done
     
     _describe -t subcommands 'django admin subcommand' subcommands && ret=0
     ;;

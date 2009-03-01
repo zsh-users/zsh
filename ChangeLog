@@ -1,3 +1,8 @@
+2009-03-01  Clint Adams  <clint@zsh.org>
+
+	* Chris Lamb: 26655: Completion/Unix/Command/_django: complete
+	custom Django management commands.
+
 2009-02-28  Clint Adams  <clint@zsh.org>
 
 	* Daniel Friesel: 26636: Completion/X/Command/_mplayer: complete
@@ -11271,5 +11276,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4585 $                         
+* $Revision: 1.4586 $                         
 *****************************************************
