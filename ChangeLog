@@ -1,5 +1,8 @@
 2009-03-01  Clint Adams  <clint@zsh.org>
 
+	* Frank Blendinger: 26656: Completion/Unix/Command/_gnupod:
+	improved gnupod completion.
+
 	* Chris Lamb: 26655: Completion/Unix/Command/_django: complete
 	custom Django management commands.
 
@@ -11276,5 +11279,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4586 $                         
+* $Revision: 1.4587 $                         
 *****************************************************

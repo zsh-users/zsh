@@ -11,16 +11,28 @@ case "$service" in
     '(-r --restore)'{-r,--restore}'[Restore the iPod (create a new GNUtunesDB from scratch)]'
     '(-d --duplicate)'{-d,--duplicate}'[Allow duplicate files]'
     '(-p --playlist)'{-p,--playlist=}'[Add songs to this playlist]:playlist:'
+    --playlist-is-podcast'[Set podcast flag for playlist(s) created using --playlist]'
+    --podcast-artwork'[Download and install artwork for podcasts from their channel.]'
+    --podcast-cache-dir='[Set a directory in which podcast media files will be cached.]:podcast cache dir:'
+    --podcast-files-limit='[Limit files to download (0 = all (default), -X = X oldest, X = X newest)]:podcast files limit:'.
     --disable-v1'[Do not read ID3v1 Tags (MP3 Only)]'
     --disable-v2'[Do not read ID3v2 Tags (MP3 Only)]'
-    --decode='[Convert FLAC Files to WAVE/MP3 or AAC on-the-fly]:encoding:(pcm mp3 aac aacbm)'
+    '(-x --decode)'{-x,--decode=}'[Convert FLAC Files to WAVE/MP3 or AAC on-the-fly]:encoding:(pcm mp3 aac aacbm)'
+    --decode=video'[Convert .avi Files into iPod video on-the-fly]'
     '(-e --reencode)'{-e,--reencode=}'[Reencode MP3/AAC files with new quality on-the-fly]:quality number (0 = Good 9 = Bad):(1 2 3 4 5 6 7 8 9)'
-    --set-artist='[Set Artist (Override ID3 Tag)]:artist:'
-    --set-album='[Set Album (Override ID3 Tag)]:album:'
-    --set-genre='[Set Genre (Override ID3 Tag)]:genre:'
-    --set-rating='[Set Rating]:rating:'
+    '(-t --set-title)'{-t,--set-title=}'[Set Title (Override ID3 Tag)]:title:'
+    '(-a --set-artist)'{-a,--set-artist=}'[Set Artist (Override ID3 Tag)]:artist:'
+    '(-l --set-album)'{-l,--set-album=}'[Set Album (Override ID3 Tag)]:album:'
+    '(-g --set-genre)'{-g,--set-genre=}'[Set Genre (Override ID3 Tag)]:genre:'
+    --set-rating='[Set Rating (0=-/20=*/40=**/60=***/80=****/100=*****)]:rating:(0 20 40 60 80 100)'
     --set-playcount='[Set Playcount]:play count:'
     --set-songnum='[Override Songnum/Tracknum field]:song number:'
+    '(-b --set-bookmarkable)'{-b,--set-bookmarkable}'[Set this song as bookmarkable (= Remember position)]'
+    --set-shuffleskip'[Exclude this file in shuffle-mode]'
+    --set-compilation'[Mark songs as being part of a compilation]'
+    --min-vol-adj='[Minimum volume adjustment allowed by ID3v2.4 RVA2 tag (range -100 to 100, default 0)]'
+    --max-vol-adj='[Maximum volume adjustment allowed by ID3v2.4 RVA2 tag (range -100 to 100, default 0)]'
+    --artwork='[Use FILE as album cover]:artwork:_files'
     '*:file to add:_files'
 )
   ;;
@@ -30,7 +42,7 @@ case "$service" in
     '(-h --help)'{-h,--help}'[display help and exit]'
     --version'[output version information and exit]'
     '(-m --mount)'{-m,--mount=}'[iPod mountpoint (default is $IPOD_MOUNTPOINT)]:mount point:_files'
-    --fixit'[try to fixup some errors]'
+    --fixit'[try to fixup some errors (may delete lost files)]'
 )
   ;;
 
@@ -41,6 +53,7 @@ case "$service" in
     '(-m --mount)'{-m,--mount=}'[iPod mountpoint (default is $IPOD_MOUNTPOINT)]:mount point:_files'
     '(-d --disable-convert)'{-d,--disable-convert}'[do not try to convert an existing iTunesDB]'
     '(-f --france)'{-f,--france}'[limit volume to 100dB, works only on very old iPods]'
+    --noask'[Do not wait for any user input]'
 )
   ;;
 
@@ -55,12 +68,15 @@ case "$service" in
     '(-i --id)'{-i,--id=}'[search songs by ID]:ID integer:'
     '(-g --genre)'{-g,--genre=}'[search songs by genre]:genre string:'
     '(-c --playcount)'{-c,--playcount=}'[search songs by playcount]:playcount:'
+    '(-s --rating)'{-s,--rating=}'[search songs by Rating (20 is one star, 40 two, etc.)]:playcount:(0 20 40 60 80 100)'
     '(-R --podcastrss)'{-R,--podcastrss=}'[search songs by RSS]:RSS:'
     '(-G --podcastguid)'{-G,--podcastguid=}'[search songs by GUID]:GUID:'
-    '(-o --match-once)'{-o,--match-once}'[search does not need to match multiple times]'
+    '(-b --bitrate)'{-b,--bitrate=}'[search songs by Bitrate]:bitrate:'
+    '(-o --match-once)'{-o,--match-once}'[search does not need to match multiple times (eg. -a & -l)]'
     --delete'[remove matched songs from the iPod]'
-    --view='[modify output (default is ialt)]:output string:'
+    --view='[modify output (default is ialt, see --help)]:output string:'
     --rename='[rename key into value for matched songs]:KEY=VALUE:'
+    --artwork='[Use FILE as Cover for found files]:artwork:_files'
 )
   ;;
 
@@ -72,6 +88,7 @@ case "$service" in
     '(-n --ipod-name)'{-n,--ipod-name=}'[iPod Name (For unlabeled iPods)]:name:'
     '(-v --volume)'{-v,--volume=}'[adjust volume +-VALUE%]:volume percent:'
     '(-e --energy)'{-e,--energy}'[save energy (disable scrolling title)]'
+    '(-g --fwguid)'{-g,--fwguid=}'[FirewireGuid / Serial of connected iPod]'
 )
   ;;
 
