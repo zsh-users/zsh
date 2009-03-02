@@ -1,5 +1,8 @@
 2009-03-02  Peter Stephenson  <pws@csr.com>
 
+	* Lionel Flandrin: 26625: Src/utils.c: inopportune interrupt
+	could wreck terminal set up.
+
 	* 26614 plus 26615: Doc/Zsh/builtins.yo, Doc/Zsh/calsys.yo,
 	Doc/Zsh/prompt.yo, Src/builtin.c, Src/utils.c: support
 	-t <fmt> in history and as a side effect support GNU
@@ -11287,5 +11290,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4588 $                         
+* $Revision: 1.4589 $                         
 *****************************************************

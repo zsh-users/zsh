@@ -1436,10 +1436,11 @@ settyinfo(struct ttyinfo *ti)
 #   define TCSADRAIN 1	/* XXX Princeton's include files are screwed up */
 #  endif
 	tcsetattr(SHTTY, TCSADRAIN, &ti->tio);
-    /* if (tcsetattr(SHTTY, TCSADRAIN, &ti->tio) == -1) */
+	while (tcsetattr(SHTTY, TCSADRAIN, &ti->tio) == -1 && errno == EINTR)
+	    ;
 # else
 	ioctl(SHTTY, TCSETS, &ti->tio);
-    /* if (ioctl(SHTTY, TCSETS, &ti->tio) == -1) */
+	while (ioctl(SHTTY, TCSETS, &ti->tio) == -1 && errno == EINTR)
 # endif
 	/*	zerr("settyinfo: %e",errno)*/ ;
 #else
