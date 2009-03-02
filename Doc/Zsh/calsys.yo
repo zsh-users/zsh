@@ -613,9 +613,11 @@ The location of the main calendar.  The default is tt(~/calendar).
 kindex(date-format)
 item(tt(date-format))(
 A tt(strftime) format string (see manref(strftime)(3)) with the zsh
-extensions tt(%f) for a day of the month with no leading zero or space
-for single digits, and tt(%k) or tt(%l) for the hour of the day on the 24-
-or 12-hour clock, again with no leading zero or space for single digits.
+extensions providing various numbers with no leading zero or space
+if the number is a single digit as described for the
+tt(%D{)var(string)tt(}) prompt format in
+ifzman(the section EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
+ifnzman(noderef(Prompt Expansion)).
 
 This is used for outputting dates in tt(calendar), both to support
 the tt(-v) option and when adding recurring events back to the calendar

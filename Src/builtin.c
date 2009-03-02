@@ -69,7 +69,7 @@ static struct builtin builtins[] =
      * But that's actually not useful, so it's more consistent to
      * cause an error.
      */
-    BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "nlre:IRWAdDfEimpPa", NULL),
+    BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "aAdDe:EfiIlmnpPrRt:W", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
     BUILTIN("float", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "E:%F:%HL:%R:%Z:%ghlprtux", "E"),
     BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "kmMtuUz", NULL),
@@ -81,7 +81,7 @@ static struct builtin builtins[] =
     BUILTIN("hashinfo", 0, bin_hashinfo, 0, 0, 0, NULL, NULL),
 #endif
 
-    BUILTIN("history", 0, bin_fc, 0, -1, BIN_FC, "nrdDfEimpPa", "l"),
+    BUILTIN("history", 0, bin_fc, 0, -1, BIN_FC, "adDEfimnpPrt:", "l"),
     BUILTIN("integer", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "HL:%R:%Z:%ghi:%lprtux", "i"),
     BUILTIN("jobs", 0, bin_fg, 0, -1, BIN_JOBS, "dlpZrs", NULL),
     BUILTIN("kill", BINF_HANDLES_OPTS, bin_kill, 0, -1, 0, NULL, NULL),
@@ -1599,7 +1599,7 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
 {
     int fclistdone = 0;
     zlong tmp;
-    char *s;
+    char *s, *tdfmt, *timebuf;
     Histent ent;
 
     /* reverse range if required */
@@ -1625,6 +1625,25 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
 	return 1;
     }
 
+    if (OPT_ISSET(ops,'d') || OPT_ISSET(ops,'f') ||
+	OPT_ISSET(ops,'E') || OPT_ISSET(ops,'i') ||
+	OPT_ISSET(ops,'t')) {
+	if (OPT_ISSET(ops,'t')) {
+	    tdfmt = OPT_ARG(ops,'t');
+	} else if (OPT_ISSET(ops,'i')) {
+	    tdfmt = "%Y-%m-%d %H:%M";
+	} else if (OPT_ISSET(ops,'E')) {
+	    tdfmt = "%f.%-m.%Y %H:%M";
+	} else if (OPT_ISSET(ops,'f')) {
+	    tdfmt = "%-m/%f/%Y %H:%M";
+	} else {
+	    tdfmt = "%H:%M";
+	}
+	timebuf = zhalloc(256);
+    } else {
+	tdfmt = timebuf = NULL;
+    }
+
     for (;;) {
 	s = dupstring(ent->node.nam);
 	/* this if does the pattern matching, if required */
@@ -1641,24 +1660,11 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
 	    }
 	    /* output actual time (and possibly date) of execution of the
 	       command, if required */
-	    if (OPT_ISSET(ops,'d') || OPT_ISSET(ops,'f') ||
-		OPT_ISSET(ops,'E') || OPT_ISSET(ops,'i')) {
+	    if (tdfmt != NULL) {
 		struct tm *ltm;
 		ltm = localtime(&ent->stim);
-		if (OPT_ISSET(ops,'i')) {
-		    fprintf(f, "%d-%02d-%02d ",
-			    ltm->tm_year + 1900,
-			    ltm->tm_mon + 1, ltm->tm_mday);
-		} else if (OPT_ISSET(ops,'E')) {
-		    fprintf(f, "%d.%d.%d ",
-			    ltm->tm_mday, ltm->tm_mon + 1,
-			    ltm->tm_year + 1900);
-		} else if (OPT_ISSET(ops,'f')) {
-		    fprintf(f, "%d/%d/%d ",
-			    ltm->tm_mon + 1, ltm->tm_mday,
-			    ltm->tm_year + 1900);
-		}
-		fprintf(f, "%02d:%02d  ", ltm->tm_hour, ltm->tm_min);
+		if (ztrftime(timebuf, 256, tdfmt, ltm))
+		    fprintf(f, "%s  ", timebuf);
 	    }
 	    /* display the time taken by the command, if required */
 	    if (OPT_ISSET(ops,'D')) {

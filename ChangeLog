@@ -1,3 +1,11 @@
+2009-03-02  Peter Stephenson  <pws@csr.com>
+
+	* 26614 plus 26615: Doc/Zsh/builtins.yo, Doc/Zsh/calsys.yo,
+	Doc/Zsh/prompt.yo, Src/builtin.c, Src/utils.c: support
+	-t <fmt> in history and as a side effect support GNU
+	"-" extension for date and time elements with no padding
+	for those handled internally.
+
 2009-03-01  Clint Adams  <clint@zsh.org>
 
 	* Frank Blendinger: 26656: Completion/Unix/Command/_gnupod:
@@ -11279,5 +11287,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4587 $                         
+* $Revision: 1.4588 $                         
 *****************************************************

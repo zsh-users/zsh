@@ -171,11 +171,23 @@ The date in var(mm)tt(/)var(dd)tt(/)var(yy) format.
 )
 item(tt(%D{)var(string)tt(}))(
 var(string) is formatted using the tt(strftime) function.
-See manref(strftime)(3) for more details.  Three additional codes are
-available:  tt(%f) prints the day of the month, like tt(%e) but
-without any preceding space if the day is a single digit, and
-tt(%K)/tt(%L) correspond to tt(%k)/tt(%l) for the hour of the day
-(24/12 hour clock) in the same way.
+See manref(strftime)(3) for more details.  Various zsh
+extensions provide numbers with no leading zero or space
+if the number is a single digit:
+
+startsitem()
+sitem(tt(%f))(a day of the month)
+sitem(tt(%K))(the hour of the day on the 24-hour clock)
+sitem(tt(%L))(the hour of the day on the 12-hour clock)
+endsitem()
+
+The GNU extension that a `tt(-)' between the tt(%) and the
+format character causes a leading zero or space to be stripped
+is handled directly by the shell for the format characters tt(d), tt(f),
+tt(H), tt(k), tt(l), tt(m), tt(M), tt(S) and tt(y); any other format
+characters are provided to tt(strftime()) with any leading `tt(-)',
+present, so the handling is system dependent.  Further GNU
+extensions are not supported at present.
 )
 enditem()
 

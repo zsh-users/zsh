@@ -2436,14 +2436,19 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
      "Aug", "Sep", "Oct", "Nov", "Dec"};
 #endif
     char *origbuf = buf;
-    char tmp[3];
+    char tmp[4];
 
 
-    tmp[0] = '%';
-    tmp[2] = '\0';
     while (*fmt)
 	if (*fmt == '%') {
+	    int strip;
+
 	    fmt++;
+	    if (*fmt == '-') {
+		strip = 1;
+		fmt++;
+	    } else
+		strip = 0;
 	    /*
 	     * Assume this format will take up at least two
 	     * characters.  Not always true, but if that matters
@@ -2454,51 +2459,67 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		return -1;
 	    switch (*fmt++) {
 	    case 'd':
-		*buf++ = '0' + tm->tm_mday / 10;
+		if (strip || tm->tm_mday > 9)
+		    *buf++ = '0' + tm->tm_mday / 10;
 		*buf++ = '0' + tm->tm_mday % 10;
 		break;
 	    case 'e':
+		strip = 1;
+		/* FALLTHROUGH */
 	    case 'f':
 		if (tm->tm_mday > 9)
 		    *buf++ = '0' + tm->tm_mday / 10;
-		else if (fmt[-1] == 'e')
+		else if (!strip)
 		    *buf++ = ' ';
 		*buf++ = '0' + tm->tm_mday % 10;
 		break;
-	    case 'k':
 	    case 'K':
+		strip = 1;
+		/* FALLTHROUGH */
+	    case 'H':
+	    case 'k':
 		if (tm->tm_hour > 9)
 		    *buf++ = '0' + tm->tm_hour / 10;
-		else if (fmt[-1] == 'k')
-		    *buf++ = ' ';
+		else if (!strip) {
+		    if (fmt[-1] == 'H')
+			*buf++ = '0';
+		    else
+			*buf++ = ' ';
+		}
 		*buf++ = '0' + tm->tm_hour % 10;
 		break;
-	    case 'l':
 	    case 'L':
+		strip = 1;
+		/* FALLTHROUGH */
+	    case 'l':
 		hr12 = tm->tm_hour % 12;
 		if (hr12 == 0)
 		    hr12 = 12;
 	        if (hr12 > 9)
 		    *buf++ = '1';
-		else if (fmt[-1] == 'l')
+		else if (!strip)
 		    *buf++ = ' ';
 
 		*buf++ = '0' + (hr12 % 10);
 		break;
 	    case 'm':
-		*buf++ = '0' + (tm->tm_mon + 1) / 10;
+		if (tm->tm_mon > 8 || !strip)
+		    *buf++ = '0' + (tm->tm_mon + 1) / 10;
 		*buf++ = '0' + (tm->tm_mon + 1) % 10;
 		break;
 	    case 'M':
-		*buf++ = '0' + tm->tm_min / 10;
+		if (tm->tm_min > 9 || !strip)
+		    *buf++ = '0' + tm->tm_min / 10;
 		*buf++ = '0' + tm->tm_min % 10;
 		break;
 	    case 'S':
-		*buf++ = '0' + tm->tm_sec / 10;
+		if (tm->tm_sec > 9 || !strip)
+		    *buf++ = '0' + tm->tm_sec / 10;
 		*buf++ = '0' + tm->tm_sec % 10;
 		break;
 	    case 'y':
-		*buf++ = '0' + (tm->tm_year / 10) % 10;
+		if (tm->tm_year > 9 || !strip)
+		    *buf++ = '0' + (tm->tm_year / 10) % 10;
 		*buf++ = '0' + tm->tm_year % 10;
 		break;
 	    case '\0':
@@ -2507,6 +2528,26 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		fmt--;
 		break;
 #ifndef HAVE_STRFTIME
+	    case 'Y':
+	    {
+		/*
+		 * Not worth handling this natively if
+		 * strftime has it.
+		 */
+		int year, digits, testyear;
+		year = tm->tm_year + 1900;
+		digits = 1;
+		testyear = year;
+		while (testyear > 9) {
+		    digits++;
+		    testyear /= 10;
+		}
+		if (ztrftimebuf(&bufsize, digits))
+		    return -1;
+		sprintf(buf, "%d", year);
+		buf += digits;
+		break;
+	    }
 	    case 'a':
 		if (ztrftimebuf(&bufsize, strlen(astr[tm->tm_wday]) - 2))
 		    return -1;
@@ -2532,7 +2573,7 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		 * in the accounting in bufsize (but nowhere else).
 		 */
 		*buf = '\1';
-		tmp[1] = fmt[-1];
+		sprintf(tmp, strip ? "%%-%c" : "%%%c", fmt[-1]);
 		if (!strftime(buf, bufsize + 2, tmp, tm))
 		{
 		    if (*buf) {

@@ -484,7 +484,9 @@ Do nothing and return an exit status of 1.
 findex(fc)
 cindex(history, editing)
 cindex(editing history)
-xitem(tt(fc) [ tt(-e) var(ename) ] [ tt(-nlrdDfEim) ] [ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
+xitem(tt(fc) [ tt(-e) var(ename) ] [ tt(-m) var(match) ] [ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
+xitem(tt(fc) tt(-l) [ tt(-nrdfEiD) ] [ tt(-t) var(timefmt) ] [ tt(-m) var(match) ])
+xitem(      [ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
 xitem(tt(fc) tt(-p) [ tt(-a) ] [ var(filename) [ var(histsize) [ var(savehistsize) ] ] ])
 xitem(tt(fc) tt(-P))
 item(tt(fc) tt(-ARWI) [ var(filename) ])(
@@ -517,13 +519,26 @@ or to -1 if the tt(-l) flag is given.
 
 The flag tt(-r) reverses the order of the commands and the
 flag tt(-n) suppresses command numbers when listing.
-Also when listing, tt(-d) prints timestamps for each command, and
-tt(-f) prints full time-date stamps.  Adding the tt(-E) flag
-causes the dates to be printed as `var(dd)tt(.)var(mm)tt(.)var(yyyy)',
-instead of the default `var(mm)tt(/)var(dd)tt(/)var(yyyy)'.
-Adding the tt(-i) flag causes the dates to be printed in ISO8601
-`var(yyyy)tt(-)var(mm)tt(-)var(dd)' format.
-With the tt(-D) flag, tt(fc) prints elapsed times.
+
+Also when listing,
+startsitem()
+sitem(tt(-d))(prints timestamps for each command)
+sitem(tt(-f))(prints full time-date stamps in the US
+`var(MM)tt(/)var(DD)tt(/)var(YY) var(hh):var(mm)' format)
+sitem(tt(-E))(prints full time-date stamps in the European
+`var(dd)tt(.)var(mm)tt(.)var(yyyy) var(hh):var(mm)' format)
+sitem(tt(-i))(prints full time-date stamps in ISO8601
+`var(yyyy)tt(-)var(mm)tt(-)var(dd) var(hh):var(mm)' format)
+sitem(tt(-t) var(fmt))(prints time and date stamps in the given format;
+var(fmt) is formatted with the strftime function with the zsh extensions
+described for the tt(%D{)var(string)tt(}) prompt format in
+ifzman(the section EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
+ifnzman(noderef(Prompt Expansion)).  The resulting formatted string must be
+no more than 256 characters or will not be printed.
+)
+sitem(tt(-D))(prints elapsed times; may be combined with one of the
+options above.)
+endsitem()
 
 cindex(history, stack)
 cindex(stack, history)
