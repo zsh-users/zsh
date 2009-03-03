@@ -4431,10 +4431,12 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 mod_export void
 runshfunc(Eprog prog, FuncWrap wrap, char *name)
 {
-    int cont;
-    VARARR(char, ou, underscoreused);
+    int cont, ouu;
+    char *ou;
 
-    memcpy(ou, underscore, underscoreused);
+    ou = zalloc(ouu = underscoreused);
+    if (ou)
+	memcpy(ou, underscore, underscoreused);
 
     while (wrap) {
 	wrap->module->wrapper++;
@@ -4445,13 +4447,19 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
 	    (wrap->module->node.flags & MOD_UNLOAD))
 	    unload_module(wrap->module);
 
-	if (!cont)
+	if (!cont) {
+	    if (ou)
+		zfree(ou, ouu);
 	    return;
+	}
 	wrap = wrap->next;
     }
     startparamscope();
     execode(prog, 1, 0);
-    setunderscore(ou);
+    if (ou) {
+	setunderscore(ou);
+	zfree(ou, ouu);
+    }
     endparamscope();
 }
 

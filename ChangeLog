@@ -1,5 +1,8 @@
 2009-03-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 26686: Src/exec.c, Src/utils.c: storing long $_ on the
+	stack can be problematic, so use zalloc() rather than VARARR().
+
 	* 26683: Doc/Zsh/params.yo, Doc/Zsh/roadmap.yo: add some notes
 	on LC_CTYPE etc.
 
@@ -11328,5 +11331,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4599 $                         
+* $Revision: 1.4600 $                         
 *****************************************************

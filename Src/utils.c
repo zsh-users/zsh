@@ -1340,9 +1340,13 @@ checkmailpath(char **s)
 		    fprintf(shout, "You have new mail.\n");
 		    fflush(shout);
 		} else {
-		    VARARR(char, usav, underscoreused);
+		    char *usav;
+		    int uusav = underscoreused;
 
-		    memcpy(usav, underscore, underscoreused);
+		    usav = zalloc(underscoreused);
+
+		    if (usav)
+			memcpy(usav, underscore, underscoreused);
 
 		    setunderscore(*s);
 
@@ -1353,7 +1357,10 @@ checkmailpath(char **s)
 			fputc('\n', shout);
 			fflush(shout);
 		    }
-		    setunderscore(usav);
+		    if (usav) {
+			setunderscore(usav);
+			zfree(usav, uusav);
+		    }
 		}
 	    }
 	    if (isset(MAILWARNING) && st.st_atime > st.st_mtime &&
