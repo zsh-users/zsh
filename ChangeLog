@@ -1,6 +1,9 @@
 2009-03-03  Peter Stephenson  <pws@csr.com>
 
-	* Doc/Zsh/options.yo, Src/lex.c, Src/options.c, Src/zsh.h,
+	* 26676: Doc/Zsh/options.yo: redirect to main description
+	of reserved words instead.
+
+	* 26675: Doc/Zsh/options.yo, Src/lex.c, Src/options.c, Src/zsh.h,
 	Test/A02alias.ztst: add POSIX_ALIASES option.
 
 	* 26671: Completion/Zsh/Command/_zattr, Doc/Zsh/.distfiles,
@@ -11311,5 +11314,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4594 $                         
+* $Revision: 1.4595 $                         
 *****************************************************

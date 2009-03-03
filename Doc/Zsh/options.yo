@@ -1715,31 +1715,9 @@ pindex(NOPOSIXALIASES)
 item(tt(POSIX_ALIASES) <K> <S>)(
 When this option is set, reserved words are not candidates for
 alias expansion:  it is still possible to declare any of them as an alias,
-but the alias will never be expanded.  Reserved words are
-tt(!),
-tt([[),
-tt({),
-tt(}),
-tt(case),
-tt(coproc),
-tt(do),
-tt(done),
-tt(elif),
-tt(else),
-tt(end),
-tt(esac),
-tt(fi),
-tt(for),
-tt(foreach),
-tt(function),
-tt(if),
-tt(nocorrect),
-tt(repeat),
-tt(select),
-tt(then),
-tt(time),
-tt(until),
-tt(while).
+but the alias will never be expanded.  Reserved words are described in
+ifnzman(noderef(Reserved Words))\
+ifzman(the section RESERVED WORDS in zmanref(zshmisc)).
 
 Alias expansion takes place while text is being read; hence when this
 option is set it does not take effect until the end of any function or
