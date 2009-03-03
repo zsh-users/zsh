@@ -906,7 +906,12 @@ information within ranges in glob brackets and for sorting.
 vindex(LC_CTYPE)
 item(tt(LC_CTYPE) <S>)(
 This variable determines the locale category for character handling
-functions.
+functions.  If the tt(MULTIBYTE) option is in effect this variable or
+tt(LANG) should contain a value that reflects the character set in
+use, even if it is a single-byte character set, unless only the
+7-bit subset (ASCII) is used.  For example, if the character set
+is ISO-8859-1, a suitable value might be tt(en_US.iso88591) (certain
+Linux distributions) or tt(en_US.ISO8859-1) (MacOS).
 )
 vindex(LC_MESSAGES)
 item(tt(LC_MESSAGES) <S>)(

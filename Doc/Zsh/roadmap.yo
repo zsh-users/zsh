@@ -50,6 +50,17 @@ by the shell, but the degree of support in terminal emulators is variable.
 There is some discussion of this in the shell FAQ,
 http://zsh.dotsrc.org/FAQ/ .  Note in particular that for combining
 characters to be handled the option tt(COMBINING_CHARS) needs to be set.
+Because the shell is now more sensitive to the definition of the
+character set, note that if you are upgrading from an older version of
+the shell you should ensure that the appropriate variable, either
+tt(LANG) (to affect all aspects of the shell's operation) or
+tt(LC_CTYPE) (to affect only the handling of character sets) is set to
+an appropriate value.  This is true even if you are using a
+single-byte character set including extensions of ASCII such as
+tt(ISO-8859-1) or tt(ISO-8859-15).  See the description of tt(LC_CTYPE)
+in
+ifnzman(noderef(Parameters))\
+ifzman(zmanref(zshparam)).
 
 subsect(Completion)
 
