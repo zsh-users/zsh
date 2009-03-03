@@ -1,3 +1,7 @@
+2009-03-03  Peter Stephenson  <pws@csr.com>
+
+	* Jun T.: 26667: Doc/Zsh/prompt.yo: separate out parentheses.
+
 2009-03-02  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 26665: Src/utils.c: fix one incorrect test in 26614.
@@ -11294,5 +11298,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4590 $                         
+* $Revision: 1.4591 $                         
 *****************************************************

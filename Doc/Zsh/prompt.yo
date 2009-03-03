@@ -185,7 +185,7 @@ The GNU extension that a `tt(-)' between the tt(%) and the
 format character causes a leading zero or space to be stripped
 is handled directly by the shell for the format characters tt(d), tt(f),
 tt(H), tt(k), tt(l), tt(m), tt(M), tt(S) and tt(y); any other format
-characters are provided to tt(strftime()) with any leading `tt(-)',
+characters are provided to tt(strftime+LPAR()RPAR()) with any leading `tt(-)',
 present, so the handling is system dependent.  Further GNU
 extensions are not supported at present.
 )
