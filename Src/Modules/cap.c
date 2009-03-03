@@ -73,7 +73,6 @@ bin_getcap(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	char *result = NULL;
 	ssize_t length;
 	cap_t caps;
-	char *filename;
 
 	caps = cap_get_file(unmetafy(dupstring(*argv), NULL));
 	if(caps)
@@ -102,7 +101,7 @@ bin_setcap(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
     }
 
     do {
-	if(cap_set_file(unmetafy(dupstring(*argv, NULL)), caps)) {
+	if(cap_set_file(unmetafy(dupstring(*argv), NULL), caps)) {
 	    zwarnnam(nam, "%s: %e", *argv, errno);
 	    ret = 1;
 	}

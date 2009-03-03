@@ -1,3 +1,8 @@
+2009-03-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Src/Modules/cap.c: that's what happens when you
+	make patches for things that aren't supported on your system.
+
 2009-03-03  Peter Stephenson  <pws@csr.com>
 
 	* 26680: Src/Modules/cap.c: missed some stuff that needed metafied
@@ -11320,5 +11325,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4597 $                         
+* $Revision: 1.4598 $                         
 *****************************************************
