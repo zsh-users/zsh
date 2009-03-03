@@ -1,3 +1,7 @@
+2009-03-02  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 26665: Src/utils.c: fix one incorrect test in 26614.
+
 2009-03-02  Peter Stephenson  <pws@csr.com>
 
 	* Lionel Flandrin: 26625: Src/utils.c: inopportune interrupt
@@ -11290,5 +11294,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4589 $                         
+* $Revision: 1.4590 $                         
 *****************************************************

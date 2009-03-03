@@ -2460,7 +2460,7 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		return -1;
 	    switch (*fmt++) {
 	    case 'd':
-		if (strip || tm->tm_mday > 9)
+		if (tm->tm_mday > 9 || !strip)
 		    *buf++ = '0' + tm->tm_mday / 10;
 		*buf++ = '0' + tm->tm_mday % 10;
 		break;
@@ -3090,6 +3090,7 @@ inittyptab(void)
     for (t0 = 0240; t0 != 0400; t0++)
 	typtab[t0] = IALPHA | IALNUM | IIDENT | IUSER | IWORD;
 #endif
+    /* typtab['.'] |= IIDENT; */ /* Allow '.' in variable names - broken */
     typtab['_'] = IIDENT | IUSER;
     typtab['-'] = typtab['.'] = IUSER;
     typtab[' '] |= IBLANK | INBLANK;
