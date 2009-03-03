@@ -37,10 +37,10 @@ static int
 bin_getattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     int ret = 0;
-    int len;
+    int len, slen;
     char value[256];
 
-    unmetafy(*argv, NULL);
+    unmetafy(*argv, &slen);
     unmetafy(*(argv+1), NULL);
     if (listxattr(*argv, NULL, 0) > 0) {
         if (0 < (len = getxattr(*argv, *(argv+1), value, 255))) {
@@ -51,8 +51,8 @@ bin_getattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
                 else
                     printf("%s\n", value);
             }
-        } else {
-            zwarnnam(nam, "%s: %e", metafy(*argv, -1, META_NOALLOC), errno);
+        } else if (len < 0) {
+            zwarnnam(nam, "%s: %e", metafy(*argv, slen, META_NOALLOC), errno);
             ret = 1;
         }
     }
@@ -62,13 +62,13 @@ bin_getattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 static int
 bin_setattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
-    int ret = 0;
- 
-    unmetafy(*argv, NULL);
+    int ret = 0, slen;
+
+    unmetafy(*argv, &slen);
     unmetafy(*(argv+1), NULL);
     unmetafy(*(argv+2), NULL);
     if (setxattr(*argv, *(argv+1), *(argv+2), strlen(*(argv+2)), 0)) {
-        zwarnnam(nam, "%s: %e", metafy(*argv, -1, META_NOALLOC), errno);
+        zwarnnam(nam, "%s: %e", metafy(*argv, slen, META_NOALLOC), errno);
         ret = 1;
     }
     return ret;
@@ -77,25 +77,25 @@ bin_setattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 static int
 bin_delattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
-    int ret = 0;
- 
-    unmetafy(*argv, NULL);
+    int ret = 0, slen;
+
+    unmetafy(*argv, &slen);
     unmetafy(*(argv+1), NULL);
     if (removexattr(*argv, *(argv+1))) {
-        zwarnnam(nam, "%s: %e", metafy(*argv, -1, META_NOALLOC), errno);
+        zwarnnam(nam, "%s: %e", metafy(*argv, slen, META_NOALLOC), errno);
         ret = 1;
     }
     return ret;
 }
- 
+
 static int
 bin_listattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     int ret = 0;
-    int len, i = 1;
+    int len, slen;
     char value[256];
 
-    unmetafy(*argv, NULL);
+    unmetafy(*argv, &slen);
     if (0 < (len = listxattr(*argv, value, 256))) {
         if (len < 256) {
             char *p = value;
@@ -106,8 +106,8 @@ bin_listattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
                 p += strlen(p) + 1;
             }
         }
-    } else {
-        zwarnnam(nam, "%s: %e", metafy(*argv, -1, META_NOALLOC), errno);
+    } else if (len < 0) {
+        zwarnnam(nam, "%s: %e", metafy(*argv, slen, META_NOALLOC), errno);
         ret = 1;
     }
     return ret;

@@ -1,5 +1,9 @@
 2009-03-03  Peter Stephenson  <pws@csr.com>
 
+	* 26671: Completion/Zsh/Command/_zattr, Doc/Zsh/.distfiles,
+	Src/Modules/attr.c: various minor tidy-ups (tidies up?) for
+	26670.
+
 	* Mikael Magnusson: 26670: configure.ac,
 	Completion/Command/Zsh/.distfiles, Completion/Zsh/Command/_zattr,
 	Doc/Makefile.in, Doc/Zsh/.distfiles, Doc/Zsh/mod_attr.yo,
@@ -11304,5 +11308,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4592 $                         
+* $Revision: 1.4593 $                         
 *****************************************************
