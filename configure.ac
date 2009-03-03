@@ -858,6 +858,8 @@ if test x$gdbm != xno; then
   AC_CHECK_LIB(gdbm, gdbm_open)
 fi
 
+AC_CHECK_HEADERS(sys/xattr.h)
+
 dnl --------------
 dnl CHECK TYPEDEFS
 dnl --------------
@@ -1155,7 +1157,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       grantpt unlockpt ptsname \
 	       htons ntohs \
 	       regcomp regexec regerror regfree \
-	       gdbm_open)
+	       gdbm_open getxattr)
 AC_FUNC_STRCOLL
 
 if test x$enable_cap = xyes; then

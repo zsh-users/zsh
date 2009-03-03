@@ -5,7 +5,8 @@ DISTFILES_SRC='
     contrib.yo        exec.yo           expn.yo           filelist.yo
     files.yo          func.yo           grammar.yo        index.yo
     intro.yo          invoke.yo         jobs.yo           manmodmenu.yo
-    manual.yo         metafaq.yo        mod_cap.yo        mod_clone.yo
+    manual.yo         metafaq.yo        mod_attr.yo       mod_cap.yo
+    mod_clone.yo
     mod_compctl.yo    mod_complete.yo   mod_complist.yo   mod_computil.yo
     mod_curses.yo     mod_datetime.yo   mod_deltochar.yo  mod_example.yo
     mod_files.yo      mod_langinfo.yo   modlist.yo        mod_mapfile.yo

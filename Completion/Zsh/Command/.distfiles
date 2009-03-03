@@ -37,6 +37,7 @@ _unsetopt
 _vared
 _wait
 _which
+_zattr
 _zcompile
 _zed
 _zftp

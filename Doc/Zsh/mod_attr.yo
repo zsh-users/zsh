@@ -1,0 +1,34 @@
+COMMENT(!MOD!zsh/attr
+Builtins for manipulating extended attributes (xattr).
+!MOD!)
+The tt(zsh/attr) module is used for manipulating extended attributes.
+The builtins in this module are:
+
+startitem()
+findex(zgetattr)
+cindex(extended attributes, xattr, getting from files)
+item(tt(zgetattr) var(filename) var(attribute) [ var(parameter) ])(
+Get the extended attribute var(attribute) from the specified
+var(filename). If the optional argument var(parameter) is given, the
+attribute is set on that parameter instead of being printed to stdout.
+)
+findex(zsetattr)
+cindex(extended attributes, xattr, setting on files)
+item(tt(zsetattr) var(filename) var(attribute) var(value))(
+Set the extended attribute var(attribute) on the specified
+var(filename) to var(value).
+)
+findex(zdelattr)
+cindex(extended attributes, xattr, removing, deleting)
+item(tt(zdelattr) var(filename) var(attribute))(
+Remove the extended attribute var(attribute) from the specified
+var(filename).
+)
+findex(zlistattr)
+cindex(extended attributes, xattr, listing)
+item(tt(zlistattr) var(filename) [ var(parameter) ])(
+List the extended attributes currently set on the specified
+var(filename). If the optional argument var(parameter) is given, the
+list of attributes is set on that parameter instead of being printed to stdout.
+)
+enditem()

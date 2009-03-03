@@ -1,0 +1,34 @@
+#compdef zgetattr zsetattr zdelattr zlistattr
+
+local state line expl ret=1 REPLY
+local -a args privs
+
+case $service in
+zgetattr)
+_arguments \
+  '1:file:_files' \
+  '2:attribute:->attrs' \
+  '3:parameter'
+;;
+zsetattr)
+_arguments \
+  '1:file:_files' \
+  '2:attribute:->attrs' \
+  '3:value'
+;;
+zdelattr)
+_arguments \
+  '1:file:_files' \
+  '2:attribute:->attrs'
+;;
+zlistattr)
+_arguments \
+  '1:file:_files' \
+  '2:parameter'
+;;
+esac
+
+if [[ $state = attrs ]]; then
+  zlistattr $line[1] REPLY
+  _wanted attrs expl 'attribute' compadd ${(0)REPLY}
+fi

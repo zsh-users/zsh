@@ -55,7 +55,7 @@ zshall.1
 YODLDOC = $(MAN) texi
 
 MODDOCSRC = \
-Zsh/mod_cap.yo Zsh/mod_clone.yo \
+Zsh/mod_attr.yo Zsh/mod_cap.yo Zsh/mod_clone.yo \
 Zsh/mod_compctl.yo Zsh/mod_complete.yo Zsh/mod_complist.yo \
 Zsh/mod_computil.yo Zsh/mod_curses.yo \
 Zsh/mod_datetime.yo Zsh/mod_deltochar.yo \
