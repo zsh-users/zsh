@@ -1,5 +1,8 @@
 2009-03-03  Peter Stephenson  <pws@csr.com>
 
+	* 26677: Src/Module/caps.c: need some unmetafy() calls as noticed
+	by Mikael.
+
 	* 26676: Doc/Zsh/options.yo: redirect to main description
 	of reserved words instead.
 
@@ -11314,5 +11317,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4595 $                         
+* $Revision: 1.4596 $                         
 *****************************************************

@@ -38,6 +38,7 @@ bin_cap(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
     int ret = 0;
     cap_t caps;
     if(*argv) {
+	unmetafy(*argv, NULL);
 	caps = cap_from_text(*argv);
 	if(!caps) {
 	    zwarnnam(nam, "invalid capability string");
@@ -90,6 +91,7 @@ bin_setcap(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
     cap_t caps;
     int ret = 0;
 
+    unmetafy(*argv, NULL);
     caps = cap_from_text(*argv++);
     if(!caps) {
 	zwarnnam(nam, "invalid capability string");
@@ -97,6 +99,7 @@ bin_setcap(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
     }
 
     do {
+	unmetafy(*argv, NULL);
 	if(cap_set_file(*argv, caps)) {
 	    zwarnnam(nam, "%s: %e", *argv, errno);
 	    ret = 1;
