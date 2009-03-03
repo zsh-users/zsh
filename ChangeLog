@@ -1,5 +1,8 @@
 2009-03-03  Peter Stephenson  <pws@csr.com>
 
+	* Doc/Zsh/options.yo, Src/lex.c, Src/options.c, Src/zsh.h,
+	Test/A02alias.ztst: add POSIX_ALIASES option.
+
 	* 26671: Completion/Zsh/Command/_zattr, Doc/Zsh/.distfiles,
 	Src/Modules/attr.c: various minor tidy-ups (tidies up?) for
 	26670.
@@ -11308,5 +11311,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4593 $                         
+* $Revision: 1.4594 $                         
 *****************************************************

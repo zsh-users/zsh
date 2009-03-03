@@ -1748,9 +1748,11 @@ exalias(void)
 
 	if (tok == STRING) {
 	    /* Check for an alias */
-	    if (!noaliases && isset(ALIASESOPT)) {
+	    if (!noaliases && isset(ALIASESOPT) &&
+		(!isset(POSIXALIASES) ||
+		 !reswdtab->getnode(reswdtab, zshlextext))) {
 		char *suf;
-		
+
 		an = (Alias) aliastab->getnode(aliastab, zshlextext);
 		if (an && !an->inuse &&
 		    ((an->node.flags & ALIAS_GLOBAL) || incmdpos || inalmore)) {

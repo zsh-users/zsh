@@ -25,3 +25,14 @@
   \bar \bar
 0:Aliasing with a backslash
 >bar
+
+  (alias '!=echo This command has the argument'
+  eval 'print Without
+  ! true'
+  setopt posixaliases
+  eval 'print With
+  ! true')
+1:POSIX_ALIASES option
+>Without
+>This command has the argument true
+>With
