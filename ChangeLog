@@ -1,5 +1,11 @@
 2009-03-04  Peter Stephenson  <pws@csr.com>
 
+	* 26690: Completion/Unix/Command/_perforce: the
+	whole-path style allows you to complete certain types of
+	file (e.g. opened) as a complete path rather than in directory
+	segments; the special value absolute only does that if you
+	type the leading slash.
+
 	* unposted: Etc/FAQ.yo: add POSIX_ALIASES and POSIX_IDENTIFIERS
 	to the list of compatibility options with ksh.
 
@@ -11336,5 +11342,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4601 $                         
+* $Revision: 1.4602 $                         
 *****************************************************

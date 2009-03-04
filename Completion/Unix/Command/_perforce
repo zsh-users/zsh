@@ -163,14 +163,33 @@
 # File completion for some functions is restricted by the Perforce
 # status of the file; for example, `p4 opened' only completes opened
 # files (surprised?)  However, you can set the style (N.B. not tag)
-# all-files; so, for example, you can turn off the limit in this case by
+# `all-files'; so, for example, you can turn off the limit in this case by
 #   zstyle ':completion:*:p4-opened:*' all-files true
-# Normally the file-patterns style would be used to control matching,
+# Normally the `file-patterns' style would be used to control matching,
 # but as the file types are not selected by globbing it doesn't work here
 # However, if you set the all-files style, all filename completion is done
-# by the standard mechanism; in this case, the file-patterns style works
-# as usual.  The style ignored-patterns is available in any case, even
-# without all-files; this is therefore generally the one to use.
+# by the standard mechanism; in this case, the `file-patterns' style works
+# as usual.  The style `ignored-patterns' is available in any case, even
+# without `all-files'; this is therefore generally the one to use.
+#
+# The style `whole-path' allows you complete the entire path to a file
+# at once.  This is useful in cases such as opened files where the
+# list of files is likely to be short but may include files with
+# widely different paths.  As with the `glob' style, the tag is the
+# Perforce disposition of the file: integrated, opened, resolved, dirs,
+# files.  For example, with
+#   zstyle ':completion:*:p4-revert:*:opened' whole-path true
+# completion after `p4 revert' will offer you the entire depot path
+# to a file rather than just part of the path at once (with the
+# usual methods of disambiguation).  Directory completion is turned
+# off during a `whole-path' completion.  The `whole-path' style can
+# also take the value `absolute'; this means that an initial `/'
+# activates `whole-path' completion, otherwise a relative file path
+# will be completed in the normal way.  For example, with
+#   zstyle ':completion:*:p4-revert:*:opened' whole-path absolute
+# then after `p4 revert <TAB>' you are offered open files in the
+# current directory plus directories; after `p4 revert /<TAB>' you
+# are offered all open files in depot syntax.
 #
 # With `p4 diff', the shell will spot if you have used an option that
 # allows you to diff unopened files (such as -f) and in that case offer
@@ -791,6 +810,26 @@ _perforce_file_suffix() {
 }
 
 
+# Helper function for the helper function for the helper functions
+# for the helper function _perforce_files.
+#
+# Check if we should do whole-path completion.
+# The argument is the Perforce disposition of files are looking at.
+_perforce_whole_path() {
+  local wp
+
+  zstyle -s ":completion:${curcontext}:$1" whole-path wp
+  case $wp in
+    (true|yes|on|1)
+    do_wp=1
+    ;;
+
+    (absolute)
+    [[ ${(Q)PREFIX} = /* ]] && do_wp=1
+    ;;
+  esac
+}
+
 #
 # Helper function for the helper functions for the helper function
 # _perforce_files.  This is common code to retrieve a list of files
@@ -806,7 +845,9 @@ _perforce_retrieve_files() {
   local pfx
   local -a files
 
-  if zstyle -t ":completion:${curcontext}:$1" glob; then
+  if _perforce_whole_path $1; then
+    files=(${${(f)"$(_perforce_call_p4 $1 $1 2>/dev/null)"}%%\#*})
+  elif zstyle -t ":completion:${curcontext}:$1" glob; then
     # Limit the list by using Perforce to glob the pattern.
     # This may be faster, but won't use matcher specs etc.
     pfx=${(Q)PREFIX}
@@ -993,6 +1034,8 @@ _perforce_files() {
   local dodirs unmaintained
   # Suffix operations can modify context
   local curcontext="$curcontext"
+  # Used to inhibit directory completion
+  local nodirs
 
   while (( $# )); do
     if [[ $1 = -t(#b)(?) ]]; then
@@ -1030,6 +1073,7 @@ _perforce_files() {
   # We might get into problems with characters recognised as
   # special by p4 files and p4 dirs, but worry about that later.
   pfx=${(Q)PREFIX}
+
   if [[ -prefix *@ ]]; then
     # Modify context to indicate we are in a suffix.
     curcontext="${curcontext%:*}:at-suffix"
@@ -1072,14 +1116,17 @@ _perforce_files() {
 	  ! zstyle -t ":completion:${curcontext}:" all-files; then
 	  for type in $types; do
 	    altfiles+=("$type-files:$type file:_perforce_${type}_files")
+	    _perforce_whole_path $type && nodirs=1
 	  done
 	else
 	  altfiles+=("depot-files:file in depot:_perforce_depot_files")
 	fi
       fi
-      # Intermediate directories in a client view.
-      # See function for notes.
-      altfiles+=("client-dirs:client directory:_perforce_client_dirs")
+      if [[ -z $nodirs ]]; then
+	# Intermediate directories in a client view.
+	# See function for notes.
+	altfiles+=("client-dirs:client directory:_perforce_client_dirs")
+      fi
     fi
     altfiles+=("depot-dirs:directory in depot:_perforce_depot_dirs"
 #      "subdirs:subdirectory search:_perforce_subdirs"
@@ -1118,13 +1165,16 @@ _perforce_files() {
 
     for type in $types; do
       altfiles+=("$type-files:$type file:_perforce_${type}_files")
+      _perforce_whole_path $type && nodirs=1
     done
 
-#    altfiles+=("subdirs:subdirectory search:_perforce_subdirs")
-    if zstyle -t ":completion:${curcontext}:" depot-files; then
-      altfiles+=("depot-dirs:directory in depot:_perforce_depot_dirs")
-    else
-      altfiles+=("directories:directory:_path_files -/")
+    if [[ -z $nodirs ]]; then
+#      altfiles+=("subdirs:subdirectory search:_perforce_subdirs")
+      if zstyle -t ":completion:${curcontext}:" depot-files; then
+	altfiles+=("depot-dirs:directory in depot:_perforce_depot_dirs")
+      else
+	altfiles+=("directories:directory:_path_files -/")
+      fi
     fi
     _alternative $altfiles
   elif zstyle -t ":completion:${curcontext}:" depot-files; then
