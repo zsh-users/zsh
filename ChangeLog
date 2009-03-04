@@ -1,3 +1,8 @@
+2009-03-04  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Etc/FAQ.yo: add POSIX_ALIASES and POSIX_IDENTIFIERS
+	to the list of compatibility options with ksh.
+
 2009-03-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 26686: Src/exec.c, Src/utils.c: storing long $_ on the
@@ -11331,5 +11336,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4600 $                         
+* $Revision: 1.4601 $                         
 *****************************************************

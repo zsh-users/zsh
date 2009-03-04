@@ -517,8 +517,8 @@ link(3.1)(31);
 tt(NO_HUP),
   tt(NO_NOMATCH), tt(NO_RCS), tt(NO_SHORT_LOOPS), tt(PROMPT_SUBST), \
 tt(RM_STAR_SILENT),
-  tt(POSIX_BUILTINS), tt(SH_FILE_EXPANSION), tt(SH_GLOB), \
-tt(SH_OPTION_LETTERS),
+  tt(POSIX_ALIASES), tt(POSIX_BUILTINS), tt(POSIX_IDENTIFIERS),
+  tt(SH_FILE_EXPANSION), tt(SH_GLOB), tt(SH_OPTION_LETTERS),
   tt(SH_WORD_SPLIT) (see question link(3.1)(31)) and tt(SINGLE_LINE_ZLE).
   Note that you can also disable any built-in commands which get in
   your way.  If invoked as `ksh', the shell will try to set suitable
