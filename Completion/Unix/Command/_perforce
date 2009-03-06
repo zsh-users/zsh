@@ -821,13 +821,15 @@ _perforce_whole_path() {
   zstyle -s ":completion:${curcontext}:$1" whole-path wp
   case $wp in
     (true|yes|on|1)
-    do_wp=1
+    return 0
     ;;
 
     (absolute)
-    [[ ${(Q)PREFIX} = /* ]] && do_wp=1
+    [[ ${(Q)PREFIX} = /* ]] && return 0
     ;;
   esac
+
+  return 1
 }
 
 #

@@ -1,3 +1,7 @@
+2009-03-06  Peter Stephenson  <pws@csr.com>
+
+	* unposted: fix definition of _perforce_whole_path in 26690.
+
 2009-03-04  Peter Stephenson  <pws@csr.com>
 
 	* 26690: Completion/Unix/Command/_perforce: the
@@ -11342,5 +11346,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4602 $                         
+* $Revision: 1.4603 $                         
 *****************************************************
