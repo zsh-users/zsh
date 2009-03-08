@@ -42,8 +42,16 @@ bin_getattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 
     unmetafy(*argv, &slen);
     unmetafy(*(argv+1), NULL);
-    if (listxattr(*argv, NULL, 0) > 0) {
-        if (0 < (len = getxattr(*argv, *(argv+1), value, 255))) {
+    if (listxattr(*argv, NULL, 0
+#ifdef XATTR_EXTRA_ARGS
+		  , 0
+#endif
+		  ) > 0) {
+        if (0 < (len = getxattr(*argv, *(argv+1), value, 255
+#ifdef XATTR_EXTRA_ARGS
+				, 0, 0
+#endif
+				))) {
             if (len < 256) {
                 value[len] = '\0';
                 if (*(argv+2))
@@ -67,7 +75,11 @@ bin_setattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
     unmetafy(*argv, &slen);
     unmetafy(*(argv+1), NULL);
     unmetafy(*(argv+2), NULL);
-    if (setxattr(*argv, *(argv+1), *(argv+2), strlen(*(argv+2)), 0)) {
+    if (setxattr(*argv, *(argv+1), *(argv+2), strlen(*(argv+2)), 0
+#ifdef XATTR_EXTRA_ARGS
+						     , 0
+#endif
+		 )) {
         zwarnnam(nam, "%s: %e", metafy(*argv, slen, META_NOALLOC), errno);
         ret = 1;
     }
@@ -81,7 +93,11 @@ bin_delattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 
     unmetafy(*argv, &slen);
     unmetafy(*(argv+1), NULL);
-    if (removexattr(*argv, *(argv+1))) {
+    if (removexattr(*argv, *(argv+1)
+#ifdef XATTR_EXTRA_ARGS
+		    , 0
+#endif
+		    )) {
         zwarnnam(nam, "%s: %e", metafy(*argv, slen, META_NOALLOC), errno);
         ret = 1;
     }
@@ -96,7 +112,11 @@ bin_listattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
     char value[256];
 
     unmetafy(*argv, &slen);
-    if (0 < (len = listxattr(*argv, value, 256))) {
+    if (0 < (len = listxattr(*argv, value, 256
+#ifdef XATTR_EXTRA_ARGS
+		  , 0
+#endif
+			     ))) {
         if (len < 256) {
             char *p = value;
             if (*(argv+1))

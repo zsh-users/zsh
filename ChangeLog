@@ -1,3 +1,9 @@
+2009-03-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 26697: configure.ac, Src/Modules/attr.c, Src/Modules/attr.mdd:
+	test for Linux- and Mac- style xattr functions and don't use
+	if neither appropriate.
+
 2009-03-06  Peter Stephenson  <pws@csr.com>
 
 	* unposted: fix definition of _perforce_whole_path in 26690.
@@ -11346,5 +11352,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4603 $                         
+* $Revision: 1.4604 $                         
 *****************************************************

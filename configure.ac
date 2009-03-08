@@ -1251,6 +1251,49 @@ if test x$dynamic = xyes; then
 		shl_load shl_unload shl_findsym)
 fi
 
+AH_TEMPLATE([XATTR_EXTRA_ARGS],
+Define if getxattr() etc. require additional MacOS-style arguments)
+if test x$ac_cv_func_getxattr = xyes && test x$ac_cv_header_sys_xattr_h = xyes
+then
+  AC_CACHE_CHECK(if getxattr etc. are Linux-like,
+  zsh_cv_getxattr_linux,
+  [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
+#include <sys/xattr.h>]],
+  [[
+  (void)listxattr("", 0, 0);
+  (void)getxattr("", "", 0, 0);
+  (void)setxattr("", "", "", 0, 0);
+  (void)removexattr("", "");
+  ]])],
+  [zsh_cv_getxattr_linux=yes],
+  [zsh_cv_getxattr_linux=no])])
+
+  if test x$zsh_cv_getxattr_linux != xyes; then
+    AC_CACHE_CHECK(if getxattr etc. are MAC-like,
+    zsh_cv_getxattr_mac,
+    [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
+#include <sys/xattr.h>]],
+    [[(void)listxattr("", 0, 0, 0);
+    (void)getxattr("", "", 0, 0, 0, 0);
+    (void)setxattr("", "", "", 0, 0, 0);
+    (void)removexattr("", "", 0);]])],
+    [zsh_cv_getxattr_mac=yes],
+    [zsh_cv_getxattr_mac=no])])
+
+    if test x$zsh_cv_getxattr_mac = xyes; then
+      AC_DEFINE(XATTR_EXTRA_ARGS)
+    fi
+  fi
+fi
+
+AC_CACHE_CHECK(if getxattr etc. are usable,
+zsh_cv_use_xattr,
+[if test x$zsh_cv_getxattr_linux = xyes || test x$zsh_cv_getxattr_mac = xyes
+then
+zsh_cv_use_xattr=yes
+else
+zsh_cv_use_xattr=no
+fi])
 
 dnl -------------
 dnl CHECK SIGNALS

@@ -1,5 +1,5 @@
 name=zsh/attr
-link='if test "x$ac_cv_func_getxattr" = xyes && test "x$ac_cv_header_sys_xattr_h" = xyes; then
+link='if test "x$zsh_cv_use_xattr" = xyes; then
   echo dynamic
 else
   echo no
