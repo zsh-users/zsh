@@ -1,5 +1,9 @@
 2009-03-09  Peter Stephenson  <pws@csr.com>
 
+	* 26702: Src/init.c: lexsave()/lexrestore() needed around
+	use of history in loop() when not at top level; shows up
+	when calling things from zle, for example.
+
 	* derf@sievert.tabularazor.org: 22701:
 	Completion/Unix/Command/_devtodo: new completion
 
@@ -11357,5 +11361,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4605 $                         
+* $Revision: 1.4606 $                         
 *****************************************************

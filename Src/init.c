@@ -105,6 +105,8 @@ loop(int toplevel, int justonce)
     Eprog prog;
 
     pushheap();
+    if (!toplevel)
+	lexsave();
     for (;;) {
 	freeheap();
 	if (stophist == 3)	/* re-entry via preprompt() */
@@ -199,6 +201,8 @@ loop(int toplevel, int justonce)
 	if (justonce)
 	    break;
     }
+    if (!toplevel)
+	lexrestore();
     popheap();
 }
 
