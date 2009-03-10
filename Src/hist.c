@@ -2433,13 +2433,16 @@ lockhistfile(char *fn, int keep_trying)
 	    } else
 		close(fd);
 	    while (link(tmpfile, lockfile) < 0) {
-		if (errno != EEXIST || !keep_trying)
+		if (errno != EEXIST)
+		    zerr("failed to create hard link as lock file %s: %e",
+			 lockfile, errno);
+		else if (!keep_trying)
 		    ;
 		else if (stat(lockfile, &sb) < 0) {
 		    if (errno == ENOENT)
 			continue;
-		}
-		else {
+		    zerr("failed to stat lock file %s: %e", lockfile, errno);
+		} else {
 		    if (time(NULL) - sb.st_mtime < 10)
 			sleep(1);
 		    else
