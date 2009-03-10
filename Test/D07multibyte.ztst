@@ -410,3 +410,20 @@
 0:Metafied characters in prompt expansion
 >梶浦由記
 >Пётр Ильич Чайковский
+
+  (
+  setopt nonomatch
+  tmp1=Ą
+  tmpA=(Ą 'Пётр Ильич Чайковский' 梶浦由記)
+  print ${tmp1} ${(%)tmp1} ${(%%)tmp1}
+  print ${#tmp1} ${#${(%)tmp1}} ${#${(%%)tmp1}}
+  print ${tmpA}
+  print ${(%)tmpA}
+  print ${(%%)tmpA}
+  )
+0:More metafied characters in prompt expansion
+>Ą Ą Ą
+>1 1 1
+>Ą Пётр Ильич Чайковский 梶浦由記
+>Ą Пётр Ильич Чайковский 梶浦由記
+>Ą Пётр Ильич Чайковский 梶浦由記

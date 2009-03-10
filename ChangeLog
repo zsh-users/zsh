@@ -1,3 +1,9 @@
+2009-03-10  Peter Stephenson  <pws@csr.com>
+
+	* 26705: Src/subst.c, Test/D07multibyte.ztst: still problems
+	with multibyte characters with Meta in prompt expansion within
+	parameter expansion.
+
 2009-03-09  Peter Stephenson  <pws@csr.com>
 
 	* 26702: Src/init.c: lexsave()/lexrestore() needed around
@@ -11361,5 +11367,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4606 $                         
+* $Revision: 1.4607 $                         
 *****************************************************

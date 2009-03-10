@@ -2734,7 +2734,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      */
     if (presc) {
 	int ops = opts[PROMPTSUBST], opb = opts[PROMPTBANG];
-	int opp = opts[PROMPTPERCENT], len;
+	int opp = opts[PROMPTPERCENT];
 
 	if (presc < 2) {
 	    opts[PROMPTPERCENT] = 1;
@@ -2756,10 +2756,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    ap = aval;
 	    for (; *ap; ap++) {
 		char *tmps;
-		unmetafy(*ap, &len);
 		untokenize(*ap);
-		tmps = promptexpand(metafy(*ap, len, META_NOALLOC),
-				    0, NULL, NULL, NULL);
+		tmps = promptexpand(*ap, 0, NULL, NULL, NULL);
 		*ap = dupstring(tmps);
 		free(tmps);
 	    }
@@ -2767,10 +2765,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    char *tmps;
 	    if (!copied)
 		val = dupstring(val), copied = 1;
-	    unmetafy(val, &len);
 	    untokenize(val);
-	    tmps = promptexpand(metafy(val, len, META_NOALLOC),
-					0, NULL, NULL, NULL);
+	    tmps = promptexpand(val, 0, NULL, NULL, NULL);
 	    val = dupstring(tmps);
 	    free(tmps);
 	}
