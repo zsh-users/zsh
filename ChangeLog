@@ -1,5 +1,9 @@
 2009-03-13  Peter Stephenson  <pws@csr.com>
 
+	* users/13902: Doc/Zsh/zle.yo, Src/Zle/zle_hist.yo,
+	Src/Zle/zle_params.yo: improve return value from isearch functions
+	and add LASTABORTEDSEARCH variable.
+
 	* 26723: Completion/Unix/Type/.distfiles,
 	Completion/Unix/Type/_have_glob_qual,
 	Completion/Unix/Type_path_files: centralise test for whether
@@ -11384,5 +11388,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4611 $                         
+* $Revision: 1.4612 $                         
 *****************************************************

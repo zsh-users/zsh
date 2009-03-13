@@ -721,10 +721,16 @@ effectively sets the maximum length of the kill ring, while the number of
 non-zero strings gives the current length, both as seen by the user at the
 command line.
 )
-
+vindex(LASTABORTEDSEARCH)
+item(tt(LASTABORTEDSEARCH) (scalar))(
+The last search string used by an interactive search that was
+aborted by the user (status 3 returned by the search widget).
+)
 vindex(LASTSEARCH)
 item(tt(LASTSEARCH) (scalar))(
-The last search string used by an interactive search ; read-only.
+The last search string used by an interactive search; read-only.
+This is set even if the search failed (status 0, 1 or 2 returned
+by the search widget), but not if it was aborted by the user.
 )
 vindex(LASTWIDGET)
 item(tt(LASTWIDGET) (scalar))(
@@ -1116,7 +1122,10 @@ item(tt(history-incremental-search-backward) (^R ^Xr) (unbound) (unbound))(
 Search backward incrementally for a specified string.  The search is
 case-insensitive if the search string does not have uppercase letters and no
 numeric argument was given.  The string may begin with `tt(^)' to anchor the
-search to the beginning of the line.
+search to the beginning of the line.  When called from a user-defined
+function returns the following statuses: 0, if the search succeeded;
+1, if the search failed; 2, if the search term was a bad pattern;
+3, if the search was aborted by the tt(send-break) command.
 
 A restricted set of editing functions
 is available in the mini-buffer.  Keys are looked up in the special

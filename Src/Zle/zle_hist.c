@@ -44,10 +44,15 @@ int histline;
 /* Previous search string use in an incremental search */
 
 /**/
-ZLE_STRING_T previous_search = NULL;
+char *previous_search = NULL;
 
 /**/
-int previous_search_len = 0;
+int previous_search_len;
+
+/* Previous aborted search string use in an incremental search */
+
+/**/
+char *previous_aborted_search = NULL;
 
 /* Local keymap in isearch mode */
 
@@ -891,32 +896,28 @@ zgetline(UNUSED(char **args))
 int
 historyincrementalsearchbackward(char **args)
 {
-    doisearch(args, -1, 0);
-    return 0;
+    return doisearch(args, -1, 0);
 }
 
 /**/
 int
 historyincrementalsearchforward(char **args)
 {
-    doisearch(args, 1, 0);
-    return 0;
+    return doisearch(args, 1, 0);
 }
 
 /**/
 int
 historyincrementalpatternsearchbackward(char **args)
 {
-    doisearch(args, -1, 1);
-    return 0;
+    return doisearch(args, -1, 1);
 }
 
 /**/
 int
 historyincrementalpatternsearchforward(char **args)
 {
-    doisearch(args, 1, 1);
-    return 0;
+    return doisearch(args, 1, 1);
 }
 
 static struct isrch_spot {
@@ -1023,6 +1024,24 @@ isearch_newpos(LinkList matchlist, int curpos, int dir,
     return -1;
 }
 
+/*
+ * Save an isearch buffer from sbuf to sbuf+sbptr
+ * into the string *search with length *searchlen.
+ * searchlen may be NULL; the string is a NULL-terminated metafied string.
+ */
+static void
+save_isearch_buffer(char *sbuf, int sbptr,
+		    char **search, int *searchlen)
+{
+    if (*search)
+	free(*search);
+    *search = zalloc(sbptr+1);
+    memcpy(*search, sbuf, sbptr);
+    if (searchlen)
+	*searchlen = sbptr;
+    (*search)[sbptr] = '\0';
+}
+
 #define ISEARCH_PROMPT		"XXXXXXX XXX-i-search: "
 #define FAILING_TEXT		"failing"
 #define INVALID_TEXT		"invalid"
@@ -1034,12 +1053,15 @@ isearch_newpos(LinkList matchlist, int curpos, int dir,
 int isearch_active, isearch_startpos, isearch_endpos;
 
 /**/
-static void
+static int
 doisearch(char **args, int dir, int pattern)
 {
     /* The full search buffer, including space for all prompts */
     char *ibuf = zhalloc(80);
-    /* The part of the search buffer with the search string */
+    /*
+     * The part of the search buffer with the search string.
+     * This is a normal metafied string.
+     */
     char *sbuf = ibuf + FIRST_SEARCH_CHAR;
     /* The previous line shown to the user */
     char *last_line = NULL;
@@ -1141,9 +1163,13 @@ doisearch(char **args, int dir, int pattern)
      * command line.
      */
     ZleIntFunc exitfn = (ZleIntFunc)0;
+    /*
+     * Flag that the search was aborted.
+     */
+    int aborted = 0;
 
     if (!(he = quietgethist(hl)))
-	return;
+	return 1;
 
     selectlocalmap(isearch_keymap);
 
@@ -1446,6 +1472,9 @@ doisearch(char **args, int dir, int pattern)
 	zrefresh();
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    int i;
+	    aborted = 1;
+	    save_isearch_buffer(sbuf, sbptr,
+				&previous_aborted_search, NULL);
 	    get_isrch_spot(0, &hl, &pos, &pat_hl, &pat_pos, &end_pos,
 			   &i, &sbptr, &dir, &nomatch);
 	    he = quietgethist(hl);
@@ -1597,8 +1626,12 @@ doisearch(char **args, int dir, int pattern)
 #endif
 	    } else {
 		ungetkeycmd();
-		if (cmd == Th(z_sendbreak))
+		if (cmd == Th(z_sendbreak)) {
+		    aborted = 1;
+		    save_isearch_buffer(sbuf, sbptr,
+					&previous_aborted_search, NULL);
 		    sbptr = 0;
+		}
 		break;
 	    }
 	ins:
@@ -1629,9 +1662,8 @@ doisearch(char **args, int dir, int pattern)
 	feep = 0;
     }
     if (sbptr) {
-	zfree(previous_search, previous_search_len);
-	previous_search = zalloc(sbptr);
-	memcpy(previous_search, sbuf, previous_search_len = sbptr);
+	save_isearch_buffer(sbuf, sbptr,
+			    &previous_search, &previous_search_len);
     }
     statusline = NULL;
     unmetafy_line();
@@ -1650,6 +1682,8 @@ doisearch(char **args, int dir, int pattern)
 	kungetct = savekeys;
 
     selectlocalmap(NULL);
+
+    return aborted ? 3 : nomatch;
 }
 
 static Histent

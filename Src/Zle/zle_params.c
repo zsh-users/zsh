@@ -54,6 +54,8 @@ static const struct gsu_scalar keymap_gsu =
 { get_keymap, nullstrsetfn, zleunsetfn };
 static const struct gsu_scalar keys_gsu =
 { get_keys, nullstrsetfn, zleunsetfn };
+static const struct gsu_scalar lastabortedsearch_gsu =
+{ get_lasearch, nullstrsetfn, zleunsetfn };
 static const struct gsu_scalar lastsearch_gsu =
 { get_lsearch, nullstrsetfn, zleunsetfn };
 static const struct gsu_scalar lastwidget_gsu =
@@ -115,6 +117,8 @@ static struct zleparam {
     { "KEYMAP", PM_SCALAR | PM_READONLY, GSU(keymap_gsu), NULL },
     { "KEYS", PM_SCALAR | PM_READONLY, GSU(keys_gsu), NULL },
     { "killring", PM_ARRAY, GSU(killring_gsu), NULL },
+    { "LASTABORTEDSEARCH", PM_SCALAR | PM_READONLY, GSU(lastabortedsearch_gsu),
+      NULL },
     { "LASTSEARCH", PM_SCALAR | PM_READONLY, GSU(lastsearch_gsu), NULL },
     { "LASTWIDGET", PM_SCALAR | PM_READONLY, GSU(lastwidget_gsu), NULL },
     { "LBUFFER", PM_SCALAR,  GSU(lbuffer_gsu), NULL },
@@ -641,12 +645,19 @@ free_prepostdisplay(void)
 
 /**/
 static char *
+get_lasearch(UNUSED(Param pm))
+{
+    if (previous_aborted_search)
+	return previous_aborted_search;
+    return "";
+}
+
+/**/
+static char *
 get_lsearch(UNUSED(Param pm))
 {
-    if (previous_search_len) {
-	return zlelineasstring(previous_search, previous_search_len, 0,
-			       NULL, NULL, 1);
-    }
+    if (previous_search)
+	return previous_search;
     return "";
 }
 
