@@ -15,6 +15,7 @@ _file_systems
 _files
 _global_tags
 _groups
+_have_glob_qual
 _hosts
 _java_class
 _ld_debug

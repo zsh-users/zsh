@@ -14,12 +14,7 @@ local -a match mbegin mend
 # there was at least one character before the parenthesis for
 # a bare glob qualifier.
 # The later test looks for an outstanding quote.
-if [[ ( -o bareglobqual && \
-           $PREFIX = (#b)((*[^\\]|)(\\\\)#\()([^\)]#) && \
-           ${#match[1]} -gt 1 || \
-        -o extendedglob && \
-	   $PREFIX = (#b)((*[^\\]|)(\\\\)#"(#q")([^\)]#) \
-      ) && -z $compstate[quote] ]]; then
+if _have_glob_qual $PREFIX; then
    compset -p ${#match[1]}
    if [[ -o extendedglob ]] && compset -P '\#'; then
      _globflags
@@ -88,7 +83,7 @@ if (( $#ignore )); then
   else
     ignore=( ${(P)ignore[2]} )
   fi
-fi  
+fi
 
 # If we were given no file selection option, we behave as if we were given
 # a `-f'.
@@ -162,14 +157,12 @@ if zstyle -s ":completion:${curcontext}:" file-sort tmp1; then
 
     tmp2=()
     for tmp1 in "$pats[@]"; do
-      if [[ "$tmp1" = (#b)(*[^\$])"(#q"(*)")" ]]; then
-	tmp2=( "$tmp2[@]" "${match[1]}(#q${sort}${match[2]})" )
-      elif [[ "$tmp1" = (#b)(*[^\$])(\(\([^\|~]##\)\)) ]]; then
-        tmp2=( "$tmp2[@]" "${match[1]}((${sort}${match[2][3,-1]}" )
-      elif [[ "$tmp1" = (#b)(*[^\$])(\([^\|~]##\)) ]]; then
-        tmp2=( "$tmp2[@]" "${match[1]}(${sort}${match[2][2,-1]}" )
+      if _have_glob_qual "$tmp1" complete; then
+	# unbalanced parenthesis is correct: match[1] contains the start,
+	# match[5] doesn't contain the end.
+	tmp2+=( "${match[1]}${sort}${match[5]})" )
       else
-        tmp2=( "$tmp2[@]" "${tmp1}(${sort})" )
+        tmp2+=( "${tmp1}(${sort})" )
       fi
     done
     pats=( "$tmp2[@]" )
@@ -198,31 +191,29 @@ zstyle -a ":completion:${curcontext}:" fake-files fake
 
 zstyle -s ":completion:${curcontext}:" ignore-parents ignpar
 
-if [[ -n "$compstate[pattern_match]" &&
-      ( ( -z "$SUFFIX" && "$PREFIX" = (|*[^\$])\([^\|\~]##\) ) ||
-        "$SUFFIX" =  (|*[^\$])\([^\|\~]##\) ) ]]; then
-  # Copy all glob qualifiers from the line to
-  # the patterns used when generating matches
-  if [[ "$SUFFIX" = *\([^\|\~]##\) ]]; then
-    tmp3="${${(M)SUFFIX%\([^\|\~]##\)}[2,-2]}"
-    SUFFIX="${SUFFIX%\($tmp3\)}"
-  else
-    tmp3="${${(M)PREFIX%\([^\|\~]##\)}[2,-2]}"
-    PREFIX="${PREFIX%\($tmp3\)}"
-  fi
-  tmp2=()
-  for tmp1 in "$pats[@]"; do
-    if [[ "$tmp1" = (#b)(*[^\$])"(#q"(*)")" ]]; then
-      tmp2=( "$tmp2[@]" "${match[1]}(#q${tmp3}${match[2]})" )
-    elif [[ "$tmp1" = (#b)(*[^\$])(\(\([^\|~]##\)\)) ]]; then
-      tmp2=( "$tmp2[@]" "${match[1]}((${tmp3}${match[2][3,-1]}" )
-    elif [[ "$tmp1" = (#b)(*[^\$])(\([^\|~]##\)) ]]; then
-      tmp2=( "$tmp2[@]" "${match[1]}(${tmp3}${match[2][2,-1]}" )
+if [[ -n "$compstate[pattern_match]" ]]; then
+  if { [[ -z "$SUFFIX" ]] && _have_glob_qual "$PREFIX" complete } ||
+    _have_glob_qual "$SUFFIX" complete; then
+    # Copy all glob qualifiers from the line to
+    # the patterns used when generating matches
+    tmp3=${match[5]}
+    if [[ -n "$SUFFIX" ]]; then
+      SUFFIX=${match[2]}
     else
-      tmp2=( "$tmp2[@]" "${tmp1}(${tmp3})" )
+      PREFIX=${match[2]}
     fi
-  done
-  pats=( "$tmp2[@]" )
+    tmp2=()
+    for tmp1 in "$pats[@]"; do
+      if _have_glob_qual "$tmp1" complete; then
+	# unbalanced parenthesis is correct: match[1] contains the start,
+	# match[5] doesn't contain the end.
+	tmp2+=( "${match[1]}${tmp3}${match[5]})")
+      else
+	tmp2+=( "${tmp1}(${tmp3})" )
+      fi
+    done
+    pats=( "$tmp2[@]" )
+  fi
 fi
 
 # We get the prefix and the suffix from the line and save the whole

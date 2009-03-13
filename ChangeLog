@@ -1,5 +1,10 @@
 2009-03-13  Peter Stephenson  <pws@csr.com>
 
+	* 26723: Completion/Unix/Type/.distfiles,
+	Completion/Unix/Type/_have_glob_qual,
+	Completion/Unix/Type_path_files: centralise test for whether
+	file has glob qualifiers and how to match them.
+
 	* users/13903: Src/Zle/zle_hist.c: repeated vi searching was
 	broken and "_" prompt was missing.
 
@@ -11379,5 +11384,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4610 $                         
+* $Revision: 1.4611 $                         
 *****************************************************
