@@ -1,3 +1,5 @@
+#autoload
+
 local ret=1
 local -a flags
 
