@@ -1,3 +1,8 @@
+2009-03-13  Peter Stephenson  <pws@csr.com>
+
+	* users/13903: Src/Zle/zle_hist.c: repeated vi searching was
+	broken and "_" prompt was missing.
+
 2009-03-13  Geoff Wing  <gcw@zsh.org>
 
 	* unposted: LICENCE: update year to 2009
@@ -11374,5 +11379,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4609 $                         
+* $Revision: 1.4610 $                         
 *****************************************************

@@ -1742,7 +1742,7 @@ getvisrchstr(void)
     selectkeymap("main", 1);
     while (sptr) {
 	sbuf[sptr] = '_';
-	sbuf[sptr] = '\0';
+	sbuf[sptr+1] = '\0';
 	zrefresh();
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    ret = 0;
@@ -1760,6 +1760,10 @@ getvisrchstr(void)
 	    	cmd == Th(z_vicmdmode)) {
 	    sbuf[sptr] = ZWC('\0');
 	    visrchstr = ztrdup(sbuf+1);
+	    if (!strlen(visrchstr)) {
+	        zsfree(visrchstr);
+		visrchstr = ztrdup(vipenultsrchstr);
+	    }
 	    ret = 1;
 	    sptr = 0;
 	} else if(cmd == Th(z_backwarddeletechar) ||
