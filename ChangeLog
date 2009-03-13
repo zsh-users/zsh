@@ -1,3 +1,7 @@
+2009-03-13  Geoff Wing  <gcw@zsh.org>
+
+	* unposted: LICENCE: update year to 2009
+
 2009-03-10  Peter Stephenson  <pws@csr.com>
 
 	* 26708: Src/hist.c: print message if we give up trying to
@@ -11370,5 +11374,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4608 $                         
+* $Revision: 1.4609 $                         
 *****************************************************
