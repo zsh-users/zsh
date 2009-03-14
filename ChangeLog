@@ -1,5 +1,8 @@
 2009-03-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* users/13910: Src/jobs.c: spawnjob() should output job
+	information to the tty like printjob() does.
+
 	* 26699: Makefile.in: dependencies for config.modules.
 
 2009-03-14  Wayne Davison  <wayned@users.sourceforge.net>
@@ -11400,5 +11403,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4615 $                         
+* $Revision: 1.4616 $                         
 *****************************************************

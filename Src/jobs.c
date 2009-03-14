@@ -1380,11 +1380,11 @@ spawnjob(void)
 	} else if (prevjob == -1 || !(jobtab[prevjob].stat & STAT_STOPPED))
 	    prevjob = thisjob;
 	if (interact && jobbing && jobtab[thisjob].procs) {
-	    fprintf(stderr, "[%d]", thisjob);
+	    fprintf(shout, "[%d]", thisjob);
 	    for (pn = jobtab[thisjob].procs; pn; pn = pn->next)
-		fprintf(stderr, " %ld", (long) pn->pid);
-	    fprintf(stderr, "\n");
-	    fflush(stderr);
+		fprintf(shout, " %ld", (long) pn->pid);
+	    fprintf(shout, "\n");
+	    fflush(shout);
 	}
     }
     if (!hasprocs(thisjob))
