@@ -1,3 +1,7 @@
+2009-03-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 26699: Makefile.in: dependencies for config.modules.
+
 2009-03-14  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Adding .gitignore for the mirrored git repo.
@@ -11396,5 +11400,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4614 $                         
+* $Revision: 1.4615 $                         
 *****************************************************

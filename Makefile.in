@@ -41,7 +41,7 @@ INSTALL         = @INSTALL@
 # ========== DEPENDENCIES FOR BUILDING ==========
 
 # default target
-all: config.h
+all: config.h config.modules
 	@for subdir in Src Doc; do \
 	  (cd $$subdir && $(MAKE) $(MAKEDEFS) $@) || exit 1; \
 	done
@@ -142,8 +142,9 @@ config.h: stamp-h
 stamp-h: $(sdir)/config.h.in config.status
 	cd $(dir_top) && $(SHELL) ./config.status config.h $@
 
-config.modules: $(sdir)/config.h.in config.status
-	cd $(dir_top) && $(SHELL) ./config.status $@
+config.modules: $(sdir)/config.h.in config.status config.modules.sh
+	cd $(dir_top) && $(SHELL) ./config.status $@ && \
+	$(SHELL) ./config.modules.sh
 
 $(sdir)/config.h.in: $(sdir)/stamp-h.in
 $(sdir)/stamp-h.in: $(sdir)/configure.ac \
