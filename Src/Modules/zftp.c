@@ -2043,8 +2043,9 @@ zfgetinfo(char *prompt, int noecho)
 	fflush(stderr);
     }
 
-    fgets(instr, 256, stdin);
-    if (instr[len = strlen(instr)-1] == '\n')
+    if (fgets(instr, 256, stdin) == NULL)
+	instr[len = 0] = '\0';
+    else if (instr[len = strlen(instr)-1] == '\n')
 	instr[len] = '\0';
 
     strret = dupstring(instr);

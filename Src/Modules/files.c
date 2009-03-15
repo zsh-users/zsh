@@ -428,7 +428,8 @@ recursivecmd(char *nam, int opt_noerr, int opt_recurse, int opt_safe,
     if ((err & 2) && ds.dirfd >= 0 && restoredir(&ds) && zchdir(pwd)) {
 	zsfree(pwd);
 	pwd = ztrdup("/");
-	chdir(pwd);
+	if (chdir(pwd) < 0)
+	    zwarn("failed to chdir(%s): %e", pwd, errno);
     }
     if (ds.dirfd >= 0)
 	close(ds.dirfd);

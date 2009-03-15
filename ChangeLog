@@ -1,3 +1,9 @@
+2009-03-14  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 26735: Src/Modules/files.c, Src/Modules/mapfile.c,
+	Src/Modules/zftp.c, Src/builtin.c, Src/exec.c,
+	Src/hist.c, Src/utils.c: improved return-value checking.
+
 2009-03-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/13910: Src/jobs.c: spawnjob() should output job
@@ -11403,5 +11409,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4616 $                         
+* $Revision: 1.4617 $
 *****************************************************

@@ -795,16 +795,16 @@ bin_cd(char *nam, char **argv, Options ops, int func)
 	setjobpwd();
 	zsfree(pwd);
 	pwd = metafy(zgetcwd(), -1, META_DUP);
-    } else if (stat(".", &st2) < 0)
-	chdir(unmeta(pwd));
-    else if (st1.st_ino != st2.st_ino || st1.st_dev != st2.st_dev) {
+    } else if (stat(".", &st2) < 0) {
+	if (chdir(unmeta(pwd)) < 0)
+	    zwarn("unable to chdir(%s): %e", pwd, errno);
+    } else if (st1.st_ino != st2.st_ino || st1.st_dev != st2.st_dev) {
 	if (chasinglinks) {
 	    setjobpwd();
 	    zsfree(pwd);
 	    pwd = metafy(zgetcwd(), -1, META_DUP);
-	} else {
-	    chdir(unmeta(pwd));
-	}
+	} else if (chdir(unmeta(pwd)) < 0)
+	    zwarn("unable to chdir(%s): %e", pwd, errno);
     }
     unqueue_signals();
     return 0;

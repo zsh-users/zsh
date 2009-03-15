@@ -92,7 +92,8 @@ setpmmapfile(Param pm, char *value)
 	 * First we need to make sure the file is long enough for
 	 * when we msync.  On AIX, at least, we just get zeroes otherwise.
 	 */
-	ftruncate(fd, len);
+	if (ftruncate(fd, len) < 0)
+	    zwarn("ftruncate failed: %e", errno);
 	memcpy(mmptr, value, len);
 #ifndef MS_SYNC
 #define MS_SYNC 0
@@ -102,7 +103,8 @@ setpmmapfile(Param pm, char *value)
 	 * Then we need to truncate again, since mmap() always maps complete
 	 * pages.  Honestly, I tried it without, and you need both.
 	 */
-	ftruncate(fd, len);
+	if (ftruncate(fd, len) < 0)
+	    zwarn("ftruncate failed: %e", errno);
 	munmap(mmptr, len);
     }
 #else /* don't USE_MMAP */

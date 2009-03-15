@@ -2722,7 +2722,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 #ifdef HAVE_NICE
 	/* Check if we should run background jobs at a lower priority. */
 	if ((how & Z_ASYNC) && isset(BGNICE))
-	    nice(5);
+	    if (nice(5) < 0)
+		zwarn("nice(5) failed: %e", errno);
 #endif /* HAVE_NICE */
 
     } else if (is_cursh) {

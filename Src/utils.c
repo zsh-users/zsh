@@ -5422,7 +5422,8 @@ lchdir(char const *path, struct dirsav *d, int hard)
     }
 #ifdef HAVE_LSTAT
     if (*path == '/')
-	chdir("/");
+	if (chdir("/") < 0)
+	    zwarn("failed to chdir(/): %e", errno);
     for(;;) {
 	while(*path == '/')
 	    path++;

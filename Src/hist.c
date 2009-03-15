@@ -2291,9 +2291,9 @@ savehistfile(char *fn, int err, int writeflags)
 #ifdef HAVE_FCHMOD
 	    if (old_exists && out) {
 #ifdef HAVE_FCHOWN
-		fchown(fileno(out), sb.st_uid, sb.st_gid);
+		if (fchown(fileno(out), sb.st_uid, sb.st_gid) < 0) {} /* IGNORE FAILURE */
 #endif
-		fchmod(fileno(out), sb.st_mode);
+		if (fchmod(fileno(out), sb.st_mode) < 0) {} /* IGNORE FAILURE */
 	    }
 #endif
 	}
