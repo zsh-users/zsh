@@ -3199,6 +3199,8 @@ modify(char **str, char **ptr)
 
 	for (; !c && **ptr;) {
 	    switch (**ptr) {
+            case 'a':
+            case 'A':
 	    case 'h':
 	    case 'r':
 	    case 'e':
@@ -3337,6 +3339,12 @@ modify(char **str, char **ptr)
 			copy = dupstring(tt);
 		    *e = tc;
 		    switch (c) {
+                    case 'a':
+			chabspath(&copy);
+			break;
+		    case 'A':
+			chrealpath(&copy);
+			break;
 		    case 'h':
 			remtpath(&copy);
 			break;
@@ -3396,6 +3404,12 @@ modify(char **str, char **ptr)
 
 	    } else {
 		switch (c) {
+		case 'a':
+		    chabspath(str);
+		    break;
+		case 'A':
+		    chrealpath(str);
+		    break;
 		case 'h':
 		    remtpath(str);
 		    break;

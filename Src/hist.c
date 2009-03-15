@@ -623,6 +623,21 @@ histsubchar(int c)
 	    case 'p':
 		histdone = HISTFLAG_DONE | HISTFLAG_NOEXEC;
 		break;
+	    case 'a':
+		if (!chabspath(&sline)) {
+		    herrflush();
+		    zerr("modifier failed: a");
+		    return -1;
+		}
+		break;
+
+	    case 'A':
+		if (!chrealpath(&sline)) {
+		    herrflush();
+		    zerr("modifier failed: A");
+		    return -1;
+		}
+		break;
 	    case 'h':
 		if (!remtpath(&sline)) {
 		    herrflush();
@@ -1481,6 +1496,132 @@ hcomsearch(char *str)
 }
 
 /* various utilities for : modifiers */
+
+/**/
+int
+chabspath(char **junkptr)
+{
+    char *current, *dest;
+
+    if (!**junkptr)
+	return 1;
+
+    if (**junkptr != '/') {
+	*junkptr = zhtricat(zgetcwd(), "/", *junkptr);
+    }
+
+    current = *junkptr;
+    dest = *junkptr;
+
+#ifdef HAVE_SUPERROOT
+    while (*current == '/' && current[1] == '.' && current[2] == '.' &&
+	   (!current[3] || current[3] == '/')) {
+	*dest++ = '/';
+	*dest++ = '.';
+	*dest++ = '.';
+	current += 3;
+    }
+#endif
+	
+    for (;;) {
+	if (*current == '/') {
+#ifdef __CYGWIN__
+	    if (current == *junkptr && current[1] == '/')
+		*dest++ = *current++;
+#endif
+	    *dest++ = *current++;
+	    while (*current == '/')
+		current++;
+	} else if (!*current) {
+	    while (dest > *junkptr + 1 && dest[-1] == '/')
+		dest--;
+	    *dest = '\0';
+	    break;
+	} else if (current[0] == '.' && current[1] == '.' &&
+		   (!current[2] || current[2] == '/')) {
+		if (current == *junkptr || dest == *junkptr) {
+		    *dest++ = '.';
+		    *dest++ = '.';
+		    current += 2;
+		} else if (dest > *junkptr + 2 &&
+			   !strncmp(dest - 3, "../", 3)) {
+		    *dest++ = '.';
+		    *dest++ = '.';
+		    current += 2;
+		} else if (dest > *junkptr + 1) {
+		    *dest = '\0';
+		    for (dest--;
+			 dest > *junkptr + 1 && dest[-1] != '/';
+			 dest--);
+		    if (dest[-1] != '/')
+			dest--;
+		    current += 2;
+		} else if (dest == *junkptr + 1) {
+		    /* This might break with Cygwin's leading double slashes? */
+		    current += 2;
+		} else {
+		    return 0;
+		}
+	} else if (current[0] == '.' && (current[1] == '/' || !current[1])) {
+	     while (*++current == '/');
+	} else {
+	    while (*current != '/' && *current != '\0')
+		if ((*dest++ = *current++) == Meta)
+		    dest[-1] = *current++ ^ 32;
+	}
+    }
+    return 1;
+}
+
+/**/
+int
+chrealpath(char **junkptr)
+{
+    char *lastpos, *nonreal, real[PATH_MAX];
+
+    if (!**junkptr)
+	return 1;
+
+    /* Notice that this means ..'s are applied before symlinks are resolved! */
+    if (!chabspath(junkptr))
+	return 0;
+
+    /*
+     * Notice that this means you cannot pass relative paths into this
+     * function!
+     */
+    if (**junkptr != '/')
+	return 0;
+
+    lastpos = strend(*junkptr);
+    nonreal = lastpos + 1;
+
+    while (!realpath(*junkptr, real)) {
+	if (errno == EINVAL || errno == ELOOP ||
+	    errno == ENAMETOOLONG || errno == ENOMEM)
+	    return 0;
+
+	if (nonreal == *junkptr) {
+	    *real = '\0';
+	    break;
+	}
+
+	while (*nonreal != '/' && nonreal >= *junkptr)
+	    nonreal--;
+	*nonreal = '\0';
+    }
+
+    char *str = nonreal;
+    while (str <= lastpos) {
+	if (*str == '\0')
+	    *str = '/';
+	str++;
+    }
+
+    *junkptr = bicat(real, nonreal);
+
+    return 1;
+}
 
 /**/
 int

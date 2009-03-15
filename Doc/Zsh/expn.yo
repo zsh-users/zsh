@@ -216,20 +216,24 @@ of em(filename generation) and em(parameter expansion), except where
 noted.
 
 startitem()
-item(tt(h))(
-Remove a trailing pathname component, leaving the head.  This works
-like `tt(dirname)'.
+item(tt(a))(
+Turn a file name into an absolute path:  prepends the current directory,
+if necessary, and resolves any use of `tt(..)' and `tt(.)' in the path.
 )
-item(tt(r))(
-Remove a filename extension of the form `tt(.)var(xxx)', leaving
-the root name.
+item(tt(A))(
+As `tt(a)', but also resolve use of symbolic links where possible.
+Note that resolution of `tt(..)' occurs em(before) resolution of symbolic
+links.
 )
 item(tt(e))(
 Remove all but the extension.
 )
-item(tt(t))(
-Remove all leading pathname components, leaving the tail.  This works
-like `tt(basename)'.
+item(tt(h))(
+Remove a trailing pathname component, leaving the head.  This works
+like `tt(dirname)'.
+)
+item(tt(l))(
+Convert the words to all lowercase.
 )
 item(tt(p))(
 Print the new command but do not execute it.  Only works with history
@@ -244,15 +248,9 @@ by tt(eval).
 item(tt(Q))(
 Remove one level of quotes from the substituted words.
 )
-item(tt(x))(
-Like tt(q), but break into words at whitespace.  Does not work with
-parameter expansion.
-)
-item(tt(l))(
-Convert the words to all lowercase.
-)
-item(tt(u))(
-Convert the words to all uppercase.
+item(tt(r))(
+Remove a filename extension of the form `tt(.)var(xxx)', leaving
+the root name.
 )
 item(tt(s/)var(l)tt(/)var(r)[tt(/)])(
 Substitute var(r) for var(l) as described below.
@@ -271,6 +269,17 @@ Repeat the previous tt(s) substitution.  Like tt(s), may be preceded
 immediately by a tt(g).  In parameter expansion the tt(&) must appear
 inside braces, and in filename generation it must be quoted with a
 backslash.
+)
+item(tt(t))(
+Remove all leading pathname components, leaving the tail.  This works
+like `tt(basename)'.
+)
+item(tt(u))(
+Convert the words to all uppercase.
+)
+item(tt(x))(
+Like tt(q), but break into words at whitespace.  Does not work with
+parameter expansion.
 )
 enditem()
 

@@ -1,3 +1,10 @@
+2009-03-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 26736: Doc/Zsh/expn.yo: document 26731.
+
+	* Michael Hwang: 26731 (with cosmetic changes): Src/hist.c,
+	Src/subst.c: add `a' and `A' modifiers.
+
 2009-03-14  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 26735: Src/Modules/files.c, Src/Modules/mapfile.c,
@@ -11409,5 +11416,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4617 $
+* $Revision: 1.4618 $
 *****************************************************
