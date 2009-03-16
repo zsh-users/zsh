@@ -1,3 +1,8 @@
+2009-03-16  Peter Stephenson  <pws@csr.com>
+
+	* 26744: Completion/Zsh/Context/_normal: handle completion
+	of history modifiers for normal command line arguments.
+
 2009-03-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/13937, users/13939: configure.ac, Src/jobs.c: check for
@@ -11421,5 +11426,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4619 $
+* $Revision: 1.4620 $
 *****************************************************

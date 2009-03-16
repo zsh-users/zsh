@@ -9,6 +9,19 @@ else
   _compskip=''
 fi
 
+# Check for a history reference to complete modifiers.
+# $PREFIX has a quoted form of the !, so we can't test that
+# (it might the start of a real argument), but words has the
+# raw McCoy.
+if [[ -o BANG_HIST && $words[CURRENT] = \!*: && -z $compstate[quote] ]]; then
+  # This looks like a real history expansion; in that case
+  # we'd better put the !'s back the way pfalstad intended.
+  PREFIX=${PREFIX//\\!/!}
+  compset -P '*:'
+  _history_modifiers h
+  return
+fi
+
 # Completing in command position?
 
 if [[ CURRENT -eq 1 ]]; then
