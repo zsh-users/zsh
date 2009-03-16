@@ -1,3 +1,8 @@
+2009-03-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* users/13937, users/13939: configure.ac, Src/jobs.c: check for
+	and if available use setproctitle() for "jobs -Z".
+
 2009-03-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 26736: Doc/Zsh/expn.yo: document 26731.
@@ -11416,5 +11421,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4618 $
+* $Revision: 1.4619 $
 *****************************************************

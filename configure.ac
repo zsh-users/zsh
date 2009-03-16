@@ -1885,6 +1885,12 @@ if test x$zsh_cv_use_getcwd = xyes; then
   AC_DEFINE(USE_GETCWD)
 fi
 
+dnl CHECK FOR setproctitle() FOR jobs -Z / ARGV0
+AH_TEMPLATE([HAVE_SETPROCTITLE],
+[Define to 1 if the system supports `setproctitle' to change process name])
+AC_CHECK_FUNC(setproctitle,AC_DEFINE(HAVE_SETPROCTITLE),
+AC_SEARCH_LIBS(setproctitle,util,AC_DEFINE(HAVE_SETPROCTITLE)))
+
 dnl -------------
 dnl CHECK FOR NIS
 dnl -------------

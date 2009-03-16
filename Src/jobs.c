@@ -1572,12 +1572,14 @@ getjob(const char *s, const char *prog)
     return returnval;
 }
 
+#ifndef HAVE_SETPROCTITLE
 /* For jobs -Z (which modifies the shell's name as seen in ps listings).  *
  * hackzero is the start of the safely writable space, and hackspace is   *
  * its length, excluding a final NUL terminator that will always be left. */
 
 static char *hackzero;
 static int hackspace;
+#endif
 
 
 /* Initialise job handling. */
@@ -1600,6 +1602,7 @@ init_jobs(char **argv, char **envp)
     jobtabsize = MAXJOBS_ALLOC;
     memset(jobtab, 0, init_bytes);
 
+#ifndef HAVE_SETPROCTITLE
     /*
      * Initialise the jobs -Z system.  The technique is borrowed from
      * perl: check through the argument and environment space, to see
@@ -1622,6 +1625,7 @@ init_jobs(char **argv, char **envp)
     }
     done:
     hackspace = p - hackzero;
+#endif
 }
 
 
@@ -1718,10 +1722,14 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	}
 	queue_signals();
 	unmetafy(*argv, &len);
+#ifdef HAVE_SETPROCTITLE
+	setproctitle("%s", *argv);
+#else
 	if(len > hackspace)
 	    len = hackspace;
 	memcpy(hackzero, *argv, len);
 	memset(hackzero + len, 0, hackspace - len);
+#endif
 	unqueue_signals();
 	return 0;
     }
