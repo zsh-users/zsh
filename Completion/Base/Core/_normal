@@ -13,7 +13,9 @@ fi
 # $PREFIX has a quoted form of the !, so we can't test that
 # (it might the start of a real argument), but words has the
 # raw McCoy.
-if [[ -o BANG_HIST && $words[CURRENT] = \!*: && -z $compstate[quote] ]]; then
+if [[ -o BANG_HIST &&
+     ( ( $words[CURRENT] = \!*: && -z $compstate[quote] ) ||
+       ( $words[CURRENT] = \"\!*: && $compstate[all_quotes] = \" ) ) ]]; then
   # This looks like a real history expansion; in that case
   # we'd better put the !'s back the way pfalstad intended.
   PREFIX=${PREFIX//\\!/!}

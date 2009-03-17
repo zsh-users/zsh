@@ -64,6 +64,8 @@ while true; do
       )
     if (( ! global )); then
       list+=(
+	"a:absolute path"
+	"A:absolute path resolving symbolic links"
 	"g:globally apply s or &"
 	"h:head - strip trailing path element"
 	"t:tail - strip directories"

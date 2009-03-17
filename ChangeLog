@@ -1,3 +1,10 @@
+2009-03-17  Peter Stephenson  <pws@csr.com>
+
+	* 26746: Completion/Zsh/Context/_normal,
+	Completion/Zsh/Type/_history_modifiers: complete new history
+	modifiers a and A and allow completion of history modifiers
+	at the start of double quotes.
+
 2009-03-16  Peter Stephenson  <pws@csr.com>
 
 	* 26744: Completion/Zsh/Context/_normal: handle completion
@@ -11426,5 +11433,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4620 $
+* $Revision: 1.4621 $
 *****************************************************
