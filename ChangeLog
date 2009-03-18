@@ -1,3 +1,8 @@
+2009-03-18  Peter Stephenson  <pws@csr.com>
+
+	* Frank Terbeck: 26751: b/Functions/VCS_Info/vcs_info_setsys:
+	suppress warning with WARN_CREATE_GLOBAL.
+
 2009-03-17  Peter Stephenson  <pws@csr.com>
 
 	* 26746: Completion/Zsh/Context/_normal,
@@ -11433,5 +11438,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4621 $
+* $Revision: 1.4622 $
 *****************************************************

@@ -6,7 +6,7 @@ emulate -L zsh
 setopt extendedglob typeset_silent
 
 local sys
-typeset -g VCS_INFO_backends
+typeset -ga VCS_INFO_backends
 
 VCS_INFO_backends=()
 
