@@ -1507,7 +1507,7 @@ chabspath(char **junkptr)
 	return 1;
 
     if (**junkptr != '/') {
-	*junkptr = zhtricat(zgetcwd(), "/", *junkptr);
+	*junkptr = zhtricat(metafy(zgetcwd(), -1, META_HEAPDUP), "/", *junkptr);
     }
 
     current = *junkptr;
@@ -1556,6 +1556,8 @@ chabspath(char **junkptr)
 		    if (dest[-1] != '/')
 			dest--;
 		    current += 2;
+		    if (*current == '/')
+			current++;
 		} else if (dest == *junkptr + 1) {
 		    /* This might break with Cygwin's leading double slashes? */
 		    current += 2;
@@ -1567,7 +1569,7 @@ chabspath(char **junkptr)
 	} else {
 	    while (*current != '/' && *current != '\0')
 		if ((*dest++ = *current++) == Meta)
-		    dest[-1] = *current++ ^ 32;
+		    *dest++ = *current++;
 	}
     }
     return 1;
@@ -1592,6 +1594,8 @@ chrealpath(char **junkptr)
      */
     if (**junkptr != '/')
 	return 0;
+
+    unmetafy(*junkptr, NULL);
 
     lastpos = strend(*junkptr);
     nonreal = lastpos + 1;
@@ -1618,7 +1622,7 @@ chrealpath(char **junkptr)
 	str++;
     }
 
-    *junkptr = bicat(real, nonreal);
+    *junkptr = metafy(bicat(real, nonreal), -1, META_HEAPDUP);
 
     return 1;
 }
