@@ -1,5 +1,8 @@
 2009-03-19  Peter Stephenson  <pws@csr.com>
 
+	* Mikael: 26759: Src/Modules/curses.mdd: missing here-document
+	terminator.
+
 	* 26756: Completion/Zsh/Type/_history_modifiers: handling
 	following :s was wrong.
 
@@ -11451,5 +11454,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4626 $
+* $Revision: 1.4627 $
 *****************************************************

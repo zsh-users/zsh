@@ -11,3 +11,4 @@ curses.o curses..o: curses_keys.h
 
 curses_keys.h: curses_keys.awk @CURSES_KEYS_H@
 	$(AWK) -f $(sdir)/curses_keys.awk @CURSES_KEYS_H@ /dev/null >curses_keys.h
+Make
