@@ -31,11 +31,11 @@ while true; do
       fi
       delim=$PREFIX[1]
       compset -p 1
-      if ! compset "[^$delim]#$delim[^$delim]#$delim"; then
-	if compset "[^$delim]#$delim"; then
-	  _message original string
+      if ! compset -P "[^${delim}]#${delim}[^${delim}]#${delim}"; then
+	if compset -P "[^${delim}]#${delim}"; then
+	  _message "replacement string"
 	else
-	  _message replacement string
+	  _message "original string"
 	fi
 	return
       fi

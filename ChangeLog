@@ -1,5 +1,8 @@
 2009-03-19  Peter Stephenson  <pws@csr.com>
 
+	* 26756: Completion/Zsh/Type/_history_modifiers: handling
+	following :s was wrong.
+
 	* 26754: configure.ac, Doc/Zsh/expn.yo, Src/compat.c, Src/hist.c:
 	tweak zgetdir() (but don't use it) and test for realpath().
 
@@ -11448,5 +11451,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4625 $
+* $Revision: 1.4626 $
 *****************************************************
