@@ -1522,7 +1522,7 @@ chabspath(char **junkptr)
 	current += 3;
     }
 #endif
-	
+
     for (;;) {
 	if (*current == '/') {
 #ifdef __CYGWIN__
@@ -1579,7 +1579,14 @@ chabspath(char **junkptr)
 int
 chrealpath(char **junkptr)
 {
+    char *str;
+#ifdef HAVE_CANONICALIZE_FILE_NAME
+    char *lastpos, *nonreal, *real;
+#else
+# ifdef HAVE_REAL_PATH
     char *lastpos, *nonreal, real[PATH_MAX];
+# endif
+#endif
 
     if (!**junkptr)
 	return 1;
@@ -1588,6 +1595,9 @@ chrealpath(char **junkptr)
     if (!chabspath(junkptr))
 	return 0;
 
+#if !defined(HAVE_REALPATH) && !defined(HAVE_CANONICALIZE_FILE_NAME)
+    return 1;
+#else
     /*
      * Notice that this means you cannot pass relative paths into this
      * function!
@@ -1600,7 +1610,19 @@ chrealpath(char **junkptr)
     lastpos = strend(*junkptr);
     nonreal = lastpos + 1;
 
-    while (!realpath(*junkptr, real)) {
+    while (!
+#ifdef HAVE_CANONICALIZE_FILE_NAME
+	   /*
+	    * This is a GNU extension to realpath(); it's the
+	    * same as calling realpath() with a NULL second argument
+	    * which uses malloc() to get memory.  The alternative
+	    * interface is easier to test for, however.
+	    */
+	   (real = canonicalize_file_name(*junkptr))
+#else
+	   realpath(*junkptr, real)
+#endif
+	) {
 	if (errno == EINVAL || errno == ELOOP ||
 	    errno == ENAMETOOLONG || errno == ENOMEM)
 	    return 0;
@@ -1615,7 +1637,7 @@ chrealpath(char **junkptr)
 	*nonreal = '\0';
     }
 
-    char *str = nonreal;
+    str = nonreal;
     while (str <= lastpos) {
 	if (*str == '\0')
 	    *str = '/';
@@ -1623,6 +1645,10 @@ chrealpath(char **junkptr)
     }
 
     *junkptr = metafy(bicat(real, nonreal), -1, META_HEAPDUP);
+#ifdef HAVE_CANONICALIZE_FILE_NAME
+    free(real);
+#endif
+#endif
 
     return 1;
 }

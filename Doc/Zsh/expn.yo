@@ -223,7 +223,8 @@ if necessary, and resolves any use of `tt(..)' and `tt(.)' in the path.
 item(tt(A))(
 As `tt(a)', but also resolve use of symbolic links where possible.
 Note that resolution of `tt(..)' occurs em(before) resolution of symbolic
-links.
+links.  This call is equivalent to tt(a) unless your system has the
+tt(realpath) system call (modern systems do).
 )
 item(tt(e))(
 Remove all but the extension.

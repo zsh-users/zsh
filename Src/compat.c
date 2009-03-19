@@ -227,6 +227,26 @@ zopenmax(void)
 }
 #endif
 
+/*
+ * Rationalise the current directory, returning the string.
+ *
+ * If "d" is not NULL, it is used to store information about the
+ * directory.  The returned name is also present in d->dirname and is in
+ * permanently allocated memory.  The handling of this case depends on
+ * whether the fchdir() system call is available; if it is, it is assumed
+ * the caller is able to restore the current directory.  On successfully
+ * identifying the directory the function returns immediately rather
+ * than ascending the hierarchy.
+ *
+ * If "d" is NULL, no assumption about the caller's behaviour is
+ * made.  The returned string is in heap memory.  This case is
+ * always handled by changing directory up the hierarchy.
+ *
+ * On Cygwin or other systems where USE_GETCWD is defined (at the
+ * time of writing only QNX), we skip all the above and use the
+ * getcwd() system call.
+ */
+
 /**/
 mod_export char *
 zgetdir(struct dirsav *d)
@@ -257,25 +277,30 @@ zgetdir(struct dirsav *d)
 	return buf;
     }
 
+    /* Record the initial inode and device */
     pino = sbuf.st_ino;
     pdev = sbuf.st_dev;
     if (d)
 	d->ino = pino, d->dev = pdev;
+#if !defined(__CYGWIN__) && !defined(USE_GETCWD)
 #ifdef HAVE_FCHDIR
     else
 #endif
-#if !defined(__CYGWIN__) && !defined(USE_GETCWD)
 	holdintr();
 
     for (;;) {
+	/* Examine the parent of the current directory. */
 	if (stat("..", &sbuf) < 0)
 	    break;
 
+	/* Inode and device of curtent directory */
 	ino = pino;
 	dev = pdev;
+	/* Inode and device of current directory's parent */
 	pino = sbuf.st_ino;
 	pdev = sbuf.st_dev;
 
+	/* If they're the same, we've reached the root directory. */
 	if (ino == pino && dev == pdev) {
 	    if (!buf[pos])
 		buf[--pos] = '/';
@@ -291,6 +316,7 @@ zgetdir(struct dirsav *d)
 	    return buf + pos;
 	}
 
+	/* Search the parent for the current directory. */
 	if (!(dir = opendir("..")))
 	    break;
 
@@ -303,6 +329,7 @@ zgetdir(struct dirsav *d)
 		continue;
 #ifdef HAVE_STRUCT_DIRENT_D_STAT
 	    if(de->d_stat.st_dev == dev && de->d_stat.st_ino == ino) {
+		/* Found the directory we're currently in */
 		strncpy(nbuf + 3, fn, PATH_MAX);
 		break;
 	    }
@@ -311,6 +338,7 @@ zgetdir(struct dirsav *d)
 	    if (dev != pdev || (ino_t) de->d_ino == ino)
 # endif /* HAVE_STRUCT_DIRENT_D_INO */
 	    {
+		/* Maybe found directory, need to check device & inode */
 		strncpy(nbuf + 3, fn, PATH_MAX);
 		lstat(nbuf, &sbuf);
 		if (sbuf.st_dev == dev && sbuf.st_ino == ino)
@@ -320,7 +348,7 @@ zgetdir(struct dirsav *d)
 	}
 	closedir(dir);
 	if (!de)
-	    break;
+	    break;		/* Not found */
 	len = strlen(nbuf + 2);
 	pos -= len;
 	while (pos <= 1) {

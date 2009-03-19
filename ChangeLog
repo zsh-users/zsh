@@ -1,3 +1,8 @@
+2009-03-19  Peter Stephenson  <pws@csr.com>
+
+	* 26754: configure.ac, Doc/Zsh/expn.yo, Src/compat.c, Src/hist.c:
+	tweak zgetdir() (but don't use it) and test for realpath().
+
 2009-03-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 26752: Src/hist.c: fix ../ removal in :a and metafication
@@ -11443,5 +11448,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4624 $
+* $Revision: 1.4625 $
 *****************************************************
