@@ -1583,7 +1583,7 @@ chrealpath(char **junkptr)
 #ifdef HAVE_CANONICALIZE_FILE_NAME
     char *lastpos, *nonreal, *real;
 #else
-# ifdef HAVE_REAL_PATH
+# ifdef HAVE_REALPATH
     char *lastpos, *nonreal, real[PATH_MAX];
 # endif
 #endif

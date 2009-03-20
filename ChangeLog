@@ -1,3 +1,7 @@
+2009-03-20  Peter Stephenson  <pws@csr.com>
+
+	* Bart: 26761: Src/hist.c: typo in 26754.
+
 2009-03-19  Peter Stephenson  <pws@csr.com>
 
 	* Mikael: 26759: Src/Modules/curses.mdd: missing here-document
@@ -11454,5 +11458,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4627 $
+* $Revision: 1.4628 $
 *****************************************************
