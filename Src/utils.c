@@ -5388,11 +5388,7 @@ lchdir(char const *path, struct dirsav *d, int hard)
     if (*path == '/') {
 #endif
 	level = -1;
-#ifdef HAVE_FCHDIR
-	if (d->dirfd < 0 && (d->dirfd = open(".", O_RDONLY | O_NOCTTY)) < 0 &&
-	    zgetdir(d) && *d->dirname != '/')
-	    d->dirfd = open("..", O_RDONLY | O_NOCTTY);
-#else
+#ifndef HAVE_FCHDIR
 	if (!d->dirname)
 	    zgetdir(d);
 #endif
@@ -5404,6 +5400,11 @@ lchdir(char const *path, struct dirsav *d, int hard)
 	    d->ino = st1.st_ino;
 	}
     }
+#ifdef HAVE_FCHDIR
+    if (d->dirfd < 0 && (d->dirfd = open(".", O_RDONLY | O_NOCTTY)) < 0 &&
+	zgetdir(d) && *d->dirname != '/')
+	d->dirfd = open("..", O_RDONLY | O_NOCTTY);
+#endif
 
 #ifdef HAVE_LSTAT
     if (!hard)

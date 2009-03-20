@@ -1,5 +1,8 @@
 2009-03-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 26763: Src/utils.c: fix problem restoring directory
+	when attempting to cd to relative path and failing.
+
 	* users/13593: Src/utils.c: tidy up from 26625.
 
 2009-03-20  Peter Stephenson  <pws@csr.com>
@@ -11462,5 +11465,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4629 $
+* $Revision: 1.4630 $
 *****************************************************

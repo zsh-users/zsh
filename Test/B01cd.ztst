@@ -109,6 +109,14 @@ F:something is broken.  But you already knew that.
 >$mydir/cdtst.tmp/real
 >$mydir/cdtst.tmp/real
 
+ ln -s nonexistent link_to_nonexistent
+ pwd1=$(pwd -P)
+ cd -s link_to_nonexistent
+ pwd2=$(pwd -P)
+ [[ $pwd1 = $pwd2 ]] || print "Ooops, changed to directory '$pwd2'"
+0:
+?(eval):cd:3: not a directory: link_to_nonexistent
+
 %clean
 # This optional section cleans up after the test, if necessary,
 # e.g. killing processes etc.  This is in addition to the removal of *.tmp
