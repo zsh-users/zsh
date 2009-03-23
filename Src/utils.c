@@ -5374,6 +5374,9 @@ lchdir(char const *path, struct dirsav *d, int hard)
     int err;
     struct stat st2;
 #endif
+#ifdef HAVE_FCHDIR
+    int close_dir = 0;
+#endif
 
     if (!d) {
 	ds.ino = ds.dev = 0;
@@ -5400,11 +5403,6 @@ lchdir(char const *path, struct dirsav *d, int hard)
 	    d->ino = st1.st_ino;
 	}
     }
-#ifdef HAVE_FCHDIR
-    if (d->dirfd < 0 && (d->dirfd = open(".", O_RDONLY | O_NOCTTY)) < 0 &&
-	zgetdir(d) && *d->dirname != '/')
-	d->dirfd = open("..", O_RDONLY | O_NOCTTY);
-#endif
 
 #ifdef HAVE_LSTAT
     if (!hard)
@@ -5420,7 +5418,16 @@ lchdir(char const *path, struct dirsav *d, int hard)
 	}
 	return zchdir((char *) path);
     }
+
 #ifdef HAVE_LSTAT
+#ifdef HAVE_FCHDIR
+    if (d->dirfd < 0) {
+	close_dir = 1;
+        if ((d->dirfd = open(".", O_RDONLY | O_NOCTTY) < 0) &&
+	    zgetdir(d) && *d->dirname != '/')
+	    d->dirfd = open("..", O_RDONLY | O_NOCTTY);
+    }
+#endif
     if (*path == '/')
 	if (chdir("/") < 0)
 	    zwarn("failed to chdir(/): %e", errno);
@@ -5428,12 +5435,16 @@ lchdir(char const *path, struct dirsav *d, int hard)
 	while(*path == '/')
 	    path++;
 	if(!*path) {
-	    if (d == &ds) {
+	    if (d == &ds)
 		zsfree(ds.dirname);
-		if (ds.dirfd >=0)
-		    close(ds.dirfd);
-	    } else
+	    else
 		d->level = level;
+#ifdef HAVE_FCHDIR
+	    if (d->dirfd >=0 && close_dir) {
+		close(d->dirfd);
+		d->dirfd = -1;
+	    }
+#endif
 	    return 0;
 	}
 	for(pptr = path; *++pptr && *pptr != '/'; ) ;
@@ -5468,19 +5479,25 @@ lchdir(char const *path, struct dirsav *d, int hard)
 	}
     }
     if (restoredir(d)) {
-	if (d == &ds) {
+	if (d == &ds)
 	    zsfree(ds.dirname);
-	    if (ds.dirfd >=0)
-		close(ds.dirfd);
+#ifdef HAVE_FCHDIR
+	if (d->dirfd >=0 && close_dir) {
+	    close(d->dirfd);
+	    d->dirfd = -1;
 	}
+#endif
 	errno = err;
 	return -2;
     }
-    if (d == &ds) {
+    if (d == &ds)
 	zsfree(ds.dirname);
-	if (ds.dirfd >=0)
-	    close(ds.dirfd);
+#ifdef HAVE_FCHDIR
+    if (d->dirfd >=0 && close_dir) {
+	close(d->dirfd);
+	d->dirfd = -1;
     }
+#endif
     errno = err;
     return -1;
 #endif /* HAVE_LSTAT */
