@@ -638,6 +638,13 @@ histsubchar(int c)
 		    return -1;
 		}
 		break;
+	    case 'c':
+		if (!(sline = equalsubstr(sline, 0, 0))) {
+		    herrflush();
+		    zerr("modifier failed: c");
+		    return -1;
+		}
+		break;
 	    case 'h':
 		if (!remtpath(&sline)) {
 		    herrflush();

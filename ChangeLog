@@ -1,5 +1,8 @@
 2009-03-23  Peter Stephenson  <pws@csr.com>
 
+	* 26748: Doc/Zsh/expn.yo, Src/hist.c, Src/subst.c: c modifier
+	to add command path.
+
 	* 26767: Src/utils.c: 26763 created file descriptor leak.
 
 2009-03-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
@@ -11469,5 +11472,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4631 $
+* $Revision: 1.4632 $
 *****************************************************

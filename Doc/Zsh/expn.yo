@@ -219,12 +219,21 @@ startitem()
 item(tt(a))(
 Turn a file name into an absolute path:  prepends the current directory,
 if necessary, and resolves any use of `tt(..)' and `tt(.)' in the path.
+Note that the transformation takes place even if the file or any
+intervening directories do not exist.
 )
 item(tt(A))(
 As `tt(a)', but also resolve use of symbolic links where possible.
 Note that resolution of `tt(..)' occurs em(before) resolution of symbolic
 links.  This call is equivalent to tt(a) unless your system has the
 tt(realpath) system call (modern systems do).
+)
+item(tt(c))(
+Resolve a command name into an absolute path by searching the command
+path given by the tt(PATH) variable.  This does not work for commands
+containing directory parts.  Note also that this does not usually work as
+a glob qualifier unless a file of the same name is found in the
+current directory.
 )
 item(tt(e))(
 Remove all but the extension.
