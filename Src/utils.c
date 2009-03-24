@@ -5423,7 +5423,7 @@ lchdir(char const *path, struct dirsav *d, int hard)
 #ifdef HAVE_FCHDIR
     if (d->dirfd < 0) {
 	close_dir = 1;
-        if ((d->dirfd = open(".", O_RDONLY | O_NOCTTY) < 0) &&
+        if ((d->dirfd = open(".", O_RDONLY | O_NOCTTY)) < 0 &&
 	    zgetdir(d) && *d->dirname != '/')
 	    d->dirfd = open("..", O_RDONLY | O_NOCTTY);
     }

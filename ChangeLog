@@ -1,5 +1,7 @@
 2009-03-23  Peter Stephenson  <pws@csr.com>
 
+	* 26769: Src/utils.c: 26767 created an even worse problem.
+
 	* 26748: Doc/Zsh/expn.yo, Src/hist.c, Src/subst.c: c modifier
 	to add command path.
 
@@ -11472,5 +11474,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4632 $
+* $Revision: 1.4633 $
 *****************************************************
