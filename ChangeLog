@@ -1,5 +1,7 @@
 2009-03-24  Peter Stephenson  <pws@csr.com>
 
+	* 26774: Src/utils.c: cd to $HOME on failure in preference to /.
+
 	* 26772: Src/glob.c, Src/utils.c, Src/zsh.h, Src/Modules/files.c:
 	more failed cd handling: fix possible runaway series of chdirs;
 	better error handling.
@@ -11480,5 +11482,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4634 $
+* $Revision: 1.4635 $
 *****************************************************

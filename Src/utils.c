@@ -5493,16 +5493,30 @@ lchdir(char const *path, struct dirsav *d, int hard)
     }
     if (restoredir(d)) {
 	int restoreerr = errno;
+	int i;
 	/*
 	 * Failed to restore the directory.
 	 * Just be definite, cd to root and report the result.
 	 */
-	zsfree(pwd);
-	pwd = ztrdup("/");
-	if (chdir(pwd) < 0)
+	for (i = 0; i < 2; i++) {
+	    const char *cdest;
+	    if (i)
+		cdest = "/";
+	    else {
+		if (!home)
+		    continue;
+		cdest = home;
+	    }
+	    zsfree(pwd);
+	    pwd = ztrdup(cdest);
+	    if (chdir(pwd) == 0)
+		break;
+	}
+	if (i == 2)
 	    zerr("lost current directory, failed to cd to /: %e", errno);
 	else
-	    zerr("lost current directory: %e: changed to /", restoreerr);
+	    zerr("lost current directory: %e: changed to `%s'", restoreerr,
+		pwd);
 	if (d == &ds)
 	    zsfree(ds.dirname);
 #ifdef HAVE_FCHDIR
