@@ -1,3 +1,9 @@
+2009-03-24  Peter Stephenson  <pws@csr.com>
+
+	* 26772: Src/glob.c, Src/utils.c, Src/zsh.h, Src/Modules/files.c:
+	more failed cd handling: fix possible runaway series of chdirs;
+	better error handling.
+
 2009-03-23  Peter Stephenson  <pws@csr.com>
 
 	* 26769: Src/utils.c: 26767 created an even worse problem.
@@ -11474,5 +11480,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4633 $
+* $Revision: 1.4634 $
 *****************************************************

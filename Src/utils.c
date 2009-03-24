@@ -5356,6 +5356,21 @@ upchdir(int n)
     return 0;
 }
 
+/*
+ * Initialize a "struct dirsav".
+ * The structure will be set to the directory we want to save
+ * the first time we change to a different directory.
+ */
+
+/**/
+mod_export void
+init_dirsav(Dirsav d)
+{
+    d->ino = d->dev = 0;
+    d->dirname = NULL;
+    d->dirfd = d->level = -1;
+}
+
 /* Change directory, without following symlinks.  Returns 0 on success, -1 *
  * on failure.  Sets errno to ENOTDIR if any symlinks are encountered.  If *
  * fchdir() fails, or the current directory is unreadable, we might end up *
@@ -5379,9 +5394,7 @@ lchdir(char const *path, struct dirsav *d, int hard)
 #endif
 
     if (!d) {
-	ds.ino = ds.dev = 0;
-	ds.dirname = NULL;
-	ds.dirfd = -1;
+	init_dirsav(&ds);
 	d = &ds;
     }
 #ifdef HAVE_LSTAT
@@ -5479,6 +5492,17 @@ lchdir(char const *path, struct dirsav *d, int hard)
 	}
     }
     if (restoredir(d)) {
+	int restoreerr = errno;
+	/*
+	 * Failed to restore the directory.
+	 * Just be definite, cd to root and report the result.
+	 */
+	zsfree(pwd);
+	pwd = ztrdup("/");
+	if (chdir(pwd) < 0)
+	    zerr("lost current directory, failed to cd to /: %e", errno);
+	else
+	    zerr("lost current directory: %e: changed to /", restoreerr);
 	if (d == &ds)
 	    zsfree(ds.dirname);
 #ifdef HAVE_FCHDIR

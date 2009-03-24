@@ -492,9 +492,7 @@ scanner(Complist q)
     int errssofar = errsfound;
     struct dirsav ds;
 
-    ds.ino = ds.dev = 0;
-    ds.dirname = NULL;
-    ds.dirfd = ds.level = -1;
+    init_dirsav(&ds);
     if (!q)
 	return;
 

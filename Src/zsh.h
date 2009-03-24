@@ -382,6 +382,7 @@ typedef struct builtin   *Builtin;
 typedef struct cmdnam    *Cmdnam;
 typedef struct complist  *Complist;
 typedef struct conddef   *Conddef;
+typedef struct dirsav    *Dirsav;
 typedef struct features  *Features;
 typedef struct feature_enables  *Feature_enables;
 typedef struct funcstack *Funcstack;
