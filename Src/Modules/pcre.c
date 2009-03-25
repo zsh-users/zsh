@@ -82,6 +82,7 @@ bin_pcre_compile(char *nam, char **args, Options ops, UNUSED(int func))
     if(OPT_ISSET(ops,'i')) pcre_opts |= PCRE_CASELESS;
     if(OPT_ISSET(ops,'m')) pcre_opts |= PCRE_MULTILINE;
     if(OPT_ISSET(ops,'x')) pcre_opts |= PCRE_EXTENDED;
+    if(OPT_ISSET(ops,'s')) pcre_opts |= PCRE_DOTALL;
     
     if (zpcre_utf8_enabled())
 	pcre_opts |= PCRE_UTF8;
@@ -137,9 +138,11 @@ bin_pcre_study(char *nam, UNUSED(char **args), UNUSED(Options ops), UNUSED(int f
 
 /**/
 static int
-zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar, char *substravar, int matchedinarr)
+zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar, char *substravar, 
+    int want_offset_pair, int matchedinarr)
 {
     char **captures, *match_all, **matches;
+    char offset_all[50];
     int capture_start = 1;
 
     if (matchedinarr)
@@ -148,9 +151,14 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar, char *substr
 	matchvar = "MATCH";
     if (substravar == NULL)
 	substravar = "match";
-
+    
     /* captures[0] will be entire matched string, [1] first substring */
-    if(!pcre_get_substring_list(arg, ovec, ret, (const char ***)&captures)) {
+    if (!pcre_get_substring_list(arg, ovec, ret, (const char ***)&captures)) {
+	/* Set to the offsets of the complete match */
+	if (want_offset_pair) {
+	    sprintf(offset_all, "%d %d", ovec[0], ovec[1]);
+	    setsparam("ZPCRE_OP", ztrdup(offset_all));
+	}
 	match_all = ztrdup(captures[0]);
 	setsparam(matchvar, match_all);
 	matches = zarrdup(&captures[capture_start]);
@@ -163,12 +171,32 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar, char *substr
 
 /**/
 static int
+getposint(char *instr, char *nam)
+{
+    char *eptr;
+    int ret;
+
+    ret = (int)zstrtol(instr, &eptr, 10);
+    if (*eptr || ret < 0) {
+	zwarnnam(nam, "integer expected: %s", instr);
+	return -1;
+    }
+
+    return ret;
+}
+
+/**/
+static int
 bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int ret, capcount, *ovec, ovecsize, c;
     char *matched_portion = NULL;
     char *receptacle = NULL;
     int return_value = 1;
+    /* The subject length and offset start are both int values in pcre_exec */
+    int subject_len;
+    int offset_start = 0;
+    int want_offset_pair = 0;
 
     if (pcre_pattern == NULL) {
 	zwarnnam(nam, "no pattern has been compiled");
@@ -181,6 +209,12 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     if(OPT_HASARG(ops,c='v')) {
 	matched_portion = OPT_ARG(ops,c);
     }
+    if(OPT_HASARG(ops,c='n')) { /* The offset position to start the search, in bytes. */
+	offset_start = getposint(OPT_ARG(ops,c), nam);
+    }
+    /* For the entire match, 'Return' the offset byte positions instead of the matched string */
+    if(OPT_ISSET(ops,'b')) want_offset_pair = 1; 
+    
     if(!*args) {
 	zwarnnam(nam, "not enough arguments");
     }
@@ -194,12 +228,17 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     ovecsize = (capcount+1)*3;
     ovec = zalloc(ovecsize*sizeof(int));
     
-    ret = pcre_exec(pcre_pattern, pcre_hints, *args, strlen(*args), 0, 0, ovec, ovecsize);
-    
+    subject_len = (int)strlen(*args);
+
+    if (offset_start < 0 || offset_start >= subject_len)
+	ret = PCRE_ERROR_NOMATCH;
+    else
+	ret = pcre_exec(pcre_pattern, pcre_hints, *args, subject_len, offset_start, 0, ovec, ovecsize);
+
     if (ret==0) return_value = 0;
     else if (ret==PCRE_ERROR_NOMATCH) /* no match */;
     else if (ret>0) {
-	zpcre_get_substrings(*args, ovec, ret, matched_portion, receptacle, 0);
+	zpcre_get_substrings(*args, ovec, ret, matched_portion, receptacle, want_offset_pair, 0);
 	return_value = 0;
     }
     else {
@@ -258,7 +297,7 @@ cond_pcre_match(char **a, int id)
 		    break;
 		}
                 else if (r>0) {
-		    zpcre_get_substrings(lhstr, ov, r, NULL, avar, isset(BASHREMATCH));
+		    zpcre_get_substrings(lhstr, ov, r, NULL, avar, 0, isset(BASHREMATCH));
 		    return_value = 1;
 		    break;
 		}
@@ -289,8 +328,8 @@ static struct conddef cotab[] = {
 #endif /* !(HAVE_PCRE_COMPILE && HAVE_PCRE_EXEC) */
 
 static struct builtin bintab[] = {
-    BUILTIN("pcre_compile", 0, bin_pcre_compile, 1, 1, 0, "aimx",  NULL),
-    BUILTIN("pcre_match",   0, bin_pcre_match,   1, 1, 0, "a:v:",    NULL),
+    BUILTIN("pcre_compile", 0, bin_pcre_compile, 1, 1, 0, "aimxs",  NULL),
+    BUILTIN("pcre_match",   0, bin_pcre_match,   1, 1, 0, "a:v:n:b",    NULL),
     BUILTIN("pcre_study",   0, bin_pcre_study,   0, 0, 0, NULL,    NULL)
 };
 
