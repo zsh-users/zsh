@@ -3741,6 +3741,23 @@ bin_print(char *name, char **args, Options ops, int func)
 
 		memset(&mbs, 0, sizeof(mbstate_t));
 		while (l > 0) {
+		    /*
+		     * Prevent misaligned columns due to escape sequences by
+		     * skipping over them. Octals \033 and \233 are the
+		     * possible escape characters recognized by ANSI.
+		     *
+		     * It ought to be possible to do this in the case
+		     * of prompt expansion by propagating the information
+		     * about escape sequences (currently we strip this
+		     * out).
+		     */
+		    if (*aptr == '\033' || *aptr == '\233') {
+			for (aptr++, l--; l && !isalpha(*aptr); aptr++, l--);
+			aptr++;
+			l--;
+			continue;
+		    }
+
 		    wchar_t wc;
 		    size_t cnt = mbrtowc(&wc, aptr, l, &mbs);
 		    int wcw;

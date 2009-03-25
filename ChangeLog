@@ -1,3 +1,8 @@
+2009-03-25  Peter Stephenson  <pws@csr.com>
+
+	* Michael Hwang: 26776: Src/builtin.c: improved column alignment
+	with print -c -P.
+
 2009-03-24  Peter Stephenson  <pws@csr.com>
 
 	* 26774: Src/utils.c: cd to $HOME on failure in preference to /.
@@ -11482,5 +11487,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4635 $
+* $Revision: 1.4636 $
 *****************************************************
