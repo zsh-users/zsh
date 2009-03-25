@@ -1,5 +1,8 @@
 2009-03-25  Peter Stephenson  <pws@csr.com>
 
+	* 26783: Doc/Zsh/compsys.yo, Completion/Base/Completer/.distfiles,
+	Completion/Base/Completer/_user_expand: new _user_expand completer.
+
 	* Jon Strait: 26778, 26781: Doc/Zsh/mod_pcre.yo,
 	Src/Modules/pcre.c:  a couple of extra options for PCRE matching.
 
@@ -11490,5 +11493,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4637 $
+* $Revision: 1.4638 $
 *****************************************************

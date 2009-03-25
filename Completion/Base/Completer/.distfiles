@@ -1,6 +1,17 @@
 DISTFILES_SRC='
 .distfiles
-_all_matches   _correct       _history       _match         _prefix
-_approximate   _expand        _ignored       _menu
-_complete      _expand_alias  _list          _oldlist
+_all_matches
+_approximate
+_complete
+_correct
+_expand
+_expand_alias
+_history
+_ignored
+_list
+_match
+_menu
+_oldlist
+_prefix
+_user_expand
 '

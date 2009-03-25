@@ -202,6 +202,13 @@ to tt(fpath) as necessary.  To force a check of exactly the directories
 currently named in tt(fpath), set tt(_compdir) to an empty string before
 calling tt(compaudit) or tt(compinit).
 
+findex(bashcompinit)
+The function tt(bashcompinit) compatibility with bash's programmable
+completion system.  When run it will define the functions, tt(compgen) and
+tt(complete) which correspond to the bash builtins with the same names.
+It will then be possible to use completion specifications and functions
+written for bash.
+
 subsect(Autoloaded files)
 cindex(completion system, autoloaded functions)
 
@@ -3096,13 +3103,35 @@ tt(COMPLETE_IN_WORD) option is set; otherwise, the cursor will
 be moved to the end of the current word before the completion code is
 called and hence there will be no suffix.
 )
-findex(bashcompinit)
-item(tt(bashcompinit))(
-This function provides compatibility with bash's programmable completion
-system.  When run it will define the functions, tt(compgen) and
-tt(complete) which correspond to the bash builtins with the same names.
-It will then be possible to use completion specifications and functions
-written for bash.
+findex(_user_expand)
+item(tt(_user_expand))(
+This completer behaves similarly to the tt(_expand) completer but
+instead performs expansions defined by users.  The styles tt(add-space) and
+tt(sort) styles specific to the tt(_expand) completer are usable with
+tt(_user_expand) in addition to other styles handled more generally by
+the completion system.  The tag tt(all-expansions) is also available.
+
+The expansion depends on the array style tt(user-expand) being defined
+for the current context; remember that the context for completers is less
+specific than that for contextual completion as the full context has not
+yet been determined.  Elements of the array may have one of the following
+forms:
+startsitem()
+sitem(tt($)var(hash))(
+var(hash) is the name of an associative array.  Note this is not a full
+parameter expression, merely a tt($), suitably quoted to prevent immediate
+expansion, followed by the name of an associative array.  If the trial
+expansion word matches a key in var(hash), the resulting expansion is the
+corresponding value.
+)
+sitem(var(_func))(
+var(_func) is the name of a shell function whose name must begin with
+tt(_) but is not otherwise special to the completion system.  The function
+is called with the trial word as an argument.  If the word is to be
+expanded, the function should set the array tt(reply) to a list of
+expansions.  The return status of the function is irrelevant.
+)
+endsitem()
 )
 enditem()
 
