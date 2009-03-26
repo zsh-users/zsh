@@ -1,3 +1,7 @@
+2009-03-26  Peter Stephenson  <pws@csr.com>
+
+	* 26795: Doc/Zsh/options.yo: further warning in POSIX_ALIASES.
+
 2009-03-25  Peter Stephenson  <pws@csr.com>
 
 	* 26783: Doc/Zsh/compsys.yo, Completion/Base/Completer/.distfiles,
@@ -11493,5 +11497,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4638 $
+* $Revision: 1.4639 $
 *****************************************************

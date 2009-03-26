@@ -1721,7 +1721,12 @@ ifzman(the section RESERVED WORDS in zmanref(zshmisc)).
 
 Alias expansion takes place while text is being read; hence when this
 option is set it does not take effect until the end of any function or
-other piece of shell code evaluated as one unit.
+other piece of shell code evaluated as one unit.  Note this may
+cause differences from other shells even when the option is in
+effect.  For example, when running a command with `tt(zsh -c)' the
+entire command argument is parsed in one go, so aliases defined within
+the argument are not available even in later lines.  If in doubt, avoid use
+of aliases in non-interactive code.
 )
 pindex(POSIX_BUILTINS)
 pindex(NO_POSIX_BUILTINS)
