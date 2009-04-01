@@ -2,6 +2,8 @@
 
 local ret
 
+# indicate if this is a precommand modifier
+[[ $service = command ]] && precommands+=(command)
 if [[ CURRENT -ge 3 ]]; then
   compset -n 2
   _normal && ret=0

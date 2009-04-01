@@ -32,6 +32,9 @@ local func funcs ret=1 tmp _compskip format nm call match min max i num\
       _saved_insert="${compstate[insert]}" \
       _saved_colors="$ZLS_COLORS"
 
+# _precommand sets this to indicate we are following a precommand modifier
+local -a precommands
+
 typeset -U _lastdescr _comp_ignore _comp_colors
 
 [[ -z "$curcontext" ]] && curcontext=:::

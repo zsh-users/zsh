@@ -1,3 +1,12 @@
+2009-04-01  Peter Stephenson  <pws@csr.com>
+
+	* 26801: Completion/Base/Core/_main_complete,
+	Completion/Unix/Command/_calendar,
+	Completion/Zsh/Command/_command,
+	Completion/Zsh/Command/_precommand: add completion for calendar
+	function; add tracking for precommand modifiers that are
+	in effect.
+
 2009-03-26  Peter Stephenson  <pws@csr.com>
 
 	* 26797: Doc/Zsh/options.yo: further minor changes.
@@ -11499,5 +11508,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4640 $
+* $Revision: 1.4641 $
 *****************************************************
