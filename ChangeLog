@@ -1,3 +1,8 @@
+2009-04-04  Clint Adams  <clint@zsh.org>
+
+	* Simon Ruderich: 26800: Completion/Unix/Command/_git: fixes for "git add"
+        completion.
+
 2009-04-01  Peter Stephenson  <pws@csr.com>
 
 	* 26801: Completion/Base/Core/_main_complete,
@@ -11508,5 +11513,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4641 $
+* $Revision: 1.4642 $
 *****************************************************

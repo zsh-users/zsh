@@ -1331,9 +1331,9 @@ _git-add () {
     '(-v --verbose)'{-v,--verbose}'[show files as they are added]' \
     '(-f --force)'{-f,--force}'[allow adding otherwise ignored files]' \
     '(-i --interactive : -)'{-i,--interactive}'[add contents interactively to the index]' \
-    '(-p --patch : -)'{-p,--patch}'[like -i but go directly into patch mode for specified files]' \
-    '(-u --update)'{-u,--update}'[update only files git already knows about]' \
-    '(-A --all)'{-A,--all}'[act as both add . and add -u]' \
+    '(-p --patch)'{-p,--patch}'[like -i but go directly into patch mode for specified files]' \
+    '(-u --update -A --all)'{-u,--update}'[update only files git already knows about]' \
+    '(-A --all -u --update)'{-A,--all}'[act as both add . and add -u]' \
     '(-N --intent-to-add)'{-N,--intent-to-add}'[record only that the path will be added later]' \
     '--refresh[do not add files, but refresh their stat() info in the index]' \
     '--ignore-errors[continue adding if an error occurs]' \
