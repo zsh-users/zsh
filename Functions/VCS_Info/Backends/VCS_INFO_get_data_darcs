@@ -7,5 +7,5 @@ local darcsbase
 
 darcsbase=${vcs_comm[basedir]}
 rrn=${darcsbase:t}
-VCS_INFO_formats '' "${darcsbase:t}" "${darcsbase}" '' ''
+VCS_INFO_formats '' "${darcsbase:t}" "${darcsbase}" '' '' '' ''
 return 0

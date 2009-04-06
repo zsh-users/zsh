@@ -579,6 +579,17 @@ the default is to use the not-that-simple code, which is potentially a lot
 slower but might be more accurate in all possible cases. This style is only
 used by the tt(bzr) backend.
 )
+kindex(get-revision)
+item(tt(get-revision))(
+If set to true, vcs_info goes the extra mile to figure out the revision of
+a repository's work tree (currently for the tt(git) and tt(hg) backends,
+where this kind of information is not always vital). For tt(git), the
+hash value of the currently checked out commit is available via the tt(%i)
+expansion. With tt(hg), the local revision number is available via tt(%i)
+and the corresponding global hash is available via tt(%m).
+If this style is set in the tt(hg) context, the backend supports the
+branchformat style.
+)
 kindex(use-prompt-escapes)
 item(tt(use-prompt-escapes))(
 Determines if we assume that the assembled
@@ -604,6 +615,7 @@ sitem(tt(unstagedstr))((string: "U"))
 sitem(tt(command))((empty string))
 sitem(tt(use-server))(false)
 sitem(tt(use-simple))(false)
+sitem(tt(get-revision))(false)
 sitem(tt(use-prompt-escapes))(true)
 endsitem()
 
@@ -615,6 +627,7 @@ sitem(tt(%s))(The vcs in use (git, hg, svn etc.))
 sitem(tt(%b))(Information about the current branch.)
 sitem(tt(%a))(An identifier, that describes the action. Only makes sense in
 actionformats.)
+sitem(tt(%i))(The current revision number or identifier.)
 sitem(tt(%c))(The string from the var(stagedstr) style if there are staged
 changes in the repository.)
 sitem(tt(%u))(The string from the var(unstagedstr) style if there are unstaged
@@ -624,6 +637,10 @@ sitem(tt(%r))(repository name. If tt(%R) is var(/foo/bar/repoXY), tt(%r) is
 var(repoXY).)
 sitem(tt(%S))(subdirectory within a repository. If tt($PWD) is
 var(/foo/bar/reposXY/beer/tasty), tt(%S) is var(beer/tasty).)
+sitem(tt(%m))(A "misc" replacement. It is at the discretion of the backend
+to decide what this replacement expands to. It is currently used only by
+the tt(hg) backend. The hg backend replaces tt(%m) with the global hash
+value of the current revision.)
 endsitem()
 
 In tt(branchformat) these replacements are done:

@@ -3,7 +3,24 @@
 ## Distributed under the same BSD-ish license as zsh itself.
 
 setopt localoptions noksharrays NO_shwordsplit
-local action=$1 branch=$2 base=$3 staged=$4 unstaged=$5
+local action=$1 branch=$2 base=$3 staged=$4 unstaged=$5 rev=$6 misc=$7
+
+## description:
+#   action:   a string that signals a certain non-default condition in the
+#             repository (like 'rebase-i' in git). If this in non-empty,
+#             the actionformats will be used, too.
+#   branch:   the name of the currently checked out branch.
+#   base:     the full name of the repository's root directory.
+#   staged:   non-empty if the repository contains staged changes.
+#   unstaged: non-empty if the repository contains unstaged changes.
+#   rev:      an identifier of the currently checked out revision.
+#   misc:     a string that may contain anything the author likes.
+#             the backends should document what they put in it and when.
+#
+# If an argument has no valid value for a given backend, an empty value
+# should be provided. eg:
+#   VCS_INFO_formats '' "${foobranch}" "${foobase}" '' '' '' "${foomisc}"
+
 local msg
 local -i i j
 
@@ -31,6 +48,8 @@ for i in {1..${#msgs}} ; do
                     a:${action}                     \
                     b:${branch}                     \
                     c:${staged}                     \
+                    i:${rev}                        \
+                    m:${misc}                       \
                     r:${base:t}                     \
                     s:${vcs}                        \
                     u:${unstaged}                   \

@@ -14,5 +14,5 @@ cvsbranch=$(< ./CVS/Repository)
 rrn=${cvsbase:t}
 cvsbranch=${cvsbranch##${rrn}/}
 [[ -z ${cvsbranch} ]] && cvsbranch=${rrn}
-VCS_INFO_formats '' "${cvsbranch}" "${cvsbase}" '' ''
+VCS_INFO_formats '' "${cvsbranch}" "${cvsbase}" '' '' '' ''
 return 0

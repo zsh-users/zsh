@@ -1,3 +1,13 @@
+2009-04-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	*  Frank Terbeck <ft@bewatermyfriend.org>:  Functions/VCS_Info/*:
+        26816: vcs_info: add revision and "misc" argument to
+	VCS_INFO_formats(); 26817: updates for get-revision, %i and %m;
+	26818:  Add git's sha1 hash as revision information; 26819: Add
+	information about hg's local revision number and the  commit's
+	hash; 26820:  Make the hg backend work with new versions of
+	mercurial.
+
 2009-04-06  Peter Stephenson  <pws@csr.com>
 
 	* 26806 (doc tweaked): Add CORRECT_IGNORE variable for pattern to
@@ -11518,5 +11528,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4643 $
+* $Revision: 1.4644 $
 *****************************************************

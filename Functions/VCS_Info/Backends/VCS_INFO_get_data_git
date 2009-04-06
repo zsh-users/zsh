@@ -3,7 +3,7 @@
 ## Distributed under the same BSD-ish license as zsh itself.
 
 setopt localoptions extendedglob NO_shwordsplit
-local gitdir gitbase gitbranch gitaction gitunstaged gitstaged
+local gitdir gitbase gitbranch gitaction gitunstaged gitstaged gitsha1
 
 VCS_INFO_git_getaction () {
     local gitaction='' gitdir=$1
@@ -77,7 +77,7 @@ VCS_INFO_git_getbranch () {
         gitbranch="$(${(z)gitsymref} 2> /dev/null)"
 
         if [[ $? -ne 0 ]] ; then
-            gitbranch="$(${vcs_comm[cmd]} describe --exact-match HEAD 2>/dev/null)"
+            gitbranch="refs/tags/$(${vcs_comm[cmd]} describe --exact-match HEAD 2>/dev/null)"
 
             if [[ $? -ne 0 ]] ; then
                 gitbranch="${${"$(< $gitdir/HEAD)"}[1,7]}..."
@@ -85,12 +85,21 @@ VCS_INFO_git_getbranch () {
         fi
     fi
 
-    printf '%s' "${gitbranch##refs/heads/}"
+    printf '%s' "${gitbranch}"
     return 0
 }
 
 gitdir=${vcs_comm[gitdir]}
 gitbranch="$(VCS_INFO_git_getbranch ${gitdir})"
+if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision && \
+    [[ ${gitbranch} == refs/* ]] && \
+    [[ -r "${gitdir}/${gitbranch}" ]] ; then
+
+    gitsha1="${"$(< $gitdir/$gitbranch)"}"
+else
+    gitsha1=''
+fi
+gitbranch="${gitbranch##refs/[^/]##/}"
 
 if [[ -z ${gitdir} ]] || [[ -z ${gitbranch} ]] ; then
     return 1
@@ -108,5 +117,5 @@ VCS_INFO_adjust
 gitaction="$(VCS_INFO_git_getaction ${gitdir})"
 gitbase=${PWD%/${$( ${vcs_comm[cmd]} rev-parse --show-prefix )%/##}}
 rrn=${gitbase:t}
-VCS_INFO_formats "${gitaction}" "${gitbranch}" "${gitbase}" "${gitstaged}" "${gitunstaged}"
+VCS_INFO_formats "${gitaction}" "${gitbranch}" "${gitbase}" "${gitstaged}" "${gitunstaged}" "${gitsha1}" ''
 return 0

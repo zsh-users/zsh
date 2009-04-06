@@ -22,5 +22,5 @@ fi
 rrn=${bzrbase:t}
 zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat bzrbr || bzrbr="%b:%r"
 zformat -f bzrbr "${bzrbr}" "b:${bzrinfo[2]}" "r:${bzrinfo[1]}"
-VCS_INFO_formats '' "${bzrbr}" "${bzrbase}" '' ''
+VCS_INFO_formats '' "${bzrbr}" "${bzrbase}" '' '' "${bzrinfo[1]}" ''
 return 0
