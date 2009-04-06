@@ -2236,12 +2236,16 @@ getquery(char *valid_chars, int purge)
 
 static int d;
 static char *guess, *best;
+static Patprog spckpat;
 
 /**/
 static void
 spscan(HashNode hn, UNUSED(int scanflags))
 {
     int nd;
+
+    if (spckpat && pattry(spckpat, hn->nam))
+	return;
 
     nd = spdist(hn->nam, guess, (int) strlen(guess) / 4 + 1);
     if (nd <= d) {
@@ -2257,7 +2261,7 @@ spscan(HashNode hn, UNUSED(int scanflags))
 mod_export void
 spckword(char **s, int hist, int cmd, int ask)
 {
-    char *t;
+    char *t, *correct_ignore;
     int x;
     char ic = '\0';
     int ne;
@@ -2293,6 +2297,14 @@ spckword(char **s, int hist, int cmd, int ask)
 	    break;
     if (**s == Tilde && !*t)
 	return;
+
+    if ((correct_ignore = getsparam("CORRECT_IGNORE")) != NULL) {
+	tokenize(correct_ignore = dupstring(correct_ignore));
+	remnulargs(correct_ignore);
+	spckpat = patcompile(correct_ignore, 0, NULL);
+    } else
+	spckpat = NULL;
+
     if (**s == String && !*t) {
 	guess = *s + 1;
 	if (itype_end(guess, IIDENT, 1) == guess)

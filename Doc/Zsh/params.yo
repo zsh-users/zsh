@@ -797,6 +797,17 @@ item(tt(COLUMNS) <S>)(
 The number of columns for this terminal session.
 Used for printing select lists and for the line editor.
 )
+vindex(CORRECT_IGNORE)
+item(tt(CORRECT_IGNORE))(
+If set, is treated as a pattern during spelling correction.  Any
+potential correction that matches the pattern is ignored.  For example,
+if the value is `tt(_*)' then completion functions (which, by
+convention, have names beginning with `tt(_)') will never be offered
+as spelling corrections.  The pattern does not apply the correction
+of file names, as applied by the tt(CORRECT_ALL) option (so with the
+example just given files beginning with `tt(_)' in the current
+directory would still be completed).
+)
 vindex(DIRSTACKSIZE)
 item(tt(DIRSTACKSIZE))(
 The maximum size of the directory stack.  If the

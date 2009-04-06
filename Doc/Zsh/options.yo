@@ -1007,6 +1007,9 @@ Try to correct the spelling of commands.
 Note that, when the tt(HASH_LIST_ALL) option is not set or when some
 directories in the path are not readable, this may falsely report spelling
 errors the first time some commands are used.
+
+The shell variable tt(CORRECT_IGNORE) may be set to a pattern to
+match words that will never be offered as corrections.
 )
 pindex(CORRECT_ALL)
 pindex(NO_CORRECT_ALL)

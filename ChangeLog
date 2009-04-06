@@ -1,3 +1,8 @@
+2009-04-06  Peter Stephenson  <pws@csr.com>
+
+	* 26806 (doc tweaked): Add CORRECT_IGNORE variable for pattern to
+	be ignored by correction from internal hash tables.
+
 2009-04-04  Clint Adams  <clint@zsh.org>
 
 	* Simon Ruderich: 26800: Completion/Unix/Command/_git: fixes for "git add"
@@ -11513,5 +11518,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4642 $
+* $Revision: 1.4643 $
 *****************************************************
