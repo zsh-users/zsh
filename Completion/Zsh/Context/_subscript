@@ -17,7 +17,7 @@ compset -P '\(([^\(\)]|\(*\))##\)' # remove subscript flags
 # name expansion.  Also expand in anything that looks like an assignment
 # or colon list.
 integer pos=$((CURSOR+1))
-while [[ pos > 1 && $BUFFER[pos-1] != '[' ]]; do (( pos-- )); done
+while [[ pos -gt 1 && $BUFFER[pos-1] != '[' ]]; do (( pos-- )); done
 if [[ $BUFFER[1,pos-1] = *[[:space:]:=]##\~\[ ]]; then
   _dynamic_directory_name
 elif [[ "$PREFIX" = :* ]]; then
