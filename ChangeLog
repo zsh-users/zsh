@@ -1,7 +1,7 @@
 2009-04-07  Peter Stephenson  <pws@csr.com>
 
 	* Bart: 26822: Completion/Zsh/Context/_subscript: ">" should
-	be "-gt"---caused infinite loop looking for no existent subscript.
+	be "-gt"---caused infinite loop looking for nonexistent subscript.
 
 2009-04-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
@@ -11533,5 +11533,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4645 $
+* $Revision: 1.4646 $
 *****************************************************
