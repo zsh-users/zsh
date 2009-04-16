@@ -1,5 +1,8 @@
 2009-04-16  Peter Stephenson  <pws@csr.com>
 
+	* 26389: Doc/.cvsignore, Doc/.distfiles, Doc/Makefile.in: add
+	--node-files option to texi2html.
+
 	* Alexey I. Froloff: 26830: Completion/Unix/Command/_man: fix
 	stripping of manual page suffixes.
 
@@ -11553,5 +11556,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4650 $
+* $Revision: 1.4651 $
 *****************************************************

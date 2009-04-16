@@ -40,7 +40,7 @@ INSTALL         = @INSTALL@
 MAKEINFO = makeinfo
 TEXI2DVI = texi2dvi
 DVIPS = dvips
-TEXI2HTML = texi2html --output . --ifinfo --split=chapter
+TEXI2HTML = texi2html --output . --ifinfo --split=chapter --node-files
 
 .SUFFIXES: .yo .1
 

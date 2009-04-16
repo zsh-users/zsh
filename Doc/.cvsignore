@@ -3,7 +3,7 @@ version.yo
 zsh*.1
 zsh.texi
 zsh.info*
-zsh*.html
+*.html
 zsh.aux zsh.toc
 zsh.cp zsh.cps
 zsh.fn zsh.fns

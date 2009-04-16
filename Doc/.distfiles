@@ -15,7 +15,7 @@ DISTFILES_SRC='
 
 DISTFILES_DOC='
     zsh.info zsh.info-[0-9]*
-    zsh.html zsh_*toc.html zsh_[0-9]*.html
+    *.html
     zsh.dvi
     zsh.pdf
 '
