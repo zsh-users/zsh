@@ -7,7 +7,7 @@ if [[ $CURRENT -ge 4 ]]; then
 	  rx|tx)
 		if [[ $words[2] = '-G' ]] && _message -e n 'number of ring entries' || _wanted -x onoff expl 'enabled' compadd off on
 	  ;;
-	  autoneg|adaptive-rx|adaptive-tx|raw|sg|tso)
+	  autoneg|adaptive-rx|adaptive-tx|raw|hex|sg|tso|ufo|gso)
 		_wanted -x onoff expl 'enabled' compadd off on
 	  ;;
 	  rx-usecs|rx-frames|rx-usecs-irq|rx-frames-irq|tx-usecs|tx-frames|tx-usecs-irq|tx-frames-irq|stats-block-usecs|pkt-rate-low|rx-usecs-low|rx-frames-low|tx-usecs-low|tx-frames-low|pkt-rate-high|rx-usecs-high|rx-frames-high|tx-usecs-high|tx-frames-high|sample-interval|rx-mini|rx-jumbo|offset|length|magic|value|phyad|msglvl)
@@ -21,6 +21,18 @@ if [[ $CURRENT -ge 4 ]]; then
 	  ;;
 	  port)
 		_wanted -x port expl 'device port' compadd tp aui bnc mii
+	  ;;
+	  advertise)
+		_values 'hexidecimal value (or a combination of the following)' \
+			'0x001[10 Half]' \
+			'0x002[10 Full]' \
+			'0x004[100 Half]' \
+			'0x008[100 Full]' \
+			'0x010[1000 Half(not supported by IEEE standards)]' \
+			'0x020[1000 Full]' \
+			'0x8000[2500 Full(not supported by IEEE standards)]' \
+			'0x800[10000 Full]' \
+			'0x03F[Auto]'
 	  ;;
 	  xcvr)
 		_wanted -x xcvr expl 'transceiver type' compadd internal external
@@ -39,15 +51,18 @@ if [[ $CURRENT -ge 4 ]]; then
 	  sopass)
 		_message -e secureon 'password - 6 bytes in ethernet MAC hex format (xx:yy:zz:aa:bb:cc)'
 	  ;;
+	  file)
+		_wanted files expl 'raw register dump files' _files
+	  ;;
 	  *)
 	case $words[2]; in
-	  -A)
+	  -A|--pause)
 		_values -S ' ' -w 'pause options' \
 			'autoneg[Specify if pause autonegotiation is enabled]' \
 			'rx[Specify if RX pause is enabled]' \
 			'tx[Specify if TX pause is enabled]'
 	  ;;
-	  -C)
+	  -C|--coalesce)
 		_values -S ' ' -w 'coalescing settings' \
 			'adaptive-rx' 'adaptive-tx' \
 			'rx-usecs' 'rx-frames' 'rx-usecs-irq' 'rx-frames-irq' \
@@ -61,50 +76,55 @@ if [[ $CURRENT -ge 4 ]]; then
 			'tx-usecs-high' 'tx-frames-high' \
 			'sample-interval'
 	  ;;
-	  -G)
+	  -G|--set-ring)
 		_values -S ' ' -w 'ring parameters' \
 			'rx[Change number of ring entries for the RX ring]' \
 			'rx-mini[Change number of ring entries for the RX Mini ring]' \
 			'rx-jumbo[Change number of ring entries for the RX Jumbo ring]' \
 			'tx[Change number of ring entries for the TX ring]'
 	  ;;
-	  -d)
+	  -d|--register-dump)
 		_values -S ' ' -w 'register dump options' \
-			'raw[dump raw register data]'
+			'hex[dump hex register data]' \
+			'raw[dump raw register data]' \
+			'file[use contents from file rather than device]'
 	  ;;
-	  -e)
+	  -e|--eeprom-dump)
 		_values -S ' ' -w 'EEPROM dump options' \
 			'raw[dump raw EEPROM data]' \
 			'offset[dump certain portions of the EEPROM]' \
 			'length[dump certain portions of the EEPROM]'
 	  ;;
-	  -E)
+	  -E|--change-eeprom)
 		_values -S ' ' -w 'EEPROM values' \
 			'magic[device-specific key]' \
 			'offset[select byte]' \
 			'value[new value]'
 	  ;;
-	  -K)
+	  -K|--offload)
 		_values -S ' ' -w 'offload options' \
 			'rx[Specify if RX checksumming is enabled]' \
 			'tx[Specify if TX checksumming is enabled]' \
 			'sg[Specify if scatter-gather is enabled]' \
-			'tso[Specify if tcp segmentation offload is enabled]'
+			'tso[Specify if TCP segmentation offload is enabled]' \
+			'ufo[Specify if UDP segmentation offload is enabled]' \
+			'gso[Specify if generic segmentation offload is enabled]'
 	  ;;
-	  -p)
+	  -p|--identify)
 		if [[ $CURRENT -eq 4 ]] && _message -e length 'seconds'
 	  ;;
-	  -t)
+	  -t|--test)
 		_values -S ' ' -w 'selftest option' \
 			'(online)offline:perform full set of tests possibly causing normal operation interruption (default)]' \
 			'(offline)online:perform limited set of tests do not interrupting normal adapter operation]'
 	  ;;
-	  -s)
+	  -s|--change)
 		_values -S ' ' -w 'change setting' \
 			'speed[Set speed in Mb/s]' \
 			'duplex[Set full or half duplex mode]' \
 			'port[Select device port]' \
 			'autoneg[Specify if autonegotiation is enabled]' \
+			'advertise[Set the speed and duplex advertised by autonegotiation]' \
 			'phyad[PHY address]' \
 			'xcvr[Select transceiver type]' \
 			'wol[Set Wake-on-LAN options]' \
@@ -116,26 +136,29 @@ if [[ $CURRENT -ge 4 ]]; then
 	esac
 fi
 
-cmds=(-h -a -A -c -C -g -G -i -d -e -E -k -K -p -r -S -t -s)
+cmds=(-h -a -A -c -C -g -G -i -d -e -E -k -K -p -r -S -t -s
+	--help --show-pause --pause --show-coalesce --coalesce --show-ring
+	--set-ring --driver --register-dump --eeprom-dump --change-eeprom
+	--show-offload --offload --identify --negotiate --statistics --test --change)
 
 _arguments \
 	"($cmds)1:interface:_net_interfaces" \
-	"($cmds 1)-h[shows a short help message]" \
-	"($cmds)-a[queries the specified ethernet device for pause parameter information]" \
-	"($cmds)-A[change the pause parameters of the specified ethernet device]" \
-	"($cmds)-c[queries the specified ethernet device for coalescing information]" \
-	"($cmds)-C[change the coalescing settings of the specified ethernet device]" \
-	"($cmds)-g[queries the specified ethernet device for RX/TX ring parameter information]" \
-	"($cmds)-G[change the RX/TX ring parameters of the specified ethernet device]" \
-	"($cmds)-i[queries the specified ethernet device for associated driver information]" \
-	"($cmds)-d[retrieves and prints a register dump for the specified ethernet device]" \
-	"($cmds)-e[retrieves and prints an EEPROM dump for the specified ethernet device]" \
-	"($cmds)-E[Changes EEPROM byte for the specified ethernet device]" \
-	"($cmds)-k[queries the specified ethernet device for offload information]" \
-	"($cmds)-K[change the offload parameters of the specified ethernet device]" \
-	"($cmds)-p[initiates adapter-specific action intended to identify the adapter by sight]" \
-	"($cmds)-r[restarts auto-negotiation on the specified ethernet device]" \
-	"($cmds)-S[queries the specified ethernet device for NIC- and driver-specific statistics]" \
-	"($cmds)-t[executes adapter selftest on the specified ethernet device]" \
-	"($cmds)-s[allows changing some or all settings of the specified ethernet device]" \
+	"($cmds 1)"{-h,--help}'[shows a short help message]' \
+	"($cmds)"{-a,--show-pause}'[queries the specified ethernet device for pause parameter information]' \
+	"($cmds)"{-A,--pause}'[change the pause parameters of the specified ethernet device]' \
+	"($cmds)"{-c,--show-coalesce}'[queries the specified ethernet device for coalescing information]' \
+	"($cmds)"{-C,--coalesce}'[change the coalescing settings of the specified ethernet device]' \
+	"($cmds)"{-g,--show-ring}'[queries the specified ethernet device for RX/TX ring parameter information]' \
+	"($cmds)"{-G,--set-ring}'[change the RX/TX ring parameters of the specified ethernet device]' \
+	"($cmds)"{-i,--driver}'[queries the specified ethernet device for associated driver information]' \
+	"($cmds)"{-d,--register-dump}'[retrieves and prints a register dump for the specified ethernet device]' \
+	"($cmds)"{-e,--eeprom-dump}'[retrieves and prints an EEPROM dump for the specified ethernet device]' \
+	"($cmds)"{-E,--change-eeprom}'[Changes EEPROM byte for the specified ethernet device]' \
+	"($cmds)"{-k,--show-offload}'[queries the specified ethernet device for offload information]' \
+	"($cmds)"{-K,--offload}'[change the offload parameters of the specified ethernet device]' \
+	"($cmds)"{-p,--identify}'[initiates adapter-specific action intended to identify the adapter by sight]' \
+	"($cmds)"{-r,--negotiate}'[restarts auto-negotiation on the specified ethernet device]' \
+	"($cmds)"{-S,--statistics}'[queries the specified ethernet device for NIC- and driver-specific statistics]' \
+	"($cmds)"{-t,--test}'[executes adapter selftest on the specified ethernet device]' \
+	"($cmds)"{-s,--change}'[allows changing some or all settings of the specified ethernet device]' \
 	'*:' && ret=0

@@ -1,3 +1,14 @@
+2009-04-16  Peter Stephenson  <pws@csr.com>
+
+	* Tomasz Pala: users/14031: Completion/Linux/Command/_ipset:
+	updates.
+
+	* Tomasz Pala: users/14032: Completion/Linux/Command/_mdmadm,
+	Completion/Linux/Command/_rpmbuild: new completions.
+
+	* Tomasz Pala: users/14030: Completion/Linux/Command/_ethtool:
+	update.
+
 2009-04-07  Peter Stephenson  <pws@csr.com>
 
 	* Bart: 26822: Completion/Zsh/Context/_subscript: ">" should
@@ -11533,5 +11544,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4646 $
+* $Revision: 1.4647 $
 *****************************************************

@@ -11,7 +11,11 @@ _set_types () {
 		'iphash[Hash of IP addresses]' \
 		'nethash[Hash of network addresses]' \
 		'ipporthash[Hash of IP address and port pairs]' \
-		'iptree[Tree of IP addresses, optionally with timeout]'
+		'ipportiphash[Hash of IP address,port and IP address triples]' \
+		'ipportnethash[Hash of IP address,port and network address triples]' \
+		'iptree[Tree of IP addresses, optionally with timeout]' \
+		'iptreemap[Tree of IP addresses or networks]' \
+		'setlist[List of sets]'
 }
 
 if [[ $words[2] = (-q|--quiet) ]]; then
@@ -77,11 +81,17 @@ case $words[offset+2]; in
 	  nethash)
 		args=(	$hash )
 	  ;;
-	  ipporthash)
+	  ipporthash|ipportiphash|ipportnethash)
 		args=(	$from_to $hash )
 	  ;;
 	  iptree)
 	  	args=(	'--timeout[Timeout value for the entries in seconds (default 0)]:timeout' )
+	  ;;
+	  iptreemap)
+	  	args=(	'--gc[Garbage collection inverval (default 300 seconds)]:timeout' )
+	  ;;
+	  setlist)
+	  	args=(	'--size[Size of the new setlist (default 8)]:size' )
 	  ;;
 	esac
   ;;

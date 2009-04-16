@@ -1,9 +1,31 @@
 DISTFILES_SRC='
 .distfiles
-_acpi           _acpitool       _analyseplugin  _brctl          _chrt           
-_ethtool        _fusermount     _ionice         _ipset          _iptables       
-_iwconfig       _losetup        _lsusb          _mii-tool       _modutils       
-_mondo          _pkgtool        _sshfs          _strace         _tpb            
-_tpconfig       _tune2fs        _uml            _valgrind       _vserver        
-_yast           
+_acpi
+_acpitool
+_analyseplugin
+_brctl
+_chrt
+_ethtool
+_fusermount
+_ionice
+_ipset
+_iptables
+_iwconfig
+_losetup
+_lsusb
+_mdmadm
+_mii-tool
+_modutils
+_mondo
+_pkgtool
+_rpmbuild
+_sshfs
+_strace
+_tpb
+_tpconfig
+_tune2fs
+_uml
+_valgrind
+_vserver
+_yast
 '
