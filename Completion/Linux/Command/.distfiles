@@ -13,7 +13,7 @@ _iptables
 _iwconfig
 _losetup
 _lsusb
-_mdmadm
+_mdadm
 _mii-tool
 _modutils
 _mondo

@@ -1,5 +1,7 @@
 2009-04-16  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Unix/Command/_mdmadm -> _mdadm
+
 	* 26389: Doc/.cvsignore, Doc/.distfiles, Doc/Makefile.in: add
 	--node-files option to texi2html.
 
@@ -11556,5 +11558,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4651 $
+* $Revision: 1.4652 $
 *****************************************************
