@@ -1,5 +1,8 @@
 2009-04-16  Peter Stephenson  <pws@csr.com>
 
+	* Alexey I. Froloff: 26830: Completion/Unix/Command/_man: fix
+	stripping of manual page suffixes.
+
 	* Evgenii Terechkov: 26831: Completion/Unix/Command/_screen:
 	filter out redundant output.
 
@@ -11550,5 +11553,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4649 $
+* $Revision: 1.4650 $
 *****************************************************

@@ -98,9 +98,9 @@ _man_pages() {
   if ((CURRENT > 2)) ||
       ! zstyle -t ":completion:${curcontext}:manuals.$sect" insert-sections
   then
-    compadd "$@" - ${pages%.(?|<->*(|.gz|.bz2|.Z))}
+    compadd "$@" - ${pages%.((?|<->*)(|.gz|.bz2|.Z))}
   else
-    compadd "$@" -P "$sopt$sect " - ${pages%.(?|<->*(|.gz|.bz2|.Z))}
+    compadd "$@" -P "$sopt$sect " - ${pages%.((?|<->*)(|.gz|.bz2|.Z))}
   fi
 }
 
