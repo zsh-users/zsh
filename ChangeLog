@@ -1,5 +1,8 @@
 2009-04-16  Peter Stephenson  <pws@csr.com>
 
+	* Evgenii Terechkov: 26831: Completion/Unix/Command/_screen:
+	filter out redundant output.
+
 	* Alexey I. Froloff: 26829: Completion/Unix/Command/_rsync:
 	miscounting fields in output.
 
@@ -11547,5 +11550,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4648 $
+* $Revision: 1.4649 $
 *****************************************************

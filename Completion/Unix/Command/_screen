@@ -98,19 +98,19 @@ if [[ -n $state ]]; then
     attached-sessions)
       sessions=(
         ${${${(M)${(f)"$(_call_program screen-sessions $words[1] \
-            -ls)"}:#*[Aa]ttached*}##[[:blank:]]}%%[[:blank:]]*}
+            -ls 2>/dev/null)"}:#*[Aa]ttached*}##[[:blank:]]}%%[[:blank:]]*}
       )
     ;;
     detached-sessions)
       sessions=(
         ${${${(M)${(f)"$(_call_program screen-sessions $words[1] \
-            -ls)"}:#*[Dd]etached*}##[[:blank:]]}%%[[:blank:]]*}
+            -ls 2>/dev/null)"}:#*[Dd]etached*}##[[:blank:]]}%%[[:blank:]]*}
       )
     ;;
     any-sessions)
       sessions=(
         ${${${(M)${(f)"$(_call_program screen-sessions $words[1] \
-	    -ls)"}:#*tached*}##[[:blank:]]}%%[[:blank:]]*}
+	    -ls 2>/dev/null)"}:#*tached*}##[[:blank:]]}%%[[:blank:]]*}
       )
   esac
 
