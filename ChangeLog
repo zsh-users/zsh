@@ -1,5 +1,8 @@
 2009-04-16  Peter Stephenson  <pws@csr.com>
 
+	* Alexey I. Froloff: 26829: Completion/Unix/Command/_rsync:
+	miscounting fields in output.
+
 	* Tomasz Pala: users/14031: Completion/Linux/Command/_ipset:
 	updates.
 
@@ -11544,5 +11547,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4647 $
+* $Revision: 1.4648 $
 *****************************************************

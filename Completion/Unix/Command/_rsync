@@ -31,11 +31,14 @@ if compset -P '*::*/' || compset -P 'rsync://*/*/'; then
   remdispf=(${remfiles:#d*})
   remdispd=(${(M)remfiles:#d*})
 
-  _wanted files expl 'remote file or directory' \
-      compadd -d remdispf ${remdispf##* }
+  # $remdisp[fd] format:
+  # attrs  size  date  time  name
 
   _wanted files expl 'remote file or directory' \
-      compadd -S/ -d remdispd ${remdispd##* }
+      compadd -d remdispf ${${${${remdispf##[^ ]## ##}##[^ ]## ##}##[^ ]## ##}##[^ ]## ##}
+
+  _wanted files expl 'remote file or directory' \
+      compadd -S/ -d remdispd ${${${${remdispd##[^ ]## ##}##[^ ]## ##}##[^ ]## ##}##[^ ]## ##}
 
 elif compset -P 1 '*::' || compset -P 1 'rsync://*/'; then
 
