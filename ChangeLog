@@ -1,3 +1,7 @@
+2009-04-17  Peter Stephenson  <pws@csr.com>
+
+	* Jesse W: 26840: Doc/Zsh/manual.yo: texi2html instructions.
+
 2009-04-16  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_mdmadm -> _mdadm
@@ -11558,5 +11562,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4652 $
+* $Revision: 1.4653 $
 *****************************************************

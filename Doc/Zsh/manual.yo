@@ -187,9 +187,9 @@ An HTML version of this manual is available at the Zsh web site via:
 tt(http://zsh.sunsite.dk/Doc/).
 
 (The HTML version is produced with bf(texi2html), which may be obtained
-from tt(http://www.mathematik.uni-kl.de/~obachman/Texi2html/). The command is
-`tt(texi2html -split chapter -expand info zsh.texi)'.  If necessary,
-upgrade to version 1.64 of texi2html.)
+from tt(http://www.nongnu.org/texi2html/). The command is
+`tt(texi2html --output .  --ifinfo --split=chapter --node-files zsh.texi)'.
+If necessary, upgrade to version 1.78 of texi2html.)
 )
 enditem()
 
