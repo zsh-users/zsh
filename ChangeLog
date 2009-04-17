@@ -1,5 +1,8 @@
 2009-04-17  Peter Stephenson  <pws@csr.com>
 
+	* users/14041: Doc/Zsh/zle.yo, Src/Zle/zle_bindings.c: bind ":"
+	by default to execute-named-cmd in vicmd mode.
+
 	* unposted: Config/version.mk: change version to 4.3.9.dev-2.
 
 	* Jesse W: 26840: Doc/Zsh/manual.yo: texi2html instructions.
@@ -11564,5 +11567,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4654 $
+* $Revision: 1.4655 $
 *****************************************************

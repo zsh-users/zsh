@@ -1871,7 +1871,7 @@ If a zero prefix argument is given, the region is activated but
 point and mark are not swapped.
 )
 tindex(execute-named-cmd)
-item(tt(execute-named-cmd) (ESC-x) (unbound) (unbound))(
+item(tt(execute-named-cmd) (ESC-x) (:) (unbound))(
 Read the name of an editor command and
 execute it.  A restricted set of editing functions is available in the
 mini-buffer.  Keys are looked up in the special

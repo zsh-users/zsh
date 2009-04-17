@@ -348,7 +348,7 @@ int vicmdbind[128] = {
     /* 7 */ z_digitargument,
     /* 8 */ z_digitargument,
     /* 9 */ z_digitargument,
-    /* : */ z_undefinedkey,
+    /* : */ z_executenamedcmd,
     /* ; */ z_virepeatfind,
     /* < */ z_viunindent,
     /* = */ z_listchoices,
