@@ -1,5 +1,7 @@
 2009-04-17  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Config/version.mk: change version to 4.3.9.dev-2.
+
 	* Jesse W: 26840: Doc/Zsh/manual.yo: texi2html instructions.
 
 2009-04-16  Peter Stephenson  <pws@csr.com>
@@ -11562,5 +11564,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4653 $
+* $Revision: 1.4654 $
 *****************************************************
