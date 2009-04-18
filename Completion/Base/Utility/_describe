@@ -97,10 +97,10 @@ while _tags; do
     
         if [[ -n $_mats ]]; then
           compadd "$_opts[@]" "${(@)_expl:/-J/-2V}" -D $_strs - \
-                  "${(@M)${(@P)_mats}##([^:\\]|\\?)##}"
+                  "${(@)${(@M)${(@P)_mats}##([^:\\]|\\?)##}//\\(#b)(?)/$match[1]}"
         else
           compadd "$_opts[@]" "${(@)_expl:/-J/-2V}" -D $_strs - \
-                  "${(@M)${(@P)_strs}##([^:\\]|\\?)##}"
+                  "${(@)${(@M)${(@P)_strs}##([^:\\]|\\?)##}//\\(#b)(?)/$match[1]}"
         fi
       done
       set - "$_argv[@]"

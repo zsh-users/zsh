@@ -4016,7 +4016,8 @@ The var(descr) is taken as a string to display above the matches if the
 tt(format) style for the tt(descriptions) tag is set.  This is followed by
 one or two names of arrays followed by options to pass to tt(compadd).  The
 first array contains the possible completions with their descriptions in
-the form `var(completion)tt(:)var(description)'.  If a second array is
+the form `var(completion)tt(:)var(description)'.  Any literal colons in
+var(completion) must be quoted with a backslash.  If a second array is
 given, it should have the same number of elements as the first; in this
 case the corresponding elements are added as possible completions instead
 of the var(completion) strings from the first array.  The completion list
