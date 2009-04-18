@@ -31,7 +31,7 @@ Doc/version.yo
 Doc/zsh*.1
 Doc/zsh.texi
 Doc/zsh.info*
-Doc/zsh*.html
+Doc/*.html
 Doc/zsh.aux
 Doc/zsh.toc
 Doc/zsh.cp
