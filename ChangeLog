@@ -1,3 +1,8 @@
+2009-04-20  Peter Stephenson  <pws@csr.com>
+
+	* Src/Modules/terminfo.mdd: make test agree with the one
+	in terminfo.c.
+
 2009-04-20  Clint Adams  <clint@zsh.org>
 
 	* Kalle Olavi Niemitalo: 26850: Completion/Unix/Command/_git:
@@ -11578,5 +11583,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4657 $
+* $Revision: 1.4658 $
 *****************************************************
