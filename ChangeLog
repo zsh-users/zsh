@@ -1,3 +1,8 @@
+2009-04-20  Clint Adams  <clint@zsh.org>
+
+	* Kalle Olavi Niemitalo: 26850: Completion/Unix/Command/_git:
+	fix breakage in git write-tree and git send-pack.
+
 2009-04-18  Andrey Borzenkov <bor@zsh.org>
 
 	* users/14033 as modified by users/14037 and added doc:
@@ -11573,5 +11578,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4656 $
+* $Revision: 1.4657 $
 *****************************************************
