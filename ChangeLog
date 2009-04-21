@@ -1,5 +1,8 @@
 2009-04-21  Peter Stephenson  <pws@csr.com>
 
+	* 26858: Test/A01grammar.ztst: use zsh -fc instead of /bin/sh -c
+	for testing exec -l to avoid sensitivity to /etc/profile.
+
 	* 26853 + typo fix: NEWS, README, Etc/CONTRIBUTORS, Etc/FAQ.yo,
 	Etc/relnote_4.3.10.txt: package documentation updates.
 
@@ -11588,5 +11591,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4659 $
+* $Revision: 1.4660 $
 *****************************************************

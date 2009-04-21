@@ -62,9 +62,9 @@
   (exec /bin/sh; echo bar)
 0:`exec' precommand modifier
 
-  (exec -l /bin/sh -c 'echo $0')
+  (exec -l $ZTST_testdir/../Src/zsh -fc 'echo $0' | sed 's%/.*/%%' )
 0:`exec' with -l option
->-/bin/sh
+>-zsh
 
   (exec -a /bin/SPLATTER /bin/sh -c 'echo $0')
 0:`exec' with -a option
