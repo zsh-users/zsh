@@ -20,18 +20,30 @@ Version 4.3
 
 Contributors to the main shell include Clint Adams, Rocky Bernstein, Andrey
 Borzenkov, Dan Bullok, Marc Chantreux, Thorsten Dahlheimer, Wayne Davison,
-Oliver Kiddle, Matthias Kopferman, Mikael Magnusson, Dan Nelson, Phil
-Pennock, Toby Peterson, R. Ramkumar, Bart Schaefer, Joerg Sonnenberger,
-Peter Stephenson, Takimoto Jun, River Tarnell, Philippe Troin, Geoff Wing,
-Matt Wozniski.
+Lionel Flandrin, Michael Hwang, Oliver Kiddle, Greg Klanderman, Matthias
+Kopferman, Mikael Magnusson, Dan Nelson, Phil Pennock, Toby Peterson,
+R. Ramkumar, Fran√ßois Revol, Bart Schaefer, Tom√°≈° Smetana, Joerg
+Sonnenberger, Peter Stephenson, Jon Strait, Takimoto Jun, River Tarnell,
+Frank Terbeck, Philippe Troin, Geoff Wing, Matt Wozniski.
 
 The VCS_Info function system was written by Frank Terbeck.
 
-Contributors to completion functions include those above plus Zack Cerza,
-Danek Duvall, Tobias Gruetzmacher, Dough Kearns, Hannu Koivisto, Henryk
-Konsek, Scott Murray, Tomasz Pala, Carlos Phillips, Haakon Riiser, Felix
-Rosencrantz, Stephen R¸ger, Kris Shannon, Travis Spencer, MÂrten
-Svantesson, Motoi Washida, Jess Weinstein.
+Contributors to completion and other shell functions include those above
+plus Nuno Alexandre, Ralph Amissah, Micah Anderson, arno, Frank Benkstein,
+Jay Berkenbilt, Frank Blendinger, Zack Cerza, Brendan Cully, Baptiste
+Daroussin, Danek Duvall, Ryan F, Sean Finney, Daniel Friesel, Alexey
+I. Froloff, Tobias Gruetzmacher, Pierre Habouzit, Richard Hartmann,
+Benjamin R. Haskell, Ag. D. Hatzimanikas, Pete Hollobon, Erik Johansson,
+Kohsuke Kawaguchi, Dough Kearns, Hannu Koivisto, Henryk Konsek, Chris Lamb,
+Vincent Lefevre, Roger Leigh, Eric Mangold, Max Mikhanosha, Arkadiusz
+Miskiewicz, Matthieu Moy, Scott Murray, Alexander Myodov, Kalle Olavi
+Niemitalo, Kazuhiro NISHIYAMA, Omari Norman, Mustafa Oezkan, Tomasz Pala,
+Peter Palfrader, Carlos Phillips, Daniel Qarras, Jean-Baptiste Quenot,
+David Riebenbauer, Haakon Riiser, Ingo Rohlfs, Felix Rosencrantz, Simon
+Ruderich, Stephen R√ºger, William Scott, Kris Shannon, J√∂rg Sommer, Travis
+Spencer, Vincent Steman, M√•rten Svantesson, Evgenii Terechkov, Magnus
+Therning, Ingmar Vanhassel, Markus Waldeck, Motoi Washida, Nikolai Weibull,
+Jesse Weinstein.
 
 Version 4.2
 -----------
@@ -175,7 +187,7 @@ Versions 3.1.7 to 3.1.9
   fix guttering, put up shelves in study, recarpet hall, ...
 
 Other patches were submitted by Will Day, Irving Wolfe, John Williams, Vin
-Shelton, Akim Demaille, Helmut Jarausch, Gene Cohler, Johan Sundstrˆm.
+Shelton, Akim Demaille, Helmut Jarausch, Gene Cohler, Johan Sundstr√∂m.
 
 Version 3.1.6
 -------------
@@ -202,7 +214,7 @@ Version 3.1.6
 * Geoff Wing <gcw@zsh.org>:  Zle display code fixes, mailing list and patch
   archive.
 
-* Zolt·n HidvÈgi <hzoli@cs.elte.hu>: AIX dynamic loading code.
+* Zolt√°n Hidv√©gi <hzoli@cs.elte.hu>: AIX dynamic loading code.
 
 * Matt Armstrong: cygwin configuration changes.
 
@@ -212,7 +224,7 @@ Furukawa, Ville Herva, Will Day, Lehti Rahmi, Larry P. Schrof, Helmut
 Jarausch, Phil Pennock, Wilfredo Sanchez, Bruce Stephens, Gene Cohler,
 Ollivier Robert, Felix Rosencrantz.
 
-Previous versions of zsh 3 were maintained by Zolt·n HidvÈgi and Andrew
+Previous versions of zsh 3 were maintained by Zolt√°n Hidv√©gi and Andrew
 Main (Zefram).
 
 Version 3.0
@@ -224,7 +236,7 @@ Version 3.0
   internal hash tables and rewrote the related builtins (enable, disable,
   hash, unhash).  Made some cleanups in exec.c.
 
-* Zolt·n HidvÈgi <hzoli@cs.elte.hu> maintained zsh from version
+* Zolt√°n Hidv√©gi <hzoli@cs.elte.hu> maintained zsh from version
   2.6-beta16.  Rewrote most of the lexer and substitution and the related
   completion code.  Improved sh/ksh/POSIX compatibility.  Fixed lots
   of bugs in completion, parameter and history code.  Made zsh fully

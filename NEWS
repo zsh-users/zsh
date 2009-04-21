@@ -4,6 +4,22 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes between versions 4.3.9 and 4.3.10
+-----------------------------------------
+
+The command "emulate <mode> -c ..." evaluates an expression in a given
+emulation.  The emulation is sticky for functions defined within the
+expression.
+
+The variable CORRECT_IGNORE gives a pattern that can be ignored
+in spelling correction.  CORRECT_IGNORE='_*' ignores completion functions.
+
+The option POSIX_ALIASES improves compatibility of aliases with other
+shells.
+
+The variable ZSH_PATCHLEVEL can be used to test for unreleased versions of
+the shell; it is present but less useful in released versions.
+
 Major changes between versions 4.3.6 and 4.3.9
 ----------------------------------------------
 
