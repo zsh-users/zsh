@@ -1,5 +1,8 @@
 2009-04-21  Peter Stephenson  <pws@csr.com>
 
+	* Greg Klanderman: 26862: Functions/Misc/run-help: remove
+	unecessary "print".
+
 	* Greg Klanderman (26861) + 26863:
 	Completion/Base/Widget/_read_comp: don't warn over unset
 	parameters but typeset -g _read_comp anyway.
@@ -11595,5 +11598,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4661 $
+* $Revision: 1.4662 $
 *****************************************************
