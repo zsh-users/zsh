@@ -23,9 +23,10 @@
 #  _read_comp         Last completion string read from user
 
 # emulate -L zsh
-setopt localoptions extendedglob nobadpattern # xtrace promptsubst
+setopt localoptions extendedglob nobadpattern unset # xtrace promptsubst
 # local PS4='%N:%i:$((#key))> '
 
+typeset -g _read_comp
 if [[ ${+NUMERIC} = 0 && -n $_read_comp ]]; then
   if [[ $_read_comp = _* ]]; then
     eval $_read_comp
