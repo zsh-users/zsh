@@ -1,3 +1,8 @@
+2009-04-22  Peter Stephenson  <pws@csr.com>
+
+	* see 26867: Functions/VCS_Info/Backends/VCS_INFO_get_data_svk:
+	remove odd "${".
+
 2009-04-21  Peter Stephenson  <pws@csr.com>
 
 	* Greg Klanderman: 26862: Functions/Misc/run-help: remove
@@ -11598,5 +11603,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4662 $
+* $Revision: 1.4663 $
 *****************************************************
