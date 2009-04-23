@@ -1,6 +1,7 @@
 2009-04-23  Clint Adams  <clint@zsh.org>
 
-	* 26877: Completion/Debian/Command/_apt: handle apt-get purge.
+	* 26877, 26879: Completion/Debian/Command/_apt: handle apt-get
+	purge.
 
 2009-04-22  Peter Stephenson  <pws@csr.com>
 
@@ -11607,5 +11608,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4664 $
+* $Revision: 1.4665 $
 *****************************************************
