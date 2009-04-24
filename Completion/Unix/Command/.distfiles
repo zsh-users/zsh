@@ -155,6 +155,7 @@ _prcs
 _printenv
 _psutils
 _pump
+_pydoc
 _python
 _qemu
 _quilt
@@ -206,6 +207,7 @@ _tin
 _tla
 _todo.sh
 _toilet
+_topgit
 _totd
 _tracepath
 _twisted
@@ -227,6 +229,7 @@ _whois
 _wiggle
 _xargs
 _xmlsoft
+_xmms2
 _yafc
 _yodl
 _yp

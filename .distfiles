@@ -1,5 +1,5 @@
 DISTFILES_SRC='
-    .cvsignore .distfiles .preconfig Makefile.in
+    .cvsignore .distfiles .gitignore .preconfig Makefile.in
     ChangeLog
     FEATURES INSTALL LICENCE MACHINES META-FAQ NEWS README
     aclocal.m4 aczsh.m4 configure.ac
