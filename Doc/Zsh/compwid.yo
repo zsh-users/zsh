@@ -58,6 +58,11 @@ endmenu()
 texinode(Completion Special Parameters)(Completion Builtin Commands)()(Completion Widgets)
 sect(Completion Special Parameters)
 
+The parameters tt(ZLE_REMOVE_SUFFIX_CHARS) and tt(ZLE_SPACE_SUFFIX_CHARS)
+are used by the completion mechanism, but are not special.
+ifzman(See em(Parameters Used By The Shell) in zmanref(zshparam))\
+ifnzman(noderef(Parameters Used By The Shell)).
+
 Inside completion widgets, and any functions called from them, some
 parameters have special meaning; outside these functions they are not
 special to the shell in any way.  These parameters are used to pass

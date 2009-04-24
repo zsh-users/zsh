@@ -380,6 +380,10 @@ enum suffixtype {
     SUFTYP_NEGRNG		/* Range of characters not to match */
 };
 
+/* Additional flags to suffixes */
+enum suffixflags {
+    SUFFLAGS_SPACE = 0x0001	/* Add a space when removing suffix */
+};
 
 #ifdef MULTIBYTE_SUPPORT
 /*

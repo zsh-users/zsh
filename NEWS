@@ -20,6 +20,10 @@ shells.
 The variable ZSH_PATCHLEVEL can be used to test for unreleased versions of
 the shell; it is present but less useful in released versions.
 
+The variables ZLE_REMOVE_SUFFIX_CHARS and ZLE_SPACE_SUFFIX_CHARS allow more
+control over the way automatically removed suffixes are treated in
+completion.
+
 Major changes between versions 4.3.6 and 4.3.9
 ----------------------------------------------
 

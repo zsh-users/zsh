@@ -1330,4 +1330,47 @@ item(tt(ZDOTDIR))(
 The directory to search for shell startup files (.zshrc, etc),
 if not tt($HOME).
 )
+vindex(ZLE_REMOVE_SUFFIX_CHARS)
+vindex(ZLE_SPACE_SUFFIX_CHARS)
+xitem(tt(ZLE_REMOVE_SUFFIX_CHARS))
+item(tt(ZLE_SPACE_SUFFIX_CHARS))(
+These parameters are used by the line editor.  In certain circumstances
+suffixes (typically space or slash) added by the completion system
+will be removed automatically, either because the next editing command
+was not an insertable character, or because the character was marked
+as requiring the suffix to be removed.
+
+These variables can contain the sets of characters that will cause the
+suffix to be removed.  If tt(ZLE_REMOVE_SUFFIX_CHARS) is set, those
+characters will cause the suffix to be removed; if
+tt(ZLE_SPACE_SUFFIX_CHARS) is set, those characters will cause the
+suffix to be removed and replaced by a space.
+
+If tt(ZLE_REMOVE_SUFFIX_CHARS) is not set, the default behaviour is
+equivalent to:
+
+example(ZLE_REMOVE_SUFFIX_CHARS=$' \t\n;&|')
+
+If tt(ZLE_REMOVE_SUFFIX_CHARS) is set but is empty, no characters have this
+behaviour.  tt(ZLE_SPACE_SUFFIX_CHARS) takes precedence, so that the
+following:
+
+example(ZLE_SPACE_SUFFIX_CHARS=$'&|')
+
+causes the characters `tt(&)' and `tt(|)' to remove the suffix but to
+replace it with a space.
+
+To illustrate the difference, suppose that the option tt(AUTO_REMOVE_SLASH)
+is in effect and the directory tt(DIR) has just been completed, with an
+appended tt(/), following which the user types `tt(&)'.  The default result
+is `tt(DIR&)'.  With tt(ZLE_REMOVE_SUFFIX_CHARS) set but without including
+`tt(&)' the result is `tt(DIR/&)'.  With tt(ZLE_SPACE_SUFFIX_CHARS) set to
+include `tt(&)' the result is `tt(DIR &)'.
+
+Note that certain completions may provide their own suffix removal
+or replacement behaviour which overrides the values described here.
+See the completion system documentation in
+ifzman(zmanref(zshcompsys))\
+ifnzman(noderef(Completion System)).
+)
 enditem()

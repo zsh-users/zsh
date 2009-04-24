@@ -1232,6 +1232,7 @@ struct suffixset;
 struct suffixset {
     struct suffixset *next;	/* Next in the list */
     int tp;			/* The SUFTYP_* from enum suffixtype */
+    int flags;			/* Some of SUFFLAGS_* */
     ZLE_STRING_T chars;		/* Set of characters to match (or not) */
     int lenstr;			/* Length of chars */
     int lensuf;			/* Length of suffix */
@@ -1255,13 +1256,14 @@ suffixnoinslen;
 
 /**/
 mod_export void
-addsuffix(int tp, ZLE_STRING_T chars, int lenstr, int lensuf)
+addsuffix(int tp, int flags, ZLE_STRING_T chars, int lenstr, int lensuf)
 {
     struct suffixset *newsuf = zalloc(sizeof(struct suffixset));
     newsuf->next = suffixlist;
     suffixlist = newsuf;
 
     newsuf->tp = tp;
+    newsuf->flags = flags;
     if (lenstr) {
 	newsuf->chars = zalloc(lenstr*sizeof(ZLE_CHAR_T));
 	ZS_memcpy(newsuf->chars, chars, lenstr);
@@ -1271,6 +1273,24 @@ addsuffix(int tp, ZLE_STRING_T chars, int lenstr, int lensuf)
     newsuf->lensuf = lensuf;
 }
 
+
+/* Same as addsuffix, but from metafied string */
+
+/**/
+mod_export void
+addsuffixstring(int tp, int flags, char *chars, int lensuf)
+{
+    int slen, alloclen;
+    ZLE_STRING_T suffixstr;
+
+    /* string needs to be writable... I've been regretting this for years.. */
+    chars = ztrdup(chars);
+    suffixstr = stringaszleline(chars, 0, &slen, &alloclen, NULL);
+    addsuffix(tp, flags, suffixstr, slen, lensuf);
+    zfree(suffixstr, alloclen);
+    zsfree(chars);
+}
+
 /* Set up suffix: the last n characters are a suffix that should be *
  * removed in the usual word end conditions.                        */
 
@@ -1278,7 +1298,17 @@ addsuffix(int tp, ZLE_STRING_T chars, int lenstr, int lensuf)
 mod_export void
 makesuffix(int n)
 {
-    addsuffix(SUFTYP_POSSTR, ZWS(" \t\n;&|"), 6, n);
+    char *suffixchars;
+
+    if (!(suffixchars = getsparam("ZLE_REMOVE_SUFFIX_CHARS")))
+	suffixchars = " \t\n;&|";
+
+    addsuffixstring(SUFTYP_POSSTR, 0, suffixchars, n);
+
+    /* Do this second so it takes precedence */
+    if ((suffixchars = getsparam("ZLE_SPACE_SUFFIX_CHARS")) && *suffixchars)
+	addsuffixstring(SUFTYP_POSSTR, SUFFLAGS_SPACE, suffixchars, n);
+
     suffixnoinslen = n;
 }
 
@@ -1301,7 +1331,7 @@ makeparamsuffix(int br, int n)
 	    lenstr += 6;
     }
     if (lenstr)
-	addsuffix(SUFTYP_POSSTR, charstr, lenstr, n);
+	addsuffix(SUFTYP_POSSTR, 0, charstr, lenstr, n);
 }
 
 /* Set up suffix given a string containing the characters on which to   *
@@ -1344,11 +1374,11 @@ makesuffixstr(char *f, char *s, int n)
 		ZLE_CHAR_T str[2];
 
 		if (wptr > lasts)
-		    addsuffix(inv ? SUFTYP_NEGSTR : SUFTYP_POSSTR,
+		    addsuffix(inv ? SUFTYP_NEGSTR : SUFTYP_POSSTR, 0,
 			      lasts, wptr - lasts, n);
 		str[0] = *wptr;
 		str[1] = wptr[2];
-		addsuffix(inv ? SUFTYP_NEGRNG : SUFTYP_POSRNG,
+		addsuffix(inv ? SUFTYP_NEGRNG : SUFTYP_POSRNG, 0,
 			  str, 2, n);
 
 		wptr += 3;
@@ -1360,7 +1390,7 @@ makesuffixstr(char *f, char *s, int n)
 	    }
 	}
 	if (wptr > lasts)
-	    addsuffix(inv ? SUFTYP_NEGSTR : SUFTYP_POSSTR,
+	    addsuffix(inv ? SUFTYP_NEGSTR : SUFTYP_POSSTR, 0,
 		      lasts, wptr - lasts, n);
 	free(ws);
     } else
@@ -1410,7 +1440,7 @@ iremovesuffix(ZLE_INT_T c, int keep)
 	zsfree(suffixfunc);
 	suffixfunc = NULL;
     } else {
-	int sl = 0;
+	int sl = 0, flags = 0;
 	struct suffixset *ss;
 
 	if (c == NO_INSERT_CHAR) {
@@ -1463,8 +1493,10 @@ iremovesuffix(ZLE_INT_T c, int keep)
 		    }
 		    break;
 		}
-		if (found)
+		if (found) {
+		    flags = ss->flags;
 		    break;
+		}
 	    }
 
 	    if (!found)
@@ -1472,12 +1504,17 @@ iremovesuffix(ZLE_INT_T c, int keep)
 	}
 	if (sl) {
 	    /* must be shifting wide character lengths */
-	    if (zlemetaline != NULL) {
-		unmetafy_line();
-		backdel(sl, CUT_RAW);
-		metafy_line();
-	    } else
-		backdel(sl, CUT_RAW);
+	    backdel(sl, CUT_RAW);
+	    if (flags & SUFFLAGS_SPACE)
+	    {
+		/* Add a space and advance over it */
+		spaceinline(1);
+		if (zlemetaline) {
+		    zlemetaline[zlemetacs++] = ' ';
+		} else {
+		    zleline[zlecs++] = ZWC(' ');
+		}
+	    }
 	    if (!keep)
 		invalidatelist();
 	}

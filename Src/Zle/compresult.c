@@ -1011,7 +1011,7 @@ do_single(Cmatch m)
 		    stringaszleline(m->suf, 0, &len, NULL, NULL);
 		makesuffixstr(m->remf, m->rems, len);
 		if (len == 1)
-		    addsuffix(SUFTYP_POSSTR, wsuf, 1, 1);
+		    addsuffix(SUFTYP_POSSTR, 0, wsuf, 1, 1);
 		free(wsuf);
 	    }
 	}
@@ -1104,7 +1104,7 @@ do_single(Cmatch m)
 			makesuffixstr(m->remf, m->rems, 1);
 		    else if (isset(AUTOREMOVESLASH)) {
 			makesuffix(1);
-			addsuffix(SUFTYP_POSSTR, ZWS("/"), 1, 1);
+			addsuffix(SUFTYP_POSSTR, 0, ZWS("/"), 1, 1);
 		    }
 		}
 	    }
@@ -1119,7 +1119,7 @@ do_single(Cmatch m)
 	    /* If a suffix was added, and is removable, let *
 	     * `,' and `}' remove it.                       */
 	    if (isset(AUTOPARAMKEYS))
-		addsuffix(SUFTYP_POSSTR, ZWS(",}"), 2, suffixnoinslen);
+		addsuffix(SUFTYP_POSSTR, 0, ZWS(",}"), 2, suffixnoinslen);
 	} else if (!menucmp) {
 	    /*{{*/
 	    /* Otherwise, add a `,' suffix, and let `}' remove it. */
@@ -1129,7 +1129,7 @@ do_single(Cmatch m)
 	    minfo.insc++;
 	    makesuffix(1);
 	    if ((!menucmp || minfo.we) && isset(AUTOPARAMKEYS))
-		addsuffix(SUFTYP_POSSTR, ZWS(",}"), 2, 1);
+		addsuffix(SUFTYP_POSSTR, 0, ZWS(",}"), 2, 1);
 	}
     } else if (!havesuff && (!(m->flags & CMF_FILE) || !sr)) {
 	/* If we didn't add a suffix, add a space, unless we are *
