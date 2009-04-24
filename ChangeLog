@@ -1,5 +1,7 @@
 2009-04-24  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Config/version.mk: update to 4.3.9-dev-3.
+
 	* 26876 (documentation slightly modified): NEWS, Doc/Zsh/compwid.yo,
 	Doc/Zsh/params.yo, Src/Zle/compresult.c, Src/Zle/zle.h,
 	Src/Zle/zle_misc.c: add ZLE_REMOVE_SUFFIX_CHARS and
@@ -11616,5 +11618,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4666 $
+* $Revision: 1.4667 $
 *****************************************************
