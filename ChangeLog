@@ -1,3 +1,7 @@
+2009-04-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted, see 26880: Functions/Misc/run-help: back off 26862.
+
 2009-04-24  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk: update to 4.3.9-dev-3.
@@ -11620,5 +11624,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4668 $
+* $Revision: 1.4669 $
 *****************************************************
