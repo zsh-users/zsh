@@ -1,3 +1,8 @@
+2009-04-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Paul Ackersviller: 26883: Test/D07multibyte.ztst: naming of
+	UTF8 locales is different in HPUX.
+
 2009-04-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted, see 26880: Functions/Misc/run-help: back off 26862.
@@ -11624,5 +11629,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4669 $
+* $Revision: 1.4670 $
 *****************************************************
