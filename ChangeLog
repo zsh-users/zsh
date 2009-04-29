@@ -1,3 +1,8 @@
+2009-04-29  Peter Stephenson  <pws@csr.com>
+
+	* 26898: Ingmar Vanhassel: configure.ac: don't link
+	libbind unless really needed.
+
 2009-04-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Paul Ackersviller: 26883: Test/D07multibyte.ztst: naming of
@@ -11629,5 +11634,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4670 $
+* $Revision: 1.4671 $
 *****************************************************
