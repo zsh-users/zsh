@@ -73,9 +73,9 @@ _ssh () {
       '(-1 -t)-T[disable pseudo-tty allocation (protocol version 2 only)]' \
       '(-q)*-v[verbose mode]' \
       '-V[show version number]' \
-      '(-X)-x[disable X11 forwarding]' \
-      '(-x)-X[enable X11 forwarding]' \
-      '-Y[enable trusted X11 forwarding]' \
+      '(-X -Y)-x[disable X11 forwarding]' \
+      '(-x -Y)-X[enable (untrusted) X11 forwarding]' \
+      '(-x -X)-Y[enable trusted X11 forwarding]' \
       '-M[master mode for connection sharing]' \
       '-S:path to control socket:_files' \
       '-O:multiplex control command:(check exit)' \

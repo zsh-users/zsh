@@ -1,5 +1,8 @@
 2009-04-29  Peter Stephenson  <pws@csr.com>
 
+	* 26900: Benjamin R. Haskell: Completion/Unix/Command/_ssh: ssh -Y,
+	-x and -X are mutually exclusive.
+
 	* 26899: Ingmar Vanhassel: Completion/Unix/Command/_ssh: -Y option
 
 	* 26898: Ingmar Vanhassel: configure.ac: don't link
@@ -11636,5 +11639,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4672 $
+* $Revision: 1.4673 $
 *****************************************************
