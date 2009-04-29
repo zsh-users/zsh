@@ -75,6 +75,7 @@ _ssh () {
       '-V[show version number]' \
       '(-X)-x[disable X11 forwarding]' \
       '(-x)-X[enable X11 forwarding]' \
+      '-Y[enable trusted X11 forwarding]' \
       '-M[master mode for connection sharing]' \
       '-S:path to control socket:_files' \
       '-O:multiplex control command:(check exit)' \
