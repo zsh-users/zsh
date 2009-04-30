@@ -1,3 +1,10 @@
+2009-04-30  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* users/14076 (tweaked per 26906): Completion/Unix/Command/_ssh:
+	Add -q or -r: options to some compadd argument lists to properly
+	handle suffix removal when completing ssh option names or remote
+	host references in file names.
+
 2009-04-30  Peter Stephenson  <pws@csr.com>
 
 	* c.f. 26895: Test/D07/multibyte.ztst: restrict the sorting test
@@ -11644,5 +11651,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4674 $
+* $Revision: 1.4675 $
 *****************************************************

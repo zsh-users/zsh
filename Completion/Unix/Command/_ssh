@@ -228,7 +228,7 @@ _ssh () {
         esac
       else
         _wanted values expl 'configure file option' \
-            compadd -M 'm:{a-z}={A-Z}' -S '=' - \
+            compadd -M 'm:{a-z}={A-Z}' -qS '=' - \
 	    	AddressFamily \
                 AFSTokenPassing BatchMode BindAddress \
 		ChallengeResponseAuthentication CheckHostIP \
@@ -294,12 +294,12 @@ _ssh () {
         _remote_files ${(kv)~opt_args[(I)-[FP1246]]/-P/-p} && ret=0
       elif compset -P '*@'; then
         suf=( -S '' )
-        compset -S ':*' || suf=( -S : )
+        compset -S ':*' || suf=( -r: -S: )
         _wanted hosts expl 'remote host name' _ssh_hosts $suf && ret=0
       else
         _alternative \
 	    'files:: _files' \
-	    'hosts:remote host name:_ssh_hosts -S:' \
+	    'hosts:remote host name:_ssh_hosts -r: -S:' \
 	    'users:user:_ssh_users -qS@' && ret=0
       fi
       ;;
@@ -307,10 +307,10 @@ _ssh () {
       if compset -P '*:'; then
         _remote_files && ret=0
       elif compset -P '*@'; then
-        _wanted hosts expl host _ssh_hosts -S: && ret=0
+        _wanted hosts expl host _ssh_hosts -r: -S: && ret=0
       else
         _alternative \
-	    'hosts:remote host name:_ssh_hosts -S:' \
+	    'hosts:remote host name:_ssh_hosts -r: -S:' \
 	    'users:user:_ssh_users -qS@' && ret=0
       fi
       ;;
