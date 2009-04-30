@@ -1,3 +1,8 @@
+2009-04-30  Peter Stephenson  <pws@csr.com>
+
+	* c.f. 26895: Test/D07/multibyte.ztst: restrict the sorting test
+	to western European characters.
+
 2009-04-29  Peter Stephenson  <pws@csr.com>
 
 	* 26900: Benjamin R. Haskell: Completion/Unix/Command/_ssh: ssh -Y,
@@ -11639,5 +11644,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4673 $
+* $Revision: 1.4674 $
 *****************************************************
