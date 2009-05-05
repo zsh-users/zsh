@@ -1,3 +1,8 @@
+2009-05-05  Peter Stephenson  <pws@csr.com>
+
+	* martin f. krafft: 26922: Completion/Unix/Command/_xmms2: extend
+	xmms2 completion.
+
 2009-04-30  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/14076 (tweaked per 26906): Completion/Unix/Command/_ssh:
@@ -11651,5 +11656,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4675 $
+* $Revision: 1.4676 $
 *****************************************************

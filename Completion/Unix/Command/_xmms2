@@ -190,6 +190,20 @@ _xmms2_coll_attr() {
     _xmms2_coll_helper
 }
 
+_xmms2_add() {
+  _files
+}
+
+_xmms2_radd() {
+  _dirs
+}
+
+_xmms2_addpls() {
+  local expl
+  _description files expl 'playlist'
+  _files "$expl[@]" -g '*.([mM]3[uU]|[pP][lL][sS])'
+}
+
 _xmms2() {
 _arguments \
     '--format[specify the format of song display]:format string' \
