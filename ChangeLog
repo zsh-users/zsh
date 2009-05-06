@@ -1,3 +1,8 @@
+2009-05-06  Clint Adams  <clint@zsh.org>
+
+	* 26937: Completion/Unix/Command/_git: have `git log` complete
+	files after branch/range.
+
 2009-05-05  Peter Stephenson  <pws@csr.com>
 
 	* martin f. krafft: 26922: Completion/Unix/Command/_xmms2: extend
@@ -11656,5 +11661,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4676 $
+* $Revision: 1.4677 $
 *****************************************************

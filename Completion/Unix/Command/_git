@@ -1815,8 +1815,8 @@ _git-log () {
   case $state in
     (files)
       _arguments -S \
-        '::index file:__git_cached_files' \
-        '*::branch:__git_commit_ranges2' && ret=0
+        ':branch:__git_commit_ranges2' \
+        '*:index file:__git_cached_files' && ret=0
       ;;
   esac
 }
