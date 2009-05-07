@@ -427,3 +427,9 @@
 >Ą Пётр Ильич Чайковский 梶浦由記
 >Ą Пётр Ильич Чайковский 梶浦由記
 >Ą Пётр Ильич Чайковский 梶浦由記
+
+  setopt cbases
+  print $'\xc5' | read
+  print $(( [#16] #REPLY ))
+0:read passes through invalid multibyte characters
+>0xC5

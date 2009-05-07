@@ -1,3 +1,8 @@
+2009-05-07  Peter Stephenson  <pws@csr.com>
+
+	* 26945: Src/builtin.c, Test/D07multibyte.ztst: read should
+	pass through invalid multibyte characters.
+
 2009-05-06  Clint Adams  <clint@zsh.org>
 
 	* 26937: Completion/Unix/Command/_git: have `git log` complete
@@ -11661,5 +11666,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4677 $
+* $Revision: 1.4678 $
 *****************************************************

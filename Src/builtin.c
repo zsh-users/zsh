@@ -5546,8 +5546,12 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		wc = (wchar_t)c;
 	    }
 	    if (ret != MB_INCOMPLETE) {
-		if (ret == MB_INVALID)
+		if (ret == MB_INVALID) {
 		    memset(&mbs, 0, sizeof(mbs));
+		    /* Treat this as a single character */
+		    wc = (wchar_t)c;
+		    laststart = bptr;
+		}
 		/*
 		 * \ at the end of a line introduces a continuation line,
 		 * except in raw mode (-r option)
