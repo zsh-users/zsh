@@ -1,5 +1,11 @@
 2009-05-08  Peter Stephenson  <pws@csr.com>
 
+	* 26953: Test/D07multibyte.ztst: print warning but don't fail test
+	if system apparently can't do simple character set conversion.
+
+	* 26950: Src/params.c: warn on failed attempt to change real or
+	effective group or user ID.
+
 	* 26949: Completion/Unix/Command/_sudo: new options and sudoedit.
 
 	* 26948: Src/Zle/zle_refresh.c: ensure recorded window sizes
@@ -11673,5 +11679,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4680 $
+* $Revision: 1.4681 $
 *****************************************************

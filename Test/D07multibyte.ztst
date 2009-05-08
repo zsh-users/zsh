@@ -378,17 +378,25 @@
 >X$'\300'Y$'\a'Z$'\177'T
 
 # This also isn't strictly multibyte and is here to reduce the
-# likelihood of a "can't do character set conversion" error.
-  testfn() { (LC_ALL=C; print $'\u00e9') }
-  repeat 4 testfn 2>&1 | while read line; do
-    if [[ $line = *"character not in range"* ]]; then
-      print OK
-    elif [[ $line = "?" ]]; then
-      print OK
-    else
-      print Failed: no error message and no question mark
-    fi
-  done
+# likelihood of a "cannot do character set conversion" error.
+  (print $'\u00e9') 2>&1 | read
+  if [[ $REPLY != é ]]; then
+    print "warning: your system can't do simple Unicode conversion." >&$ZTST_fd
+    print "Check you have a correctly installed iconv library." >&$ZTST_fd
+    # cheat
+    repeat 4 print OK
+  else
+    testfn() { (LC_ALL=C; print $'\u00e9') }
+    repeat 4 testfn 2>&1 | while read line; do
+      if [[ $line = *"character not in range"* ]]; then
+        print OK
+      elif [[ $line = "?" ]]; then
+        print OK
+      else
+        print Failed: no error message and no question mark
+      fi
+    done
+  fi
   true
 0:error handling in Unicode quoting
 >OK

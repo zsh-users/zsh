@@ -3527,7 +3527,11 @@ usernamesetfn(UNUSED(Param pm), char *x)
 # ifdef USE_INITGROUPS
 	initgroups(x, pswd->pw_gid);
 # endif
-	if(!setgid(pswd->pw_gid) && !setuid(pswd->pw_uid)) {
+	if (setgid(pswd->pw_gid))
+	    zwarn("failed to change group ID: %e", errno);
+	else if (setuid(pswd->pw_uid))
+	    zwarn("failed to change user ID: %e", errno);
+	else {
 	    zsfree(cached_username);
 	    cached_username = ztrdup(pswd->pw_name);
 	    cached_uid = pswd->pw_uid;
@@ -3553,7 +3557,8 @@ void
 uidsetfn(UNUSED(Param pm), zlong x)
 {
 #ifdef HAVE_SETUID
-    setuid((uid_t)x);
+    if (setuid((uid_t)x))
+	zwarn("failed to change user ID: %e", errno);
 #endif
 }
 
@@ -3573,7 +3578,8 @@ void
 euidsetfn(UNUSED(Param pm), zlong x)
 {
 #ifdef HAVE_SETEUID
-    seteuid((uid_t)x);
+    if (seteuid((uid_t)x))
+	zwarn("failed to change effective user ID: %e", errno);
 #endif
 }
 
@@ -3593,7 +3599,8 @@ void
 gidsetfn(UNUSED(Param pm), zlong x)
 {
 #ifdef HAVE_SETUID
-    setgid((gid_t)x);
+    if (setgid((gid_t)x))
+	zwarn("failed to change group ID: %e", errno);
 #endif
 }
 
@@ -3613,7 +3620,8 @@ void
 egidsetfn(UNUSED(Param pm), zlong x)
 {
 #ifdef HAVE_SETEUID
-    setegid((gid_t)x);
+    if (setegid((gid_t)x))
+	zwarn("failed to change effective group ID: %e", errno);
 #endif
 }
 
