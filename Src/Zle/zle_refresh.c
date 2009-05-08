@@ -699,6 +699,8 @@ freevideo(void)
 #endif
 	nbuf = NULL;
 	obuf = NULL;
+	winw_alloc = -1;
+	winh_alloc = -1;
     }
 }
 

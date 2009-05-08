@@ -1,3 +1,8 @@
+2009-05-08  Peter Stephenson  <pws@csr.com>
+
+	* 26948: Src/Zle/zle_refresh.c: ensure recorded window sizes
+	are reset when video data is freed.
+
 2009-05-07  Peter Stephenson  <pws@csr.com>
 
 	* 26945: Src/builtin.c, Test/D07multibyte.ztst: read should
@@ -11666,5 +11671,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4678 $
+* $Revision: 1.4679 $
 *****************************************************
