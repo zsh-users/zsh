@@ -1,26 +1,45 @@
-#compdef sudo
+#compdef sudo sudoedit
 
 local curcontext="$curcontext" environ e
+local -a args
+
 zstyle -a "$curcontext" environ environ
 
 for e in "${environ[@]}"
 do local -x "$e"
 done
 
-_arguments \
-       '-V[show version]' \
-       '-l[list allowed commands]' \
-       '-L[list options from Default section]' \
-       '-h[show help]' \
-       '-v[validate user timestamp]' \
-       '-k[invalidate user timestamp]' \
-       '-K[remove user timestamp]' \
-       '-b[run command in background]' \
-       '-r[Kerberos realm]:Kerberos realm:' \
-       '-p[password prompt]:password prompt:' \
-       '-u[user name]:user name:_users' \
-       '-s[run SHELL]' \
-       '-H[set HOME environment variable]' \
-       '-S[read password from stdin]' \
-       '(-):command name: _command_names -e'  \
-       '*::arguments: _normal'
+args=(
+       '-V[show version]'
+       '-l[list allowed commands]'
+       '-L[list options from Default section]'
+       '-a[BSD auth type]:BSD auth type:'
+       '-c[BSD login class]:BSD login class:'
+       '-h[show help]'
+       '-v[validate user timestamp]'
+       '-k[invalidate user timestamp]'
+       '-K[remove user timestamp]'
+       '-r[Kerberos realm]:Kerberos realm:'
+       '-p[password prompt]:password prompt:'
+       '-u[user name]:user name:_users'
+       '-S[read password from stdin]'
+)
+
+if [[ $service = sudoedit || -n $words[(R)-e] ]]; then
+  args+=(
+    '*:file: _files'
+  )
+else
+  args+=(
+    '-b[run command in background]'
+    '-E[preserve environment]'
+    '-H[set HOME environment variable]'
+    '-P[preserve group vector]'
+    '(-i)-s[run SHELL]'
+    '(-s)-i[simulate login]'
+    '(-):command name: _command_names -e'
+    '*::arguments: _normal'
+  )
+fi
+
+_arguments $args

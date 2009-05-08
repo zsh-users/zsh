@@ -1,5 +1,7 @@
 2009-05-08  Peter Stephenson  <pws@csr.com>
 
+	* 26949: Completion/Unix/Command/_sudo: new options and sudoedit.
+
 	* 26948: Src/Zle/zle_refresh.c: ensure recorded window sizes
 	are reset when video data is freed.
 
@@ -11671,5 +11673,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4679 $
+* $Revision: 1.4680 $
 *****************************************************
