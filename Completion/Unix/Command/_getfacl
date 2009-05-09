@@ -15,14 +15,15 @@ _arguments -s -S \
   '(-d --default)'{-d,--default}'[display the default access control list only]' \
   '--omit-header[do not display the comment header]' \
   '--all-effective[print all effective rights]' \
-  '--no-effective[print no effective rights] '\
+  '--no-effective[print no effective rights]' \
   '--skip-base[skip files that only have the base entries]' \
   '(-R --recursive)'{-R,--recursive}'[recurse into subdirectories]' \
   '(-L --logical)'{-L,--logical}'[logical walk, follow symbolic links]' \
   '(-P --physical)'{-P,--physical}'[physical walk, do not follow symbolic links]' \
   '--tabular[use tabular output format]' \
   '--numeric[print numeric user/group identifiers]' \
-  '--absolute-names[don'"'"'t strip leading '"'"'/'"'"' in pathnames' \
+  '--absolute-names[don'"'"'t strip leading '"'"'/'"'"' in pathnames]' \
   '--version[print version and exit]' \
-  '--help[this help text]'
+  '--help[this help text]' \
+  '*: :_files'
 fi

@@ -1,3 +1,8 @@
+2009-05-09  Andrey Borzenkov <bor@zsh.org>
+
+	* unposted: Completion/Unix/Command/_getfacl:
+	fix options definition; add file names completion for variant=unix
+
 2009-05-08  Peter Stephenson  <pws@csr.com>
 
 	* 26953: Test/D07multibyte.ztst: print warning but don't fail test
@@ -11679,5 +11684,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4681 $
+* $Revision: 1.4682 $
 *****************************************************
