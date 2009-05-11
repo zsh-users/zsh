@@ -2644,6 +2644,10 @@ zle_refresh_finish(void)
     freevideo();
 
     if (region_highlights)
+    {
 	zfree(region_highlights,
 	      sizeof(struct region_highlight) * n_region_highlights);
+	region_highlights = NULL;
+	n_region_highlights = 0;
+    }
 }

@@ -1,3 +1,10 @@
+2009-05-11  Peter Stephenson  <pws@csr.com>
+
+	* 26956: Etc/zsh-development-guide, Src/Zle/zle_refresh:
+	clear up region highlight variables properly and note that the
+	variables should be zeroed even if the module is being unloaded
+	(problem on HP-UX).
+
 2009-05-09  Andrey Borzenkov <bor@zsh.org>
 
 	* unposted: Completion/Unix/Command/_getfacl:
@@ -11684,5 +11691,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4682 $
+* $Revision: 1.4683 $
 *****************************************************

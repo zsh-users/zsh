@@ -279,6 +279,10 @@ However, `finish_' is called even if `setup_' failed, so it should
 not rely on the module successfully being set up.
 The state from `finish_' module is currently ignored; it is called
 too late to prevent the module from being unloaded.
+*Note* in addition to freeing memory, variables associated with allocated
+memory should be set to NULL or to indicate arrays are empty, etc.  It
+should not be assumed that the variables will automatically be zeroed if
+the module is reloaded (though some configurations may do this).
 
 In short, the `cleanup_'-function should undo what the `boot_'-function did
 (together with handling any residual effects of `enables_'), but should
