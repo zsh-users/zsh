@@ -1,3 +1,10 @@
+2009-05-12  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Functions/Prompts/prompt_bart_setup: fix a warning
+	with WARN_CREATE_GLOBAL.
+
+	* Src/builtin.c: fix some memory usage issues.
+
 2009-05-11  Peter Stephenson  <pws@csr.com>
 
 	* 26956: Etc/zsh-development-guide, Src/Zle/zle_refresh:
@@ -11691,5 +11698,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4683 $
+* $Revision: 1.4684 $
 *****************************************************

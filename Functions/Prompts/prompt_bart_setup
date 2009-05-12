@@ -78,6 +78,7 @@ prompt_bart_precmd () {
     psvar[8]=''				# No padding until we compute it
     psvar[9]=()
 
+    typeset -g PSCOL
     # Reset the truncation widths for upcoming computations
     ((PSCOL == 1)) || { PSCOL=1 ; prompt_bart_ps1 }
     if [[ -o promptcr ]]

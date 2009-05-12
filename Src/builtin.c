@@ -5085,16 +5085,16 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     if (OPT_ISSET(ops,'d')) {
 	char *delimstr = OPT_ARG(ops,'d');
 #ifdef MULTIBYTE_SUPPORT
-	wint_t wc;
+	wint_t wi;
 
 	if (isset(MULTIBYTE)) {
 	    mb_metacharinit();
-	    (void)mb_metacharlenconv(delimstr, &wc);
+	    (void)mb_metacharlenconv(delimstr, &wi);
 	}
 	else
-	    wc = WEOF;
-	if (wc != WEOF)
-	    delim = (wchar_t)wc;
+	    wi = WEOF;
+	if (wi != WEOF)
+	    delim = (wchar_t)wi;
 	else
 	    delim = (wchar_t)((delimstr[0] == Meta) ?
 			      delimstr[1] ^ 32 : delimstr[0]);
@@ -5358,8 +5358,12 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		wc = (wchar_t)c;
 	    }
 	    if (ret != MB_INCOMPLETE) {
-		if (ret == MB_INVALID)
+		if (ret == MB_INVALID) {
 		    memset(&mbs, 0, sizeof(mbs));
+		    /* Treat this as a single character */
+		    wc = (wchar_t)c;
+		    laststart = bptr;
+		}
 		if (bslash && wc == delim) {
 		    bslash = 0;
 		    continue;
@@ -5450,9 +5454,10 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	}
 	signal_setmask(s);
 #ifdef MULTIBYTE_SUPPORT
-	if (c == EOF)
+	if (c == EOF) {
 	    gotnl = 1;
-	if (ret == MB_INCOMPLETE) {
+	    *bptr = '\0';	/* see below */
+	} else if (ret == MB_INCOMPLETE) {
 	    /*
 	     * We can only get here if there is an EOF in the
 	     * middle of a character... safest to keep the debris,
