@@ -1,3 +1,8 @@
+2009-05-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 26958: Src/prompt.c: Reallocation of prompt line didn't
+	fix the pointer to the start of the current line.
+
 2009-05-12  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Functions/Prompts/prompt_bart_setup: fix a warning
@@ -11698,5 +11703,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4684 $
+* $Revision: 1.4685 $
 *****************************************************
