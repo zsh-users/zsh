@@ -1,3 +1,11 @@
+2009-05-13  Peter Stephenson  <pws@csr.com>
+
+	* users/14118: Functions/Prompts/prompt_special_chars: fix test
+	and assignment.
+
+	* Paul Ackersviller: 26959: Test/Makefile.in: need a delay before
+	removing modules after testing on HP-UX.
+
 2009-05-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 26958: Src/prompt.c: Reallocation of prompt line didn't
@@ -11703,5 +11711,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4685 $
+* $Revision: 1.4686 $
 *****************************************************

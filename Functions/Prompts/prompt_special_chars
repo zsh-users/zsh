@@ -8,7 +8,7 @@
 
 typeset -gA schars
 
-if [[ ${LC_ALL:-${LC_CTYPE:-$LANG}} = *UTF-8* ]]; then
+if [[ ${LC_ALL:-${LC_CTYPE:-$LANG}} = *(UTF-8|utf8)* ]]; then
   schars[300]=$'\xe2\x94\x94'
   schars[304]=$'\xe2\x94\x8c'
   schars[332]=$'\xe2\x94\x8c'
@@ -20,6 +20,6 @@ if [[ ${LC_ALL:-${LC_CTYPE:-$LANG}} = *UTF-8* ]]; then
   schars[260]=$'\xe2\x96\x91'
 else
   for code in 300 304 332 333 371 372 262 261 260; do
-    eval "char[$code]=\$'\\$code'"
+    eval "schars[$code]=\$'\\$code'"
   done
 fi

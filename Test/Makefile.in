@@ -54,6 +54,7 @@ check test:
 	else \
 	 stat=1; \
 	fi; \
+	sleep 1; \
 	rm -rf Modules .zcompdump; \
 	exit $$stat
 
