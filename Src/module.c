@@ -1480,7 +1480,7 @@ load_and_bind(const char *fn)
 #else
 
 #ifdef HAVE_DLFCN_H
-# if defined(HAVE_DL_H) && defined(HPUXDYNAMIC)
+# if defined(HAVE_DL_H) && defined(HPUX10DYNAMIC)
 #  include <dl.h>
 # else
 #  include <dlfcn.h>
@@ -1498,7 +1498,7 @@ load_and_bind(const char *fn)
 #endif
 
 /**/
-#ifdef HPUXDYNAMIC
+#ifdef HPUX10DYNAMIC
 # define dlopen(file,mode) (void *)shl_load((file), (mode), (long) 0)
 # define dlclose(handle) shl_unload((shl_t)(handle))
 

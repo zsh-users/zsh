@@ -94,11 +94,13 @@ HP: HP-UX 9, 10.20, 11.x (PA-RISC, Itanium)
 	  have been found to stop functioning.  One suggested fix is
 	  to alter the way the curses library is linked in the Makefile.
 	  Replacing `-lcurses' with `-lHcurses -lcurses' in the libraries
-	  is reported to fix.  An attempt to fix this in configure
-	  is apparently ineffective; more information would be appreciated
-	  as the maintainers do not have access to an HP-UX system.
-	  Recent reports indicated this is not necessary on recent versions
-	  of HP-UX 11.
+	  is reported to fix this on 11.0, but is no longer necessary on
+	  more recent versions of HP-UX 11, i.e. 11.11+.
+
+	  Typical gcc installations on HP-UX use HP's linker rather than
+	  the GNU one.  Configure will fail to set up dynamic linking in
+	  this situation.  The following should allow building of modules:
+	    DLLD=/usr/ccs/bin/ld DLLDFLAGS=-b DLCFLAGS=-fpic ./configure ...
 
 	  Compiling with gcc 2.7.1 is known to fail with header file
 	  conflicts.  Use the HP ANSI C compiler.

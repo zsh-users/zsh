@@ -669,7 +669,7 @@ dnl Prefer BSD termcap library to SysV curses library, except on certain
 dnl SYSV-derived systems.  However, if we find terminfo and termcap
 dnl stuff in the same library we will use that; typically this
 dnl is ncurses or curses.
-dnl On HPUX, Hcurses is reported to work better than curses.
+dnl On pre-11.11 HPUX, Hcurses is reported to work better than curses.
 dnl Prefer ncurses to curses on all systems.  tinfo isn't very common now.
 AC_ARG_WITH(term-lib,
 AC_HELP_STRING([--with-term-lib=LIBS], [search space-separated LIBS for terminal handling]),
@@ -680,7 +680,10 @@ else
   termcap_curses_order="$ncursesw_test tinfo termcap $ncurses_test curses"
 fi],
 [case "$host_os" in
-  hpux10.*|hpux11.*|solaris*)
+  solaris*)
+   termcap_curses_order="$ncursesw_test $ncurses_test curses termcap" ;;
+  hpux10.*|hpux11.*)
+   DL_EXT="${DL_EXT=sl}"
    termcap_curses_order="Hcurses $ncursesw_test $ncurses_test curses termcap" ;;
   *)
    termcap_curses_order="$ncursesw_test tinfo termcap $ncurses_test curses" ;;
@@ -2434,7 +2437,7 @@ fi
 dnl ---------------
 dnl dynamic loading
 dnl ---------------
-AH_TEMPLATE([HPUXDYNAMIC],
+AH_TEMPLATE([HPUX10DYNAMIC],
 [Define to 1 if you want to use dynamically loaded modules on HPUX 10.])
 L=N
 INSTLIB="install.bin-\$(L)"
@@ -2467,7 +2470,7 @@ elif test "$ac_cv_func_dlopen"  != yes ||
     dnl going into a header, and we can't undefine anything, so
     dnl just define this anyway and rely on the later tests to
     dnl define DYNAMIC or not.
-    AC_DEFINE(HPUXDYNAMIC)dnl
+    AC_DEFINE(HPUX10DYNAMIC)dnl
   fi
 fi
 
@@ -2677,7 +2680,7 @@ EOM
     AC_TRY_COMMAND($DLLD $LDFLAGS $DLLDFLAGS -o conftest.$DL_EXT conftest.o 1>&AC_FD_CC) &&
     AC_TRY_RUN([
 #include <stdio.h>
-#ifdef HPUXDYNAMIC
+#ifdef HPUX10DYNAMIC
 #include <dl.h>
 #define RTLD_LAZY BIND_DEFERRED
 #define RTLD_GLOBAL DYNAMIC_PATH

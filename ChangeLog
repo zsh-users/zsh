@@ -1,3 +1,8 @@
+2009-05-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Paul Ackersviller: 26962: configure.ac, aczsh.m4,
+	Src/module.c, MACHINES, INSTALL: updated HP-UX dynamic linking.
+
 2009-05-13  Peter Stephenson  <pws@csr.com>
 
 	* users/14118: Functions/Prompts/prompt_special_chars: fix test
@@ -11711,5 +11716,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4686 $
+* $Revision: 1.4687 $
 *****************************************************
