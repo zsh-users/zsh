@@ -1216,12 +1216,16 @@ preprompt(void)
 	 * Unfortunately it interacts badly with ZLE displaying message
 	 * when ^D has been pressed. So just disable PROMPT_SP logic in
 	 * this case */
+	char *eolmark = getsparam("PROMPT_EOL_MARK");
 	char *str;
-	int percents = opts[PROMPTPERCENT];
+	int percents = opts[PROMPTPERCENT], w = 0;
+	if (!eolmark || !*eolmark)
+	    eolmark = "%B%S%#%s%b";
 	opts[PROMPTPERCENT] = 1;
-	str = promptexpand("%B%S%#%s%b", 0, NULL, NULL, NULL);
+	str = promptexpand(eolmark, 1, NULL, NULL, NULL);
+	countprompt(str, &w, 0, -1);
 	opts[PROMPTPERCENT] = percents;
-	fprintf(shout, "%s%*s\r", str, (int)columns - 1 - !hasxn, "");
+	fprintf(shout, "%s%*s\r", str, (int)columns - w - !hasxn, "");
 	free(str);
     }
 

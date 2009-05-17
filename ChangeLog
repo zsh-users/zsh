@@ -1,3 +1,11 @@
+2009-05-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Greg Klanderman: 26964 (modified): Src/utils.c,
+	Doc/zsh/options.yo, Doc/Zsh/params.yo:  make prompt
+	end-of-line configurable with PROMPT_EOL_MARK.
+
+	* Greg Klanderman: 26963: fix suffix handling for svn completion
+
 2009-05-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Paul Ackersviller: 26962: configure.ac, aczsh.m4,
@@ -11716,5 +11724,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4687 $
+* $Revision: 1.4688 $
 *****************************************************
