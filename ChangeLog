@@ -1,5 +1,7 @@
 2009-05-19  Peter Stephenson  <pws@csr.com>
 
+	* Config/version.mk: 4.3.9-dev-5 (4.3.9-dev-4 not recorded).
+
 	* Greg Klanderman: 26972: Src/utils.c: fix problem ni 26964.
 
 2009-05-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
@@ -11728,5 +11730,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4689 $
+* $Revision: 1.4690 $
 *****************************************************
