@@ -2371,7 +2371,7 @@ enditem()
 See the comments in the function for a few extra tips.
 )
 findex(zmathfuncdef)
-item(tt(zmathfuncdef) var(mathfunc) [ var(body) ])(
+item(tt(zmathfuncdef) [ var(mathfunc) [ var(body) ] ])(
 A convenient front end to tt(functions -M).
 
 With two arguments, define a mathematical function named var(mathfunc)
@@ -2383,10 +2383,15 @@ to refer to optional parameters.  Note that the forms must be
 strictly adhered to for the function to calculate the correct number
 of arguments.  The implementation is held in a shell function named
 tt(zsh_math_func_)var(mathfunc); usually the user will not need
-to refer to the shell function directly.
+to refer to the shell function directly.  Any existing function
+of the same name is silently replaced.
 
 With one argument, remove the mathematical function var(mathfunc)
 as well as the shell function implementation.
+
+With no arguments, list all var(mathfunc) functions in a form
+suitable for restoring the definition.
+The functions have not necessarily been defined by tt(zmathfuncdef).
 )
 enditem()
 

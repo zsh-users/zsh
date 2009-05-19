@@ -5,10 +5,24 @@
 
 emulate -L zsh
 setopt extendedglob
+local -a match mbegin mend line
+local func
 
-if (( $# < 1 || $# > 2 )); then
-  print "Usage: $0 name [body]" >&2
+if (( $# > 2 )); then
+  print "Usage: $0 [name [body]]" >&2
   return 1
+fi
+
+zmodload -i zsh/parameter || return 1
+
+if (( $# == 0 )); then
+  functions -M | while read -A line; do
+    func=${functions[$line[6]]}
+    if [[ $func = (#b)[[:space:]]#\(\([[:space:]]#(*[^[:space:]])[[:space:]]#\)\) ]]; then
+      print "zmathfuncdef $line[3] ${(qq)match[1]}"
+    fi
+  done
+  return 0
 fi
 
 local mname=$1
@@ -17,6 +31,8 @@ local fname="zsh_math_func_$1"
 if (( $# == 1 )); then
   functions +M $mname && unfunction $fname
   return 0
+elif [[ -n $functions[$fname] ]]; then
+  functions +M $mname
 fi
 
 integer iarg=0 ioptarg
