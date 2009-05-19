@@ -1225,7 +1225,10 @@ preprompt(void)
 	str = promptexpand(eolmark, 1, NULL, NULL, NULL);
 	countprompt(str, &w, 0, -1);
 	opts[PROMPTPERCENT] = percents;
-	fprintf(shout, "%s%*s\r", str, (int)columns - w - !hasxn, "");
+	zputs(str, shout);
+	for (w = (int)columns - w - !hasxn; w > 0; w--)
+	    putc(' ', shout);
+	putc('\r', shout);
 	free(str);
     }
 

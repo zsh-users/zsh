@@ -1,3 +1,7 @@
+2009-05-19  Peter Stephenson  <pws@csr.com>
+
+	* Greg Klanderman: 26972: Src/utils.c: fix problem ni 26964.
+
 2009-05-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Greg Klanderman: 26964 (modified): Src/utils.c,
@@ -11724,5 +11728,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4688 $
+* $Revision: 1.4689 $
 *****************************************************
