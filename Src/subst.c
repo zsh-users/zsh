@@ -714,9 +714,10 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
     convchar_t cchar;
 
     MB_METACHARINIT();
-    if (*ifs)
-	def = dupstrpfx(ifs, MB_METACHARLEN(ifs));
-    else
+    if (!ifs || *ifs) {
+	char *tmpifs = ifs ? ifs : DEFAULT_IFS;
+	def = dupstrpfx(tmpifs, MB_METACHARLEN(tmpifs));
+    } else
 	def = "";
     if (preone && !*preone)
 	preone = def;

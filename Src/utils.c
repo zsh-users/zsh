@@ -3162,7 +3162,7 @@ inittyptab(void)
     }
 #ifdef MULTIBYTE_SUPPORT
     set_widearray(wordchars, &wordchars_wide);
-    set_widearray(ifs, &ifs_wide);
+    set_widearray(ifs ? ifs : DEFAULT_IFS, &ifs_wide);
 #endif
     for (s = SPECCHARS; *s; s++)
 	typtab[STOUC(*s)] |= ISPECIAL;

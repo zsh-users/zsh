@@ -1,4 +1,12 @@
+2009-05-20  Peter Stephenson  <pws@csr.com>
+
+	* users/14143 plus extra fix in padding code: Doc/Zsh/params.yo,
+	Src/subst.c, Src/utils.c: use default IFS if IFS is unset.
+
 2009-05-19  Peter Stephenson  <pws@csr.com>
+
+	* 26973: Doc/Zsh/contrib.yo, Functions/Misc/zmathfuncdef: make
+	zmathfuncdef replace functions and list existing functions.
 
 	* Config/version.mk: 4.3.9-dev-5 (4.3.9-dev-4 not recorded).
 
@@ -11730,5 +11738,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4690 $
+* $Revision: 1.4691 $
 *****************************************************

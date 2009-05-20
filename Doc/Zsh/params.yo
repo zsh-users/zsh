@@ -893,6 +893,9 @@ character together with any adjacent IFS white space character delimit
 a field.  If an IFS white space character appears twice consecutively
 in the IFS, this character is treated as if it were not an IFS white
 space character.
+
+If the parameter is unset, the default is used.  Note this has
+a different effect from setting the parameter to an empty string.
 )
 vindex(KEYTIMEOUT)
 item(tt(KEYTIMEOUT))(
