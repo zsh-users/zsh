@@ -3741,6 +3741,10 @@ bin_print(char *name, char **args, Options ops, int func)
 
 		memset(&mbs, 0, sizeof(mbstate_t));
 		while (l > 0) {
+		    wchar_t wc;
+		    size_t cnt;
+		    int wcw;
+
 		    /*
 		     * Prevent misaligned columns due to escape sequences by
 		     * skipping over them. Octals \033 and \233 are the
@@ -3752,15 +3756,16 @@ bin_print(char *name, char **args, Options ops, int func)
 		     * out).
 		     */
 		    if (*aptr == '\033' || *aptr == '\233') {
-			for (aptr++, l--; l && !isalpha(*aptr); aptr++, l--);
+			for (aptr++, l--;
+			     l && !isalpha(STOUC(*aptr));
+			     aptr++, l--)
+			    ;
 			aptr++;
 			l--;
 			continue;
 		    }
 
-		    wchar_t wc;
-		    size_t cnt = mbrtowc(&wc, aptr, l, &mbs);
-		    int wcw;
+		    cnt = mbrtowc(&wc, aptr, l, &mbs);
 
 		    if (cnt == MB_INCOMPLETE || cnt == MB_INVALID)
 		    {
