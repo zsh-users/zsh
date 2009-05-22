@@ -1,3 +1,8 @@
+2009-05-22  Peter Stephenson  <pws@csr.com>
+
+	* 26970: Greg Klanderman: Completion/Unix/Command/_subversion: fix
+	caching.
+
 2009-05-22  Clint Adams  <clint@zsh.org>
 
 	* 26939: Completion/Unix/Command/_xmms2: clean up xmms2 jump
@@ -11748,5 +11753,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4694 $
+* $Revision: 1.4695 $
 *****************************************************

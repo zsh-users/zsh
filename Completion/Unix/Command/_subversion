@@ -22,7 +22,7 @@ _svn () {
     ;;
     args)
       local cmd args usage
-      typeset -gHA _cache_svn_status
+      typeset -gHA _cache_svn_status _cache_svn_mtime
 
       cmd="${${(k)_svn_cmds[(R)*:$words[1]:*]}:-${(k)_svn_cmds[(i):$words[1]:]}}"
       if (( $#cmd )); then
@@ -193,11 +193,16 @@ _svn_status() {
   local dir=$REPLY:h
   local pat="${1:-([ADMR~]|?M)}"
 
-  if (( ! $+_cache_svn_status[$dir] )); then
-    _cache_svn_status[$dir]="$(_call_program files svn status -N $dir)"
+  zmodload -F zsh/stat b:zstat 2>/dev/null
+  local key="$(zstat +device $dir):$(zstat +inode $dir)"
+  local mtime="$(zstat +mtime $dir/.svn/entries)"
+
+  if (( ! $+_cache_svn_status[$key] || _cache_svn_mtime[$key] != mtime )); then
+    _cache_svn_status[$key]="$(_call_program files svn status -N $dir)"
+    _cache_svn_mtime[$key]="$mtime"
   fi
 
-  (( ${(M)#${(f)_cache_svn_status[$dir]}:#(#s)${~pat}*$REPLY} ))
+  (( ${(M)#${(f)_cache_svn_status[$key]}:#(#s)${~pat}*$REPLY} ))
 }
 
 (( $+functions[_svn_urls] )) ||
