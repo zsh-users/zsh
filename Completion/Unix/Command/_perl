@@ -31,7 +31,7 @@ _perl () {
     "-V-[print perl configuration information]:configuration keys:_perl_config_vars" \
     '-w[turn warnings on for compilation of your script. Recommended]' \
     '-x-[strip off text before #!perl line and perhaps cd to directory]:directory to cd to:_files -/' \
-    '1:Perl script:_files -/ -g "*.(p[ml]|PL)(-.)"' \
+    '1:Perl script:_files -/ -g "*.(p[ml]|PL|t)(-.)"' \
     '*::args: _normal' 
 }
 
