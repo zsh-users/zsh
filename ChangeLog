@@ -1,5 +1,8 @@
 2009-05-22  Peter Stephenson  <pws@csr.com>
 
+	* 26982: Julien Langer: Doc/Zsh/contrib.yo,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git: support stgit
+
 	* 26970: Greg Klanderman: Completion/Unix/Command/_subversion: fix
 	caching.
 
@@ -11753,5 +11756,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4695 $
+* $Revision: 1.4696 $
 *****************************************************

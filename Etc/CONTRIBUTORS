@@ -26,7 +26,8 @@ R. Ramkumar, François Revol, Bart Schaefer, Tomáš Smetana, Joerg
 Sonnenberger, Peter Stephenson, Jon Strait, Takimoto Jun, River Tarnell,
 Frank Terbeck, Philippe Troin, Geoff Wing, Matt Wozniski.
 
-The VCS_Info function system was written by Frank Terbeck.
+The VCS_Info function system was written by Frank Terbeck with
+contributions from Julien Langer.
 
 Contributors to completion and other shell functions include those above
 plus Nuno Alexandre, Ralph Amissah, Micah Anderson, arno, Frank Benkstein,

@@ -486,6 +486,13 @@ want var(vcs_info) to completely take over the generation of your prompt.
 You would do something like tt(PS1='${vcs_info_msg_0_}') to accomplish
 that.
 )
+kindex(stgitformat)
+item(tt(stgitformat))(
+The tt(git) backend replaces var(%m) in the formats and
+actionformats styles with tt(stgit)-specific information for
+tt(stgit)-initialized branches. This style let's you modify how that string
+should look like.
+)
 kindex(max-exports)
 item(tt(max-exports))(
 Defines the maximum number if
@@ -605,6 +612,7 @@ sitem(tt(formats))(" (%s)-[%b|%a]-")
 sitem(tt(actionformats))(" (%s)-[%b]-")
 sitem(tt(branchformat))("%b:%r" (for bzr, svn and svk))
 sitem(tt(nvcsformats))("")
+sitem(tt(stgitformat))(" %p (%c)")
 sitem(tt(max-exports))(2)
 sitem(tt(enable))(ALL)
 sitem(tt(disable))((empty list))
@@ -638,9 +646,10 @@ var(repoXY).)
 sitem(tt(%S))(subdirectory within a repository. If tt($PWD) is
 var(/foo/bar/reposXY/beer/tasty), tt(%S) is var(beer/tasty).)
 sitem(tt(%m))(A "misc" replacement. It is at the discretion of the backend
-to decide what this replacement expands to. It is currently used only by
-the tt(hg) backend. The hg backend replaces tt(%m) with the global hash
-value of the current revision.)
+to decide what this replacement expands to. It is currently used by
+the tt(hg) and tt(git) backends. The tt(hg) backend replaces tt(%m) with the
+global hash value of the current revision and the tt(git) backend replaces it
+with the string from the var(stgitformat) style.)
 endsitem()
 
 In tt(branchformat) these replacements are done:
@@ -648,6 +657,13 @@ In tt(branchformat) these replacements are done:
 startsitem()
 sitem(tt(%b))(the branch name)
 sitem(tt(%r))(the current revision number)
+endsitem()
+
+In tt(stgitformat) these replacements are done:
+
+startsitem()
+sitem(tt(%p))(the name of the patch currently on top of the stack)
+sitem(tt(%c))(the number of unapplied patches)
 endsitem()
 
 Not all vcs backends have to support all replacements. For tt(nvcsformats)
