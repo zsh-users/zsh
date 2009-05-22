@@ -55,14 +55,11 @@ _xmms2_command() {
 }
 
  _xmms2_jump() {
-     oldIFS=$IFS
-     IFS=$'\n'
-     songlist=($(xmms2 list))
-     IFS=oldIFS
-     playlistitems=""
+     songlist=(${"$(xmms2 list)"})
+     playlistitems=()
      for song ($songlist); do 
 	 if [[ $song = (#b)'  '\[(<->)/(<->)\]' '(*)' '\((*)\) ]]; then
-		    playlistitems=($playlistitems "$match[1][$match[3]]")
+		    playlistitems+=("$match[1][$match[3]]")
 	 fi
      done
      
