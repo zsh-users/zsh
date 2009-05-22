@@ -1,3 +1,8 @@
+2009-05-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 26978: Julien Langer: Completion/Unix/Command/_stgit: complete
+	patch names.
+
 2009-05-22  Peter Stephenson  <pws@csr.com>
 
 	* 26982: Julien Langer: Doc/Zsh/contrib.yo,
@@ -11756,5 +11761,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4696 $
+* $Revision: 1.4697 $
 *****************************************************

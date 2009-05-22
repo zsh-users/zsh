@@ -50,8 +50,33 @@ subcmds=(
   'status:show the tree status'
 )
 
+local curcontext="$curcontext"
+local subcmd
+local ret=1
+
 if (( CURRENT == 2 )); then
-  _describe -t commands 'stgit command' subcmds
+  _describe -t commands 'stgit command' subcmds && ret=0
 else
-  _files
+  shift words
+  (( CURRENT-- ))
+  subcmd="$words[1]"
+  curcontext="${curcontext%:*}-${subcmd}:"
+
+  case $subcmd in
+    (push)
+      _wanted -V "unapplied patches" expl "patch" compadd $(stg unapplied) \
+		&& ret=0
+    ;;
+    (pop)
+      _wanted -V "applied patches" expl "patch" compadd $(stg applied) && ret=0
+    ;;
+    (edit|files|goto|rename|log|float|delete|sink|mail|sync|show|pick|hide)
+      _wanted -V "patches" expl "patch" compadd $(stg series --noprefix) && ret=0
+    ;;
+    (*)
+      _files
+    ;;
+  esac
 fi
+
+return ret
