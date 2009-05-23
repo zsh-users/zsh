@@ -4303,7 +4303,7 @@ findex(_parameters)
 item(tt(_parameters))(
 This is used to complete the names of shell parameters.
 
-The option `tt(-g var(pattern))' limits the completion to parameters
+The option `tt(-g) var(pattern)' limits the completion to parameters
 whose type matches the var(pattern).  The type of a parameter is that
 shown by `tt(print ${(t))var(param)tt(})', hence judicious use of
 `tt(*)' in var(pattern) is probably necessary.
