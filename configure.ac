@@ -26,7 +26,7 @@ dnl  support, updates, enhancements, or modifications.
 dnl
 
 AC_INIT(Src/zsh.h)
-AC_PREREQ(2.53b)
+AC_PREREQ(2.59c)
 AC_CONFIG_HEADER(config.h)
 
 dnl What version of zsh are we building ?
@@ -303,6 +303,12 @@ fi], [sitescriptdir=${datadir}/${tzsh_name}/scripts])
 
 AC_SUBST(scriptdir)dnl
 AC_SUBST(sitescriptdir)dnl
+
+dnl htmldir is already handled, but if it wasn't set, use
+dnl the standard zsh default.
+if test x$htmldir = x'${docdir}' || test x$htmldir = x; then
+  htmldir='$(datadir)/$(tzsh)/htmldoc'
+fi
 
 AH_TEMPLATE([CUSTOM_PATCHLEVEL],
 [Define to a custom value for the ZSH_PATCHLEVEL parameter])

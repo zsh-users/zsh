@@ -50,7 +50,7 @@ fndir           = @fndir@
 sitefndir       = @sitefndir@
 scriptdir       = @scriptdir@
 sitescriptdir   = @sitescriptdir@
-htmldir         = $(datadir)/$(tzsh)/htmldoc
+htmldir         = @htmldir@
 
 # compilation
 CC              = @CC@
