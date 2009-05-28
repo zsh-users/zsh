@@ -20,7 +20,7 @@ else
     solaris*)
       args=( '-a:adjustment' )
     ;;
-    freebsd*)
+    freebsd*|darwin*)
       args=(
 	'-n[only set time on current machine]'
 	'-d:daylight saving time value'

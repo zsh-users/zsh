@@ -1,3 +1,7 @@
+2009-05-28  Peter Stephenson  <pws@csr.com>
+
+	* Jun T.: 27010: Completion/Unix/Command/_date: Darwin.
+
 2009-05-26  Peter Stephenson  <pws@csr.com>
 
 	* 26998: configure.ac, Config/defs.mk.in: use --htmldir passed
@@ -11776,5 +11780,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4700 $
+* $Revision: 1.4701 $
 *****************************************************
