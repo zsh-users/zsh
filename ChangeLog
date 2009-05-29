@@ -1,3 +1,9 @@
+2009-05-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27021: Src/pattern.c: length of variable saving globflags
+	was wrong causing restored value to be wrong in pattern matching
+	on big-endian 64-bit systems.
+
 2009-05-28  Peter Stephenson  <pws@csr.com>
 
 	* Jun T.: 27010: Completion/Unix/Command/_date: Darwin.
@@ -11780,5 +11786,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4701 $
+* $Revision: 1.4702 $
 *****************************************************

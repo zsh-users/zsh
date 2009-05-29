@@ -668,7 +668,8 @@ patcompswitch(int paren, int *flagp)
 {
     long starter, br, ender, excsync = 0;
     int parno = 0;
-    int flags, gfchanged = 0, savglobflags = patglobflags;
+    int flags, gfchanged = 0;
+    long savglobflags = (long)patglobflags;
     Upat ptr;
 
     *flagp = 0;
@@ -688,7 +689,7 @@ patcompswitch(int paren, int *flagp)
     br = patnode(P_BRANCH);
     if (!patcompbranch(&flags))
 	return 0;
-    if (patglobflags != savglobflags)
+    if (patglobflags != (int)savglobflags)
 	gfchanged++;
     if (starter)
 	pattail(starter, br);
@@ -777,7 +778,7 @@ patcompswitch(int paren, int *flagp)
 		    patadd((char *)&up, 0, sizeof(union upat), 0);
 		}
 	    } else {
-		patglobflags = savglobflags;
+		patglobflags = (int)savglobflags;
 	    }
 	}
 	newbr = patcompbranch(&flags);
@@ -792,7 +793,7 @@ patcompswitch(int paren, int *flagp)
 	    return 0;
 	if (gfnode)
 	    pattail(gfnode, newbr);
-	if (!tilde && patglobflags != savglobflags)
+	if (!tilde && patglobflags != (int)savglobflags)
 	    gfchanged++;
 	pattail(starter, br);
 	if (excsync)
@@ -831,7 +832,7 @@ patcompswitch(int paren, int *flagp)
 	 * a later branch happened to put the flags back.
 	 */
 	pattail(ender, patnode(P_GFLAGS));
-	patglobflags = savglobflags;
+	patglobflags = (int)savglobflags;
 	patadd((char *)&savglobflags, 0, sizeof(long), 0);
     }
 
