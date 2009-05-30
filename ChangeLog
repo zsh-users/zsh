@@ -1,3 +1,8 @@
+2009-05-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Jesse W: 27024: configure.ac, Doc/Makefile.in: allow
+	overriding TEXI2HTML.
+
 2009-05-30  Clint Adams  <clint@zsh.org>
 
 	* 27025: Src/system.h: define _GNU_SOURCE on the Hurd.
@@ -11790,5 +11795,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4703 $
+* $Revision: 1.4704 $
 *****************************************************
