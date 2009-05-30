@@ -1,3 +1,7 @@
+2009-05-30  Clint Adams  <clint@zsh.org>
+
+	* 27025: Src/system.h: define _GNU_SOURCE on the Hurd.
+
 2009-05-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27021: Src/pattern.c: length of variable saving globflags
@@ -11786,5 +11790,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4702 $
+* $Revision: 1.4703 $
 *****************************************************
