@@ -1,3 +1,7 @@
+2009-06-01  Peter Stephenson  <pws@csr.com>
+
+	* Config/versio.mk: release 4.3.10.
+
 2009-05-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Jesse W: 27024: configure.ac, Doc/Makefile.in: allow
@@ -11795,5 +11799,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4704 $
+* $Revision: 1.4705 $
 *****************************************************
