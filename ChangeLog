@@ -1,3 +1,8 @@
+2009-06-01  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* Util/mkdisttree.sh, Util/preconfig: Tweak find to prune a .git dir.
+	This allows a .git/cvs dir to exist with a cvs checkout in it.
+
 2009-06-01  Peter Stephenson  <pws@csr.com>
 
 	* Config/versio.mk: release 4.3.10.
@@ -11799,5 +11804,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4705 $
+* $Revision: 1.4706 $
 *****************************************************

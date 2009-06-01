@@ -46,7 +46,7 @@ filelist=filelist$$
 trap 'rm -f $filelist; rm -rf $disttree; exit 1' 1 2 15
 (
     cd $sdir_top
-    find . -name '?*.*' -prune -o -name .distfiles -print
+    find . -name .git -prune -o -name '?*.*' -prune -o -name .distfiles -print
 ) > $filelist
 ( while read dfn; do
     subdir=`echo $dfn | sed 's,/\.distfiles$,,'`
