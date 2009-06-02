@@ -1,3 +1,8 @@
+2009-06-02  Peter Stephenson  <pws@csr.com>
+
+	* Config/version.mk: update version recorded in archive
+	to 4.3.10-dev-1 (not released).
+
 2009-06-01  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* Util/mkdisttree.sh, Util/preconfig: Tweak find to prune a .git dir.
@@ -5,7 +10,7 @@
 
 2009-06-01  Peter Stephenson  <pws@csr.com>
 
-	* Config/versio.mk: release 4.3.10.
+	* Config/version.mk: release 4.3.10.
 
 2009-05-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
@@ -11804,5 +11809,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4706 $
+* $Revision: 1.4707 $
 *****************************************************
