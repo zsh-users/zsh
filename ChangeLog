@@ -1,5 +1,8 @@
 2009-06-02  Peter Stephenson  <pws@csr.com>
 
+	* Akinori MUSHA: private communication:
+	Completion/Unix/Command/_subversion: fix typo.
+
 	* Config/version.mk: update version recorded in archive
 	to 4.3.10-dev-1 (not released).
 
@@ -11809,5 +11812,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4707 $
+* $Revision: 1.4708 $
 *****************************************************
