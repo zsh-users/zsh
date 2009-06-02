@@ -1,3 +1,8 @@
+2009-06-02  Clint Adams  <clint@zsh.org>
+
+	* Colin Watson: 27027: Completion/Unix/Command/_bzr:
+	completion for bzr switch.
+
 2009-06-02  Peter Stephenson  <pws@csr.com>
 
 	* Akinori MUSHA: private communication:
@@ -11812,5 +11817,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4708 $
+* $Revision: 1.4709 $
 *****************************************************

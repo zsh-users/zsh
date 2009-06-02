@@ -331,6 +331,16 @@ case $cmd in
 	)
     ;;
 
+(switch)
+    args+=(
+	'--force[Switch even if local commits will be lost]'
+	'(-q --quiet -v --verbose)'{--quiet,-q}'[be quiet]'
+	'(-v --verbose -q --quiet)'{--verbose,-v}'[display more information]'
+	'*:local repository:_files -/'
+	)
+    _bzr_completeParents
+    ;;
+
 (help)
     args=(
 	'(-l --long)'{--long,-l}'[use long format]'
