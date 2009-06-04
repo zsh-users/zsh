@@ -1,3 +1,8 @@
+2009-06-04  Peter Stephenson  <pws@csr.com>
+
+	*  Baptiste Daroussin: 27029: Completion/BSD/Command/_pfctl: new
+	completion.
+
 2009-06-02  Clint Adams  <clint@zsh.org>
 
 	* Colin Watson: 27027: Completion/Unix/Command/_bzr:
@@ -11817,5 +11822,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4709 $
+* $Revision: 1.4710 $
 *****************************************************

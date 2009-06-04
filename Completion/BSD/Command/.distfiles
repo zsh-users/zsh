@@ -7,6 +7,7 @@ _cvsup
 _fetch
 _freebsd-update
 _kld
+_pfctl
 _portaudit
 _portlint
 _portsnap
