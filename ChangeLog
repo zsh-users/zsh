@@ -1,5 +1,8 @@
 2009-06-04  Peter Stephenson  <pws@csr.com>
 
+	* Baptiste Daroussin: 27030: Completion/Unix/Type/_file_systems:
+	update for FreeBSD.
+
 	*  Baptiste Daroussin: 27029: Completion/BSD/Command/_pfctl: new
 	completion.
 
@@ -11822,5 +11825,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4710 $
+* $Revision: 1.4711 $
 *****************************************************
