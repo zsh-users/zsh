@@ -1,5 +1,8 @@
 2009-06-04  Peter Stephenson  <pws@csr.com>
 
+	* Baptiste Daroussin: 27033: Completion/BSD/Command/_portaudit,
+	Completion/Unix/Command/_mount: more FreeBSD changes.
+
 	* Baptiste Daroussin: 27030: Completion/Unix/Type/_file_systems:
 	update for FreeBSD.
 
@@ -11825,5 +11828,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4711 $
+* $Revision: 1.4712 $
 *****************************************************

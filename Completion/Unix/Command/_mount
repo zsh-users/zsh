@@ -41,10 +41,10 @@ fi
 
 local curcontext="$curcontext" state line expl suf ret=1
 local args deffs=iso9660 tmp typeops=-t _nfs_access _fs_nfs _nfs_ufs \
-_fs_ufs _fs_efs _fs_iso9660 _fs_cachefs _fs_s5fs _fs_tmpfs _fs_pcfs _fs_hsfs \
-_fs_advfs _fs_cdfs _fs_affs _fs_ext2 _fs_fat _fs_ext3 _fs_msdos _fs_umsdos \
-_fs_vfat _fs_hpfs _fs_ntfs _fs_reiserfs _fs_smbfs _fs_xfs _fs_std _fs_devfs \
-_fs_fdesc _fs_kernfs _fs_linprocfs _fs_procfs
+_fs_ufs _fs_efs _fs_cd9660 _fs_iso9660 _fs_cachefs _fs_s5fs _fs_tmpfs _fs_pcfs \
+_fs_hsfs _fs_advfs _fs_cdfs _fs_affs _fs_ext2 _fs_fat _fs_ext3 _fs_msdos \
+_fs_msdosfs _fs_umsdos _fs_vfat _fs_hpfs _fs_ntfs _fs_reiserfs _fs_smbfs \
+_fs_xfs _fs_std _fs_devfs _fs_fdesc _fs_kernfs _fs_linprocfs _fs_procfs
 
 typeset -A opt_args
 
@@ -527,7 +527,7 @@ if (( ! $+_fs_any )); then
       'swidth[specify stripe width]:size'
     )
     ;;
-  *freebsd*|dragonfly*)
+  freebsd*|dragonfly*)
     _fs_any=(
       '(sync)async[do all I/O asynchronously]'
       'current[use current options on already mounted file system]'
@@ -548,12 +548,12 @@ if (( ! $+_fs_any )); then
       'update[change status of already mounted filesystem]'
       'union[cause the namespace at the mount point to appear as the union of the mounted filesystem and the existing directory]'
     )
-    _fs_iso9660=(
-      'extatt[enable use of extended attributes]'
-      "gens[don't strip version number on files]"
-      "joliet[don't use any Joliet extensions]"
-      "rrip[don't use any Rockridge extensions]"
-      'strictjoliet[relax checking for Supplementary Volume Descriptor Flags field which is set to a wrong value on some Joliet formatted disks]'
+    _fs_cd9660=(
+      'extatt[enable the use of extended attributes]'
+      'gens[do not strip version numbers on files]'
+      'nojoliet[do not use any Joliet extensions]'
+      'norrip[do not use any Rockridge extensions]'
+      'nostrictjoliet[relax checking for Supplementary Volume Descriptor Flags field]'
     )
     _fs_std=(
       "nodev[don't interpret devices]"
@@ -571,7 +571,13 @@ if (( ! $+_fs_any )); then
       'shortnames[]'
       'longnames[]'
       'nowin95[]'
+      'shortnames[force only the old MS-DOS 8.3 style filenames to be visible]'
+      'longnames[force Windows 95 long filenames to be visible]'
+      'nowin95[completely ignore Windows 95 extended file information]'
     )
+    if [[ "${OSTYPE}" =~ freebsd.* ]]; then
+	    _fs_msdosfs=( "$_fs_msdos[@]" )
+    fi
     ;;
   esac
 fi
@@ -682,7 +688,7 @@ if [[ "$service" = mount ]]; then
     deffs=hsfs
     typeops=-F
     ;;
-  *freebsd*|dragonfly*)
+  freebsd*|dragonfly*)
     args=( -s
       '(:)-a[mount all filesystems in fstab]'
       '-d[cause everything to be done except for the actual system call]'      
@@ -757,7 +763,7 @@ else
 	'*:dev or dir:->udevordir'
       )
     ;;
-    *freebsd*|dragonfly*)
+    freebsd*|dragonfly*)
       args=(
 	'(*)-a[unmount all mounted file systems]'
 	'-A[unmount all mounted file systems except the root]'
@@ -819,7 +825,7 @@ devordir)
   fi
 
   case "$OSTYPE" in
-  *freebsd*|dragonfly*)
+  dragonfly*)
     while read mline; do 
       case $mline[(w)1] in
 	\#* )
@@ -833,6 +839,37 @@ devordir)
 	  ;;
       esac
     done < /etc/fstab
+
+    _alternative \
+      'hosts:host:_hosts -S :' \
+      'devices:device:compadd -a dev_tmp' \
+      'directories:mount point:compadd -a mp_tmp' && ret=0
+      ;;
+  freebsd*)
+    local _glabel
+    while read mline; do 
+      case $mline[(w)1] in
+	\#* )
+	  ;;
+	proc)
+	  ;;
+	*)
+	  [[ $mline[(w)3] == swap ]] || \
+	    dev_tmp+=( $mline[(w)1] ) \
+	    mp_tmp+=( $mline[(w)2] )
+	  ;;
+      esac
+    done < /etc/fstab
+    # 
+    /sbin/ggatel list | while read mline; do
+      dev_tmp+=(/dev/$mline)
+    done
+
+    # add glabel devices
+    _glabel=(${(M)${(f)"$(/sbin/glabel list)"}:#*Name:[[:space:]]*/*})
+    for mline ($_glabel);do
+	    dev_tmp+=( mline[(w)3] )
+    done
 
     _alternative \
       'hosts:host:_hosts -S :' \
@@ -859,6 +896,12 @@ udevordir)
     dev_tmp=( "${(@)${(@)tmp%% *}:#none}" )
     mp_tmp=( "${(@)${(@)tmp#* }%% *}" )
     ;;
+  freebsd*|dragonfly*)
+    /sbin/mount | while read mline; do
+      dev_tmp+=( $mline[(w)1] )
+      mp_tmp+=( $mline[(w)3] )
+    done
+  ;;
   *)
     /sbin/mount | while read mline; do
       mp_tmp+=( $mline[(w)1] )
