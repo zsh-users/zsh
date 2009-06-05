@@ -8,8 +8,7 @@
 #	autoload run-help
 #
 
-emulate -R zsh
-setopt localoptions
+emulate -RL zsh
 
 local HELPDIR="${HELPDIR:-/usr/share/zsh/$ZSH_VERSION/help}"
 
@@ -103,7 +102,7 @@ do
 		done
 		eval "run-help-$1:t ${(q@)cmd_args[2,-1]}"
 	    else
-		man $@:t
+		POSIXLY_CORRECT=1 man $@:t
 	    fi
 	fi
 	;;

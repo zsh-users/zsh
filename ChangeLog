@@ -1,5 +1,8 @@
 2009-06-05  Peter Stephenson  <pws@csr.com>
 
+	* 27305: Functions/Misc/run-help: use POSIXLY_CORRECT with man
+	to avoid GNU man grabbing options in the argument list.
+
 	* 27304: Doc/Zsh/expn.yo, Src/subst.c, Src/utils.c, Src/zsh.h,
 	Test/D04parameter.ztst:  add ${(q-)...} flag to do minimal
 	quoting of arguments with no unnecessary single quotes.
@@ -11834,5 +11837,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4713 $
+* $Revision: 1.4714 $
 *****************************************************
