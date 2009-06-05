@@ -1583,6 +1583,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		switch (c) {
 		case ')':
 		case Outpar:
+		    /* how can this happen? */
 		    break;
 		case '~':
 		case Tilde:
@@ -1653,7 +1654,17 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    break;
 
 		case 'q':
-		    quotemod++, quotetype++;
+		    if (quotetype == QT_DOLLARS)
+			goto flagerr;
+		    if (s[1] == '-') {
+			if (quotemod)
+			    goto flagerr;
+			s++;
+			quotemod = 1;
+			quotetype = QT_SINGLE_OPTIONAL;
+		    } else {
+			quotemod++, quotetype++;
+		    }
 		    break;
 		case 'Q':
 		    quotemod--;
@@ -2801,8 +2812,26 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * the repetitions of the (q) flag.
      */
     if (quotemod) {
-	if (quotetype > QT_DOLLARS)
-	    quotetype = QT_DOLLARS;
+	int pre = 0, post = 0;
+
+	if (quotemod > 0 && quotetype > QT_BACKSLASH) {
+	    switch (quotetype)
+	    {
+	    case QT_DOLLARS:
+		/* space for "$" */
+		pre = 2;
+		post = 1;
+		break;
+
+	    case QT_SINGLE_OPTIONAL:
+		/* quotes will be added for us */
+		break;
+
+	    default:
+		pre = post = 1;
+		break;
+	    }
+	}
 	if (isarr) {
 	    char **ap;
 
@@ -2816,13 +2845,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    char *tmp;
 
 		    for (; *ap; ap++) {
-			int pre = quotetype != QT_DOLLARS ? 1 : 2;
 			tmp = quotestring(*ap, NULL, quotetype);
 			sl = strlen(tmp);
-			*ap = (char *) zhalloc(pre + sl + 2);
+			*ap = (char *) zhalloc(pre + sl + post + 1);
 			strcpy((*ap) + pre, tmp);
-			ap[0][pre - 1] = ap[0][pre + sl] =
-			    (quotetype != QT_DOUBLE ? '\'' : '"');
+			if (pre)
+			    ap[0][pre - 1] = ap[0][pre + sl] =
+				(quotetype != QT_DOUBLE ? '\'' : '"');
 			ap[0][pre + sl + 1] = '\0';
 			if (quotetype == QT_DOLLARS)
 			  ap[0][0] = '$';
@@ -2853,15 +2882,15 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		val = dupstring(val), copied = 1;
 	    if (quotemod > 0) {
 		if (quotetype > QT_BACKSLASH) {
-		    int pre = quotetype != QT_DOLLARS ? 1 : 2;
 		    int sl;
 		    char *tmp;
 		    tmp = quotestring(val, NULL, quotetype);
 		    sl = strlen(tmp);
 		    val = (char *) zhalloc(pre + sl + 2);
 		    strcpy(val + pre, tmp);
-		    val[pre - 1] = val[pre + sl] =
-			(quotetype != QT_DOUBLE ? '\'' : '"');
+		    if (pre)
+			val[pre - 1] = val[pre + sl] =
+			    (quotetype != QT_DOUBLE ? '\'' : '"');
 		    val[pre + sl + 1] = '\0';
 		    if (quotetype == QT_DOLLARS)
 		      val[0] = '$';

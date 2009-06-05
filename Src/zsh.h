@@ -210,7 +210,14 @@ enum {
      * in those cases where we need to represent a complete set.
      */
     QT_BACKTICK,
+    /*
+     * Single quotes, but the default is not to quote unless necessary.
+     * This is only useful as an argument to quotestring().
+     */
+    QT_SINGLE_OPTIONAL
 };
+
+#define QT_IS_SINGLE(x)	((x) == QT_SINGLE || (x) == QT_SINGLE_OPTIONAL)
 
 /*
  * Lexical tokens: unlike the character tokens above, these never

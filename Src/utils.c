@@ -4408,6 +4408,11 @@ addunprintable(char *v, const char *u, const char *uend)
  * 
  * The last argument is a QT_ value defined in zsh.h other than QT_NONE.
  *
+ * Most quote styles other than backslash assume the quotes are to
+ * be added outside quotestring().  QT_SINGLE_OPTIONAL is different:
+ * the single quotes are only added where necessary, so the
+ * whole expression is handled here.
+ *
  * The string may be metafied and contain tokens.
  */
 
@@ -4417,20 +4422,50 @@ quotestring(const char *s, char **e, int instring)
 {
     const char *u, *tt;
     char *v;
-    /*
-     * With QT_BACKSLASH we may need to use $'\300' stuff.
-     * Keep memory usage within limits by allocating temporary
-     * storage and using heap for correct size at end.
-     */
-    int alloclen = (instring == QT_BACKSLASH ? 7 : 4) * strlen(s) + 1;
-    char *buf = zshcalloc(alloclen);
+    int alloclen;
+    char *buf;
     int sf = 0;
+    /*
+     * quotesub is used with QT_SINGLE_OPTIONAL.
+     * quotesub = 0:  mechanism not active
+     * quotesub = 1:  mechanism pending, no "'" yet;
+     *                needs adding at quotestart.
+     * quotesub = 2:  mechanism active, added opening "'"; need
+     *                closing "'".
+     */
+    int quotesub = 0;
+    char *quotestart;
     convchar_t cc;
     const char *uend;
 
-    DPUTS(instring < QT_BACKSLASH || instring > QT_DOLLARS,
+    switch (instring)
+    {
+    case QT_BACKSLASH:
+	/*
+	 * With QT_BACKSLASH we may need to use $'\300' stuff.
+	 * Keep memory usage within limits by allocating temporary
+	 * storage and using heap for correct size at end.
+	 */
+	alloclen = strlen(s) * 7 + 1;
+	break;
+
+    case QT_SINGLE_OPTIONAL:
+	/*
+	 * Here, we may need to add single quotes.
+	 */
+	alloclen = strlen(s) * 4 + 3;
+	quotesub = 1;
+	break;
+
+    default:
+	alloclen = strlen(s) * 4 + 1;
+	break;
+    }
+    tt = quotestart = v = buf = zshcalloc(alloclen);
+
+    DPUTS(instring < QT_BACKSLASH || instring == QT_BACKTICK ||
+	  instring > QT_SINGLE_OPTIONAL,
 	  "BUG: bad quote type in quotestring");
-    tt = v = buf;
     u = s;
     if (instring == QT_DOLLARS) {
 	/*
@@ -4526,12 +4561,64 @@ quotestring(const char *s, char **e, int instring)
 		       (u[-1] == '=' || u[-1] == ':')) ||
 		      (*u == '~' && isset(EXTENDEDGLOB))) &&
 		     (instring == QT_BACKSLASH ||
+		      instring == QT_SINGLE_OPTIONAL ||
 		      (isset(BANGHIST) && *u == (char)bangchar &&
 		       instring != QT_SINGLE) ||
 		      (instring == QT_DOUBLE &&
 		       (*u == '$' || *u == '`' || *u == '\"' || *u == '\\')) ||
 		      (instring == QT_SINGLE && *u == '\''))) {
-		if (*u == '\n' || (instring == QT_SINGLE && *u == '\'')) {
+		if (instring == QT_SINGLE_OPTIONAL) {
+		    if (quotesub == 1) {
+			/*
+			 * We haven't yet had to quote at the start.
+			 */
+			if (*u == '\'') {
+			    /*
+			     * We don't need to.
+			     */
+			    *v++ = '\\';
+			} else {
+			    /*
+			     * It's now time to add quotes.
+			     */
+			    if (v > quotestart)
+			    {
+				char *addq;
+
+				for (addq = v; addq > quotestart; addq--)
+				    *addq = addq[-1];
+			    }
+			    *quotestart = '\'';
+			    v++;
+			    quotesub = 2;
+			}
+			*v++ = *u++;
+			/*
+			 * Next place to start quotes is here.
+			 */
+			quotestart = v;
+		    } else if (*u == '\'') {
+			if (unset(RCQUOTES)) {
+			    *v++ = '\'';
+			    *v++ = '\\';
+			    *v++ = '\'';
+			    /* Don't restart quotes unless we need them */
+			    quotesub = 1;
+			    quotestart = v;
+			} else {
+			    /* simplest just to use '' always */
+			    *v++ = '\'';
+			    *v++ = '\'';
+			}
+			/* dealt with */
+			u++;
+		    } else {
+			/* else already quoting, just add */
+			*v++ = *u++;
+		    }
+		    continue;
+		} else if (*u == '\n' ||
+			   (instring == QT_SINGLE && *u == '\'')) {
 		    if (unset(RCQUOTES)) {
 			*v++ = '\'';
 			if (*u == '\'')
@@ -4589,6 +4676,8 @@ quotestring(const char *s, char **e, int instring)
 	    }
 	}
     }
+    if (quotesub == 2)
+	*v++ = '\'';
     *v = '\0';
 
     if (e && *e == u)

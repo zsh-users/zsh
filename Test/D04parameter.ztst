@@ -319,11 +319,25 @@
   print -r ${(qq)foo}
   print -r ${(qqq)foo}
   print -r ${(qqqq)foo}
+  print -r ${(q-)foo}
 0:${(q...)...}
 >playing\ \'stupid\'\ \"games\"\ \\w\\i\\t\\h\ \$quoting.
 >'playing '\''stupid'\'' "games" \w\i\t\h $quoting.'
 >"playing 'stupid' \"games\" \\w\\i\\t\\h \$quoting."
 >$'playing \'stupid\' "games" \\w\\i\\t\\h $quoting.'
+>'playing '\'stupid\'' "games" \w\i\t\h $quoting.'
+
+  print -r -- ${(q-):-foo}
+  print -r -- ${(q-):-foo bar}
+  print -r -- ${(q-):-"*(.)"}
+  print -r -- ${(q-):-"wow 'this is cool' or is it?"}
+  print -r -- ${(q-):-"no-it's-not"}
+0:${(q-)...} minimal single quoting
+>foo
+>'foo bar'
+>'*(.)'
+>'wow '\''this is cool'\'' or is it?'
+>no-it\'s-not
 
   foo="'and now' \"even the pubs\" \\a\\r\\e shut."
   print -r ${(Q)foo}

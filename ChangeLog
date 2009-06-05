@@ -1,3 +1,9 @@
+2009-06-05  Peter Stephenson  <pws@csr.com>
+
+	* 27304: Doc/Zsh/expn.yo, Src/subst.c, Src/utils.c, Src/zsh.h,
+	Test/D04parameter.ztst:  add ${(q-)...} flag to do minimal
+	quoting of arguments with no unnecessary single quotes.
+
 2009-06-04  Peter Stephenson  <pws@csr.com>
 
 	* Baptiste Daroussin: 27033: Completion/BSD/Command/_portaudit,
@@ -11828,5 +11834,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4712 $
+* $Revision: 1.4713 $
 *****************************************************
