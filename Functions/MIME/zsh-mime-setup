@@ -293,8 +293,8 @@ for file in $cap_files; do
 	  else
 	    print -r "Adding" >&2
 	  fi
-	  print -r " handler for type $type:
-  $line" >&2
+	  print -r " handler for type $type:" >&2
+	  print -r "  $line" >&2
 	fi
 	type_handler_map[$type]=$line
 	type_flags_map[$type]=$flags
@@ -305,8 +305,8 @@ for file in $cap_files; do
 	  print -r "  with flags $flags" >&2
 	fi
       elif [[ -n $o_verbose ]]; then
-	print -r "Skipping handler for already defined type $type:
-  $line" >&2
+	print -r "Skipping handler for already defined type $type:" >&2
+	print -r "  $line" >&2
 	if [[ -n $flags ]]; then
 	  print -r " with flags $flags" >&2
 	fi

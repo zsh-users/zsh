@@ -1,3 +1,8 @@
+2009-06-18  Clint Adams  <clint@zsh.org>
+
+	* 27048: Functions/MIME/zsh-mime-setup: avoid multiline prints
+	which break CSH_JUNKIE_QUOTES.
+
 2009-06-05  Peter Stephenson  <pws@csr.com>
 
 	* 27305: Functions/Misc/run-help: use POSIXLY_CORRECT with man
@@ -11837,5 +11842,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4714 $
+* $Revision: 1.4715 $
 *****************************************************
