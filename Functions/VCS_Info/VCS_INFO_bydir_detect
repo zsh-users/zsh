@@ -10,7 +10,7 @@ realbasedir="$(VCS_INFO_realpath ${basedir})"
 while [[ ${realbasedir} != '/' ]]; do
     if [[ -n ${vcs_comm[detect_need_file]} ]] ; then
         [[ -d ${basedir}/${dirname} ]] && \
-        [[ -f ${basedir}/${dirname}/${vcs_comm[detect_need_file]} ]] && \
+        [[ -e ${basedir}/${dirname}/${vcs_comm[detect_need_file]} ]] && \
             break
     else
         [[ -d ${basedir}/${dirname} ]] && break

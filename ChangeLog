@@ -1,3 +1,12 @@
+2009-06-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Frank Terbeck: 27049, 27050, 27051, 27052:
+	Functions/VCS_Info/VCS_INFO_bydir_detect,
+	Functions/VCS_Info/Backends/VCS_INFO_detect_hg,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg: VCS_INFO
+	improvements.
+
 2009-06-18  Clint Adams  <clint@zsh.org>
 
 	* 27048: Functions/MIME/zsh-mime-setup: avoid multiline prints
@@ -11842,5 +11851,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4715 $
+* $Revision: 1.4716 $
 *****************************************************

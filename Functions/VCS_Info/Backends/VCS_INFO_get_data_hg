@@ -3,10 +3,43 @@
 ## Distributed under the same BSD-ish license as zsh itself.
 
 setopt localoptions NO_shwordsplit
-local hgbranch hgbase
+local file hgbranch hgbranch_name hgbase hghash hglrev r_branch r_info
 
 hgbase=${vcs_comm[basedir]}
 rrn=${hgbase:t}
-hgbranch=$(< ${hgbase}/.hg/branch)
-VCS_INFO_formats '' "${hgbranch}" "${hgbase}" '' '' '' ''
+
+file="${hgbase}/.hg/branch"
+if [[ -r ${file} ]] ; then
+    hgbranch_name=$(< ${file})
+else
+    hgbranch_name="default"
+fi
+
+hghash=''
+hglrev=''
+if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision ; then
+    # Calling the 'hg' program is quite a bit too slow for prompts.
+    # If there's a way around that, I'd be interested.
+    # Disabled by default anyway, so no harm done.
+
+    HGRCPATH="/dev/null" ${vcs_comm[cmd]} branches \
+    | while read -r r_branch r_info ; do
+        if [[ ${r_branch} == ${hgbranch_name} ]] ; then
+            match=()
+            : ${r_info/(#b)([^:]##):(*)}
+            hglrev=${match[1]}
+            hghash=${match[2]}
+            break
+        fi
+    done
+
+    if [[ -n ${hglrev} ]] ; then
+        zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat hgbranch || hgbranch="%b:%r"
+        zformat -f hgbranch "${hgbranch}" "b:${hgbranch_name}" "r:${hglrev}"
+    fi
+else
+    hgbranch="${hgbranch_name}"
+fi
+
+VCS_INFO_formats '' "${hgbranch}" "${hgbase}" '' '' "${hglrev}" "${hghash}"
 return 0
