@@ -2489,10 +2489,10 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		    *buf++ = '0' + tm->tm_mday / 10;
 		*buf++ = '0' + tm->tm_mday % 10;
 		break;
-	    case 'e':
+	    case 'f':
 		strip = 1;
 		/* FALLTHROUGH */
-	    case 'f':
+	    case 'e':
 		if (tm->tm_mday > 9)
 		    *buf++ = '0' + tm->tm_mday / 10;
 		else if (!strip)

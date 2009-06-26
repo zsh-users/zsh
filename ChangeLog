@@ -1,5 +1,8 @@
 2009-06-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Greg Klanderman: 27057: Src/utils.c: %e and %f time formats
+	were swapped.
+
 	* Frank Terbeck: users/14207:
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_git: make
 	variable local.
@@ -11857,5 +11860,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4717 $
+* $Revision: 1.4718 $
 *****************************************************
