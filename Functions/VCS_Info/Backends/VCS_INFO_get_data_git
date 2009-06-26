@@ -3,7 +3,7 @@
 ## Distributed under the same BSD-ish license as zsh itself.
 
 setopt localoptions extendedglob NO_shwordsplit
-local gitdir gitbase gitbranch gitaction gitunstaged gitstaged gitsha1
+local gitdir gitbase gitbranch gitaction gitunstaged gitstaged gitsha1 gitmisc
 
 VCS_INFO_git_getaction () {
     local gitaction='' gitdir=$1

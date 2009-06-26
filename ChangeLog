@@ -1,3 +1,9 @@
+2009-06-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Frank Terbeck: users/14207:
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git: make
+	variable local.
+
 2009-06-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Frank Terbeck: 27049, 27050, 27051, 27052:
@@ -11851,5 +11857,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4716 $
+* $Revision: 1.4717 $
 *****************************************************
