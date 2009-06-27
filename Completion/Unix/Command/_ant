@@ -12,10 +12,16 @@ find_targets() {
     # be invoked from the command line; see zsh-workers/24129.
     sed -n "s/ *<target[^>]* name=[\"']\([^-][^\"']*\)[\"'].*/\1/p" $1
     if (( $#importedfiles )) ; then
-	( cd $1:h
-    	for file in $importedfiles ; do
-	    find_targets $file
-	done )
+        ( cd $1:h
+            for file in $importedfiles ; do
+                expanded=( $(echo $file | sed -n "s|\${ant.home}|$ANT_HOME|p") )
+                if [[ ! "bla$expanded" = "bla" ]]; then
+                    file=$expanded
+                fi
+                if [[ -f $file ]]; then
+                    find_targets $file
+                fi
+        done )
     fi
 }
 
