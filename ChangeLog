@@ -1,3 +1,8 @@
+2009-06-28  Andrey Borzenkov <bor@zsh.org>
+
+	* unposted: Completion/Unix/Command/_man:
+	support lzma compression of man pages used in Mandriva
+
 2009-06-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27061: Nicolas Lalevée: Completion/Unix/Command/_ant:
@@ -11865,5 +11870,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4719 $
+* $Revision: 1.4720 $
 *****************************************************
