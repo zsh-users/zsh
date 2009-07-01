@@ -2572,7 +2572,7 @@ domenuselect(Hookdef dummy, Chdata dat)
                               cmd != Th(z_selfinsertunmeta)))) {
 	    ungetkeycmd();
 	    break;
-	} else if (cmd == Th(z_acceptline)) {
+	} else if (cmd == Th(z_acceptline) || cmd == Th(z_acceptsearch)) {
             if (mode == MM_FSEARCH || mode == MM_BSEARCH) {
                 mode = 0;
                 continue;
@@ -3316,7 +3316,23 @@ domenuselect(Hookdef dummy, Chdata dat)
 	mlbeg = -1;
 	showinglist = ((validlist && !nolist) ? -2 : 0);
 	onlyexpl = oe;
-	if (!smatches)
+	if (acc && listshown) {
+	    /*
+	     * Clear the list without spending sixteen weeks of
+	     * redrawing it in slightly different states first.
+	     * The following seems to work.  I'm not sure what
+	     * the difference is between listshown and showinglist,
+	     * but listshown looks like the traditional thing to
+	     * check for in this file at least.
+	     *
+	     * showinglist has a normally undocumented value of 1,
+	     * and an extra-specially undocumented value of -2, which
+	     * seems to be a force---it appears we need to kick it out
+	     * of that state, though it worries me that in some places
+	     * the code actually forces it back into that state.
+	     */
+	    clearlist = listshown = showinglist = 1;
+	} else if (!smatches)
 	    clearlist = listshown = 1;
 	zrefresh();
     }

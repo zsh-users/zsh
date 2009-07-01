@@ -287,8 +287,9 @@ bottom line.  The following zle functions have special meaning during
 menu selection:
 
 startitem()
-item(tt(accept-line))(
-accepts the current match and leaves menu selection
+item(tt(accept-line), tt(accept-search))(
+accept the current match and leave menu selection (but do
+not cause the command line to be accepted)
 )
 item(tt(send-break))(
 leaves menu selection and restores the previous contents of the
