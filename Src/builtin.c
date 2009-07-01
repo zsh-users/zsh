@@ -5812,12 +5812,14 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
 	}
     }
 
+    lexsave();
     testargs = argv;
     tok = NULLTOK;
     condlex = testlex;
     testlex();
     prog = parse_cond();
     condlex = zshlex;
+    lexrestore();
 
     if (errflag) {
 	errflag = 0;

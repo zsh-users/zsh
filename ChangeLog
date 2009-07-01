@@ -1,3 +1,9 @@
+2009-07-01  Peter Stephenson  <pws@csr.com>
+
+	* 27079: Src/builtin.c: test builtin uses parser and so should
+	save and restore the lexical context to avoid pulling the
+	rug out when called in some nested fashion.
+
 2009-06-28  Andrey Borzenkov <bor@zsh.org>
 
 	* unposted: Completion/Unix/Command/_man:
@@ -11870,5 +11876,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4720 $
+* $Revision: 1.4721 $
 *****************************************************
