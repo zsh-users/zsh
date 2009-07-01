@@ -974,6 +974,8 @@ asklistscroll(int ml)
 		   !strcmp(cmd->nam, "menu-complete") ||
 	     !strcmp(cmd->nam, "menu-expand-or-complete"))
 	mrestlines = lines - 1;
+    else if (cmd == Th(z_acceptsearch))
+	ret = 1;
     else {
 	ungetkeycmd();
 	ret = 1;
