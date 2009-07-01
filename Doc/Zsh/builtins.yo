@@ -46,7 +46,9 @@ then commands are read from that file instead of var(file).
 If any arguments var(arg) are given,
 they become the positional parameters; the old positional
 parameters are restored when the var(file) is done executing.
-The exit status is the exit status of the last command executed.
+If var(file) was not found the return status is 129; if var(file) was found
+but contained a syntax error the return status is 128; else the return
+status is the exit status of the last command executed.
 )
 findex(NOTRANS(:))
 cindex(expanding parameters)

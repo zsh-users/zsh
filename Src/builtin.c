@@ -4701,9 +4701,10 @@ int
 bin_dot(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     char **old, *old0 = NULL;
-    int ret, diddot = 0, dotdot = 0;
+    int diddot = 0, dotdot = 0;
     char *s, **t, *enam, *arg0, *buf;
     struct stat st;
+    enum source_return ret;
 
     if (!*argv)
 	return 0;
@@ -4719,14 +4720,14 @@ bin_dot(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     }
     s = unmeta(enam);
     errno = ENOENT;
-    ret = 1;
+    ret = SOURCE_NOT_FOUND;
     /* for source only, check in current directory first */
     if (*name != '.' && access(s, F_OK) == 0
 	&& stat(s, &st) >= 0 && !S_ISDIR(st.st_mode)) {
 	diddot = 1;
 	ret = source(enam);
     }
-    if (ret) {
+    if (ret == SOURCE_NOT_FOUND) {
 	/* use a path with / in it */
 	for (s = arg0; *s; s++)
 	    if (*s == '/') {
@@ -4739,7 +4740,8 @@ bin_dot(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		ret = source(arg0);
 		break;
 	    }
-	if (!*s || (ret && isset(PATHDIRS) && diddot < 2 && dotdot == 0)) {
+	if (!*s || (ret == SOURCE_NOT_FOUND &&
+		    isset(PATHDIRS) && diddot < 2 && dotdot == 0)) {
 	    pushheap();
 	    /* search path for script */
 	    for (t = path; *t; t++) {
@@ -4766,12 +4768,12 @@ bin_dot(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	freearray(pparams);
 	pparams = old;
     }
-    if (ret)
+    if (ret == SOURCE_NOT_FOUND)
 	zwarnnam(name, "%e: %s", errno, enam);
     zsfree(arg0);
     if (old0)
 	argzero = old0;
-    return ret ? ret : lastval;
+    return ret == SOURCE_OK ? lastval : 127 + ret;
 }
 
 /*

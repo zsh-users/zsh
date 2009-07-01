@@ -1725,6 +1725,17 @@ struct nameddir {
 #define PRINT_WHENCE_FUNCDEF	(1<<9)
 #define PRINT_WHENCE_WORD	(1<<10)
 
+/* Return values from source() */
+
+enum source_return {
+    /* Source ran OK */
+    SOURCE_OK = 0,
+    /* Internal error sourcing file */
+    SOURCE_ERROR = 1,
+    /* File not found */
+    SOURCE_NOT_FOUND = 2
+};
+
 /***********************************/
 /* Definitions for history control */
 /***********************************/

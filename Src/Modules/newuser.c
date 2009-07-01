@@ -97,7 +97,7 @@ boot_(UNUSED(Module m))
 	VARARR(char, buf, strlen(*sp) + 9);
 	sprintf(buf, "%s/newuser", *sp);
 
-	if (!source(buf))
+	if (source(buf) != SOURCE_NOT_FOUND)
 	    break;
     }
 

@@ -99,10 +99,11 @@ mod_export struct hookdef zshhooks[] = {
 /* keep executing lists until EOF found */
 
 /**/
-void
+int
 loop(int toplevel, int justonce)
 {
     Eprog prog;
+    int err;
 
     pushheap();
     if (!toplevel)
@@ -201,9 +202,12 @@ loop(int toplevel, int justonce)
 	if (justonce)
 	    break;
     }
+    err = errflag;
     if (!toplevel)
 	lexrestore();
     popheap();
+
+    return err;
 }
 
 static char *cmd;
@@ -1049,10 +1053,13 @@ init_misc(void)
 	readhistfile(NULL, 0, HFILE_USE_OPTIONS);
 }
 
-/* source a file */
+/*
+ * source a file
+ * Returns one of the SOURCE_* enum values.
+ */
 
 /**/
-mod_export int
+mod_export enum source_return
 source(char *s)
 {
     Eprog prog;
@@ -1066,11 +1073,12 @@ source(char *s)
     int ocsp;
     int otrap_return = trap_return, otrap_state = trap_state;
     struct funcstack fstack;
+    enum source_return ret = SOURCE_OK;
 
     if (!s || 
 	(!(prog = try_source_file((us = unmeta(s)))) &&
 	 (tempfd = movefd(open(us, O_RDONLY | O_NOCTTY))) == -1)) {
-	return 1;
+	return SOURCE_NOT_FOUND;
     }
 
     /* save the current shell state */
@@ -1121,8 +1129,13 @@ source(char *s)
 	errflag = 0;
 	execode(prog, 1, 0);
 	popheap();
-    } else
-	loop(0, 0);		     /* loop through the file to be sourced  */
+	if (errflag)
+	    ret = SOURCE_ERROR;
+    } else {
+	/* loop through the file to be sourced  */
+	if (loop(0, 0))
+	    ret = SOURCE_ERROR;
+    }
     funcstack = funcstack->prev;
     sourcelevel--;
 
@@ -1152,7 +1165,7 @@ source(char *s)
     cmdstack = ocs;
     cmdsp = ocsp;
 
-    return 0;
+    return ret;
 }
 
 /* Try to source a file in the home directory */
