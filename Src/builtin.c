@@ -4773,7 +4773,7 @@ bin_dot(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     zsfree(arg0);
     if (old0)
 	argzero = old0;
-    return ret == SOURCE_OK ? lastval : 127 + ret;
+    return ret == SOURCE_OK ? lastval : 128 - ret;
 }
 
 /*

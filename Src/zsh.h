@@ -1730,10 +1730,10 @@ struct nameddir {
 enum source_return {
     /* Source ran OK */
     SOURCE_OK = 0,
-    /* Internal error sourcing file */
-    SOURCE_ERROR = 1,
     /* File not found */
-    SOURCE_NOT_FOUND = 2
+    SOURCE_NOT_FOUND = 1,
+    /* Internal error sourcing file */
+    SOURCE_ERROR = 2
 };
 
 /***********************************/

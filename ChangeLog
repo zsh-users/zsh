@@ -1,5 +1,9 @@
 2009-07-02  Peter Stephenson  <pws@csr.com>
 
+	* 27087: Doc/Zsh/builtins.yo, Src/builtin.c, Src/zsh.h,
+	Test/A01grammar.ztst:  change return codes from 27083 to
+	126, 127.
+
 	* Nicolas Pouillard: 27028: Completion/Unix/Command/_darcs: New
 	darcs completion; it's a lot shorter but apparently that's OK.
 
@@ -11895,5 +11899,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4725 $
+* $Revision: 1.4726 $
 *****************************************************

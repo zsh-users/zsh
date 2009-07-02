@@ -515,10 +515,10 @@
 >not#comment
 
   . ./nonexistent
-129: Attempt to "." non-existent file.
+127: Attempt to "." non-existent file.
 ?(eval):.:1: no such file or directory: ./nonexistent
 
   echo '[[' >bad_syntax
   . ./bad_syntax
-128: Attempt to "." file with bad syntax.
+126: Attempt to "." file with bad syntax.
 ?./bad_syntax:2: parse error near `\n'
