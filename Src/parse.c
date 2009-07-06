@@ -1199,6 +1199,10 @@ par_if(int *complex)
 	type = (xtok == IF ? WC_IF_IF : WC_IF_ELIF);
 	par_save_list(complex);
 	incmdpos = 1;
+	if (tok == ENDINPUT) {
+	    cmdpop();
+	    YYERRORV(oecused);
+	}
 	while (tok == SEPER)
 	    zshlex();
 	xtok = FI;

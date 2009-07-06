@@ -1,3 +1,9 @@
+2009-07-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27092: Src/parse.c, Test/A01grammar.ztst: "if" didn't check
+	for missing clauses so a missing then-clause wasn't spotted
+	as an error.
+
 2009-07-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Brendan Cully: 27088: Completion/Unix/Command/_hg,
@@ -11904,5 +11910,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4727 $
+* $Revision: 1.4728 $
 *****************************************************

@@ -378,9 +378,14 @@
 >true-2
 >false
 
-  if true; print true
+  if { true } print true
+  if { false } print false
 0:Short form of `if'
 >true
+
+  eval "if"
+1:Short form of `if' can't be too short
+?(eval):1: parse error near `if'
 
   for name ( word1 word2 word3 ) print $name
 0:Form of `for' with parentheses.
