@@ -486,7 +486,7 @@ init_io(void)
      * process group leader.
      */
     mypid = (zlong)getpid();
-    if (opts[MONITOR] && interact && (SHTTY != -1)) {
+    if (opts[MONITOR] && (SHTTY != -1)) {
 	origpgrp = GETPGRP();
         acquire_pgrp(); /* might also clear opts[MONITOR] */
     } else

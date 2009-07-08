@@ -730,7 +730,7 @@ dosetopt(int optno, int value, int force)
     } else if (!force && optno == MONITOR && value) {
 	if (opts[optno] == value)
 	    return 0;
-	if (interact && (SHTTY != -1)) {
+	if (SHTTY != -1) {
 	    origpgrp = GETPGRP();
 	    acquire_pgrp();
 	} else
