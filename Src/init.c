@@ -233,6 +233,11 @@ parseargs(char **argv)
      * be changed.  At the end of the function, a value of 2 gets        *
      * changed to 1.                                                     */
     opts[INTERACTIVE] = isatty(0) ? 2 : 0;
+    /*
+     * MONITOR is similar:  we initialise it to 2, and if it's
+     * still 2 at the end, we set it to the value of INTERACTIVE.
+     */
+    opts[MONITOR] = 2;   /* may be unset in init_io() */
     opts[SHINSTDIN] = 0;
     opts[SINGLECOMMAND] = 0;
 
@@ -343,6 +348,8 @@ parseargs(char **argv)
     if(isset(SINGLECOMMAND))
 	opts[INTERACTIVE] &= 1;
     opts[INTERACTIVE] = !!opts[INTERACTIVE];
+    if (opts[MONITOR] == 2)
+	opts[MONITOR] = opts[INTERACTIVE];
     pparams = x = (char **) zshcalloc((countlinknodes(paramlist) + 1) * sizeof(char *));
 
     while ((*x++ = (char *)getlinknode(paramlist)));
@@ -1395,7 +1402,6 @@ zsh_main(UNUSED(int argc), char **argv)
     createoptiontable();
     emulate(zsh_name, 1);   /* initialises most options */
     opts[LOGINSHELL] = (**argv == '-');
-    opts[MONITOR] = 1;   /* may be unset in init_io() */
     opts[PRIVILEGED] = (getuid() != geteuid() || getgid() != getegid());
     opts[USEZLE] = 1;   /* may be unset in init_io() */
     parseargs(argv);   /* sets INTERACTIVE, SHINSTDIN and SINGLECOMMAND */
