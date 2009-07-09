@@ -3590,7 +3590,7 @@ attachtty(pid_t pgrp)
 {
     static int ep = 0;
 
-    if (jobbing) {
+    if (jobbing && interact) {
 #ifdef HAVE_TCSETPGRP
 	if (SHTTY != -1 && tcsetpgrp(SHTTY, pgrp) == -1 && !ep)
 #else
