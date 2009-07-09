@@ -828,7 +828,7 @@ printjob(Job jn, int lng, int synch)
     int job, len = 9, sig, sflag = 0, llen;
     int conted = 0, lineleng = columns, skip = 0, doputnl = 0;
     int doneprint = 0;
-    FILE *fout = (synch == 2) ? stdout : shout;
+    FILE *fout = (synch == 2) ? stdout : shout ? shout : stderr;
 
     if (oldjobtab != NULL)
 	job = jn - oldjobtab;
@@ -887,7 +887,7 @@ printjob(Job jn, int lng, int synch)
 /* print if necessary: ignore option state on explicit call to `jobs'. */
 
     if (synch == 2 || 
-	(interact && jobbing &&
+	(jobbing &&
 	 ((jn->stat & STAT_STOPPED) || sflag || job != thisjob))) {
 	int len2, fline = 1;
 	/* use special format for current job, except in `jobs' */
@@ -1379,12 +1379,13 @@ spawnjob(void)
 	    setprevjob();
 	} else if (prevjob == -1 || !(jobtab[prevjob].stat & STAT_STOPPED))
 	    prevjob = thisjob;
-	if (interact && jobbing && jobtab[thisjob].procs) {
-	    fprintf(shout, "[%d]", thisjob);
+	if (jobbing && jobtab[thisjob].procs) {
+	    FILE *fout = shout ? shout : stderr;
+	    fprintf(fout, "[%d]", thisjob);
 	    for (pn = jobtab[thisjob].procs; pn; pn = pn->next)
-		fprintf(shout, " %ld", (long) pn->pid);
-	    fprintf(shout, "\n");
-	    fflush(shout);
+		fprintf(fout, " %ld", (long) pn->pid);
+	    fprintf(fout, "\n");
+	    fflush(fout);
 	}
     }
     if (!hasprocs(thisjob))
@@ -1907,7 +1908,8 @@ bin_fg(char *name, char **argv, Options ops, int func)
 		printjob(jobtab + job, (stopped) ? -1 : lng, 1);
 	    if (func != BIN_BG) {		/* fg or wait */
 		if (jobtab[job].pwd && strcmp(jobtab[job].pwd, pwd)) {
-		    FILE *fout = (func == BIN_JOBS) ? stdout : shout;
+		    FILE *fout = (func == BIN_JOBS) ? stdout : shout ?
+			shout : stderr;
 		    fprintf(fout, "(pwd : ");
 		    fprintdir(jobtab[job].pwd, fout);
 		    fprintf(fout, ")\n");
