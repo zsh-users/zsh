@@ -1,3 +1,13 @@
+2009-07-09  Eric Blake  <ebb9@byu.net>
+
+	* 27109: Touch up non-interactive MONITOR handling.
+	Don't mess with tty when MONITOR but not interactive.
+
+2009-07-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27110: Src/init.c: Only turn on MONITOR if INTERACTIVE is on
+	or if set explicitly.
+
 2009-07-08  Peter Stephenson  <pws@csr.com>
 
 	* 27100: Allow MONITOR option in non-interactive shells.
@@ -11916,5 +11926,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4729 $
+* $Revision: 1.4730 $
 *****************************************************
