@@ -26,7 +26,7 @@ if [[ CURRENT -eq 1 ]]; then
       reassign merge unmerge tag tags severity forwarded notforwarded help \
       clone submitter found notfound block unblock user usertag usertags \
       package owner noowner reportspam cache cleancache claim unclaim \
-      subscribe unsubscribe
+      subscribe unsubscribe fixed notfixed
   return
 fi
 
@@ -147,7 +147,7 @@ case "$words[1]" in
       _wanted sep expl 'separator' compadd -S ' ' , .
     fi
   ;;
-  (found|notfound)
+  (found|notfound|fixed|notfixed)
     if [[ CURRENT -eq 2 ]]; then
       _message -e bugnum 'bug number'
     elif [[ CURRENT -eq 3 ]]; then

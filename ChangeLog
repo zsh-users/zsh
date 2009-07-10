@@ -1,3 +1,8 @@
+2009-07-10  Clint Adams  <clint@zsh.org>
+
+	* 27127: Vincent Bernat: Completion/Debian/Command/_bts: handle
+	bts fixed and bts notfixed.
+
 2009-07-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27126: Src/exec.c, Src/init.c, Test/A01grammar.ztst,
@@ -11954,5 +11959,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4735 $
+* $Revision: 1.4736 $
 *****************************************************
