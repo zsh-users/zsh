@@ -1131,6 +1131,7 @@ source(char *s)
     fstack.tp = FS_SOURCE;
     funcstack = &fstack;
 
+    lastval = 0;		/* status of empty file is zero */
     if (prog) {
 	pushheap();
 	errflag = 0;

@@ -1,5 +1,9 @@
 2009-07-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 27126: Src/exec.c, Src/init.c, Test/A01grammar.ztst,
+	Test/C04funcdef.ztst, Test/D08cmdsubst.ztst: a few more
+	contexts where empty lists should give status zero.
+
 	* 27125: Src/prompt.c: handle nested use of colour code buffer
 	allocation.
 
@@ -11950,5 +11954,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4734 $
+* $Revision: 1.4735 $
 *****************************************************

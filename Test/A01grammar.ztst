@@ -27,6 +27,18 @@
   $nonexistent_variable
 0:Executing command that evaluates to empty resets status
 
+  false
+  sleep 1 &
+  print $?
+  # a tidy test is a happy test
+  wait $!
+0:Starting background command resets status
+>0
+
+  false
+  . /dev/null
+0:Sourcing empty file resets status
+
   fn() { local foo; read foo; print $foo; }
   coproc fn
   print -p coproc test output
@@ -531,3 +543,13 @@
   . ./bad_syntax
 126: Attempt to "." file with bad syntax.
 ?./bad_syntax:2: parse error near `\n'
+
+  echo 'false' >dot_false
+  . ./dot_false
+  print $?
+  echo 'true' >dot_true
+  . ./dot_true
+  print $?
+0:Last status of successfully executed "." file is retained
+>1
+>0

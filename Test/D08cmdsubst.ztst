@@ -89,3 +89,7 @@
   X=$(exit 2) $(exit 0) || print $?
 0:variable assignments processed after other substitutions
 >2
+
+ false
+ ``
+0:Empty command substitution resets status

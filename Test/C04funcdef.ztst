@@ -1,5 +1,20 @@
 %test
 
+  fn1() { return 1; }
+  fn2() {
+      fn1
+      print $?
+      return 2
+  }
+  fn2
+2:Basic status returns from functions
+>1
+
+  fnz() { }
+  false
+  fnz
+0:Empty function body resets status
+
   function f$$ () {
     print regress expansion of function names
   }

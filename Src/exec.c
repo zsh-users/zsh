@@ -1372,7 +1372,8 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 	else
 	    spawnjob();
 	child_unblock();
-	return 0;
+	/* Executing background code resets shell status */
+	return lastval = 0;
     } else {
 	if (newjob != lastwj) {
 	    Job jn = jobtab + newjob;
@@ -3512,6 +3513,7 @@ getoutput(char *cmd, int qt)
 	return retval;
     }
     /* pid == 0 */
+    lastval = 0;		/* status of empty list is zero */
     child_unblock();
     zclose(pipes[0]);
     redup(pipes[1], 1);
@@ -4259,6 +4261,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     if (trap_state == TRAP_STATE_PRIMED)
 	trap_return--;
     oldlastval = lastval;
+    lastval = 0;		/* status of empty function is zero */
     oldnumpipestats = numpipestats;
     if (noreturnval) {
 	/*
