@@ -1,3 +1,9 @@
+2009-07-10  Peter Stephenson  <pws@csr.com>
+
+	* 27119: Src/jobs.c: correct 27112: output is to stdout, not
+	stderr, and there's no automated jobs notification if not
+	INTERACTIVE.
+
 2009-07-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27112: Src/jobs.c: allow output to stderr if MONITOR but
@@ -11931,5 +11937,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4731 $
+* $Revision: 1.4732 $
 *****************************************************
