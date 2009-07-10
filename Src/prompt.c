@@ -1764,12 +1764,17 @@ struct colour_sequences {
 struct colour_sequences fg_bg_sequences[2];
 
 /*
- * We need a buffer for colour sequence compostion.  It may
+ * We need a buffer for colour sequence composition.  It may
  * vary depending on the sequences set.  However, it's inefficient
  * allocating it separately every time we send a colour sequence,
  * so do it once per refresh.
  */
 static char *colseq_buf;
+
+/*
+ * Count how often this has been allocated, for recursive usage.
+ */
+static int colseq_buf_allocs;
 
 /**/
 void
@@ -1801,9 +1806,13 @@ set_colour_code(char *str, char **var)
 mod_export void
 allocate_colour_buffer(void)
 {
-    char **atrs = getaparam("zle_highlight");
+    char **atrs;
     int lenfg, lenbg, len;
 
+    if (colseq_buf_allocs++)
+	return;
+
+    atrs = getaparam("zle_highlight");
     if (atrs) {
 	for (; *atrs; atrs++) {
 	    if (strpfx("fg_start_code:", *atrs)) {
@@ -1846,6 +1855,9 @@ allocate_colour_buffer(void)
 mod_export void
 free_colour_buffer(void)
 {
+    if (--colseq_buf_allocs)
+	return;
+
     DPUTS(!colseq_buf, "Freeing colour sequence buffer without alloc");
     /* Free buffer for colour code composition */
     free(colseq_buf);
