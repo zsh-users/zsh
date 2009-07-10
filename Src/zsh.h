@@ -930,6 +930,7 @@ struct execstack {
     int badcshglob;
     pid_t cmdoutpid;
     int cmdoutval;
+    int use_cmdoutval;
     int trap_return;
     int trap_state;
     int trapisfunc;
@@ -1955,6 +1956,7 @@ enum {
     POSIXALIASES,
     POSIXBUILTINS,
     POSIXIDENTIFIERS,
+    POSIXJOBS,
     PRINTEIGHTBIT,
     PRINTEXITVALUE,
     PRIVILEGED,

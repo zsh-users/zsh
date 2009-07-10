@@ -151,6 +151,15 @@ pid_t cmdoutpid;
 /**/
 int cmdoutval;
 
+/*
+ * This is set by an exiting $(...) substitution to indicate we need
+ * to retain the status.  We initialize it to zero if we think we need
+ * to reset the status for a command.
+ */
+
+/**/
+int use_cmdoutval;
+
 /* The context in which a shell function is called, see SFC_* in zsh.h. */ 
 
 /**/
@@ -2262,6 +2271,14 @@ execcmd(Estate state, int input, int output, int how, int last1)
      */
     if (!args && varspc)
 	lastval = errflag ? errflag : cmdoutval;
+    /*
+     * If there are arguments, we should reset the status for the
+     * command before execution---unless we are using the result of a
+     * command substitution, which will be indicated by setting
+     * use_cmdoutval to 1.  We haven't kicked those off yet, so
+     * there's no race.
+     */
+    use_cmdoutval = !args;
 
     for (i = 0; i < 10; i++) {
 	save[i] = -2;
@@ -2478,7 +2495,12 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    lastval = 0;
 		    return;
 		} else {
-		    cmdoutval = lastval;
+		    /*
+		     * No arguments.  Reset the status if there were
+		     * arguments before and no command substitution
+		     * has provided a status.
+		     */
+		    cmdoutval = use_cmdoutval ? lastval : 0;
 		    if (varspc)
 			addvars(state, varspc, 0);
 		    if (errflag)
@@ -4674,6 +4696,7 @@ execsave(void)
     es->badcshglob = badcshglob;
     es->cmdoutpid = cmdoutpid;
     es->cmdoutval = cmdoutval;
+    es->use_cmdoutval = use_cmdoutval;
     es->trap_return = trap_return;
     es->trap_state = trap_state;
     es->trapisfunc = trapisfunc;
@@ -4704,6 +4727,7 @@ execrestore(void)
     badcshglob = exstack->badcshglob;
     cmdoutpid = exstack->cmdoutpid;
     cmdoutval = exstack->cmdoutval;
+    use_cmdoutval = exstack->use_cmdoutval;
     trap_return = exstack->trap_return;
     trap_state = exstack->trap_state;
     trapisfunc = exstack->trapisfunc;

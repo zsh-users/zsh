@@ -813,6 +813,7 @@ should_report_time(Job j)
  * synch = 0 means asynchronous
  * synch = 1 means synchronous
  * synch = 2 means called synchronously from jobs
+ * synch = 3 means called synchronously from bg or fg
  *
  * Returns 1 if some output was done.
  *
@@ -884,12 +885,18 @@ printjob(Job jn, int lng, int synch)
 	}
     }
 
-/* print if necessary: ignore option state on explicit call to `jobs'. */
-
+    /*
+     * - Always print if called from jobs
+     * - Otherwise, require MONITOR option ("jobbing") and some
+     *   change of state
+     * - also either the shell is interactive or this is synchronous.
+     */
     if (synch == 2 ||
-	(interact && jobbing &&
+	((interact || synch) && jobbing &&
 	 ((jn->stat & STAT_STOPPED) || sflag || job != thisjob))) {
 	int len2, fline = 1;
+	/* POSIX requires just the job text for bg and fg */
+	int plainfmt = (synch == 3) && isset(POSIXJOBS);
 	/* use special format for current job, except in `jobs' */
 	int thisfmt = job == thisjob && synch != 2;
 	Process qn;
@@ -908,54 +915,60 @@ printjob(Job jn, int lng, int synch)
 		for (qn = pn->next; qn; qn = qn->next) {
 		    if (qn->status != pn->status)
 			break;
-		    if ((int)strlen(qn->text) + len2 + ((qn->next) ? 3 : 0) > lineleng)
+		    if ((int)strlen(qn->text) + len2 + ((qn->next) ? 3 : 0)
+			> lineleng)
 			break;
 		    len2 += strlen(qn->text) + 2;
 		}
 	    doneprint = 1;
-	    if (!thisfmt || lng) {
-		if (fline)
-		    fprintf(fout, "[%ld]  %c ",
-			    (long)job,
-			    (job == curjob) ? '+'
-			    : (job == prevjob) ? '-' : ' ');
-		else
-		    fprintf(fout, (job > 9) ? "        " : "       ");
-	    } else
-		fprintf(fout, "zsh: ");
-	    if (lng & 1)
-		fprintf(fout, "%ld ", (long) pn->pid);
-	    else if (lng & 2) {
-		pid_t x = jn->gleader;
+	    if (!plainfmt) {
+		if (!thisfmt || lng) {
+		    if (fline)
+			fprintf(fout, "[%ld]  %c ",
+				(long)job,
+				(job == curjob) ? '+'
+				: (job == prevjob) ? '-' : ' ');
+		    else
+			fprintf(fout, (job > 9) ? "        " : "       ");
+		} else
+		    fprintf(fout, "zsh: ");
+		if (lng & 1)
+		    fprintf(fout, "%ld ", (long) pn->pid);
+		else if (lng & 2) {
+		    pid_t x = jn->gleader;
 
-		fprintf(fout, "%ld ", (long) x);
-		do
+		    fprintf(fout, "%ld ", (long) x);
+		    do
+			skip++;
+		    while ((x /= 10));
 		    skip++;
-		while ((x /= 10));
-		skip++;
-		lng &= ~3;
-	    } else
-		fprintf(fout, "%*s", skip, "");
-	    if (pn->status == SP_RUNNING) {
-		if (!conted)
-		    fprintf(fout, "running%*s", len - 7 + 2, "");
+		    lng &= ~3;
+		} else
+		    fprintf(fout, "%*s", skip, "");
+		if (pn->status == SP_RUNNING) {
+		    if (!conted)
+			fprintf(fout, "running%*s", len - 7 + 2, "");
+		    else
+			fprintf(fout, "continued%*s", len - 9 + 2, "");
+		}
+		else if (WIFEXITED(pn->status)) {
+		    if (WEXITSTATUS(pn->status))
+			fprintf(fout, "exit %-4d%*s", WEXITSTATUS(pn->status),
+				len - 9 + 2, "");
+		    else
+			fprintf(fout, "done%*s", len - 4 + 2, "");
+		} else if (WIFSTOPPED(pn->status))
+		    fprintf(fout, "%-*s", len + 2,
+			    sigmsg(WSTOPSIG(pn->status)));
+		else if (WCOREDUMP(pn->status))
+		    fprintf(fout, "%s (core dumped)%*s",
+			    sigmsg(WTERMSIG(pn->status)),
+			    (int)(len - 14 + 2 -
+				  strlen(sigmsg(WTERMSIG(pn->status)))), "");
 		else
-		    fprintf(fout, "continued%*s", len - 9 + 2, "");
+		    fprintf(fout, "%-*s", len + 2,
+			    sigmsg(WTERMSIG(pn->status)));
 	    }
-	    else if (WIFEXITED(pn->status)) {
-		if (WEXITSTATUS(pn->status))
-		    fprintf(fout, "exit %-4d%*s", WEXITSTATUS(pn->status),
-			    len - 9 + 2, "");
-		else
-		    fprintf(fout, "done%*s", len - 4 + 2, "");
-	    } else if (WIFSTOPPED(pn->status))
-		fprintf(fout, "%-*s", len + 2, sigmsg(WSTOPSIG(pn->status)));
-	    else if (WCOREDUMP(pn->status))
-		fprintf(fout, "%s (core dumped)%*s",
-			sigmsg(WTERMSIG(pn->status)),
-			(int)(len - 14 + 2 - strlen(sigmsg(WTERMSIG(pn->status)))), "");
-	    else
-		fprintf(fout, "%-*s", len + 2, sigmsg(WTERMSIG(pn->status)));
 	    for (; pn != qn; pn = pn->next) {
 		char *txt = dupstring(pn->text);
 		int txtlen;
@@ -1905,7 +1918,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    }
 	    if (func != BIN_WAIT)
 		/* for bg and fg -- show the job we are operating on */
-		printjob(jobtab + job, (stopped) ? -1 : lng, 1);
+		printjob(jobtab + job, (stopped) ? -1 : lng, 3);
 	    if (func != BIN_BG) {		/* fg or wait */
 		if (jobtab[job].pwd && strcmp(jobtab[job].pwd, pwd)) {
 		    FILE *fout = (func == BIN_JOBS || !shout) ? stdout : shout;

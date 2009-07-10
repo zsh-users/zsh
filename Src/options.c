@@ -201,6 +201,7 @@ static struct optname optns[] = {
 {{NULL, "posixaliases",       OPT_EMULATE|OPT_BOURNE},	 POSIXALIASES},
 {{NULL, "posixbuiltins",      OPT_EMULATE|OPT_BOURNE},	 POSIXBUILTINS},
 {{NULL, "posixidentifiers",   OPT_EMULATE|OPT_BOURNE},	 POSIXIDENTIFIERS},
+{{NULL, "posixjobs",          OPT_EMULATE|OPT_BOURNE},	 POSIXJOBS},
 {{NULL, "printeightbit",      0},                        PRINTEIGHTBIT},
 {{NULL, "printexitvalue",     0},			 PRINTEXITVALUE},
 {{NULL, "privileged",	      OPT_SPECIAL},		 PRIVILEGED},

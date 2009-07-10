@@ -23,6 +23,10 @@
   true | false
 1:Exit status of pipeline with builtins (false)
 
+  false
+  $nonexistent_variable
+0:Executing command that evaluates to empty resets status
+
   fn() { local foo; read foo; print $foo; }
   coproc fn
   print -p coproc test output

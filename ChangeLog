@@ -1,5 +1,13 @@
 2009-07-10  Peter Stephenson  <pws@csr.com>
 
+	* 27122: Doc/Zsh/options.yo, Src/jobs.c, Src/options.c, Src/zsh.h:
+	add POSIX_JOBS option to print only job text for bg and fg.
+
+	* 27106: Src/exec.c, Src/signals.c, Src/zsh.h,
+	Test/A01grammar.ztst: on a command line that had text that
+	expanded to nothing reset the status (unless it should come
+	from a command substitution).
+
 	* 27119: Src/jobs.c: correct 27112: output is to stdout, not
 	stderr, and there's no automated jobs notification if not
 	INTERACTIVE.
@@ -11937,5 +11945,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4732 $
+* $Revision: 1.4733 $
 *****************************************************

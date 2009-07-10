@@ -494,6 +494,7 @@ zhandler(int sig)
 			*procsubval = (0200 | WTERMSIG(status));
 		    else
 			*procsubval = WEXITSTATUS(status);
+		    use_cmdoutval = 1;
 		    get_usage();
 		    cont = 1;
 		    break;
