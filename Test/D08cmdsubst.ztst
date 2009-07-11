@@ -93,3 +93,8 @@
  false
  ``
 0:Empty command substitution resets status
+
+ false
+ echo `echo $?`
+0:Non-empty command substitution inherits status
+>1

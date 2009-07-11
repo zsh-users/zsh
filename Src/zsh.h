@@ -1726,6 +1726,17 @@ struct nameddir {
 #define PRINT_WHENCE_FUNCDEF	(1<<9)
 #define PRINT_WHENCE_WORD	(1<<10)
 
+/* Return values from loop() */
+
+enum loop_return {
+    /* Loop executed OK */
+    LOOP_OK,
+    /* Loop executed no code */
+    LOOP_EMPTY,
+    /* Loop encountered an error */
+    LOOP_ERROR
+};
+
 /* Return values from source() */
 
 enum source_return {

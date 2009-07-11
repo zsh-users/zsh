@@ -553,3 +553,9 @@
 0:Last status of successfully executed "." file is retained
 >1
 >0
+
+  echo 'echo $?' >dot_status
+  false
+  . ./dot_status
+0:"." file sees status from previous command
+>1

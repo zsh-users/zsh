@@ -99,11 +99,11 @@ mod_export struct hookdef zshhooks[] = {
 /* keep executing lists until EOF found */
 
 /**/
-int
+enum loop_return
 loop(int toplevel, int justonce)
 {
     Eprog prog;
-    int err;
+    int err, non_empty = 0;
 
     pushheap();
     if (!toplevel)
@@ -151,6 +151,7 @@ loop(int toplevel, int justonce)
 	if (hend(prog)) {
 	    int toksav = tok;
 
+	    non_empty = 1;
 	    if (toplevel &&
 		(getshfunc("preexec") ||
 		 paramtab->getnode(paramtab, "preexec" HOOK_SUFFIX))) {
@@ -207,7 +208,11 @@ loop(int toplevel, int justonce)
 	lexrestore();
     popheap();
 
-    return err;
+    if (err)
+	return LOOP_ERROR;
+    if (!non_empty)
+	return LOOP_EMPTY;
+    return LOOP_OK;
 }
 
 static char *cmd;
@@ -1131,7 +1136,6 @@ source(char *s)
     fstack.tp = FS_SOURCE;
     funcstack = &fstack;
 
-    lastval = 0;		/* status of empty file is zero */
     if (prog) {
 	pushheap();
 	errflag = 0;
@@ -1141,8 +1145,21 @@ source(char *s)
 	    ret = SOURCE_ERROR;
     } else {
 	/* loop through the file to be sourced  */
-	if (loop(0, 0))
+	switch (loop(0, 0))
+	{
+	case LOOP_OK:
+	    /* nothing to do but compilers like a complete enum */
+	    break;
+
+	case LOOP_EMPTY:
+	    /* Empty code resets status */
+	    lastval = 0;
+	    break;
+
+	case LOOP_ERROR:
 	    ret = SOURCE_ERROR;
+	    break;
+	}
     }
     funcstack = funcstack->prev;
     sourcelevel--;

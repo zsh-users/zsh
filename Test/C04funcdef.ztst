@@ -15,6 +15,13 @@
   fnz
 0:Empty function body resets status
 
+  fn3() { return 3; }
+  fnstat() { print $?; }
+  fn3
+  fnstat
+0:Status is not reset on non-empty function body
+>3
+
   function f$$ () {
     print regress expansion of function names
   }

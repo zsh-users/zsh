@@ -1056,6 +1056,10 @@ execlist(Estate state, int dont_change_job, int exiting)
     /* Loop over all sets of comands separated by newline, *
      * semi-colon or ampersand (`sublists').               */
     code = *state->pc++;
+    if (wc_code(code) != WC_LIST) {
+	/* Empty list; this returns status zero. */
+	lastval = 0;
+    }
     while (wc_code(code) == WC_LIST && !breaks && !retflag && !errflag) {
 	int donedebug;
 
@@ -3513,7 +3517,6 @@ getoutput(char *cmd, int qt)
 	return retval;
     }
     /* pid == 0 */
-    lastval = 0;		/* status of empty list is zero */
     child_unblock();
     zclose(pipes[0]);
     redup(pipes[1], 1);
@@ -4261,7 +4264,6 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     if (trap_state == TRAP_STATE_PRIMED)
 	trap_return--;
     oldlastval = lastval;
-    lastval = 0;		/* status of empty function is zero */
     oldnumpipestats = numpipestats;
     if (noreturnval) {
 	/*
