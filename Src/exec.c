@@ -931,11 +931,7 @@ entersubsh(int flags)
     zsh_subshell++;
     if ((flags & ESUB_REVERTPGRP) && getpid() == mypgrp)
 	release_pgrp();
-    if (SHTTY != -1) {
-	shout = NULL;
-	zclose(SHTTY);
-	SHTTY = -1;
-    }
+    shout = NULL;
     if (isset(MONITOR)) {
 	signal_default(SIGTTOU);
 	signal_default(SIGTTIN);

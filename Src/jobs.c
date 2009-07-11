@@ -1307,7 +1307,8 @@ clearjobtab(int monitor)
 
     if (monitor && oldmaxjob) {
 	int sz = oldmaxjob * sizeof(struct job);
-	DPUTS(oldjobtab != NULL, "BUG: saving job table twice\n");
+	if (oldjobtab)
+	    free(oldjobtab);
 	oldjobtab = (struct job *)zalloc(sz);
 	memcpy(oldjobtab, jobtab, sz);
 
