@@ -1280,10 +1280,26 @@ pindex(NO_POSIX_JOBS)
 pindex(NOPOSIXJOBS)
 cindex(bg, output in POSIX format)
 cindex(fg, output in POSIX format)
+cindex(job control, in subshell)
+cindex(jobs, output in subshell)
 item(tt(POSIX_JOBS) <K> <S>)(
-When putting jobs in the background or foreground with tt(bg) or tt(fg),
-just print the text of the job as required by POSIX,
-rather than the full information that would be output by tt(jobs).
+This option makes job control more compliant with the POSIX standard.
+
+When the option is not set, the tt(MONITOR) option is unset on entry to
+subshells, so that job control is no longer active.  When the option is
+set, the tt(MONITOR) option and job control remain active in the
+subshell, but note that the subshell has no access to jobs in the parent
+shell.
+
+When the option is not set, jobs put in the background or foreground
+with tt(bg) or tt(fg) are displayed with the same information that would
+be reported by tt(jobs).  When the option is set, only the text is
+printed.  The output from tt(jobs) itself is not affected by the option.
+
+When the option is not set, job information from the parent
+shell is saved for output within a subshell (for example, within a
+pipeline).  When the option is set, the output of tt(jobs) is empty
+until a job is started within the subshell.
 )
 enditem()
 

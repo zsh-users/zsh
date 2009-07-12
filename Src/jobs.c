@@ -1292,6 +1292,8 @@ clearjobtab(int monitor)
 {
     int i;
 
+    if (isset(POSIXJOBS))
+	oldmaxjob = 0;
     for (i = 1; i <= maxjob; i++) {
 	/*
 	 * See if there is a jobtable worth saving.
@@ -1299,7 +1301,7 @@ clearjobtab(int monitor)
 	 * once for each subshell of a shell with job control,
 	 * so doesn't create a leak.
 	 */
-	if (monitor && jobtab[i].stat)
+	if (monitor && !isset(POSIXJOBS) && jobtab[i].stat)
 	    oldmaxjob = i+1;
 	else if (jobtab[i].stat & STAT_INUSE)
 	    freejob(jobtab + i, 0);

@@ -1,3 +1,12 @@
+2009-07-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27135: Doc/Zsh/options.yo, Src/exec.c, Src/jobs.c: expand
+	POSIX_JOBS option to leave MONITOR on in subshell and not to
+	report the parent shell's jobs.
+
+	* 27134: Src/exec.c, Src/init.c: improve 27131 by setting
+	FD_CLOEXEC for SHTTY or closing it by hand when executing.
+
 2009-07-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27131: Src/exec.c, Src/jobs.c: tentative attempt to
@@ -11971,5 +11980,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4738 $
+* $Revision: 1.4739 $
 *****************************************************

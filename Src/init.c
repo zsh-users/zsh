@@ -480,8 +480,16 @@ init_io(void)
     if (SHTTY == -1) {
 	zsfree(ttystrname);
 	ttystrname = ztrdup("");
-    } else if (!ttystrname) {
-	ttystrname = ztrdup("/dev/tty");
+    } else {
+#ifdef FD_CLOEXEC
+	long fdflags = fcntl(SHTTY, F_GETFD, 0);
+	if (fdflags != (long)-1) {
+	    fdflags |= FD_CLOEXEC;
+	    fcntl(SHTTY, F_SETFD, fdflags);
+	}
+#endif
+	if (!ttystrname)
+	    ttystrname = ztrdup("/dev/tty");
     }
 
     /* We will only use zle if shell is interactive, *

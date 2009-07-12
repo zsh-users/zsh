@@ -595,6 +595,12 @@ execute(LinkList args, int flags, int defpath)
      * here, which should be visible to external processes.
      */
     closem(FDT_XTRACE);
+#ifndef FD_CLOEXEC
+    if (SHTTY != -1) {
+	close(SHTTY);
+	SHTTY = -1;
+    }
+#endif
     child_unblock();
     if ((int) strlen(arg0) >= PATH_MAX) {
 	zerr("command too long: %s", arg0);
@@ -944,7 +950,9 @@ entersubsh(int flags)
     }
     if (!(sigtrapped[SIGQUIT] & ZSIG_IGNORED))
 	signal_default(SIGQUIT);
-    opts[MONITOR] = opts[USEZLE] = 0;
+    if (!isset(POSIXJOBS))
+	opts[MONITOR] = 0;
+    opts[USEZLE] = 0;
     zleactive = 0;
     if (flags & ESUB_PGRP)
 	clearjobtab(monitor);
