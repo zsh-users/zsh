@@ -87,7 +87,7 @@ case "$state" in
     else
       kver=$(uname -r)
     fi
-    modules=( $modules_dir/$kver/(*~source)/**/*(.:t:r) )
+    modules=( $modules_dir/$kver/(*~(source|build))/**/*(.:t:r) )
 
     if [[ $state = loadable_modules ]]; then
         modules=( ${modules:#(${(j:|:)~${=loaded_modules//_/-}})} )
