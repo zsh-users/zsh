@@ -1,3 +1,8 @@
+2009-07-14  Eric Blake  <ebb9@byu.net>
+
+	* Eric Blake: 27151: Src/builtin.c: Fix // handling in cd for
+	cygwin.
+
 2009-07-14  Peter Stephenson  <pws@csr.com>
 
 	* Andy Spencer: 27148: Completion/Linux/Command/_modutils:
@@ -11986,5 +11991,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4740 $
+* $Revision: 1.4741 $
 *****************************************************

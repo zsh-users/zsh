@@ -1029,17 +1029,19 @@ cd_try_chdir(char *pfix, char *dest, int hard)
 
     /* handle directory prefix */
     if (pfix && *pfix) {
-	if (*pfix == '/')
+	if (*pfix == '/') {
 #ifdef __CYGWIN__
 /* NB: Don't turn "/"+"bin" into "//"+"bin" by mistake!  "//bin" may *
  * not be what user really wants (probably wants "/bin"), but        *
  * "//bin" could be valid too (see fixdir())!  This is primarily for *
- * handling CDPATH correctly.                                        */
-	    buf = tricat(pfix, ( pfix[1] == '\0' ? "" : "/" ), dest);
+ * handling CDPATH correctly.  Likewise for "//"+"bin" not becoming  *
+ * "///bin" (aka "/bin").                                            */
+	    int root = pfix[1] == '\0' || (pfix[1] == '/' && pfix[2] == '\0');
+	    buf = tricat(pfix, ( root ? "" : "/" ), dest);
 #else
 	    buf = tricat(pfix, "/", dest);
 #endif
-	else {
+	} else {
 	    int pfl = strlen(pfix);
 	    dlen = strlen(pwd);
 
@@ -1200,8 +1202,8 @@ fixdir(char *src)
 	/* compress multiple /es into single */
 	if (*src == '/') {
 #ifdef __CYGWIN__
-	    /* allow leading // under cygwin */
-	    if (src == s0 && src[1] == '/')
+	    /* allow leading // under cygwin, but /// still becomes / */
+	    if (src == s0 && src[1] == '/' && src[2] != '/')
 		*dest++ = *src++;
 #endif
 	    *dest++ = *src++;
