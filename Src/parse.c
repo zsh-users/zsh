@@ -1546,7 +1546,7 @@ static int
 par_simple(int *complex, int nr)
 {
     int oecused = ecused, isnull = 1, r, argc = 0, p, isfunc = 0, sr = 0;
-    int c = *complex, nrediradd;
+    int c = *complex, nrediradd, assignments = 0;
 
     r = ecused;
     for (;;) {
@@ -1586,6 +1586,7 @@ par_simple(int *complex, int nr)
 	    ecstr(name);
 	    ecstr(str);
 	    isnull = 0;
+	    assignments = 1;
 	} else if (tok == ENVARRAY) {
 	    int oldcmdpos = incmdpos, n, type2;
 
@@ -1606,6 +1607,7 @@ par_simple(int *complex, int nr)
 		YYERROR(oecused);
 	    incmdpos = oldcmdpos;
 	    isnull = 0;
+	    assignments = 1;
 	} else
 	    break;
 	zshlex();
@@ -1667,7 +1669,11 @@ par_simple(int *complex, int nr)
 	    zlong oldlineno = lineno;
 	    int onp, so, oecssub = ecssub;
 
+	    /* Error if too many function definitions at once */
 	    if (!isset(MULTIFUNCDEF) && argc > 1)
+		YYERROR(oecused);
+	    /* Error if preceding assignments */
+	    if (assignments)
 		YYERROR(oecused);
 
 	    *complex = c;

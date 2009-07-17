@@ -1,3 +1,9 @@
+2009-07-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/14240: Src/parse.c: assignment before a function
+	definition should be an error, in common with other complex
+	functions and as documented.
+
 2009-07-14  Eric Blake  <ebb9@byu.net>
 
 	* Eric Blake: 27151: Src/builtin.c: Fix // handling in cd for
@@ -11991,5 +11997,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4741 $
+* $Revision: 1.4742 $
 *****************************************************
