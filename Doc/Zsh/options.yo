@@ -115,6 +115,22 @@ This also has the effect of tt(CHASE_DOTS), i.e. a `tt(..)' path segment
 will be treated as referring to the physical parent, even if the preceding
 path segment is a symbolic link.
 )
+pindex(POSIX_CD)
+pindex(POSIXCD)
+pindex(NO_POSIX_CD)
+pindex(NOPOSIXCD)
+cindex(CDPATH, order of checking)
+item(tt(POSIX_CD))(
+Modifies the behaviour of tt(cd), tt(chdir) and tt(pushd) commands
+to make them more compatible with the POSIX standard. The behaviour with
+the option unset is described in the documentation for the tt(cd)
+builtin in
+ifzman(zmanref(zshbuiltins))\
+ifnzman(noderef(Shell Builtin Commands)).
+If the option is set, the shell does not test for directories beneath
+the local directory (`tt(.)') until after all directories in tt(cdpath)
+have been tested.
+)
 pindex(PUSHD_IGNORE_DUPS)
 pindex(NO_PUSHD_IGNORE_DUPS)
 pindex(PUSHDIGNOREDUPS)

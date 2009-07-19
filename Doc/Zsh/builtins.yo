@@ -183,6 +183,9 @@ to the directory var(arg) under each component of tt(cdpath) in turn until
 successful.  If `tt(.)' occurs in tt(cdpath), then tt(cdpath) is searched
 strictly in order so that `tt(.)' is only tried at the appropriate point.
 
+The order of testing tt(cdpath) is modified if the option tt(POSIX_CD)
+is set, as described in the documentation for the option.
+
 If no directory is found, the option tt(CDABLE_VARS) is set, and a
 parameter named var(arg) exists whose value begins with a slash, treat its
 value as the directory.  In that case, the parameter is added to the named

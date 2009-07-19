@@ -945,14 +945,23 @@ cd_do_chdir(char *cnam, char *dest, int hard)
 	return NULL;
     }
 
-    /* if cdpath is being used, check it for . */
-    if (!nocdpath)
+    /*
+     * If cdpath is being used, check it for ".".
+     * Don't bother doing this if POSIXCD is set, we don't
+     * need to know (though it doesn't actually matter).
+     */
+    if (!nocdpath && !isset(POSIXCD))
 	for (pp = cdpath; *pp; pp++)
 	    if (!(*pp)[0] || ((*pp)[0] == '.' && (*pp)[1] == '\0'))
 		hasdot = 1;
-    /* if there is no . in cdpath (or it is not being used), try the directory
-       as-is (i.e. from .) */
-    if (!hasdot) {
+    /*
+     * If 
+     * (- there is no . in cdpath
+     *  - or cdpath is not being used)
+     *  - and the POSIXCD option is not set
+     * try the directory as-is (i.e. from .)
+     */
+    if (!hasdot && !isset(POSIXCD)) {
 	if ((ret = cd_try_chdir(NULL, dest, hard)))
 	    return ret;
 	if (errno != ENOENT)
@@ -971,6 +980,15 @@ cd_do_chdir(char *cnam, char *dest, int hard)
 	    if (errno != ENOENT)
 		eno = errno;
 	}
+    /*
+     * POSIX requires us to check "." after CDPATH rather than before.
+     */
+    if (isset(POSIXCD)) {
+	if ((ret = cd_try_chdir(NULL, dest, hard)))
+	    return ret;
+	if (errno != ENOENT)
+	    eno = errno;
+    }
 
     /* handle the CDABLEVARS option */
     if ((ret = cd_able_vars(dest))) {
