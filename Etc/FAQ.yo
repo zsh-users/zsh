@@ -819,6 +819,14 @@ label(23)
   use in the body of a function, but define the function first if the
   alias has the same name as the function.
 
+  If you aware of the problem, you can always escape part or all of the
+  name of the function:
+  verb(
+     'l'() { /bin/ls -la "$@" | more }
+  )
+  Adding the quotes has no effect on the function definition, but
+  suppresses alias expansion for the function name.  Hence this is
+  guaranteed to be safe.
 
 sect(Similarities with tcsh)
 

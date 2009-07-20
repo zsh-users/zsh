@@ -1,3 +1,8 @@
+2009-07-20  Peter Stephenson  <pws@csr.com>
+
+	* 27178: Etc/FAQ.yo: as pointed out by Mikael, quoting
+	function names to stop alias expansion is always safe.
+
 2009-07-19  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 27169: Src/jobs.c, Src/signals.c: 23067 went too far in opening
@@ -12018,5 +12023,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4746 $
+* $Revision: 1.4747 $
 *****************************************************
