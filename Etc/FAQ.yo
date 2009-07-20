@@ -826,7 +826,9 @@ label(23)
   )
   Adding the quotes has no effect on the function definition, but
   suppresses alias expansion for the function name.  Hence this is
-  guaranteed to be safe.
+  guaranteed to be safe---unless you are in the habit of defining
+  aliases for expressions such as tt('l'), which is valid, but probably
+  confusing.
 
 sect(Similarities with tcsh)
 
