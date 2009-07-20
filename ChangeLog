@@ -1,3 +1,10 @@
+2009-07-19  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 27169: Src/jobs.c, Src/signals.c: 23067 went too far in opening
+	up the signal mask when waiting for jobs; an interrupt from the
+	terminal should not terminate the shell until the foreground job
+	has a chance to exit or to choose not to do so.
+
 2009-07-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27167: Src/builtin.c, Src/options.c, Src/zsh.h,
@@ -12011,5 +12018,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4745 $
+* $Revision: 1.4746 $
 *****************************************************

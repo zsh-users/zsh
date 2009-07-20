@@ -342,29 +342,38 @@ static signal_jmp_buf suspend_jmp_buf;
 
 /**/
 int
-signal_suspend(UNUSED(int sig))
+signal_suspend(UNUSED(int sig), int wait_cmd)
 {
     int ret;
- 
-#ifdef POSIX_SIGNALS
+
+#if defined(POSIX_SIGNALS) || defined(BSD_SIGNALS)
     sigset_t set;
-#ifdef BROKEN_POSIX_SIGSUSPEND
+# if defined(POSIX_SIGNALS) && defined(BROKEN_POSIX_SIGSUSPEND)
     sigset_t oset;
-#endif /* BROKEN_POSIX_SIGSUSPEND */
+# endif
 
     sigemptyset(&set);
-#ifdef BROKEN_POSIX_SIGSUSPEND
+
+    /* SIGINT from the terminal driver needs to interrupt "wait"
+     * and to cause traps to fire, but otherwise should not be
+     * handled by the shell until after any foreground job has
+     * a chance to decide whether to exit on that signal.
+     */
+    if (!(wait_cmd || isset(TRAPSASYNC) ||
+	  (sigtrapped[SIGINT] & ~ZSIG_IGNORED)))
+	sigaddset(&set, SIGINT);
+#endif /* POSIX_SIGNALS || BSD_SIGNALS */
+
+#ifdef POSIX_SIGNALS
+# ifdef BROKEN_POSIX_SIGSUSPEND
     sigprocmask(SIG_SETMASK, &set, &oset);
     pause();
     sigprocmask(SIG_SETMASK, &oset, NULL);
-#else /* not BROKEN_POSIX_SIGSUSPEND */
+# else /* not BROKEN_POSIX_SIGSUSPEND */
     ret = sigsuspend(&set);
-#endif /* BROKEN_POSIX_SIGSUSPEND */
+# endif /* BROKEN_POSIX_SIGSUSPEND */
 #else /* not POSIX_SIGNALS */
 # ifdef BSD_SIGNALS
-    sigset_t set;
-
-    sigemptyset(&set);
     ret = sigpause(set);
 # else
 #  ifdef SYSV_SIGNALS
