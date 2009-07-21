@@ -130,6 +130,14 @@ ifnzman(noderef(Shell Builtin Commands)).
 If the option is set, the shell does not test for directories beneath
 the local directory (`tt(.)') until after all directories in tt(cdpath)
 have been tested.
+
+Also, if the option is set, the conditions under which the shell
+prints the new directory after changing to it are modified.  It is
+no longer restricted to interactive shells (although printing of
+the directory stack with tt(pushd) is still limited to interactive
+shells); and any use of a component of tt(CDPATH), including a `tt(.)' but
+excluding an empty component that is otherwise treated as `tt(.)', causes
+the directory to be printed.
 )
 pindex(PUSHD_IGNORE_DUPS)
 pindex(NO_PUSHD_IGNORE_DUPS)

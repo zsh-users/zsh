@@ -972,8 +972,19 @@ cd_do_chdir(char *cnam, char *dest, int hard)
     if (!nocdpath)
 	for (pp = cdpath; *pp; pp++) {
 	    if ((ret = cd_try_chdir(*pp, dest, hard))) {
-		if (strcmp(*pp, ".")) {
-		    doprintdir++;
+		if (isset(POSIXCD)) {
+		    /*
+		     * For POSIX we need to print the directory
+		     * any time CDPATH was used, except in the
+		     * special case of an empty segment being
+		     * treated as a ".".
+		     */
+		    if (**pp)
+			doprintdir++;
+		}  else {
+		    if (strcmp(*pp, ".")) {
+			doprintdir++;
+		    }
 		}
 		return ret;
 	    }
@@ -1146,8 +1157,8 @@ cd_new_pwd(int func, LinkNode dir, int quiet)
     pwd = new_pwd;
     set_pwd_env();
 
-    if (isset(INTERACTIVE)) {
-	if (func != BIN_CD) {
+    if (isset(INTERACTIVE) || isset(POSIXCD)) {
+	if (func != BIN_CD && isset(INTERACTIVE)) {
             if (unset(PUSHDSILENT) && !quiet)
 	        printdirstack();
         } else if (doprintdir) {
