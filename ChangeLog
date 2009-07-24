@@ -1,3 +1,9 @@
+2009-07-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27188: Doc/Zsh/builtins.yo, Src/builtin.c, Test/B04read.ztst,
+	Test/D07multibyte.ztst: Make read -q use the same code as read
+	-k, hence enabling support for -t with terminals, -p and -u.
+
 2009-07-21  Peter Stephenson  <pws@csr.com>
 
 	* 27181: Doc/Zsh/options.yo, Src/builtin.c: extend POSIX_CD to
@@ -12028,5 +12034,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4749 $
+* $Revision: 1.4750 $
 *****************************************************

@@ -232,6 +232,12 @@
 <«»ignored
 >«»
 
+  read -q -u0 mb
+  print $?
+0:multibyte character makes read -q return false
+<«
+>1
+
   # See if the system grokks first-century Greek...
   ioh="Ἐν ἀρχῇ ἦν ὁ λόγος, καὶ ὁ λόγος ἦν πρὸς τὸν θεόν, καὶ θεὸς ἦν ὁ λόγος."
   for (( i = 1; i <= ${#ioh}; i++ )); do

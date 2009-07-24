@@ -24,6 +24,18 @@
 0:read specified number of chars
 >foo
 
+ for char in y Y n N X $'\n'; do
+   read -q -u0 <<<$char
+   print $?
+ done
+0:read yes or no, default no
+>0
+>0
+>1
+>1
+>1
+>1
+
  read -d: <<<foo:bar
  print $REPLY
 0:read up to delimiter

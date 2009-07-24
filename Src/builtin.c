@@ -5040,8 +5040,8 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     if(OPT_ISSET(ops,'l') || OPT_ISSET(ops,'c'))
 	return compctlreadptr(name, args, ops, reply);
 
-    if ((OPT_ISSET(ops,'k') && !OPT_ISSET(ops,'u') &&
-	 !OPT_ISSET(ops,'p')) || OPT_ISSET(ops,'q')) {
+    if ((OPT_ISSET(ops,'k') || OPT_ISSET(ops,'q')) &&
+	!OPT_ISSET(ops,'u') && !OPT_ISSET(ops,'p')) {
 	if (!zleactive) {
 	    if (SHTTY == -1) {
 		/* need to open /dev/tty specially */
@@ -5065,7 +5065,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		gettyinfo(&shttyinfo);
 	    /* attach to the tty */
 	    attachtty(mypgrp);
-	    if (!isem && OPT_ISSET(ops,'k'))
+	    if (!isem)
 		setcbreak();
 	    readfd = SHTTY;
 	}
@@ -5184,8 +5184,9 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 #endif
 	} else {
 	    if (readfd == -1 ||
-		!read_poll(readfd, &readchar, keys && !zleactive, timeout)) {
-		if (OPT_ISSET(ops,'k') && !zleactive && !isem)
+		!read_poll(readfd, &readchar, keys && !zleactive,
+			   timeout)) {
+		if (keys && !zleactive && !isem)
 		    settyinfo(&shttyinfo);
 		else if (resettty && SHTTY != -1)
 		    settyinfo(&saveti);
@@ -5194,7 +5195,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		    shout = oshout;
 		    SHTTY = -1;
 		}
-		return 1;
+		return OPT_ISSET(ops,'q') ? 2 : 1;
 	    }
 	}
     }
@@ -5203,11 +5204,18 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
     memset(&mbs, 0, sizeof(mbs));
 #endif
 
-    /* option -k means read only a given number of characters (default 1) */
-    if (OPT_ISSET(ops,'k')) {
+    /*
+     * option -k means read only a given number of characters (default 1)
+     * option -q means get one character, and interpret it as a Y or N
+     */
+    if (OPT_ISSET(ops,'k') || OPT_ISSET(ops,'q')) {
 	int eof = 0;
 	/* allocate buffer space for result */
+#ifdef MULTIBYTE_SUPPORT
+	bptr = buf = (char *)zalloc(nchars*MB_CUR_MAX+1);
+#else
 	bptr = buf = (char *)zalloc(nchars+1);
+#endif
 
 	do {
 	    if (izle) {
@@ -5295,6 +5303,17 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	    }
 	}
 
+	if (OPT_ISSET(ops,'q'))
+	{
+	    /*
+	     * Keep eof as status but status is now whether we read
+	     * 'y' or 'Y'.  If we timed out, status is 2.
+	     */
+	    if (eof)
+		eof = 2;
+	    else
+		eof = (bptr - buf != 1 || (buf[0] != 'y' && buf[0] != 'Y'));
+	}
 	if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E'))
 	    fwrite(buf, bptr - buf, 1, stdout);
 	if (!OPT_ISSET(ops,'e'))
@@ -5304,59 +5323,6 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	if (resettty && SHTTY != -1)
 	    settyinfo(&saveti);
 	return eof;
-    }
-
-    /* option -q means get one character, and interpret it as a Y or N */
-    if (OPT_ISSET(ops,'q')) {
-	char readbuf[2];
-
-	/* set up the buffer */
-	readbuf[1] = '\0';
-
-	/* get, and store, reply */
-	if (izle) {
-#ifdef MULTIBYTE_SUPPORT
-	    int key;
-	    char c;
-
-	    for (;;) {
-		zleentry(ZLE_CMD_GET_KEY, izle_timeout, NULL, &key);
-		if (key < 0)
-		    break;
-		c = (char)key;
-		/*
-		 * If multibyte, it can't be y, so we don't care
-		 * what key gets set to; just read to end of character.
-		 */
-		if (!isset(MULTIBYTE) ||
-		    mbrlen(&c, 1, &mbs) != MB_INCOMPLETE)
-		    break;
-	    }
-#else
-	    int key;
-	    zleentry(ZLE_CMD_GET_KEY, izle_timeout, NULL, &key);
-#endif
-
-	    readbuf[0] = (key == 'y' ? 'y' : 'n');
-	} else {
-	    readbuf[0] = ((char)getquery(NULL, 0)) == 'y' ? 'y' : 'n';
-
-	    /* dispose of result appropriately, etc. */
-	    if (haso) {
-		fclose(shout);	/* close(SHTTY) */
-		shout = oshout;
-		SHTTY = -1;
-	    }
-	}
-
-	if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E'))
-	    printf("%s\n", readbuf);
-	if (!OPT_ISSET(ops,'e'))
-	    setsparam(reply, ztrdup(readbuf));
-
-	if (resettty && SHTTY != -1)
-	    settyinfo(&saveti);
-	return readbuf[0] == 'n';
     }
 
     /* All possible special types of input have been exhausted.  Take one line,
