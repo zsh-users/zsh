@@ -49,13 +49,14 @@ if [[ -z "$_comp_no_ignore" ]]; then
 
   zstyle -s ":completion:${curcontext}:$1" ignore-line hidden &&
     case "$hidden" in
-    true|yes|on|1) _comp_ignore=( "$_comp_ignore[@]" "$words[@]" );;
-    current)       _comp_ignore=( "$_comp_ignore[@]" "$words[CURRENT]" );;
-    current-shown) [[ "$compstate[old_list]" = *shown* ]] &&
-                       _comp_ignore=( "$_comp_ignore[@]" "$words[CURRENT]" );;
+    true|yes|on|1) _comp_ignore=( "$_comp_ignore[@]" ${(q)"${words[@]}"} );;
+    current)       _comp_ignore=( "$_comp_ignore[@]" "${(q)words[CURRENT]}" );;
+    current-shown)
+	    [[ "$compstate[old_list]" = *shown* ]] &&
+            _comp_ignore=( "$_comp_ignore[@]" "${(q)words[CURRENT]}" );;
     other)         _comp_ignore=( "$_comp_ignore[@]"
-                                  "${(@)words[1,CURRENT-1]}"
-				  "${(@)words[CURRENT+1,-1]}" );;
+                                  "${(@q)words[1,CURRENT-1]}"
+				  "${(@q)words[CURRENT+1,-1]}" );;
     esac
 
   # Ensure the ignore option is first so we can override it

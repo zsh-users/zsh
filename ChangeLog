@@ -1,3 +1,9 @@
+2009-07-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/14267: Completion/Base/Core/_description: files added
+	for the ignore-line style need to be quoted to be treated
+	literally.
+
 2009-07-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27188: Doc/Zsh/builtins.yo, Src/builtin.c, Test/B04read.ztst,
@@ -12034,5 +12040,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4750 $
+* $Revision: 1.4751 $
 *****************************************************
