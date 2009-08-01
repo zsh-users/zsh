@@ -1,5 +1,8 @@
 2009-08-01  Clint Adams  <clint@zsh.org>
 
+	* 27203: Completion/Debian/Command/_aptitude: treat
+	aptitude build-depends just as aptitude build-dep.
+
 	* 27202: Src/system.h: unbreak _GNU_SOURCE on Debian
 	GNU/kFreeBSD.
 
@@ -12045,5 +12048,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4752 $
+* $Revision: 1.4753 $
 *****************************************************
