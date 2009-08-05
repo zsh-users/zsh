@@ -160,7 +160,7 @@ if zstyle -s ":completion:${curcontext}:" file-sort tmp1; then
       if _have_glob_qual "$tmp1" complete; then
 	# unbalanced parenthesis is correct: match[1] contains the start,
 	# match[5] doesn't contain the end.
-	tmp2+=( "${match[1]}${sort}${match[5]})" )
+	tmp2+=( "${match[1]}${match[5]})(${sort})" )
       else
         tmp2+=( "${tmp1}(${sort})" )
       fi
