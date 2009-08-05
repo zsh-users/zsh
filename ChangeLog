@@ -1,5 +1,8 @@
 2009-08-05  Clint Adams  <clint@zsh.org>
 
+	* 27209: Completion/Unix/Type_path_files: fix breakage from
+	27208.
+
 	* Mikael Magnusson: 27204: Completion/Unix/Command/_patch:
 	remove stray curly brace.
 
@@ -12056,5 +12059,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4755 $
+* $Revision: 1.4756 $
 *****************************************************
