@@ -1,5 +1,8 @@
 2009-08-05  Clint Adams  <clint@zsh.org>
 
+	* Mikael Magnusson: 27204: Completion/Unix/Command/_patch:
+	remove stray curly brace.
+
 	* 27208: Completion/Unix/Type_path_files: try to do the
 	right thing when applying file-sort to extant glob qualifiers.
 
@@ -12053,5 +12056,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4754 $
+* $Revision: 1.4755 $
 *****************************************************

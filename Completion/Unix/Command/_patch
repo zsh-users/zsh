@@ -114,7 +114,7 @@ if (( ! $+_patch_args )); then
     '* --patch-root=DIR *' '--patch-root=[restrict paths]:patch root:_files -/'
 
     '* -U *' '(--unified-reject-files)-U[create unified reject files]'
-    '* --unified-reject-files *' '(-U)--unified-reject-files}[create unified reject files]'
+    '* --unified-reject-files *' '(-U)--unified-reject-files[create unified reject files]'
     '* --global-reject-file=file *' '--global-reject-file=[put all rejects into one file]:file:_files'
   )
   _patch_args=(
