@@ -3931,6 +3931,22 @@ bin_comptry(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
 #define PATH_MAX2 (PATH_MAX * 2)
 
+/*
+ * Return a list of files we should accept exactly, without
+ * trying pattern matching.
+ *
+ * This is based on the accept-exact style, which may be
+ * an array so is passed in via "accept".  The trial files
+ * are input in "names".  "skipped" is passed down straight
+ * from the file completion function:  it's got something to
+ * do with other components in the path but it's hard to work out
+ * quite what.
+ *
+ * There is one extra trick here for Cygwin.  Regardless of the style,
+ * if the file ends in a colon it has to be a drive or a special device
+ * file and we always accept it exactly because treating it as a pattern
+ * won't work.
+ */
 static LinkList
 cfp_test_exact(LinkList names, char **accept, char *skipped)
 {
@@ -3939,16 +3955,41 @@ cfp_test_exact(LinkList names, char **accept, char *skipped)
     struct stat st;
     LinkNode node;
     LinkList ret = newlinklist(), alist = NULL;
+#ifdef __CYGWIN__
+    int accept_off = 0;
+#endif
 
-    if ((!(compprefix && *compprefix) && !(compsuffix && *compsuffix)) ||
-	(!accept || !*accept ||
-	 ((!strcmp(*accept, "false") || !strcmp(*accept, "no") ||
-	   !strcmp(*accept, "off") || !strcmp(*accept, "0")) && !accept[1])))
+    /*
+     * Don't do this unless completion has provided either a
+     * prefix or suffix from the command line.
+     */
+    if (!(compprefix && *compprefix) && !(compsuffix && *compsuffix))
 	return NULL;
 
-    if (accept[1] ||
-	(strcmp(*accept, "true") && strcmp(*accept, "yes") &&
-	 strcmp(*accept, "on") && strcmp(*accept, "1"))) {
+    /*
+     * See if accept-exact is off, implicitly or explicitly.
+     */
+    if (!accept || !*accept ||
+	((!strcmp(*accept, "false") || !strcmp(*accept, "no") ||
+	  !strcmp(*accept, "off") || !strcmp(*accept, "0")) && !accept[1])) {
+#ifdef __CYGWIN__
+	accept_off = 1;
+#else
+	/* If not Cygwin, nothing to do here. */
+	return NULL;
+#endif
+    }
+
+    /*
+     * See if the style is something other than just a boolean.
+     */
+    if (
+#ifdef __CYGWIN__
+	!accept_off &&
+#endif
+	(accept[1] ||
+	 (strcmp(*accept, "true") && strcmp(*accept, "yes") &&
+	  strcmp(*accept, "on") && strcmp(*accept, "1")))) {
 	Patprog prog;
 
 	alist = newlinklist();
@@ -3963,6 +4004,10 @@ cfp_test_exact(LinkList names, char **accept, char *skipped)
 		addlinknode(alist, prog);
 	}
     }
+    /*
+     * Assemble the bits other than the set of file names:
+     * the other components, and the prefix and suffix.
+     */
     sl = strlen(skipped) + (compprefix ? strlen(compprefix) : 0) +
 	(compsuffix ? strlen(compsuffix) : 0);
 
@@ -3976,8 +4021,21 @@ cfp_test_exact(LinkList names, char **accept, char *skipped)
 	if (l + sl < PATH_MAX2) {
 	    strcpy(buf, p);
 	    strcpy(buf + l, suf);
-
+#ifdef __CYGWIN__
+	    /*
+	     * If accept-exact is not set, accept this only if
+	     * it looks like a special file such as a drive.
+	     * We still test if it exists.
+	     */
+	    if (accept_off &&
+		(strchr(buf, '/') || buf[strlen(buf)-1] != ':'))
+		continue;
+#endif
 	    if (!ztat(buf, &st, 0)) {
+		/*
+		 * File exists; if accept-exact contained non-boolean
+		 * values it must match those, too.
+		 */
 		if (alist) {
 		    LinkNode anode;
 

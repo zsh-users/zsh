@@ -1,3 +1,9 @@
+2009-08-05  Peter Stephenson  <pws@csr.com>
+
+	* 27211: Src/Zle/computil.c: Extend exact completion within
+	compfiles -p/-P to treat drives and device files specially under
+	Cygwin.
+
 2009-08-05  Clint Adams  <clint@zsh.org>
 
 	* 27209: Completion/Unix/Type_path_files: fix breakage from
@@ -12059,5 +12065,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4756 $
+* $Revision: 1.4757 $
 *****************************************************
