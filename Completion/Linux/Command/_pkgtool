@@ -12,7 +12,7 @@ case "$service" in
       "-ask[always ask on package installation regardless of package's priority]" \
       '-priority[provide a priority for the entire package list to use]:priority list:(ADD REC OPT SKP)' \
       '-tagfile[specify a different file to use for package priorities]:tagfile:_files -/' \
-      '*:package file:_files -g "*.tgz(-.)"'
+      '*:package file:_files -g "*.t[gblx]z(-.)"'
   ;;
 
   removepkg)
@@ -29,11 +29,11 @@ case "$service" in
       '--install-new[install new packages in addition to upgrading existing ones]' \
       '--reinstall[upgrade even when the same version is already installed]' \
       '--verbose[show all the gory details of the upgrade]' \
-      '*:package file:_files -g "*.tgz(-.)"'
+      '*:package file:_files -g "*.t[gblx]z(-.)"'
   ;;
 
   explodepkg)
-    _wanted file expl 'package file' _files -g '*.tgz(-.)'
+    _wanted file expl 'package file' _files -g '*.t[gblx]z(-.)'
   ;;
 
   makepkg)

@@ -1,3 +1,8 @@
+2009-08-07  Peter Stephenson  <pws@csr.com>
+
+	* Andrew Psaltis: 27212: Completion/Linux/Command/_pkgtool:
+	Slackware supports extra tar formats.
+
 2009-08-05  Peter Stephenson  <pws@csr.com>
 
 	* 27211: Src/Zle/computil.c: Extend exact completion within
@@ -12065,5 +12070,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4757 $
+* $Revision: 1.4758 $
 *****************************************************
