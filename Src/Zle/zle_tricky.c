@@ -1211,7 +1211,15 @@ get_comp_string(void)
 	    (ins == 2 && i == 2) || (ins == 3 && i == 3) ||
 	    tok == BAR    || tok == AMPER     ||
 	    tok == BARAMP || tok == AMPERBANG ||
-	    ((tok == DBAR || tok == DAMPER) && !incond)) {
+	    ((tok == DBAR || tok == DAMPER) && !incond) ||
+	    /*
+	     * Special case: we might reach a new command (incmdpos set)
+	     * if we've already found the string we're completing (tt set)
+	     * without hitting one of the above if we're using one of
+	     * the special zsh forms of delimiting for conditions and
+	     * loops that I really loathe having to support.
+	     */
+	    (tt && incmdpos)) {
 	    /* This is one of the things that separate commands.  If we  *
 	     * already have the things we need (e.g. the token strings), *
 	     * leave the loop.                                           */
