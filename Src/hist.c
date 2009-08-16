@@ -1156,6 +1156,7 @@ hend(Eprog prog)
 	zfree(chline, hlinesz);
 	zfree(chwords, chwordlen*sizeof(short));
 	chline = NULL;
+	chwords = NULL;
 	histactive = 0;
 	unqueue_signals();
 	return 1;
@@ -1270,6 +1271,7 @@ hend(Eprog prog)
     zfree(chline, hlinesz);
     zfree(chwords, chwordlen*sizeof(short));
     chline = NULL;
+    chwords = NULL;
     histactive = 0;
     if (isset(SHAREHISTORY)? histfileIsLocked() : isset(INCAPPENDHISTORY))
 	savehistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);

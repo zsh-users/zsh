@@ -1,3 +1,7 @@
+2009-08-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27216: Src/hist.c: set chwords to NULL when freed.
+
 2009-08-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/14307: Src/Zle/zle_tricky.c: end of current command in
@@ -12076,5 +12080,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4759 $
+* $Revision: 1.4760 $
 *****************************************************
