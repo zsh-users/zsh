@@ -1866,9 +1866,12 @@ ca_parse_line(Cadef d, int multi, int first)
     Caopt ptr, wasopt = NULL, dopt;
     struct castate state;
     char *line, *oline, *pe, **argxor = NULL;
-    int cur, doff, argend, arglast, ne;
+    int cur, doff, argend, arglast;
     Patprog endpat = NULL, napat = NULL;
     LinkList sopts = NULL;
+#if 0
+    int ne;
+#endif
 
     /* Free old state. */
 
@@ -1927,13 +1930,24 @@ ca_parse_line(Cadef d, int multi, int first)
 	dopt = NULL;
 	doff = state.singles = arglast = 0;
 
-        /* remove quotes */
         oline = line;
+#if 0
+        /*
+	 * remove quotes.
+	 * This is commented out:  it doesn't allow you to discriminate
+	 * between command line values that can be expanded and those
+	 * that can't, and in some cases this generates inconsistency;
+	 * for example, ~/foo\[bar unqotes to ~/foo[bar which doesn't
+	 * work either way---it's wrong if the ~ is quoted, and
+	 * wrong if the [ isn't quoted..  So it's now up to the caller to
+	 * unquote.
+	 */
         line = dupstring(line);
         ne = noerrs;
         noerrs = 2;
         parse_subst_string(line);
         noerrs = ne;
+#endif
         remnulargs(line);
         untokenize(line);
 

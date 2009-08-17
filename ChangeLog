@@ -1,3 +1,9 @@
+2009-08-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27218: Src/Zle/computil.c: don't unquote command line
+	to generate "line" in _arguments since the caller can't
+	tell what was there before.
+
 2009-08-17  Peter Stephenson  <pws@csr.com>
 
 	* 27217: Functions/Newuser/zsh-newuser-install: fix typo
@@ -12085,5 +12091,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4761 $
+* $Revision: 1.4762 $
 *****************************************************
