@@ -1,5 +1,8 @@
 2009-08-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 27219: Completion/Unix/Type/_files: "_files -F <array>" wasnʼt
+	correctly handled, which broke duplicate filtering in _rm.
+
 	* 27218: Src/Zle/computil.c: don't unquote command line
 	to generate "line" in _arguments since the caller can't
 	tell what was there before.
@@ -12091,5 +12094,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4762 $
+* $Revision: 1.4763 $
 *****************************************************
