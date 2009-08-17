@@ -1,3 +1,8 @@
+2009-08-17  Peter Stephenson  <pws@csr.com>
+
+	* 27217: Functions/Newuser/zsh-newuser-install: fix typo
+	in assignment.
+
 2009-08-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27216: Src/hist.c: set chwords to NULL when freed.
@@ -12080,5 +12085,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4760 $
+* $Revision: 1.4761 $
 *****************************************************

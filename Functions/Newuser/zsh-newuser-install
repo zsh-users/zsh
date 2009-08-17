@@ -348,7 +348,7 @@ __zni_apply_defaults() {
     (-B)
     shift
     if [[ -z $state_keymaps[main] ]]; then
-      parsed_keymaps[main] = $1
+      parsed_keymaps[main]=$1
       if [[ $1 = none ]]; then
 	state_keymaps[main]="no value set"
       else
