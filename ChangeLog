@@ -1,3 +1,8 @@
+2009-08-21  Peter Stephenson  <pws@csr.com>
+
+	* 27228: Functions/Newuser/zsh-newuser-install: add a clear
+	function if the command doesn't exist.
+
 2009-08-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27219: Completion/Unix/Type/_files: "_files -F <array>" wasnʼt
@@ -12094,5 +12099,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4763 $
+* $Revision: 1.4764 $
 *****************************************************

@@ -19,6 +19,15 @@ if (( EUID == 0 || UID == 0 )); then
   return 1
 fi
 
+# clear is missing in some Cygwin configurations (lacking ncurses)
+if ! ( clear >/dev/null 2>/dev/null ); then
+  if zmodload zsh/termcap 2>/dev/null; then
+    clear() { echotc cl; }
+  else
+    clear() { print -n "\e[H\e[J"; }
+  fi
+fi
+
 # The directory in which to look for and save .zshrc.
 local zd=${ZDOTDIR:-$HOME}
 # The same directory in a user friendly form, i.e. with ~ replacement.
