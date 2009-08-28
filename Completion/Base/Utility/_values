@@ -59,7 +59,7 @@ if compvalues -i "$@"; then
       _describe "$descr" \
         noargs "$sep[@]" -M 'r:|[_-]=* r:|=*' -- \
         args -S "${argsep}" -M 'r:|[_-]=* r:|=*' -- \
-        opts -qS "${argsep}" -M 'r:|[_-]=* r:|=*'
+        opts -qS "${argsep}" -r "${argsep}${sep} \\t\\n\\-" -M 'r:|[_-]=* r:|=*'
 
       curcontext="$oldcontext"
 

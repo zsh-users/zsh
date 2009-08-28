@@ -322,7 +322,7 @@ if (( ! $+_fs_any )); then
       '(nosuid)suid[use suid and sgid bits]'
       '(async)sync[do I/O synchronously]'
       'dirsync[perform directory updates synchronously]'
-      'loop[use loopback device]:loopback device:_files'
+      'loop[use loopback device]::loopback device:_files'
       'encryption[enable encryption]:cypher'
       'keybits[set number of bits in encryption key]:key size:(64 128 160 192 256)'
       'offset[specify data start for loopback mount]:offset (bytes)'

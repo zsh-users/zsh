@@ -1,3 +1,10 @@
+2009-08-28  Peter Stephenson  <pws@csr.com>
+
+	* 27233: Completion/Base/Utility/_values,
+	Completion/Unix/Command/_mount: improve _values handling of
+	optional arguments so that list separate removes the argument
+	separator; use this to make "mount -o loop" complete better.
+
 2009-08-21  Peter Stephenson  <pws@csr.com>
 
 	* 27228: Functions/Newuser/zsh-newuser-install: add a clear
@@ -12099,5 +12106,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4764 $
+* $Revision: 1.4765 $
 *****************************************************
