@@ -1,3 +1,8 @@
+2009-09-02  Peter Stephenson  <pws@csr.com>
+
+	* 27240: Src/builtin.c: 27079 caused later use of tokstr and tok
+	to be invalid.
+
 2009-08-28  Peter Stephenson  <pws@csr.com>
 
 	* 27233: Completion/Base/Utility/_values,
@@ -12106,5 +12111,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4765 $
+* $Revision: 1.4766 $
 *****************************************************

@@ -5818,17 +5818,19 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
     testlex();
     prog = parse_cond();
     condlex = zshlex;
-    lexrestore();
 
     if (errflag) {
 	errflag = 0;
+	lexrestore();
 	return 1;
     }
 
     if (!prog || tok == LEXERR) {
 	zwarnnam(name, tokstr ? "parse error" : "argument expected");
+	lexrestore();
 	return 1;
     }
+    lexrestore();
 
     if (*curtestarg) {
 	zwarnnam(name, "too many arguments");
