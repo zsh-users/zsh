@@ -1345,6 +1345,11 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    len = arrlen(ta);
 	    if (beg < 0)
 		beg += len;
+	    if (down) {
+		if (beg < 0)
+		    return 0;
+	    } else if (beg >= len)
+		return len + 1;
 	    if (beg >= 0 && beg < len) {
 		if (down) {
 		    if (!hasbeg)
@@ -1363,6 +1368,11 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    len = arrlen(ta);
 	    if (beg < 0)
 		beg += len;
+	    if (down) {
+		if (beg < 0)
+		    return 0;
+	    } else if (beg >= len)
+		return len + 1;
 	    if (beg >= 0 && beg < len) {
 		if (down) {
 		    if (!hasbeg)

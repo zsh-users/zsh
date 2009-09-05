@@ -998,6 +998,34 @@
 >sunny
 >day
 
+# ' emacs likes this close quote
+
+  a=(sping spang spong bumble)
+  print ${a[(i)spong]}
+  print ${a[(i)spung]}
+  print ${a[(ib.1.)spong]}
+  print ${a[(ib.4.)spong]}
+  print ${a[(ib.10.)spong]}
+0:In and out of range reverse matched indices without and with b: arrays
+>3
+>5
+>3
+>5
+>5
+
+  a="thrimblewuddlefrong"
+  print ${a[(i)w]}
+  print ${a[(i)x]}
+  print ${a[(ib.3.)w]}
+  print ${a[(ib.10.)w]}
+  print ${a[(ib.30.)w]}
+0:In and out of range reverse matched indices without and with b: strings
+>9
+>20
+>9
+>20
+>20
+
   foo="line:with::missing::fields:in:it"
   print -l ${(s.:.)foo}
 0:Removal of empty fields in unquoted splitting

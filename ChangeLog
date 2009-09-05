@@ -1,3 +1,9 @@
+2009-09-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27243: Src/params.c, Test/D04parameter.ztst: reverse
+	indexing in array parameters with a beginning index out of range
+	returned the wrong value.
+
 2009-09-02  Peter Stephenson  <pws@csr.com>
 
 	* 27240: Src/builtin.c: 27079 caused later use of tokstr and tok
@@ -12111,5 +12117,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4766 $
+* $Revision: 1.4767 $
 *****************************************************
