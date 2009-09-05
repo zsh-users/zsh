@@ -1,5 +1,9 @@
 2009-09-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Daniel Friesel <derf@tabularazor.org: 27244:
+	Completion/Unix/Command/_feh, Completion/Unix/Command/.distfils:
+	new completion.
+
 	* 27243: Src/params.c, Test/D04parameter.ztst: reverse
 	indexing in array parameters with a beginning index out of range
 	returned the wrong value.
@@ -12117,5 +12121,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4767 $
+* $Revision: 1.4768 $
 *****************************************************
