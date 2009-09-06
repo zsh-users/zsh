@@ -1,3 +1,7 @@
+2009-09-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27247: Functions/Misc/zmv: checking for "**/" was wrong.
+
 2009-09-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Daniel Friesel <derf@tabularazor.org: 27244:
@@ -12121,5 +12125,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4768 $
+* $Revision: 1.4769 $
 *****************************************************

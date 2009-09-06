@@ -187,7 +187,7 @@ if [[ -n $opt_w || -n $opt_W ]]; then
   # Well, this seems to work.
   # The tricky bit is getting all forms of [...] correct, but as long
   # as we require inactive bits to be backslashed its not so bad.
-  find='(#m)((\*\*#/|[*?]|<[0-9]#-[0-9]#>|\[(^|)(\]|)(\[:[a-z]##:\]|\\?|[^\]])##\])\##|?\###)'
+  find='(#m)((\*\*##/|[*?]|<[0-9]#-[0-9]#>|\[(^|)(\]|)(\[:[a-z]##:\]|\\?|[^\]])##\])\##|?\###)'
   tmp="${pat//${~find}/$[++cnt]}"
   if [[ $cnt = 0 ]]; then
     print -r -- "$myname: warning: no wildcards were found in search pattern" >&2
