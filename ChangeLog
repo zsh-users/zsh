@@ -1,5 +1,9 @@
 2009-09-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Holger Weiss <holger@CIS.FU-Berlin.DE>: 27248:
+	Src/Zle/zle_hist.c: anchoring of vi search was wrong because
+	of reversed prefix matching.
+
 	* 27247: Functions/Misc/zmv: checking for "**/" was wrong.
 
 2009-09-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
@@ -12125,5 +12129,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4769 $
+* $Revision: 1.4770 $
 *****************************************************

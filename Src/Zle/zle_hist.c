@@ -1942,7 +1942,7 @@ virepeatsearch(UNUSED(char **args))
 	    continue;
 	zt = GETZLETEXT(he);
 	if (zlinecmp(zt, zlemetaline) &&
-	    (*visrchstr == '^' ? strpfx(zt, visrchstr + 1) :
+	    (*visrchstr == '^' ? strpfx(visrchstr + 1, zt) :
 	     zlinefind(zt, 0, visrchstr, 1, 1) != 0)) {
 	    if (--n <= 0) {
 		unmetafy_line();
