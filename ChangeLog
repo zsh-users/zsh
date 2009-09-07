@@ -1,3 +1,8 @@
+2009-09-07  Peter Stephenson  <pws@csr.com>
+
+	* 27236 (somewhat late): configure.ac: use $CPPFLAGS
+	after all occurrences of $CPP and see what happens.
+
 2009-09-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Holger Weiss <holger@CIS.FU-Berlin.DE>: 27248:
@@ -12129,5 +12134,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4770 $
+* $Revision: 1.4771 $
 *****************************************************

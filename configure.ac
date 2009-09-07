@@ -1345,7 +1345,7 @@ dnl but then you can get a rather long list of files to test.
 dnl The backslash substitution is to persuade cygwin to cough up
 dnl slashes rather than doubled backslashes in the path.
 echo "#include <signal.h>" > nametmp.c
-sigfile_list="`$CPP nametmp.c |
+sigfile_list="`$CPP $CPPFLAGS nametmp.c |
 sed -n -e 's/^#line[ 	].*\"\(.*\)\"/\1/p' \
        -e 's/^#[ 	].*\"\(.*\)\"/\1/p' |
 sed 's/\\\\\\\\/\//g' |
@@ -1393,7 +1393,7 @@ dnl but then you can get a rather long list of files to test.
 dnl The backslash substitution is to persuade cygwin to cough up
 dnl slashes rather than doubled backslashes in the path.
 echo "#include <errno.h>" > nametmp.c
-errfile_list="`$CPP nametmp.c |
+errfile_list="`$CPP $CPPFLAGS nametmp.c |
 sed -n -e 's/^#line[ 	].*\"\(.*\)\"/\1/p' \
        -e 's/^#[ 	0-9].*\"\(.*\)\"/\1/p' |
 sed 's/\\\\\\\\/\//g' |
@@ -1462,7 +1462,7 @@ else
   echo "#include <$zsh_cv_path_curses_header>" >nametmp.c
 fi
 
-curses_list="`$CPP nametmp.c |
+curses_list="`$CPP $CPPFLAGS nametmp.c |
 sed -n -e 's/^#line[ 	].*\"\(.*\)\"/\1/p' \
        -e 's/^#[ 	0-9].*\"\(.*\)\"/\1/p' |
 sed 's/\\\\\\\\/\//g' |
@@ -1584,7 +1584,7 @@ AC_CACHE_CHECK(where the RLIMIT macros are located,zsh_cv_path_rlimit_h,
 [dnl Look at the output from the preprocessor.
 dnl Copied from the search for the signal names above.
 echo "#include <sys/resource.h>" >restmp.c
-resourcefile_list="`$CPP restmp.c |
+resourcefile_list="`$CPP $CPPFLAGS restmp.c |
 sed -n -e 's/^#line[ 	].*\"\(.*\)\"/\1/p' \
        -e 's/^#[ 	].*\"\(.*\)\"/\1/p' |
 sed 's/\\\\\\\\/\//g' |
