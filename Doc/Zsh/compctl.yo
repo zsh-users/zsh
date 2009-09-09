@@ -177,10 +177,10 @@ These produce completion lists made up by the shell itself:
 
 startitem()
 item(tt(-f))(
-Filenames and filesystem paths.
+Filenames and file system paths.
 )
 item(tt(-/))(
-Just filesystem paths.
+Just file system paths.
 )
 item(tt(-c))(
 Command names, including aliases, shell functions, builtins

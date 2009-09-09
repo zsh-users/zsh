@@ -1,3 +1,9 @@
+2009-09-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Greg Klanderman: 27255: Doc/Zsh/builtins.yo,
+	Doc/Zsh/compctl.yo, Doc/Zsh/compsys.yo, Doc/Zsh/contrib.yo:
+	some consistency fixes.
+
 2009-09-07  Peter Stephenson  <pws@csr.com>
 
 	* 27236 (somewhat late): configure.ac: use $CPPFLAGS
@@ -12134,5 +12140,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4771 $
+* $Revision: 1.4772 $
 *****************************************************

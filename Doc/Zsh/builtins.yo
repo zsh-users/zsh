@@ -2055,7 +2055,7 @@ loaded but not all features could be enabled, tt(zmodload) returns status 2.
 
 With tt(-u), tt(zmodload) unloads modules.  The same var(name)
 must be given that was given when the module was loaded, but it is not
-necessary for the module to exist in the filesystem.
+necessary for the module to exist in the file system.
 The tt(-i) option suppresses the error if the module is already
 unloaded (or was never loaded).
 

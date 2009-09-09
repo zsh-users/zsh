@@ -2565,7 +2565,7 @@ in place of the default alias.  See `Accessing On-Line Help'
 ifzman(above)\
 ifnzman((noderef(Utilities))) for setup instructions.
 
-In the discussion which follows, if var(cmd) is a filesystem path, it is
+In the discussion which follows, if var(cmd) is a file system path, it is
 first reduced to its rightmost component (the file name).
 
 Help is first sought by looking for a file named var(cmd) in the directory

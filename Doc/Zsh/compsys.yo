@@ -1387,16 +1387,16 @@ without a tag.  Its values are of the form
 separated by spaces) as
 possible matches when completing in the directory var(dir), even if no 
 such files really exist.  The dir may be a pattern; pattern characters
-or colons in var(dir) should be quote with a backslash to be treated
+or colons in var(dir) should be quoted with a backslash to be treated
 literally.
 
-This can be useful on systems that support special filesystems whose
+This can be useful on systems that support special file systems whose
 top-level pathnames can not be listed or generated with glob patterns.
 It can also be used for directories for which one does not have read
 permission.
 
 The pattern form can be used to add a certain `magic' entry
-to all directories on a particular filing system.
+to all directories on a particular file system.
 )
 kindex(fake-parameters, completion style)
 item(tt(fake-parameters))(
@@ -1952,7 +1952,7 @@ completing options).  It defaults to `tt(-)tt(-)' (two hyphens).
 kindex(local, completion style)
 item(tt(local))(
 This is for use with functions that complete URLs for which the
-corresponding files are available directly from the filing system.
+corresponding files are available directly from the file system.
 Its value should consist of three strings: a
 hostname, the path to the default web pages for the server, and the
 directory name used by a user placing web pages within their home
