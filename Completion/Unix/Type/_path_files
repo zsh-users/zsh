@@ -247,7 +247,11 @@ if [[ "$pre" = [^][*?#^\|\<\>\\]#(\`[^\`]#\`|\$)*/* && "$compstate[quote]" != \'
   # meant as a partial path.
 
   linepath="${(M)pre##*\$[^/]##/}"
-  eval 'realpath=${(e)~linepath}' 2>/dev/null
+  function {
+    # do not treat an unset parameter expansion as the empty string
+    setopt localoptions nounset
+    eval 'realpath=${(e)~linepath}' 2>/dev/null
+  }
   [[ -z "$realpath" || "$realpath" = "$linepath" ]] && return 1
   pre="${pre#${linepath}}"
   i='[^/]'
