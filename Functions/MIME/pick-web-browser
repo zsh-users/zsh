@@ -74,16 +74,11 @@ for bstyle in $bstyles; do
 
     # Get the name of all windows running; use the internal name, not
     # the friendly name, which is less useful.
-    #
-    # The nasty but portable version.
-    # The nice but non-portable version uses Perl, even though perl
-    # is more portable.
-    #    windows=(${(f)"$(xwininfo -root -all | 
-    #	sed -ne 's/.*".*": ("\(.*\)" ".*").*/\1/p' |sort | uniq)"})
 
-    windows=(${(f)"$(xwininfo -root -all | 
-         perl -ne '/.*"(.*)": \("(.*)" "(.*)"\).*/ and $w{$2} = 1;
-                   END { print join("\n", keys %w), "\n" }')"})
+    windows=(${(ou)${(M)${(f)"$(xwininfo -root -all)"}:#*\"*\"\:[[:space:]]\(\"*}/(#b)*\"*\"\:[[:space:]]\(\"(*)\"[[:space:]]\"*\"\)*/$match[1]})
+    #windows=(${(f)"$(xwininfo -root -all |
+    #     perl -ne '/.*"(.*)": \("(.*)" "(.*)"\).*/ and $w{$2} = 1;
+    #               END { print join("\n", keys %w), "\n" }')"})
 
     # Is any browser we've heard of running?
     for browser in $xbrowsers; do
