@@ -220,8 +220,7 @@ The commands for retrieving files all take at least two options. tt(-G)
 suppresses remote filename expansion which would otherwise be performed
 (see below for a more detailed description of that).  tt(-t) attempts
 to set the modification time of the local file to that of the remote file:
-this requires version 5 of tt(perl), see the description of the function
-tt(zfrtime) below for more information.
+see the description of the function tt(zfrtime) below for more information.
 
 startitem()
 findex(zfget)
@@ -462,11 +461,9 @@ findex(zfrtime)
 item(tt(zfrtime var(lfile) var(rfile) [ var(time) ]))(
 Set the local file var(lfile) to have the same modification time as the
 remote file var(rfile), or the explicit time var(time) in FTP format
-tt(CCYYMMDDhhmmSS) for the GMT timezone.
-
-Currently this requires tt(perl) version 5 to perform the conversion from
-GMT to local time.  This is unfortunately difficult to do using shell code
-alone.
+tt(CCYYMMDDhhmmSS) for the GMT timezone.  This uses the shell's
+tt(zsh/datetime) module to perform the conversion from
+GMT to local time.
 )
 findex(zftp_chpwd, supplied version)
 item(tt(zftp_chpwd))(

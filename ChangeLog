@@ -1,3 +1,9 @@
+2009-09-11  Peter Stephenson  <pws@csr.com>
+
+	* Baptiste Daroussin: 27267 plus 27269 plus doc:
+	Functions/Zftp/zfrtime, Doc/Zsh/zftpsys.yo: remove perl
+	dependency.
+
 2009-09-10  Peter Stephenson  <pws@csr.com>
 
 	* Greg Klanderman: 27259 / 27260:
@@ -12146,5 +12152,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4773 $
+* $Revision: 1.4774 $
 *****************************************************

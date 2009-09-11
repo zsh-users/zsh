@@ -6,12 +6,13 @@
 #
 # Unfortunately, since the time returned from FTP is GMT and
 # your file needs to be set in local time, we need to do some
-# hacking around with time.  At the moment this requires perl 5
-# with the standard library.
+# hacking around with time.
 
 emulate -L zsh
+zmodload zsh/datetime
 
-local time gmtime loctime
+local time gmtime loctime year mon mday hr min sec y tmpdate
+local -i days_since_epoch
 
 if [[ -n $3 ]]; then
   time=$3
@@ -21,25 +22,22 @@ else
 fi
 [[ -z $time ]] && return 1
 
-# Now's the real *!@**!?!.  We have the date in GMT and want to turn
-# it into local time for touch to handle.  It's just too nasty
-# to handle in zsh; do it in perl.
-if perl -mTime::Local -e '($file, $t) = @ARGV;
-$yr = substr($t, 0, 4) - 1900;
-$mon = substr($t, 4, 2) - 1;
-$mday = substr($t, 6, 2) + 0;
-$hr = substr($t, 8, 2) + 0;
-$min = substr($t, 10, 2) + 0;
-$sec = substr($t, 12, 2) + 0;
-$time = Time::Local::timegm($sec, $min, $hr, $mday, $mon, $yr);
-utime $time, $time, $file and return 0;' $1 $time 2>/dev/null; then
-  print "Setting time for $1 failed.  Need perl 5." 2>1
-fi
+year=$time[1,4]
+mon=$time[5,6]
+mday=$time[7,8]
+hr=$time[9,10]
+min=$time[11,12]
+sec=$time[13,14]
 
-# If it wasn't for the GMT/local time thing, it would be this simple.
-#
-# time="${time[1,12]}.${time[13,14]}"
-#
-# touch -t $time $1
-
-# }
+#count the number of days since epoch without the current day
+for y  in {1970..$(( $year - 1))}; do
+  strftime -s tmpdate -r "%Y/%m/%d" ${y}/12/31
+  days_since_epoch+=$(strftime "%j" $tmpdate)
+done
+strftime -s tmpdate -r "%Y/%m/%d" $year/$mon/$(( $mday - 1 ))
+days_since_epoch+=$(strftime "%j" $tmpdate)
+# convert the time in number of seconds (this should be equivalent to timegm)
+time=$(( $sec + 60 * ( $min + 60 * ($hr + 24 * $days_since_epoch))  ))
+#Convert it back to CCYYMMDDhhmmSS
+strftime -s time "%Y%m%d%H%M%S" ${EPOCHSECONDS}
+touch -t ${time[1,12]}.${time[13,14]} $1
