@@ -1,3 +1,9 @@
+2009-09-10  Peter Stephenson  <pws@csr.com>
+
+	* Greg Klanderman: 27259 / 27260:
+	Completion/Unix/Type/_path_files: make unset parameters in
+	file prefix not be treated as empty.
+
 2009-09-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Greg Klanderman: 27255: Doc/Zsh/builtins.yo,
@@ -12140,5 +12146,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4772 $
+* $Revision: 1.4773 $
 *****************************************************
