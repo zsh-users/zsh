@@ -1,5 +1,8 @@
 2009-09-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Baptiste Daroussin: 27271: Functions/Zftp/zfanon: remove awk
+	dependence.
+
 	* Baptiste Daroussin: 27270: Functions/Zftp/zfcd_match: remove
 	awk dependence.
 
@@ -12160,5 +12163,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4776 $
+* $Revision: 1.4777 $
 *****************************************************

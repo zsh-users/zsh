@@ -23,12 +23,11 @@ if [[ -z $EMAIL_ADDR ]]; then
     host=$HOST
   elif [[ -f /etc/resolv.conf ]]; then
     # Next, maybe we've got resolv.conf.
-    domain=$(awk '/domain/ { print $2 }' /etc/resolv.conf)
+    domain=${${=${(M)${(f)"$(</etc/resolv.conf)"}:#domain*}}[2]}
     [[ -n $domain ]] && host=$HOST.$domain
   fi
-  # Next, maybe we've got nlsookup.  May not work on LINUX.
-  [[ -z $host ]] && host=$(nslookup $HOST 2>/dev/null |
-    awk '/Name:/ { print $2 }')
+  # Next, maybe we've got nslookup.  May not work on LINUX.
+  [[ -z $host ]] && host=${${=${(M)${(f)"$(nslookup $HOST 2>/dev/null)"}:#Name:*}}[2]}
   if [[ -z $host ]]; then
     # we're running out of ideas, but this should work.
     # after all, i wrote it...
