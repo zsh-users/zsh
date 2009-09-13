@@ -1,6 +1,7 @@
 # function zfcd_match {
 
 emulate -L zsh
+setopt extendedglob
 
 # see zfcd for details of this hack
 if [[ $1 = $HOME || $1 = $HOME/* ]]; then
@@ -24,10 +25,10 @@ if [[ $ZFTP_SYSTEM = UNIX* ]]; then
   fi
   # If we're using -F, we get away with using a directory
   # to list, but not a glob.  Don't ask me why.
-  # I hate having to rely on awk here.
-  zftp ls -LF $dir >$tmpf
-  reply=($(awk '/\/$/ { print substr($1, 1, length($1)-1) }' $tmpf))
-  rm -f $tmpf
+  reply=(${${(M)${(f)"$(zftp ls -lF $dir)"}:#d*}/(#b)*[[:space:]](*)\//$match[1]})
+#  zftp ls -LF $dir >$tmpf
+#  reply=($(awk '/\/$/ { print substr($1, 1, length($1)-1) }' $tmpf))
+#  rm -f $tmpf
   [[ -n $dir && $dir != */ ]] && dir="$dir/"
   if [[ -n $WIDGET ]]; then
     _wanted directories expl 'remote directory' \

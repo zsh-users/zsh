@@ -1,3 +1,8 @@
+2009-09-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Baptiste Daroussin: 27270: Functions/Zftp/zfcd_match: remove
+	awk dependence.
+
 2009-09-11  Peter Stephenson  <pws@csr.com>
 
 	* Baptiste Daroussin: 27268: Functions/MIME/pick-web-browser:
@@ -12155,5 +12160,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4775 $
+* $Revision: 1.4776 $
 *****************************************************
