@@ -359,7 +359,7 @@ for prepath in "$prepaths[@]"; do
     tmp1=$match[1]
     tpre=$match[2]
     while true; do
-      if [[ -d $donepath$tmp1 ]]; then
+      if [[ -d $prepath$realpath$donepath$tmp1 ]]; then
 	donepath=$donepath$tmp1/
 	pre=$tpre
 	break

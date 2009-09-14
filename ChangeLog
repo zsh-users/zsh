@@ -1,3 +1,8 @@
+2009-09-14  Peter Stephenson  <pws@csr.com>
+
+	* Greg Klanderman: 27262: Completion/Unix/Type/_path_files:
+	prefixes were incorrect with accept-exact-dirs style.
+
 2009-09-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Baptiste Daroussin: 27271: Functions/Zftp/zfanon: remove awk
@@ -42,7 +47,7 @@
 
 2009-09-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* Daniel Friesel <derf@tabularazor.org: 27244:
+	* Daniel Friesel <derf@tabularazor.org>: 27244:
 	Completion/Unix/Command/_feh, Completion/Unix/Command/.distfils:
 	new completion.
 
@@ -12163,5 +12168,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4777 $
+* $Revision: 1.4778 $
 *****************************************************
