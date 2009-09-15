@@ -366,10 +366,10 @@ texinode(Alternate Forms For Complex Commands)(Reserved Words)(Complex Commands)
 sect(Alternate Forms For Complex Commands)
 cindex(alternate forms for complex commands)
 cindex(commands, alternate forms for complex)
-Many of zsh's complex commands have alternate forms.  These particular
-versions of complex commands should be considered deprecated and may be
-removed in the future.  The versions in the previous section should be
-preferred instead.
+Many of zsh's complex commands have alternate forms.  These are
+non-standard and are likely not to be obvious even to seasoned shell
+programmers; they should not be used anywhere that portability of shell
+code is a concern.
 
 The short versions below only work if var(sublist) is of the form `tt({)
 var(list) tt(})' or if the tt(SHORT_LOOPS) option is set.  For the tt(if),

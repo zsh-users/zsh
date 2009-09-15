@@ -1,3 +1,9 @@
+2009-09-15  Peter Stephenson  <pws@csr.com>
+
+	* users/14387 (tweaked): Doc/Zsh/grammar.yo: alternative syntax is
+	not about to disappear, but does make shell scripts less portable
+	and possibly readable.
+
 2009-09-14  Peter Stephenson  <pws@csr.com>
 
 	* Greg Klanderman: 27262: Completion/Unix/Type/_path_files:
@@ -12168,5 +12174,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4778 $
+* $Revision: 1.4779 $
 *****************************************************
