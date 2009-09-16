@@ -13,6 +13,9 @@ _arguments -s \
     '-k[keep temporary copies of failed updates]' \
     '-l[Lock file]:lock file:_files' \
     '-L[Verbosity level]:verbosity level:(0 1 2)' \
+    '-L0[Verbosity level 0]' \
+    '-L1[Verbosity level 1]' \
+    '-L2[Verbosity level 2]' \
     '-p[Server port]:port:_ports' \
     '-r[maximum number of retries]:maximum number of retries:' \
     '-s[suppress status checks]' \

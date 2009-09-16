@@ -1,3 +1,8 @@
+2009-09-16  Peter Stephenson  <pws@csr.com>
+
+	* Baptiste Daroussin: 27277: Completion/BSD/Command/_csup: Improve
+	csup completion.
+
 2009-09-15  Peter Stephenson  <pws@csr.com>
 
 	* users/14387 (tweaked): Doc/Zsh/grammar.yo: alternative syntax is
@@ -12174,5 +12179,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4779 $
+* $Revision: 1.4780 $
 *****************************************************
