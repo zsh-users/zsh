@@ -36,7 +36,7 @@ The option `tt(-t) var(timeout)' specifies a timeout in hundredths of a
 second.  This may be zero, in which case the file descriptors will simply
 be polled and tt(zselect) will return immediately.  It is possible to call
 zselect with no file descriptors and a non-zero timeout for use as a
-finer-grained replacement for `sleep'; not, however, the return status is
+finer-grained replacement for `sleep'; note, however, the return status is
 always 1 for a timeout.
 
 The option `tt(-a) var(array)' indicates that tt(array) should be set to

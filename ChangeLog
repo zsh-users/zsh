@@ -1,3 +1,8 @@
+2009-09-18  Peter Stephenson  <pws@csr.com>
+
+	* Mikael: 27279: Doc/Zsh/builtins.yo, Doc/Zsh/mod_zselect.yo:
+	minor tweaks.
+
 2009-09-16  Peter Stephenson  <pws@csr.com>
 
 	* Baptiste Daroussin: 27277: Completion/BSD/Command/_csup: Improve
@@ -12179,5 +12184,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4780 $
+* $Revision: 1.4781 $
 *****************************************************

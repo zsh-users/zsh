@@ -1195,6 +1195,7 @@ block on the second character.  Use two instances of `tt(read -t -k)' if
 this is not what is wanted.
 )
 enditem()
+
 If the first argument contains a `tt(?)', the remainder of this
 word is used as a var(prompt) on standard error when the shell
 is interactive.
