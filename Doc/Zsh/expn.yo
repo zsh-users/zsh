@@ -117,7 +117,7 @@ repeats the last command, replacing the string var(foo) with var(bar).
 More precisely, the sequence `tt(^)var(foo)tt(^)var(bar)tt(^)' is
 synonymous with `tt(!!:s)tt(^)var(foo)tt(^)var(bar)tt(^)', hence other
 modifiers (see noderef(Modifiers)) may follow the final `tt(^)'.
-In particular, `tt(^)var(foo)tt(^)var(bar)tt(:G)' performs a global
+In particular, `tt(^)var(foo)tt(^)var(bar)tt(^:G)' performs a global
 substitution.
 
 If the shell encounters the character sequence `tt(!")'

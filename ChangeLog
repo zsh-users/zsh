@@ -1,3 +1,8 @@
+2009-09-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Holger Weiss: 27281: Doc/Zsh/expn.yo: example of global
+	history substitution was wrong.
+
 2009-09-18  Peter Stephenson  <pws@csr.com>
 
 	* Mikael: 27279: Doc/Zsh/builtins.yo, Doc/Zsh/mod_zselect.yo:
@@ -12184,5 +12189,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4781 $
+* $Revision: 1.4782 $
 *****************************************************
