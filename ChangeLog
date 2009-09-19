@@ -1,5 +1,8 @@
 2009-09-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Darel Henman: users/14412: Doc/Zsh/builtins.yo: fix confusions
+	in explanation of getopts option arguments.
+
 	* Holger Weiss: 27281: Doc/Zsh/expn.yo: example of global
 	history substitution was wrong.
 
@@ -12189,5 +12192,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4782 $
+* $Revision: 1.4783 $
 *****************************************************

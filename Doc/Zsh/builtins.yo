@@ -671,7 +671,7 @@ a `tt(PLUS())' or a `tt(-)', or the argument `tt(-)tt(-)', ends the options.
 Note that a single `tt(-)' is not considered a valid option argument.
 var(optstring) contains the letters that tt(getopts)
 recognizes.  If a letter is followed by a `tt(:)', that option
-is expected to have an argument.  The options can be
+requires an argument.  The options can be
 separated from the argument by blanks.
 
 Each time it is invoked, tt(getopts) places the option letter it finds
@@ -692,7 +692,7 @@ stored.  The option itself is still stored in var(name) in this case.
 
 A leading `tt(:)' in var(optstring) causes tt(getopts) to store the
 letter of any invalid option in tt(OPTARG), and to set var(name) to
-`tt(?)' for an unknown option and to `tt(:)' when a required option is
+`tt(?)' for an unknown option and to `tt(:)' when a required argument is
 missing.  Otherwise, tt(getopts) sets var(name) to `tt(?)' and prints
 an error message when an option is invalid.  The exit status is
 nonzero when there are no more options.
