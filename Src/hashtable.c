@@ -630,20 +630,50 @@ hashdir(char **dirp)
 {
     Cmdnam cn;
     DIR *dir;
-    char *fn;
+    char *fn, *unmetadir, *pathbuf, *pathptr;
+    int dirlen;
 #if defined(_WIN32) || defined(__CYGWIN__)
     char *exe;
 #endif /* _WIN32 || _CYGWIN__ */
 
-    if (isrelative(*dirp) || !(dir = opendir(unmeta(*dirp))))
+    if (isrelative(*dirp))
 	return;
+    unmetadir = unmeta(*dirp);
+    if (!(dir = opendir(unmetadir)))
+	return;
+
+    dirlen = strlen(unmetadir);
+    pathbuf = (char *)zalloc(dirlen + PATH_MAX + 2);
+    sprintf(pathbuf, "%s/", unmetadir);
+    pathptr = pathbuf + dirlen + 1;
 
     while ((fn = zreaddir(dir, 1))) {
 	if (!cmdnamtab->getnode(cmdnamtab, fn)) {
-	    cn = (Cmdnam) zshcalloc(sizeof *cn);
-	    cn->node.flags = 0;
-	    cn->u.name = dirp;
-	    cmdnamtab->addnode(cmdnamtab, ztrdup(fn), cn);
+	    char *fname = ztrdup(fn);
+	    struct stat statbuf;
+	    int add = 0, dummylen;
+
+	    unmetafy(fn, &dummylen);
+	    if (strlen(fn) > PATH_MAX) {
+		/* Too heavy to do all the allocation */
+		add = 1;
+	    } else {
+		strcpy(pathptr, fn);
+		/*
+		 * This is the same test as for the glob qualifier for
+		 * executable plain files.
+		 */
+		if (stat(pathbuf, &statbuf) == 0 &&
+		    S_ISREG(statbuf.st_mode) && (statbuf.st_mode & S_IXUGO))
+		    add = 1;
+	    }
+	    if (add) {
+		cn = (Cmdnam) zshcalloc(sizeof *cn);
+		cn->node.flags = 0;
+		cn->u.name = dirp;
+		cmdnamtab->addnode(cmdnamtab, fname, cn);
+	    } else
+		zsfree(fname);
 	}
 #if defined(_WIN32) || defined(__CYGWIN__)
 	/* Hash foo.exe as foo, since when no real foo exists, foo.exe
@@ -664,6 +694,7 @@ hashdir(char **dirp)
 #endif /* _WIN32 || __CYGWIN__ */
     }
     closedir(dir);
+    zfree(pathbuf, dirlen + PATH_MAX + 2);
 }
 
 /* Go through user's PATH and add everything to *

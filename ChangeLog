@@ -1,3 +1,8 @@
+2009-09-21  Peter Stephenson  <pws@csr.com>
+
+	* users/14411: Src/hashtable.c: only hash stat-able executable
+	regular files in the command table.
+
 2009-09-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Darel Henman: users/14412: Doc/Zsh/builtins.yo: fix confusions
@@ -12192,5 +12197,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4783 $
+* $Revision: 1.4784 $
 *****************************************************
