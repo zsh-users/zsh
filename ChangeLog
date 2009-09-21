@@ -1,3 +1,8 @@
+2009-09-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27283: Src/exec.c, Src/utils.c: failure to dup fd accessed
+	uninitialised memory and closed the original fd regardless.
+
 2009-09-21  Peter Stephenson  <pws@csr.com>
 
 	* users/14411: Src/hashtable.c: only hash stat-able executable
@@ -12197,5 +12202,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4784 $
+* $Revision: 1.4785 $
 *****************************************************

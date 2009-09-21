@@ -1631,7 +1631,8 @@ movefd(int fd)
 #else
 	int fe = movefd(dup(fd));
 #endif
-	zclose(fd);
+	if (fe != -1)
+	    zclose(fd);
 	fd = fe;
     }
     if(fd != -1) {

@@ -1980,6 +1980,7 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag,
 		     */
 		    if (fdN < 0 && errno != EBADF) {
 			zerr("cannot duplicate fd %d: %e", fd1, errno);
+			mfds[fd1] = NULL;
 			closemnodes(mfds);
 			return;
 		    }
