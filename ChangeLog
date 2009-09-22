@@ -1,3 +1,9 @@
+2009-09-22  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 27286: Src/Modules/socket.c Src/Modules/tcp.c Src/utils.c:
+	Made movefd() return the targetfd on success.  Added a little
+	more error checking in the callers of movefd().
+
 2009-09-22  Peter Stephenson  <pws@csr.com>
 
 	* 27284: Src/exec.c, Src/parse.c, Src/utils.c,
@@ -12209,5 +12215,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4786 $
+* $Revision: 1.4787 $
 *****************************************************

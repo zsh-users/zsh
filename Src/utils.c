@@ -1654,14 +1654,14 @@ movefd(int fd)
 
 /*
  * Move fd x to y.  If x == -1, fd y is closed.
- * Return 0 for success, -1 for failure.
+ * Returns y for success, -1 for failure.
  */
 
 /**/
 mod_export int
 redup(int x, int y)
 {
-    int ret = 0;
+    int ret = y;
 
     if(x < 0)
 	zclose(y);

@@ -120,10 +120,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 
 	if (targetfd) {
-	    if (redup(sfd, targetfd) == -1)
-		sfd = -1;
-	    else
-		sfd = targetfd;
+	    sfd = redup(sfd, targetfd);
 	}
 	else {
 	    /* move the fd since no one will want to read from it */
@@ -205,8 +202,11 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 
 	if (targetfd) {
-	    redup(rfd, targetfd);
-	    sfd = targetfd;
+	    sfd = redup(rfd, targetfd);
+	    if (sfd < 0) {
+		zerrnam(nam, "could not duplicate socket fd to %d: %e", targetfd, errno);
+		return 1;
+	    }
 	}
 	else {
 	    sfd = rfd;
@@ -242,8 +242,11 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	else
 	{
 	    if (targetfd) {
-		redup(sfd, targetfd);
-		sfd = targetfd;
+		sfd = redup(sfd, targetfd);
+		if (sfd < 0) {
+		    zerrnam(nam, "could not duplicate socket fd to %d: %e", targetfd, errno);
+		    return 1;
+		}
 	    }
 
 	    setiparam("REPLY", sfd);
