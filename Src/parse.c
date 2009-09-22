@@ -3095,6 +3095,8 @@ load_dump_file(char *dump, struct stat *sbuf, int other, int len)
 	return;
 
     fd = movefd(fd);
+    if (fd == -1)
+	return;
 
     if ((addr = (Wordcode) mmap(NULL, mlen, PROT_READ, MAP_SHARED, fd, off)) ==
 	((Wordcode) -1)) {

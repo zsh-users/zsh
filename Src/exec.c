@@ -1958,14 +1958,19 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag,
     if (varid) {
 	/* fd will be over 10, don't touch mfds */
 	fd1 = movefd(fd2);
-	fdtable[fd1] = FDT_EXTERNAL;
-	setiparam(varid, (zlong)fd1);
-	/*
-	 * If setting the parameter failed, close the fd else
-	 * it will leak.
-	 */
-	if (errflag)
-	    zclose(fd1);
+	if (fd1 == -1) {
+	    zerr("cannot moved fd %d: %e", fd2, errno);
+	    return;
+	} else {
+	    fdtable[fd1] = FDT_EXTERNAL;
+	    setiparam(varid, (zlong)fd1);
+	    /*
+	     * If setting the parameter failed, close the fd else
+	     * it will leak.
+	     */
+	    if (errflag)
+		zclose(fd1);
+	}
     } else if (!mfds[fd1] || unset(MULTIOS)) {
 	if(!mfds[fd1]) {		/* starting a new multio */
 	    mfds[fd1] = (struct multio *) zhalloc(sizeof(struct multio));

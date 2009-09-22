@@ -446,12 +446,20 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 
 	if (targetfd) {
-	    redup(sess->fd,targetfd);
-	    sess->fd = targetfd;
+	    if (redup(sess->fd,targetfd) == -1)
+		sess->fd = -1;
+	    else
+		sess->fd = targetfd;
 	}
 	else {
 	    /* move the fd since no one will want to read from it */
 	    sess->fd = movefd(sess->fd);
+	}
+
+	if (sess->fd == -1) {
+	    zwarnnam(nam, "cannot duplicate fd %d: %e", sess->fd, errno);
+	    tcp_close(sess);
+	    return 1;
 	}
 
 	setiparam("REPLY", sess->fd);

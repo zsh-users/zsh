@@ -401,6 +401,12 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	zexit(lastval, 0);
     }
     master = movefd(master);
+    if (master == -1) {
+	zerrnam(nam, "cannot duplicate fd %d: %e", master, errno);
+	scriptname = oscriptname;
+	ineval = oineval;
+	return 1;
+    }
 
     p = (Ptycmd) zalloc(sizeof(*p));
 
@@ -423,6 +429,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 
     scriptname = oscriptname;
     ineval = oineval;
+
     return 0;
 }
 

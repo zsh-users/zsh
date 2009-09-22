@@ -120,12 +120,18 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 
 	if (targetfd) {
-	    redup(sfd, targetfd);
-	    sfd = targetfd;
+	    if (redup(sfd, targetfd) == -1)
+		sfd = -1;
+	    else
+		sfd = targetfd;
 	}
 	else {
 	    /* move the fd since no one will want to read from it */
 	    sfd = movefd(sfd);
+	}
+	if (sfd == -1) {
+	    zerrnam(nam, "cannot duplicate fd %d: %e", sfd, errno);
+	    return 1;
 	}
 
 	setiparam("REPLY", sfd);

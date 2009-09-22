@@ -1631,8 +1631,13 @@ movefd(int fd)
 #else
 	int fe = movefd(dup(fd));
 #endif
-	if (fe != -1)
-	    zclose(fd);
+	/*
+	 * To close or not to close if fe is -1?
+	 * If it is -1, we haven't moved the fd, so if we close
+	 * it we lose it; but we're probably not going to be able
+	 * to use it in situ anyway.  So probably better to avoid a leak.
+	 */
+	zclose(fd);
 	fd = fe;
     }
     if(fd != -1) {
@@ -1647,22 +1652,30 @@ movefd(int fd)
     return fd;
 }
 
-/* Move fd x to y.  If x == -1, fd y is closed. */
+/*
+ * Move fd x to y.  If x == -1, fd y is closed.
+ * Return 0 for success, -1 for failure.
+ */
 
 /**/
-mod_export void
+mod_export int
 redup(int x, int y)
 {
+    int ret = 0;
+
     if(x < 0)
 	zclose(y);
     else if (x != y) {
 	while (y >= fdtable_size)
 	    fdtable = zrealloc(fdtable, (fdtable_size *= 2)*sizeof(*fdtable));
-	dup2(x, y);
+	if (dup2(x, y) == -1)
+	    ret = -1;
 	if ((fdtable[y] = fdtable[x]) && y > max_zsh_fd)
 	    max_zsh_fd = y;
 	zclose(x);
     }
+
+    return ret;
 }
 
 /* Close the given fd, and clear it from fdtable. */
