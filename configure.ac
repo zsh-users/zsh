@@ -462,8 +462,9 @@ AC_PROG_GCC_TRADITIONAL     dnl Do we need -traditional flag for gcc.
 AC_C_CONST                  dnl Does compiler support `const'.
 
 dnl Default preprocessing on Mac OS X produces warnings
+dnl Mac OS X 10.6 (darwin10.x.x) does not need this.
 case "$host_os" in
-  darwin*) CPP="$CPP -traditional-cpp" ;;
+  darwin[[0-9]].*) CPP="$CPP -traditional-cpp" ;;
 esac
 
 fp_PROG_CC_STDC

@@ -1,3 +1,8 @@
+2009-09-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Jun T.: 27296: configure.ac: bad preprocessing of Mac OS
+	Snow Leopard headers.
+
 2009-09-29  Peter Stephenson  <pws@csr.com>
 
 	* Jun T.: 27292: Src/Modules/socket.c: abuse of UNIX_PATH_MAX on
@@ -12220,5 +12225,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4788 $
+* $Revision: 1.4789 $
 *****************************************************
