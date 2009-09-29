@@ -1,3 +1,8 @@
+2009-09-29  Peter Stephenson  <pws@csr.com>
+
+	* Jun T.: 27292: Src/Modules/socket.c: abuse of UNIX_PATH_MAX on
+	Snow Leopard: use the correct maximum.
+
 2009-09-22  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 27286: Src/Modules/socket.c Src/Modules/tcp.c Src/utils.c:
@@ -12215,5 +12220,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4787 $
+* $Revision: 1.4788 $
 *****************************************************

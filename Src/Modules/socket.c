@@ -33,10 +33,6 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#ifndef UNIX_PATH_MAX
-# define UNIX_PATH_MAX 108
-#endif
-
 /*
  * We need to include the zsh headers later to avoid clashes with
  * the definitions on some systems, however we need the configuration
@@ -103,7 +99,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 
 	soun.sun_family = AF_UNIX;
-	strncpy(soun.sun_path, localfn, UNIX_PATH_MAX);
+	strncpy(soun.sun_path, localfn, sizeof(soun.sun_path)-1);
 
 	if (bind(sfd, (struct sockaddr *)&soun, sizeof(struct sockaddr_un)))
 	{
@@ -232,7 +228,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 
 	soun.sun_family = AF_UNIX;
-	strncpy(soun.sun_path, args[0], UNIX_PATH_MAX);
+	strncpy(soun.sun_path, args[0], sizeof(soun.sun_path)-1);
 	
 	if ((err = connect(sfd, (struct sockaddr *)&soun, sizeof(struct sockaddr_un)))) {
 	    zwarnnam(nam, "connection failed: %e", errno);
