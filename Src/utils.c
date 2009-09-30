@@ -3427,8 +3427,11 @@ spname(char *oldname)
      * otherwise a copy of oldname with a corrected prefix is returned.  *
      * Rationale for this, if there ever was any, has been forgotten.    */
     for (;;) {
-	while (*old == '/')
+	while (*old == '/') {
+	    if ((new - newname) >= (sizeof(newname)-1))
+		return NULL;
 	    *new++ = *old++;
+	}
 	*new = '\0';
 	if (*old == '\0')
 	    return newname;

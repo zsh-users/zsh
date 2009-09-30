@@ -1,3 +1,11 @@
+2009-09-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* http://www.opensource.apple.com/source/zsh/zsh-53/patches/utils.c.patch:
+	Src/utils.c: fix length of search when spell checking.
+
+	* http://www.opensource.apple.com/source/zsh/zsh-53/patches/PR-6370391.patch:
+	Src/jobs.c: fix error message.
+
 2009-09-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Jun T.: 27296: configure.ac: bad preprocessing of Mac OS
@@ -12225,5 +12233,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4789 $
+* $Revision: 1.4790 $
 *****************************************************

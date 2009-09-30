@@ -2113,7 +2113,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 		}
 		sig = zstrtol(*argv, &endp, 10);
 		if (*endp) {
-		    zwarnnam(nam, "invalid signal number: %s", signame);
+		    zwarnnam(nam, "invalid signal number: %s", *argv);
 		    return 1;
 		}
 	    } else {
