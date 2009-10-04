@@ -12,7 +12,19 @@ if chkconfig --list > /dev/null 2>&1; then
     'init:init service:compadd -a inits' \
     'xinetd:xinetd service:compadd -a xinetds' && ret=0
 else
-  _wanted services expl service compadd "$@" - /etc/init.d/*(-*:t) && ret=0
+  local -a scriptpath
+  local dir
+  # Known locations of init scripts
+  # C.f. Unix/Commands/_init_d
+  scriptpath=(/etc/init.d /etc/rc.d /etc/rc.d/init.d)
+
+  for dir in $scriptpath; do
+    if [[ -d $dir ]]; then
+      break
+    fi
+  done
+  _wanted services expl service compadd "$@" - $dir/*(-*:t) &&
+  ret=0
 fi
 
 return ret

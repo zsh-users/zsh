@@ -7,7 +7,20 @@ _compskip=all
 # This should probably be system specific...
 
 script=$words[1]
-[[ $script = */* ]] || script=/etc/init.d/$script
+if [[ $script != */* ]]; then
+  local -a scriptpath
+  local dir
+  # Known locations of init scripts
+  # C.f. Unix/Type/_services
+  scriptpath=(/etc/init.d /etc/rc.d /etc/rc.d/init.d)
+
+  for dir in $scriptpath; do
+    if [[ -f $dir/$script ]]; then
+      script=$dir/$script
+      break
+    fi
+  done
+fi
 
 # If the file starts with `#!' we hope that this is a shell script
 # and get lines looking like <space>foo|bar) with the words in $what.

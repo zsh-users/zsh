@@ -1,3 +1,13 @@
+2009-10-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27308, based on 27305 from Edgar Merino:
+	Completion/Unix/Command/_init_d, Completion/Unix/Type/_services:
+	search for init scripts in other locations.
+
+	* Lionel Flandrin: 27307:
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,
+	Doc/Zsh/contrib.yo: enhanced VCS_INFO support for Mecurial.
+
 2009-09-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* http://www.opensource.apple.com/source/zsh/zsh-53/patches/utils.c.patch:
@@ -12233,5 +12243,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4790 $
+* $Revision: 1.4791 $
 *****************************************************
