@@ -493,6 +493,13 @@ actionformats styles with tt(stgit)-specific information for
 tt(stgit)-initialized branches. This style let's you modify how that string
 should look like.
 )
+kindex(hgrevformat)
+item(tt(hgrevformat))(
+tt(hg) uses both a hash and a revision number to reference a specific
+changeset in a repository. With this style you can format the revision
+string (see var(branchformat)) to include either of both. It's only
+useful when var(get-revision) is true.
+)
 kindex(max-exports)
 item(tt(max-exports))(
 Defines the maximum number if
@@ -610,9 +617,10 @@ The default values for these styles in all contexts are:
 startsitem()
 sitem(tt(formats))(" (%s)-[%b|%a]-")
 sitem(tt(actionformats))(" (%s)-[%b]-")
-sitem(tt(branchformat))("%b:%r" (for bzr, svn and svk))
+sitem(tt(branchformat))("%b:%r" (for bzr, svn, svk and hg))
 sitem(tt(nvcsformats))("")
 sitem(tt(stgitformat))(" %p (%c)")
+sitem(tt(hgrevformat))("%r:%h")
 sitem(tt(max-exports))(2)
 sitem(tt(enable))(ALL)
 sitem(tt(disable))((empty list))
@@ -635,7 +643,8 @@ sitem(tt(%s))(The vcs in use (git, hg, svn etc.))
 sitem(tt(%b))(Information about the current branch.)
 sitem(tt(%a))(An identifier, that describes the action. Only makes sense in
 actionformats.)
-sitem(tt(%i))(The current revision number or identifier.)
+sitem(tt(%i))(The current revision number or identifier. For tt(hg)
+the var(hgrevformat) style may be used to customize the output.)
 sitem(tt(%c))(The string from the var(stagedstr) style if there are staged
 changes in the repository.)
 sitem(tt(%u))(The string from the var(unstagedstr) style if there are unstaged
@@ -648,7 +657,7 @@ var(/foo/bar/reposXY/beer/tasty), tt(%S) is var(beer/tasty).)
 sitem(tt(%m))(A "misc" replacement. It is at the discretion of the backend
 to decide what this replacement expands to. It is currently used by
 the tt(hg) and tt(git) backends. The tt(hg) backend replaces tt(%m) with the
-global hash value of the current revision and the tt(git) backend replaces it
+topmost Mq patch applied (qtop) and the tt(git) backend replaces it
 with the string from the var(stgitformat) style.)
 endsitem()
 
@@ -656,7 +665,7 @@ In tt(branchformat) these replacements are done:
 
 startsitem()
 sitem(tt(%b))(the branch name)
-sitem(tt(%r))(the current revision number)
+sitem(tt(%r))(the current revision number or the var(hgrevformat) style for tt(hg))
 endsitem()
 
 In tt(stgitformat) these replacements are done:
@@ -664,6 +673,13 @@ In tt(stgitformat) these replacements are done:
 startsitem()
 sitem(tt(%p))(the name of the patch currently on top of the stack)
 sitem(tt(%c))(the number of unapplied patches)
+endsitem()
+
+In tt(hgrevformat) these replacements are done:
+
+startsitem()
+sitem(tt(%r))(the current revision number)
+sitem(tt(%h))(the hash identifier for the current resivion in short form)
 endsitem()
 
 Not all vcs backends have to support all replacements. For tt(nvcsformats)

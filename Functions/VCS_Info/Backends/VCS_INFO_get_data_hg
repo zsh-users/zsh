@@ -3,7 +3,21 @@
 ## Distributed under the same BSD-ish license as zsh itself.
 
 setopt localoptions NO_shwordsplit
-local file hgbranch hgbranch_name hgbase hghash hglrev r_branch r_info
+local file hgbranch hgbranch_name hgbase hghash hglrev hgmisc r_branch r_info revformat
+
+VCS_INFO_hg_get_mq_top_patch () {
+    local patchdir=$1
+
+    if [[ -e "${patchdir}/status" ]]; then
+        local -a patches
+        patches=(${(f)"$(< "${patchdir}/status")"})
+        printf "%s" "${patches[-1]/[^:]*:/}"
+        return 0
+    fi
+
+    return 1
+}
+
 
 hgbase=${vcs_comm[basedir]}
 rrn=${hgbase:t}
@@ -34,6 +48,8 @@ if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision ; then
     done
 
     if [[ -n ${hglrev} ]] ; then
+        zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" hgrevformat revformat || revformat="%r:%h"
+        zformat -f hglrev "${revformat}" "r:${hglrev}" "h:${hghash}"
         zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat hgbranch || hgbranch="%b:%r"
         zformat -f hgbranch "${hgbranch}" "b:${hgbranch_name}" "r:${hglrev}"
     fi
@@ -41,5 +57,15 @@ else
     hgbranch="${hgbranch_name}"
 fi
 
-VCS_INFO_formats '' "${hgbranch}" "${hgbase}" '' '' "${hglrev}" "${hghash}"
+local patchdir=${hgbase}/.hg/patches/
+
+if [[ -d $patchdir ]] ; then
+    hgmisc=$(VCS_INFO_hg_get_mq_top_patch "${patchdir}")
+
+    hgmisc=${hgmisc:-"no patch applied"}
+else
+    hgmisc=''
+fi
+
+VCS_INFO_formats '' "${hgbranch}" "${hgbase}" '' '' "${hglrev}" "${hgmisc}"
 return 0
