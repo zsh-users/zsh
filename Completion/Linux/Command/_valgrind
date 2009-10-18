@@ -20,6 +20,10 @@ common=(
   '--alignment=-[set minimum alignment of allocations]:number'
 )
 
+common_read_varinfo=(
+  '--read-var-info=-[read DWARF3 debug info]:enable:(yes no)'
+)
+
 common_mem_null=(
   '--xml=-[output everything in XML]:enable:(yes no)'
   '--xml-user-comment=-[copy specified string verbatim to XML output]:string'
@@ -31,13 +35,14 @@ args_addrcheck=(
   '--partial-loads-ok=-:enable:(yes no)'
   '--freelist-vol=-[volume of freed blocks queue]:blocks'
   '--leak-check=-[search for memory leaks at exit]:enable:(yes no)'
-  '--leak-resolution=-[how much bt merging in leak check]:(low med high)'
+  '--leak-resolution=-[how much bt merging in leak check]:level:(low med high)'
   '--show-reachable=-[show reachable blocks in leak check]:enable:(yes no)'
   '--workaround-gcc296-bugs=-:enable:(yes no)'
 )
 
 args_memcheck=(
   $args_addrcheck
+  $common_read_varinfo
 )
 
 args_cachegrind=(
@@ -48,6 +53,7 @@ args_cachegrind=(
 
 args_helgrind=(
   $common
+  $common_read_varinfo
   '--private-stacks=-[assume thread stacks are used privately]:enable:(yes no)'
   '--show-last-access=-[show location of last word access on error]:locations:(no some all)'
 )

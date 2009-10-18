@@ -1,5 +1,8 @@
 2009-10-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Mikael: 27312: Completion/Unix/Command/_valgrind: option
+	changes.
+
 	* Jesse Weinstein: 27311: Completion/Unix/Type/_diff_options:
 	remove redundant line.
 
@@ -12253,5 +12256,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4792 $
+* $Revision: 1.4793 $
 *****************************************************
