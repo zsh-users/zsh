@@ -777,7 +777,7 @@ Here is how to print the vcs information as a command (not in a prompt):
 example(alias vcsi='vcs_info command; vcs_info_lastmsg')
 
 This way, you can even define different formats for output via
-tt(vcs_info_lastmsg) in the ':vcs_info:formats:command:*' namespace.
+tt(vcs_info_lastmsg) in the ':vcs_info:*:command:*' namespace.
 
 
 texinode(Prompt Themes)(ZLE Functions)(Version Control Information)(User Contributions)

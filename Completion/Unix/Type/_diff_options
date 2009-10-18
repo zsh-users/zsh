@@ -47,7 +47,6 @@ if _pick_variant -c $cmd gnu=GNU unix -v; then
     '(--ignore-file-name-case)--no-ignore-file-name-case[consider case when comparing file names]' \
     '(-E --ignore-tab-expansion)'{-E,--ignore-tab-expansion}'[ignore changes due to tab expansion]' \
     '(-b --ignore-space-change)'{-b,--ignore-space-change}'[ignore changes in the amount of white space]' \
-    '(--ignore-space-change)-b[ignore changes in the amount of white space]' \
     '(--ignore-all-space -w)'{--ignore-all-space,-w}'[ignore all white space]' \
     '(-B --ignore-blank-lines)'{-B,--ignore-blank-lines}'[ignore lines that are all blank]' \
     '(-I --ignore-matching-lines)'{-I+,--ignore-matching-lines=}'[ignore lines that match regex]:line exclusion regex:' \

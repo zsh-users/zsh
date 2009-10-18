@@ -1,3 +1,13 @@
+2009-10-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Jesse Weinstein: 27311: Completion/Unix/Type/_diff_options:
+	remove redundant line.
+
+	* Holger Weiss: 27310: Doc/Zsh/compsys.yo: typo.
+
+	* Frank Terbeck: 27309: Doc/Zsh/contrib.yo: improve context
+	in VCS_Info docs.
+
 2009-10-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27308, based on 27305 from Edgar Merino:
@@ -12243,5 +12253,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4791 $
+* $Revision: 1.4792 $
 *****************************************************
