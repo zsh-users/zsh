@@ -1,5 +1,8 @@
 2009-10-22  Peter Stephenson  <pws@csr.com>
 
+	* Functions/Zle/history-beginning-search-menu: unposted:
+	make more variables local.
+
 	* unposted, c.f. 27313: INSTALL, NEWS, README, Doc/Zsh/contrib.yo,
 	Doc/Zsh/manual.yo, Doc/Zsh/metafaq.yo, Etc/CONTRIBUTORS,
 	Etc/FAQ.yo, Etc/changelog2html.pl,
@@ -12265,5 +12268,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4794 $
+* $Revision: 1.4795 $
 *****************************************************

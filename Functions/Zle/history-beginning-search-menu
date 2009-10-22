@@ -38,7 +38,7 @@ zmodload -i zsh/parameter
 local -aU matches
 local -a display
 
-local search=$LBUFFER
+local search=$LBUFFER MATCH MBEGIN MEND
 
 search=${search//(#m)[\][()\\*?#<>~^]/\\$MATCH}
 if [[ $WIDGET = *-space* ]]; then
