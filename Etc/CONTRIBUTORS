@@ -4,7 +4,7 @@ ZSH CONTRIBUTORS
 
 Zsh was originally written by Paul Falstad <pf@zsh.org>.  Zsh is
 now maintained by the members of the zsh-workers mailing list
-<zsh-workers@sunsite.dk>.  The development is currently coordinated
+<zsh-workers@zsh.org>.  The development is currently coordinated
 by Peter Stephenson <pws@zsh.org>.
 
 This file credits only the major contributors to the current release.
@@ -13,7 +13,7 @@ patches.  Note that email addresses below and in the ChangeLog file
 are included for disambiguation purposes only, and are not guaranteed
 to be currently accurate.  If you feel that you or someone else have
 been unfairly omitted from this list please mail the list
-<zsh-workers@sunsite.dk>.
+<zsh-workers@zsh.org>.
 
 Version 4.3
 -----------

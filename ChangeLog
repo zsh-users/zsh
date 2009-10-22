@@ -1,3 +1,12 @@
+2009-10-22  Peter Stephenson  <pws@csr.com>
+
+	* unposted, c.f. 27313: INSTALL, NEWS, README, Doc/Zsh/contrib.yo,
+	Doc/Zsh/manual.yo, Doc/Zsh/metafaq.yo, Etc/CONTRIBUTORS,
+	Etc/FAQ.yo, Etc/changelog2html.pl,
+	Functions/Zle/history-beginning-search-menu,
+	Functions/Zle/insert-composed-char: mailing lists moved
+	to zsh.org and website to zsh.sourceforge.net.
+
 2009-10-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Mikael: 27312: Completion/Unix/Command/_valgrind: option
@@ -12256,5 +12265,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4793 $
+* $Revision: 1.4794 $
 *****************************************************

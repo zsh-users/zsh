@@ -1265,7 +1265,7 @@ The set of accented characters is reasonably complete up to Unicode
 character U+0180, the set of special characters less so.  However, it it
 is very sporadic from that point.  Adding new characters is easy,
 however; see the function tt(define-composed-chars).  Please send any
-additions to tt(zsh-workers@sunsite.dk).
+additions to tt(zsh-workers@zsh.org).
 
 The codes for the second character when used to accent the first are as
 follows.  Note that not every character can take every accent.

@@ -151,21 +151,20 @@ sect(Sources of information)
 label(11)
 
   Information on zsh is available via the World Wide Web.  The URL
-  is url(http://sunsite.dk/zsh/)(http://sunsite.dk/zsh/) .
+  is url(http://zsh.sourceforge.net/)(http://zsh.sourceforge.net/) .
   The server provides this FAQ and much else and is
-  now maintained by Karsten Thygesen and others (mail \
-  email(zsh@sunsite.dk)
-  with any related messages).  The FAQ is at \
-url(http://sunsite.dk/zsh/FAQ/)(http://sunsite.dk/zsh/FAQ/) .
+  now maintained by the zsh workers (email email(zsh-workers@zsh.org)).
+  The FAQ is at \
+url(http://zsh.sourceforge.net/FAQ/)(http://zsh.sourceforge.net/FAQ/) .
   The site also contains some contributed zsh scripts and functions;
   we are delighted to add more, or simply links to your own collection.
 
   This document was originally written in YODL, allowing it to be converted
   easily into various other formats.  The master source file lives at
-  url(http://sunsite.dk/zsh/FAQ/zshfaq.yo)
-(http://sunsite.dk/zsh/FAQ/zshfaq.yo) and the plain text version
-  can be found at url(http://sunsite.dk/zsh/FAQ/zshfaq.txt)
-(http://sunsite.dk/zsh/FAQ/zshfaq.txt) .
+  url(http://zsh.sourceforge.net/FAQ/zshfaq.yo)
+(http://zsh.sourceforge.net/FAQ/zshfaq.yo) and the plain text version
+  can be found at url(http://zsh.sourceforge.net/FAQ/zshfaq.txt)
+(http://zsh.sourceforge.net/FAQ/zshfaq.txt) .
 
   Another useful source of information is the collection of FAQ articles
   posted frequently to the Usenet news groups comp.unix.questions,
@@ -194,7 +193,7 @@ email(mail-server@rtfm.mit.edu)
   I have put together a user guide to complement the manual by
   explaining the most useful features of zsh in a more easy to read way.
   This can be found at the zsh web site:
-    url(http://zsh.sunsite.dk/Guide/)(http://zsh.sunsite.dk/Guide/)
+    url(http://zsh.sourceforge.net/Guide/)(http://zsh.sourceforge.net/Guide/)
 
   (As a method of reading the following in Emacs, you can type tt(\M-2
   \C-x $) to make all the indented text vanish, then tt(\M-0 \C-x $)
@@ -382,7 +381,7 @@ label(16)
   Win32 API, and a pre-compiled version of zsh can be downloaded by
   the Cygwin installer.  You can find information about this at
   url(http://www.cygwin.com/)(http://www.cygwin.com/).  Please email
-  email(zsh-workers@sunsite.dk) if you have information about other ports.
+  email(zsh-workers@zsh.org) if you have information about other ports.
 
   Starting from mid-October 1997, there is an archive of patches sent
   to the maintainers' mailing list.  Note that these may not all be
@@ -393,8 +392,8 @@ label(16)
   link(1.1)(11)) at:
 
   description(
-    mydit()        url(http://sunsite.dk/zsh/Patches/)
-(http://sunsite.dk/zsh/Patches/)
+    mydit()        url(http://zsh.sourceforge.net/Patches/)
+(http://zsh.sourceforge.net/Patches/)
   )
 
 sect(I don't have root access: how do I make zsh my login shell?)
@@ -2195,7 +2194,7 @@ label(52)
   The shell is being maintained by various (entirely self-appointed)
   subscribers to the mailing list,
   verb(
-    zsh-workers@sunsite.dk
+    zsh-workers@zsh.org
   )
   so mail on any issues (bug reports, suggestions, complaints...)
   related to the development of the shell should be sent there.  If
@@ -2215,12 +2214,12 @@ label(52)
   Two progressively lower volume lists exist, one with messages
   concerning the use of zsh,
   verb(
-    zsh-users@sunsite.dk
+    zsh-users@zsh.org
   )
   and one just containing announcements:  about releases, about major
   changes in the shell, or this FAQ, for example,
   verb(
-    zsh-announce@sunsite.dk
+    zsh-announce@zsh.org
   )
   (posting to the last one is currently restricted).
 
@@ -2234,15 +2233,15 @@ label(52)
 
   To join zsh-workers, send email to
   verb(
-    zsh-workers-subscribe@sunsite.dk
+    zsh-workers-subscribe@zsh.org
   )
   (the actual content is unimportant).  Replace tt(subscribe) with
   tt(unsubscribe) to unsubscribe.  The mailing software (tt(ezlm)) has
   various bells and whistles: you can retrieve archived messages.
-  Mail email(zsh-workers-help@sunsite.dk) for detailed information.
+  Mail email(zsh-workers-help@zsh.org) for detailed information.
   Adminstrative matters are best sent to
-  email(zsh-workers-owner@sunsite.dk).  The list maintainer's
-  real name is email(Karsten Thygesen <karthy@kom.auc.dk>).
+  email(zsh-workers-owner@zsh.org).
+  real name is email(Geoff Wing <gcw@zsh.org>).
   
   An archive of mailings for the last few years can be found at
     url(http://www.zsh.org/mla/)(http://www.zsh.org/mla/)
@@ -2290,9 +2289,9 @@ Thanks to zsh-list, in particular Bart Schaefer, for suggestions
 regarding this document.  Zsh has been in the hands of archivists Jim
 Mattson, Bas de Bakker, Richard Coleman, Zoltan Hidvegi and Andrew
 Main, and the mailing list has been run by Peter Gray, Rick Ohnemus,
-Richard Coleman and Karsten Thygesen, all of whom deserve thanks.  The
-world is eternally in the debt of Paul Falstad for inventing zsh in
-the first place (though the wizzo extended completion is by Sven
+Richard Coleman, Karsten Thygesen and Geoff Wing, all of whom deserve
+thanks.  The world is eternally in the debt of Paul Falstad for inventing
+zsh in the first place (though the wizzo extended completion is by Sven
 Wischnowsky).
 
 
@@ -2309,4 +2308,4 @@ notice appears in all copies of this documentation.  Remember,
 however, that this document changes monthly and it may be more useful
 to provide a pointer to it rather than the entire text.  A suitable
 pointer is "information on the Z-shell can be obtained on the World
-Wide Web at URL http://sunsite.dk/zsh/".
+Wide Web at URL http://zsh.sourceforge.net/".

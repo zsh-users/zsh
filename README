@@ -290,7 +290,7 @@ Zsh Maintenance and Bug Reports
 
 Zsh is currently maintained by the members of the zsh-workers mailing list
 and coordinated by Peter Stephenson <coordinator@zsh.org>.  Please send
-any feedback and bugs reports to <zsh-workers@sunsite.dk>.
+any feedback and bugs reports to <zsh-workers@zsh.org>.
 
 Reports are most helpful if you can reproduce the bug starting zsh with
 the -f option.  This skips the execution of local startup files except

@@ -338,7 +338,7 @@ module; depending on the configuration, the main shell may not require the
 additional functions.  As the integration of wide character support into
 ncurses is continuing, it is possible that on some systems attempting to
 use ncursesw may cause problems during building.  If so, please report this
-to the developers at zsh-workers@sunsite.dk and attempt to recompile with
+to the developers at zsh-workers@zsh.org and attempt to recompile with
 --with-term-lib="tinfo termcap ncurses curses" (see below).
 
 Note that use of ncurses requires the header ncurses.h, so this

@@ -405,7 +405,7 @@ Further enhancements to new completion system:
    styles
  - compctl library separated out (frozen but still supported)
  - User-friendly introduction available at zsh website
-   http://sunsite.auc.dk/zsh/
+   http://zsh.sourceforge.net/
 
 Additions to complist listing library (coloured completion and menu
 selection):

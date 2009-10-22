@@ -20,7 +20,7 @@
 # The set of accented characters is reasonably complete up to U+0180, the
 # set of special characters less so.  However, it mostly gives up at that
 # point.  Adding new Unicode characters is easy, however.  Please send any
-# additions to zsh-workers@sunsite.dk .
+# additions to zsh-workers@zsh.org .
 #
 # Some of the accent codes are a little more obscure than others.
 #  !   Grave
