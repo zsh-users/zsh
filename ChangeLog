@@ -1,3 +1,8 @@
+2009-10-24  Clint Adams  <clint@zsh.org>
+
+	* 27314: Completion/Unix/Command/_mpc: update list of mpc
+	search types.
+
 2009-10-22  Peter Stephenson  <pws@csr.com>
 
 	* Functions/Zle/history-beginning-search-menu: unposted:
@@ -12268,5 +12273,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4795 $
+* $Revision: 1.4796 $
 *****************************************************
