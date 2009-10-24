@@ -26,36 +26,43 @@ _mpc_command() {
 
   mpc_cmds=(
     add:"add a song to the current playlist"
-    crop:"remove all songs except for the currently playing song"
-    del:"remove a song from the current playlist"
-    play:"start playing"
-    next:"play the next song in the current playlist"
-    prev:"play the previous song in the current playlist"
-    pause:"pause the currently playing song"
-    toggle:"toggles Play/Pause, plays if stopped"
-    stop:"stop the currently playing playlists"
-    seek:"seek to the position specified in percent"
     clear:"clear the current playlist"
-    outputs:"show the current outputs"
-    enable:"enable a output"
+    crop:"remove all songs except for the currently playing song"
+    current:"show the currently playing song"
+    crossfade:"set and display crossfade settings"
+    del:"remove a song from the current playlist"
     disable:"disable a output"
-    shuffle:"shuffle the current playlist"
-    move:"move song in playlist"
-    playlist:"print the current playlist"
+    enable:"enable a output"
+    idle:"wait until an event occurs"
+    idleloop:"loop waiting for events"
     listall:"list all songs in the music directory"
+    load:"load file as a playlist"
     ls:"list the contents of specified directory"
     lsplaylists:"list currently available playlists"
-    load:"load file as a playlist"
-    save:"save a playlist to file"
-    rm:"remove a playlist"
-    volume:"set volume"
-    repeat:"toggle repeat mode, or specify state"
+    move:"move song in playlist"
+    next:"play the next song in the current playlist"
+    outputs:"show the current outputs"
+    pause:"pause the currently playing song"
+    play:"start playing"
+    playlist:"print the current playlist"
+    prev:"play the previous song in the current playlist"
     random:"toggle random mode, or specify state"
+    repeat:"toggle repeat mode, or specify state"
+    single:"toggle single mode, or specify state"
+    consume:"toggle consume mode, or specify state"
+    rm:"remove a playlist"
+    save:"save a playlist to file"
     search:"search for a song"
-    crossfade:"set and display crossfade settings"
-    update:"scan music directory for updates"
+    find:"search for a song, exact match"
+    list:"list all tags of given type"
+    seek:"seek to the position specified in percent"
+    shuffle:"shuffle the current playlist"
     stats:"display statistics about MPD"
+    stop:"stop the currently playing playlists"
+    toggle:"toggles Play/Pause, plays if stopped"
+    update:"scan music directory for updates"
     version:"report version of MPD"
+    volume:"set volume"
     status:"display MPD status"
   )
 
@@ -234,6 +241,14 @@ _mpc_random() {
   _mpc_helper_bool
 }
 
+_mpc_single() {
+  _mpc_helper_bool
+}
+
+_mpc_consume() {
+  _mpc_helper_bool
+}
+
 _mpc_search() {
   local list expl
   list=(album artist title track name genre date composer performer comment disc filename any)
@@ -243,6 +258,14 @@ _mpc_search() {
   else
     _message "pattern"
   fi
+}
+
+_mpc_find() {
+  _mpc_search "$@"
+}
+
+_mpc_list() {
+  _mpc_search "$@"
 }
 
 _mpc_update() {

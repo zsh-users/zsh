@@ -1,7 +1,7 @@
 2009-10-24  Clint Adams  <clint@zsh.org>
 
-	* 27314: Completion/Unix/Command/_mpc: update list of mpc
-	search types.
+	* 27314, 27315: Completion/Unix/Command/_mpc: update for
+	mpc 0.17.
 
 2009-10-22  Peter Stephenson  <pws@csr.com>
 
@@ -12273,5 +12273,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4796 $
+* $Revision: 1.4797 $
 *****************************************************
