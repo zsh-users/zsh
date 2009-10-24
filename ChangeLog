@@ -3,6 +3,9 @@
 	* 27314, 27315: Completion/Unix/Command/_mpc: update for
 	mpc 0.17.
 
+	* unposted: update config.guess and config.sub to
+	2009-06-10 and 2009-06-11 versions respectively.
+
 2009-10-22  Peter Stephenson  <pws@csr.com>
 
 	* Functions/Zle/history-beginning-search-menu: unposted:
@@ -12273,5 +12276,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4797 $
+* $Revision: 1.4798 $
 *****************************************************
