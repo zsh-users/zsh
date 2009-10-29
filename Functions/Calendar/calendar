@@ -298,7 +298,8 @@ fi
     fi
     (( shown = 0 ))
     if (( brief )); then
-      showline=${(F)${${(f)line}[1,brief]}}
+      line=("${(f)line}")
+      showline=${(F)${${line[1,brief]}}}
     else
       showline=$line
     fi
