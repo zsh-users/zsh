@@ -1,3 +1,8 @@
+2009-11-03  Peter Stephenson  <pws@csr.com>
+
+	* Mikael: 27337: Src/utils.c: fix bug with cd checking symlinks
+	that could do arbitrarily nasty things when looking for a "/".
+
 2009-10-29  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Functions/Calendar/calendar: brief display
@@ -12281,5 +12286,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4799 $
+* $Revision: 1.4800 $
 *****************************************************

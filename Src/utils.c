@@ -691,6 +691,8 @@ xsymlinks(char *s)
 	    zsfree(*pp);
 	    if (!strcmp(xbuf, "/"))
 		continue;
+	    if (!*xbuf)
+		continue;
 	    p = xbuf + strlen(xbuf);
 	    while (*--p != '/');
 	    *p = '\0';
