@@ -1,3 +1,8 @@
+2009-10-29  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Functions/Calendar/calendar: brief display
+	failed on single-line entries.
+
 2009-10-24  Clint Adams  <clint@zsh.org>
 
 	* 27314, 27315: Completion/Unix/Command/_mpc: update for
@@ -12276,5 +12281,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4798 $
+* $Revision: 1.4799 $
 *****************************************************

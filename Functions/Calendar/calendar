@@ -7,7 +7,7 @@ integer time start stop today ndays y m d next=-1 shown done nodone
 integer verbose warntime mywarntime t tcalc tsched i rstat remaining
 integer showcount icount repeating repeattime resched showall brief
 local -a calendar_entries calendar_addlines
-local -a times calopts showprog lockfiles match mbegin mend
+local -a times calopts showprog lockfiles match mbegin mend tmplines
 local -A reply
 
 zmodload -i zsh/datetime || return 1
@@ -298,8 +298,8 @@ fi
     fi
     (( shown = 0 ))
     if (( brief )); then
-      line=("${(f)line}")
-      showline=${(F)${${line[1,brief]}}}
+      tmplines=("${(f)line}")
+      showline=${(F)${${tmplines[1,brief]}}}
     else
       showline=$line
     fi
