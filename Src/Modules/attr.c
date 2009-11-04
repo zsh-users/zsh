@@ -33,102 +33,190 @@
 #include <sys/types.h>
 #include <sys/xattr.h>
 
+static ssize_t
+xgetxattr(const char *path, const char *name, void *value, size_t size, int symlink)
+{
+#ifdef XATTR_EXTRA_ARGS
+    return getxattr(path, name, value, size, 0, symlink ? XATTR_NOFOLLOW: 0);
+#else
+    switch (symlink) {
+    case 0:
+        return getxattr(path, name, value, size);
+    case 1:
+        return lgetxattr(path, name, value, size);
+    }
+#endif
+}
+
+static ssize_t
+xlistxattr(const char *path, char *list, size_t size, int symlink)
+{
+#ifdef XATTR_EXTRA_ARGS
+    return listxattr(path, list, size, symlink ? XATTR_NOFOLLOW : 0);
+#else
+    switch (symlink) {
+    case 0:
+        return listxattr(path, list, size);
+    case 1:
+        return llistxattr(path, list, size);
+    }
+#endif
+}
+
 static int
-bin_getattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
+xsetxattr(const char *path, const char *name, const void *value,
+          size_t size, int flags, int symlink)
+{
+#ifdef XATTR_EXTRA_ARGS
+    return setxattr(path, name, value, size, 0, flags | symlink ? XATTR_NOFOLLOW : 0);
+#else
+    switch (symlink) {
+    case 0:
+        return setxattr(path, name, value, size, flags);
+    case 1:
+        return lsetxattr(path, name, value, size, flags);
+    }
+#endif
+}
+
+static int
+xremovexattr(const char *path, const char *name, int symlink)
+{
+#ifdef XATTR_EXTRA_ARGS
+    return removexattr(path, name, symlink ? XATTR_NOFOLLOW : 0);
+#else
+    switch (symlink) {
+    case 0:
+        return removexattr(path, name);
+    case 1:
+        return lremovexattr(path, name);
+    }
+#endif
+}
+
+static int
+bin_getattr(char *nam, char **argv, Options ops, UNUSED(int func))
 {
     int ret = 0;
-    int len, slen;
-    char value[256];
+    int list_len, val_len, attr_len, slen;
+    char *value, *file = argv[0], *attr = argv[1], *param = argv[2];
+    int symlink = OPT_ISSET(ops, 'h');
 
-    unmetafy(*argv, &slen);
-    unmetafy(*(argv+1), NULL);
-    if (listxattr(*argv, NULL, 0
-#ifdef XATTR_EXTRA_ARGS
-		  , 0
-#endif
-		  ) > 0) {
-        if (0 < (len = getxattr(*argv, *(argv+1), value, 255
-#ifdef XATTR_EXTRA_ARGS
-				, 0, 0
-#endif
-				))) {
-            if (len < 256) {
-                value[len] = '\0';
-                if (*(argv+2))
-                    setsparam(*(argv+2), metafy(value, len, META_DUP));
+    unmetafy(file, &slen);
+    unmetafy(attr, NULL);
+    list_len = xlistxattr(file, NULL, 0, symlink);
+    if (list_len > 0) {
+        val_len = xgetxattr(file, attr, NULL, 0, symlink);
+        if (val_len == 0) {
+            if (param)
+                unsetparam(param);
+            return 0;
+        }
+        if (val_len > 0) {
+            value = (char *)zalloc(val_len+1);
+            attr_len = xgetxattr(file, attr, value, val_len, symlink);
+            if (attr_len > 0 && attr_len <= val_len) {
+                value[attr_len] = '\0';
+                if (param)
+                    setsparam(param, metafy(value, attr_len, META_DUP));
                 else
                     printf("%s\n", value);
             }
-        } else if (len < 0) {
-            zwarnnam(nam, "%s: %e", metafy(*argv, slen, META_NOALLOC), errno);
+            zfree(value, val_len+1);
+        }
+    }
+    if (list_len < 0 || val_len < 0 || attr_len < 0)  {
+        zwarnnam(nam, "%s: %e", metafy(file, slen, META_NOALLOC), errno);
+        ret = 1 + (attr_len > val_len);
+    }
+    return ret;
+}
+
+static int
+bin_setattr(char *nam, char **argv, Options ops, UNUSED(int func))
+{
+    int ret = 0, slen, vlen;
+    int symlink = OPT_ISSET(ops, 'h');
+    char *file = argv[0], *attr = argv[1], *value = argv[2];
+
+    unmetafy(file, &slen);
+    unmetafy(attr, NULL);
+    unmetafy(value, &vlen);
+    if (xsetxattr(file, attr, value, vlen, 0, symlink)) {
+        zwarnnam(nam, "%s: %e", metafy(file, slen, META_NOALLOC), errno);
+        ret = 1;
+    }
+    return ret;
+}
+
+static int
+bin_delattr(char *nam, char **argv, Options ops, UNUSED(int func))
+{
+    int ret = 0, slen;
+    int symlink = OPT_ISSET(ops, 'h');
+    char *file = argv[0], **attr = &argv[1];
+
+    unmetafy(file, &slen);
+    while (*++attr) {
+        unmetafy(*attr, NULL);
+        if (xremovexattr(file, *attr, symlink)) {
+            zwarnnam(nam, "%s: %e", metafy(file, slen, META_NOALLOC), errno);
             ret = 1;
+            break;
         }
     }
     return ret;
 }
 
 static int
-bin_setattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
-{
-    int ret = 0, slen;
-
-    unmetafy(*argv, &slen);
-    unmetafy(*(argv+1), NULL);
-    unmetafy(*(argv+2), NULL);
-    if (setxattr(*argv, *(argv+1), *(argv+2), strlen(*(argv+2)), 0
-#ifdef XATTR_EXTRA_ARGS
-						     , 0
-#endif
-		 )) {
-        zwarnnam(nam, "%s: %e", metafy(*argv, slen, META_NOALLOC), errno);
-        ret = 1;
-    }
-    return ret;
-}
-
-static int
-bin_delattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
-{
-    int ret = 0, slen;
-
-    unmetafy(*argv, &slen);
-    unmetafy(*(argv+1), NULL);
-    if (removexattr(*argv, *(argv+1)
-#ifdef XATTR_EXTRA_ARGS
-		    , 0
-#endif
-		    )) {
-        zwarnnam(nam, "%s: %e", metafy(*argv, slen, META_NOALLOC), errno);
-        ret = 1;
-    }
-    return ret;
-}
-
-static int
-bin_listattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
+bin_listattr(char *nam, char **argv, Options ops, UNUSED(int func))
 {
     int ret = 0;
-    int len, slen;
-    char value[256];
+    int val_len, list_len, slen;
+    char *value, *file = argv[0], *param = argv[1];
+    int symlink = OPT_ISSET(ops, 'h');
 
-    unmetafy(*argv, &slen);
-    if (0 < (len = listxattr(*argv, value, 256
-#ifdef XATTR_EXTRA_ARGS
-		  , 0
-#endif
-			     ))) {
-        if (len < 256) {
+    unmetafy(file, &slen);
+    val_len = xlistxattr(file, NULL, 0, symlink);
+    if (val_len == 0) {
+        if (param)
+            unsetparam(param);
+        return 0;
+    }
+    if (val_len > 0) {
+        value = (char *)zalloc(val_len+1);
+        list_len = xlistxattr(file, value, val_len, symlink);
+        if (list_len > 0 && list_len <= val_len) {
             char *p = value;
-            if (*(argv+1))
-                setsparam(*(argv+1), metafy(value, len, META_DUP));
-            else while (p < &value[len]) {
+            if (param) {
+                if (strlen(value) + 1 == list_len)
+                    setsparam(param, metafy(value, list_len-1, META_DUP));
+                else {
+                    int arrlen = 0;
+                    char **array = NULL, **arrptr = NULL;
+
+                    while (p < &value[list_len]) {
+                        arrlen++;
+                        p += strlen(p) + 1;
+                    }
+                    arrptr = array = (char **)zshcalloc((arrlen+1) * sizeof(char *));
+                    p = value;
+                    while (p < &value[list_len]) {
+                        *arrptr++ = metafy(p, -1, META_DUP);
+                        p += strlen(p) + 1;
+                    }
+                    setaparam(param, array);
+                }
+            } else while (p < &value[list_len]) {
                 printf("%s\n", p);
                 p += strlen(p) + 1;
             }
         }
-    } else if (len < 0) {
-        zwarnnam(nam, "%s: %e", metafy(*argv, slen, META_NOALLOC), errno);
-        ret = 1;
+        zfree(value, val_len+1);
+    }
+    if (val_len < 0 || list_len < 0) {
+        zwarnnam(nam, "%s: %e", metafy(file, slen, META_NOALLOC), errno);
+        ret = 1 + (list_len > val_len);
     }
     return ret;
 }
@@ -136,10 +224,10 @@ bin_listattr(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 /* module paraphernalia */
 
 static struct builtin bintab[] = {
-    BUILTIN("zgetattr", 0, bin_getattr, 2, 3, 0, NULL, NULL),
-    BUILTIN("zsetattr", 0, bin_setattr, 3, 3, 0, NULL, NULL),
-    BUILTIN("zdelattr", 0, bin_delattr, 2, 2, 0, NULL, NULL),
-    BUILTIN("zlistattr", 0, bin_listattr, 1, 2, 0, NULL, NULL),
+    BUILTIN("zgetattr", 0, bin_getattr, 2, 3, 0, "h", NULL),
+    BUILTIN("zsetattr", 0, bin_setattr, 3, 3, 0, "h", NULL),
+    BUILTIN("zdelattr", 0, bin_delattr, 2, -1, 0, "h", NULL),
+    BUILTIN("zlistattr", 0, bin_listattr, 1, 2, 0, "h", NULL),
 };
 
 static struct features module_features = {

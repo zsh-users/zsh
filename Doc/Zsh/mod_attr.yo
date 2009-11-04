@@ -32,3 +32,8 @@ var(filename). If the optional argument var(parameter) is given, the
 list of attributes is set on that parameter instead of being printed to stdout.
 )
 enditem()
+
+tt(zgetattr) and tt(zlistattr) allocate memory dynamically.  If the
+attribute or list of attributes grows between the allocation and the call
+to get them, they return 2.  On all other errors, 1 is returned.  This
+allows the calling function to check for this case and retry.

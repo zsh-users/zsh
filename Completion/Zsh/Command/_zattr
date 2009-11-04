@@ -29,6 +29,6 @@ _arguments \
 esac
 
 if [[ $state = attrs ]]; then
-  zlistattr $~line[1] REPLY
-  _wanted attrs expl 'attribute' compadd ${(0)REPLY}
+  zlistattr $~line[1] REPLY 2> /dev/null
+  _wanted attrs expl 'attribute' compadd $REPLY
 fi
