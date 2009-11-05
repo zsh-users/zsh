@@ -154,7 +154,7 @@ bin_delattr(char *nam, char **argv, Options ops, UNUSED(int func))
 {
     int ret = 0, slen;
     int symlink = OPT_ISSET(ops, 'h');
-    char *file = argv[0], **attr = &argv[1];
+    char *file = argv[0], **attr = argv;
 
     unmetafy(file, &slen);
     while (*++attr) {
