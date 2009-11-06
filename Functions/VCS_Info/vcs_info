@@ -41,6 +41,8 @@ vcs_info () {
     emulate -L zsh
     setopt extendedglob
 
+    [[ -r . ]] || return 0
+
     local pat
     local -i found
     local -a enabled disabled dps

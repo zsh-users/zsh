@@ -8,6 +8,7 @@ local basedir="." realbasedir
 
 realbasedir="$(VCS_INFO_realpath ${basedir})"
 while [[ ${realbasedir} != '/' ]]; do
+    [[ -r ${realbasedir} ]] || return 1
     if [[ -n ${vcs_comm[detect_need_file]} ]] ; then
         [[ -d ${basedir}/${dirname} ]] && \
         [[ -e ${basedir}/${dirname}/${vcs_comm[detect_need_file]} ]] && \

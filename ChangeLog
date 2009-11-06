@@ -1,3 +1,8 @@
+2009-11-06  Peter Stephenson  <pws@csr.com>
+
+        * Frank Terbeck: 27353: Functions/VCS_Info/VCS_INFO_bydir_detect,
+	Functions/VCS_Info/vcs_info: More sanity checks for vcs_info
+
 2009-11-05  Peter Stephenson  <pws@csr.com>
 
 	* Jun T.: 27351: zdelattr missed first argument.
@@ -12296,5 +12301,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4802 $
+* $Revision: 1.4803 $
 *****************************************************
