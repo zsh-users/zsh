@@ -4747,7 +4747,7 @@ bin_dot(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     enam = arg0 = ztrdup(*argv);
     if (isset(FUNCTIONARGZERO)) {
 	old0 = argzero;
-	argzero = arg0;
+	argzero = ztrdup(arg0);
     }
     s = unmeta(enam);
     errno = ENOENT;
@@ -4802,8 +4802,10 @@ bin_dot(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     if (ret == SOURCE_NOT_FOUND)
 	zwarnnam(name, "%e: %s", errno, enam);
     zsfree(arg0);
-    if (old0)
+    if (old0) {
+	zsfree(argzero);
 	argzero = old0;
+    }
     return ret == SOURCE_OK ? lastval : 128 - ret;
 }
 

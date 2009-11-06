@@ -42,7 +42,7 @@ xgetxattr(const char *path, const char *name, void *value, size_t size, int syml
     switch (symlink) {
     case 0:
         return getxattr(path, name, value, size);
-    case 1:
+    default:
         return lgetxattr(path, name, value, size);
     }
 #endif
@@ -57,7 +57,7 @@ xlistxattr(const char *path, char *list, size_t size, int symlink)
     switch (symlink) {
     case 0:
         return listxattr(path, list, size);
-    case 1:
+    default:
         return llistxattr(path, list, size);
     }
 #endif
@@ -73,7 +73,7 @@ xsetxattr(const char *path, const char *name, const void *value,
     switch (symlink) {
     case 0:
         return setxattr(path, name, value, size, flags);
-    case 1:
+    default:
         return lsetxattr(path, name, value, size, flags);
     }
 #endif
@@ -88,7 +88,7 @@ xremovexattr(const char *path, const char *name, int symlink)
     switch (symlink) {
     case 0:
         return removexattr(path, name);
-    case 1:
+    default:
         return lremovexattr(path, name);
     }
 #endif

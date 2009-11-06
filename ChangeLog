@@ -1,3 +1,10 @@
+2009-11-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27358: Src/builtin.c: error if $0 was altered within
+	a sourced file.
+
+	* 27357: Src/Modules/attr.c: fix compiler warnings
+
 2009-11-06  Peter Stephenson  <pws@csr.com>
 
         * Frank Terbeck: 27353: Functions/VCS_Info/VCS_INFO_bydir_detect,
@@ -12301,5 +12308,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4803 $
+* $Revision: 1.4804 $
 *****************************************************
