@@ -1,0 +1,1461 @@
+#compdef tmux
+
+# tmux <http://tmux.sf.net> completion for zsh <http://zsh.sf.net>.
+#
+# Configuration:
+#
+# - On some OSs, the directory for tmux's server sockets may not be
+#   the default (which is /tmp/tmux-<uid>/), but say
+#   /var/run/tmux/tmux-<uid>, in which case the completion for
+#   'tmux -L <tab>' will not be able to find the sockets in the default
+#   location (debian does this, for instance); tell _tmux the right place
+#   to look:
+#       % zstyle ':completion:*:*:tmux:*:sockets' socketdir "/var/run/tmux/tmux-${UID}"
+#
+# - tmux knows a *lot* of sub-commands, hence 'tmux <tab>' returns a lot
+#   of possible completions. _tmux knows about all commands and their aliases.
+#   By default, both are offered. If you do not care about the aliases, do this:
+#       % zstyle ':completion:*:*:tmux:*:subcommands' mode 'commands'
+#
+#   The same can be done to only return aliases by setting the above style
+#   to 'aliases'. The default value is 'both' (but actually every value
+#   different from 'commands' and 'aliases' will have the same effect).
+#
+#   'lsw' is an alias for 'list-windows' for example; note that not all
+#   commands have aliases. So probably, either the default 'both' or
+#   'commands' makes most sense for this style.
+#
+# - For finer grained control over what is suggested as possible completions,
+#   the 'ignored-patterns' style may be used; suppose you think that only
+#   '*-window' or '*-windows' are worth being completed. You would get that
+#   behaviour like this:
+#       % zstyle ':completion:*:*:tmux:*:subcommands' ignored-patterns '^*-window(|s)'
+#
+#   Some tmux commands currently do not work if called from a shell prompt,
+#   so it would make sense to ignore them per default (at the time of writing,
+#   those commands are choose-{session,client,window}, confirm-before and
+#   find-window. This would ignore them:
+#       % zstyle ':completion:*:*:tmux:*:subcommands' ignored-patterns \
+#                'choose-*' 'confirm-before' 'find-window'
+#
+# The configuration for subcommand completions may be done in
+# this context: ':completion:*:*:tmux-<sub-command>:*:*'
+
+# Global variables; setup the first time _tmux is called.
+# For $_tmux_commands[] generation, see the very end of this file.
+typeset -ga _tmux_commands _tmux_aliases
+typeset -gA _tmux_aliasmap
+
+_tmux_aliasmap=(
+    # clients and sessions
+    attach      attach-session
+    detach      detach-client
+    has         has-session
+    lsc         list-clients
+    lscm        list-commands
+    ls          list-sessions
+    new         new-session
+    refresh     refresh-client
+    rename      rename-session
+    source      source-file
+    start       start-server
+    suspendc    suspend-client
+    switchc     switch-client
+
+    # windows and panes
+    breakp      break-pane
+    displayp    display-panes
+    downp       down-pane
+    findw       find-window
+    killp       kill-pane
+    killw       kill-window
+    last        last-window
+    linkw       link-window
+    lsp         list-panes
+    lsw         list-windows
+    movew       move-window
+    neww        new-window
+    nextl       next-layout
+    next        next-window
+    pipep       pipe-pane
+    prev        previous-window
+    renamew     rename-window
+    resizep     resize-pane
+    respawnw    respawn-window
+    rotatew     rotate-window
+    selectl     select-layout
+    selectp     select-pane
+    selectw     select-window
+    splitw      split-window
+    swapp       swap-pane
+    swapw       swap-window
+    unlinkw     unlink-window
+    upp         up-pane
+
+    # key bindings
+    bind        bind-key
+    lsk         list-keys
+    send        send-keys
+    unbind      unbind-key
+
+    # options
+    set         set-option
+    setw        set-window-option
+    show        show-options
+    showw       show-window-options
+
+    # environment
+    #no aliases so far in this category
+
+    # status line
+    confirm     confirm-before
+    display     display-message
+
+    # buffers
+    clearhist   clear-history
+    copyb       copy-buffer
+    deleteb     delete-buffer
+    lsb         list-buffers
+    loadb       load-buffer
+    pasteb      paste-buffer
+    saveb       save-buffer
+    setb        set-buffer
+    showb       show-buffer
+
+    # miscellaneous
+    if          if-shell
+    lock        lock-server
+    run         run-shell
+    info        server-info
+)
+
+# --- Sub-command functions ---
+# These *must* be called _tmux-*(); The description generation relies on
+# them being names that way. *No* other functions may match that pattern.
+# Other utility functions should be named __tmux-*() (see below).
+#
+# Another thing, the description generation needs, is handling of
+# $tmux_describe: If that parameter is non-empty, the sub-command function
+# should only print a description of the sub-command it handles and return
+# immidiately after doing so.
+#
+# To add support for a new sub-command, you only have to add a new
+# _tmux-<foo>() function below (preferably alphabetically sorted), that
+# behaves like described above; and add a alias->command pair in the
+# _tmux_aliasmap associative array above (if the comand in fact has an
+# alias). The rest should just work[tm].
+
+function _tmux-attach-session() {
+    [[ -n ${tmux_describe} ]] && print "Attach or switch to a session" && return
+    local -a args
+
+    args=(
+        '-d[Detach other clients attached to target session]'
+        '-t[Choose a target session]:target session:__tmux-sessions'
+    )
+    _arguments ${args}
+}
+
+function _tmux-bind-key() {
+    [[ -n ${tmux_describe} ]] && print "Bind a key to a command" && return
+    local curcontext="${curcontext}" state
+    local -a args
+
+    args=(
+        '-c[Bind to command mode instead of normal mode]'
+        '-n[Make the binding work without the need for the prefix key]'
+        '-r[The key may repeat]'
+        '-t[Choose a key table for the binding]:key tables:__tmux-key-tables'
+        '1: :->key'
+        '*:: :->command_and_args'
+    )
+    _arguments -C ${args} && return
+
+    if [[ ${state} == 'key' ]]; then
+        _message "key"
+    else
+        # quite cool, that this works. :-)
+        _tmux
+    fi
+}
+
+function _tmux-break-pane() {
+    [[ -n ${tmux_describe} ]] && print "Break a pane from an existing into a new window" && return
+    local -a args
+    args=(
+        '-d[Do not make the new window become the active one]'
+        '-t[Choose a target pane]:panes:__tmux-panes'
+    )
+    _arguments ${args}
+}
+
+function _tmux-choose-client() {
+    [[ -n ${tmux_describe} ]] && print "Put a window into client choice mode" && return
+    __tmux-choose-stuff
+}
+
+function _tmux-choose-session() {
+    [[ -n ${tmux_describe} ]] && print "Put a window into session choice mode" && return
+    __tmux-choose-stuff
+}
+
+function _tmux-choose-window() {
+    [[ -n ${tmux_describe} ]] && print "Put a window into window choice mode" && return
+    __tmux-choose-stuff
+}
+
+function _tmux-clear-history() {
+    [[ -n ${tmux_describe} ]] && print "Remove and clear history for a pane" && return
+    local -a args
+    args=('-t[Choose a target pane]:panes:__tmux-panes')
+    _arguments ${args}
+}
+
+function _tmux-clock-mode() {
+    [[ -n ${tmux_describe} ]] && print "Enter clock mode" && return
+    local -a args
+    args=('-t[Choose a target pane]:panes:__tmux-panes')
+    _arguments ${args}
+}
+
+function _tmux-command-prompt() {
+    [[ -n ${tmux_describe} ]] && print "Open the tmux command prompt in a client" && return
+    local state
+    local -a args
+    args=(
+        '-p[List of prompts]:prompts:->plist'
+        '-t[Choose a target client]:clients:__tmux-clients'
+        '*:: :->tmpl'
+    )
+    _arguments -C ${args} && return
+    if [[ ${state} == 'plist' ]]; then
+        _message "comma seperated list of prompts"
+        return
+    fi
+    __tmux-lastarg ${state} 'tmpl' 1 "command template"
+}
+
+function _tmux-confirm-before() {
+    [[ -n ${tmux_describe} ]] && print "Run a command but ask for confirmation before" && return
+    local state
+    local -a args
+    args=(
+        '-t[Choose a target client]:clients:__tmux-clients'
+        '*:: :->command_and_args'
+    )
+    _arguments -C ${args} && return
+    __tmux-lastarg ${state} 'command_and_args' 1 "command string"
+}
+
+function _tmux-copy-buffer() {
+    [[ -n ${tmux_describe} ]] && print "Copy session paste buffers" && return
+    local state session
+    local -a args
+    local -ax bopts
+
+    args=(
+        '-a[Choose a source buffer index]:buffer:->srcbuf'
+        '-b[Choose a destination buffer index]:buffer:->dstbuf'
+        '-s[Choose a source session]:session:->srcsession'
+        '-t[Choose a destination session]:session:->dstsession'
+    )
+    _arguments ${args}
+
+    case ${state} in
+        ((src|dst)session)
+            __tmux-sessions
+            return
+            ;;
+        (srcbuf)
+            session="$(__tmux-get-optarg -s "${words[@]}")"
+            ;;
+        (srcbuf)
+            session="$(__tmux-get-optarg -t "${words[@]}")"
+            ;;
+    esac
+    if [[ -n ${session} ]]; then
+        bopts=( -t ${session} )
+        __tmux-buffers
+        return
+    fi
+    bopts=()
+    __tmux-buffers
+}
+
+function _tmux-copy-mode() {
+    [[ -n ${tmux_describe} ]] && print "Enter copy mode" && return
+    local -a args
+    args=(
+        '-t[Choose a target pane]:panes:__tmux-panes'
+        '-u[Scroll up one page]'
+    )
+    _arguments ${args}
+}
+
+function _tmux-delete-buffer() {
+    [[ -n ${tmux_describe} ]] && print "Delete a paste buffer" && return
+    local state session
+    local -a args
+    local -ax bopts
+
+    args=(
+        '-b[Choose a target buffer index]:panes:->buffer'
+        '-t[Choose a target session]:panes:->session'
+    )
+    _arguments ${args}
+
+    case ${state} in
+        (session)
+            __tmux-sessions
+            return
+            ;;
+        (buffer)
+            session="$(__tmux-get-optarg -t "${words[@]}")"
+            ;;
+        (*) return ;;
+    esac
+    if [[ -n ${session} ]]; then
+        bopts=( -t ${session} )
+        __tmux-buffers
+        return
+    fi
+    bopts=()
+    __tmux-buffers
+}
+
+function _tmux-detach-client() {
+    [[ -n ${tmux_describe} ]] && print "Detach a client from the server" && return
+    local -a args
+    args=('-t[Choose a target client]:clients:__tmux-clients')
+    _arguments ${args}
+}
+
+function _tmux-display-message() {
+    [[ -n ${tmux_describe} ]] && print "Display a message in the status line" && return
+    local -a args
+    args=(
+        '-t[Choose a target client]:clients:__tmux-clients'
+        '*:: :->msg'
+    )
+    _arguments ${args} && return
+    __tmux-lastarg ${state} 'msg' 1 "message"
+}
+
+function _tmux-display-panes() {
+    [[ -n ${tmux_describe} ]] && print "Display an indicator for each visible pane" && return
+    local -a args
+    args=('-t[Choose a target client]:clients:__tmux-clients')
+    _arguments ${args}
+}
+
+function _tmux-down-pane() {
+    [[ -n ${tmux_describe} ]] && print "Move down a pane" && return
+    local -a args
+    args=('-t[Choose a target pane]:panes:__tmux-panes')
+    _arguments ${args}
+}
+
+function _tmux-find-window() {
+    [[ -n ${tmux_describe} ]] && print "Search for a pattern in windows" && return
+    local curcontext="${curcontext}" state
+    local -a args
+    args=(
+        '-t[Choose a target window]:windows:__tmux-windows'
+        '*:: :->pattern'
+    )
+    _arguments ${args} && return
+    __tmux-lastarg ${state} 'pattern' 1 "window search pattern"
+}
+
+function _tmux-has-session() {
+    [[ -n ${tmux_describe} ]] && print "Check and report if a session exists on the server" && return
+    local -a args
+    args=('-t[Choose a target session]:sessions:__tmux-sessions')
+    _arguments ${args}
+}
+
+function _tmux-if-shell() {
+    [[ -n ${tmux_describe} ]] && print "Execute a tmux command if a shell-command succeeded" && return
+    local -a args
+    args=(
+        '1:shell command:'
+        '2:tmux command:'
+    )
+    _arguments ${args}
+}
+
+function _tmux-kill-pane() {
+    [[ -n ${tmux_describe} ]] && print "Destroy a given pane" && return
+    local -a args
+    args=(
+        '-a[Kill all panes, except current]'
+        '-t[Choose a target pane]:panes:__tmux-panes'
+    )
+    _arguments ${args}
+}
+
+function _tmux-kill-server() {
+    [[ -n ${tmux_describe} ]] && print "Kill clients, sessions and server" && return
+    __tmux-nothing-else
+}
+
+function _tmux-kill-session() {
+    [[ -n ${tmux_describe} ]] && print "Destroy a given session" && return
+    local -a args
+    args=('-t[Choose a target session]:sessions:__tmux-sessions')
+    _arguments ${args}
+}
+
+function _tmux-kill-window() {
+    [[ -n ${tmux_describe} ]] && print "Destroy a given window" && return
+    local -a args
+    args=('-t[Choose a target window]:windows:__tmux-windows')
+    _arguments ${args}
+}
+
+function _tmux-last-window() {
+    [[ -n ${tmux_describe} ]] && print "Select the previously selected window" && return
+    local -a args
+    args=('-t[Choose a session]:sessions:__tmux-sessions')
+    _arguments ${args} && return
+}
+
+function _tmux-link-window() {
+    [[ -n ${tmux_describe} ]] && print "Link a window to another" && return
+    local -a args
+    args=(
+        '-d[Do not make the new window become the active one]'
+        '-k[Kill the target window if it exists]'
+        '-s[Choose source window]:window:__tmux-windows'
+        '-t[Choose destination window]:window:__tmux-windows'
+    )
+    _arguments ${args}
+}
+
+function _tmux-list-buffers() {
+    [[ -n ${tmux_describe} ]] && print "List paste buffers of a session" && return
+    local -a args
+    args=('-t[Choose a session]:sessions:__tmux-sessions')
+    _arguments ${args} && return
+}
+
+function _tmux-list-clients() {
+    [[ -n ${tmux_describe} ]] && print "List clients attached to server" && return
+    __tmux-nothing-else
+}
+
+function _tmux-list-commands() {
+    [[ -n ${tmux_describe} ]] && print "List supported sub-commands" && return
+    __tmux-nothing-else
+}
+
+function _tmux-list-keys() {
+    [[ -n ${tmux_describe} ]] && print "List all key-bindings" && return
+    local -a args
+    args=('-t[Choose a key table]:key table:__tmux-key-tables')
+    _arguments ${args} && return
+}
+
+function _tmux-list-panes() {
+    [[ -n ${tmux_describe} ]] && print "List panes of a window" && return
+    local -a args
+    args=('-t[Choose a window]:windows:__tmux-windows')
+    _arguments ${args} && return
+}
+
+function _tmux-list-sessions() {
+    [[ -n ${tmux_describe} ]] && print "List sessions managed by server" && return
+    __tmux-nothing-else
+}
+
+function _tmux-list-windows() {
+    [[ -n ${tmux_describe} ]] && print "List windows of a session" && return
+    local -a args
+    args=('-t[Choose a session]:sessions:__tmux-sessions')
+    _arguments ${args} && return
+}
+
+function _tmux-load-buffer() {
+    [[ -n ${tmux_describe} ]] && print "Load a file into a paste buffer" && return
+    local state session
+    local -a args
+    local -ax bopts
+
+    args=(
+        '-b[Choose a target buffer index]:panes:->buffer'
+        '-t[Choose a target session]:panes:->session'
+        '1:file name:_files -g "*(-.)"'
+    )
+    _arguments ${args}
+
+    case ${state} in
+        (session)
+            __tmux-sessions
+            return
+            ;;
+        (buffer)
+            session="$(__tmux-get-optarg -t "${words[@]}")"
+            ;;
+        (*) return ;;
+    esac
+    if [[ -n ${session} ]]; then
+        bopts=( -t ${session} )
+        __tmux-buffers
+        return
+    fi
+    bopts=()
+    __tmux-buffers
+}
+
+function _tmux-lock-client() {
+    [[ -n ${tmux_describe} ]] && print "Lock a client" && return
+    local -a args
+    args=('-t[Choose a client]:clients:__tmux-clients')
+    _arguments ${args} && return
+}
+
+function _tmux-lock-server() {
+    [[ -n ${tmux_describe} ]] && print "Lock all clients attached to the server" && return
+    __tmux-nothing-else
+}
+
+function _tmux-lock-session() {
+    [[ -n ${tmux_describe} ]] && print "Lock all clients attached to a session" && return
+    local -a args
+    args=('-t[Choose a session]:sessions:__tmux-sessions')
+    _arguments ${args} && return
+}
+
+function _tmux-move-window() {
+    [[ -n ${tmux_describe} ]] && print "Move a window to another" && return
+    local -a args
+    args=(
+        '-d[Do not make the new window become the active one]'
+        '-s[Choose source window]:window:__tmux-windows'
+        '-t[Choose destination window]:window:__tmux-windows'
+    )
+    _arguments ${args}
+}
+
+function _tmux-new-session() {
+    [[ -n ${tmux_describe} ]] && print "Create a new session" && return
+    local -a args
+    args=(
+        '-d[Attach the new session the current terminal]'
+        '-n[Name the initial window]:window name'
+        '-s[Name the session]:session name'
+        '-t[Specify target session]:sessions:__tmux-sessions'
+        '*:: :_command'
+    )
+    _arguments ${args}
+}
+
+function _tmux-new-window() {
+    [[ -n ${tmux_describe} ]] && print "Create a new window" && return
+    local -a args
+    args=(
+        '-d[Do not make the new window become the active one]'
+        '-k[Destroy it if the specified window exists]'
+        '-n[Specify a window name]:window name:'
+        '-t[Specify target window]:windows:__tmux-windows'
+        '*:: :_command'
+    )
+    _arguments ${args}
+}
+
+function _tmux-next-layout() {
+    [[ -n ${tmux_describe} ]] && print "Move a window to the next layout" && return
+    local -a args
+    args=('-t[Choose target window]:window:__tmux-windows')
+    _arguments ${args}
+}
+
+function _tmux-next-window() {
+    [[ -n ${tmux_describe} ]] && print "Move to the next window in a session" && return
+    local -a args
+    args=(
+        '-a[Move to the next window with activity]'
+        '-t[Choose target session]:session:__tmux-sessions'
+    )
+    _arguments ${args}
+}
+
+function _tmux-paste-buffer() {
+    [[ -n ${tmux_describe} ]] && print "Insert a paste buffer into the window" && return
+    local -a args
+    args=(
+        '-d[Remove buffer from stack after pasting]'
+        '-r[Do not replace LF with CR when pasting]'
+        '-b[Choose buffer]:source buffer:__tmux-buffers'
+        '-t[Choose target window]:window:__tmux-windows'
+    )
+    _arguments ${args}
+}
+
+function _tmux-pipe-pane() {
+    [[ -n ${tmux_describe} ]] && print "Pipe output from a pane to a shell command" && return
+    local state
+    args=(
+        '-o[Only open a pipe if none is currently opened]'
+        '-t[Choose target pane]:pane:__tmux-panes'
+        '*:: :->cmd'
+    )
+    _arguments ${args} && return
+    __tmux-lastarg ${state} 'cmd' 1 "command string"
+}
+
+function _tmux-previous-layout() {
+    [[ -n ${tmux_describe} ]] && print "Move a window to the previous layout" && return
+    local -a args
+    args=('-t[Choose target window]:window:__tmux-windows')
+    _arguments ${args}
+}
+
+function _tmux-previous-window() {
+    [[ -n ${tmux_describe} ]] && print "Move to the previous window in a session" && return
+    local -a args
+    args=(
+        '-a[Move to the previous window with activity]'
+        '-t[Choose target session]:session:__tmux-sessions'
+    )
+    _arguments ${args}
+}
+
+function _tmux-refresh-client() {
+    [[ -n ${tmux_describe} ]] && print "Refresh a client" && return
+    local -a args
+    args=('-t[Choose target client]:client:__tmux-clients')
+    _arguments ${args}
+}
+
+function _tmux-rename-session() {
+    [[ -n ${tmux_describe} ]] && print "Rename a session" && return
+    local state
+    args=(
+        '-t[Choose target session]:session:__tmux-sessions'
+        '*:: :->name'
+    )
+    _arguments ${args} && return
+    __tmux-lastarg ${state} 'name' 1 "new session name"
+}
+
+function _tmux-rename-window() {
+    [[ -n ${tmux_describe} ]] && print "Rename a window" && return
+    local state
+    args=(
+        '-t[Choose target window]:window:__tmux-windows'
+        '*:: :->name'
+    )
+    _arguments ${args} && return
+    __tmux-lastarg ${state} 'name' 1 "new window name"
+}
+
+function _tmux-resize-pane() {
+    [[ -n ${tmux_describe} ]] && print "Resize a pane" && return
+    args=(
+        '-D[Resize downward]'
+        '-D[Resize to the left]'
+        '-D[Resize to the right]'
+        '-U[Resize upward]'
+        '-t[Choose target pane]:pane:__tmux-panes'
+        '1::adjustment (defaults to one):_guard "[0-9]#" "numeric value"'
+    )
+    _arguments ${args}
+}
+
+function _tmux-respawn-window() {
+    [[ -n ${tmux_describe} ]] && print "Reuse a window in which a command has exited" && return
+    local -a args
+    args=(
+        '-k[Kill window if it is in use]'
+        '-t[Choose target window]:window:__tmux-windows'
+        '*::command:_command'
+    )
+    _arguments ${args}
+}
+
+function _tmux-rotate-window() {
+    [[ -n ${tmux_describe} ]] && print "Rotate positions of panes in a window" && return
+    local -a args
+    args=(
+        '-D[Rotate downward]'
+        '-U[Rotate upward]'
+        '-t[Choose target window]:window:__tmux-windows'
+    )
+    _arguments ${args}
+}
+
+function _tmux-run-shell() {
+    [[ -n ${tmux_describe} ]] && print "Execute a command without creating a new window" && return
+    _command
+}
+
+function _tmux-save-buffer() {
+    [[ -n ${tmux_describe} ]] && print "Save a paste buffer to a file" && return
+    local state session
+    local -a args
+    local -ax bopts
+
+    args=(
+        '-b[Choose a target buffer index]:buffer:->buffer'
+        '-t[Choose a target session]:buffer:->session'
+    )
+    _arguments ${args}
+
+    case ${state} in
+        (session)
+            __tmux-sessions
+            return
+            ;;
+        (buffer)
+            session="$(__tmux-get-optarg -t "${words[@]}")"
+            ;;
+        (*) return ;;
+    esac
+    if [[ -n ${session} ]]; then
+        bopts=( -t ${session} )
+        __tmux-buffers
+        return
+    fi
+    bopts=()
+    __tmux-buffers
+}
+
+function _tmux-select-layout() {
+    [[ -n ${tmux_describe} ]] && print "Choose a layout for a window" && return
+    args=(
+        '-t[Choose a target window]:target window:__tmux-windows'
+        '*::layout name:__tmux-layouts'
+    )
+    _arguments ${args}
+}
+
+function _tmux-select-pane() {
+    [[ -n ${tmux_describe} ]] && print "Make a pane the active one in the window" && return
+    local -a args
+    args=('-t[Choose a target pane]:panes:__tmux-panes')
+    _arguments ${args} && return
+}
+
+function _tmux-select-prompt() {
+    [[ -n ${tmux_describe} ]] && print "Open a prompt to enter a window index" && return
+    local -a args
+    args=('-t[Choose a target client]:clients:__tmux-clients')
+    _arguments ${args} && return
+}
+
+function _tmux-select-window() {
+    [[ -n ${tmux_describe} ]] && print "Select a window" && return
+    local -a args
+    args=('-t[Choose a target window]:windows:__tmux-windows')
+    _arguments ${args} && return
+}
+
+function _tmux-send-keys() {
+    [[ -n ${tmux_describe} ]] && print "Send key(s) to a window" && return
+    local curcontext="${curcontext}" state
+    local -a args
+    args=(
+        '-t[Choose a target pane]:panes:__tmux-panes'
+        '*:: :->key'
+    )
+    _arguments ${args} && return
+    __tmux-lastarg ${state} 'key' 1 "key"
+}
+
+function _tmux-send-prefix() {
+    [[ -n ${tmux_describe} ]] && print "Send the prefix key to a window" && return
+    local -a args
+    args=('-t[Choose a target pane]:panes:__tmux-panes')
+    _arguments ${args}
+}
+
+function _tmux-server-info() {
+    [[ -n ${tmux_describe} ]] && print "Show server information" && return
+    __tmux-nothing-else
+}
+
+function _tmux-set-buffer() {
+    [[ -n ${tmux_describe} ]] && print "Set contents of a paster buffer" && return
+    local state session
+    local -a args
+    local -ax bopts
+
+    args=(
+        '-b[Choose a target buffer index]:panes:->buffer'
+        '-t[Choose a target session]:panes:->session'
+    )
+    _arguments ${args}
+
+    case ${state} in
+        (session)
+            __tmux-sessions
+            return
+            ;;
+        (buffer)
+            session="$(__tmux-get-optarg -t "${words[@]}")"
+            ;;
+        (*) return ;;
+    esac
+    if [[ -n ${session} ]]; then
+        bopts=( -t ${session} )
+        __tmux-buffers
+        return
+    fi
+    bopts=()
+    __tmux-buffers
+}
+
+function _tmux-set-environment() {
+    [[ -n ${tmux_describe} ]] && print "(Un)Set an environment variable" && return
+    local state
+    local -a args
+    args=(
+        '-g[Modify global environment]'
+        '-r[Remove variable before starting new processes]'
+        '-u[Unset a variable]'
+        '-t[Choose a target session]:target session:__tmux-sessions'
+        '*:: :->name_or_value'
+    )
+    _arguments -C ${args}
+
+    case ${state} in
+        name_or_value)
+            if (( CURRENT == 1 )); then
+                _message 'name'
+            elif (( CURRENT == 2 )); then
+                _message 'value'
+            else
+                __tmux-nothing-else
+            fi
+            ;;
+    esac
+}
+
+function _tmux-set-option() {
+    [[ -n ${tmux_describe} ]] && print "Set a session option" && return
+    local -a args
+    args=(
+        '-a[Append to string options]'
+        '-g[Set a global session option]'
+        '-u[Unset a non-global option]'
+        '-t[Choose a target session]:target session:__tmux-sessions'
+        '*:: :->name_or_value'
+    )
+    _arguments -C ${args}
+
+    case ${state} in
+        name_or_value)
+            if (( CURRENT == 1 )); then
+                __tmux-options
+            elif (( CURRENT == 2 )); then
+                __tmux-option-guard 'session' ${words[1]}
+            else
+                __tmux-nothing-else
+            fi
+            ;;
+    esac
+}
+
+function _tmux-set-window-option() {
+    [[ -n ${tmux_describe} ]] && print "Set a window option" && return
+    local -a args
+    args=(
+        '-a[Append to string options]'
+        '-g[Set a global window option]'
+        '-u[Unset a non-global option]'
+        '-t[Choose a target window]:target window:__tmux-windows'
+        '*:: :->name_or_value'
+    )
+    _arguments -C ${args}
+
+    case ${state} in
+        name_or_value)
+            if (( CURRENT == 1 )); then
+                __tmux-window-options
+            elif (( CURRENT == 2 )); then
+                __tmux-option-guard 'window' ${words[1]}
+            else
+                __tmux-nothing-else
+            fi
+            ;;
+    esac
+}
+
+function _tmux-show-buffer() {
+    [[ -n ${tmux_describe} ]] && print "Display the contents of a paste buffer" && return
+    local state session
+    local -a args
+    local -ax bopts
+
+    args=(
+        '-b[Choose a target buffer index]:panes:->buffer'
+        '-t[Choose a target session]:panes:->session'
+    )
+    _arguments ${args}
+
+    case ${state} in
+        (session)
+            __tmux-sessions
+            return
+            ;;
+        (buffer)
+            session="$(__tmux-get-optarg -t "${words[@]}")"
+            ;;
+        (*) return ;;
+    esac
+    if [[ -n ${session} ]]; then
+        bopts=( -t ${session} )
+        __tmux-buffers
+        return
+    fi
+    bopts=()
+    __tmux-buffers
+}
+
+function _tmux-show-environment() {
+    [[ -n ${tmux_describe} ]] && print "Display the environment" && return
+    local -a args
+    args=(
+        '-g[Show global environment]'
+        '-t[Choose a target session]:target session:__tmux-sessions'
+    )
+    _arguments ${args}
+}
+
+function _tmux-show-options() {
+    [[ -n ${tmux_describe} ]] && print "Show session options" && return
+    local -a args
+    args=(
+        '-g[Show global options]'
+        '-t[Choose a target session]:target session:__tmux-sessions'
+    )
+    _arguments ${args}
+}
+
+function _tmux-show-window-options() {
+    [[ -n ${tmux_describe} ]] && print "Show window options" && return
+    local -a args
+    args=(
+        '-g[Show global options]'
+        '-t[Choose a target window]:target window:__tmux-windows'
+    )
+    _arguments ${args}
+}
+
+function _tmux-source-file() {
+    [[ -n ${tmux_describe} ]] && print "Execute tmux commands from a file" && return
+    _files -g "*(-.)"
+}
+
+function _tmux-split-window() {
+    [[ -n ${tmux_describe} ]] && print "Creates a new pane" && return
+    local -a args
+    args=(
+        '-d[Do not make the new window become the active one]'
+        '-h[Split horizontally]'
+        '-v[Split vertically]'
+        '-l[Define new pane'\''s size]: :_guard "[0-9]#" "numeric value"'
+        '-p[Define new pane'\''s size in percent]: :_guard "[0-9]#" "numeric value"'
+        '-t[Choose target window]:window:__tmux-windows'
+        '*:: :_command'
+    )
+    _arguments ${args} && return
+}
+
+function _tmux-start-server() {
+    [[ -n ${tmux_describe} ]] && print "Start a tmux server" && return
+    __tmux-nothing-else
+}
+
+function _tmux-suspend-client() {
+    [[ -n ${tmux_describe} ]] && print "Suspend a client" && return
+    local -a args
+    args=('-t[Choose destination client]:client:__tmux-clients')
+    _arguments ${args}
+}
+
+function _tmux-swap-pane() {
+    [[ -n ${tmux_describe} ]] && print "Swap two panes" && return
+    local -a args
+    args=(
+        '-D[Move pane down]'
+        '-U[Move pane up]'
+        '-s[Choose source pane]:pane:__tmux-panes'
+        '-t[Choose destination pane]:pane:__tmux-panes'
+    )
+    _arguments ${args}
+}
+
+function _tmux-swap-window() {
+    [[ -n ${tmux_describe} ]] && print "Swap two windows" && return
+    local -a args
+    args=(
+        '-d[Do not make the new window become the active one]'
+        '-s[Choose source window]:window:__tmux-windows'
+        '-t[Choose destination window]:window:__tmux-windows'
+    )
+    _arguments ${args}
+}
+
+function _tmux-switch-client() {
+    [[ -n ${tmux_describe} ]] && print "Switch the client to another session" && return
+    local -a args
+    args=(
+        '-c[Choose a target client]:client:__tmux-key-clients'
+        '-t[Choose a target window]:window:__tmux-key-windows'
+    )
+    _arguments ${args}
+}
+
+function _tmux-unbind-key() {
+    [[ -n ${tmux_describe} ]] && print "Unbind a key" && return
+    local state keytable
+    local -a args ow
+
+    ow=( "${words[@]}" )
+    args=(
+        '-c[Kill the window if it is only in one session]'
+        '-n[Remove a non-prefix binding]'
+        '-t[Choose a key table]:key table:__tmux-key-tables'
+        '*:: :->boundkeys'
+    )
+    _arguments ${args} && return
+    [[ ${state} != 'boundkeys' ]] && return
+    keytable="$(__tmux-get-optarg -t "${ow[@]}")"
+    if [[ -n ${keytable} ]]; then
+        __tmux-bound-keys -t ${keytable}
+        return
+    fi
+    __tmux-bound-keys
+}
+
+function _tmux-unlink-window() {
+    [[ -n ${tmux_describe} ]] && print "Unlink a window" && return
+    local -a args
+    args=(
+        '-k[Kill the window if it is only in one session]'
+        '-t[Choose a target window]:target window:__tmux-windows'
+    )
+    _arguments ${args}
+}
+
+function _tmux-up-pane() {
+    [[ -n ${tmux_describe} ]] && print "Move up a pane" && return
+    local -a args
+    args=('-t[Choose a target pane]:panes:__tmux-panes')
+    _arguments ${args}
+}
+
+# --- Utility functions ---
+# They should be called __tmux-*() and kept seperate from the
+# sub-command functions.
+
+function __tmux-attributes() {
+    local -a attr already
+    attr=( default bright bold dim underscore blink reverse hidden italics )
+    compset -P '*,'
+    already=(${(s<,>)IPREFIX})
+    _describe -t tmux-attribute 'tmux attribute' attr -S, -F already -q
+}
+
+function __tmux-buffers() {
+    local expl
+    local -a buffers
+
+    if [[ ${(t)bopts} != *array* ]]; then
+        local -a bopts; bopts=()
+    fi
+
+    buffers=( ${${(f)"$(command tmux list-buffers "${bopts[@]}")"}/:[ $'\t']##/:} )
+    _describe -t buffers 'buffers' buffers
+}
+
+function __tmux-bound-keys() {
+    local expl
+    local -a keys
+
+    keys=( ${${${${(f)"$(command tmux list-keys "$@")"}/:[ $'\t']##/:}/(#s)[ $'\t']##/}/(#s):/\\:} )
+    _describe -t keys 'keys' keys
+}
+
+function __tmux-choose-stuff() {
+    # choose-{client,session,window} accept exactly the same arguments, so...
+    local curcontext="${curcontext}" state
+    local -a args
+    args=(
+        '-t[Choose a target pane]:panes:__tmux-panes'
+        '*:: :->tmpl'
+    )
+    _arguments ${args} && return
+    __tmux-lastarg ${state} 'tmpl' 1 "tmux command template"
+}
+
+function __tmux-clients() {
+    local expl
+    local -a clients
+    clients=( ${${(f)"$(command tmux list-clients)"}/:[ $'\t']##/:} )
+    _describe -t clients 'clients' clients
+}
+
+function __tmux-colours() {
+    local -a colnames
+    colnames=( default black red green yellow blue magenta cyan white colourN:"replace N by a number between 0 and 255" )
+    compset -P 'colour*'
+    if [[ -z ${IPREFIX} ]]; then
+        _describe -t tmux-colours 'colour' colnames
+    else
+        _message 'colour number 0..255'
+    fi
+}
+
+function __tmux-get-optarg() {
+    local opt="$1"
+    local -i i
+    shift
+
+    for (( i = 1; i <= $#; i++ )); do
+        if [[ ${argv[$i]} == ${opt} ]]; then
+            if [[ ${argv[$(( i + 1 ))]} != -* ]]; then
+                print -- ${argv[$(( i + 1 ))]}
+            fi
+            return
+        fi
+    done
+}
+
+function __tmux-key-tables() {
+    local expl
+    local -a tables
+    tables=( vi-edit emacs-edit vi-choice emacs-choice vi-copy emacs-copy )
+    _wanted keytable expl 'key tables' compadd ${expl} -- ${tables}
+}
+
+function __tmux-lastarg() {
+    local got_state="$1" want_state="$2" pos="$3" msg="$4"
+
+    if [[ ${want_state} == ${got_state} ]] && (( CURRENT == ${pos} )); then
+        _message ${msg}
+    else
+        __tmux-nothing-else
+    fi
+}
+
+function __tmux-layouts() {
+    local expl
+    local -a layouts
+    layouts=( even-horizontal even-vertical main-horizontal main-vertical )
+    _wanted layout expl 'layouts' compadd ${expl} -- ${layouts}
+}
+
+function __tmux-nothing-else() {
+    _message "no further arguments"
+}
+
+function __tmux-option-guard() {
+    local mode opt guard int_guard
+    mode="$1"
+    opt="$2"
+    shift; shift
+    local -a options desc
+    int_guard='_guard "[0-9]#" "'${opt}': numeric value"'
+    if [[ ${mode} == 'session' ]]; then
+        options=(
+            'base-index:'${int_guard}
+            'bell-action:DESC:any none current'
+            'buffer-limit:'${int_guard}
+            'default-command:MSG:command string'
+            'default-path:MSG:path name'
+            'default-shell:MSG:shell executable'
+            'default-terminal:MSG:terminal string'
+            'display-panes-colour:__tmux-colours'
+            'display-panes-time:'${int_guard}
+            'display-time:'${int_guard}
+            'history-limit:'${int_guard}
+            'lock-after-time:'${int_guard}
+            'lock-command:MSG:command string'
+            'lock-server:DESC:on off'
+            'message-attr:__tmux-attributes'
+            'message-bg:__tmux-colours'
+            'message-fg:__tmux-colours'
+            'mouse-select-pane:DESC:on off'
+            'prefix:MSG:comma-seperated key list'
+            'repeat-time:'${int_guard}
+            'set-remain-on-exit:DESC:on off'
+            'set-titles:DESC:on off'
+            'set-titles-string:MSG:title format string'
+            'status:DESC:on off'
+            'status-attr:__tmux-attributes'
+            'status-bg:__tmux-colours'
+            'status-fg:__tmux-colours'
+            'status-interval:'${int_guard}
+            'status-justify:DESC:left centre right'
+            'status-keys:DESC:vi emacs'
+            'status-left:MSG:format string'
+            'status-left-attr:__tmux-attributes'
+            'status-left-bg:__tmux-colours'
+            'status-left-fg:__tmux-colours'
+            'status-left-length:'${int_guard}
+            'status-right:MSG:format string'
+            'status-right-attr:__tmux-attributes'
+            'status-right-bg:__tmux-colours'
+            'status-right-fg:__tmux-colours'
+            'status-right-length:'${int_guard}
+            'status-utf8:DESC:on off'
+            'terminal-overrides:MSG:overrides string'
+            'update-environment:MSG:string listing env. variables'
+            'visual-activity:DESC:on off'
+            'visual-bell:DESC:on off'
+            'visual-content:DESC:on off'
+        )
+    else
+        options=(
+            'aggressive-resize:DESC:on off'
+            'automatic-rename:DESC:on off'
+            'clock-mode-colour:__tmux-colours'
+            'clock-mode-style:DESC:12 24'
+            'force-height:'${int_guard}
+            'force-width:'${int_guard}
+            'main-pane-height:'${int_guard}
+            'main-pane-width:'${int_guard}
+            'mode-attr:__tmux-attributes'
+            'mode-bg:__tmux-colours'
+            'mode-fg:__tmux-colours'
+            'mode-keys:DESC:vi emacs'
+            'mode-mouse:DESC:on off'
+            'monitor-activity:DESC:on off'
+            'monitor-content:MSG:fnmatch(3) pattern'
+            'remain-on-exit:DESC:on off'
+            'synchronize-panes:DESC:on off'
+            'utf8:DESC:on off'
+            'window-status-attr:__tmux-attributes'
+            'window-status-bg:__tmux-colours'
+            'window-status-current-attr:__tmux-attributes'
+            'window-status-current-bg:__tmux-colours'
+            'window-status-current-fg:__tmux-colours'
+            'window-status-fg:__tmux-colours'
+            'xterm-keys:DESC:on off'
+        )
+    fi
+
+    guard=${(M)options:#$opt:*}
+    if [[ -z ${guard} ]]; then
+        _message "unknown ${mode} option: ${opt}"
+        return
+    fi
+    _message "${mode} option value"
+    guard=${guard#*:}
+    case ${guard} in
+        ('') ;;
+        (MSG:*)
+            _message ${guard#*:}
+            ;;
+        (DESC:*)
+            eval "desc=( ${guard#*:} )"
+            _describe -t "tmux-${mode}-option-value" "${opt}" desc
+            ;;
+        (*)
+            eval ${guard}
+            ;;
+    esac
+}
+
+function __tmux-options() {
+    local -a tmux_options
+    tmux_options=(
+        'base-index:Define where to start numbering'
+        'bell-action:Set action on window bell'
+        'buffer-limit:Number of buffers kept per session'
+        'default-command:Default command for new windows'
+        'default-path:Default working directory'
+        'default-shell:Default shell executable'
+        'default-terminal:Default terminal definition string'
+        'display-panes-colour:Colour used for display-panes'
+        'display-panes-time:Time (in msecs) of display-panes output'
+        'display-time:Time (in msecs) messages are displayed'
+        'history-limit:Number of copy-mode lines per window'
+        'lock-after-time:Lock sessions after N seconds'
+        'lock-command:Command to run for locking a client'
+        'lock-server:Make lock-after-time lock the server instead of sessions'
+        'message-attr:Set status line message attributes'
+        'message-bg:Set status line message background colour'
+        'message-fg:Set status line message foreground colour'
+        'mouse-select-pane:Make mouse clicks select window panes'
+        'prefix:Comma seperated line of keys accepted as prefix key'
+        'repeat-time:Time for multiple commands without prefix-key presses'
+        'set-remain-on-exit:Set remain-on-exit window option'
+        'set-titles:Try to set xterm window titles'
+        'set-titles-string:Format used by set-titles'
+        'status:Show or hide the status bar'
+        'status-attr:Status bar attributes'
+        'status-bg:Status bar background colour'
+        'status-fg:Status bar foreground colour'
+        'status-interval:Interval (in seconds) for status bar updates'
+        'status-justify:Position of the window list in status bar'
+        'status-keys:Mode to use in status bar modes (vi/emacs)'
+        'status-left:Format to use left in status bar'
+        'status-left-attr:Attribute for the left part of the status bar'
+        'status-left-bg:Background colour of the left part of the status bar'
+        'status-left-fg:Foreground colour of the left part of the status bar'
+        'status-left-length:Maximum length of the left part of the status bar'
+        'status-right:Format to use right in status bar'
+        'status-right-attr:Attribute for the right part of the status bar'
+        'status-right-bg:Background colour of the right part of the status bar'
+        'status-right-fg:Foreground colour of the right part of the status bar'
+        'status-right-length:Maximum length of the right part of the status bar'
+        'status-utf8:Assume UTF-8 sequences to appear in status bar'
+        'terminal-overrides:Override terminal descriptions'
+        'update-environment:List of variables to be copied to a session'\''s environment'
+        'visual-activity:Display status line messages upon activity'
+        'visual-bell:Use visual bell instead of audible'
+        'visual-content:Display status line messages upon content changes'
+    )
+    _describe -t tmux-options 'tmux option' tmux_options
+}
+
+function __tmux-panes() {
+    local expl line
+    local -i num
+    local -a panes opts
+
+    compset -P '*.'
+    if [[ -n ${IPREFIX} ]]; then
+        opts=( -t "${IPREFIX%.}" )
+    else
+        opts=( )
+    fi
+    num=0
+    command tmux list-panes "${opts[@]}" | while IFS= read -r line; do
+        panes+=( $(( num++ )):${line//:/} )
+    done
+    _describe -t panes 'panes' panes "$@"
+    if [[ ${IPREFIX} != *. ]]; then
+        _wanted windows expl 'windows' __tmux-windows -S.
+    fi
+}
+
+function __tmux-sessions() {
+    local expl
+    local -a sessions
+    sessions=( ${${(f)"$(command tmux list-sessions)"}/:[ $'\t']##/:} )
+    _describe -t sessions 'sessions' sessions "$@"
+}
+
+function __tmux-socket-name() {
+    local expl sdir
+    local curcontext="${curcontext}"
+    local -a socks
+    zstyle -s ":completion:${curcontext}:sockets" socketdir sdir || sdir="/tmp/tmux-${UID}"
+    socks=(${sdir}/*(=:t))
+    _wanted socket expl 'socket name' compadd ${expl} -- ${socks}
+}
+
+function __tmux-window-options() {
+    local -a tmux_window_options
+    tmux_window_options=(
+        'aggressive-resize:Aggressively resize windows'
+        'automatic-rename:Attempt to automatically rename windows'
+        'clock-mode-colour:Set clock colour'
+        'clock-mode-style:Set clock hour format (12/24)'
+        'force-height:Force a windows to a certain height'
+        'force-width:Force a windows to a certain width'
+        'main-pane-height:Set height for main-* layouts'
+        'main-pane-width:Set width for main-* layouts'
+        'mode-attr:Set window modes attributes'
+        'mode-bg:Set window modes background colour'
+        'mode-fg:Set window modes foreground colour'
+        'mode-keys:Mode to use in copy and choice modes (vi/emacs)'
+        'mode-mouse:Use mouse in modes'
+        'monitor-activity:Monitor window activity'
+        'monitor-content:Monitor window contents for a fnmatch(3) pattern'
+        'remain-on-exit:Do not destroy windows after the program exits'
+        'synchronize-panes:Send input to all panes of a window'
+        'utf8:Assume UTF-8 sequences to appear in a window'
+        'window-status-attr:Set status line attributes for a window'
+        'window-status-bg:Set status line background for a window'
+        'window-status-current-attr:Set status line attributes for active window'
+        'window-status-current-bg:Set status line background for active window'
+        'window-status-current-fg:Set status line foreground for active window'
+        'window-status-fg:Set status line foreground for a window'
+        'xterm-keys:Generate xterm-style function key sequences'
+    )
+    _describe -t tmux-window-options 'tmux window option' tmux_window_options
+}
+
+function __tmux-windows() {
+    local expl
+    local -a wins opts
+
+    compset -P '*:'
+    if [[ -n ${IPREFIX} ]]; then
+        opts=( -t "${IPREFIX%:}" )
+    else
+        opts=( )
+    fi
+    wins=( ${${(f)"$(command tmux list-windows "${opts[@]}")"}/:[ $'\t']##/:} )
+    _describe -t windows 'windows' wins "$@"
+    if [[ ${IPREFIX} != *: ]]; then
+        _wanted sessions expl 'sessions' __tmux-sessions -S:
+    fi
+}
+
+# And here is the actual _tmux(), that puts it all together:
+function _tmux() {
+    local curcontext="${curcontext}"
+    local mode state ret
+    local -a args
+    local -x tmuxcommand
+    unset tmux_describe
+
+    args=(
+        '-2[force using 256 colours]'
+        '-8[force using 88 colours]'
+        '-c[execute a shell command]:command name:_command_names'
+        '-f[specify configuration file]:tmux config file:_files -g "*(-.)"'
+        '-l[behave like a login shell]'
+        '-L[specify socket name]:socket name:__tmux-socket-name'
+        '-q[do not send informational messages]'
+        '-S[specify socket path]:server socket:_path_files -g "*(=,/)"'
+        '-u[force using UTF-8]'
+        '-v[request verbose logging]'
+        '*:: :->subcommand_or_options'
+    )
+    _arguments -C -s -w ${args} && return
+
+    if [[ ${state} == "subcommand_or_options" ]]; then
+        if (( CURRENT == 1 )) ; then
+            zstyle -s ":completion:${curcontext}:subcommands" mode mode || mode='both'
+            if [[ ${mode} == 'commands' ]]; then
+                _describe -t subcommands 'tmux commands' _tmux_commands
+            elif [[ ${mode} == 'aliases' ]]; then
+                _describe -t subcommands 'tmux aliases' _tmux_aliases
+            else
+                _describe -t subcommands 'tmux commands and aliases' _tmux_commands -- _tmux_aliases
+            fi
+        else
+            tmuxcommand="${words[1]}"
+            if [[ -n ${_tmux_aliasmap[$tmuxcommand]} ]] ; then
+                tmuxcommand="${_tmux_aliasmap[$tmuxcommand]}"
+            fi
+            curcontext="${curcontext%:*:*}:tmux-${tmuxcommand}:"
+            _call_function ret _tmux-${tmuxcommand}
+        fi
+    fi
+}
+
+# description generation follows; only done on 1st _tmux call.
+local f desc
+local -A rev
+local -x tmux_describe
+tmux_describe='yes, please'
+for f in ${(k)_tmux_aliasmap} ; do
+    rev+=( ${_tmux_aliasmap[$f]} $f )
+done
+for f in ${(M)${(k)functions}:#_tmux-*} ; do
+    desc="$($f)"
+    _tmux_commands+=( "${f#_tmux-}${desc:+:$desc}" )
+    [[ -n ${rev[${f#_tmux-}]} ]] && _tmux_aliases+=( "${rev[${f#_tmux-}]}${desc:+:$desc}" )
+done
+unset desc f rev tmux_describe
+
+_tmux
