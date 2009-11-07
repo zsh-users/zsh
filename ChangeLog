@@ -1,3 +1,8 @@
+2009-11-07  Clint Adams  <clint@zsh.org>
+
+	* Frank Terbeck: 27359: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_tmux: completion for tmux 1.1.
+
 2009-11-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27358: Src/builtin.c: error if $0 was altered within
@@ -12308,5 +12313,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4804 $
+* $Revision: 1.4805 $
 *****************************************************
