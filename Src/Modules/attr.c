@@ -98,7 +98,7 @@ static int
 bin_getattr(char *nam, char **argv, Options ops, UNUSED(int func))
 {
     int ret = 0;
-    int list_len, val_len, attr_len, slen;
+    int list_len, val_len = 0, attr_len = 0, slen;
     char *value, *file = argv[0], *attr = argv[1], *param = argv[2];
     int symlink = OPT_ISSET(ops, 'h');
 
@@ -125,9 +125,9 @@ bin_getattr(char *nam, char **argv, Options ops, UNUSED(int func))
             zfree(value, val_len+1);
         }
     }
-    if (list_len < 0 || val_len < 0 || attr_len < 0)  {
+    if (list_len < 0 || val_len < 0 || attr_len < 0 || attr_len > val_len)  {
         zwarnnam(nam, "%s: %e", metafy(file, slen, META_NOALLOC), errno);
-        ret = 1 + (attr_len > val_len);
+        ret = 1 + (attr_len > val_len || attr_len < 0);
     }
     return ret;
 }
@@ -172,7 +172,7 @@ static int
 bin_listattr(char *nam, char **argv, Options ops, UNUSED(int func))
 {
     int ret = 0;
-    int val_len, list_len, slen;
+    int val_len, list_len = 0, slen;
     char *value, *file = argv[0], *param = argv[1];
     int symlink = OPT_ISSET(ops, 'h');
 
@@ -214,9 +214,9 @@ bin_listattr(char *nam, char **argv, Options ops, UNUSED(int func))
         }
         zfree(value, val_len+1);
     }
-    if (val_len < 0 || list_len < 0) {
+    if (val_len < 0 || list_len < 0 || list_len > val_len) {
         zwarnnam(nam, "%s: %e", metafy(file, slen, META_NOALLOC), errno);
-        ret = 1 + (list_len > val_len);
+        ret = 1 + (list_len > val_len || list_len < 0);
     }
     return ret;
 }

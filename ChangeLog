@@ -1,3 +1,7 @@
+2009-11-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Mikael: 27362: Src/Modules/attr.c: some more fixes.
+
 2009-11-07  Clint Adams  <clint@zsh.org>
 
 	* Frank Terbeck: 27359: Completion/Unix/Command/.distfiles,
@@ -12313,5 +12317,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4805 $
+* $Revision: 1.4806 $
 *****************************************************
