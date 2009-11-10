@@ -1,3 +1,11 @@
+2009-11-10  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Greg Klanderman: 27377 (slightly tweaked):
+	Completion/Unix/Command/_rm: fix ignored (duplicate) file names
+
+	* 27368, 27369: FEATURES: replace one incorrect example with two
+	correct ones
+
 2009-11-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Mikael: 27362: Src/Modules/attr.c: some more fixes.
@@ -12317,5 +12325,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4806 $
+* $Revision: 1.4807 $
 *****************************************************
