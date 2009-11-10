@@ -5,7 +5,7 @@ args=(
   '(-f --force)'{-f,--force}'[ignore nonexistent files, never prompt]'
   '(-I --interactive)-i[prompt before every removal]'
   '(-r -R --recursive)'{-r,-R,--recursive}'[remove directories and their contents recursively]'
-  '*:files:->file'
+  '*::files:->file'
 )
 if _pick_variant gnu=gnu unix --help; then
   opts+=(-S)
@@ -33,7 +33,10 @@ _arguments -C $opts \
 case $state in
   (file)
     declare -a ignored
-    ignored=(${line//(#m)[\[\]()\\*?#<>~\^]/\\$MATCH})
+    if ((CURRENT > 1)); then
+      ignored=(${line[1,CURRENT-1]//(#m)[\[\]()\\*?#<>~\^]/\\$MATCH})
+      ignored+=(${line[CURRENT+1,-1]//(#m)[\[\]()\\*?#<>~\^]/\\$MATCH})
+    fi
     _files -F ignored && ret=0
     ;;
 esac
