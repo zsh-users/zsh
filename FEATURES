@@ -28,7 +28,8 @@ advanced globbing:
 qualifiers in parentheses after globbing expression:
   ls *(*@)  matches executable files/directories or symlinks
   ls *(L0f.go-w.)  matches all zero-length files not group or world writable
-  ls *(om[2])  matches the two most recently modified files
+  ls *(om[1,3])  matches the three most recently modified files
+  ls *(om[2])  matches the second most recently modified file
 null command shorthands:
   "< file" is same as "more <file"
   "> file" is same as "cat >file"
