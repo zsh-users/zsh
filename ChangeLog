@@ -1,3 +1,8 @@
+2009-11-11  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Frank Terbeck: 27364: Completion/Unix/Command/_tmux: fix
+	cut'n'paste error in descriptions
+
 2009-11-10  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Greg Klanderman: 27377 (slightly tweaked):
@@ -12325,5 +12330,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4807 $
+* $Revision: 1.4808 $
 *****************************************************
