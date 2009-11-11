@@ -654,8 +654,8 @@ function _tmux-resize-pane() {
     [[ -n ${tmux_describe} ]] && print "Resize a pane" && return
     args=(
         '-D[Resize downward]'
-        '-D[Resize to the left]'
-        '-D[Resize to the right]'
+        '-L[Resize to the left]'
+        '-R[Resize to the right]'
         '-U[Resize upward]'
         '-t[Choose target pane]:pane:__tmux-panes'
         '1::adjustment (defaults to one):_guard "[0-9]#" "numeric value"'
