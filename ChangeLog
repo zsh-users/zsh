@@ -1,5 +1,11 @@
 2009-11-11  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* users/14548: Src/Modules/termcap.c: prevent libtermcap from
+	exiting on an unknown terminal type
+
+	* Alexey Froloff: 27367: Completion/Unix/Command/_ri: update
+	for Ruby 1.9 and later
+
 	* Frank Terbeck: 27364: Completion/Unix/Command/_tmux: fix
 	cut'n'paste error in descriptions
 
@@ -12330,5 +12336,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4808 $
+* $Revision: 1.4809 $
 *****************************************************
