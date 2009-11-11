@@ -369,7 +369,10 @@ boot_(Module m)
 {
 #ifdef HAVE_TGETENT
 # ifdef HAVE_SETUPTERM
-    setupterm((char *)0, 1, (int *)0);
+    int errret;
+    if (setupterm((char *)0, 1, &errret) == ERR) {
+	return 1;
+    }
 # endif
 #endif
     return  0;
