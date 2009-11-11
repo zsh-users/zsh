@@ -6,19 +6,81 @@ typeset -A opt_args
 _arguments \
   '(- *)'{-h,--help}'[print help information and exit]' \
   '(- *)'{-v,--version}'[display the version of ri]' \
-  '(-c --classes)'{-c,--classes}'[display the names of classes and modules we know about]' \
-  '(-d --doc-dir)'{-d,--doc-dir}'[directory to search for documentation]:ri doc directory:_files -/' \
-  '(-f --format)'{-f,--format}'[format to use when displaying output]:output format:(ansi bs html plain simple)' \
-  '(-l --list-names)'{-l,--list-names}'[list all the names known to RDoc]' \
+  '*'{-d,--doc-dir}'[directory to search for documentation]:ri doc directory:_files -/' \
+  '(-f --fmt --format)'{-f,--fmt,--format}'[format to use when displaying output]:output format:(ansi bs html plain simple)' \
   '(-T --no-pager)'{-T,--no-pager}'[send output directly to stdout]' \
+  '(-i, --interactive)'{-i,--interactive}'[interactive mode]' \
+  '--list-doc-dirs[list the directories from which ri will source documentation]' \
   '(-w --width)'{-w,--width}'[set the width of the output]:output width:' \
+  '--no-standard-docs[do not include documentation from the Ruby standard library, site_lib, installed gems, or ~/.rdoc]' \
+  '(--no-use-cache --use-cache)--'{no-,}'use-cache[whether or not to use ri'\''s cache]' \
+  '(--no-system --system)--'{no-,}'system[include documentation from Ruby'\''s standard library]' \
+  '(--no-site --site)--'{no-,}'site[include documentation from libraries installed in site_lib]' \
+  '(--no-gems --gems)--'{no-,}'gems[include documentation from RubyGems]' \
+  '(--no-home --home)--'{no-,}'home[include documentation stored in ~/.rdoc]' \
   '*:ri name:->ri-name' && ret=0
 
 if [[ "$state" = ri-name ]]; then
-    local ri_names expl
+  local -a ri_dirs ri_names ri_wants ri_names
+  local class_dir esc_name dir curtag tag descr expl
 
-    ri_names=( ${(f)"$( _call_program ri-names "$words[1]" ${(v)opt_args[(I)(-d|--doc-dir)]:+-d "${(v)opt_args[(I)(-d|--doc-dir)]}"} -l -T )"} )
-    _wanted ri-names expl "ri name" compadd -a ri_names && ret=0
+  ret=1
+
+  if "ruby${words[1]#ri}" -rrdoc/ri/ri_options.rb -e 1 >/dev/null 2>&1; then
+    # Old-style Ruby 1.8.x RI
+    ri_dirs=( ${(f)"$(_call_program ri-names "ruby${words[1]#ri}" -rrdoc/ri/ri_options -e '"o = RI::Options.instance; o.parse(ARGV); o.path.each { |p| puts p }"' -- ${(kv)opt_args[(I)-d|--doc-dir|--(system|site|gems|home)]})"} )
+  else
+    # New-style Ruby 1.9+ RI
+    ri_dirs=( ${(f)"$(_call_program ri-names "$words[1]" ${(kv)opt_args[(I)-d|--doc-dir|--((no-|)(system|site|gems|home)|standard-docs)]} --list-doc-dirs -f plain -T)"} )
+  fi
+
+  if compset -P '?*(::|\#|.)'; then
+    class_dir=${IPREFIX//(::|\#|.)/\/}
+    #else
+    #	:
+  fi
+  esc_name=${${(Q)PREFIX}//(#b)([^A-Za-z0-9_])/$(printf %%%x ${(qq)match[1]})}
+
+  case "$IPREFIX" in
+    (*::) ri_wants=( 'classes:class names' 'class-methods:class methods' );;
+    (*\#) ri_wants=( 'instance-methods:instance methods' );;
+    (*.) ri_wants=( 'class-methods:class methods' 'instance-methods:instance methods' );;
+    (*) ri_wants=( 'classes:class names' )
+  esac
+
+  for curtag in $ri_wants; do
+    tag=${curtag%%:*}
+    descr=${curtag#*:}
+
+    _tags "$tag"
+    while _tags; do
+      while _next_label "$tag" expl "$descr"; do
+        ri_wants=()
+        case "$tag" in
+          (classes)
+          for dir in $ri_dirs[@]; do
+            ri_wants+=( $dir/$class_dir*(-/:t) )
+          done
+          ;;
+          (class-methods)
+          for dir in $ri_dirs[@]; do
+            fnames=( $dir/$class_dir*-c.yaml(-.:t) )
+            ri_wants+=( ${${fnames%-c.yaml}//(#b)%(??)/$(print "\\x$match[1]")} )
+          done
+          ;;
+          (instance-methods)
+          for dir in $ri_dirs[@]; do
+            fnames=( $dir/$class_dir*-i.yaml(-.:t) )
+            ri_wants+=( ${${fnames%-i.yaml}//(#b)%(??)/$(print "\\x$match[1]")} )
+          done
+          ;;
+        esac
+        ri_names=( ${(Q)ri_wants} )
+        compadd -S '' -d ri_names -a "$expl[@]" ri_wants && ret=0
+      done
+      (( ret )) || break
+    done
+  done
 fi
 
-return $ret
+return ret
