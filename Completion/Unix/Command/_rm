@@ -33,10 +33,11 @@ _arguments -C $opts \
 case $state in
   (file)
     declare -a ignored
-    if ((CURRENT > 1)); then
-      ignored=(${line[1,CURRENT-1]//(#m)[\[\]()\\*?#<>~\^]/\\$MATCH})
+    ignored=()
+    ((CURRENT > 1)) &&
+      ignored+=(${line[1,CURRENT-1]//(#m)[\[\]()\\*?#<>~\^]/\\$MATCH})
+    ((CURRENT < $#line)) &&
       ignored+=(${line[CURRENT+1,-1]//(#m)[\[\]()\\*?#<>~\^]/\\$MATCH})
-    fi
     _files -F ignored && ret=0
     ;;
 esac

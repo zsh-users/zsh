@@ -1,5 +1,8 @@
 2009-11-11  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* Greg Klanderman: 27391: Completion/Unix/Command/_rm:
+	 fix ignored (duplicate) file names
+	
 	* users/14548: Src/Modules/termcap.c: prevent libtermcap from
 	exiting on an unknown terminal type
 
@@ -10,9 +13,6 @@
 	cut'n'paste error in descriptions
 
 2009-11-10  Barton E. Schaefer  <schaefer@zsh.org>
-
-	* Greg Klanderman: 27377 (slightly tweaked):
-	Completion/Unix/Command/_rm: fix ignored (duplicate) file names
 
 	* 27368, 27369: FEATURES: replace one incorrect example with two
 	correct ones
@@ -12336,5 +12336,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4809 $
+* $Revision: 1.4810 $
 *****************************************************
