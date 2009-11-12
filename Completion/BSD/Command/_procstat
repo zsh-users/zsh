@@ -1,0 +1,17 @@
+#compdef procstat
+
+local pids
+#get list of pids and associated process name as comment
+pids=(${${${(f)"$(/usr/bin/procstat -ah)"}/[[:space:]]#/}/[[:space:]]*[[:space:]](ELF[[:digit:]]#[[:space:]]|-[[:space:]]#)/:})
+
+_arguments -s \
+'-b[Display binary information for the process]' \
+'-c[Display command line arguments for the process]' \
+'-f[Display file descriptor information for the process]' \
+'-k[Display the stacks of kernel threads in the process]' \
+'-s[Display security credential information for the process]' \
+'-t[Display thread information for the process]' \
+'-v[Display virtual memory mappings for the process]' \
+'-h[Suppress table headers.]' \
+'-a[All processes]' \
+':Process id:(($pids))'
