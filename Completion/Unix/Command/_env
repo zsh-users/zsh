@@ -3,9 +3,10 @@
 if _pick_variant gnu=Free\ Soft unix --version; then
   _arguments \
     '(--ignore-environment -i)'{-i,--ignore-environment}'[start with empty environment]' \
-    '*'{-u,--unset=}':env var to remove:compadd ${(k)parameters[(R)*export*]}' \
+    '*'{-u,--unset=}'[remove variable from the environment]:env var to remove:compadd ${(k)parameters[(R)*export*]}' \
     '--help[help]' \
     '--version[version]' \
+    '(-):command: _command_names -e' \
     '*::arguments: _normal'
 else
   _precommand
