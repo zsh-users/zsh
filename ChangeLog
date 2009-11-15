@@ -1,5 +1,9 @@
 2009-11-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Greg Klanderman: 27409: Completion/Unix/Command/_subversion,
+	Completion/Unix/Type/_urls: improve subversion remote paths
+	and fix minor URL issues.
+
 	* Frank Terbeck: 27407: Completion/Unix/Command/_tmux:
 	switch-client subcommand.
 
@@ -12344,5 +12348,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4813 $
+* $Revision: 1.4814 $
 *****************************************************

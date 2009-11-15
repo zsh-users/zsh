@@ -48,7 +48,7 @@ zstyle -a ":completion:${curcontext}:urls" urls urls
 
 if [[ $#urls -gt 1 || ( $#urls -eq 1 && ! -d $urls[1] ) ]]; then
   [[ $#urls -eq 1 && -f $urls[1] ]] && urls=( $(< $urls[1]) )
-  _wanted urls expl 'URL' compadd -a urls && return 0
+  _wanted urls expl 'URL' compadd "$@" -a urls && return 0
   urls=()
 fi
 
@@ -82,7 +82,7 @@ case "$scheme" in
     fi
   ;;
   file)
-    [[ -prefix //(127.0.0.1|localhost)/ ]] && compset -P //(127.0.0.1|localhost)
+    [[ -prefix //(127.0.0.1|localhost)/ ]] && compset -P '//(127.0.0.1|localhost)'
     [[ -prefix /// ]] && compset -P //
     if ! compset -P //; then
       _tags -C file files
