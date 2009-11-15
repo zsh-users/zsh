@@ -1,3 +1,8 @@
+2009-11-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Benjamin R. Haskell: users/14565:
+	Completion/Unix/Command/_env: argument problem.
+
 2009-11-11  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Greg Klanderman: 27391: Completion/Unix/Command/_rm:
@@ -12336,5 +12341,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4810 $
+* $Revision: 1.4811 $
 *****************************************************
