@@ -166,7 +166,7 @@ _hg_tags() {
   typeset -a tags
   local tag rev
 
-  _hg_cmd tags | while read tag
+  _hg_cmd tags 2> /dev/null | while read tag
   do
     tags+=(${tag/ #    [0-9]#:*})
   done
@@ -205,7 +205,7 @@ _hg_files() {
 
 _hg_status() {
   [[ -d $PREFIX ]] || PREFIX=$PREFIX:h
-  status_files=(${(ps:\0:)"$(_hg_cmd status -0n$1 ./$PREFIX)"})
+  status_files=(${(ps:\0:)"$(_hg_cmd status -0n$1 ./$PREFIX 2>/dev/null)"})
 }
 
 _hg_unknown() {
@@ -231,7 +231,7 @@ _hg_resolve() {
 
   [[ -d $PREFIX ]] || PREFIX=$PREFIX:h
 
-  _hg_cmd resolve -l ./$PREFIX | while read rstate rpath
+  _hg_cmd resolve -l ./$PREFIX 2> /dev/null | while read rstate rpath
   do
     [[ $rstate == 'R' ]] && resolved_files+=($rpath)
     [[ $rstate == 'U' ]] && unresolved_files+=($rpath)
@@ -275,7 +275,7 @@ _hg_ssh_urls() {
       compset -P '*/'
       if _cache_invalid "$cacheid" || ! _retrieve_cache "$cacheid"
       then
-        remdirs=(${${(M)${(f)"$(_call_program files ssh -a -x $host ls -1FL "${(q)rempath}")"}##*/}%/})
+        remdirs=(${${(M)${(f)"$(_call_program files ssh -a -x $host ls -1FL "${(q)rempath}" 2> /dev/null)"}##*/}%/})
         _store_cache "$cacheid" remdirs
       fi
       _describe -t directories 'remote directory' remdirs -S/
@@ -313,7 +313,7 @@ _hg_urls() {
 
 _hg_paths() {
   typeset -a paths pnames
-  _hg_cmd paths | while read -A pnames
+  _hg_cmd paths 2> /dev/null | while read -A pnames
   do
     paths+=($pnames[1])
   done
@@ -772,13 +772,13 @@ _hg_cmd_view() {
 # MQ
 _hg_qseries() {
   typeset -a patches
-  patches=(${(f)"$(_hg_cmd qseries)"})
+  patches=(${(f)"$(_hg_cmd qseries 2> /dev/null)"})
   (( $#patches )) && _describe -t hg-patches 'patches' patches
 }
 
 _hg_qapplied() {
   typeset -a patches
-  patches=(${(f)"$(_hg_cmd qapplied)"})
+  patches=(${(f)"$(_hg_cmd qapplied 2> /dev/null)"})
   if (( $#patches ))
   then
     patches+=(qbase qtip)
@@ -788,14 +788,14 @@ _hg_qapplied() {
 
 _hg_qunapplied() {
   typeset -a patches
-  patches=(${(f)"$(_hg_cmd qunapplied)"})
+  patches=(${(f)"$(_hg_cmd qunapplied 2> /dev/null)"})
   (( $#patches )) && _describe -t hg-unapplied-patches 'unapplied patches' patches
 }
 
 # unapplied, including guarded patches
 _hg_qdeletable() {
   typeset -a unapplied
-  unapplied=(${(f)"$(_hg_cmd qseries)"})
+  unapplied=(${(f)"$(_hg_cmd qseries 2> /dev/null)"})
   for p in $(_hg_cmd qapplied)
   do
     unapplied=(${unapplied:#$p})
@@ -808,7 +808,7 @@ _hg_qguards() {
   typeset -a guards
   local guard
   compset -P "+|-"
-  _hg_cmd qselect -s | while read guard
+  _hg_cmd qselect -s 2> /dev/null | while read guard
   do
     guards+=(${guard#(+|-)})
   done
