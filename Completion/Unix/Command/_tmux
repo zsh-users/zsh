@@ -1002,8 +1002,8 @@ function _tmux-switch-client() {
     [[ -n ${tmux_describe} ]] && print "Switch the client to another session" && return
     local -a args
     args=(
-        '-c[Choose a target client]:client:__tmux-key-clients'
-        '-t[Choose a target window]:window:__tmux-key-windows'
+        '-c[Choose a target client]:client:__tmux-clients'
+        '-t[Choose a target window]:window:__tmux-windows'
     )
     _arguments ${args}
 }

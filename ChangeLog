@@ -1,5 +1,8 @@
 2009-11-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Frank Terbeck: 27407: Completion/Unix/Command/_tmux:
+	switch-client subcommand.
+
 	* Benjamin R. Haskell: users/14565, 27399:
 	Completion/Unix/Command/_env: argument problem.
 
@@ -12341,5 +12344,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4812 $
+* $Revision: 1.4813 $
 *****************************************************
