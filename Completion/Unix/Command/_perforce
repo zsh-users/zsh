@@ -1106,8 +1106,22 @@ _perforce_files() {
     # no point trying to look for unmaintained files.  Assume
     # the user knows what they're doing.
     local -a altfiles
+    integer whole_path
 
-    if [[ $PREFIX = //[^/]# ]]; then
+    for type in $types; do
+      _perforce_whole_path $type && whole_path=1
+    done
+
+    # If we're doing whole-path completion, and the user starts
+    # a completion early, assume they want just those files,
+    # rather than a client spec.  This isn't necessarily the case,
+    # but there's an excellent chance it does fit the user's intention
+    # in a case where it's not really worth adding a special option.
+    # A client list can be huge and they're not actually used very
+    # often to refer to files.  In fact, this whole completion
+    # probably ought to be optional (you can do it with tags if
+    # you really want).
+    if [[ $PREFIX = //[^/]# && $whole_path -eq 0 ]]; then
       # Complete //clientname spec.  Don't complete non-directories...
       # I don't actually know if they are valid here.
       altfiles+=("clients:Perforce client:_perforce_clients")
@@ -1118,8 +1132,8 @@ _perforce_files() {
 	  ! zstyle -t ":completion:${curcontext}:" all-files; then
 	  for type in $types; do
 	    altfiles+=("$type-files:$type file:_perforce_${type}_files")
-	    _perforce_whole_path $type && nodirs=1
 	  done
+	  (( whole_path )) && nodirs=1
 	else
 	  altfiles+=("depot-files:file in depot:_perforce_depot_files")
 	fi

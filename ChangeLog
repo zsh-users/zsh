@@ -1,3 +1,9 @@
+2009-11-17  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: improve
+	whole-path completion so that it doesn't take ages looking
+	for clients after typing two slashes.
+
 2009-11-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Greg Klanderman: 27409: Completion/Unix/Command/_subversion,
@@ -12348,5 +12354,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4814 $
+* $Revision: 1.4815 $
 *****************************************************
