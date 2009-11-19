@@ -2,6 +2,7 @@
 
 _svn () {
   local curcontext="$curcontext" state line expl ret=1
+  typeset -A opt_args
 
   _arguments -C \
     '(-)--help[print help information]' \
@@ -207,12 +208,20 @@ _svn_status() {
 
 (( $+functions[_svn_remote_paths] )) ||
 _svn_remote_paths() {
-  local expl remfiles remdispf remdispd suf ret=1
+  local expl remfiles remdispf remdispd suf ret=1 pfx='\^/' sub='^/'
 
-  [[ -prefix *://*/ ]] || return 1
+  # prefix must match a valid repository path format, either standard style
+  # schema://host/path/.. or ^/path/.. specifying a path relative to the
+  # root of the working directory repository.  In the second form, allow the
+  # leading '^' be escaped in case the user has the extendedglob option set.
+  [[ -prefix *://*/ ]] ||
+  [[ -f .svn/entries && ( -prefix '^/' || -prefix '\^/' ) ]] ||
+  return 1
+
+  # return if remote access is not permitted
   zstyle -T ":completion:${curcontext}:" remote-access || return 1
 
-  remfiles=( ${(f)"$(svn list $IPREFIX${PREFIX%%[^./][^/]#} 2>/dev/null)"} )
+  remfiles=( ${(f)"$(svn list $IPREFIX${${PREFIX%%[^/]#}/#$pfx/$sub} 2>/dev/null)"} )
   (( $? == 0 )) || return 1
 
   # you might consider trying to return early if $#remfiles is zero,

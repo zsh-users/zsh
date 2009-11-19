@@ -1,3 +1,8 @@
+2009-11-19  Peter Stephenson  <pws@csr.com>
+
+	* Greg: 27416: Completion/Unix/Command/_subversion: repository
+	path enhancement.
+
 2009-11-17  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: improve
@@ -12354,5 +12359,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4815 $
+* $Revision: 1.4816 $
 *****************************************************
