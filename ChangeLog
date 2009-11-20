@@ -1,3 +1,8 @@
+2009-11-20  Clint Adams  <clint@zsh.org>
+
+	* unposted: Functions/Prompts/prompt_clint_setup: change bracket
+	colors default to yellow when in an ssh session.
+
 2009-11-19  Peter Stephenson  <pws@csr.com>
 
 	* Greg: 27416: Completion/Unix/Command/_subversion: repository
@@ -12359,5 +12364,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4816 $
+* $Revision: 1.4817 $
 *****************************************************

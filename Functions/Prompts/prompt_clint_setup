@@ -17,7 +17,7 @@ prompt_clint_setup () {
 
   autoload -Uz vcs_info
 
-  pcc[1]=${1:-'red'}
+  pcc[1]=${1:-${${SSH_CLIENT+'yellow'}:-'red'}}
   pcc[2]=${2:-'cyan'}
   pcc[3]=${3:-'green'}
   pcc[4]=${4:-'yellow'}
