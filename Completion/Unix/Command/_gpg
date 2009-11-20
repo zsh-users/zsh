@@ -11,8 +11,8 @@ _arguments -C -s -S -A "-*" \
   '(-c --symmetric)'{-c,--symmetric}'[encrypt with symmetric cypher only]' \
   '--store[store only]' \
   '--decrypt[decrypt file or stdin]' \
-  '--verify[verify a signature]:file attachment:_files' \
-  '--verify-files[verify a list of files]:_files attachment_files' \
+  '--verify[verify a signature]' \
+  '--verify-files[verify a list of files]' \
   '(-f --encrypt-files)'{-f,--encrypt-files}'[encrypt files]' \
   '--decrypt-files[decrypt files]' \
   '--list-keys[list all keys]' \

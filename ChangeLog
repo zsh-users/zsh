@@ -1,5 +1,8 @@
 2009-11-20  Clint Adams  <clint@zsh.org>
 
+	* 27417: Completion/Unix/Command/_gpg: fix completion after
+	gpg --verify-files.
+
 	* unposted: Functions/Prompts/prompt_clint_setup: change bracket
 	colors default to yellow when in an ssh session.
 
@@ -12364,5 +12367,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4817 $
+* $Revision: 1.4818 $
 *****************************************************
