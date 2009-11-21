@@ -11,6 +11,12 @@
 	* Greg: 27416: Completion/Unix/Command/_subversion: repository
 	path enhancement.
 
+2009-11-17  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 27415: Src/Zle/computil.c: comparguments "*::..." descriptions
+	could step on sequentially earlier descriptions when completing
+	for a word other than the last word on the command line.
+
 2009-11-17  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: improve
@@ -12367,5 +12373,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4818 $
+* $Revision: 1.4819 $
 *****************************************************
