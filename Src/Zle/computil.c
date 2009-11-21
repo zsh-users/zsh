@@ -2133,6 +2133,23 @@ ca_parse_line(Cadef d, int multi, int first)
 	    if ((adef = state.def = ca_get_arg(d, state.nth)) &&
 		(state.def->type == CAA_RREST ||
 		 state.def->type == CAA_RARGS)) {
+
+		/* Bart 2009/11/17:
+		 * We've reached the "rest" definition.  If at this point
+		 * we already found another definition that describes the
+		 * current word, use that instead.  If not, prep for the
+		 * "narrowing" of scope to only the remaining words.
+		 *
+		 * We can't test ca_laststate.def in the loop conditions
+		 * at the top because this same loop also handles the
+		 * ':*PATTERN:MESSAGE:ACTION' form for multiple arguments
+		 * after an option, which may need to continue scanning.
+		 * There might be an earlier point at which this test can
+		 * be made but tracking it down is not worth the effort.
+		 */
+		if (ca_laststate.def)
+		    break;
+
 		state.inrest = 0;
 		state.opt = (cur == state.nargbeg + 1 &&
 			     (!multi || !*line || 
