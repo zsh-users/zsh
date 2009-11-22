@@ -1,3 +1,11 @@
+2009-11-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Alexey. I Froloff: users/14588:
+	Completion/Zsh/Command/.distfiles,
+	Completion/Zsh/Command/_ztodo,
+	Functions/Misc/.distfiles, Functions/Misc/ztodo: new ztodo
+	function.
+
 2009-11-20  Clint Adams  <clint@zsh.org>
 
 	* 27417: Completion/Unix/Command/_gpg: fix completion after
@@ -12373,5 +12381,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4819 $
+* $Revision: 1.4820 $
 *****************************************************

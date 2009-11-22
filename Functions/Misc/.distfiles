@@ -26,4 +26,5 @@ zmathfuncdef
 zmv
 zrecompile
 zstyle+
+ztodo
 '
