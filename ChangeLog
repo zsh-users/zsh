@@ -1,5 +1,8 @@
 2009-11-24  Peter Stephenson  <pws@csr.com>
 
+	* 27429:  Completion/Unix/Command/_make: restore variable value
+	completion.  Also make indentation more standard (not posted).
+
 	* Michael Hwang <michael.a.hwang@gmail.com>: 27428:
 	Completion/Unix/Command/_make:  complete rewrite with
 	variable completion.
@@ -12387,5 +12390,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4821 $
+* $Revision: 1.4822 $
 *****************************************************
