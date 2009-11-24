@@ -197,7 +197,7 @@ else
     fi
   fi
 
-  if [[ $PREFIX == (#b)([^=]##)'='* ]] && [[ -n ${${(k)VARIABLES}[(r)${match[1]}]} ]]
+  if [[ $PREFIX == *'='* ]]
   then
     # Complete make variable as if shell variable
     compstate[parameter]="${PREFIX%%\=*}"
