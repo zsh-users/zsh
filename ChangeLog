@@ -1,3 +1,9 @@
+2009-11-24  Peter Stephenson  <pws@csr.com>
+
+	* Michael Hwang <michael.a.hwang@gmail.com>: 27428:
+	Completion/Unix/Command/_make:  complete rewrite with
+	variable completion.
+
 2009-11-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Alexey. I Froloff: users/14588:
@@ -12381,5 +12387,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4820 $
+* $Revision: 1.4821 $
 *****************************************************
