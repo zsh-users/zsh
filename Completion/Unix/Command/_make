@@ -193,7 +193,13 @@ else
     then
       parseMakefile $PWD < <(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null)
     else
-      parseMakefile $PWD < $file
+      case "$OSTYPE" in
+        freebsd*)
+        parseMakefile $PWD < <(_call_program targets "$words[1]" -nsp -f "$file" .PHONY 2> /dev/null)
+	;;
+	*)
+        parseMakefile $PWD < $file
+      esac
     fi
   fi
 

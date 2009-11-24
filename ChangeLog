@@ -1,5 +1,8 @@
 2009-11-24  Peter Stephenson  <pws@csr.com>
 
+	* Baptiste Daroussin: 27431: Completion/Unix/Command/_make: Fix
+	for FreeBSD.
+
 	* 27430: Completion/Unix/Command/_make: extend variable value
 	completion to anything that looks like an assignment.
 
@@ -12393,5 +12396,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4823 $
+* $Revision: 1.4824 $
 *****************************************************
