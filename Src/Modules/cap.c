@@ -45,7 +45,7 @@ bin_cap(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    return 1;
 	}
 	if(cap_set_proc(caps)) {
-	    zwarnnam(nam, "can't change capabilites: %e", errno);
+	    zwarnnam(nam, "can't change capabilities: %e", errno);
 	    ret = 1;
 	}
     } else {
@@ -55,7 +55,7 @@ bin_cap(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	if(caps)
 	    result = cap_to_text(caps, &length);
 	if(!caps || !result) {
-	    zwarnnam(nam, "can't get capabilites: %e", errno);
+	    zwarnnam(nam, "can't get capabilities: %e", errno);
 	    ret = 1;
 	} else
 	    puts(result);

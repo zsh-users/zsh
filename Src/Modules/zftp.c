@@ -2197,7 +2197,7 @@ zftp_login(char *name, char **args, UNUSED(int flags))
 	int cnt;
 	for (cnt = 0; *args; args++)
 	    cnt++;
-	zwarnnam(name, "warning: %d comand arguments not used\n", cnt);
+	zwarnnam(name, "warning: %d command arguments not used\n", cnt);
     }
     zfstatusp[zfsessno] |= ZFST_LOGI;
     zfsetparam("ZFTP_USER", ztrdup(user), ZFPM_READONLY);

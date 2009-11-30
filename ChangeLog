@@ -1,3 +1,8 @@
+2009-11-30  Peter Stephenson  <pws@csr.com>
+
+	* Richard Hartmann: 27440: Src/Modules/cap.c, Src/Modules/zftp.c:
+	typos in warnings.
+
 2009-11-24  Peter Stephenson  <pws@csr.com>
 
 	* Baptiste Daroussin: 27431: Completion/Unix/Command/_make: Fix
@@ -12396,5 +12401,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4824 $
+* $Revision: 1.4825 $
 *****************************************************
