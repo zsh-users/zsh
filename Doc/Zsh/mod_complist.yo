@@ -72,6 +72,10 @@ for world writable directories with sticky bit set
 item(tt(ow 34;43))(
 for world writable directories without sticky bit set
 )
+item(tt(sa) var(none))(
+for files with an associated suffix alias; this is only tested
+after specific suffixes, as described below
+)
 item(tt(st 37;44))(
 for directories with sticky bit set but not world writable
 )

@@ -1,5 +1,8 @@
 2009-11-30  Peter Stephenson  <pws@csr.com>
 
+	* 27441: Doc/Zsh/mod_complist.yo, Src/Zle/complist.c: add "sa"
+	highlight code for suffix aliases.
+
 	* Richard Hartmann: 27440: Src/Modules/cap.c, Src/Modules/zftp.c:
 	typos in warnings.
 
@@ -12401,5 +12404,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4825 $
+* $Revision: 1.4826 $
 *****************************************************
