@@ -1,3 +1,8 @@
+2009-12-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Alexey: 27445: Completion/Unix/Command/_ruby: argument can be
+	any file.
+
 2009-11-30  Peter Stephenson  <pws@csr.com>
 
 	* 27441: Doc/Zsh/mod_complist.yo, Src/Zle/complist.c: add "sa"
@@ -12404,5 +12409,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4826 $
+* $Revision: 1.4827 $
 *****************************************************
