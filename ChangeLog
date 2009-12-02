@@ -1,9 +1,20 @@
+2009-12-02  Peter Stephenson  <pws@csr.com>
+
+	* 27442 plus tweak: Src/exec.c, Src/init.c, Src/jobs.c,
+	Src/signals.c: return status for last background job from
+	wait even if it's already exited, but only if POSIX_JOBS
+	is set.
+
 2009-12-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Alexey: 27445: Completion/Unix/Command/_ruby: argument can be
 	any file.
 
 2009-11-30  Peter Stephenson  <pws@csr.com>
+
+	* 27442: Src/exec.c, Src/init.c, Src/job.s,c Src/signals.c:
+	add lastpid_status to record status of last background job
+	even after it's exited.
 
 	* 27441: Doc/Zsh/mod_complist.yo, Src/Zle/complist.c: add "sa"
 	highlight code for suffix aliases.
@@ -12409,5 +12420,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4827 $
+* $Revision: 1.4828 $
 *****************************************************

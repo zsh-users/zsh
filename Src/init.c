@@ -913,6 +913,7 @@ setupvals(void)
     bufstack = znewlinklist();
     hsubl = hsubr = NULL;
     lastpid = 0;
+    lastpid_status = -1L;
     bshin = SHIN ? fdopen(SHIN, "r") : stdin;
     if (isset(SHINSTDIN) && !SHIN && unset(INTERACTIVE)) {
 #ifdef _IONBF

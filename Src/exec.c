@@ -2727,6 +2727,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 #endif
 	    if (how & Z_ASYNC) {
 		lastpid = (zlong) pid;
+		/* indicate it's possible to set status for lastpid */
+		lastpid_status = -2L;
 	    } else if (!jobtab[thisjob].stty_in_env && varspc) {
 		/* search for STTY=... */
 		Wordcode p = varspc;

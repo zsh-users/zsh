@@ -530,6 +530,7 @@ zhandler(int sig)
 	     * Find the process and job containing this pid and
 	     * update it.
 	     */
+	    pn = NULL;
 	    if (findproc(pid, &jn, &pn, 0)) {
 #if defined(HAVE_WAIT3) && defined(HAVE_GETRUSAGE)
 		struct timezone dummy_tz;
@@ -551,6 +552,15 @@ zhandler(int sig)
 		 */
 		get_usage();
 	    }
+	    /*
+	     * Remember the status associated with $!, so we can
+	     * wait for it even if it's exited.  This value is
+	     * only used if we can't find the PID in the job table,
+	     * so it doesn't matter that the value we save here isn't
+	     * useful until the process has exited.
+	     */
+	    if (pn != NULL && pid == lastpid && lastpid_status != -1L)
+		lastpid_status = lastval2;
 	}
         break;
  

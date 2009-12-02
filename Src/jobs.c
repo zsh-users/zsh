@@ -104,6 +104,15 @@ int prev_errflag, prev_breaks, errbrk_saved;
 /**/
 int numpipestats, pipestats[MAX_PIPESTATS];
 
+/*
+ * The status associated with the process lastpid.
+ * -1 if not set and no associated lastpid
+ * -2 if lastpid is set and status isn't yet
+ * else the value returned by wait().
+ */
+/**/
+long lastpid_status;
+
 /* Diff two timevals for elapsed-time computations */
 
 /**/
@@ -1109,6 +1118,14 @@ addproc(pid_t pid, char *text, int aux, struct timeval *bgtime)
 {
     Process pn, *pnlist;
 
+    if (pid == lastpid && lastpid_status != -2L) {
+	/*
+	 * The status for the previous lastpid is invalid.
+	 * Presumably process numbers have wrapped.
+	 */
+	lastpid_status = -1L;
+    }
+
     DPUTS(thisjob == -1, "No valid job in addproc.");
     pn = (Process) zshcalloc(sizeof *pn);
     pn->pid = pid;
@@ -1845,6 +1862,9 @@ bin_fg(char *name, char **argv, Options ops, int func)
 		retval = waitforpid(pid, 1);
 		if (!retval)
 		    retval = lastval2;
+	    } else if (isset(POSIXJOBS) &&
+		       pid == lastpid && lastpid_status >= 0L) {
+		retval = (int)lastpid_status;
 	    } else {
 		zwarnnam(name, "pid %d is not a child of this shell", pid);
 		/* presumably lastval2 doesn't tell us a heck of a lot? */
