@@ -57,6 +57,7 @@ _tmux_aliasmap=(
     new         new-session
     refresh     refresh-client
     rename      rename-session
+    showmsgs    show-messages
     source      source-file
     start       start-server
     suspendc    suspend-client
@@ -105,7 +106,8 @@ _tmux_aliasmap=(
     showw       show-window-options
 
     # environment
-    #no aliases so far in this category
+    setenv      set-environment
+    showenv     show-environment
 
     # status line
     confirm     confirm-before
@@ -334,6 +336,7 @@ function _tmux-display-message() {
     [[ -n ${tmux_describe} ]] && print "Display a message in the status line" && return
     local -a args
     args=(
+        '-p[Print message to stdout]'
         '-t[Choose a target client]:clients:__tmux-clients'
         '*:: :->msg'
     )
@@ -923,6 +926,12 @@ function _tmux-show-environment() {
     _arguments ${args}
 }
 
+function _tmux-show-messages() {
+    [[ -n ${tmux_describe} ]] && print "Show client"\'"s message log" && return
+    args=('-t[Choose target client]:client:__tmux-clients')
+    _arguments ${args}
+}
+
 function _tmux-show-options() {
     [[ -n ${tmux_describe} ]] && print "Show session options" && return
     local -a args
@@ -1178,6 +1187,7 @@ function __tmux-option-guard() {
             'message-attr:__tmux-attributes'
             'message-bg:__tmux-colours'
             'message-fg:__tmux-colours'
+            'message-limit:'${int_guard}
             'mouse-select-pane:DESC:on off'
             'prefix:MSG:comma-seperated key list'
             'repeat-time:'${int_guard}
@@ -1233,7 +1243,9 @@ function __tmux-option-guard() {
             'window-status-current-attr:__tmux-attributes'
             'window-status-current-bg:__tmux-colours'
             'window-status-current-fg:__tmux-colours'
+            'window-status-current-format:MSG:status format string'
             'window-status-fg:__tmux-colours'
+            'window-status-format:MSG:status format string'
             'xterm-keys:DESC:on off'
         )
     fi
@@ -1280,6 +1292,7 @@ function __tmux-options() {
         'message-attr:Set status line message attributes'
         'message-bg:Set status line message background colour'
         'message-fg:Set status line message foreground colour'
+        'message-limit:Set size of message log per client'
         'mouse-select-pane:Make mouse clicks select window panes'
         'prefix:Comma seperated line of keys accepted as prefix key'
         'repeat-time:Time for multiple commands without prefix-key presses'
@@ -1376,7 +1389,9 @@ function __tmux-window-options() {
         'window-status-current-attr:Set status line attributes for active window'
         'window-status-current-bg:Set status line background for active window'
         'window-status-current-fg:Set status line foreground for active window'
+        'window-status-current-format:Set status line format for active window'
         'window-status-fg:Set status line foreground for a window'
+        'window-status-format:Set status line format for all but the active window'
         'xterm-keys:Generate xterm-style function key sequences'
     )
     _describe -t tmux-window-options 'tmux window option' tmux_window_options

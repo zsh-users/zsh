@@ -1,5 +1,9 @@
 2009-12-02  Peter Stephenson  <pws@csr.com>
 
+	* 27447: Doc/Zsh/options.yo: document 27442.
+
+	* Frank: 27446: Completion/Unix/Command/_tmux: update.
+
 	* 27442 plus tweak: Src/exec.c, Src/init.c, Src/jobs.c,
 	Src/signals.c: return status for last background job from
 	wait even if it's already exited, but only if POSIX_JOBS
@@ -12420,5 +12424,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4828 $
+* $Revision: 1.4829 $
 *****************************************************
