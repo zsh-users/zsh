@@ -1,3 +1,9 @@
+2009-12-03  Clint Adams  <clint@zsh.org>
+
+	* 27448: Completion/Unix/Command/_tar,
+	Completion/Unix/Type/_tar_archive: mild understanding of
+	xz-compressed tarballs.
+
 2009-12-02  Peter Stephenson  <pws@csr.com>
 
 	* 27447: Doc/Zsh/options.yo: document 27442.
@@ -12424,5 +12430,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4829 $
+* $Revision: 1.4830 $
 *****************************************************

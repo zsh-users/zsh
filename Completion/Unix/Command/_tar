@@ -35,6 +35,8 @@ _tar_cmd="${(j::)tmp#-}"
 
 (( $words[(I)--(un|)gzip] ))     && _tar_cmd="z$_tar_cmd"
 (( $words[(I)--(un|)compress] )) && _tar_cmd="Z$_tar_cmd"
+(( $words[(I)--bzip2] ))         && _tar_cmd="j$_tar_cmd"
+(( $words[(I)--xz] ))            && _tar_cmd="J$_tar_cmd"
 (( $words[(I)--list] ))          && _tar_cmd="t$_tar_cmd"
 (( $words[(I)--(extract|get)] )) && _tar_cmd="x$_tar_cmd"
 (( $words[(I)--create] ))        && _tar_cmd="c$_tar_cmd"
@@ -141,6 +143,8 @@ elif [[ ( "$_tar_cmd" = *[xt]* || -n $del ) && -n "$tf" ]]; then
     largs=-tZf
   elif [[ $_tar_cmd = *I* ]]; then
     largs=-tIf
+  elif [[ $_tar_cmd = *J* ]]; then
+    largs=-tJf
   else
     # Some random compression program
     tmp="${words[(r)--use-comp*]}"
