@@ -247,8 +247,9 @@ struct region_highlight *region_highlights;
  * for the first few elements of region_highlights.
  * 0: region between point and mark
  * 1: isearch region
+ * 2: suffix
  */
-#define N_SPECIAL_HIGHLIGHTS	(2)
+#define N_SPECIAL_HIGHLIGHTS	(3)
 /*
  * Number of elements in region_highlights.
  * This includes the special elements above.
@@ -340,6 +341,7 @@ zle_set_highlight(void)
     int special_atr_on_set = 0;
     int region_atr_on_set = 0;
     int isearch_atr_on_set = 0;
+    int suffix_atr_on_set = 0;
     struct region_highlight *rhp;
 
     special_atr_on = default_atr_on = 0;
@@ -373,6 +375,9 @@ zle_set_highlight(void)
 	    } else if (strpfx("isearch:", *atrs)) {
 		match_highlight(*atrs + 8, &(region_highlights[1].atr));
 		isearch_atr_on_set = 1;
+	    } else if (strpfx("suffix:", *atrs)) {
+		match_highlight(*atrs + 7, &(region_highlights[2].atr));
+		suffix_atr_on_set = 1;
 	    }
 	}
     }
@@ -384,6 +389,8 @@ zle_set_highlight(void)
 	region_highlights->atr = TXTSTANDOUT;
     if (!isearch_atr_on_set)
 	region_highlights[1].atr = TXTUNDERLINE;
+    if (!suffix_atr_on_set)
+	region_highlights[2].atr = TXTBOLDFACE;
 
     allocate_colour_buffer();
 }
@@ -1059,6 +1066,13 @@ zrefresh(void)
 	region_highlights[1].end = isearch_endpos;
     } else {
 	region_highlights[1].start = region_highlights[1].end = -1;
+    }
+    /* check for an active completion suffix */
+    if (suffixnoinslen) {
+	region_highlights[2].start = zlecs - suffixnoinslen;
+	region_highlights[2].end = zlecs;
+    } else {
+	region_highlights[2].start = region_highlights[2].end = -1;
     }
 
     if (clearlist && listshown > 0) {

@@ -2163,6 +2163,17 @@ Individual characters that have no direct printable
 representation but are shown in a special manner by the line editor.
 These characters are described below.
 )
+cindex(completion removable suffix, highlighting)
+cindex(suffix, highlighting removable, in completion)
+cindex(removable suffix, highlighting in completino)
+item(tt(suffix))(
+This context is used in completion for characters that are
+marked as suffixes that will be removed if the completion ends
+at that point, the most obvious example being a slash (tt(/)) after
+a directory name.  Note that suffix removal is configurable; the
+circumstances under which the suffix will be removed may differ
+for different completions.
+)
 enditem()
 
 tt(zle_highlight) may contain additional fields for controlling how
@@ -2235,6 +2246,7 @@ not usually affected by the bold attribute.
 )
 item(tt(bold))(
 The characters in the given context are shown in a bold font.
+Not all terminals distinguish bold fonts.
 )
 item(tt(standout))(
 The characters in the given context are shown in the terminal's standout
@@ -2280,7 +2292,7 @@ If tt(zle_highlight) is not set or no value applies to a particular
 context, the defaults applied are equivalent to
 
 example(zle_highlight=LPAR()region:standout special:standout
-isearch:underline+RPAR())
+suffix:bold isearch:underline+RPAR())
 
 i.e. both the region and special characters are shown in standout mode.
 

@@ -1,6 +1,11 @@
 2009-12-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* frank: 27450: b/Completion/Unix/Command/_tmux: another
+	* 27466: Doc/Zsh/zle.yo: document 27453.
+
+	* Mikael: 27453: Src/Zle/zle_refresh.c: highlighting
+	of removable completions suffixes.
+
+	* Frank: 27450: b/Completion/Unix/Command/_tmux: another
 	update.
 
 2009-12-05  Clint Adams  <clint@zsh.org>
@@ -12446,5 +12451,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4834 $
+* $Revision: 1.4835 $
 *****************************************************
