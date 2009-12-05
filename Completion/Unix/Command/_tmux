@@ -65,6 +65,7 @@ _tmux_aliasmap=(
 
     # windows and panes
     breakp      break-pane
+    capturep    capture-pane
     displayp    display-panes
     downp       down-pane
     findw       find-window
@@ -187,6 +188,16 @@ function _tmux-break-pane() {
     args=(
         '-d[Do not make the new window become the active one]'
         '-t[Choose a target pane]:panes:__tmux-panes'
+    )
+    _arguments ${args}
+}
+
+function _tmux-capture-pane() {
+    [[ -n ${tmux_describe} ]] && print "Capture the contents of a pane to a buffer" && return
+    local -a args
+    args=(
+        '-b[Choose target buffer]:target buffer:__tmux-buffers'
+        '-t[Choose source pane]:source pane:__tmux-panes'
     )
     _arguments ${args}
 }
