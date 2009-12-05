@@ -1,5 +1,8 @@
 2009-12-05  Clint Adams  <clint@zsh.org>
 
+	* Ingmar Vanhassel: 27457: Completion/Zsh/Command/_precommand:
+	add hilite as a precommand.
+
 	* Ingmar Vanhassel: 27456: Completion/Unix/Type/_tar_archive:
 	complete .tar.lzma, .tbz, .txz.
 
@@ -12435,5 +12438,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4831 $
+* $Revision: 1.4832 $
 *****************************************************
