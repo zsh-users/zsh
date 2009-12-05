@@ -837,27 +837,19 @@ function _tmux-set-environment() {
 
 function _tmux-set-option() {
     [[ -n ${tmux_describe} ]] && print "Set a session option" && return
+    local mode
     local -a args
     args=(
         '-a[Append to string options]'
         '-g[Set a global session option]'
         '-u[Unset a non-global option]'
+        '-w[Change window (not session) options]'
         '-t[Choose a target session]:target session:__tmux-sessions'
         '*:: :->name_or_value'
     )
+    __tmux-got-option-already -w && mode=window || mode=session
     _arguments -C ${args}
-
-    case ${state} in
-        name_or_value)
-            if (( CURRENT == 1 )); then
-                __tmux-options
-            elif (( CURRENT == 2 )); then
-                __tmux-option-guard 'session' ${words[1]}
-            else
-                __tmux-nothing-else
-            fi
-            ;;
-    esac
+    __tmux-options-complete ${mode} ${state}
 }
 
 function _tmux-set-window-option() {
@@ -871,18 +863,7 @@ function _tmux-set-window-option() {
         '*:: :->name_or_value'
     )
     _arguments -C ${args}
-
-    case ${state} in
-        name_or_value)
-            if (( CURRENT == 1 )); then
-                __tmux-window-options
-            elif (( CURRENT == 2 )); then
-                __tmux-option-guard 'window' ${words[1]}
-            else
-                __tmux-nothing-else
-            fi
-            ;;
-    esac
+    __tmux-options-complete window ${state}
 }
 
 function _tmux-show-buffer() {
@@ -1133,6 +1114,11 @@ function __tmux-get-optarg() {
     done
 }
 
+function __tmux-got-option-already() {
+    [[ -n ${(M)words:#$1} ]] && return 0
+    return 1
+}
+
 function __tmux-key-tables() {
     local expl
     local -a tables
@@ -1324,6 +1310,24 @@ function __tmux-options() {
         'visual-content:Display status line messages upon content changes'
     )
     _describe -t tmux-options 'tmux option' tmux_options
+}
+
+function __tmux-options-complete() {
+    local mode="$1" state="$2"
+
+    case ${state} in
+        name_or_value)
+            if (( CURRENT == 1 )) && [[ ${mode} == 'session' ]]; then
+                __tmux-options
+            elif (( CURRENT == 1 )) && [[ ${mode} == 'window' ]]; then
+                __tmux-window-options
+            elif (( CURRENT == 2 )); then
+                __tmux-option-guard ${mode} ${words[1]}
+            else
+                __tmux-nothing-else
+            fi
+            ;;
+    esac
 }
 
 function __tmux-panes() {

@@ -1,5 +1,8 @@
 2009-12-05  Clint Adams  <clint@zsh.org>
 
+	* Frank Terbeck: 27458: Completion/Unix/Command/_tmux:
+	set-option -w completion.
+
 	* Ingmar Vanhassel: 27457: Completion/Zsh/Command/_precommand:
 	add hilite as a precommand.
 
@@ -12438,5 +12441,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4832 $
+* $Revision: 1.4833 $
 *****************************************************
