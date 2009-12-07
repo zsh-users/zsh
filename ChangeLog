@@ -1,3 +1,9 @@
+2009-12-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27479: Src/Zle/zle_tricky.c: prevent completions
+	split across backlash-newline continuations from
+	causing mayhem.
+
 2009-12-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27466: Doc/Zsh/zle.yo: document 27453.
@@ -12451,5 +12457,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4835 $
+* $Revision: 1.4836 $
 *****************************************************

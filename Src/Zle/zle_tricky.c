@@ -1067,6 +1067,10 @@ get_comp_string(void)
     int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins, ia, parct, varq = 0;
     int ona = noaliases;
     /*
+     * Index of word being considered
+     */
+    int wordpos;
+    /*
      * qsub fixes up the offset into the current completion word
      * for changes made by the lexer.  That currently means the
      * effect of RCQUOTES on embedded pairs of single quotes.
@@ -1141,7 +1145,7 @@ get_comp_string(void)
     lexsave();
     inpush(dupstrspace(linptr), 0, NULL);
     strinbeg(0);
-    i = tt0 = cp = rd = ins = oins = linarr = parct = ia = redirpos = 0;
+    wordpos = tt0 = cp = rd = ins = oins = linarr = parct = ia = redirpos = 0;
 
     /* This loop is possibly the wrong way to do this.  It goes through *
      * the previously massaged command line using the lexer.  It stores *
@@ -1154,8 +1158,9 @@ get_comp_string(void)
     do {
         qsub = 0;
 
-	lincmd = ((incmdpos && !ins && !incond) || (oins == 2 && i == 2) ||
-		  (ins == 3 && i == 1));
+	lincmd = ((incmdpos && !ins && !incond) ||
+		  (oins == 2 && wordpos == 2) ||
+		  (ins == 3 && wordpos == 1));
 	linredir = (inredir && !ins);
 	oins = ins;
 	/* Get the next token. */
@@ -1198,7 +1203,7 @@ get_comp_string(void)
                 strcpy(rdop, tokstrings[tok]);
             strcpy(rdstr, rdop);
 	    /* Record if we haven't had the command word yet */
-	    if (i == redirpos)
+	    if (wordpos == redirpos)
 		redirpos++;
         }
 	if (tok == DINPAR)
@@ -1208,7 +1213,7 @@ get_comp_string(void)
 	if (tok == ENDINPUT)
 	    break;
 	if ((ins && (tok == DOLOOP || tok == SEPER)) ||
-	    (ins == 2 && i == 2) || (ins == 3 && i == 3) ||
+	    (ins == 2 && wordpos == 2) || (ins == 3 && wordpos == 3) ||
 	    tok == BAR    || tok == AMPER     ||
 	    tok == BARAMP || tok == AMPERBANG ||
 	    ((tok == DBAR || tok == DAMPER) && !incond) ||
@@ -1226,7 +1231,7 @@ get_comp_string(void)
 	    if (tt)
 		break;
 	    /* Otherwise reset the variables we are collecting data in. */
-	    i = tt0 = cp = rd = ins = redirpos = 0;
+	    wordpos = tt0 = cp = rd = ins = redirpos = 0;
 	}
 	if (lincmd && (tok == STRING || tok == FOR || tok == FOREACH ||
 		       tok == SELECT || tok == REPEAT || tok == CASE)) {
@@ -1236,15 +1241,46 @@ get_comp_string(void)
 	    zsfree(cmdstr);
 	    cmdstr = ztrdup(tokstr);
 	    /* If everything before is a redirection, don't reset the index */
-	    if (i != redirpos)
-		i = redirpos = 0;
+	    if (wordpos != redirpos)
+		wordpos = redirpos = 0;
 	}
 	if (!zleparse && !tt0) {
 	    /* This is done when the lexer reached the word the cursor is on. */
 	    tt = tokstr ? dupstring(tokstr) : NULL;
 
+	    /*
+	     * If there was a proper interface between this
+	     * function and the lexical analyser, we wouldn't
+	     * have to fix things up.
+	     *
+	     * Fix up backslash-newline pairs in zlemetaline
+	     * that the lexer will have removed.  As we're
+	     * looking back at the zlemetaline version it's
+	     * still using untokenized quotes.
+	     */
+	    for (i = j = k = 0, u = zlemetaline + wb;
+		 u < zlemetaline + we; u++) {
+		if (*u == '`' && !(k & 1))
+		    i++;
+		else if (*u == '\"' && !(k & 1) && !(i & 1))
+		    j++;
+		else if (*u == '\'' && !(j & 1))
+		    k++;
+		else if (*u == '\\' && u[1] && !(k & 1))
+		{
+		    if (u[1] == '\n') {
+			/* Removed by lexer in tt */
+			qsub += 2;
+		    }
+		    u++;
+		}
+	    }
+	    /*
+	     * Fix up RCQUOTES quotes that the
+	     * the lexer will also have removed.
+	     */
             if (isset(RCQUOTES) && tt) {
-		char *tt1, *e = tt + zlemetacs - wb;
+		char *tt1, *e = tt + zlemetacs - wb - qsub;
 		for (tt1 = tt; *tt1; tt1++) {
 		    if (*tt1 == Snull) {
 			char *p;
@@ -1259,7 +1295,7 @@ get_comp_string(void)
 		chuck(tt + zlemetacs - wb - qsub);
 	    tt0 = tok;
 	    /* Store the number of this word. */
-	    clwpos = i;
+	    clwpos = wordpos;
 	    cp = lincmd;
 	    rd = linredir;
 	    ia = linarr;
@@ -1279,39 +1315,39 @@ get_comp_string(void)
 	if (!tokstr)
 	    continue;
 	/* Hack to allow completion after `repeat n do'. */
-	if (oins == 2 && !i && !strcmp(tokstr, "do"))
+	if (oins == 2 && !wordpos && !strcmp(tokstr, "do"))
 	    ins = 3;
 	/* We need to store the token strings of all words (for some of *
 	 * the more complicated compctl -x things).  They are stored in *
 	 * the clwords array.  Make this array big enough.              */
-	if (i + 1 == clwsize) {
+	if (wordpos + 1 == clwsize) {
 	    int n;
 	    clwords = (char **)realloc(clwords,
 				       (clwsize *= 2) * sizeof(char *));
-	    for(n = clwsize; --n > i; )
+	    for(n = clwsize; --n > wordpos; )
 		clwords[n] = NULL;
 	}
-	zsfree(clwords[i]);
+	zsfree(clwords[wordpos]);
 	/* And store the current token string. */
-	clwords[i] = ztrdup(tokstr);
+	clwords[wordpos] = ztrdup(tokstr);
 	sl = strlen(tokstr);
 	/* Sometimes the lexer gives us token strings ending with *
 	 * spaces we delete the spaces.                           */
-	while (sl && clwords[i][sl - 1] == ' ' &&
-	       (sl < 2 || (clwords[i][sl - 2] != Bnull &&
-			   clwords[i][sl - 2] != Meta)))
-	    clwords[i][--sl] = '\0';
+	while (sl && clwords[wordpos][sl - 1] == ' ' &&
+	       (sl < 2 || (clwords[wordpos][sl - 2] != Bnull &&
+			   clwords[wordpos][sl - 2] != Meta)))
+	    clwords[wordpos][--sl] = '\0';
 	/* If this is the word the cursor is in and we added a `x', *
 	 * remove it.                                               */
-	if (clwpos == i++ && addedx) {
+	if (clwpos == wordpos++ && addedx) {
 	    zlemetacs_qsub = zlemetacs - qsub;
-	    chuck(&clwords[i - 1][((zlemetacs_qsub - wb) >= sl) ?
+	    chuck(&clwords[wordpos - 1][((zlemetacs_qsub - wb) >= sl) ?
 				 (sl - 1) : (zlemetacs_qsub - wb)]);
 	}
     } while (tok != LEXERR && tok != ENDINPUT &&
 	     (tok != SEPER || (zleparse && !tt0)));
     /* Calculate the number of words stored in the clwords array. */
-    clwnum = (tt || !i) ? i : i - 1;
+    clwnum = (tt || !wordpos) ? wordpos : wordpos - 1;
     zsfree(clwords[clwnum]);
     clwords[clwnum] = NULL;
     t0 = tt0;
