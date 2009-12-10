@@ -88,6 +88,10 @@ case "$service" in
       '(-d)--debug' \
       '--version' \
       '--license' \
+      '(--no-paranoid)--paranoid' \
+      '(--paranoid)--no-paranoid' \
+      '--body=:message body string' \
+      '--body-file=:message body file:_files' \
       "$_bug_commonargs[@]" \
       "$_rb_commonargs[@]"
   ;;

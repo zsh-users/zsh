@@ -1,3 +1,8 @@
+2009-12-10  Clint Adams  <clint@zsh.org>
+
+	* 27494: Completion/Debian/Command/_bug: reportbug --paranoid,
+	--no-paranoid, --body, and --body-file.
+
 2009-12-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27479: Src/Zle/zle_tricky.c: prevent completions
@@ -12457,5 +12462,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4836 $
+* $Revision: 1.4837 $
 *****************************************************
