@@ -1181,6 +1181,7 @@ callhookfunc(char *name, LinkList lnklst, int arrayp, int *retval)
 	memcpy(arrnam + namlen, HOOK_SUFFIX, HOOK_SUFFIX_LEN);
 
 	if ((arrptr = getaparam(arrnam))) {
+	    arrptr = arrdup(arrptr);
 	    for (; *arrptr; arrptr++) {
 		if ((shfunc = getshfunc(*arrptr))) {
 		    int newret = doshfunc(shfunc, lnklst, 1);

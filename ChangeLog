@@ -1,3 +1,8 @@
+2009-12-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27503: Src/utils.c: fix crash when changing a hook
+	function inside a hook function of the same type.
+
 2009-12-10  Clint Adams  <clint@zsh.org>
 
 	* 27494: Completion/Debian/Command/_bug: reportbug --paranoid,
@@ -12462,5 +12467,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4837 $
+* $Revision: 1.4838 $
 *****************************************************
