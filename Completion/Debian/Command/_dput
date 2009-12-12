@@ -5,7 +5,7 @@ _arguments \
   '(-c --config)'{-c,--config}'[specify config file]:config file:_files' \
   '(-d --debug)'{-d,--debug}'[debug mode]' \
   '(-D --dinstall)'{-D,--dinstall}'[run dinstall after upload]' \
-  '(-e --delayed)'{-E,--delayed}'number of days in delayed queue:(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)' \
+  '(-e --delayed)'{-E,--delayed}'[number of days in delayed queue]:number of days:(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)' \
   '(-f --force)'{-f,--force}'[force upload of already uploaded package]' \
   '(-H --host-list)'{-H,--host-list}'[display host list]' \
   '(-l --lintian)'{-l,--lintian}'[run lintian before upload]' \

@@ -1,3 +1,8 @@
+2009-12-12  Clint Adams  <clint@zsh.org>
+
+	* Michael Prokop: 27504: Completion/Debian/Command/_dput:
+	fix typo with dput --delayed.
+
 2009-12-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27503: Src/utils.c: fix crash when changing a hook
@@ -12467,5 +12472,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4838 $
+* $Revision: 1.4839 $
 *****************************************************
