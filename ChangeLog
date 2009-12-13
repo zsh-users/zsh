@@ -1,3 +1,8 @@
+2009-12-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Alexey I. Froloff: 27470: Completion/Unix/Command/_git:
+	update.
+
 2009-12-13  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Completion/Unix/Command/_rsync: Fixed the
@@ -12477,5 +12482,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4840 $
+* $Revision: 1.4841 $
 *****************************************************

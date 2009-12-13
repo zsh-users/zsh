@@ -2773,19 +2773,70 @@ __git_stages () {
   __git_guard $* "[[:digit:]]#" 'stage'
 }
 
+(( $+functions[__git_files_relative] )) ||
+__git_files_relative () {
+  local rawfiles files file f_parts prefix p_parts tmp
+
+  prefix=$(_call_program gitprefix git rev-parse --show-prefix 2>/dev/null)
+  __git_command_successful || return
+
+  # Empty prefix, no modifications
+  if (( $#prefix == 0 )); then
+    print $1
+    return
+  fi
+
+  rawfiles=(${(ps:\0:)1})
+  files=()
+
+  # Now we assume that we've given "absolute" paths list with "root"
+  # being repository top directory.  $prefix is also "absolute" path.
+  for file in $rawfiles; do
+    # Collapse "/./" and "//", strip "/." and "/" from tail (I know,
+    # this is a bit paranoid).
+    f_parts=(${(s:/:)"${${${${file//\/\///}//\/.\///}%%/.}%%/}"})
+    p_parts=(${(s:/:)"${${${${prefix//\/\///}//\/.\///}%%/.}%%/}"})
+    tmp=()
+
+    # Strip common path prefix.
+    while (( $#f_parts > 0 )) && (( $#p_parts > 0 )) && [[ $f_parts[1] == $p_parts[1] ]]; do
+      f_parts[1]=()
+      p_parts[1]=()
+    done
+
+    # If prefix still not empty, ascend up.
+    while (( $#p_parts > 0 )); do
+	tmp+=..
+	p_parts[1]=()
+    done
+
+    # Add remaining path.
+    tmp=("$tmp[@]" "$f_parts[@]")
+
+    files+=${(j:/:)tmp}
+  done
+
+  print ${(pj:\0:)files}
+}
+
 (( $+functions[__git_files] )) ||
 __git_files () {
-  local expl files ls_opts opts gitdir
+  local expl files ls_opts opts gitdir gitcdup
 
   zparseopts -D -E -a opts -- -cached -deleted -modified -others -ignored -unmerged -killed
 
   gitdir=$(_call_program gitdir git rev-parse --git-dir 2>/dev/null)
   __git_command_successful || return
 
+  gitcdup=$(_call_program gitcdup git rev-parse --show-cdup 2>/dev/null)
+  __git_command_successful || return
+
   ls_opts=("--exclude-per-directory=.gitignore")
   [[ -f "$gitdir/info/exclude" ]] && ls_opts+="--exclude-from=$gitdir/info/exclude"
 
-  files=(${(ps:\0:)"$(_call_program files git ls-files -z $ls_opts $opts 2>/dev/null)"})
+  files=$(_call_program files git ls-files -z --full-name $ls_opts $opts -- $gitcdup 2>/dev/null)
+  __git_command_successful || return
+  files=(${(ps:\0:)"$(__git_files_relative $files)"})
   __git_command_successful || return
 
   _wanted files expl 'index file' _multi_parts $@ - / files
@@ -2824,9 +2875,11 @@ __git_unmerged_files () {
 #this is for git-commit which can take files both git-added and not
 (( $+functions[__git_changed_files] )) ||
 __git_changed_files () {
-  local -a files
+  local files
 
-  files=(${(ps:\0:)"$(_call_program files git diff-index -z --name-only --no-color HEAD 2>/dev/null)"})
+  files=$(_call_program files git diff-index -z --name-only --no-color HEAD 2>/dev/null)
+  __git_command_successful || return
+  files=(${(ps:\0:)"$(__git_files_relative $files)"})
   __git_command_successful || return
 
   _wanted files expl 'index file' _multi_parts $@ - / files
