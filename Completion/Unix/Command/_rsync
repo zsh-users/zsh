@@ -207,7 +207,7 @@ _arguments -s \
   '--compress-level=[explicitly set compression level]:number' \
   '--skip-compress=[skip compressing files with a listed suffix]:suffixes' \
   '(-C --cvs-exclude)'{-C,--cvs-exclude}'[auto-ignore files the same way CVS does]' \
-  '*'{-f,--filter=}'[add a file-filtering rule]:rule' \
+  '*'{-f=,--filter=}'[add a file-filtering rule]:rule' \
   '*-F[same as --filter="dir-merge /.rsync-filter", repeated: --filter="- .rsync-filter"]' \
   '--exclude-from=[read exclude patterns from specified file]:file:_files' \
   '*--exclude=[exclude files matching pattern]:pattern' \
@@ -217,8 +217,7 @@ _arguments -s \
   '(-0 --from0)'{-0,--from0}'[all *-from file lists are delimited by nulls]' \
   '(-s --protect-args)'{-s,--protect-args}'[no space-splitting; only wildcard special-chars]' \
   '--version[print version number]' \
-  '(-h --human-readable --si)'{-h,--human-readable}'[output numbers in a human-readable format]' \
-  '(-h --human-readable)--si[like --human-readable, but use powers of 1000]' \
+  '*'{-h,--human-readable}'[output numbers in a human-readable format]' \
   '--blocking-io[use blocking I/O for the remote shell]' \
   '--no-blocking-io[turn off --blocking-io]' \
   '--stats[give some file-transfer stats]' \
