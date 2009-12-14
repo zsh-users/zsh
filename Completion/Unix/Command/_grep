@@ -55,6 +55,7 @@ arguments=( $arguments[@]
   '*--include=[examine files matching specified pattern]:file pattern'
   '*--exclude=[skip files matching specified pattern]:file pattern'
   '*--exclude-from=[skip files matching pattern in specified file]:file:_files'
+  '*--exclude-dir=[skip directories matching specified pattern]:directory pattern'
   '(--no-messages -s)'{--no-messages,-s}'[suppress messages about unreadable]'
   '(--version -V)'{--version,-V}'[display version info]'
   '(--invert-match -v)'{--invert-match,-v}'[select non-matching lines]'
