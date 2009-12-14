@@ -1,3 +1,8 @@
+2009-12-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27518: Completion/Unix/Command/_configure: suggest some
+	more patterns for arguments.
+
 2009-12-14  Andrey Borzenkov <bor@zsh.org>
 
 	* unposted: Completion/Unix/Command/_grep:
@@ -12487,5 +12492,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4842 $
+* $Revision: 1.4843 $
 *****************************************************

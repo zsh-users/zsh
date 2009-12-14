@@ -6,4 +6,6 @@ _arguments -- -i '(--(disable|enable)-FEATURE* --(with|without)-PACKAGE*)' \
 		   (#s)--with- --without-
 		   (#s)--without- --with-)' \
 	      '*=(E|)PREFIX*:prefix directory:_files -/' \
-              '*=PROGRAM*:program:_command_names -e'
+              '*=PROGRAM*:program:_command_names -e' \
+	      '*=NAME*executable*:program:_command_names -e' \
+	      '*=NAME*:file:_files'
