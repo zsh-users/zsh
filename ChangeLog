@@ -1,3 +1,8 @@
+2009-12-16  Peter Stephenson  <pws@csr.com>
+
+	* 27492 based on Jörg Sommer: 27473: Functions/Misc/run-help:
+	fix alias problem.
+
 2009-12-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27518: Completion/Unix/Command/_configure: suggest some
@@ -12492,5 +12497,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4843 $
+* $Revision: 1.4844 $
 *****************************************************
