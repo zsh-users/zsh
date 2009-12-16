@@ -2136,6 +2136,56 @@ checkrmall(char *s)
     return (getquery("ny", 1) == 'y');
 }
 
+/**/
+mod_export ssize_t
+read_loop(int fd, void *buf, size_t len)
+{
+    ssize_t got = len;
+
+    while (1) {
+	ssize_t ret = read(fd, buf, len);
+	if (ret == len)
+	    break;
+	if (ret <= 0) {
+	    if (ret < 0) {
+		if (errno == EINTR)
+		    continue;
+		if (fd != SHTTY)
+		    zwarn("read failed: %e", errno);
+	    }
+	    return ret;
+	}
+	buf += ret;
+	len -= ret;
+    }
+
+    return got;
+}
+
+/**/
+mod_export ssize_t
+write_loop(int fd, const void *buf, size_t len)
+{
+    ssize_t wrote = len;
+
+    while (1) {
+	ssize_t ret = write(fd, buf, len);
+	if (ret == len)
+	    break;
+	if (ret < 0) {
+	    if (errno == EINTR)
+		continue;
+	    if (fd != SHTTY)
+		zwarn("write failed: %e", errno);
+	    return -1;
+	}
+	buf += ret;
+	len -= ret;
+    }
+
+    return wrote;
+}
+
 static int
 read1char(int echo)
 {
@@ -2146,7 +2196,7 @@ read1char(int echo)
 	    return -1;
     }
     if (echo)
-	write(SHTTY, &c, 1);
+	write_loop(SHTTY, &c, 1);
     return STOUC(c);
 }
 
@@ -2161,8 +2211,11 @@ noquery(int purge)
 
     ioctl(SHTTY, FIONREAD, (char *)&val);
     if (purge) {
-	for (; val; val--)
-	    read(SHTTY, &c, 1);
+	for (; val; val--) {
+	    if (read(SHTTY, &c, 1) != 1) {
+		/* Do nothing... */
+	    }
+	}
     }
 #endif
 
@@ -2197,7 +2250,7 @@ getquery(char *valid_chars, int purge)
     if (noquery(purge)) {
 	if (!isem)
 	    settyinfo(&shttyinfo);
-	write(SHTTY, "n\n", 2);
+	write_loop(SHTTY, "n\n", 2);
 	return 'n';
     }
 
@@ -2220,9 +2273,9 @@ getquery(char *valid_chars, int purge)
 	zbeep();
     }
     if (c >= 0)
-	write(SHTTY, &c, 1);
+	write_loop(SHTTY, &c, 1);
     if (nl)
-	write(SHTTY, "\n", 1);
+	write_loop(SHTTY, "\n", 1);
 
     if (isem) {
 	if (c != '\n')
@@ -2251,7 +2304,7 @@ getquery(char *valid_chars, int purge)
 		}
 	    }
 #endif
-	    write(SHTTY, "\n", 1);
+	    write_loop(SHTTY, "\n", 1);
 	}
     }
     settyinfo(&shttyinfo);
@@ -3063,9 +3116,9 @@ zbeep(void)
     if ((vb = getsparam("ZBEEP"))) {
 	int len;
 	vb = getkeystring(vb, &len, GETKEYS_BINDKEY, NULL);
-	write(SHTTY, vb, len);
+	write_loop(SHTTY, vb, len);
     } else if (isset(BEEP))
-	write(SHTTY, "\07", 1);
+	write_loop(SHTTY, "\07", 1);
     unqueue_signals();
 }
 
