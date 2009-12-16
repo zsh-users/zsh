@@ -2747,7 +2747,7 @@ write_dump(int dfd, LinkList progs, int map, int hlen, int tlen)
 	fdsetflags(pre, ((map ? FDF_MAP : 0) | other));
 	fdsetother(pre, tlen);
 	strcpy(fdversion(pre), ZSH_VERSION);
-	write(dfd, pre, FD_PRELEN * sizeof(wordcode));
+	write_loop(dfd, pre, FD_PRELEN * sizeof(wordcode));
 
 	for (node = firstnode(progs); node; incnode(node)) {
 	    wcf = (WCFunc) getdata(node);
@@ -2768,11 +2768,11 @@ write_dump(int dfd, LinkList progs, int map, int hlen, int tlen)
 	    head.flags = fdhbldflags(wcf->flags, (tail - n));
 	    if (other)
 		fdswap((Wordcode) &head, sizeof(head) / sizeof(wordcode));
-	    write(dfd, &head, sizeof(head));
+	    write_loop(dfd, &head, sizeof(head));
 	    tmp = strlen(n) + 1;
-	    write(dfd, n, tmp);
+	    write_loop(dfd, n, tmp);
 	    if ((tmp &= (sizeof(wordcode) - 1)))
-		write(dfd, &head, sizeof(wordcode) - tmp);
+		write_loop(dfd, &head, sizeof(wordcode) - tmp);
 	}
 	for (node = firstnode(progs); node; incnode(node)) {
 	    prog = ((WCFunc) getdata(node))->prog;
@@ -2780,7 +2780,7 @@ write_dump(int dfd, LinkList progs, int map, int hlen, int tlen)
 		   sizeof(wordcode) - 1) / sizeof(wordcode);
 	    if (other)
 		fdswap(prog->prog, (((Wordcode) prog->strs) - prog->prog));
-	    write(dfd, prog->prog, tmp * sizeof(wordcode));
+	    write_loop(dfd, prog->prog, tmp * sizeof(wordcode));
 	}
 	if (other)
 	    break;

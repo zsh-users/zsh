@@ -586,7 +586,7 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)
 	    seen = 1;
 	    if (++used == blen) {
 		if (!*args) {
-		    write(1, buf, used);
+		    write_loop(1, buf, used);
 		    used = 0;
 		} else {
 		    buf = hrealloc(buf, blen, blen << 1);
@@ -632,7 +632,7 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)
     if (*args)
 	setsparam(*args, ztrdup(metafy(buf, used, META_HREALLOC)));
     else if (used)
-	write(1, buf, used);
+	write_loop(1, buf, used);
 
     if (seen && (!prog || matchok || !mustmatch))
 	return 0;

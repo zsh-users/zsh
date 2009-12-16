@@ -2398,7 +2398,7 @@ acquire_pgrp(void)
 	    if (mypgrp == gettygrp())
 		break;
 	    signal_setmask(oldset);
-	    read(0, NULL, 0); /* Might generate SIGT* */
+	    if (read(0, NULL, 0) != 0) {} /* Might generate SIGT* */
 	    signal_block(blockset);
 	    mypgrp = GETPGRP();
 	}

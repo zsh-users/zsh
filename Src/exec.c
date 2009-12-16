@@ -1344,11 +1344,19 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 	    zclose(coprocin);
 	    zclose(coprocout);
 	}
-	mpipe(ipipe);
-	mpipe(opipe);
-	coprocin = ipipe[0];
-	coprocout = opipe[1];
-	fdtable[coprocin] = fdtable[coprocout] = FDT_UNUSED;
+	if (mpipe(ipipe) < 0) {
+	    coprocin = coprocout = -1;
+	    slflags &= ~WC_SUBLIST_COPROC;
+	} else if (mpipe(opipe) < 0) {
+	    close(ipipe[0]);
+	    close(ipipe[1]);
+	    coprocin = coprocout = -1;
+	    slflags &= ~WC_SUBLIST_COPROC;
+	} else {
+	    coprocin = ipipe[0];
+	    coprocout = opipe[1];
+	    fdtable[coprocin] = fdtable[coprocout] = FDT_UNUSED;
+	}
     }
     /* This used to set list_pipe_pid=0 unconditionally, but in things
      * like `ls|if true; then sleep 20; cat; fi' where the sleep was
@@ -1456,16 +1464,17 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    ((jn->stat & STAT_STOPPED) ||
 		     (list_pipe_job && pline_level &&
 		      (jobtab[list_pipe_job].stat & STAT_STOPPED)))) {
-		    pid_t pid;
+		    pid_t pid = 0;
 		    int synch[2];
 		    struct timeval bgtime;
 
-		    pipe(synch);
-
-		    if ((pid = zfork(&bgtime)) == -1) {
+		    if (pipe(synch) < 0 || (pid = zfork(&bgtime)) == -1) {
+			if (pid < 0) {
+			    close(synch[0]);
+			    close(synch[1]);
+			} else
+			    zerr("pipe failed: %e", errno);
 			zleentry(ZLE_CMD_TRASH);
-			close(synch[0]);
-			close(synch[1]);
 			fprintf(stderr, "zsh: job can't be suspended\n");
 			fflush(stderr);
 			makerunning(jn);
@@ -1482,7 +1491,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			nowait = errflag = 1;
 			breaks = loops;
 			close(synch[1]);
-			read(synch[0], &dummy, 1);
+			read_loop(synch[0], &dummy, 1);
 			close(synch[0]);
 			/* If this job has finished, we leave it as a
 			 * normal (non-super-) job. */
@@ -1586,7 +1595,9 @@ execpline2(Estate state, wordcode pcode,
 	for (pc = state->pc; wc_code(code = *pc) == WC_REDIR;
 	     pc += WC_REDIR_WORDS(code));
 
-	mpipe(pipes);
+	if (mpipe(pipes) < 0) {
+	    /* FIXME */
+	}
 
 	/* if we are doing "foo | bar" where foo is a current *
 	 * shell command, do foo in a subshell and do the     *
@@ -1595,8 +1606,9 @@ execpline2(Estate state, wordcode pcode,
 	    int synch[2];
 	    struct timeval bgtime;
 
-	    pipe(synch);
-	    if ((pid = zfork(&bgtime)) == -1) {
+	    if (pipe(synch) < 0) {
+		zerr("pipe failed: %e", errno);
+	    } else if ((pid = zfork(&bgtime)) == -1) {
 		close(synch[0]);
 		close(synch[1]);
 	    } else if (pid) {
@@ -1605,7 +1617,7 @@ execpline2(Estate state, wordcode pcode,
 		text = getjobtext(state->prog, state->pc);
 		addproc(pid, text, 0, &bgtime);
 		close(synch[1]);
-		read(synch[0], &dummy, 1);
+		read_loop(synch[0], &dummy, 1);
 		close(synch[0]);
 	    } else {
 		zclose(pipes[0]);
@@ -1873,7 +1885,7 @@ closemn(struct multio **mfds, int fd)
 			break;
 		}
 		for (i = 0; i < mn->ct; i++)
-		    write(mn->fds[i], buf, len);
+		    write_loop(mn->fds[i], buf, len);
 	    }
 	} else {
 	    /* cat process */
@@ -1885,7 +1897,7 @@ closemn(struct multio **mfds, int fd)
 			else
 			    break;
 		    }
-		    write(mn->pipe, buf, len);
+		    write_loop(mn->pipe, buf, len);
 		}
 	}
 	_exit(0);
@@ -2019,7 +2031,11 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag,
 		return;
 	    }
 	    mfds[fd1]->fds[1] = fdN;
-	    mpipe(pipes);
+	    if (mpipe(pipes) < 0) {
+		zerr("multio failed for fd %d: %e", fd2, errno);
+		closemnodes(mfds);
+		return;
+	    }
 	    mfds[fd1]->pipe = pipes[1 - rflag];
 	    redup(pipes[rflag], fd1);
 	    mfds[fd1]->ct = 2;
@@ -2708,9 +2724,13 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	struct timeval bgtime;
 
 	child_block();
-	pipe(synch);
 
-	if ((pid = zfork(&bgtime)) == -1) {
+	if (pipe(synch) < 0) {
+	    zerr("pipe failed: %e", errno);
+	    if (oautocont >= 0)
+		opts[AUTOCONTINUE] = oautocont;
+	    return;
+	} else if ((pid = zfork(&bgtime)) == -1) {
 	    close(synch[0]);
 	    close(synch[1]);
 	    if (oautocont >= 0)
@@ -2720,7 +2740,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	if (pid) {
 
 	    close(synch[1]);
-	    read(synch[0], &dummy, 1);
+	    read_loop(synch[0], &dummy, 1);
 	    close(synch[0]);
 #ifdef PATH_DEV_FD
 	    closem(FDT_PROC_SUBST);
@@ -3445,7 +3465,7 @@ getherestr(struct redir *fn)
     t[len++] = '\n';
     if ((fd = gettempfile(NULL, 1, &s)) < 0)
 	return -1;
-    write(fd, t, len);
+    write_loop(fd, t, len);
     close(fd);
     fd = open(s, O_RDONLY | O_NOCTTY);
     unlink(s);
@@ -3507,7 +3527,11 @@ getoutput(char *cmd, int qt)
 	}
 	return readoutput(stream, qt);
     }
-    mpipe(pipes);
+    if (mpipe(pipes) < 0) {
+	errflag = 1;
+	cmdoutpid = 0;
+	return NULL;
+    }
     child_block();
     cmdoutval = 0;
     if ((cmdoutpid = pid = zfork(NULL)) == -1) {
@@ -3664,7 +3688,7 @@ getoutputfile(char *cmd, char **eptr)
 	/* optimised here-string */
 	int len;
 	unmetafy(s, &len);
-	write(fd, s, len);
+	write_loop(fd, s, len);
 	close(fd);
 	return nam;
     }
@@ -3767,7 +3791,8 @@ getproc(char *cmd, char **eptr)
     pnam = hcalloc(strlen(PATH_DEV_FD) + 6);
     if (!(prog = parsecmd(cmd, eptr)))
 	return NULL;
-    mpipe(pipes);
+    if (mpipe(pipes) < 0)
+	return NULL;
     if ((pid = zfork(&bgtime))) {
 	sprintf(pnam, "%s/%d", PATH_DEV_FD, pipes[!out]);
 	zclose(pipes[out]);
@@ -3821,7 +3846,8 @@ getpipe(char *cmd, int nullexec)
 	zerr("invalid syntax for process substitution in redirection");
 	return -1;
     }
-    mpipe(pipes);
+    if (mpipe(pipes) < 0)
+	return -1;
     if ((pid = zfork(&bgtime))) {
 	zclose(pipes[out]);
 	if (pid == -1) {
@@ -3845,12 +3871,16 @@ getpipe(char *cmd, int nullexec)
 /* open pipes with fds >= 10 */
 
 /**/
-static void
+static int
 mpipe(int *pp)
 {
-    pipe(pp);
+    if (pipe(pp) < 0) {
+	zerr("pipe failed: %e", errno);
+	return -1;
+    }
     pp[0] = movefd(pp[0]);
     pp[1] = movefd(pp[1]);
+    return 0;
 }
 
 /*

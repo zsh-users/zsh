@@ -1,3 +1,12 @@
+2009-12-16  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 26735+unposted: Src/utils.c, Src/Modules/zftp.c, Src/Modules/zpty.c,
+	Src/Zle/zle_main.c, Src/exec.c, Src/init.c, Src/input.c, Src/jobs.c,
+	Src/parse.c:  Check the return value of all pipe(), read(), and
+	write() calls.  Gets rid of all "ignoring return value" compiler
+	warnings, and makes some read/write operations safer by ensuring
+	that an EINTR is handled.
+
 2009-12-16  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Functions/Misc/run-help-p4, Functions/Misc/.distfiles:
@@ -12500,5 +12509,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4845 $
+* $Revision: 1.4846 $
 *****************************************************

@@ -1125,7 +1125,7 @@ zleread(char **lp, char **rp, int flags, int context)
 	pptbuf = unmetafy(promptexpand(lp ? *lp : NULL, 0, NULL, NULL,
 				       &pmpt_attr),
 			  &pptlen);
-	write(2, (WRITE_ARG_2_T)pptbuf, pptlen);
+	write_loop(2, (WRITE_ARG_2_T)pptbuf, pptlen);
 	free(pptbuf);
 	return shingetline();
     }
