@@ -13,6 +13,7 @@ promptnl
 relative
 run-help
 run-help-git
+run-help-p4
 run-help-svk
 run-help-svn
 sticky-note

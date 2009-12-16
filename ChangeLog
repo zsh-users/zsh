@@ -1,5 +1,8 @@
 2009-12-16  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Functions/Misc/run-help-p4, Functions/Misc/.distfiles:
+	new helper.
+
 	* 27492 based on Jörg Sommer: 27473: Functions/Misc/run-help:
 	fix alias problem.
 
@@ -12497,5 +12500,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4844 $
+* $Revision: 1.4845 $
 *****************************************************
