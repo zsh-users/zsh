@@ -1,3 +1,8 @@
+2009-12-17  Peter Stephenson  <pws@csr.com>
+
+	* Greg: 27529: Completion/Unix/Command/_subversion: make URL
+	schemas (schemata?) configurable.
+
 2009-12-16  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 26735+unposted: Src/utils.c, Src/Modules/zftp.c, Src/Modules/zpty.c,
@@ -12509,5 +12514,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4846 $
+* $Revision: 1.4847 $
 *****************************************************

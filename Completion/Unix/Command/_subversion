@@ -249,7 +249,7 @@ _svn_remote_paths() {
 
 (( $+functions[_svn_urls] )) ||
 _svn_urls() {
-  local expl ret=1
+  local urlsch expl ret=1
 
   # first try completing a remote path; if successful, we are all done..
   _svn_remote_paths && return 0
@@ -260,9 +260,13 @@ _svn_urls() {
   _urls -S/ && ret=0
 
   if [[ ! -prefix *://? ]] ; then
-    compset -S '[^:]*'
-    _wanted url-schemas expl 'URL schema' compadd -S '' - \
-        file:// http:// https:// svn:// svn+ssh:// && ret=0
+    zstyle -a ":completion:${curcontext}:" url-schemas urlsch \
+     || urlsch=( file:// http:// https:// svn:// svn+ssh:// )
+    
+    if (( $#urlsch )) ; then
+      compset -S '[^:]*'
+      _wanted url-schemas expl 'URL schema' compadd -S '' - $urlsch[@] && ret=0
+    fi
   fi
 
   return ret
