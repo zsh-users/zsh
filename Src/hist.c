@@ -2600,11 +2600,38 @@ lockhistfile(char *fn, int keep_trying)
 	int fd;
 	char *lockfile;
 #ifdef HAVE_LINK
+# ifdef HAVE_SYMLINK
+	char pidbuf[32], *lnk;
+# else
 	char *tmpfile;
+# endif
 #endif
 
 	lockfile = bicat(unmeta(fn), ".LOCK");
+	/* NOTE: only use symlink locking on a link()-having host in order to
+	 * avoid a change from open()-based locking to symlink()-based. */
 #ifdef HAVE_LINK
+# ifdef HAVE_SYMLINK
+	sprintf(pidbuf, "/pid-%ld/host-", (long)mypid);
+	lnk = bicat(pidbuf, getsparam("HOST"));
+	/* We'll abuse fd as our success flag. */
+	while ((fd = symlink(lnk, lockfile)) < 0) {
+	    if (errno != EEXIST || !keep_trying)
+		break;
+	    if (lstat(lockfile, &sb) < 0) {
+		if (errno == ENOENT)
+		    continue;
+		break;
+	    }
+	    if (time(NULL) - sb.st_mtime < 10)
+		sleep(1);
+	    else
+		unlink(lockfile);
+	}
+	if (fd < 0)
+	    lockhistct--;
+	free(lnk);
+# else /* not HAVE_SYMLINK */
 	if ((fd = gettempfile(fn, 0, &tmpfile)) >= 0) {
 	    FILE *out = fdopen(fd, "w");
 	    if (out) {
@@ -2618,7 +2645,7 @@ lockhistfile(char *fn, int keep_trying)
 			 lockfile, errno);
 		else if (!keep_trying)
 		    ;
-		else if (stat(lockfile, &sb) < 0) {
+		else if (lstat(lockfile, &sb) < 0) {
 		    if (errno == ENOENT)
 			continue;
 		    zerr("failed to stat lock file %s: %e", lockfile, errno);
@@ -2635,11 +2662,12 @@ lockhistfile(char *fn, int keep_trying)
 	    unlink(tmpfile);
 	    free(tmpfile);
 	}
+# endif /* not HAVE_SYMLINK */
 #else /* not HAVE_LINK */
 	while ((fd = open(lockfile, O_WRONLY|O_CREAT|O_EXCL, 0644)) < 0) {
 	    if (errno != EEXIST || !keep_trying)
 		break;
-	    if (stat(lockfile, &sb) < 0) {
+	    if (lstat(lockfile, &sb) < 0) {
 		if (errno == ENOENT)
 		    continue;
 		break;

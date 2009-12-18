@@ -1,3 +1,7 @@
+2009-12-18  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* users/14659: Src/hist.c: Add symlink-based hist-file locking.
+
 2009-12-17  Peter Stephenson  <pws@csr.com>
 
 	* Greg: 27529: Completion/Unix/Command/_subversion: make URL
@@ -12514,5 +12518,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4847 $
+* $Revision: 1.4848 $
 *****************************************************

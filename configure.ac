@@ -1169,7 +1169,8 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       htons ntohs \
 	       regcomp regexec regerror regfree \
 	       gdbm_open getxattr \
-	       realpath canonicalize_file_name)
+	       realpath canonicalize_file_name \
+	       symlink)
 AC_FUNC_STRCOLL
 
 if test x$enable_cap = xyes; then
