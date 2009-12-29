@@ -154,7 +154,7 @@ case $state in
         )
         ;;
 
-      runserver)
+      runserver|runserver_plus)
         args+=(
           '--noreload[do not use auto-reloader]'
       	  '--adminmedia=[directory from which to serve admin media]:directory:_directories'
@@ -198,6 +198,10 @@ case $state in
         ;;
 
       validate|runfcgi)
+        ;;
+
+      *)
+        _files
         ;;
     esac
 

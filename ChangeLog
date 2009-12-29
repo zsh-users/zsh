@@ -1,3 +1,8 @@
+2009-12-28  Clint Adams  <clint@zsh.org>
+
+	* Chris Lamb: 27545: Completion/Unix/Command/_django:
+        runserver_plus and files completion for django.
+
 2009-12-18  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* users/14659: Src/hist.c: Add symlink-based hist-file locking.
@@ -12518,5 +12523,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4848 $
+* $Revision: 1.4849 $
 *****************************************************
