@@ -1,3 +1,8 @@
+2010-01-04  Clint Adams  <clint@zsh.org>
+
+	* Jesse Weinstein: 27558: Completion/Unix/Command/_espeak:
+	completion for espeak.
+
 2010-01-04  Peter Stephenson  <pws@csr.com>
 
 	* 27556: Src/lex.c: lexsave() should sanitize more variables else
@@ -12529,5 +12534,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4850 $
+* $Revision: 1.4851 $
 *****************************************************
