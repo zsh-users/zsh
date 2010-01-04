@@ -1,5 +1,8 @@
 2010-01-04  Clint Adams  <clint@zsh.org>
 
+	* 27559: Completion/Unix/Command/_espeak: espeak language
+	codes and voice names.
+
 	* Jesse Weinstein: 27558: Completion/Unix/Command/_espeak:
 	completion for espeak.
 
@@ -12534,5 +12537,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4851 $
+* $Revision: 1.4852 $
 *****************************************************
