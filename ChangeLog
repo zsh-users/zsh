@@ -1,3 +1,9 @@
+2010-01-04  Peter Stephenson  <pws@csr.com>
+
+	* 27556: Src/lex.c: lexsave() should sanitize more variables else
+	inner loops can get confused by outer state.  Symptom was
+	source within precmd.
+
 2009-12-28  Clint Adams  <clint@zsh.org>
 
 	* Chris Lamb: 27545: Completion/Unix/Command/_django:
@@ -12523,5 +12529,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4849 $
+* $Revision: 1.4850 $
 *****************************************************

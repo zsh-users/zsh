@@ -248,8 +248,11 @@ lexsave(void)
     ls->histactive = histactive;
     ls->histdone = histdone;
     ls->stophist = stophist;
+    stophist = 0;
     ls->hline = chline;
+    chline = NULL;
     ls->hptr = hptr;
+    hptr = NULL;
     ls->hlinesz = hlinesz;
     ls->cstack = cmdstack;
     ls->csp = cmdsp;
@@ -259,7 +262,9 @@ lexsave(void)
     ls->tokstr = tokstr;
     ls->zshlextext = zshlextext;
     ls->bptr = bptr;
+    tokstr = zshlextext = bptr = NULL;
     ls->bsiz = bsiz;
+    bsiz = 256;
     ls->len = len;
     ls->chwords = chwords;
     ls->chwordlen = chwordlen;
