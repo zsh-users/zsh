@@ -3672,13 +3672,13 @@ such as tt(PREFIX) and tt(words).  This gives the calling function the
 choice of resetting these parameters or propagating changes in them.
 
 A function calling tt(_arguments) with at least
-one action containing a `tt(->)var(string)' therefore must declare
+one action containing a `tt(->)var(string)' must therefore declare
 appropriate local parameters:
 
 example(local context state line
 typeset -A opt_args)
 
-to avoid tt(_arguments) from altering the global environment.
+to prevent tt(_arguments) from altering the global environment.
 )
 item(tt({)var(eval-string)tt(}))(
 vindex(expl, use of)
