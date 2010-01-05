@@ -1,5 +1,8 @@
 2010-01-05  Peter Stephenson  <pws@csr.com>
 
+	* 27566: Src/Builtins/rlimits.c: add ulimit -c hard and immediate
+	return on argument error
+
 	* 27565: Src/Builtins/rlimits.c: ulimit didn't sanity check
 	numeric arguments.
 
@@ -12542,5 +12545,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4853 $
+* $Revision: 1.4854 $
 *****************************************************

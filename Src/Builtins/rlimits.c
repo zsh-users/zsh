@@ -836,11 +836,24 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    /* set limit to specified value */
 	    rlim_t limit;
 
-	    limit = zstrtorlimt(*argv, &eptr, 10);
-	    if (*eptr) {
-		zwarnnam(name, "invalid number: %s", *argv);
-		ret++;
+	    if (!strcmp(*argv, "hard")) {
+		struct rlimit vals;
+
+		if (getrlimit(res, &vals) < 0)
+		{
+		    zwarnnam(name, "can't read limit: %e", errno);
+		    return 1;
+		}
+		else
+		{
+		    limit = vals.rlim_max;
+		}
 	    } else {
+		limit = zstrtorlimt(*argv, &eptr, 10);
+		if (*eptr) {
+		    zwarnnam(name, "invalid number: %s", *argv);
+		    return 1;
+		}
 		/* scale appropriately */
 		switch (res) {
 		case RLIMIT_FSIZE:
@@ -870,9 +883,9 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    limit *= 1024;
 		    break;
 		}
-		if (do_limit(name, res, limit, hard, soft, 1))
-		    ret++;
 	    }
+	    if (do_limit(name, res, limit, hard, soft, 1))
+		ret++;
 	} else {
 	    if (do_unlimit(name, res, hard, soft, 1, geteuid()))
 		ret++;
