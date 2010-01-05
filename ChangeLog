@@ -1,3 +1,8 @@
+2010-01-05  Peter Stephenson  <pws@csr.com>
+
+	* 27565: Src/Builtins/rlimits.c: ulimit didn't sanity check
+	numeric arguments.
+
 2010-01-04  Clint Adams  <clint@zsh.org>
 
 	* 27559: Completion/Unix/Command/_espeak: espeak language
@@ -12537,5 +12542,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4852 $
+* $Revision: 1.4853 $
 *****************************************************
