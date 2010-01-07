@@ -1,5 +1,8 @@
 2010-01-07  Clint Adams  <clint@zsh.org>
 
+	* 27579: Completion/Unix/Command/_ssh: allow ssh -S argument to
+	follow immediately the option letter.
+
 	* 27578: Completion/Linux/Command/_ionice: allow ionice -c and -n
 	arguments to immediately follow the option letters.
 
@@ -12550,5 +12553,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4855 $
+* $Revision: 1.4856 $
 *****************************************************
