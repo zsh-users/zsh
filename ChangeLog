@@ -1,3 +1,8 @@
+2010-01-07  Clint Adams  <clint@zsh.org>
+
+	* 27578: Completion/Linux/Command/_ionice: allow ionice -c and -n
+	arguments to immediately follow the option letters.
+
 2010-01-05  Peter Stephenson  <pws@csr.com>
 
 	* 27566: Src/Builtins/rlimits.c: add ulimit -c hard and immediate
@@ -12545,5 +12550,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4854 $
+* $Revision: 1.4855 $
 *****************************************************
