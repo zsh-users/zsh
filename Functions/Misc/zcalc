@@ -152,7 +152,7 @@ for (( num = 1; num <= $#; num++ )); do
 done
 
 psvar[1]=$num
-while vared -cehp "${(%)ZCALCPROMPT}" line; do
+while vared -cehp "${ZCALCPROMPT}" line; do
   [[ -z $line ]] && break
   # special cases
   # Set default base if `[#16]' or `[##16]' etc. on its own.

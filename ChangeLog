@@ -1,3 +1,9 @@
+2010-01-08  Peter Stephenson  <pws@csr.com>
+
+	* 27577: sergio: Functions/Misc/zcalc: vared -p obeys
+	the PROMPTPERCENT option so it's not necessary to have an
+	explicit (%) in the variable expansion.
+
 2010-01-07  Clint Adams  <clint@zsh.org>
 
 	* 27579: Completion/Unix/Command/_ssh: allow ssh -S argument to
@@ -22,6 +28,7 @@
 	* Jesse Weinstein: 27558: Completion/Unix/Command/_espeak:
 	completion for espeak.
 
+>>>>>>> 1.4856
 2010-01-04  Peter Stephenson  <pws@csr.com>
 
 	* 27556: Src/lex.c: lexsave() should sanitize more variables else
@@ -12553,5 +12560,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4856 $
+* $Revision: 1.4857 $
 *****************************************************
