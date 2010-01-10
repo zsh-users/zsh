@@ -1,3 +1,7 @@
+2010-01-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27553: Jesse Weinstein: Doc/Zsh/compsys.yo: improve phrasing.
+
 2010-01-10  Clint Adams  <clint@zsh.org>
 
 	* Frank Terbeck: 27586: Completion/Unix/Command/_tmux:
@@ -12564,5 +12568,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4858 $
+* $Revision: 1.4859 $
 *****************************************************
