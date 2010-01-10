@@ -1,3 +1,8 @@
+2010-01-10  Clint Adams  <clint@zsh.org>
+
+	* Frank Terbeck: 27586: Completion/Unix/Command/_tmux:
+	more tmux completion support.
+
 2010-01-08  Peter Stephenson  <pws@csr.com>
 
 	* 27577: sergio: Functions/Misc/zcalc: vared -p obeys
@@ -28,7 +33,6 @@
 	* Jesse Weinstein: 27558: Completion/Unix/Command/_espeak:
 	completion for espeak.
 
->>>>>>> 1.4856
 2010-01-04  Peter Stephenson  <pws@csr.com>
 
 	* 27556: Src/lex.c: lexsave() should sanitize more variables else
@@ -12560,5 +12564,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4857 $
+* $Revision: 1.4858 $
 *****************************************************

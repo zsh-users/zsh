@@ -69,6 +69,7 @@ _tmux_aliasmap=(
     displayp    display-panes
     downp       down-pane
     findw       find-window
+    joinp       join-pane
     killp       kill-pane
     killw       kill-window
     last        last-window
@@ -396,6 +397,21 @@ function _tmux-if-shell() {
         '2:tmux command:'
     )
     _arguments ${args}
+}
+
+function _tmux-join-pane() {
+    [[ -n ${tmux_describe} ]] && print "Split a pane and move an existing one into the new space" && return
+    local -a args
+    args=(
+        '-d[Do not make the new window become the active one]'
+        '-h[Split horizontally]'
+        '-v[Split vertically]'
+        '-l[Define new pane'\''s size]: :_guard "[0-9]#" "numeric value"'
+        '-p[Define new pane'\''s size in percent]: :_guard "[0-9]#" "numeric value"'
+        '-s[Choose source pane]:window:__tmux-panes'
+        '-t[Choose target pane]:window:__tmux-panes'
+    )
+    _arguments ${args} && return
 }
 
 function _tmux-kill-pane() {
@@ -855,10 +871,17 @@ function _tmux-set-option() {
         '-g[Set a global session option]'
         '-u[Unset a non-global option]'
         '-w[Change window (not session) options]'
+        '-s[Change server (not session) options]'
         '-t[Choose a target session]:target session:__tmux-sessions'
         '*:: :->name_or_value'
     )
-    __tmux-got-option-already -w && mode=window || mode=session
+    if __tmux-got-option-already -w; then
+        mode=window
+    elif __tmux-got-option-already -s; then
+        mode=server
+    else
+        mode=session
+    fi
     _arguments -C ${args}
     __tmux-options-complete ${mode} ${state}
 }
@@ -950,7 +973,7 @@ function _tmux-source-file() {
 }
 
 function _tmux-split-window() {
-    [[ -n ${tmux_describe} ]] && print "Creates a new pane" && return
+    [[ -n ${tmux_describe} ]] && print "Splits a pane into two" && return
     local -a args
     args=(
         '-d[Do not make the new window become the active one]'
@@ -958,7 +981,11 @@ function _tmux-split-window() {
         '-v[Split vertically]'
         '-l[Define new pane'\''s size]: :_guard "[0-9]#" "numeric value"'
         '-p[Define new pane'\''s size in percent]: :_guard "[0-9]#" "numeric value"'
-        '-t[Choose target window]:window:__tmux-windows'
+        # Yes, __tmux_pane is correct here. The behaviour was changed
+        # in recent tmux versions and makes more sense. Except that
+        # changing the command's name might annoy users. So it stays like
+        # this.
+        '-t[Choose target pane]:window:__tmux-panes'
         '*:: :_command'
     )
     _arguments ${args} && return
@@ -1186,6 +1213,10 @@ function __tmux-option-guard() {
             'message-fg:__tmux-colours'
             'message-limit:'${int_guard}
             'mouse-select-pane:DESC:on off'
+            'pane-border-bg:__tmux-colours'
+            'pane-border-fg:__tmux-colours'
+            'pane-active-border-bg:__tmux-colours'
+            'pane-active-border-fg:__tmux-colours'
             'prefix:MSG:comma-seperated key list'
             'repeat-time:'${int_guard}
             'set-remain-on-exit:DESC:on off'
@@ -1214,6 +1245,11 @@ function __tmux-option-guard() {
             'visual-activity:DESC:on off'
             'visual-bell:DESC:on off'
             'visual-content:DESC:on off'
+        )
+    elif [[ ${mode} == 'server' ]]; then
+        options=(
+            'escape-time:'${int_guard}
+            'quiet:DESC:on off'
         )
     else
         options=(
@@ -1291,6 +1327,10 @@ function __tmux-options() {
         'message-fg:Set status line message foreground colour'
         'message-limit:Set size of message log per client'
         'mouse-select-pane:Make mouse clicks select window panes'
+        'pane-border-bg:Set pane border foreground colour'
+        'pane-border-fg:Set pane border background colour'
+        'pane-active-border-bg:Set active pane border foreground colour'
+        'pane-active-border-fg:Set active pane border background colour'
         'prefix:Comma seperated line of keys accepted as prefix key'
         'repeat-time:Time for multiple commands without prefix-key presses'
         'set-remain-on-exit:Set remain-on-exit window option'
@@ -1330,6 +1370,8 @@ function __tmux-options-complete() {
         name_or_value)
             if (( CURRENT == 1 )) && [[ ${mode} == 'session' ]]; then
                 __tmux-options
+            elif (( CURRENT == 1 )) && [[ ${mode} == 'server' ]]; then
+                __tmux-server-options
             elif (( CURRENT == 1 )) && [[ ${mode} == 'window' ]]; then
                 __tmux-window-options
             elif (( CURRENT == 2 )); then
@@ -1360,6 +1402,15 @@ function __tmux-panes() {
     if [[ ${IPREFIX} != *. ]]; then
         _wanted windows expl 'windows' __tmux-windows -S.
     fi
+}
+
+function __tmux-server-options() {
+    local -a tmux_server_options
+    tmux_server_options=(
+        'escape-time:Set timeout to detect single escape characters (in msecs)'
+        'quiet:Enable/disable the display of various informational messages'
+    )
+    _describe -t tmux-server-options 'tmux server option' tmux_server_options
 }
 
 function __tmux-sessions() {
