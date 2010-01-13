@@ -1,3 +1,8 @@
+2010-01-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Mikael: 27597: Completion/Zsh/Command/_zstyle: accepting
+	completion unnecessarily hard.
+
 2010-01-13  Peter Stephenson  <pws@csr.com>
 
 	* Joakim Rosqvist: 27591 as modified in 27594:
@@ -12575,5 +12580,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4860 $
+* $Revision: 1.4861 $
 *****************************************************

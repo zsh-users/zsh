@@ -185,7 +185,7 @@ while (( $#state )); do
   case "$state[1]" in
     (contexts)
       if [[ ! -prefix :*: ]]; then
-	_wanted contexts expl context compadd -P : -S : completion zftp
+	_wanted contexts expl context compadd -P : -qS : completion zftp
       elif compset -P :completion:; then
         for ostate in functions _completers cmdorcont argument tag; do
 	  compset -P '[^:]#:' || break
