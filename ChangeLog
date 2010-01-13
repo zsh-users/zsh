@@ -1,3 +1,10 @@
+2010-01-13  Peter Stephenson  <pws@csr.com>
+
+	* Joakim Rosqvist: 27591 as modified in 27594:
+	FEATURES, Doc/Zsh/options.yo, Doc/Zsh/params.yo, Src/input.c,
+	Src/options.c, Src/params.c: extend SUN_KEYBOARD_HACK option
+	to KEYBOARD_HACK variable.
+
 2010-01-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27553: Jesse Weinstein: Doc/Zsh/compsys.yo: improve phrasing.
@@ -12568,5 +12575,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4859 $
+* $Revision: 1.4860 $
 *****************************************************

@@ -108,6 +108,9 @@ zlong lineno,		/* $LINENO      */
 mod_export unsigned char bangchar;
 /**/
 unsigned char hatchar, hashchar;
+
+/**/
+unsigned char keyboardhackchar = '\0';
  
 /* $SECONDS = now.tv_sec - shtimer.tv_sec
  *          + (now.tv_usec - shtimer.tv_usec) / 1000000.0
@@ -204,6 +207,8 @@ static const struct gsu_scalar ifs_gsu =
 { ifsgetfn, ifssetfn, stdunsetfn };
 static const struct gsu_scalar underscore_gsu =
 { underscoregetfn, nullstrsetfn, stdunsetfn };
+static const struct gsu_scalar keyboard_hack_gsu =
+{ keyboardhackgetfn, keyboardhacksetfn, stdunsetfn };
 #ifdef USE_LOCALE
 static const struct gsu_scalar lc_blah_gsu =
 { strgetfn, lcsetfn, stdunsetfn };
@@ -273,6 +278,7 @@ IPDEF2("TERM", term_gsu, 0),
 IPDEF2("WORDCHARS", wordchars_gsu, 0),
 IPDEF2("IFS", ifs_gsu, PM_DONTIMPORT),
 IPDEF2("_", underscore_gsu, PM_READONLY),
+IPDEF2("KEYBOARD_HACK", keyboard_hack_gsu, PM_DONTIMPORT),
 
 #ifdef USE_LOCALE
 # define LCIPDEF(name) IPDEF2(name, lc_blah_gsu, PM_UNSET)
@@ -3832,6 +3838,46 @@ zlong
 errnogetfn(UNUSED(Param pm))
 {
     return errno;
+}
+
+/* Function to get value for special parameter `KEYBOARD_HACK' */
+
+/**/
+char *
+keyboardhackgetfn(UNUSED(Param pm))
+{
+    static char buf[2];
+
+    buf[0] = keyboardhackchar;
+    buf[1] = '\0';
+    return buf;
+}
+
+
+/* Function to set value of special parameter `KEYBOARD_HACK' */
+
+/**/
+void
+keyboardhacksetfn(UNUSED(Param pm), char *x)
+{
+    if (x) {
+	int len, i;
+
+	unmetafy(x, &len);
+	if (len > 1) {
+	    len = 1;
+	    zwarn("Only one KEYBOARD_HACK character can be defined");  /* could be changed if needed */
+	}
+	for (i = 0; i < len; i++) {
+	    if (!isascii(STOUC(x[i]))) {
+		zwarn("KEYBOARD_HACK can only contain ASCII characters");
+		return;
+	    }
+	}
+	keyboardhackchar = len ? STOUC(x[0]) : '\0';
+	free(x);
+    } else
+	keyboardhackchar = '\0';
 }
 
 /* Function to get value for special parameter `histchar' */

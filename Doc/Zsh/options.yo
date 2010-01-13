@@ -1209,6 +1209,8 @@ If a line ends with a backquote, and there are an odd number
 of backquotes on the line, ignore the trailing backquote.
 This is useful on some keyboards where the return key is
 too small, and the backquote key lies annoyingly close to it.
+As an alternative the variable tt(KEYBOARD_HACK) lets you choose the
+character to be removed.
 )
 enditem()
 

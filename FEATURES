@@ -66,6 +66,7 @@ with histverify option, performing csh-style history expansions causes the
   input line to be brought up for editing instead of being executed
 with sunkeyboardhack option, accidentally typed trailing ` characters
   are removed from the input line (for those of you with Sun keyboards :-) )
+with KEYBOARD_HACK, any accidentally typed trailing ascii character can be junked
 "cd old new" replaces "old" with "new" in directory string
 generalized argument completion, new system based on shell functions:
   - highly context sensitive

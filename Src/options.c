@@ -748,6 +748,9 @@ dosetopt(int optno, int value, int force)
     } else if ((optno == EMACSMODE || optno == VIMODE) && value) {
 	zleentry(ZLE_CMD_SET_KEYMAP, optno);
 	opts[(optno == EMACSMODE) ? VIMODE : EMACSMODE] = 0;
+    } else if (optno == SUNKEYBOARDHACK) {
+	/* for backward compatibility */
+	keyboardhackchar = (value ? '`' : '\0');
     }
     opts[optno] = value;
     if (optno == BANGHIST || optno == SHINSTDIN)

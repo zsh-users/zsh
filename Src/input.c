@@ -291,20 +291,32 @@ inputline(void)
 	zputs(ingetcline, stderr);
 	fflush(stderr);
     }
-    if (*ingetcline && ingetcline[strlen(ingetcline) - 1] == '\n' &&
-	interact && isset(SUNKEYBOARDHACK) && isset(SHINSTDIN) &&
-	SHTTY != -1 && *ingetcline && ingetcline[1] &&
-	ingetcline[strlen(ingetcline) - 2] == '`') {
-	/* Junk an unmatched "`" at the end of the line. */
-	int ct;
-	char *ptr;
+    if (keyboardhackchar && *ingetcline &&
+	ingetcline[strlen(ingetcline) - 1] == '\n' &&
+	interact && isset(SHINSTDIN) &&
+	SHTTY != -1 && ingetcline[1])
+    {
+	char *stripptr = ingetcline + strlen(ingetcline) - 2;
+	if (*stripptr == keyboardhackchar) {
+	    /* Junk an unwanted character at the end of the line.
+	       (key too close to return key) */
+	    int ct = 1;  /* force odd */
+	    char *ptr;
 
-	for (ct = 0, ptr = ingetcline; *ptr; ptr++)
-	    if (*ptr == '`')
-		ct++;
-	if (ct & 1) {
-	    ptr[-2] = '\n';
-	    ptr[-1] = '\0';
+	    if (keyboardhackchar == '\'' || keyboardhackchar == '"' ||
+		keyboardhackchar == '`') {
+		/*
+		 * for the chars above, also require an odd count before
+		 * junking
+		 */
+		for (ct = 0, ptr = ingetcline; *ptr; ptr++)
+		    if (*ptr == keyboardhackchar)
+			ct++;
+	    }
+	    if (ct & 1) {
+		stripptr[0] = '\n';
+		stripptr[1] = '\0';
+	    }
 	}
     }
     isfirstch = 1;

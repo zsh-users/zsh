@@ -897,6 +897,16 @@ space character.
 If the parameter is unset, the default is used.  Note this has
 a different effect from setting the parameter to an empty string.
 )
+vindex(KEYBOARD_HACK)
+item(tt(KEYBOARD_HACK))(
+This variable defines a character to be removed from the end of the
+command line before interpreting it (interactive shells only). It is
+intended to fix the problem with keys placed annoyingly close to return
+and replaces the tt(SUNKEYBOARDHACK) option which did this for
+backquotes only.  Should the chosen character be one of singlequote,
+doublequote or backquote, there must also be an odd number of them
+on the command line for the last one to be removed.
+)
 vindex(KEYTIMEOUT)
 item(tt(KEYTIMEOUT))(
 The time the shell waits, in hundredths of seconds, for another key to
