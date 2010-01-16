@@ -615,8 +615,8 @@ enditem()
 The default values for these styles in all contexts are:
 
 startsitem()
-sitem(tt(formats))(" (%s)-[%b|%a]-")
-sitem(tt(actionformats))(" (%s)-[%b]-")
+sitem(tt(formats))(" (%s)-[%b]-")
+sitem(tt(actionformats))(" (%s)-[%b|%a]-")
 sitem(tt(branchformat))("%b:%r" (for bzr, svn, svk and hg))
 sitem(tt(nvcsformats))("")
 sitem(tt(stgitformat))(" %p (%c)")
