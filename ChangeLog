@@ -1,3 +1,9 @@
+2010-01-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27600: Doc/Zsh/cond.yo, Src/Modules/pcre.c, Src/Modules/regex.c,
+	Test/C02cond.ztst: extend =~ syntax to set MBEGIN and MEND
+	with MATCH and mbegin and mend with match.
+
 2010-01-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Frank: 27599: Doc/Zsh/contrib.yo: fix formatting documentation
@@ -12585,5 +12591,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4862 $
+* $Revision: 1.4863 $
 *****************************************************

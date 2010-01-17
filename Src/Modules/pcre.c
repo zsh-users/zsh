@@ -138,8 +138,9 @@ bin_pcre_study(char *nam, UNUSED(char **args), UNUSED(Options ops), UNUSED(int f
 
 /**/
 static int
-zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar, char *substravar, 
-    int want_offset_pair, int matchedinarr)
+zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar,
+		     char *substravar, int want_offset_pair, int matchedinarr,
+		     int want_begin_end)
 {
     char **captures, *match_all, **matches;
     char offset_all[50];
@@ -154,6 +155,7 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar, char *substr
     
     /* captures[0] will be entire matched string, [1] first substring */
     if (!pcre_get_substring_list(arg, ovec, ret, (const char ***)&captures)) {
+	int nelem = arrlen(captures)-1;
 	/* Set to the offsets of the complete match */
 	if (want_offset_pair) {
 	    sprintf(offset_all, "%d %d", ovec[0], ovec[1]);
@@ -161,8 +163,70 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar, char *substr
 	}
 	match_all = ztrdup(captures[0]);
 	setsparam(matchvar, match_all);
-	matches = zarrdup(&captures[capture_start]);
-	setaparam(substravar, matches);
+	/*
+	 * If we're setting match, mbegin, mend we only do
+	 * so if there were parenthesised matches, for consistency
+	 * (c.f. regex.c).
+	 */
+	if (!want_begin_end || nelem) {
+	    matches = zarrdup(&captures[capture_start]);
+	    setaparam(substravar, matches);
+	}
+
+	if (want_begin_end) {
+	    char *ptr = arg;
+	    zlong offs = 0;
+
+	    /* Count the characters before the match */
+	    MB_METACHARINIT();
+	    while (ptr < arg + ovec[0]) {
+		offs++;
+		ptr += MB_METACHARLEN(ptr);
+	    }
+	    setiparam("MBEGIN", offs + !isset(KSHARRAYS));
+	    /* Add on the characters in the match */
+	    while (ptr < arg + ovec[1]) {
+		offs++;
+		ptr += MB_METACHARLEN(ptr);
+	    }
+	    setiparam("MEND", offs + !isset(KSHARRAYS) - 1);
+	    if (nelem) {
+		char **mbegin, **mend, **bptr, **eptr;
+		int i, *ipair;
+
+		bptr = mbegin = zalloc(nelem+1);
+		eptr = mend = zalloc(nelem+1);
+
+		for (ipair = ovec + 2, i = 0;
+		     i < nelem;
+		     ipair += 2, i++, bptr++, eptr++)
+		{
+		    char buf[DIGBUFSIZE];
+		    ptr = arg;
+		    offs = 0;
+		    /* Find the start offset */
+		    MB_METACHARINIT();
+		    while (ptr < arg + ipair[0]) {
+			offs++;
+			ptr += MB_METACHARLEN(ptr);
+		    }
+		    convbase(buf, offs + !isset(KSHARRAYS), 10);
+		    *bptr = ztrdup(buf);
+		    /* Continue to the end offset */
+		    while (ptr < arg + ipair[1]) {
+			offs++;
+			ptr += MB_METACHARLEN(ptr);
+		    }
+		    convbase(buf, offs + !isset(KSHARRAYS) - 1, 10);
+		    *eptr = ztrdup(buf);
+		}
+		*bptr = *eptr = NULL;
+
+		setaparam("mbegin", mbegin);
+		setaparam("mend", mend);
+	    }
+	}
+
 	pcre_free_substring_list((const char **)captures);
     }
 
@@ -238,7 +302,8 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     if (ret==0) return_value = 0;
     else if (ret==PCRE_ERROR_NOMATCH) /* no match */;
     else if (ret>0) {
-	zpcre_get_substrings(*args, ovec, ret, matched_portion, receptacle, want_offset_pair, 0);
+	zpcre_get_substrings(*args, ovec, ret, matched_portion, receptacle,
+			     want_offset_pair, 0, 0);
 	return_value = 0;
     }
     else {
@@ -297,7 +362,9 @@ cond_pcre_match(char **a, int id)
 		    break;
 		}
                 else if (r>0) {
-		    zpcre_get_substrings(lhstr, ov, r, NULL, avar, 0, isset(BASHREMATCH));
+		    zpcre_get_substrings(lhstr, ov, r, NULL, avar, 0,
+					 isset(BASHREMATCH),
+					 !isset(BASHREMATCH));
 		    return_value = 1;
 		    break;
 		}

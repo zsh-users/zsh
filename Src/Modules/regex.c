@@ -108,11 +108,65 @@ zcond_regex_match(char **a, int id)
 	    if (isset(BASHREMATCH)) {
 		setaparam("BASH_REMATCH", arr);
 	    } else {
+		zlong offs;
+		char *ptr;
+
 		m = matches;
 		s = ztrduppfx(lhstr + m->rm_so, m->rm_eo - m->rm_so);
 		setsparam("MATCH", s);
-		if (nelem)
+		/*
+		 * Count the characters before the match.
+		 */
+		ptr = lhstr;
+		offs = 0;
+		MB_METACHARINIT();
+		while (ptr < lhstr + m->rm_so) {
+		    offs++;
+		    ptr += MB_METACHARLEN(ptr);
+		}
+		setiparam("MBEGIN", offs + !isset(KSHARRAYS));
+		/*
+		 * Add on the characters in the match.
+		 */
+		while (ptr < lhstr + m->rm_eo) {
+		    offs++;
+		    ptr += MB_METACHARLEN(ptr);
+		}
+		setiparam("MEND", offs + !isset(KSHARRAYS) - 1);
+		if (nelem) {
+		    char **mbegin, **mend, **bptr, **eptr;
+		    bptr = mbegin = (char **)zalloc(nelem+1);
+		    eptr = mend = (char **)zalloc(nelem+1);
+
+		    for (m = matches + start, n = start;
+			 n <= (int)re.re_nsub;
+			 ++n, ++m, ++bptr, ++eptr)
+		    {
+			char buf[DIGBUFSIZE];
+			ptr = lhstr;
+			offs = 0;
+			/* Find the start offset */
+			MB_METACHARINIT();
+			while (ptr < lhstr + m->rm_so) {
+			    offs++;
+			    ptr += MB_METACHARLEN(ptr);
+			}
+			convbase(buf, offs + !isset(KSHARRAYS), 10);
+			*bptr = ztrdup(buf);
+			/* Continue to the end offset */
+			while (ptr < lhstr + m->rm_eo) {
+			    offs++;
+			    ptr += MB_METACHARLEN(ptr);
+			}
+			convbase(buf, offs + !isset(KSHARRAYS) - 1, 10);
+			*eptr = ztrdup(buf);
+		    }
+		    *bptr = *eptr = NULL;
+
 		    setaparam("match", arr);
+		    setaparam("mbegin", mbegin);
+		    setaparam("mend", mend);
+		}
 	    }
 	}
 	else

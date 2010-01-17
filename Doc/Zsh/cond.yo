@@ -117,13 +117,29 @@ the tt(zsh/pcre) module, else it is tested as a POSIX
 extended regular expression using the tt(zsh/regex) module.
 Upon successful match, some variables will be updated; no variables
 are changed if the matching fails.
+
+If the option tt(BASH_REMATCH) is not set the scalar parameter
+tt(MATCH) is set to the substring that matched the pattern and
+the integer parameters tt(MBEGIN) and tt(MEND) to the index of the start
+and end, respectively, of the match in var(string), such that if
+var(string) is contained in variable tt(var) the expression
+`${var[$MBEGIN,$MEND]}' is identical to `$MATCH'.  The setting
+of the option tt(KSH_ARRAYS) is respected.  Likewise, the array
+tt(match) is set to the substrings that matched parenthesised
+subexpressions and the arrays tt(mbegin) and tt(mend) to the indices of
+the start and end positions, respectively, of the substrings within
+var(string).  The arrays are not set if there were no parenthesised
+subexpresssions.  For example, if the string `tt(a short string)' is matched
+against the regular expression `tt(s(...)t)', then (assuming the option
+tt(KSH_ARRAYS) is not set) tt(MATCH), tt(MBEGIN)
+and tt(MEND) are `tt(short)', 3 and 7, respectively, while tt(match),
+tt(mbegin) and tt(mend) are single entry arrays containing
+the strings `tt(hor)', `tt(4)' and `tt(6), respectively.
+
 If the option tt(BASH_REMATCH) is set the array
 tt(BASH_REMATCH) is set to the substring that matched the pattern
 followed by the substrings that matched parenthesised
-subexpressions within the pattern; otherwise, the scalar parameter
-tt(MATCH) is set to the substring that matched the pattern and
-and the array tt(match) to the substrings that matched parenthesised
-subexpressions.
+subexpressions within the pattern.
 )
 item(var(string1) tt(<) var(string2))(
 true if var(string1) comes before var(string2)
