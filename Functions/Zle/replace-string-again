@@ -13,7 +13,7 @@ if [[ -z $_replace_string_src ]]; then
   return 1
 fi
 
-if [[ $curwidget = *pattern* ]]; then
+if [[ $curwidget = *(pattern|regex)* ]]; then
     local rep2
     # The following horror is so that an & preceded by an even
     # number of backslashes is active, without stripping backslashes,
@@ -38,8 +38,14 @@ if [[ $curwidget = *pattern* ]]; then
 	rep=${match[5]}
     done
     rep2+=$rep
-    LBUFFER=${LBUFFER//(#bm)$~_replace_string_src/${(e)rep2}}
-    RBUFFER=${RBUFFER//(#bm)$~_replace_string_src/${(e)rep2}}
+    if [[ $curwidget = *regex* ]]; then
+      autoload -U regexp-replace
+      regexp-replace LBUFFER $_replace_string_src $rep2
+      regexp-replace RBUFFER $_replace_string_src $rep2
+    else
+      LBUFFER=${LBUFFER//(#bm)$~_replace_string_src/${(e)rep2}}
+      RBUFFER=${RBUFFER//(#bm)$~_replace_string_src/${(e)rep2}}
+    fi
 else
     LBUFFER=${LBUFFER//$_replace_string_src/$_replace_string_rep}
     RBUFFER=${RBUFFER//$_replace_string_src/$_replace_string_rep}

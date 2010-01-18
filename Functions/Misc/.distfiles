@@ -10,6 +10,7 @@ is-at-least
 mere
 nslookup
 promptnl
+regexp-replace
 relative
 run-help
 run-help-git

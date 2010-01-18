@@ -1570,14 +1570,14 @@ tindex(replace-string-again)
 tindex(replace-pattern)
 xitem(tt(replace-string), tt(replace-pattern))
 item(tt(replace-string-again), tt(replace-pattern-again))(
-The function tt(replace-string) implements two widgets.
+The function tt(replace-string) implements three widgets.
 If defined under the same name as the function, it prompts for two
 strings; the first (source) string will be replaced by the second
 everywhere it occurs in the line editing buffer.
 
 If the widget name contains the word `tt(pattern)', for example by
 defining the widget using the command `tt(zle -N replace-pattern
-replace-string)', then the replacement is done by pattern matching.  All
+replace-string)', then the matching is performed using zsh patterns.  All
 zsh extended globbing patterns can be used in the source string; note
 that unlike filename generation the pattern does not need to match an
 entire word, nor do glob qualifiers have any effect.  In addition, the
@@ -1588,6 +1588,12 @@ replaced by the var(N)th parenthesised expression matched.  The form
 `tt(\{)var(N)tt(})' may be used to protect the digit from following
 digits.
 
+If the widget instead contains the word `tt(regex)' (or `tt(regexp)'),
+then the matching is performed using regular expressions, respecting
+the setting of the option tt(RE_MATCH_PCRE) (see the description of the
+function tt(regexp-replace) below).  The facilities described
+for pattern matching are also available.
+
 By default the previous source or replacement string will not be offered
 for editing.  However, this feature can be activated by setting the style
 tt(edit-previous) in the context tt(:zle:)var(widget) (for example,
@@ -1595,12 +1601,12 @@ tt(:zle:replace-string)) to tt(true).  In addition, a positive
 numeric argument forces the previous values to be offered, a negative or
 zero argument forces them not to be.
 
-The function tt(replace-string-again) can be used to repeat the
-previous replacement; no prompting is done.  As with tt(replace-string), if
-the name of the widget contains the word `tt(pattern)', pattern matching
-is performed, else a literal string replacement.  Note that the
-previous source and replacement text are the same whether pattern or string
-matching is used.
+The function tt(replace-string-again) can be used to repeat the previous
+replacement; no prompting is done.  As with tt(replace-string), if the name
+of the widget contains the word `tt(pattern)' or `tt(regex)', pattern or
+regular expression matching is performed, else a literal string
+replacement.  Note that the previous source and replacement text are the
+same whether pattern, regular expression or string matching is used.
 
 For example, starting from the line:
 
@@ -2573,6 +2579,25 @@ the function-based completion system).  Completion styles may be set with
 the context prefix `tt(:completion:nslookup)'.
 
 See also the tt(pager), tt(prompt) and tt(rprompt) styles below.
+)
+findex(regexp-replace)
+item(tt(regexp-replace) var(var) var(regexp) var(replace))(
+Use regular expressions to perform a global search and replace operation
+on a variable.  If the option tt(RE_MATCH_PCRE) is not set, POSIX
+extended regular expressions are used, else Perl-compatible regular
+expressions (this requires the shell to be linked against the tt(pcre)
+library).
+
+var(var) is the name of the variable containing the string to be matched.
+The variable will be modified directly by the function.  The
+variables tt(MATCH), tt(MBEGIN), tt(MEND), tt(match), tt(mbegin), tt(mend)
+should be avoided as these are used by the regular expression code.
+
+var(regexp) is the regular expression to match against the string.
+
+var(replace) is the replacement text.  This can contain parameter, command
+and arithmetic expressions which will be replaced:  in particular, a
+reference to tt($MATCH) will be replaced by the text matched by the pattern.
 )
 findex(run-help)
 item(tt(run-help) var(cmd))(
