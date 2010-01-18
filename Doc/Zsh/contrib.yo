@@ -1591,8 +1591,8 @@ digits.
 If the widget instead contains the word `tt(regex)' (or `tt(regexp)'),
 then the matching is performed using regular expressions, respecting
 the setting of the option tt(RE_MATCH_PCRE) (see the description of the
-function tt(regexp-replace) below).  The facilities described
-for pattern matching are also available.
+function tt(regexp-replace) below).  The special replacement facilities
+described above for pattern matching are available.
 
 By default the previous source or replacement string will not be offered
 for editing.  However, this feature can be activated by setting the style
