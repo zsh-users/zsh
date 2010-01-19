@@ -1,3 +1,7 @@
+2010-01-19  Peter Stephenson  <pws@csr.com>
+
+	* Frank: 27606: Completion/Unix/Command/_tmux: tmux -d.
+
 2010-01-18  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/contrib.yo: minor clarification in 27604.
@@ -12600,5 +12604,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4864 $
+* $Revision: 1.4865 $
 *****************************************************

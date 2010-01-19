@@ -1009,6 +1009,7 @@ function _tmux-swap-pane() {
     args=(
         '-D[Move pane down]'
         '-U[Move pane up]'
+        '-d[Do not change the active pane]'
         '-s[Choose source pane]:pane:__tmux-panes'
         '-t[Choose destination pane]:pane:__tmux-panes'
     )
