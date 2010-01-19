@@ -130,8 +130,8 @@ subexpressions and the arrays tt(mbegin) and tt(mend) to the indices of
 the start and end positions, respectively, of the substrings within
 var(string).  The arrays are not set if there were no parenthesised
 subexpresssions.  For example, if the string `tt(a short string)' is matched
-against the regular expression `tt(s(...)t)', then (assuming the option
-tt(KSH_ARRAYS) is not set) tt(MATCH), tt(MBEGIN)
+against the regular expression `tt(s+LPAR()...RPAR()t)', then (assuming the
+option tt(KSH_ARRAYS) is not set) tt(MATCH), tt(MBEGIN)
 and tt(MEND) are `tt(short)', 3 and 7, respectively, while tt(match),
 tt(mbegin) and tt(mend) are single entry arrays containing
 the strings `tt(hor)', `tt(4)' and `tt(6), respectively.

@@ -1,5 +1,7 @@
 2010-01-19  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Doc/Zsh/cond.yo: avoid Yodl error.
+
 	* Frank: 27606: Completion/Unix/Command/_tmux: tmux -d.
 
 2010-01-18  Peter Stephenson  <pws@csr.com>
@@ -12604,5 +12606,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4865 $
+* $Revision: 1.4866 $
 *****************************************************
