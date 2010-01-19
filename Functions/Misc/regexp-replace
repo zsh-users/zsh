@@ -19,13 +19,19 @@ emulate -L zsh
 4=${(P)1}
 # $5 is the final string
 5=
+# 6 indicates if we made a change
+6=
 local MATCH MBEGIN MEND
 local -a match mbegin mend
 
 while [[ -n $4 ]]; do
   if [[ $4 =~ $2 ]]; then
+    # append initial part and subsituted match
     5+=${4[1,MBEGIN-1]}${(e)3}
+    # truncate remaining string
     4=${4[MEND+1,-1]}
+    # indicate we did something
+    6=1
   else
     break
   fi
@@ -33,3 +39,5 @@ done
 5+=$4
 
 eval ${1}=${(q)5}
+# status 0 if we did something, else 1.
+[[ -n $6 ]]

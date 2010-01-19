@@ -1,5 +1,8 @@
 2010-01-19  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Doc/Zsh/contrib.yo, Functions/Misc/regexp-replace:
+	return status 1 if no replacement.
+
 	* unposted: Doc/Zsh/cond.yo: avoid Yodl error.
 
 	* Frank: 27606: Completion/Unix/Command/_tmux: tmux -d.
@@ -12606,5 +12609,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4866 $
+* $Revision: 1.4867 $
 *****************************************************
