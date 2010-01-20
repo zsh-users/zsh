@@ -194,8 +194,8 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar,
 		char **mbegin, **mend, **bptr, **eptr;
 		int i, *ipair;
 
-		bptr = mbegin = zalloc(nelem+1);
-		eptr = mend = zalloc(nelem+1);
+		bptr = mbegin = zalloc(sizeof(char*)*(nelem+1));
+		eptr = mend = zalloc(sizeof(char*)*(nelem+1));
 
 		for (ipair = ovec + 2, i = 0;
 		     i < nelem;

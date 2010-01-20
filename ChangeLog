@@ -1,3 +1,9 @@
+2010-01-20  Peter Stephenson  <pws@csr.com>
+
+	* 27608: Src/Modules/pcre.c, Src/Modules/regex.c,
+	Test/C02cond.ztst:  test was broken and sizes of variables
+	for arrays were wrong.
+
 2010-01-19  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/contrib.yo, Functions/Misc/regexp-replace:
@@ -12609,5 +12615,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4867 $
+* $Revision: 1.4868 $
 *****************************************************

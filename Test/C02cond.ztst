@@ -251,7 +251,7 @@ F:Failures in these cases do not indicate a problem in the shell.
   fi
 0:regex tests shouldn't crash
 
-  if zmodload -i zsh/regex 2>/dev/null; then
+  (if zmodload -i zsh/regex 2>/dev/null; then
     string="this has stuff in it"
     bad_regex=0
     if [[ $string =~ "h([a-z]*) s([a-z]*) " ]]; then
@@ -259,7 +259,7 @@ F:Failures in these cases do not indicate a problem in the shell.
 	print -r "regex variables MATCH MBEGIN MEND:
   '$MATCH $MBEGIN $MEND'
   should be:
-  'has stuff  6 15'" >&2
+  'has stuff  6 15'"
         bad_regex=1
       else
 	results=("as 7 8" "tuff 11 14")
@@ -268,19 +268,20 @@ F:Failures in these cases do not indicate a problem in the shell.
 	    print -r "regex variables match[$i] mbegin[$i] mend[$i]:
   '$match[$i] $mbegin[$i] $mend[$i]'
   should be
-  '$results[$i]'" >&2
+  '$results[$i]'"
+            bad_regex=1
 	    break
 	  fi
 	done
       fi
+      (( bad_regex )) || print OK
     else
-      print -r "regex failed to match '$string'" >&2
+      print -r "regex failed to match '$string'"
     fi
-    (( bad_regex )) || print OK
   else
     # if it didn't load, tough, but not a test error
     print OK
-  fi
+  fi)
 0:MATCH, MBEGIN, MEND, match, mbegin, mend
 >OK
 

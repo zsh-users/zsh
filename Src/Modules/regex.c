@@ -135,11 +135,11 @@ zcond_regex_match(char **a, int id)
 		setiparam("MEND", offs + !isset(KSHARRAYS) - 1);
 		if (nelem) {
 		    char **mbegin, **mend, **bptr, **eptr;
-		    bptr = mbegin = (char **)zalloc(nelem+1);
-		    eptr = mend = (char **)zalloc(nelem+1);
+		    bptr = mbegin = (char **)zalloc(sizeof(char *)*(nelem+1));
+		    eptr = mend = (char **)zalloc(sizeof(char *)*(nelem+1));
 
-		    for (m = matches + start, n = start;
-			 n <= (int)re.re_nsub;
+		    for (m = matches + start, n = 0;
+			 n < nelem;
 			 ++n, ++m, ++bptr, ++eptr)
 		    {
 			char buf[DIGBUFSIZE];
