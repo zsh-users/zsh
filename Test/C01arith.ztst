@@ -188,3 +188,25 @@
 >0xFF
 >FF
 
+  array=(1)
+  x=0
+  (( array[++x]++ ))
+  print $x
+  print $#array
+  print $array
+0:no double increment for subscript
+>1
+>1
+>2
+
+  # This is a bit naughty...  the value of array
+  # isn't well defined since there's no sequence point
+  # between the increments of x, however we just want
+  # to be sure that in this case, unlike the above,
+  # x does get incremented twice.
+  x=0
+  array=(1 2)
+  (( array[++x] = array[++x] + 1 ))
+  print $x
+0:double increment for repeated expression
+>2

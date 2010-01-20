@@ -27,6 +27,8 @@
  *
  */
 
+struct mathvalue;
+
 #include "zsh.mdh"
 #include "math.pro"
 
@@ -304,7 +306,16 @@ static int mtok;			/* last token */
 static int sp = -1;			/* stack pointer */
 
 struct mathvalue {
+    /*
+     * If we need to get a variable, this is the string to be passed
+     * to the parameter code.  It may include a subscript.
+     */
     char *lval;
+    /*
+     * If this is not zero, we've retrieved a variable and this
+     * stores a reference to it.
+     */
+    Value pval;
     mnumber val;
 };
 
@@ -316,6 +327,26 @@ enum prec_type {
     /* Evaluating a function argument */
     MPREC_ARG
 };
+
+
+/*
+ * Get a number from a variable.
+ * Try to be clever about reusing subscripts by caching the Value structure.
+ */
+static mnumber
+getmathparam(struct mathvalue *mptr)
+{
+    if (!mptr->pval) {
+	char *s = mptr->lval;
+	mptr->pval = (Value)zhalloc(sizeof(struct value));
+	if (!getvalue(mptr->pval, &s, 1))
+	{
+	    mptr->pval = NULL;
+	    return zero_mnumber;
+	}
+    }
+    return getnumvalue(mptr->pval);
+}
 
 static mnumber
 mathevall(char *s, enum prec_type prec_tp, char **ep)
@@ -384,7 +415,7 @@ mathevall(char *s, enum prec_type prec_tp, char **ep)
 	ret.u.l = 0;
     } else {
 	if (stack[0].val.type == MN_UNSET)
-	    ret = getnparam(stack[0].lval);
+	    ret = getmathparam(stack);
 	else
 	    ret = stack[0].val;
     }
@@ -742,6 +773,7 @@ push(mnumber val, char *lval, int getme)
 	sp++;
     stack[sp].val = val;
     stack[sp].lval = lval;
+    stack[sp].pval = NULL;
     if (getme)
 	stack[sp].val.type = MN_UNSET;
 }
@@ -753,7 +785,7 @@ pop(int noget)
     struct mathvalue *mv = stack+sp;
 
     if (mv->val.type == MN_UNSET && !noget)
-	mv->val = getnparam(mv->lval);
+	mv->val = getmathparam(mv);
     sp--;
     return errflag ? zero_mnumber : mv->val;
 }
@@ -790,9 +822,29 @@ getcvar(char *s)
 
 /**/
 static mnumber
-setvar(char *s, mnumber v)
+setmathvar(struct mathvalue *mvp, mnumber v)
 {
-    if (!s) {
+    if (mvp->pval) {
+	/*
+	 * This value may have been hanging around for a while.
+	 * Be ultra-paranoid in checking the variable is still valid.
+	 */
+	char *s = mvp->lval, *ptr;
+	Param pm;
+	DPUTS(!mvp->lval, "no variable name but variable value in math");
+	if ((ptr = strchr(s, '[')))
+	    s = dupstrpfx(s, ptr - s);
+	pm = (Param) paramtab->getnode(paramtab, s);
+	if (pm == mvp->pval->pm) {
+	    if (noeval)
+		return v;
+	    setnumvalue(mvp->pval, v);
+	    return v;
+	}
+	/* Different parameter, start again from scratch */
+	mvp->pval = NULL;
+    }
+    if (!mvp->lval) {
 	zerr("lvalue required");
 	v.type = MN_INTEGER;
 	v.u.l = 0;
@@ -800,8 +852,8 @@ setvar(char *s, mnumber v)
     }
     if (noeval)
 	return v;
-    untokenize(s);
-    setnparam(s, v);
+    untokenize(mvp->lval);
+    setnparam(mvp->lval, v);
     return v;
 }
 
@@ -1101,8 +1153,9 @@ op(int what)
 	    }
 	}
 	if (tp & (OP_E2|OP_E2IO)) {
+	    struct mathvalue *mvp = stack + sp + 1;
 	    lv = stack[sp+1].lval;
-	    push(setvar(lv,c), lv, 0);
+	    push(setmathvar(mvp,c), mvp->lval, 0);
 	} else
 	    push(c,NULL, 0);
 	return;
@@ -1110,7 +1163,7 @@ op(int what)
 
     spval = &stack[sp].val;
     if (stack[sp].val.type == MN_UNSET)
-	*spval = getnparam(stack[sp].lval);
+	*spval = getmathparam(stack + sp);
     switch (what) {
     case NOT:
 	if (spval->type & MN_FLOAT) {
@@ -1119,6 +1172,7 @@ op(int what)
 	} else
 	    spval->u.l = !spval->u.l;
 	stack[sp].lval = NULL;
+	stack[sp].pval = NULL;
 	break;
     case COMP:
 	if (spval->type & MN_FLOAT) {
@@ -1127,6 +1181,7 @@ op(int what)
 	} else
 	    spval->u.l = ~spval->u.l;
 	stack[sp].lval = NULL;
+	stack[sp].pval = NULL;
 	break;
     case POSTPLUS:
 	a = *spval;
@@ -1134,7 +1189,7 @@ op(int what)
 	    a.u.d++;
 	else
 	    a.u.l++;
-	(void)setvar(stack[sp].lval, a);
+	(void)setmathvar(stack + sp, a);
 	break;
     case POSTMINUS:
 	a = *spval;
@@ -1142,10 +1197,11 @@ op(int what)
 	    a.u.d--;
 	else
 	    a.u.l--;
-	(void)setvar(stack[sp].lval, a);
+	(void)setmathvar(stack + sp, a);
 	break;
     case UPLUS:
 	stack[sp].lval = NULL;
+	stack[sp].pval = NULL;
 	break;
     case UMINUS:
 	if (spval->type & MN_FLOAT)
@@ -1153,6 +1209,7 @@ op(int what)
 	else
 	    spval->u.l = -spval->u.l;
 	stack[sp].lval = NULL;
+	stack[sp].pval = NULL;
 	break;
     case QUEST:
 	DPUTS(sp < 2, "BUG: math: three shall be the number of the counting.");
@@ -1172,14 +1229,14 @@ op(int what)
 	    spval->u.d++;
 	else
 	    spval->u.l++;
-	setvar(stack[sp].lval, *spval);
+	setmathvar(stack + sp, *spval);
 	break;
     case PREMINUS:
 	if (spval->type & MN_FLOAT)
 	    spval->u.d--;
 	else
 	    spval->u.l--;
-	setvar(stack[sp].lval, *spval);
+	setmathvar(stack + sp, *spval);
 	break;
     default:
 	zerr("out of integers");
@@ -1196,7 +1253,7 @@ bop(int tk)
     int tst;
 
     if (stack[sp].val.type == MN_UNSET)
-	*spval = getnparam(stack[sp].lval);
+	*spval = getmathparam(stack + sp);
     tst = (spval->type & MN_FLOAT) ? (zlong)spval->u.d : spval->u.l; 
 
     switch (tk) {
@@ -1337,7 +1394,7 @@ mathparse(int pc)
 	    break;
 	case QUEST:
 	    if (stack[sp].val.type == MN_UNSET)
-		stack[sp].val = getnparam(stack[sp].lval);
+		stack[sp].val = getmathparam(stack + sp);
 	    q = (stack[sp].val.type == MN_FLOAT) ? (zlong)stack[sp].val.u.d :
 		stack[sp].val.u.l;
 

@@ -1,5 +1,8 @@
 2010-01-20  Peter Stephenson  <pws@csr.com>
 
+	* 27611: Src/math.c, Test/C01arith.ztst: cache parameter values so
+	that subscripts aren't multiply evaluated when they shouldn't be.
+
 	* 27608: Src/Modules/pcre.c, Src/Modules/regex.c,
 	Test/C02cond.ztst:  test was broken and sizes of variables
 	for arrays were wrong.
@@ -12615,5 +12618,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4868 $
+* $Revision: 1.4869 $
 *****************************************************
