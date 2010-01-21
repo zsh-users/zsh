@@ -1795,9 +1795,9 @@ charnext(char *x, char *y)
 
 
 /* Get a character and increment */
-#define CHARREFINC(x, y)	charrefinc(&(x), (y))
+#define CHARREFINC(x, y, z)	charrefinc(&(x), (y), (z))
 static wchar_t
-charrefinc(char **x, char *y)
+charrefinc(char **x, char *y, int *z)
 {
     wchar_t wc;
     size_t ret;
@@ -1808,7 +1808,8 @@ charrefinc(char **x, char *y)
     ret = mbrtowc(&wc, *x, y-*x, &shiftstate);
 
     if (ret == MB_INVALID || ret == MB_INCOMPLETE) {
-	/* Error.  Treat as single byte. */
+	/* Error.  Treat as single byte, but flag. */
+	*z = 1;
 	/* Reset the shift state for next time. */
 	memset(&shiftstate, 0, sizeof(shiftstate));
 	return (wchar_t) STOUC(*(*x)++);
@@ -1865,7 +1866,7 @@ charsub(char *x, char *y)
 /* Increment a pointer past the current character. */
 #define CHARINC(x, y)	((x)++)
 /* Get a character and increment */
-#define CHARREFINC(x, y)	(STOUC(*(x)++))
+#define CHARREFINC(x, y, z)	(STOUC(*(x)++))
 /* Counter the number of characters between two pointers, smaller first */
 #define CHARSUB(x,y)	((y) - (x))
 
@@ -2419,9 +2420,21 @@ patmatch(Upat prog)
 	    while (chrop < chrend && patinput < patinend) {
 		char *savpatinput = patinput;
 		char *savchrop = chrop;
-		patint_t chin = CHARREFINC(patinput, patinend);
-		patint_t chpa = CHARREFINC(chrop, chrend);
-		if (!CHARMATCH(chin, chpa)) {
+		int badin = 0, badpa = 0;
+		/*
+		 * Care with character matching:
+		 * We do need to convert the character to wide
+		 * representation if possible, because we may need
+		 * to do case transformation.  However, we should
+		 * be careful in case one, but not the other, wasn't
+		 * representable in the current locale---in that
+		 * case they don't match even if the returned
+		 * values (one properly converted, one raw) are
+		 * the same.
+		 */
+		patint_t chin = CHARREFINC(patinput, patinend, &badin);
+		patint_t chpa = CHARREFINC(chrop, chrend, &badpa);
+		if (!CHARMATCH(chin, chpa) || badin != badpa) {
 		    fail = 1;
 		    patinput = savpatinput;
 		    chrop = savchrop;

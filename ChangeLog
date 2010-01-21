@@ -1,3 +1,8 @@
+2010-01-21  Peter Stephenson  <pws@csr.com>
+
+	* users/14723: Src/pattern.c: invalid character conversions
+	should never match valid character conversions.
+
 2010-01-20  Peter Stephenson  <pws@csr.com>
 
 	* 27611: Src/math.c, Test/C01arith.ztst: cache parameter values so
@@ -12618,5 +12623,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4869 $
+* $Revision: 1.4870 $
 *****************************************************
