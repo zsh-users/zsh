@@ -1,3 +1,8 @@
+2010-01-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/14732: Src/Zle/computil.c: we need to test X:/ rather
+	than X: for recent versions of Cygwin.
+
 2010-01-21  Peter Stephenson  <pws@csr.com>
 
 	* users/14723: Src/pattern.c: invalid character conversions
@@ -12623,5 +12628,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4870 $
+* $Revision: 1.4871 $
 *****************************************************

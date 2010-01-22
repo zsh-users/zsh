@@ -4050,19 +4050,44 @@ cfp_test_exact(LinkList names, char **accept, char *skipped)
     for (node = firstnode(names); node; incnode(node)) {
 	l = strlen(p = (char *) getdata(node));
 	if (l + sl < PATH_MAX2) {
+#ifdef __CYGWIN__
+	    char *testbuf;
+#define TESTBUF testbuf
+#else
+#define TESTBUF buf
+#endif
 	    strcpy(buf, p);
 	    strcpy(buf + l, suf);
 #ifdef __CYGWIN__
-	    /*
-	     * If accept-exact is not set, accept this only if
-	     * it looks like a special file such as a drive.
-	     * We still test if it exists.
-	     */
-	    if (accept_off &&
-		(strchr(buf, '/') || buf[strlen(buf)-1] != ':'))
-		continue;
+	    if (accept_off) {
+		int sl = strlen(buf);
+		/*
+		 * If accept-exact is not set, accept this only if
+		 * it looks like a special file such as a drive.
+		 * We still test if it exists.
+		 */
+		if (!sl || strchr(buf, '/') || buf[sl-1] != ':')
+		    continue;
+		if (sl == 2) {
+		    /*
+		     * Recent versions of Cygwin only recognise "c:/",
+		     * but not "c:", as special directories.  So
+		     * we have to append the slash for the purpose of
+		     * the test.
+		     */
+		    testbuf = zhalloc(sl + 2);
+		    strcpy(testbuf, buf);
+		    testbuf[sl] = '/';
+		    testbuf[sl+1] = '\0';
+		} else {
+		    /* Don't do this with stuff like PRN: */
+		    testbuf = buf;
+		}
+	    } else {
+		testbuf = buf;
+	    }
 #endif
-	    if (!ztat(buf, &st, 0)) {
+	    if (!ztat(TESTBUF, &st, 0)) {
 		/*
 		 * File exists; if accept-exact contained non-boolean
 		 * values it must match those, too.
