@@ -1,3 +1,8 @@
+2010-01-23  Clint Adams  <clint@zsh.org>
+
+	* 27617: Completion/Unix/Command/_graphicsmagick: graphicsmagick
+	completion based on _imagemagick.
+
 2010-01-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/14732: Src/Zle/computil.c: we need to test X:/ rather
@@ -12628,5 +12633,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4871 $
+* $Revision: 1.4872 $
 *****************************************************
