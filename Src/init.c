@@ -1126,6 +1126,11 @@ source(char *s)
     scriptname = s;
     scriptfilename = s;
 
+    if (isset(SOURCETRACE)) {
+	printprompt4();
+	fprintf(xtrerr ? xtrerr : stderr, "<sourcetrace>\n");
+    }
+
     /*
      * The special return behaviour of traps shouldn't
      * trigger in files sourced from traps; the return

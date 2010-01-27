@@ -1,3 +1,9 @@
+2010-01-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27638, based on Frank Terbeck, 27633: Doc/Zsh/options.yo,
+	init.c, options.c, zsh.h: add SOURCE_TRACE option with output
+	similar to XTRACE for tracing sourced files.
+
 2010-01-23  Clint Adams  <clint@zsh.org>
 
 	* 27617: Completion/Unix/Command/_graphicsmagick: graphicsmagick
@@ -12633,5 +12639,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4872 $
+* $Revision: 1.4873 $
 *****************************************************

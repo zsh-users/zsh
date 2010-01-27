@@ -1584,6 +1584,18 @@ Sequences of digits indicating a numeric base such as the `tt(08)'
 component in `tt(08#77)' are always interpreted as decimal, regardless
 of leading zeroes.
 )
+pindex(SOURCE_TRACE)
+pindex(NO_SOURCE_TRACE)
+pindex(SOURCETRACE)
+pindex(NOSOURCETRACE)
+item(tt(SOURCE_TRACE))(
+If set, zsh will print an informational message announcing the name of
+each file it loads.  The format of the output is similar to that
+for the tt(XTRACE) option, with the message tt(<sourcetrace>).
+A file may be loaded by the shell itself when it
+starts up and shuts down (tt(Startup/Shutdown Files)) or by the use of
+the `tt(source)' and `tt(dot)' builtin commands.
+)
 pindex(TYPESET_SILENT)
 pindex(NO_TYPESET_SILENT)
 pindex(TYPESETSILENT)
@@ -1610,7 +1622,11 @@ pindex(NOXTRACE)
 cindex(tracing, of commands)
 cindex(commands, tracing)
 item(tt(XTRACE) (tt(-x), ksh: tt(-x)))(
-Print commands and their arguments as they are executed.
+Print commands and their arguments as they are executed.  The
+output is proceded by the value of tt($PS4), formatted as described
+in
+ifzman(the section EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
+ifnzman(noderef(Prompt Expansion)).
 )
 enditem()
 

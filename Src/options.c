@@ -233,6 +233,7 @@ static struct optname optns[] = {
 {{NULL, "shwordsplit",	      OPT_EMULATE|OPT_BOURNE},	 SHWORDSPLIT},
 {{NULL, "singlecommand",      OPT_SPECIAL},		 SINGLECOMMAND},
 {{NULL, "singlelinezle",      OPT_KSH},			 SINGLELINEZLE},
+{{NULL, "sourcetrace",        0},			 SOURCETRACE},
 {{NULL, "sunkeyboardhack",    0},			 SUNKEYBOARDHACK},
 {{NULL, "transientrprompt",   0},			 TRANSIENTRPROMPT},
 {{NULL, "trapsasync",	      0},			 TRAPSASYNC},
