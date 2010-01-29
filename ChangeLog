@@ -1,5 +1,8 @@
 2010-01-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* users/14752: Functions/Misc/zed, Src/builtin.c: add #!
+	line to zed; allow script run with -i to exit on "return".
+
 	* Julien Jehannet: users/14751: Functions/Misc/zed: variable
 	incorrect when autoloading function.
 
@@ -12644,5 +12647,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4874 $
+* $Revision: 1.4875 $
 *****************************************************

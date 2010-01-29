@@ -4577,7 +4577,8 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	breaks = nump ? minimum(num,loops) : 1;
 	break;
     case BIN_RETURN:
-	if (isset(INTERACTIVE) || locallevel || sourcelevel) {
+	if ((isset(INTERACTIVE) && isset(SHINSTDIN))
+	    || locallevel || sourcelevel) {
 	    retflag = 1;
 	    breaks = loops;
 	    lastval = num;
