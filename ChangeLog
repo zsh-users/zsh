@@ -1,3 +1,8 @@
+2010-01-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Julien Jehannet: users/14751: Functions/Misc/zed: variable
+	incorrect when autoloading function.
+
 2010-01-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27638, based on Frank Terbeck, 27633: Doc/Zsh/options.yo,
@@ -12639,5 +12644,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4873 $
+* $Revision: 1.4874 $
 *****************************************************

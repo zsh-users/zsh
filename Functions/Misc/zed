@@ -74,7 +74,7 @@ if ((fun)) then
   var="$(functions $1)"
   # If function is undefined but autoloadable, load it
   if [[ $var = *\#\ undefined* ]] then
-      ar="$(autoload +X $1; functions $1)"
+    var="$(autoload +X $1; functions $1)"
   elif [[ -z $var ]] then
     var="$1() {
 }"
