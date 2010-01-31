@@ -146,6 +146,9 @@ while [[ -n $PREFIX ]]; do
 	"m:last modification time"
 	"c:last inode change time"
 	"d:directory depth"
+	"N:no sorting"
+	"e:execute code"
+	"+:+ command name"
 	)
       _describe -t sort-specifiers "sort specifier" alts -Q -S ''
       return

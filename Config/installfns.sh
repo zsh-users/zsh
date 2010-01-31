@@ -46,7 +46,7 @@ for file in $allfuncs; do
     fi
     test -d $instdir || /bin/sh $sdir_top/mkinstalldirs $instdir || exit 1
     $INSTALL_DATA $sdir_top/$file $instdir || exit 1
-    if test -x $sdir_top/$file; then
+    if sed -ne '1p' $sdir_top/$file | grep '^#!' >/dev/null; then
 	chmod +x $instdir/`echo $file | sed -e 's%^.*/%%'`
     fi
   fi

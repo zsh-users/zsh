@@ -1,3 +1,8 @@
+2010-01-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Mikael: 27642: Completion/Zsh/Type/_globquals: add some
+	missing entries.
+
 2010-01-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/14752: Functions/Misc/zed, Src/builtin.c: add #!
@@ -12647,5 +12652,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4875 $
+* $Revision: 1.4876 $
 *****************************************************
