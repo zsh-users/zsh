@@ -1,3 +1,8 @@
+2010-02-01  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Etc/FAQ.yo: update with notes on
+	zsh-nt.sourceforge.net and application terminal mode horror.
+
 2010-01-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Mikael: 27642: Completion/Zsh/Type/_globquals: add some
@@ -12652,5 +12657,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4876 $
+* $Revision: 1.4877 $
 *****************************************************
