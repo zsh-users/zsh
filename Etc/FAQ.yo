@@ -98,7 +98,7 @@ Chapter 3:  How to get various things to work
 3.5. How do I get the Meta key to work on my xterm?
 3.6. How do I automatically display the directory in my xterm title bar?
 3.7. How do I make the completion list use eight bit characters?
-3.8. Why do the cursor (arrow) keys not work?
+3.8. Why do the cursor (arrow) keys not work?  (And other terminal oddities.)
 3.9. Why does my terminal act funny in some way?
 3.10. Why does zsh not work in an Emacs shell mode any more?
 3.11. Why do my autoloaded functions not autoload [the first time]?
@@ -373,15 +373,16 @@ label(16)
 (http://zsh.open-mirror.com/)
   )
 
-  A Windows port used to be maintaiend by Amol Deshpandem based on 3.0.5,
-  but this is rather out of date and hard to find.  Various other
-  attempts have been made to port zsh to Windows but I am not aware
-  of any current native Windows version.  All recent releases of zsh
-  compile under Cygwin, a freely available UNIX-style environment for the
-  Win32 API, and a pre-compiled version of zsh can be downloaded by
-  the Cygwin installer.  You can find information about this at
-  url(http://www.cygwin.com/)(http://www.cygwin.com/).  Please email
-  email(zsh-workers@zsh.org) if you have information about other ports.
+  A Windows port was created by Amol Deshpandem based on 3.0.5 (which
+  is now rather old).  This has now been restored and can be found at
+  url(http://zsh-nt.sourceforge.net/)(http://zsh-nt.sourceforge.net/).
+
+  All recent releases of zsh compile under Cygwin, a freely available
+  UNIX-style environment for the Win32 API, and a pre-compiled version of
+  zsh can be downloaded by the Cygwin installer.  You can find information
+  about this at url(http://www.cygwin.com/)(http://www.cygwin.com/).
+  Please email email(zsh-workers@zsh.org) if you have information about
+  other ports.
 
   Starting from mid-October 1997, there is an archive of patches sent
   to the maintainers' mailing list.  Note that these may not all be
@@ -1248,7 +1249,7 @@ sect(How do I make the completion list use eight bit characters?)
   shell, there is no easy way out.
 
 
-sect(Why do the cursor (arrow) keys not work?)
+sect(Why do the cursor (arrow) keys not work?  (And other terminal oddities.))
 
   The cursor keys send different codes depending on the terminal; zsh
   only binds the most well known versions.  If you see these problems,
@@ -1260,7 +1261,7 @@ sect(Why do the cursor (arrow) keys not work?)
     bindkey "$(echotc ku)" up-line-or-history
     bindkey "$(echotc kd)" down-line-or-history
   )
-  
+
   If you use vi mode, use mytt(vi-backward-char) and mytt(vi-forward-char)
   where appropriate.  As of version 4.0.1, zsh attempts to look up these
   codes and to set the key bindings for you (both emacs and vi), but in
@@ -1295,6 +1296,25 @@ sect(Why do the cursor (arrow) keys not work?)
   For most even vaguely VT100-compatible terminals, the above eight
   instructions are a fairly safe bet for your tt(.zshrc).  Of course
   you can substitute variant functions for the second argument here too.
+
+  It should be noted that the mytt(O) / mytt([) confusion can occur
+  with other keys such as Home and End.  Some systems let you query
+  the key sequences sent by these keys from the system's terminal
+  database, terminfo.  Unfortunately, the key sequences given there
+  typically apply to the mode that is not the one zsh uses by default (it's
+  the "application" mode rather than the "raw" mode).  Explaining the use
+  of terminfo is outside the scope of this FAQ, but if you wish to use the
+  key sequences given there you can tell the line editor to turn on
+  "application" mode when it starts and turn it off when it stops:
+  verb(
+    function zle-line-init () { echoti smkx }
+    function zle-line-finish () { echoti rmkx }
+    zle -N zle-line-init
+    zle -N zle-line-finish
+  )
+  If you only have the predecessor to terminfo, called termcap (which is
+  what we used to get the cursor keys above), replace mytt(echoti smkx)
+  with mytt(echotc ks) and replace mytt(echoti rmkx) with mytt(echotc ke).
 
 
 sect(Why does my terminal act funny in some way?)
