@@ -1,5 +1,8 @@
 2010-02-02  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Doc/Zsh/contrib.yo: minor doc upgrade for
+	regexp-replace.
+
 	* based on Andrei, 27644: Config/installfns.zsh: check for
 	#! line without a fork.
 
@@ -12662,5 +12665,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4878 $
+* $Revision: 1.4879 $
 *****************************************************

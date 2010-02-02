@@ -2598,6 +2598,8 @@ var(regexp) is the regular expression to match against the string.
 var(replace) is the replacement text.  This can contain parameter, command
 and arithmetic expressions which will be replaced:  in particular, a
 reference to tt($MATCH) will be replaced by the text matched by the pattern.
+
+The return status is 0 if at least one match was performed, else 1.
 )
 findex(run-help)
 item(tt(run-help) var(cmd))(
