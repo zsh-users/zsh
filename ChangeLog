@@ -1,3 +1,8 @@
+2010-02-02  Peter Stephenson  <pws@csr.com>
+
+	* based on Andrei, 27644: Config/installfns.zsh: check for
+	#! line without a fork.
+
 2010-02-01  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Etc/FAQ.yo: update with notes on
@@ -12657,5 +12662,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4877 $
+* $Revision: 1.4878 $
 *****************************************************
