@@ -1,3 +1,7 @@
+2010-02-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Mikael: 27647: Completion/Unix/Command/_cp: update
+
 2010-02-02  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/contrib.yo: minor doc upgrade for
@@ -12665,5 +12669,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4879 $
+* $Revision: 1.4880 $
 *****************************************************
