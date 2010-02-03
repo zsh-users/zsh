@@ -37,18 +37,38 @@ for x_mod in $x_mods; do
         echo "/* non-linked-in known module \`$x_mod' */"
 	linked=no
     esac
-    unset moddeps autofeatures
+    unset moddeps autofeatures autofeatures_emu
     . $srcdir/../$modfile
     if test "x$autofeatures" != x; then
-	echo "  if (EMULATION(EMULATE_ZSH)) {"
-	echo "    char *features[] = { "
-	for feature in $autofeatures; do
-	    echo "      \"$feature\","
-	done
-	echo "      NULL"
-	echo "    }; "
-	echo "    autofeatures(\"zsh\", \"$x_mod\", features, 0, 1);"
-	echo "  }"
+        if test "x$autofeatures_emu" != x; then
+            echo "  {"
+	    echo "    char *zsh_features[] = { "
+	    for feature in $autofeatures; do
+		echo "      \"$feature\","
+	    done
+	    echo "      NULL"
+	    echo "    }; "
+	    echo "    char *emu_features[] = { "
+	    for feature in $autofeatures_emu; do
+		echo "      \"$feature\","
+	    done
+	    echo "      NULL"
+	    echo "    }; "
+	    echo "    autofeatures(\"zsh\", \"$x_mod\","
+	    echo "       EMULATION(EMULATE_ZSH) ? zsh_features : emu_features,"
+	    echo "       0, 1);"
+	    echo "  }"
+        else
+	    echo "  if (EMULATION(EMULATE_ZSH)) {"
+	    echo "    char *features[] = { "
+	    for feature in $autofeatures; do
+		echo "      \"$feature\","
+	    done
+	    echo "      NULL"
+	    echo "    }; "
+	    echo "    autofeatures(\"zsh\", \"$x_mod\", features, 0, 1);"
+	    echo "  }"
+	fi
     fi
     for dep in $moddeps; do
 	echo "  add_dep(\"$x_mod\", \"$dep\");"

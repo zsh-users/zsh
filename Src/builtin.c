@@ -206,6 +206,17 @@ freebuiltinnode(HashNode hn)
     }
 }
 
+/**/
+void
+init_builtins(void)
+{
+    if (!EMULATION(EMULATE_ZSH)) {
+	HashNode hn = reswdtab->getnode2(reswdtab, "repeat");
+	if (hn)
+	    reswdtab->disablenode(hn, 0);
+    }
+}
+
 /* Make sure we have space for a new option and increment. */
 
 #define OPT_ALLOC_CHUNK 16

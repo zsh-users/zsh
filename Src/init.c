@@ -1443,6 +1443,7 @@ zsh_main(UNUSED(int argc), char **argv)
     setupvals();
     init_signals();
     init_bltinmods();
+    init_builtins();
     run_init_scripts();
     init_misc();
 

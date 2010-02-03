@@ -872,6 +872,10 @@ sitem(var(n)tt(k))(kilobytes (default))
 sitem(var(n)tt(m))(megabytes or minutes)
 sitem([var(mm)tt(:)]var(ss))(minutes and seconds)
 endsitem()
+
+The tt(limit) command is not made available by default when the
+shell starts in a mode emulating another shell.  It can be made available
+with the command `tt(zmodload -F zsh/rlimits b:limit)'.
 )
 findex(local)
 item(tt(local) [ {tt(PLUS())|tt(-)}tt(AEFHUahlprtux) ] \
@@ -1286,6 +1290,10 @@ all parameters are printed on the standard output.  If the only argument is
 For historical reasons, `tt(set -)' is treated as `tt(set +xv)'
 and `tt(set -) var(args)' as `tt(set +xv --) var(args)' when in
 any other emulation mode than zsh's native mode.
+
+The tt(sched) builtin is not made available by default when the shell
+starts in a mode emulating another shell.  It can be made available
+with the command `tt(zmodload -F zsh/sched b:sched)'.
 )
 module(setcap)(zsh/cap)
 findex(setopt)
@@ -1794,6 +1802,10 @@ If the tt(-h) flag is given and the shell has appropriate privileges,
 the hard resource limit for each var(resource) is removed.
 The resources of the shell process are only changed if the tt(-s)
 flag is given.
+
+The tt(unlimit) command is not made available by default when the
+shell starts in a mode emulating another shell.  It can be made available
+with the command `tt(zmodload -F zsh/rlimits b:unlimit)'.
 )
 findex(unset)
 cindex(parameters, unsetting)

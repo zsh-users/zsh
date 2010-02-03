@@ -222,6 +222,10 @@ item(tt(repeat) var(word) tt(do) var(list) tt(done))(
 var(word) is expanded and treated as an arithmetic expression,
 which must evaluate to a number var(n).
 var(list) is then executed var(n) times.
+
+The tt(repeat) syntax is disabled by default when the
+shell starts in a mode emulating another shell.  It can be enabled
+with the command `tt(enable -r repeat)'
 )
 findex(case)
 cindex(case selection)

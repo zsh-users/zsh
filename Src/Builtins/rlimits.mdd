@@ -3,6 +3,7 @@ link=either
 load=yes
 
 autofeatures="b:limit b:ulimit b:unlimit"
+autofeatures_emu="b:ulimit"
 
 objects="rlimits.o"
 

@@ -1,3 +1,13 @@
+2010-02-03  Peter Stephenson  <pws@csr.com>
+
+	* 27648, 267650/1, unposted README change: README,
+	Doc/Zsh/builtins.yo, Doc/Zsh/grammar.yo,
+	Etc/zsh-development-guide, Src/builtin.c, Src/init.c,
+	Src/mkbltnmlst.sh, Src/Builtins/rlimits.mdd: "repeat"
+        is not available when starting in emulation mode,
+	"ulimit" is; document that "sched", "limit", "unlimit"
+	already aren't.
+
 2010-02-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Mikael: 27647: Completion/Unix/Command/_cp: update
@@ -12669,5 +12679,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4880 $
+* $Revision: 1.4881 $
 *****************************************************
