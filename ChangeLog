@@ -1,3 +1,8 @@
+2010-02-04  Peter Stephenson  <pws@csr.com>
+
+	* 27661: Ben: Doc/Zsh/builtins.yo, Doc/Zsh/options.yo,
+	Doc/Zsh/tcpsys.yo: typos in manual references.
+
 2010-02-03  Peter Stephenson  <pws@csr.com>
 
 	* 27648, 267650/1, unposted README change: README,
@@ -12679,5 +12684,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4881 $
+* $Revision: 1.4882 $
 *****************************************************

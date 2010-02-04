@@ -1923,7 +1923,7 @@ the same directory as the var(file).  The shell will load the compiled
 file instead of the normal function file when the function
 is autoloaded; see
 ifzman(\
-the section `Autoloading Functions' in zmanref(zshfunc)
+the section `Autoloading Functions' in zmanref(zshmisc)
 )\
 ifnzman(\
 noderef(Functions)

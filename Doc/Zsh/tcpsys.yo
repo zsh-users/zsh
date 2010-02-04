@@ -19,7 +19,7 @@ tt(zsh/net/tcp) module, the tt(zsh/zselect) module is used to implement
 timeouts on read operations.  For troubleshooting tips, consult the
 corresponding advice for the tt(zftp) functions described in
 ifzman(\
-zmanref(zshftpsys)
+zmanref(zshzftpsys)
 )\
 ifnzman(\
 noderef(Zftp Function System)
