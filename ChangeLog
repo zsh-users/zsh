@@ -1,3 +1,8 @@
+2010-02-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Michael Hwang: 27675: Src/builtin.c: fix crash from error in
+	has builtin.
+
 2010-02-04  Peter Stephenson  <pws@csr.com>
 
 	* 27661: Ben: Doc/Zsh/builtins.yo, Doc/Zsh/options.yo,
@@ -12684,5 +12689,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4882 $
+* $Revision: 1.4883 $
 *****************************************************

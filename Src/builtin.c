@@ -3348,7 +3348,6 @@ bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
 				 "invalid character in directory name: %s",
 				 asg->name);
 			returnval = 1;
-			argv++;
 			continue;
 		    } else {
 			Nameddir nd = hn = zshcalloc(sizeof *nd);
