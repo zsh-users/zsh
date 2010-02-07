@@ -1,5 +1,9 @@
 2010-02-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Frank: 27679:
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	better logic.
+
 	* Michael Hwang: 27675: Src/builtin.c: fix crash from error in
 	has builtin.
 
@@ -12689,5 +12693,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4883 $
+* $Revision: 1.4884 $
 *****************************************************

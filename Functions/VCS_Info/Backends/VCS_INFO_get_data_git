@@ -54,23 +54,31 @@ VCS_INFO_git_getaction () {
 }
 
 VCS_INFO_git_getbranch () {
-    local gitbranch gitdir=$1
+    local gitbranch gitdir=$1 tmp actiondir
     local gitsymref="${vcs_comm[cmd]} symbolic-ref HEAD"
 
-    if    [[ -d "${gitdir}/rebase-apply" ]] \
-       || [[ -d "${gitdir}/rebase" ]]       \
-       || [[ -d "${gitdir}/../.dotest" ]]   \
-       || [[ -f "${gitdir}/MERGE_HEAD" ]] ; then
+    actiondir=''
+    for tmp in "${gitdir}/rebase-apply" \
+               "${gitdir}/rebase"       \
+               "${gitdir}/../.dotest"; do
+        if [[ -d ${tmp} ]]; then
+            actiondir=${tmp}
+            break
+        fi
+    done
+    if [[ -n ${actiondir} ]]; then
         gitbranch="$(${(z)gitsymref} 2> /dev/null)"
-        [[ -z ${gitbranch} ]] && [[ -r ${gitdir}/rebase-apply/head-name ]] \
-            && gitbranch="$(< ${gitdir}/rebase-apply/head-name)"
+        [[ -z ${gitbranch} ]] && [[ -r ${actiondir}/head-name ]] \
+            && gitbranch="$(< ${actiondir}/head-name)"
 
-    elif   [[ -f "${gitdir}/rebase-merge/interactive" ]] \
-        || [[ -d "${gitdir}/rebase-merge" ]] ; then
+    elif [[ -f "${gitdir}/MERGE_HEAD" ]] ; then
+        gitbranch="$(${(z)gitsymref} 2> /dev/null)"
+        [[ -z ${gitbranch} ]] && gitbranch="$(< ${gitdir}/MERGE_HEAD)"
+
+    elif [[ -d "${gitdir}/rebase-merge" ]] ; then
         gitbranch="$(< ${gitdir}/rebase-merge/head-name)"
 
-    elif   [[ -f "${gitdir}/.dotest-merge/interactive" ]] \
-        || [[ -d "${gitdir}/.dotest-merge" ]] ; then
+    elif [[ -d "${gitdir}/.dotest-merge" ]] ; then
         gitbranch="$(< ${gitdir}/.dotest-merge/head-name)"
 
     else
