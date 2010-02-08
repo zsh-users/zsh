@@ -1,6 +1,6 @@
 #compdef zip unzip zipinfo
 
-local suffixes suf zipfile uzi
+local suffixes suf zipfile uzi testfile
 local expl curcontext="$curcontext" state line ret=1
 typeset -A opt_args
 
@@ -114,10 +114,18 @@ case $state in
     if [[ $service = zip ]] && (( ! ${+opt_args[-d]} )); then
       _wanted files expl zfile _files -g '^(#i)*.(zip|xpi|[ejw]ar)(-.)' && return
     else
-      zipfile=( $~line[1](|.zip|.ZIP) )
-      [[ -z $zipfile[1] ]] && return 1
-      if [[ $zipfile[1] !=  $_zip_cache_list ]]; then
-	_zip_cache_name="$zipfile[1]"
+      testfile=${~${(Q)line[1]}}
+      if [[ -f $testfile ]]; then
+	zipfile=$testfile
+      elif [[ -f $testfile.zip ]]; then
+	zipfile=$testfile.zip
+      elif [[ -f $testfile.ZIP ]]; then
+	zipfile=$testfile.ZIP
+      else
+	return 1
+      fi
+      if [[ $zipfile !=  $_zip_cache_name ]]; then
+	_zip_cache_name="$zipfile"
 	_zip_cache_list=( ${(f)"$(zipinfo -1 $_zip_cache_name)"} )
       fi
      _wanted files expl 'file from archive' \
