@@ -1,3 +1,8 @@
+2010-02-08  Peter Stephenson  <pws@csr.com>
+
+	* 27658: Completion/Unix/Command/_zip: work around globbing
+	problems.
+
 2010-02-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Frank: 27679:
@@ -12693,5 +12698,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4884 $
+* $Revision: 1.4885 $
 *****************************************************
