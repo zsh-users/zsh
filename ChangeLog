@@ -1,5 +1,12 @@
 2010-02-08  Peter Stephenson  <pws@csr.com>
 
+	* unposte: Src/subst.c: comment about what colon in parameter
+	substitution might be doing.
+
+	* unposted: Completion/compinit,
+	Functions/Calendar/calendar_scandate: add some "typeset -g"s
+	to avoid WARN_CREATE_GLOBAL warnings.
+
 	* 27665: Frank: Completion/Unix/Command/_tmux: update.
 
 	* 27658: Completion/Unix/Command/_zip: work around globbing
@@ -12700,5 +12707,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4886 $
+* $Revision: 1.4887 $
 *****************************************************

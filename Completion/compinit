@@ -440,7 +440,7 @@ Ignore insecure $_i_q and continue [y] or abort compinit [n]? "; then
         (( $#_i_wdirs ))  && _i_files=( "${(@)_i_files:#(${(j:|:)_i_wdirs%.zwc})/*}" )
       fi
     fi
-    _comp_secure=yes
+    typeset -g _comp_secure=yes
   fi
 fi
 

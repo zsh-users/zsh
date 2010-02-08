@@ -720,8 +720,9 @@ if (( relative )); then
     fi
     # relative_start is zero if we're not using it
     (( reladd += (hour * 60 + minute) * 60 + second ))
+    typeset -g REPLY
     (( REPLY = relative_start + reladd  ))
-    [[ -n $setvar ]] && REPLY2=$line
+    [[ -n $setvar ]] && typeset -g REPLY2="$line"
     return 0
   fi
   return 1
@@ -747,6 +748,6 @@ fi
 
 strftime -s REPLY -r $fmt $nums
 
-[[ -n $setvar ]] && REPLY2=$line
+[[ -n $setvar ]] && typeset -g REPLY2="$line"
 
 return 0

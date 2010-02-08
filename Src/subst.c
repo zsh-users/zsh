@@ -2356,6 +2356,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	if (!(flags & (SUB_MATCH|SUB_REST|SUB_BIND|SUB_EIND|SUB_LEN)))
 	    flags |= SUB_REST;
 
+	/*
+	 * With ":" treat a value as unset if the variable is set but
+	 * - (array) contains no elements
+	 * - (scalar) contains an empty string
+	 */
 	if (colf && !vunset)
 	    vunset = (isarr) ? !*aval : !*val || (*val == Nularg && !val[1]);
 
