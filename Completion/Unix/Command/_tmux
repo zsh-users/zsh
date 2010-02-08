@@ -1203,6 +1203,7 @@ function __tmux-option-guard() {
             'default-shell:MSG:shell executable'
             'default-terminal:MSG:terminal string'
             'display-panes-colour:__tmux-colours'
+            'display-panes-active-colour:__tmux-colours'
             'display-panes-time:'${int_guard}
             'display-time:'${int_guard}
             'history-limit:'${int_guard}
@@ -1317,6 +1318,7 @@ function __tmux-options() {
         'default-shell:Default shell executable'
         'default-terminal:Default terminal definition string'
         'display-panes-colour:Colour used for display-panes'
+        'display-panes-active-colour:Colour for active pane in display-panes'
         'display-panes-time:Time (in msecs) of display-panes output'
         'display-time:Time (in msecs) messages are displayed'
         'history-limit:Number of copy-mode lines per window'

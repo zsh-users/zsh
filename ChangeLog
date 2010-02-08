@@ -1,5 +1,7 @@
 2010-02-08  Peter Stephenson  <pws@csr.com>
 
+	* 27665: Frank: Completion/Unix/Command/_tmux: update.
+
 	* 27658: Completion/Unix/Command/_zip: work around globbing
 	problems.
 
@@ -12698,5 +12700,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4885 $
+* $Revision: 1.4886 $
 *****************************************************
