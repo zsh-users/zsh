@@ -1,7 +1,7 @@
 2010-02-09  Peter Stephenson  <pws@csr.com>
 
-	* Geoff: 27693: Src/exec.c, Src/init.c, Src/params.c, Src/init.c:
-	rename underscore to avoid name clash.
+	* Geoff: 27693: Src/exec.c, Src/init.c, Src/params.c, Src/init.c,
+	Src/utils.c: rename underscore to avoid name clash.
 
 2010-02-08  Peter Stephenson  <pws@csr.com>
 
@@ -12712,5 +12712,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4888 $
+* $Revision: 1.4889 $
 *****************************************************
