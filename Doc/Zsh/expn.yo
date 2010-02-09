@@ -2296,6 +2296,18 @@ expressions. As in parameter subscripting they may be negative to make
 them count from the last match backward. E.g.: `tt(*(-OL[1,3]))'
 gives a list of the names of the three largest files.
 )
+item(tt(P))(var(string))(
+The var(string) will be prepended to each glob match as a separate
+word.  var(string) is delimited in the same way as arguments to the
+tt(e) glob qualifier described above.  The qualifier can be repeated;
+the words are prepended separately so that the resulting command
+line contains the words in the same order they were given in the
+list of glob qualifiers.
+
+A typical use for this is to prepend an option before all occurrences
+of a file name; for example, the pattern `tt(*(P:-f:))' produces the
+command line arguments `tt(-f) var(file1) tt(-f) var(file2) ...'
+)
 enditem()
 
 More than one of these lists can be combined, separated by commas. The

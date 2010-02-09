@@ -31,10 +31,10 @@ while [[ -n $PREFIX ]]; do
     fi
     ;;
 
-    (e)
+    ([eP])
     # complete/skip delimited command line
     if [[ -z $PREFIX ]]; then
-      _delimiters qualifer-e
+      _delimiters qualifer-$char
       return
     elif ! _globqual_delims; then
       # still completing command to eval

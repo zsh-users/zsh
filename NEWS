@@ -4,6 +4,13 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes between versions 4.3.10 and 4.3.11
+------------------------------------------
+
+The glob qualifier P can be used to add a separate word before each
+match.  For example, *(P:-f:) produces the command line
+`-f file1 -f file2 ...'.
+
 Changes between versions 4.3.9 and 4.3.10
 -----------------------------------------
 

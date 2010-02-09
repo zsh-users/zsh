@@ -343,6 +343,47 @@
 0:Exclusions with complicated path specifications
 >glob.tmp/dir1 glob.tmp/dir2 glob.tmp/dir4
 
+ print -l -- glob.tmp/*(P:-f:)
+0:Prepending words to each argument
+>-f
+>glob.tmp/a
+>-f
+>glob.tmp/b
+>-f
+>glob.tmp/c
+>-f
+>glob.tmp/dir1
+>-f
+>glob.tmp/dir2
+>-f
+>glob.tmp/dir3
+>-f
+>glob.tmp/dir4
+
+ print -l -- glob.tmp/*(P:one word:P:another word:)
+0:Prepending two words to each argument
+>one word
+>another word
+>glob.tmp/a
+>one word
+>another word
+>glob.tmp/b
+>one word
+>another word
+>glob.tmp/c
+>one word
+>another word
+>glob.tmp/dir1
+>one word
+>another word
+>glob.tmp/dir2
+>one word
+>another word
+>glob.tmp/dir3
+>one word
+>another word
+>glob.tmp/dir4
+
  [[ "" = "" ]] && echo OK
 0:Empty strings
 >OK

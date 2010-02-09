@@ -1,5 +1,9 @@
 2010-02-09  Peter Stephenson  <pws@csr.com>
 
+	* 27694: NEWS, Completion/Zsh/Type/_globquals, Doc/Zsh/expn.yo,
+	Src/glob.c, Test/D02glob.ztst: add "P" glob qualifier for
+	prepending words.
+
 	* Frank: 27696: Completion/Unix/Command/_tmux: another update
 
 	* Geoff: 27693: Src/exec.c, Src/init.c, Src/params.c, Src/init.c,
@@ -26,7 +30,7 @@
 	better logic.
 
 	* Michael Hwang: 27675: Src/builtin.c: fix crash from error in
-	has builtin.
+	hash builtin.
 
 2010-02-04  Peter Stephenson  <pws@csr.com>
 
@@ -12714,5 +12718,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4890 $
+* $Revision: 1.4891 $
 *****************************************************

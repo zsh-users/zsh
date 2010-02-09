@@ -176,6 +176,7 @@ struct globdata {
     int gd_gf_numsort;
     int gd_gf_follow, gd_gf_sorts, gd_gf_nsorts;
     struct globsort gd_gf_sortlist[MAX_SORTS];
+    LinkList gd_gf_pre_words;
 
     char *gd_glob_pre, *gd_glob_suf;
 };
@@ -206,6 +207,7 @@ static struct globdata curglobdata;
 #define gf_sorts      (curglobdata.gd_gf_sorts)
 #define gf_nsorts     (curglobdata.gd_gf_nsorts)
 #define gf_sortlist   (curglobdata.gd_gf_sortlist)
+#define gf_pre_words  (curglobdata.gd_gf_pre_words)
 
 /* and macros for save/restore */
 
@@ -1031,8 +1033,8 @@ static struct qual *dup_qual_list(struct qual *orig, struct qual **lastp)
 
 
 /*
- * Get a glob string for execution, following e or + qualifiers.
- * Pointer is character after the e or +.
+ * Get a glob string for execution, following e, P or + qualifiers.
+ * Pointer is character after the e, P or +.
  */
 
 /**/
@@ -1070,6 +1072,23 @@ glob_exec_string(char **sp)
 	*sp = tt;
 
     return sdata;
+}
+
+/*
+ * Insert a glob match.
+ * If there were words to prepend given by the P glob qualifier, do so.
+ */
+static void
+insert_glob_match(LinkList list, LinkNode next, char *data)
+{
+    if (gf_pre_words) {
+	LinkNode added;
+	for (added = firstnode(gf_pre_words); added; incnode(added)) {
+	    next = insertlinknode(list, next, dupstring(getdata(added)));
+	}
+    }
+
+    insertlinknode(list, next, data);
 }
 
 /* Main entry point to the globbing code for filename globbing. *
@@ -1606,6 +1625,19 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    end = v.end;
 		    break;
 		}
+		case 'P':
+		{
+		    char *tt;
+		    tt = glob_exec_string(&s);
+
+		    if (tt != NULL)
+		    {
+			if (!gf_pre_words)
+			    gf_pre_words = newlinklist();
+			addlinknode(gf_pre_words, tt);
+		    }
+		    break;
+		}
 		default:
 		    zerr("unknown file attribute");
 		    restore_globstate(saved);
@@ -1816,14 +1848,14 @@ zglob(LinkList list, LinkNode np, int nountok)
 	    matchptr = matchbuf + matchct - first - 1;
 	    while (end-- > 0) {
 		/* insert matches in the arg list */
-		insertlinknode(list, node, matchptr->name);
+		insert_glob_match(list, node, matchptr->name);
 		matchptr--;
 	    }
 	} else {
 	    matchptr = matchbuf + matchct - first - end;
 	    while (end-- > 0) {
 		/* insert matches in the arg list */
-		insertlinknode(list, node, matchptr->name);
+		insert_glob_match(list, node, matchptr->name);
 		matchptr++;
 	    }
 	}
