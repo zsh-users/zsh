@@ -3974,7 +3974,7 @@ wordcharssetfn(UNUSED(Param pm), char *x)
 char *
 underscoregetfn(UNUSED(Param pm))
 {
-    char *u = dupstring(underscore);
+    char *u = dupstring(zunderscore);
 
     untokenize(u);
     return u;

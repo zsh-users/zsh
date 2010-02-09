@@ -42,7 +42,7 @@ int noexitct = 0;
 /* buffer for $_ and its length */
 
 /**/
-char *underscore;
+char *zunderscore;
 
 /**/
 int underscorelen, underscoreused;
@@ -818,9 +818,9 @@ setupvals(void)
     ifs         = ztrdup(DEFAULT_IFS);
     wordchars   = ztrdup(DEFAULT_WORDCHARS);
     postedit    = ztrdup("");
-    underscore  = (char *) zalloc(underscorelen = 32);
+    zunderscore  = (char *) zalloc(underscorelen = 32);
     underscoreused = 1;
-    *underscore = '\0';
+    *zunderscore = '\0';
 
     zoptarg = ztrdup("");
     zoptind = 1;

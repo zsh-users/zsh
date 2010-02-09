@@ -2191,17 +2191,17 @@ setunderscore(char *str)
 	int l = strlen(str) + 1, nl = (l + 31) & ~31;
 
 	if (nl > underscorelen || (underscorelen - nl) > 64) {
-	    zfree(underscore, underscorelen);
-	    underscore = (char *) zalloc(underscorelen = nl);
+	    zfree(zunderscore, underscorelen);
+	    zunderscore = (char *) zalloc(underscorelen = nl);
 	}
-	strcpy(underscore, str);
+	strcpy(zunderscore, str);
 	underscoreused = l;
     } else {
 	if (underscorelen > 128) {
-	    zfree(underscore, underscorelen);
-	    underscore = (char *) zalloc(underscorelen = 32);
+	    zfree(zunderscore, underscorelen);
+	    zunderscore = (char *) zalloc(underscorelen = 32);
 	}
-	*underscore = '\0';
+	*zunderscore = '\0';
 	underscoreused = 1;
     }
 }
@@ -4506,7 +4506,7 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
 
     ou = zalloc(ouu = underscoreused);
     if (ou)
-	memcpy(ou, underscore, underscoreused);
+	memcpy(ou, zunderscore, underscoreused);
 
     while (wrap) {
 	wrap->module->wrapper++;
@@ -4750,7 +4750,7 @@ execsave(void)
     es->traplocallevel = traplocallevel;
     es->noerrs = noerrs;
     es->subsh_close = subsh_close;
-    es->underscore = ztrdup(underscore);
+    es->underscore = ztrdup(zunderscore);
     es->next = exstack;
     exstack = es;
     noerrs = cmdoutpid = 0;
