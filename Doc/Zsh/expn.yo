@@ -2296,7 +2296,7 @@ expressions. As in parameter subscripting they may be negative to make
 them count from the last match backward. E.g.: `tt(*(-OL[1,3]))'
 gives a list of the names of the three largest files.
 )
-item(tt(P))(var(string))(
+item(tt(P)var(string))(
 The var(string) will be prepended to each glob match as a separate
 word.  var(string) is delimited in the same way as arguments to the
 tt(e) glob qualifier described above.  The qualifier can be repeated;
