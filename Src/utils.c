@@ -1356,7 +1356,7 @@ checkmailpath(char **s)
 		    usav = zalloc(underscoreused);
 
 		    if (usav)
-			memcpy(usav, underscore, underscoreused);
+			memcpy(usav, zunderscore, underscoreused);
 
 		    setunderscore(*s);
 
