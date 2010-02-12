@@ -221,6 +221,7 @@ case $state in
     "n:numeric glob sort"
     "o:+ sort order, up"
     "O:+ sort order, down"
+    "P:prepend word"
     "[:+ range of files"
     "):end of qualifiers"
     "\::modifier"

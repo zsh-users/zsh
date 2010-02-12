@@ -1,3 +1,7 @@
+2010-02-12  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Zsh/Type/_globquals: add P to list.
+
 2010-02-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Doc/Zsh/expn.yo: typo in formatting.
@@ -12722,5 +12726,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4892 $
+* $Revision: 1.4893 $
 *****************************************************
