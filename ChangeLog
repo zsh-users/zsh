@@ -1,5 +1,8 @@
 2010-02-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 27708: Src/text.c: remove distracting initial semicolons
+	in job output.
+
 	* unposted: zero gf_pre_words from 27694.
 
 	* Mikael: Completion/Zsh/Type/_globquals: extend argument
@@ -12735,5 +12738,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4897 $
+* $Revision: 1.4898 $
 *****************************************************

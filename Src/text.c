@@ -102,7 +102,7 @@ taddlist(Estate state, int num)
 
 /**/
 static void
-taddnl(void)
+taddnl(int no_semicolon)
 {
     int t0;
 
@@ -110,8 +110,11 @@ taddnl(void)
 	taddchr('\n');
 	for (t0 = 0; t0 != tindent; t0++)
 	    taddchr('\t');
-    } else
+    } else if (no_semicolon) {
+	taddstr(" ");
+    } else {
 	taddstr("; ");
+    }
 }
 
 /* get a permanent textual representation of n */
@@ -275,7 +278,7 @@ gettext2(Estate state)
 		}
 		if (!(stack = (WC_LIST_TYPE(code) & Z_END))) {
 		    if (tnewlins)
-			taddnl();
+			taddnl(0);
 		    else
 			taddstr((WC_LIST_TYPE(code) & Z_ASYNC) ? " " : "; ");
 		    s->code = *state->pc++;
@@ -355,7 +358,7 @@ gettext2(Estate state)
 	    if (!s) {
 		taddstr("(");
 		tindent++;
-		taddnl();
+		taddnl(1);
 		n = tpush(code, 1);
 		n->u._subsh.end = state->pc + WC_SUBSH_SKIP(code);
 		/* skip word only use for try/always */
@@ -363,7 +366,8 @@ gettext2(Estate state)
 	    } else {
 		state->pc = s->u._subsh.end;
 		dec_tindent();
-		taddnl();
+		/* semicolon is optional here but more standard */
+		taddnl(0);
 		taddstr(")");
 		stack = 1;
 	    }
@@ -372,7 +376,7 @@ gettext2(Estate state)
 	    if (!s) {
 		taddstr("{");
 		tindent++;
-		taddnl();
+		taddnl(1);
 		n = tpush(code, 1);
 		n->u._subsh.end = state->pc + WC_CURSH_SKIP(code);
 		/* skip word only use for try/always */
@@ -380,7 +384,8 @@ gettext2(Estate state)
 	    } else {
 		state->pc = s->u._subsh.end;
 		dec_tindent();
-		taddnl();
+		/* semicolon is optional here but more standard */
+		taddnl(0);
 		taddstr("}");
 		stack = 1;
 	    }
@@ -412,7 +417,7 @@ gettext2(Estate state)
 		} else {
 		    taddstr(" () {");
 		    tindent++;
-		    taddnl();
+		    taddnl(1);
 		    n = tpush(code, 1);
 		    n->u._funcdef.strs = state->strs;
 		    n->u._funcdef.end = end;
@@ -423,7 +428,7 @@ gettext2(Estate state)
 		state->strs = s->u._funcdef.strs;
 		state->pc = s->u._funcdef.end;
 		dec_tindent();
-		taddnl();
+		taddnl(0);
 		taddstr("}");
 		stack = 1;
 	    }
@@ -445,15 +450,15 @@ gettext2(Estate state)
 			taddstr(" in ");
 			taddlist(state, *state->pc++);
 		    }
-		    taddnl();
+		    taddnl(0);
 		    taddstr("do");
 		}
 		tindent++;
-		taddnl();
+		taddnl(0);
 		tpush(code, 1);
 	    } else {
 		dec_tindent();
-		taddnl();
+		taddnl(0);
 		taddstr("done");
 		stack = 1;
 	    }
@@ -467,11 +472,11 @@ gettext2(Estate state)
 		    taddlist(state, *state->pc++);
 		}
 		tindent++;
-		taddnl();
+		taddnl(0);
 		tpush(code, 1);
 	    } else {
 		dec_tindent();
-		taddnl();
+		taddnl(0);
 		taddstr("done");
 		stack = 1;
 	    }
@@ -484,14 +489,14 @@ gettext2(Estate state)
 		tpush(code, 0);
 	    } else if (!s->pop) {
 		dec_tindent();
-		taddnl();
+		taddnl(0);
 		taddstr("do");
 		tindent++;
-		taddnl();
+		taddnl(0);
 		s->pop = 1;
 	    } else {
 		dec_tindent();
-		taddnl();
+		taddnl(0);
 		taddstr("done");
 		stack = 1;
 	    }
@@ -500,14 +505,14 @@ gettext2(Estate state)
 	    if (!s) {
 		taddstr("repeat ");
 		taddstr(ecgetstr(state, EC_NODUP, NULL));
-		taddnl();
+		taddnl(0);
 		taddstr("do");
 		tindent++;
-		taddnl();
+		taddnl(0);
 		tpush(code, 1);
 	    } else {
 		dec_tindent();
-		taddnl();
+		taddnl(0);
 		taddstr("done");
 		stack = 1;
 	    }
@@ -522,7 +527,7 @@ gettext2(Estate state)
 
 		if (state->pc >= end) {
 		    if (tnewlins)
-			taddnl();
+			taddnl(0);
 		    else
 			taddchr(' ');
 		    taddstr("esac");
@@ -530,7 +535,7 @@ gettext2(Estate state)
 		} else {
 		    tindent++;
 		    if (tnewlins)
-			taddnl();
+			taddnl(0);
 		    else
 			taddchr(' ');
 		    taddstr("(");
@@ -559,7 +564,7 @@ gettext2(Estate state)
 		    break;
 		}
 		if (tnewlins)
-		    taddnl();
+		    taddnl(0);
 		else
 		    taddchr(' ');
 		taddstr("(");
@@ -588,7 +593,7 @@ gettext2(Estate state)
 		}
 		dec_tindent();
 		if (tnewlins)
-		    taddnl();
+		    taddnl(0);
 		else
 		    taddchr(' ');
 		taddstr("esac");
@@ -610,14 +615,14 @@ gettext2(Estate state)
 		stack = 1;
 	    } else if (s->u._if.cond) {
 		dec_tindent();
-		taddnl();
+		taddnl(0);
 		taddstr("then");
 		tindent++;
-		taddnl();
+		taddnl(0);
 		s->u._if.cond = 0;
 	    } else if (state->pc < s->u._if.end) {
 		dec_tindent();
-		taddnl();
+		taddnl(0);
 		code = *state->pc++;
 		if (WC_IF_TYPE(code) == WC_IF_ELIF) {
 		    taddstr("elif ");
@@ -626,12 +631,12 @@ gettext2(Estate state)
 		} else {
 		    taddstr("else");
 		    tindent++;
-		    taddnl();
+		    taddnl(0);
 		}
 	    } else {
 		s->pop = 1;
 		dec_tindent();
-		taddnl();
+		taddnl(0);
 		taddstr("fi");
 		stack = 1;
 	    }
@@ -762,7 +767,7 @@ gettext2(Estate state)
 	    if (!s) {
 		taddstr("{");
 		tindent++;
-		taddnl();
+		taddnl(0);
 		n = tpush(code, 0);
 		state->pc++;
 		/* this is the end of the try block alone */
@@ -770,14 +775,14 @@ gettext2(Estate state)
 	    } else if (!s->pop) {
 		state->pc = s->u._subsh.end;
 		dec_tindent();
-		taddnl();
+		taddnl(0);
 		taddstr("} always {");
 		tindent++;
-		taddnl();
+		taddnl(0);
 		s->pop = 1;
 	    } else {
 		dec_tindent();
-		taddnl();
+		taddnl(0);
 		taddstr("}");
 		stack = 1;
 	    }
