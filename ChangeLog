@@ -1,5 +1,7 @@
 2010-02-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: zero gf_pre_words from 27694.
+
 	* Mikael: Completion/Zsh/Type/_globquals: extend argument
 	handling.
 
@@ -12733,5 +12735,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4896 $
+* $Revision: 1.4897 $
 *****************************************************

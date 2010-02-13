@@ -1141,6 +1141,7 @@ zglob(LinkList list, LinkNode np, int nountok)
     gf_noglobdots = unset(GLOBDOTS);
     gf_numsort = isset(NUMERICGLOBSORT);
     gf_sorts = gf_nsorts = 0;
+    gf_pre_words = NULL;
 
     /* Check for qualifiers */
     while (!nobareglob || isset(EXTENDEDGLOB)) {
