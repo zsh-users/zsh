@@ -1,3 +1,7 @@
+2010-02-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Frank: 27702: Completion/Unix/Command/_git: notes
+
 2010-02-12  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Zsh/Type/_globquals: add P to list.
@@ -12726,5 +12730,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4893 $
+* $Revision: 1.4894 $
 *****************************************************
