@@ -21,20 +21,32 @@ while [[ -n $PREFIX ]]; do
     (f)
     if ! compset -P "[-=+][0-7?]##"; then
       if [[ -z $PREFIX ]]; then
-	_delimiters qualifier-f
-	return
+        _delimiters qualifier-f
+        return
       elif ! _globqual_delims; then
-	# still completing mode spec
-	_message -e modes "mode spec"
-	return
+        # still completing mode spec
+        _message -e modes "mode spec"
+        return
       fi
     fi
     ;;
 
-    ([eP])
+    (P)
+    # skip delimited prefix
+    if [[ -z $PREFIX ]]; then
+      _delimiters qualifier-P
+      return
+    elif ! _globqual_delims; then
+      # can't suggest anything here
+      _message -e prefix prefix
+      return
+    fi
+    ;;
+
+    (e)
     # complete/skip delimited command line
     if [[ -z $PREFIX ]]; then
-      _delimiters qualifer-$char
+      _delimiters qualifer-e
       return
     elif ! _globqual_delims; then
       # still completing command to eval
@@ -74,12 +86,12 @@ while [[ -n $PREFIX ]]; do
     # complete/skip UID or delimited user
     if ! compset -P '[[:digit:]]##'; then
       if [[ -z $PREFIX ]]; then
-	_delimiters qualifier-u
-	return
+        _delimiters qualifier-u
+        return
       elif ! _globqual_delims; then
-	# still completing user
-	_users -S $delim
-	return
+        # still completing user
+        _users -S $delim
+        return
       fi
     fi
     ;;
@@ -88,12 +100,12 @@ while [[ -n $PREFIX ]]; do
     # complete/skip GID or delimited group
     if ! compset -P '[[:digit:]]##'; then
       if [[ -z $PREFIX ]]; then
-	_delimiter qualifier-g
-	return
+        _delimiter qualifier-g
+        return
       elif ! _globqual_delims; then
-	# still completing group
-	_groups -S $delim
-	return
+        # still completing group
+        _groups -S $delim
+        return
       fi
     fi
     ;;
@@ -103,12 +115,12 @@ while [[ -n $PREFIX ]]; do
       # complete/skip relative time spec
       alts=()
       if ! compset -P '[Mwhms]' && [[ -z $PREFIX ]]; then
-	alts+=(
-	  "time-specifiers:time specifier:\
+        alts+=(
+          "time-specifiers:time specifier:\
 ((M\:months w\:weeks h\:hours m:\minutes s\:seconds))")
       fi
       if ! compset -P '[-+]' && [[ -z $PREFIX ]]; then
-	alts+=("senses:sense:((-\:less\ than +\:more\ than))")
+        alts+=("senses:sense:((-\:less\ than +\:more\ than))")
       fi
       alts+=('digits:digit: ')
       _alternative $alts
@@ -122,12 +134,12 @@ while [[ -n $PREFIX ]]; do
       # complete/skip size spec
       alts=()
       if ! compset -P '[kKmMpP]' && [[ -z $PREFIX ]]; then
-	alts+=(
-	  "size-specifiers:size specifier:\
+        alts+=(
+          "size-specifiers:size specifier:\
 ((k\:kb m\:mb p\:512-byte\ blocks))")
       fi
       if ! compset -P '[-+]' && [[ -z $PREFIX ]]; then
-	alts+=("senses:sense:((-\:less\ than +\:more\ than))")
+        alts+=("senses:sense:((-\:less\ than +\:more\ than))")
       fi
       alts+=('digits:digit: ')
       _alternative $alts
@@ -139,19 +151,34 @@ while [[ -n $PREFIX ]]; do
     # complete/skip sort spec
     if ! compset -P "?"; then
       alts=(
-	"n:lexical order of name"
-	"L:size of file"
-	"l:number of hard links"
-	"a:last access time"
-	"m:last modification time"
-	"c:last inode change time"
-	"d:directory depth"
-	"N:no sorting"
-	"e:execute code"
-	"+:+ command name"
-	)
+        "n:lexical order of name"
+        "L:size of file"
+        "l:number of hard links"
+        "a:last access time"
+        "m:last modification time"
+        "c:last inode change time"
+        "d:directory depth"
+        "N:no sorting"
+        "e:execute code"
+        "+:+ command name"
+        )
       _describe -t sort-specifiers "sort specifier" alts -Q -S ''
       return
+    elif [[ $IPREFIX[-1] = e ]]; then
+      if [[ -z $PREFIX ]]; then
+        _delimiters qualifier-oe
+        return
+      elif ! _globqual_delims; then
+        compset -q
+        _normal
+        return
+      fi
+    elif [[ $IPREFIX[-1] = + ]]; then
+      if [[ $PREFIX = [[:IDENT:]]# ]]; then
+        # either nothing there yet, or still on name
+        _command_names
+        return
+      fi
     fi
     ;;
 
@@ -159,9 +186,9 @@ while [[ -n $PREFIX ]]; do
     # complete/skip range: check for closing bracket
     if ! compset -P "(-|)[[:digit:]]##(,(-|)[[:digit:]]##|)]"; then
       if compset -P "(-|)[[:digit:]]##,"; then
-	_message "end of range"
+        _message "end of range"
       else
-	_message "start of range"
+        _message "start of range"
       fi
       return
     fi
