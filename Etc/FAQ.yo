@@ -43,14 +43,14 @@ whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
 whensgml(report(ARG1)(ARG2)(ARG3)))
-myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2005/12/14)
+myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2010/02/15)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2005/12/14
+mydit(Last-Modified:) 2010/02/15
 mydit(Submitted-By:) email(pws@pwstephenson.fsnet.co.uk (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
-mydit(Copyright:) (C) P.W. Stephenson, 1995--2005 (see end of document)
+mydit(Copyright:) (C) P.W. Stephenson, 1995--2010 (see end of document)
 )
 
 This document contains a list of frequently-asked (or otherwise

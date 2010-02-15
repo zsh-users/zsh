@@ -1,3 +1,7 @@
+2010-02-15  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Etc/FAQ.yo: correct outrageously old dates in FAQ.
+
 2010-02-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27708: Src/text.c: remove distracting initial semicolons
@@ -12738,5 +12742,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4898 $
+* $Revision: 1.4899 $
 *****************************************************
