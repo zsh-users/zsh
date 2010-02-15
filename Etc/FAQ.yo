@@ -933,37 +933,16 @@ sect(What is zsh's support for Unicode/UTF-8?)
   ways of supporting character sets beyond ASCII.  `UTF-8' is an
   encoding of Unicode that is particularly natural on Unix-like systems.
 
-  Q: Does zsh support UTF-8?
-
-  A: zsh's built-in printf command supports "\u" and "\U" escapes
-  to output arbitrary Unicode characters.  ZLE (the Zsh Line Editor) has
+  The production branch of zsh, 4.2, has very limited support:
+  the built-in printf command supports "\u" and "\U" escapes
+  to output arbitrary Unicode characters; ZLE (the Zsh Line Editor) has
   no concept of character encodings, and is confused by multi-octet
   encodings.
 
-  Q: Why doesn't zsh have proper UTF-8 support?
-
-  A: The code has not been written yet.
-
-  Q: What makes UTF-8 support difficult to implement?
-
-  A: In order to handle arbitrary encodings the correct way, significant
-  and intrusive changes must be made to the shell.
-
-  Q: Why can't zsh just use readline?
-
-  A: ZLE is not encapsulated from the rest of the shell.  Isolating it
-  such that it could be replaced by readline would be a significant
-  effort.  Furthermore, using readline would effect a significant loss of
-  features.
-
-  Q: What changes are planned?
-
-  A: Introduction of Unicode support will be gradual, so if you are
-  interested in being involved you should join the zsh-workers mailing
-  list.  As a first step ZLE will be rewritten to use wide characters
-  internally.  Character based widgets can then operate on a single wide
-  character instead of a single byte, and the proper display width can be
-  calculated with wcswidth().
+  However, the 4.3 branch has much better support, and furthermore this
+  is now fairly stable.  (Only a few minor areas need fixing before
+  this becomes a production release.)  This is discussed more
+  fully below, see `Multibyte input and output'.
 
 
 chapter(How to get various things to work)
@@ -2030,7 +2009,7 @@ sect(What is multibyte input?)
   zsh will be able to use any such encoding as long as it contains ASCII as
   a single-octet subset and the system can provide information about other
   characters.  However, in the case of Unicode, UTF-8 is the only one you
-  are likely to enounter.
+  are likely to enounter that is useful in zsh.
 
   (In case you're confused: Unicode is the character set, while UTF-8 is
   an encoding of it.  You might hear about other encodings, such as UCS-2
@@ -2063,7 +2042,7 @@ sect(How does zsh handle multibyte input and output?)
   Note that if the shell is emulating a Bourne shell the tt(MULTIBYTE)
   option is unset by default.  This allows various POSIX modes to
   work normally (POSIX does not deal with multibyte characters).  If
-  you use a "sh" or "ksh" emulation interactively you shouldprobably
+  you use a "sh" or "ksh" emulation interactively you should probably
   set the tt(MULTIBYTE) option.
 
   The other option that affects multibyte support is tt(COMBINING_CHARS),
@@ -2072,9 +2051,10 @@ sect(How does zsh handle multibyte input and output?)
   assumed to be modifications (accents etc.) to the base character and to
   be displayed within the same screen area as the base character.  As not
   all terminals handle this, even if they correctly display the base
-  multibyte character, this option is not on by default.  The KDE terminal
-  emulator tt(konsole), tt(rxvt-unicode), and the Unicode version of
-  xterm, tt(xterm -u8) or the front-end tt(uxterm), are known to handle
+  multibyte character, this option is not on by default.  Recent versions
+  of the KDE and GNOME terminal emulators tt(konsole) and
+  tt(gnome-terminal) as well as tt(rxvt-unicode), and the Unicode version
+  of xterm, tt(xterm -u8) or the front-end tt(uxterm), are known to handle
   combining characters.
 
   The tt(COMBINING_CHARS) option only affects output; combining characters
@@ -2110,12 +2090,12 @@ sect(How do I ensure multibyte input and output work on my system?)
       edit file names that have been created using a different character
       set it won't work properly.)
    it() The terminal emulator.  Those that are supplied with a recent
-      desktop environment, such as gnome-terminal, are likely to have
-      extensive support for localization and may work correctly as soon
-      as they know the locale.  You can enable UTF-8 support for
-      tt(xterm) in its application defaults file.  The following are
-      the relevant resources; you don't actually need all of them, as
-      described below.  If you use a mytt(~/.Xdefaults) or
+      desktop environment, such as tt(konsole) and tt(gnome-terminal), are
+      likely to have extensive support for localization and may work
+      correctly as soon as they know the locale.  You can enable UTF-8
+      support for tt(xterm) in its application defaults file.  The
+      following are the relevant resources; you don't actually need all of
+      them, as described below.  If you use a mytt(~/.Xdefaults) or
       mytt(~/.Xresources) file for setting resources, prefix all the lines
       with mytt(xterm):
       verb(
@@ -2147,7 +2127,12 @@ sect(How do I ensure multibyte input and output work on my system?)
   this feature does.)  If your terminal doesn't have characters
   that need to be input as multibyte, however, you can still use
   the meta bindings and can ignore the warning message.  Use
-  mytt(bindkey -m 2>/dev/null) to suprress it.
+  mytt(bindkey -m 2>/dev/null) to suppress it.
+
+  You might also note that the latest version of the Cygwin environment
+  for Windows supports UTF-8.  In previous versions, zsh was able
+  to compile with the tt(MULTIBYTE) option enabled, but the system
+  didn't provide full support for it.
 
 
 sect(How can I input characters that aren't on my keyboard?)
@@ -2187,6 +2172,9 @@ url(http://www.unicode.org/charts/)(http://www.unicode.org/charts/).
   however, using UTF-8 massively extends the number of valid characters
   that can be produced.
 
+  If you have a recent X Window System installation, you might find
+  the tt(AltGr) key helps you input accented Latin characters; for
+  example on my keyboard tt(AltGr-; e) gives mytt(e) with an acute accent.
   See also url(http://www.cl.cam.ac.uk/~mgk25/unicode.html#input)(http://www.cl.cam.ac.uk/~mgk25/unicode.html#input)
   for general information on entering Unicode characters from a keyboard.
 

@@ -1,5 +1,7 @@
 2010-02-15  Peter Stephenson  <pws@csr.com>
 
+	* 27710: Etc/FAQ.yo: update sections on advanced character sets.
+
 	* unposted: Etc/FAQ.yo: correct outrageously old dates in FAQ.
 
 2010-02-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
@@ -12742,5 +12744,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4899 $
+* $Revision: 1.4900 $
 *****************************************************
