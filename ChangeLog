@@ -1,3 +1,16 @@
+2010-02-16  Peter Stephenson  <pws@csr.com>
+
+	* Frank Terbeck, Seth House: 27712, 22713, 27714: Doc/Zsh/contrib.yo,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_bzr,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_p4,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_svk,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_svn,
+	Functions/VCS_Info/VCS_INFO_formats,
+	Functions/VCS_Info/VCS_INFO_hook, Functions/VCS_Info/vcs_info:
+	hooks and Mercurial improvements.
+
 2010-02-15  Peter Stephenson  <pws@csr.com>
 
 	* 27710: Etc/FAQ.yo: update sections on advanced character sets.
@@ -12744,5 +12757,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4900 $
+* $Revision: 1.4901 $
 *****************************************************
