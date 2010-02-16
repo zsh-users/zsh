@@ -4,6 +4,8 @@
 
 setopt localoptions extendedglob NO_shwordsplit
 local gitdir gitbase gitbranch gitaction gitunstaged gitstaged gitsha1 gitmisc
+local stgitpatch stgitunapplied
+local -xA hook_com
 
 VCS_INFO_git_getaction () {
     local gitaction='' gitdir=$1
@@ -97,36 +99,6 @@ VCS_INFO_git_getbranch () {
     return 0
 }
 
-VCS_INFO_git_get_stgit_top_patch () {
-    local patchdir=$1
-
-    if [[ -d "$patchdir" ]]; then
-        local -a patches
-        patches=(${(f)"$(< "${patchdir}/applied")"})
-        printf '%s' $patches[-1]
-        return 0
-    fi
-
-    return 1
-}
-
-VCS_INFO_git_get_stgit_unapplied() {
-    local patchdir=$1
-
-    if [[ -d "$patchdir" ]]; then
-        local -a patches
-        patches=(${(f)"$(< "${patchdir}/unapplied")"})
-        if [[ -z $patches[@] ]]; then
-            printf 0
-        else
-            printf '%d' $#patches
-        fi
-        return 0
-    fi
-
-    return 1
-}
-
 gitdir=${vcs_comm[gitdir]}
 gitbranch="$(VCS_INFO_git_getbranch ${gitdir})"
 if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision && \
@@ -160,14 +132,37 @@ rrn=${gitbase:t}
 
 local patchdir=${gitdir}/patches/${gitbranch}
 if [[ -d $patchdir ]] ; then
-    stgitpatch=$(VCS_INFO_git_get_stgit_top_patch "${patchdir}")
-    stgitunapplied=$(VCS_INFO_git_get_stgit_unapplied "${patchdir}")
+    local -a stgit_applied stgit_unapplied
 
-    stgitpatch=${stgitpatch:-"no patch applied"}
+    stgit_applied=(${(f)"$(< "${patchdir}/applied")"})
+    stgit_applied=( ${(Oa)stgit_applied} )
+    stgit_unapplied=(${(f)"$(< "${patchdir}/unapplied")"})
+    stgit_unapplied=( ${(oa)stgit_applied} )
+
+    if VCS_INFO_hook 'gen-stgit-patch-string' "${stgit_applied[@]}"; then
+        if (( ${#stgit_applied} )); then
+            stgitpatch=${stgit_applied[1]}
+        else
+            stgitpatch="no patch applied"
+        fi
+    else
+        stgitpatch=${hook_com[stgit-patch-string]}
+    fi
+    if VCS_INFO_hook 'gen-stgit-unapplied-string' "${stgit_unapplied[@]}"; then
+        stgitunapplied=${#stgit_unapplied}
+    else
+        stgitunapplied=${hook_com[stgit-unapplied-string]}
+    fi
 
     zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" stgitformat stgitmsg || stgitmsg=" %p (%c)"
-    zformat -f stgitmsg "${stgitmsg}" "p:${stgitpatch}" "c:${stgitunapplied}"
-    gitmisc=${stgitmsg}
+    hook_com=( patch "${stgitpatch}" unapplied "${stgitunapplied}" )
+    if VCS_INFO_hook 'set-stgit-format' "${stgitformat}"; then
+        zformat -f stgitmsg "${stgitmsg}" "p:${hook_com[patch]}" "c:${hook_com[unapplied]}"
+        gitmisc=${stgitmsg}
+    else
+        gitmisc=${hook_com[stgit-replace]}
+    fi
+    hook_com=()
 else
     gitmisc=''
 fi

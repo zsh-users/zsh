@@ -324,7 +324,7 @@ cindex(version control utility)
 In a lot of cases, it is nice to automatically retrieve information from
 version control systems (VCSs), such as subversion, CVS or git, to be able
 to provide it to the user; possibly in the user's prompt. So that you can
-instantly tell on which branch you are currently on,  for example.
+instantly tell which branch you are currently on, for example.
 
 In order to do that, you may use the tt(vcs_info) function.
 
@@ -419,7 +419,8 @@ example(:vcs_info:<vcs-string>:<user-context>:<repo-root-name>)
 startitem()
 item(tt(<vcs-string>))(
 is one of: git, git-svn, git-p4, hg, darcs, bzr,
-cdv, mtn, svn, cvs, svk, tla or p4.
+cdv, mtn, svn, cvs, svk, tla or p4. When hooks are active the hooks name
+is added after a `+'. (See tt(Hooks in vcs_info) below.)
 )
 item(tt(<user-context>))(
 is a freely configurable string, assignable by
@@ -532,14 +533,17 @@ example(zstyle ':vcs_info:*' disable-patterns "$HOME/.zsh+LPAR()|/*+RPAR()")
 )
 kindex(check-for-changes)
 item(tt(check-for-changes))(
-If enabled, this style (currently only used by the tt(git) backend) causes the
-tt(%c) and tt(%u) format escapes to be filled with information. The strings
-filled into these escapes can be controlled via the var(stagedstr) and
-var(unstagedstr) styles.
+If enabled, this style causes the tt(%c) and tt(%u) format escapes to be filled
+with information. The strings filled into these escapes can be controlled via
+the var(stagedstr) and var(unstagedstr) styles. The only backends that
+currently support this option are tt(git) and tt(hg) (tt(hg) only supports
+unstaged).
 
 Note, that the actions taken if this style is enabled are potentially expensive
 (read: they take time, depending on how big the current repository is).
-Therefore, it is disabled by default.
+Therefore, it is disabled by default. In order to use this style with
+the tt(hg) backend you must also use the var(get-revision) style to avoid
+having to start the interpreter more than once.
 )
 kindex(stagedstr)
 item(tt(stagedstr))(
@@ -599,16 +603,32 @@ If set to true, vcs_info goes the extra mile to figure out the revision of
 a repository's work tree (currently for the tt(git) and tt(hg) backends,
 where this kind of information is not always vital). For tt(git), the
 hash value of the currently checked out commit is available via the tt(%i)
-expansion. With tt(hg), the local revision number is available via tt(%i)
-and the corresponding global hash is available via tt(%m).
+expansion. With tt(hg), the local revision number and the corresponding
+global hash are available via tt(%i); in addition, the topmost
+applied tt(mq) patch and bookmarks are available via tt(%m).
 If this style is set in the tt(hg) context, the backend supports the
-branchformat style.
+var(branchformat) style.
+)
+kindex(get-bookmarks)
+item(tt(get-bookmarks))(
+If set to true, the tt(hg) backend will try to get a list of current
+bookmarks. They will be available in via the `tt(%m)' replacement.
 )
 kindex(use-prompt-escapes)
 item(tt(use-prompt-escapes))(
 Determines if we assume that the assembled
 string from var(vcs_info) includes prompt escapes. (Used by
 tt(vcs_info_lastmsg).)
+)
+kindex(debug)
+item(tt(debug))(
+Enable debugging output, to track possible problems. Currently this style
+is only used by tt(vcs_info)'s hooks system.
+)
+kindex(hooks)
+item(tt(hooks))(
+A list style, that defines hook-function names. See tt(Hooks in vcs_info)
+below for details.
 )
 enditem()
 
@@ -632,7 +652,10 @@ sitem(tt(command))((empty string))
 sitem(tt(use-server))(false)
 sitem(tt(use-simple))(false)
 sitem(tt(get-revision))(false)
+sitem(tt(get-bookmarks))(false)
 sitem(tt(use-prompt-escapes))(true)
+sitem(tt(debug))(false)
+sitem(tt(hooks))((empty list))
 endsitem()
 
 In normal tt(formats) and tt(actionformats), the following replacements are
@@ -657,8 +680,9 @@ var(/foo/bar/reposXY/beer/tasty), tt(%S) is var(beer/tasty).)
 sitem(tt(%m))(A "misc" replacement. It is at the discretion of the backend
 to decide what this replacement expands to. It is currently used by
 the tt(hg) and tt(git) backends. The tt(hg) backend replaces tt(%m) with the
-topmost Mq patch applied (qtop) and the tt(git) backend replaces it
-with the string from the var(stgitformat) style.)
+topmost tt(mq) patch applied (qtop) and a list of any current bookmarks. The
+tt(git) backend replaces it with the string from the var(stgitformat)
+style.)
 endsitem()
 
 In tt(branchformat) these replacements are done:
@@ -747,6 +771,168 @@ enditem()
 
 All variables named VCS_INFO_* are for internal use only.
 
+subsect(Hooks in vcs_info)
+
+Hooks are places in tt(vcs_info) where you can run your own code. That
+code can communicate with the code that called it and through that,
+change the system's behaviour.
+
+For configuration, hooks change the style context:
+example(:vcs_info:<vcs-string>+<hook-name>:<user-context>:<repo-root-name>)
+
+To register functions to a hook, you need to list them in the tt(hooks)
+style in the appropriate context.
+
+Example:
+example(zstyle ':vcs_info:*+foo:*' hooks bar baz)
+
+This registers functions to the hook `foo' for all backends. In order to
+avoid namespace problems, all registered function names are prepended by
+a `+vi-', so the actual functions called for the `foo' hook are
+`tt(+vi-bar)' and `tt(+vi-baz)'.
+
+If something seems weird, you can enable the `debug' boolean style in
+the proper context and the hook-calling code will print what it tried
+to execute and whether the function in question existed.
+
+When you register more than one function to a hook, all functions are
+executed one after another until one function returns non-zero or until
+all functions have been called.
+
+There are a number of variables, that are special in hook contexts:
+
+startitem()
+item(tt(ret))(
+The return value, that the hooks system will return to the caller. The
+default is an integer `zero'. If and how a changed tt(ret) value changes
+the execution of the caller depends on the specific hook. See the hook's
+documentation below for details.
+)
+item(tt(hook_com))(
+An associated array, which is used for bidirectional communication from
+the caller to hook functions. The used keys depend on the specific hook.
+)
+item(tt(context))(
+The active context of the hook. Functions that wish to change this
+variable should make it local scope first.
+)
+enditem()
+
+Finally, the full list of currently available hooks:
+
+startitem()
+item(tt(gen-hg-bookmark-string))(
+Called in the Mercurial backend (the tt(get-revision) and tt(get-bookmarks)
+styles must be active) when a bookmark string is generated.
+
+This hook gets the names of the Mercurial bookmarks, that
+tt(vcs_info) collected from `hg'.
+
+When setting tt(ret) to non-zero, the string in
+tt(${hook_com[hg-bookmark-string]}) will be used as the
+`tt(misc1)' replacement in the variables set by tt(vcs_info).
+)
+item(tt(gen-mq-patch-string))(
+Called in the Mercurial backend when a mq-patch string is generated. That
+only happens if a tt(.hg/patches) directory exists in the repository.
+
+This hook gets the names of all applied mq patches which tt(vcs_info)
+collected so far in the opposite order, which mean that the first argument
+is the top-most patch and so forth.
+
+When setting tt(ret) to non-zero, the string in
+tt(${hook_com[hg-mqpatch-string]}) will be used as the
+`tt(misc0)' replacement in the variables set by tt(vcs_info).
+)
+item(tt(gen-stgit-patch-string))(
+Called in the git backend when a stgit-patch string is generated. That
+only happens if stgit is in use in the repository.
+
+This hook gets the names of all applied stgit patches which tt(vcs_info)
+collected so far in the opposite order, which mean that the first argument
+is the top-most patch and so forth.
+
+When setting tt(ret) to non-zero, the string in
+tt(${hook_com[stgit-patch-string]}) will be used as the
+`tt(misc0)' replacement in the variables set by tt(vcs_info).
+)
+item(tt(gen-stgit-unapplied-string))(
+Called in the git backend when a stgit-unapplied string is generated. That
+only happens if stgit is in use in the repository.
+
+This hook gets the names of all unapplied stgit patches which tt(vcs_info)
+collected so far.
+
+When setting tt(ret) to non-zero, the string in
+tt(${hook_com[stgit-unapplied-string]}) will be used as the
+`tt(misc0)' replacement in the variables set by tt(vcs_info).
+)
+item(tt(set-branch-format))(
+Called before a `tt(branchformat)' is set. The only argument to the
+hook is the format that is configured at this point.
+
+The `tt(hook_com)' keys considered are `tt(branch)' and `tt(revision)'.
+They are set to the values figured out so far by tt(vcs_info) and any
+change will be used directly when the actual replacement is done.
+
+If tt(ret) is set to to non-zero, the string in
+tt(${hook_com[branch-replace]}) will be used unchanged as the
+`tt(%b)' replacement in the variables set by tt(vcs_info).
+)
+item(tt(set-hgrev-format))(
+Called before a `tt(hgrevformat)' is set. The only argument to the
+hook is the format that is configured at this point.
+
+The `tt(hook_com)' keys considered are `tt(hash)' and `tt(localref)'.
+They are set to the values figured out so far by tt(vcs_info) and any
+change will be used directly when the actual replacement is done.
+
+If tt(ret) is set to to non-zero, the string in
+tt(${hook_com[rev-replace]}) will be used unchanged as the
+`tt(%i)' replacement in the variables set by tt(vcs_info).
+)
+item(tt(set-message))(
+Called each time before a `tt(vcs_info_msg_N_)' message is set.
+It takes two arguments; the first being the `N' in the message
+variable name, the second is the currently configured format or
+actionformat.
+
+There are a number of `tt(hook_com)' keys, that are used here:
+`tt(action)', `tt(branch)', `tt(base)', `tt(base-name)', `tt(subdir)',
+`tt(staged)', `tt(unstaged)', `tt(revision)', `tt(misc)', `tt(vcs)'
+and one `tt(miscN)' entry for each backend-specific data field (tt(N)
+starting at zero). They are set to the values figured out so far by
+tt(vcs_info) and any change will be used directly when the actual
+replacement is done.
+
+Since this hook is triggered multiple times (once for each configured
+format or actionformat), each of the `tt(hook_com)' keys mentioned
+above (except for the tt(miscN) entries) has an `tt(_orig)' counterpart,
+so even if you changed a value to your liking you can still get the
+original value in the next run. Changing the `tt(_orig)' values is
+probably not a good idea.
+
+If tt(ret) is set to to non-zero, the string in
+tt(${hook_com[message]}) will be used unchanged as the message by
+tt(vcs_info).
+)
+item(tt(set-stgit-format))(
+Called before a `tt(stgitformat)' is set. The only argument to the
+hook is the format that is configured at this point.
+
+The `tt(hook_com)' keys considered are `tt(patch)' and `tt(unapplied)'.
+They are set to the values figured out so far by tt(vcs_info) and any
+change will be used directly when the actual replacement is done.
+
+If tt(ret) is set to to non-zero, the string in
+tt(${hook_com[stgit-replace]}) will be used unchanged as the
+`tt(misc0)' replacement in the variables set by tt(vcs_info).
+)
+enditem()
+
+If all of this sounds rather confusing, take a look at the tt(Examples)
+section below. It contains some explanatory code.
+
 subsect(Examples)
 
 Don't use tt(vcs_info) at all (even though it's in your prompt):
@@ -778,6 +964,86 @@ example(alias vcsi='vcs_info command; vcs_info_lastmsg')
 
 This way, you can even define different formats for output via
 tt(vcs_info_lastmsg) in the ':vcs_info:*:command:*' namespace.
+
+Now as promised, some code that uses hooks:
+say, you'd like to replace the string `svn' by `subversion' in
+tt(vcs_info)'s tt(%s) format-replacement.
+
+First, we will tell tt(vcs_info) to call a function when populating
+the message variables with the gathered information:
+example(zstyle ':vcs_info:*+set-message:*' hooks svn2subversion)
+
+Nothing happens. Which is reasonable, since there we didn't define
+the actual function yet. To see what the hooks subsystem is trying to
+do, enable the `tt(debug)' style:
+example(zstyle ':vcs_info:*+*:*' debug true)
+
+That should give you an idea what is going on. Specifically, the function
+that we are looking for is `tt(+vi-svn2subversion)'. Note, the `tt(+vi-)'
+prefix. So, everything is in order, just as documented. When you are done
+checking out the debugging output, disable it again:
+example(zstyle ':vcs_info:*+*:*' debug false)
+
+Now, let's define the function:
+example(
+function +vi-svn2subversion+LPAR()RPAR() {
+    [[ ${hook_com[vcs_orig]} == svn ]] && hook_com[vcs]=subversion
+})
+
+Simple enough. And it could have even been simpler, if only we had
+registered our function in a less generic context. If we do it only in
+the `tt(svn)' backend's context, we don't need to test which the active
+backend is:
+example(zstyle ':vcs_info:svn+set-message:*' hooks svn2subversion)
+example(
+function +vi-svn2subversion+LPAR()RPAR() {
+    hook_com[vcs]=subversion
+})
+
+And finally a little more elaborate example, that uses a hook to create
+a customised bookmark string for the tt(hg) backend.
+
+Again, we start off by registering a function:
+example(zstyle ':vcs_info:hg+gen-hg-bookmark-string:*' hooks hgbookmarks)
+
+And then we define the `tt(+vi-hgbookmarks) function:
+example(
+function +vi-hgbookmarks+LPAR()RPAR() {
+    # The default is to connect all bookmark names by
+    # semicolons. This mixes things up a little.
+    # Imagine, there's one type of bookmarks that is
+    # special to you. Say, because it's *your* work.
+    # Those bookmarks look always like this: "sh/*"
+    # (because your initials are sh, for example).
+    # This makes the bookmarks string use only those
+    # bookmarks. If there's more than one, it
+    # concatenates them using commas.
+    local s i)
+example(
+    # The bookmarks returned by `hg' are available in
+    # the functions positional parameters.
+    (( $# == 0 )) && return 0
+    for i in "$@"; do
+        if [[ $i == sh/* ]]; then
+            [[ -n $s ]] && s=$s,
+            s=${s}$i
+        fi
+    done)
+example(
+    # Now, the communication with the code that calls
+    # the hook functions is done via the hook_com[]
+    # hash. The key, at which the `gen-hg-bookmark-string'
+    # hook looks at is `hg-bookmark-string'. So:
+    hook_com[hg-bookmark-string]=$s)
+example(
+    # And to signal, that we want to use the sting we
+    # just generated, set the special variable `ret' to
+    # something other than the default zero:
+    ret=1
+    return 0
+})
+
+This concludes our guided tour through zsh's tt(vcs_info).
 
 
 texinode(Prompt Themes)(ZLE Functions)(Version Control Information)(User Contributions)

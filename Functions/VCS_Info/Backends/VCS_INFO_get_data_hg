@@ -3,21 +3,11 @@
 ## Distributed under the same BSD-ish license as zsh itself.
 
 setopt localoptions NO_shwordsplit
-local file hgbranch hgbranch_name hgbase hghash hglrev hgmisc r_branch r_info revformat
-
-VCS_INFO_hg_get_mq_top_patch () {
-    local patchdir=$1
-
-    if [[ -e "${patchdir}/status" ]]; then
-        local -a patches
-        patches=(${(f)"$(< "${patchdir}/status")"})
-        printf "%s" "${patches[-1]/[^:]*:/}"
-        return 0
-    fi
-
-    return 1
-}
-
+local file hgbranch hgbranch_name hgbase hghash hglrev hgmqstring \
+    r_branch hgchanges revformat bookmarks r_bmhash r_bmname hgbmstring
+local -i getbookmarks
+local -a hgbm mqpatches hgmisc_args
+local -xA hook_com
 
 hgbase=${vcs_comm[basedir]}
 rrn=${hgbase:t}
@@ -31,27 +21,70 @@ fi
 
 hghash=''
 hglrev=''
+hgbm=()
+bookmarks="${hgbase}/.hg/bookmarks"
 if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision ; then
     # Calling the 'hg' program is quite a bit too slow for prompts.
     # If there's a way around that, I'd be interested.
     # Disabled by default anyway, so no harm done.
+    local HGRCPATH
 
-    HGRCPATH="/dev/null" ${vcs_comm[cmd]} branches \
-    | while read -r r_branch r_info ; do
-        if [[ ${r_branch} == ${hgbranch_name} ]] ; then
-            match=()
-            : ${r_info/(#b)([^:]##):(*)}
-            hglrev=${match[1]}
-            hghash=${match[2]}
-            break
+    if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" \
+            "check-for-changes" ; then
+
+        HGRCPATH="/dev/null" ${vcs_comm[cmd]} id --debug -i -n -b \
+        | read -r hghash hglrev r_branch
+
+        # Are there uncommitted-changes?
+        if [[ $hglrev[-1] == + ]] ; then
+            hgchanges=1
         fi
-    done
+
+        # Remove uncommitted-changes marker, if any
+        hglrev=${hglrev/+/}
+        hghash=${hghash/+/}
+    else
+        HGRCPATH="/dev/null" ${vcs_comm[cmd]} \
+        parents --template="{node} {rev} {branches}\n" \
+        | read -r hghash hglrev r_branch
+    fi
+
+    if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" "get-bookmarks" \
+            && getbookmarks=1 || getbookmarks=0
+
+    if (( getbookmarks )) && [[ -r "${bookmarks}" ]] ; then
+        while read -r r_bmhash r_bmname ; do
+            if [[ $hghash == $r_bmhash ]] ; then
+                hgbm=( "$r_bmname" ${hgbm} )
+            fi
+        done < ${bookmarks}
+    fi
 
     if [[ -n ${hglrev} ]] ; then
         zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" hgrevformat revformat || revformat="%r:%h"
-        zformat -f hglrev "${revformat}" "r:${hglrev}" "h:${hghash}"
+        hook_com=( localrev "${hglrev}" "hash" "${hghash}" )
+        if VCS_INFO_hook 'set-hgrev-format' "${revformat}"; then
+            zformat -f hglrev "${revformat}" "r:${hook_com[localrev]}" "h:${hook_com[hash]}"
+        else
+            hglrev=${hook_com[rev-replace]}
+        fi
+        hook_com=()
+        if (( getbookmarks )) ; then
+            if VCS_INFO_hook 'gen-hg-bookmark-string' "${hgbm[@]}"; then
+                hgbmstring=${(j.;.)hgbm}
+            else
+                hgbmstring=${hook_com[hg-bookmark-string]}
+            fi
+            hook_com=()
+        fi
         zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat hgbranch || hgbranch="%b:%r"
-        zformat -f hgbranch "${hgbranch}" "b:${hgbranch_name}" "r:${hglrev}"
+        hook_com=( branch "${hgbranch_name}" revision "${hglrev}" )
+        if VCS_INFO_hook 'set-branch-format' "${hgbranch}"; then
+            zformat -f hgbranch "${hgbranch}" "b:${hook_com[branch]}" "r:${hook_com[revision]}"
+        else
+            hgbranch=${hook_com[branch-replace]}
+        fi
+        hook_com=()
     fi
 else
     hgbranch="${hgbranch_name}"
@@ -60,12 +93,36 @@ fi
 local patchdir=${hgbase}/.hg/patches/
 
 if [[ -d $patchdir ]] ; then
-    hgmisc=$(VCS_INFO_hg_get_mq_top_patch "${patchdir}")
+    local -a mqpatches
+    if [[ -e "${patchdir}/status" ]]; then
+        mqpatches=( ${${(f)"$(< "${patchdir}/status")"}/(#s)[a-f0-9]##:/} )
+        mqpatches=( ${(Oa)mqpatches} )
+    else
+        mqpatches=( )
+    fi
 
-    hgmisc=${hgmisc:-"no patch applied"}
+    if VCS_INFO_hook 'gen-mq-patch-string' "${mqpatches[@]}"; then
+        if (( ${#mqpatches} )); then
+            hgmqstring=${mqpatches[1]}
+        else
+            hgmqstring="no patch applied"
+        fi
+    else
+        hgbmstring=${hook_com[hg-mqpatch-string]}
+    fi
+    hook_com=()
 else
-    hgmisc=''
+    hgmqstring=''
 fi
 
-VCS_INFO_formats '' "${hgbranch}" "${hgbase}" '' '' "${hglrev}" "${hgmisc}"
+if [[ -z "${hgmqstring}" ]] && [[ -z "${hgbmstring}" ]]; then
+    hgmisc_args=( '' ) # make sure there's at least *one* misc argument
+elif [[ -z "${hgmqstring}" ]]; then
+    hgmisc_args=( "${hgmqstring}" )
+elif [[ -z "${hgbmstring}" ]]; then
+    hgmisc_args=( "${hgbmstring}" )
+else
+    hgmisc_args=( "${hgmqstring}" "${hgbmstring}" )
+fi
+VCS_INFO_formats '' "${hgbranch}" "${hgbase}" '' "${hgchanges}" "${hglrev}" "${hgmisc_args[@]}"
 return 0

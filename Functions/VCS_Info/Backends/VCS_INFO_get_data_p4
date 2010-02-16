@@ -6,6 +6,7 @@
 setopt localoptions extendedglob
 local p4base a b
 local -A p4info
+local -xA hook_com
 
 ${vcs_comm[cmd]} info | while IFS=: read a b; do p4info[${a// /_}]="${b## #}"; done
 p4base=${vcs_comm[basedir]}
@@ -16,9 +17,13 @@ local p4branch change
 # here down is synced as the revision.
 # I suppose the following might be slow on a tortuous client view.
 change="${${$(${vcs_comm[cmd]} changes -m 1 ...\#have)##Change }%% *}"
-zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat p4branch ||
-p4branch="%b:%r"
-zformat -f p4branch "${p4branch}" "b:${p4info[Client_name]}" \
-"r:$change"
-
+zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat p4branch || p4branch="%b:%r"
+hook_com=( branch "${p4info[Client_name]}" revision "${change}" )
+if VCS_INFO_hook 'set-branch-format' "${p4branch}"; then
+    zformat -f p4branch "${p4branch}" "b:${hook_com[branch]}" "r:${hook_com[revision]}"
+else
+    p4branch=${hook_com[branch-replace]}
+fi
+hook_com=()
 VCS_INFO_formats '' "${p4branch}" "${p4base}" '' '' "$change" ''
+return 0

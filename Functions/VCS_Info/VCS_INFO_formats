@@ -3,7 +3,39 @@
 ## Distributed under the same BSD-ish license as zsh itself.
 
 setopt localoptions noksharrays NO_shwordsplit
-local action=$1 branch=$2 base=$3 staged=$4 unstaged=$5 rev=$6 misc=$7
+local msg tmp
+local -i i
+local -xA hook_com
+# The _origs are needed because hooks can change values and there would
+# be no way to get the originals back for later hooks (a hook is run for
+# each message, that's being created).
+hook_com=(
+    action        "$1"
+    action_orig   "$1"
+    branch        "$2"
+    branch_orig   "$2"
+    base          "$3"
+    base_orig     "$3"
+    staged        "$4"
+    staged_orig   "$4"
+    unstaged      "$5"
+    unstaged_orig "$5"
+    revision      "$6"
+    revision_orig "$6"
+    vcs           "${vcs}"
+    vcs_orig      "${vcs}"
+)
+shift 6
+i=0
+for tmp in "$@"; do
+    hook_com[misc$((i++))]="${tmp}"
+done
+hook_com[misc]=${(j:,:)argv}
+hook_com[misc_orig]=${hook_com[misc]}
+hook_com[base-name]="${${hook_com[base]}:t}"
+hook_com[base-name_orig]="${hook_com[base_name]}"
+hook_com[subdir]="$(VCS_INFO_reposub ${hook_com[base]})"
+hook_com[subdir_orig]="${hook_com[subdir]}"
 
 ## description:
 #   action:   a string that signals a certain non-default condition in the
@@ -13,18 +45,15 @@ local action=$1 branch=$2 base=$3 staged=$4 unstaged=$5 rev=$6 misc=$7
 #   base:     the full name of the repository's root directory.
 #   staged:   non-empty if the repository contains staged changes.
 #   unstaged: non-empty if the repository contains unstaged changes.
-#   rev:      an identifier of the currently checked out revision.
-#   misc:     a string that may contain anything the author likes.
+#   revision: an identifier of the currently checked out revision.
+#   misc0..N: a set of strings that may contain anything the author likes.
 #             the backends should document what they put in it and when.
 #
 # If an argument has no valid value for a given backend, an empty value
 # should be provided. eg:
 #   VCS_INFO_formats '' "${foobranch}" "${foobase}" '' '' '' "${foomisc}"
 
-local msg
-local -i i j
-
-if [[ -n ${action} ]] ; then
+if [[ -n ${hook_com[action]} ]] ; then
     zstyle -a ":vcs_info:${vcs}:${usercontext}:${rrn}" actionformats msgs
     (( ${#msgs} < 1 )) && msgs[1]=' (%s)-[%b|%a]-'
 else
@@ -32,29 +61,33 @@ else
     (( ${#msgs} < 1 )) && msgs[1]=' (%s)-[%b]-'
 fi
 
-if [[ -n ${staged} ]] ; then
-    zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" stagedstr staged
-    [[ -z ${staged} ]] && staged='S'
+if [[ -n ${hook_com[staged]} ]] ; then
+    zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" stagedstr tmp
+    [[ -z ${tmp} ]] && hook_com[staged]='S' || hook_com[staged]=${tmp}
 fi
 
-if [[ -n ${unstaged} ]] ; then
-    zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" unstagedstr unstaged
-    [[ -z ${unstaged} ]] && unstaged='U'
+if [[ -n ${hook_com[unstaged]} ]] ; then
+    zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" unstagedstr tmp
+    [[ -z ${tmp} ]] && hook_com[unstaged]='U' || hook_com[unstaged]=${tmp}
 fi
 
 (( ${#msgs} > maxexports )) && msgs[$(( maxexports + 1 )),-1]=()
 for i in {1..${#msgs}} ; do
-    zformat -f msg ${msgs[$i]}                      \
-                    a:${action}                     \
-                    b:${branch}                     \
-                    c:${staged}                     \
-                    i:${rev}                        \
-                    m:${misc}                       \
-                    r:${base:t}                     \
-                    s:${vcs}                        \
-                    u:${unstaged}                   \
-                    R:${base}                       \
-                    S:"$(VCS_INFO_reposub ${base})"
-    msgs[$i]=${msg}
+    if VCS_INFO_hook "set-message" $(( $i - 1 )) "${msgs[$i]}"; then
+        zformat -f msg ${msgs[$i]}                      \
+                        a:${hook_com[action]}           \
+                        b:${hook_com[branch]}           \
+                        c:${hook_com[staged]}           \
+                        i:${hook_com[revision]}         \
+                        m:${hook_com[misc]}             \
+                        r:${hook_com[base-name]}        \
+                        s:${hook_com[vcs]}              \
+                        u:${hook_com[unstaged]}         \
+                        R:${hook_com[base]}             \
+                        S:${hook_com[subdir]}
+        msgs[$i]=${msg}
+    else
+        msgs[$i]=${hook_com[message]}
+    fi
 done
 return 0
