@@ -1,5 +1,7 @@
 2010-02-16  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Unix/Command/.distfiles: new files
+
 	* Frank Terbeck, Seth House: 27712, 22713, 27714: Doc/Zsh/contrib.yo,
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_bzr,
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
@@ -12757,5 +12759,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4901 $
+* $Revision: 1.4902 $
 *****************************************************

@@ -52,6 +52,7 @@ _elinks
 _elm
 _enscript
 _env
+_espeak
 _fakeroot
 _feh
 _fetchmail
@@ -78,6 +79,7 @@ _gnutls
 _gpg
 _gphoto2
 _gprof
+_graphicsmagick
 _grep
 _groff
 _growisofs
