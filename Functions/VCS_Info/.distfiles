@@ -6,6 +6,7 @@ VCS_INFO_bydir_detect
 VCS_INFO_check_com
 VCS_INFO_formats
 VCS_INFO_get_cmd
+VCS_INFO_hook
 vcs_info_lastmsg
 VCS_INFO_maxexports
 VCS_INFO_nvcsformats
