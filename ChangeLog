@@ -1,3 +1,9 @@
+2010-12-16  Andrey Borzenkov <bor@zsh.org>
+
+	* 27715: Completion/Unix/Command/_stgit: fixes for new
+	version (workaround removed commands); autogenerate list
+	of stg subcommands.
+
 2010-02-16  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/.distfiles: new files
@@ -12759,5 +12765,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4902 $
+* $Revision: 1.4903 $
 *****************************************************
