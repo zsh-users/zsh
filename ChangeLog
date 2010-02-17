@@ -1,3 +1,8 @@
+2010-02-17  Peter Stephenson  <pws@csr.com>
+
+	* Frank: 27717: Functions/VCS_Info/vcs_info_lastmsg:
+	add option terminators for builtins.
+
 2010-12-17  Andrey Borzenkov <bor@zsh.org>
 
 	* unposted: Doc/Zsh/compsys.yo: typo fix
@@ -12769,5 +12774,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4904 $
+* $Revision: 1.4905 $
 *****************************************************
