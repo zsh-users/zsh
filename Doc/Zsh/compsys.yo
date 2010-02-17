@@ -203,7 +203,7 @@ currently named in tt(fpath), set tt(_compdir) to an empty string before
 calling tt(compaudit) or tt(compinit).
 
 findex(bashcompinit)
-The function tt(bashcompinit) compatibility with bash's programmable
+The function tt(bashcompinit) provides compatibility with bash's programmable
 completion system.  When run it will define the functions, tt(compgen) and
 tt(complete) which correspond to the bash builtins with the same names.
 It will then be possible to use completion specifications and functions

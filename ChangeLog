@@ -1,3 +1,7 @@
+2010-12-17  Andrey Borzenkov <bor@zsh.org>
+
+	* unposted: Doc/Zsh/compsys.yo: typo fix
+
 2010-12-16  Andrey Borzenkov <bor@zsh.org>
 
 	* 27715: Completion/Unix/Command/_stgit: fixes for new
@@ -12765,5 +12769,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4903 $
+* $Revision: 1.4904 $
 *****************************************************
