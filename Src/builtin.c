@@ -4885,7 +4885,7 @@ eval(char **argv)
 	} else {
 	    execode(prog, 1, 0);
 
-	    if (errflag)
+	    if (errflag && !lastval)
 		lastval = errflag;
 	}
     } else {

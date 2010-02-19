@@ -425,7 +425,7 @@
 >/ [[:WORD:]] yes
 
  [[ foo = (#c0)foo ]]
-1:Misplaced (#c...) flag
+2:Misplaced (#c...) flag
 ?(eval):1: bad pattern: (#c0)foo
 
  mkdir glob.tmp/dir5

@@ -1,3 +1,8 @@
+2010-02-19  Peter Stephenson  <pws@csr.com>
+
+	* 27723: Src/builtin.c, Test/D02glob.ztst: eval shouldn't
+	modify non-zero return statuses.
+
 2010-02-17  Peter Stephenson  <pws@csr.com>
 
 	* Frank: 27717: Functions/VCS_Info/vcs_info_lastmsg:
@@ -12774,5 +12779,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4905 $
+* $Revision: 1.4906 $
 *****************************************************
