@@ -285,6 +285,14 @@ F:Failures in these cases do not indicate a problem in the shell.
 0:MATCH, MBEGIN, MEND, match, mbegin, mend
 >OK
 
+  [[ -fail badly ]]
+2:Error message for unknown prefix condition
+?(eval):1: unknown condition: -fail
+
+  [[ really -fail badly ]]
+2:Error message for unknown infix condition
+?(eval):1: unknown condition: -fail
+
 %clean
   # This works around a bug in rm -f in some versions of Cygwin
   chmod 644 unmodish

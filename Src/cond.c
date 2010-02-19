@@ -104,7 +104,7 @@ evalcond(Estate state, char *fromtest)
     case COND_MODI:
 	{
 	    Conddef cd;
-	    char *name = overridename;
+	    char *name = overridename, *errname;
 	    char **strs;
 	    int l = WC_COND_SKIP(code);
 
@@ -122,10 +122,17 @@ evalcond(Estate state, char *fromtest)
 		strs = arrdup(sbuf);
 		l = 2;
 	    }
-	    if ((cd = getconddef((ctype == COND_MODI), name + 1, 1))) {
+	    if (name && name[0] == '-')
+		errname = name;
+	    else if (strs[0] && *strs[0] == '-')
+		errname = strs[0];
+	    else
+		errname = "<null>";
+	    if (name && name[0] == '-' &&
+		(cd = getconddef((ctype == COND_MODI), name + 1, 1))) {
 		if (ctype == COND_MOD &&
 		    (l < cd->min || (cd->max >= 0 && l > cd->max))) {
-		    zwarnnam(fromtest, "unknown condition: -%s", name);
+		    zwarnnam(fromtest, "unknown condition: %s", name);
 		    return 2;
 		}
 		if (tracingcond)
@@ -151,8 +158,8 @@ evalcond(Estate state, char *fromtest)
 		if (name && name[0] == '-' &&
 		    (cd = getconddef(0, name + 1, 1))) {
 		    if (l < cd->min || (cd->max >= 0 && l > cd->max)) {
-			zwarnnam(fromtest, "unknown condition: -%s",
-				 name);
+			zwarnnam(fromtest, "unknown condition: %s",
+				 errname);
 			return 2;
 		    }
 		    if (tracingcond)
@@ -160,8 +167,8 @@ evalcond(Estate state, char *fromtest)
 		    return !cd->handler(strs, cd->condid);
 		} else {
 		    zwarnnam(fromtest,
-			     "unknown condition: -%s",
-			     name ? name : "<null>");
+			     "unknown condition: %s",
+			     errname);
 		}
 	    }
 	    /* module not found, error */

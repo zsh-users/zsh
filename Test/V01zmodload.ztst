@@ -151,7 +151,7 @@
   print "Shouldn't get here.")
 2:Failed condition autoload
 ?(eval):3: module `zsh/parameter' has no such feature: `c:fail': autoload cancelled
-?(eval):3: unknown condition: -foo
+?(eval):3: unknown condition: -fail
 
   (zmodload -u zsh/parameter
   zmodload -aF zsh/parameter f:fail
