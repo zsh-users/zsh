@@ -1,3 +1,8 @@
+2010-02-21  Clint Adams  <clint@zsh.org>
+
+	* Michael Prokop: 27725: Completion/Debian/Command/_apt: apt
+	--no-install-recommends.
+
 2010-02-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Jonathan Beckman: 27728: Completion/X/Command/_mplayer: quote
@@ -12788,5 +12793,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4908 $
+* $Revision: 1.4909 $
 *****************************************************

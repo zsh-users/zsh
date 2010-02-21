@@ -403,6 +403,7 @@ _apt-get () {
     -V,--verbose-versions:bool \
     -m,--ignore-missing,--fix-missing:bool \
     --no-download:bool \
+    --no-install-recommends:bool \
     --ignore-hold:bool \
     --no-upgrade:bool \
     --force-yes:bool \
