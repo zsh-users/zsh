@@ -1,3 +1,8 @@
+2010-02-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Jonathan Beckman: 27728: Completion/X/Command/_mplayer: quote
+	colon after -ss.
+
 2010-02-19  Peter Stephenson  <pws@csr.com>
 
 	* 27722: Src/cond.c, Test/C02cond.zts, Test/V01zmodload.ztst: Error
@@ -12783,5 +12788,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4907 $
+* $Revision: 1.4908 $
 *****************************************************

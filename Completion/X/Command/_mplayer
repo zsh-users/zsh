@@ -77,7 +77,7 @@ _x_arguments -C -s \
   '-sid[turn on DVD subtitles]:language id' \
   '-speed[set playback speed rate]:playback speed rate' \
   '-srate[specify frequency of audio playback]:frequency (Hz)' \
-  '-ss[seek to given time position]:position (hh:mm\[:ss\])' \
+  '-ss[seek to given time position]:position (hh:mm\[\:ss\])' \
   '-sstep[specify time between displayed frames]:time (seconds)' \
   -ssf:mode -stop_xscreensaver \
   '-stereo:mode:((0\:stereo 1\:left\ channel 2\:right\ channel))' \
