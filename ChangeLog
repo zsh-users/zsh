@@ -1,3 +1,8 @@
+2010-02-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Frank: 27731: Functions/VCS_Info/vcs_info: turn off
+	WARN_CREATE_GLOBAL.
+
 2010-02-21  Clint Adams  <clint@zsh.org>
 
 	* Michael Prokop: 27725: Completion/Debian/Command/_apt: apt
@@ -12793,5 +12798,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4909 $
+* $Revision: 1.4910 $
 *****************************************************

@@ -40,7 +40,7 @@ vcs_info_setsys
 # and now, finally create the real vcs_info function
 vcs_info () {
     emulate -L zsh
-    setopt extendedglob
+    setopt extendedglob NO_warn_create_global
 
     [[ -r . ]] || return 0
 
