@@ -1,3 +1,10 @@
+2010-02-22  Peter Stephenson  <pws@csr.com>
+
+	* 27721: Src/compat.c [with unnecessary test removed], Src/exec.c,
+	Src/system.h, Src/utils.c:  update zopenmax() not to examine huge
+	numbers of file descriptors; only call it at initialisation;
+	rationalise use of fdtable_size and expansion of fdtable.
+
 2010-02-22  Clint Adams  <clint@zsh.org>
 
 	* 27744: Completion/Debian/Command/_pbuilder: completion for
@@ -12803,5 +12810,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4911 $
+* $Revision: 1.4912 $
 *****************************************************
