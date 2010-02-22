@@ -1621,6 +1621,27 @@ adjustwinsize(int from)
     }
 }
 
+/*
+ * Ensure the fdtable is large enough for fd, and that the
+ * maximum fd is set appropriately.
+ */
+static void
+check_fd_table(int fd)
+{
+    if (fd <= max_zsh_fd)
+	return;
+
+    if (fd >= fdtable_size) {
+	int old_size = fdtable_size;
+	while (fd >= fdtable_size)
+	    fdtable = zrealloc(fdtable,
+			       (fdtable_size *= 2)*sizeof(*fdtable));
+	memset(fdtable + old_size, 0,
+	       (fdtable_size - old_size) * sizeof(*fdtable));
+    }
+    max_zsh_fd = fd;
+}
+
 /* Move a fd to a place >= 10 and mark the new fd in fdtable.  If the fd *
  * is already >= 10, it is not moved.  If it is invalid, -1 is returned. */
 
@@ -1644,12 +1665,7 @@ movefd(int fd)
 	fd = fe;
     }
     if(fd != -1) {
-	if (fd > max_zsh_fd) {
-	    while (fd >= fdtable_size)
-		fdtable = zrealloc(fdtable,
-				   (fdtable_size *= 2)*sizeof(*fdtable));
-	    max_zsh_fd = fd;
-	}
+	check_fd_table(fd);
 	fdtable[fd] = FDT_INTERNAL;
     }
     return fd;
@@ -1669,12 +1685,12 @@ redup(int x, int y)
     if(x < 0)
 	zclose(y);
     else if (x != y) {
-	while (y >= fdtable_size)
-	    fdtable = zrealloc(fdtable, (fdtable_size *= 2)*sizeof(*fdtable));
-	if (dup2(x, y) == -1)
+	if (dup2(x, y) == -1) {
 	    ret = -1;
-	if ((fdtable[y] = fdtable[x]) && y > max_zsh_fd)
-	    max_zsh_fd = y;
+	} else {
+	    check_fd_table(y);
+	    fdtable[y] = fdtable[x];
+	}
 	zclose(x);
     }
 

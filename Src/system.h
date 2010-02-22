@@ -304,16 +304,22 @@ struct timezone {
 # endif
 #endif
 
+/*
+ * The number of file descriptors we'll allocate initially.
+ * We will reallocate later if necessary.
+ */
+#define ZSH_INITIAL_OPEN_MAX 64
 #ifndef OPEN_MAX
 # ifdef NOFILE
 #  define OPEN_MAX NOFILE
 # else
    /* so we will just pick something */
-#  define OPEN_MAX 64
+#  define OPEN_MAX ZSH_INITIAL_OPEN_MAX
 # endif
 #endif
 #ifndef HAVE_SYSCONF
-# define zopenmax() ((long) OPEN_MAX)
+# define zopenmax() ((long) (OPEN_MAX > ZSH_INITIAL_OPEN_MAX ? \
+			     ZSH_INITIAL_OPEN_MAX : OPEN_MAX))
 #endif
 
 #ifdef HAVE_FCNTL_H

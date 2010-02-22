@@ -1928,7 +1928,7 @@ closeallelse(struct multio *mn)
     int i, j;
     long openmax;
 
-    openmax = zopenmax();
+    openmax = fdtable_size;
 
     for (i = 0; i < openmax; i++)
 	if (mn->pipe != i) {

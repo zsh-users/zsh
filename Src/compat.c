@@ -187,40 +187,45 @@ zpathmax(char *dir)
 #endif /* 0 */
 
 #ifdef HAVE_SYSCONF
-/* This is replaced by a macro from system.h if not HAVE_SYSCONF.    *
- * 0 is returned by sysconf if _SC_OPEN_MAX is unavailable;          *
- * -1 is returned on error                                           *
- *                                                                   *
- * Neither of these should happen, but resort to OPEN_MAX rather     *
- * than return 0 or -1 just in case.                                 */
+/*
+ * This is replaced by a macro from system.h if not HAVE_SYSCONF.
+ * 0 is returned by sysconf if _SC_OPEN_MAX is unavailable;
+ * -1 is returned on error
+ *
+ * Neither of these should happen, but resort to OPEN_MAX rather
+ * than return 0 or -1 just in case.
+ *
+ * We'll limit the open maximum to ZSH_INITIAL_OPEN_MAX to
+ * avoid probing ridiculous numbers of file descriptors.
+ */
 
 /**/
 mod_export long
 zopenmax(void)
 {
-    static long openmax = 0;
+    long openmax;
 
-    if (openmax < 1) {
-	if ((openmax = sysconf(_SC_OPEN_MAX)) < 1) {
-	    openmax = OPEN_MAX;
-	} else if (openmax > OPEN_MAX) {
-	    /* On some systems, "limit descriptors unlimited" or the  *
-	     * equivalent will set openmax to a huge number.  Unless  *
-	     * there actually is a file descriptor > OPEN_MAX already *
-	     * open, nothing in zsh requires the true maximum, and in *
-	     * fact it causes inefficiency elsewhere if we report it. *
-	     * So, report the maximum of OPEN_MAX or the largest open *
-	     * descriptor (is there a better way to find that?).      */
-	    long i, j = OPEN_MAX;
-	    for (i = j; i < openmax; i += (errno != EINTR)) {
-		errno = 0;
-		if (fcntl(i, F_GETFL, 0) < 0 &&
-		    (errno == EBADF || errno == EINTR))
-		    continue;
-		j = i;
-	    }
-	    openmax = j;
+    if ((openmax = sysconf(_SC_OPEN_MAX)) < 1) {
+	openmax = OPEN_MAX;
+    } else if (openmax > OPEN_MAX) {
+	/* On some systems, "limit descriptors unlimited" or the  *
+	 * equivalent will set openmax to a huge number.  Unless  *
+	 * there actually is a file descriptor > OPEN_MAX already *
+	 * open, nothing in zsh requires the true maximum, and in *
+	 * fact it causes inefficiency elsewhere if we report it. *
+	 * So, report the maximum of OPEN_MAX or the largest open *
+	 * descriptor (is there a better way to find that?).      */
+	long i, j = OPEN_MAX;
+	if (openmax > ZSH_INITIAL_OPEN_MAX)
+	    openmax = ZSH_INITIAL_OPEN_MAX;
+	for (i = j; i < openmax; i += (errno != EINTR)) {
+	    errno = 0;
+	    if (fcntl(i, F_GETFL, 0) < 0 &&
+		(errno == EBADF || errno == EINTR))
+		continue;
+	    j = i;
 	}
+	openmax = j;
     }
 
     return (max_zsh_fd > openmax) ? max_zsh_fd : openmax;
@@ -771,7 +776,7 @@ mk_wcwidth(wchar_t ucs)
 
   /* if we arrive here, ucs is not a combining or C0/C1 control character */
 
-  return 1 + 
+  return 1 +
     (ucs >= 0x1100 &&
      (ucs <= 0x115f ||                    /* Hangul Jamo init. consonants */
       ucs == 0x2329 || ucs == 0x232a ||
