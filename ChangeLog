@@ -1,5 +1,8 @@
 2010-02-22  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Src/utils.c: Add a debug test for trapping bad uses of
+	fdtable when closing fd's in zclose().
+
 	* 27721: Src/compat.c [with unnecessary test removed], Src/exec.c,
 	Src/system.h, Src/utils.c:  update zopenmax() not to examine huge
 	numbers of file descriptors; only call it at initialisation;
@@ -12810,5 +12813,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4912 $
+* $Revision: 1.4913 $
 *****************************************************

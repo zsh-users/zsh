@@ -1,3 +1,4 @@
+
 /*
  * utils.c - miscellaneous utilities
  *
@@ -1704,6 +1705,14 @@ mod_export int
 zclose(int fd)
 {
     if (fd >= 0) {
+	/*
+	 * We sometimes zclose() an fd twice where the second
+	 * time is a catch-all in case there was a failure using
+	 * the fd.  This is harmless but we need to trap it
+	 * for the error check here.
+	 */
+	DPUTS2(fd > max_zsh_fd && fdtable[fd] != FDT_UNUSED,
+	       "BUG: fd is %d, max_zsh_fd is %d", fd, max_zsh_fd);
 	fdtable[fd] = FDT_UNUSED;
 	while (max_zsh_fd > 0 && fdtable[max_zsh_fd] == FDT_UNUSED)
 	    max_zsh_fd--;
