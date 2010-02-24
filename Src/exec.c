@@ -136,6 +136,12 @@ mod_export int coprocin;
 /**/
 mod_export int coprocout;
 
+/* count of file locks recorded in fdtable */
+
+/**/
+int fdtable_flocks;
+
+
 /* != 0 if the line editor is active */
 
 /**/
@@ -2716,7 +2722,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
     if ((how & Z_ASYNC) ||
 	(!do_exec &&
 	 (((is_builtin || is_shfunc) && output) ||
-	  (!is_cursh && (last1 != 1 || nsigtrapped || havefiles()))))) {
+	  (!is_cursh && (last1 != 1 || nsigtrapped || havefiles() ||
+			 fdtable_flocks))))) {
 
 	pid_t pid;
 	int synch[2], flags;

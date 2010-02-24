@@ -1,3 +1,9 @@
+2010-02-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27754: NEWS (unposted), Doc/Zsh/mod_system.yo, Src/exec.c,
+	Src/utils.c, Src/zsh.h, Src/Modules/system.c: add
+	"zsystem flock" subcommand to zsh/system module.
+
 2010-02-22  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/utils.c: Add a debug test for trapping bad uses of
@@ -12813,5 +12819,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4913 $
+* $Revision: 1.4914 $
 *****************************************************

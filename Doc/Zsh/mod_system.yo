@@ -1,8 +1,8 @@
 COMMENT(!MOD!zsh/system
 A builtin interface to various low-level system features.
 !MOD!)
-The tt(zsh/system) module makes available three builtin commands and
-two parameters.
+The tt(zsh/system) module makes available various builtin commands and
+parameters.
 
 subsect(Builtins)
 
@@ -108,6 +108,45 @@ The return status may be 0 for success, 1 for an error in the parameters
 to the command, or 2 for an error on the write; no error message is
 printed in the last case, but the parameter tt(ERRNO) will reflect
 the error that occurred.
+)
+xitem(tt(zsystem flock [ -t) var(timeout) tt(] [ -f) var(var) tt(] [-er]) var(file))
+item(tt(zsystem flock -u) var(fd_expr))(
+The builtin tt(zsystem)'s subcommand tt(flock) performs advisory file
+locking (via the manref(fcntl)(2) system call) over the entire contents
+of the given file.  This form of locking requires the processes
+accessing the file to cooperate; its most obvious use is between two
+instances of the shell itself.
+
+In the first form the named var(file), which must already exist, is
+locked by opening a file descriptor to the file and applying a lock to
+the file descriptor.  The lock terminates when the shell process that
+created the lock exits; it is therefore often convenient to create file
+locks within subshells, since the lock is automatically released when
+the subshell exits.  Status 0 is returned if the lock succeeds, else
+status 1.
+
+In the second form the file descriptor given by the arithmetic
+expression tt(fd_expr) is closed, releasing a lock.  The file descriptor
+can be queried by using the `tt(-f) var(var)' form during the lock;
+on a successful lock, the shell variable var(var) is set to the file
+descriptor used for locking.  The lock will be released if the
+file descriptor is closed by any other means, for example using
+`tt(exec {)var(var)tt(}>&-)'; however, the form described here performs
+a safety check that the file descriptor is in use for file locking.
+
+By default the shell waits indefinitely for the lock to succeed.
+The option tt(-t) var(timeout) specifies a timeout for the lock in
+seconds; currently this must be an integer.  The shell will attempt
+to lock the file once a second during this period.  If the attempt
+times out, status 2 is returned.
+
+If the option tt(-e) is given, the file descriptor for the lock is
+preserved when the shell uses tt(exec) to start a new process;
+otherwise it is closed at that point and the lock released.
+
+If the option tt(-r) is given, the lock is only for reading, otherwise
+it is for reading and writing.  The file descriptor is opened
+accordingly.
 )
 enditem()
 

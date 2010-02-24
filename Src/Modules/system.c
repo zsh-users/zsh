@@ -173,7 +173,7 @@ bin_sysread(char *nam, char **args, Options ops, UNUSED(int func))
 	    select_tv.tv_usec = 0;
 	}
 
-	while ((ret = select(infd+1, (SELECT_ARG_2_T) &fds, 
+	while ((ret = select(infd+1, (SELECT_ARG_2_T) &fds,
 			     NULL, NULL,&select_tv)) < 1) {
 	    if (errno != EINTR || errflag || retflag || breaks || contflag)
 		break;
@@ -340,10 +340,174 @@ bin_syserror(char *nam, char **args, Options ops, UNUSED(int func))
     return 0;
 }
 
+/**/
+static int
+bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
+{
+    int cloexec = 1, unlock = 0, readlock = 0;
+    time_t timeout = 0;
+    char *fdvar = NULL;
+#ifdef HAVE_FCNTL_H
+    struct flock lck;
+    int flock_fd, flags;
+#endif
+
+    while (*args && **args == '-') {
+	int opt;
+	char *optptr = *args + 1, *optarg;
+	args++;
+	if (!*optptr || !strcmp(optptr, "-"))
+	    break;
+	while ((opt = *optptr)) {
+	    switch (opt) {
+	    case 'e':
+		/* keep lock on "exec" */
+		cloexec = 0;
+		break;
+
+	    case 'f':
+		/* variable for fd */
+		if (optptr[1]) {
+		    fdvar = optptr + 1;
+		    optptr += strlen(fdvar) - 1;
+		} else if (*args) {
+		    fdvar = *args++;
+		}
+		if (fdvar == NULL || !isident(fdvar)) {
+		    zwarnnam(nam, "flock: option %c requires a variable name",
+			     opt);
+		    return 1;
+		}
+		break;
+
+	    case 'r':
+		/* read lock rather than read-write lock */
+		readlock = 1;
+		break;
+
+	    case 't':
+		/* timeout in seconds */
+		if (optptr[1]) {
+		    optarg = optptr + 1;
+		    optptr += strlen(optarg) - 1;
+		} else if (!*args) {
+		    zwarnnam(nam, "flock: option %c requires a numeric timeout",
+			     opt);
+		    return 1;
+		} else {
+		    optarg = *args++;
+		}
+		timeout = (time_t)mathevali(optarg);
+		break;
+
+	    case 'u':
+		/* unlock: argument is fd */
+		unlock = 1;
+		break;
+
+	    default:
+		zwarnnam(nam, "flock: unknown option: %c", *optptr);
+		return 1;
+	    }
+	    optptr++;
+	}
+    }
+
+
+    if (!args[0]) {
+	zwarnnam(nam, "flock: not enough arguments");
+	return 1;
+    }
+    if (args[1]) {
+	zwarnnam(nam, "flock: too many arguments");
+	return 1;
+    }
+
+#ifdef HAVE_FCNTL_H
+    if (unlock) {
+	flock_fd = (int)mathevali(args[0]);
+	if (zcloselockfd(flock_fd) < 0) {
+	    zwarnnam(nam, "flock: file descriptor %d not in use for locking",
+		     flock_fd);
+	    return 1;
+	}
+	return 0;
+    }
+
+    if (readlock)
+	flags = O_RDONLY | O_NOCTTY;
+    else
+	flags = O_RDWR | O_NOCTTY;
+    if ((flock_fd = open(unmeta(args[0]), flags)) < 0) {
+	zwarnnam(nam, "failed to open %s for writing: %e", args[0], errno);
+	return 1;
+    }
+    flock_fd = movefd(flock_fd);
+    if (flock_fd == -1)
+	return 1;
+#ifdef FD_CLOEXEC
+    if (cloexec)
+    {
+	long fdflags = fcntl(flock_fd, F_GETFD, 0);
+	if (fdflags != (long)-1)
+	    fcntl(flock_fd, F_SETFD, fdflags | FD_CLOEXEC);
+    }
+#endif
+    addlockfd(flock_fd, cloexec);
+
+    lck.l_type = readlock ? F_RDLCK : F_WRLCK;
+    lck.l_whence = SEEK_SET;
+    lck.l_start = 0;
+    lck.l_len = 0;  /* lock the whole file */
+
+    if (timeout > 0) {
+	time_t end = time(NULL) + (time_t)timeout;
+	while (fcntl(flock_fd, F_SETLK, &lck) < 0) {
+	    if (errno != EINTR && errno != EACCES && errno != EAGAIN) {
+		zwarnnam(nam, "failed to lock file %s: %e", args[0], errno);
+		return 1;
+	    }
+	    if (time(NULL) >= end)
+		return 2;
+	    sleep(1);
+	}
+    } else {
+	while (fcntl(flock_fd, F_SETLKW, &lck) < 0) {
+	    if (errno == EINTR)
+		continue;
+	    zwarnnam(nam, "failed to lock file %s: %e", args[0], errno);
+	    return 1;
+	}
+    }
+
+    if (fdvar)
+	setiparam(fdvar, flock_fd);
+
+    return 0;
+#else /* HAVE_FCNTL_H */
+    zwarnnam(nam, "flock: not implemented on this system");
+    return 255;
+#endif /* HAVE_FCNTL_H */
+}
+
+
+/**/
+static int
+bin_zsystem(char *nam, char **args, Options ops, int func)
+{
+    /* If more commands are implemented, this can be more sophisticated */
+    if (!strcmp(*args, "flock")) {
+	return bin_zsystem_flock(nam, args+1, ops, func);
+    }
+    zwarnnam(nam, "unknown subcommand: %s", *args);
+    return 1;
+}
+
 static struct builtin bintab[] = {
     BUILTIN("syserror", 0, bin_syserror, 0, 1, 0, "e:p:", NULL),
     BUILTIN("sysread", 0, bin_sysread, 0, 1, 0, "c:i:o:s:t:", NULL),
     BUILTIN("syswrite", 0, bin_syswrite, 1, 1, 0, "c:o:", NULL),
+    BUILTIN("zsystem", 0, bin_zsystem, 1, -1, 0, NULL, NULL)
 };
 
 

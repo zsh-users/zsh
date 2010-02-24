@@ -1691,11 +1691,41 @@ redup(int x, int y)
 	} else {
 	    check_fd_table(y);
 	    fdtable[y] = fdtable[x];
+	    if (fdtable[y] == FDT_FLOCK || fdtable[y] == FDT_FLOCK_EXEC)
+		fdtable[y] = FDT_INTERNAL;
 	}
+	/*
+	 * Closing any fd to the locked file releases the lock.
+	 * This isn't expected to happen, it's here for completeness.
+	 */
+	if (fdtable[x] == FDT_FLOCK)
+	    fdtable_flocks--;
 	zclose(x);
     }
 
     return ret;
+}
+
+/*
+ * Indicate that an fd has a file lock; if cloexec is 1 it will be closed
+ * on exec.
+ * The fd should already be known to fdtable (e.g. by movefd).
+ * Note the fdtable code doesn't care what sort of lock
+ * is used; this simply prevents the main shell exiting prematurely
+ * when it holds a lock.
+ */
+
+/**/
+mod_export void
+addlockfd(int fd, int cloexec)
+{
+    if (cloexec) {
+	if (fdtable[fd] != FDT_FLOCK)
+	    fdtable_flocks++;
+	fdtable[fd] = FDT_FLOCK;
+    } else {
+	fdtable[fd] = FDT_FLOCK_EXEC;
+    }
 }
 
 /* Close the given fd, and clear it from fdtable. */
@@ -1713,6 +1743,8 @@ zclose(int fd)
 	 */
 	DPUTS2(fd > max_zsh_fd && fdtable[fd] != FDT_UNUSED,
 	       "BUG: fd is %d, max_zsh_fd is %d", fd, max_zsh_fd);
+	if (fdtable[fd] == FDT_FLOCK)
+	    fdtable_flocks--;
 	fdtable[fd] = FDT_UNUSED;
 	while (max_zsh_fd > 0 && fdtable[max_zsh_fd] == FDT_UNUSED)
 	    max_zsh_fd--;
@@ -1723,6 +1755,22 @@ zclose(int fd)
 	return close(fd);
     }
     return -1;
+}
+
+/*
+ * Close an fd returning 0 if used for locking; return -1 if it isn't.
+ */
+
+/**/
+mod_export int
+zcloselockfd(int fd)
+{
+    if (fd > max_zsh_fd)
+	return -1;
+    if (fdtable[fd] != FDT_FLOCK && fdtable[fd] != FDT_FLOCK_EXEC)
+	return -1;
+    zclose(fd);
+    return 0;
 }
 
 #ifdef HAVE__MKTEMP

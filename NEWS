@@ -11,6 +11,11 @@ The glob qualifier P can be used to add a separate word before each
 match.  For example, *(P:-f:) produces the command line
 `-f file1 -f file2 ...'.
 
+The module zsh/system has a new "zsystem" builtin whose subcommands
+perform system level tasks.  Currently "zsystem flock" performs
+advisory file locking.  This is a particularly convenient way
+of locking files for the length of a subshell.
+
 Changes between versions 4.3.9 and 4.3.10
 -----------------------------------------
 

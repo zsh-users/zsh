@@ -350,6 +350,15 @@ enum {
  * Entry used by output from the XTRACE option.
  */
 #define FDT_XTRACE		3
+/*
+ * Entry used for file locking.
+ */
+#define FDT_FLOCK		4
+/*
+ * As above, but the fd is not marked for closing on exec,
+ * so the shell can still exec the last process.
+ */
+#define FDT_FLOCK_EXEC		5
 #ifdef PATH_DEV_FD
 /*
  * Entry used by a process substition.
@@ -357,7 +366,7 @@ enum {
  * decremented on exit; we don't close entries greater than
  * FDT_PROC_SUBST except when closing everything.
  */
-#define FDT_PROC_SUBST		4
+#define FDT_PROC_SUBST		6
 #endif
 
 /* Flags for input stack */
