@@ -148,6 +148,16 @@ If the option tt(-r) is given, the lock is only for reading, otherwise
 it is for reading and writing.  The file descriptor is opened
 accordingly.
 )
+item(tt(zsystem supports) var(subcommand))(
+The builtin tt(zsystem)'s subcommand tt(supports) tests whether a
+given subcommand is supported.  It returns status 0 if so, else
+status 1.  It operates silently unless there was a syntax error
+(i.e. the wrong number of arguments), in which case status 255
+is returned.  Status 1 can indicate one of two things:  var(subcommand)
+is known but not supported by the current operating system, or
+var(subcommand) is not known (possibly because this is an older
+version of the shell before it was implemented).
+)
 enditem()
 
 subsect(Parameters)

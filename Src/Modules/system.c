@@ -491,6 +491,35 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 }
 
 
+/*
+ * Return status zero if the zsystem feature is supported, else 1.
+ * Operates silently for future-proofing.
+ */
+/**/
+static int
+bin_zsystem_supports(char *nam, char **args,
+		     UNUSED(Options ops), UNUSED(int func))
+{
+    if (!args[0]) {
+	zwarnnam(nam, "supports: not enough arguments");
+	return 255;
+    }
+    if (args[1]) {
+	zwarnnam(nam, "supports: too many arguments");
+	return 255;
+    }
+
+    /* stupid but logically this should work... */
+    if (!strcmp(*args, "supports"))
+	return 0;
+#ifdef HAVE_FCNTL_H
+    if (!strcmp(*args, "flock"))
+	return 0;
+#endif
+    return 1;
+}
+
+
 /**/
 static int
 bin_zsystem(char *nam, char **args, Options ops, int func)
@@ -498,6 +527,8 @@ bin_zsystem(char *nam, char **args, Options ops, int func)
     /* If more commands are implemented, this can be more sophisticated */
     if (!strcmp(*args, "flock")) {
 	return bin_zsystem_flock(nam, args+1, ops, func);
+    } else if (!strcmp(*args, "supports")) {
+	return bin_zsystem_supports(nam, args+1, ops, func);
     }
     zwarnnam(nam, "unknown subcommand: %s", *args);
     return 1;

@@ -1,3 +1,8 @@
+2010-02-25  Peter Stephenson  <pws@csr.com>
+
+	* 27755: Doc/Zsh/mod_system.yo, Src/Modules/system.c:
+	add "zsystem supports" to test what zsystem supports.
+
 2010-02-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27754: NEWS (unposted), Doc/Zsh/mod_system.yo, Src/exec.c,
@@ -12819,5 +12824,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4914 $
+* $Revision: 1.4915 $
 *****************************************************
