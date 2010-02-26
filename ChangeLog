@@ -1,5 +1,8 @@
 2010-02-26  Peter Stephenson  <pws@csr.com>
 
+	* users/14897: Src/Modules/datetime.c: test needed on
+	conversion of time_t to struct tm.  Found on 64-bit Linux.
+
 	* 27756: Doc/Zsh/calsys.yo, Functions/Calendar/calendar,
 	Functions/Calendar/calendar_add, Functions/Calendar/calendar_edit,
 	Functions/Calendar/calendar_sort, Src/Modules/system.c:
@@ -12835,5 +12838,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4917 $
+* $Revision: 1.4918 $
 *****************************************************

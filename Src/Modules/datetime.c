@@ -121,6 +121,10 @@ bin_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
     }
 
     t = localtime(&secs);
+    if (!t) {
+	zwarnnam(nam, "%s: unable to convert to time", argv[1]);
+	return 1;
+    }
     bufsize = strlen(argv[0]) * 8;
     buffer = zalloc(bufsize);
 
