@@ -113,7 +113,7 @@ bin_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
 
     errno = 0;
     secs = (time_t)strtoul(argv[1], &endptr, 10);
-    if (secs == (time_t)ULONG_MAX && errno != 0) {
+    if (errno != 0) {
 	zwarnnam(nam, "%s: %e", argv[1], errno);
 	return 1;
     } else if (*endptr != '\0') {
