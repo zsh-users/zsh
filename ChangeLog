@@ -1,3 +1,8 @@
+2010-02-26  Peter Stephenson  <pws@csr.com>
+
+	* users/14891: Doc/Zsh/cond.yo: say explicitly that condition
+	arguments don't undergo file generation.
+
 2010-02-25  Peter Stephenson  <pws@csr.com>
 
 	* 27755: Doc/Zsh/mod_system.yo, Src/Modules/system.c:
@@ -12824,5 +12829,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4915 $
+* $Revision: 1.4916 $
 *****************************************************
