@@ -470,7 +470,9 @@ tt(calendar -s) is called to update it.
 
 This function locks out the calendar system during the edit.
 Hence it should be used to edit the calendar file if there is any
-possibility of a calendar event occurring meanwhile.
+possibility of a calendar event occurring meanwhile.  Note this
+can lead to another shell with calendar functions enabled hanging waiting
+for a lock, so it is necessary to quit the editor as soon as possible.
 )
 findex(calendar_parse)
 item(tt(calendar_parse) var(calendar-entry))(

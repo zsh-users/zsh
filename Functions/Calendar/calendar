@@ -253,13 +253,21 @@ if (( verbose )); then
   fi
 fi
 
+# start of subshell for OS file locking
+(
 # start of block for following always to clear up lockfiles.
+# Not needed but harmless if OS file locking is used.
 {
   if [[ -n $donefile ]]; then
     # Attempt to lock both $donefile and $calendar.
     # Don't lock $newfile; we've tried our best to make
     # the name unique.
-    calendar_lockfiles $calendar $donefile || return 1
+    if zmodload -F zsh/system b:zsystem && zsystem supports flock; then
+      zsystem flock $calendar
+      zsystem flock $donefile
+    else
+      calendar_lockfiles $calendar $donefile || exit 1
+    fi
   fi
 
   calendar_read $calendar
@@ -414,4 +422,5 @@ Old calendar left in $calendar.old." >&2
   (( ${#lockfiles} )) && rm -f $lockfiles
 }
 
-return $rstat
+exit $rstat
+)

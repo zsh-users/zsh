@@ -463,6 +463,8 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     if (timeout > 0) {
 	time_t end = time(NULL) + (time_t)timeout;
 	while (fcntl(flock_fd, F_SETLK, &lck) < 0) {
+	    if (errflag)
+		return 1;
 	    if (errno != EINTR && errno != EACCES && errno != EAGAIN) {
 		zwarnnam(nam, "failed to lock file %s: %e", args[0], errno);
 		return 1;
@@ -473,6 +475,8 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	}
     } else {
 	while (fcntl(flock_fd, F_SETLKW, &lck) < 0) {
+	    if (errflag)
+		return 1;
 	    if (errno == EINTR)
 		continue;
 	    zwarnnam(nam, "failed to lock file %s: %e", args[0], errno);

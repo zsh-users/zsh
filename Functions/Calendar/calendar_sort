@@ -11,9 +11,16 @@ integer i
 # Read the calendar file from the calendar-file style
 zstyle -s ':datetime:calendar:' calendar-file calendar || calendar=~/calendar
 
-# Start block for "always" to handle lockfile
+# start of subshell for OS file locking
+(
+# start of block for following always to clear up lockfiles.
+# Not needed but harmless if OS file locking is used.
 {
-  calendar_lockfiles $calendar || return 1
+  if zmodload -F zsh/system b:zsystem && zsystem supports flock; then
+    zsystem flock $calendar
+  else
+    calendar_lockfiles $calendar || exit 1
+  fi
 
   new=$calendar.new.$$
   calendar_read $calendar
@@ -65,3 +72,4 @@ Old calendar left in $calendar.old"
 } always {
   (( ${#lockfiles} )) && rm -rf $lockfiles
 }
+)

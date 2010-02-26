@@ -1,5 +1,11 @@
 2010-02-26  Peter Stephenson  <pws@csr.com>
 
+	* 27756: Doc/Zsh/calsys.yo, Functions/Calendar/calendar,
+	Functions/Calendar/calendar_add, Functions/Calendar/calendar_edit,
+	Functions/Calendar/calendar_sort, Src/Modules/system.c:
+	use new file locking in calendar where available and add
+	errflag test to loop over fcntl().
+
 	* users/14891: Doc/Zsh/cond.yo: say explicitly that condition
 	arguments don't undergo file generation.
 
@@ -12829,5 +12835,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4916 $
+* $Revision: 1.4917 $
 *****************************************************
