@@ -947,6 +947,32 @@
 >/
 >/
 
+  baz=foo/bar
+  zab=oof+rab
+  print ${baz:s/\//+/}
+  print "${baz:s/\//+/}"
+  print ${zab:s/+/\//}
+  print "${zab:s/+/\//}"
+0:Quoting of separator in substitution modifier
+>foo+bar
+>foo+bar
+>oof/rab
+>oof/rab
+
+  print -r ${${:-one/two}:s,/,X&Y,}
+  print -r ${${:-one/two}:s,/,X\&Y,}
+  print -r ${${:-one/two}:s,/,X\\&Y,}
+  print -r "${${:-one/two}:s,/,X&Y,}"
+  print -r "${${:-one/two}:s,/,X\&Y,}"
+  print -r "${${:-one/two}:s,/,X\\&Y,}"
+0:Quoting of ampersand in substitution modifier RHS
+>oneX/Ytwo
+>oneX&Ytwo
+>oneX\/Ytwo
+>oneX/Ytwo
+>oneX&Ytwo
+>oneX\/Ytwo
+
   nully=($'a\0c' $'a\0b\0b' $'a\0b\0a' $'a\0b\0' $'a\0b' $'a\0' $'a')
   for string in ${(o)nully}; do
     for (( i = 1; i <= ${#string}; i++ )); do

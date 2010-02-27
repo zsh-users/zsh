@@ -273,6 +273,8 @@ The forms `tt(gs/)var(l)tt(/)var(r)' and `tt(s/)var(l)tt(/)var(r)tt(/:G)'
 perform global substitution, i.e. substitute every occurrence of var(r)
 for var(l).  Note that the tt(g) or tt(:G) must appear in exactly the
 position shown.
+
+See further notes on this form of substitution below.
 )
 item(tt(&))(
 Repeat the previous tt(s) substitution.  Like tt(s), may be preceded
@@ -293,18 +295,18 @@ parameter expansion.
 )
 enditem()
 
-The tt(s/l/r/) substitution works as follows.  By default the left-hand
-side of substitutions are not patterns, but character strings.  Any
-character can be used as the delimiter in place of `tt(/)'.  A
-backslash quotes the delimiter character.  The character `tt(&)', in
-the right-hand-side var(r), is replaced by the text from the
+The tt(s/)var(l)tt(/)var(r)tt(/) substitution works as follows.  By
+default the left-hand side of substitutions are not patterns, but
+character strings.  Any character can be used as the delimiter in place
+of `tt(/)'.  A backslash quotes the delimiter character.  The character
+`tt(&)', in the right-hand-side var(r), is replaced by the text from the
 left-hand-side var(l).  The `tt(&)' can be quoted with a backslash.  A
-null var(l) uses the previous string either from the previous var(l)
-or from the contextual scan string var(s) from `tt(!?)var(s)'.  You can
+null var(l) uses the previous string either from the previous var(l) or
+from the contextual scan string var(s) from `tt(!?)var(s)'.  You can
 omit the rightmost delimiter if a newline immediately follows var(r);
-the rightmost `tt(?)' in a context scan can similarly be omitted.
-Note the same record of the last var(l) and var(r) is maintained
-across all forms of expansion.
+the rightmost `tt(?)' in a context scan can similarly be omitted.  Note
+the same record of the last var(l) and var(r) is maintained across all
+forms of expansion.
 
 If the option tt(HIST_SUBST_PATTERN) is set, var(l) is treated as
 a pattern of the usual form described in

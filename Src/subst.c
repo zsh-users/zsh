@@ -3282,6 +3282,13 @@ modify(char **str, char **ptr)
 		ptr1 += charlen;
 		for (ptr2 = ptr1, charlen = 0; *ptr2; ptr2 += charlen) {
 		    convchar_t del2;
+		    if ((*ptr2 == Bnull || *ptr2 == '\\') && ptr2[1]) {
+			/* in double quotes, the backslash isn't tokenized */
+			if (*ptr2 == '\\')
+			    *ptr2 = Bnull;
+			charlen = 2;
+			continue;
+		    }
 		    charlen = MB_METACHARLENCONV(ptr2, &del2);
 #ifdef MULTIBYTE_SUPPORT
 		    if (del2 == WEOF)
@@ -3301,6 +3308,13 @@ modify(char **str, char **ptr)
 		*ptr1end = '\0';
 		for (ptr3 = ptr2, charlen = 0; *ptr3; ptr3 += charlen) {
 		    convchar_t del3;
+		    if ((*ptr3 == Bnull || *ptr3 == '\\') && ptr3[1]) {
+			/* in double quotes, the backslash isn't tokenized */
+			if (*ptr3 == '\\')
+			    *ptr3 = Bnull;
+			charlen = 2;
+			continue;
+		    }
 		    charlen = MB_METACHARLENCONV(ptr3, &del3);
 #ifdef MULTIBYTE_SUPPORT
 		    if (del3 == WEOF)
@@ -3326,9 +3340,20 @@ modify(char **str, char **ptr)
 			chuck(tt--);
 		if (!isset(HISTSUBSTPATTERN))
 		    untokenize(hsubl);
-		for (tt = hsubr = ztrdup(ptr2); *tt; tt++)
-		    if (inull(*tt) && *tt != Bnullkeep)
-			chuck(tt--);
+		for (tt = hsubr = ztrdup(ptr2); *tt; tt++) {
+		    if (inull(*tt) && *tt != Bnullkeep) {
+			if (*tt == Bnull && (tt[1] == '&' || tt[1] == '\\')) {
+			    /*
+			     * The substitution will treat \& and \\
+			     * specially.  We need to leave real \'s
+			     * as the first character for this to work.
+			     */
+			    *tt = '\\';
+			} else {
+			    chuck(tt--);
+			}
+		    }
+		}
 		*ptr1end = sav1;
 		*ptr3 = sav;
 		*ptr = ptr3 - 1;

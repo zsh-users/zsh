@@ -1,3 +1,9 @@
+2010-02-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/14905 (modified, see users/14096): Doc/Zsh/expn.yo,
+	Src/subst.c, Test/D04parameter.ztst: fix various problems
+	with :s modifier in parameters.
+
 2010-02-26  Peter Stephenson  <pws@csr.com>
 
 	* users/14902: Src/Modules/datetime.c: another go.
@@ -12843,5 +12849,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4920 $
+* $Revision: 1.4921 $
 *****************************************************
