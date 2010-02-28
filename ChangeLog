@@ -1,3 +1,8 @@
+2010-02-28  Clint Adams  <clint@zsh.org>
+
+	* 27762: Completion/Unix/Type/_hosts: omit ssh known_hosts
+	entries with port numbers from host completion.
+
 2010-02-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/14905 (modified, see users/14096): Doc/Zsh/expn.yo,
@@ -12849,5 +12854,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4921 $
+* $Revision: 1.4922 $
 *****************************************************

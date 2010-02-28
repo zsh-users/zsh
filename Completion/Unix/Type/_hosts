@@ -41,9 +41,9 @@ if ! zstyle -a ":completion:${curcontext}:hosts" hosts _hosts; then
 
     for khostfile in $khostfiles; do
       if [[ -r $khostfile ]]; then
-        khosts=(${(s:,:)${(j:,:)${(u)${(f)"$(<$khostfile)"}%%[ |#]*}}})
+        khosts=(${${(s:,:)${(j:,:)${(u)${(f)"$(<$khostfile)"}%%[ |#]*}}}:#*[\[\]]*})
         if [[ -z $useip ]]; then
-	  khosts=(${${khosts:#(#s)[0-9]##.[0-9]##.[0-9]##.[0-9]##(#e)}:#(#s)[0-9a-f:]##(#e)})
+	  khosts=(${${${khosts:#(#s)[0-9]##.[0-9]##.[0-9]##.[0-9]##(#e)}:#(#s)[0-9a-f:]##(#e)}:#*[\[\]]*})
         fi
         _cache_hosts+=($khosts)
       fi
