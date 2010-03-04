@@ -1,5 +1,25 @@
 #compdef git git-cvsserver git-receive-pack git-upload-archive git-upload-pack git-shell
 
+# Some parts of this completion's behaviour are configurable:
+#
+# Say, you got your own git sub-commands (git will run a program `git-foo'
+# when you run "git foo") and you want "git f<tab>" to complete that sub
+# commands name for you. You can make that sub-command know to the completion
+# via the user-command style:
+#
+#     % zstyle ':completion:*:*:git:*' user-commands foo:'description for foo'
+#
+# `user-commands' is a list style, so you can add any number of programs there.
+# The :description part is optional, so you could add all git-* programs from
+# your $path like this:
+#
+#     % zstyle ':completion:*:*:git:*' user-commands ${${(M)${(k)commands}:#git-*}/git-/}
+#
+# You could even create a function _git-foo() to handle specific completion
+# for that command.
+
+# TODO: There is still undocumented configurability in here.
+
 # TODO: All if (( words[(I)-option] )) should be turned into
 # if (( words[(I)-option] > 0 && words[(I)-option] < CURRENT )), as the user
 # may go back and want to add an option before -option and in that case should
@@ -304,7 +324,9 @@ _git_commands () {
     'upload-pack:command invoked by clone-pack and fetch-pack')
 
   local wanted_commands
-  zstyle -s ':completion:${curcontext}:' commands wanted_commands || wanted_commands="all -internal"
+  zstyle -s ":completion:${curcontext}:" commands wanted_commands || wanted_commands="all -internal"
+  local -a user_commands
+  zstyle -a ":completion:${curcontext}:" user-commands user_commands || user_commands=()
 
   local -aU unique_wanted_commands
   unique_wanted_commands=($=wanted_commands)
@@ -339,6 +361,7 @@ _git_commands () {
         commands+=($internal_commands) ;;
     esac
   done
+  commands+=( $user_commands )
 
   _describe -t commands 'git command' commands && ret=0
 }
