@@ -30,6 +30,72 @@
 #include "zsh.mdh"
 #include "linklist.pro"
 
+/*
+ * Anatomy of a LinkList
+ *
+ * LinkList with 4 nodes:
+ *
+ * LinkList is a        first   last   flags   (LinkList)
+ * union; see zsh.h     next    prev   dat     (LinkNode)
+ *                    +-------+------+------+
+ *                    |       |      |      | See comment in subst.c
+ *     +------------> |   |   |   |  |      | about LF_ARRAY.
+ *     |              +---|---+---|--+------+
+ *     |                  |       |
+ *     |     +------------+       +--------------+
+ *     |     |                                   |
+ *     |    \|/                                 \|/
+ *     |   +----+      +----+      +----+      +----+
+ *     |   |    |      |    |      |    |      | \/ |  X here is NULL.
+ *     |   |  -------> |  -------> |  -------> | /\ |
+ *     |   |next|      |next|      |next|      |next|
+ *     |   +----+      +----+      +----+      +----+
+ *     |   |    |      |    |      |    |      |    |
+ *     +------  | <-------  | <-------  | <-------  |
+ *         |prev|      |prev|      |prev|      |prev|
+ *         +----+      +----+      +----+      +----+
+ *         |    |      |    |      |    |      |    | Pointers to data,
+ *         |dat |      |dat |      |dat |      |dat | usually char **.
+ *         +----+      +----+      +----+      +----+
+ *        LinkNode    LinkNode    LinkNode    LinkNode
+ *
+ *
+ * Empty LinkList:
+ *                    first   last   flags
+ *                   +------+------+-------+
+ *             +---> | NULL |      |   0   |
+ *             |     |      |   |  |       |
+ *             |     +------+---|--+-------+
+ *             |                |
+ *             +----------------+
+ *
+ * Traversing a LinkList:
+ * Traversing forward through a list uses an iterator-style paradigm.
+ * for (LinkNode node = firstnode(list); node; incnode(node)) {
+ *     // Access/manipulate the node using macros (see zsh.h)
+ * }
+ *
+ * Traversing backwards is the same, with a small caveat.
+ * for (LinkNode node = lastnode(list); node != &list->node; decnode(node)) {
+ *     // The loop condition should be obvious given the above diagrams.
+ * }
+ *
+ * If you're going to be moving back and forth, best to AND both
+ * conditions.
+ *
+ * while (node && node != &list->node) {
+ *     // If both incnode(list) and decnode(list) are used, and it's
+ *     // unknown at which end of the list traversal will stop.
+ * }
+ *
+ * Macros and functions prefixed with 'z' (ie znewlinklist,
+ * zinsertlinknode) use permanent allocation, which you have to free
+ * manually (with freelinklist(), maybe?). Non-z-prefixed
+ * macros/functions allocate from heap, which will be automatically
+ * freed.
+ *
+ */
+
 /* Get an empty linked list header */
 
 /**/
@@ -240,6 +306,8 @@ countlinknodes(LinkList list)
     return ct;
 }
 
+/* Make specified node first, moving preceding nodes to end */
+
 /**/
 mod_export void
 rolllist(LinkList l, LinkNode nd)
@@ -251,6 +319,8 @@ rolllist(LinkList l, LinkNode nd)
     nd->prev = &l->node;
     l->list.last->next = 0;
 }
+
+/* Create linklist of specified size. node->dats are not initialized. */
 
 /**/
 mod_export LinkList
