@@ -1,3 +1,8 @@
+2010-03-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Michael Hwang: 27773: Src/linklist.c: document how linked
+	lists are joined together.
+
 2010-03-04  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 27770: Completion/Unix/Command/_git: support for user specific
@@ -12864,5 +12869,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4924 $
+* $Revision: 1.4925 $
 *****************************************************
