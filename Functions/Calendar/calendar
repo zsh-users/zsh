@@ -328,6 +328,10 @@ fi
       (( tsched = t - mywarntime ))
       if (( tsched >= start && tsched <= stop)); then
 	$showprog $start $stop "due in ${mywarnstr}: $showline"
+      elif (( tsched < start )); then
+	# We haven't actually shown it, but it's in the past,
+	# so treat it the same.  Should probably rename this variable.
+	(( shown = 1 ))
       fi
     fi
     if [[ -n $sched ]]; then

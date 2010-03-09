@@ -1,8 +1,13 @@
-local editor=${VISUAL:-${EDITOR:-vi}}
 local line calendar
-local -a lockfiles
+local -a lockfiles editor
 
 integer cal_running
+
+if (( $# )); then
+  editor=("$@")
+else
+  editor=(${VISUAL:-${EDITOR:-vi}})
+fi
 
 sched | while read line; do
   [[ $line = *" calendar -s "<->" "<-> ]] && (( cal_running = 1 ))

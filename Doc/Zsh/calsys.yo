@@ -463,8 +463,11 @@ The second line will not be shown by the tt(calendar) function.
 )
 findex(calendar_edit)
 item(tt(calendar_edit))(
-This calls the user's editor to edit the calendar file.  The editor
-is given by the variable tt(VISUAL), if set, else the variable tt(EDITOR).
+This calls the user's editor to edit the calendar file.  If
+there are arguments, they are taken as the editor to use (the file name
+is appended to the commands); otherwise, the editor is given by the
+variable tt(VISUAL), if set, else the variable tt(EDITOR).
+
 If the calendar scheduler was running, then after editing the file
 tt(calendar -s) is called to update it.
 

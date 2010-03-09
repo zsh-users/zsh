@@ -1,3 +1,11 @@
+2010-03-09  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Doc/Zsh/calsys.yo, Functions/Calendar/calendar,
+	Functions/Calendar/calendar_editfiles:  Fix bug that
+	calendar wouldn't update repeating event times for events
+	that were already in the past; allow calendar_editfiles to
+	take argument to specify editor.
+
 2010-03-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Michael Hwang: 27773: Src/linklist.c: document how linked
@@ -12869,5 +12877,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4925 $
+* $Revision: 1.4926 $
 *****************************************************
