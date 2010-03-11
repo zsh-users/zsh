@@ -127,6 +127,10 @@ struct mathfunc {
 
 #define DEFAULT_IFS	" \t\n\203 "
 
+/* As specified in the standard (POSIX 2008) */
+
+#define DEFAULT_IFS_SH	" \t\n"
+
 /*
  * Character tokens.
  * These should match the characters in ztokens, defined in lex.c

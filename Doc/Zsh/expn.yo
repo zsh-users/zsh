@@ -308,6 +308,9 @@ the rightmost `tt(?)' in a context scan can similarly be omitted.  Note
 the same record of the last var(l) and var(r) is maintained across all
 forms of expansion.
 
+Note that if a `tt(&)' is used within glob qualifers an extra backslash
+is needed as a tt(&) is a special character in this case.
+
 If the option tt(HIST_SUBST_PATTERN) is set, var(l) is treated as
 a pattern of the usual form described in
 ifzman(the section FILENAME GENERATION below)\

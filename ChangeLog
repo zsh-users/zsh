@@ -1,3 +1,11 @@
+2010-03-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Doc/Zsh/expn.yo: note that & needs quoting in :s in
+	glob qualifier.
+
+	* 27785: Src/init.c, Src/utils.c, Src/zsh.h: default IFS in sh
+	and ksh mode doesn't have '\0'.
+
 2010-03-11  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Simon Ruderich: 27779: Functions/VCS_Info/vcs_info_printsys,
@@ -12882,5 +12890,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4927 $
+* $Revision: 1.4928 $
 *****************************************************

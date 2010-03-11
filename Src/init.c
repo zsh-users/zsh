@@ -815,7 +815,8 @@ setupvals(void)
 	? ztrdup("+ ") : ztrdup("+%N:%i> ");
     sprompt = ztrdup("zsh: correct '%R' to '%r' [nyae]? ");
 
-    ifs         = ztrdup(DEFAULT_IFS);
+    ifs         = EMULATION(EMULATE_KSH|EMULATE_SH) ?
+	ztrdup(DEFAULT_IFS_SH) : ztrdup(DEFAULT_IFS);
     wordchars   = ztrdup(DEFAULT_WORDCHARS);
     postedit    = ztrdup("");
     zunderscore  = (char *) zalloc(underscorelen = 32);
