@@ -389,7 +389,7 @@ svn
 tla
 ## flavours (cannot be used in the enable or disable styles; they
 ## are enabled and disabled with their master [git-svn -> git])
-## they *can* be used contexts: ':vcs_info:git-svn:*'.
+## they *can* be used in contexts: ':vcs_info:git-svn:*'.
 git-p4
 git-svn)
 
@@ -476,7 +476,7 @@ kindex(branchformat)
 item(tt(branchformat))(
 Some backends replace var(%b) in the formats and
 actionformats styles above, not only by a branch name but also by a
-revision number. This style let's you modify how that string should look
+revision number. This style lets you modify how that string should look
 like.
 )
 kindex(nvcsformats)
@@ -491,7 +491,7 @@ kindex(stgitformat)
 item(tt(stgitformat))(
 The tt(git) backend replaces var(%m) in the formats and
 actionformats styles with tt(stgit)-specific information for
-tt(stgit)-initialized branches. This style let's you modify how that string
+tt(stgit)-initialized branches. This style lets you modify how that string
 should look like.
 )
 kindex(hgrevformat)
@@ -503,7 +503,7 @@ useful when var(get-revision) is true.
 )
 kindex(max-exports)
 item(tt(max-exports))(
-Defines the maximum number if
+Defines the maximum number of
 var(vcs_info_msg_*_) variables var(vcs_info) will export.
 )
 kindex(enable)
@@ -676,7 +676,7 @@ sitem(tt(%R))(base directory of the repository.)
 sitem(tt(%r))(repository name. If tt(%R) is var(/foo/bar/repoXY), tt(%r) is
 var(repoXY).)
 sitem(tt(%S))(subdirectory within a repository. If tt($PWD) is
-var(/foo/bar/reposXY/beer/tasty), tt(%S) is var(beer/tasty).)
+var(/foo/bar/repoXY/beer/tasty), tt(%S) is var(beer/tasty).)
 sitem(tt(%m))(A "misc" replacement. It is at the discretion of the backend
 to decide what this replacement expands to. It is currently used by
 the tt(hg) and tt(git) backends. The tt(hg) backend replaces tt(%m) with the

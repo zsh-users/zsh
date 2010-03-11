@@ -37,7 +37,7 @@ done
 
 print -l '## flavours (cannot be used in the enable or disable styles; they' \
          '## are enabled and disabled with their master [git-svn -> git])'   \
-         '## they *can* be used contexts: '\'':vcs_info:git-svn:*'\''.'
+         '## they *can* be used in contexts: '\'':vcs_info:git-svn:*'\''.'
 
 for sys in ${VCS_INFO_backends} ; do
     VCS_INFO_detect_${sys} --flavours

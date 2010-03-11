@@ -1,3 +1,8 @@
+2010-03-11  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Simon Ruderich: 27779: Functions/VCS_Info/vcs_info_printsys,
+	Doc/Zsh/contrib.yo:  Fix mistakes in vcs_info's documentation.
+
 2010-03-09  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/calsys.yo, Functions/Calendar/calendar,
@@ -12877,5 +12882,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4926 $
+* $Revision: 1.4927 $
 *****************************************************
