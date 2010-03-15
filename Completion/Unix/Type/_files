@@ -90,7 +90,7 @@ fi
 
 tried=()
 for def in "$pats[@]"; do
-  eval "def=( ${${def:gs/\\:/\\\\\\\\\\\\:}//(#b)([][()|*?^#~<>])/\\${match[1]}} )"
+  eval "def=( ${${def:gs/\\:/\\\\\\:}//(#b)([][()|*?^#~<>])/\\${match[1]}} )"
 
   tmp="${(@M)def#*[^\\]:}"
   (( $tried[(I)${(q)tmp}] )) && continue

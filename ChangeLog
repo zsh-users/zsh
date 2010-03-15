@@ -1,3 +1,9 @@
+2010-03-15  Peter Stephenson  <pws@csr.com>
+
+	* 27780: Completion/Unix/Type/_files, Test/D04parameter.ztst:
+	users/14905 changed the number of backslashes needed to
+	quote backslashes in :s modifier.
+
 2010-03-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Doc/Zsh/expn.yo: note that & needs quoting in :s in
@@ -12890,5 +12896,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4928 $
+* $Revision: 1.4929 $
 *****************************************************

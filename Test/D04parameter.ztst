@@ -959,6 +959,25 @@
 >oof/rab
 >oof/rab
 
+  bsbs='X\\\\Y'
+  print -r -- ${bsbs:s/\\/\\/}
+  print -r -- "${bsbs:s/\\/\\/}"
+  print -r -- ${bsbs:s/\\\\/\\\\/}
+  print -r -- "${bsbs:s/\\\\/\\\\/}"
+  print -r -- ${bsbs:gs/\\/\\/}
+  print -r -- "${bsbs:gs/\\/\\/}"
+  print -r -- ${bsbs:gs/\\\\/\\\\/}
+  print -r -- "${bsbs:gs/\\\\/\\\\/}"
+0:Handling of backslashed backslashes in substitution modifier
+>X\\\\Y
+>X\\\\Y
+>X\\\\Y
+>X\\\\Y
+>X\\\\Y
+>X\\\\Y
+>X\\\\Y
+>X\\\\Y
+
   print -r ${${:-one/two}:s,/,X&Y,}
   print -r ${${:-one/two}:s,/,X\&Y,}
   print -r ${${:-one/two}:s,/,X\\&Y,}
