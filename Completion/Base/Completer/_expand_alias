@@ -58,7 +58,7 @@ if [[ -n $tmp ]]; then
       tmp="\\$tmp"
     fi
   fi
-  $pre _wanted aliases expl alias compadd -UQ ${tmp%%[[:blank:]]##}
+  $pre _wanted aliases expl alias compadd -UQ -- ${tmp%%[[:blank:]]##}
 elif (( $#pre )) && zstyle -t ":completion:${curcontext}:" complete; then
   $pre _aliases -s "$sel" -S ''
 else

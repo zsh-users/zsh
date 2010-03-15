@@ -1,5 +1,8 @@
 2010-03-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Mikael: 27797: Completion/Base/Completer/_expand_alias:
+	delimit arguments to avoid problems with hyphens.
+
 	* Alexey: 27789: Completion/Unix/Command/_sudo: use _arguments.
 
 2010-03-15  Peter Stephenson  <pws@csr.com>
@@ -12900,5 +12903,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4930 $
+* $Revision: 1.4931 $
 *****************************************************
