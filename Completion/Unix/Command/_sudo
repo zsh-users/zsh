@@ -25,21 +25,18 @@ args=(
        '-S[read password from stdin]'
 )
 
-if [[ $service = sudoedit || -n $words[(R)-e] ]]; then
-  args+=(
+if [[ $service = sudoedit ]]; then
+  _arguments $args \
     '*:file: _files'
-  )
 else
-  args+=(
-    '-b[run command in background]'
-    '-E[preserve environment]'
-    '-H[set HOME environment variable]'
-    '-P[preserve group vector]'
-    '(-i)-s[run SHELL]'
-    '(-s)-i[simulate login]'
-    '(-):command name: _command_names -e'
+  _arguments $args \
+    '(- :)-e[edit file]:*:file:_files' \
+    '(- :)-s[run SHELL]' \
+    '(- :)-i[simulate login]' \
+    '(-i -s -e)-b[run command in background]' \
+    '(-i -s -e)-E[preserve environment]' \
+    '(-i -s -e)-H[set HOME environment variable]' \
+    '(-i -s -e)-P[preserve group vector]' \
+    '(-):command: _command_names -e' \
     '*::arguments: _normal'
-  )
 fi
-
-_arguments $args

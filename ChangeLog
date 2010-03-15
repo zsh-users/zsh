@@ -1,3 +1,7 @@
+2010-03-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Alexey: 27789: Completion/Unix/Command/_sudo: use _arguments.
+
 2010-03-15  Peter Stephenson  <pws@csr.com>
 
 	* 27780: Completion/Unix/Type/_files, Test/D04parameter.ztst:
@@ -12896,5 +12900,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4929 $
+* $Revision: 1.4930 $
 *****************************************************
