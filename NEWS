@@ -7,6 +7,11 @@ Note also the list of incompatibilities in the README file.
 Changes between versions 4.3.10 and 4.3.11
 ------------------------------------------
 
+When the shell is invoked with the base name of a script, for example as
+`zsh scriptname', previous versions of zsh have used the name directly,
+whereas other shells use the value of $PATH to find the script.  The
+option PATH_SCRIPT has been added to provide the alternative behaviour.
+
 The glob qualifier P can be used to add a separate word before each
 match.  For example, *(P:-f:) produces the command line
 `-f file1 -f file2 ...'.
@@ -14,7 +19,8 @@ match.  For example, *(P:-f:) produces the command line
 The module zsh/system has a new "zsystem" builtin whose subcommands
 perform system level tasks.  Currently "zsystem flock" performs
 advisory file locking.  This is a particularly convenient way
-of locking files for the length of a subshell.
+of locking files for the length of a subshell.  "zsystem supports flock"
+provides a test for this feature.
 
 Changes between versions 4.3.9 and 4.3.10
 -----------------------------------------

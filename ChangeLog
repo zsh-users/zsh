@@ -1,3 +1,7 @@
+2010-03-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: NEWS: PATH_SCRIPT
+
 2010-03-16  Peter Stephenson  <pws@csr.com>
 
 	* 27793 plus 27794, 27795: Doc/Zsh/invoke.yo, Doc/Zsh/options.yo,
@@ -12909,5 +12913,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4932 $
+* $Revision: 1.4933 $
 *****************************************************
