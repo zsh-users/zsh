@@ -539,14 +539,8 @@ findex(age)
 
 The function tt(age) can be autoloaded and use separately from
 the calendar system, although it uses the function tt(calendar_scandate)
-for date formatting.  It requires the tt(zsh/stat) builtin, which
-makes available the builtin tt(stat).  This may conflict with an
-external programme of the same name; if it does, the builtin may be
-disabled for normal operation by including the following code in
-an initialization file:
-
-example(zmodload -i zsh/stat
-disable stat)
+for date formatting.  It requires the tt(zsh/stat) builtin, but uses
+only the builtin tt(zstat).
 
 tt(age) selects files having a given modification time for use
 as a glob qualifier.  The format of the date is the same as that

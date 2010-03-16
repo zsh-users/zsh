@@ -1,5 +1,7 @@
 2010-03-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Doc/Zsh/calsys.yo: age now uses zstat.
+
 	* unposted: NEWS: PATH_SCRIPT
 
 2010-03-16  Peter Stephenson  <pws@csr.com>
@@ -12913,5 +12915,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4933 $
+* $Revision: 1.4934 $
 *****************************************************
