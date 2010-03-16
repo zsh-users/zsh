@@ -1,7 +1,7 @@
 texinode(Invocation)(Files)(Roadmap)(Top)
 chapter(Invocation)
 cindex(invocation)
-sect(Invocation Options)
+sect(Invocation)
 cindex(shell options)
 cindex(options, shell)
 cindex(shell flags)
@@ -17,7 +17,8 @@ first one is assigned to tt($0), rather than being used as a positional
 parameter.
 )
 item(tt(-i))(
-Force shell to be interactive.
+Force shell to be interactive.  It is still possible to specify a
+script to execute.
 )
 item(tt(-s))(
 Force shell to read commands from the standard input.
@@ -26,6 +27,15 @@ the first argument is taken to be the pathname of a script to
 execute.
 )
 enditem()
+
+If there are any remaining arguments after option processing, and neither
+of the options tt(-c) or tt(-s) was supplied, the first argument is taken
+as the file name of a script containing shell commands to be executed.  If
+the option tt(PATH_SCRIPT) is set, and the file name does not contain a
+directory path (i.e. there is no `tt(/)' in the name), first the current
+directory and then the command path given by the variable tt(PATH) are
+searched for the script.  If the option is not set or the file name
+contains a `tt(/)' it is used directly.
 
 After the first one or two arguments have been appropriated as described above,
 the remaining arguments are assigned to the positional parameters.

@@ -559,3 +559,21 @@
   . ./dot_status
 0:"." file sees status from previous command
 >1
+
+  mkdir test_path_script
+  print "#!/bin/sh\necho Found the script." >test_path_script/myscript
+  chmod u+x test_path_script/myscript
+  path=($PWD/test_path_script $path)
+  export PATH
+  $ZTST_testdir/../Src/zsh -f -o pathscript myscript
+0:PATHSCRIPT option
+>Found the script.
+
+  $ZTST_testdir/../Src/zsh -f myscript
+127q:PATHSCRIPT option not used.
+?$ZTST_testdir/../Src/zsh: can't open input file: myscript
+
+  $ZTST_testdir/../Src/zsh -c 'echo $0; echo $1' myargzero myargone
+0:$0 is traditionally if bizarrely set to the first argument with -c
+>myargzero
+>myargone

@@ -1138,6 +1138,20 @@ executables specified in this form.  This takes place before any search
 indicated by this option, and regardless of whether `tt(.)' or the current
 directory appear in the command search path.
 )
+pindex(PATH_SCRIPT)
+pindex(NO_PATH_SCRIPT)
+pindex(PATHSCRIPT)
+pindex(NOPATHSCRIPT)
+cindex(path search, for script argument to shell)
+item(tt(PATH_SCRIPT) <K> <S>)(
+If this option is not set, a script passed as the first non-option argument
+to the shell must contain the name of the file to open.  If this
+option is set, and the script does not specify a directory path,
+the script is looked for first in the current directory, then in the
+command path.  See
+ifnzman(noderef(Invocation))\
+ifzman(the section INVOCATION in zmanref(zshmisc)).
+)
 pindex(PRINT_EIGHT_BIT)
 pindex(NO_PRINT_EIGHT_BIT)
 pindex(PRINTEIGHTBIT)

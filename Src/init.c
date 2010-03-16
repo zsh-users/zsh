@@ -219,8 +219,8 @@ static char *cmd;
 static int restricted;
 
 /**/
-void
-parseargs(char **argv)
+static void
+parseargs(char **argv, char **runscript)
 {
     int optionbreak = 0;
     char **x;
@@ -335,15 +335,11 @@ parseargs(char **argv)
     }
     if (*argv) {
 	if (unset(SHINSTDIN)) {
-	    if (!cmd)
-		SHIN = movefd(open(unmeta(*argv), O_RDONLY | O_NOCTTY));
-	    if (SHIN == -1) {
-		zerr("can't open input file: %s", *argv);
-		exit(127);
-	    }
+	    if (cmd)
+		argzero = *argv;
+	    else
+		*runscript = *argv;
 	    opts[INTERACTIVE] &= 1;
-	    argzero = *argv;
-	    scriptfilename = argzero;
 	    argv++;
 	}
 	while (*argv)
@@ -737,7 +733,6 @@ setupvals(void)
     zero_mnumber.type = MN_INTEGER;
     zero_mnumber.u.l = 0;
 
-    lineno = 1;
     noeval = 0;
     curhist = 0;
     histsiz = DEFAULT_HISTSIZE;
@@ -915,14 +910,6 @@ setupvals(void)
     hsubl = hsubr = NULL;
     lastpid = 0;
     lastpid_status = -1L;
-    bshin = SHIN ? fdopen(SHIN, "r") : stdin;
-    if (isset(SHINSTDIN) && !SHIN && unset(INTERACTIVE)) {
-#ifdef _IONBF
-	setvbuf(stdin, NULL, _IONBF, 0);
-#else
-	setlinebuf(stdin);
-#endif
-    }
 
     get_usage();
 
@@ -933,6 +920,78 @@ setupvals(void)
 
     /* Colour sequences for outputting colours in prompts and zle */
     set_default_colour_sequences();
+}
+
+/*
+ * Setup shell input, opening any script file (runscript, may be NULL).
+ * This is deferred until we have a path to search, in case
+ * PATHSCRIPT is set for sh-compatible behaviour.
+ */
+static void
+setupshin(char *runscript)
+{
+    if (runscript) {
+	char *funmeta, *sfname = NULL;
+	struct stat st;
+
+	funmeta = unmeta(runscript);
+	/*
+	 * Always search the current directory first.
+	 */
+	if (access(funmeta, F_OK) == 0 &&
+	    stat(funmeta, &st) >= 0 &&
+	    !S_ISDIR(st.st_mode))
+	    sfname = runscript;
+	else if (isset(PATHSCRIPT) && !strchr(runscript, '/')) {
+	    /*
+	     * With the PATHSCRIPT option, search the path if no
+	     * path was given in the script name.
+	     */
+	    char **pp, ppmaxlen = 0, *buf;
+	    for (pp = path; *pp; pp++)
+	    {
+		int len = strlen(*pp);
+		if (len > ppmaxlen)
+		    ppmaxlen = len;
+	    }
+	    buf = zhalloc(ppmaxlen + strlen(runscript) + 2);
+	    for (pp = path; *pp; pp++) {
+		sprintf(buf, "%s/%s", *pp, runscript);
+		/* careful, static buffer used in open() later */
+		funmeta = unmeta(buf);
+		if (access(funmeta, F_OK) == 0 &&
+		    stat(funmeta, &st) >= 0 &&
+		    !S_ISDIR(st.st_mode)) {
+		    sfname = buf;
+		    break;
+		}
+	    }
+	}
+	if (!sfname ||
+	    (SHIN = movefd(open(funmeta, O_RDONLY | O_NOCTTY)))
+	    == -1) {
+	    zerr("can't open input file: %s", runscript);
+	    exit(127);
+	}
+	scriptfilename = sfname;
+	argzero = runscript;
+    }
+    /*
+     * We only initialise line numbering once there is a script to
+     * read commands from.
+     */
+    lineno = 1;
+    /*
+     * Finish setting up SHIN and its relatives.
+     */
+    bshin = SHIN ? fdopen(SHIN, "r") : stdin;
+    if (isset(SHINSTDIN) && !SHIN && unset(INTERACTIVE)) {
+#ifdef _IONBF
+	setvbuf(stdin, NULL, _IONBF, 0);
+#else
+	setlinebuf(stdin);
+#endif
+    }
 }
 
 /* Initialize signal handling */
@@ -1389,7 +1448,7 @@ mod_export int use_exit_printed;
 mod_export int
 zsh_main(UNUSED(int argc), char **argv)
 {
-    char **t;
+    char **t, *runscript = NULL;
     int t0;
 #ifdef USE_LOCALE
     setlocale(LC_ALL, "");
@@ -1437,15 +1496,18 @@ zsh_main(UNUSED(int argc), char **argv)
     opts[LOGINSHELL] = (**argv == '-');
     opts[PRIVILEGED] = (getuid() != geteuid() || getgid() != getegid());
     opts[USEZLE] = 1;   /* may be unset in init_io() */
-    parseargs(argv);   /* sets INTERACTIVE, SHINSTDIN and SINGLECOMMAND */
+    /* sets INTERACTIVE, SHINSTDIN and SINGLECOMMAND */
+    parseargs(argv, &runscript);
 
     SHTTY = -1;
     init_io();
     setupvals();
+
     init_signals();
     init_bltinmods();
     init_builtins();
     run_init_scripts();
+    setupshin(runscript);
     init_misc();
 
     for (;;) {

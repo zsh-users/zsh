@@ -1,3 +1,9 @@
+2010-03-16  Peter Stephenson  <pws@csr.com>
+
+	* 27793 plus 27794, 27795: Doc/Zsh/invoke.yo, Doc/Zsh/options.yo,
+	Src/init.c, Src/options.c, Src/zsh.h, Test/A01grammar.ztst:
+	add PATH_SCRIPT option to find script using path.
+
 2010-03-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Mikael: 27797: Completion/Base/Completer/_expand_alias:
@@ -12903,5 +12909,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4931 $
+* $Revision: 1.4932 $
 *****************************************************
