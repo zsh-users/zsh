@@ -42,6 +42,8 @@ if [[ -n $warnstr ]]; then
   fi
 fi
 
+local myschedcmds="${TMPPREFIX:-/tmp/zsh}.sched.$$"
+
 [[ -f $calendar ]] || return 1
 
 # We're not using getopts because we want +... to refer to a
@@ -394,8 +396,10 @@ fi
     if [[ $next -ge 0 ]]; then
       # Remove any existing calendar scheduling.
       i=${"${(@)zsh_scheduled_events#*:*:}"[(I)calendar -s*]}
-      (( i )) && sched -$i
-      $sched $next calendar "${calopts[@]}" $next $next
+      {
+        (( i )) && print sched -$i
+        print $sched $next calendar "${calopts[@]}" $next $next
+      } >$myschedcmds
     else
       $showprog $start $stop \
 "No more calendar events: calendar not rescheduled.
@@ -427,4 +431,10 @@ Old calendar left in $calendar.old." >&2
 }
 
 exit $rstat
-)
+) && {
+  # Tasks that need to be in the current shell
+  if [[ -f $myschedcmds ]]; then
+    . $myschedcmds
+    rm -f $myschedcmds
+  fi
+}

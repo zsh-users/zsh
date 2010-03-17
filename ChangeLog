@@ -1,3 +1,8 @@
+2010-03-17  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Functions/Calendar/calendar: fix embarrassing bug in
+	calendar scheduling introduced by new file locking, 27756.
+
 2010-03-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Doc/Zsh/calsys.yo: age now uses zstat.
@@ -12915,5 +12920,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4934 $
+* $Revision: 1.4935 $
 *****************************************************
