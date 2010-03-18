@@ -1454,6 +1454,8 @@ doisearch(char **args, int dir, int pattern)
 	    memset(&mbs, 0, sizeof(mbs));
 	    while (charpos < end_pos) {
 		ret = mb_metacharlenconv_r(zlemetaline + charpos, &wc, &mbs);
+		if (ret <= 0) /* Unrecognised, treat as single char */
+		    ret = 1;
 		if (charpos <= pos && pos < charpos + ret)
 		    isearch_startpos = charcount;
 		charcount++;
