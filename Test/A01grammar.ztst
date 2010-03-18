@@ -573,7 +573,7 @@
 127q:PATHSCRIPT option not used.
 ?$ZTST_testdir/../Src/zsh: can't open input file: myscript
 
-  $ZTST_testdir/../Src/zsh -c 'echo $0; echo $1' myargzero myargone
+  $ZTST_testdir/../Src/zsh -fc 'echo $0; echo $1' myargzero myargone
 0:$0 is traditionally if bizarrely set to the first argument with -c
 >myargzero
 >myargone

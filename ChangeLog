@@ -1,5 +1,8 @@
 2010-03-18  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Test/A01grammar.ztst: missed -f option off zsh
+	invocation in 27793++.
+
 	* 27804: Src/Zle/zle_hist.c: don't hang on encountering invalid
 	character in incremental search.
 
@@ -12925,5 +12928,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4936 $
+* $Revision: 1.4937 $
 *****************************************************
