@@ -588,10 +588,11 @@ tt(EXTENDED_GLOB).
         occurred somewhere in the path (e.g. mytt(users/barstaff/foo) will
         be excluded by the mytt(~) operator).  As the mytt(**) operator cannot
         be grouped (inside parentheses it is treated as mytt(*)), this is
-        the way to exclude some subdirectories from matching a mytt(**).
+        one way to exclude some subdirectories from matching a mytt(**).
+	The form (^foo/)# also works.
     it()  Unquoted assignments do file expansion after mytt(:)s (intended for
         PATHs). 
-    it()  mytt(typeset) and mytt(integer) have special behaviour for
+    it()* mytt(typeset) and mytt(integer) have special behaviour for
         assignments in ksh, but not in zsh.  For example, this doesn't
         work in zsh:
   verb(
@@ -605,7 +606,7 @@ tt(EXTENDED_GLOB).
   itemize(
     it()* There is no tt($ENV) variable (use tt(/etc/zshrc), tt(~/.zshrc); 
         note also tt($ZDOTDIR)).
-    it()  tt($PATH) is not searched for commands specified
+    it()* tt($PATH) is not searched for commands specified
         at invocation without -c.
   )
   it() Aliases and functions:
@@ -1738,14 +1739,31 @@ sect(What's wrong with cut and paste on my xterm?)
 
 sect(How do I get coloured prompts on my colour xterm?)
 
-  (Or `color xterm', if you're reading this in black and white.)  You need
-  to find the sequences which generate the various colours from the manual
-  for your terminal emulator; these are ANSI standard on those I know about
-  which support colour.  With a recent (post 3.1.6) distribution of zsh,
-  there is a theme system to handle this for you; even if you don't see that,
-  the installed function `mytt(colors)' (meaning `colours', if you're not
-  reading this in black and white) gives the escape sequences.  You will end
-  up with code looking like this (borrowed from Oliver Kiddle):
+  (Or `color xterm', if you're reading this in black and white.)
+
+  Versions of the shell starting with the 4.3 series have this
+  built in.  Use
+  verb(
+    PS1='%K{white}%F{red}<red on white>%f%k<default colours>'
+  )
+  to change the prompt.  Names are only usable for the colours
+  black, red, green, yellow, blue, magenta, cyan and white, understood
+  by most terminals, but if you happen to know the details of how
+  your terminal implements colours you can specify a number, e.g.
+  mytt(%20F) to turn the foreground into colour number 20. mytt(echotc
+  Co) will often output the number of colours the terminal supports.
+  (Careful: mytt(echotc co) is different; it also outputs a number
+  but it's the number of columns in the terminal.)  If this is 8
+  then probably you have the named colours and nothing more.
+
+  In older versions of the shell you need to find the sequences which
+  generate the various colours from the manual for your terminal
+  emulator; these are ANSI standard on those I know about which support
+  colour.  With a recent (post 3.1.6) distribution of zsh, there is a
+  theme system to handle this for you; even if you don't see that, the
+  installed function `mytt(colors)' (meaning `colours', if you're not
+  reading this in black and white) gives the escape sequences.  You will
+  end up with code looking like this (borrowed from Oliver Kiddle):
   verb(
     PS1=$'%{\e[1;31m%}<the rest of your prompt here>%{\e[0m%}'
   )
@@ -2002,7 +2020,7 @@ sect(What is multibyte input?)
   just needs to ask the system library how many octets form the next
   character, and if there's a valid character there at all.  (It can also
   ask the system what width the character takes up on the screen, so that
-  characters no longer need to be exacxtly one position wide.)
+  characters no longer need to be exactly one position wide.)
 
   The way this is done is called UTF-8.  Multibyte encodings of other
   character sets exist (you might encounter them for Asian character sets);

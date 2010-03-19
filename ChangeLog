@@ -1,3 +1,8 @@
+2010-03-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Etc/FAQ.yo: update section on coloured prompts and
+	some other minor bits.
+
 2010-03-19  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Functions/Calendar/calendar: update previous
@@ -12938,5 +12943,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4939 $
+* $Revision: 1.4940 $
 *****************************************************
