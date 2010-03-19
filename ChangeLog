@@ -1,5 +1,9 @@
 2010-03-19  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Functions/Calendar/calendar: update previous
+	change also to perform calendar_show in current shell since
+	it interacts better with zle for use with sched.
+
 	* 27808: Completion/Unix/Type/_files: Use // parameter
 	substitution instead of :gs.  This form is consistent with the
 	rest of the file and has handled quoting correctly for longer.
@@ -12934,5 +12938,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4938 $
+* $Revision: 1.4939 $
 *****************************************************

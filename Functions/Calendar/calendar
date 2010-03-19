@@ -42,8 +42,6 @@ if [[ -n $warnstr ]]; then
   fi
 fi
 
-local myschedcmds="${TMPPREFIX:-/tmp/zsh}.sched.$$"
-
 [[ -f $calendar ]] || return 1
 
 # We're not using getopts because we want +... to refer to a
@@ -255,6 +253,10 @@ if (( verbose )); then
   fi
 fi
 
+local mycmds="${TMPPREFIX:-/tmp/zsh}.calendar_cmds.$$"
+touch $mycmds
+chmod 600 $mycmds
+
 # start of subshell for OS file locking
 (
 # start of block for following always to clear up lockfiles.
@@ -322,14 +324,15 @@ fi
     showline=${showline%%[[:space:]]#}
     if (( showall || (t >= start && (remaining || t <= stop || icount < showcount)) ))
     then
-      $showprog $start $stop "$showline"
+      print -r -- ${(qq)showprog} $start $stop ${(qq)showline} >>$mycmds
       (( icount++ ))
       # Doesn't count as "shown" unless the event has now passed.
       (( t <= EPOCHSECONDS )) && (( shown = 1 ))
     elif [[ -n $sched ]]; then
       (( tsched = t - mywarntime ))
       if (( tsched >= start && tsched <= stop)); then
-	$showprog $start $stop "due in ${mywarnstr}: $showline"
+	showline="due in ${mywarnstr}: $showline"
+	print -r -- ${(qq)showprog} $start $stop ${(qq)showline} >>$mycmds
       elif (( tsched < start )); then
 	# We haven't actually shown it, but it's in the past,
 	# so treat it the same.  Should probably rename this variable.
@@ -398,12 +401,12 @@ fi
       i=${"${(@)zsh_scheduled_events#*:*:}"[(I)calendar -s*]}
       {
         (( i )) && print sched -$i
-        print $sched $next calendar "${calopts[@]}" $next $next
-      } >$myschedcmds
+        print -r -- ${(qq)sched} $next calendar "${calopts[@]}" $next $next
+      } >>$mycmds
     else
-      $showprog $start $stop \
-"No more calendar events: calendar not rescheduled.
+      showline="No more calendar events: calendar not rescheduled.
 Run \"calendar -s\" again if you add to it."
+      print -r -- ${(qq)showprog} $start $stop ${(qq)showline} >>$mycmds
     fi
   fi
 
@@ -433,8 +436,6 @@ Old calendar left in $calendar.old." >&2
 exit $rstat
 ) && {
   # Tasks that need to be in the current shell
-  if [[ -f $myschedcmds ]]; then
-    . $myschedcmds
-    rm -f $myschedcmds
-  fi
+  [[ -s $mycmds ]] && . $mycmds
+  rm -f $mycmds
 }
