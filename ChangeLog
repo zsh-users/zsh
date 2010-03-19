@@ -1,3 +1,9 @@
+2010-03-19  Peter Stephenson  <pws@csr.com>
+
+	* 27808: Completion/Unix/Type/_files: Use // parameter
+	substitution instead of :gs.  This form is consistent with the
+	rest of the file and has handled quoting correctly for longer.
+
 2010-03-18  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Test/A01grammar.ztst: missed -f option off zsh
@@ -12928,5 +12934,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4937 $
+* $Revision: 1.4938 $
 *****************************************************
