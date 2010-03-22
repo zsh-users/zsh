@@ -1,5 +1,8 @@
 2010-03-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 27823: Src/hist.c: 27822 could access freed memory because
+	hptr wasn't consistently set to NULL when chline was.
+
 	* 27812: Doc/Zsh/zle.yo, Src/Zle/zle.h, Src/Zle/zle_refresh.c,
 	Src/Zle/zle_utils.c: when wchar_t contains Unicode code points,
 	use private area to put bytes that don't form characters for
@@ -12956,5 +12959,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4942 $
+* $Revision: 1.4943 $
 *****************************************************
