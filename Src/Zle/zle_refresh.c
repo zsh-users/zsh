@@ -1263,7 +1263,11 @@ zrefresh(void)
 	    }
 	}
 #ifdef MULTIBYTE_SUPPORT
-	else if (iswprint(*t) && (width = WCWIDTH(*t)) > 0) {
+	else if (
+#ifdef __STDC_ISO_10646__
+		 !ZSH_INVALID_WCHAR_TEST(*t) &&
+#endif
+		 iswprint(*t) && (width = WCWIDTH(*t)) > 0) {
 	    int ichars;
 	    if (width > rpms.sen - rpms.s) {
 		int started = 0;
@@ -1367,6 +1371,12 @@ zrefresh(void)
 	    wchar_t wc;
 	    int started = 0;
 
+#ifdef __STDC_ISO_10646__
+	    if (ZSH_INVALID_WCHAR_TEST(*t)) {
+		int c = ZSH_INVALID_WCHAR_TO_INT(*t);
+		sprintf(dispchars, "<%.02x>", c);
+	    } else
+#endif
 	    if ((unsigned)*t > 0xffffU) {
 		sprintf(dispchars, "<%.08x>", (unsigned)*t);
 	    } else {

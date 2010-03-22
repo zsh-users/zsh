@@ -120,11 +120,19 @@ zlecharasstring(ZLE_CHAR_T inchar, char *buf)
     size_t ret;
     char *ptr;
 
-    ret = wctomb(buf, inchar);
-    if (ret <= 0) {
-	/* Ick. */
-	buf[0] = '?';
-	return 1;
+#ifdef __STDC_ISO_10646__
+    if (ZSH_INVALID_WCHAR_TEST(inchar)) {
+	buf[0] = ZSH_INVALID_WCHAR_TO_CHAR(inchar);
+	ret = 1;
+    } else
+#endif
+    {
+	ret = wctomb(buf, inchar);
+	if (ret <= 0) {
+	    /* Ick. */
+	    buf[0] = '?';
+	    return 1;
+	}
     }
     ptr = buf + ret - 1;
     for (;;) {
@@ -196,13 +204,20 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
     for (i=0; i < inll; i++, incs--) {
 	if (incs == 0)
 	    outcs = mb_len;
-	j = wcrtomb(s + mb_len, instr[i], &mbs);
-	if (j == -1) {
-	    /* invalid char; what to do? */
-	    s[mb_len++] = ZWC('?');
-	    memset(&mbs, 0, sizeof(mbs));
-	} else {
-	    mb_len += j;
+#ifdef __STDC_ISO_10646__
+	if (ZSH_INVALID_WCHAR_TEST(instr[i])) {
+	    s[mb_len++] = ZSH_INVALID_WCHAR_TO_CHAR(instr[i]);
+	} else
+#endif
+	{
+	    j = wcrtomb(s + mb_len, instr[i], &mbs);
+	    if (j == -1) {
+		/* invalid char */
+		s[mb_len++] = ZWC('?');
+		memset(&mbs, 0, sizeof(mbs));
+	    } else {
+		mb_len += j;
+	    }
 	}
     }
     if (incs == 0)
@@ -332,6 +347,13 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 	while (ll > 0) {
 	    size_t cnt = mbrtowc(outptr, inptr, ll, &mbs);
 
+#ifdef __STDC_ISO_10646__
+	    if (cnt == MB_INCOMPLETE || cnt == MB_INVALID) {
+		/* Use private encoding for invalid single byte */
+		*outptr = ZSH_CHAR_TO_INVALID_WCHAR(*inptr);
+		cnt = 1;
+	    }
+#else
 	    /*
 	     * At this point we don't handle either incomplete (-2) or
 	     * invalid (-1) multibyte sequences.  Use the current length
@@ -339,6 +361,7 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 	     */
 	    if (cnt == MB_INCOMPLETE || cnt == MB_INVALID)
 		break;
+#endif
 
 	    if (cnt == 0) {
 		/* Converting '\0' returns 0, but a '\0' is a real

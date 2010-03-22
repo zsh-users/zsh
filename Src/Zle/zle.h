@@ -419,6 +419,20 @@ typedef struct {
 typedef REFRESH_ELEMENT *REFRESH_STRING;
 
 
+#if defined(MULTIBYTE_SUPPORT) && defined(__STDC_ISO_10646__)
+#define ZSH_INVALID_WCHAR_BASE	(0xe000U)
+#define ZSH_INVALID_WCHAR_TEST(x)			\
+    ((unsigned)(x) >= ZSH_INVALID_WCHAR_BASE &&		\
+     (unsigned)(x) <= (ZSH_INVALID_WCHAR_BASE + 255u))
+#define ZSH_INVALID_WCHAR_TO_CHAR(x)			\
+    ((char)((unsigned)(x) - ZSH_INVALID_WCHAR_BASE))
+#define ZSH_INVALID_WCHAR_TO_INT(x)			\
+    ((int)((unsigned)(x) - ZSH_INVALID_WCHAR_BASE))
+#define ZSH_CHAR_TO_INVALID_WCHAR(x)		\
+    ((wchar_t)(STOUC(x) + ZSH_INVALID_WCHAR_BASE))
+#endif
+
+
 #ifdef DEBUG
 #define METACHECK()		\
 	DPUTS(zlemetaline == NULL, "line not metafied")

@@ -1,3 +1,10 @@
+2010-03-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27812: Doc/Zsh/zle.yo, Src/Zle/zle.h, Src/Zle/zle_refresh.c,
+	Src/Zle/zle_utils.c: when wchar_t contains Unicode code points,
+	use private area to put bytes that don't form characters for
+	special display.
+
 2010-03-22  Peter Stephenson  <pws@csr.com>
 
 	* 27822: Src/hist.c, Src/lex.c, Src/zle_params.c,
@@ -12949,5 +12956,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4941 $
+* $Revision: 1.4942 $
 *****************************************************

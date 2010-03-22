@@ -2286,6 +2286,20 @@ angle brackets.  The number is the code point of the character in the wide
 character set; this may or may not be Unicode, depending on the operating
 system.
 )
+item(Invalid multibyte characters)(
+If the tt(MULTIBYTE) option is in effect, any sequence of one or more
+bytes that does not form a valid character in the current character
+set is treated as a series of bytes each shown as a special character.
+This case can be distinguished from other unprintable characters
+as the bytes are represented as two hexadecimal digits between angle
+brackets, as distinct from the four or eight digits that are used for
+unprintable characters that are nonetheless valid in the current
+character set.
+
+Not all systems support this: for it to work, the system's representation of
+wide characters must be code values from the Universal Character Set,
+as defined by IS0 10646 (also known as Unicode).
+)
 enditem()
 
 If tt(zle_highlight) is not set or no value applies to a particular
