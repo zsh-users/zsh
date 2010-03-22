@@ -1171,7 +1171,7 @@ hend(Eprog prog)
     if (histactive & HA_NOINC) {
 	zfree(chline, hlinesz);
 	zfree(chwords, chwordlen*sizeof(short));
-	chline = NULL;
+	chline = hptr = NULL;
 	chwords = NULL;
 	histactive = 0;
 	unqueue_signals();
@@ -1286,7 +1286,7 @@ hend(Eprog prog)
     }
     zfree(chline, hlinesz);
     zfree(chwords, chwordlen*sizeof(short));
-    chline = NULL;
+    chline = hptr = NULL;
     chwords = NULL;
     histactive = 0;
     if (isset(SHAREHISTORY)? histfileIsLocked() : isset(INCAPPENDHISTORY))
