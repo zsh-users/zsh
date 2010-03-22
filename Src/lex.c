@@ -249,6 +249,13 @@ lexsave(void)
     ls->histdone = histdone;
     ls->stophist = stophist;
     stophist = 0;
+    if (!lstack) {
+	/* top level, make this version visible to ZLE */
+	zle_chline = chline;
+	/* ensure line stored is NULL-terminated */
+	if (hptr)
+	    *hptr = '\0';
+    }
     ls->hline = chline;
     chline = NULL;
     ls->hptr = hptr;
@@ -355,6 +362,11 @@ lexrestore(void)
     errflag = 0;
 
     ln = lstack->next;
+    if (!ln) {
+	/* Back to top level: don't need special ZLE value */
+	DPUTS(chline != zle_chline, "BUG: Ouch, wrong chline for ZLE");
+	zle_chline = NULL;
+    }
     free(lstack);
     lstack = ln;
 }

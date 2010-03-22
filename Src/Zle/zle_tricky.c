@@ -632,16 +632,16 @@ docomplete(int lst)
     origline = dupstring(zlemetaline);
     origcs = zlemetacs;
     origll = zlemetall;
-    if (!isfirstln && chline != NULL) {
-	/* If we are completing in a multi-line buffer (which was not  *
-	 * taken from the history), we have to prepend the stuff saved *
-	 * in chline to the contents of line.                          */
-
+    if (!isfirstln && (chline != NULL || zle_chline != NULL)) {
 	ol = dupstring(zlemetaline);
-	/* Make sure that chline is zero-terminated. */
-	*hptr = '\0';
+	/*
+	 * Make sure that chline is zero-terminated.
+	 * zle_chline always is and hptr doesn't point into it anyway.
+	 */
+	if (!zle_chline)
+	    *hptr = '\0';
 	zlemetacs = 0;
-	inststr(chline);
+	inststr(zle_chline ? zle_chline : chline);
 	chl = zlemetacs;
 	zlemetacs += ocs;
     } else

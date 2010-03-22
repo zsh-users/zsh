@@ -164,6 +164,22 @@ mod_export char *hptr;
 /**/
 mod_export char *chline;
 
+/*
+ * The current history line as seen by ZLE.
+ * We modify chline for use in other contexts while ZLE may
+ * still be running; ZLE should see only the top-level value.
+ *
+ * To avoid having to modify this every time we modify chline,
+ * we set it when we push the stack, and unset it when we pop
+ * the appropriate value off the stack.  As it's never modified
+ * on the stack this is the only maintainance we ever do on it.
+ * In return, ZLE has to check both zle_chline and (if that's
+ * NULL) chline to get the current value.
+ */
+
+/**/
+mod_export char *zle_chline;
+
 /* true if the last character returned by hgetc was an escaped bangchar *
  * if it is set and NOBANGHIST is unset hwaddc escapes bangchars        */
 

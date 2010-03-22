@@ -334,8 +334,19 @@ get_rbuffer(UNUSED(Param pm))
 static char *
 get_prebuffer(UNUSED(Param pm))
 {
-    if (chline)
+    /*
+     * Use the editing current history line, not necessarily the
+     * history line that's currently in the history mechanism
+     * since our line may have been stacked.
+     */
+    if (zle_chline) {
+	/* zle_chline was NULL terminated when pushed onto the stack */
+	return dupstring(zle_chline);
+    }
+    if (chline) {
+	/* hptr is valid */
 	return dupstrpfx(chline, hptr - chline);
+    }
     return dupstring("");
 }
 

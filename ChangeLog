@@ -1,3 +1,9 @@
+2010-03-22  Peter Stephenson  <pws@csr.com>
+
+	* 27822: Src/hist.c, Src/lex.c, Src/zle_params.c,
+	Src/zle_tricky.c: Fix ZLE access to current history line if pushed
+	onto lexical stack.
+
 2010-03-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Etc/FAQ.yo: update section on coloured prompts and
@@ -12943,5 +12949,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4940 $
+* $Revision: 1.4941 $
 *****************************************************
