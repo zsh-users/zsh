@@ -1,3 +1,9 @@
+2010-03-25  Peter Stephenson  <pws@csr.com>
+
+	* 27827: Src/input.c, Test/A02alias.ztst: infinite loop
+	if alias with recursive definition occurred at end
+	of parsed string (normal shell input was OK).
+
 2010-03-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27823: Src/hist.c: 27822 could access freed memory because
@@ -12959,5 +12965,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4943 $
+* $Revision: 1.4944 $
 *****************************************************

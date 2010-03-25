@@ -36,3 +36,9 @@
 >Without
 >This command has the argument true
 >With
+
+  print -u $ZTST_fd 'This test hangs the shell when it fails...'
+  alias sort='LC_ALL=C sort'
+  cat <(echo foo | sort)
+0:Alias expansion works at the end of parsed strings
+>foo

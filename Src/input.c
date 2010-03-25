@@ -195,20 +195,23 @@ ingetc(void)
 	    return lastc;
 	}
 
+	/*
+	 * See if we have reached the end of input
+	 * (due to an error, or to reading from a single string).
+	 * Check the remaining characters left, since if there aren't
+	 * any we don't want to pop the stack---it'll mark any aliases
+	 * as not in use before we've finished processing.
+	 */
+	if (!inbufct && (strin || errflag)) {
+	    lexstop = 1;
+	    return ' ';
+	}
 	/* If the next element down the input stack is a continuation of
 	 * this, use it.
-	 */ 
+	 */
 	if (inbufflags & INP_CONT) {
 	    inpoptop();
 	    continue;
-	}
-	/*
-	 * Otherwise, see if we have reached the end of input
-	 * (due to an error, or to reading from a single string).
-	 */
-	if (strin || errflag) {
-	    lexstop = 1;
-	    return ' ';
 	}
 	/* As a last resort, get some more input */
 	if (inputline())
