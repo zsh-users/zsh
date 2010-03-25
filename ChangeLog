@@ -1,5 +1,8 @@
 2010-03-25  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Test/A02alias.ztst: change sort to cat to
+	make test foolerproof.
+
 	* 27827: Src/input.c, Test/A02alias.ztst: infinite loop
 	if alias with recursive definition occurred at end
 	of parsed string (normal shell input was OK).
@@ -12965,5 +12968,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4944 $
+* $Revision: 1.4945 $
 *****************************************************
