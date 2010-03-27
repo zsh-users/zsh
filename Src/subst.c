@@ -675,6 +675,40 @@ strcatsub(char **d, char *pb, char *pe, char *src, int l, char *s, int glbsub,
     return dest;
 }
 
+#ifdef MULTIBYTE_SUPPORT
+#define WCPADWIDTH(cchar, mw)	wcpadwidth(cchar, mw)
+
+/*
+ * Width of character for padding purposes.
+ * 0: all characters count 1.
+ * 1: use width of multibyte character.
+ * 2: non-zero width characters count 1, zero width 0.
+ */
+static int
+wcpadwidth(wchar_t wc, int multi_width)
+{
+    int width;
+
+    switch (multi_width)
+    {
+    case 0:
+	return 1;
+
+    case 1:
+	width = WCWIDTH(wc);
+	if (width >= 0)
+	    return width;
+	return 0;
+
+    default:
+	return WCWIDTH(wc) > 0 ? 1 : 0;
+    }
+}
+
+#else
+#define WCPADWIDTH(cchar, mw)	(1)
+#endif
+
 /*
  * Pad the string str, returning a result from the heap (or str itself,
  * if it didn't need padding).  If str is too large, it will be truncated.
@@ -703,12 +737,6 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 #endif
     )
 {
-#ifdef MULTIBYTE_SUPPORT
-#define WCPADWIDTH(cchar)	(multi_width ? WCWIDTH(cchar) : 1)
-#else
-#define WCPADWIDTH(cchar)	(1)
-#endif
-
     char *def, *ret, *t, *r;
     int ls, ls2, lpreone, lpostone, lpremul, lpostmul, lr, f, m, c, cc, cl;
     convchar_t cchar;
@@ -775,14 +803,14 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 		MB_METACHARINIT();
 		while (f > 0) {
 		    str += MB_METACHARLENCONV(str, &cchar);
-		    f -= WCPADWIDTH(cchar);
+		    f -= WCPADWIDTH(cchar, multi_width);
 		}
 		/* Now finish the first half. */
 		for (c = prenum; c > 0; ) {
 		    cl = MB_METACHARLENCONV(str, &cchar);
 		    while (cl--)
 			*r++ = *str++;
-		    c -= WCPADWIDTH(cchar);
+		    c -= WCPADWIDTH(cchar, multi_width);
 		}
 	    } else {
 		if (f <= lpreone) {
@@ -796,7 +824,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 			/* So skip. */
 			for (t = preone; f > 0; ) {
 			    t += MB_METACHARLENCONV(t, &cchar);
-			    f -= WCPADWIDTH(cchar);
+			    f -= WCPADWIDTH(cchar, multi_width);
 			}
 			/* Then copy the entire remainder. */
 			while (*t)
@@ -814,7 +842,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 			    m = lpremul - m;
 			    for (t = premul; m > 0; ) {
 				t += MB_METACHARLENCONV(t, &cchar);
-				m -= WCPADWIDTH(cchar);
+				m -= WCPADWIDTH(cchar, multi_width);
 			    }
 			    /* Output the rest. */
 			    while (*t)
@@ -827,7 +855,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 				cl = MB_METACHARLENCONV(t, &cchar);
 				while (cl--)
 				    *r++ = *t++;
-				c -= WCPADWIDTH(cchar);
+				c -= WCPADWIDTH(cchar, multi_width);
 			    }
 			}
 		    }
@@ -840,7 +868,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 		/* Output the first half width of the original string. */
 		for (c = ls2; c > 0; ) {
 		    cl = MB_METACHARLENCONV(str, &cchar);
-		    c -= WCPADWIDTH(cchar);
+		    c -= WCPADWIDTH(cchar, multi_width);
 		    while (cl--)
 			*r++ = *str++;
 		}
@@ -854,7 +882,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 		MB_METACHARINIT();
 		for (c = postnum; c > 0; ) {
 		    cl = MB_METACHARLENCONV(str, &cchar);
-		    c -= WCPADWIDTH(cchar);
+		    c -= WCPADWIDTH(cchar, multi_width);
 		    while (cl--)
 			*r++ = *str++;
 		}
@@ -867,7 +895,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 			/* Can't fit unrepeated string, truncate it */
 			for (c = f; c > 0; ) {
 			    cl = MB_METACHARLENCONV(postone, &cchar);
-			    c -= WCPADWIDTH(cchar);
+			    c -= WCPADWIDTH(cchar, multi_width);
 			    while (cl--)
 				*r++ = *postone++;
 			}
@@ -890,7 +918,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 			    MB_METACHARINIT();
 			    while (m > 0) {
 				cl = MB_METACHARLENCONV(postmul, &cchar);
-				m -= WCPADWIDTH(cchar);
+				m -= WCPADWIDTH(cchar, multi_width);
 				while (cl--)
 				    *r++ = *postmul++;
 			    }
@@ -914,14 +942,14 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 		MB_METACHARINIT();
 		while (f > 0) {
 		    str += MB_METACHARLENCONV(str, &cchar);
-		    f -= WCPADWIDTH(cchar);
+		    f -= WCPADWIDTH(cchar, multi_width);
 		}
 		/* Copy the rest of the original string */
 		for (c = prenum; c > 0; ) {
 		    cl = MB_METACHARLENCONV(str, &cchar);
 		    while (cl--)
 			*r++ = *str++;
-		    c -= WCPADWIDTH(cchar);
+		    c -= WCPADWIDTH(cchar, multi_width);
 		}
 	    } else {
 		/*
@@ -942,7 +970,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 			MB_METACHARINIT();
 			for (t = preone; f > 0; ) {
 			    t += MB_METACHARLENCONV(t, &cchar);
-			    f -= WCPADWIDTH(cchar);
+			    f -= WCPADWIDTH(cchar, multi_width);
 			}
 			/* Copy the rest of preone */
 			while (*t)
@@ -966,14 +994,14 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 			    MB_METACHARINIT();
 			    for (t = premul; m > 0; ) {
 				t += MB_METACHARLENCONV(t, &cchar);
-				m -= WCPADWIDTH(cchar);
+				m -= WCPADWIDTH(cchar, multi_width);
 			    }
 			    /* Now the rest of the repeated string. */
 			    while (c > 0) {
 				cl = MB_METACHARLENCONV(t, &cchar);
 				while (cl--)
 				    *r++ = *t++;
-				c -= WCPADWIDTH(cchar);
+				c -= WCPADWIDTH(cchar, multi_width);
 			    }
 			}
 			for (cc = f / lpremul; cc--;) {
@@ -985,7 +1013,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 				cl = MB_METACHARLENCONV(t, &cchar);
 				while (cl--)
 				    *r++ = *t++;
-				c -= WCPADWIDTH(cchar);
+				c -= WCPADWIDTH(cchar, multi_width);
 			    }
 			}
 		    }
@@ -1023,7 +1051,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 		cl = MB_METACHARLENCONV(str, &cchar);
 		while (cl--)
 		    *r++ = *str++;
-		c -= WCPADWIDTH(cchar);
+		c -= WCPADWIDTH(cchar, multi_width);
 	    }
 	} else {
 	    /*
@@ -1035,7 +1063,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 		cl = MB_METACHARLENCONV(str, &cchar);
 		while (cl--)
 		    *r++ = *str++;
-		c -= WCPADWIDTH(cchar);
+		c -= WCPADWIDTH(cchar, multi_width);
 	    }
 	    MB_METACHARINIT();
 	    if (f <= lpostone) {
@@ -1048,7 +1076,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 			cl = MB_METACHARLENCONV(postone, &cchar);
 			while (cl--)
 			    *r++ = *postone++;
-			c -= WCPADWIDTH(cchar);
+			c -= WCPADWIDTH(cchar, multi_width);
 		    }
 		}
 	    } else {
@@ -1059,7 +1087,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 			cl = MB_METACHARLENCONV(postone, &cchar);
 			while (cl--)
 			    *r++ = *postone++;
-			c -= WCPADWIDTH(cchar);
+			c -= WCPADWIDTH(cchar, multi_width);
 		    }
 		}
 		if (lpostmul) {
@@ -1070,7 +1098,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 			    cl = MB_METACHARLENCONV(t, &cchar);
 			    while (cl--)
 				*r++ = *t++;
-			    c -= WCPADWIDTH(cchar);
+			    c -= WCPADWIDTH(cchar, multi_width);
 			}
 		    }
 		    /*
@@ -1083,7 +1111,7 @@ dopadding(char *str, int prenum, int postnum, char *preone, char *postone,
 			    cl = MB_METACHARLENCONV(postmul, &cchar);
 			    while (cl--)
 				*r++ = *postmul++;
-			    m -= WCPADWIDTH(cchar);
+			    m -= WCPADWIDTH(cchar, multi_width);
 			}
 		    }
 		}
@@ -1782,7 +1810,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 		case 'm':
 #ifdef MULTIBYTE_SUPPORT
-		    multi_width = 1;
+		    multi_width++;
 #endif
 		    break;
 

@@ -1004,6 +1004,14 @@ calculating the how much of the string it occupies or the overall
 length of the string.  Most printable characters have a width of one
 unit, however certain Asian character sets and certain special effects
 use wider characters; combining characters have zero width.
+Non-printable characters are arbitrarily counted as zero width; how they
+would actually be displayed will vary.
+
+If the tt(m) is repeated, the character either counts zero (if it has
+zero width), else one.  For printable character strings this has the
+effect of counting the number of glyphs (visibly separate characters),
+except for the case where combining characters themselves have non-zero
+width (true in certain alphabets).
 )
 item(tt(r:)var(expr)tt(::)var(string1)tt(::)var(string2)tt(:))(
 As tt(l), but pad the words on the right and insert var(string2)

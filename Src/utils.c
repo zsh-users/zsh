@@ -4406,6 +4406,8 @@ mb_metacharlenconv(const char *s, wint_t *wcp)
  * until end of string.
  *
  * If width is 1, return total character width rather than number.
+ * If width is greater than 1, return 1 if character has non-zero width,
+ * else 0.
  */
 
 /**/
@@ -4444,13 +4446,15 @@ mb_metastrlen(char *ptr, int width)
 	    } else if (width) {
 		/*
 		 * Returns -1 if not a printable character.  We
-		 * turn this into 1 for backward compatibility.
+		 * turn this into 0.
 		 */
 		int wcw = WCWIDTH(wc);
-		if (wcw >= 0)
-		    num += wcw;
-		else
-		    num++;
+		if (wcw > 0) {
+		    if (width == 1)
+			num += wcw;
+		    else
+			num++;
+		}
 	    } else
 		num++;
 	    laststart = ptr;
@@ -5859,8 +5863,8 @@ privasserted(void)
 		    cap_free(caps);
 		    return 1;
 		}
-	    cap_free(caps);
 	}
+	cap_free(caps);
     }
 #endif /* HAVE_CAP_GET_PROC */
     return 0;

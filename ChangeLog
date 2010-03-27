@@ -1,3 +1,9 @@
+2010-03-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27831: Doc/Zsh/expn.yo, Src/input.c, Src/subst.c, Src/utils.c:
+	add ${(mm)...} to count displayed characters and rationalise use
+	of wcwidth so that negative numbers are treated as zero.
+
 2010-03-25  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Test/A02alias.ztst: change sort to cat to
@@ -12968,5 +12974,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4945 $
+* $Revision: 1.4946 $
 *****************************************************
