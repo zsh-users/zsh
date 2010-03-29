@@ -746,7 +746,7 @@ Save each command's beginning timestamp (in seconds since the epoch)
 and the duration (in seconds) to the history file.  The format of
 this prefixed data is:
 
-`tt(:)var(<beginning time>)tt(:)var(<elapsed seconds>)tt(:)var(<command>)'.
+`tt(:) var(<beginning time>)tt(:)var(<elapsed seconds>)tt(;)var(<command>)'.
 )
 pindex(HIST_ALLOW_CLOBBER)
 pindex(NO_HIST_ALLOW_CLOBBER)
