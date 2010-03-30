@@ -1,3 +1,7 @@
+2010-03-30  Clint Adams  <clint@zsh.org>
+
+	* 27847: Completion/Unix/Command/_uzbl: completion for uzbl.
+
 2010-03-29  Peter Stephenson  <pws@csr.com>
 
 	* 27843: Simon Ruderich: Doc/Zsh/options.yo: claimed format for
@@ -12979,5 +12983,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4947 $
+* $Revision: 1.4948 $
 *****************************************************
