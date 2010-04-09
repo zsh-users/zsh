@@ -6,11 +6,13 @@ _set_command
 
 strs=( -default- )
 
-if [[ -n "$_comp_command1" ]]; then
-  strs=( "${_comp_command1}" "$strs[@]" )
-  [[ -n "$_comp_command2" ]] &&
+if [[ "$CURRENT" != "1" ]]; then
+  strs=( "${_comp_command}" "$strs[@]" )
+  if [[ -n "$_comp_command1" ]]; then
+    strs=( "${_comp_command1}" "$strs[@]" )
+    [[ -n "$_comp_command2" ]] &&
       strs=( "${_comp_command2}" "$strs[@]" )
+  fi
 fi
 
-_dispatch -redirect-,${compstate[redirect]},${_comp_command} \
-          -redirect-,{${compstate[redirect]},-default-},${^strs}
+_dispatch -redirect-,{${compstate[redirect]},-default-},${^strs}

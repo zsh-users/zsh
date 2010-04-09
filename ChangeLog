@@ -1,3 +1,8 @@
+2010-04-09  Peter Stephenson  <pws@csr.com>
+
+	* Ben: 27589: Completion/Zsh/Context/_redirect: attempt
+	to use arguments better.
+
 2010-03-30  Clint Adams  <clint@zsh.org>
 
 	* 27847: Completion/Unix/Command/_uzbl: completion for uzbl.
@@ -12983,5 +12988,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4948 $
+* $Revision: 1.4949 $
 *****************************************************
