@@ -221,6 +221,16 @@
 >\\foo matched by \\*\\
 >a\\b not matched by \\*\\
 
+  (
+    setopt globsubst
+    foo="boring*"
+    print ${foo+$foo}
+    print ${foo+"$foo"}
+  )
+0:globsubst together with nested quoted expansion
+>boringfile
+>boring*
+
   print -l "${$(print one word)}" "${=$(print two words)}"
 0:splitting of $(...) inside ${...}
 >one word

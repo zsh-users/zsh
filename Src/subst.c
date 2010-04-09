@@ -2417,7 +2417,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		multsub(&val, spbreak && !aspar, (aspar ? NULL : &aval), &isarr, NULL);
 		opts[SHWORDSPLIT] = ws;
 		copied = 1;
-		spbreak = 0;
+		spbreak = globsubst = 0;
 	    }
 	    break;
 	case ':':

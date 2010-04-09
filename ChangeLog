@@ -1,5 +1,10 @@
 2010-04-09  Peter Stephenson  <pws@csr.com>
 
+	* 27865: Src/subst.c, Test/D04parameter.ztst: text in parameter
+	substitution that came from the command line rather than the
+	parameter was a candidate for GLOB_SUBST even if it was quoted
+	if the overall expression was not quoted.
+
 	* Ben: 27589: Completion/Zsh/Context/_redirect: attempt
 	to use arguments better.
 
@@ -12988,5 +12993,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4949 $
+* $Revision: 1.4950 $
 *****************************************************
