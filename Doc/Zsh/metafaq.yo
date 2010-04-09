@@ -88,8 +88,10 @@ nofill(tt(http://zsh.open-mirror.com/))
 )
 enditem()
 
-The up-to-date source code is available via anonymous CVS from Sourceforge.
-See tt(http://sourceforge.net/projects/zsh/) for details.
+The up-to-date source code is available via anonymous CVS and Git from
+Sourceforge.  See tt(http://sourceforge.net/projects/zsh/) for details.
+A summary of instructions for the CVS and Git archives can be found at
+tt(http://zsh.sourceforget.net/).
 
 texinode(Mailing Lists)(The Zsh FAQ)(Availability)(Introduction)
 sect(Mailing Lists)

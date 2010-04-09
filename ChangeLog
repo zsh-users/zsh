@@ -1,3 +1,8 @@
+2010-04-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Simon Ruderich: 27856 (tweaked): Doc/Zsh/metafaq.yo: Git
+	availability.
+
 2010-04-09  Peter Stephenson  <pws@csr.com>
 
 	* 27865: Src/subst.c, Test/D04parameter.ztst: text in parameter
@@ -12993,5 +12998,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4950 $
+* $Revision: 1.4951 $
 *****************************************************
