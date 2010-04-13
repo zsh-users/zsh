@@ -266,9 +266,11 @@ chmod 600 $mycmds
     # Attempt to lock both $donefile and $calendar.
     # Don't lock $newfile; we've tried our best to make
     # the name unique.
-    if zmodload -F zsh/system b:zsystem && zsystem supports flock; then
-      zsystem flock $calendar
-      zsystem flock $donefile
+    if zmodload -F zsh/system b:zsystem && zsystem supports flock &&
+      zsystem flock $calendar 2>/dev/null &&
+      zsystem flock $donefile 2>/dev/null; then
+      # locked OK
+      :
     else
       calendar_lockfiles $calendar $donefile || exit 1
     fi

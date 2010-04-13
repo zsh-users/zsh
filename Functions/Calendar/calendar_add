@@ -74,8 +74,10 @@ fi
 # Not needed but harmless if OS file locking is used.
 {
   if (( ! nolock )); then
-    if zmodload -F zsh/system b:zsystem && zsystem supports flock; then
-      zsystem flock $calendar
+    if zmodload -F zsh/system b:zsystem && zsystem supports flock &&
+      zsystem flock $calendar 2>/dev/null; then
+      # locked OK
+      :
     else
       calendar_lockfiles $calendar || exit 1
     fi

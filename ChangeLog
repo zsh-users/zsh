@@ -1,3 +1,10 @@
+2010-04-13  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Functions/Calendar/calendar, Functions/Calendar/calendar_add,
+	Functions/Calendar/calendar-edit, Functions/Calendar/calendar_show,
+	Functions/Calendar/calendar_sort:  Fall back to link file locking if
+	system file locking fails; don't need dcop for kdialog.
+
 2010-04-12  Clint Adams  <clint@zsh.org>
 
 	* 27876: Completion/Debian/Command/_axi-cache: completion for
@@ -13003,5 +13010,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4952 $
+* $Revision: 1.4953 $
 *****************************************************

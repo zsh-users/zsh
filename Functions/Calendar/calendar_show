@@ -13,7 +13,7 @@ zmodload -i zsh/parameter || return
 # HERE: this should be configurable and we should be able to do
 # better if xmessage isn't available, e.g. wish.
 if [[ -n $DISPLAY &&  $start -eq $stop ]]; then
-  if [[ -n ${commands[kdialog]} && -n $KDE_SESSION_UID ]] && dcop >&/dev/null
+  if [[ -n ${commands[kdialog]} && -n $KDE_SESSION_UID ]]
   then
     # We're in a KDE session, most probably.
     # Simple:
