@@ -1,5 +1,8 @@
 2010-04-14  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Doc/Zsh/compsys.yo: add kindex entry for
+	path-completion.
+
 	* unposted: Doc/Zsh/compsys.yo: slightly rephrase previous doc.
 
 	* users/15011: Completion/Unix/Type/_path_files,
@@ -13019,5 +13022,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4955 $
+* $Revision: 1.4956 $
 *****************************************************
