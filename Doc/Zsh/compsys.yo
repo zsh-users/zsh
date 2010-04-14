@@ -2267,8 +2267,8 @@ This is used by filename completion.  By default, filename completion
 examines all components of a path to see if there are completions of
 that component.  For example, tt(/u/b/z) can be completed to
 tt(/usr/bin/zsh).  Explicitly setting this style to tt(false) inhibits this
-behaviour for path components before the cursor; this overrides the
-setting of tt(accept-exact-dirs).
+behaviour for path components up to the tt(/) before the cursor; this
+overrides the setting of tt(accept-exact-dirs).
 
 Even with the style set to tt(false), it is still possible to complete
 multiple paths by setting the option tt(COMPLETE_IN_WORD) and moving the
