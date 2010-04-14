@@ -1,3 +1,10 @@
+2010-04-14  Peter Stephenson  <pws@csr.com>
+
+	* users/15011: Completion/Unix/Type/_path_files,
+	Doc/Zsh/compsys.yo: add path-completion style to allow
+	completion of preceeding directories in files to be be turned
+	off.
+
 2010-04-13  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Functions/Calendar/calendar, Functions/Calendar/calendar_add,
@@ -13010,5 +13017,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4953 $
+* $Revision: 1.4954 $
 *****************************************************

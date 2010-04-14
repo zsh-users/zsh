@@ -1123,6 +1123,9 @@ When this style is true, any prefix of a path that matches an existing
 directory is accepted without any attempt to complete it further.
 Hence, in the given example, the path tt(/usr/bin/) is accepted
 immediately and completion tried in that directory.
+
+If you wish to inhibit this behaviour entirely, set the tt(path-completion)
+style (see below) to tt(false).
 )
 kindex(add-space, completion style)
 item(tt(add-space))(
@@ -2258,6 +2261,20 @@ tt(colors) tag.  The value should be the pathname of a file
 containing color names in the format of an X11 tt(rgb.txt) file.  If
 the style is not set but this file is found in one of various standard
 locations it will be used as the default.
+)
+item(tt(path-completion))(
+This is used by filename completion.  By default, filename completion
+examines all components of a path to see if there are completions of
+that component.  For example, tt(/u/b/z) can be completed to
+tt(/usr/bin/zsh).  Explicitly setting this style to tt(false) inhibits this
+behaviour for path components before the cursor; this overrides the
+setting of tt(accept-exact-dirs).
+
+Even with the style set to tt(false), it is still possible to complete
+multiple paths by setting the option tt(COMPLETE_IN_WORD) and moving the
+cursor back to the first component in the path to be completed.  For
+example, tt(/u/b/z) can be completed to tt(/usr/bin/zsh) if the cursor is
+after the tt(/u).
 )
 kindex(pine-directory, completion style)
 item(tt(pine-directory))(

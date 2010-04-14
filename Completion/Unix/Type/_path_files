@@ -32,6 +32,7 @@ local tmp1 tmp2 tmp3 tmp4 i orig eorig pre suf tpre tsuf opre osuf cpre
 local pats haspats ignore pfx pfxsfx sopt gopt opt sdirs ignpar cfopt listsfx
 local nm=$compstate[nmatches] menu matcher mopts sort mid accex fake
 local listfiles listopts tmpdisp origtmp1 Uopt
+local accept_exact_dirs path_completion
 integer npathcheck
 local -a Mopts
 
@@ -190,6 +191,11 @@ zstyle -a ":completion:${curcontext}:paths" accept-exact accex
 zstyle -a ":completion:${curcontext}:" fake-files fake
 
 zstyle -s ":completion:${curcontext}:" ignore-parents ignpar
+
+zstyle -t ":completion:${curcontext}:paths" accept-exact-dirs &&
+  accept_exact_dirs=1
+zstyle -T ":completion:${curcontext}:paths" path-completion &&
+  path_completion=1
 
 if [[ -n "$compstate[pattern_match]" ]]; then
   if { [[ -z "$SUFFIX" ]] && _have_glob_qual "$PREFIX" complete } ||
@@ -350,16 +356,17 @@ for prepath in "$prepaths[@]"; do
   skipped=
   cpre=
 
-  if zstyle -t ":completion:${curcontext}:paths" accept-exact-dirs &&
-    [[ $pre = (#b)(*)/([^/]#) ]]; then
-    # We've been told that we can accept an exact directory
-    # prefix immediately.  Try this with the longest path prefix
-    # first:  this saves stats in the simple case and may get around
-    # automount behaviour if early components don't yet exist.
+  if [[ ( -n $accept_exact_dirs || -z $path_completion ) && \
+        $pre = (#b)(*)/([^/]#) ]]; then
+    # We've been told either that we can accept an exact directory prefix
+    # immediately, or that path expansion is inhibited.  Try the longest
+    # path prefix first: in the first case, this saves stats in the simple
+    # case and may get around automount behaviour if early components don't
+    # yet exist, and in the second case this is the prefix we want to keep.
     tmp1=$match[1]
     tpre=$match[2]
     while true; do
-      if [[ -d $prepath$realpath$donepath$tmp1 ]]; then
+      if [[ -z $path_completion || -d $prepath$realpath$donepath$tmp1 ]]; then
 	donepath=$donepath$tmp1/
 	pre=$tpre
 	break
