@@ -1699,7 +1699,8 @@ _git-clone () {
 _git-commit () {
   _arguments -S \
     '--allow-empty[allow recording an empty commit]' \
-    '(-a --all)'{-a,--all}'[update all paths in the index file]' \
+    '(-a --all --interactive)'{-a,--all}'[update all paths in the index file]' \
+    '(-a --all --interactive)--interactive[interactively update paths in the index file]' \
     '--author[override the author name used in the commit]:author name' \
     '--cleanup=-[specify how the commit message should be cleaned up]:mode:((verbatim\:"don'\''t change the commit message at all"
                                                                              whitespace\:"remove leading and trailing whitespace lines"
