@@ -16,11 +16,19 @@ The glob qualifier P can be used to add a separate word before each
 match.  For example, *(P:-f:) produces the command line
 `-f file1 -f file2 ...'.
 
-The module zsh/system has a new "zsystem" builtin whose subcommands
-perform system level tasks.  Currently "zsystem flock" performs
-advisory file locking.  This is a particularly convenient way
-of locking files for the length of a subshell.  "zsystem supports flock"
-provides a test for this feature.
+The module zsh/system has a new "zsystem" builtin whose subcommands perform
+system level tasks.  Currently "zsystem flock" performs advisory file
+locking (for aficionados, this uses the fcntl() system call so works over
+the network on Linux).  This is a particularly convenient way of locking
+files for the length of a subshell.  "zsystem supports flock" provides a
+test for this feature.
+
+The completion system now has a style path-completion.  Setting this to
+false inhibits completion of paths before the current path component,
+e.g. /u/b/z no longer completes to /usr/bin/zsh.  This is useful on systems
+where this form of completion is pathologically slow due to network
+performance.
+
 
 Changes between versions 4.3.9 and 4.3.10
 -----------------------------------------

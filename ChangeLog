@@ -1,3 +1,7 @@
+2010-04-15  Peter Stephenson  <pws@csr.com>
+
+	* unposted: NEWS: update to include path-completion.
+
 2010-04-15  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 27798: Alexey I. Froloff: Completion/Unix/Command/_git: support
@@ -13027,5 +13031,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4957 $
+* $Revision: 1.4958 $
 *****************************************************
