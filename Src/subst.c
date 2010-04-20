@@ -1386,7 +1386,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int plan9 = isset(RCEXPANDPARAM);
     /*
      * Likwise, but with ~ and ~~.  Also, we turn it off later
-     * on if qt is passed down.
+     * on if qt is passed down. The value can go to 2 if we
+     * use ~ to force this on.
      */
     int globsubst = isset(GLOBSUBST);
     /*
@@ -1899,12 +1900,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	     * spsep, NULL means $IFS.
 	     */
 	} else if (c == '~' || c == Tilde) {
-	    /* GLOB_SUBST on or off (doubled) */
+	    /* GLOB_SUBST (forced) on or off (doubled) */
 	    if ((c = *++s) == '~' || c == Tilde) {
 		globsubst = 0;
 		s++;
 	    } else
-		globsubst = 1;
+		globsubst = 2;
 	} else if (c == '+') {
 	    /*
 	     * Return whether indicated parameter is set. 
@@ -1935,7 +1936,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    break;
     }
     /* Don't activate special pattern characters if inside quotes */
-    globsubst = globsubst && !qt;
+    if (qt)
+	globsubst = 0;
 
     /*
      * At this point, we usually expect a parameter name.
@@ -2417,7 +2419,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		multsub(&val, spbreak && !aspar, (aspar ? NULL : &aval), &isarr, NULL);
 		opts[SHWORDSPLIT] = ws;
 		copied = 1;
-		spbreak = globsubst = 0;
+		spbreak = 0;
+		/* Leave globsubst on if forced */
+		if (globsubst != 2)
+		    globsubst = 0;
 	    }
 	    break;
 	case ':':

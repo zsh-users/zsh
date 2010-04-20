@@ -1,3 +1,8 @@
+2010-04-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27889: Src/subst.c, Test/D04parameter.ztst: Force more use of
+	GLOB_SUBST in parameters if ~ is used.
+
 2010-04-20  Peter Stephenson  <pws@csr.com>
 
 	* "Akinori MUSHA: 27892: Completion/Redhat/Command/.distfiles,
@@ -13040,5 +13045,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4959 $
+* $Revision: 1.4960 $
 *****************************************************

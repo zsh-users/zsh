@@ -226,10 +226,12 @@
     foo="boring*"
     print ${foo+$foo}
     print ${foo+"$foo"}
+    print ${~foo+"$foo"}
   )
 0:globsubst together with nested quoted expansion
 >boringfile
 >boring*
+>boringfile
 
   print -l "${$(print one word)}" "${=$(print two words)}"
 0:splitting of $(...) inside ${...}
