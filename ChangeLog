@@ -1,3 +1,12 @@
+2010-04-20  Peter Stephenson  <pws@csr.com>
+
+	* "Akinori MUSHA: 27892: Completion/Redhat/Command/.distfiles,
+	Completion/Redhat/Command/_service
+	Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_init_d,
+        Completion/Unix/Command/_service (moved from Redhat),
+	Completion/Unix/Type/_services: updates for FreeBSD.
+
 2010-04-15  Peter Stephenson  <pws@csr.com>
 
 	* unposted: NEWS: update to include path-completion.
@@ -13031,5 +13040,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4958 $
+* $Revision: 1.4959 $
 *****************************************************

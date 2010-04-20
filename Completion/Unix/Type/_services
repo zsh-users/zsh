@@ -3,7 +3,13 @@
 local -a inits xinetds alls
 local expl ret=1
 
-if chkconfig --list > /dev/null 2>&1; then
+if [[ $OSTYPE = freebsd* ]]; then
+  if [[ -x /usr/sbin/service ]]; then
+    alls=( $(service -l) ) && ret=0
+
+    _wanted services expl service compadd "$@" - $alls[@] && ret=0
+  fi
+elif chkconfig --list > /dev/null 2>&1; then
   alls=( ${(f)"$(LANGUAGE=C LANG=C LC_ALL=C chkconfig --list)"} )
   inits=( ${${${alls[1,(r)xinetd based*]}[1,-2]}/%[[:space:]]*/} )
   xinetds=( ${${${${alls[(r)xinetd based*,-1]}[2,-1]}/#[[:space:]]#}/%:*} )

@@ -1,0 +1,31 @@
+#compdef service
+
+# *:: for last argument looks more like a hack but it is
+# the simplest way known to me to reset $words and keep
+# _sub_command happy
+
+# we are interested in init service only
+local ctx="${curcontext}argument-1:"
+zstyle -T  ":completion:${ctx}" tag-order && \
+  zstyle ":completion:${ctx}" tag-order init
+
+
+if [[ $OSTYPE = freebsd* ]]; then
+  _arguments -s \
+    '(-)-e[show services that are enabled]' \
+    '(-)-l[list all scripts in /etc/rc.d and the local startup directory]' \
+    '(-)-r[show the results of boot time rcorder]' \
+    '(-)-v[verbose]' \
+    ':service name:_services' \
+    '*::service argument:_init_d'
+else
+  _arguments -s \
+    '(-d --debug)'{-d,--debug}'[turn debugging on]' \
+    '(- :)'{-h,--help}'[print usage]' \
+    '(- :)'{-v,--version}'[print version]' \
+    '(-)'{-f,--full-restart}'[restart service]' \
+    '(- :)'{-R,--full-restart-all}'[restart all services]' \
+    '(- :)'{-s,--status-all}'[print status of all services]' \
+    ':service name:_services' \
+    '*::service argument: _init_d'
+fi
