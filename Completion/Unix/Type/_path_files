@@ -357,7 +357,7 @@ for prepath in "$prepaths[@]"; do
   cpre=
 
   if [[ ( -n $accept_exact_dirs || -z $path_completion ) && \
-        $pre = (#b)(*)/([^/]#) ]]; then
+        ${(Q)pre} = (#b)(*)/([^/]#) ]]; then
     # We've been told either that we can accept an exact directory prefix
     # immediately, or that path expansion is inhibited.  Try the longest
     # path prefix first: in the first case, this saves stats in the simple

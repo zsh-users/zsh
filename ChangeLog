@@ -1,3 +1,10 @@
+2010-04-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/15028 (modified to do the unquoting a bit more
+	logically): Completion/Unix/Type/_path_files: for
+	path-completion false and accept-exact-dirs true we need to
+	unquote the word from the command line.
+
 2010-04-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27889: Src/subst.c, Test/D04parameter.ztst: Force more use of
@@ -13045,5 +13052,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4960 $
+* $Revision: 1.4961 $
 *****************************************************
