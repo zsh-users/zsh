@@ -25,7 +25,7 @@ _arguments \
         _lsusb_devices[${pair}]="$match[2]"
       ;;
     esac
-  done < <(zcat /var/lib/usbutils/usb.ids)
+  done < /var/lib/usbutils/usb.ids
 fi
 
 compadd -k _lsusb_devices
