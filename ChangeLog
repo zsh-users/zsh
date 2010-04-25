@@ -1,7 +1,10 @@
 2010-04-25  Clint Adams  <clint@zsh.org>
 
 	* 27912: Completion/Linux/Command/_lsusb: presume that
-	pci.ids is uncompressed now.
+	usb.ids is uncompressed now.
+
+	* 27914: Completion/Linux/Command/_lsusb: find usb.ids
+	in /usr/share/misc.
 
 2010-04-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
@@ -13057,5 +13060,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4962 $
+* $Revision: 1.4963 $
 *****************************************************
