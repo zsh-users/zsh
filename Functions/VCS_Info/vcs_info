@@ -47,11 +47,17 @@ vcs_info () {
     local pat
     local -i found
     local -a enabled disabled dps
-    local -x usercontext vcs rrn
+    local -x usercontext vcs rrn LC_MESSAGES
     local -ix maxexports
     local -ax msgs
     local -Ax vcs_comm
 
+    LC_MESSAGES=C
+    if [[ -n ${LC_ALL} ]]; then
+        local -x LANG
+        LANG=${LC_ALL}
+        local -x LC_ALL
+    fi
     vcs='-init-'; rrn='-all-'
     usercontext=${1:-default}
 

@@ -1,3 +1,8 @@
+2010-04-26  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 27908: Functions/VCS_Info/vcs_info: Avoid locale related
+	problems
+
 2010-04-26  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: update to Perforce
@@ -13068,5 +13073,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4965 $
+* $Revision: 1.4966 $
 *****************************************************
