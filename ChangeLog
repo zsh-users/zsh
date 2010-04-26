@@ -1,3 +1,11 @@
+2010-04-26  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: update to Perforce
+	2009.2 features.
+
+	* unposted: Completion/X/Command/_kfmclient: also kioclient;
+	probe desktop bindings.
+
 2010-04-25  Clint Adams  <clint@zsh.org>
 
 	* 27912: Completion/Linux/Command/_lsusb: presume that
@@ -13060,5 +13068,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4964 $
+* $Revision: 1.4965 $
 *****************************************************

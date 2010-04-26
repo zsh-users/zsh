@@ -1,7 +1,10 @@
-#compdef kfmclient
+#compdef kfmclient kioclient
 
 # kfmclient is a command line interface for use with Konqueror,
 # the KDE file manager and web browser.
+#
+# In KDE4, kioclient has similar syntax but doesn't necessarily talk
+# to Konqueror ("kioclient exec ." by default starts Dolphin, for example).
 
 local expl
 local -a context state line
@@ -82,8 +85,8 @@ case $line[1] in
 
   (exec)
   if [[ $state = secondarg ]]; then
-    # TODO: could probe inside Desktop files.
-    _message "KDE binding"
+    # Look for a Desktop Action binding.
+    _wanted binding expl 'KDE binding' compadd -- ${${${(M)${(f)"$(<$file)"}:#"[Desktop Action "*"]"}%%\]}##"[Desktop Action "}
     return
   elif [[ $state = firstarg ]]; then
     _webbrowser

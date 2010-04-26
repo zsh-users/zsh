@@ -414,6 +414,8 @@ _perforce() {
       '-xi[switch server database to unicode mode and quit]' \
       '-xu[run database upgrade and quit]' \
       '-c[run command and exit]:command of some sort: ' \
+      '-Id[specify description]:description: ' \
+      '-In[specify unique name]:name: ' \
       '-jc[checkpoint, save and truncate journal]::optional prefix: ' \
       '-jd[checkpoint, not saving journal]::optional file:_files' \
       '-jj[save and truncate journal]::optional prefix: ' \
@@ -487,7 +489,10 @@ _perforce_gen_cmd_list() {
   local -a unsup
   unsup=(
     "attribute:Set attributes for open file (EXPERIMENTAL)"
+    "dbschema:Report meta database information"
+    "export:Rxtract journal or checkpoint records"
     "interchanges:Report changes not yet integrated between branches"
+    "replicate:Poll for journal changes and apply to another server"
     "spec:Allows limited changes to form specifications (admin)"
   )
   for line in $unsup; do
@@ -560,6 +565,7 @@ _perforce_global_options() {
     '-s[output script tags]' \
     '-u+[user]:user name:_perforce_users' \
     '-x+[filename or -]:file:_perforce_files_or_minus' \
+    '-z+[select output format]:output format:(tag)'
   )
 
   integer i
@@ -660,6 +666,12 @@ awk '/^Client:/ { print $2 }')")
       ctype="local pending "
       ;;
 
+      # Changes that were shelved
+      (-tS)
+      cstatus=(-s shelved)
+      ctype="shelved "
+      ;;
+
       # Range allowed: append comma and supply rules for
       # removing and handling subsequent `#'.
       (-tR)
@@ -671,7 +683,9 @@ awk '/^Client:/ { print $2 }')")
   # output.
   cl=(
 ${${${${(f)"$(_perforce_call_p4 changes changes $amax $xargs $cstatus \$file)"}##Change\ }//\ on\ /:}/\ by\ /\ }
-"default:change not yet numbered")
+  )
+  # "default" can't have shelved files in it...
+  [[ $ctype = shelved* ]] || cl+=("default:change not yet numbered")
   [[ $#cl -eq 1 && $cl[1] = '' ]] && cl=()
   _describe -t changes "${ctype}change" cl -V changes-unsorted $comma
 }
@@ -761,6 +775,16 @@ _perforce_dates() {
   done
 
   _describe -t dates $name offer $opts
+}
+
+
+(( $+functions[_perforce_dbtables] )) ||
+_perforce_dbtables() {
+  local -a tables
+  tables=(archmap bodtext change changex counters depot domain have integ
+    integed ixtext label locks resolve rev revcx revdx revhx revsx trigger
+    user view working)
+  _describe -t db-table "DB table" tables
 }
 
 
@@ -1232,7 +1256,9 @@ _perforce_filetypes() {
       "C:server stores compress file per revision"
       "D:server stores deltas in RCS format"
       "F:server stores full file per revision"
-      "S:server stores only head revision")
+      "S:server stores only head revision"
+      "X:externally archived file"
+    )
     _describe -t file-modifiers 'Perforce file modifier' values
   else
     values=(
@@ -1243,6 +1269,28 @@ _perforce_filetypes() {
       "unicode:text, translate newlines, store as UTF-8")
     _describe -t file-types 'Perforce file type' values -S+ -q
   fi
+}
+
+
+(( $+functions[_perforce_fstat_fields] )) ||
+_perforce_fstat_fields() {
+  local sep
+  if [[ $argv[-1] = -tv ]]; then
+    # jobview, space is separator
+    sep=' '
+  else
+    sep=','
+  fi
+  local -a values
+  # yes, "phew", sorry.
+  # output from "p4 help fstat" gives fields like
+  #    digest               -- MD5 digest (fingerprint)
+  # etc. etc.
+  values=(
+    ${${${${(M)${(f)"$(_perforce_call_p4 help-fstat help fstat)"}:#[[:blank:]]#[a-zA-Z]##(|\#)[[:blank:]]##--*}##[[:blank:]]#}:#fstat *}//[[:blank:]]##--[[:blank:]]##/:}
+  )
+  compset -P '*[,[:blank:]]'
+  _describe -t fstat-fields 'Perforce fstat fields' values -S, -q
 }
 
 
@@ -1556,15 +1604,27 @@ _perforce_cmd_admin() {
     local -a adcmds
     adcmds=(
       "checkpoint:checkpoint, save copy of journal file"
+      "dbstat:db tables"
       "journal:save and truncate journal file"
+      "logstat:report sizes of log files"
       "stop:stop the server")
     _describe -t commands 'Perforce admin command' adcmds
-  elif [[ $words[2] == (checkpoint|journal) ]]; then
-    shift words
-    (( CURRENT-- ))
-    _arguments -s : \
-      '-z[gzip journal file]' \
-      '1::journal file prefix: '
+  else
+    case $words[2] in
+      (checkpoint|journal)
+      shift words
+      (( CURRENT-- ))
+      _arguments -s : \
+	'-z[gzip journal file]' \
+	'1::journal file prefix: '
+      ;;
+
+      (dbstat)
+      shift words
+      (( CURRENT -- ))
+      _arguments -s : \
+	'-s[show sizes]'
+    esac
   fi
 }
 
@@ -1613,6 +1673,7 @@ _perforce_cmd_branch() {
 (( $+functions[_perforce_cmd_branches] )) ||
 _perforce_cmd_branches() {
   _arguments -s : \
+    '-e[limit by wildcard]:wildcard on branches: ' \
     '-u+[select by user]:user:_perforce_users' \
     '-m+[set maximum to show]:max branches: '
 }
@@ -1657,7 +1718,7 @@ _perforce_cmd_changes() {
     '-L[long output, truncated change text]' \
     '-c+[select by client]:client:_perforce_clients' \
     '-m+[most recent N changes]:max changes: ' \
-    '-s+[select by status]:status:(pending submitted)' \
+    '-s+[select by status]:status:(pending shelved submitted)' \
     '-u+[select by user]:user:_perforce_users' \
     '*::file:_perforce_files -tR'
 }
@@ -1684,6 +1745,7 @@ _perforce_cmd_client() {
 (( $+functions[_perforce_cmd_clients] )) ||
 _perforce_cmd_clients() {
   _arguments -s : \
+    '-e[limit by wildcard]:wildcard on clients: ' \
     '-u+[select by user]:user:_perforce_users' \
     '-m+[set maximum to show]:max clients: '
 }
@@ -1703,6 +1765,26 @@ _perforce_cmd_counter() {
 _perforce_cmd_counters() {
   # No arguments
   _arguments -s :
+}
+
+
+(( $+functions[_perforce_cmd_dbschema] )) ||
+_perforce_cmd_dbschema() {
+  if [[ $PREFIX = *:* ]]; then
+    _message 'table version'
+  else
+    _perforce_dbtables
+  fi
+}
+
+
+(( $+functions[_perforce_cmd_dbstat] )) ||
+_perforce_cmd_dbstat() {
+  _arguments -s : \
+  '(-s)-h[histogram of leaf pages in DB table]' \
+  '(-s)-a[all tables]' \
+  '(-h -a)-s[report sizes of tables]' \
+  '(-s -a)*::DB table:_perforce_dbtable'
 }
 
 
@@ -1737,6 +1819,7 @@ _perforce_cmd_describe() {
   _arguments -s : \
     '-d-[select diff option]:diff option:((b\:ignore\ blanks c\:context n\:RCS s\:summary u\:unified w\:ignore\ all\ whitespace))' \
     '-s[short form]' \
+    '-S[show shelved changes]' \
     '*::change:_perforce_changes'
 }
 
@@ -1786,20 +1869,36 @@ _perforce_cmd_dirs() {
 _perforce_cmd_edit() {
   _arguments -s : \
     '-c[set change for edit]:change:_perforce_changes -tc' \
+    '-k[no resync from server]' \
     '-n[show files to edit without opening them]' \
     '-t[set filetype]:filetype:_perforce_filetypes' \
     '*::file:_perforce_files'
 }
 
 
+(( $+functions[_perforce_cmd_export] )) ||
+_perforce_cmd_export() {
+  _arguments -s : \
+    '(-j)-c[specify checkpoint number (/ position)]:checkpoint number: ' \
+    '(-c)-j[specify journal number (/ position)]:journal number: ' \
+    '(-j)-f[reformat non-textual data types]' \
+    '(-j)-l[specify number of lines]:number of lines: ' \
+    '(-j)-F[specify filter]:filter pattern: ' \
+    '(-c)-r[raw format]' \
+    '-J[specify file prefix]:file prefix: '
+}
+
+
 (( $+functions[_perforce_cmd_filelog] )) ||
 _perforce_cmd_filelog() {
   _arguments -s : \
+    '-c[select by changelist]:change:_perforce_changes -ts' \
     '-h[follow branc/copy from records]' \
     '-i[follow branches]' \
     '-l[long output, full change text]' \
     '-L[long output, truncated change text]' \
     '-m[set maximum number of revisions to show]:max revisions: ' \
+    '-s[short output]' \
     '-t[include time with date]' \
     '*::file:_perforce_files'
 }
@@ -1872,14 +1971,18 @@ _perforce_cmd_fstat() {
     '-c+[affected since change]:change:_perforce_changes -ts' \
     '-e+[affected by change]:change:_perforce_changes -ts' \
     '-C[select mapped files (-Rc)]' \
+    '-F[pick filter for files]:filter:_perforce_fstat_fields -tv' \
     '-H[select synced files (-Rh)]' \
     '-W[select opened files (-Ro)]' \
     '-l[include fileSize, possibly slow (-Ol)]' \
     '-m[set max files to show]:max files: ' \
     "-O-[select output type]:output type:((f\:all\ revisions l\:fileSize p\:client\ path\ format r\:pending\ integrations s\:exclude\ local\ path$Oattr))" \
     '-P[output clientFile in full Perforce syntax (deprecated: use -Op)]' \
-    '-R-[restrict selected files]:restriction:((c\:mapped\ in\ client h\:synced\ to\ client n\:not\ synced\ to\ head o\:opened r\:resolved u\:unresolved))' \
+    '-r[show in reverse order]' \
+    '-R-[restrict selected files]:restriction:((c\:mapped\ in\ client h\:synced\ to\ client n\:not\ synced\ to\ head o\:opened r\:resolved s\:shelved u\:unresolved))' \
     '-s[shorten, no client-related data (deprecated: use -Os)]' \
+    '-S-[changes sort order]:sort criterion:((t\:filetype d\:date r\:head\ revision h\:have\ revision s\:filesize))' \
+    '-T[select output fields]:output field:_perforce_fstat_fields' \
     $Aattr \
     '*::file:_perforce_files'
 }
@@ -1969,6 +2072,11 @@ i\:ignore\ readded\ source\ file
 }
 
 
+(( $+functions[_perforce_cmd_integ] )) ||
+_perforce_cmd_integ() {
+  _perforce_cmd_integrate "$@"
+}
+
 (( $+functions[_perforce_cmd_integrated] )) ||
 _perforce_cmd_integrated() {
   _arguments -s : \
@@ -2055,7 +2163,9 @@ _perforce_cmd_label() {
 (( $+functions[_perforce_cmd_labels] )) ||
 _perforce_cmd_labels() {
   _arguments -s : \
+    '-e[limit by wildcard]:label wildcard: ' \
     '-m+[set maximum to show]:max labels: ' \
+    '-t[output time as well as date]' \
     '-u+[select by user]:user:_perforce_users' \
     '1::file or revisions which must contain label:_perforce_files -tR'
 }
@@ -2088,6 +2198,12 @@ _perforce_cmd_lock() {
 }
 
 
+(( $+functions[_perforce_cmd_lockstat] )) ||
+_perforce_cmd_lockstat() {
+  _message 'no arguments'
+}
+
+
 (( $+functions[_perforce_cmd_logger] )) ||
 _perforce_cmd_logger() {
   _arguments -s : \
@@ -2111,6 +2227,21 @@ _perforce_cmd_login() {
 _perforce_cmd_logout() {
   _arguments -s : \
     '-a[invalidate ticket on server]'
+}
+
+
+(( $+functions[_perforce_cmd_logstat] )) ||
+_perforce_cmd_logstat() {
+  _message 'no arguments'
+}
+
+
+(( $+functions[_perforce_cmd_logtail] )) ||
+_perforce_cmd_logtail() {
+  _arguments -s : \
+    '-b[specify block size, default 8192]:block size: ' \
+    '-s[specify start offset]:offset: ' \
+    '-m[specify max blocks]:max blocks: '
 }
 
 
@@ -2146,6 +2277,18 @@ _perforce_cmd_monitor() {
 }
 
 
+(( $+functions[_perforce_cmd_move] )) ||
+_perforce_cmd_move() {
+  _arguments -s : \
+    '-c[specify new change list]:change:_perforce_changes -tc' \
+    '-k[no resync from server]' \
+    '-t[specify new file type]:filetype:_perforce_filetypes' \
+    '-n[show files to move without moving them]' \
+    '1::source file, wildcards allowed:_perforce_files -to' \
+    '2::destination file, wildcards match source:_perforce_files'
+}
+
+
 (( $+functions[_perforce_cmd_obliterate] )) ||
 _perforce_cmd_obliterate() {
     if [[ ${words[(I)-y]} -gt 0 ]]; then
@@ -2170,6 +2313,7 @@ _perforce_cmd_opened() {
     '-c+[select by change]:change:_perforce_changes -tc' \
     '-C[select by client]:client:_perforce_clients' \
     '-m[max files to show]:max files: ' \
+    '-u[select by user]:user name:_perforce_users' \
     '*::file:_perforce_files -to'
 }
 
@@ -2219,6 +2363,20 @@ _perforce_cmd_reopen() {
     '-c+[select change to reopen on]:change:_perforce_changes -tc' \
     '-t+[set file type]:file type:_perforce_filetypes' \
     '*::file:_perforce_files -to'
+}
+
+
+(( $+functions[_perforce_cmd_replicate] )) ||
+_perforce_cmd_replicate() {
+  _arguments -s : \
+    '-i[specify interval in seconds]:interval: ' \
+    '-j[specify journal number (/ position)]:journal number: ' \
+    '-J[specify file prefix]:file prefix: ' \
+    '-k[keep pipe open]' \
+    '-o[specify output file]:output file:_files' \
+    '-s[specify file to track state]:state file:_files' \
+    '-x[terminate when journal rotates]' \
+    '*::->_command'
 }
 
 
@@ -2281,6 +2439,18 @@ _perforce_cmd_set() {
 }
 
 
+(( $+functions[_perforce_cmd_shelve] )) ||
+_perforce_cmd_shelve() {
+  _arguments -s : \
+    '(-i)-c[specify changlist if not default]:change:_perforce_changes -tc' \
+    '(-i -r)-d[delete shelved files]' \
+    '(-r)-f[force by admin user or force to overwrite]' \
+    '(-c)-i[read from standard input]' \
+    '(-d)-r[replace shelved files in changelist]' \
+    '(-i -r)*::file:_perforce_files -to'
+}
+
+
 (( $+functions[_perforce_cmd_sizes] )) ||
 _perforce_cmd_sizes() {
   _arguments -s : \
@@ -2335,18 +2505,18 @@ _perforce_cmd_tag() {
 }
 
 
+(( $+functions[_perforce_cmd_tickets] )) ||
+_perforce_cmd_tickets() {
+  # No arguments.
+  _arguments -s :
+}
+
+
 (( $+functions[_perforce_cmd_triggers] )) ||
 _perforce_cmd_triggers() {
   _arguments -s : \
     '-o[output form to stdout]' \
     '-i[read from from stdin]'
-}
-
-
-(( $+functions[_perforce_cmd_tickets] )) ||
-_perforce_cmd_tickets() {
-  # No arguments.
-  _arguments -s :
 }
 
 
@@ -2364,6 +2534,17 @@ _perforce_cmd_unlock() {
     '-c[non-default change to unlock]:change:_perforce_changes -tc' \
     '-f[allow superuser to unlock any file]' \
     '*::file:_perforce_files'
+}
+
+
+(( $+functions[_perforce_cmd_unshelve] )) ||
+_perforce_cmd_unshelve() {
+  _arguments -s : \
+    '-s[specify shelving change]:change:_perforce_changes -tS' \
+    '-c[specify change for unshelve]:change:_perforce_changes -tc' \
+    '-f[force clobbering of writeable files]' \
+    '-n[preview unshelve]' \
+    '*::file, pattern allowed:_perforce_files'
 }
 
 
@@ -2393,6 +2574,7 @@ _perforce_cmd_verify() {
     '-q[operate quietly]' \
     '-u[compute and save digest if missing]' \
     '-v[compute and save all digets]' \
+    '-z[skip duplicates]' \
     '*::file:_perforce_files -tR'
 }
 
