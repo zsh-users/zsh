@@ -1,3 +1,8 @@
+2010-04-27  Peter Stephenson  <pws@csr.com>
+
+	* 27911: Completion/Base/Core/_main_complete: ensure colouring is
+	not used if not configured when showing old lists.
+
 2010-04-26  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 27908: Functions/VCS_Info/vcs_info: Avoid locale related
@@ -13073,5 +13078,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4966 $
+* $Revision: 1.4967 $
 *****************************************************

@@ -30,7 +30,8 @@ local func funcs ret=1 tmp _compskip format nm call match min max i num\
       _saved_lastprompt="${compstate[last_prompt]}" \
       _saved_list="${compstate[list]}" \
       _saved_insert="${compstate[insert]}" \
-      _saved_colors="$ZLS_COLORS"
+      _saved_colors="$ZLS_COLORS" \
+      _saved_colors_set=${+ZLS_COLORS}
 
 # _precommand sets this to indicate we are following a precommand modifier
 local -a precommands
@@ -325,7 +326,11 @@ fi
     compstate[list]="${compstate[list]//messages} force"
 
 if [[ "$compstate[old_list]" = keep ]]; then
-  ZLS_COLORS="$_saved_colors"
+  if [[ $_saved_colors_set = 1 ]]; then
+    ZLS_COLORS="$_saved_colors"
+  else
+    unset ZLS_COLORS
+  fi
 elif (( $#_comp_colors )); then
   ZLS_COLORS="${(j.:.)_comp_colors}"
 else
