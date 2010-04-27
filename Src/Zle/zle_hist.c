@@ -634,6 +634,7 @@ insertlastword(char **args)
 	}
     }
 
+    fixsuffix();
     metafy_line();
     if (lastinsert && lastlen &&
 	lastpos <= zlemetacs &&

@@ -1,5 +1,8 @@
 2010-04-27  Peter Stephenson  <pws@csr.com>
 
+	* 27926: Src/Zle/zle_hist.c: fix completion suffix when inserting
+	last word.
+
 	* 27911: Completion/Base/Core/_main_complete: ensure colouring is
 	not used if not configured when showing old lists.
 
@@ -13078,5 +13081,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4967 $
+* $Revision: 1.4968 $
 *****************************************************
