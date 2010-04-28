@@ -1,3 +1,8 @@
+2010-04-28  Clint Adams  <clint@zsh.org>
+
+	* Bernd Zeimetz: 27931: Completion/Debian/Command/_bts:
+	completion for bts affects.
+
 2010-04-28  Peter Stephenson  <pws@csr.com>
 
 	* Mikael: 27929: Src/lex.c, Doc/Zsh/options.yo (added pws): global
@@ -13086,5 +13091,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4969 $
+* $Revision: 1.4970 $
 *****************************************************
