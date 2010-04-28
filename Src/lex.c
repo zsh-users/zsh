@@ -1774,7 +1774,7 @@ exalias(void)
 		if (an && !an->inuse &&
 		    ((an->node.flags & ALIAS_GLOBAL) || incmdpos || inalmore)) {
 		    inpush(an->text, INP_ALIAS, an);
-		    if (an->text[0] == ' ')
+		    if (an->text[0] == ' ' && !(an->node.flags & ALIAS_GLOBAL))
 			aliasspaceflag = 1;
 		    lexstop = 0;
 		    if (zshlextext == copy)

@@ -1,3 +1,8 @@
+2010-04-28  Peter Stephenson  <pws@csr.com>
+
+	* Mikael: 27929: Src/lex.c, Doc/Zsh/options.yo (added pws): global
+	aliases with space shouldn't trigger HIST_IGNORE_SPACE.
+
 2010-04-27  Peter Stephenson  <pws@csr.com>
 
 	* 27926: Src/Zle/zle_hist.c: fix completion suffix when inserting
@@ -13081,5 +13086,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4968 $
+* $Revision: 1.4969 $
 *****************************************************

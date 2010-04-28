@@ -829,7 +829,8 @@ cindex(history, ignoring spaces)
 item(tt(HIST_IGNORE_SPACE) (tt(-g)))(
 Remove command lines from the history list when the first character on
 the line is a space, or when one of the expanded aliases contains a
-leading space.
+leading space.  Only normal aliases (not global or suffix aliases)
+have this behaviour.
 Note that the command lingers in the internal history until the next
 command is entered before it vanishes, allowing you to briefly reuse
 or edit the line.  If you want to make it vanish right away without
