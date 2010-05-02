@@ -3126,7 +3126,7 @@ __git_heads () {
   branch_names=(${${(f)"$(_call_program headrefs git for-each-ref --format='"%(refname)"' refs/heads refs/remotes 2>/dev/null)"}#refs/(heads|remotes)/})
   __git_command_successful || return
 
-  _wanted heads expl branch-name compadd $* - $branch_names HEAD
+  _wanted heads expl branch-name compadd $* - $branch_names HEAD FETCH_HEAD ORIG_HEAD MERGE_HEAD
 }
 
 (( $+functions[__git_tags] )) ||

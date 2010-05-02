@@ -1,3 +1,8 @@
+2010-05-02  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Simon Ruderich: 27813: Completion/Unix/Command/_git: Complete
+	some generic symbolic references as heads.
+
 2010-04-28  Clint Adams  <clint@zsh.org>
 
 	* Bernd Zeimetz: 27931: Completion/Debian/Command/_bts:
@@ -13091,5 +13096,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4970 $
+* $Revision: 1.4971 $
 *****************************************************
