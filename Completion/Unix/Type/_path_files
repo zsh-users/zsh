@@ -357,16 +357,26 @@ for prepath in "$prepaths[@]"; do
   cpre=
 
   if [[ ( -n $accept_exact_dirs || -z $path_completion ) && \
-        ${(Q)pre} = (#b)(*)/([^/]#) ]]; then
+        ${pre} = (#b)(*)/([^/]#) ]]; then
     # We've been told either that we can accept an exact directory prefix
     # immediately, or that path expansion is inhibited.  Try the longest
     # path prefix first: in the first case, this saves stats in the simple
     # case and may get around automount behaviour if early components don't
     # yet exist, and in the second case this is the prefix we want to keep.
-    tmp1=$match[1]
-    tpre=$match[2]
+    #
+    # Explanation of substitution: For tmp1 and tpre, which are used further
+    # on, we need to remove quotes from everything that's not a pattern
+    # character, because the code that does the file generation only
+    # strips qutoes from pattern characters (you know better than
+    # to ask why).  Because we need to test for a real directory,
+    # however, for tmp2 we unquote everything.
+    tmp1=${match[1]}
+    tpre=${match[2]}
+    tmp2=${(Q)tmp1}
+    tmp1=${tmp1//(#b)\\([^\\\]\[\^\~\(\)\#\*\?])/$match[1]}
+    tpre=${tpre//(#b)\\([^\\\]\[\^\~\(\)\#\*\?])/$match[1]}
     while true; do
-      if [[ -z $path_completion || -d $prepath$realpath$donepath$tmp1 ]]; then
+      if [[ -z $path_completion || -d $prepath$realpath$donepath$tmp2 ]]; then
 	donepath=$donepath$tmp1/
 	pre=$tpre
 	break
@@ -381,7 +391,14 @@ for prepath in "$prepaths[@]"; do
 
   tpre="$pre"
   tsuf="$suf"
-  testpath="$donepath"
+  # Now we strip quoting from pattern characters, too, because
+  # testpath is used as a literal string.  I suppose we could
+  # alternatively use ${~testpath} later.
+  #
+  # I'm not sure if donepath itself should be entirely unquoted at
+  # some point but probably not here, since we need the quoted pattern
+  # characters in tmp1 below (I think).
+  testpath="${donepath//(#b)\\([\\\]\[\^\~\(\)\#\*\?])/$match[1]}"
 
   tmp2="${(M)tpre##${~skips}}"
   tpre="${tpre#$tmp2}"

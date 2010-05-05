@@ -1,5 +1,9 @@
 2010-05-05  Peter Stephenson  <pws@csr.com>
 
+	* users/15031: Completion/Unix/Type/_path_files: fix (still
+	incomplete) for bizarre quoting rules for files in completion
+	with path-completion off or accept-exact-dirs on.
+
 	* 27947: Src/exec.c, Test/C03traps.ztst: fix some cases where we
 	should (probably) execute an EXIT trap but don't.
 
@@ -13101,5 +13105,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4972 $
+* $Revision: 1.4973 $
 *****************************************************
