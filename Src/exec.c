@@ -1299,6 +1299,12 @@ sublist_done:
     lineno = oldlineno;
     if (dont_change_job)
 	thisjob = cj;
+
+    if (exiting && sigtrapped[SIGEXIT]) {
+	dotrap(SIGEXIT);
+	/* Make sure this doesn't get executed again. */
+	sigtrapped[SIGEXIT] = 0;
+    }
 }
 
 /* Execute a pipeline.                                                *
@@ -1631,7 +1637,7 @@ execpline2(Estate state, wordcode pcode,
 		entersubsh(((how & Z_ASYNC) ? ESUB_ASYNC : 0)
 			   | ESUB_PGRP | ESUB_KEEPTRAP);
 		close(synch[1]);
-		execcmd(state, input, pipes[1], how, 0);
+		execcmd(state, input, pipes[1], how, 1);
 		_exit(lastval);
 	    }
 	} else {

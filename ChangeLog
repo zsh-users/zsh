@@ -1,3 +1,8 @@
+2010-05-05  Peter Stephenson  <pws@csr.com>
+
+	* 27947: Src/exec.c, Test/C03traps.ztst: fix some cases where we
+	should (probably) execute an EXIT trap but don't.
+
 2010-05-02  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Simon Ruderich: 27813: Completion/Unix/Command/_git: Complete
@@ -13096,5 +13101,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4971 $
+* $Revision: 1.4972 $
 *****************************************************
