@@ -1,3 +1,8 @@
+2010-05-10  Peter Stephenson  <pws@csr.com>
+
+	* c.f. 27950: Test/C03traps.ztst some bogus whitespace got added
+	in patching 27947.
+
 2010-05-10  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Seth House, Simon Ruderich and myself: 27948:
@@ -13117,5 +13122,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4974 $
+* $Revision: 1.4975 $
 *****************************************************

@@ -352,11 +352,11 @@
 
    { trap 'echo This subshell is exiting' EXIT; } | cat
 0: EXIT trap set in current shell at left of pipeline
->This subshell is exiting  
+>This subshell is exiting
 
    ( trap 'echo This subshell is also exiting' EXIT; ) | cat
 0: EXIT trap set in subshell at left of pipeline
->This subshell is also exiting  
+>This subshell is also exiting
 
    ( trap 'echo Should only appear once at the end' EXIT
      ( : trap reset here ) | cat
@@ -365,11 +365,11 @@
    )
 0: EXIT trap set in subshell reset in subsubshell
 >nothing after this should appear
->Should only appear once at the end  
+>Should only appear once at the end
 
    echo $( trap 'echo command substitution exited' EXIT )
 0: EXIT trap set in command substitution
->command substitution exited  
+>command substitution exited
 
 %clean
 
