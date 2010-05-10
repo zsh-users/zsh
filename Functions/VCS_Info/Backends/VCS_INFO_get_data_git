@@ -3,7 +3,7 @@
 ## Distributed under the same BSD-ish license as zsh itself.
 
 setopt localoptions extendedglob NO_shwordsplit
-local gitdir gitbase gitbranch gitaction gitunstaged gitstaged gitsha1 gitmisc
+local gitdir gitbase gitbranch gitaction gitunstaged gitstaged gitsha1
 local stgitpatch stgitunapplied
 local -xA hook_com
 
@@ -139,33 +139,40 @@ if [[ -d $patchdir ]] ; then
     stgit_unapplied=(${(f)"$(< "${patchdir}/unapplied")"})
     stgit_unapplied=( ${(oa)stgit_applied} )
 
-    if VCS_INFO_hook 'gen-stgit-patch-string' "${stgit_applied[@]}"; then
+    if VCS_INFO_hook 'gen-applied-string' "${stgit_applied[@]}"; then
         if (( ${#stgit_applied} )); then
             stgitpatch=${stgit_applied[1]}
         else
-            stgitpatch="no patch applied"
+            stgitpatch=""
         fi
     else
-        stgitpatch=${hook_com[stgit-patch-string]}
+        stgitpatch=${hook_com[patch-string]}
     fi
-    if VCS_INFO_hook 'gen-stgit-unapplied-string' "${stgit_unapplied[@]}"; then
+    hook_com=()
+    if VCS_INFO_hook 'gen-unapplied-string' "${stgit_unapplied[@]}"; then
         stgitunapplied=${#stgit_unapplied}
     else
-        stgitunapplied=${hook_com[stgit-unapplied-string]}
+        stgitunapplied=${hook_com[unapplied-string]}
     fi
 
-    zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" stgitformat stgitmsg || stgitmsg=" %p (%c)"
-    hook_com=( patch "${stgitpatch}" unapplied "${stgitunapplied}" )
-    if VCS_INFO_hook 'set-stgit-format' "${stgitformat}"; then
-        zformat -f stgitmsg "${stgitmsg}" "p:${hook_com[patch]}" "c:${hook_com[unapplied]}"
-        gitmisc=${stgitmsg}
+    if (( ${#stgit_applied} )); then
+        zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" patch-format stgitmsg || stgitmsg="%p (%n applied)"
     else
-        gitmisc=${hook_com[stgit-replace]}
+        zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" nopatch-format stgitmsg || stgitmsg="no patch applied"
+    fi
+    hook_com=( applied "${stgitpatch}"     unapplied "${stgitunapplied}"
+               applied-n ${#stgit_applied} unapplied-n ${#stgit_unapplied} )
+    if VCS_INFO_hook 'set-patch-format' "${stgitmsg}"; then
+        zformat -f stgitmsg "${stgitmsg}" "p:${hook_com[applied]}" "u:${hook_com[unapplied]}" \
+                                          "n:${#stgit_applied}" "c:${#stgit_unapplied}"
+    else
+        stgitmsg=${hook_com[patch-replace]}
     fi
     hook_com=()
 else
-    gitmisc=''
+    stgitmsg=''
 fi
 
-VCS_INFO_formats "${gitaction}" "${gitbranch}" "${gitbase}" "${gitstaged}" "${gitunstaged}" "${gitsha1}" "${gitmisc}"
+backend_misc[patches]="${stgitmsg}"
+VCS_INFO_formats "${gitaction}" "${gitbranch}" "${gitbase}" "${gitstaged}" "${gitunstaged}" "${gitsha1}" "${stgitmsg}"
 return 0

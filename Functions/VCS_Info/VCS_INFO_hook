@@ -20,8 +20,11 @@ if (( debug )); then
 fi
 
 zstyle -a "${context}" hooks hooks || return 0
-# protect some internal variables in hooks
-typeset -r vcs rrn usercontext maxexports msgs vcs_comm
+# Protect some internal variables in hooks. The `-g' parameter to
+# typeset does *not* make the parameters global here (they are already
+# "*-local-export). It prevents typeset from creating *new* *local*
+# parameters in this function's scope.
+typeset -g -r vcs rrn usercontext maxexports msgs vcs_comm
 for hook in ${hooks} ; do
     func="+vi-${hook}"
     if (( ${+functions[$func]} == 0 )); then
@@ -29,6 +32,7 @@ for hook in ${hooks} ; do
         continue
     fi
     (( debug )) && printf '  + Running function: "%s"\n' "${func}"
+    true
     ${func} "$@"
     case $? in
         (0)
@@ -38,5 +42,5 @@ for hook in ${hooks} ; do
             ;;
     esac
 done
-typeset +r vcs rrn usercontext maxexports msgs vcs_comm
+typeset -g +r vcs rrn usercontext maxexports msgs vcs_comm
 return $ret

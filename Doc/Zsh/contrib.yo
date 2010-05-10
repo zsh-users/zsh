@@ -334,15 +334,19 @@ startsitem()
 sitem(Bazaar (tt(bzr)))(http://bazaar-vcs.org/)
 sitem(Codeville (tt(cdv)))(http://codeville.org/)
 sitem(Concurrent Versioning System (tt(cvs)))(http://www.nongnu.org/cvs/)
-sitem(tt(darcs))(http://darcs.net/)
-sitem(tt(git))(http://git.or.cz/)
+sitem(Darcs (tt(darcs)))(http://darcs.net/)
+sitem(Git (tt(git)))(http://git-scm.com/)
 sitem(GNU arch (tt(tla)))(http://www.gnu.org/software/gnu-arch/)
-sitem(Mercurial (tt(hg)))(http://selenic.com/mercurial/)
+sitem(Mercurial (tt(hg)))(http://mercurial.selenic.com/)
 sitem(Monotone (tt(mtn)))(http://monotone.ca/)
 sitem(Perforce (tt(p4)))(http://www.perforce.com/)
 sitem(Subversion (tt(svn)))(http://subversion.tigris.org/)
 sitem(SVK (tt(svk)))(http://svk.bestpractical.com/)
 endsitem()
+
+There is also support for the patch management system tt(quilt)
+(http://savannah.nongnu.org/projects/quilt). See tt(Quilt Support)
+below for details.
 
 To load var(vcs_info):
 
@@ -364,7 +368,7 @@ zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
 precmd () { vcs_info }
 PS1='%F{5}[%F{2}%n%F{5}] %F{3}%3~ ${vcs_info_msg_0_}%f%# ')
 
-Obviously, the last two lines are there for demonstration: You need to
+Obviously, the last two lines are there for demonstration. You need to
 call var(vcs_info) from your var(precmd) function. Once that is done you need
 a tt(single quoted) var('${vcs_info_msg_0_}') in your prompt.
 
@@ -391,7 +395,10 @@ tla
 ## are enabled and disabled with their master [git-svn -> git])
 ## they *can* be used in contexts: ':vcs_info:git-svn:*'.
 git-p4
-git-svn)
+git-svn
+hg-git
+hg-hgsubversion
+hg-hgsvn)
 
 You may not want all of these because there is no point in running the
 code to detect systems you do not use.  So there is a way to disable
@@ -409,6 +416,7 @@ var(enable) style - if you used that) marked as disabled by a hash sign.
 That means the detection of these systems is skipped tt(completely). No
 wasted time there.
 
+
 subsect(Configuration)
 
 The var(vcs_info) feature can be configured via var(zstyle).
@@ -418,9 +426,9 @@ example(:vcs_info:<vcs-string>:<user-context>:<repo-root-name>)
 
 startitem()
 item(tt(<vcs-string>))(
-is one of: git, git-svn, git-p4, hg, darcs, bzr,
-cdv, mtn, svn, cvs, svk, tla or p4. When hooks are active the hooks name
-is added after a `+'. (See tt(Hooks in vcs_info) below.)
+is one of: git, git-svn, git-p4, hg, hg-git, hg-hgsubversion, hg-hgsvn,
+darcs, bzr, cdv, mtn, svn, cvs, svk, tla or p4. When hooks are active the
+hooks name is added after a `+'. (See tt(Hooks in vcs_info) below.)
 )
 item(tt(<user-context>))(
 is a freely configurable string, assignable by
@@ -430,13 +438,13 @@ below).
 item(tt(<repo-root-name>))(
 is the name of a repository in which you want a
 style to match. So, if you want a setting specific to var(/usr/src/zsh),
-with that being a cvs checkout, you can set tt(<repo-root-name>) to
+with that being a CVS checkout, you can set tt(<repo-root-name>) to
 var(zsh) to make it so.
 )
 enditem()
 
 There are three special values for tt(<vcs-string>): The first is named
-var(-init-), that is in effect as long as there was no decision what vcs
+var(-init-), that is in effect as long as there was no decision what VCS
 backend to use. The second is var(-preinit-); it is used tt(before)
 var(vcs_info) is run, when initializing the data exporting variables. The
 third special value is var(formats) and is used by the tt(vcs_info_lastmsg)
@@ -469,36 +477,28 @@ A list of formats, used when actionformats is not used
 kindex(actionformats)
 item(tt(actionformats))(
 A list of formats, used if a there is a special
-action going on in your current repository; (like an interactive rebase or
-a merge conflict).
+action going on in your current repository; like an interactive rebase or
+a merge conflict.
 )
 kindex(branchformat)
 item(tt(branchformat))(
 Some backends replace var(%b) in the formats and
 actionformats styles above, not only by a branch name but also by a
-revision number. This style lets you modify how that string should look
-like.
+revision number. This style lets you modify how that string should look.
 )
 kindex(nvcsformats)
 item(tt(nvcsformats))(
-These "formats" are exported, when we didn't detect
-a version control system for the current directory. This is useful, if you
+These "formats" are exported when we didn't detect
+a version control system for the current directory. This is useful if you
 want var(vcs_info) to completely take over the generation of your prompt.
 You would do something like tt(PS1='${vcs_info_msg_0_}') to accomplish
 that.
-)
-kindex(stgitformat)
-item(tt(stgitformat))(
-The tt(git) backend replaces var(%m) in the formats and
-actionformats styles with tt(stgit)-specific information for
-tt(stgit)-initialized branches. This style lets you modify how that string
-should look like.
 )
 kindex(hgrevformat)
 item(tt(hgrevformat))(
 tt(hg) uses both a hash and a revision number to reference a specific
 changeset in a repository. With this style you can format the revision
-string (see var(branchformat)) to include either of both. It's only
+string (see var(branchformat)) to include either or both. It's only
 useful when var(get-revision) is true.
 )
 kindex(max-exports)
@@ -508,16 +508,15 @@ var(vcs_info_msg_*_) variables var(vcs_info) will export.
 )
 kindex(enable)
 item(tt(enable))(
-A list of backends you want to use. Checked in the
-var(-init-) context. If this list contains an item called tt(NONE) no
-backend is used at all and var(vcs_info) will do nothing. If this list
-contains tt(ALL) var(vcs_info) will use all backends known to it. Only with
-tt(ALL) in tt(enable), the tt(disable) style has any effect. tt(ALL) and
-tt(NONE) are actually tested case insensitively.
+A list of backends you want to use. Checked in the var(-init-) context. If
+this list contains an item called tt(NONE) no backend is used at all and
+var(vcs_info) will do nothing. If this list contains tt(ALL) var(vcs_info)
+will use all known backends. Only with tt(ALL) in tt(enable) will the
+tt(disable) style have any effect. tt(ALL) and tt(NONE) are case insensitive.
 )
 kindex(disable)
 item(tt(disable))(
-A list of VCSs, you don't want var(vcs_info) to test for
+A list of VCSs you don't want var(vcs_info) to test for
 repositories (checked in the var(-init-) context, too). Only used if
 tt(enable) contains tt(ALL).
 )
@@ -531,19 +530,37 @@ Say, tt(~/.zsh) is a directory under version control, in which you do
 not want var(vcs_info) to be active, do:
 example(zstyle ':vcs_info:*' disable-patterns "$HOME/.zsh+LPAR()|/*+RPAR()")
 )
+kindex(use-quilt)
+item(tt(use-quilt))(
+If enabled, the tt(quilt) support code is active in `addon' mode.
+See tt(Quilt Support) for details.
+)
+kindex(quilt-standalone)
+item(tt(quilt-standalone))(
+If enabled, `standalone' mode detection is attempted if no VCS is active
+in a given directory. See tt(Quilt Support) for details.
+)
+kindex(quilt-patch-dir)
+item(tt(quilt-patch-dir))(
+Overwrite the value of the var($QUILT_PATCHES) environment variable. See
+tt(Quilt Support) for details.
+)
+kindex(quiltcommand)
+item(tt(quiltcommand))(
+When tt(quilt) itself is called in quilt support the value of this style
+is used as the command name.
+)
 kindex(check-for-changes)
 item(tt(check-for-changes))(
-If enabled, this style causes the tt(%c) and tt(%u) format escapes to be filled
-with information. The strings filled into these escapes can be controlled via
-the var(stagedstr) and var(unstagedstr) styles. The only backends that
-currently support this option are tt(git) and tt(hg) (tt(hg) only supports
-unstaged).
+If enabled, this style causes the tt(%c) and tt(%u) format escapes to show
+when the working directory has uncommitted changes. The strings displayed by
+these escapes can be controlled via the var(stagedstr) and var(unstagedstr)
+styles. The only backends that currently support this option are tt(git) and
+tt(hg) (tt(hg) only supports unstaged).
 
-Note, that the actions taken if this style is enabled are potentially expensive
-(read: they take time, depending on how big the current repository is).
-Therefore, it is disabled by default. In order to use this style with
-the tt(hg) backend you must also use the var(get-revision) style to avoid
-having to start the interpreter more than once.
+Note, the actions taken if this style is enabled are potentially expensive
+(read: they may be slow, depending on how big the current repository is).
+Therefore, it is disabled by default.
 )
 kindex(stagedstr)
 item(tt(stagedstr))(
@@ -552,25 +569,25 @@ the repository.
 )
 kindex(unstagedstr)
 item(tt(unstagedstr))(
-This string will be used in the tt(%u) escape if there are unstaged changes in
-the repository.
+This string will be used in the tt(%u) escape if there are unstaged changes
+in the repository.
 )
 kindex(command)
 item(tt(command))(
 This style causes var(vcs_info) to use the supplied string as the command
-to use as the vcs's binary. Note, that setting this in ':vcs_info:*' is
+to use as the VCS's binary. Note, that setting this in ':vcs_info:*' is
 not a good idea.
 
 If the value of this style is empty (which is the default), the used binary
-name is the name of the backend in use (e.g. var(svn) is used in a var(svn)
+name is the name of the backend in use (e.g. var(svn) is used in an var(svn)
 repository).
 
 The var(repo-root-name) part in the context is always the default tt(-all-)
 when this style is looked up.
 
 For example, this style can be used to use binaries from non-default
-installation directories. Assume, var(git) is installed in /usr/bin, but
-your sysadmin installed a newer version in /usr/bin/local. Now, instead of
+installation directories. Assume, var(git) is installed in /usr/bin but
+your sysadmin installed a newer version in /usr/bin/local. Instead of
 changing the order of your tt($PATH) parameter, you can do this:
 example(zstyle ':vcs_info:git:*:-all-' command /usr/local/bin/git)
 )
@@ -581,8 +598,8 @@ contact the Perforce server to find out if a directory is managed
 by Perforce.  This is the only reliable way of doing this, but runs
 the risk of a delay if the server name cannot be found.  If the
 server (more specifically, the var(host)tt(:)var(port) pair describing the
-server) cannot be contacted its name is put into the associative array
-tt(vcs_info_p4_dead_servers) and not contacted again during the session
+server) cannot be contacted, its name is put into the associative array
+tt(vcs_info_p4_dead_servers) and is not contacted again during the session
 until it is removed by hand.  If you do not set this style, the tt(p4)
 backend is only usable if you have set the environment variable
 tt(P4CONFIG) to a file name and have corresponding files in the root
@@ -594,8 +611,10 @@ item(tt(use-simple))(
 If there are two different ways of gathering
 information, you can select the simpler one by setting this style to true;
 the default is to use the not-that-simple code, which is potentially a lot
-slower but might be more accurate in all possible cases. This style is only
-used by the tt(bzr) backend.
+slower but might be more accurate in all possible cases. This style is
+used by the tt(bzr) and tt(hg) backends. In the case of tt(hg) it will invoke
+the external hexdump program to parse the binary dirstate cache file; this
+method will not return the local revision number.
 )
 kindex(get-revision)
 item(tt(get-revision))(
@@ -604,15 +623,17 @@ a repository's work tree (currently for the tt(git) and tt(hg) backends,
 where this kind of information is not always vital). For tt(git), the
 hash value of the currently checked out commit is available via the tt(%i)
 expansion. With tt(hg), the local revision number and the corresponding
-global hash are available via tt(%i); in addition, the topmost
-applied tt(mq) patch and bookmarks are available via tt(%m).
-If this style is set in the tt(hg) context, the backend supports the
-var(branchformat) style.
+global hash are available via tt(%i).
+)
+kindex(get-mq)
+item(tt(get-mq))(
+If set to true, the tt(hg) backend will look for a Mercurial Queue (tt(mq))
+patch directory. Information will be available via the `tt(%m)' replacement.
 )
 kindex(get-bookmarks)
 item(tt(get-bookmarks))(
 If set to true, the tt(hg) backend will try to get a list of current
-bookmarks. They will be available in via the `tt(%m)' replacement.
+bookmarks. They will be available via the `tt(%m)' replacement.
 )
 kindex(use-prompt-escapes)
 item(tt(use-prompt-escapes))(
@@ -622,12 +643,12 @@ tt(vcs_info_lastmsg).)
 )
 kindex(debug)
 item(tt(debug))(
-Enable debugging output, to track possible problems. Currently this style
-is only used by tt(vcs_info)'s hooks system.
+Enable debugging output to track possible problems. Currently this style
+is only used by var(vcs_info)'s hooks system.
 )
 kindex(hooks)
 item(tt(hooks))(
-A list style, that defines hook-function names. See tt(Hooks in vcs_info)
+A list style that defines hook-function names. See tt(Hooks in vcs_info)
 below for details.
 )
 enditem()
@@ -639,7 +660,6 @@ sitem(tt(formats))(" (%s)-[%b]-")
 sitem(tt(actionformats))(" (%s)-[%b|%a]-")
 sitem(tt(branchformat))("%b:%r" (for bzr, svn, svk and hg))
 sitem(tt(nvcsformats))("")
-sitem(tt(stgitformat))(" %p (%c)")
 sitem(tt(hgrevformat))("%r:%h")
 sitem(tt(max-exports))(2)
 sitem(tt(enable))(ALL)
@@ -652,62 +672,70 @@ sitem(tt(command))((empty string))
 sitem(tt(use-server))(false)
 sitem(tt(use-simple))(false)
 sitem(tt(get-revision))(false)
+sitem(tt(get-mq))(true)
 sitem(tt(get-bookmarks))(false)
 sitem(tt(use-prompt-escapes))(true)
 sitem(tt(debug))(false)
 sitem(tt(hooks))((empty list))
+sitem(tt(use-quilt))(false)
+sitem(tt(quilt-standalone))(false)
+sitem(tt(quilt-patch-dir))(empty - use var($QUILT_PATCHES))
+sitem(tt(quiltcommand))(quilt)
 endsitem()
 
-In normal tt(formats) and tt(actionformats), the following replacements are
+In normal tt(formats) and tt(actionformats) the following replacements are
 done:
 
 startsitem()
-sitem(tt(%s))(The vcs in use (git, hg, svn etc.))
+sitem(tt(%s))(The VCS in use (git, hg, svn, etc.).)
 sitem(tt(%b))(Information about the current branch.)
-sitem(tt(%a))(An identifier, that describes the action. Only makes sense in
-actionformats.)
+sitem(tt(%a))(An identifier that describes the action. Only makes sense in
+var(actionformats).)
 sitem(tt(%i))(The current revision number or identifier. For tt(hg)
 the var(hgrevformat) style may be used to customize the output.)
 sitem(tt(%c))(The string from the var(stagedstr) style if there are staged
 changes in the repository.)
-sitem(tt(%u))(The string from the var(unstagedstr) style if there are unstaged
-changes in the repository.)
-sitem(tt(%R))(base directory of the repository.)
-sitem(tt(%r))(repository name. If tt(%R) is var(/foo/bar/repoXY), tt(%r) is
-var(repoXY).)
-sitem(tt(%S))(subdirectory within a repository. If tt($PWD) is
+sitem(tt(%u))(The string from the var(unstagedstr) style if there are
+unstaged changes in the repository.)
+sitem(tt(%R))(The base directory of the repository.)
+sitem(tt(%r))(The repository name. If tt(%R) is var(/foo/bar/repoXY), tt(%r)
+is var(repoXY).)
+sitem(tt(%S))(A subdirectory within a repository. If tt($PWD) is
 var(/foo/bar/repoXY/beer/tasty), tt(%S) is var(beer/tasty).)
-sitem(tt(%m))(A "misc" replacement. It is at the discretion of the backend
-to decide what this replacement expands to. It is currently used by
-the tt(hg) and tt(git) backends. The tt(hg) backend replaces tt(%m) with the
-topmost tt(mq) patch applied (qtop) and a list of any current bookmarks. The
-tt(git) backend replaces it with the string from the var(stgitformat)
-style.)
+sitem(tt(%m))(A "misc" replacement. It is at the discretion of the backend to
+decide what this replacement expands to. It is currently used by the tt(hg)
+and tt(git) backends to display patch information from the tt(mq) and
+tt(stgit) extensions.)
 endsitem()
 
 In tt(branchformat) these replacements are done:
 
 startsitem()
-sitem(tt(%b))(the branch name)
-sitem(tt(%r))(the current revision number or the var(hgrevformat) style for tt(hg))
-endsitem()
-
-In tt(stgitformat) these replacements are done:
-
-startsitem()
-sitem(tt(%p))(the name of the patch currently on top of the stack)
-sitem(tt(%c))(the number of unapplied patches)
+sitem(tt(%b))(The branch name.)
+sitem(tt(%r))(The current revision number or the var(hgrevformat) style for
+tt(hg).)
 endsitem()
 
 In tt(hgrevformat) these replacements are done:
 
 startsitem()
-sitem(tt(%r))(the current revision number)
-sitem(tt(%h))(the hash identifier for the current resivion in short form)
+sitem(tt(%r))(The current local revision number.)
+sitem(tt(%h))(The current 40-character changeset ID hash identifier.)
 endsitem()
 
-Not all vcs backends have to support all replacements. For tt(nvcsformats)
-no replacements are performed at all. It is just a string.
+In tt(patch-format) and tt(nopatch-format) these replacements are done:
+
+startsitem()
+sitem(tt(%p))(The name of the top-most applied patch.)
+sitem(tt(%u))(The number of unapplied patches.)
+sitem(tt(%n))(The number of applied patches.)
+sitem(tt(%c))(The number of unapplied patches.)
+sitem(tt(%g))(The names of active tt(mq) guards (tt(hg) backend).)
+sitem(tt(%G))(The number of active tt(mq) guards (tt(hg) backend).)
+endsitem()
+
+Not all VCS backends have to support all replacements. For tt(nvcsformats)
+no replacements are performed at all, it is just a string.
 
 subsect(Oddities)
 
@@ -720,21 +748,110 @@ cannot be easily avoided. Luckily we do not clash with a lot of prompt
 expansions and this only needs to be done for those.
 
 
-subsect(Function descriptions (public API))
+subsect(Quilt Support)
+
+tt(Quilt) is not a version control system, therefore this is not implemented
+as a backend. It can help keeping track of a series of patches. People use it
+to keep a set of changes they want to use on top of software packages (which
+is tightly integrated into the package build process - the Debian project
+does this for a large number of packages). Quilt can also help individual
+developers keep track of their own patches on top of real version control
+systems.
+
+The var(vcs_info) integration tries to support both ways of using quilt by
+having two slightly different modes of operation: `addon' mode and
+`standalone' mode).
+
+For `addon' mode to become active var(vcs_info) must have already detected a
+real version control system controlling the directory. If that is the case,
+a directory that holds quilt's patches needs to be found. That directory is
+configurable via the var(`QUILT_PATCHES') environment variable. If that
+variable exists its value is used, otherwise the value tt(`patches') is
+assumed. The value from var($QUILT_PATCHES) can be overwritten using the
+tt(`quilt-patches') style. (Note: you can use var(vcs_info) to keep the value
+of var($QUILT_PATCHES) correct all the time via the tt(post-quilt) hook).
+
+When the directory in question is found, quilt is assumed to be active. To
+gather more information, var(vcs_info) looks for a directory called `.pc';
+Quilt uses that directory to track its current state. If this directory does
+not exist we know that quilt has not done anything to the working directory
+(read: no patches have been applied yet).
+
+If patches are applied, var(vcs_info) will try to find out which. If you want
+to know which patches of a series are not yet applied, you need to activate
+the tt(get-unapplied) style in the appropriate context.
+
+var(vcs_info) allows for very detailed control over how the gathered
+information is presented (see the below sections, tt(Styles) and tt(Hooks in
+vcs_info)), all of which are documented below. Note there are a number of
+other patch tracking systems that work on top of a certain version control
+system (like tt(stgit) for tt(git), or tt(mq) for tt(hg)); the configuration
+for systems like that are generally configured the same way as the tt(quilt)
+support.
+
+If the tt(quilt) support is working in `addon' mode, the produced string is
+available as a simple format replacement (var(%Q) to be precise), which can
+be used in tt(formats) and tt(actionformats); see below for details).
+
+If, on the other hand, the support code is working in `standalone' mode,
+var(vcs_info) will pretend as if tt(quilt) were an actual version control
+system. That means that the version control system identifier (which
+otherwise would be something like `svn' or `cvs') will be set to
+`tt(-quilt-)'. This has implications on the used style context where this
+identifier is the second element. var(vcs_info) will have filled in a proper
+value for the "repository's" root directory and the string containing the
+information about quilt's state will be available as the `misc' replacement
+(and var(%Q) for compatibility with `addon' mode.
+
+What is left to discuss is how `standalone' mode is detected. The detection
+itself is a series of searches for directories. You can have this detection
+enabled all the time in every directory that is not otherwise under version
+control. If you know there is only a limited set of trees where you would
+like var(vcs_info) to try and look for Quilt in `standalone' mode to minimise
+the amount of searching on every call to var(vcs_info), there are a number of
+ways to do that:
+
+Essentially, `standalone' mode detection is controlled by a style called
+`tt(quilt-standalone)'. It is a string style and its value can have different
+effects. The simplest values are: `tt(always)' to run detection every time
+var(vcs_info) is run, and `tt(never)' to turn the detection off entirely.
+
+If the value of tt(quilt-standalone) is something else, it is interpreted
+differently. If the value is the name of a scalar variable the value of that
+variable is checked and that value is used in the same `always'/`never' way
+as described above.
+
+If the value of tt(quilt-standalone) is an array, the elements of that array
+are used as directory names under which you want the detection to be active.
+
+If tt(quilt-standalone) is an associative array, the keys are taken as
+directory names under which you want the detection to be active, but only if
+the corresponding value is the string `tt(true)'.
+
+Last, but not least, if the value of tt(quilt-standalone) is the name of a
+function, the function is called without arguments and the return value
+decides whether detection should be active. A `0' return value is true; a
+non-zero return value is interpreted as false.
+
+Note, if there is both a function and a variable by the name of
+tt(quilt-standalone), the function will take precedence.
+
+
+subsect(Function Descriptions (Public API))
 
 startitem()
 findex(vcs_info)
 item(tt(vcs_info) [var(user-context)])(
-The main function, that runs all
-backends and assembles all data into var(${vcs_info_msg_*_}). This is the
-function you want to call from tt(precmd) if you want to include up-to-date
-information in your prompt (see Variable description below). If an argument
-is given, that string will be used instead of tt(default) in the
-user-context field of the style context.
+The main function, that runs all backends and assembles all data into
+var(${vcs_info_msg_*_}). This is the function you want to call from
+tt(precmd) if you want to include up-to-date information in your prompt (see
+tt(Variable description) below). If an argument is given, that string will be
+used instead of tt(default) in the tt(user-context) field of the style
+context.
 )
 item(tt(vcs_info_lastmsg))(
 Outputs the last var(${vcs_info_msg_*_}) value.
-Takes into account the value of the use-prompt-escapes style in
+Takes into account the value of the tt(use-prompt-escapes) style in
 var(':vcs_info:formats:command:-all-'). It also only prints tt(max-exports)
 values.
 )
@@ -753,14 +870,14 @@ enditem()
 
 All functions named VCS_INFO_* are for internal use only.
 
-subsect(Variable description)
+subsect(Variable Description)
 
 startitem()
 item(tt(${vcs_info_msg_N_}) (Note the trailing underscore))
 (
-Where var(N) is an integer, eg: var(vcs_info_msg_0_) These variables
+Where var(N) is an integer, e.g., var(vcs_info_msg_0_). These variables
 are the storage for the informational message the last var(vcs_info) call
-has assembled. These are strongly connected to the formats,
+has assembled. These are strongly connected to the tt(formats),
 tt(actionformats) and tt(nvcsformats) styles described above. Those styles
 are lists. The first member of that list gets expanded into
 var(${vcs_info_msg_0_}), the second into var(${vcs_info_msg_1_})
@@ -773,7 +890,7 @@ All variables named VCS_INFO_* are for internal use only.
 
 subsect(Hooks in vcs_info)
 
-Hooks are places in tt(vcs_info) where you can run your own code. That
+Hooks are places in var(vcs_info) where you can run your own code. That
 code can communicate with the code that called it and through that,
 change the system's behaviour.
 
@@ -799,114 +916,152 @@ When you register more than one function to a hook, all functions are
 executed one after another until one function returns non-zero or until
 all functions have been called.
 
-There are a number of variables, that are special in hook contexts:
+You may pass data between functions via an associative array, tt(user_data).
+For example:
+example(
++vi-git-myfirsthook+LPAR()RPAR(){
+    user_data[myval]=$myval
+}
++vi-git-mysecondhook+LPAR()RPAR(){
+    # do something with ${user_data[myval]}
+})
+
+There are a number of variables that are special in hook contexts:
 
 startitem()
 item(tt(ret))(
-The return value, that the hooks system will return to the caller. The
+The return value that the hooks system will return to the caller. The
 default is an integer `zero'. If and how a changed tt(ret) value changes
-the execution of the caller depends on the specific hook. See the hook's
+the execution of the caller depends on the specific hook. See the hook
 documentation below for details.
 )
 item(tt(hook_com))(
-An associated array, which is used for bidirectional communication from
+An associated array which is used for bidirectional communication from
 the caller to hook functions. The used keys depend on the specific hook.
 )
 item(tt(context))(
 The active context of the hook. Functions that wish to change this
 variable should make it local scope first.
 )
+item(tt(vcs))(
+The current VCS after it was detected. The same values as in the
+enable/disable style are used. Available in all hooks except tt(start-up).
+)
 enditem()
 
 Finally, the full list of currently available hooks:
 
 startitem()
+item(tt(start-up))(
+Called after starting var(vcs_info) but before the VCS in this directory is
+determined. It can be used to deactivate var(vcs_info) temporarily if
+necessary. When tt(ret) is set to var(1), var(vcs_info) aborts and does
+nothing; when set to var(2), var(vcs_info) sets up everything as if no
+version control were active and exits.
+)
+item(tt(pre-get-data))(
+Same as tt(start-up) but after the VCS was detected.
+)
 item(tt(gen-hg-bookmark-string))(
-Called in the Mercurial backend (the tt(get-revision) and tt(get-bookmarks)
-styles must be active) when a bookmark string is generated.
+Called in the Mercurial backend when a bookmark string is generated; the
+tt(get-revision) and tt(get-bookmarks) styles must be true.
 
-This hook gets the names of the Mercurial bookmarks, that
-tt(vcs_info) collected from `hg'.
+This hook gets the names of the Mercurial bookmarks that
+var(vcs_info) collected from `hg'.
 
 When setting tt(ret) to non-zero, the string in
-tt(${hook_com[hg-bookmark-string]}) will be used as the
-`tt(misc1)' replacement in the variables set by tt(vcs_info).
+tt(${hook_com[hg-bookmark-string]}) will be used in the var(%m) escape in
+tt(formats) and tt(actionformats) and will be availabe in the global
+var(backend_misc) array as tt(${backend_misc[bookmarks]}).
 )
-item(tt(gen-mq-patch-string))(
-Called in the Mercurial backend when a mq-patch string is generated. That
-only happens if a tt(.hg/patches) directory exists in the repository.
+item(tt(gen-applied-string))(
+Called in the tt(git) (with tt(stgit)), and tt(hg) (with tt(mq)) backends
+and in tt(quilt) support when the var(applied-string) is generated; the
+tt(use-quilt) zstyle must be true for tt(quilt) (the tt(mq) and tt(stgit)
+backends are active by default).
 
-This hook gets the names of all applied mq patches which tt(vcs_info)
-collected so far in the opposite order, which mean that the first argument
-is the top-most patch and so forth.
+This hook gets the names of all applied patches which var(vcs_info) collected
+so far in the opposite order, which means that the first argument is the
+top-most patch and so forth.
 
 When setting tt(ret) to non-zero, the string in
-tt(${hook_com[hg-mqpatch-string]}) will be used as the
-`tt(misc0)' replacement in the variables set by tt(vcs_info).
+tt(${hook_com[applied-string]}) will be used in the var(%m) escape in
+tt(formats) and tt(actionformats); it will be available in the global
+var(backend_misc) array as tt($backend_misc[patches]}); and it will be
+available as var(%p) in the tt(patch-format) and tt(nopatch-format) styles.
 )
-item(tt(gen-stgit-patch-string))(
-Called in the git backend when a stgit-patch string is generated. That
-only happens if stgit is in use in the repository.
+item(tt(gen-unapplied-string))(
+Called in the tt(git) (with tt(stgit)), and tt(hg) (with tt(mq)) backend
+and in tt(quilt) support when the var(unapplied-string) is generated; the
+tt(get-unapplied) style must be true.
 
-This hook gets the names of all applied stgit patches which tt(vcs_info)
-collected so far in the opposite order, which mean that the first argument
-is the top-most patch and so forth.
+This hook gets the names of all unapplied patches which var(vcs_info)
+collected so far in the opposite order, which mean that the first argument is
+the patch next-in-line to be applied and so forth.
 
 When setting tt(ret) to non-zero, the string in
-tt(${hook_com[stgit-patch-string]}) will be used as the
-`tt(misc0)' replacement in the variables set by tt(vcs_info).
+tt(${hook_com[unapplied-string]}) will be available as var(%u) in the
+tt(patch-format) and tt(nopatch-format) styles.
 )
-item(tt(gen-stgit-unapplied-string))(
-Called in the git backend when a stgit-unapplied string is generated. That
-only happens if stgit is in use in the repository.
+item(tt(gen-mqguards-string))(
+Called in the tt(hg) backend when tt(guards-string) is generated; the
+tt(get-mq) style must be true (default).
 
-This hook gets the names of all unapplied stgit patches which tt(vcs_info)
-collected so far.
+This hook gets the names of any active tt(mq) guards.
 
 When setting tt(ret) to non-zero, the string in
-tt(${hook_com[stgit-unapplied-string]}) will be used as the
-`tt(misc0)' replacement in the variables set by tt(vcs_info).
+tt(${hook_com[guards-string]}) will be used in the var(%g) escape in the
+tt(patch-format) and tt(nopatch-format) styles.
+)
+item(tt(post-quilt))(
+Called after the tt(quilt) support is done. The following information
+is passed as arguments to the hook: 1. the quilt-support mode (`addon' or
+`standalone'); 2. the directory that contains the patch series; 3. the
+directory that holds quilt's status information (the `.pc' directory) or
+the string tt("-nopc-") if that directory wasn't found.
+
+The `hook_com' parameter is not used.
 )
 item(tt(set-branch-format))(
-Called before a `tt(branchformat)' is set. The only argument to the
+Called before `tt(branchformat)' is set. The only argument to the
 hook is the format that is configured at this point.
 
 The `tt(hook_com)' keys considered are `tt(branch)' and `tt(revision)'.
-They are set to the values figured out so far by tt(vcs_info) and any
+They are set to the values figured out so far by var(vcs_info) and any
 change will be used directly when the actual replacement is done.
 
 If tt(ret) is set to to non-zero, the string in
 tt(${hook_com[branch-replace]}) will be used unchanged as the
-`tt(%b)' replacement in the variables set by tt(vcs_info).
+`tt(%b)' replacement in the variables set by var(vcs_info).
 )
 item(tt(set-hgrev-format))(
 Called before a `tt(hgrevformat)' is set. The only argument to the
 hook is the format that is configured at this point.
 
-The `tt(hook_com)' keys considered are `tt(hash)' and `tt(localref)'.
-They are set to the values figured out so far by tt(vcs_info) and any
+The `tt(hook_com)' keys considered are `tt(hash)' and `tt(localrev)'.
+They are set to the values figured out so far by var(vcs_info) and any
 change will be used directly when the actual replacement is done.
 
 If tt(ret) is set to to non-zero, the string in
 tt(${hook_com[rev-replace]}) will be used unchanged as the
-`tt(%i)' replacement in the variables set by tt(vcs_info).
+`tt(%i)' replacement in the variables set by var(vcs_info).
 )
 item(tt(set-message))(
 Called each time before a `tt(vcs_info_msg_N_)' message is set.
 It takes two arguments; the first being the `N' in the message
-variable name, the second is the currently configured format or
-actionformat.
+variable name, the second is the currently configured tt(formats) or
+tt(actionformats).
 
 There are a number of `tt(hook_com)' keys, that are used here:
 `tt(action)', `tt(branch)', `tt(base)', `tt(base-name)', `tt(subdir)',
 `tt(staged)', `tt(unstaged)', `tt(revision)', `tt(misc)', `tt(vcs)'
 and one `tt(miscN)' entry for each backend-specific data field (tt(N)
 starting at zero). They are set to the values figured out so far by
-tt(vcs_info) and any change will be used directly when the actual
+var(vcs_info) and any change will be used directly when the actual
 replacement is done.
 
 Since this hook is triggered multiple times (once for each configured
-format or actionformat), each of the `tt(hook_com)' keys mentioned
+tt(formats) or tt(actionformats)), each of the `tt(hook_com)' keys mentioned
 above (except for the tt(miscN) entries) has an `tt(_orig)' counterpart,
 so even if you changed a value to your liking you can still get the
 original value in the next run. Changing the `tt(_orig)' values is
@@ -914,28 +1069,16 @@ probably not a good idea.
 
 If tt(ret) is set to to non-zero, the string in
 tt(${hook_com[message]}) will be used unchanged as the message by
-tt(vcs_info).
+var(vcs_info).
 )
-item(tt(set-stgit-format))(
-Called before a `tt(stgitformat)' is set. The only argument to the
-hook is the format that is configured at this point.
-
-The `tt(hook_com)' keys considered are `tt(patch)' and `tt(unapplied)'.
-They are set to the values figured out so far by tt(vcs_info) and any
-change will be used directly when the actual replacement is done.
-
-If tt(ret) is set to to non-zero, the string in
-tt(${hook_com[stgit-replace]}) will be used unchanged as the
-`tt(misc0)' replacement in the variables set by tt(vcs_info).
-)
-enditem()
 
 If all of this sounds rather confusing, take a look at the tt(Examples)
-section below. It contains some explanatory code.
+section below and also in the Misc/vcs_info-examples file in the Zsh source.
+They contain some explanatory code.
 
 subsect(Examples)
 
-Don't use tt(vcs_info) at all (even though it's in your prompt):
+Don't use var(vcs_info) at all (even though it's in your prompt):
 example(zstyle ':vcs_info:*' enable NONE)
 
 Disable the backends for tt(bzr) and tt(svk):
@@ -948,6 +1091,17 @@ Provide a special formats for tt(git):
 example(zstyle ':vcs_info:git:*' formats       ' GIT, BABY! [%b]'
 zstyle ':vcs_info:git:*' actionformats ' GIT ACTION! [%b|%a]')
 
+All tt(%x) expansion in all sorts of formats ("formats", "actionformats",
+branchformat, you name it) are done using the `tt(zformat)' builtin from
+the `tt(zsh/zutil)' module. That means you can do everything with these
+tt(%x) items what zformat supports. In particular, if you want something
+that is really long to have a fixed width, like a hash in a mercurial
+branchformat, you can do this: tt(%12.12i). That'll shrink the 40 character
+hash to its 12 leading characters. The form is actually
+`tt(%)var(min)tt(.)var(max)tt(x)'. More is possible.
+See ifzman(the section `The zsh/zutil Module' in zmanref(zshmodules))\
+ifnzman(noderef(The zsh/zutil Module)) for details.
+
 Use the quicker tt(bzr) backend
 example(zstyle ':vcs_info:bzr:*' use-simple true)
 
@@ -956,10 +1110,10 @@ If you do use tt(use-simple), please report if it does `the-right-thing[tm]'.
 Display the revision number in yellow for tt(bzr) and tt(svn):
 example(zstyle ':vcs_info:(svn|bzr):*' branchformat '%b%{'${fg[yellow]}'%}:%r')
 
-If you want colors, make sure you enclose the color codes in tt(%{...%}),
-if you want to use the string provided by tt(vcs_info) in prompts.
+If you want colors, make sure you enclose the color codes in tt(%{...%})
+if you want to use the string provided by var(vcs_info) in prompts.
 
-Here is how to print the vcs information as a command (not in a prompt):
+Here is how to print the VCS information as a command (not in a prompt):
 example(alias vcsi='vcs_info command; vcs_info_lastmsg')
 
 This way, you can even define different formats for output via
@@ -967,15 +1121,15 @@ tt(vcs_info_lastmsg) in the ':vcs_info:*:command:*' namespace.
 
 Now as promised, some code that uses hooks:
 say, you'd like to replace the string `svn' by `subversion' in
-tt(vcs_info)'s tt(%s) format-replacement.
+var(vcs_info)'s tt(%s) tt(formats) replacement.
 
-First, we will tell tt(vcs_info) to call a function when populating
+First, we will tell var(vcs_info) to call a function when populating
 the message variables with the gathered information:
 example(zstyle ':vcs_info:*+set-message:*' hooks svn2subversion)
 
-Nothing happens. Which is reasonable, since there we didn't define
-the actual function yet. To see what the hooks subsystem is trying to
-do, enable the `tt(debug)' style:
+Nothing happens. Which is reasonable, since we didn't define the actual
+function yet. To see what the hooks subsystem is trying to do, enable the
+`tt(debug)' style:
 example(zstyle ':vcs_info:*+*:*' debug true)
 
 That should give you an idea what is going on. Specifically, the function
@@ -1010,7 +1164,7 @@ And then we define the `tt(+vi-hgbookmarks) function:
 example(
 function +vi-hgbookmarks+LPAR()RPAR() {
     # The default is to connect all bookmark names by
-    # semicolons. This mixes things up a little.
+    # commas. This mixes things up a little.
     # Imagine, there's one type of bookmarks that is
     # special to you. Say, because it's *your* work.
     # Those bookmarks look always like this: "sh/*"
@@ -1018,8 +1172,7 @@ function +vi-hgbookmarks+LPAR()RPAR() {
     # This makes the bookmarks string use only those
     # bookmarks. If there's more than one, it
     # concatenates them using commas.
-    local s i)
-example(
+    local s i
     # The bookmarks returned by `hg' are available in
     # the functions positional parameters.
     (( $# == 0 )) && return 0
@@ -1028,22 +1181,25 @@ example(
             [[ -n $s ]] && s=$s,
             s=${s}$i
         fi
-    done)
-example(
+    done
     # Now, the communication with the code that calls
     # the hook functions is done via the hook_com[]
     # hash. The key, at which the `gen-hg-bookmark-string'
     # hook looks at is `hg-bookmark-string'. So:
-    hook_com[hg-bookmark-string]=$s)
-example(
+    hook_com[hg-bookmark-string]=$s
     # And to signal, that we want to use the sting we
     # just generated, set the special variable `ret' to
     # something other than the default zero:
     ret=1
     return 0
-})
+}
+)
 
-This concludes our guided tour through zsh's tt(vcs_info).
+Some longer examples and code snippets which might be useful are available in
+the examples file located at Misc/vcs_info-examples in the Zsh source
+directory.
+
+This concludes our guided tour through zsh's var(vcs_info).
 
 
 texinode(Prompt Themes)(ZLE Functions)(Version Control Information)(User Contributions)

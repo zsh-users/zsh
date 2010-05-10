@@ -11,6 +11,7 @@ vcs_info_lastmsg
 VCS_INFO_maxexports
 VCS_INFO_nvcsformats
 vcs_info_printsys
+VCS_INFO_quilt
 VCS_INFO_realpath
 VCS_INFO_reposub
 VCS_INFO_set

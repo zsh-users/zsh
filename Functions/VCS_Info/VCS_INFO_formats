@@ -22,20 +22,17 @@ hook_com=(
     unstaged_orig "$5"
     revision      "$6"
     revision_orig "$6"
+    misc          "$7"
+    misc_orig     "$7"
     vcs           "${vcs}"
     vcs_orig      "${vcs}"
 )
-shift 6
-i=0
-for tmp in "$@"; do
-    hook_com[misc$((i++))]="${tmp}"
-done
-hook_com[misc]=${(j:,:)argv}
-hook_com[misc_orig]=${hook_com[misc]}
 hook_com[base-name]="${${hook_com[base]}:t}"
 hook_com[base-name_orig]="${hook_com[base_name]}"
 hook_com[subdir]="$(VCS_INFO_reposub ${hook_com[base]})"
 hook_com[subdir_orig]="${hook_com[subdir]}"
+
+VCS_INFO_hook 'post-backend'
 
 ## description:
 #   action:   a string that signals a certain non-default condition in the
@@ -46,8 +43,7 @@ hook_com[subdir_orig]="${hook_com[subdir]}"
 #   staged:   non-empty if the repository contains staged changes.
 #   unstaged: non-empty if the repository contains unstaged changes.
 #   revision: an identifier of the currently checked out revision.
-#   misc0..N: a set of strings that may contain anything the author likes.
-#             the backends should document what they put in it and when.
+#   misc:     a string that may contain anything the backend author likes.
 #
 # If an argument has no valid value for a given backend, an empty value
 # should be provided. eg:
@@ -71,6 +67,15 @@ if [[ -n ${hook_com[unstaged]} ]] ; then
     [[ -z ${tmp} ]] && hook_com[unstaged]='U' || hook_com[unstaged]=${tmp}
 fi
 
+if [[ ${quiltmode} != 'standalone' ]] && VCS_INFO_hook "pre-addon-quilt"; then
+    local -x REPLY
+    VCS_INFO_quilt addon
+    hook_com[quilt]="${REPLY}"
+    unset REPLY
+elif [[ ${quiltmode} == 'standalone' ]]; then
+    hook_com[quilt]=${hook_com[misc]}
+fi
+
 (( ${#msgs} > maxexports )) && msgs[$(( maxexports + 1 )),-1]=()
 for i in {1..${#msgs}} ; do
     if VCS_INFO_hook "set-message" $(( $i - 1 )) "${msgs[$i]}"; then
@@ -83,6 +88,7 @@ for i in {1..${#msgs}} ; do
                         r:${hook_com[base-name]}        \
                         s:${hook_com[vcs]}              \
                         u:${hook_com[unstaged]}         \
+                        Q:${hook_com[quilt]}            \
                         R:${hook_com[base]}             \
                         S:${hook_com[subdir]}
         msgs[$i]=${msg}
@@ -90,4 +96,6 @@ for i in {1..${#msgs}} ; do
         msgs[$i]=${hook_com[message]}
     fi
 done
+hook_com=()
+backend_misc=()
 return 0

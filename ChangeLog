@@ -1,3 +1,15 @@
+2010-05-10  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Seth House, Simon Ruderich and myself: 27948:
+	Doc/Zsh/contrib.yo, Functions/VCS_Info/.distfiles, Misc/.distfiles,
+	Misc/vcs_info-examples, Functions/VCS_Info/Backends/VCS_INFO_detect_hg,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,
+	Functions/VCS_Info/VCS_INFO_formats, Functions/VCS_Info/VCS_INFO_hook,
+	Functions/VCS_Info/VCS_INFO_quilt, Functions/VCS_Info/vcs_info: various
+	vcs_info changes: mercurial backend improvements, new hooks, quilt
+	support, documentation improvements and bugfixes
+
 2010-05-05  Peter Stephenson  <pws@csr.com>
 
 	* users/15031: Completion/Unix/Type/_path_files: fix (still
@@ -13105,5 +13117,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4973 $
+* $Revision: 1.4974 $
 *****************************************************
