@@ -57,7 +57,8 @@ char **pparams,		/* $argv        */
      **mailpath,	/* $mailpath    */
      **manpath,		/* $manpath     */
      **psvar,		/* $psvar       */
-     **watch;		/* $watch       */
+     **watch,		/* $watch       */
+     **zsh_eval_context; /* $zsh_eval_context */
 /**/
 mod_export
 char **path,		/* $path        */
@@ -341,6 +342,7 @@ IPDEF8("MAILPATH", &mailpath, "mailpath", 0),
 IPDEF8("WATCH", &watch, "watch", 0),
 IPDEF8("PATH", &path, "path", PM_RESTRICTED),
 IPDEF8("PSVAR", &psvar, "psvar", 0),
+IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, "zsh_eval_context", PM_READONLY),
 
 /* MODULE_PATH is not imported for security reasons */
 IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_RESTRICTED),
@@ -349,12 +351,21 @@ IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_RESTRICTED),
 #define IPDEF9(A,B,C) IPDEF9F(A,B,C,0)
 IPDEF9F("*", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
 IPDEF9F("@", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
+
+/*
+ * This empty row indicates the end of parameters available in
+ * all emulations.
+ */
 {{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
 
 #define IPDEF10(A,B) {{NULL,A,PM_ARRAY|PM_SPECIAL},BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
 
-/* The following parameters are not available in sh/ksh compatibility *
- * mode. All of these have sh compatible equivalents.                */
+/*
+ * The following parameters are not available in sh/ksh compatibility *
+ * mode.
+ */
+
+/* All of these have sh compatible equivalents.                */
 IPDEF1("ARGC", argc_gsu, PM_READONLY),
 IPDEF2("HISTCHARS", histchars_gsu, PM_DONTIMPORT),
 IPDEF4("status", &lastval),
@@ -373,8 +384,12 @@ IPDEF9("manpath", &manpath, "MANPATH"),
 IPDEF9("psvar", &psvar, "PSVAR"),
 IPDEF9("watch", &watch, "WATCH"),
 
+IPDEF9F("zsh_eval_context", &zsh_eval_context, "ZSH_EVAL_CONTEXT", PM_READONLY),
+
 IPDEF9F("module_path", &module_path, "MODULE_PATH", PM_RESTRICTED),
 IPDEF9F("path", &path, "PATH", PM_RESTRICTED),
+
+/* These are known to zsh alone. */
 
 IPDEF10("pipestatus", pipestatus_gsu),
 

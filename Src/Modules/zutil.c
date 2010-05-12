@@ -343,7 +343,7 @@ evalstyle(Stypat p)
     char **ret, *str;
 
     unsetparam("reply");
-    execode(p->eval, 1, 0);
+    execode(p->eval, 1, 0, "style");
     if (errflag) {
 	errflag = ef;
 	return NULL;
@@ -1253,7 +1253,7 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 	    char *action = getdata(ln);
 
 	    if (action)
-		execstring(action, 1, 0);
+		execstring(action, 1, 0, "zregexparse-action");
 	}
 	return 0;
     }
@@ -1278,7 +1278,8 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 		    return 3;
 	    }
 	    if (next->pattern && pattry(next->patprog, subj) &&
-		(!next->guard || (execstring(next->guard, 1, 0), !lastval))) {
+		(!next->guard || (execstring(next->guard, 1, 0,
+					     "zregesparse-guard"), !lastval))) {
 		LinkNode aln;
 		char **mend;
 		int len;
@@ -1299,7 +1300,7 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 		    char *action = getdata(aln);
 
 		    if (action)
-			execstring(action, 1, 0);
+			execstring(action, 1, 0, "zregexparse-action");
 		}
 		restorematch(&match2);
 
@@ -1328,7 +1329,7 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 		    char *action = getdata(ln);
 
 		    if (action)
-			execstring(action, 1, 0);
+			execstring(action, 1, 0, "zregexparse-action");
 		}
 		return 0;
 	    }
@@ -1339,7 +1340,7 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 	for (ln = firstnode(nexts); ln; ln = nextnode(ln)) {
 	    br = getdata(ln);
 	    if (br->state->action)
-		execstring(br->state->action, 1, 0);
+		execstring(br->state->action, 1, 0, "zregexparse-action");
 	}
     }
     return empty(nexts) ? 2 : 1;

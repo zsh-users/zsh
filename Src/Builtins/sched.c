@@ -119,7 +119,7 @@ checksched(void)
 
 	if ((sch->flags & SCHEDFLAG_TRASH_ZLE) && zleactive)
 	    zleentry(ZLE_CMD_TRASH);
-	execstring(sch->cmd, 0, 0);
+	execstring(sch->cmd, 0, 0, "sched");
 	zsfree(sch->cmd);
 	zfree(sch, sizeof(struct schedcmd));
 

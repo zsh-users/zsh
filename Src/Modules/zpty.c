@@ -396,7 +396,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	setsparam("TTY", ztrdup(ttystrname));
 
 	opts[INTERACTIVE] = 0;
-	execode(prog, 1, 0);
+	execode(prog, 1, 0, "zpty");
 	stopmsg = 2;
 	zexit(lastval, 0);
     }

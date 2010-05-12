@@ -1755,7 +1755,7 @@ fcedit(char *ename, char *fn)
 	return 1;
 
     s = tricat(ename, " ", fn);
-    execstring(s, 1, 0);
+    execstring(s, 1, 0, "fc");
     zsfree(s);
 
     return !lastval;
@@ -4883,7 +4883,7 @@ eval(char **argv)
 	    /* No code to execute */
 	    lastval = 0;
 	} else {
-	    execode(prog, 1, 0);
+	    execode(prog, 1, 0, "eval");
 
 	    if (errflag && !lastval)
 		lastval = errflag;

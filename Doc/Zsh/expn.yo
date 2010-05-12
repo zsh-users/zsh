@@ -2149,12 +2149,17 @@ xitem(tt(e)var(string))
 item(tt(PLUS())var(cmd))(
 The var(string) will be executed as shell code.  The filename will be
 included in the list if and only if the code returns a zero status (usually
-the status of the last command).  The first character after the `tt(e)'
+the status of the last command).
+
+In the first form, the first character after the `tt(e)'
 will be used as a separator and anything up to the next matching separator
 will be taken  as the var(string); `tt([)', `tt({)', and `tt(<)' match
 `tt(])', `tt(})', and `tt(>)', respectively, while any other character
 matches itself. Note that expansions must be quoted in the var(string)
 to prevent them from being expanded before globbing is done.
+var(string) is then executed as shell code.  The string tt(globqual)
+is appended to the array tt(zsh_eval_context) the duration of
+execution.
 
 vindex(REPLY, use of)
 vindex(reply, use of)
@@ -2288,12 +2293,13 @@ specifiers may occur to resolve ties.
 tt(oe) and tt(o+) are special cases; they are each followed by shell code,
 delimited as for the tt(e) glob qualifier and the tt(+) glob qualifier
 respectively (see above).  The code is executed for each matched file with
-the parameter tt(REPLY) set to the name of the file on entry.  The code
-should modify the parameter tt(REPLY) in some fashion.  On return, the value
-of the parameter is used instead of the file name as the string on which to
-sort.  Unlike other sort operators, tt(oe) and tt(o+) may be repeated, but
-note that the maximum number of sort operators of any kind that may appear
-in any glob expression is 12.
+the parameter tt(REPLY) set to the name of the file on entry and
+tt(globsort) appended to tt(zsh_eval_context).  The code
+should modify the parameter tt(REPLY) in some fashion.  On return, the
+value of the parameter is used instead of the file name as the string on
+which to sort.  Unlike other sort operators, tt(oe) and tt(o+) may be
+repeated, but note that the maximum number of sort operators of any kind
+that may appear in any glob expression is 12.
 )
 item(tt(O)var(c))(
 like `tt(o)', but sorts in descending order; i.e. `tt(*(^oc))' is the

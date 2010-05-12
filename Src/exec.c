@@ -564,7 +564,7 @@ execute(LinkList args, int flags, int defpath)
 
 	STTYval = 0;	/* this prevents infinite recursion */
 	zsfree(s);
-	execstring(t, 1, 0);
+	execstring(t, 1, 0, "stty");
 	zsfree(t);
     } else if (s) {
 	STTYval = 0;
@@ -970,21 +970,40 @@ entersubsh(int flags)
 
 /**/
 mod_export void
-execstring(char *s, int dont_change_job, int exiting)
+execstring(char *s, int dont_change_job, int exiting, char *context)
 {
     Eprog prog;
 
     pushheap();
     if ((prog = parse_string(s, 0)))
-	execode(prog, dont_change_job, exiting);
+	execode(prog, dont_change_job, exiting, context);
     popheap();
 }
 
 /**/
 mod_export void
-execode(Eprog p, int dont_change_job, int exiting)
+execode(Eprog p, int dont_change_job, int exiting, char *context)
 {
     struct estate s;
+    static int zsh_eval_context_len;
+    int alen;
+
+    if (!zsh_eval_context_len) {
+	zsh_eval_context_len = 16;
+	alen = 0;
+	zsh_eval_context = (char **)zalloc(zsh_eval_context_len *
+					   sizeof(*zsh_eval_context));
+    } else {
+	alen = arrlen(zsh_eval_context);
+	if (zsh_eval_context_len == alen + 1) {
+	    zsh_eval_context_len *= 2;
+	    zsh_eval_context = zrealloc(zsh_eval_context,
+					zsh_eval_context_len *
+					sizeof(*zsh_eval_context));
+	}
+    }
+    zsh_eval_context[alen] = context;
+    zsh_eval_context[alen+1] = NULL;
 
     s.prog = p;
     s.pc = p->prog;
@@ -994,6 +1013,12 @@ execode(Eprog p, int dont_change_job, int exiting)
     execlist(&s, dont_change_job, exiting);
 
     freeeprog(p);		/* Free if now unused */
+
+    /*
+     * zsh_eval_context may have been altered by a recursive
+     * call, but that's OK since we're using the global value.
+     */
+    zsh_eval_context[alen] = NULL;
 }
 
 /* Execute a simplified command. This is used to execute things that
@@ -3571,7 +3596,7 @@ getoutput(char *cmd, int qt)
     redup(pipes[1], 1);
     entersubsh(ESUB_PGRP|ESUB_NOMONITOR);
     cmdpush(CS_CMDSUBST);
-    execode(prog, 0, 1);
+    execode(prog, 0, 1, "cmdsubst");
     cmdpop();
     close(1);
     _exit(lastval);
@@ -3725,7 +3750,7 @@ getoutputfile(char *cmd, char **eptr)
     redup(fd, 1);
     entersubsh(ESUB_PGRP|ESUB_NOMONITOR);
     cmdpush(CS_CMDSUBST);
-    execode(prog, 0, 1);
+    execode(prog, 0, 1, "equalsubst");
     cmdpop();
     close(1);
     _exit(lastval);
@@ -3827,7 +3852,7 @@ getproc(char *cmd, char **eptr)
 #endif /* PATH_DEV_FD */
 
     cmdpush(CS_CMDSUBST);
-    execode(prog, 0, 1);
+    execode(prog, 0, 1, out ? "outsubst" : "insubst");
     cmdpop();
     zclose(out);
     _exit(lastval);
@@ -3875,7 +3900,7 @@ getpipe(char *cmd, int nullexec)
     redup(pipes[out], out);
     closem(FDT_UNUSED);	/* this closes pipes[!out] as well */
     cmdpush(CS_CMDSUBST);
-    execode(prog, 0, 1);
+    execode(prog, 0, 1, out ? "outsubst" : "insubst");
     cmdpop();
     _exit(lastval);
     return 0;
@@ -4196,7 +4221,7 @@ execautofn(Estate state, UNUSED(int do_exec))
     oldscriptname = scriptname;
     oldscriptfilename = scriptfilename;
     scriptname = scriptfilename = dupstring(shf->node.nam);
-    execode(shf->funcdef, 1, 0);
+    execode(shf->funcdef, 1, 0, "loadautofunc");
     scriptname = oldscriptname;
     scriptfilename = oldscriptfilename;
 
@@ -4250,7 +4275,7 @@ loadautofn(Shfunc shf, int fksh, int autol)
 	} else {
 	    VARARR(char, n, strlen(shf->node.nam) + 1);
 	    strcpy(n, shf->node.nam);
-	    execode(prog, 1, 0);
+	    execode(prog, 1, 0, "evalautofunc");
 	    shf = (Shfunc) shfunctab->getnode(shfunctab, n);
 	    if (!shf || (shf->node.flags & PM_UNDEFINED)) {
 		/* We're not actually in the function; decrement locallevel */
@@ -4538,7 +4563,7 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
 	wrap = wrap->next;
     }
     startparamscope();
-    execode(prog, 1, 0);
+    execode(prog, 1, 0, "shfunc");
     if (ou) {
 	setunderscore(ou);
 	zfree(ou, ouu);

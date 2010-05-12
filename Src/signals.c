@@ -1198,7 +1198,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	trap_state = TRAP_STATE_PRIMED;
 	trapisfunc = isfunc = 0;
 
-	execode((Eprog)sigfn, 1, 0);
+	execode((Eprog)sigfn, 1, 0, "trap");
     }
     runhookdef(AFTERTRAPHOOK, NULL);
 

@@ -182,7 +182,7 @@ loop(int toplevel, int justonce)
 	    }
 	    if (stopmsg)	/* unset 'you have stopped jobs' flag */
 		stopmsg--;
-	    execode(prog, 0, 0);
+	    execode(prog, 0, 0, toplevel ? "toplevel" : "file");
 	    tok = toksav;
 	    if (toplevel)
 		noexitct = 0;
@@ -1125,7 +1125,7 @@ init_misc(void)
 	    fclose(bshin);
 	SHIN = movefd(open("/dev/null", O_RDONLY | O_NOCTTY));
 	bshin = fdopen(SHIN, "r");
-	execstring(cmd, 0, 1);
+	execstring(cmd, 0, 1, "cmdarg");
 	stopmsg = 1;
 	zexit(lastval, 0);
     }
@@ -1213,7 +1213,7 @@ source(char *s)
     if (prog) {
 	pushheap();
 	errflag = 0;
-	execode(prog, 1, 0);
+	execode(prog, 1, 0, "filecode");
 	popheap();
 	if (errflag)
 	    ret = SOURCE_ERROR;

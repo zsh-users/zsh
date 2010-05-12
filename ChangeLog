@@ -1,3 +1,11 @@
+2010-05-12  Peter Stephenson  <pws@csr.com>
+
+	* 27951: Doc/Zsh/expn.yo, Doc/Zsh/params.yo, Src/builtin.c,
+	Src/exec.c, Src/glob.c, Src/init.c, Src/params.c, Src/signals.c,
+	Src/Builtins/sched.c, Src/Modules/zpty.c, Src/Modules/zutil.c:
+	Add $ZSH_EVAL_CONTEXT and $zsh_eval_context to provide context
+	stack.
+
 2010-05-10  Peter Stephenson  <pws@csr.com>
 
 	* c.f. 27950: Test/C03traps.ztst some bogus whitespace got added
@@ -13122,5 +13130,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4975 $
+* $Revision: 1.4976 $
 *****************************************************
