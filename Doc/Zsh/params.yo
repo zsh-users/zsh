@@ -806,7 +806,7 @@ code.
 item(tt(zpty))(
 Code executed by the tt(zpty) builtin from the tt(zsh/zpty) module.
 )
-item(tt(zregesparse-guard))(
+item(tt(zregexparse-guard))(
 Code executed as a guard by the tt(zregexparse) command from the
 tt(zsh/zutil) module.
 )

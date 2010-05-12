@@ -1279,7 +1279,7 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 	    }
 	    if (next->pattern && pattry(next->patprog, subj) &&
 		(!next->guard || (execstring(next->guard, 1, 0,
-					     "zregesparse-guard"), !lastval))) {
+					     "zregexparse-guard"), !lastval))) {
 		LinkNode aln;
 		char **mend;
 		int len;

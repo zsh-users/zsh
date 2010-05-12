@@ -1219,3 +1219,12 @@
 >LOST
 >Subscript flags returning single values
 >STRING key= val=
+
+   print $zsh_eval_context[1]
+   [[ $ZSH_EVAL_CONTEXT = ${(j.:.)zsh_eval_context} ]] || print Not equal!
+   (( icontext = ${#zsh_eval_context} + 1 ))
+   contextfn() { print $(print $zsh_eval_context[icontext,-1]); }
+   contextfn
+0:$ZSH_EVAL_CONTEXT and $zsh_eval_context
+>toplevel
+>shfunc cmdsubst

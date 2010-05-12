@@ -1,5 +1,8 @@
 2010-05-12  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Doc/Zsh/params.yo, Src/Modules/zutil.c: fix typo
+	("zregesparse-guard").
+
 	* 27951: Doc/Zsh/expn.yo, Doc/Zsh/params.yo, Src/builtin.c,
 	Src/exec.c, Src/glob.c, Src/init.c, Src/params.c, Src/signals.c,
 	Src/Builtins/sched.c, Src/Modules/zpty.c, Src/Modules/zutil.c:
@@ -13130,5 +13133,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4976 $
+* $Revision: 1.4977 $
 *****************************************************
