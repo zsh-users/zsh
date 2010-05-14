@@ -2,7 +2,7 @@
 
 ### Running vcs_info #########################################################
 
-# As always, there's more than one way to skin a cat. Running vcs_info is
+# As always, there's more than one way to skin a cat. Running vcs_info is no
 # exception. Here is a rundown of three common ways to get it into action.
 #
 # All three ways need vcs_info to be marked for autoloading first, so you'd
@@ -140,7 +140,6 @@ zstyle ':vcs_info:hg:*' branchformat '%b'
 # Then add the hash to 'formats' as %i and truncate it to 12 chars:
 zstyle ':vcs_info:hg:*' formats ' (%s)-[%12.12i %b]-'
 
-
 ### Truncate long hash to 12-chars but also allow for multiple parents
 # Hashes are joined with a + to mirror the output of `hg id`.
 zstyle ':vcs_info:hg+set-hgrev-format:*' hooks hg-shorthash
@@ -162,7 +161,7 @@ function +vi-hg-shorthash() {
 zstyle ':vcs_info:hg+set-hgrev-format:*' hooks hg-storerev
 zstyle ':vcs_info:hg+set-message:*' hooks hg-branchhead
 
-# The hash is availabe in the hgrev-format hook, store a copy of it in the
+# The hash is available in the hgrev-format hook, store a copy of it in the
 # user_data array so we can access it in the second function
 function +vi-hg-storerev() {
     user_data[hash]=${hook_com[hash]}
@@ -189,7 +188,7 @@ function +vi-hg-branchhead() {
 }
 
 
-### Run vcs_info selectively to increase speed in large repos #################
+### Run vcs_info selectively to increase speed in large repos ################
 
 # The following example shows a possible setup for vcs_info which displays
 # staged and unstaged changes in the vcs_info prompt and prevents running
@@ -306,7 +305,7 @@ zstyle ':vcs_info:*' actionformats " (%s)-[%b%Q|%a]-"
 # or apply patches to a normal directory tree that's not under version
 # control. The debian project does this for a large number of packages,
 # during their automatic build process.
-# The `use-quilt' style only enables# addon-mode, because for standalone
+# The `use-quilt' style only enables addon-mode, because for standalone
 # mode we'd have to try to detect whether quilt is "active" in a directory.
 # You can fine-tune that "detection" using the `quilt-standalone' style.
 # If the value of that style is a function name, that function is executed
@@ -361,7 +360,7 @@ zstyle ':vcs_info:*' quiltformat '#%p [%n|%c]'
 # quilt-nopatch-format (default: "no patch applied")
 zstyle ':vcs_info:*' quilt-nopatch-format '#cleeaaaaan!1!!'
 
-# To retrieve inforamation about unapplied patches, vcs_info invokes `quilt'
+# To retrieve information about unapplied patches, vcs_info invokes `quilt'
 # itself. Even though that's pretty quick, it's not needed for the default
 # behaviour. If we want to have `%c' and `%u' to contain meaningful data,
 # we have to enable retrieval of unapplied data:
@@ -379,7 +378,6 @@ zstyle ':vcs_info:-quilt-.quilt-standalone:*:*' quilt-patch-dir debian/patches
 # want the default `patches' though but a dedicated place for them.
 # Say `~/patches/<repository-name>'. Now we'll use some evaluated-style
 # magic to achieve all that:
-
 zstyle -e ':vcs_info:*.quilt-addon:*:*' quilt-patch-dir 'my-patches-func'
 
 # That runs something called `my-patches-func', and the value of $reply is
