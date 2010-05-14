@@ -51,10 +51,10 @@ VCS_INFO_hook 'post-backend'
 
 if [[ -n ${hook_com[action]} ]] ; then
     zstyle -a ":vcs_info:${vcs}:${usercontext}:${rrn}" actionformats msgs
-    (( ${#msgs} < 1 )) && msgs[1]=' (%s)-[%b|%a]-'
+    (( ${#msgs} < 1 )) && msgs[1]=' (%s)-[%b|%a]%u%c-'
 else
     zstyle -a ":vcs_info:${vcs}:${usercontext}:${rrn}" formats msgs
-    (( ${#msgs} < 1 )) && msgs[1]=' (%s)-[%b]-'
+    (( ${#msgs} < 1 )) && msgs[1]=' (%s)-[%b]%u%c-'
 fi
 
 if [[ -n ${hook_com[staged]} ]] ; then

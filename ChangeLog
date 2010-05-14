@@ -3,6 +3,10 @@
 	* Simon Ruderich: 27954: Doc/Zsh/contrib.yo, Misc/vcs_info-examples:
 	vcs_info: more minor documentation fixes.
 
+	* Simon Ruderich: 27953: Doc/Zsh/contrib.yo, Misc/vcs_info-examples,
+	Functions/VCS_Info/VCS_INFO_formats: vcs_info: changed default formats
+	and actionformats
+
 2010-05-12  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/params.yo, Src/Modules/zutil.c: fix typo
@@ -13138,5 +13142,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4978 $
+* $Revision: 1.4979 $
 *****************************************************
