@@ -1,3 +1,7 @@
+2010-05-22  Clint Adams  <clint@zsh.org>
+
+	* 27964: Doc/Zsh/contrib.yo: add back missing enditem().
+
 2010-05-14  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Simon Ruderich: 27954: Doc/Zsh/contrib.yo, Misc/vcs_info-examples:
@@ -13142,5 +13146,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4979 $
+* $Revision: 1.4980 $
 *****************************************************

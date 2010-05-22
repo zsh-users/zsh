@@ -1071,6 +1071,7 @@ If tt(ret) is set to to non-zero, the string in
 tt(${hook_com[message]}) will be used unchanged as the message by
 var(vcs_info).
 )
+enditem()
 
 If all of this sounds rather confusing, take a look at the tt(Examples)
 section below and also in the Misc/vcs_info-examples file in the Zsh source.
