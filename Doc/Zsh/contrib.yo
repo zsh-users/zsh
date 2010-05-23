@@ -2412,7 +2412,7 @@ startitem()
 findex(zsh-mime-setup)
 findex(zsh-mime-handler)
 xitem(tt(zsh-mime-setup) [ tt(-fv) ] [ tt(-l) [ var(suffix ...) ] ])
-item(tt(zsh-mime-handler))(
+item(tt(zsh-mime-handler [-l] var(command arguments ...)))(
 These two functions use the files tt(~/.mime.types) and tt(/etc/mime.types),
 which associate types and extensions, as well as tt(~/.mailcap) and
 tt(/etc/mailcap) files, which associate types and the programs that
@@ -2636,6 +2636,12 @@ terminal; the second flag is used if the output should be sent to a pager.
 An example of a suitable tt(mailcap) entry for such a program is:
 
 example(text/html; /usr/bin/lynx '%s'; needsterminal)
+
+Running `tt(zsh-mime-handler -l) var(command line)' prints the command
+line that would be executed, simplified to remove the effect of any
+flags, and quoted so that the output can be run as a complete zsh
+command line.  This is used by the completion system to decide how to
+complete after a file handled by tt(zsh-mime-setup).
 )
 findex(pick-web-browser)
 item(tt(pick-web-browser))(

@@ -34,6 +34,28 @@ setopt extendedglob cbases nullglob $autocd
 # We need zformat from zsh/zutil for %s replacement.
 zmodload -i zsh/zutil
 
+# Look for options.  Because of the way this is usually invoked,
+# (there is always a command to be handled), only handle options
+# up to second last argument.
+local opt
+integer list
+while (( $# - $OPTIND > 0 )); do
+  if getopts "l" opt; then
+    case $opt in
+      (l)
+      list=1
+      ;;
+
+      (*)
+      return 1
+      ;;
+    esac
+  else
+    break
+  fi
+done
+shift $(( OPTIND - 1 ))
+
 # Always called with a filename argument first.
 # There might be other arguments; don't really know what to do
 # with these, but if they came from e.g. `*.ps' then we might
@@ -47,7 +69,8 @@ local -a match mbegin mend
 suffix=${(L)match[1]}
 context=":mime:.${suffix}:"
 
-local handler flags no_sh no_bg
+local handler flags no_sh no_bg arg
+integer i
 local -a exec_asis hand_nonex
 
 # Set to a list of patterns which are ignored and executed as they are,
@@ -94,7 +117,20 @@ fi
 for pattern in $exec_asis; do
   files=(${dirpref}${~pattern})
   if [[ -n ${files[(r)$1]} ]]; then
-    "$@"
+    if (( list )); then
+      for (( i = 1; i <= $#; i++ )); do
+	(( i == 1 )) || print -n " "
+	arg=${argv[i]}
+	if [[ -n $arg ]]; then
+	  print -rn -- ${(q)arg}
+	else
+	  print "''"
+	fi
+      done
+      print
+    else
+      "$@"
+    fi
     return
   fi
 done
@@ -152,12 +188,13 @@ if [[ $handler = *%s* ]]; then
       # Probably we ought not even to handle multiple
       # arguments, but at least the error message ought
       # to make it obvious what's going on.
-      zformat -f command $handler s:"$argv"
+      zformat -f command $handler s:"$argv[0]"
     else
-      files=(${(q)argv})
-      zformat -f command $handler s:"$files"
+      zformat -f command $handler s:"${(q)argv[0]}"
     fi
-    if [[ $no_sh = yes ]]; then
+    if (( list )); then
+      execargs=(${(Q)${(z)command}} ${argv[1,-1]})
+    elif [[ $no_sh = yes ]]; then
       execargs=(eval $command)
     else
       execargs=(sh -c $command)
@@ -174,11 +211,25 @@ if [[ $handler = *%s* ]]; then
 else
   # If there's no %s, the input is supposed to come from stdin.
   stdin=1
-  if [[ -n $hasmeta && $no_sh != yes ]]; then
+  if [[ -n $hasmeta && $no_sh != yes && list -eq 0 ]]; then
     execargs=(sh -c "$handler")
   else
     execargs=(${=handler})
   fi
+fi
+
+if (( list )); then
+  for (( i = 1; i <= ${#execargs}; i++ )); do
+    (( i == 1 )) || print -n " "
+    arg=${execargs[i]}
+    if [[ -n $arg ]]; then
+      print -rn -- ${(q)arg}
+    else
+      print -n "''"
+    fi
+  done
+  print
+  return 0
 fi
 
 # Now execute the command in the appropriate fashion.

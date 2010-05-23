@@ -1,0 +1,9 @@
+#compdef zsh-mime-handler
+
+# zsh-mime-handler -l is supposed to print out the command line
+# with quoting to turn it into a full executable line.  So
+# we need to use shell splitting to turn it into words and
+# then unquoting on those words.
+words=(${(Q)${(z)"$(zsh-mime-handler -l ${words[2,-1]})"}})
+
+_normal
