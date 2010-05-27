@@ -2896,7 +2896,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    }
 		} else
 		    for (; *ap; ap++)
-			*ap = quotestring(*ap, NULL, QT_BACKSLASH);
+			*ap = quotestring(*ap, NULL, QT_BACKSLASH_SHOWNULL);
 	    } else {
 		int one = noerrs, oef = errflag, haserr = 0;
 
@@ -2933,7 +2933,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    if (quotetype == QT_DOLLARS)
 		      val[0] = '$';
 		} else
-		    val = quotestring(val, NULL, QT_BACKSLASH);
+		    val = quotestring(val, NULL, QT_BACKSLASH_SHOWNULL);
 	    } else {
 		int one = noerrs, oef = errflag, haserr;
 
@@ -3490,7 +3490,7 @@ modify(char **str, char **ptr)
 			    subst(&copy, hsubl, hsubr, gbal);
 			break;
 		    case 'q':
-			copy = quotestring(copy, NULL, QT_BACKSLASH);
+			copy = quotestring(copy, NULL, QT_BACKSLASH_SHOWNULL);
 			break;
 		    case 'Q':
 			{

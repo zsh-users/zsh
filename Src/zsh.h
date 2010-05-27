@@ -218,7 +218,11 @@ enum {
      * Single quotes, but the default is not to quote unless necessary.
      * This is only useful as an argument to quotestring().
      */
-    QT_SINGLE_OPTIONAL
+    QT_SINGLE_OPTIONAL,
+    /*
+     * As QT_BACKSLASH, but a NULL string is shown as ''.
+     */
+    QT_BACKSLASH_SHOWNULL
 };
 
 #define QT_IS_SINGLE(x)	((x) == QT_SINGLE || (x) == QT_SINGLE_OPTIONAL)

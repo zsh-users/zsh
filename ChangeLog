@@ -1,5 +1,10 @@
 2010-05-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 27965 plus as per 27966: Src/builtin.c, Src/subst.c,
+	Src/utils.c, Src/zsh.h: Use $'\n' quoting instead of literal
+	newline for ${(q)...} to avoid lines getting split unexpectedly.
+	Quote empty strings as ''.
+
 	* 27976: Doc/Zsh/expn.yo: add yet more to the my-brain-hurts
 	description of how parameter expansion is ordered.
 
@@ -13164,5 +13169,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4983 $
+* $Revision: 1.4984 $
 *****************************************************

@@ -4233,7 +4233,7 @@ bin_print(char *name, char **args, Options ops, int func)
 		break;
 	    case 'q':
 		stringval = curarg ?
-		    quotestring(curarg, NULL, QT_BACKSLASH) : &nullstr;
+		    quotestring(curarg, NULL, QT_BACKSLASH_SHOWNULL) : &nullstr;
 		*d = 's';
 		print_val(stringval);
 		break;

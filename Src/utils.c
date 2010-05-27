@@ -4576,7 +4576,7 @@ quotestring(const char *s, char **e, int instring)
     char *v;
     int alloclen;
     char *buf;
-    int sf = 0;
+    int sf = 0, shownull;
     /*
      * quotesub is used with QT_SINGLE_OPTIONAL.
      * quotesub = 0:  mechanism not active
@@ -4585,11 +4585,18 @@ quotestring(const char *s, char **e, int instring)
      * quotesub = 2:  mechanism active, added opening "'"; need
      *                closing "'".
      */
-    int quotesub = 0;
+    int quotesub = 0, slen;
     char *quotestart;
     convchar_t cc;
     const char *uend;
 
+    slen = strlen(s);
+    if (instring == QT_BACKSLASH_SHOWNULL) {
+	shownull = 1;
+	instring = QT_BACKSLASH;
+    } else {
+	shownull = 0;
+    }
     switch (instring)
     {
     case QT_BACKSLASH:
@@ -4598,21 +4605,24 @@ quotestring(const char *s, char **e, int instring)
 	 * Keep memory usage within limits by allocating temporary
 	 * storage and using heap for correct size at end.
 	 */
-	alloclen = strlen(s) * 7 + 1;
+	alloclen = slen * 7 + 1;
+	if (!*s && shownull)
+	    alloclen += 2;	/* for '' */
 	break;
 
     case QT_SINGLE_OPTIONAL:
 	/*
 	 * Here, we may need to add single quotes.
 	 */
-	alloclen = strlen(s) * 4 + 3;
+	alloclen = slen * 4 + 3;
 	quotesub = 1;
 	break;
 
     default:
-	alloclen = strlen(s) * 4 + 1;
+	alloclen = slen * 4 + 1;
 	break;
     }
+
     tt = quotestart = v = buf = zshcalloc(alloclen);
 
     DPUTS(instring < QT_BACKSLASH || instring == QT_BACKTICK ||
@@ -4659,6 +4669,13 @@ quotestring(const char *s, char **e, int instring)
     }
     else
     {
+	if (shownull) {
+	    /* We can't show an empty string with just backslash quoting. */
+	    if (!*u) {
+		*v++ = '\'';
+		*v++ = '\'';
+	    }
+	}
 	/*
 	 * Here there are syntactic special characters, so
 	 * we start by going through bytewise.
@@ -4771,15 +4788,19 @@ quotestring(const char *s, char **e, int instring)
 		    continue;
 		} else if (*u == '\n' ||
 			   (instring == QT_SINGLE && *u == '\'')) {
-		    if (unset(RCQUOTES)) {
+		    if (*u == '\n') {
+			*v++ = '$';
+			*v++ = '\'';
+			*v++ = '\\';
+			*v++ = 'n';
+			*v++ = '\'';
+		    } else if (unset(RCQUOTES)) {
 			*v++ = '\'';
 			if (*u == '\'')
 			    *v++ = '\\';
 			*v++ = *u;
 			*v++ = '\'';
-		    } else if (*u == '\n')
-			*v++ = '"', *v++ = '\n', *v++ = '"';
-		    else
+		    } else
 			*v++ = '\'', *v++ = '\'';
 		    u++;
 		    continue;
