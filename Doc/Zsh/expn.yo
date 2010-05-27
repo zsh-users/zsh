@@ -1172,7 +1172,15 @@ Any modifiers, as specified by a trailing `tt(#)', `tt(%)', `tt(/)'
 noderef(Modifiers) in noderef(History Expansion)), are applied to the words
 of the value at this level.
 )
-item(tt(8.) em(Forced Joining))(
+item(tt(8.) em(Character evaluation))(
+Any tt((#)) flag is applied, evaluating the result so far numerically
+as a character.
+)
+item(tt(9.) em(Length))(
+Any initial tt(#) modifier, i.e. in the form tt(${#)var(var)tt(}), is
+used to evaluate the length of the expression so far.
+)
+item(tt(10.) em(Forced Joining))(
 If the `tt((j))' flag is present, or no `tt((j))' flag is present but
 the string is to be split as given by rules tt(8.) or tt(9.), and joining
 did not take place at step tt(4.), any words in the value are joined
@@ -1180,36 +1188,51 @@ together using the given string or the first character of tt($IFS) if none.
 Note that the `tt((F))' flag implicitly supplies a string for joining in this
 manner.
 )
-item(tt(9.) em(Forced Splitting))(
+item(tt(11.) em(Case modification))(
+Any case modification from one of the flags tt((L)), tt((U)) or tt((C))
+is applied.
+)
+item(tt(12.) em(Prompt evaluation))(
+Any prompt-style formatting from the tt((%)) family of flags is applied.
+)
+item(tt(13.) em(Quote application))(
+Any quoting or unquoting using tt((q)) and tt((Q)) and related flags
+is applied.
+)
+item(tt(14.) em(Visibility enhancment))(
+Any modifications to make characters visible using the tt((V)) flag
+are applied.
+)
+item(tt(15.) em(Forced Splitting))(
 If one of the `tt((s))', `tt((f))' or `tt((z))' flags are present, or the `tt(=)'
 specifier was present (e.g. tt(${=)var(var)tt(})), the word is split on
 occurrences of the specified string, or (for tt(=) with neither of the two
 flags present) any of the characters in tt($IFS).
 )
-item(tt(10.) em(Shell Word Splitting))(
+item(tt(16.) em(Shell Word Splitting))(
 If no `tt((s))', `tt((f))' or `tt(=)' was given, but the word is not
 quoted and the option tt(SH_WORD_SPLIT) is set, the word is split on
 occurrences of any of the characters in tt($IFS).  Note this step, too,
 takes place at all levels of a nested substitution.
 )
-item(tt(11.) em(Uniqueness))(
+item(tt(17.) em(Uniqueness))(
 If the result is an array and the `tt((u))' flag was present, duplicate
 elements are removed from the array.
 )
-item(tt(12.) em(Ordering))(
+item(tt(18.) em(Ordering))(
 If the result is still an array and one of the `tt((o))' or `tt((O))' flags
 was present, the array is reordered.
 )
-item(tt(13.) em(Re-Evaluation))(
+item(tt(19.) em(Re-Evaluation))(
 Any `tt((e))' flag is applied to the value, forcing it to be re-examined
 for new parameter substitutions, but also for command and arithmetic
 substitutions.
 )
-item(tt(14.) em(Padding))(
+item(tt(20.) em(Padding))(
 Any padding of the value by the `tt(LPAR()l.)var(fill)tt(.RPAR())' or
 `tt(LPAR()r.)var(fill)tt(.RPAR())' flags is applied.
 )
-item(tt(15.) em(Semantic Joining))(
+item(tt(21.) em(Semantic Joining))(
 In contexts where expansion semantics requires a single word to
 result, all words are rejoined with the first character of tt(IFS)
 between.  So in `tt(${LPAR()P)tt(RPAR()${LPAR()f)tt(RPAR()lines}})'
@@ -1217,6 +1240,15 @@ the value of tt(${lines}) is split at newlines, but then must be
 joined again before the tt(P) flag can be applied.
 
 If a single word is not required, this rule is skipped.
+)
+item(tt(22.) em(Empty argument removal))(
+If the substitution does not appear in double quotes, any resulting
+zero-length argument, whether from a scalar or an element of an array,
+is elided from the list of arguments inserted into the command line.
+
+Strictly speaking, the removal happens later as the same happens with
+other forms of substitution; the point to note here is simply that
+it occurs after any of the above parameter operations.
 )
 enditem()
 

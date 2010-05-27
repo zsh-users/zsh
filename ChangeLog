@@ -1,3 +1,8 @@
+2010-05-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27976: Doc/Zsh/expn.yo: add yet more to the my-brain-hurts
+	description of how parameter expansion is ordered.
+
 2010-05-27  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Seth House: 27971: Functions/VCS_Info/Backends/VCS_INFO_get_data_hg:
@@ -13159,5 +13164,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4982 $
+* $Revision: 1.4983 $
 *****************************************************
