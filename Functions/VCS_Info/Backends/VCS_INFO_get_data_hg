@@ -58,9 +58,10 @@ fi
 # If the user doesn't opt to invoke hg we can still get the current branch
 if [[ -z ${r_branch} && -r ${branchfile} ]] ; then
     r_branch=$(< ${branchfile})
-else
-    r_branch="default"
 fi
+
+# If we still don't know the branch it's safe to assume default
+[[ -n ${r_branch} ]] || r_branch="default"
 
 # The working dir has uncommitted-changes if the revision ends with a +
 if [[ $r_lrev[-1] == + ]] ; then

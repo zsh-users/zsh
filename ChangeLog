@@ -1,3 +1,9 @@
+2010-05-27  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Seth House: 27971: Functions/VCS_Info/Backends/VCS_INFO_get_data_hg:
+	vcs_info: Fix a bug that caused the mercurial backend to always return
+	`default' as the branch name.
+
 2010-05-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/15078: Completion/Zsh/Function/.distfiles,
@@ -13153,5 +13159,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4981 $
+* $Revision: 1.4982 $
 *****************************************************
