@@ -100,7 +100,7 @@ while [[ -n $PREFIX ]]; do
     # complete/skip GID or delimited group
     if ! compset -P '[[:digit:]]##'; then
       if [[ -z $PREFIX ]]; then
-        _delimiter qualifier-g
+        _delimiters qualifier-g
         return
       elif ! _globqual_delims; then
         # still completing group
