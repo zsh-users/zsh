@@ -59,6 +59,7 @@ elif compset -P '\('; then
       '(r R k i I)K[all values where subscript matched by key as pattern]'
       '(r R k K I)i[any one key matched by subscript as pattern]'
       '(r R k K i)I[all keys matched by subscript as pattern]'
+      'e[interpret * or @ as a single key]'
     );;
     (|scalar*)) flags=(
       'w[make subscripting work on words of scalar]'
@@ -66,6 +67,7 @@ elif compset -P '\('; then
       'p[recognise escape sequences in subsequent s flag]'
     );&
     array*) flags=($flags
+      'e[interpret * or @ as a single key and use plain string matching]'
       'n[Nth lowest/highest index with i/I/r/R flag]'
       'b[begin with specified element]'
       '(r R k K i)I[highest index of value matched by subscript]'

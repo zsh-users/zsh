@@ -1,3 +1,8 @@
+2010-05-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Mikael: 27981: Completion/Zsh/Context/_subscript: complete
+	(e).
+
 2010-05-28  Peter Stephenson  <pws@csr.com>
 
 	* Mikael: 27980: Completion/Zsh/Type/_globquals: typo.
@@ -13173,5 +13178,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4985 $
+* $Revision: 1.4986 $
 *****************************************************
