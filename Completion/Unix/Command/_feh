@@ -1,5 +1,5 @@
 #compdef feh
-## completion for feh 1.3.4, based on feh(1)
+## completion for feh 1.6, based on feh(1)
 
 typeset -a arguments
 typeset -A argument_pairs argument_postfix
@@ -39,15 +39,12 @@ argument_pairs=(
 	'thumbnails'  't'
 	'menu-font'   'M+'
 	'no-menus'    'N'
-	'next-button' '1+'
-	'zoom-button' '2+'
-	'pan-button'  '3+'
-	'menu-button' '4+'
-	'no-menu-ctrl-mask' '5'
-	'rotate-button' '6+'
-	'no-rotate-ctrl-mask' '7'
-	'blur-button' '8+'
-	'no-blur-ctrl-mask' '9'
+	'reload-button' '0'
+	'menu-button' '3+'
+	'prev-button' '4+'
+	'next-button' '5+'
+	'rotate-button' '8+'
+	'blur-button' '9+'
 	'ignore-aspect' 'X'
 	'stretch'     's'
 	'thumb-width' 'y+'
@@ -57,6 +54,18 @@ argument_pairs=(
 	'bg'          'b+'
 	'alpha'       'a+'
 	'font'        'e+'
+	'scale-down'  '.'
+	'output-dir'  'j+'
+	'wget-timestamp' 'G'
+	'fontpath'    'C+'
+	'image-bg'    'B+'
+	'output'      'o'
+	'output-only' 'O'
+	'rcfile'      '_'
+	'thumb-title' '~'
+	'title'       '^'
+	'start-at'    '|'
+	'title-font'  '@'
 )
 
 argument_postfix=(
@@ -92,15 +101,14 @@ argument_postfix=(
 	'thumbnails'  '[Enable interactive index mode]'
 	'menu-font'   '[Set font in menus]:font: '
 	'no-menus'    "[Don't load or show any menus]"
-	'next-button' '[Button for next image]:button:_feh_button'
-	'zoom-button' '[Button to zoom image]:button:_fes_button'
-	'pan-button'  '[Ctrl+Button to pan image]:button:_feh_button'
+	'reload-button' '[Button to reload image]:button:_feh_button'
+	'pan-button'  '[Button to pan image]:button:_feh_button'
+	'zoom-button' '[Button to zoom image]:button:_feh_button'
 	'menu-button' '[Button to activate menu]:button:_feh_button'
-	'no-menu-ctrl-mask' '[Show Menu without pressing ctrl]'
+	'prev-button' '[Button to go to previous image]:button:_feh_button'
+	'next-button' '[Button to go to next image]:button:_feh_button'
 	'rotate-button' '[Ctrl+Button to rotate image]:button:_feh_button'
-	'no-rotate-ctrl-mask' '[Rotate without pressing ctrl]'
 	'blur-button' '[Ctrl+Button tu blur image]:button:_feh_button'
-	'no-blur-ctrl-mask' '[Blur without pressing ctrl]'
 	'ignore-aspect' "[montage mode: Don't preserve aspect ratio]"
 	'stretch'     '[montage mode: Enlarge images to fit thumbnail size]'
 	'thumb-width' '[montage mode: Thumbnail width]:pixels: '
@@ -111,34 +119,52 @@ argument_postfix=(
 	'alpha'       '[montage mode: Thumbnail transparency level]:integer: '
 	'font'        '[index mode: Thumbnail info font]:font: '
 	'slideshow-delay' '[slide change delay]:seconds'
+	'scale-down'  '[Scale down images which are too big]'
+	'output-dir'  '[Save files to DIR (with -k)]:directory:_files -/'
+	'wget-timestamp' '[Add no timestamp ("?123") to URLs]'
+	'fontpath'    '[Add paths to font path]:font path:_files -/'
+	'image-bg'    '[Set transparent image background]:background:(white black default)'
+	'output'      '[montage mode: Output file]:file:_files'
+	'output-only' "[montage mode: Output file, don't display montage]:file: files"
+	'rcfile'      '[Specify config file]:file:_files'
+	'thumb-title' '[Window title in thumbnail mode]:format string'
+	'title'       '[Window title in slideshow mode]:format string'
+	'start-at'    '[Start slideshow at]:file:_files'
+	'title-font'  '[Title font for index mode]:font'
 )
 
 arguments=(
-	'--rcfile[Specify config file]:file:_files'
 	'--zoom[Zoom images]:percent: '
 	'--caption-path[Where to look for image captions]:relative directory: '
 	--action{1..9}':shell: '
 	'--bg-tile[Set tiled desktop background]:file:_files'
 	'--bg-center[Set centered desktop background]:file:_files'
 	'--bg-scale[Set scaled desktop background]:file:_files'
-	'--bg-seamless[Set scaled desktop background, preserving aspect]:file:_files'
+	'--bg-seamless[Set desktop background with seamless borders]:file:_files'
+	'--bg-fill[Set scaled desktop background, preserving aspect ratio]:file:_files'
 	'--menu-style[Style descriptor for menu text]:file:_files'
-	'--menu-bg[Background image in menus]: :_feh_background'
 	'--menu-border[Set menu background border]:integer: '
-	'--no-pan-ctrl-mask[Pan without pressing ctrl]'
-	'--xinerama[Toggle xinerama support]'
+	'--menu-ctrl-mask[Use Ctrl+Button to display menu]'
+	'--no-rotate-ctrl-mask[Don'\''t require Ctrl for the rotate button]'
+	'--no-blur-ctrl-mask[Don'\''t require Ctrl for the blur button]'
+	'--no-xinerama[Disable xinerama support]'
 	'--screen-clip[Toggle window clipping]'
 	'--hide-pointer[Hide mouse pointer in fullscreen mode]'
-	'-o[montage mode: Output file]:file:_files'
-	"-O[montage mode: Output file, don't display montage]:file:_files"
 	'*--fontpath[index mode: directory to search for fonts]:directory:_path_files -/'
-	'--title-font[index mode: title font]:font: '
+	'--index-name[Show image name in index/thumbnail mode]:bool:(0 1)'
+	'--index-size[Show image size in index/thumbnail mode]:bool:(0 1)'
+	'--index-dim[Show image dimensions in index/thumbnail mode]:bool:(0 1)'
+	'--no-jump-on-resort[Stay at current image after resorting the filelist]'
+	'--cycle-once[Quit after one loop through the slideshow]'
+	'--draw-actions[Draw defined actions]'
+	'--cache-thumbnails[Enable thumbnail caching]'
+	'--menu-bg[Background image in menus]: :_feh_background'
+	'--thumb-redraw[Set thumbnail image redraw frequency]:digit'
 	'*:file:_files'
 )
 
 for arg in ${(k)argument_pairs}; {
-	arguments+='(--'$arg')-'${argument_pairs[$arg]}${argument_postfix[$arg]}
-	arguments+='(-'${argument_pairs[$arg]}[1]')--'${arg}${argument_postfix[$arg]}
+	arguments+='(--'${arg}')-'${argument_pairs[$arg]}${argument_postfix[$arg	arguments+='(-'${argument_pairs[$arg]}[1]')--'${arg}${argument_postfix[$arg]}
 }
 
 function _feh_theme {
@@ -147,9 +173,9 @@ function _feh_theme {
 		typeset theme IFS=$'\n'
 		for theme in $(grep "\w" ~/.fehrc | grep -v "^#"); do
 			tmp=(${(s: :)theme})
-			theme=$tmp[1]
+			theme=${tmp[1]}
 			shift tmp
-			themes+=$theme:${(j: :)tmp}
+			themes+=${theme}:${(j: :)tmp}
 		done
 		_describe 'theme' themes
 	fi
@@ -158,7 +184,7 @@ function _feh_theme {
 function _feh_button {
 	typeset expl
 	_wanted button expl button \
-	compadd 1 2 3
+	compadd {0..5}
 }
 
 function _feh_background {
@@ -167,4 +193,4 @@ function _feh_background {
 	'mode:mode:(trans)'
 }
 
-_arguments -s $arguments
+_arguments -s ${arguments}

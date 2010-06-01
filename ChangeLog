@@ -1,3 +1,7 @@
+2010-06-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Daniel Friesel: 27982: Completion/Unix/Command/_feh: update.
+
 2010-05-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Mikael: 27981: Completion/Zsh/Context/_subscript: complete
@@ -13178,5 +13182,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4986 $
+* $Revision: 1.4987 $
 *****************************************************
