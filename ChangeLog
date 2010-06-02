@@ -1,3 +1,10 @@
+2010-06-02  Peter Stephenson  <pws@csr.com>
+
+	* 27990: Src/Modules/termcap.c (not in original patch),
+	Src/Modules/terminfo.c: ignore error return value from
+	setupterm(), it's not useful in telling us whether the module
+	booted OK.
+
 2010-06-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Daniel Friesel: 27982: Completion/Unix/Command/_feh: update.
@@ -13182,5 +13189,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4987 $
+* $Revision: 1.4988 $
 *****************************************************

@@ -341,8 +341,12 @@ boot_(Module m)
 # ifdef HAVE_SETUPTERM
     int errret;
 
-    if (setupterm((char *)0, 1, &errret) == ERR)
-	return 1;
+    /*
+     * Just because we can't set up the terminal doesn't
+     * mean the modules hasn't booted---TERM may change,
+     * and it should be handled dynamically---so ignore errors here.
+     */
+    (void)setupterm((char *)0, 1, &errret);
 # endif
 #endif
 
