@@ -461,7 +461,8 @@ getparamnode(HashTable ht, const char *nam)
 	     * stuff to go ahead with the autoload stub with
 	     * no error status we're in for all sorts of mayhem?
 	     */
-	    zerr("unknown parameter: %s", nam);
+	    zerr("autoloading module %s failed to define parameter: %s", mn,
+		 nam);
 	}
     }
     return hn;

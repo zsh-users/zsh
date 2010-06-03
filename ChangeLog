@@ -1,3 +1,8 @@
+2010-06-03  Peter Stephenson  <pws@csr.com>
+
+	* 27994: Src/params.c: better error message when failing to
+	autoload parameter.
+
 2010-05-03  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Holger Weiss: 27977: Completion/Unix/Command/_git: shouldn't
@@ -13194,5 +13199,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4989 $
+* $Revision: 1.4990 $
 *****************************************************
