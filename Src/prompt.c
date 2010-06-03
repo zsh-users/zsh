@@ -1925,8 +1925,13 @@ set_colour_attribute(int atr, int fg_bg, int flags)
 	    } else {
 		tputs(tgoto(tcstr[tc], colour, colour), 1, putshout);
 	    }
+	    /* That worked. */
+	    return;
 	}
-	/* for 0 to 7 assume standard ANSI works, otherwise it won't. */
+	/*
+	 * Nope, that didn't work.
+	 * If 0 to 7, assume standard ANSI works, otherwise it won't.
+	 */
 	if (colour > 7)
 	    return;
     }

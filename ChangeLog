@@ -1,3 +1,7 @@
+2010-06-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 27983: Src/prompt.c: colours could be output twice.
+
 2010-06-03  Peter Stephenson  <pws@csr.com>
 
 	* 27994: Src/params.c: better error message when failing to
@@ -13199,5 +13203,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4990 $
+* $Revision: 1.4991 $
 *****************************************************
