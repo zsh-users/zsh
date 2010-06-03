@@ -1,3 +1,8 @@
+2010-05-03  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Holger Weiss: 27977: Completion/Unix/Command/_git: shouldn't
+	return 0 if there are no matches.
+
 2010-06-02  Peter Stephenson  <pws@csr.com>
 
 	* 27990: Src/Modules/termcap.c (not in original patch),
@@ -13189,5 +13194,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4988 $
+* $Revision: 1.4989 $
 *****************************************************

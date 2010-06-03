@@ -4471,11 +4471,13 @@ if [[ $service == git ]]; then
       else
         curcontext="${curcontext%:*:*}:git-$words[1]:"
         _call_function ret _git-$words[1]
+        return ret
       fi
       ;;
   esac
 else
   _call_function ret _$service
+  return ret
 fi
 }
 
