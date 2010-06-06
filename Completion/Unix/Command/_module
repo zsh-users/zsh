@@ -23,32 +23,32 @@ _module()
   local -a _module_cmds
 
   _module_cmds=(
-    "help:Print the usage of each sub-command"
-    "load:Load a module into the shell environment"
-    "add:Load a module into the shell environment"
-    "unload:Remove a module from the shell environment"
-    "rm:Remove a module from the shell environment"
-    "switch:Switch loaded a loaded module with another module"
-    "swap:Switch loaded a loaded module with another module"
-    "display:Display information about a module"
-    "show:Display information about a module"
-    "list:List loaded modules"
-    "avail:List all available modules"
-    "use:Add a directory to MODULEPATH"
-    "unuse:Remove a directory from MODULEPATH"
-    "update:Reload all loaded modules"
-    "clear:Clear loaded modules information"
-    "purge:Unload all loaded modules"
-    "refresh:Refresh all non-persistent components of loaded modules"
-    "whatis:Display module information"
-    "appropos:Search for a given keyword in modules"
-    "keyword:Search for a given keyword in modules"
-    "initadd:Add or append a module to the user's shell init file"
-    "initprepend:Add or prepend a module to the user's shell init files"
-    "initrm:Remove a module from the user's shell init file"
-    "initswitch:Switch modules in the user's shell init file"
-    "initlist:List all loaded modules in the user's shell init files"
-    "initclear:Clear all modules from the user's shell init files"
+    "help:print the usage of each sub-command"
+    "load:load a module into the shell environment"
+    "add:load a module into the shell environment"
+    "unload:remove a module from the shell environment"
+    "rm:remove a module from the shell environment"
+    "switch:switch loaded a loaded module with another module"
+    "swap:switch loaded a loaded module with another module"
+    "display:display information about a module"
+    "show:display information about a module"
+    "list:list loaded modules"
+    "avail:list all available modules"
+    "use:add a directory to MODULEPATH"
+    "unuse:remove a directory from MODULEPATH"
+    "update:reload all loaded modules"
+    "clear:clear loaded modules information"
+    "purge:unload all loaded modules"
+    "refresh:refresh all non-persistent components of loaded modules"
+    "whatis:display module information"
+    "appropos:search for a given keyword in modules"
+    "keyword:search for a given keyword in modules"
+    "initadd:add or append a module to the user's shell init file"
+    "initprepend:add or prepend a module to the user's shell init files"
+    "initrm:remove a module from the user's shell init file"
+    "initswitch:switch modules in the user's shell init file"
+    "initlist:list all loaded modules in the user's shell init files"
+    "initclear:clear all modules from the user's shell init files"
   )
 
   if (( CURRENT == 1 )); then
@@ -131,7 +131,7 @@ _module_available_modules()
 (( $+functions[_module_use] )) || _module_use()
 {
   _arguments -s \
-    '(-a --append)'{--append,-a}'[Append the directories instead of prepending]' \
+    '(-a --append)'{--append,-a}'[append the directories instead of prepending]' \
     '*:directory:_files -/'    
 }
 

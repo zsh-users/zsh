@@ -1,3 +1,44 @@
+2010-06-06  Doug Kearns  <dougkearns@gmail.com>
+
+	* unposted: Completion/BSD/Command/_csup,
+	Completion/BSD/Command/_fetch, Completion/BSD/Command/_freebsd-update,
+	Completion/BSD/Command/_fstat, Completion/BSD/Command/_pfctl,
+	Completion/BSD/Command/_portaudit, Completion/BSD/Command/_portmaster,
+	Completion/BSD/Command/_portsnap, Completion/BSD/Command/_powerd,
+	Completion/BSD/Command/_procstat, Completion/Darwin/Command/_open,
+	Completion/Darwin/Command/_softwareupdate,
+	Completion/Debian/Command/_apt-file,
+	Completion/Linux/Command/_analyseplugin,
+	Completion/Linux/Command/_ethtool, Completion/Linux/Command/_ipset,
+	Completion/Linux/Command/_mdadm, Completion/Linux/Command/_rpmbuild,
+	Completion/Linux/Command/_strace,
+	Completion/Mandriva/Command/_rebootin, Completion/Redhat/Command/_yum,
+	Completion/Solaris/Command/_coreadm,
+	Completion/Solaris/Command/_dhcpinfo,
+	Completion/Solaris/Command/_dladm, Completion/Solaris/Command/_dumpadm,
+	Completion/Solaris/Command/_gcore, Completion/Solaris/Command/_inetadm,
+	Completion/Solaris/Command/_ptree,
+	Completion/Solaris/Command/_savecore,
+	Completion/Solaris/Command/_svcadm, Completion/Solaris/Command/_svccfg,
+	Completion/Solaris/Command/_svcprop, Completion/Solaris/Command/_svcs,
+	Completion/Solaris/Command/_zlogin, Completion/Unix/Command/_arp,
+	Completion/Unix/Command/_arping, Completion/Unix/Command/_bzr,
+	Completion/Unix/Command/_cdcd, Completion/Unix/Command/_ecasound,
+	Completion/Unix/Command/_feh, Completion/Unix/Command/_git,
+	Completion/Unix/Command/_gnupod, Completion/Unix/Command/_gnutls,
+	Completion/Unix/Command/_locate, Completion/Unix/Command/_module,
+	Completion/Unix/Command/_perforce, Completion/Unix/Command/_pkgadd,
+	Completion/Unix/Command/_pkginfo, Completion/Unix/Command/_pkgrm,
+	Completion/Unix/Command/_sisu, Completion/Unix/Command/_sqsh,
+	Completion/Unix/Command/_surfraw, Completion/Unix/Command/_tcpdump,
+	Completion/Unix/Command/_tmux, Completion/Unix/Command/_todo.sh,
+	Completion/Unix/Command/_wget, Completion/Unix/Command/_yafc,
+	Completion/Unix/Command/_zfs, Completion/Unix/Command/_zpool,
+	Completion/Unix/Type/_printers, Completion/X/Command/_mplayer,
+	Completion/X/Command/_setxkbmap, Completion/Zsh/Command/_cd: fix
+	incorrectly capitalized completion descriptions as per the
+	recommendations in Etc/completion-style-guide.
+
 2010-06-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 27983: Src/prompt.c: colours could be output twice.
@@ -167,7 +208,7 @@
 	Completion/Redhat/Command/_service
 	Completion/Unix/Command/.distfiles,
 	Completion/Unix/Command/_init_d,
-        Completion/Unix/Command/_service (moved from Redhat),
+	Completion/Unix/Command/_service (moved from Redhat),
 	Completion/Unix/Type/_services: updates for FreeBSD.
 
 2010-04-15  Peter Stephenson  <pws@csr.com>
@@ -528,7 +569,7 @@
 	Doc/Zsh/builtins.yo, Doc/Zsh/grammar.yo,
 	Etc/zsh-development-guide, Src/builtin.c, Src/init.c,
 	Src/mkbltnmlst.sh, Src/Builtins/rlimits.mdd: "repeat"
-        is not available when starting in emulation mode,
+	is not available when starting in emulation mode,
 	"ulimit" is; document that "sched", "limit", "unlimit"
 	already aren't.
 
@@ -681,7 +722,7 @@
 2009-12-28  Clint Adams  <clint@zsh.org>
 
 	* Chris Lamb: 27545: Completion/Unix/Command/_django:
-        runserver_plus and files completion for django.
+	runserver_plus and files completion for django.
 
 2009-12-18  Wayne Davison  <wayned@users.sourceforge.net>
 
@@ -902,7 +943,7 @@
 
 2009-11-06  Peter Stephenson  <pws@csr.com>
 
-        * Frank Terbeck: 27353: Functions/VCS_Info/VCS_INFO_bydir_detect,
+	* Frank Terbeck: 27353: Functions/VCS_Info/VCS_INFO_bydir_detect,
 	Functions/VCS_Info/vcs_info: More sanity checks for vcs_info
 
 2009-11-05  Peter Stephenson  <pws@csr.com>
@@ -1676,7 +1717,7 @@
 2009-04-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	*  Frank Terbeck <ft@bewatermyfriend.org>:  Functions/VCS_Info/*:
-        26816: vcs_info: add revision and "misc" argument to
+	26816: vcs_info: add revision and "misc" argument to
 	VCS_INFO_formats(); 26817: updates for get-revision, %i and %m;
 	26818:  Add git's sha1 hash as revision information; 26819: Add
 	information about hg's local revision number and the  commit's
@@ -1691,7 +1732,7 @@
 2009-04-04  Clint Adams  <clint@zsh.org>
 
 	* Simon Ruderich: 26800: Completion/Unix/Command/_git: fixes for "git add"
-        completion.
+	completion.
 
 2009-04-01  Peter Stephenson  <pws@csr.com>
 
@@ -4326,7 +4367,7 @@
 	* 24878: NEWS, Doc/Zsh/zle.yo, Src/glob.c, Src/pattern.c,
 	Src/zsh.h, Src/Zle/iwidgets.list, Src/Zle/zle_hist.c:
 	add history-incremental-pattern-search-backward and
-        history-incremental-pattern-search-forward, also optimize
+	history-incremental-pattern-search-forward, also optimize
 	history searches a bit more.
 
 	* 24876: don't install manual pages if empty.
@@ -8040,7 +8081,7 @@
 
 2006-09-29  Vin Shelton  <acs@xemacs.org>
 
-       * 22789: Src/init.c: Source zshenv even if non-interactive.
+	* 22789: Src/init.c: Source zshenv even if non-interactive.
 
 2006-09-29  Andrey Borzenkov <bor@zsh.org>
 
@@ -13203,5 +13244,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4991 $
+* $Revision: 1.4992 $
 *****************************************************

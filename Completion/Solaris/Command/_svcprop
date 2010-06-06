@@ -2,19 +2,19 @@
 
 _svcprop() {
 	_arguments -s \
-		'-f[Designate properties by their FMRI]' \
-		'-q[Quiet]' \
-		'-t[Use multi-property output format]' \
-		'-v[Verbose]' \
+		'-f[designate properties by their FMRI]' \
+		'-q[quiet]' \
+		'-t[use multi-property output format]' \
+		'-v[verbose]' \
 		- set1 \
-		'-w[Waits for the selected property or property group to change]' \
-		'-p[Prints values of named property or property group]' \
+		'-w[waits for the selected property or property group to change]' \
+		'-p[prints values of named property or property group]' \
 		':FMRI:_svcs_fmri -i' \
 		- set2 \
-		'(-c -s)-C[Retrieve properties without composition]' \
-		'(-C -s)-c[Retrieve properties with composition]' \
-		'(-c -C)-s[Retrieve properties from snapshot]:snapshot:' \
-		'*-p[Prints values of named property or property group]' \
+		'(-c -s)-C[retrieve properties without composition]' \
+		'(-C -s)-c[retrieve properties with composition]' \
+		'(-c -C)-s[retrieve properties from snapshot]:snapshot:' \
+		'*-p[prints values of named property or property group]' \
 		'*:FMRI:_svcs_fmri -i'
 }
 

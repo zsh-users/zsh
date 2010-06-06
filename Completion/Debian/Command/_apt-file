@@ -24,10 +24,10 @@ _apt-file() {
     case $state in
       cmds)
         cmds=(
-            'update:Resynchronize package contents'
-            'search:Search in which package file is included'
-            'list:List contents of a package'
-            'show:Alias for list'
+            'update:resynchronize package contents'
+            'search:search in which package file is included'
+            'list:list contents of a package'
+            'show:alias for list'
             'purge:remove all Contents-<ARCH>.gz files in cache directory'
         )
         _describe -t commands 'apt-list command' cmds && ret=0

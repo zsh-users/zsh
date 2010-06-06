@@ -4,7 +4,7 @@ local expl context state line nopts ret=1
 typeset -A opt_args
 
 _arguments \
-    '-l[Gives a brief listing (one line per plugin)]' \
+    '-l[gives a brief listing (one line per plugin)]' \
     '(-)1:plugin file:->pfile' \
     '(-)2::plugin label:->plabel' && ret=0
 

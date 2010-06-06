@@ -2,14 +2,14 @@
 
 _zlogin() {
 	_arguments -s \
-		'-E[Disable escape character]' \
-		'-e[Specify escape character]:character:' \
-		'-l[Specify username]:username:_users' \
+		'-E[disable escape character]' \
+		'-e[specify escape character]:character:' \
+		'-l[specify username]:username:_users' \
 		':zonename:' \
 		- set1 \
-		'-C[Connect to zone console]' \
+		'-C[connect to zone console]' \
 		- set2 \
-		'-S["Safe" login mode]' \
+		'-S["safe" login mode]' \
 		':utility'
 }
 

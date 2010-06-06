@@ -116,10 +116,10 @@ case $cmd in
 (log)
     args+=(
 	'--forward[reverse direction of revisions]'
-	'(-l --long --short --log_format)--line[Use log format with one line per revision. Same as "--log-format line"]'
-	'(-l --long --short --line)--log-format=[Use the specified log format]:log format:(line short long)'
-	'(-l --long --short --line --log-format)'{--long,-l}'[Use detailed log format. Same as "--log-format long"]'
-	'(-l --long --log_format)--short[Use moderately short log format. Same as "--log-format short"]'
+	'(-l --long --short --log_format)--line[use log format with one line per revision. Same as "--log-format line"]'
+	'(-l --long --short --line)--log-format=[use the specified log format]:log format:(line short long)'
+	'(-l --long --short --line --log-format)'{--long,-l}'[use detailed log format. Same as "--log-format long"]'
+	'(-l --long --log_format)--short[use moderately short log format. Same as "--log-format short"]'
 	'(-m --message)'{--message=,-m}'[specify regexp]:regexp:'
 	'(-r --revision)'{--revision=,-r}'[revision or range]:rev or rev range:'
 	'--show-ids[show file IDs]'
@@ -180,8 +180,8 @@ case $cmd in
 
 (pull)
     args+=(
-	'--overwrite[Ignore differences, overwrite unconditionally]'
-	'--remember[Remember the specified location as a default]'
+	'--overwrite[ignore differences, overwrite unconditionally]'
+	'--remember[remember the specified location as a default]'
 	'(-r --revision)'{--revision=,-r}'[get a particular revision]:revision:'
 	'(-v --verbose)'{--verbose,-v}'[display more information]'
 	'*:local repository:_files -/'
@@ -191,14 +191,14 @@ case $cmd in
 
 (missing)
     args+=(
-	'(-l --long --short --log_format)--line[Use log format with one line per revision. Same as "--log-format line"]'
-	'(-l --long --short --line)--log-format=[Use the specified log format]:log format:(line short long)'
-	'(-l --long --short --line --log-format)'{--long,-l}'[Use detailed log format. Same as "--log-format long"]'
-	'(-l --long --log_format)--short[Use moderately short log format. Same as "--log-format short"]'
-	'--mine-only[Display changes in the local branch only]'
-	'--reverse[Reverse the order of revisions]'
+	'(-l --long --short --log_format)--line[use log format with one line per revision. Same as "--log-format line"]'
+	'(-l --long --short --line)--log-format=[use the specified log format]:log format:(line short long)'
+	'(-l --long --short --line --log-format)'{--long,-l}'[use detailed log format. Same as "--log-format long"]'
+	'(-l --long --log_format)--short[use moderately short log format. Same as "--log-format short"]'
+	'--mine-only[display changes in the local branch only]'
+	'--reverse[reverse the order of revisions]'
 	'--show-ids[show internal object ids]'
-	'--theirs-only[Display changes in the remote branch only]'
+	'--theirs-only[display changes in the remote branch only]'
 	'(-v --verbose)'{--verbose,-v}'[display more information]'
 	'*:local repository:_files -/'
 	)
@@ -238,8 +238,8 @@ case $cmd in
 (remerge)
     args+=(
 	'--merge-type=[the type of the merge]:type:'
-	'--reprocess[Reprocess to reduce spurious conflicts]'
-	'--show-base[Show base revision text in conflicts]'
+	'--reprocess[reprocess to reduce spurious conflicts]'
+	'--show-base[show base revision text in conflicts]'
 	)
     _bzr_completeParents
     ;;
@@ -308,10 +308,10 @@ case $cmd in
     args+=(
 	'--force[ignore uncommitted changes]'
 	'--merge-type:merge type:(diff3 merge3 weave)'
-	'--remember[Remember the specified location as a default]'
-	'--reprocess[Reprocess to reduce spurious conflicts]'
+	'--remember[remember the specified location as a default]'
+	'--reprocess[reprocess to reduce spurious conflicts]'
 	'(-r --revision)'{--revision=,-r}'[revision]:revision:'
-	'--show-base[Show base revision text in conflicts]'
+	'--show-base[show base revision text in conflicts]'
 	'*:local repository:_files -/'
 	)
     _bzr_completeParents
@@ -322,18 +322,18 @@ case $cmd in
 	'(-q --quiet -v --verbose)'{--quiet,-q}'[be quiet]'
 	'(-v --verbose -q --quiet)'{--verbose,-v}'[display more information]'
 	'(-r --revision)'{--revision=,-r}'[revision]:revision:'
-	'--from-root[Print all paths from the root of the branch]'
-	'--non-recursive[Do not recurse into subdirectories]'
-	'--null[Null separate the files]'
-	'--ignored[Print ignored files]'
-	'--unknown[Print unknown files]'
-	'--versioned[Print versioned files]'
+	'--from-root[print all paths from the root of the branch]'
+	'--non-recursive[do not recurse into subdirectories]'
+	'--null[null separate the files]'
+	'--ignored[print ignored files]'
+	'--unknown[print unknown files]'
+	'--versioned[print versioned files]'
 	)
     ;;
 
 (switch)
     args+=(
-	'--force[Switch even if local commits will be lost]'
+	'--force[switch even if local commits will be lost]'
 	'(-q --quiet -v --verbose)'{--quiet,-q}'[be quiet]'
 	'(-v --verbose -q --quiet)'{--verbose,-v}'[display more information]'
 	'*:local repository:_files -/'
@@ -367,9 +367,9 @@ case $cmd in
 
 (push)
     args+=(
-	'--create-prefix[Create the path leading up to the branch when missing]'
-	'--overwrite[Ignore differences, overwrite unconditionally]'
-	'--remember[Remember the specified location as a default]'
+	'--create-prefix[create the path leading up to the branch when missing]'
+	'--overwrite[ignore differences, overwrite unconditionally]'
+	'--remember[remember the specified location as a default]'
 	'*:local repository:_files -/'
 	)
     _bzr_completeParents

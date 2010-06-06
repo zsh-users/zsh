@@ -13,10 +13,10 @@
 
 _cd_options() {
   _arguments -s \
-  '-q[Quiet, no output or use of hooks]' \
-  '-s[Refuse to use paths with symlinks]' \
-  '(-P)-L[Retain symbolic links ignoring CHASE_LINKS]' \
-  '(-L)-P[Resolve symbolic links as CHASE_LINKS]'
+  '-q[quiet, no output or use of hooks]' \
+  '-s[refuse to use paths with symlinks]' \
+  '(-P)-L[retain symbolic links ignoring CHASE_LINKS]' \
+  '(-L)-P[resolve symbolic links as CHASE_LINKS]'
 }
 
 setopt localoptions nonomatch

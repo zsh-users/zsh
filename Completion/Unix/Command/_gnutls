@@ -26,8 +26,8 @@ _arguments \
      "$_gnutls_cli_common_args[@]" \
      '(-r --resume)'{-r,--resume}'[resume session]' \
      '(-s --starttls)'{-s,--starttls}'[start TLS on EOF or SIGALRM]' \
-     '--crlf[Send CR LF instead of LF]' \
-     '--x509fmtder[Use DER format for certificates to read from]' \
+     '--crlf[send CR LF instead of LF]' \
+     '--x509fmtder[use DER format for certificates to read from]' \
      '(-f --fingerprint)'{-f,--fingerprint}'[send the openpgp fingerprint instead of the key]' \
      '--disable-extensions[disable all the TLS extensions]' \
      '--xml[print the certificate information in XML format]' \

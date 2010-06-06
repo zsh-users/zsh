@@ -49,7 +49,7 @@ _zfs() {
 
 	if [[ $service == "zfs" ]]; then
 		_arguments -C -A "-*" \
-			'-\?[Help]' \
+			'-\?[help]' \
 			'*::command:->subcmd' && return 0
 
 		if (( CURRENT == 1 )); then
@@ -63,43 +63,43 @@ _zfs() {
 	case $service in
 	("create")
 		_arguments -A "-*" \
-			'-p[Create parent datasets]' \
-			'-o[Set initial properties]:property:_values -s , "property" $rw_properties' \
+			'-p[create parent datasets]' \
+			'-o[set initial properties]:property:_values -s , "property" $rw_properties' \
 			- set1 \
 			':filesystem:' \
 			- set2 \
-			'-s[Create sparse volume]' \
-			'-b[Set volblocksize]:blocksize:' \
-			'-V[Set size]:size:' \
+			'-s[create sparse volume]' \
+			'-b[set volblocksize]:blocksize:' \
+			'-V[set size]:size:' \
 			':volume:'
 		;;
 
 	("destroy")
 		_arguments -A "-*" \
-			'-r[Recursively destroy all children]' \
-			'-R[Recursively destroy all dependents]' \
-			'-f[Force unmounts]' \
+			'-r[recursively destroy all children]' \
+			'-R[recursively destroy all dependents]' \
+			'-f[force unmounts]' \
 			':filesystem/volume/snapshot:_zfs_dataset'
 		;;
 
 	("snapshot")
 		_arguments -A "-*" \
-			'-r[Recursively snapshot all descendant datasets]' \
+			'-r[recursively snapshot all descendant datasets]' \
 			':filesystem/volume:_zfs_dataset -t fs -t vol -S@'
 		;;
 
 	("rollback")
 		_arguments -A "-*" \
-			'-r[Recursively destroy more recent snapshots]' \
-			'-R[Recursively destroy more recent snapshots and clones]' \
-			'-f[Force unmounts]' \
+			'-r[recursively destroy more recent snapshots]' \
+			'-R[recursively destroy more recent snapshots and clones]' \
+			'-f[force unmounts]' \
 			':snapshot:_zfs_dataset -t snap'
 		;;
 
 	("clone")
 		# XXX needs to bail if there are no snapshots
 		_arguments -A "-*" \
-			'-p[Create parent datasets]' \
+			'-p[create parent datasets]' \
 			':snapshot:_zfs_dataset -t snap' \
 			':filesystem/volume:'
 		;;
@@ -113,23 +113,23 @@ _zfs() {
 	("rename")
 		_arguments -A "-*" \
 			- set1 \
-			'-p[Create parent datasets]' \
+			'-p[create parent datasets]' \
 			':filesystem/volume/snapshot:_zfs_dataset' \
 			':filesystem/volume/snapshot:' \
 			- set2 \
-			'-r[Recursively rename snapshots of all descendent datasets]' \
+			'-r[recursively rename snapshots of all descendent datasets]' \
 			':snapshot:_zfs_dataset -t snap' \
 			':snapshot:'
 		;;
 
 	("list")
 		_arguments -A "-*" \
-			'-r[Recursively display children]' \
-			'-H[Scripting mode]' \
-			'-o[Properties to list]:property:_values -s , "property" $ro_properties $rw_propnames' \
-			'*-s[Sort key (ascending)]:property:_values "property" $ro_properties $rw_propnames' \
-			'*-S[Sort key (descending)]:property:_values "property" $ro_properties $rw_propnames' \
-			'-t[Dataset types to list]:dataset type:_values -s , "dataset type" filesystem snapshot volume' \
+			'-r[recursively display children]' \
+			'-H[scripting mode]' \
+			'-o[properties to list]:property:_values -s , "property" $ro_properties $rw_propnames' \
+			'*-s[sort key (ascending)]:property:_values "property" $ro_properties $rw_propnames' \
+			'*-S[sort key (descending)]:property:_values "property" $ro_properties $rw_propnames' \
+			'-t[dataset types to list]:dataset type:_values -s , "dataset type" filesystem snapshot volume' \
 			'*:filesystem/volume/snapshot:_zfs_dataset'
 		;;
 
@@ -141,46 +141,46 @@ _zfs() {
 
 	("get")
 		_arguments -A "-*" \
-			"-r[Recursively display children's properties]" \
-			'-H[Scripting mode]' \
-			'-p[Display numbers exactly]' \
-			'-s[Specify sources]:source:_values -s , "source" local default inherited temporary none' \
-			'-o[Specify fields]:field:_values -s , "field" name property value source' \
+			"-r[recursively display children's properties]" \
+			'-H[scripting mode]' \
+			'-p[display numbers exactly]' \
+			'-s[specify sources]:source:_values -s , "source" local default inherited temporary none' \
+			'-o[specify fields]:field:_values -s , "field" name property value source' \
 			':property:_values -s , "property" $ro_properties $rw_propnames all' \
 			'*:filesystem/volume/snapshot:_zfs_dataset'
 		;;
 
 	("inherit")
 		_arguments -A "-*" \
-			'-r[Recursively inherit property for all children]' \
+			'-r[recursively inherit property for all children]' \
 			':property:_values -s , "property" $ro_properties $rw_properties' \
 			'*:filesystem/volume:_zfs_dataset -t fs -t vol'
 		;;
 
 	("mount")
 		_arguments -A "-*" \
-			'-o[Mount options]:mount options:_values -s , "option" {,no}{devices,exec,setuid} ro rw' \
-			'-O[Overlay mount]' \
-			'-v[Report mount progress]' \
+			'-o[mount options]:mount options:_values -s , "option" {,no}{devices,exec,setuid} ro rw' \
+			'-O[overlay mount]' \
+			'-v[report mount progress]' \
 			- set1 \
 			':filesystem:_zfs_dataset -t fs' \
 			- set2 \
-			'-a[Mount all available ZFS filesystems]'
+			'-a[mount all available ZFS filesystems]'
 		;;
 
 	("unmount")
 		_arguments -A "-*" \
 			- set1 \
-			'-f[Force unmount]' \
+			'-f[force unmount]' \
 			':filesystem:_zfs_dataset -t fs -t mtpt' \
 			- set2 \
-			'-a[Unmount all ZFS filesystems]'
+			'-a[unmount all ZFS filesystems]'
 		;;
 
 	("share")
 		_arguments -A "-*" \
 			- set1 \
-			'-a[Share all available ZFS filesystems]' \
+			'-a[share all available ZFS filesystems]' \
 			- set2 \
 			':filesystem:_zfs_dataset -t fs'
 		;;
@@ -188,27 +188,27 @@ _zfs() {
 	("unshare")
 		_arguments -A "-*" \
 			- set1 \
-			'-a[Unshare all shared ZFS filesystems]' \
+			'-a[unshare all shared ZFS filesystems]' \
 			- set2 \
-			'-F[Force unshare]' \
+			'-F[force unshare]' \
 			':filesystem:_zfs_dataset -t fs -t mtpt'
 		;;
 
 	("send")
 		_arguments -A "-*" \
-			'-i[Generate an incremental stream]:snapshot:_zfs_dataset -t snap' \
+			'-i[generate an incremental stream]:snapshot:_zfs_dataset -t snap' \
 			':snapshot:_zfs_dataset -t snap'
 		;;
 
 	("receive")
 		_arguments -A "-*" \
-			'-v[Verbose]' \
-			'-n[Do not receive the stream]' \
-			'-F[Force a rollback if necessary]' \
+			'-v[verbose]' \
+			'-n[do not receive the stream]' \
+			'-F[force a rollback if necessary]' \
 			- set1 \
 			':filesystem/volume/snapshot:_zfs_dataset' \
 			- set2 \
-			'-d[Set path prefix]:filesystem:_zfs_dataset -t fs'
+			'-d[set path prefix]:filesystem:_zfs_dataset -t fs'
 		;;
 
 	("allow"|"unallow")
@@ -218,14 +218,14 @@ _zfs() {
 	("upgrade")
 		_arguments -A "-*" \
 			- set1 \
-			'-v[Verbose]' \
+			'-v[verbose]' \
 			- set2 \
-			'-a[Upgrade all filesystems on all pools]' \
-			'-r[Upgrade descendent filesystems, too]' \
-			'-V[Upgrade to specified version]:version:(1 2)' \
+			'-a[upgrade all filesystems on all pools]' \
+			'-r[upgrade descendent filesystems, too]' \
+			'-V[upgrade to specified version]:version:(1 2)' \
 			- set3 \
-			'-r[Upgrade descendent filesystems, too]' \
-			'-V[Upgrade to specified version]:version:(1 2)' \
+			'-r[upgrade descendent filesystems, too]' \
+			'-V[upgrade to specified version]:version:(1 2)' \
 			':filesystem:_zfs_dataset -t fs' \
 		;;
 

@@ -15,37 +15,37 @@ _sybase_server() {
 }
 
 _arguments : \
-    '-A[Adjust TDS packet size (512)]:packet size (bytes):(512 1024 1536 2048)' \
-    '-B[Turn off file buffering on startup]' \
-    '-C[Send sql statment to server]:sql' \
-    '-D[Change database context on startup]:database' \
-    '-E[Replace default editor (vi)]:editor' \
-    '-H[Set the client hostname]:reported hostname' \
-    '-I[Alternate interfaces file]:interface file:_files' \
-    '-J[Client character set]:charset' \
-    '*-L[Set the value of a given variable]:variable=value' \
+    '-A[adjust TDS packet size (512)]:packet size (bytes):(512 1024 1536 2048)' \
+    '-B[turn off file buffering on startup]' \
+    '-C[send sql statment to server]:sql' \
+    '-D[change database context on startup]:database' \
+    '-E[replace default editor (vi)]:editor' \
+    '-H[set the client hostname]:reported hostname' \
+    '-I[alternate interfaces file]:interface file:_files' \
+    '-J[client character set]:charset' \
+    '*-L[set the value of a given variable]:variable=value' \
     '-P[Sybase password (NULL)]:password' \
-    '-S[Name of Sybase server (\$DSQUERY)]:_sybase_server' \
-    '-U[Name of Sybase user]:username' \
-    '-X[Enable client password encryption]' \
-    '-a[Max. # of errors before abort]:number' \
-    '-b[Suppress banner message on startup]' \
-    '*-c[Alias for the ''go'' command]:go alias' \
-    '-d[Min. severity level to display]:severity level (0-22)' \
-    '-e[Echo batch prior to executing]' \
-    '-f[Min. severity level for failure]:failure severity' \
-    '-h[Disable headers and footers]' \
-    '-i[Read input from file]:_files' \
-    '-k[Specify alternate keywords file]:_files' \
-    '-l[Set debugging level]' \
-    '-m[Set display mode (normal)]:display style:(horiz vert bcp html meta pretty none)' \
-    '-n[Set chained transaction mode]:chained transaction mode:(on off)' \
-    '-o[Direct all output to file]:_files' \
-    '-p[Display performance stats]' \
-    '-r[Specify name of .sqshrc]:_files' \
-    '-s[Alternate column separator (\t)]:column separator' \
-    '-t[Filter batches through program]:filter program:_files -g "*(*)"' \
-    '-v[Display current version and exit]' \
-    '-w[Adjust result display width]:number' \
-    '-y[Override value of $SYBASE]:_directories' \
-    '-z[Alternate display language]:language'
+    '-S[name of Sybase server (\$DSQUERY)]:_sybase_server' \
+    '-U[name of Sybase user]:username' \
+    '-X[enable client password encryption]' \
+    '-a[max. # of errors before abort]:number' \
+    '-b[suppress banner message on startup]' \
+    '*-c[alias for the ''go'' command]:go alias' \
+    '-d[min. severity level to display]:severity level (0-22)' \
+    '-e[echo batch prior to executing]' \
+    '-f[min. severity level for failure]:failure severity' \
+    '-h[disable headers and footers]' \
+    '-i[read input from file]:_files' \
+    '-k[specify alternate keywords file]:_files' \
+    '-l[set debugging level]' \
+    '-m[set display mode (normal)]:display style:(horiz vert bcp html meta pretty none)' \
+    '-n[set chained transaction mode]:chained transaction mode:(on off)' \
+    '-o[direct all output to file]:_files' \
+    '-p[display performance stats]' \
+    '-r[specify name of .sqshrc]:_files' \
+    '-s[alternate column separator (\t)]:column separator' \
+    '-t[filter batches through program]:filter program:_files -g "*(*)"' \
+    '-v[display current version and exit]' \
+    '-w[adjust result display width]:number' \
+    '-y[override value of $SYBASE]:_directories' \
+    '-z[alternate display language]:language'

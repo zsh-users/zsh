@@ -15,7 +15,7 @@ _arguments \
   '-sr\:-[set internal sampling rate]:internal sampling rate:(8000 11025 22050 44100 48000)' \
   '*-a\:-[select active signal chains]:chain name' \
   '-b\:-[set the size of buffer in samples]:buffer size:->b' \
-  '-m\:-[force use of specified mix mode]:mix mode:((auto\:Automatic simple\:Only\ one\ input/cain/output normal\:Normal\ single-threaded\ mode))' \
+  '-m\:-[force use of specified mix mode]:mix mode:((auto\:automatic simple\:only\ one\ input/cain/output normal\:normal\ single-threaded\ mode))' \
   '-r[use realtime scheduling policy (SCHED_FIFO)]' \
   '-r\:-[use realtime scheduling policy (SCHED_FIFO)]:sched_priority' \
   '-x[truncate outputs]' \

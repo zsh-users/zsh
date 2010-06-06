@@ -5,9 +5,9 @@ _ptree() {
 	typeset -A opt_args
 
 	_arguments -s \
-		'-a[All processes]' \
-		'-c[Show contract memberships]' \
-		'-z[Show processes in zone]:zone:($(zoneadm list))' \
+		'-a[all processes]' \
+		'-c[show contract memberships]' \
+		'-z[show processes in zone]:zone:($(zoneadm list))' \
 		'*:pid or user:->pidoruser' && ret=0
 
 	if [[ $ret -ne 0 ]]; then

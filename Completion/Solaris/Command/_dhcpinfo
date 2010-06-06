@@ -28,8 +28,8 @@ _dhcpinfo() {
 
 	_arguments -A \
 		'-c[]' \
-		'-i[Interface]:interface:' \
-		'-n[Maximum number of lines]:limit:' \
+		'-i[interface]:interface:' \
+		'-n[maximum number of lines]:limit:' \
 		':DHCP Parameter:_values "DHCP Parameter" $mnemonics_v4' \
 }
 

@@ -3,8 +3,8 @@
 local loader=$(sudo detectloader -q)
 
 _arguments -C -s \
-    '-n[No immediate reboot just  set the flags for next reboot.]' \
-    '-f[Create a /fastboot file to reboot in fastboot mode]' \
+    '-n[no immediate reboot just set the flags for next reboot]' \
+    '-f[create a /fastboot file to reboot in fastboot mode]' \
     '*::arguments:->loader_entry'
 
 local expl

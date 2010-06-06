@@ -79,7 +79,7 @@ _arguments -C -s \
   '(--user)--ftp-user=:user' \
   '(--password)--ftp-password=:password' \
   "--no-remove-listing[don't remove \`.listing' files]" \
-  '--no-glob[turn off FTP file name globbing.]' \
+  '--no-glob[turn off FTP file name globbing]' \
   '--no-passive-ftp' \
   '--retr-symlinks' \
   '--preserve-permissions[preserve remote file permissions with ftp]' \

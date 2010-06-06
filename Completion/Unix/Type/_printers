@@ -83,7 +83,7 @@ if (( ! $+_lp_cache )); then
     _lp_cache+=( ${${${(S)${(f)tmp}/(#b):*((#e)|description=([^:]#):)*/:${match[2]}|}%%|*}:#_default*} ) # If you use YP
   fi
 
-  (( $#_lp_cache )) || _lp_cache=( 'lp0:Guessed default printer' )
+  (( $#_lp_cache )) || _lp_cache=( 'lp0:guessed default printer' )
   (( $#_lp_alias_cache )) || unset _lp_alias_cache
 fi
 

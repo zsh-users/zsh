@@ -36,24 +36,24 @@ _layouts () {
 			;;
 		10|raid10)
 	                _values -s ' ' 'RAID10 layout with number of copies of each datablock' \
-        	                'n1[Near copies]' \
-        	                'n2[Near copies]' \
-        	                'n3[Near copies]' \
-        	                'n4[Near copies]' \
-        	                'n5[Near copies]' \
-        	                'n6[Near copies]' \
-        	                'n7[Near copies]' \
-        	                'n8[Near copies]' \
-        	                'n8[Near copies]' \
-        	                'f1[Far copies]' \
-        	                'f2[Far copies]' \
-        	                'f3[Far copies]' \
-        	                'f4[Far copies]' \
-        	                'f5[Far copies]' \
-        	                'f6[Far copies]' \
-        	                'f7[Far copies]' \
-        	                'f8[Far copies]' \
-        	                'f9[Far copies]'
+        	                'n1[near copies]' \
+        	                'n2[near copies]' \
+        	                'n3[near copies]' \
+        	                'n4[near copies]' \
+        	                'n5[near copies]' \
+        	                'n6[near copies]' \
+        	                'n7[near copies]' \
+        	                'n8[near copies]' \
+        	                'n8[near copies]' \
+        	                'f1[far copies]' \
+        	                'f2[far copies]' \
+        	                'f3[far copies]' \
+        	                'f4[far copies]' \
+        	                'f5[far copies]' \
+        	                'f6[far copies]' \
+        	                'f7[far copies]' \
+        	                'f8[far copies]' \
+        	                'f9[far copies]'
 			;;
 		faulty)
 			_values -S \  "Failure mode" \
@@ -70,46 +70,46 @@ _layouts () {
 
 if (( $+words[(r)-(A|-assemble)] )); then
 	args=(
-		'(--bitmap)'--bitmap='[bitmap file to use with the array]::Bitmap file:_files'
+		'(--bitmap)'--bitmap='[bitmap file to use with the array]::bitmap file:_files'
 		'(--uuid -u)'{--uuid=,-u}'[UUID of array to assemble]:UUID'
-		'(--super-minor -m)'{--super-minor=,-m}'[minor number to look for in super-block]:Minor number'
-		'(--name -N)'{--name=,-N}'[Array name to look for in super-block]:Array name'
-		'(--config -c)'{--config=,-c}'[config file]::Config file:_files'
+		'(--super-minor -m)'{--super-minor=,-m}'[minor number to look for in super-block]:minor number'
+		'(--name -N)'{--name=,-N}'[array name to look for in super-block]:array name'
+		'(--config -c)'{--config=,-c}'[config file]::config file:_files'
 		'(--scan -s)'{--scan,-s}'[scan config file for missing information]'
-		'(--run -R)'{--run,-R}'[Try to start the array even if not enough devices for a full array are present]'
-		'(--force -f)'{--force,-f}'[Assemble the array even if some superblocks appear out-of-date]'
-		'(--update,-U)'{--update=,-U}'[Update superblock]::Update the superblock:(sparc2.2 summaries uuid resync byteorder super-minor)'
+		'(--run -R)'{--run,-R}'[try to start the array even if not enough devices for a full array are present]'
+		'(--force -f)'{--force,-f}'[assemble the array even if some superblocks appear out-of-date]'
+		'(--update,-U)'{--update=,-U}'[update superblock]::update the superblock:(sparc2.2 summaries uuid resync byteorder super-minor)'
 	)
 fi
 
 if (( $+words[(r)-(B|-build)] )); then
 	args=(
-		'(--bitmap)'--bitmap='[file to store/find bitmap information in]::Bitmap file:_files'
-		'(--chunk -c)'{--chunk=,-c}'[chunk size of kibibytes]:Chunk size'
-		'(--rounding)'--rounding='[rounding factor for linear array (==chunk size)]:Rounding factor'
+		'(--bitmap)'--bitmap='[file to store/find bitmap information in]::bitmap file:_files'
+		'(--chunk -c)'{--chunk=,-c}'[chunk size of kibibytes]:chunk size'
+		'(--rounding)'--rounding='[rounding factor for linear array (==chunk size)]:rounding factor'
 		'(--level -l)'{--level=,-l}'[RAID level]::RAID level:_raids_build'
 		'(--raid-devices -n)'{--raid-devices=,-n}'[number of active devices in array]:active devices number'
-		'(--bitmap-chunk)'--bitmap-chunk='[bitmap chunksize in Kilobytes]:Bitmap chunk'
-		'(--delay -d)'{--delay=,-d}'[bitmap update delay in seconds]:Bitmap update delay'
+		'(--bitmap-chunk)'--bitmap-chunk='[bitmap chunksize in Kilobytes]:bitmap chunk'
+		'(--delay -d)'{--delay=,-d}'[bitmap update delay in seconds]:bitmap update delay'
 	)
 fi
 
 if (( $+words[(r)-(C|-create)] )); then
 	args=(
-		'(--bitmap)'--bitmap='[create a bitmap for the array with the given filename]::Bitmap file:_files'
-		'(--chunk -c)'{--chunk=,-c}'[chunk size of kibibytes]:Chunk size'
-		'(--rounding)'--rounding='[rounding factor for linear array (==chunk size)]:Rounding factor'
+		'(--bitmap)'--bitmap='[create a bitmap for the array with the given filename]::bitmap file:_files'
+		'(--chunk -c)'{--chunk=,-c}'[chunk size of kibibytes]:chunk size'
+		'(--rounding)'--rounding='[rounding factor for linear array (==chunk size)]:rounding factor'
 		'(--level -l)'{--level=,-l}'[RAID level]::RAID level:_raids'
-		'(--parity -p --layout)'{--parity=,-p,--layout=}'[RAID5/6/10 parity algorithm, faulty mode]::Layout:_layouts'
+		'(--parity -p --layout)'{--parity=,-p,--layout=}'[RAID5/6/10 parity algorithm, faulty mode]::layout:_layouts'
 		'(--raid-devices -n)'{--raid-devices=,-n}'[number of active devices in array]:active devices number'
-		'(--spare-devices -x)'{--spare-devices=,-x}'[number of spares (eXtras) devices in initial array]:Spare devices number'
-		'(--size -z)'{--size=,-z}'[size (in K) of each drive in RAID1/4/5/6/10]:Size of each drive'
+		'(--spare-devices -x)'{--spare-devices=,-x}'[number of spares (eXtras) devices in initial array]:spare devices number'
+		'(--size -z)'{--size=,-z}'[size (in K) of each drive in RAID1/4/5/6/10]:size of each drive'
 		'(--force -f)'{--force,-f}'[honour devices as listed on command line]'
 		'(--run -R)'{--run,-R}'[insist of running the array even if not all devices are present or some look odd]'
 		'(--readonly -o)'{--readonly,-o}'[start the array readonly]'
-		'(--name -N)'{--name=,-N}'[textual name for array - max 32 characters]:Array name'
-		'(--bitmap-chunk)'--bitmap-chunk='[bitmap chunksize in Kilobytes]:Bitmap chunk'
-		'(--delay -d)'{--delay,-d}'[bitmap update delay in seconds]:Bitmap update delay'
+		'(--name -N)'{--name=,-N}'[textual name for array - max 32 characters]:array name'
+		'(--bitmap-chunk)'--bitmap-chunk='[bitmap chunksize in Kilobytes]:bitmap chunk'
+		'(--delay -d)'{--delay,-d}'[bitmap update delay in seconds]:bitmap update delay'
 	)
 fi
 
@@ -126,22 +126,22 @@ fi
 
 if (( $+words[(r)-(F|-follow|-monitor)] )); then
 	args=(
-		'(--mail -m)'{--mail=,-m}'[Address to mail alerts of failure to]:::_email_addresses'
-		'(--program -p --alert)'{--program=,-p,--alert=}'[Program to run when an event is detected]::Program:_files'
+		'(--mail -m)'{--mail=,-m}'[address to mail alerts of failure to]:::_email_addresses'
+		'(--program -p --alert)'{--program=,-p,--alert=}'[program to run when an event is detected]::program:_files'
 		'(--delay -d)'{--delay=,-d}'[seconds of delay between polling state]:seconds'
-		'(--config -c)'{--config=,-c}'[specify a different config file]::Config file:_files'
+		'(--config -c)'{--config=,-c}'[specify a different config file]::config file:_files'
 		'(--scan -s)'{--scan,-s}'[find mail-address/program in config file]'
-		'(--daemonise -f)'{--daemonise,-f}'[Fork and continue in child, parent exits]'
-		'(--pid-file -i)'{--pid-file=,-i}'[In daemon mode write pid to specified file instead of stdout]::PID file:_files'
-		'(--oneshot -1)'{--oneshot,-1}'[Check for degraded arrays, then exit]'
-		'(--test -t)'{--test,-t}'[Generate a TestMessage event against each array at startup]'
+		'(--daemonise -f)'{--daemonise,-f}'[fork and continue in child, parent exits]'
+		'(--pid-file -i)'{--pid-file=,-i}'[in daemon mode write pid to specified file instead of stdout]::PID file:_files'
+		'(--oneshot -1)'{--oneshot,-1}'[check for degraded arrays, then exit]'
+		'(--test -t)'{--test,-t}'[generate a TestMessage event against each array at startup]'
 	)
 fi
 
 if (( $+words[(r)-(G|-grow)] )); then
 	args=(
-		'(--size -z)'{--size=,-z}'[Change the active size of devices in an array]:active size'
-		'(--raid-disks -n)'{--raid-disks=,-n}'[Change the number of active devices in a RAID1 array]:number of active devices'
+		'(--size -z)'{--size=,-z}'[change the active size of devices in an array]:active size'
+		'(--raid-disks -n)'{--raid-disks=,-n}'[change the number of active devices in a RAID1 array]:number of active devices'
 	)
 fi
 
@@ -150,22 +150,22 @@ _mds () {
 	vals=( ${${${(M)${(f)"$(< /etc/mdadm.conf)"}##ARRAY *}//ARRAY /}%%[[:blank:]]*} )
 	_describe -t mds "RAID devices" vals
 	_arguments \
-		"(-h --help)"{-h,--help}'[Display a mode specific help message]'
+		"(-h --help)"{-h,--help}'[display a mode specific help message]'
 }
 
 modes=(-A --assemble -B --build -C --create -F --follow --monitor -G --grow -h --help -V --version)
 misc=(-D --detail -E --examine -X --examine-bitmap -Q --query)
 
 _arguments \
-	"($misc $modes)"{-A,--assemble}'[Assemble a pre-existing array]:::_mds' \
-	"($misc $modes)"{-B,--build}'[Build a legacy array without superblocks]:::_mds' \
-	"($misc $modes)"{-C,--create}'[Create a new array]' \
-	"($misc $modes)"{-F,--follow,--monitor}'[Select Monitor mode]' \
-	"($misc $modes)"{-G,--grow}'[Change the size or shape of an active array]' \
-	"($modes -D --detail -E --examine -X --examine-bitmap)"{-D,--detail}'[Print detail of one or more md devices]' \
-	"($modes -D --detail -E --examine -X --examine-bitmap -Q --query)"{-E,--examine}'[Print content of md superblock on device(s)]' \
-	"($modes -Q --query)"{-Q,--query}'[Examine a device]' \
-	"($modes -E --examine -X --examine-bitmap)"{-X,--examine-bitmap}'[Report information about a bitmap file]' \
-	"(-)"{-h,--help}'[Display general help message]' \
-	"(-)"{-V,--version}'[Print version information for mdadm]' \
+	"($misc $modes)"{-A,--assemble}'[assemble a pre-existing array]:::_mds' \
+	"($misc $modes)"{-B,--build}'[build a legacy array without superblocks]:::_mds' \
+	"($misc $modes)"{-C,--create}'[create a new array]' \
+	"($misc $modes)"{-F,--follow,--monitor}'[select Monitor mode]' \
+	"($misc $modes)"{-G,--grow}'[change the size or shape of an active array]' \
+	"($modes -D --detail -E --examine -X --examine-bitmap)"{-D,--detail}'[print detail of one or more md devices]' \
+	"($modes -D --detail -E --examine -X --examine-bitmap -Q --query)"{-E,--examine}'[print content of md superblock on device(s)]' \
+	"($modes -Q --query)"{-Q,--query}'[examine a device]' \
+	"($modes -E --examine -X --examine-bitmap)"{-X,--examine-bitmap}'[report information about a bitmap file]' \
+	"(-)"{-h,--help}'[display general help message]' \
+	"(-)"{-V,--version}'[print version information for mdadm]' \
 	"$args[@]"

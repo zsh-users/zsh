@@ -35,7 +35,7 @@ _zpool() {
 
 	if [[ $service == "zpool" ]]; then
 		_arguments -C -A "-*" \
-			'-\?[Help]' \
+			'-\?[help]' \
 			'*::command:->subcmd' && return 0
 
 		if (( CURRENT == 1 )); then
@@ -56,38 +56,38 @@ _zpool() {
 	(create)
 		# TODO: investigate better vdev handling
 		_arguments -A "-*" \
-			'-f[Force use of in-use devices]' \
-			'-n[Display configuration without creating pool]' \
-			'-R[Use alternate root]:alternate root:_files -/' \
-			'-m[Set mountpoint for root dataset]:mountpoint:' \
+			'-f[force use of in-use devices]' \
+			'-n[display configuration without creating pool]' \
+			'-R[use alternate root]:alternate root:_files -/' \
+			'-m[set mountpoint for root dataset]:mountpoint:' \
 			':pool name:' \
 			'*:virtual device:_files'
 		;;
 
 	(destroy)
 		_arguments -A "-*" \
-			'-f[Force active datasets to be unmounted]' \
+			'-f[force active datasets to be unmounted]' \
 			':pool name:_zfs_pool'
 		;;
 
 	(add)
 		_arguments -A "-*" \
-			'-f[Force use of in-use devices]' \
-			'-n[Display configuration without modifying pool]' \
+			'-f[force use of in-use devices]' \
+			'-n[display configuration without modifying pool]' \
 			':pool name:_zfs_pool' \
 			'*:virtual device:_files'
 		;;
 
 	(list)
 		_arguments \
-			'-H[Scripted mode]' \
-			'-o[Fields to list]:field:_values -s , "field" ${^fields/\:/[}\]' \
+			'-H[scripted mode]' \
+			'-o[fields to list]:field:_values -s , "field" ${^fields/\:/[}\]' \
 			'::pool name:_zfs_pool'
 		;;
 
 	(iostat)
 		_arguments -A "-*" \
-			'-v[Verbose statistics]' \
+			'-v[verbose statistics]' \
 			'*::pool name:_zfs_pool' \
 			'::interval:' \
 			'::count:'
@@ -95,14 +95,14 @@ _zpool() {
 
 	(status)
 		_arguments -A "-*" \
-			'-v[Verbose information]' \
-			'-x[Show only unhealthy pools]' \
+			'-v[verbose information]' \
+			'-x[show only unhealthy pools]' \
 			'*::pool name:_zfs_pool'
 		;;
 
 	(offline)
 		_arguments -A "-*" \
-			'-t[Offline until next reboot]' \
+			'-t[offline until next reboot]' \
 			':pool name:_zfs_pool' \
 			'*:virtual device:_files'
 		;;
@@ -116,7 +116,7 @@ _zpool() {
 	(attach)
 		# TODO: first device should choose first from existing.
 		_arguments \
-			'-f[Force attach, even if in use]' \
+			'-f[force attach, even if in use]' \
 			':pool name:_zfs_pool' \
 			':virtual device:_files' \
 			':virtual device:_files'
@@ -130,7 +130,7 @@ _zpool() {
 
 	(replace)
 		_arguments -A "-*" \
-			'-f[Force attach, even if in use]' \
+			'-f[force attach, even if in use]' \
 			':pool name:_zfs_pool' \
 			':virtual device:_files' \
 			'::virtual device:_files'
@@ -138,30 +138,30 @@ _zpool() {
 
 	(scrub)
 		_arguments -A "-*" \
-			'-s[Stop scrubbing]' \
+			'-s[stop scrubbing]' \
 			'*:pool name:_zfs_pool'
 		;;
 
 	(export)
 		_arguments -A "-*" \
-			'-f[Forcefully unmount all datasets]' \
+			'-f[forcefully unmount all datasets]' \
 			'*:pool name:_zfs_pool'
 		;;
 
 	(import)
 		# TODO: -o should complete options
 		_arguments -A "-*" \
-			'*-d[Search for devices or files in directory]:_files -/' \
-			'-D[Destroyed pools]' \
-			'-f[Force import]' \
+			'*-d[search for devices or files in directory]:_files -/' \
+			'-D[destroyed pools]' \
+			'-f[force import]' \
 			- set1 \
-			'-o[Mount options]' \
-			'-p[Set property]:property:_values -s , "property" $import_properties' \
-			'-R[Alternate root]:_files -/' \
+			'-o[mount options]' \
+			'-p[set property]:property:_values -s , "property" $import_properties' \
+			'-R[alternate root]:_files -/' \
 			'*:pool name or id:_zfs_pool' \
 			'::new pool name:' \
 			- set2 \
-			'-a[All pools]'
+			'-a[all pools]'
 		;;
 
 	(get)
@@ -179,16 +179,16 @@ _zpool() {
 	(upgrade)
 		_arguments -A "-*" \
 			- set1 \
-			'-v[Display ZFS versions and descriptions]' \
+			'-v[display ZFS versions and descriptions]' \
 			- set2 \
-			'-a[Upgrade all pools]' \
+			'-a[upgrade all pools]' \
 			'*:pool name:_zfs_pool'
 		;;
 
 	(history)
 		_arguments -A "-*" \
-			'-i[Display internal events]' \
-			'-l[Long format]' \
+			'-i[display internal events]' \
+			'-l[long format]' \
 			'*:pool name:_zfs_pool'
 		;;
 

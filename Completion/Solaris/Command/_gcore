@@ -4,27 +4,27 @@ _gcore() {
 	local -a content
 
 	content=(
-		"anon[Anonymous private mappings]"
+		"anon[anonymous private mappings]"
 		"ctf[CTF type information]"
-		"data[Writable private file mappings]"
+		"data[writable private file mappings]"
 		"dism[DISM mappings]"
-		"heap[Process heap]"
+		"heap[process heap]"
 		"ism[ISM mappings]"
-		"rodata[Read-only private file mappings]"
-		"shanon[Anonymous shared mappings]"
-		"shfile[File-backed shared mappings]"
+		"rodata[read-only private file mappings]"
+		"shanon[anonymous shared mappings]"
+		"shfile[file-backed shared mappings]"
 		"shm[System V shared memory]"
-		"stack[Process stack]"
-		"symtab[Symbol table sections for loaded files]"
-		"text[Readable and executable private file mappings]"
+		"stack[process stack]"
+		"symtab[symbol table sections for loaded files]"
+		"text[readable and executable private file mappings]"
 	)
 
 	_arguments -s \
-		'-p[Use per-process core file repository]' \
-		'-g[Use global core file repository]' \
-		'-F[Force grabbing the target process]' \
-		'-c[Set core file content]:_values -s + "content" $content' \
-		'-o[Set core file base name]:' \
+		'-p[use per-process core file repository]' \
+		'-g[use global core file repository]' \
+		'-F[force grabbing the target process]' \
+		'-c[set core file content]:_values -s + "content" $content' \
+		'-o[set core file base name]:' \
 		'*:pids:_pids'
 }
 

@@ -25,11 +25,11 @@ _svccfg() {
 
 	if [[ $service == "svccfg" ]]; then
 		_arguments -s \
-			'-?[Help]' \
-			'-v[Verbose]' \
+			'-?[help]' \
+			'-v[verbose]' \
 			'-s[FMRI on which to operate]:fmri:_svcs_fmri -c' \
 			- set1 \
-			'-f[Read commands from file]:command file:_files' \
+			'-f[read commands from file]:command file:_files' \
 			- set2 \
 			'*::command:->subcmd' && return 0
 
@@ -44,7 +44,7 @@ _svccfg() {
 	case $service in
 	(import)
 		_arguments \
-			'-V[Verify property updates]' \
+			'-V[verify property updates]' \
 			':file:_files'
 		;;
 
@@ -62,15 +62,15 @@ _svccfg() {
 
 	(delete)
 		_arguments \
-			'-f[Force deletion if online or degraded]' \
+			'-f[force deletion if online or degraded]' \
 			'*:FMRI:_svcs_fmri -c'
 		;;
 
 	(describe)
 		local fmri=$opt_args[-s]
 		_arguments -A "-*" \
-			'-v[Give all information]' \
-			'-t[Show only template data]' \
+			'-v[give all information]' \
+			'-t[show only template data]' \
 			":property group or property:_svccfg_properties $fmri"
 		;;
 

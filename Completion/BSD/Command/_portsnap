@@ -4,20 +4,20 @@ local context state line
 typeset -A opt_args
 
 flags=(
-  '(cron)fetch[Fetch a compressed snapshot or update existing one]'
-  '(fetch)cron[Sleep rand(3600) seconds, and then fetch updates]'
-  '(update)extract[Extract snapshot, replacing existing files and dirs]'
-  '(extract)update[Update ports tree to match current snapshot]'
+  '(cron)fetch[fetch a compressed snapshot or update existing one]'
+  '(fetch)cron[sleep rand(3600) seconds, and then fetch updates]'
+  '(update)extract[extract snapshot, replacing existing files and dirs]'
+  '(extract)update[update ports tree to match current snapshot]'
 )
 
 _arguments -C -s \
-    '-d[Store working files in workdir]:workdir:_files -/' \
-    '-f[Read configuration options from conffile]:conf file:_files' \
-    '-I[Update INDEX only. (update command only)]' \
-    '-k[Trust an RSA key with SHA256 hash of KEY]:RSA key:_files' \
-    '-l[Merge the specified local describes file into the INDEX]:file:_files' \
-    '-p[Location of uncompressed ports tree]:uncompressed ports tree:_files -/' \
-    '-s[Server from which to fetch updates]:server:_hosts' \
+    '-d[store working files in workdir]:workdir:_files -/' \
+    '-f[read configuration options from conffile]:conf file:_files' \
+    '-I[update INDEX only. (update command only)]' \
+    '-k[trust an RSA key with SHA256 hash of KEY]:RSA key:_files' \
+    '-l[merge the specified local describes file into the INDEX]:file:_files' \
+    '-p[location of uncompressed ports tree]:uncompressed ports tree:_files -/' \
+    '-s[server from which to fetch updates]:server:_hosts' \
     '*:principal:->principal' && ret=0
 
 if [[ $state == principal ]]; then

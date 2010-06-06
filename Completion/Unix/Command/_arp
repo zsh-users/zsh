@@ -10,8 +10,8 @@ _arguments -C \
   "($cmds 1 -n --numeric -D --use-device -H --hw-type)"{-d,--delete}'[delete entry from table]:host:->hostintable' \
   "($cmds 1 -n --numeric)"{-s,--set}'[create an ARP entry]:host:_hosts:ethernet address::*:option:(temp trail pub)' \
   "($cmds 1 -n --numeric)"{-f,--file}'[read multiple entries from file]:file:_files' \
-  '(-i --device)'{-i,--device}'[Select an interface]:::_net_interfaces:' \
-  '(-D --use-device -a --display -d --delete)'{-D,--use-device}"[Use the interface ifa's hardware address]" \
+  '(-i --device)'{-i,--device}'[select an interface]:::_net_interfaces:' \
+  '(-D --use-device -a --display -d --delete)'{-D,--use-device}"[use the interface ifa's hardware address]" \
   '(-H --hw-type -d --delete)'{-H,--hw-type}'[class of entries to check for]:class:(ether arcnet pronet ax25 netrom)' \
   '(-n --numeric -d --delete -s --set -f --file)'{-n,--numeric}'[shows numerical addresses]' \
   '(-v --verbose)'{-v,--verbose}'[be verbose]' \

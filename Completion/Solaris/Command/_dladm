@@ -77,7 +77,7 @@ _dladm() {
 
 	if [[ $service == "dladm" ]]; then
 		_arguments -C -A "-*" \
-			'-\?[Help]' \
+			'-\?[help]' \
 			'*::command:->subcmd' && return 0
 
 		if (( CURRENT == 1 )); then
@@ -111,31 +111,31 @@ _dladm() {
 	case $service in
 	("show-link")
 		_arguments -A "-*" \
-			'(-P --persistent)'{-P,--persistent}'[Display persistent link configuration]' \
-			'(-p --parseable)'{-p,--parseable}'[Parseable output]' \
+			'(-P --persistent)'{-P,--persistent}'[display persistent link configuration]' \
+			'(-p --parseable)'{-p,--parseable}'[parseable output]' \
 			- set1 \
-			'(-o --output)'{-o,--output}'[Properties to display]:property:_values -s , "property" $link_properties' \
+			'(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" $link_properties' \
 			- set2 \
-			'(-s --statistics)'{-s,--statistics}'[Display link statistics]' \
-			'(-i --interval)'{-i,--interval}'[Specify an interval]:interval:' \
-			'(-o --output)'{-o,--output}'[Properties to display]:property:_values -s , "property" $link_stats_properties' \
+			'(-s --statistics)'{-s,--statistics}'[display link statistics]' \
+			'(-i --interval)'{-i,--interval}'[specify an interval]:interval:' \
+			'(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" $link_stats_properties' \
 			':link name:_dladm_links' \
 		;;
 
 	("rename-link")
 		_arguments -A "-*" \
-			'-R[Root directory]:directory:_path_files -/' \
+			'-R[root directory]:directory:_path_files -/' \
 			':old link name:_dladm_links' \
 			':new link name:' \
 		;;
 
 	("show-phys")
 		_arguments -A "-*" \
-			'(-P --persistent)'{-P,--persistent}'[Display persistent link configuration]' \
-			'(-p --parseable)'{-p,--parseable}'[Parseable output]' \
-			'(-s --statistics)'{-s,--statistics}'[Display link statistics]' \
-			'(-i --interval)'{-i,--interval}'[Specify an interval]:interval:' \
-			'(-o --output)'{-o,--output}'[Properties to display]:property:_values -s , "property" link media state speed duplex device' \
+			'(-P --persistent)'{-P,--persistent}'[display persistent link configuration]' \
+			'(-p --parseable)'{-p,--parseable}'[parseable output]' \
+			'(-s --statistics)'{-s,--statistics}'[display link statistics]' \
+			'(-i --interval)'{-i,--interval}'[specify an interval]:interval:' \
+			'(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" link media state speed duplex device' \
 			':physical link name:_dladm_devs'
 		;;
 
@@ -146,97 +146,97 @@ _dladm() {
 
 	("create-aggr")
 		_arguments -A "-*" \
-			'(-t --temporary)'{-t,--temporary}'[Aggregation should be temporary]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
-			'(-l --link)'{-l,--link}'[Component link]:link:_dladm_links' \
-			'(-P --policy)'{-P,--policy}'[Port selection policy]:policy:_values -s , "policy" L2 L3 L4' \
+			'(-t --temporary)'{-t,--temporary}'[aggregation should be temporary]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
+			'(-l --link)'{-l,--link}'[component link]:link:_dladm_links' \
+			'(-P --policy)'{-P,--policy}'[port selection policy]:policy:_values -s , "policy" L2 L3 L4' \
 			'(-L --lacp-mode)'{-L,--lacp-mode}'[LACP mode]:lacp mode:(off active passive)' \
 			'(-T --lacp-timer)'{-T,--lacp-timer}'[LACP timer]:lacp timer:(short long)' \
-			'(-u --unicast)'{-u,--unicast}'[Unicast address]:unicast address:' \
+			'(-u --unicast)'{-u,--unicast}'[unicast address]:unicast address:' \
 			':aggregate link name:'
 		;;
 
 	("modify-aggr")
 		_arguments -A "-*" \
-			'(-t --temporary)'{-t,--temporary}'[Aggregation should be temporary]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
-			'(-l --link)'{-l,--link}'[Component link]:link:_dladm_links' \
-			'(-P --policy)'{-P,--policy}'[Port selection policy]:policy:_values -s , "policy" L2 L3 L4' \
+			'(-t --temporary)'{-t,--temporary}'[aggregation should be temporary]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
+			'(-l --link)'{-l,--link}'[component link]:link:_dladm_links' \
+			'(-P --policy)'{-P,--policy}'[port selection policy]:policy:_values -s , "policy" L2 L3 L4' \
 			'(-L --lacp-mode)'{-L,--lacp-mode}'[LACP mode]:lacp mode:(off active passive)' \
 			'(-T --lacp-timer)'{-T,--lacp-timer}'[LACP timer]:lacp timer:(short long)' \
-			'(-u --unicast)'{-u,--unicast}'[Unicast address]:unicast address:' \
+			'(-u --unicast)'{-u,--unicast}'[unicast address]:unicast address:' \
 			':aggregate link name:_dladm_aggrs'
 		;;
 
 	("delete-aggr")
 		_arguments -A "-*" \
-			'(-t --temporary)'{-t,--temporary}'[Deletion should be temporary]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
+			'(-t --temporary)'{-t,--temporary}'[deletion should be temporary]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
 			':aggregate link name:_dladm_aggrs'
 		;;
 
 	("add-aggr")
 		_arguments -A "-*" \
-			'(-t --temporary)'{-t,--temporary}'[Aggregation should be temporary]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
-			'(-l --link)'{-l,--link}'[Component link]:link:_dladm_links' \
+			'(-t --temporary)'{-t,--temporary}'[aggregation should be temporary]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
+			'(-l --link)'{-l,--link}'[component link]:link:_dladm_links' \
 			':aggregate link name:_dladm_aggrs'
 		;;
 
 	("remove-aggr")
 		_arguments -A "-*" \
-			'(-t --temporary)'{-t,--temporary}'[Aggregation should be temporary]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
-			'(-l --link)'{-l,--link}'[Component link]:link:_dladm_aggr_ports' \
+			'(-t --temporary)'{-t,--temporary}'[aggregation should be temporary]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
+			'(-l --link)'{-l,--link}'[component link]:link:_dladm_aggr_ports' \
 			':aggregate link name:_dladm_aggrs'
 		;;
 
 	("show-aggr")
 		_arguments -A "-*" \
-			'(-P --persistent)'{-P,--persistent}'[Display persistent link configuration]' \
-			'(-p --parseable)'{-p,--parseable}'[Parseable output]' \
-			'(-s --statistics)'{-s,--statistics}'[Display link statistics]' \
-			'(-i --interval)'{-i,--interval}'[Specify an interval]:interval:' \
+			'(-P --persistent)'{-P,--persistent}'[display persistent link configuration]' \
+			'(-p --parseable)'{-p,--parseable}'[parseable output]' \
+			'(-s --statistics)'{-s,--statistics}'[display link statistics]' \
+			'(-i --interval)'{-i,--interval}'[specify an interval]:interval:' \
 			':aggregate link name:_dladm_links' \
 			- set1 \
-			'(-o --output)'{-o,--output}'[Properties to display]:property:_values -s , "property" $aggr_properties' \
+			'(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" $aggr_properties' \
 			- lacp \
 			'(-L --lacp)'{-L,--lacp}'[LACP information]' \
-			'(-o --output)'{-o,--output}'[Properties to display]:property:_values -s , "property" $aggr_lacp_properties' \
+			'(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" $aggr_lacp_properties' \
 			- extended \
-			'(-x --extended)'{-x,--extended}'[Extended information]' \
-			'(-o --output)'{-o,--output}'[Properties to display]:property:_values -s , "property" $aggr_ext_properties' \
+			'(-x --extended)'{-x,--extended}'[extended information]' \
+			'(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" $aggr_ext_properties' \
 		;;
 
 	("create-vlan")
 		_arguments -A "-*" \
 			'(-t --temporary)'{-t,--temporary}'[VLAN should be temporary]' \
-			'(-f --force)'{-f,--force}'[Force VLAN creation]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
-			'(-l --link)'{-l,--link}'[Component link]:link:_dladm_links' \
+			'(-f --force)'{-f,--force}'[force VLAN creation]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
+			'(-l --link)'{-l,--link}'[component link]:link:_dladm_links' \
 			'-v[VLAN ID]:id:' \
 			':VLAN link name:'
 		;;
 
 	("delete-vlan")
 		_arguments -A "-*" \
-			'(-t --temporary)'{-t,--temporary}'[Deletion should be temporary]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
+			'(-t --temporary)'{-t,--temporary}'[deletion should be temporary]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
 			':VLAN link name:_dladm_vlans'
 		;;
 
 	("show-vlan")
 		_arguments -A "-*" \
-			'(-P --persistent)'{-P,--persistent}'[Display persistent link configuration]' \
-			'(-p --parseable)'{-p,--parseable}'[Parseable output]' \
-			'(-o --output)'{-o,--output}'[Properties to display]:property:_values -s , "property" $vlan_properties' \
+			'(-P --persistent)'{-P,--persistent}'[display persistent link configuration]' \
+			'(-p --parseable)'{-p,--parseable}'[parseable output]' \
+			'(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" $vlan_properties' \
 			':VLAN link name:_dladm_vlans'
 		;;
 
 	("scan-wifi")
 		_arguments -A "-*" \
-			'(-p --parseable)'{-p,--parseable}'[Parseable output]' \
-			'(-o --output)'{-o,--output}'[Properties to display]:property:_values -s , "property" $wifi_connect_properties' \
+			'(-p --parseable)'{-p,--parseable}'[parseable output]' \
+			'(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" $wifi_connect_properties' \
 			':wireless link name:_dladm_wifi_links'
 		;;
 
@@ -245,127 +245,127 @@ _dladm() {
 			'(-e --essid)'{-e,--essid}'[ESSID name]:network:_dladm_wifi_nets' \
 			'(-b --bsstype)'{-b,--bsstype}'[BSS type]:' \
 			'(-m --mode)'{-m,--mode}'[802.11 mode]:mode:(a b g)' \
-			'(-k --key)'{-k,--key}'[Key name]:key:_dladm_secobjs' \
-			'(-s --sec)'{-s,--sec}'[Security mode]:(none wep wpa)' \
-			'(-a --auth)'{-a,--auth}'[Authentication mode]:mode:(open shared)' \
-			'(-c --create-ibss)'{-c,--create-ibss}'[Create an ad-hoc network]' \
-			'(-T --timeout)'{-T,--timeout}'[Association timeout]:(forever)' \
+			'(-k --key)'{-k,--key}'[key name]:key:_dladm_secobjs' \
+			'(-s --sec)'{-s,--sec}'[security mode]:(none wep wpa)' \
+			'(-a --auth)'{-a,--auth}'[authentication mode]:mode:(open shared)' \
+			'(-c --create-ibss)'{-c,--create-ibss}'[create an ad-hoc network]' \
+			'(-T --timeout)'{-T,--timeout}'[association timeout]:(forever)' \
 			':wireless link name:_dladm_wifi_links'
 		;;
 
 	("disconnect-wifi")
 		_arguments -A "-*" \
 			- set1 \
-			'(-a --all-links)'{-a,--all-links}'[All links]' \
+			'(-a --all-links)'{-a,--all-links}'[all links]' \
 			- set2 \
 			':wireless link name:_dladm_wifi_links'
 		;;
 
 	("show-wifi")
 		_arguments -A "-*" \
-			'(-p --parseable)'{-p,--parseable}'[Parseable output]' \
-			'(-o --output)'{-o,--output}'[Properties to display]:property:_values -s , "property" $wifi_properties' \
+			'(-p --parseable)'{-p,--parseable}'[parseable output]' \
+			'(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" $wifi_properties' \
 			':wireless link name:_dladm_wifi_links'
 		;;
 
 	("show-ether")
 		_arguments -A "-*" \
-			'(-p --parseable)'{-p,--parseable}'[Parseable output]' \
-			'(-x --extended)'{-x,--extended}'[Extended output]' \
-			'(-o --output)'{-o,--output}'[Properties to display]:property:_values -s , "property" $ether_properties' \
+			'(-p --parseable)'{-p,--parseable}'[parseable output]' \
+			'(-x --extended)'{-x,--extended}'[extended output]' \
+			'(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" $ether_properties' \
 			':ethernet link name:_dladm_ethers'
 		;;
 
 	("set-linkprop")
 		_arguments -A "-*" \
-			'(-t --temporary)'{-t,--temporary}'[Change should be temporary]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
-			'(-p --prop)'{-p,--prop}'[Properties]:property:_dladm_linkprops' \
+			'(-t --temporary)'{-t,--temporary}'[change should be temporary]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
+			'(-p --prop)'{-p,--prop}'[properties]:property:_dladm_linkprops' \
 			':link name:_dladm_links'
 		;;
 
 	("reset-linkprop")
 		_arguments -A "-*" \
-			'(-t --temporary)'{-t,--temporary}'[Change should be temporary]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
-			'(-p --prop)'{-p,--prop}'[Properties]:property:_dladm_linkprops' \
+			'(-t --temporary)'{-t,--temporary}'[change should be temporary]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
+			'(-p --prop)'{-p,--prop}'[properties]:property:_dladm_linkprops' \
 			':link name:_dladm_links'
 		;;
 
 	("show-linkprop")
 		_arguments -A "-*" \
-			'(-P --persistent)'{-P,--persistent}'[Display persistent link properties]' \
-			'(-c --parseable)'{-c,--parseable}'[Parseable output]' \
-			'(-o --output)'{-o,--output}'[Properties to display]:property:_values -s , "property" $linkprop_properties' \
-			'(-p --prop)'{-p,--prop}'[Properties]:property:_dladm_linkprops' \
+			'(-P --persistent)'{-P,--persistent}'[display persistent link properties]' \
+			'(-c --parseable)'{-c,--parseable}'[parseable output]' \
+			'(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" $linkprop_properties' \
+			'(-p --prop)'{-p,--prop}'[properties]:property:_dladm_linkprops' \
 			':link name:_dladm_links'
 		;;
 
 	("create-secobj")
 		_arguments -A "-*" \
-			'(-t --temporary)'{-t,--temporary}'[Creation should be temporary]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
-			'(-c --class)'{-c,--class}'[Class]:class:(wep wpa)' \
-			'(-f --file)'{-f,--file}'[File containing object value]:file:_path_files' \
+			'(-t --temporary)'{-t,--temporary}'[creation should be temporary]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
+			'(-c --class)'{-c,--class}'[class]:class:(wep wpa)' \
+			'(-f --file)'{-f,--file}'[file containing object value]:file:_path_files' \
 			':object name:'
 		;;
 
 	("delete-secobj")
 		_arguments -A "-*" \
-			'(-t --temporary)'{-t,--temporary}'[Deletion should be temporary]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
+			'(-t --temporary)'{-t,--temporary}'[deletion should be temporary]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
 			':object name:_dladm_secobjs'
 		;;
 
 	("show-secobj")
 		_arguments -A "-*" \
-			'(-P --persistent)'{-P,--persistent}'[Display persistent object information]' \
-			'(-p --parseable)'{-p,--parseable}'[Parseable output]' \
-			'(-o --output)'{-o,--output}'[Properties to display]:property:_values -s , "property" $secobj_properties' \
+			'(-P --persistent)'{-P,--persistent}'[display persistent object information]' \
+			'(-p --parseable)'{-p,--parseable}'[parseable output]' \
+			'(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" $secobj_properties' \
 			':object name:_dladm_secobjs'
 		;;
 
 	("create-vnic")
 		# TODO: MAC address completion could be richer
 		_arguments -A "-*" \
-			'(-t --temporary)'{-t,--temporary}'[Creation should be temporary]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
-			'(-l --link)'{-l,--link}'[Component link]:link:_dladm_links' \
+			'(-t --temporary)'{-t,--temporary}'[creation should be temporary]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
+			'(-l --link)'{-l,--link}'[component link]:link:_dladm_links' \
 			'(-m --mac-address)'{-m,--mac-address}'[MAC address]:address:(factory random auto)' \
 			'-v[VLAN ID]:id:' \
-			'(-p --prop)'{-p,--prop}'[Property values]:value:' \
+			'(-p --prop)'{-p,--prop}'[property values]:value:' \
 			':VNIC name:'
 		;;
 
 	("delete-vnic")
 		_arguments -A "-*" \
-			'(-t --temporary)'{-t,--temporary}'[Deletion should be temporary]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
+			'(-t --temporary)'{-t,--temporary}'[deletion should be temporary]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
 			':VNIC name:_dladm_vnics'
 		;;
 
 	("show-vnic")
 		_arguments -A "-*" \
-			'(-P --persistent)'{-P,--persistent}'[Display persistent object information]' \
-			'(-p --parseable)'{-p,--parseable}'[Parseable output]' \
-			'(-o --output)'{-o,--output}'[Properties to display]:property:_values -s , "property" $vnic_properties' \
-			'(-l --link)'{-l,--link}'[Limit to VNICs on link]:link:_dladm_links' \
-			'(-s --statistics)'{-s,--statistics}'[Display VNIC statistics]' \
-			'(-i --interval)'{-i,--interval}'[Specify an interval]:interval:' \
+			'(-P --persistent)'{-P,--persistent}'[display persistent object information]' \
+			'(-p --parseable)'{-p,--parseable}'[parseable output]' \
+			'(-o --output)'{-o,--output}'[properties to display]:property:_values -s , "property" $vnic_properties' \
+			'(-l --link)'{-l,--link}'[limit to VNICs on link]:link:_dladm_links' \
+			'(-s --statistics)'{-s,--statistics}'[display VNIC statistics]' \
+			'(-i --interval)'{-i,--interval}'[specify an interval]:interval:' \
 			':VNIC name:_dladm_vnics'
 		;;
 
 	("create-etherstub")
 		_arguments -A "-*" \
-			'(-t --temporary)'{-t,--temporary}'[Creation should be temporary]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
+			'(-t --temporary)'{-t,--temporary}'[creation should be temporary]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
 			':etherstub name:'
 		;;
 
 	("delete-etherstub")
 		_arguments -A "-*" \
-			'(-t --temporary)'{-t,--temporary}'[Deletion should be temporary]' \
-			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
+			'(-t --temporary)'{-t,--temporary}'[deletion should be temporary]' \
+			'(-R --root)'{-R,--root}'[root directory]:directory:_path_files -/' \
 			':etherstub name:_dladm_etherstubs'
 		;;
 
@@ -376,11 +376,11 @@ _dladm() {
 
 	("show-usage")
 		_arguments -A "-*" \
-			'(-f --file)'{-f,--file}'[Read records from file]:_path_files' \
-			'(-F --format)'{-f,--format}'[Plotfile format]:(gnuplot)' \
-			'(-p --plot)'{-p,--plot}'[Write plot to file]:' \
-			'(-e --start)'{-e,--start}'[Start time]:date/time (MM/DD/YYYY,hh\:mm\:ss)' \
-			'(-s --stop)'{-s,--stop}'[Stop time]:date/time (MM/DD/YYYY,hh\:mm\:ss)' \
+			'(-f --file)'{-f,--file}'[read records from file]:_path_files' \
+			'(-F --format)'{-f,--format}'[plotfile format]:(gnuplot)' \
+			'(-p --plot)'{-p,--plot}'[write plot to file]:' \
+			'(-e --start)'{-e,--start}'[start time]:date/time (MM/DD/YYYY,hh\:mm\:ss)' \
+			'(-s --stop)'{-s,--stop}'[stop time]:date/time (MM/DD/YYYY,hh\:mm\:ss)' \
 			':link name:_dladm_links'
 		;;
 

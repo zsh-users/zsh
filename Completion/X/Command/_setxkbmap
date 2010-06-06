@@ -30,10 +30,10 @@ _setxkbmap() {
         '(-)'-print'[print component names]'
         '-rules[rules file]:rules:_files'
         '-symbols[symbols components]:symbols:'
-        '(-)'{-help,-h}'[Display help message]'
+        '(-)'{-help,-h}'[display help message]'
         '-synch[force synchronization]'
         '-types[types components]:types:'
-        '(-verbose -v)'{-verbose,-v}'[Set verbosity level]:verbosity:(0 1 2 3 4 5 6 7 8 9)'
+        '(-verbose -v)'{-verbose,-v}'[set verbosity level]:verbosity:(0 1 2 3 4 5 6 7 8 9)'
         '*::keyboard:_setxkbmap_dispatcher'
     )
     _arguments $arguments

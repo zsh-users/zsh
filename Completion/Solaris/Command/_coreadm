@@ -4,19 +4,19 @@ _coreadm() {
 	local -a content option
 
 	content=(
-		"anon[Anonymous private mappings]"
+		"anon[anonymous private mappings]"
 		"ctf[CTF type information]"
-		"data[Writable private file mappings]"
+		"data[writable private file mappings]"
 		"dism[DISM mappings]"
-		"heap[Process heap]"
+		"heap[process heap]"
 		"ism[ISM mappings]"
-		"rodata[Read-only private file mappings]"
-		"shanon[Anonymous shared mappings]"
-		"shfile[File-backed shared mappings]"
+		"rodata[read-only private file mappings]"
+		"shanon[anonymous shared mappings]"
+		"shfile[file-backed shared mappings]"
 		"shm[System V shared memory]"
-		"stack[Process stack]"
-		"symtab[Symbol table sections for loaded files]"
-		"text[Readable and executable private file mappings]"
+		"stack[process stack]"
+		"symtab[symbol table sections for loaded files]"
+		"text[readable and executable private file mappings]"
 	)
 
 	option=(
@@ -31,18 +31,18 @@ _coreadm() {
 	# "+" or "-"
 	_arguments -s \
 		- set1 \
-		'-g[Global core file name pattern]:' \
-		'-G[Global core file content]:content:_values -s + "content" $content' \
-		'-i[Per-process core file name pattern]:' \
-		'-I[Per-process core file content]:content:_values -s + "content" $content' \
-		'*-d[Disable core option]:option:(($option))' \
-		'*-e[Enable core option]:option:(($option))' \
+		'-g[global core file name pattern]:' \
+		'-G[global core file content]:content:_values -s + "content" $content' \
+		'-i[per-process core file name pattern]:' \
+		'-I[per-process core file content]:content:_values -s + "content" $content' \
+		'*-d[disable core option]:option:(($option))' \
+		'*-e[enable core option]:option:(($option))' \
 		- set2 \
 		'-p[PID-specific per-process core file name pattern]:' \
 		'-P[PID-specific per-process core file content]:content:_values -s + "content" $content' \
 		'*:pids:_pids' \
 		- set3 \
-		'-u[Update options from coreadm.conf]'
+		'-u[update options from coreadm.conf]'
 }
 
 _coreadm "$@"

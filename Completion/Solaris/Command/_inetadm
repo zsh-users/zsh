@@ -2,13 +2,13 @@
 
 _inetadm() {
 	_arguments -s \
-		'-?[Help]' \
-		'-l[List service instance properties]:FMRI:_svcs_fmri -i' \
-		'-e[Enable specified instance]:FMRI:_svcs_fmri -i' \
-		'-d[Disable specified instance]:FMRI:_svcs_fmri -i' \
-		'-p[List inet service properties]' \
-		'-m[Modify service instance properties]:FMRI:_svcs_fmri -i' \
-		'-M[Modify inet service properties]'
+		'-?[help]' \
+		'-l[list service instance properties]:FMRI:_svcs_fmri -i' \
+		'-e[enable specified instance]:FMRI:_svcs_fmri -i' \
+		'-d[disable specified instance]:FMRI:_svcs_fmri -i' \
+		'-p[list inet service properties]' \
+		'-m[modify service instance properties]:FMRI:_svcs_fmri -i' \
+		'-M[modify inet service properties]'
 }
 
 _inetadm "$@"

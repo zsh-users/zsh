@@ -36,7 +36,7 @@ _softwareupdate() {
 
   _arguments -R \
     '(-h --help -l --list)-q[quiet mode]' \
-    {-l,--list}'[List all available updates]:*:' \
+    {-l,--list}'[list all available updates]:*:' \
     {-d,--download}'[download to directory set in InternetConfig]:*:' \
     {-i,--install}'[install (requires root)]:*: :->install' \
     '--ignored[show or manage ignored updates list (per-user)]:*:: :->ignored' \

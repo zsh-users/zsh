@@ -39,7 +39,7 @@ _arguments -s -C -M 'r:|[_-]=* r:|=*' \
   '(--convert --to -C)-X[XML dom style]' \
   '(--convert --to -C)-x[XML sax style]' \
   '(--convert --to -C)-y[output summary page, manifest of existing generated output]' \
-  '(--convert --to -C)-Z[Zap delete/destroy output]' \
+  '(--convert --to -C)-Z[zap delete/destroy output]' \
   '--import[-\[Dd\] imports document to database]' \
   '--update[-\[Dd\] updates document in database]' \
   '--remove[-\[Dd\] removes document from database]' \

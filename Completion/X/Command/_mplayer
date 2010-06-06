@@ -45,7 +45,7 @@ _x_arguments -C -s \
   {-h,-help,--help}'[display help info]' \
   -hardframedrop \-hr-mp3-seek \
   '-hue:video signal hue adjustment' \
-  '(-rootwin)-icelayer:icewm layer:((0\:Desktop 2\:Below 4\:Normal 6\:OnTop 8\:Dock 10\:AboveDock 12\:Menu))' \
+  '(-rootwin)-icelayer:icewm layer:((0\:desktop 2\:below 4\:normal 6\:ontop 8\:dock 10\:abovedock 12\:menu))' \
   '(-use-stdin)-idx[rebuild index of the avi]' \
   '-ifo:ifo file:_files' '-include:config-file:_files' \
   '-input:command:(conf ar-delay ar-rate keylist cmdlist js-dev file)' \

@@ -24,29 +24,29 @@ if [[ $CURRENT -ge 4 ]]; then
 	  ;;
 	  advertise)
 		_values 'hexidecimal value (or a combination of the following)' \
-			'0x001[10 Half]' \
-			'0x002[10 Full]' \
-			'0x004[100 Half]' \
-			'0x008[100 Full]' \
-			'0x010[1000 Half(not supported by IEEE standards)]' \
-			'0x020[1000 Full]' \
-			'0x8000[2500 Full(not supported by IEEE standards)]' \
-			'0x800[10000 Full]' \
-			'0x03F[Auto]'
+			'0x001[10 half]' \
+			'0x002[10 full]' \
+			'0x004[100 half]' \
+			'0x008[100 full]' \
+			'0x010[1000 half(not supported by IEEE standards)]' \
+			'0x020[1000 full]' \
+			'0x8000[2500 full(not supported by IEEE standards)]' \
+			'0x800[10000 full]' \
+			'0x03F[auto]'
 	  ;;
 	  xcvr)
 		_wanted -x xcvr expl 'transceiver type' compadd internal external
 	  ;;
 	  wol)
 		_values -s '' 'Wake-on-LAN options' \
-			'(d)p[Wake on phy activity]' \
-			'(d)u[Wake on unicast messages]' \
-			'(d)m[Wake on multicast messages]' \
-			'(d)b[Wake on broadcast messages]' \
-			'(d)a[Wake on ARP]' \
-			'(d)g[Wake on MagicPacket(tm)]' \
-			'(d)s[Enable SecureOn(tm) password for MagicPacket(tm)]' \
-			'(p u m b a g s)d[Disable (wake on nothing)]'
+			'(d)p[wake on phy activity]' \
+			'(d)u[wake on unicast messages]' \
+			'(d)m[wake on multicast messages]' \
+			'(d)b[wake on broadcast messages]' \
+			'(d)a[wake on ARP]' \
+			'(d)g[wake on MagicPacket(tm)]' \
+			'(d)s[enable SecureOn(tm) password for MagicPacket(tm)]' \
+			'(p u m b a g s)d[disable (wake on nothing)]'
 	  ;;
 	  sopass)
 		_message -e secureon 'password - 6 bytes in ethernet MAC hex format (xx:yy:zz:aa:bb:cc)'
@@ -58,9 +58,9 @@ if [[ $CURRENT -ge 4 ]]; then
 	case $words[2]; in
 	  -A|--pause)
 		_values -S ' ' -w 'pause options' \
-			'autoneg[Specify if pause autonegotiation is enabled]' \
-			'rx[Specify if RX pause is enabled]' \
-			'tx[Specify if TX pause is enabled]'
+			'autoneg[specify if pause autonegotiation is enabled]' \
+			'rx[specify if RX pause is enabled]' \
+			'tx[specify if TX pause is enabled]'
 	  ;;
 	  -C|--coalesce)
 		_values -S ' ' -w 'coalescing settings' \
@@ -78,10 +78,10 @@ if [[ $CURRENT -ge 4 ]]; then
 	  ;;
 	  -G|--set-ring)
 		_values -S ' ' -w 'ring parameters' \
-			'rx[Change number of ring entries for the RX ring]' \
-			'rx-mini[Change number of ring entries for the RX Mini ring]' \
-			'rx-jumbo[Change number of ring entries for the RX Jumbo ring]' \
-			'tx[Change number of ring entries for the TX ring]'
+			'rx[change number of ring entries for the RX ring]' \
+			'rx-mini[change number of ring entries for the RX Mini ring]' \
+			'rx-jumbo[change number of ring entries for the RX Jumbo ring]' \
+			'tx[change number of ring entries for the TX ring]'
 	  ;;
 	  -d|--register-dump)
 		_values -S ' ' -w 'register dump options' \
@@ -103,12 +103,12 @@ if [[ $CURRENT -ge 4 ]]; then
 	  ;;
 	  -K|--offload)
 		_values -S ' ' -w 'offload options' \
-			'rx[Specify if RX checksumming is enabled]' \
-			'tx[Specify if TX checksumming is enabled]' \
-			'sg[Specify if scatter-gather is enabled]' \
-			'tso[Specify if TCP segmentation offload is enabled]' \
-			'ufo[Specify if UDP segmentation offload is enabled]' \
-			'gso[Specify if generic segmentation offload is enabled]'
+			'rx[specify if RX checksumming is enabled]' \
+			'tx[specify if TX checksumming is enabled]' \
+			'sg[specify if scatter-gather is enabled]' \
+			'tso[specify if TCP segmentation offload is enabled]' \
+			'ufo[specify if UDP segmentation offload is enabled]' \
+			'gso[specify if generic segmentation offload is enabled]'
 	  ;;
 	  -p|--identify)
 		if [[ $CURRENT -eq 4 ]] && _message -e length 'seconds'
@@ -120,16 +120,16 @@ if [[ $CURRENT -ge 4 ]]; then
 	  ;;
 	  -s|--change)
 		_values -S ' ' -w 'change setting' \
-			'speed[Set speed in Mb/s]' \
-			'duplex[Set full or half duplex mode]' \
-			'port[Select device port]' \
-			'autoneg[Specify if autonegotiation is enabled]' \
-			'advertise[Set the speed and duplex advertised by autonegotiation]' \
+			'speed[set speed in Mb/s]' \
+			'duplex[set full or half duplex mode]' \
+			'port[select device port]' \
+			'autoneg[specify if autonegotiation is enabled]' \
+			'advertise[set the speed and duplex advertised by autonegotiation]' \
 			'phyad[PHY address]' \
-			'xcvr[Select transceiver type]' \
-			'wol[Set Wake-on-LAN options]' \
-			'sopass[Set the SecureOn(tm) password]' \
-			'msglvl[Set the driver message level]'
+			'xcvr[select transceiver type]' \
+			'wol[set Wake-on-LAN options]' \
+			'sopass[set the SecureOn(tm) password]' \
+			'msglvl[set the driver message level]'
 	  ;;
 	esac
 	  ;;
@@ -153,7 +153,7 @@ _arguments \
 	"($cmds)"{-i,--driver}'[queries the specified ethernet device for associated driver information]' \
 	"($cmds)"{-d,--register-dump}'[retrieves and prints a register dump for the specified ethernet device]' \
 	"($cmds)"{-e,--eeprom-dump}'[retrieves and prints an EEPROM dump for the specified ethernet device]' \
-	"($cmds)"{-E,--change-eeprom}'[Changes EEPROM byte for the specified ethernet device]' \
+	"($cmds)"{-E,--change-eeprom}'[changes EEPROM byte for the specified ethernet device]' \
 	"($cmds)"{-k,--show-offload}'[queries the specified ethernet device for offload information]' \
 	"($cmds)"{-K,--offload}'[change the offload parameters of the specified ethernet device]' \
 	"($cmds)"{-p,--identify}'[initiates adapter-specific action intended to identify the adapter by sight]' \

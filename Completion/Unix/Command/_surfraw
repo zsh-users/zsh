@@ -65,13 +65,13 @@ case $state in
       ;;
       ctan)
 	_arguments $args \
-	'-name[Search by filename]' \
-	'-desc[Search descriptions (default)]'\
-	'-doc[Search documentation]'
+	'-name[search by filename]' \
+	'-desc[search descriptions (default)]'\
+	'-doc[search documentation]'
       ;;
       currency)
         _arguments \
-          '-l[List all known currency symbols]' \
+          '-l[list all known currency symbols]' \
           '-from=-:currency symbol:(EUR USD GBP CAD AUD JPY INR NZD CHF ZAR)' \
           '-to=-:currency symbol:(EUR USD GBP CAD AUD JPY INR NZD CHF ZAR)' \
           '*:currency amount' && ret=0
@@ -155,8 +155,8 @@ case $state in
       ;;
       debpackages)
         _arguments \
-          '-release=-:Search release:(all main non-US contrib non-free)' \
-          '-distro=-:Search distribution:(all stable testing unstable)' \
+          '-release=-:search release:(all main non-US contrib non-free)' \
+          '-distro=-:search distribution:(all stable testing unstable)' \
           '*:package:_deb_packages avail' && ret=0
       ;;
       debpts)
@@ -230,9 +230,9 @@ case $state in
       ;;
       gutenberg)
 	_arguments $args \
-	  '-title[Search titles (default)]'
-	  '-author[Search authors]'
-	  '-num[Search etext numbers]'
+	  '-title[search titles (default)]'
+	  '-author[search authors]'
+	  '-num[search etext numbers]'
       ;;       
       imdb)
         _arguments $args \
@@ -256,11 +256,11 @@ case $state in
         _arguments \
           '-tol=:special character tolerance:(off standard high)' \
           '-to=:language:(de en either)' \
-          '-lang=:Webpage is in this language:(en de)' \
-          '-link=:Link results:(on off)' \
-          '-head=:Display headlines:(on off)' \
-          '-grid=:Show results in grid:(on off)' \
-          '-spell=:Spelling tolerance:(off standard force)' \
+          '-lang=:webpage is in this language:(en de)' \
+          '-link=:link results:(on off)' \
+          '-head=:display headlines:(on off)' \
+          '-grid=:show results in grid:(on off)' \
+          '-spell=:spelling tolerance:(off standard force)' \
           '*:dictionary word:->dictword' && ret=0
 
         [[ "$state" = dictword ]] && _wanted words expl 'dictionary word' \
@@ -274,7 +274,7 @@ case $state in
       pgpkeys)
         _arguments \
           '-s[display key signatures]' \
-          '*:KeyID or email' && ret=0
+          '*:key ID or email' && ret=0
       ;;
       pubmed)
         _arguments $args \
@@ -387,19 +387,19 @@ case $state in
       ;;
       wayback)
 	_arguments $args \
-	  '-syear=-[Start search from this year]:year' \
-	  '-smonth=-:[Start search from this month]:month:(jan feb mar apr may jun jul aug sep oct nov dec)' \
-	  '-sday=-[Start search from this day]:number' \
-	  '-eyear=-[End search in this year]:year' \
-	  '-emonth=-[End search in this month]:month:(jan feb mar apr may jun jul aug sep oct nov dec)' \
-	  '-eday=-[End search in this day]:number' \
-	  '-list[List all pages that match search criteria]' \
-	  '-dups[Show dups]' \
-	  '-compare[Compare pages]' \
-	  '-pdf[Show as PDF]' \
-	  '-alias=-[How to handle site aliases]:alias:(merge show hide)' \
-	  '-redir=-[How to handle redirections]:redir:(hide flag show)' \
-	  '-type=-[File type to search for]:type:(image audio video binary text pdf)'
+	  '-syear=-[start search from this year]:year' \
+	  '-smonth=-:[start search from this month]:month:(jan feb mar apr may jun jul aug sep oct nov dec)' \
+	  '-sday=-[start search from this day]:number' \
+	  '-eyear=-[end search in this year]:year' \
+	  '-emonth=-[end search in this month]:month:(jan feb mar apr may jun jul aug sep oct nov dec)' \
+	  '-eday=-[end search in this day]:number' \
+	  '-list[list all pages that match search criteria]' \
+	  '-dups[show dups]' \
+	  '-compare[compare pages]' \
+	  '-pdf[show as PDF]' \
+	  '-alias=-[how to handle site aliases]:alias:(merge show hide)' \
+	  '-redir=-[how to handle redirections]:redir:(hide flag show)' \
+	  '-type=-[file type to search for]:type:(image audio video binary text pdf)'
       ;;
       wetandwild)
         _arguments \

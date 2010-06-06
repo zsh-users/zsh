@@ -488,12 +488,12 @@ _perforce_gen_cmd_list() {
   # but let's at least check they're not already there.
   local -a unsup
   unsup=(
-    "attribute:Set attributes for open file (EXPERIMENTAL)"
-    "dbschema:Report meta database information"
-    "export:Rxtract journal or checkpoint records"
-    "interchanges:Report changes not yet integrated between branches"
-    "replicate:Poll for journal changes and apply to another server"
-    "spec:Allows limited changes to form specifications (admin)"
+    "attribute:set attributes for open file (EXPERIMENTAL)"
+    "dbschema:report meta database information"
+    "export:extract journal or checkpoint records"
+    "interchanges:report changes not yet integrated between branches"
+    "replicate:poll for journal changes and apply to another server"
+    "spec:allows limited changes to form specifications (admin)"
   )
   for line in $unsup; do
     if [[ ${_perforce_cmd_list[(r)${line%%:*}:*]} = '' ]]; then
@@ -2029,7 +2029,7 @@ _perforce_cmd_help() {
       fi
     done
     if [[ -z ${_perforce_help_list[(r)undoc:*]} ]]; then
-      _perforce_help_list+=("undoc:Help for otherwise undocumented features")
+      _perforce_help_list+=("undoc:help for otherwise undocumented features")
     fi
   fi
   _describe -t help-options 'Perforce help option' _perforce_help_list

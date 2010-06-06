@@ -32,19 +32,19 @@ local txtmsg="text with contexts or projects"
 case $state in
   (commands)
   cmdlist=(
-    "add:Add TODO ITEM to todo.txt."
-    "append:Adds to item on line NUMBER the text TEXT."
-    "archive:Moves done items from todo.txt to done.txt."
-    "del:Deletes the item on line NUMBER in todo.txt."
-    "do:Marks item on line NUMBER as done in todo.txt."
-    "list:Displays all todo items containing TERM(s), sorted by priority."
-    "listall:Displays items including done ones containing TERM(s)"
-    "listpri:Displays all items prioritized at PRIORITY."
-    "prepend:Adds to the beginning of the item on line NUMBER text TEXT."
-    "pri:Adds or replace in NUMBER the priority PRIORITY (upper case letter)."
-    "replace:Replace in NUMBER the TEXT."
-    "remdup:Remove exact duplicates from todo.txt."
-    "report:Adds the number of open and done items to report.txt."
+    "add:add TODO ITEM to todo.txt."
+    "append:adds to item on line NUMBER the text TEXT."
+    "archive:moves done items from todo.txt to done.txt."
+    "del:deletes the item on line NUMBER in todo.txt."
+    "do:marks item on line NUMBER as done in todo.txt."
+    "list:displays all todo items containing TERM(s), sorted by priority."
+    "listall:displays items including done ones containing TERM(s)"
+    "listpri:displays all items prioritized at PRIORITY."
+    "prepend:adds to the beginning of the item on line NUMBER text TEXT."
+    "pri:adds or replace in NUMBER the priority PRIORITY (upper case letter)."
+    "replace:replace in NUMBER the TEXT."
+    "remdup:remove exact duplicates from todo.txt."
+    "report:adds the number of open and done items to report.txt."
   )
   _describe -t todo-commands 'todo.sh command' cmdlist
   ;;

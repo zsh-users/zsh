@@ -4,12 +4,12 @@ local pids
 pids=(${${${(f)"$(/usr/bin/procstat -ah)"}/[[:space:]]#/}/[[:space:]]*[[:space:]](ELF[[:digit:]]#[[:space:]]|-[[:space:]]#)/:})
 
 _arguments -s \
-'-f[Restrict examination to files open in the same file systems as the named file arguments]' \
-'-M[Extract values associated with the name list from the specified core]:core:_files' \
-'-N[Extract the name list from the specified system]:system:' \
-'-m[Include memory-mapped files in the listing]' \
-'-n[Numerical format]' \
-'-p[Report all files open by the specified process]:Process id:(($pids))' \
-'-u[Report all files open by the specified user]:User:_users' \
-'-v[Verbose mode]' \
-'*:Files:_files'
+'-f[restrict examination to files open in the same file systems as the named file arguments]' \
+'-M[extract values associated with the name list from the specified core]:core:_files' \
+'-N[extract the name list from the specified system]:system:' \
+'-m[include memory-mapped files in the listing]' \
+'-n[numerical format]' \
+'-p[report all files open by the specified process]:process id:(($pids))' \
+'-u[report all files open by the specified user]:user:_users' \
+'-v[verbose mode]' \
+'*:files:_files'

@@ -47,18 +47,18 @@ _sys_calls () {
 
 _sets () {
 	_alternative \
-		'special:Special values:(all none)' \
+		'special:special values:(all none)' \
 		'calls::_sys_calls'
 }
 
 _traces () {
 	local expl
-	traces=('file:Trace all system calls which take a file name as an argument'
-		'process:Trace all system calls which involve process management'
-		'network:Trace all the network related system calls'
-		'signal:Trace all signal related system calls'
-		'ipc:Trace all IPC related system calls'
-		'desc:Trace all file descriptor related system calls')
+	traces=('file:trace all system calls which take a file name as an argument'
+		'process:trace all system calls which involve process management'
+		'network:trace all the network related system calls'
+		'signal:trace all signal related system calls'
+		'ipc:trace all IPC related system calls'
+		'desc:trace all file descriptor related system calls')
 	compset -P '*,'
 	_describe -t traces 'Related system calls' traces -qS ,
 }
@@ -71,43 +71,43 @@ _traces_sets () {
 
 _expression () {
 	_values -S = "Qualifying expression" \
-		'trace[Trace specified set of system calls only]:system calls:_traces_sets' \
-		'abbrev[Abbreviate the output from printing each member of large structures]:system calls:_sets' \
-		'verbose[Dereference structures for the specified set of system calls]:system calls:_sets' \
-		'raw[Print raw, undecoded arguments for the specified set of system calls]:system calls:_sets' \
-		'signal[Trace only the specified subset of signals]:signal:{compset -P "*,"; _signals -s -qS ,}' \
-		'read[Perform a full hex and ASCII dump of all the data read from listed file descriptors]:file descriptors:{compset -P "*,"; _file_descriptors -qS ,}' \
-		'write[Perform a full hex and ASCII dump of all the data written to listed file descriptors]:file descriptors:{compset -P "*,"; _file_descriptors -qS ,}'
+		'trace[trace specified set of system calls only]:system calls:_traces_sets' \
+		'abbrev[abbreviate the output from printing each member of large structures]:system calls:_sets' \
+		'verbose[dereference structures for the specified set of system calls]:system calls:_sets' \
+		'raw[print raw, undecoded arguments for the specified set of system calls]:system calls:_sets' \
+		'signal[trace only the specified subset of signals]:signal:{compset -P "*,"; _signals -s -qS ,}' \
+		'read[perform a full hex and ASCII dump of all the data read from listed file descriptors]:file descriptors:{compset -P "*,"; _file_descriptors -qS ,}' \
+		'write[perform a full hex and ASCII dump of all the data written to listed file descriptors]:file descriptors:{compset -P "*,"; _file_descriptors -qS ,}'
 	if [[ -z "$words[CURRENT]" || -n "${words[CURRENT]:#*=*}" ]]; then
 		_traces_sets
 	fi
 }
 
 _arguments \
-	'()-c[Count time, calls, and errors for each system call and report a summary]' \
-	-d'[Show some debugging output of strace itself on the standard error]' \
-	-f'[Trace child processes as they are created by currently traced processes]' \
-	-ff'[Write each process trace to <filename>.<pid> (when using -o <filename>]' \
-	'(-c -d -f -ff -i -q -r -t -tt -ttt -T -v -V -x -xx -a -e -o -O -p -s -S -u -E)-h[Print help]' \
-	-i'[Print the instruction pointer at the time of the system call]' \
-	-q'[Suppress messages about attaching, detaching etc.]' \
-	-r'[Print a relative timestamp upon entry to each system call]' \
-	'(-ttt)-t[Prefix each line of the trace with the time of day]' \
-	'(-ttt -tt)-tt[Prefix each line of the trace with the time of day including the microseconds]' \
-	'(-tt -t)-ttt[Prefix each line of the trace with the number of seconds and microseconds since the epoch]' \
-	-T'[Show the time spent in system calls]' \
-	-v'[Print unabbreviated versions of environment, stat, termios, etc. calls]' \
-	'(-c -d -f -ff -h -i -q -r -t -tt -ttt -T -v -x -xx -a -e -o -O -p -s -S -u -E)-V[Print the version number of strace]' \
-	'(-xx)-x[Print all non-ASCII strings in hexadecimal string format]' \
-	'(-x)-xx[Print all strings in hexadecimal string format]' \
-	-a'[Align return values in a specific column (default 40)]:column number' \
-	'*-e[Select events to trace or how to trace]:system call:_expression' \
-	'-o[Write the trace output to the file]:output file:_files' \
-	'-O[Overhead for tracing system calls]:overhead microseconds' \
-	'(:)-p[Attach to the process with specified process ID and begin tracing]:Process ID:_pids' \
-	'-s[Specify the maximum string size to print (default 32)]:maximum string size' \
-	'-S[Sort the output of the histogram (-c option) by the specified criterion]:sort by:(time calls name nothing)' \
-	'-u[Run as specified user]:user:_users' \
-	'*-E[Remove variable from the inherited list of environment or define a value]:variable:_printenv' \
+	'()-c[count time, calls, and errors for each system call and report a summary]' \
+	-d'[show some debugging output of strace itself on the standard error]' \
+	-f'[trace child processes as they are created by currently traced processes]' \
+	-ff'[write each process trace to <filename>.<pid> (when using -o <filename>]' \
+	'(-c -d -f -ff -i -q -r -t -tt -ttt -T -v -V -x -xx -a -e -o -O -p -s -S -u -E)-h[print help]' \
+	-i'[print the instruction pointer at the time of the system call]' \
+	-q'[suppress messages about attaching, detaching etc.]' \
+	-r'[print a relative timestamp upon entry to each system call]' \
+	'(-ttt)-t[prefix each line of the trace with the time of day]' \
+	'(-ttt -tt)-tt[prefix each line of the trace with the time of day including the microseconds]' \
+	'(-tt -t)-ttt[prefix each line of the trace with the number of seconds and microseconds since the epoch]' \
+	-T'[show the time spent in system calls]' \
+	-v'[print unabbreviated versions of environment, stat, termios, etc. calls]' \
+	'(-c -d -f -ff -h -i -q -r -t -tt -ttt -T -v -x -xx -a -e -o -O -p -s -S -u -E)-V[print the version number of strace]' \
+	'(-xx)-x[print all non-ASCII strings in hexadecimal string format]' \
+	'(-x)-xx[print all strings in hexadecimal string format]' \
+	-a'[align return values in a specific column (default 40)]:column number' \
+	'*-e[select events to trace or how to trace]:system call:_expression' \
+	'-o[write the trace output to the file]:output file:_files' \
+	'-O[overhead for tracing system calls]:overhead microseconds' \
+	'(:)-p[attach to the process with specified process ID and begin tracing]:process ID:_pids' \
+	'-s[specify the maximum string size to print (default 32)]:maximum string size' \
+	'-S[sort the output of the histogram (-c option) by the specified criterion]:sort by:(time calls name nothing)' \
+	'-u[run as specified user]:user:_users' \
+	'*-E[remove variable from the inherited list of environment or define a value]:variable:_printenv' \
 	'(-):command name: _command_names -e' \
 	'*::arguments:_normal'

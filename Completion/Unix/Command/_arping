@@ -7,7 +7,7 @@ _arguments -s \
   '-q[be quiet]' \
   '-b[keep broadcasting, do not go unicast]' \
   '-D[duplicate address detection mode]'\
-  '-U[Unsolicited ARP mode, update your neighbours]' \
+  '-U[unsolicited ARP mode, update your neighbours]' \
   '-A[ARP answer mode, update your neighbours]' \
   '-V[print version and exit]' \
   '-c[how many packets to send]:count' \

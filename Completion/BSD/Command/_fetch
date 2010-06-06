@@ -2,29 +2,29 @@
 # Deprecated arguments are removed from the completion
 
 _arguments -s \
-	'-1[Stop and return exit code 0 at the first successfully retrieved file]' \
-	'-4[Forces fetch to use IPv4 addresses only]' \
-	'-6[Forces fetch to use IPv6 addresses only]' \
-	'-A[Do not automatically follow "temporary" (302) redirects]' \
-	'-a[Automatically retry the transfer upon soft failures]' \
-	'-B[Specify the read buffer size in bytes]:bytes:' \
-	'-d[Use a direct connection even if a proxy is configured]' \
-	'-F[In combination with the -r flag, forces a restart]' \
-	'-l[If the target is a file-scheme URL, make a symbolic link to the target]' \
+	'-1[stop and return exit code 0 at the first successfully retrieved file]' \
+	'-4[forces fetch to use IPv4 addresses only]' \
+	'-6[forces fetch to use IPv6 addresses only]' \
+	'-A[do not automatically follow "temporary" (302) redirects]' \
+	'-a[automatically retry the transfer upon soft failures]' \
+	'-B[specify the read buffer size in bytes]:bytes:' \
+	'-d[use a direct connection even if a proxy is configured]' \
+	'-F[in combination with the -r flag, forces a restart]' \
+	'-l[if the target is a file-scheme URL, make a symbolic link to the target]' \
 	'-M' \
-	'-m[Mirror mode]' \
-	'-N[Use file instead of ~/.netrc to look up login names and pass- words for FTP sites]' \
-	'-n[Do not preserve the modification time]' \
-	'-o[Set the output file name]:file:_files' \
+	'-m[mirror mode]' \
+	'-N[use file instead of ~/.netrc to look up login names and pass- words for FTP sites]' \
+	'-n[do not preserve the modification time]' \
+	'-o[set the output file name]:file:_files' \
 	'-P' \
-	'-p[Use passive FTP]' \
-	'-q[Quiet mode]' \
-	'-R[Do not delete the output file in any circumstances]' \
-	'-r[Restart a previously interrupted transfer]' \
-	'-S[Require the file size reported by the server to match the specified value]' \
-	'-s[Print the size in bytes, without fetching it]' \
-	'-T[Set timeout value]:seconds:' \
-	'-U[When using passive FTP, allocate the port for the data connection from the low port range]' \
-	'-v[Increase verbosity level]' \
+	'-p[use passive FTP]' \
+	'-q[quiet mode]' \
+	'-R[do not delete the output file in any circumstances]' \
+	'-r[restart a previously interrupted transfer]' \
+	'-S[require the file size reported by the server to match the specified value]' \
+	'-s[print the size in bytes, without fetching it]' \
+	'-T[set timeout value]:seconds:' \
+	'-U[when using passive FTP, allocate the port for the data connection from the low port range]' \
+	'-v[increase verbosity level]' \
 	'-w[wait successive retries]:seconds:' \
 	'*:URL to fetch:_urls'

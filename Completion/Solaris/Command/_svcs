@@ -11,19 +11,19 @@ _svcs() {
 	)
 
 	_arguments -s \
-		'(-l -x -d -D)-a[List all instances]' \
-		'(-l -x -D -a -R)-d[List dependencies]' \
-		'(-l -x -d -a -R)-D[List dependents]' \
-		'(-l -x)-H[Suppress header line]' \
-		'(-x -d -D -a -R -s)-l[Print detailed status about services and instances]' \
-		'(-l -x)-o[Display specific columns]:column:_values -s , "column" ${^cols/\:/[}\]' \
-		'(-l -x)-p[List processes]' \
-		'(-l -x -d -D)-R[List services with the given restarter]:instance FMRI:_svcs_fmri -i' \
-		'(-l -x)-s[Sort by a column]:column:(($cols))' \
-		'(-l -x)-S[Reverse sort by a column]:column:(($cols))' \
+		'(-l -x -d -D)-a[list all instances]' \
+		'(-l -x -D -a -R)-d[list dependencies]' \
+		'(-l -x -d -a -R)-D[list dependents]' \
+		'(-l -x)-H[suppress header line]' \
+		'(-x -d -D -a -R -s)-l[print detailed status about services and instances]' \
+		'(-l -x)-o[display specific columns]:column:_values -s , "column" ${^cols/\:/[}\]' \
+		'(-l -x)-p[list processes]' \
+		'(-l -x -d -D)-R[list services with the given restarter]:instance FMRI:_svcs_fmri -i' \
+		'(-l -x)-s[sort by a column]:column:(($cols))' \
+		'(-l -x)-S[reverse sort by a column]:column:(($cols))' \
 		'-v[verbose columns]' \
-		'(-l)-x[Display explanation for service states]' \
-		'(-l -x)-\?[Print help]' \
+		'(-l)-x[display explanation for service states]' \
+		'(-l -x)-\?[print help]' \
 		'*:FMRI or pattern:_svcs_fmri -i'
 }
 

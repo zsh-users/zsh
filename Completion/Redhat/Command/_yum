@@ -8,19 +8,19 @@ _yum()
 	_arguments -s \
 	   {-h,--help}'[show the help message]' \
 	   {-t,--tolerant}'[be tolerant of errors]' \
-	   '-C[Run entirely from cache]' \
-	   '-c[Config file location]:Yum conf file:_files' \
-	   '-R[Maximum command wait time (in minutes)]:Max wait time' \
-	   '-d[Debug level (0-10)]:Debug level' \
-	   '-e[Error level (0-10)]:Error level' \
-	   '-y[Answer yes for all questions]' \
-	   '--installroot=[Set install root]:Install Root:_files -/' \
-	   '*--enablerepo=[Enable or or more repositories]:Repos to enable:_yum_disabled_repos_list' \
-	   '*--disablerepo=[Disable one or more repositories]:Disable Repos:_yum_enabled_repos_list' \
-	   '--exclude=[Exclude package(s) by name or glob]:Exclude Packages' \
-	   '--version[Show yum version]' \
-	   '--obseletes[Enable obsoletes processing during updates]' \
-	   '--noplugins[Disable yum plugins]' \
+	   '-C[run entirely from cache]' \
+	   '-c[config file location]:Yum conf file:_files' \
+	   '-R[maximum command wait time (in minutes)]:max wait time' \
+	   '-d[debug level (0-10)]:debug level' \
+	   '-e[error level (0-10)]:error level' \
+	   '-y[answer yes for all questions]' \
+	   '--installroot=[set install root]:install root:_files -/' \
+	   '*--enablerepo=[enable or or more repositories]:repos to enable:_yum_disabled_repos_list' \
+	   '*--disablerepo=[disable one or more repositories]:disable repos:_yum_enabled_repos_list' \
+	   '--exclude=[exclude package(s) by name or glob]:exclude packages' \
+	   '--version[show yum version]' \
+	   '--obseletes[enable obsoletes processing during updates]' \
+	   '--noplugins[disable yum plugins]' \
 	   '*::yum command:_yum_command'
 }
 
@@ -28,29 +28,29 @@ _yum()
 {
   	local -a _yum_cmds
   	_yum_cmds=(
-		"install:Install the latest version of a package or group of packages"
-		"erase:Remove an installed package (with its dependencies)"
-		"remove:Remove an installed package (with its dependencies)"
-		"clean:Clean local yum cache"
-		"deplist:Gives a list of all dependencies for a package"
-		"check-update:Check if any updates are available"
-		"info:Get description of available packages"
-		"list:Is used to list various information about packages"
-		"groupinfo:Get info on package groups"
-		"groupinstall:Install a package group or groups"
-		"groupremove:Remove a package group or groups"
-		"grouplist:List package groups"
-		"groupupdate:Update a package group or groups"
-		"localinstall:Install packages with local rpm files"
-		"localupdate:Update packages with local rpm files"
-		"makecache:Makes a local yum cache"
-		"provides:Find out which package provides some feature or file"
-		"whatprovides:Find out which package provides some feature or file"
-		"resolvedep:List packages providing the specified dependencies"
-		"search:Find any packages matching pattern"
-		"shell:Enter the 'yum shell'"
-		"update:Update one or more packages"
-		"upgrade:Upgrade one or more packages"
+		"install:install the latest version of a package or group of packages"
+		"erase:remove an installed package (with its dependencies)"
+		"remove:remove an installed package (with its dependencies)"
+		"clean:clean local yum cache"
+		"deplist:gives a list of all dependencies for a package"
+		"check-update:check if any updates are available"
+		"info:get description of available packages"
+		"list:is used to list various information about packages"
+		"groupinfo:get info on package groups"
+		"groupinstall:install a package group or groups"
+		"groupremove:remove a package group or groups"
+		"grouplist:list package groups"
+		"groupupdate:update a package group or groups"
+		"localinstall:install packages with local rpm files"
+		"localupdate:update packages with local rpm files"
+		"makecache:makes a local yum cache"
+		"provides:find out which package provides some feature or file"
+		"whatprovides:find out which package provides some feature or file"
+		"resolvedep:list packages providing the specified dependencies"
+		"search:find any packages matching pattern"
+		"shell:enter the 'yum shell'"
+		"update:update one or more packages"
+		"upgrade:upgrade one or more packages"
   	)
 
   	if (( CURRENT == 1 )); then

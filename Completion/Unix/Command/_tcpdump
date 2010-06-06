@@ -46,47 +46,47 @@ _bpf_filter () {
 }
 
 _arguments \
-  '()-A[Print each packet in ASCII]' \
-  -c'[Exit after receiving specified number of packets]:number of packets' \
-  -C'[Specify output file size in MB (10e6 bytes)]:output file size' \
-  '(-ddd)-d[Dump the compiled packet-matching code in a human readable form]' \
-  '(-ddd)-dd[Dump packet-matching code as a C program fragment]' \
-  '(-d -dd)-ddd[Dump packet-matching code as decimal numbers (preceded with a count)]' \
-  '(-A -c -C -d -dd -ddd -e -E -f -F -i -l -L -m -M -n -N -O -p -q -R -r -S -s -T -t -tt -ttt -tttt -u -U -v -vv -vvv -w -W -x -xx -X -XX -y -Z *)'-D'[Print the list of the network interfaces available on the system]' \
-  -e'[Print the link-level header on each dump line]' \
-  -E"[Decrypting IPsec ESP packets]:spi@ipaddr::algo\:secret:_esp_secrets" \
-  -f"[Print 'foreign' IPv4 addresses numerically]" \
+  '()-A[print each packet in ASCII]' \
+  -c'[exit after receiving specified number of packets]:number of packets' \
+  -C'[specify output file size in MB (10e6 bytes)]:output file size' \
+  '(-ddd)-d[dump the compiled packet-matching code in a human readable form]' \
+  '(-ddd)-dd[dump packet-matching code as a C program fragment]' \
+  '(-d -dd)-ddd[dump packet-matching code as decimal numbers (preceded with a count)]' \
+  '(-A -c -C -d -dd -ddd -e -E -f -F -i -l -L -m -M -n -N -O -p -q -R -r -S -s -T -t -tt -ttt -tttt -u -U -v -vv -vvv -w -W -x -xx -X -XX -y -Z *)'-D'[print the list of the network interfaces available on the system]' \
+  -e'[print the link-level header on each dump line]' \
+  -E"[decrypting IPsec ESP packets]:spi@ipaddr::algo\:secret:_esp_secrets" \
+  -f"[print 'foreign' IPv4 addresses numerically]" \
   -F'[input file for the filter expression]:filter expression file:_files' \
-  -i'[Interface]:interface:_interfaces' \
-  -l'[Make stdout line buffered]' \
-  '(-A -c -C -d -dd -ddd -e -E -f -F -l -D -m -M -n -N -O -p -q -R -r -S -s -T -t -tt -ttt -tttt -u -U -v -vv -vvv -w -W -x -xx -X -XX -y -Z *)'-L'[List the known data link types for the interface]' \
-  '*-m[Load SMI MIB module definitions]:SMI MIB module definitions:_files' \
+  -i'[interface]:interface:_interfaces' \
+  -l'[make stdout line buffered]' \
+  '(-A -c -C -d -dd -ddd -e -E -f -F -l -D -m -M -n -N -O -p -q -R -r -S -s -T -t -tt -ttt -tttt -u -U -v -vv -vvv -w -W -x -xx -X -XX -y -Z *)'-L'[list the known data link types for the interface]' \
+  '*-m[load SMI MIB module definitions]:SMI MIB module definitions:_files' \
   -M'[shared secret for validating the digests in TCP segments with the TCP-MD5 option]:secret' \
-  -n"[Don't convert addresses to names]" \
-  -N"[Don't print domain name qualification of host names]" \
-  -O"[Don't run the packet-matching code optimizer]" \
-  -p"[Don't put the interface into promiscuous mode]" \
-  -q'[Quick (quiet?) output]' \
-  -R'[Assume ESP/AH packets to be based on old specification (RFC1825 to RFC1829)]' \
-  -r'[Read packets from file]:input file:_files' \
-  -S'[Print absolute TCP sequence numbers]' \
-  -s'[Specify number of bytes of data to snarf from each packet]:number of bytes to snap' \
-  -T'[Interpret captured packets as specified type]:packet type:_packet_types' \
-  "(-tttt)-t[Don't print a timestamp on each dump line]" \
-  '(-ttt -tttt)-tt[Print an unformatted timestamp on each dump line]' \
-  '(-tt -tttt)-ttt[Print a delta (in micro-seconds) between current and previous line on each dump line]' \
-  '(-t -tt -ttt)-tttt[Print a timestamp in default format proceeded by date on each dump line]' \
-  -u'[Print undecoded NFS handles]' \
-  -U'[Make output packet-buffered when saving to file (-w)]' \
+  -n"[don't convert addresses to names]" \
+  -N"[don't print domain name qualification of host names]" \
+  -O"[don't run the packet-matching code optimizer]" \
+  -p"[don't put the interface into promiscuous mode]" \
+  -q'[quick (quiet?) output]' \
+  -R'[assume ESP/AH packets to be based on old specification (RFC1825 to RFC1829)]' \
+  -r'[read packets from file]:input file:_files' \
+  -S'[print absolute TCP sequence numbers]' \
+  -s'[specify number of bytes of data to snarf from each packet]:number of bytes to snap' \
+  -T'[interpret captured packets as specified type]:packet type:_packet_types' \
+  "(-tttt)-t[don't print a timestamp on each dump line]" \
+  '(-ttt -tttt)-tt[print an unformatted timestamp on each dump line]' \
+  '(-tt -tttt)-ttt[print a delta (in micro-seconds) between current and previous line on each dump line]' \
+  '(-t -tt -ttt)-tttt[print a timestamp in default format proceeded by date on each dump line]' \
+  -u'[print undecoded NFS handles]' \
+  -U'[make output packet-buffered when saving to file (-w)]' \
   '(-vvv)-v[slightly more verbose output]' \
   '(-vvv)-vv[more verbose output]' \
   '(-v -vv)-vvv[most verbose output]' \
-  -w'[Write the raw packets to file]:output file:_files' \
-  -W'[Limit the number of created files (-C)]:number of files' \
-  -x'[Print each packet (minus its link level header) in hex]' \
-  '(-x)-xx[Print each packet, including its link level header, in hex]' \
-  -X'[Print each packet (minus its link level header) in hex and ASCII]' \
-  '(-X)-XX[Print each packet, including its link level header, in hex and ASCII]' \
-  -y'[Set the data link type to use while capturing packets]:data link type:_data_link_types' \
-  -Z'[Drops privileges (if root) and changes user ID (along with primary group)]:user:_users' \
+  -w'[write the raw packets to file]:output file:_files' \
+  -W'[limit the number of created files (-C)]:number of files' \
+  -x'[print each packet (minus its link level header) in hex]' \
+  '(-x)-xx[print each packet, including its link level header, in hex]' \
+  -X'[print each packet (minus its link level header) in hex and ASCII]' \
+  '(-X)-XX[print each packet, including its link level header, in hex and ASCII]' \
+  -y'[set the data link type to use while capturing packets]:data link type:_data_link_types' \
+  -Z'[drops privileges (if root) and changes user ID (along with primary group)]:user:_users' \
   '*:BPF filter:_bpf_filter'

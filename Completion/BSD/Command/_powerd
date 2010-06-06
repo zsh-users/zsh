@@ -3,11 +3,11 @@
 local powerd_mode
 powerd_mode=(minimum maximum adaptative)
 _arguments -s \
-    "-a[Mode to use while on AC power]:mode:($powerd_mode)" \
-    "-b[Mode to use while on battery power]:mode:($powerd_mode)" \
+    "-a[mode to use while on AC power]:mode:($powerd_mode)" \
+    "-b[mode to use while on battery power]:mode:($powerd_mode)" \
     '-i[CPU idle percent level when begin to degrade performance]:percent:' \
     "-n[mode to use normally when the AC line state is unknown]:mode:($powerd_mode)" \
     '-p[polling interval (in milliseconds) for AC line state and system idle levels]:interval:' \
-    '-P[Alternative pidfile]:pidfile:_files' \
+    '-P[alternative pidfile]:pidfile:_files' \
     '-r[CPU idle percent level where to increase performance]:percent:' \
-    '-v[Verbose mode]'
+    '-v[verbose mode]'

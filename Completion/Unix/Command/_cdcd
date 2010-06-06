@@ -32,7 +32,7 @@ _cdcd_commands ()
     'list:list all CDs in a CD-ROM changer'
     'slot:changes the current CD in the CD-ROM changer'
     'edit:edit information about the disc'
-    'ext:Extended information about the disc'
+    'ext:extended information about the disc'
     'refresh:refresh the information about the CD from a CDDB server'
     'device:change the CD-ROM device cdcd will use'
     'verbose:toggle verbosity'

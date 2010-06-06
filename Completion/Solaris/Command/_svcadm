@@ -8,7 +8,7 @@ _svcadm() {
 
 	if [[ $service == "svcadm" ]]; then
 		_arguments -C -A "-*" \
-			'-v[Print actions verbosely]' \
+			'-v[print actions verbosely]' \
 			'*::command:->subcmd' && return 0
 
 		if (( CURRENT == 1 )); then
@@ -22,23 +22,23 @@ _svcadm() {
 	case $service in
 	(enable)
 		_arguments \
-			'-r[Recursively enable dependencies]' \
-			'-s[Wait for service to come online]' \
-			'-t[State change is temporary]' \
+			'-r[recursively enable dependencies]' \
+			'-s[wait for service to come online]' \
+			'-t[state change is temporary]' \
 			'*:instance FMRI:_svcs_fmri -i'
 		;;
 
 	(disable)
 		_arguments \
-			'-s[Wait for service to become disabled]' \
-			'-t[State change is temporary]' \
+			'-s[wait for service to become disabled]' \
+			'-t[state change is temporary]' \
 			'*:instance FMRI:_svcs_fmri -i'
 		;;
 
 	(mark)
 		_arguments \
-			'-I[Change state immediately]' \
-			'-t[State change is temporary]' \
+			'-I[change state immediately]' \
+			'-t[state change is temporary]' \
 			':state:(degraded maintenance)' \
 			':instance FMRI:_svcs_fmri -i'
 		;;
@@ -50,7 +50,7 @@ _svcadm() {
 
 	(milestone)
 		_arguments \
-			'-d[Make milestone the default]' \
+			'-d[make milestone the default]' \
 			'*:milestone FMRI:_svcs_fmri -m'
 		;;
 
