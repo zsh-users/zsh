@@ -1,3 +1,8 @@
+2010-06-08  Doug Kearns  <dougkearns@gmail.com>
+
+	* unposted: Completion/Mandriva/Command/_urpmi: fix typo in parameter
+	name.
+
 2010-06-07  Peter Stephenson  <pws@csr.com>
 
 	* Alexey: 27999: Test/V01zmodload.ztst: fix error message.
@@ -13252,5 +13257,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4994 $
+* $Revision: 1.4995 $
 *****************************************************
