@@ -1,3 +1,7 @@
+2010-06-07  Doug Kearns  <dougkearns@gmail.com>
+
+	* Simon Ruderich: 28002: Completion/Unix/Command/_feh: fix bad commit.
+
 2010-06-06  Doug Kearns  <dougkearns@gmail.com>
 
 	* unposted: Completion/BSD/Command/_csup,
@@ -13244,5 +13248,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4992 $
+* $Revision: 1.4993 $
 *****************************************************
