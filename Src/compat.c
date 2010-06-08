@@ -275,11 +275,7 @@ zgetdir(struct dirsav *d)
     buf[pos] = '\0';
     strcpy(nbuf, "../");
     if (stat(".", &sbuf) < 0) {
-	if (d)
-	    return NULL;
-	buf[0] = '.';
-	buf[1] = '\0';
-	return buf;
+	return NULL;
     }
 
     /* Record the initial inode and device */
@@ -354,6 +350,11 @@ zgetdir(struct dirsav *d)
 	closedir(dir);
 	if (!de)
 	    break;		/* Not found */
+	/*
+	 * We get the "/" free just by copying from nbuf+2 instead
+	 * of nbuf+3, which is where we copied the path component.
+	 * This means buf[pos] is always a "/".
+	 */
 	len = strlen(nbuf + 2);
 	pos -= len;
 	while (pos <= 1) {
@@ -371,15 +372,22 @@ zgetdir(struct dirsav *d)
 	if (chdir(".."))
 	    break;
     }
+
+    /*
+     * Fix up the directory, if necessary.
+     * We're changing back down the hierarchy, ignore the
+     * "/" at buf[pos].
+     */
     if (d) {
 #ifndef HAVE_FCHDIR
-	if (*buf)
+	if (buf[pos])
 	    zchdir(buf + pos + 1);
 	noholdintr();
 #endif
 	return NULL;
     }
-    if (*buf)
+
+    if (buf[pos])
 	zchdir(buf + pos + 1);
     noholdintr();
 
@@ -397,16 +405,36 @@ zgetdir(struct dirsav *d)
     }
 #endif
 
-    buf[0] = '.';
-    buf[1] = '\0';
-    return buf;
+    /*
+     * Something bad happened.
+     * This has been seen when inside a special directory,
+     * such as the Netapp .snapshot directory, that doesn't
+     * appear as a directory entry in the parent directory.
+     * We'll just need our best guess.
+     *
+     * We only get here from zgetcwd(); let that fall back to pwd.
+     */
+
+    return NULL;
 }
+
+/*
+ * Try to find the current directory.
+ * If it fails, fall back to pwd; if zgetcwd() is being used
+ * to set pwd, pwd should be NULL and we just return ".".
+ * We could fall back to getcwd() instead.
+ */
 
 /**/
 char *
 zgetcwd(void)
 {
-    return zgetdir(NULL);
+    char *ret = zgetdir(NULL);
+    if (!ret)
+	ret = pwd;
+    if (!ret)
+	ret = dupstring(".");
+    return ret;
 }
 
 /* chdir with arbitrary long pathname.  Returns 0 on success, -1 on normal *

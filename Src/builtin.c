@@ -805,6 +805,7 @@ bin_cd(char *nam, char **argv, Options ops, int func)
     if (stat(unmeta(pwd), &st1) < 0) {
 	setjobpwd();
 	zsfree(pwd);
+	pwd = NULL;
 	pwd = metafy(zgetcwd(), -1, META_DUP);
     } else if (stat(".", &st2) < 0) {
 	if (chdir(unmeta(pwd)) < 0)
@@ -813,6 +814,7 @@ bin_cd(char *nam, char **argv, Options ops, int func)
 	if (chasinglinks) {
 	    setjobpwd();
 	    zsfree(pwd);
+	    pwd = NULL;
 	    pwd = metafy(zgetcwd(), -1, META_DUP);
 	} else if (chdir(unmeta(pwd)) < 0)
 	    zwarn("unable to chdir(%s): %e", pwd, errno);

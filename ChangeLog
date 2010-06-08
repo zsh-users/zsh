@@ -1,3 +1,9 @@
+2010-06-08  Peter Stephenson  <pws@csr.com>
+
+	* 28006: Src/builtin.c, Src/compat.c, Src/init.c: Make zgetcwd()
+	fall back to pwd in preference to returning "."; only use "." if
+	we're trying to set pwd at that point.
+
 2010-06-08  Doug Kearns  <dougkearns@gmail.com>
 
 	* unposted: Completion/Mandriva/Command/_urpmi: fix typo in parameter
@@ -13257,5 +13263,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4995 $
+* $Revision: 1.4996 $
 *****************************************************
