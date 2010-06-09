@@ -1,3 +1,7 @@
+2010-06-09  Peter Stephenson  <pws@csr.com>
+
+	* Haakon Riiser: 28009: Completion/Unix/Command/_ffmpeg: new.
+
 2010-06-08  Peter Stephenson  <pws@csr.com>
 
 	* 28006: Src/builtin.c, Src/compat.c, Src/init.c: Make zgetcwd()
@@ -13263,5 +13267,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4996 $
+* $Revision: 1.4997 $
 *****************************************************

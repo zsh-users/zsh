@@ -1,0 +1,163 @@
+#compdef ffmpeg
+
+local context state line
+typeset -A opt_args
+
+local BOLD=$'\e[1m'
+local NORM=$'\e[m'
+
+_ffmpeg_compadd() {
+    compadd -X "${BOLD}$1${NORM}" -q -S "$3" -a $2
+}
+
+_ffmpeg_presets() {
+    local presets
+    presets=(~/.ffmpeg/*.ffpreset(:t:r) "$FFMPEG_DATADIR"/*.ffpreset(:t:r))
+    _ffmpeg_compadd 'select preset' presets ''
+}
+
+_ffmpeg_acodecs() {
+    local acodecs
+    acodecs=($(ffmpeg -codecs 2>/dev/null | sed -n '/^ .[E ]A/ {s/^ .......//; s/ .*//p;}'))
+    _ffmpeg_compadd 'force audio codec (''copy'' to copy stream)' acodecs ''
+}
+
+_ffmpeg_vcodecs() {
+    local vcodecs
+    vcodecs=($(ffmpeg -codecs 2>/dev/null | sed -n '/^ .[E ]V/ {s/^ .......//; s/ .*//p;}'))
+    _ffmpeg_compadd 'force video codec (''copy'' to copy stream)' vcodecs ''
+}
+
+_ffmpeg_formats() {
+    local formats
+    formats=($(ffmpeg -formats 2>/dev/null | sed -e '1,/--/d' -e 's/^....//' -e 's/ .*//' | tr , '\n' | sort | uniq))
+    _ffmpeg_compadd 'force format' formats ''
+}
+
+_ffmpeg_list_pix_fmts() {
+    ffmpeg -pix_fmts 2>/dev/null | sed -e '1,/-----/d' -e 's/^......//' -e 's/ .*//'
+}
+
+_ffmpeg_pix_fmts() {
+    local pix_fmts
+    pix_fmts=($(_ffmpeg_list_pix_fmts))
+    _ffmpeg_compadd 'set pixel format' pix_fmts ''
+}
+
+_ffmpeg_bsfs() {
+    local bsfs
+    bsfs=($(ffmpeg -bsfs 2>/dev/null | sed 1d))
+    _ffmpeg_compadd 'set bitstream filter' bsfs ''
+}
+
+_ffmpeg_argspecs="$(ffmpeg -h 2>/dev/null | perl -e '
+my $lastopt;
+my $lastopt_description;
+my $lastopt_takesargs;
+my @lastopt_values;
+while (<>) {
+    if (/^(-\S+)\s+(\S.+)$/) {
+        print_opt();
+        $lastopt = $1;
+        $lastopt_description = $2;
+        if ($lastopt_description =~ /<\w+>/) {
+            $lastopt_description =~ s/<.*?>\s+//;
+            $lastopt_description =~ s/\S{5} ?//;
+            $lastopt_description = $lastopt if not $lastopt_description;
+            escape_str($lastopt_description);
+        } elsif ($lastopt_description =~ /^(\S+)\s\s+/) {
+            my $example = $1;
+            $lastopt_description =~ s/^\S+\s\s+//;
+            escape_str($example);
+            escape_str($lastopt_description);
+            if ($example eq q(filename)) {
+                $lastopt_takesargs = 0;
+                $lastopt .= qq(:$lastopt_description:_files);
+            } elsif ($lastopt =~ /^-[asv]pre$/) {
+                $lastopt_takesargs = 0;
+                $lastopt .= qq(: :_ffmpeg_presets);
+            } elsif ($lastopt eq q(-acodec)) {
+                $lastopt_takesargs = 0;
+                $lastopt .= qq(: :_ffmpeg_acodecs);
+            } elsif ($lastopt eq q(-vcodec)) {
+                $lastopt_takesargs = 0;
+                $lastopt .= qq(: :_ffmpeg_vcodecs);
+            } elsif ($lastopt eq q(-f)) {
+                $lastopt_takesargs = 0;
+                $lastopt .= qq(: :_ffmpeg_formats);
+            } elsif ($lastopt eq q(-pix_fmt)) {
+                $lastopt_takesargs = 0;
+                $lastopt .= qq(: :_ffmpeg_pix_fmts);
+            } elsif ($example eq q(bitstream_filter)) {
+                $lastopt_takesargs = 0;
+                $lastopt .= qq(: :_ffmpeg_bsfs);
+            } else {
+                $lastopt_takesargs = 1;
+                $lastopt_description .= qq{ ($example)};
+            }
+        } else {
+            $lastopt_takesargs = 0;
+            if ($lastopt eq q(-vfilters)) {
+                $lastopt .= qq(: :->vfilters);
+            }
+        }
+        @lastopt_values = ();
+    } elsif (/^   (\S+)/) {
+        $lastopt_takesargs = 1;
+        push @lastopt_values, $1;
+    }
+}
+print_opt();
+exit;
+
+sub escape_str {
+    $_[0] =~ s/:/\\:/g;
+}
+
+sub print_opt {
+    return if not $lastopt;
+
+    print qq($lastopt);
+    if (!$lastopt_takesargs) {
+        print qq(\n);
+    } else {
+        print qq(:$lastopt_description:);
+        if (@lastopt_values) {
+            printf qq{(%s)}, join(q( ), @lastopt_values);
+        }
+        print qq(\n);
+    }
+}
+')"
+_ffmpeg_argspecs=(${(f)_ffmpeg_argspecs})
+
+_arguments -S \
+    "${_ffmpeg_argspecs[@]}" \
+    '*:output file:_files' \
+    && return 0
+
+[[ "$state" == "vfilters" ]] &&
+ _values -s , -S = 'video filters' \
+ 'aspect:set aspect ratio (rational number X\:Y or decimal number):' \
+ 'crop:crop input video (x\:y\:width\:height):' \
+ 'format: :->format' \
+ 'noformat: :->noformat' \
+ 'null' \
+ 'pad:add pads to the input image (width\:height\:x\:y\:color_string):' \
+ 'pixelaspect:set pixel aspect ratio (rational number X\:Y or decimal number):' \
+ 'scale:scale input video (width\:height):' \
+ 'slicify:output slice height ("random" or a number of pixels):' \
+ 'unsharp:luma_x\:luma_y\:luma_amount\:chroma_x\:chroma_y\:chroma_amount:' \
+ 'vflip' \
+ 'buffer' \
+ 'nullsrc' \
+ 'nullsink' \
+ && return 0
+
+[[ "$state" == "format" ]] &&
+ _values -s : -S = 'convert input video to one of the specified pixel formats' $(_ffmpeg_list_pix_fmts) && return 0
+
+[[ "$state" == "noformat" ]] &&
+ _values -s : -S = 'disable specified pixel formats by force' $(_ffmpeg_list_pix_fmts) && return 0
+
+return 1
