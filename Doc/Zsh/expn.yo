@@ -1451,6 +1451,12 @@ parts of the directory path, as described below; it is used if the prefix
 length matched (16 in the example) is longer than that matched by any
 static name.
 
+The completion system calls `tt(zsh_directory_name c)' in order to
+completion dynamic names for directories.  The code for this should be
+as for any other completion function as described in
+ifnzman(noderef(Completion System))\
+ifzman(zmanref(zshcompsys)).
+
 As a working example, here is a function that expands any dynamic names
 beginning with the string tt(p:) to directories below
 tt(/home/pws/perforce).  In this simple case a static name for the
@@ -1461,16 +1467,28 @@ example(zsh_directory_name+LPAR()RPAR() {
   setopt extendedglob
   local -a match mbegin mend
   if [[ $1 = d ]]; then
+    # turn the directory into a name
     if [[ $2 = (#b)(/home/pws/perforce/)([^/]##)* ]]; then
       typeset -ga reply
       reply=(p:$match[2] $(( ${#match[1]} + ${#match[2]} )) )
     else
       return 1
     fi
-  else
+  elif [[ $1 = n ]]; then
+    # turn the name into a directory
     [[ $2 != (#b)p:(?*) ]] && return 1
     typeset -ga reply
     reply=(/home/pws/perforce/$match[1])
+  elif [[ $1 = c ]]; then
+    # complete names
+    local expl
+    local -a dirs
+    dirs=(/home/pws/perforce/*(/:t))
+    dirs=(p:${^dirs})
+    _wanted dynamic-dirs expl 'dynamic directory' compadd -S\] -a dirs
+    return
+  else
+    return 1
   fi
   return 0
 })

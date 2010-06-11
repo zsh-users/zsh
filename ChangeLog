@@ -1,5 +1,9 @@
 2010-06-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 28026: Completion/Zsh/Context/_dynamic_directory_name,
+	Doc/Zsh/expn.yo: use "zsh_directory_name c" for completion
+	of dynamic directory names.
+
 	* 28025: Doc/Zsh/expn.yo, Src/subst.c, Src/utils.c: (D)
 	parameter flag to abbreviate directories.
 
@@ -13272,5 +13276,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4998 $
+* $Revision: 1.4999 $
 *****************************************************
