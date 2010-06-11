@@ -766,6 +766,23 @@ fprintdir(char *s, FILE *f)
     }
 }
 
+/*
+ * Substitute a directory using a name.
+ * If there is none, return the original argument.
+ */
+
+/**/
+char *
+substnamedir(char *s)
+{
+    Nameddir d = finddir(s);
+
+    if (!d)
+	return s;
+    return zhtricat("~", d->node.nam, s + strlen(d->dir));
+}
+
+
 /* Returns the current username.  It caches the username *
  * and uid to try to avoid requerying the password files *
  * or NIS/NIS+ database.                                 */

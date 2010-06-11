@@ -771,6 +771,13 @@ Capitalize the resulting words.  `Words' in this case refers to sequences
 of alphanumeric characters separated by non-alphanumerics, em(not) to words
 that result from field splitting.
 )
+item(tt(D))(
+Assume the string or array elements contain directories and attempt
+to substitute the leading part of these by names.  This is the reverse
+of `tt(~)' substitution:  see
+ifnzman(noderef(Filename Expansion))\
+ifzman(the section FILENAME EXPANSION below).
+)
 item(tt(e))(
 Perform em(parameter expansion), em(command substitution) and
 em(arithmetic expansion) on the result. Such expansions can be
@@ -1199,40 +1206,43 @@ item(tt(13.) em(Quote application))(
 Any quoting or unquoting using tt((q)) and tt((Q)) and related flags
 is applied.
 )
-item(tt(14.) em(Visibility enhancment))(
+item(tt(14.) em(Directory naming))(
+Any directory name substitution using tt((D)) flag is applied.
+)
+item(tt(15.) em(Visibility enhancment))(
 Any modifications to make characters visible using the tt((V)) flag
 are applied.
 )
-item(tt(15.) em(Forced Splitting))(
+item(tt(16.) em(Forced Splitting))(
 If one of the `tt((s))', `tt((f))' or `tt((z))' flags are present, or the `tt(=)'
 specifier was present (e.g. tt(${=)var(var)tt(})), the word is split on
 occurrences of the specified string, or (for tt(=) with neither of the two
 flags present) any of the characters in tt($IFS).
 )
-item(tt(16.) em(Shell Word Splitting))(
+item(tt(17.) em(Shell Word Splitting))(
 If no `tt((s))', `tt((f))' or `tt(=)' was given, but the word is not
 quoted and the option tt(SH_WORD_SPLIT) is set, the word is split on
 occurrences of any of the characters in tt($IFS).  Note this step, too,
 takes place at all levels of a nested substitution.
 )
-item(tt(17.) em(Uniqueness))(
+item(tt(18.) em(Uniqueness))(
 If the result is an array and the `tt((u))' flag was present, duplicate
 elements are removed from the array.
 )
-item(tt(18.) em(Ordering))(
+item(tt(19.) em(Ordering))(
 If the result is still an array and one of the `tt((o))' or `tt((O))' flags
 was present, the array is reordered.
 )
-item(tt(19.) em(Re-Evaluation))(
+item(tt(20.) em(Re-Evaluation))(
 Any `tt((e))' flag is applied to the value, forcing it to be re-examined
 for new parameter substitutions, but also for command and arithmetic
 substitutions.
 )
-item(tt(20.) em(Padding))(
+item(tt(21.) em(Padding))(
 Any padding of the value by the `tt(LPAR()l.)var(fill)tt(.RPAR())' or
 `tt(LPAR()r.)var(fill)tt(.RPAR())' flags is applied.
 )
-item(tt(21.) em(Semantic Joining))(
+item(tt(22.) em(Semantic Joining))(
 In contexts where expansion semantics requires a single word to
 result, all words are rejoined with the first character of tt(IFS)
 between.  So in `tt(${LPAR()P)tt(RPAR()${LPAR()f)tt(RPAR()lines}})'
@@ -1241,7 +1251,7 @@ joined again before the tt(P) flag can be applied.
 
 If a single word is not required, this rule is skipped.
 )
-item(tt(22.) em(Empty argument removal))(
+item(tt(23.) em(Empty argument removal))(
 If the substitution does not appear in double quotes, any resulting
 zero-length argument, whether from a scalar or an element of an array,
 is elided from the list of arguments inserted into the command line.

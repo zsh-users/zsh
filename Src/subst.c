@@ -1459,14 +1459,16 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      */
     int quotemod = 0, quotetype = QT_NONE, quoteerr = 0;
     /*
-     * (V) flag: fairly straightforward, except that as with so
-     * many flags it's not easy to decide where to put it in the order.
+     * Various fairly straightforward modifications, except that as with so
+     * many flags it's not easy to decide where to put them in the order.
+     * bit 0: (D) flag.
+     * bit 1: (V) flag.
      */
-    int visiblemod = 0;
+    int mods = 0;
     /*
      * The (z) flag, nothing to do with SH_WORD_SPLIT which is tied
      * spbreak, see above; fairly straighforward in use but c.f.
-     * the comment for visiblemod.
+     * the comment for mods.
      */
     int shsplit = 0;
     /*
@@ -1514,7 +1516,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      */
     int aspar = 0;
     /*
-     * The (%) flag, c.f. visiblemod again.
+     * The (%) flag, c.f. mods again.
      */	
     int presc = 0;
     /*
@@ -1678,8 +1680,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    indord = 1;
 		    break;
 
+		case 'D':
+		    mods |= 1;
+		    break;
 		case 'V':
-		    visiblemod++;
+		    mods |= 2;
 		    break;
 
 		case 'q':
@@ -2954,19 +2959,26 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     }
     /*
      * Transform special characters in the string to make them
-     * printable.
+     * printable, or to show directories, or possibly even both.
      */
-    if (visiblemod) {
+    if (mods) {
 	if (isarr) {
 	    char **ap;
 	    if (!copied)
 		aval = arrdup(aval), copied = 1;
-	    for (ap = aval; *ap; ap++)
-		*ap = nicedupstring(*ap);
+	    for (ap = aval; *ap; ap++) {
+		if (mods & 1)
+		    *ap = substnamedir(*ap);
+		if (mods & 2)
+		    *ap = nicedupstring(*ap);
+	    }
 	} else {
 	    if (!copied)
 		val = dupstring(val), copied = 1;
-	    val = nicedupstring(val);
+	    if (mods & 1)
+		val = substnamedir(val);
+	    if (mods & 2)
+		val = nicedupstring(val);
 	}
     }
     /*

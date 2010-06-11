@@ -1,3 +1,8 @@
+2010-06-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28025: Doc/Zsh/expn.yo, Src/subst.c, Src/utils.c: (D)
+	parameter flag to abbreviate directories.
+
 2010-06-09  Peter Stephenson  <pws@csr.com>
 
 	* Haakon Riiser: 28009: Completion/Unix/Command/_ffmpeg: new.
@@ -13267,5 +13272,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.4997 $
+* $Revision: 1.4998 $
 *****************************************************
