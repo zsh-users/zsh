@@ -1452,7 +1452,7 @@ length matched (16 in the example) is longer than that matched by any
 static name.
 
 The completion system calls `tt(zsh_directory_name c)' in order to
-completion dynamic names for directories.  The code for this should be
+complete dynamic names for directories.  The code for this should be
 as for any other completion function as described in
 ifnzman(noderef(Completion System))\
 ifzman(zmanref(zshcompsys)).
