@@ -23,6 +23,19 @@
 #   from 1900 to 2099 inclusive are matched.
 # - Although timezones are parsed (complicated formats may not be recognized),
 #   they are then ignored; no time adjustment is made.
+# - Embedding of times within dates (e.g. "Wed Jun 16 09:30:00 BST 2010")
+#   causes horrific problems because of the combination of the many
+#   possible date and time formats to match.  The approach taken
+#   here is to match the time, remove it, and see if the nearby text
+#   looks like a date.  The problem is that the time matched may not
+#   be that associated with the date, in which case the time will be
+#   ignored.  To minimise this, when the argument "-a" is given to
+#   anchor the date/time to the start of the line, we never look
+#   beyond a newline.  So if any date/time strings in the text
+#   are on separate lines the problem is avoided.
+# - If you feel sophisticated enough and wish to avoid any ambiguity,
+#   you can use RFC 2445 date/time strings, for example 20100601T170000.
+#   These are parsed in one go.
 #
 # The following give some obvious examples; users finding here
 # a format they like and not subject to vagaries of style may skip
@@ -136,7 +149,7 @@
 # In this case absolute dates are ignored.
 
 emulate -L zsh
-setopt extendedglob
+setopt extendedglob # xtrace
 
 zmodload -i zsh/datetime || return 1
 
@@ -145,7 +158,7 @@ zmodload -i zsh/datetime || return 1
 # relatively logical dates like 2006/09/19:14:27
 # don't allow / before time !  the above
 # is not 19 hours 14 mins and 27 seconds after anything.
-local tschars="[-,:[:space:]]"
+local tschars="[-,:[:blank:]]"
 # start pattern for time when anchored
 local tspat_anchor="(${tschars}#)"
 # ... when not anchored
@@ -175,9 +188,10 @@ local repat="(|s)(|${schars}*)"
 # We may need some completely different heuristic.
 local monthpat="(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]#"
 integer daysecs=$(( 24 * 60 * 60 ))
+local d="[[:digit:]]"
 
 integer year year2 month month2 day day2 hour minute second then nth wday wday2
-local opt line orig_line mname MATCH MBEGIN MEND tz test
+local opt line orig_line mname MATCH MBEGIN MEND tz test rest_line
 local -a match mbegin mend
 # Flags that we found a date or a time (maybe a relative time)
 integer date_found time_found
@@ -237,7 +251,7 @@ while getopts "aAdmrR:st" opt; do
 done
 shift $(( OPTIND - 1 ))
 
-line=$1 orig_line=$1
+line=$1
 
 local dspat dspat_noday tspat
 if (( anchor )); then
@@ -250,11 +264,20 @@ if (( anchor )); then
     # We'll test later if the time is associated with the date.
     tspat=$tspat_noanchor
   fi
+  # We can save a huge amount of grief (I've discovered) if when
+  # we're anchored to the start we ignore anything after a newline.
+  # However, don't do this if we're anchored to the end.  The
+  # match should fail if there are extra lines in that case.
+  if [[ anchor_end -eq 0 && $line = (#b)([^$'\n']##)($'\n'*) ]]; then
+    line=$match[1]
+    rest_line=$match[2]
+  fi
 else
   dspat=$dspat_noanchor
   dspat_noday=$dspat_noanchor
   tspat=$tspat_noanchor
 fi
+orig_line=$line
 
 # Look for a time separately; we need colons for this.
 # We want to look for the first time to ensure it's associated
@@ -268,6 +291,7 @@ fi
 # To use a case statement we'd need to be able to request non-greedy
 # matching for a pattern.
 local rest
+# HH:MM:SECONDS am/pm with optional decimal seconds
 rest=${line#(#ibm)${~tspat}(<0-12>):(<0-59>)[.:]((<0-59>)(.<->|))[[:space:]]#([ap])(|.)[[:space:]]#m(.|[[:space:]]|(#e))}
 if [[ $rest != $line ]]; then
   hour=$match[2]
@@ -275,7 +299,8 @@ if [[ $rest != $line ]]; then
   second=$match[5]
   [[ $match[7] = (#i)p ]] && (( hour <= 12 )) && (( hour += 12 ))
   time_found=1
-else
+fi
+if (( time_found == 0 )); then
   # no seconds, am/pm
   rest=${line#(#ibm)${~tspat}(<0-12>):(<0-59>)[[:space:]]#([ap])(|.)[[:space:]]#m(.|[[:space:]]|(#e))}
   if [[ $rest != $line ]]; then
@@ -283,37 +308,60 @@ else
     minute=$match[3]
     [[ $match[4] = (#i)p ]] && (( hour <= 12 )) && (( hour += 12 ))
     time_found=1
-  else
-    # no colon, even, but a.m./p.m. indicator
-    rest=${line#(#ibm)${~tspat}(<0-12>)[[:space:]]#([ap])(|.)[[:space:]]#m(.|[[:space:]]|(#e))}
-    if [[ $rest != $line ]]; then
-      hour=$match[2]
-      minute=0
-      [[ $match[3] = (#i)p ]] && (( hour <= 12 )) && (( hour += 12 ))
-      time_found=1
-    else
-      # 24 hour clock, with seconds
-      rest=${line#(#ibm)${~tspat}(<0-24>):(<0-59>)[.:]((<0-59>)(.<->|))(.|[[:space:]]|(#e))}
-      if [[ $rest != $line ]]; then
-	hour=$match[2]
-	minute=$match[3]
-	second=$match[5]
-	time_found=1
-      else
-	rest=${line#(#ibm)${~tspat}(<0-24>):(<0-59>)(.|[[:space:]]|(#e))}
-	if [[ $rest != $line ]]; then
-	  hour=$match[2]
-	  minute=$match[3]
-	  time_found=1
-	fi
-      fi
-    fi
+  fi
+fi
+if (( time_found == 0 )); then
+  # no colon, even, but a.m./p.m. indicator
+  rest=${line#(#ibm)${~tspat}(<0-12>)[[:space:]]#([ap])(|.)[[:space:]]#m(.|[[:space:]]|(#e))}
+  if [[ $rest != $line ]]; then
+    hour=$match[2]
+    minute=0
+    [[ $match[3] = (#i)p ]] && (( hour <= 12 )) && (( hour += 12 ))
+    time_found=1
+  fi
+fi
+if (( time_found == 0 )); then
+  # 24 hour clock, with seconds
+  rest=${line#(#ibm)${~tspat}(<0-24>):(<0-59>)[.:]((<0-59>)(.<->|))(.|[[:space:]]|(#e))}
+  if [[ $rest != $line ]]; then
+    hour=$match[2]
+    minute=$match[3]
+    second=$match[5]
+    time_found=1
+  fi
+fi
+if (( time_found == 0 )); then
+  rest=${line#(#ibm)${~tspat}(<0-24>):(<0-59>)(.|[[:space:]]|(#e))}
+  if [[ $rest != $line ]]; then
+    hour=$match[2]
+    minute=$match[3]
+    time_found=1
+  fi
+fi
+if (( time_found == 0 )); then
+  # Combined date and time formats:  here we can use an anchor because
+  # we know the complete format.
+  (( anchor )) && tspat=$tspat_anchor
+  # RFC 2445
+  rest=${line#(#ibm)${~tspat}(|\"[^\"]##\":)($~d$~d$~d$~d)($~d$~d)($~d$~d)T($~d$~d)($~d$~d)($~d$~d)([[:space:]]#|(#e))}
+  if [[ $rest != $line ]]; then
+    year=$match[3]
+    month=$match[4]
+    day=$match[5]
+    hour=$match[6]
+    minute=$match[7]
+    second=$match[8]
+    # signal don't need to take account of time in date...
+    time_found=2
+    date_found=1
+    date_start=$mbegin[3]
+    date_end=$mend[-1]
   fi
 fi
 (( hour == 24 )) && hour=0
 
-if (( time_found )); then
-  # time was found
+if (( time_found && ! date_found )); then
+  # time was found; if data also found already, process below.
   time_start=$mbegin[2]
   time_end=$mend[-1]
   # Remove the timespec because it may be in the middle of
@@ -331,7 +379,7 @@ if (( time_found )); then
   (( debug )) && print "line after time: $line"
 fi
 
-if (( relative == 0 )); then
+if (( relative == 0 && date_found == 0 )); then
   # Date.
   case $line in
   # Look for YEAR[-/.]MONTH[-/.]DAY
@@ -468,7 +516,7 @@ if (( date_found || (time_ok && time_found) )); then
     fi
     line=${line[1,$date_start-1]}${line[$date_end+1,-1]}
   fi
-  if (( time_found )); then
+  if (( time_found == 1 )); then
     if (( date_found )); then
       # If we found a time, it must be associated with the date,
       # or we can't use it.  Since we removed the time from the
@@ -540,7 +588,7 @@ if (( date_found || (time_ok && time_found) )); then
 	"'$orig_line[time_start,time_end]'"
       (( date_ok )) && print "Date string: $date_start,$date_end:" \
 	"'$orig_line[date_start,date_end]'"
-      print "Remaining line: '$line'"
+      print "Remaining line: '$line$rest_line'"
     fi
   fi
 fi
@@ -722,11 +770,11 @@ if (( relative )); then
     (( reladd += (hour * 60 + minute) * 60 + second ))
     typeset -g REPLY
     (( REPLY = relative_start + reladd  ))
-    [[ -n $setvar ]] && typeset -g REPLY2="$line"
+    [[ -n $setvar ]] && typeset -g REPLY2="$line$rest_line"
     return 0
   fi
   return 1
-elif (( ! date_found )); then
+elif (( date_found == 0 )); then
   return 1
 fi
 
@@ -748,6 +796,6 @@ fi
 
 strftime -s REPLY -r $fmt $nums
 
-[[ -n $setvar ]] && typeset -g REPLY2="$line"
+[[ -n $setvar ]] && typeset -g REPLY2="$line$rest_line"
 
 return 0

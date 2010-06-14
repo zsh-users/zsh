@@ -408,6 +408,49 @@ made of the repeat count, so that it is not possible to query the schedule
 for a recurrence of an event in the calendar until the previous event
 has passed.
 
+If tt(RPT) is used, it is also possible to specify that certain
+recurrences of an event are rescheduled or cancelled.  This is
+done with the tt(OCCURRENCE) keyword, followed by whitespace and the
+date and time of the occurrence in the regular sequence, followed by
+whitespace and either the date and time of the rescheduled event or
+the exact string tt(CANCELLED).  In this case the date and time must
+be in exactly the "date with local time" format used by the
+tt(text/calendar) MIME type (RFC 2445),
+var(<YYYY><MM><DD>)tt(T)var(<hh><mm><ss>) (note the presence of the literal
+character tt(T)).  The first word (the regular recurrence) may be
+something other than a proper date/time to indicate that the event
+is additional to the normal sequence; a convention that retains
+the formatting appearance is tt(XXXXXXXXTXXXXXX).
+
+Furthermore, it is useful to record the next regular recurrence
+(as then the displayed date may be for a rescheduled event so cannot
+be used for calculating the regular sequence).  This is specified by
+tt(RECURRENCE) and a time or date in the same format.  tt(calendar_add)
+adds such an indication when it encounters a recurring event that does not
+include one, based on the headline date/time.
+
+If tt(calendar_add) is used to update occurrences the tt(UID) keyword
+described there should be present in both the existing entry and the added
+occurrence in order to identify recurring event sequences.
+
+For example,
+
+example(Thu May 6, 2010 11:00 Informal chat RPT 1 week
+  # RECURRENCE 20100506T110000
+  # OCCURRENCE 20100513T110000 20100513T120000
+  # OCCURRENCE 20100520T110000 CANCELLED)
+
+The event that occurs at 11:00 on 13th May 2010 is rescheduled an hour
+later.  The event that occurs a week later is cancelled.  The occurrences
+are given on a continuation line starting with a tt(#) character so will
+not usually be displayed as part of the event.  As elsewhere, no account of
+time zones is taken with the times. After the next event occurs the headline
+date/time will be `tt(Thu May 13, 2010 12:00)' while the tt(RECURRENCE)
+date/time will be `tt(20100513T110000)' (note that cancelled and
+moved events are not taken account of in the tt(RECURRENCE), which
+records what the next regular recurrence is, but they are accounted for in
+the headline date/time).
+
 It is safe to run tt(calendar -s) to reschedule an existing event
 (if the calendar file has changed, for example), and also to have it
 running in multiples instances of the shell since the calendar file
@@ -460,6 +503,24 @@ example(Aug 31, 2007 09:30  Celebrate the end of the holidays
   # UID 045B78A0)
 
 The second line will not be shown by the tt(calendar) function.
+
+It is possible to specify the tt(RPT) keyword followed by tt(CANCELLED)
+instead of a relative time.  This causes any matched event or series
+of events to be cancelled (the original event does not have to be marked
+as recurring in order to be cancelled by this method).  A tt(UID) is
+required in order to match an existing event in the calendar.
+
+tt(calendar_add) will attempt to manage recurrences and occurrences of
+repeating events as described for event scheduling by tt(calendar -s)
+above.  To reschedule or cancel a single event tt(calendar_add) should be
+called with an entry that includes the correct tt(UID) but does em(not)
+include the tt(RPT) keyword as this is taken to mean the entry applies to a
+series of repeating events and hence replaces all existing information.
+Each rescheduled or cancelled occurrence must have an tt(OCCURRENCE)
+keyword in the entry passed to tt(calendar_add) which will be merged into
+the calendar file.  Any existing reference to the occurrence is replaced.
+An occurrence that does not refer to a valid existing event is added as a
+one-off occurrence to the same calendar entry.
 )
 findex(calendar_edit)
 item(tt(calendar_edit))(
@@ -489,6 +550,10 @@ array tt(reply) as follows:
 startsitem()
 sitem(time)(The time as a string of digits in the same units as
 tt($EPOCHSECONDS))
+sitem(schedtime)(The regularly scheduled time.  This may differ from
+the actual event time tt(time) if this is a recurring event and the next
+occurrence has been rescheduled.  Then tt(time) gives the actual time
+and tt(schedtime) the time of the regular recurrence before modification.)
 sitem(text1)(The text from the line not including the date and time of the
 event, but including any tt(WARN) or tt(RPT) keywords and values.)
 sitem(warntime)(Any warning time given by the tt(WARN) keyword as a string
@@ -501,6 +566,10 @@ sitem(rpttime)(Any recurrence time given by the tt(RPT) keyword as a string
 of digits containing the time of the recurrence in the same units
 as tt($EPOCHSECONDS).  (Note this is an absolute time.)  Not set if
 no tt(RPT) keyword and value were matched.)
+sitem(schedrpttime)(The next regularly scheduled occurrence of a recurring
+event before modification.  This may differ from tt(rpttime), which is the
+actual time of the event that may have been rescheduled from the regular
+time.)
 sitem(rptstr)(The raw string matched after the tt(RPT) keyword, else unset.)
 sitem(text2)(The text from the line after removal of the date and any
 keywords and values.)

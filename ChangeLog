@@ -1,5 +1,11 @@
 2010-06-14  Peter Stephenson  <pws@csr.com>
 
+	* 28038: Index: Completion/Zsh/Command/_zstyle, Doc/Zsh/calsys.yo,
+	Functions/Calendar/calendar, Functions/Calendar/calendar_add,
+	Functions/Calendar/calendar_parse,
+	Functions/Calendar/calendar_scandate: improved handling of
+	recurring events in calendar system.
+
 	* unposted: Doc/Zsh/params.yo: extra note on ZSH_EVAL_CONTEXT.
 
 	* 28037: Src/exec.c, Src/math.c, Src/module.c,
@@ -13291,5 +13297,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5004 $
+* $Revision: 1.5005 $
 *****************************************************

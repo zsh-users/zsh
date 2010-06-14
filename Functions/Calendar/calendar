@@ -296,7 +296,9 @@ chmod 600 $mycmds
     fi
     # Look for a repeat time.
     if [[ -n ${reply[rpttime]} ]]; then
-      (( repeattime = ${reply[rpttime]}, repeating = 1 ))
+      # The actual time of the next event, which appears as text
+      (( repeattime = ${reply[rpttime]} ))
+      (( repeating = 1 ))
     else
       (( repeating = 0 ))
     fi
@@ -320,7 +322,7 @@ chmod 600 $mycmds
     match=()
     # Strip continuation lines starting " #".
     while [[ $showline = (#b)(*$'\n')[[:space:]]##\#[^$'\n']##(|$'\n'(*)) ]]; do
-	  showline="$match[1]$match[3]"
+      showline="$match[1]$match[3]"
     done
     # Strip trailing empty lines
     showline=${showline%%[[:space:]]#}
