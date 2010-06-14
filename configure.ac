@@ -1170,7 +1170,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       regcomp regexec regerror regfree \
 	       gdbm_open getxattr \
 	       realpath canonicalize_file_name \
-	       symlink)
+	       symlink getcwd)
 AC_FUNC_STRCOLL
 
 if test x$enable_cap = xyes; then
@@ -1896,6 +1896,34 @@ AH_TEMPLATE([USE_GETCWD],
 [Define to 1 if you need to use the native getcwd.])
 if test x$zsh_cv_use_getcwd = xyes; then
   AC_DEFINE(USE_GETCWD)
+fi
+
+dnl GNU getcwd() can allocate as much space as necessary for a
+dnl directory name, preventing guessing games.
+AH_TEMPLATE([GETCWD_CALLS_MALLOC],
+[Define to 1 if getcwd() calls malloc to allocate memory.])
+if test x$ac_cv_func_getcwd = xyes; then
+  AC_CACHE_CHECK(whether getcwd calls malloc to allocate memory,
+  zsh_cv_getcwd_malloc,
+  [AC_TRY_RUN([
+#include <unistd.h>
+#include <string.h>
+int main() {
+    char buf[1024], *ptr1, *ptr2;
+    ptr1 = getcwd(buf, 1024);
+    ptr2 = getcwd(NULL, 0);
+    if (ptr1 && ptr2 && !strcmp(ptr1, ptr2)) {
+      return 0;
+    }
+    return 1;
+}
+],
+  zsh_cv_getcwd_malloc=yes,
+  zsh_cv_getcwd_malloc=no,
+  zsh_cv_getcwd_malloc=no)])
+  if test x$zsh_cv_getcwd_malloc = xyes; then
+    AC_DEFINE(GETCWD_CALLS_MALLOC)
+  fi
 fi
 
 dnl CHECK FOR setproctitle() FOR jobs -Z / ARGV0

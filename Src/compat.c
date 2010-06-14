@@ -420,9 +420,9 @@ zgetdir(struct dirsav *d)
 
 /*
  * Try to find the current directory.
+ * If we couldn't work it out internally, fall back to getcwd().
  * If it fails, fall back to pwd; if zgetcwd() is being used
  * to set pwd, pwd should be NULL and we just return ".".
- * We could fall back to getcwd() instead.
  */
 
 /**/
@@ -430,6 +430,23 @@ char *
 zgetcwd(void)
 {
     char *ret = zgetdir(NULL);
+#ifdef HAVE_GETCWD
+    if (!ret) {
+#ifdef GETCWD_CALLS_MALLOC
+	char *cwd = getcwd(NULL, 0);
+	if (cwd) {
+	    ret = dupstring(cwd);
+	    free(cwd);
+	}
+#else
+	char *cwdbuf = zalloc(PATH_MAX);
+	ret = getcwd(cwdbuf, PATH_MAX);
+	if (ret)
+	    ret = dupstring(ret);
+	free(cwdbuf);
+#endif /* GETCWD_CALLS_MALLOC */
+    }
+#endif /* HAVE_GETCWD */
     if (!ret)
 	ret = pwd;
     if (!ret)
