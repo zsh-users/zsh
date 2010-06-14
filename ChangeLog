@@ -1,6 +1,7 @@
 2010-06-14  Peter Stephenson  <pws@csr.com>
 
-	* 28010
+	* 28010: configure.ac, Src/compat.c: use getcwd() as fallback
+	if zgetcwd() fails.
 
 2010-06-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
@@ -13284,5 +13285,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5001 $
+* $Revision: 1.5002 $
 *****************************************************
