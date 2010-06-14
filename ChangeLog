@@ -1,5 +1,7 @@
 2010-06-14  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Doc/Zsh/params.yo: extra note on ZSH_EVAL_CONTEXT.
+
 	* 28037: Src/exec.c, Src/math.c, Src/module.c,
 	Test/V01zmodload.ztst: improved error messages for autoloading
 	math functions and builtins (but not conditions).
@@ -13289,5 +13291,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5003 $
+* $Revision: 1.5004 $
 *****************************************************

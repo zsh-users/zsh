@@ -732,6 +732,9 @@ the array to indicate the type of operation that is being performed.
 Read in order the array gives an indication of the stack of
 operations being performed with the most immediate context last.
 
+Note that the variable does not give information on syntactic context such
+as pipelines or subshells.  Use tt($ZSH_SUBSHELL) to detect subshells.
+
 The context is one of the following:
 startitem()
 item(tt(cmdarg))(
