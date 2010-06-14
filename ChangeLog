@@ -1,5 +1,9 @@
 2010-06-14  Peter Stephenson  <pws@csr.com>
 
+	* 28037: Src/exec.c, Src/math.c, Src/module.c,
+	Test/V01zmodload.ztst: improved error messages for autoloading
+	math functions and builtins (but not conditions).
+
 	* 28010: configure.ac, Src/compat.c: use getcwd() as fallback
 	if zgetcwd() fails.
 
@@ -13285,5 +13289,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5002 $
+* $Revision: 1.5003 $
 *****************************************************

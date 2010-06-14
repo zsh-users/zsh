@@ -2274,18 +2274,20 @@ static HashNode
 resolvebuiltin(const char *cmdarg, HashNode hn)
 {
     if (!((Builtin) hn)->handlerfunc) {
+	char *modname = dupstring(((Builtin) hn)->optstr);
 	/*
 	 * Ensure the module is loaded and the
 	 * feature corresponding to the builtin
 	 * is enabled.
 	 */
-	(void)ensurefeature(((Builtin) hn)->optstr, "b:",
+	(void)ensurefeature(modname, "b:",
 			    (hn->flags & BINF_AUTOALL) ? NULL :
 			    hn->nam);
 	hn = builtintab->getnode(builtintab, cmdarg);
 	if (!hn) {
 	    lastval = 1;
-	    zerr("unknown builtin: %s", cmdarg);
+	    zerr("autoloading module %s failed to define builtin: %s",
+		 modname, cmdarg);
 	    return NULL;
 	}
     }

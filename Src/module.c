@@ -1273,7 +1273,10 @@ getmathfunc(const char *name, int autol)
 		(void)ensurefeature(n, "f:", (flags & MFF_AUTOALL) ? NULL :
 				    name);
 
-		return getmathfunc(name, 0);
+	       p = getmathfunc(name, 0);
+	       if (!p) {
+		   zerr("autoloading module %s failed to define math function: %s", n, name);
+	       }
 	    }
 	    return p;
 	}

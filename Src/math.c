@@ -941,8 +941,9 @@ callmathfunc(char *o)
 		    zerr("wrong number of arguments: %s", o);
 	    }
 	}
-    } else
+    } else {
 	zerr("unknown function: %s", n);
+    }
 
     dummy.type = MN_INTEGER;
     dummy.u.l = 0;
