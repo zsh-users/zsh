@@ -1,28 +1,45 @@
 DISTFILES_SRC='
 .distfiles
-backward-kill-word-match       backward-word-match
-capitalize-word-match          copy-earlier-word
-cycle-completion-positions     define-composed-chars
-delete-whole-word-match        down-case-word-match
-down-line-or-beginning-search  edit-command-line
-forward-word-match             history-beginning-search-menu
-history-pattern-search         history-search-end
-incarg                         incremental-complete-word
-insert-composed-char           insert-files
-insert-unicode-char            keeper
-keymap+widget                  kill-word-match
+backward-kill-word-match
+backward-word-match
+capitalize-word-match
+copy-earlier-word
+cycle-completion-positions
+define-composed-chars
+delete-whole-word-match
+down-case-word-match
+down-line-or-beginning-search
+edit-command-line
+forward-word-match
+history-beginning-search-menu
+history-pattern-search
+history-search-end
+incarg
+incremental-complete-word
+insert-composed-char
+insert-files
+insert-unicode-char
+keeper
+keymap+widget
+kill-word-match
 match-word-context
 match-words-by-style
 modify-current-argument
 narrow-to-region
-narrow-to-region-invisible     predict-on
-quote-and-complete-word        read-from-minibuffer
-replace-string                 select-word-style
+narrow-to-region-invisible
+predict-on
+quote-and-complete-word
+read-from-minibuffer
+replace-string
 replace-string-again
+select-word-style
 smart-insert-last-word
 split-shell-arguments
+transpose-lines
 transpose-words-match
-up-case-word-match             up-line-or-beginning-search
-url-quote-magic                which-command
+up-case-word-match
+up-line-or-beginning-search
+url-quote-magic
+which-command
 zed-set-file-name
 '

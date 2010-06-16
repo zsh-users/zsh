@@ -2073,6 +2073,23 @@ a true value, the search continues upward through the history.  When
 tt(auto-previous) is unset or false (the default), the widget must be
 invoked repeatedly in order to search earlier history lines.
 )
+tindex(transpose-lines)
+item(tt(transpose-lines))(
+Only useful with a multi-line editing buffer; the lines here are
+lines within the current on-screen buffer, not history lines.
+The effect is similar to the function of the same name in Emacs.
+
+Transpose the current line with the previous line and move the cursor
+to the start of the next line.  Repeating this (which can be done by
+providing a positive numeric prefix argument) has the effect of moving
+the line above the cursor down by a number of lines.
+
+With a negative numeric prefix argument, requires two lines above the
+cursor.  These two lines are transposed and the cursor moved to the
+start of the previous line.  Using a numeric prefix less than -1
+has the effect of moving the line above the cursor up by minus that
+number of lines.
+)
 tindex(which-command)
 item(tt(which-command))(
 This function is a drop-in replacement for the builtin widget

@@ -1,3 +1,8 @@
+2010-06-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28042: Doc/Zsh/contrib.yo, Functions/Zle/.distfiles,
+	Functions/Zle/transpose-lines: new widget.
+
 2010-06-14  Peter Stephenson  <pws@csr.com>
 
 	* 28038: Index: Completion/Zsh/Command/_zstyle, Doc/Zsh/calsys.yo,
@@ -13297,5 +13302,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5005 $
+* $Revision: 1.5006 $
 *****************************************************
