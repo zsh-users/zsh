@@ -1780,7 +1780,7 @@ of the cursor.  If it is set to `false', completion will be done even there.
 
 The value may also contain the substrings `tt(pending)' or
 `tt(pending=)var(val)'.  In this case, the typed character will be
-inserted instead of staring completion when there is unprocessed input
+inserted instead of starting completion when there is unprocessed input
 pending.  If a var(val) is given, completion will not be done if there
 are at least that many characters of unprocessed input.  This is often
 useful when pasting characters into a terminal.  Note
