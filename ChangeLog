@@ -5,6 +5,8 @@
 
 	* Holger Weiss: 28020: Doc/Zsh/compsys.yo: Fix a typo.
 
+	* unposted: Fix a date in ChangeLog.
+
 2010-06-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28042: Doc/Zsh/contrib.yo, Functions/Zle/.distfiles,
@@ -113,7 +115,7 @@
 	* 27994: Src/params.c: better error message when failing to
 	autoload parameter.
 
-2010-05-03  Frank Terbeck  <ft@bewatermyfriend.org>
+2010-06-03  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Holger Weiss: 27977: Completion/Unix/Command/_git: shouldn't
 	return 0 if there are no matches.
@@ -13309,5 +13311,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5008 $
+* $Revision: 1.5009 $
 *****************************************************
