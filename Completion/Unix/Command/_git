@@ -1597,13 +1597,6 @@ _git-branch () {
 }
 __git_zstyle_default ':completion::complete:git-branch:delete-argument-rest:*' ignore-line yes
 
-(( $+functions[__git_is_treeish] )) ||
-__git_is_treeish () {
-  local sha1
-  sha1="$(git rev-parse $1 -- 2> /dev/null)" &&
-  [[ "$(git cat-file -t "${sha1}^{tree}" 2> /dev/null)" == tree ]]
-}
-
 # TODO: __git_tree_ishs is just stupid.  It should be giving us a list of tags
 # and perhaps also allow all that just with ^{tree} and so on.  Not quite sure
 # how to do that, though.
@@ -1990,22 +1983,33 @@ _git-rerere () {
 
 (( $+functions[_git-reset] )) ||
 _git-reset () {
-  local commit_arg path_arg
+  local curcontext=$curcontext state line
+  typeset -A opt_args
 
-  if [[ $words[2] == --mixed ]]; then
-    commit_arg=':commit:__git_revisions'
-    path_arg="*:file:__git_tree_files . $words[3]"
-  else
-    commit_arg='::commit:__git_revisions'
-  fi
+  _arguments -C -S -A '-*' \
+      '(-q --quiet)'{-q,--quiet}'[be quiet, only report errors]' \
+      '::commit:__git_revisions' \
+    - reset-head \
+      '(        --soft --hard --merge --keep)--mixed[reset the index but not the working tree (default)]' \
+      '(--mixed        --hard --merge --keep)--soft[do not touch the index file nor the working tree]' \
+      '(--mixed --soft        --merge --keep)--hard[match the working tree and index to the given tree]' \
+      '(--mixed --soft --hard         --keep)--merge[reset out of a conflicted merge]' \
+      '(--mixed --soft --hard --merge       )--keep[like --hard, but keep local working tree changes]' \
+    - reset-paths \
+      '(-p --patch)'{-p,--patch}'[select diff hunks to remove from the index]' \
+      '*::file:->files' && ret=0
 
-  _arguments -S -A '--*' \
-    '(        --soft --hard)--mixed[like --soft but report what has not been updated (default)]' \
-    '(--mixed        --hard)--soft[do not touch the index file nor the working tree]' \
-    '(--mixed --soft       )--hard[match the working tree and index to the given tree]' \
-    '--merge[bring local changes along to new commit]' \
-    $commit_arg \
-    $path_arg && ret=0
+  case $state in
+    (files)
+      local commit
+      if [[ -n $line[1] ]] && __git_is_committish $line[1]; then
+        commit=$line[1]
+      else
+        commit=HEAD
+      fi
+      __git_tree_files . $commit && ret=0
+      ;;
+  esac
 }
 
 (( $+functions[_git-revert] )) ||
@@ -2946,7 +2950,9 @@ __git_tree_files () {
   local multi_parts_opts
   local tree Path
   integer at_least_one_tree_added
-  local -a tree_files
+  local -a tree_files compadd_opts
+
+  zparseopts -D -E -a compadd_opts V: J: 1 2 n f X: M: P: S: r: R: q F:
 
   [[ "$1" == */ ]] && Path="$1" || Path="${1:h}/"
   shift
@@ -2957,11 +2963,11 @@ __git_tree_files () {
   done
 
   if (( !at_least_one_tree_added )); then
-    return
+    return 1
   fi
 
   local expl
-  _wanted files expl 'tree file' _multi_parts -f $@ -- / tree_files
+  _wanted files expl 'tree file' _multi_parts -f $compadd_opts -- / tree_files
 }
 
 # TODO: deal with things that __git_heads and __git_tags has in common (i.e.,
@@ -4420,6 +4426,23 @@ __git_setup_revision_arguments () {
 }
 
 # ---
+
+(( $+functions[__git_is_type] )) ||
+__git_is_type () {
+  local sha1
+  sha1="$(git rev-parse $2 2> /dev/null)" &&
+  [[ "$(git cat-file -t "${sha1}^{$1}" 2> /dev/null)" == $1 ]]
+}
+
+(( $+functions[__git_is_committish] )) ||
+__git_is_committish () {
+  __git_is_type commit $1
+}
+
+(( $+functions[__git_is_treeish] )) ||
+__git_is_treeish () {
+  __git_is_type tree $1
+}
 
 (( $+functions[__git_is_indexed] )) ||
 __git_is_indexed () {
