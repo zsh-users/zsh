@@ -1,3 +1,7 @@
+2010-06-22  Doug Kearns  <dougkearns@gmail.com>
+
+	* 28051: Completion/Unix/Command/_elinks: update for version 0.12pre5.
+
 2010-06-17  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Holger Weiss: 28016, 28017, 28018, 28019:
@@ -13311,5 +13315,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5009 $
+* $Revision: 1.5010 $
 *****************************************************
