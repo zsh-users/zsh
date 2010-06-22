@@ -235,9 +235,9 @@ There are a number of documents about zsh in this distribution:
 
 Doc/Zsh/*.yo	The master source for the zsh documentation is written in
 		yodl.  Yodl is a document language written by Karel Kubat.
-		It is not required by zsh but but it is a nice program so
-		you might want to get it anyway, especially if you are a
-		zsh developer.  It can be downloaded from
+		It is not required by zsh but it is a nice program so you
+		might want to get it anyway, especially if you are a zsh
+		developer.  It can be downloaded from
 		ftp://yodl.sourceforge.net/
 
 Doc/zsh*.1	Man pages in nroff format.  These will be installed

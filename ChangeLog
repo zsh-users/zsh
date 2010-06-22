@@ -1,5 +1,7 @@
 2010-06-22  Doug Kearns  <dougkearns@gmail.com>
 
+	* unposted: INSTALL, README: fix typos. 
+
 	* 28051: Completion/Unix/Command/_elinks: update for version 0.12pre5.
 
 2010-06-17  Frank Terbeck  <ft@bewatermyfriend.org>
@@ -13315,5 +13317,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5010 $
+* $Revision: 1.5011 $
 *****************************************************

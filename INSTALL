@@ -407,7 +407,7 @@ Startup/shutdown files
 ----------------------
 
 Zsh has several startup/shutdown files which are in /etc by default.  This
-can be overriden using one of the options below when invoking "configure".
+can be overridden using one of the options below when invoking "configure".
 
  --enable-etcdir=directory    # default directory for global zsh scripts
  --enable-zshenv=pathname     # the full pathname of the global zshenv script
