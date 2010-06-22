@@ -23,6 +23,7 @@ _completers() {
 # Assoc array of styles; the values give the possible top-level
 # contexts:
 #   c   completion
+#   d   chpwd
 #   e   line editor
 #   z   zftp
 # or any combination of the above,
@@ -104,6 +105,7 @@ styles=(
   prefix-needed		 c:bool
   preserve-prefix        c:preserve-prefix
   range                  c:
+  recent-dirs-insert     c:recent-dirs-insert
   regular                c:bool
   remote-access		 c:bool
   remove-all-dups	 c:bool
@@ -130,6 +132,12 @@ styles=(
   users-hosts-ports	 c:user-host-port
   verbose		 ce:bool
   word			 c:bool
+
+  recent-dirs-default    d:bool
+  recent-dirs-file       d:_files
+  recent-dirs-max        d:
+  recent-dirs-prune      d:
+  recent-dirs-pushd      d:bool
 
   auto-previous          e:bool
   break-keys             e:
@@ -219,6 +227,10 @@ while (( $#state )); do
 	ctop=c
 	;;
 
+	(:chwpd:*)
+	ctop=d
+	;;
+
 	(:zftp:*)
 	ctop=z
 	;;
@@ -228,7 +240,7 @@ while (( $#state )); do
 	;;
 
 	(*)
-        ctop=cez
+        ctop=cdez
 	;;
       esac
       _wanted styles expl style \
@@ -420,6 +432,11 @@ while (( $#state )); do
 
     (preserve-prefix)
       _message -e prefixes 'pattern matching prefix to keep'
+      ;;
+
+    (recent-dirs-insert)
+      _wanted values expl 'inserting recent directories' \
+	compadd true false always fallback both
       ;;
 
     (separator)

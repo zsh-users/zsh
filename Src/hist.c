@@ -1194,7 +1194,7 @@ hend(Eprog prog)
     callhookfunc("zshaddhistory", hookargs, 1, &hookret);
     /* For history sharing, lock history file once for both read and write */
     hf = getsparam("HISTFILE");
-    if (isset(SHAREHISTORY) && lockhistfile(hf, 0)) {
+    if (isset(SHAREHISTORY) && !lockhistfile(hf, 0)) {
 	readhistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
 	curline.histnum = curhist+1;
     }
@@ -2231,20 +2231,25 @@ readhistfile(char *fn, int err, int readflags)
     short *wordlist;
     struct stat sb;
     int nwordpos, nwordlist, bufsiz;
-    int searching, newflags, l;
+    int searching, newflags, l, ret;
 
     if (!fn && !(fn = getsparam("HISTFILE")))
 	return;
     if (readflags & HFILE_FAST) {
 	if (stat(unmeta(fn), &sb) < 0
 	 || (lasthist.fsiz == sb.st_size && lasthist.mtim == sb.st_mtime)
-	 || !lockhistfile(fn, 0))
+	 || lockhistfile(fn, 0))
 	    return;
 	lasthist.fsiz = sb.st_size;
 	lasthist.mtim = sb.st_mtime;
+    } else if ((ret = lockhistfile(fn, 1))) {
+	if (ret == 2) {
+	    zwarn("locking failed for %s: %e: reading anyway", fn, errno);
+	} else {
+	    zerr("locking failed for %s: %e", fn, errno);
+	    return;
+	}
     }
-    else if (!lockhistfile(fn, 1))
-	return;
     if ((in = fopen(unmeta(fn), "r"))) {
 	nwordlist = 64;
 	wordlist = (short *)zalloc(nwordlist*sizeof(short));
@@ -2377,6 +2382,11 @@ readhistfile(char *fn, int err, int readflags)
 #ifdef HAVE_FCNTL_H
 static int flock_fd = -1;
 
+/*
+ * Lock file using fcntl().  Return 0 on success, 1 on failure of
+ * locking mechanism, 2 on permanent failure (e.g. permission).
+ */
+
 static int
 flockhistfile(char *fn, int keep_trying)
 {
@@ -2384,7 +2394,7 @@ flockhistfile(char *fn, int keep_trying)
     int ctr = keep_trying ? 9 : 0;
 
     if ((flock_fd = open(unmeta(fn), O_RDWR | O_NOCTTY)) < 0)
-	return errno == ENOENT; /* "successfully" locked missing file */
+	return errno == ENOENT ? 0 : 2; /* "successfully" locked missing file */
 
     lck.l_type = F_WRLCK;
     lck.l_whence = SEEK_SET;
@@ -2395,12 +2405,12 @@ flockhistfile(char *fn, int keep_trying)
 	if (--ctr < 0) {
 	    close(flock_fd);
 	    flock_fd = -1;
-	    return 0;
+	    return 1;
 	}
 	sleep(1);
     }
 
-    return 1;
+    return 0;
 }
 #endif
 
@@ -2424,14 +2434,16 @@ savehistfile(char *fn, int err, int writeflags)
 	    lasthist.next_write_ev = he->histnum + 1;
 	    he = down_histent(he);
 	}
-	if (!he || !lockhistfile(fn, 0))
+	if (!he || lockhistfile(fn, 0))
 	    return;
 	if (histfile_linect > savehistsiz + savehistsiz / 5)
 	    writeflags &= ~HFILE_FAST;
     }
     else {
-	if (!lockhistfile(fn, 1))
+	if (lockhistfile(fn, 1)) {
+	    zerr("locking failed for %s: %e", fn, errno);
 	    return;
+	}
 	he = hist_ring->down;
     }
     if (writeflags & HFILE_USE_OPTIONS) {
@@ -2597,18 +2609,27 @@ savehistfile(char *fn, int err, int writeflags)
 
 static int lockhistct;
 
+/*
+ * Lock history file.  Return 0 on success, 1 on failure to lock this
+ * time, 2 on permanent failure (e.g. permission).
+ */
+
 /**/
 int
 lockhistfile(char *fn, int keep_trying)
 {
     int ct = lockhistct;
+    int ret = 0;
 
     if (!fn && !(fn = getsparam("HISTFILE")))
-	return 0;
+	return 1;
 
 #ifdef HAVE_FCNTL_H
-    if (isset(HISTFCNTLLOCK) && flock_fd < 0 && !flockhistfile(fn, keep_trying))
-	return 0;
+    if (isset(HISTFCNTLLOCK) && flock_fd < 0) {
+	ret = flockhistfile(fn, keep_trying);
+	if (ret)
+	    return ret;
+    }
 #endif
 
     if (!lockhistct++) {
@@ -2632,8 +2653,13 @@ lockhistfile(char *fn, int keep_trying)
 	lnk = bicat(pidbuf, getsparam("HOST"));
 	/* We'll abuse fd as our success flag. */
 	while ((fd = symlink(lnk, lockfile)) < 0) {
-	    if (errno != EEXIST || !keep_trying)
+	    if (errno != EEXIST) {
+		ret = 2;
 		break;
+	    } else if (!keep_trying) {
+		ret = 1;
+		break;
+	    }
 	    if (lstat(lockfile, &sb) < 0) {
 		if (errno == ENOENT)
 		    continue;
@@ -2656,15 +2682,16 @@ lockhistfile(char *fn, int keep_trying)
 	    } else
 		close(fd);
 	    while (link(tmpfile, lockfile) < 0) {
-		if (errno != EEXIST)
-		    zerr("failed to create hard link as lock file %s: %e",
-			 lockfile, errno);
-		else if (!keep_trying)
-		    ;
-		else if (lstat(lockfile, &sb) < 0) {
+		if (errno != EEXIST) {
+		    ret = 2;
+		    break;
+		} else if (!keep_trying) {
+		    ret = 1;
+		    break;
+		} else if (lstat(lockfile, &sb) < 0) {
 		    if (errno == ENOENT)
 			continue;
-		    zerr("failed to stat lock file %s: %e", lockfile, errno);
+		    ret = 2;
 		} else {
 		    if (time(NULL) - sb.st_mtime < 10)
 			sleep(1);
@@ -2681,11 +2708,17 @@ lockhistfile(char *fn, int keep_trying)
 # endif /* not HAVE_SYMLINK */
 #else /* not HAVE_LINK */
 	while ((fd = open(lockfile, O_WRONLY|O_CREAT|O_EXCL, 0644)) < 0) {
-	    if (errno != EEXIST || !keep_trying)
+	    if (errno != EEXIST) {
+		ret = 2;
 		break;
+	    } else if (!keep_trying) {
+		ret = 1;
+		break;
+	    }
 	    if (lstat(lockfile, &sb) < 0) {
 		if (errno == ENOENT)
 		    continue;
+		ret = 2;
 		break;
 	    }
 	    if (time(NULL) - sb.st_mtime < 10)
@@ -2714,9 +2747,10 @@ lockhistfile(char *fn, int keep_trying)
 	    flock_fd = -1;
 	}
 #endif
-	return 0;
+	DPUTS(ret == 0, "BUG: return value non-zero on locking error");
+	return ret;
     }
-    return 1;
+    return 0;
 }
 
 /* Unlock the history file if this corresponds to the last nested lock

@@ -1,3 +1,10 @@
+2010-06-22  Peter Stephenson  <pws@csr.com>
+
+	* 28047: Src/hist.c: make fc -R/-W more consistently verbose
+	and allow fc -R to work if file could be read but permissions
+	didn't allow it to be locked (as distinct from failing to lock
+	it because something else had locked it).
+
 2010-06-22  Doug Kearns  <dougkearns@gmail.com>
 
 	* 28052: Completion/Unix/Command/_cvs: remove duplicated completion of
@@ -13320,5 +13327,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5012 $
+* $Revision: 1.5013 $
 *****************************************************
