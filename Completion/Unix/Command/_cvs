@@ -48,7 +48,6 @@ _cvs_command() {
 
   (( $+_cvs_cmds )) || _cvs_cmds=(
     ${${(f)"$(_call_program commands cvs --help-commands 2>&1)"}[2,-2]/(#b) #([a-z]##) #([A-Z])/$match[1]:${match[2]:l}}
-    'version:display cvs version being used on client and server'
   )
 
   if (( CURRENT == 1 )); then
