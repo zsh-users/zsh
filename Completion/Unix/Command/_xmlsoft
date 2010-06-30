@@ -14,6 +14,7 @@ case $service in
       '--debug[dump the tree of the result instead]' \
       '--dumpextensions[dump registered extension elements and functions]' \
       '--novalid[skip the DTD loading phase]' \
+      '--nodtdattr[do not default attributes from the DTD]' \
       '--noout[do not dump the result]' \
       '--maxdepth[increase the maximum depth]:depth' \
       '--maxparsedepth[increase the maximum parser depth]:depth' \
