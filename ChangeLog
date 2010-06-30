@@ -1,7 +1,7 @@
 2010-06-30  Clint Adams  <clint@zsh.org>
 
-	* 27998: Functions/Newuser/zsh-newuser-install: add recommended
-	zshrc option.
+	* 27998, 28061: Functions/Newuser/zsh-newuser-install: add
+	recommended zshrc option.
 
 	* 28060: Completion/Unix/Command/_xmlsoft: xmlsoft --nodtdattr
 	completion thanks to Vincent Lefevre.
@@ -13343,5 +13343,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5017 $
+* $Revision: 1.5018 $
 *****************************************************
