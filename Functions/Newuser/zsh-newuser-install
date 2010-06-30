@@ -954,6 +954,11 @@ You can:
   print -r "
 (1)  Continue to the main menu.
 "
+  if [[ -f /etc/zsh/recommended.zshrc ]]; then
+    print -r "
+(2)  Populate your $zdmsg/.zshrc with the configuration recommended
+     by the system administrator."
+  fi
 
   read -k key$longprompt
   print
@@ -969,6 +974,12 @@ You can:
     ;;
 
     (1)
+    ;;
+
+    (2)
+    cp /etc/zsh/recommended.zshrc $zd/.zshrc
+    source $zd/.zshrc
+    return 0
     ;;
 
     (*)
