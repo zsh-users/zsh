@@ -954,7 +954,7 @@ You can:
   print -r "
 (1)  Continue to the main menu.
 "
-  if [[ -f /etc/zsh/zshrc.recommended ]]; then
+  if [[ -f /etc/zsh/newuser.zshrc.recommended ]]; then
     print -r "
 (2)  Populate your $zdmsg/.zshrc with the configuration recommended
      by the system administrator and exit (you will need to edit
@@ -978,7 +978,7 @@ You can:
     ;;
 
     (2)
-    cp /etc/zsh/zshrc.recommended $zd/.zshrc
+    cp /etc/zsh/newuser.zshrc.recommended $zd/.zshrc
     source $zd/.zshrc
     return 0
     ;;
