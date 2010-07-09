@@ -11,6 +11,7 @@ such as shell functions, look for comments in the function source files.
 
 startmenu()
 menu(Utilities)
+menu(Recent Directories)
 menu(Version Control Information)
 menu(Prompt Themes)
 menu(ZLE Functions)
@@ -21,7 +22,7 @@ menu(User Configuration Functions)
 menu(Other Functions)
 endmenu()
 
-texinode(Utilities)(Version Control Information)()(User Contributions)
+texinode(Utilities)(Recent Directories)()(User Contributions)
 sect(Utilities)
 
 subsect(Accessing On-Line Help)
@@ -317,7 +318,270 @@ functions to be executed.
 )
 enditem()
 
-texinode(Version Control Information)(Prompt Themes)(Utilities)(User Contributions)
+texinode(Recent Directories)(Version Control Information)(Utilities)(User
+Contributions)
+cindex(recent directories, maintaining list of)
+cindex(directories, maintaining list of recent)
+findex(cdr)
+findex(_cdr)
+findex(chpwd_recent_add)
+findex(chpwd_recent_dirs)
+findex(chpwd_recent_filehandler)
+sect(Remembering Recent Directories)
+
+The function tt(cdr) allows you to change the working directory to a
+previous working directory from a list maintained automatically.  It is
+similar in concept to the directory stack controlled by the tt(pushd),
+tt(popd) and tt(dirs) builtins, but is more configurable, and as it stores
+all entries in files it is maintained across sessions and (by default)
+between terminal emulators in the current session.  (The tt(pushd)
+directory stack is not actually modified or used by tt(cdr) unless you
+configure it to do so as described in the configuration section below.)
+
+subsect(Installation)
+
+The system works by means of a hook function that is called every time the
+directory changes.  To install the system, autoload the required functions
+and use the tt(add-zsh-hook) function described above:
+
+example(autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
+add-zsh-hook chpwd chpwd_recent_dirs)
+
+Now every time you change directly interactively, no matter which
+command you use, the directory to which you change will be remembered
+in most-recent-first order.
+
+subsect(Use)
+
+All direct user interaction is via the tt(cdr) function.
+
+The argument to cdr is a number var(N) corresponding to the var(N)th most
+recently changed-to directory.  1 is the immediately preceeding directory;
+the current directory is remembered but is not offered as a destination.
+Note that if you have multiple windows open 1 may refer to a directory
+changed to in another window; you can avoid this by having per-terminal
+files for storing directory as described for the
+tt(recent-dirs-file) style below.
+
+If you set the tt(recent-dirs-default) style described below tt(cdr)
+will behave the same as tt(cd) if given a non-numeric argument, or more
+than one argument.  The recent directory list is updated just the same
+however you change directory.
+
+If the argument is omitted, 1 is assumed.  This is similar to tt(pushd)'s
+behaviour of swapping the two most recent directories on the stack.
+
+Completion for the argument to tt(cdr) is available if compinit has been
+run; menu selection is recommended, using:
+
+example(zstyle ':completion:*:*:cdr:*:*' menu selection)
+
+to allow you to cycle through recent directories; the order is preserved,
+so the first choice is the most recent directory before the current one.
+The verbose style is also recommended to ensure the directory is shown; this
+style is on by default so no action is required unless you have changed it.
+
+subsect(Options)
+
+The behaviour of tt(cdr) may be modified by the following options.
+
+startitem()
+item(tt(-l))(
+lists the numbers and the corresponding directories in
+abbreviated form (i.e. with tt(~) substitution reapplied), one per line.
+The directories here are not quoted (this would only be an issue if a
+directory name contained a newline).  This is used by the completion
+system.
+)
+item(tt(-r))(
+sets the variable tt(reply) to the current set of directories.  Nothing
+is printed and the directory is not changed.
+)
+item(tt(-e))(
+allows you to edit the list of directories, one per line.  The
+list can be edited to any extent you like; no sanity checking is
+performed.  Completion is available.  No quoting is necessary (except for
+newlines, where I have in any case no sympathy); directories are in
+unabbreviated from and contain an absolute path, i.e. they start with tt(/).
+Usually the first entry should be left as the current directory.
+)
+enditem()
+
+subsect(Configuration)
+
+Configuration is by mean of the styles mechanism that should be familiar
+from completion; if not, see the description of the tt(zstyle) command in
+ifzman(see zmanref(zshmodules))\
+ifnzman(noderef(The zsh/zutil Module)).  The context for setting styles
+should be tt(':chpwd:*') in case the meaning of the context is extended in
+future, for example:
+
+example(zstyle ':chpwd:*' recent-dirs-max 0)
+
+sets the value of the tt(recent-dirs-max) style to 0.  In practice the
+style name is specific enough that a context of '*' should be fine.
+
+An exception is tt(recent-dirs-insert), which is used exclusively by the
+completion system and so has the usual completion system context
+(tt(':completion:*') if nothing more specific is needed), though again
+tt('*') should be fine in practice.
+
+startitem()
+item(tt(recent-dirs-default))(
+If true, and the command is expecting a recent directory index, and
+either there is more than one argument or the argument is not an
+integer, then fall through to "cd".  This allows the lazy to use only
+one command for directory changing.  Completion recognises this, too;
+see recent-dirs-insert for how to control completion when this option
+is in use.
+)
+item(tt(recent-dirs-file))(
+The file where the list of directories is saved.  The default
+is tt(${ZDOTDIR:-$HOME}/.chpwd-recent-dirs), i.e. this is in your
+home directory unless you have set the variable tt(ZDOTDIR) to point
+somewhere else.  Directory names are saved in tt($')var(...)tt(') quoted
+form, so each line in the file can be supplied directly to the shell as an
+argument.
+
+The value of this style may be an array.  In this case, the first
+file in the list will always be used for saving directories while any
+other files are left untouched.  When reading the recent directory
+list, if there are fewer than the maximum number of entries in the
+first file, the contents of later files in the array will be appended
+with duplicates removed from the list shown.  The contents of the two
+files are not sorted together, i.e. all the entries in the first file
+are shown first.  The special value tt(+) can appear in the list to
+indicate the default file should be read at that point.  This allows
+effects like the following:
+
+example(zstyle recent-dirs-file ':chpwd:*' \ 
+~/.chpwd-recent-dirs-${TTY##*/} +)
+
+Recent directories are read from a file numbered according to
+the terminal.  If there are insufficient entries the list
+is supplemented from the default file.
+)
+item(tt(recent-dirs-insert))(
+Used by completion.  If tt(recent-dirs-default) is true, then setting
+this to tt(true) causes the actual directory, rather than its index, to
+be inserted on the command line; this has the same effect as using
+the corresponding index, but makes the history clearer and the line
+easier to edit.  With this setting, if part of an argument was
+already typed, normal directory completion rather than recent
+directory completion is done; this is because recent directory
+completion is expected to be done by cycling through entries menu
+fashion.
+
+If the value of the style is tt(always), then only recent directories will
+be completed; in that case, use the tt(cd) command when you want to
+complete other directories.
+
+If the value is tt(fallback), recent directories will be tried first, then
+normal directory completion is performed if recent directory completion
+failed to find a match.
+
+Finally, if the value is tt(both) then both sets of completions are
+presented; the usual tag mechanism can be used to distinguish results, with
+recent directories tagged as tt(recent-dirs).  Note that the recent
+directories inserted are abbreviated with directory names where appropriate.
+)
+item(tt(recent-dirs-max))(
+The maximum number of directories to save to the file.  If
+this is zero or negative there is no maximum.  The default is 20.
+Note this includes the current directory, which isn't offered,
+so the highest number of directories you will be offered
+is one less than the maximum.
+)
+item(tt(recent-dirs-prune))(
+This style is an array determining what directories should (or should
+not) be added to the recent list.  Elements of the array can include:
+
+startitem()
+item(tt(parent))(
+Prune parents (more accurately, ancestors) from the recent list.
+If present, changing directly down by any number of directories
+causes the current directory to be overwritten.  For example,
+changing from ~pws to ~pws/some/other/dir causes ~pws not to be
+left on the recent directory stack.  This only applies to direct
+changes to descendant diretories; earlier directories on the
+list are not pruned.  For example, changing from ~pws/yet/another
+to ~pws/some/other/dir does not cause ~pws to be pruned.
+)
+item(tt(pattern:var(pattern)))(
+Gives a zsh pattern for directories that should not be
+added to the recent list (if not already there).  This element
+can be repeated to add different patterns.  For example,
+tt('pattern:/tmp(|/*)') stops tt(/tmp) or its descendants from being
+added.  The tt(EXTENDED_GLOB) option is always turned on for
+these patterns.
+)
+enditem()
+)
+item(tt(recent-dirs-pushd))(
+If set to true, tt(cdr) will use tt(pushd) instead of tt(cd) to change the
+directory, so the directory is saved on the directory stack.  As the
+directory stack is completely separate from the list of files saved
+by the mechanism used in this file there is no obvious reason to do
+this.
+)
+enditem()
+
+subsect(Use with dynamic directory naming)
+
+It is possible to refer to recent directories using the dynamic directory
+name syntax that appeared in zsh version 4.3.7.  If you create and
+autoload a function tt(zsh_directory_name) containing the following code,
+tt(~[1]) will refer to the most recent directory other than $PWD, and so on.
+This also includes completion.
+
+example(if [[ $1 = n ]]; then
+  if [[ $2 = <-> ]]; then
+    # Recent directory
+    typeset -ga reply
+    autoload -Uz cdr
+    cdr -r
+    if [[ -n ${reply[$2]} ]]; then
+      reply=LPAR()${reply[$2]}RPAR()
+      return 0
+    else
+      reply=LPAR()RPAR()
+      return 1
+    fi
+  fi
+elif [[ $1 = c ]]; then
+  if [[ $PREFIX = <-> || -z $PREFIX ]]; then
+    typeset -a keys values
+    values=LPAR()${${(f)"$+LPAR()cdr -l+RPAR()"}/ ##/:}RPAR()
+    keys=LPAR()${values%%:*}RPAR()
+    _describe -t dir-index 'recent directory index' \
+      values keys -V unsorted -S']'
+    return
+  fi
+fi
+return 1)
+
+subsect(Details of directory handling)
+
+This section is for the curious or confused; most users will not
+need to know this information.
+
+Recent directories are saved to a file immediately and hence are
+preserved across sessions.  Note currently no file locking is applied:
+the list is updated immediately on interactive commands and nowhere else
+(unlike history), and it is assumed you are only going to change
+directory in one window at once.  This is not safe on shared accounts,
+but in any case the system has limited utility when someone else is
+changing to a different set of directories behind your back.
+
+To make this a little safer, only directory changes instituted from the
+command line, either directly or indirectly through shell function calls
+(but not through subshells, evals, traps, completion functions and the
+like) are saved.  Shell functions should use tt(cd -q) or tt(pushd -q) to
+avoid side effects if the change to the directory is to be invisible at the
+command line.  See the contents of the function tt(chpwd_recent_dirs) for
+more details.
+
+texinode(Version Control Information)(Prompt Themes)(Recent Directories)(User Contributions)
 sect(Gathering information from version control systems)
 cindex(version control utility)
 

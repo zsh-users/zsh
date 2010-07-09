@@ -1,3 +1,12 @@
+2010-07-09  Peter Stephenson  <pws@csr.com>
+
+	* 28065: Doc/Zsh/contrib.yo, Functions/Chpwd/.distfiles,
+	Functions/Chpwd/cdr, Functions/Chpwd/_cdr,
+	Functions/Chpwd/chpwd_recent_add,
+	Functions/Chpwd/chpwd_recent_dirs,
+	Functions/Chpwd/chpwd_recent_filehandler, plus Src/zsh.mdd
+	(not posted): add cdr function, tools, and documentation.
+
 2010-06-30  Clint Adams  <clint@zsh.org>
 
 	* 27998, 28061, 28062: Functions/Newuser/zsh-newuser-install:
@@ -13343,5 +13352,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5019 $
+* $Revision: 1.5020 $
 *****************************************************

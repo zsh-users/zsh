@@ -1,0 +1,8 @@
+DISTFILES_SRC='
+.distfiles
+cdr
+_cdr
+chpwd_recent_add
+chpwd_recent_dirs
+chpwd_recent_filehandler
+'
