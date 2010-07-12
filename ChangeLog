@@ -1,3 +1,8 @@
+2010-07-12  Peter Stephenson  <pws@csr.com>
+
+	* 28068: Doc/Zsh/contrib.yo: Texinfo declaration got wrapped
+	causing mayhem.
+
 2010-07-12  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* users/15165: Doc/Zsh/contrib.yo: Fix a warning about a
@@ -13357,5 +13362,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5021 $
+* $Revision: 1.5022 $
 *****************************************************

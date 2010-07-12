@@ -318,8 +318,7 @@ functions to be executed.
 )
 enditem()
 
-texinode(Recent Directories)(Version Control Information)(Utilities)(User
-Contributions)
+texinode(Recent Directories)(Version Control Information)(Utilities)(User Contributions)
 cindex(recent directories, maintaining list of)
 cindex(directories, maintaining list of recent)
 findex(cdr)
