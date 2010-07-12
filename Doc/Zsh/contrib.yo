@@ -511,9 +511,9 @@ item(tt(pattern:var(pattern)))(
 Gives a zsh pattern for directories that should not be
 added to the recent list (if not already there).  This element
 can be repeated to add different patterns.  For example,
-tt('pattern:/tmp(|/*)') stops tt(/tmp) or its descendants from being
-added.  The tt(EXTENDED_GLOB) option is always turned on for
-these patterns.
+tt('pattern:/tmp+LPAR()|/*RPAR()') stops tt(/tmp) or its descendants
+from being added.  The tt(EXTENDED_GLOB) option is always turned on
+for these patterns.
 )
 enditem()
 )
