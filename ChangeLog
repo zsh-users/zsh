@@ -1,3 +1,8 @@
+2010-07-13  Peter Stephenson  <pws@csr.com>
+
+	* Jörg Sommer: 28063: Completion/Unix/Command/_rubber: suppress
+	warning messages when extracting output.
+
 2010-07-12  Peter Stephenson  <pws@csr.com>
 
 	* 28068: Doc/Zsh/contrib.yo: Texinfo declaration got wrapped
@@ -13362,5 +13367,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5022 $
+* $Revision: 1.5023 $
 *****************************************************

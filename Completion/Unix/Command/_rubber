@@ -2,7 +2,7 @@
 
 local _rubber_version _rubber_path _rubber_modules _rubber_args
 
-eval $(rubber --version | sed 's/^.* \([^ ]*\): */_rubber_\1=/')
+eval $(rubber --version 2>/dev/null | sed 's/^.* \([^ ]*\): */_rubber_\1=/')
 if [[ ${_rubber_version#0} != $_rubber_version ]]; then
   _rubber_modules=(
     $_rubber_path/rubber/modules/[^_]*.py(N:r:t)
