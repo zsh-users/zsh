@@ -949,25 +949,7 @@ setupshin(char *runscript)
 	     * With the PATHSCRIPT option, search the path if no
 	     * path was given in the script name.
 	     */
-	    char **pp, ppmaxlen = 0, *buf;
-	    for (pp = path; *pp; pp++)
-	    {
-		int len = strlen(*pp);
-		if (len > ppmaxlen)
-		    ppmaxlen = len;
-	    }
-	    buf = zhalloc(ppmaxlen + strlen(runscript) + 2);
-	    for (pp = path; *pp; pp++) {
-		sprintf(buf, "%s/%s", *pp, runscript);
-		/* careful, static buffer used in open() later */
-		funmeta = unmeta(buf);
-		if (access(funmeta, F_OK) == 0 &&
-		    stat(funmeta, &st) >= 0 &&
-		    !S_ISDIR(st.st_mode)) {
-		    sfname = buf;
-		    break;
-		}
-	    }
+	    funmeta = pathprog(runscript, &sfname);
 	}
 	if (!sfname ||
 	    (SHIN = movefd(open(funmeta, O_RDONLY | O_NOCTTY)))

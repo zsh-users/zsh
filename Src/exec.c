@@ -461,8 +461,15 @@ zexecve(char *pth, char **argv, char **newenvp)
 			for (ptr = execvebuf + 2; *ptr && *ptr == ' '; ptr++);
 			for (ptr2 = ptr; *ptr && *ptr != ' '; ptr++);
 			if (eno == ENOENT) {
+			    char *pprog;
 			    if (*ptr)
 				*ptr = '\0';
+			    if (*ptr2 != '/' &&
+				(pprog = pathprog(ptr2, NULL))) {
+				argv[-2] = ptr2;
+				argv[-1] = ptr + 1;
+				execve(pprog, argv - 2, newenvp);
+			    }
 			    zerr("%s: bad interpreter: %s: %e", pth, ptr2,
 				 eno);
 			} else if (*ptr) {

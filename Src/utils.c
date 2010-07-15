@@ -606,6 +606,44 @@ zwcwidth(wint_t wc)
 /**/
 #endif /* MULTIBYTE_SUPPORT */
 
+/*
+ * Search the path for prog and return the file name.
+ * The returned value is unmetafied and in the unmeta storage
+ * area (N.B. should be duplicated if not used immediately and not
+ * equal to *namep).
+ *
+ * If namep is not NULL, *namep is set to the metafied programme
+ * name, which is in heap storage.
+ */
+/**/
+char *
+pathprog(char *prog, char **namep)
+{
+    char **pp, ppmaxlen = 0, *buf, *funmeta;
+    struct stat st;
+
+    for (pp = path; *pp; pp++)
+    {
+	int len = strlen(*pp);
+	if (len > ppmaxlen)
+	    ppmaxlen = len;
+    }
+    buf = zhalloc(ppmaxlen + strlen(prog) + 2);
+    for (pp = path; *pp; pp++) {
+	sprintf(buf, "%s/%s", *pp, prog);
+	funmeta = unmeta(buf);
+	if (access(funmeta, F_OK) == 0 &&
+	    stat(funmeta, &st) >= 0 &&
+	    !S_ISDIR(st.st_mode)) {
+	    if (namep)
+		*namep = buf;
+	    return funmeta;
+	}
+    }
+
+    return NULL;
+}
+
 /* get a symlink-free pathname for s relative to PWD */
 
 /**/
