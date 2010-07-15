@@ -1,3 +1,8 @@
+2010-07-15  Doug Kearns  <dougkearns@gmail.com>
+
+	* Michael Hwang: 28075: Completion/Unix/Command/_gpg: add gpg-zip
+	completion and other general improvements.
+
 2010-07-13  Peter Stephenson  <pws@csr.com>
 
 	* Jörg Sommer: 28063: Completion/Unix/Command/_rubber: suppress
@@ -13367,5 +13372,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5023 $
+* $Revision: 1.5024 $
 *****************************************************
