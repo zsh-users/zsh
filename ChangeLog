@@ -7,6 +7,9 @@
 	* Seth House: 28084, 28083: Misc/vcs_info-examples: cleanups
 	and new examples.
 
+	* 28095: Functions/VCS_Info/Backends/VCS_INFO_get_data_git: Fix
+	two hard-coded invocations of the "git" command.
+
 2010-07-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28073: Src/exec.c, Src/init.c, Src/utils.c: allow #!
@@ -13388,5 +13391,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5028 $
+* $Revision: 1.5029 $
 *****************************************************

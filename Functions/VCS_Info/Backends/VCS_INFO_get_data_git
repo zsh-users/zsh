@@ -116,8 +116,8 @@ if [[ -z ${gitdir} ]] || [[ -z ${gitbranch} ]] ; then
 fi
 
 if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" "check-for-changes" && \
-   [[ "$(git rev-parse --is-inside-git-dir 2> /dev/null)" != 'true' ]] && \
-   git rev-parse --quiet --verify HEAD &> /dev/null ; then
+   [[ "$(${vcs_comm[cmd]} rev-parse --is-inside-git-dir 2> /dev/null)" != 'true' ]] && \
+   ${vcs_comm[cmd]} rev-parse --quiet --verify HEAD &> /dev/null ; then
     # Default: off - these are potentially expensive on big repositories
     ${vcs_comm[cmd]} diff --no-ext-diff --ignore-submodules --quiet --exit-code ||
         gitunstaged=1
