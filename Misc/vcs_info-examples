@@ -67,29 +67,6 @@ precmd() {
 }
 
 
-### Hooks ####################################################################
-
-# A number of examples in this file revolve around the concept of `hooks'
-# in vcs_info. Hooks are places in vcs_info where you may put in your
-# own code to achieve something "totally awesome"[tm].
-#
-# Hooks can be confusing. It's hard to keep track of what's going on.
-# In order to help you with that vcs_info can output some debugging
-# information when it processes hooks. This will tell you which hooks
-# are being run and which functions are attempted to run (and if the
-# functions in question were found or not).
-#
-# If you feel like you need to see what's attempted and where, I suggest
-# you use the following line and see for yourself.
-zstyle ':vcs_info:*+*:*' debug true
-
-# You can just comment it out (or disable it) again when you've seen enough.
-# Debugging is off by default - of course.
-zstyle ':vcs_info:*+*:*' debug false
-
-# Further down, every example that uses a function named `+vi-*' uses a hook.
-
-
 ### check-for-changes just in some places ####################################
 
 # Some backends (git and mercurial at the time of writing) can tell you
@@ -126,21 +103,46 @@ function estyle-cfc() {
 }
 
 
-###  Mercurial Tips  #########################################################
+### Hook Examples ############################################################
 
-### Truncate Long Hashes  ####################################################
+# A number of examples in this file revolve around the concept of `hooks'
+# in vcs_info. Hooks are places in vcs_info where you may put in your
+# own code to achieve something "totally awesome"[tm].
+#
+# Hooks can be confusing. It's hard to keep track of what's going on.
+# In order to help you with that vcs_info can output some debugging
+# information when it processes hooks. This will tell you which hooks
+# are being run and which functions are attempted to run (and if the
+# functions in question were found or not).
+#
+# If you feel like you need to see what's attempted and where, I suggest
+# you use the following line and see for yourself.
+zstyle ':vcs_info:*+*:*' debug true
+
+# You can just comment it out (or disable it) again when you've seen enough.
+# Debugging is off by default - of course.
+zstyle ':vcs_info:*+*:*' debug false
+
+# Further down, every example that uses a function named `+vi-*' uses a hook.
+
+
+### Truncate Long Hashes
 
 ### Truncate a long hash to 12 characters (which is usually unique enough)
 # NOTE: On Mercurial this will hide the second parent hash during a merge
-# (see an example in the Mercurial section below on how to retain both parents)
+# (see an example below on how to retain both parents)
 # Use zformat syntax (remember %i is the hash): %12.12i
 
+# git:
+zstyle ':vcs_info:git*' formats "(%s)-[%12.12i %b]-" # hash & branch
+
+# hg:
 # First, remove the hash from the default 'branchformat':
 zstyle ':vcs_info:hg:*' branchformat '%b'
 # Then add the hash to 'formats' as %i and truncate it to 12 chars:
 zstyle ':vcs_info:hg:*' formats ' (%s)-[%12.12i %b]-'
 
-### Truncate long hash to 12-chars but also allow for multiple parents
+### hg: Truncate long hash to 12-chars but also allow for multiple parents
 # Hashes are joined with a + to mirror the output of `hg id`.
 zstyle ':vcs_info:hg+set-hgrev-format:*' hooks hg-shorthash
 function +vi-hg-shorthash() {
@@ -153,7 +155,30 @@ function +vi-hg-shorthash() {
     ret=1
 }
 
-### Show marker when the working directory is not on a branch head
+
+### Compare local changes to remote changes
+
+### git: Show +N/-N when your local branch is ahead-of or behind remote HEAD.
+# Make sure you have added misc to your 'formats':  %m
+zstyle ':vcs_info:git*+set-message:*' hooks git-st
+function +vi-git-st() {
+    local ahead behind
+    local -a gitstatus
+
+    # for git prior to 1.7
+    # ahead=$(git rev-list origin/${hook_com[branch]}..HEAD | wc -l)
+    ahead=$(git rev-list ${hook_com[branch]}@{upstream}..HEAD 2>/dev/null | wc -l)
+    (( $ahead )) && gitstatus+=( "+${ahead}" )
+
+    # for git prior to 1.7
+    # behind=$(git rev-list HEAD..origin/${hook_com[branch]} | wc -l)
+    behind=$(git rev-list HEAD..${hook_com[branch]}@{upstream} 2>/dev/null | wc -l)
+    (( $behind )) && gitstatus+=( "-${behind}" )
+
+    hook_com[misc]+=${(j:/:)gitstatus}
+}
+
+### hg: Show marker when the working directory is not on a branch head
 # This may indicate that running `hg up` will do something
 # NOTE: the branchheads.cache file is not updated with every Mercurial
 # operation, so it will sometimes give false positives. Think of this more as a
