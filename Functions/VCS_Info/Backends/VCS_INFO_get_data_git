@@ -121,8 +121,8 @@ if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" "check-for-changes" && \
     # Default: off - these are potentially expensive on big repositories
     ${vcs_comm[cmd]} diff --no-ext-diff --ignore-submodules --quiet --exit-code ||
         gitunstaged=1
-    ${vcs_comm[cmd]} diff-index --cached --quiet --ignore-submodules HEAD ||
-        gitstaged=1
+    ${vcs_comm[cmd]} diff-index --cached --quiet --ignore-submodules HEAD 2> /dev/null
+    (( $? && $? != 128 )) && gitstaged=1
 fi
 
 VCS_INFO_adjust

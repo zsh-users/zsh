@@ -1,3 +1,9 @@
+2010-07-19  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 28093, based on Michel Lespinasse: 28090:
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git: Fix a problem
+	with `check-for-changes' and freshly initialised repositories.
+
 2010-07-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28073: Src/exec.c, Src/init.c, Src/utils.c: allow #!
@@ -13379,5 +13385,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5026 $
+* $Revision: 1.5027 $
 *****************************************************
