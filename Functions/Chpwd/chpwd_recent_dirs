@@ -38,11 +38,6 @@ fi
 chpwd_recent_filehandler
 
 if [[ $reply[1] != $PWD ]]; then
-  if [[ -n $OLDPWD && $reply[1] != $OLDPWD ]]; then
-    # The first time we change directory we probably don't have
-    # the initial directory.
-    chpwd_recent_add $OLDPWD && changed=1
-  fi
   chpwd_recent_add $PWD && changed=1
 
   (( changed )) && chpwd_recent_filehandler $reply
