@@ -4653,6 +4653,15 @@ cf_pats(int dirs, int noopt, LinkList names, char **accept, char *skipped,
 			 names, skipped, sdirs, fake);
 }
 
+/*
+ * This function looks at device/inode pairs to determine if
+ * a file is one we should ignore because of its relationship
+ * to the current or parent directory.
+ *
+ * We don't follow symbolic links here, because typically
+ * a user will not want an explicit link to the current or parent
+ * directory ignored.
+ */
 static void
 cf_ignore(char **names, LinkList ign, char *style, char *path)
 {
@@ -4661,14 +4670,14 @@ cf_ignore(char **names, LinkList ign, char *style, char *path)
     char *n, *c, *e;
 
     tpar = !!strstr(style, "parent");
-    if ((tpwd = !!strstr(style, "pwd")) && stat(pwd, &est))
+    if ((tpwd = !!strstr(style, "pwd")) && lstat(pwd, &est))
 	tpwd = 0;
 
     if (!tpar && !tpwd)
 	return;
 
     for (; (n = *names); names++) {
-	if (!ztat(n, &nst, 0) && S_ISDIR(nst.st_mode)) {
+	if (!ztat(n, &nst, 1) && S_ISDIR(nst.st_mode)) {
 	    if (tpwd && nst.st_dev == est.st_dev && nst.st_ino == est.st_ino) {
 		addlinknode(ign, quotestring(n, NULL, QT_BACKSLASH));
 		continue;
@@ -4684,7 +4693,7 @@ cf_ignore(char **names, LinkList ign, char *style, char *path)
 		    }
 		}
 		if (found || ((e = strrchr(c, '/')) && e > c + pl &&
-			      !ztat(c, &st, 0) && st.st_dev == nst.st_dev &&
+			      !ztat(c, &st, 1) && st.st_dev == nst.st_dev &&
 			      st.st_ino == nst.st_ino))
 		    addlinknode(ign, quotestring(n, NULL, QT_BACKSLASH));
 	    }

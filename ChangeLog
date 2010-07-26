@@ -1,3 +1,8 @@
+2010-07-26  Peter Stephenson  <pws@csr.com>
+
+	* 28102: Src/Zle/computil.c: use lstat() when checking
+	ignore-parents.
+
 2010-07-19  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 28101: Completion/Unix/Command/_tmux: Fix window completion
@@ -13418,5 +13423,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5035 $
+* $Revision: 1.5036 $
 *****************************************************
