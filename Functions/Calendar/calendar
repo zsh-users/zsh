@@ -13,7 +13,7 @@ local -A reply
 zmodload -i zsh/datetime || return 1
 zmodload -i zsh/zutil || return 1
 
-autoload -U calendar_{add,parse,read,scandate,show,lockfiles}
+autoload -Uz calendar_{add,parse,read,scandate,show,lockfiles}
 
 # Read the calendar file from the calendar-file style
 zstyle -s ':datetime:calendar:' calendar-file calendar || calendar=~/calendar

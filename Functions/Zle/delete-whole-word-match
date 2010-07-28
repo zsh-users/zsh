@@ -16,7 +16,7 @@ local -a matched_words
 # Start and end of range of characters to remove.
 integer pos1 pos2
 
-autoload -U match-words-by-style
+autoload -Uz match-words-by-style
 match-words-by-style
 
 if [[ -n "${matched_words[3]}" ]]; then

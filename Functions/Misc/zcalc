@@ -105,7 +105,7 @@ history -ap "${ZDOTDIR:-$HOME}/.zcalc_history"
 forms=( '%2$g' '%.*g' '%.*f' '%.*E' '')
 
 zmodload -i zsh/mathfunc 2>/dev/null
-autoload -U zmathfuncdef
+autoload -Uz zmathfuncdef
 
 : ${ZCALCPROMPT="%1v> "}
 

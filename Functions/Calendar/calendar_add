@@ -21,7 +21,7 @@ local -A reply parse_new parse_old
 local -a match mbegin mend
 local my_uid their_uid
 
-autoload -U calendar_{parse,read,lockfiles}
+autoload -Uz calendar_{parse,read,lockfiles}
 
 while getopts "BL" opt; do
   case $opt in

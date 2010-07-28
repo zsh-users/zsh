@@ -1,7 +1,7 @@
 emulate -L zsh
 setopt extendedglob
 
-autoload -U read-from-minibuffer replace-string-again
+autoload -Uz read-from-minibuffer replace-string-again
 
 local p1="Replace: " p2="   with: "
 # Saving curwidget is necessary to avoid the widget name being overwritten.

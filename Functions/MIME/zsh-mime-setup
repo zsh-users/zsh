@@ -3,7 +3,7 @@ setopt extendedglob cbases
 
 local opt o_verbose o_list
 
-autoload -U zsh-mime-handler
+autoload -Uz zsh-mime-handler
 
 while getopts "flv" opt; do
   case $opt in

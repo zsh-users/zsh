@@ -39,7 +39,7 @@ if [[ $curwidget = *(pattern|regex)* ]]; then
     done
     rep2+=$rep
     if [[ $curwidget = *regex* ]]; then
-      autoload -U regexp-replace
+      autoload -Uz regexp-replace
       regexp-replace LBUFFER $_replace_string_src $rep2
       regexp-replace RBUFFER $_replace_string_src $rep2
     else

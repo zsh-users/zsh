@@ -44,7 +44,7 @@ then
   return 0
 fi
 
-(($+bg && $+fg)) || { autoload -U colors; colors }
+(($+bg && $+fg)) || { autoload -Uz colors; colors }
 
 # Invoked as a command, behave like zed, but write a history file
 setopt nobanghist extendedhistory histignoredups

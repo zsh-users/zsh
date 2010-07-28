@@ -1,7 +1,7 @@
 emulate -L zsh
 setopt extendedglob
 
-autoload -U calendar_{read,scandate,lockfiles}
+autoload -Uz calendar_{read,scandate,lockfiles}
 
 local calendar line REPLY new lockfile
 local -a calendar_entries

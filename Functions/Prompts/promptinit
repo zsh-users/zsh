@@ -32,7 +32,7 @@ promptinit () {
   done
 
   # To manipulate precmd and preexec hooks...
-  autoload -U add-zsh-hook
+  autoload -Uz add-zsh-hook
 
   # Variables common to all prompt styles
   prompt_newline=$'\n%{\r%}'
@@ -134,7 +134,7 @@ Use prompt -h <theme> for help on specific themes.'
        ;;
     s) print "Set and save not yet implemented.  Please ensure your ~/.zshrc"
        print "contains something similar to the following:\n"
-       print "  autoload -U promptinit"
+       print "  autoload -Uz promptinit"
        print "  promptinit"
        print "  prompt $*[2,-1]"
        shift

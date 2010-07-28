@@ -40,7 +40,7 @@ integer now then replaced firstsched schedrpt
 # may occur multiple times.  We set occurrences[<timestamp>]=disposition.
 local -A occurrences
 
-autoload -U calendar_scandate
+autoload -Uz calendar_scandate
 
 typeset -gA reply
 

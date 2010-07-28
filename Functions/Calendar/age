@@ -31,7 +31,7 @@ emulate -L zsh
 zmodload -F zsh/stat b:zstat
 zmodload -i zsh/parameter
 
-autoload -U calendar_scandate
+autoload -Uz calendar_scandate
 
 local -a vals tmp
 
