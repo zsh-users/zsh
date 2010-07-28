@@ -1,5 +1,8 @@
 2010-07-28  Peter Stephenson  <pws@csr.com>
 
+	* users/15204: Functions/Zftp/zfinit: check compctl is loaded
+	before trying to use it (for ksh emulation).
+
 	* as described in users/15202: Functions/Misc/run-help,
 	Functions/Newuser/zsh-newuser-install,
 	Functions/Prompts/promptinit, Functions/TCP/tcp_open,
@@ -13438,5 +13441,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5037 $
+* $Revision: 1.5038 $
 *****************************************************
