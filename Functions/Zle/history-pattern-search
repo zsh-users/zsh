@@ -13,7 +13,7 @@ emulate -L zsh
 setopt extendedglob
 
 # Load required features.
-autoload -U read-from-minibuffer
+autoload -Uz read-from-minibuffer
 zmodload -i zsh/parameter
 
 local REPLY dir new

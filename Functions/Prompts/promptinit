@@ -22,7 +22,7 @@ promptinit () {
       name="$match[1]"
       if [[ -r "$theme" ]]; then
         prompt_themes=($prompt_themes $name)
-        autoload -U prompt_${name}_setup
+        autoload -Uz prompt_${name}_setup
       else
         print "Couldn't read file $theme containing theme $name."
       fi

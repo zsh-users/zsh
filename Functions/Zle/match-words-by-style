@@ -73,7 +73,7 @@ local nwords MATCH MBEGIN MEND subwordrange
 
 local curcontext=${curcontext:-:zle:match-words-by-style}
 
-autoload -U match-word-context
+autoload -Uz match-word-context
 match-word-context
 
 while getopts "w:s:c:C:r:" opt; do

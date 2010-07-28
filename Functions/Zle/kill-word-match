@@ -1,7 +1,7 @@
 emulate -L zsh
 setopt extendedglob
 
-autoload match-words-by-style
+autoload -Uz match-words-by-style
 
 local curcontext=":zle:$WIDGET" word done
 local -a matched_words

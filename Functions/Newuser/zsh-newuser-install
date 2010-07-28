@@ -1081,7 +1081,7 @@ ${install_state[options]:+  ($install_state[options].)}
     if [[ $1 != -f ]]; then
       print -r "The function will not be run in future, but you can run
 it yourself as follows:
-  autoload $myname
+  autoload -Uz $myname
   $myname -f
 
 The code added to $zdmsg/.zshrc is marked by the lines

@@ -8,13 +8,13 @@ word_functions=(backward-kill-word backward-word
     forward-word kill-word
     transpose-words up-case-word)
 
-[[ -z $1 ]] && autoload read-from-minibuffer
+[[ -z $1 ]] && autoload -Uz read-from-minibuffer
 
 local REPLY detail f wordstyle
 
 if ! zle -l $word_functions[1]; then
     for f in $word_functions; do
-	autoload -U $f-match
+	autoload -Uz $f-match
 	zle -N $f $f-match
     done
 fi

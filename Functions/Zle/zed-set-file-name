@@ -1,6 +1,6 @@
 emulate -L zsh
 
-autoload -U read-from-minibuffer
+autoload -Uz read-from-minibuffer
 
 zle -K zed-normal-keymap
 

@@ -11,7 +11,7 @@
 # on X would be turned into `barXfoo' with the cursor still on the X,
 # regardless of what the character X is.
 
-autoload -z match-words-by-style
+autoload -Uz match-words-by-style
 
 local curcontext=":zle:$WIDGET" skip
 local -a matched_words

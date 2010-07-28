@@ -1,3 +1,18 @@
+2010-07-28  Peter Stephenson  <pws@csr.com>
+
+	* as described in users/15202: Functions/Misc/run-help,
+	Functions/Newuser/zsh-newuser-install,
+	Functions/Prompts/promptinit, Functions/TCP/tcp_open,
+	Functions/Zftp/zfinit, Functions/Zle/down-case-word-match,
+	Functions/Zle/forward-word-match,
+	Functions/Zle/history-pattern-search,
+	Functions/Zle/insert-composed-char, Functions/Zle/kill-word-match,
+	Functions/Zle/match-words-by-style,
+	Functions/Zle/select-word-style,
+	Functions/Zle/transpose-words-match,
+	Functions/Zle/up-case-word-match, Functions/Zle/zed-set-file-name:
+	Use "autoload -Uz" consistently throughout distributed functions.
+
 2010-07-26  Peter Stephenson  <pws@csr.com>
 
 	* 28102: Src/Zle/computil.c: use lstat() when checking
@@ -13423,5 +13438,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5036 $
+* $Revision: 1.5037 $
 *****************************************************

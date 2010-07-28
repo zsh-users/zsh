@@ -5,7 +5,7 @@
 # Install this function by placing it in your FPATH and then
 # adding to your .zshrc the lines:
 #	unalias run-help
-#	autoload run-help
+#	autoload -Uz run-help
 #
 
 emulate -RL zsh

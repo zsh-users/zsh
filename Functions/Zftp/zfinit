@@ -25,10 +25,10 @@ alias zfls='noglob zfls'
 alias zfdir='noglob zfdir'
 alias zfuget='noglob zfuget'
 
-autoload -U zfanon zfautocheck zfcd zfcd_match zfcget zfclose zfcput
-autoload -U zfdir zffcache zfgcp zfget zfget_match zfgoto zfhere zfinit zfls
-autoload -U zfmark zfopen zfparams zfpcp zfput zfrglob zfrtime zfsession
-autoload -U zfstat zftp_chpwd zftp_progress zftransfer zftype zfuget zfuput
+autoload -Uz zfanon zfautocheck zfcd zfcd_match zfcget zfclose zfcput
+autoload -Uz zfdir zffcache zfgcp zfget zfget_match zfgoto zfhere zfinit zfls
+autoload -Uz zfmark zfopen zfparams zfpcp zfput zfrglob zfrtime zfsession
+autoload -Uz zfstat zftp_chpwd zftp_progress zftransfer zftype zfuget zfuput
 
 #
 # zftp completions: only use these if new-style completion is not

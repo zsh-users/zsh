@@ -142,7 +142,7 @@ fi
 if (( ${+zsh_accented_chars} == 0 )); then
   # Save quite a lot of memory by running and then erasing
   # the function that defines the characters.
-  autoload -U define-composed-chars
+  autoload -Uz define-composed-chars
   define-composed-chars
   unfunction define-composed-chars
 fi
