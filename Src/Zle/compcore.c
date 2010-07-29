@@ -2932,7 +2932,7 @@ add_match_data(int alt, char *str, char *orig, Cline line,
 		comp_setunset(0, 0, CP_EXACTSTR, 0);
 	    }
 	    ai->exactm = cm;
-	} else if (useexact && !matcheq(cm, ai->exactm)) {
+	} else if (useexact && (!ai->exactm || !matcheq(cm, ai->exactm))) {
 	    ai->exact = 2;
 	    ai->exactm = NULL;
 	    if (incompfunc)
