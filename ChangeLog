@@ -1,3 +1,8 @@
+2010-07-29  Peter Stephenson  <pws@csr.com>
+
+	* <hamer@hamer.org.ua>: 28104: Src/Zle/compcore.c: crash
+	in obscure completion case due to NULL pointer.
+
 2010-07-28  Peter Stephenson  <pws@csr.com>
 
 	* users/15204: Functions/Zftp/zfinit: check compctl is loaded
@@ -13441,5 +13446,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5038 $
+* $Revision: 1.5039 $
 *****************************************************
