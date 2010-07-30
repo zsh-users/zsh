@@ -464,8 +464,8 @@ It is possible to use tt(zstyle -e) to make the directory configurable
 at run time:
 
 example(zstyle -e ':chpwd:*' recent-dirs-file pick-recent-dirs-file
-pick-recent-dirs-file() {
-  if [[ $PWD = ~/text/writing(|/*) ]]; then
+pick-recent-dirs-file+LPAR()RPAR() {
+  if [[ $PWD = ~/text/writing+LPAR()|/*RPAR() ]]; then
     reply=(~/.chpwd-recent-dirs-writing)
   else
     reply=(+)

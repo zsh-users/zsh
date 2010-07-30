@@ -1,3 +1,9 @@
+2010-07-30  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Mikael Magnusson: 28110: Doc/Zsh/compsys.yo: Fix yodl warning.
+
+	* unposted: Fix a date in ChangeLog.
+
 2010-07-29  Peter Stephenson  <pws@csr.com>
 
 	* <hamer@hamer.org.ua>: 28104: Src/Zle/compcore.c: crash
@@ -26,7 +32,7 @@
 	* 28102: Src/Zle/computil.c: use lstat() when checking
 	ignore-parents.
 
-2010-07-19  Frank Terbeck  <ft@bewatermyfriend.org>
+2010-07-26  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 28101: Completion/Unix/Command/_tmux: Fix window completion
 	for tmux version 1.3 and newer.
@@ -13446,5 +13452,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5039 $
+* $Revision: 1.5040 $
 *****************************************************
