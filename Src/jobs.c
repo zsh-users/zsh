@@ -837,7 +837,7 @@ printjob(Job jn, int lng, int synch)
     Process pn;
     int job, len = 9, sig, sflag = 0, llen;
     int conted = 0, lineleng = columns, skip = 0, doputnl = 0;
-    int doneprint = 0;
+    int doneprint = 0, skip_print = 0;
     FILE *fout = (synch == 2 || !shout) ? stdout : shout;
 
     if (oldjobtab != NULL)
@@ -846,16 +846,7 @@ printjob(Job jn, int lng, int synch)
 	job = jn - jobtab;
 
     if (jn->stat & STAT_NOPRINT) {
-	if (jn->stat & STAT_DONE) {
-	    deletejob(jn);
-	    if (job == curjob) {
-		curjob = prevjob;
-		prevjob = job;
-	    }
-	    if (job == prevjob)
-		setprevjob();
-	}
-	return 0;
+	skip_print = 1;
     }
 
     if (lng < 0) {
@@ -889,9 +880,24 @@ printjob(Job jn, int lng, int synch)
 		if (job == thisjob && sig == SIGTSTP)
 		    doputnl = 1;
 	    } else if (isset(PRINTEXITVALUE) && isset(SHINSTDIN) &&
-		       WEXITSTATUS(pn->status))
+		       WEXITSTATUS(pn->status)) {
 		sflag = 1;
+		skip_print = 0;
+	    }
 	}
+    }
+
+    if (skip_print) {
+	if (jn->stat & STAT_DONE) {
+	    deletejob(jn);
+	    if (job == curjob) {
+		curjob = prevjob;
+		prevjob = job;
+	    }
+	    if (job == prevjob)
+		setprevjob();
+	}
+	return 0;
     }
 
     /*
