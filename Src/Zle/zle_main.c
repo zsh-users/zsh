@@ -84,6 +84,14 @@ int done;
 int mark;
 
 /*
+ * Status ($?) saved before function entry.  This is the
+ * status we need to use in prompts.
+ */
+
+/**/
+static int pre_zle_status;
+
+/*
  * Last character pressed.
  *
  * Depending how far we are with processing, the lastcharacter may
@@ -1129,6 +1137,12 @@ zleread(char **lp, char **rp, int flags, int context)
 	free(pptbuf);
 	return shingetline();
     }
+    /*
+     * The current status is what we need if we are going
+     * to display a prompt.  We'll remember it here for
+     * use further in.
+     */
+    pre_zle_status = lastval;
 
     keytimeout = (time_t)getiparam("KEYTIMEOUT");
     if (!shout) {
@@ -1756,6 +1770,14 @@ reexpandprompt(void)
     static int reexpanding;
 
     if (!reexpanding++) {
+	/*
+	 * If we're displaying a status in the prompt, it
+	 * needs to be the toplevel one, not the one from
+	 * any status set within the local zle function.
+	 */
+	int local_lastval = lastval;
+	lastval = pre_zle_status;
+
 	free(lpromptbuf);
 	lpromptbuf = promptexpand(raw_lp ? *raw_lp : NULL, 1, NULL, NULL,
 				  &pmpt_attr);
@@ -1763,6 +1785,7 @@ reexpandprompt(void)
 	free(rpromptbuf);
 	rpromptbuf = promptexpand(raw_rp ? *raw_rp : NULL, 1, NULL, NULL,
 				  &rpmpt_attr);
+	lastval = local_lastval;
     }
     reexpanding--;
 }
