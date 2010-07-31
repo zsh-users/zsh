@@ -873,6 +873,10 @@ printjob(Job jn, int lng, int synch)
 		    sflag = 1;
 		if (job == thisjob && sig == SIGINT)
 		    doputnl = 1;
+		if (isset(PRINTEXITVALUE) && isset(SHINSTDIN)) {
+		    sflag = 1;
+		    skip_print = 0;
+		}
 	    } else if (WIFSTOPPED(pn->status)) {
 		sig = WSTOPSIG(pn->status);
 		if ((int)strlen(sigmsg(sig)) > len)
