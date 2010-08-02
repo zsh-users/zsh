@@ -178,6 +178,22 @@ function +vi-git-st() {
     hook_com[misc]+=${(j:/:)gitstatus}
 }
 
+### git: Show remote branch name for remote-tracking branches
+zstyle ':vcs_info:git*+set-message:*' hooks git-remotebranch
+
+function +vi-git-remotebranch() {
+    local remote
+
+    # Are we on a remote-tracking branch?
+    remote=${$(git rev-parse --verify ${hook_com[branch]}@{upstream} \
+        --symbolic-full-name 2>/dev/null)/refs\/remotes\/}
+
+    if [[ -n ${remote} ]] ; then
+        hook_com[branch]="${hook_com[branch]} [${remote}]"
+    fi
+}
+
+
 ### hg: Show marker when the working directory is not on a branch head
 # This may indicate that running `hg up` will do something
 # NOTE: the branchheads.cache file is not updated with every Mercurial

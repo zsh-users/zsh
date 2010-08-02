@@ -1,3 +1,8 @@
+2010-08-02  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Seth House: 28115: Misc/vcs_info-examples: Another git example
+	hook.
+
 2010-08-02  Peter Stephenson  <pws@csr.com>
 
 	* Daiki Ueno: 28112: Src/Zle/zle_refresh.c: missing parentheses
@@ -13468,5 +13473,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5044 $
+* $Revision: 1.5045 $
 *****************************************************
