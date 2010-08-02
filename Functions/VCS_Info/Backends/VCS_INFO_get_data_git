@@ -101,11 +101,8 @@ VCS_INFO_git_getbranch () {
 
 gitdir=${vcs_comm[gitdir]}
 gitbranch="$(VCS_INFO_git_getbranch ${gitdir})"
-if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision && \
-    [[ ${gitbranch} == refs/* ]] && \
-    [[ -r "${gitdir}/${gitbranch}" ]] ; then
-
-    gitsha1="${"$(< $gitdir/$gitbranch)"}"
+if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision ; then
+    gitsha1=$(${vcs_comm[cmd]} rev-parse --quiet --verify HEAD)
 else
     gitsha1=''
 fi
