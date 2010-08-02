@@ -2341,7 +2341,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	if (tmpline[t0] == ZWC('\t'))
 	    vsiz = (vsiz | 7) + 2;
 #ifdef MULTIBYTE_SUPPORT
-	else if (iswprint(tmpline[t0]) && (width = WCWIDTH(tmpline[t0]) > 0)) {
+	else if (iswprint(tmpline[t0]) && ((width = WCWIDTH(tmpline[t0])) > 0)) {
 	    vsiz += width;
 	    if (isset(COMBININGCHARS) && IS_BASECHAR(tmpline[t0])) {
 		while (t0 < tmpll-1 && IS_COMBINING(tmpline[t0+1]))
