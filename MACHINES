@@ -46,10 +46,13 @@ Red Hat Inc.: Cygwin
 	`binmode'). There are various issues with Cygwin versions before
 	1.3.2 - you are adviced to update to the latest release.
 
-	Dynamic loading works as of cygwin-1.1.3 and binutils-20000722-1.
-	It was not tested for earlier versions. This does not imply
-	that every module will work. New completion and in
-	particular zsh/zftp and zsh/mathfunc are known to work.
+	Process substitution using <(...), >(...), =(...) may be
+	problematic.  Different versions of zsh and Cygwin have
+	a different mix of issues.
+
+	Problems handling subprocesses have been reported with Cygwin
+	1.7.5.  It is not currently known how the problems split between
+	Cygwin and zsh.
 
 	Some of the tests in the Test subdirectory are known to fail:
 	this is because the UNIX environment is not completely implemented.

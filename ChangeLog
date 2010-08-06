@@ -2,6 +2,9 @@
 
 	* 28131: MACHINES: latest status on Cygwin.
 
+	* users/15232: Completion/Unix/Type/_path_files: somehow
+	this didn't get completed.
+
 2010-08-05  Peter Stephenson  <pws@csr.com>
 
 	* users/15232: Completion/Unix/Type/_path_files: another
@@ -13491,5 +13494,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5048 $
+* $Revision: 1.5050 $
 *****************************************************
