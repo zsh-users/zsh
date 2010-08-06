@@ -1,3 +1,12 @@
+2010-08-06  Peter Stephenson  <pws@csr.com>
+
+	* 28131: MACHINES: latest status on Cygwin.
+
+2010-08-05  Peter Stephenson  <pws@csr.com>
+
+	* users/15232: Completion/Unix/Type/_path_files: another
+	go at fixing up for bizarre quoting rules, c.f. users/15031.
+
 2010-08-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Holger Macht: 28130: Completion/Unix/Command/_osc: new
@@ -13482,5 +13491,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5047 $
+* $Revision: 1.5048 $
 *****************************************************
