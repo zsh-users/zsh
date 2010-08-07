@@ -1,4 +1,10 @@
+2010-08-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Simon Ruderich: 28136: README: typo.
+
 2010-08-06  Peter Stephenson  <pws@csr.com>
+
+	* 28131: MACHINES: latest status on Cygwin.
 
 	* users/15232: Completion/Unix/Type/_path_files: somehow
 	this didn't get completed.
@@ -13492,5 +13498,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5049 $
+* $Revision: 1.5051 $
 *****************************************************

@@ -82,7 +82,7 @@ were only handled if they appeared as separate command arguments.
 (However, the latter two forms caused the current argument to be
 terminated and a new one started even if they occurred in the middle of
 a string.)  Now all three may be followed by other strings, and the
-latter two may also be preceeded by other strings.  Remaining
+latter two may also be preceded by other strings.  Remaining
 limitations on their use (to reduce incompatibilities to a minimum)
 are documented in the zshexpn.1 manual.
 
