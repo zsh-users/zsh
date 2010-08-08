@@ -188,9 +188,9 @@ if [[ $handler = *%s* ]]; then
       # Probably we ought not even to handle multiple
       # arguments, but at least the error message ought
       # to make it obvious what's going on.
-      zformat -f command $handler s:"$argv[0]"
+      zformat -f command $handler s:"$argv[1]"
     else
-      zformat -f command $handler s:"${(q)argv[0]}"
+      zformat -f command $handler s:"${(q)argv[1]}"
     fi
     if (( list )); then
       execargs=(${(Q)${(z)command}} ${argv[1,-1]})
