@@ -6,9 +6,9 @@
 #  - "replace" will complete the original text for editing
 #  - completing priorities will cycle through A to Z (even without
 #    menu completion)
-#  - list and listall will complete p:<project> and @<where> from
+#  - list and listall will complete +<project> and @<where> from
 #    values in existing entries
-#  - will complete after p: and @ if typed in message text
+#  - will complete after + and @ if typed in message text
 
 setopt localoptions braceccl
 
@@ -53,7 +53,7 @@ case $state in
   case $words[NORMARG] in
     (append|del|do|prepend|pri|replace)
     if (( NORMARG == CURRENT - 1 )); then
-      itemlist=(${${(M)${(f)"$(todo.sh -p list)"}##<-> *}/(#b)(<->) (*)/${match[1]}:${match[2]}})
+      itemlist=(${${(M)${(f)"$(todo.sh -p list | sed '/^--/,$d')"}##<-> *}/(#b)(<->) (*)/${match[1]}:${match[2]}})
       _describe -t todo-items 'todo item' itemlist
     else
       case $words[NORMARG] in
@@ -64,7 +64,7 @@ case $state in
 	nextstate=proj
 	;;
 	(replace)
-	compadd -Q -- "${(qq)$(todo.sh -p list "^0*${words[CURRENT-1]} ")##<-> }"
+	compadd -Q -- "${(qq)$(todo.sh -p list "^[ 0]*${words[CURRENT-1]} " | sed '/^--/,$d')##<-> (\([A-Z]\) |)}"
 	;;
       esac
     fi
@@ -102,15 +102,15 @@ case $nextstate in
   ;;
 
   (proj)
-  # This completes stuff beginning with p: (projects) or @ (contexts);
+  # This completes stuff beginning with + (projects) or @ (contexts);
   # these are todo.sh conventions.
-  if [[ ! -prefix p: && ! -prefix @ ]]; then
+  if [[ ! -prefix + && ! -prefix @ ]]; then
     projmsg=$txtmsg
   fi
   # In case there are quotes, ignore anything up to whitespace before
-  # the p: or @ (which may not even be there yet).
+  # the + or @ (which may not even be there yet).
   compset -P '*[[:space:]]'
   _wanted search expl $projmsg \
-    compadd ${${=${${(M)${(f)"$(todo.sh -p list)"}##<-> *}##<-> }}:#^(p:*|@*)}
+    compadd $(todo.sh lsprj) $(todo.sh lsc)
   ;;
 esac
