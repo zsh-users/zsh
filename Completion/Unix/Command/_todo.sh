@@ -12,7 +12,7 @@
 
 setopt localoptions braceccl
 
-local expl curcontext="$curcontext" state line pri nextstate
+local expl curcontext="$curcontext" state line pri nextstate item
 local -a cmdlist itemlist match mbegin mend
 integer NORMARG
 
@@ -64,7 +64,8 @@ case $state in
 	nextstate=proj
 	;;
 	(replace)
-	compadd -Q -- "${(qq)$(todo.sh -p list "^[ 0]*${words[CURRENT-1]} " | sed '/^--/,$d')##<-> (\([A-Z]\) |)}"
+	item=${words[CURRENT-1]##0##}
+	compadd -Q -- "${(qq)$(todo.sh -p list "^[ 0]*$item " | sed '/^--/,$d')##<-> (\([A-Z]\) |)}"
 	;;
       esac
     fi
