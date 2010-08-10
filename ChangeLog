@@ -1,3 +1,8 @@
+2010-08-10  Clint Adams  <clint@zsh.org>
+
+	* unposted: Functions/Newuser/zsh-newuser-install: tweak
+	newline placement.
+
 2010-08-10  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_todo.sh: need care matching
@@ -13508,5 +13513,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5053 $
+* $Revision: 1.5054 $
 *****************************************************
