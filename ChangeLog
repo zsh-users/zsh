@@ -1,3 +1,8 @@
+2010-08-11  Peter Stephenson  <pws@csr.com>
+
+	* 28139: based on Frank Terbeck: 28122: Src/Zle/zle_params.c,
+	Doc/Zsh/zle.yo: add ZLE_STATE variable.
+
 2010-08-10  Clint Adams  <clint@zsh.org>
 
 	* unposted: Functions/Newuser/zsh-newuser-install: tweak
@@ -13513,5 +13518,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5054 $
+* $Revision: 1.5055 $
 *****************************************************

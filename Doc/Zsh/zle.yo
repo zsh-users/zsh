@@ -854,6 +854,17 @@ executed; the second argument that followed tt(zle -C) when the widget was
 defined.  This is the name of a builtin completion widget.  For widgets
 defined with tt(zle -N) this is set to the empty string.  Read-only.
 )
+vindex(ZLE_STATE)
+item(tt(ZLE_STATE) (scalar))(
+Contains a set of space-separated words that describe the current tt(zle)
+state.
+
+Currently, the only state shown is the insert mode as set by the
+tt(overwrite-mode) or tt(vi-replace) widgets.  The string contains
+`tt(insert)' if characters to be inserted on the command line move existing
+characters to the right, `tt(overwrite)' if characters to be inserted
+overwrite existing characters.
+)
 enditem()
 
 subsect(Special Widgets)
