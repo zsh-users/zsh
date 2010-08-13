@@ -1789,7 +1789,7 @@ refreshline(int ln)
 /* 0: setup */
     nl = nbuf[ln];
     rnllen = nllen = nl ? ZR_strlen(nl) : 0;
-    if (obuf[ln]) {
+    if (ln < olnct && obuf[ln]) {
 	ol = obuf[ln];
 	ollen = ZR_strlen(ol);
     }
@@ -2083,6 +2083,11 @@ refreshline(int ln)
 	    if (now_off)
 		settextattributes(TXT_ATTR_OFF_FROM_ON(now_off));
 
+	    /*
+	     * This is deliberately called if nl->chr is WEOF
+	     * in order to keep text attributes consistent.
+	     * We check for WEOF inside.
+	     */
 	    zputc(nl);
 	    nl++, ol++;
 	    ccs++, vcs++;

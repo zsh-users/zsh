@@ -1,3 +1,10 @@
+2010-08-13  Peter Stephenson  <pws@csr.com>
+
+	* 28160 modified as per 28164: Src/Zle/zle_refresh.c: when the
+	display was reset we didn't properly mark the old display line
+	as invalid.  This could mean the display didn't get redrawn
+	properly.
+
 2010-08-11  Peter Stephenson  <pws@csr.com>
 
 	* 28139: based on Frank Terbeck: 28122: Src/Zle/zle_params.c,
@@ -13518,5 +13525,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5055 $
+* $Revision: 1.5056 $
 *****************************************************
