@@ -2284,6 +2284,8 @@ invalidate_list(void)
     zsfree(minfo.postbr);
     minfo.postbr = minfo.prebr = NULL;
     compwidget = NULL;
+    nmatches = 0;
+    amatches = NULL;
 
     return 0;
 }
