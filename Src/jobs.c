@@ -2217,7 +2217,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    signal. */
 	    if (jobtab[p].stat & STAT_STOPPED) {
 		if (sig == SIGCONT)
-		    jobtab[p].stat &= ~STAT_STOPPED;
+		    makerunning(jobtab + p);
 		if (sig != SIGKILL && sig != SIGCONT && sig != SIGTSTP
 		    && sig != SIGTTOU && sig != SIGTTIN && sig != SIGSTOP)
 		    killjb(jobtab + p, SIGCONT);
@@ -2225,9 +2225,19 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	} else if (!isanum(*argv)) {
 	    zwarnnam("kill", "illegal pid: %s", *argv);
 	    returnval++;
-	} else if (kill(atoi(*argv), sig) == -1) {
-	    zwarnnam("kill", "kill %s failed: %e", *argv, errno);
-	    returnval++;
+	} else {
+	    int pid = atoi(*argv);
+	    if (kill(pid, sig) == -1) {
+		zwarnnam("kill", "kill %s failed: %e", *argv, errno);
+		returnval++;
+	    } else if (sig == SIGCONT) {
+		Job jn;
+		Process pn;
+		if (findproc(pid, &jn, &pn, 0)) {
+		    if (WIFSTOPPED(pn->status))
+			pn->status = SP_RUNNING;
+		}
+	    }
 	}
     }
     unqueue_signals();

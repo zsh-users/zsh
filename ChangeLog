@@ -1,3 +1,8 @@
+2010-08-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28172: Src/jobs.c: mark processes as not stopped if
+	sent SIGCONT.
+
 2010-08-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28167: Src/Zle/compresult.c: reset more variables when
@@ -13530,5 +13535,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5057 $
+* $Revision: 1.5058 $
 *****************************************************
