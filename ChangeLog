@@ -1,3 +1,7 @@
+2010-08-19  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_todo.sh: more commands.
+
 2010-08-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28172: Src/jobs.c: mark processes as not stopped if
@@ -13535,5 +13539,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5058 $
+* $Revision: 1.5059 $
 *****************************************************
