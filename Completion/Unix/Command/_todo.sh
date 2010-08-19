@@ -29,17 +29,30 @@ _arguments -s -n : \
 local projmsg="context or project"
 local txtmsg="text with contexts or projects"
 
+# Skip "command" as command prefix if words after
+if [[ $words[NORMARG] == command && NORMARG -lt CURRENT ]]; then
+  (( NORMARG++ ))
+fi
+
 case $state in
   (commands)
   cmdlist=(
     "add:add TODO ITEM to todo.txt."
+    "addm:add TODO ITEMs, one per line, to todo.txt."
+    "addto:add text to file (not item)"
     "append:adds to item on line NUMBER the text TEXT."
     "archive:moves done items from todo.txt to done.txt."
+    "command:run internal commands only"
     "del:deletes the item on line NUMBER in todo.txt."
+    "depri:remove prioritization from item"
     "do:marks item on line NUMBER as done in todo.txt."
+    "help:display help"
     "list:displays all todo items containing TERM(s), sorted by priority."
     "listall:displays items including done ones containing TERM(s)"
+    "listcon:list all contexts"
+    "listfile:display all files in .todo directory"
     "listpri:displays all items prioritized at PRIORITY."
+    "move:move item between files"
     "prepend:adds to the beginning of the item on line NUMBER text TEXT."
     "pri:adds or replace in NUMBER the priority PRIORITY (upper case letter)."
     "replace:replace in NUMBER the TEXT."
@@ -51,10 +64,9 @@ case $state in
 
   (arguments)
   case $words[NORMARG] in
-    (append|del|do|prepend|pri|replace)
+    (append|command|del|move|mv|prepend|pri|replace|rm)
     if (( NORMARG == CURRENT - 1 )); then
-      itemlist=(${${(M)${(f)"$(todo.sh -p list | sed '/^--/,$d')"}##<-> *}/(#b)(<->) (*)/${match[1]}:${match[2]}})
-      _describe -t todo-items 'todo item' itemlist
+      nextstate=item
     else
       case $words[NORMARG] in
 	(pri)
@@ -62,6 +74,9 @@ case $state in
 	;;
 	(append|prepend)
 	nextstate=proj
+	;;
+	(move|mv)
+	nextstate=file
 	;;
 	(replace)
 	item=${words[CURRENT-1]##0##}
@@ -71,11 +86,31 @@ case $state in
     fi
     ;;
 
-    (add|list|listall)
+    (depri|do|dp)
+    nextstate=item
+    ;;
+
+    (a|add|addm|list|ls|listall|lsa)
     nextstate=proj
     ;;
 
-    (listpri)
+    (addto)
+    if (( NORMARG == CURRENT - 1 )); then
+      nextstate=file
+    else
+      nexstate=proj
+    fi
+    ;;
+
+    (listfile|lf)
+    if (( NORMARG == CURRENT -1 )); then
+      nextstate=file
+    else
+      _message "Term to search file for"
+    fi
+    ;;
+
+    (listpri|lsp)
     nextstate=pri
     ;;
 
@@ -87,6 +122,15 @@ case $state in
 esac
 
 case $nextstate in
+  (file)
+  _path_files -W ~/.todo
+  ;;
+
+  (item)
+  itemlist=(${${(M)${(f)"$(todo.sh -p list | sed '/^--/,$d')"}##<-> *}/(#b)(<->) (*)/${match[1]}:${match[2]}})
+  _describe -t todo-items 'todo item' itemlist
+  ;;
+
   (pri)
   if [[ $words[CURRENT] = (|[A-Z]) ]]; then
     if [[ $words[CURRENT] = (|Z) ]]; then
