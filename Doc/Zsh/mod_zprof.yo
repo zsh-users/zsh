@@ -19,7 +19,7 @@ at least once.  This summary is sorted in decreasing order of the
 amount of time spent in each.  The lines contain
 the number of the function in order, which is used in 
 other parts of the list in suffixes of the form
-`tt([)var(num)tt(])'), then the number of calls made to the function.
+`tt([)var(num)tt(])', then the number of calls made to the function.
 The next three columns list the time in
 milliseconds spent in the function and its descendants, the average
 time in milliseconds spent in the function and its descendants per

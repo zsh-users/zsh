@@ -1,3 +1,8 @@
+2010-08-21  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Mikael Magnusson: 28181: Doc/Zsh/mod_zprof.yo: Remove a
+	stray `)' that caused a ".RE" string to be output
+
 2010-08-19  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_todo.sh: more commands.
@@ -13539,5 +13544,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5059 $
+* $Revision: 1.5060 $
 *****************************************************
