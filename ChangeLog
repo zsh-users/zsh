@@ -1,3 +1,9 @@
+2010-08-22  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 28186: Completion/Base/Utility/_multi_parts: replace a single
+	(...|...) pattern-match with a loop over the alternatives to
+	avoid issues with pattern-quoting each alternative.
+
 2010-08-21  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Mikael Magnusson: 28181: Doc/Zsh/mod_zprof.yo: Remove a
@@ -13544,5 +13550,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5060 $
+* $Revision: 1.5061 $
 *****************************************************

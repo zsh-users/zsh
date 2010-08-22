@@ -127,7 +127,8 @@ while true; do
 	return
       fi
     elif (( $#tmp1 )); then
-      local ret=1
+      local ret=1 tt
+      local -a mm
 
       # More than one match. First we get all strings that match the
       # rest from the line.
@@ -144,7 +145,11 @@ while true; do
 	SUFFIX="$suf"
       fi
 
-      matches=( "${(@M)matches:#(${(j:|:)~${(q)tmp1}})*}" )
+      for tt in $tmp1
+      do
+        mm+=( "${(@M)matches:#$tt*}" )
+      done
+      matches=( $mm )
 
       if ! zstyle -t ":completion:${curcontext}:" expand suffix ||
          [[ -n "$menu" || -z "$compstate[insert]" ]]; then
