@@ -390,7 +390,8 @@ Process substitutions may be used following redirection operators; in this
 case, the substitution must appear with no trailing string.
 
 In the case of the tt(<) or tt(>) forms, the shell runs the commands in
-var(list) asynchronously.  If the system supports the tt(/dev/fd)
+var(list) as a subprocess of the job executing the shell command line.
+If the system supports the tt(/dev/fd)
 mechanism, the command argument is the name of the device file
 corresponding to a file descriptor; otherwise, if the system supports named
 pipes (FIFOs), the command argument will be a named pipe.  If the form with
@@ -456,7 +457,7 @@ version of the example above:
 example(tt(paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2)tt(RPAR()) tt(> >LPAR())var(process)tt(RPAR()))
 
 (note that no tt(MULTIOS) are involved), var(process) will be run
-asynchronously.  The workaround is:
+asynchronously as far as the parent shell is concerned.  The workaround is:
 
 example(tt({ paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2)tt(RPAR() }) tt(> >LPAR())var(process)tt(RPAR()))
 

@@ -320,6 +320,36 @@ update_process(Process pn, int status)
 }
 #endif
 
+/*
+ * Called when the current shell is behaving as if it received
+ * a interactively generated signal (sig).
+ * 
+ * As we got the signal or are pretending we did, we need to pretend
+ * anything attached to a CURSH process got it, too.
+ */
+/**/
+void
+check_cursh_sig(int sig)
+{
+    int i, j;
+
+    if (!errflag)
+	return;
+    for (i = 1; i <= maxjob; i++) {
+	if ((jobtab[i].stat & (STAT_CURSH|STAT_DONE)) ==
+	    STAT_CURSH) {
+	    for (j = 0; j < 2; j++) {
+		Process pn = j ? jobtab[i].auxprocs : jobtab[i].procs;
+		for (; pn; pn = pn->next) {
+		    if (pn->status == SP_RUNNING) {
+			kill(pn->pid, sig);
+		    }
+		}
+	    }
+	}
+    }
+}
+
 /* Update status of job, possibly printing it */
 
 /**/
@@ -331,11 +361,20 @@ update_job(Job jn)
     int val = 0, status = 0;
     int somestopped = 0, inforeground = 0;
 
-    for (pn = jn->auxprocs; pn; pn = pn->next)
+    for (pn = jn->auxprocs; pn; pn = pn->next) {
+#ifdef WIFCONTINUED
+	if (WIFCONTINUED(pn->status))
+	    pn->status = SP_RUNNING;
+#endif
 	if (pn->status == SP_RUNNING)
 	    return;
+    }
 
     for (pn = jn->procs; pn; pn = pn->next) {
+#ifdef WIFCONTINUED
+	if (WIFCONTINUED(pn->status))
+	    pn->status = SP_RUNNING;
+#endif
 	if (pn->status == SP_RUNNING)      /* some processes in this job are running       */
 	    return;                        /* so no need to update job table entry         */
 	if (WIFSTOPPED(pn->status))        /* some processes are stopped                   */
@@ -496,6 +535,7 @@ update_job(Job jn)
 		breaks = loops;
 		errflag = 1;
 	    }
+	    check_cursh_sig(sig);
 	}
     }
 }
@@ -1793,6 +1833,14 @@ bin_fg(char *name, char **argv, Options ops, int func)
     }
 
     queue_signals();
+    /*
+     * In case any processes changed state recently, wait for them.
+     * This updates stopped processes (but we should have been
+     * signalled about those, up to inevitable races), and also
+     * continued processes if that feature is available.
+     */
+    wait_for_processes();
+
     /* If necessary, update job table. */
     if (unset(NOTIFY))
 	scanjobs();
@@ -2216,8 +2264,11 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    job, and send the job a SIGCONT if sending it a non-stopping
 	    signal. */
 	    if (jobtab[p].stat & STAT_STOPPED) {
+#ifndef WIFCONTINUED
+		/* With WIFCONTINUED we find this out properly */
 		if (sig == SIGCONT)
 		    makerunning(jobtab + p);
+#endif
 		if (sig != SIGKILL && sig != SIGCONT && sig != SIGTSTP
 		    && sig != SIGTTOU && sig != SIGTTIN && sig != SIGSTOP)
 		    killjb(jobtab + p, SIGCONT);
@@ -2230,14 +2281,18 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    if (kill(pid, sig) == -1) {
 		zwarnnam("kill", "kill %s failed: %e", *argv, errno);
 		returnval++;
-	    } else if (sig == SIGCONT) {
+	    } 
+#ifndef WIFCONTINUED
+	    else if (sig == SIGCONT) {
 		Job jn;
 		Process pn;
+		/* With WIFCONTINUED we find this out properly */
 		if (findproc(pid, &jn, &pn, 0)) {
 		    if (WIFSTOPPED(pn->status))
 			pn->status = SP_RUNNING;
 		}
 	    }
+#endif
 	}
     }
     unqueue_signals();

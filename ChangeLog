@@ -1,3 +1,17 @@
+2010-08-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28179: Src/jobs.c, Src/signals.c: use WIFCONTINUED() and
+	WCONTINUE by exporting child handler to a function.
+
+	* users/15314: Doc/Zsh/expn.yo: redescribe process substitution.
+
+	* users/15310 (bits applying to process substitution with
+	redirection): Src/exec.c: make redirection process substitution
+	attach to the appropriate process group.
+
+	* users/15200: pass foreground signals on to process
+	substitutions in current shell
+
 2010-08-22  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 28186: Completion/Base/Utility/_multi_parts: replace a single
@@ -13550,5 +13564,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5061 $
+* $Revision: 1.5062 $
 *****************************************************

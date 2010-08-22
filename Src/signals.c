@@ -400,6 +400,129 @@ signal_suspend(UNUSED(int sig), int wait_cmd)
 /**/
 int last_signal;
 
+/*
+ * Wait for any processes that have changed state.
+ *
+ * The main use for this is in the SIGCHLD handler.  However,
+ * we also use it to pick up status changes of jobs when
+ * updating jobs.
+ */
+/**/
+void
+wait_for_processes(void)
+{
+    /* keep WAITING until no more child processes to reap */
+    for (;;) {
+	/* save the errno, since WAIT may change it */
+	int old_errno = errno;
+	int status;
+	Job jn;
+	Process pn;
+	pid_t pid;
+	pid_t *procsubpid = &cmdoutpid;
+	int *procsubval = &cmdoutval;
+	int cont = 0;
+	struct execstack *es = exstack;
+
+	/*
+	 * Reap the child process.
+	 * If we want usage information, we need to use wait3.
+	 */
+#if defined(HAVE_WAIT3) || defined(HAVE_WAITPID)
+# ifdef WCONTINUED
+# define WAITFLAGS (WNOHANG|WUNTRACED|WCONTINUED)
+# else
+# define WAITFLAGS (WNOHANG|WUNTRACED)
+# endif
+#endif
+#ifdef HAVE_WAIT3
+# ifdef HAVE_GETRUSAGE
+	struct rusage ru;
+
+	pid = wait3((void *)&status, WAITFLAGS, &ru);
+# else
+	pid = wait3((void *)&status, WAITFLAGS, NULL);
+# endif
+#else
+# ifdef HAVE_WAITPID
+	pid = waitpid(-1, &status, WAITFLAGS);
+# else
+	pid = wait(&status);
+# endif
+#endif
+
+	if (!pid)  /* no more children to reap */
+	    break;
+
+	/* check if child returned was from process substitution */
+	for (;;) {
+	    if (pid == *procsubpid) {
+		*procsubpid = 0;
+		if (WIFSIGNALED(status))
+		    *procsubval = (0200 | WTERMSIG(status));
+		else
+		    *procsubval = WEXITSTATUS(status);
+		use_cmdoutval = 1;
+		get_usage();
+		cont = 1;
+		break;
+	    }
+	    if (!es)
+		break;
+	    procsubpid = &es->cmdoutpid;
+	    procsubval = &es->cmdoutval;
+	    es = es->next;
+	}
+	if (cont)
+	    continue;
+
+	/* check for WAIT error */
+	if (pid == -1) {
+	    if (errno != ECHILD)
+		zerr("wait failed: %e", errno);
+	    /* WAIT changed errno, so restore the original */
+	    errno = old_errno;
+	    break;
+	}
+
+	/*
+	 * Find the process and job containing this pid and
+	 * update it.
+	 */
+	pn = NULL;
+	if (findproc(pid, &jn, &pn, 0)) {
+#if defined(HAVE_WAIT3) && defined(HAVE_GETRUSAGE)
+	    struct timezone dummy_tz;
+	    gettimeofday(&pn->endtime, &dummy_tz);
+	    pn->status = status;
+	    pn->ti = ru;
+#else
+	    update_process(pn, status);
+#endif
+	    update_job(jn);
+	} else if (findproc(pid, &jn, &pn, 1)) {
+	    pn->status = status;
+	    update_job(jn);
+	} else {
+	    /* If not found, update the shell record of time spent by
+	     * children in sub processes anyway:  otherwise, this
+	     * will get added on to the next found process that
+	     * terminates.
+	     */
+	    get_usage();
+	}
+	/*
+	 * Remember the status associated with $!, so we can
+	 * wait for it even if it's exited.  This value is
+	 * only used if we can't find the PID in the job table,
+	 * so it doesn't matter that the value we save here isn't
+	 * useful until the process has exited.
+	 */
+	if (pn != NULL && pid == lastpid && lastpid_status != -1L)
+	    lastpid_status = lastval2;
+    }
+}
+
 /* the signal handler */
  
 /**/
@@ -458,110 +581,7 @@ zhandler(int sig)
  
     switch (sig) {
     case SIGCHLD:
-
-	/* keep WAITING until no more child processes to reap */
-	for (;;) {
-	    /* save the errno, since WAIT may change it */
-	    int old_errno = errno;
-	    int status;
-	    Job jn;
-	    Process pn;
-	    pid_t pid;
-	    pid_t *procsubpid = &cmdoutpid;
-	    int *procsubval = &cmdoutval;
-	    int cont = 0;
-	    struct execstack *es = exstack;
-
-	    /*
-	     * Reap the child process.
-	     * If we want usage information, we need to use wait3.
-	     */
-#ifdef HAVE_WAIT3
-# ifdef HAVE_GETRUSAGE
-	    struct rusage ru;
-
-	    pid = wait3((void *)&status, WNOHANG|WUNTRACED, &ru);
-# else
-	    pid = wait3((void *)&status, WNOHANG|WUNTRACED, NULL);
-# endif
-#else
-# ifdef HAVE_WAITPID
-	    pid = waitpid(-1, &status, WNOHANG|WUNTRACED);
-# else
-	    pid = wait(&status);
-# endif
-#endif
-
-	    if (!pid)  /* no more children to reap */
-		break;
-
-	    /* check if child returned was from process substitution */
-	    for (;;) {
-		if (pid == *procsubpid) {
-		    *procsubpid = 0;
-		    if (WIFSIGNALED(status))
-			*procsubval = (0200 | WTERMSIG(status));
-		    else
-			*procsubval = WEXITSTATUS(status);
-		    use_cmdoutval = 1;
-		    get_usage();
-		    cont = 1;
-		    break;
-		}
-		if (!es)
-		    break;
-		procsubpid = &es->cmdoutpid;
-		procsubval = &es->cmdoutval;
-		es = es->next;
-	    }
-	    if (cont)
-		continue;
-
-	    /* check for WAIT error */
-	    if (pid == -1) {
-		if (errno != ECHILD)
-		    zerr("wait failed: %e", errno);
-		/* WAIT changed errno, so restore the original */
-		errno = old_errno;
-		break;
-	    }
-
-	    /*
-	     * Find the process and job containing this pid and
-	     * update it.
-	     */
-	    pn = NULL;
-	    if (findproc(pid, &jn, &pn, 0)) {
-#if defined(HAVE_WAIT3) && defined(HAVE_GETRUSAGE)
-		struct timezone dummy_tz;
-		gettimeofday(&pn->endtime, &dummy_tz);
-		pn->status = status;
-		pn->ti = ru;
-#else
-		update_process(pn, status);
-#endif
-		update_job(jn);
-	    } else if (findproc(pid, &jn, &pn, 1)) {
-		pn->status = status;
-		update_job(jn);
-	    } else {
-		/* If not found, update the shell record of time spent by
-		 * children in sub processes anyway:  otherwise, this
-		 * will get added on to the next found process that
-		 * terminates.
-		 */
-		get_usage();
-	    }
-	    /*
-	     * Remember the status associated with $!, so we can
-	     * wait for it even if it's exited.  This value is
-	     * only used if we can't find the PID in the job table,
-	     * so it doesn't matter that the value we save here isn't
-	     * useful until the process has exited.
-	     */
-	    if (pn != NULL && pid == lastpid && lastpid_status != -1L)
-		lastpid_status = lastval2;
-	}
+	wait_for_processes();
         break;
  
     case SIGHUP:
@@ -580,6 +600,7 @@ zhandler(int sig)
                 breaks = loops;
                 errflag = 1;
 		inerrflush();
+		check_cursh_sig(SIGINT);
             }
         }
         break;
