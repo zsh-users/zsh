@@ -1251,7 +1251,7 @@ _perforce_filetypes() {
       "w:always writeable on client"
       "x:set exec bit on client"
       "k:full RCS keyword expansion"
-      "k:RCS expansion only for Id, Header"
+      "ko:RCS expansion only for Id, Header"
       "l:exclusive open, disallow multiple opens"
       "C:server stores compress file per revision"
       "D:server stores deltas in RCS format"
@@ -1591,6 +1591,7 @@ _perforce_variables() {
 _perforce_cmd_add() {
   _arguments -s : \
     '-c+[select by change]:change:_perforce_changes -tc' \
+    '-d[reopen removed file for add (downgrade)]' \
     '-f[allow filenames with wild cards]' \
     '-n[display operation without doing it]' \
     '-t+[set file type]:file type:_perforce_filetypes' \
@@ -1756,8 +1757,9 @@ _perforce_cmd_counter() {
   _arguments -s : \
     '-d[delete counter]' \
     '-f[force setting of internal counter]' \
+    '-i[increment by one atomically]' \
     '1:counter:_perforce_counters' \
-    '(-d)2::numeric value:_perforce_counter_values'
+    '(-d -i)2::numeric value:_perforce_counter_values'
 }
 
 
@@ -1765,6 +1767,13 @@ _perforce_cmd_counter() {
 _perforce_cmd_counters() {
   # No arguments
   _arguments -s :
+}
+
+
+(( $+functions[_perforce_cmd_cstat] )) ||
+_perforce_cmd_cstat() {
+  _arguments -s : \
+  '*::file:_perforce_files'
 }
 
 
@@ -1984,6 +1993,28 @@ _perforce_cmd_fstat() {
     '-S-[changes sort order]:sort criterion:((t\:filetype d\:date r\:head\ revision h\:have\ revision s\:filesize))' \
     '-T[select output fields]:output field:_perforce_fstat_fields' \
     $Aattr \
+    '*::file:_perforce_files'
+}
+
+
+(( $+functions[_perforce_cmd_grep] )) ||
+_perforce_cmd_grep() {
+  _arguments -s : \
+    '-a[search all revisions]' \
+    '-i[case insensitive match]' \
+    '-n[display matching line]' \
+    '-v[display file name]' \
+    '-F[interpret as fixed string]' \
+    '-G[interpret as regexp (default)]' \
+    '-L[list non-matching file/revisions]' \
+    '-l[list matching file/revisions]' \
+    '-s[suppresses errors on long lines]' \
+    '-t[treat all files as text]' \
+    '-A[]:trailing context lines: ' \
+    '-V[]:leading context lines: ' \
+    '-C[]:context lines: ' \
+    '1:-e required before pattern:(-e)' \
+    '2:pattern: ' \
     '*::file:_perforce_files'
 }
 
@@ -2281,6 +2312,7 @@ _perforce_cmd_monitor() {
 _perforce_cmd_move() {
   _arguments -s : \
     '-c[specify new change list]:change:_perforce_changes -tc' \
+    '-f[force move when already synced]' \
     '-k[no resync from server]' \
     '-t[specify new file type]:filetype:_perforce_filetypes' \
     '-n[show files to move without moving them]' \
@@ -2457,6 +2489,7 @@ _perforce_cmd_sizes() {
     '-a[show for all revisions]' \
     '-b[set blocksize]:blocksize in bytes: ' \
     '-s[sum the file sizes]' \
+    '-S[show sizes of shelved files]' \
     '*:file:_perforce_files -tR'
 }
 
