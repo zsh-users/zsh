@@ -1,5 +1,8 @@
 2010-08-23  Peter Stephenson  <pws@csr.com>
 
+	* Mikael: 28190: Doc/Zsh/options.yo: reference to wrong
+	manual page.
+
 	* unposted: Completion/Unix/Command/_perforce: update for 2010.1.
 
 2010-08-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
@@ -13568,5 +13571,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5063 $
+* $Revision: 1.5064 $
 *****************************************************

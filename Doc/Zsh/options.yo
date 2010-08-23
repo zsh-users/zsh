@@ -1151,7 +1151,7 @@ option is set, and the script does not specify a directory path,
 the script is looked for first in the current directory, then in the
 command path.  See
 ifnzman(noderef(Invocation))\
-ifzman(the section INVOCATION in zmanref(zshmisc)).
+ifzman(the section INVOCATION in zmanref(zsh)).
 )
 pindex(PRINT_EIGHT_BIT)
 pindex(NO_PRINT_EIGHT_BIT)
