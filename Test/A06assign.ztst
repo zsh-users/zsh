@@ -277,3 +277,18 @@
 >
 >
 >
+
+  call() { print $HELLO; }
+  export HELLO=world
+  call
+  HELLO=universe call
+  call
+  HELLO=${HELLO}liness call
+  call
+  unset HELLO
+0:save and restore when using original value in temporary
+>world
+>universe
+>world
+>worldliness
+>world

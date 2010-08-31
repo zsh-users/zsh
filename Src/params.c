@@ -927,11 +927,17 @@ createspecialhash(char *name, GetNodeFunc get, ScanTabFunc scan, int flags)
 }
 
 
-/* Copy a parameter */
+/*
+ * Copy a parameter
+ *
+ * If fakecopy is set, we are just saving the details of a special
+ * parameter.  Otherwise, the result will be used as a real parameter
+ * and we need to do more work.
+ */
 
 /**/
 void
-copyparam(Param tpm, Param pm, int toplevel)
+copyparam(Param tpm, Param pm, int fakecopy)
 {
     /*
      * Note that tpm, into which we're copying, may not be in permanent
@@ -942,7 +948,8 @@ copyparam(Param tpm, Param pm, int toplevel)
     tpm->node.flags = pm->node.flags;
     tpm->base = pm->base;
     tpm->width = pm->width;
-    if (!toplevel)
+    tpm->level = pm->level;
+    if (!fakecopy)
 	tpm->node.flags &= ~PM_SPECIAL;
     switch (PM_TYPE(pm->node.flags)) {
     case PM_SCALAR:
@@ -963,13 +970,15 @@ copyparam(Param tpm, Param pm, int toplevel)
 	break;
     }
     /*
-     * If called from inside an associative array, that array is later going
-     * to be passed as a real parameter, so we need the gets and sets
-     * functions to be useful.  However, the saved associated array is
-     * not itself special, so we just use the standard ones.
-     * This is also why we switch off PM_SPECIAL.
+     * If the value is going to be passed as a real parameter (e.g. this is
+     * called from inside an associative array), we need the gets and sets
+     * functions to be useful.
+     *
+     * In this case we assume the the saved parameter is not itself special,
+     * so we just use the standard functions.  This is also why we switch off
+     * PM_SPECIAL.
      */
-    if (!toplevel)
+    if (!fakecopy)
 	assigngetset(tpm);
 }
 

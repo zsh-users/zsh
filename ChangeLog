@@ -1,5 +1,10 @@
 2010-08-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 28220: Src/exec.c (plus comments), Src/params.c,
+	Test/A06assign.ztst: "HELLO=$HELLO shellfunc" failed because
+	we removed HELLO from the parameter table to save it.  Copy it
+	instead.
+
 	* Mikael: 28202: Src/Zle/complist.c: need line unmetafied for
 	reversemenucomplete().
 
@@ -13576,5 +13581,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5065 $
+* $Revision: 1.5066 $
 *****************************************************

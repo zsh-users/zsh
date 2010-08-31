@@ -3313,13 +3313,32 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
     while (wc_code(ac = *pc) == WC_ASSIGN) {
 	s = ecrawstr(state->prog, pc + 1, NULL);
 	if ((pm = (Param) paramtab->getnode(paramtab, s))) {
+	    Param tpm;
 	    if (pm->env)
 		delenv(pm);
 	    if (!(pm->node.flags & PM_SPECIAL)) {
-		paramtab->removenode(paramtab, s);
+		/*
+		 * We used to remove ordinary parameters from the
+		 * table, but that meant "HELLO=$HELLO shellfunc"
+		 * failed because the expansion of $HELLO hasn't
+		 * been done at this point.  Instead, copy the
+		 * parameter:  in this case, we'll insert the
+		 * copied parameter straight back into the parameter
+		 * table so we wan't to be sure everything is
+		 * properly set up and in permanent memory.
+		 */
+		tpm = (Param) zshcalloc(sizeof *tpm);
+		tpm->node.nam = ztrdup(pm->node.nam);
+		copyparam(tpm, pm, 0);
+		pm = tpm;
 	    } else if (!(pm->node.flags & PM_READONLY) &&
 		       (unset(RESTRICTED) || !(pm->node.flags & PM_RESTRICTED))) {
-		Param tpm = (Param) hcalloc(sizeof *tpm);
+		/*
+		 * In this case we're just saving parts of
+		 * the parameter in a tempory, so use heap allocation
+		 * and don't bother copying every detail.
+		 */
+		tpm = (Param) hcalloc(sizeof *tpm);
 		tpm->node.nam = pm->node.nam;
 		copyparam(tpm, pm, 1);
 		pm = tpm;
@@ -3383,8 +3402,9 @@ restore_params(LinkList restorelist, LinkList removelist)
 		    break;
 		}
 		pm = tpm;
-	    } else
+	    } else {
 		paramtab->addnode(paramtab, pm->node.nam, pm);
+	    }
 	    if ((pm->node.flags & PM_EXPORTED) && ((s = getsparam(pm->node.nam))))
 		addenv(pm, s);
 	}
