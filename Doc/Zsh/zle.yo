@@ -1146,7 +1146,8 @@ An interrupt signal, as defined by the stty
 setting, will stop the search and go back to the original line.  An undefined
 key will have the same effect.  Note that the following always
 perform the same task within incremental searches and cannot be
-replaced by user defined widgets.  The supported functions are:
+replaced by user defined widgets, nor can the set of functions
+be extended.  The supported functions are:
 
 startitem()
 xitem(tt(accept-and-hold))
@@ -1888,7 +1889,10 @@ execute it.  A restricted set of editing functions is available in the
 mini-buffer.  Keys are looked up in the special
 tt(command) keymap, and if not found there in the main keymap.
 An interrupt signal, as defined by the stty setting, will
-abort the function. The allowed functions are:
+abort the function.  Note that the following always
+perform the same task within the tt(executed-named-cmd) environment and
+cannot be replaced by user defined widgets, nor can the set of functions
+be extended.  The allowed functions are:
 tt(backward-delete-char),
 tt(vi-backward-delete-char),
 tt(clear-screen),

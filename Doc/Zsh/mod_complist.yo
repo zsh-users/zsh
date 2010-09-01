@@ -291,7 +291,10 @@ Selecting matches is done by moving the mark around using the zle movement
 functions.  When not all matches can be shown on the screen at the same 
 time, the list will scroll up and down when crossing the top or
 bottom line.  The following zle functions have special meaning during
-menu selection:
+menu selection.  Note that the following always
+perform the same task within the menu selection map and cannot be
+replaced by user defined widgets, nor can the set of functions
+be extended:
 
 startitem()
 item(tt(accept-line), tt(accept-search))(

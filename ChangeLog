@@ -1,3 +1,8 @@
+2010-09-01  Peter Stephenson  <pws@csr.com>
+
+	* 28188: Doc/Zsh/mod_complist.yo, Doc/Zsh/zle.yo: better
+	documentation for limitations in the overlay key maps.
+
 2010-08-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28220: Src/exec.c (plus comments), Src/params.c,
@@ -13581,5 +13586,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5066 $
+* $Revision: 1.5067 $
 *****************************************************
