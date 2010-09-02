@@ -2302,10 +2302,17 @@ time.
 )
 item(tt(L)[tt(PLUS())|tt(-)]var(n))(
 files less than var(n) bytes (tt(-)), more than var(n) bytes (tt(PLUS())), or
-exactly var(n) bytes in length. If this flag is directly followed by a `tt(k)'
-(`tt(K)'), `tt(m)' (`tt(M)'), or `tt(p)' (`tt(P)') (e.g. `tt(Lk-50)')
-the check is performed with kilobytes, megabytes, or blocks (of 512 bytes)
-instead.
+exactly var(n) bytes in length.
+
+If this flag is directly followed by a `tt(k)' (`tt(K)'), `tt(m)'
+(`tt(M)'), or `tt(p)' (`tt(P)') (e.g. `tt(Lk-50)') the check is performed
+with kilobytes, megabytes, or blocks (of 512 bytes) instead.  In this
+case a file is regarded as "exactly" the size if the file size rounded up
+to the next unit is equal to the test size.  Hence `tt(*LPAR()Lm1+RPAR())'
+matches files from 1 byte up to 1 Megabyte inclusive.  Note also that
+the set of files "less than" the test size only includes files that would
+not match the equality test; hence `tt(*LPAR()Lm-1+RPAR())' only matches
+files of zero size.
 )
 item(tt(^))(
 negates all qualifiers following it

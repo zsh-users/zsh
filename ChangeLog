@@ -1,3 +1,8 @@
+2010-09-02  Peter Stephenson  <pws@csr.com>
+
+	* users/15350: Doc/expn.yo: explain the strange rounding rules for
+	size glob qualifier.
+
 2010-09-01  Peter Stephenson  <pws@csr.com>
 
 	* 28188: Doc/Zsh/mod_complist.yo, Doc/Zsh/zle.yo: better
@@ -13586,5 +13591,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5067 $
+* $Revision: 1.5068 $
 *****************************************************
