@@ -139,7 +139,7 @@ cindex(rebinding keys)
 cindex(keys, binding)
 cindex(binding keys)
 cindex(keymaps)
-xitem(tt(bindkey) [ var(options) ] tt(-l))
+xitem(tt(bindkey) [ var(options) ] tt(-l) [ tt(-l) ] [ var(keymap) ... ])
 xitem(tt(bindkey) [ var(options) ] tt(-d))
 xitem(tt(bindkey) [ var(options) ] tt(-D) var(keymap) ...)
 xitem(tt(bindkey) [ var(options) ] tt(-A) var(old-keymap new-keymap))
@@ -179,10 +179,13 @@ selected, namely:
 
 startitem()
 item(tt(-l))(
-List all existing keymap names.  If the tt(-L)
-option is also used, list in the form of tt(bindkey)
-commands to create the keymaps; this combination also shows
-which keymap is linked to `tt(main)', if any.
+List all existing keymap names; if any arguments are given, list just
+those keymaps.
+
+If the tt(-L) option is also used, list in the form of tt(bindkey)
+commands to create or link the keymaps.  `tt(bindkey -lL
+main)' shows which keymap is linked to `tt(main)', if any, and hence if
+the standard emacs or vi emulation is in effect.
 )
 item(tt(-d))(
 Delete all existing keymaps and reset to the default state.

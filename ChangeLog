@@ -1,7 +1,8 @@
 2010-09-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 28226: Doc/Zsh/zle.yo, Src/Zle/zle_keymap.c: "bindkey -lL" now
-	lists aliased keymaps in a more useful way.
+	* 28226, 28229: Doc/Zsh/zle.yo, Src/Zle/zle_keymap.c: "bindkey
+	-lL" now lists aliased keymaps in a more useful way; can list
+	individual keymaps.
 
 	* 28227: Doc/Zsh/zle.yo: a few remarks on the question of
 	keymaps.
@@ -13599,5 +13600,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5069 $
+* $Revision: 1.5070 $
 *****************************************************

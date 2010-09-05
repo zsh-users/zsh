@@ -724,7 +724,7 @@ bin_bindkey(char *name, char **argv, Options ops, UNUSED(int func))
 	int (*func) _((char *, char *, Keymap, char **, Options, char));
 	int min, max;
     } const opns[] = {
-	{ 'l', 0, bin_bindkey_lsmaps, 0,  0 },
+	{ 'l', 0, bin_bindkey_lsmaps, 0,  -1 },
 	{ 'd', 0, bin_bindkey_delall, 0,  0 },
 	{ 'D', 0, bin_bindkey_del,    1, -1 },
 	{ 'A', 0, bin_bindkey_link,   2,  2 },
@@ -807,10 +807,24 @@ bin_bindkey(char *name, char **argv, Options ops, UNUSED(int func))
 
 /**/
 static int
-bin_bindkey_lsmaps(UNUSED(char *name), UNUSED(char *kmname), UNUSED(Keymap km), UNUSED(char **argv), Options ops, UNUSED(char func))
+bin_bindkey_lsmaps(char *name, UNUSED(char *kmname), UNUSED(Keymap km), char **argv, Options ops, UNUSED(char func))
 {
-    scanhashtable(keymapnamtab, 1, 0, 0, scanlistmaps, OPT_ISSET(ops,'L'));
-    return 0;
+    int ret = 0;
+    if (*argv) {
+	for (; *argv; argv++) {
+	    KeymapName kmn = (KeymapName)
+		keymapnamtab->getnode(keymapnamtab, *argv);
+	    if (!kmn) {
+		zwarnnam(name, "no such keymap: `%s'", *argv);
+		ret = 1;
+	    } else {
+		scanlistmaps((HashNode)kmn, OPT_ISSET(ops,'L'));
+	    }
+	}
+    } else {
+	scanhashtable(keymapnamtab, 1, 0, 0, scanlistmaps, OPT_ISSET(ops,'L'));
+    }
+    return ret;
 }
 
 /**/
