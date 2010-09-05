@@ -58,11 +58,24 @@ struct keymapname {
     Keymap keymap;	/* the keymap itsef */
 };
 
+/* Can't be deleted (.safe) */
 #define KMN_IMMORTAL (1<<1)
 
 struct keymap {
     Thingy first[256];	/* base binding of each character */
     HashTable multi;	/* multi-character bindings */
+    /*
+     * The "real" name of this keymap.
+     * For an aliased keymap, this is the first name to be defined.
+     * If this is deleted but there are other names we randomly pick another
+     * one, avoiding the name "main".  The principal use
+     * for this is to make it clear what "main" is aliased to.
+     *
+     * If "main" is the only name for this map, this will be NULL.
+     * That's fine, there's no alias.  We'll pick a primary if we
+     * alias "main" again.
+     */
+    KeymapName primary;
     int flags;		/* various flags (see below) */
     int rc;		/* reference count */
 };
@@ -162,6 +175,70 @@ makekeymapnamnode(Keymap keymap)
     return kmn;
 }
 
+
+/*
+ * Reference a keymap from a keymapname.
+ * Used when linking keymaps.  This includes the first link to a
+ * newly created keymap.
+ */
+
+static void
+refkeymap_by_name(KeymapName kmn)
+{
+    refkeymap(kmn->keymap);
+    if (!kmn->keymap->primary && strcmp(kmn->nam, "main") != 0)
+	kmn->keymap->primary = kmn;
+}
+
+/*
+ * Communication to keymap scanner when looking for a new primary name.
+ */
+static Keymap km_rename_me;
+
+/* Find a new primary name for a keymap.  See below. */
+
+static void
+scanprimaryname(HashNode hn, int ignored)
+{
+    KeymapName n = (KeymapName) hn;
+
+    (void)ignored;
+
+    /* Check if we've already found a new primary name. */
+    if (km_rename_me->primary)
+	return;
+    /* Don't use "main". */
+    if (!strcmp(n->nam, "main"))
+	return;
+    if (n->keymap == km_rename_me)
+	km_rename_me->primary = n;
+}
+
+/*
+ * Unreference a keymap from a keymapname.
+ * Used when unlinking keymaps to ensure there is still a primary
+ * name for the keymap, unless it is an unaliased "main".
+ */
+static void
+unrefkeymap_by_name(KeymapName kmname)
+{
+    Keymap km = kmname->keymap;
+    if (unrefkeymap(km) && km->primary == kmname) {
+	/*
+	 * The primary name for the keymap has gone,
+	 * but the keymap is still referred to; find a new primary name
+	 * for it.  Sort the keymap to make the result deterministic.
+	 */
+	/* Set the primary name to NULL so we can check if we've found one */
+	km->primary = NULL;
+	km_rename_me = km;
+	scanhashtable(keymapnamtab, 1, 0, 0, scanprimaryname, 0);
+	/* Just for neatness */
+	km_rename_me = NULL;
+    }
+}
+
+
 /**/
 static void
 freekeymapnamnode(HashNode hn)
@@ -169,7 +246,7 @@ freekeymapnamnode(HashNode hn)
     KeymapName kmn = (KeymapName) hn;
 
     zsfree(kmn->nam);
-    unrefkeymap(kmn->keymap);
+    unrefkeymap_by_name(kmn);
     zfree(kmn, sizeof(*kmn));
 }
 
@@ -354,7 +431,7 @@ linkkeymap(Keymap km, char *name, int imm)
 	    return 1;
 	if(n->keymap == km)
 	    return 0;
-	unrefkeymap(n->keymap);
+	unrefkeymap_by_name(n);
 	n->keymap = km;
     } else {
 	n = makekeymapnamnode(km);
@@ -362,21 +439,29 @@ linkkeymap(Keymap km, char *name, int imm)
 	    n->flags |= KMN_IMMORTAL;
 	keymapnamtab->addnode(keymapnamtab, ztrdup(name), n);
     }
-    refkeymap(km);
+    refkeymap_by_name(n);
     return 0;
 }
 
 /**/
-void refkeymap(Keymap km)
+void
+refkeymap(Keymap km)
 {
     km->rc++;
 }
 
+/* Unreference keymap, returning new reference count, 0 if deleted */
+
 /**/
-void unrefkeymap(Keymap km)
+int
+unrefkeymap(Keymap km)
 {
-    if (!--km->rc)
+    if (!--km->rc) {
 	deletekeymap(km);
+	return 0;
+    }
+
+    return km->rc;
 }
 
 /* Select a keymap as the current ZLE keymap.  Can optionally fall back *
@@ -734,10 +819,21 @@ scanlistmaps(HashNode hn, int list)
 {
     KeymapName n = (KeymapName) hn;
 
-    if(list) {
-	fputs("bindkey -N ", stdout);
-	if(n->nam[0] == '-')
-	    fputs("-- ", stdout);
+    if (list) {
+	Keymap km = n->keymap;
+	fputs("bindkey -", stdout);
+	if (km->primary && km->primary != n) {
+	    KeymapName pn = km->primary;
+	    fputs("A ", stdout);
+	    if (pn->nam[0] == '-')
+		fputs("-- ", stdout);
+	    quotedzputs(pn->nam, stdout);
+	    fputc(' ', stdout);
+	} else {
+	    fputs("N ", stdout);
+	    if(n->nam[0] == '-')
+		fputs("-- ", stdout);
+	}
 	quotedzputs(n->nam, stdout);
     } else
 	nicezputs(n->nam, stdout);

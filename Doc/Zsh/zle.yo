@@ -149,21 +149,27 @@ xitem(tt(bindkey) [ var(options) ] tt(-r) var(in-string) ...)
 xitem(tt(bindkey) [ var(options) ] tt(-s) var(in-string out-string) ...)
 xitem(tt(bindkey) [ var(options) ] var(in-string command) ...)
 item(tt(bindkey) [ var(options) ] [ var(in-string) ])(
-tt(bindkey)'s options can be divided into three categories: keymap selection,
-operation selection, and others.  The keymap selection options are:
+tt(bindkey)'s options can be divided into three categories: keymap
+selection for the current command, operation selection, and others.  The
+keymap selection options are:
 
 startitem()
 item(tt(-e))(
-Selects keymap `tt(emacs)', and also links it to `tt(main)'.
+Selects keymap `tt(emacs)' for any operations by the current command,
+and also links `tt(emacs)' to `tt(main)' so that it is selected by
+default the next time the editor starts.
 )
 item(tt(-v))(
-Selects keymap `tt(viins)', and also links it to `tt(main)'.
+Selects keymap `tt(viins)' for any operations by the current command,
+and also links `tt(viins)' to `tt(main)' so that it is selected by default
+the next time the editor starts.
 )
 item(tt(-a))(
-Selects keymap `tt(vicmd)'.
+Selects keymap `tt(vicmd)' for any operations by the current command.
 )
 item(tt(-M) var(keymap))(
-The var(keymap) specifies a keymap name.
+The var(keymap) specifies a keymap name that is selected for any
+operations by the current command.
 )
 enditem()
 
@@ -175,7 +181,8 @@ startitem()
 item(tt(-l))(
 List all existing keymap names.  If the tt(-L)
 option is also used, list in the form of tt(bindkey)
-commands to create the keymaps.
+commands to create the keymaps; this combination also shows
+which keymap is linked to `tt(main)', if any.
 )
 item(tt(-d))(
 Delete all existing keymaps and reset to the default state.
@@ -1207,11 +1214,10 @@ mini-buffer.
 )
 enditem()
 
-Any multi-character string that is not bound to one of the above functions
-will beep and interrupt the search, leaving the last found line in the
-buffer. Any single character that is not bound to one of the above
-functions, or tt(self-insert) or tt(self-insert-unmeta), will have the same
-effect but the function will be executed.
+Any character that is not bound to one of the above functions, or
+tt(self-insert) or tt(self-insert-unmeta), will cause the mode to be
+exited.  The character is then looked up and executed in the keymap in
+effect at that point.
 
 When called from a widget function by the tt(zle) command, the incremental
 search commands can take a string argument.  This will be treated as a
