@@ -70,12 +70,12 @@ still to turn job control off, however if the new POSIX_JOBS option is set
 MONITOR remains active in subshells.
 
 Regular expression matches now use the same variables for storing matched
-components as shell pattern matching.  The function system now provides
-the function regexp-replace for replacing text using regular expressions.
-The zle widgets replace-string, replace-string-again, if defined with regex
-in the name (e.g. "zle -N replace-regexp replace-string"), perform regular
-expression matches.  In replacement text \& and \1 have the standard
-meaning.
+components as shell pattern matching.  The function system now provides the
+function regexp-replace for replacing text using regular expressions.  The
+zle widget functions replace-string, replace-string-again, if defined with
+regex in the name (e.g. "zle -N replace-regexp replace-string"), perform
+regular expression matches.  In replacement text \& and \1 have the
+standard meaning.
 
 Changes between versions 4.3.9 and 4.3.10
 -----------------------------------------
