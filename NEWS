@@ -49,7 +49,7 @@ whether the line editor is in insert or overwrite mode.
 There is now a function system for recording and restoring recently
 entered directories.  See the entry for cdr in the zshcontrib manual page.
 
-The (D) flag use in parameter expansion abbreviates directories in the
+The (D) flag in parameter expansion abbreviates directories in the
 substituted value.  The (q-) flag does minimal shell quotation of arguments
 for maximum human readability of the result.
 
