@@ -1,5 +1,8 @@
 2010-09-08  Peter Stephenson  <pws@csr.com>
 
+	* 28244 with typo noted by Mikael and Bart: NEWS: updated 4.3.11
+	news.
+
 	* 28241: Doc/Zsh/zle.yo, Src/Zle/zle_keymap.c: don't list .safe
 	keymap with "bindkey -lL", you don't get there from here.
 
@@ -13612,5 +13615,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5072 $
+* $Revision: 1.5073 $
 *****************************************************

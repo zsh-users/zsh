@@ -29,6 +29,53 @@ e.g. /u/b/z no longer completes to /usr/bin/zsh.  This is useful on systems
 where this form of completion is pathologically slow due to network
 performance.
 
+With the MULTIBYTE option, the line editor now highlights bytes in the
+input that are not part of a valid character in the current locale in hex
+as <XX> for hex digits X; highlighting is controlled by the "special"
+keyword in the zle_highlight array.  These can be distinguished from
+unprintable Unicode characters which also use "special" highlighting as the
+latter are always two or four bytes long, e.g. <XXXX>, <XXXXXXXX>.
+
+The line editor now sets the variable ZLE_LINE_ABORTED if there is
+an error when editing the line.  The following code can be used
+to create a bindable editor widget to restore the aborted line:
+  recover-line() { LBUFFER=$ZLE_LINE_ABORTED RBUFFER=; }
+  zle -N recover-line
+
+The parameter ZLE_STATE, available in user-defined line editor widgets,
+gives information on the state of the line editor.  Currently this is
+whether the line editor is in insert or overwrite mode.
+
+There is now a function system for recording and restoring recently
+entered directories.  See the entry for cdr in the zshcontrib manual page.
+
+The (D) flag use in parameter expansion abbreviates directories in the
+substituted value.  The (q-) flag does minimal shell quotation of arguments
+for maximum human readability of the result.
+
+The new shell option SOURCE_TRACE causes the shell to report files
+containing shell code that the shell executes directly, i.e. startup files
+or files run with the `source' or `.' builtins.
+
+The shell option SUN_KEYBOARD_HACK has been supplemented by a more general
+mechanism: the KEYBOARD_HACK variable defines the character to be ignored.
+
+The new shell option POSIX_CD, active in emulations of POSIX-based shells,
+makes the cd builtin POSIX-compatible.
+
+The shell option MONITOR can be set in non-interactive shells, and also in
+subshells (as created by surrounding commands with parentheses), turning on
+job control for that subshell.  The initial behaviour of a subshell is
+still to turn job control off, however if the new POSIX_JOBS option is set
+MONITOR remains active in subshells.
+
+Regular expression matches now use the same variables for storing matched
+components as shell pattern matching.  The function system now provides
+the function regexp-replace for replacing text using regular expressions.
+The zle widgets replace-string, replace-string-again, if defined with regex
+in the name (e.g. "zle -N replace-regexp replace-string"), perform regular
+expression matches.  In replacement text \& and \1 have the standard
+meaning.
 
 Changes between versions 4.3.9 and 4.3.10
 -----------------------------------------
