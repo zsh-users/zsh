@@ -1226,6 +1226,9 @@ zleread(char **lp, char **rp, int flags, int context)
 
     zlecore();
 
+    if (errflag)
+	setsparam("ZLE_LINE_ABORTED", zlegetline(NULL, NULL));
+
     if (done && !exit_pending && !errflag &&
 	(initthingy = rthingy_nocreate("zle-line-finish"))) {
 	int saverrflag = errflag;

@@ -829,12 +829,18 @@ bin_bindkey_lsmaps(char *name, UNUSED(char *kmname), UNUSED(Keymap km), char **a
 
 /**/
 static void
-scanlistmaps(HashNode hn, int list)
+scanlistmaps(HashNode hn, int list_verbose)
 {
     KeymapName n = (KeymapName) hn;
 
-    if (list) {
+    if (list_verbose) {
 	Keymap km = n->keymap;
+	/*
+	 * Don't list ".safe" as a bindkey command; we can't
+	 * actually create it that way.
+	 */
+	if (!strcmp(n->nam, ".safe"))
+	    return;
 	fputs("bindkey -", stdout);
 	if (km->primary && km->primary != n) {
 	    KeymapName pn = km->primary;

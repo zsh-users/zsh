@@ -1,3 +1,11 @@
+2010-09-08  Peter Stephenson  <pws@csr.com>
+
+	* 28241: Doc/Zsh/zle.yo, Src/Zle/zle_keymap.c: don't list .safe
+	keymap with "bindkey -lL", you don't get there from here.
+
+	* 28237: Doc/Zsh/params.yo, Doc/Zsh/zle.yo, Src/Zle/zle_main.c:
+	set ZLE_LINE_ABORTED to line so far when ZLE aborts on an error.
+
 2010-09-06  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Doc/Zsh/zle.yo: small typo.
@@ -13604,5 +13612,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5071 $
+* $Revision: 1.5072 $
 *****************************************************

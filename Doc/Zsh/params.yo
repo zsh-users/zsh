@@ -1448,6 +1448,13 @@ item(tt(ZDOTDIR))(
 The directory to search for shell startup files (.zshrc, etc),
 if not tt($HOME).
 )
+vindex(ZLE_LINE_ABORTED)
+item(tt(ZLE_LINE_ABORTED))(
+This parameter is set by the line editor when an error occurs.  It
+contains the line that was being edited at the point of the error.
+`tt(print -zr -- $ZLE_LINE_ABORTED)' can be used to recover the line.
+Only the most recent line of this kind is remembered.
+)
 vindex(ZLE_REMOVE_SUFFIX_CHARS)
 vindex(ZLE_SPACE_SUFFIX_CHARS)
 xitem(tt(ZLE_REMOVE_SUFFIX_CHARS))

@@ -185,7 +185,10 @@ those keymaps.
 If the tt(-L) option is also used, list in the form of tt(bindkey)
 commands to create or link the keymaps.  `tt(bindkey -lL
 main)' shows which keymap is linked to `tt(main)', if any, and hence if
-the standard emacs or vi emulation is in effect.
+the standard emacs or vi emulation is in effect.  This option does
+not show the tt(.safe) keymap because it cannot be created in that
+fashion; however, neither is `tt(bindkey -lL .safe)' reported as an
+error, it simply outputs nothing.
 )
 item(tt(-d))(
 Delete all existing keymaps and reset to the default state.
@@ -2057,7 +2060,8 @@ tindex(send-break)
 item(tt(send-break) (^G ESC-^G) (unbound) (unbound))(
 Abort the current editor function, e.g. tt(execute-named-command), or the
 editor itself, e.g. if you are in tt(vared). Otherwise abort the parsing of
-the current line.
+the current line; in this case the aborted line is available in the shell
+variable tt(ZLE_LINE_ABORTED).
 )
 tindex(run-help)
 item(tt(run-help) (ESC-H ESC-h) (unbound) (unbound))(
