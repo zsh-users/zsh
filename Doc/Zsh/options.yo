@@ -1876,6 +1876,19 @@ If multibyte character support is not compiled into the shell this option is
 ignored; all octets with the top bit set may be used in identifiers.
 This is non-standard but is the traditional zsh behaviour.
 )
+pindex(POSIX_TRAPS)
+pindex(NO_POSIX_TRAPS)
+pindex(POSIXTRAPS)
+pindex(NOPOSIXTRAPS)
+cindex(traps, on function exit)
+cindex(traps, POSIX compatibility)
+item(tt(POSIX_TRAPS) <K> <S>)(
+When the is option is set, the usual zsh behaviour of executing
+traps for tt(EXIT) on exit from shell functions is suppressed.
+In that case, manipulating tt(EXIT) traps always alters the global
+trap for exiting the shell; the tt(LOCAL_TRAPS) option is
+ignored for the tt(EXIT) trap.
+)
 pindex(SH_FILE_EXPANSION)
 pindex(NO_SH_FILE_EXPANSION)
 pindex(SHFILEEXPANSION)

@@ -864,7 +864,8 @@ removetrap(int sig)
      * one, to aid in removing this one.  However, if there's
      * already one at the current locallevel we just overwrite it.
      */
-    if (!dontsavetrap && (isset(LOCALTRAPS) || sig == SIGEXIT) &&
+    if (!dontsavetrap &&
+	(sig == SIGEXIT ? !isset(POSIXTRAPS) : isset(LOCALTRAPS)) &&
 	locallevel &&
 	(!trapped || locallevel > (sigtrapped[sig] >> ZSIG_SHIFT)))
 	dosavetrap(sig, locallevel);
@@ -932,7 +933,7 @@ starttrapscope(void)
      * so give it the next higher one. dosavetrap() is called
      * automatically where necessary.
      */
-    if (sigtrapped[SIGEXIT]) {
+    if (sigtrapped[SIGEXIT] && !isset(POSIXTRAPS)) {
 	locallevel++;
 	unsettrap(SIGEXIT);
 	locallevel--;
@@ -960,7 +961,7 @@ endtrapscope(void)
      */
     if (intrap)
 	exittr = 0;
-    else if ((exittr = sigtrapped[SIGEXIT])) {
+    else if (!isset(POSIXTRAPS) && (exittr = sigtrapped[SIGEXIT])) {
 	if (exittr & ZSIG_FUNC) {
 	    exitfn = removehashnode(shfunctab, "TRAPEXIT");
 	} else {
@@ -1005,7 +1006,8 @@ endtrapscope(void)
     }
 
     if (exittr) {
-	dotrapargs(SIGEXIT, &exittr, exitfn);
+	if (!isset(POSIXTRAPS))
+	    dotrapargs(SIGEXIT, &exittr, exitfn);
 	if (exittr & ZSIG_FUNC)
 	    shfunctab->freenode((HashNode)exitfn);
 	else

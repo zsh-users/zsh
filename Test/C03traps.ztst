@@ -371,6 +371,23 @@
 0: EXIT trap set in command substitution
 >command substitution exited
 
+   (cd ..; $ZTST_exe -fc 'setopt posixtraps;
+   TRAPEXIT() { print Exited; }
+   fn1() { trap; }
+   setopt localtraps # should be ignored by EXIT
+   fn2() { TRAPEXIT() { print No, really exited; } }
+   fn1
+   fn2
+   fn1')
+0:POSIX_TRAPS option
+>TRAPEXIT () {
+>	print Exited
+>}
+>TRAPEXIT () {
+>	print No, really exited
+>}
+>No, really exited
+
 %clean
 
   rm -f TRAPEXIT
