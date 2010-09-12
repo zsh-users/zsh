@@ -1,5 +1,8 @@
 2010-09-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Doc/Zsh/builtins.yo: note exit trap runs before
+	zshexit hook.
+
 	* 28250: Doc/Zsh/options.yo, Src/options.c, Src/signals.c,
 	Src/zsh.h, Test/C03traps.ztst: POSIX_TRAPS option.
 
@@ -13626,5 +13629,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5076 $
+* $Revision: 1.5077 $
 *****************************************************

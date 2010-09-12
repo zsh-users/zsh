@@ -1424,7 +1424,8 @@ The value of tt($?) at the start of execution is the exit status of the
 shell or the return status of the function exiting.
 If var(sig) is tt(0) or tt(EXIT)
 and the tt(trap) statement is not executed inside the body of a function,
-then the command var(arg) is executed when the shell terminates.
+then the command var(arg) is executed when the shell terminates; the
+trap runs before any tt(zshexit) hook functions.
 
 tt(ZERR), tt(DEBUG), and tt(EXIT) traps are not executed inside other
 traps.  tt(ZERR) and tt(DEBUG) traps are kept within subshells, while
