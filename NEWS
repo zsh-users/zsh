@@ -63,6 +63,9 @@ mechanism: the KEYBOARD_HACK variable defines the character to be ignored.
 The new shell option POSIX_CD, active in emulations of POSIX-based shells,
 makes the cd builtin POSIX-compatible.
 
+The new shell option POSIX_TRAPS causes the EXIT trap to behave in the same
+way as in other shells, i.e. it is only run when the shell exits.
+
 The shell option MONITOR can be set in non-interactive shells, and also in
 subshells (as created by surrounding commands with parentheses), turning on
 job control for that subshell.  The initial behaviour of a subshell is

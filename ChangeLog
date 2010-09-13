@@ -1,5 +1,7 @@
 2010-09-13  Peter Stephenson  <pws@csr.com>
 
+	* unposted: NEWS: add POSIX_TRAPS
+
 	* Mikael: 28252: Completion/Zsh/Command/_zle: remove unnecessary
 	looped that caused errors.
 
@@ -13634,5 +13636,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5078 $
+* $Revision: 1.5079 $
 *****************************************************
