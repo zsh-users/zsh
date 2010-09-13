@@ -36,38 +36,34 @@ _arguments -s -S \
     "(-L)-a[list all widgets]" \
     '*:widget name:->widget' && ret=0
 
-while (( $#state )); do
-  case "$state[1]" in
-    (args)
-      _arguments \
-        '(-N)-n[numeric prefix]:number:' \
-	'(-n)-N[reset numeric prefix]' \
-	'(-)*:widget arguments: ' && ret=0
-      ;;
-    (widget*)
-      _wanted -C "$context[1]" widgets expl widget compadd -k widgets && ret=0
-      ;&
-    (function)
-      [[ $state[1] != *function ]] ||	# Handle fall-through
-      _wanted -C "$context[1]" functions expl 'widget shell function' \
-	compadd -k functions && ret=0
-      ;;
-    (comp-widget)
-      _wanted -C "$context[1]" widgets expl 'completion widget' \
-	compadd -k "widgets[(R)(*:|)(.|)(${(j(|))compwids})(|:*)]" && ret=0
-      ;&
-    (builtin-comp-widget)
-      _wanted -C "$context[1]" widgets expl 'builtin completion widget' \
-	compadd -k "widgets[(I)(.|)(${(j(|))compwids})]" && ret=0
-      ;;
-    (redisplay)
-      _arguments -s -S '!-R' \
-	"-c[clear listing]" \
-	":status line" "*:strings to list" && ret=0
-      ;;
-  esac
-  shift 1 state
-  shift 1 context
-done
+case "$state[1]" in
+  (args)
+    _arguments \
+      '(-N)-n[numeric prefix]:number:' \
+      '(-n)-N[reset numeric prefix]' \
+      '(-)*:widget arguments: ' && ret=0
+    ;;
+  (widget*)
+    _wanted -C "$context[1]" widgets expl widget compadd -k widgets && ret=0
+    ;&
+  (function)
+    [[ $state[1] != *function ]] ||	# Handle fall-through
+    _wanted -C "$context[1]" functions expl 'widget shell function' \
+      compadd -k functions && ret=0
+    ;;
+  (comp-widget)
+    _wanted -C "$context[1]" widgets expl 'completion widget' \
+      compadd -k "widgets[(R)(*:|)(.|)(${(j(|))compwids})(|:*)]" && ret=0
+    ;&
+  (builtin-comp-widget)
+    _wanted -C "$context[1]" widgets expl 'builtin completion widget' \
+      compadd -k "widgets[(I)(.|)(${(j(|))compwids})]" && ret=0
+    ;;
+  (redisplay)
+    _arguments -s -S '!-R' \
+      "-c[clear listing]" \
+      ":status line" "*:strings to list" && ret=0
+    ;;
+esac
 
 return ret
