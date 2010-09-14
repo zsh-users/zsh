@@ -951,7 +951,7 @@ endtrapscope(void)
 {
     LinkNode ln;
     struct savetrap *st;
-    int exittr;
+    int exittr = 0;
     void *exitfn = NULL;
 
     /*
@@ -959,9 +959,8 @@ endtrapscope(void)
      * after all the other traps have been put back.
      * Don't do this inside another trap.
      */
-    if (intrap)
-	exittr = 0;
-    else if (!isset(POSIXTRAPS) && (exittr = sigtrapped[SIGEXIT])) {
+    if (!intrap &&
+	!isset(POSIXTRAPS) && (exittr = sigtrapped[SIGEXIT])) {
 	if (exittr & ZSIG_FUNC) {
 	    exitfn = removehashnode(shfunctab, "TRAPEXIT");
 	} else {
