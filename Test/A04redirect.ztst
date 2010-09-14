@@ -134,6 +134,10 @@
 >    $foo$foo met celeste  'but with extra'  "stuff to test quoting"
 >Last line
 
+  read -r line <<'  HERE'
+  HERE
+1:No input, not even newline, from empty here document.
+
   #
   # exec tests: perform these in subshells so if they fail the
   # shell won't exit.

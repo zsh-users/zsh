@@ -30,7 +30,7 @@
 #include "zsh.mdh"
 #include "text.pro"
 
-static char *tptr, *tbuf, *tlim;
+static char *tptr, *tbuf, *tlim, *tpending;
 static int tsiz, tindent, tnewlins, tjob;
 
 static void
@@ -39,6 +39,53 @@ dec_tindent(void)
     DPUTS(tindent == 0, "attempting to decrement tindent below zero");
     if (tindent > 0)
 	tindent--;
+}
+
+/*
+ * Add a pair of pending strings and a newline.
+ * This is used for here documents.  It will be output when
+ * we have a lexically significant newline.
+ *
+ * This isn't that common and a multiple use on the same line is *very*
+ * uncommon; we don't try to optimise it.
+ *
+ * This is not used for job text; there we bear the inaccuracy
+ * of turning this into a here-string.
+ */
+static void
+taddpending(char *str1, char *str2)
+{
+    int len = strlen(str1) + strlen(str2) + 1;
+
+    /*
+     * We don't strip newlines from here-documents converted
+     * to here-strings, so no munging is required except to
+     * add a newline after the here-document terminator.
+     * However, because the job text doesn't automatically
+     * have a newline right at the end, we handle that
+     * specially.
+     */
+    if (tpending) {
+	int oldlen = strlen(tpending);
+	tpending = realloc(tpending, len + oldlen);
+	sprintf(tpending + oldlen, "%s%s", str1, str2);
+    } else {
+	tpending = (char *)zalloc(len);
+	sprintf(tpending, "%s%s", str1, str2);
+    }
+}
+
+/* Output the pending string where appropriate */
+
+static void
+tdopending(void)
+{
+    if (tpending) {
+	taddchr('\n');
+	taddstr(tpending);
+	zsfree(tpending);
+	tpending = NULL;
+    }
 }
 
 /* add a character to the text buffer */
@@ -107,6 +154,7 @@ taddnl(int no_semicolon)
     int t0;
 
     if (tnewlins) {
+	tdopending();
 	taddchr('\n');
 	for (t0 = 0; t0 != tindent; t0++)
 	    taddchr('\t');
@@ -253,7 +301,7 @@ gettext2(Estate state)
     while (1) {
 	if (stack) {
 	    if (!(s = tstack))
-		return;
+		break;
 	    if (s->pop) {
 		tstack = s->prev;
 		s->prev = tfree;
@@ -795,6 +843,7 @@ gettext2(Estate state)
 	    return;
 	}
     }
+    tdopending();
 }
 
 /**/
@@ -833,27 +882,53 @@ getredirs(LinkList redirs)
 		taddchr('}');
 	    } else if (f->fd1 != (IS_READFD(f->type) ? 0 : 1))
 		taddchr('0' + f->fd1);
-	    taddstr(fstr[f->type]);
-	    if (f->type != REDIR_MERGEIN && f->type != REDIR_MERGEOUT)
-		taddchr(' ');
 	    if (f->type == REDIR_HERESTR &&
 		(f->flags & REDIRF_FROM_HEREDOC)) {
-		/*
-		 * Strings that came from here-documents are converted
-		 * to here strings without quotation, so add that
-		 * now.  If tokens are present we need to do double quoting.
-		 */
-		if (!has_token(f->name)) {
-		    taddchr('\'');
-		    taddstr(quotestring(f->name, NULL, QT_SINGLE));
-		    taddchr('\'');
+		if (tnewlins) {
+		    /*
+		     * Strings that came from here-documents are converted
+		     * to here strings without quotation, so convert them
+		     * back.
+		     */
+		    taddstr(fstr[REDIR_HEREDOC]);
+		    taddstr(f->here_terminator);
+		    taddpending(f->name, f->munged_here_terminator);
 		} else {
-		    taddchr('"');
-		    taddstr(quotestring(f->name, NULL, QT_DOUBLE));
-		    taddchr('"');
+		    taddstr(fstr[REDIR_HERESTR]);
+		    /*
+		     * Just a quick and dirty representation.
+		     * Remove a terminating newline, if any.
+		     */
+		    int fnamelen = strlen(f->name);
+		    int sav;
+		    if (fnamelen > 0 && f->name[fnamelen-1] == '\n') {
+			sav = 1;
+			f->name[fnamelen-1] = '\0';
+		    } else
+			sav = 0;
+		    /*
+		     * Strings that came from here-documents are converted
+		     * to here strings without quotation, so add that
+		     * now.  If tokens are present we need to do double quoting.
+		     */
+		    if (!has_token(f->name)) {
+			taddchr('\'');
+			taddstr(quotestring(f->name, NULL, QT_SINGLE));
+			taddchr('\'');
+		    } else {
+			taddchr('"');
+			taddstr(quotestring(f->name, NULL, QT_DOUBLE));
+			taddchr('"');
+		    }
+		    if (sav)
+			f->name[fnamelen-1] = '\n';
 		}
-	    } else
+	    } else {
+		taddstr(fstr[f->type]);
+		if (f->type != REDIR_MERGEIN && f->type != REDIR_MERGEOUT)
+		    taddchr(' ');
 		taddstr(f->name);
+	    }
 	    taddchr(' ');
 	    break;
 #ifdef DEBUG

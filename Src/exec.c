@@ -3449,11 +3449,12 @@ closem(int how)
 
 /**/
 char *
-gethere(char *str, int typ)
+gethere(char **strp, int typ)
 {
     char *buf;
     int bsiz, qt = 0, strip = 0;
     char *s, *t, *bptr, c;
+    char *str = *strp;
 
     for (s = str; *s; s++)
 	if (inull(*s)) {
@@ -3467,6 +3468,7 @@ gethere(char *str, int typ)
 	while (*str == '\t')
 	    str++;
     }
+    *strp = str;
     bptr = buf = zalloc(bsiz = 256);
     for (;;) {
 	t = bptr;
@@ -3500,8 +3502,6 @@ gethere(char *str, int typ)
 	}
 	*bptr++ = '\n';
     }
-    if (t > buf && t[-1] == '\n')
-	t--;
     *t = '\0';
     if (!qt) {
 	int ef = errflag;
@@ -3529,7 +3529,15 @@ getherestr(struct redir *fn)
     singsub(&t);
     untokenize(t);
     unmetafy(t, &len);
-    t[len++] = '\n';
+    /*
+     * For real here-strings we append a newline, as if the
+     * string given was a complete command line.
+     *
+     * For here-strings from here documents, we use the original
+     * text exactly.
+     */
+    if (!(fn->flags & REDIRF_FROM_HEREDOC))
+	t[len++] = '\n';
     if ((fd = gettempfile(NULL, 1, &s)) < 0)
 	return -1;
     write_loop(fd, t, len);

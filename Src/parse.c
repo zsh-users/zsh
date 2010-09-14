@@ -1813,13 +1813,17 @@ par_redir(int *rp, char *idstring)
 	struct heredocs **hd;
 	int htype = type;
 
+	/*
+	 * Add two here for the string to remember the HERE
+	 * terminator in raw and munged form.
+	 */
 	if (idstring)
 	{
 	    type |= REDIR_VARID_MASK;
-	    ncodes = 4;
+	    ncodes = 6;
 	}
 	else
-	    ncodes = 3;
+	    ncodes = 5;
 
 	/* If we ever to change the number of codes, we have to change
 	 * the definition of WC_REDIR_WORDS. */
@@ -1828,10 +1832,16 @@ par_redir(int *rp, char *idstring)
 	ecbuf[r] = WCB_REDIR(type);
 	ecbuf[r + 1] = fd1;
 
+	/*
+	 * r + 2: the HERE string we recover
+	 * r + 3: the HERE document terminator, raw
+	 * r + 4: the HERE document terminator, munged
+	 */
 	if (idstring)
-	    ecbuf[r + 3] = ecstrcode(idstring);
+	    ecbuf[r + 5] = ecstrcode(idstring);
 
-	for (hd = &hdocs; *hd; hd = &(*hd)->next);
+	for (hd = &hdocs; *hd; hd = &(*hd)->next)
+	    ;
 	*hd = zalloc(sizeof(struct heredocs));
 	(*hd)->next = NULL;
 	(*hd)->type = htype;
@@ -1887,10 +1897,12 @@ par_redir(int *rp, char *idstring)
 
 /**/
 void
-setheredoc(int pc, int type, char *str)
+setheredoc(int pc, int type, char *str, char *termstr, char *munged_termstr)
 {
     ecbuf[pc] = WCB_REDIR(type | REDIR_FROM_HEREDOC_MASK);
     ecbuf[pc + 2] = ecstrcode(str);
+    ecbuf[pc + 3] = ecstrcode(termstr);
+    ecbuf[pc + 4] = ecstrcode(munged_termstr);
 }
 
 /*
@@ -2439,10 +2451,15 @@ ecgetredirs(Estate s)
 	r->type = WC_REDIR_TYPE(code);
 	r->fd1 = *s->pc++;
 	r->name = ecgetstr(s, EC_DUP, NULL);
-	if (WC_REDIR_FROM_HEREDOC(code))
+	if (WC_REDIR_FROM_HEREDOC(code)) {
 	    r->flags = REDIRF_FROM_HEREDOC;
-	else
+	    r->here_terminator = ecgetstr(s, EC_DUP, NULL);
+	    r->munged_here_terminator = ecgetstr(s, EC_DUP, NULL);
+	} else {
 	    r->flags = 0;
+	    r->here_terminator = NULL;
+	    r->munged_here_terminator = NULL;
+	}
 	if (WC_REDIR_VARID(code))
 	    r->varid = ecgetstr(s, EC_DUP, NULL);
 	else

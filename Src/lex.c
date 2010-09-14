@@ -384,16 +384,17 @@ zshlex(void)
     if (tok == NEWLIN || tok == ENDINPUT) {
 	while (hdocs) {
 	    struct heredocs *next = hdocs->next;
-	    char *name;
+	    char *doc, *munged_term;
 
 	    hwbegin(0);
 	    cmdpush(hdocs->type == REDIR_HEREDOC ? CS_HEREDOC : CS_HEREDOCD);
+	    munged_term = dupstring(hdocs->str);
 	    STOPHIST
-	    name = gethere(hdocs->str, hdocs->type);
+	    doc = gethere(&munged_term, hdocs->type);
 	    ALLOWHIST
 	    cmdpop();
 	    hwend();
-	    if (!name) {
+	    if (!doc) {
 		zerr("here document too large");
 		while (hdocs) {
 		    next = hdocs->next;
@@ -403,7 +404,8 @@ zshlex(void)
 		tok = LEXERR;
 		break;
 	    }
-	    setheredoc(hdocs->pc, REDIR_HERESTR, name);
+	    setheredoc(hdocs->pc, REDIR_HERESTR, doc, hdocs->str,
+		       munged_term);
 	    zfree(hdocs, sizeof(struct heredocs));
 	    hdocs = next;
 	}

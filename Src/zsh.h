@@ -597,6 +597,8 @@ struct redir {
     int fd1, fd2;
     char *name;
     char *varid;
+    char *here_terminator;
+    char *munged_here_terminator;
 };
 
 /* The number of fds space is allocated for  *
@@ -787,7 +789,9 @@ struct eccstr {
 #define WC_REDIR_FROM_HEREDOC(C) ((int)(wc_data(C) & REDIR_FROM_HEREDOC_MASK))
 #define WCB_REDIR(T)        wc_bld(WC_REDIR, (T))
 /* Size of redir is 4 words if REDIR_VARID_MASK is set, else 3 */
-#define WC_REDIR_WORDS(C)   (WC_REDIR_VARID(C) ? 4 : 3)
+#define WC_REDIR_WORDS(C)			\
+    ((WC_REDIR_VARID(C) ? 4 : 3) +		\
+     (WC_REDIR_FROM_HEREDOC(C) ? 2 : 0))
 
 #define WC_ASSIGN_TYPE(C)   (wc_data(C) & ((wordcode) 1))
 #define WC_ASSIGN_TYPE2(C)  ((wc_data(C) & ((wordcode) 2)) >> 1)
