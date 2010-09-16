@@ -1,3 +1,8 @@
+2010-09-15  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 28261: Julius Plenz: Completion/Debian/_dpkg: separate the
+	options to _arguments.
+
 2010-09-14  Peter Stephenson  <pws@csr.com>
 
 	* 28259: Src/exec.c, Src/lex.c, Src/parse.c, Src/text.c,
@@ -13646,5 +13651,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5081 $
+* $Revision: 1.5082 $
 *****************************************************
