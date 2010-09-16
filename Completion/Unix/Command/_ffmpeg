@@ -18,24 +18,24 @@ _ffmpeg_presets() {
 
 _ffmpeg_acodecs() {
     local acodecs
-    acodecs=($(ffmpeg -codecs 2>/dev/null | sed -n '/^ .[E ]A/ {s/^ .......//; s/ .*//p;}'))
+    acodecs=(${${(M)${(f)"$(ffmpeg -codecs 2>/dev/null)"}:#[[:space:]][D[:space:]][E[:space:]]A[S[:space:]][D[:space:]][T[:space:]][[:space:]][^[:space:]]##*}//(#b)????????([^[:space:]]##)*/$match[1]})
     _ffmpeg_compadd 'force audio codec (''copy'' to copy stream)' acodecs ''
 }
 
 _ffmpeg_vcodecs() {
     local vcodecs
-    vcodecs=($(ffmpeg -codecs 2>/dev/null | sed -n '/^ .[E ]V/ {s/^ .......//; s/ .*//p;}'))
+    vcodecs=(${${(M)${(f)"$(ffmpeg -codecs 2>/dev/null)"}:#[[:space:]][D[:space:]][E[:space:]]V[S[:space:]][D[:space:]][T[:space:]][[:space:]][^[:space:]]##*}//(#b)????????([^[:space:]]##)*/$match[1]})
     _ffmpeg_compadd 'force video codec (''copy'' to copy stream)' vcodecs ''
 }
 
 _ffmpeg_formats() {
     local formats
-    formats=($(ffmpeg -formats 2>/dev/null | sed -e '1,/--/d' -e 's/^....//' -e 's/ .*//' | tr , '\n' | sort | uniq))
+    formats=(${(ou)${=${(s:,:)${${(M)${(f)"$(ffmpeg -formats 2>/dev/null)"}:#[[:space:]][D[:space:]][E[:space:]][[:space:]][^[:space:]]##*}//(#b)????([^[:space:]]##)*/$match[1]}}}})
     _ffmpeg_compadd 'force format' formats ''
 }
 
 _ffmpeg_list_pix_fmts() {
-    ffmpeg -pix_fmts 2>/dev/null | sed -e '1,/-----/d' -e 's/^......//' -e 's/ .*//'
+    print -l ${${(M)${(f)"$(ffmpeg -pix_fmts 2>/dev/null)"}:#[I.]*}//(#b)??????([^[:space:]]##)*/$match[1]}
 }
 
 _ffmpeg_pix_fmts() {
@@ -46,7 +46,7 @@ _ffmpeg_pix_fmts() {
 
 _ffmpeg_bsfs() {
     local bsfs
-    bsfs=($(ffmpeg -bsfs 2>/dev/null | sed 1d))
+    bsfs=(${${(f)"$(ffmpeg -bsfs 2>/dev/null)"}:#*:})
     _ffmpeg_compadd 'set bitstream filter' bsfs ''
 }
 
