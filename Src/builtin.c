@@ -3720,13 +3720,21 @@ bin_print(char *name, char **args, Options ops, int func)
     if (OPT_HASARG(ops,'u') || OPT_ISSET(ops,'p')) {
 	int fd;
 
-	if (OPT_ISSET(ops, 'p'))
+	if (OPT_ISSET(ops, 'p')) {
 	    fd = coprocout;
-	else {
+	    if (fd < 0) {
+		zwarnnam(name, "-p: no coprocess");
+		return 1;
+	    }
+	} else {
 	    char *argptr = OPT_ARG(ops,'u'), *eptr;
 	    /* Handle undocumented feature that -up worked */
 	    if (!strcmp(argptr, "p")) {
 		fd = coprocout;
+		if (fd < 0) {
+		    zwarnnam(name, "-p: no coprocess");
+		    return 1;
+		}
 	    } else {
 		fd = (int)zstrtol(argptr, &eptr, 10);
 		if (*eptr) {
@@ -5091,6 +5099,10 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	/* The old code handled -up, but that was never documented. Still...*/
 	if (!strcmp(argptr, "p")) {
 	    readfd = coprocin;
+	    if (readfd < 0) {
+		zwarnnam(name, "-p: no coprocess");
+		return 1;
+	    }
 	} else {
 	    readfd = (int)zstrtol(argptr, &eptr, 10);
 	    if (*eptr) {
@@ -5105,6 +5117,10 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	izle = 0;
     } else if (OPT_ISSET(ops,'p')) {
 	readfd = coprocin;
+	if (readfd < 0) {
+	    zwarnnam(name, "-p: no coprocess");
+	    return 1;
+	}
 	izle = 0;
     } else
 	readfd = izle = 0;
