@@ -486,22 +486,11 @@ selectkeymap(char *name, int fb)
     }
     if(name != curkeymapname) {
 	char *oname = curkeymapname;
-	Thingy chgthingy;
 
 	curkeymapname = ztrdup(name);
 
-	if (oname && zleactive && strcmp(oname, curkeymapname) &&
-	    (chgthingy = rthingy_nocreate("zle-keymap-select"))) {
-	    char *args[2];
-	    int saverrflag = errflag, savretflag = retflag;
-	    args[0] = oname;
-	    args[1] = NULL;
-	    errflag = retflag = 0;
-	    execzlefunc(chgthingy, args, 1);
-	    unrefthingy(chgthingy);
-	    errflag = saverrflag;
-	    retflag = savretflag;
-	}
+	if (oname && zleactive && strcmp(oname, curkeymapname))
+	    zlecallhook("zle-keymap-select", oname);
 	zsfree(oname);
     }
     curkeymap = km;

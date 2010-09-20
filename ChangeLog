@@ -1,3 +1,9 @@
+2010-09-20  Peter Stephenson  <pws@csr.com>
+
+	* 28282: Src/Zle/zle_keymap.c, Src/Zle/zle_main.c,
+	Src/zle_utils.c: new function zlecallhook() and fix argument to
+	zle-keymap-select.
+
 2010-09-19  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 28268: Src/builtin.c: I/O to a terminated (or never created)
@@ -13662,5 +13668,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5084 $
+* $Revision: 1.5085 $
 *****************************************************

@@ -1115,7 +1115,6 @@ zleread(char **lp, char **rp, int flags, int context)
     char *s;
     int old_errno = errno;
     int tmout = getiparam("TMOUT");
-    Thingy initthingy;
 
 #if defined(HAVE_POLL) || defined(HAVE_SELECT)
     /* may not be set, but that's OK since getiparam() returns 0 == off */
@@ -1215,32 +1214,15 @@ zleread(char **lp, char **rp, int flags, int context)
 
     zrefresh();
 
-    if ((initthingy = rthingy_nocreate("zle-line-init"))) {
-	char *args[2];
-	args[0] = initthingy->nam;
-	args[1] = NULL;
-	execzlefunc(initthingy, args, 1);
-	unrefthingy(initthingy);
-	errflag = retflag = 0;
-    }
+    zlecallhook("zle-line-init", NULL);
 
     zlecore();
 
     if (errflag)
 	setsparam("ZLE_LINE_ABORTED", zlegetline(NULL, NULL));
 
-    if (done && !exit_pending && !errflag &&
-	(initthingy = rthingy_nocreate("zle-line-finish"))) {
-	int saverrflag = errflag;
-	int savretflag = retflag;
-	char *args[2];
-	args[0] = initthingy->nam;
-	args[1] = NULL;
-	execzlefunc(initthingy, args, 1);
-	unrefthingy(initthingy);
-	errflag = saverrflag;
-	retflag = savretflag;
-    }
+    if (done && !exit_pending && !errflag)
+	zlecallhook("zle-line-finish", NULL);
 
     statusline = NULL;
     invalidatelist();

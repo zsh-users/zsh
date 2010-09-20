@@ -1237,3 +1237,35 @@ viundochange(char **args)
     } else
 	return undo(args);
 }
+
+/*
+ * Call a ZLE hook: a user-defined widget called at a specific point
+ * within the line editor.
+ *
+ * A single argument arg is passed to the function (in addition to the
+ * function name).  It may be NULL.
+ */
+
+/**/
+void
+zlecallhook(char *name, char *arg)
+{
+    Thingy thingy = rthingy_nocreate(name);
+    int saverrflag, savretflag;
+    char *args[3];
+
+    if (!thingy)
+	return;
+
+    saverrflag = errflag;
+    savretflag = retflag;
+
+    args[0] = thingy->nam;
+    args[1] = arg;
+    args[2] = NULL;
+    execzlefunc(thingy, args, 1);
+    unrefthingy(thingy);
+
+    errflag = saverrflag;
+    retflag = savretflag;
+}
