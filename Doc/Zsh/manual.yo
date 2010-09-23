@@ -184,7 +184,7 @@ produce a nicely formatted printed manual.
 item(The HTML manual)(
 An HTML version of this manual is available at the Zsh web site via:
 
-tt(http://zsh.sunsite.org/Doc/).
+tt(http://zsh.sourceforge.net/Doc/).
 
 (The HTML version is produced with bf(texi2html), which may be obtained
 from tt(http://www.nongnu.org/texi2html/). The command is

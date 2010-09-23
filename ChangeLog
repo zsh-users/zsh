@@ -1,3 +1,7 @@
+2010-09-23  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Doc/Zsh/manual.yo: update address of HTML manual.
+
 2010-09-20  Peter Stephenson  <pws@csr.com>
 
 	* 28282: Src/Zle/zle_keymap.c, Src/Zle/zle_main.c,
@@ -13668,5 +13672,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5085 $
+* $Revision: 1.5086 $
 *****************************************************
