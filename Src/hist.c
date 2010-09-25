@@ -2228,11 +2228,12 @@ readhistfile(char *fn, int err, int readflags)
     Histent he;
     time_t stim, ftim, tim = time(NULL);
     off_t fpos;
-    short *wordlist;
+    short *words;
     struct stat sb;
-    int nwordpos, nwordlist, bufsiz;
+    int nwordpos, nwords, bufsiz;
     int searching, newflags, l, ret;
-
+    LinkList wordlist;
+   
     if (!fn && !(fn = getsparam("HISTFILE")))
 	return;
     if (readflags & HFILE_FAST) {
@@ -2251,8 +2252,8 @@ readhistfile(char *fn, int err, int readflags)
 	}
     }
     if ((in = fopen(unmeta(fn), "r"))) {
-	nwordlist = 64;
-	wordlist = (short *)zalloc(nwordlist*sizeof(short));
+	nwords = 64;
+	words = (short *)zalloc(nwords*sizeof(short));
 	bufsiz = 1024;
 	buf = zalloc(bufsiz);
 
@@ -2334,29 +2335,66 @@ readhistfile(char *fn, int err, int readflags)
 	    else
 		he->ftim = ftim;
 
-	    /* Divide up the words.  We don't know how it lexes,
-	       so just look for white-space.
-	       */
+	    /*
+	     * Divide up the words.  Attempt to do this using the lexer.
+	     */
 	    nwordpos = 0;
 	    start = pt;
-	    do {
+	    wordlist = bufferwords(NULL, pt, NULL);
+	    he->nwords = countlinknodes(wordlist);
+	    if (2*he->nwords > nwords) {
+		nwords = 2*he->nwords;
+		words = (short *)realloc(words, nwords*sizeof(short));
+	    }
+	    while (firstnode(wordlist)) {
+		char *word = uremnode(wordlist, firstnode(wordlist));
+		
 		while (inblank(*pt))
 		    pt++;
-		if (*pt) {
-		    if (nwordpos >= nwordlist)
-			wordlist = (short *) realloc(wordlist,
-					(nwordlist += 64)*sizeof(short));
-		    wordlist[nwordpos++] = pt - start;
-		    while (*pt && !inblank(*pt))
-			pt++;
-		    wordlist[nwordpos++] = pt - start;
+		if (!strpfx(word, pt)) {
+		    int bad = 0;
+		    /*
+		     * Oddity 1: newlines turn into semicolons.
+		     */
+		    if (!strcmp(word, ";"))
+			continue;
+		    /*
+		     * Oddity 2: !'s turn into |'s.
+		     */
+		    while (*pt) {
+			if (!*word) {
+			    bad = 1;
+			    break;
+			}
+			if (*pt == *word ||
+			    (*pt == '!' && *word == '|')) {
+			    pt++;
+			    word++;
+			} else {
+			    bad = 1;
+			    break;
+			}
+		    }
+		    if (bad) {
+#ifdef DEBUG
+			dputs(ERRMSG("bad wordsplit reading history: %s\nat: %s"
+				     "\nword: %s"),
+			      start, pt, word);
+#endif
+			words[nwordpos++] = pt - start;
+			pt += strlen(pt);
+			words[nwordpos++] = pt - start;
+			break;
+		    }
 		}
-	    } while (*pt);
+		words[nwordpos++] = pt - start;
+		pt += strlen(word);
+		words[nwordpos++] = pt - start;
+	    }
 
-	    he->nwords = nwordpos/2;
 	    if (he->nwords) {
 		he->words = (short *)zalloc(nwordpos*sizeof(short));
-		memcpy(he->words, wordlist, nwordpos*sizeof(short));
+		memcpy(he->words, words, nwordpos*sizeof(short));
 	    } else
 		he->words = (short *)NULL;
 	    addhistnode(histtab, he->node.nam, he);
@@ -2369,7 +2407,7 @@ readhistfile(char *fn, int err, int readflags)
 	    zsfree(lasthist.text);
 	    lasthist.text = ztrdup(start);
 	}
-	zfree(wordlist, nwordlist*sizeof(short));
+	zfree(words, nwords*sizeof(short));
 	zfree(buf, bufsiz);
 
 	fclose(in);
