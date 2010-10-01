@@ -1,7 +1,7 @@
 #compdef zstyle
 
 local state context ostate line expl ctop suf
-local nm=$compstate[nmatches] taglist patterns pstyles
+local nm=$compstate[nmatches] taglist patterns pstyles contexts
 typeset -A opt_args styles
 
 (( $+functions[_completers] )) ||
@@ -9,7 +9,7 @@ _completers() {
   # option: -p - needs a `_' prefix
   local us
   local -a disp list expl
-  
+
   list=( complete approximate correct match expand list menu oldlist
          ignored prefix history )
   zparseopts -D -K -E 'p=us'
@@ -25,6 +25,7 @@ _completers() {
 #   c   completion
 #   d   chpwd
 #   e   line editor
+#   v   vcs_info
 #   z   zftp
 # or any combination of the above,
 # followed by a colon, followed by a state to enter, empty if none.
@@ -41,14 +42,21 @@ styles=(
   cache-policy           c:_functions
   call-command           c:bool
   command                c:command
+  command-path		 c:_dir_list
   commands               c:
   complete               c:bool
+  complete-options	 c:bool
   completer		 c:completer
   condition		 c:bool
   cursor		 c:cursor
+  delimiters		 c:
   disabled               c:bool
   domains                c:
+  environ		 c:environ
   expand		 c:
+  extra-verbose		 c:bool
+  fake			 c:
+  fake-always            c:
   fake-files		 c:fake-files
   fake-parameters	 c:fake-params
   file-list              c:bool
@@ -94,11 +102,12 @@ styles=(
   numbers		 c:bool
   old-list		 c:bool
   old-matches            c:oldmatches
-  old-menu		 c:bool 
+  old-menu		 c:bool
   original		 c:bool
   packageset		 c:packageset
   path			 c:_directories
   pager			 c:_command_names
+  path-completion	 c:bool
   pine-directory         c:_directories
   ports			 c:_ports
   prefix-hidden		 c:bool
@@ -107,17 +116,18 @@ styles=(
   range                  c:
   recent-dirs-insert     c:recent-dirs-insert
   regular                c:bool
+  rehash		 c:bool
   remote-access		 c:bool
   remove-all-dups	 c:bool
   select-prompt          c:
   select-scroll          c:
   separate-sections      c:bool
+  show-completer	 c:bool
   single-ignored         c:single-ignored
   sort			 c:bool
   special-dirs		 c:sdirs
   squeeze-slashes	 c:bool
   stop			 c:stop
-  stop-keys		 c:
   strip-comments	 c:bool
   subst-globs-only       c:bool
   substitute		 c:bool
@@ -127,6 +137,8 @@ styles=(
   urls                   c:_urls
   use-cache		 c:bool
   use-compctl		 c:urgh
+  use-ip		 c:bool
+  use-perl		 c:bool
   users			 c:_users
   users-hosts		 c:user-host
   users-hosts-ports	 c:user-host-port
@@ -159,6 +171,24 @@ styles=(
   word-chars             e:
   word-style             e:word-style
   word-context           e:
+
+  formats                v:vcs-format
+  actionformats          v:vcs-format
+  branchformat           v:branch-format
+  nvcsformats            v:
+  stgitformat            v:stg-format
+  max-exports            v:
+  enable                 v:vcs
+  disable                v:vcs
+  disable-patterns       v:
+  check-for-changes      v:bool
+  stagedstr              v:
+  unstagedstr            v:
+  command                v:_command_names
+  use-server             v:bool
+  use-simple             v:bool
+  get-revision           v:bool
+  use-prompt-escapes     v:bool
 
   chpwd			 z:bool
   progress		 z:progress
@@ -193,14 +223,19 @@ while (( $#state )); do
   case "$state[1]" in
     (contexts)
       if [[ ! -prefix :*: ]]; then
-	_wanted contexts expl context compadd -P : -qS : completion zftp
+	_wanted contexts expl context compadd -P : -qS : completion vcs_info zftp
       elif compset -P :completion:; then
-        for ostate in functions _completers cmdorcont argument tag; do
+        contexts=( functions _completers cmdorcont argument tag )
+      elif compset -P :vcs_info:; then
+        contexts=( vcs-string user-context repo-root-name )
+      fi
+      if (( $#contexts )); then
+        for ostate in $contexts; do
 	  compset -P '[^:]#:' || break
 	done
 	suf=()
 	compset -S ':*' || suf=( -qS: )
-	[[ $ostate = tag ]] && suf=()
+	[[ $ostate = $contexts[-1] ]] && suf=()
 	if compset -P '(|\\)\((*\||)'; then  # handle (x|y) patterns
 	  suf=()
 	  compset -S '(|\\)[)|]*' ||
@@ -222,7 +257,7 @@ while (( $#state )); do
 
     (styles)
       # Get the top-level context we're completing for, if any.
-      case $line[1] in
+      case ${(Q)line[1]} in
 	(:completion:*)
 	ctop=c
 	;;
@@ -234,6 +269,10 @@ while (( $#state )); do
 	(:zftp:*)
 	ctop=z
 	;;
+
+        (:vcs_info:*)
+        ctop=v
+        ;;
 
 	(:zle:*)
 	ctop=e
@@ -248,7 +287,7 @@ while (( $#state )); do
       ;;
 
     (style-arg)
-      state+=( "${styles[$line[2]]#*:}" )
+      state+=( "${styles[${(Q)line[2]}]#*:}" )
       ;;
 
     (argument)
@@ -276,6 +315,18 @@ while (( $#state )); do
 
     (completer)
       _wanted values expl completer _completers -p
+      ;;
+
+    (environ)
+      if [[ "$PREFIX" = *\=* ]]; then
+	compstate[parameter]="${PREFIX%%\=*}"
+	compset -P 1 '*='
+	_value
+      else
+        suf=()
+	compset -S '=*' || suf=(-S '=')
+	_parameters -q $suf
+      fi
       ;;
 
     (fsort)
@@ -453,6 +504,64 @@ while (( $#state )); do
 
     (word-style)
       _wanted word-styles expl 'word style' compadd normal shell space
+      ;;
+
+    (vcs-string)
+      _wanted vcs expl vcs compadd $suf - \
+          ${${(f)"$(_call_program vcs vcs_info_printsys 2>/dev/null)"}:#\#*}
+      ;;
+
+    (vcs)
+      _wanted vcs expl vcs compadd \
+          ${${(f)"$(_call_program vcs vcs_info_printsys 2>/dev/null)"}:#(\#|*-)*}
+      ;;
+
+    (user-context)
+      _wanted user-contexts expl 'user context' compadd $suf default command
+      ;;
+
+    (repo-root-name)
+      _message -e names 'repository root name'
+      ;;
+
+    (vcs-format)
+      if [[ $PREFIX = *% ]]; then
+        compset -P '*%'
+        _values -s '' 'format replacement' \
+          's[the vcs in use]' \
+          'b[the current branch]' \
+          'a[an identifier describing the action]' \
+          'i[current revision no/id]' \
+          'c[details of staged changes]' \
+          'u[details of unstaged changes]' \
+          'r[repository name]' \
+          'S[subdirectory within repository]' \
+          'm[misc replacement - backend specific]'
+      else
+        _message -e formats 'vcs format'
+      fi
+      ;;
+
+    (branch-format)
+      if [[ $PREFIX = *% ]]; then
+        compset -P '*%'
+        _values -s '' 'format replacement' \
+          'b[the current branch]' \
+          'r[current revision number]' \
+      else
+        _message -e formats 'vcs format'
+      fi
+      ;;
+
+    (stg-format)
+      if [[ $PREFIX = *% ]]; then
+        compset -P '*%'
+        _values -s '' 'format replacement' \
+          'p[patch currently on top of the stack]' \
+          'c[the number of unapplied patches]'
+      else
+        _message -e formats 'vcs format'
+      fi
       ;;
 
     (_*)

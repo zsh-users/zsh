@@ -1,3 +1,8 @@
+2010-10-01  Oliver Kiddle  <opk@zsh.org>
+
+	* 28307: Completion/Zsh/Command/_zstyle: support new styles
+	especially vcs_info ones and allow quoted contexts again
+
 2010-09-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28295 plus tweak for failure case: use lexer to split words
@@ -13677,5 +13682,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5087 $
+* $Revision: 1.5088 $
 *****************************************************
