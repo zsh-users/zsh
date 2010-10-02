@@ -1,3 +1,7 @@
+2010-10-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Mikael: 28301: Doc/Zsh/compsys.yo: restore missing line.
+
 2010-10-01  Oliver Kiddle  <opk@zsh.org>
 
 	* 28307: Completion/Zsh/Command/_zstyle: support new styles
@@ -13682,5 +13686,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5088 $
+* $Revision: 1.5089 $
 *****************************************************

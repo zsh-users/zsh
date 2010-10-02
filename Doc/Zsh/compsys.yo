@@ -2263,6 +2263,7 @@ the style is not set but this file is found in one of various standard
 locations it will be used as the default.
 )
 kindex(path-completion, completion style)
+item(tt(path-completion))(
 This is used by filename completion.  By default, filename completion
 examines all components of a path to see if there are completions of
 that component.  For example, tt(/u/b/z) can be completed to
