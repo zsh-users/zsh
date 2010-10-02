@@ -1,5 +1,9 @@
 2010-10-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 28310 with 28308 (Bart): Doc/Zsh/options.yo, Src/hist.c,
+	Src/options.c, Src/zsh.h: HIST_LEX_WORDS option and check
+	for full history file read.
+
 	* 28309: Src/subst.c: infinite loop when padding with extra wide
 	characters.
 
@@ -13689,5 +13693,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5090 $
+* $Revision: 1.5091 $
 *****************************************************

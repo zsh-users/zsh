@@ -836,6 +836,21 @@ command is entered before it vanishes, allowing you to briefly reuse
 or edit the line.  If you want to make it vanish right away without
 entering another command, type a space and press return.
 )
+pindex(HIST_LEX_WORDS)
+pindex(NO_HIST_LEX_WORDS)
+pindex(HISTLEXWORDS)
+pindex(NOHISTLEXWORDS)
+item(tt(HIST_LEX_WORDS))(
+By default, shell history that is read in from files is split into
+words on all white space.  This means that arguments with quoted
+whitespace are not correctly handled, with the consequence that
+references to words in history lines that have been read from a file
+may be inaccurate.  When this option is set, words read in from a
+history file are divided up in a similar fashion to normal shell
+command line handling.  Although this produces more accurately delimited
+words, if the size of the history file is large this can be slow.  Trial
+and error is necessary to decide.
+)
 pindex(HIST_NO_FUNCTIONS)
 pindex(NO_HIST_NO_FUNCTIONS)
 pindex(HISTNOFUNCTIONS)

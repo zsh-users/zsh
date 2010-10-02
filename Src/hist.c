@@ -2232,7 +2232,6 @@ readhistfile(char *fn, int err, int readflags)
     struct stat sb;
     int nwordpos, nwords, bufsiz;
     int searching, newflags, l, ret;
-    LinkList wordlist;
    
     if (!fn && !(fn = getsparam("HISTFILE")))
 	return;
@@ -2336,60 +2335,81 @@ readhistfile(char *fn, int err, int readflags)
 		he->ftim = ftim;
 
 	    /*
-	     * Divide up the words.  Attempt to do this using the lexer.
+	     * Divide up the words.
 	     */
 	    nwordpos = 0;
 	    start = pt;
-	    wordlist = bufferwords(NULL, pt, NULL);
-	    he->nwords = countlinknodes(wordlist);
-	    if (2*he->nwords > nwords) {
-		nwords = 2*he->nwords;
-		words = (short *)realloc(words, nwords*sizeof(short));
-	    }
-	    while (firstnode(wordlist)) {
-		char *word = uremnode(wordlist, firstnode(wordlist));
-		
-		while (inblank(*pt))
-		    pt++;
-		if (!strpfx(word, pt)) {
-		    int bad = 0;
-		    /*
-		     * Oddity 1: newlines turn into semicolons.
-		     */
-		    if (!strcmp(word, ";"))
-			continue;
-		    /*
-		     * Oddity 2: !'s turn into |'s.
-		     */
-		    while (*pt) {
-			if (!*word) {
-			    bad = 1;
-			    break;
-			}
-			if (*pt == *word ||
-			    (*pt == '!' && *word == '|')) {
-			    pt++;
-			    word++;
-			} else {
-			    bad = 1;
-			    break;
-			}
-		    }
-		    if (bad) {
-#ifdef DEBUG
-			dputs(ERRMSG("bad wordsplit reading history: %s\nat: %s"
-				     "\nword: %s"),
-			      start, pt, word);
-#endif
-			words[nwordpos++] = pt - start;
-			pt += strlen(pt);
-			words[nwordpos++] = pt - start;
-			break;
-		    }
+	    if (isset(HISTLEXWORDS) && !(readflags & HFILE_FAST)) {
+		/*
+		 * Attempt to do this using the lexer.
+		 */
+		LinkList wordlist = bufferwords(NULL, pt, NULL);
+		he->nwords = countlinknodes(wordlist);
+		if (2*he->nwords > nwords) {
+		    nwords = 2*he->nwords;
+		    words = (short *)realloc(words, nwords*sizeof(short));
 		}
-		words[nwordpos++] = pt - start;
-		pt += strlen(word);
-		words[nwordpos++] = pt - start;
+		while (firstnode(wordlist)) {
+		    char *word = uremnode(wordlist, firstnode(wordlist));
+		
+		    while (inblank(*pt))
+			pt++;
+		    if (!strpfx(word, pt)) {
+			int bad = 0;
+			/*
+			 * Oddity 1: newlines turn into semicolons.
+			 */
+			if (!strcmp(word, ";"))
+			    continue;
+			/*
+			 * Oddity 2: !'s turn into |'s.
+			 */
+			while (*pt) {
+			    if (!*word) {
+				bad = 1;
+				break;
+			    }
+			    if (*pt == *word ||
+				(*pt == '!' && *word == '|')) {
+				pt++;
+				word++;
+			    } else {
+				bad = 1;
+				break;
+			    }
+			}
+			if (bad) {
+#ifdef DEBUG
+			    dputs(ERRMSG("bad wordsplit reading history: "
+					 "%s\nat: %s\nword: %s"),
+				  start, pt, word);
+#endif
+			    words[nwordpos++] = pt - start;
+			    pt += strlen(pt);
+			    words[nwordpos++] = pt - start;
+			    break;
+			}
+		    }
+		    words[nwordpos++] = pt - start;
+		    pt += strlen(word);
+		    words[nwordpos++] = pt - start;
+		}
+	    } else {
+		do {
+		    while (inblank(*pt))
+			pt++;
+		    if (*pt) {
+			if (nwordpos >= nwords)
+			    words = (short *)
+				realloc(words, (nwords += 64)*sizeof(short));
+			words[nwordpos++] = pt - start;
+			while (*pt && !inblank(*pt))
+			    pt++;
+			words[nwordpos++] = pt - start;
+		    }
+		} while (*pt);
+
+		he->nwords = nwordpos/2;
 	    }
 
 	    if (he->nwords) {

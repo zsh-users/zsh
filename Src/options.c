@@ -149,6 +149,7 @@ static struct optname optns[] = {
 {{NULL, "histignorealldups",  0},			 HISTIGNOREALLDUPS},
 {{NULL, "histignoredups",     0},			 HISTIGNOREDUPS},
 {{NULL, "histignorespace",    0},			 HISTIGNORESPACE},
+{{NULL, "histlexwords",	      0},			 HISTLEXWORDS},
 {{NULL, "histnofunctions",    0},			 HISTNOFUNCTIONS},
 {{NULL, "histnostore",	      0},			 HISTNOSTORE},
 {{NULL, "histsubstpattern",   OPT_EMULATE},              HISTSUBSTPATTERN},
