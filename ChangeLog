@@ -1,5 +1,8 @@
 2010-10-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 28309: Src/subst.c: infinite loop when padding with extra wide
+	characters.
+
 	* Mikael: 28301: Doc/Zsh/compsys.yo: restore missing line.
 
 2010-10-01  Oliver Kiddle  <opk@zsh.org>
@@ -13686,5 +13689,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5089 $
+* $Revision: 1.5090 $
 *****************************************************
