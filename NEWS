@@ -53,6 +53,11 @@ The (D) flag in parameter expansion abbreviates directories in the
 substituted value.  The (q-) flag does minimal shell quotation of arguments
 for maximum human readability of the result.
 
+The new shell option HIST_LEX_WORDS causes history lines read in from
+a file to be split in the same way as normal shell lines, instead of
+simply on whitespace.  It's an option as although the result is more
+accurate it can take a long time when the history size is large.
+
 The new shell option SOURCE_TRACE causes the shell to report files
 containing shell code that the shell executes directly, i.e. startup files
 or files run with the `source' or `.' builtins.

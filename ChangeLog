@@ -1,5 +1,7 @@
 2010-10-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: NEWS: note HIST_LEX_WORDS option.
+
 	* 28310 with 28308 (Bart): Doc/Zsh/options.yo, Src/hist.c,
 	Src/options.c, Src/zsh.h: HIST_LEX_WORDS option and check
 	for full history file read.
@@ -13693,5 +13695,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5092 $
+* $Revision: 1.5093 $
 *****************************************************
