@@ -1472,6 +1472,7 @@ doisearch(char **args, int dir, int pattern)
 	} else
 	    isearch_active = 0;
     ref:
+	zlecallhook("zle-isearch-update", NULL);
 	zrefresh();
 	if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak)) {
 	    int i;
@@ -1670,6 +1671,7 @@ doisearch(char **args, int dir, int pattern)
     }
     statusline = NULL;
     unmetafy_line();
+    zlecallhook("zle-isearch-exit", NULL);
     if (exitfn)
 	exitfn(zlenoargs);
     selectkeymap(okeymap, 1);
