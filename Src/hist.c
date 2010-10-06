@@ -2231,8 +2231,8 @@ readhistfile(char *fn, int err, int readflags)
     short *words;
     struct stat sb;
     int nwordpos, nwords, bufsiz;
-    int searching, newflags, l, ret;
-   
+    int searching, newflags, l, ret, uselex;
+
     if (!fn && !(fn = getsparam("HISTFILE")))
 	return;
     if (readflags & HFILE_FAST) {
@@ -2256,6 +2256,7 @@ readhistfile(char *fn, int err, int readflags)
 	bufsiz = 1024;
 	buf = zalloc(bufsiz);
 
+	pushheap();
 	if (readflags & HFILE_FAST && lasthist.text) {
 	    if (lasthist.fpos < lasthist.fsiz) {
 		fseek(in, lasthist.fpos, 0);
@@ -2339,19 +2340,24 @@ readhistfile(char *fn, int err, int readflags)
 	     */
 	    nwordpos = 0;
 	    start = pt;
-	    if (isset(HISTLEXWORDS) && !(readflags & HFILE_FAST)) {
+	    uselex = isset(HISTLEXWORDS) && !(readflags & HFILE_FAST);
+	    if (uselex) {
 		/*
 		 * Attempt to do this using the lexer.
 		 */
 		LinkList wordlist = bufferwords(NULL, pt, NULL);
-		he->nwords = countlinknodes(wordlist);
-		if (2*he->nwords > nwords) {
-		    nwords = 2*he->nwords;
+		LinkNode wordnode;
+		int nwords_max;
+		nwords_max = 2 * countlinknodes(wordlist);
+		if (nwords_max > nwords) {
+		    nwords = nwords_max;
 		    words = (short *)realloc(words, nwords*sizeof(short));
 		}
-		while (firstnode(wordlist)) {
-		    char *word = uremnode(wordlist, firstnode(wordlist));
-		
+		for (wordnode = firstnode(wordlist);
+		     wordnode;
+		     incnode(wordnode)) {
+		    char *word = getdata(wordnode);
+
 		    while (inblank(*pt))
 			pt++;
 		    if (!strpfx(word, pt)) {
@@ -2361,14 +2367,23 @@ readhistfile(char *fn, int err, int readflags)
 			 */
 			if (!strcmp(word, ";"))
 			    continue;
-			/*
-			 * Oddity 2: !'s turn into |'s.
-			 */
 			while (*pt) {
+			    /*
+			     * Oddity 3: "'"s can turn out differently
+			     * if RC_QUOTES is in use.
+			     */
+			    if (*pt == '\'' && pt > start &&
+				pt[-1] == '\'' && word[-1] == '\'') {
+				pt++;
+				continue;
+			    }
 			    if (!*word) {
 				bad = 1;
 				break;
 			    }
+			    /*
+			     * Oddity 2: !'s turn into |'s.
+			     */
 			    if (*pt == *word ||
 				(*pt == '!' && *word == '|')) {
 				pt++;
@@ -2384,9 +2399,9 @@ readhistfile(char *fn, int err, int readflags)
 					 "%s\nat: %s\nword: %s"),
 				  start, pt, word);
 #endif
-			    words[nwordpos++] = pt - start;
-			    pt += strlen(pt);
-			    words[nwordpos++] = pt - start;
+			    pt = start;
+			    nwordpos = 0;
+			    uselex = 0;
 			    break;
 			}
 		    }
@@ -2394,7 +2409,9 @@ readhistfile(char *fn, int err, int readflags)
 		    pt += strlen(word);
 		    words[nwordpos++] = pt - start;
 		}
-	    } else {
+		freeheap();
+	    }
+	    if (!uselex) {
 		do {
 		    while (inblank(*pt))
 			pt++;
@@ -2409,9 +2426,9 @@ readhistfile(char *fn, int err, int readflags)
 		    }
 		} while (*pt);
 
-		he->nwords = nwordpos/2;
 	    }
 
+	    he->nwords = nwordpos/2;
 	    if (he->nwords) {
 		he->words = (short *)zalloc(nwordpos*sizeof(short));
 		memcpy(he->words, words, nwordpos*sizeof(short));
@@ -2430,6 +2447,7 @@ readhistfile(char *fn, int err, int readflags)
 	zfree(words, nwords*sizeof(short));
 	zfree(buf, bufsiz);
 
+	popheap();
 	fclose(in);
     } else if (err)
 	zerr("can't read history file %s", fn);
