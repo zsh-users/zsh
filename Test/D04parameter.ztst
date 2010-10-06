@@ -389,6 +389,34 @@
 >)
 >ten( more
 
+  strings=(
+    'foo=(1 2 3)'
+    '(( 3 + 1 == 8 / 2 ))'
+    'for (( i = 1 ; i < 10 ; i++ ))'
+  )
+  for string in $strings; do
+    array=(${(z)string})
+    for (( i = 1; i <= ${#array}; i++ )); do
+      print -r -- "${i}:${array[i]}:"
+    done
+  done
+0:Some syntactical expressions that are hard to split into words with (z).
+>1:foo=(:
+>2:1:
+>3:2:
+>4:3:
+>5:):
+>1:(( 3 + 1 == 8 / 2 )):
+>1:for:
+>2:((:
+# Leading whitespace is removed, because the word proper hasn't started;
+# trailing whitespace is left because the word is terminated by the
+# semicolon or double parentheses.  Bit confusing but sort of consistent.
+>3:i = 1 ;:
+>4:i < 10 ;:
+>5:i++ :
+>6:)):
+
   psvar=(dog)
   setopt promptsubst
   foo='It shouldn'\''t $(happen) to a %1v.'

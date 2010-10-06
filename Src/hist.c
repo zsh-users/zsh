@@ -2869,6 +2869,7 @@ bufferwords(LinkList list, char *buf, int *index)
     int num = 0, cur = -1, got = 0, ne = noerrs;
     int owb = wb, owe = we, oadx = addedx, ozp = zleparse, onc = nocomments;
     int ona = noaliases, ocs = zlemetacs, oll = zlemetall;
+    int forloop = 0;
     char *p, *addedspaceptr;
 
     if (!list)
@@ -2942,25 +2943,84 @@ bufferwords(LinkList list, char *buf, int *index)
 	ctxtlex();
 	if (tok == ENDINPUT || tok == LEXERR)
 	    break;
-	if (tokstr && *tokstr) {
-	    untokenize((p = dupstring(tokstr)));
-	    if (ingetptr() == addedspaceptr + 1) {
-		/*
-		 * Whoops, we've read past the space we added, probably
-		 * because we were expecting a terminator but when
-		 * it didn't turn up we shrugged our shoulders thinking
-		 * it might as well be a complete string anyway.
-		 * So remove the space.  C.f. below for the case
-		 * where the missing terminator caused a lex error.
-		 * We use the same paranoid test.
-		 */
-		int plen = strlen(p);
-		if (plen && p[plen-1] == ' ' &&
-		    (plen == 1 || p[plen-2] != Meta))
-		    p[plen-1] = '\0';
+	if (tok == FOR) {
+	    /*
+	     * The way for (( expr1 ; expr2; expr3 )) is parsed is:
+	     * - a FOR tok
+	     * - a DINPAR with no tokstr
+	     * - two DINPARS with tokstr's expr1, expr2.
+	     * - a DOUTPAR with tokstr expr3.
+	     *
+	     * We'll decrement the variable forloop as we verify
+	     * the various stages.
+	     *
+	     * Don't ask me, ma'am, I'm just the programmer.
+	     */
+	    forloop = 5;
+	} else {
+	    switch (forloop) {
+	    case 1:
+		if (tok != DOUTPAR)
+		    forloop = 0;
+		break;
+
+	    case 2:
+	    case 3:
+	    case 4:
+		if (tok != DINPAR)
+		    forloop = 0;
+		break;
+
+	    default:
+		/* nothing to do */
+		break;
 	    }
-	    addlinknode(list, p);
-	    num++;
+	}
+	if (tokstr) {
+	    switch (tok) {
+	    case ENVARRAY:
+		p = dyncat(tokstr, "=(");
+		break;
+
+	    case DINPAR:
+		if (forloop) {
+		    /* See above. */
+		    p = dyncat(tokstr, ";");
+		} else {
+		    /*
+		     * Mathematical expressions analysed as a single
+		     * word.  That's correct because it behaves like
+		     * double quotes.  Whitespace in the middle is
+		     * similarly retained, so just add the parentheses back.
+		     */
+		    p = tricat("((", tokstr, "))");
+		}
+		break;
+
+	    default:
+		p = dupstring(tokstr);
+		break;
+	    }
+	    if (*p) {
+		untokenize(p);
+		if (ingetptr() == addedspaceptr + 1) {
+		    /*
+		     * Whoops, we've read past the space we added, probably
+		     * because we were expecting a terminator but when
+		     * it didn't turn up we shrugged our shoulders thinking
+		     * it might as well be a complete string anyway.
+		     * So remove the space.  C.f. below for the case
+		     * where the missing terminator caused a lex error.
+		     * We use the same paranoid test.
+		     */
+		    int plen = strlen(p);
+		    if (plen && p[plen-1] == ' ' &&
+			(plen == 1 || p[plen-2] != Meta))
+			p[plen-1] = '\0';
+		}
+		addlinknode(list, p);
+		num++;
+	    }
 	} else if (buf) {
 	    if (IS_REDIROP(tok) && tokfd >= 0) {
 		char b[20];
@@ -2972,6 +3032,16 @@ bufferwords(LinkList list, char *buf, int *index)
 		addlinknode(list, dupstring(tokstrings[tok]));
 		num++;
 	    }
+	}
+	if (forloop) {
+	    if (forloop == 1) {
+		/*
+		 * Final "))" of for loop to match opening,
+		 * since we've just added the preceding element.
+ 		 */
+		addlinknode(list, dupstring("))"));
+	    }
+	    forloop--;
 	}
 	if (!got && !zleparse) {
 	    got = 1;
