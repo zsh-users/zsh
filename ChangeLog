@@ -1,11 +1,10 @@
 2010-10-06  Peter Stephenson  <pws@csr.com>
 
-	* <To be posted when mailing list comes back>: Src/hist.c,
-	Test/D04parameter.ztst: Problems with HIST_LEX_WORDS: memory
-	allocation was screwed if we skipped "words" from the lexer;
-	use local heap to avoid silly amounts of memory; fallback
-	to non-lex on failure rather than just fixing up at the end;
-	workaround oddity with splitting with RC_QUOTES.
+	* 28326: Src/hist.c, Test/D04parameter.ztst: Problems with
+	HIST_LEX_WORDS: memory allocation was screwed if we skipped
+	"words" from the lexer; use local heap to avoid silly amounts of
+	memory; fallback to non-lex on failure rather than just fixing
+	up at the end; workaround oddity with splitting with RC_QUOTES.
 
 	* 28319: Src/hist.c, Test/D04parameter.ztst: ${(z)...}
 	splitting oddities and some tests for consistency.
@@ -13710,5 +13709,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5096 $
+* $Revision: 1.5097 $
 *****************************************************
