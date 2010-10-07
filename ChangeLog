@@ -1,3 +1,8 @@
+2010-10-07  Peter Stephenson  <pws@csr.com>
+
+	* 28327: Src/hist.c: Fix bufferwords() splitting when RC_QUOTES
+	is turned on.
+
 2010-10-06  Peter Stephenson  <pws@csr.com>
 
 	* 28326: Src/hist.c, Test/D04parameter.ztst: Problems with
@@ -13709,5 +13714,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5097 $
+* $Revision: 1.5098 $
 *****************************************************

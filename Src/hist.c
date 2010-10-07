@@ -2368,15 +2368,6 @@ readhistfile(char *fn, int err, int readflags)
 			if (!strcmp(word, ";"))
 			    continue;
 			while (*pt) {
-			    /*
-			     * Oddity 3: "'"s can turn out differently
-			     * if RC_QUOTES is in use.
-			     */
-			    if (*pt == '\'' && pt > start &&
-				pt[-1] == '\'' && word[-1] == '\'') {
-				pt++;
-				continue;
-			    }
 			    if (!*word) {
 				bad = 1;
 				break;
@@ -2887,12 +2878,18 @@ bufferwords(LinkList list, char *buf, int *index)
     int num = 0, cur = -1, got = 0, ne = noerrs;
     int owb = wb, owe = we, oadx = addedx, ozp = zleparse, onc = nocomments;
     int ona = noaliases, ocs = zlemetacs, oll = zlemetall;
-    int forloop = 0;
+    int forloop = 0, rcquotes = opts[RCQUOTES];
     char *p, *addedspaceptr;
 
     if (!list)
 	list = newlinklist();
 
+    /*
+     * With RC_QUOTES, 'foo '' bar' comes back as 'foo ' bar'.  That's
+     * not very useful.  As nothing in here requires the fully processed
+     * string expression, we just turn the option off for this function.
+     */
+    opts[RCQUOTES] = 0;
     zleparse = 1;
     addedx = 0;
     noerrs = 1;
@@ -3095,6 +3092,7 @@ bufferwords(LinkList list, char *buf, int *index)
     wb = owb;
     we = owe;
     addedx = oadx;
+    opts[RCQUOTES] = rcquotes;
 
     if (index)
 	*index = cur;
