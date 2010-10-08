@@ -26,12 +26,11 @@ if [[ -z $_acroread_version ]]; then
   fi
 fi
 
-if [[ $_acroread_version == [78].* ]]; then
+if [[ $_acroread_version == [789].* ]]; then
   local -a extra_args
-  if [[ $_acroread_version == 8.* ]]; then
-    extra_args=(-man '-installCertificate:server ip::server port')
-  else
-    extra_args=()
+  extra_args=()
+  if [[ $_acroread_version == [89].* ]]; then
+    extra_args+=(-man '-installCertificate:server ip::server port')
   fi
   _arguments -C \
     "${extra_args[@]}" \

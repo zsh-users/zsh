@@ -1,3 +1,8 @@
+2010-10-08  Peter Stephenson  <pws@csr.com>
+
+	* Ben: Completion/X/Command/_acroread: version 9 is similar to 7
+	and 8.
+
 2010-10-07  Peter Stephenson  <pws@csr.com>
 
 	* 28327: Src/hist.c: Fix bufferwords() splitting when RC_QUOTES
@@ -13714,5 +13719,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5098 $
+* $Revision: 1.5099 $
 *****************************************************
