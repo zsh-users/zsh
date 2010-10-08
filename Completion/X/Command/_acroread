@@ -32,6 +32,9 @@ if [[ $_acroread_version == [789].* ]]; then
   if [[ $_acroread_version == [89].* ]]; then
     extra_args+=(-man '-installCertificate:server ip::server port')
   fi
+  if [[ $_acroread_version == 9.* ]]; then
+    extra_args+=(-openInNewInstance)
+  fi
   _arguments -C \
     "${extra_args[@]}" \
     '--display=:X display:_x_display' \
