@@ -2275,9 +2275,22 @@ setstrvalue(Value v, char *val)
 	    if (v->start > zlen)
 		v->start = zlen;
 	    if (v->end < 0) {
-		v->end += zlen + 1;
-		if (v->end < 0)
+		v->end += zlen;
+		if (v->end < 0) {
 		    v->end = 0;
+		} else if (v->end >= zlen) {
+		    v->end = zlen;
+		} else {
+#ifdef MULTIBYTE_SUPPORT
+		    if (isset(MULTIBYTE)) {
+			v->end += MB_METACHARLEN(z + v->end);
+		    } else {
+			v->end++;
+		    }
+#else
+		    v->end++;
+#endif
+		}
 	    }
 	    else if (v->end > zlen)
 		v->end = zlen;

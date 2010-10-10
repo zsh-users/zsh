@@ -447,3 +447,21 @@
   print $(( [#16] #REPLY ))
 0:read passes through invalid multibyte characters
 >0xC5
+
+  word=abcま          
+  word[-1]=
+  print $word
+  word=abcま 
+  word[-2]=
+  print $word
+  word=abcま 
+  word[4]=d
+  print $word
+  word=abcま 
+  word[3]=not_c
+  print $word  
+0:assignment with negative indices
+>abc
+>abま
+>abcd
+>abnot_cま

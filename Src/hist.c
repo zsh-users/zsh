@@ -2365,7 +2365,7 @@ readhistfile(char *fn, int err, int readflags)
 			 */
 			if (inblank(*pt))
 			    pt++;
-			else if (strpfx("\\\n", pt))
+			else if (pt[0] == '\\' && pt[1] == '\n')
 			    pt += 2;
 			else
 			    break;
@@ -2414,8 +2414,14 @@ readhistfile(char *fn, int err, int readflags)
 	    }
 	    if (!uselex) {
 		do {
-		    while (inblank(*pt))
-			pt++;
+		    for (;;) {
+			if (inblank(*pt))
+			    pt++;
+			else if (pt[0] == '\\' && pt[1] == '\n')
+			    pt += 2;
+			else
+			    break;
+		    }
 		    if (*pt) {
 			if (nwordpos >= nwords)
 			    words = (short *)
