@@ -285,6 +285,19 @@ F:Failures in these cases do not indicate a problem in the shell.
 0:MATCH, MBEGIN, MEND, match, mbegin, mend
 >OK
 
+  (if zmodload -i zsh/regex 2>/dev/null; then
+    if [[ a =~ a && b == b ]]; then
+      print OK
+    else
+      print "regex =~ inverted following test"
+    fi
+  else
+    # not a test error
+    print OK
+  fi)
+0:regex infix operator should not invert following conditions
+>OK
+
   [[ -fail badly ]]
 2:Error message for unknown prefix condition
 ?(eval):1: unknown condition: -fail

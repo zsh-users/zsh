@@ -2172,10 +2172,11 @@ par_cond_triple(char *a, char *b, char *c)
 	ecadd(ecnpats++);
     } else if ((b[0] == Equals || b[0] == '=') &&
                (b[1] == '~' || b[1] == Tilde) && !b[2]) {
+        /* We become an implicit COND_MODI but do not provide the first
+	 * item, it's skipped */
 	ecadd(WCB_COND(COND_REGEX, 0));
 	ecstr(a);
 	ecstr(c);
-	ecadd(ecnpats++);
     } else if (b[0] == '-') {
 	if ((t0 = get_cond_num(b + 1)) > -1) {
 	    ecadd(WCB_COND(t0 + COND_NT, 0));
