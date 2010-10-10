@@ -2358,8 +2358,18 @@ readhistfile(char *fn, int err, int readflags)
 		     incnode(wordnode)) {
 		    char *word = getdata(wordnode);
 
-		    while (inblank(*pt))
-			pt++;
+		    for (;;) {
+			/*
+			 * Not really an oddity: "\\\n" is
+			 * removed from input as if whitespace.
+			 */
+			if (inblank(*pt))
+			    pt++;
+			else if (strpfx("\\\n", pt))
+			    pt += 2;
+			else
+			    break;
+		    }
 		    if (!strpfx(word, pt)) {
 			int bad = 0;
 			/*
