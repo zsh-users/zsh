@@ -10,6 +10,11 @@
 	backslash-newline line continuation properly.  Come to think of
 	it, neither does the alternative.
 
+2010-10-10  Phil Pennock  <pdpennock@users.sourceforge.net>
+
+	* 28338: Src/cond.c, C02cond.ztst: keep =~ from inverting sense
+	of subsequent tests (after &&/||).
+
 2010-10-08  Peter Stephenson  <pws@csr.com>
 
 	* Ben: 28330: Completion/X/Command/_acroread: add
@@ -13734,5 +13739,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5102 $
+* $Revision: 1.5103 $
 *****************************************************
