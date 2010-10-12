@@ -30,5 +30,6 @@ _arguments -s -S \
   '--restore=[restore ACLs]:file:_files' \
   '--test[test mode (ACLs are not modified)]' \
   '--version[print version and exit]' \
-  '--help[this help text]'
+  '--help[this help text]' \
+  '*: :_files'
 fi

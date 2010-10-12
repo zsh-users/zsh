@@ -1,3 +1,8 @@
+2010-10-12  Peter Stephenson  <pws@csr.com>
+
+	* Mikael: 28343: Completion/Unix/Command/_setfacl: didn't
+	complete file argument in all cases.
+
 2010-10-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28340: Src/params.c: assignment with negative index didn't
@@ -13739,5 +13744,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5103 $
+* $Revision: 1.5104 $
 *****************************************************
