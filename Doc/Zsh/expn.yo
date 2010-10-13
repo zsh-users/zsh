@@ -1168,7 +1168,7 @@ joining instead of tt($IFS).
 item(tt(6.) em(Nested Subscripting))(
 Any remaining subscripts (i.e. of a nested substitution) are evaluated at
 this point, based on whether the value is an array or a scalar.  As with
-tt(2.), multiple subscripts can appear.  Note that tt(${foo[2,4][2]}) is
+tt(3.), multiple subscripts can appear.  Note that tt(${foo[2,4][2]}) is
 thus equivalent to tt(${${foo[2,4]}[2]}) and also to
 tt("${${(@)foo[2,4]}[2]}") (the nested substitution returns an array in
 both cases), but not to tt("${${foo[2,4]}[2]}") (the nested substitution
@@ -1190,8 +1190,8 @@ used to evaluate the length of the expression so far.
 )
 item(tt(10.) em(Forced Joining))(
 If the `tt((j))' flag is present, or no `tt((j))' flag is present but
-the string is to be split as given by rules tt(8.) or tt(9.), and joining
-did not take place at step tt(4.), any words in the value are joined
+the string is to be split as given by rules tt(16.) or tt(17.), and joining
+did not take place at step tt(5.), any words in the value are joined
 together using the given string or the first character of tt($IFS) if none.
 Note that the `tt((F))' flag implicitly supplies a string for joining in this
 manner.

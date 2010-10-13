@@ -1,3 +1,8 @@
+2010-10-12  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted (users/15440): Doc/Zsh/expn.yo: fix cross-references
+	among parameter expansion rules.
+
 2010-10-12  Peter Stephenson  <pws@csr.com>
 
 	* Mikael: 28343: Completion/Unix/Command/_setfacl: didn't
@@ -13744,5 +13749,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5104 $
+* $Revision: 1.5105 $
 *****************************************************
