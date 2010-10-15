@@ -291,7 +291,7 @@ if (( list )); then
   dirs=($reply)
   for (( i = 1; i <= ${#dirs}; i++ )); do
     print -n ${(r.5.)i}
-    print -D ${dirs[i]}
+    print -r ${(D)dirs[i]}
   done
   return
 fi

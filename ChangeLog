@@ -1,3 +1,9 @@
+2010-10-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28345: Doc/Zsh/expn.yo, Functions/Chpwd/cdr, Src/builtin.c,
+	Src/utils.c: make new ${(D)} flag return the contracted file as
+	a fully usable command line argument.
+
 2010-10-12  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted (users/15440): Doc/Zsh/expn.yo: fix cross-references
@@ -13749,5 +13755,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5105 $
+* $Revision: 1.5106 $
 *****************************************************

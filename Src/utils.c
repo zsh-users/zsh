@@ -807,6 +807,8 @@ fprintdir(char *s, FILE *f)
 /*
  * Substitute a directory using a name.
  * If there is none, return the original argument.
+ *
+ * At this level all strings involved are metafied.
  */
 
 /**/
@@ -816,8 +818,9 @@ substnamedir(char *s)
     Nameddir d = finddir(s);
 
     if (!d)
-	return s;
-    return zhtricat("~", d->node.nam, s + strlen(d->dir));
+	return quotestring(s, NULL, QT_BACKSLASH);
+    return zhtricat("~", d->node.nam, quotestring(s + strlen(d->dir),
+						  NULL, QT_BACKSLASH));
 }
 
 
@@ -874,9 +877,13 @@ finddir_scan(HashNode hn, UNUSED(int flags))
     }
 }
 
-/* See if a path has a named directory as its prefix. *
- * If passed a NULL argument, it will invalidate any  *
- * cached information.                                */
+/*
+ * See if a path has a named directory as its prefix.
+ * If passed a NULL argument, it will invalidate any 
+ * cached information.
+ *
+ * s here is metafied.
+ */
 
 /**/
 Nameddir
@@ -915,9 +922,7 @@ finddir(char *s)
     scanhashtable(nameddirtab, 0, 0, 0, finddir_scan, 0);
 
     if (func) {
-	char *dir_meta = metafy(finddir_full, strlen(finddir_full),
-				META_ALLOC);
-	char **ares = subst_string_by_func(func, "d", dir_meta);
+	char **ares = subst_string_by_func(func, "d", finddir_full);
 	int len;
 	if (ares && arrlen(ares) >= 2 &&
 	    (len = (int)zstrtol(ares[1], NULL, 10)) > finddir_best) {
@@ -928,8 +933,6 @@ finddir(char *s)
 	    finddir_last->diff = len - strlen(finddir_last->node.nam);
 	    finddir_best = len;
 	}
-	if (dir_meta != finddir_full)
-	    zsfree(dir_meta);
     }
 
     return finddir_last;
@@ -1038,6 +1041,10 @@ getnameddir(char *name)
     /* There are no more possible sources of directory names, so give up. */
     return NULL;
 }
+
+/*
+ * Compare directories.  Both are metafied.
+ */
 
 /**/
 static int
@@ -4607,7 +4614,7 @@ addunprintable(char *v, const char *u, const char *uend)
 }
 
 /*
- * Quote the string s and return the result.
+ * Quote the string s and return the result as a string from the heap.
  *
  * If e is non-zero, the
  * pointer it points to may point to a position in s and in e the position

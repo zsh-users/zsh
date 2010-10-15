@@ -3704,6 +3704,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	    Nameddir d;
 
 	    queue_signals();
+	    /* TODO: finddir takes a metafied file */
 	    d = finddir(args[n]);
 	    if(d) {
 		int dirlen = strlen(d->dir);

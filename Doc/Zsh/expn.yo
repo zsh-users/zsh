@@ -774,8 +774,10 @@ that result from field splitting.
 )
 item(tt(D))(
 Assume the string or array elements contain directories and attempt
-to substitute the leading part of these by names.  This is the reverse
-of `tt(~)' substitution:  see
+to substitute the leading part of these by names.  The remainder of
+the path (the whole of it if the leading part was not subsituted)
+is then quoted so that the whole string can be used as a shell
+argument.  This is the reverse of `tt(~)' substitution:  see
 ifnzman(noderef(Filename Expansion))\
 ifzman(the section FILENAME EXPANSION below).
 )
