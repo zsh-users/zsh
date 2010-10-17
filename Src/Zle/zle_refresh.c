@@ -2089,7 +2089,9 @@ refreshline(int ln)
 	     * We check for WEOF inside.
 	     */
 	    zputc(nl);
-	    nl++, ol++;
+	    nl++;
+	    if (ol->chr)
+	      ol++;
 	    ccs++, vcs++;
 #ifdef MULTIBYTE_SUPPORT
 	    /*
