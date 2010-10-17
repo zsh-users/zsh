@@ -1,3 +1,8 @@
+2010-10-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* c.f. 28353: Doc/Zsh/metafaq.yo: removing remaining reference
+	to sunsite in FTP sites.
+
 2010-10-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28345: Doc/Zsh/expn.yo, Functions/Chpwd/cdr, Src/builtin.c,
@@ -13755,5 +13760,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5106 $
+* $Revision: 1.5107 $
 *****************************************************

@@ -34,9 +34,6 @@ item(Australia)(
 nofill(tt(ftp://ftp.zsh.org/pub/zsh/)
 tt(http://www.zsh.org/pub/zsh/))
 )
-item(Denmark)(
-nofill(tt(ftp://sunsite.dk/pub/unix/shells/zsh/))
-)
 item(Finland)(
 nofill(tt(ftp://ftp.funet.fi/pub/unix/shells/zsh/))
 )
