@@ -1,3 +1,8 @@
+2010-10-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Silas Silva: users/15464: Completion/Unix/Command/_man:
+	support for -M argument.
+
 2010-10-18  Peter Stephenson  <pws@csr.com>
 
 	* Jérôme Pouiller: 28351: Functions/Misc/run-help-openssl,
@@ -13768,5 +13773,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5109 $
+* $Revision: 1.5110 $
 *****************************************************

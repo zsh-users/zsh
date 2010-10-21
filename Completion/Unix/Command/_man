@@ -3,6 +3,10 @@
 _man() {
   local dirs expl mrd awk
 
+  if (( $words[(I)-M] == (( $CURRENT - 1 )) )); then
+    _directories && return 0
+  fi
+
   if [[ $service == man ]] && (( $words[(I)-l] + $words[(I)--local-file] )); then
     _files || return 0
   fi
@@ -20,6 +24,12 @@ _man() {
 
   (( $#_manpath )) ||
       _manpath=( /usr/man(-/) /(opt|usr)/(pkg|dt|share|X11R6|local)/(cat|)man(-/) )
+
+  if (( $words[(I)-M] )); then
+    local opt
+    opt=$words[(( $words[(I)-M]+1 ))]
+    _manpath=($_manpath $opt)
+  fi
 
   # `sman' is the SGML manual directory for Solaris 7.
   # 1M is system administrator commands on SVR4
