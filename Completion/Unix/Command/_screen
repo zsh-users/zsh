@@ -81,7 +81,7 @@ _arguments -C \
   '-DR: :->any-sessions' \
   '-dR: :->any-sessions' \
   '-s[shell to execute rather than $SHELL]:shell name: _command_names -e' \
-  '-S[name this session <pid>.sockname instead of <pid>.<tty>.<host>]:session name' \
+  '-S[name this session <pid>.sockname instead of <pid>.<tty>.<host>]:session name:->any-sessions' \
   "-t[set title (window's name)]:title" \
   '-T[use term as $TERM for windows, rather than "screen"]:terminal type:_terminals' \
   '-U[tell screen to use UTF-8 encoding]' \
