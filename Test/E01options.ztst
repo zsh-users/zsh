@@ -998,7 +998,7 @@
 >two
 >words
 
-  fn() { unset foo; print $foo; }
+  fn() { unset foo; print value is $foo; }
   setopt nounset
   print option unset unset by setting nounset
   eval fn
@@ -1008,8 +1008,31 @@
 0:UNSET option
 >option unset unset by setting nounset
 >option unset reset
->
+>value is
 ?fn: foo: parameter not set
+
+  fn1() { unset foo; print value 1 is ${foo#bar}; }
+  fn2() { unset foo; print value 2 is ${foo%bar}; }
+  fn3() { unset foo; print value 3 is ${foo/bar}; }
+  setopt nounset
+  print option unset unset by setting nounset
+  eval fn1
+  eval fn2
+  eval fn3
+  print option unset reset
+  setopt unset
+  fn1
+  fn2
+  fn3
+0:UNSET option with operators
+>option unset unset by setting nounset
+>option unset reset
+>value 1 is
+>value 2 is
+>value 3 is
+?fn1: foo: parameter not set
+?fn2: foo: parameter not set
+?fn3: foo: parameter not set
 
   fn() {
     emulate -L zsh

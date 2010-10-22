@@ -2649,8 +2649,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		}
 		getmatcharr(&aval, s, flags, flnum, replstr);
 	    } else {
-		if (vunset)
+		if (vunset) {
+		    if (unset(UNSET)) {
+			*idend = '\0';
+			zerr("%s: parameter not set", idbeg);
+			return NULL;
+		    }
 		    val = dupstring("");
+		}
 		if (!copied) {
 		    val = dupstring(val);
 		    copied = 1;
