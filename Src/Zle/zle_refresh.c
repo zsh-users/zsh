@@ -2000,7 +2000,7 @@ refreshline(int ln)
 		   newline: foobar	 / characters, then we have six matches */
 		if (tccan(TCDEL)) {
 		    int first = 1;
-		    for (i = 1; ol[i].chr; i++)
+		    for (i = 1; ol[i].chr; i++) {
 			if (tcdelcost(i) < wpfxlen(ol + i, nl)) {
 			    /*
 			     * Some terminals will output the current
@@ -2023,15 +2023,19 @@ refreshline(int ln)
 			    i = 0;
 			    break;
 			}
+		    }
 		    if (!i)
 			continue;
 		}
-		/* inserting characters - characters pushed off the right should be
-		   annihilated, but we don't do this if we're on the last line lest
-		   undesired scrolling occurs due to `illegal' characters on screen */
-
-		if (tccan(TCINS) && (vln != lines - 1)) {	/* not on last line */
-		    for (i = 1; nl[i].chr; i++)
+		/*
+		 * inserting characters - characters pushed off the right
+		 * should be annihilated, but we don't do this if we're on the
+		 * last line lest undesired scrolling occurs due to `illegal'
+		 * characters on screen
+		 */ 
+		if (tccan(TCINS) && (vln != lines - 1)) {
+		    /* not on last line */
+		    for (i = 1; nl[i].chr; i++) {
 			if (tcinscost(i) < wpfxlen(ol, nl + i)) {
 			    tc_inschars(i);
 			    zwrite(nl, i);
@@ -2044,19 +2048,37 @@ refreshline(int ln)
 #endif
 			    char_ins += i;
 			    ccs = (vcs += i);
-			    /* if we've pushed off the right, truncate oldline */
-			    for (i = 0; ol[i].chr && i < winw - ccs; i++);
+			    /*
+			     * if we've pushed off the right, truncate
+			     * oldline
+			     */
+			    for (i = 0; ol[i].chr && i < winw - ccs; i++)
+				;
 #ifdef MULTIBYTE_SUPPORT
 			    while (ol[i].chr == WEOF)
 				i++;
-#endif
+			    if (i >= winw - ccs) {
+				/*
+				 * Yes, we're over the right.
+				 * Make sure we truncate at the real
+				 * character, not a WEOF added to
+				 * make up the width.
+				 */
+				while (ol[i-1].chr == WEOF)
+				    i--;
+				ol[i] = zr_zr;
+				ins_last = 1;
+			    }
+#else
 			    if (i >= winw - ccs) {
 				ol[i] = zr_zr;
 				ins_last = 1;
 			    }
+#endif
 			    i = 0;
 			    break;
 			}
+		    }
 		    if (!i)
 			continue;
 		}

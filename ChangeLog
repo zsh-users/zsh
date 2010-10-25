@@ -1,3 +1,8 @@
+2010-10-25  Peter Stephenson  <pws@csr.com>
+
+	* 28363: Src/Zle/zle_refresh.c: inserting a character when a
+	wide character was at the end of the line didn't work.
+
 2010-10-22  Peter Stephenson  <pws@csr.com>
 
 	* 28360: Src/subst.c, Test/E01options.ztst: NO_UNSET option
@@ -13781,5 +13786,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5113 $
+* $Revision: 1.5114 $
 *****************************************************
