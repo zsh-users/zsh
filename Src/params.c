@@ -2591,8 +2591,15 @@ assignsparam(char *s, char *val, int flags)
 	*ss = '\0';
 	if (!(v = getvalue(&vbuf, &s, 1)))
 	    createparam(t, PM_ARRAY);
-	else
+	else {
+	    if (v->pm->node.flags & PM_READONLY) {
+		zerr("read-only variable: %s", v->pm->node.nam);
+		*ss = '[';
+		zsfree(val);
+		return NULL;
+	    }
 	    flags &= ~ASSPM_WARN_CREATE;
+	}
 	*ss = '[';
 	v = NULL;
     } else {
