@@ -1,3 +1,8 @@
+2010-11-10  Clint Adams  <clint@zsh.org>
+
+	* 28401: Completion/Debian/Command/_git-buildpackage:
+	git-buildpackage completion from Felipe Sateler.
+
 2010-11-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Mikael: 28389: Completion/Unix/Type/_java_class: empty section
@@ -487,7 +492,7 @@
 	* 28052: Completion/Unix/Command/_cvs: remove duplicated completion of
 	the version subcommand.
 
-	* unposted: INSTALL, README: fix typos. 
+	* unposted: INSTALL, README: fix typos.
 
 	* 28051: Completion/Unix/Command/_elinks: update for version 0.12pre5.
 
@@ -13804,5 +13809,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5118 $
+* $Revision: 1.5119 $
 *****************************************************
