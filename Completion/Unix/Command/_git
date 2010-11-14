@@ -205,6 +205,7 @@ _git_commands () {
     'stage:add file contents to the staging area'
     'stash:stash away changes to the working tree'
     'status:show working-tree'\''s status'
+    'submodule:initialize or update or inspect submodules'
     'tag:create tag object signed with GPG'
     'verify-tag:check GPG signature of a tag')
 
@@ -290,7 +291,8 @@ _git_commands () {
     'cvsimport:import a CVS "repository" into a git repository'
     'svnimport:import SVN repository into git'
     'quiltimport:apply a quilt patchset'
-    'svn:bidirectional operation between a single Subversion branch and git')
+    'svn:bidirectional operation between a single Subversion branch and git'
+    'annex:manage files without tracking content')
 
   local -a ancillary_commands
   ancillary_commands=(
@@ -4493,7 +4495,11 @@ if [[ $service == git ]]; then
         __git_aliases_and_commands
       else
         curcontext="${curcontext%:*:*}:git-$words[1]:"
-        _call_function ret _git-$words[1]
+	if (( $+functions[_git-$words[1]] )); then
+          _call_function ret _git-$words[1]
+	else
+	  _files
+	fi
         return ret
       fi
       ;;

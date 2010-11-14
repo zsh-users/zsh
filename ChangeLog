@@ -1,3 +1,9 @@
+2010-11-14  Clint Adams  <clint@zsh.org>
+
+	* 28411: Completion/Unix/Command/_git: complete submodule
+	and annex as subcommands; complete files when the subcommand
+	is unknown.
+
 2010-11-10  Clint Adams  <clint@zsh.org>
 
 	* 28401: Completion/Debian/Command/_git-buildpackage:
@@ -13809,5 +13815,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5119 $
+* $Revision: 1.5120 $
 *****************************************************
