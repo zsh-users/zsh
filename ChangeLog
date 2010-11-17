@@ -1,3 +1,7 @@
+2010-11-17  Peter Stephenson  <pws@csr.com>
+
+	* 28377: Doc/Zsh/grammar.yo: document more alias problems.
+
 2010-11-14  Clint Adams  <clint@zsh.org>
 
 	* 28411: Completion/Unix/Command/_git: complete submodule
@@ -13815,5 +13819,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5120 $
+* $Revision: 1.5121 $
 *****************************************************

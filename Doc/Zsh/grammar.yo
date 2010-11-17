@@ -500,6 +500,27 @@ is too late to expand the newly defined alias.  This is often
 a problem in shell scripts, functions, and code executed with `tt(source)'
 or `tt(.)'.  Consequently, use of functions rather than aliases is
 recommended in non-interactive code.
+
+Note also the unhelpful interaction of aliases and function definitions:
+
+example(alias func='noglob func'
+func+LPAR()RPAR() {
+    echo Do something with $*
+})
+
+Because aliases are expanded in function defintions, this causes the
+following command to be executed:
+
+example(noglob func+LPAR()RPAR() {
+    echo Do something with $*
+})
+
+which defines tt(noglob) as well as tt(func) as functions with the
+body given.  To avoid this, either quote the name tt(func) or use the
+alternative function definition form `tt(function func)'.  Ensuring the
+alias is defined after the function works but is problematic if the
+code fragment might be re-executed.
+
 texinode(Quoting)()(Aliasing)(Shell Grammar)
 sect(Quoting)
 cindex(quoting)
