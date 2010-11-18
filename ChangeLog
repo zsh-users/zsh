@@ -1,5 +1,8 @@
 2010-11-18  Peter Stephenson  <pws@csr.com>
 
+	* 28419: Doc/Zsh/expn.yo, Src/subst.c, Test/D04parameter.ztst:
+	KSH_ARRAY ${*:0:1} gives $0 etc.
+
 	* 28418: Doc/Zsh/expn.yo, Src/lex.c, Src/params.c, Src/subst.c,
 	Test/D04parameter.ztst: add ${NAME:OFFSET} and
 	${NAME:OFFSET:LENGTH} substitution syntax.
@@ -13825,5 +13828,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5122 $
+* $Revision: 1.5123 $
 *****************************************************

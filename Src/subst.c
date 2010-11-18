@@ -1636,6 +1636,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * and the argument passing to fetchvalue has another kludge.
      */
     int subexp;
+    /*
+     * If we're referring to the positional parameters, then
+     * e.g ${*:1:1} refers to $1 even if KSH_ARRAYS is in effect.
+     * This is for compatibility.
+     */
+    int horrible_offset_hack = 0;
 
     *s++ = '\0';
     /*
@@ -2281,6 +2287,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		val = getstrvalue(v);
 	    }
 	}
+	/* See if this is a reference to the positional parameters. */
+	if (v && v->pm && v->pm->gsu.a == &vararray_gsu &&
+	    (char ***)v->pm->u.data == &pparams)
+	    horrible_offset_hack = 1;
+	else
+	    horrible_offset_hack = 0;
 	/*
 	 * Finished with the original parameter and its indices;
 	 * carry on looping to see if we need to do more indexing.
@@ -2732,6 +2744,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    if (check_offset) {
 		zlong offset = mathevali(check_offset);
 		zlong length = (zlong)-1;
+		int offset_hack_argzero = 0;
 		if (errflag)
 		    return NULL;
 		if ((*check_offset2 && *check_offset2 != ':')) {
@@ -2753,8 +2766,21 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			return NULL;
 		    }
 		}
-		if (!isset(KSHARRAYS) && offset > 0)
-		    offset--;
+		if (!isset(KSHARRAYS) || horrible_offset_hack) {
+		    /*
+		     * As part of the 'orrible hoffset 'ack,
+		     * (what hare you? Han 'orrible hoffset 'ack,
+		     * sergeant major), if we are given a ksh/bash/POSIX
+		     * style array which includes offset 0, we use
+		     * $0.
+		     */
+		    if (isset(KSHARRAYS) && horrible_offset_hack &&
+			offset == 0 && isarr) {
+			offset_hack_argzero = 1;
+		    } else if (offset > 0) {
+			offset--;
+		    }
+		}
 		if (isarr) {
 		    int alen = arrlen(aval), count;
 		    char **srcptr, **dstptr, **newarr;
@@ -2764,6 +2790,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			if (offset < 0)
 			    offset = 0;
 		    }
+		    if (offset_hack_argzero)
+			alen++;
 		    if (length < 0)
 		      length = alen;
 		    if (offset > alen)
@@ -2774,6 +2802,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    srcptr = aval + offset;
 		    newarr = dstptr = (char **)
 			zhalloc((length+1)*sizeof(char *));
+		    if (count && offset_hack_argzero) {
+			*dstptr++ = dupstring(argzero);
+			count--;
+		    }
 		    while (count--)
 			*dstptr++ = dupstring(*srcptr++);
 		    *dstptr = (char *)NULL;

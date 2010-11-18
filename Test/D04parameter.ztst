@@ -1302,3 +1302,32 @@
 >6
 >9
 >1 2 3 4 5 6 7 8 9
+
+   testfn() {
+     emulate -L sh
+     set -A foo 1 2 3
+     set -- 1 2 3
+     str=abc
+     echo ${foo[*]:0:1}
+     echo ${foo[*]:1:1}
+     echo ${foo[*]: -1:1}
+     :
+     echo ${*:0:1}
+     echo ${*:1:1}
+     echo ${*: -1:1}
+     :
+     echo ${str:0:1}
+     echo ${str:1:1}
+     echo ${str: -1:1}
+   }
+   testfn
+0:Bash-style subscripts, Bourne-style indexing
+>1
+>2
+>3
+>testfn
+>1
+>3
+>a
+>b
+>c

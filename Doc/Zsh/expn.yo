@@ -623,6 +623,16 @@ tt(${)var(name)tt(:-)var(word)tt(}) form of substitution; a space
 may be inserted before the tt(-).  Furthermore, neither var(offset) nor
 var(length) may begin with an alphabetic character or tt(&) as these are
 used to indicate history-style modifiers.
+
+For further compatibility with other shells there is a special case
+when the tt(KSH_ARRAYS) option is active, as in emulation of
+Bourne-style shells.  In this case array subscript 0 usually refers to the
+first element of the array.  However, if the substitution refers to the
+positional parameter array, e.g. tt($@) or tt($*), then offset 0
+instead refers to tt($0), offset 1 refers to tt($1), and so on.  In
+other words, the positional parameter array is effectively extended by
+prepending tt($0).  Hence tt(${*:0:1}) substitutes tt($0) and
+tt(${*:1:1}) substitutes tt($1).
 )
 xitem(tt(${)var(name)tt(/)var(pattern)tt(/)var(repl)tt(}))
 item(tt(${)var(name)tt(//)var(pattern)tt(/)var(repl)tt(}))(
