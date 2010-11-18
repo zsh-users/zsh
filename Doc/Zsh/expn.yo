@@ -585,6 +585,45 @@ If var(name) is an array
 the matching array elements are removed (use the `tt((M))' flag to
 remove the non-matched elements).
 )
+xitem(tt(${)var(name)tt(:)var(offset)tt(}))
+item(tt(${)var(name)tt(:)var(offset)tt(:)var(length)tt(}))(
+This syntax gives effects similar to parameter subscripting
+in the form tt($)var(name)tt({)var(offset)tt(,)var(end)tt(}) but in
+a form compatible with other shells.
+
+If the variable var(name) is a scalar, substitute the contents
+starting from offset var(offset); if var(name) is an array,
+substitute elements from element var(offset).  If var(length) is
+given, substitute that many characters or elements, otherwise the
+entire rest of the scalar or array.
+
+var(offset) is treated similarly to a parameter subscript:
+the offset of the first character or element in var(name)
+is 0 if the option tt(KSH_ARRAYS) is set, else 1; a negative
+subscript counts backwards so that -1 corresponds to the last
+character or element.
+
+var(length) is always treated directly as a length and hence may not be
+negative.
+
+var(offset) and var(length) undergo the same set of shell substitutions
+as for scalar assignment; in addition, they are then subject to arithmetic
+evaluation.  Hence, for example
+
+example(print ${foo:3}
+print ${foo: 1 + 2}
+print ${foo:$(( 1 + 2))}
+print ${foo:$(echo 1 + 2)})
+
+all have the same effect.
+
+Note that if var(offset) is negative, the tt(-) may not appear immediately
+after the tt(:) as this indicates the
+tt(${)var(name)tt(:-)var(word)tt(}) form of substitution; a space
+may be inserted before the tt(-).  Furthermore, neither var(offset) nor
+var(length) may begin with an alphabetic character or tt(&) as these are
+used to indicate history-style modifiers.
+)
 xitem(tt(${)var(name)tt(/)var(pattern)tt(/)var(repl)tt(}))
 item(tt(${)var(name)tt(//)var(pattern)tt(/)var(repl)tt(}))(
 Replace the longest possible match of var(pattern) in the expansion of

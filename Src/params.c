@@ -1013,7 +1013,7 @@ isident(char *s)
 	return 0;
 
     /* Require balanced [ ] pairs with something between */
-    if (!(ss = parse_subscript(++ss, 1)))
+    if (!(ss = parse_subscript(++ss, 1, ']')))
 	return 0;
     untokenize(s);
     return !ss[1];
@@ -1628,7 +1628,7 @@ getindex(char **pptr, Value v, int flags)
 
     *s++ = '[';
     /* Error handled after untokenizing */
-    s = parse_subscript(s, flags & SCANPM_DQUOTED);
+    s = parse_subscript(s, flags & SCANPM_DQUOTED, ']');
     /* Now we untokenize everything except inull() markers so we can check *
      * for the '*' and '@' special subscripts.  The inull()s are removed  *
      * in getarg() after we know whether we're doing reverse indexing.    */

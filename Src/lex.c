@@ -1398,7 +1398,12 @@ gettokstr(int c, int sub)
 }
 
 
-/* Return non-zero for error (character to unget), else zero */
+/*
+ * Parse input as if in double quotes.
+ * endchar is the end character to expect.
+ * sub has got something to do with whether we are doing quoted substitution.
+ * Return non-zero for error (character to unget), else zero
+ */
 
 /**/
 static int
@@ -1591,14 +1596,20 @@ parsestrnoerr(char *s)
     return err;
 }
 
+/*
+ * Parse a subscript in string s.
+ * sub is passed down to dquote_parse().
+ * endchar is the final character.
+ * Return the next character, or NULL.
+ */
 /**/
 mod_export char *
-parse_subscript(char *s, int sub)
+parse_subscript(char *s, int sub, int endchar)
 {
     int l = strlen(s), err;
     char *t;
 
-    if (!*s || *s == ']')
+    if (!*s || *s == endchar)
 	return 0;
     lexsave();
     untokenize(t = dupstring(s));
@@ -1607,15 +1618,16 @@ parse_subscript(char *s, int sub)
     len = 0;
     bptr = tokstr = s;
     bsiz = l + 1;
-    err = dquote_parse(']', sub);
+    err = dquote_parse(endchar, sub);
     if (err) {
 	err = *bptr;
-	*bptr = 0;
+	*bptr = '\0';
 	untokenize(s);
 	*bptr = err;
-	s = 0;
-    } else
+	s = NULL;
+    } else {
 	s = bptr;
+    }
     strinend();
     inpop();
     DPUTS(cmdsp, "BUG: parse_subscript: cmdstack not empty.");

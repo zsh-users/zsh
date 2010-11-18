@@ -1371,6 +1371,43 @@ untok_and_escape(char *s, int escapes, int tok_arg)
     return dst;
 }
 
+/*
+ * See if an argument str looks like a subscript or length following
+ * a colon and parse it.  It must be followed by a ':' or nothing.
+ * If this succeeds, expand and return the evaulated expression if
+ * found, else return NULL.
+ *
+ * We assume this is what is meant if the first character is not
+ * an alphabetic character or '&', which signify modifiers.
+ *
+ * Set *endp to point to the next character following.
+ */
+static char *
+check_colon_subscript(char *str, char **endp)
+{
+    int sav;
+
+    /* Could this be a modifier (or empty)? */
+    if (!*str || ialpha(*str) || *str == '&')
+	return NULL;
+
+    *endp = parse_subscript(str, 0, ':');
+    if (!*endp) {
+	/* No trailing colon? */
+	*endp = parse_subscript(str, 0, '\0');
+	if (!*endp)
+	    return NULL;
+    }
+    sav = **endp;
+    **endp = '\0';
+    if (parsestr(str = dupstring(str)))
+	return NULL;
+    singsub(&str);
+
+    **endp = sav;
+    return str;
+}
+
 /* parameter substitution */
 
 #define	isstring(c) ((c) == '$' || (char)(c) == String || (char)(c) == Qstring)
@@ -2682,6 +2719,97 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		return NULL;
 	    }
 	    val = dupstring("");
+	}
+	if (colf && inbrace) {
+	    /*
+	     * Look for ${PARAM:OFFSET} or ${PARAM:OFFSET:LENGTH}.
+	     * This must appear before modifiers.  For compatibility
+	     * with bash we perform both standard string substitutions
+	     * and math eval.
+	     */
+	    char *check_offset2;
+	    char *check_offset = check_colon_subscript(s, &check_offset2);
+	    if (check_offset) {
+		zlong offset = mathevali(check_offset);
+		zlong length = (zlong)-1;
+		if (errflag)
+		    return NULL;
+		if ((*check_offset2 && *check_offset2 != ':')) {
+		    zerr("invalid subscript: %s", check_offset);
+		    return NULL;
+		}
+		if (*check_offset2) {
+		    check_offset = check_colon_subscript(check_offset2 + 1,
+							 &check_offset2);
+		    if (*check_offset2 && *check_offset2 != ':') {
+			zerr("invalid length: %s", check_offset);
+			return NULL;
+		    }
+		    length = mathevali(check_offset);
+		    if (errflag)
+			return NULL;
+		    if (length < (zlong)0) {
+			zerr("invalid length: %s", check_offset);
+			return NULL;
+		    }
+		}
+		if (!isset(KSHARRAYS) && offset > 0)
+		    offset--;
+		if (isarr) {
+		    int alen = arrlen(aval), count;
+		    char **srcptr, **dstptr, **newarr;
+
+		    if (offset < 0) {
+			offset += alen;
+			if (offset < 0)
+			    offset = 0;
+		    }
+		    if (length < 0)
+		      length = alen;
+		    if (offset > alen)
+			offset = alen;
+		    if (offset + length > alen)
+			length = alen - offset;
+		    count = length;
+		    srcptr = aval + offset;
+		    newarr = dstptr = (char **)
+			zhalloc((length+1)*sizeof(char *));
+		    while (count--)
+			*dstptr++ = dupstring(*srcptr++);
+		    *dstptr = (char *)NULL;
+		    aval = newarr;
+		} else {
+		    char *sptr, *eptr;
+		    if (offset < 0) {
+			MB_METACHARINIT();
+			for (sptr = val; *sptr; ) {
+			    sptr += MB_METACHARLEN(sptr);
+			    offset++;
+			}
+			if (offset < 0)
+			    offset = 0;
+		    }
+		    MB_METACHARINIT();
+		    for (sptr = val; *sptr && offset; ) {
+			sptr += MB_METACHARLEN(sptr);
+			offset--;
+		    }
+		    if (length >= 0) {
+			for (eptr = sptr; *eptr && length; ) {
+			    eptr += MB_METACHARLEN(eptr);
+			    length--;
+			}
+			val = dupstrpfx(sptr, eptr - sptr);
+		    } else {
+			val = dupstring(sptr);
+		    }
+		}
+		if (!*check_offset2) {
+		    colf = 0;
+		} else {
+		    s = check_offset2 + 1;
+		}
+	    }
 	}
 	if (colf) {
 	    /*
