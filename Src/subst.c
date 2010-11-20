@@ -1403,6 +1403,8 @@ check_colon_subscript(char *str, char **endp)
     if (parsestr(str = dupstring(str)))
 	return NULL;
     singsub(&str);
+    remnulargs(str);
+    untokenize(str);
 
     **endp = sav;
     return str;

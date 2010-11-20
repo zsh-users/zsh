@@ -1,3 +1,7 @@
+2010-11-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28425: Src/subst.c: remove null arguments and untokenize.
+
 2010-11-18  Peter Stephenson  <pws@csr.com>
 
 	* 28419: Doc/Zsh/expn.yo, Src/subst.c, Test/D04parameter.ztst:
@@ -13828,5 +13832,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5123 $
+* $Revision: 1.5124 $
 *****************************************************
