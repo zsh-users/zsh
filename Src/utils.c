@@ -5200,7 +5200,7 @@ getkeystring(char *s, int *len, int how, int *misc)
     char *buf, tmp[1];
     char *t, *tdest = NULL, *u = NULL, *sstart = s, *tbuf = NULL;
     char svchar = '\0';
-    int meta = 0, control = 0;
+    int meta = 0, control = 0, ignoring = 0;
     int i;
 #if defined(HAVE_WCHAR_H) && defined(HAVE_WCTOMB) && defined(__STDC_ISO_10646__)
     wint_t wval;
@@ -5623,11 +5623,22 @@ getkeystring(char *s, int *len, int how, int *misc)
 	if (how & GETKEY_DOLLAR_QUOTE) {
 	    char *t2;
 	    for (t2 = tbuf; t2 < t; t2++) {
+		/*
+		 * In POSIX mode, an embedded NULL is discarded and
+		 * terminates processing.  It just does, that's why.
+		 */
+		if (isset(POSIXSTRINGS)) {
+		    if (*t2 == '\0')
+			ignoring = 1;
+		    if (ignoring)
+			break;
+		}
 		if (imeta(*t2)) {
 		    *tdest++ = Meta;
 		    *tdest++ = *t2 ^ 32;
-		} else
+		} else {
 		    *tdest++ = *t2;
+		}
 	    }
 	    /*
 	     * Reset use of temporary buffer.

@@ -42,6 +42,7 @@
   unsetopt rcquotes
 0:Yes RC_QUOTES with single quotes
 >'
+# ' Deconfuse Emacs quoting rules
 
   print '<\u0041>'
   printf '%s\n' $'<\u0042>'
@@ -52,3 +53,24 @@
 ><B>
 ><C>
 ><D>
+
+  null1="$(print -r a$'b\0c'd)"
+  null2="$(setopt posixstrings; print -r a$'b\0c'd)"
+  for string in $null1 $null2; do
+    print ":"
+    for (( i = 1; i <= $#string; i++ )); do
+      char=$string[$i]
+      print $(( [#16] #char ))
+    done
+  done
+0:Embedded null characters in $'...' strings.
+>:
+>16#61
+>16#62
+>16#0
+>16#63
+>16#64
+>:
+>16#61
+>16#62
+>16#64
