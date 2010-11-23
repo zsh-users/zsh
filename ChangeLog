@@ -1,3 +1,9 @@
+2010-11-22  Peter Stephenson  <pws@csr.com>
+
+	* 28424: Doc/Zsh/options.yo, Src/options.c, Src/utils.c,
+	Src/zsh.h, Test/A03quoting.ztst: New POSIX_STRINGS option
+	makes \0 in $'...' terminate the quoted string.
+
 2010-11-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28425: Src/subst.c: remove null arguments and untokenize.
@@ -13832,5 +13838,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5124 $
+* $Revision: 1.5125 $
 *****************************************************
