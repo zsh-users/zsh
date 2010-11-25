@@ -62,7 +62,7 @@ else
     _requested loadedmodules expl 'loaded modules' \
       compadd -k 'modules[(R)loaded]' && ret=0
     _requested files expl 'module file' \
-      _files -W module_path -/g '*.(dll|s[ol])(:r)' && ret=0
+      _files -W module_path -/g '*.(dll|s[ol]|bundle)(:r)' && ret=0
     _requested aliases expl 'module alias' \
       compadd "$suf[@]" -k 'modules[(R)alias*]' && ret=0
   done

@@ -5,6 +5,9 @@
 
 2010-11-25  Peter Stephenson  <pws@csr.com>
 
+	* Sebastian Stark: users/15581:
+	Completion/Zsh/Command/_zmodload: MacOS has .bundle DLL files.
+
 	* users/15580: Completion/Zsh/Function/_zsh-mime-handler,
 	Functions/MIME/zsh-mime-handler: fixes for completion when
 	dropping through to normal completion.
@@ -13852,5 +13855,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5128 $
+* $Revision: 1.5129 $
 *****************************************************
