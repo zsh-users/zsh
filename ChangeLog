@@ -1,5 +1,9 @@
 2010-11-25  Peter Stephenson  <pws@csr.com>
 
+	* users/15580: Completion/Zsh/Function/_zsh-mime-handler,
+	Functions/MIME/zsh-mime-handler: fixes for completion when
+	dropping through to normal completion.
+
 	* 28434: Doc/Zsh/expn.yo, Src/subst.c, Test/D04parameter.ztst:
 	Make ${NAME:OFFSET} always use zero-offset.
 
@@ -13843,5 +13847,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5126 $
+* $Revision: 1.5127 $
 *****************************************************

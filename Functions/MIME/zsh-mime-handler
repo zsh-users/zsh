@@ -144,7 +144,11 @@ if [[ ! -e $1 ]]; then
     fi
   done
   if [[ -z $nonex_ok ]]; then
-    "$@"
+    if (( list )); then
+      print -r -- "${(q)@}"
+    else
+      "$@"
+    fi
     return
   fi
 fi
