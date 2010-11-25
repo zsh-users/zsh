@@ -1268,15 +1268,15 @@
    print ${foo:$(echo 3 + 3):`echo 4 - 3`}
    print ${foo: -1}
    print ${foo: -10}
-0:Bash-style subscripts, scalar
->3456789
+0:Bash-style offsets, scalar
 >456789
 >56789
 >6789
->3
+>789
 >4
 >5
 >6
+>7
 >9
 >123456789
 
@@ -1291,15 +1291,15 @@
    print ${foo:$(echo 3 + 3):`echo 4 - 3`}
    print ${foo: -1}
    print ${foo: -10}
-0:Bash-style subscripts, array
->3 4 5 6 7 8 9
+0:Bash-style offsets, array
 >4 5 6 7 8 9
 >5 6 7 8 9
 >6 7 8 9
->3
+>7 8 9
 >4
 >5
 >6
+>7
 >9
 >1 2 3 4 5 6 7 8 9
 
@@ -1321,7 +1321,7 @@
      echo ${str: -1:1}
    }
    testfn
-0:Bash-style subscripts, Bourne-style indexing
+0:Bash-style offsets, Bourne-style indexing
 >1
 >2
 >3

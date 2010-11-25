@@ -1640,7 +1640,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int subexp;
     /*
      * If we're referring to the positional parameters, then
-     * e.g ${*:1:1} refers to $1 even if KSH_ARRAYS is in effect.
+     * e.g ${*:1:1} refers to $1.
      * This is for compatibility.
      */
     int horrible_offset_hack = 0;
@@ -2768,16 +2768,15 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			return NULL;
 		    }
 		}
-		if (!isset(KSHARRAYS) || horrible_offset_hack) {
+		if (horrible_offset_hack) {
 		    /*
 		     * As part of the 'orrible hoffset 'ack,
 		     * (what hare you? Han 'orrible hoffset 'ack,
 		     * sergeant major), if we are given a ksh/bash/POSIX
-		     * style array which includes offset 0, we use
-		     * $0.
+		     * style positional parameter array which includes
+		     * offset 0, we use $0.
 		     */
-		    if (isset(KSHARRAYS) && horrible_offset_hack &&
-			offset == 0 && isarr) {
+		    if (offset == 0 && isarr) {
 			offset_hack_argzero = 1;
 		    } else if (offset > 0) {
 			offset--;

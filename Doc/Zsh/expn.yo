@@ -588,23 +588,29 @@ remove the non-matched elements).
 xitem(tt(${)var(name)tt(:)var(offset)tt(}))
 item(tt(${)var(name)tt(:)var(offset)tt(:)var(length)tt(}))(
 This syntax gives effects similar to parameter subscripting
-in the form tt($)var(name)tt({)var(offset)tt(,)var(end)tt(}) but in
-a form compatible with other shells.
+in the form tt($)var(name)tt({)var(start)tt(,)var(end)tt(}), but is
+compatible with other shells; note that both var(offset) and var(length)
+are interpreted differently from the components of a subscript.
 
-If the variable var(name) is a scalar, substitute the contents
-starting from offset var(offset); if var(name) is an array,
-substitute elements from element var(offset).  If var(length) is
-given, substitute that many characters or elements, otherwise the
-entire rest of the scalar or array.
+If var(offset) is non-negative, then if the variable var(name) is a
+scalar substitute the contents starting var(offset) characters from the
+first character of the string, and if var(name) is an array substitute
+elements starting var(offset) elements from the first element.  If
+var(length) is given, substitute that many characters or elements,
+otherwise the entire rest of the scalar or array.
 
-var(offset) is treated similarly to a parameter subscript:
-the offset of the first character or element in var(name)
-is 0 if the option tt(KSH_ARRAYS) is set, else 1; a negative
-subscript counts backwards so that -1 corresponds to the last
-character or element.
+A positive var(offset) is always treated as the offset of a character or
+element in var(name) from the first character or element of the array
+(this is different from native zsh subscript notation).  Hence 0
+refers to the first character or element regardless of the setting of
+the option tt(KSH_ARRAYS).
+
+A negative offset counts backwards from the end of the scalar or array,
+so that -1 corresponds to the last character or element, and so on.
 
 var(length) is always treated directly as a length and hence may not be
-negative.
+negative.  The option tt(MULTIBYTE) is obeyed, i.e. the offset and length
+count multibyte characters where appropriate.
 
 var(offset) and var(length) undergo the same set of shell substitutions
 as for scalar assignment; in addition, they are then subject to arithmetic
@@ -615,19 +621,29 @@ print ${foo: 1 + 2}
 print ${foo:$(( 1 + 2))}
 print ${foo:$(echo 1 + 2)})
 
-all have the same effect.
+all have the same effect, extracting the string starting at the fourth
+character of tt($foo) if the substution would otherwise return a scalar,
+or the array starting at the fourth element if tt($foo) would return an
+array.  Note that with the option tt(KSH_ARRAYS) tt($foo) always returns
+a scalar (regardless of the use of the offset syntax) and a form
+such as tt($foo[*]:3) is required to extract elements of an array named
+tt(foo).
 
-Note that if var(offset) is negative, the tt(-) may not appear immediately
+If var(offset) is negative, the tt(-) may not appear immediately
 after the tt(:) as this indicates the
-tt(${)var(name)tt(:-)var(word)tt(}) form of substitution; a space
+tt(${)var(name)tt(:-)var(word)tt(}) form of substitution.  Instead, a space
 may be inserted before the tt(-).  Furthermore, neither var(offset) nor
 var(length) may begin with an alphabetic character or tt(&) as these are
-used to indicate history-style modifiers.
+used to indicate history-style modifiers.  To substitute a value from a
+variable, the recommended approach is to proceed it with a tt($) as this
+signifies the intention (parameter substitution can easily be rendered
+unreadable); however, as arithmetic substitution is performed, the
+expression tt(${var: offs}) does work, retrieving the offset from
+tt($offs).
 
 For further compatibility with other shells there is a special case
-when the tt(KSH_ARRAYS) option is active, as in emulation of
-Bourne-style shells.  In this case array subscript 0 usually refers to the
-first element of the array.  However, if the substitution refers to the
+for array offset 0.  This usually accesses to the
+first element of the array.  However, if the substitution refers the
 positional parameter array, e.g. tt($@) or tt($*), then offset 0
 instead refers to tt($0), offset 1 refers to tt($1), and so on.  In
 other words, the positional parameter array is effectively extended by
