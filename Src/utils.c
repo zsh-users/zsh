@@ -1292,10 +1292,7 @@ preprompt(void)
 	countprompt(str, &w, 0, -1);
 	opts[PROMPTPERCENT] = percents;
 	zputs(str, shout);
-	if (hasxn)
-	    fprintf(shout, "%*s\r%*s\r", (int)columns - w, "", w, "");
-	else
-	    fprintf(shout, "%*s\r", (int)columns - w - 1, "");
+	fprintf(shout, "%*s\r%*s\r", (int)columns - w - !hasxn, "", w, "");
 	free(str);
     }
 
