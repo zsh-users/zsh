@@ -1293,6 +1293,7 @@ preprompt(void)
 	opts[PROMPTPERCENT] = percents;
 	zputs(str, shout);
 	fprintf(shout, "%*s\r%*s\r", (int)columns - w - !hasxn, "", w, "");
+	fflush(shout);
 	free(str);
     }
 
