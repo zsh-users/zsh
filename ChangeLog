@@ -1,6 +1,13 @@
+2010-11-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 28461: Src/exec.c: flush stderr in PRINT_EXIT_VALUE handling.
+
+	* users/15583: Functions/Misc/sticky-note: update with zstyles and
+	for ease of use in zle-line-init.
+
 2010-11-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 28559: Src/utils.c: flush shell output in PROMPT_SP handling.
+	* 28459: Src/utils.c: flush shell output in PROMPT_SP handling.
 
 2010-11-25  Wayne Davison  <wayned@users.sourceforge.net>
 
@@ -27,7 +34,8 @@
 
 2010-11-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 28425: Src/subst.c: remove null arguments and untokenize.
+	* 28425: Src/subst.c: remove null arguments and untokenize
+	in check_colon_subscript().
 
 2010-11-18  Peter Stephenson  <pws@csr.com>
 
@@ -13859,5 +13867,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5130 $
+* $Revision: 1.5131 $
 *****************************************************
