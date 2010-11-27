@@ -3186,6 +3186,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    if (isset(PRINTEXITVALUE) && isset(SHINSTDIN) &&
 		lastval && !subsh) {
 		fprintf(stderr, "zsh: exit %ld\n", (long)lastval);
+		fflush(stderr);
 	    }
 
 	    if (do_exec) {
