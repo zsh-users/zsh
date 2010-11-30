@@ -1,3 +1,8 @@
+2010-11-30  Peter Stephenson  <pws@csr.com>
+
+	* unposted: NEWS: add news about ${NAME:OFFSET} and took the
+	opportunity for a general tidy up.
+
 2010-11-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 28461: Src/exec.c: flush stderr in PRINT_EXIT_VALUE handling.
@@ -13867,5 +13872,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5131 $
+* $Revision: 1.5132 $
 *****************************************************

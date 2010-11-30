@@ -11,17 +11,35 @@ When the shell is invoked with the base name of a script, for example as
 `zsh scriptname', previous versions of zsh have used the name directly,
 whereas other shells use the value of $PATH to find the script.  The
 option PATH_SCRIPT has been added to provide the alternative behaviour.
+This is turned on where appropriate in compatibility modes.
+
+Parameters, globbing, etc.
+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Parameter expansion has been enhanced to provide the ${NAME:OFFSET} and
+${NAME:OFFSET:LENGTH} syntax for substrings and subarrays present in
+several other shells.  OFFSET always uses zero-based indexing.  The only
+clash with existing zsh syntax occurs if OFFSET begins with an
+alphabetic character or `&', which is not likely.
+
+The (D) flag in parameter expansion abbreviates directories in the
+substituted value.  The (q-) flag does minimal shell quotation of arguments
+for maximum human readability of the result.
 
 The glob qualifier P can be used to add a separate word before each
 match.  For example, *(P:-f:) produces the command line
 `-f file1 -f file2 ...'.
 
-The module zsh/system has a new "zsystem" builtin whose subcommands perform
-system level tasks.  Currently "zsystem flock" performs advisory file
-locking (for aficionados, this uses the fcntl() system call so works over
-the network on Linux).  This is a particularly convenient way of locking
-files for the length of a subshell.  "zsystem supports flock" provides a
-test for this feature.
+Regular expression matches now use the same variables for storing matched
+components as shell pattern matching.  The function system now provides the
+function regexp-replace for replacing text using regular expressions.  The
+zle widget functions replace-string, replace-string-again, if defined with
+regex in the name (e.g. "zle -N replace-regexp replace-string"), perform
+regular expression matches.  In replacement text \& and \1 have the
+standard meaning.
+
+Line editor and completion
+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 The completion system now has a style path-completion.  Setting this to
 false inhibits completion of paths before the current path component,
@@ -41,22 +59,39 @@ an error when editing the line.  The following code can be used
 to create a bindable editor widget to restore the aborted line:
   recover-line() { LBUFFER=$ZLE_LINE_ABORTED RBUFFER=; }
   zle -N recover-line
+and then either bind recover-line to a key sequence or use
+`M-x recover-line <RET>'.
 
 The parameter ZLE_STATE, available in user-defined line editor widgets,
 gives information on the state of the line editor.  Currently this is
 whether the line editor is in insert or overwrite mode.
 
-There is now a function system for recording and restoring recently
-entered directories.  See the entry for cdr in the zshcontrib manual page.
-
-The (D) flag in parameter expansion abbreviates directories in the
-substituted value.  The (q-) flag does minimal shell quotation of arguments
-for maximum human readability of the result.
+Miscellaneous options
+-+-+-+-+-+-+-+-+-+-+-
 
 The new shell option HIST_LEX_WORDS causes history lines read in from
 a file to be split in the same way as normal shell lines, instead of
 simply on whitespace.  It's an option as although the result is more
 accurate it can take a long time when the history size is large.
+
+The shell option MONITOR can be set in non-interactive shells, and also in
+subshells (as created by surrounding commands with parentheses), turning on
+job control for that subshell.  The initial behaviour of a subshell is
+still to turn job control off, however if the new POSIX_JOBS option is set
+MONITOR remains active in subshells.
+
+The new shell option POSIX_CD, active in emulations of POSIX-based shells,
+makes the cd builtin POSIX-compatible.
+
+The POSIX_JOBS option already referred to has various other
+compatibility enchancements.
+
+The new shell option POSIX_STRINGS makes a null character in $'...'
+expansion terminate the string.  This is not particularly useful
+behaviour but may become a POSIX requirement.
+
+The new shell option POSIX_TRAPS causes the EXIT trap to behave in the same
+way as in other shells, i.e. it is only run when the shell exits.
 
 The new shell option SOURCE_TRACE causes the shell to report files
 containing shell code that the shell executes directly, i.e. startup files
@@ -65,25 +100,21 @@ or files run with the `source' or `.' builtins.
 The shell option SUN_KEYBOARD_HACK has been supplemented by a more general
 mechanism: the KEYBOARD_HACK variable defines the character to be ignored.
 
-The new shell option POSIX_CD, active in emulations of POSIX-based shells,
-makes the cd builtin POSIX-compatible.
+Add-on modules and function
+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 
-The new shell option POSIX_TRAPS causes the EXIT trap to behave in the same
-way as in other shells, i.e. it is only run when the shell exits.
+The module zsh/system has a new "zsystem" builtin whose subcommands perform
+system level tasks.  Currently "zsystem flock" performs advisory file
+locking (for aficionados, this uses the fcntl() system call so works over
+the network on Linux).  This is a particularly convenient way of locking
+files for the length of a subshell.  "zsystem supports flock" provides a
+test for this feature.
 
-The shell option MONITOR can be set in non-interactive shells, and also in
-subshells (as created by surrounding commands with parentheses), turning on
-job control for that subshell.  The initial behaviour of a subshell is
-still to turn job control off, however if the new POSIX_JOBS option is set
-MONITOR remains active in subshells.
+There is now a function system for recording and restoring recently
+entered directories in a persistent fashion, with support in completion
+and (if explicitly installed) dynamic directory expansion.  See the
+entry for cdr in the zshcontrib manual page.
 
-Regular expression matches now use the same variables for storing matched
-components as shell pattern matching.  The function system now provides the
-function regexp-replace for replacing text using regular expressions.  The
-zle widget functions replace-string, replace-string-again, if defined with
-regex in the name (e.g. "zle -N replace-regexp replace-string"), perform
-regular expression matches.  In replacement text \& and \1 have the
-standard meaning.
 
 Changes between versions 4.3.9 and 4.3.10
 -----------------------------------------
