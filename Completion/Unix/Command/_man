@@ -86,6 +86,18 @@ _man() {
 _man_pages() {
   local matcher pages dummy sopt
 
+  # What files corresponding to manual pages can end in.
+  local suf='.((?|<->*)(|.gz|.bz2|.Z|.lzma))'
+
+  if [[ $PREFIX$SUFFIX = */* ]]; then
+    # Easy way to test for versions of man that allow file names.
+    # This can't be a normal man page reference.
+    # Try to complete by glob first.
+    _path_files -g "*$suf" && return
+    _path_files
+    return
+  fi
+
   zparseopts -E M+:=matcher
 
   if (( $#matcher )); then
@@ -109,9 +121,9 @@ _man_pages() {
   if ((CURRENT > 2)) ||
       ! zstyle -t ":completion:${curcontext}:manuals.$sect" insert-sections
   then
-    compadd "$@" - ${pages%.((?|<->*)(|.gz|.bz2|.Z|.lzma))}
+    compadd "$@" - ${pages%$~suf}
   else
-    compadd "$@" -P "$sopt$sect " - ${pages%.((?|<->*)(|.gz|.bz2|.Z|.lzma))}
+    compadd "$@" -P "$sopt$sect " - ${pages%$~suf}
   fi
 }
 

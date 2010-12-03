@@ -1,3 +1,9 @@
+2010-12-03  Peter Stephenson  <pws@csr.com>
+
+	* 28468: Completion/Unix/Command/_man: if argument contains a
+	"/", complete file instead of manual page reference; prefer
+	files with man suffixes.
+
 2010-11-30  Peter Stephenson  <pws@csr.com>
 
 	* unposted: NEWS: add news about ${NAME:OFFSET} and took the
@@ -13872,5 +13878,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5132 $
+* $Revision: 1.5133 $
 *****************************************************
