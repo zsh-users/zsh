@@ -190,6 +190,7 @@ _git_commands () {
     'fetch:download objects and a head from another repository'
     'gc:cleanup unnecessary files and optimize the local repository'
     'grep:print lines matching a pattern'
+    'help:display help information about git subcommands'
     'init:create empty git object database'
     'log:show commit logs'
     'merge:grand unified merge driver'
@@ -490,6 +491,19 @@ _git-hash-object () {
                                                     tree\:"a recursive tree of blobs"))' \
     '-w[write the object to the object database]' \
     '(--stdin):file:_files' && ret=0
+}
+
+(( $+functions[_git-help] )) ||
+_git-help () {
+  _arguments -S \
+    ':command:_git_commands' \
+    - '(all)' \
+    '(:)'{--all,-a}'[List all available commands]' \
+    - '(format)' \
+    {--man,-m}'[Display help in man page format]' \
+    {--info,-i}'[Display help in info format]' \
+    {--web,-w}'[Display help in web browser]' \
+    && ret=0
 }
 
 (( $+functions[_git-index-pack] )) ||

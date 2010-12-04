@@ -1,3 +1,8 @@
+2010-12-04  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* Aaron Schrab: 28210: Completion/Unix/Command/_git: add completion
+	for help subcommand.
+
 2010-12-03  Peter Stephenson  <pws@csr.com>
 
 	* 28468: Completion/Unix/Command/_man: if argument contains a
@@ -1544,7 +1549,7 @@
 
 	* Greg Klanderman: 27391: Completion/Unix/Command/_rm:
 	 fix ignored (duplicate) file names
-	
+
 	* users/14548: Src/Modules/termcap.c: prevent libtermcap from
 	exiting on an unknown terminal type
 
@@ -13878,5 +13883,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5133 $
+* $Revision: 1.5134 $
 *****************************************************
