@@ -1,5 +1,8 @@
 2010-12-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Mikael: 28474, 28478: Doc/Zsh/expn.yo, Src/glob.c,
+	Test/D09brace.ztst: extended {START..END..STEP} syntax.
+
 	* 28476: Test/.distfiles, Test/D09brace.ztst: new set of tests
 	for brace expansion.
 
@@ -13893,5 +13896,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5138 $
+* $Revision: 1.5139 $
 *****************************************************

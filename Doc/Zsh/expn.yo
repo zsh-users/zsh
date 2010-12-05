@@ -1419,8 +1419,19 @@ where var(n1) and var(n2) are integers,
 is expanded to every number between
 var(n1) and var(n2) inclusive.  If either number begins with a
 zero, all the resulting numbers will be padded with leading zeroes to
-that minimum width.  If the numbers are in decreasing order the
+that minimum width, but for negative numbers the tt(-) character is also
+included in the width.  If the numbers are in decreasing order the
 resulting sequence will also be in decreasing order.
+
+An expression of the form `tt({)var(n1)tt(..)var(n2)tt(..)var(n3)tt(})',
+where var(n1), var(n2), and var(n3) are integers,
+is expanded as above, but only every var(n3)th number starting from var(n1)
+is output.  If var(n3) is negative the numbers are output in reverse order,
+this is slightly different from simply swapping var(n1) and var(n2) in the case
+that the step var(n3) doesn't evenly divide the range.  Zero padding can be
+specified in any of the three numbers, specifying it in the third can be useful
+to pad for example `tt({-99..100..01})' which is not possible to specify by putting a
+0 on either of the first two numbers (i.e. pad to two characters).
 
 If a brace expression matches none of the above forms, it is left
 unchanged, unless the option tt(BRACE_CCL) (an abbreviation for `brace
