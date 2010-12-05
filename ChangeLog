@@ -1,5 +1,8 @@
 2010-12-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 28475: Test/A05execution.ztst: test that starting a background
+	job resets the status.
+
 	* 28469: Src/exec.c: fix memory leak in anonymous function.
 
 2010-12-04  Wayne Davison  <wayned@users.sourceforge.net>
@@ -13887,5 +13890,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5135 $
+* $Revision: 1.5136 $
 *****************************************************

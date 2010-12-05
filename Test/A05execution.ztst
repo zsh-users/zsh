@@ -171,3 +171,10 @@
 0:trap ZERR
 >Command failed again.
 >Command failed again.
+
+  false
+  sleep 1000 &
+  print $?
+  kill $!
+0:Status reset by starting a backgrounded command
+>0
