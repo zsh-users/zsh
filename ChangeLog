@@ -1,3 +1,7 @@
+2010-12-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28469: Src/exec.c: fix memory leak in anonymous function.
+
 2010-12-04  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* Aaron Schrab: 28210: Completion/Unix/Command/_git: add completion
@@ -13883,5 +13887,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5134 $
+* $Revision: 1.5135 $
 *****************************************************

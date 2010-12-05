@@ -4159,6 +4159,10 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 
 	    execshfunc(shf, args);
 	    ret = lastval;
+
+	    freeeprog(shf->funcdef);
+	    zsfree(shf->filename);
+	    zfree(shf, sizeof(*shf));
 	    break;
 	} else {
 	    /* is this shell function a signal trap? */
