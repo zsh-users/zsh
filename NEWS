@@ -26,6 +26,10 @@ The (D) flag in parameter expansion abbreviates directories in the
 substituted value.  The (q-) flag does minimal shell quotation of arguments
 for maximum human readability of the result.
 
+Numeric expansion with braces has been extended so that a step may be
+given, as in {3..9..2}.  The step may be negative as may the start and
+end of the range (this is also new).
+
 The glob qualifier P can be used to add a separate word before each
 match.  For example, *(P:-f:) produces the command line
 `-f file1 -f file2 ...'.
