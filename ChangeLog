@@ -1,6 +1,6 @@
 2010-12-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 28476: Test/.distfiles, Test/D09brace.ztst: new test of tests
+	* 28476: Test/.distfiles, Test/D09brace.ztst: new set of tests
 	for brace expansion.
 
 	* 28475: Test/A05execution.ztst: test that starting a background
@@ -13893,5 +13893,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5137 $
+* $Revision: 1.5138 $
 *****************************************************
