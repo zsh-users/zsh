@@ -28,6 +28,7 @@ D05array.ztst
 D06subscript.ztst
 D07multibyte.ztst
 D08cmdsubst.ztst
+D09brace.ztst
 E01options.ztst
 E02xtrace.ztst
 Makefile.in

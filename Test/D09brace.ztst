@@ -1,0 +1,52 @@
+# Tests for brace expansion
+
+%prep
+
+  foo=(a b c)
+  arr=(foo bar baz)
+
+%test
+
+  print X{1,2,{3..6},7,8}Y
+0:Basic brace expansion
+>X1Y X2Y X3Y X4Y X5Y X6Y X7Y X8Y
+
+  print ${foo}{one,two,three}$arr
+0:Brace expansion with arrays, no RC_EXPAND_PARAM
+>a b conefoo ctwofoo cthreefoo bar baz
+
+  print ${^foo}{one,two,three}$arr
+0:Brace expansion with arrays, with RC_EXPAND_PARAM (1)
+>aonefoo atwofoo athreefoo bonefoo btwofoo bthreefoo conefoo ctwofoo cthreefoo bar baz
+
+  print ${foo}{one,two,three}$^arr
+0:Brace expansion with arrays, with RC_EXPAND_PARAM (2)
+>a b conefoo ctwofoo cthreefoo conebar ctwobar cthreebar conebaz ctwobaz cthreebaz
+
+  print ${^foo}{one,two,three}$^arr
+0:Brace expansion with arrays, with RC_EXPAND_PARAM (3)
+>aonefoo atwofoo athreefoo aonebar atwobar athreebar aonebaz atwobaz athreebaz bonefoo btwofoo bthreefoo bonebar btwobar bthreebar bonebaz btwobaz bthreebaz conefoo ctwofoo cthreefoo conebar ctwobar cthreebar conebaz ctwobaz cthreebaz
+
+  print X{01..4}Y
+0:Numeric range expansion, padding (1)
+>X01Y X02Y X03Y X04Y
+
+  print X{1..04}Y
+0:Numeric range expansion, padding (2)
+>X01Y X02Y X03Y X04Y
+
+  print X{7..12}Y
+0:Numeric range expansion, padding (or not) (3)
+>X7Y X8Y X9Y X10Y X11Y X12Y
+
+  print X{07..12}Y
+0:Numeric range expansion, padding (4)
+>X07Y X08Y X09Y X10Y X11Y X12Y
+
+  print X{7..012}Y
+0:Numeric range expansion, padding (5)
+>X007Y X008Y X009Y X010Y X011Y X012Y
+
+  print X{4..1}Y
+0:Numeric range expansion, decreasing
+>X4Y X3Y X2Y X1Y
