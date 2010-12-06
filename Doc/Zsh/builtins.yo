@@ -169,7 +169,7 @@ item(tt(cd) [ tt(-qsLP) ] {tt(PLUS())|tt(-)}var(n))(
 Change the current directory.  In the first form, change the
 current directory to var(arg), or to the value of tt($HOME) if
 var(arg) is not specified.  If var(arg) is `tt(-)', change to the
-value of tt($OLDPWD), the previous directory.
+previous directory.
 
 Otherwise, if var(arg) begins with a slash, attempt to change to the
 directory given by var(arg).

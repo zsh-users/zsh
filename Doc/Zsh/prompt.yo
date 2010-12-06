@@ -93,16 +93,17 @@ continuation lines and tt(PS4) for debugging with the tt(XTRACE) option; in
 the latter case it will also work non-interactively.
 )
 xitem(tt(%d))
-item(tt(%/))(
-Present working directory (tt($PWD)).  If an integer follows the `tt(%)',
-it specifies a number of trailing components of tt($PWD) to show; zero
-means the whole path.  A negative integer specifies leading components,
-i.e. tt(%-1d) specifies the first component.
+item(tt(/))(
+Current working directory.  If an integer follows the `tt(%)',
+it specifies a number of trailing components of the current working
+directory to show; zero means the whole path.  A negative integer
+specifies leading components, i.e. tt(%-1d) specifies the first component.
 )
 item(tt(%~))(
-As tt(%d) and tt(%/), but if tt($PWD) has a named directory as its prefix,
-that part is replaced by a `tt(~)' followed by the name of the directory.
-If it starts with tt($HOME), that part is replaced by a `tt(~)'.
+As tt(%d) and tt(%/), but if the current working directory has a named
+directory as its prefix, that part is replaced by a `tt(~)' followed by
+the name of the directory.  If it starts with tt($HOME), that part is
+replaced by a `tt(~)'.
 )
 xitem(tt(%h))
 item(tt(%!))(
@@ -139,7 +140,7 @@ names are not shown, instead the file where they were defined.
 xitem(tt(%c))
 xitem(tt(%.))
 item(tt(%C))(
-Trailing component of tt($PWD).
+Trailing component of the current working directory.
 An integer may follow the `tt(%)' to get more than one component.
 Unless `tt(%C)' is used, tilde contraction is performed first.  These are
 deprecated as tt(%c) and tt(%C) are equivalent to tt(%1~) and tt(%1/),

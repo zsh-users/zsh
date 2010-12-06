@@ -1472,8 +1472,8 @@ described here.  If so, then the `tt(~)' and the checked portion are
 replaced with the appropriate substitute value.
 
 A `tt(~)' by itself is replaced by the value of tt($HOME).
-A `tt(~)' followed by a `tt(PLUS())' or a `tt(-)' is replaced by the value of
-tt($PWD) or tt($OLDPWD), respectively.
+A `tt(~)' followed by a `tt(PLUS())' or a `tt(-)' is replaced by current
+or previous working directory, respectively.
 
 A `tt(~)' followed by a number is replaced by the directory at that
 position in the directory stack.

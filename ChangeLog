@@ -1,5 +1,9 @@
 2010-12-06  Peter Stephenson  <pws@csr.com>
 
+	* Mikael: 28487: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo,
+	Doc/Zsh/options.yo, Doc/Zsh/prompt.yo: fix docs to refer to
+	current directory rather than $PWD.
+
 	* 28486: Src/Zle/compcore.c: $compstate[parameter] needed
 	untokenizing.
 
@@ -13906,5 +13910,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5142 $
+* $Revision: 1.5143 $
 *****************************************************
