@@ -7,22 +7,42 @@ if _pick_variant gnu=Free\ Soft unix --version /dummy/no-such-file; then
     '(-B --block-size -k)'{-B,--block-size=}'[specify block size]:size (bytes)' \
     '(-B --block-size -k --apparent-size -b --bytes)'{-b,--bytes}'[equivalent to --apparent-size --block-size=1]' \
     '(-c --total)'{-c,--total}'[produce a grand total]' \
-    '(-D --dereference-args -L --dereference)'{-D,--dereference-args}'[dereference arguments that are symlinks]' \
+    '(-H -D --dereference-args -L --dereference -P --no-dereference)'{-H,-D,--dereference-args}'[dereference arguments that are symlinks]' \
+    '(-H -D --dereference-args -L --dereference -P --no-dereference)'{-P,--no-dereference}'[do not dereference any symlinks]' \
     '(-h --human-readable -H --si)'{-h,--human-readable}'[print sizes in human readable format]' \
-    '(-H --si -h --human-readable)'{-H,--si}'[human readable form using powers of 1000]' \
+    '(--si -h --human-readable)--si[human readable form using powers of 1000]' \
     '(-B --block-size)-k[use block size of 1k]' \
+    '(-B --block-size)-m[use block size of 1M]' \
     '(-l --count-links)'{-l,--count-links}'[count sizes many times if hard linked]' \
-    '(-L --dereference -D --dereference-args)'{-L,--dereference}'[dereference all symlinks]' \
+    '(-L --dereference -H -D --dereference-args -P --no-dereference)'{-L,--dereference}'[dereference all symlinks]' \
     '(-S --separate-dirs)'{-S,--separate-dirs}'[do not include size of subdirectories]' \
     '(-s --summarize --max-depth -a --all)'{-s,--summarize}'[only display total for each argument]' \
     '(-x --one-file-system)'{-x,--one-file-system}'[skip directories on different filesystems]' \
+    '(-0 --null)'{-0,--null}'[end each output line with NUL instead of newline]' \
     \*{-X+,--exclude-from=}'[exclude files matching any pattern in file]:file:_files' \
     '*--exclude=[exclude files matching pattern]:pattern' \
     '(-s --summarize)--max-depth=[maximum levels to recurse]:levels' \
+    '--files0-from=[use NUL-terminated list of files from file]:file' \
+    '--time-style=[show times using given style, +FORMAT for strftime formatted args]:style:->timestyle' \
+    '--time=-[show time of last modification of any file in the directory]:property:->time' \
     '(* -)--help[display help information]' \
     '(* -)--version[display version information]' \
     '*:file:_files'
-  return
+
+  case $state in
+    (time)
+      local -a property
+      property=(atime access use ctime status)
+      _wanted property expl property compadd -a property
+      ;;
+    (timestyle)
+      local -a style desc
+      style=(full-iso long-iso iso +)
+      desc=('full-iso' 'long-iso' 'iso' '+FORMAT like `date'\''')
+      _wanted -V style expl style compadd -d desc -a style
+      ;;
+  esac
+
 else
   # based on $OSTYPE = solaris2.8
   local xdev='[skip directories on different filesystems]'
@@ -40,5 +60,4 @@ else
     '-r[notify about unreadable files/directories]' \
     '(-a)-s[only display total for each argument]' \
     '*:file:_files'
-  return
 fi

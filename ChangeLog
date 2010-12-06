@@ -1,3 +1,8 @@
+2010-12-06  Peter Stephenson  <pws@csr.com>
+
+	* Mikael: 28484: Completion/Unix/Command/_du: updated for GNU
+	variant.
+
 2010-12-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: NEWS: mention {START..END..STEP} changes.
@@ -13898,5 +13903,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5140 $
+* $Revision: 1.5141 $
 *****************************************************
