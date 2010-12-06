@@ -2,6 +2,7 @@
 
 local comp pat val name i ret=1 _compskip="$_compskip"
 local curcontext="$curcontext" service str noskip
+local -a match mbegin mend
 
 # If we get the option `-s', we don't reset `_compskip'.
 
@@ -24,6 +25,10 @@ if [[ "$_compskip" != (all|*patterns*) ]]; then
     [[ -n "$str" ]] || continue
     service="${_services[$str]:-$str}"
     for i in "${(@)_patcomps[(K)$str]}"; do
+      if [[ $i = (#b)"="([^=]#)"="(*) ]]; then
+	service=$match[1]
+	i=$match[2]
+      fi
       eval "$i" && ret=0
       if [[ "$_compskip" = *patterns* ]]; then
         break

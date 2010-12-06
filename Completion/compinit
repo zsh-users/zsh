@@ -230,6 +230,10 @@ comppostfuncs=()
 
 compdef() {
   local opt autol type func delete new i ret=0 cmd svc
+  local -a match mbegin mend
+
+  emulate -L zsh
+  setopt extendedglob
 
   # Get the options.
 
@@ -364,10 +368,18 @@ compdef() {
         else
           case "$type" in
           pattern)
-            _patcomps[$1]="$func"
+	    if [[ $1 = (#b)(*)=(*) ]]; then
+	      _patcomps[$match[1]]="=$match[2]=$func"
+	    else
+	      _patcomps[$1]="$func"
+	    fi
             ;;
           postpattern)
-            _postpatcomps[$1]="$func"
+	    if [[ $1 = (#b)(*)=(*) ]]; then
+	      _postpatcomps[$match[1]]="=$match[2]=$func"
+	    else
+	      _postpatcomps[$1]="$func"
+	    fi
             ;;
           *)
             if [[ "$1" = *\=* ]]; then

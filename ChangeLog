@@ -1,5 +1,15 @@
 2010-12-06  Peter Stephenson  <pws@csr.com>
 
+	* users/15622: Completion/Base/Utility/_pick_variant: use
+	$service rather than $words[1] to pick the service. Although
+	there may be cases where this doesn't work, this provides
+	transparent behaviour for simple uses along the lines of
+	"compdef <_func> <cmd>=<service>"
+
+	* users/15621: Completion/compinit,
+	Completion/Base/Core/dispatch: fix setting service for compef
+	-p/-P.
+
 	* Mikael: 28487: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo,
 	Doc/Zsh/options.yo, Doc/Zsh/prompt.yo: fix docs to refer to
 	current directory rather than $PWD.
@@ -13910,5 +13920,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5143 $
+* $Revision: 1.5144 $
 *****************************************************
