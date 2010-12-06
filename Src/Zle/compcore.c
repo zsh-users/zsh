@@ -648,6 +648,17 @@ callcompfunc(char *s, char *fn)
         else
             compredirs = (char **) zshcalloc(sizeof(char *));
 
+	/*
+	 * We need to untokenize compparameter which is the
+	 * raw internals of a parameter subscript.
+	 *
+	 * The double memory duplication is a bit ugly: the additional
+	 * dupstring() is necessary because untokenize() might change
+	 * the string length and so later zsfree() would get the wrong
+	 * length of the string.
+	 */
+	compparameter = dupstring(compparameter);
+	untokenize(compparameter);
 	compparameter = ztrdup(compparameter);
 	compredirect = ztrdup(compredirect);
 	zsfree(compquote);
