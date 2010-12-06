@@ -1285,7 +1285,7 @@ preprompt(void)
 	char *eolmark = getsparam("PROMPT_EOL_MARK");
 	char *str;
 	int percents = opts[PROMPTPERCENT], w = 0;
-	if (!eolmark || !*eolmark)
+	if (!eolmark)
 	    eolmark = "%B%S%#%s%b";
 	opts[PROMPTPERCENT] = 1;
 	str = promptexpand(eolmark, 1, NULL, NULL, NULL);
