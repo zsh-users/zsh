@@ -1,3 +1,8 @@
+2010-12-07  Peter Stephenson  <pws@csr.com>
+
+	* unposted: remove users/15622 which causes problems
+	with certain existing forms of testing commands.
+
 2010-12-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	*  Mikael: 28480: Doc/Zsh/params.yo, Src/utils.c: allow
@@ -13925,5 +13930,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5145 $
+* $Revision: 1.5146 $
 *****************************************************
