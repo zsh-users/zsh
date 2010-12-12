@@ -843,7 +843,7 @@ copyprevshellword(UNUSED(char **args))
     if (zmult <= 0)
 	return 1;
 
-    if ((l = bufferwords(NULL, NULL, &i))) {
+    if ((l = bufferwords(NULL, NULL, &i, 0))) {
 	i -= (zmult-1);
 	if (i < 0)
 	    return 1;

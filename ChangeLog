@@ -1,3 +1,9 @@
+2010-12-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28510: Doc/Zsh/expn.yo, Src/hist.c, Src/lex.c, Src/subst.c,
+	Src/Modules/parameter.c, Src/Zle/zle_hist.c, Src/Zle/zle_misc.c,
+	Test/D04parameter.ztst: add (z+c+) and (z+C+) parameter flags.
+
 2010-12-07  Peter Stephenson  <pws@csr.com>
 
 	* unposted: remove users/15622 which causes problems
@@ -13930,5 +13936,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5146 $
+* $Revision: 1.5147 $
 *****************************************************

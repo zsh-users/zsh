@@ -677,7 +677,7 @@ insertlastword(char **args)
 	 * a deleted word, because that can only have come
 	 * from a non-empty line.  I think.
 	 */
-	if (!(l = bufferwords(NULL, NULL, NULL))) {
+	if (!(l = bufferwords(NULL, NULL, NULL, 0))) {
 	    unmetafy_line();
 	    return 1;
 	}

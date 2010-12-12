@@ -1556,6 +1556,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * The (z) flag, nothing to do with SH_WORD_SPLIT which is tied
      * spbreak, see above; fairly straighforward in use but c.f.
      * the comment for mods.
+     *
+     * This ultimately becomes zleparse during lexical analysis, via
+     * the comments argument to bufferwords(). It's got nothing
+     * to do with zle.
      */
     int shsplit = 0;
     /*
@@ -1934,6 +1938,27 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 		case 'z':
 		    shsplit = 1;
+		    if (s[1] == '+') {
+			s += 2;
+			while (*s && *s != '+' && *s != ')' && *s != Outpar) {
+			    switch (*s++) {
+			    case 'c':
+				/* Parse and keep comments */
+				shsplit = 2;
+				break;
+
+			    case 'C':
+				/* Parse and remove comments */
+				shsplit = 3;
+				break;
+
+			    default:
+				goto flagerr;
+			    }
+			}
+			if (*s != '+')
+			    goto flagerr;
+		    }
 		    break;
 
 		case 'u':
@@ -3207,10 +3232,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	if (isarr) {
 	    char **ap;
 	    for (ap = aval; *ap; ap++)
-		list = bufferwords(list, *ap, NULL);
+		list = bufferwords(list, *ap, NULL, shsplit-1);
 	    isarr = 0;
 	} else
-	    list = bufferwords(NULL, val, NULL);
+	    list = bufferwords(NULL, val, NULL, shsplit-1);
 
 	if (!list || !firstnode(list))
 	    val = dupstring("");

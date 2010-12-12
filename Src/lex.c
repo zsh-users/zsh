@@ -116,7 +116,22 @@ mod_export int wb, we;
 /**/
 mod_export int noaliases;
 
-/* we are parsing a line sent to use by the editor */
+/*
+ * we are parsing a line sent to use by the editor, or some other string
+ * that's not part of standard command input (e.g. eval is part of
+ * normal command input).
+ *
+ * zleparse = 1 is the normal case.
+ * zleparse = 2 is used for word splitting; the difference is we
+ *              preserve comments.
+ * zleparse = 3 is also for word splitting, here handling comments
+ *              but stripping them.
+ *
+ * Note that although it is passed into the lexer as an input, the
+ * lexer can set it to zero after finding the word it's searching for.
+ * This only happens if the line being parsed actually does come from
+ * ZLE.
+ */
 
 /**/
 mod_export int zleparse;
@@ -743,26 +758,50 @@ gettok(void)
 
     /* chars in initial position in word */
 
+    /*
+     * Handle comments.  There are some special cases when this
+     * is not normal command input: zleparse implies we are examining
+     * a line lexically without it being used for normal command input.
+     * If zleparse is 1 we treat comments as normal for interactive
+     * mode.
+     * If zleparse is 2 (which has actually got nothing to do with zle)
+     * we always handle comments and retain them.
+     * If zleparse is 3 we always handle comments and discard them.
+     */
     if (c == hashchar && !nocomments &&
 	(isset(INTERACTIVECOMMENTS) ||
-	 (!zleparse && !expanding &&
+	 ((zleparse != 1) && !expanding &&
 	  (!interact || unset(SHINSTDIN) || strin)))) {
 	/* History is handled here to prevent extra  *
 	 * newlines being inserted into the history. */
 
+	if (zleparse == 2) {
+	    len = 0;
+	    bptr = tokstr = (char *)hcalloc(bsiz = 32);
+	    add(c);
+	}
 	while ((c = ingetc()) != '\n' && !lexstop) {
 	    hwaddc(c);
 	    addtoline(c);
+	    if (zleparse == 2)
+		add(c);
 	}
 
 	if (errflag)
 	    peek = LEXERR;
 	else {
-	    hwend();
-	    hwbegin(0);
-	    hwaddc('\n');
-	    addtoline('\n');
-	    peek = NEWLIN;
+	    if (zleparse == 2) {
+		*bptr = '\0';
+		if (!lexstop)
+		    hungetc(c);
+		peek = STRING;
+	    } else {
+		hwend();
+		hwbegin(0);
+		hwaddc('\n');
+		addtoline('\n');
+		peek = NEWLIN;
+	    }
 	}
 	return peek;
     }

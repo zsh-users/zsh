@@ -2345,7 +2345,7 @@ readhistfile(char *fn, int err, int readflags)
 		/*
 		 * Attempt to do this using the lexer.
 		 */
-		LinkList wordlist = bufferwords(NULL, pt, NULL);
+		LinkList wordlist = bufferwords(NULL, pt, NULL, 1);
 		LinkNode wordnode;
 		int nwords_max;
 		nwords_max = 2 * countlinknodes(wordlist);
@@ -2885,11 +2885,27 @@ histfileIsLocked(void)
  * which may not even be valid at this point.
  *
  * However, I'm so confused it could simply be baking Bakewell tarts.
+ *
+ * list may be an existing linked list (off the heap), in which case
+ * it will be appended to; otherwise it will be created.
+ *
+ * If buf is set we will take input from that string, else we will
+ * attempt to use ZLE directly in a way they tell you not to do on all
+ * programming courses.
+ *
+ * If index is non-NULL, and input is from a string in ZLE, *index
+ * is set to the position of the end of the current editor word.
+ *
+ * comments is used if buf is non-NULL (i.e. this is not a string
+ * from ZLE).
+ * If it is 0, comments are not parsed; they are treated as ordinary words.
+ * If it is 1, comments are treated as single strings, one per line.
+ * If it is 2, comments are removed.
  */
 
 /**/
 mod_export LinkList
-bufferwords(LinkList list, char *buf, int *index)
+bufferwords(LinkList list, char *buf, int *index, int comments)
 {
     int num = 0, cur = -1, got = 0, ne = noerrs;
     int owb = wb, owe = we, oadx = addedx, ozp = zleparse, onc = nocomments;
@@ -2906,7 +2922,6 @@ bufferwords(LinkList list, char *buf, int *index)
      * string expression, we just turn the option off for this function.
      */
     opts[RCQUOTES] = 0;
-    zleparse = 1;
     addedx = 0;
     noerrs = 1;
     lexsave();
@@ -2928,11 +2943,18 @@ bufferwords(LinkList list, char *buf, int *index)
 	inpush(p, 0, NULL);
 	zlemetall = strlen(p) ;
 	zlemetacs = zlemetall + 1;
-	nocomments = 1;
+
+	/*
+	 * If comments is non-zero we are handling comments.
+	 * zleparse indicates the mode to the lexer.
+	 */
+	zleparse = 1 + comments;
+	nocomments = !comments;
     } else {
 	int ll, cs;
 	char *linein;
 
+	zleparse = 1;
 	linein = zleentry(ZLE_CMD_GET_LINE, &ll, &cs);
 	zlemetall = ll + 1; /* length of line plus space added below */
 	zlemetacs = cs;

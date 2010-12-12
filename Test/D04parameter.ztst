@@ -417,6 +417,45 @@
 >5:i++ :
 >6:)):
 
+  line=$'A line with # someone\'s comment\nanother line # (1 more\nanother one'
+  print "*** Normal ***"
+  print -l ${(z)line}
+  print "*** Kept ***"
+  print -l ${(z+c+)line}
+  print "*** Removed ***"
+  print -l ${(z+C+)line}
+0:Comments with (z)
+>*** Normal ***
+>A
+>line
+>with
+>#
+>someone's comment
+>another line # (1 more
+>another one
+>*** Kept ***
+>A
+>line
+>with
+># someone's comment
+>;
+>another
+>line
+># (1 more
+>;
+>another
+>one
+>*** Removed ***
+>A
+>line
+>with
+>;
+>another
+>line
+>;
+>another
+>one
+
   psvar=(dog)
   setopt promptsubst
   foo='It shouldn'\''t $(happen) to a %1v.'
