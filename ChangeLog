@@ -1,3 +1,9 @@
+2010-12-13  Peter Stephenson  <pws@csr.com>
+
+	* 28526: Src/lex.c, Test/D04parameter.ztst: zplitting
+	'line # with comment' when stripping comments shouldn't generate
+	a newline at the end (unless there is one).
+
 2010-12-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28510: Doc/Zsh/expn.yo, Src/hist.c, Src/lex.c, Src/subst.c,
@@ -13936,5 +13942,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5147 $
+* $Revision: 1.5148 $
 *****************************************************

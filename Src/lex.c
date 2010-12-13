@@ -800,7 +800,15 @@ gettok(void)
 		hwbegin(0);
 		hwaddc('\n');
 		addtoline('\n');
-		peek = NEWLIN;
+		/*
+		 * If splitting a line and removing comments,
+		 * we don't want a newline token since it's
+		 * treated specially.
+		 */
+		if (zleparse == 3 && lexstop)
+		    peek = ENDINPUT;
+		else
+		    peek = NEWLIN;
 	    }
 	}
 	return peek;

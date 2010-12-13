@@ -456,6 +456,12 @@
 >another
 >one
 
+  line='with comment # at the end'
+  print -l ${(z+C+)line}
+0:Test we don't get an additional newline token
+>with
+>comment
+
   psvar=(dog)
   setopt promptsubst
   foo='It shouldn'\''t $(happen) to a %1v.'
