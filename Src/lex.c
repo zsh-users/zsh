@@ -587,13 +587,20 @@ add(int c)
     }
 }
 
-#define SETPARBEGIN {if (lexflags && !(inbufflags & INP_ALIAS) && zlemetacs >= zlemetall+1-inbufct) parbegin = inbufct;}
-#define SETPAREND {\
-	    if (lexflags && !(inbufflags & INP_ALIAS) && parbegin != -1 && parend == -1) {\
-		if (zlemetacs >= zlemetall + 1 - inbufct)\
-		    parbegin = -1;\
-		else\
-		    parend = inbufct;} }
+#define SETPARBEGIN {							\
+	if ((lexflags & LEXFLAGS_ZLE) && !(inbufflags & INP_ALIAS) &&	\
+	    zlemetacs >= zlemetall+1-inbufct)				\
+	    parbegin = inbufct;		      \
+    }
+#define SETPAREND {						      \
+	if ((lexflags & LEXFLAGS_ZLE) && !(inbufflags & INP_ALIAS) && \
+	    parbegin != -1 && parend == -1) {			      \
+	    if (zlemetacs >= zlemetall + 1 - inbufct)		      \
+		parbegin = -1;					      \
+	    else						      \
+		parend = inbufct;				      \
+	}							      \
+    }
 
 /*
  * Return 1 for math, 0 for a command, 2 for an error.  If it couldn't be
