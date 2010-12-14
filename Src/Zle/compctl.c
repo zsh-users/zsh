@@ -2789,10 +2789,10 @@ sep_comp_string(char *ss, char *s, int noffs)
 
     /* Put the string in the lexer buffer and call the lexer to *
      * get the words we have to expand.                        */
-    lexflags = LEXFLAGS_ACTIVE;
     addedx = 1;
     noerrs = 1;
     lexsave();
+    lexflags = LEXFLAGS_ZLE;
     tmp = (char *) zhalloc(tl = sl + 3 + strlen(s));
     strcpy(tmp, ss);
     tmp[sl] = ' ';
@@ -2843,7 +2843,7 @@ sep_comp_string(char *ss, char *s, int noffs)
     noaliases = ona;
     strinend();
     inpop();
-    errflag = lexflags = 0;
+    errflag = 0;
     noerrs = ne;
     lexrestore();
     wb = owb;
@@ -3703,8 +3703,8 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 
 	/* Put the string in the lexer buffer and call the lexer to *
 	 * get the words we have to expand.                        */
-	lexflags = LEXFLAGS_ACTIVE;
 	lexsave();
+	lexflags = LEXFLAGS_ZLE;
 	tmpbuf = (char *)zhalloc(strlen(cc->str) + 5);
 	sprintf(tmpbuf, "foo %s", cc->str); /* KLUDGE! */
 	inpush(tmpbuf, 0, NULL);
@@ -3721,7 +3721,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	noaliases = ona;
 	strinend();
 	inpop();
-	errflag = lexflags = 0;
+	errflag = 0;
 	lexrestore();
 	/* Fine, now do full expansion. */
 	prefork(foo, 0);

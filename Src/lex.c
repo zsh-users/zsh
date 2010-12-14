@@ -126,7 +126,7 @@ mod_export int noaliases;
  * Note that although it is passed into the lexer as an input, the
  * lexer can set it to zero after finding the word it's searching for.
  * This only happens if the line being parsed actually does come from
- * ZLE.
+ * ZLE, and hence the bit LEXFLAGS_ZLE is set.
  */
 
 /**/
@@ -202,6 +202,7 @@ struct lexstack {
     int isfirstch;
     int histactive;
     int histdone;
+    int lexflags;
     int stophist;
     int hlinesz;
     char *hline;
@@ -258,6 +259,7 @@ lexsave(void)
     ls->isfirstch = isfirstch;
     ls->histactive = histactive;
     ls->histdone = histdone;
+    ls->lexflags = lexflags;
     ls->stophist = stophist;
     stophist = 0;
     if (!lstack) {
@@ -332,6 +334,7 @@ lexrestore(void)
     isfirstch = lstack->isfirstch;
     histactive = lstack->histactive;
     histdone = lstack->histdone;
+    lexflags = lstack->lexflags;
     stophist = lstack->stophist;
     chline = lstack->hline;
     hptr = lstack->hptr;
@@ -1804,7 +1807,7 @@ exalias(void)
 	} else
 	    zshlextext = tokstr;
 
-	if (lexflags && !(inbufflags & INP_ALIAS)) {
+	if ((lexflags & LEXFLAGS_ZLE) && !(inbufflags & INP_ALIAS)) {
 	    int zp = lexflags;
 
 	    gotword();

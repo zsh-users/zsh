@@ -1,5 +1,10 @@
 2010-12-14  Peter Stephenson  <pws@csr.com>
 
+	* 28529: Src/hist.c, Src/lex.c, Src/zsh.h, Src/Zle/compcore.c,
+	Src/Zle/compctl.c, Src/Zle/zle_tricky.c: save and restore
+	lexflags and separate out special word logic for ZLE by
+	adding new flag LEXFLAGS_ZLE.
+
 	* 28528: Doc/Zsh/expn.yo, Src/hist.c, Src/lex.c, Src/subst.c,
 	Src/zsh.h, Src/Zle/compcore.c, Src/Zle/compctl.c,
 	Src/Zle/zle_tricky.c, Test/D04parameter.ztst: clear up use of
@@ -13950,5 +13955,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5149 $
+* $Revision: 1.5150 $
 *****************************************************

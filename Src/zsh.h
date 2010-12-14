@@ -1835,13 +1835,19 @@ struct histent {
  */
 #define LEXFLAGS_ACTIVE		0x0001
 /*
+ * Being used from zle.  This is slightly more intrusive
+ * (=> grotesquely non-modular) than use from within
+ * the main shell, so it's a separate flag.
+ */
+#define LEXFLAGS_ZLE		0x0002
+/*
  * Parse comments and treat each comment as a single string
  */
-#define LEXFLAGS_COMMENTS_KEEP	0x0002
+#define LEXFLAGS_COMMENTS_KEEP	0x0004
 /*
  * Parse comments and strip them.
  */
-#define LEXFLAGS_COMMENTS_STRIP	0x0004
+#define LEXFLAGS_COMMENTS_STRIP	0x0008
 /*
  * Either of the above
  */
@@ -1849,7 +1855,7 @@ struct histent {
 /*
  * Treat newlines as whitespace
  */
-#define LEXFLAGS_NEWLINE	0x0008
+#define LEXFLAGS_NEWLINE	0x0010
 
 /******************************************/
 /* Definitions for programable completion */

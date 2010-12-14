@@ -1481,13 +1481,13 @@ set_comp_sep(void)
 
     /* Put the string in the lexer buffer and call the lexer to *
      * get the words we have to expand.                        */
-    lexflags = LEXFLAGS_ACTIVE;
     ocs = zlemetacs;
     oll = zlemetall;
     ol = zlemetaline;
     addedx = 1;
     noerrs = 1;
     lexsave();
+    lexflags = LEXFLAGS_ZLE;
     /*
      * tl is the length of the temporary string including
      * the space at the start and the x at the cursor position,
@@ -1634,7 +1634,7 @@ set_comp_sep(void)
     noaliases = ona;
     strinend();
     inpop();
-    errflag = lexflags = 0;
+    errflag = 0;
     noerrs = ne;
     lexrestore();
     wb = owb;

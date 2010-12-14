@@ -2897,11 +2897,9 @@ histfileIsLocked(void)
  * If index is non-NULL, and input is from a string in ZLE, *index
  * is set to the position of the end of the current editor word.
  *
- * comments is used if buf is non-NULL (i.e. this is not a string
- * from ZLE).
- * If it is 0, comments are not parsed; they are treated as ordinary words.
- * If it is 1, comments are treated as single strings, one per line.
- * If it is 2, comments are removed.
+ * flags is passed directly to lexflags, see lex.c, except that
+ * we 'or' in the bit LEXFLAGS_ACTIVE to make sure the variable
+ * is set.
  */
 
 /**/
@@ -2909,7 +2907,7 @@ mod_export LinkList
 bufferwords(LinkList list, char *buf, int *index, int flags)
 {
     int num = 0, cur = -1, got = 0, ne = noerrs;
-    int owb = wb, owe = we, oadx = addedx, ozp = lexflags, onc = nocomments;
+    int owb = wb, owe = we, oadx = addedx, onc = nocomments;
     int ona = noaliases, ocs = zlemetacs, oll = zlemetall;
     int forloop = 0, rcquotes = opts[RCQUOTES];
     char *p, *addedspaceptr;
@@ -3120,7 +3118,6 @@ bufferwords(LinkList list, char *buf, int *index, int flags)
     strinend();
     inpop();
     errflag = 0;
-    lexflags = ozp;
     nocomments = onc;
     noerrs = ne;
     lexrestore();

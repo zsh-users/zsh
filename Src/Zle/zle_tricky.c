@@ -1140,9 +1140,9 @@ get_comp_string(void)
     zsfree(varname);
     varname = NULL;
     insubscr = 0;
-    lexflags = LEXFLAGS_ACTIVE;
     clwpos = -1;
     lexsave();
+    lexflags = LEXFLAGS_ZLE;
     inpush(dupstrspace(linptr), 0, NULL);
     strinbeg(0);
     wordpos = tt0 = cp = rd = ins = oins = linarr = parct = ia = redirpos = 0;
@@ -2707,7 +2707,6 @@ doexpandhist(void)
     noaliases = ona;
     strinend();
     inpop();
-    lexflags = 0;
     lexrestore();
     expanding = 0;
 
@@ -2807,8 +2806,8 @@ getcurcmd(void)
     int curlincmd;
     char *s = NULL;
 
-    lexflags = LEXFLAGS_ACTIVE;
     lexsave();
+    lexflags = LEXFLAGS_ZLE;
     metafy_line();
     inpush(dupstrspace(zlemetaline), 0, NULL);
     strinbeg(1);
@@ -2829,7 +2828,7 @@ getcurcmd(void)
     popheap();
     strinend();
     inpop();
-    errflag = lexflags = 0;
+    errflag = 0;
     unmetafy_line();
     lexrestore();
 
