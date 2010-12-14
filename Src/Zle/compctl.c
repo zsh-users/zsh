@@ -2789,7 +2789,7 @@ sep_comp_string(char *ss, char *s, int noffs)
 
     /* Put the string in the lexer buffer and call the lexer to *
      * get the words we have to expand.                        */
-    zleparse = 1;
+    lexflags = LEXFLAGS_ACTIVE;
     addedx = 1;
     noerrs = 1;
     lexsave();
@@ -2828,7 +2828,7 @@ sep_comp_string(char *ss, char *s, int noffs)
 	    addlinknode(foo, (p = ztrdup(tokstr)));
 	else
 	    p = NULL;
-	if (!got && !zleparse) {
+	if (!got && !lexflags) {
 	    DPUTS(!p, "no current word in substr");
 	    got = 1;
 	    cur = i;
@@ -2843,7 +2843,7 @@ sep_comp_string(char *ss, char *s, int noffs)
     noaliases = ona;
     strinend();
     inpop();
-    errflag = zleparse = 0;
+    errflag = lexflags = 0;
     noerrs = ne;
     lexrestore();
     wb = owb;
@@ -3703,7 +3703,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 
 	/* Put the string in the lexer buffer and call the lexer to *
 	 * get the words we have to expand.                        */
-	zleparse = 1;
+	lexflags = LEXFLAGS_ACTIVE;
 	lexsave();
 	tmpbuf = (char *)zhalloc(strlen(cc->str) + 5);
 	sprintf(tmpbuf, "foo %s", cc->str); /* KLUDGE! */
@@ -3721,7 +3721,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	noaliases = ona;
 	strinend();
 	inpop();
-	errflag = zleparse = 0;
+	errflag = lexflags = 0;
 	lexrestore();
 	/* Fine, now do full expansion. */
 	prefork(foo, 0);

@@ -117,15 +117,11 @@ mod_export int wb, we;
 mod_export int noaliases;
 
 /*
- * we are parsing a line sent to use by the editor, or some other string
- * that's not part of standard command input (e.g. eval is part of
- * normal command input).
+ * If non-zero, we are parsing a line sent to use by the editor, or some
+ * other string that's not part of standard command input (e.g. eval is
+ * part of normal command input).
  *
- * zleparse = 1 is the normal case.
- * zleparse = 2 is used for word splitting; the difference is we
- *              preserve comments.
- * zleparse = 3 is also for word splitting, here handling comments
- *              but stripping them.
+ * Set of bits from LEXFLAGS_*.
  *
  * Note that although it is passed into the lexer as an input, the
  * lexer can set it to zero after finding the word it's searching for.
@@ -134,7 +130,7 @@ mod_export int noaliases;
  */
 
 /**/
-mod_export int zleparse;
+mod_export int lexflags;
 
 /**/
 mod_export int wordbeg;
@@ -429,7 +425,7 @@ zshlex(void)
 	isnewlin = 0;
     else
 	isnewlin = (inbufct) ? -1 : 1;
-    if (tok == SEMI || tok == NEWLIN)
+    if (tok == SEMI || (tok == NEWLIN && !(lexflags & LEXFLAGS_NEWLINE)))
 	tok = SEPER;
 }
 
@@ -588,9 +584,9 @@ add(int c)
     }
 }
 
-#define SETPARBEGIN {if (zleparse && !(inbufflags & INP_ALIAS) && zlemetacs >= zlemetall+1-inbufct) parbegin = inbufct;}
+#define SETPARBEGIN {if (lexflags && !(inbufflags & INP_ALIAS) && zlemetacs >= zlemetall+1-inbufct) parbegin = inbufct;}
 #define SETPAREND {\
-	    if (zleparse && !(inbufflags & INP_ALIAS) && parbegin != -1 && parend == -1) {\
+	    if (lexflags && !(inbufflags & INP_ALIAS) && parbegin != -1 && parend == -1) {\
 		if (zlemetacs >= zlemetall + 1 - inbufct)\
 		    parbegin = -1;\
 		else\
@@ -760,22 +756,17 @@ gettok(void)
 
     /*
      * Handle comments.  There are some special cases when this
-     * is not normal command input: zleparse implies we are examining
+     * is not normal command input: lexflags implies we are examining
      * a line lexically without it being used for normal command input.
-     * If zleparse is 1 we treat comments as normal for interactive
-     * mode.
-     * If zleparse is 2 (which has actually got nothing to do with zle)
-     * we always handle comments and retain them.
-     * If zleparse is 3 we always handle comments and discard them.
      */
     if (c == hashchar && !nocomments &&
 	(isset(INTERACTIVECOMMENTS) ||
-	 ((zleparse != 1) && !expanding &&
+	 ((!lexflags || (lexflags & LEXFLAGS_COMMENTS)) && !expanding &&
 	  (!interact || unset(SHINSTDIN) || strin)))) {
 	/* History is handled here to prevent extra  *
 	 * newlines being inserted into the history. */
 
-	if (zleparse == 2) {
+	if (lexflags & LEXFLAGS_COMMENTS_KEEP) {
 	    len = 0;
 	    bptr = tokstr = (char *)hcalloc(bsiz = 32);
 	    add(c);
@@ -783,14 +774,14 @@ gettok(void)
 	while ((c = ingetc()) != '\n' && !lexstop) {
 	    hwaddc(c);
 	    addtoline(c);
-	    if (zleparse == 2)
+	    if (lexflags & LEXFLAGS_COMMENTS_KEEP)
 		add(c);
 	}
 
 	if (errflag)
 	    peek = LEXERR;
 	else {
-	    if (zleparse == 2) {
+	    if (lexflags & LEXFLAGS_COMMENTS_KEEP) {
 		*bptr = '\0';
 		if (!lexstop)
 		    hungetc(c);
@@ -805,7 +796,7 @@ gettok(void)
 		 * we don't want a newline token since it's
 		 * treated specially.
 		 */
-		if (zleparse == 3 && lexstop)
+		if ((lexflags & LEXFLAGS_COMMENTS_STRIP) && lexstop)
 		    peek = ENDINPUT;
 		else
 		    peek = NEWLIN;
@@ -1778,7 +1769,7 @@ gotword(void)
     we = zlemetall + 1 - inbufct + (addedx == 2 ? 1 : 0);
     if (zlemetacs <= we) {
 	wb = zlemetall - wordbeg + addedx;
-	zleparse = 0;
+	lexflags = 0;
     }
 }
 
@@ -1813,11 +1804,11 @@ exalias(void)
 	} else
 	    zshlextext = tokstr;
 
-	if (zleparse && !(inbufflags & INP_ALIAS)) {
-	    int zp = zleparse;
+	if (lexflags && !(inbufflags & INP_ALIAS)) {
+	    int zp = lexflags;
 
 	    gotword();
-	    if (zp == 1 && !zleparse) {
+	    if (zp == 1 && !lexflags) {
 		if (zshlextext == copy)
 		    zshlextext = tokstr;
 		return 0;

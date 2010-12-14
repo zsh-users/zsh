@@ -462,6 +462,17 @@
 >with
 >comment
 
+  line=$'echo one\necho two # with a comment\necho three'
+  print -l ${(z+nc+)line}
+0:Treating zplit newlines as ordinary whitespace
+>echo
+>one
+>echo
+>two
+># with a comment
+>echo
+>three
+
   psvar=(dog)
   setopt promptsubst
   foo='It shouldn'\''t $(happen) to a %1v.'

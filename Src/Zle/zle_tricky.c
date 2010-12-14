@@ -1140,7 +1140,7 @@ get_comp_string(void)
     zsfree(varname);
     varname = NULL;
     insubscr = 0;
-    zleparse = 1;
+    lexflags = LEXFLAGS_ACTIVE;
     clwpos = -1;
     lexsave();
     inpush(dupstrspace(linptr), 0, NULL);
@@ -1244,7 +1244,7 @@ get_comp_string(void)
 	    if (wordpos != redirpos)
 		wordpos = redirpos = 0;
 	}
-	if (!zleparse && !tt0) {
+	if (!lexflags && !tt0) {
 	    /* This is done when the lexer reached the word the cursor is on. */
 	    tt = tokstr ? dupstring(tokstr) : NULL;
 
@@ -1345,7 +1345,7 @@ get_comp_string(void)
 				 (sl - 1) : (zlemetacs_qsub - wb)]);
 	}
     } while (tok != LEXERR && tok != ENDINPUT &&
-	     (tok != SEPER || (zleparse && !tt0)));
+	     (tok != SEPER || (lexflags && !tt0)));
     /* Calculate the number of words stored in the clwords array. */
     clwnum = (tt || !wordpos) ? wordpos : wordpos - 1;
     zsfree(clwords[clwnum]);
@@ -1360,7 +1360,7 @@ get_comp_string(void)
     }
     strinend();
     inpop();
-    errflag = zleparse = 0;
+    errflag = lexflags = 0;
     if (parbegin != -1) {
 	/* We are in command or process substitution if we are not in
 	 * a $((...)). */
@@ -2707,7 +2707,7 @@ doexpandhist(void)
     noaliases = ona;
     strinend();
     inpop();
-    zleparse = 0;
+    lexflags = 0;
     lexrestore();
     expanding = 0;
 
@@ -2807,7 +2807,7 @@ getcurcmd(void)
     int curlincmd;
     char *s = NULL;
 
-    zleparse = 2;
+    lexflags = LEXFLAGS_ACTIVE;
     lexsave();
     metafy_line();
     inpush(dupstrspace(zlemetaline), 0, NULL);
@@ -2825,11 +2825,11 @@ getcurcmd(void)
 	    cmdwe = zlemetall + 1 - inbufct;
 	}
     }
-    while (tok != ENDINPUT && tok != LEXERR && zleparse);
+    while (tok != ENDINPUT && tok != LEXERR && lexflags);
     popheap();
     strinend();
     inpop();
-    errflag = zleparse = 0;
+    errflag = lexflags = 0;
     unmetafy_line();
     lexrestore();
 

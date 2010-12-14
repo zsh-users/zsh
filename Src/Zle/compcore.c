@@ -1481,7 +1481,7 @@ set_comp_sep(void)
 
     /* Put the string in the lexer buffer and call the lexer to *
      * get the words we have to expand.                        */
-    zleparse = 1;
+    lexflags = LEXFLAGS_ACTIVE;
     ocs = zlemetacs;
     oll = zlemetall;
     ol = zlemetaline;
@@ -1616,7 +1616,7 @@ set_comp_sep(void)
         }
 	else
 	    p = NULL;
-	if (!got && !zleparse) {
+	if (!got && !lexflags) {
 	    DPUTS(!p, "no current word in substr");
 	    got = 1;
 	    cur = i;
@@ -1634,7 +1634,7 @@ set_comp_sep(void)
     noaliases = ona;
     strinend();
     inpop();
-    errflag = zleparse = 0;
+    errflag = lexflags = 0;
     noerrs = ne;
     lexrestore();
     wb = owb;

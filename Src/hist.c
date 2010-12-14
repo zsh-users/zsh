@@ -2345,7 +2345,8 @@ readhistfile(char *fn, int err, int readflags)
 		/*
 		 * Attempt to do this using the lexer.
 		 */
-		LinkList wordlist = bufferwords(NULL, pt, NULL, 1);
+		LinkList wordlist = bufferwords(NULL, pt, NULL,
+						LEXFLAGS_COMMENTS_KEEP);
 		LinkNode wordnode;
 		int nwords_max;
 		nwords_max = 2 * countlinknodes(wordlist);
@@ -2905,10 +2906,10 @@ histfileIsLocked(void)
 
 /**/
 mod_export LinkList
-bufferwords(LinkList list, char *buf, int *index, int comments)
+bufferwords(LinkList list, char *buf, int *index, int flags)
 {
     int num = 0, cur = -1, got = 0, ne = noerrs;
-    int owb = wb, owe = we, oadx = addedx, ozp = zleparse, onc = nocomments;
+    int owb = wb, owe = we, oadx = addedx, ozp = lexflags, onc = nocomments;
     int ona = noaliases, ocs = zlemetacs, oll = zlemetall;
     int forloop = 0, rcquotes = opts[RCQUOTES];
     char *p, *addedspaceptr;
@@ -2925,6 +2926,12 @@ bufferwords(LinkList list, char *buf, int *index, int comments)
     addedx = 0;
     noerrs = 1;
     lexsave();
+    lexflags = flags | LEXFLAGS_ACTIVE;
+    /*
+     * Are we handling comments?
+     */
+    nocomments = !(flags & (LEXFLAGS_COMMENTS_KEEP|
+			    LEXFLAGS_COMMENTS_STRIP));
     if (buf) {
 	int l = strlen(buf);
 
@@ -2943,18 +2950,10 @@ bufferwords(LinkList list, char *buf, int *index, int comments)
 	inpush(p, 0, NULL);
 	zlemetall = strlen(p) ;
 	zlemetacs = zlemetall + 1;
-
-	/*
-	 * If comments is non-zero we are handling comments.
-	 * zleparse indicates the mode to the lexer.
-	 */
-	zleparse = 1 + comments;
-	nocomments = !comments;
     } else {
 	int ll, cs;
 	char *linein;
 
-	zleparse = 1;
 	linein = zleentry(ZLE_CMD_GET_LINE, &ll, &cs);
 	zlemetall = ll + 1; /* length of line plus space added below */
 	zlemetacs = cs;
@@ -3096,7 +3095,7 @@ bufferwords(LinkList list, char *buf, int *index, int comments)
 	    }
 	    forloop--;
 	}
-	if (!got && !zleparse) {
+	if (!got && !lexflags) {
 	    got = 1;
 	    cur = num - 1;
 	}
@@ -3121,7 +3120,7 @@ bufferwords(LinkList list, char *buf, int *index, int comments)
     strinend();
     inpop();
     errflag = 0;
-    zleparse = ozp;
+    lexflags = ozp;
     nocomments = onc;
     noerrs = ne;
     lexrestore();

@@ -1,3 +1,11 @@
+2010-12-14  Peter Stephenson  <pws@csr.com>
+
+	* 28528: Doc/Zsh/expn.yo, Src/hist.c, Src/lex.c, Src/subst.c,
+	Src/zsh.h, Src/Zle/compcore.c, Src/Zle/compctl.c,
+	Src/Zle/zle_tricky.c, Test/D04parameter.ztst: clear up use of
+	zleparse variable into lexflags; add (z+n+) for splitting with
+	newline treated as ordinary whitespace.
+
 2010-12-13  Peter Stephenson  <pws@csr.com>
 
 	* 28526: Src/lex.c, Test/D04parameter.ztst: zplitting
@@ -13942,5 +13950,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5148 $
+* $Revision: 1.5149 $
 *****************************************************

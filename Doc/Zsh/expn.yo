@@ -1009,14 +1009,17 @@ find the words, i.e. taking into account any quoting in the value.
 Comments are not treated specially but as ordinary strings, similar
 to interactive shells with the tt(INTERACTIVE_COMMENTS) option unset.
 
-The flag can take option letters between a following pair of
-`tt(PLUS())' characters.  tt(LPAR()z+PLUS()c+PLUS()RPAR()) causes
-comments to be parsed as a string and retained; any field in the
+The flag can take a combination of option letters between a following
+pair of `tt(PLUS())' characters.  tt(LPAR()z+PLUS()c+PLUS()RPAR())
+causes comments to be parsed as a string and retained; any field in the
 resulting array beginning with an unquoted comment character is a
 comment.  tt(LPAR()z+PLUS()C+PLUS()RPAR()) causes comments to be parsed
 and removed.  The rule for comments is standard: anything between a word
 starting with the third charcter of tt($HISTCHARS), default tt(#), up to
-the next newline is a comment.
+the next newline is a comment.  tt(LPAR()z+PLUS()n+PLUS()RPAR()) causes
+unquoted newlines to be treated as ordinary whitespace, else they are
+treated as if they are shell code delimiters and converted to
+semicolons.
 
 Note that this is done very late, as for the `tt((s))' flag. So to
 access single words in the result, one has to use nested expansions as 

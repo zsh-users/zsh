@@ -1823,6 +1823,34 @@ struct histent {
 #define HFILE_NO_REWRITE	0x0020
 #define HFILE_USE_OPTIONS	0x8000
 
+/*
+ * Flags argument to bufferwords() used
+ * also by lexflags variable.
+ */
+/*
+ * Kick the lexer into special string-analysis
+ * mode without parsing.  Any bit set in
+ * the flags has this effect, but this
+ * has otherwise all the default effects.
+ */
+#define LEXFLAGS_ACTIVE		0x0001
+/*
+ * Parse comments and treat each comment as a single string
+ */
+#define LEXFLAGS_COMMENTS_KEEP	0x0002
+/*
+ * Parse comments and strip them.
+ */
+#define LEXFLAGS_COMMENTS_STRIP	0x0004
+/*
+ * Either of the above
+ */
+#define LEXFLAGS_COMMENTS (LEXFLAGS_COMMENTS_KEEP|LEXFLAGS_COMMENTS_STRIP)
+/*
+ * Treat newlines as whitespace
+ */
+#define LEXFLAGS_NEWLINE	0x0008
+
 /******************************************/
 /* Definitions for programable completion */
 /******************************************/

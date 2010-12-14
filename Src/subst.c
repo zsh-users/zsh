@@ -1557,9 +1557,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * spbreak, see above; fairly straighforward in use but c.f.
      * the comment for mods.
      *
-     * This ultimately becomes zleparse during lexical analysis, via
-     * the comments argument to bufferwords(). It's got nothing
-     * to do with zle.
+     * This gets set to one of the LEXFLAGS_* values.
      */
     int shsplit = 0;
     /*
@@ -1937,19 +1935,24 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    break;
 
 		case 'z':
-		    shsplit = 1;
+		    shsplit = LEXFLAGS_ACTIVE;
 		    if (s[1] == '+') {
 			s += 2;
 			while (*s && *s != '+' && *s != ')' && *s != Outpar) {
 			    switch (*s++) {
 			    case 'c':
 				/* Parse and keep comments */
-				shsplit = 2;
+				shsplit |= LEXFLAGS_COMMENTS_KEEP;
 				break;
 
 			    case 'C':
 				/* Parse and remove comments */
-				shsplit = 3;
+				shsplit |= LEXFLAGS_COMMENTS_STRIP;
+				break;
+
+			    case 'n':
+				/* Treat newlines as whitespace */
+				shsplit |= LEXFLAGS_NEWLINE;
 				break;
 
 			    default:
@@ -3232,10 +3235,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	if (isarr) {
 	    char **ap;
 	    for (ap = aval; *ap; ap++)
-		list = bufferwords(list, *ap, NULL, shsplit-1);
+		list = bufferwords(list, *ap, NULL, shsplit);
 	    isarr = 0;
 	} else
-	    list = bufferwords(NULL, val, NULL, shsplit-1);
+	    list = bufferwords(NULL, val, NULL, shsplit);
 
 	if (!list || !firstnode(list))
 	    val = dupstring("");
