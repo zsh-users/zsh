@@ -421,9 +421,9 @@
   print "*** Normal ***"
   print -l ${(z)line}
   print "*** Kept ***"
-  print -l ${(z+c+)line}
+  print -l ${(Z+c+)line}
   print "*** Removed ***"
-  print -l ${(z+C+)line}
+  print -l ${(Z+C+)line}
 0:Comments with (z)
 >*** Normal ***
 >A
@@ -457,13 +457,13 @@
 >one
 
   line='with comment # at the end'
-  print -l ${(z+C+)line}
+  print -l ${(Z+C+)line}
 0:Test we don't get an additional newline token
 >with
 >comment
 
   line=$'echo one\necho two # with a comment\necho three'
-  print -l ${(z+nc+)line}
+  print -l ${(Z+nc+)line}
 0:Treating zplit newlines as ordinary whitespace
 >echo
 >one

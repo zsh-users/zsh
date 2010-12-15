@@ -1936,10 +1936,15 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 		case 'z':
 		    shsplit = LEXFLAGS_ACTIVE;
-		    if (s[1] == '+') {
-			s += 2;
-			while (*s && *s != '+' && *s != ')' && *s != Outpar) {
-			    switch (*s++) {
+		    break;
+
+		case 'Z':
+		    t = get_strarg(++s, &arglen);
+		    if (*t) {
+			sav = *t;
+			*t = 0;
+			while (*++s) {
+			    switch (*s) {
 			    case 'c':
 				/* Parse and keep comments */
 				shsplit |= LEXFLAGS_COMMENTS_KEEP;
@@ -1956,12 +1961,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 				break;
 
 			    default:
-				goto flagerr;
+				*t = sav;
+ 				goto flagerr;
 			    }
 			}
-			if (*s != '+')
-			    goto flagerr;
-		    }
+			*t = sav;
+			s = t + arglen - 1;
+		    } else
+			goto flagerr;
 		    break;
 
 		case 'u':
@@ -1971,6 +1978,25 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		case '#':
 		case Pound:
 		    evalchar = 1;
+		    break;
+
+		case '_':
+		    t = get_strarg(++s, &arglen);
+		    if (*t) {
+			sav = *t;
+			*t = 0;
+			while (*++s) {
+			    /* Reserved for future use */
+			    switch (*s) {
+			    default:
+				*t = sav;
+				goto flagerr;
+			    }
+			}
+			*t = sav;
+			s = t + arglen - 1;
+		    } else
+			goto flagerr;
 		    break;
 
 		default:

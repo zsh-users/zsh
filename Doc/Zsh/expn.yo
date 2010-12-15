@@ -1009,18 +1009,6 @@ find the words, i.e. taking into account any quoting in the value.
 Comments are not treated specially but as ordinary strings, similar
 to interactive shells with the tt(INTERACTIVE_COMMENTS) option unset.
 
-The flag can take a combination of option letters between a following
-pair of `tt(PLUS())' characters.  tt(LPAR()z+PLUS()c+PLUS()RPAR())
-causes comments to be parsed as a string and retained; any field in the
-resulting array beginning with an unquoted comment character is a
-comment.  tt(LPAR()z+PLUS()C+PLUS()RPAR()) causes comments to be parsed
-and removed.  The rule for comments is standard: anything between a word
-starting with the third charcter of tt($HISTCHARS), default tt(#), up to
-the next newline is a comment.  tt(LPAR()z+PLUS()n+PLUS()RPAR()) causes
-unquoted newlines to be treated as ordinary whitespace, else they are
-treated as if they are shell code delimiters and converted to
-semicolons.
-
 Note that this is done very late, as for the `tt((s))' flag. So to
 access single words in the result, one has to use nested expansions as 
 in `tt(${${(z)foo}[2]})'. Likewise, to remove the quotes in the
@@ -1128,6 +1116,25 @@ print -l "${(s.:.)line}")
 produces two lines of output for tt(one) and tt(three) and elides the
 empty field.  To override this behaviour, supply the "(@)" flag as well,
 i.e.  tt("${(@s.:.)line}").
+)
+item(tt(Z:)var(opts)tt(:))(
+As tt(z) but takes a combination of option letters between a following
+pair of delimiter characters.  tt(LPAR()Z+PLUS()c+PLUS()RPAR())
+causes comments to be parsed as a string and retained; any field in the
+resulting array beginning with an unquoted comment character is a
+comment.  tt(LPAR()Z+PLUS()C+PLUS()RPAR()) causes comments to be parsed
+and removed.  The rule for comments is standard: anything between a word
+starting with the third character of tt($HISTCHARS), default tt(#), up to
+the next newline is a comment.  tt(LPAR()Z+PLUS()n+PLUS()RPAR()) causes
+unquoted newlines to be treated as ordinary whitespace, else they are
+treated as if they are shell code delimiters and converted to
+semicolons.
+)
+item(tt(_:)var(flags)tt(:))(
+The underscore (tt(_)) flag is reserved for future use.  As of this
+revision of zsh, there are no valid var(flags); anything following an
+underscore, other than an empty pair of delimiters, is treated as an
+error, and the flag itself has no effect.
 )
 enditem()
 
