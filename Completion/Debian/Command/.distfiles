@@ -27,6 +27,7 @@ _dpkg-repack
 _dpkg_source
 _dput
 _dupload
+_git-buildpackage
 _invoke-rc.d
 _lighttpd
 _linda
