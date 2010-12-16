@@ -1,5 +1,7 @@
 2010-12-16  Peter Stephenson  <pws@csr.com>
 
+	* unposted: NEWS: add notes on (Z) parameter flag.
+
 	* unposted: README, Config/version.mk, Etc/FAQ.yo,
 	Completion/Debian/Command/.distfiles: update for 4.3.10-test-3.
 
@@ -13968,5 +13970,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5153 $
+* $Revision: 1.5154 $
 *****************************************************

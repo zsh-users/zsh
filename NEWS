@@ -26,6 +26,13 @@ The (D) flag in parameter expansion abbreviates directories in the
 substituted value.  The (q-) flag does minimal shell quotation of arguments
 for maximum human readability of the result.
 
+The (Z) flag in parameter expansion is an enhanced version of the (z)
+flag that takes an argument indicating how the string to be split
+is treated. (Z:c:) parses comments as strings; (Z:C:) parses comments
+and strips them; (Z:n:) treats newlines as ordinary whitespace: (z)
+has always treated unquoted newlines as shell delimiters and turned them
+into semicolons, though this was not previously documented.
+
 Numeric expansion with braces has been extended so that a step may be
 given, as in {3..9..2}.  The step may be negative as may the start and
 end of the range (this is also new).
@@ -91,8 +98,8 @@ The POSIX_JOBS option already referred to has various other
 compatibility enchancements.
 
 The new shell option POSIX_STRINGS makes a null character in $'...'
-expansion terminate the string.  This is not particularly useful
-behaviour but may become a POSIX requirement.
+expansion terminate the string, as is already the case in bash.  This is
+not particularly useful behaviour but may become a POSIX requirement.
 
 The new shell option POSIX_TRAPS causes the EXIT trap to behave in the same
 way as in other shells, i.e. it is only run when the shell exits.
