@@ -3325,7 +3325,7 @@ save_params(Estate state, Wordcode pc, LinkList *restore_p, LinkList *remove_p)
 		 * been done at this point.  Instead, copy the
 		 * parameter:  in this case, we'll insert the
 		 * copied parameter straight back into the parameter
-		 * table so we wan't to be sure everything is
+		 * table so we want to be sure everything is
 		 * properly set up and in permanent memory.
 		 */
 		tpm = (Param) zshcalloc(sizeof *tpm);

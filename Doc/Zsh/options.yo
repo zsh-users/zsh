@@ -1579,7 +1579,7 @@ example(unsetopt localtraps
 trap - INT
 fn+LPAR()RPAR() { setopt localtraps; trap '' INT; sleep 3; })
 
-will restore normally handling of tt(SIGINT) after the function exits.
+will restore normal handling of tt(SIGINT) after the function exits.
 )
 pindex(MULTI_FUNC_DEF)
 pindex(NO_MULTI_FUNC_DEF)

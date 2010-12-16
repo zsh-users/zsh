@@ -37,7 +37,7 @@ as a controlling tty. That means two things:
 
 This does not apply when cloning to an bf(unused) vc.
 
-Cloning to an used (and unprepared) terminal will result in two
+Cloning to a used (and unprepared) terminal will result in two
 processes reading simultaneously from the same terminal, with
 input bytes going randomly to either process.
 

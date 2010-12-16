@@ -8,7 +8,7 @@
 #
 # Example: telnet
 #
-#  Assume an user sets the style `users-hosts-ports' as for the my-accounts
+#  Assume a user sets the style `users-hosts-ports' as for the my-accounts
 #  tag:
 #
 #    zstyle ':completion:*:*:telnet:*:my-accounts' users-hosts-ports \

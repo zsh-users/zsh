@@ -1,5 +1,9 @@
 2010-12-16  Peter Stephenson  <pws@csr.com>
 
+	* Mikael: 28531: Completion/Base/Utility/_combination,
+	Doc/Zsh/expn.yo, Doc/Zsh/mod_clone.yo, Doc/Zsh/options.yo,
+	Src/exec.c: typos.
+
 	* unposted: NEWS: add notes on (Z) parameter flag.
 
 	* unposted: README, Config/version.mk, Etc/FAQ.yo,
@@ -13970,5 +13974,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5154 $
+* $Revision: 1.5155 $
 *****************************************************
