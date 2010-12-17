@@ -154,7 +154,7 @@
 #         causes the current directory to be overwritten.  For example,
 #         changing from ~pws to ~pws/some/other/dir causes ~pws not to be
 #         left on the recent directory stack.  This only applies to direct
-#         changes to descendant diretories; earlier directories on the
+#         changes to descendant directories; earlier directories on the
 #         list are not pruned.  For example, changing from ~pws/yet/another
 #         to ~pws/some/other/dir does not cause ~pws to be pruned.
 #       pattern:<pattern>

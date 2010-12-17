@@ -852,7 +852,7 @@ em(arithmetic expansion) on the result. Such expansions can be
 nested but too deep recursion may have unpredictable effects.
 )
 item(tt(f))(
-Split the result of the expansion to lines. This is a shorthand
+Split the result of the expansion at newlines. This is a shorthand
 for `tt(ps:\n:)'.
 )
 item(tt(F))(
@@ -1077,7 +1077,7 @@ item(tt(m))(
 Only useful together with one of the flags tt(l) or tt(r) or with the
 tt(#) length operator when the tt(MULTIBYTE) option
 is in effect.  Use the character width reported by the system in
-calculating the how much of the string it occupies or the overall
+calculating how much of the string it occupies or the overall
 length of the string.  Most printable characters have a width of one
 unit, however certain Asian character sets and certain special effects
 use wider characters; combining characters have zero width.
@@ -2200,7 +2200,7 @@ item(tt(F))(
 `full' (i.e. non-empty) directories.  Note that the
 opposite sense tt(LPAR()^F)tt(RPAR()) expands to empty directories
 and all non-directories.  Use tt(LPAR()/^F)tt(RPAR()) for
-empty directories
+empty directories.
 )
 item(tt(.))(
 plain files

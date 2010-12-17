@@ -900,7 +900,7 @@ If set, is treated as a pattern during spelling correction.  Any
 potential correction that matches the pattern is ignored.  For example,
 if the value is `tt(_*)' then completion functions (which, by
 convention, have names beginning with `tt(_)') will never be offered
-as spelling corrections.  The pattern does not apply the correction
+as spelling corrections.  The pattern does not apply to the correction
 of file names, as applied by the tt(CORRECT_ALL) option (so with the
 example just given files beginning with `tt(_)' in the current
 directory would still be completed).

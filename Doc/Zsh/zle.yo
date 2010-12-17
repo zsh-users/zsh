@@ -618,7 +618,7 @@ simply to perform some small action.  The ZLE commands that key sequences
 in keymaps are bound to are in fact widgets.  Widgets can be user-defined
 or built in.
 
-The standard widgets built in to ZLE are listed in Standard Widgets below.
+The standard widgets built into ZLE are listed in Standard Widgets below.
 Other built-in widgets can be defined by other modules (see
 ifzman(zmanref(zshmodules))\
 ifnzman(noderef(Zsh Modules))\
@@ -695,8 +695,8 @@ cursor being moved to the appropriate end of the buffer.
 )
 vindex(CUTBUFFER)
 item(tt(CUTBUFFER) (scalar))(
-The last item to be cut using one of the `tt(kill-)' commands; the
-string which the next yank would insert in the line.  Later entries in
+The last item cut using one of the `tt(kill-)' commands; the string
+which the next yank would insert in the line.  Later entries in
 the kill ring are in the array tt(killring).  Note that the
 command `tt(zle copy-region-as-kill) var(string)' can be used to
 set the text of the cut buffer from a shell function and cycle the kill
@@ -784,7 +784,7 @@ vindex(PREDISPLAY)
 item(tt(PREDISPLAY) (scalar))(
 Text to be displayed before the start of the editable text buffer.  This
 does not have to be a complete line; to display a complete line, a newline
-must be appended explicitly.    The text is reset on each new invocation
+must be appended explicitly.  The text is reset on each new invocation
 (but not recursive invocation) of zle.
 )
 vindex(POSTDISPLAY)
@@ -936,7 +936,7 @@ widget to be called.
 The value tt($KEYMAP) within the function reflects the new keymap.  The
 old keymap is passed as the sole argument.
 
-This can been used for detecting switches between the vi command
+This can be used for detecting switches between the vi command
 (tt(vicmd)) and insert (usually tt(main)) keymaps.
 )
 enditem()
@@ -1362,11 +1362,11 @@ the same way to pick a word from that event.
 
 When called from a shell function invoked from a user-defined widget, the
 command can take one to three arguments.  The first argument specifies a
-history offset which applies to successive calls to this widget: if is -1,
+history offset which applies to successive calls to this widget: if it is -1,
 the default behaviour is used, while if it is 1, successive calls will move
 forwards through the history.  The value 0 can be used to indicate that the
 history line examined by the previous execution of the command will be
-reexamined.  Note that negative numbers should be preceded with a
+reexamined.  Note that negative numbers should be preceded by a
 `tt(-)tt(-)' argument to avoid confusing them with options.
 
 If two arguments are given, the second specifies the word on the command

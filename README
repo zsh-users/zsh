@@ -255,7 +255,7 @@ Doc/zsh.texi	Everything the man pages have, but in texinfo format.  These
 		top level Makefile.  Version 4.0 or above of the
 		Texinfo tools are recommended for processing this file.
 
-Also include in the distribution are:
+Also included in the distribution are:
 
 Doc/intro.ms	An introduction to zsh in troff format using the ms
 		macros.  This document explains many of the features

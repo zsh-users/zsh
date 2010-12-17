@@ -29,22 +29,23 @@ Frank Terbeck, Philippe Troin, Geoff Wing, Matt Wozniski.
 The VCS_Info function system was written by Frank Terbeck with
 contributions from Julien Langer.
 
-Contributors to completion and other shell functions include those above
-plus Nuno Alexandre, Ralph Amissah, Micah Anderson, arno, Frank Benkstein,
-Jay Berkenbilt, Frank Blendinger, Zack Cerza, Brendan Cully, Baptiste
-Daroussin, Danek Duvall, Ryan F, Sean Finney, Daniel Friesel, Alexey
-I. Froloff, Tobias Gruetzmacher, Pierre Habouzit, Richard Hartmann,
-Benjamin R. Haskell, Ag. D. Hatzimanikas, Pete Hollobon, Erik Johansson,
-Kohsuke Kawaguchi, Dough Kearns, Hannu Koivisto, Henryk Konsek, Chris Lamb,
-Vincent Lefevre, Roger Leigh, Eric Mangold, Max Mikhanosha, Arkadiusz
-Miskiewicz, Matthieu Moy, Scott Murray, Alexander Myodov, Kalle Olavi
-Niemitalo, Kazuhiro NISHIYAMA, Omari Norman, Mustafa Oezkan, Tomasz Pala,
-Peter Palfrader, Carlos Phillips, Daniel Qarras, Jean-Baptiste Quenot,
-David Riebenbauer, Haakon Riiser, Ingo Rohlfs, Felix Rosencrantz, Simon
-Ruderich, Stephen Rüger, William Scott, Kris Shannon, Jörg Sommer, Travis
-Spencer, Vincent Steman, Mårten Svantesson, Evgenii Terechkov, Magnus
-Therning, Ingmar Vanhassel, Markus Waldeck, Motoi Washida, Nikolai Weibull,
-Jesse Weinstein.
+Contributors to documentation and to completion and other shell
+functions include those above plus Nuno Alexandre, Ralph Amissah, Micah
+Anderson, arno, Frank Benkstein, Jay Berkenbilt, Frank Blendinger, Zack
+Cerza, Brendan Cully, Baptiste Daroussin, Danek Duvall, Ryan F, Sean
+Finney, Daniel Friesel, Alexey I. Froloff, Tobias Gruetzmacher, Pierre
+Habouzit, Richard Hartmann, Benjamin R. Haskell, Ag. D. Hatzimanikas,
+Pete Hollobon, Erik Johansson, Kohsuke Kawaguchi, Dough Kearns, Hannu
+Koivisto, Henryk Konsek, Chris Lamb, Vincent Lefevre, Roger Leigh, Eric
+Mangold, Max Mikhanosha, Arkadiusz Miskiewicz, Matthieu Moy, Scott
+Murray, Alexander Myodov, Štěpán Němec, Kalle Olavi Niemitalo, Kazuhiro
+NISHIYAMA, Omari Norman, Mustafa Oezkan, Tomasz Pala, Peter Palfrader,
+Carlos Phillips, Daniel Qarras, Jean-Baptiste Quenot, David Riebenbauer,
+Haakon Riiser, Ingo Rohlfs, Felix Rosencrantz, Simon Ruderich, Stephen
+Rüger, William Scott, Kris Shannon, Jörg Sommer, Travis Spencer, Vincent
+Steman, Mårten Svantesson, Evgenii Terechkov, Magnus Therning, Ingmar
+Vanhassel, Markus Waldeck, Motoi Washida, Nikolai Weibull, Jesse
+Weinstein.
 
 Version 4.2
 -----------

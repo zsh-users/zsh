@@ -306,7 +306,7 @@ var(hook) is one of tt(chpwd), tt(periodic), tt(precmd) or tt(preexec),
 the special functions in question.
 
 var(functions) is name of an ordinary shell function.  If no options
-are given this will be added to the array of functions to be executed.
+are given this will be added to the array of functions to be executed
 in the given context.
 
 If the option tt(-d) is given, the var(function) is removed from
@@ -408,7 +408,7 @@ enditem()
 
 subsect(Configuration)
 
-Configuration is by mean of the styles mechanism that should be familiar
+Configuration is by means of the styles mechanism that should be familiar
 from completion; if not, see the description of the tt(zstyle) command in
 ifzman(see zmanref(zshmodules))\
 ifnzman(noderef(The zsh/zutil Module)).  The context for setting styles
@@ -518,7 +518,7 @@ If present, changing directly down by any number of directories
 causes the current directory to be overwritten.  For example,
 changing from ~pws to ~pws/some/other/dir causes ~pws not to be
 left on the recent directory stack.  This only applies to direct
-changes to descendant diretories; earlier directories on the
+changes to descendant directories; earlier directories on the
 list are not pruned.  For example, changing from ~pws/yet/another
 to ~pws/some/other/dir does not cause ~pws to be pruned.
 )
@@ -732,7 +732,7 @@ for looking up its styles.
 The initial value of tt(<repo-root-name>) is var(-all-) and it is replaced
 with the actual name, as soon as it is known. Only use this part of the
 context for defining the var(formats), var(actionformats) or
-var(branchformat) styles. As it is guaranteed that tt(<repo-root-name>) is
+var(branchformat) styles, as it is guaranteed that tt(<repo-root-name>) is
 set up correctly for these only. For all other styles, just use tt('*')
 instead.
 
@@ -755,7 +755,7 @@ A list of formats, used when actionformats is not used
 )
 kindex(actionformats)
 item(tt(actionformats))(
-A list of formats, used if a there is a special
+A list of formats, used if there is a special
 action going on in your current repository; like an interactive rebase or
 a merge conflict.
 )
@@ -1020,7 +1020,7 @@ subsect(Oddities)
 
 If you want to use the tt(%b) (bold off) prompt expansion in var(formats),
 which expands tt(%b) itself, use tt(%%b). That will cause the var(vcs_info)
-expansion to replace tt(%%b) with tt(%b). So zsh's prompt expansion
+expansion to replace tt(%%b) with tt(%b), so that zsh's prompt expansion
 mechanism can handle it. Similarly, to hand down tt(%b) from
 var(branchformat), use tt(%%%%b). Sorry for this inconvenience, but it
 cannot be easily avoided. Luckily we do not clash with a lot of prompt
@@ -2019,7 +2019,7 @@ endsitem()
 item(Special letters)(
 Characters found in various variants of the Latin alphabet:
 startsitem()
-sitem(tt(ss))(Eszett (scafes S))
+sitem(tt(ss))(Eszett (scharfes S))
 sitem(tt(D-), tt(d-))(Eth)
 sitem(tt(TH), tt(th))(Thorn)
 sitem(tt(kk))(Kra)

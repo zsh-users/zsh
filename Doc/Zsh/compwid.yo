@@ -546,7 +546,7 @@ item(tt(-J) var(name))(
 Gives the name of the group of matches the words should be stored in.
 )
 item(tt(-V) var(name))(
-Like tt(-J) but naming a unsorted group. These are in a different name 
+Like tt(-J) but naming an unsorted group. These are in a different name
 space than groups created with the tt(-J) flag.
 )
 item(tt(-1))(
@@ -671,8 +671,8 @@ option stores the `tt(foo)' originally given.
 item(tt(-D) var(array))(
 As with tt(-O), the var(words) are not added to the set of possible
 completions.  Instead, the completion code tests whether each var(word) 
-in turn matches what is on the line.  If the var(n)'th var(word) does not
-match, the var(n)'th element of the var(array) is removed.  Elements
+in turn matches what is on the line.  If the var(n)th var(word) does not
+match, the var(n)th element of the var(array) is removed.  Elements
 for which the corresponding var(word) is matched are retained.
 )
 item(tt(-C))(
@@ -732,8 +732,8 @@ matches the var(pattern), the matched portion is removed from
 tt(PREFIX) and appended to tt(IPREFIX).
 
 Without the optional var(number), the longest match is taken, but
-if var(number) is given, anything up to the var(number)'th match is
-moved.  If the var(number) is negative, the var(number)'th longest
+if var(number) is given, anything up to the var(number)th match is
+moved.  If the var(number) is negative, the var(number)th longest
 match is moved. For example, if tt(PREFIX) contains the string
 `tt(a=b=c)', then tt(compset -P '*\=') will move the string `tt(a=b=)' 
 into the tt(IPREFIX) parameter, but tt(compset -P 1 '*\=') will move only
@@ -750,7 +750,7 @@ matched portion to the front of the value of tt(ISUFFIX).
 item(tt(-n) var(begin) [ var(end) ])(
 If the current word position as specified by the parameter tt(CURRENT) 
 is greater than or equal to var(begin), anything up to the
-var(begin)'th word is removed from the tt(words) array and the value
+var(begin)th word is removed from the tt(words) array and the value
 of the parameter tt(CURRENT) is decremented by var(begin).
 
 If the optional var(end) is given, the modification is done only if
@@ -799,7 +799,7 @@ ignored by the completion code.
 item(tt(compcall) [ tt(-TD) ])(
 This allows the use of completions defined with the tt(compctl) builtin
 from within completion widgets.  The list of matches will be generated as
-if one of the non-widget completion function (tt(complete-word), etc.)
+if one of the non-widget completion functions (tt(complete-word), etc.)
 had been called, except that only tt(compctl)s given for specific commands
 are used. To force the code to try completions defined with the tt(-T)
 option of tt(compctl) and/or the default completion (whether defined by
@@ -1051,7 +1051,7 @@ in the middle of the string on the command line and the option
 tt(COMPLETE_IN_WORD) is set. In this case the completion code would
 normally try to match trial completions that end with the string as
 typed so far, i.e. it will only insert new characters at the cursor
-position rather then at the end.  However in our example we would like
+position rather than at the end.  However in our example we would like
 the code to recognise matches which contain extra characters after the
 string on the line (the `tt(nix)' in the example).  Hence we say that the
 empty string at the end of the string on the line matches any characters
