@@ -65,7 +65,7 @@ keyword in the zle_highlight array.  These can be distinguished from
 unprintable Unicode characters which also use "special" highlighting as the
 latter are always two or four bytes long, e.g. <XXXX>, <XXXXXXXX>.
 
-zle_highlight also control highlighting of a removable completion
+zle_highlight also controls highlighting of a removable completion
 suffix, e.g. the "/" automatically appended to directories.  This uses
 the keyword "suffix".
 
