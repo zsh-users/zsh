@@ -1,3 +1,10 @@
+2010-12-17  Peter Stephenson  <pws@csr.com>
+
+	* unposted: NEWS: note zle_highlight suffix control.
+
+	* Mikael: users/15653: Src/Zle/zle_refresh.c:
+	zle_highlight=(none) should turn off suffix highlighting.
+
 2010-12-16  Peter Stephenson  <pws@csr.com>
 
 	* Mikael: 28531: Completion/Base/Utility/_combination,
@@ -13974,5 +13981,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5155 $
+* $Revision: 1.5156 $
 *****************************************************
