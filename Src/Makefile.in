@@ -109,7 +109,7 @@ rm-modobjs-tmp:
 
 @CONFIG_MK@
 
-Makemod prep: $(CONFIG_INCS) $(dir_top)/config.modules
+Makemod: $(CONFIG_INCS) $(dir_top)/config.modules
 	@case $(sdir_top) in \
 	    /*) top_srcdir=$(sdir_top) ;; \
 	    *) top_srcdir=$(subdir)/$(sdir_top) ;; \
@@ -119,6 +119,7 @@ Makemod prep: $(CONFIG_INCS) $(dir_top)/config.modules
 	    '$$top_srcdir/$(subdir)/mkmakemod.sh $(subdir) Makemod'; \
 	cd $(dir_top) && \
 	    $(SHELL) $$top_srcdir/$(subdir)/mkmakemod.sh $(subdir) Makemod
+prep: Makemod
 	@$(MAKE) -f Makemod $(MAKEDEFS) prep || rm -f Makemod
 .PHONY: prep
 
