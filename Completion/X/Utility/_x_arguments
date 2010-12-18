@@ -1,4 +1,4 @@
-#compdef -P */X11(|R[456])/*
+#compdef -P */X11(|R<4->)/*
 
 local ret long xargs opts rawret nm="$compstate[nmatches]"
 
