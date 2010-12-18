@@ -1,3 +1,11 @@
+2010-12-18  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 27862 (belatedly): Completion/X/Utility/_x_arguments: handle
+	X11 versions greater than X11R6 in the compdef line.
+
+	* unposted: Src/Makefile.in: "prep" target depends on Makemod,
+	not on the files on which Makemod depends.
+
 2010-12-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Mikael: 28535: NEWS: typo
@@ -13989,5 +13997,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5158 $
+* $Revision: 1.5159 $
 *****************************************************
