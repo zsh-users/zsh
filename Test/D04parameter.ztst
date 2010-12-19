@@ -393,6 +393,7 @@
     'foo=(1 2 3)'
     '(( 3 + 1 == 8 / 2 ))'
     'for (( i = 1 ; i < 10 ; i++ ))'
+    '((0.25542 * 60) - 15)*60'
   )
   for string in $strings; do
     array=(${(z)string})
@@ -416,6 +417,19 @@
 >4:i < 10 ;:
 >5:i++ :
 >6:)):
+# This one needs resolving between a math expression and
+# a command, which causes interesting effects internally.
+>1:(:
+>2:(:
+>3:0.25542:
+>4:*:
+>5:60:
+>6:):
+>7:-:
+>8:15:
+>9:):
+>10:*60:
+
 
   line=$'A line with # someone\'s comment\nanother line # (1 more\nanother one'
   print "*** Normal ***"

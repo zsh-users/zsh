@@ -1,3 +1,9 @@
+2010-12-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28537: Src/lex.c, Test/D04parameter.ztst: word splitting on
+	'((' in command position that turned into nested subshell
+	commands was broken.
+
 2010-12-18  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 27862 (belatedly): Completion/X/Utility/_x_arguments: handle
@@ -13997,5 +14003,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5159 $
+* $Revision: 1.5160 $
 *****************************************************

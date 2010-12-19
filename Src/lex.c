@@ -885,6 +885,11 @@ gettok(void)
 		    return DINPAR;
 
 		case 0:
+		    /*
+		     * Not math, so we don't return the contents
+		     * as a string in this case.
+		     */
+		    tokstr = NULL;
 		    return INPAR;
 
 		default:
