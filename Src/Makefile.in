@@ -225,6 +225,6 @@ modobjs modules headers proto $(MAIN_OBJS) zsh.export: Makemod
 	   $(MAKE) prep; \
 	fi
 	@$(MAKE) -f Makemod $(MAKEDEFS) $@
-.PHONY: headers proto
+.PHONY: install.modules uninstall.modules headers proto
 
 $(MAIN_OBJS): $(sdir)/zsh.h
