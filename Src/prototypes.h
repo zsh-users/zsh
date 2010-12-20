@@ -44,13 +44,6 @@ extern int tputs _((char *cp, int affcnt, int (*outc) (int)));
 
 /* MISSING PROTOTYPES FOR VARIOUS OPERATING SYSTEMS */
 
-/* HP/UX 9 c89 */
-#if defined(__hpux) && defined(_XPG3) && !defined(_POSIX1_1988)
-# define WRITE_ARG_2_T void *
-#else
-# define WRITE_ARG_2_T char *
-#endif
-
 #if defined(__hpux) && defined(_HPUX_SOURCE) && !defined(_XPG4_EXTENDED)
 # define SELECT_ARG_2_T int *
 #else

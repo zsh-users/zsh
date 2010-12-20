@@ -2272,7 +2272,7 @@ checkrmall(char *s)
 
 /**/
 mod_export ssize_t
-read_loop(int fd, void *buf, size_t len)
+read_loop(int fd, char *buf, size_t len)
 {
     ssize_t got = len;
 
@@ -2298,7 +2298,7 @@ read_loop(int fd, void *buf, size_t len)
 
 /**/
 mod_export ssize_t
-write_loop(int fd, const void *buf, size_t len)
+write_loop(int fd, const char *buf, size_t len)
 {
     ssize_t wrote = len;
 

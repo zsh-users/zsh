@@ -260,7 +260,7 @@ inputline(void)
 	    int pptlen;
 	    pptbuf = unmetafy(promptexpand(ingetcpmptl ? *ingetcpmptl : NULL,
 					   0, NULL, NULL, NULL), &pptlen);
-	    write_loop(2, (WRITE_ARG_2_T)pptbuf, pptlen);
+	    write_loop(2, pptbuf, pptlen);
 	    free(pptbuf);
 	}
 	ingetcline = shingetline();
