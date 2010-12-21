@@ -7,6 +7,105 @@
 1:assign to association with odd no. of values
 ?(eval):2: bad set of key/value pairs for associative array
 
+# tests of array element assignment
+
+ array=(1 2 3 4 5)
+ array[1]=42
+ print $array
+0:Replacement of array element
+>42 2 3 4 5
+
+ array=(1 2 3 4 5)
+ array[1]=(42 43)
+ print $array
+0:Replacement of array element with array
+>42 43 2 3 4 5
+
+ array=(1 2 3 4 5)
+ array[1,2]=(42 43)
+ print $array
+0:Replacement of start of array
+>42 43 3 4 5
+
+ array=(1 2 3 4 5)
+ array[1,4]=(42 43)
+ print $array
+0:Replacement of start of array with shorter slice
+>42 43 5
+
+ array=(1 2 3 4 5)
+ array[1,6]=(42 43)
+ print $array
+0:Replacement of array by extending slice
+>42 43
+
+ array=(1 2 3 4 5)
+ array[3]=(42 43)
+ print $array
+0:Replacement of middle element with array
+>1 2 42 43 4 5
+
+ array=(1 2 3 4 5)
+ array[3,4]=(42 43 44)
+ print $array
+0:Replacement of slice in middle
+>1 2 42 43 44 5
+
+ array=(1 2 3 4 5)
+ array[7,8]=(42 43)
+ print $array
+ # check that [6] was left empty...
+ array[6]=41
+ print $array
+0:Appending by replacing elements off the end
+>1 2 3 4 5 42 43
+>1 2 3 4 5 41 42 43
+
+ array=(1 2 3 4 5)
+ array[-1]=42
+ print $array
+0:Replacement of last element of array, negative indices
+>1 2 3 4 42
+
+ array=(1 2 3 4 5)
+ array[-1]=(42 43)
+ print $array
+0:Replacement of last element of array with array, negative indices
+>1 2 3 4 42 43
+
+ array=(1 2 3 4 5)
+ array[-3,-2]=(42 43 44)
+ print $array
+0:Replacement of middle of array, negative indices
+>1 2 42 43 44 5
+
+ array=(1 2 3 4 5)
+ array[-5,-1]=(42 43)
+ print $array
+0:Replacement of entire array, negative indices
+>42 43
+
+ array=(1 2 3 4 5)
+ array[-7,-1]=(42 43)
+ print $array
+0:Replacement of more than entire array, negative indices
+>42 43
+
+ array=(1 2 3 4 5)
+ array[-7]=42
+ print $array
+0:Replacement of element off start of array.
+>42 1 2 3 4 5
+
+ array=(1 2 3 4 5)
+ array[-7]=42
+ array[-6]=43
+ print $array
+0:Replacement off start doesn't leave gaps.  Hope this is right.
+>43 1 2 3 4 5
+
+# TODO: mixed indices [-num,num] and [num,-num]
+
 # tests of var+=scalar
 
  s+=foo
