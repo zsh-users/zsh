@@ -104,7 +104,29 @@
 0:Replacement off start doesn't leave gaps.  Hope this is right.
 >43 1 2 3 4 5
 
-# TODO: mixed indices [-num,num] and [num,-num]
+ array=(1 2 3 4 5)
+ array[1,-1]=(42 43)
+ print $array
+ array[-3,3]=(1 2 3 4 5)
+ print $array
+0:Replacement of entire array, mixed indices
+>42 43
+>1 2 3 4 5
+
+ array=(1 2 3 4 5)
+ array[-7,7]=(42 43)
+ print $array
+0:Replacement of more than entire array, mixed indices
+>42 43
+
+ array=(1 2 3 4 5)
+ array[3,-2]=(42 43 44)
+ print $array
+ array[-3,5]=(100 99)
+ print $array
+0:Replacement of slice in middle, mixed indices
+>1 2 42 43 44 5
+>1 2 42 100 99 5
 
 # tests of var+=scalar
 

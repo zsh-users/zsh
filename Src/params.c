@@ -2442,8 +2442,6 @@ setarrvalue(Value v, char **val)
 		v->start--;
 	    v->end--;
 	}
-	if (v->end < v->start)
-	    v->end = v->start;
 	q = old = v->pm->gsu.a->getfn(v->pm);
 	n = arrlen(old);
 	if (v->start < 0) {
@@ -2456,6 +2454,8 @@ setarrvalue(Value v, char **val)
 	    if (v->end < 0)
 		v->end = 0;
 	}
+	if (v->end < v->start)
+	    v->end = v->start;
 
 	ll = v->start + arrlen(val);
 	if (v->end <= n)
