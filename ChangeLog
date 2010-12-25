@@ -1,3 +1,7 @@
+2010-12-25  Clint Adams  <clint@zsh.org>
+
+	* 28548: Completion/Unix/Command/_fuser: match psmisc in any case.
+
 2010-12-21  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/15662: Src/params.c: fix array slice assignment with one
@@ -14031,5 +14035,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5166 $
+* $Revision: 1.5167 $
 *****************************************************
