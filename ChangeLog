@@ -1,3 +1,11 @@
+2011-01-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28568 c.f. 28549 (Ricky Zhou): Src/utils.c: buffer overflow
+	examining paths.
+
+	* Alexey: 28557: Completion/Unix/Command/_ri: update for new
+	versions of Ruby.
+
 2010-12-25  Clint Adams  <clint@zsh.org>
 
 	* 28548: Completion/Unix/Command/_fuser: match psmisc in any case.
@@ -14035,5 +14043,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5167 $
+* $Revision: 1.5168 $
 *****************************************************

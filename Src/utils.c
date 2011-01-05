@@ -3667,16 +3667,22 @@ mindist(char *dir, char *mindistguess, char *mindistbest)
     int mindistd, nd;
     DIR *dd;
     char *fn;
-    char buf[PATH_MAX];
+    char *buf;
 
     if (dir[0] == '\0')
 	dir = ".";
     mindistd = 100;
+
+    buf = zalloc(strlen(dir) + strlen(mindistguess) + 2);
     sprintf(buf, "%s/%s", dir, mindistguess);
+
     if (access(unmeta(buf), F_OK) == 0) {
 	strcpy(mindistbest, mindistguess);
+	free(buf);
 	return 0;
     }
+    free(buf);
+
     if (!(dd = opendir(unmeta(dir))))
 	return mindistd;
     while ((fn = zreaddir(dd, 0))) {
