@@ -785,8 +785,7 @@ gettext2(Estate state)
 			    taddstr(" ");
 			    taddstr(ecgetstr(state, EC_NODUP, NULL));
 			    if (ctype == COND_STREQ ||
-				ctype == COND_STRNEQ ||
-				ctype == COND_REGEX)
+				ctype == COND_STRNEQ)
 				state->pc++;
 			} else {
 			    /* Unary test: `-f foo' etc. */ 

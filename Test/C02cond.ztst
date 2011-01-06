@@ -306,6 +306,21 @@ F:Failures in these cases do not indicate a problem in the shell.
 2:Error message for unknown infix condition
 ?(eval):1: unknown condition: -fail
 
+  crashme() {
+    if [[ $1 =~ ^http:* ]]
+    then
+      url=${1#*=}
+    fi
+  }
+  which crashme
+0:Regression test for examining code with regular expression match
+>crashme () {
+>	if [[ $1 =~ ^http:* ]]
+>	then
+>		url=${1#*=} 
+>	fi
+>}
+
 %clean
   # This works around a bug in rm -f in some versions of Cygwin
   chmod 644 unmodish
