@@ -1,6 +1,8 @@
 #compdef du
 
 if _pick_variant gnu=Free\ Soft unix --version /dummy/no-such-file; then
+  local ret=1
+
   _arguments -s \
     '(-a --all -s --summarize)'{-a,--all}'[write counts for all files]' \
     '--apparent-size[print apparent sizes rather than disc usage]' \
@@ -27,21 +29,23 @@ if _pick_variant gnu=Free\ Soft unix --version /dummy/no-such-file; then
     '--time=-[show time of last modification of any file in the directory]:property:->time' \
     '(* -)--help[display help information]' \
     '(* -)--version[display version information]' \
-    '*:file:_files'
+    '*:file:_files' && ret=0
 
   case $state in
     (time)
       local -a property
       property=(atime access use ctime status)
-      _wanted property expl property compadd -a property
+      _wanted property expl property compadd -a property && ret=0
       ;;
     (timestyle)
       local -a style desc
       style=(full-iso long-iso iso +)
       desc=('full-iso' 'long-iso' 'iso' '+FORMAT like `date'\''')
-      _wanted -V style expl style compadd -d desc -a style
+      _wanted -V style expl style compadd -d desc -a style && ret=0
       ;;
   esac
+
+  return ret
 
 else
   # based on $OSTYPE = solaris2.8

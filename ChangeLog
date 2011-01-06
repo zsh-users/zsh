@@ -1,5 +1,8 @@
 2011-01-06  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 28579: Completion/Unix/Command/_du: propagate failure status
+	from _arguments so that _complete will try other completions.
+
 	* 28578 (plus test): Src/utils.c, Src/zsh.h, Test/B03print.ztst:
 	fix handling of numeric escapes that expand to "%" in printf
 	format strings, so they are not treated as format introducers.
@@ -14049,5 +14052,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5169 $
+* $Revision: 1.5170 $
 *****************************************************
