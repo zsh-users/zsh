@@ -2405,8 +2405,10 @@ getquery(char *valid_chars, int purge)
 	}
 	zbeep();
     }
-    if (c >= 0)
-	write_loop(SHTTY, &c, 1);
+    if (c >= 0) {
+	char buf = (char)c;
+	write_loop(SHTTY, &buf, 1);
+    }
     if (nl)
 	write_loop(SHTTY, "\n", 1);
 

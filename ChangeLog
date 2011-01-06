@@ -1,5 +1,7 @@
 2011-01-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Src/utils.c: fix argument type for write_loop().
+
 	* 28588: Src/text.c, Test/C02cond.ztst: fix textual display
 	after =~ test.
 
@@ -14059,5 +14061,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5172 $
+* $Revision: 1.5173 $
 *****************************************************
