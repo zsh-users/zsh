@@ -32,7 +32,7 @@ if [[ "$state" = ri-name ]]; then
     ri_ext=yaml
   elif "ruby${words[1]#ri}" -rrdoc/ri -rrdoc/ri/store -e 1 >/dev/null 2>&1; then
     # Newer-style Ruby 1.9.2 RI
-    ri_dirs=( ${(f)"$(_call_program ri-names "$words[1]" ${(kv)opt_args[(I)-d|--doc-dir|--((no-|)(system|site|gems|home)|standard-docs)]} --list-doc-dirs -f plain -T)"} )
+    ri_dirs=( ${(f)"$(_call_program ri-names "$words[1]" ${(kv)opt_args[(I)-d|--doc-dir|--((no-|)(system|site|gems|home)|standard-docs)]} --list-doc-dirs -f bs -T)"} )
     ri_ext=ri
   else
     # New-style Ruby 1.9+ RI
