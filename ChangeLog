@@ -1,3 +1,9 @@
+2011-01-06  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 28578 (plus test): Src/utils.c, Src/zsh.h, Test/B03print.ztst:
+	fix handling of numeric escapes that expand to "%" in printf
+	format strings, so they are not treated as format introducers.
+
 2011-01-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28568 c.f. 28549 (Ricky Zhou): Src/utils.c: buffer overflow
@@ -14043,5 +14049,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5168 $
+* $Revision: 1.5169 $
 *****************************************************

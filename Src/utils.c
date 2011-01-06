@@ -1,4 +1,3 @@
-
 /*
  * utils.c - miscellaneous utilities
  *
@@ -5523,6 +5522,8 @@ getkeystring(char *s, int *len, int how, int *misc)
 		    }
 		    *t++ = zstrtol(s + (*s == 'x'), &s,
 				   (*s == 'x') ? 16 : 8);
+		    if ((how & GETKEY_PRINTF_PERCENT) && t[-1] == '%')
+		        *t++ = '%';
 		    if (svchar) {
 			u[3] = svchar;
 			svchar = '\0';

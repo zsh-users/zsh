@@ -2492,7 +2492,11 @@ enum {
      * Yes, I know that doesn't seem to make much sense.
      * It's for use in completion, comprenez?
      */
-    GETKEY_UPDATE_OFFSET = (1 << 7)
+    GETKEY_UPDATE_OFFSET = (1 << 7),
+    /*
+     * When replacing numeric escapes for printf format strings, % -> %%
+     */
+    GETKEY_PRINTF_PERCENT = (1 << 8)
 };
 
 /*
@@ -2501,8 +2505,9 @@ enum {
  */
 /* echo builtin */
 #define GETKEYS_ECHO	(GETKEY_BACKSLASH_C)
-/* printf format string:  \123 -> S, \0123 -> NL 3 */
-#define GETKEYS_PRINTF_FMT	(GETKEY_OCTAL_ESC|GETKEY_BACKSLASH_C)
+/* printf format string:  \123 -> S, \0123 -> NL 3, \045 -> %% */
+#define GETKEYS_PRINTF_FMT	\
+        (GETKEY_OCTAL_ESC|GETKEY_BACKSLASH_C|GETKEY_PRINTF_PERCENT)
 /* printf argument:  \123 -> \123, \0123 -> S */
 #define GETKEYS_PRINTF_ARG	(GETKEY_BACKSLASH_C)
 /* Full print without -e */

@@ -105,10 +105,9 @@
 0:numeric value of high numbered character
 >f0
 
-# code will probably be changed to print the literal `%s' in this case
  printf '\x25s\n' arg
-0:using \x25 to introduce a format specifier
->arg
+0:using \x25 to print a literal % in format
+>%s
 
  printf '%3c\n' c
 0:width specified in format specifier
