@@ -88,3 +88,8 @@
  print ${#line}
 0:read with trailing metafied characters
 >24
+
+ (typeset -r foo
+  read foo) <<<bar
+1:return status on failing to set parameter
+?(eval):2: read-only variable: foo

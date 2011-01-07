@@ -1,5 +1,8 @@
 2011-01-07  Peter Stephenson  <pws@csr.com>
 
+	* 28590 (added a comment): Src/builtin.c, Test/B04read.ztst:
+	read builtin should return non-zero status on error.
+
 	* Mikael: 28585: Completion/Unix/Command/_mkdir: don't set ret=0
 	when _wanted fails to find any matches.
 
@@ -14066,5 +14069,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5174 $
+* $Revision: 1.5175 $
 *****************************************************

@@ -5710,7 +5710,12 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	}
 	return 1;
     }
-    return 0;
+    /*
+     * The following is to ensure a failure to set the parameter
+     * causes a non-zero status return.  There are arguments for
+     * turning a non-zero status into errflag more widely.
+     */
+    return errflag;
 }
 
 /**/
