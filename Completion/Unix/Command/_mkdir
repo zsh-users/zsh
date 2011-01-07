@@ -60,9 +60,8 @@ case "$state" in
     if (( $ret )) && [[ ! -prefix - ]] || \
       [[ $variant == zsh && ${#${${words[2,-1]}:#-*}} -gt 0 ]]; then
       _wanted directories expl \
-	'parent directory (alternatively specify name of directory)' \
-	_path_files -/ || _message 'name of directory'
-      ret=0
+        'parent directory (alternatively specify name of directory)' \
+        _path_files -/ && ret=0 || _message 'name of directory'
     fi
     ;;
 esac

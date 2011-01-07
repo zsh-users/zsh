@@ -1,3 +1,8 @@
+2011-01-07  Peter Stephenson  <pws@csr.com>
+
+	* Mikael: 28585: Completion/Unix/Command/_mkdir: don't set ret=0
+	when _wanted fails to find any matches.
+
 2011-01-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Src/utils.c: fix argument type for write_loop().
@@ -14061,5 +14066,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5173 $
+* $Revision: 1.5174 $
 *****************************************************
