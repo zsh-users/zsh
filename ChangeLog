@@ -1,5 +1,8 @@
 2011-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 28544: Src/Makefile.in, Makemod.in.in: another way of handling
+	bad dependencies for 'make prep' as in 28541.
+
 	* gi1242+zsh@gmail.com: 28594 (with changes as in 28598):
 	Completion/Linux/Command/.distfiles,
 	Completion/Linux/Command/_modutils,
@@ -14085,5 +14088,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5176 $
+* $Revision: 1.5177 $
 *****************************************************
