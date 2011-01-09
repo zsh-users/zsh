@@ -25,6 +25,7 @@ case $service in
       '-depth:depth' \
       '-passwd:file:_files' \
       '(1)-listen:display number' \
+      '-via:host:_hosts' \
       '(-listen)1::display:_x_display'
   ;;
 esac

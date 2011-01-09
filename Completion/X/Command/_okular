@@ -1,0 +1,10 @@
+#compdef okular
+local extns
+
+extns="{pdf,ps,eps,dvi}(.gz|.bz2)(#c,1)|djvu|tiff|chm|cbr|cbz"
+
+_arguments \
+  '(-p --page)'{-p,--page}'[Page of the document to be shown]:page: ' \
+  '--presentation[Start the document in presentation mode]' \
+  '--unique[Unique instance control]' \
+  "*:Okular documents:_files -g '*.(#i)($extns)(-.)'"

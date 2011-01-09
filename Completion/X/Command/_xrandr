@@ -1,4 +1,11 @@
 #compdef xrandr
+local context state line
+typeset -A opt_args
+local outputs modes expl
+
+# User configurable. TODO -- styles?
+outputs=(LVDS1 TV1 VGA1)
+modes=(1280x800 1024x768 800x600 640x480)
 
 _arguments \
   '(-d -display)'{-d,-display}':X display:_x_display' \
@@ -6,28 +13,50 @@ _arguments \
   '(-o --orientation)'{-o,--orientation}':rotation:(normal inverted left right 0 1 2 3)' \
   '(-q --query)'{-q,--query}'[display current state]' \
   '(-s --size)'{-s,--size}':size:' \
-  '(-r --rate --refresh)'{-r,--rate,--refresh}':target refresh rate:' \
+  '(-r --rate --refresh)'{*-r,*--rate,*--refresh}':target refresh rate:' \
   '(-v --version)'{-v,--version}'[display version]' \
   '-x[reflect across X axis]' \
   '-y[reflect across Y axis]' \
   '--screen:X screen number' \
   '--verbose[be more verbose]' \
   '--dryrun' \
+  '--nograb' \
   '(--prop --properties)'{--prop,--properties}'[display the contents of properties for each output]' \
   '--fb:size:' \
   '--fbmm:size:' \
   '--dpi:dpi:' \
-  '--output:output to reconfigure:' \
-  '--auto' \
-  '--mode:mode:' \
-  '--preferred' \
-  '--pos:position:' \
-  '--reflect:axes:(normal x y xy)' \
-  '--rotate:rotation:(normal inverted left right)' \
-  '--left-of:output' \
-  '--right-of:output' \
-  '--above:output' \
-  '--below:output' \
-  '--same-as:output' \
-  '--off[disable the output]' \
-  '--crtc:crtc to use:'
+  "*--output:output to reconfigure:($outputs)" \
+  '*--auto' \
+  "*--mode:mode:($modes)" \
+  '*--preferred' \
+  '*--pos:position:' \
+  '*--reflect:axes:(normal x y xy)' \
+  '*--rotate:rotation:(normal inverted left right)' \
+  "*--left-of:relative position to:($outputs)" \
+  "*--right-of:relative position to:($outputs)" \
+  "*--above:relative position to:($outputs)" \
+  "*--below:relative position to:($outputs)" \
+  "*--same-as:relative position to:($outputs)" \
+  '*--set:property:(Backlight scaling\ mode):value:->value' \
+  '*--scale:output scaling:' \
+  '*--transform:transformation matrix:' \
+  '*--off[disable the output]' \
+  '*--crtc:crtc to use:' \
+  '*--panning:panning:' \
+  '*--gamma:r\:g\:b:' \
+  '*--primary' \
+  '--noprimary' \
+  '*--newmode:name: :clock MHz: :hdisp: :hsync-start: :hsync-end: :htotal: :vdisp: :vsync-start: :vsync-end: :vtotal:' \
+  '*--rmmode:Mode name:' \
+  "*--addmode:output:($outputs):name:" \
+  "*--delmode:output:($outputs):name:" \
+  && return 0
+
+if [[ $state == value ]]; then
+    case $words[CURRENT-1] in
+	(scaling* mode)
+	    _description value expl "output property 'scaling mode'"
+	    compadd "$@" "$expl[@]" None Full Center Full\ aspect && return 0
+	    ;;
+    esac
+fi

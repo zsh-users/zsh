@@ -34,7 +34,7 @@ _arguments \
   '--arguments=:ghostscript arguments:' \
   '--page=:label of first page:' \
   '--media=:page size:(Letter Legal Statement Tabloid Ledger Folio Quarto 10x14 Executive A3 A4 A5 B4 B5)' \
-  '--orientation=:orientation:' \
+  '--orientation=:orientation:(landscape seascape upsidedown portrait)' \
   '--scale=:scale entry:' \
   '--scalebase=:scale base:' \
   '--ad=:resource file:_files' \

@@ -1,3 +1,19 @@
+2011-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* gi1242+zsh@gmail.com: 28594 (with changes as in 28598):
+	Completion/Linux/Command/.distfiles,
+	Completion/Linux/Command/_modutils,
+	Completion/Linux/Command/_wpa_cli,
+	Completion/Unix/Command/.distfiles, Completion/Unix/Command/_lp,
+	Completion/Unix/Command/_pgrep,
+	Completion/Unix/Command/_subversion,
+	Completion/Unix/Command/_unison,
+	Completion/Unix/Command/_xournal, Completion/Unix/Type/_pdf,
+	Completion/X/Command/.distfiles, Completion/X/Command/_gv,
+	Completion/X/Command/_okular, Completion/X/Command/_pdftk,
+	Completion/X/Command/_vnc, Completion/X/Command/_xrandr: Various
+	new and improved completions.
+
 2011-01-07  Peter Stephenson  <pws@csr.com>
 
 	* 28590 (added a comment): Src/builtin.c, Test/B04read.ztst:
@@ -14069,5 +14085,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5175 $
+* $Revision: 1.5176 $
 *****************************************************

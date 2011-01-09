@@ -4,6 +4,12 @@ _svn () {
   local curcontext="$curcontext" state line expl ret=1
   typeset -A opt_args
 
+  local update_policy
+  zstyle -s ":completion:*:*:$service:*" cache-policy update_policy
+  if [[ -z "$update_policy" ]]; then
+    zstyle ":completion:*:*:$service:*" cache-policy _svn_caching_policy
+  fi
+
   _arguments -C \
     '(-)--help[print help information]' \
     '(- *)--version[print client version information]' \
@@ -12,9 +18,12 @@ _svn () {
 
   if [[ -n $state ]] && (( ! $+_svn_cmds )); then
     typeset -gHA _svn_cmds
-    _svn_cmds=(
-      ${=${(f)${${"$(LC_ALL=C _call_program commands svn help)"#l#*Available subcommands:}%%Subversion is a tool*}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
-    )
+    if ! _cache_invalid svn_cmds && ! _retrieve_cache svn_cmds; then 
+      _svn_cmds=(
+	${=${(f)${${"$(LC_ALL=C _call_program commands svn help)"#l#*Available subcommands:}%%Subversion is a tool*}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
+      )
+      _store_cache svn_cmds _svn_cmds
+    fi
   fi
 
   case $state in
@@ -29,10 +38,20 @@ _svn () {
       if (( $#cmd )); then
         curcontext="${curcontext%:*:*}:svn-${cmd}:"
 
-        usage=${${(M)${(f)"$(LC_ALL=C _call_program options svn help $cmd)"}:#usage:*}#usage:*$cmd] }
-        args=(
-          ${=${${${(M)${(f)"$(LC_ALL=C _call_program options svn help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}
-        )
+	if ! _cache_invalid svn-${cmd}-usage && \
+	    ! _retrieve_cache svn-${cmd}-usage;
+	then
+	  usage=${${(M)${(f)"$(LC_ALL=C _call_program options svn help $cmd)"}:#usage:*}#usage:*$cmd] }
+	  _store_cache svn-${cmd}-usage usage
+	fi
+	if ! _cache_invalid svn-${cmd}-usage && \
+	    ! _retrieve_cache svn-${cmd}-args;
+	then
+	  args=(
+	    ${=${${${(M)${(f)"$(LC_ALL=C _call_program options svn help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}
+	  )
+	  _store_cache svn-${cmd}-args args
+	fi
 
         case $cmd in;
           (add)
@@ -296,5 +315,14 @@ _subversion () {
     (svnadmin) _svnadmin "$@" ;;
   esac
 }
+
+_svn_caching_policy() {
+  # Rebuild every week
+  local -a oldp
+
+  oldp=( "$1"(Nmw+1) )
+  (( $#oldp ))
+}
+
 
 _subversion "$@"

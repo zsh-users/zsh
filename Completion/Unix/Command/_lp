@@ -1,52 +1,219 @@
-#compdef lp lpr lpq lprm
+#compdef lp lpr lpq lprm lpoptions lpstat
 
 local expl ret=1 printer list disp strs shown
 
-if compset -P '-[dP]' || [[ "$words[CURRENT-1]" = -[dP] ]]; then
-  _printers
-else
-  if [[ "$service" = (lpq|lprm) ]]; then
-    if [[ "$words" = *-P* ]]; then
-      printer=(-P "${${words##*-P( |)}%% *}")
-    else
-      printer=()
-    fi
-    list=( ${(M)"${(f@)$(_call_program jobs lpq $printer 2> /dev/null)}":#[0-9]*} )
+_lp_get_printer()
+{
+  # No reason to call _lp_get_printer when service == lpstat. Others matched
+  # below.
+  case $service in
+    (lpr|lpq|lprm)
+      [[ "$words" == (#I)*-P* ]] && printer="${${words##*(#I)-P( |)}%% *}"
+      ;;
+    (lp)
+      [[ "$words" == (#I)*-d* ]] && printer="${${words##*(#I)-d( |)}%% *}"
+      ;;
+    (lpoptions)
+      [[ "$words" == (#I)*-(d|p)* ]] && \
+	printer="${${words##*(#I)-(d|p)( |)}%% *}"
+      ;;
+  esac
+}
 
-    if (( $#list )); then
-      _tags users jobs
+_lp_job_options()
+{
+  local -a lopts_with_args lopts_no_args
 
-      while _tags; do
-        if _requested users; then
-          strs=( "${(@)${(@)list##[^ 	]##[ 	]##[^ 	]##[ 	]##}%%[ 	]*}" )
-          if [[ -z "$shown" ]] &&
-             zstyle -T ":completion:${curcontext}:users" verbose; then
-            disp=(-ld list)
-  	  shown=yes
-          else
-  	  disp=()
-          fi
-	  _all_labels users expl user compadd "$disp[@]" -a strs ||
-              _users && ret=0
-        fi
-        if _requested jobs; then
-          strs=( "${(@)${(@)list##[^ 	]##[ 	]##[^ 	]##[ 	]##[^ 	]##[ 	]##}%%[ 	]*}" )
-          if [[ -z "$shown" ]] &&
-             zstyle -T ":completion:${curcontext}:jobs" verbose; then
-            disp=(-ld list)
-  	  shown=yes
-          else
-  	  disp=()
-          fi
-          _all_labels jobs expl job compadd "$disp[@]" -a strs && ret=0
-        fi
-        (( ret )) || return 0
-      done
-    else
-      _message 'no print jobs'
-    fi
-    return 1
+  # Generic options (from lp manual page)
+  lopts_with_args=( media orientation-requested sides number-up scaling cpi lpi
+    page-{bottom,left,right,top} )
+
+  lopts_no_args=(fitplot landscape)
+
+  _lp_get_printer
+  [[ -n "$printer" ]] && printer=(-p $printer)
+
+  # The program specified by the style list-printer-options should list jobs in
+  # the same style as lpoptions -l.
+  if compset -P '*='; then
+    # List values for the option
+    case ${IPREFIX%=} in
+      (media)
+	compadd "$@" a4 letter legal
+	;;
+      (orientation-requested)
+	compadd "$@" 4
+	;;
+      (sides)
+	compadd "$@" one-sided two-sided-{long,short}-edge
+	;;
+      (number-up)
+	_description -V option-o-1 expl "pages per sheet"
+	compadd "$expl[@]" 2 4 6 9 16
+	;;
+      (scaling|cpi|lpi|page-(bottom|left|right|top))
+	return 0; # Don't complete anything
+	;;
+      (*)
+	compadd "$@" \
+	  $(_call_program list-printer-options lpoptions $printer -l | \
+	    grep "^${IPREFIX%=}" | cut -d: -f2 | tr -d \* )
+	;;
+    esac
   else
-    _pspdf
+    # List options
+    local eq_suffix
+
+    # Don't add an '=' suffix when completing lpoptions -r
+    if [[ $service == lpoptions && $words[CURRENT-1] == "-r" ]]; then
+      eq_suffix=()
+    else
+      eq_suffix=(-S '=')
+    fi
+
+    _description lpopts expl "generic printer options"
+    compadd "$expl[@]" $eq_suffix $lopts_with_args
+    compadd "$expl[@]" $lopts_no_args
+
+    _description printeropts expl "printer specific options"
+    compadd "$expl[@]" $eq_suffix \
+      $(_call_program list-printer-options \
+	lpoptions $printer -l | cut -d/ -f1)
   fi
-fi
+}
+
+_lp_list_jobs()
+{
+  _lp_get_printer
+  [[ -n "$printer" ]] && printer=(-P $printer)
+
+  list=( ${(M)"${(f@)$(_call_program jobs lpq $printer 2> /dev/null)}":#[0-9]*} )
+
+  if (( $#list )); then
+    _tags users jobs
+
+    while _tags; do
+      if _requested users; then
+	strs=( "${(@)${(@)list##[^ 	]##[ 	]##[^ 	]##[ 	]##}%%[ 	]*}" )
+	if [[ -z "$shown" ]] &&
+	   zstyle -T ":completion:${curcontext}:users" verbose;
+	then
+	  disp=(-ld list)
+	  shown=yes
+	else
+	  disp=()
+	fi
+	_all_labels users expl user compadd "$disp[@]" -a strs ||
+	    _users && ret=0
+      fi
+      if _requested jobs; then
+	strs=( "${(@)${(@)list##[^ 	]##[ 	]##[^ 	]##[ 	]##[^ 	]##[ 	]##}%%[ 	]*}" )
+	if [[ -z "$shown" ]] &&
+	   zstyle -T ":completion:${curcontext}:jobs" verbose; then
+	  disp=(-ld list)
+	shown=yes
+	else
+	disp=()
+	fi
+	_all_labels jobs expl job compadd "$disp[@]" -a strs && ret=0
+      fi
+      (( ret )) || return 0
+    done
+  else
+    _message 'no print jobs'
+  fi
+  return 1
+}
+
+case $service in
+  (lpq)
+    _arguments \
+      '-E[Force encryption]' \
+      '-U:username (for connection to server):_users' \
+      '-h:alternate server:_hosts' \
+      '(-a)-P+[destination printer]:printers:_printers' \
+      '(-P)-a[all printers]' \
+      '-l[long listing]' \
+      '*:poll interval (+seconds):'
+    ;;
+
+  (lprm)
+    _arguments \
+      '-E[Force encryption]' \
+      '-U:username (for connection to server):_users' \
+      '-h:alternate server:_hosts' \
+      '-P+[destination printer]:printers:_printers' \
+      '*:job ids:_lp_list_jobs'
+    ;;
+
+  (lpoptions)
+    _arguments \
+      '-E[Force encryption]' \
+      '-U:username (for connection to server):_users' \
+      '-h:alternate server:_hosts' \
+      '(-p -l -r -x)-d[set default printer]:printers:_printers' \
+      '(-l -x)*-o:job options:_lp_job_options' \
+      '(-d -x)-p[destination printer for options]:printers:_printers' \
+      '(-d -o -r -x)-l[list options]' \
+      '(-d -l -x)*-r:remove option:_lp_job_options' \
+      '(-d -l -r -o)-x[remove all options]:printers:_printers'
+    ;;
+
+  (lpstat)
+    _arguments \
+      '-E[Force encryption]' \
+      '-R[Shows print job ranking]' \
+      '-U:username (for connection to server):_users' \
+      '-W:which jobs:(completed not-completed)' \
+      '-a[Show accepting state]:printers:_printers' \
+      '-c:printer classes:' \
+      '-d[Show current default destination]' \
+      '-h:hostname (alternate server):_hosts' \
+      '-l[long listing]' \
+      '-o[destinations]:printers:_printers' \
+      '-p:printers:_printers' \
+      '-r[CUPS server running status]' \
+      '-s[Status summary]' \
+      '-t[All status info]' \
+      '-u[list jobs by users]:users:_users' \
+      '-v[show devices]:printers:_printers'
+    ;;
+
+  (lpr)
+    _arguments \
+      '-E[Force encryption]' \
+      '-H:hostname (alternate server):_hosts' \
+      '(-C -J -T)'-{C,J,T}':job name:' \
+      '-P+[destination printer]:printers:_printers' \
+      '-U:username (for connection to server):_users' \
+      '-#[Copies]:copies (1--100):' \
+      '-h[Disables banner printing]' \
+      '-l[raw file]' \
+      '-m[Send an email on job completion]' \
+      '*-o:print job options:_lp_job_options' \
+      '-p[format with shaded header incl. date, time etc.]' \
+      '-q[Hold job for printing.]' \
+      '-r[delete files after printing]' \
+      '*:PS/PDF files:_pspdf'
+    ;;
+
+  (lp)
+    _arguments \
+      '-E[Force encryption]' \
+      '-U[username (for connection to server)]:username:_users' \
+      '-c[(OBSOLETE) copy to spool dir before printing]' \
+      '-d[destination printer]:printers:_printers' \
+      '-h:hostname (alternate server):_hosts' \
+      '-i[job id to modify]:job id:' \
+      '-m[Send an email on job completion]' \
+      '-n[Copies]:copies (1--100):' \
+      '*-o:print job options:_lp_job_options' \
+      '-q[Job priority -- 1 (lowest) to 100 (highest)]:priority:' \
+      '-s[Dont report resulting job IDs]' \
+      '-t[Sets the job name]:job name:' \
+      '-u[job submission username]:username:_users' \
+      '-H[Time to print]:print time (or enter hh\:mm):(hold immediate restart resume)' \
+      '-P:page range list:' \
+      '*:PS/PDF files:_pspdf'
+    ;;
+esac

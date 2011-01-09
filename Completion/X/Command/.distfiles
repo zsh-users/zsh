@@ -4,6 +4,8 @@ _acroread       _dcop
 _gnome-gv       _gqview         _gv             _kfmclient
 _mozilla        _mplayer        _nautilus
 _nedit          _netscape
+_okular
+_pdftk
 _qiv            
 _setxkbmap
 _urxvt          _vnc

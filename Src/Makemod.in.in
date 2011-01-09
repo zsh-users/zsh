@@ -116,8 +116,9 @@ prep:
 	done
 .PHONY: prep
 
-headers prep: $(dir_src)/modules.stamp
+headers: $(dir_src)/modules.stamp
 $(dir_src)/modules.stamp: $(MDDS)
+	$(MAKE) -f $(makefile) $(MAKEDEFS) prep
 	echo 'timestamp for *.mdd files' > $@
 .PHONY: headers
 

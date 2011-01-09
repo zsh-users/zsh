@@ -1,7 +1,22 @@
 #compdef lsmod modinfo modprobe rmmod insmod
 
+_modules_caching_policy()
+{
+  # Rebuild every week, or if $modules_dir is newer than the cache
+  local -a oldp
+
+  oldp=( "$1"(Nmw+1) )
+  (( $#oldp )) || [[ $modules_dir -nt $1 ]]
+}
+
 local curcontext="$curcontext" expl state line modules ign args ret=1
 local -r modules_dir=/lib/modules
+
+local update_policy
+zstyle -s ":completion:*:*:$service:*" cache-policy update_policy
+if [[ -z "$update_policy" ]]; then
+  zstyle ":completion:*:*:$service:*" cache-policy _modules_caching_policy
+fi
 
 args=(
   '(-)'{-V,--version}'[print version]'
@@ -39,6 +54,7 @@ case "$service" in
       "(-v --verbose $ign)"{-v,--verbose}'[print all commands as executed]' \
       '(-C --config)'{-C,--config}'[specify config file]:config file:_files' \
       "(-r --remove -l --list -t --type -a --all $ign)"{-r,--remove}'[remove module (stacks)]' \
+      "(-l --list -t --type -a --all $ign)"{'-i[ignore install/remove commands in config file]','--ignore-install[ignore install commands in config file]','--ignore-remove[ignore remove commands in config file]'} \
       "(* -l --list -r --remove $ign)"{-l,--list}'[list matching modules]' \
       "(-c $ign)1:modules:->loadable_modules" \
       "(-c -l --list -t --type $ign)*:params:->params" && ret=0
@@ -87,7 +103,13 @@ case "$state" in
     else
       kver=$(uname -r)
     fi
-    modules=( $modules_dir/$kver/(*~(source|build))/**/*(.:t:r) )
+    if [[ -z $modules ]] && ! _cache_invalid modules-$kver && \
+      ! _retrieve_cache modules-$kver;
+    then 
+      # 2011-01-02 gi1242: Do we need .o files? Or is .ko enough?
+      modules=( $modules_dir/$kver/(*~(source|build))/**/*.(o|ko)(.:t:r) )
+      _store_cache modules-$kver modules
+    fi
 
     if [[ $state = loadable_modules ]]; then
         modules=( ${modules:#(${(j:|:)~${=loaded_modules//_/-}})} )
