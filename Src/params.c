@@ -1055,6 +1055,14 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
     zlong num = 1, beg = 0, r = 0, quote_arg = 0;
     Patprog pprog = NULL;
 
+    /*
+     * If in NO_EXEC mode, the parameters won't be set up
+     * properly, so there's no point even doing any sanity checking.
+     * Just return 0 now.
+     */
+    if (unset(EXECOPT))
+	return 0;
+
     ishash = (v->pm && PM_TYPE(v->pm->node.flags) == PM_HASHED);
     if (prevcharlen)
 	*prevcharlen = 1;
@@ -2230,6 +2238,8 @@ export_param(Param pm)
 mod_export void
 setstrvalue(Value v, char *val)
 {
+    if (unset(EXECOPT))
+	return;
     if (v->pm->node.flags & PM_READONLY) {
 	zerr("read-only variable: %s", v->pm->node.nam);
 	zsfree(val);
@@ -2361,6 +2371,8 @@ setnumvalue(Value v, mnumber val)
 {
     char buf[BDIGBUFSIZE], *p;
 
+    if (unset(EXECOPT))
+	return;
     if (v->pm->node.flags & PM_READONLY) {
 	zerr("read-only variable: %s", v->pm->node.nam);
 	return;
@@ -2398,6 +2410,8 @@ setnumvalue(Value v, mnumber val)
 mod_export void
 setarrvalue(Value v, char **val)
 {
+    if (unset(EXECOPT))
+	return;
     if (v->pm->node.flags & PM_READONLY) {
 	zerr("read-only variable: %s", v->pm->node.nam);
 	freearray(val);
@@ -2808,6 +2822,8 @@ sethparam(char *s, char **val)
 	errflag = 1;
 	return NULL;
     }
+    if (unset(EXECOPT))
+	return;
     queue_signals();
     if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING)))
 	createparam(t, PM_HASHED);
@@ -2846,6 +2862,8 @@ setnparam(char *s, mnumber val)
 	errflag = 1;
 	return NULL;
     }
+    if (unset(EXECOPT))
+	return;
     queue_signals();
     ss = strchr(s, '[');
     v = getvalue(&vbuf, &s, 1);

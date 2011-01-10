@@ -1,3 +1,9 @@
+2011-01-10  Peter Stephenson  <pws@csr.com>
+
+	* 28617: Src/glob.c, Src/params.c, Test/E01options.ztst: NO_EXEC
+	option was doing to much work with parameter subscripting,
+	parameter assignments, and globbing.
+
 2011-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28544: Src/Makefile.in, Makemod.in.in: another way of handling
@@ -14088,5 +14094,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5177 $
+* $Revision: 1.5178 $
 *****************************************************

@@ -1111,7 +1111,7 @@ zglob(LinkList list, LinkNode np, int nountok)
     struct globdata saved;		/* saved glob state              */
     int nobareglob = !isset(BAREGLOBQUAL);
 
-    if (unset(GLOBOPT) || !haswilds(ostr)) {
+    if (unset(GLOBOPT) || !haswilds(ostr) || unset(EXECOPT)) {
 	if (!nountok)
 	    untokenize(ostr);
 	return;

@@ -344,6 +344,15 @@
 0:NO_EXEC option
 >before
 
+  (setopt noexec
+  typeset -A hash
+  hash['this is a string'])
+0:NO_EXEC option should not attempt to parse subscripts
+
+  (setopt noexec nomatch
+  echo *NonExistentFile*)
+0:NO_EXEC option should not do globbing
+
   setopt NO_eval_lineno
   eval 'print $LINENO'
   setopt eval_lineno
