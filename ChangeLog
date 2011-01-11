@@ -1,3 +1,8 @@
+2011-01-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28611: Src/Zle/zle_move.c: remove unused special behaviour for
+	VI mark 26.
+
 2011-01-11  Peter Stephenson  <pws@csr.com>
 
 	* 28626: Doc/Zsh/func.yo: summarise differences between two
@@ -14099,5 +14104,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5179 $
+* $Revision: 1.5180 $
 *****************************************************
