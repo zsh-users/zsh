@@ -2823,7 +2823,7 @@ sethparam(char *s, char **val)
 	return NULL;
     }
     if (unset(EXECOPT))
-	return;
+	return NULL;
     queue_signals();
     if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING)))
 	createparam(t, PM_HASHED);
@@ -2863,7 +2863,7 @@ setnparam(char *s, mnumber val)
 	return NULL;
     }
     if (unset(EXECOPT))
-	return;
+	return NULL;
     queue_signals();
     ss = strchr(s, '[');
     v = getvalue(&vbuf, &s, 1);

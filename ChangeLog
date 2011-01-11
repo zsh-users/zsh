@@ -1,5 +1,7 @@
 2011-01-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Src/params.c: fix return types in 28617.
+
 	* 28611: Src/Zle/zle_move.c: remove unused special behaviour for
 	VI mark 26.
 
@@ -14104,5 +14106,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5180 $
+* $Revision: 1.5181 $
 *****************************************************
