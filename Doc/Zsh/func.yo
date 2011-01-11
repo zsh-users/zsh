@@ -348,19 +348,28 @@ enditem()
 
 findex(trap, use of)
 The functions beginning `tt(TRAP)' may alternatively be defined with the
-tt(trap) builtin:  this may be preferable for some uses, as they are then
-run in the environment of the calling process, rather than in their own
-function environment.  Apart from the difference in calling procedure and
-the fact that the function form appears in lists of functions, the forms
+tt(trap) builtin:  this may be preferable for some uses.  The forms
 
 example(TRAPNAL+LPAR()RPAR() { 
  # code
 })
 
-and
+('function traps') and
 
 example(trap '
  # code
 ' NAL)
 
-are equivalent.
+('list traps') are equivalent in most ways, the exceptions being the
+following:
+
+startitemize()
+itemiz(Function traps have all the properties of normal functions,
+appearing in the list of functions and being called with their own
+function context rather than the context where the trap was triggered.)
+itemiz(The return status from function traps is special, whereas a return
+from a list trap causes the surrounding context to return with the given
+status.)
+itemiz(Function traps are not reset within subshells, in accordance with
+zsh behaviour; list traps are reset, in accordance with POSIX behaviour.)
+enditemize()
