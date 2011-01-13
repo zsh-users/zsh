@@ -1,3 +1,7 @@
+2011-01-13  Peter Stephenson  <pws@csr.com>
+
+	* c.f. 28628: Doc/Zsh/func.yo: some extra notes on traps.
+
 2011-01-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Src/params.c: fix return types in 28617.
@@ -14106,5 +14110,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5181 $
+* $Revision: 1.5182 $
 *****************************************************

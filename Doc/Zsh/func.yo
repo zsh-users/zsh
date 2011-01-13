@@ -348,7 +348,10 @@ enditem()
 
 findex(trap, use of)
 The functions beginning `tt(TRAP)' may alternatively be defined with the
-tt(trap) builtin:  this may be preferable for some uses.  The forms
+tt(trap) builtin:  this may be preferable for some uses.  Setting a trap
+with one form removes any trap of the other form for the same signal;
+removing a trap in either form removes all traps for the same signal.
+The forms
 
 example(TRAPNAL+LPAR()RPAR() { 
  # code
@@ -371,5 +374,6 @@ itemiz(The return status from function traps is special, whereas a return
 from a list trap causes the surrounding context to return with the given
 status.)
 itemiz(Function traps are not reset within subshells, in accordance with
-zsh behaviour; list traps are reset, in accordance with POSIX behaviour.)
+zsh behaviour; list traps are reset, in accordance with POSIX
+behaviour.)
 enditemize()
