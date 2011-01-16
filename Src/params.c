@@ -1009,6 +1009,8 @@ isident(char *s)
      * definitely not a valid identifier.         */
     if (!*ss)
 	return 1;
+    if (s == ss)
+	return 0;
     if (*ss != '[')
 	return 0;
 

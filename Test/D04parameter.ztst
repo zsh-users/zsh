@@ -1401,3 +1401,7 @@
 >a
 >b
 >c
+
+   printf "%n" '[0]'
+1:Regression test for identifier test
+?(eval):1: not an identifier: [0]

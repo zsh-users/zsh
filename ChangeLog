@@ -1,3 +1,16 @@
+2011-01-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28634: Test/D04parameter.ztst: test for 28630.
+
+	* Ricky Zhou: 28630: Src/params.c: fix crash with isident.
+
+	* gi1242+zsh@gmail.com: 28629: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_lp, Completion/Unix/Command/_tex,
+	Completion/Unix/Command/_xournal,
+	Completion/Unix/Type/.distfiles, Completion/Unix/Type/_tex,
+	Completion/X/Command/.distfiles, Completion/X/Command/_xournal:
+	completion updates.
+
 2011-01-16  Clint Adams  <clint@zsh.org>
 
 	* unposted: Completion/Unix/Command/_fuser: fix typo in pattern
@@ -14114,5 +14127,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5183 $
+* $Revision: 1.5184 $
 *****************************************************
