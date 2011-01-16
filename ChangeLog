@@ -1,5 +1,12 @@
 2011-01-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 28631: gi1242+zsh@gmail.com (as in 28633):
+	Completion/Unix/Command/.distfiles, Completion/Unix/Command/_lp,
+	Completion/Unix/Command/_tex, Completion/Unix/Command/_xournal,
+	Completion/Unix/Type/.distfiles, Completion/Unix/Type/_tex,
+	Completion/X/Command/.distfiles, Completion/X/Command/_xournal:
+	various updates.
+
 	* 28634: Test/D04parameter.ztst: test for 28630.
 
 	* Ricky Zhou: 28630: Src/params.c: fix crash with isident.
@@ -14127,5 +14134,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5184 $
+* $Revision: 1.5185 $
 *****************************************************

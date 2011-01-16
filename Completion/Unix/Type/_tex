@@ -1,6 +1,0 @@
-#compdef tex latex slitex pdflatex jadetex pdfjadetex xetex=tex xelatex=latex latexmk
-
-local expl
-
-_description files expl 'TeX or LaTeX file'
-_files "$@" "$expl[@]" -g '*.(tex|TEX|texinfo|texi)(-.)'
