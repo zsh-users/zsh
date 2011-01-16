@@ -3,7 +3,7 @@
 local -a args arg1
 typeset -A opt_args
 
-if _pick_variant -c $words[1] psmisc='#(i)psmisc' unix -V; then
+if _pick_variant -c $words[1] psmisc='(#i)psmisc' unix -V; then
 
   (( $+functions[_fuser_services] )) ||
   _fuser_services() {
