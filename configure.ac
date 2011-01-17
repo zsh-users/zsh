@@ -539,6 +539,15 @@ AC_PROG_AWK                 dnl Check for mawk,gawk,nawk, then awk.
 AC_PROG_LN                  dnl Check for working ln, for "make install"
 AC_PROG_EGREP               dnl sets $EGREP to grep -E or egrep
 AC_CHECK_PROGS([YODL], [yodl], [: yodl])
+
+YODL_OPTIONS=''
+if test "x$ac_cv_prog_YODL" = xyodl; then
+    case `yodl --version` in
+      *"version 3."*) YODL_OPTIONS='-L' ;;
+    esac
+fi
+AC_SUBST(YODL_OPTIONS)
+
 AC_CHECK_PROGS([PDFETEX], [pdfetex], [: pdfetex])
 AC_CHECK_PROGS([TEXI2PDF], [texi2pdf], [])
 AC_CHECK_PROGS([TEXI2HTML], [texi2html], [])
