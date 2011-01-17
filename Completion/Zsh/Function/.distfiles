@@ -1,4 +1,5 @@
 DISTFILES_SRC='
 .distfiles
+_zargs
 _zsh-mime-handler
 '

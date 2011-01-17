@@ -1,3 +1,7 @@
+2011-01-17  Peter Stephenson  <pws@csr.com>
+
+	* Atom Smasher: users/15715: Completion/Zsh/Function/_zargs: new
+
 2011-01-16  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: Config/defs.mk.in, configure.ac: use the -L option
@@ -14139,5 +14143,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5186 $
+* $Revision: 1.5187 $
 *****************************************************
