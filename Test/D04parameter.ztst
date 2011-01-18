@@ -1405,3 +1405,8 @@
    printf "%n" '[0]'
 1:Regression test for identifier test
 ?(eval):1: not an identifier: [0]
+
+   str=rts
+   print ${str:0:}
+1:Regression test for missing length after offset
+?(eval):2: unrecognized modifier

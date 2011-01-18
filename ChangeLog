@@ -1,3 +1,7 @@
+2011-01-18  Peter Stephenson  <pws@csr.com>
+
+	* Mikael: 28637: Src/subst.c: ${foo:0:} caused crash.
+
 2011-01-17  Peter Stephenson  <pws@csr.com>
 
 	* Atom Smasher: users/15715: Completion/Zsh/Function/_zargs: new
@@ -14143,5 +14147,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5187 $
+* $Revision: 1.5188 $
 *****************************************************

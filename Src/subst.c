@@ -2814,12 +2814,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			zerr("invalid length: %s", check_offset);
 			return NULL;
 		    }
-		    length = mathevali(check_offset);
-		    if (errflag)
-			return NULL;
-		    if (length < (zlong)0) {
-			zerr("invalid length: %s", check_offset);
-			return NULL;
+                    if (check_offset) {
+			length = mathevali(check_offset);
+			if (errflag)
+			    return NULL;
+			if (length < (zlong)0) {
+			    zerr("invalid length: %s", check_offset);
+			    return NULL;
+			}
 		    }
 		}
 		if (horrible_offset_hack) {
