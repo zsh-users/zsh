@@ -1,3 +1,9 @@
+2011-01-19  Peter Stephenson  <pws@csr.com>
+
+	* 28638: Doc/Zsh/parameter.yo, Src/zsh.h,
+	Src/Modules/parameter.c, plus NEWS added: add $usergroups hash
+	mapping from user's own groups by name to GID.
+
 2011-01-18  Peter Stephenson  <pws@csr.com>
 
 	* Mikael: 28637: Src/subst.c: ${foo:0:} caused crash.
@@ -14147,5 +14153,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5188 $
+* $Revision: 1.5189 $
 *****************************************************

@@ -164,6 +164,12 @@ item(tt(userdirs))(
 This associative array maps user names to the pathnames of their home
 directories.
 )
+vindex(usergroups)
+item(tt(usergroups))(
+This associative array maps names of system groups of which the current
+user is a member to the corresponding group identifiers.  The contents
+are the same as the groups output by the tt(id) command.
+)
 vindex(funcfiletrace)
 item(tt(funcfiletrace))(
 This array contains the absolute line numbers and corresponding file

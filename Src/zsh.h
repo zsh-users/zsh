@@ -1731,6 +1731,23 @@ struct nameddir {
 #define ND_USERNAME	(1<<1)	/* nam is actually a username       */
 #define ND_NOABBREV	(1<<2)	/* never print as abbrev (PWD or OLDPWD) */
 
+/* Storage for single group/name mapping */
+typedef struct {
+    /* Name of group */
+    char *name;
+    /* Group identifier */
+    gid_t gid;
+} groupmap;
+typedef groupmap *Groupmap;
+
+/* Storage for a set of group/name mappings */
+typedef struct {
+    /* The set of name to gid mappings */
+    Groupmap array;
+    /* A count of the valid entries in groupmap. */
+    int num;
+} groupset;
+typedef groupset *Groupset;
 
 /* flags for controlling printing of hash table nodes */
 #define PRINT_NAMEONLY		(1<<0)

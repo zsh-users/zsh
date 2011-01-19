@@ -1820,6 +1820,141 @@ scanpmdissaliases(HashTable ht, ScanFunc func, int flags)
     scanaliases(sufaliastab, ht, func, flags, ALIAS_SUFFIX|DISABLED);
 }
 
+
+/* Functions for the usergroups special parameter */
+
+/*
+ * Get GID and names for groups of which the current user is a member.
+ */
+
+/**/
+static Groupset get_all_groups(void)
+{
+    Groupset gs = zhalloc(sizeof(*gs));
+    Groupmap gaptr;
+    gid_t *list, *lptr, egid;
+    int add_egid;
+    struct group *grptr;
+
+    egid = getegid();
+    add_egid = 1;
+    gs->num = getgroups(0, NULL);
+    if (gs->num > 0) {
+	list = zhalloc(gs->num * sizeof(*list));
+	if (getgroups(gs->num, list) < 0) {
+	    return NULL;
+	}
+
+	/*
+	 * It's unspecified whether $EGID is included in the
+	 * group set, so check.
+	 */
+	for (lptr = list; lptr < list + gs->num; lptr++) {
+	    if (*lptr == egid) {
+		add_egid = 0;
+		break;
+	    }
+	}
+	gs->array = zhalloc((gs->num + add_egid) * sizeof(*gs->array));
+	/* Put EGID if needed first */
+	gaptr = gs->array + add_egid;
+	for (lptr = list; lptr < list + gs->num; lptr++) {
+	    gaptr->gid = *lptr;
+	    gaptr++;
+	}
+	gs->num += add_egid;
+    } else {
+	/* Just use effective GID */
+	gs->num = 1;
+	gs->array = zhalloc(sizeof(*gs->array));
+    }
+    if (add_egid) {
+	gs->array->gid = egid;
+    }
+
+    /* Get group names */
+    for (gaptr = gs->array; gaptr < gs->array + gs->num; gaptr++) {
+	grptr = getgrgid(gaptr->gid);
+	if (!grptr) {
+	    return NULL;
+	}
+	gaptr->name = dupstring(grptr->gr_name);
+    }
+
+    return gs;
+}
+
+/* Standard hash element lookup. */
+
+/**/
+static HashNode
+getpmusergroups(UNUSED(HashTable ht), const char *name)
+{
+    Param pm = NULL;
+    Groupset gs = get_all_groups();
+    Groupmap gaptr;
+
+    pm = (Param)hcalloc(sizeof(struct param));
+    pm->node.nam = dupstring(name);
+    pm->node.flags = PM_SCALAR | PM_READONLY;
+    pm->gsu.s = &nullsetscalar_gsu;
+
+    if (!gs) {
+	zerr("failed to retrieve groups for user: %e", errno);
+	pm->u.str = dupstring("");
+	pm->node.flags |= PM_UNSET;
+	return &pm->node;
+    }
+
+    for (gaptr = gs->array; gaptr < gs->array + gs->num; gaptr++) {
+	if (!strcmp(name, gaptr->name)) {
+	    char buf[DIGBUFSIZE];
+
+	    sprintf(buf, "%d", (int)gaptr->gid);
+	    pm->u.str = dupstring(buf);
+	    return &pm->node;
+	}
+    }
+
+    pm->u.str = dupstring("");
+    pm->node.flags |= PM_UNSET;
+    return &pm->node;
+}
+
+/* Standard hash scan. */
+
+/**/
+static void
+scanpmusergroups(UNUSED(HashTable ht), ScanFunc func, int flags)
+{
+    struct param pm;
+    Groupset gs = get_all_groups();
+    Groupmap gaptr;
+
+    if (!gs) {
+	zerr("failed to retrieve groups for user: %e", errno);
+	return;
+    }
+
+    memset((void *)&pm, 0, sizeof(pm));
+    pm.node.flags = PM_SCALAR | PM_READONLY;
+    pm.gsu.s = &nullsetscalar_gsu;
+
+    for (gaptr = gs->array; gaptr < gs->array + gs->num; gaptr++) {
+	pm.node.nam = gaptr->name;
+	if (func != scancountparams &&
+	    ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+	     !(flags & SCANPM_WANTKEYS))) {
+	    char buf[DIGBUFSIZE];
+
+	    sprintf(buf, "%d", (int)gaptr->gid);
+	    pm.u.str = dupstring(buf);
+	}
+	func(&pm.node, flags);
+    }
+}
+
+
 /* Table for defined parameters. */
 
 struct pardef {
@@ -1926,7 +2061,9 @@ static struct paramdef partab[] = {
     SPECIALPMDEF("saliases", 0,
 	    &pmsaliases_gsu, getpmsalias, scanpmsaliases),
     SPECIALPMDEF("userdirs", PM_READONLY,
-	    NULL, getpmuserdir, scanpmuserdirs)
+	    NULL, getpmuserdir, scanpmuserdirs),
+    SPECIALPMDEF("usergroups", PM_READONLY,
+	    NULL, getpmusergroups, scanpmusergroups)
 };
 
 static struct features module_features = {

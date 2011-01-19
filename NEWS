@@ -4,6 +4,14 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes since 4.3.11
+--------------------
+
+The zsh/parameter module has a new readonly associative array
+$usergroups whose keys are the names of system groups of which the
+current user is a member and whose values are the corresponding
+group identifiers.
+
 Changes between versions 4.3.10 and 4.3.11
 ------------------------------------------
 
