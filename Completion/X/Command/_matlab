@@ -1,0 +1,19 @@
+#compdef matlab
+
+_arguments : \
+    {-h,-help}'[Display arguments.]' \
+    '(-e)-n[Display final environment variables, and exit]' \
+    '(-n)-e[Display ALL the environment variables and values, and exit]' \
+    '-arch[Start MATLAB assuming architecture arch]:architecture:' \
+    '-c[Set location of the license file]:licensefile:_files' \
+    '(-nodisplay)-display:display:_x_display' \
+    '(-display)-nodisplay[Do not display any X commands.]' \
+    '-nosplash[Do not display the splash screen during startup.]' \
+    '-mwvisual[The default X visual to use for figure windows.]:visualid:' \
+    '-debug[Provide debugging information especially for X based problems.]' \
+    '(-nodesktop -nojvm)-desktop[Allow the MATLAB desktop to be started by a process without a controlling terminal.]' \
+    '(-desktop -nojvm)-nodesktop[Do not start the MATLAB desktop.]' \
+    '(-nodesktop -desktop)-nojvm[Shut off all Java support by not starting the Java virtual machine.]' \
+    '-r[Start MATLAB and execute the MATLAB_command.]:MATLAB_command:' \
+    '-logfile[Make a copy of any output to the command window in file log.]:log file:' \
+    '-D-:debugger:_path_commands'
