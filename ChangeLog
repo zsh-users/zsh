@@ -1,3 +1,8 @@
+2011-01-24  Clint Adams  <clint@zsh.org>
+
+	* Carl Worth: 28648: Completion/Unix/Command/_notmuch: notmuch
+	completion by Ingmar Vanhassel.
+
 2011-01-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* gi1242+zsh@gmail.com: 28647: Completion/X/Command/_vnc: more
@@ -14161,5 +14166,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5190 $
+* $Revision: 1.5191 $
 *****************************************************
