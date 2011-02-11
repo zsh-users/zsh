@@ -243,6 +243,7 @@ parseargs(char **argv, char **runscript)
      * still 2 at the end, we set it to the value of INTERACTIVE.
      */
     opts[MONITOR] = 2;   /* may be unset in init_io() */
+    opts[HASHDIRS] = 2;  /* same relationship to INTERACTIVE */
     opts[SHINSTDIN] = 0;
     opts[SINGLECOMMAND] = 0;
 
@@ -351,6 +352,8 @@ parseargs(char **argv, char **runscript)
     opts[INTERACTIVE] = !!opts[INTERACTIVE];
     if (opts[MONITOR] == 2)
 	opts[MONITOR] = opts[INTERACTIVE];
+    if (opts[HASHDIRS] == 2)
+	opts[HASHDIRS] = opts[INTERACTIVE];
     pparams = x = (char **) zshcalloc((countlinknodes(paramlist) + 1) * sizeof(char *));
 
     while ((*x++ = (char *)getlinknode(paramlist)));
