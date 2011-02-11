@@ -7,5 +7,5 @@ setopt localoptions NO_shwordsplit
 [[ $1 == '--flavours' ]] && return 1
 
 VCS_INFO_check_com ${vcs_comm[cmd]} || return 1
-[[ -d ".svn" ]] && return 0
+{ [[ -f ".svn/entries" ]] || [[ -f ".svn/format" ]] } && return 0
 return 1
