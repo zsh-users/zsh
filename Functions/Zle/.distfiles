@@ -33,6 +33,7 @@ read-from-minibuffer
 replace-string
 replace-string-again
 select-word-style
+send-invisible
 smart-insert-last-word
 split-shell-arguments
 transpose-lines
