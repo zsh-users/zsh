@@ -71,8 +71,10 @@ _deb_packages_update_uninstalled () {
   _deb_packages_update_avail
   _deb_packages_update_installed
   if (( ! $+_deb_packages_cache_uninstalled )); then
+    # Package lists too large to efficiently diff with zsh expansion
     _deb_packages_cache_uninstalled=(
-      ${_deb_packages_cache_avail:#${(j:|:)~${_deb_packages_cache_installed:q}}}
+      $( print -l $_deb_packages_cache_avail |
+         fgrep -xvf =(print -l $_deb_packages_cache_installed) )
     )
   fi
   cachevar=_deb_packages_cache_uninstalled
