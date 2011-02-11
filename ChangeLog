@@ -10,6 +10,9 @@
 	parameter expansion with command substitution to speed diffing
 	of large lists of packages.
 
+	* unposted: Doc/Zsh/contrib.yo: add send-invisible.  Re-order
+	some other entries to restore approximate alphabetization.
+
 2011-01-24  Clint Adams  <clint@zsh.org>
 
 	* Carl Worth: 28648: Completion/Unix/Command/_notmuch: notmuch
@@ -14178,5 +14181,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5192 $
+* $Revision: 1.5193 $
 *****************************************************

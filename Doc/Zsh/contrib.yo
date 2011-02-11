@@ -1771,22 +1771,6 @@ The tt(word-context) style is implemented by the function
 tt(match-word-context).  This should not usually need to be called
 directly.
 )
-tindex(delete-whole-word-match)
-item(tt(delete-whole-word-match))(
-This is another function which works like the tt(-match) functions
-described immediately above, i.e. using styles to decide the word
-boundaries.  However, it is not a replacement for any existing function.
-
-The basic behaviour is to delete the word around the cursor.  There is no
-numeric prefix handling; only the single word around the cursor is
-considered.  If the widget contains the string tt(kill), the removed text
-will be placed in the cutbuffer for future yanking.  This can be obtained
-by defining tt(kill-whole-word-match) as follows:
-
-example(zle -N kill-whole-word-match delete-whole-word-match)
-
-and then binding the widget tt(kill-whole-word-match).
-)
 tindex(copy-earlier-word)
 item(tt(copy-earlier-word))(
 This widget works like a combination of tt(insert-last-word) and
@@ -1817,6 +1801,33 @@ little typing as possible.
 This widget allows the cursor to be easily moved to the other interesting
 spots.  It can be invoked repeatedly to cycle between all positions
 reported by the completion system.
+)
+tindex(delete-whole-word-match)
+item(tt(delete-whole-word-match))(
+This is another function which works like the tt(-match) functions
+described immediately above, i.e. using styles to decide the word
+boundaries.  However, it is not a replacement for any existing function.
+
+The basic behaviour is to delete the word around the cursor.  There is no
+numeric prefix handling; only the single word around the cursor is
+considered.  If the widget contains the string tt(kill), the removed text
+will be placed in the cutbuffer for future yanking.  This can be obtained
+by defining tt(kill-whole-word-match) as follows:
+
+example(zle -N kill-whole-word-match delete-whole-word-match)
+
+and then binding the widget tt(kill-whole-word-match).
+)
+tindex(down-line-or-beginning-search)
+tindex(up-line-or-beginning-search)
+item(tt(up-line-or-beginning-search), tt(down-line-or-beginning-search))(
+These widgets are similar to the builtin functions tt(up-line-or-search)
+and tt(down-line-or-search):  if in a multiline buffer they move up or
+down within the buffer, otherwise they search for a history line matching
+the start of the current line.  In this case, however, they search for
+a line which matches the current line up to the current cursor position, in
+the manner of tt(history-beginning-search-backward) and tt(-forward), rather
+than the first word on the line.
 )
 tindex(edit-command-line)
 item(tt(edit-command-line))(
@@ -1889,17 +1900,6 @@ example immediately above:
 example(autoload -U history-pattern-search
 zle -N history-pattern-search-backward history-pattern-search
 zle -N history-pattern-search-forward history-pattern-search)
-)
-tindex(up-line-or-beginning-search)
-tindex(down-line-or-beginning-search)
-item(tt(up-line-or-beginning-search), tt(down-line-or-beginning-search))(
-These widgets are similar to the builtin functions tt(up-line-or-search)
-and tt(down-line-or-search):  if in a multiline buffer they move up or
-down within the buffer, otherwise they search for a history line matching
-the start of the current line.  In this case, however, they search for
-a line which matches the current line up to the current cursor position, in
-the manner of tt(history-beginning-search-backward) and tt(-forward), rather
-than the first word on the line.
 )
 tindex(incarg)
 vindex(incarg, use of)
@@ -2130,6 +2130,17 @@ into the command line.
 
 example(bindkey '^Xf' insert-files)
 )
+tindex(insert-unicode-char)
+item(tt(insert-unicode-char))(
+When first executed, the user inputs a set of hexadecimal digits.
+This is terminated with another call to tt(insert-unicode-char).
+The digits are then turned into the corresponding Unicode character.
+For example, if the widget is bound to tt(^XU), the character sequence
+`tt(^XU 4 c ^XU)' inserts tt(L) (Unicode U+004c).
+
+See tt(insert-composed-char) for a way of inserting characters
+using a two-character mnemonic.
+)
 tindex(narrow-to-region)
 tindex(narrow-to-region-invisible)
 xitem(tt(narrow-to-region [ -p) var(pre) tt(] [ -P) var(post) tt(]))
@@ -2186,17 +2197,6 @@ narrow-to-region -p $'Editing restricted region\n' \
   -P '' -S state
 zle recursive-edit
 narrow-to-region -R state)
-)
-tindex(insert-unicode-char)
-item(tt(insert-unicode-char))(
-When first executed, the user inputs a set of hexadecimal digits.
-This is terminated with another call to tt(insert-unicode-char).
-The digits are then turned into the corresponding Unicode character.
-For example, if the widget is bound to tt(^XU), the character sequence
-`tt(^XU 4 c ^XU)' inserts tt(L) (Unicode U+004c).
-
-See tt(insert-composed-char) for a way of inserting characters
-using a two-character mnemonic.
 )
 tindex(predict-on)
 tindex(predict-off)
@@ -2324,6 +2324,25 @@ The range of the replacement string can be limited by using the
 tt(narrow-to-region-invisible) widget.  One limitation of the current
 version is that tt(undo) will cycle through changes to the replacement
 and source strings before undoing the replacement itself.
+)
+tindex(send-invisible)
+item(tt(send-invisible))(
+This is similar to read-from-minibuffer in that it may be called as a
+function from a widget or as a widget of its own, and interactively reads
+input from the keyboard.  However, the input being typed is concealed and
+a string of asterisks (`tt(*)') is shown instead.  The value is saved in
+the paramter tt($INVISIBLE) to which a reference is inserted into the
+editing buffer at the restored cursor position.  If the read was aborted
+by a keyboard break (typically tt(^G)) or another escape from editing such
+as tt(push-line), the function returns status 1, tt($INVISIBLE) is set to
+empty, and the original buffer is restored unchanged.
+
+If one argument is supplied to the function it is taken as a prompt,
+otherwise `tt(Non-echoed text: )' is used (as in emacs).  If a second and
+third argument are supplied they are used to begin and end the reference
+to tt($INVISIBLE) that is inserted into the buffer.  The default is to
+open with tt(${), then tt(INVISIBLE), and close with tt(}), but many
+other effects are possible.
 )
 tindex(smart-insert-last-word)
 item(tt(smart-insert-last-word))(
