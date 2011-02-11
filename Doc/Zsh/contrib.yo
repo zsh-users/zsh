@@ -2334,8 +2334,8 @@ a string of asterisks (`tt(*)') is shown instead.  The value is saved in
 the paramter tt($INVISIBLE) to which a reference is inserted into the
 editing buffer at the restored cursor position.  If the read was aborted
 by a keyboard break (typically tt(^G)) or another escape from editing such
-as tt(push-line), the function returns status 1, tt($INVISIBLE) is set to
-empty, and the original buffer is restored unchanged.
+as tt(push-line), tt($INVISIBLE) is set to empty and the original buffer
+is restored unchanged.
 
 If one argument is supplied to the function it is taken as a prompt,
 otherwise `tt(Non-echoed text: )' is used (as in emacs).  If a second and
