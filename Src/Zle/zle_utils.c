@@ -1085,8 +1085,10 @@ mkundoent(void)
     struct change *ch;
 
     UNMETACHECK();
-    if(lastll == zlell && !ZS_memcmp(lastline, zleline, zlell))
+    if(lastll == zlell && !ZS_memcmp(lastline, zleline, zlell)) {
+	lastcs = zlecs;
 	return;
+    }
     for(pre = 0; pre < sh && zleline[pre] == lastline[pre]; )
 	pre++;
     for(suf = 0; suf < sh - pre &&
