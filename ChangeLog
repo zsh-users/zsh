@@ -1,3 +1,15 @@
+2011-02-10  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* users/15759 (slightly augmented): Functions/Zle/send-invisible,
+	Functions/Zle/.distfiles: widget to read a concealed string from
+	the keyboard and stash it in $INVISIBLE.
+
+	* users/15770: Src/init.c: disable HASH_DIRS when not interactive.
+
+	* 28710: Completion/Debian/Type/_deb_packages: replace complex
+	parameter expansion with command substitution to speed diffing
+	of large lists of packages.
+
 2011-01-24  Clint Adams  <clint@zsh.org>
 
 	* Carl Worth: 28648: Completion/Unix/Command/_notmuch: notmuch
@@ -14166,5 +14178,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5191 $
+* $Revision: 1.5192 $
 *****************************************************
