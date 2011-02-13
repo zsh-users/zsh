@@ -1,3 +1,11 @@
+2011-02-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28750 with some extra comments:
+	Completion/Unix/Type/_path_files: separate out completeinword
+	handling where the current component is not the last but is
+	the first from the already handled case where there is a further
+	component in front.
+
 2011-02-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28671: Src/Zle/zle_utils.c: better cursor positioning
@@ -14195,5 +14203,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5196 $
+* $Revision: 1.5197 $
 *****************************************************
