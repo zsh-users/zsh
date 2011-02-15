@@ -1,3 +1,7 @@
+2011-02-15  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 28758: Functions/Misc/colors: work with non-default option sets.
+
 2011-02-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28750 with some extra comments:
@@ -14203,5 +14207,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5197 $
+* $Revision: 1.5198 $
 *****************************************************
