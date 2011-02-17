@@ -3218,10 +3218,14 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			_exit(1);
 		}
 		closem(FDT_INTERNAL);
-		if (coprocin)
+		if (coprocin != -1) {
 		    zclose(coprocin);
-		if (coprocout)
+		    coprocin = -1;
+		}
+		if (coprocout != -1) {
 		    zclose(coprocout);
+		    coprocout = -1;
+		}
 #ifdef HAVE_GETRLIMIT
 		if (!forked)
 		    setlimits(NULL);

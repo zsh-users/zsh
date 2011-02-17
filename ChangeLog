@@ -1,3 +1,8 @@
+2011-02-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28762: Src/exec.c: logic for closing coproc file descriptors
+	was wrong.
+
 2011-02-15  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 28758: Functions/Misc/colors: work with non-default option sets.
@@ -14207,5 +14212,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5198 $
+* $Revision: 1.5199 $
 *****************************************************
