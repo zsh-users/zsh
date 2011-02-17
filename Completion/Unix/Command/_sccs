@@ -109,7 +109,9 @@ case $service in
   sact|print) _sccs_files;;
   create|enter) _files;;
   deledit|delget|delta)
-    _arguments '-s[silent]' '-y+[specify delta commentary]:comment'
+    _arguments "$sfiles" \
+	'-s[silent]' \
+	'-y+[specify delta commentary]:comment' \
   ;;
   diffs)
     _diff_options diff "$sfiles" "$ropt" "$copt" \
