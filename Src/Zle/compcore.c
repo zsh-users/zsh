@@ -1395,8 +1395,6 @@ set_comp_sep(void)
     LinkNode n;
     /* Save word position */
     int owe = we, owb = wb;
-    /* Save cursor position and line length */
-    int ocs, oll;
     /*
      * Values of word beginning and end and cursor after subtractions
      * due to separators.   I think these are indexes into zlemetaline,
@@ -1481,8 +1479,7 @@ set_comp_sep(void)
 
     /* Put the string in the lexer buffer and call the lexer to *
      * get the words we have to expand.                        */
-    ocs = zlemetacs;
-    oll = zlemetall;
+    zle_save_positions();
     ol = zlemetaline;
     addedx = 1;
     noerrs = 1;
@@ -1639,9 +1636,8 @@ set_comp_sep(void)
     lexrestore();
     wb = owb;
     we = owe;
-    zlemetacs = ocs;
     zlemetaline = ol;
-    zlemetall = oll;
+    zle_restore_positions();
     if (cur < 0 || i < 1)
 	return 1;
     owb = offs;

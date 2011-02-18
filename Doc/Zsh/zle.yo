@@ -842,10 +842,7 @@ specifies that the first twenty characters of the text including
 any predisplay string should be highlighted in bold.
 
 Note that the effect of tt(region_highlight) is not saved and disappears
-as soon as the line is accepted.  The line editor makes no attempt to
-keep the highlighting effect synchronised with the line as it is edited;
-hence region highlighting is best limited to static effects within
-user widgets.
+as soon as the line is accepted.
 )
 vindex(WIDGET)
 item(tt(WIDGET) (scalar))(

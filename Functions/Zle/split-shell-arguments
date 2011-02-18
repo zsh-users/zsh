@@ -15,7 +15,7 @@ local -a bufwords lbufwords
 local word
 integer pos=1 cpos=$((CURSOR+1)) opos iword ichar
 
-bufwords=(${(z)BUFFER})
+bufwords=(${(Z+n+)BUFFER})
 
 reply=()
 while [[ ${BUFFER[pos]} = [[:space:]] ]]; do

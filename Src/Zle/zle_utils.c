@@ -179,6 +179,8 @@ zlecharasstring(ZLE_CHAR_T inchar, char *buf)
  * string length, without the NULL byte.
  *
  * If outcsp is non-NULL, assign the new character position.
+ * If outcsp is &zlemetacs, update the positions in the region_highlight
+ * array, too.  This is a bit of a hack.
  *
  * If useheap is 1, memory is returned from the heap, else is allocated
  * for later freeing.
@@ -190,6 +192,7 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 		int *outcsp, int useheap)
 {
     int outcs, outll;
+    struct region_highlight *rhp;
 
 #ifdef MULTIBYTE_SUPPORT
     char *s;
@@ -201,9 +204,22 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 
     outcs = 0;
     memset(&mbs, 0, sizeof(mbs));
-    for (i=0; i < inll; i++, incs--) {
+    for (i=0; i < inll; i++) {
 	if (incs == 0)
 	    outcs = mb_len;
+	incs--;
+	if (region_highlights && outcsp == &zlemetacs) {
+	    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+		 rhp < region_highlights + n_region_highlights;
+		 rhp++) {
+		if (rhp->start == 0)
+		    rhp->start_meta = mb_len;
+		rhp->start--;
+		if (rhp->end == 0)
+		    rhp->end_meta = mb_len;
+		rhp->end--;
+	    }
+	}
 #ifdef __STDC_ISO_10646__
 	if (ZSH_INVALID_WCHAR_TEST(instr[i])) {
 	    s[mb_len++] = ZSH_INVALID_WCHAR_TO_CHAR(instr[i]);
@@ -222,12 +238,30 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
     }
     if (incs == 0)
 	outcs = mb_len;
+    if (region_highlights && outcsp == &zlemetacs) {
+	for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+	     rhp < region_highlights + n_region_highlights;
+	     rhp++) {
+	    if (rhp->start == 0)
+		rhp->start_meta = mb_len;
+	    if (rhp->end == 0)
+		rhp->end_meta = mb_len;
+	}
+    }
     s[mb_len] = '\0';
 
     outll = mb_len;
 #else
     outll = inll;
     outcs = incs;
+    if (region_highlights && outcsp == &zlemetacs) {
+	for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+	     rhp < region_highlights + n_region_highlights;
+	     rhp++) {
+	    rhp->start_meta = rhp->start;
+	    rhp->end_meta = rhp->end;
+	}
+    }
 #endif
 
     /*
@@ -243,11 +277,33 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 #endif
 	char *stopcs = strp + outcs;
 	char *stopll = strp + outll;
+	char *startp = strp;
 
+	if (region_highlights && outcsp == &zlemetacs) {
+	    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+		 rhp < region_highlights + n_region_highlights;
+		 rhp++) {
+		/* Used as temporary storage */
+		rhp->start = rhp->start_meta;
+		rhp->end = rhp->end_meta;
+	    }
+	}
 	while (strp < stopll) {
 	    if (imeta(*strp)) {
 		if (strp < stopcs)
 		    outcs++;
+		if (region_highlights && outcsp == &zlemetacs) {
+		    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+			 rhp < region_highlights + n_region_highlights;
+			 rhp++) {
+			if (strp < startp + rhp->start) {
+			    rhp->start_meta++;
+			}
+			if (strp < startp + rhp->end) {
+			    rhp->end_meta++;
+			}
+		    }
+		}
 		outll++;
 	    }
 	    strp++;
@@ -290,6 +346,9 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
  * each metafied character) is converted into the corresponding
  * character position in *outcs.
  *
+ * If, further, outcs is &zlecs, we update the positions in the
+ * region_highlight array, too.  (This is a bit of a hack.)
+ *
  * Note that instr is modified in place, hence should be copied
  * first if necessary;
  *
@@ -304,6 +363,7 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 {
     ZLE_STRING_T outstr;
     int ll, sz;
+    struct region_highlight *rhp;
 #ifdef MULTIBYTE_SUPPORT
     mbstate_t mbs;
 #endif
@@ -316,10 +376,32 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 	 * is all the processing required to calculate outcs.
 	 */
 	char *inptr = instr, *cspos = instr + incs;
-	while (*inptr && inptr < cspos) {
+	if (region_highlights && outcs == &zlecs) {
+	    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+		 rhp < region_highlights + n_region_highlights;
+		 rhp++) {
+		rhp->start = rhp->start_meta;
+		rhp->end = rhp->end_meta;
+	    }
+	}
+	while (*inptr) {
 	    if (*inptr == Meta) {
+		if (inptr < cspos) {
+		    incs--;
+		}
+		if (region_highlights && outcs == &zlecs) {
+		    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+			 rhp < region_highlights + n_region_highlights;
+			 rhp++) {
+			if (inptr - instr < rhp->start) {
+			    rhp->start_meta--;
+			}
+			if (inptr - instr < rhp->end) {
+			    rhp->end_meta--;
+			}
+		    }
+		}
 		inptr++;
-		incs--;
 	    }
 	    inptr++;
 	}
@@ -385,6 +467,20 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 		int offs = inptr - instr;
 		if (offs <= incs && incs < offs + (int)cnt)
 		    *outcs = outptr - outstr;
+		if (region_highlights && outcs == &zlecs) {
+		    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+			 rhp < region_highlights + n_region_highlights;
+			 rhp++) {
+			if (offs <= rhp->start_meta &&
+			    rhp->start_meta < offs + (int)cnt) {
+			    rhp->start = outptr - outstr;
+			}
+			if (offs <= rhp->end_meta &&
+			    rhp->end_meta < offs + (int)cnt) {
+			    rhp->end = outptr - outstr;
+			}
+		    }
+		}
 	    }
 
 	    inptr += cnt;
@@ -404,6 +500,14 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
     *outll = ll;
     if (outcs)
 	*outcs = incs;
+    if (region_highlights && outcs == &zlecs) {
+	for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+	     rhp < region_highlights + n_region_highlights;
+	     rhp++) {
+	    rhp->start = rhp->start_meta;
+	    rhp->end = rhp->end_meta;
+	}
+    }
 #endif
 
     return outstr;
@@ -432,6 +536,158 @@ zlegetline(int *ll, int *cs)
 }
 
 
+/* Forward reference */
+struct zle_region;
+
+/* A non-special entry in region_highlight */
+struct zle_region  {
+    struct zle_region *next;
+    /* Entries of region_highlight, as needed */
+    int atr;
+    int start;
+    int end;
+    int flags;
+};
+
+/* Forward reference */
+struct zle_position;
+
+/* A saved set of position information */
+struct zle_position {
+    /* Link pointer */
+    struct zle_position *next;
+    /* Cursor position */
+    int cs;
+    /* Mark */
+    int mk;
+    /* Line length */
+    int ll;
+    struct zle_region *regions;
+};
+
+/* LIFO stack of positions */
+struct zle_position *zle_positions;
+
+/*
+ * Save positions including cursor, end-of-line and
+ * (non-special) region highlighting.
+ *
+ * Must be matched by a subsequent zle_restore_positions().
+ */
+
+/**/
+void
+zle_save_positions(void)
+{
+    struct region_highlight *rhp;
+    struct zle_position *newpos;
+    struct zle_region **newrhpp, *newrhp;
+
+    newpos = (struct zle_position *)zalloc(sizeof(*newpos));
+
+    newpos->mk = mark;
+    if (zlemetaline) {
+	/* Use metafied information */
+	newpos->cs = zlemetacs;
+	newpos->ll = zlemetall;
+    } else {
+	/* Use unmetafied information */
+	newpos->cs = zlecs;
+	newpos->ll = zlell;
+
+    }
+
+    newrhpp = &newpos->regions;
+    *newrhpp = NULL;
+    if (region_highlights) {
+	for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+	     rhp < region_highlights + n_region_highlights;
+	     rhp++) {
+	    /*
+	     * This is a FIFO stack, so we preserve the order
+	     * of entries when we restore region_highlights.
+	     */
+	    newrhp = *newrhpp = (struct zle_region *)zalloc(sizeof(**newrhpp));
+	    newrhp->next = NULL;
+	    newrhp->atr = rhp->atr;
+	    newrhp->flags = rhp->flags;
+	    if (zlemetaline) {
+		newrhp->start = rhp->start_meta;
+		newrhp->end = rhp->end_meta;
+	    } else {
+		newrhp->start = rhp->start;
+		newrhp->end = rhp->end;
+	    }
+	    newrhpp = &newrhp->next;
+	}
+    }
+
+    newpos->next = zle_positions;
+    zle_positions = newpos;
+}
+
+/*
+ * Restore positions previously saved.
+ * Relies on zlemetaline being restored correctly beforehand,
+ * so that it can tell whether to use metafied positions or not.
+ */
+
+/**/
+void
+zle_restore_positions(void)
+{
+    struct zle_position *oldpos = zle_positions;
+    struct zle_region *oldrhp;
+    struct region_highlight *rhp;
+    int nreg;
+
+    zle_positions = oldpos->next;
+
+    mark = oldpos->mk;
+    if (zlemetaline) {
+	/* Use metafied information */
+	zlemetacs = oldpos->cs;
+	zlemetall = oldpos->ll;
+    } else {
+	/* Use unmetafied information */
+	zlecs = oldpos->cs;
+	zlell = oldpos->ll;
+    }
+
+    /* Count number of regions and see if the array needs resizing */
+    for (nreg = 0, oldrhp = oldpos->regions;
+	 oldrhp;
+	 nreg++, oldrhp = oldrhp->next)
+	;
+    if (nreg + N_SPECIAL_HIGHLIGHTS != n_region_highlights) {
+	n_region_highlights = nreg + N_SPECIAL_HIGHLIGHTS;
+	region_highlights = (struct region_highlight *)
+	    zrealloc(region_highlights,
+		     sizeof(struct region_highlight) * n_region_highlights);
+    }
+    oldrhp = oldpos->regions;
+    rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+    while (oldrhp) {
+	struct zle_region *nextrhp = oldrhp->next;
+
+	rhp->atr = oldrhp->atr;
+	rhp->flags = oldrhp->flags;
+	if (zlemetaline) {
+	    rhp->start_meta = oldrhp->start;
+	    rhp->end_meta = oldrhp->end;
+	} else {
+	    rhp->start = oldrhp->start;
+	    rhp->end = oldrhp->end;
+	}
+
+	zfree(oldrhp, sizeof(*oldrhp));
+	oldrhp = nextrhp;
+	rhp++;
+    }
+
+    zfree(oldpos, sizeof(*oldpos));
+}
+
 /*
  * Basic utility functions for adding to line or removing from line.
  * At this level the counts supplied are raw character counts, so
@@ -450,6 +706,7 @@ mod_export void
 spaceinline(int ct)
 {
     int i;
+    struct region_highlight *rhp;
 
     if (zlemetaline) {
 	sizeline(ct + zlemetall);
@@ -460,6 +717,19 @@ spaceinline(int ct)
 
 	if (mark > zlemetacs)
 	    mark += ct;
+
+	if (region_highlights) {
+	    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+		 rhp < region_highlights + n_region_highlights;
+		 rhp++) {
+		if (rhp->start_meta >= zlemetacs) {
+		    rhp->start_meta += ct;
+		}
+		if (rhp->end_meta >= zlemetacs) {
+		    rhp->end_meta += ct;
+		}
+	    }
+	}
     } else {
 	sizeline(ct + zlell);
 	for (i = zlell; --i >= zlecs;)
@@ -469,26 +739,85 @@ spaceinline(int ct)
 
 	if (mark > zlecs)
 	    mark += ct;
+
+	if (region_highlights) {
+	    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+		 rhp < region_highlights + n_region_highlights;
+		 rhp++) {
+		if (rhp->start >= zlecs) {
+		    rhp->start += ct;
+		}
+		if (rhp->end >= zlecs) {
+		    rhp->end += ct;
+		}
+	    }
+	}
     }
     region_active = 0;
 }
+
+/*
+ * Within the ZLE line, cut the "cnt" characters from position "to".
+ */
 
 /**/
 void
 shiftchars(int to, int cnt)
 {
+    struct region_highlight *rhp;
+
     if (mark >= to + cnt)
 	mark -= cnt;
     else if (mark > to)
 	mark = to;
 
     if (zlemetaline) {
+	/* before to is updated... */
+	if (region_highlights) {
+	    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+		 rhp < region_highlights + n_region_highlights;
+		 rhp++) {
+		if (rhp->start_meta > to) {
+		    if (rhp->start_meta > to + cnt)
+			rhp->start_meta -= cnt;
+		    else
+			rhp->start_meta = to;
+		}
+		if (rhp->end_meta > to) {
+		    if (rhp->end_meta > to + cnt)
+			rhp->end_meta -= cnt;
+		    else
+			rhp->end_meta = to;
+		}
+	    }
+	}
+
 	while (to + cnt < zlemetall) {
 	    zlemetaline[to] = zlemetaline[to + cnt];
 	    to++;
 	}
 	zlemetaline[zlemetall = to] = '\0';
     } else {
+	/* before to is updated... */
+	if (region_highlights) {
+	    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+		 rhp < region_highlights + n_region_highlights;
+		 rhp++) {
+		if (rhp->start > to) {
+		    if (rhp->start > to + cnt)
+			rhp->start -= cnt;
+		    else
+			rhp->start = to;
+		}
+		if (rhp->end > to) {
+		    if (rhp->end > to + cnt)
+			rhp->end -= cnt;
+		    else
+			rhp->end = to;
+		}
+	    }
+	}
+
 	while (to + cnt < zlell) {
 	    zleline[to] = zleline[to + cnt];
 	    to++;

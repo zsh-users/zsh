@@ -385,6 +385,47 @@ enum suffixflags {
     SUFFLAGS_SPACE = 0x0001	/* Add a space when removing suffix */
 };
 
+
+/* Flags for the region_highlight structure */
+enum {
+    /* Offsets include predisplay */
+    ZRH_PREDISPLAY = 1
+};
+
+/*
+ * Attributes used for highlighting regions.
+ * and mark.
+ */
+struct region_highlight {
+    /* Attributes turned on in the region */
+    int atr;
+    /* Start of the region */
+    int start;
+    /* Start of the region in metafied ZLE line */
+    int start_meta;
+    /*
+     * End of the region:  position of the first character not highlighted
+     * (the same system as for point and mark).
+     */
+    int end;
+    /* End of the region in metafied ZLE line */
+    int end_meta;
+    /*
+     * Any of the flags defined above.
+     */
+    int flags;
+};
+
+/*
+ * Count of special uses of region highlighting, which account
+ * for the first few elements of region_highlights.
+ * 0: region between point and mark
+ * 1: isearch region
+ * 2: suffix
+ */
+#define N_SPECIAL_HIGHLIGHTS	(3)
+
+
 #ifdef MULTIBYTE_SUPPORT
 /*
  * We use a wint_t here, since we need an invalid character as a
@@ -420,15 +461,28 @@ typedef REFRESH_ELEMENT *REFRESH_STRING;
 
 
 #if defined(MULTIBYTE_SUPPORT) && defined(__STDC_ISO_10646__)
+/*
+ * With ISO 10646 there is a private range defined within
+ * the encoding.  We use this for storing single-byte
+ * characters in sections of strings that wouldn't convert to wide
+ * characters.  This allows to preserve the string when transformed
+ * back to multibyte strings.
+ */
+
+/* The start of the private range we use, for 256 characters */
 #define ZSH_INVALID_WCHAR_BASE	(0xe000U)
+/* Detect a wide character within our range */
 #define ZSH_INVALID_WCHAR_TEST(x)			\
     ((unsigned)(x) >= ZSH_INVALID_WCHAR_BASE &&		\
      (unsigned)(x) <= (ZSH_INVALID_WCHAR_BASE + 255u))
+/* Turn a wide character in that range back to single byte */
 #define ZSH_INVALID_WCHAR_TO_CHAR(x)			\
     ((char)((unsigned)(x) - ZSH_INVALID_WCHAR_BASE))
+/* Turn a wide character in that range to an integer */
 #define ZSH_INVALID_WCHAR_TO_INT(x)			\
     ((int)((unsigned)(x) - ZSH_INVALID_WCHAR_BASE))
-#define ZSH_CHAR_TO_INVALID_WCHAR(x)		\
+/* Turn a single byte character into a private wide character */
+#define ZSH_CHAR_TO_INVALID_WCHAR(x)			\
     ((wchar_t)(STOUC(x) + ZSH_INVALID_WCHAR_BASE))
 #endif
 

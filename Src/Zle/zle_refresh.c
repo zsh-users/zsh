@@ -210,50 +210,21 @@ int predisplaylen, postdisplaylen;
 
 static int default_atr_on, special_atr_on;
 
-/* Flags for the region_highlight structure */
-enum {
-    /* Offsets include predisplay */
-    ZRH_PREDISPLAY = 1
-};
-
-/*
- * Attributes used for highlighting regions.
- * and mark.
- */
-struct region_highlight {
-    /* Attributes turned on in the region */
-    int atr;
-    /* Start of the region */
-    int start;
-    /*
-     * End of the region:  position of the first character not highlighted
-     * (the same system as for point and mark).
-     */
-    int end;
-    /*
-     * Any of the flags defined above.
-     */
-    int flags;
-};
 /*
  * Array of region highlights, no special termination.
  * The first element (0) always describes the region between
  * point and mark.  Any other elements are set by the user
  * via the parameter region_highlight.
  */
+
+/**/
 struct region_highlight *region_highlights;
-/*
- * Count of special uses of region highlighting, which account
- * for the first few elements of region_highlights.
- * 0: region between point and mark
- * 1: isearch region
- * 2: suffix
- */
-#define N_SPECIAL_HIGHLIGHTS	(3)
+
 /*
  * Number of elements in region_highlights.
  * This includes the special elements above.
  */
+/**/
 int n_region_highlights;
 
 /*

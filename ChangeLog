@@ -1,3 +1,10 @@
+2011-02-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28772: Doc/Zsh/zle.yo, Src/Zle/compcore.c,
+	Src/Zle/compresult.c, Src/Zle/zle.h, Src/Zle/zle_refresh.c,
+	Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c: update regions
+	in $region_highlight dynamically.
+
 2011-02-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28761: Completion/Unix/Command/_sccs: file completion missing
@@ -14215,5 +14222,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5200 $
+* $Revision: 1.5201 $
 *****************************************************

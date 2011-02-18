@@ -2675,14 +2675,13 @@ int
 doexpandhist(void)
 {
     char *ol;
-    int oll, ocs, ne = noerrs, err, ona = noaliases;
+    int ne = noerrs, err, ona = noaliases;
 
     UNMETACHECK();
 
     pushheap();
     metafy_line();
-    oll = zlemetall;
-    ocs = zlemetacs;
+    zle_save_positions();
     ol = dupstring(zlemetaline);
     expanding = 1;
     excs = zlemetacs;
@@ -2725,8 +2724,7 @@ doexpandhist(void)
     }
 
     strcpy(zlemetaline, ol);
-    zlemetall = oll;
-    zlemetacs = ocs;
+    zle_restore_positions();
     unmetafy_line();
 
     popheap();

@@ -698,8 +698,10 @@ hasbrpsfx(Cmatch m, char *pre, char *suf)
     {
 	char *op = lastprebr, *os = lastpostbr;
 	VARARR(char, oline, zlemetall);
-	int oll = zlemetall, ocs = zlemetacs, ole = lastend, opcs = brpcs, oscs = brscs, ret;
+	int oll = zlemetall, newll, ole = lastend;
+	int opcs = brpcs, oscs = brscs, ret;
 
+	zle_save_positions();
 	memcpy(oline, zlemetaline, zlemetall);
 
 	lastprebr = lastpostbr = NULL;
@@ -710,7 +712,10 @@ hasbrpsfx(Cmatch m, char *pre, char *suf)
 	foredel(zlemetall, CUT_RAW);
 	spaceinline(oll);
 	memcpy(zlemetaline, oline, oll);
-	zlemetacs = ocs;
+	/* we do not want to restore zlemetall */
+	newll = zlemetall;
+	zle_restore_positions();
+	zlemetall = newll;
 	lastend = ole;
 	brpcs = opcs;
 	brscs = oscs;
