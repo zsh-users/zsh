@@ -923,6 +923,10 @@ item(tt(zle-line-finish))(
 This is similar to tt(zle-line-init) but is executed every time the
 line editor has finished reading a line of input.
 )
+tindex(zle-history-line-set)
+item(tt(zle-history-line-set))(
+Executed when the history line changes.
+)
 tindex(zle-keymap-select)
 item(tt(zle-keymap-select))(
 Executed every time the keymap changes, i.e. the special parameter

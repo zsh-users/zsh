@@ -765,6 +765,7 @@ zle_setline(Histent he)
     histline = he->histnum;
 
     setline(GETZLETEXT(he), ZSL_COPY|ZSL_TOEND);
+    zlecallhook("zle-history-line-set", NULL);
     setlastline();
     clearlist = 1;
     if (remetafy)
