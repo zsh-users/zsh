@@ -4,15 +4,17 @@
 
 setopt localoptions NO_shwordsplit
 local dirname=$1
-local basedir="." realbasedir
+local basedir="." realbasedir file
 
 realbasedir="$(VCS_INFO_realpath ${basedir})"
 while [[ ${realbasedir} != '/' ]]; do
     [[ -r ${realbasedir} ]] || return 1
     if [[ -n ${vcs_comm[detect_need_file]} ]] ; then
-        [[ -d ${basedir}/${dirname} ]] && \
-        [[ -e ${basedir}/${dirname}/${vcs_comm[detect_need_file]} ]] && \
-            break
+        [[ -d ${basedir}/${dirname} ]] && {
+            for file in ${(s: :)${vcs_comm[detect_need_file]}}; do
+                [[ -e ${basedir}/${dirname}/${file} ]] && break 2
+            done
+        }
     else
         [[ -d ${basedir}/${dirname} ]] && break
     fi

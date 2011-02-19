@@ -7,7 +7,7 @@ setopt localoptions NO_shwordsplit
 [[ $1 == '--flavours' ]] && { print -l hg-git hg-hgsubversion hg-hgsvn; return 0 }
 
 VCS_INFO_check_com ${vcs_comm[cmd]} || return 1
-vcs_comm[detect_need_file]=store
+vcs_comm[detect_need_file]="store data"
 VCS_INFO_bydir_detect '.hg' || return 1
 
 if [[ -d ${vcs_comm[basedir]}/.hg/svn ]] ; then

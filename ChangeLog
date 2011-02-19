@@ -1,3 +1,11 @@
+2011-02-19  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 28776: Functions/VCS_Info/VCS_INFO_bydir_detect,
+	Functions/VCS_Info/Backends/VCS_INFO_detect_hg,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg: Let
+	vcs_info detect very old mercurial repositories.
+
+
 2011-02-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28773, Doc/Zsh/zle.yo, Src/zle_hist.c: add
@@ -14225,5 +14233,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5202 $
+* $Revision: 1.5203 $
 *****************************************************
