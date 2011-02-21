@@ -877,7 +877,7 @@ gettok(void)
 		dbparens = 1;
 		return DINPAR;
 	    }
-	    if (incmdpos) {
+	    if (incmdpos || (isset(SHGLOB) && !isset(KSHGLOB))) {
 		len = 0;
 		bptr = tokstr = (char *) hcalloc(bsiz = 32);
 		switch (cmd_or_math(CS_MATH)) {
@@ -1141,6 +1141,8 @@ gettokstr(int c, int sub)
 		    break;
 		if (incasepat && !len)
 		    return INPAR;
+		if (!isset(KSHGLOB) && len)
+		    goto brk;
 	    }
 	    if (!in_brace_param) {
 		if (!sub) {

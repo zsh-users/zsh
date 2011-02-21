@@ -577,3 +577,15 @@
 0:$0 is traditionally if bizarrely set to the first argument with -c
 >myargzero
 >myargone
+
+  (setopt shglob
+  eval '
+  if ! (echo success1); then echo failure1; fi
+  if !(echo success2); then echo failure2; fi
+  print -l one two | while(read foo)do(print read it)done
+  ')
+0:Parentheses in shglob
+>success1
+>success2
+>read it
+>read it

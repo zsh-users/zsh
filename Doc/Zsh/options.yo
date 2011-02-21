@@ -683,8 +683,12 @@ item(tt(SH_GLOB) <K> <S>)(
 Disables the special meaning of `tt(LPAR())', `tt(|)', `tt(RPAR())'
 and 'tt(<)' for globbing the result of parameter and command substitutions,
 and in some other places where
-the shell accepts patterns.  This option is set by default if zsh is
-invoked as tt(sh) or tt(ksh).
+the shell accepts patterns.  If tt(SH_GLOB) is set but tt(KSH_GLOB) is
+not, the shell allows the interpretation of
+subshell expressions enclosed in parentheses in some cases where there
+is no space before the opening parenthesis, e.g. tt(!LPAR()true+RPAR())
+is interpreted as if there were a space after the tt(!).  This option is
+set by default if zsh is invoked as tt(sh) or tt(ksh).
 )
 pindex(UNSET)
 pindex(NO_UNSET)
