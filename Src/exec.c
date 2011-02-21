@@ -181,7 +181,15 @@ struct execstack *exstack;
 /**/
 mod_export Funcstack funcstack;
 
-#define execerr() if (!forked) { lastval = 1; goto done; } else _exit(1)
+#define execerr()				\
+    do {					\
+	if (!forked) {				\
+	    redir_err = lastval = 1;		\
+	    goto done;				\
+	} else {				\
+	    _exit(1);				\
+	}					\
+    } while (0)
 
 static int doneps4;
 static char *STTYval;
@@ -2312,7 +2320,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
     struct multio *mfds[10];
     char *text;
     int save[10];
-    int fil, dfil, is_cursh, type, do_exec = 0, i, htok = 0;
+    int fil, dfil, is_cursh, type, do_exec = 0, redir_err = 0, i, htok = 0;
     int nullexec = 0, assign = 0, forked = 0;
     int is_shfunc = 0, is_builtin = 0, is_exec = 0, use_defpath = 0;
     /* Various flags to the command. */
@@ -3289,6 +3297,13 @@ execcmd(Estate state, int input, int output, int how, int last1)
     fixfds(save);
 
  done:
+    if (redir_err && isset(POSIXBUILTINS)) {
+	if (!isset(INTERACTIVE)) {
+	    /* We've already _exit'ed if forked */
+	    exit(1);
+	}
+	errflag = 1;
+    }
     if (newxtrerr) {
 	fil = fileno(newxtrerr);
 	fclose(newxtrerr);

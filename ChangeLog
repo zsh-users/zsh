@@ -1,3 +1,8 @@
+2011-02-21  Peter Stephenson  <pws@csr.com>
+
+	* 28784: Doc/Zsh/options.yo, Test/A04redirect.ztst, Src/exec.c:
+	exit on exec redirection error with POSIXBUILTINS.
+
 2011-02-19  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 28776: Functions/VCS_Info/VCS_INFO_bydir_detect,
@@ -14233,5 +14238,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5203 $
+* $Revision: 1.5204 $
 *****************************************************

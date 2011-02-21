@@ -366,3 +366,15 @@
 >more output:
 >This file contains data.
 >This file contains data.
+
+  $ZTST_testdir/../Src/zsh -fc 'exec >/nonexistent/nonexistent
+  echo output'
+0:failed exec redir, no POSIX_BUILTINS
+>output
+?zsh:1: no such file or directory: /nonexistent/nonexistent
+
+  $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS -c '
+  exec >/nonexistent/nonexistent
+  echo output'
+1:failed exec redir, POSIX_BUILTINS
+?zsh:2: no such file or directory: /nonexistent/nonexistent
