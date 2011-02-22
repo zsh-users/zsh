@@ -1,3 +1,9 @@
+2011-02-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28791: Doc/Zsh/options.yo, Src/builtin.c, Src/exec.c,
+	Test/A04redirect.ztst: exit on errors in special builtins
+	with POSIXBUILTINS.
+
 2011-02-21  Peter Stephenson  <pws@csr.com>
 
 	* 28783: Doc/Zsh/options.yo, Src/lex.c, Test/A01grammar.ztst:
@@ -14242,5 +14248,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5205 $
+* $Revision: 1.5206 $
 *****************************************************

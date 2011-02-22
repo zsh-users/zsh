@@ -2416,6 +2416,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		checked = !(cflags & BINF_BUILTIN);
 		break;
 	    }
+	    cflags &= ~BINF_BUILTIN & ~BINF_COMMAND;
+	    cflags |= hn->flags;
 	    if (!(hn->flags & BINF_PREFIX)) {
 		is_builtin = 1;
 
@@ -2425,8 +2427,6 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		assign = (hn->flags & BINF_MAGICEQUALS);
 		break;
 	    }
-	    cflags &= ~BINF_BUILTIN & ~BINF_COMMAND;
-	    cflags |= hn->flags;
 	    checked = 0;
 	    if ((cflags & BINF_COMMAND) && nextnode(firstnode(args))) {
 		/* check for options to command builtin */
@@ -3297,12 +3297,20 @@ execcmd(Estate state, int input, int output, int how, int last1)
     fixfds(save);
 
  done:
-    if (redir_err && isset(POSIXBUILTINS)) {
-	if (!isset(INTERACTIVE)) {
-	    /* We've already _exit'ed if forked */
-	    exit(1);
+    if (isset(POSIXBUILTINS) &&
+	(cflags & (BINF_PSPECIAL|BINF_EXEC))) {
+	/*
+	 * For POSIX-compatibile behaviour with special
+	 * builtins (including exec which we don't usually
+	 * classify as a builtin, we treat all errors as fatal.
+	 */
+	if (redir_err || errflag) {
+	    if (!isset(INTERACTIVE)) {
+		/* We've already _exit'ed if forked */
+		exit(1);
+	    }
+	    errflag = 1;
 	}
-	errflag = 1;
     }
     if (newxtrerr) {
 	fil = fileno(newxtrerr);

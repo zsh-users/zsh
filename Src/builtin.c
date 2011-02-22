@@ -4821,8 +4821,14 @@ bin_dot(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	freearray(pparams);
 	pparams = old;
     }
-    if (ret == SOURCE_NOT_FOUND)
-	zwarnnam(name, "%e: %s", errno, enam);
+    if (ret == SOURCE_NOT_FOUND) {
+	if (isset(POSIXBUILTINS)) {
+	    /* hard error in POSIX (we'll exit later) */
+	    zerrnam(name, "%e: %s", errno, enam);
+	} else {
+	    zwarnnam(name, "%e: %s", errno, enam);
+	}
+    }
     zsfree(arg0);
     if (old0) {
 	zsfree(argzero);

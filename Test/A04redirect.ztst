@@ -378,3 +378,52 @@
   echo output'
 1:failed exec redir, POSIX_BUILTINS
 ?zsh:2: no such file or directory: /nonexistent/nonexistent
+
+  $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS -c '
+  set >/nonexistent/nonexistent
+  echo output'
+1:failed special builtin redir, POSIX_BUILTINS
+?zsh:2: no such file or directory: /nonexistent/nonexistent
+
+  $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS -c '
+  echo >/nonexistent/nonexistent
+  echo output'
+0:failed unspecial builtin redir, POSIX_BUILTINS
+>output
+?zsh:2: no such file or directory: /nonexistent/nonexistent
+
+  $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS -c '
+  . /nonexistent/nonexistent
+  echo output'
+1:failed dot, POSIX_BUILTINS
+?zsh:.:2: no such file or directory: /nonexistent/nonexistent
+
+  $ZTST_testdir/../Src/zsh -f -c '
+  . /nonexistent/nonexistent
+  echo output'
+0:failed dot, NO_POSIX_BUILTINS
+>output
+?zsh:.:2: no such file or directory: /nonexistent/nonexistent
+
+  $ZTST_testdir/../Src/zsh -f <<<'
+  readonly foo
+  foo=bar set output
+  echo output'
+0:failed assignment on posix special, NO_POSIX_BUILTINS
+>output
+?zsh: read-only variable: foo
+
+  $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS <<<'
+  readonly foo
+  foo=bar set output
+  echo output'
+1:failed assignment on posix special, POSIX_BUILTINS
+?zsh: read-only variable: foo
+
+  $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS <<<'
+  readonly foo
+  foo=bar echo output
+  echo output'
+0:failed assignment on non-posix-special, POSIX_BUILTINS
+>output
+?zsh: read-only variable: foo

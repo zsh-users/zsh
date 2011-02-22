@@ -1871,9 +1871,9 @@ tt(times),
 tt(trap) and
 tt(unset).
 
-In addition, a failed redirection after tt(exec) causes a non-interactive
-shell to exit and an interactive shell to return to its top-level
-processing.
+In addition, various error conditions associated with the above builtins
+or tt(exec) cause a non-interactive shell to exit and an interactive
+shell to return to its top-level processing.
 )
 pindex(POSIX_IDENTIFIERS)
 pindex(NO_POSIX_IDENTIFIERS)
