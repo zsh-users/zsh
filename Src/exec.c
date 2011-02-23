@@ -3300,14 +3300,16 @@ execcmd(Estate state, int input, int output, int how, int last1)
     if (isset(POSIXBUILTINS) &&
 	(cflags & (BINF_PSPECIAL|BINF_EXEC))) {
 	/*
-	 * For POSIX-compatibile behaviour with special
+	 * For POSIX-compatible behaviour with special
 	 * builtins (including exec which we don't usually
-	 * classify as a builtin, we treat all errors as fatal.
+	 * classify as a builtin) we treat all errors as fatal.
 	 */
 	if (redir_err || errflag) {
 	    if (!isset(INTERACTIVE)) {
-		/* We've already _exit'ed if forked */
-		exit(1);
+		if (forked)
+		    _exit(1);
+		else
+		    exit(1);
 	    }
 	    errflag = 1;
 	}

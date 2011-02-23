@@ -1,3 +1,8 @@
+2011-02-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28795: Src/exec.c: tweak to 28791 for forked shells.
+	Also (unposted) typos in comments noticed by Mikael.
+
 2011-02-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28791: Doc/Zsh/options.yo, Src/builtin.c, Src/exec.c,
@@ -14248,5 +14253,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5206 $
+* $Revision: 1.5207 $
 *****************************************************
