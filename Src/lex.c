@@ -1825,7 +1825,7 @@ exalias(void)
 	    int zp = lexflags;
 
 	    gotword();
-	    if (zp == 1 && !lexflags) {
+	    if ((zp & LEXFLAGS_ZLE) && !lexflags) {
 		if (zshlextext == copy)
 		    zshlextext = tokstr;
 		return 0;

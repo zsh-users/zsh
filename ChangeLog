@@ -1,3 +1,9 @@
+2011-02-24  Peter Stephenson  <pws@csr.com>
+
+	* 28799: Src/lex.c: fix bug introduced with lexflags
+	that lexical analyser didn't stop quickly enough when
+	retrieving completion words.
+
 2011-02-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28795: Src/exec.c: tweak to 28791 for forked shells.
@@ -14253,5 +14259,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5207 $
+* $Revision: 1.5208 $
 *****************************************************
