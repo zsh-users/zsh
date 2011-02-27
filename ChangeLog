@@ -1,3 +1,8 @@
+2011-02-27  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* Nikolai Weibull: 28649,28804: Completion/Unix/Command/_git:
+	Latest version copied from https://github.com/now/zsh.
+
 2011-02-24  Peter Stephenson  <pws@csr.com>
 
 	* 28799: Src/lex.c: fix bug introduced with lexflags
@@ -14259,5 +14264,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5208 $
+* $Revision: 1.5209 $
 *****************************************************
