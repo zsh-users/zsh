@@ -1,3 +1,9 @@
+2011-02-28  Peter Stephenson  <pws@csr.com>
+
+	* Frank, 28812, modified as in 28813: Src/string.c: wcs_ztrdup()
+	needs to allocate array of wchar_t.  Looks like this isn't
+	currently used anywhere.
+
 2011-02-27  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* Nikolai Weibull: 28649,28804: Completion/Unix/Command/_git:
@@ -14264,5 +14270,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5209 $
+* $Revision: 1.5210 $
 *****************************************************

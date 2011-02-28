@@ -64,7 +64,7 @@ wcs_ztrdup(const wchar_t *s)
 
     if (!s)
 	return NULL;
-    t = (wchar_t *)zalloc(wcslen((wchar_t *)s) + 1);
+    t = (wchar_t *)zalloc(sizeof(wchar_t) * (wcslen((wchar_t *)s) + 1));
     wcscpy(t, s);
     return t;
 }
