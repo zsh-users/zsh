@@ -1,3 +1,9 @@
+2011-03-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Baptiste: 28819: Completion/BSD/Command/_sockstat,
+        Completion/Unix/Command/_mount,
+	Completion/Unix/Type/_file_systems: FreeBSD completion tweaks.
+
 2011-02-28  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 28823: Src/builtin.c: make it an error to tie the same scalar to
@@ -14276,5 +14282,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5211 $
+* $Revision: 1.5212 $
 *****************************************************

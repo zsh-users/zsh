@@ -21,8 +21,8 @@ case $OSTYPE in
           ntfs null nwfs portal procfs std udf ufs umap union )
   ;;
   freebsd*)
-    fss=( cd9660 devfs ext2fs fdesc kernfs linprocfs mfs msdosfs nfs
-    ntfs nullfs nwfs portal procfs smbfs std udf ufs umap unionfs 
+    fss=( cd9660 devfs ext2fs fdescfs kernfs linprocfs linsysfs mfs msdosfs nfs
+    ntfs nullfs nwfs portalfs procfs smbfs std udf ufs unionfs 
     reiserfs xfs)
   ;;
   darwin*)

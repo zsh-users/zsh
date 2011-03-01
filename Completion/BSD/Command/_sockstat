@@ -1,0 +1,23 @@
+#compdef sockstat
+
+local tmp_proto protocols proto
+
+tmp_proto=(${${(M)${(f)"$(</etc/protocols)"}##[a-z0-9]*}})
+for proto ($tmp_proto) { 
+	case $proto in
+	*\#*)
+		protocols=($protocols ${${(j: :)${=proto}}// *\# /:}) 
+		;;
+	*)
+		protocols=($protocols ${${(j: :)${=proto}}// */})
+	esac
+}
+
+_arguments -s \
+	'-4[Show AF_INET (IPv4) sockets]' \
+	'-6[Show AF_INET6 (IPv6) sockets]' \
+	'-c[Show connected sockets]' \
+	'-l[Show listening sockets]' \
+	'-u[Show AF_LOCAL (UNIX) sockets]' \
+	'-p[Only show Internet sockets if the port number is on the specified list]' \
+	'-P[Only show sockets of the specified protocols]:protocols:(($protocols))'
