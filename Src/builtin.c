@@ -2420,12 +2420,12 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	}
 	if (!strcmp(asg0.name, asg->name)) {
 	    unqueue_signals();
-	    zerrnam(name, "can't tie a variable to itself");
+	    zerrnam(name, "can't tie a variable to itself: %s", asg0.name);
 	    return 1;
 	}
 	if (strchr(asg0.name, '[') || strchr(asg->name, '[')) {
 	    unqueue_signals();
-	    zerrnam(name, "can't tie array elements");
+	    zerrnam(name, "can't tie array elements: %s", asg0.name);
 	    return 1;
 	}
 	/*
@@ -2440,6 +2440,11 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	if ((pm = (Param) paramtab->getnode(paramtab, asg0.name))
 	    && !(pm->node.flags & PM_UNSET)
 	    && (locallevel == pm->level || !(on & PM_LOCAL))) {
+	    if (pm->node.flags & PM_TIED) {
+		unqueue_signals();
+		zerrnam(name, "can't tie already tied scalar: %s", asg0.name);
+		return 1;
+	    }
 	    if (!asg0.value && !(PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)))
 		oldval = ztrdup(getsparam(asg0.name));
 	    on |= (pm->node.flags & PM_EXPORTED);

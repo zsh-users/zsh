@@ -1,3 +1,9 @@
+2011-02-28  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 28823: Src/builtin.c: make it an error to tie the same scalar to
+	two different arrays (prevents crash bug); improve a couple of
+	other error messages.
+
 2011-02-28  Peter Stephenson  <pws@csr.com>
 
 	* Frank, 28812, modified as in 28813: Src/string.c: wcs_ztrdup()
@@ -14270,5 +14276,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5210 $
+* $Revision: 1.5211 $
 *****************************************************
