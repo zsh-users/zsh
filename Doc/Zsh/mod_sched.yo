@@ -39,6 +39,10 @@ the shell to clear the command line before the event and redraw it
 afterwards.  This should be used with any scheduled event that produces
 visible output to the terminal; it is not needed, for example, with
 output that updates a terminal emulator's title bar.
+
+The tt(sched) builtin is not made available by default when the shell
+starts in a mode emulating another shell.  It can be made available
+with the command `tt(zmodload -F zsh/sched b:sched)'.
 )
 enditem()
 
