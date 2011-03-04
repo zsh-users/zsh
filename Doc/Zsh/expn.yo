@@ -381,7 +381,7 @@ Each part of a command argument that takes the form
 `tt(<LPAR())var(list)tt(RPAR())',
 `tt(>LPAR())var(list)tt(RPAR())' or
 `tt(=LPAR())var(list)tt(RPAR())'
-is subject to process substitution.  The expression may be preceeded
+is subject to process substitution.  The expression may be preceded
 or followed by other strings except that, to prevent clashes with
 commonly occurring strings and patterns, the last
 form must occur at the start of a command argument, and the forms

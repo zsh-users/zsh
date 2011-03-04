@@ -4713,7 +4713,7 @@ zexit(int val, int from_where)
      */
     in_exit = -1;
     /*
-     * We want to do all remaining processing regardless of preceeding
+     * We want to do all remaining processing regardless of preceding
      * errors.
      */
     errflag = 0;

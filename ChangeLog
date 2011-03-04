@@ -1,3 +1,8 @@
+2011-03-04  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 28853: Doc/Zsh/contrib.yo, Doc/Zsh/expn.yo, Functions/Chpwd/cdr,
+	Src/builtin.c, Src/prompt.c: Fix typo: preceed -> precede
+
 2011-03-02  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 28805: Doc/Zsh/builtins.yo, Doc/Zsh/mod_sched.yo: move stray
@@ -1272,7 +1277,7 @@
 
 	* users/15011: Completion/Unix/Type/_path_files,
 	Doc/Zsh/compsys.yo: add path-completion style to allow
-	completion of preceeding directories in files to be be turned
+	completion of preceding directories in files to be be turned
 	off.
 
 2010-04-13  Peter Stephenson  <pws@csr.com>
@@ -14287,5 +14292,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5213 $
+* $Revision: 1.5214 $
 *****************************************************

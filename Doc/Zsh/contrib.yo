@@ -355,7 +355,7 @@ subsect(Use)
 All direct user interaction is via the tt(cdr) function.
 
 The argument to cdr is a number var(N) corresponding to the var(N)th most
-recently changed-to directory.  1 is the immediately preceeding directory;
+recently changed-to directory.  1 is the immediately preceding directory;
 the current directory is remembered but is not offered as a destination.
 Note that if you have multiple windows open 1 may refer to a directory
 changed to in another window; you can avoid this by having per-terminal

@@ -15,7 +15,7 @@
 # changing directory permanently, see below.
 #
 # The argument to cdr is a number corresponding to the Nth most recently
-# changed-to directory starting at 1 for the immediately preceeding
+# changed-to directory starting at 1 for the immediately preceding
 # directory (the current directory is remembered but is not offered as a
 # destination).  You can use directory arguments if you set the
 # recent-dirs-default style, see below; however, it should be noted

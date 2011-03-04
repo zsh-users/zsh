@@ -1205,7 +1205,7 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar,
 		if (truncatleft) {
 		    /*
 		     * To truncate at the left, selectively copy
-		     * maxwidth bytes from the main prompt, preceeded
+		     * maxwidth bytes from the main prompt, preceded
 		     * by the truncation string in full.
 		     *
 		     * We're overwriting the string containing the
