@@ -1,3 +1,8 @@
+2011-03-05  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Adrian: 28857: Functions/Prompts/prompt_bigfade_setup: use %d
+	instead of $PWD
+
 2011-03-04  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 28853: Doc/Zsh/contrib.yo, Doc/Zsh/expn.yo, Functions/Chpwd/cdr,
@@ -14292,5 +14297,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5214 $
+* $Revision: 1.5215 $
 *****************************************************
