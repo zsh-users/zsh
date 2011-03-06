@@ -2324,7 +2324,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
     int nullexec = 0, assign = 0, forked = 0;
     int is_shfunc = 0, is_builtin = 0, is_exec = 0, use_defpath = 0;
     /* Various flags to the command. */
-    int cflags = 0, checked = 0, oautocont = -1;
+    int cflags = 0, orig_cflags = 0, checked = 0, oautocont = -1;
     LinkList redir;
     wordcode code;
     Wordcode beg = state->pc, varspc;
@@ -2416,6 +2416,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		checked = !(cflags & BINF_BUILTIN);
 		break;
 	    }
+	    orig_cflags |= cflags;
 	    cflags &= ~BINF_BUILTIN & ~BINF_COMMAND;
 	    cflags |= hn->flags;
 	    if (!(hn->flags & BINF_PREFIX)) {
@@ -3298,11 +3299,13 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
  done:
     if (isset(POSIXBUILTINS) &&
-	(cflags & (BINF_PSPECIAL|BINF_EXEC))) {
+	(cflags & (BINF_PSPECIAL|BINF_EXEC)) &&
+	!(orig_cflags & BINF_COMMAND)) {
 	/*
 	 * For POSIX-compatible behaviour with special
 	 * builtins (including exec which we don't usually
 	 * classify as a builtin) we treat all errors as fatal.
+	 * The "command" builtin is not special so resets this behaviour.
 	 */
 	if (redir_err || errflag) {
 	    if (!isset(INTERACTIVE)) {

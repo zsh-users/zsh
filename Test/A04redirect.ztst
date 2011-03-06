@@ -386,6 +386,13 @@
 ?zsh:2: no such file or directory: /nonexistent/nonexistent
 
   $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS -c '
+  command set >/nonexistent/nonexistent
+  echo output'
+0:failed special builtin redir with command prefix, POSIX_BUILTINS
+>output
+?zsh:2: no such file or directory: /nonexistent/nonexistent
+
+  $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS -c '
   echo >/nonexistent/nonexistent
   echo output'
 0:failed unspecial builtin redir, POSIX_BUILTINS

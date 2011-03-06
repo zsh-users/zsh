@@ -1,3 +1,8 @@
+2011-03-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 28866: Src/exec.c, Test/A04redirect.ztst: With POSIX_BUILTINS,
+	"command" prefix tops a command having special behaviour.
+
 2011-03-05  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Adrian: 28857: Functions/Prompts/prompt_bigfade_setup: use %d
@@ -14297,5 +14302,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5215 $
+* $Revision: 1.5216 $
 *****************************************************
