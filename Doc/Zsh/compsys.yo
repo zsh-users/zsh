@@ -2298,13 +2298,29 @@ The default value for this style is `false'.
 )
 kindex(prefix-needed, completion style)
 item(tt(prefix-needed))(
-This, too, is used for matches with a common prefix.  If it is set to
-`true' this common prefix must be typed by the user to generate the
-matches.  In the case of command options, this means that the initial
-`tt(-)', `tt(+)', or `tt(-)tt(-)' must be typed explicitly before option
-names will be completed.
+This style is also relevant for matches with a common prefix.  If it is
+set to `true' this common prefix must be typed by the user to generate
+the matches.
 
-The default value for this style is `true'.
+The style is applicable to the tt(options), tt(signals), tt(jobs),
+tt(functions), and tt(parameters) completion tags.
+
+For command options, this means that the initial `tt(-)', `tt(+)', or
+`tt(-)tt(-)' must be typed explicitly before option names will be
+completed.
+
+For signals, an initial `tt(-)' is required before signal names will
+be completed.
+
+For jobs, an initial `tt(%)' is required before job names will be
+completed.
+
+For function and parameter names, an initial `tt(_)' or `tt(.)' is
+required before function or parameter names starting with those
+characters will be completed.
+
+The default value for this style is `false' for tt(function) and
+tt(parameter) completions, and  `true' otherwise.
 )
 kindex(preserve-prefix, completion style)
 item(tt(preserve-prefix))(

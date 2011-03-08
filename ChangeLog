@@ -1,3 +1,11 @@
+2011-03-08  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Greg Klanderman: 28846: Completion/Zsh/Type/_functions,
+	Completion/Zsh/Type/_command_names,
+	Completion/Zsh/Type/_parameters, Doc/Zsh/compsys.yo: adapt
+	prefix-needed zstyle to handle the completion function naming
+	convention of a leading underscore.
+
 2011-03-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 28866: Src/exec.c, Test/A04redirect.ztst: With POSIX_BUILTINS,
@@ -14302,5 +14310,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5216 $
+* $Revision: 1.5217 $
 *****************************************************

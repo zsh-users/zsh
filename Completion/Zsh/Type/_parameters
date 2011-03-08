@@ -6,7 +6,7 @@
 # If you specify a -g option with a pattern, the pattern will be used to
 # restrict the type of parameters matched.
 
-local expl pattern fakes faked tmp
+local expl pattern fakes faked tmp pfilt
 
 pattern=(-g \*)
 zparseopts -D -K -E g:=pattern
@@ -23,8 +23,12 @@ if zstyle -a ":completion:${curcontext}:" fake-parameters tmp; then
   done
 fi
 
+zstyle -t ":completion:${curcontext}:parameters" prefix-needed && \
+ [[ $PREFIX != [_.]* ]] && \
+ pfilt='[^_.]'
+
 _wanted parameters expl parameter \
     compadd "$@" -Q - \
-        "${(@k)parameters[(R)${pattern[2]}~*local*]}" \
+        "${(@M)${(@k)parameters[(R)${pattern[2]}~*local*]}:#${~pfilt}*}" \
         "$fakes[@]" \
         "${(@)${(@M)faked:#${~pattern[2]}}%%:*}"

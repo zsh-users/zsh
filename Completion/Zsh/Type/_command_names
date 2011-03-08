@@ -4,9 +4,13 @@
 # complete only external commands and executable files. This and a
 # `-' as the first argument is then removed from the arguments.
 
-local args defs
+local args defs ffilt
 
 zstyle -t ":completion:${curcontext}:commands" rehash && rehash
+
+zstyle -t ":completion:${curcontext}:functions" prefix-needed && \
+ [[ $PREFIX != [_.]* ]] && \
+ ffilt='[(I)[^_.]*]'
 
 defs=(
   'commands:external command:_path_commands'
@@ -24,7 +28,7 @@ else
 
   defs=( "$defs[@]"
     'builtins:builtin command:compadd -k builtins'
-    'functions:shell function:compadd -k functions'
+    "functions:shell function:compadd -k functions$ffilt"
     'aliases:alias:compadd -k aliases'
     'suffix-aliases:suffix alias:_suffix_alias_files'
     'reserved-words:reserved word:compadd -k reswords'
