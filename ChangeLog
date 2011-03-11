@@ -1,5 +1,10 @@
 2011-03-11  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/Zsh/Context/_dynamic_directory_name:
+	Mikael spotted that completion doesn't work if
+	$zsh_directory_name_functions is set but zsh_directory_name
+	isn't defined.
+
 	* users/15864: Completion/Zsh/Context/_dynamic_directory_name,
 	Doc/Zsh/contrib.yo, Doc/Zsh/expn.yo, Functions/Chpwd/.distfiles,
 	Functions/Chpwd/zsh_directory_name_cdr,
@@ -14322,5 +14327,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5219 $
+* $Revision: 1.5220 $
 *****************************************************
