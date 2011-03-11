@@ -579,7 +579,6 @@ filesubstr(char **namptr, int assign)
     char *str = *namptr;
 
     if (*str == Tilde && str[1] != '=' && str[1] != Equals) {
-	Shfunc dirfunc;
 	char *ptr, *tmp, *res, *ptr2;
 	int val;
 
@@ -594,12 +593,11 @@ filesubstr(char **namptr, int assign)
 	    *namptr = dyncat((tmp = oldpwd) ? tmp : pwd, str + 2);
 	    return 1;
 	} else if (str[1] == Inbrack &&
-		   (dirfunc = getshfunc("zsh_directory_name")) &&
 		   (ptr2 = strchr(str+2, Outbrack))) {
 	    char **arr;
 	    untokenize(tmp = dupstrpfx(str+2, ptr2 - (str+2)));
 	    remnulargs(tmp);
-	    arr = subst_string_by_func(dirfunc, "n", tmp);
+	    arr = subst_string_by_hook("zsh_directory_name", "n", tmp);
 	    res = arr ? *arr : NULL;
 	    if (res) {
 		*namptr = dyncat(res, ptr2+1);

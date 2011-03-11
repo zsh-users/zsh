@@ -302,10 +302,13 @@ called at the same point; these are so-called `hook functions'.
 The shell function tt(add-zsh-hook) provides a simple way of adding or
 removing functions from the array.
 
-var(hook) is one of tt(chpwd), tt(periodic), tt(precmd) or tt(preexec),
-the special functions in question.
+var(hook) is one of tt(chpwd), tt(periodic), tt(precmd), tt(preexec),
+tt(zshaddhistory), tt(zshexit), or tt(zsh_directory_name),
+the special functions in question.  Note that tt(zsh_directory_name)
+is called in a different way from the other functions, but may
+still be manipulated as a hook.
 
-var(functions) is name of an ordinary shell function.  If no options
+var(function) is name of an ordinary shell function.  If no options
 are given this will be added to the array of functions to be executed
 in the given context.
 
@@ -315,6 +318,10 @@ the array of functions to be executed.
 If the option tt(-D) is given, the var(function) is treated as a pattern
 and any matching names of functions are removed from the array of
 functions to be executed.
+
+The options tt(-U), tt(-z) and tt(-k) are passed as arguments to
+tt(autoload) for var(function).  For functions contributed with zsh, the
+options tt(-Uz) are appropriate.
 )
 enditem()
 
@@ -544,36 +551,15 @@ enditem()
 subsect(Use with dynamic directory naming)
 
 It is possible to refer to recent directories using the dynamic directory
-name syntax that appeared in zsh version 4.3.7.  If you create and
-autoload a function tt(zsh_directory_name) containing the following code,
-tt(~[1]) will refer to the most recent directory other than $PWD, and so on.
-This also includes completion.
+name syntax by using the supplied function tt(zsh_directory_name_cdr)
+a hook:
 
-example(if [[ $1 = n ]]; then
-  if [[ $2 = <-> ]]; then
-    # Recent directory
-    typeset -ga reply
-    autoload -Uz cdr
-    cdr -r
-    if [[ -n ${reply[$2]} ]]; then
-      reply=LPAR()${reply[$2]}RPAR()
-      return 0
-    else
-      reply=LPAR()RPAR()
-      return 1
-    fi
-  fi
-elif [[ $1 = c ]]; then
-  if [[ $PREFIX = <-> || -z $PREFIX ]]; then
-    typeset -a keys values
-    values=LPAR()${${(f)"$+LPAR()cdr -l+RPAR()"}/ ##/:}RPAR()
-    keys=LPAR()${values%%:*}RPAR()
-    _describe -t dir-index 'recent directory index' \
-      values keys -V unsorted -S']'
-    return
-  fi
-fi
-return 1)
+example(autoload -Uz add-zsh-hook
+add-zsh-hook -Uz zsh_directory_name zsh_directory_name_cdr)
+
+When this is done, tt(~[1]) will refer to the most recent
+directory other than $PWD, and so on.  Completion after tt(~[)var(...)
+also works.
 
 subsect(Details of directory handling)
 

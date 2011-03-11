@@ -890,7 +890,8 @@ finddir(char *s)
 {
     static struct nameddir homenode = { {NULL, "", 0}, NULL, 0 };
     static int ffsz;
-    Shfunc func = getshfunc("zsh_directory_name");
+    char **ares;
+    int len;
 
     /* Invalidate directory cache if argument is NULL.  This is called *
      * whenever a node is added to or removed from the hash table, and *
@@ -906,9 +907,16 @@ finddir(char *s)
 	return finddir_last = NULL;
     }
 
-    /* It's not safe to use the cache while we have function transformations.*/
-    if(!func && !strcmp(s, finddir_full) && *finddir_full)
+#if 0
+    /*
+     * It's not safe to use the cache while we have function
+     * transformations, and it's not clear it's worth the
+     * complexity of guessing here whether subst_string_by_hook
+     * is going to turn up the goods.
+     */
+    if (!strcmp(s, finddir_full) && *finddir_full)
 	return finddir_last;
+#endif
 
     if ((int)strlen(s) >= ffsz) {
 	free(finddir_full);
@@ -920,18 +928,15 @@ finddir(char *s)
     finddir_scan(&homenode.node, 0);
     scanhashtable(nameddirtab, 0, 0, 0, finddir_scan, 0);
 
-    if (func) {
-	char **ares = subst_string_by_func(func, "d", finddir_full);
-	int len;
-	if (ares && arrlen(ares) >= 2 &&
-	    (len = (int)zstrtol(ares[1], NULL, 10)) > finddir_best) {
-	    /* better duplicate this string since it's come from REPLY */
-	    finddir_last = (Nameddir)hcalloc(sizeof(struct nameddir));
-	    finddir_last->node.nam = zhtricat("[", dupstring(ares[0]), "]");
-	    finddir_last->dir = dupstrpfx(finddir_full, len);
-	    finddir_last->diff = len - strlen(finddir_last->node.nam);
-	    finddir_best = len;
-	}
+    ares = subst_string_by_hook("zsh_directory_name", "d", finddir_full);
+    if (ares && arrlen(ares) >= 2 &&
+	(len = (int)zstrtol(ares[1], NULL, 10)) > finddir_best) {
+	/* better duplicate this string since it's come from REPLY */
+	finddir_last = (Nameddir)hcalloc(sizeof(struct nameddir));
+	finddir_last->node.nam = zhtricat("[", dupstring(ares[0]), "]");
+	finddir_last->dir = dupstrpfx(finddir_full, len);
+	finddir_last->diff = len - strlen(finddir_last->node.nam);
+	finddir_best = len;
     }
 
     return finddir_last;
@@ -3212,7 +3217,7 @@ getshfunc(char *nam)
 char **
 subst_string_by_func(Shfunc func, char *arg1, char *orig)
 {
-    int osc = sfcontext;
+    int osc = sfcontext, osm = stopmsg;
     LinkList l = newlinklist();
     char **ret;
 
@@ -3228,6 +3233,47 @@ subst_string_by_func(Shfunc func, char *arg1, char *orig)
 	ret = getaparam("reply");
 
     sfcontext = osc;
+    stopmsg = osm;
+    return ret;
+}
+
+/**
+ * Front end to subst_string_by_func to use hook-like logic.
+ * name can refer to a function, and name + "_hook" can refer
+ * to an array containing a list of functions.  The functions
+ * are tried in order until one returns success.
+ */
+/**/
+char **
+subst_string_by_hook(char *name, char *arg1, char *orig)
+{
+    Shfunc func;
+    char **ret = NULL;
+
+    if ((func = getshfunc(name))) {
+	ret = subst_string_by_func(func, arg1, orig);
+    }
+
+    if (!ret) {
+	char **arrptr;
+	int namlen = strlen(name);
+	VARARR(char, arrnam, namlen + HOOK_SUFFIX_LEN);
+	memcpy(arrnam, name, namlen);
+	memcpy(arrnam + namlen, HOOK_SUFFIX, HOOK_SUFFIX_LEN);
+
+	if ((arrptr = getaparam(arrnam))) {
+	    /* Guard against internal modification of the array */
+	    arrptr = arrdup(arrptr);
+	    for (; *arrptr; arrptr++) {
+		if ((func = getshfunc(*arrptr))) {
+		    ret = subst_string_by_func(func, arg1, orig);
+		    if (ret)
+			break;
+		}
+	    }
+	}
+    }
+
     return ret;
 }
 

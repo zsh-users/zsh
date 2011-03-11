@@ -1517,8 +1517,12 @@ cindex(directories, named, dynamic)
 cindex(named directories, dynamic)
 cindex(dynamic named directories)
 
-The feature described here is only available if the shell function
-tt(zsh_directory_name) exists.
+If the function tt(zsh_directory_name) exists, or the shell variable
+tt(zsh_directory_name_functions) exists and contains an array of
+function names, then the functions are used to implement dynamic
+directory naming.  The functions are tried in order until one returns
+status zero, so it is important that functions test whether they can
+handle the case in question and return an appropriate status.
 
 A `tt(~)' followed by a string var(namstr) in unquoted square brackets is
 treated specially as a dynamic directory name.  Note that the first
@@ -1529,11 +1533,12 @@ which is the directory corresponding to the name and return status zero
 (executing an assignment as the last statement is usually sufficient), or
 it should return status non-zero.  In the former case the element of reply
 is used as the directory; in the latter case the substitution is deemed to
-have failed and tt(NOMATCH) handling is applied if the option is set.
+have failed.  If all functions fail and the option tt(NOMATCH) is set,
+an error results.
 
-The function tt(zsh_directory_name) is also used to see if a directory can
+The functions defined as above are also used to see if a directory can
 be turned into a name, for example when printing the directory stack or
-when expanding tt(%~) in prompts.  In this case the function is passed two
+when expanding tt(%~) in prompts.  In this case each function is passed two
 arguments: the string tt(d) (for directory) and the candidate for dynamic
 naming.  The function should either return non-zero status, if the
 directory cannot be named by the function, or it should set the array reply
@@ -1551,7 +1556,15 @@ parts of the directory path, as described below; it is used if the prefix
 length matched (16 in the example) is longer than that matched by any
 static name.
 
-The completion system calls `tt(zsh_directory_name c)' in order to
+It is not a requirement that a function implements both
+tt(n) and tt(d) calls; for example, it might be appropriate for certain
+dynamic forms of expansion not to be contracted to names.  In that case
+any call with the first argument tt(d) should cause a non-zero status to
+be returned.
+
+The completion system calls `tt(zsh_directory_name c)' followed by
+equivalent calls to elements of the array
+tt(zsh_directory_name_functions), if it exists, in order to
 complete dynamic names for directories.  The code for this should be
 as for any other completion function as described in
 ifnzman(noderef(Completion System))\

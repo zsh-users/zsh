@@ -1,6 +1,6 @@
 # Add to HOOK the given FUNCTION.
 # HOOK is one of chpwd, precmd, preexec, periodic, zshaddhistory,
-# zshexit (the _functions subscript is not required).
+# zshexit, zsh_directory_name (the _functions subscript is not required).
 #
 # With -d, remove the function from the hook instead; delete the hook
 # variable if it is empty.
@@ -15,7 +15,10 @@
 emulate -L zsh
 
 local -a hooktypes
-hooktypes=(chpwd precmd preexec periodic zshaddhistory zshexit)
+hooktypes=(
+  chpwd precmd preexec periodic zshaddhistory zshexit
+  zsh_directory_name
+)
 
 local opt
 local -a autoopts

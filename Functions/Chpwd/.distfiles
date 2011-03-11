@@ -5,4 +5,5 @@ _cdr
 chpwd_recent_add
 chpwd_recent_dirs
 chpwd_recent_filehandler
+zsh_directory_name_cdr
 '
