@@ -191,7 +191,7 @@ mod_export char *
 zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 		int *outcsp, int useheap)
 {
-    int outcs, outll;
+    int outcs, outll, sub;
     struct region_highlight *rhp;
 
 #ifdef MULTIBYTE_SUPPORT
@@ -212,11 +212,15 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 	    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
 		 rhp < region_highlights + n_region_highlights;
 		 rhp++) {
-		if (rhp->start == 0)
-		    rhp->start_meta = mb_len;
+		if (rhp->flags & ZRH_PREDISPLAY)
+		    sub = predisplaylen;
+		else
+		    sub = 0;
+		if (rhp->start - sub == 0)
+		    rhp->start_meta = sub + mb_len;
 		rhp->start--;
-		if (rhp->end == 0)
-		    rhp->end_meta = mb_len;
+		if (rhp->end - sub == 0)
+		    rhp->end_meta = sub + mb_len;
 		rhp->end--;
 	    }
 	}
@@ -242,10 +246,14 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 	for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
 	     rhp < region_highlights + n_region_highlights;
 	     rhp++) {
-	    if (rhp->start == 0)
-		rhp->start_meta = mb_len;
-	    if (rhp->end == 0)
-		rhp->end_meta = mb_len;
+	    if (rhp->flags & ZRH_PREDISPLAY)
+		sub = predisplaylen;
+	    else
+		sub = 0;
+	    if (rhp->start - sub == 0)
+		rhp->start_meta = sub + mb_len;
+	    if (rhp->end - sub == 0)
+		rhp->end_meta = sub + mb_len;
 	}
     }
     s[mb_len] = '\0';
@@ -296,10 +304,14 @@ zlelineasstring(ZLE_STRING_T instr, int inll, int incs, int *outllp,
 		    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
 			 rhp < region_highlights + n_region_highlights;
 			 rhp++) {
-			if (strp < startp + rhp->start) {
+			if (rhp->flags & ZRH_PREDISPLAY)
+			    sub = predisplaylen;
+			else
+			    sub = 0;
+			if (strp < startp + rhp->start - sub) {
 			    rhp->start_meta++;
 			}
-			if (strp < startp + rhp->end) {
+			if (strp < startp + rhp->end - sub) {
 			    rhp->end_meta++;
 			}
 		    }
@@ -362,7 +374,7 @@ mod_export ZLE_STRING_T
 stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 {
     ZLE_STRING_T outstr;
-    int ll, sz;
+    int ll, sz, sub;
     struct region_highlight *rhp;
 #ifdef MULTIBYTE_SUPPORT
     mbstate_t mbs;
@@ -393,10 +405,14 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 		    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
 			 rhp < region_highlights + n_region_highlights;
 			 rhp++) {
-			if (inptr - instr < rhp->start) {
+			if (rhp->flags & ZRH_PREDISPLAY)
+			    sub = predisplaylen;
+			else
+			    sub = 0;
+			if (inptr - instr < rhp->start - sub) {
 			    rhp->start_meta--;
 			}
-			if (inptr - instr < rhp->end) {
+			if (inptr - instr < rhp->end - sub) {
 			    rhp->end_meta--;
 			}
 		    }
@@ -471,13 +487,17 @@ stringaszleline(char *instr, int incs, int *outll, int *outsz, int *outcs)
 		    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
 			 rhp < region_highlights + n_region_highlights;
 			 rhp++) {
-			if (offs <= rhp->start_meta &&
-			    rhp->start_meta < offs + (int)cnt) {
-			    rhp->start = outptr - outstr;
+			if (rhp->flags & ZRH_PREDISPLAY)
+			    sub = predisplaylen;
+			else
+			    sub = 0;
+			if (offs <= rhp->start_meta - sub &&
+			    rhp->start_meta - sub < offs + (int)cnt) {
+			    rhp->start = outptr - outstr + sub;
 			}
-			if (offs <= rhp->end_meta &&
-			    rhp->end_meta < offs + (int)cnt) {
-			    rhp->end = outptr - outstr;
+			if (offs <= rhp->end_meta - sub &&
+			    rhp->end_meta - sub < offs + (int)cnt) {
+			    rhp->end = outptr - outstr + sub;
 			}
 		    }
 		}
@@ -705,7 +725,7 @@ zle_restore_positions(void)
 mod_export void
 spaceinline(int ct)
 {
-    int i;
+    int i, sub;
     struct region_highlight *rhp;
 
     if (zlemetaline) {
@@ -722,10 +742,14 @@ spaceinline(int ct)
 	    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
 		 rhp < region_highlights + n_region_highlights;
 		 rhp++) {
-		if (rhp->start_meta >= zlemetacs) {
+		if (rhp->flags & ZRH_PREDISPLAY)
+		    sub = predisplaylen;
+		else
+		    sub = 0;
+		if (rhp->start_meta - sub >= zlemetacs) {
 		    rhp->start_meta += ct;
 		}
-		if (rhp->end_meta >= zlemetacs) {
+		if (rhp->end_meta - sub >= zlemetacs) {
 		    rhp->end_meta += ct;
 		}
 	    }
@@ -744,10 +768,14 @@ spaceinline(int ct)
 	    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
 		 rhp < region_highlights + n_region_highlights;
 		 rhp++) {
-		if (rhp->start >= zlecs) {
+		if (rhp->flags & ZRH_PREDISPLAY)
+		    sub = predisplaylen;
+		else
+		    sub = 0;
+		if (rhp->start - sub >= zlecs) {
 		    rhp->start += ct;
 		}
-		if (rhp->end >= zlecs) {
+		if (rhp->end - sub >= zlecs) {
 		    rhp->end += ct;
 		}
 	    }
@@ -765,6 +793,7 @@ void
 shiftchars(int to, int cnt)
 {
     struct region_highlight *rhp;
+    int sub;
 
     if (mark >= to + cnt)
 	mark -= cnt;
@@ -777,14 +806,18 @@ shiftchars(int to, int cnt)
 	    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
 		 rhp < region_highlights + n_region_highlights;
 		 rhp++) {
-		if (rhp->start_meta > to) {
-		    if (rhp->start_meta > to + cnt)
+		if (rhp->flags & ZRH_PREDISPLAY)
+		    sub = predisplaylen;
+		else
+		    sub = 0;
+		if (rhp->start_meta - sub > to) {
+		    if (rhp->start_meta - sub > to + cnt)
 			rhp->start_meta -= cnt;
 		    else
 			rhp->start_meta = to;
 		}
-		if (rhp->end_meta > to) {
-		    if (rhp->end_meta > to + cnt)
+		if (rhp->end_meta - sub > to) {
+		    if (rhp->end_meta - sub > to + cnt)
 			rhp->end_meta -= cnt;
 		    else
 			rhp->end_meta = to;
@@ -803,14 +836,18 @@ shiftchars(int to, int cnt)
 	    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
 		 rhp < region_highlights + n_region_highlights;
 		 rhp++) {
-		if (rhp->start > to) {
-		    if (rhp->start > to + cnt)
+		if (rhp->flags & ZRH_PREDISPLAY)
+		    sub = predisplaylen;
+		else
+		    sub = 0;
+		if (rhp->start - sub > to) {
+		    if (rhp->start - sub > to + cnt)
 			rhp->start -= cnt;
 		    else
 			rhp->start = to;
 		}
-		if (rhp->end > to) {
-		    if (rhp->end > to + cnt)
+		if (rhp->end - sub > to) {
+		    if (rhp->end - sub > to + cnt)
 			rhp->end -= cnt;
 		    else
 			rhp->end = to;

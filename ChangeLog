@@ -1,3 +1,9 @@
+2011-03-11  Peter Stephenson  <pws@csr.com>
+
+	* 28886: Src/Zle/zle_utils.c: Fix 28772 for the case where
+	regions have the "P" flag to include $PREDISPLAY in the
+	offsets.
+
 2011-03-08  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Greg Klanderman: 28846: Completion/Zsh/Type/_functions,
@@ -14310,5 +14316,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5217 $
+* $Revision: 1.5218 $
 *****************************************************
