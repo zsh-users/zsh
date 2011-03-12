@@ -3,6 +3,11 @@
 	* 28889: Src/subst.c, Test/D04parameter.ztst: ${##} should
 	return the length of $#.
 
+2011-03-11  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Greg Klanderman: 28887: Completion/Zsh/Type/_command_names:
+	fix quoting in defs array.
+
 2011-03-11  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Zsh/Context/_dynamic_directory_name:
@@ -14332,5 +14337,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5221 $
+* $Revision: 1.5222 $
 *****************************************************
