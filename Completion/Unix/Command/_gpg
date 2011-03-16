@@ -193,15 +193,15 @@ gpgextra=('--decrypt-files[decrypt multiple files]'
 
 case "$service" in
   gpg)
-    _arguments -C -s -S -A "-*" $gpgbasic $gpgextra $gpgv '*:args:->args'
+    _arguments -C -s -S -A "-*" $gpgbasic $gpgextra $gpgv '*:args:->args' && ret=0
     ;;
 
   gpgv)
-    _arguments -C -s -S -A "-*" $gpgv '*:args:->args'
+    _arguments -C -s -S -A "-*" $gpgv '*:args:->args' && ret=0
     ;;
 
   gpg-zip)
-    _arguments -C -s -S -A "-*" $gpgbasic $gpgzip '*:args:->args'
+    _arguments -C -s -S -A "-*" $gpgbasic $gpgzip '*:args:->args' && ret=0
     ;;
 esac
 
