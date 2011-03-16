@@ -1,3 +1,8 @@
+2011-03-16  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 28896: Functions/Zle/edit-command-line: unset `monitor' option
+	while the widget is running to avoid accidential data loss.
+
 2011-03-16  Peter Stephenson  <pws@csr.com>
 
 	* Mikael: users/15875: Completion/Unix/Command/_gpg: use return
@@ -14342,5 +14347,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5223 $
+* $Revision: 1.5224 $
 *****************************************************
