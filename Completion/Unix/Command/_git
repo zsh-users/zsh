@@ -396,7 +396,7 @@ _git-checkout () {
         # TODO: Allow A...B
         local branch_arg='branches::__git_revisions' \
               tree_ish_arg='tree-ishs::__git_tree_ishs' \
-              file_arg='files::__git_cached_files'
+              file_arg='modified-files::__git_modified_files'
 
         if [[ -n ${opt_args[(I)-b|-B|--orphan]} ]]; then
           tree_ish_arg=
@@ -418,7 +418,7 @@ _git-checkout () {
       elif [[ -n $line[1] ]] && __git_is_treeish $line[1]; then
         __git_ignore_line __git_tree_files ${PREFIX:-.} $line[1] && ret=0
       else
-        __git_ignore_line __git_cached_files && ret=0
+        __git_ignore_line __git_modified_files && ret=0
       fi
       ;;
   esac

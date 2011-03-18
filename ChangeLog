@@ -1,7 +1,10 @@
 2011-03-18  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Nikolai Weibull: 28914: Completion/Unix/Command/_git: Typo
-	fix in `cvsexportcommit' description
+	fix in `cvsexportcommit' description.
+
+	* Nikolai Weibull: 28911: Completion/Unix/Command/_git: Only show
+	modified files for git-checkout without tree.
 
 2011-03-16  Frank Terbeck  <ft@bewatermyfriend.org>
 
@@ -14352,5 +14355,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5225 $
+* $Revision: 1.5226 $
 *****************************************************
