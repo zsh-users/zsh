@@ -3157,7 +3157,7 @@ _git-send-email () {
     '--smtp-pass=[specify password to use for SMTP-AUTH]::password' \
     '--smtp-server=[specify SMTP server to connect to]:smtp server:_hosts' \
     '--smtp-server-port=[specify port to connect to SMTP server on]:smtp port:_ports' \
-    '--smtp-user=[specify user to use for SMTP-AUTH:smtp user:_users' \
+    '--smtp-user=[specify user to use for SMTP-AUTH]:smtp user:_users' \
     '--cc-cmd=[specify command to generate Cc\: header with]:Cc\: command:_path_commands' \
     '(                 --no-chain-reply-to)--chain-reply-to[send each email as a reply to previous one]' \
     '(--chain-reply-to                    )--no-chain-reply-to[send all emails after first as replies to first one]' \
