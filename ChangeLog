@@ -1,3 +1,8 @@
+2011-03-18  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Nikolai Weibull: 28914: Completion/Unix/Command/_git: Typo
+	fix in `cvsexportcommit' description
+
 2011-03-16  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 28896: Functions/Zle/edit-command-line: unset `monitor' option
@@ -14347,5 +14352,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5224 $
+* $Revision: 1.5225 $
 *****************************************************

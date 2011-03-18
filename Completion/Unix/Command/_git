@@ -3070,7 +3070,7 @@ _git-cvsexportcommit () {
     '-m[prepend the commit message with the provided prefix]:message prefix' \
     '-u[update affected files from CVS repository before attempting export]' \
     '-k[reverse CVS keyword expansion]' \
-    '-w[specify location of cVS checkout to use for export]' \
+    '-w[specify location of CVS checkout to use for export]' \
     '-W[use current working directory for bot Git and CVS checkout]' \
     '-v[verbose output]' \
     '-h[display usage]' \
