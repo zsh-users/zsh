@@ -230,8 +230,10 @@ get_cursor(UNUSED(Param pm))
 	/* A lot of work for one number, but still... */
 	ZLE_STRING_T tmpline;
 	int tmpcs, tmpll, tmpsz;
-	tmpline = stringaszleline(zlemetaline, zlemetacs,
+	char *tmpmetaline = ztrdup(zlemetaline);
+	tmpline = stringaszleline(tmpmetaline, zlemetacs,
 				  &tmpll, &tmpsz, &tmpcs);
+	free(tmpmetaline);
 	free(tmpline);
 	return tmpcs;
     }
