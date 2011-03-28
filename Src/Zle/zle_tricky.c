@@ -2650,7 +2650,9 @@ listlist(LinkList l)
     } else {
 	for (p = data; *p; p++) {
 	    nicezputs(*p, shout);
-	    putc('\n', shout);
+	    /* One column: newlines between elements, not after the last */
+	    if (p[1])
+		putc('\n', shout);
 	}
     }
     if (clearflag) {

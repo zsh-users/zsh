@@ -12,6 +12,11 @@
 	* Johan Sundström: 28890: Completion/Unix/Command/.distfiles,
 	Completion/Unix/Command/_npm: New _npm completion.
 
+2011-03-19  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 28926: Src/Zle/zle_tricky.c: No newline after the last line in
+	listlist() when printing the list in a single column.
+
 2011-03-18  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Nikolai Weibull: 28914: Completion/Unix/Command/_git: Typo
@@ -14372,5 +14377,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5230 $
+* $Revision: 1.5231 $
 *****************************************************
