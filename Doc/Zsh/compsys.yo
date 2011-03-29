@@ -447,7 +447,7 @@ directly.
 findex(compdef)
 cindex(completion system, adding definitions)
 startitem()
-xitem(tt(compdef) [ tt(-an) ] var(function names...) [ tt(-[pP]) var(patterns...) [ tt(-N) var(names...) ] ])
+xitem(tt(compdef) [ tt(-ane) ] var(function names...) [ tt(-[pP]) var(patterns...) [ tt(-N) var(names...) ] ])
 xitem(tt(compdef -d) var(names...))
 xitem(tt(compdef -k) [ tt(-an) ] var(function style key-sequences...))
 item(tt(compdef -K) [ tt(-an) ] var(function name style key-sequences ...))(
@@ -460,11 +460,14 @@ defined by `var(cmd1)tt(=)var(service)' lines in tt(#compdef) files, as
 described above.  The argument for var(cmd) will be completed in the
 same way as var(service).
 
-The var(function) argument may alternatively be a string containing any
-shell code.  The string will be executed using the tt(eval) builtin
-command to generate completions.  This provides a way of avoiding having
-to define a new completion function.  For example, to complete
-files ending in `tt(.h)' as arguments to the command tt(foo):
+The var(function) argument may alternatively be a string containing
+almost any shell code.  If the string contains an equal sign, the above
+will take precedence.  The option -e may be used to specify the first
+argument is to be evaluated as shell code even if it contains an equal
+sign.  The string will be executed using the tt(eval) builtin command to
+generate completions.  This provides a way of avoiding having to define
+a new completion function.  For example, to complete files ending in
+`tt(.h)' as arguments to the command tt(foo):
 
 example(compdef '_files -g "*.h"' foo)
 

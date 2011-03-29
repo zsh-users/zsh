@@ -229,7 +229,7 @@ comppostfuncs=()
 #   delete the definitions for the command names `bar' and `baz'
 
 compdef() {
-  local opt autol type func delete new i ret=0 cmd svc
+  local opt autol type func delete eval new i ret=0 cmd svc
   local -a match mbegin mend
 
   emulate -L zsh
@@ -242,7 +242,7 @@ compdef() {
     return 1
   fi
 
-  while getopts "anpPkKd" opt; do
+  while getopts "anpPkKde" opt; do
     case "$opt" in
     a)    autol=yes;;
     n)    new=yes;;
@@ -263,6 +263,7 @@ compdef() {
 	  fi
 	  ;;
     d) delete=yes;;
+    e) eval=yes;;
     esac
   done
   shift OPTIND-1
@@ -276,7 +277,7 @@ compdef() {
     # If the first word contains an equal sign, all words must contain one
     # and we define which services to use for the commands.
 
-    if [[ "$1" = *\=* ]]; then
+    if [[ -z "$eval" ]] && [[ "$1" = *\=* ]]; then
       while (( $# )); do
         if [[ "$1" = *\=* ]]; then
 	  cmd="${1%%\=*}"

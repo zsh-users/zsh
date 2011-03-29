@@ -1,3 +1,8 @@
+2011-03-29  Peter Stephenson  <pws@csr.com>
+
+	* Mikael: 28948: Completion/compinit, Doc/Zsh/compsys.yo:
+	compdef -e overrides interpretation of argument as service.
+
 2011-03-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Mikael: 28941: Src/Zle/zle_params.c: accessing cursor with
@@ -14377,5 +14382,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5231 $
+* $Revision: 1.5232 $
 *****************************************************
