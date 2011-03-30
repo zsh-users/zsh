@@ -1,6 +1,8 @@
 DISTFILES_SRC='
 .distfiles
 vcs_info
+vcs_info_hookadd
+vcs_info_hookdel
 VCS_INFO_adjust
 VCS_INFO_bydir_detect
 VCS_INFO_check_com

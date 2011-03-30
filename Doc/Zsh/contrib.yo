@@ -1117,6 +1117,24 @@ tt(Variable description) below). If an argument is given, that string will be
 used instead of tt(default) in the tt(user-context) field of the style
 context.
 )
+findex(vcs_info_hookadd)
+item(tt(vcs_info_hookadd))(
+Statically registers a number of functions to a given hook. The hook needs
+to be given as the first argument; what follows is a list of hook-function
+names to register to the hook. The `tt(+vi-)' prefix needs to be left out
+here. See tt(Hooks in vcs_info) below for details.
+)
+findex(vcs_info_hookdel)
+item(tt(vcs_info_hookdel))(
+Remove hook-functions from a given hook. The hook needs to be given as the
+first non-option argument; what follows is a list of hook-function
+names to un-register from the hook. If `tt(-a)' is used as the first
+argument, tt(all) occurances of the functions are unregistered. Otherwise
+only the last occurance is removed (if a function was registered to a hook
+more than once) . The `tt(+vi-)' prefix needs to be left out here. See
+tt(Hooks in vcs_info) below for details.
+)
+findex(vcs_info_lastmsg)
 item(tt(vcs_info_lastmsg))(
 Outputs the last var(${vcs_info_msg_*_}) value.
 Takes into account the value of the tt(use-prompt-escapes) style in
@@ -1129,6 +1147,7 @@ Prints a list of all
 supported version control systems. Useful to find out possible contexts
 (and which of them are enabled) or values for the var(disable) style.
 )
+findex(vcs_info_setsys)
 item(tt(vcs_info_setsys))(
 Initializes var(vcs_info)'s internal list of
 available backends. With this function, you can add support for new VCSs
@@ -1176,13 +1195,20 @@ avoid namespace problems, all registered function names are prepended by
 a `+vi-', so the actual functions called for the `foo' hook are
 `tt(+vi-bar)' and `tt(+vi-baz)'.
 
+If you would like to register a function to a hook regardless of the
+current context, you may use the var(vcs_info_hookadd) function. To remove
+a function that was added like that, the var(vcs_info_hookdel) function
+can be used.
+
 If something seems weird, you can enable the `debug' boolean style in
 the proper context and the hook-calling code will print what it tried
 to execute and whether the function in question existed.
 
 When you register more than one function to a hook, all functions are
 executed one after another until one function returns non-zero or until
-all functions have been called.
+all functions have been called. Context-sensitive hook functions are
+executed tt(before) statically registered ones (the ones added by
+var(vcs_info_hookadd)).
 
 You may pass data between functions via an associative array, tt(user_data).
 For example:

@@ -26,6 +26,8 @@ static_functions=(
     VCS_INFO_reposub
     VCS_INFO_set
 
+    vcs_info_hookadd
+    vcs_info_hookdel
     vcs_info_lastmsg
     vcs_info_printsys
     vcs_info_setsys

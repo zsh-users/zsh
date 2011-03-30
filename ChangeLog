@@ -13,6 +13,11 @@
 	* 28958: Functions/VCS_Info/VCS_INFO_hook: Support registering
 	hooks independent of the context.
 
+	* 28960: Doc/Zsh/contrib.yo, Functions/VCS_Info/.distfiles,
+	Functions/VCS_Info/vcs_info, Functions/VCS_Info/vcs_info_hookadd,
+	Functions/VCS_Info/vcs_info_hookdel: Add functions to add/remove
+	static hooks.
+
 2011-03-29  Mikael Magnusson <mikachu@gmail.com>
 
 	* unposted: Completion/Unix/Command/_vim: Fix typo in
@@ -14402,5 +14407,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5236 $
+* $Revision: 1.5237 $
 *****************************************************
