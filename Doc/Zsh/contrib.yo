@@ -600,6 +600,7 @@ sitem(Bazaar (tt(bzr)))(http://bazaar-vcs.org/)
 sitem(Codeville (tt(cdv)))(http://codeville.org/)
 sitem(Concurrent Versioning System (tt(cvs)))(http://www.nongnu.org/cvs/)
 sitem(Darcs (tt(darcs)))(http://darcs.net/)
+sitem(Fossil (tt(fossil)))(http://fossil-scm.org/)
 sitem(Git (tt(git)))(http://git-scm.com/)
 sitem(GNU arch (tt(tla)))(http://www.gnu.org/software/gnu-arch/)
 sitem(Mercurial (tt(hg)))(http://mercurial.selenic.com/)
@@ -649,6 +650,7 @@ bzr
 cdv
 cvs
 darcs
+fossil
 git
 hg
 mtn
@@ -692,8 +694,9 @@ example(:vcs_info:<vcs-string>:<user-context>:<repo-root-name>)
 startitem()
 item(tt(<vcs-string>))(
 is one of: git, git-svn, git-p4, hg, hg-git, hg-hgsubversion, hg-hgsvn,
-darcs, bzr, cdv, mtn, svn, cvs, svk, tla or p4. When hooks are active the
-hooks name is added after a `+'. (See tt(Hooks in vcs_info) below.)
+darcs, bzr, cdv, mtn, svn, cvs, svk, tla, p4 or fossil. When hooks are
+active the hooks name is added after a `+'. (See tt(Hooks in vcs_info)
+below.)
 )
 item(tt(<user-context>))(
 is a freely configurable string, assignable by
