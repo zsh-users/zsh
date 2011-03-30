@@ -4,6 +4,7 @@ VCS_INFO_detect_bzr
 VCS_INFO_detect_cdv
 VCS_INFO_detect_cvs
 VCS_INFO_detect_darcs
+VCS_INFO_detect_fossil
 VCS_INFO_detect_git
 VCS_INFO_detect_hg
 VCS_INFO_detect_mtn
@@ -15,6 +16,7 @@ VCS_INFO_get_data_bzr
 VCS_INFO_get_data_cdv
 VCS_INFO_get_data_cvs
 VCS_INFO_get_data_darcs
+VCS_INFO_get_data_fossil
 VCS_INFO_get_data_git
 VCS_INFO_get_data_hg
 VCS_INFO_get_data_mtn

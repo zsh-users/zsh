@@ -1,9 +1,14 @@
-2011-03-20  Frank Terbeck  <ft@bewatermyfriend.org>
+2011-03-30  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Mike Meyer: 28956, 28957:
 	Functions/VCS_Info/Backends/VCS_INFO_detect_fossil,
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_fossil,
 	Doc/Zsh/contrib.yo: Add fossil support to vcs_info.
+
+	* unposted: Functions/VCS_Info/Backends/.distfiles: Add
+	new backend files to `.distfiles'.
+
+	* unposted: ChangeLog: Fix typo in date.
 
 2011-03-29  Mikael Magnusson <mikachu@gmail.com>
 
@@ -14394,5 +14399,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5234 $
+* $Revision: 1.5235 $
 *****************************************************
