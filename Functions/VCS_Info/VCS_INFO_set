@@ -16,6 +16,7 @@ if [[ $1 == '--nvcs' ]] ; then
         typeset -gx vcs_info_msg_${i}_=
     done
     VCS_INFO_nvcsformats $2
+    [[ $2 != '-preinit-' ]] && VCS_INFO_hook "no-vcs"
 fi
 
 (( ${#msgs} - 1 < 0 )) && return 0

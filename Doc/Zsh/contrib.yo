@@ -1307,6 +1307,11 @@ When setting tt(ret) to non-zero, the string in
 tt(${hook_com[guards-string]}) will be used in the var(%g) escape in the
 tt(patch-format) and tt(nopatch-format) styles.
 )
+item(tt(no-vcs))(
+This hooks is called when no version control system was detected.
+
+The `hook_com' parameter is not used.
+)
 item(tt(post-quilt))(
 Called after the tt(quilt) support is done. The following information
 is passed as arguments to the hook: 1. the quilt-support mode (`addon' or
