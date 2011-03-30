@@ -10,6 +10,9 @@
 
 	* unposted: ChangeLog: Fix typo in date.
 
+	* 28958: Functions/VCS_Info/VCS_INFO_hook: Support registering
+	hooks independent of the context.
+
 2011-03-29  Mikael Magnusson <mikachu@gmail.com>
 
 	* unposted: Completion/Unix/Command/_vim: Fix typo in
@@ -14399,5 +14402,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5235 $
+* $Revision: 1.5236 $
 *****************************************************
