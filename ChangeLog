@@ -21,6 +21,10 @@
 	* 28961: Doc/Zsh/contrib.yo, Functions/VCS_Info/VCS_INFO_set: Add
 	`no-vcs' hook.
 
+	* 28959: Doc/Zsh/contrib.yo, Functions/VCS_Info/VCS_INFO_set,
+	Functions/VCS_Info/vcs_info: Make the nvcsformats style be used if
+	vcs_info is disabled.
+
 2011-03-29  Mikael Magnusson <mikachu@gmail.com>
 
 	* unposted: Completion/Unix/Command/_vim: Fix typo in
@@ -14410,5 +14414,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5238 $
+* $Revision: 1.5239 $
 *****************************************************

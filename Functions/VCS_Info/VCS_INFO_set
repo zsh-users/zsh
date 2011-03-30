@@ -5,11 +5,6 @@
 setopt localoptions noksharrays NO_shwordsplit
 local -i i j
 
-if [[ $1 == '--clear' ]] ; then
-    for i in {0..9} ; do
-        unset vcs_info_msg_${i}_
-    done
-fi
 if [[ $1 == '--nvcs' ]] ; then
     [[ $2 == '-preinit-' ]] && (( maxexports == 0 )) && (( maxexports = 1 ))
     for i in {0..$((maxexports - 1))} ; do

@@ -37,6 +37,7 @@ for func in ${static_functions} ; do
     autoload -Uz ${func}
 done
 
+[[ -n ${(Mk)parameters:#vcs_info_msg_<->_} ]] && unset ${parameters[(I)vcs_info_msg_<->_]}
 VCS_INFO_set --nvcs '-preinit-'
 vcs_info_setsys
 
@@ -77,7 +78,7 @@ vcs_info () {
     (( ${#enabled} == 0 )) && enabled=( all )
 
     if [[ -n ${(M)enabled:#(#i)none} ]] ; then
-        [[ -n ${vcs_info_msg_0_} ]] && VCS_INFO_set --clear
+        [[ -n ${vcs_info_msg_0_} ]] && VCS_INFO_set --nvcs
         return 0
     fi
 
@@ -90,7 +91,7 @@ vcs_info () {
 
     for pat in ${dps} ; do
         if [[ ${PWD} == ${~pat} ]] ; then
-            [[ -n ${vcs_info_msg_0_} ]] && VCS_INFO_set --clear
+            [[ -n ${vcs_info_msg_0_} ]] && VCS_INFO_set --nvcs
             return 0
         fi
     done

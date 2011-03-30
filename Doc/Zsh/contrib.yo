@@ -756,11 +756,11 @@ revision number. This style lets you modify how that string should look.
 )
 kindex(nvcsformats)
 item(tt(nvcsformats))(
-These "formats" are exported when we didn't detect
-a version control system for the current directory. This is useful if you
-want var(vcs_info) to completely take over the generation of your prompt.
-You would do something like tt(PS1='${vcs_info_msg_0_}') to accomplish
-that.
+These "formats" are exported when we didn't detect a version control system
+for the current directory or var(vcs_info) was disabled. This is useful if
+you want var(vcs_info) to completely take over the generation of your
+prompt. You would do something like tt(PS1='${vcs_info_msg_0_}') to
+accomplish that.
 )
 kindex(hgrevformat)
 item(tt(hgrevformat))(
