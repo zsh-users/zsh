@@ -173,11 +173,28 @@ findproc(pid_t pid, Job *jptr, Process *pptr, int aux)
 
 	for (pn = aux ? jobtab[i].auxprocs : jobtab[i].procs;
 	     pn; pn = pn->next)
-	    if (pn->pid == pid) {
+	{
+	    /*
+	     * Make sure we match a process that's still running.
+	     *
+	     * When a job contains two pids, one terminated pid and one
+	     * running pid, then the condition (jobtab[i].stat &
+	     * STAT_DONE) will not stop these pids from being candidates
+	     * for the findproc result (which is supposed to be a
+	     * RUNNING pid), and if the terminated pid is an identical
+	     * process number for the pid identifying the running
+	     * process we are trying to find (after pid number
+	     * wrapping), then we need to avoid returning the terminated
+	     * pid, otherwise the shell would block and wait forever for
+	     * the termination of the process which pid we were supposed
+	     * to return in a different job.
+	     */
+	    if (pn->pid == pid && pn->status == SP_RUNNING) {
 		*pptr = pn;
 		*jptr = jobtab + i;
 		return 1;
 	    }
+	}
     }
 
     return 0;

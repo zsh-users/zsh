@@ -1,3 +1,9 @@
+2011-04-01  Peter Stephenson  <pws@csr.com>
+
+	* Stef van Vlierberghe: 28965 (as posted in 28967):
+	findproc() should not return processes not marked as SP_RUNNING
+	since findproc() is used find processes still known to the OS.
+
 2011-03-30  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Mike Meyer: 28956, 28957:
@@ -14414,5 +14420,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5239 $
+* $Revision: 1.5240 $
 *****************************************************
