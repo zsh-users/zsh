@@ -1,3 +1,8 @@
+2011-04-05  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 28977: Src/utils.c: fix copying of uninitialized memory
+	when trying to spell-correct a really long string.
+
 2011-04-01  Peter Stephenson  <pws@csr.com>
 
 	* Stef van Vlierberghe: 28965 (as posted in 28967):
@@ -14420,5 +14425,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5240 $
+* $Revision: 1.5241 $
 *****************************************************

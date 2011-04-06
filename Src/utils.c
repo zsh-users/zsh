@@ -3684,6 +3684,8 @@ spname(char *oldname)
 	thresh = (int)(p - spnameguess) / 4 + 1;
 	if (thresh < 3)
 	    thresh = 3;
+	else if (thresh > 100)
+	    thresh = 100;
 	if ((thisdist = mindist(newname, spnameguess, spnamebest)) >= thresh) {
 	    /* The next test is always true, except for the first path    *
 	     * component.  We could initialize bestdist to some large     *
