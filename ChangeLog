@@ -1,3 +1,11 @@
+2011-04-11  Peter Stephenson  <pws@csr.com>
+
+	* users/15953: Src/builtin.c: handle EINTR when using read -k or
+	-q together with -u or -p.
+
+	* cat.in.136: users/15945: Completion/Redhat/Command/_yum:
+	various corrections and updates.
+
 2011-04-05  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 28977: Src/utils.c: fix copying of uninitialized memory
@@ -14425,5 +14433,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5241 $
+* $Revision: 1.5242 $
 *****************************************************

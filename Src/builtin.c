@@ -5291,9 +5291,16 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 		    *bptr = readchar;
 		    val = 1;
 		    readchar = -1;
-		} else if ((val = read(readfd, bptr, nchars)) <= 0) {
-		    eof = 1;
-		    break;
+		} else {
+		    while ((val = read(readfd, bptr, nchars)) < 0) {
+			if (errno != EINTR ||
+			    errflag || retflag || breaks || contflag)
+			    break;
+		    }
+		    if (val <= 0) {
+			eof = 1;
+			break;
+		    }
 		}
 
 #ifdef MULTIBYTE_SUPPORT
