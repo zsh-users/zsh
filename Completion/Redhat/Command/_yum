@@ -6,21 +6,23 @@ _yum()
 	local curcontext="$curcontext" state lstate line
 
 	_arguments -s \
-	   {-h,--help}'[show the help message]' \
-	   {-t,--tolerant}'[be tolerant of errors]' \
-	   '-C[run entirely from cache]' \
-	   '-c[config file location]:Yum conf file:_files' \
-	   '-R[maximum command wait time (in minutes)]:max wait time' \
-	   '-d[debug level (0-10)]:debug level' \
-	   '-e[error level (0-10)]:error level' \
-	   '-y[answer yes for all questions]' \
+	   '(- *)'{-h,--help}'[show the help message]' \
+	   '(-t --tolerant)'{-t,--tolerant}'[be tolerant of errors]' \
+	   '(-C --cacheonly)'{-C,--cacheonly}'[run entirely from cache]' \
+	   '(-c --config)'{-c,--config=}'[config file location]:Yum conf file:_files' \
+	   '(-R --randomwait)'{-R,--randomwait=}'[maximum command wait time (in minutes)]:max wait time' \
+	   '(-d --debuglevel)'{-d,--debuglevel=}'[debug level (0-10)]:debug level' \
+	   '(-e --errorlevel)'{-e,--errorlevel=}'[error level (0-10)]:error level' \
+	   '(-y --assumeyes)'{-y,--assumeyes}'[answer yes for all questions]' \
 	   '--installroot=[set install root]:install root:_files -/' \
 	   '*--enablerepo=[enable or or more repositories]:repos to enable:_yum_disabled_repos_list' \
 	   '*--disablerepo=[disable one or more repositories]:disable repos:_yum_enabled_repos_list' \
-	   '--exclude=[exclude package(s) by name or glob]:exclude packages' \
+	   {*-x,*--exclude=}'[exclude package(s) by name or glob]:exclude packages' \
 	   '--version[show yum version]' \
-	   '--obseletes[enable obsoletes processing during updates]' \
+	   '--obsoletes[enable obsoletes processing during updates]' \
+	   '--nogpgcheck[disable gpg signature checking]' \
 	   '--noplugins[disable yum plugins]' \
+	   '--disablepresto[disable Presto plugin and don''''t download any deltarpms]' \
 	   '*::yum command:_yum_command'
 }
 
@@ -148,12 +150,16 @@ yum_repos() {
 
 (( $+functions[_yum_disabled_repos_list] )) || _yum_disabled_repos_list()
 {
+	compset -P '*,'
+	compset -S ',*'
 	yum_repos			
 	compadd "$@" -a -- disabled_yum_repos
 }
 
 (( $+functions[_yum_enabled_repos_list] )) || _yum_enabled_repos_list()
 {
+	compset -P '*,'
+	compset -S ',*'
 	yum_repos			
 	compadd "$@" -a -- enabled_yum_repos
 }
