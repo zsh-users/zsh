@@ -1015,6 +1015,7 @@ AC_CHECK_MEMBERS([struct stat.st_atim.tv_nsec,
 
 dnl Check for struct timezone since some old SCO versions do not define it
 zsh_TYPE_EXISTS([
+#define _GNU_SOURCE 1
 #ifdef HAVE_SYS_TIME_H
 # include <sys/time.h>
 #endif
