@@ -992,7 +992,8 @@ dnl <sys/types.h> and <signal.h>.  Others might need
 dnl to be added.
 AC_CACHE_CHECK(for sigset_t, zsh_cv_type_sigset_t,
 [AC_TRY_COMPILE(
-[#include <sys/types.h>
+[#define _POSIX_C_SOURCE 200809L
+#include <sys/types.h>
 #include <signal.h>], [sigset_t tempsigset;],
   zsh_cv_type_sigset_t=yes, zsh_cv_type_sigset_t=no)])
 AH_TEMPLATE([sigset_t],
