@@ -1,6 +1,6 @@
 2011-04-12  Peter Stephenson  <pws@csr.com>
 
-	* Valention Ochs: 28990: configure.ac, Src/system.h: more
+	* Valentin Ochs: 28990: configure.ac, Src/system.h: more
 	changes needed for signals.
 
 	* Valentin Ochs: 28989: configure.ac: define _POSIX_C_SOURCE
@@ -14441,5 +14441,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5244 $
+* $Revision: 1.5245 $
 *****************************************************
