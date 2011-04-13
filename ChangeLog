@@ -1,3 +1,8 @@
+2011-04-13  Peter Stephenson  <pws@csr.com>
+
+	* gi1242+zsh: 28991: Completion/Unix/Command/_subversion: fix
+	caching policy for subversion.
+
 2011-04-12  Peter Stephenson  <pws@csr.com>
 
 	* Valentin Ochs: 28990: configure.ac, Src/system.h: more
@@ -14441,5 +14446,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5245 $
+* $Revision: 1.5246 $
 *****************************************************

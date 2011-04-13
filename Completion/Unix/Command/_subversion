@@ -18,11 +18,11 @@ _svn () {
 
   if [[ -n $state ]] && (( ! $+_svn_cmds )); then
     typeset -gHA _svn_cmds
-    if ! _cache_invalid svn_cmds && ! _retrieve_cache svn_cmds; then 
+    if _cache_invalid svn-cmds || ! _retrieve_cache svn-cmds; then 
       _svn_cmds=(
 	${=${(f)${${"$(LC_ALL=C _call_program commands svn help)"#l#*Available subcommands:}%%Subversion is a tool*}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
       )
-      _store_cache svn_cmds _svn_cmds
+      _store_cache svn-cmds _svn_cmds
     fi
   fi
 
@@ -38,13 +38,13 @@ _svn () {
       if (( $#cmd )); then
         curcontext="${curcontext%:*:*}:svn-${cmd}:"
 
-	if ! _cache_invalid svn-${cmd}-usage && \
+	if _cache_invalid svn-${cmd}-usage || \
 	    ! _retrieve_cache svn-${cmd}-usage;
 	then
 	  usage=${${(M)${(f)"$(LC_ALL=C _call_program options svn help $cmd)"}:#usage:*}#usage:*$cmd] }
 	  _store_cache svn-${cmd}-usage usage
 	fi
-	if ! _cache_invalid svn-${cmd}-usage && \
+	if _cache_invalid svn-${cmd}-usage || \
 	    ! _retrieve_cache svn-${cmd}-args;
 	then
 	  args=(
@@ -317,12 +317,7 @@ _subversion () {
 }
 
 _svn_caching_policy() {
-  # Rebuild every week
-  local -a oldp
-
-  oldp=( "$1"(Nmw+1) )
-  (( $#oldp ))
+  [[ =$service -nt $1 ]]
 }
-
 
 _subversion "$@"
