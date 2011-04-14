@@ -37,12 +37,16 @@
 #endif
 #endif
 
+#if defined(__linux) || defined(__GNU__) || defined(__GLIBC__) || defined(LIBC_MUSL)
 /*
  * Turn on numerous extensions.
  * This is in order to get the functions for manipulating /dev/ptmx.
  */
 #define _GNU_SOURCE 1
+#endif
+#ifdef LIBC_MUSL
 #define _POSIX_C_SOURCE 200809L
+#endif
 
 /* NeXT has half-implemented POSIX support *
  * which currently fools configure         */

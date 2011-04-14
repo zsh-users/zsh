@@ -2466,6 +2466,17 @@ if test x$zsh_cv_c_unicode_support = xyes; then
 fi
 
 dnl
+dnl musl support
+dnl
+AH_TEMPLATE([LIBC_MUSL],
+[Define to 1 if musl is being used as the C library])
+AC_ARG_ENABLE(libc-musl,
+AC_HELP_STRING([--enable-libc-musl], [compile with musl as the C library]),
+[if test x$enableval = xyes; then
+  AC_DEFINE(LIBC_MUSL)
+fi])
+
+dnl
 dnl static user lookup
 dnl
 AC_ARG_ENABLE(dynamic-nss,
