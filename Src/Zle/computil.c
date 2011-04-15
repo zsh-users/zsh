@@ -1904,7 +1904,7 @@ ca_parse_line(Cadef d, int multi, int first)
     state.argbeg = state.optbeg = state.nargbeg = state.restbeg = state.actopts =
 	state.nth = state.inopt = state.inarg = state.opt = state.arg = 1;
     state.argend = argend = arrlen(compwords) - 1;
-    state.inrest = state.doff = state.singles = state.doff = state.oopt = 0;
+    state.inrest = state.doff = state.singles = state.oopt = 0;
     state.curpos = compcurrent;
     state.args = znewlinklist();
     state.oargs = (LinkList *) zalloc(d->nopts * sizeof(LinkList));

@@ -1,3 +1,8 @@
+2011-04-15  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* Unposted: Src/Zle/computil.c: Fix compiler warning caused by
+	duplicate initialization of state.doff.
+
 2011-04-15  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Simon Ruderich: 28927: Completion/Unix/Command/_git: Fix "git
@@ -14461,5 +14466,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5249 $
+* $Revision: 1.5250 $
 *****************************************************
