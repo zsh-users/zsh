@@ -5,6 +5,7 @@
 
 local prev="$words[CURRENT-1]" file expl tmp is_gnu dir incl match
 local -A TARGETS VARIABLES
+local ret=1
 
 expandVars() {
   local open close var val front ret tmp=$1
@@ -159,10 +160,10 @@ fi
 
 if [[ "$prev" == -[CI] ]]
 then
-  _files -W ${(q)$(findBasedir ${words[1,CURRENT-1]})} -/
+  _files -W ${(q)$(findBasedir ${words[1,CURRENT-1]})} -/ && ret=0
 elif [[ "$prev" == -[foW] ]]
 then
-  _files -W ${(q)$(findBasedir $words)}
+  _files -W ${(q)$(findBasedir $words)} && ret=0
 else
   file="$words[(I)-f]"
   if (( file ))
@@ -208,15 +209,17 @@ else
     # Complete make variable as if shell variable
     compstate[parameter]="${PREFIX%%\=*}"
     compset -P 1 '*='
-    _value "$@"
+    _value "$@" && ret=0
   else
     _tags targets variables
     while _tags
     do
       _requested targets expl 'make targets' \
-        compadd -- ${(k)TARGETS}
+        compadd -- ${(k)TARGETS} && ret=0
       _requested variables expl 'make variables' \
-        compadd -S '=' -- ${(k)VARIABLES}
+        compadd -S '=' -- ${(k)VARIABLES} && ret=0
     done
   fi
 fi
+
+return ret
