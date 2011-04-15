@@ -1,3 +1,8 @@
+2011-04-15  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Simon Ruderich: 28927: Completion/Unix/Command/_git: Fix "git
+	tag -v" completion.
+
 2011-04-15  Mikael Magnusson <mikachu@gmail.com>
 
 	* 28998: Completion/Unix/Command/_make: set return status
@@ -14456,5 +14461,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5248 $
+* $Revision: 1.5249 $
 *****************************************************

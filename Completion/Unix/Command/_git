@@ -1511,7 +1511,9 @@ _git-tag () {
       '-l[list tags matching pattern]:pattern' \
       '--contains=[only list tags which contain the specified commit]: :__git_commits' \
     - verification \
-      '-v[verifies gpg signutare of tags]' && ret=0
+      '-v[verifies gpg signutare of tags]' \
+      '*:: :__git_ignore_line_inside_arguments __git_tags' \
+      && ret=0
 }
 
 # Ancillary Commands (Manipulators)
