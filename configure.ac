@@ -276,6 +276,16 @@ else
   FUNCTIONS_SUBDIRS=no
 fi
 
+ifdef([additionalfpath],[undefine([additionalfpath])])dnl
+AC_ARG_ENABLE(additional-fpath,
+AC_HELP_STRING([--enable-additional-fpath=DIR], [add directories to default function path]),
+[if test x$enableval = xyes; then
+  additionalfpath=""
+else
+  additionalfpath="${enableval}"
+fi], [additionalfpath=""])
+
+AC_SUBST(additionalfpath)dnl
 AC_SUBST(fndir)dnl
 AC_SUBST(sitefndir)dnl
 AC_SUBST(FUNCTIONS_SUBDIRS)dnl
@@ -3087,6 +3097,9 @@ man page install path     : ${zshman}
 info install path         : ${zshinfo}"
 if test "$zshfndir" != no; then
   echo "functions install path    : ${zshfndir}"
+fi
+if test "x$additionalfpath" != x; then
+  echo "additional fpath entries  : ${additionalfpath}"
 fi
 echo "See config.modules for installed modules and functions.
 "

@@ -1,3 +1,9 @@
+2011-04-18  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 29008, 29012: Config/defs.mk.in, Src/init.c, Src/zsh.mdd,
+	configure.ac, INSTALL: Add `--enable-additional-fpath' option to
+	add arbitrary directories to the default `$fpath'.
+
 2011-04-18  Peter Stephenson  <pws@csr.com>
 
 	* Simon Ruderich: 29004: M Doc/Zsh/compsys.yo,
@@ -14471,5 +14477,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5251 $
+* $Revision: 1.5252 $
 *****************************************************

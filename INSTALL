@@ -472,6 +472,12 @@ $fpath array on shell startup.  This directory will not be affected by
 `make uninstall' or `make uninstall.fns', although the version-specific
 directory and its contents will be deleted.
 
+The --enable-additional-fpath option may be used to add arbitrary
+directories to the shell's default $fpath array.  This may be useful to
+have vendor specific function directories available for vendor specific
+addons.  You may add more than one directory this way by listing them with
+the option separated by commas.
+
 Function depth
 --------------
 
@@ -593,6 +599,7 @@ fndir=directory      # the directory where shell functions will go
                      # [DATADIR/zsh/VERSION/functions]
 site-fndir=directory # the directory where site-specific functions can go
                      # [DATADIR/zsh/site-functions]
+additional-path      # add directories to default function path [<none>]
 function-subdirs     # if functions will be installed into subdirectories [no]
 dynamic              # allow dynamically loaded binary modules [yes]
 largefile            # allow configure check for large files [yes]

@@ -86,6 +86,9 @@ INSTALL_DATA    = @INSTALL_DATA@
 # variables used in determining what to install
 FUNCTIONS_SUBDIRS = @FUNCTIONS_SUBDIRS@
 
+# Additional fpath entries (eg. for vendor specific directories).
+additionalfpath = @additionalfpath@
+
 # flags passed to recursive makes in subdirectories
 MAKEDEFS = \
 prefix='$(prefix)' exec_prefix='$(exec_prefix)' bindir='$(bindir)' \

@@ -86,6 +86,10 @@ zshpaths.h: Makemod $(CONFIG_INCS)
 	    >>zshpaths.h.tmp; \
 	  fi; \
 	fi
+	@if test x$(additionalfpath) != x; then \
+	  fpath_tmp="`echo $(additionalfpath) | sed -e 's:,:\", \":g'`"; \
+	  echo "#define ADDITIONAL_FPATH { \"$$fpath_tmp\" }" >> zshpaths.h.tmp; \
+	fi
 	@if cmp -s zshpaths.h zshpaths.h.tmp; then \
 	    rm -f zshpaths.h.tmp; \
 	    echo "\`zshpaths.h' is up to date." ; \
