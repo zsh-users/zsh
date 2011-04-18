@@ -1,3 +1,8 @@
+2011-04-18  Peter Stephenson  <pws@csr.com>
+
+	* Simon Ruderich: 29004: M Doc/Zsh/compsys.yo,
+	Doc/Zsh/metafaq.yo, Etc/FAQ.yo: update archive list.
+
 2011-04-15  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* Unposted: Src/Zle/computil.c: Fix compiler warning caused by
@@ -14466,5 +14471,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5250 $
+* $Revision: 1.5251 $
 *****************************************************

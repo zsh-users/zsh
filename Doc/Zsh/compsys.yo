@@ -2686,11 +2686,11 @@ descend as deep as necessary.
 For example, 
 
 example(zstyle ':completion:*' urls ~/.urls
-mkdir -p ~/.urls/ftp/ftp.zsh.org/pub/development
+mkdir -p ~/.urls/ftp/ftp.zsh.org/pub
 )
 
 allows completion of all the components of the URL
-tt(ftp://ftp.zsh.org/pub/development) after suitable commands such as
+tt(ftp://ftp.zsh.org/pub) after suitable commands such as
 `tt(netscape)' or `tt(lynx)'.  Note, however, that access methods and
 files are completed separately, so if the tt(hosts) style is set hosts
 can be completed without reference to the tt(urls) style.
