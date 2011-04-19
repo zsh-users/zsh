@@ -322,6 +322,9 @@ _perforce() {
   local p4cmd==p4 match mbegin mend
   integer _perforce_cmd_ind
 
+  # Localise variables used at different levels of the hierarchy.
+  local _perforce_exclude_change
+
   if [[ $1 = -l ]]; then
     # Run to load _perforce and associated functions but do
     # nothing else.
@@ -857,28 +860,65 @@ _perforce_whole_path() {
 }
 
 #
+# Helper function for the helper function _perforce_retreive_files
+# for the helper functions for the helper function _perforce files.
+#
+# This code retrieves the list of files with a glob filter and
+# possibly a line filter specified by the caller.  The line filter
+# must match the entire line.
+#
+# Result returned in $files.
+#
+(( $+functions[_perforce_filter_files] )) ||
+_perforce_filter_files() {
+  local call="$1"
+  local globfilter="$2"
+  local linefilter="$3"
+  local line
+
+  if [[ -n $linefilter ]]; then
+    files=(
+      ${${${(f)"$(_perforce_call_p4 $call $call $globfilter 2>/dev/null)"}:#${~linefilter}}%%\#*}
+    )
+  else
+    files=(
+      ${${(f)"$(_perforce_call_p4 $call $call $globfilter 2>/dev/null)"}%%\#*}
+    )
+  fi
+}
+
+#
 # Helper function for the helper functions for the helper function
 # _perforce_files.  This is common code to retrieve a list of files
 # from Perforce.
 #
 # First argument is the p4 subcommand used to list the files.
 # This is also used as a tag for the style to decide whether
-# to limit the list within Perforce.
+# to limit the list within Perforce. It may have a colon
+# followed by a shell pattern to match lines to be excluded
+# from the match.
+#
 # Remaining arguments are additional arguments to compadd.
 #
 (( $+functions[_perforce_retrieve_files] )) ||
 _perforce_retrieve_files() {
-  local pfx
-  local -a files
+  local pfx exclude
+  local -a files match mbegin mend
+
+  if [[ $1 = (#b)([^:]##):(*) ]]; then
+    1=$match[1]
+    exclude=$match[2]
+  fi
 
   if _perforce_whole_path $1; then
-    files=(${${(f)"$(_perforce_call_p4 $1 $1 2>/dev/null)"}%%\#*})
+    _perforce_filter_files $1 '' $exclude
   elif zstyle -t ":completion:${curcontext}:$1" glob; then
     # Limit the list by using Perforce to glob the pattern.
     # This may be faster, but won't use matcher specs etc.
     pfx=${(Q)PREFIX}
     compset -P '*/'
-    files=(${${${(f)"$(_perforce_call_p4 $1 $1 \"\$pfx\*\$\{\(Q\)SUFFIX\}\" 2>/dev/null)"}%%\#*}##*/})
+    _perforce_filter_files $1 '"$pfx*${(Q)SUFFIX}"' $exclude
+    files=(${files##*/})
   else
     # We need to limit the list to a directory.
     if [[ $PREFIX = */* ]]; then
@@ -887,7 +927,8 @@ _perforce_retrieve_files() {
       pfx="*"
     fi
     compset -P '*/'
-    files=(${${${(f)"$(_perforce_call_p4 $1 $1 \$pfx 2>/dev/null)"}%%\#*}##*/})
+    _perforce_filter_files $1 '$pfx' $exclude
+    files=(${files##*/})
   fi
   [[ $#files -eq 1 && $files[1] = '' ]] && files=()
   shift
@@ -912,10 +953,17 @@ _perforce_integrated_files() {
 
 (( $+functions[_perforce_opened_files] )) ||
 _perforce_opened_files() {
-  local type
-  local -a files
+  local csuf
 
-  _perforce_retrieve_files opened "$@"
+  if [[ -n $_perforce_exclude_change ]]; then
+    if [[ $_perforce_exclude_change = default ]]; then
+      csuf=":* default change [^#]#"
+    else
+      csuf=":* change $_perforce_exclude_change [^#]#"
+    fi
+  fi
+
+  _perforce_retrieve_files opened$csuf "$@"
 }
 
 
@@ -2391,6 +2439,14 @@ _perforce_cmd_protects() {
 
 (( $+functions[_perforce_cmd_reopen] )) ||
 _perforce_cmd_reopen() {
+  # Assume user doesn't want to reopen to same changelist.
+  integer pos=${words[(I)-c]}
+  if (( pos )); then
+    _perforce_exclude_change=${words[pos+1]}
+  elif [[ -n ${words[(R)-c?*]} ]]; then
+    _perforce_exclude_change=${${words[(R)-c?*]}##-c}
+  fi
+
   _arguments -s : \
     '-c+[select change to reopen on]:change:_perforce_changes -tc' \
     '-t+[set file type]:file type:_perforce_filetypes' \
@@ -2474,7 +2530,7 @@ _perforce_cmd_set() {
 (( $+functions[_perforce_cmd_shelve] )) ||
 _perforce_cmd_shelve() {
   _arguments -s : \
-    '(-i)-c[specify changlist if not default]:change:_perforce_changes -tc' \
+    '(-i)-c[specify changelist if not default]:change:_perforce_changes -tc' \
     '(-i -r)-d[delete shelved files]' \
     '(-r)-f[force by admin user or force to overwrite]' \
     '(-c)-i[read from standard input]' \

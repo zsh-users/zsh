@@ -1,3 +1,8 @@
+2011-04-19  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: don't complete p4
+	reopen to same change.
+
 2011-04-18  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 29008, 29012: Config/defs.mk.in, Src/init.c, Src/zsh.mdd,
@@ -14477,5 +14482,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5252 $
+* $Revision: 1.5253 $
 *****************************************************
