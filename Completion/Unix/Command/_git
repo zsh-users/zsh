@@ -1331,10 +1331,11 @@ _git-stash () {
             ':: :__git_stashes' && ret=0
           ;;
         (pop|apply)
-          _arguments -
+          _arguments \
             '--index[try to reinstate the changes added to the index as well]' \
             '(-q --quiet)'{-q,--quiet}'[suppress all output]' \
             ':: :__git_stashes' && ret=0
+          ;;
         (branch)
           _arguments \
             ': :__git_guard_branch-name' \
