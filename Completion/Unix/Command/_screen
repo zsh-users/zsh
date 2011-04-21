@@ -3,6 +3,18 @@
 local curcontext="$curcontext" state line expl
 local scr_cmds sessions
 
+function __screen_normal() {
+    if (( CURRENT == 1 )) && [[ $PREFIX == /dev/* ]]; then
+        _path_files -g '*(%)'
+    elif (( CURRENT == 2 )) && [[ ${words[1]} == /dev/* ]]; then
+        _message "baud rate"
+    elif (( CURRENT > 2 )) && [[ ${words[1]} == /dev/* ]]; then
+        _message "no more parameters"
+    else
+        _normal "$@"
+    fi
+}
+
 scr_cmds=(
   acladd            aclchg            acldel            aclgrp
   aclumask          activity          addacl            allpartial
@@ -91,7 +103,7 @@ _arguments -C \
   '-Dx: :->any-sessions' \
   '-dx: :->any-sessions' \
   '-X[execute command as a screen command in the specified session]:screencmd:(${scr_cmds[@]})' \
-  '*::arguments: _normal'
+  '*::arguments: __screen_normal'
 
 if [[ -n $state ]]; then
   case $state in
