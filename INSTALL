@@ -476,7 +476,9 @@ The --enable-additional-fpath option may be used to add arbitrary
 directories to the shell's default $fpath array.  This may be useful to
 have vendor specific function directories available for vendor specific
 addons.  You may add more than one directory this way by listing them with
-the option separated by commas.
+the option separated by commas.  The additional directories will be added
+after the site specific directory (--enable-site-fndir) in the same order
+in which they are supplied.
 
 Function depth
 --------------

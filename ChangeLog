@@ -6,6 +6,9 @@
 	* 29027: Completion/Unix/Command/_screen: support "/dev/ttyUSB0
 	[baud]"-style arguments.
 
+	* unposted: INSTALL: Clarify at which point directories from
+	--enable-additional-fpath are added to $fpath.
+
 2011-04-19  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/X/Command/.distfiles, Config/version.mk:
@@ -14493,5 +14496,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5256 $
+* $Revision: 1.5257 $
 *****************************************************
