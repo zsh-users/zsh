@@ -49,7 +49,6 @@
 	* 28998: Completion/Unix/Command/_make: set return status
 	correctly.
 
->>>>>>> 1.5257
 2011-04-14  Peter Stephenson  <pws@csr.com>
 
 	* 28997: configure.ac, Src/system.h: make --enable-libc-musl
@@ -14503,5 +14502,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5258 $
+* $Revision: 1.5259 $
 *****************************************************
