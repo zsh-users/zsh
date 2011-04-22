@@ -266,7 +266,7 @@
 
 ## Select now reads from stdin if the shell is not interactive.
 ## Its own output goes to stderr.
-  (COLUMNS=80
+  (COLUMNS=80 LINES=3
   PS3="input> "
   select name in one two three; do
     print $name

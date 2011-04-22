@@ -1,3 +1,9 @@
+2011-04-21  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 29025: Test/A01grammar.ztst: in select test, assert LINES=3
+	along with COLUMNS=80 so that the selectlist is sure to be
+	printed where the control script can capture/examine it.
+
 2011-04-21  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Valentin Haenel: 29019, Completion/Unix/Command/_git: Fix git
@@ -43,6 +49,7 @@
 	* 28998: Completion/Unix/Command/_make: set return status
 	correctly.
 
+>>>>>>> 1.5257
 2011-04-14  Peter Stephenson  <pws@csr.com>
 
 	* 28997: configure.ac, Src/system.h: make --enable-libc-musl
@@ -14496,5 +14503,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5257 $
+* $Revision: 1.5258 $
 *****************************************************
