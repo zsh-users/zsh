@@ -1,3 +1,9 @@
+2011-04-24  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Jun T.: 29031: Src/Zle/complist.c: increment global minfo
+	state when inserting characters on the line during interactive
+	menu selection.
+
 2011-04-21  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29025: Test/A01grammar.ztst: in select test, assert LINES=3
@@ -14502,5 +14508,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5259 $
+* $Revision: 1.5260 $
 *****************************************************

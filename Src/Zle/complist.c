@@ -2699,6 +2699,8 @@ domenuselect(Hookdef dummy, Chdata dat)
                 else
                     selfinsertunmeta(zlenoargs);
 		metafy_line();
+		minfo.len++;
+		minfo.end++;
 
                 saveline = (char *) zhalloc(zlemetall);
                 memcpy(saveline, zlemetaline, zlemetall);
