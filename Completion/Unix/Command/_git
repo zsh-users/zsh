@@ -1,4 +1,4 @@
-#compdef git git-cvsserver git-receive-pack git-upload-archive git-upload-pack git-shell gitk
+#compdef git git-cvsserver git-receive-pack git-upload-archive git-upload-pack git-shell gitk tig
 
 # Some parts of this completion's behaviour are configurable:
 #
@@ -5963,6 +5963,11 @@ __git_color_attributes () {
 
 (( $+functions[_gitk] )) ||
 _gitk () {
+  _git-log
+}
+
+(( $+functions[_tig] )) ||
+_tig () {
   _git-log
 }
 

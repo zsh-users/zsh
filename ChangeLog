@@ -3,6 +3,9 @@
 	* Felipe Contreras: 29028: Completion/Unix/Command/_git: Add
 	useful completion for `gitk'.
 
+	* Simon Ruderich: 29041: Completion/Unix/Command/_git: Add
+	completion for `tig' like the one for `gitk' from 29028.
+
 2011-04-24  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Jun T.: 29031: Src/Zle/complist.c: increment global minfo
@@ -14513,5 +14516,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5261 $
+* $Revision: 1.5262 $
 *****************************************************
