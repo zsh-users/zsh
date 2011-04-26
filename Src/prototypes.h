@@ -34,12 +34,12 @@ char *calloc _((size_t, size_t));
 #endif
 
 #if !(defined(USES_TERMCAP_H) || defined(USES_TERM_H))
-extern int tgetent _((char *bp, char *name));
-extern int tgetnum _((char *id));
-extern int tgetflag _((char *id));
-extern char *tgetstr _((char *id, char **area));
-extern char *tgoto _((char *cm, int destcol, int destline));
-extern int tputs _((char *cp, int affcnt, int (*outc) (int)));
+extern int tgetent _((char *bp, const char *name));
+extern int tgetnum _((const char *id));
+extern int tgetflag _((const char *id));
+extern char *tgetstr _((const char *id, char **area));
+extern char *tgoto _((const char *cm, int destcol, int destline));
+extern int tputs _((const char *cp, int affcnt, int (*outc) (int)));
 #endif
 
 /* MISSING PROTOTYPES FOR VARIOUS OPERATING SYSTEMS */

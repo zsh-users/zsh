@@ -1,3 +1,8 @@
+2011-04-26  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 29053 (modified): Src/prototypes.h: Use "const" qualifier
+	in termcap prototypes.
+
 2011-04-25  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Felipe Contreras: 29028: Completion/Unix/Command/_git: Add
@@ -14519,5 +14524,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5263 $
+* $Revision: 1.5264 $
 *****************************************************
