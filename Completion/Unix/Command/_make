@@ -7,7 +7,7 @@ local prev="$words[CURRENT-1]" file expl tmp is_gnu dir incl match
 local -A TARGETS VARIABLES
 local ret=1
 
-expandVars() {
+_make-expandVars() {
   local open close var val front ret tmp=$1
 
   front=${tmp%%\$*}
@@ -29,7 +29,7 @@ expandVars() {
     ;;
 
     (\$*) # Escaped $.
-    print -- "${front}\$$(expandVars ${tmp#\$})"
+    print -- "${front}\$$(_make-expandVars ${tmp#\$})"
     return
     ;;
 
@@ -59,10 +59,10 @@ expandVars() {
     ;;
   esac
 
-  print -- "${front}$(expandVars ${ret})"
+  print -- "${front}$(_make-expandVars ${ret})"
 }
 
-parseMakefile () {
+_make-parseMakefile () {
   local input var val target dep TAB=$'\t' dir=$1 tmp
 
   while read input
@@ -82,14 +82,14 @@ parseMakefile () {
       var=${input%%[ $TAB]#:=*}
       val=${input#*=}
       val=${val##[ $TAB]#}
-      val=$(expandVars $val)
+      val=$(_make-expandVars $val)
       VARIABLES[$var]=$val
       ;;
 
       # TARGET: dependencies
       # TARGET1 TARGET2 TARGET3: dependencies
       ([[:alnum:]][^$TAB:=]#:[^=]*)
-      input=$(expandVars $input)
+      input=$(_make-expandVars $input)
       target=${input%%:*}
       dep=${input#*:}
       dep=${(z)dep}
@@ -108,7 +108,7 @@ parseMakefile () {
         f=${f#[\"<]}
         f=${f%[\">]}
       fi
-      f=$(expandVars $f)
+      f=$(_make-expandVars $f)
       case $f in
         (/*) ;;
         (*) f=$dir/$f ;;
@@ -116,14 +116,14 @@ parseMakefile () {
 
       if [[ -r $f ]]
       then
-        parseMakefile ${f%%/[^/]##} < $f
+        _make-parseMakefile ${f%%/[^/]##} < $f
       fi
       ;;
     esac
   done
 }
 
-findBasedir () {
+_make-findBasedir () {
   local file index basedir
   basedir=$PWD
   for (( index=0; index < $#@; index++ ))
@@ -160,20 +160,20 @@ fi
 
 if [[ "$prev" == -[CI] ]]
 then
-  _files -W ${(q)$(findBasedir ${words[1,CURRENT-1]})} -/ && ret=0
+  _files -W ${(q)$(_make-findBasedir ${words[1,CURRENT-1]})} -/ && ret=0
 elif [[ "$prev" == -[foW] ]]
 then
-  _files -W ${(q)$(findBasedir $words)} && ret=0
+  _files -W ${(q)$(_make-findBasedir $words)} && ret=0
 else
   file="$words[(I)-f]"
   if (( file ))
   then
     file=${~words[file+1]}
-    [[ $file == [^/]* ]] && file=${(q)$(findBasedir $words)}/$file
+    [[ $file == [^/]* ]] && file=${(q)$(_make-findBasedir $words)}/$file
     [[ -r $file ]] || file=
   else
     local basedir
-    basedir=${(q)$(findBasedir $words)}
+    basedir=${(q)$(_make-findBasedir $words)}
     if [[ $is_gnu == gnu && -r $basedir/GNUmakefile ]]
     then
       file=$basedir/GNUmakefile
@@ -192,14 +192,14 @@ else
   then
     if [[ $is_gnu == gnu ]] && zstyle -t ":completion:${curcontext}:targets" call-command
     then
-      parseMakefile $PWD < <(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null)
+      _make-parseMakefile $PWD < <(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null)
     else
       case "$OSTYPE" in
         freebsd*)
-        parseMakefile $PWD < <(_call_program targets "$words[1]" -nsp -f "$file" .PHONY 2> /dev/null)
+        _make-parseMakefile $PWD < <(_call_program targets "$words[1]" -nsp -f "$file" .PHONY 2> /dev/null)
 	;;
 	*)
-        parseMakefile $PWD < $file
+        _make-parseMakefile $PWD < $file
       esac
     fi
   fi

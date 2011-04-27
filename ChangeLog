@@ -1,3 +1,8 @@
+2011-04-27  Mikael Magnusson <mikachu@gmail.com>
+
+	* 29051: Completion/Unix/Command/_make: add _make- prefix to
+	internal helper functions.
+
 2011-04-26  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 29053 (modified): Src/prototypes.h: Use "const" qualifier
@@ -14524,5 +14529,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5264 $
+* $Revision: 1.5265 $
 *****************************************************
