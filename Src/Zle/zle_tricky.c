@@ -1899,7 +1899,7 @@ get_comp_string(void)
 			*dbeg = '{';
 			i -= len;
 			boffs -= len;
-			strcpy(dbeg, dbeg + len);
+			memmove(dbeg, dbeg + len, 1+strlen(dbeg+len));
 			dp -= len;
 		    }
 		    bbeg = lastp = p;
@@ -1948,7 +1948,7 @@ get_comp_string(void)
 			*dbeg = '{';
 			i -= len;
 			boffs -= len;
-			strcpy(dbeg, dbeg + len);
+			memmove(dbeg, dbeg + len, 1+strlen(dbeg+len));
 			dp -= len;
 		    }
 		    bbeg = NULL;
@@ -2013,7 +2013,7 @@ get_comp_string(void)
 		new->qpos = strlen(quotename(predup, NULL));
 		*dbeg = '{';
 		boffs -= len;
-		strcpy(dbeg, dbeg + len);
+		memmove(dbeg, dbeg + len, 1+strlen(dbeg+len));
 	    }
 	    if (brend) {
 		Brinfo bp, prev = NULL;
@@ -2026,7 +2026,7 @@ get_comp_string(void)
 		    l = bp->qpos;
 		    bp->pos = strlen(predup + p + l);
 		    bp->qpos = strlen(quotename(predup + p + l, NULL));
-		    strcpy(predup + p, predup + p + l);
+		    memmove(predup + p, predup + p + l, 1+bp->pos);
 		}
 	    }
 	    if (hascom) {
