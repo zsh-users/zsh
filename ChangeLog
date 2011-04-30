@@ -1,5 +1,8 @@
 2011-04-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	*  Haakon Riiser: 29100: Completion/Unix/Command/_ffmpeg: Clean
+	up and add dependencies.
+
 	* 29114: Doc/Makefile.in, Doc/Zsh/.distfiles,
 	Doc/Zsh/ftp_sites.yo, Doc/Zsh/metafaq.yo, Etc/FAQ.yo: Use same
 	FTP sites list in META-FAQ as FAQ.
@@ -14547,5 +14550,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5268 $
+* $Revision: 1.5269 $
 *****************************************************
