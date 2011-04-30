@@ -1,0 +1,73 @@
+#compdef zypper
+#
+# Copyright (C) 2009 Holger Macht <holger@homac.de>
+#
+# This file is released under the GPLv2.
+#
+# Based on the the zsh guide from http://zsh.dotsrc.org/Guide/zshguide06.html
+#
+# Toggle verbose completions: zstyle ':completion:*:zypper:*' verbose no
+#                             zstyle ':completion:*:zypper-subcommand:*' verbose no
+#
+#  version 0.1
+#
+# Main dispatcher
+
+_zypper() {
+    if (( CURRENT > 2 )) && [[ ${words[2]} != "help" ]]; then
+        # Remember the subcommand name
+	local cmd=${words[2]}
+        # Set the context for the subcommand.
+	curcontext="${curcontext%:*:*}:zypper-subcommand"
+        # Narrow the range of words we are looking at to exclude `zypper'
+	(( CURRENT-- ))
+	shift words
+	
+	_zypper_cmd_do $cmd
+    else
+	local hline
+	local -a cmdlist
+	local tag=0
+	_call_program help-commands zypper help | while read -A hline; do
+	    # start parsing with "Global Options:"
+	    [[ $hline =~ "^Global Options:" ]] && tag=1
+	    [[ $tag = 0 ]] && continue
+	    [[ $hline[1] =~ ^\t\t\t\t ]] && continue
+	    # all commands have to start with lower case letters
+	    [[ $hline[1] =~ ^[A-Z] ]] && continue
+	    (( ${#hline} < 2 )) && continue
+
+	    # cut comma at end of command
+	    hline[1]=`echo $hline[1] | sed -e 's/\(^.*\),/\1/'`
+
+	    # ${hline[1]%,} truncates the last ','
+	    cmdlist=($cmdlist "${hline[1]%,}:${hline[2,-1]}")
+	done
+	_describe -t zypper-commands 'zypper command' cmdlist
+    fi
+}
+
+_zypper_cmd_do() {
+    local hline
+    local -a cmdlist
+    local tag=0
+    _call_program help-commands zypper help $cmd | while read -A hline; do
+	# start parsing from "Options:"
+	[[ $hline =~ "^Command options:" ]] && tag=1
+	[[ $tag = 0 ]] && continue
+	# Option has to start with a '-'
+	[[ $hline[1] =~ ^- ]] || continue
+	(( ${#hline} < 2 )) && continue
+
+	cmdlist=($cmdlist "${hline[1]%,}:${hline[2,-1]}")
+    done
+
+    if [ -n "$cmdlist" ]; then
+	_describe -t zypper-commands 'zypper command' cmdlist
+    else
+	_complete
+    fi
+}
+
+# Code to make sure _zypper is run when we load it
+_zypper "$@"

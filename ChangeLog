@@ -1,3 +1,12 @@
+2011-04-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* İsmail Dönmez: 29020: Completion/openSUSE/Command/_SuSEconfig,
+	Completion/openSUSE/Command/_hwinfo,
+	Completion/openSUSE/Command/_osc,
+	Completion/openSUSE/Command/_yast2,
+	Completion/openSUSE/Command/_zypper (plus .distfiles): new
+	completions.
+
 2011-04-29  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29107: Src/Zle/zle_tricky.c: replace overlapping strcpy with
@@ -14534,5 +14543,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5266 $
+* $Revision: 1.5267 $
 *****************************************************

@@ -1,0 +1,28 @@
+#compdef SuSEconfig
+
+local curcontext="$curcontext" state line
+typeset -A opt_args
+
+if [[ -z "$_SuSEconfig_modules" ]]; then 
+	for i in /sbin/conf.d/SuSEconfig.*; do
+		case $i in *.rpm*|*.swap|*.bak|*.orig|*~|\#*) continue;; esac
+		_SuSEconfig_modules=($_SuSEconfig_modules ${i##*/SuSEconfig.})
+	done
+fi
+
+
+_arguments \
+  '--help' \
+  '--quick' \
+  '--force' \
+  '--verbose' \
+  '--nonewpackage' \
+  '--module:module:->module' && return 0
+
+case $state in
+	module) compadd $_SuSEconfig_modules ;;
+esac
+
+# Usage: SuSEconfig [--quick|--nonewpackage|--force|--verbose] [--module name]
+
+

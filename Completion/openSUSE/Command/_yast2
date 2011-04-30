@@ -1,0 +1,30 @@
+#compdef yast2 yast
+
+local curcontext="$curcontext" state line
+typeset -A opt_args
+
+if [[ -z "$_yast2_modules" ]]; then 
+	for i in $(/sbin/yast2 --list | grep -v "Available.*modules"); do
+		_yast2_modules=($_yast2_modules $i)
+	done
+fi
+
+_arguments -s \
+  '(--list)-l[list all available modules]' '(-l)--list' \
+  '(--help)-h[help]' '(-h)--help'\
+  \
+ {'(--geometry)-g[default window size (qt only)]','(-g)--geometry'}':geometry:(800x600+0+0)' \
+  '(--style)-s[widget style (qt only)]' '(-s)--style' \
+  \
+ {'(--install)-i[install rpm package]','(-i)--install'}':filename:_files' \
+  \
+ '--noborder[no window manager border for main window]' '--noborder' \
+ '--fullscreen[use full screen]' '--fullscreen' \
+  \
+  ':module:->module' && return 0
+
+case $state in
+	module) compadd $_yast2_modules; _files -g "*.ycp";;
+esac
+
+

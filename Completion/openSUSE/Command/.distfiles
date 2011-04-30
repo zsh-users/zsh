@@ -1,0 +1,8 @@
+DISTFILES_SRC='
+.distfiles
+_hwinfo
+_osc
+_SuSEconfig
+_yast2
+_zypper
+'
