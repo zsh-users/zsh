@@ -25,34 +25,7 @@ mirroring tt(ftp.cs.elte.hu) instead of the primary site.
 cindex(FTP sites for zsh)
 cindex(acquiring zsh by FTP)
 cindex(availability of zsh)
-startitem()
-item(Primary site)(
-nofill(tt(ftp://ftp.zsh.org/pub/)
-tt(http://www.zsh.org/pub/))
-)
-item(Australia)(
-nofill(tt(ftp://ftp.zsh.org/pub/)
-tt(http://www.zsh.org/pub/))
-)
-item(Denmark)(
-nofill(tt(ftp://mirrors.dotsrc.org/zsh/))
-)
-item(Finland)(
-nofill(tt(ftp://ftp.funet.fi/pub/unix/shells/zsh/))
-)
-item(France)(
-nofill(tt(ftp://nephtys.lip6.fr/pub/unix/shells/zsh/))
-)
-item(Germany)(
-nofill(tt(ftp://ftp.fu-berlin.de/pub/unix/shells/zsh/))
-)
-item(Hungary)(
-nofill(tt(ftp://ftp.kfki.hu/pub/packages/zsh/))
-)
-item(Poland)(
-nofill(tt(ftp://sunsite.icm.edu.pl/pub/unix/shells/zsh/))
-)
-enditem()
+INCLUDEFILE(Zsh/ftp_sites.yo)\
 
 The up-to-date source code is available via anonymous CVS and Git from
 Sourceforge.  See tt(http://sourceforge.net/projects/zsh/) for details.

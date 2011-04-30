@@ -1,5 +1,9 @@
 2011-04-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 29114: Doc/Makefile.in, Doc/Zsh/.distfiles,
+	Doc/Zsh/ftp_sites.yo, Doc/Zsh/metafaq.yo, Etc/FAQ.yo: Use same
+	FTP sites list in META-FAQ as FAQ.
+
 	* İsmail Dönmez: 29020: Completion/openSUSE/Command/_SuSEconfig,
 	Completion/openSUSE/Command/_hwinfo,
 	Completion/openSUSE/Command/_osc,
@@ -14543,5 +14547,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5267 $
+* $Revision: 1.5268 $
 *****************************************************

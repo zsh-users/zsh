@@ -42,7 +42,12 @@ whenhtml(report(ARG1)(ARG2)(ARG3))\
 whenlatex(report(ARG1)(ARG2)(ARG3))\
 whenman(report(ARG1)(ARG2)(ARG3))\
 whenms(report(ARG1)(ARG2)(ARG3))\
-whensgml(report(ARG1)(ARG2)(ARG3)))
+whensgml(report(ARG1)(ARG2)(ARG3)))\
+def(startitem)(0)() \
+def(enditem)(0)()\
+def(item)(2)(
+ARG1: ARG2)\
+def(nofill)(1)(ARG1)
 myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2010/02/15)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
@@ -334,25 +339,7 @@ label(16)
   the shell.  The following list also appears on the WWW at
   url(http://www.zsh.org/)(http://www.zsh.org/) .
 
-  description(
-    mydit(Home site) url(ftp://ftp.zsh.org/pub/)(ftp://ftp.zsh.org/pub/)
-    mydit()          (also url(http://www.zsh.org/pub/)
-(http://www.zsh.org/pub/))
-    mydit(Denmark)   url(ftp://mirrors.dotsrc.org/zsh/)
-(ftp://mirrors.dotsrc.org/zsh/)
-    mydit()          (also url(http://mirrors.dotsrc.org/zsh/)
-(http://mirrors.dotsrc.org/zsh/))
-    mydit(Finland)   url(ftp://ftp.funet.fi/pub/unix/shells/zsh/)
-(ftp://ftp.funet.fi/pub/unix/shells/zsh/)
-    mydit(France)    url(ftp://nephtys.lip6.fr/pub/unix/shells/zsh/)
-(ftp://nephtys.lip6.fr/pub/unix/shells/zsh/)
-    mydit(Germany)   url(ftp://ftp.fu-berlin.de/pub/unix/shells/zsh/)
-(ftp://ftp.fu-berlin.de/pub/unix/shells/zsh/)
-    mydit(Hungary)   url(ftp://ftp.kfki.hu/pub/packages/zsh/)
-(ftp://ftp.kfki.hu/pub/packages/zsh/)
-    mydit(Poland)    url(ftp://sunsite.icm.edu.pl/pub/unix/shells/zsh/)
-(ftp://sunsite.icm.edu.pl/pub/unix/shells/zsh/)
-  )
+includefile(../Doc/Zsh/ftp_sites.yo)
 
   A Windows port was created by Amol Deshpandem based on 3.0.5 (which
   is now rather old).  This has now been restored and can be found at
