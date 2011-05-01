@@ -1,57 +1,49 @@
 #compdef ffmpeg
 
-local context state line
+local context state line expl
 typeset -A opt_args
-
-local -a _ffmpeg_argspecs
-
-local BOLD=$'\e[1m'
-local NORM=$'\e[m'
-
-(( $+functions[_ffmpeg_compadd] )) || _ffmpeg_compadd() {
-    compadd -X "${BOLD}$1${NORM}" -q -S "$3" -a $2
-}
 
 (( $+functions[_ffmpeg_presets] )) || _ffmpeg_presets() {
     local presets
     presets=(~/.ffmpeg/*.ffpreset(:t:r) "$FFMPEG_DATADIR"/*.ffpreset(:t:r))
-    _ffmpeg_compadd 'select preset' presets ''
+    _wanted ffmpeg-presets expl 'select preset' compadd -a presets
 }
 
 (( $+functions[_ffmpeg_acodecs] )) || _ffmpeg_acodecs() {
     local acodecs
     acodecs=(copy ${${(M)${(f)"$(_call_program audio-codecs $words[1] -codecs 2>/dev/null)"}:#[[:space:]][D[:space:]][E[:space:]]A[S[:space:]][D[:space:]][T[:space:]][[:space:]][^[:space:]]##*}//(#b)????????([^[:space:]]##)*/$match[1]})
-    _ffmpeg_compadd 'force audio codec (''copy'' to copy stream)' acodecs ''
+    _wanted ffmpeg-audio-codecs expl 'force audio codec (''copy'' to copy stream)' compadd -a acodecs
 }
 
 (( $+functions[_ffmpeg_vcodecs] )) || _ffmpeg_vcodecs() {
     local vcodecs
     vcodecs=(copy ${${(M)${(f)"$(_call_program video-codecs $words[1] -codecs 2>/dev/null)"}:#[[:space:]][D[:space:]][E[:space:]]V[S[:space:]][D[:space:]][T[:space:]][[:space:]][^[:space:]]##*}//(#b)????????([^[:space:]]##)*/$match[1]})
-    _ffmpeg_compadd 'force video codec (''copy'' to copy stream)' vcodecs ''
+    _wanted ffmpeg-video-codecs expl 'force video codec (''copy'' to copy stream)' compadd -a vcodecs
 }
 
 (( $+functions[_ffmpeg_formats] )) || _ffmpeg_formats() {
     local formats
     formats=(${(ou)${=${(s:,:)${${(M)${(f)"$(_call_program formats $words[1] -formats 2>/dev/null)"}:#[[:space:]][D[:space:]][E[:space:]][[:space:]][^[:space:]]##*}//(#b)????([^[:space:]]##)*/$match[1]}}}})
-    _ffmpeg_compadd 'force format' formats ''
+    _wanted ffmpeg-formats expl 'force format' compadd -a formats
 }
 
 (( $+functions[_ffmpeg_list_pix_fmts] )) || _ffmpeg_list_pix_fmts() {
-    print -l ${${(M)${(f)"$(_call_program pix-fmts $words[1] -pix_fmts 2>/dev/null)"}:#[I.]*}//(#b)??????([^[:space:]]##)*/$match[1]}
+    echo - ${${${(M)${(f)"$(_call_program formats $words[1] -pix_fmts 2>/dev/null)"}:#[I.][O.][H.][P.][B.] [^=[:space:]]*}#* }%% *}
 }
 
 (( $+functions[_ffmpeg_pix_fmts] )) || _ffmpeg_pix_fmts() {
     local pix_fmts
     pix_fmts=($(_ffmpeg_list_pix_fmts))
-    _ffmpeg_compadd 'set pixel format' pix_fmts ''
+    _wanted ffmpeg-pix-fmts expl 'set pixel format' compadd -a pix_fmts
 }
 
 (( $+functions[_ffmpeg_bsfs] )) || _ffmpeg_bsfs() {
     local bsfs
     bsfs=(${${(f)"$(_call_program bsfs $words[1] -bsfs 2>/dev/null)"}:#*:})
-    _ffmpeg_compadd 'set bitstream filter' bsfs ''
+    _wanted ffmpeg-bsfs expl 'set bitstream filter' compadd -a bsfs
 }
 
+local -a _ffmpeg_argspecs
 {
     local lastopt
     local lastopt_description

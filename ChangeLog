@@ -1,3 +1,8 @@
+2011-05-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Haakon Riiser: unposted: Completion/Unix/Command/_ffmpeg: more
+	tweaks.
+
 2011-04-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Haakon Riiser: 29100: Completion/Unix/Command/_ffmpeg: Clean
@@ -14550,5 +14555,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5270 $
+* $Revision: 1.5271 $
 *****************************************************
