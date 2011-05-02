@@ -1,3 +1,8 @@
+2011-05-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 29129: Src/exec.c: reading off end of file descriptor array
+	noticed by Vincent.
+
 2011-05-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Haakon Riiser: unposted: Completion/Unix/Command/_ffmpeg: more
@@ -14555,5 +14560,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5271 $
+* $Revision: 1.5272 $
 *****************************************************

@@ -3008,10 +3008,11 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		if (!checkclobberparam(fn))
 		    fil = -1;
 		else if (fn->fd2 > 9 &&
-		    ((fdtable[fn->fd2] != FDT_UNUSED &&
-		      fdtable[fn->fd2] != FDT_EXTERNAL) ||
-		     fn->fd2 == coprocin ||
-		     fn->fd2 == coprocout)) {
+			 (fn->fd2 > max_zsh_fd ||
+			  (fdtable[fn->fd2] != FDT_UNUSED &&
+			   fdtable[fn->fd2] != FDT_EXTERNAL) ||
+			  fn->fd2 == coprocin ||
+			  fn->fd2 == coprocout)) {
 		    fil = -1;
 		    errno = EBADF;
 		} else {
