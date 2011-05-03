@@ -43,27 +43,73 @@ typeset -A opt_args
     _wanted ffmpeg-bsfs expl 'set bitstream filter' compadd -a bsfs
 }
 
+typeset -A _ffmpeg_flags
+
+(( $+functions[_ffmpeg_flag_options] )) || _ffmpeg_flag_options() {
+    local expl
+    _wanted options expl 'select flags' compadd -S '' -- {-,+}${^flag_options}
+}
+
+(( $+functions[_ffmpeg_more_flag_options] )) || _ffmpeg_more_flag_options() {
+    compset -p $1 && _ffmpeg_flag_options
+}
+
+(( $+functions[_ffmpeg_new_flag_options] )) || _ffmpeg_new_flag_options() {
+    compset -P '*' && _ffmpeg_flag_options
+}
+
+(( $+functions[_ffmpeg_flags] )) || _ffmpeg_flags() {
+    local -a flag_options
+    eval "flag_options=(\${=_ffmpeg_flags[$1]})"
+
+    local match mbegin mend
+    integer ret=1
+
+    if [[ $PREFIX = (#b)(*)[-+]([^-+]#) ]]; then 
+        if [[ -n ${flag_options[(R)$match[2]]} ]]; then
+            _ffmpeg_new_flag_options && ret=0
+        fi 
+        if [[ -n ${flag_options[(R)$match[2]?*]} ]]; then
+            _ffmpeg_more_flag_options ${#match[1]} && ret=0
+        fi
+    else
+        _ffmpeg_flag_options && ret=0
+    fi
+
+    return $ret
+}
+
+(( $+functions[_ffmpeg_register_lastopt_values] )) || _ffmpeg_register_lastopt_values() {
+    if (( lastopt_takesargs )); then
+        lastopt+=":$lastopt_description:"
+        if (( $#lastopt_values )); then
+            if [[ $lastopt_type == flags ]]; then
+                flagtype=${${lastopt%%:*}#-}
+                lastopt+="->$flagtype"
+                _ffmpeg_flags[$flagtype]="${lastopt_values[*]}"
+            else
+                lastopt+="(${lastopt_values[*]})"
+            fi
+        fi
+    fi
+    _ffmpeg_argspecs+=$lastopt
+}
+
 local -a _ffmpeg_argspecs
 {
     local lastopt
     local lastopt_description
     local lastopt_takesargs
+    local lastopt_type
     local -a lastopt_values
 
     _call_program options $words[1] -h 2>/dev/null | while IFS=$'\n' read -r; do
         if [[ $REPLY == -* ]]; then
-            if [[ -n $lastopt ]]; then
-                if (( lastopt_takesargs )); then
-                    lastopt+=":$lastopt_description:"
-                    if (( $#lastopt_values )); then
-                        lastopt+="(${lastopt_values[*]})"
-                    fi
-                fi
-                _ffmpeg_argspecs+=$lastopt
-            fi
+            [[ -n $lastopt ]] && _ffmpeg_register_lastopt_values
             lastopt=${REPLY%%[[:space:]]*}
             lastopt_description=${REPLY##-[^[:space:]]##[[:space:]]##}
-            if [[ $lastopt_description == '<'* ]]; then
+            if [[ $lastopt_description == (#b)'<'(?##)'>'* ]]; then
+                lastopt_type=$match[1]
                 lastopt_description=${lastopt_description##<[^[:space:]]##>[[:space:]]##[^[:space:]]##[[:space:]]#}
                 if [[ -z $lastopt_description ]]; then
                     lastopt_description=$lastopt
@@ -113,15 +159,7 @@ local -a _ffmpeg_argspecs
             lastopt_values+=$REPLY
         fi
     done
-    if [[ -n $lastopt ]]; then
-        if (( lastopt_takesargs )); then
-            lastopt+=":$lastopt_description:"
-            if (( $#lastopt_values )); then
-                lastopt+="(${lastopt_values[*]})"
-            fi
-        fi
-        _ffmpeg_argspecs+=$lastopt
-    fi
+    [[ -n $lastopt ]] && _ffmpeg_register_lastopt_values
 }
 
 _arguments -S \
@@ -152,5 +190,8 @@ _arguments -S \
 
 [[ "$state" == "noformat" ]] &&
     _values -s : -S = 'disable specified pixel formats by force' $(_ffmpeg_list_pix_fmts) && return 0
+
+[[ -n $state && -n $_ffmpeg_flags[$state] ]] &&
+    _ffmpeg_flags $state && return 0
 
 return 1
