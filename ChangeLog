@@ -1,3 +1,8 @@
+2011-05-03  Peter Stephenson  <pws@csr.com>
+
+	* 29134: Src/prototypes.h: change termcap prototypes for AIX
+	locally until we find the header.
+
 2011-05-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 29129: Src/exec.c: reading off end of file descriptor array
@@ -14560,5 +14565,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5272 $
+* $Revision: 1.5273 $
 *****************************************************

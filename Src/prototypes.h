@@ -34,12 +34,24 @@ char *calloc _((size_t, size_t));
 #endif
 
 #if !(defined(USES_TERMCAP_H) || defined(USES_TERM_H))
-extern int tgetent _((char *bp, const char *name));
-extern int tgetnum _((const char *id));
-extern int tgetflag _((const char *id));
-extern char *tgetstr _((const char *id, char **area));
-extern char *tgoto _((const char *cm, int destcol, int destline));
-extern int tputs _((const char *cp, int affcnt, int (*outc) (int)));
+/*
+ * These prototypes are only used where we don't have the
+ * headers.  In some cases they need tweaking.
+ * TBD: we'd much prefer to get hold of the header where
+ * these are defined.
+ */
+#ifdef _AIX
+#define TC_CONST const
+#else
+#define TC_CONST
+#endif
+extern int tgetent _((char *bp, TC_CONST char *name));
+extern int tgetnum _((char *id));
+extern int tgetflag _((char *id));
+extern char *tgetstr _((char *id, char **area));
+extern char *tgoto _((TC_CONST char *cm, int destcol, int destline));
+extern int tputs _((TC_CONST char *cp, int affcnt, int (*outc) (int)));
+#undef TC_CONST
 #endif
 
 /* MISSING PROTOTYPES FOR VARIOUS OPERATING SYSTEMS */
