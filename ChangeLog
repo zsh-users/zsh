@@ -1,5 +1,9 @@
 2011-05-04  Peter Stephenson  <pws@csr.com>
 
+	* Rocky Bernstein: 29135 (plus tweaks): Completion/bashcompinit,
+	Test/.distfiles, Test/Y04compgen.ztst, Test/compgentest: fix and
+	test "compgen -W" in bash completion.
+
 	* unposted: NEWS: a few notes for next release.
 
 2011-05-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
@@ -14574,5 +14578,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5275 $
+* $Revision: 1.5276 $
 *****************************************************

@@ -1,0 +1,21 @@
+# Tests for bash compgen compatibility.
+
+%prep
+  if ( zmodload zsh/parameter ) >/dev/null 2>&1; then
+    . $ZTST_srcdir/compgentest
+    comptestinit -z $ZTST_testdir/../Src/zsh &&
+  else
+    ZTST_unimplemented="the zsh/parameter module is not available"
+  fi
+
+%test
+
+  comptest $': \t\t\t\t\t\t\t'
+0:bash compatibility: compgen -W
+>abc
+>abe
+>ab
+
+%clean
+
+  zmodload -ui zsh/parameter

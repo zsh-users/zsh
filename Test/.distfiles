@@ -42,6 +42,7 @@ V06parameter.ztst
 Y01completion.ztst
 Y02compmatch.ztst
 Y03arguments.ztst
+Y04compgen.ztst
 comptest
 runtests.zsh
 ztst.zsh
