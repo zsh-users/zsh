@@ -1,3 +1,10 @@
+2011-05-04  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 29140: Completion/bashcompinit: introduce function-scope wrapper
+	around the call to the bash completion function; in this wrapper,
+	hide the "words" special variable so that it may be used as an
+	ordinary variable by the bash completions.
+
 2011-05-04  Peter Stephenson  <pws@csr.com>
 
 	* Rocky Bernstein: 29135 (plus tweaks): Completion/bashcompinit,
@@ -14578,5 +14585,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5276 $
+* $Revision: 1.5277 $
 *****************************************************

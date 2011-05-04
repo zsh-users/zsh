@@ -127,7 +127,13 @@ compgen() {
       ;;
       F)
         COMPREPLY=()
-	$OPTARG "${words[0]}" "${words[CURRENT-1]}" "${words[CURRENT-2]}"
+        (){
+          set -- "${words[0]}" "${words[CURRENT-1]}" "${words[CURRENT-2]}"
+          # There may be more things we need to add to this typeset to
+          # protect bash functions from compsys special variable names
+          typeset -h words
+          $OPTARG "$@"
+        }
 	results+=( "${COMPREPLY[@]}" )
       ;;
       G)
