@@ -220,8 +220,28 @@ freeheap(void)
     h_free++;
 #endif
 
+    /* At this point we used to do:
     fheap = NULL;
-    for (h = heaps; h; h = hn) {
+     *
+     * When pushheap() is called, it sweeps over the entire heaps list of
+     * arenas and marks every one of them with the amount of free space in
+     * that arena at that moment.  zhalloc() is then allowed to grab bits
+     * out of any of those arenas that have free space.
+     *
+     * With the above reset of fheap, the loop below sweeps back over the
+     * entire heap list again, resetting the free space in every arena to
+     * the amount stashed by pushheap() and finding the first arena with
+     * free space to optimize zhalloc()'s next search.  When there's a lot
+     * of stuff already on the heap, this is an enormous amount of work,
+     * and performance goes to hell.
+     *
+     * However, there doesn't seem to be any reason to reset fheap before
+     * beginning this loop.  Either it's already correct, or it has never
+     * been set and this loop will do it, or it'll be reset from scratch
+     * on the next popheap().  So all that's needed here is to pick up
+     * the scan wherever the last pass [or the last popheap()] left off.
+     */
+    for (h = (fheap ? fheap : heaps); h; h = hn) {
 	hn = h->next;
 	if (h->sp) {
 #ifdef ZSH_MEM_DEBUG
@@ -242,7 +262,7 @@ freeheap(void)
     if (hl)
 	hl->next = NULL;
     else
-	heaps = NULL;
+	heaps = fheap = NULL;
 
     unqueue_signals();
 }

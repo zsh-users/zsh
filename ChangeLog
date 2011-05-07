@@ -1,3 +1,7 @@
+2011-05-07  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 29175 (w/comment typo fixed): Src/mem.c: optimize freeheap.
+
 2011-05-07  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 29170: Doc/Zsh/contrib.yo: vcs_info: Clarify check-for-changes
@@ -14598,5 +14602,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5280 $
+* $Revision: 1.5281 $
 *****************************************************
