@@ -1,3 +1,8 @@
+2011-05-07  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 29170: Doc/Zsh/contrib.yo: vcs_info: Clarify check-for-changes
+	style behaviour with the mercurial backend.
+
 2011-05-06  Peter Stephenson  <pws@csr.com>
 
 	* 29163: README, Etc/FAQ.yo: update latest version claimed
@@ -14590,5 +14595,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5278 $
+* $Revision: 1.5279 $
 *****************************************************

@@ -826,6 +826,10 @@ these escapes can be controlled via the var(stagedstr) and var(unstagedstr)
 styles. The only backends that currently support this option are tt(git) and
 tt(hg) (tt(hg) only supports unstaged).
 
+For this style to be evaluated with the tt(hg) backend, the var(get-revision)
+needs to be set and the var(use-simple) style needs to be unset. The latter
+is the default; the former is not.
+
 Note, the actions taken if this style is enabled are potentially expensive
 (read: they may be slow, depending on how big the current repository is).
 Therefore, it is disabled by default.
