@@ -1069,8 +1069,47 @@ zccmd_input(const char *nam, char **args)
     }
 #endif
 
+    /*
+     * Some documentation for wgetch() says:
+
+       The behavior of getch and friends in the presence of  handled  signals
+       is  unspecified  in the SVr4 and XSI Curses documentation.  Under his-
+       torical curses implementations, it varied  depending  on  whether  the
+       operating system's implementation of handled signal receipt interrupts
+       a read(2) call in progress or not, and also (in some  implementations)
+       depending  on  whether  an input timeout or non-blocking mode has been
+       set.
+
+       Programmers concerned about portability should be prepared for  either
+       of  two cases: (a) signal receipt does not interrupt getch; (b) signal
+       receipt interrupts getch and causes it to return ERR with errno set to
+       EINTR.  Under the ncurses implementation, handled signals never inter-
+       rupt getch.
+
+     * The observed behavior, however, is different:  wgetch() consistently
+     * returns ERR with EINTR when a signal is handled by the shell "trap"
+     * command mechanism.  Further, it consistently returns ERR twice, the
+     * second time without even attempting to repeat the interrupted read,
+     * which has the side-effect of NOT updating errno.  A third call will
+     * then begin reading again.
+     *
+     * Therefore, to properly implement signal trapping, we must (1) call
+     * wgetch() in a loop as long as errno remains EINTR, and (2) clear
+     * errno only before beginning the loop, not on every pass.
+     *
+     * There remains a potential bug here in that, if the caller has set
+     * a timeout for the read [see zccmd_timeout()] the countdown is very
+     * likely restarted on every call to wgetch(), so an interrupted call
+     * might wait much longer than desired.
+     */
+    errno = 0;
+
 #ifdef HAVE_WGET_WCH
-    switch (wget_wch(w->win, &wi)) {
+    while ((ret = wget_wch(w->win, &wi)) == ERR) {
+	if (errno != EINTR)
+	    break;
+    }
+    switch (ret) {
     case OK:
 	ret = wctomb(instr, (wchar_t)wi);
 	if (ret == 0) {
@@ -1092,9 +1131,10 @@ zccmd_input(const char *nam, char **args)
 	return 1;
     }
 #else
-    ci = wgetch(w->win);
-    if (ci == ERR)
-	return 1;
+    while ((ci = wgetch(w->win)) == ERR) {
+	if (errno != EINTR)
+	    return 1;
+    }
     if (ci >= 256) {
 	keypadnum = ci;
 	*instr = '\0';

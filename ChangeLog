@@ -1,3 +1,8 @@
+2011-05-08  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* users/15986 (belated commit): Src/Modules/curses.c: handle
+	EINTR in zccmd_input.
+
 2011-05-08  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* Valentin Haenel: 29187: Completion/Unix/Command/_git: add a
@@ -14607,5 +14612,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5282 $
+* $Revision: 1.5283 $
 *****************************************************
