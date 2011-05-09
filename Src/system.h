@@ -851,7 +851,7 @@ extern short ospeed;
 # define GET_ST_CTIME_NSEC(st) (st).st_ctimensec
 #endif
 
-#ifdef HAVE_TGETENT
+#if defined(HAVE_TGETENT) && !defined(ZSH_NO_TERM_HANDLING)
 # if defined(ZSH_HAVE_CURSES_H) && defined(ZSH_HAVE_TERM_H)
 #  define USES_TERM_H 1
 # else

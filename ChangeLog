@@ -1,5 +1,10 @@
 2011-05-09  Peter Stephenson  <pws@csr.com>
 
+	* 29195: Src/.distfiles, Src/hashnameddir.c, Src/hashtable.c,
+	Src/system.h, Src/zsh.mdd: Separate out hash handling for named
+	directories in order to keep RCP header usage from curses to
+	avoid clash on Solaris 8.
+
 	* 29193: Src/text.c: fix variable declaration that was after
 	code.
 
@@ -14627,5 +14632,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5285 $
+* $Revision: 1.5286 $
 *****************************************************
