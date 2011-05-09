@@ -1,5 +1,8 @@
 2011-05-09  Peter Stephenson  <pws@csr.com>
 
+	* 29193: Src/text.c: fix variable declaration that was after
+	code.
+
 	* 29165: Src/builtin.c, Src/exec.c, Src/glob.c, Src/hashtable.c,
 	Src/init.c, Src/jobs.c, Src/loop.c, Src/params.c, Src/prompt.c,
 	Src/system.h, Src/utils.c, Src/Modules/files.c,
@@ -14624,5 +14627,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5284 $
+* $Revision: 1.5285 $
 *****************************************************
