@@ -226,8 +226,8 @@ cd_prep()
     runp = &(cd_state.runs);
 
     if (cd_state.groups) {
-        int lines = cd_state.groups + cd_state.descs;
-        VARARR(Cdstr, grps, lines);
+        int preplines = cd_state.groups + cd_state.descs;
+        VARARR(Cdstr, grps, preplines);
         VARARR(int, wids, cd_state.maxg);
         Cdstr gs, gp, gn, *gpp;
         int i, j, d;
@@ -275,7 +275,7 @@ cd_prep()
         if (cd_state.gprew > cd_state.maxmlen && cd_state.maxglen > 1)
             return 1;
 
-	for (i = 0; i < lines; i++) {
+	for (i = 0; i < preplines; i++) {
 	    Cdstr s = grps[i];
 	    int dummy;
 
@@ -283,9 +283,9 @@ cd_prep()
 	    unmetafy(s->sortstr, &dummy);
 	}
 
-        qsort(grps, lines, sizeof(Cdstr), cd_sort);
+        qsort(grps, preplines, sizeof(Cdstr), cd_sort);
 
-        for (i = lines, strp = grps; i > 1; i--, strp++) {
+        for (i = preplines, strp = grps; i > 1; i--, strp++) {
             strp2 = strp + 1;
             if (!strcmp((*strp)->desc, (*strp2)->desc))
                 continue;
@@ -303,9 +303,9 @@ cd_prep()
         expl =  (Cdrun) zalloc(sizeof(*run));
         expl->type = CRT_EXPL;
         expl->strs = grps[0];
-        expl->count = lines;
+        expl->count = preplines;
 
-        for (i = lines, strp = grps, strp2 = NULL; i; i--, strp++) {
+        for (i = preplines, strp = grps, strp2 = NULL; i; i--, strp++) {
             str = *strp;
             *strp = str->other;
             if (strp2)
@@ -321,7 +321,7 @@ cd_prep()
         *strp2 = NULL;
 
         for (i = cd_state.maxg - 1; i; i--) {
-            for (d = 0, j = lines, strp = grps; j; j--, strp++) {
+            for (d = 0, j = preplines, strp = grps; j; j--, strp++) {
                 if ((str = *strp)) {
                     if (d) {
                         *runp = run = (Cdrun) zalloc(sizeof(*run));
@@ -465,7 +465,7 @@ cd_init(char *nam, char *hide, char *mlen, char *sep,
     cd_state.showd = disp;
     cd_state.maxg = cd_state.groups = cd_state.descs = 0;
     cd_state.maxmlen = atoi(mlen);
-    itmp = columns - cd_state.swidth - 4;
+    itmp = zterm_columns - cd_state.swidth - 4;
     if (cd_state.maxmlen > itmp)
         cd_state.maxmlen = itmp;
     if (cd_state.maxmlen < 4)
@@ -545,7 +545,7 @@ cd_init(char *nam, char *hide, char *mlen, char *sep,
 	    args++;
     }
     if (disp && grp) {
-        int mg = columns;
+        int mg = zterm_columns;
 
         do {
             cd_group(mg);
@@ -651,7 +651,8 @@ cd_get(char **params)
 		     * is available. Leave 1 character at the end of screen
 		     * as safety margin
 		     */
-		    remw = columns - cd_state.premaxw - cd_state.swidth - 3;
+		    remw = zterm_columns - cd_state.premaxw -
+			cd_state.swidth - 3;
 		    d = str->desc;
 		    w = MB_METASTRWIDTH(d);
 		    if (w <= remw)
@@ -727,7 +728,8 @@ cd_get(char **params)
         case CRT_EXPL:
             {
 		/* add columns as safety margin */
-                VARARR(char, dbuf, cd_state.suf + cd_state.slen + columns);
+                VARARR(char, dbuf, cd_state.suf + cd_state.slen +
+		       zterm_columns);
                 char buf[20], *p, *pp, *d;
                 int i = run->count, remw, w, l;
 
@@ -743,7 +745,8 @@ cd_get(char **params)
                     }
 
                     strcpy(dbuf, cd_state.sep);
-		    remw = columns - cd_state.gprew - cd_state.swidth - CM_SPACE;
+		    remw = zterm_columns - cd_state.gprew -
+			cd_state.swidth - CM_SPACE;
 		    p = pp = dbuf + cd_state.slen;
 		    d = str->desc;
 		    w = MB_METASTRWIDTH(d);

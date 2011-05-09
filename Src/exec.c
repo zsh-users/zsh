@@ -4398,7 +4398,7 @@ loadautofn(Shfunc shf, int fksh, int autol)
 mod_export int
 doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 {
-    char **tab, **x, *oargv0;
+    char **pptab, **x, *oargv0;
     int oldzoptind, oldlastval, oldoptcind, oldnumpipestats, ret;
     int *oldpipestats = NULL;
     char saveopts[OPT_SIZE], *oldscriptname = scriptname;
@@ -4432,7 +4432,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 
     starttrapscope();
 
-    tab = pparams;
+    pptab = pparams;
     if (!(flags & PM_UNDEFINED))
 	scriptname = dupstring(name);
     oldzoptind = zoptind;
@@ -4548,7 +4548,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	zsfree(argzero);
 	argzero = oargv0;
     }
-    pparams = tab;
+    pparams = pptab;
     optcind = oldoptcind;
     zoptind = oldzoptind;
     scriptname = oldscriptname;

@@ -850,3 +850,27 @@ extern short ospeed;
 #elif HAVE_STRUCT_STAT_ST_CTIMENSEC
 # define GET_ST_CTIME_NSEC(st) (st).st_ctimensec
 #endif
+
+#ifdef HAVE_TGETENT
+# if defined(ZSH_HAVE_CURSES_H) && defined(ZSH_HAVE_TERM_H)
+#  define USES_TERM_H 1
+# else
+#  ifdef HAVE_TERMCAP_H
+#   define USES_TERMCAP_H 1
+#  endif
+# endif
+
+# ifdef USES_TERM_H
+#  ifdef HAVE_TERMIO_H
+#   include <termio.h>
+#  endif
+#  ifdef ZSH_HAVE_CURSES_H
+#   include "zshcurses.h"
+#  endif
+#  include "zshterm.h"
+# else
+#  ifdef USES_TERMCAP_H
+#   include <termcap.h>
+#  endif
+# endif
+#endif

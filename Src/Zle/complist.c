@@ -656,7 +656,7 @@ clprintfmt(char *p, int ml)
 		tcout(TCCLEAREOL);
 	    cc = 0;
 	}
-	if (ml == mlend - 1 && (cc % columns) == columns - 1)
+	if (ml == mlend - 1 && (cc % zterm_columns) == zterm_columns - 1)
 	    return 0;
 
 	if (*p == Meta) {
@@ -664,9 +664,9 @@ clprintfmt(char *p, int ml)
 	    putc(*p ^ 32, shout);
 	} else
 	    putc(*p, shout);
-	if ((beg = !(cc % columns)))
+	if ((beg = !(cc % zterm_columns)))
 	    ml++;
-	if (mscroll && !(cc % columns) &&
+	if (mscroll && !(cc % zterm_columns) &&
 	    !--mrestlines && (ask = asklistscroll(ml)))
 	    return ask;
     }
@@ -765,7 +765,7 @@ clnicezputs(int do_colors, char *s, int ml)
 	    /* Input is metafied... */
 	    int nc = (*t == Meta) ? STOUC(*++t ^ 32) : STOUC(*t);
 	    /* Is the screen full? */
-	    if (ml == mlend - 1 && col == columns - 1) {
+	    if (ml == mlend - 1 && col == zterm_columns - 1) {
 		mlprinted = ml - oml;
 		return 0;
 	    }
@@ -787,13 +787,13 @@ clnicezputs(int do_colors, char *s, int ml)
 	     * There might be problems with characters of printing width
 	     * greater than one here.
 	     */
-	    if (col > columns) {
+	    if (col > zterm_columns) {
 		ml++;
 		if (mscroll && !--mrestlines && (ask = asklistscroll(ml))) {
 		    mlprinted = ml - oml;
 		    return ask;
 		}
-		col -= columns;
+		col -= zterm_columns;
 		if (do_colors)
 		    fputs(" \010", shout);
 	    }
@@ -820,12 +820,12 @@ clnicezputs(int do_colors, char *s, int ml)
 
 	for (t = nicechar(cc); *t; t++) {
 	    int nc = (*t == Meta) ? STOUC(*++t ^ 32) : STOUC(*t);
-	    if (ml == mlend - 1 && col == columns - 1) {
+	    if (ml == mlend - 1 && col == zterm_columns - 1) {
 		mlprinted = ml - oml;
 		return 0;
 	    }
 	    putc(nc, shout);
-	    if (++col > columns) {
+	    if (++col > zterm_columns) {
 		ml++;
 		if (mscroll && !--mrestlines && (ask = asklistscroll(ml))) {
 		    mlprinted = ml - oml;
@@ -991,7 +991,7 @@ asklistscroll(int ml)
 		   !strcmp(cmd->nam, "expand-or-complete-prefix") ||
 		   !strcmp(cmd->nam, "menu-complete") ||
 	     !strcmp(cmd->nam, "menu-expand-or-complete"))
-	mrestlines = lines - 1;
+	mrestlines = zterm_lines - 1;
     else if (cmd == Th(z_acceptsearch))
 	ret = 1;
     else {
@@ -1001,7 +1001,7 @@ asklistscroll(int ml)
     selectlocalmap(NULL);
     settyinfo(&shttyinfo);
     putc('\r', shout);
-    for (i = columns - 1; i-- > 0; )
+    for (i = zterm_columns - 1; i-- > 0; )
 	putc(' ', shout);
     putc('\r', shout);
 
@@ -1213,8 +1213,8 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    /* nc only contains ASCII text */
 		    int l = strlen(nc);
 
-		    if (l + cc > columns - 2)
-			nc[l -= l + cc - (columns - 2)] = '\0';
+		    if (l + cc > zterm_columns - 2)
+			nc[l -= l + cc - (zterm_columns - 2)] = '\0';
 		    fputs(nc, shout);
 		    cc += l;
 		} else if (dopr && m == 1) {
@@ -1230,16 +1230,17 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	} else {
 	    cc += width;
 
-	    if ((cc >= columns - 2 || cchar == ZWC('\n')) && stat)
+	    if ((cc >= zterm_columns - 2 || cchar == ZWC('\n')) && stat)
 		dopr = 2;
 	    if (cchar == ZWC('\n')) {
 		if (dopr == 1 && mlbeg >= 0 && tccan(TCCLEAREOL))
 		    tcout(TCCLEAREOL);
-		l += 1 + ((cc - 1) / columns);
+		l += 1 + ((cc - 1) / zterm_columns);
 		cc = 0;
 	    }
 	    if (dopr == 1) {
-		if (ml == mlend - 1 && (cc % columns) == columns - 1) {
+		if (ml == mlend - 1 && (cc % zterm_columns) ==
+		    zterm_columns - 1) {
 		    dopr = 0;
 		    p += len;
 		    continue;
@@ -1256,7 +1257,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		 * TODO: the following doesn't allow for
 		 * character widths greater than 1.
 		 */
-		if ((beg = !(cc % columns)) && !stat) {
+		if ((beg = !(cc % zterm_columns)) && !stat) {
 		    ml++;
                     fputs(" \010", shout);
                 }
@@ -1264,7 +1265,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 		    *stop = 1;
 		    if (stat && n)
 			mfirstl = -1;
-		    mlprinted = l + (cc ? ((cc-1) / columns) : 0);
+		    mlprinted = l + (cc ? ((cc-1) / zterm_columns) : 0);
 		    return mlprinted;
 		}
 	    }
@@ -1273,7 +1274,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
 	}
     }
     if (dopr) {
-        if (!(cc % columns))
+        if (!(cc % zterm_columns))
             fputs(" \010", shout);
         if (mlbeg >= 0 && tccan(TCCLEAREOL))
             tcout(TCCLEAREOL);
@@ -1285,7 +1286,7 @@ compprintfmt(char *fmt, int n, int dopr, int doesc, int ml, int *stop)
      * *Not* subtracting 1 from cc at this point appears to be
      * correct.  C.f. printfmt in zle_tricky.c.
      */
-    mlprinted = l + (cc / columns);
+    mlprinted = l + (cc / zterm_columns);
     return mlprinted;
 }
 
@@ -1309,7 +1310,7 @@ compzputs(char const *s, int ml)
 	putc(c, shout);
 	if (c == '\n' && mlbeg >= 0 && tccan(TCCLEAREOL))
 	    tcout(TCCLEAREOL);
-	if (mscroll && (++col == columns || c == '\n')) {
+	if (mscroll && (++col == zterm_columns || c == '\n')) {
 	    ml++;
 	    if (!--mrestlines && (ask = asklistscroll(ml)))
 		return ask;
@@ -1344,10 +1345,11 @@ compprintlist(int showall)
 	lastml = 0;
 	lastnlnct = -1;
     }
-    cl = (listdat.nlines > lines - nlnct - mhasstat ?
-	  lines - nlnct - mhasstat : listdat.nlines) - (lastnlnct > nlnct);
+    cl = (listdat.nlines > zterm_lines - nlnct - mhasstat ?
+	  zterm_lines - nlnct - mhasstat :
+	  listdat.nlines) - (lastnlnct > nlnct);
     lastnlnct = nlnct;
-    mrestlines = lines - 1;
+    mrestlines = zterm_lines - 1;
     lastinvcount = invcount;
 
     if (cl < 2) {
@@ -1643,20 +1645,20 @@ compprintlist(int showall)
 	/* Move the cursor up to the prompt, if always_last_prompt *
 	 * is set and all that...                                  */
 	if (mlbeg >= 0) {
-	    if ((nl = listdat.nlines + nlnct) >= lines) {
+	    if ((nl = listdat.nlines + nlnct) >= zterm_lines) {
 		if (mhasstat) {
 		    putc('\n', shout);
 		    compprintfmt(NULL, 0, 1, 1, mline, NULL);
                     mstatprinted = 1;
 		}
-		nl = lines - 1;
+		nl = zterm_lines - 1;
 	    } else
 		nl--;
 	    tcmultout(TCUP, TCMULTUP, nl);
 	    showinglist = -1;
 
 	    lastlistlen = listdat.nlines;
-	} else if ((nl = listdat.nlines + nlnct - 1) < lines) {
+	} else if ((nl = listdat.nlines + nlnct - 1) < zterm_lines) {
 	    if (mlbeg >= 0 && tccan(TCCLEAREOL))
 		tcout(TCCLEAREOL);
 	    tcmultout(TCUP, TCMULTUP, nl);
@@ -1666,12 +1668,12 @@ compprintlist(int showall)
 	} else {
 	    clearflag = 0;
 	    if (!asked) {
-		mrestlines = (ml + nlnct > lines);
+		mrestlines = (ml + nlnct > zterm_lines);
 		compprintnl(ml);
 	    }
 	}
     } else if (!asked) {
-	mrestlines = (ml + nlnct > lines);
+	mrestlines = (ml + nlnct > zterm_lines);
 	compprintnl(ml);
     }
     listshown = (clearflag ? 1 : -1);
@@ -1789,7 +1791,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	if (!dolist(ml)) {
 	    int nc = ZMB_nicewidth(m->disp ? m->disp : m->str);
 	    if (nc)
-		mlprinted = (nc-1) / columns;
+		mlprinted = (nc-1) / zterm_columns;
 	    else
 		mlprinted = 0;
 	    return 0;
@@ -1831,7 +1833,7 @@ clprintm(Cmgroup g, Cmatch *mp, int mc, int ml, int lastc, int width)
 	    return 1;
 	}
 	len = ZMB_nicewidth(m->disp ? m->disp : m->str);
-	mlprinted = len ? (len-1) / columns : 0;
+	mlprinted = len ? (len-1) / zterm_columns : 0;
 
 	modec = (mcolors.flags & LC_FOLLOW_SYMLINKS) ? m->fmodec : m->modec;
 	if ((g->flags & CGF_FILES) && modec) {
@@ -1864,9 +1866,11 @@ static int
 singlecalc(int *cp, int l, int *lcp)
 {
     int c = *cp, n, j, first = 1;
-    Cmatch **p, *op, *mp = mtab[l * columns + c];
+    Cmatch **p, *op, *mp = mtab[l * zterm_columns + c];
 
-    for (n = 0, j = c, p = mtab + l * columns + c, op = NULL; j >= 0; j--, p--) {
+    for (n = 0, j = c, p = mtab + l * zterm_columns + c, op = NULL;
+	 j >= 0;
+	 j--, p--) {
         if (*p == mp)
             c = j;
         if (!first && *p != op)
@@ -1876,7 +1880,7 @@ singlecalc(int *cp, int l, int *lcp)
     }
     *cp = c;
     *lcp = 1;
-    for (p = mtab + l * columns + c; c < columns; c++, p++)
+    for (p = mtab + l * zterm_columns + c; c < zterm_columns; c++, p++)
         if (*p && mp != *p)
             *lcp = 0;
 
@@ -1906,9 +1910,9 @@ singledraw()
         tc_downcurs(md1);
     if (mc1)
         tcmultout(TCRIGHT, TCMULTRIGHT, mc1);
-    DPUTS(ml1 * columns + mc1 >= mgtabsize, "BUG: invalid position");
-    g = mgtab[ml1 * columns + mc1];
-    clprintm(g, mtab[ml1 * columns + mc1], mcc1, ml1, lc1,
+    DPUTS(ml1 * zterm_columns + mc1 >= mgtabsize, "BUG: invalid position");
+    g = mgtab[ml1 * zterm_columns + mc1];
+    clprintm(g, mtab[ml1 * zterm_columns + mc1], mcc1, ml1, lc1,
              (g->widths ? g->widths[mcc1] : g->width));
     if (mlprinted)
 	(void) tcmultout(TCUP, TCMULTUP, mlprinted);
@@ -1918,20 +1922,20 @@ singledraw()
         tc_downcurs(md2 - md1);
     if (mc2)
         tcmultout(TCRIGHT, TCMULTRIGHT, mc2);
-    DPUTS(ml2 * columns + mc2 >= mgtabsize, "BUG: invalid position");
-    g = mgtab[ml2 * columns + mc2];
-    clprintm(g, mtab[ml2 * columns + mc2], mcc2, ml2, lc2,
+    DPUTS(ml2 * zterm_columns + mc2 >= mgtabsize, "BUG: invalid position");
+    g = mgtab[ml2 * zterm_columns + mc2];
+    clprintm(g, mtab[ml2 * zterm_columns + mc2], mcc2, ml2, lc2,
              (g->widths ? g->widths[mcc2] : g->width));
     if (mlprinted)
 	(void) tcmultout(TCUP, TCMULTUP, mlprinted);
     putc('\r', shout);
 
     if (mstatprinted) {
-        int i = lines - md2 - nlnct;
+        int i = zterm_lines - md2 - nlnct;
 
         tc_downcurs(i - 1);
         compprintfmt(NULL, 0, 1, 1, mline, NULL);
-        tcmultout(TCUP, TCMULTUP, lines - 1);
+        tcmultout(TCUP, TCMULTUP, zterm_lines - 1);
     } else
         tcmultout(TCUP, TCMULTUP, md2 + nlnct);
 
@@ -1951,7 +1955,7 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 
     noselect = 0;
 
-    if ((minfo.asked == 2 && mselect < 0) || nlnct >= lines) {
+    if ((minfo.asked == 2 && mselect < 0) || nlnct >= zterm_lines) {
 	showinglist = 0;
 	amatches = oamatches;
 	return (noselect = 1);
@@ -1971,7 +1975,7 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 
     getcols();
 
-    mnew = ((calclist(mselect >= 0) || mlastcols != columns ||
+    mnew = ((calclist(mselect >= 0) || mlastcols != zterm_columns ||
 	     mlastlines != listdat.nlines) && mselect >= 0);
 
     if (!listdat.nlines || (mselect >= 0 &&
@@ -2006,7 +2010,7 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 	    mscroll = 1;
 	} else {
 	    clearflag = 1;
-	    minfo.asked = (listdat.nlines + nlnct <= lines);
+	    minfo.asked = (listdat.nlines + nlnct <= zterm_lines);
 	}
     } else {
 	unqueue_signals();
@@ -2019,7 +2023,7 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 	}
     }
     if (mlbeg >= 0) {
-	mlend = mlbeg + lines - nlnct - mhasstat;
+	mlend = mlbeg + zterm_lines - nlnct - mhasstat;
 	while (mline >= mlend)
 	    mlbeg++, mlend++;
     } else
@@ -2030,7 +2034,7 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 
     	mtab_been_reallocated = 1;
 
-	i = columns * listdat.nlines;
+	i = zterm_columns * listdat.nlines;
 	free(mtab);
 	mtab = (Cmatch **) zalloc(i * sizeof(Cmatch **));
 	memset(mtab, 0, i * sizeof(Cmatch **));
@@ -2040,7 +2044,7 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 	mgtabsize = i;
 #endif
 	memset(mgtab, 0, i * sizeof(Cmgroup));
-	mlastcols = mcols = columns;
+	mlastcols = mcols = zterm_columns;
 	mlastlines = mlines = listdat.nlines;
     }
     last_cap = (char *) zhalloc(max_caplen + 1);
@@ -2067,13 +2071,13 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 static int
 adjust_mcol(int wish, Cmatch ***tabp, Cmgroup **grp)
 {
-    Cmatch **tab = *tabp;
+    Cmatch **matchtab = *tabp;
     int p, n, c;
 
-    tab -= mcol;
+    matchtab -= mcol;
 
-    for (p = wish; p >= 0 && (!tab[p] || mmarked(tab[p])); p--);
-    for (n = wish; n < mcols && (!tab[n] || mmarked(tab[n])); n++);
+    for (p = wish; p >= 0 && (!matchtab[p] || mmarked(matchtab[p])); p--);
+    for (n = wish; n < mcols && (!matchtab[n] || mmarked(matchtab[n])); n++);
     if (n == mcols)
 	n = -1;
 
@@ -2086,7 +2090,7 @@ adjust_mcol(int wish, Cmatch ***tabp, Cmgroup **grp)
     else
 	c = ((mcol - p) < (n - mcol) ? p : n);
 
-    *tabp = tab + c;
+    *tabp = matchtab + c;
     if (grp)
 	*grp = *grp + c - mcol;
 
@@ -2177,7 +2181,7 @@ setmstatus(char *status, char *sline, int sll, int scs,
     }
     pl = strlen(p);
     sl = strlen(s);
-    max = (columns < MAX_STATUS ? columns : MAX_STATUS) - 14;
+    max = (zterm_columns < MAX_STATUS ? zterm_columns : MAX_STATUS) - 14;
 
     if (max > 12) {
         int h = (max - 2) >> 1;
@@ -2394,9 +2398,9 @@ domenuselect(Hookdef dummy, Chdata dat)
     
     if ((s = getsparam("MENUSCROLL"))) {
 	if (!(step = mathevali(s)))
-	    step = (lines - nlnct) >> 1;
+	    step = (zterm_lines - nlnct) >> 1;
 	else if (step < 0)
-	    if ((step += lines - nlnct) < 0)
+	    if ((step += zterm_lines - nlnct) < 0)
 		step = 1;
     }
     if ((s = getsparam("MENUMODE"))) {
@@ -2473,34 +2477,34 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    }
 
 	if (mlbeg && lbeg != mlbeg) {
-	    Cmatch **p = mtab + ((mlbeg - 1) * columns), **q;
+	    Cmatch **p = mtab + ((mlbeg - 1) * zterm_columns), **q;
 	    int c;
 
 	    while (mlbeg) {
-		for (q = p, c = columns; c > 0; q++, c--)
+		for (q = p, c = zterm_columns; c > 0; q++, c--)
 		    if (*q && !mmarked(*q))
 			break;
 		if (c)
 		    break;
-		p -= columns;
+		p -= zterm_columns;
 		mlbeg--;
 	    }
 	}
-	if ((space = lines - pl - mhasstat))
+	if ((space = zterm_lines - pl - mhasstat))
 	    while (mline >= mlbeg + space)
 		if ((mlbeg += step) + space > mlines)
 		    mlbeg = mlines - space;
 	if (lbeg != mlbeg) {
-	    Cmatch **p = mtab + (mlbeg * columns), **q;
+	    Cmatch **p = mtab + (mlbeg * zterm_columns), **q;
 	    int c;
 
 	    while (mlbeg < mlines) {
-		for (q = p, c = columns; c > 0; q++, c--)
+		for (q = p, c = zterm_columns; c > 0; q++, c--)
 		    if (*q)
 			break;
 		if (c)
 		    break;
-		p += columns;
+		p += zterm_columns;
 		mlbeg++;
 	    }
 	}
@@ -2955,7 +2959,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		   cmd == Th(z_viforwardword) ||
 		   cmd == Th(z_viforwardwordend) ||
 		   cmd == Th(z_forwardword)) {
-	    int i = lines - pl - 1, oi = i, ll = 0;
+	    int i = zterm_lines - pl - 1, oi = i, ll = 0;
 	    Cmatch **lp = NULL;
 
             mode = 0;
@@ -2983,7 +2987,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	} else if (cmd == Th(z_emacsbackwardword) ||
 		   cmd == Th(z_vibackwardword) ||
 		   cmd == Th(z_backwardword)) {
-	    int i = lines - pl - 1, oi = i, ll = 0;
+	    int i = zterm_lines - pl - 1, oi = i, ll = 0;
 	    Cmatch **lp = NULL;
 
             mode = 0;

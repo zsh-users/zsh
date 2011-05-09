@@ -908,8 +908,8 @@ setupvals(void)
     /* columns and lines are normally zero, unless something different *
      * was inhereted from the environment.  If either of them are zero *
      * the setiparam calls below set them to the defaults from termcap */
-    setiparam("COLUMNS", columns);
-    setiparam("LINES", lines);
+    setiparam("COLUMNS", zterm_columns);
+    setiparam("LINES", zterm_lines);
 #endif
 
 #ifdef HAVE_GETRLIMIT

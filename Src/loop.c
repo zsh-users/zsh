@@ -324,13 +324,13 @@ selectlist(LinkList l, size_t start)
     while (t0)
 	t0 /= 10, longest++;
     /* to compensate for added ')' */
-    fct = (columns - 1) / (longest + 3);
+    fct = (zterm_columns - 1) / (longest + 3);
     if (fct == 0)
 	fct = 1;
     else
-	fw = (columns - 1) / fct;
+	fw = (zterm_columns - 1) / fct;
     colsz = (ct + fct - 1) / fct;
-    for (t1 = start; t1 != colsz && t1 - start < lines - 2; t1++) {
+    for (t1 = start; t1 != colsz && t1 - start < zterm_lines - 2; t1++) {
 	ap = arr + t1;
 	do {
 	    size_t t2 = strlen(*ap) + 2;

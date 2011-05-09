@@ -893,7 +893,7 @@ printjob(Job jn, int lng, int synch)
 {
     Process pn;
     int job, len = 9, sig, sflag = 0, llen;
-    int conted = 0, lineleng = columns, skip = 0, doputnl = 0;
+    int conted = 0, lineleng = zterm_columns, skip = 0, doputnl = 0;
     int doneprint = 0, skip_print = 0;
     FILE *fout = (synch == 2 || !shout) ? stdout : shout;
 

@@ -351,8 +351,8 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	    struct ttyinfo info;
 
 	    if (ioctl(slave, TIOCGWINSZ, (char *) &info.winsize) == 0) {
-		info.winsize.ws_row = lines;
-		info.winsize.ws_col = columns;
+		info.winsize.ws_row = zterm_lines;
+		info.winsize.ws_col = zterm_columns;
 		ioctl(slave, TIOCSWINSZ, (char *) &info.winsize);
 	    }
 	}

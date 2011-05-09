@@ -3903,7 +3903,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	     * nc: number of columns (at least one)
 	     */
 	    sc = l + 2;
-	    nc = (columns + 1) / sc;
+	    nc = (zterm_columns + 1) / sc;
 	    if (!nc)
 		nc = 1;
 	    nr = (n + nc - 1) / nc;

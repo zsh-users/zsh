@@ -35,34 +35,11 @@
  */
 #include "../../config.h"
 
-#ifdef HAVE_TGETENT
-# if defined(ZSH_HAVE_CURSES_H) && defined(ZSH_HAVE_TERM_H)
-#  define USES_TERM_H 1
-# else
-#  ifdef HAVE_TERMCAP_H
-#   define USES_TERMCAP_H 1
-#  endif
-# endif
-#endif
-
 #include "termcap.mdh"
 #include "termcap.pro"
 
 /**/
 #ifdef HAVE_TGETENT
-# ifdef USES_TERM_H
-#  ifdef HAVE_TERMIO_H
-#   include <termio.h>
-#  endif
-#  ifdef ZSH_HAVE_CURSES_H
-#   include "../zshcurses.h"
-#  endif
-#  include "../zshterm.h"
-# else
-#  ifdef USES_TERMCAP_H
-#   include <termcap.h>
-#  endif
-# endif
 
 #ifndef HAVE_BOOLCODES
 static char *boolcodes[] = {

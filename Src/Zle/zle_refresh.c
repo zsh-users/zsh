@@ -688,12 +688,12 @@ resetvideo(void)
 {
     int ln;
  
-    winw = columns;  /* terminal width */
+    winw = zterm_columns;  /* terminal width */
     if (termflags & TERM_SHORT)
 	winh = 1;
     else
-	winh = (lines < 2) ? 24 : lines;
-    rwinh = lines;		/* keep the real number of lines */
+	winh = (zterm_lines < 2) ? 24 : zterm_lines;
+    rwinh = zterm_lines;		/* keep the real number of lines */
     vln = vmaxln = winprompt = 0;
     winpos = -1;
     if (winw_alloc != winw || winh_alloc != winh) {
@@ -1082,7 +1082,7 @@ zrefresh(void)
 
     cleareol = 0;		/* unset */
     more_start = more_end = 0;	/* unset */
-    if (isset(SINGLELINEZLE) || lines < 3
+    if (isset(SINGLELINEZLE) || zterm_lines < 3
 	|| (termflags & (TERM_NOUP | TERM_BAD | TERM_UNKNOWN)))
 	termflags |= TERM_SHORT;
     else
@@ -1138,7 +1138,7 @@ zrefresh(void)
 	}
 	fflush(shout);
 	clearf = clearflag;
-    } else if (winw != columns || rwinh != lines)
+    } else if (winw != zterm_columns || rwinh != zterm_lines)
 	resetvideo();
 
 /* now winw equals columns and winh equals lines 
@@ -2004,7 +2004,7 @@ refreshline(int ln)
 		 * last line lest undesired scrolling occurs due to `illegal'
 		 * characters on screen
 		 */ 
-		if (tccan(TCINS) && (vln != lines - 1)) {
+		if (tccan(TCINS) && (vln != zterm_lines - 1)) {
 		    /* not on last line */
 		    for (i = 1; nl[i].chr; i++) {
 			if (tcinscost(i) < wpfxlen(ol, nl + i)) {

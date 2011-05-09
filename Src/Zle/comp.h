@@ -323,8 +323,8 @@ struct cadata {
 typedef struct cldata *Cldata;
 
 struct cldata {
-    int columns;		/* screen width */
-    int lines;			/* screen height */
+    int zterm_columns;		/* screen width */
+    int zterm_lines;		/* screen height */
     int menuacc;		/* value of global menuacc */
     int valid;			/* no need to calculate anew */
     int nlist;			/* number of matches to list */

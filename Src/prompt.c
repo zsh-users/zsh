@@ -1008,7 +1008,7 @@ countprompt(char *str, int *wp, int *hp, int overf)
 #endif
 
     for (; *str; str++) {
-	if (w >= columns && overf >= 0) {
+	if (w >= zterm_columns && overf >= 0) {
 	    w = 0;
 	    h++;
 	}
@@ -1092,8 +1092,8 @@ countprompt(char *str, int *wp, int *hp, int overf)
      * This isn't easy to handle generally; just assume there's no
      * output.
      */
-    if(w >= columns && overf >= 0) {
-	if (!overf || w > columns) {
+    if(w >= zterm_columns && overf >= 0) {
+	if (!overf || w > zterm_columns) {
 	    w = 0;
 	    h++;
 	}

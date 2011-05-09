@@ -1268,7 +1268,7 @@ pattern_match_equivalence(Cpattern lp, convchar_t wind, int wmtp,
 /**/
 static int
 pattern_match_restrict(Cpattern p, Cpattern wp, convchar_t *wsc, int wsclen,  
-		       Cpattern prestrict, ZLE_STRING_T newline)
+		       Cpattern prestrict, ZLE_STRING_T new_line)
 {
     convchar_t c;
     convchar_t ind, wind;
@@ -1356,7 +1356,7 @@ pattern_match_restrict(Cpattern p, Cpattern wp, convchar_t *wsc, int wsclen,
 	}
 
 	/* We need to assemble the line */
-	*newline++ = (ZLE_CHAR_T)c;
+	*new_line++ = (ZLE_CHAR_T)c;
 	prestrict = prestrict->next;
 	wsc++;
 	wsclen--;
@@ -1393,7 +1393,7 @@ pattern_match_restrict(Cpattern p, Cpattern wp, convchar_t *wsc, int wsclen,
 	if (!pattern_match1(p, c, &mt))
 	    return 0;
 	p = p->next;
-	*newline++ = (ZLE_CHAR_T)c;
+	*new_line++ = (ZLE_CHAR_T)c;
 	prestrict = prestrict->next;
     }
 

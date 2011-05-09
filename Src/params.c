@@ -94,8 +94,8 @@ mod_export
 zlong lastval,		/* $?           */
      mypid,		/* $$           */
      lastpid,		/* $!           */
-     columns,		/* $COLUMNS     */
-     lines,		/* $LINES       */
+     zterm_columns,	/* $COLUMNS     */
+     zterm_lines,	/* $LINES       */
      ppid,		/* $PPID        */
      zsh_subshell;	/* $ZSH_SUBSHELL */
 /**/
@@ -312,8 +312,8 @@ IPDEF4("PPID", &ppid),
 IPDEF4("ZSH_SUBSHELL", &zsh_subshell),
 
 #define IPDEF5(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL},BR((void *)B),GSU(varinteger_gsu),10,0,NULL,NULL,NULL,0}
-IPDEF5("COLUMNS", &columns, zlevar_gsu),
-IPDEF5("LINES", &lines, zlevar_gsu),
+IPDEF5("COLUMNS", &zterm_columns, zlevar_gsu),
+IPDEF5("LINES", &zterm_lines, zlevar_gsu),
 IPDEF5("OPTIND", &zoptind, varinteger_gsu),
 IPDEF5("SHLVL", &shlvl, varinteger_gsu),
 IPDEF5("TRY_BLOCK_ERROR", &try_errflag, varinteger_gsu),
@@ -3269,8 +3269,8 @@ zlevarsetfn(Param pm, zlong x)
     zlong *p = pm->u.valptr;
 
     *p = x;
-    if (p == &lines || p == &columns)
-	adjustwinsize(2 + (p == &columns));
+    if (p == &zterm_lines || p == &zterm_columns)
+	adjustwinsize(2 + (p == &zterm_columns));
 }
 
 /* Function to set value of generic special scalar    *

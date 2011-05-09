@@ -1,3 +1,15 @@
+2011-05-09  Peter Stephenson  <pws@csr.com>
+
+	* 29165: Src/builtin.c, Src/exec.c, Src/glob.c, Src/hashtable.c,
+	Src/init.c, Src/jobs.c, Src/loop.c, Src/params.c, Src/prompt.c,
+	Src/system.h, Src/utils.c, Src/Modules/files.c,
+	Src/Modules/termcap.c, Src/Modules/zpty.c, Src/Zle/comp.h,
+	Src/Zle/complist.c, Src/Zle/compmatch.c, Src/Zle/compresult.c,
+	Src/Zle/computil.c, Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c,
+	Src/Zle/zle_utils.c: Use term.h globally if needed, instead of
+	just using in Modules and fudging the headers elsewhere.  Fix
+	various name clashes.
+
 2011-05-08  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/15986 (belated commit): Src/Modules/curses.c: handle
@@ -14612,5 +14624,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5283 $
+* $Revision: 1.5284 $
 *****************************************************

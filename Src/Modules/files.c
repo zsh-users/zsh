@@ -195,7 +195,7 @@ bin_rmdir(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 static int
 bin_ln(char *nam, char **args, Options ops, int func)
 {
-    MoveFunc move;
+    MoveFunc movefn;
     int flags, have_dir, err = 0;
     char **a, *ptr, *rp, *buf;
     struct stat st;
@@ -203,7 +203,7 @@ bin_ln(char *nam, char **args, Options ops, int func)
 
 
     if(func == BIN_MV) {
-	move = (MoveFunc) rename;
+	movefn = (MoveFunc) rename;
 	flags = OPT_ISSET(ops,'f') ? 0 : MV_ASKNW;
 	flags |= MV_ATOMIC;
     } else {
@@ -212,11 +212,11 @@ bin_ln(char *nam, char **args, Options ops, int func)
 	if(OPT_ISSET(ops,'h') || OPT_ISSET(ops,'n'))
 	    flags |= MV_NOCHASETARGET;
 	if(OPT_ISSET(ops,'s'))
-	    move = (MoveFunc) symlink;
+	    movefn = (MoveFunc) symlink;
 	else
 #endif
 	{
-	    move = (MoveFunc) link;
+	    movefn = (MoveFunc) link;
 	    if(!OPT_ISSET(ops,'d'))
 		flags |= MV_NODIRS;
 	}
@@ -267,7 +267,7 @@ bin_ln(char *nam, char **args, Options ops, int func)
 	else
 	    args[1] = args[0];
     }
-    return domove(nam, move, args[0], args[1], flags);
+    return domove(nam, movefn, args[0], args[1], flags);
  havedir:
     buf = ztrdup(*a);
     *a = NULL;
@@ -283,7 +283,7 @@ bin_ln(char *nam, char **args, Options ops, int func)
 
 	buf[blen] = 0;
 	buf = appstr(buf, ptr);
-	err |= domove(nam, move, *args, buf, flags);
+	err |= domove(nam, movefn, *args, buf, flags);
     }
     zsfree(buf);
     return err;
@@ -291,7 +291,7 @@ bin_ln(char *nam, char **args, Options ops, int func)
 
 /**/
 static int
-domove(char *nam, MoveFunc move, char *p, char *q, int flags)
+domove(char *nam, MoveFunc movefn, char *p, char *q, int flags)
 {
     struct stat st;
     char *pbuf, *qbuf;
@@ -341,7 +341,7 @@ domove(char *nam, MoveFunc move, char *p, char *q, int flags)
 	if(doit && !(flags & MV_ATOMIC))
 	    unlink(qbuf);
     }
-    if(move(pbuf, qbuf)) {
+    if(movefn(pbuf, qbuf)) {
 	zwarnnam(nam, "%s: %e", p, errno);
 	zsfree(pbuf);
 	return 1;

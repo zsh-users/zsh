@@ -59,7 +59,7 @@ struct scanstatus {
     int sorted;
     union {
 	struct {
-	    HashNode *tab;
+	    HashNode *hashtab;
 	    int ct;
 	} s;
 	HashNode u;
@@ -187,11 +187,11 @@ addhashnode2(HashTable ht, char *nam, void *nodeptr)
 	hn->next = hp->next;
 	if(ht->scan) {
 	    if(ht->scan->sorted) {
-		HashNode *tab = ht->scan->u.s.tab;
+		HashNode *hashtab = ht->scan->u.s.hashtab;
 		int i;
 		for(i = ht->scan->u.s.ct; i--; )
-		    if(tab[i] == hp)
-			tab[i] = hn;
+		    if(hashtab[i] == hp)
+			hashtab[i] = hn;
 	    } else if(ht->scan->u.u == hp)
 		ht->scan->u.u = hn;
 	}
@@ -286,11 +286,11 @@ removehashnode(HashTable ht, const char *nam)
 	ht->ct--;
 	if(ht->scan) {
 	    if(ht->scan->sorted) {
-		HashNode *tab = ht->scan->u.s.tab;
+		HashNode *hashtab = ht->scan->u.s.hashtab;
 		int i;
 		for(i = ht->scan->u.s.ct; i--; )
-		    if(tab[i] == hp)
-			tab[i] = NULL;
+		    if(hashtab[i] == hp)
+			hashtab[i] = NULL;
 	    } else if(ht->scan->u.u == hp)
 		ht->scan->u.u = hp->next;
 	}
@@ -397,7 +397,7 @@ scanmatchtable(HashTable ht, Patprog pprog, int sorted,
 	qsort((void *)hnsorttab, ct, sizeof(HashNode), hnamcmp);
 
 	st.sorted = 1;
-	st.u.s.tab = hnsorttab;
+	st.u.s.hashtab = hnsorttab;
 	st.u.s.ct = ct;
 	ht->scan = &st;
 

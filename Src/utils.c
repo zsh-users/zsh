@@ -1296,7 +1296,8 @@ preprompt(void)
 	countprompt(str, &w, 0, -1);
 	opts[PROMPTPERCENT] = percents;
 	zputs(str, shout);
-	fprintf(shout, "%*s\r%*s\r", (int)columns - w - !hasxn, "", w, "");
+	fprintf(shout, "%*s\r%*s\r", (int)zterm_columns - w - !hasxn,
+		"", w, "");
 	fflush(shout);
 	free(str);
     }
@@ -1558,49 +1559,49 @@ mod_export int winchanged;
 static int
 adjustlines(int signalled)
 {
-    int oldlines = lines;
+    int oldlines = zterm_lines;
 
 #ifdef TIOCGWINSZ
-    if (signalled || lines <= 0)
-	lines = shttyinfo.winsize.ws_row;
+    if (signalled || zterm_lines <= 0)
+	zterm_lines = shttyinfo.winsize.ws_row;
     else
-	shttyinfo.winsize.ws_row = lines;
+	shttyinfo.winsize.ws_row = zterm_lines;
 #endif /* TIOCGWINSZ */
-    if (lines <= 0) {
+    if (zterm_lines <= 0) {
 	DPUTS(signalled, "BUG: Impossible TIOCGWINSZ rows");
-	lines = tclines > 0 ? tclines : 24;
+	zterm_lines = tclines > 0 ? tclines : 24;
     }
 
-    if (lines > 2)
+    if (zterm_lines > 2)
 	termflags &= ~TERM_SHORT;
     else
 	termflags |= TERM_SHORT;
 
-    return (lines != oldlines);
+    return (zterm_lines != oldlines);
 }
 
 static int
 adjustcolumns(int signalled)
 {
-    int oldcolumns = columns;
+    int oldcolumns = zterm_columns;
 
 #ifdef TIOCGWINSZ
-    if (signalled || columns <= 0)
-	columns = shttyinfo.winsize.ws_col;
+    if (signalled || zterm_columns <= 0)
+	zterm_columns = shttyinfo.winsize.ws_col;
     else
-	shttyinfo.winsize.ws_col = columns;
+	shttyinfo.winsize.ws_col = zterm_columns;
 #endif /* TIOCGWINSZ */
-    if (columns <= 0) {
+    if (zterm_columns <= 0) {
 	DPUTS(signalled, "BUG: Impossible TIOCGWINSZ cols");
-	columns = tccolumns > 0 ? tccolumns : 80;
+	zterm_columns = tccolumns > 0 ? tccolumns : 80;
     }
 
-    if (columns > 2)
+    if (zterm_columns > 2)
 	termflags &= ~TERM_NARROW;
     else
 	termflags |= TERM_NARROW;
 
-    return (columns != oldcolumns);
+    return (zterm_columns != oldcolumns);
 }
 
 /* check the size of the window and adjust if necessary. *
@@ -1634,8 +1635,8 @@ adjustwinsize(int from)
 	    ttycols = shttyinfo.winsize.ws_col;
 	} else {
 	    /* Set to value from environment on failure */
-	    shttyinfo.winsize.ws_row = lines;
-	    shttyinfo.winsize.ws_col = columns;
+	    shttyinfo.winsize.ws_row = zterm_lines;
+	    shttyinfo.winsize.ws_col = zterm_columns;
 	    resetzle = (from == 1);
 	}
 #else
@@ -1655,9 +1656,9 @@ adjustwinsize(int from)
 	 * but I'm concerned about what happens on race conditions; e.g., *
 	 * suppose the user resizes his xterm during `eval $(resize)'?    */
 	if (adjustlines(from) && zgetenv("LINES"))
-	    setiparam("LINES", lines);
+	    setiparam("LINES", zterm_lines);
 	if (adjustcolumns(from) && zgetenv("COLUMNS"))
-	    setiparam("COLUMNS", columns);
+	    setiparam("COLUMNS", zterm_columns);
 	getwinsz = 1;
 	break;
     case 2:

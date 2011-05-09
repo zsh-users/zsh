@@ -2419,13 +2419,13 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		    if (tccan(TCCLEAREOL))
 			tcout(TCCLEAREOL);
 		    else {
-			int s = columns - 1 - (cc % columns);
+			int s = zterm_columns - 1 - (cc % zterm_columns);
 
 			while (s-- > 0)
 			    putc(' ', shout);
 		    }
 		}
-		l += 1 + ((cc - 1) / columns);
+		l += 1 + ((cc - 1) / zterm_columns);
 		cc = 0;
 		if (dopr)
 		    putc('\n', shout);
@@ -2445,18 +2445,18 @@ printfmt(char *fmt, int n, int dopr, int doesc)
 		} else
 		    p += clen;
 		cc += WCWIDTH_WINT(cchar);
-		if (dopr && !(cc % columns))
+		if (dopr && !(cc % zterm_columns))
 			fputs(" \010", shout);
 	    }
 	}
     }
     if (dopr) {
-        if (!(cc % columns))
+        if (!(cc % zterm_columns))
             fputs(" \010", shout);
 	if (tccan(TCCLEAREOL))
 	    tcout(TCCLEAREOL);
 	else {
-	    int s = columns - 1 - (cc % columns);
+	    int s = zterm_columns - 1 - (cc % zterm_columns);
 
 	    while (s-- > 0)
 		putc(' ', shout);
@@ -2467,7 +2467,7 @@ printfmt(char *fmt, int n, int dopr, int doesc)
      * cc is correct, i.e. if just misses wrapping we still add 1.
      * (Why?)
      */
-    return l + (cc / columns);
+    return l + (cc / zterm_columns);
 }
 
 /* This is used to print expansions. */
@@ -2481,8 +2481,8 @@ listlist(LinkList l)
     LinkNode node;
     char **p;
     VARARR(int, lens, num);
-    VARARR(int, widths, columns);
-    int longest = 0, shortest = columns, totl = 0;
+    VARARR(int, widths, zterm_columns);
+    int longest = 0, shortest = zterm_columns, totl = 0;
     int len, ncols, nlines, tolast, col, i, max, pack = 0, *lenp;
 
     for (node = firstnode(l), p = data; node; incnode(node), p++)
@@ -2500,7 +2500,7 @@ listlist(LinkList l)
 	    shortest = len;
 	totl += len;
     }
-    if ((ncols = ((columns + 2) / longest))) {
+    if ((ncols = ((zterm_columns + 2) / longest))) {
 	int tlines = 0, tline, tcols = 0, maxlen, nth, width;
 
 	nlines = (num + ncols - 1) / ncols;
@@ -2509,7 +2509,7 @@ listlist(LinkList l)
 	    if (isset(LISTROWSFIRST)) {
 		int count, tcol, first, maxlines = 0, llines;
 
-		for (tcols = columns / shortest; tcols > ncols;
+		for (tcols = zterm_columns / shortest; tcols > ncols;
 		     tcols--) {
 		    for (nth = first = maxlen = width = maxlines =
 			     llines = tcol = 0,
@@ -2522,7 +2522,7 @@ listlist(LinkList l)
 			nth += tcols;
 			tlines++;
 			if (nth >= num) {
-			    if ((width += maxlen) >= columns)
+			    if ((width += maxlen) >= zterm_columns)
 				break;
 			    widths[tcol++] = maxlen;
 			    maxlen = 0;
@@ -2536,13 +2536,13 @@ listlist(LinkList l)
 			widths[tcol++] = maxlen;
 			width += maxlen;
 		    }
-		    if (!count && width < columns)
+		    if (!count && width < zterm_columns)
 			break;
 		}
 		if (tcols > ncols)
 		    tlines = maxlines;
 	    } else {
-		for (tlines = ((totl + columns) / columns);
+		for (tlines = ((totl + zterm_columns) / zterm_columns);
 		     tlines < nlines; tlines++) {
 		    for (p = data, nth = tline = width =
 			     maxlen = tcols = 0;
@@ -2550,7 +2550,7 @@ listlist(LinkList l)
 			if (lens[nth] > maxlen)
 			    maxlen = lens[nth];
 			if (++tline == tlines) {
-			    if ((width += maxlen) >= columns)
+			    if ((width += maxlen) >= zterm_columns)
 				break;
 			    widths[tcols++] = maxlen;
 			    maxlen = tline = 0;
@@ -2560,7 +2560,7 @@ listlist(LinkList l)
 			widths[tcols++] = maxlen;
 			width += maxlen;
 		    }
-		    if (nth == num && width < columns)
+		    if (nth == num && width < zterm_columns)
 			break;
 		}
 	    }
@@ -2572,7 +2572,7 @@ listlist(LinkList l)
     } else {
 	nlines = 0;
 	for (p = data; *p; p++)
-	    nlines += 1 + (strlen(*p) / columns);
+	    nlines += 1 + (strlen(*p) / zterm_columns);
     }
     /* Set the cursor below the prompt. */
     trashzle();
@@ -2581,7 +2581,7 @@ listlist(LinkList l)
     clearflag = (isset(USEZLE) && !termflags && tolast);
 
     max = getiparam("LISTMAX");
-    if ((max && num > max) || (!max && nlines > lines)) {
+    if ((max && num > max) || (!max && nlines > zterm_lines)) {
 	int qup, l;
 
 	zsetterm();
@@ -2589,7 +2589,7 @@ listlist(LinkList l)
 	     fprintf(shout, "zsh: do you wish to see all %d possibilities (%d lines)? ",
 		     num, nlines) :
 	     fprintf(shout, "zsh: do you wish to see all %d lines? ", nlines));
-	qup = ((l + columns - 1) / columns) - 1;
+	qup = ((l + zterm_columns - 1) / zterm_columns) - 1;
 	fflush(shout);
 	if (!getzlequery()) {
 	    if (clearflag) {
@@ -2656,7 +2656,7 @@ listlist(LinkList l)
 	}
     }
     if (clearflag) {
-	if ((nlines += nlnct - 1) < lines) {
+	if ((nlines += nlnct - 1) < zterm_lines) {
 	    tcmultout(TCUP, TCMULTUP, nlines);
 	    showinglist = -1;
 	} else
