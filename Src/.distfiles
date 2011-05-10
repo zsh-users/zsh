@@ -41,12 +41,12 @@ signals.h
 sort.c
 string.c
 subst.c
-system.h
 text.c
 utils.c
 watch.c
 zsh.h
 zsh.mdd
+zsh_system.h
 ztype.h
 zsh.rc
 zsh.ico

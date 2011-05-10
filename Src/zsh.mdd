@@ -14,7 +14,7 @@ hist.o init.o input.o jobs.o lex.o linklist.o loop.o math.o \
 mem.o module.o options.o params.o parse.o pattern.o prompt.o signals.o \
 signames.o sort.o string.o subst.o text.o utils.o watch.o"
 
-headers="../config.h system.h zsh.h sigcount.h signals.h \
+headers="../config.h zsh_system.h zsh.h sigcount.h signals.h \
 prototypes.h hashtable.h ztype.h"
 
 :<<\Make

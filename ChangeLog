@@ -1,5 +1,9 @@
 2011-05-10  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Src/.distfiles, Src/system.h, Src/zsh.mdd,
+	Src/zsh_system.h: rename system.h to zsh_system.h to ensure
+	there are no clashes.
+
 	* 29214: Src/Makemod.in.in, Src/mkmakemod.sh, Src/zsh.mdd: use
 	-I to find headers in order to allow #include'ing generated
 	headers from non-generated headers when the build tree is
@@ -14642,5 +14646,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5288 $
+* $Revision: 1.5289 $
 *****************************************************
