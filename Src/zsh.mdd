@@ -127,7 +127,7 @@ clean.zsh:
 
 # This is not properly part of this module, but it is built as if it were.
 main.o: main.c zsh.mdh main.epro
-	$(CC) -c -I. $(CPPFLAGS) $(DEFS) $(CFLAGS) -o $@ $(sdir)/main.c
+	$(CC) -c -I. -I$(sdir_top)/Src $(CPPFLAGS) $(DEFS) $(CFLAGS) -o $@ $(sdir)/main.c
 
 main.syms: $(PROTODEPS)
 proto.zsh: main.epro

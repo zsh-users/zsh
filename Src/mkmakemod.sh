@@ -383,11 +383,7 @@ if $first_stage; then
 	if test -n "$headers"; then
 	    echo "	    echo '/* Extra headers for this module */'; \\"
 	    echo "	    for hdr in $headers; do \\"
-	    echo "		if test -f \$\$hdr; then \\"
-	    echo "		    echo '# include \"'\$\$hdr'\"'; \\"
-	    echo "		else \\"
-	    echo "		    echo '# include \"\$(sdir)/'\$\$hdr'\"'; \\"
-	    echo "		fi; \\"
+	    echo "		echo '# include \"'\$\$hdr'\"'; \\"
 	    echo "	    done; \\"
 	    echo "	    echo; \\"
 	fi

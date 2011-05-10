@@ -1,5 +1,10 @@
 2011-05-10  Peter Stephenson  <pws@csr.com>
 
+	* 29214: Src/Makemod.in.in, Src/mkmakemod.sh, Src/zsh.mdd: use
+	-I to find headers in order to allow #include'ing generated
+	headers from non-generated headers when the build tree is
+	separate from the source tree.
+
 	* 29191 (Danek) and 29203 (with fixes): Doc/Zsh/params.yo,
 	Src/params.c: make TERMINFO variable special.
 
@@ -14637,5 +14642,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5287 $
+* $Revision: 1.5288 $
 *****************************************************
