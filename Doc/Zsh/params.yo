@@ -1273,6 +1273,13 @@ is necessary to make such an assignment upon any change to the terminal
 definition database or terminal type in order for the new settings to
 take effect.
 )
+vindex(TERMINFO)
+item(tt(TERMINFO) <S>)(
+A reference to a compiled description of the terminal, used by the
+`terminfo' library when the system has it; see manref(terminfo)(5).
+If set, this causes the shell to reinitialise the terminal, making
+the workaround `tt(TERM=$TERM)' unnecessary.
+)
 vindex(TIMEFMT)
 item(tt(TIMEFMT))(
 The format of process time reports with the tt(time) keyword.

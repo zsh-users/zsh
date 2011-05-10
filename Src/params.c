@@ -86,6 +86,7 @@ mod_export
 char *ifs,		/* $IFS         */
      *postedit,		/* $POSTEDIT    */
      *term,		/* $TERM        */
+     *zsh_terminfo,     /* $TERMINFO    */
      *ttystrname,	/* $TTY         */
      *pwd;		/* $PWD         */
 
@@ -202,6 +203,8 @@ static const struct gsu_scalar home_gsu =
 { homegetfn, homesetfn, stdunsetfn };
 static const struct gsu_scalar term_gsu =
 { termgetfn, termsetfn, stdunsetfn };
+static const struct gsu_scalar terminfo_gsu =
+{ terminfogetfn, terminfosetfn, stdunsetfn };
 static const struct gsu_scalar wordchars_gsu =
 { wordcharsgetfn, wordcharssetfn, stdunsetfn };
 static const struct gsu_scalar ifs_gsu =
@@ -276,6 +279,7 @@ IPDEF2("-", dash_gsu, PM_READONLY),
 IPDEF2("histchars", histchars_gsu, PM_DONTIMPORT),
 IPDEF2("HOME", home_gsu, PM_UNSET),
 IPDEF2("TERM", term_gsu, 0),
+IPDEF2("TERMINFO", terminfo_gsu, PM_UNSET),
 IPDEF2("WORDCHARS", wordchars_gsu, 0),
 IPDEF2("IFS", ifs_gsu, PM_DONTIMPORT),
 IPDEF2("_", underscore_gsu, PM_READONLY),
@@ -4045,6 +4049,18 @@ underscoregetfn(UNUSED(Param pm))
     return u;
 }
 
+/* Function used when we need to reinitialise the terminal */
+
+static void
+term_reinit_from_pm(void)
+{
+    /* If non-interactive, delay setting up term till we need it. */
+    if (unset(INTERACTIVE) || !*term)
+	termflags |= TERM_UNKNOWN;
+    else
+	init_term();
+}
+
 /* Function to get value for special parameter `TERM' */
 
 /**/
@@ -4062,12 +4078,35 @@ termsetfn(UNUSED(Param pm), char *x)
 {
     zsfree(term);
     term = x ? x : ztrdup("");
+    term_reinit_from_pm();
+}
 
-    /* If non-interactive, delay setting up term till we need it. */
-    if (unset(INTERACTIVE) || !*term)
-	termflags |= TERM_UNKNOWN;
-    else 
-	init_term();
+/* Function to get value of special parameter `TERMINFO' */
+
+/**/
+char *
+terminfogetfn(UNUSED(Param pm))
+{
+    return zsh_terminfo ? zsh_terminfo : dupstring("");
+}
+
+/* Function to set value of special parameter `TERMINFO' */
+
+/**/
+void
+terminfosetfn(Param pm, char *x)
+{
+    zsfree(zsh_terminfo);
+    zsh_terminfo = x;
+
+    /*
+     * terminfo relies on the value being exported before
+     * we reinitialise the terminal.  This is a bit inefficient.
+     */
+    if ((pm->node.flags & PM_EXPORTED) && x)
+	addenv(pm, x);
+
+    term_reinit_from_pm();
 }
 
 /* Function to get value for special parameter `pipestatus' */
