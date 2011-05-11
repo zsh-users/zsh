@@ -1,3 +1,8 @@
+2011-05-11  Peter Stephenson  <pws@csr.com>
+
+	* 29217: Src/zsh.mdd: zshterm.h and zshcurses.h are now
+	dependencies for the main shell.
+
 2011-05-10  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Src/.distfiles, Src/system.h, Src/zsh.mdd,
@@ -14646,5 +14651,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5289 $
+* $Revision: 1.5290 $
 *****************************************************
