@@ -1,3 +1,7 @@
+2011-05-11  Mikael Magnusson <mikachu@gmail.com>
+
+	* 29206: Doc/Zsh/mod_complist.yo: fix formatting.
+
 2011-05-11  Peter Stephenson  <pws@csr.com>
 
 	* 29217: Src/zsh.mdd: zshterm.h and zshcurses.h are now
@@ -14651,5 +14655,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5290 $
+* $Revision: 1.5291 $
 *****************************************************

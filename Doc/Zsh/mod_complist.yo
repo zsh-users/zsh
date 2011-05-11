@@ -383,8 +383,8 @@ make the longest unambiguous string be inserted in the command line
 and tt(undo) and tt(backward-delete-char) go back to the previous set
 of matches
 )
-item(tt(history-incremental-search-forward),
-tt(history-incremental-search-backward))(
+xitem(tt(history-incremental-search-forward))
+item(tt(history-incremental-search-backward))(
 this starts incremental searches in the list of completions displayed;
 in this mode, tt(accept-line) only leaves incremental search, going
 back to the normal menu selection mode
