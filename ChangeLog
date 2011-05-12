@@ -1,5 +1,10 @@
 2011-05-12  Mikael Magnusson <mikachu@gmail.com>
 
+	* Nikolai Weibull: 29124: Completion/Unix/Command/_git: Fix
+	-l option.
+
+2011-05-12  Mikael Magnusson <mikachu@gmail.com>
+
 	* 29205: Completion/Unix/Type/_pids: don't sort processes.
 
 2011-05-12  Mikael Magnusson <mikachu@gmail.com>
@@ -14664,5 +14669,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5293 $
+* $Revision: 1.5294 $
 *****************************************************
