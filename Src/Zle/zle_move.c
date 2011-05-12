@@ -536,6 +536,9 @@ vimatchbracket(UNUSED(char **args))
     int ocs = zlecs, dir, ct;
     unsigned char oth, me;
 
+    if ((zlecs == zlell || zleline[zlecs] == '\n') && zlecs > 0)
+	DECCS();
+
   otog:
     if (zlecs == zlell || zleline[zlecs] == '\n') {
 	zlecs = ocs;
