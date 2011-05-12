@@ -27,8 +27,8 @@ _xset_compopts () {
       tmp=("$tmp[@]" "$opt")
     fi
   done
-  _describe -o options tmp -- ||
-  _describe -o options allopts --
+  _describe -O options tmp -- ||
+  _describe -O options allopts --
 }
 
 _xset_compfpadd () {

@@ -1,5 +1,10 @@
 2011-05-12  Mikael Magnusson <mikachu@gmail.com>
 
+	* 29245: Completion/X/Command/_xset: pass -O instead of -o
+	to _describe.
+
+2011-05-12  Mikael Magnusson <mikachu@gmail.com>
+
 	* Nikolai Weibull: 29124: Completion/Unix/Command/_git: Fix
 	-l option.
 
@@ -14669,5 +14674,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5294 $
+* $Revision: 1.5295 $
 *****************************************************
