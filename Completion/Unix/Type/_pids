@@ -37,7 +37,7 @@ else
   desc=()
 fi
 
-_wanted processes expl 'process ID' \
+_wanted -V processes expl 'process ID' \
     compadd "$@" "$desc[@]" "$all[@]" -a - pids && ret=0
 
 if [[ -n "$all" ]]; then
