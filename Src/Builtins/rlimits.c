@@ -954,7 +954,6 @@ int
 cleanup_(Module m)
 {
     return setfeatureenables(m, &module_features, NULL);
-    return 0;
 }
 
 /**/

@@ -50,6 +50,7 @@ struct zftp_session;
 typedef struct zftp_session *Zftp_session;
 
 #include "tcp.h"
+#include "tcp.mdh"
 #include "zftp.mdh"
 #include "zftp.pro"
 

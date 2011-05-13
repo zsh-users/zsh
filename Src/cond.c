@@ -403,7 +403,6 @@ evalcond(Estate state, char *fromtest)
 	zwarnnam(fromtest, "bad cond code");
 	return 2;
     }
-    return 1;
 }
 
 

@@ -146,7 +146,7 @@ bin_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
 }
 
 static zlong
-getcurrentsecs()
+getcurrentsecs(UNUSED(Param pm))
 {
     return (zlong) time(NULL);
 }

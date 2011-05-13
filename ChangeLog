@@ -1,3 +1,9 @@
+2011-05-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Danek: 29254: Src/cond.c, Src/Builtins/rlimits.c,
+	Src/Modules/datetime.c, Src/Modules/zftp.c, Src/Zle/computil.c:
+	fix some compiler warnings.
+
 2011-05-13  Peter Stephenson  <pws@csr.com>
 
 	*  Jérémie Roquet: 29258: Src/Zle/zle_utils.c: mark a couple
@@ -14682,5 +14688,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5297 $
+* $Revision: 1.5298 $
 *****************************************************

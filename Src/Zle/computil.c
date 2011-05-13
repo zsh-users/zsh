@@ -3358,7 +3358,6 @@ bin_compvalues(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
 	    return 0;
 	}
-	return 1;
 
     case 'D':
         /* This returns the description and action to use if we are at
