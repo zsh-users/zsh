@@ -596,7 +596,7 @@ struct zle_position *zle_positions;
  */
 
 /**/
-void
+mod_export void
 zle_save_positions(void)
 {
     struct region_highlight *rhp;
@@ -653,7 +653,7 @@ zle_save_positions(void)
  */
 
 /**/
-void
+mod_export void
 zle_restore_positions(void)
 {
     struct zle_position *oldpos = zle_positions;

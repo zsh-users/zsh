@@ -1,5 +1,8 @@
 2011-05-13  Peter Stephenson  <pws@csr.com>
 
+	*  Jérémie Roquet: 29258: Src/Zle/zle_utils.c: mark a couple
+	more functions for export.
+
 	* unposted (late commit): Completion/Unix/Command/.distfiles,
 	Config/version.mk, Test/.distfiles: update for 4.3.11-dev-3.
 
@@ -14679,5 +14682,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5296 $
+* $Revision: 1.5297 $
 *****************************************************
