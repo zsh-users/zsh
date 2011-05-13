@@ -1,6 +1,7 @@
 DISTFILES_SRC='
 .cvsignore
 .distfiles
+compgentest
 A01grammar.ztst
 A02alias.ztst
 A03quoting.ztst
