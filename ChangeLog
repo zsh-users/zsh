@@ -2,7 +2,7 @@
 
 	* 29267: configure.ac, Src/mem.c, Src/zsh.h, Src/Zle/comp.h,
 	Src/Zle/compcore.c, Src/Zle/compctl.c, Src/Zle/complist.c,
-	Src/Zle/compresult.c: add --enable-zsh-hash-debug and use
+	Src/Zle/compresult.c: add --enable-zsh-heap-debug and use
 	for debugging completion matcher groups.
 
 2011-05-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
@@ -14695,5 +14695,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5299 $
+* $Revision: 1.5300 $
 *****************************************************
