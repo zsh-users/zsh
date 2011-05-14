@@ -1,3 +1,8 @@
+2011-05-14  Bart Schaefer  <schaefer@zsh.org>
+
+	* 29276: Src/zsh.h: typedef Heapid unconditionally, to prevent
+	compile errors in automatically-generated header files.
+
 2011-05-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 29268: Src/Zle/compcore.c: dupstring() the value that's
@@ -14698,5 +14703,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5301 $
+* $Revision: 1.5302 $
 *****************************************************

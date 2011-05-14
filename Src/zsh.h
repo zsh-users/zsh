@@ -2327,7 +2327,6 @@ enum {
  * Memory management *
  *********************/
 
-#ifdef ZSH_HEAP_DEBUG
 /*
  * A Heapid is a type for identifying, uniquely up to the point where
  * the count of new identifiers wraps. all heaps that are or
@@ -2340,6 +2339,8 @@ enum {
  * We could make this unsigned long long if we wanted a big range.
  */
 typedef unsigned int Heapid;
+
+#ifdef ZSH_HEAP_DEBUG
 
 /* printf format specifier corresponding to Heapid */
 #define HEAPID_FMT	"%x"
