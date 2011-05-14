@@ -123,6 +123,7 @@ static Heap heaps;
 
 static Heap fheap;
 
+/**/
 #ifdef ZSH_HEAP_DEBUG
 /*
  * The heap ID we'll allocate next.
@@ -172,6 +173,8 @@ new_heap_id(void)
 {
     return next_heap_id++;
 }
+
+/**/
 #endif
 
 /* Use new heaps from now on. This returns the old heap-list. */
@@ -723,6 +726,7 @@ hrealloc(char *p, size_t old, size_t new)
     }
 }
 
+/**/
 #ifdef ZSH_HEAP_DEBUG
 /*
  * Check if heap_id is the identifier of a currently valid heap,
@@ -768,6 +772,7 @@ memory_validate(Heapid heap_id)
 
     return 1;
 }
+/**/
 #endif
 
 /* allocate memory from the current memory pool and clear it */
