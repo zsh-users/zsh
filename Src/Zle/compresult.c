@@ -906,7 +906,14 @@ do_allmatches(UNUSED(int end))
 
     for (minfo.group = amatches;
 	 minfo.group && !(minfo.group)->mcount;
-	 minfo.group = (minfo.group)->next);
+	 minfo.group = (minfo.group)->next) {
+#ifdef ZSH_HEAP_DEBUG
+	if (memory_validate(minfo.group->heap_id)) {
+	    HEAP_ERROR(minfo.group->heap_id);
+	}
+#endif
+    }
+
 
     mc = (minfo.group)->matches;
 
@@ -1172,6 +1179,11 @@ do_single(Cmatch m)
 	struct chdata dat;
 
 	dat.matches = amatches;
+#ifdef ZSH_HEAP_DEBUG
+	if (memory_validate(dat.matches->heap_id)) {
+	    HEAP_ERROR(dat.matches->heap_id);
+	}
+#endif
 	dat.num = nmatches;
 	dat.cur = m;
 
@@ -1210,8 +1222,14 @@ do_menucmp(int lst)
     do {
 	if (!*++(minfo.cur)) {
 	    do {
-		if (!(minfo.group = (minfo.group)->next))
+		if (!(minfo.group = (minfo.group)->next)) {
 		    minfo.group = amatches;
+#ifdef ZSH_HEAP_DEBUG
+		    if (memory_validate(minfo.group->heap_id)) {
+			HEAP_ERROR(minfo.group->heap_id);
+		    }
+#endif
+		}
 	    } while (!(minfo.group)->mcount);
 	    minfo.cur = minfo.group->matches;
 	}
@@ -1291,12 +1309,18 @@ accept_last(void)
 	    Cmgroup g;
 	    Cmatch *m;
 
-	    for (g = amatches, m = NULL; g && (!m || !*m); g = g->next)
+	    for (g = amatches, m = NULL; g && (!m || !*m); g = g->next) {
+#ifdef ZSH_HEAP_DEBUG
+		if (memory_validate(g->heap_id)) {
+		    HEAP_ERROR(g->heap_id);
+		}
+#endif
 		for (m = g->matches; *m; m++)
 		    if (!hasbrpsfx(*m, minfo.prebr, minfo.postbr)) {
 			showinglist = -2;
 			break;
 		    }
+	    }
 	}
     }
     menuacc++;
@@ -1381,7 +1405,13 @@ do_ambig_menu(void)
 	insgnum = comp_mod(insgnum, lastpermgnum);
 	for (minfo.group = amatches;
 	     minfo.group && (minfo.group)->num != insgnum + 1;
-	     minfo.group = (minfo.group)->next);
+	     minfo.group = (minfo.group)->next) {
+#ifdef ZSH_HEAP_DEBUG
+	    if (memory_validate(minfo.group->heap_id)) {
+		HEAP_ERROR(minfo.group->heap_id);
+	    }
+#endif
+	}
 	if (!minfo.group || !(minfo.group)->mcount) {
 	    minfo.cur = NULL;
 	    minfo.asked = 0;
@@ -1393,8 +1423,14 @@ do_ambig_menu(void)
 	insmnum = comp_mod(insmnum, lastpermmnum);
 	for (minfo.group = amatches;
 	     minfo.group && (minfo.group)->mcount <= insmnum;
-	     minfo.group = (minfo.group)->next)
+	     minfo.group = (minfo.group)->next) {
 	    insmnum -= (minfo.group)->mcount;
+#ifdef ZSH_HEAP_DEBUG
+	    if (memory_validate(minfo.group->heap_id)) {
+		HEAP_ERROR(minfo.group->heap_id);
+	    }
+#endif
+	}
 	if (!minfo.group) {
 	    minfo.cur = NULL;
 	    minfo.asked = 0;
@@ -1483,6 +1519,11 @@ calclist(int showall)
 	int nl = 0, l, glong = 1, gshort = zterm_columns, ndisp = 0, totl = 0;
         int hasf = 0;
 
+#ifdef ZSH_HEAP_DEBUG
+	if (memory_validate(g->heap_id)) {
+	    HEAP_ERROR(g->heap_id);
+	}
+#endif
 	g->flags |= CGF_PACKED | CGF_ROWS;
 
 	if (!onlyexpl && pp) {
@@ -1624,6 +1665,11 @@ calclist(int showall)
 	for (g = amatches; g; g = g->next) {
 	    glines = 0;
 
+#ifdef ZSH_HEAP_DEBUG
+	    if (memory_validate(g->heap_id)) {
+		HEAP_ERROR(g->heap_id);
+	    }
+#endif
 	    zfree(g->widths, 0);
 	    g->widths = NULL;
 
@@ -1858,6 +1904,11 @@ calclist(int showall)
     else
 	for (g = amatches; g; g = g->next)
 	{
+#ifdef ZSH_HEAP_DEBUG
+	    if (memory_validate(g->heap_id)) {
+		HEAP_ERROR(g->heap_id);
+	    }
+#endif
 	    zfree(g->widths, 0);
 	    g->widths = NULL;
 	}
@@ -1945,6 +1996,11 @@ printlist(int over, CLPrintFunc printm, int showall)
     for (g = amatches; g; g = g->next) {
 	char **pp = g->ylist;
 
+#ifdef ZSH_HEAP_DEBUG
+	if (memory_validate(g->heap_id)) {
+	    HEAP_ERROR(g->heap_id);
+	}
+#endif
 	if ((e = g->expls)) {
 	    int l;
 
@@ -2144,7 +2200,13 @@ bld_all_str(Cmatch all)
 
     buf[0] = '\0';
 
-    for (g = amatches; g && !g->mcount; g = g->next);
+    for (g = amatches; g && !g->mcount; g = g->next) {
+#ifdef ZSH_HEAP_DEBUG
+	if (memory_validate(g->heap_id)) {
+	    HEAP_ERROR(g->heap_id);
+	}
+#endif
+    }
 
     mp = g->matches;
     while (1) {
@@ -2262,6 +2324,11 @@ list_matches(UNUSED(Hookdef dummy), UNUSED(void *dummy2))
 #endif
 
     dat.matches = amatches;
+#ifdef ZSH_HEAP_DEBUG
+    if (memory_validate(dat.matches->heap_id)) {
+	HEAP_ERROR(dat.matches->heap_id);
+    }
+#endif
     dat.num = nmatches;
     dat.cur = NULL;
     ret = runhookdef(COMPLISTMATCHESHOOK, (void *) &dat);

@@ -105,6 +105,18 @@ AC_HELP_STRING([--enable-zsh-secure-free], [turn on error checking for free()]),
   AC_DEFINE(ZSH_SECURE_FREE)
 fi])
 
+dnl Do you want to debug zsh heap allocation?
+dnl Does not depend on zsh-mem.
+ifdef([zsh-heap-debug],[undefine([zsh-heap-debug])])dnl
+AH_TEMPLATE([ZSH_HEAP_DEBUG],
+[Define to 1 if you want to turn on error checking for heap allocation.])
+AC_ARG_ENABLE(zsh-heap-debug,
+AC_HELP_STRING([--enable-zsh-heap-debug],
+[turn on error checking for heap allocation]),
+[if test x$enableval = xyes; then
+  AC_DEFINE(ZSH_HEAP_DEBUG)
+fi])
+
 dnl Do you want debugging information on internal hash tables.
 dnl This turns on the `hashinfo' builtin command.
 ifdef([zsh-hash-debug],[undefine([zsh-hash-debug])])dnl

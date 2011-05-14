@@ -76,6 +76,9 @@ struct cmgroup {
     int totl;			/* total length */
     int shortest;		/* length of shortest match */
     Cmgroup perm;		/* perm. alloced version of this group */
+#ifdef ZSH_HEAP_DEBUG
+    Heapid heap_id;
+#endif
 };
 
 

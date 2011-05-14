@@ -1363,6 +1363,11 @@ compprintlist(int showall)
     while (g) {
 	char **pp = g->ylist;
 
+#ifdef ZSH_HEAP_DEBUG
+	if (memory_validate(g->heap_id)) {
+	    HEAP_ERROR(g->heap_id);
+	}
+#endif
 	if ((e = g->expls)) {
 	    int l;
 
@@ -1952,6 +1957,11 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
     Cmgroup oamatches = amatches;
 
     amatches = dat->matches;
+#ifdef ZSH_HEAP_DEBUG
+    if (memory_validate(amatches->heap_id)) {
+	HEAP_ERROR(amatches->heap_id);
+    }
+#endif
 
     noselect = 0;
 
@@ -2640,6 +2650,11 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    s->mlbeg = mlbeg;
 	    memcpy(&(s->info), &minfo, sizeof(struct menuinfo));
 	    s->amatches = amatches;
+#ifdef ZSH_HEAP_DEBUG
+	    if (memory_validate(amatches->heap_id)) {
+		HEAP_ERROR(amatches->heap_id);
+	    }
+#endif
 	    s->pmatches = pmatches;
 	    s->lastmatches = lastmatches;
 	    s->lastlmatches = lastlmatches;
@@ -2835,6 +2850,11 @@ domenuselect(Hookdef dummy, Chdata dat)
 		if (lastmatches)
 		    freematches(lastmatches, 0);
 		amatches = u->amatches;
+#ifdef ZSH_HEAP_DEBUG
+		if (memory_validate(amatches->heap_id)) {
+		    HEAP_ERROR(amatches->heap_id);
+		}
+#endif
 		pmatches = u->pmatches;
 		lastmatches = u->lastmatches;
 		lastlmatches = u->lastlmatches;

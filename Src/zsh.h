@@ -2327,11 +2327,67 @@ enum {
  * Memory management *
  *********************/
 
+#ifdef ZSH_HEAP_DEBUG
+/*
+ * A Heapid is a type for identifying, uniquely up to the point where
+ * the count of new identifiers wraps. all heaps that are or
+ * (importantly) have been valid.  Each valid heap is given an
+ * identifier, and every time we push a heap we save the old identifier
+ * and give the heap a new identifier so that when the heap is popped
+ * or freed we can spot anything using invalid memory from the popped
+ * heap.
+ *
+ * We could make this unsigned long long if we wanted a big range.
+ */
+typedef unsigned int Heapid;
+
+/* printf format specifier corresponding to Heapid */
+#define HEAPID_FMT	"%x"
+
+/* Marker that memory is permanently allocated */
+#define HEAPID_PERMANENT (UINT_MAX)
+
+/*
+ * Heap debug verbosity.
+ * Bits to be 'or'ed into the variable also called heap_debug_verbosity.
+ */
+enum heap_debug_verbosity {
+    /* Report when we push a heap */
+    HDV_PUSH = 0x01,
+    /* Report when we pop a heap */
+    HDV_POP = 0x02,
+    /* Report when we create a new heap from which to allocate */
+    HDV_CREATE = 0x04,
+    /* Report every time we free a complete heap */
+    HDV_FREE = 0x08,
+    /* Report when we temporarily install a new set of heaps */
+    HDV_NEW = 0x10,
+    /* Report when we restore an old set of heaps */
+    HDV_OLD = 0x20,
+    /* Report when we temporarily switch heaps */
+    HDV_SWITCH = 0x40,
+    /*
+     * Report every time we allocate memory from the heap.
+     * This is very verbose, and arguably not very useful: we
+     * would expect to allocate memory from a heap we create.
+     * For much debugging heap_debug_verbosity = 0x7f should be sufficient.
+     */
+    HDV_ALLOC = 0x80
+};
+
+#define HEAP_ERROR(heap_id)			\
+    fprintf(stderr, "%s:%d: HEAP DEBUG: invalid heap: " HEAPID_FMT ".\n", \
+	    __FILE__, __LINE__, heap_id)
+#endif
+
 /* heappush saves the current heap state using this structure */
 
 struct heapstack {
     struct heapstack *next;	/* next one in list for this heap */
     size_t used;
+#ifdef ZSH_HEAP_DEBUG
+    Heapid heap_id;
+#endif
 };
 
 /* A zsh heap. */
@@ -2341,6 +2397,10 @@ struct heap {
     size_t size;		/* size of heap                              */
     size_t used;		/* bytes used from the heap                  */
     struct heapstack *sp;	/* used by pushheap() to save the value used */
+
+#ifdef ZSH_HEAP_DEBUG
+    unsigned int heap_id;
+#endif
 
 /* Uncomment the following if the struct needs padding to 64-bit size. */
 /* Make sure sizeof(heap) is a multiple of 8 

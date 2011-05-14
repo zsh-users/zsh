@@ -1,3 +1,10 @@
+2011-05-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 29267: configure.ac, Src/mem.c, Src/zsh.h, Src/Zle/comp.h,
+	Src/Zle/compcore.c, Src/Zle/compctl.c, Src/Zle/complist.c,
+	Src/Zle/compresult.c: add --enable-zsh-hash-debug and use
+	for debugging completion matcher groups.
+
 2011-05-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Danek: 29254: Src/cond.c, Src/Builtins/rlimits.c,
@@ -14688,5 +14695,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5298 $
+* $Revision: 1.5299 $
 *****************************************************

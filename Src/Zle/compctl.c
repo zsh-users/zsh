@@ -1838,6 +1838,11 @@ ccmakehookfn(UNUSED(Hookdef dummy), struct ccmakedat *dat)
 	    diffmatches = odm;
 	    validlist = 1;
 	    amatches = lastmatches;
+#ifdef ZSH_HEAP_DEBUG
+	    if (memory_validate(amatches->heap_id)) {
+		HEAP_ERROR(amatches->heap_id);
+	    }
+#endif
 	    lmatches = lastlmatches;
 	    if (pmatches) {
 		freematches(pmatches, 1);
