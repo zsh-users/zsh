@@ -2344,7 +2344,7 @@ addmatches(Cadata dat, char **argv)
 		dat->pre = dupstring(dat->pre);
 	    if (dat->suf)
 		dat->suf = dupstring(dat->suf);
-	    if (!dat->prpre && (dat->prpre = oppre)) {
+	    if (!dat->prpre && (dat->prpre = dupstring(oppre))) {
 		singsub(&(dat->prpre));
 		untokenize(dat->prpre);
 	    } else

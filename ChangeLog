@@ -1,5 +1,8 @@
 2011-05-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 29268: Src/Zle/compcore.c: dupstring() the value that's
+	going to be used for prpre, whatever the heck that is.
+
 	* 29267: configure.ac, Src/mem.c, Src/zsh.h, Src/Zle/comp.h,
 	Src/Zle/compcore.c, Src/Zle/compctl.c, Src/Zle/complist.c,
 	Src/Zle/compresult.c: add --enable-zsh-heap-debug and use
@@ -14695,5 +14698,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5300 $
+* $Revision: 1.5301 $
 *****************************************************
