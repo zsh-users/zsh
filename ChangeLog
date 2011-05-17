@@ -1,3 +1,8 @@
+2011-05-17  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Nikolai Weibull: 29166: Completion/Unix/Command/_git: Speed
+	improvements for file completion.
+
 2011-05-17  Nikolai Weibull <now@bitwi.se>
 
 	* 29273: Completion/Unix/Command/_git: Parse compadd options in
@@ -14722,5 +14727,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5306 $
+* $Revision: 1.5307 $
 *****************************************************
