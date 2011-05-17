@@ -35,7 +35,7 @@ _arguments \
         kernel-source\:"package of the kernel sources" \
         kernel-headers\:"package of the header files included in the kernel" \
         kernel-manual\:"package of the manual pages included in the kernel" \
-        kernel-doc\:"package of teh documentation included in the kernel" \
+        kernel-doc\:"package of the documentation included in the kernel" \
         kernel-image\:"package of the kernel image" \
         build\:"compiles the kernel" \
         modules\:"build all add-on modules" \

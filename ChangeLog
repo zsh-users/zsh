@@ -1,3 +1,8 @@
+2011-05-17  Clint Adams  <clint@zsh.org>
+
+	* 29306: Completion/Debian/Command/_make-kpkg: typo fix
+	from Laurent Fousse.
+
 2011-05-17  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Nikolai Weibull: 29166: Completion/Unix/Command/_git: Speed
@@ -14727,5 +14732,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5307 $
+* $Revision: 1.5308 $
 *****************************************************
