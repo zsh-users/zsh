@@ -1,3 +1,8 @@
+2011-05-17  Nikolai Weibull <now@bitwi.se>
+
+	* 29273: Completion/Unix/Command/_git: Parse compadd options in
+	__git_guard_number.
+
 2011-05-14  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29278: Completion/Unix/Type/_path_files: fix use of the $skips
@@ -14717,5 +14722,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5305 $
+* $Revision: 1.5306 $
 *****************************************************

@@ -5424,6 +5424,10 @@ __git_guard_diff-stat-width () {
 
 (( $+functions[__git_guard_number] )) ||
 __git_guard_number () {
+  declare -A opts
+
+  zparseopts -K -D -A opts M: J: V: 1 2 n F: X:
+
   _guard "[[:digit:]]#" ${1:-number}
 }
 
