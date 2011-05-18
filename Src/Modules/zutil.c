@@ -1405,6 +1405,8 @@ struct zoptdesc {
 #define ZOF_OPT  2
 #define ZOF_MULT 4
 #define ZOF_SAME 8
+#define ZOF_MAP 16
+#define ZOF_CYC 32
 
 struct zoptarr {
     Zoptarr next;
@@ -1459,12 +1461,44 @@ get_opt_arr(char *name)
     return NULL;
 }
 
+static Zoptdesc
+map_opt_desc(Zoptdesc start)
+{
+    Zoptdesc map = NULL;
+
+    if (!start || !(start->flags & ZOF_MAP))
+	return start;
+
+    map = get_opt_desc(start->arr->name);
+
+    if (!map)
+	return start;
+
+    if (map == start) {
+	start->flags &= ~ZOF_MAP;	/* optimize */
+	return start;
+    }
+
+    if (map->flags & ZOF_CYC)
+	return NULL;
+
+    start->flags |= ZOF_CYC;
+    map = map_opt_desc(map);
+    start->flags &= ~ZOF_CYC;
+
+    return map;
+}
+
 static void
 add_opt_val(Zoptdesc d, char *arg)
 {
     Zoptval v = NULL;
     char *n = dyncat("-", d->name);
     int new = 0;
+
+    Zoptdesc map = map_opt_desc(d);
+    if (map)
+	d = map;
 
     if (!(d->flags & ZOF_MULT))
 	v = d->vals;
@@ -1513,7 +1547,7 @@ static int
 bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     char *o, *p, *n, **pp, **aval, **ap, *assoc = NULL, **cp, **np;
-    int del = 0, f, extract = 0, keep = 0;
+    int del = 0, flags = 0, extract = 0, keep = 0;
     Zoptdesc sopts[256], d;
     Zoptarr a, defarr = NULL;
     Zoptval v;
@@ -1531,6 +1565,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    case '-':
 		if (o[2])
 		    args--;
+		/* else unreachable, default parsing removes "--" */
 		o = NULL;
 		break;
 	    case 'D':
@@ -1557,6 +1592,14 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		}
 		keep = 1;
 		break;
+	    case 'M':
+		if (o[2]) {
+		    args--;
+		    o = NULL;
+		    break;
+		}
+		flags |= ZOF_MAP;
+		break;
 	    case 'a':
 		if (defarr) {
 		    zwarnnam(nam, "default array given more than once");
@@ -1578,6 +1621,10 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		opt_arrs = defarr;
 		break;
 	    case 'A':
+		if (assoc) {
+		    zwarnnam(nam, "associative array given more than once");
+		    return 1;
+		}
 		if (o[2]) 
 		    assoc = o + 2;
 		else if (*args)
@@ -1586,6 +1633,11 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    zwarnnam(nam, "missing array name");
 		    return 1;
 		}
+		break;
+	    default:
+		/* Anything else is an option description */
+		args--;
+		o = NULL;
 		break;
 	    }
 	    if (!o) {
@@ -1602,11 +1654,11 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	return 1;
     }
     while ((o = dupstring(*args++))) {
+	int f = 0;
 	if (!*o) {
 	    zwarnnam(nam, "invalid option description: %s", o);
 	    return 1;
 	}
-	f = 0;
 	for (p = o; *p; p++) {
 	    if (*p == '\\' && p[1])
 		p++;
@@ -1633,6 +1685,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	a = NULL;
 	if (*p == '=') {
 	    *p++ = '\0';
+	    f |= flags;
 	    if (!(a = get_opt_arr(p))) {
 		a = (Zoptarr) zhalloc(sizeof(*a));
 		a->name = p;
@@ -1666,6 +1719,10 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	opt_descs = d;
 	if (!o[1])
 	    sopts[STOUC(*o)] = d;
+	if ((flags & ZOF_MAP) && !map_opt_desc(d)) {
+	    zwarnnam(nam, "cyclic option mapping: %s", args[-1]);
+	    return 1;
+	}
     }
     np = cp = pp = ((extract && del) ? arrdup(pparams) : pparams);
     for (; (o = *pp); pp++) {
@@ -1732,12 +1789,20 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		add_opt_val(d, NULL);
 	}
     }
+
+    if (flags & ZOF_MAP) {
+	for (d = opt_descs; d; d = d->next)
+	    if (d->arr && !d->vals && (d->flags & ZOF_MAP)) {
+		if (d->arr->num == 0 && get_opt_desc(d->arr->name))
+		    d->arr->num = -1;	/* this is not a real array */
+	    }
+    }
     if (extract && del)
 	while (*pp)
 	    *cp++ = *pp++;
 
     for (a = opt_arrs; a; a = a->next) {
-	if (!keep || a->num) {
+	if (a->num >= 0 && (!keep || a->num)) {
 	    aval = (char **) zalloc((a->num + 1) * sizeof(char *));
 	    for (ap = aval, v = a->vals; v; ap++, v = v->next) {
 		if (v->str)

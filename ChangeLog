@@ -1,3 +1,9 @@
+2011-05-17  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 29312, users/16032: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c:
+	add "zparseopts -M" which allows option descriptions to map
+	synonymous option names onto a single name.
+
 2011-05-17  Clint Adams  <clint@zsh.org>
 
 	* 29306: Completion/Debian/Command/_make-kpkg: typo fix
@@ -14732,5 +14738,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5308 $
+* $Revision: 1.5309 $
 *****************************************************
