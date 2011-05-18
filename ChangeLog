@@ -1,3 +1,8 @@
+2011-05-18  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* Valentin Haenel: 29315: Completion/Unix/Command/_git: add a
+	missing backslash.
+
 2011-05-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29313: Src/subst.c: when SHWORDSPLIT is in effect, the state of
@@ -14742,5 +14747,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5310 $
+* $Revision: 1.5311 $
 *****************************************************
