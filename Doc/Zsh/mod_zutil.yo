@@ -178,7 +178,7 @@ item(tt(zregexparse))(
 This implements some internals of the tt(_regex_arguments) function.
 )
 findex(zparseopts)
-item(tt(zparseopts) [ tt(-D) ] [ tt(-K) ] [ tt(-E) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] var(specs))(
+item(tt(zparseopts) [ tt(-D) ] [ tt(-K) ] [ tt(-M) ] [ tt(-E) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] var(specs))(
 This builtin simplifies the parsing of options in positional parameters,
 i.e. the set of arguments given by tt($*).  Each var(spec) describes one
 option and must be of the form `var(opt)[tt(=)var(array)]'.  If an option
@@ -255,6 +255,15 @@ options and with the `tt(=)var(array)' forms are kept unchanged when none
 of the var(specs) for them is used.  This allows assignment of default
 values to them before calling tt(zparseopts).
 )
+item(tt(-M))(
+This changes the assignment rules to implement a map among equivalent
+option names.  If any var(spec) uses the `tt(=)var(array)' form, the
+string var(array) is interpreted as the name of another var(spec),
+which is used to choose where to store the values.  If no other var(spec)
+is found, the values are stored as usual.  This changes only the way the
+values are stored, not the way tt($*) is parsed, so results may be
+unpredicable if the `var(name)tt(+)' specifier is used inconsistently.
+)
 item(tt(-E))(
 This changes the parsing rules to em(not) stop at the first string
 that isn't described by one of the var(spec)s.  It can be used to test
@@ -288,5 +297,15 @@ set -- -a x -c z arg1 arg2)
 
 I.e., the option tt(-b) and its arguments are taken from the
 positional parameters and put into the array tt(bar).
+
+The tt(-M) option can be used like this:
+
+example(set -- -a -bx -c y -cz baz -cend
+zparseopts -A bar -M a=foo b+: c:=b)
+
+to have the effect of
+
+example(foo=(-a)
+bar=(-a '' -b xyz))
 )
 enditem()
