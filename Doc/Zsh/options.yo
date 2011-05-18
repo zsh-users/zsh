@@ -2024,7 +2024,7 @@ pindex(NO_LOGIN)
 pindex(NOLOGIN)
 item(tt(LOGIN) (tt(-l), ksh: tt(-l)))(
 This is a login shell.
-If this option is not explicitly set, the shell is a login shell if
+If this option is not explicitly set, the shell becomes a login shell if
 the first character of the tt(argv[0]) passed to the shell is a `tt(-)'.
 )
 pindex(PRIVILEGED)
