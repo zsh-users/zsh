@@ -1611,7 +1611,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * This is one of the things that decides whether multsub
      * will produce an array, but in an extremely indirect fashion.
      */
-    int nojoin = 0;
+    int nojoin = isset(SHWORDSPLIT) ? !(ifs && *ifs) : 0;
     /*
      * != 0 means ${...}, otherwise $...  What works without braces
      * is largely a historical artefact (everything works with braces,
@@ -1717,7 +1717,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    ++arrasg;
 		    break;
 		case '@':
-		    nojoin = 1;
+		    nojoin = 2;	/* nojoin = 2 means force */
 		    break;
 		case 'M':
 		    flags |= SUB_MATCH;
@@ -2033,9 +2033,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    /* SH_WORD_SPLIT on or off (doubled). spbreak = 2 means force */
 	    if ((c = *++s) == '=' || c == Equals) {
 		spbreak = 0;
+		if (nojoin < 2)
+		    nojoin = 0;
 		s++;
-	    } else
+	    } else {
 		spbreak = 2;
+		if (nojoin < 2)
+		    nojoin = !(ifs && *ifs);
+	    }
 	} else if ((c == '#' || c == Pound) &&
 		   (itype_end(s+1, IIDENT, 0) != s + 1
 		    || (cc = s[1]) == '*' || cc == Star || cc == '@'
@@ -2653,14 +2658,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		*idend = sav;
 		copied = 1;
 		if (isarr) {
-		  if (nojoin)
-		    isarr = -1;
-		  if (qt && !getlen && isarr > 0 && !spsep && spbreak < 2) {
-		    val = sepjoin(aval, sep, 1);
-		    isarr = 0;
-		  }
-		  sep = spsep = NULL;
-		  spbreak = 0;
+		    if (nojoin)
+			isarr = -1;
+		    if (qt && !getlen && isarr > 0 && !spsep && spbreak < 2) {
+			val = sepjoin(aval, sep, 1);
+			isarr = 0;
+		    }
+		    sep = spsep = NULL;
+		    spbreak = 0;
 		}
 	    }
 	    break;
@@ -3018,7 +3023,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     /* At this point we make sure that our arrayness has affected the
      * arrayness of the linked list.  Then, we can turn our value into
      * a scalar for convenience sake without affecting the arrayness
-     * of the resulting value. */
+     * of the resulting value.  ## This is the YUK chunk. ## */
     if (isarr)
 	l->list.flags |= LF_ARRAY;
     else
@@ -3040,7 +3045,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * done any requested splitting of the word value with quoting preserved.
      * "ssub" is true when we are called from singsub (via prefork):
      * it means that we must join arrays and should not split words. */
-    if (ssub || spbreak || spsep || sep) {
+    if (ssub || (spbreak && isarr >= 0) || spsep || sep) {
 	if (isarr) {
 	    val = sepjoin(aval, sep, 1);
 	    isarr = 0;

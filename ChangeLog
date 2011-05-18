@@ -1,5 +1,9 @@
 2011-05-17  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 29313: Src/subst.c: when SHWORDSPLIT is in effect, the state of
+	the (@) expansion flag depends on the value of $IFS so as to mimic
+	Bourne shell join/split behavior more closely (see users/15442).
+
 	* 29312, users/16032: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c:
 	add "zparseopts -M" which allows option descriptions to map
 	synonymous option names onto a single name.
@@ -14738,5 +14742,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5309 $
+* $Revision: 1.5310 $
 *****************************************************
