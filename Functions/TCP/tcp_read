@@ -1,7 +1,7 @@
 # Helper function for reading input from a TCP connection.
 # Actually, the input doesn't need to be a TCP connection at all, it
 # is simply an input file descriptor.  However, it must be contained
-# in ${tcp_by_fd[$TCP_SESS]}.  This is set set by tcp_open, but may be
+# in ${tcp_by_fd[$TCP_SESS]}.  This is set by tcp_open, but may be
 # set by hand.  (Note, however, the blocking/timeout behaviour is usually
 # not implemented for reading from regular files.)
 #

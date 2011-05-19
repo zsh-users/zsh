@@ -2605,7 +2605,7 @@ _perforce_cmd_tickets() {
 _perforce_cmd_triggers() {
   _arguments -s : \
     '-o[output form to stdout]' \
-    '-i[read from from stdin]'
+    '-i[read from stdin]'
 }
 
 

@@ -23,7 +23,7 @@ if [[ $(echo abcd | tail +2c) = bcd ]]; then
 elif [[ $(echo abcd | tail --bytes=+2) = bcd ]]; then
   tailtype=b
 else
-  print "I can't get your \`tail' to start from from arbitrary characters.\n" \
+  print "I can't get your \`tail' to start from arbitrary characters.\n" \
   "If you know how to do this, let me know." 2>&1
   return 1
 fi

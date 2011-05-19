@@ -809,7 +809,7 @@ item(tt(@))(
 In double quotes, array elements are put into separate words.
 E.g., `tt("${(@)foo}")' is equivalent to `tt("${foo[@]}")' and
 `tt("${(@)foo[1,2]}")' is the same as `tt("$foo[1]" "$foo[2]")'.
-This is distinct from em(field splitting) by the the tt(f), tt(s)
+This is distinct from em(field splitting) by the tt(f), tt(s)
 or tt(z) flags, which still applies within each array element.
 )
 item(tt(A))(

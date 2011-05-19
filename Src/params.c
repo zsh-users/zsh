@@ -978,7 +978,7 @@ copyparam(Param tpm, Param pm, int fakecopy)
      * called from inside an associative array), we need the gets and sets
      * functions to be useful.
      *
-     * In this case we assume the the saved parameter is not itself special,
+     * In this case we assume the saved parameter is not itself special,
      * so we just use the standard functions.  This is also why we switch off
      * PM_SPECIAL.
      */

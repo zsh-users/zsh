@@ -96,7 +96,7 @@ suffixes=("")
 autosuffix=()
 
 while [[ $# -gt 0 && "$str" == *${1}* ]]; do
-  # Remove anything up to the the suffix.
+  # Remove anything up to the suffix.
 
   str="${str#*${1}}"
 

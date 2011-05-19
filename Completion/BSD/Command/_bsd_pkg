@@ -178,7 +178,7 @@ _bsd_pkg() {
       '-m[show mtree files]'
       '-p[show installation prefixes]'
       '-q[be quiet]'
-      '-R[show list list of installed requiring packages]'
+      '-R[show list of installed requiring packages]'
       '-r[show requirements scripts]'
       '-v[be verbose]'
     )

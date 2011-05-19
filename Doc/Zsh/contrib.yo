@@ -1333,7 +1333,7 @@ The `tt(hook_com)' keys considered are `tt(branch)' and `tt(revision)'.
 They are set to the values figured out so far by var(vcs_info) and any
 change will be used directly when the actual replacement is done.
 
-If tt(ret) is set to to non-zero, the string in
+If tt(ret) is set to non-zero, the string in
 tt(${hook_com[branch-replace]}) will be used unchanged as the
 `tt(%b)' replacement in the variables set by var(vcs_info).
 )
@@ -1345,7 +1345,7 @@ The `tt(hook_com)' keys considered are `tt(hash)' and `tt(localrev)'.
 They are set to the values figured out so far by var(vcs_info) and any
 change will be used directly when the actual replacement is done.
 
-If tt(ret) is set to to non-zero, the string in
+If tt(ret) is set to non-zero, the string in
 tt(${hook_com[rev-replace]}) will be used unchanged as the
 `tt(%i)' replacement in the variables set by var(vcs_info).
 )
@@ -1370,7 +1370,7 @@ so even if you changed a value to your liking you can still get the
 original value in the next run. Changing the `tt(_orig)' values is
 probably not a good idea.
 
-If tt(ret) is set to to non-zero, the string in
+If tt(ret) is set to non-zero, the string in
 tt(${hook_com[message]}) will be used unchanged as the message by
 var(vcs_info).
 )
@@ -1988,7 +1988,7 @@ See tt(insert-unicode-char) for an alternative way of inserting Unicode
 characters using their hexadecimal character number.
 
 The set of accented characters is reasonably complete up to Unicode
-character U+0180, the set of special characters less so.  However, it it
+character U+0180, the set of special characters less so.  However, it
 is very sporadic from that point.  Adding new characters is easy,
 however; see the function tt(define-composed-chars).  Please send any
 additions to tt(zsh-workers@zsh.org).
@@ -3043,7 +3043,7 @@ tt(firefox mozilla netscape opera konqueror).
 )
 item(tt(tty-browsers))(
 An array similar to tt(x-browsers), except that it gives browsers to
-use use when no X Window display is available.  The default is
+use when no X Window display is available.  The default is
 tt(elinks links lynx).
 )
 item(tt(command))(

@@ -363,7 +363,7 @@ entry.  `tt(-B 1)' is equivalent to `tt(-b)'.
 )
 item(tt(-C) var(calfile))(
 Explicitly specify a calendar file instead of the value of
-the tt(calendar-file) style or the the default tt(~/calendar).
+the tt(calendar-file) style or the default tt(~/calendar).
 )
 item(tt(-d))(
 Move any events that have passed from the calendar file to the

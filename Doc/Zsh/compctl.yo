@@ -69,7 +69,7 @@ search is retried with the last pathname component. If the command starts
 with a tt(=), completion is tried with the pathname of the command.
 
 Any of the var(command) strings may be patterns of the form normally
-used for filename generation.  These should be be quoted to protect them
+used for filename generation.  These should be quoted to protect them
 from immediate expansion; for example the command string tt('foo*')
 arranges for completion of the words of any command beginning with
 tt(foo).  When completion is attempted, all pattern completions are

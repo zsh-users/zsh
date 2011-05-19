@@ -1594,7 +1594,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
     int arrasg = 0;
     /*
      * The (e) flag.  As we need to do extra work not quite
-     * at the end, the effect of this is kludged in in several places.
+     * at the end, the effect of this is kludged in several places.
      */
     int eval = 0;
     /*
@@ -2987,7 +2987,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * TODO: again. one might naively have thought this had the
      * same sort of effect as the ${(t)...} flag and the ${+...}
      * test, although in this case we do need the value rather
-     * the the parameter, so maybe it's a bit different.
+     * the parameter, so maybe it's a bit different.
      */
     if (getlen) {
 	long len = 0;

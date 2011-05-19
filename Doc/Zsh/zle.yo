@@ -854,7 +854,7 @@ The name of the shell function that implements a widget defined with
 either tt(zle -N) or tt(zle -C).  In the former case, this is the second
 argument to the tt(zle -N) command that defined the widget, or
 the first argument if there was no second argument.  In the latter case
-this is the the third argument to the tt(zle -C) command that defined the
+this is the third argument to the tt(zle -C) command that defined the
 widget.  Read-only.
 )
 vindex(WIDGETSTYLE)
@@ -1866,7 +1866,7 @@ executed as a shell command.
 tindex(accept-line-and-down-history)
 item(tt(accept-line-and-down-history) (^O) (unbound) (unbound))(
 Execute the current line, and push the next history
-event on the the buffer stack.
+event on the buffer stack.
 )
 tindex(auto-suffix-remove)
 item(tt(auto-suffix-remove))(
@@ -2150,7 +2150,7 @@ column of the cursor in the current line.
 )
 tindex(where-is)
 item(tt(where-is))(
-Read the name of an editor command and and print the listing of key
+Read the name of an editor command and print the listing of key
 sequences that invoke the specified command.
 A restricted set of editing functions is available in the
 mini-buffer.  Keys are looked up in the special

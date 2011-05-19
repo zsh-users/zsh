@@ -4,7 +4,7 @@
 #
 # This file is released under the GPLv2.
 #
-# Based on the the zsh guide from http://zsh.dotsrc.org/Guide/zshguide06.html
+# Based on the zsh guide from http://zsh.dotsrc.org/Guide/zshguide06.html
 #
 # Toggle verbose completions: zstyle ':completion:*:zypper:*' verbose no
 #                             zstyle ':completion:*:zypper-subcommand:*' verbose no

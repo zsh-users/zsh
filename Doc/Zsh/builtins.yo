@@ -621,7 +621,7 @@ ifnzman(noderef(Arithmetic Evaluation))\
 .  By default var(mathfn) may take
 any number of comma-separated arguments.  If var(min) is given,
 it must have exactly var(min) args; if var(min) and var(max) are
-both given, it must have at least var(min) and and at most var(max)
+both given, it must have at least var(min) and at most var(max)
 args.  var(max) may be -1 to indicate that there is no upper limit.
 
 By default the function is implemented by a shell function of the same

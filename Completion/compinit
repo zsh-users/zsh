@@ -26,7 +26,7 @@
 #     expand-or-complete, expand-or-complete-prefix, list-choices,
 #     menu-complete, menu-expand-or-complete, or reverse-menu-complete).
 #     This creates a widget behaving like <style> so that the
-#     completions are chosen as given in the the rest of the file,
+#     completions are chosen as given in the rest of the file,
 #     rather than by the context.  The widget has the same name as
 #     the autoload file and can be bound using bindkey in the normal way.
 #

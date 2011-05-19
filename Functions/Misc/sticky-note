@@ -19,7 +19,7 @@
 #
 # Otherwise, invoke the line editor with the previous notes available
 # as an editor history.  Two quick taps on the return/enter key finish
-# the note, or you can use use ^X^W as usual (ZZ in vicmd mode).
+# the note, or you can use ^X^W as usual (ZZ in vicmd mode).
 
 # The application is configured by three zstyles, all using the context
 # ":sticky-note".  The first two styles are "notefile" and "maxnotes"

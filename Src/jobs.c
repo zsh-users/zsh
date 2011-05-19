@@ -531,7 +531,7 @@ update_job(Job jn)
 
     /* When MONITOR is set, the foreground process runs in a different *
      * process group from the shell, so the shell will not receive     *
-     * terminal signals, therefore we we pretend that the shell got    *
+     * terminal signals, therefore we pretend that the shell got       *
      * the signal too.                                                 */
     if (inforeground == 2 && isset(MONITOR) && WIFSIGNALED(status)) {
 	int sig = WTERMSIG(status);

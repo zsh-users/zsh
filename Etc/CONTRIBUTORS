@@ -271,7 +271,7 @@ Version 3.0
   including further texinfo documentation updates and maintained the zsh
   web pages during their tenure at www.mal.com.
 
-* Wayne Davison <wayne@clari.net> improved the the zle search functions
+* Wayne Davison <wayne@clari.net> improved the zle search functions
   and made them 8-bit clean.  Some other little bugfixes.
 
 * Bart Schaefer <schaefer@zsh.org> submitted several bugfixes, reported

@@ -1755,7 +1755,7 @@ parse_subst_string(char *s)
 	     * additional memory should come off the heap or
 	     * otherwise.  So we cheat by copying the unquoted string
 	     * into place, unless it's too long.  That's not the
-	     * normal case, but I'm worried there are are pathological
+	     * normal case, but I'm worried there are pathological
 	     * cases with converting metafied multibyte strings.
 	     * If someone can prove there aren't I will be very happy.
 	     */

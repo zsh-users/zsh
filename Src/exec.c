@@ -2757,7 +2757,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
      * A `fake exec' is possible if we have all the following conditions:     *
      * 1) last1 flag is 1.  This indicates that the current shell will not    *
      *    be needed after the current command.  This is typically the case    *
-     *    when when the command is the last stage in a subshell, or is the    *
+     *    when the command is the last stage in a subshell, or is the         *
      *    last command after the option `-c'.                                 *
      * 2) We don't have any traps set.                                        *
      * 3) We don't have any files to delete.                                  *

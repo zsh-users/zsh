@@ -46,7 +46,7 @@ mod_export mnumber zero_mnumber;
 
 /*
  * The last value we computed:  note this isn't cleared
- * until the next computation, unlike unlike yyval.
+ * until the next computation, unlike yyval.
  * Everything else is saved and returned to allow recursive calls.
  */
 /**/

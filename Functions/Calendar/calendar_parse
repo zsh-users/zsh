@@ -1,7 +1,7 @@
 # Parse the line passed down in the first argument as a calendar entry.
 # Sets the values parsed into the associative array reply, consisting of:
 # time  The time as an integer (as per EPOCHSECONDS) of the (next) event.
-# text1 The text from the the line not including the date/time, but
+# text1 The text from the line not including the date/time, but
 #       including any WARN or RPT text.  This is useful for rescheduling
 #       events, since the keywords need to be retained in this case.
 # warntime  Any warning time (WARN keyword) as an integer, else an empty

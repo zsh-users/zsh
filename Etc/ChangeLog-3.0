@@ -2557,7 +2557,7 @@ Fri Jul 12 17:19:02 1996  Zoltán Hidvégi  <hzoli@cs.elte.hu>
 	  noshortloops.  If CSHJUNKIELOOPS is set accept repeat word list
 	  end.
 
-	* Doc/zshmisc.man: more precise definition the the syntax of
+	* Doc/zshmisc.man: more precise definition the syntax of
  	  complex commands
 
 	* Src/parse.c: the repeat word sublist syntax does not work if

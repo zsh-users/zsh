@@ -131,7 +131,7 @@ _git-archive () {
     '--format=-[format of the resulting archive]:archive format:__git_archive_formats' \
     '(- :)'{-l,--list}'[list available archive formats]' \
     '(-v --verbose)'{-v,--verbose}'[report progress to stderr]' \
-    '--prefix=-[prepend the given path prefix to to each filename]:path prefix:_directories -r ""' \
+    '--prefix=-[prepend the given path prefix to each filename]:path prefix:_directories -r ""' \
     '--output=[write archive to argument instead of stdout]:archive:_files' \
     '--worktree-attributes[look for attributes in .gitattributes in working directory too]' \
     $backend_args \

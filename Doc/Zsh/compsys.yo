@@ -1934,7 +1934,7 @@ changing the foreground background colour, are also available, as is the form
 (or, with a numeric argument, some other) width.
 
 After deleting this prompt the variable tt(LISTPROMPT) should be unset for
-the the removal to take effect.
+the removal to take effect.
 )
 kindex(list-rows-first, completion style)
 item(tt(list-rows-first))(
@@ -2665,7 +2665,7 @@ most commands.
 )
 kindex(urls, completion style)
 item(tt(urls))(
-This is used together with the the tt(urls) tag by
+This is used together with the tt(urls) tag by
 functions completing URLs.
 
 If the value consists of more than one string, or if the only string
