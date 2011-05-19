@@ -19,6 +19,9 @@ the command line is edited.
 In POSIX emulation ("emulate sh") the shell is more accurate about
 when it should or should not exit on errors.
 
+The ${NAME:OFFSET:LENGTH} syntax now supports negative LENGTH, which
+counts back from the end of the string.
+
 Changes between versions 4.3.10 and 4.3.11
 ------------------------------------------
 

@@ -2839,7 +2839,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    char *check_offset = check_colon_subscript(s, &check_offset2);
 	    if (check_offset) {
 		zlong offset = mathevali(check_offset);
-		zlong length = (zlong)-1;
+		zlong length;
+		int length_set = 0;
 		int offset_hack_argzero = 0;
 		if (errflag)
 		    return NULL;
@@ -2854,14 +2855,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			zerr("invalid length: %s", check_offset);
 			return NULL;
 		    }
-                    if (check_offset) {
+		    if (check_offset) {
 			length = mathevali(check_offset);
+			length_set = 1;
 			if (errflag)
 			    return NULL;
-			if (length < (zlong)0) {
-			    zerr("invalid length: %s", check_offset);
-			    return NULL;
-			}
 		    }
 		}
 		if (horrible_offset_hack) {
@@ -2889,8 +2887,16 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    }
 		    if (offset_hack_argzero)
 			alen++;
-		    if (length < 0)
-		      length = alen;
+		    if (length_set) {
+			if (length < 0)
+			    length += alen - offset;
+			if (length < 0) {
+			    zerr("substring expression: %d < %d",
+			         length + offset, offset);
+			    return NULL;
+			}
+		    } else
+			length = alen;
 		    if (offset > alen)
 			offset = alen;
 		    if (offset + length > alen)
@@ -2909,6 +2915,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    aval = newarr;
 		} else {
 		    char *sptr, *eptr;
+		    int given_offset;
 		    if (offset < 0) {
 			MB_METACHARINIT();
 			for (sptr = val; *sptr; ) {
@@ -2918,12 +2925,27 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			if (offset < 0)
 			    offset = 0;
 		    }
+		    given_offset = offset;
 		    MB_METACHARINIT();
+		    if (length_set && length < 0)
+			length -= offset;
 		    for (sptr = val; *sptr && offset; ) {
 			sptr += MB_METACHARLEN(sptr);
 			offset--;
 		    }
-		    if (length >= 0) {
+		    if (length_set) {
+			if (length < 0) {
+			    MB_METACHARINIT();
+			    for (eptr = val; *eptr; ) {
+				eptr += MB_METACHARLEN(eptr);
+				length++;
+			    }
+			    if (length < 0) {
+				zerr("substring expression: %d < %d",
+				     length + given_offset, given_offset);
+				return NULL;
+			    }
+			}
 			for (eptr = sptr; *eptr && length; ) {
 			    eptr += MB_METACHARLEN(eptr);
 			    length--;

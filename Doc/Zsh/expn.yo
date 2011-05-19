@@ -588,7 +588,7 @@ remove the non-matched elements).
 xitem(tt(${)var(name)tt(:)var(offset)tt(}))
 item(tt(${)var(name)tt(:)var(offset)tt(:)var(length)tt(}))(
 This syntax gives effects similar to parameter subscripting
-in the form tt($)var(name)tt({)var(start)tt(,)var(end)tt(}), but is
+in the form tt($)var(name)tt([)var(start)tt(,)var(end)tt(]), but is
 compatible with other shells; note that both var(offset) and var(length)
 are interpreted differently from the components of a subscript.
 
@@ -608,8 +608,12 @@ the option tt(KSH_ARRAYS).
 A negative offset counts backwards from the end of the scalar or array,
 so that -1 corresponds to the last character or element, and so on.
 
-var(length) is always treated directly as a length and hence may not be
-negative.  The option tt(MULTIBYTE) is obeyed, i.e. the offset and length
+When positive, var(length) counts from the var(offset) position
+toward the end of the scalar or array.  When negative, var(length)
+counts back from the end.  If this results in a position smaller
+than var(offset), a diagnostic is printed and nothing is substituted.
+
+The option tt(MULTIBYTE) is obeyed, i.e. the offset and length
 count multibyte characters where appropriate.
 
 var(offset) and var(length) undergo the same set of shell substitutions
@@ -635,7 +639,7 @@ tt(${)var(name)tt(:-)var(word)tt(}) form of substitution.  Instead, a space
 may be inserted before the tt(-).  Furthermore, neither var(offset) nor
 var(length) may begin with an alphabetic character or tt(&) as these are
 used to indicate history-style modifiers.  To substitute a value from a
-variable, the recommended approach is to proceed it with a tt($) as this
+variable, the recommended approach is to precede it with a tt($) as this
 signifies the intention (parameter substitution can easily be rendered
 unreadable); however, as arithmetic substitution is performed, the
 expression tt(${var: offs}) does work, retrieving the offset from

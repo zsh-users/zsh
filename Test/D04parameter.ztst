@@ -1366,6 +1366,7 @@
    print ${foo:$(echo 3 + 3):`echo 4 - 3`}
    print ${foo: -1}
    print ${foo: -10}
+   print ${foo:5:-2}
 0:Bash-style offsets, scalar
 >456789
 >56789
@@ -1377,6 +1378,7 @@
 >7
 >9
 >123456789
+>67
 
    foo=(1 2 3 4 5 6 7 8 9)
    print ${foo:3}
@@ -1389,6 +1391,7 @@
    print ${foo:$(echo 3 + 3):`echo 4 - 3`}
    print ${foo: -1}
    print ${foo: -10}
+   print ${foo:5:-2}
 0:Bash-style offsets, array
 >4 5 6 7 8 9
 >5 6 7 8 9
@@ -1400,6 +1403,7 @@
 >7
 >9
 >1 2 3 4 5 6 7 8 9
+>6 7
 
    testfn() {
      emulate -L sh
@@ -1438,3 +1442,13 @@
    print ${str:0:}
 1:Regression test for missing length after offset
 ?(eval):2: unrecognized modifier
+
+   foo="123456789"
+   print ${foo:5:-6}
+1:Regression test for total length < 0 in string
+?(eval):2: substring expression: 3 < 5
+
+   foo=(1 2 3 4 5 6 7 8 9)
+   print ${foo:5:-6}
+1:Regression test for total length < 0 in array
+?(eval):2: substring expression: 3 < 5

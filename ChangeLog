@@ -1,5 +1,9 @@
 2011-05-19  Mikael Magnusson <mikachu@gmail.com>
 
+	* 29224: Support negative LEN in ${VAR:OFFSET:LEN} like bash.
+
+2011-05-19  Mikael Magnusson <mikachu@gmail.com>
+
 	* 29261: Add g:: parameter expansion flag. Add note that s::
 	can take an empty string.
 
@@ -14757,5 +14761,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5313 $
+* $Revision: 1.5314 $
 *****************************************************
