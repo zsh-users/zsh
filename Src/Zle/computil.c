@@ -4656,7 +4656,7 @@ cfp_opt_pats(char **pats, char *matcher)
 	    q = dupstring(q);
 	    t = q + strlen(q) - 1;
 	    if (*t == ')') {
-		for (s = t--; t > q; t--)
+		while (--t > q)
 		    if (*t == ')' || *t == '|' || *t == '~' || *t == '(')
 			break;
 		if (t != q && *t == '(')

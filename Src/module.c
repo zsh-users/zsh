@@ -426,14 +426,13 @@ static int
 add_autobin(const char *module, const char *bnam, int flags)
 {
     Builtin bn;
-    int ret;
 
     bn = zshcalloc(sizeof(*bn));
     bn->node.nam = ztrdup(bnam);
     bn->optstr = ztrdup(module);
     if (flags & FEAT_AUTOALL)
 	bn->node.flags |= BINF_AUTOALL;
-    if ((ret = addbuiltin(bn))) {
+    if (addbuiltin(bn)) {
 	builtintab->freenode(&bn->node);
 	if (!(flags & FEAT_IGNORE))
 	    return 1;
