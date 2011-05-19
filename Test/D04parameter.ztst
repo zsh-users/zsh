@@ -298,6 +298,26 @@
 >Howzat
 >usay
 
+  foo='\u65\123'
+  print -r ${(g:o:)foo}
+  foo='\u65\0123'
+  print -r ${(g::)foo}
+  foo='\u65^X'
+  print -r ${(V)${(g:c:)foo}}
+  foo='\u65\C-x\M-a'
+  print -r ${(V)${(g:e:)foo}}
+  foo='\u65\123\C-x'
+  print -r ${(V)${(g:eo:)foo}}
+  foo=('\u65' '\0123' '^X\M-a')
+  print -r ${(V)${(g:e:)foo}}
+0:${(g)...}
+>eS
+>eS
+>e^X
+>e^X\M-a
+>eS^X
+>e S ^X\M-a
+
   foo='I'\''m nearly out of my mind with tedium'
   bar=foo
   print ${(P)bar}

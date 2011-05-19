@@ -1607,6 +1607,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      */	
     int presc = 0;
     /*
+     * The (g) flag.  Process escape sequences with various GETKEY_ flags.
+     */
+    int getkeys = -1;
+    /*
      * The (@) flag; interacts obscurely with qt and isarr.
      * This is one of the things that decides whether multsub
      * will produce an array, but in an extremely indirect fashion.
@@ -1930,6 +1934,36 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 
 		case '%':
 		    presc++;
+		    break;
+
+		case 'g':
+		    t = get_strarg(++s, &arglen);
+		    if (getkeys < 0)
+			getkeys = 0;
+		    if (*t) {
+			sav = *t;
+			*t = 0;
+			while (*++s) {
+			    switch (*s) {
+			    case 'e':
+				getkeys |= GETKEY_EMACS;
+				break;
+			    case 'o':
+				getkeys |= GETKEY_OCTAL_ESC;
+				break;
+			    case 'c':
+				getkeys |= GETKEY_CTRL;
+				break;
+
+			    default:
+				*t = sav;
+				goto flagerr;
+			    }
+			}
+			*t = sav;
+			s = t + arglen - 1;
+		    } else
+			goto flagerr;
 		    break;
 
 		case 'z':
@@ -3080,6 +3114,28 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    *ap2++ = NULL;
 	} else {
 	    val = casemodify(val, casmod);
+	}
+    }
+    /*
+     * Process echo- and print-style escape sequences.
+     */
+    if (getkeys >= 0) {
+	int len;
+
+	copied = 1;		/* string is always copied */
+	if (isarr) {
+	    char **ap, **ap2;
+
+	    ap = aval;
+	    aval = (char **) zhalloc(sizeof(char *) * (arrlen(aval)+1));
+	    for (ap2 = aval; *ap; ap++, ap2++) {
+		*ap2 = getkeystring(*ap, &len, getkeys, NULL);
+		*ap2 = metafy(*ap2, len, META_USEHEAP);
+	    }
+	    *ap2++ = NULL;
+	} else {
+	    val = getkeystring(val, &len, getkeys, NULL);
+	    val = metafy(val, len, META_USEHEAP);
 	}
     }
     /*

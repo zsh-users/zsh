@@ -1,5 +1,10 @@
 2011-05-19  Mikael Magnusson <mikachu@gmail.com>
 
+	* 29261: Add g:: parameter expansion flag. Add note that s::
+	can take an empty string.
+
+2011-05-19  Mikael Magnusson <mikachu@gmail.com>
+
 	* 29307, 29308 + replies: Fix some doubled words in docs and
 	comments.
 
@@ -14752,5 +14757,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5312 $
+* $Revision: 1.5313 $
 *****************************************************

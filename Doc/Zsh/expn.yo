@@ -859,6 +859,14 @@ item(tt(F))(
 Join the words of arrays together using newline as a separator.
 This is a shorthand for `tt(pj:\n:)'.
 )
+item(tt(g:opts:))(
+Process escape sequences like the echo builtin when no options are given
+(tt(g::)).  With the tt(o) option, octal escapes don't take a leading
+zero.  With the tt(c) option, sequences like `tt(^X)' are also processed.
+With the tt(e) option, processes `tt(\M-t)' and similar sequences like the
+print builtin.  With both of the tt(o) and tt(e) options, behaves like the
+print builtin except that in none of these modes is `tt(\c)' interpreted.
+)
 item(tt(i))(
 Sort case-insensitively.  May be combined with `tt(n)' or `tt(O)'.
 )
@@ -1104,7 +1112,9 @@ Force field splitting at the
 separator var(string).  Note that a var(string) of two or more
 characters means that all of them must match in sequence; this differs from
 the treatment of two or more characters in the tt(IFS) parameter.
-See also the tt(=) flag and the tt(SH_WORD_SPLIT) option.
+See also the tt(=) flag and the tt(SH_WORD_SPLIT) option.  An empty
+string may also be given in which case every character will be a separate
+element.
 
 For historical reasons, the usual behaviour that empty array elements
 are retained inside double quotes is disabled for arrays generated
@@ -1288,8 +1298,9 @@ item(tt(11.) em(Case modification))(
 Any case modification from one of the flags tt((L)), tt((U)) or tt((C))
 is applied.
 )
-item(tt(12.) em(Prompt evaluation))(
-Any prompt-style formatting from the tt((%)) family of flags is applied.
+item(tt(12.) em(Escape sequence replacement))(
+First any replacements from the tt((g)) flag are performed, then any
+prompt-style formatting from the tt((%)) family of flags is applied.
 )
 item(tt(13.) em(Quote application))(
 Any quoting or unquoting using tt((q)) and tt((Q)) and related flags
