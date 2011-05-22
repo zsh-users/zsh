@@ -462,7 +462,7 @@ same way as var(service).
 
 The var(function) argument may alternatively be a string containing
 almost any shell code.  If the string contains an equal sign, the above
-will take precedence.  The option -e may be used to specify the first
+will take precedence.  The option tt(-e) may be used to specify the first
 argument is to be evaluated as shell code even if it contains an equal
 sign.  The string will be executed using the tt(eval) builtin command to
 generate completions.  This provides a way of avoiding having to define

@@ -1,21 +1,37 @@
 2011-05-22  Mikael Magnusson <mikachu@gmail.com>
 
-	* 29328: Another missing backslash in _git, remove some not
-	needed backslashes in array definitions.
+	* unposted: Doc/Zsh/compsys.yo, ChangeLog: Quote -e with tt().
+	Fix some formatting in ChangeLog.
+
+	* 29328: Completion/Redhat/Command/_rpm,
+	Completion/Unix/Command/_git, Completion/Unix/Command/_gnutls,
+	Completion/Unix/Command/_gpg, Completion/Unix/Command/_growisofs,
+	Completion/Unix/Command/_php: Another missing backslash in _git,
+	remove some not needed backslashes in array definitions.
 
 2011-05-19  Mikael Magnusson <mikachu@gmail.com>
 
-	* 29224: Support negative LEN in ${VAR:OFFSET:LEN} like bash.
+	* 29224: Doc/Zsh/expn.yo, NEWS, Src/subst.c,
+	Test/D04parameter.ztst: Support negative LEN in ${VAR:OFFSET:LEN}
+	like bash.
 
-2011-05-19  Mikael Magnusson <mikachu@gmail.com>
+	* 29261: Doc/Zsh/expn.yo, Src/subst.c, Test/D04parameter.ztst:
+	Add g:: parameter expansion flag. Add note that s:: can take an
+	empty string.
 
-	* 29261: Add g:: parameter expansion flag. Add note that s::
-	can take an empty string.
-
-2011-05-19  Mikael Magnusson <mikachu@gmail.com>
-
-	* 29307, 29308 + replies: Fix some doubled words in docs and
-	comments.
+	* 29307, 29308 + replies: Completion/BSD/Command/_bsd_pkg,
+	Completion/Base/Utility/_sep_parts, Completion/Unix/Command/_git,
+	Completion/Unix/Command/_osc, Completion/Unix/Command/_perforce,
+	Completion/compinit, Completion/openSUSE/Command/_osc,
+	Completion/openSUSE/Command/_zypper, Doc/Zsh/builtins.yo,
+	Doc/Zsh/calsys.yo, Doc/Zsh/compctl.yo, Doc/Zsh/compsys.yo,
+	Doc/Zsh/compwid.yo, Doc/Zsh/contrib.yo,
+	Doc/Zsh/expn.yo, Doc/Zsh/zle.yo, Etc/CONTRIBUTORS,
+	Functions/Calendar/calendar_parse, Functions/Misc/sticky-note,
+	Functions/TCP/tcp_read, Functions/Zftp/zfcput, Src/Zle/compctl.c,
+	Src/Zle/zle_hist.c, Src/exec.c, Src/hist.c, Src/jobs.c, Src/lex.c,
+	Src/math.c, Src/params.c, Src/subst.c: Fix some doubled words in
+	docs and comments.
 
 2011-05-18  Wayne Davison  <wayned@users.sourceforge.net>
 
@@ -95,16 +111,10 @@
 	* 29245: Completion/X/Command/_xset: pass -O instead of -o
 	to _describe.
 
-2011-05-12  Mikael Magnusson <mikachu@gmail.com>
-
 	* Nikolai Weibull: 29124: Completion/Unix/Command/_git: Fix
 	-l option.
 
-2011-05-12  Mikael Magnusson <mikachu@gmail.com>
-
 	* 29205: Completion/Unix/Type/_pids: don't sort processes.
-
-2011-05-12  Mikael Magnusson <mikachu@gmail.com>
 
 	* 29208: Src/Zle/zle_move.c: make vimatchbracket check the
 	character left of the cursor when at the end of the line.
@@ -14766,5 +14776,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5315 $
+* $Revision: 1.5316 $
 *****************************************************
