@@ -55,7 +55,7 @@ _rpm () {
     '--httpport:http port number'
     {-\?,--help}'[print help information]'
     '--version[print version number]'
-    '--pipe:pipe command:->command' \
+    '--pipe:pipe command:->command'
   )
 
   # package selection options of which only one can be used

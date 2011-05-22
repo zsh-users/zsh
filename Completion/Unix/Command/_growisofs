@@ -75,13 +75,13 @@ find_expressions=(
   '*-size[true if the size of the file is in the given range]:range'
   '*-sparse[true if the file appears to be sparse]'
   '*-true[always true]'
-  '*-type[true if the file is of the given type]:file type:((b\:"block (buffered) special" \
-                                                             c\:"character (unbuffered) special" \
-                                                             d\:directory \
-                                                             p\:"named pipe (FIFO)" \
-                                                             f\:"regular file" \
-                                                             l\:"symbolic link" \
-                                                             s\:socket \
+  '*-type[true if the file is of the given type]:file type:((b\:"block (buffered) special"
+                                                             c\:"character (unbuffered) special"
+                                                             d\:directory
+                                                             p\:"named pipe (FIFO)"
+                                                             f\:"regular file"
+                                                             l\:"symbolic link"
+                                                             s\:socket
                                                              D\:"door (Solaris)"
                                                              e\:unknown))'
   '*-user[true if the file is owned by the given user]:user:_users'

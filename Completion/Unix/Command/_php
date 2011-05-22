@@ -31,7 +31,7 @@ args+=(
   '(- 1 *)'{-i,--info}'[PHP information]'
   '(-   *)'{-l,--syntax-check}'[syntax check only (lint)]'
   '(- 1 *)'{-m,--modules}'[show compiled in modules]'
-  "(-r --run -f --file $exclusions -l --syntax-check -s --syntax-highlight -w --strip 1)"{-r,--run}'[run the specified PHP code without using script tags <?..?>]:PHP code:'\
+  "(-r --run -f --file $exclusions -l --syntax-check -s --syntax-highlight -w --strip 1)"{-r,--run}'[run the specified PHP code without using script tags <?..?>]:PHP code:'
   '(- 1 *)'{-s,--syntax-highlight}'[display colour syntax highlighted source]'
   '(- 1 *)'{-v,--version}'[display version information]'
   '(-   *)'{-w,--strip}'[display source with stripped comments and whitespace]'

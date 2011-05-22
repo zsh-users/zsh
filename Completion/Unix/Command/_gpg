@@ -22,7 +22,7 @@ gpgbasic=('(-e --encrypt)'{-e,--encrypt}'[encrypt data. this option may be combi
   '(-c --symmetric)'{-c,--symmetric}'[encrypt with symmetric cypher only]'
   '(-s --sign)'{-s,--sign}'[make a signature]'
   '*'{-r+,--recipient}'[specify user to encrypt for]:recipient:->public-keys'
-  '(-u --local-user)'{-u+,--local-user}'[use name as the user ID to sign]:user attachment:_users'\
+  '(-u --local-user)'{-u+,--local-user}'[use name as the user ID to sign]:user attachment:_users'
   '(-o --output)'{-o+,--output}'[write output to file]:output file:_files'
   '(-h --help)'{-h,--help}'[display usage information]'
   '--version[print info on program version and supported algorithms]')
@@ -44,7 +44,7 @@ gpgextra=('--decrypt-files[decrypt multiple files]'
   '--list-packets[list only the sequence of packets]'
   '--gen-key[generate a new pair key]'
   '--edit-key[a menu for edit yours keys]:key attachment:->public-keys'
-  '--sign-key[sign a key]:key attachment:->public-keys'\
+  '--sign-key[sign a key]:key attachment:->public-keys'
   '--lsign-key[sign a key but mark as non-exportable]:key attachment:->public-keys'
   '--nrsign-key[sign a key non-revocably]'
   '--delete-key[remove key from public keyring]:key attachment:->public-keys'

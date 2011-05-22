@@ -1,3 +1,8 @@
+2011-05-22  Mikael Magnusson <mikachu@gmail.com>
+
+	* 29328: Another missing backslash in _git, remove some not
+	needed backslashes in array definitions.
+
 2011-05-19  Mikael Magnusson <mikachu@gmail.com>
 
 	* 29224: Support negative LEN in ${VAR:OFFSET:LEN} like bash.
@@ -14761,5 +14766,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5314 $
+* $Revision: 1.5315 $
 *****************************************************

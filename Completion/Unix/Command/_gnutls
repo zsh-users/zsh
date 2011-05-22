@@ -8,7 +8,7 @@ local _gnutls_cli_common_args
 _gnutls_cli_common_args=(
      '(-d --debug)'{-d,--debug}':debug level'
      '(-p --port)'{-p,--port}':port'
-     '(-h --help)'{-h,--help}'[help]' \
+     '(-h --help)'{-h,--help}'[help]'
 )
 
 case "$service" in
