@@ -1,7 +1,7 @@
 #compdef gccgo gofmt 5l 6l 8l 5g 6g 8g
 
 # This is for the computer language go,
-# http://glolang.org.
+# http://golang.org.
 
 local expl pat
 

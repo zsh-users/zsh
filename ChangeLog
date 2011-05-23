@@ -2,6 +2,8 @@
 
 	* unposted: Config/version.mk: 4.3.11-dev-4.
 
+	* unposted: Completion/Unix/Command/_go: typo
+
 	* 29341, corrected: Completion/Unix/Command/_go,
 	Completion/Unix/Command/.distfiles: basic completion for
 	commands associated with the Go programming language.
@@ -14784,5 +14786,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5318 $
+* $Revision: 1.5319 $
 *****************************************************
