@@ -2892,7 +2892,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			    length += alen - offset;
 			if (length < 0) {
 			    zerr("substring expression: %d < %d",
-			         length + offset, offset);
+			         (int)(length + offset), (int)offset);
 			    return NULL;
 			}
 		    } else
@@ -2942,7 +2942,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			    }
 			    if (length < 0) {
 				zerr("substring expression: %d < %d",
-				     length + given_offset, given_offset);
+				     (int)(length + given_offset),
+				     (int)given_offset);
 				return NULL;
 			    }
 			}
