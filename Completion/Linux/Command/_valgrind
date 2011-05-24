@@ -118,7 +118,11 @@ if [[ -n "$state" ]]; then
   # Basically uses debug output to find out the directory where the tools are
   # present and lists all executables in that directory.
   # Hope the program provides a neater interface some day!
-  tools=(${${${(M)${(f)"$(_call_program tools valgrind --tool=something -d 2> /dev/null)"}:#*launcher launching *something}##*launcher launching }%%something}*(*:t))
+  () {
+    setopt localoptions histsubstpattern
+    tools=( ${${${(M)${(f)"$(_call_program tools valgrind --tool=something -d 2>&1)"}:#*launcher launching *something*}##*launcher launching }%%something*}*~*.*(*:t:s/-*//) )
+    typeset -U tools
+  }
   _wanted tools exl 'valgrind tool' compadd $tools && return
 fi
 
