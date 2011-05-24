@@ -1,5 +1,8 @@
 2011-05-24  Mikael Magnusson <mikachu@gmail.com>
 
+	* 29364: Completion/Unix/Command/_make: Partial fix for
+	completion in dirs with spaces and other unusual characters.
+
 	* 29335: Completion/Linux/Command/_valgrind: Update the hack
 	for --tool= completion.
 
@@ -14797,5 +14800,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5323 $
+* $Revision: 1.5324 $
 *****************************************************

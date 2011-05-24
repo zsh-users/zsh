@@ -173,7 +173,7 @@ else
     [[ -r $file ]] || file=
   else
     local basedir
-    basedir=${(q)$(_make-findBasedir $words)}
+    basedir=${$(_make-findBasedir $words)}
     if [[ $is_gnu == gnu && -r $basedir/GNUmakefile ]]
     then
       file=$basedir/GNUmakefile
