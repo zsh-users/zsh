@@ -64,6 +64,9 @@
 
 2011-05-17  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Doc/Zsh/options.yo: tweak description of the -l (LOGIN)
+	option for clarity.
+
 	* 29313: Src/subst.c: when SHWORDSPLIT is in effect, the state of
 	the (@) expansion flag depends on the value of $IFS so as to mimic
 	Bourne shell join/split behavior more closely (see users/15442).
@@ -14800,5 +14803,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5324 $
+* $Revision: 1.5325 $
 *****************************************************
