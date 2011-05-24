@@ -1,3 +1,8 @@
+2011-05-23  Mikael Magnusson <mikachu@gmail.com>
+
+	* 29338: Completion/Base/Core/_main_complete: Correct pattern
+	checking for true value in insert-tab style.
+
 2011-05-23  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk: 4.3.11-dev-4.
@@ -14789,5 +14794,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5321 $
+* $Revision: 1.5322 $
 *****************************************************

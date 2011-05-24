@@ -51,7 +51,7 @@ if [[ ( "$tmp" = *pending(|[[:blank:]]*) && PENDING -gt 0 ) ||
 fi
 
 if [[ "$compstate[insert]" = tab* ]]; then
-  { [[ "$tmp" = (|[[:blank:]]*)(yes|true|on|1)(|[[:blank:]]*) ]] &&
+  { [[ "$tmp" = (|*[[:blank:]])(yes|true|on|1)(|[[:blank:]]*) ]] &&
     { [[ "$curcontext" != :* || -z "$compstate[vared]" ]] ||
         zstyle -t ":completion:vared${curcontext}:" insert-tab } } && return 0
 
