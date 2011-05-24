@@ -1,3 +1,14 @@
+2011-05-24  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* 29368: Src/exec.c: do not restore xtrerr to stderr before
+	running simple commands; restore xtrerr to stderr just before
+	running a function body, but after printing the trace of
+	the function call itself.
+
+	* 29367: Test/E02xtrace.ztst: update tests to fix mistaken
+	assumptions introduced by 25154 and add check of redirection
+	inside a function body.
+
 2011-05-24  Mikael Magnusson <mikachu@gmail.com>
 
 	* 29364: Completion/Unix/Command/_make: Partial fix for
@@ -14803,5 +14814,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5325 $
+* $Revision: 1.5326 $
 *****************************************************

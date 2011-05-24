@@ -3079,7 +3079,6 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	if (mfds[i] && mfds[i]->ct >= 2)
 	    closemn(mfds, i);
 
-    xtrerr = stderr;
     if (nullexec) {
 	if (nullexec == 1) {
 	    /*
@@ -4260,6 +4259,7 @@ execshfunc(Shfunc shf, LinkList args)
     cmdsp = 0;
     if ((osfc = sfcontext) == SFC_NONE)
 	sfcontext = SFC_DIRECT;
+    xtrerr = stderr;
     doshfunc(shf, args, 0);
     sfcontext = osfc;
     free(cmdstack);
