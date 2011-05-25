@@ -95,6 +95,7 @@ _ifconfig
 _iftop
 _imagemagick
 _init_d
+_initctl
 _ip
 _irssi
 _ispell
