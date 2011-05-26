@@ -633,7 +633,7 @@ raw_getbyte(long do_keytmout, char *cptr)
 	    /*
 	     * Make sure a user interrupt gets passed on straight away.
 	     */
-	    if (selret < 0 && errflag)
+	    if (selret < 0 && (errflag || retflag || breaks || exit_pending))
 		break;
 	    /*
 	     * Try to avoid errors on our special fd's from
@@ -875,7 +875,7 @@ getbyte(long do_keytmout, int *timeout)
 	    icnt = 0;
 	    if (errno == EINTR) {
 		die = 0;
-		if (!errflag && !retflag && !breaks)
+		if (!errflag && !retflag && !breaks && !exit_pending)
 		    continue;
 		errflag = 0;
 		breaks = obreaks;

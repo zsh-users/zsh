@@ -1,3 +1,8 @@
+2011-05-26  Peter Stephenson  <pws@csr.com>
+
+	* 29374: Src/Zle/zle_main.c: Exit ZLE immediately if exit
+	is pending when a keypress is expected.
+
 2011-05-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	*  Bernhard Tittelbach: 29371: Completion/Unix/Command/_initctl:
@@ -14820,5 +14825,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5329 $
+* $Revision: 1.5330 $
 *****************************************************
