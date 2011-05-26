@@ -1,3 +1,7 @@
+2011-05-27  Mikael Magnusson <mikachu@gmail.com>
+
+	* 29331: NEWS: Note g:: parameter expansion flag.
+
 2011-05-26  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Etc/CONTRIBUTORS: expand.
@@ -14827,5 +14831,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5331 $
+* $Revision: 1.5332 $
 *****************************************************
