@@ -3,10 +3,6 @@
 # TODO: Based on targets given on the command line, show only variables that
 # are used in those targets and their dependencies.
 
-local prev="$words[CURRENT-1]" file expl tmp is_gnu dir incl match
-local -A TARGETS VARIABLES
-local ret=1
-
 _make-expandVars() {
   local open close var val front ret tmp=$1
 
@@ -149,77 +145,86 @@ _make-findBasedir () {
   print -- $basedir
 }
 
-_pick_variant -r is_gnu gnu=GNU unix -v -f
+_make() {
 
-if [[ $is_gnu == gnu ]]
-then
-  incl="(-|)include"
-else
-  incl=.include
-fi
+  local prev="$words[CURRENT-1]" file expl tmp is_gnu dir incl match
+  local -A TARGETS VARIABLES
+  local ret=1
 
-if [[ "$prev" == -[CI] ]]
-then
-  _files -W ${(q)$(_make-findBasedir ${words[1,CURRENT-1]})} -/ && ret=0
-elif [[ "$prev" == -[foW] ]]
-then
-  _files -W ${(q)$(_make-findBasedir $words)} && ret=0
-else
-  file="$words[(I)-f]"
-  if (( file ))
+  _pick_variant -r is_gnu gnu=GNU unix -v -f
+
+  if [[ $is_gnu == gnu ]]
   then
-    file=${~words[file+1]}
-    [[ $file == [^/]* ]] && file=${(q)$(_make-findBasedir $words)}/$file
-    [[ -r $file ]] || file=
+    incl="(-|)include"
   else
-    local basedir
-    basedir=${$(_make-findBasedir $words)}
-    if [[ $is_gnu == gnu && -r $basedir/GNUmakefile ]]
+    incl=.include
+  fi
+
+  if [[ "$prev" == -[CI] ]]
+  then
+    _files -W ${(q)$(_make-findBasedir ${words[1,CURRENT-1]})} -/ && ret=0
+  elif [[ "$prev" == -[foW] ]]
+  then
+    _files -W ${(q)$(_make-findBasedir $words)} && ret=0
+  else
+    file="$words[(I)-f]"
+    if (( file ))
     then
-      file=$basedir/GNUmakefile
-    elif [[ -r $basedir/makefile ]]
-    then
-      file=$basedir/makefile
-    elif [[ -r $basedir/Makefile ]]
-    then
-      file=$basedir/Makefile
+      file=${~words[file+1]}
+      [[ $file == [^/]* ]] && file=${(q)$(_make-findBasedir $words)}/$file
+      [[ -r $file ]] || file=
     else
-      file=''
+      local basedir
+      basedir=${$(_make-findBasedir $words)}
+      if [[ $is_gnu == gnu && -r $basedir/GNUmakefile ]]
+      then
+        file=$basedir/GNUmakefile
+      elif [[ -r $basedir/makefile ]]
+      then
+        file=$basedir/makefile
+      elif [[ -r $basedir/Makefile ]]
+      then
+        file=$basedir/Makefile
+      else
+        file=''
+      fi
+    fi
+
+    if [[ -n "$file" ]]
+    then
+      if [[ $is_gnu == gnu ]] && zstyle -t ":completion:${curcontext}:targets" call-command
+      then
+        _make-parseMakefile $PWD < <(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null)
+      else
+        case "$OSTYPE" in
+          freebsd*)
+          _make-parseMakefile $PWD < <(_call_program targets "$words[1]" -nsp -f "$file" .PHONY 2> /dev/null)
+    ;;
+    *)
+          _make-parseMakefile $PWD < $file
+        esac
+      fi
+    fi
+
+    if [[ $PREFIX == *'='* ]]
+    then
+      # Complete make variable as if shell variable
+      compstate[parameter]="${PREFIX%%\=*}"
+      compset -P 1 '*='
+      _value "$@" && ret=0
+    else
+      _tags targets variables
+      while _tags
+      do
+        _requested targets expl 'make targets' \
+          compadd -- ${(k)TARGETS} && ret=0
+        _requested variables expl 'make variables' \
+          compadd -S '=' -- ${(k)VARIABLES} && ret=0
+      done
     fi
   fi
 
-  if [[ -n "$file" ]]
-  then
-    if [[ $is_gnu == gnu ]] && zstyle -t ":completion:${curcontext}:targets" call-command
-    then
-      _make-parseMakefile $PWD < <(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null)
-    else
-      case "$OSTYPE" in
-        freebsd*)
-        _make-parseMakefile $PWD < <(_call_program targets "$words[1]" -nsp -f "$file" .PHONY 2> /dev/null)
-	;;
-	*)
-        _make-parseMakefile $PWD < $file
-      esac
-    fi
-  fi
+  return ret
+}
 
-  if [[ $PREFIX == *'='* ]]
-  then
-    # Complete make variable as if shell variable
-    compstate[parameter]="${PREFIX%%\=*}"
-    compset -P 1 '*='
-    _value "$@" && ret=0
-  else
-    _tags targets variables
-    while _tags
-    do
-      _requested targets expl 'make targets' \
-        compadd -- ${(k)TARGETS} && ret=0
-      _requested variables expl 'make variables' \
-        compadd -S '=' -- ${(k)VARIABLES} && ret=0
-    done
-  fi
-fi
-
-return ret
+_make "$@"
