@@ -16,7 +16,7 @@ local -a match mbegin mend
 # The later test looks for an outstanding quote.
 if _have_glob_qual $PREFIX; then
    compset -p ${#match[1]}
-   if [[ -o extendedglob ]] && compset -P '\#'; then
+   if [[ $_comp_caller_options[extendedglob] == on ]] && compset -P '\#'; then
      _globflags
    else
      _globquals

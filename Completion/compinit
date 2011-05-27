@@ -160,7 +160,9 @@ _comp_options=(
 # have a valid stdin descriptor (zle closes it before calling widgets)
 # and don't get confused by user's ZERR trap handlers.
 
-typeset -g _comp_setup='setopt localoptions localtraps ${_comp_options[@]};
+typeset -g _comp_setup='local -A _comp_caller_options;
+             _comp_caller_options=(${(kv)options});
+             setopt localoptions localtraps ${_comp_options[@]};
              local IFS=$'\'\ \\t\\r\\n\\0\''
              exec </dev/null;
              trap - ZERR

@@ -70,7 +70,7 @@ if [[ "$force" = *s* ]] ||
 ###  parameter expressions such as ${foo} be expanded like brace
 ###  expansions, too (and with braceccl set...).
 
-   if [[ ! -o ignorebraces && "${#${exp}//[^\{]}" = "${#${exp}//[^\}]}" ]]; then
+   if [[ ! $_comp_caller_options[ignorebraces] == on && "${#${exp}//[^\{]}" = "${#${exp}//[^\}]}" ]]; then
      local otmp
 
      tmp=${(q)word}

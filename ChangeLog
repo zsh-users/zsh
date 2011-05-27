@@ -3,6 +3,12 @@
 	* 28364: Doc/Zsh/zle.yo: Document that space left by wrapping
 	double-width characters is highlighted with the 'special' style.
 
+	* 29384: Completion/Base/Completer/_expand,
+	Completion/Unix/Type/_have_glob_qual,
+	Completion/Unix/Type/_path_files, Completion/compinit: Add
+	_comp_caller_options and use it in completions that want to
+	check values of options that are overwritten by _comp_options.
+
 2011-05-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29382: Src/Modules/curses.c: apply 29374 to zccmd_input too.
@@ -14852,5 +14858,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5338 $
+* $Revision: 1.5339 $
 *****************************************************
