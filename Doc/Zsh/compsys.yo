@@ -786,7 +786,9 @@ for names of device special files
 )
 kindex(directories, completion tag)
 item(tt(directories))(
-for names of directories
+for names of directories DASH()- tt(local-directories) is used instead
+when completing arguments of tt(cd) and related builtin commands when
+the tt(cdpath) array is set
 )
 kindex(directory-stack, completion tag)
 item(tt(directory-stack))(
@@ -879,7 +881,8 @@ kindex(local-directories, completion tag)
 item(tt(local-directories))(
 for names of directories that are subdirectories of the current working
 directory when completing arguments of tt(cd) and related builtin
-commands (compare tt(path-directories))
+commands (compare tt(path-directories)) DASH()- when the tt(cdpath)
+array is unset, tt(directories) is used instead
 )
 kindex(manuals, completion tag)
 item(tt(manuals))(

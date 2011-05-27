@@ -18,6 +18,9 @@
 	* 29387: Completion/Unix/Command/.distfiles,
 	Completion/Unix/Command/_at: Add completion for at and friends.
 
+	* 29385: Doc/Zsh/compsys.yo: Document when directories and
+	local-directories are used.
+
 2011-05-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29382: Src/Modules/curses.c: apply 29374 to zccmd_input too.
@@ -14867,5 +14870,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5342 $
+* $Revision: 1.5343 $
 *****************************************************
