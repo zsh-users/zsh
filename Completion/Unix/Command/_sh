@@ -5,7 +5,10 @@ if [[ $service == zsh ]]; then
   if [[ ${words[CURRENT-1]} == -o ]]; then
     _options
     # no other possibilities
-    return
+    return 0
+  fi
+  if _arguments -S -s -- '*:'; then
+    return 0
   fi
 fi
 
