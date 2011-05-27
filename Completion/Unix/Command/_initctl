@@ -2,28 +2,7 @@
 # Written by Bernhard Tittelbach
 # based on completion script by Mildred
 
-local -a common_args
-common_args=(
-  '--session[use D-Bus session bus to connect to init daemon (for testing)]'
-  '--system[talk via DBUS system bus instead of socket]'
-  '(-q --quiet)'{-q,--quiet}'[reduce output to errors only]'
-  '(-v --verbose)'{-v,--verbose}'[increase output to include informational messages]'
-  '--dest=[D-Bus name for init, defaults to com.ubuntu.Upstart]'
-  '--help[display help and exit]'
-  '--version[output version information and exit]'
-)
-
-# don't overwrite work that we might have already done
-if (( ${+_initctl_events_list} + ${+_initctl_eventargs_list} != 2 )); then
-  typeset -g -a -U _initctl_events_list _initctl_eventargs_list
-fi
-
-# map each initctl function to a completion function
-local -A cmd_completion_funcs
-cmd_completion_funcs=( start startstop stop startstop restart startstop reload startstop show-config show-config status argjob emit emit check-config check-config )
-
-# define fallback completion function
-local cmd_completion_default=basic
+typeset -g -a -U _initctl_events_list _initctl_eventargs_list
 
 # run show-config -e and if possible parse out all events and KEY= argumnts
 # otherwise provide some common values
@@ -169,13 +148,37 @@ _initctl_check-config()
         '*::'
 }
 
-# depending on which command was used, call different completion funtions
-case $service in
-  initctl)
-    _arguments "${common_args[@]}" '*::Initctl Commands:_initctl_command'
-  ;;
-  start|stop|restart|reload|status)
-    _call_function ret _initctl_${cmd_completion_funcs[${service}]-${cmd_completion_default}}
-  ;;
-  *)  return 1  ;;
-esac
+# after defining above functions, overwrite _initctl function so helper-functions are loaded only once
+_initctl()
+{
+  local -a common_args
+  common_args=(
+    '--session[use D-Bus session bus to connect to init daemon (for testing)]'
+    '--system[talk via DBUS system bus instead of socket]'
+    '(-q --quiet)'{-q,--quiet}'[reduce output to errors only]'
+    '(-v --verbose)'{-v,--verbose}'[increase output to include informational messages]'
+    '--dest=[D-Bus name for init, defaults to com.ubuntu.Upstart]'
+    '--help[display help and exit]'
+    '--version[output version information and exit]'
+  )
+
+  # map each initctl function to a completion function
+  local -A cmd_completion_funcs
+  cmd_completion_funcs=( start startstop stop startstop restart startstop reload startstop show-config show-config status argjob emit emit check-config check-config )
+
+  # define fallback completion function
+  local cmd_completion_default=basic
+
+  # depending on which command was used, call different completion funtions
+  case $service in
+    initctl)
+      _arguments "${common_args[@]}" '*::Initctl Commands:_initctl_command'
+    ;;
+    start|stop|restart|reload|status)
+      _call_function ret _initctl_${cmd_completion_funcs[${service}]-${cmd_completion_default}}
+    ;;
+    *)  return 1  ;;
+  esac
+}
+
+_initctl "$@"
