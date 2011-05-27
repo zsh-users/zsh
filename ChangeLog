@@ -12,6 +12,9 @@
 	* 29334: Completion/Unix/Command/_sh: Complete options for zsh with
 	_arguments --.
 
+	* 29392: Doc/Zsh/compsys.yo: Remove now-defunct use-perl style
+	documentation.
+
 2011-05-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29382: Src/Modules/curses.c: apply 29374 to zccmd_input too.
@@ -14861,5 +14864,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5340 $
+* $Revision: 1.5341 $
 *****************************************************

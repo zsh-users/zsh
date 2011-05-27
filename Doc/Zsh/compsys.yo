@@ -2736,17 +2736,6 @@ where the tt(hosts) style is set; note also it must be set before
 the cache of host names is generated (typically the first completion
 attempt).
 )
-kindex(use-perl, completion style)
-item(tt(use-perl))(
-Various parts of the function system use awk to extract words from
-files or command output as it is universally available.  However, many
-versions of awk have arbitrary limits on the size of input.  If this
-style is set, perl will be used instead.  This is almost always
-preferable if perl is available on your system.
-
-Currently this is only used in completions for `make', but it may be
-extended depending on authorial frustration.
-)
 kindex(users, completion style)
 item(tt(users))(
 This may be set to a list of usernames to be completed.
