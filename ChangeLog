@@ -11,6 +11,9 @@
 	* unposted: Doc/Zsh/params.yo: Document that PROMPT_EOL_MARK can
 	be empty, forgot in 28480.
 
+	* 29329: Src/math.c: Fix undefined behaviour in function argument
+	evaluation order.
+
 2011-05-26  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Etc/CONTRIBUTORS: expand.
@@ -14840,5 +14843,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5335 $
+* $Revision: 1.5336 $
 *****************************************************

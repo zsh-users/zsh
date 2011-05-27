@@ -1156,7 +1156,8 @@ op(int what)
 	if (tp & (OP_E2|OP_E2IO)) {
 	    struct mathvalue *mvp = stack + sp + 1;
 	    lv = stack[sp+1].lval;
-	    push(setmathvar(mvp,c), mvp->lval, 0);
+	    c = setmathvar(mvp, c);
+	    push(c, mvp->lval, 0);
 	} else
 	    push(c,NULL, 0);
 	return;
