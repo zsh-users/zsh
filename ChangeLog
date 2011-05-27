@@ -1,3 +1,7 @@
+2011-05-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 29382: Src/Modules/curses.c: apply 29374 to zccmd_input too.
+
 2011-05-27  Mikael Magnusson <mikachu@gmail.com>
 
 	* 29331: NEWS: Note g:: parameter expansion flag.
@@ -27,7 +31,7 @@
 	completion for initctl and related system job management
 	utilities.
 
-2011-05-24  Barton E. Schaefer  <schaefer@brasslantern.com>
+2011-05-24  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29368: Src/exec.c: do not restore xtrerr to stderr before
 	running simple commands; restore xtrerr to stderr just before
@@ -14843,5 +14847,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5336 $
+* $Revision: 1.5337 $
 *****************************************************

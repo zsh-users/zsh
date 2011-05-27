@@ -1106,7 +1106,7 @@ zccmd_input(const char *nam, char **args)
 
 #ifdef HAVE_WGET_WCH
     while ((ret = wget_wch(w->win, &wi)) == ERR) {
-	if (errno != EINTR)
+	if (errno != EINTR || errflag || retflag || breaks || exit_pending)
 	    break;
     }
     switch (ret) {
@@ -1132,7 +1132,7 @@ zccmd_input(const char *nam, char **args)
     }
 #else
     while ((ci = wgetch(w->win)) == ERR) {
-	if (errno != EINTR)
+	if (errno != EINTR || errflag || retflag || breaks || exit_pending)
 	    return 1;
     }
     if (ci >= 256) {
