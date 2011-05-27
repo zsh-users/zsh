@@ -2406,6 +2406,13 @@ readhistfile(char *fn, int err, int readflags)
 			    uselex = 0;
 			    break;
 			}
+		    } else if (!strcmp(word, ";") && strpfx(";;", pt)) {
+			/*
+			 * Don't get confused between a semicolon that's
+			 * probably really a newline and a double
+			 * semicolon that's terminating a case.
+			 */
+			continue;
 		    }
 		    words[nwordpos++] = pt - start;
 		    pt += strlen(word);

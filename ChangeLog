@@ -1,3 +1,7 @@
+2011-05-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 29403: Src/hist.c: histlexwords splitting of ";;" in case.
+
 2011-05-27  Mikael Magnusson <mikachu@gmail.com>
 
 	* 28364: Doc/Zsh/zle.yo: Document that space left by wrapping
@@ -28,7 +32,7 @@
 2011-05-27  Mikael Magnusson <mikachu@gmail.com>
 
 	* 29331: NEWS: Note g:: parameter expansion flag.
-	
+
 	* 29365: Completion/Unix/Command/_make: redefine _make so that
 	helper functions are only defined once.
 
@@ -14870,5 +14874,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5343 $
+* $Revision: 1.5344 $
 *****************************************************
