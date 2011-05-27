@@ -15,6 +15,9 @@
 	* 29392: Doc/Zsh/compsys.yo: Remove now-defunct use-perl style
 	documentation.
 
+	* 29387: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_at: Add completion for at and friends.
+
 2011-05-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29382: Src/Modules/curses.c: apply 29374 to zccmd_input too.
@@ -14864,5 +14867,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5341 $
+* $Revision: 1.5342 $
 *****************************************************
