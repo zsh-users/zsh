@@ -1,3 +1,8 @@
+2011-05-27  Mikael Magnusson <mikachu@gmail.com>
+
+	* 28364: Doc/Zsh/zle.yo: Document that space left by wrapping
+	double-width characters is highlighted with the 'special' style.
+
 2011-05-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29382: Src/Modules/curses.c: apply 29374 to zccmd_input too.
@@ -14847,5 +14852,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5337 $
+* $Revision: 1.5338 $
 *****************************************************

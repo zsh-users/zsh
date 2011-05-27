@@ -2351,6 +2351,11 @@ Not all systems support this: for it to work, the system's representation of
 wide characters must be code values from the Universal Character Set,
 as defined by IS0 10646 (also known as Unicode).
 )
+item(Wrapped double-width characters)(
+When a double-width character appears in the final column of a line, it
+is instead shown on the next line. The empty space left in the original
+position is highlighted as a special character.
+)
 enditem()
 
 If tt(zle_highlight) is not set or no value applies to a particular
