@@ -1158,8 +1158,8 @@ item(tt(PROMPT_EOL_MARK))(
 When the tt(PROMPT_CR) and tt(PROMPT_SP) options are set, the
 tt(PROMPT_EOL_MARK) parameter can be used to customize how the end of
 partial lines are shown.  This parameter undergoes prompt expansion, with
-the tt(PROMPT_PERCENT) option set.  If not set or empty, the default
-behavior is equivalent to the value `tt(%B%S%#%s%b)'.
+the tt(PROMPT_PERCENT) option set.  If not set, the default behavior is
+equivalent to the value `tt(%B%S%#%s%b)'.
 )
 vindex(PS1)
 item(tt(PS1) <S>)(

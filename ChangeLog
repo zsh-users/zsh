@@ -8,6 +8,9 @@
 	* 29376: Completion/Unix/Command/_initctl: redefine _initctl so
 	that helper functions are only defined once.
 
+	* unposted: Doc/Zsh/params.yo: Document that PROMPT_EOL_MARK can
+	be empty, forgot in 28480.
+
 2011-05-26  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Etc/CONTRIBUTORS: expand.
@@ -14837,5 +14840,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5334 $
+* $Revision: 1.5335 $
 *****************************************************
