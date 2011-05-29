@@ -1,3 +1,8 @@
+2011-05-29  Nikolai Weibull <now@bitwi.se>
+
+	* unposted: Completion/Unix/Command/_git: Update git-branch completion
+	to deal with -r and -d correctly.
+
 2011-05-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 29403: Src/hist.c: histlexwords splitting of ";;" in case.
@@ -14874,5 +14879,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5344 $
+* $Revision: 1.5345 $
 *****************************************************
