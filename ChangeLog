@@ -1,3 +1,8 @@
+2011-05-31  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 29410: Test/V01zmodload.ztst: skip autoload persistence test
+	when zsh/example module is not available.
+
 2011-05-31  Mikael Magnusson <mikachu@gmail.com>
 
 	* Omari Norman: users/16057: Completion/Unix/Command/.distfiles,
@@ -14888,5 +14893,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5347 $
+* $Revision: 1.5348 $
 *****************************************************

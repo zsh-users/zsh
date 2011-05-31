@@ -125,8 +125,10 @@
  fi
 0d:Autoload a module via a builtin
 
+ if [[ $mods[(r)zsh/example] == zsh/example ]]; then
   zmodload -u zsh/example
   builtin example
+ fi
 0d:Autoloads are persistent
 
   (zmodload -u zsh/parameter
