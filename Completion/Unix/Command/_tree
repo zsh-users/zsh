@@ -1,0 +1,51 @@
+#compdef tree
+
+# Completions for tree, version 1.5.3
+# Tree is available at
+# http://mama.indstate.edu/users/ice/tree/
+
+typeset -a opts
+
+opts=(
+'--help[verbose usage listing]'
+'--version[version of tree]'
+'-a[show all files, including hidden ones]'
+'-d[list directories only]'
+'-f[print full path prefix for each file]'
+'-i[do not print indentation lines]'
+'-l[follow symlinks that point to directories]'
+'-x[stay on current filesystem]'
+'-P[list only files matching a pattern]:pattern:'
+'-I[do not list files matching a pattern]:pattern:'
+'--noreport[do not print file and directory report at end]'
+'-p[print file type and permissions, like ls -l]'
+'-s[print size of each file in bytes]'
+'-h[print human readable file size]'
+'-u[print username]'
+'-g[print group name]'
+'-D[print date of last modification]'
+'--inodes[print inode numbers]'
+'--device[print device number to which file or directory belongs]'
+'-F[append descriptive character to end, like ls -F]'
+'-q[print non-printable characters as question mark, not caret]'
+'-N[print non-printable characters as is, not as caret]'
+'-v[sort the output as version]'
+'-r[sort output in reverse alphabetic order]'
+'-t[sort output by last modification time instead of alphabetically]'
+'--dirsfirst[list directories before files]'
+'-n[turn colorization off always, over-ridden by the -C option]'
+'-C[turn colorization on always]'
+'-A[turn on ANSI line graphics hack when printing indentation lines]'
+'-S[turn on ASCII line graphics]'
+'-L[max display depth of tree]:level:'
+'--filelimit[do not descend directories with more than number of entries]:number:'
+'-R[recursively cross down the tree and execute tree again]'
+'-H[turn on HTML output]'
+'-T[title for HTML output]'
+'--charset[character set for HTML and for line drawing]:charset:'
+'--nolinks[turn off hyperlinks in HTML output]'
+'-o[send output to file]:filename:_files'
+'*:directory:_files -/'
+)
+
+_arguments $opts
