@@ -1,3 +1,9 @@
+2011-05-31  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Jan Pobrislo: 29411:
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_bzr: vcs_info: Major
+	bzr backend update.
+
 2011-05-31  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29410: Test/V01zmodload.ztst: skip autoload persistence test
@@ -14893,5 +14899,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5348 $
+* $Revision: 1.5349 $
 *****************************************************
