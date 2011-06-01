@@ -1,5 +1,8 @@
 2011-06-01  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* users/16064: Functions/Zle/move-line-in-buffer: example widget
+	for moving in multiline buffers without navigating history
+
 	* 29416 (plus typo fixes): Doc/Zsh/contrib.yo: Fix (mis-)uses of
 	var() in vcs_info documentation.
 
@@ -14909,5 +14912,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5351 $
+* $Revision: 1.5352 $
 *****************************************************
