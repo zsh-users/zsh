@@ -1520,6 +1520,10 @@ function _tmux() {
                 _describe -t subcommands 'tmux commands and aliases' _tmux_commands -- _tmux_aliases
             fi
         else
+            if (( ${+commands[tmux]} == 0 )); then
+                _message '`tmux'\'' not found in $path; sub-cmd completions disabled.'
+                return 0
+            fi
             tmuxcommand="${words[1]}"
             if [[ -n ${_tmux_aliasmap[$tmuxcommand]} ]] ; then
                 tmuxcommand="${_tmux_aliasmap[$tmuxcommand]}"

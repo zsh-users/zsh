@@ -1,5 +1,8 @@
 2011-06-01  Frank Terbeck  <ft@bewatermyfriend.org>
 
+	* 29412: Completion/Unix/Command/_tmux: Disable sub-command
+	completions if tmux is not found in `$path'.
+
 	* Valentin Haenel: 29431: Misc/vcs_info-examples: Hook example for
 	signaling untracked files in git repositories.
 
@@ -14917,5 +14920,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5353 $
+* $Revision: 1.5354 $
 *****************************************************
