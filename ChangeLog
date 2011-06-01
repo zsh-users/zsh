@@ -1,3 +1,8 @@
+2011-06-01  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 29416 (plus typo fixes): Doc/Zsh/contrib.yo: Fix (mis-)uses of
+	var() in vcs_info documentation.
+
 2011-05-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk: update version to 4.3.12-dev-0
@@ -14904,5 +14909,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5350 $
+* $Revision: 1.5351 $
 *****************************************************
