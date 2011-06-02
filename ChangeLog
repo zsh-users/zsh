@@ -1,3 +1,8 @@
+2011-06-02  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 29434: Doc/Zsh/contrib.yo: Use PLUS() to avoid a + being
+	silently dropped.
+
 2011-06-01  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 29412: Completion/Unix/Command/_tmux: Disable sub-command
@@ -14920,5 +14925,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5354 $
+* $Revision: 1.5355 $
 *****************************************************

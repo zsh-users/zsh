@@ -1187,7 +1187,7 @@ code can communicate with the code that called it and through that,
 change the system's behaviour.
 
 For configuration, hooks change the style context:
-example(:vcs_info:var(vcs-string)+var(hook-name):var(user-context):var(repo-root-name))
+example(:vcs_info:var(vcs-string)PLUS()var(hook-name):var(user-context):var(repo-root-name))
 
 To register functions to a hook, you need to list them in the tt(hooks)
 style in the appropriate context.
