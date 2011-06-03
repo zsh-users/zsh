@@ -99,7 +99,7 @@ static struct builtin builtins[] =
 #endif
 
     BUILTIN("popd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 1, BIN_POPD, "q", NULL),
-    BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "abcC:Df:ilmnNoOpPrRsu:z-", NULL),
+    BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "abcC:Df:ilmnNoOpPrRsSu:z-", NULL),
     BUILTIN("printf", 0, bin_print, 1, -1, BIN_PRINTF, NULL, NULL),
     BUILTIN("pushd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_PUSHD, "qsPL", NULL),
     BUILTIN("pushln", 0, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
@@ -3965,25 +3965,45 @@ bin_print(char *name, char **args, Options ops, int func)
 	    return 0;
 	}
 	/* -s option -- add the arguments to the history list */
-	if (OPT_ISSET(ops,'s')) {
+	if (OPT_ISSET(ops,'s') || OPT_ISSET(ops,'S')) {
 	    int nwords = 0, nlen, iwords;
 	    char **pargs = args;
 
 	    queue_signals();
-	    ent = prepnexthistent();
 	    while (*pargs++)
 		nwords++;
-	    if ((ent->nwords = nwords)) {
-		ent->words = (short *)zalloc(nwords*2*sizeof(short));
-		nlen = iwords = 0;
-		for (pargs = args; *pargs; pargs++) {
-		    ent->words[iwords++] = nlen;
-		    nlen += strlen(*pargs);
-		    ent->words[iwords++] = nlen;
-		    nlen++;
+	    if (nwords) {
+		if (OPT_ISSET(ops,'S')) {
+		    int wordsize;
+		    short *words;
+		    if (nwords > 1) {
+			zwarnnam(name, "option -S takes a single argument");
+			return 1;
+		    }
+		    words = NULL;
+		    wordsize = 0;
+		    histsplitwords(*args, &words, &wordsize, &nwords, 1);
+		    ent = prepnexthistent();
+		    ent->words = (short *)zalloc(nwords*sizeof(short));
+		    memcpy(ent->words, words, nwords*sizeof(short));
+		    free(words);
+		    ent->nwords = nwords/2;
+		} else {
+		    ent = prepnexthistent();
+		    ent->words = (short *)zalloc(nwords*2*sizeof(short));
+		    ent->nwords = nwords;
+		    nlen = iwords = 0;
+		    for (pargs = args; *pargs; pargs++) {
+			ent->words[iwords++] = nlen;
+			nlen += strlen(*pargs);
+			ent->words[iwords++] = nlen;
+			nlen++;
+		    }
 		}
-	    } else
+	    } else {
+		ent = prepnexthistent();
 		ent->words = (short *)NULL;
+	    }
 	    ent->node.nam = zjoin(args, ' ', 0);
 	    ent->stim = ent->ftim = time(NULL);
 	    ent->node.flags = 0;

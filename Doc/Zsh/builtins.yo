@@ -914,7 +914,7 @@ and the new directory stack is not printed.  This is useful for calls to
 tt(popd) that do not change the environment seen by an interactive user.
 )
 findex(print)
-xitem(tt(print) [ tt(-abcDilmnNoOpPrsz) ] [ tt(-u) var(n) ] [ tt(-f) var(format) ] [ tt(-C) var(cols) ])
+xitem(tt(print) [ tt(-abcDilmnNoOpPrsSz) ] [ tt(-u) var(n) ] [ tt(-f) var(format) ] [ tt(-C) var(cols) ])
 item(  [ tt(-R) [ tt(-en) ]] [ var(arg) ... ])(
 With the `tt(-f)' option the arguments are printed as described by tt(printf).
 With no flags or with the flag `tt(-)', the arguments are printed on
@@ -994,6 +994,15 @@ tt(-R); all other arguments and options are printed.
 )
 item(tt(-s))(
 Place the results in the history list instead of on the standard output.
+Each argument to the tt(print) command is treated as a single word in the
+history, regardless of its content.
+)
+item(tt(-S))(
+Place the results in the history list instead of on the standard output.
+In this case only a single argument is allowed; it will be split into
+words as if it were a full shell command line.  The effect is
+similar to reading the line from a history file with the
+tt(HIST_LEX_WORDS) option active.
 )
 item(tt(-u) var(n))(
 Print the arguments to file descriptor var(n).
