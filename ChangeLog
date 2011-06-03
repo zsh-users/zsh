@@ -3,6 +3,9 @@
 	* 29438: Completion/Zsh/Context/_subscript: adjust pattern so
 	we complete dynamic directory names in command position as well.
 
+	* 29448: Completion/Unix/Command/_initctl: complete symlinks
+	to files too.
+
 2011-06-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 29413: Doc/Zsh/builtins.yo, Src/builtin.c, Src/hist.c: print
@@ -14936,5 +14939,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5357 $
+* $Revision: 1.5358 $
 *****************************************************

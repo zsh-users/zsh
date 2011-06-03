@@ -37,7 +37,7 @@ _initctl_fillarray_events_args ()
 # list all upstart jobs, i.e. all files in /etc/init/
 _initctl_helper_jobs()
 {
-    _path_files -W "/etc/init/" -g "*.conf(.:r)"
+    _path_files -W "/etc/init/" -g "*.conf(-.:r)"
 }
 
 # list events, generate array if necessary
