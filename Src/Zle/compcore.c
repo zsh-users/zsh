@@ -1150,7 +1150,7 @@ check_param(char *s, int set, int test)
 	p[1] != Inpar && p[1] != Inbrack && p[1] != Snull) {
 	/* This is a parameter expression, not $(...), $[...], $'...'. */
 	char *b = p + 1, *e = b, *ie;
-	int n = 0, br = 1, nest = 0;
+	int br = 1, nest = 0;
 
 	if (*b == Inbrace) {
 	    char *tb = b;
@@ -1161,7 +1161,17 @@ check_param(char *s, int set, int test)
 
 	    /* Ignore the possible (...) flags. */
 	    b++, br++;
-	    n = skipparens(Inpar, Outpar, &b);
+	    if (skipparens(Inpar, Outpar, &b) > 0) {
+		/*
+		 * We are still within the parameter flags.  There's no
+		 * point trying to do anything clever here with
+		 * parameter names.  Instead, just report that we are in
+		 * a brace parameter but let the completion function
+		 * decide what to do about it.
+		 */
+		ispar = 2;
+		return NULL;
+	    }
 
 	    for (tb = p - 1; tb > s && *tb != Outbrace && *tb != Inbrace; tb--);
 	    if (tb > s && *tb == Inbrace && (tb[-1] == String || *tb == Qstring))
@@ -1204,7 +1214,7 @@ check_param(char *s, int set, int test)
 	}
 
 	/* Now make sure that the cursor is inside the name. */
-	if (offs <= e - s && offs >= b - s && n <= 0) {
+	if (offs <= e - s && offs >= b - s) {
 	    char sav;
 
 	    if (br) {

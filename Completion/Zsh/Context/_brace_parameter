@@ -1,3 +1,190 @@
 #compdef -brace-parameter-
 
+local char delim found_percent found_m exp
+local -a flags
+integer q_last n_q
+
+if [[ $PREFIX = '${('[^\)]# ]]; then
+  # Parameter flags.
+  compset -p 3
+
+  # Based on code in _globquals.
+  while [[ -n $PREFIX ]]; do
+    char=$PREFIX[1]
+    compset -p 1
+    if [[ $char = q ]]; then
+      (( q_last++, n_q++ ))
+      continue
+    else
+      (( q_last = 0 ))
+    fi
+    # Skip arguments to find what's left to complete
+    case $char in
+      (%)
+      found_percent=1
+      ;;
+
+      (m)
+      found_m=1
+      ;;
+
+      ([gIjsZ_])
+      # Single delimited argument.
+      if [[ -z $PREFIX ]]; then
+	_delimiters qualifer-$char
+	return
+      elif ! _globqual_delims; then
+	# still completing argument
+	case $char in
+	  (g)
+	  compset -P '*'
+	  flags=('o:octal escapes' 'c:expand ^X etc.' 'e:expand \M-t etc.')
+	  _describe -t format 'format option' flags -Q -S ''
+	  ;;
+
+	  (I)
+	  _message 'integer expression'
+	  ;;
+
+	  (js)
+	  _message "separator"
+	  ;;
+
+	  (Z)
+	  compset -P '*'
+	  flags=(
+	    'c:parse comments as strings (else as ordinary words)'
+	    'C:strip comments (else treat as ordinary words)'
+	    'n:treat newlines as whitespace'
+	  )
+	  _describe -t format 'format option' flags -Q -S ''
+	  ;;
+
+	  (_)
+	  _message "no useful values"
+	  ;;
+	esac
+	return
+      fi
+      ;;
+
+      ([lr])
+      # One compulsory argument, two optional.
+      if [[ -z $PREFIX ]]; then
+	_delimiters qualifer-$char
+	return
+      else
+	delim=$PREFIX[1]
+	if ! _globqual_delims; then
+	  # still completing argument
+	  _message "padding width"
+	  return
+	fi
+	# TBD if $PREFIX is empty can complete
+	# either repeat delimiter or a new qualifier.
+	# You might think it would just be easier
+	# for the user to type the delimiter at
+	# this stage, but users are astonishingly lazy.
+	if [[ $delim = $PREFIX[1] ]]; then
+	  # second argument
+	  if ! _globqual_delims; then
+	    _message "repeated padding"
+	    return
+	  fi
+	  if [[ $delim = $PREFIX[1] ]]; then
+	    if ! _globqual_delims; then
+	      _message "one-off padding"
+	      return
+	    fi
+	  fi
+	fi
+      fi
+      ;;
+    esac
+  done
+
+  if [[ -z $found_percent ]]; then
+    flags=("%:Expand prompt sequences")
+  else
+    flags=("%:Expand prompts respecting options")
+  fi
+  case $q_last in
+    (0)
+    if (( n_q == 0 )); then
+      flags+=("q:quote with backslashes")
+    fi
+    ;;
+
+    (1)
+    flags+=(
+      "q:quote with single quotes"
+      "-:quote minimally for readability"
+    )
+    ;;
+
+    (2)
+    flags+=("q:quote with double quotes")
+    ;;
+
+    (3)
+    flags+=("q:quote with \$'...'")
+    ;;
+  esac
+  if (( !n_q )); then
+    flags+=("Q:remove one level of quoting")
+  fi
+  if [[ -z $found_m ]]; then
+    flags+=("m:Count multibyte width in padding calculation")
+  else
+    flags+=("m:Count number of character code points in padding calculation")
+  fi
+  flags+=(
+    "#:Evaluate as numeric expression"
+    "@:Double-quoted splitting of scalars"
+    "A:Create array parameter"
+    "a:Sort in array index order (with O to reverse)"
+    "c:Count characters in an array (with \${(c)#...})"
+    "C:Capitalize words"
+    "D:Perform directory name abbreviation"
+    "e:Perform single-word shell expansions"
+    "f:Split the result on newlines"
+    "F:Join arrays with newlines"
+    "g:Process echo array sequences (needs options)"
+    "i:Sort case-insensitively"
+    "k:Subsitute keys of associative arrays"
+    "L:Lower case all letters"
+    "n:Sort decimal integers numerically"
+    "o:Sort in ascending order (lexically if no other sort option)"
+    "O:Sort in descending order (lexically if no other sort option)"
+    "P:Use parameter value as name of parameter for redirected lookup"
+    "t:Substitute type of parameter"
+    "u:Substitute first occurrence of each unique word"
+    "U:Upper case all letters"
+    "v:Substitute values of associative arrays (with (k))"
+    "V:Visibility enhancements for special characters"
+    "w:Count words in array or string (with \${(w)#...})"
+    "W:Count words including empty words (with \${(W)#...})"
+    "X:Report parsing errors and eXit substitution"
+    "z:Split words as if zsh command line"
+    "0:Split words on null bytes"
+    "p:Handle print escapes in parameter flag arguments"
+    "~:Treat strings in parameter flag arguments as patterns"
+    "j:Join arrays with specified string"
+    "l:Left-pad resulting words"
+    "r:Right-pad resulting words"
+    "s:Split words on specified string"
+    "Z:Split words as if zsh command line (with options)"
+    # "_:Extended flags, for future expansion"
+    "S:Search substrings in #, %, / expressions"
+    "I:Search <argument>th match in #, %, / expressions"
+    "B:Include index of beginning of match in #, %, / expressions"
+    "E:Include index of end of match in #, %, / expressions"
+    "M:Include matched portion in #, %, / expressions"
+    "N:Include length of match in #, %,  expressions"
+    "R:Include rest (unmatched portion) in #, %, / expressions"
+  )
+  _describe -t flags "parameter flag" flags -Q -S ''
+  return
+fi
+
 _parameters -e

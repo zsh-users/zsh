@@ -1,3 +1,9 @@
+2011-06-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 29452: Completion/Zsh/Context/_brace_parameter,
+	Src/Zle/compcore.c (typo corrected): allow completion
+	of parameter flags.
+
 2011-06-03  Mikael Magnusson <mikachu@gmail.com>
 
 	* 29438: Completion/Zsh/Context/_subscript: adjust pattern so
@@ -14945,5 +14951,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5360 $
+* $Revision: 1.5361 $
 *****************************************************
