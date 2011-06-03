@@ -11,6 +11,9 @@
 
 2011-06-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 29451: Src/subst.c, Test/D04parameter.ztst: ${##stuff}
+	removes stuff from the head of $#.
+
 	* 29413: Doc/Zsh/builtins.yo, Src/builtin.c, Src/hist.c: print
 	-S takes a single argument, applies lexical history word
 	splitting, and puts it on the history.
@@ -14942,5 +14945,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5359 $
+* $Revision: 1.5360 $
 *****************************************************

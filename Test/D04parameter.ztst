@@ -179,9 +179,17 @@
   print ${##}
   set 1 2 3 4 5 6 7 8 9 10
   print ${##}
-0:${##} is length of $#
+  print ${##""}
+  print ${##1}
+  print ${##2}
+  print ${###<->} # oh, for pete's sake...
+0:${##} is length of $#, and other tales of hash horror
 >1
 >2
+>10
+>0
+>10
+>
 
   array=(once bitten twice shy)
   print IF${array}THEN

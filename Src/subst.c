@@ -2080,7 +2080,16 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		    || (cc = s[1]) == '*' || cc == Star || cc == '@'
 		    || cc == '?' || cc == Quest
 		    || cc == '$' || cc == String || cc == Qstring
-		    || cc == '#' || cc == Pound
+		    /*
+		     * Me And My Squiggle:
+		     * ${##} is the length of $#, but ${##foo}
+		     * is $# with a "foo" removed from the start.
+		     * If someone had defined the *@!@! language
+		     * properly in the first place we wouldn't
+		     * have this nonsense.
+		     */
+		    || ((cc == '#' || cc == Pound) &&
+			s[2] == Outbrace)
 		    || cc == '-' || (cc == ':' && s[2] == '-')
 		    || (isstring(cc) && (s[2] == Inbrace || s[2] == Inpar)))) {
 	    getlen = 1 + whichlen, s++;
