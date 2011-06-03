@@ -300,23 +300,16 @@
 
   foo='\u65\123'
   print -r ${(g:o:)foo}
-  foo='\u65\0123'
+  foo='\u65\0123^X\C-x'
   print -r ${(g::)foo}
-  foo='\u65^X'
-  print -r ${(V)${(g:c:)foo}}
-  foo='\u65\C-x\M-a'
-  print -r ${(V)${(g:e:)foo}}
-  foo='\u65\123\C-x'
-  print -r ${(V)${(g:eo:)foo}}
-  foo=('\u65' '\0123' '^X\M-a')
-  print -r ${(V)${(g:e:)foo}}
+  foo='^X'
+  bar='\C-\130'
+  [[ ${(g:c:)foo} == ${(g:oe:)bar} ]]
+  echo $?
 0:${(g)...}
 >eS
->eS
->e^X
->e^X\M-a
->eS^X
->e S ^X\M-a
+>eS^X\C-x
+>0
 
   foo='I'\''m nearly out of my mind with tedium'
   bar=foo
