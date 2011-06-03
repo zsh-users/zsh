@@ -18,7 +18,7 @@ compset -P '\(([^\(\)]|\(*\))##\)' # remove subscript flags
 # or colon list.
 integer pos=$((CURSOR+1))
 while [[ pos -gt 1 && $BUFFER[pos-1] != '[' ]]; do (( pos-- )); done
-if [[ $BUFFER[1,pos-1] = *[[:space:]:=]##\~\[ ]]; then
+if [[ $BUFFER[1,pos-1] = (|*[[:space:]:=]##)\~\[ ]]; then
   _dynamic_directory_name
 elif [[ "$PREFIX" = :* ]]; then
   _wanted characters expl 'character class' \
