@@ -1099,7 +1099,7 @@ mod_export char *
 check_param(char *s, int set, int test)
 {
     char *p;
-    int found = 0;
+    int found = 0, qstring = 0;
 
     zsfree(parpre);
     parpre = NULL;
@@ -1126,6 +1126,7 @@ check_param(char *s, int set, int test)
 		!(*p == String && p[1] == Snull) &&
 		!(*p == Qstring && p[1] == '\'')) {
 		found = 1;
+		qstring = (*p == Qstring);
 		break;
 	    }
 	}
@@ -1161,7 +1162,8 @@ check_param(char *s, int set, int test)
 
 	    /* Ignore the possible (...) flags. */
 	    b++, br++;
-	    if (skipparens(Inpar, Outpar, &b) > 0) {
+	    if ((qstring ? skipparens('(', ')', &b) :
+		 skipparens(Inpar, Outpar, &b)) > 0) {
 		/*
 		 * We are still within the parameter flags.  There's no
 		 * point trying to do anything clever here with

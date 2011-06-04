@@ -4,7 +4,7 @@ local char delim found_percent found_m exp
 local -a flags
 integer q_last n_q
 
-if [[ $PREFIX = '${('[^\)]# ]]; then
+if [[ $PREFIX = *'${('[^\)]# ]]; then
   # Parameter flags.
   compset -p 3
 
