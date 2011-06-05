@@ -1,3 +1,8 @@
+2011-06-05  Clint Adams  <clint@zsh.org>
+
+	* unposted: Functions/Zle/move-line-in-buffer: clean
+	the funny characters out of move-line-in-buffer.
+
 2011-06-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Completion/Zsh/Context/_brace_parameter, Src/Zle/compcore.c
@@ -14958,5 +14963,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5362 $
+* $Revision: 1.5363 $
 *****************************************************

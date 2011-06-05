@@ -12,5 +12,5 @@
 
 local hno=$HISTNO curs=$CURSOR
 zle .${WIDGET:s/in-buffer/or-history} "$@" &&
-    (( HISTNO != hno && (HISTNO=hno, CURSOR=curs) ))
+    (( HISTNO != hno && (HISTNO=hno, CURSOR=curs) ))
 return 0
