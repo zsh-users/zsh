@@ -438,7 +438,7 @@ for prepath in "$prepaths[@]"; do
 
     tmp2=( "$tmp1[@]" )
 
-    if [[ "$tpre$tsuf" = */* ]]; then
+    if [[ "$tpre$tsuf" = (#b)*/(*) && -n "$fake${match[1]}" ]]; then
       compfiles -P$cfopt tmp1 accex "$skipped" "$_matcher $matcher[2]" "$sdirs" fake
     elif [[ "$sopt" = *[/f]* ]]; then
       compfiles -p$cfopt tmp1 accex "$skipped" "$_matcher $matcher[2]" "$sdirs" fake "$pats[@]"

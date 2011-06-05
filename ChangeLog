@@ -3,6 +3,13 @@
 	* unposted: Functions/Zle/move-line-in-buffer: clean
 	the funny characters out of move-line-in-buffer.
 
+2011-06-04  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 29444: Completion/Unix/Type/_path_files: when called with a
+	pattern to match directories, as from _files with list-dirs-first,
+	do not descend into subdirectories looking for fake files unless
+	some fake files have been defined.
+
 2011-06-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Completion/Zsh/Context/_brace_parameter, Src/Zle/compcore.c
@@ -14963,5 +14970,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5363 $
+* $Revision: 1.5364 $
 *****************************************************
