@@ -1,3 +1,8 @@
+2011-06-06  Peter Stephenson  <pws@csr.com>
+
+	* 29462: Src/subst.c: fix warning with some compilers (code was
+	already safe).
+
 2011-06-05  Clint Adams  <clint@zsh.org>
 
 	* unposted: Functions/Zle/move-line-in-buffer: clean
@@ -14970,5 +14975,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5364 $
+* $Revision: 1.5365 $
 *****************************************************

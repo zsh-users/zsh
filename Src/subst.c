@@ -2848,7 +2848,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	    char *check_offset = check_colon_subscript(s, &check_offset2);
 	    if (check_offset) {
 		zlong offset = mathevali(check_offset);
-		zlong length;
+		zlong length = 0;
 		int length_set = 0;
 		int offset_hack_argzero = 0;
 		if (errflag)
