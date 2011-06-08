@@ -135,6 +135,26 @@ a=j
 z[$a]="\
 i 133 \
 "
+# ligature with f
+a=f
+z[$a]="\
+f FB00 \
+"
+# ligature with i
+a=i
+z[$a]="\
+f FB01 \
+"
+# ligature with l
+a=l
+z[$a]="\
+f FB02 \
+"
+# ligature with t
+a=t
+z[$a]="\
+f FB05 s FB06 \
+"
 # eszett
 a=s
 z[$a]="\
@@ -252,6 +272,19 @@ z[$a]+=" Z 5e6"
 a=h
 z[$a]+=" S 5e9"
 
+# Superscripts
+a=S
+z[$a]+=" \
+0 2070 1 B9 2 B2 3 B3 4 2074 5 2075 6 2076 7 2077 8 2078 9 2079 \
++ 207a - 207b = 207C ( 207D ) 207E n 207f \
+"
+# Subscripts
+a=s
+z[$a]+=" \
+0 2080 1 2081 2 2082 3 2083 4 2084 5 2085 6 2086 7 2087 8 2088 9 2089 \
++ 208a - 208b = 208C ( 208D ) 208E \
+"
+
 typeset -i 16 -Z 4 ia
 typeset -i 16 -Z 6 iuni
 # Extended width characters ^A, ^B, ... (not RFC1345)
@@ -327,10 +360,14 @@ z[g]+=" R AE"
 z[m]+=" ' AF"
 # degree
 z[G]+=" D B0"
+# degree centigrade
+z[C]+=" o 2103"
+# degree fahrenheit
+z[F]+=" o 2109"
+# numero
+z[0]+=" N 2116"
 # +/-
 z[-]+=" + B1"
-# superscripts
-z[S]+=" 2 B2 3 B3"
 # lonely acute
 a=\'
 z[$a]+=" ' B4"
@@ -342,8 +379,6 @@ z[I]+=" P B6"
 z[M]+=" . B7"
 # Lonely cedilla
 z[,]+=" ' B8"
-# Superscript one
-z[S]+=" 1 B9"
 # spanish masculine ordinal
 z[o]+=" - BA"
 # right guillemet
@@ -415,5 +450,20 @@ z[0]+=" 0 221E"
 # Female and male
 z[m]+=" F 2640"
 z[l]+=" M 2642"
+# Commercial AT
+z[t]+=" A 40"
+# Prime, double prime, triple prime
+a=\'
+z[$a]+=" 1 2032 2 2033 3 2034"
+# Arrows
+z[-]+=" < 2190"
+a=\!
+z[$a]+=" - 2191"
+a=\>
+z[$a]+=" - 2192 < 2194 = 21D2"
+z[v]+=" - 2193"
+z[D]+=" U 2195"
+a=\=
+z[$a]+=" < 21D0 = 21D4"
 
 zsh_accented_chars=("${(kv)z[@]}")

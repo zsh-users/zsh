@@ -1,3 +1,8 @@
+2011-06-08  Peter Stephenson  <pws@csr.com>
+
+	* Jeremy Sylvestre: 29468: Functions/Zle/define-composed-chars:
+	add some ligatures and symbols.
+
 2011-06-06  Peter Stephenson  <pws@csr.com>
 
 	* 29462: Src/subst.c: fix warning with some compilers (code was
@@ -14975,5 +14980,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5365 $
+* $Revision: 1.5366 $
 *****************************************************
