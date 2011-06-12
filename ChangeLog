@@ -1,3 +1,8 @@
+2011-06-12  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* 29472: Src/jobs.c: findproc() needs at least to also return
+	stopped jobs.  See 28967.
+
 2011-06-08  Peter Stephenson  <pws@csr.com>
 
 	* Jeremy Sylvestre: 29468: Functions/Zle/define-composed-chars:
@@ -560,7 +565,7 @@
 
 2011-04-01  Peter Stephenson  <pws@csr.com>
 
-	* Stef van Vlierberghe: 28965 (as posted in 28967):
+	* Stef van Vlierberghe: Src/jobs.c: 28965 (as posted in 28967):
 	findproc() should not return processes not marked as SP_RUNNING
 	since findproc() is used find processes still known to the OS.
 
@@ -14980,5 +14985,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5366 $
+* $Revision: 1.5367 $
 *****************************************************
