@@ -189,7 +189,8 @@ findproc(pid_t pid, Job *jptr, Process *pptr, int aux)
 	     * the termination of the process which pid we were supposed
 	     * to return in a different job.
 	     */
-	    if (pn->pid == pid && pn->status == SP_RUNNING) {
+	    if (pn->pid == pid && (pn->status == SP_RUNNING ||
+				   WIFSTOPPED(pn->status))) {
 		*pptr = pn;
 		*jptr = jobtab + i;
 		return 1;
