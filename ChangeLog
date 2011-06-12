@@ -1,4 +1,4 @@
-2011-06-12  Barton E. Schaefer  <schaefer@brasslantern.com>
+2011-06-12  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29472: Src/jobs.c: findproc() needs at least to also return
 	stopped jobs.  See 28967.
@@ -14985,5 +14985,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5367 $
+* $Revision: 1.5368 $
 *****************************************************
