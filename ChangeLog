@@ -1,3 +1,8 @@
+2011-06-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Doc/Zsh/compwid.yo: document change to brace
+	parameter context in 29452/29459.
+
 2011-06-12  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29472: Src/jobs.c: findproc() needs at least to also return
@@ -27,10 +32,10 @@
 
 2011-06-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* Completion/Zsh/Context/_brace_parameter, Src/Zle/compcore.c
-	(check_param): In shell function, check for ${( not at start
-	of match; in C code, check for untokenized parentheses when
-	in double quotes.
+	* 29459: Completion/Zsh/Context/_brace_parameter,
+	Src/Zle/compcore.c (check_param): In shell function, check for
+	${( not at start of match; in C code, check for untokenized
+	parentheses when in double quotes.
 
 2011-06-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
@@ -14985,5 +14990,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5368 $
+* $Revision: 1.5369 $
 *****************************************************

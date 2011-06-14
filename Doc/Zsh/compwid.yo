@@ -162,7 +162,10 @@ this case the tt(words) array contains the words inside the parentheses.
 )
 item(tt(brace_parameter))(
 when completing the name of a parameter in a parameter expansion beginning
-with tt(${).
+with tt(${).  This context will also be set when completing parameter
+flags following tt(${LPAR()); the full command line argument is presented
+and the handler must test the value to be completed to ascertain that
+this is the case.
 )
 item(tt(assign_parameter))(
 when completing the name of a parameter in a parameter assignment.
