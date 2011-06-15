@@ -1,3 +1,10 @@
+2011-06-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 29481: Src/jobs.c, Src/signals.c: always return a matching job
+	in findproc() [reverses 28967 and 29472], but scan the whole list
+	to prefer running jobs in the rare event that one running and one
+	exited job share a PID.
+
 2011-06-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Doc/Zsh/compwid.yo: document change to brace
@@ -14990,5 +14997,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5369 $
+* $Revision: 1.5370 $
 *****************************************************

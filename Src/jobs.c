@@ -160,6 +160,8 @@ findproc(pid_t pid, Job *jptr, Process *pptr, int aux)
     Process pn;
     int i;
 
+    *jptr = NULL;
+    *pptr = NULL;
     for (i = 1; i <= maxjob; i++)
     {
 	/*
@@ -189,16 +191,16 @@ findproc(pid_t pid, Job *jptr, Process *pptr, int aux)
 	     * the termination of the process which pid we were supposed
 	     * to return in a different job.
 	     */
-	    if (pn->pid == pid && (pn->status == SP_RUNNING ||
-				   WIFSTOPPED(pn->status))) {
+	    if (pn->pid == pid) {
 		*pptr = pn;
 		*jptr = jobtab + i;
-		return 1;
+		if (pn->status == SP_RUNNING) 
+		    return 1;
 	    }
 	}
     }
 
-    return 0;
+    return (*pptr && *jptr);
 }
 
 /* Does the given job number have any processes? */

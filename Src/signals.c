@@ -489,7 +489,6 @@ wait_for_processes(void)
 	 * Find the process and job containing this pid and
 	 * update it.
 	 */
-	pn = NULL;
 	if (findproc(pid, &jn, &pn, 0)) {
 #if defined(HAVE_WAIT3) && defined(HAVE_GETRUSAGE)
 	    struct timezone dummy_tz;
