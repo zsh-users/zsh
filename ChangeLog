@@ -1,3 +1,8 @@
+2011-06-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Michel Dos Reis: 29482: Completion/Linux/Command/_modutils:
+	handle .gz kernel modules.
+
 2011-06-16  Doug Kearns  <dougkearns@gmail.com>
 
 	* 29483: Completion/Unix/Command/_vim: add --servername completion.
@@ -15001,5 +15006,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5371 $
+* $Revision: 1.5372 $
 *****************************************************
