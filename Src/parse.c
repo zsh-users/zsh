@@ -1480,12 +1480,25 @@ par_funcdef(void)
     ecbuf[p + num + 4] = ecnpats;
     ecbuf[p + 1] = num;
 
-    lineno += oldlineno;
     ecnpats = onp;
     ecssub = oecssub;
     ecnfunc++;
 
     ecbuf[p] = WCB_FUNCDEF(ecused - 1 - p);
+
+    if (num == 0) {
+	/* Unnamed function */
+	int parg = ecadd(0);
+	ecadd(0);
+	while (tok == STRING) {
+	    ecstr(tokstr);
+	    num++;
+	    zshlex();
+	}
+	ecbuf[parg] = ecused - parg; /*?*/
+	ecbuf[parg+1] = num;
+    }
+    lineno += oldlineno;
 }
 
 /*
@@ -1730,12 +1743,25 @@ par_simple(int *complex, int nr)
 	    ecbuf[p + argc + 3] = ecsoffs - so;
 	    ecbuf[p + argc + 4] = ecnpats;
 
-	    lineno += oldlineno;
 	    ecnpats = onp;
 	    ecssub = oecssub;
 	    ecnfunc++;
 
 	    ecbuf[p] = WCB_FUNCDEF(ecused - 1 - p);
+
+	    if (argc == 0) {
+		/* Unnamed function */
+		int parg = ecadd(0);
+		ecadd(0);
+		while (tok == STRING) {
+		    ecstr(tokstr);
+		    argc++;
+		    zshlex();
+		}
+		ecbuf[parg] = ecused - parg; /*?*/
+		ecbuf[parg+1] = argc;
+	    }
+	    lineno += oldlineno;
 
 	    isfunc = 1;
 	    isnull = 0;

@@ -50,20 +50,20 @@ int noerrexit;
  * noerrs = 1: suppress error messages
  * noerrs = 2: don't set errflag on parse error, either
  */
- 
+
 /**/
 mod_export int noerrs;
- 
+
 /* do not save history on exec and exit */
 
 /**/
 int nohistsave;
- 
+
 /* error/break flag */
- 
+
 /**/
 mod_export int errflag;
- 
+
 /*
  * State of trap return value.  Value is from enum trap_state.
  */
@@ -88,23 +88,23 @@ int trap_state;
  * - non-negative in a trap once it was triggered.  It should remain
  *   non-negative until restored after execution of the trap.
  */
- 
+
 /**/
 int trap_return;
- 
+
 /* != 0 if this is a subshell */
- 
+
 /**/
 int subsh;
- 
+
 /* != 0 if we have a return pending */
- 
+
 /**/
 mod_export int retflag;
 
 /**/
 long lastval2;
- 
+
 /* The table of file descriptors.  A table element is zero if the  *
  * corresponding fd is not used by the shell.  It is greater than  *
  * 1 if the fd is used by a <(...) or >(...) substitution and 1 if *
@@ -148,12 +148,12 @@ int fdtable_flocks;
 mod_export int zleactive;
 
 /* pid of process undergoing 'process substitution' */
- 
+
 /**/
 pid_t cmdoutpid;
- 
+
 /* exit status of process undergoing 'process substitution' */
- 
+
 /**/
 int cmdoutval;
 
@@ -166,7 +166,7 @@ int cmdoutval;
 /**/
 int use_cmdoutval;
 
-/* The context in which a shell function is called, see SFC_* in zsh.h. */ 
+/* The context in which a shell function is called, see SFC_* in zsh.h. */
 
 /**/
 mod_export int sfcontext;
@@ -239,7 +239,7 @@ parse_string(char *s, int reset_lineno)
 
 /**/
 mod_export struct rlimit current_limits[RLIM_NLIMITS], limits[RLIM_NLIMITS];
- 
+
 /**/
 mod_export int
 zsetlimit(int limnum, char *nam)
@@ -340,7 +340,7 @@ zfork(struct timeval *tv)
  *
  * (when waiting for the grep, ignoring execpline2 for now). At this time,
  * zsh has built two job-table entries for it: one for the cat and one for
- * the grep. If the user hits ^Z at this point (and jobbing is used), the 
+ * the grep. If the user hits ^Z at this point (and jobbing is used), the
  * shell is notified that the grep was suspended. The list_pipe flag is
  * used to tell the execpline where it was waiting that it was in a pipeline
  * with a shell construct at the end (which may also be a shell function or
@@ -351,7 +351,7 @@ zfork(struct timeval *tv)
  * shell (its pid and the text for it) in the job entry of the cat. The pid
  * is passed down in the list_pipe_pid variable.
  * But there is a problem: the suspended grep is a child of the parent shell
- * and can't be adopted by the sub-shell. So the parent shell also has to 
+ * and can't be adopted by the sub-shell. So the parent shell also has to
  * keep the information about this process (more precisely: this pipeline)
  * by keeping the job table entry it created for it. The fact that there
  * are two jobs which have to be treated together is remembered by setting
@@ -528,10 +528,10 @@ isgooderr(int e, char *dir)
 {
     /*
      * Maybe the directory was unreadable, or maybe it wasn't
-     * even a directory. 
+     * even a directory.
      */
     return ((e != EACCES || !access(dir, X_OK)) &&
-	    e != ENOENT && e != ENOTDIR); 
+	    e != ENOENT && e != ENOTDIR);
 }
 
 /*
@@ -639,7 +639,7 @@ execute(LinkList args, int flags, int defpath)
 	    break;
 	}
 
-    /* for command -p, search the default path */ 
+    /* for command -p, search the default path */
     if (defpath) {
 	char *s, pbuf[PATH_MAX];
 	char *dptr, *pe, *ps = DEFAULT_PATH;
@@ -676,7 +676,7 @@ execute(LinkList args, int flags, int defpath)
 	    eno = ee;
 
     } else {
-   
+
 	if ((cn = (Cmdnam) cmdnamtab->getnode(cmdnamtab, arg0))) {
 	    char nn[PATH_MAX], *dptr;
 
@@ -1312,9 +1312,9 @@ sublist_done:
 		donetrap = 1;
 	    }
 	    if (lastval) {
-		int errreturn = isset(ERRRETURN) && 
+		int errreturn = isset(ERRRETURN) &&
 		    (isset(INTERACTIVE) || locallevel || sourcelevel);
-		int errexit = isset(ERREXIT) || 
+		int errexit = isset(ERREXIT) ||
 		    (isset(ERRRETURN) && !errreturn);
 		if (errexit) {
 		    if (sigtrapped[SIGEXIT])
@@ -1536,7 +1536,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    else if (pid) {
 			char dummy;
 
-			lpforked = 
+			lpforked =
 			    (killpg(jobtab[list_pipe_job].gleader, 0) == -1 ? 2 : 1);
 			list_pipe_pid = pid;
 			list_pipe_start = bgtime;
@@ -3112,7 +3112,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		ESUB_PGRP | ESUB_FAKE;
 	    if (type != WC_SUBSH)
 		flags |= ESUB_KEEPTRAP;
-	    if ((do_exec || (type >= WC_CURSH && last1 == 1)) 
+	    if ((do_exec || (type >= WC_CURSH && last1 == 1))
 		&& !forked)
 		flags |= ESUB_REVERTPGRP;
 	    entersubsh(flags);
@@ -4184,10 +4184,19 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 	     * Anonymous function, execute immediately.
 	     * Function name is "(anon)", parameter list is empty.
 	     */
-	    LinkList args = newlinklist();
+	    LinkList args;
 
+	    state->pc = end;
+	    end += *state->pc++;
+	    args = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok);
+
+	    if (htok && args)
+		execsubst(args);
+
+	    if (!args)
+		args = newlinklist();
 	    shf->node.nam = "(anon)";
-	    addlinknode(args, shf->node.nam);
+	    pushnode(args, shf->node.nam);
 
 	    execshfunc(shf, args);
 	    ret = lastval;

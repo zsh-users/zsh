@@ -158,9 +158,13 @@ If no name is given for a function, it is `anonymous' and is handled
 specially.  Either form of function definition may be used: a `tt(())' with
 no preceding name, or a `tt(function)' with an immediately following open
 brace.  The function is executed immediately at the point of definition and
-is not stored for future use.  The function name is set to `tt((anon))' and
-the parameter list passed to the function is empty.  Note that this means
+is not stored for future use.  The function name is set to `tt((anon))'.
+
+Arguments to the function may be specified as words following the
+closing brace defining the function, hence if there are none no
+arguments (other than tt($0)) are set.  Note that this means
 the argument list of any enclosing script or function is hidden.
+
 Redirections may be applied to the anonymous function in the same manner as
 to a current-shell structure enclosed in braces.  The main use of anonymous
 functions is to provide a scope for local variables.  This is particularly
@@ -172,13 +176,13 @@ For example,
 example(variable=outside
 function {
   local variable=inside
-  print "I am $variable"
-}
+  print "I am $variable with arguments $*"
+} this and that
 print "I am $variable")
 
 outputs the following:
 
-example(I am inside
+example(I am inside with arguments this and that
 I am outside)
 
 Note that function definitions with arguments that expand to nothing,

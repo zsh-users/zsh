@@ -26,7 +26,7 @@
     print regress expansion of function names
   }
   f$$
-0:Regression test: `function f$$ () { ... }'
+0:Regression test: 'function f$$ () { ... }'
 >regress expansion of function names
 
   function foo () print bar
@@ -108,6 +108,8 @@
 >some
 >really useful
 >args
+
+# ' deconfuse emacs
 
   command_not_found_handler() {
      print "Your command:" >&2
@@ -200,6 +202,31 @@
 >Dum da dum
 >Da de da
 >Do be do
+
+  () { print This has arguments $*; } of all sorts; print After the function
+  function { print More stuff $*; } and why not; print Yet more
+0:Anonymous function with arguments
+>This has arguments of all sorts
+>After the function
+>More stuff and why not
+>Yet more
+
+  fn() {
+    (){ print Anonymous function 1 $*; } with args
+    function { print Anonymous function 2 $*; } with more args
+    print Following bit
+  }
+  functions fn
+0:Text representation of anonymous function with arguments
+>fn () {
+>	() {
+>		print Anonymous function 1 $*
+>	} with args
+>	() {
+>		print Anonymous function 2 $*
+>	} with more args
+>	print Following bit
+>}
 
 %clean
 
