@@ -1,3 +1,8 @@
+2011-06-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 29490: Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c,
+	Src/Builtins/rlimits.mdd: add RLIMIT_RTTIME.
+
 2011-06-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Michel Dos Reis: 29482: Completion/Linux/Command/_modutils:
@@ -15006,5 +15011,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5372 $
+* $Revision: 1.5373 $
 *****************************************************

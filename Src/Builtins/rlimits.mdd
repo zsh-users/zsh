@@ -14,7 +14,7 @@ rlimits.o rlimits..o: rlimits.h
 rlimits.h: rlimits.awk @RLIMITS_INC_H@
 	$(AWK) -f $(sdir)/rlimits.awk @RLIMITS_INC_H@ /dev/null > rlimits.h
 	@if grep ZLIMTYPE_UNKNOWN rlimits.h >/dev/null; then \
-	    echo >&2 WARNING: unknown limits: mail rlimits.h to developers; \
+	    echo >&2 WARNING: unknown limits: mail Src/Builtins/rlimits.h to developers; \
 	else :; fi
 
 clean-here: clean.rlimits

@@ -36,6 +36,7 @@ enum {
     ZLIMTYPE_MEMORY,
     ZLIMTYPE_NUMBER,
     ZLIMTYPE_TIME,
+    ZLIMTYPE_MICROSECONDS,
     ZLIMTYPE_UNKNOWN
 };
 
@@ -113,10 +114,37 @@ showlimitvalue(int lim, rlim_t val)
 	   seconds. */
 	printf("%d:%02d:%02d\n", (int)(val / 3600),
 	       (int)(val / 60) % 60, (int)(val % 60));
+    } else if (limtype[lim] == ZLIMTYPE_MICROSECONDS) {
+	/* microseconds */
+# ifdef RLIM_T_IS_QUAD_T
+	printf("%qdus\n", val);
+# else
+#  ifdef RLIM_T_IS_LONG_LONG
+	printf("%lldus\n", val);
+#  else
+#   ifdef RLIM_T_IS_UNSIGNED
+	printf("%luus\n", val);
+#   else
+	printf("%ldus\n", val);
+#   endif /* RLIM_T_IS_UNSIGNED */
+#  endif /* RLIM_T_IS_LONG_LONG */
+# endif /* RLIM_T_IS_QUAD_T */
     } else if (limtype[lim] == ZLIMTYPE_NUMBER ||
 	       limtype[lim] == ZLIMTYPE_UNKNOWN) {
 	/* pure numeric resource */
-	printf("%d\n", (int)val);
+# ifdef RLIM_T_IS_QUAD_T
+	printf("%qd\n", val);
+# else
+#  ifdef RLIM_T_IS_LONG_LONG
+	printf("%lld\n", val);
+#  else
+#   ifdef RLIM_T_IS_UNSIGNED
+	printf("%lu\n", val);
+#   else
+	printf("%ld\n", val);
+#   endif /* RLIM_T_IS_UNSIGNED */
+#  endif /* RLIM_T_IS_LONG_LONG */
+# endif /* RLIM_T_IS_QUAD_T */
     } else if (val >= 1024L * 1024L)
 	/* memory resource -- display with `K' or `M' modifier */
 # ifdef RLIM_T_IS_QUAD_T
@@ -125,7 +153,7 @@ showlimitvalue(int lim, rlim_t val)
 	printf("%qdkB\n", val / 1024L);
 # else
 #  ifdef RLIM_T_IS_LONG_LONG
-    printf("%lldMB\n", val / (1024L * 1024L));
+	printf("%lldMB\n", val / (1024L * 1024L));
     else
 	printf("%lldkB\n", val / 1024L);
 #  else
@@ -539,7 +567,9 @@ bin_limit(char *nam, char **argv, Options ops, UNUSED(int func))
 		    return 1;
 		}
 	    }
-	} else if (limtype[lim] == ZLIMTYPE_NUMBER || limtype[lim] == ZLIMTYPE_UNKNOWN) {
+	} else if (limtype[lim] == ZLIMTYPE_NUMBER ||
+		   limtype[lim] == ZLIMTYPE_UNKNOWN ||
+		   limtype[lim] == ZLIMTYPE_MICROSECONDS) {
 	    /* pure numeric resource -- only a straight decimal number is
 	    permitted. */
 	    char *t = s;
