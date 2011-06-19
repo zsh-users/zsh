@@ -1369,8 +1369,6 @@ compprintlist(int showall)
 	}
 #endif
 	if ((e = g->expls)) {
-	    int l;
-
 	    if (!lastused && lasttype == 1) {
 		e = lastexpl;
 		ml = lastml;
@@ -1393,9 +1391,9 @@ compprintlist(int showall)
 		    }
 		    if (mlbeg < 0 && mfirstl < 0)
 			mfirstl = ml;
-		    l = compprintfmt((*e)->str,
-                                     ((*e)->always ? -1 : (*e)->count),
-                                     dolist(ml), 1, ml, &stop);
+		    (void)compprintfmt((*e)->str,
+				       ((*e)->always ? -1 : (*e)->count),
+				       dolist(ml), 1, ml, &stop);
 		    if (mselect >= 0) {
 			int mm = (mcols * ml), i;
 

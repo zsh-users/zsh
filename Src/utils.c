@@ -4689,7 +4689,7 @@ addunprintable(char *v, const char *u, const char *uend)
 mod_export char *
 quotestring(const char *s, char **e, int instring)
 {
-    const char *u, *tt;
+    const char *u;
     char *v;
     int alloclen;
     char *buf;
@@ -4740,7 +4740,7 @@ quotestring(const char *s, char **e, int instring)
 	break;
     }
 
-    tt = quotestart = v = buf = zshcalloc(alloclen);
+    quotestart = v = buf = zshcalloc(alloclen);
 
     DPUTS(instring < QT_BACKSLASH || instring == QT_BACKTICK ||
 	  instring > QT_SINGLE_OPTIONAL,

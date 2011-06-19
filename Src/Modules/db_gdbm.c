@@ -39,7 +39,9 @@
 
 #include <gdbm.h>
 
+#if 0 /* what is this for? */
 static char *backtype = "db/gdbm";
+#endif
 
 static const struct gsu_scalar gdbm_gsu =
 { gdbmgetfn, gdbmsetfn, gdbmunsetfn };
@@ -138,7 +140,6 @@ static void
 gdbmsetfn(Param pm, char *val)
 {
     datum key, content;
-    int ret;
     GDBM_FILE dbf;
 
     key.dptr = pm->node.nam;
@@ -147,7 +148,7 @@ gdbmsetfn(Param pm, char *val)
     content.dsize = strlen(content.dptr) + 1;
 
     dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
-    ret = gdbm_store(dbf, key, content, GDBM_REPLACE);
+    (void)gdbm_store(dbf, key, content, GDBM_REPLACE);
 }
 
 /**/
@@ -155,14 +156,13 @@ static void
 gdbmunsetfn(Param pm, int um)
 {
     datum key;
-    int ret;
     GDBM_FILE dbf;
 
     key.dptr = pm->node.nam;
     key.dsize = strlen(key.dptr) + 1;
 
     dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
-    ret = gdbm_delete(dbf, key);
+    (void)gdbm_delete(dbf, key);
 }
 
 /**/
@@ -171,12 +171,10 @@ getgdbmnode(HashTable ht, const char *name)
 {
     int len;
     char *nameu;
-    datum key;
     Param pm = NULL;
 
     nameu = dupstring(name);
     unmetafy(nameu, &len);
-    key.dptr = nameu;
 
     pm = (Param) hcalloc(sizeof(struct param));
     pm->node.nam = nameu;

@@ -655,7 +655,10 @@ createparamtable(void)
     char **new_environ;
     int  envsize;
 #endif
-    char **envp, **envp2, **sigptr, **t;
+#ifndef USE_SET_UNSET_ENV
+    char **envp;
+#endif
+    char **envp2, **sigptr, **t;
     char buf[50], *str, *iname, *ivalue, *hostnam;
     int  oae = opts[ALLEXPORT];
 #ifdef HAVE_UNAME
@@ -721,7 +724,11 @@ createparamtable(void)
     /* Now incorporate environment variables we are inheriting *
      * into the parameter hash table. Copy them into dynamic   *
      * memory so that we can free them if needed               */
-    for (envp = envp2 = environ; *envp2; envp2++) {
+    for (
+#ifndef USE_SET_UNSET_ENV
+	envp = 
+#endif
+	    envp2 = environ; *envp2; envp2++) {
 	if (split_env_string(*envp2, &iname, &ivalue)) {
 	    if (!idigit(*iname) && isident(iname) && !strchr(iname, '[')) {
 		if ((!(pm = (Param) paramtab->getnode(paramtab, iname)) ||
@@ -993,9 +1000,7 @@ mod_export int
 isident(char *s)
 {
     char *ss;
-    int ne;
 
-    ne = noeval;		/* save the current value of noeval     */
     if (!*s)			/* empty string is definitely not valid */
 	return 0;
 

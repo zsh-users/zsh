@@ -1709,11 +1709,11 @@ par_simple(int *complex, int nr)
 		}
 		zshlex();
 	    } else {
-		int ll, sl, pl, c = 0;
+		int ll, sl, c = 0;
 
 		ll = ecadd(0);
 		sl = ecadd(0);
-		pl = ecadd(WCB_PIPE(WC_PIPE_END, 0));
+		(void)ecadd(WCB_PIPE(WC_PIPE_END, 0));
 
 		if (!par_cmd(&c)) {
 		    cmdpop();

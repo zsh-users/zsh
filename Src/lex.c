@@ -1698,7 +1698,7 @@ parse_subscript(char *s, int sub, int endchar)
 mod_export int
 parse_subst_string(char *s)
 {
-    int c, l = strlen(s), err, olen, lexstop_ret;
+    int c, l = strlen(s), err;
     char *ptr;
 
     if (!*s || !strcmp(s, nulstring))
@@ -1711,13 +1711,11 @@ parse_subst_string(char *s)
     bptr = tokstr = s;
     bsiz = l + 1;
     c = hgetc();
-    lexstop_ret = lexstop;
     c = gettokstr(c, 1);
     err = errflag;
     strinend();
     inpop();
     DPUTS(cmdsp, "BUG: parse_subst_string: cmdstack not empty.");
-    olen = len;
     lexrestore();
     errflag = err;
     if (c == LEXERR) {
@@ -1726,8 +1724,9 @@ parse_subst_string(char *s)
     }
 #ifdef DEBUG
     /*
-     * Historical note: we used to check here for olen == l, but
-     * that's not necessarily the case if we stripped an RCQUOTE.
+     * Historical note: we used to check here for olen (the value of len
+     * before lexrestore()) == l, but that's not necessarily the case if
+     * we stripped an RCQUOTE.
      */
     if (c != STRING || (errflag && !noerrs)) {
 	fprintf(stderr, "Oops. Bug in parse_subst_string: %s\n",

@@ -1477,7 +1477,7 @@ set_comp_sep(void)
      *      when stripping single quotes: 1 for RCQUOTES, 3 otherwise
      *      (because we leave a "'" in the final string).
      */
-    int dq = 0, odq, sq = 0, osq, qttype, sqq = 0, lsq = 0, qa = 0;
+    int dq = 0, odq, sq = 0, qttype, sqq = 0, lsq = 0, qa = 0;
     /* dolq: like sq and dq but for dollars quoting. */
     int dolq = 0;
     /* remember some global variable values (except lp is local) */
@@ -1582,7 +1582,6 @@ set_comp_sep(void)
 
     }
     odq = dq;
-    osq = sq;
     inpush(dupstrspace(tmp), 0, NULL);
     zlemetaline = tmp;
     /*
@@ -3306,7 +3305,7 @@ dupmatch(Cmatch m, int nbeg, int nend)
 mod_export int
 permmatches(int last)
 {
-    Cmgroup g = amatches, n, opm;
+    Cmgroup g = amatches, n;
     Cmatch *p, *q;
     Cexpl *ep, *eq, e, o;
     LinkList mlist;
@@ -3320,7 +3319,6 @@ permmatches(int last)
     }
     newmatches = fi = 0;
 
-    opm = pmatches;
     pmatches = lmatches = NULL;
     nmatches = smatches = diffmatches = 0;
 

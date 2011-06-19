@@ -1801,7 +1801,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    Eprog prog;
 
 		    if ((prog = parse_string(sortp->exec, 0))) {
-			int ef = errflag, lv = lastval, ret;
+			int ef = errflag, lv = lastval;
 
 			/* Parsed OK, execute for each name */
 			for (tmpptr = matchbuf; tmpptr < matchptr; tmpptr++) {
@@ -1814,7 +1814,6 @@ zglob(LinkList list, LinkNode np, int nountok)
 				tmpptr->sortstrs[iexec] = tmpptr->name;
 			}
 
-			ret = lastval;
 			errflag = ef;
 			lastval = lv;
 		    } else {

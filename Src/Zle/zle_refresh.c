@@ -2418,8 +2418,6 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	all_atr_off = TXT_ATTR_OFF_FROM_ON(all_atr_on);
 
 	if (tmpline[t0] == ZWC('\t')) {
-	    REFRESH_ELEMENT sp = zr_sp;
-	    sp.atr = base_atr_on;
 	    for (*vp++ = zr_sp; (vp - vbuf) & 7; )
 		*vp++ = zr_sp;
 	    vp[-1].atr |= base_atr_off;

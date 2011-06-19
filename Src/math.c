@@ -969,7 +969,6 @@ void
 op(int what)
 {
     mnumber a, b, c, *spval;
-    char *lv;
     int tp = type[what];
 
     if (errflag)
@@ -1155,7 +1154,6 @@ op(int what)
 	}
 	if (tp & (OP_E2|OP_E2IO)) {
 	    struct mathvalue *mvp = stack + sp + 1;
-	    lv = stack[sp+1].lval;
 	    c = setmathvar(mvp, c);
 	    push(c, mvp->lval, 0);
 	} else

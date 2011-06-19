@@ -529,7 +529,7 @@ parambeg(char *s)
 	 * or $'...').
 	 */
 	char *b = p + 1, *e = b;
-	int n = 0, br = 1, nest = 0;
+	int n = 0, br = 1;
 
 	if (*b == Inbrace) {
 	    char *tb = b;
@@ -543,8 +543,6 @@ parambeg(char *s)
 	    n = skipparens(Inpar, Outpar, &b);
 
 	    for (tb = p - 1; tb > s && *tb != Outbrace && *tb != Inbrace; tb--);
-	    if (tb > s && *tb == Inbrace && (tb[-1] == String || *tb == Qstring))
-		nest = 1;
 	}
 
 	/* Ignore the stuff before the parameter name. */

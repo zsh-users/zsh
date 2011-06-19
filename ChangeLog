@@ -1,5 +1,10 @@
 2011-06-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 29491: Src/glob.c, Src/lex.c, Src/math.c, Src/params.c,
+	Src/parse.c, Src/utils.c, Src/Modules/db_gdbm.c,
+	Src/Zle/compcore.c, Src/Zle/complist.c, Src/Zle/zle_refresh.c,
+	Src/Zle/zle_tricky.c: remove some variables set but not used.
+
 	* 29490: Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c,
 	Src/Builtins/rlimits.mdd: add RLIMIT_RTTIME.
 
@@ -15011,5 +15016,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5373 $
+* $Revision: 1.5374 $
 *****************************************************
