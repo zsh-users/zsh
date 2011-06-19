@@ -1,5 +1,7 @@
 2011-06-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Luka Perkov: 29493: Completion/Unix/Type/_pdf: handle apvlv.
+
 	* 29492: Doc/Zsh/func.yo, Src/exec.c, Src/parse.c, Src/text.c,
 	Test/C04funcdef.ztst: add argument handling to anonymous functions.
 
@@ -15022,5 +15024,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5376 $
+* $Revision: 1.5377 $
 *****************************************************
