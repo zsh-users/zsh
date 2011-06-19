@@ -541,8 +541,6 @@ parambeg(char *s)
 	    /* Ignore the possible (...) flags. */
 	    b++, br++;
 	    n = skipparens(Inpar, Outpar, &b);
-
-	    for (tb = p - 1; tb > s && *tb != Outbrace && *tb != Inbrace; tb--);
 	}
 
 	/* Ignore the stuff before the parameter name. */
