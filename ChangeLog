@@ -1,3 +1,8 @@
+2011-06-20  Peter Stephenson  <pws@csr.com>
+
+	* unposted: update version to 4.3.12-dev-1 as wordcode
+	now incompatible with anonymous functions.
+
 2011-06-20  Doug Kearns  <dougkearns@gmail.com>
 
 	* unposted: Completion/BSD/Command/_sockstat,
@@ -15033,5 +15038,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5378 $
+* $Revision: 1.5379 $
 *****************************************************
