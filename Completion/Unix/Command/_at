@@ -7,29 +7,29 @@ typeset -A opt_args
 case $service in
 atrm)
   _arguments \
-    '-V[Print version number]' \
+    '-V[print version number]' \
     '*:job number:->jobs'
   ;;
 atq)
   _arguments \
-    '-V[Print version number]' \
-    '-q[Uses specified queue]:a-z+A-Z'
+    '-V[print version number]' \
+    '-q[uses specified queue]:a-z+A-Z'
   ;;
 at|batch)
   _arguments \
     - new-job \
-      '-V[Print version number]' \
-      '-q[Uses specified queue, uppercase acts as batch]:a-z+A-Z' \
-      '-f[Read job from file rather than from stdin]:file:_files' \
-      '-v[Show the time the job will be executed]' \
-      '-m[Send mail even if there was no output]' \
+      '-V[print version number]' \
+      '-q[uses specified queue, uppercase acts as batch]:a-z+A-Z' \
+      '-f[read job from file rather than from stdin]:file:_files' \
+      '-v[show the time the job will be executed]' \
+      '-m[send mail even if there was no output]' \
       ':time:' \
     - atq \
-      '-l[Alias for atq]' \
+      '-l[alias for atq]' \
     - atrm \
-      '-d[Alias for atrm]' \
+      '-d[alias for atrm]' \
     - show-job \
-      '-c[Cat specified jobs to stdout]:*:job number:->jobs'
+      '-c[cat specified jobs to stdout]:*:job number:->jobs'
 esac
 
 case $state in

@@ -30,7 +30,7 @@ _arguments \
   '--git-prebuild=-[command to run before a build]:command:' \
   '--git-postbuild=-[hook run after a successful build]:command:' \
   '--git-posttag=-[hook run after a successful tag operation]:command:' \
-  '--git-pbuilder[Invoke git-pbuilder for building]' \
+  '--git-pbuilder[invoke git-pbuilder for building]' \
   '--git-no-pbuilder[negates --git-pbuilder]' \
   '--git-dist=-[build for this distribution when using git-pbuilder]:distribution:' \
   '--git-arch=-[build for this architecture when using git-pbuilder]:architecture:' \

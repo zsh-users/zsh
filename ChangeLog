@@ -1,3 +1,12 @@
+2011-06-20  Doug Kearns  <dougkearns@gmail.com>
+
+	* unposted: Completion/BSD/Command/_sockstat,
+	Completion/Debian/Command/_git-buildpackage,
+	Completion/Unix/Command/_at, Completion/Unix/Command/_lp,
+	Completion/Unix/Command/_unison, Completion/X/Command/_matlab,
+	Completion/X/Command/_okular, Completion/Zsh/Function/_zargs: clean up
+	completion descriptions as per Etc/completion-style-guide.
+
 2011-06-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Luka Perkov: 29493: Completion/Unix/Type/_pdf: handle apvlv.
@@ -15024,5 +15033,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5377 $
+* $Revision: 1.5378 $
 *****************************************************

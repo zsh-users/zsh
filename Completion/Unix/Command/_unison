@@ -42,7 +42,7 @@ _arguments \
     '-copythreshold[use copyprog on files bigger than this]:size (kb):' \
     '-debug:debug module:(all verbose)' \
     '-diff[command for showing differences between files]:program:_files -g "*(-x)"' \
-    '-dontchmod[When set, never use the chmod system call]' \
+    '-dontchmod[when set, never use the chmod system call]' \
     '-dumbtty[do not change terminal settings in text UI]' \
     '-fastcheck:fast update detection:(true false default)' \
     '-forcepartial[add a pattern to the forcepartial list]:pattern:' \
@@ -63,7 +63,7 @@ _arguments \
     '-mountpoint[abort if this path does not exist]:mountpoint:_files -/' \
     '-numericids[dont map uid/gid values by user/group names]' \
     '-preferpartial[add a pattern to the preferpartial list]:pattern:' \
-    '-pretendwin[Use creation times for detecting updates]' \
+    '-pretendwin[use creation times for detecting updates]' \
     '-repeat[synchronize repeatedly (text interface only)]:repeat:' \
     '-retry[re-try failed synchronizations N times (text ui only)]:retry times:' \
     '-rootalias[register alias for canonical root names]:root alias:' \

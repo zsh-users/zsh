@@ -133,7 +133,7 @@ _lp()
   case $service in
     (lpq)
       _arguments \
-	'-E[Force encryption]' \
+	'-E[force encryption]' \
 	'-U:username (for connection to server):_users' \
 	'-h:alternate server:_hosts' \
 	'(-a)-P+[destination printer]:printers:_printers' \
@@ -144,7 +144,7 @@ _lp()
 
     (lprm)
       _arguments \
-	'-E[Force encryption]' \
+	'-E[force encryption]' \
 	'-U:username (for connection to server):_users' \
 	'-h:alternate server:_hosts' \
 	'-P+[destination printer]:printers:_printers' \
@@ -153,7 +153,7 @@ _lp()
 
     (lpoptions)
       _arguments \
-	'-E[Force encryption]' \
+	'-E[force encryption]' \
 	'-U:username (for connection to server):_users' \
 	'-h:alternate server:_hosts' \
 	'(-p -l -r -x)-d[set default printer]:printers:_printers' \
@@ -166,58 +166,58 @@ _lp()
 
     (lpstat)
       _arguments \
-	'-E[Force encryption]' \
-	'-R[Shows print job ranking]' \
+	'-E[force encryption]' \
+	'-R[shows print job ranking]' \
 	'-U:username (for connection to server):_users' \
 	'-W:which jobs:(completed not-completed)' \
-	'-a[Show accepting state]:printers:_printers' \
+	'-a[show accepting state]:printers:_printers' \
 	'-c:printer classes:' \
-	'-d[Show current default destination]' \
+	'-d[show current default destination]' \
 	'-h:hostname (alternate server):_hosts' \
 	'-l[long listing]' \
 	'-o[destinations]:printers:_printers' \
 	'-p:printers:_printers' \
 	'-r[CUPS server running status]' \
-	'-s[Status summary]' \
-	'-t[All status info]' \
+	'-s[status summary]' \
+	'-t[all status info]' \
 	'-u[list jobs by users]:users:_users' \
 	'-v[show devices]:printers:_printers'
       ;;
 
     (lpr)
       _arguments \
-	'-E[Force encryption]' \
+	'-E[force encryption]' \
 	'-H:hostname (alternate server):_hosts' \
 	'(-C -J -T)'-{C,J,T}':job name:' \
 	'-P+[destination printer]:printers:_printers' \
 	'-U:username (for connection to server):_users' \
-	'-#[Copies]:copies (1--100):' \
-	'-h[Disables banner printing]' \
+	'-#[copies]:copies (1--100):' \
+	'-h[disables banner printing]' \
 	'-l[raw file]' \
-	'-m[Send an email on job completion]' \
+	'-m[send an email on job completion]' \
 	'*-o:print job options:_lp_job_options' \
 	'-p[format with shaded header incl. date, time etc.]' \
-	'-q[Hold job for printing.]' \
+	'-q[hold job for printing]' \
 	'-r[delete files after printing]' \
 	'*:PS/PDF files:_pspdf'
       ;;
 
     (lp)
       _arguments \
-	'-E[Force encryption]' \
+	'-E[force encryption]' \
 	'-U[username (for connection to server)]:username:_users' \
 	'-c[(OBSOLETE) copy to spool dir before printing]' \
 	'-d[destination printer]:printers:_printers' \
 	'-h:hostname (alternate server):_hosts' \
 	'-i[job id to modify]:job id:' \
-	'-m[Send an email on job completion]' \
-	'-n[Copies]:copies (1--100):' \
+	'-m[send an email on job completion]' \
+	'-n[copies]:copies (1--100):' \
 	'*-o:print job options:_lp_job_options' \
-	'-q[Job priority -- 1 (lowest) to 100 (highest)]:priority:' \
-	'-s[Dont report resulting job IDs]' \
-	'-t[Sets the job name]:job name:' \
+	'-q[job priority -- 1 (lowest) to 100 (highest)]:priority:' \
+	'-s[dont report resulting job IDs]' \
+	'-t[sets the job name]:job name:' \
 	'-u[job submission username]:username:_users' \
-	'-H[Time to print]:print time (or enter hh\:mm):(hold immediate restart resume)' \
+	'-H[time to print]:print time (or enter hh\:mm):(hold immediate restart resume)' \
 	'-P:page range list:' \
 	'*:PS/PDF files:_pspdf'
       ;;
