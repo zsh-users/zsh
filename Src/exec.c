@@ -4343,6 +4343,7 @@ loadautofn(Shfunc shf, int fksh, int autol)
     }
     if (!prog) {
 	zsfree(fname);
+	popheap();
 	return NULL;
     }
     if (ksh == 2 || (ksh == 1 && isset(KSHAUTOLOAD))) {

@@ -2146,10 +2146,6 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	ss = quotename(ss, NULL);
 	untokenize(ss);
 	inststr(ss);
-#if 0
-	if (olst != COMP_EXPAND_COMPLETE || nonempty(vl) ||
-	    (zlemetacs && zlemetaline[zlemetacs-1] != '/')) {
-#endif
 	if (nonempty(vl) || !first) {
 	    spaceinline(1);
 	    zlemetaline[zlemetacs++] = ' ';

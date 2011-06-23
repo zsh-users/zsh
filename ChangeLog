@@ -1,3 +1,7 @@
+2011-06-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 29503: Src/exec.c: Missing popheap() on failed autoload.
+
 2011-06-20  Peter Stephenson  <pws@csr.com>
 
 	* unposted: update version to 4.3.12-dev-1 as wordcode
@@ -15038,5 +15042,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5379 $
+* $Revision: 1.5380 $
 *****************************************************
