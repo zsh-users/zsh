@@ -1,3 +1,8 @@
+2011-06-27  Peter Stephenson  <pws@csr.com>
+
+	*  Mikael Muszynski: 29510: Completion/X/Command/_mplayer:
+	complete .m4v files.
+
 2011-06-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 29503: Src/exec.c: Missing popheap() on failed autoload.
@@ -15042,5 +15047,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5380 $
+* $Revision: 1.5381 $
 *****************************************************
