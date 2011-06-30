@@ -70,6 +70,9 @@ vcs_info () {
     if (( retval == 1 )); then
         return 0
     elif (( retval == 2 )); then
+        # This needs `max-exports' set. We're still setting it again later
+        # for more specific contexts.
+        VCS_INFO_maxexports
         VCS_INFO_set --nvcs
         return 0
     fi
