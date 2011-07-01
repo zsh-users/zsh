@@ -4613,6 +4613,12 @@ _git_commands () {
   _describe -t plumbing-sync-commands 'plumbing sync command' plumbing_sync_commands && ret=0
   _describe -t plumbing-sync-helper-commands 'plumbing sync helper command' plumbing_sync_helper_commands && ret=0
   _describe -t plumbing-internal-helper-commands 'plumbing internal helper command' plumbing_internal_helper_commands && ret=0
+  local -a addons
+  local a
+  for a in $_git_third_party; do
+      (( ${+commands[git-${a%%:*}]} )) && addons+=( $a )
+  done
+  _describe -t third-party-addons 'third party addon' addons && ret=0
   return ret
 }
 
@@ -6048,5 +6054,43 @@ _git() {
   fi
   return ret
 }
+
+# Handle add-on completions. Say you got a third party add-on `foo'. What you
+# want to do is write your completion as `_git-foo' and this code will pick it
+# up. That should be a regular compsys function, which starts like this:
+#
+#  #compdef git-foo
+#
+# In addition to what compinit does, this also reads the second line of the
+# completion. If that matches "#desc:*" the part behind "#desc:" will be used
+# as the addon's description. Like this:
+#
+#  #desc:checks git's foobar value
+local addon input i desc
+typeset -gUa _git_third_party
+for addon in ${^fpath}/_git-*~*~(.N); do
+    if [[ -n ${(M)_git_third_party:#${${addon:t}#_git-}*} ]]; then
+        # This makes sure only the first _git-foo in $fpath gets read.
+        continue
+    fi
+    # Read the second line of the file.
+    i=1
+    desc=
+    while read input; do
+        if (( i == 2 )); then
+            desc=$input
+            break
+        fi
+        (( i++ ))
+    done < $addon
+    # Setup `$desc' appropriately.
+    if [[ $desc != '#desc:'* ]]; then
+        desc=
+    else
+        desc=${desc#\#desc}
+    fi
+    # Add the addon's completion.
+    _git_third_party+=( ${${addon:t}#_git-}$desc )
+done
 
 _git

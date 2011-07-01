@@ -6,6 +6,9 @@
 	* 29527: Completion/Unix/Command/_git: Make file-completion
 	fallback optional.
 
+	* 29519: Completion/Unix/Command/_git: Pick up addon completions
+	from $fpath.
+
 2011-06-30  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 29526: Functions/VCS_Info/vcs_info: Set `max-exports' early
@@ -15065,5 +15068,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5385 $
+* $Revision: 1.5386 $
 *****************************************************
