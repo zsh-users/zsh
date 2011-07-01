@@ -4619,6 +4619,9 @@ _git_commands () {
       (( ${+commands[git-${a%%:*}]} )) && addons+=( $a )
   done
   _describe -t third-party-addons 'third party addon' addons && ret=0
+  local -a user_commands
+  zstyle -a ":completion:${curcontext}:" user-commands user_commands || user_commands=()
+  _describe -t user-specific-commands 'user specific command' user_commands && ret=0
   return ret
 }
 
