@@ -6023,7 +6023,12 @@ _git() {
       (option-or-argument)
         curcontext=${curcontext%:*:*}:git-$words[1]:
 
-        _call_function ret _git-$words[1]
+        if (( ${+functions[_git-$words[1]]} )); then
+            _git-$words[1]
+        else
+            _path_files
+            ret=$?
+        fi
         ;;
     esac
   else
