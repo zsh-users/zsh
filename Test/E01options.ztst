@@ -353,6 +353,10 @@
   echo *NonExistentFile*)
 0:NO_EXEC option should not do globbing
 
+  (setopt noexec
+  echo ${unset_var?Not an error})
+0:NO_EXEC should not test for unset variables
+
   setopt NO_eval_lineno
   eval 'print $LINENO'
   setopt eval_lineno

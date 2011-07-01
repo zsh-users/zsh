@@ -2715,19 +2715,21 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	case '?':
 	case Quest:
 	    if (vunset) {
-		*idend = '\0';
-		zerr("%s: %s", idbeg, *s ? s : "parameter not set");
-		if (!interact) {
-		    if (mypid == getpid()) {
-			/*
-			 * paranoia: don't check for jobs, but there shouldn't
-			 * be any if not interactive.
-			 */
-			stopmsg = 1;
-			zexit(1, 0);
-		    } else
-			_exit(1);
-		}
+                if (isset(EXECOPT)) {
+                    *idend = '\0';
+                    zerr("%s: %s", idbeg, *s ? s : "parameter not set");
+                    if (!interact) {
+                        if (mypid == getpid()) {
+                            /*
+                             * paranoia: don't check for jobs, but there
+                             * shouldn't be any if not interactive.
+                             */
+                            stopmsg = 1;
+                            zexit(1, 0);
+                        } else
+                            _exit(1);
+                    }
+                }
 		return NULL;
 	    }
 	    break;
