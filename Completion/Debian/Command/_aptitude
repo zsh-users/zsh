@@ -13,6 +13,39 @@ ${${(M)${(f)"$(</etc/apt/sources.list)"}\
   #}}}
 }
 
+# Helper function for -F / --display-format
+function _aptitude_format_strings() {
+  _values -s , 'format string' \
+    '%%[Literal %]' \
+    '%#number[Parameter replacement]' \
+    '%a[Action flag]' \
+    '%A[Action]' \
+    '%B[Broken count]' \
+    '%c[Current state flag]' \
+    '%C[Current state]' \
+    '%d[Description]' \
+    '%H[Hostname]' \
+    '%i[Pin priority]' \
+    '%I[Installed size]' \
+    '%m[Maintainer]' \
+    '%M[Automatic flag]' \
+    '%n[Program version]' \
+    '%N[Program name]' \
+    '%o[Download size]' \
+    '%p[Package name]' \
+    '%P[Priority]' \
+    '%r[Reverse depends count]' \
+    '%R[Abbreviated priority]' \
+    '%s[Section]' \
+    '%S[Trust status]' \
+    '%t[Archive]' \
+    '%T[Tagged]' \
+    '%u[Disk usage change]' \
+    '%v[Current version]' \
+    '%V[Candidate version]' \
+    '%Z[Size change]'
+}
+
 _arguments -C \
   '(- 1 *)'{-h,--help}'[display help information]' \
   '(- 1 *)--version[display version information]' \
@@ -20,7 +53,7 @@ _arguments -C \
   '(-d --download-only)'{-d,--download-only}"[just download packages - don\'t install]" \
   '(-P --prompt)'{-P,--prompt}'[always display a prompt]' \
   '(-y --assume-yes)'{-y,--assume-yes}'[assume yes answer to questions]' \
-  '(-F --display-format)'{-F,--display-format}'[specify output format for search command]:format' \
+  '(-F --display-format)'{-F,--display-format}'[specify output format for search command]:format:_aptitude_format_strings' \
   '(-O --sort)'{-O,--sort}'[specify sort order]:sort order:()' \
   '(-w --width)'{-w,--width}'[specify output width]:width' \
   '-f[aggressivley try to fix dependencies of broken packages]' \

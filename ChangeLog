@@ -15,6 +15,9 @@
 	* 29523: Completion/Debian/Command/_git-buildpackage: Use "#desc:"
 	line for _git third-party add-on completion description.
 
+	* Daniel Bolton: 29529: Completion/Debian/Command/_aptitude: Complete
+	format specifiers with the `-F' option.
+
 2011-06-30  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 29526: Functions/VCS_Info/vcs_info: Set `max-exports' early
@@ -15074,5 +15077,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5388 $
+* $Revision: 1.5389 $
 *****************************************************
