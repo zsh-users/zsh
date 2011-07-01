@@ -17,6 +17,16 @@
 #
 # You could even create a function _git-foo() to handle specific completion
 # for that command.
+#
+# When _git does not know a given sub-command (say `bar'), it falls back to
+# completing file names for all arguments to that sub command. I.e.:
+#
+#     % git bar <tab>
+#
+# ...will complete file names. If you do *not* want that fallback to be used,
+# use the `use-fallback' style like this:
+#
+#     % zstyle ':completion:*:*:git*:*' use-fallback false
 
 # TODO: There is still undocumented configurability in here.
 
@@ -6025,9 +6035,11 @@ _git() {
 
         if (( ${+functions[_git-$words[1]]} )); then
             _git-$words[1]
-        else
+        elif zstyle -T ":completion:${curcontext}:" use-fallback; then
             _path_files
             ret=$?
+        else
+            _message 'Unknown sub-command'
         fi
         ;;
     esac
