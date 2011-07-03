@@ -1,6 +1,6 @@
 2011-07-03  Frank Terbeck  <ft@bewatermyfriend.org>
 
-	* unposted: Doc/Zsh/contrib.yo: Fix typo "paramter" to. Caught by
+	* unposted: Doc/Zsh/contrib.yo: Fix typo "paramter". Caught by
 	debian's lintian.
 
 2011-07-01  Peter Stephenson  <pws@csr.com>
@@ -15092,5 +15092,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5392 $
+* $Revision: 1.5393 $
 *****************************************************
