@@ -2,6 +2,7 @@ DISTFILES_SRC='
 .distfiles
 _a2ps
 _aap
+_adb
 _ant
 _antiword
 _apachectl

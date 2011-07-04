@@ -1,3 +1,8 @@
+2011-07-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Eric Moors: 29531: Completion/Unix/Command/_adb: completion
+	for Android debugger.
+
 2011-07-03  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* unposted: Doc/Zsh/contrib.yo: Fix typo "paramter". Caught by
@@ -15092,5 +15097,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5393 $
+* $Revision: 1.5394 $
 *****************************************************
