@@ -1233,7 +1233,7 @@ zleread(char **lp, char **rp, int flags, int context)
     alarm(0);
 
     freeundo();
-    if (eofsent) {
+    if (eofsent || errflag) {
 	s = NULL;
     } else {
 	zleline[zlell++] = ZWC('\n');

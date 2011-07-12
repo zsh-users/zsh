@@ -876,7 +876,18 @@ hbegin(int dohist)
 	stophist = (!interact || unset(SHINSTDIN)) ? 2 : 0;
     else
 	stophist = 0;
-    if (stophist == 2 || (inbufflags & INP_ALIAS)) {
+    /*
+     * pws: We used to test for "|| (inbufflags & INP_ALIAS)"
+     * in this test, but at this point we don't have input
+     * set up up so this can trigger unnecessarily.
+     * I don't see how the test at this point could ever be
+     * useful, since we only get here when we're initialising
+     * the history mechanism, before we've done any input.
+     *
+     * (I also don't see any point where this function is called with
+     * dohist=0.)
+     */
+    if (stophist == 2) {
 	chline = hptr = NULL;
 	hlinesz = 0;
 	chwords = NULL;
@@ -3090,7 +3101,10 @@ histsplitwords(char *lineptr, short **wordsp, int *nwordsp, int *nwordposp,
 	     wordnode;
 	     incnode(wordnode)) {
 	    char *word = getdata(wordnode);
+	    char *lptr, *wptr = word;
+	    int loop_next = 0, skipping;
 
+	    /* Skip stuff at the start of the word */
 	    for (;;) {
 		/*
 		 * Not really an oddity: "\\\n" is
@@ -3098,57 +3112,119 @@ histsplitwords(char *lineptr, short **wordsp, int *nwordsp, int *nwordposp,
 		 */
 		if (inblank(*lineptr))
 		    lineptr++;
-		else if (lineptr[0] == '\\' && lineptr[1] == '\n')
+		else if (lineptr[0] == '\\' && lineptr[1] == '\n') {
+		    /*
+		     * Optimisation: we handle this in the loop below,
+		     * too.
+		     */
 		    lineptr += 2;
-		else
+		} else
 		    break;
 	    }
-	    if (!strpfx(word, lineptr)) {
-		int bad = 0;
-		/*
-		 * Oddity 1: newlines turn into semicolons.
-		 */
-		if (!strcmp(word, ";"))
-		    continue;
-		while (*lineptr) {
-		    if (!*word) {
-			bad = 1;
-			break;
-		    }
+	    lptr = lineptr;
+	    /*
+	     * Skip chunks of word with possible intervening
+	     * backslash-newline.
+	     *
+	     * To get round C's annoying lack of ability to
+	     * reference the outer loop, we'll break from this
+	     * one with
+	     * loop_next = 0: carry on as normal
+	     * loop_next = 1: break from outer loop
+	     * loop_next = 2: continue round outer loop.
+	     */
+	    do {
+		skipping = 0;
+		if (strpfx(wptr, lptr)) {
 		    /*
-		     * Oddity 2: !'s turn into |'s.
+		     * Normal case: word from lexer matches start of
+		     * string from line.  Just advance over it.
 		     */
-		    if (*lineptr == *word ||
-			(*lineptr == '!' && *word == '|')) {
-			lineptr++;
-			word++;
-		    } else {
-			bad = 1;
+		    int len;
+		    if (!strcmp(wptr, ";") && strpfx(";;", lptr)) {
+			/*
+			 * Don't get confused between a semicolon that's
+			 * probably really a newline and a double
+			 * semicolon that's terminating a case.
+			 */
+			loop_next = 2;
 			break;
 		    }
-		}
-		if (bad) {
+		    len = strlen(wptr);
+		    lptr += len;
+		    wptr += len;
+		} else {
+		    /*
+		     * Didn't get to the end of the word.
+		     * See what's amiss.
+		     */
+		    int bad = 0;
+		    /*
+		     * Oddity 1: newlines turn into semicolons.
+		     */
+		    if (!strcmp(wptr, ";"))
+		    {
+			loop_next = 2;
+			break;
+		    }
+		    while (*lptr) {
+			if (!*wptr) {
+			    /*
+			     * End of the word before the end of the
+			     * line: not good.
+			     */
+			    bad = 1;
+			    loop_next = 1;
+			    break;
+			}
+			/*
+			 * Oddity 2: !'s turn into |'s.
+			 */
+			if (*lptr == *wptr ||
+			    (*lptr == '!' && *wptr == '|')) {
+			    lptr++;
+			    wptr++;
+			} else if (lptr[0] == '\\' &&
+				   lptr[1] == '\n') {
+			    /*
+			     * \\\n can occur in the middle of a word;
+			     * wptr is already pointing at this, we
+			     * just need to skip over the break
+			     * in lptr and look at the next chunk.
+			     */
+			    lptr += 2;
+			    skipping = 1;
+			    break;
+			} else {
+			    bad = 1;
+			    loop_next = 1;
+			    break;
+			}
+		    }
+		    if (bad) {
 #ifdef DEBUG
-		    dputs(ERRMSG("bad wordsplit reading history: "
-				 "%s\nat: %s\nword: %s"),
-			  start, lineptr, word);
+			dputs(ERRMSG("bad wordsplit reading history: "
+				     "%s\nat: %s\nword: %s"),
+			      start, lineptr, word);
 #endif
-		    lineptr = start;
-		    nwordpos = 0;
-		    uselex = 0;
-		    break;
+			lineptr = start;
+			nwordpos = 0;
+			uselex = 0;
+			loop_next = 1;
+		    }
 		}
-	    } else if (!strcmp(word, ";") && strpfx(";;", lineptr)) {
-		/*
-		 * Don't get confused between a semicolon that's
-		 * probably really a newline and a double
-		 * semicolon that's terminating a case.
-		 */
+	    } while (skipping);
+	    if (loop_next) {
+		if (loop_next == 1)
+		    break;
 		continue;
 	    }
+	    /* Record position of current word... */
 	    words[nwordpos++] = lineptr - start;
-	    lineptr += strlen(word);
-	    words[nwordpos++] = lineptr - start;
+	    words[nwordpos++] = lptr - start;
+
+	    /* ready for start of next word. */
+	    lineptr = lptr;
 	}
     }
     if (!uselex) {

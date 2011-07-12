@@ -1,3 +1,12 @@
+2011-07-12  Peter Stephenson  <pws@csr.com>
+
+	* 29543: Src/hist.c: saved history lines with backslash-newline
+	in the middle of words confused histlexwords.
+
+	* 29542: Src/hist.c, Src/Zle/zle_main.c: remove test when
+	initialising history that could cause crashes (and was probably
+	never useful); ensure ZLE returns NULL if there's an error.
+
 2011-07-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Eric Moors: 29531: Completion/Unix/Command/_adb: completion
@@ -15097,5 +15106,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5394 $
+* $Revision: 1.5395 $
 *****************************************************
