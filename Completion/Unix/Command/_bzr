@@ -259,7 +259,7 @@ case $cmd in
 	)
     ;;
 
-(diff|dif|di)
+(diff|dif|di|cdiff)
     args+=(
 	'(-r --revision)'{--revision=,-r}'[revision]:revision:'
 	'--diff-options=[options to pass to gdiff]:diff options:'
