@@ -2246,10 +2246,12 @@ readhistfile(char *fn, int err, int readflags)
 
     if (!fn && !(fn = getsparam("HISTFILE")))
 	return;
+    if (stat(unmeta(fn), &sb) < 0 ||
+	sb.st_size == 0)
+	return;
     if (readflags & HFILE_FAST) {
-	if (stat(unmeta(fn), &sb) < 0
-	 || (lasthist.fsiz == sb.st_size && lasthist.mtim == sb.st_mtime)
-	 || lockhistfile(fn, 0))
+	if ((lasthist.fsiz == sb.st_size && lasthist.mtim == sb.st_mtime)
+	    || lockhistfile(fn, 0))
 	    return;
 	lasthist.fsiz = sb.st_size;
 	lasthist.mtim = sb.st_mtime;

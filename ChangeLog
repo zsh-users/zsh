@@ -1,3 +1,7 @@
+2011-07-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/16131: Src/hist.c: skip reading an empty history file.
+
 2011-07-18  Peter Stephenson  <pws@csr.com>
 
 	* Matthieu Baerts: 29547: Completion/Unix/Command/_bzr: cdiff
@@ -15111,5 +15115,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5396 $
+* $Revision: 1.5397 $
 *****************************************************
