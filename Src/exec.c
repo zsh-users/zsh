@@ -3008,11 +3008,17 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		if (!checkclobberparam(fn))
 		    fil = -1;
 		else if (fn->fd2 > 9 &&
-			 (fn->fd2 > max_zsh_fd ||
-			  (fdtable[fn->fd2] != FDT_UNUSED &&
-			   fdtable[fn->fd2] != FDT_EXTERNAL) ||
-			  fn->fd2 == coprocin ||
-			  fn->fd2 == coprocout)) {
+			 /*
+			  * If the requested fd is > max_zsh_fd,
+			  * the shell doesn't know about it.
+			  * Just assume the user knows what they're
+			  * doing.
+			  */
+			 (fn->fd2 <= max_zsh_fd &&
+			  ((fdtable[fn->fd2] != FDT_UNUSED &&
+			    fdtable[fn->fd2] != FDT_EXTERNAL) ||
+			   fn->fd2 == coprocin ||
+			   fn->fd2 == coprocout))) {
 		    fil = -1;
 		    errno = EBADF;
 		} else {

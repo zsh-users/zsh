@@ -1,3 +1,8 @@
+2011-07-19  Peter Stephenson  <pws@csr.com>
+
+	* 29555: Src/exec.c: fix problem that shell failed to use file
+	descriptor opened in parent if beyond max_zsh_fd.
+
 2011-07-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/16131: Src/hist.c: skip reading an empty history file.
@@ -15115,5 +15120,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5397 $
+* $Revision: 1.5398 $
 *****************************************************
