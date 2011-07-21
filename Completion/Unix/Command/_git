@@ -36,7 +36,7 @@
 
 (( $+functions[_git-add] )) ||
 _git-add () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   local ignore_missing=
@@ -75,6 +75,8 @@ _git-add () {
         $ignored_files_alternatives && ret=0
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-am] )) ||
@@ -109,12 +111,12 @@ _git-am () {
     '--patch-format=-[specify format patches are in]:patch format:((mbox\:"mbox format"
                                                                     stgit-series\:"StGit patch series"
                                                                     stgit\:"stgit format"))' \
-    '*:mbox file:_files' && ret=0
+    '*:mbox file:_files'
 }
 
 (( $+functions[_git-archive] )) ||
 _git-archive () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   declare -a backend_args
@@ -155,6 +157,8 @@ _git-archive () {
       __git_tree_files ${PREFIX:-.} $line[1] && ret=0
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-applymbox] )) ||
@@ -166,14 +170,14 @@ _git-applymbox () {
     '-u[encode commit information in UTF-8]' \
     '(1)-c[restart command after fixing an unclean patch]:patch:_files -g ".dotest/0*"' \
     ':mbox file:_files' \
-    '::signoff file:__git_signoff_file' && ret=0
+    '::signoff file:__git_signoff_file'
 }
 
 (( $+functions[_git-bisect] )) ||
 _git-bisect () {
   # TODO: next subcommand is undocumented.  Git-bisect.sh mentions that the
   # subcommand might be removed from the UI level.
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -C \
@@ -256,6 +260,8 @@ _git-bisect () {
       esac
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-branch] )) ||
@@ -316,12 +322,12 @@ _git-branch () {
     $dependent_modification_args \
     "($l $c $m -D)-d[delete a fully merged branch]" \
     "($l $c $m -d)-D[delete a branch]" \
-    $dependent_deletion_args && ret=0
+    $dependent_deletion_args
 }
 
 (( $+functions[_git-bundle] )) ||
 _git-bundle () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -C \
@@ -369,6 +375,8 @@ _git-bundle () {
       esac
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-checkout] )) ||
@@ -381,7 +389,7 @@ _git-checkout () {
     new_branch_reflog_opt="(--patch)-l[create the new branch's reflog]"
   fi
 
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -w -C -s \
@@ -430,7 +438,7 @@ _git-checkout () {
           $tree_ish_arg \
           $file_arg && ret=0
       elif [[ -n ${opt_args[(I)-b|-B|-t|--track|--orphan]} ]]; then
-        _nothing && ret=0
+        _nothing
       elif [[ -n $line[1] ]] && __git_is_treeish $line[1]; then
         __git_ignore_line __git_tree_files ${PREFIX:-.} $line[1] && ret=0
       else
@@ -438,6 +446,8 @@ _git-checkout () {
       fi
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-cherry-pick] )) ||
@@ -449,7 +459,7 @@ _git-cherry-pick () {
     '(-n --no-commit --ff)'{-n,--no-commit}'[do not make the actually commit]' \
     '(-s --signoff --ff)'{-s,--signoff}'[add Signed-off-by line at the end of the commit message]' \
     '(-e --edit -x -n --no-commit -s --signoff)--ff[fast forward, if possible]' \
-    ': :__git_revisions' && ret=0
+    ': :__git_revisions'
 }
 
 (( $+functions[_git-citool] )) ||
@@ -459,7 +469,7 @@ _git-citool () {
 
 (( $+functions[_git-clean] )) ||
 _git-clean () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -w -C -S -s \
@@ -509,11 +519,13 @@ _git-clean () {
         $other_files_alt && ret=0
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-clone] )) ||
 _git-clone () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   # TODO: Argument to -o should be a remote name.
@@ -548,6 +560,8 @@ _git-clone () {
       fi
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-commit] )) ||
@@ -599,7 +613,7 @@ _git-commit () {
       {-F,--file=}'[read commit message from given file]: :_files' \
       {-m,--message=}'[use the given message as the commit message]:message' \
       {-t,--template=}'[use file as a template commit message]:template:_files' \
-      $amend_opt && ret=0
+      $amend_opt
 }
 
 (( $+functions[_git-describe] )) ||
@@ -616,12 +630,12 @@ _git-describe () {
     '(--abbrev)--long[always show full format, even for exact matches]' \
     '--match=[only consider tags matching glob pattern]:pattern' \
     '--always[show uniquely abbreviated commit object as fallback]' \
-    '*: :__git_committishs' && ret=0
+    '*: :__git_committishs'
 }
 
 (( $+functions[_git-diff] )) ||
 _git-diff () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   local -a diff_options
@@ -699,11 +713,13 @@ _git-diff () {
       esac
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-fetch] )) ||
 _git-fetch () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   local -a fetch_options
@@ -727,11 +743,13 @@ _git-fetch () {
       fi
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-format-patch] )) ||
 _git-format-patch () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   local -a diff_options
@@ -780,6 +798,8 @@ _git-format-patch () {
       fi
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-gc] )) ||
@@ -789,7 +809,7 @@ _git-gc () {
     '--auto[check whether housekeeping is required]' \
     '(        --no-prune)--prune=[prune loose objects older than given date]: :__git_datetimes' \
     '(--prune           )--no-prune[do not prune any loose objects]' \
-    '--quiet[suppress all progress reports]' && ret=0
+    '--quiet[suppress all progress reports]'
 }
 
 (( $+functions[_git-grep] )) ||
@@ -804,7 +824,7 @@ _git-grep () {
       '--not[the following pattern must not match]')
   fi
 
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   # TODO: Need to implement -<num> as a shorthand for -C<num>
@@ -881,17 +901,19 @@ _git-grep () {
       fi
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-gui] )) ||
 _git-gui () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -C \
     '--version[display version information]' \
     ': :->command' \
-    '*:: :->arg'
+    '*:: :->arg' && ret=0
 
   case $state in
     (command)
@@ -910,7 +932,7 @@ _git-gui () {
 
       case $line[1] in
         (blame)
-          _git-blame
+          _git-blame && ret=0
           ;;
         (browser)
           _arguments -C \
@@ -924,7 +946,7 @@ _git-gui () {
           esac
           ;;
         (citool)
-          _git-citool
+          _git-citool && ret=0
           ;;
         (version)
           _nothing
@@ -935,6 +957,8 @@ _git-gui () {
       esac
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-init] )) ||
@@ -944,12 +968,12 @@ _git-init () {
     '--bare[create a bare repository]' \
     '--template=[directory to use as a template for the object database]: :_directories' \
     '--shared=[share repository amongst several users]:: :__git_repository_permissions' \
-    ':: :_directories' && ret=0
+    ':: :_directories'
 }
 
 (( $+functions[_git-log] )) ||
 _git-log () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   local -a log_options revision_options
@@ -988,6 +1012,8 @@ _git-log () {
           ;;
       esac
   esac
+
+  return ret
 }
 
 (( $+functions[_git-merge] )) ||
@@ -1000,12 +1026,12 @@ _git-merge () {
     '-m[set the commit message to be used for the merge commit]:merge message' \
     '(                    --no-rerere-autoupdate)--rerere-autoupdate[allow the rerere mechanism to update the index]' \
     '(--rerere-autoupdate                       )--no-rerere-autoupdate[do not allow the rerere mechanism to update the index]' \
-    '*: :__git_commits' && ret=0
+    '*: :__git_commits'
 }
 
 (( $+functions[_git-mv] )) ||
 _git-mv () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -w -C -S -s \
@@ -1022,11 +1048,13 @@ _git-mv () {
         'directories:destination directory:_directories' && ret=0
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-notes] )) ||
 _git-notes () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -C \
@@ -1092,6 +1120,8 @@ _git-notes () {
       esac
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-pull] )) ||
@@ -1106,7 +1136,7 @@ _git-pull () {
     '(--rebase            )--no-rebase[do not perform a rebase after fetching]' \
     $fetch_options \
     ': :__git_any_repositories' \
-    '*: :__git_ref_specs' && ret=0
+    '*: :__git_ref_specs'
 }
 
 (( $+functions[_git-push] )) ||
@@ -1132,7 +1162,7 @@ _git-push () {
     '(-q --quiet -v --verbose)'{-v,--verbose}'[output additional information]' \
     '(-q --quiet)--progress[output progress information]' \
     ':: :__git_any_repositories' \
-    '*: :__git_ref_specs' && ret=0
+    '*: :__git_ref_specs'
 }
 
 (( $+functions[_git-rebase] )) ||
@@ -1167,12 +1197,12 @@ _git-rebase () {
     '--no-ff[cherry-pick all rebased commits with --interactive, otherwise synonymous to --force-rebase]' \
     '--onto[start new branch with HEAD equal to given revision]:newbase:__git_revisions' \
     ':upstream branch:__git_revisions' \
-    '::working branch:__git_branch_names' && ret=0
+    '::working branch:__git_branch_names'
 }
 
 (( $+functions[_git-reset] )) ||
 _git-reset () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   typeset -A opt_args
 
   _arguments -w -C -s \
@@ -1196,6 +1226,8 @@ _git-reset () {
       __git_tree_files ${PREFIX:-.} $commit && ret=0
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-revert] )) ||
@@ -1206,12 +1238,12 @@ _git-revert () {
     '(-e --edit)--no-edit[do not edit the commit message]' \
     '(-n --no-commit)'{-n,--no-commit}'[do not commit the reversion]' \
     '(-s --signoff)'{-s,--signoff}'[add Signed-off-by line at the end of the commit message]' \
-    ': :__git_commits' && ret=0
+    ': :__git_commits'
 }
 
 (( $+functions[_git-rm] )) ||
 _git-rm () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -w -C -S -s \
@@ -1232,11 +1264,13 @@ _git-rm () {
       fi
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-shortlog] )) ||
 _git-shortlog () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   local -a revision_options
@@ -1268,11 +1302,13 @@ _git-shortlog () {
       fi
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-show] )) ||
 _git-show () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   typeset -A opt_args
 
   local -a log_options revision_options
@@ -1293,11 +1329,13 @@ _git-show () {
         'blobs::__git_blobs' && ret=0
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-stash] )) ||
 _git-stash () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -C \
@@ -1378,6 +1416,8 @@ _git-stash () {
       esac
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-status] )) ||
@@ -1397,12 +1437,12 @@ _git-status () {
                                                                                      all\:"also show untracked files in untracked directories (default)"))' \
     '--ignore-submodules[ignore changes to submodules]:: :__git_ignore_submodules_whens' \
     '(--porcelain)-z[use NUL termination on output]' \
-    '*: :__git_ignore_line_inside_arguments _files' && ret=0
+    '*: :__git_ignore_line_inside_arguments _files'
 }
 
 (( $+functions[_git-submodule] )) ||
 _git-submodule () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -C -A '-*' \
@@ -1503,6 +1543,8 @@ _git-submodule () {
       esac
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-tag] )) ||
@@ -1534,7 +1576,7 @@ _git-tag () {
       '::pattern' \
     - verification \
       '-v[verifies gpg signutare of tags]' \
-      '*:: :__git_ignore_line_inside_arguments __git_tags' && ret=0
+      '*:: :__git_ignore_line_inside_arguments __git_tags'
 }
 
 # Ancillary Commands (Manipulators)
@@ -1542,7 +1584,7 @@ _git-tag () {
 (( $+functions[_git-config] )) ||
 _git-config () {
   local name_arg value_arg
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   if (( words[(I)--get-regexp] )); then
@@ -1965,7 +2007,7 @@ _git-config () {
 
   case $state in
     (section)
-      __git_config_sections -b '(|)' '^' section-names 'section name' $*
+      __git_config_sections -b '(|)' '^' section-names 'section name' $* && ret=0
       ;;
     (is-a-tty)
       declare -a values
@@ -1973,7 +2015,7 @@ _git-config () {
         true
         false
         auto)
-      _describe -t values 'stdout is a tty' values
+      _describe -t values 'stdout is a tty' values && ret=0
       ;;
     (option)
       local label=option
@@ -2155,7 +2197,7 @@ _git-config () {
       ;;
     (gettable-option)
       _describe -t git-options option \
-        ${${${(0)"$(_call_program gettable-options git config -z --list)"}%%$'\n'*}//:/\\:}
+        ${${${(0)"$(_call_program gettable-options git config -z --list)"}%%$'\n'*}//:/\\:} && ret=0
       ;;
     (gettable-colorbool-option)
       __git_config_sections -b '(|)' -a '(|)' '^color\.[^.]+$' gettable-colorbool-options option && ret=0
@@ -2188,7 +2230,7 @@ _git-config () {
           # TODO: Should really only complete unique remotes, that is, not the same
           # remote more than once in the list.
           __git_remotes -S $suffix -q && ret=0
-          return
+          return ret
           ;;
       esac
       local z=$'\0'
@@ -2197,7 +2239,7 @@ _git-config () {
       if (( $#parts < 2 )) && [[ $line[1] == [^.]##.*.[^.]## ]]; then
         parts=("${(S@0)${git_options_static[(r)(#i)${line[1]%%.*}.\*.${line[1]##*.}:*]}//(#b)(*[^\\]|):/$match[1]$z}")
       fi
-      (( $#parts > 0 )) || return
+      (( $#parts > 0 )) || return ret
       case $parts[4] in
         ('->'*)
           case ${parts[4]#->} in
@@ -2463,6 +2505,8 @@ _git-config () {
       esac
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-fast-export] )) ||
@@ -2484,7 +2528,7 @@ _git-fast-export () {
     '--fake-missing-tagger=[fake a tagger when tags lack them]' \
     '--no-data[do not output blocb objects, instead referring to them via their SHA-1 hash]' \
     '--full-tree[output full tree for each commit]' \
-    '*: :__git_commit_ranges' && ret=0
+    '*: :__git_commit_ranges'
 }
 
 (( $+functions[_git-fast-import] )) ||
@@ -2504,7 +2548,7 @@ _git-fast-import () {
     '*--no-relative-marks[paths for export/import are not relative to internal directory in current repository]' \
     '--export-pack-edges=-[list packfiles and last commit on branches in them in given file]: :_files' \
     '--quiet[disable all non-fatal output]' \
-    '--stats[display statistics about object created]' && ret=0
+    '--stats[display statistics about object created]'
 }
 
 (( $+functions[_git-filter-branch] )) ||
@@ -2526,7 +2570,7 @@ _git-filter-branch () {
     '--original[namespace where original commits will be stored]:namespace:_directories' \
     '-d[temporary directory used for rewriting]: :_directories' \
     '(-f --force)'{-f,--force}'[force operation]' \
-    '*: :__git_commit_ranges' && ret=0
+    '*: :__git_commit_ranges'
 }
 
 (( $+functions[_git-mergetool] )) ||
@@ -2536,7 +2580,7 @@ _git-mergetool () {
     '(-t --tool)'{-t,--tool=}'[merge resolution program to use]: :__git_mergetools' \
     '(-y --no-prompt --prompt)'{-y,--no-prompt}'[do not prompt before invocation of merge resolution program]' \
     '(-y --no-prompt)--prompt[prompt before invocation of merge resolution program]' \
-    '*:conflicted file:_files' && ret=0
+    '*:conflicted file:_files'
 }
 
 (( $+functions[_git-pack-refs] )) ||
@@ -2545,7 +2589,7 @@ _git-pack-refs () {
     '(      --no-all)--all[pack all refs]' \
     '(--all         )--no-all[do not pack all refs]' \
     '(        --no-prune)--prune[remove loose refs after packing them]' \
-    '(--prune           )--no-prune[do not remove loose refs after packing them]' && ret=0
+    '(--prune           )--no-prune[do not remove loose refs after packing them]'
 }
 
 (( $+functions[_git-prune] )) ||
@@ -2554,7 +2598,7 @@ _git-prune () {
     '(-n --dry-run)'{-n,--dry-run}'[do not remove anything; just report what would be removed]' \
     '(-v --verbose)'{-v,--rerbose}'[report all removed objects]' \
     '--expire[only expire loose objects older than given date]: :__git_datetimes' \
-    '*:: :__git_heads' && ret=0
+    '*:: :__git_heads'
 }
 
 (( $+functions[_git-reflog] )) ||
@@ -2565,9 +2609,9 @@ _git-reflog () {
   if [[ $words[2] == --* ]]; then
     _arguments -S \
       $revision_options \
-      ':: :__git_references' && ret=0
+      ':: :__git_references'
   else
-    local curcontext=$curcontext state line
+    local curcontext=$curcontext state line ret=1
     declare -A opt_args
 
     # TODO: -h is undocumented.
@@ -2626,6 +2670,8 @@ _git-reflog () {
             ;;
         esac
     esac
+
+    return ret
   fi
 }
 
@@ -2637,12 +2683,12 @@ _git-relink () {
     '--help[display help]' \
     ': :_directories' \
     ': :_directories' \
-    '*: :_directories' && ret=0
+    '*: :_directories'
 }
 
 (( $+functions[_git-remote] )) ||
 _git-remote () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -C \
@@ -2735,6 +2781,8 @@ _git-remote () {
       esac
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-repack] )) ||
@@ -2752,7 +2800,7 @@ _git-repack () {
     '--window=-[number of objects to consider when doing delta compression]: :__git_guard_number "number of objects"' \
     '--depth=-[maximum delta depth]: :__git_guard_number "maximum delta depth"' \
     '--window-memory=-[scale window size dynamically to not use more than N bytes of memory]: :__git_guard_bytes' \
-    '--max-pack-size=-[maximum size of each output packfile]:maximum pack size:__git_guard_bytes' && ret=0
+    '--max-pack-size=-[maximum size of each output packfile]:maximum pack size:__git_guard_bytes'
 }
 
 (( $+functions[_git-replace] )) ||
@@ -2763,14 +2811,14 @@ _git-replace () {
     '(- : *)-l[list replace refs]:pattern' \
     ': :__git_objects' \
     ':replacement:__git_objects' \
-    '*: :__git_objects' && ret=0
+    '*: :__git_objects'
 }
 
 # Ancillary Commands (Interrogators)
 
 (( $+functions[_git-blame] )) ||
 _git-blame () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   declare -a revision_options
@@ -2814,6 +2862,8 @@ _git-blame () {
       fi
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-cherry] )) ||
@@ -2824,13 +2874,13 @@ _git-cherry () {
     '--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length' \
     ':upstream commit:__git_commits' \
     '::head commit:__git_commits' \
-    '::limit commit:__git_commits' && ret=0
+    '::limit commit:__git_commits'
 }
 
 (( $+functions[_git-count-objects] )) ||
 _git-count-objects () {
   _arguments \
-    '(-v --verbose)'{-v,--verbose}'[also report number of in-pack objects and objects that can be removed]' && ret=0
+    '(-v --verbose)'{-v,--verbose}'[also report number of in-pack objects and objects that can be removed]'
 }
 
 (( $+functions[_git-difftool] )) ||
@@ -2857,7 +2907,7 @@ _git-fsck () {
     '--strict[do strict checking]' \
     '(-v --verbose)'{-v,--verbose}'[output additional information]' \
     '--lost-found[write dangling objects into .git/lost-found]' \
-    '*: :__git_objects' && ret=0
+    '*: :__git_objects'
 }
 
 (( $+functions[_git-get-tar-commit-id] )) ||
@@ -2872,12 +2922,12 @@ _git-help () {
     '(-a --all           -m --man -w --web)'{-i,--info}'[show all available commands]' \
     '(-a --all -i --info          -w --web)'{-m,--man}'[show all available commands]' \
     '(-a --all -i --info -m --man         )'{-w,--web}'[show all available commands]' \
-    ': :__git_aliases_and_commands' && ret=0
+    ': :__git_aliases_and_commands'
 }
 
 (( $+functions[_git-instaweb] )) ||
 _git-instaweb () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -w -C -S -s \
@@ -2903,6 +2953,8 @@ _git-instaweb () {
       _describe -t commands command commands && ret=0
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-merge-tree] )) ||
@@ -2910,12 +2962,12 @@ _git-merge-tree () {
   _arguments \
     ':base-tree:__git_tree_ishs' \
     ':branch 1:__git_tree_ishs' \
-    ':branch 2:__git_tree_ishs' && ret=0
+    ':branch 2:__git_tree_ishs'
 }
 
 (( $+functions[_git-rerere] )) ||
 _git-rerere () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   # TODO: --rerere-autoupdate is undocumented.
@@ -2934,6 +2986,8 @@ _git-rerere () {
         'gc[prune old records of conflicted merges]' && ret=0
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-rev-parse] )) ||
@@ -2950,6 +3004,8 @@ _git-rev-parse () {
   if (( words[(I)--verify] )); then
     quiet_opts=({-q,--quiet}'[do not output error messages]')
   fi
+
+  local ret=0
 
   if (( words[(I)--parseopt] )); then
     if (( words[(I)--] )); then
@@ -3001,11 +3057,13 @@ _git-rev-parse () {
       '(--until --before)'{--until=-,--before=-}'[show --min-age= parameter corresponding given date string]:datestring' \
       '*: :__git_objects' && ret=0
   fi
+
+  return ret
 }
 
 (( $+functions[_git-show-branch] )) ||
 _git-show-branch () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -w -C -S -s -A '-*' \
@@ -3041,6 +3099,8 @@ _git-show-branch () {
       fi
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-verify-tag] )) ||
@@ -3048,7 +3108,7 @@ _git-verify-tag () {
   # TODO: -v and --verbose are undocumented.
   _arguments -w -S -s \
     '(-v --verbose)'{-v,--verbose}'[output additional information]' \
-    '*: :__git_tags' && ret=0
+    '*: :__git_tags'
 }
 
 (( $+functions[_git-whatchanged] )) ||
@@ -3059,7 +3119,7 @@ _git-whatchanged () {
   _arguments -S \
     $revision_options \
     '1:: :__git_commits' \
-    '*: :__git_cached_files' && ret=0
+    '*: :__git_cached_files'
 }
 
 # Interacting With Others
@@ -3077,7 +3137,7 @@ _git-archimport () {
     '-D[attempt to import trees that have been merged from]: :__git_guard_number depth' \
     '-a[auto-register archives at http://mirrors.sourcecontrol.net]' \
     '-t[use given directory as temporary directory]: :_directories' \
-    '*:archive/branch' && ret=0
+    '*:archive/branch'
 }
 
 (( $+functions[_git-cvsexportcommit] )) ||
@@ -3098,7 +3158,7 @@ _git-cvsexportcommit () {
     '-v[verbose output]' \
     '-h[display usage]' \
     ':: :__git_commits' \
-    ': :__git_commits' && ret=0
+    ': :__git_commits'
 }
 
 (( $+functions[_git-cvsimport] )) ||
@@ -3125,7 +3185,7 @@ _git-cvsimport () {
     '-A[specify author-conversion file]:author-conversion file:_files' \
     '-R[generate cvs-revisions file mapping CVS revision numbers to commit IDs]' \
     '-h[display usage information]' \
-    ':cvsmodule' && ret=0
+    ':cvsmodule'
 }
 
 (( $+functions[_git-cvsserver] )) ||
@@ -3137,7 +3197,7 @@ _git-cvsserver () {
     '(- * -V --version)'{-V,--version}'[display version information]' \
     '(- * -h --help)'{-h,-H,--help}'[display usage information]' \
     '::type:(pserver server)' \
-    '*: :_directories' && ret=0
+    '*: :_directories'
 }
 
 (( $+functions[_git-imap-send] )) ||
@@ -3150,7 +3210,7 @@ _git-quiltimport () {
   _arguments -S \
     '(-n --dry-run)'{-n,--dry-run}'[check patches and warn if they cannot be imported]' \
     '--author[default author name and email address to use for patches]: :_email_addresses' \
-    '--patches[set directory containing patches]:patch directory:_directories' && ret=0
+    '--patches[set directory containing patches]:patch directory:_directories'
 }
 
 (( $+functions[_git-request-pull] )) ||
@@ -3200,12 +3260,12 @@ _git-send-email () {
     '(           --no-validate)--validate[perform sanity checks on patches]' \
     '(--validate              )--validate[do not perform sanity checks on patches]' \
     '--force[send emails even if safetiy checks would prevent it]' \
-    '*: :_files' && ret=0
+    '*: :_files'
 }
 
 (( $+functions[_git-svn] )) ||
 _git-svn () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -C \
@@ -3448,6 +3508,8 @@ _git-svn () {
       esac
       ;;
   esac
+
+  return ret
 }
 
 # LOW-LEVEL COMMANDS (PLUMBING)
@@ -3478,7 +3540,7 @@ _git-apply () {
     '--inaccurate-eof[work around missing-new-line-at-EOF bugs]' \
     '(-v --verbose)'{-v,--verbose}'[display progress on stderr]' \
     '--recount[do not trust line counts in hunk headers]' \
-    '*:patch:_files' && ret=0
+    '*:patch:_files'
 }
 
 (( $+functions[_git-checkout-index] )) ||
@@ -3500,7 +3562,7 @@ _git-checkout-index () {
     '--temp[write content to temporary files]' \
     '(-a --all *)--stdin[read list of paths from the standard input]' \
     $z_opt \
-    '*: :__git_cached_files' && ret=0
+    '*: :__git_cached_files'
 }
 
 (( $+functions[_git-commit-tree] )) ||
@@ -3508,11 +3570,11 @@ _git-commit-tree () {
   if (( CURRENT == 2 )); then
     _arguments \
       '-h[display usage]' \
-      ': :__git_trees' && ret=0
+      ': :__git_trees'
   elif [[ $words[CURRENT-1] == -p ]]; then
     local expl
     _description commits expl 'parent commit'
-    __git_objects $expl && ret=0
+    __git_objects $expl
   else
     compadd - '-p'
   fi
@@ -3530,7 +3592,7 @@ _git-hash-object () {
     '(: --stdin --path)--stdin-paths[read file names from standard input instead of from command line]' \
     '(       --no-filters)--path=[hash object as if it were located at given path]: :_files' \
     '(--path             )--no-filters[hash contents as is, ignoring any input filters]' \
-    '(--stdin --stdin-paths):file:_files' && ret=0
+    '(--stdin --stdin-paths):file:_files'
 }
 
 (( $+functions[_git-index-pack] )) ||
@@ -3551,7 +3613,7 @@ _git-index-pack () {
     '--stdin[read pack from stdin and instead write to specified file]' \
     $stdin_opts \
     '--strict[die if the pack contains broken objects or links]' \
-    ':pack file:_files -g "*.pack"' && ret=0
+    ':pack file:_files -g "*.pack"'
 }
 
 (( $+functions[_git-merge-file] )) ||
@@ -3580,7 +3642,7 @@ _git-merge-file () {
     '--diff3[undocumented]' \
     ':current file:_files' \
     ':base file:_files' \
-    ':other file:_files' && ret=0
+    ':other file:_files'
 }
 
 (( $+functions[_git-merge-index] )) ||
@@ -3588,7 +3650,7 @@ _git-merge-index () {
   if (( CURRENT > 2 )) && [[ $words[CURRENT-1] != -[oq] ]]; then
     _arguments -S \
       '(:)-a[run merge against all files in index that need merging]' \
-      '*: :__git_cached_files' && ret=0
+      '*: :__git_cached_files'
   else
     declare -a arguments
 
@@ -3596,7 +3658,7 @@ _git-merge-index () {
     (( CURRENT == 2 || CURRENT == 3 )) && arguments+='(-o)-q[do not complain about failed merges]'
     (( 2 <= CURRENT && CURRENT <= 4 )) && arguments+='*:merge program:_files -g "*(*)"'
 
-    _arguments -S $arguments && ret=0
+    _arguments -S $arguments
   fi
 }
 
@@ -3610,7 +3672,7 @@ _git-mktree () {
   _arguments -w -S -s \
     '-z[read NUL-terminated ls-tree -z output]' \
     '--missing[allow missing objects]' \
-    '--batch[allow creation of more than one tree]' && ret=0
+    '--batch[allow creation of more than one tree]'
 }
 
 (( $+functions[_git-pack-objects] )) ||
@@ -3652,14 +3714,14 @@ _git-pack-objects () {
     '--keep-true-parents[pack parents hidden by grafts]' \
     '(                   --unpack-unreachable)--keep-unreachable[undocumented]' \
     '(--keep-unreachable                     )--unpack-unreachable[undocumented]' \
-    ':base-name:_files' && ret=0
+    ':base-name:_files'
 }
 
 (( $+functions[_git-prune-packed] )) ||
 _git-prune-packed () {
   _arguments -w -S -s \
     '(-n --dry-run)'{-n,--dry-run}'[only list objects that would be removed]' \
-    '(-q --quiet)'{-q,--quiet}'[do not display progress on standard error]' && ret=0
+    '(-q --quiet)'{-q,--quiet}'[do not display progress on standard error]'
 }
 
 (( $+functions[_git-read-tree] )) ||
@@ -3698,7 +3760,7 @@ _git-read-tree () {
     '--no-sparse-checkout[display sparse checkout support]' \
     '1:first tree-ish to be read/merged:__git_tree_ishs' \
     '2::second tree-ish to be read/merged:__git_tree_ishs' \
-    '3::third tree-ish to be read/merged:__git_tree_ishs' && ret=0
+    '3::third tree-ish to be read/merged:__git_tree_ishs'
 }
 
 (( $+functions[_git-symbolic-ref] )) ||
@@ -3707,7 +3769,7 @@ _git-symbolic-ref () {
     '(-q --quiet)'{-q,--quiet}'[do not issue error if specified name is not a symbolic ref]' \
     '-m[update reflog for specified name with specied reason]:reason for update' \
     ':symbolic reference:__git_heads' \
-    ':: :__git_references' && ret=0
+    ':: :__git_references'
 }
 
 (( $+functions[_git-unpack-objects] )) ||
@@ -3716,7 +3778,7 @@ _git-unpack-objects () {
     '-n[only list the objects that would be unpacked]' \
     '-q[run quietly]' \
     '-r[try recovering objects from corrupt packs]' \
-    '--strict[do not write objects with broken content or links]' && ret=0
+    '--strict[do not write objects with broken content or links]'
 }
 
 (( $+functions[_git-update-index] )) ||
@@ -3754,7 +3816,7 @@ _git-update-index () {
     '(: -)--stdin[read list of paths from standard input]' \
     '--verbose[report what is being added and removed from the index]' \
     $z_opt \
-    '*:: :_files' && ret=0
+    '*:: :_files'
 }
 
 (( $+functions[_git-update-ref] )) ||
@@ -3765,7 +3827,7 @@ _git-update-ref () {
     '--no-deref[overwrite ref itself, not what it points to]' \
     ':symbolic reference:__git_revisions' \
     ':new reference:__git_revisions' \
-    '::old reference:__git_revisions' && ret=0
+    '::old reference:__git_revisions'
 }
 
 (( $+functions[_git-write-tree] )) ||
@@ -3773,7 +3835,7 @@ _git-write-tree () {
   # NOTE: --ignore-cache-tree is only used for debugging.
   _arguments -w -S -s \
     '--missing-ok[ignore objects in index that are missing in object database]' \
-    '--prefix=[write tree representing given sub-directory]:sub-directory:_directories -r ""' && ret=0
+    '--prefix=[write tree representing given sub-directory]:sub-directory:_directories -r ""'
 }
 
 # Interrogation commands
@@ -3789,7 +3851,7 @@ _git-cat-file () {
     '(- :)--batch[print SHA1, type, size, and contents of each object provided on stdin]' \
     '(- :)--batch-check[print SHA1, type, and size of each object provided on stdin]' \
     '(-):object type:(blob commit tag tree)' \
-    ': :__git_objects' && ret=0
+    ': :__git_objects'
 }
 
 (( $+functions[_git-diff-files] )) ||
@@ -3801,7 +3863,7 @@ _git-diff-files () {
     $revision_options \
     ': :__git_changed-in-working-tree_files' \
     ': :__git_changed-in-working-tree_files' \
-    '*: :__git_changed-in-working-tree_files' && ret=0
+    '*: :__git_changed-in-working-tree_files'
 }
 
 (( $+functions[_git-diff-index] )) ||
@@ -3818,12 +3880,12 @@ _git-diff-index () {
     '--cached[do not consider the work tree at all]' \
     '-m[flag non-checked-out files as up-to-date]' \
     ': :__git_tree_ishs' \
-    '*: :__git_cached_files' && ret=0
+    '*: :__git_cached_files'
 }
 
 (( $+functions[_git-diff-tree] )) ||
 _git-diff-tree () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   declare -a revision_options
@@ -3868,6 +3930,8 @@ _git-diff-tree () {
       fi
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-for-each-ref] )) ||
@@ -3883,7 +3947,7 @@ _git-for-each-ref () {
     '(-s --shell -p --perl --python --tcl)'{-p,--perl}'[use string literals suitable for Perl]' \
     '(-s --shell -p --perl          --tcl)'--python'[use string literals suitable for Python]' \
     '(-s --shell -p --perl --python      )'--tcl'[use string literals suitable for Tcl]' \
-    ':: :_guard "([^-]?#|)" pattern' && ret=0
+    ':: :_guard "([^-]?#|)" pattern'
 }
 
 (( $+functions[_git-ls-files] )) ||
@@ -3918,7 +3982,7 @@ _git-ls-files () {
     '-v[identify each files status (hmrck?)]' \
     '--full-name[force paths to be output relative to the project top directory]' \
     '--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length' \
-    '*:: :_files' && ret=0
+    '*:: :_files'
 }
 
 (( $+functions[_git-ls-remote] )) ||
@@ -3929,12 +3993,12 @@ _git-ls-remote () {
     '(-t --tags)'{-t,--tags}'[show only refs under refs/tags]' \
     '(-u --upload-pack)'{-u,--upload-pack=-}'[specify path to git-upload-pack on remote side]:remote path' \
     ': :__git_any_repositories' \
-    '*: :__git_references' && ret=0
+    '*: :__git_references'
 }
 
 (( $+functions[_git-ls-tree] )) ||
 _git-ls-tree () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -w -C -S -s \
@@ -3955,6 +4019,8 @@ _git-ls-tree () {
       __git_ignore_line __git_tree_files ${PREFIX:-.} $line[1] && ret=0
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-merge-base] )) ||
@@ -3964,7 +4030,7 @@ _git-merge-base () {
     '--octopus[compute best common ancestors of all supplied commits]' \
     '(-)--independent[display minimal subset of supplied commits with same ancestors]' \
     ': :__git_commits' \
-    '*: :__git_commits' && ret=0
+    '*: :__git_commits'
 }
 
 (( $+functions[_git-name-rev] )) ||
@@ -3977,7 +4043,7 @@ _git-name-rev () {
     '--name-only[display only name of commits]' \
     '--no-undefined[die with non-zero return when a reference is undefined]' \
     '--always[show uniquely abbreviated commit object as fallback]' \
-    '(--stdin --all)*: :__git_commits' && ret=0
+    '(--stdin --all)*: :__git_commits'
 }
 
 (( $+functions[_git-pack-redundant] )) ||
@@ -3986,12 +4052,12 @@ _git-pack-redundant () {
     '(:)--all[process all packs]' \
     '--alt-odb[do not require objects to be present in local packs]' \
     '--verbose[output some statistics to standard error]' \
-    '(--all)*::packs:_files -g "*.pack"' && ret=0
+    '(--all)*::packs:_files -g "*.pack"'
 }
 
 (( $+functions[_git-rev-list] )) ||
 _git-rev-list () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   declare -a revision_options
@@ -4018,6 +4084,8 @@ _git-rev-list () {
       fi
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-show-index] )) ||
@@ -4039,14 +4107,14 @@ _git-show-ref () {
       '(-q --quiet)'{-q,--quiet}'[do not print any results]' \
       '*: :_guard "([^-]?#|)" pattern' \
     - exclude \
-      '--exclude-existing=-[filter out existing refs from stdin]:: :_guard "([^-]?#|)" pattern' && ret=0
+      '--exclude-existing=-[filter out existing refs from stdin]:: :_guard "([^-]?#|)" pattern'
 }
 
 (( $+functions[_git-unpack-file] )) ||
 _git-unpack-file () {
   _arguments -A '-*' \
     '(:)-h[display usage information]' \
-    '(-): :__git_blobs' && ret=0
+    '(-): :__git_blobs'
 }
 
 (( $+functions[_git-var] )) ||
@@ -4056,7 +4124,7 @@ _git-var () {
     '(-):variable:((GIT_AUTHOR_IDENT\:"name and email of author" \
                     GIT_COMMITTER_IDENT\:"name and email of committer" \
                     GIT_EDITOR\:"text editor used by git commands" \
-                    GIT_PAGER\:"text viewer used by git commands"))' && ret=0
+                    GIT_PAGER\:"text viewer used by git commands"))'
 }
 
 (( $+functions[_git-verify-pack] )) ||
@@ -4064,7 +4132,7 @@ _git-verify-pack () {
   _arguments -w -S -s \
     '(-v --verbose)'{-v,--verbose}'[show objects contained in pack]' \
     '(-s --stat-only)'{-s,--stat-only}'[do not verify pack contents; only display histogram of delta chain length]' \
-    '*:index file:_files -g "*.idx"' && ret=0
+    '*:index file:_files -g "*.idx"'
 }
 
 # Synching Repositories
@@ -4098,7 +4166,7 @@ _git-daemon () {
     '--disable=-[disable site-wide service]: :__git_daemon_service' \
     '--allow-override[allow overriding site-wide service]: :__git_daemon_service' \
     '--forbid-override[forbid overriding site-wide service]: :__git_daemon_service' \
-    '*:repository:_directories' && ret=0
+    '*:repository:_directories'
 }
 
 (( $+functions[_git-fetch-pack] )) ||
@@ -4115,7 +4183,7 @@ _git-fetch-pack () {
     '--no-progress[do not display progress]' \
     '-v[produce verbose output]' \
     ': :__git_any_repositories' \
-    '*: :__git_references' && ret=0
+    '*: :__git_references'
 }
 
 (( $+functions[_git-http-backend] )) ||
@@ -4139,13 +4207,13 @@ _git-send-pack () {
     '--stateless-rpc[undocumented]' \
     '--helper-status[undocumented]' \
     ': :__git_any_repositories' \
-    '*: :__git_remote_references' && ret=0
+    '*: :__git_remote_references'
 }
 
 (( $+functions[_git-update-server-info] )) ||
 _git-update-server-info () {
   _arguments -w -S -s \
-    '(-f --force)'{-f,--force}'[update the info files from scratch]' && ret=0
+    '(-f --force)'{-f,--force}'[update the info files from scratch]'
 }
 
 (( $+functions[_git-http-fetch] )) ||
@@ -4159,7 +4227,7 @@ _git-http-fetch () {
     '--recover[recover from a failed fetch]' \
     '(1)--stdin[read commit ids and refs from standard input]' \
     ': :__git_commits' \
-    ': :_urls' && ret=0
+    ': :_urls'
 }
 
 (( $+functions[_git-http-push] )) ||
@@ -4172,7 +4240,7 @@ _git-http-push () {
     '(   -D)-d[remove refs from remote repository]' \
     '(-d   )-D[forcefully remove refs from remote repository]' \
     ': :_urls' \
-    '*: :__git_remote_references' && ret=0
+    '*: :__git_remote_references'
 }
 
 # NOTE: git-parse-remote isn’t a user command.
@@ -4184,12 +4252,12 @@ _git-receive-pack () {
   _arguments -A '-*' \
     '--advertise-refs[undocumented]' \
     '--stateless-rpc[undocumented]' \
-    ':directory to sync into:_directories' && ret=0
+    ':directory to sync into:_directories'
 }
 
 (( $+functions[_git-shell] )) ||
 _git-shell () {
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   _arguments -C \
@@ -4227,13 +4295,15 @@ _git-shell () {
       esac
       ;;
   esac
+
+  return ret
 }
 
 
 (( $+functions[_git-upload-archive] )) ||
 _git-upload-archive () {
   _arguments \
-    ':directory to get tar archive from:_directories' && ret=0
+    ':directory to get tar archive from:_directories'
 }
 
 (( $+functions[_git-upload-pack] )) ||
@@ -4245,7 +4315,7 @@ _git-upload-pack () {
     '--timeout=-[interrupt transfer after given number of seconds of inactivity]: :__git_guard_number "inactivity timeout"' \
     '--advertise-refs[undocumented]' \
     '--stateless-rpc[undocumented]' \
-    ': :_directories' && ret=0
+    ': :_directories'
 }
 
 # Internal Helper Commands
@@ -4254,7 +4324,7 @@ _git-upload-pack () {
 _git-check-attr () {
   local z_opt=
 
-  local curcontext=$curcontext state line
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   if (( words[(I)--stdin] )); then
@@ -4290,6 +4360,8 @@ _git-check-attr () {
       fi
       ;;
   esac
+
+  return ret
 }
 
 (( $+functions[_git-check-ref-format] )) ||
@@ -4298,7 +4370,7 @@ _git-check-ref-format () {
     '-h[display usage information]' \
     '--print[display canonicalized name of hypothetical reference of given name]' \
     '--branch[expand previous branch syntax]' \
-    ': :__git_references' && ret=0
+    ': :__git_references'
 }
 
 (( $+functions[_git-fmt-merge-msg] )) ||
@@ -4307,7 +4379,7 @@ _git-fmt-merge-msg () {
     '(      --no-log)--log[display one-line descriptions from actual commits being merged]' \
     '(--log         )--no-log[do not display one-line descriptions from actual commits being merged]' \
     '(-m --message)'{-m+,--message=}'[use given message instead of branch names for first line in log message]:message' \
-    '(-F --file)'{-F,--file}'[specify list of merged objects from file]: :_files' && ret=0
+    '(-F --file)'{-F,--file}'[specify list of merged objects from file]: :_files'
 }
 
 (( $+functions[_git-mailinfo] )) ||
@@ -4322,7 +4394,7 @@ _git-mailinfo () {
     '(--scissors              )--no-scissors[do not remove everything in body before a scissors line]' \
     '--no-inbody-headers[undocumented]' \
     ':message file:_files' \
-    ':patch file:_files' && ret=0
+    ':patch file:_files'
 }
 
 (( $+functions[_git-mailsplit] )) ||
@@ -4333,7 +4405,7 @@ _git-mailsplit () {
     '-d-[specify number of leading zeros]: :__git_guard_number precision' \
     '-f-[skip the first N numbers]: :__git_guard_number' \
     '--keep-cr[do not remove CR from lines ending with CR+LF]' \
-    '*::mbox file:_files' && ret=0
+    '*::mbox file:_files'
 }
 
 (( $+functions[_git-merge-one-file] )) ||
@@ -4351,7 +4423,7 @@ _git-patch-id () {
 (( $+functions[_git-stripspace] )) ||
 _git-stripspace () {
   _arguments \
-    '(-s --strip-comments)'{-s,--strip-comments}'[also strip lines starting with #]' && ret=0
+    '(-s --strip-comments)'{-s,--strip-comments}'[also strip lines starting with #]'
 }
 
 # INTERNAL GIT COMPLETION FUNCTIONS
@@ -4602,6 +4674,7 @@ _git_commands () {
     stripspace:'filter out empty lines')
 
   integer ret=1
+
   # TODO: Is this the correct way of doing it?
   # TODO: Should we be chaining them together with || instead?
   _describe -t main-porcelain-commands 'main porcelain command' main_porcelain_commands && ret=0
@@ -4613,15 +4686,18 @@ _git_commands () {
   _describe -t plumbing-sync-commands 'plumbing sync command' plumbing_sync_commands && ret=0
   _describe -t plumbing-sync-helper-commands 'plumbing sync helper command' plumbing_sync_helper_commands && ret=0
   _describe -t plumbing-internal-helper-commands 'plumbing internal helper command' plumbing_internal_helper_commands && ret=0
+
   local -a addons
   local a
   for a in $_git_third_party; do
       (( ${+commands[git-${a%%:*}]} )) && addons+=( $a )
   done
   _describe -t third-party-addons 'third party addon' addons && ret=0
+
   local -a user_commands
   zstyle -a ":completion:${curcontext}:" user-commands user_commands || user_commands=()
   _describe -t user-specific-commands 'user specific command' user_commands && ret=0
+
   return ret
 }
 
@@ -4640,6 +4716,7 @@ __git_aliases_and_commands () {
     'aliases::__git_aliases' \
     'commands::_git_commands'
 }
+
 (( $+functions[__git_date_formats] )) ||
 __git_date_formats () {
   declare -a date_formats
@@ -4670,7 +4747,7 @@ __git_merge_strategies () {
   local -a merge_strategies
 
   merge_strategies=(${=${${(M)${(f)"$(_call_program merge-strategies "git merge -s '' 2>&1")"}:#[Aa]vailable (custom )#strategies are: *}#[Aa]vailable (custom )#strategies are: }%.})
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
   _wanted merge-strategies expl 'merge strategy' compadd $* - $merge_strategies
 }
@@ -4834,7 +4911,7 @@ __git_reflog_entries () {
   declare -a reflog_entries
 
   reflog_entries=(${${${(f)"$(_call_program reflog-entries git reflog 2>/dev/null)"}#* }%%:*})
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
   if compset -P '*@'; then
     reflog_entries=(${${(M)reflog_entries:#$IPREFIX*}#$IPREFIX})
@@ -4895,7 +4972,7 @@ __git_stashes () {
   declare -a stashes
 
   stashes=(${${(f)"$(_call_program stashes git stash list 2>/dev/null)"}/: */})
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
   _wanted stashes expl stash compadd $* - $stashes
 }
@@ -4934,7 +5011,7 @@ __git_branch_names () {
   declare -a branch_names
 
   branch_names=(${${(f)"$(_call_program branchrefs git for-each-ref --format='"%(refname)"' refs/heads 2>/dev/null)"}#refs/heads/})
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
   _wanted branch-names expl branch-name compadd $* - $branch_names
 }
@@ -4945,7 +5022,7 @@ __git_remote_branch_names () {
   declare -a branch_names
 
   branch_names=(${${(f)"$(_call_program remote-branch-refs git for-each-ref --format='"%(refname)"' refs/remotes 2>/dev/null)"}#refs/remotes/})
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
   _wanted remote-branch-names expl 'remote branch name' compadd $* - $branch_names
 }
@@ -5065,7 +5142,7 @@ __git_submodules () {
   declare -a submodules
 
   submodules=(${${(f)"$(_call_program submodules git submodule 2>/dev/null)"}#* })
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
   _wanted submodules expl submodule compadd $* - $submodules
 }
@@ -5078,7 +5155,7 @@ __git_tags () {
   declare -a tags
 
   tags=(${${(f)"$(_call_program tagrefs git for-each-ref --format='"%(refname)"' refs/tags 2>/dev/null)"}#refs/tags/})
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
   _wanted tags expl tag compadd $* - $tags
 }
@@ -5101,13 +5178,9 @@ __git_tags_of_type () {
   type=$1; shift
 
   tags=(${${(M)${(f)"$(_call_program $type-tag-refs "git for-each-ref --format='%(*objecttype)%(objecttype) %(refname)' refs/tags 2>/dev/null")"}:#$type(tag|) *}#$type(tag|) refs/tags/})
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
   _wanted $type-tags expl "$type tag" compadd $* - $tags
-}
-
-(( $+functions[__git_tag_ids] )) ||
-__git_tag_ids () {
 }
 
 # Reference Argument Types
@@ -5126,7 +5199,7 @@ __git_references () {
   # TODO: deal with GIT_DIR
   if [[ $_git_refs_cache_pwd != $PWD ]]; then
     _git_refs_cache=(${${${(f)"$(_call_program references git ls-remote ./. 2>/dev/null)"}#*$'\t'}#refs/(heads|tags)/})
-    __git_command_successful $pipestatus || return
+    __git_command_successful $pipestatus || return 1
     _git_refs_cache_pwd=$PWD
   fi
 
@@ -5139,7 +5212,7 @@ __git_local_references () {
 
   if [[ $_git_local_refs_cache_pwd != $PWD ]]; then
     _git_local_refs_cache=(${${${(f)"$(_call_program references git ls-remote ./. 2>/dev/null)"}#*$'\t'}#refs/})
-    __git_command_successful $pipestatus || return
+    __git_command_successful $pipestatus || return 1
     _git_local_refs_cache_pwd=$PWD
   fi
 
@@ -5156,7 +5229,7 @@ __git_local_references () {
   local references expl
 
   references=(${${(M)${${(f)"$(_call_program references git ls-remote ./. 2>/dev/null)"}#*$'\t'}:#refs/notes/*}#refs/notes/})
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
   _wanted references expl reference compadd - $references
 }
@@ -5166,9 +5239,9 @@ __git_notes_refs () {
   declare -a notes_refs
 
   notes_refs=(${${(f)"$(_call_program notes-refs git for-each-ref --format='"%(refname)"' refs/notes 2>/dev/null)"}#$type refs/notes/})
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
-  _wanted notes-refs expl "notes ref" compadd $* - $notes_refs
+  _wanted notes-refs expl 'notes ref' compadd $* - $notes_refs
 }
 
 # File Argument Types
@@ -5178,7 +5251,7 @@ __git_files_relative () {
   local files file f_parts prefix p_parts tmp
 
   prefix=$(_call_program gitprefix git rev-parse --show-prefix 2>/dev/null)
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
   if (( $#prefix == 0 )); then
     print $1
@@ -5215,10 +5288,10 @@ __git_files () {
   tag=$1 description=$2; shift 2
 
   gitcdup=$(_call_program gitcdup git rev-parse --show-cdup 2>/dev/null)
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
   gitprefix=$(_call_program gitprefix git rev-parse --show-prefix 2>/dev/null)
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
   # TODO: --directory should probably be added to $opts when --others is given.
 
@@ -5274,9 +5347,9 @@ __git_changed-in-index_files () {
   local files expl
 
   files=$(_call_program files git diff-index -z --name-only --no-color --cached HEAD 2>/dev/null)
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
   files=(${(0)"$(__git_files_relative $files)"})
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
   _wanted changed-in-index-files expl 'changed in index file' _multi_parts $@ - / files
 }
@@ -5286,9 +5359,9 @@ __git_changed-in-working-tree_files () {
   local files expl
 
   files=$(_call_program changed-in-working-tree-files git diff -z --name-only --no-color 2>/dev/null)
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
   files=(${(0)"$(__git_files_relative $files)"})
-  __git_command_successful $pipestatus || return
+  __git_command_successful $pipestatus || return 1
 
   _wanted changed-in-working-tree-files expl 'changed in working tree file' _multi_parts $@ -f - / files
 }
@@ -5429,7 +5502,7 @@ __git_guard_branch-name () {
 __git_guard_diff-stat-width () {
   if [[ $PREFIX == *,* ]]; then
     compset -P '*,'
-    __git_guard_number "filename width"
+    __git_guard_number 'filename width'
   else
     compset -S ',*'
     __git_guard_number width
@@ -5442,7 +5515,7 @@ __git_guard_number () {
 
   zparseopts -K -D -A opts M: J: V: 1 2 n F: X:
 
-  _guard "[[:digit:]]#" ${1:-number}
+  _guard '[[:digit:]]#' ${1:-number}
 }
 
 (( $+functions[__git_guard_bytes] )) ||
@@ -5453,17 +5526,17 @@ __git_guard_bytes () {
 (( $+functions[__git_datetimes] )) ||
 __git_datetimes () {
   # TODO: Use this in more places.
-  _guard "*" 'time specification'
+  _guard '*' 'time specification'
 }
 
 (( $+functions[__git_stages] )) ||
 __git_stages () {
-  __git_guard $* "[[:digit:]]#" 'stage'
+  __git_guard $* '[[:digit:]]#' 'stage'
 }
 
 (( $+functions[__git_svn_revision_numbers] )) ||
 __git_svn_revision_numbers () {
-  __git_guard_number "revision number"
+  __git_guard_number 'revision number'
 }
 
 # _arguments Helpers
@@ -6014,7 +6087,8 @@ _git() {
     unset git_aliases aliases
   fi
 
-  local ret=1
+  integer ret=1
+
   if [[ $service == git ]]; then
     local curcontext=$curcontext state line
     declare -A opt_args
@@ -6035,6 +6109,7 @@ _git() {
       '--no-replace-objects[do not use replacement refs to replace git objects]' \
       '(-): :->command' \
       '(-)*:: :->option-or-argument' && return
+
     case $state in
       (command)
         __git_aliases_and_commands && ret=0
@@ -6043,18 +6118,18 @@ _git() {
         curcontext=${curcontext%:*:*}:git-$words[1]:
 
         if (( ${+functions[_git-$words[1]]} )); then
-            _git-$words[1]
+          _call_function ret _git-$words[1]
         elif zstyle -T ":completion:${curcontext}:" use-fallback; then
-            _path_files
-            ret=$?
+          _path_files && ret=0
         else
-            _message 'Unknown sub-command'
+          _message 'unknown sub-command'
         fi
         ;;
     esac
   else
     _call_function ret _$service
   fi
+
   return ret
 }
 
