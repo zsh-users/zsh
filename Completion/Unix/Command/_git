@@ -83,11 +83,10 @@ _git-am () {
   local -a apply_options
   __git_setup_apply_options
 
-  # NOTE: --resolvemsg is only for internal use between git rebase and git am.
+  # NOTE: --rebasing and --resolvemsg are only for internal use between git
+  # rebase and git am.
   # TODO: --patch-format is undocumented.
-  # TODO: --ignore-date is incorrectly documented as being passed to git
-  # mailsplit.
-  # TODO: --rebasing, --rerere-autoupdate, and --no-rerere-autoupdate are
+  # TODO: --rerere-autoupdate and --no-rerere-autoupdate are
   # undocumented (and not implemented here).
   _arguments -S \
     '(-s --signoff)'{-s,--signoff}'[add Signed-off-by: line to the commit message]' \
