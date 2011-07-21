@@ -9,6 +9,10 @@
 	* unposted: Completion/Unix/Command/_git: Fix bug in git-add completion
 	that prevented -f option from being used correctly.
 
+	* unposted: Completion/Unix/Command/_git: Update git-add completion to
+	not complete already given file arguments and also to not list file
+	completions if an option is being completed.
+
 2011-07-19  Peter Stephenson  <pws@csr.com>
 
 	* 29555: Src/exec.c: fix problem that shell failed to use file
@@ -15131,5 +15135,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5401 $
+* $Revision: 1.5402 $
 *****************************************************

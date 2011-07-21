@@ -57,21 +57,20 @@ _git-add () {
     '--refresh[do not add files, but refresh their stat() info in index]' \
     '--ignore-errors[continue adding if an error occurs]' \
     $ignore_missing \
-    '*:: :->file' && ret=0
+    '*:: :->file' && return
 
   case $state in
     (file)
-      # TODO: Use __git_ignore_line_inside_arguments.
       declare -a ignored_files_alternatives
       if [[ -n ${opt_args[(I)-f|--force]} ]]; then
         ignored_files_alternatives=(
-          'ignored-modified-files:ignored modified files:__git_modified_files --ignored'
-          'ignored-other-files:ignored other files:__git_other_files --ignored')
+          'ignored-modified-files:ignored modified files:__git_ignore_line_inside_arguments __git_modified_files --ignored'
+          'ignored-other-files:ignored other files:__git_ignore_line_inside_arguments __git_other_files --ignored')
       fi
 
       _alternative \
-        'modified-files::__git_modified_files' \
-        'other-files::__git_other_files' \
+        'modified-files::__git_ignore_line_inside_arguments __git_modified_files' \
+        'other-files::__git_ignore_line_inside_arguments __git_other_files' \
         $ignored_files_alternatives && ret=0
       ;;
   esac
@@ -4524,7 +4523,11 @@ __git_ignore_line () {
 
 (( $+functions[__git_ignore_line_inside_arguments] )) ||
 __git_ignore_line_inside_arguments () {
-  __git_ignore_line ${*[-1]} ${*[1,-2]}
+  declare -a compadd_opts
+
+  zparseopts -D -E -a compadd_opts V: J: 1 2 n f X: M: P: S: r: R: q F:
+
+  __git_ignore_line $* $compadd_opts
 }
 
 # Common Argument Types
