@@ -1579,6 +1579,16 @@ _git-tag () {
       '*:: :__git_ignore_line_inside_arguments __git_tags'
 }
 
+(( $+functions[_gitk] )) ||
+_gitk () {
+  _git-log
+}
+
+(( $+functions[_tig] )) ||
+_tig () {
+  _git-log
+}
+
 # Ancillary Commands (Manipulators)
 
 (( $+functions[_git-config] )) ||
@@ -6050,16 +6060,6 @@ __git_color_attributes () {
   attributes=(bold dim ul blink reverse)
 
   _describe -t attributes attribute attributes $*
-}
-
-(( $+functions[_gitk] )) ||
-_gitk () {
-  _git-log
-}
-
-(( $+functions[_tig] )) ||
-_tig () {
-  _git-log
 }
 
 # Now, for the main driver…

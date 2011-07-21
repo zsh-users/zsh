@@ -3,6 +3,9 @@
 	* 29272: Completion/Unix/Command/_git: Use return values correctly
 	accross all completion functions.
 
+	* unposted: Completion/Unix/Command/_git: Move _gitk and _tig to
+	correct location.
+
 2011-07-19  Peter Stephenson  <pws@csr.com>
 
 	* 29555: Src/exec.c: fix problem that shell failed to use file
@@ -15125,5 +15128,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5399 $
+* $Revision: 1.5400 $
 *****************************************************
