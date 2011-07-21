@@ -63,7 +63,7 @@ _git-add () {
     (file)
       # TODO: Use __git_ignore_line_inside_arguments.
       declare -a ignored_files_alternatives
-      if [[ -n ${line[(I)-f|--force]} ]]; then
+      if [[ -n ${opt_args[(I)-f|--force]} ]]; then
         ignored_files_alternatives=(
           'ignored-modified-files:ignored modified files:__git_modified_files --ignored'
           'ignored-other-files:ignored other files:__git_other_files --ignored')
