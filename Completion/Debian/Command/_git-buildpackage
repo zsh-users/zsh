@@ -1,5 +1,5 @@
 #compdef git-buildpackage
-#desc:build Debian packages from a git repository
+#description build Debian packages from a git repository
 
 _arguments \
   '--version[show program version number and exit]' \

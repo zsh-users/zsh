@@ -2,6 +2,14 @@
 
 	* unposted: Completion/Unix/Command/_git: Use _files, not _path_files.
 
+	* 29582: Completion/Unix/Command/_git: Alter the way that commands and
+	aliases are listed when both are requested.
+
+	* 29589: Completion/Unix/Command/_git,
+	Completion/Debian/Command/_git-buildpackage: Use #description instead
+	of #desc: for description of third-party commands.  Also, refactor the
+	code to match the rest of the file.
+
 2011-07-21  Nikolai Weibull <now@bitwi.se>
 
 	* 29272: Completion/Unix/Command/_git: Use return values correctly
@@ -15141,5 +15149,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5404 $
+* $Revision: 1.5405 $
 *****************************************************

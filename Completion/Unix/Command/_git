@@ -2,7 +2,7 @@
 
 # Some parts of this completion's behaviour are configurable:
 #
-# Say, you got your own git sub-commands (git will run a program `git-foo'
+# Say you got your own git sub-commands (git will run a program `git-foo'
 # when you run "git foo") and you want "git f<tab>" to complete that sub
 # commands name for you. You can make that sub-command know to the completion
 # via the user-command style:
@@ -15,8 +15,21 @@
 #
 #     % zstyle ':completion:*:*:git:*' user-commands ${${(M)${(k)commands}:#git-*}/git-/}
 #
-# You could even create a function _git-foo() to handle specific completion
-# for that command.
+# A better solution is to create a function _git-foo() to handle specific
+# completion for that command.  This also allows you to add command-specific
+# completion as well.  Place such a function inside an autoloaded #compdef file
+# and you should be all set.  You can add a description to such a function by
+# adding a line matching
+# 
+#     #description DESCRIPTION
+#
+# as the second line in the file.  See
+# Completion/Debian/Command/_git-buildpackage in the Zsh sources for an
+# example.
+#
+# As this solution is so much better than the user-commands zstyle method, the
+# zstyle method is now DEPRECATED.  It will most likely be removed in the next
+# major release of Zsh (5.0).
 #
 # When _git does not know a given sub-command (say `bar'), it falls back to
 # completing file names for all arguments to that sub command. I.e.:
@@ -2114,7 +2127,7 @@ _git-config () {
             __git_mergetools -S . && ret=0
             ;;
           (pager.)
-            __git_aliases_and_commands && ret=0
+            _git_commands && ret=0
             ;;
           (pretty.)
             __git_config_sections -a '(|)' '^pretty\..+\.[^.]+$' prettys 'pretty format string' && ret=0
@@ -2930,7 +2943,7 @@ _git-help () {
     '(-a --all           -m --man -w --web)'{-i,--info}'[show all available commands]' \
     '(-a --all -i --info          -w --web)'{-m,--man}'[show all available commands]' \
     '(-a --all -i --info -m --man         )'{-w,--web}'[show all available commands]' \
-    ': :__git_aliases_and_commands'
+    ': :_git_commands'
 }
 
 (( $+functions[_git-instaweb] )) ||
@@ -4685,11 +4698,41 @@ _git_commands () {
     patch-id:'compute unique ID for a patch'
     stripspace:'filter out empty lines')
 
+  local -a user_commands
+  zstyle -a :completion:$curcontext: user-commands user_commands
+
+  local -a third_party_commands
+  local command
+  for command in $_git_third_party_commands; do
+    (( $+commands[git-${command%%:*}] )) && third_party_commands+=$command
+  done
+
+  local -a aliases unique_aliases
+  __git_extract_aliases
+  local alias
+  for alias in $aliases; do
+    local name=${alias%%:*}
+    (( main_porcelain_commands[(I)$name:*] ||
+       user_commands[(I)$name:*] ||
+       third_party_commands[(I)$name:*] ||
+       ancillary_manipulator_commands[(I)$name:*] ||
+       ancillary_interrogator_commands[(I)$name:*] ||
+       interaction_commands[(I)$name:*] ||
+       plumbing_manipulator_commands[(I)$name:*] ||
+       plumbing_interrogator_commands[(I)$name:*] ||
+       plumbing_sync_commands[(I)$name:*] ||
+       plumbing_sync_helper_commands[(I)$name:*] ||
+       plumbing_internal_helper_commands[(I)$name:*] )) || unique_aliases+=$alias
+  done
+
   integer ret=1
 
-  # TODO: Is this the correct way of doing it?
-  # TODO: Should we be chaining them together with || instead?
+  # TODO: Is this the correct way of doing it?  Should we be using _alternative
+  # and separate functions for each set of commands instead?
+  _describe -t aliases alias unique_aliases && ret=0
   _describe -t main-porcelain-commands 'main porcelain command' main_porcelain_commands && ret=0
+  _describe -t user-commands 'user command' user_commands && ret=0
+  _describe -t third-party-commands 'third-party command' third_party_commands && ret=0
   _describe -t ancillary-manipulator-commands 'ancillary manipulator command' ancillary_manipulator_commands && ret=0
   _describe -t ancillary-interrogator-commands 'ancillary interrogator command' ancillary_interrogator_commands && ret=0
   _describe -t interaction-commands 'interaction command' interaction_commands && ret=0
@@ -4699,34 +4742,20 @@ _git_commands () {
   _describe -t plumbing-sync-helper-commands 'plumbing sync helper command' plumbing_sync_helper_commands && ret=0
   _describe -t plumbing-internal-helper-commands 'plumbing internal helper command' plumbing_internal_helper_commands && ret=0
 
-  local -a addons
-  local a
-  for a in $_git_third_party; do
-      (( ${+commands[git-${a%%:*}]} )) && addons+=( $a )
-  done
-  _describe -t third-party-addons 'third party addon' addons && ret=0
-
-  local -a user_commands
-  zstyle -a ":completion:${curcontext}:" user-commands user_commands || user_commands=()
-  _describe -t user-specific-commands 'user specific command' user_commands && ret=0
-
   return ret
 }
 
 (( $+functions[__git_aliases] )) ||
 __git_aliases () {
-  declare -a aliases
-
-  aliases=(${^${${(0)"$(_call_program aliases "git config -z --get-regexp '^alias.'")"}#alias.}/$'\n'/:alias for \'}\')
+  local -a aliases
+  __git_extract_aliases
 
   _describe -t aliases alias aliases $*
 }
 
-(( $+functions[__git_aliases_and_commands] )) ||
-__git_aliases_and_commands () {
-  _alternative \
-    'aliases::__git_aliases' \
-    'commands::_git_commands'
+(( $+functions[__git_extract_aliases] )) ||
+__git_extract_aliases () {
+  aliases=(${^${${(0)"$(_call_program aliases "git config -z --get-regexp '^alias.'")"}#alias.}/$'\n'/:alias for \'}\')
 }
 
 (( $+functions[__git_date_formats] )) ||
@@ -6073,7 +6102,7 @@ _git() {
     aliases=(${(f)${${${(f)"$(_call_program aliases git config --get-regexp '\^alias\.')"}#alias.}/ /$'\n'}/(#e)/$'\n'})
     (( $#aliases % 2 == 0 )) && git_aliases=($aliases)
 
-    if [[ -n ${git_aliases[$words[2]]} ]] ; then
+    if (( $+git_aliases[$words[2]] && !$+commands[git-$words[2]] )); then
       local -a tmpwords expalias
       expalias=(${(z)git_aliases[$words[2]]})
       tmpwords=(${words[1]} ${expalias})
@@ -6114,14 +6143,14 @@ _git() {
 
     case $state in
       (command)
-        __git_aliases_and_commands && ret=0
+        _git_commands && ret=0
         ;;
       (option-or-argument)
         curcontext=${curcontext%:*:*}:git-$words[1]:
 
-        if (( ${+functions[_git-$words[1]]} )); then
+        if (( $+functions[_git-$words[1]] )); then
           _call_function ret _git-$words[1]
-        elif zstyle -T ":completion:${curcontext}:" use-fallback; then
+        elif zstyle -T :completion:$curcontext: use-fallback; then
           _files && ret=0
         else
           _message 'unknown sub-command'
@@ -6135,42 +6164,30 @@ _git() {
   return ret
 }
 
-# Handle add-on completions. Say you got a third party add-on `foo'. What you
-# want to do is write your completion as `_git-foo' and this code will pick it
-# up. That should be a regular compsys function, which starts like this:
-#
-#  #compdef git-foo
-#
-# In addition to what compinit does, this also reads the second line of the
-# completion. If that matches "#desc:*" the part behind "#desc:" will be used
-# as the addon's description. Like this:
-#
-#  #desc:checks git's foobar value
-local addon input i desc
-typeset -gUa _git_third_party
-for addon in ${^fpath}/_git-*~*~(.N); do
-    if [[ -n ${(M)_git_third_party:#${${addon:t}#_git-}*} ]]; then
-        # This makes sure only the first _git-foo in $fpath gets read.
-        continue
+# Load any _git-* definitions so that they may be completed as commands.
+declare -gUa _git_third_party_commands
+_git_third_party_commands=()
+
+local file
+for file in ${^fpath}/_git-*~(*~|*.zwc)(.N); do
+  local name=${${file:t}#_git-}
+  if (( $+_git_third_party_commands[$name] )); then
+    continue
+  fi
+
+  local desc=
+  integer i=1
+  while read input; do
+    if (( i == 2 )); then
+      if [[ $input == '#description '* ]]; then
+        desc=:${input#\#description }
+      fi
+      break
     fi
-    # Read the second line of the file.
-    i=1
-    desc=
-    while read input; do
-        if (( i == 2 )); then
-            desc=$input
-            break
-        fi
-        (( i++ ))
-    done < $addon
-    # Setup `$desc' appropriately.
-    if [[ $desc != '#desc:'* ]]; then
-        desc=
-    else
-        desc=${desc#\#desc}
-    fi
-    # Add the addon's completion.
-    _git_third_party+=( ${${addon:t}#_git-}$desc )
+    (( i++ ))
+  done < $file
+
+  _git_third_party_commands+=$name$desc
 done
 
 _git
