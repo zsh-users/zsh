@@ -1,3 +1,8 @@
+2011-07-22  Mikael Magnusson <mikachu@gmail.com>
+
+	* 29596: Completion/compinit: Fix syntax to work with KSH_ARRAYS
+	set.
+
 2011-07-22  Nikolai Weibull <now@bitwi.se>
 
 	* unposted: Completion/Unix/Command/_git: Use _files, not _path_files.
@@ -15149,5 +15154,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5405 $
+* $Revision: 1.5406 $
 *****************************************************
