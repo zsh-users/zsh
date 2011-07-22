@@ -6122,7 +6122,7 @@ _git() {
         if (( ${+functions[_git-$words[1]]} )); then
           _call_function ret _git-$words[1]
         elif zstyle -T ":completion:${curcontext}:" use-fallback; then
-          _path_files && ret=0
+          _files && ret=0
         else
           _message 'unknown sub-command'
         fi
