@@ -2975,17 +2975,16 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			fn->fd1 = (int)getintvalue(v);
 			if (errflag)
 			    bad = 1;
-			else if (fn->fd1 > max_zsh_fd)
-			    bad = 3;
-			else if (fn->fd1 >= 10 &&
+			else if (fn->fd1 <= max_zsh_fd) {
+			    if (fn->fd1 >= 10 &&
 				 fdtable[fn->fd1] == FDT_INTERNAL)
-			    bad = 4;
+				bad = 3;
+			}
 		    }
 		    if (bad) {
 			const char *bad_msg[] = {
 			    "parameter %s does not contain a file descriptor",
 			    "can't close file descriptor from readonly parameter %s",
-			    "file descriptor %d out of range, not closed",
 			    "file descriptor %d used by shell, not closed"
 			};
 			if (bad > 2)
@@ -2995,11 +2994,18 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			execerr();
 		    }
 		}
+		/*
+		 * Note we may attempt to close an fd beyond max_zsh_fd:
+		 * OK as long as we never look in fdtable for it.
+ 		 */
 		if (!forked && fn->fd1 < 10 && save[fn->fd1] == -2)
 		    save[fn->fd1] = movefd(fn->fd1);
 		if (fn->fd1 < 10)
 		    closemn(mfds, fn->fd1);
-		zclose(fn->fd1);
+		if (zclose(fn->fd1) < 0) {
+		    zwarn("failed to close file descriptor %d: %e",
+			  fn->fd1, errno);
+		}
 		break;
 	    case REDIR_MERGEIN:
 	    case REDIR_MERGEOUT:

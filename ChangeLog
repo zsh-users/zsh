@@ -1,3 +1,8 @@
+2011-07-25  Peter Stephenson  <pws@csr.com>
+
+	* 29561: Src/exec.c, Src/utils.c, Test/A04redirect.ztst: Allow
+	closing of file descriptors not recorded internally by the shell.
+
 2011-07-22  Mikael Magnusson <mikachu@gmail.com>
 
 	* 29596: Completion/compinit: Fix syntax to work with KSH_ARRAYS
@@ -15154,5 +15159,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5406 $
+* $Revision: 1.5407 $
 *****************************************************
