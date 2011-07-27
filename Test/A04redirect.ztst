@@ -155,9 +155,12 @@
   (exec 3<&-
   read foo <&-)
 1:'<&-' redirection
+?(eval):1: failed to close file descriptor 3: bad file descriptor
+?(eval):2: failed to close file descriptor 0: bad file descriptor
 
   print foo >&-
 0:'>&-' redirection
+?(eval):1: failed to close file descriptor 1: bad file descriptor
 
   fn() { local foo; read foo; print $foo; }
   coproc fn
