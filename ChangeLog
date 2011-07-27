@@ -1,3 +1,9 @@
+2011-07-27  Mikael Magnusson <mikachu@gmail.com>
+
+	* 29618: Completion/Linux/Command/_ethtool,
+	Completion/Zsh/Type/_file_descriptors: Fix some syntax to not depend
+	on SHORT_LOOPS being set.
+
 2011-07-25  Peter Stephenson  <pws@csr.com>
 
 	* 29561: Src/exec.c, Src/utils.c, Test/A04redirect.ztst: Allow
@@ -15159,5 +15165,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5407 $
+* $Revision: 1.5408 $
 *****************************************************

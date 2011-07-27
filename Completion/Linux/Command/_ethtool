@@ -3,9 +3,9 @@
 local -a cmds
 
 if [[ $CURRENT -ge 4 ]]; then
-	case $words[CURRENT-1]; in
+	case $words[CURRENT-1] in
 	  rx|tx)
-		if [[ $words[2] = '-G' ]] && _message -e n 'number of ring entries' || _wanted -x onoff expl 'enabled' compadd off on
+		[[ $words[2] = '-G' ]] && _message -e n 'number of ring entries' || _wanted -x onoff expl 'enabled' compadd off on
 	  ;;
 	  autoneg|adaptive-rx|adaptive-tx|raw|hex|sg|tso|ufo|gso)
 		_wanted -x onoff expl 'enabled' compadd off on
@@ -55,7 +55,7 @@ if [[ $CURRENT -ge 4 ]]; then
 		_wanted files expl 'raw register dump files' _files
 	  ;;
 	  *)
-	case $words[2]; in
+	case $words[2] in
 	  -A|--pause)
 		_values -S ' ' -w 'pause options' \
 			'autoneg[specify if pause autonegotiation is enabled]' \
@@ -111,7 +111,7 @@ if [[ $CURRENT -ge 4 ]]; then
 			'gso[specify if generic segmentation offload is enabled]'
 	  ;;
 	  -p|--identify)
-		if [[ $CURRENT -eq 4 ]] && _message -e length 'seconds'
+		[[ $CURRENT -eq 4 ]] && _message -e length 'seconds'
 	  ;;
 	  -t|--test)
 		_values -S ' ' -w 'selftest option' \

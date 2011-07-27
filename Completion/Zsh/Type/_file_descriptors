@@ -13,7 +13,9 @@ if zstyle -T ":completion:${curcontext}:" verbose && [[ -h /proc/$$/fd/$fds[1] ]
       list+=( "$i $sep ${link[1]}" )
     done
   elif (( $+commands[readlink] )); then
-    for i in "${fds[@]}"; list+=( "$i $sep $(readlink /proc/$$/fd/$i)" )
+    for i in "${fds[@]}"; do
+      list+=( "$i $sep $(readlink /proc/$$/fd/$i)" )
+    done
   else
     for i in "${fds[@]}"; do
       list+=( "$i $sep $(ls -l /proc/$$/fd/$i|sed 's/.*-> //' )" )
