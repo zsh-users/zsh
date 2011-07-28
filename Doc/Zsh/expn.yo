@@ -236,7 +236,10 @@ a glob qualifier unless a file of the same name is found in the
 current directory.
 )
 item(tt(e))(
-Remove all but the extension.
+Remove all but the part of the filename extension following the `tt(.)';
+see the definition of the filename extension in the description of the
+tt(r) modifier below.  Note that according to that definition the result
+will be empty if the string ends with a `tt(.)'.
 )
 item(tt(h))(
 Remove a trailing pathname component, leaving the head.  This works
@@ -259,8 +262,12 @@ item(tt(Q))(
 Remove one level of quotes from the substituted words.
 )
 item(tt(r))(
-Remove a filename extension of the form `tt(.)var(xxx)', leaving
-the root name.
+Remove a filename extension leaving the root name.  Strings with no
+filename extension are not altered.  A filename
+extension is a `tt(.)' followed by any number of characters (including
+zero) that are neither `tt(.)' nor `tt(/)' and that continue to the end
+of the string.  For example, the extension of
+`tt(foo.orig.c)' is `tt(.c)', and `tt(dir.c/foo)' has no extension.
 )
 item(tt(s/)var(l)tt(/)var(r)[tt(/)])(
 Substitute var(r) for var(l) as described below.

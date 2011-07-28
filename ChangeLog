@@ -1,3 +1,9 @@
+2011-07-28  Peter Stephenson  <pws@csr.com>
+
+	* 29602 and subsequent changes: Doc/Zsh/expn.yo: clarify meaning
+	of filename extension in :r and :e modifiers (which were
+	slightly inconsistent).
+
 2011-07-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 29561: Test/A04redirect.ztst: this bit didn't get committed,
@@ -15170,5 +15176,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5409 $
+* $Revision: 1.5410 $
 *****************************************************
