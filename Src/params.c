@@ -4193,6 +4193,7 @@ arrfixenv(char *s, char **t)
 int
 zputenv(char *str)
 {
+    DPUTS(!str, "Attempt to put null string into environment.");
 #ifdef USE_SET_UNSET_ENV
     /*
      * If we are using unsetenv() to remove values from the

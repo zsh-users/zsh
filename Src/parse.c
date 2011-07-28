@@ -1465,6 +1465,7 @@ par_funcdef(void)
 	    ecssub = oecssub;
 	    YYERRORV(oecused);
 	}
+	incmdpos = 0;
 	zshlex();
     } else if (unset(SHORTLOOPS)) {
 	lineno += oldlineno;
@@ -1720,6 +1721,7 @@ par_simple(int *complex, int nr)
 		    ecssub = oecssub;
 		    YYERROR(oecused);
 		}
+		incmdpos = 0;
 		zshlex();
 	    } else {
 		int ll, sl, c = 0;

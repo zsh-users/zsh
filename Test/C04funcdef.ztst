@@ -1,3 +1,8 @@
+%prep
+
+  mkdir funcdef.tmp
+  cd funcdef.tmp
+
 %test
 
   fn1() { return 1; }
@@ -227,6 +232,18 @@
 >	} with more args
 >	print Following bit
 >}
+
+  touch yes no
+  () { echo $1 } (y|z)*
+  (echo here)
+  () { echo $* } some (y|z)*
+  () { echo empty };(echo here)
+0:Anonymous function arguments and command arguments
+>yes
+>here
+>some yes
+>empty
+>here
 
 %clean
 
