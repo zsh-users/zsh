@@ -1,5 +1,8 @@
 #compdef quilt
 
+local -a tmp
+local rc
+
 _arguments \
   '--trace' \
   '--quiltrc:config file:_files' \
@@ -10,21 +13,37 @@ _arguments \
   '*::subcmd:->subcmd' && return 0
 
 case "$state" in
-    (subcmd)
+  (subcmd)
 
   case "$words[1]" in
       (applied|delete|files|graph|header|next|previous|refresh|unapplied)
-      	_wanted -V 'patches' expl 'patch' compadd ${(f)"$(quilt series)"}
-	;;
+        _wanted -V 'patches' expl 'patch' compadd ${(f)"$(quilt series)"}
+        ;;
       (push)
-    	_wanted -V 'unapplied patches' expl 'patch' compadd ${(f)"$(quilt unapplied)"}
-    	;;
+        if (( CURRENT == 2 )); then
+          tmp=( ${(f)"$(quilt unapplied 2>&1)"} )
+          rc=$?
+          if (( rc == 0 )); then
+            _wanted -V 'unapplied patches' expl 'patch' compadd "${tmp[@]}"
+          else
+            _message "No unapplied patches"
+          fi
+        fi
+        ;;
       (pop)
-    	_wanted -V 'applied patches' expl 'patch' compadd ${(f)"$(quilt applied)"}
-    	;;
+        if (( CURRENT == 2 )); then
+          tmp=( ${(f)"$(quilt applied 2>&1)"} )
+          rc=$?
+          if (( rc == 0 )); then
+            _wanted -V 'applied patches' expl 'patch' compadd "${tmp[@]}"
+          else
+            _message "No applied patches"
+          fi
+        fi
+        ;;
       (*)
-    	_files
-    	;;
+        _files
+        ;;
   esac
   ;;
 esac

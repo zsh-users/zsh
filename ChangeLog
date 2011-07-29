@@ -1,3 +1,8 @@
+2011-07-29  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Luka Perkov: 29624: Completion/Unix/Command/_quilt: Improve
+	`push' and `pop' completion.
+
 2011-07-28  Peter Stephenson  <pws@csr.com>
 
 	* 29626: Src/parse.c, Test/C04funcdef.ztst: arguments to
@@ -15179,5 +15184,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5411 $
+* $Revision: 1.5412 $
 *****************************************************
