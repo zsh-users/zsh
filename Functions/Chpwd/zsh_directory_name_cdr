@@ -18,7 +18,7 @@ elif [[ $1 = c ]]; then
     values=(${${(f)"$(cdr -l)"}/ ##/:})
     keys=(${values%%:*})
     _describe -t dir-index 'recent directory index' \
-      values keys -V unsorted -S']'
+      values -V unsorted -S']'
     return
   fi
 fi

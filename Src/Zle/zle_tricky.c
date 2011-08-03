@@ -398,7 +398,18 @@ mod_export char *cmdstr;
 /**/
 mod_export char *varname;
 
-/* != 0 if we are in a subscript */
+/*
+ * != 0 if we are in a subscript.
+ * Of course, this being the completion code, you're expected to guess
+ * what the different numbers actually mean, but here's a cheat:
+ * 1: Key of an ordinary array
+ * 2: Key of a hash
+ * 3: Ummm.... this appears to be a special case of 2.  After a lot
+ *    of uncommented code looking for groups of brackets, we suddenly
+ *    decide to set it to 2.  The only upshot seems to be that compctl
+ *    then doesn't add a matching ']' at the end, so I think it means
+ *    there's one there already.
+ */
 
 /**/
 mod_export int insubscr;

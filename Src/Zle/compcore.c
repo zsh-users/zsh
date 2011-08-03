@@ -607,7 +607,7 @@ callcompfunc(char *s, char *fn)
 	    if (rdstr)
 		compredirect = rdstr;
 	    kset |= CP_REDIRECT;
-	} else
+	} else {
 	    switch (linwhat) {
 	    case IN_ENV:
 		compcontext = (linarr ? "array_value" : "value");
@@ -637,6 +637,7 @@ callcompfunc(char *s, char *fn)
 		    aadd = 1;
 		}
 	    }
+	}
 	compcontext = ztrdup(compcontext);
 	if (compwords)
 	    freearray(compwords);

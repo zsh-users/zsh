@@ -1,5 +1,9 @@
 2011-08-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 29644: Functions/Chpwd/zsh_directory_name_cdr,
+	Src/Zle/compcore.c, Src/Zle/zle_tricky.c: Work round a bug in
+	_describe, plus a new comment and some more braces.
+
 	* 29633: Doc/Zsh/func.yo, Src/parse.c, Test/C04funcdef.ztst: be
 	more careful that anonymous function syntax doesn't mess up
 	working syntax with other functions.
@@ -15195,5 +15199,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5414 $
+* $Revision: 1.5415 $
 *****************************************************
