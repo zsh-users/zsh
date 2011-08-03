@@ -1,3 +1,8 @@
+2011-08-03  Peter Stephenson  <pws@csr.com>
+
+	* 29635: Completion/Base/Widget/_complete_debug: Improve file
+	descriptor handling and standardise syntax.
+
 2011-07-29  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Luka Perkov: 29624: Completion/Unix/Command/_quilt: Improve
@@ -15184,5 +15189,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5412 $
+* $Revision: 1.5413 $
 *****************************************************

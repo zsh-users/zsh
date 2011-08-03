@@ -6,21 +6,27 @@ eval "$_comp_setup"
 local tmp=${TMPPREFIX}${$}${words[1]:t}$[++_debug_count]
 local pager w="${(qq)words}"
 
-exec 3>&-	# Too bad if somebody else is using it ...
-[[ -t 2 ]] && { exec 3>&2 2>| $tmp ; trap 'exec 2>&3 3>&-' EXIT INT }
+integer debug_fd=-1
+{
+  if [[ -t 2 ]]; then
+    exec {debug_fd}>&2 2>| $tmp
+  fi
 
-setopt xtrace
-: $ZSH_NAME $ZSH_VERSION
-${1:-_main_complete}
-integer ret=$?
-unsetopt xtrace
+  setopt xtrace
+  : $ZSH_NAME $ZSH_VERSION
+  ${1:-_main_complete}
+  integer ret=$?
+  unsetopt xtrace
 
-[[ -t 3 ]] && {
+  if (( debug_fd != -1 )); then
     zstyle -s ':completion:complete-debug::::' pager pager
     print -sR "${pager:-${PAGER:-${VISUAL:-${EDITOR:-more}}}} ${(q)tmp} ;: $w"
     _message -r "Trace output left in $tmp (up-history to view)"
-    [[ $compstate[nmatches] -le 1 && $compstate[list] != *force* ]] &&
+    if [[ $compstate[nmatches] -le 1 && $compstate[list] != *force* ]]; then
         compstate[list]='list force messages'
+    fi
+  fi
+} always {
+  (( debug_fd != -1 )) && exec 2>&$debug_fd {debug_fd}>&-
 }
-
 return ret
