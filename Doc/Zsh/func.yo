@@ -162,8 +162,15 @@ is not stored for future use.  The function name is set to `tt((anon))'.
 
 Arguments to the function may be specified as words following the
 closing brace defining the function, hence if there are none no
-arguments (other than tt($0)) are set.  Note that this means
-the argument list of any enclosing script or function is hidden.
+arguments (other than tt($0)) are set.  This is a difference from the
+way other functions are parsed: normal function definitions may be
+followed by certain keywords such as `tt(else)' or `tt(fi)', which will
+be treated as arguments to anonymous functions, so that a newline or
+semicolon is needed to force keyword interpretation.
+
+Note also that the argument list of any enclosing script or function is
+hidden (as would be the case for any other function called at this
+point).
 
 Redirections may be applied to the anonymous function in the same manner as
 to a current-shell structure enclosed in braces.  The main use of anonymous

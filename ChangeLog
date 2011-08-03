@@ -1,3 +1,9 @@
+2011-08-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 29633: Doc/Zsh/func.yo, Src/parse.c, Test/C04funcdef.ztst: be
+	more careful that anonymous function syntax doesn't mess up
+	working syntax with other functions.
+
 2011-08-03  Peter Stephenson  <pws@csr.com>
 
 	* 29635: Completion/Base/Widget/_complete_debug: Improve file
@@ -15189,5 +15195,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5413 $
+* $Revision: 1.5414 $
 *****************************************************

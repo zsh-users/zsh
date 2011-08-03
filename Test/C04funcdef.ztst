@@ -245,6 +245,12 @@
 >empty
 >here
 
+  if true; then f() { echo foo1; } else f() { echo bar1; } fi; f
+  if false; then f() { echo foo2; } else f() { echo bar2; } fi; f
+0:Compatibility with other shells when not anonymous functions
+>foo1
+>bar2
+
 %clean
 
  rm -f file.in file.out
