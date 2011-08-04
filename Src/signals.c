@@ -1184,7 +1184,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     traplocallevel = locallevel;
     runhookdef(BEFORETRAPHOOK, NULL);
     if (*sigtr & ZSIG_FUNC) {
-	int osc = sfcontext;
+	int osc = sfcontext, old_incompfunc = incompfunc;
 	HashNode hn = gettrapnode(sig, 0);
 
 	args = znewlinklist();
@@ -1210,8 +1210,10 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	trapisfunc = isfunc = 1;
 
 	sfcontext = SFC_SIGNAL;
+	incompfunc = 0;
 	doshfunc((Shfunc)sigfn, args, 1);
 	sfcontext = osc;
+	incompfunc= old_incompfunc;
 	freelinklist(args, (FreeFunc) NULL);
 	zsfree(name);
     } else {

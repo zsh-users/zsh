@@ -53,11 +53,6 @@ mod_export int zlecs, zlell;
 /**/
 mod_export int incompctlfunc;
 
-/* != 0 if we are in a new style completion function */
-
-/**/
-mod_export int incompfunc;
-
 /* != 0 if completion module is loaded */
 
 /**/

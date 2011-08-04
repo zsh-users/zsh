@@ -40,6 +40,11 @@ mod_export char *scriptname;     /* is sometimes a function name */
 /**/
 mod_export char *scriptfilename;
 
+/* != 0 if we are in a new style completion function */
+
+/**/
+mod_export int incompfunc;
+
 #ifdef MULTIBYTE_SUPPORT
 struct widechar_array {
     wchar_t *chars;
@@ -1232,8 +1237,10 @@ callhookfunc(char *name, LinkList lnklst, int arrayp, int *retval)
 	 * to a list of jobs generated in a hook.
 	 */
     int osc = sfcontext, osm = stopmsg, stat = 1, ret = 0;
+    int old_incompfunc = incompfunc;
 
     sfcontext = SFC_HOOK;
+    incompfunc = 0;
 
     if ((shfunc = getshfunc(name))) {
 	ret = doshfunc(shfunc, lnklst, 1);
@@ -1262,6 +1269,7 @@ callhookfunc(char *name, LinkList lnklst, int arrayp, int *retval)
 
     sfcontext = osc;
     stopmsg = osm;
+    incompfunc = old_incompfunc;
 
     if (retval)
 	*retval = ret;
@@ -3216,7 +3224,7 @@ getshfunc(char *nam)
 char **
 subst_string_by_func(Shfunc func, char *arg1, char *orig)
 {
-    int osc = sfcontext, osm = stopmsg;
+    int osc = sfcontext, osm = stopmsg, old_incompfunc = incompfunc;
     LinkList l = newlinklist();
     char **ret;
 
@@ -3225,6 +3233,7 @@ subst_string_by_func(Shfunc func, char *arg1, char *orig)
 	addlinknode(l, arg1);
     addlinknode(l, orig);
     sfcontext = SFC_SUBST;
+    incompfunc = 0;
 
     if (doshfunc(func, l, 1))
 	ret = NULL;
@@ -3233,6 +3242,7 @@ subst_string_by_func(Shfunc func, char *arg1, char *orig)
 
     sfcontext = osc;
     stopmsg = osm;
+    incompfunc = old_incompfunc;
     return ret;
 }
 
