@@ -149,13 +149,33 @@ file descriptor 2 would be associated
 with the terminal (assuming file descriptor 1 had been)
 and then file descriptor 1 would be associated with file var(fname).
 
-If instead of a digit one of the operators above is preceded by
-a valid identifier enclosed in braces, the shell will open a new
-file descriptor that is guaranteed to be at least 10 and set the
-parameter named by the identifier to the file descriptor opened.
-No whitespace is allowed between the closing brace and the redirection
-character.  The option tt(IGNORE_BRACES) must not be set.
-For example:
+The `tt(|&)' command separator described in
+ifzman(em(Simple Commands & Pipelines) in zmanref(zshmisc))\
+ifnzman(noderef(Simple Commands & Pipelines))
+is a shorthand for `tt(2>&1 |)'.
+
+The various forms of process substitution, `tt(<LPAR())var(list)tt(RPAR())',
+and `tt(=LPAR())var(list)(RPAR())' for input and
+`tt(>LPAR())var(list)tt(RPAR())' for output, are often used together with
+redirection.  For example, if var(word) in an output redirection is of the
+form `tt(>LPAR())var(list)tt(RPAR())' then the output is piped to the
+command represented by var(list).  See
+ifzman(\
+em(Process Substitution) in zmanref(zshexpn))\
+ifnzman(\
+noderef(Process Substitution)).
+sect(Opening file descriptors using parameters)
+cindex(file descriptors, use with parameters)
+cindex(parameters, for using file descriptors)
+
+When the shell is parsing arguments to a command, and the shell option
+The option tt(IGNORE_BRACES) is not set, a different form of
+redirection is allowed: instead of a digit before the operator
+there is a valid shell identifier enclosed in braces.  The shell will
+open a new file descriptor that is guaranteed to be at least 10 and set
+the parameter named by the identifier to the file descriptor opened.  No
+whitespace is allowed between the closing brace and the redirection
+character.    For example:
 
 indent(... {myfd}>&1)
 
@@ -181,8 +201,12 @@ using it for allocating a file descriptor avoids the error.
 
 Note that this mechanism merely allocates or closes a file descriptor; it
 does not perform any redirections from or to it.  It is usually convenient
-to allocate a file descriptor prior to use as an argument to tt(exec).  The
-following shows a typical sequence of allocation, use, and closing of a
+to allocate a file descriptor prior to use as an argument to tt(exec).
+The syntax does not in any case work when used around complex commands
+such as parenthesised subshells or loops, where the opening brace is
+interpreted as part of a command list to be executed in the current shell.
+
+The following shows a typical sequence of allocation, use, and closing of a
 file descriptor:
 
 example(integer myfd
@@ -194,22 +218,6 @@ Note that the expansion of the variable in the expression tt(>&$myfd)
 occurs at the point the redirection is opened.  This is after the expansion
 of command arguments and after any redirections to the left on the command
 line have been processed.
-
-The `tt(|&)' command separator described in
-ifzman(em(Simple Commands & Pipelines) in zmanref(zshmisc))\
-ifnzman(noderef(Simple Commands & Pipelines))
-is a shorthand for `tt(2>&1 |)'.
-
-The various forms of process substitution, `tt(<LPAR())var(list)tt(RPAR())',
-and `tt(=LPAR())var(list)(RPAR())' for input and
-`tt(>LPAR())var(list)tt(RPAR())' for output, are often used together with
-redirection.  For example, if var(word) in an output redirection is of the
-form `tt(>LPAR())var(list)tt(RPAR())' then the output is piped to the
-command represented by var(list).  See
-ifzman(\
-em(Process Substitution) in zmanref(zshexpn))\
-ifnzman(\
-noderef(Process Substitution)).
 sect(Multios)
 cindex(multios)
 pindex(MULTIOS, use of)

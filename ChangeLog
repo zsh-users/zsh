@@ -1,3 +1,8 @@
+2011-08-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 29661: Doc/Zsh/redirect.yo: Improve the documentation for
+	{var}>... redirections.
+
 2011-08-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 29644: Functions/Chpwd/zsh_directory_name_cdr,
@@ -15199,5 +15204,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5415 $
+* $Revision: 1.5416 $
 *****************************************************
