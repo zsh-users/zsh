@@ -30,9 +30,17 @@ in seconds if tt(-r) is given) to var(scalar) instead of printing it.
 )
 enditem()
 
-The tt(zsh/datetime) module makes available one parameter:
+The tt(zsh/datetime) module makes available several parameters:
 
 startitem()
+vindex(EPOCHREALTIME)
+item(tt(EPOCHREALTIME))(
+A floating point value representing the number of seconds since
+the epoch.  The notional accuracy is to nanoseconds if the
+tt(clock_gettime) call is available and to microseconds otherwise,
+but in practice the range of double precision floating point and
+shell scheduling latencies may be significant effects.
+)
 vindex(EPOCHSECONDS)
 item(tt(EPOCHSECONDS))(
 An integer value representing the number of seconds since the

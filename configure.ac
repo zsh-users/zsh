@@ -693,6 +693,8 @@ AC_CHECK_LIB(c, printf, [LIBS="$LIBS -lc"])
 
 AC_CHECK_LIB(m, pow)
 
+AC_CHECK_LIB(rt, clock_gettime)
+
 dnl Various features of ncurses depend on having the right header
 dnl (the system's own curses.h may well not be good enough).
 dnl So don't search for ncurses unless we found the header.
@@ -1170,7 +1172,7 @@ dnl need to integrate this function
 dnl AC_FUNC_STRFTIME
 
 AC_CHECK_FUNCS(strftime strptime mktime timelocal \
-	       difftime gettimeofday \
+	       difftime gettimeofday clock_gettime \
 	       select poll \
 	       readlink faccessx fchdir ftruncate \
 	       fstat lstat lchown fchown fchmod \

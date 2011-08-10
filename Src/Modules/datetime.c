@@ -151,6 +151,28 @@ getcurrentsecs(UNUSED(Param pm))
     return (zlong) time(NULL);
 }
 
+static double
+getcurrentrealtime(UNUSED(Param pm))
+{
+#ifdef HAVE_CLOCK_GETTIME
+    struct timespec now;
+
+    if (clock_gettime(CLOCK_REALTIME, &now) < 0) {
+	zwarn("EPOCHREALTIME: unable to retrieve time: %e", errno);
+	return (double)0.0;
+    }
+
+    return (double)now.tv_sec + (double)now.tv_nsec * 1e-9;
+#else
+    struct timeval now;
+    struct timezone dummy_tz;
+
+    gettimeofday(&now, &dummy_tz);
+
+    return (double)now.tv_sec + (double)now.tv_usec * 1e-6;
+#endif
+}
+
 static struct builtin bintab[] = {
     BUILTIN("strftime",    0, bin_strftime,    2,   2, 0, "qrs:", NULL),
 };
@@ -158,9 +180,14 @@ static struct builtin bintab[] = {
 static const struct gsu_integer epochseconds_gsu =
 { getcurrentsecs, NULL, stdunsetfn };
 
+static const struct gsu_float epochrealtime_gsu =
+{ getcurrentrealtime, NULL, stdunsetfn };
+
 static struct paramdef patab[] = {
     SPECIALPMDEF("EPOCHSECONDS", PM_INTEGER|PM_READONLY,
 		 &epochseconds_gsu, NULL, NULL),
+    SPECIALPMDEF("EPOCHREALTIME", PM_FFLOAT|PM_READONLY,
+		 &epochrealtime_gsu, NULL, NULL)
 };
 
 static struct features module_features = {

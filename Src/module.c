@@ -1081,6 +1081,11 @@ addparamdef(Paramdef d)
 	    pm->gsu.i = d->gsu ? (GsuInteger)d->gsu : &varinteger_gsu;
 	    break;
 
+	case PM_FFLOAT:
+	case PM_EFLOAT:
+	    pm->gsu.f = d->gsu;
+	    break;
+
 	case PM_ARRAY:
 	    pm->gsu.a = d->gsu ? (GsuArray)d->gsu : &vararray_gsu;
 	    break;
