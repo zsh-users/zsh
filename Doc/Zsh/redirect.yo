@@ -169,13 +169,12 @@ cindex(file descriptors, use with parameters)
 cindex(parameters, for using file descriptors)
 
 When the shell is parsing arguments to a command, and the shell option
-The option tt(IGNORE_BRACES) is not set, a different form of
-redirection is allowed: instead of a digit before the operator
-there is a valid shell identifier enclosed in braces.  The shell will
-open a new file descriptor that is guaranteed to be at least 10 and set
-the parameter named by the identifier to the file descriptor opened.  No
-whitespace is allowed between the closing brace and the redirection
-character.    For example:
+tt(IGNORE_BRACES) is not set, a different form of redirection is allowed:
+instead of a digit before the operator there is a valid shell identifier
+enclosed in braces.  The shell will open a new file descriptor that
+is guaranteed to be at least 10 and set the parameter named by the
+identifier to the file descriptor opened.  No whitespace is allowed
+between the closing brace and the redirection character.  For example:
 
 indent(... {myfd}>&1)
 
