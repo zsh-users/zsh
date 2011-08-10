@@ -2845,7 +2845,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	/* This is a current shell procedure that didn't need to fork.    *
 	 * This includes current shell procedures that are being exec'ed, *
 	 * as well as null execs.                                         */
-	jobtab[thisjob].stat |= STAT_CURSH|STAT_NOPRINT;
+	jobtab[thisjob].stat |= STAT_CURSH;
+	if (!jobtab[thisjob].procs)
+	    jobtab[thisjob].stat |= STAT_NOPRINT;
     } else {
 	/* This is an exec (real or fake) for an external command.    *
 	 * Note that any form of exec means that the subshell is fake *

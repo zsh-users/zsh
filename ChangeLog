@@ -3,6 +3,15 @@
 	* 29661: Doc/Zsh/redirect.yo: Improve the documentation for
 	{var}>... redirections.
 
+2011-08-09  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* 29654: Src/jobs.c: "wait" should resume stopped jobs identified
+	by process ID as well as by job number.
+
+	* 29654: Src/exec.c: don't hide the job table entry for the left
+	side of a pipline that ends in a shell builtin.  This change may
+	be backed out if the patch in 29660 can be improved.
+
 2011-08-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 29644: Functions/Chpwd/zsh_directory_name_cdr,
@@ -15204,5 +15213,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5416 $
+* $Revision: 1.5417 $
 *****************************************************

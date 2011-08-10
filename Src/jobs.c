@@ -1933,12 +1933,19 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    Process p;
 
 	    if (findproc(pid, &j, &p, 0)) {
-		/*
-		 * returns 0 for normal exit, else signal+128
-		 * in which case we should return that status.
-		 */
-		retval = waitforpid(pid, 1);
-		if (!retval)
+		if (j->stat & STAT_STOPPED) {
+		    retval = (killjb(j, SIGCONT) != 0);
+		    if (retval == 0)
+			makerunning(j);
+		}
+		if (retval == 0) {
+		    /*
+		     * returns 0 for normal exit, else signal+128
+		     * in which case we should return that status.
+		     */
+		    retval = waitforpid(pid, 1);
+		}
+		if (retval == 0)
 		    retval = lastval2;
 	    } else if (isset(POSIXJOBS) &&
 		       pid == lastpid && lastpid_status >= 0L) {
