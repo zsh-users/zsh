@@ -1,3 +1,8 @@
+2011-08-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Src/subst.c: 29674: Src/Modules/datetime.c,
+	Doc/Zsh/mod_datetime.yo: add $epochtime array.
+
 2011-08-10  Peter Stephenson  <pws@csr.com>
 
 	* 29663: configure.ac, Src/module.c, Src/Modules/datetime.c,
@@ -15224,5 +15229,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5418 $
+* $Revision: 1.5419 $
 *****************************************************
