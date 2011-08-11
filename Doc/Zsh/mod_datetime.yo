@@ -30,7 +30,8 @@ in seconds if tt(-r) is given) to var(scalar) instead of printing it.
 )
 enditem()
 
-The tt(zsh/datetime) module makes available several parameters:
+The tt(zsh/datetime) module makes available several parameters;
+all are readonly:
 
 startitem()
 vindex(EPOCHREALTIME)
@@ -45,5 +46,19 @@ vindex(EPOCHSECONDS)
 item(tt(EPOCHSECONDS))(
 An integer value representing the number of seconds since the
 epoch.
+)
+vindex(epochtime)
+item(tt(epochtime))(
+An array value containing the number of seconds since the epoch
+in the first element and the remainder of the time since the epoch
+in nanoseconds in the second element.  To ensure the two elements
+are consistent the array should be copied or otherwise referenced
+as a single substitution before the values are used.  The following
+idiom may be used:
+
+example(for secs nsecs in $epochtime; do
+  ...
+done)
+
 )
 enditem()

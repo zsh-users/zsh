@@ -173,6 +173,45 @@ getcurrentrealtime(UNUSED(Param pm))
 #endif
 }
 
+static char **
+getcurrenttime(UNUSED(Param pm))
+{
+    char **arr;
+    char buf[DIGBUFSIZE];
+
+#ifdef HAVE_CLOCK_GETTIME
+    struct timespec now;
+
+    if (clock_gettime(CLOCK_REALTIME, &now) < 0) {
+	zwarn("EPOCHREALTIME: unable to retrieve time: %e", errno);
+	return NULL;
+    }
+
+    arr = (char **)zhalloc(3 * sizeof(*arr));
+    sprintf(buf, "%ld", (long)now.tv_sec);
+    arr[0] = dupstring(buf);
+    sprintf(buf, "%ld", now.tv_nsec);
+    arr[1] = dupstring(buf);
+    arr[2] = NULL;
+
+    return arr;
+#else
+    struct timeval now;
+    struct timezone dummy_tz;
+
+    gettimeofday(&now, &dummy_tz);
+
+    arr = (char **)zhalloc(3 * sizeof(*arr));
+    sprintf(buf, "%ld", (long)now.tv_sec);
+    arr[0] = dupstring(buf);
+    sprintf(buf, "%ld", (long)now.tv_usec * 1000);
+    arr[1] = dupstring(buf);
+    arr[2] = NULL;
+
+    return arr;
+#endif
+}
+
 static struct builtin bintab[] = {
     BUILTIN("strftime",    0, bin_strftime,    2,   2, 0, "qrs:", NULL),
 };
@@ -183,11 +222,16 @@ static const struct gsu_integer epochseconds_gsu =
 static const struct gsu_float epochrealtime_gsu =
 { getcurrentrealtime, NULL, stdunsetfn };
 
+static const struct gsu_array epochtime_gsu =
+{ getcurrenttime, NULL, stdunsetfn };
+
 static struct paramdef patab[] = {
     SPECIALPMDEF("EPOCHSECONDS", PM_INTEGER|PM_READONLY,
 		 &epochseconds_gsu, NULL, NULL),
     SPECIALPMDEF("EPOCHREALTIME", PM_FFLOAT|PM_READONLY,
-		 &epochrealtime_gsu, NULL, NULL)
+		 &epochrealtime_gsu, NULL, NULL),
+    SPECIALPMDEF("epochtime", PM_ARRAY|PM_READONLY,
+		 &epochtime_gsu, NULL, NULL)
 };
 
 static struct features module_features = {
