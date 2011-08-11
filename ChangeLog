@@ -1,5 +1,8 @@
 2011-08-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Src/params.c: unposted: Src/params.c, Test/V04features.ztst:
+	fix some tests I broke.
+
 	* Src/subst.c: 29674: Src/Modules/datetime.c,
 	Doc/Zsh/mod_datetime.yo: add $epochtime array.
 
@@ -15229,5 +15232,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5419 $
+* $Revision: 1.5420 $
 *****************************************************

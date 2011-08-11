@@ -17,18 +17,24 @@
 0:Loading modules with no features
 >-b:strftime
 >-p:EPOCHSECONDS
+>-p:EPOCHREALTIME
+>-p:epochtime
 
   zmodload -F zsh/datetime b:strftime
   zmodload -lF zsh/datetime
 0:Enabling features
 >+b:strftime
 >-p:EPOCHSECONDS
+>-p:EPOCHREALTIME
+>-p:epochtime
 
   zmodload -F zsh/datetime +p:EPOCHSECONDS -b:strftime
   zmodload -lF zsh/datetime
 0:Disabling features
 >-b:strftime
 >+p:EPOCHSECONDS
+>-p:EPOCHREALTIME
+>-p:epochtime
 
   zmodload -Fe zsh/datetime p:EPOCHSECONDS b:strftime
 0:Testing existing features
@@ -109,6 +115,8 @@
 0:Feature state with loading after error enabling
 >+b:strftime
 >-p:EPOCHSECONDS
+>+p:EPOCHREALTIME
+>+p:epochtime
 
   zmodload -F zsh/datetime p:EPOCHSECONDS
   zmodload -Fe zsh/datetime +p:EPOCHSECONDS
@@ -159,3 +167,5 @@
 0:zmodload with no -F enables all features
 >+b:strftime
 >+p:EPOCHSECONDS
+>+p:EPOCHREALTIME
+>+p:epochtime

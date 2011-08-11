@@ -3046,9 +3046,21 @@ mod_export void
 stdunsetfn(Param pm, UNUSED(int exp))
 {
     switch (PM_TYPE(pm->node.flags)) {
-	case PM_SCALAR: pm->gsu.s->setfn(pm, NULL); break;
-	case PM_ARRAY:  pm->gsu.a->setfn(pm, NULL); break;
-	case PM_HASHED: pm->gsu.h->setfn(pm, NULL); break;
+	case PM_SCALAR:
+	    if (pm->gsu.s->setfn)
+		pm->gsu.s->setfn(pm, NULL);
+	    break;
+
+	case PM_ARRAY:
+	    if (pm->gsu.a->setfn)
+		pm->gsu.a->setfn(pm, NULL);
+	    break;
+
+	case PM_HASHED:
+	    if (pm->gsu.h->setfn)
+		pm->gsu.h->setfn(pm, NULL);
+	    break;
+
 	default:
 	    if (!(pm->node.flags & PM_SPECIAL))
 	    	pm->u.str = NULL;
