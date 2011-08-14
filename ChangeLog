@@ -1,9 +1,9 @@
 2011-08-14  Mikael Magnusson  <mikachu@gmail.com>
 
-	* 29673: Doc/Zsh/compsys.yo: Clarify what 'other' in the
+	* 29673: Doc/Zsh/compsys.yo: clarify what 'other' in the
 	ignore-line style does.
 
-	* 28852: Misc/zargs, Zle/match-words-by-style: Use syntax that
+	* 28852: Misc/zargs, Zle/match-words-by-style: use syntax that
 	doesn't depend on SHORT_LOOPS being set.
 
 	* unposted: Src/hist.c: fix a typo in a comment.
@@ -13,6 +13,9 @@
 
 	* 29388, 29680: Doc/Zsh/expn.yo: clarify note about e:string:
 	quoting.
+
+	* 29504: Doc/Zsh/expn.yo: note when (#cN,M) can't be used in
+	place of # or ##.
 
 2011-08-14  Barton E. Schaefer  <schaefer@zsh.org>
 
@@ -15257,5 +15260,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5428 $
+* $Revision: 1.5429 $
 *****************************************************
