@@ -11,6 +11,9 @@
 	* unposted: Src/jobs.c: fix capitalized word in the middle of
 	a sentence.
 
+	* 29388, 29680: Doc/Zsh/expn.yo: clarify note about e:string:
+	quoting.
+
 2011-08-14  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29677: Src/exec.c, Src/signals.c, Src/zsh.h: flag jobs that are
@@ -15254,5 +15257,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5427 $
+* $Revision: 1.5428 $
 *****************************************************

@@ -2367,8 +2367,8 @@ latter is inserted into the command line word by word.
 
 For example, suppose a directory contains a single file `tt(lonely)'.  Then
 the expression `tt(*(e:'reply=(${REPLY}{1,2})':))' will cause the words
-`tt(lonely1 lonely2)' to be inserted into the command line.  Note the
-quotation marks.
+`tt(lonely1)' and `tt(lonely2)' to be inserted into the command line.  Note
+the quoting of var(string).
 
 The form tt(PLUS())var(cmd) has the same effect, but no delimiters appear
 around var(cmd).  Instead, var(cmd) is taken as the longest sequence of
