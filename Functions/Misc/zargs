@@ -207,7 +207,7 @@ then
     else
 	call=($command)
 	# Use "repeat" here so "continue" won't complain.
-	repeat 1 eval "$execute ; $analyze"
+	repeat 1; do eval "$execute ; $analyze"; done
 	return $ret
     fi
 fi
@@ -273,7 +273,7 @@ do
     repeat $P
     do
 	((ARGC)) || break
-	for (( end=l; end && ${(c)#argv[1,end]} > s; end/=2 )) :
+	for (( end=l; end && ${(c)#argv[1,end]} > s; end/=2 )) { }
 	(( end > n && ( end = n ) ))
 	args=( $argv[1,end] )
 	shift $((end > ARGC ? ARGC : end))

@@ -220,8 +220,7 @@ if [[ $wordstyle = *subword* ]]; then
 fi
 
 match=()
-charskip=
-repeat $skip charskip+=\?
+charskip=${(l:skip::?:)}
 
 eval pat2='${RBUFFER##(#b)('${charskip}${spacepat}')('\
 ${wordpat2}')('${spacepat}')}'

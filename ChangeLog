@@ -3,6 +3,9 @@
 	* 29673: Doc/Zsh/compsys.yo: Clarify what 'other' in the
 	ignore-line style does.
 
+	* 28852: Misc/zargs, Zle/match-words-by-style: Use syntax that doesn't
+	depend on SHORT_LOOPS being set.
+
 2011-08-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Src/Modules/datetime.mdd: unposted: also fix the autofeatures.
@@ -15239,5 +15242,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5423 $
+* $Revision: 1.5424 $
 *****************************************************
