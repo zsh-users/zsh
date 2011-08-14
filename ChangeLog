@@ -11,6 +11,13 @@
 	* unposted: Src/jobs.c: fix capitalized word in the middle of
 	a sentence.
 
+2011-08-14  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 29677: Src/exec.c, Src/signals.c, Src/zsh.h: flag jobs that are
+	builtins running in the current shell, and if they control a
+	pipeline, do not allow the external processes in that pipeline to
+	become suspended when the foreground shell cannot suspend.
+
 2011-08-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Src/Modules/datetime.mdd: unposted: also fix the autofeatures.
@@ -15247,5 +15254,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5426 $
+* $Revision: 1.5427 $
 *****************************************************

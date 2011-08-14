@@ -907,6 +907,8 @@ struct job {
 #define STAT_ATTACH	(0x1000) /* delay reattaching shell to tty       */
 #define STAT_SUBLEADER  (0x2000) /* is super-job, but leader is sub-shell */
 
+#define STAT_BUILTIN    (0x4000) /* job at tail of pipeline is a builtin */
+
 #define SP_RUNNING -1		/* fake status for jobs currently running */
 
 struct timeinfo {

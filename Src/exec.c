@@ -2848,6 +2848,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	jobtab[thisjob].stat |= STAT_CURSH;
 	if (!jobtab[thisjob].procs)
 	    jobtab[thisjob].stat |= STAT_NOPRINT;
+	if (is_builtin)
+	  jobtab[thisjob].stat |= STAT_BUILTIN;
     } else {
 	/* This is an exec (real or fake) for an external command.    *
 	 * Note that any form of exec means that the subshell is fake *

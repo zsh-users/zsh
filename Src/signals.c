@@ -490,14 +490,21 @@ wait_for_processes(void)
 	 * update it.
 	 */
 	if (findproc(pid, &jn, &pn, 0)) {
+	    if (((jn->stat & STAT_BUILTIN) ||
+		 (list_pipe && (jobtab[thisjob].stat & STAT_BUILTIN))) &&
+		WIFSTOPPED(status) && WSTOPSIG(status) == SIGTSTP) {
+		killjb(jn, SIGCONT);
+		zwarn("job can't be suspended");
+	    } else {
 #if defined(HAVE_WAIT3) && defined(HAVE_GETRUSAGE)
-	    struct timezone dummy_tz;
-	    gettimeofday(&pn->endtime, &dummy_tz);
-	    pn->status = status;
-	    pn->ti = ru;
+		struct timezone dummy_tz;
+		gettimeofday(&pn->endtime, &dummy_tz);
+		pn->status = status;
+		pn->ti = ru;
 #else
-	    update_process(pn, status);
+		update_process(pn, status);
 #endif
+	    }
 	    update_job(jn);
 	} else if (findproc(pid, &jn, &pn, 1)) {
 	    pn->status = status;
