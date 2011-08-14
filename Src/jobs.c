@@ -2255,7 +2255,7 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 		}
 		if (sig > SIGCOUNT) {
 		    zwarnnam(nam, "unknown signal: SIG%s", signame);
-		    zwarnnam(nam, "type kill -l for a List of signals");
+		    zwarnnam(nam, "type kill -l for a list of signals");
 		    return 1;
 		}
 	    }

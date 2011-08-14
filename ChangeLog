@@ -3,10 +3,13 @@
 	* 29673: Doc/Zsh/compsys.yo: Clarify what 'other' in the
 	ignore-line style does.
 
-	* 28852: Misc/zargs, Zle/match-words-by-style: Use syntax that doesn't
-	depend on SHORT_LOOPS being set.
+	* 28852: Misc/zargs, Zle/match-words-by-style: Use syntax that
+	doesn't depend on SHORT_LOOPS being set.
 
 	* unposted: Src/hist.c: fix a typo in a comment.
+
+	* unposted: Src/jobs.c: fix capitalized word in the middle of
+	a sentence.
 
 2011-08-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
@@ -15244,5 +15247,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5425 $
+* $Revision: 1.5426 $
 *****************************************************
