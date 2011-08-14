@@ -1,3 +1,8 @@
+2011-08-14  Mikael Magnusson <mikachu@gmail.com>
+
+	* 29673: Doc/Zsh/compsys.yo: Clarify what 'other' in the
+	ignore-line style does.
+
 2011-08-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Src/Modules/datetime.mdd: unposted: also fix the autofeatures.
@@ -15234,5 +15239,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5421 $
+* $Revision: 1.5422 $
 *****************************************************

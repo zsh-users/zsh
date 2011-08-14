@@ -1684,8 +1684,8 @@ will be considered as possible completions.  If it is set to
 `tt(current)', the word the cursor is on will not be considered as a
 possible completion.  The value `tt(current-shown)' is similar but only
 applies if the list of completions is currently shown on the screen.
-Finally, if the style is set to `tt(other)', no word apart from the
-current one will be considered as a possible completion.
+Finally, if the style is set to `tt(other)', all words on the line except
+for the current one will be excluded from the possible completions.
 
 The values `tt(current)' and `tt(current-shown)' are a bit like the
 opposite of the tt(accept-exact) style:  only strings with
