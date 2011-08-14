@@ -1,4 +1,4 @@
-2011-08-14  Mikael Magnusson <mikachu@gmail.com>
+2011-08-14  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29673: Doc/Zsh/compsys.yo: Clarify what 'other' in the
 	ignore-line style does.
@@ -72,7 +72,7 @@
 	* 29561: Test/A04redirect.ztst: this bit didn't get committed,
 	somehow.
 
-2011-07-27  Mikael Magnusson <mikachu@gmail.com>
+2011-07-27  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29618: Completion/Linux/Command/_ethtool,
 	Completion/Zsh/Type/_file_descriptors: Fix some syntax to not depend
@@ -83,12 +83,12 @@
 	* 29561: Src/exec.c, Src/utils.c, Test/A04redirect.ztst: Allow
 	closing of file descriptors not recorded internally by the shell.
 
-2011-07-22  Mikael Magnusson <mikachu@gmail.com>
+2011-07-22  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29596: Completion/compinit: Fix syntax to work with KSH_ARRAYS
 	set.
 
-2011-07-22  Nikolai Weibull <now@bitwi.se>
+2011-07-22  Nikolai Weibull  <now@bitwi.se>
 
 	* unposted: Completion/Unix/Command/_git: Use _files, not _path_files.
 
@@ -100,7 +100,7 @@
 	of #desc: for description of third-party commands.  Also, refactor the
 	code to match the rest of the file.
 
-2011-07-21  Nikolai Weibull <now@bitwi.se>
+2011-07-21  Nikolai Weibull  <now@bitwi.se>
 
 	* 29272: Completion/Unix/Command/_git: Use return values correctly
 	accross all completion functions.
@@ -292,7 +292,7 @@
 	Src/Zle/compcore.c (typo corrected): allow completion
 	of parameter flags.
 
-2011-06-03  Mikael Magnusson <mikachu@gmail.com>
+2011-06-03  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29438: Completion/Zsh/Context/_subscript: adjust pattern so
 	we complete dynamic directory names in command position as well.
@@ -349,7 +349,7 @@
 	* 29410: Test/V01zmodload.ztst: skip autoload persistence test
 	when zsh/example module is not available.
 
-2011-05-31  Mikael Magnusson <mikachu@gmail.com>
+2011-05-31  Mikael Magnusson  <mikachu@gmail.com>
 
 	* Omari Norman: users/16057: Completion/Unix/Command/.distfiles,
 	Completion/Unix/Command/_tree: Add completion for tree.
@@ -358,7 +358,7 @@
 
 	* unposted: Config/version.mk: release 4.3.12.
 
-2011-05-29  Nikolai Weibull <now@bitwi.se>
+2011-05-29  Nikolai Weibull  <now@bitwi.se>
 
 	* unposted: Completion/Unix/Command/_git: Update git-branch completion
 	to deal with -r and -d correctly.
@@ -367,7 +367,7 @@
 
 	* 29403: Src/hist.c: histlexwords splitting of ";;" in case.
 
-2011-05-27  Mikael Magnusson <mikachu@gmail.com>
+2011-05-27  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 28364: Doc/Zsh/zle.yo: Document that space left by wrapping
 	double-width characters is highlighted with the 'special' style.
@@ -394,7 +394,7 @@
 
 	* 29382: Src/Modules/curses.c: apply 29374 to zccmd_input too.
 
-2011-05-27  Mikael Magnusson <mikachu@gmail.com>
+2011-05-27  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29331: NEWS: Note g:: parameter expansion flag.
 
@@ -434,7 +434,7 @@
 	assumptions introduced by 25145 and add check of redirection
 	inside a function body.
 
-2011-05-24  Mikael Magnusson <mikachu@gmail.com>
+2011-05-24  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29364: Completion/Unix/Command/_make: Partial fix for
 	completion in dirs with spaces and other unusual characters.
@@ -458,7 +458,7 @@
 	Completion/Unix/Command/.distfiles: basic completion for
 	commands associated with the Go programming language.
 
-2011-05-22  Mikael Magnusson <mikachu@gmail.com>
+2011-05-22  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Doc/Zsh/compsys.yo, ChangeLog: Quote -e with tt().
 	Fix some formatting in ChangeLog.
@@ -469,7 +469,7 @@
 	Completion/Unix/Command/_php: Another missing backslash in _git,
 	remove some not needed backslashes in array definitions.
 
-2011-05-19  Mikael Magnusson <mikachu@gmail.com>
+2011-05-19  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29224: Doc/Zsh/expn.yo, NEWS, Src/subst.c,
 	Test/D04parameter.ztst: Support negative LEN in ${VAR:OFFSET:LEN}
@@ -521,7 +521,7 @@
 	* Nikolai Weibull: 29166: Completion/Unix/Command/_git: Speed
 	improvements for file completion.
 
-2011-05-17  Nikolai Weibull <now@bitwi.se>
+2011-05-17  Nikolai Weibull  <now@bitwi.se>
 
 	* 29273: Completion/Unix/Command/_git: Parse compadd options in
 	__git_guard_number.
@@ -531,7 +531,7 @@
 	* 29278: Completion/Unix/Type/_path_files: fix use of the $skips
 	pattern from the squeeze-slashes style.
 
-2011-05-14  Mikael Magnusson <mikachu@gmail.com>
+2011-05-14  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29271: Doc/Zsh/compwid.yo: document _alternative -O name.
 
@@ -569,7 +569,7 @@
 	* unposted (late commit): Completion/Unix/Command/.distfiles,
 	Config/version.mk, Test/.distfiles: update for 4.3.11-dev-3.
 
-2011-05-12  Mikael Magnusson <mikachu@gmail.com>
+2011-05-12  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29245: Completion/X/Command/_xset: pass -O instead of -o
 	to _describe.
@@ -582,7 +582,7 @@
 	* 29208: Src/Zle/zle_move.c: make vimatchbracket check the
 	character left of the cursor when at the end of the line.
 
-2011-05-11  Mikael Magnusson <mikachu@gmail.com>
+2011-05-11  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29206: Doc/Zsh/mod_complist.yo: fix formatting.
 
@@ -708,7 +708,7 @@
 	* 29107: Src/Zle/zle_tricky.c: replace overlapping strcpy with
 	memmove.
 
-2011-04-27  Mikael Magnusson <mikachu@gmail.com>
+2011-04-27  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29051: Completion/Unix/Command/_make: add _make- prefix to
 	internal helper functions.
@@ -781,7 +781,7 @@
 	* Simon Ruderich: 28927: Completion/Unix/Command/_git: Fix "git
 	tag -v" completion.
 
-2011-04-15  Mikael Magnusson <mikachu@gmail.com>
+2011-04-15  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 28998: Completion/Unix/Command/_make: set return status
 	correctly.
@@ -850,7 +850,7 @@
 	Functions/VCS_Info/vcs_info: Make the nvcsformats style be used if
 	vcs_info is disabled.
 
-2011-03-29  Mikael Magnusson <mikachu@gmail.com>
+2011-03-29  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Completion/Unix/Command/_vim: Fix typo in
 	description for -N.
@@ -2468,11 +2468,11 @@
 	* Frank: 27717: Functions/VCS_Info/vcs_info_lastmsg:
 	add option terminators for builtins.
 
-2010-12-17  Andrey Borzenkov <bor@zsh.org>
+2010-12-17  Andrey Borzenkov  <bor@zsh.org>
 
 	* unposted: Doc/Zsh/compsys.yo: typo fix
 
-2010-12-16  Andrey Borzenkov <bor@zsh.org>
+2010-12-16  Andrey Borzenkov  <bor@zsh.org>
 
 	* 27715: Completion/Unix/Command/_stgit: fixes for new
 	version (workaround removed commands); autogenerate list
@@ -2750,7 +2750,7 @@
 	* 27518: Completion/Unix/Command/_configure: suggest some
 	more patterns for arguments.
 
-2009-12-14  Andrey Borzenkov <bor@zsh.org>
+2009-12-14  Andrey Borzenkov  <bor@zsh.org>
 
 	* unposted: Completion/Unix/Command/_grep:
 	add --exclude-dir option
@@ -3367,7 +3367,7 @@
 	save and restore the lexical context to avoid pulling the
 	rug out when called in some nested fashion.
 
-2009-06-28  Andrey Borzenkov <bor@zsh.org>
+2009-06-28  Andrey Borzenkov  <bor@zsh.org>
 
 	* unposted: Completion/Unix/Command/_man:
 	support lzma compression of man pages used in Mandriva
@@ -3553,7 +3553,7 @@
 	variables should be zeroed even if the module is being unloaded
 	(problem on HP-UX).
 
-2009-05-09  Andrey Borzenkov <bor@zsh.org>
+2009-05-09  Andrey Borzenkov  <bor@zsh.org>
 
 	* unposted: Completion/Unix/Command/_getfacl:
 	fix options definition; add file names completion for variant=unix
@@ -3664,7 +3664,7 @@
 	* Kalle Olavi Niemitalo: 26850: Completion/Unix/Command/_git:
 	fix breakage in git write-tree and git send-pack.
 
-2009-04-18  Andrey Borzenkov <bor@zsh.org>
+2009-04-18  Andrey Borzenkov  <bor@zsh.org>
 
 	* users/14033 as modified by users/14037 and added doc:
 	Completion/Base/Utility/_describe, Doc/Zsh/compsys.yo: allow
@@ -4128,7 +4128,7 @@
 
 	* Richard Hartmann: 26535: Doc/Zsh/options.yo: remove typo.
 
-2009-02-08  Andrey Borzenkov <bor@zsh.org>
+2009-02-08  Andrey Borzenkov  <bor@zsh.org>
 
 	* 26530: Doc/Zsh/builtins.yo: clarify that "emulate -c"
 	restores all options on return, not only those related
@@ -4161,7 +4161,7 @@
 	* 26513: README: note that addition of ".." in completion
 	was broken.
 
-2009-02-01  Andrey Borzenkov <bor@zsh.org>
+2009-02-01  Andrey Borzenkov  <bor@zsh.org>
 
 	* 26504: Doc/Zsh/options.yo: document that LOCAL_OPTIONS
 	does not restore PRIVILEGED and RESTRICTED
@@ -4235,7 +4235,7 @@
 	* Greg Klanderman: 26439: Doc/Zsh/mod_system.yo: convert sections
 	to subsections.
 
-2009-01-25  Andrey Borzenkov <bor@zsh.org>
+2009-01-25  Andrey Borzenkov  <bor@zsh.org>
 
 	* 26425: Doc/Zsh/builtins.yo Src/builtin.c:
 	"emulate csh -c command" will evaluate `command' after temporary
@@ -4361,7 +4361,7 @@
 	* unposted: add RCS Revision tag for use in patchlevel
 	recording.
 
-2009-01-09  Andrey Borzenkov <bor@zsh.org>
+2009-01-09  Andrey Borzenkov  <bor@zsh.org>
 
 	* 26270: Completion/Base/Utility/_values, Doc/Zsh/compwid.yo,
 	Src/Zle/compcore.c, Src/Zle/complete.c, Src/Zle/compresult.c:
@@ -4399,7 +4399,7 @@
 	Completion/Unix/Type/_ps, Completion/Unix/Type/_pdf:
 	files compressed with .bz2.
 
-2009-01-05  Andrey Borzenkov <bor@zsh.org>
+2009-01-05  Andrey Borzenkov  <bor@zsh.org>
 
 	* 26247: configure.ac, Src/Zle/zle_tricky.c: fix compilation
 	with -Werror=format-security GCC option.
@@ -5439,7 +5439,7 @@
 	of complex sublists were wrong, plus test; another place to make
 	lineno more consistent.
 
-2008-08-31  Andrey Borzenkov <bor@zsh.org>
+2008-08-31  Andrey Borzenkov  <bor@zsh.org>
 
 	* users/13169: Src/exec.c: really restore emulation mode when
 	exiting shell function if 'emulate -L' has been used (actually
@@ -6444,7 +6444,7 @@
 	* users/12793: William Scott: Completion/BSD/Command/_chflags:
 	hidden/nohidden flags.
 
-2008-04-20  Andrey Borzenkov <bor@zsh.org>
+2008-04-20  Andrey Borzenkov  <bor@zsh.org>
 
 	* 24851: Doc/Zsh/mod_complist.yo, Src/Zle/complist.c: support
 	colour codes for from current GNU ls
@@ -6710,7 +6710,7 @@
 2008-03-22  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/params.yo: further documentation tweak for the
-	(R) and	(I) subscript flags.
+	(R) and (I) subscript flags.
 
 2008-03-18  Barton E. Schaefer  <schaefer@zsh.org>
 
@@ -8279,7 +8279,7 @@
 	words immediately followed by () or something that looks
 	like it's going to be one.
 
-2007-08-12  Andrey Borzenkov <bor@zsh.org>
+2007-08-12  Andrey Borzenkov  <bor@zsh.org>
 
 	* 23751: Completion/Linux/Command/_modutils: support for
 	completing module files directly
@@ -8450,7 +8450,7 @@
 	make autoloads persistent.  Put modules in hash table.
 	Rationalise error handling and error messages.  Improve
 	module listing.  Abort at top level of list execution when
-	errflag is set 	instead of relying on called functions returning
+	errflag is set instead of relying on called functions returning
 	early.
 
 2007-07-06  Clint Adams  <clint@zsh.org>
@@ -8918,7 +8918,7 @@
 	* 23433: Src/Zle/zle_main.c: cast for ZMAXTIMEOUT was wrong
 	where sizeof(long) > sizeof(int).
 
-2007-05-10  Andrey Borzenkov <bor@zsh.org>
+2007-05-10  Andrey Borzenkov  <bor@zsh.org>
 
 	* 23409 with extra comment: Src/init.c, Src/utils.c: after ZLE
 	displayed "use 'exit' to exit" message, PROMPT_SP will overwrite
@@ -9203,7 +9203,7 @@
 	* 23214: Completion/Unix/Command/_subversion: complete files
 	after svn commit --file.
 
-2007-02-10  Felix Rosencrantz <f.rosencrantz@gmail.com>
+2007-02-10  Felix Rosencrantz  <f.rosencrantz@gmail.com>
 
 	* unposted: Completion/Unix/Command/_comm: added -s flag to
 	_arguments so completion could deal with combined flags.
@@ -9335,7 +9335,7 @@
 	try to parse base indicators in octal and raise error for
 	bases above 36.
 
-2007-02-10  Felix Rosencrantz <f.rosencrantz@gmail.com>
+2007-02-10  Felix Rosencrantz  <f.rosencrantz@gmail.com>
 	* 23164: Src/builtin.c when PUSHD_SILENT is set, don't print anything
 	from popd/pushd.
 
@@ -9962,7 +9962,7 @@
 	* 22835: Completion/Unix/Command/_pon: tidy up pon bit
 	and add poff completion.
 
-2006-10-07  Andrey Borzenkov <bor@zsh.org>
+2006-10-07  Andrey Borzenkov  <bor@zsh.org>
 
 	* 22831: Src/Zle/comp.h, Src/Zle/compresult.c, Src/Zle/computil.c:
 	make CM_SPACE definition global and use it consistently in
@@ -10069,7 +10069,7 @@
 	Completion/Linux/Type/_wakeup_capable_devices: completion for
 	acpitool.
 
-2006-09-30  Andrey Borzenkov <bor@zsh.org>
+2006-09-30  Andrey Borzenkov  <bor@zsh.org>
 
 	* unposted: Src/Zle/compmatch.c: fix thinko in 22787 that changed
 	semantic of pattern matching in join_strs
@@ -10078,7 +10078,7 @@
 
 	* 22789: Src/init.c: Source zshenv even if non-interactive.
 
-2006-09-29  Andrey Borzenkov <bor@zsh.org>
+2006-09-29  Andrey Borzenkov  <bor@zsh.org>
 
 	* 22787: Srz/Zsh/compmatch.c: change calling convention of
 	pattern_match to not depend on current implementation that works
@@ -10109,7 +10109,7 @@
 	Src/Zle/zle_main.c: rename some MB_ macros to WC_ since they
 	act on wchar_t's.
 
-2006-09-23  Andrey Borzenkov <bor@zsh.org>
+2006-09-23  Andrey Borzenkov  <bor@zsh.org>
 
 	* unposted: Test/A06assign.ztst, Test/B03print.ztst,
 	Test/E01options.ztst, Test/ztst.zsh: as pointed by Bart in 22759,
@@ -10120,7 +10120,7 @@
 	to consistently use character width when laying out matches.
 	This supercedes fix in 22729.
 
-2006-09-22  Andrey Borzenkov <bor@zsh.org>
+2006-09-22  Andrey Borzenkov  <bor@zsh.org>
 
 	* 22758: Test/A06assign.ztst, Test/B03print.ztst,
 	Test/E01options.ztst: force locale to C to avoid test failures
@@ -10171,7 +10171,7 @@
 	* 22727: Src/init.c, Src/Zle/zle_main.c: "use 'exit' to exit"
 	was suboptimal.
 
-2006-09-16  Andrey Borzenkov <bor@zsh.org>
+2006-09-16  Andrey Borzenkov  <bor@zsh.org>
 
 	* 22721: Makefile.in: add pdf target
 
@@ -10368,7 +10368,7 @@
 2006-08-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Functions/Example/pushd: maintain pushdignoredups if
-	it was 	set on entry to the function.  I have a weird sense of
+	it was set on entry to the function.  I have a weird sense of
 	deja vu about this...
 
 	* 22594: Src/Zle/complist.c, Src/Zle/compresult.c,
@@ -12401,7 +12401,7 @@
 
 	* 21609: Src/glob.c: fixed the readlink() call in statfullpath().
 
-2005-08-15  Felix Rosencrantz <f.rosencrantz@gmail.com>
+2005-08-15  Felix Rosencrantz  <f.rosencrantz@gmail.com>
 
 	* 21611: Completion/X/Command/_mozilla: Added Firefox support.
 
@@ -13008,7 +13008,7 @@
 	Completion/Zsh/Type/_options, Completion/Zsh/Type/_options_set,
 	Completion/Zsh/Type/_options_unset: make completion functions
 	give precedence to descriptions passed as parameters and
-	cleanup	descriptions in calling functions
+	cleanup descriptions in calling functions
 
 	* 21314: Doc/Zsh/compsys.yo: declare expl local in example use
 	of _wanted
@@ -13128,12 +13128,12 @@
 
 	* unposted: Completion/X/Command/_qiv: new completion for qiv
 
-2005-05-13  Motoi Washida <a66@h8.dion.ne.jp>
+2005-05-13  Motoi Washida  <a66@h8.dion.ne.jp>
 
 	* users/8826: Completion/Darwin/Type/_retrieve_mac_apps: search
 	applications using spotlight.
 
-2005-05-12  Felix Rosencrantz <f.rosencrantz@gmail.com>
+2005-05-12  Felix Rosencrantz  <f.rosencrantz@gmail.com>
 
 	* 21257: Completion/Unix/Command/_perforce: fix minor typo
 	in completion for the p4 password command.
@@ -13278,7 +13278,7 @@
 	* 21156: Completion/Debian/Command/_dpkg: tweaks to
 	dpkg-reconfigure completion.
 
-2005-04-18  Felix Rosencrantz <f_rosencrantz@gmail.com>
+2005-04-18  Felix Rosencrantz  <f_rosencrantz@gmail.com>
 
 	* 21154: Completion/Unix/Command/_perforce: add pid completion for
 	monitor (clear|terminate) commands.
@@ -13777,7 +13777,7 @@
 	cleanup and 2 more options for the upcoming rsync 2.6.4
 	release.
 
-2005-02-19  Motoi Washida <a66@h8.dion.ne.jp>
+2005-02-19  Motoi Washida  <a66@h8.dion.ne.jp>
 
 	* users/8522: Completion/Darwin/Command/_defaults: fixed the
 	number of spaces broken while sending the patch by email.
@@ -14286,7 +14286,7 @@
 
 	* 20528: Src/exec.c: Clint spotted that fix in 18492 to make
 	> >(...) synchronous failed in the case of an fd opened for the
-	shell's own use with an	exec.
+	shell's own use with an exec.
 
 2004-10-26  Peter Stephenson  <pws@csr.com>
 
@@ -14882,7 +14882,7 @@
 	* 20024: Doc/Zsh/func.yo: Improve documentation for TRAPNAL
 	functions.
 
-2004-06-03  Felix Rosencrantz <f_rosencrantz@yahoo.com>
+2004-06-03  Felix Rosencrantz  <f_rosencrantz@yahoo.com>
 
 	* 20002: Src/Zle/compmatch.c: Fix a problem with an inconsistent
 	struct change in cmp_anchors().
@@ -15208,7 +15208,7 @@
 	configure.ac, Doc/Zsh/mod_zftp.yo, Src/Modules/zftp.c,
 	Etc/NEWS, Functions/Zftp/zfstat: Add support for non-standard
 	ports to core zftp.  Not yet handled by the function system
-	(except zfstat reports port): needed in lastloc	and bookmarks.
+	(except zfstat reports port): needed in lastloc and bookmarks.
 
 2004-03-23  Peter Stephenson  <pws@csr.com>
 
@@ -15239,5 +15239,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5422 $
+* $Revision: 1.5423 $
 *****************************************************
