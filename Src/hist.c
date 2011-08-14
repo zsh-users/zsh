@@ -229,7 +229,7 @@ ihwaddc(int c)
 	/* Quote un-expanded bangs in the history line. */
 	if (c == bangchar && stophist < 2 && qbang)
 	    /* If qbang is not set, we do not escape this bangchar as it's *
-	     * not mecessary (e.g. it's a bang in !=, or it is followed    *
+	     * not necessary (e.g. it's a bang in !=, or it is followed    *
 	     * by a space). Roughly speaking, qbang is zero only if the    *
 	     * history interpreter has already digested this bang and      *
 	     * found that it is not necessary to escape it.                */
