@@ -152,13 +152,13 @@ getcurrentsecs(UNUSED(Param pm))
 }
 
 static double
-getcurrentrealtime(UNUSED(Param pm))
+getcurrentrealtime(Param pm)
 {
 #ifdef HAVE_CLOCK_GETTIME
     struct timespec now;
 
     if (clock_gettime(CLOCK_REALTIME, &now) < 0) {
-	zwarn("EPOCHREALTIME: unable to retrieve time: %e", errno);
+	zwarn("%s: unable to retrieve time: %e", pm->node.nam, errno);
 	return (double)0.0;
     }
 
@@ -167,6 +167,7 @@ getcurrentrealtime(UNUSED(Param pm))
     struct timeval now;
     struct timezone dummy_tz;
 
+    (void)pm;
     gettimeofday(&now, &dummy_tz);
 
     return (double)now.tv_sec + (double)now.tv_usec * 1e-6;
@@ -174,7 +175,7 @@ getcurrentrealtime(UNUSED(Param pm))
 }
 
 static char **
-getcurrenttime(UNUSED(Param pm))
+getcurrenttime(Param pm)
 {
     char **arr;
     char buf[DIGBUFSIZE];
@@ -183,7 +184,7 @@ getcurrenttime(UNUSED(Param pm))
     struct timespec now;
 
     if (clock_gettime(CLOCK_REALTIME, &now) < 0) {
-	zwarn("EPOCHREALTIME: unable to retrieve time: %e", errno);
+	zwarn("%s: unable to retrieve time: %e", pm->node.nam, errno);
 	return NULL;
     }
 
@@ -199,6 +200,7 @@ getcurrenttime(UNUSED(Param pm))
     struct timeval now;
     struct timezone dummy_tz;
 
+    (void)pm;
     gettimeofday(&now, &dummy_tz);
 
     arr = (char **)zhalloc(3 * sizeof(*arr));
