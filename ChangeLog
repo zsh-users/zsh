@@ -1,3 +1,8 @@
+2011-08-16  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 29650: Src/jobs.c: don't lose the the time info after a
+	suspend+restore.
+
 2011-08-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Src/Modules/datetime.c: use pm->node.nam to get
@@ -15265,5 +15270,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5430 $
+* $Revision: 1.5431 $
 *****************************************************

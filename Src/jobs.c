@@ -953,6 +953,8 @@ printjob(Job jn, int lng, int synch)
 
     if (skip_print) {
 	if (jn->stat & STAT_DONE) {
+	    if (should_report_time(jn))
+		dumptime(jn);
 	    deletejob(jn);
 	    if (job == curjob) {
 		curjob = prevjob;
