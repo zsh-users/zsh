@@ -1,3 +1,8 @@
+2011-08-17  Nikolai Weibull  <now@bitwi.se>
+
+	* 29698: Completion/Unix/Command/_git: Complete diff options for git
+	log.
+
 2011-08-17  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29681: Src/Zle/zle_refresh.c: consistently use [] to access
@@ -15284,5 +15289,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5435 $
+* $Revision: 1.5436 $
 *****************************************************

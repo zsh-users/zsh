@@ -987,13 +987,15 @@ _git-log () {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
-  local -a log_options revision_options
+  local -a log_options revision_options diff_options
   __git_setup_log_options
   __git_setup_revision_options
+  __git_setup_diff_options
 
   _arguments -w -C -s \
     $log_options \
     $revision_options \
+    $diff_options \
     '(-)--[start file arguments]' \
     '*:: :->commit-range-or-file' && ret=0
 
@@ -5340,6 +5342,7 @@ __git_files () {
   files=(${(0)"$(_call_program files git ls-files -z --exclude-standard $opts -- ${pref:+$pref\*} 2>/dev/null)"})
   __git_command_successful $pipestatus || return
 
+#  _wanted $tag expl $description _files -g '{'${(j:,:)files}'}' $compadd_opts -
   _wanted $tag expl $description _multi_parts -f $compadd_opts - / files
 }
 
