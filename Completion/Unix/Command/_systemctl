@@ -1,0 +1,102 @@
+#compdef systemctl
+
+# Completion for systemd's systemctl
+# Version 1.0 ARF 3 August 2011
+
+# list the unit completions.
+_systemd_units(){
+  local -a units
+  local expl
+  units=(${(f)"$( systemctl --full list-units | sed -e 's/ .*//' )"})
+  _wanted keys expl 'units' compadd "$units[@]"
+}
+
+# list the job completions.
+_systemd_jobs(){
+  local -a jobs
+  local expl
+  jobs=(${(f)"$( systemctl --full list-jobs | sed -e 's/ .*//' )"})
+  _wanted keys expl 'jobs' compadd "$jobs[@]"
+}
+
+# list the snapshot completions.
+_systemd_snapshots(){
+  local -a ss
+  local expl
+  ss=(${(f)"$(
+  	systemctl dump | sed -n -e 's/^-> Unit \(.*\.snapshot\):/\1/p'
+  )"})
+  _wanted keys expl 'snapshots' compadd "$ss[@]"
+}
+
+_systemctl(){
+  local -a _systemctl_cmds
+
+  # Determine the sub commands
+  #$(systemctl --help  | sed -n -e 's/^  \([a-z]\)/\1/p' | sed -e 's/ .*//')
+  _systemctl_cmds=( 
+        list-units start stop reload restart try-restart reload-or-
+        restart reload-or-try-restart isolate kill is-active status show
+        reset-failed enable disable is-enabled load list-jobs cancel
+        monitor dump dot snapshot delete daemon-reload daemon-reexec show-
+        environment set-environment unset-environment default rescue
+        emergency halt poweroff reboot kexec exit
+  )
+
+  local curcontext="$curcontext" state line expl
+  typeset -A opt_args
+
+  # Initial flags
+  _arguments -A '-*' \
+    '--help[Show help]' \
+    '--version[Show package version]' \
+    '(-a,--all)'{-a,--all}'[Show all units/properties, including dead/empty ones]' \
+    '--full[Dont ellipsize unit names on output]' \
+    '--failed[Show only failed units]' \
+    '--fail[When queueing a new job, fail if conflicting jobs are pending]' \
+    '--ignore-dependencies[ignore dependencies]' \
+    '(-p,--privileged)'{-p,--privileged}'[Acquire privileges before execution]' \
+    '(-q,--quiet)'{-q,--quiet}'[Suppress output]' \
+    '--no-block[Do not wait until operation finished]' \
+    '--no-wall[Dont send wall message before halt/power-off/reboot]' \
+    '--no-reload[dont reload daemon configuration]' \
+    '--no-pager[Do use pager]' \
+    '--no-ask-password[Do not ask for system passwords]' \
+    '--order[When generating graph for dot, show only order]' \
+    '--require[When generating graph for dot, show only requirement]' \
+    '--system[Connect to system manager]' \
+    '--user[Connect to user service manager]' \
+    '--global[Enable/disable unit files globally]' \
+    '(-f,--force)'{-f,--force}'[When enabling unit files, override existing symlinks. When shutting down, execute action immediately]' \
+    '--defaults[When disabling unit files, remove default symlinks only]' \
+    '*::command:->subcmd' && return 0
+
+  # Complete subcommands.
+  if (( CURRENT == 1 )); then
+    _describe -t commands "command" _systemctl_cmds
+    return
+  fi
+
+  # handle arguments to the subcommands.
+  case $words[1] in
+  	start|restart|reload|stop|status|try-restart|reload-or-restart|reload-or-try-restart|isolate|kill|is-active|show|reset-failed|enable|disable|is-enabled|load)
+		# many units can be listed
+		_arguments "*:key:_systemd_units"
+	;;
+
+	cancel) _arguments "*:key:_systemd_jobs" ;;
+
+	# snapshots
+	snapshot) _normal ;;
+	delete) _arguments "*:key:_systemd_snapshots" ;;
+
+	# no arguments
+	dump|dot|monitor|daemon-reload|daemon-reexec|show-environment|default|rescue|emergency|halt|poweroff|reboot|kexec|exit|list-jobs|list-units)
+	;;
+
+	*) _message "unknown systemctl command: $words[1]" ;;
+  esac
+}
+
+_systemctl "$@"
+
