@@ -84,3 +84,7 @@
   )
 0:=(...) preceded by other stuff has no special effect
 >everything,=(here is left),alone
+
+  print something=${:-=(echo 'C,D),(F,G)'}
+1: Graceful handling of bad substitution in enclosed context
+?(eval):1: unterminated `=(...)'

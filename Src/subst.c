@@ -162,6 +162,8 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 		subst = getproc(str, &rest);	/* <(...) or >(...) */
 	    else
 		subst = getoutputfile(str, &rest);	/* =(...) */
+	    if (errflag)
+		return NULL;
 	    if (!subst)
 		subst = "";
 

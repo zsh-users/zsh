@@ -3755,7 +3755,15 @@ parsecmd(char *cmd, char **eptr)
 
     for (str = cmd + 2; *str && *str != Outpar; str++);
     if (!*str || cmd[1] != Inpar) {
-	zerr("oops.");
+	/*
+	 * This can happen if the expression is being parsed
+	 * inside another construct, e.g. as a value within ${..:..} etc.
+	 * So print a proper error message instead of the not very
+	 * useful but traditional "oops".
+ 	 */
+	char *errstr = dupstrpfx(cmd, 2);
+	untokenize(errstr);
+	zerr("unterminated `%s...)'", errstr);
 	return NULL;
     }
     *str = '\0';
