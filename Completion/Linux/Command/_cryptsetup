@@ -1,0 +1,103 @@
+#compdef cryptsetup
+## completion for cryptsetup 1.3.0, based on cryptsetup(1)
+
+function _cryptsetup_action {
+	typeset -a actions
+	actions=(
+		'create:create a mapping'
+		'remove:remove an existing mapping'
+		'status:report mapping status'
+		'resize:resize an active mapping'
+		'luksFormat:Initialize a LUKS partition'
+		'luksOpen:Open LUKS partition'
+		'luksClose:remove an existing mapping'
+		'luksSuspend:suspend active device'
+		'luksResume:resume suspended device'
+		'luksAddKey:add a new key'
+		'luksRemoveKey:remove a key'
+		'luksChangeKey:change a key'
+		'luksKillSlot:wipe key from slot'
+		'luksUUID:print/change device UUID'
+		'isLuks:check if device is a LUKS partition'
+		'luksDump:dump header information'
+		'luksHeaderBackup:store binary backup of headers'
+		'luksHeaderRestore:restore header backup'
+	)
+	_describe action actions
+}
+
+function _cryptsetup_device {
+	typeset expl
+	_wanted file expl device \
+	_files
+}
+
+function _cryptsetup_mapping {
+	typeset expl
+	_wanted file expl 'mapping name' \
+	_path_files -W /dev/mapper
+}
+
+function _cryptsetup_arguments {
+
+	case ${words[1]} in
+
+		create)
+			_arguments ':mapping:_cryptsetup_mapping' ':device:_cryptsetup_device'
+			;;
+
+		remove|status|resize|luksClose|luksSuspend|luksResume)
+			_arguments ': :_cryptsetup_mapping'
+			;;
+
+		luks(AddKey|RemoveKey|DelKey|UUID|Dump)|isLuks)
+			_arguments ': :_cryptsetup_device'
+			;;
+
+		luks(Format|AddKey|RemoveKey|ChangeKey))
+			_arguments ': :_cryptsetup_device' ':key file:_files'
+			;;
+
+		luksKillSlot)
+			_arguments ': :_cryptsetup_device' ':key slot number'
+			;;
+
+		luksOpen)
+			_arguments ': :_cryptsetup_device' ': :_cryptsetup_mapping'
+			;;
+
+	esac
+}
+
+function _cryptsetup {
+	_arguments \
+	'(-v --verbose)'{-v,--verbose}'[enable verbose mode]' \
+	'--debug[enable debug mode]' \
+	'(-h --hash)'{-h,--hash}'[hash algorithm]:hash algorithm' \
+	'(-c --cipher)'{-c,--cipher}'[set cipher]:cipher specification' \
+	'(-y --verify-passphrase)'{-y,--verify-passphrase}'[query for password twice]' \
+	'(-d --key-file)'{-d,--key-file}'[set keyfile]:key file:_files' \
+	'(-l --keyfile-size)'{-l,--keyfile-size}'[set keyfile size]:bytes' \
+	'--new-keyfile-size[set new keyfile size (luksAddKey)]:bytes' \
+	'--master-key-file[set master key]:key file:_files' \
+	'--dump-master-key[dump luks master key]' \
+	'(--use-urandom)--use-random[use /dev/random to generate volume key]' \
+	'(--use-random)--use-urandom[use /dev/urandom to generate volume key]' \
+	'(-S --key-slot)'{-S,--key-slot}'[select key slot]:key slot' \
+	'(-s --key-size)'{-s,--key-size}'[set key size]:bits' \
+	'(-b --size)'{-b,--size}'[force device size]:sectors' \
+	'(-o --offset)'{-o,--offset}'[set start offset]:sectors' \
+	'(-p --skip)'{-p,--skip}'[data to skip at beginning]:sectors' \
+	'--readonly[set up read-only mapping]' \
+	'(-i --iter-time)'{-i,--iter-time}'[set password processing duration]:milliseconds' \
+	'(-q --batch-mode)'{-q,--batch-mode}'[do not ask for confirmation]' \
+	'(-t --timeout)'{-t,--timeout}'[set password prompt timeout]:seconds' \
+	'(-T --tries)'{-T,--tries}'[set maximum number of retries]:maximum retries' \
+	'--align-payload[set payload alignment]:sectors' \
+	'--uuid[set device UUID]:uuid' \
+	'--version[show version information]' \
+	':action:_cryptsetup_action' \
+	'*::arguments:_cryptsetup_arguments'
+}
+
+_cryptsetup "$@"

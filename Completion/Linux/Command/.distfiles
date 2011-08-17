@@ -5,6 +5,7 @@ _acpitool
 _analyseplugin
 _brctl
 _chrt
+_cryptsetup
 _ethtool
 _fusermount
 _ionice
