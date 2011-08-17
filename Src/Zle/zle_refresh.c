@@ -341,7 +341,7 @@ zle_set_highlight(void)
 		match_highlight(*atrs + 8, &special_atr_on);
 		special_atr_on_set = 1;
 	    } else if (strpfx("region:", *atrs)) {
-		match_highlight(*atrs + 7, &region_highlights->atr);
+		match_highlight(*atrs + 7, &region_highlights[0].atr);
 		region_atr_on_set = 1;
 	    } else if (strpfx("isearch:", *atrs)) {
 		match_highlight(*atrs + 8, &(region_highlights[1].atr));
@@ -357,7 +357,7 @@ zle_set_highlight(void)
     if (!special_atr_on_set)
 	special_atr_on = TXTSTANDOUT;
     if (!region_atr_on_set)
-	region_highlights->atr = TXTSTANDOUT;
+	region_highlights[0].atr = TXTSTANDOUT;
     if (!isearch_atr_on_set)
 	region_highlights[1].atr = TXTUNDERLINE;
     if (!suffix_atr_on_set)
@@ -1022,14 +1022,14 @@ zrefresh(void)
     /* check for region between point ($CURSOR) and mark ($MARK) */
     if (region_active) {
 	if (zlecs <= mark) {
-	    region_highlights->start = zlecs;
-	    region_highlights->end = mark;
+	    region_highlights[0].start = zlecs;
+	    region_highlights[0].end = mark;
 	} else {
-	    region_highlights->start = mark;
-	    region_highlights->end = zlecs;
+	    region_highlights[0].start = mark;
+	    region_highlights[0].end = zlecs;
 	}
     } else {
-	region_highlights->start = region_highlights->end = -1;
+	region_highlights[0].start = region_highlights[0].end = -1;
     }
     /* check for isearch string to highlight */
     if (isearch_active) {
