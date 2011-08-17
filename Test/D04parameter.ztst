@@ -1453,3 +1453,8 @@
    print ${foo:5:-6}
 1:Regression test for total length < 0 in array
 ?(eval):2: substring expression: 3 < 5
+
+   foo=(${(0)"$(print -n)"})
+   print ${#foo}
+0:Nularg removed from split empty string
+>0

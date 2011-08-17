@@ -1,6 +1,9 @@
 2011-08-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	*  Anthony R Fletcher: users/16260:
+	* users/16253, users/16255: Src/utils.c, Test/D04parameter.ztst:
+        A nulstring should be split like an empty string.
+
+	* Anthony R Fletcher: users/16260:
 	Completion/Unix/Command/_systemctl: new completion.
 
 2011-08-17  Nikolai Weibull  <now@bitwi.se>
@@ -15294,5 +15297,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5437 $
+* $Revision: 1.5438 $
 *****************************************************

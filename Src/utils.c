@@ -3176,6 +3176,10 @@ sepsplit(char *s, char *sep, int allownull, int heap)
     int n, sl;
     char *t, *tt, **r, **p;
 
+    /* Null string?  Treat as empty string. */
+    if (s[0] == Nularg && !s[1])
+	s++;
+
     if (!sep)
 	return spacesplit(s, allownull, heap, 0);
 
