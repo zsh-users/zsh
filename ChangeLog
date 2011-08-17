@@ -3,6 +3,9 @@
 	* 29681: Src/Zle/zle_refresh.c: consistently use [] to access
 	region_highlights.
 
+	* 29682: Completion/Zsh/Command/.distfiles,
+	Completion/Zsh/Command/_schedtool: new _schedtool completer.
+
 2011-08-16  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 29650: Src/jobs.c: don't lose the the time info after a
@@ -15275,5 +15278,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5432 $
+* $Revision: 1.5433 $
 *****************************************************
