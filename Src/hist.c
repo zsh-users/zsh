@@ -1355,7 +1355,8 @@ ihwend(void)
 					    (chwordlen += 32) * 
 					    sizeof(short));
 	    }
-	    if (hwgetword > -1) {
+	    if (hwgetword > -1 &&
+		(inbufflags & INP_ALIAS) && !(inbufflags & INP_HIST)) {
 		/* We want to reuse the current word position */
 		chwordpos = hwgetword;
 		/* Start from where previous word ended, if possible */
