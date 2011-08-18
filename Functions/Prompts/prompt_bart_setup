@@ -67,15 +67,38 @@ prompt_bart_help () {
 }
 
 integer PSCOL=1
+typeset PSCMD=
+
+prompt_bart_preexec () {
+    setopt localoptions noxtrace noksharrays unset
+    local -a cmd; cmd=( ${(z)3} )
+    if [[ $cmd[1] = fg ]]
+    then
+	shift cmd
+	cmd[1]=${cmd[1]:-%+}
+    fi
+    if [[ $#cmd -eq 1 && $cmd[1] = %* ]]
+    then
+	PSCMD=$jobtexts[$cmd[1]]
+    elif [[ -o autoresume && -n $jobtexts[%?$2] ]]
+    then
+	PSCMD=$jobtexts[%?$2]
+    else
+	PSCMD=$2
+    fi
+    return 0
+}
 
 prompt_bart_precmd () {
     setopt localoptions noxtrace noksharrays unset
     local zero='%([BSUbfksu]|[FB]{*})' escape colno lineno
 
+    : "${PSCMD:=$history[$[HISTCMD-1]]}"	# Default to history text
+
     # Using psvar here protects against unwanted promptsubst expansions.
 
-    psvar[7]="$history[$[HISTCMD-1]]"	# Use history text, not just number
-    psvar[8]=''				# No padding until we compute it
+    psvar[7]="$PSCMD"
+    psvar[8]=''		# No padding until we compute it
     psvar[9]=()
 
     typeset -g PSCOL
@@ -153,6 +176,7 @@ prompt_bart_setup () {
     repeat 1 case "$1:l" in
       (off|disable)
         add-zsh-hook -D precmd "prompt_*_precmd"
+        add-zsh-hook -D preexec "prompt_*_preexec"
 	functions[TRAPWINCH]="${functions[TRAPWINCH]//prompt_bart_winch}"
 	[[ $prompt_theme[1] = bart ]] && PS1=${${(f)PS1}[-1]}
 	return 1
@@ -182,6 +206,7 @@ prompt_bart_setup () {
     # Paste our special commands into precmd and TRAPWINCH
     
     add-zsh-hook precmd prompt_bart_precmd
+    add-zsh-hook preexec prompt_bart_preexec
     functions[TRAPWINCH]="${functions[TRAPWINCH]//prompt_bart_winch}
 	prompt_bart_winch"
 
