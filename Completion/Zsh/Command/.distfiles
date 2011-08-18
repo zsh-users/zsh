@@ -23,7 +23,6 @@ _print
 _prompt
 _read
 _sched
-_schedtool
 _set
 _setopt
 _source

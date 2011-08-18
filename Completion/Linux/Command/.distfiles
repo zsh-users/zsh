@@ -20,6 +20,7 @@ _modutils
 _mondo
 _pkgtool
 _rpmbuild
+_schedtool
 _sshfs
 _strace
 _tpb
