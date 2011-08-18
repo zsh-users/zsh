@@ -27,6 +27,14 @@
 	Completion/Unix/Command/_twidge: new _twidge and _cryptsetup
 	completers.
 
+2011-08-16  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 29694: Src/hist.c: Don't overwrite the current history word if
+	we aren't actually expanding an alias or history event.
+	
+	* users/16251: Functions/Prompts/prompt_bart_setup: use a preexec
+	hook to replace "fg" et al. with the jobtext of the resumed job.
+
 2011-08-16  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* 29650: Src/jobs.c: don't lose the the time info after a
@@ -15299,5 +15307,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5439 $
+* $Revision: 1.5440 $
 *****************************************************
