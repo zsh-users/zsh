@@ -21,7 +21,7 @@ if _pick_variant gnu=GNU unix --version; then
     '1:input file:_files' && return 0
 
   if [[ $state = codeset ]]; then
-    if compset -P '*/'; then
+    if compset -P '*[^/]/'; then
       _wanted option expl option compadd "$@" /TRANSLIT && ret=0
     else
       _wanted codesets expl 'code set' compadd "$@" \
