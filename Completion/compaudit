@@ -82,19 +82,6 @@ fi
 
 [[ $_i_fail == use ]] && return 0
 
-# RedHat Linux "per-user groups" check.  This is tricky, because it's very
-# difficult to tell whether the sysadmin has put someone else into your
-# "private" group (e.g., via the default group field in /etc/passwd, or
-# by NFS group sharing with an untrustworthy machine).  So we must assume
-# that this has not happened, and pick the best group.
-
-local GROUP GROUPMEM _i_pw _i_gid _i_ulwdirs
-if ((UID == EUID )); then
-  getent group $LOGNAME | IFS=: read GROUP _i_pw _i_gid GROUPMEM
-else
-  getent group $EGID | IFS=: read GROUP _i_pw _i_gid GROUPMEM
-fi
-
 # We search for:
 # - world/group-writable directories in fpath not owned by root and the user
 # - parent-directories of directories in fpath that are world/group-writable
@@ -105,12 +92,27 @@ fi
 # - and for files in directories from fpath not owned by root and the user
 #   (including zwc files)
 
-if [[ $GROUP == $LOGNAME && ( -z $GROUPMEM || $GROUPMEM == $LOGNAME ) ]]; then
-  _i_wdirs=( ${^fpath}(N-f:g+w:^g:${GROUP}:,-f:o+w:,-^u0u${EUID})
-             ${^fpath:h}(N-f:g+w:^g:${GROUP}:,-f:o+w:,-^u0u${EUID}) )
-else
-  _i_wdirs=( ${^fpath}(N-f:g+w:,-f:o+w:,-^u0u${EUID})
-             ${^fpath:h}(N-f:g+w:,-f:o+w:,-^u0u${EUID}) )
+_i_wdirs=( ${^fpath}(N-f:g+w:,-f:o+w:,-^u0u${EUID})
+           ${^fpath:h}(N-f:g+w:,-f:o+w:,-^u0u${EUID}) )
+
+# RedHat Linux "per-user groups" check.  This is tricky, because it's very
+# difficult to tell whether the sysadmin has put someone else into your
+# "private" group (e.g., via the default group field in /etc/passwd, or
+# by NFS group sharing with an untrustworthy machine).  So we must assume
+# that this has not happened, and pick the best group.
+
+if (( $#_i_wdirs )); then
+  local GROUP GROUPMEM _i_pw _i_gid _i_ulwdirs
+  if ((UID == EUID )); then
+    getent group $LOGNAME | IFS=: read GROUP _i_pw _i_gid GROUPMEM
+  else
+    getent group $EGID | IFS=: read GROUP _i_pw _i_gid GROUPMEM
+  fi
+
+  if [[ $GROUP == $LOGNAME && ( -z $GROUPMEM || $GROUPMEM == $LOGNAME ) ]]
+  then
+    _i_wdirs=( ${^_i_wdirs}(N-f:g+w:^g:${GROUP}:,-f:o+w:,-^u0u${EUID}) )
+  fi
 fi
 
 if [[ -f /etc/debian_version ]]

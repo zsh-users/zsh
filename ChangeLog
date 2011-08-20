@@ -1,3 +1,8 @@
+2011-08-20  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 29711: Completion/compaudit: avoid calling potentially-slow
+	"getent group" unless group-writable directories are found.
+
 2011-08-20  Nikolai Weibull  <now@bitwi.se>
 
 	* 29707: Completion/Unix/Command/.distfiles,
@@ -15323,5 +15328,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5443 $
+* $Revision: 1.5444 $
 *****************************************************
