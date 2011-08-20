@@ -1,3 +1,8 @@
+2011-08-20  Nikolai Weibull  <now@bitwi.se>
+
+	* 29707: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_ln: New _ln completer.
+
 2011-08-18  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Completion/Linux/Command/.distfiles,
@@ -15318,5 +15323,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5442 $
+* $Revision: 1.5443 $
 *****************************************************
