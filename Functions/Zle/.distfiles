@@ -25,6 +25,7 @@ kill-word-match
 match-word-context
 match-words-by-style
 modify-current-argument
+move-line-in-buffer
 narrow-to-region
 narrow-to-region-invisible
 predict-on

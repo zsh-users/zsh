@@ -1,4 +1,6 @@
-2011-08-20  Barton E. Schaefer  <schaefer@zsh.org>
+2011-08-20  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* unposted: Functions/Zle/.distfiles: add move-line-in-buffer
 
 	* 29711: Completion/compaudit: avoid calling potentially-slow
 	"getent group" unless group-writable directories are found.
@@ -15328,5 +15330,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5444 $
+* $Revision: 1.5445 $
 *****************************************************
