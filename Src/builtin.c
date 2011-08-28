@@ -5549,7 +5549,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	*bptr = '\0';
 #endif
 	/* dispose of word appropriately */
-	if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E')) {
+	if (OPT_ISSET(ops,'e')) {
 	    zputs(buf, stdout);
 	    putchar('\n');
 	}
@@ -5581,7 +5581,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	     : (char **)zalloc((al + 1) * sizeof(char *)));
 
 	for (pp = p, n = firstnode(readll); n; incnode(n)) {
-	    if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E')) {
+	    if (OPT_ISSET(ops,'E')) {
 		zputs((char *) getdata(n), stdout);
 		putchar('\n');
 	    }

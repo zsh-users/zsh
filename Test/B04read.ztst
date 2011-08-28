@@ -93,3 +93,20 @@
   read foo) <<<bar
 1:return status on failing to set parameter
 ?(eval):2: read-only variable: foo
+
+  read -AE array <<<'one two three'
+  print ${(j.:.)array}
+0:Behaviour of -A and -E combination
+>one
+>two
+>three
+>one:two:three
+
+  array=()
+  read -Ae array <<<'four five six'
+  print ${(j.:.)array}
+0:Behaviour of -A and -e combination
+>four
+>five
+>six
+>
