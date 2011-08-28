@@ -405,7 +405,7 @@ execcursh(Estate state, int do_exec)
     state->pc++;
 
     if (!list_pipe && thisjob != list_pipe_job && !hasprocs(thisjob))
-	deletejob(jobtab + thisjob);
+	deletejob(jobtab + thisjob, 0);
     cmdpush(CS_CURSH);
     execlist(state, 1, do_exec);
     cmdpop();
@@ -1434,7 +1434,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 	    zclose(opipe[0]);
 	}
 	if (how & Z_DISOWN) {
-	    deletejob(jobtab + thisjob);
+	    deletejob(jobtab + thisjob, 1);
 	    thisjob = -1;
 	}
 	else
@@ -1484,7 +1484,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    printjob(jn, !!isset(LONGLISTJOBS), 1);
 		}
 		else if (newjob != list_pipe_job)
-		    deletejob(jn);
+		    deletejob(jn, 0);
 		else
 		    lastwj = -1;
 	    }
@@ -1588,7 +1588,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 
 	    if (list_pipe && (lastval & 0200) && pj >= 0 &&
 		(!(jn->stat & STAT_INUSE) || (jn->stat & STAT_DONE))) {
-		deletejob(jn);
+		deletejob(jn, 0);
 		jn = jobtab + pj;
 		if (jn->gleader)
 		    killjb(jn, lastval & ~0200);
@@ -1596,7 +1596,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 	    if (list_pipe_child ||
 		((jn->stat & STAT_DONE) &&
 		 (list_pipe || (pline_level && !(jn->stat & STAT_SUBJOB)))))
-		deletejob(jn);
+		deletejob(jn, 0);
 	    thisjob = pj;
 
 	}
@@ -4271,7 +4271,7 @@ execshfunc(Shfunc shf, LinkList args)
 	 * would be filled by a recursive function. */
 	last_file_list = jobtab[thisjob].filelist;
 	jobtab[thisjob].filelist = NULL;
-	deletejob(jobtab + thisjob);
+	deletejob(jobtab + thisjob, 0);
     }
 
     if (isset(XTRACE)) {
@@ -4300,7 +4300,7 @@ execshfunc(Shfunc shf, LinkList args)
     cmdsp = ocsp;
 
     if (!list_pipe)
-	deletefilelist(last_file_list);
+	deletefilelist(last_file_list, 0);
 }
 
 /* Function to execute the special type of command that represents an *

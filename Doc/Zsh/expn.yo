@@ -471,6 +471,18 @@ example(tt({ paste <LPAR()cut -f1) var(file1)tt(RPAR() <LPAR()cut -f3) var(file2
 The extra processes here are
 spawned from the parent shell which will wait for their completion.
 
+Another problem arises any time a job with a substitution that requires
+a temporary file is disowned by the shell, including the case where
+`tt(&!)' or `tt(&|)' appears at the end of a command containing a
+subsitution.  In that case the temporary file will not be cleaned up as
+the shell no longer has any memory of the job.  A workaround is to use
+a subshell, for example,
+
+example(LPAR()mycmd =(myoutput)RPAR() &!)
+
+as the forked subshell will wait for the command to finish then remove
+the temporary file.
+
 texinode(Parameter Expansion)(Command Substitution)(Process Substitution)(Expansion)
 sect(Parameter Expansion)
 cindex(parameter expansion)

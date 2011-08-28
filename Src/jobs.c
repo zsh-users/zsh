@@ -269,7 +269,7 @@ handle_sub(int job, int fg)
 	       sleep, the rest will be executed by a sub-shell,
 	       but the parent shell gets notified for the
 	       sleep.
-	       deletejob(sj); */
+	       deletejob(sj, 0); */
 	    /* If this super-job contains only the sub-shell,
 	       we have to attach the tty to its process group
 	       now. */
@@ -955,7 +955,7 @@ printjob(Job jn, int lng, int synch)
 	if (jn->stat & STAT_DONE) {
 	    if (should_report_time(jn))
 		dumptime(jn);
-	    deletejob(jn);
+	    deletejob(jn, 0);
 	    if (job == curjob) {
 		curjob = prevjob;
 		prevjob = job;
@@ -1085,7 +1085,7 @@ printjob(Job jn, int lng, int synch)
     if (jn->stat & STAT_DONE) {
 	if (should_report_time(jn))
 	    dumptime(jn);
-	deletejob(jn);
+	deletejob(jn, 0);
 	if (job == curjob) {
 	    curjob = prevjob;
 	    prevjob = job;
@@ -1100,12 +1100,13 @@ printjob(Job jn, int lng, int synch)
 
 /**/
 void
-deletefilelist(LinkList file_list)
+deletefilelist(LinkList file_list, int disowning)
 {
     char *s;
     if (file_list) {
 	while ((s = (char *)getlinknode(file_list))) {
-	    unlink(s);
+	    if (!disowning)
+		unlink(s);
 	    zsfree(s);
 	}
 	zfree(file_list, sizeof(struct linklist));
@@ -1141,7 +1142,7 @@ freejob(Job jn, int deleting)
 	/* careful in case we shrink and move the job table */
 	int job = jn - jobtab;
 	if (deleting)
-	    deletejob(jobtab + jn->other);
+	    deletejob(jobtab + jn->other, 0);
 	else
 	    freejob(jobtab + jn->other, 0);
 	jn = jobtab + job;
@@ -1161,13 +1162,17 @@ freejob(Job jn, int deleting)
 /*
  * We are actually finished with this job, rather
  * than freeing it to make space.
+ *
+ * If "disowning" is set, files associated with the job are not
+ * actually deleted --- and won't be as there is nothing left
+ * to clear up.
  */
 
 /**/
 void
-deletejob(Job jn)
+deletejob(Job jn, int disowning)
 {
-    deletefilelist(jn->filelist);
+    deletefilelist(jn->filelist, disowning);
     if (jn->stat & STAT_ATTACH) {
 	attachtty(mypgrp);
 	adjustwinsize(0);
@@ -1343,7 +1348,7 @@ zwaitjob(int job, int wait_cmd)
 	    child_block();
 	}
     } else {
-	deletejob(jn);
+	deletejob(jn, 0);
 	pipestats[0] = lastval;
 	numpipestats = 1;
     }
@@ -1366,7 +1371,7 @@ waitjobs(void)
     if (jn->procs || jn->auxprocs)
 	zwaitjob(thisjob, 0);
     else {
-	deletejob(jn);
+	deletejob(jn, 0);
 	pipestats[0] = lastval;
 	numpipestats = 1;
     }
@@ -1494,7 +1499,7 @@ spawnjob(void)
 	}
     }
     if (!hasprocs(thisjob))
-	deletejob(jobtab + thisjob);
+	deletejob(jobtab + thisjob, 0);
     else
 	jobtab[thisjob].stat |= STAT_LOCKED;
     thisjob = -1;
@@ -2070,7 +2075,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 		waitjobs();
 		retval = lastval2;
 	    } else if (ofunc == BIN_DISOWN)
-	        deletejob(jobtab + job);
+	        deletejob(jobtab + job, 1);
 	    break;
 	case BIN_JOBS:
 	    printjob(job + (oldjobtab ? oldjobtab : jobtab), lng, 2);
@@ -2106,7 +2111,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
 #endif
                          pids);
 	    }
-	    deletejob(jobtab + job);
+	    deletejob(jobtab + job, 1);
 	    break;
 	}
 	thisjob = ocj;

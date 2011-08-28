@@ -1,3 +1,8 @@
+2011-08-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/16289: Doc/Zsh/expn.yo, Src/exec.c, Src/jobs.c: don't
+	delete temporary files when disowning and document this.
+
 2011-08-20  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* unposted: Functions/Zle/.distfiles: add move-line-in-buffer
@@ -15330,5 +15335,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5445 $
+* $Revision: 1.5446 $
 *****************************************************
