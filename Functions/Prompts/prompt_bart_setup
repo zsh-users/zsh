@@ -70,7 +70,7 @@ integer PSCOL=1
 typeset PSCMD=
 
 prompt_bart_preexec () {
-    setopt localoptions noxtrace noksharrays unset
+    setopt localoptions noxtrace noshwordsplit noksharrays unset
     local -a cmd; cmd=( ${(z)3} )
     if [[ $cmd[1] = fg ]]
     then
@@ -84,7 +84,8 @@ prompt_bart_preexec () {
     then
 	PSCMD=$jobtexts[%?$2]
     else
-	PSCMD=$2
+	# Use history text to avoid alias expansion
+	PSCMD=$history[$HISTCMD]
     fi
     return 0
 }

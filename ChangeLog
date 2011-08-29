@@ -1,3 +1,8 @@
+2011-08-29  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* users/16291: Functions/Prompts/prompt_bart_setup: revert to
+	using history text in non-"fg" case to avoid alias expansion.
+
 2011-08-29  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29722: Completion/X/Command/_mplayer: escape colon.
@@ -15344,5 +15349,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5448 $
+* $Revision: 1.5449 $
 *****************************************************
