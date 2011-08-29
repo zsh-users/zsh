@@ -5549,7 +5549,14 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	*bptr = '\0';
 #endif
 	/* dispose of word appropriately */
-	if (OPT_ISSET(ops,'e')) {
+	if (OPT_ISSET(ops,'e') ||
+	    /*
+	     * When we're doing an array assignment, we'll
+	     * handle echoing at that point.  In all other
+	     * cases (including -A with no assignment)
+	     * we'll do it here.
+	     */
+	    (OPT_ISSET(ops,'E') && !OPT_ISSET(ops,'A'))) {
 	    zputs(buf, stdout);
 	    putchar('\n');
 	}
