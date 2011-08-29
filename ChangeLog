@@ -1,3 +1,9 @@
+2011-08-29  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 29722: Completion/X/Command/_mplayer: escape colon.
+
+	* 29706: Completion/X/Command/_mplayer: add missing ret=0.
+
 2011-08-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 29731: Src/builtin.c, Test/B04read.ztst: fix output from `read
@@ -34,7 +40,7 @@
 	* 29703: Src/exec.c, Src/subst.c, Test/D03procsubst.ztst: 
 
 	* users/16253, users/16255: Src/utils.c, Test/D04parameter.ztst:
-        A nulstring should be split like an empty string.
+	A nulstring should be split like an empty string.
 
 	* Anthony R Fletcher: users/16260:
 	Completion/Unix/Command/_systemctl: new completion.
@@ -1057,7 +1063,7 @@
 2011-03-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Baptiste: 28819: Completion/BSD/Command/_sockstat,
-        Completion/Unix/Command/_mount,
+	Completion/Unix/Command/_mount,
 	Completion/Unix/Type/_file_systems: FreeBSD completion tweaks.
 
 2011-02-28  Barton E. Schaefer  <schaefer@zsh.org>
@@ -15338,5 +15344,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5447 $
+* $Revision: 1.5448 $
 *****************************************************
