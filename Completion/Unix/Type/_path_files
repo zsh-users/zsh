@@ -438,8 +438,19 @@ for prepath in "$prepaths[@]"; do
 
     tmp2=( "$tmp1[@]" )
 
-    if [[ "$tpre$tsuf" = (#b)*/(*) && -n "$fake${match[1]}" ]]; then
-      compfiles -P$cfopt tmp1 accex "$skipped" "$_matcher $matcher[2]" "$sdirs" fake
+    if [[ "$tpre$tsuf" = (#b)*/(*) ]]; then
+
+      # We are going to be looping over the leading path segments.
+      # This means we should not apply special-dirs handling unless
+      # the path tail is a fake directory that needs to be simulated,
+      # and we should not apply pattern matching until we are looking
+      # for files rather than for intermediate directories.
+
+      if [[ -n "$fake${match[1]}" ]]; then
+        compfiles -P$cfopt tmp1 accex "$skipped" "$_matcher $matcher[2]" "$sdirs" fake
+      else
+        compfiles -P$cfopt tmp1 accex "$skipped" "$_matcher $matcher[2]" '' fake
+      fi
     elif [[ "$sopt" = *[/f]* ]]; then
       compfiles -p$cfopt tmp1 accex "$skipped" "$_matcher $matcher[2]" "$sdirs" fake "$pats[@]"
     else

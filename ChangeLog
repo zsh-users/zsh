@@ -1,3 +1,9 @@
+2011-09-05  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* users/16302: Completion/Unix/Type/_path_files: pattern matching
+	for plain files (e.g., *.pdf for xpdf completion) was broken by
+	29444.  Hopefully this does not re-break directory patterns.
+
 2011-08-30  Simon Ruderich  <simon@ruderich.org>
 
 	* 29745: Mikael Magnusson: Completion/X/Command/_mplayer: fix -ss
@@ -15359,5 +15365,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5452 $
+* $Revision: 1.5453 $
 *****************************************************
