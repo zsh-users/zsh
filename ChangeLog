@@ -5,6 +5,9 @@
 	* 29738: Completion/Unix/Command/_ssh: Add PreferredAuthentications
 	completion.
 
+	* 29739: Completion/Unix/Command/_rsync: redefine _rsync(), make
+	-e accept cuddled arguments.
+
 2011-09-05  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* users/16302: Completion/Unix/Type/_path_files: pattern matching
@@ -15372,5 +15375,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5455 $
+* $Revision: 1.5456 $
 *****************************************************
