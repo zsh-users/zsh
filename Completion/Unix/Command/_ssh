@@ -225,6 +225,9 @@ _ssh () {
           _description files expl 'path to control socket'
           _files "$expl[@]" && ret=0
 	  ;;
+        *(#i)preferredauthentications*)
+          _values -s , 'authentication method' gssapi-with-mic \
+              hostbased publickey keyboard-interactive password && ret=0
         esac
       else
         _wanted values expl 'configure file option' \
