@@ -1,3 +1,7 @@
+2011-09-06  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 29736: Doc/Zsh/mod_zutil.yo: mention when zstyle -t returns 1.
+
 2011-09-05  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* users/16302: Completion/Unix/Type/_path_files: pattern matching
@@ -15365,5 +15369,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5453 $
+* $Revision: 1.5454 $
 *****************************************************
