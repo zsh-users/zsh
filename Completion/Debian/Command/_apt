@@ -433,6 +433,7 @@ _apt-get () {
     /$'dselect-upgrade\0'/ \| \
     /$'clean\0'/ \| \
     /$'autoclean\0'/ \| \
+    /$'changelog\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'check\0'/ \| \
     /$'source\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'build-dep\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
@@ -440,7 +441,7 @@ _apt-get () {
     /$'help\0/' \| \
     /$'markauto\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'unmarkauto\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
-    /"[]"/	':argument-1::compadd "$expl_action[@]" update upgrade install remove purge dist-upgrade dselect-upgrade clean autoclean check source build-dep autoremove help markauto unmarkauto'
+    /"[]"/	':argument-1::compadd "$expl_action[@]" update upgrade install remove purge dist-upgrade dselect-upgrade clean autoclean changelog check source build-dep autoremove help markauto unmarkauto'
 
   _apt-get () {
     local expl_action expl_packages

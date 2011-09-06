@@ -13,6 +13,9 @@
 	* 29741: Completion/Zsh/Command/_zattr: add ret=0, fix filename
 	globbing like in 27658 for _zip.
 
+	* 29733: Jonathan Kolberg: Completion/Debian/Command/_apt: add
+	completion for apt-get changelog.
+
 2011-09-05  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* users/16302: Completion/Unix/Type/_path_files: pattern matching
@@ -15380,5 +15383,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5458 $
+* $Revision: 1.5459 $
 *****************************************************
