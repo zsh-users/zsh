@@ -21,6 +21,7 @@ _arguments -C -s \
   '--retry-connrefused[retry even if connection is refused]' \
   '(--output-document -O)'{--output-document=,-O+}'[specify file to write documents to]:output file:_files' \
   '(--continue -c)'{--continue,-c}'[continue getting an existing file]'  \
+  '--content-disposition[honor the Content-Disposition header when choosing local file names]'  \
   '--progress=[set progress gauge type]:gauge type:->gauge' \
   '(--timestamping -N)'{--timestamping,-N}'[retrieve only files newer than existing]' \
   '(--server-response -S)'{--server-response,-S}'[print server response]' \
