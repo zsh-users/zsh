@@ -10,6 +10,9 @@
 
 	* 29740: Completion/Unix/Command/_wget: add --content-disposition.
 
+	* 29741: Completion/Zsh/Command/_zattr: add ret=0, fix filename
+	globbing like in 27658 for _zip.
+
 2011-09-05  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* users/16302: Completion/Unix/Type/_path_files: pattern matching
@@ -15377,5 +15380,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5457 $
+* $Revision: 1.5458 $
 *****************************************************

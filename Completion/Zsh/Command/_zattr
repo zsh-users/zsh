@@ -26,9 +26,9 @@ _arguments \
   '1:file:_files' \
   '2:parameter'
 ;;
-esac
+esac && ret=0
 
 if [[ $state = attrs ]]; then
-  zlistattr $~line[1] REPLY 2> /dev/null
+  zlistattr ${~${(Q)line[1]}} REPLY 2> /dev/null
   _wanted attrs expl 'attribute' compadd $REPLY
 fi
