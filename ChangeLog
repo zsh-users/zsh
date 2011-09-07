@@ -2,6 +2,8 @@
 
 	* 29756: Doc/Zsh/params.yo: DIRSTACKSIZE is unlimited by default.
 
+	* 29757: Doc/Zsh/compsys.yo: Remove superfluous brace.
+
 2011-09-07  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29755: Completion/Unix/Command/_ssh: add -O stop to to _ssh.
@@ -15391,5 +15393,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5461 $
+* $Revision: 1.5462 $
 *****************************************************

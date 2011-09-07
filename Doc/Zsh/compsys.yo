@@ -1085,7 +1085,7 @@ Some of these styles are tested first for every possible tag
 corresponding to a type of match, and if no style was found, for the
 tt(default) tag.  The most notable styles of this type are tt(menu), 
 tt(list-colors) and styles controlling completion listing such as 
-tt(list-packed) and tt(last-prompt)).  When tested for the tt(default)
+tt(list-packed) and tt(last-prompt).  When tested for the tt(default)
 tag, only the var(function) field of the context will be set so that
 a style using the default tag will normally be defined along the lines of:
 
