@@ -907,7 +907,7 @@ directory would still be completed).
 )
 vindex(DIRSTACKSIZE)
 item(tt(DIRSTACKSIZE))(
-The maximum size of the directory stack.  If the
+The maximum size of the directory stack, by default there is no limit.  If the
 stack gets larger than this, it will be truncated automatically.
 This is useful with the tt(AUTO_PUSHD) option.
 pindex(AUTO_PUSHD, use of)
