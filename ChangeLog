@@ -1,3 +1,7 @@
+2011-09-07  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 29755: Completion/Unix/Command/_ssh: add -O stop to to _ssh.
+
 2011-09-06  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29736: Doc/Zsh/mod_zutil.yo: mention when zstyle -t returns 1.
@@ -15383,5 +15387,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5459 $
+* $Revision: 1.5460 $
 *****************************************************
