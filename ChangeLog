@@ -1,3 +1,8 @@
+2011-09-07  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Completion/Unix/Command/_perforce: updates for
+	2010.2 release.
+
 2011-09-07  Simon Ruderich  <simon@ruderich.org>
 
 	* 29756: Doc/Zsh/params.yo: DIRSTACKSIZE is unlimited by default.
@@ -15393,5 +15398,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5462 $
+* $Revision: 1.5463 $
 *****************************************************

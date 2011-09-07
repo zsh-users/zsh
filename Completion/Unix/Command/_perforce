@@ -1686,6 +1686,7 @@ _perforce_cmd_annotate() {
     '-a[all, show both added and deleted lines]' \
     '-c[output change numbers instead of revisions]' \
     '-i[follow branches (integration records)]' \
+    '-I[follow integrations to get change numbers]' \
     '-q[quiet, suppress one-line file header]' \
     '*::file:_perforce_files -tR'
 }
@@ -1748,7 +1749,8 @@ _perforce_cmd_change() {
     '(-d -i -f)-o[output specification to standard output]' \
     '(-d -o)-i[read specification from standard input]' \
     '(-d -o)-u[force change of jobs or description by owner]' \
-    "(-i)1::change:_perforce_changes$ctype"
+    "(-i)1::change:_perforce_changes$ctype" \
+    '-t[specify visibility type]:visibility type:(public restricted)'
 }
 
 
@@ -1799,6 +1801,22 @@ _perforce_cmd_clients() {
     '-m+[set maximum to show]:max clients: '
 }
 
+
+(( $+functions[_perforce_cmd_copy] )) ||
+_perforce_cmd_copy() {
+  local range
+  # If -s is present, the first normal argument can't have revRange.
+  [[ ${words[(I)-s]} -eq 0 ]] && range=" -tR"
+  _arguments -s : \
+    '-b[select branch]:branch:_perforce_branches' \
+    '-c[select change for copy]:change:_perforce_changes -tc' \
+    '-n[no action, dummy run]' \
+    '-r[reverse direction of copy with branch]' \
+    '-s[select source with -b]:source file:_perforce_files -tR' \
+    '-v[leave newly copied files uncopied till sync]' \
+    "1:file:_perforce_files$range" \
+    '*::file:_perforce_files'
+}
 
 (( $+functions[_perforce_cmd_counter] )) ||
 _perforce_cmd_counter() {
@@ -1942,7 +1960,8 @@ _perforce_cmd_export() {
     '(-j)-l[specify number of lines]:number of lines: ' \
     '(-j)-F[specify filter]:filter pattern: ' \
     '(-c)-r[raw format]' \
-    '-J[specify file prefix]:file prefix: '
+    '-J[specify file prefix]:file prefix: ' \
+    '-T[space-separated list of tables not to export]'
 }
 
 
@@ -2117,8 +2136,8 @@ _perforce_cmd_help() {
 
 (( $+functions[_perforce_cmd_info] )) ||
 _perforce_cmd_info() {
-  # No arguments
-  _arguments -s :
+  _arguments -s : \
+    '-s[don'\''t check for unknown users or clients]'
 }
 
 
@@ -2257,6 +2276,7 @@ _perforce_cmd_labelsync() {
     '-d[delete files from label]' \
     '-n[no effect, dummy run]' \
     '-l[specify label]:label:_perforce_labels' \
+    '-q[suppress informational messages]' \
     '*::file:_perforce_files -tR'
 }
 
@@ -2407,6 +2427,19 @@ _perforce_cmd_passwd() {
 }
 
 
+(( $+functions[_perforce_cmd_ping] )) ||
+_perforce_cmd_ping() {
+  _arguments -s : \
+    '-c[specify count of messages]:count of messages: ' \
+    '-t[specify total time of test]:time in seconds: ' \
+    '-i[specify iterations for test]:number of iterations: ' \
+    '-f[transmit continuously without waiting for responses]' \
+    '-p[specify pause between tests]:pause in seconds: ' \
+    '-s[specify send size]:send size in octets: ' \
+    '-r[specify receive size]:receive size in octets: '
+}
+
+
 (( $+functions[_perforce_cmd_print] )) ||
 _perforce_cmd_print() {
   _arguments -s : \
@@ -2437,6 +2470,15 @@ _perforce_cmd_protects() {
 }
 
 
+(( $+functions[_perforce_cmd_pull] )) ||
+_perforce_cmd_pull() {
+  _arguments -s : \
+    '-i[repeat as specified]:seconds between repeats: ' \
+    '-u[retrieve file content rather than journal]' \
+    '-p[display information about pending transfers]' \
+    '-J[specify prefix for journal file]:journal file prefix: '
+}
+
 (( $+functions[_perforce_cmd_reopen] )) ||
 _perforce_cmd_reopen() {
   # Assume user doesn't want to reopen to same changelist.
@@ -2462,7 +2504,9 @@ _perforce_cmd_replicate() {
     '-J[specify file prefix]:file prefix: ' \
     '-k[keep pipe open]' \
     '-o[specify output file]:output file:_files' \
+    '-R[reconnect on failure, needs -i]' \
     '-s[specify file to track state]:state file:_files' \
+    '-T[space-separate list of tables not to transfer]' \
     '-x[terminate when journal rotates]' \
     '*::->_command'
 }
@@ -2580,6 +2624,7 @@ _perforce_cmd_sync() {
     '-f[force resynchronisation]' \
     '-n[show operations but don'\''t perform them]' \
     '-k[bypass client file update]' \
+    '-q[suppress informational messages]' \
     '*::file:_perforce_files -tR'
 }
 
