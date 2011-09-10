@@ -1,3 +1,8 @@
+2011-09-10  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 29760: Completion/compaudit: declare _i_ulwdirs and make sure
+	it is correctly referenced.
+
 2011-09-07  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_perforce: updates for
@@ -31,7 +36,7 @@
 	* 29733: Jonathan Kolberg: Completion/Debian/Command/_apt: add
 	completion for apt-get changelog.
 
-2011-09-05  Barton E. Schaefer  <schaefer@brasslantern.com>
+2011-09-05  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/16302: Completion/Unix/Type/_path_files: pattern matching
 	for plain files (e.g., *.pdf for xpdf completion) was broken by
@@ -47,7 +52,7 @@
 	* 29744: Src/builtin.c: don't mess up non '-A' case in
 	29731.
 
-2011-08-29  Barton E. Schaefer  <schaefer@brasslantern.com>
+2011-08-29  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/16291: Functions/Prompts/prompt_bart_setup: revert to
 	using history text in non-"fg" case to avoid alias expansion.
@@ -66,7 +71,7 @@
 	* users/16289: Doc/Zsh/expn.yo, Src/exec.c, Src/jobs.c: don't
 	delete temporary files when disowning and document this.
 
-2011-08-20  Barton E. Schaefer  <schaefer@brasslantern.com>
+2011-08-20  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Zle/.distfiles: add move-line-in-buffer
 
@@ -188,7 +193,7 @@
 	* 29661: Doc/Zsh/redirect.yo: Improve the documentation for
 	{var}>... redirections.
 
-2011-08-09  Barton E. Schaefer  <schaefer@brasslantern.com>
+2011-08-09  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 29654: Src/jobs.c: "wait" should resume stopped jobs identified
 	by process ID as well as by job number.
@@ -15398,5 +15403,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5463 $
+* $Revision: 1.5464 $
 *****************************************************

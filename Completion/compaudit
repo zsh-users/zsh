@@ -102,7 +102,7 @@ _i_wdirs=( ${^fpath}(N-f:g+w:,-f:o+w:,-^u0u${EUID})
 # that this has not happened, and pick the best group.
 
 if (( $#_i_wdirs )); then
-  local GROUP GROUPMEM _i_pw _i_gid _i_ulwdirs
+  local GROUP GROUPMEM _i_pw _i_gid
   if ((UID == EUID )); then
     getent group $LOGNAME | IFS=: read GROUP _i_pw _i_gid GROUPMEM
   else
@@ -117,8 +117,9 @@ fi
 
 if [[ -f /etc/debian_version ]]
 then
-_i_ulwdirs=( ${(M)_i_wdirs:#/usr/local/*} )
-_i_wdirs=( ${_i_wdirs:#/usr/local/*} ${^_i_ulwdir}(Nf:g+ws:^g:staff:,f:o+w:,^u0) )
+  local _i_ulwdirs
+  _i_ulwdirs=( ${(M)_i_wdirs:#/usr/local/*} )
+  _i_wdirs=( ${_i_wdirs:#/usr/local/*} ${^_i_ulwdirs}(Nf:g+ws:^g:staff:,f:o+w:,^u0) )
 fi
 
 _i_wdirs=( $_i_wdirs ${^fpath}.zwc^([^_]*|*~)(N-^u0u${EUID}) )
