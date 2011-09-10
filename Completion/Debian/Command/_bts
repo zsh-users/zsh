@@ -85,16 +85,18 @@ case "$words[1]" in
       _wanted operator expl 'operator' compadd - '+' '-' '='
     elif [[ CURRENT -eq 4 ]]; then
       _wanted tag expl 'tag' \
-	 compadd patch wontfix moreinfo unreproducible fixed security \
-	 potato woody sid help pending upstream lfs sarge experimental \
-	 sarge-ignore d-i confirmed ipv6 fixed-in-experimental \
-	 fixed-upstream
+	 compadd patch wontfix moreinfo unreproducible help pending \
+	 fixed security upstream confirmed fixed-upstream \
+	 fixed-in-experimental d-i ipv6 lfs l10n potato woody sarge \
+	 sarge-ignore etch etch-ignore lenny lenny-ignore squeeze \
+	 squeeze-ignore wheezy wheezy-ignore sid experimental
     else
       _wanted tag expl 'tag' \
-	 compadd patch wontfix moreinfo unreproducible fixed security \
-	 potato woody sid help pending upstream lfs sarge experimental \
-	 sarge-ignore d-i confirmed ipv6 fixed-in-experimental \
-	 fixed-upstream
+	 compadd patch wontfix moreinfo unreproducible help pending \
+	 fixed security upstream confirmed fixed-upstream \
+	 fixed-in-experimental d-i ipv6 lfs l10n potato woody sarge \
+	 sarge-ignore etch etch-ignore lenny lenny-ignore squeeze \
+	 squeeze-ignore wheezy wheezy-ignore sid experimental
       _wanted sep expl 'separator' compadd -S ' ' , .
     fi
   ;;
