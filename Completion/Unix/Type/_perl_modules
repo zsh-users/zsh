@@ -101,7 +101,7 @@ _perl_modules () {
 
         # Find all modules
         if [[ -d $libdir && -x $libdir ]]; then
-          new_pms=( $libdir/{[A-Z]*/***/,}*${~sufpat}~*blib* )
+          new_pms=( $libdir/{[A-Za-z]*/***/,}*${~sufpat}~*blib* )
           new_pms=( "${(@)new_pms##$libdir/##}" )
         fi
 
