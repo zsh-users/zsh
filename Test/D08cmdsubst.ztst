@@ -98,3 +98,11 @@
  echo `echo $?`
 0:Non-empty command substitution inherits status
 >1
+
+ echo $(( ##\" ))
+ echo $(echo \")
+ echo $((echo \"); echo OK)
+0:Handling of backslash double quote in parenthesised substitutions
+>34
+>"
+>" OK

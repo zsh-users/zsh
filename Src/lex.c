@@ -1567,7 +1567,7 @@ dquote_parse(char endchar, int sub)
 		err = (!brct-- && math);
 	    break;
 	case '"':
-	    if (intick || ((endchar == ']' || !endchar) && !bct))
+	    if (intick || (endchar != '"' && !bct))
 		break;
 	    if (bct) {
 		add(Dnull);

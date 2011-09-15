@@ -1,5 +1,9 @@
 2011-09-15  Peter Stephenson  <pws@csr.com>
 
+	* 29776 (modified as noted): Src/lex.c, Test/D08cmdsubst.ztst:
+	double quotes are not special in double-quote-style parsing
+	if the end character is something else.
+
 	* 29773: Marco Hinz: Completion/Unix/Type/_perl_modules:
 	complete some missed modules.
 
@@ -15413,5 +15417,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5466 $
+* $Revision: 1.5467 $
 *****************************************************
