@@ -1,3 +1,10 @@
+2011-09-16  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 29764, 29765: Completion/Unix/Command/_pgrep: use _users and
+	_groups rather than reimplementing them, use _wanted instead
+	of plain compadd to get descriptions, return 0 on success,
+	fix conditions on -f and -x, complete pts/* for -t too.
+
 2011-09-15  Peter Stephenson  <pws@csr.com>
 
 	* 29776 (modified as noted): Src/lex.c, Test/D08cmdsubst.ztst:
@@ -15417,5 +15424,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5467 $
+* $Revision: 1.5468 $
 *****************************************************

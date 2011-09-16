@@ -1,112 +1,89 @@
 #compdef pgrep pkill 
 
-local context state line
+local context state line ret=1 expl
 typeset -A opt_args
 typeset -a arguments
 
 arguments=('-P[parent process id]:parent process id:->ppid' 
-	   '-g[match only in process group ids]:group:->pgid' 
-	   '-G[match only real group id]:group:->group' 
-	   '-s[match only session id]:session id:->sid' 
-	   '-t[match only controlled by terminal]:terminal device:->tty'
-	   '-u[match only effective user id]:user:->user' 
-	   '-U[match only real user id]:user:->user' 
+     '-g[match only in process group ids]:group:->pgid' 
+     '-G[match only real group id]:group:_groups' 
+     '-s[match only session id]:session id:->sid' 
+     '-t[match only controlled by terminal]:terminal device:->tty'
+     '-u[match only effective user id]:user:_users' 
+     '-U[match only real user id]:user:_users' 
            '(-n)-o[oldest process]' 
-	   '(-o)-n[newest process]' 
-	   '-f[match against full command line]' 
-	   '-v[negate matching]' 
-	   '-x[match exactly]' 
-	   '*:process name:->pname')
+     '(-o)-n[newest process]' 
+     '-f[match against full command line]' 
+     '-v[negate matching]' 
+     '-x[match exactly]' 
+     '*:process name:->pname')
 
 if [[ $service == 'pkill' ]]
 then
-	arguments+=('-'${^signals}'[signal]')
+  arguments+=('-'${^signals}'[signal]')
 elif [[ $service == 'pgrep' ]]
 then
-	arguments+=('-d[output delimiter]:delimiter:compadd ${(s\:\:)IFS}'
-		    '-l[list name in addition to id]')
+  arguments+=('-d[output delimiter]:delimiter:compadd ${(s\:\:)IFS}'
+        '-l[list name in addition to id]')
 fi
 
-_arguments -s -w $arguments
+_arguments -s -w $arguments && ret=0
 
 case $state in
-	(tty)
-		compset -P '*,'
+  (tty)
+    compset -P '*,'
 
-		local -a used
-		used=(${(s:,:)IPREFIX})
+    local -a used ttys
+    used=(${(s:,:)IPREFIX})
 
-		compadd -S ',' -q -F used /dev/tty*(:t)
-		;;
-		
-	(sid)
-		compset -P '*,'
+    ttys=( /dev/tty*(N) /dev/pts/*(N) )
+    _wanted tty expl 'terminal device' compadd -S ',' -q -F used ${ttys#/dev/}
+    ;;
+    
+  (sid)
+    compset -P '*,'
 
-		local -a used sid
-		used=(${(s:,:)IPREFIX})
-		sid=(${(uon)$(ps -A o sid=)})
+    local -a used sid
+    used=(${(s:,:)IPREFIX})
+    sid=(${(uon)$(ps -A o sid=)})
 
-		compadd -S ',' -q -F used $sid
-		;;
-	
-	(ppid)
-		compset -P '*,'
+    _wanted sid expl 'session id' compadd -S ',' -q -F used $sid
+    ;;
+  
+  (ppid)
+    compset -P '*,'
 
-		local -a used ppid
-		used=(${(s:,:)IPREFIX})
-		ppid=(${(uon)$(ps -A o ppid=)})
+    local -a used ppid
+    used=(${(s:,:)IPREFIX})
+    ppid=(${(uon)$(ps -A o ppid=)})
 
-		compadd -S ',' -q -F used $ppid
-		;;
+    _wanted ppid expl 'parent process id' compadd -S ',' -q -F used $ppid
+    ;;
 
-	(pgid)
-		compset -P '*,'
+  (pgid)
+    compset -P '*,'
 
-		local -a used pgid
-		used=(${(s:,:)IPREFIX})
-		pgid=(${(uon)$(ps -A o pgid=)})
+    local -a used pgid
+    used=(${(s:,:)IPREFIX})
+    pgid=(${(uon)$(ps -A o pgid=)})
 
-		compadd -S ',' -q -F used $pgid
-		;;
-	
-	(pname)
-		if (( ${+opt_args[-x]} )) && (( ${+opt_args[-f]} ))
-		then
-			compadd ${(u)${(f)"$(ps -A o cmd=)"}}
-		else
-			compadd ${(u)${(f)"$(ps -A co cmd=)"}}
-		fi
-		;;
-	
-	(group)
-		compset -P '*,'
+    _wanted pgid expl 'process group id' compadd -S ',' -q -F used $pgid
+    ;;
+  
+  (pname)
+    local ispat="pattern matching "
+    if (( ${+opt_args[-x]} ))
+    then
+      ispat=""
+    fi
+    if (( ${+opt_args[-f]} ))
+    then
+      _wanted pname expl $ispat'process command line' compadd ${(u)${(f)"$(ps -A o cmd=)"}}
+    else
+      _wanted pname expl $ispat'process name' compadd ${(u)${(f)"$(ps -A co cmd=)"}}
+    fi
+    ;;
+  
+esac && ret=0
 
-		local group
-		group=$(getent group)
-
-		local -a groups ids
-		groups=(${${(f)group}%%:*})
-		ids=(${${${(f)group}#*:*:}%%:*})
-
-		local -a used
-		used=(${(s:,:)IPREFIX})
-
-		compadd -S ',' -q -F used -d ids $groups $groups
-		;;
-
-	(user)
-		compset -P '*,'
-
-		local passwd
-		passwd=$(getent passwd)
-
-		local -a users ids
-		users=(${${(f)passwd}%%:*})
-		ids=(${${${(f)passwd}#*:*:}%%:*})
-		
-		local -a used
-		used=(${(s:,:)IPREFIX})
-
-		compadd -S ',' -q -F used -d ids $users $users
-		;;
-esac
+return ret
