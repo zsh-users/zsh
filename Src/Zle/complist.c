@@ -849,9 +849,9 @@ putmatchcol(char *group, char *n)
 {
     Patcol pc;
 
-    nrefs = MAX_POS - 1;
+    for (pc = mcolors.pats; pc; pc = pc->next) {
+	nrefs = MAX_POS - 1;
 
-    for (pc = mcolors.pats; pc; pc = pc->next)
 	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
 	    pattryrefs(pc->pat, n, -1, -1, 0, &nrefs, begpos, endpos)) {
 	    if (pc->cols[1]) {
@@ -863,6 +863,7 @@ putmatchcol(char *group, char *n)
 
 	    return 0;
 	}
+    }
 
     zcputs(group, COL_NO);
 
@@ -880,9 +881,9 @@ putfilecol(char *group, char *filename, mode_t m, int special)
     Patcol pc;
     int len;
 
-    nrefs = MAX_POS - 1;
+    for (pc = mcolors.pats; pc; pc = pc->next) {
+	nrefs = MAX_POS - 1;
 
-    for (pc = mcolors.pats; pc; pc = pc->next)
 	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
 	    pattryrefs(pc->pat, filename, -1, -1, 0, &nrefs, begpos, endpos)) {
 	    if (pc->cols[1]) {
@@ -894,6 +895,7 @@ putfilecol(char *group, char *filename, mode_t m, int special)
 
 	    return 0;
 	}
+    }
 
     if (special != -1) {
 	colour = special;
