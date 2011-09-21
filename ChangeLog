@@ -1,3 +1,8 @@
+2011-09-21  Peter Stephenson  <pws@csr.com>
+
+	* Luka Perkov: 29788: Completion/Unix/Command/_quilt:
+	improved quilt completion.
+
 2011-09-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/16375: Src/Zle/complist.c: initialise number of
@@ -15430,5 +15435,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5469 $
+* $Revision: 1.5470 $
 *****************************************************

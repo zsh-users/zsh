@@ -3,46 +3,238 @@
 local -a tmp
 local rc
 
+_quilt_applied () {
+  tmp=( ${(f)"$(quilt applied 2>&1)"} )
+  rc=$?
+  if (( rc == 0 )); then
+    _wanted -V 'applied patches' expl 'patch' compadd "${tmp[@]}"
+  else
+    _message "No applied patches"
+  fi
+}
+
+_quilt_series () {
+  _wanted -V 'patches' expl 'patch' compadd ${(f)"$(quilt series)"}
+}
+
+_quilt_unapplied () {
+  tmp=( ${(f)"$(quilt unapplied 2>&1)"} )
+  rc=$?
+  if (( rc == 0 )); then
+    _wanted -V 'unapplied patches' expl 'patch' compadd "${tmp[@]}"
+  else
+    _message "No unapplied patches"
+  fi
+}
+
 _arguments \
-  '--trace' \
-  '--quiltrc:config file:_files' \
-  '--version' \
-  ':quilt command:(add files import previous setup annotate fold mail push
-    snapshot applied fork new refresh top delete graph next remove unapplied
-    diff grep patches rename upgrade edit header pop series)' \
+  '--trace[Runs the command in bash trace mode]' \
+  '--quiltrc[Use the specified configuration file]:files:_files' \
+  '--version[Print the version number and exit]' \
+  ':quilt command:(add annotate applied delete diff edit files fold fork graph
+    grep header import mail new next patches pop previous push refresh rename
+    revert series setup shell snapshot top unapplied upgrade)' \
   '*::subcmd:->subcmd' && return 0
 
-case "$state" in
-  (subcmd)
-
+case "$state" in (subcmd)
   case "$words[1]" in
-      (applied|delete|files|graph|header|next|previous|refresh|unapplied)
-        _wanted -V 'patches' expl 'patch' compadd ${(f)"$(quilt series)"}
+      (add)
+        _arguments '-h' \
+          '-P[Patch to add files to]:quilt series:_quilt_series' \
+          '*:files:_files'
         ;;
-      (push)
-        if (( CURRENT == 2 )); then
-          tmp=( ${(f)"$(quilt unapplied 2>&1)"} )
-          rc=$?
-          if (( rc == 0 )); then
-            _wanted -V 'unapplied patches' expl 'patch' compadd "${tmp[@]}"
-          else
-            _message "No unapplied patches"
-          fi
-        fi
+      (annotate)
+        _arguments '-h' \
+          '-P[Stop checking for changes at the specified rather than the topmost patch]:quilt series:_quilt_series' \
+          ':files:_files'
+        ;;
+      (applied)
+        _arguments '-h' \
+          ':quilt series:_quilt_series'
+        ;;
+      (delete)
+        _arguments '-h' \
+          '-n[Delete the next patch after topmost]' \
+          '-r[Remove the deleted patch file from the patches directory as well]' \
+          '--backup[Rename the patch file to patch~ rather than deleting it]' \
+          ':quilt series:_quilt_series'
+        ;;
+      (diff)
+        _arguments '-h' \
+          '-p[Select a patch style]:quilt patch style:(0 1 ab)' \
+          '-u[Create a unified diff]' \
+          '-U[Create a unified diff with num lines of context]:quilt unified diff: ' \
+          '-c[Create a context diff]' \
+          '-C[Create a context diff with num lines of context]:quilt context diff: ' \
+          '--no-timestamps[Do not include file timestamps in patch headers]' \
+          '--no-index[Do not output Index: lines]' \
+          '-z[Write to standard output the changes that have been made relative to the topmost or specified patch]' \
+          '-R[Create a reverse diff]' \
+          '-P[Create a diff for the specified patch]:quilt series:_quilt_series' \
+          '--combine[Create a combined diff for all patches between this patch and the patch specified with -P]:quilt series:_quilt_series' \
+          '--snapshot[Diff against snapshot]' \
+          '--diff=[Use the specified utility for generating the diff]:quilt select diff utility:_command_names -e' \
+          '--color=[Use syntax coloring]:quilt select color:(always auto never)' \
+          '--sort[Sort files by their name]' \
+          '*:files:_files'
+        ;;
+      (edit)
+        _arguments '-h' \
+          '*:files:_files'
+        ;;
+      (files)
+        _arguments '-h' \
+          '-a[List all files in all applied patches]' \
+          '-l[Add patch name to output]' \
+          '-v[Verbose, more user friendly output]' \
+          '--combine[Create a listing for all patches between this patch and the topmost or specified patch]:quilt series:_quilt_series' \
+          ':quilt series:_quilt_series'
+        ;;
+      (fold)
+        _arguments '-h' \
+          '-R[Apply patch in reverse]' \
+          '-q[Quiet operation]' \
+          '-f[Force apply]' \
+          '-p[The number of pathname components to strip]:quilt select strip-level: '
+        ;;
+      (fork)
+        _arguments '-h'
+        ;;
+      (graph)
+        _arguments '-h' \
+          '--all[Generate a graph including all applied patches and their dependencies]' \
+          '--reduce[Eliminate transitive edges from the graph]' \
+          '--lines[Compute dependencies by looking at the lines the patches modify]:quilt select lines: ' \
+          '--edge-labels=files[Label graph edges with the file names that the adjacent patches modify]' \
+          '-T ps[Directly produce a PostScript output file]' \
+          ':quilt series:_quilt_series'
+        ;;
+      (header)
+        _arguments '-h' \
+          '-a[Append the exiting patch header]' \
+          '-r[Replace the exiting patch header]' \
+          '-e[Edit the header in $EDITOR]' \
+          '--strip-diffstat[Strip diffstat output from the header]' \
+          '--strip-trailing-whitespace[Strip trailing whitespace at the end of lines of the header]' \
+          '--backup[Create a backup copy of the old version of a patch as patch~]' \
+          ':quilt series:_quilt_series'
+        ;;
+      (import)
+        _arguments '-h' \
+          '-p[Number of directory levels to strip when applying]:quilt select strip-level: ' \
+          '-R[Apply patch in reverse]' \
+          '-P[Patch filename to use inside quilt]:quilt select patch filename: ' \
+          '-f[Overwrite/update existing patches]' \
+          '-d[When overwriting in existing patch, keep the old (o), all (a), or new (n) patch header]:quilt select patch:(a n o)' \
+          '*:files:_files'
+        ;;
+      (mail)
+        _arguments '-h' \
+          '-m[Text to use as the text in the introduction]:quilt select text: ' \
+          '--prefix[Use an alternate prefix in the bracketed part of the subjects generated]:quilt select prefix: ' \
+          '--mbox[Store all messages in the specified file in mbox format]:files:_files' \
+          '--send[Send the messages directly]' \
+          '--sender[The envelope sender address to use]:quilt select sender: ' \
+          '--from[From header]:quilt select from: ' \
+          '--subject[Subject header]:quilt select subject: ' \
+          '--to[Append a recipient to the To header]:quilt select to: ' \
+          '--cc[Append a recipient to the Cc header]:quilt select cc: ' \
+          '--bcc[Append a recipient to the Bcc header]:quilt select bcc: ' \
+          '--signature[Append the specified signature to messages]:files:_files' \
+          '--reply-to[Add the appropriate headers to reply to the specified message]:quilt select reply-to: ' \
+          '*:quilt series:_quilt_series'
+        ;;
+      (new)
+        _arguments '-h'
+        ;;
+      (next)
+        _arguments '-h' \
+          ':quilt series:_quilt_series'
+        ;;
+      (patches)
+        _arguments '-h' \
+          '-v[Verbose, more user friendly output]' \
+          ':files:_files'
         ;;
       (pop)
-        if (( CURRENT == 2 )); then
-          tmp=( ${(f)"$(quilt applied 2>&1)"} )
-          rc=$?
-          if (( rc == 0 )); then
-            _wanted -V 'applied patches' expl 'patch' compadd "${tmp[@]}"
-          else
-            _message "No applied patches"
-          fi
-        fi
+        _arguments '-h' \
+          '-a[Remove all applied patches]' \
+          '-f[Force remove]' \
+          '-R[Always verify if the patch removes cleanly]' \
+          '-q[Quiet operation]' \
+          '-v[Verbose operation]' \
+          ':quilt applied:_quilt_applied'
+        ;;
+      (previous)
+        _arguments '-h' \
+          ':quilt series:_quilt_series'
+        ;;
+      (push)
+        _arguments '-h' \
+          '-a[Apply all patches in the series file]' \
+          '-q[Quiet operation]' \
+          '-f[Force apply, even if the patch has rejects]' \
+          '-v[Verbose operation]' \
+          '--leave-rejects[Leave around the reject files patch produced]' \
+          '--color=[Use syntax coloring]:quilt select color:(always auto never)' \
+          ':quilt unapplied:_quilt_unapplied'
+        ;;
+      (refresh)
+        _arguments '-h' \
+          '-p[Select a patch style]:quilt patch style:(0 1 ab)' \
+          '-u[Create a unified diff]' \
+          '-U[Create a unified diff with num lines of context]:quilt unified diff: ' \
+          '-c[Create a context diff]' \
+          '-C[Create a context diff with num lines of context]:quilt context diff: ' \
+          '-z[Create a new patch containing the changes instead of refreshing the topmost patch]:quilt select new patch name: ' \
+          '--no-timestamps[Do not include file timestamps in patch headers]' \
+          '--no-index[Do not output Index: lines]' \
+          '--diffstat[Add a diffstat section to the patch header, or replace the existing diffstat section]' \
+          '-f[Enforce refreshing of a patch that is not on top]' \
+          '--backup[Create a backup copy of the old version of a patch as patch~]' \
+          '--sort[Sort files by their name instead of preserving the original order]' \
+          '--strip-trailing-whitespace[Strip trailing whitespace at the end of lines]' \
+          ':quilt series:_quilt_series'
+        ;;
+      (rename)
+        _arguments '-h' \
+          '-P[Patch to rename]:quilt series:_quilt_series'
+        ;;
+      (revert)
+        _arguments '-h' \
+          '-P[Revert changes in the named patch]:quilt series:_quilt_series' \
+          '*:files:_files'
+        ;;
+      (series)
+        _arguments '-h' \
+          '-v[Verbose, more user friendly output]'
+        ;;
+      (setup)
+        _arguments '-h' \
+          '-d[Optional path prefix for the resulting source tree]:quilt select path-prefix: ' \
+          '--sourcedir[Directory that contains the package sources]:quilt select package sources directory: ' \
+          '-v[Verbose debug output]' \
+          ':files:_files'
+        ;;
+      (shell)
+        _arguments '-h' \
+          ':quilt select shell command:_command_names -e'
+        ;;
+      (snapshot)
+        _arguments '-h' \
+          '-d[Remove current snapshot]'
+        ;;
+      (top)
+        _arguments '-h'
+        ;;
+      (unapplied)
+        _arguments '-h' \
+          ':quilt series:_quilt_series'
+        ;;
+      (upgrade)
+        _arguments '-h'
         ;;
       (*)
-        _files
         ;;
   esac
   ;;
