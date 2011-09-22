@@ -16,6 +16,8 @@
 	* 36078: Doc/Zsh/contrib.yo: vcs_info: Adjust documentation for
 	no longer exporting
 
+	* 36116: Completion/Unix/Command/_git: various fixes
+
 2015-08-11  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36108: NEWS: list of major changes so far since 5.0.8

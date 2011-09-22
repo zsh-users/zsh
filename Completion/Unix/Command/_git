@@ -132,7 +132,7 @@ _git-archive () {
 
   declare -a backend_args
 
-  if (( words[(I)--format=*] > 0 && words[(I)--format=*] < CURRENT )); then
+  if (( words[(b:CURRENT-1:I)--format=*] )); then
     case ${words[$words[(I)--format=*]]#--format=} in
       (zip)
         backend_args=(
@@ -442,7 +442,7 @@ _git-checkout () {
     '(-b -B -t --track --patch --detach)--orphan[create a new orphan branch based at given commit]: :__git_branch_names' \
     '--ignore-skip-worktree-bits[ignores patterns and adds back any files in <paths>]' \
     '(-q --quiet -f --force -m --merge --conflict --patch)'{-m,--merge}'[3way merge current branch, working tree and new branch]' \
-    '(-q --quiet -f --force -m --merge --patch)--conflict[same as --merge, using given merge style]:style:(merge diff3)' \
+    '(-q --quiet -f --force -m --merge --patch)--conflict=[same as --merge, using given merge style]:style:(merge diff3)' \
     '(-)'{-p,--patch}'[interactively select hunks in diff between given tree-ish and working tree]' \
     '(-)--[start file arguments]' \
     '*:: :->branch-or-tree-ish-or-file' && ret=0
@@ -1285,7 +1285,7 @@ _git-push () {
     '(--verify)--no-verify[bybass the pre-push hook]' \
     '--recurse-submodules=[submodule handling]:submodule handling:((check\:"refuse pushing of supermodule if submodule commit cannot be found on the remote"
                                                                     on-demand\:"push all changed submodules"))' \
-    ':: :__git_any_repositories' \
+    ': :__git_any_repositories' \
     '*: :__git_ref_specs' && ret=0
 
   case $state in
@@ -6356,8 +6356,8 @@ __git_setup_revision_options () {
     '*--not[reverses meaning of ^ prefix for revisions that follow]'
     '--all[show all commits from refs]'
     '--branches=-[show all commits from refs/heads]::pattern'
-    '--tags=[-show all commits from refs/tags]::pattern'
-    '--remotes=[-show all commits from refs/remotes]::pattern'
+    '--tags=-[show all commits from refs/tags]::pattern'
+    '--remotes=-[show all commits from refs/remotes]::pattern'
     '--glob=[show all commits from refs matching glob]:pattern'
     '--exclude=[do not include refs matching glob]:pattern'
     '--exclude=[do not include refs matching glob]:pattern'
