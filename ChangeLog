@@ -1,3 +1,8 @@
+2011-09-22  Peter Stephenson  <pws@csr.com>
+
+	* Daniel Friesel: 29796: Copmletion/X/Command/_mplayer: complete
+	.webm.
+
 2011-09-21  Peter Stephenson  <pws@csr.com>
 
 	* Luka Perkov: 29788: Completion/Unix/Command/_quilt:
@@ -15435,5 +15440,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5470 $
+* $Revision: 1.5471 $
 *****************************************************
