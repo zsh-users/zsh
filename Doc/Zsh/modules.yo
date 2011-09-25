@@ -6,7 +6,11 @@ Some optional parts of zsh are in modules, separate from the core
 of the shell.  Each of these modules may be linked in to the
 shell at build time,
 or can be dynamically linked while the shell is running
-if the installation supports this feature.  The modules that
-are bundled with the zsh distribution are:
+if the installation supports this feature.
+Modules are linked at runtime with the tt(zmodload) command,
+see ifzman(zmanref(zshbuiltins))\
+ifnzman(noderef(Shell Builtin Commands)).
+
+The modules that are bundled with the zsh distribution are:
 
 includefile(Zsh/modlist.yo)

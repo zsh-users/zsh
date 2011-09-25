@@ -491,7 +491,9 @@ wait_for_processes(void)
 	 */
 	if (findproc(pid, &jn, &pn, 0)) {
 	    if (((jn->stat & STAT_BUILTIN) ||
-		 (list_pipe && (jobtab[thisjob].stat & STAT_BUILTIN))) &&
+		 (list_pipe &&
+		  (thisjob == -1 ||
+		   (jobtab[thisjob].stat & STAT_BUILTIN)))) &&
 		WIFSTOPPED(status) && WSTOPSIG(status) == SIGTSTP) {
 		killjb(jn, SIGCONT);
 		zwarn("job can't be suspended");
