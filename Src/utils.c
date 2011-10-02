@@ -1691,8 +1691,8 @@ adjustwinsize(int from)
 	winchanged =
 #endif /* TIOCGWINSZ */
 	    resetneeded = 1;
-	zleentry(ZLE_CMD_REFRESH);
 	zleentry(ZLE_CMD_RESET_PROMPT);
+	zleentry(ZLE_CMD_REFRESH);
     }
 }
 
