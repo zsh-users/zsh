@@ -1,3 +1,7 @@
+2011-10-12  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 29815: Doc/Makefile.in: include mod_langinfo in documentation.
+
 2011-09-25  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* 29799: Src/utils.c: swap order of RESET_PROMPT / REFRESH in
@@ -15451,5 +15455,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5474 $
+* $Revision: 1.5475 $
 *****************************************************
