@@ -1869,6 +1869,10 @@ get_comp_string(void)
 		}
 	    } else if (p < curs) {
 		if (*p == Outbrace) {
+		    /*
+		     * HERE: strip and remember code from last
+		     * comma to here.
+		     */
 		    cant = 1;
 		    break;
 		}
@@ -1876,6 +1880,16 @@ get_comp_string(void)
 		    char *tp = p;
 
 		    if (!skipparens(Inbrace, Outbrace, &tp)) {
+			/*
+			 * Balanced brace: skip.
+			 * We only deal with unfinished braces, so
+			 *  something{foo<x>bar,morestuff}else
+			 * doesn't work
+			 *
+			 * HERE: instead, continue, look for a comma.
+			 * Stack tp and brace for popping when we
+			 * find a comma at each level.
+			 */
 			i += tp - p - 1;
 			dp += tp - p - 1;
 			p = tp - 1;
@@ -1918,10 +1932,16 @@ get_comp_string(void)
 		    hascom = 1;
 		}
 	    } else {
+		/* On or after the cursor position */
 		if (*p == Inbrace) {
 		    char *tp = p;
 
 		    if (!skipparens(Inbrace, Outbrace, &tp)) {
+			/*
+			 * Balanced braces after the cursor.
+			 * Could do the same with these as
+			 * those before the cursor.
+			 */
 			i += tp - p - 1;
 			dp += tp - p - 1;
 			p = tp - 1;
@@ -1932,6 +1952,14 @@ get_comp_string(void)
 		    break;
 		}
 		if (p == curs) {
+		    /*
+		     * We've reached the cursor position.
+		     * If there's a pending open brace at this
+		     * point we need to stack the text.
+		     * We've marked the bit we don't want from
+		     * bbeg to bend, which might be a comma
+		     * between the opening brace and us.
+		     */
 		    if (bbeg) {
 			Brinfo new;
 			int len = bend - bbeg;
@@ -1961,10 +1989,23 @@ get_comp_string(void)
 		    bbeg = NULL;
 		}
 		if (*p == Comma) {
+		    /*
+		     * Comma on or after cursor.
+		     * We set bbeg to NULL at the cursor; here
+		     * it's being used to find the first comma
+		     * afterwards.
+		     */
 		    if (!bbeg)
 			bbeg = p;
 		    hascom = 2;
 		} else if (*p == Outbrace) {
+		    /*
+		     * Closing brace on or after the cursor.
+		     * Not sure how this can be after the cursor;
+		     * if it was matched, wouldn't we have skipped
+		     * over the group, and if it wasn't, surely we're
+		     * not interested in it?
+		     */
 		    Brinfo new;
 		    int len;
 

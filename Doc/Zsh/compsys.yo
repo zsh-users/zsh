@@ -4387,7 +4387,9 @@ tt(ambiguous), tt(special-dirs), tt(list-suffixes) and tt(file-sort)
 described above.
 )
 findex(_pick_variant)
-item(tt(_pick_variant [ tt(-c) var(command) ] [ tt(-r) var(name) ] var(label)tt(=)var(pattern) ... var(label) [ var(args) ... ]))(
+xitem(tt(_pick_variant) [ tt(-b) var(builtin-label) ] [ tt(-c)
+var(command) ] [ tt(-r) var(name) ])
+item(   var(label)tt(=)var(pattern) ... var(label) [ var(args) ... ])(
 This function is used to resolve situations where a single command name
 requires more than one type of handling, either because it
 has more than one variant or because there is a name clash between two
@@ -4402,6 +4404,10 @@ var(label)tt(=)var(pattern); if the output of `var(command) var(args)
 tt(...)' contains var(pattern), then tt(label) is selected as the label
 for the command variant.  If none of the patterns match, the final
 command label is selected and status 1 is returned.
+
+If the `tt(-b) var(builtin-label)' is given, the command is tested to
+see if it is provided as a shell builtin, possibly autoloaded; if so,
+the label var(builtin-label) is selected as the label for the variant.
 
 If the `tt(-r) var(name)' is given, the var(label) picked is stored in
 the parameter named var(name).

@@ -1,3 +1,9 @@
+2011-10-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 29820: Doc/Zsh/compsys.yo,
+	Completion/Base/Utility/_pick_variant: -b option to match
+	builtins.
+
 2011-10-12  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29815: Doc/Makefile.in: include mod_langinfo in documentation.
@@ -15455,5 +15461,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5475 $
+* $Revision: 1.5476 $
 *****************************************************
