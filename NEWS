@@ -4,6 +4,12 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes since 4.3.12
+--------------------
+
+There are no significant feature changes to the shell itself, although
+many bug fixes and improvements to functions.
+
 Changes since 4.3.11
 --------------------
 
