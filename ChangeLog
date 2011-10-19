@@ -1,3 +1,9 @@
+2011-10-19  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Suraj N. Kurapati: 29828: Misc/vcs_info-examples: Mention
+	different ways to handle remote branch names in
+	`vi-git-remotebranch()'.
+
 2011-10-17  Peter Stephenson  <pws@csr.com>
 
 	* unposted: NEWS, README, Config/version.mk, Etc/.distfiles,
@@ -15470,5 +15476,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5478 $
+* $Revision: 1.5479 $
 *****************************************************
