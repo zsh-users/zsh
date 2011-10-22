@@ -3,17 +3,23 @@
 # zsh completion code for the Perl interpreter
 # Adam Spiers <adam@spiers.net>
 #
+# Completions currently based on Perl 5.14.1.
 
 _perl () {
   _arguments -s \
-    '-0-:input record separator in octal (\0, if no argument): ' \
+    '-0-[input record separator ($/)]:$/ in octal or hex (\0, if no argument)' \
     '-a[autosplit mode with -n or -p (splits $_ into @F)]' \
+    '-C-[control some unicode features]: :_perl_unicode_flags' \
     "-c[check syntax only (runs BEGIN and END blocks)]" \
-    '-d[run scripts under debugger]' \
-    '-d\:-[run under control of a debugging/tracing module]:debugging/tracing module:_perl_modules --strip-prefix --perl-hierarchy=Devel' \
-    '-D-:set debugging flags (argument is a bit mask or flags): ' \
-    "*-e+:one line of script. Several -e's allowed. Omit [programfile]." \
-    "-F-:split() pattern for autosplit (-a). The //'s are optional.: " \
+    '(   -dt -d: -dt:)-d[run scripts under debugger]' \
+    '(-d     -d: -dt:)-dt[run scripts under debugger (debugged code uses threads)]' \
+    '(-d -dt     -dt:)-d\:-[run under control of a debugging/tracing module]:debugging/tracing module:_perl_modules --strip-prefix --perl-hierarchy=Devel' \
+    '(-d -dt -d:     )-dt\:-[run under control of a debugging/tracing module (debugged coded uses threads)]:debugging/tracing module:_perl_modules --strip-prefix --perl-hierarchy=Devel' \
+    '-D-[set debugging flags]: :_perl_debugging_flags' \
+    '(   -E)*-e+[run one line of program]:one line of program' \
+    '(-e   )*-E+[like -e but enable all optional features]:one line of program: ' \
+    '-f[disable executing $Config{sitelib}/sitecustomize.pl at startup]' \
+    '-F-[split() pattern for autosplit (-a)]:split() pattern, // is optional' \
     '-h[list help summary]' \
     '-i-[edit <> files in place (make backup if extension supplied)]:backup file extension: ' \
     '*-I-[specify @INC/#include directory (may be used more than once)]:include path:_files -/' \
@@ -21,18 +27,21 @@ _perl () {
     \*{-m,-M}"-[module.. executes \`use/no module...' before executing your script]:module:_perl_m_opt" \
     "-n[assume 'while (<>) { ... }' loop around your script]" \
     "-p[assume loop like -n but print line also like sed]" \
-    "-P[run script through C preprocessor before compilation]" \
+    '-P[run script through C preprocessor before compilation (deprecated)]' \
     "-s[enable some switch parsing for switches after script name]" \
     "-S[look for the script using PATH environment variable]" \
-    "-T[turn on tainted checks]" \
+    '(   -T)-t[turn on taint checks but only issue warnings]' \
+    '(-t   )-T[turn on taint checks]' \
     "-u[dump core after parsing script]" \
     "-U[allow unsafe operations]" \
     "-v[print version number, patchlevel plus VERY IMPORTANT perl info]" \
     "-V-[print perl configuration information]:configuration keys:_perl_config_vars" \
-    '-w[turn warnings on for compilation of your script. Recommended]' \
+    '(   -W -X)-w[turn warnings on for compilation of your script (recommended)]' \
+    "(-w    -X)-W[enable all warnings (ignores 'no warnings')]" \
+    "(-w -W   )-X[disable all warnings (ignores 'use warnings')]" \
     '-x-[strip off text before #!perl line and perhaps cd to directory]:directory to cd to:_files -/' \
     '1:Perl script:_files -/ -g "*.(p[ml]|PL|t)(-.)"' \
-    '*::args: _normal' 
+    '*::args: _normal'
 }
 
 _perl_m_opt () {
@@ -58,6 +67,48 @@ _perl_config_vars () {
 
   compset -P '* ' && compset -q
   compadd "$expl[@]" $add_colon -S$delimiter -q -a _perl_config_vars
+}
+
+_perl_unicode_flags () {
+  _values -s '' 'unicode bitmask or flags' \
+    'I[  1 STDIN is assumed to be in UTF-8]' \
+    'O[  2 STDOUT will be in UTF-8]' \
+    'E[  4 STDERR will be in UTF-8]' \
+    'S[  7 I + O + E]' \
+    'i[  8 UTF-8 is the default PerlIO layer for input streams]' \
+    'o[ 16 UTF-8 is the default PerlIO layer for output streams]' \
+    'D[ 24 i + o]' \
+    'A[ 32 the @ARGV elements are expected to be strings encoded in UTF-8]' \
+    'L[ 64 make "IOEioA" conditional on the locale environment variables]' \
+    'a[256 set ${^UTF8CACHE} to -1, used for debugging]' \
+}
+
+_perl_debugging_flags () {
+  _values -s '' 'debugging bitmask or flags' \
+    'p[      1 Tokenizing and parsing (with v, displays parse stack)]' \
+    's[      2 Stack snapshots (with v, displays all stacks)]' \
+    'l[      4 Context (loop) stack processing]' \
+    't[      8 Trace execution]' \
+    'o[     16 Method and overloading resolution]' \
+    'c[     32 String/numeric conversions]' \
+    'P[     64 Print profiling info, preprocessor command for -P, source file input state]' \
+    'm[    128 Memory and SV allocation]' \
+    'f[    256 Format processing]' \
+    'r[    512 Regular expression parsing and execution]' \
+    'x[   1024 Syntax tree dump]' \
+    'u[   2048 Tainting checks]' \
+    'U[   4096 Unofficial, User hacking (reserved for private, unreleased use)]' \
+    'H[   8192 Hash dump -- usurps values()]' \
+    'X[  16384 Scratchpad allocation]' \
+    'D[  32768 Cleaning up]' \
+    'S[  66536 Thread synchronization]' \
+    'T[ 131072 Tokenising]' \
+    'R[ 262144 Include reference counts of dumped variables (eg when using -Ds)]' \
+    'J[ 524288 Do not s,t,P-debug (Jump over) opcodes within package DB]' \
+    'v[1048576 Verbose: use in conjunction with other flags]' \
+    'C[2097152 Copy On Write]' \
+    'A[4194304 Consistency checks on internal structures]' \
+    'q[8388608 quiet - currently only suppresses the "EXECUTING" message]' \
 }
 
 _perl "$@"

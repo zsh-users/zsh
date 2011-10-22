@@ -1,3 +1,7 @@
+2011-10-22  Simon Ruderich  <simon@ruderich.org>
+
+	* 29823: Completion/Unix/Command/_perl: Update for 5.14.1.
+
 2011-10-19  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Suraj N. Kurapati: 29828: Misc/vcs_info-examples: Mention
@@ -15476,5 +15480,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5479 $
+* $Revision: 1.5480 $
 *****************************************************
