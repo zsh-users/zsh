@@ -159,6 +159,11 @@ NetBSD: NetBSD 1.x
 OpenBSD: OpenBSD 2.x, 3.x
 	Should build `out-of-the-box'.
 
+OpenIndiana: OpenIndiana 151a
+	Problems have been reported with awk when used to generate
+	prototype files for building zsh.  Upgrading to gawk (GNU awk)
+	version 4.0.0 fixes this.	
+
 SIEMENS: Reliant UNIX
 	[Out of date.]
 

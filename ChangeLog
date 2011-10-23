@@ -1,3 +1,7 @@
+2011-10-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/16492: MACHINES: OpenIndiana issue.
+
 2011-10-22  Simon Ruderich  <simon@ruderich.org>
 
 	* 29823: Completion/Unix/Command/_perl: Update for 5.14.1.
@@ -15480,5 +15484,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5480 $
+* $Revision: 1.5481 $
 *****************************************************
