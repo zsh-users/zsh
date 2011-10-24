@@ -1,5 +1,8 @@
 2011-10-24  Peter Stephenson  <pws@csr.com>
 
+	* Jérémie Roquet: c.f. users/16541: Doc/Zsh/cond.yo:
+	should be "filename generation", not "file generation".
+
 	* Foudil Brétel: 29842: Completion/Unix/Command/_systemctl:
 	major rewrite.
 
@@ -15497,5 +15500,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5483 $
+* $Revision: 1.5484 $
 *****************************************************

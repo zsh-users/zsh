@@ -184,7 +184,7 @@ enditem()
 Normal shell expansion is performed on the var(file), var(string) and
 var(pattern) arguments, but the result of each expansion is constrained to
 be a single word, similar to the effect of double quotes.
-File generation is not performed on any form of argument to conditions.
+Filename generation is not performed on any form of argument to conditions.
 However, pattern metacharacters are active for the var(pattern) arguments;
 the patterns are the same as those used for filename generation, see
 ifzman(\
