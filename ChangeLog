@@ -1,3 +1,8 @@
+2011-10-24  Peter Stephenson  <pws@csr.com>
+
+	* Foudil Brétel: 29842: Completion/Unix/Command/_systemctl:
+	major rewrite.
+
 2011-10-24  Phil Pennock  <pdpennock@users.sourceforge.net>
 
 	* 29838: Src/Modules/pcre.c: metafy/unmetafy strings, to
@@ -15492,5 +15497,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5482 $
+* $Revision: 1.5483 $
 *****************************************************
