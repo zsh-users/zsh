@@ -1,3 +1,11 @@
+2011-10-24  Phil Pennock  <pdpennock@users.sourceforge.net>
+
+	* 29838: Src/Modules/pcre.c: metafy/unmetafy strings, to
+	correctly handle non-ASCII characters in UTF-8 for regexp
+	matches.
+
+	* unposted: Test/V07pcre.ztst: some PCRE tests
+
 2011-10-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/16492: MACHINES: OpenIndiana issue.
@@ -15484,5 +15492,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5481 $
+* $Revision: 1.5482 $
 *****************************************************

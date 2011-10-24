@@ -77,6 +77,7 @@ bin_pcre_compile(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int pcre_opts = 0, pcre_errptr;
     const char *pcre_error;
+    char *target;
     
     if(OPT_ISSET(ops,'a')) pcre_opts |= PCRE_ANCHORED;
     if(OPT_ISSET(ops,'i')) pcre_opts |= PCRE_CASELESS;
@@ -92,8 +93,13 @@ bin_pcre_compile(char *nam, char **args, Options ops, UNUSED(int func))
     if (pcre_pattern)
 	pcre_free(pcre_pattern);
 
-    pcre_pattern = pcre_compile(*args, pcre_opts, &pcre_error, &pcre_errptr, NULL);
+    target = ztrdup(*args);
+    unmetafy(target, NULL);
+
+    pcre_pattern = pcre_compile(target, pcre_opts, &pcre_error, &pcre_errptr, NULL);
     
+    free(target);
+
     if (pcre_pattern == NULL)
     {
 	zwarnnam(nam, "error in regex: %s", pcre_error);
@@ -161,7 +167,7 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar,
 	    sprintf(offset_all, "%d %d", ovec[0], ovec[1]);
 	    setsparam("ZPCRE_OP", ztrdup(offset_all));
 	}
-	match_all = ztrdup(captures[0]);
+	match_all = metafy(captures[0], -1, META_DUP);
 	setsparam(matchvar, match_all);
 	/*
 	 * If we're setting match, mbegin, mend we only do
@@ -169,7 +175,15 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar,
 	 * (c.f. regex.c).
 	 */
 	if (!want_begin_end || nelem) {
-	    matches = zarrdup(&captures[capture_start]);
+	    char **x, **y;
+	    y = &captures[capture_start];
+	    matches = x = (char **) zalloc(sizeof(char *) * (arrlen(y) + 1));
+	    do {
+		if (*y)
+		    *x++ = metafy(*y, -1, META_DUP);
+		else
+		    *x++ = NULL;
+	    } while (*y++);
 	    setaparam(substravar, matches);
 	}
 
@@ -255,6 +269,7 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
 {
     int ret, capcount, *ovec, ovecsize, c;
     char *matched_portion = NULL;
+    char *plaintext = NULL;
     char *receptacle = NULL;
     int return_value = 1;
     /* The subject length and offset start are both int values in pcre_exec */
@@ -278,7 +293,7 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     }
     /* For the entire match, 'Return' the offset byte positions instead of the matched string */
     if(OPT_ISSET(ops,'b')) want_offset_pair = 1; 
-    
+
     if(!*args) {
 	zwarnnam(nam, "not enough arguments");
     }
@@ -288,26 +303,28 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
 	zwarnnam(nam, "error %d in fullinfo", ret);
 	return 1;
     }
-    
+
     ovecsize = (capcount+1)*3;
     ovec = zalloc(ovecsize*sizeof(int));
-    
-    subject_len = (int)strlen(*args);
+
+    plaintext = ztrdup(*args);
+    unmetafy(plaintext, NULL);
+    subject_len = (int)strlen(plaintext);
 
     if (offset_start < 0 || offset_start >= subject_len)
 	ret = PCRE_ERROR_NOMATCH;
     else
-	ret = pcre_exec(pcre_pattern, pcre_hints, *args, subject_len, offset_start, 0, ovec, ovecsize);
+	ret = pcre_exec(pcre_pattern, pcre_hints, plaintext, subject_len, offset_start, 0, ovec, ovecsize);
 
     if (ret==0) return_value = 0;
     else if (ret==PCRE_ERROR_NOMATCH) /* no match */;
     else if (ret>0) {
-	zpcre_get_substrings(*args, ovec, ret, matched_portion, receptacle,
+	zpcre_get_substrings(plaintext, ovec, ret, matched_portion, receptacle,
 			     want_offset_pair, 0, 0);
 	return_value = 0;
     }
     else {
-	zwarnnam(nam, "error in pcre_exec");
+	zwarnnam(nam, "error in pcre_exec [%d]", ret);
     }
     
     if (ovec)
@@ -322,7 +339,8 @@ cond_pcre_match(char **a, int id)
 {
     pcre *pcre_pat;
     const char *pcre_err;
-    char *lhstr, *rhre, *avar=NULL;
+    char *lhstr, *rhre, *lhstr_plain, *rhre_plain, *avar=NULL;
+    char *p;
     int r = 0, pcre_opts = 0, pcre_errptr, capcnt, *ov, ovsize;
     int return_value = 0;
 
@@ -331,6 +349,10 @@ cond_pcre_match(char **a, int id)
 
     lhstr = cond_str(a,0,0);
     rhre = cond_str(a,1,0);
+    lhstr_plain = ztrdup(lhstr);
+    rhre_plain = ztrdup(rhre);
+    unmetafy(lhstr_plain, NULL);
+    unmetafy(rhre_plain, NULL);
     pcre_pat = NULL;
     ov = NULL;
 
@@ -339,7 +361,7 @@ cond_pcre_match(char **a, int id)
 
     switch(id) {
 	 case CPCRE_PLAIN:
-		pcre_pat = pcre_compile(rhre, pcre_opts, &pcre_err, &pcre_errptr, NULL);
+		pcre_pat = pcre_compile(rhre_plain, pcre_opts, &pcre_err, &pcre_errptr, NULL);
 		if (pcre_pat == NULL) {
 		    zwarn("failed to compile regexp /%s/: %s", rhre, pcre_err);
 		    break;
@@ -347,7 +369,7 @@ cond_pcre_match(char **a, int id)
                 pcre_fullinfo(pcre_pat, NULL, PCRE_INFO_CAPTURECOUNT, &capcnt);
     		ovsize = (capcnt+1)*3;
 		ov = zalloc(ovsize*sizeof(int));
-    		r = pcre_exec(pcre_pat, NULL, lhstr, strlen(lhstr), 0, 0, ov, ovsize);
+    		r = pcre_exec(pcre_pat, NULL, lhstr_plain, strlen(lhstr_plain), 0, 0, ov, ovsize);
 		/* r < 0 => error; r==0 match but not enough size in ov
 		 * r > 0 => (r-1) substrings found; r==1 => no substrings
 		 */
@@ -356,13 +378,16 @@ cond_pcre_match(char **a, int id)
 		    return_value = 1;
 		    break;
 		}
-	        else if (r==PCRE_ERROR_NOMATCH) return 0; /* no match */
+	        else if (r==PCRE_ERROR_NOMATCH) {
+		    return_value = 0; /* no match */
+		    break;
+		}
 		else if (r<0) {
-		    zwarn("pcre_exec() error: %d", r);
+		    zwarn("pcre_exec() error [%d]", r);
 		    break;
 		}
                 else if (r>0) {
-		    zpcre_get_substrings(lhstr, ov, r, NULL, avar, 0,
+		    zpcre_get_substrings(lhstr_plain, ov, r, NULL, avar, 0,
 					 isset(BASHREMATCH),
 					 !isset(BASHREMATCH));
 		    return_value = 1;
@@ -371,6 +396,10 @@ cond_pcre_match(char **a, int id)
 		break;
     }
 
+    if (lhstr_plain)
+	free(lhstr_plain);
+    if(rhre_plain)
+	free(rhre_plain);
     if (pcre_pat)
 	pcre_free(pcre_pat);
     if (ov)

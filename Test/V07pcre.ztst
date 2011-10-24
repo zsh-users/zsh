@@ -1,0 +1,106 @@
+%prep
+
+  zmodload zsh/pcre
+  setopt rematch_pcre
+# Find a UTF-8 locale.
+  setopt multibyte
+# Don't let LC_* override our choice of locale.
+  unset -m LC_\*
+  mb_ok=
+  langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
+	 $(locale -a 2>/dev/null | egrep 'utf8|UTF-8'))
+  for LANG in $langs; do
+    if [[ é = ? ]]; then
+      mb_ok=1
+      break;
+    fi
+  done
+  if [[ -z $mb_ok ]]; then
+    ZTST_unimplemented="no UTF-8 locale or multibyte mode is not implemented"
+  else
+    print -u $ZTST_fd Testing PCRE multibyte with locale $LANG
+    mkdir multibyte.tmp && cd multibyte.tmp
+  fi
+
+%test
+
+  [[ 'foo→bar' =~ .([^[:ascii:]]). ]]
+  print $MATCH
+  print $match[1]
+0:Basic non-ASCII regexp matching
+>o→b
+>→
+
+  [[ foo =~ f.+ ]] ; print $?
+  [[ foo =~ x.+ ]] ; print $?
+  [[ ! foo =~ f.+ ]] ; print $?
+  [[ ! foo =~ x.+ ]] ; print $?
+  [[ foo =~ f.+ && bar =~ b.+ ]] ; print $?
+  [[ foo =~ x.+ && bar =~ b.+ ]] ; print $?
+  [[ foo =~ f.+ && bar =~ x.+ ]] ; print $?
+  [[ ! foo =~ f.+ && bar =~ b.+ ]] ; print $?
+  [[ foo =~ f.+ && ! bar =~ b.+ ]] ; print $?
+  [[ ! ( foo =~ f.+ && bar =~ b.+ ) ]] ; print $?
+  [[ ! foo =~ x.+ && bar =~ b.+ ]] ; print $?
+  [[ foo =~ x.+ && ! bar =~ b.+ ]] ; print $?
+  [[ ! ( foo =~ x.+ && bar =~ b.+ ) ]] ; print $?
+0:Regex result inversion detection
+>0
+>1
+>1
+>0
+>0
+>1
+>1
+>1
+>1
+>1
+>0
+>1
+>0
+
+# Note that PCRE_ANCHORED only means anchored at the start
+# Also note that we don't unset MATCH/match on failed match (and it's an
+# open issue as to whether or not we should)
+  pcre_compile '.(→.)'
+  pcre_match foo→bar
+  print $? $MATCH $match ; unset MATCH match
+  pcre_match foo.bar
+  print $? $MATCH $match ; unset MATCH match
+  pcre_match foo†bar
+  print $? $MATCH $match ; unset MATCH match
+  pcre_match foo→†ar
+  print $? $MATCH $match ; unset MATCH match
+  pcre_study
+  pcre_match foo→bar
+  print $? $MATCH $match ; unset MATCH match
+  pcre_compile -a '.(→.)'
+  pcre_match foo→bar
+  print $? $MATCH $match ; unset MATCH match
+  pcre_match o→bar
+  print $? $MATCH $match ; unset MATCH match
+  pcre_match o→b
+  print $? $MATCH $match ; unset MATCH match
+  pcre_compile 'x.(→.)'
+  pcre_match xo→t
+  print $? $MATCH $match ; unset MATCH match
+  pcre_match Xo→t
+  print $? $MATCH $match ; unset MATCH match
+  pcre_compile -i 'x.(→.)'
+  pcre_match xo→t
+  print $? $MATCH $match ; unset MATCH match
+  pcre_match Xo→t
+  print $? $MATCH $match ; unset MATCH match
+0:pcre_compile interface testing: basic, anchored & case-insensitive
+>0 o→b →b
+>1
+>1
+>0 o→† →†
+>0 o→b →b
+>1
+>0 o→b →b
+>0 o→b →b
+>0 xo→t →t
+>1
+>0 xo→t →t
+>0 Xo→t →t
