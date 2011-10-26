@@ -1,3 +1,9 @@
+2011-10-26  Phil Pennock  <pdpennock@users.sourceforge.net>
+
+	* 29867: Bart Schaefer: Test/V07pcre.ztst: exit early with
+	unimplemented status if zsh/pcre not available; combined with
+	Peter's 29865 fix, should make PCRE testing robust.
+
 2011-10-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 29844, 29845: Src/exec.c, Test/A04redirect.ztst: remove bogus
@@ -15511,5 +15517,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5487 $
+* $Revision: 1.5488 $
 *****************************************************
