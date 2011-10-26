@@ -2912,6 +2912,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    }
 	    addfd(forked, save, mfds, fn->fd1, fn->fd2, 1, fn->varid);
 	} else {
+	    int closed;
 	    if (fn->type != REDIR_HERESTR && xpandredir(fn, redir))
 		continue;
 	    if (errflag) {
@@ -3002,11 +3003,20 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		 * Note we may attempt to close an fd beyond max_zsh_fd:
 		 * OK as long as we never look in fdtable for it.
  		 */
-		if (!forked && fn->fd1 < 10 && save[fn->fd1] == -2)
+		closed = 0;
+		if (!forked && fn->fd1 < 10 && save[fn->fd1] == -2) {
 		    save[fn->fd1] = movefd(fn->fd1);
+		    if (save[fn->fd1] >= 0) {
+			/*
+			 * The original fd is now closed, we don't need
+			 * to do it below.
+			 */
+			closed = 1;
+		    }
+		}
 		if (fn->fd1 < 10)
 		    closemn(mfds, fn->fd1);
-		if (zclose(fn->fd1) < 0) {
+		if (!closed && zclose(fn->fd1) < 0) {
 		    zwarn("failed to close file descriptor %d: %e",
 			  fn->fd1, errno);
 		}
