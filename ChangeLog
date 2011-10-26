@@ -1,5 +1,7 @@
 2011-10-26  Peter Stephenson  <pws@csr.com>
 
+	* 29865: Src/Modules/pcre.mdd: don't compile if no pcre-config.
+
 	* 29859: Src/Zle/Complete.c: compadd handles its own options.
 
 2011-10-24  Peter Stephenson  <pws@csr.com>
@@ -15504,5 +15506,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5485 $
+* $Revision: 1.5486 $
 *****************************************************
