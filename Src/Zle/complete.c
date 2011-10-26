@@ -1544,7 +1544,7 @@ cond_range(char **a, int id)
 }
 
 static struct builtin bintab[] = {
-    BUILTIN("compadd", 0, bin_compadd, 0, -1, 0, NULL, NULL),
+    BUILTIN("compadd", BINF_HANDLES_OPTS, bin_compadd, 0, -1, 0, NULL, NULL),
     BUILTIN("compset", 0, bin_compset, 1, 3, 0, NULL, NULL),
 };
 
