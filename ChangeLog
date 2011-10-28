@@ -1,3 +1,8 @@
+2011-10-28  Peter Stephenson  <pws@csr.com>
+
+	* Src/module.c (do_load_module): 29879: (via takimoto-j): Metafy
+	dlerror message to avoid corruption.
+
 2011-10-26  Phil Pennock  <pdpennock@users.sourceforge.net>
 
 	* 29867: Bart Schaefer: Test/V07pcre.ztst: exit early with
@@ -15517,5 +15522,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5488 $
+* $Revision: 1.5489 $
 *****************************************************
