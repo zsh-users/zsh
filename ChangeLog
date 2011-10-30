@@ -1,3 +1,8 @@
+2011-10-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/16547: Completion/Unix/Command/_perforce: quote
+	arguments with colon in from _describe.
+
 2011-10-28  Peter Stephenson  <pws@csr.com>
 
 	* Src/module.c (do_load_module): 29879: (via takimoto-j): Metafy
@@ -15522,5 +15527,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5489 $
+* $Revision: 1.5490 $
 *****************************************************

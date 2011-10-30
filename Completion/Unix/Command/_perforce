@@ -603,7 +603,7 @@ _perforce_global_options() {
 _perforce_branches() {
   local bline match mbegin mend
   local -a bl
-  bl=(${${${(f)"$(_perforce_call_p4 branches branches 2>/dev/null)"}##Branch }/ /:})
+  bl=(${${${${(f)"$(_perforce_call_p4 branches branches 2>/dev/null)"}##Branch }//:/\\:}/ /:})
   [[ $#bl -eq 1 && $bl[1] = '' ]] && bl=()
   (( $#bl )) && _describe -t branches 'Perforce branch' bl
 }
@@ -685,7 +685,7 @@ awk '/^Client:/ { print $2 }')")
   # Limit to the 20 most recent changes by default to avoid huge
   # output.
   cl=(
-${${${${(f)"$(_perforce_call_p4 changes changes $amax $xargs $cstatus \$file)"}##Change\ }//\ on\ /:}/\ by\ /\ }
+${${${${${(f)"$(_perforce_call_p4 changes changes $amax $xargs $cstatus \$file)"}##Change\ }//:/\\:}//\ on\ /:}/\ by\ /\ }
   )
   # "default" can't have shelved files in it...
   [[ $ctype = shelved* ]] || cl+=("default:change not yet numbered")
@@ -711,7 +711,7 @@ _perforce_clients() {
     compset -P '//' && slash=(-S/ -q)
   fi
 
-  cl=(${${${(f)"$(_perforce_call_p4 clients clients)"}##Client\ }/\ /:})
+  cl=(${${${${(f)"$(_perforce_call_p4 clients clients)"}##Client\ }//:/\\:}/\ /:})
   [[ $#cl -eq 1 && $cl[1] = '' ]] && cl=()
   _describe -t clients 'Perforce client' cl $slash
 }
@@ -722,7 +722,7 @@ _perforce_counters() {
   local cline match mbegin mend
   local -a cl
 
-  cl=(${${${(f)"$(_perforce_call_p4 counters counters)"}/\ /:}/\=/current value})
+  cl=(${${${${(f)"$(_perforce_call_p4 counters counters)"}//:/\\:}/\ /:}/\=/current value})
   [[ $#cl -eq 1 && $cl[1] = '' ]] && cl=()
   _describe -t counters 'Perforce counter' cl
 }
@@ -796,7 +796,7 @@ _perforce_depots() {
   local dline match mbegin mend
   local -a dl
 
-  dl=(${${${(f)"$(_perforce_call_p4 depots depots)"}##Depot\ }/\ /:})
+  dl=(${${${${(f)"$(_perforce_call_p4 depots depots)"}##Depot\ }//:/\\:}/\ /:})
   [[ $#dl -eq 1 && $dl[1] = '' ]] && dl=()
   _describe -t depots 'depot name' dl
 }
@@ -1594,7 +1594,7 @@ _perforce_submit_options() {
 _perforce_pids() {
   local -a ul
 
-  ul=(${${${(f)"$(_perforce_call_p4 monitor monitor show 2>/dev/null)"}# *}/\ /:})
+  ul=(${${${${(f)"$(_perforce_call_p4 monitor monitor show 2>/dev/null)"}# *}//:/\\:}/\ /:})
   [[ $#ul -eq 1 && $ul[1] = '' ]] && ul=()
   _describe -t id 'process ID' ul
 }
@@ -1604,7 +1604,7 @@ _perforce_pids() {
 _perforce_users() {
   local -a ul
 
-  ul=(${${(f)"$(_perforce_call_p4 users users)"}/\ /:})
+  ul=(${${${(f)"$(_perforce_call_p4 users users)"}//:/\\:}/\ /:})
   [[ $#ul -eq 1 && $ul[1] = '' ]] && ul=()
   _describe -t users 'Perforce user' ul
 }
