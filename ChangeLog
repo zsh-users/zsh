@@ -1,3 +1,9 @@
+2011-10-31  Peter Stephenson  <pws@csr.com>
+
+	* Jun T: 29883: Src/Builtins/rlimits.c, Src/Modules/zftp.c: cast
+	to type in printf to work around cases where types aren't
+	properly distinguished.
+
 2011-10-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/16547: Completion/Unix/Command/_perforce: quote
@@ -15527,5 +15533,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5490 $
+* $Revision: 1.5491 $
 *****************************************************

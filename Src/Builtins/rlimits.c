@@ -102,9 +102,9 @@ showlimitvalue(int lim, rlim_t val)
 	printf("%lld\n", val);
 #  else
 #   ifdef RLIM_T_IS_UNSIGNED
-	printf("%lu\n", val);
+	printf("%lu\n", (unsigned long)val);
 #   else
-	printf("%ld\n", val);
+	printf("%ld\n", (long)val);
 #   endif /* RLIM_T_IS_UNSIGNED */
 #  endif /* RLIM_T_IS_LONG_LONG */
 # endif /* RLIM_T_IS_QUAD_T */
@@ -123,9 +123,9 @@ showlimitvalue(int lim, rlim_t val)
 	printf("%lldus\n", val);
 #  else
 #   ifdef RLIM_T_IS_UNSIGNED
-	printf("%luus\n", val);
+	printf("%luus\n", (unsigned long)val);
 #   else
-	printf("%ldus\n", val);
+	printf("%ldus\n", (long)val);
 #   endif /* RLIM_T_IS_UNSIGNED */
 #  endif /* RLIM_T_IS_LONG_LONG */
 # endif /* RLIM_T_IS_QUAD_T */
@@ -139,9 +139,9 @@ showlimitvalue(int lim, rlim_t val)
 	printf("%lld\n", val);
 #  else
 #   ifdef RLIM_T_IS_UNSIGNED
-	printf("%lu\n", val);
+	printf("%lu\n", (unsigned long)val);
 #   else
-	printf("%ld\n", val);
+	printf("%ld\n", (long)val);
 #   endif /* RLIM_T_IS_UNSIGNED */
 #  endif /* RLIM_T_IS_LONG_LONG */
 # endif /* RLIM_T_IS_QUAD_T */
@@ -158,13 +158,13 @@ showlimitvalue(int lim, rlim_t val)
 	printf("%lldkB\n", val / 1024L);
 #  else
 #   ifdef RLIM_T_IS_UNSIGNED
-    printf("%luMB\n", val / (1024L * 1024L));
+    printf("%luMB\n", (unsigned long)(val / (1024L * 1024L)));
     else
-	printf("%lukB\n", val / 1024L);
+	printf("%lukB\n", (unsigned long)(val / 1024L));
 #   else
-    printf("%ldMB\n", val / (1024L * 1024L));
+    printf("%ldMB\n", (long)val / (1024L * 1024L));
     else
-	printf("%ldkB\n", val / 1024L);
+	printf("%ldkB\n", (long)val / 1024L);
 #   endif /* RLIM_T_IS_UNSIGNED */
 #  endif /* RLIM_T_IS_LONG_LONG */
 # endif /* RLIM_T_IS_QUAD_T */
@@ -398,9 +398,9 @@ printulimit(char *nam, int lim, int hard, int head)
 	printf("%lld\n", limit);
 #  else
 #   ifdef RLIM_T_IS_UNSIGNED
-	printf("%lu\n", limit);
+	printf("%lu\n", (unsigned long)limit);
 #   else
-	printf("%ld\n", limit);
+	printf("%ld\n", (long)limit);
 #   endif /* RLIM_T_IS_UNSIGNED */
 #  endif /* RLIM_T_IS_LONG_LONG */
 # endif /* RLIM_T_IS_QUAD_T */
