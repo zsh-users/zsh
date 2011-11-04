@@ -40,8 +40,10 @@ if [[ $curwidget = *(pattern|regex)* ]]; then
     rep2+=$rep
     if [[ $curwidget = *regex* ]]; then
       autoload -Uz regexp-replace
-      regexp-replace LBUFFER $_replace_string_src $rep2 || return 1
-      regexp-replace RBUFFER $_replace_string_src $rep2 || return 1
+      integer ret=1
+      regexp-replace LBUFFER $_replace_string_src $rep2 && ret=0
+      regexp-replace RBUFFER $_replace_string_src $rep2 && ret=0
+      return ret
     else
       LBUFFER=${LBUFFER//(#bm)$~_replace_string_src/${(e)rep2}}
       RBUFFER=${RBUFFER//(#bm)$~_replace_string_src/${(e)rep2}}

@@ -19,26 +19,19 @@ while getopts "k:" opt; do
 done
 (( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
+local readprompt="$1" lbuf_init="$2" rbuf_init="$3"
+
+# Use anonymous function to make sure special values get restored,
+# even if this function is called as a widget.
+# local +h ensures special parameters stay special.
+() {
   local pretext="$PREDISPLAY$LBUFFER$RBUFFER$POSTDISPLAY
 "
-# We could use the local variables mechanism to save these
-# values, but if read-from-minibuffer is called as a widget
-# (which isn't actually all that useful) the values won't be
-# restored because the variables are already local at the current
-# level and don't get restored when they go out of scope.
-# We could do it with an additional function level.
-  local save_lbuffer=$LBUFFER
-  local save_rbuffer=$RBUFFER
-  local save_predisplay=$PREDISPLAY
-  local save_postdisplay=$POSTDISPLAY
-  local -a save_region_highlight
-  save_region_highlight=("${region_highlight[@]}")
-
-{
-  LBUFFER="$2"
-  RBUFFER="$3"
-  PREDISPLAY="$pretext${1:-? }"
-  POSTDISPLAY=
+  local +h LBUFFER="$lbuf_init"
+  local +h RBUFFER="$rbuf_init"
+  local +h PREDISPLAY="$pretext${readprompt:-? }"
+  local +h POSTDISPLAY=
+  local +h -a region_highlight
   region_highlight=("P${#pretext} ${#PREDISPLAY} bold")
 
   if [[ -n $keys ]]; then
@@ -50,12 +43,6 @@ done
     stat=$?
     (( stat )) || REPLY=$BUFFER
   fi
-} always {
-  LBUFFER=$save_lbuffer
-  RBUFFER=$save_rbuffer
-  PREDISPLAY=$save_predisplay
-  POSTDISPLAY=$save_postdisplay
-  region_highlight=("${save_region_highlight[@]}")
 }
 
 return $stat
