@@ -392,11 +392,16 @@ commands to create the widgets.
 When combined with the tt(-a) option, all widget names are listed,
 including the builtin ones. In this case the tt(-L) option is ignored.
 
-If at least one var(string) is given, nothing will be printed but the
-return status will be zero if all var(string)s are names of existing
-widgets (or of user-defined widgets if the tt(-a) flag is not given)
-and non-zero if at least one var(string) is not a name of an defined
-widget.
+If at least one var(string) is given, and tt(-a) is present or tt(-L) is
+not used, nothing will be printed.  The return status will be zero if
+all var(string)s are names of existing widgets and non-zero if at least one
+var(string) is not a name of a defined widget.  If tt(-a) is also
+present, all widget names are used for the comparison including builtin
+widgets, else only user-defined widgets are used.
+
+If at least one var(string) is present and the tt(-L) option is used,
+user-defined widgets matching any var(string) are listed in the form of
+tt(zle) commands to create the widgets.
 )
 item(tt(-D) var(widget) ...)(
 Delete the named var(widget)s.

@@ -1,3 +1,8 @@
+2011-11-04  Peter Stephenson  <pws@csr.com>
+
+	* 29891: Doc/Zsh/zle.yo, Src/Zle/zle_thingy.c: allow "zle -lL"
+	with arguments to list in -L format.
+
 2011-10-31  Peter Stephenson  <pws@csr.com>
 
 	* Jun T: 29883: Src/Builtins/rlimits.c, Src/Modules/zftp.c: cast
@@ -15533,5 +15538,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5491 $
+* $Revision: 1.5492 $
 *****************************************************

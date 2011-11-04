@@ -394,9 +394,13 @@ bin_zle_list(UNUSED(char *name), char **args, Options ops, UNUSED(char func))
 	Thingy t;
 
 	for (; *args && !ret; args++) {
-	    if (!(t = (Thingy) thingytab->getnode2(thingytab, *args)) ||
+	    HashNode hn = thingytab->getnode2(thingytab, *args);
+	    if (!(t = (Thingy) hn) ||
 		(!OPT_ISSET(ops,'a') && (t->widget->flags & WIDGET_INT)))
 		ret = 1;
+	    else if (OPT_ISSET(ops,'L')) {
+		scanlistwidgets(hn, 1);
+	    }
 	}
 	return ret;
     }
@@ -483,6 +487,12 @@ bin_zle_keymap(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
     return selectkeymap(*args, 0);
 }
 
+/*
+ * List a widget.
+ * If list is negative, just print the name.
+ * If list is 0, use abbreviated format.
+ * If list is positive, output as a command.
+ */
 /**/
 static void
 scanlistwidgets(HashNode hn, int list)
