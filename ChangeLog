@@ -1,3 +1,8 @@
+2011-11-07  Peter Stephenson  <pws@csr.com>
+
+	* 29894: Doc/Zsh/contrib.yo, Functions/Zle/replace-string:
+	display previous replacement and reuse if source string is empty.
+
 2011-11-04  Peter Stephenson  <pws@csr.com>
 
 	* 29892: Functions/Zle/read-from-minibuffer,
@@ -15543,5 +15548,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5493 $
+* $Revision: 1.5494 $
 *****************************************************

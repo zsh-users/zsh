@@ -2335,6 +2335,11 @@ regular expression matching is performed, else a literal string
 replacement.  Note that the previous source and replacement text are the
 same whether pattern, regular expression or string matching is used.
 
+In addition, tt(replace-string) shows the previous replacement above
+the prompt, so long as there was one during the current session; if the
+source string is empty, that replacement will be repeated without
+the widget prompting for a replacement string.
+
 For example, starting from the line:
 
 example(print This line contains fan and fond)
