@@ -1,5 +1,11 @@
 #compdef ssh slogin=ssh scp ssh-add ssh-agent ssh-keygen sftp
 
+# Completions currently based on OpenSSH 5.9 (released on 2011-09-06).
+#
+# TODO: update ssh-keygen (not based on 5.9)
+# TODO: sshd, ssh-keyscan, ssh-keysign
+
+
 _remote_files () {
   # There should be coloring based on all the different ls -F classifiers.
   local expl rempat remfiles remdispf remdispd args suf ret=1
@@ -38,79 +44,100 @@ _ssh () {
   typeset -A opt_args
 
   common=(
-    '-c+[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)'
-    '-C[compress data]'
-    '-F+[specify alternate config file]:config file:_files'
-    '-i+[select identity file]:SSH identity file:_files'
-    '*-o+[specify extra options]:option string:->option'
     '(-2)-1[forces ssh to try protocol version 1 only]'
     '(-1)-2[forces ssh to try protocol version 2 only]'
     '(-6)-4[forces ssh to use IPv4 addresses only]'
     '(-4)-6[forces ssh to use IPv6 addresses only]'
+    '-C[compress data]'
+    '-c+[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)'
+    '-F+[specify alternate config file]:config file:_files'
+    '-i+[select identity file]:SSH identity file:_files'
+    '*-o+[specify extra options]:option string:->option'
+  )
+  common_transfer=(
+    '-l[limit used bandwidth]:bandwidth in KiB/s:'
+    '-P+[specify port on remote host]:port number on remote host'
+    '-p[preserve modification times, access times and modes]'
+    '-q[disable progress meter and warnings]'
+    '-r[recursively copy directories (follows symbolic links)]'
+    '-S+[specify ssh program]:path to ssh:_command_names -e' \
+    '-v[verbose mode]'
   )
 
   case "$service" in
   ssh)
     _arguments -C -s \
-      '(-A)-a[disable forwarding of authentication agent connection]' \
       '(-a)-A[enables forwarding of the authentication agent connection]' \
+      '(-A)-a[disable forwarding of authentication agent connection]' \
       '(-P)-b+[specify interface to transmit on]:bind address:_bind_addresses' \
-      '-D+[specify a dynamic port forwarding]:port' \
+      '-D+[specify a dynamic port forwarding]:[bind-address]\:port' \
       '-e+[set escape character]:escape character (or `none'"'"'):' \
       '(-n)-f[go to background]' \
       '-g[allow remote hosts to connect to local forwarded ports]' \
-      '-I+[specify smartcard device]:device:_files' \
-      '-k[disable forwarding of kerberos tickets]' \
-      '-l+[specify login name]:login name:_ssh_users' \
-      '(-1)-m+[specify mac algorithms]:mac spec' \
-      '-n[redirect stdin from /dev/null]' \
-      '(-1)-N[do not execute a remote command. (protocol version 2 only)]' \
-      '-p+[specify port on remote host]:port number on remote host' \
-      '-P[use non privileged port]' \
-      '(-v)*-q[quiet operation]' \
-      '(-1)-s[invoke subsystem]' \
-      '(-T)-t[force pseudo-tty allocation]' \
-      '(-1 -t)-T[disable pseudo-tty allocation (protocol version 2 only)]' \
-      '(-q)*-v[verbose mode]' \
-      '-V[show version number]' \
-      '(-X -Y)-x[disable X11 forwarding]' \
-      '(-x -Y)-X[enable (untrusted) X11 forwarding]' \
-      '(-x -X)-Y[enable trusted X11 forwarding]' \
-      '-M[master mode for connection sharing]' \
-      '-S+:path to control socket:_files' \
-      '-O:multiplex control command:(check exit forward stop)' \
+      '-I+[specify the PKCS#11 shared library to use]' \
+      '-K[enable GSSAPI-based authentication and forwarding]' \
+      '-k[disable forwarding of GSSAPI credentials]' \
       '*-L[specify local port forwarding]:local port forwarding:->forward' \
+      '-l+[specify login name]:login name:_ssh_users' \
+      '-M[master mode for connection sharing]' \
+      '(-1)-m+[specify mac algorithms]:mac spec' \
+      '(-1)-N[do not execute a remote command (protocol version 2 only)]' \
+      '-n[redirect stdin from /dev/null]' \
+      '-O[control active connection multiplexing master process]:multiplex control command:((
+          check\:"check that the master process is running"
+          forward\:"request forwardings without command execution"
+          cancel\:"cancel forwardings"
+          exit\:"request the master to exit"
+          stop\:"request the master to stop accepting further multiplexing requests"))' \
+      '-P[use non privileged port]' \
+      '-p+[specify port on remote host]:port number on remote host' \
+      '(-v)*-q[quiet operation]' \
       '*-R[specify remote port forwarding]:remote port forwarding:->forward' \
+      '-S+[specify location of control socket for connection sharing]:path to control socket:_files' \
+      '(-1)-s[invoke subsystem]' \
+      '(-1 -t)-T[disable pseudo-tty allocation (protocol version 2 only)]' \
+      '(-T)-t[force pseudo-tty allocation]' \
+      '-V[show version number]' \
+      '(-q)*-v[verbose mode]' \
+      '(-N)-W[forward standard input/output over host:port (protocol version 2 only)]:host\:port' \
+      '-w[request tunnel device forwarding with the specified tun devices]:local_tun[\:remote_tun]' \
+      '(-x -Y)-X[enable (untrusted) X11 forwarding]' \
+      '(-X -Y)-x[disable X11 forwarding]' \
+      '(-x -X)-Y[enable trusted X11 forwarding]' \
+      '-y[send log information using the syslog module]' \
       ':remote host name:->userhost' \
       '*::args:->command' "$common[@]" && ret=0
     ;;
   scp)
     _arguments -C -s \
-      '-p[preserve modification times]' \
-      '-r[recursively copy directories]' \
-      '-v[verbose mode]' \
-      '-B[batch mode]' \
-      '-q[disables the progress meter]' \
-      '-P+[specify port on remote host]:port number on remote host' \
-      '-S+[specify ssh program]:path to ssh:_command_names -e' \
-      '*:file:->file' "$common[@]" && ret=0
+      '-3[copy through local host, not directly between the remote hosts]' \
+      '-B[batch mode (don'"'"'t ask for passphrases)]' \
+      '*:file:->file' "$common[@]" "$common_transfer[@]" && ret=0
     ;;
   ssh-add)
     _arguments -s \
-      '-l[list all identities]' \
-      '-L[lists public key parameters of all identities in the agent]'\
-      '-d[remove identity]' \
+      '-c[identity is subject to confirmation via SSH_ASKPASS]' \
       '-D[delete all identities]' \
-      '-p[read passphrase from stdin]' \
+      '-d[remove identity]' \
+      '-e[remove keys provided by the PKCS#11 shared library]:library:' \
+      '-k[load plain private keys only and skip certificates]' \
+      '-L[lists public key parameters of all identities in the agent]'\
+      '-l[list all identities]' \
+      '-s[add keys provided by the PKCS#11 shared library]:library:' \
+      '-t[set maximum lifetime for identity]:maximum lifetime (in seconds or time format):' \
+      '-X[unlock the agent]' \
+      '-x[lock the agent with a password]' \
       '*:SSH identity file:_files'
     return
     ;;
   ssh-agent)
     _arguments -s \
-      '(*)-k[kill agent automatically]' \
-      '(-c)-s[force sh-style shell]' \
-      '(-s)-c[force csh-style shell]' \
+      '(-k)-a[UNIX-domain socket to bind agent to]:UNIX-domain socket:_files' \
+      '(-k -s)-c[force csh-style shell]' \
       '(-k)-d[debug mode]' \
+      '-k[kill current agent]' \
+      '(-k -c)-s[force sh-style shell]' \
+      '-t[set default maximum lifetime for identities]:maximum lifetime (in seconds or time format):' \
       '*::command: _normal'
     return
     ;;
@@ -137,16 +164,12 @@ _ssh () {
     ;;
   sftp)
     _arguments -C -s \
-      '-C[compress data]' \
-      '-F+[specify alternate config file]:config file:_files' \
-      '(-1)-s[invoke subsystem]' \
-      '-S+[specify program]:program:_command_names -e' \
-      '-B+[specify buffer size]:buffer size' \
+      '-B+[specify buffer size]:buffer size in bytes (default\: 32768):' \
       '-b+[specify batch file to read]:batch file:_files' \
-      '*-v[verbose mode]' \
-      '-1[forces ssh to try protocol version 1 only]' \
-      '*-o+[specify extra options]:option string:->option' \
-      '1:file:->rfile' '*:file:->file' && ret=0
+      '-D[connect directly to a local sftp server]:sftp server path:' \
+      '-R[specify number of outstanding requests]:number of requests (default\: 64):' \
+      '-s[SSH2 subsystem or path to sftp server on the remote host]' \
+      '1:file:->rfile' '*:file:->file' "$common[@]" "$common_transfer[@]" && ret=0
     ;;
   esac
 
@@ -163,22 +186,36 @@ _ssh () {
           ;;
         *(#i)ciphers*)
           _values -s , 'encryption cipher' \
-	      'aes128-cbc' \
 	      '3des-cbc' \
-	      'blowfish-cbc' \
-	      'cast128-cbc' \
-	      'arcfour' \
+	      'aes128-cbc' \
 	      'aes192-cbc' \
 	      'aes256-cbc' \
+	      'aes128-ctr' \
+	      'aes192-ctr' \
+	      'aes256-ctr' \
+	      'arcfour128' \
+	      'arcfour256' \
+	      'arcfour' \
+	      'blowfish-cbc' \
+	      'cast128-cbc' \
+	      \
 	      'rijndael128-cbc' \
 	      'rijndael192-cbc' \
 	      'rijndael256-cbc' \
-	      'rijndael-cbc@lysator.liu.se' && ret=0
+	      'rijndael-cbc@lysator.liu.se' \
+	      && ret=0
           ;;
         *(#i)cipher*)
-	  _wanted values expl 'encryption cipher' \
-              compadd idea des 3des blowfish arcfour tss none && ret=0
+	  _wanted values expl 'encryption cipher (protocol version 1)' \
+              compadd blowfish 3des des idea arcfour tss none && ret=0
           ;;
+	*(#i)controlmaster*)
+	  _wanted values expl 'truthish value' compadd yes no auto autoask && ret=0
+	  ;;
+	*(#i)controlpath*)
+          _description files expl 'path to control socket'
+          _files "$expl[@]" && ret=0
+	  ;;
         *(#i)globalknownhostsfile*)
           _description files expl 'global file with known hosts'
           _files "$expl[@]" && ret=0
@@ -192,6 +229,10 @@ _ssh () {
           ;;
         *(#i)(local|remote)forward*)
           state=forward
+          ;;
+        *(#i)preferredauthentications*)
+          _values -s , 'authentication method' gssapi-with-mic \
+              hostbased publickey keyboard-interactive password && ret=0
           ;;
         *(#i)protocol*)
           _values -s , 'protocol version' \
@@ -218,44 +259,95 @@ _ssh () {
           _description files expl 'xauth program'
           _files "$expl[@]" -g '*(-*)' && ret=0
           ;;
-	*(#i)controlmaster*)
-	  _wanted values expl 'truthish value' compadd yes no auto autoask && ret=0
-	  ;;
-	*(#i)controlpath*)
-          _description files expl 'path to control socket'
-          _files "$expl[@]" && ret=0
-	  ;;
-        *(#i)preferredauthentications*)
-          _values -s , 'authentication method' gssapi-with-mic \
-              hostbased publickey keyboard-interactive password && ret=0
         esac
       else
+        # old options are after the empty "\"-line
         _wanted values expl 'configure file option' \
             compadd -M 'm:{a-z}={A-Z}' -qS '=' - \
-	    	AddressFamily \
-                AFSTokenPassing BatchMode BindAddress \
-		ChallengeResponseAuthentication CheckHostIP \
-		Cipher Ciphers ClearAllForwardings Compression \
-                CompressionLevel ConnectionAttempts ConnectTimeout \
-		ControlMaster ControlPath \
-		DynamicForward EnableSSHKeysign \
-		EscapeChar FallBackToRsh ForwardAgent ForwardX11 \
-		ForwardX11Trusted \
-                GatewayPorts GlobalKnownHostsFile GSSAPIAuthentication \
-		GSSAPIDelegateCredentials HostbasedAuthentication \
-		HostKeyAlgorithms HostKeyAlias HostName IdentityFile \
-		IdentitiesOnly KbdInteractiveDevices \
-		KeepAlive KerberosAuthentication KerberosTgtPassing \
-		LocalForward LogLevel MACs NoHostAuthenticationForLocalhost \
-		NumberOfPasswordPrompts PreferredAuthentications \
-		PasswordAuthentication Port Protocol ProtocolKeepAlives \
-                ProxyCommand PubkeyAuthentication RemoteForward \
-		RhostsAuthentication RhostsRSAAuthentication \
-		RSAAuthentication ServerAliveInterval ServerAliveCountMax \
-		SetupTimeOut SmartcardDevice StrictHostKeyChecking \
-		TCPKeepAlive \
-                UsePrivilegedPort User UserKnownHostsFile UseRsh \
-                VerifyHostKeyDNS XAuthLocation && ret=0
+                AddressFamily \
+                BatchMode \
+                BindAddress \
+                ChallengeResponseAuthentication \
+                CheckHostIP \
+                Cipher \
+                Ciphers \
+                ClearAllForwardings \
+                Compression \
+                CompressionLevel \
+                ConnectionAttempts \
+                ConnectTimeout \
+                ControlMaster \
+                ControlPath \
+                ControlPersist \
+                DynamicForward \
+                EnableSSHKeysign \
+                EscapeChar \
+                ExitOnForwardFailure \
+                ForwardAgent \
+                ForwardX11 \
+                ForwardX11Timeout \
+                ForwardX11Trusted \
+                GatewayPorts \
+                GlobalKnownHostsFile \
+                GSSAPIAuthentication \
+                GSSAPIDelegateCredentials \
+                HashKnownHosts \
+                Host \
+                HostbasedAuthentication \
+                HostKeyAlgorithms \
+                HostKeyAlias \
+                HostName \
+                IdentitiesOnly \
+                IdentityFile \
+                IPQoS \
+                KbdInteractiveAuthentication \
+                KbdInteractiveDevices \
+                KexAlgorithms \
+                LocalCommand \
+                LocalForward \
+                LogLevel \
+                MACs \
+                NoHostAuthenticationForLocalhost \
+                NumberOfPasswordPrompts \
+                PasswordAuthentication \
+                PermitLocalCommand \
+                PKCS11Provider \
+                Port \
+                PreferredAuthentications \
+                Protocol \
+                ProxyCommand \
+                PubkeyAuthentication \
+                RekeyLimit \
+                RemoteForward \
+                RequestTTY \
+                RhostsRSAAuthentication \
+                RSAAuthentication \
+                SendEnv \
+                ServerAliveCountMax \
+                ServerAliveInterval \
+                StrictHostKeyChecking \
+                TCPKeepAlive \
+                Tunnel \
+                TunnelDevice \
+                UsePrivilegedPort \
+                User \
+                UserKnownHostsFile \
+                VerifyHostKeyDNS \
+                VisualHostKey \
+                XAuthLocation \
+                \
+                AFSTokenPassing \
+                FallBackToRsh \
+                KeepAlive \
+                KerberosAuthentication \
+                KerberosTgtPassing \
+                PreferredAuthentications \
+                ProtocolKeepAlives \
+                RhostsAuthentication \
+                SetupTimeOut \
+                SmartcardDevice \
+                UseRsh \
+                && ret=0
       fi
       ;;
     forward)
