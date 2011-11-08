@@ -21,6 +21,12 @@ typeset -A opt_args
     _wanted ffmpeg-video-codecs expl 'force video codec (''copy'' to copy stream)' compadd -a vcodecs
 }
 
+(( $+functions[_ffmpeg_scodecs] )) || _ffmpeg_scodecs() {
+    local scodecs
+    scodecs=(copy ${${(M)${(f)"$(_call_program video-codecs $words[1] -codecs 2>/dev/null)"}:#[[:space:]][D[:space:]][E[:space:]]S[S[:space:]][D[:space:]][T[:space:]][[:space:]][^[:space:]]##*}//(#b)????????([^[:space:]]##)*/$match[1]})
+    _wanted ffmpeg-video-codecs expl 'force video codec (''copy'' to copy stream)' compadd -a scodecs
+}
+
 (( $+functions[_ffmpeg_formats] )) || _ffmpeg_formats() {
     local formats
     formats=(${(ou)${=${(s:,:)${${(M)${(f)"$(_call_program formats $words[1] -formats 2>/dev/null)"}:#[[:space:]][D[:space:]][E[:space:]][[:space:]][^[:space:]]##*}//(#b)????([^[:space:]]##)*/$match[1]}}}})
@@ -84,6 +90,7 @@ typeset -A _ffmpeg_flags
         lastopt+=":$lastopt_description:"
         if (( $#lastopt_values )); then
             if [[ $lastopt_type == flags ]]; then
+                lastopt="*$lastopt"
                 flagtype=${${lastopt%%:*}#-}
                 lastopt+="->$flagtype"
                 _ffmpeg_flags[$flagtype]="${lastopt_values[*]}"
@@ -125,6 +132,7 @@ local -a _ffmpeg_argspecs
                     lastopt+=":$lastopt_description:_files"
                 elif [[ $lastopt == -[asv]pre ]]; then
                     lastopt_takesargs=0
+                    lastopt="*$lastopt"
                     lastopt+=": :_ffmpeg_presets"
                 elif [[ $lastopt == -acodec ]]; then
                     lastopt_takesargs=0
@@ -132,11 +140,16 @@ local -a _ffmpeg_argspecs
                 elif [[ $lastopt == -vcodec ]]; then
                     lastopt_takesargs=0
                     lastopt+=": :_ffmpeg_vcodecs"
+                elif [[ $lastopt == -scodec ]]; then
+                    lastopt_takesargs=0
+                    lastopt+=": :_ffmpeg_scodecs"
                 elif [[ $lastopt == -f ]]; then
                     lastopt_takesargs=0
+                    lastopt="*$lastopt"
                     lastopt+=": :_ffmpeg_formats"
                 elif [[ $lastopt == -pix_fmt ]]; then
                     lastopt_takesargs=0
+                    lastopt="*$lastopt"
                     lastopt+=": :_ffmpeg_pix_fmts"
                 elif [[ $example == bitstream_filter ]]; then
                     lastopt_takesargs=0

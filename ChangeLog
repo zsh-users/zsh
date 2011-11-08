@@ -1,3 +1,10 @@
+2011-11-08  Peter Stephenson  <pws@csr.com>
+
+	* Haakon Riiser: 29895, 29887: Completion/Unix/Command/_ffmpeg,
+	Completion/Linux/Command/_nmcli (plus
+	Completion/Linux/Command/.distfiles): update and new
+	NetworkManager client completion.
+
 2011-11-07  Simon Ruderich  <simon@ruderich.org>
 
 	* 29893: Completion/Unix/Command/_ssh: Update (mostly) for 5.9.
@@ -15552,5 +15559,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5495 $
+* $Revision: 1.5496 $
 *****************************************************

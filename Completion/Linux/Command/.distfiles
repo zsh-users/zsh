@@ -18,6 +18,7 @@ _mdadm
 _mii-tool
 _modutils
 _mondo
+_nmcli
 _pkgtool
 _rpmbuild
 _schedtool

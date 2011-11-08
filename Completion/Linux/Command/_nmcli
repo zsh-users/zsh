@@ -1,0 +1,244 @@
+#compdef nmcli
+
+local context state line expl
+typeset -A opt_args
+
+if [[ -z $_nmcli_version ]]; then
+    _nmcli_version="${"$(_call_program nmcli $words[1] --version)"##*version }"
+fi
+
+(( $+functions[_nmcli_is_running] )) || _nmcli_is_running() {
+    [[ $(_call_program nmcli $words[1] -f running nm) != *'not running'* ]]
+}
+
+(( $+functions[_nmcli_con_ids] )) || _nmcli_con_ids() {
+    _nmcli_is_running || return
+    local -a con_ids
+    con_ids=(${(f)"$(_call_program nmcli $words[1] -f name con)"})
+    con_ids=(${con_ids[2,-2]})
+    con_ids=(${con_ids[@]%%\ ##})
+    _describe 'select connection' con_ids
+}
+
+(( $+functions[_nmcli_con_uuids] )) || _nmcli_con_uuids() {
+    _nmcli_is_running || return
+    local -a con_uuids
+    con_uuids=(${(f)"$(_call_program nmcli $words[1] -f uuid con)"})
+    con_uuids=(${con_uuids[2,-2]})
+    con_uuids=(${con_uuids[@]%%\ ##})
+    _describe 'select connection' con_uuids
+}
+ 
+(( $+functions[_nmcli_objects] )) || _nmcli_objects() {
+    local -a objects_array
+    objects_array=(
+        'nm:NetworkManager status'
+        'con:NetworkManager connections'
+        'dev:devices managed by NetworkManager'
+    )
+    _describe 'nmcli object' objects_array
+}
+
+(( $+functions[_nmcli_nm] )) || _nmcli_nm() {
+    local -a nm_array
+    nm_array=(
+        'status:show overall status of NetworkManager'
+        'enable:get status or enable/disable networking'
+        'sleep:get sleep status or put to sleep/awake NetworkManager'
+        'wifi:inquire or set status of WiFi in NetworkManager'
+        'wwan:inquire or set status of WWAN in NetworkManager'
+    )
+    _describe 'inquire and change state of NetworkManager' nm_array
+}
+
+(( $+functions[_nmcli_con] )) || _nmcli_con() {
+    local -a con_array
+    con_array=(
+        'list:list configured connections'
+        'status:print status of active connections'
+        'up:activate a connection'
+        'down:deactivate a connection'
+    )
+    if [[ $_nmcli_version == 0.9.[1-9]* ]]; then
+        con_array[5]="delete:delete a connection"
+    fi
+    _describe "get information about NetworkManager's connections" con_array
+}
+
+(( $+functions[_nmcli_con_list] )) || _nmcli_con_list() {
+    local -a con_list_array
+    con_list_array=(
+        'id:get details on connection specified by id'
+        'uuid:get details on connection specified by uuid'
+    )
+    if [[ $_nmcli_version == 0.8* ]]; then
+        con_list_array[3]='system:only list system connections'
+        con_list_array[4]='user:only list user connections'
+    fi
+    _describe 'list configured connections' con_list_array
+}
+
+(( $+functions[_nmcli_con_up] )) || _nmcli_con_up() {
+    local -a con_up_array
+    con_up_array=(
+        'id:activate connection specified by id'
+        'uuid:activate connection specified by uuid'
+    )
+    _describe 'activate connection by id or uuid' con_up_array
+}
+
+(( $+functions[_nmcli_con_down] )) || _nmcli_con_down() {
+    local -a con_down_array
+    con_down_array=(
+        'id:deactivate connection specified by id'
+        'uuid:deactivate connection specified by uuid'
+    )
+    _describe 'deactivate connection by id or uuid' con_down_array
+}
+
+(( $+functions[_nmcli_con_delete] )) || _nmcli_con_delete() {
+    local -a con_delete_array
+    con_delete_array=(
+        'id:delete connection specified by id'
+        'uuid:delete connection specified by uuid'
+    )
+    _describe 'delete connection by id or uuid' con_delete_array
+}
+
+(( $+functions[_nmcli_con_up_extraargs] )) || _nmcli_con_up_extraargs() {
+    local -a con_up_extraargs_array
+    con_up_extraargs_array=(
+        'iface:require a particular interface'
+        'ap:require a specific access point'
+        '--nowait:don''t wait for command completion'
+        '--timeout:specify how long to wait for operation to complete'
+    )
+    _describe 'extra options for "con up"' con_up_extraargs_array
+}
+
+(( $+functions[_nmcli_dev_disconnect_extraargs] )) || _nmcli_dev_disconnect_extraargs() {
+    local -a dev_disconnect_extraargs_array
+    dev_disconnect_extraargs_array=(
+        '--nowait:don''t wait for command completion'
+        '--timeout:specify how long to wait for operation to complete'
+    )
+    _describe 'extra options for "dev disconnect"' dev_disconnect_extraargs_array
+}
+
+(( $+functions[_nmcli_dev_wifi_list] )) || _nmcli_dev_wifi_list() {
+    local -a dev_wifi_list_array
+    dev_wifi_list_array=(
+        'iface:list APs for a particular interface'
+    )
+    if [[ $_nmcli_version == 0.8* || $_nmcli_version == 0.9.0* ]]; then
+        dev_wifi_list_array[2] = 'hwaddr:list a specific AP by MAC address'
+    elif [[ $_nmcli_version == 0.9.[1-9]* ]]; then
+        dev_wifi_list_array[2] = 'bssid:list a specific AP by BSSID'
+    fi
+    _describe 'options for specifying the AP to list' dev_wifi_list_array
+}
+
+(( $+functions[_nmcli_dev] )) || _nmcli_dev() {
+    local -a dev_array
+    dev_array=(
+        'status:print status of devices'
+        'list:get detailed information about devices'
+        'disconnect:disconnect device and prevent it from automatically activating'
+        'wifi:list available WiFi access points'
+    )
+    _describe "get information about devices" dev_array
+}
+
+(( $+functions[_nmcli_truefalse] )) || _nmcli_truefalse() {
+    _wanted boolean expl 'use true/false to modify (nothing = query status)' compadd true false
+}
+
+(( $+functions[_nmcli_onoff] )) || _nmcli_onoff() {
+    _wanted onoff expl 'use on/off to modify (nothing = query status)' compadd on off
+}
+
+local w1="${words[$#words - 1]}"
+local w2="${words[$#words - 2]}"
+local w3="${words[$#words - 3]}"
+local w4="${words[$#words - 4]}"
+
+if [[ $w2 == nm && $w1 == (sleep|enable) ]]; then
+    _nmcli_truefalse && return
+elif [[ $w2 == nm && $w1 == (wifi|wwan) ]]; then
+    _nmcli_onoff && return
+elif [[ $w1 == nm ]]; then
+    _nmcli_nm && return
+elif [[ $w3 == con && $w2 == list && $w1 == id ]]; then
+    _nmcli_con_ids && return
+elif [[ $w3 == con && $w2 == list && $w1 == uuid ]]; then
+    _nmcli_con_uuids && return
+elif [[ $w2 == con && $w1 == list ]]; then
+    _nmcli_con_list && return
+elif [[ $w3 == con && $w2 == (up|down) && $w1 == id ]]; then
+    _nmcli_con_ids && return
+elif [[ $_nmcli_version == 0.9.[1-9]* && $w3 == con && $w2 == delete && $w1 == id ]]; then
+    _nmcli_con_ids && return
+elif [[ $w3 == con && $w2 == (up|down) && $w1 == uuid ]]; then
+    _nmcli_con_uuids && return
+elif [[ $_nmcli_version == 0.9.[1-9]* && $w3 == con && $w2 == delete && $w1 == uuid ]]; then
+    _nmcli_con_uuids && return
+elif [[ ${(pj:\0:)words} == *$'\0con\0up\0'(id|uuid)$'\0'* ]]; then
+     if [[ $w1 == iface ]]; then
+         _net_interfaces && return
+     elif [[ $w1 == ap ]]; then
+         _message -e descriptions 'enter MAC address' && return
+     elif [[ $w1 == --timeout ]]; then
+         _message -e descriptions 'enter timeout' && return
+     else
+         _nmcli_con_up_extraargs && return
+     fi
+elif [[ $w2 == con && $w1 == up ]]; then
+    _nmcli_con_up && return
+elif [[ $w2 == con && $w1 == down ]]; then
+    _nmcli_con_down && return
+elif [[ $_nmcli_version == 0.9.[1-9]* && $w2 == con && $w1 == delete ]]; then
+    _nmcli_con_delete && return
+elif [[ $w1 == con ]]; then
+    _nmcli_con && return
+elif [[ $w3 == dev && $w2 == (list|disconnect) && $w1 == iface ]]; then
+    _net_interfaces && return
+elif [[ ${(pj:\0:)words} == *$'\0dev\0disconnect\0iface\0'* ]]; then
+     if [[ $w1 == --timeout ]]; then
+         _message -e descriptions 'enter timeout' && return
+     else
+         _nmcli_dev_disconnect_extraargs && return
+     fi
+elif [[ $w2 == dev && $w1 == list ]]; then
+    compadd iface && return
+elif [[ $w2 == dev && $w1 == disconnect ]]; then
+    compadd iface && return
+elif [[ $w4 == dev && $w3 == wifi && $w2 == list && $w1 == iface ]]; then
+    _net_interfaces && return
+elif [[ $w4 == dev && $w3 == wifi && $w2 == list && $w1 == hwaddr ]]; then
+    _message -e descriptions 'enter MAC address' && return
+elif [[ $w3 == dev && $w2 == wifi && $w1 == list ]]; then
+    _nmcli_dev_wifi_list && return
+elif [[ $w2 == dev && $w1 == wifi ]]; then
+    compadd list && return
+elif [[ $w1 == dev ]]; then
+    _nmcli_dev && return
+else
+    _arguments \
+      {'(--terse)-t','(-t)--terse'}'[terse output]' \
+      {'(--pretty)-p','(-p)--pretty'}'[pretty output]' \
+      {'(--mode)-m','(-m)--mode'}'[output mode]:output mode:(tabular multiline)' \
+      {'(--fields)-f','(-f)--fields'}'[specify fields to output]: :->fields' \
+      {'(--escape)-e','(-e)--escape'}'[escape columns separators in values]:escape columns separators in values:(yes no)' \
+      {'(--version)-v','(-v)--version'}'[show program version]' \
+      {'(--help)-h','(-h)--help'}'[print this help]' \
+      '*::nmcli object:_nmcli_objects' \
+      && return
+fi
+
+[[ "$state" == "fields" ]] &&
+ _values -s , 'fields to be printed' \
+   all common \
+   autoconnect dbus-path device name net-enabled readonly running \
+   scope state timestamp timestamp-real type uuid wifi wifi-hardware \
+   wwan wwan-hardware \
+   && return
