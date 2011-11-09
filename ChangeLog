@@ -1,3 +1,9 @@
+2011-11-09  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Akinori MUSHA: 29900:
+	Functions/VCS_Info/Backends/VCS_INFO_detect_svn: Adjust detection
+	to support subversion 1.7.
+
 2011-11-08  Peter Stephenson  <pws@csr.com>
 
 	* Haakon Riiser: 29895, 29887: Completion/Unix/Command/_ffmpeg,
@@ -15559,5 +15565,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5496 $
+* $Revision: 1.5497 $
 *****************************************************
