@@ -1,3 +1,8 @@
+2011-11-14  Peter Stephenson  <pws@csr.com>
+
+	* gi1242: users/16578: Completion/Unix/Command/_lp: lpadmin,
+	lpinfo and other changes.
+
 2011-11-09  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Akinori MUSHA: 29900:
@@ -15565,5 +15570,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5497 $
+* $Revision: 1.5498 $
 *****************************************************
