@@ -2498,16 +2498,18 @@ spckword(char **s, int hist, int cmd, int ask)
 	return;
     if (!(*s)[0] || !(*s)[1])
 	return;
-    if (shfunctab->getnode(shfunctab, *s) ||
-	builtintab->getnode(builtintab, *s) ||
-	cmdnamtab->getnode(cmdnamtab, *s) ||
-	aliastab->getnode(aliastab, *s)  ||
-	reswdtab->getnode(reswdtab, *s))
-	return;
-    else if (isset(HASHLISTALL)) {
-	cmdnamtab->filltable(cmdnamtab);
-	if (cmdnamtab->getnode(cmdnamtab, *s))
+    if (cmd) {
+	if (shfunctab->getnode(shfunctab, *s) ||
+	    builtintab->getnode(builtintab, *s) ||
+	    cmdnamtab->getnode(cmdnamtab, *s) ||
+	    aliastab->getnode(aliastab, *s)  ||
+	    reswdtab->getnode(reswdtab, *s))
 	    return;
+	else if (isset(HASHLISTALL)) {
+	    cmdnamtab->filltable(cmdnamtab);
+	    if (cmdnamtab->getnode(cmdnamtab, *s))
+		return;
+	}
     }
     t = *s;
     if (*t == Tilde || *t == Equals || *t == String)
@@ -2621,6 +2623,8 @@ spckword(char **s, int hist, int cmd, int ask)
 		fflush(shout);
 		zbeep();
 		x = getquery("nyae \t", 0);
+		if (cmd && x == 'n')
+		    pathchecked = path;
 	    } else
 		x = 'n';
 	} else
