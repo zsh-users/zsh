@@ -1,3 +1,8 @@
+2011-11-17  Peter Stephenson  <pws@csr.com>
+
+	* Jun T.: 29907: Src/Modules/pcre.c: remove declaration of
+	unused variable.
+
 2011-11-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/16581: Src/utils.c: it seems wrong to shortcut correction
@@ -15577,5 +15582,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5499 $
+* $Revision: 1.5500 $
 *****************************************************

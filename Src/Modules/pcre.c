@@ -340,7 +340,6 @@ cond_pcre_match(char **a, int id)
     pcre *pcre_pat;
     const char *pcre_err;
     char *lhstr, *rhre, *lhstr_plain, *rhre_plain, *avar=NULL;
-    char *p;
     int r = 0, pcre_opts = 0, pcre_errptr, capcnt, *ov, ovsize;
     int return_value = 0;
 
