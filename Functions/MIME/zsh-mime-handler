@@ -34,6 +34,8 @@ setopt extendedglob cbases nullglob $autocd
 # We need zformat from zsh/zutil for %s replacement.
 zmodload -i zsh/zutil
 
+autoload -Uz zsh-mime-contexts
+
 # Look for options.  Because of the way this is usually invoked,
 # (there is always a command to be handled), only handle options
 # up to second last argument.
@@ -62,12 +64,15 @@ shift $(( OPTIND - 1 ))
 # just as well pass them all down.  However, we just take the
 # suffix from the first since that's what invoked us via suffix -s.
 
-local suffix context
+local suffix s
 local -a match mbegin mend
 
-[[ $1 = (#b)*.([^.]##) ]] || return 1
-suffix=${(L)match[1]}
-context=":mime:.${suffix}:"
+suffix=${1:t}
+if [[ $suffix != *.* ]]; then
+  "No suffix in command: $1" >&2
+  return 1
+fi
+suffix=${suffix#*.}
 
 local handler flags no_sh no_bg arg
 integer i
@@ -77,11 +82,11 @@ local -a exec_asis hand_nonex
 # despite being called for interpretation by the mime handler.
 # Defaults to executable files, which ensures that they are executed as
 # they are, even if they have a suffix.
-zstyle -a $context execute-as-is exec_asis || exec_asis=('*(*)' '*(/)')
+zsh-mime-contexts -a $suffix execute-as-is exec_asis || exec_asis=('*(*)' '*(/)')
 
 # Set to a list of patterns for which the handler will be used even
 # if the file doesn't exist on the disk.
-zstyle -a $context handle-nonexistent hand_nonex ||
+zsh-mime-contexts -a $suffix handle-nonexistent hand_nonex ||
   hand_nonex=('[[:alpha:]]#:/*')
 
 local pattern
@@ -92,9 +97,9 @@ local -a files
 # actual file or its directory.
 local dir
 local -a filepath
-if zstyle -t $context find-file-in-path && [[ $1 != /* ]] &&
+if zsh-mime-contexts -t $suffix find-file-in-path && [[ $1 != /* ]] &&
   [[ $1 != */* || -o pathdirs ]]; then
-  zstyle -a $context file-path filepath || filepath=($path)
+  zsh-mime-contexts -a $suffix file-path filepath || filepath=($path)
   for dir in $filepath; do
     if [[ -e $dir/$1 ]]; then
       1=$dir/$1
@@ -153,19 +158,54 @@ if [[ ! -e $1 ]]; then
   fi
 fi
 
-zstyle -s $context handler handler ||
-  handler="${zsh_mime_handlers[$suffix]}"
-zstyle -s $context flags flags ||
-  flags="${zsh_mime_flags[$suffix]}"
+if ! zsh-mime-contexts -s $suffix handler handler; then
+  # Look for handler starting with longest suffix match.
+  # Typically we'd only get a match for the shortest, but don't assume so.
+  s=$suffix
+  while true; do
+    handler="${zsh_mime_handlers[$s]}"
+    if [[ -n $handler ]]; then
+      break
+    fi
+    if [[ $s = *.* ]]; then
+      s=${s#*.}
+    else
+      break
+    fi
+  done
+  if [[ -z $handler ]]; then
+    if [[ $suffix = *.* ]]; then
+      print "No handler specified for suffix .$suffix or any final part" >&2
+    else
+      print "No handler specified for suffix .$suffix" >&2
+    fi
+    return 1
+  fi
+fi
+if ! zsh-mime-contexts -s $suffix flags flags; then
+  # Same again for flags.
+  s=$suffix
+  while true; do
+    flags="${zsh_mime_flags[$suffix]}"
+    if [[ -n $flags ]]; then
+      break
+    fi
+    if [[ $s = *.* ]]; then
+      s=${s#*.}
+    else
+      break
+    fi
+  done
+fi
 
 # Set to yes if we use eval instead of sh -c for complicated mailcap lines
 # Can possibly break some mailcap entries which expect sh compatibility,
 # but is faster, as a new process is not spawned.
-zstyle -t $context current-shell && no_sh=yes
+zsh-mime-contexts -t $suffix current-shell && no_sh=yes
 
 # Set to yes if the process shouldn't be backgrounded even if it doesn't need a
 # terminal and display is set.
-zstyle -t $context never-background && no_bg=yes
+zsh-mime-contexts -t $suffix never-background && no_bg=yes
 
 local hasmeta stdin
 
@@ -241,7 +281,7 @@ if [[ $flags = *copiousoutput* ]]; then
   # We need to page the output.
   # Careful in case PAGER is a set of commands and arguments.
   local -a pager
-  zstyle -a $context pager pager || pager=(${=PAGER:-more})
+  zsh-mime-contexts -a $suffix pager pager || pager=(${=PAGER:-more})
   if [[ -n $stdin ]]; then
     cat $argv | $execargs | $pager
   else

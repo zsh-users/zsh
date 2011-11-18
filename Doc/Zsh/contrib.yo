@@ -2803,6 +2803,23 @@ start with tt(:mime:), with additional components in some cases.
 It is recommended that a trailing tt(*) (suitably quoted) be appended
 to style patterns in case the system is extended in future.  Some
 examples are given below.
+
+For files that have multiple suffixes, e.g. tt(.pdf.gz), where the
+context includes the suffix it will be looked up starting with the
+longest possible suffix until a match for the style is found.
+For example, if tt(.pdf.gz) produces a match for the handler, that
+will be used; otherwise the handler for tt(.gz) will be used.  Note
+that, owing to the way suffix aliases work, it is always required that
+there be a handler for the shortest possible suffix, so in this example
+tt(.pdf.gz) can only be handled if tt(.gz) is also handled (though
+not necessarily in the same way).  Alternatively, if no handling
+for tt(.gz) on its own is needed, simply adding the command
+
+example(alias -s gz=zsh-mime-handler)
+
+to the initialisation code is sufficient; tt(.gz) will not be handled
+on its own, but may be in combination with other suffixes.
+
 startitem()
 kindex(current-shell, MIME style)
 item(tt(current-shell))(
