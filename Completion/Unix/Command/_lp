@@ -152,9 +152,9 @@ _lp()
 	'-E[Force encryption]' \
 	'-U:username (for connection to server):_users' \
 	'-h:alternate server:_hosts' \
-	'(-a)-P+[destination printer]:printers:_printers' \
-	'(-P)-a[all printers]' \
-	'-l[long listing]' \
+	'(-a)-P+[Destination printer]:printers:_printers' \
+	'(-P)-a[All printers]' \
+	'-l[Long listing]' \
 	'*:poll interval (+seconds):'
       ;;
 
@@ -163,7 +163,7 @@ _lp()
 	'-E[Force encryption]' \
 	'-U:username (for connection to server):_users' \
 	'-h:alternate server:_hosts' \
-	'-P+[destination printer]:printers:_printers' \
+	'-P+[Destination printer]:printers:_printers' \
 	'*:job ids:_lp_list_jobs'
       ;;
 
@@ -172,12 +172,12 @@ _lp()
 	'-E[Force encryption]' \
 	'-U:username (for connection to server):_users' \
 	'-h:alternate server:_hosts' \
-	'(-p -l -r -x)-d+[set default printer]:printers:_printers' \
+	'(-p -l -r -x)-d+[Set default printer]:printers:_printers' \
 	'(-l -x)*-o:job options:_lp_job_options' \
-	'(-d -x)-p+[destination printer for options]:printers:_printers' \
-	'(-d -o -r -x)-l[list options]' \
+	'(-d -x)-p+[Destination printer for options]:printers:_printers' \
+	'(-d -o -r -x)-l[List options]' \
 	'(-d -l -x)*-r:remove option:_lp_job_options' \
-	'(-d -l -r -o)-x+[remove all options]:printers:_printers'
+	'(-d -l -r -o)-x+[Remove all options]:printers:_printers'
       ;;
 
     (lpstat)
@@ -190,14 +190,14 @@ _lp()
 	'-c:printer classes:' \
 	'-d[Show current default destination]' \
 	'-h:hostname (alternate server):_hosts' \
-	'-l[long listing]' \
-	'-o+[destinations]:printers:_printers' \
+	'-l[Long listing]' \
+	'-o+[Destinations]:printers:_printers' \
 	'-p+:printers:_printers' \
 	'-r[CUPS server running status]' \
 	'-s[Status summary]' \
 	'-t[All status info]' \
-	'-u[list jobs by users]:users:_users' \
-	'-v+[show devices]:printers:_printers'
+	'-u[List jobs by users]:users:_users' \
+	'-v+[Show devices]:printers:_printers'
       ;;
 
     (lpr)
@@ -205,34 +205,34 @@ _lp()
 	'-E[Force encryption]' \
 	'-H:hostname (alternate server):_hosts' \
 	'(-C -J -T)'-{C,J,T}':job name:' \
-	'-P+[destination printer]:printers:_printers' \
+	'-P+[Destination printer]:printers:_printers' \
 	'-U:username (for connection to server):_users' \
 	'-#[Copies]:copies (1--100):' \
 	'-h[Disables banner printing]' \
-	'-l[raw file]' \
+	'-l[Raw file]' \
 	'-m[Send an email on job completion]' \
 	'*-o:print job options:_lp_job_options' \
-	'-p[format with shaded header incl. date, time etc.]' \
+	'-p[Format with shaded header incl. date, time etc.]' \
 	'-q[Hold job for printing.]' \
-	'-r[delete files after printing]' \
+	'-r[Delete files after printing]' \
 	'*:PS/PDF files:_pspdf'
       ;;
 
     (lp)
       _arguments \
 	'-E[Force encryption]' \
-	'-U[username (for connection to server)]:username:_users' \
+	'-U[Username (for connection to server)]:username:_users' \
 	'-c[(OBSOLETE) copy to spool dir before printing]' \
-	'-d+[destination printer]:printers:_printers' \
+	'-d+[Destination printer]:printers:_printers' \
 	'-h:hostname (alternate server):_hosts' \
-	'-i[job id to modify]:job id:' \
+	'-i[Job id to modify]:job id:' \
 	'-m[Send an email on job completion]' \
 	'-n[Copies]:copies (1--100):' \
 	'*-o:print job options:_lp_job_options' \
 	'-q[Job priority -- 1 (lowest) to 100 (highest)]:priority:' \
 	'-s[Dont report resulting job IDs]' \
 	'-t[Sets the job name]:job name:' \
-	'-u[job submission username]:username:_users' \
+	'-u[Job submission username]:username:_users' \
 	'-H[Time to print]:print time (or enter hh\:mm):(hold immediate restart resume)' \
 	'-P:page range list:' \
 	'*:PS/PDF files:_pspdf'
@@ -241,34 +241,34 @@ _lp()
     (lpinfo)
       _arguments \
 	'-E[Force encryption]' \
-	'-U[username (for connection to server)]:username:_users' \
+	'-U[Username (for connection to server)]:username:_users' \
 	'-h:hostname (alternate server):_hosts' \
 	'-l[Shows a "long" listing of devices or drivers]' \
-	{--exclude-schemes,--include-schemes}'[device/PPD schemes to filter from results]:scheme-list:' \
+	{--exclude-schemes,--include-schemes}'[Device/PPD schemes to filter from results]:scheme-list:' \
 	'(-v --timeout)--device-id[IEEE-1284 device ID to match]:device-id-string:' \
 	'(-v --timeout)--language:locale:' \
-	'(-v --timeout)--product[product to match]:name:' \
-	'(-v --timeout)--make-and-model[make and model to match]:name:' \
-	'(-v --timeout)-m[list available drivers]' \
-	'(-m --device-id --language --make-and-model --product)--timeout[timeout when listing devices with -v]:timeout (seconds):' \
-	'(-m --device-id --language --make-and-model --product)-v[list available devices]'
+	'(-v --timeout)--product[Product to match]:name:' \
+	'(-v --timeout)--make-and-model[Make and model to match]:name:' \
+	'(-v --timeout)-m[List available drivers]' \
+	'(-m --device-id --language --make-and-model --product)--timeout[Timeout when listing devices with -v]:timeout (seconds):' \
+	'(-m --device-id --language --make-and-model --product)-v[List available devices]'
       ;;
 
     (lpadmin)
       _arguments \
 	'-E[Force encryption/Enable destination]' \
-	'-U[username (for connection to server)]:username:_users' \
+	'-U[Username (for connection to server)]:username:_users' \
 	'-h:hostname (alternate server):_hosts' \
-	'(-p -R -x -o)-d+[default printer]:printers:_printers' \
-	'(-d -x)-p+[configure printer]:printers:_printers' \
-	'(-p -R -d -o)-x+[delete printer]:printers:_printers' \
-	'(-x -d)-R[name-default]:name-default:' \
+	'(-p -R -x -o)-d+[Default printer]:printers:_printers' \
+	'(-d -x)-p+[Configure printer]:printers:_printers' \
+	'(-p -R -d -o)-x+[Delete printer]:printers:_printers' \
+	'(-x -d)-R[Name-default]:name-default:' \
 	'-c:printer classes:' \
 	'-m:model:' \
 	'(-x -d)*-o:options:_lp_job_options' \
-	'-r[remove from class]:class:' \
-	'-u[access policy]:access policy:' \
-	'-v[device-uri of printer queue]:device-uri:' \
+	'-r[Remove from class]:class:' \
+	'-u[Access policy]:access policy:' \
+	'-v[Device-uri of printer queue]:device-uri:' \
 	'-D[Text description of destination]:info:' \
 	'-L[Location of the printer]:location:' \
 	'-P[PPD file to use]:PPD file:_files "*.(#i)ppd(-.)"'
