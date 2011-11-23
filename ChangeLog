@@ -1,3 +1,8 @@
+2011-11-23  Peter Stephenson  <pws@csr.com>
+
+	* Ignacy Gawędzki: 29912: Completion/Unix/Command/_ssh: add "--"
+	to end options to ls.
+
 2011-11-21  Peter Stephenson  <pws@csr.com>
 
 	* Foudil Brétel: 29911: add --no-legend support (v37+); multiple
@@ -15599,5 +15604,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5503 $
+* $Revision: 1.5504 $
 *****************************************************
