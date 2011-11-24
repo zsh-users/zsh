@@ -1,0 +1,29 @@
+#compdef nm
+
+# This is a stub.  It's main reason for existence is to offer
+# object files with nm.  Feel free to extend it.  If you do, remove
+# this comment.
+
+local state context line expl
+local -A opt_args
+local -a args
+integer ret=1
+
+if _pick_variant gnu='Free Soft' unix --version; then
+  args+=(-s --)
+fi
+args+=('*:file:->file')
+
+_arguments "$args[@]" && ret=0
+
+case $state in
+  (file)
+  _alternative \
+    "object-files:object file:_path_files -g '*.o'" \
+    "executable-files:executable file:_path_files -g '*(*)'" \
+    "dynamic-libraries:dynamic library:_path_files -g '*.so'" \
+    "static-libraries:static library:_path_files -g '*.a'" && ret=0
+  ;;
+esac
+
+return ret

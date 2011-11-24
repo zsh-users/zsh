@@ -1,3 +1,8 @@
+2011-11-24  Peter Stephenson  <pws@csr.com>
+
+	* 29915: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_nm: new nm completion.
+
 2011-11-23  Peter Stephenson  <pws@csr.com>
 
 	* Ignacy Gawędzki: 29912: Completion/Unix/Command/_ssh: add "--"
@@ -15604,5 +15609,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5504 $
+* $Revision: 1.5505 $
 *****************************************************
