@@ -5445,7 +5445,7 @@ __git_tree_files () {
 # Repository Argument Types
 
 # _remote_files
-_remote_files () {
+_remote_files_git () {
   # FIXME: these should be imported from _ssh
   # TODO: this should take -/ to only get directories
   # There should be coloring based on all the different ls -F classifiers.
@@ -5484,7 +5484,7 @@ __git_remote_repositories () {
   service= _ssh
 
   if compset -P '*:'; then
-    _remote_files
+    _remote_files_git
   else
     _ssh_hosts -S:
   fi

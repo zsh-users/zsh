@@ -1,3 +1,8 @@
+2011-11-24  Simon Ruderich  <simon@ruderich.org>
+
+	* 29916: Completion/Unix/Command/_git: Prevent clash with
+	_remote_files() in _ssh.
+
 2011-11-24  Peter Stephenson  <pws@csr.com>
 
 	* 29915: Completion/Unix/Command/.distfiles,
@@ -15609,5 +15614,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5505 $
+* $Revision: 1.5506 $
 *****************************************************
