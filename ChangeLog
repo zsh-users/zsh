@@ -1,3 +1,7 @@
+2011-11-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk: 4.3.12-test-3.
+
 2011-11-24  Simon Ruderich  <simon@ruderich.org>
 
 	* 29916: Completion/Unix/Command/_git: Prevent clash with
@@ -15614,5 +15618,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5506 $
+* $Revision: 1.5507 $
 *****************************************************
