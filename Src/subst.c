@@ -247,7 +247,10 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 	    if (endchar == Outpar && str2[1] == '(' && str[-2] == ')') {
 		/* Math substitution of the form $((...)) */
 		str[-2] = '\0';
-		str = arithsubst(str2 + 2, &str3, str);
+		if (isset(EXECOPT))
+		    str = arithsubst(str2 + 2, &str3, str);
+		else
+		    strncpy(str3, str2, 1);
 		setdata(node, (void *) str3);
 		continue;
 	    }

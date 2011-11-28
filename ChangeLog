@@ -1,3 +1,8 @@
+2011-11-28  Peter Stephenson  <pws@csr.com>
+
+	* Ismail Dönmez: 29920: Src/Subst.c: error with arithmetic
+	substitution with NO_EXEC.
+
 2011-11-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk: 4.3.12-test-3.
@@ -15618,5 +15623,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5507 $
+* $Revision: 1.5508 $
 *****************************************************
