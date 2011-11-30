@@ -1,3 +1,7 @@
+2011-11-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Config/version.mk: 4.3.13 release.
+
 2011-11-28  Peter Stephenson  <pws@csr.com>
 
 	* Ismail Dönmez: 29920: Src/Subst.c: error with arithmetic
@@ -15623,5 +15627,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5508 $
+* $Revision: 1.5509 $
 *****************************************************
