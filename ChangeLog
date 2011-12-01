@@ -1,3 +1,8 @@
+2011-12-01  Peter Stephenson  <pws@csr.com>
+
+	* 29923: Test/A04redirect.ztst: work around variant message from
+	strerror() for invalid file descriptor.
+
 2011-11-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Config/version.mk: 4.3.13 release.
@@ -15627,5 +15632,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5509 $
+* $Revision: 1.5510 $
 *****************************************************
