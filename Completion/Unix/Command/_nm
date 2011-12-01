@@ -22,7 +22,8 @@ case $state in
     "object-files:object file:_path_files -g '*.o'" \
     "executable-files:executable file:_path_files -g '*(*)'" \
     "dynamic-libraries:dynamic library:_path_files -g '*.so'" \
-    "static-libraries:static library:_path_files -g '*.a'" && ret=0
+    "static-libraries:static library:_path_files -g '*.a'" \
+    "directories:directory:_path_files -g '*(/)'" && ret=0
   ;;
 esac
 
