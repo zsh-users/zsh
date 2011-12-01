@@ -1,3 +1,8 @@
+2011-12-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 29924: Test/A04redirect.ztst, Test/B01cd.ztst, Test/ztst.zsh:
+	add ability to match output of tests using patterns.
+
 2011-12-01  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Completion/Unix/Command/_nm: also complete
@@ -15635,5 +15640,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5511 $
+* $Revision: 1.5512 $
 *****************************************************

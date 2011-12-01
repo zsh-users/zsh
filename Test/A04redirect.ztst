@@ -153,31 +153,17 @@
 >goodbye
 
   (exec 3<&-
-  read foo <&-) 2>errmsg1.txt
-  mystat=$?
-  (( $mystat == 1 )) || print "Unexpected error status $mystat" >&2
-  input=("${(f)$(<errmsg1.txt)}")
-  if [[ ${#input} != 1 || \
-        $input[1] !=   "(eval):1: failed to close file descriptor 3:"* ]];
-  then
-    print "Unexpected error output:\n$input" >&2
-  fi
-0:'<&-' redirection
+  read foo <&-)
+1:'<&-' redirection
+*?\(eval\):1: failed to close file descriptor 3:*
 
   print foo >&-
 0:'>&-' redirection
 
   (exec >&-
-  print foo) 2>errmsg2.txt
-  mystat=$?
-  (( $mystat == 0 )) || print "Unexpected error status $mystat" >&2
-  input=("${(f)$(<errmsg2.txt)}")
-  if [[ ${#input} != 1 || \
-        $input[1] !=   "(eval):2: write error:"* ]];
-  then
-    print "Unexpected error output:\n$input" >&2
-  fi
+  print foo)
 0:'>&-' with attempt to use closed fd
+*?\(eval\):2: write error:*
 
   fn() { local foo; read foo; print $foo; }
   coproc fn

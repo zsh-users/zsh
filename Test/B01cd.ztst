@@ -57,6 +57,14 @@
 # lines are not subject to any substitution unless the `q' flag (see
 # below) is set.
 #
+# '>' and '?' may be preceded by a '*', in which case all lines
+# in the chunk must be so delimited (i.e. all lines must start either
+# '*>' or '>' but not a mixture).  If the '*' is present, the lines
+# in the actual output are pattern matched against the lines in the
+# test output.  The entire line following '*>' or '*?' must be a
+# valid pattern, so characters special to patterns such as parentheses
+# must be quoted.  The EXTENDED_GLOB option is used for all such patterns.
+#
 # Each chunk of indented code is to be evaluated in one go and is to
 # be followed by a line starting (in the first column) with
 # the expected status returned by the code when run, or - if it is
