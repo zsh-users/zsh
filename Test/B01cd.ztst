@@ -60,10 +60,10 @@
 # The first line (only) of a '>' and '?' chunk may be preceded by a '*'.
 # This signifies that all lines in the chunk (not just the one with the
 # '*' in front) in the actual output are pattern matched against the
-# corresponding lines in the test output.  The entire set of lines
-# following '>' or '?' must be a valid pattern, so characters special to
-# patterns such as parentheses must be quoted.  The EXTENDED_GLOB option
-# is used for all such patterns.
+# corresponding lines in the test output.  Each line following '>' or
+# '?' must be a valid pattern, so characters special to patterns such as
+# parentheses must be quoted.  The EXTENDED_GLOB option is used for all
+# such patterns.
 #
 # Each chunk of indented code is to be evaluated in one go and is to
 # be followed by a line starting (in the first column) with
