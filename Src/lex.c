@@ -567,22 +567,14 @@ add(int c)
 {
     *bptr++ = c;
     if (bsiz == ++len) {
-#if 0
-	int newbsiz;
-
-	newbsiz = bsiz * 8;
-	while (newbsiz < inbufct)
-	    newbsiz *= 2;
-	bptr = len + (tokstr = (char *)hrealloc(tokstr, bsiz, newbsiz));
-	bsiz = newbsiz;
-#endif
-
 	int newbsiz = bsiz * 2;
 
 	if (newbsiz > inbufct && inbufct > bsiz)
 	    newbsiz = inbufct;
 
 	bptr = len + (tokstr = (char *)hrealloc(tokstr, bsiz, newbsiz));
+	/* len == bsiz, so bptr is at the start of newly allocated memory */
+	memset(bptr, 0, newbsiz - bsiz);
 	bsiz = newbsiz;
     }
 }
