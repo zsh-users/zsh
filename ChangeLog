@@ -1,5 +1,8 @@
 2011-12-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 29940: Src/utils.c (metafy): null termination shouldn't
+	be applied to original buffer if not to be modified.
+
 	* From Stef VAN VLIERBERGHE: 29934: Src/lex.c (add): use of
 	uninitialised memoryx when lexer needed to reallocate token.
 
@@ -15650,5 +15653,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5514 $
+* $Revision: 1.5515 $
 *****************************************************

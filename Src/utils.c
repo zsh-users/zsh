@@ -3959,7 +3959,7 @@ metafy(char *buf, int len, int heap)
 	    if (imeta(*e++))
 		meta++;
 
-    if (meta || heap == META_DUP || heap == META_HEAPDUP) {
+    if (meta || heap == META_DUP || heap == META_HEAPDUP || *e != '\0') {
 	switch (heap) {
 	case META_REALLOC:
 	    buf = zrealloc(buf, len + meta + 1);
@@ -4002,8 +4002,8 @@ metafy(char *buf, int len, int heap)
 		meta--;
 	    }
 	}
+	*e = '\0';
     }
-    *e = '\0';
     return buf;
 }
 
