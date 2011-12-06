@@ -1,3 +1,7 @@
+2011-12-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk: release 4.3.14.
+
 2011-12-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 29940: Src/utils.c (metafy): null termination shouldn't
@@ -15653,5 +15657,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5516 $
+* $Revision: 1.5517 $
 *****************************************************
