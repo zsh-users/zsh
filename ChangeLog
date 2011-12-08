@@ -1,3 +1,8 @@
+2011-12-08  Peter Stephenson  <pws@csr.com>
+
+	* 29928: Test/A04redirect.ztst: belated commit to
+	fix OpenBSD test failure.
+
 2011-12-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Etc/version.mk: update version to 4.3.14-dev-0 to
@@ -15667,5 +15672,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5519 $
+* $Revision: 1.5520 $
 *****************************************************

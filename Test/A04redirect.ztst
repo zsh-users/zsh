@@ -152,10 +152,11 @@
 >hello
 >goodbye
 
-  (exec 3<&-
+  ({ exec 3<&- } 2>/dev/null
+  exec 3<&-
   read foo <&-)
 1:'<&-' redirection
-*?\(eval\):1: failed to close file descriptor 3:*
+*?\(eval\):*: failed to close file descriptor 3:*
 
   print foo >&-
 0:'>&-' redirection
