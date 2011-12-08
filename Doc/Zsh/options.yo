@@ -548,7 +548,32 @@ cindex(disabling brace expansion)
 cindex(brace expansion, disabling)
 cindex(expansion, brace, disabling)
 item(tt(IGNORE_BRACES) (tt(-I)) <S>)(
-Do not perform brace expansion.
+Do not perform brace expansion.  For historical reasons this
+also includes the effect of the tt(IGNORE_CLOSE_BRACES) option.
+)
+pindex(IGNORE_CLOSE_BRACES)
+pindex(NO_IGNORE_CLOSE_BRACES)
+pindex(IGNORECLOSEBRACES)
+pindex(NOIGNORECLOSEBRACES)
+item(tt(IGNORE_CLOSE_BRACES))(
+When neither this option nor tt(IGNORE_BRACES) is set, a sole
+close brace character `tt(})' is syntactically significant at any
+point on a command line.  This has the effect that no semicolon
+or newline is necessary before the brace terminating a function
+or current shell construct.  When either option is set, a closing brace
+is syntactically significant only in command position.  Unlike
+tt(IGNORE_BRACES), this option does not disable brace expansion.
+
+For example, with both options unset a function may be defined
+in the following fashion:
+
+example(args() { echo $# })
+
+while if either option is set, this does not work and something
+equivalent to the following is required:
+
+example(args() { echo $#; })
+
 )
 pindex(KSH_GLOB)
 pindex(NO_KSH_GLOB)

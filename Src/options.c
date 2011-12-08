@@ -159,6 +159,7 @@ static struct optname optns[] = {
 {{NULL, "histverify",	      0},			 HISTVERIFY},
 {{NULL, "hup",		      OPT_EMULATE|OPT_ZSH},	 HUP},
 {{NULL, "ignorebraces",	      OPT_EMULATE|OPT_SH},	 IGNOREBRACES},
+{{NULL, "ignoreclosebraces",  0},			 IGNORECLOSEBRACES},
 {{NULL, "ignoreeof",	      0},			 IGNOREEOF},
 {{NULL, "incappendhistory",   0},			 INCAPPENDHISTORY},
 {{NULL, "interactive",	      OPT_SPECIAL},		 INTERACTIVE},

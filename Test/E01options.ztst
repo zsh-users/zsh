@@ -256,6 +256,8 @@
 ?next one should fail
 ?(eval):1: parse error near `end'
 
+# ` emacs deconfusion
+
   setopt cshjunkiequotes
   print this should cause an error >&2
   eval "print 'line one
@@ -270,6 +272,8 @@
 ?this should cause an error
 ?(eval):1: unmatched '
 ?this should not
+
+# ' emacs deconfusion
 
   nullcmd() { print '$NULLCMD run'; }
   readnullcmd() { print 'Running $READNULLCMD'; cat; }
@@ -901,6 +905,8 @@
 ?(eval):exec:6: ls: restricted
 ?(eval):unsetopt:7: can't change option: restricted
 
+# ' emacs deconfusion
+
   fn() {
     print =ls ={ls,}
     local foo='=ls'
@@ -1081,3 +1087,12 @@
 ?+(eval):4> fn
 ?+fn:0> print message
 ?+(eval):5> unsetopt xtrace
+
+  setopt ignoreclosebraces
+  eval "icb_test() { echo this is OK; }"
+  icb_test
+  icb_args() { print $#; }
+  eval "icb_args { this, is, ok, too }"
+0:IGNORE_CLOSE_BRACES option
+>this is OK
+>6

@@ -1857,7 +1857,8 @@ exalias(void)
 
 	    /* Then check for a reserved word */
 	    if ((incmdpos ||
-		 (unset(IGNOREBRACES) && zshlextext[0] == '}' && !zshlextext[1])) &&
+		 (unset(IGNOREBRACES) && unset(IGNORECLOSEBRACES) &&
+		  zshlextext[0] == '}' && !zshlextext[1])) &&
 		(rw = (Reswd) reswdtab->getnode(reswdtab, zshlextext))) {
 		tok = rw->token;
 		if (tok == DINBRACK)

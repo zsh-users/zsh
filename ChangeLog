@@ -1,3 +1,10 @@
+2011-12-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 29955 with bits pointed out by Mikael and Bart:
+	Doc/Zsh/grammary.yo, Doc/Zsh/options.yo, Src/lex.c,
+	Src/options.c, Src/zsh.h, Test/E01options.ztst: add
+	IGNORE_CLOSE_BRACES option.
+
 2011-12-08  Peter Stephenson  <pws@csr.com>
 
 	* 29928: Test/A04redirect.ztst: belated commit to
@@ -15672,5 +15679,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5520 $
+* $Revision: 1.5521 $
 *****************************************************
