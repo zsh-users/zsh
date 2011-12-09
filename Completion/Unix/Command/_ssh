@@ -27,9 +27,9 @@ _remote_files () {
     while _tags; do
       while _next_label files expl ${suf:-remote directory}; do
         [[ -n $suf ]] && compadd "$@" "$expl[@]" -d remdispf \
-	    ${(q)remdispf%[*=@|]} && ret=0 
-	compadd ${suf:+-S/} "$@" "$expl[@]" -d remdispd \
-	    ${(q)remdispd%/} && ret=0
+            ${(q)remdispf%[*=@|]} && ret=0 
+        compadd ${suf:+-S/} "$@" "$expl[@]" -d remdispd \
+            ${(q)remdispd%/} && ret=0
       done
       (( ret )) || return 0
     done
@@ -182,46 +182,46 @@ _ssh () {
       if compset -P '*[= ]'; then
         case "$IPREFIX" in
         *(#i)(afstokenpassing|batchmode|compression|fallbacktorsh|forward(agent|x11)|keepalive|passwordauthentication|rhosts(|rsa)authentication|rsaauthentication|usersh|kerberos(authetication|tgtparsing)|useprivileged)*)
-	  _wanted values expl 'truth value' compadd yes no && ret=0
+          _wanted values expl 'truth value' compadd yes no && ret=0
           ;;
         *(#i)ciphers*)
           _values -s , 'encryption cipher' \
-	      '3des-cbc' \
-	      'aes128-cbc' \
-	      'aes192-cbc' \
-	      'aes256-cbc' \
-	      'aes128-ctr' \
-	      'aes192-ctr' \
-	      'aes256-ctr' \
-	      'arcfour128' \
-	      'arcfour256' \
-	      'arcfour' \
-	      'blowfish-cbc' \
-	      'cast128-cbc' \
-	      \
-	      'rijndael128-cbc' \
-	      'rijndael192-cbc' \
-	      'rijndael256-cbc' \
-	      'rijndael-cbc@lysator.liu.se' \
-	      && ret=0
+              '3des-cbc' \
+              'aes128-cbc' \
+              'aes192-cbc' \
+              'aes256-cbc' \
+              'aes128-ctr' \
+              'aes192-ctr' \
+              'aes256-ctr' \
+              'arcfour128' \
+              'arcfour256' \
+              'arcfour' \
+              'blowfish-cbc' \
+              'cast128-cbc' \
+              \
+              'rijndael128-cbc' \
+              'rijndael192-cbc' \
+              'rijndael256-cbc' \
+              'rijndael-cbc@lysator.liu.se' \
+              && ret=0
           ;;
         *(#i)cipher*)
-	  _wanted values expl 'encryption cipher (protocol version 1)' \
+          _wanted values expl 'encryption cipher (protocol version 1)' \
               compadd blowfish 3des des idea arcfour tss none && ret=0
           ;;
-	*(#i)controlmaster*)
-	  _wanted values expl 'truthish value' compadd yes no auto autoask && ret=0
-	  ;;
-	*(#i)controlpath*)
+        *(#i)controlmaster*)
+          _wanted values expl 'truthish value' compadd yes no auto autoask && ret=0
+          ;;
+        *(#i)controlpath*)
           _description files expl 'path to control socket'
           _files "$expl[@]" && ret=0
-	  ;;
+          ;;
         *(#i)globalknownhostsfile*)
           _description files expl 'global file with known hosts'
           _files "$expl[@]" && ret=0
           ;;
         *(#i)hostname*)
-	  _wanted hosts expl 'real host name to log into' _ssh_hosts && ret=0
+          _wanted hosts expl 'real host name to log into' _ssh_hosts && ret=0
           ;;
         *(#i)identityfile*)
           _description files expl 'SSH identity file'
@@ -236,9 +236,9 @@ _ssh () {
           ;;
         *(#i)protocol*)
           _values -s , 'protocol version' \
-	      '1' \
-	      '2' && ret=0
-	  ;;
+              '1' \
+              '2' && ret=0
+          ;;
         *(#i)proxycommand*)
           compset -q
           shift 1 words
@@ -253,7 +253,7 @@ _ssh () {
           _files "$expl[@]" && ret=0
           ;;
         *(#i)user*)
-	  _wanted users expl 'user to log in as' _ssh_users && ret=0
+          _wanted users expl 'user to log in as' _ssh_users && ret=0
           ;;
         *(#i)xauthlocation*)
           _description files expl 'xauth program'
@@ -355,7 +355,7 @@ _ssh () {
         if compset -P '*:'; then
           _message -e port-numbers 'port number'
         else
-	  _wanted hosts expl host _ssh_hosts -qS:
+          _wanted hosts expl host _ssh_hosts -qS:
         fi
       else
         _message -e port-numbers 'listen-port number'
@@ -370,18 +370,18 @@ _ssh () {
       ;;
     userhost)
       if compset -P '*@'; then
-	_wanted hosts expl 'remote host name' _ssh_hosts && ret=0
+        _wanted hosts expl 'remote host name' _ssh_hosts && ret=0
       elif compset -S '@*'; then
         _wanted users expl 'login name' _ssh_users -S '' && ret=0
       else
         if (( $+opt_args[-l] )); then
-	  tmp=()
-	else
-	  tmp=( 'users:login name:_ssh_users -qS@' )
-	fi
-	_alternative \
-	    'hosts:remote host name:_ssh_hosts' \
-	    "$tmp[@]" && ret=0
+          tmp=()
+        else
+          tmp=( 'users:login name:_ssh_users -qS@' )
+        fi
+        _alternative \
+            'hosts:remote host name:_ssh_hosts' \
+            "$tmp[@]" && ret=0
       fi
       ;;
     file)
@@ -393,9 +393,9 @@ _ssh () {
         _wanted hosts expl 'remote host name' _ssh_hosts $suf && ret=0
       else
         _alternative \
-	    'files:: _files' \
-	    'hosts:remote host name:_ssh_hosts -r: -S:' \
-	    'users:user:_ssh_users -qS@' && ret=0
+            'files:: _files' \
+            'hosts:remote host name:_ssh_hosts -r: -S:' \
+            'users:user:_ssh_users -qS@' && ret=0
       fi
       ;;
     rfile)
@@ -405,8 +405,8 @@ _ssh () {
         _wanted hosts expl host _ssh_hosts -r: -S: && ret=0
       else
         _alternative \
-	    'hosts:remote host name:_ssh_hosts -r: -S:' \
-	    'users:user:_ssh_users -qS@' && ret=0
+            'hosts:remote host name:_ssh_hosts -r: -S:' \
+            'users:user:_ssh_users -qS@' && ret=0
       fi
       ;;
     esac
@@ -438,17 +438,17 @@ _ssh_hosts () {
     local IFS=$'\t ' key hosts host
     while read key hosts; do
       if [[ "$key" == (#i)host ]]; then
-	 for host in ${(z)hosts}; do
-	    case $host in
-	    (*[*?]*) ;;
-	    (*) config_hosts+=("$host") ;;
-	    esac
-	 done
+         for host in ${(z)hosts}; do
+            case $host in
+            (*[*?]*) ;;
+            (*) config_hosts+=("$host") ;;
+            esac
+         done
       fi
     done < "$config"
     if (( ${#config_hosts} )); then
       _wanted hosts expl 'remote host name' \
-	compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" $config_hosts
+        compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" $config_hosts
     fi
   fi
 }
