@@ -1,5 +1,8 @@
 2011-12-09  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Completion/compinit: add NO_ignoreclosebraces to
+	options needed in completion.
+
 	* users/16614: config.guess, config.sub: update from automake
 	1.11.1.
 
@@ -15689,5 +15692,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5524 $
+* $Revision: 1.5525 $
 *****************************************************
