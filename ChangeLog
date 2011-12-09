@@ -1,3 +1,8 @@
+2011-12-09  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 29876: Completion/Unix/Command/_getent: Update getent completion
+	to work when additional output comes after the databases.
+
 2011-12-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 29955 with bits pointed out by Mikael and Bart:
@@ -15679,5 +15684,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5521 $
+* $Revision: 1.5522 $
 *****************************************************

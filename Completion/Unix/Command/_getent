@@ -25,8 +25,9 @@ case $state in
   ;;
   databases)
     if [[ $is_gnu = gnu ]]; then
-      databases=( ${=${${(f)"$(_call_program databases $words[1] --help \
-          2>/dev/null)"}[(r)Supported*,-1]}[2,-1]} )
+      databases=( "${(@)${(@f)$(_call_program databases $words[1] --help \
+                   2>/dev/null)}[(r)Supported*,-1]}" )
+      databases=( "${=${(@)databases[2,${(@)databases[(i)]}-1]}}" )
     else
       databases=( passwd group hosts ipnodes services protocols ethers networks netmasks )
     fi
