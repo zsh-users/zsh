@@ -9,7 +9,7 @@ _tags fonts || return 1
 if (( ! $+_font_cache )); then
   typeset -gU _font_cache
 
- _font_cache=( "${(@)^${(@f)$(_call_program fonts xlsfonts)}%%--*}--" )
+ _font_cache=( "${(@)^${(@f)$(_call_program fonts xlsfonts 2> /dev/null)}%%--*}--" )
 fi
 
 _wanted fonts expl font \
