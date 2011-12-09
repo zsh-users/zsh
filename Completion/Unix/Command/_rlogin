@@ -1,32 +1,5 @@
 #compdef rlogin rsh remsh=rsh rcp
 
-_rcp_remote_files () {
-  # There should be coloring based on all the different ls -F classifiers.
-  local expl remfiles remdispf remdispd suf ret=1
-
-  if zstyle -T ":completion:${curcontext}:" remote-access; then
-    remfiles=(${(M)${(f)"$(rsh ${IPREFIX%:} ls -d1F ${(Q)PREFIX%%[^./][^/]#}\* 2>/dev/null)"}%%[^/]#(|/)})
-    compset -P '*/'
-    compset -S '/*' || suf='remote file'
-
-    remdispf=(${remfiles:#*/})
-    remdispd=(${(M)remfiles:#*/})
-
-    _tags files
-    while _tags; do
-      while _next_label files expl ${suf:-remote directory}; do
-        [[ -n $suf ]] && compadd "$@" "$expl[@]" -d remdispf \
-	    ${(q)remdispf%[*=@|]} && ret=0 
-	compadd ${suf:+-S/} "$@" "$expl[@]" -d remdispd \
-	    ${(q)remdispd%/} && ret=0
-      done
-      (( ret )) || return 0
-    done
-  else
-    _message -e remote-files 'remote file'
-  fi
-}
-
 _rlogin () {
   case "$service" in
   rlogin)
@@ -65,7 +38,7 @@ _rlogin () {
 
     if [[ -n "$state" ]]; then
       if compset -P '*:'; then
-	_rcp_remote_files && ret=0
+	_remote_files -- rsh && ret=0
       elif compset -P '*@'; then
         _wanted hosts expl host _rlogin_hosts -S: && ret=0
       else

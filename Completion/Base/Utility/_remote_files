@@ -1,0 +1,77 @@
+#autoload
+
+# Complete files on remote systems using SSH (and other programs). Needs
+# key-based authentication with no passwords or a running ssh-agent to work.
+#
+# Usage:
+# _remote_files [--no-files] [--no-dirs] -- <cmd> [<cmd options>]
+#
+# Options:
+# - --no-files: don't complete remote files
+# - --no-dirs:  don't complete remote directories
+#
+# Commands:
+# - ssh: Additional options for non-interactive use are automatically added
+#        (see below).
+# - All other commands are used unaltered.
+#
+# Examples:
+# - _remote_files -- ssh
+#   Use ssh to retrieve the remote paths. The "--" is not optional!
+# - _remote_files --no-files -- ssh -2 -p 42
+#   Use ssh with the option -2 and -p 42 to retrieve the remote paths and
+#   complete only directories.
+# - _remote_files -- rsh
+#   Use rsh to retrieve the remote paths.
+
+
+# There should be coloring based on all the different ls -F classifiers.
+local expl rempat remfiles remdispf remdispd args cmd cmd_args suf ret=1
+
+if zstyle -T ":completion:${curcontext}:files" remote-access; then
+
+  # Parse options to _remote_files. Stops at the first "--".
+  zparseopts -D -E -a args -no-files -no-dirs
+  shift
+
+  # Command to run on the remote system.
+  cmd="$1"
+  shift
+
+  # Handle arguments to ssh.
+  if [[ $cmd == ssh ]]; then
+    zparseopts -D -E -a cmd_args p: 1 2 4 6 F:
+    cmd_args="-o BatchMode=yes $cmd_args -a -x"
+  else
+    cmd_args="$@"
+  fi
+
+  if [[ -z $QIPREFIX ]]
+    then rempat="${PREFIX%%[^./][^/]#}\*"
+    else rempat="${(q)PREFIX%%[^./][^/]#}\*"
+  fi
+
+  remfiles=(${(M)${(f)"$(_call_program files $cmd $cmd_args ${IPREFIX%:} ls -d1FL -- "$rempat" 2>/dev/null)"}%%[^/]#(|/)})
+
+  compset -P '*/'
+  compset -S '/*' || suf='remote file'
+
+  remdispf=(${remfiles:#*/})
+  remdispd=(${(M)remfiles:#*/})
+
+  _tags files
+  while _tags; do
+    while _next_label files expl ${suf:-remote directory}; do
+      [[ ${args[(I)--no-files]} -eq 0 ]] && \
+        [[ -n $suf ]] && compadd "$@" "$expl[@]" -d remdispf \
+          ${(q)remdispf%[*=@|]} && ret=0
+      [[ ${args[(I)--no-dirs]} -eq 0 ]] && \
+        compadd ${suf:+-S/} "$@" "$expl[@]" -d remdispd \
+          ${(q)remdispd%/} && ret=0
+    done
+    (( ret )) || return 0
+  done
+  return ret
+else
+    _message -e remote-files 'remote file'
+fi

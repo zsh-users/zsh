@@ -5,40 +5,6 @@
 # TODO: update ssh-keygen (not based on 5.9)
 # TODO: sshd, ssh-keyscan, ssh-keysign
 
-
-_remote_files () {
-  # There should be coloring based on all the different ls -F classifiers.
-  local expl rempat remfiles remdispf remdispd args suf ret=1
-
-  if zstyle -T ":completion:${curcontext}:files" remote-access; then
-    zparseopts -D -E -a args p: 1 2 4 6 F:
-    if [[ -z $QIPREFIX ]]
-    then rempat="${PREFIX%%[^./][^/]#}\*"
-    else rempat="${(q)PREFIX%%[^./][^/]#}\*"
-    fi
-    remfiles=(${(M)${(f)"$(_call_program files ssh -o BatchMode=yes $args -a -x ${IPREFIX%:} ls -d1FL -- "$rempat" 2>/dev/null)"}%%[^/]#(|/)})
-    compset -P '*/'
-    compset -S '/*' || suf='remote file'
-
-    remdispf=(${remfiles:#*/})
-    remdispd=(${(M)remfiles:#*/})
-
-    _tags files
-    while _tags; do
-      while _next_label files expl ${suf:-remote directory}; do
-        [[ -n $suf ]] && compadd "$@" "$expl[@]" -d remdispf \
-            ${(q)remdispf%[*=@|]} && ret=0 
-        compadd ${suf:+-S/} "$@" "$expl[@]" -d remdispd \
-            ${(q)remdispd%/} && ret=0
-      done
-      (( ret )) || return 0
-    done
-    return ret
-  else
-    _message -e remote-files 'remote file'
-  fi
-}
-
 _ssh () {
   local curcontext="$curcontext" state line expl common tmp cmds suf ret=1
   typeset -A opt_args
@@ -386,7 +352,7 @@ _ssh () {
       ;;
     file)
       if compset -P '*:'; then
-        _remote_files ${(kv)~opt_args[(I)-[FP1246]]/-P/-p} && ret=0
+        _remote_files -- ssh ${(kv)~opt_args[(I)-[FP1246]]/-P/-p} && ret=0
       elif compset -P '*@'; then
         suf=( -S '' )
         compset -S ':*' || suf=( -r: -S: )
@@ -400,7 +366,7 @@ _ssh () {
       ;;
     rfile)
       if compset -P '*:'; then
-        _remote_files && ret=0
+        _remote_files -- ssh && ret=0
       elif compset -P '*@'; then
         _wanted hosts expl host _ssh_hosts -r: -S: && ret=0
       else

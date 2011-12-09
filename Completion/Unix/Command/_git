@@ -5444,39 +5444,6 @@ __git_tree_files () {
 
 # Repository Argument Types
 
-# _remote_files
-_remote_files_git () {
-  # FIXME: these should be imported from _ssh
-  # TODO: this should take -/ to only get directories
-  # There should be coloring based on all the different ls -F classifiers.
-  local expl rempat remfiles remdispf remdispd args suf ret=1
-
-  if zstyle -T ":completion:${curcontext}:files" remote-access; then
-    zparseopts -D -E -a args p: 1 2 4 6 F:
-    if [[ -z $QIPREFIX ]]
-    then rempat="${PREFIX%%[^./][^/]#}\*"
-    else rempat="${(q)PREFIX%%[^./][^/]#}\*"
-    fi
-    remfiles=(${(M)${(f)"$(_call_program files ssh $args -a -x ${IPREFIX%:} ls -d1FL "$rempat" 2>/dev/null)"}%%[^/]#(|/)})
-    compset -P '*/'
-    compset -S '/*' || suf='remote file'
-
-    remdispd=(${(M)remfiles:#*/})
-
-    _tags files
-    while _tags; do
-      while _next_label files expl ${suf:-remote directory}; do
-	compadd ${suf:+-S/} "$@" "$expl[@]" -d remdispd \
-	    ${(q)remdispd%/} && ret=0
-      done
-      (( ret )) || return 0
-    done
-    return ret
-  else
-    _message -e remote-files 'remote file'
-  fi
-}
-
 (( $+functions[__git_remote_repositories] )) ||
 __git_remote_repositories () {
   local service
@@ -5484,7 +5451,7 @@ __git_remote_repositories () {
   service= _ssh
 
   if compset -P '*:'; then
-    _remote_files_git
+    _remote_files --no-files -- ssh
   else
     _ssh_hosts -S:
   fi
