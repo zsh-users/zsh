@@ -1,3 +1,8 @@
+2011-12-09  Peter Stephenson  <pws@csr.com>
+
+	* users/16614: config.guess, config.sub: update from automake
+	1.11.1.
+
 2011-12-09  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 29876: Completion/Unix/Command/_getent: Update getent completion
@@ -15684,5 +15689,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5523 $
+* $Revision: 1.5524 $
 *****************************************************
