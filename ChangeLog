@@ -1,3 +1,7 @@
+2011-12-10  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 29962: Completion/Unix/Command/_ssh: Actually return ret.
+
 2011-12-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* GI: 29977: Completion/Linux/Command/_modutils: caching and
@@ -15711,5 +15715,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5532 $
+* $Revision: 1.5533 $
 *****************************************************

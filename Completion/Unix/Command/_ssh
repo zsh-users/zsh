@@ -377,6 +377,8 @@ _ssh () {
       ;;
     esac
   done
+
+  return ret
 }
 
 _ssh_users () {
