@@ -1,3 +1,8 @@
+2011-12-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* GI: 29977: Completion/Linux/Command/_modutils: caching and
+	function definition fixes.
+
 2011-12-09  Simon Ruderich  <simon@ruderich.org>
 
 	* 29918: Completion: Add new _remote_files() helper and use it to
@@ -2294,11 +2299,6 @@
 2010-07-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk: update to 4.3.10-dev-2.
-
-2011-12-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
-
-	* GI: 29977: Completion/Linux/Command/_modutils: caching and
-	function definition fixes.
 
 2010-07-24  Wayne Davison  <wayned@users.sourceforge.net>
 
@@ -15711,5 +15711,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5531 $
+* $Revision: 1.5532 $
 *****************************************************
