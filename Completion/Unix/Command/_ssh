@@ -15,6 +15,7 @@ _ssh () {
     '(-6)-4[forces ssh to use IPv4 addresses only]'
     '(-4)-6[forces ssh to use IPv6 addresses only]'
     '-C[compress data]'
+    # for protocol version 2, this can be a comma-separated list
     '-c+[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)'
     '-F+[specify alternate config file]:config file:_files'
     '-i+[select identity file]:SSH identity file:_files'
@@ -36,25 +37,20 @@ _ssh () {
       '(-a)-A[enables forwarding of the authentication agent connection]' \
       '(-A)-a[disable forwarding of authentication agent connection]' \
       '(-P)-b+[specify interface to transmit on]:bind address:_bind_addresses' \
-      '-D+[specify a dynamic port forwarding]:[bind-address]\:port' \
-      '-e+[set escape character]:escape character (or `none'"'"'):' \
+      '-D+[specify a dynamic port forwarding]:dynamic port forwarding:->dynforward' \
+      '-e+[set escape character]:escape character (or `none'\''):' \
       '(-n)-f[go to background]' \
       '-g[allow remote hosts to connect to local forwarded ports]' \
-      '-I+[specify the PKCS#11 shared library to use]' \
+      '-I+[specify smartcard device]:device:_files' \
       '-K[enable GSSAPI-based authentication and forwarding]' \
       '-k[disable forwarding of GSSAPI credentials]' \
       '*-L[specify local port forwarding]:local port forwarding:->forward' \
       '-l+[specify login name]:login name:_ssh_users' \
       '-M[master mode for connection sharing]' \
-      '(-1)-m+[specify mac algorithms]:mac spec' \
+      '(-1)-m+[specify mac algorithms]:mac spec:->macs' \
       '(-1)-N[do not execute a remote command (protocol version 2 only)]' \
       '-n[redirect stdin from /dev/null]' \
-      '-O[control active connection multiplexing master process]:multiplex control command:((
-          check\:"check that the master process is running"
-          forward\:"request forwardings without command execution"
-          cancel\:"cancel forwardings"
-          exit\:"request the master to exit"
-          stop\:"request the master to stop accepting further multiplexing requests"))' \
+      '-O:multiplex control command:((check\:"check master process is running" exit\:"request the master to exit" forward\:"request forward without command execution" stop\:"request the master to stop accepting further multiplexing requests"))' \
       '-P[use non privileged port]' \
       '-p+[specify port on remote host]:port number on remote host' \
       '(-v)*-q[quiet operation]' \
@@ -65,19 +61,19 @@ _ssh () {
       '(-T)-t[force pseudo-tty allocation]' \
       '-V[show version number]' \
       '(-q)*-v[verbose mode]' \
-      '(-N)-W[forward standard input/output over host:port (protocol version 2 only)]:host\:port' \
-      '-w[request tunnel device forwarding with the specified tun devices]:local_tun[\:remote_tun]' \
+      '-W[forward standard input and output to host]:stdinout forward:->hostport' \
+      '-w[request tunnel device forwarding]:local_tun[\:remote_tun] (integer or "any"):' \
       '(-x -Y)-X[enable (untrusted) X11 forwarding]' \
       '(-X -Y)-x[disable X11 forwarding]' \
       '(-x -X)-Y[enable trusted X11 forwarding]' \
-      '-y[send log information using the syslog module]' \
+      '-y[send log info via syslog instead of stderr]' \
       ':remote host name:->userhost' \
       '*::args:->command' "$common[@]" && ret=0
     ;;
   scp)
     _arguments -C -s \
       '-3[copy through local host, not directly between the remote hosts]' \
-      '-B[batch mode (don'"'"'t ask for passphrases)]' \
+      '-B[batch mode (don'\''t ask for passphrases)]' \
       '*:file:->file' "$common[@]" "$common_transfer[@]" && ret=0
     ;;
   ssh-add)
@@ -112,7 +108,7 @@ _ssh () {
     _arguments \
       '-q[silence ssh-keygen]' \
       "($cmds -P)-b[specify number of bits in key]:bits in key" \
-      "($cmds -P)-t[specify the type of the key to create]:key type:(rsa1 rsa dsa)" \
+      "($cmds -P)-t[specify the type of the key to create]:key type:(rsa1 rsa dsa ecdsa)" \
       "(${cmds#-p })-N[provide new passphrase]:new passphrase" \
       "($cmds -b -t)-C[provide new comment]:new comment" \
       '(-D)-f[key file]:key file:_files' \
@@ -145,12 +141,18 @@ _ssh () {
 
     case "$lstate" in
     option)
-      if compset -P '*[= ]'; then
+      if compset -P '*='; then
         case "$IPREFIX" in
-        *(#i)(afstokenpassing|batchmode|compression|fallbacktorsh|forward(agent|x11)|keepalive|passwordauthentication|rhosts(|rsa)authentication|rsaauthentication|usersh|kerberos(authetication|tgtparsing)|useprivileged)*)
+        *(#i)(afstokenpassing|batchmode|challengeresponseauthentication|checkhostip|clearallforwardings|compression|enablesshkeysign|exitonforwardfailure|fallbacktorsh|forward(agent|x11)|forwardx11trusted|gatewayports|gssapiauthentication|gssapidelegatecredentials|gssapitrustdns|hashknownhosts|hostbasedauthentication|identitiesonly|kbdinteractiveauthentication|(tcp|)keepalive|nohostauthenticationforlocalhost|passwordauthentication|permitlocalcommand|pubkeyauthentication|rhosts(|rsa)authentication|rsaauthentication|usersh|kerberos(authentication|tgtpassing)|useprivilegedport|visualhostkey)=*)
           _wanted values expl 'truth value' compadd yes no && ret=0
           ;;
-        *(#i)ciphers*)
+        *(#i)addressfamily=*)
+          _wanted values expl 'address family' compadd any inet inet6 && ret=0
+          ;;
+        *(#i)bindaddress=*)
+          _wanted bind-addresses expl 'bind address' _bind_addresses && ret=0
+          ;;
+        *(#i)ciphers=*)
           _values -s , 'encryption cipher' \
               '3des-cbc' \
               'aes128-cbc' \
@@ -171,57 +173,177 @@ _ssh () {
               'rijndael-cbc@lysator.liu.se' \
               && ret=0
           ;;
-        *(#i)cipher*)
+        *(#i)cipher=*)
           _wanted values expl 'encryption cipher (protocol version 1)' \
               compadd blowfish 3des des idea arcfour tss none && ret=0
           ;;
-        *(#i)controlmaster*)
+        *(#i)compressionlevel=*)
+          _values 'compression level' {1..9} && ret=0
+          ;;
+        *(#i)connectionattempts=*)
+          _message -e 'connection attempts' && ret=0
+          ;;
+        *(#i)connecttimeout=*)
+          _message -e 'connection timeout' && ret=0
+          ;;
+        *(#i)controlmaster=*)
           _wanted values expl 'truthish value' compadd yes no auto autoask && ret=0
           ;;
-        *(#i)controlpath*)
+        *(#i)controlpath=*)
           _description files expl 'path to control socket'
           _files "$expl[@]" && ret=0
           ;;
-        *(#i)globalknownhostsfile*)
+        *(#i)controlpersist=*)
+          _message -e 'timeout'
+          ret=0
+          _wanted values expl 'truth value' compadd yes no && ret=0
+          ;;
+        *(#i)escapechar=*)
+          _message -e 'escape character (or `none'\'')'
+          ret=0
+          ;;
+        *(#i)forwardx11timeout=*)
+          _message -e 'timeout'
+          ret=0
+          ;;
+        *(#i)globalknownhostsfile=*)
           _description files expl 'global file with known hosts'
           _files "$expl[@]" && ret=0
           ;;
-        *(#i)hostname*)
+        *(#i)hostname=*)
           _wanted hosts expl 'real host name to log into' _ssh_hosts && ret=0
           ;;
-        *(#i)identityfile*)
+        *(#i)hostkeyalgorithms=*)
+          _values -s , 'host key algorithms' \
+              'ecdsa-sha2-nistp256-cert-v01@openssh.com' \
+              'ecdsa-sha2-nistp384-cert-v01@openssh.com' \
+              'ecdsa-sha2-nistp521-cert-v01@openssh.com' \
+              'ssh-rsa-cert-v01@openssh.com' \
+              'ssh-dss-cert-v01@openssh.com' \
+              'ssh-rsa-cert-v00@openssh.com' \
+              'ssh-dss-cert-v00@openssh.com' \
+              'ecdsa-sha2-nistp256' \
+              'ecdsa-sha2-nistp384' \
+              'ecdsa-sha2-nistp521' \
+              'ssh-rsa' \
+              'ssh-dss' && ret=0
+          ;;
+        *(#i)identityfile=*)
           _description files expl 'SSH identity file'
           _files "$expl[@]" && ret=0
           ;;
-        *(#i)(local|remote)forward*)
+        *(#i)ipqos=*)
+          local descr
+          if [[ $PREFIX = *\ *\ * ]]; then return 1; fi
+          if compset -P '* '; then
+            descr='QoS for non-interactive sessions'
+          else
+            descr='QoS [for interactive sessions if second value given, separated by white space]'
+          fi
+          _values $descr 'af11' 'af12' 'af13' 'af14' 'af22' \
+              'af23' 'af31' 'af32' 'af33' 'af41' 'af42' 'af43' \
+              'cs0' 'cs1' 'cs2' 'cs3' 'cs4' 'cs5' 'cs6' 'cs7' 'ef' \
+              'lowdelay' 'throughput' 'reliability' && ret=0
+          ;;
+        *(#i)(local|remote)forward=*)
           state=forward
           ;;
-        *(#i)preferredauthentications*)
+        *(#i)dynamicforward=*)
+          state=dynforward
+          ;;
+        *(#i)kbdinteractivedevices=*)
+          _values -s , 'keyboard-interactive authentication methods' \
+              'bsdauth' 'pam' 'skey' && ret=0
+          ;;
+        *(#i)kexalgorithms=*)
+          _values -s , 'KEX algorithms' \
+              ecdh-sha2-nistp256 ecdh-sha2-nistp384 ecdh-sha2-nistp521 \
+              diffie-hellman-group-exchange-sha256 \
+              diffie-hellman-group-exchange-sha1 \
+              diffie-hellman-group14-sha1 diffie-hellman-group1-sha1 && ret=0
+          ;;
+        *(#i)localcommand=*)
+          _description commands expl 'run command locally after connecting'
+          _command_names && ret=0
+          ;;
+        *(#i)loglevel=*)
+          _values 'log level' QUIET FATAL ERROR INFO VERBOSE\
+              DEBUG DEBUG1 DEBUG2 DEBUG3 && ret=0
+          ;;
+        *(#i)macs=*)
+          state=macs
+          ;;
+        *(#i)numberofpasswordprompts=*)
+          _message -e 'number of password prompts'
+          ret=0
+          ;;
+        *(#i)pkcs11provider=*)
+          _description files expl 'PKCS#11 shared library'
+          _files -g '*.so' "$expl[@]" && ret=0
+          ;;
+        *(#i)port=*)
+          _message -e 'port number on remote host'
+          ret=0
+          ;;
+        *(#i)preferredauthentications=*)
           _values -s , 'authentication method' gssapi-with-mic \
               hostbased publickey keyboard-interactive password && ret=0
           ;;
-        *(#i)protocol*)
+        *(#i)protocol=*)
           _values -s , 'protocol version' \
               '1' \
               '2' && ret=0
           ;;
-        *(#i)proxycommand*)
+        *(#i)proxycommand=*)
           compset -q
           shift 1 words
           (( CURRENT-- ))
           _normal && ret=0
           ;;
-        *(#i)stricthostkeychecking*)
+        *(#i)rekeylimit=*)
+          _message -e 'maximum number of bytes transmitted before renegotiating session key'
+          ret=0
+          ;;
+        *(#i)requesttty=*)
+          _values 'request a pseudo-tty' \
+              'no[never request a TTY]' \
+              'yes[always request a TTY when stdin is a TTY]' \
+              'force[always request a TTY]' \
+              'auto[request a TTY when opening a login session]' && ret=0
+          ;;
+        *(#i)sendenv=*)
+          _wanted envs expl 'environment variable' _parameters -g 'scalar*export*' && ret=0
+          ;;
+        *(#i)serveralivecountmax=*)
+          _message -e 'number of alive messages without replies before disconnecting'
+          ret=0
+          ;;
+        *(#i)serveraliveinterval=*)
+          _message -e 'timeout in seconds since last data was received to send alive message'
+          ret=0
+          ;;
+        *(#i)(stricthostkeychecking|verifyhostkeydns)=*)
           _wanted values expl 'checking type' compadd yes no ask && ret=0
           ;;
-        *(#i)userknownhostsfile*)
+        *(#i)tunnel=*)
+          _values 'request device forwarding' \
+              'yes' \
+              'point-to-point' \
+              'ethernet' \
+              'no' && ret=0
+          ;;
+        *(#i)tunneldevice=*)
+          _message -e 'local_tun[:remote_tun] (integer or "any")'
+          ret=0
+          ;;
+        *(#i)userknownhostsfile=*)
           _description files expl 'user file with known hosts'
           _files "$expl[@]" && ret=0
           ;;
-        *(#i)user*)
+        *(#i)user=*)
           _wanted users expl 'user to log in as' _ssh_users && ret=0
           ;;
-        *(#i)xauthlocation*)
+        *(#i)xauthlocation=*)
           _description files expl 'xauth program'
           _files "$expl[@]" -g '*(-*)' && ret=0
           ;;
@@ -229,7 +351,7 @@ _ssh () {
       else
         # old options are after the empty "\"-line
         _wanted values expl 'configure file option' \
-            compadd -M 'm:{a-z}={A-Z}' -qS '=' - \
+            compadd -M 'm:{a-z}={A-Z}' -S '=' - \
                 AddressFamily \
                 BatchMode \
                 BindAddress \
@@ -257,6 +379,7 @@ _ssh () {
                 GlobalKnownHostsFile \
                 GSSAPIAuthentication \
                 GSSAPIDelegateCredentials \
+                GSSAPITrustDns \
                 HashKnownHosts \
                 Host \
                 HostbasedAuthentication \
@@ -317,16 +440,56 @@ _ssh () {
       fi
       ;;
     forward)
+      local port=false host=false listen=false bind=false
       if compset -P 1 '*:'; then
-        if compset -P '*:'; then
-          _message -e port-numbers 'port number'
+        if [[ $IPREFIX != (*=|)<-65535>: ]]; then
+          if compset -P 1 '*:'; then
+            if compset -P '*:'; then
+              port=true
+            else
+              host=true
+            fi
+          else
+            listen=true
+            ret=0
+          fi
         else
-          _wanted hosts expl host _ssh_hosts -qS:
+          if compset -P '*:'; then
+            port=true
+          else
+            host=true
+          fi
         fi
       else
-        _message -e port-numbers 'listen-port number'
+        listen=true
+        bind=true
       fi
-      return
+      $port && { _message -e port-numbers 'port number'; ret=0 }
+      $listen && { _message -e port-numbers 'listen-port number'; ret=0 }
+      $host && { _wanted hosts expl host _ssh_hosts -S: && ret=0 }
+      $bind && { _wanted bind-addresses expl bind-address _bind_addresses -S: && ret=0 }
+      return ret
+      ;;
+    dynforward)
+      _message -e port-numbers 'listen-port number'
+      if ! compset -P '*:'; then
+        _wanted bind-addresses expl bind-address _bind_addresses -qS:
+      fi
+      return 0
+      ;;
+    hostport)
+      if compset -P '*:'; then
+        _message -e port-numbers 'port number'
+        ret=0
+      else
+        _wanted hosts expl host _ssh_hosts -S: && ret=0
+      fi
+      return ret
+      ;;
+    macs)
+      _values -s , 'MAC algorithms' hmac-md5 hmac-sha1 umac-64@openssh.com \
+          hmac-ripemd160 hmac-sha1-96 hmac-md5-96 hmac-sha2-256 \
+          hmac-sha2-256-96 hmac-sha2-512 hmac-sha2-512-96 && ret=0
       ;;
     command)
       shift 1 words

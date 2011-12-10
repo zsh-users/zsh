@@ -2,6 +2,8 @@
 
 	* 29962: Completion/Unix/Command/_ssh: Actually return ret.
 
+	* 29961: Completion/Unix/Command/_ssh: Extend option completion.
+
 2011-12-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* GI: 29977: Completion/Linux/Command/_modutils: caching and
@@ -15715,5 +15717,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5533 $
+* $Revision: 1.5534 $
 *****************************************************
