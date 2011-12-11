@@ -2430,7 +2430,8 @@ Files accessed more than var(n) days ago are selected by a positive var(n)
 value (tt(PLUS())var(n)).  Optional unit specifiers `tt(M)', `tt(w)',
 `tt(h)', `tt(m)' or `tt(s)' (e.g. `tt(ah5)') cause the check to be
 performed with months (of 30 days), weeks, hours, minutes or seconds
-instead of days, respectively.
+instead of days, respectively.  An explicit `tt(d)' for days is also
+allowed.
 
 Any fractional part of the difference between the access time and the
 current part in the appropriate units is ignored in the comparison.  For

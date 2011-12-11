@@ -1530,6 +1530,8 @@ zglob(LinkList list, LinkNode np, int nountok)
 			    g_units = TT_MONTHS, ++s;
 			else if (*s == 's')
 			    g_units = TT_SECONDS, ++s;
+			else if (*s == 'd')
+			    ++s;
 		    }
 		    /* See if it's greater than, equal to, or less than */
 		    if ((g_range = *s == '+' ? 1 : *s == '-' ? -1 : 0))
