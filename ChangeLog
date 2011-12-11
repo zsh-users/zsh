@@ -1,5 +1,8 @@
 2011-12-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* discussed in 29984: Doc/Zsh/compsys.yo: use m+7 for files
+	"more than a week old" since w+1 is a bit counterintuitive.
+
 	* 29991: Doc/Zsh/expn.yo, Src/glob.c: allow explicit 'd' for
 	days in time qualifiers.
 
@@ -15722,5 +15725,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5535 $
+* $Revision: 1.5536 $
 *****************************************************
