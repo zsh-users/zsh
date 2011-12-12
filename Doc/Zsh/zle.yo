@@ -40,6 +40,17 @@ the following setting:
 
 example(zle_highlight=(none))
 
+In many places, references are made to the tt(numeric argument).  This can
+by default be entered in emacs mode by holding the alt key and typing
+a number, or pressing escape before each number, and in vi command mode
+by typing the number before entering a command.  Generally the numeric
+argument causes the next command entered to be repeated the specified
+number of times, unless otherwise noted below. See also
+ifzman(the em(Arguments) subsection of the em(Widgets) section )\
+ifnzman(noderef(Arguments) )\
+for some other ways the numeric argument can be modified. The default
+bindings mentioned here use the tt(digit-argument) widget.
+
 startmenu()
 menu(Keymaps)
 menu(Zle Builtins)
@@ -649,9 +660,9 @@ item(var(widget) tt([ -n) var(num) tt(]) tt([ -Nw ] [ -K) var(keymap) tt(]) var(
 Invoke the specified widget.  This can only be done when ZLE is
 active; normally this will be within a user-defined widget.
 
-With the options tt(-n) and tt(-N), the current numerical argument will be
+With the options tt(-n) and tt(-N), the current numeric argument will be
 saved and then restored after the call to tt(widget); `tt(-n) var(num)'
-sets the numerical argument temporarily to var(num), while `tt(-N)' sets it
+sets the numeric argument temporarily to var(num), while `tt(-N)' sets it
 to the default, i.e. as if there were none.
 
 With the option tt(-K), var(keymap) will be used as the current keymap
@@ -1492,7 +1503,7 @@ reexamined.  Note that negative numbers should be preceded by a
 
 If two arguments are given, the second specifies the word on the command
 line in normal array index notation (as a more natural alternative to the
-prefix argument).  Hence 1 is the first word, and -1 (the default) is the
+numeric argument).  Hence 1 is the first word, and -1 (the default) is the
 last word.
 
 If a third argument is given, its value is ignored, but it is used to
@@ -1889,14 +1900,14 @@ spaces; if instead it is followed by tt(-2), then tt(forward-char),
 move backward two spaces.
 
 Inside a widget function, if passed an argument, i.e. `tt(zle
-universal-argument) var(num)', the numerical argument will be set to
+universal-argument) var(num)', the numeric argument will be set to
 var(num); this is equivalent to `tt(NUMERIC=)var(num)'.
 )
 tindex(argument-base)
 item(tt(argument-base))(
 Use the existing numeric argument as a numeric base, which must be in the
 range 2 to 36 inclusive.  Subsequent use of tt(digit-argument) and
-tt(universal-argument) will input a new prefix in the given base.
+tt(universal-argument) will input a new numeric argument in the given base.
 The usual hexadecimal convention is used: the letter tt(a) or tt(A)
 corresponds to 10, and so on.  Arguments in bases requiring digits from 10
 upwards are more conveniently input with tt(universal-argument), since
@@ -2053,9 +2064,9 @@ Reads a key sequence, then prints the function bound to that sequence.
 tindex(exchange-point-and-mark)
 item(tt(exchange-point-and-mark) (^X^X) (unbound) (unbound))(
 Exchange the cursor position (point) with the position of the mark.
-Unless a negative prefix argument is given, the region between
+Unless a negative numeric argument is given, the region between
 point and mark is activated so that it can be highlighted.
-If a zero prefix argument is given, the region is activated but
+If a zero numeric argument is given, the region is activated but
 point and mark are not swapped.
 )
 tindex(execute-named-cmd)
@@ -2268,7 +2279,7 @@ Set the specified mark at the cursor position.
 tindex(set-mark-command)
 item(tt(set-mark-command) (^@) (unbound) (unbound))(
 Set the mark at the cursor position.  If called with a negative
-prefix argument, do not set the mark but deactivate the region so that
+numeric argument, do not set the mark but deactivate the region so that
 it is no longer highlighted (it is still usable for other purposes).
 Otherwise the region is marked as active.
 )
@@ -2426,8 +2437,8 @@ tt(set-mark-command).  The region is only highlighted if it is active,
 which is the case if tt(set-mark-command) or tt(exchange-point-and-mark)
 has been called and the line has not been subsequently modified.  The
 region can be deactivated by calling tt(set-mark-command) with a
-negative prefix argument, or reactivated by calling
-tt(exchange-point-and-mark) with a zero prefix argument.  Note
+negative numeric argument, or reactivated by calling
+tt(exchange-point-and-mark) with a zero numeric argument.  Note
 that whether or not the region is active has no effect on its
 use within widgets, it simply determines whether it is highlighted.
 )

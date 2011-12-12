@@ -1928,7 +1928,7 @@ described immediately above, i.e. using styles to decide the word
 boundaries.  However, it is not a replacement for any existing function.
 
 The basic behaviour is to delete the word around the cursor.  There is no
-numeric prefix handling; only the single word around the cursor is
+numeric argument handling; only the single word around the cursor is
 considered.  If the widget contains the string tt(kill), the removed text
 will be placed in the cutbuffer for future yanking.  This can be obtained
 by defining tt(kill-whole-word-match) as follows:
@@ -1994,14 +1994,14 @@ full history line.  Note that leading zeroes must be typed (they are only
 shown when necessary for removing ambiguity).  The entire history is
 searched; there is no distinction between forwards and backwards.
 
-With a prefix argument, the search is not anchored to the start of
+With a numeric argument, the search is not anchored to the start of
 the line; the string typed by the use may appear anywhere in the line
 in the history.
 
 If the widget name contains `tt(-end)' the cursor is moved to the end of
 the line inserted.  If the widget name contains `tt(-space)' any space
 in the text typed is treated as a wildcard and can match anything (hence
-a leading space is equivalent to giving a prefix argument).  Both
+a leading space is equivalent to giving a numeric argument).  Both
 forms can be combined, for example:
 
 example(zle -N history-beginning-search-menu-space-end \ 
@@ -2031,8 +2031,8 @@ vindex(incarg, use of)
 item(tt(incarg))(
 Typing the keystrokes for this widget with the cursor placed on or to the
 left of an integer causes that integer to be incremented by one.  With a
-numeric prefix argument, the number is incremented by the amount of the
-argument (decremented if the prefix argument is negative).  The shell
+numeric argument, the number is incremented by the amount of the
+argument (decremented if the numeric argument is negative).  The shell
 parameter tt(incarg) may be set to change the default increment to
 something other than one.
 
@@ -2506,7 +2506,7 @@ This function may replace the tt(insert-last-word) widget, like so:
 
 example(zle -N insert-last-word smart-insert-last-word)
 
-With a numeric prefix, or when passed command line arguments in a call
+With a numeric argument, or when passed command line arguments in a call
 from another widget, it behaves like tt(insert-last-word), except that
 words in comments are ignored when tt(INTERACTIVE_COMMENTS) is set.
 
@@ -2535,12 +2535,12 @@ The effect is similar to the function of the same name in Emacs.
 
 Transpose the current line with the previous line and move the cursor
 to the start of the next line.  Repeating this (which can be done by
-providing a positive numeric prefix argument) has the effect of moving
+providing a positive numeric argument) has the effect of moving
 the line above the cursor down by a number of lines.
 
-With a negative numeric prefix argument, requires two lines above the
+With a negative numeric argument, requires two lines above the
 cursor.  These two lines are transposed and the cursor moved to the
-start of the previous line.  Using a numeric prefix less than -1
+start of the previous line.  Using a numeric argument less than -1
 has the effect of moving the line above the cursor up by minus that
 number of lines.
 )

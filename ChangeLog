@@ -1,3 +1,9 @@
+2015-04-16  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 34902: Doc/Zsh/compsys.yo, Doc/Zsh/contrib.yo, Doc/Zsh/zle.yo:
+	explain the numeric argument and be consistent about what we
+	call it.
+
 2015-04-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34901: Test/A04redirect.ztst: Test for the foregoing.

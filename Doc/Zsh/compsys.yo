@@ -1860,7 +1860,7 @@ tested for all tags valid for the current completion, then the
 tt(default) tag.  The cursor will be moved back to the
 previous line if this style is `true' for all types of match.  Note
 that unlike the tt(ALWAYS_LAST_PROMPT) option this is independent of the
-numeric prefix argument.
+numeric argument.
 )
 kindex(known-hosts-files)
 item(tt(known-hosts-files))(
