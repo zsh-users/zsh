@@ -896,14 +896,16 @@ enum {
     /* Release the process group if pid is the shell's process group */
     ESUB_REVERTPGRP = 0x10,
     /* Don't handle the MONITOR option even if previously set */
-    ESUB_NOMONITOR = 0x20
+    ESUB_NOMONITOR = 0x20,
+    /* This is a subshell where job control is allowed */
+    ESUB_JOB_CONTROL = 0x40
 };
 
 /**/
 static void
 entersubsh(int flags)
 {
-    int sig, monitor;
+    int sig, monitor, job_control_ok;
 
     if (!(flags & ESUB_KEEPTRAP))
 	for (sig = 0; sig < VSIGCOUNT; sig++)
@@ -911,6 +913,7 @@ entersubsh(int flags)
 		sig != SIGDEBUG && sig != SIGZERR)
 		unsettrap(sig);
     monitor = isset(MONITOR);
+    job_control_ok = monitor && (flags & ESUB_JOB_CONTROL) && isset(POSIXJOBS);
     if (flags & ESUB_NOMONITOR)
 	opts[MONITOR] = 0;
     if (!isset(MONITOR)) {
@@ -938,6 +941,16 @@ entersubsh(int flags)
 	}
 	else if (!jobtab[thisjob].gleader ||
 		 setpgrp(0L, jobtab[thisjob].gleader) == -1) {
+	    /*
+	     * This is the standard point at which a newly started
+	     * process gets put into the foreground by taking over
+	     * the terminal.  Note that in normal circumstances we do
+	     * this only from the process itself.  This only works if
+	     * we are still ignoring SIGTTOU at this point; in this
+	     * case ignoring the signal has the special effect that
+	     * the operation is allowed to work (in addition to not
+	     * causing the shell to be suspended).
+	     */
 	    jobtab[thisjob].gleader = getpid();
 	    if (list_pipe_job != thisjob &&
 		!jobtab[list_pipe_job].gleader)
@@ -959,7 +972,13 @@ entersubsh(int flags)
     if ((flags & ESUB_REVERTPGRP) && getpid() == mypgrp)
 	release_pgrp();
     shout = NULL;
-    if (isset(MONITOR)) {
+    if (!job_control_ok) {
+	/*
+	 * If this process is not goign to be doing job control,
+	 * we don't want to do special things with the corresponding
+	 * signals.  If it is, we need to keep the special behaviour:
+	 * see note about attachtty() above.
+	 */
 	signal_default(SIGTTOU);
 	signal_default(SIGTTIN);
 	signal_default(SIGTSTP);
@@ -971,7 +990,7 @@ entersubsh(int flags)
     }
     if (!(sigtrapped[SIGQUIT] & ZSIG_IGNORED))
 	signal_default(SIGQUIT);
-    if (!isset(POSIXJOBS))
+    if (!job_control_ok)
 	opts[MONITOR] = 0;
     opts[USEZLE] = 0;
     zleactive = 0;
@@ -2829,6 +2848,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	flags = ((how & Z_ASYNC) ? ESUB_ASYNC : 0) | ESUB_PGRP;
 	if ((type != WC_SUBSH) && !(how & Z_ASYNC))
 	    flags |= ESUB_KEEPTRAP;
+	if (type == WC_SUBSH && !(how & Z_ASYNC))
+	    flags |= ESUB_JOB_CONTROL;
 	entersubsh(flags);
 	close(synch[1]);
 	forked = 1;

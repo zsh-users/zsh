@@ -1,3 +1,10 @@
+2011-12-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30000 plus a couple of comments: Src/exec.c: Better POSIXJOBS
+	behaviour: don't restore default behaviour for SIGTTOU etc. if
+	we're still doing job handling, and only continue with job
+	handling if this is a (...) subshell.
+
 2011-12-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* discussed in 29984: Doc/Zsh/compsys.yo: use m+7 for files
@@ -15725,5 +15732,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5536 $
+* $Revision: 1.5537 $
 *****************************************************
