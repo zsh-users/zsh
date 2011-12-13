@@ -2619,7 +2619,7 @@ _git-pack-refs () {
 _git-prune () {
   _arguments -S \
     '(-n --dry-run)'{-n,--dry-run}'[do not remove anything; just report what would be removed]' \
-    '(-v --verbose)'{-v,--rerbose}'[report all removed objects]' \
+    '(-v --verbose)'{-v,--verbose}'[report all removed objects]' \
     '--expire[only expire loose objects older than given date]: :__git_datetimes' \
     '*:: :__git_heads'
 }
