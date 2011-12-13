@@ -177,7 +177,7 @@ else
     fi
   fi
   if (( index )); then
-    index="$~words[index+1]"
+    index=${~${(Q)words[index+1]}}
     [[ $index = (.|..|)/* ]] || index=~+/$index
     _files -W $index
   else
