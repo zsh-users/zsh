@@ -87,6 +87,7 @@ if compvalues -i "$@"; then
   if [[ "$action" = -\>* ]]; then
     compvalues -v val_args
     state="${${action[3,-1]##[ 	]#}%%[ 	]#}"
+    state_descr="$descr"
     if [[ -n "$usecc" ]]; then
       curcontext="${oldcontext%:*}:$subc"
     else

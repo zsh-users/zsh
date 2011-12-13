@@ -44,7 +44,7 @@ case "$state[1]" in
       '(-)*:widget arguments: ' && ret=0
     ;;
   (widget*)
-    _wanted -C "$context[1]" widgets expl widget compadd -k widgets && ret=0
+    _wanted -C "$context[1]" widgets expl "${state_descr[1]:-widget}" compadd -k widgets && ret=0
     ;&
   (function)
     [[ $state[1] != *function ]] ||	# Handle fall-through

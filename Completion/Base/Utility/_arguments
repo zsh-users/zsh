@@ -344,6 +344,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 
   context=()
   state=()
+  state_descr=()
 
   while true; do
     while _tags; do
@@ -376,6 +377,7 @@ if (( $# )) && comparguments -i "$autod" "$singopt[@]" "$@"; then
 	      if (( ! $state[(I)$action] )); then
                 comparguments -W line opt_args
                 state+=( "$action" )
+                state_descr+=( "$descr" )
 	        if [[ -n "$usecc" ]]; then
 	          curcontext="${oldcontext%:*}:$subc"
 	        else

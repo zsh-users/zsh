@@ -23,7 +23,8 @@ eval "$_comp_setup"
 local func funcs ret=1 tmp _compskip format nm call match min max i num\
       _completers _completer _completer_num curtag _comp_force_list \
       _matchers _matcher _c_matcher _matcher_num _comp_tags _comp_mesg  \
-      mesg str context state line opt_args val_args curcontext="$curcontext" \
+      mesg str context state state_descr line opt_args val_args \
+      curcontext="$curcontext" \
       _last_nmatches=-1 _last_menu_style _def_menu_style _menu_style sel \
       _tags_level=0 \
       _saved_exact="${compstate[exact]}" \

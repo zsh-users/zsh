@@ -3687,10 +3687,12 @@ state of processing; the calling function then makes its own arrangements
 for generating completions.  For example, functions that implement a state
 machine can use this type of action.
 
-Where tt(_arguments) encounters a `tt(->)var(string)', it will strip
-all leading and trailing whitespace from var(string) and set the array
-tt(state) to the set of all var(strings)s for which an action is to be
-performed.
+Where tt(_arguments) encounters var(action) in the `tt(->)var(string)'
+format, it will strip all leading and trailing whitespace from var(string)
+and set the array tt(state) to the set of all var(string)s for which an
+action is to be performed.  The elements of the array tt(state_descr) are
+assigned the corresponding var(message) field from each var(optarg)
+containing such an var(action).
 
 By default and in common with all other well behaved completion
 functions, _arguments returns status zero if it was able to add matches and
@@ -3698,7 +3700,8 @@ non-zero otherwise. However, if the tt(-R) option is given,
 tt(_arguments) will instead return a status of 300 to indicate that
 tt($state) is to be handled.
 
-In addition to tt($state), tt(_arguments) also sets the global
+In addition to tt($state) and tt($state_descr), tt(_arguments) also
+sets the global
 parameters `tt(context)', `tt(line)' and `tt(opt_args)' as described
 below, and does not reset any changes made to the special parameters
 such as tt(PREFIX) and tt(words).  This gives the calling function the
@@ -3708,7 +3711,7 @@ A function calling tt(_arguments) with at least
 one action containing a `tt(->)var(string)' must therefore declare
 appropriate local parameters:
 
-example(local context state line
+example(local context state state_descr line
 typeset -A opt_args)
 
 to prevent tt(_arguments) from altering the global environment.
@@ -4794,15 +4797,17 @@ values (but not those for the arguments) should be printed.
 The associative array tt(val_args) is used to report values and their
 arguments; this works similarly to the tt(opt_args) associative array
 used by tt(_arguments).  Hence the function calling tt(_values) should
-declare the local parameters tt(state), tt(line), tt(context) and
-tt(val_args):
+declare the local parameters tt(state), tt(state_descr), tt(line),
+tt(context) and tt(val_args):
 
-example(local context state line
+example(local context state state_descr line
 typeset -A val_args)
 
 when using an action of the form `tt(->)var(string)'.  With this
 function the tt(context) parameter will be set to the name of the
-value whose argument is to be completed.
+value whose argument is to be completed.  Note that for tt(_values),
+the tt(state) and tt(state_descr) are scalars rather than arrays.
+Only a single matching state is returned.
 
 Note also that tt(_values) normally adds the character used as the
 separator between values as an auto-removable suffix (similar to a
