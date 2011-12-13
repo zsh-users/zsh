@@ -1,3 +1,17 @@
+2011-12-13  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 30020: Functions/Prompts/promptinit: prevent prompt_opts and
+	zle_highlight from leaking out of prompt_preview_theme.
+
+	* 30012: Completion/Base/Core/_main_complete,
+	Completion/Base/Utility/_arguments,
+	Completion/Base/Utility/_values, Completion/Zsh/Command/_zle,
+	Doc/Zsh/compsys.yo: add $state_descr which parallels the $state
+	array in the same way that $context does, to make the "message"
+	part of each _arguments "optarg" specification available to
+	the caller's state handler.  Used in _zle as the description
+	passed to _wanted.
+
 2011-12-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 30000 plus a couple of comments: Src/exec.c: Better POSIXJOBS
@@ -15732,5 +15746,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5537 $
+* $Revision: 1.5538 $
 *****************************************************
