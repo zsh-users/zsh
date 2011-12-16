@@ -1,3 +1,8 @@
+2011-12-16  Peter Stephenson  <pws@csr.com>
+
+	* Simon Olofsson: 30028: Completion/Unix/Command/_subversion:
+	fix matching of subversion help text.
+
 2011-12-14  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 30021: Completion/Zsh/Type/_globquals: Add d flag (see 29991),
@@ -15762,5 +15767,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5542 $
+* $Revision: 1.5543 $
 *****************************************************
