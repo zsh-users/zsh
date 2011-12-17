@@ -1,3 +1,7 @@
+2011-12-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: release 4.3.15.
+
 2011-12-16  Peter Stephenson  <pws@csr.com>
 
 	* Simon Olofsson: 30028: Completion/Unix/Command/_subversion:
@@ -15767,5 +15771,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5543 $
+* $Revision: 1.5544 $
 *****************************************************
