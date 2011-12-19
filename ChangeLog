@@ -1,3 +1,8 @@
+2011-12-19  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Config/version.mk: update version to 4.3.15-dev-0 to
+	avoid dev version clashing with installation.
+
 2011-12-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: release 4.3.15.
@@ -15771,5 +15776,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5544 $
+* $Revision: 1.5545 $
 *****************************************************
