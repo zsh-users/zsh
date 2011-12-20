@@ -544,6 +544,7 @@ bindkey(Keymap km, char *seq, Thingy bind, char *str)
 	if(km->first[f]) {
 	    char fs[3];
 	    fs[0] = f;
+	    fs[1] = 0;
 	    metafy(fs, 1, META_NOALLOC);
 	    km->multi->addnode(km->multi, ztrdup(fs),
 		makekeynode(km->first[f], NULL));
