@@ -2878,24 +2878,26 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 			    return NULL;
 		    }
 		}
-		if (horrible_offset_hack) {
-		    /*
-		     * As part of the 'orrible hoffset 'ack,
-		     * (what hare you? Han 'orrible hoffset 'ack,
-		     * sergeant major), if we are given a ksh/bash/POSIX
-		     * style positional parameter array which includes
-		     * offset 0, we use $0.
-		     */
-		    if (offset == 0 && isarr) {
-			offset_hack_argzero = 1;
-		    } else if (offset > 0) {
-			offset--;
-		    }
-		}
 		if (isarr) {
-		    int alen = arrlen(aval), count;
+		    int alen, count;
 		    char **srcptr, **dstptr, **newarr;
 
+		    if (horrible_offset_hack) {
+			/*
+			 * As part of the 'orrible hoffset 'ack,
+			 * (what hare you? Han 'orrible hoffset 'ack,
+			 * sergeant major), if we are given a ksh/bash/POSIX
+			 * style positional parameter array which includes
+			 * offset 0, we use $0.
+			 */
+			if (offset == 0) {
+			    offset_hack_argzero = 1;
+			} else if (offset > 0) {
+			    offset--;
+			}
+		    }
+
+		    alen = arrlen(aval);
 		    if (offset < 0) {
 			offset += alen;
 			if (offset < 0)
