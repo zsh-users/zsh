@@ -43,6 +43,7 @@ _systemctl()
     '--global[Enable/disable unit files globally]' \
     {-f,--force}'[When enabling unit files, override existing symlinks. When shutting down, execute action immediately]' \
     '--defaults[When disabling unit files, remove default symlinks only]' \
+    '--root=[Enable unit files in the specified root directory]:directory:_directories' \
     '*::systemctl command:_systemctl_command'
 }
 
@@ -73,8 +74,13 @@ _hosts_or_user_at_host()
     "status:Show runtime status of one or more units"
     "show:Show properties of one or more units/jobs or the manager"
     "reset-failed:Reset failed state for all, one, or more units"
+    "list-unit-files:List installed unit files"
     "enable:Enable one or more unit files"
     "disable:Disable one or more unit files"
+    "preset:Enable/disable one or more unit files based on preset configuration"
+    "mask:Mask one or more units"
+    "unmask:Unmask one or more units"
+    "link:Link one or more units into the search path"
     "is-enabled:Check whether unit files are enabled"
     "load:Load one or more units"
     "list-jobs:List jobs"
