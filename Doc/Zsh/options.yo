@@ -567,12 +567,12 @@ tt(IGNORE_BRACES), this option does not disable brace expansion.
 For example, with both options unset a function may be defined
 in the following fashion:
 
-example(args() { echo $# })
+example(args+LPAR()RPAR() { echo $# })
 
 while if either option is set, this does not work and something
 equivalent to the following is required:
 
-example(args() { echo $#; })
+example(args+LPAR()RPAR() { echo $#; })
 
 )
 pindex(KSH_GLOB)
