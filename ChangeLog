@@ -1,5 +1,8 @@
 2011-12-30  Frank Terbeck  <ft@bewatermyfriend.org>
 
+	* 30048: Test/C02cond.ztst: Avoid [[ -N ... ]] on file-systems
+	mounted `noatime', if possible.
+
 	* 30046: Functions/VCS_Info/Backends/VCS_INFO_get_data_svn: Fix
 	support for subversion version 1.7.
 
@@ -15801,5 +15804,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5550 $
+* $Revision: 1.5551 $
 *****************************************************
