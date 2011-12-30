@@ -6,12 +6,28 @@
 
 setopt localoptions noksharrays extendedglob NO_shwordsplit
 local svnbase svnbranch a b rrn
+local -i rc
 local -A svninfo parentinfo
 local -xA hook_com
 
 svnbase=".";
 svninfo=()
-${vcs_comm[cmd]} info --non-interactive | while IFS=: read a b; do svninfo[${a// /_}]="${b## #}"; done
+# Unfortunately, `$pipestatus' is broken currently. Until that problem is
+# resolved, here is a workaround that will get things done, without using it.
+# Clumsily, but that's life.
+local -a dat
+dat=( ${(f)"$(${vcs_comm[cmd]} info --non-interactive 2>&1)"} )
+rc=$?
+(( rc != 0 )) && return 1
+# The following line is the real code, the following is the workaround.
+#${vcs_comm[cmd]} info --non-interactive \
+print -l "${dat[@]}" \
+|& while IFS=: read a b; do
+    svninfo[${a// /_}]="${b## #}"
+done
+#rc=${pipestatus[1]}
+#(( rc != 0 )) && return 1
+
 while [[ -d "${svnbase}/../.svn" ]]; do
     parentinfo=()
     ${vcs_comm[cmd]} info --non-interactive "${svnbase}/.." | while IFS=: read a b; do parentinfo[${a// /_}]="${b## #}"; done
