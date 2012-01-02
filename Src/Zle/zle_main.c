@@ -1200,6 +1200,18 @@ zleread(char **lp, char **rp, int flags, int context)
 	putc('\r', shout);
     if (tmout)
 	alarm(tmout);
+
+    /*
+     * On some windowing systems we may enter this function before the
+     * terminal is fully opened and sized, resulting in an infinite
+     * series of SIGWINCH when the handler prints the prompt before we
+     * have done so here.  Therefore, hold any such signal until the
+     * first full refresh has completed.  The important bit is that the
+     * handler must not see zleactive = 1 until ZLE really is active.
+     * See the end of adjustwinsize() in Src/utils.c
+     */
+    queue_signals();
+
     zleactive = 1;
     resetneeded = 1;
     errflag = retflag = 0;
@@ -1208,6 +1220,8 @@ zleread(char **lp, char **rp, int flags, int context)
     prefixflag = 0;
 
     zrefresh();
+
+    unqueue_signals();	/* Should now be safe to acknowledge SIGWINCH */
 
     zlecallhook("zle-line-init", NULL);
 
