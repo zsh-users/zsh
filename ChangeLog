@@ -1,3 +1,7 @@
+2012-01-04  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 30079: Src/params.c: Restore `LC_ALL' when setting `LANG'.
+
 2012-01-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 30084: Src/init.c: zsfree(argzero) before we set it again
@@ -15815,5 +15819,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5553 $
+* $Revision: 1.5554 $
 *****************************************************

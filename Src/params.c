@@ -3780,6 +3780,9 @@ static struct localename {
 #ifdef LC_TIME
     {"LC_TIME", LC_TIME},
 #endif
+#ifdef LC_ALL
+    {"LC_ALL", LC_ALL},
+#endif
     {NULL, 0}
 };
 
