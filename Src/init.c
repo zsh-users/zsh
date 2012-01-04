@@ -978,6 +978,7 @@ setupshin(char *runscript)
 	    exit(127);
 	}
 	scriptfilename = sfname;
+	zsfree(argzero); /* ztrdup'd in parseargs */
 	argzero = runscript;
     }
     /*
