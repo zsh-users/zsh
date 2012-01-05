@@ -3,6 +3,10 @@
 # The main loop of the completion code. This is what is called when 
 # completion is attempted from the command line.
 
+# Note that this function is parsed before $_comp_setup is evaluated,
+# so that it should make conservative assumptions about the setting
+# of the various options that affect parsing.
+
 # In case non-standard separators are in use.
 local IFS=$' \t\n\0'
 
@@ -52,9 +56,12 @@ if [[ ( "$tmp" = *pending(|[[:blank:]]*) && PENDING -gt 0 ) ||
 fi
 
 if [[ "$compstate[insert]" = tab* ]]; then
-  { [[ "$tmp" = (|*[[:blank:]])(yes|true|on|1)(|[[:blank:]]*) ]] &&
-    { [[ "$curcontext" != :* || -z "$compstate[vared]" ]] ||
-        zstyle -t ":completion:vared${curcontext}:" insert-tab } } && return 0
+  if [[ "$tmp" = (|*[[:blank:]])(yes|true|on|1)(|[[:blank:]]*) ]]; then
+    if [[ "$curcontext" != :* || -z "$compstate[vared]" ]] ||
+      zstyle -t ":completion:vared${curcontext}:" insert-tab; then
+      return 0
+    fi
+  fi
 
   compstate[insert]="${compstate[insert]//tab /}"
 fi
