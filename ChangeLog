@@ -1,5 +1,8 @@
 2012-01-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Christian Höltje: 30087: Functions/Prompts/promptinit: remove
+	any hooks for a prompt theme when removing it.
+
 	* 30084: Doc/Zsh/zle.yo, Src/init.c, Src/Zle/zle_main.c,
 	Src/Zle/zle_refresh.c, Src/Zle/zle_thingy.c: `zle -T tc func'
 	defines function to be used insted of termcap output for
@@ -15829,5 +15832,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5555 $
+* $Revision: 1.5556 $
 *****************************************************

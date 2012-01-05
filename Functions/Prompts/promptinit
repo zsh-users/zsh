@@ -155,8 +155,10 @@ Use prompt -h <theme> for help on specific themes.'
        fi
 
        # Reset some commonly altered bits to the default
-       add-zsh-hook -D precmd "prompt_*_precmd"
-       add-zsh-hook -D preexec "prompt_*_preexec"
+       local hook
+       for hook in chpwd precmd preexec periodic zshaddhistory zshexit; do
+         add-zsh-hook -D "${hook}" "prompt_*_${hook}"
+       done
        set -A zle_highlight ${zle_highlight:#default:*}
        (( ${#zle_highlight} )) || unset zle_highlight
 
