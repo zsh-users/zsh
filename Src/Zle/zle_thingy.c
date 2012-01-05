@@ -353,6 +353,7 @@ bin_zle(char *name, char **args, Options ops, UNUSED(int func))
 	{ 'K', bin_zle_keymap, 1, 1 },
 	{ 'I', bin_zle_invalidate, 0, 0 },
 	{ 'F', bin_zle_fd, 0, 2 },
+	{ 'T', bin_zle_transform, 0, 2},
 	{ 0,   bin_zle_call, 0, -1 },
     };
     struct opn const *op, *opp;
@@ -851,6 +852,69 @@ bin_zle_fd(char *name, char **args, Options ops, UNUSED(char func))
 	    zwarnnam(name, "No handler installed for fd %d", fd);
 	    return 1;
 	}
+    }
+
+    return 0;
+}
+
+/**/
+static int
+bin_zle_transform(char *name, char **args, Options ops, UNUSED(char func))
+{
+    /*
+     * -1: too few arguments
+     * 0: just right
+     * 1: too many arguments
+     * 2: first argument not recognised
+     */
+    int badargs = 0;
+
+    if (OPT_ISSET(ops,'L')) {
+	if (args[0]) {
+	    if (args[1]) {
+		badargs = 1;
+	    } else if (strcmp(args[0], "tc")) {
+		badargs = 2;
+	    }
+	}
+	if (!badargs && tcout_func_name) {
+	    fputs("zle -T tc ", stdout);
+	    quotedzputs(tcout_func_name, stdout);
+	    putchar('\n');
+	}
+    } else if (OPT_ISSET(ops,'r')) {
+	if (!args[0]) {
+	    badargs = -1;
+	} else if (args[1]) {
+	    badargs = 1;
+	} else if (tcout_func_name) {
+	    zsfree(tcout_func_name);
+	    tcout_func_name = NULL;
+	}
+    } else {
+	if (!args[0] || !args[1]) {
+	    badargs = -1;
+	    /* we've already checked args <= 2 */
+	} else {
+	    if (!strcmp(args[0], "tc")) {
+		if (tcout_func_name) {
+		    zsfree(tcout_func_name);
+		}
+		tcout_func_name = ztrdup(args[1]);
+	    } else {
+		badargs = 2;
+	    }
+	}
+    }
+
+    if (badargs) {
+	if (badargs == 2) {
+	    zwarnnam(name, "-T: no such transformation '%s'", args[0]);
+	} else {
+	    char *way = (badargs > 0) ? "many" : "few";
+	    zwarnnam(name, "too %s arguments for option -T", way);
+	}
+	return 1;
     }
 
     return 0;

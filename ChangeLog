@@ -1,3 +1,13 @@
+2012-01-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30084: Doc/Zsh/zle.yo, Src/init.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_refresh.c, Src/Zle/zle_thingy.c: `zle -T tc func'
+	defines function to be used insted of termcap output for
+	testing.
+
+	* 30081: Completion/Base/Core/_main_complete: remove necessity
+	to have IGNORE_CLOSE_BRACES unset when loaded.
+
 2012-01-04  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 30079: Src/params.c: Restore `LC_ALL' when setting `LANG'.
@@ -15819,5 +15829,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5554 $
+* $Revision: 1.5555 $
 *****************************************************

@@ -233,6 +233,12 @@ int n_region_highlights;
 /**/
 int region_active;
 
+/*
+ * Name of function to use to output termcap values, if defined.
+ */
+/**/
+char *tcout_func_name;
+
 #ifdef HAVE_SELECT
 /* cost of last update */
 /**/
@@ -2271,11 +2277,78 @@ tc_downcurs(int ct)
     return ret;
 }
 
+/*
+ * Output a termcap value using a function defined by "zle -T tc".
+ * Loosely inspired by subst_string_by_func().
+ *
+ * cap is the internal index for the capability; it will be looked up
+ * in the table and the string passed to the function.
+ *
+ * arg is eithr an argument to the capability or -1 if there is none;
+ * if it is not -1 it will be passed as an additional argument to the
+ * function.
+ *
+ * outc is the output function; currently this is always putshout
+ * but in principle it may be used to output to a string.
+ */
+
+/**/
+static void
+tcout_via_func(int cap, int arg, int (*outc)(int))
+{
+    Shfunc tcout_func;
+    int osc, osm, old_incompfunc;
+
+    osc = sfcontext;
+    osm = stopmsg;
+    old_incompfunc = incompfunc;
+
+    sfcontext = SFC_SUBST;
+    incompfunc = 0;
+
+    if ((tcout_func = getshfunc(tcout_func_name))) {
+	LinkList l = newlinklist();
+	char buf[DIGBUFSIZE], *str;
+
+	addlinknode(l, tcout_func_name);
+	addlinknode(l, tccap_get_name(cap));
+
+	if (arg != -1) {
+	    sprintf(buf, "%d", arg);
+	    addlinknode(l, buf);
+	}
+
+	(void)doshfunc(tcout_func, l, 1);
+
+	str = getsparam("REPLY");
+	if (str) {
+	    while (*str) {
+		int chr;
+		if (*str == Meta) {
+		    chr = str[1] ^ 32;
+		    str += 2;
+		} else {
+		    chr = *str++;
+		}
+		(void)outc(chr);
+	    }
+	}
+    }
+
+    sfcontext = osc;
+    stopmsg = osm;
+    incompfunc = old_incompfunc;
+}
+
 /**/
 mod_export void
 tcout(int cap)
 {
-    tputs(tcstr[cap], 1, putshout);
+    if (tcout_func_name) {
+	tcout_via_func(cap, -1, putshout);
+    } else {
+	tputs(tcstr[cap], 1, putshout);
+    }
     SELECT_ADD_COST(tclen[cap]);
 }
 
@@ -2286,7 +2359,11 @@ tcoutarg(int cap, int arg)
     char *result;
 
     result = tgoto(tcstr[cap], arg, arg);
-    tputs(result, 1, putshout);
+    if (tcout_func_name) {
+	tcout_via_func(cap, arg, putshout);
+    } else {
+	tputs(result, 1, putshout);
+    }
     SELECT_ADD_COST(strlen(result));
 }
 

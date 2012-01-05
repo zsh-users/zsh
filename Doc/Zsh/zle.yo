@@ -370,6 +370,7 @@ xitem(tt(zle) tt(-U) var(string))
 xitem(tt(zle) tt(-K) var(keymap))
 xitem(tt(zle) tt(-F) [ tt(-L) ] [ var(fd) [ var(handler) ] ])
 xitem(tt(zle) tt(-I))
+xitem(tt(zle) tt(-T) [ tt(tc) var(function) | tt(-r) tt(tc) | tt(-L) ] )
 item(tt(zle) var(widget) tt([ -n) var(num) tt(]) tt([ -Nw ] [ -K) var(keymap) tt(]) var(args) ...)(
 The tt(zle) builtin performs a number of different actions concerning
 ZLE.
@@ -571,6 +572,33 @@ The returned status is zero if zle was invalidated, even though
 this may have been by a previous call to `tt(zle -I)' or by a system
 notification.  To test if a zle widget may be called at this point, execute
 tt(zle) with no arguments and examine the return status.
+)
+item(tt(-T))(
+This is used to add, list or remove internal transformations on the
+processing performed by the line editor.  It is typically used only for
+debugging or testing and is therefore of little interest to the general
+user.
+
+`tt(zle -T) var(transformation) var(func)' specifies that the
+given var(transformation) (see below) is effected by shell function
+var(func).
+
+`tt(zle -Tr) var(transformation)' removes the given var(transformation)
+if it was present (it is not an error if none was).
+
+`tt(zle -TL)' can be used to list all transformations currently in
+operation.
+
+Currently the only transformation is tt(tc).  This is used instead
+of outputting termcap codes to the terminal.  When the transformation is
+in operation the shell function is passed the termcap code that would be
+output as its first argument; if the operation required a numeric
+argument, that is passed as a second argument.  The function should set
+the shell variable tt(REPLY) to the transformed termcap code.  Typically
+this is used to produce some simply formatted version of the code and
+optional argument for debugging or testing.  Note that this
+transformation is not applied to other non-printing characters such as
+carriage returns and newlines.
 )
 item(var(widget) tt([ -n) var(num) tt(]) tt([ -Nw ] [ -K) var(keymap) tt(]) var(args) ...)(
 Invoke the specified widget.  This can only be done when ZLE is
