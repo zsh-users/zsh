@@ -354,6 +354,7 @@ cond_pcre_match(char **a, int id)
     unmetafy(rhre_plain, NULL);
     pcre_pat = NULL;
     ov = NULL;
+    ovsize = 0;
 
     if (isset(BASHREMATCH))
 	avar="BASH_REMATCH";
