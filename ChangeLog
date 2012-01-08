@@ -4,7 +4,7 @@
 	account of PATH_DIRS option in command completion.
 
 	* 30101: Doc/Zsh/options.yo, Src/hashtable.c, Src/options.c,
-	Src/zsh: add HASH_EXECUTABLES_ONLY option, off by default to
+	Src/zsh.h: add HASH_EXECUTABLES_ONLY option, off by default to
 	avoid problems with huge paths and remote directories.
 
 2012-01-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
@@ -15851,5 +15851,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5559 $
+* $Revision: 1.5560 $
 *****************************************************
