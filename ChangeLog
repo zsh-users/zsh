@@ -1,3 +1,12 @@
+2012-01-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/16711: Completion/Unix/Type/_path_commands: try to take
+	account of PATH_DIRS option in command completion.
+
+	* 30101: Doc/Zsh/options.yo, Src/hashtable.c, Src/options.c,
+	Src/zsh: add HASH_EXECUTABLES_ONLY option, off by default to
+	avoid problems with huge paths and remote directories.
+
 2012-01-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 30098: Jun T.: Src/params.c: more minimal alternative to
@@ -15842,5 +15851,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5558 $
+* $Revision: 1.5559 $
 *****************************************************

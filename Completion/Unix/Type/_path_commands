@@ -82,6 +82,18 @@ if [[ -n $need_desc ]]; then
 else
   _wanted commands expl 'external command' compadd "$@" -k commands && ret=0
 fi
+if [[ -o path_dirs ]]; then
+  local -a path_dirs
+  path_dirs=(${^path}/*(/N:t))
+  (( ${#path_dirs} )) &&
+  _wanted path-dirs expl 'directory in path' compadd "$@" -a path_dirs && ret=0
+
+  if [[ $PREFIX$SUFFIX = */* ]]; then
+    # Find command from path, not hashed
+    _wanted commands expl 'external command' _path_files -W path -g '*(*)' &&
+    ret=0
+  fi
+fi
 
 return $ret
 }
