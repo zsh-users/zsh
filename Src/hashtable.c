@@ -663,8 +663,9 @@ hashdir(char **dirp)
 		 * This is the same test as for the glob qualifier for
 		 * executable plain files.
 		 */
-		if (stat(pathbuf, &statbuf) == 0 &&
-		    S_ISREG(statbuf.st_mode) && (statbuf.st_mode & S_IXUGO))
+		if (unset(HASHEXECUTABLESONLY) ||
+		    (stat(pathbuf, &statbuf) == 0 &&
+		     S_ISREG(statbuf.st_mode) && (statbuf.st_mode & S_IXUGO)))
 		    add = 1;
 	    }
 	    if (add) {

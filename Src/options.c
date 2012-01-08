@@ -140,6 +140,7 @@ static struct optname optns[] = {
 {{NULL, "globsubst",	      OPT_EMULATE|OPT_NONZSH},	 GLOBSUBST},
 {{NULL, "hashcmds",	      OPT_ALL},			 HASHCMDS},
 {{NULL, "hashdirs",	      OPT_ALL},			 HASHDIRS},
+{{NULL, "hashexecutablesonly", 0},                       HASHEXECUTABLESONLY},
 {{NULL, "hashlistall",	      OPT_ALL},			 HASHLISTALL},
 {{NULL, "histallowclobber",   0},			 HISTALLOWCLOBBER},
 {{NULL, "histbeep",	      OPT_ALL},			 HISTBEEP},
