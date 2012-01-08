@@ -1,3 +1,8 @@
+2012-01-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30098: Jun T.: Src/params.c: more minimal alternative to
+	30079, don't set LANG if LC_ALL set.
+
 2012-01-06  Peter Stephenson  <pws@csr.com>
 
 	* Src/Modules/pcre.c (cond_pcre_match): unposted: fix (harmless)
@@ -15837,5 +15842,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5557 $
+* $Revision: 1.5558 $
 *****************************************************
