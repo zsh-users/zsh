@@ -29,7 +29,7 @@ else
     ;;
     (edit|files|goto|rename|log|float|delete|sink|mail|sync|show|pick|hide)
       _wanted -V "patches" expl "patch" \
-	compadd $(stg series --noprefix > /dev/null) \
+	compadd $(stg series --noprefix 2> /dev/null) \
 		&& ret=0
     ;;
     (*)

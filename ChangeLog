@@ -1,3 +1,8 @@
+2012-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Stepan Koltsov: 30105: Completion/Unix/Command/_stgit: fix
+	delete completion.
+
 2012-01-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/16711: Completion/Unix/Type/_path_commands: try to take
@@ -15851,5 +15856,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5560 $
+* $Revision: 1.5561 $
 *****************************************************
