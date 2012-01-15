@@ -1,0 +1,18 @@
+#compdef vcsh
+
+_arguments \
+	':subcommand:((
+		clone\:"clone from repo"
+		help\:"display help"
+		delete\:"delete repo"
+		enter\:"Enter repo; spawn new \$SHELL"
+		init\:"init & clone from repo"
+		list\:"list all repos"
+		list-tracked\:"list all files tracked by vcsh"
+		list-tracked-by\:"list files tracked by a repo"
+		rename\:"rename repo"
+		run\:"run command on repo"
+		setup\:"set up repo with recommended settings"
+		write-gitignore\:"write .gitignore.d/foo via git ls-files"
+		\<REPO\>\:"Run git command directly"
+	))'
