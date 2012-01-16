@@ -1,3 +1,7 @@
+2012-01-16  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 30111: Src/exec.c: Fix segfaults with exec options.
+
 2012-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Stepan Koltsov: 30105: Completion/Unix/Command/_stgit: fix
@@ -15856,5 +15860,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5561 $
+* $Revision: 1.5562 $
 *****************************************************
