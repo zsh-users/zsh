@@ -1,3 +1,8 @@
+2012-01-19  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 30114: Functions/VCS_Info/VCS_INFO_check_com: Remove a
+	superfluous stat().
+
 2012-01-16  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 30111: Src/exec.c: Fix segfaults with exec options.
@@ -15865,5 +15870,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5563 $
+* $Revision: 1.5564 $
 *****************************************************
