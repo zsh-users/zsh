@@ -1,0 +1,14 @@
+#compdef xclip
+
+_arguments \
+	'(-i -in -o -out)'{-i,-in}'[Read text into X selection]' \
+	'(-i -in -o -out)'{-o,-out}'[Print selection to standard out]' \
+	{-l,-loops}'[Number of selection requests to wait before exiting]:number:' \
+	{-d,-display}'[X display to connect to]:X11 display:' \
+	'(-)'{-h,-help}'[Usage information]' \
+	'(-selection)-selection[Selection to access]:selection:(primary secondary clipboard buffer-cut)' \
+	$'-noutf8[Use old Unicode, don\'t treat text as UTF-8]' \
+	'(-)-version[version information]' \
+	'(-quiet -verbose)-silent[Errors only, run in background]' \
+	$'(-silent -verbose)-quiet[Run in foreground, show what\'s happening]' \
+	'(-silent -quiet)-verbose[Running commentary]'
