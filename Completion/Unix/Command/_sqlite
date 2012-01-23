@@ -1,0 +1,50 @@
+#compdef sqlite sqlite3
+
+local ret opt display_opt sqlite3
+local -a options output_modes exclusive dashes
+
+[[ $service = sqlite3 ]] && sqlite3=true || unset sqlite3
+
+# sqlite options require a single hyphen, but
+# sqlite3 allows options with one or two
+dashes=( '' )
+(( $+sqlite3 )) && dashes+=( - )
+
+options=(
+  '(-init --init)'$^dashes'-init[startup file]:file containing SQLite commands:_files'
+  $^dashes'-echo[echo commands]'
+)
+
+exclusive=( {,-}-{no,}header )
+options+=(
+  "($exclusive)"$^dashes'-header[turn headers on]'
+  "($exclusive)"$^dashes'-noheader[turn headers off]'
+)
+
+output_modes=( column HTML line list )
+(( $+sqlite3 )) && output_modes+=( csv )
+exclusive=( $^dashes-${^output_modes:l} )
+for display_opt in $output_modes ; do
+  # finagle the description to match the way SQLite's -help formats them
+  opt=$display_opt:l
+  [[ $opt = $display_opt ]] && display_opt="'$display_opt'"
+  options+=( "($exclusive)"$^dashes"-${opt}[set output mode to $display_opt]" )
+done
+
+options+=(
+  $^dashes'-separator[set output field separator]:string to separate output fields:'
+  $^dashes'-nullvalue[set null value string]:string for NULL values:'
+  '(- :)'$^dashes'-version[show SQLite version]'
+  '(- :)'$^dashes'-help[show help]'
+  '1:SQLite database file:_files'
+  '(- :)2:SQL to run'
+)
+
+(( $+sqlite3 )) && options+=(
+  $^dashes'-bail[stop after hitting an error]'
+  '(-*batch -*interactive)'$^dashes'-batch[force batch I/O]'
+  '(-*batch -*interactive)'$^dashes'-interactive[force interactive I/O]'
+  $^dashes'-stats[print memory stats before each finalize]'
+)
+
+_arguments $options
