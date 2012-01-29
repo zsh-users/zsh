@@ -1,5 +1,8 @@
 2012-01-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	*  Richard Hartmann: 30140: Completion/X/Command/_mplayer:
+	whitespace fix.
+
 	* Felipe Contreras: 30131, 30132, 30133, 30134, 30135,
 	30136, 30137: Completion/bashcompinit: various improvements to
 	bash-like behaviour.
@@ -15886,5 +15889,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5567 $
+* $Revision: 1.5568 $
 *****************************************************
