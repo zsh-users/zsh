@@ -1,3 +1,9 @@
+2012-01-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Felipe Contreras: 30131, 30132, 30133, 30134, 30135,
+	30136, 30137: Completion/bashcompinit: various improvements to
+	bash-like behaviour.
+
 2012-01-23  Peter Stephenson  <pws@csr.com>
 
 	* Ben: 30118: Completion/Unix/Command/_sqlite,
@@ -15880,5 +15886,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5566 $
+* $Revision: 1.5567 $
 *****************************************************

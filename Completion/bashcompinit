@@ -8,7 +8,7 @@ _bash_complete() {
   local COMP_LINE="$words"
   local -A savejobstates savejobtexts
 
-  (( COMP_POINT = 1 + ${#${(j. .)words[1,CURRENT-1]}} + $#QIPREFIX + $#IPREFIX + $#PREFIX ))
+  (( COMP_POINT = 1 + ${#${(j. .)words[1,CURRENT]}} + $#QIPREFIX + $#IPREFIX + $#PREFIX ))
   (( COMP_CWORD = CURRENT - 1))
   COMP_WORDS=( $words )
   BASH_VERSINFO=( 2 05b 0 1 release )
@@ -18,15 +18,15 @@ _bash_complete() {
 
   [[ ${argv[${argv[(I)nospace]:-0}-1]} = -o ]] && suf=( -S '' )
 
-  matches=( ${(f)"$(compgen $@)"} )
+  matches=( ${(f)"$(compgen $@ -- ${words[CURRENT]})"} )
 
   if [[ -n $matches ]]; then
     if [[ ${argv[${argv[(I)filenames]:-0}-1]} = -o ]]; then
       compset -P '*/' && matches=( ${matches##*/} )
       compset -S '/*' && matches=( ${matches%%/*} )
-      compadd -f "${suf[@]}" -a matches && ret=0
+      compadd -Q -f "${suf[@]}" -a matches && ret=0
     else
-      compadd "${suf[@]}" -a matches && ret=0
+      compadd -Q "${suf[@]}" -a matches && ret=0
     fi
   fi
 
@@ -41,18 +41,12 @@ _bash_complete() {
   return ret
 }
 
-_compgen_opt_words() {
-  typeset -a words
-  words=( ${~=1} )
-  local find="$2"
-  results=(${(M)words[@]:#$find*})
-}
-
 compgen() {
   local opts prefix suffix job OPTARG OPTIND ret=1
   local -a name res results jids
   local -A shortopts
 
+  # words changes behavior: words[1] -> words[0]
   emulate -L sh
   setopt kshglob noshglob braceexpand nokshautoload
 
@@ -127,12 +121,13 @@ compgen() {
       ;;
       F)
         COMPREPLY=()
+        local -a args
+        args=( "${words[0]}" "${@[-1]}" "${words[CURRENT-2]}" )
         (){
-          set -- "${words[0]}" "${words[CURRENT-1]}" "${words[CURRENT-2]}"
           # There may be more things we need to add to this typeset to
           # protect bash functions from compsys special variable names
           typeset -h words
-          $OPTARG "$@"
+          $OPTARG "${args[@]}"
         }
 	results+=( "${COMPREPLY[@]}" )
       ;;
@@ -141,7 +136,7 @@ compgen() {
         results+=( ${~OPTARG} )
 	unsetopt nullglob
       ;;
-      W) _compgen_opt_words "$OPTARG" "${@[-1]}" ;;
+      W) results+=( ${(Q)~=OPTARG} ) ;;
       C) results+=( $(eval $OPTARG) ) ;;
       P) prefix="$OPTARG" ;;
       S) suffix="$OPTARG" ;;
@@ -157,10 +152,9 @@ compgen() {
   
   # support for the last, `word' option to compgen. Zsh's matching does a
   # better job but if you need to, comment this in and use compadd -U
-  #shift $(( OPTIND - 1 ))
-  #(( $# )) && results=( "${(M)results[@]:#$1*}" )
+  # (( $# >= OPTIND)) && results=( "${(M)results[@]:#${@[-1]}*}" )
 
-  print -l -- "$prefix${^results[@]}$suffix"
+  print -l -r -- "$prefix${^results[@]}$suffix"
 }
 
 complete() {
