@@ -1,5 +1,8 @@
 2012-01-31  Peter Stephenson  <pws@csr.com>
 
+	* seiler via Ismail: 30174: Completion/Unix/Command/_osc,
+	Completion/openSUSE/Command/_osc: update.
+
 	* Felipe: 30158: Test/.distfiles, Test/compgentest,
 	Test/Y04compgen.ztst: compgen test is not useful with current
 	bashcopmpinit.
@@ -15895,5 +15898,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5569 $
+* $Revision: 1.5570 $
 *****************************************************
