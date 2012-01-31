@@ -1,3 +1,9 @@
+2012-01-31  Peter Stephenson  <pws@csr.com>
+
+	* Felipe: 30158: Test/.distfiles, Test/compgentest,
+	Test/Y04compgen.ztst: compgen test is not useful with current
+	bashcopmpinit.
+
 2012-01-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	*  Richard Hartmann: 30140: Completion/X/Command/_mplayer:
@@ -15889,5 +15895,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5568 $
+* $Revision: 1.5569 $
 *****************************************************
