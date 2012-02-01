@@ -1,3 +1,8 @@
+2012-02-01  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* A.Costa: unposted: Doc/Zsh/grammar.yo, Etc/ChangeLog-3.1: Fix
+	typo to "definition".
+
 2012-01-31  Peter Stephenson  <pws@csr.com>
 
 	* seiler via Ismail: 30174: Completion/Unix/Command/_osc,
@@ -15898,5 +15903,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5570 $
+* $Revision: 1.5571 $
 *****************************************************

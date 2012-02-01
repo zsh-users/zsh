@@ -508,7 +508,7 @@ func+LPAR()RPAR() {
     echo Do something with $*
 })
 
-Because aliases are expanded in function defintions, this causes the
+Because aliases are expanded in function definitions, this causes the
 following command to be executed:
 
 example(noglob func+LPAR()RPAR() {
