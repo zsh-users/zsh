@@ -10,7 +10,7 @@ if [[ $OSTYPE = freebsd* ]]; then
     _wanted services expl service compadd "$@" - $alls[@] && ret=0
   fi
 elif chkconfig --list > /dev/null 2>&1; then
-  alls=( ${(f)"$(LANGUAGE=C LANG=C LC_ALL=C chkconfig --list)"} )
+  alls=( ${(f)"$(LANGUAGE=C LANG=C LC_ALL=C chkconfig --list 2> /dev/null)"} )
   inits=( ${${${alls[1,(r)xinetd based*]}[1,-2]}/%[[:space:]]*/} )
   xinetds=( ${${${${alls[(r)xinetd based*,-1]}[2,-1]}/#[[:space:]]#}/%:*} )
 

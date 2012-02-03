@@ -1,3 +1,8 @@
+2012-02-03  Peter Stephenson  <pws@csr.com>
+
+	* Mariusz Glebocki: 30179: Completion/Unix/Type/_services:
+	suppress stderr for service list.
+
 2012-02-01  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* A.Costa: unposted: Doc/Zsh/grammar.yo, Etc/ChangeLog-3.1: Fix
@@ -15903,5 +15908,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5571 $
+* $Revision: 1.5572 $
 *****************************************************
