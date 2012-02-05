@@ -1652,6 +1652,12 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
 	last = first;
 	first = tmp;
     }
+    if (first > last) {
+	zwarnnam("fc", "history events are in wrong order, aborted");
+	if (f != stdout)
+	    fclose(f);
+	return 1;
+    }
     /* suppress "no substitution" warning if no substitution is requested */
     if (!subs)
 	fclistdone = 1;

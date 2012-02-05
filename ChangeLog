@@ -1,3 +1,8 @@
+2012-02-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30127: Src/builtin.c: forbid executing history lines via fc in
+	the wrong order.
+
 2012-02-03  Peter Stephenson  <pws@csr.com>
 
 	* Mariusz Glebocki: 30179: Completion/Unix/Type/_services:
@@ -15908,5 +15913,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5572 $
+* $Revision: 1.5573 $
 *****************************************************
