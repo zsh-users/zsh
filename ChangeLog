@@ -1,3 +1,8 @@
+2012-02-07  Peter Stephenson  <pws@csr.com>
+
+	* Holger Macht via Ismail: 30185: Src/Zle/complete.mdd: add
+	missing openSUSE file locations.
+
 2012-02-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 30127: Src/builtin.c: forbid executing history lines via fc in
@@ -15913,5 +15918,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5573 $
+* $Revision: 1.5574 $
 *****************************************************
