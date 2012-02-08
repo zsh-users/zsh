@@ -1664,6 +1664,11 @@ chrealpath(char **junkptr)
 	    errno == ENAMETOOLONG || errno == ENOMEM)
 	    return 0;
 
+#ifdef HAVE_CANONICALIZE_FILE_NAME
+	if (!real)
+	    return 0;
+#endif
+
 	if (nonreal == *junkptr) {
 	    *real = '\0';
 	    break;
