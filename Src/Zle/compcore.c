@@ -2303,10 +2303,10 @@ addmatches(Cadata dat, char **argv)
 		strcpy(tmp + llpl + gfl + is, lsuf);
 
 		tokenize(tmp);
-		remnulargs(tmp);
 		if (haswilds(tmp)) {
 		    if (is)
 			tmp[llpl + gfl] = Star;
+		    remnulargs(tmp);
 		    if ((cp = patcompile(tmp, 0, NULL)))
 			haspattern = 1;
 		}
