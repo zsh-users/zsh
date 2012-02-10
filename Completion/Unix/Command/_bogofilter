@@ -29,16 +29,16 @@ _bogoutil() {
 	{-y,--timestamp-date=}'[date for when unknown]:date in YYYYMMDD format' \
 	'(--input-file -I)'{-I,--input-file=}'[input file]:input file:_files' \
 	{-x,--debug-flags=}'[debug flags]:debug flags:' \
-	"($_bogoutil_actions)"{-d,--dump=}'[print contents of db]:database file:_files -g "*.db"' \
+	"($_bogoutil_actions)"{-d,--dump=}'[print contents of db]:database file:_files -g "*.db(-.)"' \
   	"($_bogoutil_actions)"{-l,--load=}'[load file into db]:textfile:_files' \
-	"($_bogoutil_actions)"{-u,--upgrade=}'[upgrade wordlist version]:database file:_files -g "*.db"' \
+	"($_bogoutil_actions)"{-u,--upgrade=}'[upgrade wordlist version]:database file:_files -g "*.db(-.)"' \
 	"($_bogoutil_actions)"'-m[perform maintenance functions]:file:_files' \
   	"($_bogoutil_actions)"'-w[display token information]:database file or directory:_files' \
   	"($_bogoutil_actions)"'-p[display token probability information]:database file or directory:_files' \
 	"($_bogoutil_actions)"'-H[print histogram]:database file or directory:_files' \
 	"($_bogoutil_actions)"'-r[recalculate ROBX]:database:_files -/' \
 	"($_bogoutil_actions)"'-R[recalculate and save ROBX]:database:_files -/' \
-	"($_bogoutil_actions)"{-k,--db-cachesize=}'[set Berkeley DB cache size]:size in MB:' \
+	"($_bogoutil_actions)"{-k,--db-cachesize=}'[set Berkeley DB cache size]:size in MB' \
 	"($_bogoutil_actions)"'--db-verify[verify database]:database:_files -/' \
 	"($_bogoutil_actions)"'--db-recover[run regular recovery]:database:_files -/' \
 	"($_bogoutil_actions)"'--db-recover-harder[run catastrophic recovery]:database:_files -/' \

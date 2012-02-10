@@ -50,18 +50,18 @@ case $service in
       "--max_initiate+[specify peers needed before stopping initiating new connections]:peers:"\
       "--report_hash_failures+[report hash failures to user]:enable:(0 1)"\
       "--rarest_first_priority_cutoff+[specify peers which need to have a piece before other partials take priority over rarest first]:peers:"\
-      ':torrent file:_files -g "*.torrent"' \
+      ':torrent file:_files -g "*.torrent(-.)"' \
       && return 0
   ;;
 
 # Next up are the torrent file manipulation programs.
 
   btshowmetainfo)
-   _files -g "*.torrent" && return 0
+   _files -g "*.torrent(-.)" && return 0
    ;;
 
   btrename)
-   _files -g '*.torrent' && return 0
+   _files -g '*.torrent(-.)' && return 0
   ;;
 
   btmakemetafile)
@@ -74,7 +74,7 @@ case $service in
   ;;
 
   btreannounce)
-   _files -g '*.torrent' && return 0
+   _files -g '*.torrent(-.)' && return 0
   ;;
 
 # Lastly the tracker.

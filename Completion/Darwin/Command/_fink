@@ -157,7 +157,7 @@ _fink(){
     #configure)
     #selfupdate)
     validate|check)
-      _wanted files expl 'finkinfo file' _files -g \*.info ;;
+      _wanted files expl 'finkinfo file' _files -g "*.info(-.)" ;;
     #scanpackages)
     #checksums)
     #cleanup)

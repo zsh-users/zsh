@@ -91,7 +91,7 @@ common_args=(
 declare -ga common_toc_args
 common_toc_args=(
   $common_args
-  ':TOC file:_files -g "*.toc"')
+  ':TOC file:_files -g "*.toc(-.)"')
 
 declare -ga common_device_args
 common_device_args=(

@@ -24,7 +24,7 @@ case "$state" in
       if (( $+opt_args[-a] )); then
           _deb_packages avail
       else
-          _files -g '*.deb'
+          _files -g '*.deb(-.)'
       fi
     ;;
 esac

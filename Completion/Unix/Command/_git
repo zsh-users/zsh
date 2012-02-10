@@ -3636,7 +3636,7 @@ _git-index-pack () {
     '--stdin[read pack from stdin and instead write to specified file]' \
     $stdin_opts \
     '--strict[die if the pack contains broken objects or links]' \
-    ':pack file:_files -g "*.pack"'
+    ':pack file:_files -g "*.pack(-.)"'
 }
 
 (( $+functions[_git-merge-file] )) ||
@@ -4075,7 +4075,7 @@ _git-pack-redundant () {
     '(:)--all[process all packs]' \
     '--alt-odb[do not require objects to be present in local packs]' \
     '--verbose[output some statistics to standard error]' \
-    '(--all)*::packs:_files -g "*.pack"'
+    '(--all)*::packs:_files -g "*.pack(-.)"'
 }
 
 (( $+functions[_git-rev-list] )) ||

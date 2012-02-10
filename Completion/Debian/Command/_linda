@@ -23,4 +23,4 @@ _arguments \
   '(-U --unpack)'{-U,--unpack}':unpack level:' \
   '(-v --verbose)'{-v,--verbose}'[verbose]' \
   '(-V --version)'{-V,--version}'[version]' \
-  ':package:_files -g "*.(changes|u#deb|dsc)"'
+  ':package:_files -g "*.(changes|u#deb|dsc)(-.)"'

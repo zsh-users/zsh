@@ -59,4 +59,4 @@ _arguments -s -C -M 'r:|[_-]=* r:|=*' \
   '--to=dom[XML dom based input representation, experimental]' \
   '--convert=footnotes[embedded footnotes]' \
   '--to=current[current markup]' \
-  '*:SiSU files:_files -g "*.(sst|ssm)(.)"'
+  '*:SiSU files:_files -g "*.(sst|ssm)(-.)"'

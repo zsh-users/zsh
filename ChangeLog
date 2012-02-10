@@ -1,5 +1,24 @@
 2012-02-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 30199: Completion/Debian/Command/_pbuilder,
+	Completion/Darwin/Command/_defaults, Completion/Darwin/Command/_fink,
+	Completion/Darwin/Command/_hdiutil, Completion/Debian/Command/_dak,
+	Completion/Debian/Command/_debdiff, Completion/Debian/Command/_dpkg,
+	Completion/Debian/Command/_linda, Completion/Debian/Command/_lintian,
+	Completion/Debian/Command/_piuparts,
+	Completion/Linux/Command/_modutils,
+	Completion/Mandriva/Command/_urpmi,
+	Completion/Unix/Command/_bittorrent,
+	Completion/Unix/Command/_bogofilter, Completion/Unix/Command/_cdrdao,
+	Completion/Unix/Command/_cplay, Completion/Unix/Command/_git,
+	Completion/Unix/Command/_hg, Completion/Unix/Command/_ldd,
+	Completion/Unix/Command/_metaflac, Completion/Unix/Command/_pax,
+	Completion/Unix/Command/_rubber, Completion/Unix/Command/_sisu,
+	Completion/Unix/Command/_texinfo, Completion/Unix/Command/_vim,
+	Completion/Unix/Command/_vorbiscomment,
+	Completion/Unix/Command/_xmms2:
+	add (-.) to many completion _files globs
+
 	* 30197: Completion/Unix/Command/_subversion: complete changelists
 
 	* 30177: Completion/X/Command/_xterm,
@@ -15935,5 +15954,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5579 $
+* $Revision: 1.5580 $
 *****************************************************

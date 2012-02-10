@@ -157,7 +157,7 @@ case $state in
     _tags $tags
     while _tags; do
 	if _requested files expl 'info file'; then
-	    _files "$expl[@]" $infopath -g '*.info' && ret=0
+	    _files "$expl[@]" $infopath -g '*.info(-.)' && ret=0
 	fi
 	if _requested items; then
 	    items=(${${(M)${${(f)"$(${info} --output - ${words[1,CURRENT-1]} 2>/dev/null)"}[1,(r)[[:space:]]#--- The Detailed Node Listing ---[[:space:]]#]}:#\* *~\* Menu:*}:/(#b)\*[[:space:]]##([^:]##):(#B)( \(?##\)[^.]#.|(:|))[[:space:]]#(#b)(*)[[:space:]]#/$match[1]${match[2]:+:}$match[2]})

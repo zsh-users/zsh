@@ -420,8 +420,8 @@ _hg_cmd_backout() {
     '--parent[parent to choose when backing out merge]' \
     '(--user -u)'{-u+,--user}'[record user as commiter]:user:' \
     '(--rev -r)'{-r+,--rev}'[revision]:revision:_hg_tags' \
-    '(--message -m)'{-m+,--message}'[use <text> as commit message]:text:' \
-    '(--logfile -l)'{-l+,--logfile}'[read commit message from <file>]:log file:_files -g \*.txt'
+    '(--message -m)'{-m+,--message}'[specify commit message]:text' \
+    '(--logfile -l)'{-l+,--logfile}'[read commit message from specified file]:log file:_files'
 }
 
 _hg_cmd_bisect() {
@@ -472,8 +472,8 @@ _hg_cmd_clone() {
 _hg_cmd_commit() {
   _arguments -s -w : $_hg_global_opts $_hg_pat_opts \
   '(--addremove -A)'{-A,--addremove}'[mark new/missing files as added/removed before committing]' \
-  '(--message -m)'{-m+,--message}'[use <text> as commit message]:text:' \
-  '(--logfile -l)'{-l+,--logfile}'[read commit message from <file>]:log file:_files -g \*.txt' \
+  '(--message -m)'{-m+,--message}'[specify commit message]:text' \
+  '(--logfile -l)'{-l+,--logfile}'[read commit message from specified file]:log file:_files' \
   '(--date -d)'{-d+,--date}'[record datecode as commit date]:date code:' \
   '(--user -u)'{-u+,--user}'[record user as commiter]:user:' \
   '*:file:_hg_files'

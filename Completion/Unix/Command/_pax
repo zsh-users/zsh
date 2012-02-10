@@ -19,7 +19,7 @@ _arguments -s \
   123b 124b 125b 126b)' \
   '-c[match all but specified]' \
   '-d[match only directory but not contents]' \
-  '-f:archive:_files -g "*.(tar|cpio)"' \
+  '-f:archive:_files -g "*.(tar|cpio)(-.)"' \
   '-i[interactively rename files]' \
   '-j[filter archive through bzip2]' \
   '-k[do not overwrite existing files]' \

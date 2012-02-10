@@ -303,7 +303,7 @@ _urpmi() {
 	"($help --all --interactive  --name)--summary[print tag summary: summary]" \
 	"($help)--uniq[do not print identical lines]" \
 	"($help --all --interactive  --name)--url[print tag url: url]" \
-	"*:hdlist files:_files -g '*.cz'" \
+	"*:hdlist files:_files -g '*.cz(-.)'" \
       && ret=0
     ;;
   esac

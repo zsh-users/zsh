@@ -46,7 +46,7 @@ arguments=(
   '-D[debugging mode]'
   '-n[no swap file (memory only)]'
   '-nb[start as NetBean server]'
-  {-r,-L}'[list swap files and exit or recover from a swap file]::swap file:_vim_files -g \*.sw\?'
+  {-r,-L}'[list swap files and exit or recover from a swap file]::swap file:_vim_files -g "*.sw?(-.)"'
   '(   -H -F)-A[start in Arabic mode]'
   '(-A    -F)-H[start in Hebrew mode]'
   '(-A -H   )-F[start in Farsi mode]'

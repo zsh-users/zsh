@@ -50,7 +50,7 @@ _metaflac_opers=(
 )
 
 _arguments "$_metaflac_opts[@]" \
-    "*:FLAC file:_files -g \*.flac" \
+    "*:FLAC file:_files -g \*.flac\(-.\)" \
     - "shortcuts" \
     "$_metaflac_shorts[@]" \
     - "(operations)" \

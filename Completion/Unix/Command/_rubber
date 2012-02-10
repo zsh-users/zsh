@@ -43,7 +43,7 @@ case "$service" in
       {-f,--force}'[force at least one compilation]' \
       '--inplace[compile the documents from their source directory]' \
       \*{-W,--warn}'=[report warnings of the given TYPE]:warnings:(all boxes misc refs)' \
-      '*:LaTeX files:_files -g \*.\(tex\|dtx\|lhs\|w\)'
+      '*:LaTeX files:_files -g "*.(tex|dtx|lhs|w)(-.)"'
       return 0
 	;;
 	
@@ -64,7 +64,7 @@ case "$service" in
       '--errors[show all errors that occured during compilation]' \
       '--refs[show the list of undefined references]' \
       '--warnings[show all LaTeX warnings]' \
-      ':LaTeX file:_files -g \*.\(tex\|dtx\|lhs\|w\)'
+      ':LaTeX file:_files -g "*.(tex|dtx|lhs|w)(-.)"'
       return 0
   ;;
 esac

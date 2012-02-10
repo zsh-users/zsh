@@ -17,6 +17,6 @@ _arguments \
   '(-h --help)'{-h,--help}'[show help]' \
   '(-v --version)'{-v,--version}'[show version]' \
   '(-q --quiet)'{-q,--quiet}'[be quiet if no differences]' \
-  '--from:debs:_files -g "*.deb"' \
-  '--to:debs:_files -g "*.deb"' \
-  '*:file to compare:_files -g "*.(deb|changes|dsc)"'
+  '--from:debs:_files -g "*.deb(-.)"' \
+  '--to:debs:_files -g "*.deb(-.)"' \
+  '*:file to compare:_files -g "*.(deb|changes|dsc)(-.)"'

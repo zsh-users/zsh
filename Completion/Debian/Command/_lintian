@@ -38,7 +38,7 @@ case "$service" in
       '(-s --source)'{-s,--source}'[the following packages are source]' \
       '--udeb[the following packages are udebs]' \
       '(-p --packages-file)'{-p,--packages-file}'[process packages listed in file]:list:_files' \
-      '*:package:_files -g "*.(changes|deb|dsc)"' && return 0
+      '*:package:_files -g "*.(changes|deb|dsc)(-.)"' && return 0
       ;;
 
    (lintian-info)

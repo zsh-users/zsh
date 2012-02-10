@@ -9,7 +9,7 @@ if (( CURRENT == 2 )); then
 else
   compset -n 1
   _arguments \
-    '--basetgz:location:_files -g "*.tgz"' \
+    '--basetgz:location:_files -g "*.tgz(-.)"' \
     '--buildplace:location:_files -/' \
     '--buildresult:location:_files -/' \
     '--mirror:URL:_urls' \
@@ -28,5 +28,5 @@ else
     '--save-after-login' \
     '--save-after-exec' \
     '--autocleanaptcache' \
-    '*:source package:_files -g "*.dsc"'
+    '*:source package:_files -g "*.dsc(-.)"'
 fi

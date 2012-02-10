@@ -79,7 +79,7 @@ _hdiutil(){
 
   local -A _common_usage_options
   _common_usage_options=(
-    -shadow "-shadow:shadow file:_files -g \*.shadow"
+    -shadow "-shadow:shadow file:_files -g '*.shadow(-.)'"
     -encryption "-encryption:encryption method:(CEncryptedEncoding)"
     -stdinpass "-stdinpass[specify password from standard input]"
     -certificate "-certificate[secondary access certificate]:certificate file:_files"
@@ -89,7 +89,7 @@ _hdiutil(){
     -tgtimagekey "*-tgtimagekey[target image key]: :->keyvalue"
     -insecurehttp "-insecurehttp[ignore SSL host validation failure]"
     -plist "-plist[display output in plist format]"
-    -recover "-recover[keychain to unlock]:keychain file:_files -g \*.keychain"
+    -recover "-recover[keychain to unlock]:keychain file:_files -g '*.keychain(-.)'"
   )
 
   local -a _1st_arguments
@@ -178,7 +178,7 @@ _hdiutil(){
         "(-autoopenro)-noautoopenro" \
         "(-noautoopenrw)-autoopenrw[auto-open read/write volumes]" \
         "(-autoopenrw)-noautoopenrw" \
-        "1:disk image to attach:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)" \
+        "1:disk image to attach:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)\(-.\)" \
         && return 0
       ;;
     detach|eject)
@@ -195,7 +195,7 @@ _hdiutil(){
         "$_common_usage_options[-imagekey]" \
         "$_common_usage_options[-srcimagekey]" \
         "$_common_usage_options[-plist]" \
-        "1:disk image to verify:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)" \
+        "1:disk image to verify:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)\(-.\)" \
         && return 0
       ;;
     create)
@@ -265,7 +265,7 @@ _hdiutil(){
         "-ov[overwrite an existing file]" \
         "-format:format:_hdiutil_imageformat" \
         "-o:target disk image:_files" \
-        "1:source disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)" \
+        "1:source disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)\(-.\)" \
         && return 0
 
       if [[ $state = keyvalue ]]; then
@@ -302,7 +302,7 @@ _hdiutil(){
         "-erase[erase the media]" \
         "-fullerase[erase all sectors of the disc]" \
         "-list[list all burning devices with paths suitable for -device]" \
-        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)" \
+        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)\(-.\)" \
         && return 0
       ;;
     makehybrid)
@@ -343,7 +343,7 @@ _hdiutil(){
         "(-nokernel)-nokernel[attach with a helper process]" \
         "(-kernel)-kernel[attach without a helper process]" \
         "-o:target disk image:_files" \
-        "1:source disk image or directory:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)" \
+        "1:source disk image or directory:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)\(-.\)" \
         && return 0
       ;;
     compact)
@@ -356,7 +356,7 @@ _hdiutil(){
         "$_common_usage_options[-insecurehttp]" \
         "$_common_usage_options[-cacert]" \
         "$_common_usage_options[-plist]" \
-        "1:sparse image:_files -g \*.sparseimage" && return 0
+        "1:sparse image:_files -g '*.sparseimage(-.)'" && return 0
       ;;
     info)
       _arguments "$_common_options[@]" \
@@ -376,7 +376,7 @@ _hdiutil(){
         "$_common_usage_options[-cacert]" \
         "$_common_usage_options[-plist]" \
         "-type:image type:(UDIF-CRC32 UDIF-MD5 DC42 CRC28 CRC32 MD5)" \
-        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)" \
+        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)\(-.\)" \
         && return 0
       ;;
     chpass)
@@ -386,7 +386,7 @@ _hdiutil(){
         "$_common_usage_options[-srcimagekey]" \
         "-oldstdinpass[specify old password from standard input]" \
         "-newstdinpass[specify new password from standard input]" \
-        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)" \
+        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)\(-.\)" \
         && return 0
       ;;
     unflatten)
@@ -395,7 +395,7 @@ _hdiutil(){
         "$_common_usage_options[-encryption]" \
         "$_common_usage_options[-stdinpass]" \
         "$_common_usage_options[-srcimagekey]" \
-        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)" \
+        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)\(-.\)" \
         && return 0
       ;;
     flatten)
@@ -408,7 +408,7 @@ _hdiutil(){
         "(-noxml)-xml" \
         "(-rsrcfork)-norsrcfork[don\'t embed resource fork data]" \
         "(-norsrcfork)-rsrcfork" \
-        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)" \
+        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)\(-.\)" \
         && return 0
       ;;
     hfsanalyze)
@@ -420,7 +420,7 @@ _hdiutil(){
         "$_common_usage_options[-shadow]" \
         "$_common_usage_options[-insecurehttp]" \
         "$_common_usage_options[-cacert]" \
-        "1:disk image or device:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)" \
+        "1:disk image or device:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)\(-.\)" \
         && return 0
       ;;
     mountvol)
@@ -447,7 +447,7 @@ _hdiutil(){
         "$_common_usage_options[-plist]" \
         "-format[just print out the image format]" \
         "-checksum[just print out the image checksum]" \
-        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)" \
+        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)\(-.\)" \
         && return 0
       ;;
     plugins)
@@ -462,7 +462,7 @@ _hdiutil(){
         "$_common_usage_options[-srcimagekey]" \
         "$_common_usage_options[-plist]" \
         "(-yes -no -query)"{-yes,-no,-query} \
-        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)" \
+        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)\(-.\)" \
         && return 0
       ;;
 
@@ -485,7 +485,7 @@ _hdiutil(){
         "-shrinkonly[only allow the image to shrink]" \
         "-nofinalgap[allow elimination of trailing free partition]" \
         "-limits[displays min/current/max size]" \
-        "1:disk image:_files -g \*.dmg\(\|.bin\)" \
+        "1:disk image:_files -g \*.dmg\(\|.bin\)\(-.\)" \
         && return 0
       ;;
     segment)
@@ -501,7 +501,7 @@ _hdiutil(){
         "-firstSegmentSize[first segment size]: :_hdiutil_imagesize" \
         "-restricted[make restricted segments]" \
         "-o[first segment name]:name" \
-        "1:source disk image:_files -g \*.dmg\(\|.bin\)" \
+        "1:source disk image:_files -g \*.dmg\(\|.bin\)\(-.\)" \
         && return 0
       ;;
     pmap)
@@ -514,7 +514,7 @@ _hdiutil(){
         "$_common_usage_options[-insecurehttp]" \
         "$_common_usage_options[-cacert]" \
         "-options[just print out the image checksum]: :->option" \
-        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)" \
+        "1:disk image:_files -g \*.\(dmg\|sparseimage\)\(\|.bin\)\(-.\)" \
         && return 0
 
       case "$state" in

@@ -137,7 +137,7 @@ case $cmd in
 (clean-proposed-updates)
     args+=(
    '(-v --verbose)'{-v,--verbose}'[be more verbose about what is being done]'
-   '*:changes or admin file:_files -g "*.(changes|joey)"'
+   '*:changes or admin file:_files -g "*.(changes|joey)(-.)"'
     )
     ;;
 
@@ -151,7 +151,7 @@ case $cmd in
     args+=(
    '(-q --quiet)'{-q,--quiet}'[be quieter about what is being done]'
    '(-v --verbose)'{-v,--verbose}'[be more verbose about what is being done]'
-   '*:changes or deb or admin file:_files -g "*.(changes|deb|joey)"'
+   '*:changes or deb or admin file:_files -g "*.(changes|deb|joey)(-.)"'
     )
     ;;
 
@@ -186,7 +186,7 @@ case $cmd in
 
 (decode-dot-dak)
     args+=(
-    '*:dot-dak file:_files -g "*.dak"'
+    '*:dot-dak file:_files -g "*.dak(-.)"'
     )
     ;;
 
@@ -222,7 +222,7 @@ case $cmd in
     args+=(
   '(-m --message)'{-m,--message=}'[use this message for rejection]:message:'
   '(-s --no-mail)'{-s,--no-mail}'[do not send any mail]'
-  '*:changes file:_files -g "*.changes"'
+  '*:changes file:_files -g "*.changes(-.)"'
     )
     ;;
 

@@ -13,6 +13,6 @@ _arguments \
     '(-l)-w[overwrite comments]' \
     '(-l -c)-t[tag and value]:: ' \
     '(-l -t)-c[tag file]::_files' \
-    '1:OGG file:_files -g \*.ogg' \
-    '(-l)2:output OGG file:_files -g \*.ogg' \
+    '1:OGG file:_files -g "*.ogg(-.)"' \
+    '(-l)2:output OGG file:_files -g "*.ogg(-.)"' \
     && return 0

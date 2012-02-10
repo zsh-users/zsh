@@ -198,7 +198,7 @@ _xmms2_radd() {
 _xmms2_addpls() {
   local expl
   _description files expl 'playlist'
-  _files "$expl[@]" -g '*.([mM]3[uU]|[pP][lL][sS])'
+  _files "$expl[@]" -g '*.([mM]3[uU]|[pP][lL][sS])(-.)'
 }
 
 _xmms2() {

@@ -9,7 +9,7 @@ _defaults_domains(){
     _wanted domains expl 'defaults database domain' \
 	compadd -M 'r:|.=* r:|=*' -a list
   else
-    _files -g '*.plist(e:"reply=\${REPLY%.plist}":)'
+    _files -g '*.plist(-.:r)'
   fi
 }
 
