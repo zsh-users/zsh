@@ -18,7 +18,7 @@ _svn () {
 
   if [[ -n $state ]] && (( ! $+_svn_cmds )); then
     typeset -gHA _svn_cmds
-    if _cache_invalid svn-cmds || ! _retrieve_cache svn-cmds; then 
+    if _cache_invalid svn-cmds || ! _retrieve_cache svn-cmds; then
       _svn_cmds=(
 	${=${(f)${${"$(LC_ALL=C _call_program commands svn help)"#l#*Available subcommands:}%%Subversion is a tool*}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
       )
@@ -31,7 +31,7 @@ _svn () {
       _wanted commands expl 'svn command' _svn_commands && ret=0
     ;;
     args)
-      local cmd args usage
+      local cmd args usage idx
       typeset -gHA _cache_svn_status _cache_svn_mtime
 
       cmd="${${(k)_svn_cmds[(R)*:$words[1]:*]}:-${(k)_svn_cmds[(i):$words[1]:]}}"
@@ -50,6 +50,9 @@ _svn () {
 	  args=(
 	    ${=${${${(M)${(f)"$(LC_ALL=C _call_program options svn help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)(-##)([[:alpha:]]##) \[--([a-z-]##)\](:arg:)#/(--$match[3])$match[1]$match[2]$match[4] ($match[1]$match[2])--$match[3]$match[4]}
 	  )
+          while (( idx=$args[(I)*--c(l|hangelist):arg:] )); do
+            args[(I)*--c(l|hangelist):arg:]=( \*{--cl,--changelist}':change list:_svn_changelists' )
+          done
 	  _store_cache svn-${cmd}-args args
 	fi
 
@@ -91,6 +94,9 @@ _svn () {
               '1: : _alternative "files:file:_files -g \*\(e:_svn_controlled:\)" "urls:URL:_svn_urls"'
 	      '*:file:_files -g "*(e:_svn_controlled:)"'
             )
+          ;;
+          (mergeinfo)
+            args[(r)--show-revs:arg:]=( '--show-revs:revisions:(merged eligible)' )
           ;;
 	  (propget|propedit)
 	    args+=(
@@ -281,7 +287,7 @@ _svn_urls() {
   if [[ ! -prefix *://? ]] ; then
     zstyle -a ":completion:${curcontext}:" url-schemas urlsch \
      || urlsch=( file:// http:// https:// svn:// svn+ssh:// )
-    
+
     if (( $#urlsch )) ; then
       compset -S '[^:]*'
       _wanted url-schemas expl 'URL schema' compadd -S '' - $urlsch[@] && ret=0
@@ -307,6 +313,14 @@ _svn_props() {
 
   properties=( ${${(M)${(f)"$(svn proplist 2>/dev/null)"}:#  [^ ]*}#  } )
   compadd "$@" -a properties && return 0
+}
+
+(( $+functions[_svn_changelists] )) ||
+_svn_changelists() {
+  local cls
+
+  cls=( ${${${(M)${(f)"$(LC_ALL=C _call_program changelists svn status 2>/dev/null)"}:#--- Changelist*}%??}##*\'} )
+  compadd "$@" -a cls && return 0
 }
 
 _subversion () {
