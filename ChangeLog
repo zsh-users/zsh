@@ -1,3 +1,8 @@
+2012-02-10  Oliver Kiddle  <opk@zsh.org>
+
+	* 30177: Completion/X/Command/_xterm,
+	Completion/X/Type/_xft_fonts: completion for fontconfig fonts
+
 2012-02-09  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 30193: ChangeLog Src/Zle/compcore.c: remnulargs() after poking
@@ -15928,5 +15933,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5577 $
+* $Revision: 1.5578 $
 *****************************************************
