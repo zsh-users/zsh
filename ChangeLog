@@ -1,3 +1,8 @@
+2012-02-11  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 30206: Completion/Unix/Command/_ldd: Fix ldd completion broken by
+	previous commit.
+
 2012-02-10  Oliver Kiddle  <opk@zsh.org>
 
 	* 30199: Completion/Debian/Command/_pbuilder,
@@ -15954,5 +15959,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5580 $
+* $Revision: 1.5581 $
 *****************************************************

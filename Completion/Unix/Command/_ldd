@@ -28,5 +28,5 @@ fi
 
 _arguments $args \
   '*: : _alternative
-    "executables:executable:_files -g \^\*.so\(\-*\)"
+    "executables:executable:_files -g \^\*.so\(\-\*\)"
       "shared-objects:shared object:_files -g \*.so\(-.\)"'
