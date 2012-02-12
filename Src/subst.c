@@ -44,7 +44,7 @@ char nulstring[] = {Nularg, '\0'};
  *  - Brace expansion
  *  - Tilde and equals substitution
  *
- * PF_* flags are defined in zsh.h
+ * PREFORK_* flags are defined in zsh.h
  */
 
 /**/
@@ -52,7 +52,7 @@ mod_export void
 prefork(LinkList list, int flags)
 {
     LinkNode node, stop = 0;
-    int keep = 0, asssub = (flags & PF_TYPESET) && isset(KSHTYPESET);
+    int keep = 0, asssub = (flags & PREFORK_TYPESET) && isset(KSHTYPESET);
 
     queue_signals();
     for (node = firstnode(list); node; incnode(node)) {
@@ -67,14 +67,18 @@ prefork(LinkList list, int flags)
 	     * templates...
 	     */
 	    char *cptr = (char *)getdata(node);
-	    filesub(&cptr, flags & (PF_TYPESET|PF_ASSIGN));
+	    filesub(&cptr, flags & (PREFORK_TYPESET|PREFORK_ASSIGN));
 	    /*
 	     * The assignment is so simple it's not worth
 	     * testing if cptr changed...
 	     */
 	    setdata(node, cptr);
 	}
-	if (!(node = stringsubst(list, node, flags & PF_SINGLE, asssub))) {
+	if (!(node = stringsubst(list, node,
+				 flags & (PREFORK_SINGLE|PREFORK_SPLIT|
+					  PREFORK_SHWORDSPLIT|
+					  PREFORK_NOSHWORDSPLIT),
+				 asssub))) {
 	    unqueue_signals();
 	    return;
 	}
@@ -84,7 +88,7 @@ prefork(LinkList list, int flags)
 	    keep = 0;
 	if (*(char *)getdata(node)) {
 	    remnulargs(getdata(node));
-	    if (unset(IGNOREBRACES) && !(flags & PF_SINGLE)) {
+	    if (unset(IGNOREBRACES) && !(flags & PREFORK_SINGLE)) {
 		if (!keep)
 		    stop = nextnode(node);
 		while (hasbraces(getdata(node))) {
@@ -94,10 +98,10 @@ prefork(LinkList list, int flags)
 	    }
 	    if (unset(SHFILEEXPANSION)) {
 		char *cptr = (char *)getdata(node);
-		filesub(&cptr, flags & (PF_TYPESET|PF_ASSIGN));
+		filesub(&cptr, flags & (PREFORK_TYPESET|PREFORK_ASSIGN));
 		setdata(node, cptr);
 	    }
-	} else if (!(flags & PF_SINGLE) && !keep)
+	} else if (!(flags & PREFORK_SINGLE) && !keep)
 	    uremnode(list, node);
 	if (errflag) {
 	    unqueue_signals();
@@ -145,7 +149,7 @@ stringsubstquote(char *strstart, char **pstrdpos)
 
 /**/
 static LinkNode
-stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
+stringsubst(LinkList list, LinkNode node, int pf_flags, int asssub)
 {
     int qt;
     char *str3 = (char *)getdata(node);
@@ -213,7 +217,25 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 		setdata(node, (void *) str3);
 		continue;
 	    } else {
-		node = paramsubst(list, node, &str, qt, ssub);
+		/*
+		 * To avoid setting and unsetting the SHWORDSPLIT
+		 * option, we pass flags if we need to control it for
+		 * recursive expansion via multsub()
+		 * If PREFORK_NOSHWORDSPLIT is set, the option is
+		 * disregarded; otherwise, use it if set.
+		 * If PREFORK_SPLIT is set, splitting is forced,
+		 * regardless of the option
+		 * If PREFORK_SHWORDSPLIT is already set, or used by the
+		 * previous two to signal paramsubst(), we'll do
+		 * sh-style wordsplitting on parameters.
+		 */
+		if ((isset(SHWORDSPLIT) &&
+		     !(pf_flags & PREFORK_NOSHWORDSPLIT)) ||
+		    (pf_flags & PREFORK_SPLIT))
+		    pf_flags |= PREFORK_SHWORDSPLIT;
+		node = paramsubst(
+		    list, node, &str, qt,
+		    pf_flags & (PREFORK_SINGLE|PREFORK_SHWORDSPLIT));
 		if (errflag || !node)
 		    return NULL;
 		str3 = (char *)getdata(node);
@@ -268,7 +290,8 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 		       (qt && str[1] == '"'))))
 		    *str = ztokens[c - Pound];
 	    str++;
-	    if (!(pl = getoutput(str2 + 1, qt || ssub))) {
+	    if (!(pl = getoutput(str2 + 1, qt ||
+				 (pf_flags & PREFORK_SINGLE)))) {
 		zerr("parse error in command substitution");
 		return NULL;
 	    }
@@ -278,7 +301,7 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 		str = strcpy(str2, str);
 		continue;
 	    }
-	    if (!qt && ssub && isset(GLOBSUBST))
+	    if (!qt && (pf_flags & PREFORK_SINGLE) && isset(GLOBSUBST))
 		shtokenize(s);
 	    l1 = str2 - str3;
 	    l2 = strlen(s);
@@ -306,7 +329,7 @@ stringsubst(LinkList list, LinkNode node, int ssub, int asssub)
 	     * We are in a normal argument which looks like an assignment
 	     * and is to be treated like one, with no word splitting.
 	     */
-	    ssub = 1;
+	    pf_flags |= PREFORK_SINGLE;
 	}
 	str++;
     }
@@ -371,7 +394,7 @@ singsub(char **s)
 
     init_list1(foo, *s);
 
-    prefork(&foo, PF_SINGLE);
+    prefork(&foo, PREFORK_SINGLE);
     if (errflag)
 	return;
     *s = (char *) ugetnode(&foo);
@@ -392,13 +415,13 @@ singsub(char **s)
 
 /**/
 static int
-multsub(char **s, int split, char ***a, int *isarr, char *sep)
+multsub(char **s, int pf_flags, char ***a, int *isarr, char *sep)
 {
     int l;
     char **r, **p, *x = *s;
     local_list1(foo);
 
-    if (split) {
+    if (pf_flags & PREFORK_SPLIT) {
 	/*
 	 * This doesn't handle multibyte characters, but we're
 	 * looking for whitespace separators which must be ASCII.
@@ -413,7 +436,7 @@ multsub(char **s, int split, char ***a, int *isarr, char *sep)
 
     init_list1(foo, x);
 
-    if (split) {
+    if (pf_flags & PREFORK_SPLIT) {
 	LinkNode n = firstnode(&foo);
 	int inq = 0, inp = 0;
 	MB_METACHARINIT();
@@ -467,7 +490,7 @@ multsub(char **s, int split, char ***a, int *isarr, char *sep)
 	}
     }
 
-    prefork(&foo, 0);
+    prefork(&foo, pf_flags);
     if (errflag) {
 	if (isarr)
 	    *isarr = 0;
@@ -503,8 +526,8 @@ multsub(char **s, int split, char ***a, int *isarr, char *sep)
 }
 
 /*
- * ~, = subs: assign & PF_TYPESET => typeset or magic equals
- *            assign & PF_ASSIGN => normal assignment
+ * ~, = subs: assign & PREFORK_TYPESET => typeset or magic equals
+ *            assign & PREFORK_ASSIGN => normal assignment
  */
 
 /**/
@@ -519,7 +542,7 @@ filesub(char **namptr, int assign)
     if (!assign)
 	return;
 
-    if (assign & PF_TYPESET) {
+    if (assign & PREFORK_TYPESET) {
 	if ((*namptr)[1] && (eql = sub = strchr(*namptr + 1, Equals))) {
 	    str = sub + 1;
 	    if ((sub[1] == Tilde || sub[1] == Equals) && filesubstr(&str, assign)) {
@@ -1437,7 +1460,7 @@ check_colon_subscript(char *str, char **endp)
 
 /**/
 static LinkNode
-paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
+paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 {
     char *aptr = *str, c, cc;
     char *s = aptr, *fstr, *idbeg, *idend, *ostr = (char *) getdata(n);
@@ -1514,7 +1537,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * where we shouldn't, in particular on the multsubs for
      * handling embedded values for ${...=...} and the like.
      */
-    int spbreak = isset(SHWORDSPLIT) && !ssub && !qt;
+    int spbreak = (pf_flags & PREFORK_SHWORDSPLIT) &&
+	!(pf_flags & PREFORK_SINGLE) && !qt;
     /* Scalar and array value, see isarr above */
     char *val = NULL, **aval = NULL;
     /*
@@ -1563,6 +1587,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * This gets set to one of the LEXFLAGS_* values.
      */
     int shsplit = 0;
+    /*
+     * "ssub" is true when we are called from singsub (via prefork):
+     * it means that we must join arrays and should not split words.
+     */
+    int ssub = (pf_flags & PREFORK_SINGLE);
     /*
      * The separator from (j) and (s) respectively, or (F) and (f)
      * respectively (hardwired to "\n" in that case).  Slightly
@@ -1620,7 +1649,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * This is one of the things that decides whether multsub
      * will produce an array, but in an extremely indirect fashion.
      */
-    int nojoin = isset(SHWORDSPLIT) ? !(ifs && *ifs) : 0;
+    int nojoin = (pf_flags & PREFORK_SHWORDSPLIT) ? !(ifs && *ifs) : 0;
     /*
      * != 0 means ${...}, otherwise $...  What works without braces
      * is largely a historical artefact (everything works with braces,
@@ -2618,7 +2647,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	/* Fall Through! */
 	case '-':
 	    if (vunset) {
-		int ws = opts[SHWORDSPLIT];
+		int split_flags;
 		val = dupstring(s);
 		/* If word-splitting is enabled, we ask multsub() to split
 		 * the substituted string at unquoted whitespace.  Then, we
@@ -2627,9 +2656,20 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 		 * keep its array splits, and weird constructs such as
 		 * ${str+"one two" "3 2 1" foo "$str"} to only be split
 		 * at the unquoted spaces. */
-		opts[SHWORDSPLIT] = spbreak;
-		multsub(&val, spbreak && !aspar, (aspar ? NULL : &aval), &isarr, NULL);
-		opts[SHWORDSPLIT] = ws;
+		if (spbreak) {
+		    split_flags = PREFORK_SHWORDSPLIT;
+		    if (!aspar)
+			split_flags |= PREFORK_SPLIT;
+		} else {
+		    /*
+		     * It's not good enough not passing the flag to use
+		     * SHWORDSPLIT, because when we get to a nested
+		     * paramsubst we need to ignore isset(SHWORDSPLIT).
+		     */
+		    split_flags = PREFORK_NOSHWORDSPLIT;
+		}
+		multsub(&val, split_flags, (aspar ? NULL : &aval),
+			&isarr, NULL);
 		copied = 1;
 		spbreak = 0;
 		/* Leave globsubst on if forced */
@@ -2647,21 +2687,21 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
 	case '=':
 	case Equals:
 	    if (vunset) {
-		int ws = opts[SHWORDSPLIT];
 		char sav = *idend;
-		int l;
+		int l, split_flags;
 
 		*idend = '\0';
 		val = dupstring(s);
 		if (spsep || !arrasg) {
-		    opts[SHWORDSPLIT] = 0;
-		    multsub(&val, 0, NULL, &isarr, NULL);
+		    multsub(&val, PREFORK_NOSHWORDSPLIT, NULL, &isarr, NULL);
 		} else {
-		    opts[SHWORDSPLIT] = spbreak;
-		    multsub(&val, spbreak, &aval, &isarr, NULL);
+		    if (spbreak)
+			split_flags = PREFORK_SPLIT|PREFORK_SHWORDSPLIT;
+		    else
+			split_flags = PREFORK_NOSHWORDSPLIT;
+		    multsub(&val, split_flags, &aval, &isarr, NULL);
 		    spbreak = 0;
 		}
-		opts[SHWORDSPLIT] = ws;
 		if (arrasg) {
 		    /* This is an array assignment. */
 		    char *arr[2], **t, **a, **p;
@@ -3118,8 +3158,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int ssub)
      * (afterward) may split the joined value (e.g. (s:-:) sets "spsep").  One
      * exception is that ${name:-word} and ${name:+word} will have already
      * done any requested splitting of the word value with quoting preserved.
-     * "ssub" is true when we are called from singsub (via prefork):
-     * it means that we must join arrays and should not split words. */
+     */
     if (ssub || (spbreak && isarr >= 0) || spsep || sep) {
 	if (isarr) {
 	    val = sepjoin(aval, sep, 1);

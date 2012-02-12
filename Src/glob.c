@@ -2011,7 +2011,7 @@ xpandredir(struct redir *fn, LinkList redirtab)
     /* Stick the name in a list... */
     init_list1(fake, fn->name);
     /* ...which undergoes all the usual shell expansions */
-    prefork(&fake, isset(MULTIOS) ? 0 : PF_SINGLE);
+    prefork(&fake, isset(MULTIOS) ? 0 : PREFORK_SINGLE);
     /* Globbing is only done for multios. */
     if (!errflag && isset(MULTIOS))
 	globlist(&fake, 0);

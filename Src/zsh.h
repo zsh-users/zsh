@@ -1645,9 +1645,18 @@ enum {
 };
 
 /* Flags as the second argument to prefork */
-#define PF_TYPESET	0x01	/* argument handled like typeset foo=bar */
-#define PF_ASSIGN	0x02	/* argument handled like the RHS of foo=bar */
-#define PF_SINGLE	0x04	/* single word substitution */
+/* argument handled like typeset foo=bar */
+#define PREFORK_TYPESET	        0x01
+/* argument handled like the RHS of foo=bar */
+#define PREFORK_ASSIGN	        0x02
+/* single word substitution */
+#define PREFORK_SINGLE	        0x04
+/* explicitly split nested substitution */
+#define PREFORK_SPLIT           0x08
+/* SHWORDSPLIT in parameter expn */
+#define PREFORK_SHWORDSPLIT     0x10
+/* SHWORDSPLIT forced off in nested subst */
+#define PREFORK_NOSHWORDSPLIT   0x20
 
 /*
  * Structure for adding parameters in a module.

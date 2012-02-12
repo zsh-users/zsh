@@ -1,3 +1,11 @@
+2012-02-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30181 (plus rename PF_ flags to PREFORK_: Src/exec.c,
+	Src/glob.c, Src/subst.c, Src/zsh.h, Test/D04parameter.ztst:
+	Pass sh-wordsplitting instructions to nested parameter
+	substitution by flags, avoiding side effects of explicitly
+	changing the option.
+
 2012-02-11  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 30206: Completion/Unix/Command/_ldd: Fix ldd completion broken by
@@ -15959,5 +15967,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5581 $
+* $Revision: 1.5582 $
 *****************************************************
