@@ -1,3 +1,8 @@
+2012-02-13  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 30214: Functions/Prompts/prompt_redhat_setup: Fix quoting in
+	`redhat' prompt.
+
 2012-02-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 30181 (plus rename PF_ flags to PREFORK_: Src/exec.c,
@@ -15967,5 +15972,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5582 $
+* $Revision: 1.5583 $
 *****************************************************
