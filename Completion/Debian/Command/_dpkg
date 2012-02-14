@@ -73,7 +73,7 @@ _dpkg_options=(
 _dpkg_options_recursive=( '(--recursive -R)'{--recursive,-R}'[recursive]' )
 
 _dpkg_deb_and_query_only_actions=(
-    '(--show -W)'{--show,-W}'[show package info]:Debian package:_files -g \*.u\#deb(-.)'
+    '(--show -W)'{--show,-W}'[show package info]:Debian package:_files -g \*.u\#deb\(-.\)'
 )
 
 _dpkg_deb_and_query_only_options=(
