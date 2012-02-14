@@ -3,7 +3,7 @@
 local curcontext="$curcontext" environ e
 local -a args
 
-zstyle -a "$curcontext" environ environ
+zstyle -a ":completion:${curcontext}:" environ environ
 
 for e in "${environ[@]}"
 do local -x "$e"
