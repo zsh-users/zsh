@@ -60,6 +60,7 @@
 #       Use compsys for nested quoting analysis and command parsing.
 
 # Establish default values for styles, but only if not already set
+local -a reply
 
 zstyle -m ':url-quote-magic:\*' url-metas '*' ||
     zstyle ':url-quote-magic:*' url-metas '*?[]^(|)~#{}='
