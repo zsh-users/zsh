@@ -1,3 +1,8 @@
+2012-02-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30231 plus Mikael's change in 30232: NEWS, README, Etc/FAQ.yo:
+	updates for 4.3.16.
+
 2012-02-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 30198: Completion/Unix/Command/_sudo, Doc/Zsh/compsys.yo:
@@ -15985,5 +15990,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5586 $
+* $Revision: 1.5587 $
 *****************************************************

@@ -4,6 +4,16 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes since 4.3.15
+--------------------
+
+The option HASH_EXECUTABLES_ONLY has been added.  When this is set,
+directories in the command path will be checked for executables before
+they are added to the command table (hash); otherwise, all files in the
+directory are added.  The effect of this option was present in 4.3.15,
+which could cause significant delays when hashing on systems with
+network directories in the path.
+
 Changes since 4.3.12
 --------------------
 
