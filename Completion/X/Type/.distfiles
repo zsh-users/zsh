@@ -6,4 +6,5 @@ _x_colormapid         _x_keysym             _x_title
 _x_cursor             _x_locale             _x_window
 _x_display            _x_modifier           _xt_session_id
 _x_extension          _x_name               _x_visual
+_xft_fonts
 '

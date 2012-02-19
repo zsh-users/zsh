@@ -1,6 +1,7 @@
 2012-02-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* unposted: Etc/Config.yo: 4.3.16.
+	* unposted: Etc/Config.yo, Completion/X/Type/.distfiles,
+	Test/.distfiles: 4.3.16.
 
 2012-02-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
@@ -15994,5 +15995,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5588 $
+* $Revision: 1.5589 $
 *****************************************************
