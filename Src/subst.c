@@ -2693,7 +2693,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		*idend = '\0';
 		val = dupstring(s);
 		if (spsep || !arrasg) {
-		    multsub(&val, PREFORK_NOSHWORDSPLIT, NULL, &isarr, NULL);
+		    /* POSIX requires PREFORK_SINGLE semantics here, but
+		     * traditional zsh used PREFORK_NOSHWORDSPLIT.  Base
+		     * behavior on caller choice of PREFORK_SHWORDSPLIT. */
+		    multsub(&val,
+			    spbreak ? PREFORK_SINGLE : PREFORK_NOSHWORDSPLIT,
+			    NULL, &isarr, NULL);
 		} else {
 		    if (spbreak)
 			split_flags = PREFORK_SPLIT|PREFORK_SHWORDSPLIT;
