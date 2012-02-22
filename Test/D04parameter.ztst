@@ -264,10 +264,13 @@
     done
   }
   test_split_var=
-  : ${test_split_var:=$(test_splitting)}
+  echo _${test_split_var:=$(test_splitting)}_
   echo "_${test_split_var}_")
 0:SH_WORD_SPLIT inside $(...) inside ${...}
 >_'one' 'two' 'three'_
+>_'one'
+>'two'
+>'three'_
 
   print -l "${(f)$(print first line\\nsecond line\\nthird line)}"
 0:${(f)$(...)}

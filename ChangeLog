@@ -5,8 +5,9 @@
 
 2012-02-20  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* 30242: Src/subst.c: use PREFORK_SINGLE for the right-hand side
-	of ${...=...} when SH_WORD_SPLIT is in effect (POSIX emulation).
+	* 30242: Src/subst.c, Test/D05parameter.ztst: use PREFORK_SINGLE
+	for the right-hand side of ${...=...} when SH_WORD_SPLIT is in
+	effect (POSIX emulation).
 
 2012-02-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
@@ -16005,5 +16006,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5592 $
+* $Revision: 1.5593 $
 *****************************************************
