@@ -37,6 +37,22 @@ when it is typed.
 
 A job being run in the background will suspend if it tries to read
 from the terminal.
+
+Note that if the job running in the foreground is a shell function,
+then suspending it will have the effect of causing the shell to fork.
+This is necessary to separate the function's state from that of the
+parent shell performing the job control, so that the latter can return
+to the command line prompt.  As a result, even if tt(fg) is
+used to continue the job the function will no longer be part of the
+parent shell, and any variables set by the function will not be visible
+in the parent shell.  Thus the behaviour is different from the case
+where the function was never suspended.  Zsh is different from many
+other shells in this regard.
+
+The same behaviour is found when the shell is executing code as the
+right hand side of a pipeline or any complex shell construct such as
+tt(if), tt(for), etc., in order that the entire block of code
+can be managed as a single job.
 cindex(background jobs, I/O)
 cindex(jobs, background, I/O)
 Background jobs are normally allowed to produce output,

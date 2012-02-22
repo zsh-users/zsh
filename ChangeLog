@@ -1,3 +1,8 @@
+2012-02-22  Peter Stephenson  <pws@csr.com>
+
+	* 30238 with small fixes: Doc/Zsh/jobs.yo: document the fork
+	behaviour on suspending complex builtin execution.
+
 2012-02-20  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 30242: Src/subst.c: use PREFORK_SINGLE for the right-hand side
@@ -16000,5 +16005,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5591 $
+* $Revision: 1.5592 $
 *****************************************************
