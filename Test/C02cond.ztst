@@ -139,7 +139,7 @@
   elif [[ "$(find . -prune -fstype nfs 2>/dev/null)" == "." ]]; then
     print -u$ZTST_fd "Warning: not testing [[ -N file ]] (not supported with NFS)"
     true
-  elif test -f /etc/mtab && { grep $(df . | tail -n1 | awk '{print $1}') /etc/mtab | grep -q noatime; }; then
+  elif test -f /etc/mtab && { grep $(df . 2>/dev/null| tail -n1 | awk '{print $1}') /etc/mtab | grep -q noatime; }; then
     print -u$ZTST_fd "Warning: not testing [[ -N file ]] (not supported with noatime file system)"
     true
   else

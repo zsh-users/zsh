@@ -1,5 +1,9 @@
 2012-02-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Alexey I. Froloff: 30270: Test/C02Cond.ztst: we don't care
+	about errors from df when testing whether the file system has
+	noatime.
+
 	* unposted: Config/version.mk: Update version to 4.3.17-dev-0 to
 	avoid clash with release, also fix incorrect year noticed by
 	Darryl Zurn.
@@ -16016,5 +16020,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5595 $
+* $Revision: 1.5596 $
 *****************************************************
