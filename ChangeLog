@@ -1,3 +1,9 @@
+2012-02-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk: Update version to 4.3.17-dev-0 to
+	avoid clash with release, also fix incorrect year noticed by
+	Darryl Zurn.
+
 2012-02-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: 4.3.17.
@@ -16010,5 +16016,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5594 $
+* $Revision: 1.5595 $
 *****************************************************
