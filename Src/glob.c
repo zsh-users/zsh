@@ -2089,7 +2089,8 @@ xpandbraces(LinkList list, LinkNode *np)
 	char *dots, *p, *dots2 = NULL;
 	LinkNode olast = last;
 	/* Get the first number of the range */
-	int rstart = zstrtol(str+1,&dots,10), rend = 0, err = 0, rev = 0, rincr = 1;
+	zlong rstart = zstrtol(str+1,&dots,10), rend = 0;
+	int err = 0, rev = 0, rincr = 1;
 	int wid1 = (dots - str) - 1, wid2 = (str2 - dots) - 2, wid3 = 0;
 	int strp = str - str3;
 
@@ -2134,7 +2135,7 @@ xpandbraces(LinkList list, LinkNode *np)
 	    }
 	    if (rstart > rend) {
 		/* Handle decreasing ranges correctly. */
-		int rt = rend;
+		zlong rt = rend;
 		rend = rstart;
 		rstart = rt;
 		rev = !rev;
@@ -2147,7 +2148,7 @@ xpandbraces(LinkList list, LinkNode *np)
 	    for (; rend >= rstart; rend -= rincr) {
 		/* Node added in at end, so do highest first */
 		p = dupstring(str3);
-		sprintf(p + strp, "%0*d", minw, rend);
+		sprintf(p + strp, "%0*ld", minw, (long)rend);
 		strcat(p + strp, str2 + 1);
 		insertlinknode(list, last, p);
 		if (rev)	/* decreasing:  add in reverse order. */
