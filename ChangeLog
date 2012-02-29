@@ -1,3 +1,8 @@
+2012-02-29  Peter Stephenson  <pws@csr.com>
+
+	* 30299: Src/subst.c, Test/D04parameter.ztst: "$*" was split
+	in SHWORDSPLIT if IFS was unset or empty.
+
 2012-02-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Alexey I. Froloff: 30270: Test/C02Cond.ztst: we don't care
@@ -19,7 +24,7 @@
 
 2012-02-20  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* 30242: Src/subst.c, Test/D05parameter.ztst: use PREFORK_SINGLE
+	* 30242: Src/subst.c, Test/D04parameter.ztst: use PREFORK_SINGLE
 	for the right-hand side of ${...=...} when SH_WORD_SPLIT is in
 	effect (POSIX emulation).
 
@@ -16020,5 +16025,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5596 $
+* $Revision: 1.5597 $
 *****************************************************

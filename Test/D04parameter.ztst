@@ -1475,3 +1475,13 @@
    print ${#foo}
 0:Nularg removed from split empty string
 >0
+
+   (set -- a b c
+    setopt shwordsplit
+    IFS=
+    print -rl "$*"
+    unset IFS
+    print -rl "$*")
+0:Regression test for shwordsplit with null or unset IFS and quoted array
+>abc
+>a b c

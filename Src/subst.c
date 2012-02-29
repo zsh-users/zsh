@@ -1649,7 +1649,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
      * This is one of the things that decides whether multsub
      * will produce an array, but in an extremely indirect fashion.
      */
-    int nojoin = (pf_flags & PREFORK_SHWORDSPLIT) ? !(ifs && *ifs) : 0;
+    int nojoin = (pf_flags & PREFORK_SHWORDSPLIT) ? !(ifs && *ifs) && !qt : 0;
     /*
      * != 0 means ${...}, otherwise $...  What works without braces
      * is largely a historical artefact (everything works with braces,
