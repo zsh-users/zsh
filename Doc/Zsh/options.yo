@@ -313,8 +313,9 @@ pindex(NO_HASH_LIST_ALL)
 pindex(HASHLISTALL)
 pindex(NOHASHLISTALL)
 item(tt(HASH_LIST_ALL) <D>)(
-Whenever a command completion is attempted, make sure the entire
-command path is hashed first.  This makes the first completion slower.
+Whenever a command completion or spelling correction is attempted, make
+sure the entire command path is hashed first.  This makes the first
+completion slower but avoids false reports of spelling errors.
 )
 pindex(LIST_AMBIGUOUS)
 pindex(NO_LIST_AMBIGUOUS)
