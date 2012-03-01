@@ -664,7 +664,8 @@ hashdir(char **dirp)
 		 * executable plain files.
 		 */
 		if (unset(HASHEXECUTABLESONLY) ||
-		    (stat(pathbuf, &statbuf) == 0 &&
+		    (access(pathbuf, X_OK) == 0 &&
+		     stat(pathbuf, &statbuf) == 0 &&
 		     S_ISREG(statbuf.st_mode) && (statbuf.st_mode & S_IXUGO)))
 		    add = 1;
 	    }
