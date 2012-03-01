@@ -1,3 +1,23 @@
+2012-02-29  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 30272 (tweaked): Src/exec.c: most failures of fork() cause
+	non-interactive shells to exit nonzero; bad options to "exec"
+	cause exit under POSIX_BUILTINS behavior.
+
+	* unposted (see users/16715): Doc/Zsh/options.yo: document the
+	effects of HASH_LIST_ALL on spelling correction.
+
+	* 30184: Src/hashtable.c: the HASH_EXECUTABLES_ONLY test matches
+	the test used during path search in exec.c:iscom().
+
+	* unposted (see 30090): Functions/Misc/add-zsh-hook: add -h and
+	-L options for help text and a list of extant hooks respectively.
+
+	* unposted (see users/16697): Functions/Misc/zkbd: select a more
+	reasonable output file name when the DISPLAY variable refers to a
+	local socket file (MacOS); fix problem with writing the output
+	file when the user overrides the default value of TERM.
+	
 2012-02-29  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 30276: Src/glob.c: Use zlong rather than int when calculating
@@ -10,7 +30,7 @@
 
 2012-02-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* Alexey I. Froloff: 30270: Test/C02Cond.ztst: we don't care
+	* Alexey I. Froloff: 30270: Test/C02cond.ztst: we don't care
 	about errors from df when testing whether the file system has
 	noatime.
 
@@ -16030,5 +16050,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5598 $
+* $Revision: 1.5599 $
 *****************************************************
