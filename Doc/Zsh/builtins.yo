@@ -366,6 +366,13 @@ noderef(Compatibility)
 )\
 .
 
+If the tt(emulate) command occurs inside a function that has been
+marked for execution tracing with tt(functions -t) then the tt(xtrace)
+option will be turned on regardless of emulation mode or other options.
+Note that code executed inside the function by the tt(.), tt(source), or
+tt(eval) commands is not considered to be running directly from the
+function, hence does not provoke this behaviour.
+
 If the tt(-R) option is given, all options
 are reset to their default value corresponding to the specified emulation
 mode, except for certain options describing the interactive

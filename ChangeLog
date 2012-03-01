@@ -1,3 +1,8 @@
+2012-03-01  Peter Stephenson  <pws@csr.com>
+
+	* 30303: Doc/builtins.yo, Src/options.c: emulate executed inside
+	a function marked for execution tracing enables xtrace.
+
 2012-02-29  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 30272 (tweaked): Src/exec.c: most failures of fork() cause
@@ -16050,5 +16055,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5599 $
+* $Revision: 1.5600 $
 *****************************************************
