@@ -14,8 +14,7 @@ local zkbd term key seq
 zkbd=${ZDOTDIR:-$HOME}/.zkbd
 [[ -d $zkbd ]] || mkdir $zkbd || return 1
 
-print 'typeset -g -A key\n' > $zkbd/$TERM.tmp || return 1
-trap "unfunction getmbkey getseq; command rm -f $zkbd/$TERM.tmp" 0
+trap 'unfunction getmbkey getseq; command rm -f $zkbd/$TERM.tmp' 0
 trap "return 1" 1 2 15
 
 getmbkey () {
@@ -57,6 +56,7 @@ getseq () {
 
 read term"?Enter current terminal type: [$TERM] "
 [[ -n $term ]] && TERM=$term
+print 'typeset -g -A key\n' > $zkbd/$TERM.tmp || return 1
 
 cat <<\EOF
 
@@ -251,21 +251,22 @@ else
     fi
 fi
 
-local termID=${DISPLAY:-$VENDOR-$OSTYPE}
-command mv $zkbd/$TERM.tmp $zkbd/$TERM-$termID
+local termID=${${DISPLAY:t}:-$VENDOR-$OSTYPE} termFile=$zkbd/$TERM.tmp
+command mv $termFile $zkbd/$TERM-$termID && termFile=$zkbd/$TERM-$termID
 
 cat <<EOF
 
 Parameter assignments for the keys you typed have been written to the file:
-$zkbd/$TERM-$termID
+$termFile
 
 You may read this file into ${ZDOTDIR:-$HOME}/.zshrc or another startup
 file with the "source" or "." commands, then reference the \$key parameter
-in bindkey commands, like this:
+in bindkey commands, for example like this:
 
-    source ${zkbd/$HOME/~}/\$TERM-\${DISPLAY:-\$VENDOR-\$OSTYPE}
+    source ${(D)zkbd}/\$TERM-\${\${DISPLAY:t}:-\$VENDOR-\$OSTYPE}
     [[ -n \${key[Left]} ]] && bindkey "\${key[Left]}" backward-char
     [[ -n \${key[Right]} ]] && bindkey "\${key[Right]}" forward-char
     # etc.
 
+Adjust the name of the file being sourced, as necessary.
 EOF
