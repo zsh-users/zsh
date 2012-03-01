@@ -19,12 +19,13 @@ hooktypes=(
   chpwd precmd preexec periodic zshaddhistory zshexit
   zsh_directory_name
 )
+local usage="Usage: $0 hook function\nValid hooks are:\n  $hooktypes"
 
 local opt
 local -a autoopts
-integer del
+integer del list help
 
-while getopts "dDUzk" opt; do
+while getopts "dDhLUzk" opt; do
   case $opt in
     (d)
     del=1
@@ -32,6 +33,14 @@ while getopts "dDUzk" opt; do
 
     (D)
     del=2
+    ;;
+
+    (h)
+    help=1
+    ;;
+
+    (L)
+    list=1
     ;;
 
     ([Uzk])
@@ -45,9 +54,12 @@ while getopts "dDUzk" opt; do
 done
 shift $(( OPTIND - 1 ))
 
-if (( $# != 2 || ${hooktypes[(I)$1]} == 0 )); then
-  print "Usage: $0 hook function\nValid hooks are:\n  $hooktypes"
-  return 1
+if (( list )); then
+  typeset -mp "(${1:-${(@j:|:)hooktypes}})_functions"
+  return $?
+elif (( help || $# != 2 || ${hooktypes[(I)$1]} == 0 )); then
+  print -u$(( 2 - help )) $usage
+  return $(( 1 - help ))
 fi
 
 local hook="${1}_functions"
