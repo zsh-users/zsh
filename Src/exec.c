@@ -1617,9 +1617,8 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		 (list_pipe || (pline_level && !(jn->stat & STAT_SUBJOB)))))
 		deletejob(jn, 0);
 	    thisjob = pj;
-
 	}
-	if (slflags & WC_SUBLIST_NOT)
+	if ((slflags & WC_SUBLIST_NOT) && !errflag)
 	    lastval = !lastval;
     }
     if (!pline_level)
@@ -1679,9 +1678,13 @@ execpline2(Estate state, wordcode pcode,
 
 	    if (pipe(synch) < 0) {
 		zerr("pipe failed: %e", errno);
+		lastval = errflag = 1;
+		return;
 	    } else if ((pid = zfork(&bgtime)) == -1) {
 		close(synch[0]);
 		close(synch[1]);
+		lastval = errflag = 1;
+		return;
 	    } else if (pid) {
 		char dummy, *text;
 
@@ -2490,7 +2493,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    if (!firstnode(args)) {
 			zerr("exec requires a command to execute");
 			errflag = lastval = 1;
-			return;
+			goto done;
 		    }
 		    uremnode(args, firstnode(args));
 		    if (!strcmp(next, "--"))
@@ -2507,12 +2510,12 @@ execcmd(Estate state, int input, int output, int how, int last1)
 				if (!firstnode(args)) {
 				    zerr("exec requires a command to execute");
 				    errflag = lastval = 1;
-				    return;
+				    goto done;
 				}
 				if (!nextnode(firstnode(args))) {
 				    zerr("exec flag -a requires a parameter");
 				    errflag = lastval = 1;
-				    return;
+				    goto done;
 				}
 				exec_argv0 = (char *)
 				    getdata(nextnode(firstnode(args)));
@@ -2813,15 +2816,12 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
 	if (pipe(synch) < 0) {
 	    zerr("pipe failed: %e", errno);
-	    if (oautocont >= 0)
-		opts[AUTOCONTINUE] = oautocont;
-	    return;
+	    goto fatal;
 	} else if ((pid = zfork(&bgtime)) == -1) {
 	    close(synch[0]);
 	    close(synch[1]);
-	    if (oautocont >= 0)
-		opts[AUTOCONTINUE] = oautocont;
-	    return;
+	    lastval = errflag = 1;
+	    goto fatal;
 	}
 	if (pid) {
 
@@ -3365,6 +3365,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	 * classify as a builtin) we treat all errors as fatal.
 	 * The "command" builtin is not special so resets this behaviour.
 	 */
+    fatal:
 	if (redir_err || errflag) {
 	    if (!isset(INTERACTIVE)) {
 		if (forked)
