@@ -3252,7 +3252,11 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    }
 	    if (isset(PRINTEXITVALUE) && isset(SHINSTDIN) &&
 		lastval && !subsh) {
+#if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
+		fprintf(stderr, "zsh: exit %lld\n", lastval);
+#else
 		fprintf(stderr, "zsh: exit %ld\n", (long)lastval);
+#endif
 		fflush(stderr);
 	    }
 

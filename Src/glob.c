@@ -2148,7 +2148,11 @@ xpandbraces(LinkList list, LinkNode *np)
 	    for (; rend >= rstart; rend -= rincr) {
 		/* Node added in at end, so do highest first */
 		p = dupstring(str3);
+#if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
+		sprintf(p + strp, "%0*lld", minw, rend);
+#else
 		sprintf(p + strp, "%0*ld", minw, (long)rend);
+#endif
 		strcat(p + strp, str2 + 1);
 		insertlinknode(list, last, p);
 		if (rev)	/* decreasing:  add in reverse order. */

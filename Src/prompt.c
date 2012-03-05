@@ -663,12 +663,20 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		break;
 	    case 'L':
 		addbufspc(DIGBUFSIZE);
+#if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
+		sprintf(bv->bp, "%lld", shlvl);
+#else
 		sprintf(bv->bp, "%ld", (long)shlvl);
+#endif
 		bv->bp += strlen(bv->bp);
 		break;
 	    case '?':
 		addbufspc(DIGBUFSIZE);
+#if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
+		sprintf(bv->bp, "%lld", lastval);
+#else
 		sprintf(bv->bp, "%ld", (long)lastval);
+#endif
 		bv->bp += strlen(bv->bp);
 		break;
 	    case '%':
@@ -764,7 +772,11 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		    if (funcstack->tp == FS_EVAL)
 			lineno--;
 		    addbufspc(DIGBUFSIZE);
+#if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
+		    sprintf(bv->bp, "%lld", flineno);
+#else
 		    sprintf(bv->bp, "%ld", (long)flineno);
+#endif
 		    bv->bp += strlen(bv->bp);
 		    break;
 		}
@@ -772,7 +784,11 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		/* FALLTHROUGH */
 	    case 'i':
 		addbufspc(DIGBUFSIZE);
+#if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
+		sprintf(bv->bp, "%lld", lineno);
+#else
 		sprintf(bv->bp, "%ld", (long)lineno);
+#endif
 		bv->bp += strlen(bv->bp);
 		break;
 	    case 'x':

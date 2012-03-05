@@ -275,9 +275,13 @@ zerrmsg(FILE *file, const char *fmt, va_list ap)
 #endif
     char *errmsg;
 
-    if ((unset(SHINSTDIN) || locallevel) && lineno)
+    if ((unset(SHINSTDIN) || locallevel) && lineno) {
+#if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
+	fprintf(file, "%lld: ", lineno);
+#else
 	fprintf(file, "%ld: ", (long)lineno);
-    else
+#endif
+    } else
 	fputc((unsigned char)' ', file);
 
     while (*fmt)

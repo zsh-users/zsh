@@ -531,7 +531,11 @@ functracegetfn(UNUSED(Param pm))
 	char *colonpair;
 
 	colonpair = zhalloc(strlen(f->caller) + (f->lineno > 9999 ? 24 : 6));
+#if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
+	sprintf(colonpair, "%s:%lld", f->caller, f->lineno);
+#else
 	sprintf(colonpair, "%s:%ld", f->caller, (long)f->lineno);
+#endif
 
 	*p = colonpair;
     }
@@ -559,7 +563,11 @@ funcsourcetracegetfn(UNUSED(Param pm))
 	char *fname = f->filename ? f->filename : "";
 
 	colonpair = zhalloc(strlen(fname) + (f->flineno > 9999 ? 24 : 6));
+#if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
+	sprintf(colonpair, "%s:%lld", fname, f->flineno);
+#else
 	sprintf(colonpair, "%s:%ld", fname, (long)f->flineno);
+#endif
 
 	*p = colonpair;
     }
@@ -594,7 +602,11 @@ funcfiletracegetfn(UNUSED(Param pm))
 	     */
 	    colonpair = zhalloc(strlen(f->caller) +
 				(f->lineno > 9999 ? 24 : 6));
+#if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
+	    sprintf(colonpair, "%s:%lld", f->caller, f->lineno);
+#else
 	    sprintf(colonpair, "%s:%ld", f->caller, (long)f->lineno);
+#endif
 	} else {
 	    /*
 	     * Calling context is a function or eval; we need to find
@@ -604,7 +616,7 @@ funcfiletracegetfn(UNUSED(Param pm))
 	     * together with the $functrace line number for the current
 	     * context.
 	     */
-	    long flineno = (long)(f->prev->flineno + f->lineno);
+	    zlong flineno = f->prev->flineno + f->lineno;
 	    /*
 	     * Line numbers in eval start from 1, not zero,
 	     * so offset by one to get line in file.
@@ -614,7 +626,11 @@ funcfiletracegetfn(UNUSED(Param pm))
 	    fname = f->prev->filename ? f->prev->filename : "";
 
 	    colonpair = zhalloc(strlen(fname) + (flineno > 9999 ? 24 : 6));
-	    sprintf(colonpair, "%s:%ld", fname, flineno);
+#if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
+	    sprintf(colonpair, "%s:%lld", fname, flineno);
+#else
+	    sprintf(colonpair, "%s:%ld", fname, (long)flineno);
+#endif
 	}
 
 	*p = colonpair;

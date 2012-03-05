@@ -1010,6 +1010,37 @@ main() { return sizeof(ino_t) < 8; }
     fi
   fi
 fi
+AH_TEMPLATE([ZLONG_IS_LONG_LONG],
+[Define to 1 if the zlong type uses long long int.])
+if test "$zsh_cv_64_bit_type" = "long long"; then
+  dnl Remember this so we can get (s)printf output right.
+  AC_DEFINE(ZLONG_IS_LONG_LONG)
+fi
+
+dnl We'll blithely assume (f)printf supports the same types as sprintf.
+AC_CACHE_CHECK(for %lld printf support, zsh_cv_printf_has_lld,
+[AC_TRY_RUN(
+[#include <stdio.h>
+#include <string.h>
+int main(int argc, char **argv)
+{
+   long long foo = ((long long)0xdead << 40) | 0xf00d;
+   char buf[80];
+   sprintf(buf, "before%lldafter", foo);
+   if (!strcmp(buf, "before62677660341432333after")) {
+      return 0;
+   }
+   return 1;
+}
+],
+zsh_cv_printf_has_lld=yes,
+zsh_cv_printf_has_lld=no,
+zsh_cv_printf_has_lld=no)])
+AH_TEMPLATE(PRINTF_HAS_LLD,
+[Define to 1 if printf and sprintf support %lld for long long.])
+if test x$zsh_cv_printf_has_lld = xyes; then
+  AC_DEFINE(PRINTF_HAS_LLD)
+fi
 
 dnl Check for sigset_t.  Currently I'm looking in
 dnl <sys/types.h> and <signal.h>.  Others might need
