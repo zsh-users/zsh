@@ -1,4 +1,4 @@
-#compdef ssh slogin=ssh scp ssh-add ssh-agent ssh-keygen sftp
+#compdef ssh slogin=ssh scp ssh-add ssh-agent ssh-keygen sftp ssh-copy-id
 
 # Completions currently based on OpenSSH 5.9 (released on 2011-09-06).
 #
@@ -132,6 +132,11 @@ _ssh () {
       '-R[specify number of outstanding requests]:number of requests (default\: 64):' \
       '-s[SSH2 subsystem or path to sftp server on the remote host]' \
       '1:file:->rfile' '*:file:->file' "$common[@]" "$common_transfer[@]" && ret=0
+    ;;
+  (ssh-copy-id)
+    _arguments \
+      '-i:SSH identity file:_files' \
+      ':remote host name:->userhost' \
     ;;
   esac
 

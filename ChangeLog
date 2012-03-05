@@ -1,3 +1,8 @@
+2012-03-05  Clint Adams  <clint@zsh.org>
+
+	* 30314: Completion/Unix/Command/_ssh: add completion for
+	ssh-copy-id.
+
 2012-03-05  Peter Stephenson  <pws@csr.com>
 
 	* 30307 plus change suggested by Wayne in 30309: configure.ac,
@@ -29,7 +34,7 @@
 	reasonable output file name when the DISPLAY variable refers to a
 	local socket file (MacOS); fix problem with writing the output
 	file when the user overrides the default value of TERM.
-	
+
 2012-02-29  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 30276: Src/glob.c: Use zlong rather than int when calculating
@@ -16062,5 +16067,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5601 $
+* $Revision: 1.5602 $
 *****************************************************
