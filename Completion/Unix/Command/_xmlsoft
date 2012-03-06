@@ -53,7 +53,7 @@ case $service in
       '--xincludestyle[do XInclude processing on stylesheets]' \
       '--load-trace[print trace of all external entites loaded]' \
       {--profile,--norman}'[dump profiling information]' \
-      '1:stylesheet:_files -g "*.xsl(-.)"' \
+      '1:stylesheet:_files -g "*.xslt#(-.)"' \
       ':file:_files -g "*.xml(-.)"' && return
   ;;
   xmllint)
