@@ -3,6 +3,9 @@
 	* 30314: Completion/Unix/Command/_ssh: add completion for
 	ssh-copy-id.
 
+	* 30316: Completion/Unix/Type/_pdf: complete .pdf for evince and
+	epdfview.
+
 2012-03-05  Peter Stephenson  <pws@csr.com>
 
 	* 30307 plus change suggested by Wayne in 30309: configure.ac,
@@ -16067,5 +16070,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5602 $
+* $Revision: 1.5603 $
 *****************************************************
