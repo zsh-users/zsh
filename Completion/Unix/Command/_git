@@ -5753,7 +5753,7 @@ __git_setup_merge_options () {
     '(--stat -n --no-stat)'{-n,--no-stat}'[do not show diffstat at the end of the merge]'
     '(         --no-squash)--squash[merge, but do not commit]'
     '(--squash            )--no-squash[merge and commit]'
-    '--ff-only[refuse to merge unless HEAD is up to date or merge can be reolved as a fast-forward]'
+    '--ff-only[refuse to merge unless HEAD is up to date or merge can be resolved as a fast-forward]'
     '*'{-s,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies'
     '*'{-X,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]'
     '(-q --quiet -v --verbose)'{-q,--quiet}'[suppress all output]'
