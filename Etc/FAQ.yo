@@ -722,7 +722,7 @@ label(23)
      appear inside the tt({ }) the way they get appended to an alias.
 
   myeit() If the csh alias references its own name (tt(alias rm "rm -i")),
-     then in a zsh function you need the "command" keyword
+     then in a zsh function you need the "command" or "builtin" keyword
      (function tt(rm() { command rm -i "$@" })), but in a zsh alias
      you don't (tt(alias rm="rm -i")).
 

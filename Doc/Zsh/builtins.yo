@@ -348,7 +348,7 @@ cindex(compatibility, csh)
 cindex(sh, compatibility)
 cindex(ksh, compatibility)
 cindex(csh, compatibility)
-item(tt(emulate) [ tt(-LR) ] [ {tt(zsh)|tt(sh)|tt(ksh)|tt(csh)} [ tt(-c) tt(arg) ] ])(
+item(tt(emulate) [ tt(-LR) ] [ {tt(zsh)|tt(sh)|tt(ksh)|tt(csh)} [ var(flags) ... ] ])(
 Without any argument print current emulation mode.
 
 With single argument set up zsh options to emulate the specified shell
@@ -359,7 +359,7 @@ will be used as a default; more precisely, the tests performed on the
 argument are the same as those used to determine the emulation at startup
 based on the shell name, see
 ifzman(\
-the section `Compatibility' in zmanref(zshmisc)
+the section COMPATIBILITY in zmanref(zsh)
 )\
 ifnzman(\
 noderef(Compatibility)
@@ -373,26 +373,34 @@ Note that code executed inside the function by the tt(.), tt(source), or
 tt(eval) commands is not considered to be running directly from the
 function, hence does not provoke this behaviour.
 
-If the tt(-R) option is given, all options
+If the tt(-R) switch is given, all settable options
 are reset to their default value corresponding to the specified emulation
 mode, except for certain options describing the interactive
 environment; otherwise, only those options likely to cause portability
-problems in scripts and functions are altered.  If the tt(-L) option is given,
+problems in scripts and functions are altered.  If the tt(-L) switch is given,
 the options tt(LOCAL_OPTIONS) and tt(LOCAL_TRAPS) will be set as
 well, causing the effects of the tt(emulate) command and any tt(setopt) and
 tt(trap) commands to be local to the immediately surrounding shell
 function, if any; normally these options are turned off in all emulation
-modes except tt(ksh). The tt(-L) and tt(-c) are mutually exclusive.
+modes except tt(ksh). The tt(-L) switch is mutually exclusive with the
+use of tt(-c) in var(flags).
 
-If tt(-c) tt(arg) is given, evaluate tt(arg) while the requested
-emulation is temporarily in effect.  The emulation and all options will
-be restored to their original values before tt(emulate) returns.  The
-tt(-R) flag may be used.
+The var(flags) may be any of the invocation-time flags described in
+ifnzman(noderef(Invocation))\
+ifzman(the section INVOCATION in zmanref(zsh)),
+except that `tt(-o EMACS)' and `tt(-o VI)' may not be used.  Flags such
+as `tt(+r)'/`tt(+o RESTRICTED)' may be prohibited in some circumstances.
+If tt(-c) var(arg) appears in var(flags), var(arg) is evaluated while the
+requested emulation is temporarily in effect.  In this case the emulation
+mode and all options are restored to their previous values before
+tt(emulate) returns.  The tt(-R) switch may precede the name of the shell
+to emulate; note this has a meaning distinct from including tt(-R) in
+var(flags).
 
 Use of tt(-c) enables `sticky' emulation mode for functions defined
 within the evaluated expression:  the emulation mode is associated
 thereafter with the function so that whenever the function is executed
-the emulation (respecting the tt(-R) flag, if present) and all
+the emulation (respecting the tt(-R) switch, if present) and all
 options are set before entry to the function, and restored after exit.
 If the function is called when the sticky emulation is already in
 effect, either within an `tt(emulate) var(shell) tt(-c)' expression or
@@ -434,7 +442,7 @@ within sticky emulation.)
 sitem(3.)(No special handling is provided for functions marked for
 tt(autoload) nor for functions present in wordcode created by
 the tt(zcompile) command.)
-sitem(4.)(The presence or absence of the tt(-R) flag to tt(emulate)
+sitem(4.)(The presence or absence of the tt(-R) switch to tt(emulate)
 corresponds to different sticky emulation modes, so for example
 `tt(emulate sh -c)', `tt(emulate -R sh -c)' and `tt(emulate csh -c)'
 are treated as three distinct sticky emulations.)

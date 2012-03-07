@@ -215,6 +215,7 @@ loop(int toplevel, int justonce)
     return LOOP_OK;
 }
 
+/* Shared among parseargs(), parseopts(), init_io(), and init_misc() */
 static char *cmd;
 static int restricted;
 
@@ -222,9 +223,7 @@ static int restricted;
 static void
 parseargs(char **argv, char **runscript)
 {
-    int optionbreak = 0;
     char **x;
-    int action, optno;
     LinkList paramlist;
 
     argzero = *argv++;
@@ -247,93 +246,9 @@ parseargs(char **argv, char **runscript)
     opts[SHINSTDIN] = 0;
     opts[SINGLECOMMAND] = 0;
 
-    /* loop through command line options (begins with "-" or "+") */
-    while (!optionbreak && *argv && (**argv == '-' || **argv == '+')) {
-	char *args = *argv;
-	action = (**argv == '-');
-	if (!argv[0][1])
-	    *argv = "--";
-	while (*++*argv) {
-	    if (**argv == '-') {
-		if(!argv[0][1]) {
-		    /* The pseudo-option `--' signifies the end of options. */
-		    argv++;
-		    goto doneoptions;
-		}
-		if(*argv != args+1 || **argv != '-')
-		    goto badoptionstring;
-		/* GNU-style long options */
-		++*argv;
-		if (!strcmp(*argv, "version")) {
-		    printf("zsh %s (%s-%s-%s)\n",
-			    ZSH_VERSION, MACHTYPE, VENDOR, OSTYPE);
-		    exit(0);
-		}
-		if (!strcmp(*argv, "help")) {
-		    printhelp();
-		    exit(0);
-		}
-		/* `-' characters are allowed in long options */
-		for(args = *argv; *args; args++)
-		    if(*args == '-')
-			*args = '_';
-		goto longoptions;
-	    }
+    cmd = parseopts(NULL, &argv);
 
-	    if (unset(SHOPTIONLETTERS) && **argv == 'b') {
-		/* -b ends options at the end of this argument */
-		optionbreak = 1;
-	    } else if (**argv == 'c') {
-		/* -c command */
-		cmd = *argv;
-		opts[INTERACTIVE] &= 1;
-		scriptname = scriptfilename = ztrdup("zsh");
-	    } else if (**argv == 'o') {
-		if (!*++*argv)
-		    argv++;
-		if (!*argv) {
-		    zerr("string expected after -o");
-		    exit(1);
-		}
-	    longoptions:
-		if (!(optno = optlookup(*argv))) {
-		    zerr("no such option: %s", *argv);
-		    exit(1);
-		} else if (optno == RESTRICTED)
-		    restricted = action;
-		else
-		    dosetopt(optno, action, 1);
-              break;
-	    } else if (isspace(STOUC(**argv))) {
-		/* zsh's typtab not yet set, have to use ctype */
-		while (*++*argv)
-		    if (!isspace(STOUC(**argv))) {
-		    badoptionstring:
-			zerr("bad option string: `%s'", args);
-			exit(1);
-		    }
-		break;
-	    } else {
-	    	if (!(optno = optlookupc(**argv))) {
-		    zerr("bad option: -%c", **argv);
-		    exit(1);
-		} else if (optno == RESTRICTED)
-		    restricted = action;
-		else
-		    dosetopt(optno, action, 1);
-	    }
-	}
-	argv++;
-    }
-    doneoptions:
     paramlist = znewlinklist();
-    if (cmd) {
-	if (!*argv) {
-	    zerr("string expected after -%s", cmd);
-	    exit(1);
-	}
-	cmd = *argv++;
-    }
     if (*argv) {
 	if (unset(SHINSTDIN)) {
 	    if (cmd)
@@ -359,6 +274,114 @@ parseargs(char **argv, char **runscript)
     while ((*x++ = (char *)getlinknode(paramlist)));
     free(paramlist);
     argzero = ztrdup(argzero);
+}
+
+/**/
+mod_export char *
+parseopts(char *nam, char ***argvp)
+{
+    int optionbreak = 0;
+    int action, optno;
+    char *cmd = 0;	/* deliberately hides static */
+    char **argv = *argvp;
+
+#define WARN_OPTION(F, S) if (nam) zwarnnam(nam, F, S); else zerr(F, S)
+#define LAST_OPTION(N) \
+	if (nam) { if (*argv) argv++; goto doneargv; } else exit(N)
+
+    /* loop through command line options (begins with "-" or "+") */
+    while (!optionbreak && *argv && (**argv == '-' || **argv == '+')) {
+	char *args = *argv;
+	action = (**argv == '-');
+	if (!argv[0][1])
+	    *argv = "--";
+	while (*++*argv) {
+	    if (**argv == '-') {
+		if(!argv[0][1]) {
+		    /* The pseudo-option `--' signifies the end of options. */
+		    argv++;
+		    goto doneoptions;
+		}
+		if(*argv != args+1 || **argv != '-')
+		    goto badoptionstring;
+		/* GNU-style long options */
+		++*argv;
+		if (!strcmp(*argv, "version")) {
+		    printf("zsh %s (%s-%s-%s)\n",
+			    ZSH_VERSION, MACHTYPE, VENDOR, OSTYPE);
+		    LAST_OPTION(0);
+		}
+		if (!strcmp(*argv, "help")) {
+		    printhelp();
+		    LAST_OPTION(0);
+		}
+		/* `-' characters are allowed in long options */
+		for(args = *argv; *args; args++)
+		    if(*args == '-')
+			*args = '_';
+		goto longoptions;
+	    }
+
+	    if (unset(SHOPTIONLETTERS) && **argv == 'b') {
+		/* -b ends options at the end of this argument */
+		optionbreak = 1;
+	    } else if (**argv == 'c') {
+		/* -c command */
+		cmd = *argv;
+		opts[INTERACTIVE] &= 1;
+		scriptname = scriptfilename = ztrdup("zsh");
+	    } else if (**argv == 'o') {
+		if (!*++*argv)
+		    argv++;
+		if (!*argv) {
+		    WARN_OPTION("string expected after -o", NULL);
+		    LAST_OPTION(1);
+		}
+	    longoptions:
+		if (!(optno = optlookup(*argv))) {
+		    WARN_OPTION("no such option: %s", *argv);
+		    LAST_OPTION(1);
+		} else if (optno == RESTRICTED && !nam)
+		    restricted = action;
+		else if ((optno == EMACSMODE || optno == VIMODE) && nam)
+		    WARN_OPTION("can't change option: %s", *argv);
+		else if (dosetopt(optno, action, !nam) && nam)
+		    WARN_OPTION("can't change option: %s", *argv);
+              break;
+	    } else if (isspace(STOUC(**argv))) {
+		/* zsh's typtab not yet set, have to use ctype */
+		while (*++*argv)
+		    if (!isspace(STOUC(**argv))) {
+		     badoptionstring:
+			WARN_OPTION("bad option string: '%s'", args);
+			LAST_OPTION(1);
+		    }
+		break;
+	    } else {
+	    	if (!(optno = optlookupc(**argv))) {
+		    WARN_OPTION("bad option: -%c", **argv);
+		    LAST_OPTION(1);
+		} else if (optno == RESTRICTED && !nam)
+		    restricted = action;
+		else if ((optno == EMACSMODE || optno == VIMODE) && nam)
+		    WARN_OPTION("can't change option: %s", *argv);
+		else if (dosetopt(optno, action, !nam) && nam)
+		    WARN_OPTION("can't change option: -%c", **argv);
+	    }
+	}
+	argv++;
+    }
+ doneoptions:
+    if (cmd) {
+	if (!*argv) {
+	    WARN_OPTION("string expected after -%s", cmd);
+	    LAST_OPTION(1);
+	}
+	cmd = *argv++;
+    }
+ doneargv:
+    *argvp = argv;
+    return cmd;
 }
 
 /**/

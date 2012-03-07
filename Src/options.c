@@ -767,6 +767,8 @@ dosetopt(int optno, int value, int force)
 	    return -1;
 #endif /* GETPWNAM_FAKED */
     } else if ((optno == EMACSMODE || optno == VIMODE) && value) {
+	if (sticky_emulation)
+	    return -1;
 	zleentry(ZLE_CMD_SET_KEYMAP, optno);
 	opts[(optno == EMACSMODE) ? VIMODE : EMACSMODE] = 0;
     } else if (optno == SUNKEYBOARDHACK) {
