@@ -151,6 +151,11 @@ based on ASCII value of their characters.
 )
 item(var(exp1) tt(-eq) var(exp2))(
 true if var(exp1) is numerically equal to var(exp2).
+Note that for purely numeric comparisons use of the
+tt(LPAR()LPAR())var(...)tt(RPAR()RPAR()) builtin described in
+ifzman(the section `ARITHMETIC EVALUATION')\
+ifnzman(noderef(Arithmetic Evaluation)) is more convenient than
+conditional expressions.
 )
 item(var(exp1) tt(-ne) var(exp2))(
 true if var(exp1) is numerically not equal to var(exp2).

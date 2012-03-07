@@ -1,3 +1,9 @@
+2012-03-07  Peter Stephenson  <pws@csr.com>
+
+	* users/16865: Doc/Zsh/cond.yo: note that -eq and friends are
+	less convenient for purely numeric work than conditional
+	expressions.
+
 2012-03-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Alexey: 30322: Completion/Unix/Command/_xmlsoft: accept more
@@ -16088,5 +16094,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5606 $
+* $Revision: 1.5607 $
 *****************************************************
