@@ -1,5 +1,7 @@
 2012-03-13  Peter Stephenson  <pws@csr.com>
 
+	* Luka Perkov: 30354: Completion/Unix/Command/_quilt: update
+
 	* 30351 changed as in 30352: Src/params.c, Src/utils.c: metafy
 	scalar and array parameter values as they are imported from
 	strings defined outside zsh.
@@ -16100,5 +16102,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5608 $
+* $Revision: 1.5609 $
 *****************************************************

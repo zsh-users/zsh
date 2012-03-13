@@ -32,8 +32,8 @@ _arguments \
   '--quiltrc[Use the specified configuration file]:files:_files' \
   '--version[Print the version number and exit]' \
   ':quilt command:(add annotate applied delete diff edit files fold fork graph
-    grep header import mail new next patches pop previous push refresh rename
-    revert series setup shell snapshot top unapplied upgrade)' \
+    grep header import mail new next patches pop previous push refresh remove
+    rename revert series setup snapshot top unapplied upgrade)' \
   '*::subcmd:->subcmd' && return 0
 
 case "$state" in (subcmd)
@@ -109,6 +109,9 @@ case "$state" in (subcmd)
           '-T ps[Directly produce a PostScript output file]' \
           ':quilt series:_quilt_series'
         ;;
+      (grep)
+        _arguments '-h'
+        ;;
       (header)
         _arguments '-h' \
           '-a[Append the exiting patch header]' \
@@ -131,6 +134,7 @@ case "$state" in (subcmd)
       (mail)
         _arguments '-h' \
           '-m[Text to use as the text in the introduction]:quilt select text: ' \
+          '-M[Like the -m option, but read the introduction from file]:files:_files' \
           '--prefix[Use an alternate prefix in the bracketed part of the subjects generated]:quilt select prefix: ' \
           '--mbox[Store all messages in the specified file in mbox format]:files:_files' \
           '--send[Send the messages directly]' \
@@ -145,7 +149,8 @@ case "$state" in (subcmd)
           '*:quilt series:_quilt_series'
         ;;
       (new)
-        _arguments '-h'
+        _arguments '-h' \
+          '-p[Select a patch style]:quilt patch style:(0 1 ab)'
         ;;
       (next)
         _arguments '-h' \
@@ -175,6 +180,8 @@ case "$state" in (subcmd)
           '-q[Quiet operation]' \
           '-f[Force apply, even if the patch has rejects]' \
           '-v[Verbose operation]' \
+          '--fuzz[Set the maximum fuzz factor]' \
+          '--merge=[Merge the patch file into the original files]:quilt select merge:(merge diff3)' \
           '--leave-rejects[Leave around the reject files patch produced]' \
           '--color=[Use syntax coloring]:quilt select color:(always auto never)' \
           ':quilt unapplied:_quilt_unapplied'
@@ -196,6 +203,10 @@ case "$state" in (subcmd)
           '--strip-trailing-whitespace[Strip trailing whitespace at the end of lines]' \
           ':quilt series:_quilt_series'
         ;;
+      (remove)
+        _arguments '-h' \
+          '-P[Patch to remove]:quilt series:_quilt_series'
+        ;;
       (rename)
         _arguments '-h' \
           '-P[Patch to rename]:quilt series:_quilt_series'
@@ -214,11 +225,8 @@ case "$state" in (subcmd)
           '-d[Optional path prefix for the resulting source tree]:quilt select path-prefix: ' \
           '--sourcedir[Directory that contains the package sources]:quilt select package sources directory: ' \
           '-v[Verbose debug output]' \
+          '--fuzz[Set the maximum fuzz factor]' \
           ':files:_files'
-        ;;
-      (shell)
-        _arguments '-h' \
-          ':quilt select shell command:_command_names -e'
         ;;
       (snapshot)
         _arguments '-h' \
