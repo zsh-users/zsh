@@ -698,16 +698,18 @@ createparamtable(void)
      * So allow the user to set it in the special cases where it's
      * useful.
      */
-    setsparam("TMPPREFIX", ztrdup(DEFAULT_TMPPREFIX));
-    setsparam("TIMEFMT", ztrdup(DEFAULT_TIMEFMT));
-    setsparam("WATCHFMT", ztrdup(default_watchfmt));
+    setsparam("TMPPREFIX", ztrdup_metafy(DEFAULT_TMPPREFIX));
+    setsparam("TIMEFMT", ztrdup_metafy(DEFAULT_TIMEFMT));
+    setsparam("WATCHFMT", ztrdup_metafy(default_watchfmt));
 
     hostnam = (char *)zalloc(256);
     gethostname(hostnam, 256);
-    setsparam("HOST", ztrdup(hostnam));
+    setsparam("HOST", ztrdup_metafy(hostnam));
     zfree(hostnam, 256);
 
-    setsparam("LOGNAME", ztrdup((str = getlogin()) && *str ? str : cached_username));
+    setsparam("LOGNAME",
+	      ztrdup_metafy((str = getlogin()) && *str ?
+			    str : cached_username));
 
 #if !defined(HAVE_PUTENV) && !defined(USE_SET_UNSET_ENV)
     /* Copy the environment variables we are inheriting to dynamic *
@@ -778,22 +780,22 @@ createparamtable(void)
     if(uname(&unamebuf)) setsparam("CPUTYPE", ztrdup("unknown"));
     else
     {
-       machinebuf = ztrdup(unamebuf.machine);
+       machinebuf = ztrdup_metafy(unamebuf.machine);
        setsparam("CPUTYPE", machinebuf);
     }
-	
+
 #else
-    setsparam("CPUTYPE", ztrdup("unknown"));
+    setsparam("CPUTYPE", ztrdup_metafy("unknown"));
 #endif
-    setsparam("MACHTYPE", ztrdup(MACHTYPE));
-    setsparam("OSTYPE", ztrdup(OSTYPE));
-    setsparam("TTY", ztrdup(ttystrname));
-    setsparam("VENDOR", ztrdup(VENDOR));
-    setsparam("ZSH_NAME", ztrdup(zsh_name));
-    setsparam("ZSH_VERSION", ztrdup(ZSH_VERSION));
-    setsparam("ZSH_PATCHLEVEL", ztrdup(ZSH_PATCHLEVEL));
+    setsparam("MACHTYPE", ztrdup_metafy(MACHTYPE));
+    setsparam("OSTYPE", ztrdup_metafy(OSTYPE));
+    setsparam("TTY", ztrdup_metafy(ttystrname));
+    setsparam("VENDOR", ztrdup_metafy(VENDOR));
+    setsparam("ZSH_NAME", ztrdup_metafy(zsh_name));
+    setsparam("ZSH_VERSION", ztrdup_metafy(ZSH_VERSION));
+    setsparam("ZSH_PATCHLEVEL", ztrdup_metafy(ZSH_PATCHLEVEL));
     setaparam("signals", sigptr = zalloc((SIGCOUNT+4) * sizeof(char *)));
-    for (t = sigs; (*sigptr++ = ztrdup(*t++)); );
+    for (t = sigs; (*sigptr++ = ztrdup_metafy(*t++)); );
 
     noerrs = 0;
 }

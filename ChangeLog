@@ -1,3 +1,9 @@
+2012-03-13  Peter Stephenson  <pws@csr.com>
+
+	* 30351 changed as in 30352: Src/params.c, Src/utils.c: metafy
+	scalar and array parameter values as they are imported from
+	strings defined outside zsh.
+
 2012-03-07  Peter Stephenson  <pws@csr.com>
 
 	* users/16865: Doc/Zsh/cond.yo: note that -eq and friends are
@@ -16094,5 +16100,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5607 $
+* $Revision: 1.5608 $
 *****************************************************

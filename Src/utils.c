@@ -4013,6 +4013,28 @@ metafy(char *buf, int len, int heap)
 
 
 /*
+ * Duplicate a string, metafying it as we go.
+ *
+ * Typically, this is used only for strings imported from outside
+ * zsh, as strings internally are either already metafied or passed
+ * around with an associated length.
+ */
+/**/
+mod_export char *
+ztrdup_metafy(const char *s)
+{
+    /* To mimic ztrdup() behaviour */
+    if (!s)
+	return NULL;
+    /*
+     * metafy() does lots of different things, so the pointer
+     * isn't const.  Using it with META_DUP should be safe.
+     */
+    return metafy((char *)s, -1, META_DUP);
+}
+
+
+/*
  * Take a null-terminated, metafied string in s into a literal
  * representation by converting in place.  The length is in *len
  * len is non-NULL; if len is NULL, you don't know the length of
