@@ -178,7 +178,7 @@ prompt_bart_setup () {
     typeset -gA fg
 
     # A few extra niceties ...
-    repeat 1 case "$1:l" in
+    repeat 1; do case "$1:l" in
       (off|disable)
 	add-zsh-hook -D precmd "prompt_*_precmd"
 	add-zsh-hook -D preexec "prompt_*_preexec"
@@ -201,7 +201,7 @@ prompt_bart_setup () {
 	fg[%D]="%F{${4:-default}}"
 	fg[%@]="%F{${1:-red}}"
 	;;
-    esac
+    esac; done
 
     prompt_bart_ps1
 
