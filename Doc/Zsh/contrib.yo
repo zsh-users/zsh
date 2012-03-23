@@ -999,8 +999,8 @@ endsitem()
 In tt(patch-format) and tt(nopatch-format) these replacements are done:
 
 startsitem()
-sitem(tt(%p))(The name of the top-most applied patch.)
-sitem(tt(%u))(The number of unapplied patches.)
+sitem(tt(%p))(The name of the top-most applied patch (tt(applied-string)).)
+sitem(tt(%u))(The number of unapplied patches (tt(unapplied-string)).)
 sitem(tt(%n))(The number of applied patches.)
 sitem(tt(%c))(The number of unapplied patches.)
 sitem(tt(%g))(The names of active tt(mq) guards (tt(hg) backend).)

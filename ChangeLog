@@ -1,6 +1,8 @@
 2012-03-23  Simon Ruderich  <simon@ruderich.org>
 
 	* 30366: Misc/vcs_info-examples: Fix outdated quilt examples.
+	* 30367: Doc/Zsh/contrib.yo: vcs_info, mention settings used for
+	patch-format/nopatch-format.
 
 2012-03-13  Peter Stephenson  <pws@csr.com>
 
@@ -16106,5 +16108,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5610 $
+* $Revision: 1.5611 $
 *****************************************************
