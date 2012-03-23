@@ -392,9 +392,9 @@ function foobar() {
 }
 
 # In standalone-mode, vcs_info pretends as if quilt actually was a VCS.
-# Well, kind of. The vcs string is set to '-quilt-'. So let's define a
-# format just for that mode:
-zstyle ':vcs_info:-quilt-:*' formats " [%s%Q]-"
+# Well, kind of. The vcs string is set to '-quilt-.quilt-standalone'. So let's
+# define a format just for that mode:
+zstyle ':vcs_info:-quilt-.quilt-standalone:*' formats " [%s%Q]-"
 
 # As with other format insertions, you got total control over what is being
 # inserted. The `%Q' insertion is controlled by the `quiltformat' and
@@ -411,16 +411,16 @@ zstyle ':vcs_info:-quilt-:*' formats " [%s%Q]-"
 # There are two hooks you can use to setup what these contain. Those would be
 # `gen-applied-string' and `gen-unapplied-string'. We'll go with the default
 # here... ...no need to go into every insane detail.
-zstyle ':vcs_info:*' quiltformat '#%p [%n|%c]'
+zstyle ':vcs_info:*' patch-format '#%p [%n|%c]'
 
 # quilt-nopatch-format (default: "no patch applied")
-zstyle ':vcs_info:*' quilt-nopatch-format '#cleeaaaaan!1!!'
+zstyle ':vcs_info:*' nopatch-format '#cleeaaaaan!1!!'
 
 # To retrieve information about unapplied patches, vcs_info invokes `quilt'
 # itself. Even though that's pretty quick, it's not needed for the default
 # behaviour. If we want to have `%c' and `%u' to contain meaningful data,
 # we have to enable retrieval of unapplied data:
-zstyle ':vcs_info:*' quilt-get-unapplied true
+zstyle ':vcs_info:*' get-unapplied true
 
 # With quilt, the location of its patches are configurable. It's either
 # $QUILT_PATCHES or `patches' if that's unset. Let's assume we're a debian
