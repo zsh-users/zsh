@@ -1097,7 +1097,7 @@ function __tmux-buffers() {
         local -a bopts; bopts=()
     fi
 
-    buffers=( ${${(f)"$(command tmux list-buffers "${bopts[@]}")"}/:[ $'\t']##/:} )
+    buffers=( ${${(f)"$(command tmux 2> /dev/null list-buffers "${bopts[@]}")"}/:[ $'\t']##/:} )
     _describe -t buffers 'buffers' buffers
 }
 
@@ -1105,7 +1105,7 @@ function __tmux-bound-keys() {
     local expl
     local -a keys
 
-    keys=( ${${${${(f)"$(command tmux list-keys "$@")"}/:[ $'\t']##/:}/(#s)[ $'\t']##/}/(#s):/\\:} )
+    keys=( ${${${${(f)"$(command tmux 2> /dev/null list-keys "$@")"}/:[ $'\t']##/:}/(#s)[ $'\t']##/}/(#s):/\\:} )
     _describe -t keys 'keys' keys
 }
 
@@ -1124,7 +1124,7 @@ function __tmux-choose-stuff() {
 function __tmux-clients() {
     local expl
     local -a clients
-    clients=( ${${(f)"$(command tmux list-clients)"}/:[ $'\t']##/:} )
+    clients=( ${${(f)"$(command tmux 2> /dev/null list-clients)"}/:[ $'\t']##/:} )
     _describe -t clients 'clients' clients
 }
 
@@ -1400,7 +1400,7 @@ function __tmux-panes() {
         opts=( )
     fi
     num=0
-    command tmux list-panes "${opts[@]}" | while IFS= read -r line; do
+    command tmux 2> /dev/null list-panes "${opts[@]}" | while IFS= read -r line; do
         panes+=( $(( num++ )):${line//:/} )
     done
     _describe -t panes 'panes' panes "$@"
@@ -1421,7 +1421,7 @@ function __tmux-server-options() {
 function __tmux-sessions() {
     local expl
     local -a sessions
-    sessions=( ${${(f)"$(command tmux list-sessions)"}/:[ $'\t']##/:} )
+    sessions=( ${${(f)"$(command tmux 2> /dev/null list-sessions)"}/:[ $'\t']##/:} )
     _describe -t sessions 'sessions' sessions "$@"
 }
 
@@ -1479,7 +1479,7 @@ function __tmux-windows() {
     else
         opts=( )
     fi
-    wins=( ${${(M)${(f)"$(command tmux list-windows "${opts[@]}")"}:#<->*}/:[ $'\t']##/:} )
+    wins=( ${${(M)${(f)"$(command tmux 2> /dev/null list-windows "${opts[@]}")"}:#<->*}/:[ $'\t']##/:} )
     _describe -t windows 'windows' wins "$@"
     if [[ ${IPREFIX} != *: ]]; then
         _wanted sessions expl 'sessions' __tmux-sessions -S:
