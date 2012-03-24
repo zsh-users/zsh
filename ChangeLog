@@ -6,6 +6,10 @@
 	* 30372: Completion/Unix/Command/_tmux: Redirect error output
 	produced when no tmux server is running to /dev/null.
 
+	* 30368: Completion/Unix/Command/_tmux: Make completion work
+	when an unambiguous prefix for a known subcommand is given, as
+	in 'tmux att -<tab>'.
+
 2012-03-23  Simon Ruderich  <simon@ruderich.org>
 
 	* 30366: Misc/vcs_info-examples: Fix outdated quilt examples.
@@ -16116,5 +16120,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5613 $
+* $Revision: 1.5614 $
 *****************************************************

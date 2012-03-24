@@ -1528,6 +1528,18 @@ function _tmux() {
             if [[ -n ${_tmux_aliasmap[$tmuxcommand]} ]] ; then
                 tmuxcommand="${_tmux_aliasmap[$tmuxcommand]}"
             fi
+            if ! (( ${+functions[_tmux-$tmuxcommand]} )); then
+              local low high
+              low=$_tmux_commands[(i)$tmuxcommand*]
+              high=$_tmux_commands[(I)$tmuxcommand*]
+              if (( low == high )); then
+                tmuxcommand=${_tmux_commands[low]%%:*}
+              elif (( low < high )); then
+                _message -e "Ambiguous command $tmuxcommand"
+              else
+                _message -e "Subcommand $tmuxcommand not known"
+              fi
+            fi
             curcontext="${curcontext%:*:*}:tmux-${tmuxcommand}:"
             _call_function ret _tmux-${tmuxcommand}
         fi
