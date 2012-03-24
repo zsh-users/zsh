@@ -1,3 +1,8 @@
+2012-03-24  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 30371: Completion/Unix/Command/_ssh: You can specify -i
+	multiple times.
+
 2012-03-23  Simon Ruderich  <simon@ruderich.org>
 
 	* 30366: Misc/vcs_info-examples: Fix outdated quilt examples.
@@ -16108,5 +16113,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5611 $
+* $Revision: 1.5612 $
 *****************************************************
