@@ -1,3 +1,8 @@
+2012-03-25  Mikael Magnusson  <mikachu@gmail.com>
+
+	* Jesper Nygårds: 30378: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_gradle: new gradle completion.
+
 2012-03-24  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 30371: Completion/Unix/Command/_ssh: You can specify -i
@@ -16120,5 +16125,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5614 $
+* $Revision: 1.5615 $
 *****************************************************
