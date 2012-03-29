@@ -1359,6 +1359,10 @@ static struct change *changes, *curchange;
 
 static struct change *nextchanges, *endnextchanges;
 
+/* incremented to provide a unique change number */
+
+static zlong undo_changeno;
+
 /**/
 void
 initundo(void)
@@ -1368,6 +1372,7 @@ initundo(void)
     curchange->prev = curchange->next = NULL;
     curchange->del = curchange->ins = NULL;
     curchange->dell = curchange->insl = 0;
+    curchange->changeno = undo_changeno = 0;
     lastline = zalloc((lastlinesz = linesz) * ZLE_CHAR_SIZE);
     ZS_memcpy(lastline, zleline, (lastll = zlell));
     lastcs = zlecs;
@@ -1492,6 +1497,7 @@ mkundoent(void)
 	ch->flags = 0;
 	ch->prev = NULL;
     }
+    ch->changeno = ++undo_changeno;
     endnextchanges = ch;
 }
 
@@ -1512,8 +1518,15 @@ setlastline(void)
 
 /**/
 int
-undo(UNUSED(char **args))
+undo(char **args)
 {
+    zlong last_change = (zlong)0;
+
+    if (*args)
+    {
+	last_change = zstrtol(*args, NULL, 0);
+    }
+
     handleundo();
     do {
 	if(!curchange->prev)
@@ -1522,7 +1535,8 @@ undo(UNUSED(char **args))
 	    curchange = curchange->prev;
 	else
 	    break;
-    } while(curchange->flags & CH_PREV);
+    } while (*args ? curchange->changeno != last_change :
+	     (curchange->flags & CH_PREV));
     setlastline();
     return 0;
 }
@@ -1637,3 +1651,15 @@ zlecallhook(char *name, char *arg)
     errflag = saverrflag;
     retflag = savretflag;
 }
+
+/*
+ * Return the number corresponding to the last change made.
+ */
+
+/**/
+zlong
+get_undo_current_change(UNUSED(Param pm))
+{
+    return undo_changeno;
+}
+

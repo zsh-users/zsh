@@ -269,6 +269,7 @@ struct change {
     ZLE_STRING_T ins;		/* characters to insert */
     int insl;			/* no. of characters in ins */
     int old_cs, new_cs;		/* old and new cursor positions */
+    zlong changeno;             /* unique number of this change */
 };
 
 #define CH_NEXT (1<<0)   /* next structure is also part of this change */
