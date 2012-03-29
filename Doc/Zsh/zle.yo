@@ -878,7 +878,7 @@ Note that the effect of tt(region_highlight) is not saved and disappears
 as soon as the line is accepted.
 )
 vindex(UNDO_CHANGE_NO)
-item(tt(UNDO_CHANGE_NO) (integer))
+item(tt(UNDO_CHANGE_NO) (integer))(
 A number representing the state of the undo history.  The only use
 of this is passing as an argument to the tt(undo) widget in order to
 undo back to the recorded point.  Read-only.

@@ -1,5 +1,7 @@
 2012-03-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Doc/Zsh/zle.yo: add missing parenthesis.
+
 	* users/16932: Doc/Zsh/zle.yo, Functions/Zle/replace-string:
 	Src/Zle/zle.h, Src/Zle/zle_params.c, Src/Zle/zle_utils.c:
 	implement $UNDO_CHANGE_NO and argument to undo widget.
@@ -16131,5 +16133,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5616 $
+* $Revision: 1.5617 $
 *****************************************************
