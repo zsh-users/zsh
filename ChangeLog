@@ -1,3 +1,8 @@
+2012-03-30  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Src/init.c: add some braces to avoid warnings from
+	some versions of gcc.
+
 2012-03-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Doc/Zsh/zle.yo: add missing parenthesis.
@@ -16133,5 +16138,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5617 $
+* $Revision: 1.5618 $
 *****************************************************

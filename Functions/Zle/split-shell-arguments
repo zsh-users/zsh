@@ -17,6 +17,7 @@ integer pos=1 cpos=$((CURSOR+1)) opos iword ichar
 
 bufwords=(${(Z+n+)BUFFER})
 
+typeset -ga reply
 reply=()
 while [[ ${BUFFER[pos]} = [[:space:]] ]]; do
   (( pos++ ))
@@ -44,6 +45,7 @@ for word in "${bufwords[@]}"; do
   fi
 done
 
+typeset -g REPLY REPLY2
 if (( iword == 0 )); then
   # At the end of the line, so off the indexable positions
   # (but still a valid cursor position).

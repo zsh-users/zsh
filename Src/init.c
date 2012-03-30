@@ -341,12 +341,13 @@ parseopts(char *nam, char ***argvp)
 		if (!(optno = optlookup(*argv))) {
 		    WARN_OPTION("no such option: %s", *argv);
 		    LAST_OPTION(1);
-		} else if (optno == RESTRICTED && !nam)
+		} else if (optno == RESTRICTED && !nam) {
 		    restricted = action;
-		else if ((optno == EMACSMODE || optno == VIMODE) && nam)
+		} else if ((optno == EMACSMODE || optno == VIMODE) && nam) {
 		    WARN_OPTION("can't change option: %s", *argv);
-		else if (dosetopt(optno, action, !nam) && nam)
+		} else if (dosetopt(optno, action, !nam) && nam) {
 		    WARN_OPTION("can't change option: %s", *argv);
+		}
               break;
 	    } else if (isspace(STOUC(**argv))) {
 		/* zsh's typtab not yet set, have to use ctype */
@@ -361,12 +362,13 @@ parseopts(char *nam, char ***argvp)
 	    	if (!(optno = optlookupc(**argv))) {
 		    WARN_OPTION("bad option: -%c", **argv);
 		    LAST_OPTION(1);
-		} else if (optno == RESTRICTED && !nam)
+		} else if (optno == RESTRICTED && !nam) {
 		    restricted = action;
-		else if ((optno == EMACSMODE || optno == VIMODE) && nam)
+		} else if ((optno == EMACSMODE || optno == VIMODE) && nam) {
 		    WARN_OPTION("can't change option: %s", *argv);
-		else if (dosetopt(optno, action, !nam) && nam)
+		} else if (dosetopt(optno, action, !nam) && nam) {
 		    WARN_OPTION("can't change option: -%c", **argv);
+		}
 	    }
 	}
 	argv++;
@@ -383,7 +385,7 @@ parseopts(char *nam, char ***argvp)
     *argvp = argv;
     return cmd;
 }
-
+    
 /**/
 static void
 printhelp(void)
