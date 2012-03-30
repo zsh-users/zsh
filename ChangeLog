@@ -1,5 +1,8 @@
 2012-03-30  Peter Stephenson  <pws@csr.com>
 
+	* unposted: Functions/Zle/split-shell-arguments: add some
+	typeset -g's to avoid WARN_CREATE_GLOBAL warnings.
+
 	* unposted: Src/init.c: add some braces to avoid warnings from
 	some versions of gcc.
 
@@ -16138,5 +16141,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5618 $
+* $Revision: 1.5619 $
 *****************************************************
