@@ -1,3 +1,8 @@
+2012-04-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/16944: Functions/Zle/url-quote-magic: some more "local"s
+	needed.
+
 2012-03-30  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Functions/Zle/split-shell-arguments: add some
@@ -16141,5 +16146,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5619 $
+* $Revision: 1.5620 $
 *****************************************************
