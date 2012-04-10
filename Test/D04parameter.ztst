@@ -1076,6 +1076,16 @@
 >i
 >willJOYCE
 
+  print -l JAMES${(u)${=:-$(echo yes yes she said yes i will yes she said she will and yes she did yes)}}JOYCE
+0:New hash seive unique algorithm for arrays of more than 10 elements
+>JAMESyes
+>she
+>said
+>i
+>will
+>and
+>didJOYCE
+
   foo=
   print "${${foo}/?*/replacement}"
 0:Quoted zero-length strings are handled properly

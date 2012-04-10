@@ -3456,18 +3456,104 @@ tiedarrunsetfn(Param pm, UNUSED(int exp))
 
 /**/
 static void
-arrayuniq(char **x, int freeok)
+simple_arrayuniq(char **x, int freeok)
 {
     char **t, **p = x;
+    char *hole = "";
 
+    /* Find duplicates and replace them with holes */
     while (*++p)
 	for (t = x; t < p; t++)
-	    if (!strcmp(*p, *t)) {
+	    if (*t != hole && !strcmp(*p, *t)) {
 		if (freeok)
 		    zsfree(*p);
-		for (t = p--; (*t = t[1]) != NULL; t++);
+		*p = hole;
 		break;
 	    }
+    /* Swap non-holes into holes in optimal jumps */
+    for (p = t = x; *t != NULL; t++) {
+	if (*t == hole) {
+	    while (*p == hole)
+		++p;
+	    if ((*t = *p) != NULL)
+		*p++ = hole;
+	} else if (p == t)
+	    p++;
+    }
+    /* Erase all the remaining holes, just in case */
+    while (++t < p)
+	*t = NULL;
+}
+
+/**/
+static void
+arrayuniq_freenode(HashNode hn)
+{
+    (void)hn;
+}
+
+/**/
+static HashTable
+newuniqtable(zlong size)
+{
+    HashTable ht = newhashtable((int)size, "arrayuniq", NULL);
+    /* ??? error checking */
+
+    ht->hash        = hasher;
+    ht->emptytable  = emptyhashtable;
+    ht->filltable   = NULL;
+    ht->cmpnodes    = strcmp;
+    ht->addnode     = addhashnode;
+    ht->getnode     = gethashnode2;
+    ht->getnode2    = gethashnode2;
+    ht->removenode  = removehashnode;
+    ht->disablenode = disablehashnode;
+    ht->enablenode  = enablehashnode;
+    ht->freenode    = arrayuniq_freenode;
+    ht->printnode   = NULL;
+
+    return ht;
+}
+
+/**/
+static void
+arrayuniq(char **x, int freeok)
+{
+    char **it, **write_it;
+    zlong array_size = arrlen(x);
+    HashTable ht;
+
+    if (array_size == 0)
+	return;
+    if (array_size < 10 || !(ht = newuniqtable(array_size + 1))) {
+	/* fallback to simpler routine */
+	simple_arrayuniq(x, freeok);
+	return;
+    }
+
+    for (it = x, write_it = x; *it;) {
+	if (! gethashnode(ht, *it)) {
+	    HashNode new_node = zhalloc(sizeof(struct hashnode));
+	    if (!new_node) {
+		/* Oops, out of heap memory, no way to recover */
+		zerr("out of memory in arrayuniq");
+		break;
+	    }
+	    (void) addhashnode2(ht, *it, new_node);
+	    *write_it = *it;
+	    if (it != write_it)
+		*it = NULL;
+	    ++write_it;
+	}
+	else {
+	    if (freeok)
+		zsfree(*it);
+	    *it = NULL;
+	}
+	++it;
+    }
+    
+    deletehashtable(ht);
 }
 
 /**/
