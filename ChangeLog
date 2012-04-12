@@ -14,7 +14,7 @@
 	of heap; pull hash table creation out into a helper function and
 	use arrlen() to count the array.
 
-	* Václav Zeman: users/16991: Src/params.c: implement hash-table
+	* VÃ¡clav Zeman: users/16991: Src/params.c: implement hash-table
 	seive variant of arrayuniq() to improve speed at cost of space,
 	falls back on the constant-space version for small arrays.
 
@@ -16169,5 +16169,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5622 $
+* $Revision: 1.5623 $
 *****************************************************
