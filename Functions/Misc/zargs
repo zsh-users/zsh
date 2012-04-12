@@ -167,14 +167,14 @@ if [[ $eof == -(e|-eof) ]]; then ((end=ARGC+1))
 elif (( $#eof )); then end=$argv[(i)${eof##-(e|-eof=)}]
 else end=$argv[(i)--]
 fi
-local -a args call command; command=( ${argv[end+1,-1]} )
+local -a args call command; command=( "${(@)argv[end+1,-1]}" )
 
 if (( $opts[(I)-(null|0)] ))
-then set -- ${(ps:\000:)argv[1,end-1]}
-else set -- $argv[1,end-1]
+then set -- "${(@ps:\000:)argv[1,end-1]}"
+else set -- "${(@)argv[1,end-1]}"
 fi
 
-if [[ -n $command ]]
+if (( $#command ))
 then (( c = $#command - 1 ))
 else command=( print -r -- )
 fi
@@ -187,7 +187,7 @@ local execute='
     then print -u2 -r -- "$call"
     fi
     eval "{
-	\$call
+	\"\${(@)call}\"
     } $bg"'
 local ret=0 analyze='
     case $? in
@@ -275,11 +275,11 @@ do
 	((ARGC)) || break
 	for (( end=l; end && ${(c)#argv[1,end]} > s; end/=2 )) { }
 	(( end > n && ( end = n ) ))
-	args=( $argv[1,end] )
+	args=( "${(@)argv[1,end]}" )
 	shift $((end > ARGC ? ARGC : end))
 	if (( $#i ))
-	then call=( ${command/$i/$args} )
-	else call=( $command $args )
+	then call=( "${(@)command/$i/$args}" )
+	else call=( "${(@)command}" "${(@)args}" )
 	fi
 	if (( ${(c)#call} > s ))
 	then
