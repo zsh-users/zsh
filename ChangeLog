@@ -1,5 +1,7 @@
 2012-04-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Etc/.distfiles: missed this.
+
 	* Christian Neukirchen: 30398, 30399: Doc/params.yo: TIMEFMT
 	documentation.
 
@@ -16183,5 +16185,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5626 $
+* $Revision: 1.5627 $
 *****************************************************
