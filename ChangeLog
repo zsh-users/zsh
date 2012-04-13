@@ -1,3 +1,8 @@
+2012-04-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30400 (plus a few extra tweaks): NEWS, Etc/NEWS-4.3: update
+	NEWS for forthcoming 5.0 release.
+
 2012-04-13  Peter Stephenson  <pws@csr.com>
 
 	* 30391: Src/params.c: New hash-based arrayuniq() doesn't
@@ -16175,5 +16180,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5624 $
+* $Revision: 1.5625 $
 *****************************************************
