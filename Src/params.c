@@ -3532,7 +3532,7 @@ arrayuniq(char **x, int freeok)
     }
 
     for (it = x, write_it = x; *it;) {
-	if (! gethashnode(ht, *it)) {
+	if (! gethashnode2(ht, *it)) {
 	    HashNode new_node = zhalloc(sizeof(struct hashnode));
 	    if (!new_node) {
 		/* Oops, out of heap memory, no way to recover */
