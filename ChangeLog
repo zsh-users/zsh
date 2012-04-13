@@ -1,5 +1,8 @@
 2012-04-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Christian Neukirchen: 30398, 30399: Doc/params.yo: TIMEFMT
+	documentation.
+
 	* 30400 (plus a few extra tweaks): NEWS, Etc/NEWS-4.3: update
 	NEWS for forthcoming 5.0 release.
 
@@ -16180,5 +16183,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5625 $
+* $Revision: 1.5626 $
 *****************************************************

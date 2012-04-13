@@ -1287,7 +1287,7 @@ the workaround `tt(TERM=$TERM)' unnecessary.
 vindex(TIMEFMT)
 item(tt(TIMEFMT))(
 The format of process time reports with the tt(time) keyword.
-The default is `tt(%E real  %U user  %S system  %P %J)'.
+The default is `tt(%J  %U user %S system %P cpu %*E total)'.
 Recognizes the following escape sequences, although not all
 may be available on all systems, and some that are available
 may not be useful:
@@ -1300,12 +1300,12 @@ sitem(tt(%E))(Elapsed time in seconds.)
 sitem(tt(%P))(The CPU percentage, computed as
 (100*tt(%U)PLUS()tt(%S))/tt(%E).)
 sitem(tt(%W))(Number of times the process was swapped.)
-sitem(tt(%X))(The average amount in (shared) text space used in Kbytes.)
+sitem(tt(%X))(The average amount in (shared) text space used in kilobytes.)
 sitem(tt(%D))(The average amount in (unshared) data/stack space used in
-Kbytes.)
-sitem(tt(%K))(The total space used (%X+%D) in Kbytes.)
+kilobytes.)
+sitem(tt(%K))(The total space used (%X+%D) in kilobytes.)
 sitem(tt(%M))(The  maximum memory the process had in use at any time in
-Kbytes.)
+megabytes.)
 sitem(tt(%F))(The number of major page faults (page needed to be brought
 from disk).)
 sitem(tt(%R))(The number of minor page faults.)
