@@ -1,3 +1,7 @@
+2012-04-14  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 30406: NEWS: some typo fixes.
+
 2012-04-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Etc/.distfiles: missed this.
@@ -16185,5 +16189,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5627 $
+* $Revision: 1.5628 $
 *****************************************************
