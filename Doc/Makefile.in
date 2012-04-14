@@ -94,7 +94,7 @@ dvi: zsh.dvi
 zsh.dvi: $(sdir)/zsh.texi
 	$(TEXI2DVI) $(sdir)/zsh.texi
 
-pdf: zsh.pdf
+pdf: zsh.pdf intro.pdf
 .PHONY: pdf
 
 zsh.pdf: $(sdir)/zsh.texi
@@ -103,6 +103,9 @@ zsh.pdf: $(sdir)/zsh.texi
 	else \
 	  PDFTEX=$(PDFETEX) $(TEXI2DVI) --pdf $(sdir)/zsh.texi; \
 	fi
+
+intro.pdf: $(sdir)/intro.ms
+	pdfroff -ms $(sdir)/intro.ms >intro.pdf
 
 texi: $(sdir)/zsh.texi
 .PHONY: texi

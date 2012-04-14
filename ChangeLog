@@ -1,3 +1,8 @@
+2012-04-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30402: Doc/.distfiles, Doc/Makefile.in: turn intro.ms into
+	intro.pdf for doc distribution.  Still needs some tidy ups.
+
 2012-04-14  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 30406: NEWS: some typo fixes.
@@ -16189,5 +16194,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5628 $
+* $Revision: 1.5629 $
 *****************************************************
