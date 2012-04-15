@@ -1,3 +1,8 @@
+2012-04-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30410 (with the addition of one other case): Src/jobs.c: avoid
+	some divide-by-zero errors in TIMEFMT interpretation.
+
 2012-04-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 30402: Doc/.distfiles, Doc/Makefile.in: turn intro.ms into
@@ -16194,5 +16199,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5629 $
+* $Revision: 1.5630 $
 *****************************************************
