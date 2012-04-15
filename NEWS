@@ -29,6 +29,9 @@ Here is a summary of the most significant changes:
 - The zshroadmap manual page provides a slightly more helpful
   introduction to the shell manual than was previously available.
 
+- There have been some notable enhancements to POSIX comptability
+  when the shell is in a corresponding emulation (e.g. "emulate sh").
+
 Expansion (parameters, globbing, etc.) and redirection
 -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -282,6 +285,7 @@ Add-on functions
   replace-string and replace-string-again to provide regular expression
   replacements in the line editor.
 
+
 Changes in 4.2 since version 4.2.0
 ----------------------------------
 
@@ -348,6 +352,7 @@ Changes in 4.2 since version 4.2.0
 
 - Glob qualifier (+func) is shorthand for (e:func:) (calls a command,
   typically a shell function, with no argument).
+
 
 New features between zsh versions 4.0 and 4.2
 ---------------------------------------------
@@ -470,11 +475,13 @@ significant of a large number of improvements in the shell are:
   - Various new options for compatibility with this, that and the other
 See the 3.1.x changes below for more detail.
 
+
 New features in zsh version 3.1.8 and 3.1.9
 -------------------------------------------
 These are primarily bug-fix versions.  There are only a few user-visible
 changes.
  - Array slices ${array[a,b]} with b < a now correctly have zero length.
+
 
 New features in zsh version 3.1.7
 ---------------------------------
@@ -579,6 +586,7 @@ Other:
  - Better null-command behaviour in sh and csh emulation
  - Internal memory usage optimisations
 
+
 New features in zsh version 3.1.6 (beta version)
 ------------------------------------------------
 Note also the changes for 3.0.6, which include changes between 3.1.5. and
@@ -664,6 +672,7 @@ Other new options:
 Configuration changes:
   - Generation of signal names should be more reliable
   - Customizable installation of shell functions from distribution.
+
 
 New features in zsh version 3.0.6
 ---------------------------------
