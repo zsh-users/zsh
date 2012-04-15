@@ -1,5 +1,8 @@
 2012-04-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: NEWS: incorporate the remainder of Bart's
+	suggestions from 30408.
+
 	* 30410 (with the addition of one other case): Src/jobs.c: avoid
 	some divide-by-zero errors in TIMEFMT interpretation.
 
@@ -16199,5 +16202,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5630 $
+* $Revision: 1.5631 $
 *****************************************************

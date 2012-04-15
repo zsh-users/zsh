@@ -27,7 +27,7 @@ Here is a summary of the most significant changes:
 - Job control is supported in non-interactive shells and subshells.
 
 - The zshroadmap manual page provides a slightly more helpful
-  introduction to the shell manual than was available hitherto.
+  introduction to the shell manual than was previously available.
 
 Expansion (parameters, globbing, etc.) and redirection
 -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -92,9 +92,9 @@ Expansion (parameters, globbing, etc.) and redirection
   arbitrary file descriptors rather than the explicit range 0 to 9.
 
 - New prompt escapes:
-  %x and %I show source file and line number, useful
-    in $PS4 (the existing %N and %i show names and lines in the execution
-    environment rather than the source file).
+  %x and %I show source file and line number, useful in $PS4 (the
+    existing %N and %i show names and lines in the execution environment
+    rather than the source file).
   %F, %K, %f, %k allow colouring of prompts both using ANSI colour names
     and values supported by individual terminal emulators.
 
@@ -118,7 +118,8 @@ Shell variables (parameters)
 - New variables:
   CORRECT_IGNORE can be set to a pattern to be ignored in spelling correction.
   KEYBOARD_HACK defines characters to be ignored if typed unmatched at
-    the end of the line (an extension of the SUN_KEYBOARD_HACK option).
+    the end of the line (an extension of the SUN_KEYBOARD_HACK option,
+    but note that setting the option will override the variable).
   ZSH_PATCHLEVEL provides a unique indication of the code compiled to
     make the shell, even between releases.
   ZSH_SUBSHELL indicates the subshell level, incremented once per fork, at
@@ -137,8 +138,8 @@ Options
     code they refer to.  This is a change of the default behaviour
     as the new behaviour is much more useful.
   HASH_EXECUTABLES_ONLY: don't insert non-executable files into the
-    command hash used e.g. by completion.  This may be very slow
-    on network paths.
+    command hash used e.g. by completion; this is optional as the
+    resulting behaviour may be very slow on network paths.
   HIST_FCNTL_LOCK: Use the system's file locking mechanism instead
     of an ad-hoc mechanism for locking history files.
   HIST_LEX_WORDS: Perform lexical analysis on history lines read from
@@ -151,7 +152,8 @@ Options
     rather than raw bytes depending on the locale.  May be turned off
     within functions to perform bytewise operations.
   MULTI_FUNCDEF (on by default): "foo bar () { ... }" defines two
-    functions.  This is often found to be confusing and bug-prone.
+    functions.  This is often found to be confusing and bug-prone,
+    so you may want to unset it.
   PATH_SCRIPT: search the path for a script specified as the first
     argument to the shell on invocation.
   POSIX_ALIASES: reserved words are not candidates for alias expansion.
