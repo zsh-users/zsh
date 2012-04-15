@@ -210,7 +210,7 @@ Completion
   ZLE_REMOVE_SUFFIX_CHARS, ZLE_SPACE_SUFFIX_CHARS provide enhanced
     flexibility over suffix removal.
 
-- Matching control, typically handling with the matcher-list style,
+- Matching control, typically handled with the matcher-list style,
   supports named character ranges, such as [:upper:], wherever
   ranges were allowed, for example 'm:{[:upper:]}={[:lower:]}'.
   However, matching control does not yet handle multibyte characters
