@@ -147,7 +147,15 @@ fi
 
 _mds () {
 	local -a vals
-	vals=( ${${${(M)${(f)"$(< /etc/mdadm.conf)"}##ARRAY *}//ARRAY /}%%[[:blank:]]*} )
+	if [ -r /etc/mdadm.conf ] ; then
+	  local mdadm_conf=/etc/mdadm.conf
+	elif [ -r /etc/mdadm/mdadm.conf ] ; then
+	  local mdadm_conf=/etc/mdadm/mdadm.conf
+	else
+	  _message "could not find mdadm.conf"
+	  return 1
+	fi
+	vals=( ${${${(M)${(f)"$(< $mdadm_conf)"}##ARRAY *}//ARRAY /}%%[[:blank:]]*} )
 	_describe -t mds "RAID devices" vals
 	_arguments \
 		"(-h --help)"{-h,--help}'[display a mode specific help message]'

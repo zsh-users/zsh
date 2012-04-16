@@ -1,5 +1,8 @@
 2012-04-16  Peter Stephenson  <pws@csr.com>
 
+	* Michael Prokop: 30414: Completion/Linux/Command/_mdadm: more
+	flexible configuration file usage.
+
 	* 30413: Src/params.c, Src/utils.c, Test/D04parameter.ztst:
 	(q-) parameter flag should quote the empty string and should
 	report an error with extra trailing q's.
@@ -16208,5 +16211,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5632 $
+* $Revision: 1.5633 $
 *****************************************************
