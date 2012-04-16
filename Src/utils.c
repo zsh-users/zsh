@@ -4735,7 +4735,7 @@ quotestring(const char *s, char **e, int instring)
     char *v;
     int alloclen;
     char *buf;
-    int sf = 0, shownull;
+    int sf = 0, shownull = 0;
     /*
      * quotesub is used with QT_SINGLE_OPTIONAL.
      * quotesub = 0:  mechanism not active
@@ -4750,14 +4750,12 @@ quotestring(const char *s, char **e, int instring)
     const char *uend;
 
     slen = strlen(s);
-    if (instring == QT_BACKSLASH_SHOWNULL) {
-	shownull = 1;
-	instring = QT_BACKSLASH;
-    } else {
-	shownull = 0;
-    }
     switch (instring)
     {
+    case QT_BACKSLASH_SHOWNULL:
+	shownull = 1;
+	instring = QT_BACKSLASH;
+	/*FALLTHROUGH*/
     case QT_BACKSLASH:
 	/*
 	 * With QT_BACKSLASH we may need to use $'\300' stuff.
@@ -4765,22 +4763,23 @@ quotestring(const char *s, char **e, int instring)
 	 * storage and using heap for correct size at end.
 	 */
 	alloclen = slen * 7 + 1;
-	if (!*s && shownull)
-	    alloclen += 2;	/* for '' */
 	break;
 
     case QT_SINGLE_OPTIONAL:
 	/*
 	 * Here, we may need to add single quotes.
+	 * Always show empty strings.
 	 */
 	alloclen = slen * 4 + 3;
-	quotesub = 1;
+	quotesub = shownull = 1;
 	break;
 
     default:
 	alloclen = slen * 4 + 1;
 	break;
     }
+    if (!*s && shownull)
+	alloclen += 2;	/* for '' */
 
     quotestart = v = buf = zshcalloc(alloclen);
 

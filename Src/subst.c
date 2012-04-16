@@ -1828,6 +1828,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 			quotemod = 1;
 			quotetype = QT_SINGLE_OPTIONAL;
 		    } else {
+			if (quotetype == QT_SINGLE_OPTIONAL) {
+			    /* extra q's after '-' not allowed */
+			    goto flagerr;
+			}
 			quotemod++, quotetype++;
 		    }
 		    break;

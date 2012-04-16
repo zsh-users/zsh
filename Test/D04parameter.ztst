@@ -385,6 +385,13 @@
 >$'playing \'stupid\' "games" \\w\\i\\t\\h $quoting.'
 >'playing '\'stupid\'' "games" \w\i\t\h $quoting.'
 
+  x=( a '' '\b' 'c d' '$e' )
+  print -r ${(q)x}
+  print -r ${(q-)x}
+0:Another ${(q...)...} test
+>a '' \\b c\ d \$e
+>a '' '\b' 'c d' '$e'
+
   print -r -- ${(q-):-foo}
   print -r -- ${(q-):-foo bar}
   print -r -- ${(q-):-"*(.)"}
