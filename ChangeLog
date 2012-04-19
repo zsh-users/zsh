@@ -1,3 +1,8 @@
+2012-04-20  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 30412: Doc/Zsh/zle.yo: Document the set-local-history
+	widget in the list of widgets.
+
 2012-04-16  Peter Stephenson  <pws@csr.com>
 
 	* Michael Prokop: 30414: Completion/Linux/Command/_mdadm: more
@@ -16211,5 +16216,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5633 $
+* $Revision: 1.5634 $
 *****************************************************

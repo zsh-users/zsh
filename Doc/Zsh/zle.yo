@@ -1471,6 +1471,14 @@ line up to the cursor.
 This leaves the cursor in its original position.
 )
 enditem()
+tindex(set-local-history)
+item(tt(set-local-history))(
+By default, history movement commands visit the imported lines as well as
+the local lines. This widget lets you toggle this on and off, or set it with
+the numeric argument. Zero for both local and imported lines and nonzero for
+only local lines.
+)
+enditem()
 texinode(Modifying Text)(Arguments)(History Control)(Zle Widgets)
 subsect(Modifying Text)
 startitem()
