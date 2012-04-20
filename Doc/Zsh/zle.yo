@@ -1470,7 +1470,6 @@ Search forward in the history for a line beginning with the current
 line up to the cursor.
 This leaves the cursor in its original position.
 )
-enditem()
 tindex(set-local-history)
 item(tt(set-local-history))(
 By default, history movement commands visit the imported lines as well as

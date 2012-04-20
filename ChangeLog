@@ -3,6 +3,9 @@
 	* 30412: Doc/Zsh/zle.yo: Document the set-local-history
 	widget in the list of widgets.
 
+	* Vin Shelton: 30427: Doc/Zsh/zle.yo: Remove erroneous enditem
+	from previous commit.
+
 2012-04-16  Peter Stephenson  <pws@csr.com>
 
 	* Michael Prokop: 30414: Completion/Linux/Command/_mdadm: more
@@ -16216,5 +16219,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5634 $
+* $Revision: 1.5635 $
 *****************************************************
