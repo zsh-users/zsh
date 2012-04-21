@@ -1,3 +1,7 @@
+2012-04-21  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 30433: Src/hist.c: double backslash is not line continuation.
+
 2012-04-20  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 30412: Doc/Zsh/zle.yo: Document the set-local-history
@@ -16219,5 +16223,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5635 $
+* $Revision: 1.5636 $
 *****************************************************

@@ -2225,7 +2225,8 @@ readhistline(int start, char **bufp, int *bufsiz, FILE *in)
 	}
 	else {
 	    buf[len - 1] = '\0';
-	    if (len > 1 && buf[len - 2] == '\\') {
+	    if (len > 1 && buf[len - 2] == '\\' &&
+		(len < 3 || buf[len - 3] != '\\')) {
 		buf[--len - 1] = '\n';
 		if (!feof(in))
 		    return readhistline(len, bufp, bufsiz, in);
