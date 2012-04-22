@@ -2879,7 +2879,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
     } else if (inbrace && (*s == '|' || *s == Bar ||
 			   *s == '*' || *s == Star)) {
 	int intersect = (*s == '*' || *s == Star);
-	char **compare = getaparam(++s), **ap, **apsrc;
+	char **compare, **ap, **apsrc;
+	++s;
+	if (*itype_end(s, IIDENT, 0)) {
+	    untokenize(s);
+	    zerr("not an identifier: %s", s);
+	    return NULL;
+	}
+	compare = getaparam(s);
 	if (compare) {
 	    HashTable ht = newuniqtable(arrlen(compare)+1);
 	    int present;

@@ -1,5 +1,7 @@
 2012-04-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Src/subst.c: add test for valid identifier to 30431.
+
 	* Test/D04parameter.ztst: 30439: Src/subst.c,
 	Test/D04parameter.ztst: ${...:*...} with nonexistent or
 	non-array variable second should return no results.
@@ -16235,5 +16237,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5638 $
+* $Revision: 1.5639 $
 *****************************************************
