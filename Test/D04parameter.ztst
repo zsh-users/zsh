@@ -169,6 +169,29 @@
 >a-string-with-slashes
 >a-string-with-slashes
 
+  args=('one' '#foo' '(bar' "'three'" two)
+  mod=('#foo' '(bar' "'three'" sir_not_appearing_in_this_film)
+  print ${args:|mod}
+  print ${args:*mod}
+  print "${(@)args:|mod}"
+  print "${(@)args:*mod}"
+  args=(two words)
+  mod=('one word' 'two words')
+  print "${args:|mod}"
+  print "${args:*mod}"
+  scalar='two words'
+  print ${scalar:|mod}
+  print ${scalar:*mod}
+0:"|" array exclusion and "*" array intersection
+>one two
+>#foo (bar 'three'
+>one two
+>#foo (bar 'three'
+>
+>two words
+>
+>two words
+
   str1='twocubed'
   array=(the number of protons in an oxygen nucleus)
   print $#str1 ${#str1} "$#str1 ${#str1}" $#array ${#array} "$#array ${#array}"

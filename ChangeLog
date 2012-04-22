@@ -1,3 +1,11 @@
+2012-04-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30431 (typo in _typeset fixed):
+	Completion/Zsh/Command/_typeset, Doc/Zsh/expn.yo, ASrc/params.c,
+	Src/subst.c, Test/D04parameter.ztst:  add ${...:|...} and
+	${...:*...} operators for removal or inclusion of results
+	by array element.
+
 2012-04-21  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 30433: Src/hist.c: double backslash is not line continuation.
@@ -16223,5 +16231,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5636 $
+* $Revision: 1.5637 $
 *****************************************************

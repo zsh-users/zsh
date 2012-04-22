@@ -75,9 +75,11 @@ if [[ "$state" = vars_eq ]]; then
     if (( $+opt_args[-w] ));then
       _wanted files expl 'zwc file' _files -g '*.zwc(-.)'
     elif [[ $service = autoload || -n $opt_args[(i)-[uU]] ]]; then
-      args=(${^fpath}/*(:t))
+      args=(${^fpath}/*(-.:t))
       # Filter out functions already loaded or marked for autoload.
-      args=(${args:#(${(kj.|.)~functions})})
+      local -a funckeys
+      funckeys=(${(k)functions})
+      args=(${args:|funckeys})
       _wanted functions expl 'shell function' compadd -a args
     else
       _functions

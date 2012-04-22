@@ -3493,7 +3493,7 @@ arrayuniq_freenode(HashNode hn)
 }
 
 /**/
-static HashTable
+HashTable
 newuniqtable(zlong size)
 {
     HashTable ht = newhashtable((int)size, "arrayuniq", NULL);

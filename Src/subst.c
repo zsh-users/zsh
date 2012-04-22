@@ -2876,6 +2876,49 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	    }
 	    break;
 	}
+    } else if (inbrace && (*s == '|' || *s == Bar ||
+			   *s == '*' || *s == Star)) {
+	int intersect = (*s == '*' || *s == Star);
+	char **compare = getaparam(++s), **ap, **apsrc;
+	if (compare) {
+	    HashTable ht = newuniqtable(arrlen(compare)+1);
+	    int present;
+	    for (ap = compare; *ap; ap++)
+		(void)addhashnode2(ht, *ap, (HashNode)
+				   zhalloc(sizeof(struct hashnode)));
+	    if (!vunset && isarr) {
+		if (!copied) {
+		    aval = arrdup(aval);
+		    copied = 1;
+		}
+		for (ap = apsrc = aval; *apsrc; apsrc++) {
+		    untokenize(*apsrc);
+		    present = (gethashnode2(ht, *apsrc) != NULL);
+		    if (intersect ? present : !present) {
+			if (ap != apsrc) {
+			    *ap = *apsrc;
+			}
+			ap++;
+		    }
+		}
+		*ap = NULL;
+	    } else {
+		if (vunset) {
+		    if (unset(UNSET)) {
+			*idend = '\0';
+			zerr("%s: parameter not set", idbeg);
+			deletehashtable(ht);
+			return NULL;
+		    }
+		    val = dupstring("");
+		} else {
+		    present = (gethashnode2(ht, val) != NULL);
+		    if (intersect ? !present : present)
+			val = dupstring("");
+		}
+	    }
+	    deletehashtable(ht);
+	}
     } else {			/* no ${...=...} or anything, but possible modifiers. */
 	/*
 	 * Handler ${+...}.  TODO: strange, why do we handle this only

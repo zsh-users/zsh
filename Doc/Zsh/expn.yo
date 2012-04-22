@@ -604,6 +604,19 @@ If var(name) is an array
 the matching array elements are removed (use the `tt((M))' flag to
 remove the non-matched elements).
 )
+item(tt(${)var(name)tt(:|)var(arrayname)tt(}))(
+If var(arrayname) is the name (N.B., not contents) of an array
+variable, then any elements contained in var(arrayname) are removed
+from the substitution of var(name).  If the substitution is scalar,
+either because var(name) is a scalar variable or the expression is
+quoted, the elements of var(arrayname) are instead tested against the
+entire expression.
+)
+item(tt(${)var(name)tt(:*)var(arrayname)tt(}))(
+Similar to the preceding subsitution, but in the opposite sense,
+so that entries present in both the original substitution and as
+elements of var(arrayname) are retained and others removed.
+)
 xitem(tt(${)var(name)tt(:)var(offset)tt(}))
 item(tt(${)var(name)tt(:)var(offset)tt(:)var(length)tt(}))(
 This syntax gives effects similar to parameter subscripting
