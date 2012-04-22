@@ -1,7 +1,11 @@
 2012-04-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Test/D04parameter.ztst: 30439: Src/subst.c,
+	Test/D04parameter.ztst: ${...:*...} with nonexistent or
+	non-array variable second should return no results.
+
 	* 30431 (typo in _typeset fixed):
-	Completion/Zsh/Command/_typeset, Doc/Zsh/expn.yo, ASrc/params.c,
+	Completion/Zsh/Command/_typeset, Doc/Zsh/expn.yo, Src/params.c,
 	Src/subst.c, Test/D04parameter.ztst:  add ${...:|...} and
 	${...:*...} operators for removal or inclusion of results
 	by array element.
@@ -16231,5 +16235,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5637 $
+* $Revision: 1.5638 $
 *****************************************************

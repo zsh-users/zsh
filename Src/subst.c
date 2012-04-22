@@ -2918,6 +2918,19 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		}
 	    }
 	    deletehashtable(ht);
+	} else if (intersect) {
+	    /*
+	     * The intersection with nothing is nothing...
+	     * Seems a bit pointless complaining that the first
+	     * expression is unset here if the second is, too.
+	     */
+	    if (!vunset) {
+		if (isarr) {
+		    aval = mkarray(NULL);
+		} else {
+		    val = dupstring("");
+		}
+	    }
 	}
     } else {			/* no ${...=...} or anything, but possible modifiers. */
 	/*

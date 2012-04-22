@@ -182,6 +182,9 @@
   scalar='two words'
   print ${scalar:|mod}
   print ${scalar:*mod}
+  print ${args:*nonexistent}
+  empty=
+  print ${args:*empty}
 0:"|" array exclusion and "*" array intersection
 >one two
 >#foo (bar 'three'
@@ -191,6 +194,8 @@
 >two words
 >
 >two words
+>
+>
 
   str1='twocubed'
   array=(the number of protons in an oxygen nucleus)
