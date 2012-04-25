@@ -68,6 +68,7 @@ else
 
     what='(st(art|op|atus)|(force-|)re(start|load)|debug_(up|down)|dump(|_stats)|add|delete|clean|list)'
 
+    [[ -x $script ]] || return 1
     read -u0 -k2 magic < $script && [[ $magic = '#!' ]] &&
     cmds=( ${${(j:|:s:|:)${(M)${(f)"$(< $script)"}:#[[:blank:]]#(\'|)${~what}([[:blank:]]#\|[[:blank:]]#${~what})#(\'|)\)}}//[^-a-z_]} )
 
