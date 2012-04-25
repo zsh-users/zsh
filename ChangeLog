@@ -5,6 +5,8 @@
 
 	* 30430: Doc/intro.ms: Fix some errors and outdatedness.
 
+	* 30444: NEWS: Add entry for new syntax added in 30431 below.
+
 2012-04-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Src/subst.c: add test for valid identifier to 30431.
@@ -16244,5 +16246,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5641 $
+* $Revision: 1.5642 $
 *****************************************************

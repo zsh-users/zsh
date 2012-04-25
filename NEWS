@@ -87,6 +87,12 @@ Expansion (parameters, globbing, etc.) and redirection
   as a string, never a pattern, e.g. ${array[(ie)*]} looks for the
   index of the array element containing the literal string "*".
 
+- The operators :| and :* in parameter substitution allow for array
+  subtraction and intersection in the form ${name:|array}. With the :|
+  operator, all entries in $name that are also in $array will be removed
+  from the substitution. Conversely for the :* operation only the
+  entries that are in both arrays will be substituted.
+
 - Numeric expansions can have a positive or negative step
   e.g. "{3..9..2}".  Negative start and end of ranges are also now
   supported.
