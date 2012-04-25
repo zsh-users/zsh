@@ -3,6 +3,8 @@
 	* 30429: Completion/Unix/Command/_init_d: Avoid error when the
 	service doesn't exist.
 
+	* 30430: Doc/intro.ms: Fix some errors and outdatedness.
+
 2012-04-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Src/subst.c: add test for valid identifier to 30431.
@@ -16242,5 +16244,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5640 $
+* $Revision: 1.5641 $
 *****************************************************

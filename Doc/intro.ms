@@ -135,7 +135,7 @@ run303
 run123\0\0run2
 %\0ls\0run<300->
 run303
-%\0ls\0run<>
+%\0ls\0run<->
 run123\0\0run2\0\0\0\0run234\0\0run240\0\0run303
 .De
 The \fINUMERICGLOBSORT\fP option will sort files with numbers
@@ -143,7 +143,7 @@ according to the number.  This will not work with \fCls\fP as it
 resorts its arguments:
 .Ds
 %\0setopt\0numericglobsort
-%\0echo\0run<>
+%\0echo\0run<->
 run2\0run123\0run234\0run240\0run303
 .De
 Grouping is possible:
@@ -692,12 +692,12 @@ by setting a few more options and parameters:
 2\0\0\0\0\0\0\0/usr/bin
 3\0\0\0\0\0\0\0/usr
 4\0\0\0\0\0\0\0~
-/tmp>\0ls\0=2/df
+/tmp>\0ls\0~2/df
 /usr/bin/df
 /tmp>\0cd\0-4
 ~>
 .De
-Note that \fC=2\fP expanded to the second directory in the
+Note that \fC~2\fP expanded to the second directory in the
 history list, and that \fCcd -3\fP recalled the third
 directory in the list.
 .PP
@@ -2282,11 +2282,20 @@ The same is true of \fBCDPATH\fP and \fBcdpath\fP:
 In general, predefined parameters with names in all lowercase are
 arrays; assignments to them take the form:
 .Ds
-\fIname\fR\fC=(\fR\0\fIelem\fR\0...\\0\fC)\fR
+\fIname\fR\fC=(\fR\0\fIelem\fR\0...\0\fC)\fR
 .De
 Predefined parameters with names in all uppercase are strings.  If
 there is both an array and a string version of the same parameter, the
-string version is a colon-separated list, like \fBPATH\fP.
+string version is a colon-separated list, like \fBPATH\fP. You can use
+.Ds
+%\0typeset\0-T\0FOO\0foo
+.De
+to create more of these yourself.
+.Ds
+%\0foo=(\0a\0b\0c\0)
+%\0echo\0$FOO
+a:b:c
+.De
 .PP
 \fBHISTFILE\fP is the name of the history file, where the history
 is saved when a shell exits.
@@ -2314,7 +2323,7 @@ exit
 \0\0\029\0\0HISTSIZE=3
 \0\0\030\0\0history
 .De
-If you have several incantations of \fBzsh\fP running at the same
+If you have several instances of \fBzsh\fP running at the same
 time, like when using the X window system, it might be preferable to
 append the history of each shell to a file when a shell exits instead
 of overwriting the old contents of the file.  You can get this
@@ -2432,6 +2441,7 @@ and command line while leaving command output unhighlighted, try this:
 %\0POSTEDIT=`echotc\0se`
 %\0PROMPT='%S%%\0'
 .De
+This trick is mostly superceded by the zle_highlight array parameter.
 .Sh "Login/logout watching"
 .PP
 You can specify login or logout events to monitor
@@ -2595,10 +2605,14 @@ in csh.
 zsh:\0unmatched\0'
 .De
 \fIGLOBDOTS\fP lets files beginning with a \fC.\fP be matched without
-explicitly specifying the dot.
+explicitly specifying the dot. This can also be specified for a particular
+pattern by appending (D) to it.
 .Ds
 %\0ls\0-d\0*x*
 Mailboxes
+%\0ls\0-d\0*x*(D)
+\&.exrc\0\0\0\0\0\0\0\0\0.pnewsexpert\0\0.xserverrc
+\&.mushexpert\0\0\0.xinitrc\0\0\0\0\0\0Mailboxes
 %\0setopt\0globdots
 %\0ls\0-d\0*x*
 \&.exrc\0\0\0\0\0\0\0\0\0.pnewsexpert\0\0.xserverrc
