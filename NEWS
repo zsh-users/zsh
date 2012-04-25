@@ -52,31 +52,38 @@ Expansion (parameters, globbing, etc.) and redirection
   This is useful for expanding paths with many variable components as
   commonly found in software development.
 
-- Parameter expansion has the ${NAME:OFFSET} and ${NAME:OFFSET:LENGTH}
+- Parameter substitution has the ${NAME:OFFSET} and ${NAME:OFFSET:LENGTH}
   syntax for compatibility with other shells (and zero-based indexing
   is used to enhance compatibility).  LENGTH may be negative to count
   from the end.
 
-- The parameter expansion flag (D) abbreviates directories in parameters
+- The arbitrary limit on parameter subscripts (262144) has been removed.
+  As it was not configurable and tested in an inconvenient place it
+  was deemed preferable to remove it completely.  The limit was originally
+  introduced to prevent accidental creation of a large parameter array
+  by typos that generated assignments along the lines of "12345678=0".
+  The general advice is not to do that.
+
+- The parameter substitution flag (D) abbreviates directories in parameters
   using the familiar ~ form.
 
-- The parameter expansion flag (g) can take delimited arguments o, e and
+- The parameter substitution flag (g) can take delimited arguments o, e and
   c to provide echo- and print-style expansion: (g::) provides basic
   echo-style expansion; (g:e:) provides the extended capabilities of
   print; (g:o:) provides octal escapes without a leading zero; (g:c:)
   additionally expands "^c" style control characters as for bindkey.
   Options may be combined, e.g. (g:eoc:).
 
-- The parameter expansion flag (m) indicates that string lengths used
+- The parameter substitution flag (m) indicates that string lengths used
   calculated by the (l) and (r) flags or the # operator should take
   account of the printing width of characters in multibyte mode, whether
   0, 1 or more.  (mm) causes printing characters to count as 1 and
   non-printing chracters to count as 0.
 
-- The parameter expansion flag (q-) picks the most minimal way of
+- The parameter substitution flag (q-) picks the most minimal way of
   quoting the parameter words, to make the result as readable as possible.
 
-- The parameter expansion flag (Z), a variant of (z), takes arguments
+- The parameter substitution flag (Z), a variant of (z), takes arguments
   describing how to split a variable using shell syntax: (Z:c:) parses
   comments as strings (the default is not to treat comment characters
   specially); (Z:C:) parses comments and strips them; (Z:n:) treats

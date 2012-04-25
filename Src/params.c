@@ -1905,6 +1905,18 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
     if (!bracks && *s)
 	return NULL;
     *pptr = s;
+#if 0
+    /*
+     * Check for large subscripts that might be erroneous.
+     * This code is too gross in several ways:
+     * - the limit is completely arbitrary
+     * - the test vetoes operations on existing arrays
+     * - it's not at all clear a general test on large arrays of
+     *   this kind is any use.
+     *
+     * Until someone comes up with workable replacement code it's
+     * therefore commented out.
+     */
     if (v->start > MAX_ARRLEN) {
 	zerr("subscript too %s: %d", "big", v->start + !isset(KSHARRAYS));
 	return NULL;
@@ -1921,6 +1933,7 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	zerr("subscript too %s: %d", "small", v->end);
 	return NULL;
     }
+#endif
     return v;
 }
 
