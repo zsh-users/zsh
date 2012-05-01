@@ -27,7 +27,7 @@ if [[ CURRENT -eq 2 ]]; then
   _tags syswideconfig pathconfig standardsconfig confstring restconfig
 
   allkeys=(${${(f)"$(getconf -a 2>/dev/null)"}%%[: ]*})
-  restkeys=(${allkeys:#(${(j.|.)~mykeys})})
+  restkeys=(${allkeys:|mykeys})
 
   while _tags; do
     _requested -V syswideconfig expl 'systemwide configuration variables' \

@@ -1,3 +1,7 @@
+2012-05-01  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 30456: Completion/Unix/Command/_getconf: Use new array syntax.
+
 2012-04-25  Peter Stephenson  <pws@csr.com>
 
 	* 30455: NEWS, Src/params.c: remove max array length test.
@@ -16250,5 +16254,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5643 $
+* $Revision: 1.5644 $
 *****************************************************
