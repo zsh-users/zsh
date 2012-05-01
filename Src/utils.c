@@ -3114,7 +3114,7 @@ wordcount(char *s, char *sep, int mul)
 	r = 1;
 	sl = strlen(sep);
 	for (; (c = findsep(&s, sep, 0)) >= 0; s += sl)
-	    if ((c && *(s + sl)) || mul)
+	    if ((c || mul) && (sl || *(s + sl)))
 		r++;
     } else {
 	char *t = s;

@@ -1292,7 +1292,7 @@
 >in
 >it
 
-  foo="line:with::missing::fields:in:it"
+  foo="line:with::missing::fields:in:it:"
   print -l "${(@s.:.)foo}"
 0:Retention of empty fields in quoted splitting with "@"
 >line
@@ -1303,6 +1303,20 @@
 >fields
 >in
 >it
+>
+
+  str=abcd
+  print -l ${(s..)str}
+  print -l "${(s..)str}"
+0:splitting of strings into characters
+>a
+>b
+>c
+>d
+>a
+>b
+>c
+>d
 
   array=('%' '$' 'j' '*' '$foo')
   print ${array[(i)*]} "${array[(i)*]}"

@@ -1,3 +1,9 @@
+2012-05-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/17046: Src/utils.c, Test/D04parameter.ztst: don't
+	count too many elements when splitting quoted parameter
+	substitution on null separator.
+
 2012-05-01  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 30456: Completion/Unix/Command/_getconf: Use new array syntax.
@@ -16254,5 +16260,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5644 $
+* $Revision: 1.5645 $
 *****************************************************
