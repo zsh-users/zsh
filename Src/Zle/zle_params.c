@@ -761,7 +761,7 @@ get_zle_state(UNUSED(Param pm))
 	    *ptr = '\0';
 	}
     }
-    
+
     arr = colonsplit(zle_state, 0);
     strmetasort(arr, SORTIT_ANYOLDHOW, NULL);
     zle_state = zjoin(arr, ' ', 1);
