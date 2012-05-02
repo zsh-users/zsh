@@ -1,3 +1,10 @@
+2012-05-02  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 30461, 30462 (tweaked): Functions/Prompts/promptinit,
+	Functions/VCS_Info/vcs_info_setsys, Functions/Zftp/zfcd_match,
+	Functions/Zle/url-quote-magic: add missing local for match,
+	mbegin and mend.
+
 2012-05-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/17046: Src/utils.c, Test/D04parameter.ztst: don't
@@ -16260,5 +16267,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5645 $
+* $Revision: 1.5646 $
 *****************************************************

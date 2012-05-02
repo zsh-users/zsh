@@ -15,6 +15,7 @@ promptinit () {
   emulate -L zsh
   setopt extendedglob
   local ppath='' name theme
+  local -a match mbegin mend
 
   # Autoload all prompt_*_setup functions in fpath
   for theme in $^fpath/prompt_*_setup(N); do
