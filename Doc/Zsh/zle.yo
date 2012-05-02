@@ -908,11 +908,20 @@ item(tt(ZLE_STATE) (scalar))(
 Contains a set of space-separated words that describe the current tt(zle)
 state.
 
-Currently, the only state shown is the insert mode as set by the
-tt(overwrite-mode) or tt(vi-replace) widgets.  The string contains
-`tt(insert)' if characters to be inserted on the command line move existing
-characters to the right, `tt(overwrite)' if characters to be inserted
-overwrite existing characters.
+Currently, the states shown are the insert mode as set by the
+tt(overwrite-mode) or tt(vi-replace) widgets and whether history commands
+will visit imported entries as controlled by the set-local-history widget.
+The string contains `tt(insert)' if characters to be inserted on the
+command line move existing characters to the right or `tt(overwrite)'
+if characters to be inserted overwrite existing characters. It contains
+`tt(localhistory)' if only local history commands will be visited or
+`tt(globalhistory)' if imported history commands will also be visited.
+
+The substrings are sorted in alphabetical order so that if you want to
+test for two specific substrings in a future-proof way, you can do match
+by doing:
+
+example(if [[ $ZLE_STATE == *insert*globalhistory* ]]; then ...; fi)
 )
 enditem()
 

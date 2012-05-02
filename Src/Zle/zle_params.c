@@ -709,21 +709,17 @@ get_context(UNUSED(Param pm))
 static char *
 get_zle_state(UNUSED(Param pm))
 {
-    char *zle_state = NULL, *ptr = NULL;
+    char *zle_state = NULL, *ptr = NULL, **arr = NULL;
     int itp, istate, len = 0;
 
     /*
-     * When additional substrings are added, they should be kept in
-     * alphabetical order, so the user can easily match against this
-     * parameter: if [[ $ZLE_STATE == *bar*foo*zonk* ]]; then ...; fi
+     * Substrings are sorted at the end, so the user can
+     * easily match against this parameter:
+     * if [[ $ZLE_STATE == *bar*foo*zonk* ]]; then ...; fi
      */
     for (itp = 0; itp < 2; itp++) {
 	char *str;
-	/*
-	 * Currently there is only one state: insert or overwrite.
-	 * This loop is to make it easy to add others.
-	 */
-	for (istate = 0; istate < 1; istate++) {
+	for (istate = 0; istate < 2; istate++) {
 	    int slen;
 	    switch (istate) {
 	    case 0:
@@ -731,6 +727,13 @@ get_zle_state(UNUSED(Param pm))
 		    str = "insert";
 		} else {
 		    str = "overwrite";
+		}
+		break;
+	    case 1:
+		if (hist_skip_flags & HIST_FOREIGN) {
+		    str = "localhistory";
+		} else {
+		    str = "globalhistory";
 		}
 		break;
 
@@ -746,7 +749,7 @@ get_zle_state(UNUSED(Param pm))
 	    } else {
 		/* Accumulating string */
 		if (istate)
-		    *ptr++ = ' ';
+		    *ptr++ = ':';
 		memcpy(ptr, str, slen);
 		ptr += slen;
 	    }
@@ -758,6 +761,11 @@ get_zle_state(UNUSED(Param pm))
 	    *ptr = '\0';
 	}
     }
+    
+    arr = colonsplit(zle_state, 0);
+    strmetasort(arr, SORTIT_ANYOLDHOW, NULL);
+    zle_state = zjoin(arr, ' ', 1);
+    freearray(arr);
 
     return zle_state;
 }
