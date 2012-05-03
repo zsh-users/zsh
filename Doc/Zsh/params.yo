@@ -1103,6 +1103,22 @@ whose value is not used by the shell.  The tt(manpath)
 array can be useful, however, since setting it also sets
 tt(MANPATH), and vice versa.
 )
+xitem(tt(match))
+xitem(tt(mbegin))
+item(tt(mend))(
+Arrays set by the shell when the tt(b) globbing flag is used in pattern
+matches.  See the subsection em(Globbing flags) in
+ifzman(the documentation for em(Filename Generation) in zmanref(zshexpn))\
+ifnzman(noderef(Filename Generation)).
+)
+xitem(tt(MATCH))
+xitem(tt(MBEGIN))
+item(tt(MEND))(
+Set by the shell when the tt(m) globbing flag is used in pattern
+matches.  See the subsection em(Globbing flags) in
+ifzman(the documentation for em(Filename Generation) in zmanref(zshexpn))\
+ifnzman(noderef(Filename Generation)).
+)
 vindex(module_path)
 vindex(MODULE_PATH)
 item(tt(module_path) <S> <Z> (tt(MODULE_PATH) <S>))(

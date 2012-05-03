@@ -1967,6 +1967,9 @@ item(tt(I))(
 Case sensitive:  locally negates the effect of tt(i) or tt(l) from
 that point on.
 )
+vindex(match)
+vindex(mbegin)
+vindex(mend)
 item(tt(b))(
 Activate backreferences for parenthesised groups in the pattern;
 this does not work in filename generation.  When a pattern with a set of
@@ -2035,6 +2038,9 @@ matches; tt(LPAR()#c,)var(M)tt(RPAR()) is equivalent to specifying var(N)
 as 0; tt(LPAR()#c)var(N)tt(,RPAR()) specifies that there is no maximum
 limit on the number of matches.
 )
+vindex(MATCH)
+vindex(MBEGIN)
+vindex(MEND)
 item(tt(m))(
 Set references to the match data for the entire string matched; this is
 similar to backreferencing and does not work in filename generation.  The
