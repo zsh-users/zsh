@@ -1498,7 +1498,7 @@ bin_fc(char *nam, char **argv, Options ops, int func)
     }
     if (OPT_ISSET(ops,'l')) {
 	/* list the required part of the history */
-	retval = fclist(stdout, ops, first, last, asgf, pprog);
+	retval = fclist(stdout, ops, first, last, asgf, pprog, 0);
 	unqueue_signals();
     }
     else {
@@ -1530,7 +1530,7 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 		}
 	    }
 	    ops->ind['n'] = 1;	/* No line numbers here. */
-	    if (!fclist(out, ops, first, last, asgf, pprog)) {
+	    if (!fclist(out, ops, first, last, asgf, pprog, 1)) {
 		char *editor;
 
 		if (func == BIN_R)
@@ -1639,7 +1639,7 @@ fcsubs(char **sp, struct asgment *sub)
 /**/
 static int
 fclist(FILE *f, Options ops, zlong first, zlong last,
-       struct asgment *subs, Patprog pprog)
+       struct asgment *subs, Patprog pprog, int is_command)
 {
     int fclistdone = 0;
     zlong tmp;
@@ -1652,8 +1652,8 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
 	last = first;
 	first = tmp;
     }
-    if (first > last) {
-	zwarnnam("fc", "history events are in wrong order, aborted");
+    if (is_command && first > last) {
+	zwarnnam("fc", "history events can't be executed backwards, aborted");
 	if (f != stdout)
 	    fclose(f);
 	return 1;

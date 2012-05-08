@@ -1,3 +1,11 @@
+2012-05-08  Peter Stephenson  <pws@csr.com>
+
+	* 30469: Src/builtin.c: allow reverse listing of history using
+	fc -r, but don't allow reverse execution of commands at all.
+
+	* unposted: Doc/Zsh/contrib.yo: clarify that zargs is different
+	from xargs.
+
 2012-05-03  Peter Stephenson  <pws@csr.com>
 
 	* unposted, see 30465: Doc/Zsh/expn.yo, Doc/Zsh/params.yo: add
@@ -16276,5 +16284,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5648 $
+* $Revision: 1.5649 $
 *****************************************************
