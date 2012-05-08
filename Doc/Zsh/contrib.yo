@@ -3463,11 +3463,11 @@ game.
 )
 findex(zargs)
 item(tt(zargs) [ var(option) ... tt(-)tt(-) ] [ var(input) ... ] [ tt(-)tt(-) var(command) [ var(arg) ... ] ])(
-This function works like GNU xargs, except that instead of reading lines
-of arguments from the standard input, it takes them from the command line.
-This is useful because zsh, especially with recursive glob operators,
-often can construct a command line for a shell function that is longer
-than can be accepted by an external command.
+This function has a similar purpose to GNU xargs.  Instead of
+reading lines of arguments from the standard input, it takes them from
+the command line.  This is useful because zsh, especially with recursive
+glob operators, often can construct a command line for a shell function
+that is longer than can be accepted by an external command.
 
 The var(option) list represents options of the tt(zargs) command itself,
 which are the same as those of tt(xargs).  The var(input) list is the
@@ -3501,7 +3501,8 @@ example(zargs -e.. -- **/*(.) .. ls -l)
 This is a good choice in that example because no plain file can be named
 `tt(..)', but the best end-marker depends on the circumstances.
 
-For details of the other tt(zargs) options, see zmanref(xargs) or run
+For details of the other tt(zargs) options, see zmanref(xargs) (but note
+the difference in function between tt(zargs) and tt(xargs)) or run
 tt(zargs) with the tt(-)tt(-help) option.
 )
 findex(zed)
