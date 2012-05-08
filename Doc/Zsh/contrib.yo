@@ -3501,6 +3501,13 @@ example(zargs -e.. -- **/*(.) .. ls -l)
 This is a good choice in that example because no plain file can be named
 `tt(..)', but the best end-marker depends on the circumstances.
 
+The options tt(-i), tt(-I), tt(-l), tt(-L), and tt(-n) differ slightly
+from their usage in tt(xargs).  There are no input lines for tt(zargs) to
+count, so tt(-l) and tt(-L) count through the var(input) list, and tt(-n)
+counts the number of arguments passed to each execution of var(command),
+em(including) any var(arg) list.  Also, any time tt(-i) or tt(-I) is used,
+each var(input) is processed separately as if by `tt(-L) tt(1)'.
+
 For details of the other tt(zargs) options, see zmanref(xargs) (but note
 the difference in function between tt(zargs) and tt(xargs)) or run
 tt(zargs) with the tt(-)tt(-help) option.

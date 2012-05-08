@@ -1,3 +1,9 @@
+2012-05-08  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted, see users/17062: Doc/Zsh/contrib.yo: Briefly describe
+	option semantic differences from xargs to zargs.  (Merged with
+	PWS edits.)
+
 2012-05-08  Peter Stephenson  <pws@csr.com>
 
 	* 30469: Src/builtin.c: allow reverse listing of history using
@@ -16284,5 +16290,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5649 $
+* $Revision: 1.5650 $
 *****************************************************
