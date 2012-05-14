@@ -1,6 +1,7 @@
 2012-05-14  Mikael Magnusson  <mikachu@gmail.com>
 
-	* 30468: Functions/Prompts/prompt_fade_setup: add missing $.
+	* 30468: Functions/Prompts/prompt_fade_setup: add missing $
+	reported by Devon Meunier.
 
 	* 30466: Completion/Unix/Type/.distfiles,
 	Completion/Unix/Type/_ps1234, Completion/Zsh/Command/_print:
@@ -16300,5 +16301,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5652 $
+* $Revision: 1.5653 $
 *****************************************************
