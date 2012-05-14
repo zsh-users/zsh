@@ -1,32 +1,84 @@
-#compdef print
+#compdef print printf
 
-local state expl line eflag pflag
+local state expl line eflag pflag rest ret=1
 
-# -e flag available only after -R 
-eflag="${words[1,CURRENT-1][(r)-*R*]:+-e[enable escapes]}"
+if [[ $service = print ]]; then
+  # -e flag available only after -R 
+  eflag="${words[1,CURRENT-1][(r)-*R*]:+-e[enable escapes]}"
 
-# -p flag only relevant if we have a coprocess
-(:>&p) 2>/dev/null &&
-  pflag='(-s -u -z)-p[print arguments to input of coprocess]'
+  # -p flag only relevant if we have a coprocess
+  (:>&p) 2>/dev/null &&
+    pflag='(-s -u -z)-p[print arguments to input of coprocess]'
 
-_arguments -C -s -A "-*" -S \
-  '(-f)-r[ignore escape conventions of echo]' \
-  '(-r -b -f -m -s -l -N -o -O -i -c -u -p -z -D -P)-R[emulate BSD echo (no escapes, -n & -e flags only)]' \
-  '-b[recognise bindkey escape sequences]' \
-  '-m[remove arguments matching specified pattern]' \
-  '(-r -n -R -l -N -c)-f+[print arguments as for the printf builtin]:format' \
-  '(-u -p -z)-s[place results in the history list]' \
-  '(-c -f)-n[do not add a newline to the result]' \
-  '(-N -c -f)-l[print arguments separated by newlines]' \
-  '(-n -l -c -f)-N[print arguments separated and terminated by nulls]' \
-  '(-O)-o[sort arguments in ascending order]' \
-  '(-o)-O[sort arguments in descending order]' \
-  '-i[case-insensitive sorting]' \
-  '(-n -l -N -f -s -z)-a[with -c/-C, print arguments across before down]' \
-  '(-n -l -N -f -C -s -z)-c[print arguments in columns]' \
-  '(-n -l -N -f -c -s -z)-C+[print arguments in specified number of columns]:columns' \
-  '(-s -p -z)-u+[specify file descriptor to print arguments to]:file descriptor:_file_descriptors' \
-  '(-s -p -u)-z[push arguments onto editing buffer stack]' \
-  '-D[substitute any arguments which are named directories using ~ notation]' \
-  '-P[perform prompt expansion]' \
-  $pflag $eflag '*:default:_default'
+  if [[ -n ${words[1,CURRENT][(r)-*P*]} ]]; then
+    rest='*: :_ps1234'
+  else
+    rest='*: :_default'
+  fi
+
+  _arguments -C -s -A "-*" -S \
+    '(-f)-r[ignore escape conventions of echo]' \
+    '(-r -b -f -m -s -l -N -o -O -i -c -u -p -z -D -P)-R[emulate BSD echo (no escapes, -n & -e flags only)]' \
+    '-b[recognise bindkey escape sequences]' \
+    '-m[remove arguments matching specified pattern]' \
+    '(-r -n -R -l -N -c)-f+[print arguments as for the printf builtin]:format:->printfformat' \
+    '(-u -p -z)-s[place results in the history list]' \
+    '(-c -f)-n[do not add a newline to the result]' \
+    '(-N -c -f)-l[print arguments separated by newlines]' \
+    '(-n -l -c -f)-N[print arguments separated and terminated by nulls]' \
+    '(-O)-o[sort arguments in ascending order]' \
+    '(-o)-O[sort arguments in descending order]' \
+    '-i[case-insensitive sorting]' \
+    '(-n -l -N -f -s -z)-a[with -c/-C, print arguments across before down]' \
+    '(-n -l -N -f -C -s -z)-c[print arguments in columns]' \
+    '(-n -l -N -f -c -s -z)-C+[print arguments in specified number of columns]:columns' \
+    '(-s -p -z)-u+[specify file descriptor to print arguments to]:file descriptor:_file_descriptors' \
+    '(-s -p -u)-z[push arguments onto editing buffer stack]' \
+    '-D[substitute any arguments which are named directories using ~ notation]' \
+    '-P[perform prompt expansion]' \
+    $pflag $eflag $rest && ret=0
+elif [[ $service = printf ]]; then
+  state=printf
+fi
+
+if [[ $state = printf ]]; then
+  _arguments -C -s -S \
+    '1:format:->printfformat' \
+    '*: :_default' && ret=0
+fi
+
+if [[ $state = printfformat ]]; then
+  if [[ ${(Q)PREFIX} = *%((-|)<->|[-#0 +*.])# ]]; then
+    local -a specs
+      specs=(
+        '#:alternate form'
+        '0:zeropad to length n'
+        '-:left adjust result'
+        ' :leave one space in front of positive number from signed conversion'
+        '+:always place sign before a number from signed conversion'
+        '*:field width in next argument'
+        '.:precision'
+        'c:print the first character of the argument'
+        's:print the argument as a string'
+        {d,i}':signed decimal number or with leading " numeric value of following character'
+        'o:unsigned octal number'
+        'u:unsigned decimal number'
+        {x,X}':unsigned hexadecimal number, letters capitalized as x'
+        {e,E}':double number in scientific notation'
+        'f:double number'
+        {g,G}':double number as %f or %e depending on size'
+        '%:a percent sign'
+        'n:store number of printed bytes in parameter specified by argument'
+        'b:as %s but interpret escape sequences in argument'
+        'q:as %s but shell quote result'
+      )
+    compset -P "*"
+    _describe -t print-format-specifier 'print format specifier' specs -S ''
+    _message -e print-format-specifier 'number'
+  else
+    _describe -t print-format-specifier 'print format specifier' '(%)' -S ''
+  fi
+  ret=0
+fi
+
+return ret

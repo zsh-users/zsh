@@ -1,0 +1,109 @@
+#compdef -value-,PROMPT,-default- -value-,PROMPT2,-default- -value-,PROMPT3,-default- -value-,PROMPT4,-default- -value-,RPROMPT,-default- -value-,RPROMPT2,-default- -value-,PS1,-default- -value-,PS2,-default- -value-,PS3,-default- -value-,PS4,-default- -value-,RPS1,-default- -value-,RPS2,-default- -value-,SPROMPT,-default-
+
+local -a specs
+local expl paren
+
+if [[ -n $compstate[quote] ]]; then
+  paren='('
+else
+  paren='\('
+fi
+
+if [[ $PREFIX == *%(-|)<-># ]]; then
+  specs=(
+    'm:hostname up to first .'
+    '_:status of parser'
+    'd:current working directory'
+    '/:current working directory'
+    '~:current working directory, with ~ replacement'
+    'N:name of current script or shell function'
+    'x:name of file containing code being executed'
+    'c:deprecated'
+    '.:deprecated'
+    'C:deprecated'
+    'F:start using fg color'
+    'K:start using bg color'
+    'G:counts as extra character inside %{...%}'
+  )
+  if [[ $PREFIX == *% ]]; then
+    if [[ $service == -value-,SPROMPT,* ]]; then
+      specs+=(
+      'r:suggested correction'
+      'R:corrected string'
+      )
+    fi
+    specs+=(
+    '%:A %'
+    '):A )'
+    'l:current line (tty) with /dev/tty stripped'
+    'M:full hostname'
+    'n:username'
+    'y:current line (tty)'
+    '#:a # when root, % otherwise'
+    '?:return status of last command'
+    'h:current history event number'
+    '!:current history event number'
+    'i:current line number'
+    'I:current source line number'
+    'j:number of jobs'
+    'L:$SHLVL'
+    'D:date in yy-mm-dd format'
+    'T:current time of day, 24-hour format'
+    't:current time of day, 12-hour am/pm format'
+    '@:current time of day, 12-hour am/pm format'
+    '*:current time of day, 24-hour format with seconds'
+    'w:the date in day-dd format'
+    'W:the date in mm/dd/yy format'
+    'D{}:format string like strftime'
+    'B:start bold'
+    'b:stop bold'
+    'E:clear to end of line'
+    'U:start underline'
+    'u:stop underline'
+    'S:start standout'
+    's:stop standout'
+    'f:reset fg color'
+    'k:reset bg color'
+    '{:start literal escape sequence'
+    '}:stop literal escape sequence'
+    'v:value from $psvar array'
+    '(:ternary expression %(x.true-string.false-string)'
+    '<<:truncation from left %len<string<'
+    '>>:truncation from right %len>string>'
+    '[]:truncation from who knows where'
+    )
+  fi
+  compset -P "*"
+  _describe -t prompt-format-specifier 'prompt format specifier' specs -S ''
+  _message -e prompt-format-specifier number
+elif [[ $PREFIX == *%$paren(-|)<-># ]]; then
+  specs=(
+    '!:running with privileges'
+    '#:effective uid'
+    '?:exit status'
+    '_:at least n shell constructs started'
+    'C:at least n path elements'
+    '/:at least n path elements'
+    '.:at least n path elements'
+    'c:at least n path elements'
+    '~:at least n path elements'
+    'D:month'
+    'd:day of month'
+    'g:effective gid'
+    'j:number of jobs'
+    'L:SHLVL'
+    'l:number of characters already printed'
+    'S:SECONDS parameter at least n'
+    'T:current hour'
+    't:current minute'
+    'v:psvar has at least n elements'
+    'V:element n of psvar is set and non-empty'
+    'w:day of week (Sunday = 0)'
+  )
+  compset -P "*"
+  _describe -t ternary-prompt-expression 'ternary prompt format test character' specs -S ''
+  _message -e ternary-prompt-expression number
+else
+  _describe -t prompt-format-specifier 'prompt format specifier' '(%)' -S ''
+  _default "$@"
+fi
