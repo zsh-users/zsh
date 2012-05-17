@@ -3,6 +3,8 @@
 	* 30473: Completion/Linux/Command/_strace: update for 4.7 and
 	mark all options as taking sticked arguments.
 
+	* 30474: Completion/Unix/Command/_ssh: Add -O cancel.
+
 2012-05-14  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 30468: Functions/Prompts/prompt_fade_setup: add missing $
@@ -16306,5 +16308,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5654 $
+* $Revision: 1.5655 $
 *****************************************************
