@@ -85,29 +85,34 @@ _expression () {
 
 _arguments \
 	'()-c[count time, calls, and errors for each system call and report a summary]' \
-	-d'[show some debugging output of strace itself on the standard error]' \
-	-f'[trace child processes as they are created by currently traced processes]' \
-	-ff'[write each process trace to <filename>.<pid> (when using -o <filename>]' \
+	'()-C[count time, calls, and errors for each system call and report a summary in addition to regular output]' \
+	'-d[show some debugging output of strace itself on the standard error]' \
+	'-D[run tracer as detached grandchild, keeping traced process as direct child of calling process]' \
+	'-f[trace child processes as they are created by currently traced processes]' \
+	'-ff[write each process trace to <filename>.<pid> (when using -o <filename>]' \
 	'(-c -d -f -ff -i -q -r -t -tt -ttt -T -v -V -x -xx -a -e -o -O -p -s -S -u -E)-h[print help]' \
-	-i'[print the instruction pointer at the time of the system call]' \
-	-q'[suppress messages about attaching, detaching etc.]' \
-	-r'[print a relative timestamp upon entry to each system call]' \
+	'-i[print the instruction pointer at the time of the system call]' \
+	'-q[suppress messages about attaching, detaching etc.]' \
+	'-r[print a relative timestamp upon entry to each system call]' \
 	'(-ttt)-t[prefix each line of the trace with the time of day]' \
 	'(-ttt -tt)-tt[prefix each line of the trace with the time of day including the microseconds]' \
 	'(-tt -t)-ttt[prefix each line of the trace with the number of seconds and microseconds since the epoch]' \
-	-T'[show the time spent in system calls]' \
-	-v'[print unabbreviated versions of environment, stat, termios, etc. calls]' \
+	'-T[show the time spent in system calls]' \
+	'-y[print paths associated with file descriptor arguments]' \
+	'-v[print unabbreviated versions of environment, stat, termios, etc. calls]' \
 	'(-c -d -f -ff -h -i -q -r -t -tt -ttt -T -v -x -xx -a -e -o -O -p -s -S -u -E)-V[print the version number of strace]' \
 	'(-xx)-x[print all non-ASCII strings in hexadecimal string format]' \
 	'(-x)-xx[print all strings in hexadecimal string format]' \
-	-a'[align return values in a specific column (default 40)]:column number' \
-	'*-e[select events to trace or how to trace]:system call:_expression' \
-	'-o[write the trace output to the file]:output file:_files' \
-	'-O[overhead for tracing system calls]:overhead microseconds' \
-	'(:)-p[attach to the process with specified process ID and begin tracing]:process ID:_pids' \
-	'-s[specify the maximum string size to print (default 32)]:maximum string size' \
-	'-S[sort the output of the histogram (-c option) by the specified criterion]:sort by:(time calls name nothing)' \
-	'-u[run as specified user]:user:_users' \
-	'*-E[remove variable from the inherited list of environment or define a value]:variable:_printenv' \
+	'-I+[when strace can be interrupted by signals]:interruptible:((1\:"no signals are blocked" 2\:"fatal signals are blocked while decoding syscall (default)" 3\:"fatal signals are always blocked (default if '\''-o FILE PROG'\''" 4\:"fatal signals and SIGTSTP are always blocked"))' \
+	'*-P+[trace only system calls accessing given path]:path:_files' \
+	'-a+[align return values in a specific column (default 40)]:column number' \
+	'*-e+[select events to trace or how to trace]:system call:_expression' \
+	'-o+[write the trace output to the file]:output file:_files' \
+	'-O+[overhead for tracing system calls]:overhead microseconds' \
+	'(:)-p+[attach to the process with specified process ID and begin tracing]:process ID:_pids' \
+	'-s+[specify the maximum string size to print (default 32)]:maximum string size' \
+	'-S+[sort the output of the histogram (-c option) by the specified criterion]:sort by:(time calls name nothing)' \
+	'-u+[run as specified user]:user:_users' \
+	'*-E+[remove variable from the inherited list of environment or define a value]:variable:_printenv' \
 	'(-):command name: _command_names -e' \
 	'*::arguments:_normal'
