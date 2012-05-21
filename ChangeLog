@@ -1,3 +1,8 @@
+2012-05-21  Peter Stephenson  <pws@csr.com>
+
+	* c.f 30482 (Peter Jaros): Completion/Unix/Command/_tmux: typo
+	in description.
+
 2012-05-17  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 30473: Completion/Linux/Command/_strace: update for 4.7 and
@@ -16308,5 +16313,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5655 $
+* $Revision: 1.5656 $
 *****************************************************

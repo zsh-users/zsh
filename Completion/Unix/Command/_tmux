@@ -572,7 +572,7 @@ function _tmux-new-session() {
     [[ -n ${tmux_describe} ]] && print "Create a new session" && return
     local -a args
     args=(
-        '-d[attach the new session the current terminal]'
+        '-d[do not attach new session to current terminal]'
         '-n[name the initial window]:window name'
         '-s[name the session]:session name'
         '-t[specify target session]:sessions:__tmux-sessions'
