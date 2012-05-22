@@ -2164,10 +2164,15 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 
     /* check for, and interpret, a signal specifier */
     if (*argv && **argv == '-') {
-	if (idigit((*argv)[1]))
+	if (idigit((*argv)[1])) {
+	    char *endp;
 	    /* signal specified by number */
-	    sig = atoi(*argv + 1);
-	else if ((*argv)[1] != '-' || (*argv)[2]) {
+	    sig = zstrtol(*argv + 1, &endp, 10);
+	    if (*endp) {
+		zwarnnam(nam, "invalid signal number: %s", *argv);
+		return 1;
+	    }
+	} else if ((*argv)[1] != '-' || (*argv)[2]) {
 	    char *signame;
 
 	    /* with argument "-l" display the list of signal names */

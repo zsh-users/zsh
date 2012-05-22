@@ -1,3 +1,8 @@
+2012-05-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Danek: 30485: Src/jobs.c: trailing garbage after signal
+	number not recognised in kill builtin.
+
 2012-05-21  Peter Stephenson  <pws@csr.com>
 
 	* c.f 30482 (Peter Jaros): Completion/Unix/Command/_tmux: typo
@@ -16313,5 +16318,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5656 $
+* $Revision: 1.5657 $
 *****************************************************
