@@ -690,7 +690,7 @@ if [[ "$service" = mount ]]; then
     deffs=hsfs
     typeops=-F
     ;;
-  freebsd*|dragonfly*)
+  freebsd*|dragonfly*|darwin*)
     args=( -s
       '(:)-a[mount all filesystems in fstab]'
       '-d[cause everything to be done except for the actual system call]'      
@@ -765,7 +765,7 @@ else
 	'*:dev or dir:->udevordir'
       )
     ;;
-    freebsd*|dragonfly*)
+    freebsd*|dragonfly*|darwin*)
       args=(
 	'(*)-a[unmount all mounted file systems]'
 	'-A[unmount all mounted file systems except the root]'
@@ -904,6 +904,11 @@ udevordir)
       mp_tmp+=( $mline[(w)3] )
     done
   ;;
+  darwin*)
+    tmp=( "${(@f)$(/sbin/mount)}" )
+    dev_tmp=( "${(@)${(@)tmp%% *}:#map}" )
+    mp_tmp=( "${(@)${(@)tmp#* on }%% \(*}" )
+    ;;
   *)
     /sbin/mount | while read mline; do
       mp_tmp+=( $mline[(w)1] )
