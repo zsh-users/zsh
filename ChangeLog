@@ -1,3 +1,9 @@
+2012-05-23  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Juliano Ravasi:
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git: Fix
+	initialisation of `$stgit_unapplied'.
+
 2012-05-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Jun T.: 30483: Completion/Unix/Command/_mount: improved
@@ -16321,5 +16327,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5658 $
+* $Revision: 1.5659 $
 *****************************************************

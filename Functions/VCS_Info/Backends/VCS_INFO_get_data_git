@@ -134,7 +134,7 @@ if [[ -d $patchdir ]] ; then
     stgit_applied=(${(f)"$(< "${patchdir}/applied")"})
     stgit_applied=( ${(Oa)stgit_applied} )
     stgit_unapplied=(${(f)"$(< "${patchdir}/unapplied")"})
-    stgit_unapplied=( ${(oa)stgit_applied} )
+    stgit_unapplied=( ${(oa)stgit_unapplied} )
 
     if VCS_INFO_hook 'gen-applied-string' "${stgit_applied[@]}"; then
         if (( ${#stgit_applied} )); then
