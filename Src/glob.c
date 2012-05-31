@@ -178,7 +178,7 @@ struct globdata {
     int gd_gf_numsort;
     int gd_gf_follow, gd_gf_sorts, gd_gf_nsorts;
     struct globsort gd_gf_sortlist[MAX_SORTS];
-    LinkList gd_gf_pre_words;
+    LinkList gd_gf_pre_words, gd_gf_post_words;
 
     char *gd_glob_pre, *gd_glob_suf;
 };
@@ -210,6 +210,7 @@ static struct globdata curglobdata;
 #define gf_nsorts     (curglobdata.gd_gf_nsorts)
 #define gf_sortlist   (curglobdata.gd_gf_sortlist)
 #define gf_pre_words  (curglobdata.gd_gf_pre_words)
+#define gf_post_words (curglobdata.gd_gf_post_words)
 
 /* and macros for save/restore */
 
@@ -1074,7 +1075,14 @@ insert_glob_match(LinkList list, LinkNode next, char *data)
 	}
     }
 
-    insertlinknode(list, next, data);
+    next = insertlinknode(list, next, data);
+
+    if (gf_post_words) {
+	LinkNode added;
+	for (added = firstnode(gf_post_words); added; incnode(added)) {
+	    next = insertlinknode(list, next, dupstring(getdata(added)));
+	}
+    }
 }
 
 /*
@@ -1190,7 +1198,7 @@ zglob(LinkList list, LinkNode np, int nountok)
     gf_noglobdots = unset(GLOBDOTS);
     gf_numsort = isset(NUMERICGLOBSORT);
     gf_sorts = gf_nsorts = 0;
-    gf_pre_words = NULL;
+    gf_pre_words = gf_post_words = NULL;
 
     /* Check for qualifiers */
     while (!nobareglob ||
@@ -1679,9 +1687,10 @@ zglob(LinkList list, LinkNode np, int nountok)
 
 		    if (tt != NULL)
 		    {
-			if (!gf_pre_words)
-			    gf_pre_words = newlinklist();
-			addlinknode(gf_pre_words, tt);
+			LinkList *words = sense & 1 ? &gf_post_words : &gf_pre_words;
+			if (!*words)
+			    *words = newlinklist();
+			addlinknode(*words, tt);
 		    }
 		    break;
 		}

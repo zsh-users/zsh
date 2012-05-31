@@ -2663,6 +2663,12 @@ list of glob qualifiers.
 A typical use for this is to prepend an option before all occurrences
 of a file name; for example, the pattern `tt(*(P:-f:))' produces the
 command line arguments `tt(-f) var(file1) tt(-f) var(file2) ...'
+
+If the modifier tt(^) is active, then var(string) will be appended
+instead of prepended.  Prepending and appending is done independently
+so both can be used on the same glob expression; for example by writing
+`tt(*(P:foo:^P:bar:^P:baz:))' which produces the command line arguments
+`tt(foo) tt(baz) var(file1) tt(bar) ...'
 )
 enditem()
 

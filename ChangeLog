@@ -1,3 +1,8 @@
+2014-09-16  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 33136: Doc/Zsh/expn.yo, Src/glob.c: P glob qualifier appends
+	words when negated.
+
 2014-09-14  Marc Finet  <m.dreadlock@gmail.com>
 
 	* 33149: Misc/vcs_info-examples: vcs_info examples: fix typo
