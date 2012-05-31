@@ -212,7 +212,7 @@ _subversion
 _sudo
 _surfraw
 _sysctl
-_systemctl
+_systemd
 _tar
 _tardy
 _tcpdump

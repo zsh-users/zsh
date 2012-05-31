@@ -1,3 +1,9 @@
+2012-05-31  Peter Stephenson  <pws@csr.com>
+
+	* Foudil Brétel: 30495: Completion/Unix/Command/_systemd (also
+	Completion/Unix/Command/.distfiles): replace
+	Completion/Unix/Command/_systemctl and add various enhancements.
+
 2012-05-23  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Juliano Ravasi 30488:
@@ -16327,5 +16333,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5660 $
+* $Revision: 1.5661 $
 *****************************************************
