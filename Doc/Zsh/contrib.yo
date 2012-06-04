@@ -1734,6 +1734,16 @@ context is examined and if it contains the string tt(back), the word before
 the cursor is considered, else the word after cursor is considered. Some
 examples are given below.
 
+The style tt(skip-whitespace-first) is only used with the
+tt(forward-word) widget.  If it is set to true, then tt(forward-word)
+skips any non-word-characters, followed by any non-word-characters:
+this is similar to the behaviour of other word-orientated widgets,
+and also that used by other editors, however it differs from the
+standard zsh behaviour.  When using tt(select-word-style) the widget
+is set in the context tt(:zle:*) to tt(true) if the word style is
+tt(bash) and tt(false) otherwise.  It may be overridden by setting it in
+the more specific context tt(:zle:forward-word*).
+
 Here are some examples of use of the styles, actually taken from the
 simplified interface in tt(select-word-style):
 

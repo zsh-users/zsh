@@ -1,3 +1,10 @@
+2012-06-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/17132: Doc/Zsh/contrib.yo,
+	Functions/Zle/forward-word-match,
+	Functions/Zle/select-word-style: skip-whitespace-first style for
+	compatibility with bash and other editors in forward-word.
+
 2012-05-31  Peter Stephenson  <pws@csr.com>
 
 	* Foudil Brétel: 30495: Completion/Unix/Command/_systemd (also
@@ -16333,5 +16340,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5661 $
+* $Revision: 1.5662 $
 *****************************************************
