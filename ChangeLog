@@ -1,3 +1,8 @@
+2012-06-06  Peter Stephenson  <pws@csr.com>
+
+	* Vincent: 30497: Completion/Unix/Command/_xmlsoft: option
+	completion issue.
+
 2012-06-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/17132: Doc/Zsh/contrib.yo,
@@ -16340,5 +16345,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5662 $
+* $Revision: 1.5663 $
 *****************************************************

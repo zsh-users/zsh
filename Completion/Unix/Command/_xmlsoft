@@ -41,8 +41,8 @@ case $service in
       '--maxparserdepth[increase the maximum parser depth]:depth' \
       '--html[input document is an HTML file]' \
       '--encoding[the input document character encoding]:encoding:(${encoding[@]})' \
-      '--param[pass a parameter,value pair]:name::value (xpath expression)' \
-      '--stringparam[pass a parameter]:name::value' \
+      '*--param[pass a parameter,value pair]:name::value (xpath expression)' \
+      '*--stringparam[pass a parameter]:name::value' \
       '--path[provide a set of paths for resources]:paths:_files -/' \
       '--nonet[refuse to fetch DTDs or entities over network]' \
       '--nowrite[refuse to write to any file or resource]' \
