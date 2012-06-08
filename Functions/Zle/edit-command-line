@@ -7,6 +7,11 @@
 # except that it will handle multi-line buffers properly.
 
 emulate -L zsh
+local prebuffer
+# see below comment for why this is needed
+if (( ! ZLE_RECURSIVE )); then
+  prebuffer=$PREBUFFER
+fi
 
 () {
   exec </dev/tty
@@ -31,7 +36,21 @@ emulate -L zsh
   (( $+zle_bracketed_paste )) && print -r -n - $zle_bracketed_paste[1]
 
   # Replace the buffer with the editor output.
-  print -Rz - "$(<$1)" 
-} =(<<<"$PREBUFFER$BUFFER")
+  # avoid drawing a new prompt when we can:
+  # - in recursive-edit, the send-break will just cancel the recursive-edit
+  #   rather than reload the line from print -z so in that case we want to
+  #   just set $BUFFER (unfortunately, recursive-edit doesn't reset CONTEXT
+  #   or PREBUFFER so we have to explicitly handle this case, which overrides
+  #   the following point)
+  # - when we are at PS2 (CONTEXT == cont && ! ZLE_RECURSIVE) we do want the
+  #   break or otherwise the text from PREBUFFER will be inserted twice
+  # - in all other cases (that I can think of) we also just want to set
+  #   $BUFFER directly.
+  if [[ $CONTEXT != cont ]] || (( ZLE_RECURSIVE )); then
+    BUFFER="$(<$1)" 
+  else
+    print -Rz - "$(<$1)"
+    zle send-break
+  fi
 
-zle send-break		# Force reload from the buffer stack
+} =(<<<"$prebuffer$BUFFER")
