@@ -63,7 +63,7 @@ _arguments -C -s \
   '--default-page=[specify default page name, normally index.html]' \
   '(--adjust-extension -E)'{--adjust-extension,-E}'[save all HTML/CSS documents with proper extensions]' \
   "--ignore-length[ignore \`Content-Length' header field]" \
-  '*--header=:string' \
+  '*--header=[send a custom HTTP header]:header:->header' \
   '--max-redirect=:number' \
   '--proxy-user=:user' \
   '--proxy-password=:password' \
@@ -132,6 +132,7 @@ _arguments -C -s \
   '--no-clobber' \
   '--no-directories' \
   '--no-host-directories' \
+  '--no-use-server-timestamps[do not set timestamp to server provided value]' \
   '--htmlify=:htmlify:' \
   '--no:no:->noflags' \
   '*:URL:_urls' && return 0
@@ -155,5 +156,43 @@ case "$state" in
       '(windows)unix' \
       '(unix)windows' \
       '(unix windows)nocontrol'
+  ;;
+  header)
+    local -a headers
+    headers=(
+             Accept{,-{Charset,Encoding,Language,Datetime}}
+             Authorization
+             Cache-Control
+             Connection
+             Cookie
+             Content-{Length,MD5,Type}
+             Date
+             Expect
+             From
+             Host
+             If-Match
+             If-Modified-Since
+             If-None-Match
+             If-Range
+             If-Unmodified-Since
+             Max-Forwards
+             Pragma
+             Proxy-Authorization
+             Range
+             Referer
+             TE
+             Upgrade
+             User-Agent
+             Via
+             Warning
+             X-Requested-With
+             X-Do-Not-Track
+             DNT
+             X-Forwarded-For
+             X-ATT-DeviceId
+             X-Wap-Profile
+             )
+    headers=($^headers\\:\ )
+    _describe -t header 'HTTP header' headers
   ;;
 esac
