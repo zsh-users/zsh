@@ -54,7 +54,7 @@ _arguments -C -s \
   '--no-cache[disallow server-cached data]' \
   '(--html-extension -E)'{--html-extension,-E}'[save all HTML documents with a .html extension]' \
   "--ignore-length[ignore \`Content-Length' header field]" \
-  '--header=:string' \
+  '*--header=:string' \
   '--proxy-user=:user' \
   '--proxy-password=:password' \
   '--referer=:URL:_urls' \
