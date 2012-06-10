@@ -1,3 +1,8 @@
+2012-06-10  Clint Adams  <clint@zsh.org>
+
+	* 30503: Completion/Unix/Command/_mosh: rudimentary
+	completion for mosh.
+
 2012-06-10  Mikael Magnusson  <mikachu@gmail.com>
 
 	* Jeremy Mates: 30505: Completion/Unix/Command/_wget: Allow
@@ -16350,5 +16355,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5665 $
+* $Revision: 1.5666 $
 *****************************************************

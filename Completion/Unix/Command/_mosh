@@ -1,0 +1,12 @@
+#compdef mosh
+
+_arguments \
+  '--client=:client helper:_command_names -e' \
+  '--server=:server helper:_files' \
+  '--ssh=:ssh command to run:_files' \
+  '(-a -n)--predict=:when:(adaptive always never)' \
+  '(--predict -n)-a[predict always]' \
+  '(--predict -a)-n[predict never]' \
+  {-p,--port=}':port:_ports' \
+  ':remote:_hosts' \
+  ':remote command:_command_names -e'
