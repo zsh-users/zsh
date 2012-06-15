@@ -226,6 +226,7 @@ example (assuming the option tt(KSH_ARRAYS) is not in effect):
 example([[ ${array[(i)pattern]} -le ${#array} ]])
 
 If tt(KSH_ARRAYS) is in effect, the tt(-le) should be replaced by tt(-lt).
+)
 item(tt(R))(
 Like `tt(r)', but gives the last match.  For associative arrays, gives
 all possible matches. May be used for assigning to ordinary array
@@ -243,7 +244,6 @@ required; using a parameter to hold the key has the desired effect:
 
 example(key2='original key'
 print ${array[(Re)$key2]})
-)
 )
 item(tt(i))(
 Like `tt(r)', but gives the index of the match instead; this may not be

@@ -1,3 +1,7 @@
+2012-06-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Danek: 30510: Doc/Zsh/params.yo: bad indentation.
+
 2012-06-10  Clint Adams  <clint@zsh.org>
 
 	* 30503: Completion/Unix/Command/_mosh: rudimentary
@@ -16355,5 +16359,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5666 $
+* $Revision: 1.5667 $
 *****************************************************
