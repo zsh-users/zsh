@@ -52,8 +52,8 @@ myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2010/02/15)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2010/02/15
-mydit(Submitted-By:) email(pws@pwstephenson.fsnet.co.uk (Peter Stephenson))
+mydit(Last-Modified:) 2012/06/15
+mydit(Submitted-By:) email(coordinator@zsh.org (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
 mydit(Copyright:) (C) P.W. Stephenson, 1995--2010 (see end of document)
 )
@@ -301,13 +301,9 @@ sect(On what machines will it run?)
 
 sect(What's the latest version?)
 
-  Zsh 4.2.7 is the latest production version.  The latest development
-  version is 4.3.17; this contains support for multibyte character strings
-  (such as UTF-8 locales).  All the main features for multibyte
-  support are now in place and this is likely soon to become the
-  stable series 5.0.
-
-  There will not be any further 4.2 releases.
+  Zsh 5.0.0 is the latest production version, replacing the now
+  rather antiquated 4.2.7.  For details of all the changes, see
+  the NEWS file in the source distribution.
 
   A beta of the next version is sometimes available.  Development of zsh is
   patch by patch, with each intermediate version publicly available.  Note
@@ -2292,8 +2288,9 @@ Wischnowsky).
 nsect(Copyright Information:)
 
 This document is copyright (C) P.W. Stephenson, 1995, 1996, 1997,
-1998, 1999, 2000. This text originates in the U.K. and the author asserts
-his moral rights under the Copyrights, Designs and Patents Act, 1988.
+1998, 1999, 2000, 2012. This text originates in the U.K. and the author
+asserts his moral rights under the Copyrights, Designs and Patents Act,
+1988.
 
 Permission is hereby granted, without written agreement and without
 license or royalty fees, to use, copy, modify, and distribute this

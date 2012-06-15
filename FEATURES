@@ -2,6 +2,10 @@
 ZSH FEATURES
 ------------
 
+(Note that this file only lists basic shell features, for those who
+may not have encountered zsh before.  Those familiar with zsh are
+unlikely to find anything new here.)
+
 very close to ksh/sh grammar, with csh additions
 most features of ksh, bash, and tcsh
 can emulate ksh or POSIX sh
