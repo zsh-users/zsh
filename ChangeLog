@@ -1,3 +1,7 @@
+2012-06-15 Phil Pennock  <pdpennock@users.sourceforge.net>
+
+	* 30513: zsh/regex metafy fixes for widechar; similar to 29838.
+
 2012-06-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 30509: FEATURES, README, Etc/FAQ.yo: updates for 5.0.0.
@@ -16361,5 +16365,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5668 $
+* $Revision: 1.5669 $
 *****************************************************
