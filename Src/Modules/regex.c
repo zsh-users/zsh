@@ -3,7 +3,7 @@
  *
  * This file is part of zsh, the Z shell.
  *
- * Copyright (c) 2007 Phil Pennock
+ * Copyright (c) 2007,2012 Phil Pennock
  * All Rights Reserved.
  *
  * Permission is hereby granted, without written agreement and without
@@ -56,13 +56,18 @@ zcond_regex_match(char **a, int id)
     regex_t re;
     regmatch_t *m, *matches = NULL;
     size_t matchessz = 0;
-    char *lhstr, *rhre, *s, **arr, **x;
+    char *lhstr, *lhstr_zshmeta, *rhre, *rhre_zshmeta, *s, **arr, **x;
     int r, n, return_value, rcflags, reflags, nelem, start;
 
-    lhstr = cond_str(a,0,0);
-    rhre = cond_str(a,1,0);
+    lhstr_zshmeta = cond_str(a,0,0);
+    rhre_zshmeta = cond_str(a,1,0);
     rcflags = reflags = 0;
     return_value = 0; /* 1 => matched successfully */
+
+    lhstr = ztrdup(lhstr_zshmeta);
+    unmetafy(lhstr, NULL);
+    rhre = ztrdup(rhre_zshmeta);
+    unmetafy(rhre, NULL);
 
     switch(id) {
     case ZREGEX_EXTENDED:
@@ -101,7 +106,7 @@ zcond_regex_match(char **a, int id)
 	    if (nelem) {
 		arr = x = (char **) zalloc(sizeof(char *) * (nelem + 1));
 		for (m = matches + start, n = start; n <= (int)re.re_nsub; ++n, ++m, ++x) {
-		    *x = ztrduppfx(lhstr + m->rm_so, m->rm_eo - m->rm_so);
+		    *x = metafy(lhstr + m->rm_so, m->rm_eo - m->rm_so, META_DUP);
 		}
 		*x = NULL;
 	    }
@@ -112,7 +117,7 @@ zcond_regex_match(char **a, int id)
 		char *ptr;
 
 		m = matches;
-		s = ztrduppfx(lhstr + m->rm_so, m->rm_eo - m->rm_so);
+		s = metafy(lhstr + m->rm_so, m->rm_eo - m->rm_so, META_DUP);
 		setsparam("MATCH", s);
 		/*
 		 * Count the characters before the match.
@@ -174,12 +179,16 @@ zcond_regex_match(char **a, int id)
 	break;
     default:
 	DPUTS(1, "bad regex option");
-	return 0; /* nothing to cleanup, especially not "re". */
+	return_value = 0;
+	goto CLEAN_BASEMETA;
     }
 
     if (matches)
 	zfree(matches, matchessz);
     regfree(&re);
+CLEAN_BASEMETA:
+    free(lhstr);
+    free(rhre);
     return return_value;
 }
 
