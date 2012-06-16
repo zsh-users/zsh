@@ -62,7 +62,7 @@ done
 
 # If the cursor is not in the first column, emit EOLMARK and newline.
 
-(( ${${RECV#*\;}%R} > 1 )) && print -P -- $EOLMARK
+(( ${${${RECV#*\;}%R}:-0} > 1 )) && print -P -- $EOLMARK
 
 return 0
 
