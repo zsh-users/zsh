@@ -997,7 +997,9 @@ gmatchcmp(Gmatch a, Gmatch b)
 	    break;
 	}
 	if (r)
-	    return (int) ((s->tp & GS_DESC) ? -r : r);
+	    return (s->tp & GS_DESC) ?
+	      (r < 0L ? 1 : -1) :
+	      (r > 0L ? 1 : -1);
     }
     return 0;
 }

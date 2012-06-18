@@ -1,3 +1,8 @@
+2012-06-18  Peter Stephenson  <pws@csr.com>
+
+	* Dima Kogan: 30515: Src/glob.c: glob size test failed on very
+	large files owing to integer type error.
+
 2012-06-15 Phil Pennock  <pdpennock@users.sourceforge.net>
 
 	* 30513: zsh/regex metafy fixes for widechar; similar to 29838.
@@ -16369,5 +16374,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5670 $
+* $Revision: 1.5671 $
 *****************************************************
