@@ -1,3 +1,8 @@
+2012-06-21  Peter Stephenson  <pws@csr.com>
+
+	* 30519 (correction noticed by Danek): MACHINES: try to
+	modernise.
+
 2012-06-18  Peter Stephenson  <pws@csr.com>
 
 	* Dima Kogan: 30515: Src/glob.c: glob size test failed on very
@@ -16374,5 +16379,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5671 $
+* $Revision: 1.5672 $
 *****************************************************
