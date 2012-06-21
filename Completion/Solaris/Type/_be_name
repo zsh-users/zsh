@@ -1,0 +1,18 @@
+#autoload
+
+local -a type be_names
+local name uuid activate mtpt space policy created snap
+
+zparseopts -D -E -a type t+:
+
+beadm list -H | while IFS=\; read name uuid active mtpt space policy created; do
+	be_names=( $be_names $name )
+done
+
+if [[ -n $type[(r)all] ]]; then
+	beadm list -sH | while IFS=\; read name snap space policy created; do
+		be_names=( $be_names $snap )
+	done
+fi
+
+compadd "$@" - $be_names

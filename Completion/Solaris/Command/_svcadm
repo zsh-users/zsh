@@ -4,11 +4,11 @@ _svcadm() {
 	local context state line subcmds
 	typeset -A opt_args
 
-	subcmds=( enable disable restart refresh mark clear milestone )
+	subcmds=( enable disable restart refresh mark delegate clear milestone )
 
 	if [[ $service == "svcadm" ]]; then
 		_arguments -C -A "-*" \
-			'-v[print actions verbosely]' \
+			'-v[Print actions verbosely]' \
 			'*::command:->subcmd' && return 0
 
 		if (( CURRENT == 1 )); then
@@ -21,24 +21,24 @@ _svcadm() {
 
 	case $service in
 	(enable)
-		_arguments \
-			'-r[recursively enable dependencies]' \
-			'-s[wait for service to come online]' \
-			'-t[state change is temporary]' \
+		_arguments -A "-*" \
+			'-r[Recursively enable dependencies]' \
+			'-s[Wait for service to come online]' \
+			'-t[State change is temporary]' \
 			'*:instance FMRI:_svcs_fmri -i'
 		;;
 
 	(disable)
-		_arguments \
-			'-s[wait for service to become disabled]' \
-			'-t[state change is temporary]' \
+		_arguments -A "-*" \
+			'-s[Wait for service to become disabled]' \
+			'-t[State change is temporary]' \
 			'*:instance FMRI:_svcs_fmri -i'
 		;;
 
 	(mark)
-		_arguments \
-			'-I[change state immediately]' \
-			'-t[state change is temporary]' \
+		_arguments -A "-*" \
+			'-I[Change state immediately]' \
+			'-t[State change is temporary]' \
 			':state:(degraded maintenance)' \
 			':instance FMRI:_svcs_fmri -i'
 		;;
@@ -48,19 +48,18 @@ _svcadm() {
 			'*:instance FMRI:_svcs_fmri -i'
 		;;
 
-	(milestone)
-		_arguments \
-			'-d[make milestone the default]' \
-			'*:milestone FMRI:_svcs_fmri -m'
+	(delegate)
+		_arguments -A "-*" \
+			'-s[Wait for instances to come online]' \
+			':restarter FMRI:_svcs_fmri -r' \
+			'*:FMRI:_svcs_fmri -i'
 		;;
 
-# 	# The delegate subcommand has been removed, replaced by just using
-# 	# the restarter fmri
-# 	(delegate)
-# 		_arguments \
-# 			'1:restarter FMRI:_svcs_fmri -r' \
-# 			'*:instance FMRI:_svcs_fmri -i'
-# 		;;
+	(milestone)
+		_arguments -A "-*" \
+			'-d[Make milestone the default]' \
+			'*:milestone FMRI:_svcs_fmri -m'
+		;;
 
 	(*)
 		_message "unknown svcadm subcommand: $service"

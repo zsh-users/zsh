@@ -1,0 +1,15 @@
+#autoload
+
+local -a suf
+local expl
+
+compset -S ",*" || suf=(-S ,)
+if compset -P 1 "*,"; then
+	_alternative "zfs-keylocator-prompt:\"prompt\" locator:(prompt)" \
+		"zfs-keylocator-file:file locator:_path_files" \
+		"zfs-keylocator-pkcs11:PKCS#11 locator: " \
+		"zfs-keylocator-https:HTTPS URL locator: "
+else
+	_description format expl "keysource format"
+	compadd $suf -q "$expl[@]" "$@" raw hex passphrase
+fi

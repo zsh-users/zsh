@@ -1,0 +1,76 @@
+#compdef beadm
+
+_beadm() {
+	local context state line subcmds
+	typeset -A opt_args
+
+	subcmds=( activate create destroy list mount rename unmount )
+
+	if [[ $service == "beadm" ]]; then
+		_arguments -C -A "-*" \
+			'*::command:->subcmd' && return 0
+
+		if (( CURRENT == 1 )); then
+			_wanted commands expl 'beadm subcommand' compadd -a subcmds
+			return
+		fi
+		service="$words[1]"
+		curcontext="${curcontext%:*}=$service:"
+	fi
+
+	case $service in
+	(activate)
+		_arguments -A "-*" \
+			':BE name:_be_name'
+		;;
+
+	(create)
+		# TODO: Add support for -o, and for creating snapshots
+		_arguments -A "-*" \
+			'-a[Activate new BE]' \
+			'-d[Description]:' \
+			'-e[Base BE]:BE name or snapshot:_be_name -t all' \
+			'-p[Create new BE in specified ZFS pool]:ZFS pool:_zfs_pool' \
+			':new BE name:'
+		;;
+
+	(destroy)
+		_arguments -A "-*" \
+			'-f[Unmount BE if necessary]' \
+			"-F[Don't prompt for verification]" \
+			':BE or BE snapshot:_be_name'
+		;;
+
+	(list)
+		_arguments -A "-*" \
+			'-a[List subordinate filesystems and snapshots]' \
+			'-d[List subordinate filesystems]' \
+			'-s[List snapshots]' \
+			'-H[Parseable format]' \
+			':BE name:_be_name'
+		;;
+
+	(mount)
+		_arguments -A "-*" \
+			':BE name:_be_name' \
+			':mountpoint:_path_files -/'
+		;;
+
+	(rename)
+		_arguments -A "-*" \
+			':existing BE name:_be_name' \
+			':new BE name:'
+		;;
+
+	(unmount)
+		_arguments -A "-*" \
+			'-f[Force unmount]' \
+			':BE name:_be_name'
+		;;
+
+	(*)
+		_message "unknown beadm subcommand: $service"
+	esac
+}
+
+_beadm "$@"

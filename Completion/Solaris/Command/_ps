@@ -1,0 +1,77 @@
+#compdef ps
+
+_ps()
+{
+	local -a o_opt
+
+o_opt=(
+	"user[user ID]"
+	"ruser[real user ID]"
+	"group[group ID]"
+	"rgroup[real group ID]"
+	"pid[process ID]"
+	"ppid[parent process ID]"
+	"pgid[process group ID]"
+	"pcpu[ratio of CPU time used recently to CPU time available]"
+	"vsz[total size of the process in virtual memory, in kilobytes]"
+	"nice[decimal value of the system scheduling priority of the process]"
+	"etime[elapsed time since the process was started]"
+	"time[cumulative CPU time of the process]"
+	"tty[name of the controlling terminal of the process]"
+	"comm[name of the command being executed]"
+	"args[command with all its arguments as a string]"
+	"f[flags associated with the process]"
+	"s[state of the process]"
+	"c[processor utilization for scheduling]"
+	"uid[effective user ID number]"
+	"ruid[real user ID number]"
+	"gid[effective group ID number]"
+	"rgid[real group ID numberu]"
+	"projid[project ID number]"
+	"project[project name]"
+	"zoneid[zone ID number]"
+	"zone[zone name]"
+	"sid[process ID of the session leader]"
+	"taskid[task ID of the process]"
+	"class[scheduling class]"
+	"pri[priority, higher number - higher priority]"
+	"opri[obsolete priority, lower number - higher priority]"
+	"lwp[lwd ID number]"
+	"nlwp[number of lwps in the process]"
+	"psr[number of the processor to which the process or lwp is bound]"
+	"pset[ID of the processor set to which the process or lwp is bound]"
+	"addr[memory address of the process]"
+	"osz[total size of the process in virtual memory, in pages]"
+	"wchan[address of an event for which the process is sleeping]"
+	"stime[starting time or date of the process]"
+	"rss[resident set size of the process, in kilobytes]"
+	"pmem[ratio of resident set size to physical memory on the machine, in %]"
+	"fname[first 8 bytes of base name of process's executable file]"
+	"ctid[contract ID number]"
+	"lgrp[home lgroup]"
+)
+_arguments \
+	'-a[information about all processes most frequently requested]' \
+	'-c[information in a format that reflects scheduler properties]' \
+	'-d[information about all processes except session leaders]' \
+	'-e[information about every process]' \
+	'-f[full listing]' \
+	'-g[only process data whose group leaders ID number(s) appears in grplist]:group leader ID list' \
+	'-G[information for processes whose real group ID numbers are in gidlist]:real group ID list' \
+	'-H[prints the home lgroup of the process]' \
+	'-j[prints session ID and process group ID]' \
+	'-l[long listing]' \
+	'-L[information about each light weight process]' \
+	'-o[specify output format]:property:_values -s , "property" $o_opt' \
+	'-p[only process data whose process ID numbers are given in proclist]:process ID list' \
+	'-P[Prints the number of the processor to which the process or lwp is bound]' \
+	'-s[information on all session leaders whose IDs appear in sidlist]:session leader ID list' \
+	'-t[lists only process data associated with term]:term' \
+	'-u[only process data whose effective user ID number or login name is given in uidlist]:UID:_users' \
+	'-U[information for processes whose real user ID numbers or login names are in uidlist]:UID:_users' \
+	'-y[both RSS and SZ is reported in kilobytes, instead pages (used with -l)]' \
+	'-z[lists only processes in the specified zones]:zone list' \
+	'-Z[prints the name of the zone with which the process is associated]'
+}
+
+_ps "$@"

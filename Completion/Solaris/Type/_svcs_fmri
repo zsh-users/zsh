@@ -22,39 +22,52 @@ _svcs_fmri() {
 		# Grab all FMRIs that have a word beginning with $PREFIX,
 		# making sure not to return the portion of the FMRI before
 		# $PREFIX.  Use the cache if it exists and the user wants to.
-		if ( [[ $#_smf_fmris -eq 0 ]] || _cache_invalid $cache_id ) && ! _retrieve_cache $cache_id; then
+		if ( [[ $#_smf_fmris -eq 0 ]] || _cache_invalid $cache_id ) \
+			&& ! _retrieve_cache $cache_id; then
 			_smf_fmris=( ${(f)"$(svcs -a -H -o fmri)"} )
 			_store_cache $cache_id _smf_fmris
 		fi
-		# Each element of the array is removed which doesn't match (^|.*/)$PREFIX.*
+		# Each element of the array is removed which doesn't match
+		# (^|.*/)$PREFIX.*
 		fmri_abbrevs=( ${(M)_smf_fmris:#((#s)|*[/:])$PREFIX*} )
 
 		# Go through the remaining elements and remove the characters
 		# in front of $PREFIX.
-		for i in {1..$#fmri_abbrevs}; do
+		for ((i = 1; i <= $#fmri_abbrevs; i++ )); do
 			# Either one of these will work, but they're too
 			# greedy, preventing multiple matches below.
 			fmri_abbrevs[i]=${${fmri_abbrevs[i]}/((#s)|*[\/:])(#b)($PREFIX*)/$match[1]}
 			#fmri_abbrevs[i]=${${(M)${fmri_abbrevs[i]}:#(#b)((#s)|*/)$PREFIX*}#$match[1]}
 		done
 
-		# Remove the "default" instance identifier if we can (not for
-		# svccfg)
-		# TODO Can't remove default when there are other instances.
+		# Remove the "default" instance identifier if it's the only
+		# instance for a given service (not for svccfg).
 		if [[ $type == "-i" ]]; then
-			fmri_abbrevs=( ${fmri_abbrevs//:default(#e)/} )
+			local -a svcs insts nabbrevs
+			local s
+			svcs=( ${(u)fmri_abbrevs%:*} )
+			for s in $svcs; do
+				insts=( ${(@M)fmri_abbrevs:#$s:*} )
+				if [[ $#insts -eq 1 && $insts[1] == *":default" ]]; then
+					nabbrevs=($nabbrevs ${insts//:default})
+				elif [[ $#insts -eq 0 ]]; then
+					# Turns out we're completing the
+					# instance name.
+					nabbrevs=($nabbrevs $s)
+				else
+					nabbrevs=($nabbrevs $insts)
+				fi
+			done
+			fmri_abbrevs=( $nabbrevs )
 		fi
 
-		# Search for a second match within each result.
-		# for m in $fmri_abbrevs; do
-		# 	if [[ -n ${(M)m:#((#s)|*/)$PREFIX*/$PREFIX*} ]]; then
-		# 		fmri_abbrevs=( $fmri_abbrevs ${${(SMI:1:)m%%/$PREFIX*}#/} )
-		# 	fi
-		# done
+		# After playing with _multi_parts, I'm not sure it's actually
+		# that useful.
+		# _wanted fmri expl "full or unambiguously abbreviated FMRIs" \
+		# 	_multi_parts -i / fmri_abbrevs
 
-		# After playing with _multi_parts, I'm not sure it's actually that useful.
-		# _wanted fmri expl "full or unambiguously abbreviated FMRIs" _multi_parts / fmri_abbrevs
-		_wanted fmri expl "full or unambiguously abbreviated FMRIs" compadd $fmri_abbrevs
+		_wanted fmri expl "full or unambiguously abbreviated FMRIs" \
+			compadd $fmri_abbrevs
 		;;
 
 	(-m)
@@ -64,7 +77,8 @@ _svcs_fmri() {
 
 	(-r)
 		# TODO: need some way to pick out only restarters
-		_wanted fmri expl "restarter FMRIs" compadd master svc:/network/inetd:default
+		_wanted fmri expl "restarter FMRIs" \
+			compadd master reset svc:/network/inetd:default
 		;;
 
 	(*)

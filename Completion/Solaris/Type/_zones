@@ -1,0 +1,13 @@
+#autoload
+
+local -a type typearg
+local zonelist
+
+zparseopts -D -E -a type t+:
+
+[[ -n $type[(r)c] ]] && typearg=-c
+[[ -n $type[(r)i] ]] && typearg=-i
+
+zonelist=( ${="$(zoneadm list $typearg)"} )
+
+compadd "$@" - $zonelist

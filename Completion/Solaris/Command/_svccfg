@@ -21,7 +21,16 @@ _svccfg() {
 	local context state line subcmds
 	typeset -A opt_args
 
-	subcmds=( apply describe extract import validate export inventory delete addpropvalue delpropvalue )
+	# Subcommands that don't make sense on the commandline are missing
+	subcmds=(
+		apply export extract import inventory validate
+		add delete list
+		addpg addpropvalue delcust delpg delprop delpropvalue describe 
+		editprop listpg listprop listcust setenv setprop unsetenv
+		setnotify listnotify delnotify
+		listsnap revert selectsnap
+		refresh
+	)
 
 	if [[ $service == "svccfg" ]]; then
 		_arguments -s \
@@ -74,7 +83,13 @@ _svccfg() {
 			":property group or property:_svccfg_properties $fmri"
 		;;
 
-	(extract)
+	(extract|add|delete|list|addpg|addpropvalue|delcust|delpg|delprop)
+		;;
+
+	(delpropvalue|editprop|listpg|listprop|listcust|setenv|setprop|unsetenv)
+		;;
+
+	(setnotify|listnotify|delnotify|listsnap|revert|selectsnap|refresh)
 		;;
 
 	(*)

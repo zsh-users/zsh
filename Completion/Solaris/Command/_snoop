@@ -1,0 +1,87 @@
+#compdef snoop
+
+_snoop() {
+	local -a t_opt exp
+
+t_opt=(
+	"r"\:"time relative to first packet"
+	"a"\:"absolute time"
+	"d"\:"delta time - time since receiving previous packet"
+)
+
+exp=(
+	"ether"
+	"ethertype"
+	"host"
+	"from"
+	"to"
+	"ip"
+	"ip6"
+	"arp"
+	"rarp"
+	"pppoe"
+	"pppoed"
+	"pppoes"
+	"vlan"
+	"vlan-id"
+	"broadcast"
+	"multicast"
+	"bootp"
+	"dhcp"
+	"dhcp6"
+	"apple"
+	"decnet"
+	"greater"
+	"less"
+	"udp"
+	"tcp"
+	"icmp"
+	"icmp6"
+	"ah"
+	"esp"
+	"net"
+	"port"
+	"rpc"
+	"zone"
+	"ldap"
+	"gateway"
+	"nofrag"
+	">"
+	">="
+	"<"
+	"<="
+	"="
+	"!="
+	"and"
+	"or"
+	"not"
+	"slp"
+	"sctp"
+	"ospf"
+)
+
+	_arguments \
+		'-a[generate audio signal on receiving packets]' \
+		'-c[quit after capturing maxcount packets]:maxcount' \
+		'-d[capture packets from specified device]:device:_net_interfaces' \
+		'-i[display packets previously captured to file]:file:_files' \
+		'-n[use file as IP address-to-name mapping table]:file:_files' \
+		'-o[save captured packets to file]:file:_files' \
+		'-p[display one or more packets from captured file]:first packet number [ , last packet number]' \
+		'-q[do not display packet counter when capturing to file]' \
+		'-r[do not resolve IP addresses to names]' \
+		'-s[truncate each packet after snaplen bytes]:snaplen' \
+		'-t[time-stamp presentation]:time-stamp mode:(($t_opt))' \
+		'-C[list code generated from filter expression]' \
+		'-D[display number of packets dropped on the summary line]' \
+		'-N[create IP-address-to-name mapping table file (used with -i)]' \
+		'-I[capture packets from specified interface]:interface:_net_interfaces' \
+		'-P[capture packets in non-promiscuous mode]' \
+		'-S[display size of the entire link layer frame in bytes]' \
+		'-V[verbose summary mode]' \
+		'-v[verbose mode]' \
+		'-x[display offset and length of packet in HEX and ASCII]:offset [ , length]' \
+		'*:expression:(($exp))' \
+}
+
+_snoop "$@"

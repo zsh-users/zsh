@@ -1,0 +1,41 @@
+#compdef dtrace
+# Synced with Nevada build 160 man pages
+
+_dtrace() {
+	_arguments -s \
+	'-32[generate 32-bit D programs and ELF files]' \
+	'-64[generate 64-bit D programs and ELF files]' \
+	'-a[claim anonymous tracing state]' \
+	'-A[generate driver.conf(4) directives for anonymous tracing]' \
+	'-b[set trace buffer size]' \
+	'-c[run specified command and exit upon its completion]' \
+	'-C[run cpp(1) preprocessor on script files]' \
+	'-D[define symbol when invoking preprocessor]' \
+	'-e[exit after compiling request but prior to enabling probes]' \
+	'-f[enable or list probes matching the specified function name]:function: ' \
+	'-F[coalesce trace output by function]' \
+	'-G[generate an ELF file containing embedded dtrace program]' \
+	'-H[print included files when invoking preprocessor]' \
+	'-h[Generate a header file]' \
+	'-i[enable or list probes matching the specified probe id]' \
+	'-I[add include directory to preprocessor search path]:include dir:_files -/' \
+	'-L[Add directory to search path for DTrace libraries]:lib dir:_files -/' \
+	'-l[list probes matching specified criteria]' \
+	'-m[enable or list probes matching the specified module name]:module: ' \
+	'-n[enable or list probes matching the specified probe name]:name: ' \
+	'-o[set output file]:output file:_files' \
+	'-p[grab specified process-ID and cache its symbol tables]:pid:_pids' \
+	'-P[enable or list probes matching the specified provider name]:provider: ' \
+	'-q[set quiet mode (only output explicitly traced data)]' \
+	'-s[enable or list probes according to the specified D script]' \
+	'-S[print D compiler intermediate code]' \
+	'-U[undefine symbol when invoking preprocessor]' \
+	'-v[set verbose mode (report program stability attributes)]' \
+	'-V[report DTrace API version]' \
+	'-w[permit destructive actions]' \
+	'-x[enable or modify compiler and tracing options]' \
+	'-X[specify ISO C conformance settings for preprocessor]:ISO C conformance:((a\:"ISO plus K&R extensions (default)" c\:"Strictly conformant ISO C" s\:"K&R C only" t\:"ISO plus K&R extensions"))' \
+	'-Z[permit probe descriptions that match zero probes]'
+}
+
+_dtrace "$@"

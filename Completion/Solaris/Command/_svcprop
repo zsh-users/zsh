@@ -11,6 +11,9 @@ _svcprop() {
 		'-p[prints values of named property or property group]' \
 		':FMRI:_svcs_fmri -i' \
 		- set2 \
+		'-a[display all properties]' \
+		'-g[group type filter]:group type:' \
+		'*-l[properties from a layer]:layer:(admin site-profile system-profile manifest)' \
 		'(-c -s)-C[retrieve properties without composition]' \
 		'(-C -s)-c[retrieve properties with composition]' \
 		'(-c -C)-s[retrieve properties from snapshot]:snapshot:' \

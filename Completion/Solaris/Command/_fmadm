@@ -1,0 +1,111 @@
+#compdef fmadm
+# Synced with the Nevada build 168 man page
+
+_fm_modules() {
+	compadd "$@" - $(fmadm config 2> /dev/null | awk 'NR == 1 {continue} {print $1}')
+}
+
+_fm_faulted_fmris() {
+	compadd "$@" - $(fmadm faulty -r 2> /dev/null | awk '{print $1}')
+}
+
+_fm_faulted_uuids() {
+	compadd "$@" - $(fmadm faulty -s 2> /dev/null | tail +4 | awk '{print $4}')
+}
+
+_fm_faulted_labels() {
+	local q='"'
+	compadd "$@" - $(fmadm faulty -f 2> /dev/null | while read line; do
+		if [[ $line == "----"* ]]; then
+			read line
+			if [[ $line == '"'* ]]; then
+				print ${${line[(r)$q,(rn:2:)$q]}[2,-2]}
+			fi
+		fi
+	done)
+}
+
+_fmadm() {
+	local context state line expl
+	local -A opt_args
+	local -a subcmds
+
+	# TODO: lookup-alias and remove-alias need completion based on the
+	# output of list-alias, but I have no examples of that output.
+
+	subcmds=(
+		"acquit" "config" "faulty" "flush" "load" "unload"
+		"repaired" "replaced" "reset" "rotate"
+		"add-alias" "remove-alias" "lookup-alias" "list-alias" "sync-alias"
+	)
+
+	if [[ $service == "fmadm" ]]; then
+		_arguments -C -A "-*" \
+			'-q[Quite mode]' \
+			'*::command:->subcmd' && return 0
+
+		if (( CURRENT == 1 )); then
+			_wanted commands expl "fmadm subcommand" compadd -a subcmds
+			return
+		fi
+		service="$words[1]"
+		curcontext="${curcontext%:*}=$service:"
+	fi
+
+	case $service in
+	("acquit")
+		_alternative \
+			"fmadm-acquit-label:label:_fm_faulted_labels" \
+			"fmadm-acquit-uuid:uuid:_fm_faulted_uuids" \
+			"fmadm-acquit-fmri:fmri:_fm_faulted_fmris"
+		;;
+
+	("config")
+		;;
+
+	("faulty")
+		_arguments -A "-*" \
+			'-a[Display all faults]' \
+			'-f[Display faulty FRUs]' \
+			'-g[Group faults]' \
+			'-i[Display persistent cache IDs]' \
+			'-n[Limit output to n entries]:number:' \
+			'-p[Page output]' \
+			'-r[Display resources]' \
+			'-s[Display one-line summaries]' \
+			'-u[Only display fault with given uuid]:uuid:_fm_faulted_uuids' \
+			'-v[Display full output]'
+		;;
+
+	("flush")
+		_fm_faulted_fmris
+		;;
+
+	("load")
+		_path_files -g "/*"
+		;;
+
+	("unload")
+		_fm_modules
+		;;
+
+	("repaired"|"replaced")
+		_alternative \
+			"fmadm-acquit-label:label:_fm_faulted_labels" \
+			"fmadm-acquit-fmri:fmri:_fm_faulted_fmris"
+		;;
+
+	("reset")
+		_arguments -A "-*" \
+			'-s[Reset named SERD]:serd:' \
+			':module:_fm_modules'
+		;;
+
+	("rotate")
+		_values "logfile" "errlog" "fltlog" "infolog" "infolog_hival"
+		;;
+
+	esac
+}
+
+_fmadm "$@"

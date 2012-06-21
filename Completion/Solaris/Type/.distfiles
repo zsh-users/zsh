@@ -1,4 +1,6 @@
 DISTFILES_SRC='
 .distfiles
+_be_name
 _svcs_fmri
+_zones
 '

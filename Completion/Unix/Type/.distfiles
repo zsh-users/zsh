@@ -50,5 +50,6 @@ _user_at_host
 _users
 _users_on
 _zfs_dataset
+_zfs_keysource_props
 _zfs_pool
 '

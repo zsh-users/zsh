@@ -1,5 +1,34 @@
 2012-06-21  Peter Stephenson  <pws@csr.com>
 
+	* Danek (plus .distfiles changes): 30520:
+	Completion/Solaris/Command/.distfiles:
+	Completion/Solaris/Command/_beadm,
+	Completion/Solaris/Command/_dladm,
+	Completion/Solaris/Command/_dtrace,
+	Completion/Solaris/Command/_flowadm,
+	Completion/Solaris/Command/_fmadm,
+	Completion/Solaris/Command/_ipadm,
+	Completion/Solaris/Command/_netstat,
+	Completion/Solaris/Command/_pkg5,
+	Completion/Solaris/Command/_prstat,
+	Completion/Solaris/Command/_ps,
+	Completion/Solaris/Command/_snoop,
+	Completion/Solaris/Command/_svcadm,
+	Completion/Solaris/Command/_svccfg,
+	Completion/Solaris/Command/_svcprop,
+	Completion/Solaris/Command/_zlogin,
+	Completion/Solaris/Command/_zoneadm,
+	Completion/Solaris/Type/.distfiles,
+	Completion/Solaris/Type/_be_name,
+	Completion/Solaris/Type/_svcs_fmri,
+	Completion/Solaris/Type/_zones,
+	Completion/Unix/Command/_zfs,
+	Completion/Unix/Command/_zpool,
+	Completion/Unix/Type/.distfiles,
+	Completion/Unix/Type/_zfs_dataset,
+	Completion/Unix/Type/_zfs_keysource_props: updated completions
+	for Solaris 11.
+
 	* 30518: configure.ac, Src/zsh_system.h: attempt to supply
 	tgoto() prototype only when missing for Solaris 10 and earlier.
 
@@ -16382,5 +16411,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5673 $
+* $Revision: 1.5674 $
 *****************************************************
