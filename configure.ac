@@ -1603,6 +1603,8 @@ AH_TEMPLATE([HAVE_NUMNAMES],
 [Define if you have the terminfo numnames symbol.])
 AH_TEMPLATE([HAVE_STRNAMES],
 [Define if you have the terminfo strnames symbol.])
+AH_TEMPLATE([TGOTO_PROTO_MISSING],
+[Define if there is no prototype for the tgoto() terminal function.])
 
 if test x$zsh_cv_path_term_header != xnone; then
   AC_DEFINE(ZSH_HAVE_TERM_H)
@@ -1618,26 +1620,42 @@ if test x$zsh_cv_path_term_header != xnone; then
   AC_TRY_LINK($term_includes, [char **test = boolcodes; puts(*test);],
   AC_DEFINE(HAVE_BOOLCODES) boolcodes=yes, boolcodes=no)
   AC_MSG_RESULT($boolcodes)
+
   AC_MSG_CHECKING(if numcodes is available)
   AC_TRY_LINK($term_includes, [char **test = numcodes; puts(*test);],
   AC_DEFINE(HAVE_NUMCODES) numcodes=yes, numcodes=no)
   AC_MSG_RESULT($numcodes)
+
   AC_MSG_CHECKING(if strcodes is available)
   AC_TRY_LINK($term_includes, [char **test = strcodes; puts(*test);],
   AC_DEFINE(HAVE_STRCODES) strcodes=yes, strcodes=no)
   AC_MSG_RESULT($strcodes)
+
   AC_MSG_CHECKING(if boolnames is available)
   AC_TRY_LINK($term_includes, [char **test = boolnames; puts(*test);],
   AC_DEFINE(HAVE_BOOLNAMES) boolnames=yes, boolnames=no)
   AC_MSG_RESULT($boolnames)
+
   AC_MSG_CHECKING(if numnames is available)
   AC_TRY_LINK($term_includes, [char **test = numnames; puts(*test);],
   AC_DEFINE(HAVE_NUMNAMES) numnames=yes, numnames=no)
   AC_MSG_RESULT($numnames)
+
   AC_MSG_CHECKING(if strnames is available)
   AC_TRY_LINK($term_includes, [char **test = strnames; puts(*test);],
   AC_DEFINE(HAVE_STRNAMES) strnames=yes, strnames=no)
   AC_MSG_RESULT($strnames)
+
+  dnl There are apparently defective terminal library headers on some
+  dnl versions of Solaris before 11.
+  AC_MSG_CHECKING(if tgoto prototype is missing)
+  tgoto_includes="$term_includes
+/* guaranteed to clash with any valid tgoto prototype */
+extern void tgoto(int **stuff, float **more_stuff);"
+  AC_TRY_LINK($tgoto_includes,
+  [int *stuff; float *more_stuff; tgoto(&stuff, &more_stuff);],
+  AC_DEFINE(TGOTO_PROTO_MISSING) tgotoprotomissing=yes, tgotoprotomissing=no)
+  AC_MSG_RESULT($tgotoprotomissing)
 else
   ZSH_TERM_H=
 fi

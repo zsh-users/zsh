@@ -874,3 +874,7 @@ extern short ospeed;
 #  endif
 # endif
 #endif
+
+#ifdef TGOTO_PROTO_MISSING
+char *tgoto(const char *cap, int col, int row);
+#endif

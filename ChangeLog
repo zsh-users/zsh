@@ -1,5 +1,8 @@
 2012-06-21  Peter Stephenson  <pws@csr.com>
 
+	* 30518: configure.ac, Src/zsh_system.h: attempt to supply
+	tgoto() prototype only when missing for Solaris 10 and earlier.
+
 	* 30519 (correction noticed by Danek): MACHINES: try to
 	modernise.
 
@@ -16379,5 +16382,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5672 $
+* $Revision: 1.5673 $
 *****************************************************
