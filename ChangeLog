@@ -1,3 +1,7 @@
+2012-06-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: belatedly commit version number update.
+
 2012-06-26  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 30533: Src/utils.c: when processing a change in the value of
@@ -16424,5 +16428,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5675 $
+* $Revision: 1.5676 $
 *****************************************************
