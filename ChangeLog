@@ -1,3 +1,16 @@
+2012-06-26  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 30533: Src/utils.c: when processing a change in the value of
+	COLUMNS, do not assert the change into the tty driver winsize.
+	The code for this was dead the whole time IPDEF5 was broken and
+	this seems a bad time to make it live; besides which it is not
+	consistent about the handling of LINES (which is ignored when
+	changed by itself, but would be asserted when COLUMNS changes).
+
+	* 30530: Src/params.c: fix long-broken IPDEF5 definition to use
+	the GSU struct, thus fixing problems with values of LINES or
+	COLUMNS less than 1.
+
 2012-06-21  Peter Stephenson  <pws@csr.com>
 
 	* Danek (plus .distfiles changes): 30520:
@@ -16411,5 +16424,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5674 $
+* $Revision: 1.5675 $
 *****************************************************

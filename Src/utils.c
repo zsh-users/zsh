@@ -1686,7 +1686,7 @@ adjustwinsize(int from)
 	(shttyinfo.winsize.ws_row != ttyrows ||
 	 shttyinfo.winsize.ws_col != ttycols)) {
 	/* shttyinfo.winsize is already set up correctly */
-	ioctl(SHTTY, TIOCSWINSZ, (char *)&shttyinfo.winsize);
+	/* ioctl(SHTTY, TIOCSWINSZ, (char *)&shttyinfo.winsize); */
     }
 #endif /* TIOCGWINSZ */
 
