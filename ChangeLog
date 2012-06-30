@@ -1,3 +1,8 @@
+2012-06-30  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 30540: Src/builtin.c: process the rest of the typeset flags when
+	changing the numeric type of SECONDS e.g. from integer to float.
+
 2012-06-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: belatedly commit version number update.
@@ -16428,5 +16433,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5676 $
+* $Revision: 1.5677 $
 *****************************************************

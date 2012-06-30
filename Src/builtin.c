@@ -1976,9 +1976,10 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 			tc = 0;	/* but don't do a normal conversion */
 		    }
 		} else if (!setsecondstype(pm, on, off)) {
-		    if (value && !setsparam(pname, ztrdup(value)))
+		    if (value && !(pm = setsparam(pname, ztrdup(value))))
 			return NULL;
-		    return pm;
+		    usepm = 1;
+		    err = 0;
 		}
 	    }
 	    if (err)
