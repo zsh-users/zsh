@@ -1,3 +1,12 @@
+2012-07-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Danek: 30562: Completion/Solaris/Command/_dladm,
+	Completion/Solaris/Command/_flowadm,
+	Completion/Solaris/Command/_ipadm,
+	Completion/Solaris/Command/_zoneadm,
+	Completion/Unix/Command/_zfs, Completion/Unix/Command/_zpool,
+	Completion/Unix/Type/_zfs_dataset: Solaris completion updates.
+
 2012-06-30  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 30540: Src/builtin.c: process the rest of the typeset flags when
@@ -16433,5 +16442,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5677 $
+* $Revision: 1.5678 $
 *****************************************************

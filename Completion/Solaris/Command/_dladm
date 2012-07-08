@@ -1,5 +1,5 @@
 #compdef dladm
-# Synced with the S11U1 build 16 man page
+# Synced with the S11U1 build 19 man page
 
 _dladm_links() {
 	compadd "$@" - $(dladm show-link -p -o link)
@@ -81,15 +81,15 @@ _dladm() {
 	# TODO: some subcommands may take different arguments based on options
 
 	subcmds=(
-		"show-ether" "show-ib" "show-usage"
+		"help" "show-ether" "show-ib" "show-usage"
 		{"rename","show"}"-link"
 		{"add","create","delete","modify","remove","show"}"-aggr"
 		{"connect","disconnect","scan","show"}"-wifi"
 		{"reset","set","show"}"-linkprop"
 		{"create","delete","show"}"-secobj"
-		{"create","delete","show"}"-vlan"
+		{"create","delete","modify","show"}"-vlan"
 		{"delete","show"}"-phys"
-		{"create","delete","show"}"-vnic"
+		{"create","delete","modify","show"}"-vnic"
 		{"create","delete","show"}"-etherstub"
 		{"create","modify","delete","add","remove","show"}"-bridge"
 		{"create","modify","delete","show"}"-iptun"
@@ -112,7 +112,7 @@ _dladm() {
 	link_properties=( "link" "zone" "class" "mtu" "state" "over" )
 	link_stats_properties=( "link" "ipackets" "rbytes" "ierrors" "opackets" "obytes" "oerrors" )
 
-	aggr_properties=( "link" "policy" "addrpolicy" "lacpactivity" "lacptimer" "flags" )
+	aggr_properties=( "link" "policy" "addrpolicy" "lacpactivity" "lacptimer" "mode" "flags" )
 	aggr_lacp_properties=( "link" "port" "aggregatable" "sync" "coll" "dist" "defaulted" "expired" )
 	aggr_ext_properties=( "link" "port" "speed" "duplex" "state" "address" "portstate" )
 
@@ -148,8 +148,15 @@ _dladm() {
 
 	linkprops_general=(
 		"autopush:streams modules:"
+		"cos:value:(0 1 2 3 4 5 6 7)"
 		"cpus:processors:"
 		"cpus-effective"
+		"etsbw-lcl:percentage:"
+		"etsbw-lcl-advice"
+		"etsbw-lcl-effective"
+		"etsbw-rmt-effective"
+		"lro:value:(off on auto)"
+		"lro-effective"
 		"mac-address:MAC address:"
 		"maxbw:bandwith:"
 		"pool:pools:"
@@ -216,6 +223,8 @@ _dladm() {
 		"mtu:value:"
 		"ntcs"
 		"pfcmap:value:"
+		"pfcmap-lcl-effective"
+		"pfcmap-rmt-effective"
 		"speed"
 		"tagmode:value:(normal vlanonly)"
 		"vlan-announce:value:(off gvrp)"
@@ -233,6 +242,10 @@ _dladm() {
 	)
 
 	case $service in
+	("help")
+		_arguments ':subcommand:($subcmds)'
+		;;
+
 	("show-link")
 		_arguments -A "-*" \
 			'(-P --persistent)'{-P,--persistent}'[Display persistent link configuration]' \
@@ -257,6 +270,7 @@ _dladm() {
 
 	("show-phys")
 		_arguments -A "-*" \
+			'-D[Show Data Center Bridging information]:featureset:(ets pfc)' \
 			'-H[Show hardware resource usage]' \
 			'-L[Display location information]' \
 			'(-P --persistent)'{-P,--persistent}'[Display persistent link configuration]' \
@@ -280,6 +294,7 @@ _dladm() {
 			'(-t --temporary)'{-t,--temporary}'[Aggregation should be temporary]' \
 			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
 			'(-l --link)'{-l,--link}'[Component link]:link:_dladm_links' \
+			'(-m --mode)'{-m,--mode}'[Aggregation mode]:mode:(dlmp trunk)' \
 			'(-P --policy)'{-P,--policy}'[Port selection policy]:policy:_values -s , "policy" L2 L3 L4' \
 			'(-L --lacp-mode)'{-L,--lacp-mode}'[LACP mode]:lacp mode:(off active passive)' \
 			'(-T --lacp-timer)'{-T,--lacp-timer}'[LACP timer]:lacp timer:(short long)' \
@@ -292,6 +307,7 @@ _dladm() {
 			'(-t --temporary)'{-t,--temporary}'[Aggregation should be temporary]' \
 			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
 			'(-l --link)'{-l,--link}'[Component link]:link:_dladm_links' \
+			'(-m --mode)'{-m,--mode}'[Aggregation mode]:mode:(dlmp trunk)' \
 			'(-P --policy)'{-P,--policy}'[Port selection policy]:policy:_values -s , "policy" L2 L3 L4' \
 			'(-L --lacp-mode)'{-L,--lacp-mode}'[LACP mode]:lacp mode:(off active passive)' \
 			'(-T --lacp-timer)'{-T,--lacp-timer}'[LACP timer]:lacp timer:(short long)' \
@@ -356,6 +372,19 @@ _dladm() {
 			'(-t --temporary)'{-t,--temporary}'[Deletion should be temporary]' \
 			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
 			':VLAN link name:_dladm_vlans'
+		;;
+
+	("modify-vlan")
+		_arguments -A "-*" \
+			'(-t --temporary)'{-t,--temporary}'[VLAN should be temporary]' \
+			'(-f --force)'{-f,--force}'[Force VLAN creation]' \
+			'(-R --root-dir)'{-R,--root-dir}'[Root directory]:directory:_path_files -/' \
+			'(-l --link)'{-l,--link}'[Component link]:link:_dladm_links' \
+			'-v[VLAN ID]:id:' \
+			- set1 \
+			'-L[Source link]:link:_dladm_links' \
+			- set2 \
+			':VLAN link name:'
 		;;
 
 	("show-vlan")
@@ -484,6 +513,21 @@ _dladm() {
 			'(-t --temporary)'{-t,--temporary}'[Deletion should be temporary]' \
 			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
 			':VNIC name:_dladm_vnics'
+		;;
+
+	("modify-vnic")
+		# TODO: MAC address completion could be richer
+		_arguments -A "-*" \
+			'(-t --temporary)'{-t,--temporary}'[Creation should be temporary]' \
+			'(-R --root)'{-R,--root}'[Root directory]:directory:_path_files -/' \
+			'(-l --link)'{-l,--link}'[Component link]:link:_dladm_links' \
+			'(-m --mac-address)'{-m,--mac-address}'[MAC address]:address:(factory random auto vrrp)' \
+			'-v[VLAN ID]:id:' \
+			'(-p --prop)'{-p,--prop}'[Property values]:value:_values -s , "property" ${(M)linkprops_general\:#*\:*}' \
+			- set1 \
+			'-L[Source link]:link:_dladm_links' \
+			- set2 \
+			':VNIC name:'
 		;;
 
 	("show-vnic")

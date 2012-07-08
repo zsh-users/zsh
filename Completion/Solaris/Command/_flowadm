@@ -1,5 +1,5 @@
 #compdef flowadm
-# Synced with the Nevada build 171 man page
+# Synced with the S11U1 build 19 man page
 
 _flowadm() {
 
@@ -16,6 +16,7 @@ _flowadm_flow_int(){
 }
 
 subcmds=(
+	"help"
 	"show-flow"
 	"add-flow"
 	"remove-flow"
@@ -48,6 +49,10 @@ if [[ $service == "flowadm" ]]; then
 	curcontext="${curcontext%:*}=$service:"
 fi
 case $service in
+
+	("help")
+		_arguments ':subcommand:($subcmds)'
+		;;
 
 	("show-flow")
 	_arguments -A "-*" \

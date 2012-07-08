@@ -1,5 +1,5 @@
 #compdef zpool
-# Synced with the S11U1 build 16 man page
+# Synced with the S11U1 build 19 man page
 
 _zpool() {
 	local context state line expl
@@ -108,6 +108,7 @@ _zpool() {
 	(create)
 		# TODO: investigate better vdev handling
 		_arguments -A "-*" \
+			'-B[Create EFI boot partition on whole disks]' \
 			'-o[Set pool property at creation time]:property:_values -s , "property" $rw_props' \
 			'-O[Set dataset property at creation time]:property:_values -s , "property" $create_properties_dataset' \
 			'-f[Force use of in-use devices]' \

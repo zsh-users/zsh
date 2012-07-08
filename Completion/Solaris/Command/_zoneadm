@@ -1,5 +1,5 @@
 #compdef zoneadm
-# Synced with the Solaris 11 build 168 man page
+# Synced with the S11U1 build 19 man page
 
 _zoneadm_bootargs() {
 	# This is a subset of the arguments to kernel(1M)
@@ -129,7 +129,7 @@ _zoneadm() {
 
 	("mark")
 		_arguments -A "-*" \
-			':"incomplete":_values \"incomplete\" incomplete'
+			':state:(incomplete unavailable)'
 		;;
 
 	("move")

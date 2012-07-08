@@ -1,5 +1,5 @@
 #compdef ipadm
-# Synced with the S11U1 build 16 man page
+# Synced with the S11U1 build 19 man page
 
 _ipadm_ifs() {
 	local -a extra
@@ -81,6 +81,7 @@ _ipadm() {
 	local -a proto_all_properties proto_propproperties
 
 	subcmds=(
+		"help"
 		{"show","disable","enable"}"-if"
 		{"create","delete"}"-ip"
 		{"create","delete"}"-vni"
@@ -153,6 +154,10 @@ _ipadm() {
 	fi
 
 	case $service in
+	("help")
+		_arguments ':subcommand:($subcmds)'
+		;;
+
 	("create-ip")
 		_arguments -A "-*" \
 			'(-t --temporary)'{-t,--temporary}'[Interface should be temporary]' \

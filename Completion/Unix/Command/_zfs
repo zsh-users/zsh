@@ -1,5 +1,5 @@
 #compdef zfs
-# Synced with the S11U1 build 16 man page
+# Synced with the S11U1 build 20 man page
 
 _zfs() {
 	local context state line expl
@@ -21,7 +21,7 @@ _zfs() {
 		"compressratio" "mounted" "origin" "usedbychildren"
 		"usedbydataset" "usedbyrefreservation" "usedbysnapshots"
 		"defer_destroy" "userused@" "userrefs" "groupused@"
-		"keystatus" "rekeydate"
+		"keychangedate" "keystatus" "rekeydate"
 	)
 
 	# TODO: Be cleverer about what values can be set.  Is there any way to
@@ -111,12 +111,12 @@ _zfs() {
 			'-p[Create parent datasets]' \
 			'-o[Set initial properties]:property:_values -s , "property" $create_properties' \
 			- set1 \
-			':filesystem:' \
+			':filesystem:_zfs_dataset -t fs -e "parent dataset"' \
 			- set2 \
 			'-s[Create sparse volume]' \
 			'-b[Set volblocksize]:blocksize:' \
 			'-V[Set size]:size:' \
-			':volume:'
+			':volume:_zfs_dataset -t fs -e "parent dataset"'
 		;;
 
 	("destroy")
@@ -153,25 +153,20 @@ _zfs() {
 			'-K[Create encryption key]' \
 			'-o[Set property]:property:_values -s , "property" $create_properties' \
 			':snapshot:_zfs_dataset -t snap' \
-			':filesystem/volume:'
+			':filesystem/volume:_zfs_dataset -t fs -e "parent dataset"'
 		;;
 
 	("promote")
-		# XXX complete only cloned filesystems
 		_arguments \
-			':filesystem:_zfs_dataset -t fs' \
+			':filesystem:_zfs_dataset -t clone' \
 		;;
 
 	("rename")
 		_arguments -A "-*" \
-			- set1 \
-			'-p[Create parent datasets]' \
-			':filesystem/volume/snapshot:_zfs_dataset' \
-			':filesystem/volume/snapshot:' \
-			- set2 \
-			'-r[Recursively rename snapshots of all descendent datasets]' \
-			':snapshot:_zfs_dataset -t snap' \
-			':snapshot:'
+			'(-r)-p[Create parent datasets]' \
+			'(-p)-r[Recursively rename snapshots of all descendent datasets]' \
+			':dataset:_zfs_dataset -r1' \
+			':dataset:_zfs_dataset -r2'
 		;;
 
 	("list")
@@ -182,7 +177,7 @@ _zfs() {
 			'-o[Properties to list]:property:_values -s , "property" $ro_properties $rw_propnames' \
 			'*-s[Sort key (ascending)]:property:_values "property" $ro_properties $rw_propnames' \
 			'*-S[Sort key (descending)]:property:_values "property" $ro_properties $rw_propnames' \
-			'-t[Dataset types to list]:dataset type:_values -s , "dataset type" filesystem snapshot volume' \
+			'-t[Dataset types to list]:dataset type:_values -s , "dataset type" all filesystem snapshot volume' \
 			'*:filesystem/volume/snapshot/path:_zfs_dataset -p'
 		;;
 
