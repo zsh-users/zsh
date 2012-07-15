@@ -3055,6 +3055,34 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		    *sse = ']';
 		}
 		paramtab = tht;
+	    } else if (PM_TYPE(pm->node.flags) == PM_SCALAR ||
+		       PM_TYPE(pm->node.flags) == PM_ARRAY) {
+		struct value vbuf;
+		vbuf.isarr = (PM_TYPE(pm->node.flags) == PM_ARRAY ?
+			      SCANPM_ARRONLY : 0);
+		vbuf.pm = pm;
+		vbuf.flags = 0;
+		vbuf.start = 0;
+		vbuf.end = -1;
+		vbuf.arr = 0;
+		*ss = '[';
+		if (getindex(&ss, &vbuf, SCANPM_ASSIGNING) == 0 &&
+		    vbuf.pm && !(vbuf.pm->node.flags & PM_UNSET)) {
+		    if (PM_TYPE(pm->node.flags) == PM_SCALAR) {
+			setstrvalue(&vbuf, ztrdup(""));
+		    } else {
+			/* start is after the element for reverse index */
+			int start = vbuf.start - !!(vbuf.flags & VALFLAG_INV);
+			if (start < arrlen(vbuf.pm->u.arr)) {
+			    char *arr[2];
+			    arr[0] = "";
+			    arr[1] = 0;
+			    setarrvalue(&vbuf, zarrdup(arr));
+			}
+		    }
+		}
+		returnval = errflag;
+		errflag = 0;
 	    } else {
 		zerrnam(name, "%s: invalid element for unset", s);
 		returnval = 1;
