@@ -326,7 +326,7 @@ compdef() {
         [[ $2 = .menu-select ]] && zmodload -i zsh/complist
 	zle -C "$1" "$2" "$func"
 	if [[ -n $new ]]; then
-	  bindkey "$3" | read -A opt
+	  bindkey "$3" | IFS=$' \t' read -A opt
 	  [[ $opt[-1] = undefined-key ]] && bindkey "$3" "$1"
 	else
 	  bindkey "$3" "$1"
@@ -353,7 +353,7 @@ compdef() {
       # And bind the keys...
       for i; do
         if [[ -n $new ]]; then
-	   bindkey "$i" | read -A opt
+	   bindkey "$i" | IFS=$' \t' read -A opt
 	   [[ $opt[-1] = undefined-key ]] || continue
 	fi
         bindkey "$i" "$func"
@@ -469,7 +469,7 @@ _i_done=''
 
 if [[ -f "$_comp_dumpfile" ]]; then
   if [[ -n "$_i_check" ]]; then
-    read -rA _i_line < "$_comp_dumpfile"
+    IFS=$' \t' read -rA _i_line < "$_comp_dumpfile"
     if [[ _i_autodump -eq 1 && $_i_line[2] -eq $#_i_files &&
         $ZSH_VERSION = $_i_line[4] ]]
     then
@@ -491,7 +491,7 @@ if [[ -z "$_i_done" ]]; then
       _i_name="${_i_file:t}"
       (( $+_i_test[$_i_name] + $_i_wfiles[(I)$_i_file] )) && continue
       _i_test[$_i_name]=yes
-      read -rA _i_line < $_i_file
+      IFS=$' \t' read -rA _i_line < $_i_file
       _i_tag=$_i_line[1]
       shift _i_line
       case $_i_tag in
@@ -527,7 +527,7 @@ zle -la menu-select && zle -C menu-select .menu-select _main_complete
 
 # If the default completer set includes _expand, and tab is bound
 # to expand-or-complete, rebind it to complete-word instead.
-bindkey '^i' | read -A _i_line
+bindkey '^i' | IFS=$' \t' read -A _i_line
 if [[ ${_i_line[2]} = expand-or-complete ]] &&
   zstyle -a ':completion:' completer _i_line &&
   (( ${_i_line[(i)_expand]} <= ${#_i_line} )); then
