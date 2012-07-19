@@ -5,18 +5,26 @@
 
 local ret=1
 local -a flags
+local preprefix=$IPREFIX
 
-if compset -P a; then
-  _message -e number 'errors'
-  return
-elif compset -P q; then
+compset -P '([ilIUubBmMcq]|a(|<->))##'
+# make sure to not consider anything before the '#'
+preprefix=${IPREFIX[$#preprefix,-1]}
+if [[ $preprefix = *\#q* ]]; then
   _globquals
   return
-elif compset -P 'c[0-9]##,'; then
-  _message -e number 'max repetitions'
+elif [[ $preprefix = *q* ]]; then
+  _message 'q flag has to be specified by itself'
   return
-elif compset -P c; then
-  _message -e number 'repetitions (min or exact)'
+elif [[ $preprefix = *a(|<->) ]]; then
+  _message -e number 'errors'
+  if [[ $preprefix = *a ]]; then
+    return
+  else
+    compset -P '<->'
+  fi
+elif [[ $preprefix = *\#c ]]; then
+  _message -e range 'repetitions (min,max) or (exact)'
   return
 fi
 
@@ -35,13 +43,20 @@ flags=(
   'm:set reference to entire matched data'
   'M:deactivate m flag'
 )
-
+flags=( ${flags:#[$preprefix[(R)\#,-1]]*} )
+if [[ $IPREFIX != *'#' ]]; then
+  flags=( ${flags:#[se]*} )
+fi
 _describe -t globflags "glob flag" flags -Q -S ')' && ret=0
 flags=(
   'a:approximate matching'
   'q:introduce glob qualifier'
   'c:match repetitions of preceding pattern'
 )
+flags=( ${flags:#[$preprefix[(R)\#,-1]]*} )
+if [[ $IPREFIX != *'#' ]]; then
+  flags=( ${flags:#[cq]*} )
+fi
 _describe -t globflags "glob flag" flags -Q -S '' && ret=0
 
 return ret
