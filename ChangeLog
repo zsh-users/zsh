@@ -1,3 +1,7 @@
+2012-07-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: relabel as 5.0.0-dev-0.
+
 2012-07-23  Geoff Wing  <gcw@zsh.org>
 
 	* unposted: Doc/Zsh/ftp_sites.yo: Remove unavailable sites
@@ -16460,5 +16464,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5682 $
+* $Revision: 1.5683 $
 *****************************************************
