@@ -1,5 +1,8 @@
 2012-07-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 30590: Doc/Makefile.in, Doc/.distfiles: work around problem
+	turning intro.ms into PDF.
+
 	* unposted: relabel as 5.0.0-dev-0.
 
 2012-07-23  Geoff Wing  <gcw@zsh.org>
@@ -16464,5 +16467,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5683 $
+* $Revision: 1.5684 $
 *****************************************************

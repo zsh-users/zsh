@@ -94,7 +94,7 @@ dvi: zsh.dvi
 zsh.dvi: $(sdir)/zsh.texi
 	$(TEXI2DVI) $(sdir)/zsh.texi
 
-pdf: zsh.pdf intro.pdf
+pdf: zsh.pdf intro.a4.pdf intro.us.pdf
 .PHONY: pdf
 
 zsh.pdf: $(sdir)/zsh.texi
@@ -104,8 +104,14 @@ zsh.pdf: $(sdir)/zsh.texi
 	  PDFTEX=$(PDFETEX) $(TEXI2DVI) --pdf $(sdir)/zsh.texi; \
 	fi
 
-intro.pdf: $(sdir)/intro.ms
-	pdfroff -ms $(sdir)/intro.ms >intro.pdf
+# Use roff2ps / ps2pdf because pdfroff produces doubled output.
+intro.a4.pdf: $(sdir)/intro.ms
+	roff2ps -ms -P-pa4 < $(sdir)/intro.ms > intro.a4.ps
+	ps2pdf intro.a4.ps
+
+intro.us.pdf: $(sdir)/intro.ms
+	roff2ps -ms -P-pletter < $(sdir)/intro.ms > intro.us.ps
+	ps2pdf intro.us.ps
 
 texi: $(sdir)/zsh.texi
 .PHONY: texi

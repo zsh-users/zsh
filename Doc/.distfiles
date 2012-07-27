@@ -18,5 +18,5 @@ DISTFILES_DOC='
     *.html
     zsh.dvi
     zsh.pdf
-    intro.pdf
+    intro.a4.pdf intro.us.pdf
 '
