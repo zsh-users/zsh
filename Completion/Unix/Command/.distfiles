@@ -111,6 +111,7 @@ _kvno
 _last
 _ldd
 _less
+_lha
 _links
 _ln
 _loadkeys
@@ -143,6 +144,7 @@ _mysqldiff
 _ncftp
 _netcat
 _nice
+_nkf
 _nm
 _nmap
 _notmuch

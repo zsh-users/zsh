@@ -1,5 +1,9 @@
 2012-08-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* cat_in_136: 17200: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_lha, Completion/Unix/Command/_nkf: new
+	completions.  nkf is a Kanji code converter.
+
 	* YAMAMOTO Takashi: 30599: Src/compat.c, Src/zsh.h: don't
 	use the replacement wcwidth if not ISO-10646 as the assumptions
 	it makes probably won't work.
@@ -16473,5 +16477,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5685 $
+* $Revision: 1.5686 $
 *****************************************************
