@@ -1,3 +1,9 @@
+2012-08-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* YAMAMOTO Takashi: 30599: Src/compat.c, Src/zsh.h: don't
+	use the replacement wcwidth if not ISO-10646 as the assumptions
+	it makes probably won't work.
+
 2012-07-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 30590: Doc/Makefile.in, Doc/.distfiles: work around problem
@@ -16467,5 +16473,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5684 $
+* $Revision: 1.5685 $
 *****************************************************
