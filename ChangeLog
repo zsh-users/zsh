@@ -1,3 +1,8 @@
+2012-08-13  Peter Stephenson  <pws@csr.com>
+
+	* Aaron Schrab: 30603: Src/Zle/zle_move.c: repeating vi skip
+	characters commands caused bad positioning.
+
 2012-08-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* cat_in_136: 17200: Completion/Unix/Command/.distfiles,
@@ -16477,5 +16482,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5686 $
+* $Revision: 1.5687 $
 *****************************************************

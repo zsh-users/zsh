@@ -770,9 +770,11 @@ virevrepeatfind(char **args)
 	zmult = -zmult;
 	return ret;
     }
+    tailadd = -tailadd;
     vfinddir = -vfinddir;
     ret = virepeatfind(args);
     vfinddir = -vfinddir;
+    tailadd = -tailadd;
     return ret;
 }
 
