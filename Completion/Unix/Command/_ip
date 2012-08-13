@@ -419,7 +419,7 @@ _regex_words \
   'h*elp:show help for command' \
   'a*dd:add a new IP tunnel:$tunnel_add_cmds' \
   'c*hange:change an existing IP tunnel:$tunnel_add_cmds' \
-  'd*elete:destroy an IP tunnel:$tunnel_add_cmds' \
+  'd*el:destroy an IP tunnel:$tunnel_add_cmds' \
   's*how:list IP tunnels'
 tunnel_cmds=("$reply[@]")
 

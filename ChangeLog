@@ -1,3 +1,8 @@
+2012-08-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Michal Halenka: 30608: Completion/Unix/Command/_ip: del rather
+	delete tunnel.
+
 2012-08-13  Peter Stephenson  <pws@csr.com>
 
 	* Jesse Weinstein: 30607: Doc/Makefile.in: fix ancient
@@ -16488,5 +16493,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5689 $
+* $Revision: 1.5690 $
 *****************************************************
