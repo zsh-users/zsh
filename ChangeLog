@@ -1,5 +1,8 @@
 2012-08-13  Peter Stephenson  <pws@csr.com>
 
+	* Aaron Schrab: 30604: Src/Zle/zle_move.c: make repeating vi skip
+	character useful by ignoring character just matched.
+
 	* Aaron Schrab: 30603: Src/Zle/zle_move.c: repeating vi skip
 	characters commands caused bad positioning.
 
@@ -16482,5 +16485,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5687 $
+* $Revision: 1.5688 $
 *****************************************************
