@@ -1,3 +1,8 @@
+2012-08-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Etc/Changelog-4.3, Etc/ChangeLog-5.0,
+	Etc/.distfiles: rename
+
 2012-08-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: ChangeLog, Etc/ChangeLog-5.0: move changes up
@@ -44,5 +49,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5692 $
+* $Revision: 1.5693 $
 *****************************************************
