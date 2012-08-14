@@ -38,7 +38,11 @@
 
 	* unposted: Doc/Zsh/ftp_sites.yo: Remove unavailable sites
 
+2012-07-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: update for 5.0.0 release.
+
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5691 $
+* $Revision: 1.5692 $
 *****************************************************

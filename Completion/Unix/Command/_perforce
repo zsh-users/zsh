@@ -474,8 +474,17 @@ _perforce_gen_cmd_list() {
   # Ignore blank lines and the heading line beginning `Perforce...'
   # Just gets run once, then cached, so don't bother optimising
   # this to a grossly unreadable parameter substitution.
+  _perforce_cmd_list=()
   _perforce_call_p4 help-commands help commands | while read -A hline; do
-    (( ${#hline} < 2 )) && continue
+    if (( ${#hline} < 2 )); then
+      if (( ${#_perforce_cmd_list} )); then
+	# Ignore comments after the main list of commands, separate by blank
+	# line.
+	break
+      else
+	continue
+      fi
+    fi
     [[ $hline[1] = (#i)perforce ]] && continue
     _perforce_cmd_list+=("${hline[1]}:${hline[2,-1]}")
   done
