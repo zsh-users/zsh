@@ -1,3 +1,9 @@
+2012-08-16  Peter Stephenson  <pws@csr.com>
+
+	* 30617: Src/prototypes.h, Src/zsh_system.h: rationalise
+	replacement of tgoto() prototype which could appear twice
+	inconsistently.
+
 2012-08-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Etc/relnote_5.0.0.txt, Etc/.distfiles: add.
@@ -51,5 +57,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5694 $
+* $Revision: 1.5695 $
 *****************************************************
