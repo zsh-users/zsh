@@ -459,3 +459,12 @@
  silent2(){ local silence; silent1; }
  silent2
 0:typeset -g should be silent even without TYPESET_SILENT
+
+ typeset -T TIED_SCALAR tied_array
+ TIED_SCALAR=foo:bar
+ print $tied_array
+ typeset -T TIED_SCALAR=goo:car tied_array
+ print $tied_array
+0:retying arrays to same array works
+>foo bar
+>goo car

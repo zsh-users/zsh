@@ -1,5 +1,9 @@
 2012-08-16  Peter Stephenson  <pws@csr.com>
 
+	* 30619: Doc/Zsh/builtins.yo, Src/builtin.c,
+	Test/B02typeset.ztst: repeat "typeset -T" with same two first
+	arguments is not an error.
+
 	* 30617: Src/prototypes.h, Src/zsh_system.h: rationalise
 	replacement of tgoto() prototype which could appear twice
 	inconsistently.
@@ -57,5 +61,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5695 $
+* $Revision: 1.5696 $
 *****************************************************

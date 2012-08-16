@@ -2449,7 +2449,20 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	    && (locallevel == pm->level || !(on & PM_LOCAL))) {
 	    if (pm->node.flags & PM_TIED) {
 		unqueue_signals();
-		zerrnam(name, "can't tie already tied scalar: %s", asg0.name);
+		if (!strcmp(asg->name, pm->ename)) {
+		    /*
+		     * Already tied in the fashion requested.
+		     */
+		    struct tieddata *tdp = (struct tieddata*)pm->u.data;
+		    /* Update join character */
+		    tdp->joinchar = joinchar;
+		    if (asg0.value)
+			setsparam(asg0.name, ztrdup(asg0.value));
+		    return 0;
+		} else {
+		    zerrnam(name, "can't tie already tied scalar: %s",
+			    asg0.name);
+		}
 		return 1;
 	    }
 	    if (!asg0.value && !(PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)))

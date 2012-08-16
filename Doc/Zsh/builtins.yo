@@ -1552,7 +1552,9 @@ an array to var(SCALAR) is an error, and assigning a scalar to var(array)
 sets it to be a single-element array.  Note that both `tt(typeset -xT ...)'
 and `tt(export -T ...)' work, but only the scalar will be marked for
 export.  Setting the value using the scalar version causes a split on all
-separators (which cannot be quoted).
+separators (which cannot be quoted).  It is possible to use the
+same two tied variables with a different separator character in which
+case the variables remain joined as before but the separator is changed.
 
 The tt(-g) (global) flag is treated specially: it means that any
 resulting parameter will not be restricted to local scope.  Note that this
