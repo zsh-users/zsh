@@ -1,3 +1,8 @@
+2012-08-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Hiramatsu Yoshifumi: 30621 patch-ab (from NetBSD pkgsrc):
+	compilation on __INTERIX
+
 2012-08-16  Peter Stephenson  <pws@csr.com>
 
 	* 30619: Doc/Zsh/builtins.yo, Src/builtin.c,
@@ -61,5 +66,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5696 $
+* $Revision: 1.5697 $
 *****************************************************

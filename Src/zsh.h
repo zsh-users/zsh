@@ -2135,6 +2135,7 @@ struct ttyinfo {
 #endif
 };
 
+#ifndef __INTERIX
 /* defines for whether tabs expand to spaces */
 #if defined(HAVE_TERMIOS_H) || defined(HAVE_TERMIO_H)
 #define SGTTYFLAG       shttyinfo.tio.c_oflag
@@ -2152,6 +2153,7 @@ struct ttyinfo {
 #   endif
 #  endif
 # endif
+#endif
 
 /* flags for termflags */
 
