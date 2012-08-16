@@ -1,7 +1,11 @@
 2012-08-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Hiramatsu Yoshifumi: 30621 patch-ac (from NetBSD pkgsrc)
+	backported to configure.ac: compilation on interix, also
+	change linker flags for NetBSD.
+
 	* Hiramatsu Yoshifumi: 30621 patch-ab (from NetBSD pkgsrc):
-	compilation on __INTERIX
+	Src/zsh.h: compilation on __INTERIX
 
 2012-08-16  Peter Stephenson  <pws@csr.com>
 
@@ -66,5 +70,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5697 $
+* $Revision: 1.5698 $
 *****************************************************

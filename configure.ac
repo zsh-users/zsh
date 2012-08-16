@@ -2709,6 +2709,10 @@ char *argv[];
         DLLD="${DLLD=$CC}"
         DLLDARG=""
       ;;
+      *interix*)
+        DLLD="${DLLD=$CC}"
+        DLLDARG=""
+      ;;
       * )
 	DLLD="${DLLD=ld}"
 	DLLDARG=""
@@ -2719,6 +2723,7 @@ char *argv[];
     case "$host_os" in
       hpux*)   DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
       darwin*) DLCFLAGS="${DLCFLAGS=-fno-common}" ;;
+      interix*) DLCFLAGS="${DLCFLAGS=}" ;;
       *)       DLCFLAGS="${DLCFLAGS=-fPIC}" ;;
     esac
   else
@@ -2733,10 +2738,9 @@ char *argv[];
   fi
   case "$host_os" in
     osf*) DLLDFLAGS="${DLLDFLAGS=-shared -expect_unresolved '*'}" ;;
-    *freebsd*|linux*|irix*|gnu*|dragonfly*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
+    *freebsd*|*netbsd*|linux*|irix*|gnu*|interix*|dragonfly*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
     sunos*)       DLLDFLAGS="${DLLDFLAGS=-assert nodefinitions}" ;;
     sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G $ldflags}" ;;
-    netbsd*)      DLLDFLAGS="${DLLDFLAGS=${DLLDARG}-x -shared --whole-archive}" ;;
     aix*)         DLLDFLAGS="${DLLDFLAGS=-G -bexpall -lc}" ;;
     solaris*|sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G}" ;;
     darwin*)      DLLDFLAGS="${DLLDFLAGS=-bundle -flat_namespace -undefined suppress}" ;;
