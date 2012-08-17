@@ -213,13 +213,13 @@ if zstyle -T ":vcs_info:${vcs}:${usercontext}:${rrn}" get-mq \
     fi
 
     hook_com=( applied "${applied_string}" unapplied "${unapplied_string}"
-               applied-n ${#mqpatches}     unapplied-n ${#mqunapplied}
+               applied-n ${#mqpatches}     unapplied-n ${#mqunapplied}     all-n ${#mqseries}
                guards "${guards_string}"   guards-n ${#mqguards} )
 
     if VCS_INFO_hook 'set-patch-format' ${qstring}; then
         zformat -f hgmqstring "${hgmqstring}" \
             "p:${hook_com[applied]}" "u:${hook_com[unapplied]}" \
-            "n:${#mqpatches}" "c:${#mqunapplied}" \
+            "n:${#mqpatches}" "c:${#mqunapplied}" "a:${#mqseries}" \
             "g:${hook_com[guards]}" "G:${#mqguards}"
     else
         hgmqstring=${hook_com[patch-replace]}

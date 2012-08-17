@@ -1,3 +1,11 @@
+2012-08-17  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Stepan Koltsov: Doc/Zsh/contrib.yo,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,
+	Functions/VCS_Info/VCS_INFO_quilt: vcs_info: %a to output number
+	of all patches in (no)?patch-format styles
+
 2012-08-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Hiramatsu Yoshifumi: 30621 patch-ac (from NetBSD pkgsrc)
@@ -70,5 +78,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5698 $
+* $Revision: 1.5699 $
 *****************************************************

@@ -129,12 +129,13 @@ rrn=${gitbase:t}
 
 local patchdir=${gitdir}/patches/${gitbranch}
 if [[ -d $patchdir ]] ; then
-    local -a stgit_applied stgit_unapplied
+    local -a stgit_applied stgit_unapplied stgit_all
 
     stgit_applied=(${(f)"$(< "${patchdir}/applied")"})
     stgit_applied=( ${(Oa)stgit_applied} )
     stgit_unapplied=(${(f)"$(< "${patchdir}/unapplied")"})
     stgit_unapplied=( ${(oa)stgit_unapplied} )
+    stgit_all=( ${(Oa)stgit_applied} ${stgit_unapplied} )
 
     if VCS_INFO_hook 'gen-applied-string' "${stgit_applied[@]}"; then
         if (( ${#stgit_applied} )); then
@@ -158,10 +159,10 @@ if [[ -d $patchdir ]] ; then
         zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" nopatch-format stgitmsg || stgitmsg="no patch applied"
     fi
     hook_com=( applied "${stgitpatch}"     unapplied "${stgitunapplied}"
-               applied-n ${#stgit_applied} unapplied-n ${#stgit_unapplied} )
+               applied-n ${#stgit_applied} unapplied-n ${#stgit_unapplied} all-n ${#stgit_all} )
     if VCS_INFO_hook 'set-patch-format' "${stgitmsg}"; then
         zformat -f stgitmsg "${stgitmsg}" "p:${hook_com[applied]}" "u:${hook_com[unapplied]}" \
-                                          "n:${#stgit_applied}" "c:${#stgit_unapplied}"
+                                          "n:${#stgit_applied}" "c:${#stgit_unapplied}" "a:${#stgit_all}"
     else
         stgitmsg=${hook_com[patch-replace]}
     fi
