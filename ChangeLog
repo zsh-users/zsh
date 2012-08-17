@@ -1,5 +1,11 @@
 2012-08-17  Peter Stephenson  <pws@csr.com>
 
+	* 30629 plus unposted formatting improvements:
+	Doc/Zsh/builtins.yo, Src/Builtins/rlimits.c: more complete
+	handling for socket buffer size limit (NetBSD) plus formatting
+	and consistency changes (kb -> kbytes everywhere in ulimit
+	output, K-bytes to kilobytes everywhere in documentation).
+
 	* 30627: configure.ac, Doc/Zsh/builtins.yo,
 	Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c:
 	support RLIMIT_NTHR as on NetBSD.
@@ -67,5 +73,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5700 $
+* $Revision: 1.5701 $
 *****************************************************

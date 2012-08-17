@@ -238,32 +238,32 @@ printulimit(char *nam, int lim, int hard, int head)
     switch (lim) {
     case RLIMIT_CORE:
 	if (head)
-	    printf("-c: core file size (blocks)    ");
+	    printf("-c: core file size (blocks)         ");
 	if (limit != RLIM_INFINITY)
 	    limit /= 512;
 	break;
     case RLIMIT_DATA:
 	if (head)
-	    printf("-d: data seg size (kbytes)     ");
+	    printf("-d: data seg size (kbytes)          ");
 	if (limit != RLIM_INFINITY)
 	    limit /= 1024;
 	break;
     case RLIMIT_FSIZE:
 	if (head)
-	    printf("-f: file size (blocks)         ");
+	    printf("-f: file size (blocks)              ");
 	if (limit != RLIM_INFINITY)
 	    limit /= 512;
 	break;
 # ifdef HAVE_RLIMIT_SIGPENDING
     case RLIMIT_SIGPENDING:
 	if (head)
-	    printf("-i: pending signals            ");
+	    printf("-i: pending signals                 ");
 	break;
 # endif
 # ifdef HAVE_RLIMIT_MEMLOCK
     case RLIMIT_MEMLOCK:
 	if (head)
-	    printf("-l: locked-in-memory size (kb) ");
+	    printf("-l: locked-in-memory size (kbytes)  ");
 	if (limit != RLIM_INFINITY)
 	    limit /= 1024;
 	break;
@@ -273,7 +273,7 @@ printulimit(char *nam, int lim, int hard, int head)
 # if defined(HAVE_RLIMIT_RSS) && !defined(RLIMIT_VMEM_IS_RSS) && !defined(RLIMIT_RSS_IS_AS)
     case RLIMIT_RSS:
 	if (head)
-	    printf("-m: resident set size (kbytes) ");
+	    printf("-m: resident set size (kbytes)      ");
 	if (limit != RLIM_INFINITY)
 	    limit /= 1024;
 	break;
@@ -281,7 +281,7 @@ printulimit(char *nam, int lim, int hard, int head)
 # if defined(HAVE_RLIMIT_VMEM) && defined(HAVE_RLIMIT_RSS) && defined(RLIMIT_VMEM_IS_RSS)
     case RLIMIT_VMEM:
 	if (head)
-	    printf("-m: memory size (kb)           ");
+	    printf("-m: memory size (kbytes)            ");
 	if (limit != RLIM_INFINITY)
 	    limit /= 1024;
 	break;
@@ -289,41 +289,41 @@ printulimit(char *nam, int lim, int hard, int head)
 # ifdef HAVE_RLIMIT_NOFILE
     case RLIMIT_NOFILE:
 	if (head)
-	    printf("-n: file descriptors           ");
+	    printf("-n: file descriptors                ");
 	break;
 # endif /* HAVE_RLIMIT_NOFILE */
 # ifdef HAVE_RLIMIT_MSGQUEUE
     case RLIMIT_MSGQUEUE:
 	if (head)
-	    printf("-q: bytes in POSIX msg queues  ");
+	    printf("-q: bytes in POSIX msg queues       ");
 	break;
 # endif
     case RLIMIT_STACK:
 	if (head)
-	    printf("-s: stack size (kbytes)        ");
+	    printf("-s: stack size (kbytes)             ");
 	if (limit != RLIM_INFINITY)
 	    limit /= 1024;
 	break;
     case RLIMIT_CPU:
 	if (head)
-	    printf("-t: cpu time (seconds)         ");
+	    printf("-t: cpu time (seconds)              ");
 	break;
 # ifdef HAVE_RLIMIT_NPROC
     case RLIMIT_NPROC:
 	if (head)
-	    printf("-u: processes                  ");
+	    printf("-u: processes                       ");
 	break;
 # endif /* HAVE_RLIMIT_NPROC */
 # ifdef HAVE_RLIMIT_NTHR
     case RLIMIT_NTHR:
 	if (head)
-	    printf("-r: threads                    ");
+	    printf("-r: threads                         ");
 	break;
 #endif /* HAVE_RLIMIT_NTHR */
 # if defined(HAVE_RLIMIT_VMEM) && (!defined(HAVE_RLIMIT_RSS) || !defined(RLIMIT_VMEM_IS_RSS))
     case RLIMIT_VMEM:
 	if (head)
-	    printf("-v: virtual memory size (kb)   ");
+	    printf("-v: virtual memory size (kbytes)    ");
 	if (limit != RLIM_INFINITY)
 	    limit /= 1024;
 	break;
@@ -331,7 +331,7 @@ printulimit(char *nam, int lim, int hard, int head)
 # if defined HAVE_RLIMIT_AS && !defined(RLIMIT_VMEM_IS_AS)
     case RLIMIT_AS:
 	if (head)
-	    printf("-v: address space (kb)         ");
+	    printf("-v: address space (kbytes)          ");
 	if (limit != RLIM_INFINITY)
 	    limit /= 1024;
 	break;
@@ -339,13 +339,13 @@ printulimit(char *nam, int lim, int hard, int head)
 # ifdef HAVE_RLIMIT_LOCKS
     case RLIMIT_LOCKS:
 	if (head)
-	    printf("-x: file locks                 ");
+	    printf("-x: file locks                      ");
 	break;
 # endif /* HAVE_RLIMIT_LOCKS */
 # ifdef HAVE_RLIMIT_AIO_MEM
     case RLIMIT_AIO_MEM:
 	if (head)
-	    printf("-N %2d: AIO locked-in-memory (kb) ", RLIMIT_AIO_MEM);
+	    printf("-N %2d: AIO locked-in-memory (kbytes)", RLIMIT_AIO_MEM);
 	if (limit != RLIM_INFINITY)
 	    limit /= 1024;
 	break;
@@ -353,44 +353,42 @@ printulimit(char *nam, int lim, int hard, int head)
 # ifdef HAVE_RLIMIT_AIO_OPS
     case RLIMIT_AIO_OPS:
 	if (head)
-	    printf("-N %2d: AIO operations          ", RLIMIT_AIO_OPS);
+	    printf("-N %2d: AIO operations               ", RLIMIT_AIO_OPS);
 	break;
 # endif /* HAVE_RLIMIT_AIO_OPS */
 # ifdef HAVE_RLIMIT_TCACHE
     case RLIMIT_TCACHE:
 	if (head)
-	    printf("-N %2d: cached threads          ", RLIMIT_TCACHE);
+	    printf("-N %2d: cached threads               ", RLIMIT_TCACHE);
 	break;
 # endif /* HAVE_RLIMIT_TCACHE */
 # ifdef HAVE_RLIMIT_SBSIZE
     case RLIMIT_SBSIZE:
 	if (head)
-	    printf("-N %2d: socket buffer size (kb) ", RLIMIT_SBSIZE);
-	if (limit != RLIM_INFINITY)
-	    limit /= 1024;
+	    printf("-b: socket buffer size (bytes)      ", RLIMIT_SBSIZE);
 	break;
 # endif /* HAVE_RLIMIT_SBSIZE */
 # ifdef HAVE_RLIMIT_PTHREAD
     case RLIMIT_PTHREAD:
 	if (head)
-	    printf("-N %2d: threads per process     ", RLIMIT_PTHREAD);
+	    printf("-N %2d: threads per process          ", RLIMIT_PTHREAD);
 	break;
 # endif /* HAVE_RLIMIT_PTHREAD */
 # ifdef HAVE_RLIMIT_NICE
     case RLIMIT_NICE:
 	if (head)
-	    printf("-e: max nice                   ");
+	    printf("-e: max nice                        ");
 	break;
 # endif /* HAVE_RLIMIT_NICE */
 # ifdef HAVE_RLIMIT_RTPRIO
     case RLIMIT_RTPRIO:
 	if (head)
-	    printf("-r: max rt priority            ");
+	    printf("-r: max rt priority                 ");
 	break;
 # endif /* HAVE_RLIMIT_RTPRIO */
     default:
 	if (head)
-	    printf("-N %2d:                         ", lim);
+	    printf("-N %2d:                              ", lim);
 	break;
     }
     /* display the limit */
@@ -782,16 +780,21 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		case 'c':
 		    res = RLIMIT_CORE;
 		    break;
-# ifdef HAVE_RLIMIT_RSS
-		case 'm':
-		    res = RLIMIT_RSS;
+# ifdef HAVE_RLIMIT_SBSIZE
+		case 'b':
+		    res = RLIMIT_SBSIZE;
 		    break;
-# endif /* HAVE_RLIMIT_RSS */
+# endif /* HAVE_RLIMIT_SBSIZE */
 # ifdef HAVE_RLIMIT_MEMLOCK
 		case 'l':
 		    res = RLIMIT_MEMLOCK;
 		    break;
 # endif /* HAVE_RLIMIT_MEMLOCK */
+# ifdef HAVE_RLIMIT_RSS
+		case 'm':
+		    res = RLIMIT_RSS;
+		    break;
+# endif /* HAVE_RLIMIT_RSS */
 # ifdef HAVE_RLIMIT_NOFILE
 		case 'n':
 		    res = RLIMIT_NOFILE;
