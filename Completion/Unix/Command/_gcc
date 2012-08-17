@@ -1,4 +1,4 @@
-#compdef gcc g++ -value-,LDFLAGS,-default- -value-,CFLAGS,-default- -value-,CPPFLAGS,-default-
+#compdef gcc g++ cc c++ llvm-gcc llvm-g++ clang clang++ -value-,LDFLAGS,-default- -value-,CFLAGS,-default- -value-,CPPFLAGS,-default-
 
 local curcontext="$curcontext" state line ret=1 expl args args2
 typeset -A opt_args
@@ -210,10 +210,23 @@ h8/300)
   ;;
 esac
 
+if [[ "$service" = clang* ]]; then
+    args=(
+        $args
+        -flto -emit-llvm
+        "-Qunused-arguments[don't emit warning for unused driver arguments]"
+        --analyze
+        -fshow-column -fshow-source-location -fcaret-diagnostics -fdiagnostics-fixit-info
+        -fdiagnostics-parseable-fixits -fdiagnostics-print-source-range-info
+        -fprint-source-range-info -fdiagnostics-show-option -fmessage-length
+    )
+fi
+
 
 _arguments -C -M 'L:|-{fW}no-=-{fW} r:|[_-]=* r:|=*' \
   "$args[@]" \
   -c -S -E -v -a -w -C -H -P -s '(-pg)-p' '(-p)-pg' \
+  '-###[print commands to run this compilation]' \
   '-o:output file:_files -g "^*.(c|h|cc|C|cxx)(-.)"' \
   '-x:input file language:(c objective-c c++ c-header cpp-output c++-cpp-output assembler assembler-with-cpp none)' \
   '+e-:virtual function definitions in classes:((0\:only\ interface 1\:generate\ code))' \
@@ -226,6 +239,7 @@ _arguments -C -M 'L:|-{fW}no-=-{fW} r:|[_-]=* r:|=*' \
   '*-U-:undefine macro:' \
   '*-Wp,-:preprocessor option:' \
   '*-Wl,-:linker option:' \
+  '*-Xpreprocessor:preprocessor option:' \
   '*-Xlinker:linker option:' \
   '*-u:pretend symbol to be undefined:' \
   '*-Wa,-:assembler option:' \
@@ -234,7 +248,8 @@ _arguments -C -M 'L:|-{fW}no-=-{fW} r:|[_-]=* r:|=*' \
   '*-I-:header file search path:_files -/' \
   '-B-:executable prefix:_files -/' \
   '-b:target machine:' \
-  '-V:gcc version:' \
+  '-V:specify compiler version:' \
+  '--version' \
   '-print-file-name=:library:->library' \
   '-print-prog-name=:program:' \
   '*-include:include file:_files -g \*.h\(-.\)' \
