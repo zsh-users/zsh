@@ -314,6 +314,12 @@ printulimit(char *nam, int lim, int hard, int head)
 	    printf("-u: processes                  ");
 	break;
 # endif /* HAVE_RLIMIT_NPROC */
+# ifdef HAVE_RLIMIT_NTHR
+    case RLIMIT_NTHR:
+	if (head)
+	    printf("-r: threads                    ");
+	break;
+#endif /* HAVE_RLIMIT_NTHR */
 # if defined(HAVE_RLIMIT_VMEM) && (!defined(HAVE_RLIMIT_RSS) || !defined(RLIMIT_VMEM_IS_RSS))
     case RLIMIT_VMEM:
 	if (head)
@@ -791,6 +797,11 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    res = RLIMIT_NOFILE;
 		    break;
 # endif /* HAVE_RLIMIT_NOFILE */
+# ifdef HAVE_RLIMIT_NTHR
+		case 'r':
+		    res = RLIMIT_NTHR;
+		    break;
+# endif /* HAVE_RLIMIT_NTHR */
 # ifdef HAVE_RLIMIT_NPROC
 		case 'u':
 		    res = RLIMIT_NPROC;

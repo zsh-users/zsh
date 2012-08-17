@@ -1,19 +1,8 @@
-2012-08-17  Frank Terbeck  <ft@bewatermyfriend.org>
+2012-08-17  Peter Stephenson  <pws@csr.com>
 
-	* Stepan Koltsov: Doc/Zsh/contrib.yo,
-	Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
-	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,
-	Functions/VCS_Info/VCS_INFO_quilt: vcs_info: %a to output number
-	of all patches in (no)?patch-format styles
-
-2012-08-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
-
-	* Hiramatsu Yoshifumi: 30621 patch-ac (from NetBSD pkgsrc)
-	backported to configure.ac: compilation on interix, also
-	change linker flags for NetBSD.
-
-	* Hiramatsu Yoshifumi: 30621 patch-ab (from NetBSD pkgsrc):
-	Src/zsh.h: compilation on __INTERIX
+	* 30627: configure.ac, Doc/Zsh/builtins.yo,
+	Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c:
+	support RLIMIT_NTHR as on NetBSD.
 
 2012-08-16  Peter Stephenson  <pws@csr.com>
 
@@ -78,5 +67,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5699 $
+* $Revision: 1.5700 $
 *****************************************************
