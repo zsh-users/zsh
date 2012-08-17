@@ -1,6 +1,12 @@
 2012-08-17  Peter Stephenson  <pws@csr.com>
 
-	* 30632
+	* Stepan Koltsov: 30632
+	(https://raw.github.com/stepancheg/zsh/bfa81caaac44dacfa05adb77f61526ea90346219/Completion/Unix/Command/_clay):
+	Completion/Unix/Command/_clay,
+	Completion/Unix/Command/.distfiles:
+	new completion.
+
+	* Stepan Koltsov: 30632
 	(https://github.com/stepancheg/zsh/commit/b0f1427e4983be6dfdc07ccaf86f153d5f9959b9.patch):
 	Completion/Unix/Command/_gcc: aliases and clang-specific flags.
 
@@ -77,5 +83,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5702 $
+* $Revision: 1.5703 $
 *****************************************************
