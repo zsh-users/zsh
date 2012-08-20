@@ -279,7 +279,7 @@ fi
 for f in $files; do
   [[ -z $to[$f] ]] && continue
   exec=($action ${=opt_o} $opt_s -- $f $to[$f])
-  [[ -n $opt_i$opt_n$opt_v ]] && print -r -- ${(q)exec}
+  [[ -n $opt_i$opt_n$opt_v ]] && print -r -- ${(q-)exec}
   if [[ -n $opt_i ]]; then
     read -q 'opt?Execute? ' || continue
   fi

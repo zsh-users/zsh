@@ -1,3 +1,8 @@
+2012-08-20  Peter Stephenson  <pws@csr.com>
+
+	* Stepan Koltsov: 30634: Functions/Misc/zmv: use (q-) quoting
+	for output for clarity.
+
 2012-08-17  Peter Stephenson  <pws@csr.com>
 
 	* Stepan Koltsov: 30632
@@ -83,5 +88,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5703 $
+* $Revision: 1.5704 $
 *****************************************************
