@@ -4484,11 +4484,12 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     int *oldpipestats = NULL;
     char saveopts[OPT_SIZE], *oldscriptname = scriptname;
     char *name = shfunc->node.nam;
-    int flags = shfunc->node.flags;
+    int flags = shfunc->node.flags, ooflags;
     char *fname = dupstring(name);
     int obreaks, saveemulation, savesticky_emulation, restore_sticky;
     Eprog prog;
     struct funcstack fstack;
+    static int oflags;
 #ifdef MAX_FUNCTION_DEPTH
     static int funcdepth;
 #endif
@@ -4547,8 +4548,17 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     } else
 	restore_sticky = 0;
 
-    if (flags & PM_TAGGED)
+    if (flags & (PM_TAGGED|PM_TAGGED_LOCAL))
 	opts[XTRACE] = 1;
+    else if (oflags & PM_TAGGED_LOCAL)
+	opts[XTRACE] = 0;
+    ooflags = oflags;
+    /*
+     * oflags is static, because we compare it on the next recursive
+     * call.  Hence also we maintain ooflags for restoring the previous
+     * value of oflags after the call.
+     */
+    oflags = flags;
     opts[PRINTEXITVALUE] = 0;
     if (doshargs) {
 	LinkNode node;
@@ -4633,6 +4643,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     optcind = oldoptcind;
     zoptind = oldzoptind;
     scriptname = oldscriptname;
+    oflags = ooflags;
 
     if (restore_sticky) {
 	/*

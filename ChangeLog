@@ -1,3 +1,10 @@
+2012-08-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30633: Doc/Zsh/builtins.yo, Src/builtin.c, Src/exec.c,
+	Src/hashtable.c, Src/options.c, Src/subst.c, Src/zsh.h:
+	"functions -T" traces only marked function and not called
+	functions unless also marked.
+
 2012-08-20  Peter Stephenson  <pws@csr.com>
 
 	* Stepan Koltsov: 30634: Functions/Misc/zmv: use (q-) quoting
@@ -88,5 +95,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5704 $
+* $Revision: 1.5705 $
 *****************************************************

@@ -532,7 +532,7 @@ emulate(const char *zsh_name, int fully)
 	 * close enough.
 	 */
 	Shfunc shf = (Shfunc)shfunctab->getnode(shfunctab, funcstack->name);
-	if (shf && (shf->node.flags & PM_TAGGED)) {
+	if (shf && (shf->node.flags & (PM_TAGGED|PM_TAGGED_LOCAL))) {
 	    /* Tracing is on, so set xtrace */
 	    opts[XTRACE] = 1;
 	}

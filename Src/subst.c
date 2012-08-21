@@ -2314,6 +2314,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		    val = dyncat(val, "-readonly");
 		if (f & PM_TAGGED)
 		    val = dyncat(val, "-tag");
+		if (f & PM_TAGGED_LOCAL)
+		    val = dyncat(val, "-tag_local");
 		if (f & PM_EXPORTED)
 		    val = dyncat(val, "-export");
 		if (f & PM_UNIQUE)

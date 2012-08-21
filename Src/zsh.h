@@ -1554,6 +1554,7 @@ struct tieddata {
 #define PM_HIDE		(1<<14)	/* Special behaviour hidden by local        */
 #define PM_HIDEVAL	(1<<15)	/* Value not shown in `typeset' commands    */
 #define PM_TIED 	(1<<16)	/* array tied to colon-path or v.v.         */
+#define PM_TAGGED_LOCAL (1<<16) /* (function): non-recursive PM_TAGGED      */
 
 #define PM_KSHSTORED	(1<<17) /* function stored in ksh form              */
 #define PM_ZSHSTORED	(1<<18) /* function stored in zsh form              */

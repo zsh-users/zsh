@@ -923,12 +923,13 @@ printshfuncnode(HashNode hn, int printflags)
 	    printf("%c undefined\n\t", hashchar);
 	else
 	    t = getpermtext(f->funcdef, NULL, 1);
-	if (f->node.flags & PM_TAGGED)
+	if (f->node.flags & (PM_TAGGED|PM_TAGGED_LOCAL))
 	    printf("%c traced\n\t", hashchar);
 	if (!t) {
-	    char *fopt = "Utkz";
+	    char *fopt = "UtTkz";
 	    int flgs[] = {
-		PM_UNALIASED, PM_TAGGED, PM_KSHSTORED, PM_ZSHSTORED, 0
+		PM_UNALIASED, PM_TAGGED, PM_TAGGED_LOCAL,
+		PM_KSHSTORED, PM_ZSHSTORED, 0
 	    };
 	    int fl;;
 

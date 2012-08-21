@@ -620,7 +620,7 @@ Equivalent to tt(typeset -E), except that options irrelevant to floating
 point numbers are not permitted.
 )
 findex(functions)
-xitem(tt(functions) [ {tt(PLUS())|tt(-)}tt(UXkmtuz) ] [ var(name) ... ])
+xitem(tt(functions) [ {tt(PLUS())|tt(-)}tt(UXkmtTuz) ] [ var(name) ... ])
 xitem(tt(functions -M) var(mathfn) [ var(min) [ var(max) [ var(shellfn) ] ] ])
 xitem(tt(functions -M) [ tt(-m) var(pattern) ... ])
 item(tt(functions +M) [ tt(-m) ] var(mathfn))(
@@ -1555,6 +1555,7 @@ export.  Setting the value using the scalar version causes a split on all
 separators (which cannot be quoted).  It is possible to use the
 same two tied variables with a different separator character in which
 case the variables remain joined as before but the separator is changed.
+This flag has a different meaning when used with tt(-f); see below.
 
 The tt(-g) (global) flag is treated specially: it means that any
 resulting parameter will not be restricted to local scope.  Note that this
@@ -1652,16 +1653,18 @@ shown.
 )
 item(tt(-f))(
 The names refer to functions rather than parameters.  No assignments
-can be made, and the only other valid flags are tt(-t), tt(-k), tt(-u),
-tt(-U) and tt(-z).  The flag tt(-t) turns on execution tracing for this
-function.  The tt(-u) and tt(-U) flags cause the function to be
-marked for autoloading; tt(-U) also causes alias expansion to be
-suppressed when the function is loaded.  The tt(fpath) parameter
-will be searched to find the function definition when the function
-is first referenced; see noderef(Functions). The tt(-k) and tt(-z) flags
-make the function be loaded using ksh-style or zsh-style autoloading
-respectively. If neither is given, the setting of the KSH_AUTOLOAD option
-determines how the function is loaded.
+can be made, and the only other valid flags are tt(-t), tt(-T), tt(-k),
+tt(-u), tt(-U) and tt(-z).  The flag tt(-t) turns on execution tracing
+for this function; the flag tt(-T) does the same, but turns off tracing
+on any function called from the present one, unless that function also
+has the tt(-t) or tt(-T) flag.  The tt(-u) and tt(-U) flags cause the
+function to be marked for autoloading; tt(-U) also causes alias
+expansion to be suppressed when the function is loaded.  The tt(fpath)
+parameter will be searched to find the function definition when the
+function is first referenced; see noderef(Functions). The tt(-k) and
+tt(-z) flags make the function be loaded using ksh-style or zsh-style
+autoloading respectively. If neither is given, the setting of the
+KSH_AUTOLOAD option determines how the function is loaded.
 )
 item(tt(-h))(
 Hide: only useful for special parameters (those marked `<S>' in the table in
