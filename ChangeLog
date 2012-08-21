@@ -1,5 +1,8 @@
 2012-08-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* users/17211: Completion/Unix/Type/_files, Doc/Zsh/compsys.yo:
+	new recursive-files style.
+
 	* 30633: Doc/Zsh/builtins.yo, Src/builtin.c, Src/exec.c,
 	Src/hashtable.c, Src/options.c, Src/subst.c, Src/zsh.h:
 	"functions -T" traces only marked function and not called
@@ -95,5 +98,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5705 $
+* $Revision: 1.5706 $
 *****************************************************

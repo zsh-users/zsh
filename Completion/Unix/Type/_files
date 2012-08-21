@@ -1,7 +1,7 @@
 #compdef -redirect-,-default-,-default-
 
 local opts tmp glob pat pats expl tag i def descr end ign ret=1 match tried
-local type sdef ignvars ignvar
+local type sdef ignvars ignvar prepath oprefix rfiles rfile
 
 zparseopts -a opts \
     '/=tmp' 'f=tmp' 'g+:-=tmp' q n 1 2 P: S: r: R: W: X+: M+: F: J+: V+:
@@ -118,7 +118,21 @@ for def in "$pats[@]"; do
       while _next_label "$tag" expl "$descr"; do
         _comp_ignore=( $_comp_ignore $ign )
         if [[ -n "$end" ]]; then
-          _path_files -g "$pat" "$opts[@]" "$expl[@]" && ret=0
+          if _path_files -g "$pat" "$opts[@]" "$expl[@]"; then
+	    ret=0
+	  elif [[ $PREFIX$SUFFIX != */* ]] && zstyle -a ":completion:${curcontext}:$tag" recursive-files rfiles; then
+	    for rfile in $rfiles; do
+	      if [[ $PWD/ = ${~rfile} ]]; then
+		for prepath in **/*(/); do
+		  oprefix=$PREFIX
+		  PREFIX=$prepath/$PREFIX
+		  _path_files -g "$pat" "$opts[@]" "$expl[@]" && ret=0
+		  PREFIX=$oprefix
+		done
+		break
+	      fi
+	    done
+	  fi
         else
           _path_files "$expl[@]" -g "$pat" "$opts[@]" && ret=0
         fi

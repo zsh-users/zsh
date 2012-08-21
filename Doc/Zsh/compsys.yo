@@ -2355,6 +2355,28 @@ found, or var(max) words have been tried.
 
 The default is to complete all words from the history at once.
 )
+kindex(recursive-files, completion style)
+item(tt(recursive-files))(
+If this style is set, its value is an array of patterns to be
+tested against `tt($PWD/)': note the trailing slash, which allows
+directories in the pattern to be delimited unambiguously by including
+slashes on both sides.  If an ordinary file completion fails
+and the word on the command line does not yet have a directory part to its
+name, the style is retrieved using the same tag as for the completion
+just attempted, then the elements tested against tt($PWD/) in turn.
+If one matches, then the shell reattempts completion by prepending the word
+on the command line with each directory in the expansion of tt(**/*(/))
+in turn.  Typically the elements of the style will be set to restrict
+the number of directories beneath the current one to a manageable
+number, for example `tt(*/.git/*)'.
+
+For example,
+
+example(zstyle ':completion:*' recursive-files '*/zsh/*')
+
+If the current directory is tt(/home/pws/zsh/Src), then
+tt(zle_tr)em(TAB) can be completed to tt(Zle/zle_tricky.c).
+)
 kindex(regular, completion style)
 item(tt(regular))(
 This style is used by the tt(_expand_alias) completer and bindable 
