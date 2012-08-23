@@ -1,3 +1,8 @@
+2012-08-23  Peter Stephenson  <pws@csr.com>
+
+	* Aaron Schrab: 30638: Completion/Unix/Command/_telnet: IPv4
+	and IPv6 options.
+
 2012-08-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/17211: Completion/Unix/Type/_files, Doc/Zsh/compsys.yo:
@@ -98,5 +103,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5706 $
+* $Revision: 1.5707 $
 *****************************************************

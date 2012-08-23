@@ -12,6 +12,8 @@ if (( ! $+_telnet_args )); then
   local help="$(_call_program options 'telnet -\?' < /dev/null 2>&1)"
   local -A optionmap
   optionmap=(
+    '*\[-4\]*' '-4[Force IPv4 address resolution]'
+    '*\[-6\]*' '-6[Force IPv6 address resolution]'
     '*\[-8\]*' '-8[allow 8-Bit data]'
     '*\[-E\]*' '-E[disable an escape character]'
     '*\[-K\]*' '-K[no automatic login]'
