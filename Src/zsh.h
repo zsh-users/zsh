@@ -2681,7 +2681,14 @@ typedef wint_t convchar_t;
 #define MB_METASTRWIDTH(str)	mb_metastrlen(str, 1)
 #define MB_METASTRLEN2(str, widthp)	mb_metastrlen(str, widthp)
 
-#if defined(BROKEN_WCWIDTH) && defined(__STDC_ISO_10646__)
+/*
+ * We replace broken implementations with one that uses Unicode
+ * characters directly as wide characters.  In principle this is only
+ * likely to work if __STDC_ISO_10646__ is defined, since that's pretty
+ * much what the definition tells us.  However, we happen to know this
+ * works on MacOS which doesn't define that.
+ */
+#if defined(BROKEN_WCWIDTH) && (defined(__STDC_ISO_10646__) || defined(__APPLE__))
 #define WCWIDTH(wc)	mk_wcwidth(wc)
 #else
 #define WCWIDTH(wc)	wcwidth(wc)

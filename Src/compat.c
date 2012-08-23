@@ -630,7 +630,7 @@ strtoul(nptr, endptr, base)
 #endif /* HAVE_STRTOUL */
 
 /**/
-#if defined(BROKEN_WCWIDTH) && defined(__STDC_ISO_10646__)
+#if defined(BROKEN_WCWIDTH) && (defined(__STDC_ISO_10646__) || defined(__APPLE__))
 
 /*
  * This is an implementation of wcwidth() and wcswidth() (defined in
@@ -949,5 +949,5 @@ int mk_wcswidth_cjk(const wchar_t *pwcs, size_t n)
 #endif /* 0 */
 
 /**/
-#endif /* BROKEN_WCWIDTH && __STDC_ISO_10646__ */
+#endif /* BROKEN_WCWIDTH && (__STDC_ISO_10646__ || __APPLE__) */
 
