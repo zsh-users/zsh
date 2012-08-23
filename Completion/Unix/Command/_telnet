@@ -38,6 +38,7 @@ if (( ! $+_telnet_args )); then
     '*\[-noasynch\]*' '-noasynch'
     '*\[-noasyncnet\]*' '-noasyncnet'
     '*\[-noasynctty\]*' '-noasynctty'
+    '*\[-z ssl\]*' '*-z[SSL parameters]:SSL parameter:->ssl'
   )
   _telnet_args=($optionmap[(K)"$help"])
   (( $#_telnet_args )) || _telnet_args=( '-l+[specify user]:user:->users' )
@@ -49,6 +50,20 @@ _arguments -C -s \
   ':port:->ports' && ret=0
 
 case "$state" in
+ssl)
+  _values -w 'SSL parameter' \
+    'debug[Send SSL debugging info to stderr]' \
+    '(nossl)ssl[Negotiate SSL connection]' \
+    '(ssl)nossl[Switch off SSL negotiation]' \
+    'certrequired[Require server certificate]' \
+    'secure[No fallback to unencrypted mode]' \
+    'verbose[Be verbose about certificates, etc.]' \
+    'verify[Set SSL verify flags]:int:' \
+    'cert[Specify certificate file]:certificate file:_path_files' \
+    'key[Specify key file]:key file:_path_files' \
+    'cipher[Set preferred cipher list]:ciphers:'
+  ;;
+
 hosts)
   _wanted hosts expl host \
       _combination -s '[@:]' '' users-hosts-ports \

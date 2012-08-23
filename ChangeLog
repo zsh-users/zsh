@@ -1,5 +1,8 @@
 2012-08-23  Peter Stephenson  <pws@csr.com>
 
+	* Aaron Schrab: 30636: Completion/Unix/Command/_telnet:
+	telnet-ssl options.
+
 	* Aaron Schrab: 30637: Completion/Unix/Command/_telnet: -b option
 
 	* Aaron Schrab: 30638: Completion/Unix/Command/_telnet: IPv4
@@ -105,5 +108,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5708 $
+* $Revision: 1.5709 $
 *****************************************************
