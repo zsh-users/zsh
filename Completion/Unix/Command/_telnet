@@ -32,6 +32,7 @@ if (( ! $+_telnet_args )); then
     '*\[-n tracefile\]*' '-n+[specify tracefile]:tracefile:_files'
     '*\[-r\]*' '-r[rlogin like user interface]'
     '*\[-s src_addr\]*' '-s+[set source IP address]:src_addr:'
+    '*\[ -b addr \]*' '-b+[set source IP address]:src_addr:'
     '*\[-x\]*' '-x'
     '*\[-t transcom\]*' '-t+:transcom:'
     '*\[-noasynch\]*' '-noasynch'
