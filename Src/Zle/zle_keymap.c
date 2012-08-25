@@ -912,7 +912,7 @@ bin_bindkey_new(char *name, UNUSED(char *kmname), Keymap km, char **argv, UNUSED
     if(argv[1]) {
 	km = openkeymap(argv[1]);
 	if(!km) {
-	    zwarnnam(name, "no such keymap `%s'", argv[0]);
+	    zwarnnam(name, "no such keymap `%s'", argv[1]);
 	    return 1;
 	}
     } else

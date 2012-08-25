@@ -1,3 +1,8 @@
+2012-08-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* John Stahara: 30641: Src/Zle/zle_keymap.c: bindkey -N
+	error report is misleading when copying keymap.
+
 2012-08-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Jun T: 30640 (plus additional comment): Src/zsh.h,
@@ -114,5 +119,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5710 $
+* $Revision: 1.5711 $
 *****************************************************
