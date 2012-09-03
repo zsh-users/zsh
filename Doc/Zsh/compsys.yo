@@ -3180,7 +3180,9 @@ var(_func) is the name of a shell function whose name must begin with
 tt(_) but is not otherwise special to the completion system.  The function
 is called with the trial word as an argument.  If the word is to be
 expanded, the function should set the array tt(reply) to a list of
-expansions.  The return status of the function is irrelevant.
+expansions.  Optionally, it can set tt(REPLY) to a word that will
+be used as a description for the set of expansions.
+The return status of the function is irrelevant.
 )
 endsitem()
 )

@@ -12,7 +12,7 @@ setopt localoptions nonomatch
 
 [[ _matcher_num -gt 1 ]] && return 1
 
-local exp word sort expr expl subd suf=" " asp tmp spec
+local exp word sort expr expl subd suf=" " asp tmp spec REPLY
 local -a specs reply
 
 if [[ "$funcstack[2]" = _prefix ]]; then
@@ -30,6 +30,7 @@ exp=("$word")
 zstyle -a ":completion:${curcontext}" user-expand specs || return 1
 
 for spec in $specs; do
+  REPLY=
   case $spec in
     ('$'[[:IDENT:]]##)
     # Spec is an associative array with explicit keys.
@@ -85,9 +86,9 @@ fi
 
 if [[ -z "$compstate[insert]" ]] ;then
   if [[ "$sort" = menu ]]; then
-    _description expansions expl expansions "o:$word"
+    _description expansions expl "expansions${REPLY:+: $REPLY}" "o:$word"
   else
-    _description -V expansions expl expansions "o:$word"
+    _description -V expansions expl "expansions${REPLY:+: $REPLY}" "o:$word"
   fi
 
   compadd "$expl[@]" -UQ -qS "$suf" -a exp
@@ -98,9 +99,9 @@ else
     local i j normal space dir
 
     if [[ "$sort" = menu ]]; then
-      _description expansions expl expansions "o:$word"
+      _description expansions expl "expansions${REPLY:+: $REPLY}" "o:$word"
     else
-      _description -V expansions expl expansions "o:$word"
+      _description -V expansions expl "expansions${REPLY:+: $REPLY}" "o:$word"
     fi
     normal=()
     space=()
@@ -120,7 +121,7 @@ else
     (( $#space ))  && compadd "$expl[@]" -UQ -qS " " -a space
     (( $#normal )) && compadd "$expl[@]" -UQ -qS "" -a normal
   fi
-  if _requested all-expansions expl 'all expansions'; then
+  if _requested all-expansions expl "all expansions${REPLY:+: $REPLY}"; then
     local disp dstr
 
     if [[ "${#${exp}}" -ge COLUMNS ]]; then
