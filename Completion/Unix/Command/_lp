@@ -28,7 +28,7 @@ _lp_job_options()
 
   # Generic options (from lp manual page)
   lopts_with_args=( media orientation-requested sides number-up scaling cpi lpi
-    page-{bottom,left,right,top} )
+    page-{bottom,left,right,top} page-ranges )
 
   lopts_no_args=(fitplot landscape)
 
