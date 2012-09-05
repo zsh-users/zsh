@@ -1,5 +1,7 @@
 2012-09-05  Peter Stephenson  <pws@csr.com>
 
+	* Jun T.: 30658: Completion/Unix/Command/_uniq: more options.
+
 	* Silas Silva: users/17223: Completion/Unix/Command/_lp:
 	page-ranges option.
 
@@ -135,5 +137,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5714 $
+* $Revision: 1.5715 $
 *****************************************************

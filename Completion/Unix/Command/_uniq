@@ -13,12 +13,17 @@ args=(
   '(-u --unique)'{-u,--unique}'[only print unique lines]'
   '(-w --check-chars)'{-w,--check-chars=}'[specify maximum number of characters to compare]:characters'
   '(-W --check-fields)'{-W,--check-fields=}'[specify maximum number of fields to compare]:fields'
+  '(-z --zero-terminated)'{-z,--zero-terminated}'[delimit lines with null character, not newline]'
   '(- *)--help[display help information]'
   '(- *)--version[display version information]'
 )
 
 if ! _pick_variant gnu=Free\ Soft unix --version; then
-  args=( ${(M)args:#(|\*)(|\(*\))-[cdufs]*} )
+  local optchars="cdufs"
+  if [[ "$OSTYPE" == (darwin|freebsd)* ]]; then
+    optchars="${optchars}i"
+  fi
+  args=( ${(M)args:#(|\*)(|\(*\))-[$optchars]*} )
 fi
 
 _arguments "$args[@]" \
