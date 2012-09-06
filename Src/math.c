@@ -1053,14 +1053,34 @@ op(int what)
 		    return;
 		if (c.type == MN_FLOAT)
 		    c.u.d = a.u.d / b.u.d;
-		else
-		    c.u.l = a.u.l / b.u.l;
+		else {
+		    /*
+		     * Avoid exception when dividing the smallest
+		     * negative integer by -1.  Always treat it the
+		     * same as multiplication.  This still doesn't give
+		     * numerically the right answer in two's complement,
+		     * but treating both these in the same way seems
+		     * reasonable.
+		     */
+		    if (b.u.l == -1)
+			c.u.l = - a.u.l;
+		    else
+			c.u.l = a.u.l / b.u.l;
+		}
 		break;
 	    case MOD:
 	    case MODEQ:
 		if (!notzero(b))
 		    return;
-		c.u.l = a.u.l % b.u.l;
+		/*
+		 * Avoid exception as above.
+		 * Any integer mod -1 is the same as any integer mod 1
+		 * i.e. zero.
+		 */
+		if (b.u.l == -1)
+		    c.u.l = 0;
+		else
+		    c.u.l = a.u.l % b.u.l;
 		break;
 	    case PLUS:
 	    case PLUSEQ:

@@ -1,3 +1,8 @@
+2012-09-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30656: Src/math.c: treat dividing by -1 the same as
+	multiplying by it to get around SIGFPE.
+
 2012-09-05  Peter Stephenson  <pws@csr.com>
 
 	* Jun T.: 30658: Completion/Unix/Command/_uniq: more options.
@@ -137,5 +142,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5715 $
+* $Revision: 1.5716 $
 *****************************************************
