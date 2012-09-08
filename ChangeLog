@@ -1,3 +1,8 @@
+2012-09-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/17236: Src/builtin.c: r and other fc output didn't
+	unmetafy when listing to a file other than stdout.
+
 2012-09-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 30656: Src/math.c: treat dividing by -1 the same as
@@ -142,5 +147,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5716 $
+* $Revision: 1.5717 $
 *****************************************************

@@ -12,7 +12,7 @@ def(texinode)(4)(DELLINE)
 def(cindex)(1)(DELLINE)
 
 def(sect)(1)(
-SECTHEAD
+SECTHEAD+CHAR(10)
 ARG1
 )
 

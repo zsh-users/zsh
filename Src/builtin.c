@@ -1727,8 +1727,12 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
 	    if (f == stdout) {
 		nicezputs(s, f);
 		putc('\n', f);
-	    } else
-		fprintf(f, "%s\n", s);
+	    } else {
+		int len;
+		unmetafy(s, &len);
+		fwrite(s, 1, len, f);
+		putc('\n', f);
+	    }
 	}
 	/* move on to the next history line, or quit the loop */
 	if (first < last) {
