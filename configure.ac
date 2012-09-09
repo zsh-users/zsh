@@ -565,7 +565,8 @@ AC_CHECK_PROGS([YODL], [yodl], [: yodl])
 YODL_OPTIONS=''
 if test "x$ac_cv_prog_YODL" = xyodl; then
     case `yodl --version` in
-      *"version 3."*) YODL_OPTIONS='-L' ;;
+      *"version 2."*) YODL_OPTIONS='-k' ;;
+      *"version 3."*) YODL_OPTIONS='-k -L' ;;
     esac
 fi
 AC_SUBST(YODL_OPTIONS)

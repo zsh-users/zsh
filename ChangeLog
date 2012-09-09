@@ -1,3 +1,7 @@
+2012-09-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Jun T.: 30664: configure.ac: fix some Yodl version issues.
+
 2012-09-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/17236: Src/builtin.c: r and other fc output didn't
@@ -147,5 +151,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5717 $
+* $Revision: 1.5718 $
 *****************************************************
