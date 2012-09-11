@@ -48,6 +48,12 @@ The var(base)tt(#) may also be omitted, in which case
 base 10 is used.  For backwards compatibility the form
 `tt([)var(base)tt(])var(n)' is also accepted.
 
+An integer expression or a base given in the form
+`var(base)tt(#)var(n)' may contain underscores (`tt(_)') after the
+leading digit for visual guidance; these are ignored in computation.
+Examples are tt(1_000_000) or tt(0xffff_ffff) which are equivalent to
+tt(1000000) and tt(0xffffffff) respectively.
+
 It is also possible to specify a base to be used for output in the form
 `tt([#)var(base)tt(])', for example `tt([#16])'.  This is used when
 outputting arithmetical substitutions or when assigning to scalar
@@ -87,7 +93,9 @@ output is valid syntax for input.  If the tt(#) is doubled, for example
 Floating point constants are recognized by the presence of a decimal point
 or an exponent.  The decimal point may be the first character of the
 constant, but the exponent character tt(e) or tt(E) may not, as it will be
-taken for a parameter name.
+taken for a parameter name.  All numeric parts (before and after the
+decimal point and in the exponent) may contain underscores after the
+leading digit for visual guidance; these are ignored in computation.
 
 cindex(arithmetic operators)
 cindex(operators, arithmetic)

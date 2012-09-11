@@ -4,8 +4,27 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
-Changes between 4.2 and 5.0
----------------------------
+Changes since 5.0.0
+-------------------
+
+"functions -T" turns on tracing for the specified function(s) only,
+similar to "functions -t" except that tracing is turned off for any
+functions called from the specified one(s) that don't also have the -t
+or -T flag.
+
+In file completion, the recursive-files style can be set to an array of
+patterns to matche against "$PWD/".  In any matched location, it is
+possibly to complete files in arbitrarily deep subdirectories without
+needing to type the directory prefix.  See example in the zshcompsys
+manual.
+
+The _user_expand completer now allows expansion functions in the
+user-expand files to return a string in REPLY that will be used to name
+the set of expansions returned.
+
+
+Changes between 4.2 and 5.0.0
+-----------------------------
 
 The following changes first appeared in the 4.3 series of releases;
 see also the file Etc/NEWS-4.3.

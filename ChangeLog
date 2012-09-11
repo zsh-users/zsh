@@ -1,3 +1,9 @@
+2012-09-11  Peter Stephenson  <pws@csr.com>
+
+	* 30647, 30649: Doc/Zsh/arith.yo, Src/math.c, Src/utils.c,
+	Test/C01arith.ztst: allow underscores in numeric constants
+	within math evaluation.
+
 2012-09-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Jun T.: 30664: configure.ac: fix some Yodl version issues.
@@ -151,5 +157,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5718 $
+* $Revision: 1.5719 $
 *****************************************************

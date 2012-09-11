@@ -210,3 +210,26 @@
   print $x
 0:double increment for repeated expression
 >2
+
+  # Floating point.  Default precision should take care of rounding errors.
+  print $(( 1_0.000_000e0_1 ))
+  # Integer.
+  print $(( 0x_ff_ff_ ))
+  # _ are parts of variable names that don't start with a digit
+  __myvar__=42
+  print $(( __myvar__ + $__myvar__ ))
+  # _ is not part of variable name that does start with a digit
+  # (which are substituted before math eval)
+  set -- 6
+  print $(( $1_000_000 ))
+  # Underscores in expressions with no whitespace
+  print $(( 3_000_+4_000_/2 ))
+  # Underscores may appear in the base descriptor, for what it's worth...
+  print $(( 1_6_#f_f_ ))
+0:underscores in math constants
+>100.
+>65535
+>84
+>6000000
+>5000
+>255

@@ -2030,13 +2030,20 @@ skipparens(char inpar, char outpar, char **s)
    return level;
 }
 
+/**/
+mod_export zlong
+zstrtol(const char *s, char **t, int base)
+{
+    return zstrtol_underscore(s, t, base, 0);
+}
+
 /* Convert string to zlong (see zsh.h).  This function (without the z) *
  * is contained in the ANSI standard C library, but a lot of them seem *
  * to be broken.                                                       */
 
 /**/
 mod_export zlong
-zstrtol(const char *s, char **t, int base)
+zstrtol_underscore(const char *s, char **t, int base, int underscore)
 {
     const char *inp, *trunc = NULL;
     zulong calc = 0, newcalc = 0;
@@ -2062,22 +2069,24 @@ zstrtol(const char *s, char **t, int base)
     if (base < 2 || base > 36) {
 	zerr("invalid base (must be 2 to 36 inclusive): %d", base);
 	return (zlong)0;
-    } else if (base <= 10)
-	for (; *s >= '0' && *s < ('0' + base); s++) {
-	    if (trunc)
+    } else if (base <= 10) {
+	for (; (*s >= '0' && *s < ('0' + base)) ||
+		 (underscore && *s == '_'); s++) {
+	    if (trunc || *s == '_')
 		continue;
 	    newcalc = calc * base + *s - '0';
 	    if (newcalc < calc)
 	    {
-	      trunc = s;
-	      continue;
+		trunc = s;
+		continue;
 	    }
 	    calc = newcalc;
 	}
-    else
+    } else {
 	for (; idigit(*s) || (*s >= 'a' && *s < ('a' + base - 10))
-	     || (*s >= 'A' && *s < ('A' + base - 10)); s++) {
-	    if (trunc)
+	     || (*s >= 'A' && *s < ('A' + base - 10))
+	     || (underscore && *s == '_'); s++) {
+	    if (trunc || *s == '_')
 		continue;
 	    newcalc = calc*base + (idigit(*s) ? (*s - '0') : (*s & 0x1f) + 9);
 	    if (newcalc < calc)
@@ -2087,6 +2096,7 @@ zstrtol(const char *s, char **t, int base)
 	    }
 	    calc = newcalc;
 	}
+    }
 
     /*
      * Special case: check for a number that was just too long for
