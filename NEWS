@@ -13,7 +13,7 @@ functions called from the specified one(s) that don't also have the -t
 or -T flag.
 
 In file completion, the recursive-files style can be set to an array of
-patterns to matche against "$PWD/".  In any matched location, it is
+patterns to match against "$PWD/".  In any matched location, it is
 possibly to complete files in arbitrarily deep subdirectories without
 needing to type the directory prefix.  See example in the zshcompsys
 manual.
