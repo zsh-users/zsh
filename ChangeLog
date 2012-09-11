@@ -1,5 +1,7 @@
 2012-09-11  Peter Stephenson  <pws@csr.com>
 
+	* unposted: NEWS: refer to some newly added features.
+
 	* 30647, 30649: Doc/Zsh/arith.yo, Src/math.c, Src/utils.c,
 	Test/C01arith.ztst: allow underscores in numeric constants
 	within math evaluation.
@@ -157,5 +159,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5719 $
+* $Revision: 1.5720 $
 *****************************************************
