@@ -1,3 +1,8 @@
+2012-09-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Александр Балезин: 30667: Completion/Unix/Command/_ip: add
+	addrlabl subcommand.
+
 2012-09-11  Peter Stephenson  <pws@csr.com>
 
 	* unposted: NEWS: refer to some newly added features.
@@ -159,5 +164,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5720 $
+* $Revision: 1.5721 $
 *****************************************************

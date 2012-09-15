@@ -38,6 +38,11 @@ subcmd_ipaddrs=(
   /$'(<->(.<->(.<->(.<->|)|)|)|[:[:xdigit]]#:[:[:xdigit:]]#)(|/<->)\0'/
   ":ipaddress:IP address (v4 or v6) currently set:( $(ip addr show | sed -n 's/^ *inet6* \([0-9a-f\.:/]*\) .*$/\1/p') )"
 )
+subcmd_prefix_label=(
+  /$'(<->(.<->(.<->(.<->|)|)|)|[:[:xdigit]]#:[:[:xdigit:]]#)(|/<->)\0'/
+  ":ipaddresslabel:IP addrlabel prefix currently set:( $(ip -6 addrlabel list | sed -n 's/^prefix \([0-9a-f\.:/]*\) .*$/\1/p') )"
+)
+
 
 local -a subcmd_scope
 _regex_words scope "IP address scope" \
@@ -240,6 +245,34 @@ _regex_words \
   'f*lush:flush protocol address:$addr_show_cmds'
 addr_cmds=("$reply[@]")
 
+#
+# addrlabel
+#
+
+local -a addrlabel_add_cmds
+_regex_words addrlabel-add-commands "addlabel add command" \
+  'p*refix: limit to given IP address/prefix' \
+  'd*ev: specify device:$subcmd_dev' \
+  'l*abel: number'
+addrlabel_add_cmds=( "(" $subcmd_ipaddr "|" ")" "$reply[@]" "#")
+
+local -a addrlabel_del_cmds
+_regex_words addrlabel-add-commands "addlabel del command" \
+  'p*refix: limit to given IP address/prefix:$subcmd_prefix_label' \
+  'd*ev: specify device:$subcmd_dev' \
+  'l*abel: number:$subcmd_number'
+addrlabel_del_cmds=( "(" $subcmd_ipaddr "|" ")" "$reply[@]" "#")
+
+
+local -a addrlabel_cmds
+_regex_words \
+  addrlabel-commands "addrlabel command" \
+  'h*elp: show help for command' \
+  'a*dd: add an address labels:$addrlabel_add_cmds' \
+  'd*el: delete an address labels:$addrlabel_del_cmds' \
+  'l*ist: list address labels' \
+  'f*lush: flush adderss labels'
+addrlabel_cmds=("$reply[@]")
 
 #
 # neigh
@@ -506,6 +539,7 @@ args+=("$reply[@]" "#")
 _regex_words \
   commands "ip command" \
   'l*ink:configure network device:$link_cmds' \
+  'addrlabel:manage addrlabel:$addrlabel_cmds' \
   'a*ddr:manage protocol address:$addr_cmds' \
   'r*oute:manage routing table:$route_cmds' \
   'ru*le:manage routing policy database:$rule_cmds' \
