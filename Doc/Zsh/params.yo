@@ -1225,7 +1225,10 @@ vindex(REPORTTIME)
 item(tt(REPORTTIME))(
 If nonnegative, commands whose combined user and system execution times
 (measured in seconds) are greater than this value have timing
-statistics printed for them.
+statistics printed for them.  Output is suppressed for commands
+executed within the line editor, including completion; commands
+explicitly marked with the tt(time) keyword still cause the summary
+to be printed in this case.
 )
 vindex(REPLY)
 item(tt(REPLY))(

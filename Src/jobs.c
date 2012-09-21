@@ -868,6 +868,8 @@ should_report_time(Job j)
     /* can this ever happen? */
     if (!j->procs)
 	return 0;
+    if (zleactive)
+	return 0;
 
 #ifdef HAVE_GETRUSAGE
     reporttime -= j->procs->ti.ru_utime.tv_sec + j->procs->ti.ru_stime.tv_sec;

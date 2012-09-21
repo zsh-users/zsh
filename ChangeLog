@@ -1,3 +1,8 @@
+2012-09-21  Peter Stephenson  <pws@csr.com>
+
+	* 30687 (typo fixed): Doc/Zsh/params.yo, Src/jobs.c: don't
+	REPORTTIME if zleactive (but time keyword is allowed).
+
 2012-09-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Александр Балезин: 30667: Completion/Unix/Command/_ip: add
@@ -164,5 +169,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5721 $
+* $Revision: 1.5722 $
 *****************************************************
