@@ -198,7 +198,7 @@ zstyle -T ":completion:${curcontext}:paths" path-completion &&
   path_completion=1
 
 if [[ -n "$compstate[pattern_match]" ]]; then
-  if { [[ -z "$SUFFIX" ]] && _have_glob_qual "$PREFIX" complete } ||
+  if { [[ -z "$SUFFIX" ]] && _have_glob_qual "$PREFIX" complete; } ||
     _have_glob_qual "$SUFFIX" complete; then
     # Copy all glob qualifiers from the line to
     # the patterns used when generating matches

@@ -108,7 +108,7 @@ ifnzman(noderef(Aliasing)).
 findex(autoload)
 cindex(functions, autoloading)
 cindex(autoloading functions)
-item(tt(autoload) [ {tt(PLUS())|tt(-)}tt(UXktz) ] [ tt(-w) ] [ var(name) ... ])(
+item(tt(autoload) [ {tt(PLUS())|tt(-)}tt(UXkmtz) ] [ tt(-w) ] [ var(name) ... ])(
 Equivalent to tt(functions -u), with the exception of tt(-X)/tt(+X) and
 tt(-w).
 
@@ -129,6 +129,9 @@ undefined and marked for autoloading.  If ksh-style autoloading is
 enabled, the function created will contain the contents of the file
 plus a call to the function itself appended to it, thus giving normal
 ksh autoloading behaviour on the first call to the function.
+If the tt(-m) flag is also given each var(name) is treated as a
+pattern and all functions already marked for autoload that match the
+pattern are loaded.
 
 With the tt(-w) flag, the var(name)s are taken as names of files compiled
 with the tt(zcompile) builtin, and all functions defined in them are

@@ -1,3 +1,9 @@
+2012-09-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30692: Completion/Unix/Type/_path_files, Doc/Zsh/builtins.yo,
+	Src/builtin.c: allow autoload +X -m to work; change _path_files
+	so it works on that.
+
 2012-09-21  Peter Stephenson  <pws@csr.com>
 
 	* 30687 (typo fixed): Doc/Zsh/params.yo, Src/jobs.c: don't
@@ -169,5 +175,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5722 $
+* $Revision: 1.5723 $
 *****************************************************
