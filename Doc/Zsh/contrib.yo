@@ -768,7 +768,10 @@ item(tt(hgrevformat))(
 tt(hg) uses both a hash and a revision number to reference a specific
 changeset in a repository. With this style you can format the revision
 string (see tt(branchformat)) to include either or both. It's only
-useful when tt(get-revision) is true.
+useful when tt(get-revision) is true. Note, the full 40-character revision id
+is not available (except when using the tt(use-simple) option) because
+executing hg more than once per prompt is too slow; you may customize this
+behavior using hooks.
 )
 kindex(max-exports)
 item(tt(max-exports))(
@@ -993,7 +996,7 @@ In tt(hgrevformat) these replacements are done:
 
 startsitem()
 sitem(tt(%r))(The current local revision number.)
-sitem(tt(%h))(The current 40-character changeset ID hash identifier.)
+sitem(tt(%h))(The current global revision identifier.)
 endsitem()
 
 In tt(patch-format) and tt(nopatch-format) these replacements are done:

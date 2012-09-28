@@ -37,12 +37,15 @@ VCS_INFO_adjust
 # Calling the 'hg' program is quite a bit too slow for prompts.
 # Disabled by default anyway, so no harm done.
 if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision ; then
-    # Calling hexdump is (much) faster than hg but doesn't get the local rev
     if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" use-simple \
             && ( VCS_INFO_check_com hexdump ) && [[ -r ${dirstatefile} ]] ; then
+        # Calling hexdump is (much) faster than hg but doesn't get the local rev
         r_csetid=$(hexdump -n 20 -e '1/1 "%02x"' ${dirstatefile})
     else
-        hgid_args=( --debug id -i -n -b )
+        # Settling for a short (but unique!) hash because getting the full
+        # 40-char hash in addition to all the other info we want isn't
+        # available in a single hg invocation
+        hgid_args=( id -i -n -b )
 
         # Looking for changes is a tad bit slower since the dirstate cache must
         # first be refreshed before being read
@@ -119,7 +122,7 @@ if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-bookmarks \
         && [[ -r "${bmfile}" ]] && [[ -n "$r_csetid" ]] ; then
     while read -r i_bmhash i_bmname ; do
         # Compare hash in bookmarks file with changeset id
-        [[ $r_csetid == $i_bmhash ]] && hgbmarks+=( $i_bmname )
+        [[ $i_bmhash == $r_csetid* ]] && hgbmarks+=( $i_bmname )
     done < ${bmfile}
 
     if VCS_INFO_hook 'gen-hg-bookmark-string' "${hgbmarks[@]}"; then

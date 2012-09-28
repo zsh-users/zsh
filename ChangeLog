@@ -1,3 +1,9 @@
+2012-09-29  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* Seth House: 30702: Doc/Zsh/contrib.yo,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg: Removed --debug
+	flag from the hg vcs_info backend
+
 2012-09-28  Oliver Kiddle <opk@zsh.org>
 
 	* 30697: Completion/Unix/Command/_dbus: new completion definition
@@ -179,5 +185,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5724 $
+* $Revision: 1.5725 $
 *****************************************************
