@@ -4,6 +4,9 @@
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg: Removed --debug
 	flag from the hg vcs_info backend
 
+	* Seth House: 30701: Misc/vcs_info-examples: Added an hg hook
+	example to restore the 40-char hash
+
 2012-09-28  Oliver Kiddle <opk@zsh.org>
 
 	* 30697: Completion/Unix/Command/_dbus: new completion definition
@@ -185,5 +188,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5725 $
+* $Revision: 1.5726 $
 *****************************************************

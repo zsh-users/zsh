@@ -129,31 +129,28 @@ zstyle ':vcs_info:*+*:*' debug false
 ### Truncate Long Hashes
 
 ### Truncate a long hash to 12 characters (which is usually unique enough)
-# NOTE: On Mercurial this will hide the second parent hash during a merge
-# (see an example below on how to retain both parents)
 # Use zformat syntax (remember %i is the hash): %12.12i
 
 # git:
 zstyle ':vcs_info:git*' formats "(%s)-[%12.12i %b]-" # hash & branch
 
-# hg:
-# First, remove the hash from the default 'branchformat':
-zstyle ':vcs_info:hg:*' branchformat '%b'
-# Then add the hash to 'formats' as %i and truncate it to 12 chars:
-zstyle ':vcs_info:hg:*' formats ' (%s)-[%12.12i %b]-'
 
-### hg: Truncate long hash to 12-chars but also allow for multiple parents
-# Hashes are joined with a + to mirror the output of `hg id`.
-zstyle ':vcs_info:hg+set-hgrev-format:*' hooks hg-shorthash
-function +vi-hg-shorthash() {
-    local -a parents
+### Fetch the full 40-character Mercurial revision id
+# There is no great way to obtain branch, local rev, and untracked changes in
+# addition to the full 40-character global rev id with a single invocation of
+# Mercurial. This hook obtains the full global rev id using hexdump (in the
+# same way the use-simple flag does) while retaining all the other vcs_info
+# default functionality and information.
+zstyle ':vcs_info:hg*+set-message:*' hooks hg-fullglobalrev
 
-    parents=( ${(s:+:)hook_com[hash]} )
-    parents=( ${(@r:12:)parents} )
-    hook_com[rev-replace]=${(j:+:)parents}
-
-    ret=1
+# Output the full 40-char global rev id
+function +vi-hg-fullglobalrev() {
+    local dirstatefile="${hook_com[base]}/.hg/dirstate"
+    local grevid="$(hexdump -n 20 -e '1/1 "%02x"' ${dirstatefile})"
+    # Omit %h from your hgrevformat since it will be included below
+    hook_com[revision]="${hook_com[revision]} ${grevid}"
 }
+
 
 ### Display the existence of files not yet known to VCS
 
