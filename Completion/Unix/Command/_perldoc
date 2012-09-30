@@ -15,14 +15,15 @@ fi
 _arguments -C -s -S -A "-*" \
   '(- *)-h[print help information]' \
   '(- *)-V[display version information]' \
-  '-v[verbose output]' \
+  '-D[describe search for the item]' \
   '-t[use plain text output instead of nroff]' \
   '-u[show raw Pod source]' \
   '*-m[display entire module]:module:_perl_modules' \
   '-l[display only filename of the module found]' \
   '-F[consider arguments as filenames]' \
-  '(-q)-f+[view documentation for Perl built-in function]:perl builtin function:->perl-builtin-funcs' \
-  '(-f)-q+[search question headings in Perl FAQ]:regular expression' \
+  '(-q -v)-f+[view documentation for Perl built-in function]:perl builtin function:->perl-builtin-funcs' \
+  '(-f -v)-q+[search question headings in Perl FAQ]:regular expression' \
+  '(-f -q)-v+[view documentation for predefined variable]:special variable:->perl-variables' \
   '(-d)-T[send output direct to stdout and not via pager]' \
   '(-T)-d+[specify output file]:output file:_files' \
   '-o+[specify output format]:output format:(man nroff pod rtf text tk xml latex)' \
@@ -53,6 +54,14 @@ case  $state in
 	'pods:base pod: _perl_basepods' \
 	'files:module or .pod file:_files -g "*.(pod|pm)(-.)"' && ret=0
     fi
+  ;;
+
+  perl-variables)
+    : ${(A)_perl_special_vars:=${(u)${${${(M)${(f)"$(_call_program variables \
+      perldoc -u perlvar 2>/dev/null)"}:#\=item [\$\@\%]*}#* }:#\$<I*}}}
+
+    _wanted variables expl 'perl special variable' compadd "$@" -a - \
+	_perl_special_vars && ret=0
   ;;
 esac
 

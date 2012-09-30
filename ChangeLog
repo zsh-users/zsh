@@ -1,3 +1,7 @@
+2012-09-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Aaron Schrab: 30710: Completion/Unix/Command/_perldoc: updates.
+
 2012-09-29  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* Seth House: 30702: Doc/Zsh/contrib.yo,
@@ -192,5 +196,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5727 $
+* $Revision: 1.5728 $
 *****************************************************
