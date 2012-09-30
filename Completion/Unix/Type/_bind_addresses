@@ -11,5 +11,5 @@ case $OSTYPE in
   linux*) ;&
   *)
     _wanted bind-addresses expl 'bind address' compadd "$@" - \
-      ${${${(M)${(f)"$(ifconfig -a)"}:#*addr:*}##*addr:}%% *}
+      ${${${(M)${(f)"$(ifconfig -a)"}:#*addr:*}##*addr:( |)}%%(/| )*}
 esac
