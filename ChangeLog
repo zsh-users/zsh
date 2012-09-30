@@ -1,5 +1,8 @@
 2012-09-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Aaron Schrab: 30712: .editorconfig: multi-editor specification
+	of editing formats.
+
 	* Aaron Schrab: 30711: Completion/Unix/Type/_bind_addresses:
 	improved IPv6 completion.
 
@@ -199,5 +202,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5729 $
+* $Revision: 1.5730 $
 *****************************************************
