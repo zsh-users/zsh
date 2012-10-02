@@ -1,3 +1,8 @@
+2012-10-02  Peter Stephenson  <pws@csr.com>
+
+	* users/17304: Src/lex.c, Test/D06subscript.ztst: angle brackets
+	aren't associated with special parsing inside square brackets.
+
 2012-09-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Aaron Schrab: 30712: .editorconfig: multi-editor specification
@@ -202,5 +207,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5730 $
+* $Revision: 1.5731 $
 *****************************************************
