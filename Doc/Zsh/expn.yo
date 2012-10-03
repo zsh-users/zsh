@@ -1051,12 +1051,13 @@ item(tt(z))(
 Split the result of the expansion into words using shell parsing to
 find the words, i.e. taking into account any quoting in the value.
 Comments are not treated specially but as ordinary strings, similar
-to interactive shells with the tt(INTERACTIVE_COMMENTS) option unset.
+to interactive shells with the tt(INTERACTIVE_COMMENTS) option unset
+(however, see the tt(Z) flag below for related options)
 
-Note that this is done very late, as for the `tt((s))' flag. So to
-access single words in the result, one has to use nested expansions as 
+Note that this is done very late, even later than the `tt((s))' flag. So to
+access single words in the result use nested expansions as
 in `tt(${${(z)foo}[2]})'. Likewise, to remove the quotes in the
-resulting words one would do: `tt(${(Q)${(z)foo}})'.
+resulting words use `tt(${(Q)${(z)foo}})'.
 )
 item(tt(0))(
 Split the result of the expansion on null bytes.  This is a shorthand
@@ -1165,7 +1166,8 @@ i.e.  tt("${(@s.:.)line}").
 )
 item(tt(Z:)var(opts)tt(:))(
 As tt(z) but takes a combination of option letters between a following
-pair of delimiter characters.  tt(LPAR()Z+PLUS()c+PLUS()RPAR())
+pair of delimiter characters.  With no options the effect is identical
+to tt(z).  tt(LPAR()Z+PLUS()c+PLUS()RPAR())
 causes comments to be parsed as a string and retained; any field in the
 resulting array beginning with an unquoted comment character is a
 comment.  tt(LPAR()Z+PLUS()C+PLUS()RPAR()) causes comments to be parsed
@@ -1248,7 +1250,7 @@ em(no responsibility) for any brain damage which may occur during the
 reading of the following rules.
 
 startitem()
-item(tt(1.) em(Nested Substitution))(
+item(tt(1.) em(Nested substitution))(
 If multiple nested tt(${...}) forms are present, substitution is
 performed from the inside outwards.  At each level, the substitution takes
 account of whether the current value is a scalar or an array, whether the
@@ -1272,12 +1274,12 @@ which is expanded by filename expansion to a full path; the outer
 substitution then applies the modifier tt(:h) and takes the directory part
 of the path.)
 )
-item(tt(2.) em(Internal Parameter Flags))(
+item(tt(2.) em(Internal parameter flags))(
 Any parameter flags set by one of the tt(typeset) family of commands,
 in particular the tt(L), tt(R), tt(Z), tt(u) and tt(l) flags for padding
 and capitalization, are applied directly to the parameter value.
 )
-item(tt(3.) em(Parameter Subscripting))(
+item(tt(3.) em(Parameter subscripting))(
 If the value is a raw parameter reference with a subscript, such as
 tt(${)var(var)tt([3]}), the effect of subscripting is applied directly to
 the parameter.  Subscripts are evaluated left to right; subsequent
@@ -1287,11 +1289,11 @@ character of the first word, but tt(${var[2,4][2]}) is the entire third
 word (the second word of the range of words two through four of the
 original array).  Any number of subscripts may appear.
 )
-item(tt(4.) em(Parameter Name Replacement))(
+item(tt(4.) em(Parameter name replacement))(
 The effect of any tt((P)) flag, which treats the value so far as a
 parameter name and replaces it with the corresponding value, is applied.
 )
-item(tt(5.) em(Double-Quoted Joining))(
+item(tt(5.) em(Double-quoted joining))(
 If the value after this process is an array, and the substitution
 appears in double quotes, and no tt((@)) flag is present at the current
 level, the words of the value are joined with the first character of the
@@ -1299,7 +1301,7 @@ parameter tt($IFS), by default a space, between each word (single word
 arrays are not modified).  If the tt((j)) flag is present, that is used for
 joining instead of tt($IFS).
 )
-item(tt(6.) em(Nested Subscripting))(
+item(tt(6.) em(Nested subscripting))(
 Any remaining subscripts (i.e. of a nested substitution) are evaluated at
 this point, based on whether the value is an array or a scalar.  As with
 tt(3.), multiple subscripts can appear.  Note that tt(${foo[2,4][2]}) is
@@ -1322,7 +1324,7 @@ item(tt(9.) em(Length))(
 Any initial tt(#) modifier, i.e. in the form tt(${#)var(var)tt(}), is
 used to evaluate the length of the expression so far.
 )
-item(tt(10.) em(Forced Joining))(
+item(tt(10.) em(Forced joining))(
 If the `tt((j))' flag is present, or no `tt((j))' flag is present but
 the string is to be split as given by rules tt(16.) or tt(17.), and joining
 did not take place at step tt(5.), any words in the value are joined
@@ -1330,36 +1332,41 @@ together using the given string or the first character of tt($IFS) if none.
 Note that the `tt((F))' flag implicitly supplies a string for joining in this
 manner.
 )
-item(tt(11.) em(Case modification))(
-Any case modification from one of the flags tt((L)), tt((U)) or tt((C))
-is applied.
-)
-item(tt(12.) em(Escape sequence replacement))(
-First any replacements from the tt((g)) flag are performed, then any
-prompt-style formatting from the tt((%)) family of flags is applied.
-)
-item(tt(13.) em(Quote application))(
-Any quoting or unquoting using tt((q)) and tt((Q)) and related flags
-is applied.
-)
-item(tt(14.) em(Directory naming))(
-Any directory name substitution using tt((D)) flag is applied.
-)
-item(tt(15.) em(Visibility enhancment))(
-Any modifications to make characters visible using the tt((V)) flag
-are applied.
-)
-item(tt(16.) em(Forced Splitting))(
-If one of the `tt((s))', `tt((f))' or `tt((z))' flags are present, or the `tt(=)'
+item(tt(11.) em(Simple word splitting))(
+If one of the `tt((s))' or `tt((f))' flags are present, or the `tt(=)'
 specifier was present (e.g. tt(${=)var(var)tt(})), the word is split on
 occurrences of the specified string, or (for tt(=) with neither of the two
 flags present) any of the characters in tt($IFS).
-)
-item(tt(17.) em(Shell Word Splitting))(
+
 If no `tt((s))', `tt((f))' or `tt(=)' was given, but the word is not
 quoted and the option tt(SH_WORD_SPLIT) is set, the word is split on
 occurrences of any of the characters in tt($IFS).  Note this step, too,
 takes place at all levels of a nested substitution.
+)
+item(tt(12.) em(Case modification))(
+Any case modification from one of the flags tt((L)), tt((U)) or tt((C))
+is applied.
+)
+item(tt(13.) em(Escape sequence replacement))(
+First any replacements from the tt((g)) flag are performed, then any
+prompt-style formatting from the tt((%)) family of flags is applied.
+)
+item(tt(14.) em(Quote application))(
+Any quoting or unquoting using tt((q)) and tt((Q)) and related flags
+is applied.
+)
+item(tt(15.) em(Directory naming))(
+Any directory name substitution using tt((D)) flag is applied.
+)
+item(tt(16.) em(Visibility enhancment))(
+Any modifications to make characters visible using the tt((V)) flag
+are applied.
+)
+item(tt(17.) em(Lexical word splitting))(
+If the 'tt((z))' flag or one of the forms of the 'tt((Z))' flag is
+present, the word is split as if it were a shell command line, so that
+quotation marks and other metacharacters are used to decide what
+constitutes a word.
 )
 item(tt(18.) em(Uniqueness))(
 If the result is an array and the `tt((u))' flag was present, duplicate
@@ -1369,7 +1376,7 @@ item(tt(19.) em(Ordering))(
 If the result is still an array and one of the `tt((o))' or `tt((O))' flags
 was present, the array is reordered.
 )
-item(tt(20.) em(Re-Evaluation))(
+item(tt(20.) em(Re-evaluation))(
 Any `tt((e))' flag is applied to the value, forcing it to be re-examined
 for new parameter substitutions, but also for command and arithmetic
 substitutions.
@@ -1378,7 +1385,7 @@ item(tt(21.) em(Padding))(
 Any padding of the value by the `tt(LPAR()l.)var(fill)tt(.RPAR())' or
 `tt(LPAR()r.)var(fill)tt(.RPAR())' flags is applied.
 )
-item(tt(22.) em(Semantic Joining))(
+item(tt(22.) em(Semantic joining))(
 In contexts where expansion semantics requires a single word to
 result, all words are rejoined with the first character of tt(IFS)
 between.  So in `tt(${LPAR()P)tt(RPAR()${LPAR()f)tt(RPAR()lines}})'

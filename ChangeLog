@@ -1,5 +1,8 @@
 2012-10-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* users/17305: Doc/Zsh/expn.yo: fix documentation for ordering
+	of word splitting and improve (z) and (Z) documentation.
+
 	* users/17310: Doc/Zsh/params.yo, Src/lex.c, Test/A04redirect.ztst,
 	Test/D06subscript.ztst: back off users/17304 owing to problem
 	with [ command, document problem, and test the case that needs
@@ -214,5 +217,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5732 $
+* $Revision: 1.5733 $
 *****************************************************
