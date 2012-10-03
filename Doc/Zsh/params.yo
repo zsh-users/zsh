@@ -182,7 +182,10 @@ to the matching closing one is considered to be a list of flags, as in
 The flags tt(s), tt(n) and tt(b) take an argument; the delimiter
 is shown below as `tt(:)', but any character, or the matching pairs
 `tt(LPAR())...tt(RPAR())', `tt({)...tt(})', `tt([)...tt(])', or
-`tt(<)...tt(>)', may be used.
+`tt(<)...tt(>)', may be used, but note that `tt(<)...tt(>)' can only be
+used if the subscript is inside a double quoted expression or a
+parameter substitution enclosed in braces as otherwise the expression is
+interpreted as a redirection.
 
 The flags currently understood are:
 

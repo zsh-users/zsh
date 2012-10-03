@@ -441,3 +441,6 @@
 0:failed assignment on non-posix-special, POSIX_BUILTINS
 >output
 ?zsh: read-only variable: foo
+
+  [</dev/null ]
+1:check behaviour with square brackets

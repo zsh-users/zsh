@@ -1218,7 +1218,7 @@ gettokstr(int c, int sub)
 		c = Comma;
 	    break;
 	case LX2_OUTANG:
-	    if (in_brace_param || sub || brct)
+	    if (in_brace_param || sub)
 		break;
 	    e = hgetc();
 	    if (e != '(') {
@@ -1255,7 +1255,7 @@ gettokstr(int c, int sub)
 		break;
 	    }
 	    lexstop = 0;
-	    if (in_brace_param || sub || brct)
+	    if (in_brace_param || sub)
 		break;
 	    goto brk;
 	case LX2_EQUALS:

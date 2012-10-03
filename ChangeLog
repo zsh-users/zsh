@@ -1,3 +1,10 @@
+2012-10-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/17310: Doc/Zsh/params.yo, Src/lex.c, Test/A04redirect.ztst,
+	Test/D06subscript.ztst: back off users/17304 owing to problem
+	with [ command, document problem, and test the case that needs
+	to work.
+
 2012-10-02  Peter Stephenson  <pws@csr.com>
 
 	* users/17304: Src/lex.c, Test/D06subscript.ztst: angle brackets
@@ -207,5 +214,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5731 $
+* $Revision: 1.5732 $
 *****************************************************

@@ -249,23 +249,3 @@
   string[0]=!
 1:Can't set only element zero of string
 ?(eval):1: string: assignment to invalid subscript range
-
-  string="Life,+like+a+dome+of+many-colour'd+glass"
-  for delims in "()" "{}" "[]" "<>"; do
-    eval 'print ${string[(ws'$delims[1]'+'$delims[2]')2]}'
-    eval 'print $string[(ws'$delims[1]'+'$delims[2]')3]'
-    eval 'print "$string[(ws'$delims[1]'+'$delims[2]')4]"'
-  done
-0:Check matched delimiters in subscripts
->like
->a
->dome
->like
->a
->dome
->like
->a
->dome
->like
->a
->dome
