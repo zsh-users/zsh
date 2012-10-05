@@ -1,5 +1,8 @@
 2012-10-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 30716: Src/options.c: IGNORECLOSEBRACES should be an emulation
+	option since it changes what syntax is valid.
+
 	* 30715: Src/init.c, Src/lex.c, Src/parse.c, Src/subst.c,
 	Src/zsh.h, Src/Zle/zle_tricky.c: use a named enum for
 	lexical tokens.
@@ -223,5 +226,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5734 $
+* $Revision: 1.5735 $
 *****************************************************
