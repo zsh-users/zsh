@@ -42,7 +42,7 @@ char *zshlextext;
 /**/
 mod_export char *tokstr;
 /**/
-mod_export int tok;
+mod_export enum lextok tok;
 /**/
 mod_export int tokfd;
 
@@ -207,7 +207,7 @@ struct lexstack {
     int hlinesz;
     char *hline;
     char *hptr;
-    int tok;
+    enum lextok tok;
     int isnewlin;
     char *tokstr;
     char *zshlextext;
@@ -470,6 +470,10 @@ ctxtlex(void)
     case DINBRACK:
 	incmdpos = 0;
 	break;
+
+    default:
+	/* nothing to do, keep compiler happy */
+	break;
     }
     if (tok != DINPAR)
 	infor = tok == FOR ? 2 : 0;
@@ -698,11 +702,12 @@ isnumglob(void)
 }
 
 /**/
-static int
+static enum lextok
 gettok(void)
 {
     int c, d;
-    int peekfd = -1, peek;
+    int peekfd = -1;
+    enum lextok peek;
 
   beginning:
     tokstr = NULL;
@@ -1007,12 +1012,13 @@ gettok(void)
  */
 
 /**/
-static int
+static enum lextok
 gettokstr(int c, int sub)
 {
     int bct = 0, pct = 0, brct = 0, fdpar = 0;
     int intpos = 1, in_brace_param = 0;
-    int peek, inquote, unmatched = 0;
+    int inquote, unmatched = 0;
+    enum lextok peek;
 #ifdef DEBUG
     int ocmdsp = cmdsp;
 #endif
@@ -1692,6 +1698,7 @@ parse_subst_string(char *s)
 {
     int c, l = strlen(s), err;
     char *ptr;
+    enum lextok ctok;
 
     if (!*s || !strcmp(s, nulstring))
 	return 0;
@@ -1703,14 +1710,14 @@ parse_subst_string(char *s)
     bptr = tokstr = s;
     bsiz = l + 1;
     c = hgetc();
-    c = gettokstr(c, 1);
+    ctok = gettokstr(c, 1);
     err = errflag;
     strinend();
     inpop();
     DPUTS(cmdsp, "BUG: parse_subst_string: cmdstack not empty.");
     lexrestore();
     errflag = err;
-    if (c == LEXERR) {
+    if (ctok == LEXERR) {
 	untokenize(s);
 	return 1;
     }
@@ -1720,9 +1727,9 @@ parse_subst_string(char *s)
      * before lexrestore()) == l, but that's not necessarily the case if
      * we stripped an RCQUOTE.
      */
-    if (c != STRING || (errflag && !noerrs)) {
+    if (ctok != STRING || (errflag && !noerrs)) {
 	fprintf(stderr, "Oops. Bug in parse_subst_string: %s\n",
-		errflag ? "errflag" : "c != STRING");
+		errflag ? "errflag" : "ctok != STRING");
 	fflush(stderr);
 	untokenize(s);
 	return 1;

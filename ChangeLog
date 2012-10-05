@@ -1,3 +1,9 @@
+2012-10-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30715: Src/init.c, Src/lex.c, Src/parse.c, Src/subst.c,
+	Src/zsh.h, Src/Zle/zle_tricky.c: use a named enum for
+	lexical tokens.
+
 2012-10-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/17305: Doc/Zsh/expn.yo: fix documentation for ordering
@@ -217,5 +223,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5733 $
+* $Revision: 1.5734 $
 *****************************************************

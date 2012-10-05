@@ -232,7 +232,7 @@ enum {
  * appear in strings and don't necessarily represent a single character.
  */
 
-enum {
+enum lextok {
     NULLTOK,		/* 0  */
     SEPER,
     NEWLIN,

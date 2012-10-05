@@ -149,7 +149,7 @@ loop(int toplevel, int justonce)
 	    continue;
 	}
 	if (hend(prog)) {
-	    int toksav = tok;
+	    enum lextok toksav = tok;
 
 	    non_empty = 1;
 	    if (toplevel &&

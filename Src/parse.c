@@ -666,7 +666,8 @@ par_sublist(int *complex)
 
 	*complex |= c;
 	if (tok == DBAR || tok == DAMPER) {
-	    int qtok = tok, sl;
+	    enum lextok qtok = tok;
+	    int sl;
 
 	    cmdpush(tok == DBAR ? CS_CMDOR : CS_CMDAND);
 	    zshlex();
@@ -1176,7 +1177,8 @@ par_case(int *complex)
 static void
 par_if(int *complex)
 {
-    int oecused = ecused, xtok, p, pp, type, usebrace = 0;
+    int oecused = ecused, p, pp, type, usebrace = 0;
+    enum lextok xtok;
     unsigned char nc;
 
     p = ecadd(0);
@@ -1367,7 +1369,8 @@ par_repeat(int *complex)
 static void
 par_subsh(int *complex)
 {
-    int oecused = ecused, otok = tok, p, pp;
+    enum lextok otok = tok;
+    int oecused = ecused, p, pp;
 
     p = ecadd(0);
     /* Extra word only needed for always block */
@@ -2110,7 +2113,7 @@ par_cond_2(void)
 		  && !s1[2]);
     condlex();
     if (tok == INANG || tok == OUTANG) {
-	int xtok = tok;
+	enum lextok xtok = tok;
 	condlex();
 	if (tok != STRING)
 	    YYERROR(ecused);
@@ -2371,7 +2374,7 @@ freeeprog(Eprog p)
 
 /**/
 char *
-ecgetstr(Estate s, int dup, int *tok)
+ecgetstr(Estate s, int dup, int *tokflag)
 {
     static char buf[4];
     wordcode c = *s->pc++;
@@ -2389,8 +2392,8 @@ ecgetstr(Estate s, int dup, int *tok)
     } else {
 	r = s->strs + (c >> 2);
     }
-    if (tok)
-	*tok = (c & 1);
+    if (tokflag)
+	*tokflag = (c & 1);
 
     /*** Since function dump files are mapped read-only, avoiding to
      *   to duplicate strings when they don't contain tokens may fail
@@ -2407,33 +2410,33 @@ ecgetstr(Estate s, int dup, int *tok)
 
 /**/
 char *
-ecrawstr(Eprog p, Wordcode pc, int *tok)
+ecrawstr(Eprog p, Wordcode pc, int *tokflag)
 {
     static char buf[4];
     wordcode c = *pc;
 
     if (c == 6 || c == 7) {
-	if (tok)
-	    *tok = (c & 1);
+	if (tokflag)
+	    *tokflag = (c & 1);
 	return "";
     } else if (c & 2) {
 	buf[0] = (char) ((c >>  3) & 0xff);
 	buf[1] = (char) ((c >> 11) & 0xff);
 	buf[2] = (char) ((c >> 19) & 0xff);
 	buf[3] = '\0';
-	if (tok)
-	    *tok = (c & 1);
+	if (tokflag)
+	    *tokflag = (c & 1);
 	return buf;
     } else {
-	if (tok)
-	    *tok = (c & 1);
+	if (tokflag)
+	    *tokflag = (c & 1);
 	return p->strs + (c >> 2);
     }
 }
 
 /**/
 char **
-ecgetarr(Estate s, int num, int dup, int *tok)
+ecgetarr(Estate s, int num, int dup, int *tokflag)
 {
     char **ret, **rp;
     int tf = 0, tmp = 0;
@@ -2445,15 +2448,15 @@ ecgetarr(Estate s, int num, int dup, int *tok)
 	tf |=  tmp;
     }
     *rp = NULL;
-    if (tok)
-	*tok = tf;
+    if (tokflag)
+	*tokflag = tf;
 
     return ret;
 }
 
 /**/
 LinkList
-ecgetlist(Estate s, int num, int dup, int *tok)
+ecgetlist(Estate s, int num, int dup, int *tokflag)
 {
     if (num) {
 	LinkList ret;
@@ -2464,12 +2467,12 @@ ecgetlist(Estate s, int num, int dup, int *tok)
 	    setsizednode(ret, i, ecgetstr(s, dup, &tmp));
 	    tf |= tmp;
 	}
-	if (tok)
-	    *tok = tf;
+	if (tokflag)
+	    *tokflag = tf;
 	return ret;
     }
-    if (tok)
-	*tok = 0;
+    if (tokflag)
+	*tokflag = 0;
     return NULL;
 }
 

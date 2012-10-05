@@ -1215,7 +1215,7 @@ get_strarg(char *s, int *lenp)
 {
     convchar_t del;
     int len;
-    char tok = 0;
+    char ctok = 0;
 
     MB_METACHARINIT();
     len = MB_METACHARLENCONV(s, &del);
@@ -1243,25 +1243,25 @@ get_strarg(char *s, int *lenp)
 	del = ZWC('>');
 	break;
     case Inpar:
-	tok = Outpar;
+	ctok = Outpar;
 	break;
     case Inang:
-	tok = Outang;
+	ctok = Outang;
 	break;
     case Inbrace:
-	tok = Outbrace;
+	ctok = Outbrace;
 	break;
     case Inbrack:
-	tok = Outbrack;
+	ctok = Outbrack;
 	break;
     }
 
-    if (tok) {
+    if (ctok) {
 	/*
 	 * Looking for a matching token; we want the literal byte,
 	 * not a decoded multibyte character, so search specially.
 	 */
-	while (*s && *s != tok)
+	while (*s && *s != ctok)
 	    s++;
     } else {
 	convchar_t del2;

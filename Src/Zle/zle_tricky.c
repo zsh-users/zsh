@@ -1071,7 +1071,8 @@ has_real_token(const char *s)
 static char *
 get_comp_string(void)
 {
-    int t0, tt0, i, j, k, cp, rd, sl, ocs, ins, oins, ia, parct, varq = 0;
+    enum lextok t0, tt0;
+    int i, j, k, cp, rd, sl, ocs, ins, oins, ia, parct, varq = 0;
     int ona = noaliases;
     /*
      * Index of word being considered
@@ -1152,7 +1153,8 @@ get_comp_string(void)
     lexflags = LEXFLAGS_ZLE;
     inpush(dupstrspace(linptr), 0, NULL);
     strinbeg(0);
-    wordpos = tt0 = cp = rd = ins = oins = linarr = parct = ia = redirpos = 0;
+    wordpos = cp = rd = ins = oins = linarr = parct = ia = redirpos = 0;
+    tt0 = NULLTOK;
 
     /* This loop is possibly the wrong way to do this.  It goes through *
      * the previously massaged command line using the lexer.  It stores *
@@ -1238,7 +1240,8 @@ get_comp_string(void)
 	    if (tt)
 		break;
 	    /* Otherwise reset the variables we are collecting data in. */
-	    wordpos = tt0 = cp = rd = ins = redirpos = 0;
+	    wordpos = cp = rd = ins = redirpos = 0;
+	    tt0 = NULLTOK;
 	}
 	if (lincmd && (tok == STRING || tok == FOR || tok == FOREACH ||
 		       tok == SELECT || tok == REPEAT || tok == CASE)) {
@@ -1251,7 +1254,7 @@ get_comp_string(void)
 	    if (wordpos != redirpos)
 		wordpos = redirpos = 0;
 	}
-	if (!lexflags && !tt0) {
+	if (!lexflags && tt0 == NULLTOK) {
 	    /* This is done when the lexer reached the word the cursor is on. */
 	    tt = tokstr ? dupstring(tokstr) : NULL;
 
@@ -1352,7 +1355,7 @@ get_comp_string(void)
 				 (sl - 1) : (zlemetacs_qsub - wb)]);
 	}
     } while (tok != LEXERR && tok != ENDINPUT &&
-	     (tok != SEPER || (lexflags && !tt0)));
+	     (tok != SEPER || (lexflags && tt0 == NULLTOK)));
     /* Calculate the number of words stored in the clwords array. */
     clwnum = (tt || !wordpos) ? wordpos : wordpos - 1;
     zsfree(clwords[clwnum]);
@@ -1388,7 +1391,7 @@ get_comp_string(void)
 
     if (inwhat == IN_MATH)
 	s = NULL;
-    else if (!t0 || t0 == ENDINPUT) {
+    else if (t0 == NULLTOK || t0 == ENDINPUT) {
 	/* There was no word (empty line). */
 	s = ztrdup("");
 	we = wb = zlemetacs;
