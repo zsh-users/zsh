@@ -1176,7 +1176,8 @@ starting with the third character of tt($HISTCHARS), default tt(#), up to
 the next newline is a comment.  tt(LPAR()Z+PLUS()n+PLUS()RPAR()) causes
 unquoted newlines to be treated as ordinary whitespace, else they are
 treated as if they are shell code delimiters and converted to
-semicolons.
+semicolons.  Options are combined within the same set of delimiters,
+e.g. tt(LPAR()Z+PLUS()Cn+PLUS()RPAR()).
 )
 item(tt(_:)var(flags)tt(:))(
 The underscore (tt(_)) flag is reserved for future use.  As of this
@@ -1278,6 +1279,8 @@ item(tt(2.) em(Internal parameter flags))(
 Any parameter flags set by one of the tt(typeset) family of commands,
 in particular the tt(L), tt(R), tt(Z), tt(u) and tt(l) flags for padding
 and capitalization, are applied directly to the parameter value.
+Note these flags are options to the command, e.g. `tt(typeset -Z)';
+they are not the same as the flags used within parameter substitutions.
 )
 item(tt(3.) em(Parameter subscripting))(
 If the value is a raw parameter reference with a subscript, such as
@@ -1358,7 +1361,7 @@ is applied.
 item(tt(15.) em(Directory naming))(
 Any directory name substitution using tt((D)) flag is applied.
 )
-item(tt(16.) em(Visibility enhancment))(
+item(tt(16.) em(Visibility enhancement))(
 Any modifications to make characters visible using the tt((V)) flag
 are applied.
 )
