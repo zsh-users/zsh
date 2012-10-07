@@ -548,8 +548,8 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     /* Obsolescent sh compatibility: set - is the same as set +xv *
      * and set - args is the same as set +xv -- args              */
     if (!EMULATION(EMULATE_ZSH) && *args && **args == '-' && !args[0][1]) {
-	dosetopt(VERBOSE, 0, 0);
-	dosetopt(XTRACE, 0, 0);
+	dosetopt(VERBOSE, 0, 0, opts);
+	dosetopt(XTRACE, 0, 0, opts);
 	if (!args[1])
 	    return 0;
     }
@@ -580,7 +580,7 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		}
 		if(!(optno = optlookup(*args)))
 		    zerrnam(nam, "no such option: %s", *args);
-		else if(dosetopt(optno, action, 0))
+		else if(dosetopt(optno, action, 0, opts))
 		    zerrnam(nam, "can't change option: %s", *args);
 		break;
 	    } else if(**args == 'A') {
@@ -601,7 +601,7 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    else {
 	    	if (!(optno = optlookupc(**args)))
 		    zerrnam(nam, "bad option: -%c", **args);
-		else if(dosetopt(optno, action, 0))
+		else if(dosetopt(optno, action, 0, opts))
 		    zerrnam(nam, "can't change option: -%c", **args);
 	    }
 	}
@@ -5008,8 +5008,8 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
     int opt_L = OPT_ISSET(ops, 'L');
     int opt_R = OPT_ISSET(ops, 'R');
     int saveemulation, savesticky_emulation, savehackchar;
-    int ret = 1;
-    char saveopts[OPT_SIZE];
+    int ret = 1, new_emulation;
+    char saveopts[OPT_SIZE], new_opts[OPT_SIZE], savesticky_opts[OPT_SIZE];
     char *cmd = 0;
     const char *shname = *argv;
 
@@ -5044,7 +5044,7 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
 
     /* with single argument set current emulation */
     if (!argv[1]) {
-	emulate(shname, OPT_ISSET(ops,'R'));
+	emulate(shname, OPT_ISSET(ops,'R'), &emulation, opts);
 	if (OPT_ISSET(ops,'L'))
 	    opts[LOCALOPTIONS] = opts[LOCALTRAPS] = 1;
 	return 0;
@@ -5052,8 +5052,13 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
 
     argv++;
     memcpy(saveopts, opts, sizeof(opts));
+    memcpy(new_opts, opts, sizeof(opts));
     savehackchar = keyboardhackchar;
-    cmd = parseopts("emulate", &argv);
+    emulate(shname, OPT_ISSET(ops,'R'), &new_emulation, new_opts);
+    if (parseopts("emulate", &argv, new_opts, &cmd)) {
+	ret = 1;
+	goto restore;
+    }
 
     /* parseopts() has consumed anything that looks like an option */
     if (*argv) {
@@ -5061,6 +5066,9 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
 	goto restore;
     }
 
+    saveemulation = emulation;
+    emulation = new_emulation;
+    memcpy(opts, new_opts, sizeof(opts));
     /* If "-c command" is given, evaluate command using specified
      * emulation mode.
      */
@@ -5073,15 +5081,16 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
     } else
 	return 0;
 
-    saveemulation = emulation;
     savesticky_emulation = sticky_emulation;
-    emulate(shname, OPT_ISSET(ops,'R'));
     sticky_emulation = emulation;
+    memcpy(savesticky_opts, sticky_opts, sizeof(opts));
+    memcpy(sticky_opts, opts, sizeof(opts));
     ret = eval(argv);
     sticky_emulation = savesticky_emulation;
     emulation = saveemulation;
- restore:
     memcpy(opts, saveopts, sizeof(opts));
+    memcpy(sticky_opts, savesticky_opts, sizeof(opts));
+restore:
     keyboardhackchar = savehackchar;
     inittyptab();	/* restore banghist */
     return ret;

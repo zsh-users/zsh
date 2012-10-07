@@ -176,3 +176,28 @@
 0:Sticky emulation not triggered if sticky emulation unchanged
 >on
 >off
+
+  (
+  setopt ignorebraces
+  emulate zsh -o extendedglob -c '
+  [[ -o ignorebraces ]] || print "Yay, ignorebraces was reset"
+  [[ -o extendedglob ]] && print "Yay, extendedglob is set"
+  '
+  )
+0:emulate -c with options
+>Yay, ignorebraces was reset
+>Yay, extendedglob is set
+
+  (
+  setopt ignorebraces          
+  emulate zsh -o extendedglob
+  [[ -o ignorebraces ]] || print "Yay, ignorebraces is no longer set"
+  [[ -o extendedglob ]] && print "Yay, extendedglob is set"
+  )
+0:emulate with options but no -c
+>Yay, ignorebraces is no longer set
+>Yay, extendedglob is set
+
+  emulate zsh -o fixallmybugs 'print This was executed, bad'
+1:emulate -c with incorrect options
+?(eval):emulate:1: no such option: fixallmybugs

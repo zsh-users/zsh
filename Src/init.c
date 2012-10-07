@@ -246,7 +246,8 @@ parseargs(char **argv, char **runscript)
     opts[SHINSTDIN] = 0;
     opts[SINGLECOMMAND] = 0;
 
-    cmd = parseopts(NULL, &argv);
+    if (parseopts(NULL, &argv, opts, &cmd))
+	exit(1);
 
     paramlist = znewlinklist();
     if (*argv) {
@@ -276,18 +277,36 @@ parseargs(char **argv, char **runscript)
     argzero = ztrdup(argzero);
 }
 
+/*
+ * Parse shell options.
+ * If nam is not NULL, this is called from a command; don't
+ * exit on failure.
+ */
+
 /**/
-mod_export char *
-parseopts(char *nam, char ***argvp)
+mod_export int
+parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp)
 {
     int optionbreak = 0;
     int action, optno;
-    char *cmd = 0;	/* deliberately hides static */
     char **argv = *argvp;
 
-#define WARN_OPTION(F, S) if (nam) zwarnnam(nam, F, S); else zerr(F, S)
-#define LAST_OPTION(N) \
-	if (nam) { if (*argv) argv++; goto doneargv; } else exit(N)
+    *cmdp = 0;
+#define WARN_OPTION(F, S)						\
+    do {								\
+	if (nam)							\
+	    zwarnnam(nam, F, S);					\
+	else								\
+	    zerr(F, S);							\
+    } while (0)
+#define LAST_OPTION(N)	       \
+    do {		       \
+	if (nam) {	       \
+	    if (*argv)	       \
+		argv++;	       \
+	    goto doneargv;     \
+	} else exit(N);	       \
+    } while(0)
 
     /* loop through command line options (begins with "-" or "+") */
     while (!optionbreak && *argv && (**argv == '-' || **argv == '+')) {
@@ -327,25 +346,25 @@ parseopts(char *nam, char ***argvp)
 		optionbreak = 1;
 	    } else if (**argv == 'c') {
 		/* -c command */
-		cmd = *argv;
-		opts[INTERACTIVE] &= 1;
+		*cmdp = *argv;
+		new_opts[INTERACTIVE] &= 1;
 		scriptname = scriptfilename = ztrdup("zsh");
 	    } else if (**argv == 'o') {
 		if (!*++*argv)
 		    argv++;
 		if (!*argv) {
 		    WARN_OPTION("string expected after -o", NULL);
-		    LAST_OPTION(1);
+		    return 1;
 		}
 	    longoptions:
 		if (!(optno = optlookup(*argv))) {
 		    WARN_OPTION("no such option: %s", *argv);
-		    LAST_OPTION(1);
+		    return 1;
 		} else if (optno == RESTRICTED && !nam) {
 		    restricted = action;
 		} else if ((optno == EMACSMODE || optno == VIMODE) && nam) {
 		    WARN_OPTION("can't change option: %s", *argv);
-		} else if (dosetopt(optno, action, !nam) && nam) {
+		} else if (dosetopt(optno, action, !nam, new_opts) && nam) {
 		    WARN_OPTION("can't change option: %s", *argv);
 		}
               break;
@@ -355,18 +374,18 @@ parseopts(char *nam, char ***argvp)
 		    if (!isspace(STOUC(**argv))) {
 		     badoptionstring:
 			WARN_OPTION("bad option string: '%s'", args);
-			LAST_OPTION(1);
+			return 1;
 		    }
 		break;
 	    } else {
 	    	if (!(optno = optlookupc(**argv))) {
 		    WARN_OPTION("bad option: -%c", **argv);
-		    LAST_OPTION(1);
+		    return 1;
 		} else if (optno == RESTRICTED && !nam) {
 		    restricted = action;
 		} else if ((optno == EMACSMODE || optno == VIMODE) && nam) {
 		    WARN_OPTION("can't change option: %s", *argv);
-		} else if (dosetopt(optno, action, !nam) && nam) {
+		} else if (dosetopt(optno, action, !nam, new_opts) && nam) {
 		    WARN_OPTION("can't change option: -%c", **argv);
 		}
 	    }
@@ -374,18 +393,18 @@ parseopts(char *nam, char ***argvp)
 	argv++;
     }
  doneoptions:
-    if (cmd) {
+    if (*cmdp) {
 	if (!*argv) {
-	    WARN_OPTION("string expected after -%s", cmd);
-	    LAST_OPTION(1);
+	    WARN_OPTION("string expected after -%s", *cmdp);
+	    exit(1);
 	}
-	cmd = *argv++;
+	*cmdp = *argv++;
     }
  doneargv:
     *argvp = argv;
-    return cmd;
+    return 0;
 }
-    
+
 /**/
 static void
 printhelp(void)
@@ -1162,7 +1181,7 @@ init_misc(void)
 #else
     if (*zsh_name == 'r' || restricted)
 #endif
-	dosetopt(RESTRICTED, 1, 0);
+	dosetopt(RESTRICTED, 1, 0, opts);
     if (cmd) {
 	if (SHIN >= 10)
 	    fclose(bshin);
@@ -1225,7 +1244,7 @@ source(char *s)
     subsh  = 0;
     lineno = 1;
     loops  = 0;
-    dosetopt(SHINSTDIN, 0, 1);
+    dosetopt(SHINSTDIN, 0, 1, opts);
     scriptname = s;
     scriptfilename = s;
 
@@ -1297,7 +1316,7 @@ source(char *s)
     thisjob = cj;                    /* current job number                   */
     lineno = oldlineno;              /* our current lineno                   */
     loops = oloops;                  /* the # of nested loops we are in      */
-    dosetopt(SHINSTDIN, oldshst, 1); /* SHINSTDIN option                     */
+    dosetopt(SHINSTDIN, oldshst, 1, opts); /* SHINSTDIN option               */
     errflag = 0;
     if (!exit_pending)
 	retflag = 0;
@@ -1535,7 +1554,7 @@ zsh_main(UNUSED(int argc), char **argv)
     fdtable = zshcalloc(fdtable_size*sizeof(*fdtable));
 
     createoptiontable();
-    emulate(zsh_name, 1);   /* initialises most options */
+    emulate(zsh_name, 1, &emulation, opts);   /* initialises most options */
     opts[LOGINSHELL] = (**argv == '-');
     opts[PRIVILEGED] = (getuid() != geteuid() || getgid() != getegid());
     opts[USEZLE] = 1;   /* may be unset in init_io() */

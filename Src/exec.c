@@ -4544,7 +4544,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	 */
 	emulation = sticky_emulation = shfunc->emulation;
 	restore_sticky = 1;
-	installemulation();
+	installemulation(emulation, opts);
     } else
 	restore_sticky = 0;
 

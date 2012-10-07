@@ -771,7 +771,7 @@ setpmoption(Param pm, char *value)
 	zwarn("invalid value: %s", value);
     else if (!(n = optlookup(pm->node.nam)))
 	zwarn("no such option: %s", pm->node.nam);
-    else if (dosetopt(n, (value && strcmp(value, "off")), 0))
+    else if (dosetopt(n, (value && strcmp(value, "off")), 0, opts))
 	zwarn("can't change option: %s", pm->node.nam);
     zsfree(value);
 }
@@ -784,7 +784,7 @@ unsetpmoption(Param pm, UNUSED(int exp))
 
     if (!(n = optlookup(pm->node.nam)))
 	zwarn("no such option: %s", pm->node.nam);
-    else if (dosetopt(n, 0, 0))
+    else if (dosetopt(n, 0, 0, opts))
 	zwarn("can't change option: %s", pm->node.nam);
 }
 
@@ -812,7 +812,7 @@ setpmoptions(UNUSED(Param pm), HashTable ht)
 	    if (!val || (strcmp(val, "on") && strcmp(val, "off")))
 		zwarn("invalid value: %s", val);
 	    else if (dosetopt(optlookup(hn->nam),
-			      (val && strcmp(val, "off")), 0))
+			      (val && strcmp(val, "off")), 0, opts))
 		zwarn("can't change option: %s", hn->nam);
 	}
     deleteparamtable(ht);
