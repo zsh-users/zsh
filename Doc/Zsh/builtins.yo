@@ -137,10 +137,19 @@ With the tt(-w) flag, the var(name)s are taken as names of files compiled
 with the tt(zcompile) builtin, and all functions defined in them are
 marked for autoloading.
 
-The flags tt(-z) and tt(-k) mark the function to be autoloaded in
-native or ksh emulation, as if the option tt(KSH_AUTOLOAD) were
-unset or were set, respectively.  The flags override the setting of
-the option at the time the function is loaded.
+The flags tt(-z) and tt(-k) mark the function to be autoloaded using the
+zsh or ksh style, as if the option tt(KSH_AUTOLOAD) were unset or were
+set, respectively.  The flags override the setting of the option at the
+time the function is loaded.
+
+Note that the tt(autoload) command makes no attempt to ensure the
+shell options set during the loading or execution of the file have
+any particular value.  For this, the tt(emulate) command can be used:
+
+example(emulate zsh -c 'autoload -Uz var(func)')
+
+arranges that when var(func) is loaded the shell is in native tt(zsh)
+emulation, and this emulation is also applied when var(func) is run.
 )
 findex(bg)
 cindex(jobs, backgrounding)
@@ -393,6 +402,7 @@ ifnzman(noderef(Invocation))\
 ifzman(the section INVOCATION in zmanref(zsh)),
 except that `tt(-o EMACS)' and `tt(-o VI)' may not be used.  Flags such
 as `tt(+r)'/`tt(+o RESTRICTED)' may be prohibited in some circumstances.
+
 If tt(-c) var(arg) appears in var(flags), var(arg) is evaluated while the
 requested emulation is temporarily in effect.  In this case the emulation
 mode and all options are restored to their previous values before
@@ -409,7 +419,10 @@ If the function is called when the sticky emulation is already in
 effect, either within an `tt(emulate) var(shell) tt(-c)' expression or
 within another function with the same sticky emulation, entry and exit
 from the function do not cause options to be altered (except due to
-standard processing such as the tt(LOCAL_OPTIONS) option).
+standard processing such as the tt(LOCAL_OPTIONS) option).  This also
+applies to functions marked for autoload within the sticky emulation;
+the appropriate set of options will be applied at the point the
+function is loaded as well as when it is run.
 
 For example:
 

@@ -2944,8 +2944,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    shf = (Shfunc) zshcalloc(sizeof *shf);
 	    shf->node.flags = on;
 	    shf->funcdef = mkautofn(shf);
-	    /* No sticky emulation for autoloaded functions */
-	    shf->emulation = 0;
+	    shf->emulation = sticky_emulation;
 	    shfunctab->addnode(shfunctab, ztrdup(*argv), shf);
 
 	    if (signum != -1) {

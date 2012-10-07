@@ -251,6 +251,23 @@
 >foo1
 >bar2
 
+  (
+  setopt ignorebraces
+  fpath=(.)
+  print "{ echo OK }\n[[ -o ignorebraces ]] || print 'ignorebraces is off'" \
+      >emufunctest
+  (autoload -z emufunctest; emufunctest) 2>&1
+  emulate zsh -c 'autoload -Uz emufunctest'
+  emufunctest
+  [[ -o ignorebraces ]] && print 'ignorebraces is still on here'
+  )
+0:sticky emulation applies to autoloads and autoloaded function execution
+>emufunctest:3: parse error near `\n'
+>OK
+>ignorebraces is off
+>ignorebraces is still on here
+
+
 %clean
 
  rm -f file.in file.out

@@ -1,3 +1,9 @@
+2012-10-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30718: README, Doc/Zsh/builtins.yo, Src/builtin.c,
+	Test/C04funcdef.ztst: emulate command evaluations should apply
+	sticky emulation to autoloads, too.
+
 2012-10-07  Oliver Kiddle <opk@zsh.org>
 
 	* unposted: Completion/Unix/Command/_webbrowser,
@@ -233,5 +239,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5737 $
+* $Revision: 1.5738 $
 *****************************************************
