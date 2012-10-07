@@ -2,7 +2,7 @@
 
 	* 30722: Src/builtin.c, Src/exec.c, Src/init.c, Src/options.c,
 	Src/Modules/parameter.c, Test/B07emulate.ztst: fix some cases
-	where options or emulations where not propagated properly
+	where options or emulations were not propagated properly
 	from the emulate command.
 
 	* 30718: README, Doc/Zsh/builtins.yo, Src/builtin.c,
@@ -244,5 +244,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5739 $
+* $Revision: 1.5740 $
 *****************************************************
