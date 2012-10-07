@@ -1,3 +1,7 @@
+2012-10-07  Oliver Kiddle <opk@zsh.org>
+
+	* 30714: Completion/X/Command/_xclip: complete files,-t,-f for xclip
+
 2012-10-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 30716: Src/options.c: IGNORECLOSEBRACES should be an emulation
@@ -226,5 +230,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5735 $
+* $Revision: 1.5736 $
 *****************************************************

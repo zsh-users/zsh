@@ -1,14 +1,17 @@
 #compdef xclip
 
 _arguments \
-	'(-i -in -o -out)'{-i,-in}'[Read text into X selection]' \
-	'(-i -in -o -out)'{-o,-out}'[Print selection to standard out]' \
-	{-l,-loops}'[Number of selection requests to wait before exiting]:number:' \
-	{-d,-display}'[X display to connect to]:X11 display:' \
-	'(-)'{-h,-help}'[Usage information]' \
-	'(-selection)-selection[Selection to access]:selection:(primary secondary clipboard buffer-cut)' \
-	$'-noutf8[Use old Unicode, don\'t treat text as UTF-8]' \
-	'(-)-version[version information]' \
-	'(-quiet -verbose)-silent[Errors only, run in background]' \
-	$'(-silent -verbose)-quiet[Run in foreground, show what\'s happening]' \
-	'(-silent -quiet)-verbose[Running commentary]'
+  '(-i -in -o -out)'{-i,-in}'[read text into X selection (default)]' \
+  '(* -i -in -o -out)'{-o,-out}'[print selection to standard output]' \
+  '(-o -out -f -filter -quiet)'{-f,-filter}'[copy input additionally to standard output]' \
+  {-l,-loops}'[number of selection requests to wait before exiting]:number' \
+  {-t,-target}'[specify data format]:format:($(_call_program targets xclip -o -t TARGETS))' \
+  {-d,-display}'[X display to connect to]:display:_x_display' \
+  '(-)'{-h,-help}'[display usage information]' \
+  '(-selection)-selection[selection to access]:selection:(primary secondary clipboard buffer-cut)' \
+  "-noutf8[operate in legacy, non-Unicode, mode]" \
+  '(-)-version[display version information]' \
+  '(-quiet -verbose)-silent[errors only, run in background]' \
+  "(-silent -verbose)-quiet[run in foreground, show what's happening]" \
+  '(-silent -quiet)-verbose[running commentary]' \
+  '(-o -out)*:input file:_files'
