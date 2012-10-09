@@ -1,3 +1,7 @@
+2012-10-09  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Src/builtin.c: fix trivial typo with "functions +T".
+
 2012-10-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 30722: Src/builtin.c, Src/exec.c, Src/init.c, Src/options.c,
@@ -244,5 +248,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5740 $
+* $Revision: 1.5741 $
 *****************************************************

@@ -2692,7 +2692,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
     if (OPT_MINUS(ops,'T'))
 	on |= PM_TAGGED_LOCAL;
     else if (OPT_PLUS(ops,'T'))
-	on |= PM_TAGGED_LOCAL;
+	off |= PM_TAGGED_LOCAL;
     if (OPT_MINUS(ops,'z')) {
 	on |= PM_ZSHSTORED;
 	off |= PM_KSHSTORED;
