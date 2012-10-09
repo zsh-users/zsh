@@ -1,5 +1,8 @@
 2012-10-09  Peter Stephenson  <pws@csr.com>
 
+	* users/17318: Src/Zle/zle_utils.c: don't increment the undo
+	change number for every variable read, only the first in a row.
+
 	* users/17314: Src/Zle/zle_utils.c: ensure an undo change number
 	uniquely specifies a point in editing history by incrementing
 	the value returned by the variable.
@@ -252,5 +255,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5742 $
+* $Revision: 1.5743 $
 *****************************************************
