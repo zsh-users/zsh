@@ -1,5 +1,9 @@
 2012-10-09  Peter Stephenson  <pws@csr.com>
 
+	* users/17314: Src/Zle/zle_utils.c: ensure an undo change number
+	uniquely specifies a point in editing history by incrementing
+	the value returned by the variable.
+
 	* unposted: Src/builtin.c: fix trivial typo with "functions +T".
 
 2012-10-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
@@ -248,5 +252,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5741 $
+* $Revision: 1.5742 $
 *****************************************************
