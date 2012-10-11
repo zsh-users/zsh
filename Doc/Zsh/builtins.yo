@@ -462,6 +462,10 @@ sitem(4.)(The presence or absence of the tt(-R) switch to tt(emulate)
 corresponds to different sticky emulation modes, so for example
 `tt(emulate sh -c)', `tt(emulate -R sh -c)' and `tt(emulate csh -c)'
 are treated as three distinct sticky emulations.)
+sitem(5.)(Difference in shell options supplied in addition to the
+basic emulation also mean the sticky emulations are different, so for
+example `tt(emulate zsh -c)' and `tt(emulate zsh -o cbases -c)' are
+treated as distinct sticky emulations.)
 endsitem()
 )
 findex(enable)

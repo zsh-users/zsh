@@ -35,29 +35,21 @@
 /**/
 mod_export int emulation;
  
-/* current sticky emulation:  0 means none */
+/* current sticky emulation:  sticky = NULL means none */
 
 /**/
-mod_export int sticky_emulation;
+mod_export Emulation_options sticky;
 
 /* the options; e.g. if opts[SHGLOB] != 0, SH_GLOB is turned on */
- 
+
 /**/
 mod_export char opts[OPT_SIZE];
 
-/*
- * the options that need setting for current sticky emulation, if any:
- * same format as opts.
- */
-
-/**/
-mod_export char sticky_opts[OPT_SIZE];
- 
 /* Option name hash table */
 
 /**/
 mod_export HashTable optiontab;
- 
+
 /* The canonical option name table */
 
 #define OPT_CSH		EMULATE_CSH
@@ -786,7 +778,7 @@ dosetopt(int optno, int value, int force, char *new_opts)
 	    return -1;
 #endif /* GETPWNAM_FAKED */
     } else if ((optno == EMACSMODE || optno == VIMODE) && value) {
-	if (sticky_emulation)
+	if (sticky && sticky->emulation)
 	    return -1;
 	zleentry(ZLE_CMD_SET_KEYMAP, optno);
 	new_opts[(optno == EMACSMODE) ? VIMODE : EMACSMODE] = 0;

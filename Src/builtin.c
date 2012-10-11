@@ -2944,7 +2944,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    shf = (Shfunc) zshcalloc(sizeof *shf);
 	    shf->node.flags = on;
 	    shf->funcdef = mkautofn(shf);
-	    shf->emulation = sticky_emulation;
+	    shfunc_set_sticky(shf);
 	    shfunctab->addnode(shfunctab, ztrdup(*argv), shf);
 
 	    if (signum != -1) {
@@ -5007,11 +5007,15 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
 {
     int opt_L = OPT_ISSET(ops, 'L');
     int opt_R = OPT_ISSET(ops, 'R');
-    int saveemulation, savesticky_emulation, savehackchar;
+    int saveemulation, savehackchar;
     int ret = 1, new_emulation;
-    char saveopts[OPT_SIZE], new_opts[OPT_SIZE], savesticky_opts[OPT_SIZE];
+    char saveopts[OPT_SIZE], new_opts[OPT_SIZE];
     char *cmd = 0;
     const char *shname = *argv;
+    LinkList optlist;
+    LinkNode optnode;
+    Emulation_options save_sticky;
+    OptIndex *on_ptr, *off_ptr;
 
     /* without arguments just print current emulation */
     if (!shname) {
@@ -5055,7 +5059,8 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
     memcpy(new_opts, opts, sizeof(opts));
     savehackchar = keyboardhackchar;
     emulate(shname, OPT_ISSET(ops,'R'), &new_emulation, new_opts);
-    if (parseopts("emulate", &argv, new_opts, &cmd)) {
+    optlist = newlinklist();
+    if (parseopts("emulate", &argv, new_opts, &cmd, optlist)) {
 	ret = 1;
 	goto restore;
     }
@@ -5081,15 +5086,40 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
     } else
 	return 0;
 
-    savesticky_emulation = sticky_emulation;
-    sticky_emulation = emulation;
-    memcpy(savesticky_opts, sticky_opts, sizeof(opts));
-    memcpy(sticky_opts, opts, sizeof(opts));
+    save_sticky = sticky;
+    sticky = hcalloc(sizeof(*sticky));
+    sticky->emulation = emulation;
+    for (optnode = firstnode(optlist); optnode; incnode(optnode)) {
+	/* Data is index into new_opts */
+	char *optptr = (char *)getdata(optnode);
+	if (*optptr)
+	    sticky->n_on_opts++;
+	else
+	    sticky->n_off_opts++;
+    }
+    if (sticky->n_on_opts)
+	on_ptr = sticky->on_opts =
+	    zhalloc(sticky->n_on_opts * sizeof(*sticky->on_opts));
+    else
+	on_ptr = NULL;
+    if (sticky->n_off_opts)
+	off_ptr = sticky->off_opts = zhalloc(sticky->n_off_opts *
+					     sizeof(*sticky->off_opts));
+    else
+	off_ptr = NULL;
+    for (optnode = firstnode(optlist); optnode; incnode(optnode)) {
+	/* Data is index into new_opts */
+	char *optptr = (char *)getdata(optnode);
+	int optno = optptr - new_opts;
+	if (*optptr)
+	    *on_ptr++ = optno;
+	else
+	    *off_ptr++ = optno;
+    }
     ret = eval(argv);
-    sticky_emulation = savesticky_emulation;
+    sticky = save_sticky;
     emulation = saveemulation;
     memcpy(opts, saveopts, sizeof(opts));
-    memcpy(sticky_opts, savesticky_opts, sizeof(opts));
 restore:
     keyboardhackchar = savehackchar;
     inittyptab();	/* restore banghist */

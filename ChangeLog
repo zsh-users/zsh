@@ -1,3 +1,12 @@
+2012-10-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30726: Doc/Zsh/builtins.yo, Src/builtin.c, Src/exec.c,
+	Src/hashtable.c, Src/init.c, Src/options.c, Src/parse.c,
+	Src/signals.c, Src/zsh.h, Src/Modules/parameter.c,
+	Test/B07emulate.ztst: extend 30722 to handle the case
+	where shell options passed to the emulate command need
+	propagating to sticky emulation.
+
 2012-10-11  Peter Stephenson  <pws@csr.com>
 
 	* 30724: Src/exec.c, Src/jobs.c: shell code optimised to use
@@ -260,5 +269,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5744 $
+* $Revision: 1.5745 $
 *****************************************************

@@ -755,7 +755,10 @@ dosavetrap(int sig, int level)
 	    newshf->node.flags = shf->node.flags;
 	    newshf->funcdef = dupeprog(shf->funcdef, 0);
 	    newshf->filename = ztrdup(shf->filename);
-	    newshf->emulation = shf->emulation;
+	    if (shf->sticky) {
+		newshf->sticky = sticky_emulation_dup(shf->sticky, 0);
+	    } else
+		newshf->sticky = 0;
 	    if (shf->node.flags & PM_UNDEFINED)
 		newshf->funcdef->shf = newshf;
 	}

@@ -201,3 +201,49 @@
   emulate zsh -o fixallmybugs 'print This was executed, bad'
 1:emulate -c with incorrect options
 ?(eval):emulate:1: no such option: fixallmybugs
+
+  emulate zsh -c '
+    func() { [[ -o extendedglob ]] || print extendedglob is off }
+  '
+  func
+  emulate zsh -o extendedglob -c '
+    func() { [[ -o extendedglob ]] && print extendedglob is on }
+  '
+  func
+0:options specified alongside emulation are also sticky
+>extendedglob is off
+>extendedglob is on
+
+  emulate zsh -o extendedglob -c '
+    func_inner() { setopt nobareglobqual }
+  '
+  emulate zsh -o extendedglob -c '
+    func_outer() { 
+      func_inner
+      [[ -o bareglobqual ]] || print bareglobqual was turned off
+      [[ -o extendedglob ]] && print extendedglob is on, though
+    }
+  '
+  [[ -o extendedglob ]] || print extendedglob is initially off
+  func_outer
+0:options propagate between identical emulations
+>extendedglob is initially off
+>bareglobqual was turned off
+>extendedglob is on, though
+
+  emulate zsh -o extendedglob -c '
+    func_inner() { setopt nobareglobqual }
+  '
+  emulate zsh -o extendedglob -o cbases -c '
+    func_outer() { 
+      func_inner
+      [[ -o bareglobqual ]] && print bareglobqual is still on
+      [[ -o extendedglob ]] && print extendedglob is on, too
+    }
+  '
+  [[ -o extendedglob ]] || print extendedglob is initially off
+  func_outer
+0:options do not propagate between different emulations
+>extendedglob is initially off
+>bareglobqual is still on
+>extendedglob is on, too

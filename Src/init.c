@@ -246,7 +246,7 @@ parseargs(char **argv, char **runscript)
     opts[SHINSTDIN] = 0;
     opts[SINGLECOMMAND] = 0;
 
-    if (parseopts(NULL, &argv, opts, &cmd))
+    if (parseopts(NULL, &argv, opts, &cmd, NULL))
 	exit(1);
 
     paramlist = znewlinklist();
@@ -277,15 +277,37 @@ parseargs(char **argv, char **runscript)
     argzero = ztrdup(argzero);
 }
 
+/* Insert into list in order of pointer value */
+
+/**/
+static void
+parseopts_insert(LinkList optlist, void *ptr)
+{
+    LinkNode node;
+
+    for (node = firstnode(optlist); node; incnode(node)) {
+	if (ptr < getdata(node)) {
+	    insertlinknode(optlist, prevnode(node), ptr);
+	    return;
+	}
+    }
+
+    addlinknode(optlist, ptr);
+}
+
 /*
  * Parse shell options.
  * If nam is not NULL, this is called from a command; don't
  * exit on failure.
+ *
+ * If optlist is not NULL, it used to form a list of pointers
+ * into new_opts indicating which options have been changed.
  */
 
 /**/
 mod_export int
-parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp)
+parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
+	  LinkList optlist)
 {
     int optionbreak = 0;
     int action, optno;
@@ -364,8 +386,12 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp)
 		    restricted = action;
 		} else if ((optno == EMACSMODE || optno == VIMODE) && nam) {
 		    WARN_OPTION("can't change option: %s", *argv);
-		} else if (dosetopt(optno, action, !nam, new_opts) && nam) {
-		    WARN_OPTION("can't change option: %s", *argv);
+		} else {
+		    if (dosetopt(optno, action, !nam, new_opts) && nam) {
+			WARN_OPTION("can't change option: %s", *argv);
+		    } else if (optlist) {
+			parseopts_insert(optlist, new_opts+optno);
+		    }
 		}
               break;
 	    } else if (isspace(STOUC(**argv))) {
@@ -385,8 +411,12 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp)
 		    restricted = action;
 		} else if ((optno == EMACSMODE || optno == VIMODE) && nam) {
 		    WARN_OPTION("can't change option: %s", *argv);
-		} else if (dosetopt(optno, action, !nam, new_opts) && nam) {
-		    WARN_OPTION("can't change option: -%c", **argv);
+		} else {
+		    if (dosetopt(optno, action, !nam, new_opts) && nam) {
+			WARN_OPTION("can't change option: -%c", **argv);
+		    } else if (optlist) {
+			parseopts_insert(optlist, new_opts+optno);
+		    }
 		}
 	    }
 	}
@@ -396,7 +426,7 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp)
     if (*cmdp) {
 	if (!*argv) {
 	    WARN_OPTION("string expected after -%s", *cmdp);
-	    exit(1);
+	    return 1;
 	}
 	*cmdp = *argv++;
     }

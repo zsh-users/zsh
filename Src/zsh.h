@@ -407,6 +407,7 @@ typedef struct cmdnam    *Cmdnam;
 typedef struct complist  *Complist;
 typedef struct conddef   *Conddef;
 typedef struct dirsav    *Dirsav;
+typedef struct emulation_options *Emulation_options;
 typedef struct features  *Features;
 typedef struct feature_enables  *Feature_enables;
 typedef struct funcstack *Funcstack;
@@ -1099,7 +1100,7 @@ struct shfunc {
     char *filename;             /* Name of file located in */
     zlong lineno;		/* line number in above file */
     Eprog funcdef;		/* function definition    */
-    int emulation;		/* sticky emulation for function */
+    Emulation_options sticky;   /* sticky emulation definitions, if any */
 };
 
 /* Shell function context types. */
@@ -2104,6 +2105,12 @@ enum {
     OPT_SIZE
 };
 
+/*
+ * Size required to fit an option number.
+ * If OPT_SIZE goes above 256 this will need to expand.
+ */
+typedef unsigned char OptIndex;
+
 #undef isset
 #define isset(X) (opts[X])
 #define unset(X) (!opts[X])
@@ -2111,6 +2118,27 @@ enum {
 #define interact (isset(INTERACTIVE))
 #define jobbing  (isset(MONITOR))
 #define islogin  (isset(LOGINSHELL))
+
+/*
+ * Record of emulation and options that need to be set
+ * for a full "emulate".
+ */
+struct emulation_options {
+    /* The emulation itself */
+    int emulation;
+    /* The number of options in on_opts. */
+    int n_on_opts;
+    /* The number of options in off_opts. */
+    int n_off_opts;
+    /*
+     * Array of options to be turned on.
+     * Only options specified explicitly in the emulate command
+     * are recorded.  Null if n_on_opts is zero.
+     */
+    OptIndex *on_opts;
+    /* Array of options to be turned off, similar. */
+    OptIndex *off_opts;
+};
 
 /***********************************************/
 /* Definitions for terminal and display control */

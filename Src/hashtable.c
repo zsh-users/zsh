@@ -888,6 +888,15 @@ freeshfuncnode(HashNode hn)
     if (shf->funcdef)
 	freeeprog(shf->funcdef);
     zsfree(shf->filename);
+    if (shf->sticky) {
+	if (shf->sticky->n_on_opts)
+	    zfree(shf->sticky->on_opts,
+		  shf->sticky->n_on_opts * sizeof(*shf->sticky->on_opts));
+	if (shf->sticky->n_off_opts)
+	    zfree(shf->sticky->off_opts,
+		  shf->sticky->n_off_opts * sizeof(*shf->sticky->off_opts));
+	zfree(shf->sticky, sizeof(*shf->sticky));
+    }
     zfree(shf, sizeof(struct shfunc));
 }
 

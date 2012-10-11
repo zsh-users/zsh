@@ -4267,7 +4267,7 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 	shf->node.flags = 0;
 	shf->filename = ztrdup(scriptfilename);
 	shf->lineno = lineno;
-	shf->emulation = sticky_emulation;
+	shfunc_set_sticky(shf);
 
 	if (!names) {
 	    /*
@@ -4318,6 +4318,46 @@ execfuncdef(Estate state, UNUSED(int do_exec))
     state->pc = end;
     return ret;
 }
+
+/* Duplicate a sticky emulation */
+
+/**/
+
+mod_export Emulation_options
+sticky_emulation_dup(Emulation_options src, int useheap)
+{
+    Emulation_options newsticky = useheap ?
+	hcalloc(sizeof(*src)) : zshcalloc(sizeof(*src));
+    newsticky->emulation = src->emulation;
+    if (src->n_on_opts) {
+	size_t sz = src->n_on_opts * sizeof(*src->on_opts);
+	newsticky->n_on_opts = src->n_on_opts;
+	newsticky->on_opts = useheap ? zhalloc(sz) : zalloc(sz);
+	memcpy(newsticky->on_opts, src->on_opts, sz);
+    }
+    if (src->n_off_opts) {
+	size_t sz = src->n_off_opts * sizeof(*src->off_opts);
+	newsticky->n_off_opts = src->n_off_opts;
+	newsticky->off_opts = useheap ? zhalloc(sz) : zalloc(sz);
+	memcpy(newsticky->off_opts, src->off_opts, sz);
+    }
+
+    return newsticky;
+}
+
+/* Set the sticky emulation attributes for a shell function */
+
+/**/
+
+mod_export void
+shfunc_set_sticky(Shfunc shf)
+{
+    if (sticky)
+	shf->sticky = sticky_emulation_dup(sticky, 0);
+    else
+	shf->sticky = NULL;
+}
+
 
 /* Main entry point to execute a shell function. */
 
@@ -4479,6 +4519,45 @@ loadautofn(Shfunc shf, int fksh, int autol)
 }
 
 /*
+ * Check if a sticky emulation differs from the current one.
+ */
+
+/**/
+
+int sticky_emulation_differs(Emulation_options sticky2)
+{
+    /* If no new sticky emulation, not a different emulation */
+    if (!sticky2)
+	return 0;
+    /* If no current sticky emulation, different */
+    if (!sticky)
+	return 1;
+    /* If basic emulation different, different */
+    if (sticky->emulation != sticky2->emulation)
+	return 1;
+    /* If differing numbers of options, different */
+    if (sticky->n_on_opts != sticky2->n_on_opts ||
+	sticky->n_off_opts != sticky2->n_off_opts)
+	return 1;
+    /*
+     * We need to compare option arrays, if non-null.
+     * We made parseopts() create the list of options in option
+     * order to make this easy.
+     */
+    /* If different options turned on, different */
+    if (sticky->n_on_opts &&
+	memcmp(sticky->on_opts, sticky2->on_opts,
+	       sticky->n_on_opts * sizeof(*sticky->on_opts)) != 0)
+	return 1;
+    /* If different options turned on, different */
+    if (sticky->n_off_opts &&
+	memcmp(sticky->off_opts, sticky2->off_opts,
+	       sticky->n_off_opts * sizeof(*sticky->off_opts)) != 0)
+	return 1;
+    return 0;
+}
+
+/*
  * execute a shell function
  *
  * name is the name of the function
@@ -4507,10 +4586,11 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     char *name = shfunc->node.nam;
     int flags = shfunc->node.flags, ooflags;
     char *fname = dupstring(name);
-    int obreaks, saveemulation, savesticky_emulation, restore_sticky;
+    int obreaks, saveemulation, restore_sticky;
     Eprog prog;
     struct funcstack fstack;
     static int oflags;
+    Emulation_options save_sticky = NULL;
 #ifdef MAX_FUNCTION_DEPTH
     static int funcdepth;
 #endif
@@ -4548,9 +4628,9 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
      * function we need to restore the original options on exit.   */
     memcpy(saveopts, opts, sizeof(opts));
     saveemulation = emulation;
-    savesticky_emulation = sticky_emulation;
+    save_sticky = sticky;
 
-    if (shfunc->emulation && sticky_emulation != shfunc->emulation) {
+    if (sticky_emulation_differs(shfunc->sticky)) {
 	/*
 	 * Function is marked for sticky emulation.
 	 * Enable it now.
@@ -4563,9 +4643,24 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	 *
 	 * This propagates the sticky emulation to subfunctions.
 	 */
-	emulation = sticky_emulation = shfunc->emulation;
+	sticky = sticky_emulation_dup(shfunc->sticky, 1);
+	emulation = sticky->emulation;
 	restore_sticky = 1;
 	installemulation(emulation, opts);
+	if (sticky->n_on_opts) {
+	    OptIndex *onptr;
+	    for (onptr = sticky->on_opts;
+		 onptr < sticky->on_opts + sticky->n_on_opts;
+		 onptr++)
+		opts[*onptr] = 1;
+	}
+	if (sticky->n_off_opts) {
+	    OptIndex *offptr;
+	    for (offptr = sticky->off_opts;
+		 offptr < sticky->off_opts + sticky->n_off_opts;
+		 offptr++)
+		opts[*offptr] = 0;
+	}
     } else
 	restore_sticky = 0;
 
@@ -4674,7 +4769,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	 */
 	memcpy(opts, saveopts, sizeof(opts));
 	emulation = saveemulation;
-	sticky_emulation = savesticky_emulation;
+	sticky = save_sticky;
     } else if (isset(LOCALOPTIONS)) {
 	/* restore all shell options except PRIVILEGED and RESTRICTED */
 	saveopts[PRIVILEGED] = opts[PRIVILEGED];
