@@ -1,3 +1,8 @@
+2012-10-11  Peter Stephenson  <pws@csr.com>
+
+	* 30724: Src/exec.c, Src/jobs.c: shell code optimised to use
+	execsimple() doesn't have a valid thisjob.
+
 2012-10-09  Peter Stephenson  <pws@csr.com>
 
 	* users/17318: Src/Zle/zle_utils.c: don't increment the undo
@@ -255,5 +260,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5743 $
+* $Revision: 1.5744 $
 *****************************************************

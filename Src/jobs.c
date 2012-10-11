@@ -209,7 +209,13 @@ findproc(pid_t pid, Job *jptr, Process *pptr, int aux)
 int
 hasprocs(int job)
 {
-    Job jn = jobtab + job;
+    Job jn;
+
+    if (job < 0) {
+	DPUTS(1, "job number invalid in hasprocs");
+	return 0;
+    }
+    jn = jobtab + job;
 
     return jn->procs || jn->auxprocs;
 }

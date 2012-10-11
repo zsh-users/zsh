@@ -404,7 +404,17 @@ execcursh(Estate state, int do_exec)
     /* Skip word only used for try/always */
     state->pc++;
 
-    if (!list_pipe && thisjob != list_pipe_job && !hasprocs(thisjob))
+    /*
+     * The test thisjob != -1 was added because sometimes thisjob
+     * can be invalid at this point.  The case in question was
+     * in a precmd function after operations involving background
+     * jobs.
+     *
+     * This is because sometimes we bypass job control to execute
+     * very simple functions via execssimple().
+     */
+    if (!list_pipe && thisjob != -1 && thisjob != list_pipe_job &&
+	!hasprocs(thisjob))
 	deletejob(jobtab + thisjob, 0);
     cmdpush(CS_CURSH);
     execlist(state, 1, do_exec);
@@ -1064,7 +1074,7 @@ static int
 execsimple(Estate state)
 {
     wordcode code = *state->pc++;
-    int lv;
+    int lv, otj;
 
     if (errflag)
 	return (lastval = 1);
@@ -1074,6 +1084,13 @@ execsimple(Estate state)
 	lineno = code - 1;
 
     code = wc_code(*state->pc++);
+
+    /*
+     * Because we're bypassing job control, ensure the called
+     * code doesn't see the current job.
+     */
+    otj = thisjob;
+    thisjob = -1;
 
     if (code == WC_ASSIGN) {
 	cmdoutval = 0;
@@ -1085,6 +1102,8 @@ execsimple(Estate state)
 	lv = (errflag ? errflag : cmdoutval);
     } else
 	lv = (execfuncs[code - WC_CURSH])(state, 0);
+
+    thisjob = otj;
 
     return lastval = lv;
 }
@@ -4313,7 +4332,9 @@ execshfunc(Shfunc shf, LinkList args)
     if (errflag)
 	return;
 
-    if (!list_pipe && thisjob != list_pipe_job && !hasprocs(thisjob)) {
+    /* thisjob may be invalid if we're called via execsimple: see execcursh */
+    if (!list_pipe && thisjob != -1 && thisjob != list_pipe_job &&
+	!hasprocs(thisjob)) {
 	/* Without this deletejob the process table *
 	 * would be filled by a recursive function. */
 	last_file_list = jobtab[thisjob].filelist;
