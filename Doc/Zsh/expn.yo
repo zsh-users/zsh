@@ -483,6 +483,24 @@ example(LPAR()mycmd =(myoutput)RPAR() &!)
 as the forked subshell will wait for the command to finish then remove
 the temporary file.
 
+A general workaround to ensure a process substitution endures for
+an appropriate length of time is to pass it as a parameter to
+an anonymous shell function (a piece of shell code that is run
+immediately with function scope).  For example, this code:
+
+example(LPAR()RPAR() {
+   print File $1:
+   cat $1
+} =+LPAR()print This be the verse+RPAR())
+
+outputs something resembling the following
+
+example(File /tmp/zsh6nU0kS:
+This be the verse)
+
+The temporary file created by the process substitution will be deleted
+when the function exits.
+
 texinode(Parameter Expansion)(Command Substitution)(Process Substitution)(Expansion)
 sect(Parameter Expansion)
 cindex(parameter expansion)
