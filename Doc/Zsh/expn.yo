@@ -1329,7 +1329,7 @@ used to evaluate the length of the expression so far.
 )
 item(tt(10.) em(Forced joining))(
 If the `tt((j))' flag is present, or no `tt((j))' flag is present but
-the string is to be split as given by rules tt(16.) or tt(17.), and joining
+the string is to be split as given by rules tt(11.), and joining
 did not take place at step tt(5.), any words in the value are joined
 together using the given string or the first character of tt($IFS) if none.
 Note that the `tt((F))' flag implicitly supplies a string for joining in this

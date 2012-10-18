@@ -1,3 +1,8 @@
+2012-10-18  Peter Stephenson  <pws@csr.com>
+
+	* c.f. users/17330: Doc/Zsh/expn.yo: fix reference to splitting
+	rule in parameter expansion rules.
+
 2012-10-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 30726: Doc/Zsh/builtins.yo, Src/builtin.c, Src/exec.c,
@@ -269,5 +274,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5745 $
+* $Revision: 1.5746 $
 *****************************************************
