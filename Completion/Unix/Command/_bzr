@@ -396,6 +396,10 @@ case $cmd in
     args+=( '--dry-run[do not actually sign anything]' )
     ;;
 
+(send)
+    args+=( '*:DIR:_files -/' )
+    ;;
+
 (*)
     _message "unknown bzr command completion: $cmd"
     return 1
