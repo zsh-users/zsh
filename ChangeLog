@@ -1,3 +1,7 @@
+2012-10-19  Peter Stephenson  <pws@csr.com>
+
+	* unposted: Doc/Zsh/expn.yo: further splitting clarifications.
+
 2012-10-18  Peter Stephenson  <pws@csr.com>
 
 	* 30740: Doc/Zsh/expn.yo: add example of process substitution
@@ -277,5 +281,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5747 $
+* $Revision: 1.5748 $
 *****************************************************

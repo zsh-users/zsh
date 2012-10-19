@@ -1347,7 +1347,7 @@ used to evaluate the length of the expression so far.
 )
 item(tt(10.) em(Forced joining))(
 If the `tt((j))' flag is present, or no `tt((j))' flag is present but
-the string is to be split as given by rules tt(11.), and joining
+the string is to be split as given by rule tt(11.), and joining
 did not take place at step tt(5.), any words in the value are joined
 together using the given string or the first character of tt($IFS) if none.
 Note that the `tt((F))' flag implicitly supplies a string for joining in this
@@ -1387,7 +1387,9 @@ item(tt(17.) em(Lexical word splitting))(
 If the 'tt((z))' flag or one of the forms of the 'tt((Z))' flag is
 present, the word is split as if it were a shell command line, so that
 quotation marks and other metacharacters are used to decide what
-constitutes a word.
+constitutes a word.  Note this form of splitting is entirely distinct
+from that described by rule tt(11.): it does not use tt($IFS), and
+does not cause forced joining.
 )
 item(tt(18.) em(Uniqueness))(
 If the result is an array and the `tt((u))' flag was present, duplicate
