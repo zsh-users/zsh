@@ -121,6 +121,7 @@ _hosts_or_user_at_host()
     "rescue:Enter system rescue mode"
     "emergency:Enter system emergency mode"
     "halt:Shut down and halt the system"
+    "suspend:Suspend the system"
     "poweroff:Shut down and power-off the system"
     "reboot:Shut down and reboot the system"
     "kexec:Shut down and reboot the system with kexec"

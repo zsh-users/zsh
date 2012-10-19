@@ -1,5 +1,8 @@
 2012-10-19  Peter Stephenson  <pws@csr.com>
 
+	* Greg Bouzakis: 30741: Completion/Unix/Command/_systemd: add
+	suspend command.
+
 	* unposted: Doc/Zsh/expn.yo: further splitting clarifications.
 
 2012-10-18  Peter Stephenson  <pws@csr.com>
@@ -281,5 +284,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5748 $
+* $Revision: 1.5749 $
 *****************************************************
