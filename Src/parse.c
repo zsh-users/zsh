@@ -1610,6 +1610,11 @@ par_simple(int *complex, int nr)
 	} else if (tok == ENVARRAY) {
 	    int oldcmdpos = incmdpos, n, type2;
 
+	    /*
+	     * We consider array setting complex because it can
+	     * contain process substitutions, which need a valid job.
+	     */
+	    *complex = c = 1;
 	    p = ecadd(0);
 	    incmdpos = 0;
 	    if ((type2 = strlen(tokstr) - 1) && tokstr[type2] == '+') {

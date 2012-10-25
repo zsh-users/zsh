@@ -1,3 +1,8 @@
+2012-10-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30735: Src/parse.c: array assignments aren't simple because
+	they can contain process substitutions.
+
 2012-10-19  Peter Stephenson  <pws@csr.com>
 
 	* Roman Kaminski: 30738: Completion/Unix/Command/_bzr: send
@@ -287,5 +292,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5750 $
+* $Revision: 1.5751 $
 *****************************************************
