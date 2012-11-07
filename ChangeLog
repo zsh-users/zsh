@@ -1,5 +1,8 @@
 2012-11-07  Oliver Kiddle <opk@zsh.org>
 
+	* Benjamin R. Haskell: 30737: Completion/Unix/Command/_git:
+	make custom completion functions for git aliases easier
+
 	* users/17382: Completion/Unix/Type/_remote_files,
 	Completion/Unix/Command/_vim, Completion/Unix/Command/_git,
 	Completion/Unix/Type/_urls: complete URLs for vim and make
@@ -299,5 +302,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5752 $
+* $Revision: 1.5753 $
 *****************************************************
