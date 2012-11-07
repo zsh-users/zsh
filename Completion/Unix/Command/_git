@@ -5451,7 +5451,7 @@ __git_remote_repositories () {
   service= _ssh
 
   if compset -P '*:'; then
-    _remote_files --no-files -- ssh
+    _remote_files -/ -- ssh
   else
     _ssh_hosts -S:
   fi

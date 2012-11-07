@@ -75,7 +75,7 @@ fi
 scheme="$match[1]"
 
 case "$scheme" in
-  http(|s)|ftp|gopher)
+  http(|s)|(|s)ftp|scp|gopher)
     if ! compset -P //; then
       _wanted -C "$scheme" prefixes expl 'end of prefix' compadd -S '' "$@" //
       return
@@ -143,7 +143,7 @@ host="$match[1]"
 
 # Complete part after hostname
 
-_tags -C local files || return 1
+_tags remote-files files || return 1
 
 if [[ "$localhttp_servername" = "$host" ]]; then
   if compset -P \~; then
@@ -170,10 +170,12 @@ if [[ "$localhttp_servername" = "$host" ]]; then
   fi
 else
   while _tags; do
-    while _next_label files expl 'local file'; do
+    (( $#urls )) && while _next_label files expl 'local file'; do
       _path_files "$expl[@]" "$@" -W $urls/$scheme/$host "${glob[@]}" && ret=0
       _path_files -S/ -r '/' "$expl[@]" -W $urls/$scheme/$host -/ && ret=0
     done
+    [[ $scheme = (scp|sftp) ]] && _requested remote-files &&
+        _remote_files -h $host -- ssh && ret=0
     (( ret )) || return 0
   done
 fi

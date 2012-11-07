@@ -1,3 +1,10 @@
+2012-11-07  Oliver Kiddle <opk@zsh.org>
+
+	* users/17382: Completion/Unix/Type/_remote_files,
+	Completion/Unix/Command/_vim, Completion/Unix/Command/_git,
+	Completion/Unix/Type/_urls: complete URLs for vim and make
+	_remote_files more consistent with _files
+
 2012-10-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 30735: Src/parse.c: array assignments aren't simple because
@@ -292,5 +299,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5751 $
+* $Revision: 1.5752 $
 *****************************************************

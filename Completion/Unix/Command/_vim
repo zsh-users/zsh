@@ -4,6 +4,7 @@
 _vim_files () {
   case $PREFIX in
     (+*) _files -P './' $* && return 0 ;;
+    (scp|http(|s)|(|s)ftp):*) _urls ;;
     (*) _files $* ;;
   esac
   case $PREFIX in
@@ -21,14 +22,10 @@ arguments=(
   '(   -e -E -s -d -y)-v[vi mode]'
   '(-v    -E    -d -y)-e[ex mode]'
   '(-v -e       -d -y)-E[improved ex mode]'
-  '(-v -e -E -s    -y)-d[diff mode]'
   '(-v -e -E -s -d   )-y[easy mode]'
-  '-R[readonly mode]'
-  '-Z[restricted mode]'
   '-m[modifications (writing files) not allowed]'
   '-M[modifications in text not allowed]'
   '-b[binary mode]'
-  '-g[start with GUI]'
   '-l[lisp mode]'
   '-C[start in compatible mode]'
   '-N[start in incompatible mode]'
@@ -52,7 +49,6 @@ arguments=(
   '(-A -H   )-F[start in Farsi mode]'
   '-T[set terminal type]:::_terminals'
   '-u[use given vimrc file instead of default .vimrc]::rc file:_files'
-  '-U[use given gvimrc file instead of default .gvimrc]::rc file:_files'
   '--noplugin[do not load plugin scripts]'
   '-o-[number of windows to open (default: one for each file)]::window count: '
   '-O-[number of windows to vertically split open (default is one for each file)]::window count: '
@@ -76,7 +72,6 @@ arguments=(
   '--remote-tab-wait[as --remote-wait but open tab page for each file]:*:file:_vim_files'
   '--remote-tab-wait-silent[as --remote-wait-silent but open tab page for each file]:*:file:_vim_files'
   '--remote-expr[evaluate given expression in a vim server and print result]:expression: '
-  '--echo-wid[echo window ID on STDOUT, GUI version only]'
   '--literal[do not expand wildcards in arguments (this is useless with ZSH)]'
   '(- *)--serverlist[list available vim servers and exit]'
   '--servername[name of vim server to send to or name of server to become]:server name:->server'
@@ -87,6 +82,20 @@ arguments=(
   '(- *)--version[print version information and exit]'
   '(* -q)-t[edit file where tag is defined]:tag:_complete_tag'
   '(-t -q)*:file:_vim_files'
+)
+[[ $service != *g* ]] && arguments+='-g[start with GUI]'
+[[ $service != r* ]] && arguments+='-Z[restricted mode]'
+[[ $service != *diff ]] && arguments+='(-v -e -E -s -y)-d[diff mode]'
+[[ $service != *view ]] && arguments+='-R[readonly mode]'
+[[ $service = *g* ]] || (( ${words[(I)-g]} )) && arguments+=(
+  '-font:font:_xft_fonts'
+  '-geometry:geometry:_x_geometry'
+  '(-rv -reverse)'{-rv,-reverse}'[use reverse video]'
+  '-display:display:_x_display'
+  '--role[set unique role to identify main window]:role'
+  '--socketid[open vim inside another GTK widget]:xid'
+  '--echo-wid[echo window ID on stdout]'
+  '-U[use given gvimrc file instead of default .gvimrc]::rc file:_files'
 )
 
 _arguments -C -S $arguments && return
