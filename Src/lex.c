@@ -1265,51 +1265,53 @@ gettokstr(int c, int sub)
 		break;
 	    goto brk;
 	case LX2_EQUALS:
-	    if (intpos) {
-		e = hgetc();
-		if (e != '(') {
-		    hungetc(e);
-		    lexstop = 0;
-		    c = Equals;
-		} else {
-		    add(Equals);
-		    if (skipcomm()) {
-			peek = LEXERR;
-			goto brk;
-		    }
-		    c = Outpar;
-		}
-	    } else if (!sub && peek != ENVSTRING &&
-		       incmdpos && !bct && !brct) {
-		char *t = tokstr;
-		if (idigit(*t))
-		    while (++t < bptr && idigit(*t));
-		else {
-		    int sav = *bptr;
-		    *bptr = '\0';
-		    t = itype_end(t, IIDENT, 0);
-		    if (t < bptr) {
-			skipparens(Inbrack, Outbrack, &t);
-		    } else {
-			*bptr = sav;
-		    }
-		}
-		if (*t == '+')
-                    t++;
-		if (t == bptr) {
+	    if (!sub) {
+		if (intpos) {
 		    e = hgetc();
-		    if (e == '(' && incmdpos) {
-			*bptr = '\0';
-			return ENVARRAY;
+		    if (e != '(') {
+			hungetc(e);
+			lexstop = 0;
+			c = Equals;
+		    } else {
+			add(Equals);
+			if (skipcomm()) {
+			    peek = LEXERR;
+			    goto brk;
+			}
+			c = Outpar;
 		    }
-		    hungetc(e);
-		    lexstop = 0;
-		    peek = ENVSTRING;
-		    intpos = 2;
+		} else if (peek != ENVSTRING &&
+			   incmdpos && !bct && !brct) {
+		    char *t = tokstr;
+		    if (idigit(*t))
+			while (++t < bptr && idigit(*t));
+		    else {
+			int sav = *bptr;
+			*bptr = '\0';
+			t = itype_end(t, IIDENT, 0);
+			if (t < bptr) {
+			    skipparens(Inbrack, Outbrack, &t);
+			} else {
+			    *bptr = sav;
+			}
+		    }
+		    if (*t == '+')
+			t++;
+		    if (t == bptr) {
+			e = hgetc();
+			if (e == '(' && incmdpos) {
+			    *bptr = '\0';
+			    return ENVARRAY;
+			}
+			hungetc(e);
+			lexstop = 0;
+			peek = ENVSTRING;
+			intpos = 2;
+		    } else
+			c = Equals;
 		} else
 		    c = Equals;
-	    } else
-		c = Equals;
+	    }
 	    break;
 	case LX2_BKSLASH:
 	    c = hgetc();
