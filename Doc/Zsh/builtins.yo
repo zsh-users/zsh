@@ -1361,6 +1361,11 @@ or without the tt(no) prefix remains the same in this case.
 If the tt(-m) flag is given the arguments are taken as patterns
 (which should be quoted to protect them from filename expansion), and all
 options with names matching these patterns are set.
+
+Note that a bad option name does not cause execution of subsequent shell
+code to be aborted; this is behaviour is different from that of `tt(set
+-o)'.  This is because tt(set) is regarded as a special builtin by the
+POSIX standard, but tt(setopt) is not.
 )
 findex(shift)
 cindex(parameters, positional)

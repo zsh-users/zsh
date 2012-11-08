@@ -1,3 +1,8 @@
+2012-11-08  Peter Stephenson  <pws@csr.com>
+
+	* 30780: Doc/Zsh/builds.yo: document that set -o failures are
+	hard but setopt failures are soft.
+
 2012-11-07  Oliver Kiddle <opk@zsh.org>
 
 	* Benjamin R. Haskell: 30737: Completion/Unix/Command/_git:
@@ -302,5 +307,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5753 $
+* $Revision: 1.5754 $
 *****************************************************
