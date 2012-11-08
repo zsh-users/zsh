@@ -1,3 +1,8 @@
+2012-11-08  Bart Schaefer  <schaefer@zsh.org>
+
+	* 30786: Src/builtin.c: do not enter interactive history editing
+	or command execution if "fc" is called from a ZLE widget.
+
 2012-11-08  Peter Stephenson  <pws@csr.com>
 
 	* 30783: Src/lex.c: we don't want leading "="'s to be active when
@@ -311,5 +316,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5755 $
+* $Revision: 1.5756 $
 *****************************************************

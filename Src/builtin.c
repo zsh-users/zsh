@@ -1414,6 +1414,12 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 	unqueue_signals();
 	return 0;
     }
+
+    if (zleactive) {
+	zwarnnam(nam, "no interactive history within ZLE");
+	return 1;
+    }
+
     /* put foo=bar type arguments into the substitution list */
     while (*argv && equalsplit(*argv, &s)) {
 	Asgment a = (Asgment) zhalloc(sizeof *a);
