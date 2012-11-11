@@ -1,12 +1,12 @@
 #compdef ldd
 
-if _pick_variant gnu=GNU solaris --version; then
+if _pick_variant gnu='(GNU|EGLIBC)' solaris --version; then
   args=(
     '(- *)--version[display version information]'
     '(- *)--help[display help information]'
     '(-v --verbose)'{-v,--verbose}'[include symbol versioning information]'
     '(-d --data-relocs)'{-d,--data-relocs}'[perform data relocations and report missing objects]'
-    '(-f --function-relocs)'{-f,--function-relocs}'[perform data/function relocations and report missing objects]'
+    '(-r --function-relocs)'{-r,--function-relocs}'[perform data/function relocations and report missing objects]'
     '(-u --unused)'{-u,--unused}'[display any unused objects]'
   )
 else

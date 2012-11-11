@@ -1,3 +1,9 @@
+2012-11-11  Oliver Kiddle <opk@zsh.org>
+
+	* 30793: Completion/Unix/Command/_getent,
+	Completion/Unix/Command/_iconv, Completion/Unix/Command/_ldd:
+	account for eglibc in _pick_variant patterns
+
 2012-11-08  Bart Schaefer  <schaefer@zsh.org>
 
 	* 30786: Src/builtin.c: do not enter interactive history editing
@@ -316,5 +322,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5756 $
+* $Revision: 1.5757 $
 *****************************************************

@@ -5,12 +5,13 @@ local services databases keys
 local -a args
 typeset -A opt_args
 
-if _pick_variant -r is_gnu gnu=GNU unix --version; then
+if _pick_variant -r is_gnu gnu='(GNU|EGLIBC)' unix --version; then
   args+=(
     '(- 1 *)'{-\?,--help}'[display help information]'
     '(- 1 *)--usage[display a short usage message]'
     '(- 1 *)'{-V,--version}'[display version information]'
     {-s,--service=}'[specify service configuration to use]:service:->services'
+    '(-i --no-idn)'{-i,--no-idn}'[disable IDN encoding]'
   )
 fi
 

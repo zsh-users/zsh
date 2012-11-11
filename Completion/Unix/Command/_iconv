@@ -4,13 +4,13 @@ local expl curcontext="$curcontext" state line ret=1
 local LOCPATH="${LOCPATH:-/usr/lib/nls/loc}"
 local -U codeset
 
-if _pick_variant gnu=GNU unix --version; then
+if _pick_variant gnu='(GNU|EGLIBC)' unix --version; then
 
   local exargs="--list -? --help --usage --version -V"
   _arguments -C -S -s \
     "(-f --from-code $exargs)"{-f+,--from-code=}'[specify code set of input file]:code set:->codeset' \
     "(-t --to-code $exargs)"{-t+,--to-code=}'[specify code set for output]:code set:->codeset' \
-    '(- 1)--list[list all character code sets]' \
+    '(- 1 -l --list)'{-l,--list}'[list all character code sets]' \
     "($exargs)-c[omit invalid characters from output]" \
     "(-o --output $exargs)"{-o+,--output=}'[specify output file]:output file:_files' \
     "(-s --silent --verbose $exargs)"{-s,--silent}'[suppress warnings]' \
