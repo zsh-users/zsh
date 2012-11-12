@@ -30,6 +30,7 @@ _arguments -s \
   '--noconnect[disable autoconnect]' \
   '(-n --nick)'{-n,--nick=}'[set nick name]:nick:_irssi_nick' \
   '(-h --hostname)'{-h,--hostname=}'[specify hostname]:hostname:_hosts' \
+  '(-d --dummy)'{-d,--dummy}'[use the dummy terminal mode]' \
   '(-)'{-v,--version}'[display version information]' \
   '(-)'{-\?,--help}'[display help information]' \
   '(-)--usage[display usage]'

@@ -1,3 +1,8 @@
+2012-11-12  Oliver Kiddle <opk@zsh.org>
+
+	* 30794: Completion/Unix/Command/_irssi,
+	Completion/Unix/Command/_mutt: update for new options
+
 2012-11-11  Oliver Kiddle <opk@zsh.org>
 
 	* 30793: Completion/Unix/Command/_getent,
@@ -322,5 +327,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5757 $
+* $Revision: 1.5758 $
 *****************************************************

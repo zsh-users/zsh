@@ -1,11 +1,14 @@
 #compdef mutt
 
-_arguments -s \
+_arguments -s -S \
   '::recipient:_email_addresses -n mutt' \
-  '*-a[attach file using MIME]:file attachment:_files' \
+  '(- :)-A[expand given alias]:alias:_email_addresses -n mutt' \
+  '*-a[attach file using MIME]::file attachment:_files' \
   '*-b[specify a BCC recipient]:BCC recipient:_email_addresses -n mutt' \
   '*-c[specify a CC recipient]:CC recipient:_email_addresses -n mutt' \
-  '-e+[specify a post-init configuration command]:post-init configuration:' \
+  '(- :)-D[print the value of all variables]' \
+  '-d+[log debugging output to ~/.muttdebug0]:level:(1 2 3 4 5)' \
+  '-e+[specify a post-init configuration command]:post-init configuration' \
   '-f+[specify mailbox to load]:mailbox: _mailboxes' \
   '-F+[specify an init file]:init file:_files' \
   '-h[display help]' \
@@ -14,6 +17,7 @@ _arguments -s \
   '-m+[specify default mailbox type]:mailbox type:(mbox MMDF MH Maildir)' \
   '-n[bypass system configuration]' \
   '-p[resume postponed message]' \
+  '(- :)-Q+[query a configuration variable]:variable:(${${(f)"$(_call_program variables mutt -D 2>/dev/null)"}%%( is|=)*})' \
   '-R[open in read-only mode]' \
   '-s+[specify a subject]:subject:' \
   '-v[display mutt version]' \
