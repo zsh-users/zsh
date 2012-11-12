@@ -1,5 +1,8 @@
 2012-11-12  Oliver Kiddle <opk@zsh.org>
 
+	* 30795: Completion/Unix/Command/_xz,
+	Completion/Unix/Command/_bzip2: new xz completion, new bzip2 options
+
 	* 30794: Completion/Unix/Command/_irssi,
 	Completion/Unix/Command/_mutt: update for new options
 
@@ -327,5 +330,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5758 $
+* $Revision: 1.5759 $
 *****************************************************

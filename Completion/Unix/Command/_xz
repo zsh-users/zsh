@@ -1,0 +1,85 @@
+#compdef xz unxz xzcat=unxz lzma=xz unlzma=unxz lzcat=unxz -redirect-,<,unxz=unxz -redirect-,>,xz=unxz -redirect-,<,xz=xz -value-,XZ_OPT,-default- -value-,XZ_DEFAULTS,-default-
+
+local decompress files expl state line curcontext="$curcontext" ret=1
+typeset -A opt_args
+local decomp="(-z --compress --decompress -d --test -t --list -l --single-stream --no-sparse)"
+
+files=( '(--files --files0)*:files:->files' )
+case "$service" in
+  *XZ_*)
+    compset -q
+    words=( fake "$words[@]" )
+    (( CURRENT++ ))
+    files=()
+  ;&
+  xz) decompress=no;&
+  unxz) _arguments -C -s -S "$files[@]" \
+    '(- *)'{-h,--help}'[display help message]' \
+    '(- *)'{-H,--long-help}'[display the long help (lists also the advanced options)]' \
+    '(-d --decompress --compress -z --test -t --list -l)'{-d,--decompress}'[decompress]' \
+    "${decomp}"{-z,--compress}'[compress]' \
+    '(-k --keep)'{-k,--keep}"[keep (don't delete) input files]" \
+    '(-f --force)'{-f,--force}'[force overwrite]' \
+    '(-t --test --decompress -d --compress -z --list -l)'{-t,--test}'[test compressed file integrity]' \
+    '(-t --test --decompress -d --compress -z --list -l)'{-l,--list}'[list information about .xz files]' \
+    '(-c --stdout)'{-c,--stdout}'[write on standard output]' \
+    \*{-q,--quiet}'[suppress all warnings]' \
+    \*{-v,--verbose}'[verbose mode]' \
+    '(- *)'{-V,--version}'[display version number]' \
+    '(-e --extreme)'{-e,--extreme}'[try to improve compression ratio by using more CPU time]' \
+    '(-1 -2 -3 -4 -5 -6 -7 -8 -9 --fast       )--best' \
+    '(-1 -2 -3 -4 -5 -6 -7 -8 -9        --best)--fast' \
+    '(   -2 -3 -4 -5 -6 -7 -8 -9 --fast --best)-1' \
+    '(-1    -3 -4 -5 -6 -7 -8 -9 --fast --best)-2' \
+    '(-1 -2    -4 -5 -6 -7 -8 -9 --fast --best)-3' \
+    '(-1 -2 -3    -5 -6 -7 -8 -9 --fast --best)-4' \
+    '(-1 -2 -3 -4    -6 -7 -8 -9 --fast --best)-5' \
+    '(-1 -2 -3 -4 -5	-7 -8 -9 --fast --best)-6' \
+    '(-1 -2 -3 -4 -5 -6    -8 -9 --fast --best)-7' \
+    '(-1 -2 -3 -4 -5 -6 -7    -9 --fast --best)-8' \
+    '(-1 -2 -3 -4 -5 -6 -7 -8	 --fast --best)-9' \
+    "${decomp}--single-stream[decompress only the first stream]" \
+    "${decomp}--no-sparse[do not create sparse files when decompressing]" \
+    '(* --files --files0)--files=-[read list of files to process from file]::file:_files' \
+    '(* --files --files0)--files0=-[read null terminated list of files to process from file]::file:_files' \
+    '(-F --format)'{-F,--format}'=[specify file format]:format;(auto xz lzma raw)' \
+    '(-C --check)'{-C,--check}'=[integrity check type]:check type:(none crc32 crc64 sha256)' \
+    '--memlimit-compress=[set memory usage limit for compression]:memory usage' \
+    '--memlimit-decompress=[set memory usage limit for decompression]:memory usage' \
+    '(-M --memlimit --memory)'{-M+,--memlimit=,--memory=}'[set memory usage limit]:memory usage' \
+    '--no-adjust[give error if settings exceed memory limit]' \
+    '(-Q --no-warn)'{-Q,--no-warn}'[make warnings not affect exit status]' \
+    '--robot[use machine-parsable messages]' \
+    --{x86,powerpc,ia64,arm,armthumb,sparc}=-'[add a branch/call/jump filter]::option:->bcj-options' \
+    --lzma{1,2}=-'[add lzma filter]::option:->lzma-options' \
+    '--delta=-[add delta filter]::option:->delta-options' \
+    '(- *)--info-memory[display amount of RAM and memory usage limits]' && ret=0
+  ;;
+esac
+
+case $state in
+  files)
+    (( $+opt_args[-z] || $+opt_args[--compress] )) && decompress=no
+    [[ -n $opt_args[(i)-([dtl]|-decompress|-test|-list)] ]] && unset decompress
+    if [[ -z "$decompress" ]]; then
+      _description files expl 'compressed file'
+      _files "$expl[@]" -g '*.(xz|txz|lzma|tlz)(-.)' && return
+    else
+      _description files expl 'file to compress'
+      _files "$expl[@]" -g '^*.(xz|txz|lzma|tlz)(-.)' && return
+    fi
+  ;;
+  lzma-options)
+    _values -s , options 'preset:preset' 'dict:size' 'lc:context bits' \
+      'lp:position bits' 'mf:matchfinder:(hc3 hc4 bt2 bt3 bt4)' \
+      'mode:mode:(fast normal)' 'nice:length' 'depth:depth' && ret=0
+  ;;
+  bcj-options)
+    _values options 'start:offset' && return
+  ;;
+  delta-options)
+    _values options 'dist:distance' && return
+  ;;
+esac
+
+return ret
