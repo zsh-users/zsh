@@ -1733,6 +1733,22 @@ Make the tt(echo) builtin compatible with the BSD manref(echo)(1) command.
 This disables backslashed escape sequences in echo strings unless the
 tt(-e) option is specified.
 )
+pindex(CONTINUE_ON_ERROR)
+pindex(NO_CONTINUE_ON_ERROR)
+pindex(CONTINUEONERROR)
+pindex(NOCONTINUEONERROR)
+cindex(error, option to continue script on)
+item(tt(CONTINUE_ON_ERROR))(
+If a fatal error is encountered (see 
+ifnzman(noderef(Errors))\
+ifzman(the section ERRORS in zmanref(zshmisc))), and the code is running
+in a script, the shell will resume execution at the next statement
+in the script at the top level, in other words outside all functions
+or shell constructs such as loops and conditions.  This mimics the
+behaviour of interactive shells, where the shell returns to the
+line editor to read a new command; it was the normal behaviour in versions
+of zsh before 5.0.1.
+)
 pindex(CSH_JUNKIE_HISTORY)
 pindex(NO_CSH_JUNKIE_HISTORY)
 pindex(CSHJUNKIEHISTORY)

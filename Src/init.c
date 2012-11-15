@@ -1608,15 +1608,20 @@ zsh_main(UNUSED(int argc), char **argv)
 	 * We only do this at top level, because if we are
 	 * executing stuff we may refer to them by job pointer.
 	 */
+	int errexit = 0;
 	maybeshrinkjobtab();
 
 	do {
 	    /* Reset return from top level which gets us back here */
 	    retflag = 0;
 	    loop(1,0);
+	    if (errflag && !interact && !isset(CONTINUEONERROR)) {
+		errexit = 1;
+		break;
+	    }
 	} while (tok != ENDINPUT && (tok != LEXERR || isset(SHINSTDIN)));
-	if (tok == LEXERR) {
-	    /* Make sure a parse error exits with non-zero status */
+	if (tok == LEXERR || errexit) {
+	    /* Make sure a fatal error exits with non-zero status */
 	    if (!lastval)
 		lastval = 1;
 	    stopmsg = 1;

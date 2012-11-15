@@ -113,6 +113,7 @@ static struct optname optns[] = {
 {{NULL, "combiningchars",     0},			 COMBININGCHARS},
 {{NULL, "completealiases",    0},			 COMPLETEALIASES},
 {{NULL, "completeinword",     0},			 COMPLETEINWORD},
+{{NULL, "continueonerror",    0},                        CONTINUEONERROR},
 {{NULL, "correct",	      0},			 CORRECT},
 {{NULL, "correctall",	      0},			 CORRECTALL},
 {{NULL, "cshjunkiehistory",   OPT_EMULATE|OPT_CSH},	 CSHJUNKIEHISTORY},

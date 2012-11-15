@@ -438,7 +438,7 @@ where var(term) is at least one newline or tt(;).
 A short form of tt(select).
 )
 enditem()
-texinode(Reserved Words)(Comments)(Alternate Forms For Complex Commands)(Shell Grammar)
+texinode(Reserved Words)(Errors)(Alternate Forms For Complex Commands)(Shell Grammar)
 sect(Reserved Words)
 cindex(reserved words)
 findex(disable, use of)
@@ -451,7 +451,56 @@ select coproc nocorrect foreach end ! [[ { })
 
 Additionally, `tt(})' is recognized in any position if neither the
 tt(IGNORE_BRACES) option nor the tt(IGNORE_CLOSE_BRACES) option is set.
-texinode(Comments)(Aliasing)(Reserved Words)(Shell Grammar)
+texinode(Errors)(Comments)(Reserved Words)(Shell Grammar)
+sect(Errors)
+cindex(errors, handling of)
+Certain errors are treated as fatal by the shell: in an interactive
+shell, they cause control to return to the command line, and in a
+non-interactive shell they cause the shell to be aborted.  In older
+versions of zsh, a non-interactive shell running a script would not
+abort completely, but would resume execution at the next command to be
+read from the script, skipping the remainder of any functions or
+shell constructs such as loops or conditions; this somewhat illogical
+behaviour can be recovered by setting the option tt(CONTINUE_ON_ERROR).
+
+Fatal errors found in non-interactive shells include:
+startlist()
+list(Failure to parse shell options passed when invoking the shell)
+list(Failure to change options with the tt(set) builtin)
+list(Parse errors of all sorts, including failures to parse
+mathematical expressions)
+list(Failures to set or modify variable behaviour with tt(typeset),
+tt(local), tt(declare), tt(export), tt(integer), tt(float))
+list(Execution of incorrectly positioned loop control structures
+(tt(continue), tt(break)))
+list(Attempts to use regular expression with no regular expression
+module available)
+list(Disallowed operations when the tt(RESTRICTED) options is set)
+list(Failure to create a pipe needed for a pipeline)
+list(Failure to create a multio)
+list(Failure to autoload a module needed for a declared shell feature)
+list(Errors creating command or process substitutions)
+list(Syntax errors in glob qualifiers)
+list(File generation errors where not caught by the option tt(BAD_PATTERN))
+list(All bad patterns used for matching within case statements)
+list(File generation failures where not caused by tt(NO_MATCH) or
+list(All file generation errors where the pattern was used to create a
+multio)
+list(Memory errors where detected by the shell)
+list(Invalid subscripts to shell variables)
+list(Attempts to assign read-only variables)
+list(Logical errors with variables such as assignment to the wrong type)
+list(Use of invalid variable names)
+list(Errors in variable substitution syntax)
+list(Failure to convert characters in tt($')...tt(') expressions)
+similar options)
+endlist()
+
+If the tt(POSIX_BUILTINS) option is set, more errors associated with
+shell builtin commands are treated as fatal, as specified by the POSIX
+standard.
+
+texinode(Comments)(Aliasing)(Errors)(Shell Grammar)
 sect(Comments)
 cindex(comments)
 pindex(INTERACTIVE_COMMENTS, use of)

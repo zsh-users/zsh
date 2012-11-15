@@ -573,7 +573,7 @@ histsubchar(int c)
 		} else {
 		    herrflush();
 		    unqueue_signals();
-		    zerr("Ambiguous history reference");
+		    zerr("ambiguous history reference");
 		    return -1;
 		}
 

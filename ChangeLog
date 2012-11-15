@@ -1,5 +1,11 @@
 2012-11-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 30789: Doc/Zsh/grammar.yo, Doc/Zsh/options.yo, Src/hist.c,
+	Src/init.c, Src/options.c, Src/zsh.h, Test/A04redirect.zsh:  add
+	CONTINUE_ON_ERROR option for compatibility but turn it off:
+	scripts exit on an error instead of returning to the top-level
+	like interactive shells.
+
 	* 30800: Michal Halenka: Completion/Unix/Command/_arping: fix
 	option.
 
@@ -335,5 +341,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5760 $
+* $Revision: 1.5761 $
 *****************************************************

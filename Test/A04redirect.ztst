@@ -419,26 +419,26 @@
 >output
 ?zsh:.:2: no such file or directory: /nonexistent/nonexistent
 
+  $ZTST_testdir/../Src/zsh -f -o CONTINUE_ON_ERROR <<<'
+  readonly foo
+  foo=bar set output
+  echo output'
+0:failed assignment on posix special, CONTINUE_ON_ERROR
+>output
+?zsh: read-only variable: foo
+
   $ZTST_testdir/../Src/zsh -f <<<'
   readonly foo
   foo=bar set output
   echo output'
-0:failed assignment on posix special, NO_POSIX_BUILTINS
->output
+1:failed assignment on posix special, NO_CONTINUE_ON_ERROR
 ?zsh: read-only variable: foo
 
-  $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS <<<'
-  readonly foo
-  foo=bar set output
-  echo output'
-1:failed assignment on posix special, POSIX_BUILTINS
-?zsh: read-only variable: foo
-
-  $ZTST_testdir/../Src/zsh -f -o POSIX_BUILTINS <<<'
+  $ZTST_testdir/../Src/zsh -f -o CONTINUE_ON_ERROR <<<'
   readonly foo
   foo=bar echo output
   echo output'
-0:failed assignment on non-posix-special, POSIX_BUILTINS
+0:failed assignment on non-posix-special, CONTINUE_ON_ERROR
 >output
 ?zsh: read-only variable: foo
 
