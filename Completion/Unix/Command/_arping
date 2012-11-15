@@ -35,7 +35,7 @@ _arguments -s \
   '-s[set source MAC address]:source MAC address' \
   '-t[set target MAC address]:target MAC address' \
   '-c[send this many requests]:count' \
-  '-i[interface]:interface:_net_interfaces' \
+  '-I[interface]:interface:_net_interfaces' \
   '-A[only count addresses matching requested address]' \
   '(-B):address:_hosts'
  
