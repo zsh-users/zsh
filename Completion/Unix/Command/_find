@@ -1,18 +1,23 @@
 #compdef find
 
 _arguments \
+  '(- *)-help' '(-)--help' \
+  '(- *)-version' '(-)--version' \
+  '(-L -P)-H[only follow symlinks when resolving command-line arguments]' \
+  '(-H -P)-L[follow symlinks]' \
+  '(-H -L)-P[never follow symlinks]' \
+  '-D[print diagnostics]:deb option:(help tree search stat rates opt exec)' \
+  '-O+[enable query optimisation]:level:(1 2 3)' \
   '*-daystart' \
-  '*-depth' \
+  '*-d' '*-depth' \
   '*-follow' \
-  '*-help' \
-  '*-ignore_readdir_race' \
-  '*-maxdepth:maximum search depth:' \
-  '*-mindepth:minimum search depth:' \
+  '(-noignore_readdir_race)-ignore_readdir_race' \
+  '*-maxdepth:maximum search depth' \
+  '*-mindepth:minimum search depth' \
   '*-mount' \
-  '*-noignore_readdir_race' \
+  '(-ignore_readdir_race)-noignore_readdir_race' \
   '*-noleaf' \
-  '*-regextype:regexp syntax:(emacs posix-awk posix-basic posix-egrep posix-extended)' \
-  '*-version' \
+  '-regextype:regexp syntax:(emacs posix-awk posix-basic posix-egrep posix-extended)' \
   '*-warn' \
   '*-nowarn' \
   '*-xdev' \
@@ -27,6 +32,7 @@ _arguments \
   '*-newer:file to compare (modification time):_files' \
   '*-used:access after inode change (days):' \
   '*-empty' \
+  '*-executable' \
   '*-false' \
   '*-fstype:file system type:_file_systems' \
   '*-gid:numeric group ID:' \
@@ -48,6 +54,8 @@ _arguments \
   '*-nouser' \
   '*-nogroup' \
   '*-perm:file permission bits:' \
+  '*-readable' \
+  '*-writable' \
   '*-size:file size:' \
   '*-samefile:same inode as:_files' \
   '*-true' \
@@ -68,4 +76,7 @@ _arguments \
   '*-prune' \
   '*-quit' \
   '*-ls' \
+  '*-and' '*-a' \
+  '*-or' '*-o' \
+  '*-not' \
   '*:directory:_files -/'
