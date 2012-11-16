@@ -37,7 +37,7 @@ elif compset -P '*[^\\]-'; then
   _message -e size 'point size' && ret=0
 else
   _wanted fonts expl font compadd "$suf[@]" \
-      ${${(f)"$(_call_program fonts fc-list 2>/dev/null)"//,/$'\n'}%%:*} && ret=0
+      ${(us:,:)$(_call_program fonts fc-list -f '%\{family\},' 2>/dev/null)} && ret=0
 fi
 
 return ret
