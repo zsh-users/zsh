@@ -1,3 +1,8 @@
+2012-11-18  Bart Schaefer  <schaefer@zsh.org>
+
+	* users/17042: Src/jobs.c: don't stomp the environment in "jobs -Z"
+	unless we've first copied it to new memory.
+
 2012-11-16  Oliver Kiddle <opk@zsh.org>
 
 	* 30802: Completion/Unix/Command/_find: add new command switches
@@ -348,5 +353,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5762 $
+* $Revision: 1.5763 $
 *****************************************************

@@ -1743,12 +1743,14 @@ init_jobs(char **argv, char **envp)
 	    goto done;
 	p = strchr(q, 0);
     }
+#if !defined(HAVE_PUTENV) && !defined(USE_SET_UNSET_ENV)
     for(; *envp; envp++) {
 	q = *envp;
 	if(q != p+1)
 	    goto done;
 	p = strchr(q, 0);
     }
+#endif
     done:
     hackspace = p - hackzero;
 #endif
