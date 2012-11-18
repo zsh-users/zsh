@@ -1,3 +1,7 @@
+2012-11-16  Vin Shelton  <acs@xemacs.org>
+
+	* Doc/Zsh/grammar.yo: users/16865: Added missing menu item for Errors.
+
 2012-11-18  Bart Schaefer  <schaefer@zsh.org>
 
 	* users/17042: Src/jobs.c: don't stomp the environment in "jobs -Z"
@@ -353,5 +357,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5763 $
+* $Revision: 1.5764 $
 *****************************************************
