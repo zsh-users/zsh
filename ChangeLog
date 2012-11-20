@@ -1,3 +1,9 @@
+2012-11-20  Oliver Kiddle <opk@zsh.org>
+
+	* 30811: Completion/Linux/Command/_btrfs,
+	Completion/Unix/Command/_mount: new completion for btrfs and
+	complete btrfs and ext4 mount options and new linux mount flags
+
 2012-11-16  Vin Shelton  <acs@xemacs.org>
 
 	* Doc/Zsh/grammar.yo: users/16865: Added missing menu item for Errors.
@@ -357,5 +363,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5764 $
+* $Revision: 1.5765 $
 *****************************************************

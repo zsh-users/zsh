@@ -17,7 +17,7 @@ if [[ "$OSTYPE" == cygwin ]]; then
 	'(-)'{-i,--import-old-mounts}'[import old mounts]' \
 	'(-)'{-p,--show-cygdrive-prefix}'[show cygdrive prefix]' \
 	'(-)'{-c,--change-cygdrive-prefix}'[cygdrive prefix]:cygdrive prefix (POSIX path):_files -P/ -W "(/)" -/' \
-  
+
     return
   else
     local line
@@ -45,7 +45,7 @@ _fs_ufs _fs_efs _fs_cd9660 _fs_iso9660 _fs_cachefs _fs_s5fs _fs_tmpfs _fs_pcfs \
 _fs_hsfs _fs_advfs _fs_cdfs _fs_affs _fs_ext2 _fs_fat _fs_ext3 _fs_msdos \
 _fs_msdosfs _fs_umsdos _fs_vfat _fs_hpfs _fs_ntfs _fs_reiserfs _fs_smbfs \
 _fs_xfs _fs_std _fs_devfs _fs_fdesc _fs_kernfs _fs_linprocfs _fs_linsysfs \
-_fs_procfs
+_fs_procfs _fs_btrfs _fs_ext4
 
 typeset -A opt_args
 
@@ -54,11 +54,11 @@ if (( ! $+_fs_any )); then
   local _fs_any
 
   # These are tables describing the possible values and their
-  # arguments for the `-o' option. There is one array per 
+  # arguments for the `-o' option. There is one array per
   # file system type (only for those that accept more values
   # than those in the `_fs_any' array). The elements of the
   # array are used as arguments to `_values'. The first tables
-  # are used by several systems while system specific tables are  
+  # are used by several systems while system specific tables are
   # (re)defined in a "$OSTYPE" case.
 
   _fs_any=(
@@ -121,7 +121,7 @@ if (( ! $+_fs_any )); then
       'nosuid[prevent running setuid/setgid from mount]'
       "$_fs_any[@]"
     )
-    
+
     _fs_nfs=(
       '(fg)bg[mount in background]'
       '(bg)fg[mount in foreground]'
@@ -155,7 +155,7 @@ if (( ! $+_fs_any )); then
       'grpid[inherit group id of parent directory]'
       "$_fs_any[@]"
     )
-    
+
     _fs_efs=(
       'raw[raw device pathname to filesystem]:raw device pathname:->devordir'
       '(nofsck)fsck[fsck should check this filesystem by default]'
@@ -164,7 +164,7 @@ if (( ! $+_fs_any )); then
       '(quota)noquota[turn off quotas]'
       'lbsize[no of bytes transferred in each operation]:bytes'
     )
-    
+
     _fs_iso9660=(
       'setx[set execute permissions on every file]'
       'notranslate[don'\''t translate filenames]'
@@ -176,7 +176,7 @@ if (( ! $+_fs_any )); then
       '(rrip)norrip[disable rock ridge extensions]'
       'nmconv[specify filename translation]:filename translation:((c\:no\ translation l\:to\ lowercase m\:suppress\ version\ no))'
     )
-      
+
     _fs_nfs=(
       '(fg)bg[mount in background]'
       '(bg)fg[mount in foreground]'
@@ -194,7 +194,7 @@ if (( ! $+_fs_any )); then
       'symttl[time-to-live of cached symbolic links]:seconds'
       "$_nfs_access[@]"
     )
-    
+
     _fs_cachefs=(
       'backfstype[type of the back file system]:back file system type:(efs nfs iso9660 dos hfs cachefs)'
       'backpath[specify back file system location]:back file system location:_files -/'
@@ -206,9 +206,9 @@ if (( ! $+_fs_any )); then
       'local-access[check permissions locally]'
       'purge[purge any cached information]'
       "$_nfs_access[@]"
-    ) 
-    
-    ;;  
+    )
+
+    ;;
   solaris*)
     _fs_s5fs=(
       'remount[remount file system]'
@@ -270,7 +270,7 @@ if (( ! $+_fs_any )); then
       'vers[set NFS version number]:NFS version number:(2 3)'
       "$_nfs_access[@]"
       "$_fs_s5fs[@]"
-    ) 
+    )
     _fs_cachefs=(
       'backfstype[type of the back file system]:back file system type:(nfs hsfs)'
       'backpath[specify back file system location]:back file system location:_files -/'
@@ -306,10 +306,15 @@ if (( ! $+_fs_any )); then
     _fs_any=(
       '(sync)async[do all I/O asynchronously]'
       '(noatime)atime[update access time]'
-      '(norelatime)relatime[update atime relative to mtime/ctime]' 
+      '(norelatime)relatime[update atime relative to mtime/ctime]'
+      '(nostrictatime)strictatime[full atime updates]'
+      '(strictatime)nostrictatime[default atime update behaviour]'
       '(rw suid dev exec async)defaults[use default options]'
       '(nodev)dev[interpret devices]'
+      '(nodiratime)diratime[update directory access time]'
+      "(diratime)nodiratime[don't update directory access time]"
       '(noexec)exec[permit execution of binaries]'
+      "noiversion[don't increment i_version inode field]"
       '(nomand)mand[allow mandatory locks]'
       "(atime)noatime[don't update access time]"
       "(relatime)norelatime[update access time without regard to mtime/ctime]"
@@ -327,6 +332,10 @@ if (( ! $+_fs_any )); then
       'encryption[enable encryption]:cypher'
       'keybits[set number of bits in encryption key]:key size:(64 128 160 192 256)'
       'offset[specify data start for loopback mount]:offset (bytes)'
+      '(loud)silent' '(silent)loud'
+      '(fscontext defcontext)context:context'
+      '(context)'{fscontext,defcontext}':context'
+      'rootcontext:context'
     )
     _fs_adfs=(
       'uid[set owner of root]:user ID'
@@ -383,6 +392,7 @@ if (( ! $+_fs_any )); then
       'umask[specify umask]:umask value (octal)'
       'dmask[specify umask for directories only]:umask value (octal)'
       'fmask[specify umask for files only]:umask value (octal)'
+      'allow_utime[control permission check of mtime/atime]:value'
       'check[specify checking level]:checking level:((relaxed\:accept\ upper\ and\ lower\ case,\ truncate\ long\ name normal\:like\ '"'\`'"'relaxed'"\\'"',\ but\ reject\ special\ characters strict\:like\ '"'\`'"'normal'"\\'"',\ but\ no\ long\ parts))'
       'codepage[specify codepage for converting filenames to short form]:codepage'
       'conf[specify CR/NL conversion]:CR/NL conversion mode:((binary\:no\ translation text\:conversion\ on\ all\ files auto\:perform\ translation\ on\ file\ without\ binary\ extension))'
@@ -392,14 +402,25 @@ if (( ! $+_fs_any )); then
       'debug[debug mode]'
       'fat[specify fat type]:fat type (bit):(12 16 32)'
       'iocharset[character set to use for converting from 8 bit to unicode]:character set'
+      'tz[set timezone conversion]:zone:(UTC)'
       'quiet[quiet mode]'
     )
     _fs_ext3=(
       "$_fs_ext2[@]"
       'journal[update fs journal]:update or inode number:(update)'
+      'journal_dev[specify new journal location]:device number'
       'noload[do not load journal]'
       'data[specify mode for data]:journalling mode:(journal ordered writeback)'
+      'barrier[enable/disable barriers]:state:((0\:disabled 1\:enabled))'
       'commit[specify commit sync interval for data and metadata]:seconds'
+    )
+    _fs_ext4=(
+      "$_fs_ext3[@]"
+      journal_checksum journal_sync_commit
+      inode_readahead:blocks stripe:blocks delalloc nodelalloc
+      {max,min}'_batch_time:time (usecs)' journal_ioprio:priority
+      abort {,no}auto_da_alloc {,no}discard nouid32 resize
+      {,no}block_validity dioread_{,no}lock i_version
     )
     _fs_msdos=( "$_fs_fat[@]" )
     _fs_umsdos=( "$_fs_fat[@]" )
@@ -527,6 +548,27 @@ if (( ! $+_fs_any )); then
       'sunit[specify stripe unit]:size'
       'swidth[specify stripe width]:size'
     )
+    _fs_btrfs=(
+      'subvol[mount a subvolume]:path'
+      'subvolid[mount subvolume by id]:id'
+      'device[scan device for filesystems]:device'
+      'nodatasum[disable checksums of new files]'
+      'nobarrier[disable use of device barriers]'
+      'max_inline[set maximum space for inline data]:size (bytes)'
+      'alloc_start[set where on disk allocations start]:number'
+      'thread_pool[number of worker threads to allocate]:number'
+      '(compress-force)compress[enable compression]:algorithm:(zlib lzo no)'
+      '(compress)compress-force[enable compression for all files]:algorithm:(zlib lzo no)'
+      'ssd[optimise behaviour for SSDs]'
+      'ssd_spread[be strict about finding a large unused region for new allocations]'
+      'discard[enable discard/TRIM on freed blocks]'
+      'notreelog[disable the tree logging used for fsync]'
+      metadata_ratio:number {,no}space_cache clear_cache
+      user_subvol_rm_allowed autodefrag inode_cache
+      enospc_debug recovery check_int check_int_data
+      check_int_print_mask:number skip_balance
+      'fatal_errors:action:(bug panic)'
+    )
     ;;
   freebsd*|dragonfly*)
     _fs_any=(
@@ -628,28 +670,31 @@ if [[ "$service" = mount ]]; then
     deffs=efs
     ;;
   linux*)
+    local excl='-V --version -h --help'
     args=( -s
-      '(- :)-h[show help]'
-      '(- :)-V[show version]'
-      '(-V -h)-v[verbose mode]'
-      '(-V -h)-p[specify file descriptor from which to read passphrase]:file descriptor:_file_descriptors'
-      '(-V -h -o :)-a[mount all filesystems in fstab]'
-      '(-V -h)-F[fork off one child per device]'
-      '(-V -h)-f[fake mount]'
-      "(-V -h)-i[don't call /sbin/mount.<fs> helper]"
-      '(-V -h)-l[output ext2, ext3 and XFS labels]'
-      "(-V -h)-n[don't write /etc/mtab]"
-      '(-V -h)-s[tolerate sloppy mount options]'
-      '(-V -h -w)-r[mount read-only]'
-      '(-V -h -r)-w[mount read/write]'
-      '(-V -h)-L[mount partition with specified label]:label'
-      '(-V -h)-U[mount partition with specified uuid]:uuid'
-      '(-V -h)-t[specify file system type]:file system type:->fslist'
-      '(-V -h)-O[with -a, restrict filesystems by options]:file system option:->fsopt'
-      '(-V -h -a -O)-o[specify file system options]:file system option:->fsopt'
-      '(: -)--bind[remount part of filesystem elsewhere]:old directory:_directories:new directory:_directories'
-      '(: -)--rbind[remount part of filesystem including submounts elsewhere]:old directory:_directories:new directory:_directories'
-      '(: -)--move[move part of filesystem elsewhere]:old directory:_directories:new directory:_directories'
+      '(- :)'{-h,--help}'[show help]'
+      '(- :)'{-V,--version}'[show version]'
+      "($excl -v --verbose)"{-v,--verbose}'[verbose mode]'
+      "($excl -p --pass-fd)"{-p+,--pass-fd=}'[specify file descriptor from which to read passphrase]:file descriptor:_file_descriptors'
+      "($excl -o : -a --all)"{-a,--all}'[mount all filesystems in fstab]'
+      "($excl -F --fork)"{-F,--fork}'[fork off one child per device]'
+      "($excl -f --fake)"{-f,--fake}'[fake mount]'
+      "($excl -i --internal-only)"{-i,--internal-only}"[don't call /sbin/mount.<fs> helper]"
+      "($excl)-l[output ext2, ext3, ext4 and XFS labels]"
+      "($excl -n --no-mtab)"{-n,--no-mtab}"[don't write /etc/mtab]"
+      "($excl)--no-canonicalize[don't convert paths to canonical form]"
+      "($excl)-s[tolerate sloppy mount options]"
+      "($excl -w -r --read-only)"{-r,--read-only}'[mount read-only]'
+      "($excl -r -w --rw)"{-w,--rw}'[mount read/write]'
+      "($excl)-L+[mount partition with specified label]:label:->labels"
+      "($excl)-U+[mount partition with specified uuid]:uuid"
+      "($excl -t --types)"{-t+,--types=}'[specify file system type]:file system type:->fslist'
+      "($excl -O --test-opts)"{-O+,--test-opts=}'[with -a, restrict filesystems by options]:file system option:->fsopt'
+      "($excl -a -O -o --options)"{-o+,--options=}'[specify file system options]:file system option:->fsopt'
+      '(: -)'{-B,--bind}'[remount part of filesystem elsewhere]:old directory:_directories:new directory:_directories'
+      '(: -)'{-R,--rbind}'[remount part of filesystem including submounts elsewhere]:old directory:_directories:new directory:_directories'
+      '(: -)'{-M,--move}'[move part of filesystem elsewhere]:old directory:_directories:new directory:_directories'
+      '(: -)--make-'{r,}{shared,slave,private,unbindable}':mount point:->udevordir'
       ':dev or dir:->devordir'
       ':mount point:_files -/'
     )
@@ -693,7 +738,7 @@ if [[ "$service" = mount ]]; then
   freebsd*|dragonfly*|darwin*)
     args=( -s
       '(:)-a[mount all filesystems in fstab]'
-      '-d[cause everything to be done except for the actual system call]'      
+      '-d[cause everything to be done except for the actual system call]'
       '-f[forced mount]'
       '-o[specify file system options]:file system option:->fsopt'
       '-p[print mounted file systems]'
@@ -747,21 +792,22 @@ else
 	'-t[unmount all filesystems of specified type]:file system type:_file_systems'
 	'-v[verbose]'
       )
-    ;;  
+    ;;
     linux*)
+      local excl='-V --version -h --help'
       args=(
-	'(- *)-h[show help]'
-	'(- *)-V[show version]'
-	'(-V -h)-v[verbose mode]'
-	"(-V -h)-n[don't write /etc/mtab]"
-	'(-V -h)-r[remount read-only on failure]'
-	'(-V -h)-d[for loopback mount, free loop device]'
-        "(-V -h)-i[don't call /sbin/umount.<fs> helper]"
-	'(-V -h *)-a[unmount all file systems from /etc/mtab]'
-	'(-V -h)-t[specify file system type]:file system type:_file_systems'
-	'(-V -h *)-O[with -a, restrict filesystems by options]:file system option:->fsopt'
-	'(-V -h)-f[force unmount]'
-	'(-V -h)-l[lazy unmount]'
+	'(- *)'{-h,--help}'[show help]'
+	'(- *)'{-V,--version}'[show version]'
+	"($excl -v --verbose)"{-v,--verbose}'[verbose mode]'
+	"($excl -n --no-mtab)"{-n,--no-mtab}"[don't write /etc/mtab]"
+	"($excl)-r[remount read-only on failure]"
+	"($excl)-d[for loopback mount, free loop device]"
+	"($excl)-i[don't call /sbin/umount.<fs> helper]"
+	"($excl *)-a[unmount all file systems from /etc/mtab]"
+	"($excl)-t[specify file system type]:file system type:_file_systems"
+	"($excl *)-O[with -a, restrict filesystems by options]:file system option:->fsopt"
+	"($excl)-f[force unmount]"
+	"($excl)-l[lazy unmount]"
 	'*:dev or dir:->udevordir'
       )
     ;;
@@ -828,7 +874,7 @@ devordir)
 
   case "$OSTYPE" in
   dragonfly*)
-    while read mline; do 
+    while read mline; do
       case $mline[(w)1] in
 	\#* )
 	  ;;
@@ -849,7 +895,7 @@ devordir)
       ;;
   freebsd*)
     local _glabel
-    while read mline; do 
+    while read mline; do
       case $mline[(w)1] in
 	\#* )
 	  ;;
@@ -862,7 +908,7 @@ devordir)
 	  ;;
       esac
     done < /etc/fstab
-    # 
+
     /sbin/ggatel list | while read mline; do
       dev_tmp+=(/dev/$mline)
     done
@@ -944,6 +990,9 @@ udevordir)
     'device-labels:device label:compadd -a dev_tmp' \
     'device-paths: device path:_canonical_paths -A dpath_tmp -N device-paths device\ path' \
     'directories:mount point:_canonical_paths -A mp_tmp -N directories mount\ point' && ret=0
+  ;;
+labels)
+  _wanted labels expl 'disk label' compadd /dev/disk/by-label/*(:t) && ret=0
   ;;
 esac
 

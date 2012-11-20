@@ -4,6 +4,7 @@ _acpi
 _acpitool
 _analyseplugin
 _brctl
+_btrfs
 _chrt
 _cryptsetup
 _ethtool

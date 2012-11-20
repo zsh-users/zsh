@@ -1,0 +1,144 @@
+#compdef btrfs
+
+local curcontext="$curcontext" curstate state line expl grp cmd ret=1
+local -a groups args
+
+groups=( subvolume filesystem device scrub balance inspect-internal help version )
+cmds_1=( create delete list snapshot get-default set-default find-new help )
+cmds_2=( df show sync defragment resize label balance help )
+cmds_3=( add delete scan help )
+cmds_4=( start cancel resume status help )
+cmds_5=( start pause cancel resume status )
+cmds_6=( inode-resolve logical-resolve help )
+
+[[ $words[2] = h(|e(|l(|p))) ]] && args=( '--full[display detailed help]' )
+
+_arguments -C "$args[@]" \
+  '(- *)--help[print help information]' \
+  '(- *)--version[print version information]' \
+  '(--version)1: :->groups' \
+  '2: :->cmds' \
+  '*:: :->args' && ret=0
+
+while (( $#state )); do
+  curstate=$state
+  shift state
+  case $curstate in
+    groups)
+      _wanted command-groups expl 'btrfs command group' compadd -a groups && ret=0
+    ;;
+    cmds)
+      : $words
+      local grp=${groups[(i)$words[2]*]}
+      : $grp
+      (( grp && grp < 7 )) || return 1
+      curcontext="${curcontext%:*:*}:$service-${groups[grp]}:"
+      _wanted commands expl command compadd -a cmds_$grp && ret=0
+    ;;
+    args)
+      : $words
+      local grp=${groups[(i)$words[1]*]}
+      (( grp && grp < 7 )) || return 1
+      local group=cmds_$grp
+      local cmd=${${(P)group}[(i)$words[2]*]}
+      (( cmd )) || return 1
+      curcontext="${curcontext%:*:*}:$service-${groups[grp]}-${${(P)group}[cmd]}:"
+      args=( '(-)--help[print help information]' )
+      case ${groups[grp]}:${${(P)group}[cmd]} in
+	filesystem:balance)
+	  if (( CURRENT == 3 )); then
+	    state+=cmds
+	  else
+	    shift words
+	    (( CURRENT-- ))
+	    state+=args
+	  fi
+	  continue
+	;;
+	subvolume:create) args+=( '1:destination:->mounts' );;
+	subvolume:delete) args+=( '1:subvolume:_files -/' );;
+	subvolume:snapshot) args+=( '-r[readonly snapshot]' '1:snapshot:_files -/' );;
+	subvolume:list) args+=( '-p[include parent ID in output]' '1:path:->mounts' );;
+	subvolume:set-default) args+=( '1:id:_guard "[0-9]#" id' '2:path:->mounts' );;
+	filesystem:resize) args+=( '1:size:_guart "(|+|-)[0-9]#[GKM]"' '2:path:->mounts' );;
+	filesystem:defragment)
+	  args+=(
+	    '-v[verbose]'
+	    '-c[compress files while defragmenting]'
+	    '-f[flush after defragmenting]'
+	    '-s[start position]:byte position'
+	    '-l[defragment limited number of bytes]:length (bytes)'
+	    '-t[defragment only files over a certain size]:minimum size (bytes)'
+	    '*:file:_files'
+	  )
+	;;
+	filesystem:label) args+=( '1:device:_files -g "*(d)"' '2:label' );;
+	filesystem:show) args+=( '(1 -)--all-devices[scan all devices in /dev]' '1: :_guard "^-*" uuid or label' );;
+	device:(add|delete)) args+=( '1:device:_files -g "*(d)"' '2:path:->mounts' );;
+	device:scan) args+=( '(1 -)--all-devices[scan all devices in /dev]' '1:device:_files -g "*(d)"' );;
+	scrub:(start|resume))
+	  args+=(
+	    "-B[don't background and print statistics at end]"
+	    '-d[print separate statistics for each device]'
+	    '-q[omit error message and statistics]'
+	    '-r[read only mode]'
+	    '-u[scrub unused space too]'
+	    '1:path or device:_files'
+	  )
+	;;
+	scrub:cancel) args+=( '1:path or device' );;
+	scrub:status) args+=( '-d[separate statistics for each device]' '1:path or device:_files' );;
+	balance:start)
+	  args+=(
+	    '(-m -s)-d+[act on data chunks]:filter:->filters'
+	    '(-d -s)-m+[act on metadata chunks]:filter:->filters'
+	    '(-d -m)-s+[act on system chunks (only under -f)]:filters:->filters'
+	    '-v[verbose mode]'
+	    '-f[force reducing of metadata integrity]'
+	    '1:path:_files -/'
+	  )
+	;;
+	balance:status) args+=( '-v[verbose mode]' '2:path:_files -/' );;
+	balance:(pause|cancel|resume)) args+=( '2:path:_files -/' );;
+	inspect*:inode*) args+=( '-v[verbose mode]' '1:inode:_files' '2:path:_files -/' );;
+	inspect*:logical*)
+	  args+=(
+	    '-v[verbose mode]'
+	    '-P[skip the path resolving and print the inodes instead]'
+	    '1:logical address:_files'
+	    '2:filesystem path:_files -/'
+	  )
+	;;
+	subvolume:get-default) ;&
+	*:sync) ;&
+	*:df) args+=( '1:path:->mounts' );;
+	*) args+=( '*: :_default' );; # fallback for unknown subcommands
+      esac
+      shift words
+      (( CURRENT-- ))
+      _arguments -C "$args[@]" && ret=0
+    ;;
+    mounts)
+      _wanted mount-points expl 'mount point' compadd \
+	  ${${${(M)${(f)"$(</etc/mtab)"}:#*btrfs*}#* }%% *} && ret=0
+    ;;
+    filters)
+      state=()
+      _values -s , filter \
+	'profiles[balance only block groups in given replication profiles]:profile:->profiles' \
+	'usage[balance block groups with usage below percentage]:percentage' \
+	'devid[limit by device ID]:device ID' \
+	'drange[balance block groups overlapping byte range]:range' \
+	'vrange[balance block groups overlapping byte range in virtual address space]:range' \
+	'convert[convert block groups to given profile]:profile:->profiles' \
+	'soft[leave chunks that already have target profile]' && ret=0
+      state=( $state )
+    ;;
+    profiles)
+      compset -P '*\|'
+      _values -s ',' profile raid0 raid1 raid10 dup single && ret=0
+    ;;
+  esac
+done
+
+return ret
