@@ -152,6 +152,16 @@
 0:commas and parentheses, part 1
 >4
 
+  print $(( 07.5 ))
+  (setopt octalzeroes; print $(( 09.5 )))
+0:leading zero doesn't affect floating point
+>7.5
+>9.5
+
+  (setopt octalzeroes; print $(( 09 )))
+1:octalzeroes rejects invalid constants
+?(eval):1: bad math expression: operator expected at `9 '
+
   (setopt octalzeroes; print $(( 08#77 )))
 0:octalzeroes doesn't affect bases
 >63

@@ -447,7 +447,8 @@ lexconstant(void)
     if (*nptr == '-')
 	nptr++;
 
-    if (*nptr == '0')
+    if (*nptr == '0' &&
+	(memchr(nptr, '.', strlen(nptr)) == NULL))
     {
 	nptr++;
 	if (*nptr == 'x' || *nptr == 'X') {
