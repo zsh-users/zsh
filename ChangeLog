@@ -1,3 +1,9 @@
+2012-12-13  Peter Stephenson  <pws@csr.com>
+
+	* 30876: Src/exec.c, Test/A06assign.ztst, Test/C03traps.ztst:
+	obscure failures to process non-zero return values could result
+	from optimising a list to a simple command.
+
 2012-12-08  Bart Schaefer  <schaefer@zsh.org>
 
 	* users/17445: Src/math.c, Test/C01arith.ztst: fix handling of
@@ -368,5 +374,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5766 $
+* $Revision: 1.5767 $
 *****************************************************

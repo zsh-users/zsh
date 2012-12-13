@@ -2019,7 +2019,7 @@ _perforce_cmd_fix() {
     '-s[set job status]:status:_perforce_statuses' \
     '1::-c required:(-c)' \
     '2::change:_perforce_changes' \
-    "3::job:_perforce_jobs$job"
+    "*::job:_perforce_jobs$job"
 }
 
 

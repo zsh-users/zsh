@@ -184,8 +184,8 @@
 
  typeset -A hash
  hash=(one 1)
- h+=string
- [[ $h[@] == string ]]
+ hash+=string
+ [[ $hash[@] == string ]]
 0:add scalar to association
 
 # tests of var+=(array)

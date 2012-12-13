@@ -388,6 +388,17 @@
 >}
 >No, really exited
 
+   (set -e
+    printf "a\nb\n" | while read line
+    do
+       [[ $line = a* ]] || continue
+       ((ctr++))
+       [[ $line = foo ]]
+    done
+    echo "ctr = $ctr"
+   )
+1:ERREXIT in loop with simple commands
+
 %clean
 
   rm -f TRAPEXIT

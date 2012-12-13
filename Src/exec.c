@@ -1207,6 +1207,9 @@ execlist(Estate state, int dont_change_job, int exiting)
 	} else
 	    donedebug = intrap ? 1 : 0;
 
+	/* Reset donetrap:  this ensures that a trap is only *
+	 * called once for each sublist that fails.          */
+	donetrap = 0;
 	if (ltype & Z_SIMPLE) {
 	    next = state->pc + WC_LIST_SKIP(code);
 	    if (donedebug != 2)
@@ -1214,9 +1217,6 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    state->pc = next;
 	    goto sublist_done;
 	}
-	/* Reset donetrap:  this ensures that a trap is only *
-	 * called once for each sublist that fails.          */
-	donetrap = 0;
 
 	/* Loop through code followed by &&, ||, or end of sublist. */
 	code = *state->pc++;
