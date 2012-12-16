@@ -2887,7 +2887,7 @@ zjoin(char **arr, int delim, int heap)
  * of items into an array of strings.               */
 
 /**/
-char **
+mod_export char **
 colonsplit(char *s, int uniq)
 {
     int ct;

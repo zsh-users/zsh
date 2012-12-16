@@ -3,6 +3,8 @@
 	* unposted: README, Config/version.mk, Etc/FAQ.yo for
 	5.0.0-test-1.
 
+	* unposted: Src/utils.c: missing mod_export.
+	
 2012-12-13  Peter Stephenson  <pws@csr.com>
 
 	* 30876: Src/exec.c, Test/A06assign.ztst, Test/C03traps.ztst:
@@ -379,5 +381,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5769 $
+* $Revision: 1.5770 $
 *****************************************************
