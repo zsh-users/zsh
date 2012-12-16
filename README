@@ -5,11 +5,8 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.0.0 of the shell.  This is a stable release.
-There have been only incremental changes since the last development
-version, 4.3.17.  The new major version number represents the
-substantial changes since the 4.2 stable release series.  The
-changes are detailed in the file NEWS.
+This is version 5.0.1 of the shell.  This is a stable release.
+There are minor new features as well as bug fixes since 5.0.0.
 
 Installing Zsh
 --------------
@@ -56,9 +53,9 @@ with native zsh emulation options and run with those same options.  This
 is now the recommended way of ensuring a function is loaded and run with
 a consistent set of options.
 
-Note that the `autoload -z' has never affected the options applied when
-the function is loaded or run, only the effect of the KSH_AUTOLOAD
-option at the point the function is loaded.
+Note that the command `autoload -z' has never affected the options
+applied when the function is loaded or run, only the effect of the
+KSH_AUTOLOAD option at the point the function is loaded.
 
 Possible incompatibilities between 4.2 and 5.0
 ----------------------------------------------
