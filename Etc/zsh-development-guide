@@ -841,13 +841,13 @@ Distribution of files
 ---------------------
 
 zsh is distributed in two parts: a "src" distribution containing all
-the source files (roughly, but not exactly, corresponding to the CVS
+the source files (roughly, but not exactly, corresponding to the git
 tree), and a "doc" distribution containing some pre-built files from
 the documentation directory.  All the files in the "doc" distribution
 may be generated from files in the "src" distribution with appropriate
 freely available tools.
 
-To indicate which files should be distributed, each directory in the CVS
+To indicate which files should be distributed, each directory in the git
 tree includes a file .distfiles that sets any number of a set of Bourne
 shell (scalar) parameters.  The value of the parameter is expanded as a
 set of standard command line arguments.  Basic globbing is allowed in the
@@ -862,6 +862,69 @@ The following parameters are currently used:
   distribution.
 
 - DISTFILES_NOT is a list of files that will not be included in a
-  distribution, but that need to be present in the CVS tree.  This
+  distribution, but that need to be present in the git tree.  This
   variable is not used by the zsh build process and is present for
   the convenience of external checks.
+
+
+Use of Git
+----------
+
+zsh has migrated from CVS to git for version control.  We have so far
+kept our workflow unchanged; to wit:
+
+ 1. change is developed and posted to the zsh-workers mailing list
+ 2. the zsh-workers list management software adds an X-Seq: header
+ 3. an entry is added to ChangeLog with details, including the X-Seq:
+    header.
+    [Open Question: should the first 6 or so characters of the commit
+     fingerprint be included, so: "* 12345/deadbeef: frobbed the baz" ?]
+ 4. this is committed to git as a second commit
+ 5. this is pushed to the master server
+
+Micro Git Tutorial:
+
+  % $VISUAL file1.c file2.c new-file3.c
+  % git add new-file3.c
+  % git commit -a
+  % git push
+
+ "git commit -a" automatically finds files which are tracked and have
+ been modified, but doesn't pick up new files; "git add" adds a file to
+ the index to be part of the next commit, and can be used for new files
+ or for existing files (commit -a is a shortcut for the latter)
+
+ "git push" assumes that you're on the master branch and the repository
+ was created by cloning it from some place, with default options.
+
+Feature branch work:
+
+  % git checkout -b feature_foo
+  % $VISUAL path/to/files ...
+  % git commit -a
+  [lather, rinse, repeat]
+  % git push origin feature_foo
+  [ do mailing-list stuff here ]
+  [ Switch back to master: ]
+  % git checkout master
+  [ and get the most recent changes: ]
+  % git pull
+  [ make the branch content now be relative to *new* master tip ]
+  % git checkout feature_foo
+  % git rebase master
+  [ then bring in your changes: ]
+  % git checkout master
+  % git merge --ff-only feature_foo
+  % $VISUAL ChangeLog
+  % git commit -i ChangeLog
+  % git push
+  [ Cleanup: ]
+  % git branch -d feature_foo
+  % git push origin :feature_foo
+
+Git further reading:
+ * git help tutorial
+ * git help tutorial-2
+ * git help gitcore-tutorial
+ * http://www-cs-students.stanford.edu/~blynn/gitmagic/
+
