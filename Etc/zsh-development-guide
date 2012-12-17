@@ -39,7 +39,7 @@ Patches
   intelligently.  Please make sure the filenames in the diff header
   are relative to the top-level directory of the zsh distribution; for
   example, it should say "Src/init.c" rather than "init.c" or
-  "zsh/Src/init.c".
+  "zsh/Src/init.c".  Git-style naming of diffs is also acceptable.
 
 * Please put only one bug fix or feature enhancement in a single patch and
   only one patch per mail message.  This helps me to multiplex the many
@@ -52,9 +52,8 @@ Patches
 * Please test your patch and make sure it applies cleanly. It takes
   considerably more time to manually merge a patch into the baseline code.
 
-* There is now a zsh patch archive.  To have your patches appear in the
-  archive, send them to the mailing list with a Subject: line starting
-  with "PATCH:".
+* By convention, patches should be sent with a Subject: line starting with
+  one of "PATCH:", "[PATCH]" or "[PATCH n/m]" (for a patch series).
 
 Testing
 -------
@@ -166,6 +165,11 @@ C coding style
   part of and then its own .pro file (for local prototypes).  It may
   also #include other system headers.  It *must not* #include any other
   module's headers or any other .pro files.
+
+* The repository includes a `.editorconfig' file with whitespace/indent
+  control settings. Information about text editor plugins and this file
+  can be found at <http://editorconfig.org/>.
+
 
 Modules
 -------

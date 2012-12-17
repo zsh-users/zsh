@@ -1,6 +1,7 @@
 2012-12-17  Phil Pennock  <pdpennock@users.sourceforge.net>
 
-	* 30901: Etc/zsh-development-guide: document git usage
+	* 30901, 30906: Etc/zsh-development-guide: document git usage,
+	update patch descriptions, mention editorconfig.
 
 2012-12-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
@@ -387,5 +388,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5772 $
+* $Revision: 1.5773 $
 *****************************************************
