@@ -15,7 +15,8 @@ nl='
 '
 IFS=" ""	$nl"
 errstatus=0
-dirmode=
+# Default directory mode for all zsh files is world read- and executable
+dirmode=755
 
 usage="\
 Usage: mkinstalldirs [-h] [--help] [--version] [-m MODE] DIR ...
