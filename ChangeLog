@@ -1,3 +1,7 @@
+2012-12-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk: zsh 5.0.1.
+
 2012-12-18  Oliver Kiddle <opk@zsh.org>
 
 	* 30877: Etc/zsh-development-guide: document git workflow
@@ -397,5 +401,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5775 $
+* $Revision: 1.5776 $
 *****************************************************
