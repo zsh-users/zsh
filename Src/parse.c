@@ -846,7 +846,7 @@ par_cmd(int *complex)
 	break;
     case FUNC:
 	cmdpush(CS_FUNCDEF);
-	par_funcdef();
+	par_funcdef(complex);
 	cmdpop();
 	break;
     case DINBRACK:
@@ -1420,7 +1420,7 @@ par_subsh(int *complex)
 
 /**/
 static void
-par_funcdef(void)
+par_funcdef(int *complex)
 {
     int oecused = ecused, num = 0, onp, p, c = 0;
     int so, oecssub = ecssub;
@@ -1471,6 +1471,7 @@ par_funcdef(void)
 	if (num == 0) {
 	    /* Anonymous function, possibly with arguments */
 	    incmdpos = 0;
+	    *complex = 1;
 	}
 	zshlex();
     } else if (unset(SHORTLOOPS)) {
@@ -1735,6 +1736,7 @@ par_simple(int *complex, int nr)
 		if (argc == 0) {
 		    /* Anonymous function, possibly with arguments */
 		    incmdpos = 0;
+		    *complex = 1;
 		}
 		zshlex();
 	    } else {

@@ -88,3 +88,22 @@
   print something=${:-=(echo 'C,D),(F,G)'}
 1: Graceful handling of bad substitution in enclosed context
 ?(eval):1: unterminated `=(...)'
+
+  () {
+     print -n "first: "
+     cat $1
+     print -n "second: "
+     cat $2
+  } =(echo This becomes argument one) =(echo and this argument two)
+  function {
+     print -n "third: "
+     cat $1
+     print -n "fourth: "
+     cat $2
+  } =(echo This becomes argument three) =(echo and this argument four)
+0:Process environment of anonymous functions
+>first: This becomes argument one
+>second: and this argument two
+>third: This becomes argument three
+>fourth: and this argument four
+

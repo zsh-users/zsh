@@ -1,3 +1,9 @@
+2012-12-21  Peter Stephenson  <pws@csr.com>
+
+	* 30930: Src/parse.c, Test/D03procsubst.ztst: anonymous
+	functions shouldn't be marked as simple; this prevented process
+	based features from working in their arguments.
+
 2012-12-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk: zsh 5.0.1.
@@ -401,5 +407,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5776 $
+* $Revision: 1.5777 $
 *****************************************************
