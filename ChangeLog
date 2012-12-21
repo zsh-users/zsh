@@ -1,3 +1,8 @@
+2012-12-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: README, Config/version.mk, Etc/FAQ.yo: release
+	5.0.2.
+
 2012-12-21  Peter Stephenson  <pws@csr.com>
 
 	* 30930: Src/parse.c, Test/D03procsubst.ztst: anonymous
@@ -407,5 +412,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5777 $
+* $Revision: 1.5778 $
 *****************************************************

@@ -5,8 +5,9 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.0.1 of the shell.  This is a stable release.
-There are minor new features as well as bug fixes since 5.0.0.
+This is version 5.0.2 of the shell.  This is a stable release.
+There are minor new features as well as bug fixes since 5.0.0 and
+one bug fix since the short-lived 5.0.1.
 
 Installing Zsh
 --------------
@@ -27,20 +28,20 @@ Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
 
-Incompatibilities between 5.0.0 and 5.0.1
+Incompatibilities between 5.0.0 and 5.0.2
 -----------------------------------------
 
 In 5.0.0, the new "sticky" emulation feature was applied to functions
 explicitly declared within an expression following `emulate ... -c', but
 did not apply to functions marked for autoload in that expression.  This
 was not documented and experience suggests it was inconvenient, so in
-5.0.1 autoloads also have the sticky property.
+5.0.2 autoloads also have the sticky property.
 
 In other words,
 
   emulate zsh -c 'func() { ... }'
 
-behaves the same way in 5.0.0 and 5.0.1, with the function func always being
+behaves the same way in 5.0.0 and 5.0.2, with the function func always being
 run in native zsh emulation regardless of the current option settings.
 However,
 
@@ -48,7 +49,7 @@ However,
 
 behaves differently: in 5.0.0, func was loaded with the options in
 effect at the point where it was first run, and subsequently run with
-whatever options were in effect at that point; in 5.0.1, func is loaded
+whatever options were in effect at that point; in 5.0.2, func is loaded
 with native zsh emulation options and run with those same options.  This
 is now the recommended way of ensuring a function is loaded and run with
 a consistent set of options.
