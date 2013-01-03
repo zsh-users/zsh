@@ -748,6 +748,8 @@ If var(spec) is one of the above substitutions, substitute
 the length in characters of the result instead of
 the result itself.  If var(spec) is an array expression,
 substitute the number of elements of the result.
+This has the side-effect that joining is skipped even in quoted
+forms, which may affect other sub-expressions in var(spec).
 Note that `tt(^)', `tt(=)', and `tt(~)', below, must appear
 to the left of `tt(#)' when these forms are combined.
 )
@@ -870,11 +872,12 @@ item(tt(A))(
 Create an array parameter with `tt(${)...tt(=)...tt(})',
 `tt(${)...tt(:=)...tt(})' or `tt(${)...tt(::=)...tt(})'.
 If this flag is repeated (as in `tt(AA)'), create an associative
-array parameter.  Assignment is made before sorting or padding.
-The var(name) part may be a subscripted range for ordinary
-arrays; the var(word) part em(must) be converted to an array, for
-example by using `tt(${(AA)=)var(name)tt(=)...tt(})' to activate
-field splitting, when creating an associative array.
+array parameter.  Assignment is made before sorting or padding;
+if field splitting is active, the var(word) part is split before
+assignment.  The var(name) part may be a subscripted range for
+ordinary arrays; the var(word) part em(must) be converted to
+an array, for example by using `tt(${(AA)=)var(name)tt(=)...tt(})'
+to activate field splitting, when creating an associative array.
 )
 item(tt(a))(
 Sort in array index order; when combined with `tt(O)' sort in reverse
@@ -884,7 +887,9 @@ order.
 )
 item(tt(c))(
 With tt(${#)var(name)tt(}), count the total number of characters in an array,
-as if the elements were concatenated with spaces between them.
+as if the elements were concatenated with spaces between them.  This is not
+a true join of the array, so other expressions used with this flag may have
+an effect on the elements of the array before it is counted.
 )
 item(tt(C))(
 Capitalize the resulting words.  `Words' in this case refers to sequences
@@ -1308,7 +1313,8 @@ subscripts apply to the scalar or array value yielded by the previous
 subscript.  Thus if tt(var) is an array, tt(${var[1][2]}) is the second
 character of the first word, but tt(${var[2,4][2]}) is the entire third
 word (the second word of the range of words two through four of the
-original array).  Any number of subscripts may appear.
+original array).  Any number of subscripts may appear.  Flags such as
+tt((k)) and tt((v)) which alter the result of subscripting are applied.
 )
 item(tt(4.) em(Parameter name replacement))(
 The effect of any tt((P)) flag, which treats the value so far as a
@@ -1316,11 +1322,12 @@ parameter name and replaces it with the corresponding value, is applied.
 )
 item(tt(5.) em(Double-quoted joining))(
 If the value after this process is an array, and the substitution
-appears in double quotes, and no tt((@)) flag is present at the current
-level, the words of the value are joined with the first character of the
-parameter tt($IFS), by default a space, between each word (single word
-arrays are not modified).  If the tt((j)) flag is present, that is used for
-joining instead of tt($IFS).
+appears in double quotes, and neither an tt((@)) flag nor a tt(#)
+length operator is present at the current level, then words of the
+value are joined with the first character of the parameter tt($IFS),
+by default a space, between each word (single word arrays are not
+modified).  If the tt((j)) flag is present, that is used for joining
+instead of tt($IFS).
 )
 item(tt(6.) em(Nested subscripting))(
 Any remaining subscripts (i.e. of a nested substitution) are evaluated at

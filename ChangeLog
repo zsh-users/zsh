@@ -1,3 +1,7 @@
+2013-01-03  Bart Schaefer  <schaefer@zsh.org>
+
+	* users/17524: Doc/Zsh/expn.yo: misc. parameter flag clarifications.
+
 2013-01-03  Peter Stephenson  <pws@csr.com>
 
 	* unposted: Config/version.mk: update version to 5.0.2-dev-0
@@ -417,5 +421,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5779 $
+* $Revision: 1.5780 $
 *****************************************************
