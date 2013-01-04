@@ -1,3 +1,8 @@
+2013-01-04  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 30941: Completion/bashcompinit: scalars giving status of bash
+	completion should be exported for external programmes.
+
 2013-01-03  Bart Schaefer  <schaefer@zsh.org>
 
 	* users/17524: Doc/Zsh/expn.yo: misc. parameter flag clarifications.
@@ -421,5 +426,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5780 $
+* $Revision: 1.5781 $
 *****************************************************

@@ -3,9 +3,9 @@
 _bash_complete() {
   local ret=1
   local -a suf matches
-  local COMP_POINT COMP_CWORD
+  local -x COMP_POINT COMP_CWORD
   local -a COMP_WORDS COMPREPLY BASH_VERSINFO
-  local COMP_LINE="$words"
+  local -x COMP_LINE="$words"
   local -A savejobstates savejobtexts
 
   (( COMP_POINT = 1 + ${#${(j. .)words[1,CURRENT]}} + $#QIPREFIX + $#IPREFIX + $#PREFIX ))
