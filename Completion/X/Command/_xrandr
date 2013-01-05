@@ -4,8 +4,8 @@ typeset -A opt_args
 local outputs modes expl
 
 # User configurable. TODO -- styles?
-outputs=(LVDS1 TV1 VGA1)
-modes=(1280x800 1024x768 800x600 640x480)
+outputs=($(xrandr|sed -ne 's/^\([^[[:space:]]\+]*\) connected .*$/\1/p'))
+modes=($(xrandr|sed -ne 's/^[[:space:]]\+\([[:digit:]]\+x[[:digit:]]\+\).*$/\1/p'|sort -nr|uniq))
 
 _arguments \
   '(-d -display)'{-d,-display}':X display:_x_display' \

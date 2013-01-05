@@ -1,3 +1,8 @@
+2013-01-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 30946: Robert Kovacsics: Completion/X/Command/_xrandr: use
+	command to generate completions.
+
 2013-01-04  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 30941: Completion/bashcompinit: scalars giving status of bash
@@ -426,5 +431,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5781 $
+* $Revision: 1.5782 $
 *****************************************************
