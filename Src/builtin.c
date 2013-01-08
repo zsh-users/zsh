@@ -5491,8 +5491,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	    else
 		eof = (bptr - buf != 1 || (buf[0] != 'y' && buf[0] != 'Y'));
 	    buf[0] = eof ? 'n' : 'y';
-	    buf[1] = 0;
-	    bptr = buf+2;
+	    bptr = buf + 1;
 	}
 	if (OPT_ISSET(ops,'e') || OPT_ISSET(ops,'E'))
 	    fwrite(buf, bptr - buf, 1, stdout);

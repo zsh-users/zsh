@@ -1,3 +1,8 @@
+2013-01-07  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted (see 30952): Src/builtin.c: tweak to 30949 to fix the
+	buffer pointer.
+
 2013-01-06  Bart Schaefer  <schaefer@zsh.org>
 
 	* 30949: Src/builtin.c: restore "read -q" behavior lost by 27188.
@@ -435,5 +440,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5783 $
+* $Revision: 1.5784 $
 *****************************************************
