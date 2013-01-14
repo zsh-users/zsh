@@ -59,7 +59,7 @@ case $state in
     )
 
     for cmd in $(./manage.py --help 2>&1 >/dev/null | \
-        awk -vdrop=1 '{ if (!drop) print substr($0, 3) } /^Available subcommands/ { drop=0 }')
+        awk -v drop=1 '{ if (!drop) print substr($0, 3) } /^Available subcommands/ { drop=0 }')
     do
         if ! echo $subcommands | grep -qs "${cmd}:"
         then

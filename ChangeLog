@@ -1,3 +1,8 @@
+2013-01-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 30960: Alexey Bezhan: Completion/Unix/Command/_django:
+	compatibility issue.
+
 2013-01-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 30958: Jeremy Mates: Completion/Unix/Command/_prove,
@@ -445,5 +450,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5785 $
+* $Revision: 1.5786 $
 *****************************************************
