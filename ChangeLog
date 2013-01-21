@@ -1,3 +1,8 @@
+2013-01-20  Oliver Kiddle <opk@zsh.org>
+
+	* 30987: Completion/X/Command/_xrandr: only call xrandr when
+	necessary and use _call_program
+
 2013-01-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 30960: Alexey Bezhan: Completion/Unix/Command/_django:
@@ -450,5 +455,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5786 $
+* $Revision: 1.5787 $
 *****************************************************
