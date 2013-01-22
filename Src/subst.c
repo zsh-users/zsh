@@ -3707,6 +3707,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	char *y;
 
 	x = val;
+	if (!x) {
+	    /* Shouldn't have got here with a NULL string. */
+	    DPUTS(1, "value is NULL in paramsubst");
+	    return NULL;
+	}
 	if (prenum || postnum)
 	    x = dopadding(x, prenum, postnum, preone, postone,
 			  premul, postmul
@@ -4021,7 +4026,10 @@ modify(char **str, char **ptr)
 		    all = tmp;
 		    t = e;
 		}
-		*str = all;
+		if (!all)
+		    *str = dupstring("");
+		else
+		    *str = all;
 
 	    } else {
 		switch (c) {

@@ -1544,3 +1544,10 @@
 0:Regression test for shwordsplit with null or unset IFS and quoted array
 >abc
 >a b c
+
+   foo=
+   print ${foo:wq}
+   print ${:wq}
+0:Empty parameter shouldn't cause modifiers to crash the shell
+>
+>

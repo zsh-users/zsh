@@ -1,3 +1,9 @@
+2013-01-22  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 30993: Src/subst.c, Test/D04parameter.ztst: parameter
+	modifiers :wq operating on an empty string crashed the shell.
+	The shell isn't supposed to crash.
+
 2013-01-20  Oliver Kiddle <opk@zsh.org>
 
 	* 30987: Completion/X/Command/_xrandr: only call xrandr when
@@ -455,5 +461,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5787 $
+* $Revision: 1.5788 $
 *****************************************************
