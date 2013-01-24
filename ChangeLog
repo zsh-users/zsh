@@ -1,3 +1,9 @@
+2013-01-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/17608: Doc/Zsh/contrib.yo,
+	Functions/Zle/modify-current-argument: use function to modify
+	current command line argument.
+
 2013-01-22  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 30993: Src/subst.c, Test/D04parameter.ztst: parameter
@@ -461,5 +467,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5788 $
+* $Revision: 1.5789 $
 *****************************************************

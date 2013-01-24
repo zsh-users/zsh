@@ -2477,14 +2477,21 @@ See the function tt(modify-current-argument), described below, for
 an example of how to call this function.
 )
 tindex(modify-current-argument)
-item(tt(modify-current-argument) var(expr-using-)tt($ARG))(
+item(tt(modify-current-argument) [ var(expr-using-)tt($ARG) | var(func) ])(
 This function provides a simple method of allowing user-defined widgets
 to modify the command line argument under the cursor (or immediately to the
-left of the cursor if the cursor is between arguments).  The argument
-should be an expression which when evaluated operates on the shell
+left of the cursor if the cursor is between arguments).
+
+The argument can be an expression which when evaluated operates on the shell
 parameter tt(ARG), which will have been set to the command line argument
 under the cursor.  The expression should be suitably quoted to prevent
 it being evaluated too early.
+
+Alternatively, if the argument does not contain the string tt(ARG), it
+is assumed to be a shell function, to which the current command line
+argument is passed as the only argument.  The function should set the
+variable tt(REPLY) to the new value for the command line argument.
+If the function returns non-zero status, so does the calling function.
 
 For example, a user-defined widget containing the following code
 converts the characters in the argument under the cursor into all upper
@@ -2497,6 +2504,18 @@ or one of the styles of quotes), and replaces it with single quoting
 throughout:
 
 example(modify-current-argument '${(qq)${(Q)ARG}}')
+
+The following performs directory expansion on the command line
+argument and replaces it by the absolute path:
+
+example(expand-dir() {
+  REPLY=${~1}
+  REPLY=${REPLY:a}
+}
+modify-current-argument expand-dir)
+
+In practice the function tt(expand-dir) would probably not be defined
+within the widget where tt(modify-current-argument) is called.
 )
 enditem()
 

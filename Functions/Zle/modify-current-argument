@@ -14,24 +14,27 @@
 setopt localoptions noksharrays multibyte
 
 local -a reply
-integer REPLY REPLY2 fromend endoffset
+integer posword poschar fromend endoffset
+local REPLY REPLY2
 
 autoload -Uz split-shell-arguments
 split-shell-arguments
 
+(( posword = REPLY, poschar = REPLY2 ))
+
 # Can't do this unless there's some text under or left of us.
-(( REPLY < 2 )) && return 1
+(( posword < 2 )) && return 1
 
 # Get the index of the word we want.
-if (( REPLY & 1 )); then
+if (( posword & 1 )); then
   # Odd position; need previous word.
-  (( REPLY-- ))
+  (( posword-- ))
   # Pretend position was just after the end of it.
-  (( REPLY2 = ${#reply[REPLY]} + 1 ))
+  (( poschar = ${#reply[posword]} + 1 ))
 fi
 
 # Work out offset from end of string
-(( fromend = $REPLY2 - ${#reply[REPLY]} - 1 ))
+(( fromend = $poschar - ${#reply[posword]} - 1 ))
 if (( fromend >= -1 )); then
   # Cursor is near the end of the word, we'll try to keep it there.
   endoffset=1
@@ -39,11 +42,17 @@ fi
 
 # Length of all characters before current.
 # Force use of character (not index) counting and join without IFS.
-integer wordoff="${(cj..)#reply[1,REPLY-1]}"
+integer wordoff="${(cj..)#reply[1,posword-1]}"
 
-# Replacement for current word.  This could do anything to ${reply[REPLY]}.
-local ARG="${reply[REPLY]}" repl
-eval repl=\"$1\"
+# Replacement for current word.  This could do anything to ${reply[posword]}.
+local ARG="${reply[posword]}" repl
+if [[ $1 != *ARG* ]]; then
+    REPLY=
+    $1 $ARG || return 1
+    repl=$REPLY
+else
+    eval repl=\"$1\"
+fi
 
 if (( !endoffset )) && [[ ${repl[fromend,-1]} = ${ARG[fromend,-1]} ]]; then
   # If the part of the string from here to the end hasn't changed,
@@ -54,8 +63,8 @@ fi
 # New line:  all words before and after current word, with
 # no additional spaces since we've already got the whitespace
 # and the replacement word in the middle.
-local left="${(j..)reply[1,REPLY-1]}${repl}"
-local right="${(j..)reply[REPLY+1,-1]}"
+local left="${(j..)reply[1,posword-1]}${repl}"
+local right="${(j..)reply[posword+1,-1]}"
 
 if [[ endoffset -ne 0 && ${#repl} -ne 0 ]]; then
   # Place cursor relative to end.
@@ -71,5 +80,5 @@ else
   integer repmax=$(( ${#repl} + 1 ))
   # Remember CURSOR starts from offset 0 for some reason, so
   # subtract 1 from positions.
-  (( CURSOR = wordoff + (REPLY2 > repmax ? repmax : REPLY2) - 1 ))
+  (( CURSOR = wordoff + (poschar > repmax ? repmax : poschar) - 1 ))
 fi
