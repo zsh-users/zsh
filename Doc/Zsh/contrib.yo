@@ -2508,7 +2508,7 @@ example(modify-current-argument '${(qq)${(Q)ARG}}')
 The following performs directory expansion on the command line
 argument and replaces it by the absolute path:
 
-example(expand-dir() {
+example(expand-dir+LPAR()RPAR() {
   REPLY=${~1}
   REPLY=${REPLY:a}
 }
