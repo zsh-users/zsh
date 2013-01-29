@@ -24,7 +24,7 @@ zstyle -a ":completion:*:*:$service:*" tag-order tag_order || \
 zstyle -T ":completion:*:*:$service:*" gradle-inspect || gradle_inspect=no
 
 _arguments -C \
-    '(-)'{-\?,-h,--help}'[Shows this help message.]' \
+    '(-)'{-\?,-h,--help}'[Shows a help message.]' \
     {-a,--no-rebuild}'[Do not rebuild project dependencies.]' \
     {-b,--build-file}'[Specifies the build file.]:build file:_files -g "*.gradle(-.)"' \
     {-C,--cache}'[Specifies how compiled build scripts should be cached.]:cache policy:(on rebuild)' \
@@ -45,12 +45,17 @@ _arguments -C \
     '--offline[The build should operate without accessing network resources.]' \
     \*{-P+,--project-prop}'[Set project property for the build script (e.g. -Pmyprop=myvalue).]:project property (prop=val):' \
     {-p,--project-dir}'[Specifies the start directory for Gradle.]:start directory:_directories' \
+    '--parallel[Build projects in parallel. Gradle will attempt to determine the optimal number of executor threads to use.]' \
+    '--parallel-threads[Build projects in parallel, using the specified number of executor threads.]' \
     '--profile[Profiles build execution time and generates a report in the <build_dir>/reports/profile directory.]' \
     '--project-cache-dir[Specifies the project-specific cache directory.]:cache directory:_directories' \
     '(-d --debug -i --info)'{-q,--quiet}'[Log errors only.]' \
-    "--refresh[Refresh the state of resources of the type(s) specified.]:refresh policy:(dependencies)" \
-    '(-s --stacktrace)'{-S,--full-stacktrace}'[Print out the full (very verbose) stacktrace for all exceptions.]' \
+    '--recompile-scripts[Force build script recompiling.]' \
+    '--refresh[Refresh the state of resources of the type(s) specified.]:refresh policy:(dependencies)' \
+    '--refresh-dependencies[Refresh the state of dependencies.]' \
+    '--rerun-tasks[Ignore previously cached task results.]' \
     '(-S --full-stacktrace)'{-s,--stacktrace}'[Print out the stacktrace for all exceptions.]' \
+    '(-s --stacktrace)'{-S,--full-stacktrace}'[Print out the full (very verbose) stacktrace for all exceptions.]' \
     '(-)--stop[Stops the Gradle daemon if it is running.]' \
     {-u,--no-search-upward}"[Don't search in parent folders for a settings.gradle file.]" \
     '(-)'{-v,--version}'[Print version info.]' \
@@ -58,7 +63,7 @@ _arguments -C \
     '*:task:->task' \
     && ret=0
 
-if [[ -n $state ]]; then
+if [[ $words[CURRENT] != -* ]]; then
     if [[ $gradle_inspect == yes ]]; then
         # If a build file is specified after '-b' or '--build-file', use this file. Otherwise,
         # default is the file 'build.gradle' in the current directory.
@@ -102,7 +107,8 @@ if [[ -n $state ]]; then
         fi
     else
         _describe 'built-in tasks' '(
-            "dependencies:Displays the dependencies of root project."
+            "dependencies:Displays all dependencies declared in root project."
+            "dependencyInsight:Displays the insight into a specific dependency in root project."
             "help:Displays a help message."
             "projects:Displays the sub-projects of root project."
             "properties:Displays the properties of root project."
