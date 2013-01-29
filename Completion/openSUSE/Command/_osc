@@ -16,8 +16,8 @@
 # version 0.2
 #
 
-OSC_BUILD_TARGETS="openSUSE_11.2 openSUSE_11.3 openSUSE_11.4 openSUSE_12.1 openSUSE_Tumbleweed openSUSE_Factory SLE_11_SP1"
-OSC_PROJECTS="openSUSE:Factory openSUSE:Tumbleweed openSUSE:12.1 openSUSE:11.4 openSUSE:11.2 openSUSE:11.3"
+OSC_BUILD_TARGETS="openSUSE_12.1 openSUSE_12.2 openSUSE_12.3 openSUSE_Tumbleweed openSUSE_Factory SLE_11_SP2"
+OSC_PROJECTS="openSUSE:Factory openSUSE:Tumbleweed openSUSE:12.3 openSUSE:12.2 openSUSE:12.1"
 
 # user defined variables $OSC_BUILD_TARGETS_EXTRA and
 # $OSC_PROJECTS_EXTRA can add to the project/build target list

@@ -1,3 +1,8 @@
+2013-01-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Dmitry Roshchin: 31008: Completion/openSUSE/Command/_zypper,
+	Completion/openSUSE/Command/_osc: updates.
+
 2013-01-26  Bart Schaefer  <schaefer@zsh.org>
 
 	* 31000: Doc/Zsh/contrib.yo: fix typo in example.
@@ -471,5 +476,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5790 $
+* $Revision: 1.5791 $
 *****************************************************

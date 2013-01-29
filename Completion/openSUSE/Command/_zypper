@@ -28,11 +28,10 @@ _zypper() {
 	local hline
 	local -a cmdlist
 	local tag=0
-	_call_program help-commands zypper help | while read -A hline; do
+	_call_program help-commands LANG=C zypper help | sed -e ':a;N;$!ba;s/\n\t\t\t\t/ /g' | while read -A hline; do
 	    # start parsing with "Global Options:"
 	    [[ $hline =~ "^Global Options:" ]] && tag=1
 	    [[ $tag = 0 ]] && continue
-	    [[ $hline[1] =~ ^\t\t\t\t ]] && continue
 	    # all commands have to start with lower case letters
 	    [[ $hline[1] =~ ^[A-Z] ]] && continue
 	    (( ${#hline} < 2 )) && continue
@@ -51,7 +50,7 @@ _zypper_cmd_do() {
     local hline
     local -a cmdlist
     local tag=0
-    _call_program help-commands zypper help $cmd | while read -A hline; do
+    _call_program help-commands LANG=C zypper help $cmd | while read -A hline; do
 	# start parsing from "Options:"
 	[[ $hline =~ "^Command options:" ]] && tag=1
 	[[ $tag = 0 ]] && continue
