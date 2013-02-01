@@ -1,3 +1,7 @@
+2013-02-01  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: Fix _prove completer commit.
+
 2013-01-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Jesper Nygårds: 31012: Completion/Unix/Command/_gradle:
@@ -479,5 +483,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5792 $
+* $Revision: 1.5793 $
 *****************************************************
