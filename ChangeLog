@@ -1,3 +1,8 @@
+2013-02-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31015: Completion: compaudit: where we can find who owns the
+	zsh executable, allow the same owner to own completion files.
+
 2013-02-01  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Fix _prove completer commit.
@@ -483,5 +488,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5793 $
+* $Revision: 1.5794 $
 *****************************************************
