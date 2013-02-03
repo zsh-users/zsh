@@ -1,86 +1,33 @@
-#compdef trial conch mktap cftp tapconvert twistd ckeygen lore pyhtmlizer websetroot tap2deb tkmktap tkconch manhole tap2rpm
-
-# Copyright (c) 2005 Eric Mangold
-# Maintainer: Eric Mangold <teratorn@twistedmatrix.com>
-
-# This file is meant to be in your zsh function path. i.e. in one of those
-# directories listed in your $fpath variable.
+#compdef twistd trial conch cftp tapconvert ckeygen lore pyhtmlizer tap2deb tkconch manhole tap2rpm
 #
-# e.g. /usr/local/share/zsh/site-functions/
+# This is the ZSH completion file for Twisted commands. It calls the current
+# command-line with the special "--_shell-completion" option which is handled
+# by twisted.python.usage. t.p.usage then generates zsh code on stdout to
+# handle the completions for this particular command-line.
 #
-# It is responsible for passing completion control to the correct
-# completion function for the version of Twisted that is
-# currently in use.
+# 3rd parties that wish to provide zsh completion for commands that
+# use t.p.usage may copy this file and change the first line to reference
+# the name(s) of their command(s).
 #
-# Goals:
-#
-# We want to detect any changes to PYTHONPATH since the last time we ran.
-# That way we can re-locate the completion functions so that we are sure
-# to be completing for the right version of Twisted.
+# This file is included in the official Zsh distribution as
+# Completion/Unix/Command/_twisted
 
-local dir old_fpath python_code run shebang
+# redirect stderr to /dev/null otherwise deprecation warnings may get puked all
+# over the user's terminal if completing options for a deprecated command.
+# Redirect stderr to a file to debug errors.
+local cmd output
+cmd=("$words[@]" --_shell-completion zsh:$CURRENT)
+output=$("$cmd[@]" 2>/dev/null)
 
-function debug () {
-    echo $@ >> /tmp/twisted_stub_debug
-}
-
-#debug "START _twisted_stub"
-
-function load_twisted_completions() {
-    [[ -z $commands[twistd] ]] && echo 'ERROR: test command "twistd" not found in path' && return 1
-    shebang=$(head -1 $commands[twistd])
-    [[ $shebang != \#\!* ]] && echo 'ERROR: invalid shebang line for test script "twistd"' && return 1
-    PYTHON=$shebang[3,-1] # strip #! off the shebang
-    PYTHON=${PYTHON# *} # remove any spaces between #! and command
-
-    #debug PYTHON $PYTHON:q
-    python_code='
-import twisted, os.path
-dir = os.path.dirname(twisted.__file__)
-print os.path.join(dir, "python", "zsh")
-'
-    dir=$(${=PYTHON} -c "$python_code")
-    #debug "Trying to load twisted functions from $dir:q"
-    if [[ -r $dir/_twistd ]]; then
-        old_fpath=($fpath)
-        fpath=( $dir $fpath )
-        autoload +X _trial _conch _mktap _cftp _tapconvert _twistd _ckeygen
-        autoload +X _lore _pyhtmlizer _websetroot _tap2deb _tkmktap _tkconch
-        autoload +X _manhole _tap2rpm
-        fpath=($old_fpath)
-    else
-        echo 'ERROR: Cannot find twisted completion function files in $dir:q'
-        return 1
-    fi
-}
-
-function twisted_run () {
-    # run completion function for current command
-    # the :t modifier strips off any leading pathname components
-    eval _$words[1]:t
-}
-
-function twisted_save_load_run () {
-    # save PYTHONPATH, load twisted completions, and run the completion
-    # function for the current command
-    load_twisted_completions && twisted_run && PYTHONPATH_last=$PYTHONPATH
-}
-
-
-if [[ -n $PYTHONPATH_last ]]; then
-    #debug "PYTHONPATH_last is set to $PYTHONPATH_last"
-    #check if it's the same as the last time we ran
-    if [[ $PYTHONPATH == $PYTHONPATH_last ]]; then
-        #debug "PYTHONPATH == PYTHONPATH_last"
-        # it's the same, which means we've already loaded completion
-        # functions and nothing has changed.
-        twisted_run
-    else
-        twisted_save_load_run
-    fi
+if [[ $output == "#compdef "* ]]; then
+    # Looks like we got a valid completion function - so eval it to produce
+    # the completion matches.
+    eval $output
 else
-    twisted_save_load_run
+    echo "\nCompletion error running command:" ${(qqq)cmd}
+    echo -n "If output below is unhelpful you may need to edit this file and "
+    echo    "redirect stderr to a file."
+    echo "Expected completion function, but instead got:" 
+    echo $output
+    return 1
 fi
-
-#debug "END _twisted_stub"
-#
