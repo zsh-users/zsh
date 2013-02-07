@@ -8,7 +8,7 @@ zparseopts -a opts \
 
 type="${(@j::M)${(@)tmp#-}#?}"
 if (( $tmp[(I)-g*] )); then
-  glob="${${${${(@M)tmp:#-g*}#-g}##[[:blank:]]#}%%[[:blank:]]#}"
+  glob="${${${(@)${(@M)tmp:#-g*}#-g}##[[:blank:]]#}%%[[:blank:]]#}"
   [[ "$glob" = *[^\\][[:blank:]]* ]] &&
       glob="{${glob//(#b)([^\\])[[:blank:]]##/${match[1]},}}"
 

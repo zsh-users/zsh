@@ -1,3 +1,8 @@
+2013-02-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Han Pingtian: 31027: Completion/Unix/Type/_files: remove
+	the -g's from the glob options.
+
 2013-02-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Eric P. Mangold: c.f. 31016
@@ -494,5 +499,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5795 $
+* $Revision: 1.5796 $
 *****************************************************
