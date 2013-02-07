@@ -355,7 +355,7 @@ mention this in your message if you want a response.
 If you would like to contribute to the development and maintenance of zsh,
 then you should join the zsh-workers mailing list (check the META-FAQ
 for info on this).  You should also read the "zsh-development-guide"
-located in the subdirectory Util.
+located in the subdirectory Etc.
 
 Contributors
 ------------
