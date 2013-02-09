@@ -30,7 +30,7 @@
 #include "zle.mdh"
 #include "zle_move.pro"
 
-static int vimarkcs[26], vimarkline[26];
+static int vimarkcs[27], vimarkline[27];
 
 #ifdef MULTIBYTE_SUPPORT
 /*
@@ -825,11 +825,17 @@ int
 vigotomark(UNUSED(char **args))
 {
     ZLE_INT_T ch;
+    int oldcs = zlecs;
+    int oldline = histline;
 
     ch = getfullchar(0);
-    if (ch < ZWC('a') || ch > ZWC('z'))
-	return 1;
-    ch -= ZWC('a');
+    if (ch == ZWC('\'') || ch == ZWC('`'))
+	ch = 26;
+    else {
+	if (ch < ZWC('a') || ch > ZWC('z'))
+	    return 1;
+	ch -= ZWC('a');
+    }
     if (!vimarkline[ch])
 	return 1;
     if (curhist != vimarkline[ch] && !zle_goto_hist(vimarkline[ch], 0, 0)) {
@@ -837,6 +843,8 @@ vigotomark(UNUSED(char **args))
 	return 1;
     }
     zlecs = vimarkcs[ch];
+    vimarkcs[26] = oldcs;
+    vimarkline[26] = histline;
     if (zlecs > zlell)
 	zlecs = zlell;
     return 0;
