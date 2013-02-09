@@ -2,7 +2,7 @@
 
 local desc expl
 
-desc=( $TERMINFO ~/.terminfo $TERMINFO_DIRS /usr/{,share/}{,lib/}terminfo )
+desc=( $TERMINFO ~/.terminfo $TERMINFO_DIRS /usr/{,share/}{,lib/}terminfo /{etc,lib}/terminfo )
 
 _wanted terminals expl 'terminal name' \
     compadd "$@" - $desc/*/*(N:t)

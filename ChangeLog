@@ -1,5 +1,8 @@
 2013-02-09  Oliver Kiddle <opk@zsh.org>
 
+	* Morita Sho: 31038: Completion/Unix/Type/_terminals:
+	add location of terminfo entries on Debian
+
 	* 31037: Src/Zle/zle_move.c: return to previous position
 	with vi-goto-mark using `` or ''
 
@@ -509,5 +512,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5799 $
+* $Revision: 1.5800 $
 *****************************************************
