@@ -1,0 +1,20 @@
+# Tests of the vi mode of ZLE
+
+%prep
+  if ( zmodload -i zsh/zpty ) >/dev/null 2>&1; then
+    . $ZTST_srcdir/comptest
+    comptestinit -v -z $ZTST_testdir/../Src/zsh
+  else
+    ZTST_unimplemented="the zsh/zpty module is not available"
+  fi
+
+%test
+
+  zletest $'one two\ebmt3|`tx``'
+0:setting mark and returning to original position
+>BUFFER: one wo
+>CURSOR: 2
+
+%clean
+
+  zmodload -ui zsh/zpty
