@@ -57,6 +57,7 @@ cindex(expansion, history)
 History expansion allows you to use words from previous command
 lines in the command line you are typing.  This simplifies spelling
 corrections and the repetition of complicated commands or arguments.
+
 vindex(HISTSIZE, use of)
 Immediately before execution, each command is saved in the history list,
 the size of which is controlled by the tt(HISTSIZE) parameter.  The one
