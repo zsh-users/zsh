@@ -39,10 +39,10 @@ params.o: patchlevel.h
 version.h: $(sdir_top)/Config/version.mk zshcurses.h zshterm.h
 	echo '#define ZSH_VERSION "'$(VERSION)'"' > $@
 
-patchlevel.h: $(sdir_top)/ChangeLog
-	sed -ne \
-	's/^\* *\$$''Revision: \(.*\) ''\$$/#define ZSH_PATCHLEVEL "\1"/p' \
-	$(sdir_top)/ChangeLog >patchlevel.h
+patchlevel.h: FORCE
+	echo '#define ZSH_PATCHLEVEL "'`git describe --tags --long`'"' > $@.tmp
+	cmp $@ $@.tmp && rm -f $@.tmp || mv $@.tmp $@
+FORCE:
 
 zshcurses.h: ../config.h
 	@if test x$(ZSH_CURSES_H) != x; then \
