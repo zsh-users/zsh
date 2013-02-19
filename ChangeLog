@@ -1,3 +1,8 @@
+2013-02-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31055: Completion/compaudit: missing '$' in search of /proc
+	file system.
+
 2013-02-12  Oliver Kiddle <opk@zsh.org>
 
 	* 31041: Test/comptest, Test/X02zlevi.ztst: add support for
@@ -520,5 +525,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5802 $
+* $Revision: 1.5803 $
 *****************************************************

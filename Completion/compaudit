@@ -97,7 +97,7 @@ local _i_exe
 # If we can find out who owns the executable, we will allow files to
 # be owned by that user, too.  The argument is that if you don't trust
 # the owner of the executable, it's way too late to worry about it now...
-for _i_exe in _i_exes; do
+for _i_exe in $_i_exes; do
   if [[ -e $_i_exe ]] ;then
     if zmodload -F zsh/stat b:zstat 2>/dev/null; then
       local -A _i_stathash
