@@ -3,17 +3,21 @@
 local fc_common fc_hist fc_r
 
 fc_common=(
-  '(-A -R -W -I)-r[reverse order of the commands]'
-  '(-A -R -W -I -e)-n[suppress line numbers]'
-  '(-A -R -W -I)*::commands:_command_names -e' )
+  '(-A -R -W -I -p -P)-r[reverse order of the commands]'
+  '(-A -R -W -I -e -p -P)-n[suppress line numbers]'
+  '(-A -R -W -I -p -P)*::commands:_command_names -e' )
 
 fc_hist=(
-  '(-A -R -W -I)-m[treat first argument as a pattern]'
-  '(-A -R -W -I -e -f -E -i)-d[print time-stamps]'
-  '(-A -R -W -I -e -d -E -i)-f[mm/dd/yyyy format time-stamps]'
-  '(-A -R -W -I -e -d -f -i)-E[dd.mm.yyyy format time-stamps]'
-  '(-A -R -W -I -e -d -f -E)-i[yyyy-mm-dd format time-stamps]'
-  '(-A -R -W -I -e)-D[print elapsed times]' )
+  '(-A -R -W -I -p -p)-m[treat first argument as a pattern]'
+  '(-A -R -W -I -e -f -E -i -t -p -P)-d[print time-stamps]'
+  '(-A -R -W -I -e -d -E -i -t -p -P)-f[mm/dd/yyyy format time-stamps]'
+  '(-A -R -W -I -e -d -f -i -t -p -P)-E[dd.mm.yyyy format time-stamps]'
+  '(-A -R -W -I -e -d -f -E -t -p -P)-i[yyyy-mm-dd format time-stamps]'
+  '(-A -R -W -I -e -d -f -E -i -p -P)-t[print time-stamps in specified format]:date format'
+  '(-A -R -W -I -e -p -P)-D[print elapsed times]'
+  '(- *)-p[push current history to stack]:history file:_files:history size: :saved history size'
+  '(- *)-P[pop history from stack]'
+)
 
 fc_r='(-A -R -W -I -e)-l[list resulting commands on stdout]'
 
@@ -26,11 +30,11 @@ case $service in
   ;;
   *)
   _arguments -s -S \
-    '(-A -R -W -I -l -n -d -f -E -i -D)-e[specify editor to invoke]:editor to invoke:_command_names -e' \
-    '(-l -m -e -r -n -d -f -E -i -D -A -W *)-R[read history from file]:history file:_files' \
-    '(-l -m -e -r -n -d -f -E -i -D -R -W *)-A[append history to file]:history file:_files' \
-    '(-l -m -e -r -n -d -f -E -i -D -R -A *)-W[write history to file]:history file:_files' \
-    '(-l -m -e -r -n -d -f -E -i -D -A -W *)-I[read/write new events only]:history file:_files' \
+    '(-A -R -W -I -l -n -d -f -E -i -D -p -P)-e[specify editor to invoke]:editor to invoke:_command_names -e' \
+    '(-l -m -e -r -n -d -f -E -i -D -A -W -p -P *)-R[read history from file]:history file:_files' \
+    '(-l -m -e -r -n -d -f -E -i -D -R -W -p -P *)-A[append history to file]:history file:_files' \
+    '(-l -m -e -r -n -d -f -E -i -D -R -A -p -P *)-W[write history to file]:history file:_files' \
+    '(-l -m -e -r -n -d -f -E -i -D -A -W -p -P *)-I[read/write new events only]:history file:_files' \
     "$fc_common[@]" "$fc_hist[@]" "$fc_r" && return 0
   ;;
 esac

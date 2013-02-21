@@ -12,8 +12,10 @@ args=(
 
 if _pick_variant gnu=GNU unix --version; then
   args+=(
+    '--follow-symlinks[follow symlinks when processing in place]'
     '(-i --in-place)'{-i-,--in-place=-}'[edit files in place]::suffix for backup'
     '(-l --line-length)'{-l,--line-length=-}'[specify line-wrap length for the l command]'
+    '(-r)--posix[disable GNU extensions]'
     '(-r --regexp-extended)'{-r,--regexp-extended}'[use extended regular expressions]'
     '(-s --separate)'{-s,--separate}'[consider files separately instead of as a combined stream]'
     '(-u --unbuffered)'{-u,--unbuffered}'[disable data buffering]'

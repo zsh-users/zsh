@@ -1,3 +1,10 @@
+2013-02-21  Oliver Kiddle <opk@zsh.org>
+
+	* 31058: Completion/Zsh/Command/_fc, Completion/Unix/Command/_cut,
+	Completion/Unix/Command/_sed, Completion/Unix/Command/_wget,
+	Completion/Unix/Command/_xmlsoft: add options from newer
+	versions of some commands to completion functions
+
 2013-02-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31055: Completion/compaudit: missing '$' in search of /proc
@@ -525,5 +532,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5803 $
+* $Revision: 1.5804 $
 *****************************************************

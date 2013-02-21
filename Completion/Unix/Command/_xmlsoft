@@ -66,13 +66,14 @@ case $service in
       '--recover[output what was parsable on broken XML documents]' \
       '--huge[remove any internal arbitrary parser limits]' \
       '--noent[substitute entity references by their value]' \
+      '--noenc[ignore any encoding specified inside the document]' \
       "(--output -o)--noout[don't output the result tree]" \
       '--path[provide a set of paths for resources]:paths:_files -/' \
       '--load-trace[print trace of all external entites loaded]' \
       '--nonet[refuse to fetch DTDs or entities over network]' \
+      '--nocompact[do not generate compact text nodes]' \
       '--htmlout[output results as HTML]' \
       '--nowrap[do not put HTML doc wrapper]' \
-      '--nocompact[do not generate compact text nodes]' \
       '--valid[validate the document in addition to std well-formed check]' \
       '(--dtdvalid --relaxng --schema)--postvalid[do a posteriori validation, i.e after parsing]' \
       '(--postvalid --relaxng --schema --dtdvalidfpi)--dtdvalid[do a posteriori validation against a given DTD]:DTD:_webbrowser' \
@@ -84,27 +85,28 @@ case $service in
       '--compress[turn on gzip compression of output]' \
       '--html[use the HTML parser]' \
       '--xmlout[use the XML serializer when using --html]' \
+      '--nodefdtd[do not default HTML doctype]' \
       '--push[use the push mode of the parser]' \
       '--memory[parse from memory]' \
-      '--maxmem[imits memory allocation]:bytes' \
+      '--maxmem[limit memory allocation]:bytes' \
       '--nowarning[do not emit warnings from parser/validator]' \
       '--noblanks[drop (ignorable?) blanks spaces]' \
       '--nocdata[replace cdata section with text nodes]' \
       '--format[reformat/reindent the input]' \
       '--encode[output in the given encoding]:encoding:(${encoding[@]})' \
       '--dropdtd[remove the DOCTYPE of the input docs]' \
+      "--pretty[pretty-print in a particular style]:style:((0\:don't\ pretty\ print 1\:reformat 2\:add\ whitespace))" \
       '--c14n[save in W3C canonical format]' \
       '--c14n11[save in W3C canonical format v1.1 (with comments)]' \
       '--exc-c14n[save in W3C exclusive canonical format]' \
       '--nsclean[remove redundant namespace declarations]' \
-      '--testIO[test user I/O support]' \
       '(--nocatalogs)--catalogs[use SGML catalogs]' \
       '(--catalogs)--nocatalogs[deactivate all catalogs]' \
       '--auto[generate a small doc on the fly]' \
       '(--noxincludenode)--xinclude[do XInclude processing]' \
       '(--xinclude)--noxincludenode[do XInclude processing but do not generate XInclude nodes]' \
-      '--loaddtd[fetch external DTD]' \
       '--nofixup-base-uris[do not fixup xml:base uris]' \
+      '--loaddtd[fetch external DTD]' \
       '--dtdattr[loaddtd + populate the tree with inherited attributes]' \
       '--stream[use the streaming interface to process very large files]' \
       '--walker[create a reader and walk though the resulting doc]' \
@@ -116,7 +118,7 @@ case $service in
       '--sax1[use the old SAX1 interfaces for processing]' \
       '--sax[do not build a tree but work just at the SAX level]' \
       '--oldxml10[use XML-1.0 parsing rules before the 5th edition]' \
-      '--xpath[evaluate the XPath expression, inply --noout]:XPath expression:' \
+      '(--noout)--xpath[evaluate the XPath expression, implies --noout]:XPath expression' \
       '*:XML file:_webbrowser' && return
   ;;
   *XML_CATALOG_FILES*)
@@ -125,7 +127,7 @@ case $service in
       _urls
       return
     fi
-    
+
     compset -S ':*'
     _alternative \
       'files:catalog file:_files' \
@@ -134,5 +136,3 @@ case $service in
 esac
 
 return 1
-
-

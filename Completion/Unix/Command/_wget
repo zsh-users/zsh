@@ -17,13 +17,14 @@ _arguments -C -s \
   '(--input-file -i)'{--input-file=,-i+}'[specify input file]:file containing URLs:_files' \
   '(--force-html -F)'{--force-html,-F}'[treat input file as html]' \
   '(--base -B)'{--base=,-B+}'[prepend URL to relative links]:base URL:_urls' \
+  '--config=[specify config file]:config file:_files' \
   '(--tries -t)'{--tries=,-t+}'[set number of retries]:number of retries' \
   '--retry-connrefused[retry even if connection is refused]' \
   '(--output-document -O)'{--output-document=,-O+}'[specify file to write documents to]:output file:_files' \
   '(--continue -c)'{--continue,-c}'[continue getting an existing file]'  \
-  '--content-disposition[honor the Content-Disposition header when choosing local file names]'  \
   '--progress=[set progress gauge type]:gauge type:->gauge' \
   '(--timestamping -N)'{--timestamping,-N}'[retrieve only files newer than existing]' \
+  "--no-use-server-timestamps[don't set the local file's timestamp by the one on the server]" \
   '(--server-response -S)'{--server-response,-S}'[print server response]' \
   "--spider[don't download anything]" \
   '(--timeout -T)'{--timeout=,-T+}'[set all timeout values]:timeout (seconds)' \
@@ -40,11 +41,16 @@ _arguments -C -s \
   '--limit-rate=[specify limit to download rate]:download rate limit' \
   '--no-dns-cache[disable caching DNS lookups]' \
   '--restrict-file-names=[restrict chars in file names to ones OS allows]:OS:->restrict' \
+  '--ignore-case[ignore case when matching files/directories]' \
   '(-4 --inet4-only -6 --inet6-only)'{-4,--inet4-only}'[connect only to IPv4 addresses]' \
   '(-4 --inet4-only -6 --inet6-only)'{-6,--inet6-only}'[connect only to IPv6 addresses]' \
   '--prefer-family[connect first to addresses of specified family]:address family:(IPv6 IPv4 none)' \
   '(--http-user --ftp-user)--user[set both ftp and http user]:user' \
   '(--http-password --ftp-password)--password[set both ftp and http password]:password' \
+  '--no-iri[turn off IRI support]' \
+  '--local-encoding=[specify local encoding for IRIs]:encoding' \
+  '--remote-encoding=[specify default remote encoding]:encoding' \
+  '--unlink[remove file before clobber]' \
   '(--force-directories -x)'{--force-directories,-x}'[force creation of directories]' \
   '--protocol-directories[use protocol name in directories]' \
   '(--directory-prefix -P)'{--directory-prefix=,-P+}'[specify prefix to save files to]:prefix:_files -/' \
@@ -52,7 +58,8 @@ _arguments -C -s \
   '(--user)--http-user=:user' \
   '(--password)--http-password=:password' \
   '--no-cache[disallow server-cached data]' \
-  '(--html-extension -E)'{--html-extension,-E}'[save all HTML documents with a .html extension]' \
+  '--default-page=[specify default page name, normally index.html]' \
+  '(--adjust-extension -E)'{--adjust-extension,-E}'[save all HTML/CSS documents with proper extensions]' \
   "--ignore-length[ignore \`Content-Length' header field]" \
   '*--header=:string' \
   '--proxy-user=:user' \
@@ -61,12 +68,14 @@ _arguments -C -s \
   '--save-headers[save http headers]' \
   '(--user-agent -U)'{--user-agent=,-U+}'[specify user agent to identify as]:user-agent' \
   '--no-http-keep-alive[disable HTTP keep-alive]' \
-  '--no-cookies=[turn cookies off]' \
+  '--no-cookies[turn cookies off]' \
   '--load-cookies=[specify file to load cookies from]:cookie file:_files' \
   '--save-cookies=[specify file to save cookies to]:cookie file:_files' \
   '--keep-session-cookies[load and save session cookies]' \
   '--post-data=[use the POST method with specified data]:data to send' \
   '--post-file=[use the POST method; sending contents of a file]:file:_files' \
+  '--content-disposition[honor the Content-Disposition header when choosing local file names]'  \
+  "--auth-no-challenge[send basic HTTP authentication without first waiting for server's challenge]" \
   '--secure-protocol=[choose secure protocol]:protocol:(SSLv2 SSLv3 TLSv1)' \
   "--no-check-certificate=[don't check the server certificate]" \
   '--certificate=[specify client certificate]:client certificate file:_files' \
@@ -89,7 +98,7 @@ _arguments -C -s \
   '--delete-after' \
   '(--convert-links -k)'{--convert-links,-k}'[convert links to be relative]' \
   '(--backup-converted -K)'{--backup-converted,-K}'[backup files before conversion]' \
-  '(--mirror -m -r -N -l)'{--mirror,-m}'[mirror (-r -N -l inf -nr)]' \
+  '(--mirror -m -r -N -l)'{--mirror,-m}'[mirror (-r -N -l inf --no-remove-listing)]' \
   '(--page-requisites -p)'{--page-requisites,-p}'[get all images needed to display page]' \
   '--strict-comments[turn on strict (SGML) handling of HTML comments]' \
   '(--accept -A)'{--accept=,-A+}'[specify accepted extensions]:extensions' \
@@ -102,9 +111,10 @@ _arguments -C -s \
   '(--span-hosts -H)'{--span-hosts,-H}'[span hosts]' \
   '(--relative -L)'{--relative,-L}'[follow relative links only]' \
   '(--include-directories -I)'{--include-directories=,-I+}'[include directories]:allowed directories' \
+  '--trust-server-names' \
   '(--exclude-directories -X)'{--exclude-directories=,-X+}'[exclude directories]:excluded directories' \
+  '(-np --no-parent)'{-np,--no-parent}"[don't ascend to parent directory]" \
   '--no-host-lookup' \
-  '--no-parent' \
   '--no-verbose' \
   '--no-clobber' \
   '--no-directories' \

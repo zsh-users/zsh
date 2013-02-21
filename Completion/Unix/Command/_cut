@@ -5,54 +5,54 @@ typeset -A _cut_args
 if _pick_variant gnu="Free Soft" unix --version; then
   case $LANG in
     (de_DE.UTF-8)
-       _cut_args=(
-             bytes           "nur diese Bytes ausgeben" 
-             characters      "nur diese Zeichen ausgeben" 
-             delimiter       "Delimiter anstelle von Tabulator als Trenner benutzen"
-             fields          "nur diese Felder und alle Zeilen OHNE Trennzeichen ausgeben"
-             n               "(ignoriert)"
-             complement      "das Komplement der Menge der gew$'\u00e4'hlten Bytes, Zeichen oder Felder bilden"
-             only-delimited  "keine Zeilen ausgeben, die keinen Trenner enthalten"
-             output-delimiter "Zeichenkette als Ausgabetrennzeichen benutzen"
-             help            "diese Hilfe anzeigen und beenden"
-             version         "Versionsinformation anzeigen und beenden"
-       )
+      _cut_args=(
+	bytes           "nur diese Bytes ausgeben"
+	characters      "nur diese Zeichen ausgeben"
+	delimiter       "Delimiter anstelle von Tabulator als Trenner benutzen"
+	fields          "nur diese Felder und alle Zeilen OHNE Trennzeichen ausgeben"
+	n               "(ignoriert)"
+	complement      $'das Komplement der Menge der gew\u00e4hlten Bytes, Zeichen oder Felder bilden'
+	only-delimited  "keine Zeilen ausgeben, die keinen Trenner enthalten"
+	output-delimiter "Zeichenkette als Ausgabetrennzeichen benutzen"
+	help            "diese Hilfe anzeigen und beenden"
+	version         "Versionsinformation anzeigen und beenden"
+      )
     ;;
     (*)
-       _cut_args=(
-             bytes           "select only these bytes"
-             characters      "select only these characters"
-             delimiter       "use DELIM instead of TAB for field delimiter"
-             fields          "select only these fields and lines without the delimiter character"
-             n               "(ignored)"
-             complement      "complement the set of selected bytes, characters or fields"
-             only-delimited  "do not print lines not containing delimiters"
-             output-delimiter "use STRING as the output delimiter"
-             help            "display this help and exit"
-             version         "output version information and exit"
-       )
+      _cut_args=(
+	bytes           "select only these bytes"
+	characters      "select only these characters"
+	delimiter       "use DELIM instead of TAB for field delimiter"
+	fields          "select only these fields and lines without the delimiter character"
+	n               "(ignored)"
+	complement      "complement the set of selected bytes, characters or fields"
+	only-delimited  "do not print lines not containing delimiters"
+	output-delimiter "use STRING as the output delimiter"
+	help            "display this help and exit"
+	version         "output version information and exit"
+      )
     ;;
   esac
 
   _arguments \
-        '(--bytes -b)'{--bytes=,-b+}'['$_cut_args[bytes]']:list' \
-        '(--characters -c)'{--characters=,-c+}'['$_cut_args[characters]']:list' \
-        '(--delimiter -d)'{--delimiter=,-d+}'['$_cut_args[delimiter]']:delimeter' \
-        '(--fields -f)'{--fields=,-f+}'['$_cut_args[fields]']:list' \
-        '-n['$_cut_args[n]']' \
-        '--complement['$_cut_args[complement]']' \
-        '(--only-delimited -s)'{--only-delimited,-s}'['$_cut_args[only-delimited]']' \
-        '--output-delimiter=['$_cut_args[output-delimiter]']:delimeter' \
-        '--help['$_cut_args[help]']' \
-        '--version['$_cut_args[version]']' \
-        '*:file:_files'
+    '(--bytes -b)'{--bytes=,-b+}'['$_cut_args[bytes]']:list' \
+    '(--characters -c)'{--characters=,-c+}'['$_cut_args[characters]']:list' \
+    '(--delimiter -d)'{--delimiter=,-d+}'['$_cut_args[delimiter]']:delimiter' \
+    '(--fields -f)'{--fields=,-f+}'['$_cut_args[fields]']:list' \
+    '-n['$_cut_args[n]']' \
+    '--complement['$_cut_args[complement]']' \
+    '(--only-delimited -s)'{--only-delimited,-s}'['$_cut_args[only-delimited]']' \
+    '--output-delimiter=['$_cut_args[output-delimiter]']:delimiter' \
+    '(- *)--help['$_cut_args[help]']' \
+    '(- *)--version['$_cut_args[version]']' \
+    '*:file:_files'
 else
   _arguments \
     '-b[list specifies byte positions]:list:' \
     '-c[list specifies character positions]:list:' \
-    '-d[use alternate delimeter]:delimeter:' \
+    '-d[use alternate delimiter]:delimiter' \
     '-f[list specifies fields]:list:' \
     '-n[do not split multi-byte characters]' \
-    '-s[suppress lines with no delimeters]' \
+    '-s[suppress lines with no delimiters]' \
     '*:file:_files'
 fi
