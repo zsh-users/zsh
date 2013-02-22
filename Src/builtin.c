@@ -2680,7 +2680,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
     Patprog pprog;
     Shfunc shf;
     int i, returnval = 0;
-    int on = 0, off = 0, pflags = 0;
+    int on = 0, off = 0, pflags = 0, roff;
 
     /* Do we have any flags defined? */
     if (OPT_PLUS(ops,'u'))
@@ -2699,16 +2699,21 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	on |= PM_TAGGED_LOCAL;
     else if (OPT_PLUS(ops,'T'))
 	off |= PM_TAGGED_LOCAL;
+    roff = off;
     if (OPT_MINUS(ops,'z')) {
 	on |= PM_ZSHSTORED;
 	off |= PM_KSHSTORED;
-    } else if (OPT_PLUS(ops,'z'))
+    } else if (OPT_PLUS(ops,'z')) {
 	off |= PM_ZSHSTORED;
+	roff |= PM_ZSHSTORED;
+    }
     if (OPT_MINUS(ops,'k')) {
 	on |= PM_KSHSTORED;
 	off |= PM_ZSHSTORED;
-    } else if (OPT_PLUS(ops,'k'))
+    } else if (OPT_PLUS(ops,'k')) {
 	off |= PM_KSHSTORED;
+	roff |= PM_KSHSTORED;
+    }
 
     if ((off & PM_UNDEFINED) || (OPT_ISSET(ops,'k') && OPT_ISSET(ops,'z')) ||
 	(OPT_MINUS(ops,'X') && (OPT_ISSET(ops,'m') || *argv || !scriptname))) {
@@ -2716,7 +2721,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	return 1;
     }
 
-    if (OPT_PLUS(ops,'f') || OPT_ISSET(ops,'+'))
+    if (OPT_PLUS(ops,'f') || roff || OPT_ISSET(ops,'+'))
 	pflags |= PRINT_NAMEONLY;
 
     if (OPT_MINUS(ops,'M') || OPT_PLUS(ops,'M')) {

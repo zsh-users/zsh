@@ -1,3 +1,8 @@
+2013-02-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31060: Src/builtin.c: "+" before a flag for "functions" or
+	"autoload" should suppress display of function body.
+
 2013-02-21  Oliver Kiddle <opk@zsh.org>
 
 	* 31058: Completion/Zsh/Command/_fc, Completion/Unix/Command/_cut,
@@ -532,5 +537,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5804 $
+* $Revision: 1.5805 $
 *****************************************************
