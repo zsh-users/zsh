@@ -12,7 +12,9 @@ allargs=(
   F "($fopts -A -E -L -R -T -U -Z -a -i -m)-F[floating point, use fixed point decimal on output]"
   L "($fopts -A -E -F -i)-L+[left justify and remove leading blanks from value]:width"
   R "($fopts -A -E -F -i)-R+[right justify and fill with leading blanks]:width"
-  T "($fopts -A -E -F -a -g -h -i -l -m -t)-T[tie scalar to array]"
+  T "($fopts -A -E -F -a -g -h -i -l -m -t)-T[tie scalar to array or trace function]"
+  Tf "($popts -t)-T[trace execution of this function only]"
+  Tp "($fopts -A -E -F -a -g -h -i -l -m -t)-T[tie scalar to array]"
   U '(-A -E -F -i)-U[keep array values unique and suppress alias expansion for functions]'
   Uf '-U[suppress alias expansion for functions]'
   Up '(-E -F -i)-+U[keep array values unique]'
@@ -49,7 +51,7 @@ case ${service} in
   ;;
   float) use="EFHghlprtux";;
   functions)
-    use="Ukmtuz"
+    use="UkmTtuz"
     func=f
   ;;
   integer)
@@ -63,6 +65,12 @@ esac
 
 [[ -z "${words[(r)-*[aA]*]}" ]] || func=p
 [[ -z "${words[(r)-*f*]}" ]] || func=f
+
+# This function uses whacky features of _arguments which means we
+# need to look for options to the command beforehand.
+local onopts offopts
+onopts=${(j..)${${words[1,CURRENT-1]:#^-*}##-}}
+offopts=${(j..)${${words[1,CURRENT-1]:#^+*}##+}}
 
 for ((i=1;i<=$#use;++i)); do
   args+=( ${allargs[${use[$i]}${${(s::)use[$i]}[(r)[Uut]]:+$func}]} )
@@ -81,6 +89,22 @@ if [[ "$state" = vars_eq ]]; then
       funckeys=(${(k)functions})
       args=(${args:|funckeys})
       _wanted functions expl 'shell function' compadd -a args
+    elif [[ -n $onopts$offopts ]]; then
+      if [[ -n $offopts ]]; then
+	args=(${(f)"$(functions +$offopts)"})
+      else
+	args=(${(k)functions})
+      fi
+      if [[ -n $onopts ]]; then
+	local -a funckeys
+	funckeys=(${(f)"$(functions +$onopts)"})
+	args=(${args:|funckeys})
+      fi
+      if zstyle -t ":completion:${curcontext}:functions" prefix-needed &&
+	[[ $PREFIX != [_.]* ]]; then
+	args=(${args:#_*})
+      fi
+      _wanted functions expl 'shell functions' compadd -a args
     else
       _functions
     fi

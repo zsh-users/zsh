@@ -1,7 +1,7 @@
 2013-02-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31061: Completion/Zsh/Command/_typeset: "functions" completion
-	takes accout of options already on the command line.
+	takes account of options already on the command line.
 
 	* 31060: Src/builtin.c: "+" before a flag for "functions" or
 	"autoload" should suppress display of function body.
@@ -540,5 +540,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5806 $
+* $Revision: 1.5807 $
 *****************************************************
