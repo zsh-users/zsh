@@ -13,16 +13,16 @@ epsffit)
     ':lower left y:' \
     ':upper right x:' \
     ':upper right y:' \
-    ':input file:_ps' \
-    ':output file:_ps'
+    ':input file:_postscript' \
+    ':output file:_postscript'
   ;;
 psbook)
   _arguments \
     '-q[quiet mode]' \
     '-v[print version]' \
     '-s-[signature size]:signature size:' \
-    ':input file:_ps' \
-    ':output file:_ps'
+    ':input file:_postscript' \
+    ':output file:_postscript'
   ;;
 psnup)
   _arguments \
@@ -47,8 +47,8 @@ psnup)
     '(-2 -4    -n)-8[8 logical pages on a sheet]' \
     '(-2 -4 -8   )-n[n-up]:pages on a sheet:' \
     '-t-[layout tolerance]:layout tolerance:' \
-    ':input file:_ps' \
-    ':output file:_ps'
+    ':input file:_postscript' \
+    ':output file:_postscript'
   ;;
 psresize)
   _arguments \
@@ -60,8 +60,8 @@ psresize)
     '(-P)-W-[input page width]:input paper width:' \
     '(-P)-H-[input page height]:input paper height:' \
     '(-W -H)-P-[input page paper]:input paper paper:(a3 a4 a5 b5 letter legal 10x14)' \
-    ':input file:_ps' \
-    ':output file:_ps'
+    ':input file:_postscript' \
+    ':output file:_postscript'
   ;;
 psselect)
   _arguments \
@@ -71,8 +71,8 @@ psselect)
     '-o[select odd pages]' \
     '-r[reverse order]' \
     '-p-[pages]:pages:' \
-    ':input file:_ps' \
-    ':output file:_ps'
+    ':input file:_postscript' \
+    ':output file:_postscript'
   ;;
 pstops)
   _arguments \
@@ -84,28 +84,28 @@ pstops)
     '(-p)-h-[page height]:paper height:' \
     '(-w -h)-p-[page size]:paper size:(a3 a4 a5 b5 letter legal 10x14)' \
     ':[modulo\:][-]pageno[L][R][U][@scale][(xoff,yoff)][+|,]...:' \
-    ':input file:_ps' \
-    ':output file:_ps'
+    ':input file:_postscript' \
+    ':output file:_postscript'
   ;;
 extractres)
   _arguments \
     '-m[merge]' \
-    ':input file:_ps'
+    ':input file:_postscript'
   ;;
 fixmacps)
   _arguments \
     '-d[directory]:directory:_files -/' \
     '-n[name]:name:' \
-    ':input file:_ps'
+    ':input file:_postscript'
   ;;
 psmerge)
   _arguments \
-    '-o-[output file]:output file:_ps' \
+    '-o-[output file]:output file:_postscript' \
     '-t[thorough]' \
-    '*:input file:_ps'
+    '*:input file:_postscript'
   ;;
 fixdlsrps|fixfmps|fixpsditps|fixpspps|fixscribeps|fixtpps|fixwfwps|fixwpps|fixwwps|includeres)
-  _ps
+  _postscript
   ;;
 getafm)
   _arguments \

@@ -1,3 +1,9 @@
+2013-02-27  Oliver Kiddle <opk@zsh.org>
+
+	* c.f. 31071: Completion/Unix/Type/_postscript,
+	Completion/Unix/Command/_psutils: remove duplicate _osc and
+	rename _ps to avoid name clash
+
 2013-02-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31061: Completion/Zsh/Command/_typeset: "functions" completion
@@ -540,5 +546,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5807 $
+* $Revision: 1.5808 $
 *****************************************************
