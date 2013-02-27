@@ -1,31 +1,37 @@
 #compdef sort
 
-# zsh completions for GNU sort version 5.97
-# limitation: --key does not work exactly right
-local arguments
+local ordering='(-d --dictionary-order -g --general-numeric-sort -M --month-sort -h --human-numeric-sort -n --numeric-sort --sort -V --version-sort --help --version)'
 
-arguments=(
-    '(-b --ignore-leading-blanks)'{-b,--ignore-leading-blanks}'[ignore leading blanks]'
-    '(-d --dictionary-order)'{-d,--dictionary-order}'[consider only blanks and alphanumeric characters]'
-    '(-f --ignore-case)'{-f,--ignore-case}'[fold lower case to upper case characters]'
-    '(-g --general-numeric-sort)'{-g,--general-numeric-sort}'[compare according to general numeric value]'
-    '(-i --ignore-nonprinting)'{-i,--ignore-nonprinting}'[consider only printable characters]'
-    '(-M --month-sort)'{-M,--month-sort}"[compare (unknown) < 'JAN' < ... < 'DEC']"
-    '(-n --numeric-sort)'{-n,--numeric-sort}'[compare according to string numerical value]'
-    '(-r --reverse)'{-r,--reverse}'[reverse the result of comparisons]'
-    '(-c --check)'{-c,--check}'[check whether input is sorted; do not sort]'
-    '(-k --key)'{-k+,--key=}'[start a key at POS1, end it as POS2 (origin 1)]:key:'
-    '(-m --merge)'{-m,--merge}'[merge already sorted files; do not sort]'
-    '(-o --output)'{-o+,--output=}'[write result to FILE instead of standard output]:filename:_files'
-    '(-s --stable)'{-s+,--stable=}'[stabilize sort by disabling last-resort comparison]'
-    '(-S --buffer-size)'{-S+,--buffer-size=}'[use SIZE for main memory buffer]:size:'
-    '(-t --field-separator)'{-t+,--field-separator=}'[use SEP instead of non-blank to blank transition]:separator:'
-    '(-T --temporary-directory)'{-T+,--temporary-directory=}'[use DIR for temporaries, not $TMPDIR or /tmp; multiple options specify multiple directories]:directory'
-    '(-u --unique)'{-u,--unique}'[with -c, check for strict ordering; without -c, output only the first of an equal run]'
-    '(-z --zero-terminated)'{-z,--zero-terminated}'[end lines with 0 byte, not newline]'
-    --help'[display help and exit]'
-    --version'[output version information and exit]'
-    '*:filename:_files'
-    )
-
-_arguments -s $arguments
+_arguments -s -S \
+  '(-b --ignore-leading-blanks)'{-b,--ignore-leading-blanks}'[ignore leading blanks]' \
+  "$ordering"{-d,--dictionary-order}'[consider only blanks and alphanumeric characters]' \
+  '(-f --ignore-case)'{-f,--ignore-case}'[fold lower case to upper case characters]' \
+  "$ordering"{-g,--general-numeric-sort}'[compare according to general numeric value]' \
+  '(-i --ignore-nonprinting)'{-i,--ignore-nonprinting}'[consider only printable characters]' \
+  "$ordering"{-M,--month-sort}"[compare (unknown) < 'JAN' < ... < 'DEC']" \
+  "$ordering"{-h,--human-numeric-sort}'[compare human readable numbers (e.g., 2K 1G)]' \
+  "$ordering"{-n,--numeric-sort}'[compare according to string numerical value]' \
+  "$ordering"{-R,--random-sort}'[sort by random hash of keys]' \
+  '--random-source=[get random bytes from file]:file:_files' \
+  '(-r --reverse)'{-r,--reverse}'[reverse the result of comparisons]' \
+  "$ordering--sort=[sort according to ordering]:ordering:(general-numeric human-numeric month numeric random version)" \
+  "$ordering"{-V,--version-sort}'[sort version numbers]' \
+  '--batch-size=[maximum inputs to merge]:number' \
+  '(-c --check -C)'{-c,-C}'[check whether input is sorted; do not sort]' \
+  '(-c --check -C)--check=-[check whether input is sorted; do not sort]::bad line handling:(diagnose-first silent quiet)' \
+  '--compress-program=[specify program to compress temporary files with]:program:(gzip bzip2 lzop xz)' \
+  '--debug[annotate the of the line used to sort]' \
+  '--files0-from=[read input files from file]:file:_files' \
+  '(-k --key)'{-k+,--key=}'[start a key at POS1, end it as POS2 (origin 1)]:key' \
+  '(-m --merge)'{-m,--merge}'[merge already sorted files; do not sort]' \
+  '(-o --output)'{-o+,--output=}'[write result to file instead of standard output]:output file:_files' \
+  '(-s --stable)'{-s,--stable}'[preserve original order of lines with the same key]' \
+  '(-S --buffer-size)'{-S+,--buffer-size=}'[specify size for main memory buffer]:size' \
+  '(-t --field-separator)'{-t+,--field-separator=}'[specify field separator instead of non-blank to blank transition]:separator' \
+  \*{-T+,--temporary-directory=}'[specify directory for temporary files]:directory:_directories' \
+  '(-u --unique)'{-u,--unique}'[with -c, check for strict ordering; without -c, output only the first of an equal run]' \
+  '--parallel=[set number of sorts run concurrently]:number' \
+  '(-z --zero-terminated)'{-z,--zero-terminated}'[end lines with 0 byte, not newline]' \
+  '(- *)--help[display help and exit]' \
+  '(- *)--version[output version information and exit]' \
+  '*:file:_files'

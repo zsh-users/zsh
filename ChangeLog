@@ -1,5 +1,8 @@
 2013-02-27  Oliver Kiddle <opk@zsh.org>
 
+	* 31077: Completion/Unix/Command/_sort: update for new
+	options in GNU sort
+
 	* c.f. 31071: Completion/Unix/Type/_postscript,
 	Completion/Unix/Command/_psutils: remove duplicate _osc and
 	rename _ps to avoid name clash
@@ -546,5 +549,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5808 $
+* $Revision: 1.5809 $
 *****************************************************
