@@ -3158,6 +3158,10 @@ The output base can be initialised by passing the option `tt(-#)var(base)',
 for example `tt(zcalc -#16)' (the `tt(#)' may have to be quoted, depending
 on the globbing options set).
 
+If the option `tt(-f)' is set, all numbers are treated as floating
+point, hence for example the expression `tt(3/4)' evaluates to 0.75
+rather than 0.  Options must appear in separate words.
+
 The prompt is configurable via the parameter tt(ZCALCPROMPT), which
 undergoes standard prompt expansion.  The index of the current entry is
 stored locally in the first element of the array tt(psvar), which can be

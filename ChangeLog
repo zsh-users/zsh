@@ -1,5 +1,8 @@
 2013-03-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* users/17666: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: -f
+	option to zcalc sets FORCE_FLOAT.
+
 	* users/17665: Doc/Zsh/options.yo, Src/math.c, Src/options.c,
 	Src/zsh.h, Test/C01arith.ztst: add FORCE_FLOAT option.
 
@@ -558,5 +561,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5811 $
+* $Revision: 1.5812 $
 *****************************************************

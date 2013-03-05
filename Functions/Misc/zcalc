@@ -114,7 +114,7 @@ float PI E
 (( PI = 4 * atan(1), E = exp(1) ))
 
 # Process command line
-while [[ -n $1 && $1 = -(|[#-]*) ]]; do
+while [[ -n $1 && $1 = -(|[#-]*|f) ]]; do
   optlist=${1[2,-1]}
   shift
   [[ $optlist = (|-) ]] && break
@@ -138,6 +138,9 @@ while [[ -n $1 && $1 = -(|[#-]*) ]]; do
 	      return 1
 	    fi
             defbase="[#${arg}]"
+	    ;;
+	(f) # Force floating point operation
+	    setopt forcefloat
 	    ;;
     esac
   done
