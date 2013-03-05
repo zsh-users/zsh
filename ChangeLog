@@ -1,4 +1,13 @@
+2013-03-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/17665: Doc/Zsh/options.yo, Src/math.c, Src/options.c,
+	Src/zsh.h, Test/C01arith.ztst: add FORCE_FLOAT option.
+
 2013-02-27  Oliver Kiddle <opk@zsh.org>
+
+	* 31076: Completion/Linux/Command/_yast,
+	Completion/Unix/Type/_pids, Completion/Unix/Type/_pdf:
+	fix cases of more than one completion function for a command
 
 	* 31077: Completion/Unix/Command/_sort: update for new
 	options in GNU sort
@@ -549,5 +558,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5809 $
+* $Revision: 1.5811 $
 *****************************************************

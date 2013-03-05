@@ -131,6 +131,7 @@ static struct optname optns[] = {
 {{NULL, "extendedhistory",    OPT_CSH},			 EXTENDEDHISTORY},
 {{NULL, "evallineno",	      OPT_EMULATE|OPT_ZSH},	 EVALLINENO},
 {{NULL, "flowcontrol",	      OPT_ALL},			 FLOWCONTROL},
+{{NULL, "forcefloat",         0},                        FORCEFLOAT},
 {{NULL, "functionargzero",    OPT_EMULATE|OPT_NONBOURNE},FUNCTIONARGZERO},
 {{NULL, "glob",		      OPT_EMULATE|OPT_ALL},	 GLOBOPT},
 {{NULL, "globalexport",       OPT_EMULATE|OPT_ZSH},	 GLOBALEXPORT},

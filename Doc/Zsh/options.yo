@@ -485,6 +485,17 @@ Treat the `tt(#)', `tt(~)' and `tt(^)' characters as part of patterns
 for filename generation, etc.  (An initial unquoted `tt(~)'
 always produces named directory expansion.)
 )
+pindex(FORCE_FLOAT)
+pindex(NO_FORCE_FLOAT)
+pindex(FORCEFLOAT)
+pindex(NOFORCEFLOAT)
+cindex(floating point, forcing use of)
+cindex(forcing use of floating point)
+item(tt(FORCE_FLOAT))(
+Constants in arithmetic evaluation will be treated as floating point
+even without the use of a decimal point.  Integers in any base
+will be converted.
+)
 pindex(GLOB)
 pindex(NO_GLOB)
 pindex(NOGLOB)

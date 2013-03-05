@@ -456,6 +456,11 @@ lexconstant(void)
 	    yyval.u.l = zstrtol_underscore(ptr, &ptr, 0, 1);
 	    /* Should we set lastbase here? */
 	    lastbase = 16;
+	    if (isset(FORCEFLOAT))
+	    {
+		yyval.type = MN_FLOAT;
+		yyval.u.d = (double)yyval.u.l;
+	    }
 	    return NUM;
 	}
 	else if (isset(OCTALZEROES))
@@ -475,6 +480,11 @@ lexconstant(void)
 	    {
 		yyval.u.l = zstrtol_underscore(ptr, &ptr, 0, 1);
 		lastbase = 8;
+		if (isset(FORCEFLOAT))
+		{
+		    yyval.type = MN_FLOAT;
+		    yyval.u.d = (double)yyval.u.l;
+		}
 		return NUM;
 	    }
 	    nptr = ptr2;
@@ -536,6 +546,11 @@ lexconstant(void)
 	    ptr++;
 	    lastbase = yyval.u.l;
 	    yyval.u.l = zstrtol_underscore(ptr, &ptr, lastbase, 1);
+	}
+	if (isset(FORCEFLOAT))
+	{
+	    yyval.type = MN_FLOAT;
+	    yyval.u.d = (double)yyval.u.l;
 	}
     }
     return NUM;
