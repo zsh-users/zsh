@@ -232,6 +232,33 @@ promptexpand(char *s, int ns, char *rs, char *Rs, unsigned int *txtchangep)
     return new_vars.buf;
 }
 
+/* Parse the argument for %F and %K */
+static int
+parsecolorchar(int arg, int is_fg)
+{
+    if (bv->fm[1] == '{') {
+	char *ep;
+	bv->fm += 2; /* skip over F{ */
+	if ((ep = strchr(bv->fm, '}'))) {
+	    char oc = *ep, *col, *coll;
+	    *ep = '\0';
+	    /* expand the contents of the argument so you can use
+	     * %v for example */
+	    coll = col = promptexpand(bv->fm, 0, NULL, NULL, NULL);
+	    *ep = oc;
+	    arg = match_colour((const char **)&coll, is_fg, 0);
+	    free(col);
+	    bv->fm = ep;
+	} else {
+	    arg = match_colour((const char **)&bv->fm, is_fg, 0);
+	    if (*bv->fm != '}')
+		bv->fm--;
+	}
+    } else
+	arg = match_colour(NULL, 1, arg);
+    return arg;
+}
+
 /* Perform %- and !-expansion as required on a section of the prompt.  The *
  * section is ended by an instance of endchar.  If doprint is 0, the valid *
  * % sequences are merely skipped over, and nothing is stored.             */
@@ -494,13 +521,7 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		tsetcap(TCUNDERLINEEND, TSC_PROMPT|TSC_DIRTY);
 		break;
 	    case 'F':
-		if (bv->fm[1] == '{') {
-		    bv->fm += 2;
-		    arg = match_colour((const char **)&bv->fm, 1, 0);
-		    if (*bv->fm != '}')
-			bv->fm--;
-		} else
-		    arg = match_colour(NULL, 1, arg);
+		arg = parsecolorchar(arg, 1);
 		if (arg >= 0 && !(arg & TXTNOFGCOLOUR)) {
 		    txtchangeset(txtchangep, arg & TXT_ATTR_FG_ON_MASK,
 				 TXTNOFGCOLOUR);
@@ -515,13 +536,7 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		set_colour_attribute(TXTNOFGCOLOUR, COL_SEQ_FG, TSC_PROMPT);
 		break;
 	    case 'K':
-		if (bv->fm[1] == '{') {
-		    bv->fm += 2;
-		    arg = match_colour((const char **)&bv->fm, 0, 0);
-		    if (*bv->fm != '}')
-			bv->fm--;
-		} else
-		    arg = match_colour(NULL, 0, arg);
+		arg = parsecolorchar(arg, 0);
 		if (arg >= 0 && !(arg & TXTNOBGCOLOUR)) {
 		    txtchangeset(txtchangep, arg & TXT_ATTR_BG_ON_MASK,
 				 TXTNOBGCOLOUR);
