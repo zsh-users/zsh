@@ -5,10 +5,10 @@
 setopt localoptions extendedglob NO_shwordsplit
 local gitdir gitbase gitbranch gitaction gitunstaged gitstaged gitsha1
 local stgitpatch stgitunapplied
-local -xA hook_com
+local -A hook_com
 
 VCS_INFO_git_getaction () {
-    local gitaction='' gitdir=$1
+    local gitdir=$1
     local tmp
 
     for tmp in "${gitdir}/rebase-apply" \
@@ -22,7 +22,6 @@ VCS_INFO_git_getaction () {
             else
                 gitaction="am/rebase"
             fi
-            printf '%s' ${gitaction}
             return 0
         fi
     done
@@ -30,7 +29,7 @@ VCS_INFO_git_getaction () {
     for tmp in "${gitdir}/rebase-merge/interactive" \
                "${gitdir}/.dotest-merge/interactive" ; do
         if [[ -f "${tmp}" ]] ; then
-            printf '%s' "rebase-i"
+            gitaction="rebase-i"
             return 0
         fi
     done
@@ -38,18 +37,18 @@ VCS_INFO_git_getaction () {
     for tmp in "${gitdir}/rebase-merge" \
                "${gitdir}/.dotest-merge" ; do
         if [[ -d "${tmp}" ]] ; then
-            printf '%s' "rebase-m"
+            gitaction="rebase-m"
             return 0
         fi
     done
 
     if [[ -f "${gitdir}/MERGE_HEAD" ]] ; then
-        printf '%s' "merge"
+        gitaction="merge"
         return 0
     fi
 
     if [[ -f "${gitdir}/BISECT_LOG" ]] ; then
-        printf '%s' "bisect"
+        gitaction="bisect"
         return 0
     fi
 
@@ -59,7 +58,6 @@ VCS_INFO_git_getaction () {
         else
             gitaction=cherry
         fi
-        printf '%s' ${gitaction}
         return 0
     fi
 
@@ -67,7 +65,7 @@ VCS_INFO_git_getaction () {
 }
 
 VCS_INFO_git_getbranch () {
-    local gitbranch gitdir=$1 tmp actiondir
+    local gitdir=$1 tmp actiondir
     local gitsymref="${vcs_comm[cmd]} symbolic-ref HEAD"
 
     actiondir=''
@@ -106,12 +104,11 @@ VCS_INFO_git_getbranch () {
         fi
     fi
 
-    printf '%s' "${gitbranch}"
     return 0
 }
 
 gitdir=${vcs_comm[gitdir]}
-gitbranch="$(VCS_INFO_git_getbranch ${gitdir})"
+VCS_INFO_git_getbranch ${gitdir}
 if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision ; then
     gitsha1=$(${vcs_comm[cmd]} rev-parse --quiet --verify HEAD)
 else
@@ -134,7 +131,7 @@ if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" "check-for-changes" && \
 fi
 
 VCS_INFO_adjust
-gitaction="$(VCS_INFO_git_getaction ${gitdir})"
+VCS_INFO_git_getaction ${gitdir}
 gitbase=${PWD%/${$( ${vcs_comm[cmd]} rev-parse --show-prefix )%/##}}
 rrn=${gitbase:t}
 

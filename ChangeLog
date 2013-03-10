@@ -11,6 +11,9 @@
 	Add support for showing the current action is cherry-pick (happens
 	when cherry-picking a range).
 
+	* 31136: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	just set parameters instead of passing over a pipe.
+
 2013-03-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/17666: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: -f
@@ -574,5 +577,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5815 $
+* $Revision: 1.5816 $
 *****************************************************
