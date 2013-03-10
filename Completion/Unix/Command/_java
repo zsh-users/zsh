@@ -229,7 +229,7 @@ keytool)
       '-keypass[password for private key]:password for private key:' \
       '-validity[valid days]:number of days:' \
       '-storetype[keystore type]:store type:' \
-      '-keystore[keystore location]:keystore location:' \
+      '-keystore[keystore location]:keystore location:_files' \
       '-storepass[password for keystore]:password:' \
       '-v[verbose mode]' \
     - import \
@@ -240,7 +240,7 @@ keytool)
       '-noprompt[disable interaction with the user]' \
       '-trustcacerts[use cacerts]' \
       '-storetype[keystore type]:store type:' \
-      '-keystore[keystore location]:keystore location:' \
+      '-keystore[keystore location]:keystore location:_files' \
       '-storepass[password for keystore]:password:' \
       '-v[verbose mode]' \
     - selfcert \
@@ -251,14 +251,14 @@ keytool)
       '-validity[valid days]:number of days:' \
       '-keypass[password for private key]:password for private key:' \
       '-storetype[keystore type]:store type:' \
-      '-keystore[keystore location]:keystore location:' \
+      '-keystore[keystore location]:keystore location:_files' \
       '-storepass[password for keystore]:password:' \
       '-v[verbose mode]' \
     - identitydb \
       '-identitydb[command to read identity database]' \
       '-file[specify identity database file]:identity database file:_files' \
       '-storetype[keystore type]:store type:' \
-      '-keystore[keystore location]:keystore location:' \
+      '-keystore[keystore location]:keystore location:_files' \
       '-storepass[password for keystore]:password:' \
       '-v[verbose mode]' \
     - certreq \
@@ -268,7 +268,7 @@ keytool)
       '-file[specify certificate signing request file]:certificate signing request file:_files' \
       '-keypass[password for private key]:password for private key:' \
       '-storetype[keystore type]:store type:' \
-      '-keystore[keystore location]:keystore location:' \
+      '-keystore[keystore location]:keystore location:_files' \
       '-storepass[password for keystore]:password:' \
       '-v[verbose mode]' \
     - export \
@@ -277,14 +277,14 @@ keytool)
       '-file[specify certificate file]:certificate file:_files' \
       '-rfc[make certificate format printable as RFC 1421]' \
       '-storetype[keystore type]:store type:' \
-      '-keystore[keystore location]:keystore location:' \
+      '-keystore[keystore location]:keystore location:_files' \
       '-storepass[password for keystore]:password:' \
       '-v[verbose mode]' \
     - list \
       '-list[command to print keystore entry]' \
       '-alias[alias]:alias:' \
       '-storetype[keystore type]:store type:' \
-      '-keystore[keystore location]:keystore location:' \
+      '-keystore[keystore location]:keystore location:_files' \
       '-storepass[password for keystore]:password:' \
       '(-rfc)-v[make certificate format human-readable]' \
       '(-v)-rfc[make certificate format printable as RFC 1421]' \
@@ -299,14 +299,14 @@ keytool)
       '-keypass[password for private key]:password for private key:' \
       '-new[password for private key of new entry]:password for private key of new entry:' \
       '-storetype[keystore type]:store type:' \
-      '-keystore[keystore location]:keystore location:' \
+      '-keystore[keystore location]:keystore location:_files' \
       '-storepass[password for keystore]:password:' \
       '-v[verbose mode]' \
     - storepasswd \
       '-storepasswd[command to change password for keystore]' \
       '-new[new password]:new password:' \
       '-storetype[keystore type]:store type:' \
-      '-keystore[keystore location]:keystore location:' \
+      '-keystore[keystore location]:keystore location:_files' \
       '-storepass[password for keystore]:password:' \
       '-v[verbose mode]' \
     - keypasswd \
@@ -315,14 +315,14 @@ keytool)
       '-keypass[old password for private key]:old password for private key:' \
       '-new[nwe password for private key]:new password for private key:' \
       '-storetype[keystore type]:store type:' \
-      '-keystore[keystore location]:keystore location:' \
+      '-keystore[keystore location]:keystore location:_files' \
       '-storepass[password for keystore]:password:' \
       '-v[verbose mode]' \
     - delete \
       '-delete[command to delete entry]' \
       '-alias[alias]:alias:' \
       '-storetype[keystore type]:store type:' \
-      '-keystore[keystore location]:keystore location:' \
+      '-keystore[keystore location]:keystore location:_files' \
       '-storepass[password for keystore]:password:' \
       '-v[verbose mode]' \
     - help \
@@ -331,7 +331,7 @@ keytool)
 
 jarsigner)
   _arguments \
-    '-keystore[specify URL for keystore location]:URL for keystore location:' \
+    '-keystore[keystore location]:keystore location:_files' \
     '-storetype[specify keystore type]:store type:' \
     '-storepass[specify password for keystore]:password:' \
     '-keypass[specify password for private key]:password:' \

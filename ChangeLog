@@ -4,6 +4,9 @@
 	sequences. This allows constructs like %F{%3v} to use $psvar[3]
 	for the color.
 
+	* 30490: Completion/Unix/Command/_java: Complete files for the
+	-keystore argument.
+
 2013-03-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/17666: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: -f
@@ -567,5 +570,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5813 $
+* $Revision: 1.5814 $
 *****************************************************
