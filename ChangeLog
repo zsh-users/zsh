@@ -7,6 +7,10 @@
 	* 30490: Completion/Unix/Command/_java: Complete files for the
 	-keystore argument.
 
+	* 30639: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	Add support for showing the current action is cherry-pick (happens
+	when cherry-picking a range).
+
 2013-03-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/17666: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: -f
@@ -570,5 +574,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5814 $
+* $Revision: 1.5815 $
 *****************************************************

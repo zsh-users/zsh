@@ -52,6 +52,17 @@ VCS_INFO_git_getaction () {
         printf '%s' "bisect"
         return 0
     fi
+
+    if [[ -f "${gitdir}/CHERRY_PICK_HEAD" ]] ; then
+        if [[ -d "${gitdir}/sequencer" ]] ; then
+            gitaction=cherry-seq
+        else
+            gitaction=cherry
+        fi
+        printf '%s' ${gitaction}
+        return 0
+    fi
+
     return 1
 }
 
