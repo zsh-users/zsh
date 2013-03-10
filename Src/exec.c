@@ -1885,7 +1885,14 @@ checkclobberparam(struct redir *f)
 	return 0;
     }
 
-    if (!isset(CLOBBER) && (fd = (int)getintvalue(v)) &&
+    /*
+     * We can't clobber the value in the parameter if it's
+     * already an opened file descriptor --- that means it's a decimal
+     * integer corresponding to an opened file descriptor,
+     * not merely an expression that evaluates to a file descriptor.
+     */
+    if (!isset(CLOBBER) && (s = getstrvalue(v)) &&
+	(fd = (int)zstrtol(s, &s, 10)) >= 0 && !*s &&
 	fd <= max_zsh_fd && fdtable[fd] == FDT_EXTERNAL) {
 	zwarn("can't clobber parameter %s containing file descriptor %d",
 	     f->varid, fd);

@@ -328,6 +328,17 @@
 1q:NO_CLOBBER prevents overwriting parameter with allocated fd
 ?(eval):4: can't clobber parameter myfd containing file descriptor $myfd
 
+  (setopt noclobber
+   exec {myfd}>logfile2b
+   print First open >&$myfd
+   rm -f logfile2b # prevent normal file no_clobberation
+   myotherfd="${myfd}+0"
+   exec {myotherfd}>logfile2b
+   print Overwritten >&$myotherfd)
+   cat logfile2b
+0:NO_CLOBBER doesn't complain about any other expression
+>Overwritten
+
   (exec {myfd}>logfile4
   echo $myfd
   exec {myfd}>&-

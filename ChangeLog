@@ -1,3 +1,9 @@
+2013-03-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31141: Src/exec.c, Test/A04redirect.ztst: NO_CLOBBER for {fd}
+	syntax should only apply if $fd is exactly an fd and nothing
+	else.
+
 2013-03-10  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 30496: Src/prompt.c: Parse argument to %F and %K as prompt
@@ -577,5 +583,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5816 $
+* $Revision: 1.5817 $
 *****************************************************
