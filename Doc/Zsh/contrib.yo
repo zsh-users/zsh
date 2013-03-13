@@ -619,7 +619,7 @@ To load tt(vcs_info):
 example(autoload -Uz vcs_info)
 
 It can be used in any existing prompt, because it does not require any
-tt($psvar) entries to be left available.
+specific tt($psvar) entries to be available.
 
 subsect(Quickstart)
 

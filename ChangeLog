@@ -1,3 +1,8 @@
+2013-03-13  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: Doc/Zsh/contrib.yo: Also adjust a mention of psvar
+	in the vcs info documentation.
+
 2013-03-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted, c.f. thread from 31144: Doc/Zsh/params.yo: all psvar
@@ -588,5 +593,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5818 $
+* $Revision: 1.5819 $
 *****************************************************
