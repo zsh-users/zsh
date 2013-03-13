@@ -1215,7 +1215,7 @@ In sh or ksh emulation, the default is `tt(PLUS() )'.
 vindex(psvar)
 vindex(PSVAR)
 item(tt(psvar) <S> <Z> (tt(PSVAR) <S>))(
-An array (colon-separated list) whose first nine values can be used in
+An array (colon-separated list) whose elements can be used in
 tt(PROMPT) strings.  Setting tt(psvar) also sets tt(PSVAR), and
 vice versa.
 )
