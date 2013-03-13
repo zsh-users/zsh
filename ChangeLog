@@ -3,6 +3,11 @@
 	* unposted: Doc/Zsh/contrib.yo: Also adjust a mention of psvar
 	in the vcs info documentation.
 
+	* 31140: Src/math.c: when the math recursion limit is hit, make
+	sure to not leave *ep pointing nowhere, which caused a crash
+	sometimes. Also print the token that we refused to evaluate
+	because of the limit.
+
 2013-03-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted, c.f. thread from 31144: Doc/Zsh/params.yo: all psvar
@@ -593,5 +598,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5819 $
+* $Revision: 1.5820 $
 *****************************************************

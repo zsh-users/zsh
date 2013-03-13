@@ -362,8 +362,9 @@ mathevall(char *s, enum prec_type prec_tp, char **ep)
     if (mlevel >= MAX_MLEVEL) {
 	xyyval.type = MN_INTEGER;
 	xyyval.u.l = 0;
+	*ep = s;
 
-	zerr("math recursion limit exceeded");
+	zerr("math recursion limit exceeded: %s", *ep);
 
 	return xyyval;
     }
