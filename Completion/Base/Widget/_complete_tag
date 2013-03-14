@@ -32,6 +32,11 @@ while [[ ! -f $c_path$c_Tagsfile &&
   c_path=../$c_path
 done
 
+if [[ -f $c_path$c_Tagsfile && $c_path$c_Tagsfile -ef $c_path$c_tagsfile &&
+      "$(head -1 $c_path$c_tagsfile)" == '!_TAG_'* ]]; then
+        c_Tagsfile=
+fi
+
 if [[ -f $c_path$c_Tagsfile ]]; then
   # prefer the more comprehensive TAGS, which unfortunately is a
   # little harder to parse.

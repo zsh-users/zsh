@@ -1,3 +1,8 @@
+2013-03-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31151: Pavol Juhas: complete (C etc) tags better
+	when file system is not case sensitive.
+
 2013-03-13  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Doc/Zsh/contrib.yo: Also adjust a mention of psvar
@@ -598,5 +603,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5820 $
+* $Revision: 1.5821 $
 *****************************************************
