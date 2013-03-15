@@ -1,3 +1,8 @@
+2013-03-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31154: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: make zcalc
+	understand continuation lines using backslash.
+
 2013-03-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31151: Pavol Juhas: complete (C etc) tags better
@@ -603,5 +608,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5821 $
+* $Revision: 1.5822 $
 *****************************************************

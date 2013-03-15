@@ -3144,7 +3144,12 @@ line preceded by `tt(4> )' is available as tt($4).  The last value
 calculated is available as tt(ans).  Full command line editing, including
 the history of previous calculations, is available; the history is saved in
 the file tt(~/.zcalc_history).  To exit, enter a blank line or type `tt(:q)'
-on its own (`tt(q)' is allowed for historical compatibility).
+on its own (`tt(q)' is allowed for historical compatibility).  A
+line ending with a single backslash is treated in the same fashion
+as it is in command line editing:  the backslash is removed, the
+function prompts for more input (the prompt is preceded by `tt(...)'
+to indicate this), and the lines are combined into one to get the final
+result.
 
 If arguments are given to tt(zcalc) on start up, they are used to prime the
 first few positional parameters.  A visual indication of this is given when

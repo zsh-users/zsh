@@ -155,7 +155,17 @@ for (( num = 1; num <= $#; num++ )); do
 done
 
 psvar[1]=$num
-while vared -cehp "${ZCALCPROMPT}" line; do
+local prev_line cont_prompt
+while vared -cehp "${cont_prompt}${ZCALCPROMPT}" line; do
+  if [[ $line = (|*[^\\])('\\')#'\' ]]; then
+    prev_line+=$line[1,-2]
+    cont_prompt="..."
+    line=
+    continue
+  fi
+  line="$prev_line$line"
+  prev_line=
+  cont_prompt=
   [[ -z $line ]] && break
   # special cases
   # Set default base if `[#16]' or `[##16]' etc. on its own.
