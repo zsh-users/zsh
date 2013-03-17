@@ -3144,12 +3144,14 @@ line preceded by `tt(4> )' is available as tt($4).  The last value
 calculated is available as tt(ans).  Full command line editing, including
 the history of previous calculations, is available; the history is saved in
 the file tt(~/.zcalc_history).  To exit, enter a blank line or type `tt(:q)'
-on its own (`tt(q)' is allowed for historical compatibility).  A
-line ending with a single backslash is treated in the same fashion
+on its own (`tt(q)' is allowed for historical compatibility).
+
+A line ending with a single backslash is treated in the same fashion
 as it is in command line editing:  the backslash is removed, the
 function prompts for more input (the prompt is preceded by `tt(...)'
 to indicate this), and the lines are combined into one to get the final
-result.
+result.  In addition, if the input so far contains more open than
+close parentheses tt(zcalc) will prompt for more input.
 
 If arguments are given to tt(zcalc) on start up, they are used to prime the
 first few positional parameters.  A visual indication of this is given when
@@ -3219,11 +3221,13 @@ scope.
 )
 item(tt(:function) var(name) [ var(body) ])(
 Define a mathematical function or (with no var(body)) delete it.
+tt(:function) may be abbreviated to tt(:func) or simply tt(:f).
+The var(name) may contain the same characters as a shell function name.
 The function is defined using tt(zmathfuncdef), see below.
 
 Note that tt(zcalc) takes care of all quoting.  Hence for example:
 
-example(function cube $1 * $1 * $1)
+example(:f cube $1 * $1 * $1)
 
 defines a function to cube the sole argument.
 )

@@ -166,6 +166,14 @@ while vared -cehp "${cont_prompt}${ZCALCPROMPT}" line; do
   line="$prev_line$line"
   prev_line=
   cont_prompt=
+  # Test whether there are as many open as close
+  # parentheses in the line so far.
+  if [[ ${#line//[^\(]} -gt ${#line//[^\)]} ]]; then
+      prev_line+=$line
+      cont_prompt="..."
+      line=
+      continue
+  fi
   [[ -z $line ]] && break
   # special cases
   # Set default base if `[#16]' or `[##16]' etc. on its own.
@@ -178,6 +186,7 @@ while vared -cehp "${cont_prompt}${ZCALCPROMPT}" line; do
 	defbase=$match[1]
       fi
       print -s -- $line
+      print -- $(( ${defbase} ans ))
       line=
       continue
     else
@@ -233,7 +242,7 @@ while vared -cehp "${cont_prompt}${ZCALCPROMPT}" line; do
       continue
     ;;
 
-    ((:|)function[[:blank:]]##(#b)([^[:blank:]]##)(|[[:blank:]]##([^[:blank:]]*)))
+    ((function|:f(unc(tion|)|))[[:blank:]]##(#b)([^[:blank:]]##)(|[[:blank:]]##([^[:blank:]]*)))
       zmathfuncdef $match[1] $match[3]
       line=
       continue

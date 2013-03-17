@@ -1,3 +1,8 @@
+2013-03-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31155: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: minor
+        extra zcalc features and documentation.
+
 2013-03-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31154: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: make zcalc
@@ -608,5 +613,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5822 $
+* $Revision: 1.5823 $
 *****************************************************
