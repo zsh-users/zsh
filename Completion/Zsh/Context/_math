@@ -9,4 +9,6 @@ if [[ "$SUFFIX" = *[^a-zA-Z0-9_]* ]]; then
   SUFFIX="${SUFFIX%%[^a-zA-Z0-9_]*}"
 fi
 
-_parameters -g '(integer|float)*' || _parameters
+_alternative 'math-parameters:math parameter: _math_params' \
+    'user-math-functions:user math function: _user_math_func' \
+    'module-math-functions:math function from zsh/mathfunc: _module_math_func'

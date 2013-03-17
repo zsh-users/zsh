@@ -13,7 +13,7 @@ _zcalc_line_escapes() {
     "eng:engineering (power of 1000) output format"
     "raw:raw output format"
     "local:make variables local"
-    "function:define math function"
+    "function:define math function (also \:func or \:f)"
   )
   cmds=("\:"${^cmds})
   _describe -t command-escapes "command escapes" cmds -Q

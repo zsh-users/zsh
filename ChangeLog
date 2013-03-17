@@ -1,5 +1,7 @@
 2013-03-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 31156: improved math context completion: functions.
+
 	* 31155: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: minor
         extra zcalc features and documentation.
 
@@ -613,5 +615,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5823 $
+* $Revision: 1.5824 $
 *****************************************************
