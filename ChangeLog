@@ -1,3 +1,8 @@
+2013-04-20  Torstein Hegge  <hegge@resisty.net>
+
+	* 31159: Completion/Unix/Command/_git: git: Pass prefix filter to
+	ls-files even if it matches no files
+
 2013-04-20  Jun T  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 31281: Completion/Unix/Command/_du: _du: add support for Mac OS
