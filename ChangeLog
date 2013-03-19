@@ -1,6 +1,16 @@
+2013-03-19  Bart Schaefer  <schaefer@zsh.org>
+
+	* 31158: Src/pattern.c: following a wildcard with a repetition
+	produces a bad pattern error instead of an unbounded search
+
 2013-03-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 31156: improved math context completion: functions.
+	* 31156: Completion/Zsh/Context/_math,
+	Completion/Zsh/Context/_zcalc_line, Completion/Zsh/Type/.distfile,
+	Completion/Zsh/Type/_math_params,
+	Completion/Zsh/Type/_module_math_func,
+	Completion/Zsh/Type/_user_math_func: improved math context
+	completion: functions.
 
 	* 31155: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: minor
         extra zcalc features and documentation.
@@ -615,5 +625,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5824 $
+* $Revision: 1.5825 $
 *****************************************************

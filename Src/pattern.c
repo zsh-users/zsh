@@ -1474,7 +1474,7 @@ patcomppiece(int *flagp)
     }
 
     /* too much at once doesn't currently work */
-    if (kshchar && pound)
+    if (kshchar && (pound || count))
 	return 0;
 
     if (kshchar == '*') {
