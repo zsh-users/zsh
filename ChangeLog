@@ -1,3 +1,9 @@
+2013-03-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Han Pingtian: 31167 (with tweak):
+	Completion/Unix/Command/_ssh: limit use of colons for detecting
+	a remote path.
+
 2013-03-19  Bart Schaefer  <schaefer@zsh.org>
 
 	* 31158: Src/pattern.c: following a wildcard with a repetition
@@ -625,5 +631,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5825 $
+* $Revision: 1.5826 $
 *****************************************************

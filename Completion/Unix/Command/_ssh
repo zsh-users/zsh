@@ -519,7 +519,7 @@ _ssh () {
       fi
       ;;
     file)
-      if compset -P '*:'; then
+      if compset -P '[^./][^/]#:'; then
         _remote_files -- ssh ${(kv)~opt_args[(I)-[FP1246]]/-P/-p} && ret=0
       elif compset -P '*@'; then
         suf=( -S '' )
