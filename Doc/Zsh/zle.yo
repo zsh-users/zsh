@@ -308,6 +308,7 @@ cindex(parameters, editing)
 cindex(editing parameters)
 xitem(tt(vared) [ tt(-Aache) ] [ tt(-p) var(prompt) ] [ tt(-r) var(rprompt) ])
 xitem(  [ tt(-M) var(main-keymap) ] [ tt(-m) var(vicmd-keymap) ])
+xitem(  [ tt(-i) var(init-widget) ] [ tt(-f) var(finish-widget) ])
 item(  [ tt(-t) var(tty) ] var(name))(
 The value of the parameter var(name) is loaded into the edit
 buffer, and the line editor is invoked.  When the editor exits,
@@ -342,6 +343,10 @@ keymap during editing.  For vi-style editing, this allows a pair of keymaps
 to override tt(viins) and tt(vicmd).  For emacs-style editing, only tt(-M)
 is normally needed but the tt(-m) option may still be used.  On exit, the
 previous keymaps will be restored.
+
+tt(Vared) calls the usual `tt(zle-line-init)' and `tt(zle-line-finish)'
+hooks before and after it takes control. Using the tt(-i) and tt(-f)
+options, it is possible to replace these with other costum widgets.
 
 If `tt(-t) var(tty)' is given, var(tty) is the name of a terminal device
 to be used instead of the default tt(/dev/tty).  If var(tty) does not

@@ -6,6 +6,9 @@
 	* 31172: Src/Zle/zle_main.c: 31172: Let vared define custom init
 	and finish hooks
 
+	* 31175: Doc/Zsh/zle.yo: 31175: Add documentation for the new -i
+	and -f options of vared
+
 2013-04-04  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 31203: Completion/Unix/Command/.distfiles,
