@@ -1219,11 +1219,11 @@ zleread(char **lp, char **rp, int flags, int context)
     initmodifier(&zmod);
     prefixflag = 0;
 
-    zrefresh();
-
     unqueue_signals();	/* Should now be safe to acknowledge SIGWINCH */
 
     zlecallhook("zle-line-init", NULL);
+
+    zrefresh();
 
     zlecore();
 
