@@ -14,8 +14,8 @@
 # Fixing this is beyond my current _arguments expertise--help
 # appreciated.
 
-_arguments -S -s '-F[define input field separator to be an extended regular expression]:extended regular expression:' \
-    '*-v[assign values to variables]:assignment:' \
-    '(1)-f[program file]:program file:_files' \
+_arguments -S -s '-F+[define input field separator to be an extended regular expression]:extended regular expression:' \
+    '*-v+[assign values to variables]:assignment:' \
+    '(1)-f+[program file]:program file:_files' \
     '1:program text:' \
     '*:input files:_files'
