@@ -844,7 +844,7 @@ vigotomark(UNUSED(char **args))
     }
     zlecs = vimarkcs[ch];
     vimarkcs[26] = oldcs;
-    vimarkline[26] = histline;
+    vimarkline[26] = oldline;
     if (zlecs > zlell)
 	zlecs = zlell;
     return 0;

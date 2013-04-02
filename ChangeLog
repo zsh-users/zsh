@@ -1,3 +1,8 @@
+2013-04-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Jun T.: 31183: Src/Zle/zle_move.c: record old line rather than
+	history line in vi-goto-mark.
+
 2013-03-29  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 31182: Completion/Unix/Command/_awk: Allow sticked arguments.
@@ -635,5 +640,5 @@
 
 *****************************************************
 * This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5827 $
+* $Revision: 1.5828 $
 *****************************************************
