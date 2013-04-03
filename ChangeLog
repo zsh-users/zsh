@@ -1,3 +1,7 @@
+2013-02-18  Aaron Schrab  <aaron@schrab.com>
+
+	* 07478c6b: Src/zsh.mdd: Generate patch level using `git describe`
+
 2013-04-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Jun T.: 31183: Src/Zle/zle_move.c: record old line rather than
