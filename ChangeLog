@@ -1,3 +1,8 @@
+2013-04-04  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31203: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_etags: new etags completion.
+
 2013-02-18  Aaron Schrab  <aaron@schrab.com>
 
 	* 07478c6b: Src/zsh.mdd: Generate patch level using `git describe`
