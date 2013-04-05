@@ -4757,7 +4757,13 @@ __git_aliases () {
 
 (( $+functions[__git_extract_aliases] )) ||
 __git_extract_aliases () {
-  aliases=(${^${${(0)"$(_call_program aliases "git config -z --get-regexp '^alias.'")"}#alias.}/$'\n'/:alias for \'}\')
+  local -a tmp
+  tmp=(${${(0)"$(_call_program aliases "git config -z --get-regexp '^alias.'")"}#alias.})
+  if (( ${#tmp} > 0 )); then
+      aliases=(${^tmp/$'\n'/:alias for \'}\')
+  else
+      aliases=()
+  fi
 }
 
 (( $+functions[__git_date_formats] )) ||
