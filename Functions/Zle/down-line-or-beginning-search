@@ -3,6 +3,8 @@
 
 emulate -L zsh
 
+typeset -g __searching __savecursor
+
 if [[ ${+NUMERIC} -eq 0 &&
     ( $LASTWIDGET = $__searching || $RBUFFER != *$'\n'* ) ]]
 then

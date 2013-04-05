@@ -3,6 +3,8 @@
 
 emulate -L zsh
 
+typeset -g __searching __savecursor
+
 if [[ $LBUFFER == *$'\n'* ]]; then
   zle .up-line-or-history
   __searching=''
