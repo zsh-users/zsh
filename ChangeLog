@@ -1,3 +1,8 @@
+2013-04-07  Bart Schaefer  <schaefer@zsh.org>
+
+	* 31234: Completion/Base/Widget/_complete_help: use an "always"
+	block instead of "trap" to clean up various function overrides
+
 2013-04-05  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 31174: Src/Zle/zle_main.c: 31174: zle: Make sure state changes
@@ -664,8 +669,3 @@
 2012-07-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: update for 5.0.0 release.
-
-*****************************************************
-* This is used by the shell to define $ZSH_PATCHLEVEL
-* $Revision: 1.5828 $
-*****************************************************
