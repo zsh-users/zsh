@@ -346,7 +346,7 @@ previous keymaps will be restored.
 
 tt(Vared) calls the usual `tt(zle-line-init)' and `tt(zle-line-finish)'
 hooks before and after it takes control. Using the tt(-i) and tt(-f)
-options, it is possible to replace these with other costum widgets.
+options, it is possible to replace these with other custom widgets.
 
 If `tt(-t) var(tty)' is given, var(tty) is the name of a terminal device
 to be used instead of the default tt(/dev/tty).  If var(tty) does not
