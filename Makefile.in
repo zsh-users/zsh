@@ -160,6 +160,7 @@ targz-src: $(DISTNAME).tar.gz
 $(DISTNAME).tar.gz: FORCE
 	@$(sdir_top)/Util/mkdisttree.sh $(DISTNAME) $(sdir_top) $(dir_top) SRC \
 	    $(MAKE) $(MAKEDEFS)
+	echo '#define ZSH_PATCHLEVEL "'`git describe --tags --long`'"' >$(DISTNAME)/Src/patchlevel.h.release
 	tar cf - $(DISTNAME) | gzip -9 > $@
 	rm -rf $(DISTNAME)
 
