@@ -2470,7 +2470,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 			setsparam(asg0.name, ztrdup(asg0.value));
 		    return 0;
 		} else {
-		    zerrnam(name, "can't tie already tied scalar: %s",
+		    zwarnnam(name, "can't tie already tied scalar: %s",
 			    asg0.name);
 		}
 		return 1;

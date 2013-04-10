@@ -1,3 +1,8 @@
+2013-04-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/17754: Src/builtin.c: failing to retie an array
+	and colon-separated scalar shouldn't be a fatal error.
+
 2013-04-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31246: Makefile.in, Src/zsh.mdd: make a separate patch level
