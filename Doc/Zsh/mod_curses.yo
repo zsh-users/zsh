@@ -84,11 +84,11 @@ The subcommand tt(position) writes various positions associated with
 var(targetwin) into the array named var(array).
 These are, in order:
 startsitem()
-sitem()(The y and x coordinates of the cursor relative to the top left
+sitem(-)(The y and x coordinates of the cursor relative to the top left
 of var(targetwin))
-sitem()(The y and x coordinates of the top left of var(targetwin) on the
+sitem(-)(The y and x coordinates of the top left of var(targetwin) on the
 screen)
-sitem()(The size of var(targetwin) in y and x dimensions.)
+sitem(-)(The size of var(targetwin) in y and x dimensions.)
 endsitem()
 
 Outputting characters and strings are achieved by tt(char) and tt(string)

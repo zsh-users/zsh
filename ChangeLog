@@ -1,5 +1,9 @@
 2013-04-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 31263 (changed * to - for consistency with elsewhere):
+	Doc/Zsh/mod_curses.yo: suppress texinfo warning by adding item
+	arguments.
+
 	* 31261: Doc/Zsh/compsys.yo, Doc/ztexi.yo: updates needed
 	with latest texinfo.
 
