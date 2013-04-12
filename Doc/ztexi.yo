@@ -193,8 +193,8 @@ def(startlist)(0)(\
   startitem()\
 )
 def(endlist)(0)(\
-  NOTRANS(@item)+NL()\
-  enditem()\
+  enditem()+NL()\
+  NOTRANS(@sp 1)\
 )
 def(list)(1)(\
   item(ARG1)()\

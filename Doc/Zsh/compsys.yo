@@ -4414,8 +4414,7 @@ tt(ambiguous), tt(special-dirs), tt(list-suffixes) and tt(file-sort)
 described above.
 )
 findex(_pick_variant)
-xitem(tt(_pick_variant) [ tt(-b) var(builtin-label) ] [ tt(-c)
-var(command) ] [ tt(-r) var(name) ])
+xitem(tt(_pick_variant) [ tt(-b) var(builtin-label) ] [ tt(-c) var(command) ] [ tt(-r) var(name) ])
 item(   var(label)tt(=)var(pattern) ... var(label) [ var(args) ... ])(
 This function is used to resolve situations where a single command name
 requires more than one type of handling, either because it

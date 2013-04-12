@@ -1,3 +1,8 @@
+2013-04-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31261: Doc/Zsh/compsys.yo, Doc/ztexi.yo: updates needed
+	with latest texinfo.
+
 2013-04-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/17754: Src/builtin.c: failing to retie an array
