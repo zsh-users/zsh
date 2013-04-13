@@ -27,6 +27,10 @@ TAGS
 
 Config/defs.mk
 
+Doc/intro.a4.pdf
+Doc/intro.a4.ps
+Doc/intro.us.pdf
+Doc/intro.us.ps
 Doc/version.yo
 Doc/zsh*.1
 Doc/zsh.texi
