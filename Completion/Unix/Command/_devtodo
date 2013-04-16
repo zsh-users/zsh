@@ -8,9 +8,11 @@ typeset -i i
 typeset expl
 
 for ((i=2; i <= $#words; i++)) {
-	if [[ $words[$i] == '--database' ]] {
+	if [[ $words[$i] == '--database' ]]; then
 		todo_opts+=(--database ${~words[$((++i))]})
-	}
+	elif [[ $words[$i] == '--sort' ]]; then
+		todo_opts+=(--sort ${words[$((++i))]})
+	fi
 }
 
 priorities=(verylow low medium high veryhigh)
