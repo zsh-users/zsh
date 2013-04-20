@@ -3,6 +3,9 @@
 	* 31286: Completion/Unix/Command/_git: _git: add a couple of
 	browsers
 
+	* 31289: Completion/Unix/Command/_git: _git: branch.*.pushremote,
+	remote.pushdefault
+
 2013-04-20  Torstein Hegge  <hegge@resisty.net>
 
 	* 31159: Completion/Unix/Command/_git: git: Pass prefix filter to
