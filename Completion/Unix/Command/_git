@@ -1298,7 +1298,8 @@ _git-shortlog () {
     '(-e --email)'{-e,--email}'[show email addres of each author]' \
     '-w-[linewrap the output]:: :->wrap' \
     $revision_options \
-    '*: :__git_commits' && ret=0
+    '(-)--[start file arguments]' \
+    '*:: :->commit-range-or-file' && ret=0
 
   case $state in
     (wrap)
@@ -1314,6 +1315,30 @@ _git-shortlog () {
         __git_guard_number 'line width'
       fi
       ;;
+    (commit-range-or-file)
+      case $CURRENT in
+        (1)
+          if [[ -n ${opt_args[(I)--]} ]]; then
+            __git_cached_files && ret=0
+          else
+            _alternative \
+              'commit-ranges::__git_commit_ranges' \
+              'cached-files::__git_cached_files' && ret=0
+          fi
+          ;;
+        (*)
+          # TODO: Write a wrapper function that checks whether we have a
+          # committish range or comittish and calls __git_tree_files
+          # appropriately.
+          if __git_is_committish_range $line[1]; then
+            __git_tree_files ${PREFIX:-.} $(__git_committish_range_last $line[1]) && ret=0
+          elif __git_is_committish $line[1]; then
+            __git_tree_files ${PREFIX:-.} $line[1] && ret=0
+          else
+            __git_cached_files && ret=0
+          fi
+          ;;
+      esac
   esac
 
   return ret
