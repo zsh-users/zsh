@@ -5902,6 +5902,8 @@ __git_browsers () {
   builtinbrowsers=(
     firefox
     iceweasel
+    google-chrome
+    chromium
     konquerer
     w3m
     links

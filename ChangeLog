@@ -1,3 +1,8 @@
+2013-04-21  Ramkumar Ramachandra  <artagnon@gmail.com>
+
+	* 31286: Completion/Unix/Command/_git: _git: add a couple of
+	browsers
+
 2013-04-20  Torstein Hegge  <hegge@resisty.net>
 
 	* 31159: Completion/Unix/Command/_git: git: Pass prefix filter to
