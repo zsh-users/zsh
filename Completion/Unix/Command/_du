@@ -47,6 +47,24 @@ if _pick_variant gnu=Free\ Soft unix --version /dummy/no-such-file; then
 
   return ret
 
+elif [[ "$OSTYPE" == darwin* ]]; then
+  _arguments -s -A "-*" \
+    '(-H -L -P)-H[follow symlinks on the command line]' \
+    '(-H -L -P)-L[follow all symlinks]' \
+    '(-H -L -P)-P[do not follow symlinks (default)]' \
+    '*-I+[ignore files/directories matching specified mask]:mask' \
+    '(-a -s -d)-a[display entry also for files (not just directories) in file hierarchy]' \
+    '(-a -s -d)-d+[display entry for directories up to specified depth]:depth' \
+    '(-a -s -d)-s[display entry only for files/directories specified on the command line]' \
+    '(-h -k -m -g)-h[human readable output]' \
+    '(-h -k -m -g)-k[use block size of 1K-byte]' \
+    '(-h -k -m -g)-m[use block size of 1M-byte]' \
+    '(-h -k -m -g)-g[use block size of 1G-byte]' \
+    '-c[display grand total]' \
+    '-r[notify about unreadable files/directories]' \
+    '-x[exclude directories on different file systems]' \
+    '*:file:_files'
+
 else
   # based on $OSTYPE = solaris2.8
   local xdev='[skip directories on different filesystems]'
