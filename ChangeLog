@@ -3,6 +3,10 @@
 	* 31281: Completion/Unix/Command/_du: _du: add support for Mac OS
 	X
 
+2013-04-20  Bart Schaefer  <schaefer@zsh.org>
+
+	* 31272: Src/Zle/compctl.c: avoid double free.
+
 2013-04-16  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Daniel Friesel: 31265: Completion/Unix/Command/_devtodo:

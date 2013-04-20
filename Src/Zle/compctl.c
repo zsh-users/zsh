@@ -398,7 +398,6 @@ get_compctl(char *name, char ***av, Compctl cc, int first, int isdef, int cl)
 	if (cl)
 	    return 1;
 	else {
-	    freecompctl(cc);
 	    cclist = COMP_REMOVE;
 	    return 0;
 	}
