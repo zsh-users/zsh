@@ -3609,6 +3609,17 @@ If you quit in the middle of a game, the next invocation of the tt(tetris)
 widget will continue where you left off.  If you lost, it will start a new
 game.
 )
+item(tt(tetriscurses))(
+This is a port of the above to zcurses.  The input handling is improved
+a bit so that moving a block sideways doesn't automatically advance a
+timestep, and the graphics use unicode block graphics.
+
+This version does not save the game state between invocations, and is not
+invoked as a widget, but rather as:
+
+example(autoload -U tetriscurses
+tetriscurses)
+)
 findex(zargs)
 item(tt(zargs) [ var(option) ... tt(-)tt(-) ] [ var(input) ... ] [ tt(-)tt(-) var(command) [ var(arg) ... ] ])(
 This function has a similar purpose to GNU xargs.  Instead of

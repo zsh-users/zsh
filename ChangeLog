@@ -1,3 +1,8 @@
+2015-01-09  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 30568: Doc/Zsh/contrib.yo, Functions/Misc/tetriscurses: Add
+	tetriscurses contrib function, port of tetris to zcurses
+
 2015-01-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Src/init.c, Src/input.c, Src/lex.c, Src/parse.c, Src/zsh.h,
