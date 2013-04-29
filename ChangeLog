@@ -1,3 +1,7 @@
+2013-04-29  Jun T  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 31357: Completion/Unix/Command/_cp: add support for Mac OS X
+
 2013-04-29  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 31356: Completion/Unix/Command/_subversion: typo noted by Bart.

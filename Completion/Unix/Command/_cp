@@ -1,34 +1,62 @@
 #compdef cp
 
-_arguments -s \
-  '(-a --archive)'{-a,--archive}'[same as -dpR]' \
-  '(-b --backup)-b[backup]' \
-  '(-b --backup)--backup=[backup]:method:(none off numbered t existing nil simple never)' \
-  '--copy-contents[copy contents of special files when recursive]' \
-  '-d[same as --no-dereference --preserve=links]' \
-  '(-f --force)'{-f,--force}'[remove and retry for destinations that cannot be opened]' \
-  '(-i --interactive)'{-i,--interactive}'[prompt before overwrite]' \
-  '-H[follow command-line symbolic links]' \
-  '(-l --link)'{-l,--link}'[link files instead of copying]' \
-  '(-L --dereference)'{-L,--dereference}'[always follow symbolic links]' \
-  '(-n --no-clobber)'{-n,--no-clobber}'[do not overwrite an existing file]' \
-  '(-P --no-dereference)'{-P,--no-dereference}'[never follow symbolic links]' \
-  '-p[same as --preserve=mode,ownership,timestamps]' \
-  '--preserve=[preserve specified attributes]:attributes to preserve:_values -s , mode timestamps ownership links context xattr all' \
-  '--no-preserve=[don'\''t preserve specified attributes]:attributes not to preserve:_values -s , mode timestamps ownership links context xattr all' \
-  '--parents[append source path to target directory]' \
-  '(-R -r --recursive)'{-R,-r,--recursive}'[copy directories recursively]' \
-  '--reflink=[control clone/CoW copies]:when to perform a lightweight copy:(always auto)' \
-  '--remove-destination[remove each existing destination file before attempting to open it]' \
-  '--sparse=[control creation of sparse files]:when to create sparse files:(auto always never)' \
-  '--strip-trailing-slashes[remove any trailing slashes from each source argument]' \
-  '(-s --symbolic-link)'{-s,--symbolic-link}'[make symbolic links instead of copies of non-directories]' \
-  '(-S --suffix)'{-S,--suffix=}'[override the usual backup suffix]:backup suffix:' \
-  '(-t --target-directory)'{-t,--target-directory=}'[copy all source arguments into target directory]:target directory:_files -/' \
-  '(-T --no-target-directory)'{-T,--no-target-directory}'[treat DEST as a normal file]' \
-  '(-u --update)'{-u,--update}'[copy only when source is newer than destination or destination is missing]' \
-  '(-v --verbose)'{-v,--verbose}'[explain what is being done]' \
-  '(-x --one-file-system)'{-x,--one-file-system}'[stay on this file system]' \
-  '--help' \
-  '--version' \
-  '*:file or directory:_files'
+if _pick_variant gnu=GNU unix --version; then
+  _arguments -s -S \
+    '(-a --archive)'{-a,--archive}'[same as -dR --preserve=all]' \
+    '(-b --backup)-b[backup]' \
+    '(-b --backup)--backup=[backup]:method:(none off numbered t existing nil simple never)' \
+    '--copy-contents[copy contents of special files when recursive]' \
+    '-d[same as --no-dereference --preserve=links]' \
+    '(-f --force)'{-f,--force}'[remove and retry for destinations that cannot be opened]' \
+    '(-i --interactive)'{-i,--interactive}'[prompt before overwrite]' \
+    '-H[follow command-line symbolic links]' \
+    '(-l --link)'{-l,--link}'[link files instead of copying]' \
+    '(-L --dereference)'{-L,--dereference}'[always follow symbolic links]' \
+    '(-n --no-clobber)'{-n,--no-clobber}'[do not overwrite an existing file]' \
+    '(-P --no-dereference)'{-P,--no-dereference}'[never follow symbolic links]' \
+    '-p[same as --preserve=mode,ownership,timestamps]' \
+    '--preserve=[preserve specified attributes]:attributes to preserve:_values -s , mode timestamps ownership links context xattr all' \
+    '--no-preserve=[don'\''t preserve specified attributes]:attributes not to preserve:_values -s , mode timestamps ownership links context xattr all' \
+    '--parents[append source path to target directory]' \
+    '(-R -r --recursive)'{-R,-r,--recursive}'[copy directories recursively]' \
+    '--reflink=[control clone/CoW copies]:when to perform a lightweight copy:(always auto)' \
+    '--remove-destination[remove each existing destination file before attempting to open it]' \
+    '--sparse=[control creation of sparse files]:when to create sparse files:(auto always never)' \
+    '--strip-trailing-slashes[remove any trailing slashes from each source argument]' \
+    '(-s --symbolic-link)'{-s,--symbolic-link}'[make symbolic links instead of copies of non-directories]' \
+    '(-S --suffix)'{-S,--suffix=}'[override the usual backup suffix]:backup suffix:' \
+    '(-t --target-directory)'{-t,--target-directory=}'[copy all source arguments into target directory]:target directory:_files -/' \
+    '(-T --no-target-directory)'{-T,--no-target-directory}'[treat DEST as a normal file]' \
+    '(-u --update)'{-u,--update}'[copy only when source is newer than destination or destination is missing]' \
+    '(-v --verbose)'{-v,--verbose}'[explain what is being done]' \
+    '(-x --one-file-system)'{-x,--one-file-system}'[stay on this file system]' \
+    '--help' \
+    '--version' \
+    '*:file or directory:_files'
+
+elif [[ "$OSTYPE" == darwin* ]]; then
+  _arguments -s -S \
+    '-R[copy directories recursively]' \
+    '(-L -P)-H[with -R, follow symlinks on the command line]' \
+    '(-H -P)-L[with -R, follow all symlinks]' \
+    '(-H -L)-P[with -R, do not follow symlinks (default)]' \
+    '(-i -n)-f[force overwriting existing file]' \
+    '(-f -n)-i[confirm before overwriting existing file]' \
+    '(-f -i)-n[do not overwrite existing file]' \
+    '-a[same as -pRP]' \
+    '-p[preserve timestamps, mode, owner, flags, ACLs, and Extended Attributes]' \
+    '-v[show file names as they are copied]' \
+    '-X[do not copy Extended Attributes or resource forks]' \
+    '(-)*:file or directory:_files'
+
+else    # assume POSIX
+  _arguments -s -S \
+    '-R[copy directories recursively]' \
+    '(-L -P)-H[with -R, follow symlinks on the command line]' \
+    '(-H -P)-L[with -R, follow all symlinks]' \
+    '(-H -L)-P[do not follow symlinks]' \
+    '(-i)-f[force overwriting existing file]' \
+    '(-f)-i[confirm before overwriting existing file]' \
+    '-p[preserve timestamps, mode, and owner]' \
+    '(-)*:file or directory:_files'
+fi
