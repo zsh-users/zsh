@@ -1,3 +1,10 @@
+2013-04-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31355: Completion/Base/Utility/.distfiles,
+	Completion/Base/Utility/_comp_locale,
+	Completion/Unix/Command/_subversion: _comp_locale tries to
+	sanitise locales but keep CTYPE; use this for subversion completion.
+
 2013-04-25  Ramkumar Ramachandra  <artagnon@gmail.com>
 
 	* 31288: Completion/Unix/Command/_git: _git: fix shortlog

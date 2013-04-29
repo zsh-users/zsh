@@ -1,9 +1,25 @@
 DISTFILES_SRC='
 .distfiles
-_alternative      _call_program     _nothing          _sub_commands
-_arg_compile      _combination      _regex_arguments  _values
-_arguments        _set_command      _retrieve_cache   _guard
-_cache_invalid    _describe         _sep_parts        _pick_variant
-_call_function    _multi_parts      _store_cache      _regex_words
+_alternative
+_arg_compile
+_arguments
+_cache_invalid
+_call_function
+_comp_locale
 _complete_help_generic
+_call_program
+_combination
+_set_command
+_describe
+_multi_parts
+_nothing
+_regex_arguments
+_retrieve_cache
+_sep_parts
+_store_cache
+_sub_commands
+_values
+_guard
+_pick_variant
+_regex_words
 '

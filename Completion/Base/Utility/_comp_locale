@@ -1,0 +1,13 @@
+#autoload
+
+# Arrange that LC_CTYPE retains the current setting so characters in
+# file names are handled properly, but other locales are set to C so
+# that the completion system can process output without surprises.
+
+# This exports new locale settings, so should only
+# be run in a subshell.  A typical use is in a $(...).
+
+local ctype=${${(f)"$(locale 2>/dev/null)"}:#^LC_CTYPE=*}
+unset -m LC_\*
+[[ -n $ctype ]] && eval export $ctype
+export LANG=C
