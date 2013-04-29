@@ -1113,6 +1113,7 @@ init_signals(void)
     install_handler(SIGCHLD);
 #ifdef SIGWINCH
     install_handler(SIGWINCH);
+    winch_block();	/* See utils.c:preprompt() */
 #endif
     if (interact) {
 	install_handler(SIGALRM);

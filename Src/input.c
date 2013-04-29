@@ -143,10 +143,12 @@ shingetline(void)
 
     p = buf;
     for (;;) {
+	winch_unblock();
 	do {
 	    errno = 0;
 	    c = fgetc(bshin);
 	} while (c < 0 && errno == EINTR);
+	winch_block();
 	if (c < 0 || c == '\n') {
 	    if (c == '\n')
 		*p++ = '\n';

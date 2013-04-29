@@ -59,6 +59,14 @@
 #define child_block()      signal_block(sigchld_mask)
 #define child_unblock()    signal_unblock(sigchld_mask)
 
+#ifdef SIGWINCH
+# define winch_block()      signal_block(signal_mask(SIGWINCH))
+# define winch_unblock()    signal_unblock(signal_mask(SIGWINCH))
+#else
+# define winch_block()      0
+# define winch_unblock()    0
+#endif
+
 /* ignore a signal */
 #define signal_ignore(S)   signal(S, SIG_IGN)
 

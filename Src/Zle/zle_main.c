@@ -567,7 +567,9 @@ raw_getbyte(long do_keytmout, char *cptr)
 	gettyinfo(&ti);
 	ti.tio.c_cc[VMIN] = 0;
 	settyinfo(&ti);
+	winch_unblock();
 	ret = read(SHTTY, cptr, 1);
+	winch_block();
 	ti.tio.c_cc[VMIN] = 1;
 	settyinfo(&ti);
 	if (ret > 0)
@@ -597,7 +599,9 @@ raw_getbyte(long do_keytmout, char *cptr)
 	    else
 		poll_timeout = -1;
 
+	    winch_unblock();
 	    selret = poll(fds, errtry ? 1 : nfds, poll_timeout);
+	    winch_block();
 # else
 	    int fdmax = SHTTY;
 	    struct timeval *tvptr;
@@ -622,8 +626,10 @@ raw_getbyte(long do_keytmout, char *cptr)
 	    else
 		tvptr = NULL;
 
+	    winch_unblock();
 	    selret = select(fdmax+1, (SELECT_ARG_2_T) & foofd,
 			    NULL, NULL, tvptr);
+	    winch_block();
 # endif
 	    /*
 	     * Make sure a user interrupt gets passed on straight away.
@@ -788,7 +794,9 @@ raw_getbyte(long do_keytmout, char *cptr)
 #  else
 	ioctl(SHTTY, TCSETA, &ti.tio);
 #  endif
+	winch_unblock();
 	ret = read(SHTTY, cptr, 1);
+	winch_block();
 #  ifdef HAVE_TERMIOS_H
 	tcsetattr(SHTTY, TCSANOW, &shttyinfo.tio);
 #  else
@@ -799,7 +807,9 @@ raw_getbyte(long do_keytmout, char *cptr)
 #endif
     }
 
+    winch_unblock();
     ret = read(SHTTY, cptr, 1);
+    winch_block();
 
     return ret;
 }

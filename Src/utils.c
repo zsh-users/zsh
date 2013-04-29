@@ -1291,6 +1291,13 @@ preprompt(void)
     int period = getiparam("PERIOD");
     int mailcheck = getiparam("MAILCHECK");
 
+    /*
+     * Handle any pending window size changes before we compute prompts,
+     * then block them again to avoid interrupts during prompt display.
+     */
+    winch_unblock();
+    winch_block();
+
     if (isset(PROMPTSP) && isset(PROMPTCR) && !use_exit_printed && shout) {
 	/* The PROMPT_SP heuristic will move the prompt down to a new line
 	 * if there was any dangling output on the line (assuming the terminal
