@@ -48,7 +48,7 @@ _svn () {
 	    ! _retrieve_cache svn-${cmd}-args;
 	then
 	  args=(
-	    ${=${${${(M)${(f)"$(_comple_local; _call_program options svn help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)(-##)([[:alpha:]]##) \[--([a-z-]##)\](:arg:)#/(--$match[3])$match[1]$match[2]$match[4] ($match[1]$match[2])--$match[3]$match[4]}
+	    ${=${${${(M)${(f)"$(_comp_locale; _call_program options svn help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)(-##)([[:alpha:]]##) \[--([a-z-]##)\](:arg:)#/(--$match[3])$match[1]$match[2]$match[4] ($match[1]$match[2])--$match[3]$match[4]}
 	  )
           while (( idx=$args[(I)*--c(l|hangelist):arg:] )); do
             args[(I)*--c(l|hangelist):arg:]=( \*{--cl,--changelist}':change list:_svn_changelists' )

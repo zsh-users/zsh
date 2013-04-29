@@ -1,5 +1,7 @@
 2013-04-29  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 31356: Completion/Unix/Command/_subversion: typo noted by Bart.
+
 	* 31355: Completion/Base/Utility/.distfiles,
 	Completion/Base/Utility/_comp_locale,
 	Completion/Unix/Command/_subversion: _comp_locale tries to
