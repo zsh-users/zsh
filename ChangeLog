@@ -1,3 +1,10 @@
+2013-04-29  Bart Schaefer  <schaefer@zsh.org>
+
+	* 31350: Src/init.c, Src/input.c, Src/signals.h, Src/utils.c,
+	Src/Zle/zle_main.c: block SIGWINCH nearly all the time, except
+	when about to calculate prompts or do synchronous read, so
+	syscalls are not interrupted by window size changes.
+
 2013-04-29  Jun T  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 31357: Completion/Unix/Command/_cp: add support for Mac OS X
