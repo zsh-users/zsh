@@ -1,7 +1,10 @@
 2013-04-29  Bart Schaefer  <schaefer@zsh.org>
 
+	* 31361: Src/init.c: handle negative optno ("no" prefix used)
+	when storing options with parseopts_insert() for sticky contexts
+
 	* 31353: Src/math.c: fix handling of floating point in ternary
-	
+
 	* 31350: Src/init.c, Src/input.c, Src/signals.h, Src/utils.c,
 	Src/Zle/zle_main.c: block SIGWINCH nearly all the time, except
 	when about to calculate prompts or do synchronous read, so
