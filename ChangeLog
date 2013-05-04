@@ -1,3 +1,8 @@
+2013-05-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31369: Completion/Base/Utility/_comp_locale: action if locale
+	command is not usable.
+
 2013-04-29  Bart Schaefer  <schaefer@zsh.org>
 
 	* 31361: Src/init.c: handle negative optno ("no" prefix used)
