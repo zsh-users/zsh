@@ -1,3 +1,7 @@
+2013-05-05  Bart Schaefer  <schaefer@zsh.org>
+
+	* 31372: Src/exec.c: Do not block SIGWINCH for child processes
+
 2013-05-05  Kenyon Ralph  <kenyon@kenyonralph.com>
 
 	* 31371: Completion/Linux/Command/_brctl: _brctl: update brctl
