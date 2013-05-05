@@ -452,6 +452,7 @@ zexecve(char *pth, char **argv, char **newenvp)
 
     if (newenvp == NULL)
 	    newenvp = environ;
+    winch_unblock();
     execve(pth, argv, newenvp);
 
     /* If the execve returns (which in general shouldn't happen),   *
@@ -486,6 +487,7 @@ zexecve(char *pth, char **argv, char **newenvp)
 				(pprog = pathprog(ptr2, NULL))) {
 				argv[-2] = ptr2;
 				argv[-1] = ptr + 1;
+				winch_unblock();
 				execve(pprog, argv - 2, newenvp);
 			    }
 			    zerr("%s: bad interpreter: %s: %e", pth, ptr2,
@@ -494,13 +496,16 @@ zexecve(char *pth, char **argv, char **newenvp)
 			    *ptr = '\0';
 			    argv[-2] = ptr2;
 			    argv[-1] = ptr + 1;
+			    winch_unblock();
 			    execve(ptr2, argv - 2, newenvp);
 			} else {
 			    argv[-1] = ptr2;
+			    winch_unblock();
 			    execve(ptr2, argv - 1, newenvp);
 			}
 		    } else if (eno == ENOEXEC) {
 			argv[-1] = "sh";
+			winch_unblock();
 			execve("/bin/sh", argv - 1, newenvp);
 		    }
 		} else if (eno == ENOEXEC) {
@@ -509,6 +514,7 @@ zexecve(char *pth, char **argv, char **newenvp)
 			    break;
 		    if (t0 == ct) {
 			argv[-1] = "sh";
+			winch_unblock();
 			execve("/bin/sh", argv - 1, newenvp);
 		    }
 		}
