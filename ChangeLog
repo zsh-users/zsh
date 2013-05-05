@@ -1,3 +1,8 @@
+2013-05-05  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* unposted: Src/exec.c: Revert "31372: Do not block SIGWINCH for
+	child processes" as suggested by Bart.
+
 2013-05-05  Bart Schaefer  <schaefer@zsh.org>
 
 	* 31372: Src/exec.c: Do not block SIGWINCH for child processes

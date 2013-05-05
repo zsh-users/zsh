@@ -303,13 +303,11 @@ zfork(struct timeval *tv)
 	zerr("fork failed: %e", errno);
 	return -1;
     }
-    if (!pid) {
-	winch_unblock();
 #ifdef HAVE_GETRLIMIT
+    if (!pid)
 	/* set resource limits for the child process */
 	setlimits(NULL);
 #endif
-    }
     return pid;
 }
 
