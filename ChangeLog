@@ -1,3 +1,8 @@
+2013-05-05  Kenyon Ralph  <kenyon@kenyonralph.com>
+
+	* 31371: Completion/Linux/Command/_brctl: _brctl: update brctl
+	subcommands
+
 2013-05-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31369: Completion/Base/Utility/_comp_locale: action if locale

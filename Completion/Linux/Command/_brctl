@@ -10,10 +10,12 @@ if (( CURRENT == 2 )); then
     show:show\ all\ current\ bridge\ instances
     addif:add\ interface\ to\ bridge
     delif:remove\ interface\ from\ bridge
+    hairpin:toggle\ hairpin\ mode\ on\ a\ port
     showmacs:show\ a\ list\ of\ learned\ MAC\ addresses
     setageing:set\ MAC\ address\ ageing\ time
     setgcint:set\ grabage\ collection\ interval
     stp:control\ use\ of\ spanning\ tree\ protocol
+    showstp:show\ bridge\ stp\ info
     setbridgeprio:set\ bridge\ priority
     setfd:set\ bridge\ forward\ delay
     sethello:set\ bridge\ hello\ time
@@ -41,7 +43,7 @@ else
       setbridgeprio)
       	_message -e priority 'priority'
       ;;
-      setpathcost|setportprio)
+      setpathcost|setportprio|hairpin)
         _message -e ports 'port'
       ;;
       stp)
@@ -56,6 +58,8 @@ else
       _message -e cost 'cost'
     elif [[ $subcmd == setportprio ]]; then
       _message -e priority 'priority'
+    elif [[ $subcmd == hairpin ]]; then
+      _message -e onoff 'on|off'
     fi
   fi
 fi
