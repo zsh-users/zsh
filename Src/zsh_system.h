@@ -773,7 +773,7 @@ extern short ospeed;
 # define IS_DIRSEP(c) ((c) == '/')
 #endif
 
-#if defined(__GNUC__) && !defined(__APPLE__)
+#if defined(__GNUC__) && (!defined(__APPLE__) || defined(__clang__))
 /* Does the OS X port of gcc still gag on __attribute__? */
 #define UNUSED(x) x __attribute__((__unused__))
 #else

@@ -1,3 +1,8 @@
+2013-05-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Mihai Moldovan <ionic@ionic.de>: 31387: Src/zsh_system.h:
+	unused functions when compiling with clang.
+
 2013-05-05  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* unposted: Src/exec.c: Revert "31372: Do not block SIGWINCH for
