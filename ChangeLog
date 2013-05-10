@@ -1,5 +1,8 @@
 2013-05-10  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Richard Hartmann <richih.mailinglist@gmail.com>: 31389:
+	Completion/X/Command/_mplayer: add .ogv.
+
 	* Mihai Moldovan <ionic@ionic.de>: 31387: Src/zsh_system.h:
 	unused functions when compiling with clang.
 
