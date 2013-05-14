@@ -1401,16 +1401,18 @@ _perforce_jobs() {
   if [[ $argv[-2] = -e ]]; then
     ajobview=(-e "${(q)argv[-1]}")
     argv=("${(@)argv[1,-3]}")
-  else
-    zstyle -s ":completion:${curcontext}:jobs" jobview jobview &&
-    ajobview=(-e $jobview)
+  elif zstyle -s ":completion:${curcontext}:jobs" jobview jobview; then
+    ajobview=(-e "'$jobview'")
+  elif [[ -n $PREFIX ]]; then
+    # Extra quotes for the benefit of _call_program which does an "eval".
+    ajobview=(-e "'job=$PREFIX\\*$SUFFIX'")
   fi
   if [[ ${NUMERIC:-0} -lt 0 && -z $compstate[insert] ]]; then
   # Not inserting (i.e. just listing) and given a negative
   # prefix argument.  Instead of listing possible completions,
   # show the full description for the job which is on the line at
   # the moment.
-    _message -r "$(_perforce_call_p4 jobs jobs -e \"Job=\$PREFIX\$SUFFIX\" -l 2>/dev/null)"
+    _message -r "$(_perforce_call_p4 jobs jobs -e \"'Job=\$PREFIX\$SUFFIX'\" -l 2>/dev/null)"
     return 0
   elif [[ ${NUMERIC:-0} -gt 0 ]]; then
     max=$NUMERIC

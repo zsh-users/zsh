@@ -1,3 +1,10 @@
+2013-05-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted: Completion/Unix/Command/_perforce: Improve
+	Perforce jobs completion to limit potentially huge output
+	using jobview by default; fix quoting of arguments passed on
+	to eval within _call_program.
+
 2013-05-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Richard Hartmann <richih.mailinglist@gmail.com>: 31389:
