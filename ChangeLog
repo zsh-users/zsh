@@ -3,6 +3,9 @@
 	* 33136: Doc/Zsh/expn.yo, Src/glob.c: P glob qualifier appends
 	words when negated.
 
+	* 33137: Completion/Unix/Type/_path_files: complete # to introduce
+	a glob flag
+
 2014-09-14  Marc Finet  <m.dreadlock@gmail.com>
 
 	* 33149: Misc/vcs_info-examples: vcs_info examples: fix typo

@@ -15,13 +15,21 @@ local -a match mbegin mend
 # a bare glob qualifier.
 # The later test looks for an outstanding quote.
 if _have_glob_qual $PREFIX; then
-   compset -p ${#match[1]}
-   if [[ $_comp_caller_options[extendedglob] == on ]] && compset -P '\#'; then
-     _globflags
-   else
-     _globquals
-   fi
-   return
+  local ret=1
+  compset -p ${#match[1]}
+  if [[ $_comp_caller_options[extendedglob] == on ]] && compset -P '\#'; then
+    _globflags && ret=0
+  else
+    if [[ $_comp_caller_options[extendedglob] == on ]]; then
+      local -a flags
+      flags=(
+      '#:introduce glob flag'
+      )
+      _describe -t globflags "glob flag" flags -Q -S '' && ret=0
+    fi
+    _globquals && ret=0
+  fi
+  return ret
 fi
 
 # Utility function for in-path completion. This allows `/u/l/b<TAB>'
