@@ -36,18 +36,18 @@ autoload -Uz calendar_scandate
 local -a vals tmp
 
 [[ -e $REPLY ]] || return 1
-zstat -A vals +mtime $REPLY || return 1
+zstat -A vals +mtime -- $REPLY || return 1
 
 if (( $# >= 1 )); then
   if [[ $1 = :* ]]; then
-    zstat -A tmp -F "%Y/%m/%d" +mtime ${1[2,-1]} || return 1
+    zstat -A tmp -F "%Y/%m/%d" +mtime -- ${1#:} || return 1
     local AGEREF=$tmp[1]
   else
     local AGEREF=$1
   fi
   # if 1 argument given, never use globally defined AGEREF2
   if [[ $2 = :* ]]; then
-    zstat -A tmp -F "%Y/%m/%d" +mtime ${2[2,-1]} || return 1
+    zstat -A tmp -F "%Y/%m/%d" +mtime -- ${2#:} || return 1
     local AGEREF2=$tmp[1]
   else
     local AGEREF2=$2
