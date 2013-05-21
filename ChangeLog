@@ -1,7 +1,7 @@
-2013-05-21  Peter Stephenson  <p.stephenson@samsung.com>
+2013-05-20  Barton Schaefer  <schaefer@zsh.org>
 
-	* Stephane: 31417: Functions/Calendar/age: needs --
-	to protect againts files starting with -.
+	* 31416: Src/builtin.c: upon "read" of a short line, assign all
+	variables passed as arguments.
 
 2013-05-14  Peter Stephenson  <p.stephenson@samsung.com>
 
