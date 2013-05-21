@@ -651,16 +651,24 @@ date specification must be quoted to ensure tt(age) receives the correct
 arguments, hence the use of the additional colon to separate the date and
 time.
 
-example(AGEREF1=2006/10/04:10:15
+example(AGEREF=2006/10/04:10:15
 AGEREF2=2006/10/04:10:45
 print *+LPAR()PLUS()age+RPAR())
 
 This shows the same example before using another form of argument
-passing.  The dates and times in the parameters tt(AGEREF1) and tt(AGEREF2)
+passing.  The dates and times in the parameters tt(AGEREF) and tt(AGEREF2)
 stay in effect until unset, but will be overridden if any argument is
 passed as an explicit argument to age.  Any explicit argument
 causes both parameters to be ignored.
 
+Instead of an explicit date and time, it's possible to use the
+modification time of a file as the date and time for either argument
+by introducing the file name with a colon:
+
+example(print *+LPAR()e-age :file1 :file2-+RPAR())
+
+This matches all files modified no earlier than tt(file1) and
+no later than tt(file2).
 
 texinode(Calendar Styles)(Calendar Utility Functions)(Calendar System User Functions)(Calendar Function System)
 sect(Styles)

@@ -18,7 +18,7 @@
 # are allowed, but whitespace must be quoted to ensure age receives
 # the correct arguments.
 #
-#   AGEREF1=2006/10/04:10:15
+#   AGEREF=2006/10/04:10:15
 #   AGEREF2=2006/10/04:10:45
 #   print *(+age)
 #

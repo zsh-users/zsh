@@ -1,5 +1,9 @@
 2013-05-21  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 31418: Doc/Zsh/calsys.yo, Functions/Calendar/age:
+	in "age" docs correct typo and note the feature that
+	you can supply a file as a timestamp on the command line.
+
 	* Stephane: 31417: Functions/Calendar/age: needs --
 	to protect againts files starting with -.
 
