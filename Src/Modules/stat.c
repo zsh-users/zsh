@@ -339,7 +339,7 @@ statprint(struct stat *sbuf, char *outbuf, char *fname, int iwhich, int flags)
  *  -H hash:  as for -A array, but returns a hash with the keys being those
  *        from stat -l
  *  -F fmt: specify a $TIME-like format for printing times; the default
- *        is the (CTIME-like) "%a %b %e %k:%M:%S".  This option implies
+ *        is the (CTIME-like) "%a %b %e %k:%M:%S %Z %Y".  This option implies
  *        -s as it is not useful for numerical times.
  *
  *  +type selects just element type of stat buffer (-l gives list):
@@ -361,7 +361,7 @@ bin_stat(char *name, char **args, Options ops, UNUSED(int func))
     struct stat statbuf;
     int found = 0, nargs;
 
-    timefmt = "%a %b %e %k:%M:%S";
+    timefmt = "%a %b %e %k:%M:%S %Z %Y";
 
     for (; *args && (**args == '+' || **args == '-'); args++) {
 	char *arg = *args+1;
