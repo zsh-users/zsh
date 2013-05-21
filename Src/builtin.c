@@ -5674,7 +5674,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	    zputs(buf, stdout);
 	    putchar('\n');
 	}
-	if (!OPT_ISSET(ops,'e') && (*buf || first)) {
+	if (!OPT_ISSET(ops,'e') && (*buf || first || gotnl)) {
 	    if (OPT_ISSET(ops,'A')) {
 		addlinknode(readll, buf);
 		al++;

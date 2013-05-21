@@ -1,3 +1,8 @@
+2013-05-20  Barton Schaefer  <schaefer@zsh.org>
+
+	* 31416: Src/builtin.c: upon "read" of a short line, assign all
+	variables passed as arguments.
+
 2013-05-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Completion/Unix/Command/_perforce: Improve
