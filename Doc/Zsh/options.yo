@@ -1240,6 +1240,7 @@ pindex(NOPRINTEXITVALUE)
 cindex(exit status, printing)
 item(tt(PRINT_EXIT_VALUE) (tt(-1)))(
 Print the exit value of programs with non-zero exit status.
+This is only available at the command line in interactive shells.
 )
 pindex(RC_QUOTES)
 pindex(NO_RC_QUOTES)
