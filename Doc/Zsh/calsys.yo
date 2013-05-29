@@ -665,10 +665,15 @@ Instead of an explicit date and time, it's possible to use the
 modification time of a file as the date and time for either argument
 by introducing the file name with a colon:
 
+example(print *+LPAR()e-age :file1-+RPAR())
+
+matches all files created on the same day (24 hours starting from
+midnight) as tt(file1).
+
 example(print *+LPAR()e-age :file1 :file2-+RPAR())
 
-This matches all files modified no earlier than tt(file1) and
-no later than tt(file2).
+matches all files modified no earlier than tt(file1) and
+no later than tt(file2); precision here is to the nearest second.
 
 texinode(Calendar Styles)(Calendar Utility Functions)(Calendar System User Functions)(Calendar Function System)
 sect(Styles)
