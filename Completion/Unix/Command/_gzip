@@ -82,7 +82,11 @@ files)
       _files "$expl[@]" -g '^*.(([tT]|)[gG]|)[zZ](-.)' && return
     else
       _description files expl 'compressed file'
-      _files "$expl[@]" -g '*.(([tT]|)[gG]|)[zZ](-.)' && return
+      if (( $+opt_args[-f] )); then
+	_files "$expl[@]" && return
+      else
+	_files "$expl[@]" -g '*.(([tT]|)[gG]|)[zZ](-.)' && return
+      fi
     fi
   fi
   ;;

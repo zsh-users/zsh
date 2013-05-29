@@ -1,5 +1,8 @@
 2013-05-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 31433: Completion/Unix/Command/_gzip: zcat -f doesn't
+	need files with suffix .gz.
+
 	* 31422: Doc/Zsh/calsys.yo, Functions/Calendar/age: better
 	heuristic for timestamps in use of :file feature.
 
