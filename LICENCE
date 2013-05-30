@@ -1,3 +1,15 @@
+Unless otherwise noted in the header of specific files, files in this
+distribution have the licence shown below.
+
+However, note that certain shell functions are licensed under versions
+of the GNU Public Licence.  Anyone distributing the shell as a binary
+including those files needs to take account of this.  Search shell
+functions for "Copyright" for specific copyright information.
+None of the core functions are affected by this, so those files
+may simply be omitted.
+
+--
+
 The Z Shell is copyright (c) 1992-2009 Paul Falstad, Richard Coleman,
 Zoltán Hidvégi, Andrew Main, Peter Stephenson, Sven Wischnowsky, and
 others.  All rights reserved.  Individual authors, whether or not

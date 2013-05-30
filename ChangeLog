@@ -1,3 +1,8 @@
+2013-05-30  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31436: Doc/Zsh/expn.yo: KSH_GLOB syntax does not
+	support recursive directories.
+
 2013-05-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31433: Completion/Unix/Command/_gzip: zcat -f doesn't
