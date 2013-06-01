@@ -179,7 +179,11 @@ struct mathfunc {
  * Take care to update the use of IMETA appropriately when adding
  * tokens here.
  */
-/* Marker used in paramsubst for rc_expand_param */
+/*
+ * Marker used in paramsubst for rc_expand_param.
+ * Also used in pattern character arrays as guaranteed not to
+ * mark a character in a string.
+ */
 #define Marker		((char) 0xa0)
 
 /* chars that need to be quoted if meant literally */
@@ -1374,6 +1378,40 @@ struct patprog {
 #define PAT_NOTEND	0x0400	/* End of string is not real end */
 #define PAT_HAS_EXCLUDP	0x0800	/* (internal): top-level path1~path2. */
 #define PAT_LCMATCHUC   0x1000  /* equivalent to setting (#l) */
+
+/**
+ * Indexes into the array of active pattern characters.
+ * This must match the array zpc_chars in pattern.c.
+ */
+enum zpc_chars {
+    /*
+     * These characters both terminate a pattern segment and
+     * a pure string segment.
+     */
+    ZPC_SLASH,			/* / active as file separator */
+    ZPC_NULL,			/* \0 as string terminator */
+    ZPC_BAR,			/* | for "or" */
+    ZPC_OUTPAR,			/* ) for grouping */
+    ZPC_TILDE,			/* ~ for exclusion (extended glob) */
+    ZPC_SEG_COUNT,              /* No. of the above characters */
+    /*
+     * These characters terminate a pure string segment.
+     */
+    ZPC_INPAR = ZPC_SEG_COUNT,  /* ( for grouping */
+    ZPC_QUEST,			/* ? as wildcard */
+    ZPC_STAR,			/* * as wildcard */
+    ZPC_INBRACK,		/* [ for character class */
+    ZPC_INANG,			/* < for numeric glob */
+    ZPC_HAT,			/* ^ for exclusion (extended glob) */
+    ZPC_HASH,			/* # for repetition (extended glob) */
+    ZPC_BNULLKEEP,		/* Special backslashed null not removed */
+    ZPC_KSH_QUEST,              /* ? for ?(...) in KSH_GLOB */
+    ZPC_KSH_STAR,               /* * for *(...) in KSH_GLOB */
+    ZPC_KSH_PLUS,               /* + for +(...) in KSH_GLOB */
+    ZPC_KSH_BANG,               /* ! for !(...) in KSH_GLOB */
+    ZPC_KSH_AT,                 /* @ for @(...) in KSH_GLOB */
+    ZPC_COUNT			/* Number of special chararacters */
+};
 
 /*
  * Special match types used in character classes.  These

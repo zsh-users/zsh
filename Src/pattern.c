@@ -225,34 +225,27 @@ typedef unsigned long zrange_t;
 #endif
 
 /*
- * Characters which terminate a pattern segment.  We actually use
- * a pointer patendseg which skips the first character if we are not
- * parsing a file pattern.
- * Note that the size of this and the next array are hard-wired
- * via the definitions.
+ * Array of characters corresponding to zpc_chars enum, which it must match.
+ */
+static const char zpc_chars[ZPC_COUNT] = {
+    '/', '\0', Bar, Outpar, Tilde, Inpar, Quest, Star, Inbrack, Inang,
+    Hat, Pound, Bnullkeep, Quest, Star, '+', '!', '@'
+};
+
+/*
+ * Characters which terminate a simple string (ZPC_COUNT) or
+ * an entire pattern segment (the first ZPC_SEG_COUNT).
+ * Each entry is either the corresponding character in zpc_chars
+ * or Marker which is guaranteed not to match a character in a
+ * pattern we are compiling.
+ *
+ * The complete list indicates characters that are special, so e.g.
+ * (testchar == special[ZPC_TILDE]) succeeds only if testchar is a Tilde
+ * *and* Tilde is currently special.
  */
 
-static char endseg[] = {
-    '/',			/* file only */
-    '\0', Bar, Outpar,		/* all patterns */
-    Tilde			/* extended glob only */
-};
-
-#define PATENDSEGLEN_NORM 4
-#define PATENDSEGLEN_EXT  5
-
-/* Characters which terminate a simple string */
-
-static char endstr[] = {
-    '/',			/* file only */
-    '\0', Bar, Outpar, Quest, Star, Inbrack, Inpar, Inang, Bnullkeep,
-				/* all patterns */
-    Tilde, Hat, Pound		/* extended glob only */
-};
-
-#define PATENDSTRLEN_NORM 10
-#define PATENDSTRLEN_EXT  13
-
+/**/
+char zpc_special[ZPC_COUNT];
 
 /* Default size for pattern buffer */
 #define P_DEF_ALLOC 256
@@ -264,10 +257,6 @@ static char *patcode;		/* point of code emission */
 static long patsize;		/* size of code */
 static char *patout;		/* start of code emission string */
 static long patalloc;		/* size allocated for same */
-static char *patendseg;		/* characters ending segment */
-static int patendseglen;	/* length of same */
-static char *patendstr;		/* characters ending plain string */
-static int patendstrlen;	/* length of sameo */
 
 /* Flags used in both compilation and execution */
 static int patflags;		    /* flags passed down to patcompile */
@@ -417,12 +406,56 @@ static long rn_offs;
 		    (P_OP(p) == P_BACK) ? \
 		    ((p)-rn_offs) : ((p)+rn_offs) : NULL)
 
+/*
+ * Set up zpc_special with characters that end a string segment.
+ * "Marker" cannot occur in the pattern we are compiling so
+ * is used to mark "invalid".
+ */
+static void
+patcompcharsset(void)
+{
+    memcpy(zpc_special, zpc_chars, ZPC_COUNT);
+    if (!isset(EXTENDEDGLOB)) {
+	/* Extended glob characters are not active */
+	zpc_special[ZPC_TILDE] = zpc_special[ZPC_HAT] =
+	    zpc_special[ZPC_HASH] = Marker;
+    }
+    if (!isset(KSHGLOB)) {
+	/*
+	 * Ksh glob characters are not active.
+	 * * and ? are shared with normal globbing, but for their
+	 * use here we are looking for a following Inpar.
+	 */
+	zpc_special[ZPC_KSH_QUEST] = zpc_special[ZPC_KSH_STAR] =
+	    zpc_special[ZPC_KSH_PLUS] = zpc_special[ZPC_KSH_BANG] =
+	    zpc_special[ZPC_KSH_AT] = Marker;
+    }
+    /*
+     * Note that if we are using KSHGLOB, then we test for a following
+     * Inpar, not zpc_special[ZPC_INPAR]:  the latter makes an Inpar on
+     * its own active.  The zpc_special[ZPC_KSH_*] followed by any old Inpar
+     * discriminate ksh globbing.
+     */
+    if (isset(SHGLOB)) {
+	/*
+	 * Grouping and numeric ranges are not valid.
+	 * We do allow alternation, however; it's needed for
+	 * "case".  This may not be entirely consistent.
+	 *
+	 * Don't disable Outpar: we may need to match the end of KSHGLOB
+	 * parentheses and it would be difficult to tell them apart.
+	 */
+	zpc_special[ZPC_INPAR] = zpc_special[ZPC_INANG] = Marker;
+    }
+}
+
 /* Called before parsing a set of file matchs to initialize flags */
 
 /**/
 void
 patcompstart(void)
 {
+    patcompcharsset();
     if (isset(CASEGLOB))
 	patglobflags = 0;
     else
@@ -469,16 +502,9 @@ patcompile(char *exp, int inflags, char **endexp)
     patnpar = 1;
     patflags = inflags & ~(PAT_PURES|PAT_HAS_EXCLUDP);
 
-    patendseg = endseg;
-    patendseglen = isset(EXTENDEDGLOB) ? PATENDSEGLEN_EXT : PATENDSEGLEN_NORM;
-    patendstr = endstr;
-    patendstrlen = isset(EXTENDEDGLOB) ? PATENDSTRLEN_EXT : PATENDSTRLEN_NORM;
-
     if (!(patflags & PAT_FILE)) {
-	patendseg++;
-	patendstr++;
-	patendseglen--;
-	patendstrlen--;
+	patcompcharsset();
+	zpc_special[ZPC_SLASH] = Marker;
 	remnulargs(patparse);
 	if (isset(MULTIBYTE))
 	    patglobflags = GF_MULTIBYTE;
@@ -698,11 +724,11 @@ patcompswitch(int paren, int *flagp)
 
     *flagp |= flags & (P_HSTART|P_PURESTR);
 
-    while (*patparse == Bar ||
-	   (isset(EXTENDEDGLOB) && *patparse == Tilde &&
+    while (*patparse == zpc_chars[ZPC_BAR] ||
+	   (*patparse == zpc_special[ZPC_TILDE] &&
 	    (patparse[1] == '/' ||
-	     !memchr(patendseg, patparse[1], patendseglen)))) {
-	int tilde = *patparse++ == Tilde;
+	     !memchr(zpc_special, patparse[1], ZPC_SEG_COUNT)))) {
+	int tilde = *patparse++ == zpc_special[ZPC_TILDE];
 	long gfnode = 0, newbr;
 
 	*flagp &= ~P_PURESTR;
@@ -739,12 +765,9 @@ patcompswitch(int paren, int *flagp)
 	    up.p = NULL;
 	    patadd((char *)&up, 0, sizeof(up), 0);
 	    /* / is not treated as special if we are at top level */
-	    if (!paren && *patendseg == '/') {
+	    if (!paren && zpc_special[ZPC_SLASH] == '/') {
 		tilde++;
-		patendseg++;
-		patendseglen--;
-		patendstr++;
-		patendstrlen--;
+		zpc_special[ZPC_SLASH] = Marker;
 	    }
 	} else {
 	    excsync = 0;
@@ -784,10 +807,7 @@ patcompswitch(int paren, int *flagp)
 	newbr = patcompbranch(&flags);
 	if (tilde == 2) {
 	    /* restore special treatment of / */
-	    patendseg--;
-	    patendseglen++;
-	    patendstr--;
-	    patendstrlen++;
+	    zpc_special[ZPC_SLASH] = '/';
 	}
 	if (!newbr)
 	    return 0;
@@ -855,14 +875,13 @@ patcompbranch(int *flagp)
     *flagp = P_PURESTR;
 
     starter = chain = 0;
-    while (!memchr(patendseg, *patparse, patendseglen) ||
-	   (*patparse == Tilde && patparse[1] != '/' &&
-	    memchr(patendseg, patparse[1], patendseglen))) {
-	if (isset(EXTENDEDGLOB) &&
-	    ((!isset(SHGLOB) &&
-	      (*patparse == Inpar && patparse[1] == Pound)) ||
-	     (isset(KSHGLOB) && *patparse == '@' && patparse[1] == Inpar &&
-	      patparse[2] == Pound))) {
+    while (!memchr(zpc_special, *patparse, ZPC_SEG_COUNT) ||
+	   (*patparse == zpc_special[ZPC_TILDE] && patparse[1] != '/' &&
+	    memchr(zpc_special, patparse[1], ZPC_SEG_COUNT))) {
+	if ((*patparse == zpc_special[ZPC_INPAR] &&
+	     patparse[1] == zpc_special[ZPC_HASH]) ||
+	    (*patparse == zpc_special[ZPC_KSH_AT] && patparse[1] == Inpar &&
+	     patparse[2] == zpc_special[ZPC_HASH])) {
 	    /* Globbing flags. */
 	    char *pp1 = patparse;
 	    int oldglobflags = patglobflags, ignore;
@@ -910,7 +929,7 @@ patcompbranch(int *flagp)
 		break;
 	    else
 		continue;
-	} else if (isset(EXTENDEDGLOB) && *patparse == Hat) {
+	} else if (*patparse == zpc_special[ZPC_HAT]) {
 	    /*
 	     * ^pat:  anything but pat.  For proper backtracking,
 	     * etc., we turn this into (*~pat), except without the
@@ -1171,7 +1190,7 @@ patcomppiece(int *flagp)
 {
     long starter = 0, next, op, opnd;
     int flags, flags2, kshchar, len, ch, patch, nmeta;
-    int pound, count;
+    int hash, count;
     union upat up;
     char *nptr, *str0, *ptr, *patprev;
     zrange_t from, to;
@@ -1185,11 +1204,17 @@ patcomppiece(int *flagp)
 	 * the string doesn't introduce a ksh-like parenthesized expression.
 	 */
 	kshchar = '\0';
-	if (isset(KSHGLOB) && *patparse && patparse[1] == Inpar) {
-	    if (strchr("?*+!@", *patparse))
-		kshchar = STOUC(*patparse);
-	    else if (*patparse == Star || *patparse == Quest)
-		kshchar = STOUC(ztokens[*patparse - Pound]);
+	if (*patparse && patparse[1] == Inpar) {
+	    if (*patparse == zpc_special[ZPC_KSH_PLUS])
+		kshchar = STOUC('+');
+	    else if (*patparse == zpc_special[ZPC_KSH_BANG])
+		kshchar = STOUC('!');
+	    else if (*patparse == zpc_special[ZPC_KSH_AT])
+		kshchar = STOUC('@');
+	    else if (*patparse == zpc_special[ZPC_KSH_STAR])
+		kshchar = STOUC('*');
+	    else if (*patparse == zpc_special[ZPC_KSH_QUEST])
+		kshchar = STOUC('?');
 	}
 
 	/*
@@ -1199,10 +1224,10 @@ patcomppiece(int *flagp)
 	 * tildes are not special if there is nothing following to
 	 * be excluded.
 	 */
-	if (kshchar || (memchr(patendstr, *patparse, patendstrlen) &&
-			(*patparse != Tilde ||
+	if (kshchar || (memchr(zpc_special, *patparse, ZPC_COUNT) &&
+			(*patparse != zpc_special[ZPC_TILDE] ||
 			 patparse[1] == '/' ||
-			 !memchr(patendseg, patparse[1], patendseglen))))
+			 !memchr(zpc_special, patparse[1], ZPC_SEG_COUNT))))
 	    break;
 
 	/* Remember the previous character for backtracking */
@@ -1227,10 +1252,14 @@ patcomppiece(int *flagp)
 	 * If we have more than one character, a following hash
 	 * or (#c...) only applies to the last, so backtrack one character.
 	 */
-	if (isset(EXTENDEDGLOB) &&
-	    (*patparse == Pound ||
-	     (*patparse == Inpar && patparse[1] == Pound &&
-	      patparse[2] == 'c')) && morelen)
+	if ((*patparse == zpc_special[ZPC_HASH] ||
+	     (*patparse == zpc_special[ZPC_INPAR] &&
+	      patparse[1] == zpc_special[ZPC_HASH] &&
+	      patparse[2] == 'c') ||
+	     (*patparse == zpc_special[ZPC_KSH_AT] &&
+	      patparse[1] == Inpar &&
+	      patparse[2] == zpc_special[ZPC_HASH] &&
+	      patparse[3] == 'c')) && morelen)
 	    patparse = patprev;
 	/*
 	 * If len is 1, we can't have an active # following, so doesn't
@@ -1306,15 +1335,21 @@ patcomppiece(int *flagp)
 	METACHARINC(patparse);
 	switch(patch) {
 	case Quest:
+	    DPUTS(zpc_special[ZPC_QUEST] == Marker,
+		  "Treating '?' as pattern character although disabled");
 	    flags |= P_SIMPLE;
 	    starter = patnode(P_ANY);
 	    break;
 	case Star:
+	    DPUTS(zpc_special[ZPC_STAR] == Marker,
+		  "Treating '*' as pattern character although disabled");
 	    /* kshchar is used as a sign that we can't have #'s. */
 	    kshchar = -1;
 	    starter = patnode(P_STAR);
 	    break;
 	case Inbrack:
+	    DPUTS(zpc_special[ZPC_INBRACK] == Marker,
+		  "Treating '[' as pattern character although disabled");
 	    flags |= P_SIMPLE;
 	    if (*patparse == Hat || *patparse == '^' || *patparse == '!') {
 		patparse++;
@@ -1368,9 +1403,10 @@ patcomppiece(int *flagp)
 	    patadd(NULL, 0, 1, 0);
 	    break;
 	case Inpar:
-	    /* is this how to treat parentheses in SHGLOB? */
-	    if (isset(SHGLOB) && !kshchar)
-		return 0;
+	    DPUTS(zpc_special[ZPC_INPAR] == Marker,
+		  "Treating '(' as pattern character although disabled");
+	    DPUTS(isset(SHGLOB) && !kshchar,
+		  "Treating bare '(' as pattern character with SHGLOB");
 	    if (kshchar == '!') {
 		/* This is nasty, we should really either handle all
 		 * kshglobbing below or here.  But most of the
@@ -1393,6 +1429,9 @@ patcomppiece(int *flagp)
 	    break;
 	case Inang:
 	    /* Numeric glob */
+	    DPUTS(zpc_special[ZPC_INANG] == Marker,
+		  "Treating '<' as pattern character although disabled");
+	    DPUTS(isset(SHGLOB), "Treating <..> as numeric range with SHGLOB");
 	    len = 0;		/* beginning present 1, end present 2 */
 	    if (idigit(*patparse)) {
 		from = (zrange_t) zstrtol((char *)patparse,
@@ -1435,6 +1474,8 @@ patcomppiece(int *flagp)
 	     */
 	    break;
 	case Pound:
+	    DPUTS(zpc_special[ZPC_HASH] == Marker,
+		  "Treating '#' as pattern character although disabled");
 	    DPUTS(!isset(EXTENDEDGLOB), "BUG: # not treated as string");
 	    /*
 	     * A hash here is an error; it should follow something
@@ -1465,16 +1506,21 @@ patcomppiece(int *flagp)
     }
 
     count = 0;
-    if (!(pound = (*patparse == Pound && isset(EXTENDEDGLOB))) &&
-	!(count = (isset(EXTENDEDGLOB) && *patparse == Inpar &&
-		   patparse[1] == Pound && patparse[2] == 'c')) &&
+    if (!(hash = (*patparse == zpc_special[ZPC_HASH])) &&
+	!(count = ((*patparse == zpc_special[ZPC_INPAR] &&
+		    patparse[1] == zpc_special[ZPC_HASH] &&
+		    patparse[2] == 'c') ||
+		   (*patparse == zpc_special[ZPC_KSH_AT] &&
+		    patparse[1] == Inpar &&
+		    patparse[2] == zpc_special[ZPC_HASH] &&
+		    patparse[3] == 'c'))) &&
 	(kshchar <= 0 || kshchar == '@' || kshchar == '!')) {
 	*flagp = flags;
 	return starter;
     }
 
     /* too much at once doesn't currently work */
-    if (kshchar && (pound || count))
+    if (kshchar && (hash || count))
 	return 0;
 
     if (kshchar == '*') {
@@ -1490,7 +1536,7 @@ patcomppiece(int *flagp)
 	op = P_COUNT;
 	patparse += 3;
 	*flagp = P_HSTART;
-    } else if (*++patparse == Pound) {
+    } else if (*++patparse == zpc_special[ZPC_HASH]) {
 	op = P_TWOHASH;
 	patparse++;
 	*flagp = P_HSTART;
@@ -1600,7 +1646,7 @@ patcomppiece(int *flagp)
 	pattail(starter, next);
 	patoptail(starter, next);
     }
-    if (*patparse == Pound)
+    if (*patparse == zpc_special[ZPC_HASH])
 	return 0;
 
     return starter;

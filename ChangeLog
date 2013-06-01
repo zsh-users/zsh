@@ -1,3 +1,8 @@
+2013-06-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31441: Src/glob.c, Src/pattern.c, Src/zsh.h: use an array
+	based on ZPC_* enum to decide which forms of pattern are enabled.
+
 2013-05-30  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 31436: Doc/Zsh/expn.yo: KSH_GLOB syntax does not

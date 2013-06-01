@@ -708,8 +708,9 @@ parsecomplist(char *instr)
     }
 
     /* Parse repeated directories such as (dir/)# and (dir/)## */
-    if (*(str = instr) == Inpar && !skipparens(Inpar, Outpar, (char **)&str) &&
-        *str == Pound && isset(EXTENDEDGLOB) && str[-2] == '/') {
+    if (*(str = instr) == zpc_special[ZPC_INPAR] &&
+	!skipparens(Inpar, Outpar, (char **)&str) &&
+        *str == zpc_special[ZPC_HASH] && str[-2] == '/') {
 	instr++;
 	if (!(p1 = patcompile(instr, compflags, &instr)))
 	    return NULL;
@@ -761,9 +762,9 @@ parsepat(char *str)
      * Check for initial globbing flags, so that they don't form
      * a bogus path component.
      */
-    if ((*str == Inpar && str[1] == Pound && isset(EXTENDEDGLOB)) ||
-	(isset(KSHGLOB) && *str == '@' && str[1] == Inpar &&
-	 str[2] == Pound)) {
+    if ((*str == zpc_special[ZPC_INPAR] && str[1] == zpc_special[ZPC_HASH]) ||
+	(*str == zpc_special[ZPC_KSH_AT] && str[1] == Inpar &&
+	 str[2] == zpc_special[ZPC_HASH])) {
 	str += (*str == Inpar) ? 2 : 3;
 	if (!patgetglobflags(&str, &assert, &ignore))
 	    return NULL;
@@ -1146,7 +1147,7 @@ zglob(LinkList list, LinkNode np, int nountok)
     gf_pre_words = NULL;
 
     /* Check for qualifiers */
-    while (!nobareglob || isset(EXTENDEDGLOB)) {
+    while (!nobareglob || zpc_special[ZPC_HASH] != Marker) {
 	struct qual *newquals;
 	char *s;
 	int sense, paren;
@@ -1192,10 +1193,11 @@ zglob(LinkList list, LinkNode np, int nountok)
 	    case Outpar:
 		paren++; /*FALLTHROUGH*/
 	    case Bar:
-		nobareglob = 1;
+		if (zpc_special[ZPC_BAR] != Marker)
+		    nobareglob = 1;
 		break;
 	    case Tilde:
-		if (isset(EXTENDEDGLOB))
+		if (zpc_special[ZPC_TILDE] != Marker)
 		    nobareglob = 1;
 		break;
 	    case Inpar:
@@ -1205,7 +1207,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 	}
 	if (*s != Inpar)
 	    break;
-	if (isset(EXTENDEDGLOB) && s[1] == Pound) {
+	if (s[1] == zpc_special[ZPC_HASH]) {
 	    if (s[2] == 'q') {
 		*s = 0;
 		s += 2;
