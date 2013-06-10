@@ -73,7 +73,7 @@ _complete_help() {
 }
 
 _help_sort_tags() {
-  local f="${${(@)${(@)funcstack[3,(i)_(main_complete|complete|approximate|normal)]}:#_(dispatch|wanted|requested|all_labels|next_label)}% *}"
+  local f="${${(@)${(@)funcstack[3,(i)_(main_complete|complete|approximate|normal)]}:#(_(dispatch|wanted|requested|all_labels|next_label)|\(eval\))}% *}"
 
   if [[ "$help_funcs[$curcontext]" != *${f}* ||
         "$help_tags[${curcontext}${f}]" != *(${(j:|:)~argv})* ]]; then

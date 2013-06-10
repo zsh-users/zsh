@@ -3,6 +3,9 @@
 	* 31466: .cvsignore, .gitignore: Cause git and cvs to ignore
 	one another.
 
+	* 31205: Completion/Base/Widget/_complete_help:  Do not display
+	"(eval)" as a tag context.
+
 2013-06-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31441: Src/glob.c, Src/pattern.c, Src/zsh.h: use an array
