@@ -27,6 +27,9 @@ TAGS
 
 Config/defs.mk
 
+CVS
+.#*
+
 Doc/intro.a4.pdf
 Doc/intro.a4.ps
 Doc/intro.us.pdf
