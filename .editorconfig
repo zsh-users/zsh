@@ -1,4 +1,6 @@
-root = true  # Top-most editorconfig file
+# Top-most editorconfig file
+
+root = true
 
 [*]
 end_of_line = lf
