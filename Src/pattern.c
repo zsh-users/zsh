@@ -233,6 +233,27 @@ static const char zpc_chars[ZPC_COUNT] = {
 };
 
 /*
+ * Corresponding strings used in enable/disable -p.
+ * NULL means no way of turning this on or off.
+ */
+static const char *zpc_strings[ZPC_COUNT] = {
+   NULL, NULL, "|", NULL, "~", "(", "?", "*", "[", "<",
+   "^", "#", NULL, "?(", "*(", "+(", "!(", "@("
+};
+
+/*
+ * Corresponding array of pattern disables as set by the user
+ * using "disable -p".
+ */
+static char zpc_disables[ZPC_COUNT];
+
+/*
+ * Stack of saved (compressed) zpc_disables for function scope.
+ */
+
+static struct zpc_disables_save *zpc_disables_stack;
+
+/*
  * Characters which terminate a simple string (ZPC_COUNT) or
  * an entire pattern segment (the first ZPC_SEG_COUNT).
  * Each entry is either the corresponding character in zpc_chars
@@ -414,7 +435,19 @@ static long rn_offs;
 static void
 patcompcharsset(void)
 {
+    char *spp, *disp;
+    int i;
+
+    /* Initialise enabled special characters */
     memcpy(zpc_special, zpc_chars, ZPC_COUNT);
+    /* Apply user disables from disable -p */
+    for (i = 0, spp = zpc_special, disp = zpc_disables;
+	 i < ZPC_COUNT;
+	 i++, spp++, disp++) {
+	if (*disp)
+	    *spp = Marker;
+    }
+
     if (!isset(EXTENDEDGLOB)) {
 	/* Extended glob characters are not active */
 	zpc_special[ZPC_TILDE] = zpc_special[ZPC_HAT] =
@@ -3798,4 +3831,138 @@ freepatprog(Patprog prog)
 {
     if (prog && prog != dummy_patprog1 && prog != dummy_patprog2)
 	zfree(prog, prog->size);
+}
+
+/* Disable or reenable a pattern character */
+
+/**/
+int
+pat_enables(const char *cmd, char **patp, int enable)
+{
+    int ret = 0;
+    const char **stringp;
+    char *disp;
+
+    if (!*patp) {
+	int done = 0;
+	for (stringp = zpc_strings, disp = zpc_disables;
+	     stringp < zpc_strings + ZPC_COUNT;
+	     stringp++, disp++) {
+	    if (!*stringp)
+		continue;
+	    if (enable ? *disp : !*disp)
+		continue;
+	    if (done)
+		putc(' ', stdout);
+	    printf("'%s'", *stringp);
+	    done = 1;
+	}
+	if (done)
+	    putc('\n', stdout);
+	return 0;
+    }
+
+    for (; *patp; patp++) {
+	for (stringp = zpc_strings, disp = zpc_disables;
+	     stringp < zpc_strings + ZPC_COUNT;
+	     stringp++, disp++) {
+	    if (*stringp && !strcmp(*stringp, *patp)) {
+		*disp = (char)!enable;
+		break;
+	    }
+	}
+	if (stringp == zpc_strings + ZPC_COUNT) {
+	    zerrnam(cmd, "invalid pattern: %s", *patp);
+	    ret = 1;
+	}
+    }
+
+    return ret;
+}
+
+/*
+ * Save the current state of pattern disables, returning the saved value.
+ */
+
+/**/
+unsigned int
+savepatterndisables(void)
+{
+    unsigned int disables, bit;
+    char *disp;
+
+    disables = 0;
+    for (bit = 1, disp = zpc_disables;
+	 disp < zpc_disables + ZPC_COUNT;
+	 bit <<= 1, disp++) {
+	if (*disp)
+	    disables |= bit;
+    }
+    return disables;
+}
+
+/*
+ * Function scope saving pattern enables.
+ */
+
+/**/
+void
+startpatternscope(void)
+{
+    Zpc_disables_save newdis;
+
+    newdis = (Zpc_disables_save)zalloc(sizeof(*newdis));
+    newdis->next = zpc_disables_stack;
+    newdis->disables = savepatterndisables();
+
+    zpc_disables_stack = newdis;
+}
+
+/*
+ * Restore completely the state of pattern disables.
+ */
+
+/**/
+void
+restorepatterndisables(unsigned int disables)
+{
+    char *disp;
+    unsigned int bit;
+
+    for (bit = 1, disp = zpc_disables;
+	 disp < zpc_disables + ZPC_COUNT;
+	 bit <<= 1, disp++) {
+	if (disables & bit)
+	    *disp = 1;
+	else
+	    *disp = 0;
+    }
+}
+
+/*
+ * Function scope to restore pattern enables if localpatterns is turned on.
+ */
+
+/**/
+void
+endpatternscope(void)
+{
+    Zpc_disables_save olddis;
+
+    olddis = zpc_disables_stack;
+    zpc_disables_stack = olddis->next;
+
+    if (isset(LOCALPATTERNS))
+	restorepatterndisables(olddis->disables);
+
+    zfree(olddis, sizeof(*olddis));
+}
+
+/* Reinitialise pattern disables */
+
+/**/
+void
+clearpatterndisables(void)
+{
+    memset(zpc_disables, 0, ZPC_COUNT);
 }

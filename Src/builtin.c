@@ -55,11 +55,11 @@ static struct builtin builtins[] =
     BUILTIN("continue", BINF_PSPECIAL, bin_break, 0, 1, BIN_CONTINUE, NULL, NULL),
     BUILTIN("declare", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klmprtuxz", NULL),
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "clpv", NULL),
-    BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmrs", NULL),
+    BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmprs", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
     BUILTIN("echo", BINF_SKIPINVALID, bin_print, 0, -1, BIN_ECHO, "neE", "-"),
     BUILTIN("emulate", 0, bin_emulate, 0, -1, 0, "LR", NULL),
-    BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmrs", NULL),
+    BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmprs", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
     BUILTIN("exit", BINF_PSPECIAL, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
     BUILTIN("export", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "E:%F:%HL:%R:%TUZ:%afhi:%lprtu", "xg"),
@@ -467,7 +467,9 @@ bin_enable(char *name, char **argv, Options ops, int func)
     int match = 0, returnval = 0;
 
     /* Find out which hash table we are working with. */
-    if (OPT_ISSET(ops,'f'))
+    if (OPT_ISSET(ops,'p')) {
+	return pat_enables(name, argv, func == BIN_ENABLE);
+    } else if (OPT_ISSET(ops,'f'))
 	ht = shfunctab;
     else if (OPT_ISSET(ops,'r'))
 	ht = reswdtab;
@@ -5020,6 +5022,7 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
     int opt_R = OPT_ISSET(ops, 'R');
     int saveemulation, savehackchar;
     int ret = 1, new_emulation;
+    unsigned int savepatterns;
     char saveopts[OPT_SIZE], new_opts[OPT_SIZE];
     char *cmd = 0;
     const char *shname = *argv;
@@ -5061,7 +5064,8 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
     if (!argv[1]) {
 	emulate(shname, OPT_ISSET(ops,'R'), &emulation, opts);
 	if (OPT_ISSET(ops,'L'))
-	    opts[LOCALOPTIONS] = opts[LOCALTRAPS] = 1;
+	    opts[LOCALOPTIONS] = opts[LOCALTRAPS] = opts[LOCALPATTERNS] = 1;
+	clearpatterndisables();
 	return 0;
     }
 
@@ -5081,6 +5085,13 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
 	zwarnnam("emulate", "unknown argument %s", *argv);
 	goto restore;
     }
+
+    savepatterns = savepatterndisables();
+    /*
+     * All emulations start with an empty set of pattern disables,
+     * hence no special "sticky" behaviour is required.
+     */
+    clearpatterndisables();
 
     saveemulation = emulation;
     emulation = new_emulation;
@@ -5131,6 +5142,7 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
     sticky = save_sticky;
     emulation = saveemulation;
     memcpy(opts, saveopts, sizeof(opts));
+    restorepatterndisables(savepatterns);
 restore:
     keyboardhackchar = savehackchar;
     inittyptab();	/* restore banghist */

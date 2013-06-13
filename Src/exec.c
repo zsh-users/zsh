@@ -4627,6 +4627,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     }
 
     starttrapscope();
+    startpatternscope();
 
     pptab = pparams;
     if (!(flags & PM_UNDEFINED))
@@ -4674,6 +4675,8 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 		 offptr++)
 		opts[*offptr] = 0;
 	}
+	/* All emulations start with pattern disables clear */
+	clearpatterndisables();
     } else
 	restore_sticky = 0;
 
@@ -4773,6 +4776,8 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     zoptind = oldzoptind;
     scriptname = oldscriptname;
     oflags = ooflags;
+
+    endpatternscope();		/* before restoring old LOCALPATTERNS */
 
     if (restore_sticky) {
 	/*

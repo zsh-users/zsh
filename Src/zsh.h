@@ -1414,6 +1414,21 @@ enum zpc_chars {
 };
 
 /*
+ * Structure to save disables special characters for function scope.
+ */
+struct zpc_disables_save {
+    struct zpc_disables_save *next;
+    /*
+     * Bit vector of ZPC_COUNT disabled characters.
+     * We'll live dangerously and assumed ZPC_COUNT is no greater
+     * than the number of bits an an unsigned int.
+     */
+    unsigned int disables;
+};
+
+typedef struct zpc_disables_save *Zpc_disables_save;
+
+/*
  * Special match types used in character classes.  These
  * are represented as tokens, with Meta added.  The character
  * class is represented as a metafied string, with only these
@@ -2074,6 +2089,7 @@ enum {
     LISTROWSFIRST,
     LISTTYPES,
     LOCALOPTIONS,
+    LOCALPATTERNS,
     LOCALTRAPS,
     LOGINSHELL,
     LONGLISTJOBS,

@@ -291,8 +291,8 @@ enditem()
 findex(disable)
 cindex(disabling commands)
 cindex(commands, disabling)
-item(tt(disable) [ tt(-afmrs) ] var(name) ...)(
-Temporarily disable the var(name)d hash table elements.  The default
+item(tt(disable) [ tt(-afmprs) ] var(name) ...)(
+Temporarily disable the var(name)d hash table elements or patterns.  The default
 is to disable builtin commands.  This allows you to use an external
 command with the same name as a builtin command.  The tt(-a) option
 causes tt(disable) to act on regular or global aliases.  The tt(-s)
@@ -305,6 +305,80 @@ quoted to prevent them from undergoing filename expansion), and all hash
 table elements from the corresponding hash table matching these patterns
 are disabled.  Disabled objects can be enabled with the tt(enable)
 command.
+
+With the option tt(-p), var(name) ... refer to elements of the
+shell's pattern syntax as described in noderef(Filename Generation).
+Certain elements can be disabled separately, as given below.
+
+Note that patterns
+not allowed by the current settings for the options tt(EXTENDED_GLOB),
+tt(KSH_GLOB) and tt(SH_GLOB) are never enabled, regardless of the
+setting here.  For example, if tt(EXTENDED_GLOB) is not active,
+the pattern tt(^) is ineffective even if `tt(disable -p "^")' has
+not been issued.  The list below indicates any option settings
+that restrict the use of the pattern.  It should be noted that
+setting tt(SH_GLOB) has a wider effect then merely disabling patterns
+as certain expressions, in particular those involving parentheses,
+are parsed differently.
+
+The following patterns may be disabled; all
+the strings need quoting on the command line to prevent them from
+being interpreted immediately as patterns and the patterns are
+shown below in single quotes as a reminder.
+startitem()
+item(tt('?'))(
+The pattern character tt(?) wherever it occurs, including when preceding
+a parenthesis with tt(KSH_GLOB).
+)
+item(tt('*'))(
+The pattern character tt(*) wherever it occurs, including recursive
+globbing and when preceding a parenthesis with tt(KSH_GLOB).
+)
+item('LSQUARE()')(
+Character classes.
+)
+item(tt('<') (tt(NO_SH_GLOB)))(
+Numeric ranges.
+)
+item(tt('|') (tt(NO_SH_GLOB)))(
+Alternation in grouped patterns, case statements, or KSH_GLOB
+parenthesised expressions.
+)
+item(tt('LPAR()') (tt(NO_SH_GLOB)))(
+Grouping using single parentheses.  Disabling this does not disable the
+use of parentheses for tt(KSH_GLOB) where they are introduced by a
+special character, nor for glob qualifiers (use `tt(setopt
+NO_BARE_GLOB_QUAL)' to disable glob qualifiers that use parentheses
+only).
+)
+item(tt('~') (tt(EXTENDED_GLOB)))(
+Exclusion in the form var(A)tt(~)var(B).
+)
+item(tt('^') (tt(EXTENDED_GLOB)))(
+Exclusion in the form var(A)tt(^)var(B).
+)
+item(tt('#') (tt(EXTENDED_GLOB)))(
+The pattern character tt(#) wherever it occurs, both for
+repetition of a previous pattern and for indicating globbing flags.
+)
+item(tt('?LPAR()') (tt(KSH_GLOB)))(
+The grouping form tt(?LPAR())var(...)tt(RPAR()).  Note this is also
+disabled if tt('?') is disabled.
+)
+item(tt('*LPAR()') (tt(KSH_GLOB)))(
+The grouping form tt(*LPAR())var(...)tt(RPAR()).  Note this is also
+disabled if tt('*') is disabled.
+)
+item(tt('PLUS()LPAR()') (tt(KSH_GLOB)))(
+The grouping form tt(PLUS()LPAR())var(...)tt(RPAR()).
+)
+item(tt('!LPAR()') (tt(KSH_GLOB)))(
+The grouping form tt(!LPAR())var(...)tt(RPAR()).
+)
+item(tt('@LPAR()') (tt(KSH_GLOB)))(
+The grouping form tt(@LPAR())var(...)tt(RPAR()).
+)
+enditem()
 )
 findex(disown)
 cindex(jobs, disowning)
@@ -376,7 +450,9 @@ the section COMPATIBILITY in zmanref(zsh)
 ifnzman(\
 noderef(Compatibility)
 )\
-.
+.  In addition to setting shell options, the command also restores
+the pristine state of pattern enables, as if all patterns had been
+enabled using tt(enable -p).
 
 If the tt(emulate) command occurs inside a function that has been
 marked for execution tracing with tt(functions -t) then the tt(xtrace)
@@ -390,9 +466,11 @@ are reset to their default value corresponding to the specified emulation
 mode, except for certain options describing the interactive
 environment; otherwise, only those options likely to cause portability
 problems in scripts and functions are altered.  If the tt(-L) switch is given,
-the options tt(LOCAL_OPTIONS) and tt(LOCAL_TRAPS) will be set as
-well, causing the effects of the tt(emulate) command and any tt(setopt) and
-tt(trap) commands to be local to the immediately surrounding shell
+the options tt(LOCAL_OPTIONS), tt(LOCAL_PATTERNS) and tt(LOCAL_TRAPS)
+will be set as
+well, causing the effects of the tt(emulate) command and any tt(setopt),
+tt(disable -p) or tt(enable -b), and tt(trap) commands to be local to
+the immediately surrounding shell
 function, if any; normally these options are turned off in all emulation
 modes except tt(ksh). The tt(-L) switch is mutually exclusive with the
 use of tt(-c) in var(flags).
@@ -414,7 +492,8 @@ Use of tt(-c) enables `sticky' emulation mode for functions defined
 within the evaluated expression:  the emulation mode is associated
 thereafter with the function so that whenever the function is executed
 the emulation (respecting the tt(-R) switch, if present) and all
-options are set before entry to the function, and restored after exit.
+options are set (and pattern disables cleared)
+before entry to the function, and the state is restored after exit.
 If the function is called when the sticky emulation is already in
 effect, either within an `tt(emulate) var(shell) tt(-c)' expression or
 within another function with the same sticky emulation, entry and exit
@@ -471,7 +550,7 @@ endsitem()
 findex(enable)
 cindex(enabling commands)
 cindex(commands, enabling)
-item(tt(enable) [ tt(-afmrs) ] var(name) ...)(
+item(tt(enable) [ tt(-afmprs) ] var(name) ...)(
 Enable the var(name)d hash table elements, presumably disabled
 earlier with tt(disable).  The default is to enable builtin commands.
 The tt(-a) option causes tt(enable) to act on regular or global aliases.
@@ -483,6 +562,13 @@ printed.  With the tt(-m) flag the arguments are taken as patterns
 (should be quoted) and all hash table elements from the corresponding
 hash table matching these patterns are enabled.  Enabled objects can be
 disabled with the tt(disable) builtin command.
+
+tt(enable -p) reenables patterns disabled with tt(disable -p).  Note
+that it does not override globbing options; for example, `tt(enable -p
+"~")' does not cause the pattern character tt(~) to be active unless
+the tt(EXTENDED_GLOB) option is also set.  To enable all possible
+patterns (so that they may be invidually disabled with tt(disable -p)),
+use `tt(setopt EXTENDED_GLOB KSH_GLOB NO_SH_GLOB)'.
 )
 findex(eval)
 cindex(evaluating arguments as commands)

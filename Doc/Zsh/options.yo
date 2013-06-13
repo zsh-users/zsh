@@ -1618,6 +1618,19 @@ A shell function can also guarantee itself a known shell configuration
 with a formulation like `tt(emulate -L zsh)'; the tt(-L) activates
 tt(LOCAL_OPTIONS).
 )
+pindex(LOCAL_PATTERNS)
+pindex(NO_LOCAL_PATTERNS)
+pindex(LOCALPATTERNS)
+pindex(NOLOCALPATTERNS)
+item(tt(LOCAL_PATTERNS))(
+If this option is set at the point of return from a shell function,
+the state of pattern disables, as set with the builtin command
+`tt(disable -p)', is restored to what it was when the function was
+entered.  The behaviour of this option is similar to the effect
+of tt(LOCAL_OPTIONS) on options; hence `tt(emulate -L sh)' (or
+indeed any other emulation with the tt(-L) option) activates
+tt(LOCAL_PATTERNS).
+)
 pindex(LOCAL_TRAPS)
 pindex(NO_LOCAL_TRAPS)
 pindex(LOCALTRAPS)
