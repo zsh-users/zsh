@@ -445,41 +445,6 @@ insert(char *s, int checked)
     unqueue_signals();
 }
 
-/* Check to see if str is eligible for filename generation. */
-
-/**/
-mod_export int
-haswilds(char *str)
-{
-    /* `[' and `]' are legal even if bad patterns are usually not. */
-    if ((*str == Inbrack || *str == Outbrack) && !str[1])
-	return 0;
-
-    /* If % is immediately followed by ?, then that ? is     *
-     * not treated as a wildcard.  This is so you don't have *
-     * to escape job references such as %?foo.               */
-    if (str[0] == '%' && str[1] == Quest)
-	str[1] = '?';
-
-    for (; *str; str++) {
-	switch (*str) {
-	    case Inpar:
-	    case Bar:
-	    case Star:
-	    case Inbrack:
-	    case Inang:
-	    case Quest:
-		return 1;
-	    case Pound:
-	    case Hat:
-		if (isset(EXTENDEDGLOB))
-		    return 1;
-		break;
-	}
-    }
-    return 0;
-}
-
 /* Do the globbing:  scanner is called recursively *
  * with successive bits of the path until we've    *
  * tried all of it.                                */

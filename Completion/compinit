@@ -163,8 +163,9 @@ _comp_options=(
 
 typeset -g _comp_setup='local -A _comp_caller_options;
              _comp_caller_options=(${(kv)options[@]});
-             setopt localoptions localtraps ${_comp_options[@]};
+             setopt localoptions localtraps localpatterns ${_comp_options[@]};
              local IFS=$'\'\ \\t\\r\\n\\0\''
+             enable -p \| \~ \( \? \* \[ \< \^ \#
              exec </dev/null;
              trap - ZERR
              local -a reply

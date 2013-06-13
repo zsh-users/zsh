@@ -3966,3 +3966,78 @@ clearpatterndisables(void)
 {
     memset(zpc_disables, 0, ZPC_COUNT);
 }
+
+
+/* Check to see if str is eligible for filename generation. */
+
+/**/
+mod_export int
+haswilds(char *str)
+{
+    char *start;
+
+    /* `[' and `]' are legal even if bad patterns are usually not. */
+    if ((*str == Inbrack || *str == Outbrack) && !str[1])
+	return 0;
+
+    /* If % is immediately followed by ?, then that ? is     *
+     * not treated as a wildcard.  This is so you don't have *
+     * to escape job references such as %?foo.               */
+    if (str[0] == '%' && str[1] == Quest)
+	str[1] = '?';
+
+    /*
+     * Note that at this point zpc_special has not been set up.
+     */
+    start = str;
+    for (; *str; str++) {
+	switch (*str) {
+	    case Inpar:
+		if ((!isset(SHGLOB) && !zpc_disables[ZPC_INPAR]) ||
+		    (str > start && isset(KSHGLOB) &&
+		     ((str[-1] == Quest && !zpc_disables[ZPC_KSH_QUEST]) ||
+		      (str[-1] == Star && !zpc_disables[ZPC_KSH_STAR]) ||
+		      (str[-1] == '+' && !zpc_disables[ZPC_KSH_PLUS]) ||
+		      (str[-1] == '!' && !zpc_disables[ZPC_KSH_BANG]) ||
+		      (str[-1] == '@' && !zpc_disables[ZPC_KSH_AT]))))
+		    return 1;
+		break;
+
+	    case Bar:
+		if (!zpc_disables[ZPC_BAR])
+		    return 1;
+		break;
+
+	    case Star:
+		if (!zpc_disables[ZPC_STAR])
+		    return 1;
+		break;
+
+	    case Inbrack:
+		if (!zpc_disables[ZPC_INBRACK])
+		    return 1;
+		break;
+
+	    case Inang:
+		if (!zpc_disables[ZPC_INANG])
+		    return 1;
+		break;
+
+	    case Quest:
+		if (!zpc_disables[ZPC_QUEST])
+		    return 1;
+		break;
+
+	    case Pound:
+		if (isset(EXTENDEDGLOB) && !zpc_disables[ZPC_HASH])
+		    return 1;
+		break;
+
+	    case Hat:
+		if (isset(EXTENDEDGLOB) && !zpc_disables[ZPC_HAT])
+		    return 1;
+		break;
+	}
+    }
+    return 0;
+}

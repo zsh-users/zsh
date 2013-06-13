@@ -1,3 +1,13 @@
+2013-06-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31465: Completion/compinit, Src/glob.c, Src/pattern.c: fix
+	basic completion and globbing use of pattern disables.
+
+	* 31444: Doc/Zsh/builtins.yo, Doc/Zsh/options.yo,
+	Doc/zmacros.yo, Src/builtin.c, Src/exec.c, Src/options.c,
+	Src/pattern.c, Src/zsh.h: Basic (not fully functional) code for
+	enable/disable -p.
+
 2013-06-13  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 31474: Makefile.in, Src/zsh.mdd: create patchlevel.h correctly
