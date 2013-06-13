@@ -1,3 +1,8 @@
+2013-06-13  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31474: Makefile.in, Src/zsh.mdd: create patchlevel.h correctly
+	when running make in a separate build tree
+
 2013-06-09  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 31466: .cvsignore, .gitignore: Cause git and cvs to ignore
