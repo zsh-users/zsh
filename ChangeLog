@@ -1,3 +1,8 @@
+2013-06-27  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 31483: Call zrefresh() before unqueue()ing signals, was
+	moved in 31174.
+
 2013-06-18  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 31485: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
