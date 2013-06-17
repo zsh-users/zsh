@@ -13,6 +13,14 @@
 	* 31474: Makefile.in, Src/zsh.mdd: create patchlevel.h correctly
 	when running make in a separate build tree
 
+2013-06-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Hong Xu: 31462: .editorconfig: move comment to individual
+	line.
+
+	* Bruce Stephens (via Axel Beckert of Debian): 31459:
+	Doc/ztexi.yo: alignment of zsh info menu entry is wrong.
+
 2013-06-09  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 31466: .cvsignore, .gitignore: Cause git and cvs to ignore
