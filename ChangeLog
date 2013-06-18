@@ -1,3 +1,8 @@
+2013-06-18  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 31485: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info, git: Avoid error messages for `guilt' users
+
 2013-06-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31465: Completion/compinit, Src/glob.c, Src/pattern.c: fix
