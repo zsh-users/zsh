@@ -1,5 +1,8 @@
 2013-06-28  Clint Adams  <clint@zsh.org>
 
+	* 31500: Completion/Debian/Command/_dput: dput-ng completion
+	support from Sebastian Ramacher.
+
 	* 31499: Completion/Debian/Command/_dcut: dcut completion
 	from Sebastian Ramacher.
 
