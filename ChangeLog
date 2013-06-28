@@ -1,5 +1,8 @@
 2013-06-28  Clint Adams  <clint@zsh.org>
 
+	* 31499: Completion/Debian/Command/_dcut: dcut completion
+	from Sebastian Ramacher.
+
 	* 31498: Completion/Debian/Command/_dak: complete files for
 	subcommands that are not explicitly specified.
 
