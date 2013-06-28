@@ -1,3 +1,8 @@
+2013-06-28  Clint Adams  <clint@zsh.org>
+
+	* 31xxx: Completion/Debian/Command/_dak: complete files for
+	subcommands that are not explicitly specified.
+
 2013-06-27  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 31483: Call zrefresh() before unqueue()ing signals, was

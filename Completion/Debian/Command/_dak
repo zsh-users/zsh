@@ -238,6 +238,10 @@ case $cmd in
     )
     ;;
 
+    (*)
+    _files
+    ;;
+
 esac
 
 _arguments -s "$args[@]" && ret=0
