@@ -1,3 +1,9 @@
+2013-07-03  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31503: Doc/Zsh/contrib.yo, Functions/Misc/zmv: split words
+	in program passed to zmv with -p and add -P for programs
+	that don't understand the "--" convention.
+
 2013-06-28  Clint Adams  <clint@zsh.org>
 
 	* 31500: Completion/Debian/Command/_dput: dput-ng completion

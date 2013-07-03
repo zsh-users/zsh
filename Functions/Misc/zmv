@@ -93,7 +93,11 @@
 #  -p <program>
 #      Call <program> instead of cp, ln or mv.  Whatever it does, it should
 #      at least understand the form '<program> -- <oldname> <newname>',
-#      where <oldname> and <newname> are filenames generated.
+#      where <oldname> and <newname> are filenames generated. <program>
+#      will be split into words.
+#  -P <program>
+#      As -p, but the program doesn't understand the "--" convention.
+#      In this case the file names must already be sane.
 #  -w  Pick out wildcard parts of the pattern, as described above, and
 #      implicitly add parentheses for referring to them.
 #  -W  Just like -w, with the addition of turning wildcards in the
@@ -123,14 +127,16 @@ setopt extendedglob
 
 local f g args match mbegin mend files action myname tmpf opt exec
 local opt_f opt_i opt_n opt_q opt_Q opt_s opt_M opt_C opt_L 
-local opt_o opt_p opt_v opt_w opt_W MATCH MBEGIN MEND
+local opt_o opt_p opt_P opt_v opt_w opt_W MATCH MBEGIN MEND
 local pat repl errstr fpat hasglobqual opat
 typeset -A from to
 integer stat
 
+local dashes=--
+
 myname=${(%):-%N}
 
-while getopts ":o:p:MCLfinqQsvwW" opt; do
+while getopts ":o:p:P:MCLfinqQsvwW" opt; do
   if [[ $opt = "?" ]]; then
     print -r -- "$myname: unrecognized option: -$OPTARG" >&2
     return 1
@@ -144,6 +150,7 @@ done
 [[ -n $opt_C ]] && action=cp
 [[ -n $opt_L ]] && action=ln
 [[ -n $opt_p ]] && action=$opt_p
+[[ -n $opt_P ]] && action=$opt_P dashes=
 
 if [[ -z $action ]]; then
   action=$myname[-2,-1]
@@ -278,7 +285,7 @@ fi
 
 for f in $files; do
   [[ -z $to[$f] ]] && continue
-  exec=($action ${=opt_o} $opt_s -- $f $to[$f])
+  exec=(${=action} ${=opt_o} $opt_s $dashes $f $to[$f])
   [[ -n $opt_i$opt_n$opt_v ]] && print -r -- ${(q-)exec}
   if [[ -n $opt_i ]]; then
     read -q 'opt?Execute? ' || continue
