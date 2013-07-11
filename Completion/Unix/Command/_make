@@ -148,7 +148,9 @@ _make-findBasedir () {
 _make() {
 
   local prev="$words[CURRENT-1]" file expl tmp is_gnu dir incl match
-  local -A TARGETS VARIABLES
+  local context state line
+  local -a option_specs
+  local -A TARGETS VARIABLES opt_args
   local ret=1
 
   _pick_variant -r is_gnu gnu=GNU unix -v -f
@@ -156,21 +158,43 @@ _make() {
   if [[ $is_gnu == gnu ]]
   then
     incl="(-|)include"
+    # TBD: update option_specs
+    option_specs=(
+      '-C[change directory first]:directory:->dir'
+      '-I[include directory for makefiles]:directory:->dir'
+      '-f[specify makefile]:makefile:->file'
+      '-o[specify file not to remake]:file not to remake:->file'
+      '-W[pretend file was modified]:file to treat as modified:->file'
+    )
   else
+    # Basic make options only.
     incl=.include
+    option_specs=(
+      '-C[change directory first]:directory:->dir'
+      '-I[include directory for makefiles]:directory:->dir'
+      '-f[specify makefile]:makefile:->file'
+      '-o[specify file not to remake]:file not to remake:->file'
+      '-W[pretend file was modified]:file to treat as modified:->file'
+    )
   fi
 
-  if [[ "$prev" == -[CI] ]]
-  then
+  _arguments -s $option_specs \
+    '*:make target:->target' && ret=0
+
+  case $state in
+    (dir)
     _files -W ${(q)$(_make-findBasedir ${words[1,CURRENT-1]})} -/ && ret=0
-  elif [[ "$prev" == -[foW] ]]
-  then
+    ;;
+
+    (file)
     _files -W ${(q)$(_make-findBasedir $words)} && ret=0
-  else
-    file="$words[(I)-f]"
-    if (( file ))
+    ;;
+
+    (target)
+    file=($opt_args[(K)(-f|--file|--makefile)])
+    file=$file[1]
+    if [[ -n $file ]]
     then
-      file=${~words[file+1]}
       [[ $file == [^/]* ]] && file=${(q)$(_make-findBasedir $words)}/$file
       [[ -r $file ]] || file=
     else
@@ -222,7 +246,7 @@ _make() {
           compadd -S '=' -- ${(k)VARIABLES} && ret=0
       done
     fi
-  fi
+  esac
 
   return ret
 }

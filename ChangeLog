@@ -1,3 +1,8 @@
+2013-07-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/17856: Completion/Command/Unix/_make: rewrite to use
+	_arguments so as to make adding option handling easier.
+
 2013-07-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 31503: Doc/Zsh/contrib.yo, Functions/Misc/zmv: split words
