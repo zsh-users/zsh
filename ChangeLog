@@ -1,3 +1,8 @@
+2013-07-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Nick Cross: 31512: Completion/Unix/Command/_make:
+	extra GNU options plus fix to makefile completion.
+
 2013-07-11  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/17856: Completion/Command/Unix/_make: rewrite to use
