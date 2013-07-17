@@ -160,7 +160,7 @@ _make() {
     incl="(-|)include"
     option_specs=(
       {-B,--always-make}'[Unconditionally make all targets]'
-      {-C,--directory=}'[change directory first]:directory:->dir'
+      '*'{-C,--directory=}'[change directory first]:directory:->dir'
       '-d[Print lots of debug information]'
       '--debug=-[Print various types of debug information]:FLAGS'
       {-e,--environment-overrides}'[Environment variables override makefiles]'
@@ -168,13 +168,13 @@ _make() {
       {-f,--file=,--makefile=}'[Read FILE as a makefile]:file:->file'
       '-h[Print this message and exit]'
       {-i,--ignore-errors}'[Ignore errors from recipes]'
-      {-I,--include-dir=}'[Search DIRECTORY for included makefiles]:directory:->dir'
+      '*'{-I,--include-dir=}'[Search DIRECTORY for included makefiles]:directory:->dir'
       {-j,--jobs=}'[Allow N jobs at once; infinite jobs with no arg]:number of jobs'
       {-k,--keep-going}"[Keep going when some targets can't be made]"
       {-l,--load-average=,--max-load}"[Don't start multiple jobs unless load is below N]:load"
       {-L,--check-symlink-times}'[Use the latest mtime between symlinks and target]'
       {-n,--just-print,--dry-run,--recon}"[Don't actually run any recipe; just print them]"
-      {-o,--old-file=,--assume-old=}"[Consider FILE to be very old and don't remake it]:file not to remake:->file"
+      '*'{-o,--old-file=,--assume-old=}"[Consider FILE to be very old and don't remake it]:file not to remake:->file"
       {-p,--print-data-base}'[Print makes internal database]'
       {-q,--question}'[Run no recipe; exit status says if up to date]'
       {-r,--no-builtin-rules}'[Disable the built-in implicit rules]'
@@ -185,7 +185,7 @@ _make() {
       {-v,--version}'[Print the version number of make and exit]'
       {-w,--print-directory}'[Print the current directory]'
       '--no-print-directory[Turn off -w, even if it was turned on implicitly]'
-      {-W,--what-if=,--new-file=,--asume-new=}'[Consider FILE to be infinitely new]:file to treat as modified:->file'
+      '*'{-W,--what-if=,--new-file=,--asume-new=}'[Consider FILE to be infinitely new]:file to treat as modified:->file'
       '--warn-undefined-variables[Warn when an undefined variable is referenced]'
       '--warn-undefined-functions[Warn when an undefined user function is called]'
     )

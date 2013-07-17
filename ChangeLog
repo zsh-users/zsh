@@ -1,3 +1,8 @@
+2013-07-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Jun T: 31525: Completion/Unix/Command/_make: fix some option
+	handling.
+
 2013-07-12  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Nick Cross: 31512: Completion/Unix/Command/_make:
