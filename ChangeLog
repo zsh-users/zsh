@@ -1,5 +1,9 @@
 2013-07-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 31528: Src/exec.c, Src/jobs.c, Src/zsh.h: use job table
+	to record file descriptors associated with process
+	substitution.
+
 	* Jun T: 31525: Completion/Unix/Command/_make: fix some option
 	handling.
 

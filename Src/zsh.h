@@ -374,9 +374,8 @@ enum {
 #ifdef PATH_DEV_FD
 /*
  * Entry used by a process substition.
- * The value will be incremented on entering a function and
- * decremented on exit; we don't close entries greater than
- * FDT_PROC_SUBST except when closing everything.
+ * This marker is not tested internally as we associated the file
+ * descriptor with a job for closing.
  */
 #define FDT_PROC_SUBST		6
 #endif
@@ -422,6 +421,7 @@ typedef struct heap      *Heap;
 typedef struct heapstack *Heapstack;
 typedef struct histent   *Histent;
 typedef struct hookdef   *Hookdef;
+typedef struct jobfile   *Jobfile;
 typedef struct job       *Job;
 typedef struct linkedmod *Linkedmod;
 typedef struct linknode  *LinkNode;
@@ -878,6 +878,18 @@ struct eccstr {
 /* Definitions for job table and job control */
 /********************************************/
 
+/* Entry in filelist linked list in job table */
+
+struct jobfile {
+    /* Record to be deleted or closed */
+    union {
+	char *name; /* Name of file to delete */
+	int fd;	    /* File descriptor to close */
+    } u;
+    /* Discriminant */
+    int is_fd;
+};
+
 /* entry in the job table */
 
 struct job {
@@ -889,6 +901,7 @@ struct job {
     struct process *procs;	/* list of processes                 */
     struct process *auxprocs;	/* auxiliary processes e.g multios   */
     LinkList filelist;		/* list of files to delete when done */
+				/* elements are struct jobfile */
     int stty_in_env;		/* if STTY=... is present            */
     struct ttyinfo *ty;		/* the modes specified by STTY       */
 };

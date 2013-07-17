@@ -2860,9 +2860,6 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    close(synch[1]);
 	    read_loop(synch[0], &dummy, 1);
 	    close(synch[0]);
-#ifdef PATH_DEV_FD
-	    closem(FDT_PROC_SUBST);
-#endif
 	    if (how & Z_ASYNC) {
 		lastpid = (zlong) pid;
 		/* indicate it's possible to set status for lastpid */
@@ -3247,32 +3244,16 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    if (is_shfunc) {
 		/* It's a shell function */
 
-#ifdef PATH_DEV_FD
-		int i;
-
-		for (i = 10; i <= max_zsh_fd; i++)
-		    if (fdtable[i] >= FDT_PROC_SUBST)
-			fdtable[i]++;
-#endif
 		if (subsh_close >= 0)
 		    zclose(subsh_close);
 		subsh_close = -1;
 
 		execshfunc((Shfunc) hn, args);
-#ifdef PATH_DEV_FD
-		for (i = 10; i <= max_zsh_fd; i++)
-		    if (fdtable[i] >= FDT_PROC_SUBST)
-			if (--(fdtable[i]) <= FDT_PROC_SUBST)
-			    zclose(i);
-#endif
 	    } else {
 		/* It's a builtin */
 		if (forked)
 		    closem(FDT_INTERNAL);
 		lastval = execbuiltin(args, (Builtin) hn);
-#ifdef PATH_DEV_FD
-		closem(FDT_PROC_SUBST);
-#endif
 		fflush(stdout);
 		if (save[1] == -2) {
 		    if (ferror(stdout)) {
@@ -3887,9 +3868,7 @@ getoutputfile(char *cmd, char **eptr)
 	    untokenize(s);
     }
 
-    if (!jobtab[thisjob].filelist)
-	jobtab[thisjob].filelist = znewlinklist();
-    zaddlinknode(jobtab[thisjob].filelist, nam);
+    addfilelist(nam, 0);
 
     if (!s)
 	child_block();
@@ -3975,9 +3954,7 @@ getproc(char *cmd, char **eptr)
 	return NULL;
     if (!(prog = parsecmd(cmd, eptr)))
 	return NULL;
-    if (!jobtab[thisjob].filelist)
-	jobtab[thisjob].filelist = znewlinklist();
-    zaddlinknode(jobtab[thisjob].filelist, ztrdup(pnam));
+    addfilelist(pnam, 0);
 
     if ((pid = zfork(&bgtime))) {
 	if (pid == -1)
@@ -3995,7 +3972,7 @@ getproc(char *cmd, char **eptr)
     entersubsh(ESUB_ASYNC|ESUB_PGRP);
     redup(fd, out);
 #else /* PATH_DEV_FD */
-    int pipes[2];
+    int pipes[2], fd;
 
     if (thisjob == -1)
 	return NULL;
@@ -4012,7 +3989,9 @@ getproc(char *cmd, char **eptr)
 	    zclose(pipes[!out]);
 	    return NULL;
 	}
-	fdtable[pipes[!out]] = FDT_PROC_SUBST;
+	fd = pipes[!out];
+	fdtable[fd] = FDT_PROC_SUBST;
+	addfilelist(NULL, fd);
 	if (!out)
 	{
 	    addproc(pid, NULL, 1, &bgtime);

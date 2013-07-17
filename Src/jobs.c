@@ -1113,16 +1113,48 @@ printjob(Job jn, int lng, int synch)
     return doneprint;
 }
 
+/* Add a file to be deleted or fd to be closed to the current job */
+
+/**/
+void
+addfilelist(const char *name, int fd)
+{
+    Jobfile jf = (Jobfile)zalloc(sizeof(struct jobfile));
+    LinkList ll = jobtab[thisjob].filelist;
+
+    if (!ll)
+	ll = jobtab[thisjob].filelist = znewlinklist();
+    if (name)
+    {
+	jf->u.name = ztrdup(name);
+	jf->is_fd = 0;
+    }
+    else
+    {
+	jf->u.fd = fd;
+	jf->is_fd = 1;
+    }
+    zaddlinknode(ll, jf);
+}
+
+/* Finished with list of files for a job */
+
 /**/
 void
 deletefilelist(LinkList file_list, int disowning)
 {
-    char *s;
+    Jobfile jf;
     if (file_list) {
-	while ((s = (char *)getlinknode(file_list))) {
-	    if (!disowning)
-		unlink(s);
-	    zsfree(s);
+	while ((jf = (Jobfile)getlinknode(file_list))) {
+	    if (jf->is_fd) {
+		if (!disowning)
+		    zclose(jf->u.fd);
+	    } else {
+		if (!disowning)
+		    unlink(jf->u.name);
+		zsfree(jf->u.name);
+	    }
+	    zfree(jf, sizeof(*jf));
 	}
 	zfree(file_list, sizeof(struct linklist));
     }
