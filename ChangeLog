@@ -1,3 +1,8 @@
+2013-07-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* c.f. 31531: Completion/Unix/Command/_imagemagick,
+	Completion/Unix/Command/_graphicsmagick: complete .xcf files.
+
 2013-07-19  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 31536 (plus memory leak fixed, plus test code):

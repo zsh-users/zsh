@@ -11,7 +11,7 @@ typeset -A opt_args
 #
 # and certainly many other things...
 
-formats=jpg:jpeg:tiff:miff:ras:bmp:cgm:dcx:ps:eps:fig:fits:fpx:gif:mpeg:pbm:pgm:ppm:pcd:pcl:pdf:pcx:png:rad:rgb:rgba:rle:sgi:html:shtml:tga:ttf:uil:xwd:xbm:xpm:yuv
+formats=jpg:jpeg:tiff:miff:ras:bmp:cgm:dcx:ps:eps:fig:fits:fpx:gif:mpeg:pbm:pgm:ppm:pcd:pcl:pdf:pcx:png:rad:rgb:rgba:rle:sgi:html:shtml:tga:ttf:uil:xcf:xwd:xbm:xpm:yuv
 
 if (( $# )); then
   _files "$@" -g "*.(#i)(${~formats//:/|})(-.)"
