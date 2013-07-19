@@ -1,3 +1,10 @@
+2013-07-19  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31536 (plus memory leak fixed, plus test code):
+	Src/jobs.c, Test/D03procsubst.ztst: fix hang in 31528 by
+	closing process substitution file descriptors when waiting
+	for job to finish.
+
 2013-07-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31528: Src/exec.c, Src/jobs.c, Src/zsh.h: use job table

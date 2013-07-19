@@ -107,3 +107,11 @@
 >third: This becomes argument three
 >fourth: and this argument four
 
+  () {
+     # Make sure we don't close the file descriptor too early
+     eval 'print "Execute a complicated command first" | sed s/command/order/'
+     cat $1
+  } <(echo This line was brought to you by the letters F and D)
+0:Process substitution as anonymous function argument
+>Execute a complicated order first
+>This line was brought to you by the letters F and D

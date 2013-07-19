@@ -1368,6 +1368,31 @@ zwaitjob(int job, int wait_cmd)
 	jn->stat |= STAT_LOCKED;
 	if (jn->stat & STAT_CHANGED)
 	    printjob(jn, !!isset(LONGLISTJOBS), 1);
+	if (jn->filelist) {
+	    /*
+	     * The main shell is finished with any file descriptors used
+	     * for process substitution associated with this job: close
+	     * them to indicate to listeners there's no more input.
+	     *
+	     * Note we can't safely delete temporary files yet as these
+	     * are directly visible to other processes.  However,
+	     * we can't deadlock on the fact that those still exist, so
+	     * that's not a problem.
+	     */
+	    LinkNode node = firstnode(jn->filelist);
+	    while (node) {
+		Jobfile jf = (Jobfile)getdata(node);
+		if (jf->is_fd) {
+		    LinkNode next = nextnode(node);
+		    (void)remnode(jn->filelist, node);
+		    zclose(jf->u.fd);
+		    zfree(jf, sizeof(*jf));
+		    node = next;
+		} else {
+		    incnode(node);
+		}
+	    }
+	}
 	while (!errflag && jn->stat &&
 	       !(jn->stat & STAT_DONE) &&
 	       !(interact && (jn->stat & STAT_STOPPED))) {
