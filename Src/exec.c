@@ -448,7 +448,9 @@ zexecve(char *pth, char **argv, char **newenvp)
     else
 	sprintf(buf + 2, "%s/%s", pwd, pth);
     zputenv(buf);
+#ifndef FD_CLOEXEC
     closedumps();
+#endif
 
     if (newenvp == NULL)
 	    newenvp = environ;

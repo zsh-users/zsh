@@ -1,3 +1,9 @@
+2013-07-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31545: Src/exec.c, Src/parse.c: if FD_CLOEXEC is available,
+	so mark dump file file descriptors, avoiding possible
+	multiple use of file descriptors.
+
 2013-07-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* c.f. 31531: Completion/Unix/Command/_imagemagick,

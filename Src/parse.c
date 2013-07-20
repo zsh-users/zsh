@@ -3171,6 +3171,9 @@ load_dump_file(char *dump, struct stat *sbuf, int other, int len)
     d->dev = sbuf->st_dev;
     d->ino = sbuf->st_ino;
     d->fd = fd;
+#ifdef FD_CLOEXEC
+    fcntl(fd, F_SETFD, FD_CLOEXEC);
+#endif
     d->map = addr + (other ? (len - off) / sizeof(wordcode) : 0);
     d->addr = addr;
     d->len = len;
@@ -3439,6 +3442,7 @@ decrdumpcount(FuncDump f)
     }
 }
 
+#ifndef FD_CLOEXEC
 /**/
 mod_export void
 closedumps(void)
@@ -3448,6 +3452,7 @@ closedumps(void)
     for (p = dumps; p; p = p->next)
 	zclose(p->fd);
 }
+#endif
 
 #else
 
@@ -3461,11 +3466,13 @@ decrdumpcount(FuncDump f)
 {
 }
 
+#ifndef FD_CLOEXEC
 /**/
 mod_export void
 closedumps(void)
 {
 }
+#endif
 
 #endif
 
