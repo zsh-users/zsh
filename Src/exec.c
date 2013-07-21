@@ -1653,8 +1653,6 @@ execpline(Estate state, wordcode slcode, int how, int last1)
     return lastval;
 }
 
-static int subsh_close = -1;
-
 /* execute pipeline.  This function assumes the `pline' is not NULL. */
 
 /**/
@@ -1731,7 +1729,7 @@ execpline2(Estate state, wordcode pcode,
 	    }
 	} else {
 	    /* otherwise just do the pipeline normally. */
-	    subsh_close = pipes[0];
+	    addfilelist(NULL, pipes[0]);
 	    execcmd(state, input, pipes[1], how, 0);
 	}
 	zclose(pipes[1]);
@@ -1744,8 +1742,6 @@ execpline2(Estate state, wordcode pcode,
 	execpline2(state, *state->pc++, how, pipes[0], output, last1);
 	list_pipe = old_list_pipe;
 	cmdpop();
-	zclose(pipes[0]);
-	subsh_close = -1;
     }
 }
 
@@ -2162,8 +2158,6 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag,
 	    mfds[fd1]->fds[mfds[fd1]->ct++] = fdN;
 	}
     }
-    if (subsh_close >= 0 && fdtable[subsh_close] == FDT_UNUSED)
-	subsh_close = -1;
 }
 
 /**/
@@ -3245,11 +3239,6 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
 	    if (is_shfunc) {
 		/* It's a shell function */
-
-		if (subsh_close >= 0)
-		    zclose(subsh_close);
-		subsh_close = -1;
-
 		execshfunc((Shfunc) hn, args);
 	    } else {
 		/* It's a builtin */
@@ -3325,9 +3314,6 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		DPUTS(varspc,
 		      "BUG: assignment before complex command");
 		list_pipe = 0;
-		if (subsh_close >= 0)
-		    zclose(subsh_close);
-                subsh_close = -1;
 		/* If we're forked (and we should be), no need to return */
 		DPUTS(last1 != 1 && !forked, "BUG: not exiting?");
 		DPUTS(type != WC_SUBSH, "Not sure what we're doing.");
@@ -5069,7 +5055,6 @@ execsave(void)
     es->trapisfunc = trapisfunc;
     es->traplocallevel = traplocallevel;
     es->noerrs = noerrs;
-    es->subsh_close = subsh_close;
     es->underscore = ztrdup(zunderscore);
     es->next = exstack;
     exstack = es;
@@ -5100,7 +5085,6 @@ execrestore(void)
     trapisfunc = exstack->trapisfunc;
     traplocallevel = exstack->traplocallevel;
     noerrs = exstack->noerrs;
-    subsh_close = exstack->subsh_close;
     setunderscore(exstack->underscore);
     zsfree(exstack->underscore);
     en = exstack->next;

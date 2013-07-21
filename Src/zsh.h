@@ -977,7 +977,6 @@ struct execstack {
     int trapisfunc;
     int traplocallevel;
     int noerrs;
-    int subsh_close;
     char *underscore;
 };
 
