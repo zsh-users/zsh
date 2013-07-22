@@ -1,5 +1,8 @@
 2013-07-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Src/lex.c: correct previous commit: should call
+	hwend(), not ihwend().
+
 	* 31559: Src/lex.c: Fix problem with history lines for comments
 	that occur in the middle of an alias.
 

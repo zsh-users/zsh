@@ -778,7 +778,7 @@ gettok(void)
 	    bptr = tokstr = (char *)hcalloc(bsiz = 32);
 	    add(c);
 	}
-	ihwend();
+	hwend();
 	while ((c = ingetc()) != '\n' && !lexstop) {
 	    hwaddc(c);
 	    addtoline(c);
