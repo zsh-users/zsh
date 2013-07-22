@@ -1,5 +1,8 @@
 2013-07-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 31559: Src/lex.c: Fix problem with history lines for comments
+	that occur in the middle of an alias.
+
 	* Eric Cook: 31558: Completion/Command/Unix/_qemu: name of
 	binary has changed.
 
