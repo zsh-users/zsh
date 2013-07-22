@@ -1,8 +1,8 @@
-#compdef qemu
+#compdef -P qemu(|-system-*)
 
 _qemu_log_items () {
   local -a opts hline
-  qemu -d \? | while read -A hline; do
+  $service -d \? | while read -A hline; do
     [[ $hline[1] = Log ]] && continue
     opts=($opts "${hline[1]}[${hline[2,-1]}]")
   done
@@ -11,7 +11,7 @@ _qemu_log_items () {
 
 local _qemu_machines
 
-_qemu_machines=(${${${(f)"$(qemu -M \?)"}[2,-1]}%% *})
+_qemu_machines=(${${${(f)"$($service -M \?)"}[2,-1]}%% *})
 
 _arguments \
   '-'{fda,fdb,hda,hdb,hdc,hdd,cdrom}':disk image:_files' \

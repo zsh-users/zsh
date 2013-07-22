@@ -1,3 +1,8 @@
+2013-07-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Eric Cook: 31558: Completion/Command/Unix/_qemu: name of
+	binary has changed.
+
 2013-07-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31549: Src/exec,c, Src/zsh.h: replace ad-hoc subsh_close file
