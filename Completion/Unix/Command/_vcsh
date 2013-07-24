@@ -1,18 +1,135 @@
 #compdef vcsh
 
-_arguments \
-	':subcommand:((
-		clone\:"clone from repo"
-		help\:"display help"
-		delete\:"delete repo"
-		enter\:"Enter repo; spawn new \$SHELL"
-		init\:"init & clone from repo"
-		list\:"list all repos"
-		list-tracked\:"list all files tracked by vcsh"
-		list-tracked-by\:"list files tracked by a repo"
-		rename\:"rename repo"
-		run\:"run command on repo"
-		setup\:"set up repo with recommended settings"
-		write-gitignore\:"write .gitignore.d/foo via git ls-files"
-		\<REPO\>\:"Run git command directly"
-	))'
+function __vcsh_repositories () {
+	local expl
+	local -a repos
+	repos=( ${(f)"$(command vcsh list)"} )
+	_describe -t repos 'repositories' repos
+}
+
+function __vcsh_not_implemented_yet () {
+	_message "Subcommand completion '${1#*-}': not implemented yet"
+}
+
+function _vcsh-clone () {
+	__vcsh_not_implemented_yet "$0" #TODO
+}
+
+function _vcsh-delete () {
+	(( CURRENT == 2 )) && __vcsh_repositories
+}
+
+function _vcsh-enter () {
+	(( CURRENT == 2 )) && __vcsh_repositories
+}
+
+function _vcsh-help () {
+	_nothing
+}
+
+function _vcsh-init () {
+	_nothing
+}
+
+function _vcsh-list () {
+	_nothing
+}
+
+function _vcsh-list-tracked () {
+	_nothing
+}
+
+function _vcsh-list-tracked-by () {
+	(( CURRENT == 2 )) && __vcsh_repositories
+}
+
+function _vcsh-pull () {
+	_nothing
+}
+
+function _vcsh-push () {
+	_nothing
+}
+
+function _vcsh-rename () {
+	(( CURRENT == 2 )) && __vcsh_repositories
+	(( CURRENT == 3 )) && _message "new repository name"
+	(( CURRENT > 3 )) && _nothing
+}
+
+function _vcsh-run () {
+	(( CURRENT == 2 )) && __vcsh_repositories
+	if (( CURRENT >= 3 )); then
+		words=( "${(@)words[3,-1]}" )
+		(( CURRENT -= 2 ))
+		_complete
+	fi
+}
+
+function _vcsh-upgrade () {
+	(( CURRENT == 2 )) && __vcsh_repositories
+}
+
+function _vcsh-version () {
+	_nothing
+}
+
+function _vcsh-which () {
+	_files
+}
+
+function _vcsh-write-gitignore () {
+	(( CURRENT == 2 )) && __vcsh_repositories
+}
+
+function _vcsh () {
+	local curcontext="${curcontext}"
+	local state vcshcommand
+	local -a args subcommands
+
+	subcommands=(
+		"clone:clone an existing repository"
+		"delete:delete an existing repository"
+		"enter:enter repository; spawn new <\$SHELL>"
+		"help:display help"
+		"init:initialize an empty repository"
+		"list:list all local vcsh repositories"
+		"list-tracked:list all files tracked by vcsh"
+		"list-tracked-by:list files tracked by a repository"
+		"pull:pull from all vcsh remotes"
+		"rename:rename a repository"
+		"run:run command with <\$GIT_DIR> and <\$GIT_WORK_TREE> set"
+		"upgrade:upgrade repository to currently recommended settings"
+		"version:print version information"
+		"which:find <substring> in name of any tracked file"
+		"write-gitignore:write .gitignore.d/<repo> via git ls-files"
+	)
+
+	args=(
+		'-c[source <file> prior to other configuration files]:config files:_path_files'
+		'-d[enable debug mode]'
+		'-v[enable verbose mode]'
+		'*:: :->subcommand_or_options_or_repo'
+	)
+
+	_arguments -C ${args} && return
+
+	if [[ ${state} == "subcommand_or_options_or_repo" ]]; then
+		if (( CURRENT == 1 )); then
+			_describe -t subcommands 'vcsh sub-commands' subcommands
+			__vcsh_repositories
+		else
+			vcshcommand="${words[1]}"
+			if ! (( ${+functions[_vcsh-$vcshcommand]} )); then
+				# There is no handler function, so this is probably the name
+				# of a repository. Act accordingly.
+				_dispatch git git
+			else
+				curcontext="${curcontext%:*:*}:vcsh-${vcshcommand}:"
+				_call_function ret _vcsh-${vcshcommand}
+			fi
+		fi
+	fi
+}
+
+_vcsh "$@"
