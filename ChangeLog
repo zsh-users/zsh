@@ -2,6 +2,9 @@
 
 	* 31571: Completion/Unix/Command/_vcsh: Update
 
+	* 31572: Completion/Debian/Command/_linda,
+	Completion/Debian/Command/.distfiles: Remove _linda
+
 2013-07-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Src/hist.c: 31570: with HIST_REDUCE_BLANKS don't truncate

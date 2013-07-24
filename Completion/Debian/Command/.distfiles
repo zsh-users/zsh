@@ -30,7 +30,6 @@ _dupload
 _git-buildpackage
 _invoke-rc.d
 _lighttpd
-_linda
 _lintian
 _madison
 _make-kpkg
