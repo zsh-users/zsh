@@ -927,7 +927,8 @@ hbegin(int dohist)
 void
 histreduceblanks(void)
 {
-    int i, len, pos, needblank, spacecount = 0;
+    int i, len, pos, needblank, spacecount = 0, trunc_ok;
+    char *lastptr, *ptr;
 
     if (isset(HISTIGNORESPACE))
 	while (chline[spacecount] == ' ') spacecount++;
@@ -939,6 +940,12 @@ histreduceblanks(void)
     if (chline[len] == '\0')
 	return;
 
+    /* Remember where the delimited words end */
+    if (chwordpos)
+	lastptr = chline + chwords[chwordpos-1];
+    else
+	lastptr = chline;
+
     for (i = 0, pos = spacecount; i < chwordpos; i += 2) {
 	len = chwords[i+1] - chwords[i];
 	needblank = (i < chwordpos-2 && chwords[i+2] > chwords[i+1]);
@@ -949,7 +956,25 @@ histreduceblanks(void)
 	}
 	pos += len + needblank;
     }
-    chline[pos] = '\0';
+
+    /*
+     * A terminating comment isn't recorded as a word.
+     * Only truncate the line if just whitespace remains.
+     */
+    trunc_ok = 1;
+    for (ptr = lastptr; *ptr; ptr++) {
+	if (!inblank(*ptr)) {
+	    trunc_ok = 0;
+	    break;
+	}
+    }
+    if (trunc_ok) {
+	chline[pos] = '\0';
+    } else {
+	ptr = chline + pos;
+	while ((*ptr++ = *lastptr++))
+	    ;
+    }
 }
 
 /**/
