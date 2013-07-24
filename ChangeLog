@@ -1,5 +1,10 @@
 2013-07-25  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Jun T.: 31756: Completion/Unix/Command/_make: further make
+	completion improvements: tke care of mutually exclusive options;
+	add _description using $state_descr; add completions for
+	--debug=flag; fix typo (pointed out by Daniel Shahaf).
+
 	* 31574: Src/parse.c: alternative fix to 31545 if FD_CLOEXEC is
 	not available, removing dump records more consistently.
 
