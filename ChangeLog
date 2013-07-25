@@ -1,3 +1,8 @@
+2013-07-25  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31574: Src/parse.c: alternative fix to 31545 if FD_CLOEXEC is
+	not available, removing dump records more consistently.
+
 2013-07-24  Richard Hartmann  <richih.mailinglist@gmail.com>
 
 	* 31571: Completion/Unix/Command/_vcsh: Update

@@ -3418,6 +3418,16 @@ incrdumpcount(FuncDump f)
     f->count++;
 }
 
+/**/
+static void
+freedump(FuncDump f)
+{
+    munmap((void *) f->addr, f->len);
+    zclose(f->fd);
+    zsfree(f->filename);
+    zfree(f, sizeof(*f));
+}
+
 /* Decrement the reference counter for a dump file. If zero, unmap the file. */
 
 /**/
@@ -3434,10 +3444,7 @@ decrdumpcount(FuncDump f)
 		q->next = p->next;
 	    else
 		dumps = p->next;
-	    munmap((void *) f->addr, f->len);
-	    zclose(f->fd);
-	    zsfree(f->filename);
-	    zfree(f, sizeof(*f));
+	    freedump(f);
 	}
     }
 }
@@ -3447,10 +3454,11 @@ decrdumpcount(FuncDump f)
 mod_export void
 closedumps(void)
 {
-    FuncDump p;
-
-    for (p = dumps; p; p = p->next)
-	zclose(p->fd);
+    while (dumps) {
+	FuncDump p = dumps->next;
+	freedump(dumps);
+	dumps = p;
+    }
 }
 #endif
 
