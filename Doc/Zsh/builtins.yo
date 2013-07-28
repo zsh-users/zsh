@@ -277,7 +277,9 @@ item(tt(-c))(
 clear the directory stack.
 )
 item(tt(-l))(
-print directory names in full instead of using of using tt(~) expressions.
+print directory names in full instead of using of using tt(~) expressions (\
+ifzman(see em(Dynamic) and em(Static named directories) in zmanref(zshexpn))\
+ifnzman(noderef(Filename Expansion))).
 )
 item(tt(-p))(
 print directory entries one per line.

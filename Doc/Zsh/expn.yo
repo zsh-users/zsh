@@ -1708,14 +1708,14 @@ Note that trailing slashes will be removed from the path to the directory
 It is also possible to define directory names using the tt(-d) option to the
 tt(hash) builtin.
 
-In certain circumstances (in prompts, for instance), when the shell
-prints a path, the path is checked to see if it has a named
-directory as its prefix.  If so, then the prefix portion
-is replaced with a `tt(~)' followed by the name of the directory.
-The shortest way of referring to the directory is used,
-with ties broken in favour of using a named directory,
-except when the directory is tt(/) itself.  The parameters tt($PWD) and
-tt($OLDPWD) are never abbreviated in this fashion.
+When the shell prints a path (e.g. when expanding tt(%~) in prompts or when
+printing the directory stack), the path is checked to see if it has a named
+directory as its prefix.  If so, then the prefix portion is replaced with a
+`tt(~)' followed by the name of the directory.
+The shorter of the two ways of referring to the directory is used,
+i.e. either the directory name or the full path; the name is used
+if they are the same length.
+The parameters tt($PWD) and tt($OLDPWD) are never abbreviated in this fashion.
 
 subsect(`=' expansion)
 

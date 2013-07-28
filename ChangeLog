@@ -1,3 +1,9 @@
+2013-07-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Manuel Presnitz: 31592 (with minor changes of phrasing):
+	Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo, Doc/Zsh/prompt.yo: improve
+	documentation for named directory handling.
+
 2013-07-25  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Jun T.: 31756: Completion/Unix/Command/_make: further make

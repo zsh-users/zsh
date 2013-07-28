@@ -100,10 +100,13 @@ directory to show; zero means the whole path.  A negative integer
 specifies leading components, i.e. tt(%-1d) specifies the first component.
 )
 item(tt(%~))(
-As tt(%d) and tt(%/), but if the current working directory has a named
+As tt(%d) and tt(%/), but if the current working directory starts with
+tt($HOME), that part is replaced by a `tt(~)'. Furthermore, if it has a named
 directory as its prefix, that part is replaced by a `tt(~)' followed by
-the name of the directory.  If it starts with tt($HOME), that part is
-replaced by a `tt(~)'.
+the name of the directory, but only if the result is shorter than
+the full path; 
+ifzman(see em(Dynamic) and em(Static named directories) in zmanref(zshexpn))\
+ifnzman(noderef(Filename Expansion)).
 )
 xitem(tt(%h))
 item(tt(%!))(
