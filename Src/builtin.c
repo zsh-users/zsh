@@ -3792,11 +3792,11 @@ bin_print(char *name, char **args, Options ops, int func)
 
     /* -u and -p -- output to other than standard output */
     if (OPT_HASARG(ops,'u') || OPT_ISSET(ops,'p')) {
-	int fd;
+	int fdarg, fd;
 
 	if (OPT_ISSET(ops, 'p')) {
-	    fd = coprocout;
-	    if (fd < 0) {
+	    fdarg = coprocout;
+	    if (fdarg < 0) {
 		zwarnnam(name, "-p: no coprocess");
 		return 1;
 	    }
@@ -3804,13 +3804,13 @@ bin_print(char *name, char **args, Options ops, int func)
 	    char *argptr = OPT_ARG(ops,'u'), *eptr;
 	    /* Handle undocumented feature that -up worked */
 	    if (!strcmp(argptr, "p")) {
-		fd = coprocout;
-		if (fd < 0) {
+		fdarg= coprocout;
+		if (fdarg < 0) {
 		    zwarnnam(name, "-p: no coprocess");
 		    return 1;
 		}
 	    } else {
-		fd = (int)zstrtol(argptr, &eptr, 10);
+		fdarg = (int)zstrtol(argptr, &eptr, 10);
 		if (*eptr) {
 		    zwarnnam(name, "number expected after -%c: %s", 'u',
 			     argptr);
@@ -3819,8 +3819,8 @@ bin_print(char *name, char **args, Options ops, int func)
 	    }
 	}
 
-	if ((fd = dup(fd)) < 0) {
-	    zwarnnam(name, "bad file number: %d", fd);
+	if ((fd = dup(fdarg)) < 0) {
+	    zwarnnam(name, "bad file number: %d", fdarg);
 	    return 1;
 	}
 	if ((fout = fdopen(fd, "w")) == 0) {

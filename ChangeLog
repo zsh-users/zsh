@@ -1,3 +1,8 @@
+2013-07-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 17891: Src/builtin.c: fix error message for invalid file
+	descriptor in "print -u".
+
 2013-07-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Manuel Presnitz: 31592 (with minor changes of phrasing):
