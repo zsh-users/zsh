@@ -1,3 +1,8 @@
+2013-08-01  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Thomas Klausner: 31625: Completion/X/Command/_mplayer: mplayer
+	supports .ts (transport stream) files.
+
 2013-07-29  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 17891: Src/builtin.c: fix error message for invalid file
