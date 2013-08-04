@@ -15,7 +15,7 @@ classpath="${${classpath[2]:-${CLASSPATH:-.}}//\\:/:}"
 for i in "${(s.:.)classpath}"; do
   [[ -z $i ]] && i=.
   if [[ -f $i ]] && [[ "$i" == *.(jar|zip|war|ear) ]]; then
-    c+=( ${${${(M)$(_call_program jar_classes jar -tf $i)##*.class}%%.class}:gs#/#.#} )
+    c+=( ${${${(M)$(_call_program jar_classes jar -tf $i 2>/dev/null)##*.class}%%.class}:gs#/#.#} )
   elif [[ -d $i ]]; then
     c+=( $i/**/*.class(.:r:s/.class//:s#$i/##:gs#/#.#) )
   fi

@@ -1,3 +1,8 @@
+2013-08-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Yuusuke Yoshimoto: 31632: Completion/Unix/Type/_java_class:
+	suppress stderr from jar when completing classes.
+
 2013-08-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31611: Src/Zle/zle_tricky.c: attempt to fix crash in
