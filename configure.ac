@@ -1237,7 +1237,8 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       regcomp regexec regerror regfree \
 	       gdbm_open getxattr \
 	       realpath canonicalize_file_name \
-	       symlink getcwd)
+	       symlink getcwd \
+	       cygwin_conv_path)
 AC_FUNC_STRCOLL
 
 if test x$enable_cap = xyes; then

@@ -939,11 +939,16 @@ cd_do_chdir(char *cnam, char *dest, int hard)
      * DOS style names with drives in them
      */
     static char buf[PATH_MAX];
+#ifdef HAVE_CYGWIN_CONV_PATH
+    cygwin_conv_path(CCP_WIN_A_TO_POSIX | CCP_RELATIVE, dest, buf,
+		     PATH_MAX);
+#else
 #ifndef _SYS_CYGWIN_H
     void cygwin_conv_to_posix_path(const char *, char *);
 #endif
 
     cygwin_conv_to_posix_path(dest, buf);
+#endif
     dest = buf;
 #endif
     nocdpath = dest[0] == '.' &&
