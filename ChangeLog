@@ -1,3 +1,8 @@
+2013-08-07  Phil Pennock  <pdpennock@users.sourceforge.net>
+
+	* 31634: Functions/Misc/run-help: run-help compat with alias to
+	noglob/nocorrect
+
 2013-08-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31631: configure.ac, Src/builtin.c: use cygwin_conv_path in
