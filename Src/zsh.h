@@ -2756,7 +2756,8 @@ enum {
     ZLE_CMD_RESET_PROMPT,
     ZLE_CMD_REFRESH,
     ZLE_CMD_SET_KEYMAP,
-    ZLE_CMD_GET_KEY
+    ZLE_CMD_GET_KEY,
+    ZLE_CMD_SET_HIST_LINE
 };
 
 /***************************************/

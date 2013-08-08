@@ -1,3 +1,9 @@
+2013-08-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/17908: Src/hist.c Src/Zle/zle_main.c Src/zsh.h: if
+	modifying history with ZLE active, keep the history line
+	recorded in ZLE in sync.
+
 2013-08-07  Phil Pennock  <pdpennock@users.sourceforge.net>
 
 	* 31634: Functions/Misc/run-help: run-help compat with alias to

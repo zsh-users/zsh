@@ -76,6 +76,9 @@ mod_export int excs, exlast;
  * and a temporary history entry is inserted while the user is editing.
  * If the resulting line was not added to the list, a flag is set so
  * that curhist will be decremented in hbegin().
+ *
+ * Note curhist is passed to zle on variable length argument list:
+ * type must match that retrieved in zle_main_entry.
  */
  
 /**/
@@ -2414,6 +2417,9 @@ readhistfile(char *fn, int err, int readflags)
 	zerr("can't read history file %s", fn);
 
     unlockhistfile(fn);
+
+    if (zleactive)
+	zleentry(ZLE_CMD_SET_HIST_LINE, curhist);
 }
 
 #ifdef HAVE_FCNTL_H
@@ -3339,6 +3345,8 @@ pushhiststack(char *hf, zlong hs, zlong shs, int level)
     }
     hist_ring = NULL;
     curhist = histlinect = 0;
+    if (zleactive)
+	zleentry(ZLE_CMD_SET_HIST_LINE, curhist);
     histsiz = hs;
     savehistsiz = shs;
     inithist(); /* sets histtab */
@@ -3378,6 +3386,8 @@ pophiststack(void)
     histtab = h->histtab;
     hist_ring = h->hist_ring;
     curhist = h->curhist;
+    if (zleactive)
+	zleentry(ZLE_CMD_SET_HIST_LINE, curhist);
     histlinect = h->histlinect;
     histsiz = h->histsiz;
     savehistsiz = h->savehistsiz;

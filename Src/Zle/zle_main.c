@@ -1934,6 +1934,13 @@ zle_main_entry(int cmd, va_list ap)
 	break;
     }
 
+    case ZLE_CMD_SET_HIST_LINE:
+    {
+	histline = va_arg(ap, zlong);
+
+	break;
+    }
+
     default:
 #ifdef DEBUG
 	    dputs("Bad command %d in zle_main_entry", cmd);
