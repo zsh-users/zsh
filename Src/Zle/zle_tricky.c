@@ -2136,8 +2136,8 @@ inststrlen(char *str, int move, int len)
 	return 0;
     if (len == -1)
 	len = strlen(str);
-    spaceinline(len);
     if (zlemetaline != NULL) {
+	spaceinline(len);
 	strncpy(zlemetaline + zlemetacs, str, len);
 	if (move)
 	    zlemetacs += len;
@@ -2148,6 +2148,7 @@ inststrlen(char *str, int move, int len)
 
 	instr = ztrduppfx(str, len);
 	zlestr = stringaszleline(instr, 0, &zlelen, NULL, NULL);
+	spaceinline(zlelen);
 	ZS_strncpy(zleline + zlecs, zlestr, zlelen);
 	free(zlestr);
 	zsfree(instr);

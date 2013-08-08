@@ -1,5 +1,9 @@
 2013-08-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Src/Zle/zle_tricky.c (inststrlen): 31644: the wrong length was
+	used when inserting multibyte characters from a string from
+	outside ZLE into the editing buffer.
+
 	* users/17908: Src/hist.c Src/Zle/zle_main.c Src/zsh.h: if
 	modifying history with ZLE active, keep the history line
 	recorded in ZLE in sync.
