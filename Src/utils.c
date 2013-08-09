@@ -1287,6 +1287,7 @@ void
 preprompt(void)
 {
     static time_t lastperiodic;
+    time_t currentmailcheck;
     LinkNode ln;
     int period = getiparam("PERIOD");
     int mailcheck = getiparam("MAILCHECK");
@@ -1355,7 +1356,9 @@ preprompt(void)
 	return;
 
     /* Check mail */
-    if (mailcheck && (int) difftime(time(NULL), lastmailcheck) > mailcheck) {
+    currentmailcheck = time(NULL);
+    if (mailcheck &&
+	(int) difftime(currentmailcheck, lastmailcheck) > mailcheck) {
 	char *mailfile;
 
 	if (mailpath && *mailpath && **mailpath)
@@ -1371,7 +1374,7 @@ preprompt(void)
 	    }
 	    unqueue_signals();
 	}
-	lastmailcheck = time(NULL);
+	lastmailcheck = currentmailcheck;
     }
 
     if (prepromptfns) {
@@ -1431,7 +1434,7 @@ checkmailpath(char **s)
 	    }
 	} else if (shout) {
 	    if (st.st_size && st.st_atime <= st.st_mtime &&
-		st.st_mtime > lastmailcheck) {
+		st.st_mtime >= lastmailcheck) {
 		if (!u) {
 		    fprintf(shout, "You have new mail.\n");
 		    fflush(shout);

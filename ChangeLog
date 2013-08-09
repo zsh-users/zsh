@@ -1,3 +1,7 @@
+2013-08-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31648: joe M: Src/utils.c: fix timing errors in mailcheck.
+
 2013-08-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Src/Zle/zle_tricky.c (inststrlen): 31644: the wrong length was
