@@ -1289,8 +1289,8 @@ preprompt(void)
     static time_t lastperiodic;
     time_t currentmailcheck;
     LinkNode ln;
-    int period = getiparam("PERIOD");
-    int mailcheck = getiparam("MAILCHECK");
+    zlong period = getiparam("PERIOD");
+    zlong mailcheck = getiparam("MAILCHECK");
 
     /*
      * Handle any pending window size changes before we compute prompts,
@@ -1338,7 +1338,7 @@ preprompt(void)
     /* If 1) the parameter PERIOD exists, 2) a hook function for    *
      * "periodic" exists, 3) it's been greater than PERIOD since we *
      * executed any such hook, then execute it now.                 */
-    if (period && (time(NULL) > lastperiodic + period) &&
+    if (period && ((zlong)time(NULL) > (zlong)lastperiodic + period) &&
 	!callhookfunc("periodic", NULL, 1, NULL))
 	lastperiodic = time(NULL);
     if (errflag)
@@ -1358,7 +1358,7 @@ preprompt(void)
     /* Check mail */
     currentmailcheck = time(NULL);
     if (mailcheck &&
-	(int) difftime(currentmailcheck, lastmailcheck) > mailcheck) {
+	(zlong) difftime(currentmailcheck, lastmailcheck) > mailcheck) {
 	char *mailfile;
 
 	if (mailpath && *mailpath && **mailpath)
