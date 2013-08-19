@@ -1125,7 +1125,8 @@ cd_try_chdir(char *pfix, char *dest, int hard)
      * argument to cd relatively.  This is useful if the cwd
      * or a parent directory is renamed in the interim.
      */
-    if (lchdir(buf, NULL, hard) && lchdir(dest, NULL, hard)) {
+    if (lchdir(buf, NULL, hard) &&
+	(pfix || *dest == '/' || lchdir(dest, NULL, hard))) {
 	free(buf);
 	return NULL;
     }

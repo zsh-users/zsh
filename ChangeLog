@@ -1,3 +1,9 @@
+2013-08-17  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31637: Src/builtin.c: change of directory should not be retried
+	relative to the current directory when it has already failed along
+	some path that does not refer to the current directory.
+
 2013-08-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31650: Src/utils.c: use zlong for mailcheck parameters to
