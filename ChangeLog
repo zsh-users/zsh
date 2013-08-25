@@ -1,3 +1,8 @@
+2013-08-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Src/Modules/zpty.c, Test/V08zpty.ztst, Test/.distfiles: zpty
+	should attach terminal on slave.
+
 2013-08-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 31637: Src/builtin.c: change of directory should not be retried

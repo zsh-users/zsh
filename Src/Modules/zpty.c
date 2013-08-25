@@ -344,6 +344,8 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 
 	if (get_pty(0, &slave))
 	    exit(1);
+	SHTTY = slave;
+	attachtty(mypid);
 #ifdef TIOCGWINSZ
 	/* Set the window size before associating with the terminal *
 	 * so that we don't get hit with a SIGWINCH.  I'm paranoid. */
@@ -398,6 +400,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	opts[INTERACTIVE] = 0;
 	execode(prog, 1, 0, "zpty");
 	stopmsg = 2;
+	mypid = 0; /* trick to ensure we _exit() */
 	zexit(lastval, 0);
     }
     master = movefd(master);
