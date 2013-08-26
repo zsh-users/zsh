@@ -293,8 +293,8 @@ static int
 newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 {
     Ptycmd p;
-    int master, slave, pid, oineval = ineval;
-    char *oscriptname = scriptname;
+    int master, slave, pid, oineval = ineval, ret;
+    char *oscriptname = scriptname, syncch;
     Eprog prog;
 
     /* code borrowed from bin_eval() */
@@ -398,6 +398,20 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	setsparam("TTY", ztrdup(ttystrname));
 
 	opts[INTERACTIVE] = 0;
+
+	syncch = 0;
+	do {
+	    ret = write(1, &syncch, 1);
+	} while (ret != 1 && (
+#ifdef EWOULDBLOCK
+	    errno == EWOULDBLOCK ||
+#else
+#ifdef EAGAIN
+	    errno == EAGAIN ||
+#endif
+#endif
+	    errno == EINTR));
+
 	execode(prog, 1, 0, "zpty");
 	stopmsg = 2;
 	mypid = 0; /* trick to ensure we _exit() */
@@ -432,6 +446,18 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 
     scriptname = oscriptname;
     ineval = oineval;
+
+    do {
+	ret = read(master, &syncch, 1);
+    } while (ret != 1 && (
+#ifdef EWOULDBLOCK
+	    errno == EWOULDBLOCK ||
+#else
+#ifdef EAGAIN
+	    errno == EAGAIN ||
+#endif
+#endif
+	    errno == EINTR));
 
     return 0;
 }

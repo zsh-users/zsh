@@ -12,9 +12,17 @@
 %test
 
   zpty cat cat
+  zpty -w cat a line of text
+  var=
+  zpty -r cat var && print -r -- ${var%%$'\r\n'}
+  zpty -d cat
+0:zpty with a process that does not set up the terminal: internal write
+>a line of text
+
+  zpty cat cat
   print a line of text | zpty -w cat
   var=
   zpty -r cat var && print -r -- ${var%%$'\r\n'}
   zpty -d cat
-0:zpty with a process that does not set up the terminal
+0:zpty with a process that does not set up the terminal: write via stdin
 >a line of text
