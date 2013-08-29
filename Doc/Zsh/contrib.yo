@@ -2861,6 +2861,14 @@ question is run using the tt(eval) builtin instead of by starting a new
 tt(sh) process.  This is more efficient, but may not work in the occasional
 cases where the mailcap handler uses strict POSIX syntax.
 )
+kindex(disown, MIME style)
+item(tt(disown))(
+If this boolean style is true, mailcap handlers started in the
+background will be disowned, i.e. not subject to job control within
+the parent shell.  Such handlers nearly always produce their own
+windows, so the only likely harmful side effect of setting the style is
+that it becomes harder to kill jobs from within the shell.
+)
 kindex(execute-as-is, MIME style)
 item(tt(execute-as-is))(
 This style gives a list of patterns to be matched against files

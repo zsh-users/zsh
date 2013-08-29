@@ -1,5 +1,9 @@
 2013-08-29  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* users/17955: Doc/Zsh/contrib.yo,
+	Functions/MIME/zsh-mime-handler: "disown" style makes MIME
+	handlers put into background run without job control.
+
 	* based on 31641, 31642: Completion/Unix/Command/_make: support
 	a couple of different variants of make.
 

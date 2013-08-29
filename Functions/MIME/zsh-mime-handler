@@ -74,7 +74,7 @@ if [[ $suffix != *.* ]]; then
 fi
 suffix=${suffix#*.}
 
-local handler flags no_sh no_bg arg
+local handler flags no_sh no_bg arg bg_flag="&"
 integer i
 local -a exec_asis hand_nonex
 
@@ -88,6 +88,9 @@ zsh-mime-contexts -a $suffix execute-as-is exec_asis || exec_asis=('*(*)' '*(/)'
 # if the file doesn't exist on the disk.
 zsh-mime-contexts -a $suffix handle-nonexistent hand_nonex ||
   hand_nonex=('[[:alpha:]]#:/*')
+
+# Set to true if the job should be disowned.
+zsh-mime-contexts -t $suffix disown && bg_flag="&!"
 
 local pattern
 local -a files
@@ -309,8 +312,8 @@ else
   # Otherwise it's equivalent to removing the eval and all the quotes,
   # including the (q) flags.
   if [[ -n $stdin ]]; then
-    eval cat ${(q)argv} "|" ${(q)execargs} "&"
+    eval cat ${(q)argv} "|" ${(q)execargs} $bg_flag
   else
-    eval ${(q)execargs} "&"
+    eval ${(q)execargs} $bg_flag
   fi
 fi
