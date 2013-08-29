@@ -1,3 +1,8 @@
+2013-08-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* based on 31641, 31642: Completion/Unix/Command/_make: support
+	a couple of different variants of make.
+
 2013-08-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31672: Src/Modules/zpty.c, Test/V08zpty.ztst: add test that
