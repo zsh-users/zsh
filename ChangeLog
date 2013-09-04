@@ -1,3 +1,9 @@
+2013-09-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31696: Src/parse.c, Test/C02cond.ztst: in "test", no one
+	can hear if you shriek.  Treat exclamation marks as strings in
+	"! -a ..." and "! -o ...".
+
 2013-08-29  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/17955: Doc/Zsh/contrib.yo,

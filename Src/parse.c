@@ -2088,9 +2088,17 @@ par_cond_2(void)
 	}
     }
     if (tok == BANG) {
-	condlex();
-	ecadd(WCB_COND(COND_NOT, 0));
-	return par_cond_2();
+	/*
+	 * In "test" compatibility mode, "! -a ..." and "! -o ..."
+	 * are treated as "[string] [and] ..." and "[string] [or] ...".
+	 */
+	if (!(condlex == testlex && *testargs && 
+	      (!strcmp(*testargs, "-a") || !strcmp(*testargs, "-o"))))
+	{
+	    condlex();
+	    ecadd(WCB_COND(COND_NOT, 0));
+	    return par_cond_2();
+	}
     }
     if (tok == INPAR) {
 	int r;

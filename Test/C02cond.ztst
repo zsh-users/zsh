@@ -324,6 +324,27 @@ F:Failures in these cases do not indicate a problem in the shell.
 >	fi
 >}
 
+  weirdies=(
+    '! -a !'
+    '! -o !'
+    '! -a'
+    '! -o'
+    '! -a ! -a !'
+    '! = !'
+    '! !')
+  for w in $weirdies; do
+     eval test $w
+     print $?
+  done
+0:test compatability weirdness: treat ! as a string sometimes
+>0
+>0
+>1
+>0
+>0
+>0
+>1
+
 %clean
   # This works around a bug in rm -f in some versions of Cygwin
   chmod 644 unmodish
