@@ -4,6 +4,11 @@
 	can hear if you shriek.  Treat exclamation marks as strings in
 	"! -a ..." and "! -o ...".
 
+2013-09-02  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31685: Doc/Zsh/mod_mapfile.yo: documentation of how to get
+	lines from a file is not correct.
+
 2013-08-29  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/17955: Doc/Zsh/contrib.yo,

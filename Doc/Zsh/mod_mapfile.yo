@@ -28,9 +28,12 @@ referenced may not be written or deleted.
 
 A file may conveniently be read into an array as one line per element
 with the form
-`var(array)tt(=LPAR()"${(f)mapfile[)var(filename)tt(]}"RPAR())'.
-The double quotes are necessary to prevent empty lines from being
-removed.
+`var(array)tt(=LPAR()"${(f@)mapfile[)var(filename)tt(]}"RPAR())'.
+The double quotes and the `tt(@)' are necessary to prevent empty lines
+from being removed.  Note that if the file ends with a newline,
+the shell will split on the final newline, generating an additional
+empty field; this can be suppressed by using
+`var(array)tt(=LPAR()"${(f@)${mapfile[)var(filename)tt(]%$'\n'}}"RPAR())'.
 )
 enditem()
 
