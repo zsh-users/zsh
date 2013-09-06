@@ -1,5 +1,8 @@
 2013-09-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Luka Perkov: 31702: Completion/Unix/Command/_git:
+	check for presence of "-i" when checking for "--interactive".
+
 	* 31706: Src/builtin.c, Test/C02cond.ztst: standardise
 	handling of "test ! <x> <y> <z>".
 
