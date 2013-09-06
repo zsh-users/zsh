@@ -5995,7 +5995,7 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
     char **s;
     Eprog prog;
     struct estate state;
-    int nargs;
+    int nargs, sense = 0, ret;
 
     /* if "test" was invoked as "[", it needs a matching "]" *
      * which is subsequently ignored                         */
@@ -6014,13 +6014,17 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
     /*
      * Implement some XSI extensions to POSIX here.
      * See
-     * http://www.opengroup.org/onlinepubs/009695399/utilities/test.html.
+     * http://pubs.opengroup.org/onlinepubs/9699919799/utilities/test.html
      */
     nargs = arrlen(argv);
     if (nargs == 3 || nargs == 4)
     {
 	if (*argv[0] == '(' && *argv[nargs-1] == ')') {
 	    argv[nargs-1] = NULL;
+	    argv++;
+	}
+	if (nargs == 4 && !strcmp("!", argv[0])) {
+	    sense = 1;
 	    argv++;
 	}
     }
@@ -6057,8 +6061,11 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
     state.pc = prog->prog;
     state.strs = prog->strs;
 
+    ret = evalcond(&state, name);
+    if (ret < 2 && sense)
+	ret = ! ret;
 
-    return evalcond(&state, name);
+    return ret;
 }
 
 /* display a time, provided in units of 1/60s, as minutes and seconds */

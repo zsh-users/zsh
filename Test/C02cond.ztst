@@ -331,7 +331,9 @@ F:Failures in these cases do not indicate a problem in the shell.
     '! -o'
     '! -a ! -a !'
     '! = !'
-    '! !')
+    '! !'
+    '= -a o'
+    '! = -a o')
   for w in $weirdies; do
      eval test $w
      print $?
@@ -342,6 +344,8 @@ F:Failures in these cases do not indicate a problem in the shell.
 >1
 >0
 >0
+>0
+>1
 >0
 >1
 

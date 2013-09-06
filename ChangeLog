@@ -1,3 +1,8 @@
+2013-09-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31706: Src/builtin.c, Test/C02cond.ztst: standardise
+	handling of "test ! <x> <y> <z>".
+
 2013-09-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31696: Src/parse.c, Test/C02cond.ztst: in "test", no one
