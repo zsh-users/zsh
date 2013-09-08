@@ -4,6 +4,11 @@
 	add execute-never style for MIME handler for files on alien file
 	systems.
 
+2013-09-07  Luka Perkov  <luka@openwrt.org>
+
+	* 31708: Completion/Unix/Command/_git: _git: add --fixup and
+	--squash options to commit
+
 2013-09-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Luka Perkov: 31702: Completion/Unix/Command/_git:
