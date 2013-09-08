@@ -2881,6 +2881,28 @@ hence executable files are executed directly and not passed to a
 handler, and the option tt(AUTO_CD) may be used to change to directories
 that happen to have MIME suffixes.
 )
+kindex(execute-never, MIME style)
+item(tt(execute-never))(
+This style is useful in combination with tt(execute-as-is).  It is
+set to an array of patterns corresponding to full paths to files that
+should never be treated as executable, even if the file passed to
+the MIME handler matches tt(execute-as-is).  This is useful for file
+systems that don't handle execute permission or that contain executables
+from another operating system.  For example, if tt(/mnt/windows) is a
+Windows mount, then
+
+example(zstyle ':mime:*' execute-never '/mnt/windows/*')
+
+will ensure that any files found in that area will be executed as MIME
+types even if they are executable.  As this example shows, the complete
+file name is matched against the pattern, regardless of how the file
+was passed to the handler.  The file is resolved to a full path using
+the tt(:A) modifier described in
+ifzman(the subsection Modifers in zmanref(zshexpn))\
+ifnzman(noderef(Modifiers)));
+this means that symbolic links are resolved where possible, so that
+links into other file systems behave in the correct fashion.
+)
 kindex(file-path, MIME style)
 item(tt(file-path))(
 Used if the style tt(find-file-in-path) is true for the same context.
