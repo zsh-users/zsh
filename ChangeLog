@@ -1,3 +1,8 @@
+2013-09-10  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31714: Completion/Zsh/Command/_cd: handle ".." properly when
+	$PWD or the path prefix traverses a symbolic link.
+
 2013-09-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31711: Doc/Zsh/contrib.yo, Functions/MIME/zsh-mime-handler:

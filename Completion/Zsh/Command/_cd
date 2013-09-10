@@ -51,6 +51,18 @@ else
     _directory_stack && ret=0
   fi
 
+  local -a tmpWpath
+  if [[ $PREFIX = (|*/)../* ]]; then
+    local tmpprefix
+    # Use cd in a subshell to properly [not] resolve symlinks
+    tmpprefix=$(cd ${PREFIX%/*} >&/dev/null && print $PWD)
+    if [[ -n $tmpprefix ]]; then
+      tmpWpath=(-W $tmpprefix)
+      IPREFIX=${IPREFIX}${PREFIX%/*}/
+      PREFIX=${PREFIX##*/}
+    fi
+  fi
+
   if [[ $PREFIX != (\~|/|./|../)* ]]; then
     local tmpcdpath alt
 
@@ -88,7 +100,7 @@ else
     # already handled by _command_names (see _autocd)
 
     [[ CURRENT -ne 1 || ( -z "$path[(r).]" && $PREFIX != */* ) ]] &&
-        alt=( "${cdpath+local-}directories:${cdpath+local }directory:_path_files -/" "$alt[@]" )
+        alt=( "${cdpath+local-}directories:${cdpath+local }directory:_path_files $tmpWpath -/" "$alt[@]" )
 
     if [[ CURRENT -eq argstart && noopts -eq 0 && $PREFIX = -* ]] &&
       zstyle -t ":completion:${curcontext}:options" complete-options; then
@@ -100,7 +112,7 @@ else
     return ret
   fi
   [[ CURRENT -ne 1 ]] && _wanted directories expl directory \
-      _path_files -/ && ret=0
+      _path_files $tmpWpath -/ && ret=0
 
   return ret
 fi
