@@ -1,3 +1,8 @@
+2013-09-14  Luka Perkov  <luka@openwrt.org>
+
+	* 31723: Completion/Unix/Command/_systemd: _systemd: add more
+	system commands
+
 2013-09-10  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 31714: Completion/Zsh/Command/_cd: handle ".." properly when
