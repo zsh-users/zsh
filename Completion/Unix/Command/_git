@@ -464,6 +464,9 @@ _git-checkout () {
 (( $+functions[_git-cherry-pick] )) ||
 _git-cherry-pick () {
   _arguments \
+    '(- :)--quit[end revert or cherry-pick sequence]' \
+    '(- :)--continue[resume revert or cherry-pick sequence]' \
+    '(- :)--abort[cancel revert or cherry-pick sequence]' \
     '(-e --edit --ff)'{-e,--edit}'[edit commit before committing the revert]' \
     '(--ff)-x[append information about what commit was cherry-picked]' \
     '(-m --mainline)'{-m,--mainline}'[specify mainline when cherry-picking a merge commit]:parent number' \
@@ -1248,6 +1251,9 @@ _git-reset () {
 (( $+functions[_git-revert] )) ||
 _git-revert () {
   _arguments -w -S -s \
+    '(- :)--quit[end revert or cherry-pick sequence]' \
+    '(- :)--continue[resume revert or cherry-pick sequence]' \
+    '(- :)--abort[cancel revert or cherry-pick sequence]' \
     '(-e --edit --no-edit)'{-e,--edit}'[edit the commit before committing the revert]' \
     '(-m --mainline)'{-m+,--mainline=}'[pick which parent is mainline]:parent number' \
     '(-e --edit)--no-edit[do not edit the commit message]' \

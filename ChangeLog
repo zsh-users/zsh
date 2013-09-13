@@ -3,6 +3,9 @@
 	* 31723: Completion/Unix/Command/_systemd: _systemd: add more
 	system commands
 
+	* 31726: Completion/Unix/Command/_git: _git: add few more
+	arguments for cherry-pick and revert
+
 2013-09-10  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 31714: Completion/Zsh/Command/_cd: handle ".." properly when
