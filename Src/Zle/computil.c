@@ -2992,7 +2992,7 @@ get_cvdef(char *nam, char **args)
 	    return *p;
 	} else if (!min || !*p || (*p)->lastt < (*min)->lastt)
 	    min = p;
-    if (i)
+    if (i > 0)
 	min = p;
     if ((new = parse_cvdef(nam, args))) {
 	freecvdef(*min);

@@ -1,3 +1,9 @@
+2013-09-19  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Axel Beckert: 31735: Src/Zle/computil.c (get_cvdef):
+	off-by-one in obscure loop handling could cause crash in complex
+	completion.
+
 2013-09-14  Luka Perkov  <luka@openwrt.org>
 
 	* 31723: Completion/Unix/Command/_systemd: _systemd: add more
