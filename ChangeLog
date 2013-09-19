@@ -1,3 +1,7 @@
+2013-09-19  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31737: Src/Zle/computil.c (get_cadef): same fix as get_cvdef.
+
 2013-09-19  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Axel Beckert: 31735: Src/Zle/computil.c (get_cvdef):

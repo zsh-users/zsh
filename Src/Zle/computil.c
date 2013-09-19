@@ -1608,7 +1608,7 @@ get_cadef(char *nam, char **args)
 	    return *p;
 	} else if (!min || !*p || (*p)->lastt < (*min)->lastt)
 	    min = p;
-    if (i)
+    if (i > 0)
 	min = p;
     if ((new = parse_cadef(nam, args))) {
 	freecadef(*min);
