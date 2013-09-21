@@ -1611,7 +1611,8 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    break;
 		}
 		default:
-		    zerr("unknown file attribute");
+		    untokenize(--s);
+		    zerr("unknown file attribute: %c", *s);
 		    restore_globstate(saved);
 		    return;
 		}
