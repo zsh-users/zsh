@@ -5920,7 +5920,8 @@ __git_setup_diff_options () {
     '(-D --irreversible-delete)'{-D,--irreversible-delete}'[omit the preimage for deletes]'
     '-l-[limit number of rename/copy targets to run]: :__git_guard_number'
     '--diff-filter=-[select certain kinds of files for diff]: :_guard "[ACDMRTUXB*]#" kinds'
-    '-S-[look for differences that contain the given string]:string'
+    '-S-[look for differences that add or remove the given string]:string'
+    '-G-[look for differences whose added or removed line matches the given regex]:pattern'
     '--pickaxe-all[when -S finds a change, show all changes in that changeset]'
     '--pickaxe-regex[treat argument of -S as regular expression]'
     '-O-[output patch in the order of glob-pattern lines in given file]: :_files'
@@ -5935,6 +5936,8 @@ __git_setup_diff_options () {
     '(--exit-code)--quiet[disable all output]'
     '(           --no-ext-diff)--ext-diff[allow external diff helper to be executed]'
     '(--ext-diff              )--no-ext-diff[disallow external diff helper to be executed]'
+    '(--textconv --no-textconv)--textconv[allow external text conversion filters to be run when comparing binary files]'
+    '(--textconv --no-textconv)--no-textconv[do not allow external text conversion filters to be run when comparing binary files]'
     '--ignore-submodules[ignore changes to submodules]:: :__git_ignore_submodules_whens'
     '(--no-prefix)--src-prefix=[use given prefix for source]:prefix'
     '(--no-prefix)--dst-prefix=[use given prefix for destination]:prefix'
@@ -5949,12 +5952,6 @@ __git_setup_diff_options () {
 
     # TODO: --cumulative is undocumented.
     '--cumulative[undocumented]'
-    # TODO: --textconv is undocumented.
-    '--textconv[undocumented]'
-    # TODO: --no-textconv is undocumented.
-    '--no-textconv[undocumented]'
-    # TODO: -G is undocumented.
-    '-G[undocumented]'
     # TODO: --output is undocumented.
     '--output[undocumented]:undocumented')
 }
@@ -5978,6 +5975,8 @@ __git_setup_revision_options () {
                                                                                     format\:"specify own format"))'
     '(--abbrev-commit --no-abbrev-commit)--abbrev-commit[show only partial prefixes of commit object names]'
     '(--abbrev-commit --no-abbrev-commit)--no-abbrev-commit[show the full 40-byte hexadecimal commit object name]'
+    '(--abbrev --no-abbrev)--abbrev=[set minimum SHA1 display-length (for use with --abbrev-commit)]: :__git_guard_number length'
+    '(--abbrev --no-abbrev)--no-abbrev[show the full 40-byte hexadecimal commit object name]'
     '--oneline[shorthand for --pretty=oneline --abbrev-commit]'
     '--encoding=-[output log messages in given encoding]:: :__git_encodings'
     '(--no-notes --notes)--no-notes[do not show notes that annotate commit]'
@@ -6046,9 +6045,6 @@ __git_setup_revision_options () {
 
     '--reflog[show all commits from reflogs]'
     '--default[use argument as default revision]:default revision:__git_revisions'
-    '--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length'
-    # TODO: --no-abbrev is undocumented.
-    '--no-abbrev[undocumented]'
     # TODO: --early-output is undocumented.
     '--early-output=-[undocumented]::undocumented'
     )
