@@ -1775,7 +1775,7 @@ _git-config () {
   # TODO: Most all _path_commands should be able to take arguments and so on.
   # How do we deal with that and how do we quote the whole argument to git
   # config?
-  # TODO: Add merge.*.(name|driver|recursive) and diff.*.(command|funcname)
+  # TODO: Add support for merge.*. (merge driver), diff.*. (diff driver), and filter.*. (filter driver) options
   # (see gitattributes(5)).
   # TODO: .path options should take absolute paths.
   declare -a git_options_static
