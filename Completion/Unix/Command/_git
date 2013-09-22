@@ -1934,7 +1934,7 @@ _git-config () {
     'difftool.*.cmd:command to invoke for the diff tool::_path_commands'
     'difftool.*.path:path to use for the diff tool:absolute diff tool path:_files -g "*(*)"'
     difftool.prompt:'prompt before each invocation of the diff tool::->bool:true'
-    diff.wordRegex:'regex used to determine what a word is when performing word-by-word diff:regex:->string'
+    diff.wordRegex:'regex used to determine what a word is when performing word-by-word diff:regular expression:->string'
     diff.guitool:'diff tool with gui to use::__git_difftools'
     fetch.unpackLimit:'maximum number of objects to unpack when fetching:unpack limit:->int'
     fetch.recurseSubmodules:'recurse into submodules (as needed) when fetching::->fetch.recurseSubmodules:on-demand'

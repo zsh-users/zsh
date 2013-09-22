@@ -1,3 +1,8 @@
+2013-09-22  Øystein Walle  <oystwa@gmail.com>
+
+	* 31752: Completion/Unix/Command/_git: _git: change completion
+	text for consistency
+
 2013-09-22  m0viefreak  <m0viefreak.cm@googlemail.com>
 
 	* 31753: Completion/Unix/Command/_git: _git: correct some
