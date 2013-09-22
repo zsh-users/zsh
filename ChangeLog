@@ -1,3 +1,8 @@
+2013-09-22  m0viefreak  <m0viefreak.cm@googlemail.com>
+
+	* 31741: Completion/Unix/Command/_git: _git: fix a wrong variable
+	in __git_config_values
+
 2013-09-21  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/glob.c: improve an error message.

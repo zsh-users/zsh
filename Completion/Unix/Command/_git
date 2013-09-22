@@ -5920,7 +5920,7 @@ __git_config_values () {
   default=$2
   shift 2
   values=($*)
-  [[ -n $current ]] && values[(r)$(__git_pattern_escape $default):*]+=' (current)'
+  [[ -n $current ]] && values[(r)$(__git_pattern_escape $current):*]+=' (current)'
   values[(r)$(__git_pattern_escape $default):*]+=' (default)'
 
   _describe -t ${opts[-t]:-values} ${opts[-l]:-value} values
