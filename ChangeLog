@@ -9,6 +9,9 @@
 	* 31744: Completion/Unix/Command/_git: _git: make git submodule
 	<cmd> completion work
 
+	* 31745: Completion/Unix/Command/_git: _git: correctly use
+	__git_guard_number in some cases
+
 2013-09-21  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/glob.c: improve an error message.

@@ -850,7 +850,7 @@ _git-grep () {
     '(-a --text)'{-a,--text}'[process binary files as if they were text]' \
     '(-i --ignore-case)'{-i,--ignore-case}'[ignore case when matching]' \
     '-I[do not match pattern in binary files]' \
-    '--max-depth=[descend at most given levels of directories]:__git_guard_number depth' \
+    '--max-depth=[descend at most given levels of directories]: :__git_guard_number depth' \
     '(-w --word-regexp)'{-w,--word-regexp}'[match only whole words]' \
     '(-v --invert-match)'{-v,--invert-match}'[select non-matching lines]' \
     '(   -H)-h[supress output of filenames]' \
@@ -2548,7 +2548,7 @@ _git-config () {
             (umask)
               _alternative \
                 'values:value:(user)' \
-                'umasks::__git_guard_number umask' && ret=0
+                'umasks: :__git_guard_number umask' && ret=0
               ;;
           esac
           ;;
@@ -2910,12 +2910,12 @@ _git-blame () {
     (line-range)
       if compset -P '([[:digit:]]#|/[^/]#(\\?[^/]#)#/),'; then
         _alternative \
-          'line-numbers::__git_guard_number "line number"' \
+          'line-numbers: :__git_guard_number "line number"' \
           'regexes::_guard "(/[^/]#(\\?[^/]#)#(/|)|)" regex' \
           'offsets::_guard "([+-][[:digit:]]#|)" "line offset"' && ret=0
       else
         _alternative \
-          'line-numbers::__git_guard_number "line number"' \
+          'line-numbers: :__git_guard_number "line number"' \
           'regexes::_guard "(/[^/]#(\\?[^/]#)#(/|)|)" regex' && ret=0
       fi
       ;;
@@ -3150,7 +3150,7 @@ _git-show-branch () {
     (limit-and-base)
       if compset -P '[[:digit:]]##,'; then
         _alternative \
-          'counts::__git_guard_number count' \
+          'counts: :__git_guard_number count' \
           'dates::__git_datetimes' && ret=0
       else
         __git_guard_number limit
