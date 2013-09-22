@@ -1746,7 +1746,6 @@ _git-config () {
     value_arg=': :->value'
   fi
 
-  # TODO --local is undocumented.
   _arguments -w -C -S -s \
     '(         --system --local -f --file)--global[use user-global config file]' \
     '(--global          --local -f --file)--system[use system-wide config file]' \
@@ -6045,11 +6044,8 @@ __git_setup_revision_options () {
     '--log-size[print log message size in bytes before the message]'
     '--use-mailmap[use mailmap file to map author and committer names and email]'
 
-    # TODO: --reflog is undocumented.
     '--reflog[show all commits from reflogs]'
-    # TODO: --default is undocumented.
     '--default[use argument as default revision]:default revision:__git_revisions'
-    # TODO: --abrev is undocumented.
     '--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length'
     # TODO: --no-abbrev is undocumented.
     '--no-abbrev[undocumented]'

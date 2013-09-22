@@ -3,6 +3,9 @@
 	* 31749: Completion/Unix/Command/_git: _git: fix some typos in
 	description texts
 
+	* 31751: Completion/Unix/Command/_git: _git: remove TODOs of
+	actually documented options
+
 2013-09-22  m0viefreak  <m0viefreak.cm@googlemail.com>
 
 	* 31746: Completion/Unix/Command/_git: _git: reword _git-config
