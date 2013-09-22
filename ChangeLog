@@ -1,3 +1,8 @@
+2013-09-22  Øystein Walle  <oystwa@gmail.com>
+
+	* 31747: Completion/Unix/Command/_git: _git: completion updates to
+	match latest git v1.8.3 part 2
+
 2013-09-22  m0viefreak  <m0viefreak.cm@googlemail.com>
 
 	* 31741: Completion/Unix/Command/_git: _git: fix a wrong variable

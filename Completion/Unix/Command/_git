@@ -64,8 +64,9 @@ _git-add () {
     '(-i --interactive : -)'{-i,--interactive}'[add contents interactively to index]' \
     '(-p --patch)'{-p,--patch}'[like -i but go directly into patch mode for specified files]' \
     '(-e --edit)'{-e,--edit}'[open diff against index in editor]' \
-    '(-u --update -A --all)'{-u,--update}'[update only files git already knows about]' \
-    '(-A --all -u --update)'{-A,--all}'[act as both add . and add -u]' \
+    '(-A --all --no-ignore-removal -u --update --no-all --ignore-removal)'{-A,--all,--no-ignore-removal}'[add, modify, and remove index entries to match the working tree]' \
+    '(-A --all --no-ignore-removal -u --update --no-all --ignore-removal)'{--no-all,--ignore-removal}'[like "--all" but ignore removals]' \
+    '(-A --all --no-ignore-removal -u --update --no-all --ignore-removal)'{-u,--update}'[update the index just where it already has an entry matching <pathspec>]' \
     '(-N --intent-to-add)'{-N,--intent-to-add}'[record only that path will be added later]' \
     '--refresh[do not add files, but refresh their stat() info in index]' \
     '--ignore-errors[continue adding if an error occurs]' \
@@ -104,6 +105,7 @@ _git-am () {
   _arguments -S \
     '(-s --signoff)'{-s,--signoff}'[add Signed-off-by: line to the commit message]' \
     '(-k --keep)'{-k,--keep}'[pass -k to git mailinfo]' \
+    '--keep-non-patch[pass -b to git mailinfo]' \
     '(          --no-keep-cr)--keep-cr[pass --keep-cr to git mailsplit]' \
     '(--keep-cr             )--no-keep-cr[do not pass --keep-cr to git mailsplit]' \
     '(-c --scissors --no-scissors)'{-c,--scissors}'[strip everything before a scissors line]' \
@@ -315,10 +317,12 @@ _git-branch () {
   _arguments -w -S -s \
     "($c $m $d $e --no-color :)--color=-[turn on branch coloring]:: :__git_color_whens" \
     "($c $m $d $e : --color)--no-color[turn off branch coloring]" \
+    "($c $m $d $e --no-column)"'--column=[display tag listing in columns]:column.branch option:((always\:"always show in columns" never\:"never show in columns" auto\:"show in columns if the output is to the terminal" column\:"fill columns before rows (default)" row\:"fill rows before columns" plain\:"show in one column" dense\:"make unequal size columns to utilize more space" nodense\:"make equal size columns"))' \
+    "($c $m $d $e --column)"'--no-column[do not display in columns]' \
     "($c $m $d $e )*--list[list only branches matching glob]:pattern" \
     "($c $m    $e  -a)-r[list or delete only remote-tracking branches]" \
     "($c $m $d $e: -r)-a[list both remote-tracking branches and local branches]" \
-    "($c $m $d $e : -v --verbose)"{-v,--verbose}'[show SHA1 and commit subject line for each head]' \
+    "($c $m $d $e : -v -vv --verbose)"{-v,-vv--verbose}'[show SHA1 and commit subject line for each head]' \
     "($c $m $d $e :)--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length" \
     "($c $m $d $e :)--no-abbrev[do not abbreviate sha1s]" \
     "($l $m $d $e)-l[create the branch's reflog]" \
@@ -419,6 +423,7 @@ _git-checkout () {
     '(--patch)--no-track[override the branch.autosetupmerge configuration variable]' \
     $new_branch_reflog_opt \
     '(-b -B -t --track --patch)--orphan[create a new orphan branch based at given commit]: :__git_branch_names' \
+    '--ignore-skip-worktree-bits[ignores patterns and adds back any files in <paths>]' \
     '(-q --quiet -f --force -m --merge --conflict --patch)'{-m,--merge}'[3way merge current branch, working tree and new branch]' \
     '(-q --quiet -f --force -m --merge --patch)--conflict[same as --merge, using given merge style]:style:(merge diff3)' \
     '(-)'{-p,--patch}'[interactively select hunks in diff between given tree-ish and working tree]' \
@@ -472,6 +477,8 @@ _git-cherry-pick () {
     '(- :)--quit[end revert or cherry-pick sequence]' \
     '(- :)--continue[resume revert or cherry-pick sequence]' \
     '(- :)--abort[cancel revert or cherry-pick sequence]' \
+    '--allow-empty-message[allow replaying a commit with an empty message]' \
+    '--keep-redundant-commits[keep cherry-picked commits that will become empty]' \
     '(-e --edit --ff)'{-e,--edit}'[edit commit before committing the revert]' \
     '(--ff)-x[append information about what commit was cherry-picked]' \
     '(-m --mainline)'{-m,--mainline}'[specify mainline when cherry-picking a merge commit]:parent number' \
@@ -588,6 +595,18 @@ _git-clone () {
   return ret
 }
 
+(( $+functions[_git-column] )) ||
+_git-column () {
+  _arguments -w -S -s \
+    '--command=[look up layout mode using config vars column.<name> and column.ui]' \
+    '--mode=[specify layout mode. See configuration variable column.ui for option syntax]' \
+    '--raw-mode=[same as --mode but take mode encoded as a number]' \
+    '--width=[specify the terminal width]' \
+    '--indent=[string to be printed at the beginning of each line]' \
+    '--nl[string to be printed at the end of each line, including newline character]' \
+    '--padding[the number of spaces between columns. One space by default]'
+}
+
 (( $+functions[_git-commit] )) ||
 _git-commit () {
   local amend_opt='--amend[amend the tip of the current branch]'
@@ -623,6 +642,7 @@ _git-commit () {
                                                                             default\:"act as '\''strip'\'' if the message is to be edited and as '\''whitespace'\'' otherwise"))' \
     '(-e --edit --no-edit)'{-e,--edit}'[edit the commit message before committing]' \
     '(-e --edit --no-edit)--no-edit[do not edit the commit message before committing]' \
+    '--no-post-rewrite[bypass the post-rewrite hook]' \
     '(-a --all --interactive -o --only -i --include)'{-i,--include}'[update the given files and commit the whole index]' \
     '(-a --all --interactive -o --only -i --include)'{-o,--only}'[commit only the given files]' \
     '(-u --untracked-files)'{-u-,--untracked-files=}'[show files in untracked directories]::mode:((no\:"show no untracked files"
@@ -863,7 +883,8 @@ _git-grep () {
   _arguments -C -A '-*' \
     '(-O --open-files-in-pager --no-index)--cached[search blobs registered in index file instead of working tree]' \
     '(--cached)--no-index[search files in current directory, not just treacked files]' \
-    '--exclude-standard[exclude files standard ignore mechanisms]' \
+    '(--exclude-standard)--no-exclude-standard[also search in ignored files]' \
+    '(--no-exclude-standard)--exclude-standard[exclude files standard ignore mechanisms]' \
     '--untracked[search in untracked files]' \
     '(-a --text)'{-a,--text}'[process binary files as if they were text]' \
     '(-i --ignore-case)'{-i,--ignore-case}'[ignore case when matching]' \
@@ -878,7 +899,7 @@ _git-grep () {
     '(-E --extended-regexp -G --basic-regexp -P --perl-regexp -F --fixed-strings)'{-G,--basic-regexp}'[use POSIX basic regexes]' \
     '(-E --extended-regexp -G --basic-regexp -P --perl-regexp -F --fixed-strings)'{-P,--perl-regexp}'[use perl-compatible regexes]' \
     '(-E --extended-regexp -G --basic-regexp -P --perl-regexp -F --fixed-strings)'{-F,--fixed-strings}'[do not interpret pattern as a regex]' \
-    '-n[prefix the line number to matching lines]' \
+    '(-n --line-number)'{-n,--line-number}'[prefix the line number to matching lines]' \
     '(-l --files-with-matches -L --files-without-match --name-only)'{-l,--files-with-matches,--name-only}'[show only names of matching files]' \
     '(-l --files-with-matches -L --files-without-match)'{-L,--files-without-match}'[show only names of non-matching files]' \
     '(--cached -O --open-files-in-pager)'{-O,--open-files-in-pager}'=-[open matching files in pager]::_path_commands' \
@@ -888,9 +909,9 @@ _git-grep () {
     '(--color           )---no-color[do not color matches]' \
     '--break[prefix the line number to matching lines]' \
     '--heading[show the filename above the matches]' \
-    '-A[show trailing context]: :__git_guard_number lines' \
-    '-B[show leading context]: :__git_guard_number lines' \
-    '-C[show context]: :__git_guard_number lines' \
+    '(-A --after-context)'{-A,--after-context=}'[show <num> trailing lines, and separate groups of matches]: :__git_guard_number lines' \
+    '(-B --before-context)'{-B,--before-context=}'[show <num> leading lines, and separate groups of matches]: :__git_guard_number lines' \
+    '(-A --after-context -B --before-context -C --context)'{-C,--context=}'[show <num> leading and trailing lines, and separate groups of matches]: :__git_guard_number lines' \
     '(-p --show-function)'{-p,--show-function}'[show preceding line containing function name of match]' \
     '(-W --function-context)'{-W,--function-context}'[show whole function where a match was found]' \
     '(1)*-f[read patterns from given file]:pattern file:_files' \
@@ -1205,6 +1226,7 @@ _git-push () {
     '--porcelain[produce machine-readable output]' \
     '--delete[delete all listed refs from the remote repository]' \
     '--tags[all tags under refs/tags are pushed]' \
+    '--follow-tags[also push missing annotated tags reachable from the pushed refs]' \
     '(--receive-pack --exec)'{--receive-pack=-,--exec=-}'[path to git-receive-pack on remote]:remote git-receive-pack:_files' \
     '(-f --force)'{-f,--force}'[allow refs that are not ancestors to be updated]' \
     '(:)--repo=[default repository to use]:repository:__git_any_repositories' \
@@ -1233,6 +1255,7 @@ _git-rebase () {
   _arguments -A '-*' \
     '(- :)--continue[continue after resolving merge conflict]' \
     '(- :)--abort[abort current rebase]' \
+    '--keep-empty[keep empty commits in the result]' \
     '(- :)--skip[skip the current patch]' \
     '(-m --merge)'{-m,--merge}'[use merging strategies to rebase]' \
     '*'{-s,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
@@ -1521,7 +1544,10 @@ _git-status () {
                                                                                      normal\:"show untracked files and directories" \
                                                                                      all\:"also show untracked files in untracked directories (default)"))' \
     '--ignore-submodules[ignore changes to submodules]:: :__git_ignore_submodules_whens' \
+    '--ignored[show ignored files as well]' \
     '(--porcelain)-z[use NUL termination on output]' \
+    '(--no-column)--column=-[display in columns]::column.status option:((always\:"always show in columns" never\:"never show in columns" auto\:"show in columns if the output is to the terminal" column\:"fill columns before rows (default)" row\:"fill rows before columns" plain\:"show in one column" dense\:"make unequal size columns to utilize more space" nodense\:"make equal size columns"))' \
+    '(--column)--no-column[do not display in columns]' \
     '*: :__git_ignore_line_inside_arguments _files'
 }
 
@@ -1653,9 +1679,9 @@ _git-tag () {
 
   _arguments -A '-*' \
     - creation \
-      '(   -s -u)-a[create an unsigned, annotated tag]' \
-      '(-a    -u)-s[create an signed and annotated tag]' \
-      '(-a -s   )-u[create a tag, annotated and signed with the given key]: :__git_gpg_secret_keys' \
+      '(   -s -u --local-user)-a[create an unsigned, annotated tag]' \
+      '(-a    -u --local-user)-s[create an signed and annotated tag]' \
+      '(-a -s)'{-u,--local-user}'[create a tag, annotated and signed with the given key]: :__git_gpg_secret_keys' \
       '-f[replace existing tag]' \
       '--cleanup=[cleanup message]:mode:((verbatim\:"no cleanup" whitespace\:"remove leading and trailing whitespace" strip\:"remove leading and trailing whitespace and comments"))' \
       $message_opts \
@@ -1667,6 +1693,8 @@ _git-tag () {
     - listing \
       '-n+[limit line output of annotation]: :__git_guard_number "limit"' \
       '-l[list tags matching pattern]' \
+      '(--no-column)--column=-[display tag listing in columns]::column.tag option:((always\:"always show in columns" never\:"never show in columns" auto\:"show in columns if the output is to the terminal" column\:"fill columns before rows (default)" row\:"fill rows before columns" plain\:"show in one column" dense\:"make unequal size columns to utilize more space" nodense\:"make equal size columns"))' \
+      '(--column)--no-column[do not display in columns]' \
       '--contains=[only list tags which contain the specified commit]: :__git_commits' \
       '--points-at=[only list tags of the given object]: :__git_commits' \
       '::pattern' \
@@ -1740,7 +1768,9 @@ _git-config () {
       '(2)--get-regexp[like "--get-all", but interpret "name" as a regular expression]' \
       '(2 3 --bool --int --bool-or-int --path -z --null)--get-colorbool[check if color should be used]: :->gettable-colorbool-option' \
       '(2 3 --bool --int --bool-or-int --path -z --null)--get-color[find color setting]: :->gettable-color-option' \
-      '(-e --edit --bool --int --bool-or-int --path -z --null)'{-e,--edit}'[open config file for editing]' && ret=0
+      '(-e --edit --bool --int --bool-or-int --path -z --null)'{-e,--edit}'[open config file for editing]' \
+      '(--no-includes)'--includes'[respect "include.*" directives in config files when looking up values]' \
+      '(--includes)'--no-includes'[do not respect "include.*" directives]' && ret=0
 
   # TODO: Most all _path_commands should be able to take arguments and so on.
   # How do we deal with that and how do we quote the whole argument to git
@@ -2677,7 +2707,9 @@ _git-fast-export () {
     '-C-[detect copies as well as renames with given scope]: :__git_guard_number size' \
     '--export-marks=[dump internal marks table when complete]: :_files' \
     '--import-marks=[load marks before processing input]: :_files' \
+    '--import-marks-if-exists=[silently skip if files does not exist]: :_files' \
     '--fake-missing-tagger=[fake a tagger when tags lack them]' \
+    '--use-done-feature[start with a "feature done" stanza, and terminate with a "done" command]' \
     '--no-data[do not output blocb objects, instead referring to them via their SHA-1 hash]' \
     '--full-tree[output full tree for each commit]' \
     '*: :__git_commit_ranges'
@@ -2686,9 +2718,11 @@ _git-fast-export () {
 (( $+functions[_git-fast-import] )) ||
 _git-fast-import () {
   _arguments -S -A '-*' \
+    '--cat-blob-fd=-[write responses to cat-blob and ls queries to <fd> instead of stdout]:file descriptor' \
     '--date-format=-[type of dates used in input]:format:((raw\:"native Git format"
                                                            rfc2822\:"standard email format from RFC 2822"
                                                            now\:"use current time and timezone"' \
+    '--done[terminate with error if there is no "done" command at the end of the stream]' \
     '--force[force updating modified existing branches]' \
     '--max-pack-size=-[maximum size of each packfile]: :__git_guard_bytes' \
     '--big-file-threshold=-[maximum size of blob to create deltas for]: :__git_guard_bytes' \
@@ -2730,6 +2764,7 @@ _git-mergetool () {
   # TODO: Only complete files with merge conflicts.
   _arguments -S -A '-*' \
     '(-t --tool)'{-t,--tool=}'[merge resolution program to use]: :__git_mergetools' \
+    '--tool-help[print a list of merge tools that may be used with "--tool"]' \
     '(-y --no-prompt --prompt)'{-y,--no-prompt}'[do not prompt before invocation of merge resolution program]' \
     '(-y --no-prompt)--prompt[prompt before invocation of merge resolution program]' \
     '*:conflicted file:_files'
@@ -3034,7 +3069,8 @@ _git-cherry () {
 (( $+functions[_git-count-objects] )) ||
 _git-count-objects () {
   _arguments \
-    '(-v --verbose)'{-v,--verbose}'[also report number of in-pack objects and objects that can be removed]'
+    '(-v --verbose)'{-v,--verbose}'[also report number of in-pack objects and objects that can be removed]' \
+    {-H,--human-readable}'[Print sizes in human readable format]'
 }
 
 (( $+functions[_git-difftool] )) ||
@@ -3046,6 +3082,9 @@ _git-difftool () {
     '(-y --no-prompt)--prompt[prompt before invocation of diff tool]' \
     '(-t --tool -x --extcmd)'{-t,--tool=-}'[merge resolution program to use]: :__git_difftools' \
     '(-t --tool -x --extcmd)'{-x,--extcmd=-}'[custom diff command to use]: :_path_commands' \
+    '--tool-help[print a list of diff tools that may be used with --tool]' \
+    '(--symlinks)--no-symlinks[make copies of instead of symlinks to the working tree]' \
+    '(---no-symlinks)--symlinks[make symlinks to instead of copies of the working tree]' \
     '(-g --gui)'{-g,--gui}'[use diff.guitool instead of diff.tool]'
 }
 
@@ -3075,10 +3114,11 @@ _git-get-tar-commit-id () {
 (( $+functions[_git-help] )) ||
 _git-help () {
   _arguments -w -S -s \
-    '(         -i --info -m --man -w --web)'{-a,--all}'[show all available commands]' \
-    '(-a --all           -m --man -w --web)'{-i,--info}'[show all available commands]' \
-    '(-a --all -i --info          -w --web)'{-m,--man}'[show all available commands]' \
-    '(-a --all -i --info -m --man         )'{-w,--web}'[show all available commands]' \
+    '(         -g --guides -i --info -m --man -w --web)'{-a,--all}'[show all available commands]' \
+    '(-a --all -g --guides           -m --man -w --web)'{-i,--info}'[show all available commands]' \
+    '(-a --all -g --guides -i --info          -w --web)'{-m,--man}'[show all available commands]' \
+    '(-a --all -g --guides -i --info -m --man         )'{-w,--web}'[show all available commands]' \
+    '(-g --guides)'{-g,--guides}'[prints a list of useful guides on the standard output]' \
     ': :_git_commands'
 }
 
@@ -3198,6 +3238,7 @@ _git-rev-parse () {
       '(           --symbolic-full-name)--symbolic[output in a format as true to input as possible]' \
       '(--symbolic                     )--symbolic-full-name[same as --symbolic, but omit non-ref inputs]' \
       '--abbrev-ref=-[a non-ambiguous short name of object]::mode:(strict loose)' \
+      '--disambiguate=-[show every object whose name begins with the given prefix]:prefix' \
       '--all[show all refs found in refs/]' \
       '--branches=-[show branch refs found in refs/heads/]::shell glob pattern' \
       '--tags=-[show tag refs found in refs/tags/]::shell glob pattern' \
@@ -3213,6 +3254,7 @@ _git-rev-parse () {
       '(--revs-only --no-revs --flags --no-flags --verify)--short=-[show only shorter unique name]:: :__git_guard_number length' \
       '(--since --after)'{--since=-,--after=-}'[show --max-age= parameter corresponding given date string]:datestring' \
       '(--until --before)'{--until=-,--before=-}'[show --min-age= parameter corresponding given date string]:datestring' \
+      '--resolve-git-dir[check if <path> is a valid repository or gitfile and print location]:git dir:_files -/' \
       '*: :__git_objects' && ret=0
   fi
 
@@ -3392,13 +3434,16 @@ _git-send-email () {
     '--subject=[specify the initial subject of the email thread]:subject' \
     '--to=[specify the primary recipient of the emails]: :_email_addresses' \
     '--8bit-encoding=[encoding to use for non-ASCII messages]: :__git_encodings' \
+    '--compose-encoding=[encoding to use for compose messages]: :__git_encodings' \
     '--envelope-sender[specify the envelope sender used to send the emails]: :_email_addresses' \
     '--smtp-encryption=[specify encryption method to use]: :__git_sendemail_smtpencryption_values' \
     '--smtp-domain=[specify FQDN used in HELO/EHLO]: :_domains' \
     '--smtp-pass=[specify password to use for SMTP-AUTH]::password' \
     '--smtp-server=[specify SMTP server to connect to]:smtp server:_hosts' \
     '--smtp-server-port=[specify port to connect to SMTP server on]:smtp port:_ports' \
+    '--smtp-server-option=[specify the outgoing SMTP server option to use]:SMPT server option' \
     '--smtp-user=[specify user to use for SMTP-AUTH]:smtp user:_users' \
+    '--smtp-debug=[enable or disable debug output]:smtp debug:((0\:"disable" 1\:"enable"))' \
     '--cc-cmd=[specify command to generate Cc\: header with]:Cc\: command:_path_commands' \
     '--to-cmd=[specify command to generate To\: header with]:To\: command:_path_commands' \
     '(                 --no-chain-reply-to)--chain-reply-to[send each email as a reply to previous one]' \
@@ -3917,6 +3962,7 @@ _git-read-tree () {
     $exclude_per_directory_opt \
     '--index-output=[write index in the named file instead of $GIT_INDEX_FILE]: :_files' \
     '--no-sparse-checkout[display sparse checkout support]' \
+    '--empty[instead of reading tree object(s) into the index, just empty it]' \
     '1:first tree-ish to be read/merged:__git_tree_ishs' \
     '2::second tree-ish to be read/merged:__git_tree_ishs' \
     '3::third tree-ish to be read/merged:__git_tree_ishs'
@@ -4331,6 +4377,8 @@ _git-daemon () {
     '--disable=-[disable site-wide service]: :__git_daemon_service' \
     '--allow-override[allow overriding site-wide service]: :__git_daemon_service' \
     '--forbid-override[forbid overriding site-wide service]: :__git_daemon_service' \
+    '(--no-informative-errors)--informative-errors[report more verbose errors to the client]' \
+    '(--informative-errors)--no-informative-errors[report all errors as "access denied" to the client]' \
     '*:repository:_directories'
 }
 
@@ -4535,7 +4583,10 @@ _git-check-attr () {
 _git-check-ref-format () {
   _arguments \
     '-h[display usage information]' \
-    '--print[display canonicalized name of hypothetical reference of given name]' \
+    '(--no-allow-onelevel)--allow-onelevel[accept one-level refnames]' \
+    '(--allow-onelevel)--no-allow-onelevel[do not accept one-level refnames]' \
+    '--refspec-pattern[interpret <refname> as a reference name pattern for a refspec]' \
+    '--normalize[Normalize refname by removing leading slashes]' \
     '--branch[expand previous branch syntax]' \
     ': :__git_references'
 }
@@ -4590,7 +4641,8 @@ _git-patch-id () {
 (( $+functions[_git-stripspace] )) ||
 _git-stripspace () {
   _arguments \
-    '(-s --strip-comments)'{-s,--strip-comments}'[also strip lines starting with #]'
+    '(-s --strip-comments)'{-s,--strip-comments}'[also strip lines starting with #]' \
+    '(-c --comment-lines)'{-c,--comment-lines}'[prepend comment character and blank to each line]'
 }
 
 # INTERNAL GIT COMPLETION FUNCTIONS
@@ -5747,13 +5799,11 @@ __git_setup_diff_options () {
     '--full-index[show full object name of pre- and post-image blob]'
     '(--full-index)--binary[in addition to --full-index, output binary diffs for git-apply]'
     '--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length'
-    # TODO: --break-rewrites is undocumented.
     '(-B --break-rewrites)'{-B-,--break-rewrites=-}'[break complete rewrite changes into pairs of given size]:: :__git_guard_number size'
-    # TODO: --detect-renames is undocumented.
-    '(-M --detect-renames)'{-M-,--detect-renames=-}'[detect renames with given scope]:: :__git_guard_number size'
-    # TODO: --detect-copies is undocumented.
-    '(-C --detect-copies)'{-C-,--detect-copies=-}'[detect copies as well as renames with given scope]:: :__git_guard_number size'
+    '(-M --find-renames)'{-M-,--find-renames=-}'[Detect renames with given scope]:: :__git_guard_number size'
+    '(-C --find-copies)'{-C-,--find-copies=-}'[detect copies as well as renames with given scope]:: :__git_guard_number size'
     '--find-copies-harder[try harder to find copies]'
+    '(-D --irreversible-delete)'{-D,--irreversible-delete}'[omit the preimage for deletes]'
     '-l-[limit number of rename/copy targets to run]: :__git_guard_number'
     '--diff-filter=-[select certain kinds of files for diff]: :_guard "[ACDMRTUXB*]#" kinds'
     '-S-[look for differences that contain the given string]:string'
@@ -5812,7 +5862,8 @@ __git_setup_revision_options () {
                                                                                     email\:"use email headers like From and Subject"
                                                                                     raw\:"the raw commits"
                                                                                     format\:"specify own format"))'
-    '--abbrev-commit[show only partial prefixes of commit object names]'
+    '(--abbrev-commit --no-abbrev-commit)--abbrev-commit[show only partial prefixes of commit object names]'
+    '(--abbrev-commit --no-abbrev-commit)--no-abbrev-commit[show the full 40-byte hexadecimal commit object name]'
     '--oneline[shorthand for --pretty=oneline --abbrev-commit]'
     '--encoding=-[output log messages in given encoding]:: :__git_encodings'
     '(--no-notes --notes)--no-notes[do not show notes that annotate commit]'
@@ -5841,6 +5892,10 @@ __git_setup_revision_options () {
     '--remove-empty[stop when given path disappears from tree]'
     '--merges[display only merge commits]'
     '--no-merges[do not display commits with more than one parent]'
+    '(--min-parents --no-min-parents)--min-parents=-[show only commits having at least <n> commits]: :__git_guard_number "minimum number of parents"'
+    '(--min-parents --no-min-parents)--no-min-parents[reset limit]'
+    '(--max-parents --no-max-parents)--max-parents=-[show only commits having at most <n> commits]: :__git_guard_number "maximum number of parents"'
+    '(--max-parents --no-max-parents)--no-max-parents[reset limit]'
     '--first-parent[follow only first parent from merge commits]'
     '*--not[reverses meaning of ^ prefix for revisions that follow]'
     '--all[show all commits from refs]'
@@ -5910,6 +5965,8 @@ __git_setup_merge_options () {
     '--ff-only[refuse to merge unless HEAD is up to date or merge can be resolved as a fast-forward]'
     '*'{-s,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies'
     '*'{-X,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]'
+    '(--verify-signatures)--no-verify-signatures[verify the commits being merged or abort]'
+    '(--no-verify-signatures)--verify-signatures[do not verify the commits being merged]'
     '(-q --quiet -v --verbose)'{-q,--quiet}'[suppress all output]'
     '(-q --quiet -v --verbose)'{-v,--verbose}'[output additional information]')
 }
@@ -5929,10 +5986,13 @@ __git_setup_fetch_options () {
     '(--no-tags -t --tags)'{-t,--tags}'[fetch remote tags]'
     '(-u --update-head-ok)'{-u,--update-head-ok}'[allow updates of current branch head]'
     '--upload-pack=[specify path to git-upload-pack on remote side]:remote path'
-    '(--no-recurse-submodules --recurse-submodules)--recurse-submodules=[specify when to fetch commits of submodules]:recursive fetching mode:((no\:"disable recursion"
+    '(--no-recurse-submodules --recurse-submodules)--recurse-submodules=-[specify when to fetch commits of submodules]::recursive fetching mode:((no\:"disable recursion"
                                                                                                                                                 yes\:"always recurse"
                                                                                                                                                 on-demand\:"only when submodule reference in superproject is updated"))'
     '(--no-recurse-submodules --recurse-submodules)--no-recurse-submodules[disable recursive fetching of submodules]'
+    '(--no-recurse-submodules)--recurse-submodules-default=-[provide internal temporary non-negative value for "--recurse-submodules"]::recursive fetching mode:((yes\:"always recurse"
+                                                                                                                                                                 on-demand\:"only when submodule reference in superproject is updated"))'
+    '--submodule-prefix=-[prepend <path> to paths printed in informative messages]:submodule prefix path:_files -/'
     '(-q --quiet -v --verbose --progress)'{-q,--quiet}'[suppress all output]'
     '(-q --quiet -v --verbose)'{-v,--verbose}'[output additional information]'
     '(-q --quiet)--progress[output progress information]')
@@ -6267,13 +6327,17 @@ _git() {
       '(- :)--help[display help message]' \
       '-c[pass configuration parameter to command]:parameter' \
       '--exec-path=-[path containing core git-programs]:: :_directories' \
-      '--html-path[display path to HTML documentation and exit]' \
+      '(: -)--man-path[print the manpath for the man pages for this version of Git and exit]' \
+      '(: -)--info-path[print the path where the info files are installed and exit]' \
+      '(: -)--html-path[display path to HTML documentation and exit]' \
       '(-p --paginate)'{-p,--paginate}'[pipe output into $PAGER]' \
       '--no-pager[do not pipe git output into a pager]' \
       '--git-dir=-[path to repository]: :_directories' \
       '--work-tree=-[path to working tree]: :_directories' \
+      '--namespace=-[set the Git namespace]: :_directories' \
       '--bare[use $PWD as repository]' \
       '--no-replace-objects[do not use replacement refs to replace git objects]' \
+      '--literal-pathspecs[treat pathspecs literally, rather than as glob patterns]' \
       '(-): :->command' \
       '(-)*:: :->option-or-argument' && return
 
