@@ -1930,7 +1930,7 @@ _git-config () {
     diff.ignoreSubmodules:'ignore submodules::->bool:false'
     diff.statGraphWidth:'width of the graph part in --stat output:width:->int'
     diff.submodule:'output format for submodule differences::->diff.submodule:short'
-    diff.suppressBlankEmpty:'inbihit printing space before empty output lines::->bool:false'
+    diff.suppressBlankEmpty:'inhibit printing space before empty output lines::->bool:false'
     diff.tool:'diff tool to use::__git_difftools'
     'difftool.*.cmd:command to invoke for the diff tool::_path_commands'
     'difftool.*.path:path to use for the diff tool:absolute diff tool path:_files -g "*(*)"'
@@ -2034,7 +2034,7 @@ _git-config () {
     http.sslCAPath:'directory containing files with CA certificates to verify against for HTTPS:CA certificates directory:_directories'
     http.sslTry:'attempt to use AUTH SSL/TLS and encrypted data transfers when connecting via regular FTP protocol::->bool:false'
     http.maxRequests:'how many HTTP requests to launch in parallel:maximum number of requests::->int:5'
-    http.minSessions:'number of curl sessions to keep across requests:mininmum number of sessions::->int:1'
+    http.minSessions:'number of curl sessions to keep across requests:minimum number of sessions::->int:1'
     http.postBuffer:'maximum size of buffer used by smart HTTP transport when POSTing:maximum POST buffer size:->bytes:1m'
     http.lowSpeedLimit:'lower limit for HTTP transfer-speed:low transfer-speed limit:->int'
     http.lowSpeedTime:'duration for http.lowSpeedLimit:time:->int'
@@ -2077,7 +2077,7 @@ _git-config () {
     merge.conflictstyle:'style used for conflicted hunks::->merge.conflictstyle:merge'
     merge.defaultToUpstream:'merge the upstream branches configured for the current branch by default::->bool:false'
     merge.ff:'allow fast-forward merges::->merge.ff:true'
-    merge.log:'include summaries of merged commits in new merge commit messsages::->bool:false'
+    merge.log:'include summaries of merged commits in new merge commit messages::->bool:false'
     merge.renameLimit:'number of files to consider when detecting copy/renames during merge:limit:->int'
     merge.renormalize:'use canonical representation of files during merge::->bool:false'
     merge.stat:'print the diffstat between ORIG_HEAD and merge at end of merge::->bool:true'
@@ -2936,7 +2936,7 @@ _git-reflog () {
               '--expire-unreachable=-[prune entries older than given time and unreachable]: :__git_datetimes' \
               '--all[prune all refs]' \
               '--updateref[update ref with SHA-1 of top reflog entry after expiring or deleting]' \
-              '--rewrite[adjust reflog entries to ensure old SHA-1 points to new SHA-1 of previous entry after expring or deleting]' \
+              '--rewrite[adjust reflog entries to ensure old SHA-1 points to new SHA-1 of previous entry after expiring or deleting]' \
               '--verbose[output additional information]' && ret=0
             ;;
           (delete)
@@ -2944,7 +2944,7 @@ _git-reflog () {
             _arguments -C -S \
               '(-n --dry-run)'{-n,--dry-run}'[undocumented]' \
               '--updateref[update ref with SHA-1 of top reflog entry after expiring or deleting]' \
-              '--rewrite[adjust reflog entries to ensure old SHA-1 points to new SHA-1 of previous entry after expring or deleting]' \
+              '--rewrite[adjust reflog entries to ensure old SHA-1 points to new SHA-1 of previous entry after expiring or deleting]' \
               '*:: :->reflog-entry' && ret=0
 
             case $state in
@@ -3124,7 +3124,7 @@ _git-blame () {
     '-l[show long rev]' \
     '-t[show raw timestamp]' \
     '-S[use revs from revs-file]:revs-file:_files' \
-    '--reverse[walk histor forward instead of backward]' \
+    '--reverse[walk history forward instead of backward]' \
     '(-p --porcelain)'{-p,--porcelain}'[show results designed for machine processing]' \
     '--line-porcelain[show results designed for machine processing but show commit information for every line]' \
     '--incremental[show results incrementally for machine processing]' \
@@ -3386,7 +3386,7 @@ _git-show-branch () {
       '(--no-name            )--sha1-name[name commits with unique prefix of object names]' \
       '--topics[show only commits that are NOT on the first branch given]' \
       '(        --no-color)--color[color status sign of commits]:: :__git_color_whens' \
-      '(--color           )--no-color[do not color statis sign of commits]' \
+      '(--color           )--no-color[do not color status sign of commits]' \
       '*: :__git_revisions' \
     - reflogs \
       '(-g --reflog)'{-g,--reflog=}'[show reflog entries for given ref]:: :->limit-and-base' \
@@ -3567,7 +3567,7 @@ _git-send-email () {
     '--quiet[be less verbose]' \
     '(           --no-validate)--validate[perform sanity checks on patches]' \
     '(--validate              )--validate[do not perform sanity checks on patches]' \
-    '--force[send emails even if safetiy checks would prevent it]' \
+    '--force[send emails even if safety checks would prevent it]' \
     '*: :_files'
 }
 
@@ -4078,7 +4078,7 @@ _git-symbolic-ref () {
     '(-d --delete)'{-d,--delete}'[delete symbolic ref]' \
     '(-q --quiet)'{-q,--quiet}'[do not issue error if specified name is not a symbolic ref]' \
     '--short[shorten the ref name (eg. refs/heads/master -> master)]' \
-    '-m[update reflog for specified name with specied reason]:reason for update' \
+    '-m[update reflog for specified name with specified reason]:reason for update' \
     ':symbolic reference:__git_heads' \
     ':: :__git_references'
 }
@@ -4133,7 +4133,7 @@ _git-update-index () {
 (( $+functions[_git-update-ref] )) ||
 _git-update-ref () {
   _arguments -w -S -s \
-    '-m[update reflog for specified name with specied reason]:reason for update' \
+    '-m[update reflog for specified name with specified reason]:reason for update' \
     '(:)-d[delete given reference after verifying its value]:symbolic reference:__git_revisions:old reference:__git_revisions' \
     '--no-deref[overwrite ref itself, not what it points to]' \
     ':symbolic reference:__git_revisions' \
@@ -4383,7 +4383,7 @@ _git-rev-list () {
     '--timestamp[print raw commit timestamp]' \
     '(         --bisect-vars --bisect-all)--bisect[show only middlemost commit object]' \
     '(--bisect)--bisect-vars[same as --bisect, displaying shell-evalable code]' \
-    '(--bisect)--bisect-all[display all commit objects beteen included and excluded commits]' \
+    '(--bisect)--bisect-all[display all commit objects between included and excluded commits]' \
     '*:: :->commit-or-path' && ret=0
 
   case $state in
@@ -4876,7 +4876,7 @@ _git_commands () {
     notes:'add or inspect object notes'
     pull:'fetch from and merge with another repository or local branch'
     push:'update remote refs along with associated objects'
-    rebase:'fasforward-port local commits to the updated upstream head'
+    rebase:'forward-port local commits to the updated upstream head'
     reset:'reset current HEAD to specified state'
     revert:'revert existing commits'
     rm:'remove files from the working tree and from the index'
@@ -4892,7 +4892,7 @@ _git_commands () {
     config:'get and set repository or global options'
     fast-export:'data exporter'
     fast-import:'import information into git directly'
-    filter-branch:'rewrite branchers'
+    filter-branch:'rewrite branches'
     mergetool:'run merge conflict resolution tools to resolve merge conflicts'
     pack-refs:'pack heads and tags for efficient repository access'
     prune:'prune all unreachable objects from the object database'
@@ -5169,7 +5169,7 @@ __git_ignore_submodules_whens () {
 
   whens=(
     none:'submodule is dirty when it contains untracked or modified files'
-    untracked:'submodule is dirty when it contains untracket files'
+    untracked:'submodule is dirty when it contains untracked files'
     dirty:'ignore all changes to submodules, showing only changes to commits stored in superproject'
     all:'ignore all changes to submodules (default)')
 
@@ -6378,8 +6378,8 @@ __git_sendemail_suppresscc_values () {
     author:'avoid including patch author' \
     self:'avoid including sender' \
     cc:'avoid including anyone mentioned in Cc lines except for self' \
-    bodycc:'avoid including anyone mentiond in Cc lines in patch body except for self' \
-    sob:'avoid including anyone mentiond in Signed-off-by lines except for self' \
+    bodycc:'avoid including anyone mentioned in Cc lines in patch body except for self' \
+    sob:'avoid including anyone mentioned in Signed-off-by lines except for self' \
     cccmd:'avoid running --cc-cmd' \
     tocmd:'avoid running --to-cmd' \
     body:'equivalent to sob + bodycc' \

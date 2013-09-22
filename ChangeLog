@@ -1,3 +1,8 @@
+2013-09-22  Øystein Walle  <oystwa@gmail.com>
+
+	* 31749: Completion/Unix/Command/_git: _git: fix some typos in
+	description texts
+
 2013-09-22  m0viefreak  <m0viefreak.cm@googlemail.com>
 
 	* 31746: Completion/Unix/Command/_git: _git: reword _git-config
