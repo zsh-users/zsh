@@ -3,6 +3,9 @@
 	* 31746: Completion/Unix/Command/_git: _git: reword _git-config
 	TODO
 
+	* 31748: Completion/Unix/Command/_git: _git: support completing
+	remote branches without <remote>/ prefix
+
 2013-09-22  Øystein Walle  <oystwa@gmail.com>
 
 	* 31747: Completion/Unix/Command/_git: _git: completion updates to
