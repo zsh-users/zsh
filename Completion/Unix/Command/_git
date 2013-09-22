@@ -1491,7 +1491,7 @@ _git-submodule () {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
-  _arguments -C -A '-*' \
+  _arguments -C \
     '(-q --quiet)'{-q,--quiet}'[suppress all output]' \
     ': :->command' \
     '*:: :->option-or-argument' && ret=0

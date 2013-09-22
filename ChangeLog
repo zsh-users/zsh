@@ -6,6 +6,9 @@
 	* 31743: Completion/Unix/Command/_git: _git: fix usage of ->int:
 	for some entries in _git-config
 
+	* 31744: Completion/Unix/Command/_git: _git: make git submodule
+	<cmd> completion work
+
 2013-09-21  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/glob.c: improve an error message.
