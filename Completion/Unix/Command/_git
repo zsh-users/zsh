@@ -1344,11 +1344,7 @@ _git-rm () {
 
   case $state in
     (file)
-      if [[ -n ${opt_args[(I)--cached]} ]]; then
-        __git_changed-in-index_files && ret=0
-      else
-        __git_cached_files && ret=0
-      fi
+      __git_cached_files && ret=0
       ;;
   esac
 
