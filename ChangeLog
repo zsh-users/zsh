@@ -12,6 +12,9 @@
 	* 31745: Completion/Unix/Command/_git: _git: correctly use
 	__git_guard_number in some cases
 
+	* 31755: Completion/Unix/Command/_git: _git: completion updates to
+	match latest git v1.8.3
+
 2013-09-21  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/glob.c: improve an error message.
