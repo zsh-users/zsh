@@ -1112,7 +1112,8 @@ zglob(LinkList list, LinkNode np, int nountok)
     gf_pre_words = NULL;
 
     /* Check for qualifiers */
-    while (!nobareglob || zpc_special[ZPC_HASH] != Marker) {
+    while (!nobareglob ||
+	   (isset(EXTENDEDGLOB) && !zpc_disables[ZPC_HASH])) {
 	struct qual *newquals;
 	char *s;
 	int sense, paren;
@@ -1158,11 +1159,11 @@ zglob(LinkList list, LinkNode np, int nountok)
 	    case Outpar:
 		paren++; /*FALLTHROUGH*/
 	    case Bar:
-		if (zpc_special[ZPC_BAR] != Marker)
+		if (!zpc_disables[ZPC_BAR])
 		    nobareglob = 1;
 		break;
 	    case Tilde:
-		if (zpc_special[ZPC_TILDE] != Marker)
+		if (isset(EXTENDEDGLOB) && !zpc_disables[ZPC_TILDE])
 		    nobareglob = 1;
 		break;
 	    case Inpar:
@@ -1172,7 +1173,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 	}
 	if (*s != Inpar)
 	    break;
-	if (s[1] == zpc_special[ZPC_HASH]) {
+	if (isset(EXTENDEDGLOB) && !zpc_disables[ZPC_HASH] && s[1] == Pound) {
 	    if (s[2] == 'q') {
 		*s = 0;
 		s += 2;

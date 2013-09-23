@@ -245,7 +245,8 @@ static const char *zpc_strings[ZPC_COUNT] = {
  * Corresponding array of pattern disables as set by the user
  * using "disable -p".
  */
-static char zpc_disables[ZPC_COUNT];
+/**/
+char zpc_disables[ZPC_COUNT];
 
 /*
  * Stack of saved (compressed) zpc_disables for function scope.
