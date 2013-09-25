@@ -1188,6 +1188,13 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     viinsbegin = 0;
     statusline = NULL;
     selectkeymap("main", 1);
+    /*
+     * If main is linked to the viins keymap, we need to register
+     * explicitly that we're now in vi insert mode as there's
+     * no user operation to indicate this.
+     */
+    if (openkeymap("main") == openkeymap("viins"))
+	viinsert(NULL);
     selectlocalmap(NULL);
     fixsuffix();
     if ((s = getlinknode(bufstack))) {

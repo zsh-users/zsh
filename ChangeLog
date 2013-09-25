@@ -1,3 +1,8 @@
+2013-09-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31765: Src/Zle/zle_main.c: on entry to editor, if starting in
+	vi insert mode mark this as the start of an insertion (duh).
+
 2013-09-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31764 (with correction of sense of a test): Src/glob.c,
