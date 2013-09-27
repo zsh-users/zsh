@@ -1,3 +1,8 @@
+2013-09-26  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31770: Src/hist.c: memmove() instead of memcpy() for overlapping
+	regions.
+
 2013-09-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31765: Src/Zle/zle_main.c: on entry to editor, if starting in

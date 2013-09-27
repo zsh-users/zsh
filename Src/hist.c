@@ -953,7 +953,7 @@ histreduceblanks(void)
 	len = chwords[i+1] - chwords[i];
 	needblank = (i < chwordpos-2 && chwords[i+2] > chwords[i+1]);
 	if (pos != chwords[i]) {
-	    memcpy(chline + pos, chline + chwords[i], len + needblank);
+	    memmove(chline + pos, chline + chwords[i], len + needblank);
 	    chwords[i] = pos;
 	    chwords[i+1] = chwords[i] + len;
 	}
