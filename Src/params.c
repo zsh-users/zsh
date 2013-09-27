@@ -4667,10 +4667,12 @@ startparamscope(void)
 mod_export void
 endparamscope(void)
 {
+    queue_signals();
     locallevel--;
     /* This pops anything from a higher locallevel */
     saveandpophiststack(0, HFILE_USE_OPTIONS);
     scanhashtable(paramtab, 0, 0, 0, scanendscope, 0);
+    unqueue_signals();
 }
 
 /**/

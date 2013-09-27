@@ -1,5 +1,8 @@
 2013-09-26  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 31772: Src/params.c: queue_signals() to prevent re-entry into
+	endparamscope().
+
 	* 31770: Src/hist.c: memmove() instead of memcpy() for overlapping
 	regions.
 
