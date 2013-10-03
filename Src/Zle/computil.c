@@ -465,6 +465,7 @@ cd_init(char *nam, char *hide, char *mlen, char *sep,
     cd_state.showd = disp;
     cd_state.maxg = cd_state.groups = cd_state.descs = 0;
     cd_state.maxmlen = atoi(mlen);
+    cd_state.premaxw = 0;
     itmp = zterm_columns - cd_state.swidth - 4;
     if (cd_state.maxmlen > itmp)
         cd_state.maxmlen = itmp;
