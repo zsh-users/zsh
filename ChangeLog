@@ -1,5 +1,11 @@
 2013-10-03  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 31784: Src/Zle/computil.c: when deciding whether there is enough
+	horizontal space to show completion descriptions for each match in
+	a listing, treat the separator as part of the description rather
+	than as part of the match, and account for lines that have already
+	wrapped due to very long matches.
+	
 	* 31781: Src/Zle/computil.c: "compdescribe -i" must clear the
 	completion list column padding width along with the rest of the
 	description state.  Cf. 31782.
