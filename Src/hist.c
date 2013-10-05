@@ -871,6 +871,8 @@ unlinkcurline(void)
 mod_export void
 hbegin(int dohist)
 {
+    char *hf;
+
     isfirstln = isfirstch = 1;
     errflag = histdone = 0;
     if (!dohist)
@@ -924,6 +926,10 @@ hbegin(int dohist)
 	defev = addhistnum(curhist, -1, HIST_FOREIGN);
     } else
 	histactive = HA_ACTIVE | HA_NOINC;
+
+    hf = getsparam("HISTFILE");
+    if (isset(INCAPPENDHISTORY))
+	savehistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
 }
 
 /**/
@@ -1328,7 +1334,7 @@ hend(Eprog prog)
     chline = hptr = NULL;
     chwords = NULL;
     histactive = 0;
-    if (isset(SHAREHISTORY)? histfileIsLocked() : isset(INCAPPENDHISTORY))
+    if (isset(SHAREHISTORY) && histfileIsLocked())
 	savehistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
     unlockhistfile(hf); /* It's OK to call this even if we aren't locked */
     /*
