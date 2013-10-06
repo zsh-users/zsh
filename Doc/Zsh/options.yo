@@ -1683,6 +1683,20 @@ Sequences of digits indicating a numeric base such as the `tt(08)'
 component in `tt(08#77)' are always interpreted as decimal, regardless
 of leading zeroes.
 )
+pindex(PIPE_FAIL)
+pindex(NO_PIPE_FAIL)
+pindex(PIPEFAIL)
+pindex(NOPIPEFAIL)
+cindex(exit status from pipeline)
+cindex(status, on exit from pipeline)
+cindex(pipeline, exit status from)
+itme(tt(PIPE_FAIL))(
+By default, when a pipeline exits the exit status recorded by the shell
+and returned by the shell variable tt($?) reflects that of the
+rightmost element of a pipeline.  If this option is set, the exit status
+instead reflects the status of the rightmost element of the pipeline
+that was non-zero, or zero if all elements exited with zero status.
+)
 pindex(SOURCE_TRACE)
 pindex(NO_SOURCE_TRACE)
 pindex(SOURCETRACE)

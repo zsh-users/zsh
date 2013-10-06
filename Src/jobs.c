@@ -508,15 +508,22 @@ update_job(Job jn)
     jn->stat |= (somestopped) ? STAT_CHANGED | STAT_STOPPED :
 	STAT_CHANGED | STAT_DONE;
     if (job == thisjob && (jn->stat & STAT_DONE)) {
-	int i;
+	int i, newlastval = 0;
 	Process p;
 
-	for (p = jn->procs, i = 0; p && i < MAX_PIPESTATS; p = p->next, i++)
+	for (p = jn->procs, i = 0; p && i < MAX_PIPESTATS; p = p->next, i++) {
 	    pipestats[i] = ((WIFSIGNALED(p->status)) ?
 			    0200 | WTERMSIG(p->status) :
 			    WEXITSTATUS(p->status));
-	if ((jn->stat & STAT_CURSH) && i < MAX_PIPESTATS)
+	    if (pipestats[i])
+		newlastval = pipestats[i];
+	}
+	if ((jn->stat & STAT_CURSH) && i < MAX_PIPESTATS) {
 	    pipestats[i++] = lastval;
+	    if (!lastval && isset(PIPEFAIL))
+		lastval = newlastval;
+	} else if (isset(PIPEFAIL))
+	    lastval= newlastval;
 	numpipestats = i;
     }
     if (!inforeground &&

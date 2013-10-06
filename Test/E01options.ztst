@@ -1096,3 +1096,18 @@
 0:IGNORE_CLOSE_BRACES option
 >this is OK
 >6
+
+  (setopt pipefail
+  true | true | true
+  print $?
+  true | false | true
+  print $?
+  exit 2 | false | true
+  print $?
+  false | exit 2 | true
+  print $?)
+0:PIPE_FAIL option
+>0
+>1
+>1
+>2

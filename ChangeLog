@@ -1,3 +1,8 @@
+2013-10-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/18023: Doc/Zsh/options.yo, Src/jobs.c, Src/options.c,
+	Src/zsh.h, Test/E01options.ztst: add PIPEFAIL option and test.
+
 2013-10-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Hang Pingtian: 31789: Src/hist.c: add history for
