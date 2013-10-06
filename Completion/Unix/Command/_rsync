@@ -74,7 +74,7 @@ _rsync() {
   _arguments -s \
     '*'{-v,--verbose}'[increase verbosity]' \
     {--no-v,--no-verbose}'[turn off --verbose]' \
-    '--bwlimit=[limit I/O bandwidth]:KBytes per second' \
+    '--bwlimit=[limit I/O bandwidth]:KBytes (etc.) per second' \
     '--port=[specify alternate port number]:port:(873)' \
     '--address=[bind to the specified address]:bind address:_bind_addresses' \
     '(-T --temp-dir)'{-T,--temp-dir=}'[create temporary files in specified directory]:directory:_directories' \
@@ -137,6 +137,7 @@ _rsync() {
     '(-t --times)'{-t,--times}'[preserve times]' \
     {--no-t,--no-times}'[turn off --times]' \
     '(-O --omit-dir-times)'{-O,--omit-dir-times}'[omit directories when preserving times]' \
+    '(-J --omit-link-times)'{-J,--omit-link-times}'[omit symlinks when preserving times]' \
     '--chmod[change destination permissions]:mods' \
     '(-S --sparse)'{-S,--sparse}'[handle sparse files efficiently]' \
     '(-n --dry-run)'{-n,--dry-run}'[show what would have been transferred]' \
@@ -210,6 +211,16 @@ _rsync() {
     '(--only-write-batch)--write-batch=[write a batched update to the specified file]:file:_files' \
     '(--write-batch)--only-write-batch=[like --write-batch but w/o updating destination]:file:_files' \
     '--protocol=[force an older protocol version to be used]:number' \
+    '--info=[fine-grained informational verbosity]:comma-separated list' \
+    '--debug=[fine-grained debug verbosity]:comma-separated list' \
+    '--munge-links[munge symlinks to make them safer, but unusable]' \
+    '--ignore-missing-args[ignore missing source args without error]' \
+    '--delete-missing-args[delete missing source args from destination]' \
+    '(--usermap --chown)--usermap=[custom username mapping]:comma-separated mappings' \
+    '(--groupmap --chown)--groupmap=[custom groupname mapping]:comma-separated mappings' \
+    '(--usermap --groupmap --chown)--chown=[simple username/groupname mapping]:user and/or group' \
+    '*'{-M=,--remote-option=}'[send option to the remote side only]:option string' \
+    '--preallocate[preallocate the full length of new files]' \
     '--iconv=[request charset conversion of filenames]:number' \
     '--read-batch=[read a batched update from the specified file]:file:_files'
 }
