@@ -1,3 +1,8 @@
+2013-10-07  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31793: Src/hist.c (hbegin): Modify 31789 so that the save
+	history here only happens for interactive editing.
+
 2013-10-06  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* users/18024: Completion/Unix/Command/_rsync: add new options for

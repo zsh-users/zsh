@@ -928,7 +928,7 @@ hbegin(int dohist)
 	histactive = HA_ACTIVE | HA_NOINC;
 
     hf = getsparam("HISTFILE");
-    if (isset(INCAPPENDHISTORY))
+    if (isset(INCAPPENDHISTORY) && !(histactive & HA_NOINC) && !strin)
 	savehistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
 }
 
