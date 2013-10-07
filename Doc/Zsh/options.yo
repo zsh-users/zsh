@@ -1690,7 +1690,7 @@ pindex(NOPIPEFAIL)
 cindex(exit status from pipeline)
 cindex(status, on exit from pipeline)
 cindex(pipeline, exit status from)
-itme(tt(PIPE_FAIL))(
+item(tt(PIPE_FAIL))(
 By default, when a pipeline exits the exit status recorded by the shell
 and returned by the shell variable tt($?) reflects that of the
 rightmost element of a pipeline.  If this option is set, the exit status
