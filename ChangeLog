@@ -1,5 +1,8 @@
 2013-10-07  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 31794: Src/hist.c: further refinement that SHAREHISTORY should
+	work as it always did because it's careful about file locking.
+
 	* 31793: Src/hist.c (hbegin): Modify 31789 so that the save
 	history here only happens for interactive editing.
 
