@@ -1,3 +1,8 @@
+2013-10-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Eric Cook: 31801: Completion/Linux/Command/_btrfs: some
+	additional variables need to be local.
+
 2013-10-08  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 31797: partly fix long-standing history expansion bug in which

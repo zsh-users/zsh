@@ -1,7 +1,7 @@
 #compdef btrfs
 
 local curcontext="$curcontext" curstate state line expl grp cmd ret=1
-local -a groups args
+local -a groups args cmds_1 cmds_2 cmds_3 cmds_4 cmds_5 cmds_6
 
 groups=( subvolume filesystem device scrub balance inspect-internal help version )
 cmds_1=( create delete list snapshot get-default set-default find-new help )
