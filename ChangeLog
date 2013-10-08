@@ -1,3 +1,12 @@
+2013-10-08  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31797: partly fix long-standing history expansion bug in which
+	in some circumstances a default history expansion would occur even
+	when there is neither an event nor a word designator, which is
+	contradictory to the documentation.  There are still some cases in
+	which expansion is attempted when it should not be, but in most of
+	those cases the expansion simply fails.
+
 2013-10-07  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 31794: Src/hist.c: further refinement that SHAREHISTORY should
