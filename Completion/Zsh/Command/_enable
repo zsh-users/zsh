@@ -1,8 +1,10 @@
 #compdef enable
 
 _arguments -C -s -A "-*" -S \
-  "(-f -r)-a[act on aliases]:*:aliases:(${(k)dis_aliases})" \
-  "(-a -r)-f[act on functions]:*:functions:(${(k)dis_functions})" \
-  "(-a -f)-r[act on reserved words]:*:reserved-words:compadd -k dis_reswords" \
+  "(-f -r -s -p)-a[act on regular or global aliases]:*:aliases:(${(k)dis_aliases} ${(k)dis_galiases})" \
+  "(-a -r -s -p)-f[act on functions]:*:functions:(${(k)dis_functions})" \
+  "(-a -f -s -p)-r[act on reserved words]:*:reserved-words:compadd -k dis_reswords" \
+  "(-a -f -r -p)-s[act on suffix aliases]:*:suffix aliases:(${(k)dis_saliases})" \
+  "(-a -f -r -s)-p[act on pattern characters]:*:pattern characters:compadd -k dis_patchars" \
   '-m[treat arguments as patterns]' \
   "*:builtin command:(${(k)dis_builtins})"

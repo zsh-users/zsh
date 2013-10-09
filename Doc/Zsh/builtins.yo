@@ -471,7 +471,7 @@ problems in scripts and functions are altered.  If the tt(-L) switch is given,
 the options tt(LOCAL_OPTIONS), tt(LOCAL_PATTERNS) and tt(LOCAL_TRAPS)
 will be set as
 well, causing the effects of the tt(emulate) command and any tt(setopt),
-tt(disable -p) or tt(enable -b), and tt(trap) commands to be local to
+tt(disable -p) or tt(enable -p), and tt(trap) commands to be local to
 the immediately surrounding shell
 function, if any; normally these options are turned off in all emulation
 modes except tt(ksh). The tt(-L) switch is mutually exclusive with the
