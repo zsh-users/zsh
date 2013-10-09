@@ -236,7 +236,8 @@ static const char zpc_chars[ZPC_COUNT] = {
  * Corresponding strings used in enable/disable -p.
  * NULL means no way of turning this on or off.
  */
-static const char *zpc_strings[ZPC_COUNT] = {
+/**/
+const char *zpc_strings[ZPC_COUNT] = {
    NULL, NULL, "|", NULL, "~", "(", "?", "*", "[", "<",
    "^", "#", NULL, "?(", "*(", "+(", "!(", "@("
 };

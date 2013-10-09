@@ -759,6 +759,38 @@ disreswordsgetfn(UNUSED(Param pm))
     return getreswords(DISABLED);
 }
 
+/* Functions for the patchars special parameter. */
+
+/**/
+static char **
+getpatchars(int dis)
+{
+    int i;
+    char **ret, **p;
+
+    p = ret = (char **) zhalloc(ZPC_COUNT * sizeof(char *));
+
+    for (i = 0; i < ZPC_COUNT; i++)
+	if (zpc_strings[i] && !dis == !zpc_disables[i])
+	    *p++ = dupstring(zpc_strings[i]);
+
+    *p = NULL;
+
+    return ret;
+}
+
+static char **
+patcharsgetfn(UNUSED(Param pm))
+{
+    return getpatchars(0);
+}
+
+static char **
+dispatcharsgetfn(UNUSED(Param pm))
+{
+    return getpatchars(1);
+}
+
 /* Functions for the options special parameter. */
 
 /**/
@@ -2018,6 +2050,10 @@ static const struct gsu_array reswords_gsu =
 { reswordsgetfn, arrsetfn, stdunsetfn };
 static const struct gsu_array disreswords_gsu =
 { disreswordsgetfn, arrsetfn, stdunsetfn };
+static const struct gsu_array patchars_gsu =
+{ patcharsgetfn, arrsetfn, stdunsetfn };
+static const struct gsu_array dispatchars_gsu =
+{ dispatcharsgetfn, arrsetfn, stdunsetfn };
 static const struct gsu_array dirs_gsu =
 { dirsgetfn, dirssetfn, stdunsetfn };
 static const struct gsu_array historywords_gsu =
@@ -2038,6 +2074,8 @@ static struct paramdef partab[] = {
 	    &pmdisfunctions_gsu, getpmdisfunction, scanpmdisfunctions),
     SPECIALPMDEF("dis_galiases", 0,
 	    &pmdisgaliases_gsu, getpmdisgalias, scanpmdisgaliases),
+    SPECIALPMDEF("dis_patchars", PM_ARRAY|PM_READONLY,
+	    &dispatchars_gsu, NULL, NULL),
     SPECIALPMDEF("dis_reswords", PM_ARRAY|PM_READONLY,
 	    &disreswords_gsu, NULL, NULL),
     SPECIALPMDEF("dis_saliases", 0,
@@ -2072,6 +2110,8 @@ static struct paramdef partab[] = {
 	    &pmoptions_gsu, getpmoption, scanpmoptions),
     SPECIALPMDEF("parameters", PM_READONLY,
 	    NULL, getpmparameter, scanpmparameters),
+    SPECIALPMDEF("patchars", PM_ARRAY|PM_READONLY,
+	    &patchars_gsu, NULL, NULL),
     SPECIALPMDEF("reswords", PM_ARRAY|PM_READONLY,
 	    &reswords_gsu, NULL, NULL),
     SPECIALPMDEF("saliases", 0,
