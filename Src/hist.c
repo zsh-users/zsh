@@ -521,6 +521,12 @@ histsubchar(int c)
 		}
 		c = ingetc();
 	    }
+	    if (ptr == buf &&
+		(c == '}' ||  c == ';' || c == '\'' || c == '"' || c == '`')) {
+	      /* Neither event nor word designator, no expansion */
+	      safeinungetc(c);
+	      return bangchar;
+	    }
 	    *ptr = 0;
 	    if (!*buf) {
 		if (c != '%') {
