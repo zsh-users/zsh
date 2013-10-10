@@ -1845,8 +1845,21 @@ quote_tokenized_output(char *str, FILE *file)
 	case '*':
 	case '?':
 	case '$':
+	case ' ':
 	    putc('\\', file);
 	    break;
+
+	case '\t':
+	    fputs("$'\\t'", file);
+	    continue;
+
+	case '\n':
+	    fputs("$'\\n'", file);
+	    continue;
+
+	case '\r':
+	    fputs("$'\\r'", file);
+	    continue;
 
 	case '=':
 	    if (s == str)

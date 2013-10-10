@@ -1,3 +1,8 @@
+2013-10-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31809: Src/exec.c: make whitespace clear in trace output for
+	patterns.
+
 2013-10-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Eric Cook: 31801: Completion/Linux/Command/_btrfs: some
