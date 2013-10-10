@@ -1,5 +1,8 @@
 2013-10-10  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 31810: Test/E02xtrace.ztst: tests for simple cases of XTRACE
+	output for conditions.
+
 	* 31809: Src/exec.c: make whitespace clear in trace output for
 	patterns.
 

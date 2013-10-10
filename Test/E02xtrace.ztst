@@ -118,3 +118,12 @@
 ?+./fnfile:5> :
 ?+./fnfile:6> fn
 ?+./fnfile:3> print This is fn.
+
+ set -x
+ [[ 'f o' = 'f x'* || 'b r' != 'z o' && 'squashy sound' < 'squishy sound' ]]
+ [[ -e nonexistentfile || ( -z '' && -t 3 ) ]]
+ set +x
+0:Trace for conditions
+?+(eval):2> [[ 'f o' == f\ x* || 'b r' != z\ o && 'squashy sound' < 'squishy sound' ]]
+?+(eval):3> [[ -e nonexistentfile || -z '' && -t 3 ]]
+?+(eval):4> set +x
