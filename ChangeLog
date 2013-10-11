@@ -1,3 +1,8 @@
+2013-10-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31815: Src/hist.c: more fallout from 31789: we need to save
+	using pushed history file before we pop.
+
 2013-10-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 31810: Test/E02xtrace.ztst: tests for simple cases of XTRACE
