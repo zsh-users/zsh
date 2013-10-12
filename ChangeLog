@@ -1,3 +1,10 @@
+2013-10-12  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31818: Completion/Unix/Command/_sh, Doc/Zsh/compsys.yo: to avoid
+	side effects, reposition the _arguments call in _sh for the zsh
+	special case.  Document the side effects so avoided, and clean up
+	the _arguments documentation a bit along the way.
+
 2013-10-11  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 31805: Doc/Zsh/mod_parameter.yo, Src/Modules/parameter.c,
