@@ -937,12 +937,21 @@ hbegin(int dohist)
     /*
      * For INCAPPENDHISTORY, when interactive, save the history here
      * as it gives a better estimate of the times of commands.
+     *
      * If SHAREHISTORY is also set continue to do so in the
      * standard place, because that's safer about reading and
      * rewriting history atomically.
+     *
+     * The histsave_stack_pos test won't usually fail here.
+     * We need to test the opposite for the hend() case because we
+     * need to save in the history file we've switched to, but then
+     * we pop immediately after that so the variable becomes zero.
+     * We will already have saved the line and restored the history
+     * so that (correctly) nothing happens here.  But it shows
+     * I thought about it.
      */
     if (isset(INCAPPENDHISTORY) && !isset(SHAREHISTORY) &&
-	!(histactive & HA_NOINC) && !strin)
+	!(histactive & HA_NOINC) && !strin && histsave_stack_pos == 0)
 	savehistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
 }
 
@@ -1348,7 +1357,11 @@ hend(Eprog prog)
     chline = hptr = NULL;
     chwords = NULL;
     histactive = 0;
-    if (isset(SHAREHISTORY) && histfileIsLocked())
+    /*
+     * For normal INCAPPENDHISTORY case and reasoning, see hbegin().
+     */
+    if (isset(SHAREHISTORY) ? histfileIsLocked() :
+	(isset(INCAPPENDHISTORY) && histsave_stack_pos != 0))
 	savehistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
     unlockhistfile(hf); /* It's OK to call this even if we aren't locked */
     /*

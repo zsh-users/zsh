@@ -183,6 +183,7 @@
 >p:dis_builtins
 >p:dis_functions
 >p:dis_galiases
+>p:dis_patchars
 >p:dis_reswords
 >p:dis_saliases
 >p:funcfiletrace
@@ -200,6 +201,7 @@
 >p:nameddirs
 >p:options
 >p:parameters
+>p:patchars
 >p:reswords
 >p:saliases
 >p:userdirs

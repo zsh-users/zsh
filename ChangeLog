@@ -1,3 +1,29 @@
+2013-10-12  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31818: Completion/Unix/Command/_sh, Doc/Zsh/compsys.yo: to avoid
+	side effects, reposition the _arguments call in _sh for the zsh
+	special case.  Document the side effects so avoided, and clean up
+	the _arguments documentation a bit along the way.
+
+2013-10-11  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 31805: Doc/Zsh/mod_parameter.yo, Src/Modules/parameter.c,
+	Src/Modules/parameter.mdd, Src/pattern.c, Test/V01zmodload.ztst:
+	Add $patchars and $dis_patchars to zsh/parameter module
+
+	* 31805: Completion/Zsh/Command/_disable,
+	Completion/Zsh/Command/_enable, Doc/Zsh/builtins.yo: Update
+	_enable and _disable for -p, fix related typo in docs
+
+	* 31806: Completion/Zsh/Command/_disable,
+	Completion/Zsh/Command/_enable, Workaround special characters
+	in alias and function names breaking _arguments syntax
+
+2013-10-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31815: Src/hist.c: more fallout from 31789: we need to save
+	using pushed history file before we pop.
+
 2013-10-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 31810: Test/E02xtrace.ztst: tests for simple cases of XTRACE
@@ -13,12 +39,13 @@
 
 2013-10-08  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* 31797: partly fix long-standing history expansion bug in which
-	in some circumstances a default history expansion would occur even
-	when there is neither an event nor a word designator, which is
-	contradictory to the documentation.  There are still some cases in
-	which expansion is attempted when it should not be, but in most of
-	those cases the expansion simply fails.
+	* 31797: Src/hist.c: partly fix long-standing history expansion
+	bug in which in some circumstances a default history expansion
+	would occur even when there is neither an event nor a word
+	designator, which is contradictory to the documentation.
+	There are still some cases in which expansion is attempted
+	when it should not be, but in most of those cases the expansion
+	simply fails.
 
 2013-10-07  Peter Stephenson  <p.stephenson@samsung.com>
 

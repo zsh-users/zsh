@@ -3470,14 +3470,26 @@ Like tt(_tags) this function supports the tt(-C) option to give a
 different name for the argument context field.
 )
 findex(_arguments)
-item(tt(_arguments) [ tt(-nswWACRS) ] [ tt(-O) var(name) ] [ tt(-M) var(matchspec) ] [ tt(:) ] var(spec) ...)(
-This function can be used to give a complete specification for
-completion for a command whose arguments follow standard UNIX option and
-argument conventions.  The following forms specify individual sets of
-options and arguments; to avoid ambiguity, these may be separated from the
-options to tt(_arguments) itself by a single colon.  Options to
-tt(_arguments) itself must be in separate words, i.e. tt(-s -w), not
-tt(-sw).
+xitem(tt(_arguments) [ tt(-nswWCRS) ] [ tt(-A) var(pat) ] [ tt(-O) var(name) ] [ tt(-M) var(matchspec) ] [ tt(:) ] var(spec)...)
+item(tt(_arguments) [ var(opts)... ] tt(-)tt(-) [ -i var(pats) ] [ tt(-s) var(pair) ] [ var(helpspec)... ])(
+This function can be used to give a complete specification for completion
+for a command whose arguments follow standard UNIX option and argument
+conventions.  Options to tt(_arguments) itself must be in separate words,
+i.e. tt(-s -w), not tt(-sw).
+
+When calling tt(_arguments), all var(spec)s that describe options of the
+analyzed command line must precede all var(spec)s that describe non-option
+(aka "normal") arguments of the analyzed line.  To avoid ambiguity, all
+options to tt(_arguments) itself may be separated from the var(spec) forms
+by a single colon.
+
+The tt(-s -w -W -A) and tt(-S) options describe how parsing of the command
+line should proceed, and are discussed in context below.  The `tt(-)tt(-)'
+form is used to intuit var(spec) forms from the help output of the command
+being analyzed, and is described in detail below.  The var(opts) for the
+`tt(-)tt(-)' form are otherwise the same options as the first form.  Note
+that `tt(-s)' following `tt(-)tt(-)' has a distinct meaning from `tt(-s)'
+preceding `tt(-)tt(-)', and both may appear.
 
 With the option tt(-n), tt(_arguments) sets the parameter tt(NORMARG)
 to the position of the first normal argument in the tt($words) array,
@@ -3485,6 +3497,17 @@ i.e. the position after the end of the options.  If that argument
 has not been reached, tt(NORMARG) is set to tt(-1).  The caller
 should declare `tt(integer NORMARG)' if the tt(-n) option is passed;
 otherwise the parameter is not used.
+
+The option `tt(-M) var(matchspec)' sets a match specification to use to
+completion option names and values.  The default var(matchspec) is:
+
+example(tt(r:|[_-]=* r:|=*))
+
+This allows partial word completion after `tt(_)' and `tt(-)', for example
+`-f-b' can be completed to `tt(-foo-bar)'.
+
+Each of the following forms is a var(spec) describing individual sets of
+options or arguments on the command line being analyzed.
 
 startitem()
 xitem(var(n)tt(:)var(message)tt(:)var(action))
@@ -3530,10 +3553,10 @@ suitable for standard GNU options.
 
 The combination of tt(-s) with tt(-w) allows single-letter options to be
 combined in a single word even if one or more of the options take
-arguments.  For example, if tt(-a) takes an argument, with no
-tt(-s) `tt(-ab)' is considered as a single (unhandled) option; with
-tt(-s) tt(-ab) is an option with the argument `tt(b)'; with both tt(-s)
-and tt(-w), tt(-ab) may be the option tt(-a) and the option tt(-b) with
+arguments.  For example, if tt(-x) takes an argument, with no
+tt(-s) `tt(-xy)' is considered as a single (unhandled) option; with
+tt(-s) tt(-xy) is an option with the argument `tt(y)'; with both tt(-s)
+and tt(-w), tt(-xy) may be the option tt(-x) and the option tt(-y) with
 arguments still to come.
 
 The option tt(-W) takes this a stage further:  it is possible to
@@ -3602,6 +3625,23 @@ enditem()
 
 It is possible for options with a literal `PLUS()' or `tt(=)' to
 appear, but that character must be quoted, for example `tt(-\+)'.
+
+The options tt(-S) and tt(-A) are available to simplify the specifications
+for commands with standard option parsing.  With tt(-S), no option will be
+completed after a `tt(-)tt(-)' appearing on its own on the line; this
+argument will otherwise be ignored; hence in the line
+
+example(foobar -x -- -y)
+
+the `tt(-x)' is considered an option but the `tt(-y)' is considered an
+argument, while the `tt(-)tt(-)' is considered to be neither.
+
+With tt(-A), no options will be completed after the first non-option
+argument on the line.  The tt(-A) must be followed by a pattern matching
+all strings which are not to be taken as arguments.  For example, to make
+tt(_arguments) stop completing options after the first normal argument, but
+ignoring all strings starting with a hyphen even if they are not described
+by one of the var(optspec)s, the form is `tt(-A "-*")'.
 
 Each var(optarg) following an var(optspec) must take one of the
 following forms:
@@ -3675,6 +3715,11 @@ completions should be generated.  Except for the `tt(->)var(string)'
 form below, the var(action) will be executed by calling the
 tt(_all_labels) function to process all tag labels.  No special handling
 of tags is needed unless a function call introduces a new one.
+
+The option `tt(-O) var(name)' specifies the name of an array whose elements
+will be passed as arguments to functions called to execute var(action)s.
+For example, this can be used to pass the same set of options for the
+tt(compadd) builtin to all var(action)s.
 
 The forms for var(action) are as follows.
 
@@ -3804,6 +3849,18 @@ Furthermore, during the evaluation of the var(action) the context name in
 the tt(curcontext) parameter is altered to append the same string that is
 stored in the tt(context) parameter.
 
+The option tt(-C) tells tt(_arguments) to modify the tt(curcontext)
+parameter for an action of the form `tt(->)var(state)'.  This is the
+standard parameter used to keep track of the current context.  Here it
+(and not the tt(context) array) should be made local to the calling
+function to avoid passing back the modified value and should be
+initialised to the current value at the start of the function:
+
+example(local curcontext="$curcontext")
+
+This is useful where it is not possible for multiple states to be valid
+together.
+
 It is possible to specify multiple sets of options and
 arguments with the sets separated by single hyphens.  The specifications
 before the first hyphen (if any) are shared by all the remaining sets.
@@ -3850,47 +3907,6 @@ A useful alternative is often an option specification with rest-arguments
 (as in `tt(-foo:*:...)'); here the option tt(-foo) swallows up all
 remaining arguments as described by the var(optarg) definitions.
 
-The options tt(-S) and tt(-A) are available to simplify the specifications
-for commands with standard option parsing.  With tt(-S), no option will be
-completed after a `tt(-)tt(-)' appearing on its own on the line; this
-argument will otherwise be ignored; hence in the line
-
-example(foobar -a -- -b)
-
-the `tt(-a)' is considered an option but the `tt(-b)' is considered an
-argument, while the `tt(-)tt(-)' is considered to be neither.
-
-With tt(-A), no options will be completed after the first non-option
-argument on the line.  The tt(-A) must be followed by a pattern matching
-all strings which are not to be taken as arguments.  For example, to make
-tt(_arguments) stop completing options after the first normal argument, but
-ignoring all strings starting with a hyphen even if they are not described
-by one of the var(optspec)s, the form is `tt(-A "-*")'.
-
-The option `tt(-O) var(name)' specifies the name of an array whose elements
-will be passed as arguments to functions called to execute var(actions).
-For example, this can be used to pass the same set of options for the
-tt(compadd) builtin to all var(action)s.
-
-The option `tt(-M) var(spec)' sets a match specification to use to
-completion option names and values.  It must appear before the first
-argument specification.  The default is `tt(r:|[_-]=* r:|=*)': this allows
-partial word completion after `tt(_)' and `tt(-)', for example `-f-b'
-can be completed to `tt(-foo-bar)'.
-
-The option tt(-C) tells tt(_arguments) to modify
-the tt(curcontext) parameter for an action of the form
-`tt(->)var(state)'.  This is the standard parameter used to keep track of
-the current context.  Here it (and not the tt(context) array) should be
-made local to the calling function
-to avoid passing back the modified value and should be initialised to the
-current value at the start of the function:
-
-example(local curcontext="$curcontext")
-
-This is useful where it is not possible for multiple states to be valid
-together.
-
 The option `tt(-)tt(-)' allows tt(_arguments) to work out the names of long
 options that support the `tt(-)tt(-help)' option which is standard in many
 GNU commands.  The command word is called with the argument
@@ -3901,11 +3917,16 @@ the behaviour of the command is unspecified.
 In addition to options, `tt(_arguments -)tt(-)' will try to deduce the
 types of arguments available for options when the form
 `tt(-)tt(-)var(opt)=var(val)' is valid.  It is also possible to provide
-hints by examining the help text of the command and adding specifiers of
-the form `var(pattern)tt(:)var(message)tt(:)var(action)'; note that normal
-tt(_arguments) specifiers are not used.  The var(pattern) is matched
+hints by examining the help text of the command and adding var(helpspec) of
+the form `var(pattern)tt(:)var(message)tt(:)var(action)'; note that other
+tt(_arguments) var(spec) forms are not used.  The var(pattern) is matched
 against the help text for an option, and if it matches the var(message) and
-var(action) are used as for other argument specifiers.  For example:
+var(action) are used as for other argument specifiers.  The special case
+of `tt(*:)' means both var(message) and var(action) are empty, which has
+the effect of causing options having no description in the help output to
+be ordered in listings ahead of options that have a description.
+
+For example:
 
 example(_arguments -- '*\*:toggle:(yes no)' \ 
               '*=FILE*:file:_files' \ 
@@ -3947,12 +3968,23 @@ will cause completion to ignore the options
 useful with GNU tt(configure)).
 
 The `tt(_arguments -)tt(-)' form can also be followed by the option `tt(-s)
-var(pair)' to describe option aliases.  Each var(pair) consists of a
-pattern and a replacement.  For example, some tt(configure)-scripts
-describe options only as `tt(-)tt(-enable-foo)', but also accept
+var(pair)' to describe option aliases.  The var(pair) consists of a list
+of alternating patterns and corresponding replacements, enclosed in parens
+and quoted so that it forms a single argument word in the tt(_arguments)
+call.
+
+For example, some tt(configure)-script help output describes options only
+as `tt(-)tt(-enable-foo)', but the script also accepts the negated form
 `tt(-)tt(-disable-foo)'.  To allow completion of the second form:
 
-example(_arguments -- -s "LPAR()#-tt(-enable- -)tt(-disable-RPAR()"))
+example(tt(_arguments -- -s "LPAR()#-)tt(-enable- -)tt(-disable-RPAR()"))
+
+Finally, note that tt(_arguments) generally expects to be the primary
+function handling any completion for which it is used.  It may have side
+effects which change the treatment of any matches added by other functions
+called after it.  To combine tt(_arguments) with other functions, those
+functions should be called either before tt(_arguments), as an var(action)
+within a var(spec), or in handlers for `tt(->)var(state)' actions.
 
 Here is a more general example of the use of tt(_arguments):
 
@@ -4251,11 +4283,14 @@ which already contains an expanded description.
 The tt(-12VJ) options and the var(group) are passed to tt(compadd) and
 hence determine the group the message string is added to.
 
-The second form gives a description for completions with the tag
-var(tag) to be shown even if there are no matches for that tag.  The tag
-can be omitted and if so the tag is taken from the parameter
-tt($curtag); this is maintained by the completion system and so is
-usually correct.
+The second tt(-e) form gives a description for completions with the tag
+var(tag) to be shown even if there are no matches for that tag.  This form
+is called by tt(_arguments) in the event that there is no action for an
+option specification.  The tag can be omitted and if so the tag is taken
+from the parameter tt($curtag); this is maintained by the completion
+system and so is usually correct.  Note that if there are no matches at
+the time this function is called, tt(compstate[insert]) is cleared, so
+additional matches generated later are not inserted on the command line.
 )
 findex(_multi_parts)
 item(tt(_multi_parts) var(sep) var(array))(

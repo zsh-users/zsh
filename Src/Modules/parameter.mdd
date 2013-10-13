@@ -2,6 +2,6 @@ name=zsh/parameter
 link=either
 load=yes
 
-autofeatures="p:parameters p:commands p:functions p:dis_functions p:funcfiletrace p:funcsourcetrace p:funcstack p:functrace p:builtins p:dis_builtins p:reswords p:dis_reswords p:options p:modules p:dirstack p:history p:historywords p:jobtexts p:jobdirs p:jobstates p:nameddirs p:userdirs p:aliases p:dis_aliases p:galiases p:dis_galiases p:saliases p:dis_saliases"
+autofeatures="p:parameters p:commands p:functions p:dis_functions p:funcfiletrace p:funcsourcetrace p:funcstack p:functrace p:builtins p:dis_builtins p:reswords p:dis_reswords p:patchars p:dis_patchars p:options p:modules p:dirstack p:history p:historywords p:jobtexts p:jobdirs p:jobstates p:nameddirs p:userdirs p:aliases p:dis_aliases p:galiases p:dis_galiases p:saliases p:dis_saliases"
 
 objects="parameter.o"

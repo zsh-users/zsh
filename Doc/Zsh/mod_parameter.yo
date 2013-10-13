@@ -57,6 +57,14 @@ vindex(dis_reswords)
 item(tt(dis_reswords))(
 Like tt(reswords) but for disabled reserved words.
 )
+vindex(patchars)
+item(tt(patchars))(
+This array contains the enabled pattern characters.
+)
+vindex(dis_patchars)
+item(tt(dis_patchars))(
+Like tt(patchars) but for disabled pattern characters.
+)
 vindex(aliases)
 item(tt(aliases))(
 This maps the names of the regular aliases currently enabled to their
