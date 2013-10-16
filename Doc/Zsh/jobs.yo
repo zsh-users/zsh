@@ -115,3 +115,18 @@ The shell itself always ignores the tt(QUIT) signal.
 Otherwise, signals have the values
 inherited by the shell from its parent
 (but see the tt(TRAP)var(NAL) special functions in noderef(Functions)).
+
+cindex(exiting shell, and asynchronous jobs)
+cindex(asynchronous jobs, and exiting shell)
+cindex(jobs, asynchronous, and exiting shell)
+Certain jobs are run asynchronously by the shell other than those
+explicitly put into the background; even in cases where the shell
+would usually wait for such jobs, an explicit tt(exit) command
+or exit due to the option tt(ERR_EXIT) will cause the shell to
+exit without waiting.  Examples of such asynchronous jobs are
+process substitution, see
+ifzman(the section PROCESS SUBSTITUTION in the zmanref(zshexpn) manual page)\
+ifnzman(noderef(Process Substitution)), and the handler processes for
+multios, see
+ifzman(the section MULTIOS in the zmanref(zshmisc) manual page)\
+ifnzman(the section Multios in noderef(Redirection)).

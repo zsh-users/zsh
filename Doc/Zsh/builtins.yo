@@ -595,6 +595,11 @@ is specified, use the exit status from the last command executed.
 pindex(IGNORE_EOF, use of)
 An EOF condition will also cause the shell to exit, unless
 the tt(IGNORE_EOF) option is set.
+
+See notes at the end of
+ifzman(the section JOBS in in zmanref(zshmisc))\
+ifnzman(noderef(Jobs & Signals)) for some possibly unexpected interactions
+of the tt(exit) command with jobs.
 )
 findex(export)
 item(tt(export) [ var(name)[tt(=)var(value)] ... ])(
