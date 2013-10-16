@@ -274,10 +274,13 @@ that in the global tt(HISTFILE) parameter.  This is handled specially:
 the history context is automatically restored after the processing
 of the history line is finished.
 
-The following example function first adds the history line to the normal
-history with the newline stripped,  which is usually the correct behaviour.
-Then it switches the history context so that the line will
-be written to a history file in the current directory.
+The following example function works with one of the options
+tt(INC_APPEND_HISTORY) or tt(SHARE_HISTORY) set, in order that the line
+is written out immediately after the history entry is added.  It first
+adds the history line to the normal history with the newline stripped,
+which is usually the correct behaviour.  Then it switches the history
+context so that the line will be written to a history file in the
+current directory.
 
 example(zshaddhistory+LPAR()RPAR() {
   print -sr -- ${1%%$'\n'}
