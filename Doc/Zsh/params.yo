@@ -967,6 +967,16 @@ item(tt(HISTFILE))(
 The file to save the history in when an interactive shell exits.
 If unset, the history is not saved.
 )
+vindex(HISTORY_IGNORE)
+item(tt(HISTORY_IGNORE))(
+If set, is treated as a pattern at the time history files are written.
+Any potential history entry that matches the pattern is skipped.  For
+example, if the value is `tt(fc *)' then commands that invoke the
+interactive history editor are never written to the history file (compare
+the tt(HIST_NO_STORE) option or the tt(zshaddhistory) hook, either of
+which would prevent such commands from being added to the interactive
+history at all).
+)
 vindex(HISTSIZE)
 item(tt(HISTSIZE) <S>)(
 The maximum number of events stored in the internal history list.

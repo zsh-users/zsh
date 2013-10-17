@@ -1,3 +1,9 @@
+2013-10-17  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31836 (cf. 31823): Doc/Zsh/params.yo, Src/hist.c: add
+	HISTORY_IGNORE pattern to exclude matching lines in the
+	internal history from the HISTFILE at write time.
+
 2013-10-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 31830: Doc/Zsh/func.yo, README, Src/hist.c, Src/zsh.h:

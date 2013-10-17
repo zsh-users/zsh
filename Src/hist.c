@@ -2600,12 +2600,27 @@ savehistfile(char *fn, int err, int writeflags)
 	}
     }
     if (out) {
+	char *history_ignore;
+	Patprog histpat = NULL;
+
+	pushheap();
+
+	if ((history_ignore = getsparam("HISTORY_IGNORE")) != NULL) {
+	    tokenize(history_ignore = dupstring(history_ignore));
+	    remnulargs(history_ignore);
+	    histpat = patcompile(history_ignore, 0, NULL);
+	}
+
 	ret = 0;
 	for (; he && he->histnum <= xcurhist; he = down_histent(he)) {
 	    if ((writeflags & HFILE_SKIPDUPS && he->node.flags & HIST_DUP)
 	     || (writeflags & HFILE_SKIPFOREIGN && he->node.flags & HIST_FOREIGN)
 	     || he->node.flags & HIST_TMPSTORE)
 		continue;
+	    if (histpat &&
+		pattry(histpat, metafy(he->node.nam, -1, META_HEAPDUP))) {
+		continue;
+	    }
 	    if (writeflags & HFILE_SKIPOLD) {
 		if (he->node.flags & (HIST_OLD|HIST_NOWRITE))
 		    continue;
@@ -2685,6 +2700,8 @@ savehistfile(char *fn, int err, int writeflags)
 		histactive = remember_histactive;
 	    }
 	}
+
+	popheap();
     } else
 	ret = -1;
 
