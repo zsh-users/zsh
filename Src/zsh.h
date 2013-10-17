@@ -1894,6 +1894,7 @@ struct histent {
 #define HIST_DUP	0x00000008	/* Command duplicates a later line */
 #define HIST_FOREIGN	0x00000010	/* Command came from another shell */
 #define HIST_TMPSTORE	0x00000020	/* Kill when user enters another cmd */
+#define HIST_NOWRITE	0x00000040	/* Keep internally but don't write */
 
 #define GETHIST_UPWARD  (-1)
 #define GETHIST_DOWNWARD  1

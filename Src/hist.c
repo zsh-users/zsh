@@ -1226,7 +1226,15 @@ mod_export int
 hend(Eprog prog)
 {
     LinkList hookargs = newlinklist();
-    int flag, save = 1, hookret, stack_pos = histsave_stack_pos;
+    int flag, hookret, stack_pos = histsave_stack_pos;
+    /*
+     * save:
+     * 0: don't save
+     * 1: save normally
+     * -1: save temporarily, delete after next line
+     * -2: save internally but mark for not writing
+     */
+    int save = 1;
     char *hf;
 
     DPUTS(stophist != 2 && !(inbufflags & INP_ALIAS) && !chline,
@@ -1279,7 +1287,11 @@ hend(Eprog prog)
 	}
 	if (chwordpos <= 2)
 	    save = 0;
-	else if (hookret || should_ignore_line(prog))
+	else if (should_ignore_line(prog))
+	    save = -1;
+	else if (hookret == 2)
+	    save = -2;
+	else if (hookret)
 	    save = -1;
     }
     if (flag & (HISTFLAG_DONE | HISTFLAG_RECALL)) {
@@ -1325,7 +1337,12 @@ hend(Eprog prog)
 	    if (isset(HISTREDUCEBLANKS))
 		histreduceblanks();
 	}
-	newflags = save > 0? 0 : HIST_TMPSTORE;
+	if (save == -1)
+	    newflags = HIST_TMPSTORE;
+	else if (save == -2)
+	    newflags = HIST_NOWRITE;
+	else
+	    newflags = 0;
 	if ((isset(HISTIGNOREDUPS) || isset(HISTIGNOREALLDUPS)) && save > 0
 	 && hist_ring && histstrcmp(chline, hist_ring->node.nam) == 0) {
 	    /* This history entry compares the same as the previous.
@@ -2590,7 +2607,7 @@ savehistfile(char *fn, int err, int writeflags)
 	     || he->node.flags & HIST_TMPSTORE)
 		continue;
 	    if (writeflags & HFILE_SKIPOLD) {
-		if (he->node.flags & HIST_OLD)
+		if (he->node.flags & (HIST_OLD|HIST_NOWRITE))
 		    continue;
 		he->node.flags |= HIST_OLD;
 		if (writeflags & HFILE_USE_OPTIONS)

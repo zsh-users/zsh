@@ -1,3 +1,9 @@
+2013-10-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31830: Doc/Zsh/func.yo, README, Src/hist.c, Src/zsh.h:
+	If a zshaddhistory hook returns status 2, save the line on
+	the internal history but don't write it out.
+
 2013-10-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Users/18033: Doc/Zsh/builtins.yo, Doc/Zsh/jobs.yo,

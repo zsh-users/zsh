@@ -264,9 +264,16 @@ Executed when a history line has been read interactively, but
 before it is executed.  The sole argument is the complete history
 line (so that any terminating newline will still be present).
 
-If any of the hook functions return a non-zero value the history
-line will not be saved, although it lingers in the history until the
-next line is executed, allowing you to reuse or edit it immediately.
+If any of the hook functions returns status 1 (or any non-zero value
+other than 2, though this is not guaranteed for future versions of the
+shell) the history line will not be saved, although it lingers in the
+history until the next line is executed, allowing you to reuse or edit
+it immediately.
+
+If any of the hook functions returns status 2 the history line
+will be saved on the internal history list, but not written to
+the history file.  In case of a conflict, the first non-zero status
+value is taken.
 
 A hook function may call `tt(fc -p) var(...)' to switch the history
 context so that the history is saved in a different file from the

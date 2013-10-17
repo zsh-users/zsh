@@ -28,6 +28,17 @@ Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
 
+Incompatibilities between 5.0.2 and 5.0.3
+-----------------------------------------
+
+The "zshaddhistory" hook mechanism documented in the zshmisc manual page
+has been upgraded so that a hook returning status 2 causes a history
+line to be saved on the internal history list but not written to the
+history file.  Previously any non-zero status return would cause
+the line not to be saved on the history at all.  It is recommended
+to use status 1 for this (indeed most shell users would naturally do
+so).
+
 Incompatibilities between 5.0.0 and 5.0.2
 -----------------------------------------
 
