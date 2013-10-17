@@ -5078,29 +5078,33 @@ execsave(void)
 void
 execrestore(void)
 {
-    struct execstack *en;
+    struct execstack *en = exstack;
 
     DPUTS(!exstack, "BUG: execrestore() without execsave()");
-    list_pipe_pid = exstack->list_pipe_pid;
-    nowait = exstack->nowait;
-    pline_level = exstack->pline_level;
-    list_pipe_child = exstack->list_pipe_child;
-    list_pipe_job = exstack->list_pipe_job;
-    strcpy(list_pipe_text, exstack->list_pipe_text);
-    lastval = exstack->lastval;
-    noeval = exstack->noeval;
-    badcshglob = exstack->badcshglob;
-    cmdoutpid = exstack->cmdoutpid;
-    cmdoutval = exstack->cmdoutval;
-    use_cmdoutval = exstack->use_cmdoutval;
-    trap_return = exstack->trap_return;
-    trap_state = exstack->trap_state;
-    trapisfunc = exstack->trapisfunc;
-    traplocallevel = exstack->traplocallevel;
-    noerrs = exstack->noerrs;
-    setunderscore(exstack->underscore);
-    zsfree(exstack->underscore);
-    en = exstack->next;
-    free(exstack);
-    exstack = en;
+
+    queue_signals();
+    exstack = exstack->next;
+
+    list_pipe_pid = en->list_pipe_pid;
+    nowait = en->nowait;
+    pline_level = en->pline_level;
+    list_pipe_child = en->list_pipe_child;
+    list_pipe_job = en->list_pipe_job;
+    strcpy(list_pipe_text, en->list_pipe_text);
+    lastval = en->lastval;
+    noeval = en->noeval;
+    badcshglob = en->badcshglob;
+    cmdoutpid = en->cmdoutpid;
+    cmdoutval = en->cmdoutval;
+    use_cmdoutval = en->use_cmdoutval;
+    trap_return = en->trap_return;
+    trap_state = en->trap_state;
+    trapisfunc = en->trapisfunc;
+    traplocallevel = en->traplocallevel;
+    noerrs = en->noerrs;
+    setunderscore(en->underscore);
+    zsfree(en->underscore);
+    free(en);
+
+    unqueue_signals();
 }
