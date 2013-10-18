@@ -1087,6 +1087,9 @@ execsimple(Estate state)
     if (errflag)
 	return (lastval = 1);
 
+    if (!isset(EXECOPT))
+	return lastval = 0;
+
     /* In evaluated traps, don't modify the line number. */
     if (!IN_EVAL_TRAP() && !ineval && code)
 	lineno = code - 1;
