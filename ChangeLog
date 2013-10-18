@@ -1,3 +1,7 @@
+2013-10-18  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31840: Completion/Unix/Command/_make: "read" used wrong $IFS
+
 2013-10-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 31836 (cf. 31823): Doc/Zsh/params.yo, Src/hist.c: add

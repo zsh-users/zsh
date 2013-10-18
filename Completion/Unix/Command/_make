@@ -59,7 +59,7 @@ _make-expandVars() {
 }
 
 _make-parseMakefile () {
-  local input var val target dep TAB=$'\t' dir=$1 tmp
+  local input var val target dep TAB=$'\t' dir=$1 tmp IFS=
 
   while read input
   do
