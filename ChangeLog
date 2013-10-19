@@ -3,6 +3,11 @@
 	* 31851: Src/exec.c: execstring() should display string to
 	be executed with VERBOSE option.
 
+2013-10-19  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31849: Doc/Zsh/params.yo: note effect of KSH_ZERO_SUBSCRIPT
+	on the arrays of positional parameters e.g. ${argv[0]} vs. $0
+
 2013-10-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31846: Src/exec.c: fix NOEXEC option in execsimple().

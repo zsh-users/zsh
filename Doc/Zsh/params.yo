@@ -431,9 +431,15 @@ of a shell function, shell script, or the shell itself; see
 noderef(Invocation), and also noderef(Functions).
 The parameter var(n), where var(n) is a number,
 is the var(n)th positional parameter.
+The parameter `tt($0)' is a special case, see
+noderef(Parameters Set By The Shell).
+
 The parameters tt(*), tt(@) and tt(argv) are
 arrays containing all the positional parameters;
 thus `tt($argv[)var(n)tt(])', etc., is equivalent to simply `tt($)var(n)'.
+Note that the options tt(KSH_ARRAYS) or tt(KSH_ZERO_SUBSCRIPT) apply
+to these arrays as well, so with either of those options set,
+`tt(${argv[0]})' is equivalent to `tt($1)' and so on.
 
 Positional parameters may be changed after the shell or function starts by
 using the tt(set) builtin, by assigning to the tt(argv) array, or by direct
