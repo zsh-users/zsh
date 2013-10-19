@@ -1027,6 +1027,11 @@ execstring(char *s, int dont_change_job, int exiting, char *context)
     Eprog prog;
 
     pushheap();
+    if (isset(VERBOSE)) {
+	zputs(s, stderr);
+	fputc('\n', stderr);
+	fflush(stderr);
+    }
     if ((prog = parse_string(s, 0)))
 	execode(prog, dont_change_job, exiting, context);
     popheap();

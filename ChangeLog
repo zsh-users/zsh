@@ -1,3 +1,8 @@
+2013-10-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31851: Src/exec.c: execstring() should display string to
+	be executed with VERBOSE option.
+
 2013-10-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31846: Src/exec.c: fix NOEXEC option in execsimple().
