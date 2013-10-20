@@ -6,6 +6,9 @@
 	* 31854: Completion/Unix/Command/_git: _git: Make git-show accept
 	diff arguments
 
+	* 31859: Completion/Unix/Command/_git: _git: re-order the last two
+	git-blame arguments
+
 2013-10-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31851: Src/exec.c: execstring() should display string to

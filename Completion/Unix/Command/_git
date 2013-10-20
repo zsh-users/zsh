@@ -3148,8 +3148,8 @@ _git-blame () {
     '-s[suppress author name and timestamp]' \
     '-w[ignore whitespace when finding lines]' \
     $revision_options \
-    ': :__git_cached_files' \
-    ':: :__git_revisions' && ret=0
+    ':: :__git_revisions' \
+    ': :__git_cached_files' && ret=0
 
   case $state in
     (line-range)
