@@ -3,6 +3,9 @@
 	* 31861: Completion/Unix/Command/_git: _git: Add git-clean
 	-i/--interactive support
 
+	* 31863: Completion/Unix/Command/_git: _git: Add new arguments
+	introduced in Git v1.8.4
+
 2013-10-21  m0viefreak  <m0viefreak.cm@googlemail.com>
 
 	* 31856: Completion/Unix/Command/_git: _git: fix a few

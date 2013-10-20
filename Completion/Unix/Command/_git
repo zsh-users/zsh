@@ -684,6 +684,7 @@ _git-describe () {
     '(--abbrev)--long[always show full format, even for exact matches]' \
     '--match=[only consider tags matching glob pattern]:pattern' \
     '--always[show uniquely abbreviated commit object as fallback]' \
+    '--first-parent[follow only the first parent of merge commits]' \
     '*: :__git_committishs'
 }
 
@@ -835,6 +836,7 @@ _git-format-patch () {
     '(-k --keep-subject)--subject-prefix=[use the given prefix instead of \[PATCH\]]:prefix' \
     '*--to=[add To: header to email headers]: :_email_addresses' \
     '*--cc=[add Cc: header to email headers]: :_email_addresses' \
+    '--from=[add From: header to email headers]: :_email_addresses' \
     '*--add-header=[add an arbitrary header to email headers]:header' \
     '--cover-letter[generate a cover letter template]' \
     '--notes=[append notes for the commit after the three-dash line]:: :__git_notes_refs' \
@@ -1050,6 +1052,7 @@ _git-log () {
     $log_options \
     $revision_options \
     $diff_options \
+    '-L+[trace the evolution of a line range or regex within a file]:range' \
     '(-)--[start file arguments]' \
     '*:: :->commit-range-or-file' && ret=0
 
@@ -1241,6 +1244,7 @@ _git-push () {
     '(-q --quiet -v --verbose --progress)'{-q,--quiet}'[suppress all output]' \
     '(-q --quiet -v --verbose)'{-v,--verbose}'[output additional information]' \
     '(-q --quiet)--progress[output progress information]' \
+    '(--verify)--no-verify[bybass the pre-push hook]' \
     '--recurse-submodules=[submodule handling]:submodule handling:((check\:"refuse pushing of supermodule if submodule commit cannot be found on the remote"
                                                                     on-demand\:"push all changed submodules"))' \
     ':: :__git_any_repositories' \
@@ -5884,13 +5888,14 @@ __git_setup_log_options () {
 
 (( $+functions[__git_setup_diff_options] )) ||
 __git_setup_diff_options () {
-  local diff_types='(-p -u --patch -U --unified --raw --patch-with-raw --stat --numstat --shortstat --dirstat --dirstat-by-file --summary --patch-with-stat --name-only --name-status --cumulative)'
+  local diff_types='(-p -u --patch -U --unified --raw --patch-with-raw --stat --numstat --shortstat --dirstat --dirstat-by-file --summary --patch-with-stat --name-only --name-status --cumulative -s --no-patch)'
 
   diff_options=(
     $diff_types{-p,-u,--patch}'[generate diff in patch format]'
     $diff_types{-U,--unified=}'[generate diff with given lines of context]: :__git_guard_number lines'
     $diff_types'--raw[generate default raw diff output]'
     $diff_types'--patch-with-raw[generate patch but also keep the default raw diff output]'
+    $diff_types{-s,--no-patch}'[suppress diff output]'
     '(--minimal --patience --histogram --diff-algorithm)--minimal[spend extra time to make sure the smallest possible diff is producedm]'
     '(--minimal --patience --histogram --diff-algorithm)--patience[generate diffs with patience algorithm]'
     '(--minimal --patience --histogram --diff-algorithm)--histogram[generate diffs with histogram algorithm]'
@@ -5942,6 +5947,7 @@ __git_setup_diff_options () {
     '--ignore-space-at-eol[ignore changes in whitespace at end of line]'
     '(-b --ignore-space-change -w --ignore-all-space)'{-b,--ignore-space-change}'[ignore changes in amount of white space]'
     '(-b --ignore-space-change -w --ignore-all-space)'{-w,--ignore-all-space}'[ignore white space when comparing lines]'
+    '--ignore-blank-lines[do not show hunks that add or remove blank lines]'
     '--inter-hunk-context=[combine hunks closer than n lines]:n'
     '--exit-code[report exit code 1 if differences, 0 otherwise]'
     '(--exit-code)--quiet[disable all output]'
@@ -6035,8 +6041,9 @@ __git_setup_revision_options () {
     '(--full-history --dense          --simplify-merges --ancestry-path)--sparse[when paths are given, display only commits that changes any of them]'
     '(--full-history --dense --sparse                   --ancestry-path)--simplify-merges[milder version of --full-history]'
     '(--full-history --dense --sparse --simplify-merges                )--ancestry-path[only display commits that exists directly on ancestry chains]'
-    '(             --date-order)--topo-order[display commits in topological order]'
-    '(--topo-order             )--date-order[display commits in date order]'
+    '(             --date-order --author-date-order)--topo-order[display commits in topological order]'
+    '(--topo-order              --author-date-order)--date-order[display commits in date order]'
+    '(--topo-order --date-order                    )--author-date-order[display commits in auhor date order]'
     '(-g --walk-reflogs)--reverse[display commits in reverse order]'
     '(          --objects-edge)--objects[display object ids of objects referenced by listed commits]'
     '(--objects               )--objects-edge[display object ids of objects referenced by listed and excluded commits]'
