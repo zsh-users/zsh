@@ -4429,7 +4429,7 @@ _git-show-ref () {
     - list \
       '(-h --head)'{-h,--head}'[show HEAD reference]' \
       '--tags[show only refs/tags]' \
-      '--heads[show only refs/heads]' \
+      '--heads[show only HEAD and refs under refs/heads]' \
       '(-d --dereference)'{-d,--dereference}'[dereference tags into object IDs as well]' \
       '(-s --hash)'{-s+,--hash=-}'[only show the SHA-1 hash, not the reference name]:: :__git_guard_number length' \
       '--verify[enable stricter reference checking]' \
