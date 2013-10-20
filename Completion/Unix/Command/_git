@@ -5959,7 +5959,6 @@ __git_setup_diff_options () {
     '(-0 -1 -2 -3 --base --ours --theirs -c --cc --no-index)'{-3,--theirs}'[diff against "their branch" version]'
     '(-0 -1 -2 -3 --base --ours --theirs -c --cc --no-index)-0[omit diff output for unmerged entries]'
     '(-0 -1 -2 -3 --base --ours --theirs -c --cc --no-index)'{-c,--cc}'[compare "our branch", "their branch" and working tree files]'
-    '-q[remain silent even on nonexisting files]'
 
     # TODO: --cumulative is undocumented.
     '--cumulative[undocumented]'

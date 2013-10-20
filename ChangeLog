@@ -1,3 +1,8 @@
+2013-10-21  m0viefreak  <m0viefreak.cm@googlemail.com>
+
+	* 31857: Completion/Unix/Command/_git: _git: Remove unsupported -q
+	option from diff options
+
 2013-10-21  Øystein Walle  <oystwa@gmail.com>
 
 	* 31853: Completion/Unix/Command/_git: _git: Add missing column.*
