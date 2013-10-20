@@ -2150,7 +2150,7 @@ _git-config () {
     sendemail.confirm:'type of confirmation required before sending::->sendemail.confirm:auto'
     sendemail.envelopesender:'envelope sender to send emails as::_email_addresses'
     sendemail.from:'sender email address::_email_addresses'
-    sendemail.multiedit:'edit all files at once::->bool:false'
+    sendemail.multiedit:'edit all files at once::->bool:true'
     sendemail.signedoffbycc:'add Signed-off-by\: or Cc\: lines to Cc\: header::->bool:true'
     sendemail.smtppass:'password to use for SMTP-AUTH:password:->string'
     sendemail.suppresscc:'rules for suppressing Cc\:::->sendemail.suppresscc'
