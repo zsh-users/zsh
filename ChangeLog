@@ -15,6 +15,9 @@
 	* 31864: Completion/Unix/Command/_git: _git: Add two sub-comamnds
 	introduced in v1.8.4
 
+	* 31865: Completion/Unix/Command/_git: _git: Make --batch(-check)
+	accept an argument
+
 2013-10-21  m0viefreak  <m0viefreak.cm@googlemail.com>
 
 	* 31856: Completion/Unix/Command/_git: _git: fix a few

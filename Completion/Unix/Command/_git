@@ -4192,8 +4192,8 @@ _git-cat-file () {
     '(- 1)-e[exit with zero status if object exists]' \
     '(- 1)-p[pretty-print given object]' \
     '(- 1)--textconv[show content as transformed by a textconv filter]' \
-    '(- :)--batch[print SHA1, type, size, and contents of each object provided on stdin]' \
-    '(- :)--batch-check[print SHA1, type, and size of each object provided on stdin]' \
+    '(- :)--batch=-[print SHA1, type, size and contents (or in <format>) of objects given on stdin]:format' \
+    '(- :)--batch-check=-[print SHA1, type and size (or in <format>) of objects given on stdin]:format' \
     '(-):object type:(blob commit tag tree)' \
     ': :__git_objects'
 }
