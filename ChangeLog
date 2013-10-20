@@ -1,3 +1,8 @@
+2013-10-21  m0viefreak  <m0viefreak.cm@googlemail.com>
+
+	* 31856: Completion/Unix/Command/_git: _git: fix a few
+	"undocumented" options
+
 2013-10-21  Øystein Walle  <oystwa@gmail.com>
 
 	* 31858: Completion/Unix/Command/_git: _git: fix wrong default

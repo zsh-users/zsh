@@ -624,7 +624,6 @@ _git-commit () {
     reset_author_opt='(--author)--reset-author[make committer the author of the commit]'
   fi
 
-  # TODO: --null is an undocumented alias.
   # TODO: --interactive isn’t explicitly listed in the documentation.
   _arguments -w -S -s \
     '(-a --all --interactive -o --only -i --include *)'{-a,--all}'[stage all modified and deleted paths]' \
@@ -2978,10 +2977,9 @@ _git-reflog () {
 
 (( $+functions[_git-relink] )) ||
 _git-relink () {
-  # TODO: --help is undocumented.
   _arguments \
     '--safe[stop if two objects with the same hash exist but have different sizes]' \
-    '--help[display help]' \
+    '(-)'{-h,--help}'[display usage information]' \
     ': :_directories' \
     ': :_directories' \
     '*: :_directories'
@@ -3419,9 +3417,8 @@ _git-show-branch () {
 
 (( $+functions[_git-verify-tag] )) ||
 _git-verify-tag () {
-  # TODO: -v and --verbose are undocumented.
   _arguments -w -S -s \
-    '(-v --verbose)'{-v,--verbose}'[output additional information]' \
+    '(-v --verbose)'{-v,--verbose}'[print the contents of the tag object before validating it]' \
     '*: :__git_tags'
 }
 
@@ -5960,8 +5957,6 @@ __git_setup_diff_options () {
     '(-0 -1 -2 -3 --base --ours --theirs -c --cc --no-index)-0[omit diff output for unmerged entries]'
     '(-0 -1 -2 -3 --base --ours --theirs -c --cc --no-index)'{-c,--cc}'[compare "our branch", "their branch" and working tree files]'
 
-    # TODO: --cumulative is undocumented.
-    '--cumulative[undocumented]'
     # TODO: --output is undocumented.
     '--output[undocumented]:undocumented')
 }
