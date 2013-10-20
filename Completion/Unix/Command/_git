@@ -1800,6 +1800,10 @@ _git-config () {
     blame.date:'date format to use in output::__git_date_formats:iso'
     'branch.*.description:branch description:branch description:->string'
     cvsexportcommit.cvsdir:'the default location of the CVS checkout to use for the export:cvs export dir:_directories'
+    column.ui:'specify whether supported commands should output in columns.::->column:never'
+    column.branch:'specify whether to output branch listing in git branch in columns::->column:never'
+    column.status:'specify whether to output untracked files in git status in columns::->column:never'
+    column.tag:'specify whether to output tag listing in git tag in columns::->column:never'
     core.fileMode:'track changes to the executable bit of files::->bool:true'
     core.attributesfile:'look into this file for attributes in addition to .gitattributes:additional attributes file:_files'
     core.abbrev:'set the length object names are abbreviated to:length:->int:7'
@@ -2374,6 +2378,7 @@ _git-config () {
           browser:'browser options'
           clean:'git clean options'
           color:'color options'
+          column:'column options'
           commit:'git commit options'
           diff:'diff options'
           difftool:'difftools'
@@ -2540,6 +2545,15 @@ _git-config () {
                 {never,false,no,off}:"do not $parts[2]" \
                 always:"always $parts[2]" \
                 {auto,true,yes,on}:$parts[2] && ret=0
+              ;;
+            (column)
+              __git_config_values -- "$current" "$parts[5]" \
+                always:'always show in columns' \
+                never:'never show in columns' \
+                auto:'show in columns if the output is to the terminal' \
+                column:'fill columns before rows (implies "always")' \
+                row:'fill rows before columns (implies "akways")' \
+                plain:'show in one column (implies "always")' && ret=0
               ;;
             (commit.cleanup)
               __git_config_values -- "$current" "$parts[5]" \
