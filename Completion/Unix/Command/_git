@@ -399,6 +399,23 @@ _git-bundle () {
   return ret
 }
 
+(( $+functions[_git-check-ignore] )) ||
+_git-check-ignore () {
+  _arguments \
+    '(-q --quiet)'{-q,--quiet}'[do not output anything, just set exit status]' \
+    '(-v --verbose)'{-v,--verbose}'[output details about the matching pattern (if any) for each pathname]' \
+    '--stdin[read file names from stdin instead of from the command-line]' \
+    '-z[make output format machine-parseable]' \
+    '(-n --non-matching)'{-n,--non-matching}'[show given paths which do not match any pattern]' \
+    '*:: :->file' && ret=0
+}
+
+(( $+functions[_git-check-mailmap] )) ||
+_git-check-mailmap () {
+  _arguments \
+    '--stdin[read contacts from stdin after those given on the command line]'
+}
+
 (( $+functions[_git-checkout] )) ||
 _git-checkout () {
   # TODO: __git_tree_ishs is just stupid.  It should be giving us a list of tags
@@ -5008,6 +5025,8 @@ _git_commands () {
   local -a plumbing_internal_helper_commands
   plumbing_internal_helper_commands=(
     check-attr:'display gitattributes information'
+    check-ignore:'debug gitignore/exclude files'
+    check-mailmap:'show canonical names and email addresses of contacts'
     check-ref-format:'ensure that a reference name is well formed'
     fmt-merge-msg:'produce merge commit message'
     mailinfo:'extract patch and authorship from a single email message'
