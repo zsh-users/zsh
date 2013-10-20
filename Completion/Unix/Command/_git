@@ -2199,6 +2199,8 @@ _git-config () {
     status.relativePaths:'show paths relative to current directory::->bool:false'
     status.showUntrackedFiles:'show untracked files::->status.showUntrackedFiles:normal'
     status.submodulesummary:'include submodule summary::->bool:false'
+    status.branch:'show branch and tracking info in short format::->bool:false'
+    status.short:'use short format by default::->bool:false'
     'submodule.*.branch:remote branch name for a submodule:branch name:->string'
     'submodule.*.fetchRecurseSubmodules:fetch commits of submodules::->bool'
     'submodule.*.path:path within project:submodule directory:_directories -qS \:'

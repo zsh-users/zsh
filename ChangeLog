@@ -6,6 +6,9 @@
 	* 31863: Completion/Unix/Command/_git: _git: Add new arguments
 	introduced in Git v1.8.4
 
+	* 31862: Completion/Unix/Command/_git: _git: Add status.short and
+	status.branch
+
 2013-10-21  m0viefreak  <m0viefreak.cm@googlemail.com>
 
 	* 31856: Completion/Unix/Command/_git: _git: fix a few
