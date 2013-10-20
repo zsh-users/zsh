@@ -3,6 +3,9 @@
 	* 31853: Completion/Unix/Command/_git: _git: Add missing column.*
 	config variables
 
+	* 31854: Completion/Unix/Command/_git: _git: Make git-show accept
+	diff arguments
+
 2013-10-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31851: Src/exec.c: execstring() should display string to
