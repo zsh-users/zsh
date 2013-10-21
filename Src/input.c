@@ -142,14 +142,14 @@ shingetline(void)
     char *p;
 
     p = buf;
+    winch_unblock();
     for (;;) {
-	winch_unblock();
 	do {
 	    errno = 0;
 	    c = fgetc(bshin);
 	} while (c < 0 && errno == EINTR);
-	winch_block();
 	if (c < 0 || c == '\n') {
+	    winch_block();
 	    if (c == '\n')
 		*p++ = '\n';
 	    if (p > buf) {
@@ -165,11 +165,13 @@ shingetline(void)
 	} else
 	    *p++ = c;
 	if (p >= buf + BUFSIZ - 1) {
+	    winch_block();
 	    line = zrealloc(line, ll + (p - buf) + 1);
 	    memcpy(line + ll, buf, p - buf);
 	    ll += p - buf;
 	    line[ll] = '\0';
 	    p = buf;
+	    winch_unblock();
 	}
     }
 }

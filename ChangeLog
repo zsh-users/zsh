@@ -1,3 +1,7 @@
+2013-10-21  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31869: Src/input.c: reduce WINCH-twaddling in shingetline()
+
 2013-10-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31851: Src/exec.c: execstring() should display string to
