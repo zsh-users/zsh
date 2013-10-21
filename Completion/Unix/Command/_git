@@ -399,6 +399,23 @@ _git-bundle () {
   return ret
 }
 
+(( $+functions[_git-check-ignore] )) ||
+_git-check-ignore () {
+  _arguments \
+    '(-q --quiet)'{-q,--quiet}'[do not output anything, just set exit status]' \
+    '(-v --verbose)'{-v,--verbose}'[output details about the matching pattern (if any) for each pathname]' \
+    '--stdin[read file names from stdin instead of from the command-line]' \
+    '-z[make output format machine-parseable]' \
+    '(-n --non-matching)'{-n,--non-matching}'[show given paths which do not match any pattern]' \
+    '*:: :->file' && ret=0
+}
+
+(( $+functions[_git-check-mailmap] )) ||
+_git-check-mailmap () {
+  _arguments \
+    '--stdin[read contacts from stdin after those given on the command line]'
+}
+
 (( $+functions[_git-checkout] )) ||
 _git-checkout () {
   # TODO: __git_tree_ishs is just stupid.  It should be giving us a list of tags
@@ -508,6 +525,7 @@ _git-clean () {
   _arguments -w -C -S -s \
     '-d[also remove untracked directories]' \
     '(-f --force)'{-f,--force}'[required when clean.requireForce is true (default)]' \
+    '(-i --interactive)'{-i,--interactive}'[show what would be done and clean files interactively]' \
     '(-n --dry-run)'{-n,--dry-run}'[only show what would and what would not be removed]' \
     '(-q --quiet)'{-q,--quiet}'[only report errors]' \
     '*'{-e,--exclude=}'[skip files matching specified pattern]:pattern' \
@@ -624,7 +642,6 @@ _git-commit () {
     reset_author_opt='(--author)--reset-author[make committer the author of the commit]'
   fi
 
-  # TODO: --null is an undocumented alias.
   # TODO: --interactive isn’t explicitly listed in the documentation.
   _arguments -w -S -s \
     '(-a --all --interactive -o --only -i --include *)'{-a,--all}'[stage all modified and deleted paths]' \
@@ -684,6 +701,7 @@ _git-describe () {
     '(--abbrev)--long[always show full format, even for exact matches]' \
     '--match=[only consider tags matching glob pattern]:pattern' \
     '--always[show uniquely abbreviated commit object as fallback]' \
+    '--first-parent[follow only the first parent of merge commits]' \
     '*: :__git_committishs'
 }
 
@@ -835,6 +853,7 @@ _git-format-patch () {
     '(-k --keep-subject)--subject-prefix=[use the given prefix instead of \[PATCH\]]:prefix' \
     '*--to=[add To: header to email headers]: :_email_addresses' \
     '*--cc=[add Cc: header to email headers]: :_email_addresses' \
+    '--from=[add From: header to email headers]: :_email_addresses' \
     '*--add-header=[add an arbitrary header to email headers]:header' \
     '--cover-letter[generate a cover letter template]' \
     '--notes=[append notes for the commit after the three-dash line]:: :__git_notes_refs' \
@@ -1050,6 +1069,7 @@ _git-log () {
     $log_options \
     $revision_options \
     $diff_options \
+    '-L+[trace the evolution of a line range or regex within a file]:range' \
     '(-)--[start file arguments]' \
     '*:: :->commit-range-or-file' && ret=0
 
@@ -1241,6 +1261,7 @@ _git-push () {
     '(-q --quiet -v --verbose --progress)'{-q,--quiet}'[suppress all output]' \
     '(-q --quiet -v --verbose)'{-v,--verbose}'[output additional information]' \
     '(-q --quiet)--progress[output progress information]' \
+    '(--verify)--no-verify[bybass the pre-push hook]' \
     '--recurse-submodules=[submodule handling]:submodule handling:((check\:"refuse pushing of supermodule if submodule commit cannot be found on the remote"
                                                                     on-demand\:"push all changed submodules"))' \
     ':: :__git_any_repositories' \
@@ -1321,8 +1342,9 @@ _git-revert () {
     '(- :)--quit[end revert or cherry-pick sequence]' \
     '(- :)--continue[resume revert or cherry-pick sequence]' \
     '(- :)--abort[cancel revert or cherry-pick sequence]' \
+    '(-e --edit --no-edit)'{-e,--edit}'[edit the commit before committing the revert]' \
+    '(-e --edit --no-edit)--no-edit[do not edit the commit message before committing the revert]' \
     '(-m --mainline)'{-m+,--mainline=}'[pick which parent is mainline]:parent number' \
-    '(-e --edit)--no-edit[do not edit the commit message]' \
     '(-n --no-commit)'{-n,--no-commit}'[do not commit the reversion]' \
     '(-s --signoff)'{-s,--signoff}'[add Signed-off-by line at the end of the commit message]' \
     ': :__git_commits'
@@ -1419,9 +1441,10 @@ _git-show () {
   local curcontext=$curcontext state line ret=1
   typeset -A opt_args
 
-  local -a log_options revision_options
+  local -a log_options revision_options diff_options
   __git_setup_log_options
   __git_setup_revision_options
+  __git_setup_diff_options
 
   _arguments -w -C -s \
     $log_options \
@@ -1800,6 +1823,11 @@ _git-config () {
     blame.date:'date format to use in output::__git_date_formats:iso'
     'branch.*.description:branch description:branch description:->string'
     cvsexportcommit.cvsdir:'the default location of the CVS checkout to use for the export:cvs export dir:_directories'
+    column.ui:'specify whether supported commands should output in columns.::->column:never'
+    column.branch:'specify whether to output branch listing in git branch in columns::->column:never'
+    column.clean:'specify the layout when listing items in git clean -i::->column:never'
+    column.status:'specify whether to output untracked files in git status in columns::->column:never'
+    column.tag:'specify whether to output tag listing in git tag in columns::->column:never'
     core.fileMode:'track changes to the executable bit of files::->bool:true'
     core.attributesfile:'look into this file for attributes in addition to .gitattributes:additional attributes file:_files'
     core.abbrev:'set the length object names are abbreviated to:length:->int:7'
@@ -2145,7 +2173,7 @@ _git-config () {
     sendemail.confirm:'type of confirmation required before sending::->sendemail.confirm:auto'
     sendemail.envelopesender:'envelope sender to send emails as::_email_addresses'
     sendemail.from:'sender email address::_email_addresses'
-    sendemail.multiedit:'edit all files at once::->bool:false'
+    sendemail.multiedit:'edit all files at once::->bool:true'
     sendemail.signedoffbycc:'add Signed-off-by\: or Cc\: lines to Cc\: header::->bool:true'
     sendemail.smtppass:'password to use for SMTP-AUTH:password:->string'
     sendemail.suppresscc:'rules for suppressing Cc\:::->sendemail.suppresscc'
@@ -2188,6 +2216,8 @@ _git-config () {
     status.relativePaths:'show paths relative to current directory::->bool:false'
     status.showUntrackedFiles:'show untracked files::->status.showUntrackedFiles:normal'
     status.submodulesummary:'include submodule summary::->bool:false'
+    status.branch:'show branch and tracking info in short format::->bool:false'
+    status.short:'use short format by default::->bool:false'
     'submodule.*.branch:remote branch name for a submodule:branch name:->string'
     'submodule.*.fetchRecurseSubmodules:fetch commits of submodules::->bool'
     'submodule.*.path:path within project:submodule directory:_directories -qS \:'
@@ -2374,6 +2404,7 @@ _git-config () {
           browser:'browser options'
           clean:'git clean options'
           color:'color options'
+          column:'column options'
           commit:'git commit options'
           diff:'diff options'
           difftool:'difftools'
@@ -2540,6 +2571,15 @@ _git-config () {
                 {never,false,no,off}:"do not $parts[2]" \
                 always:"always $parts[2]" \
                 {auto,true,yes,on}:$parts[2] && ret=0
+              ;;
+            (column)
+              __git_config_values -- "$current" "$parts[5]" \
+                always:'always show in columns' \
+                never:'never show in columns' \
+                auto:'show in columns if the output is to the terminal' \
+                column:'fill columns before rows (implies "always")' \
+                row:'fill rows before columns (implies "akways")' \
+                plain:'show in one column (implies "always")' && ret=0
               ;;
             (commit.cleanup)
               __git_config_values -- "$current" "$parts[5]" \
@@ -2963,10 +3003,9 @@ _git-reflog () {
 
 (( $+functions[_git-relink] )) ||
 _git-relink () {
-  # TODO: --help is undocumented.
   _arguments \
     '--safe[stop if two objects with the same hash exist but have different sizes]' \
-    '--help[display help]' \
+    '(-)'{-h,--help}'[display usage information]' \
     ': :_directories' \
     ': :_directories' \
     '*: :_directories'
@@ -3133,8 +3172,8 @@ _git-blame () {
     '-s[suppress author name and timestamp]' \
     '-w[ignore whitespace when finding lines]' \
     $revision_options \
-    ': :__git_cached_files' \
-    ':: :__git_revisions' && ret=0
+    ':: :__git_revisions' \
+    ': :__git_cached_files' && ret=0
 
   case $state in
     (line-range)
@@ -3404,9 +3443,8 @@ _git-show-branch () {
 
 (( $+functions[_git-verify-tag] )) ||
 _git-verify-tag () {
-  # TODO: -v and --verbose are undocumented.
   _arguments -w -S -s \
-    '(-v --verbose)'{-v,--verbose}'[output additional information]' \
+    '(-v --verbose)'{-v,--verbose}'[print the contents of the tag object before validating it]' \
     '*: :__git_tags'
 }
 
@@ -4154,8 +4192,8 @@ _git-cat-file () {
     '(- 1)-e[exit with zero status if object exists]' \
     '(- 1)-p[pretty-print given object]' \
     '(- 1)--textconv[show content as transformed by a textconv filter]' \
-    '(- :)--batch[print SHA1, type, size, and contents of each object provided on stdin]' \
-    '(- :)--batch-check[print SHA1, type, and size of each object provided on stdin]' \
+    '(- :)--batch=-[print SHA1, type, size and contents (or in <format>) of objects given on stdin]:format' \
+    '(- :)--batch-check=-[print SHA1, type and size (or in <format>) of objects given on stdin]:format' \
     '(-):object type:(blob commit tag tree)' \
     ': :__git_objects'
 }
@@ -4408,7 +4446,7 @@ _git-show-ref () {
     - list \
       '(-h --head)'{-h,--head}'[show HEAD reference]' \
       '--tags[show only refs/tags]' \
-      '--heads[show only refs/heads]' \
+      '--heads[show only HEAD and refs under refs/heads]' \
       '(-d --dereference)'{-d,--dereference}'[dereference tags into object IDs as well]' \
       '(-s --hash)'{-s+,--hash=-}'[only show the SHA-1 hash, not the reference name]:: :__git_guard_number length' \
       '--verify[enable stricter reference checking]' \
@@ -4987,6 +5025,8 @@ _git_commands () {
   local -a plumbing_internal_helper_commands
   plumbing_internal_helper_commands=(
     check-attr:'display gitattributes information'
+    check-ignore:'debug gitignore/exclude files'
+    check-mailmap:'show canonical names and email addresses of contacts'
     check-ref-format:'ensure that a reference name is well formed'
     fmt-merge-msg:'produce merge commit message'
     mailinfo:'extract patch and authorship from a single email message'
@@ -5869,13 +5909,14 @@ __git_setup_log_options () {
 
 (( $+functions[__git_setup_diff_options] )) ||
 __git_setup_diff_options () {
-  local diff_types='(-p -u --patch -U --unified --raw --patch-with-raw --stat --numstat --shortstat --dirstat --dirstat-by-file --summary --patch-with-stat --name-only --name-status --cumulative)'
+  local diff_types='(-p -u --patch -U --unified --raw --patch-with-raw --stat --numstat --shortstat --dirstat --dirstat-by-file --summary --patch-with-stat --name-only --name-status --cumulative -s --no-patch)'
 
   diff_options=(
     $diff_types{-p,-u,--patch}'[generate diff in patch format]'
     $diff_types{-U,--unified=}'[generate diff with given lines of context]: :__git_guard_number lines'
     $diff_types'--raw[generate default raw diff output]'
     $diff_types'--patch-with-raw[generate patch but also keep the default raw diff output]'
+    $diff_types{-s,--no-patch}'[suppress diff output]'
     '(--minimal --patience --histogram --diff-algorithm)--minimal[spend extra time to make sure the smallest possible diff is producedm]'
     '(--minimal --patience --histogram --diff-algorithm)--patience[generate diffs with patience algorithm]'
     '(--minimal --patience --histogram --diff-algorithm)--histogram[generate diffs with histogram algorithm]'
@@ -5927,6 +5968,7 @@ __git_setup_diff_options () {
     '--ignore-space-at-eol[ignore changes in whitespace at end of line]'
     '(-b --ignore-space-change -w --ignore-all-space)'{-b,--ignore-space-change}'[ignore changes in amount of white space]'
     '(-b --ignore-space-change -w --ignore-all-space)'{-w,--ignore-all-space}'[ignore white space when comparing lines]'
+    '--ignore-blank-lines[do not show hunks that add or remove blank lines]'
     '--inter-hunk-context=[combine hunks closer than n lines]:n'
     '--exit-code[report exit code 1 if differences, 0 otherwise]'
     '(--exit-code)--quiet[disable all output]'
@@ -5944,10 +5986,7 @@ __git_setup_diff_options () {
     '(-0 -1 -2 -3 --base --ours --theirs -c --cc --no-index)'{-3,--theirs}'[diff against "their branch" version]'
     '(-0 -1 -2 -3 --base --ours --theirs -c --cc --no-index)-0[omit diff output for unmerged entries]'
     '(-0 -1 -2 -3 --base --ours --theirs -c --cc --no-index)'{-c,--cc}'[compare "our branch", "their branch" and working tree files]'
-    '-q[remain silent even on nonexisting files]'
 
-    # TODO: --cumulative is undocumented.
-    '--cumulative[undocumented]'
     # TODO: --output is undocumented.
     '--output[undocumented]:undocumented')
 }
@@ -6023,8 +6062,9 @@ __git_setup_revision_options () {
     '(--full-history --dense          --simplify-merges --ancestry-path)--sparse[when paths are given, display only commits that changes any of them]'
     '(--full-history --dense --sparse                   --ancestry-path)--simplify-merges[milder version of --full-history]'
     '(--full-history --dense --sparse --simplify-merges                )--ancestry-path[only display commits that exists directly on ancestry chains]'
-    '(             --date-order)--topo-order[display commits in topological order]'
-    '(--topo-order             )--date-order[display commits in date order]'
+    '(             --date-order --author-date-order)--topo-order[display commits in topological order]'
+    '(--topo-order              --author-date-order)--date-order[display commits in date order]'
+    '(--topo-order --date-order                    )--author-date-order[display commits in auhor date order]'
     '(-g --walk-reflogs)--reverse[display commits in reverse order]'
     '(          --objects-edge)--objects[display object ids of objects referenced by listed commits]'
     '(--objects               )--objects-edge[display object ids of objects referenced by listed and excluded commits]'

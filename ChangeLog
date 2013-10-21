@@ -2,6 +2,55 @@
 
 	* 31869: Src/input.c: reduce WINCH-twaddling in shingetline()
 
+2013-10-21  Øystein Walle  <oystwa@gmail.com>
+
+	* 31861: Completion/Unix/Command/_git: _git: Add git-clean
+	-i/--interactive support
+
+	* 31863: Completion/Unix/Command/_git: _git: Add new arguments
+	introduced in Git v1.8.4
+
+	* 31862: Completion/Unix/Command/_git: _git: Add status.short and
+	status.branch
+
+	* 31866: Completion/Unix/Command/_git: _git: Reword --heads to
+	match new meaning
+
+	* 31864: Completion/Unix/Command/_git: _git: Add two sub-comamnds
+	introduced in v1.8.4
+
+	* 31865: Completion/Unix/Command/_git: _git: Make --batch(-check)
+	accept an argument
+
+2013-10-21  m0viefreak  <m0viefreak.cm@googlemail.com>
+
+	* 31856: Completion/Unix/Command/_git: _git: fix a few
+	"undocumented" options
+
+	* 31855: Completion/Unix/Command/_git: _git: revert: add
+	'-e,--edit'
+
+2013-10-21  Øystein Walle  <oystwa@gmail.com>
+
+	* 31858: Completion/Unix/Command/_git: _git: fix wrong default
+	value
+
+2013-10-21  m0viefreak  <m0viefreak.cm@googlemail.com>
+
+	* 31857: Completion/Unix/Command/_git: _git: Remove unsupported -q
+	option from diff options
+
+2013-10-21  Øystein Walle  <oystwa@gmail.com>
+
+	* 31853: Completion/Unix/Command/_git: _git: Add missing column.*
+	config variables
+
+	* 31854: Completion/Unix/Command/_git: _git: Make git-show accept
+	diff arguments
+
+	* 31859: Completion/Unix/Command/_git: _git: re-order the last two
+	git-blame arguments
+
 2013-10-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31851: Src/exec.c: execstring() should display string to
