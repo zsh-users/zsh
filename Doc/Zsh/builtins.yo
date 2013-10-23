@@ -28,6 +28,40 @@ See ifzman(the section `Zle Builtins' in zmanref(zshzle))\
 ifnzman(noderef(Zle Builtins)).
 )\
 )\
+
+Some shell builtin commands take options as described in individual
+entries; these are often referred to in the list below as `tt(flags)' to
+avoid confusion with shell options, which may also have an effect on the
+behaviour of builtin commands.  In this introductory section,
+`tt(option)' always has the meaning of an option to a command that should
+be familiar to most command line users.
+
+Typically, options are single letters preceded by a hyphen (tt(-)).
+Options that take an argument accept it either immediately following the
+option letter or after white space, for example `tt(print -C3 *)' or
+`tt(print -C 3 *)' are equivalent.  Arguments to options are not the
+same as arguments to the command; the documentation indicates which is
+which.  Options that do not take an argument may be combined in a single
+word, for example `tt(print -ca *)' and `tt(print -c -a *)' are
+equivalent.
+
+Some shell builtin commands also take options that begin with `tt(+)'
+instead of `tt(-)'.  The list below makes clear which commands these
+are.
+
+Options (together with their individual arguments, if any) must appear
+in a group before any non-option arguments; once the first non-option
+argument has been found, option processing is terminated.
+
+All builtin commands other than precommand modifiers, even those that
+have no options, can be given the argument `tt(--)' to terminate option
+processing.  This indicates that the following words are non-option
+arguments, but is otherwise ignored.  This is useful in cases where
+arguments to the command may begin with `tt(-)'.  For historical
+reasons, most builtin commands also recognize a single `tt(-)' in a
+separate word for this purpose; note that this is less standard and
+use of `tt(--) is recommended.
+
 startitem()
 prefix(-)
 findex(.)
@@ -68,7 +102,7 @@ to be checked for alias expansion.  If the tt(-g) flag is present,
 define a global alias; global aliases are expanded even if they do not
 occur in command position.
 
-If the tt(-s) flags is present, define a suffix alias: if the command
+If the tt(-s) flag is present, define a suffix alias: if the command
 word on a command line is in the form `var(text)tt(.)var(name)', where
 var(text) is any non-empty string, it is replaced by the text
 `var(value) var(text)tt(.)var(name)'.  Note that var(name) is treated as

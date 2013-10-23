@@ -1,3 +1,8 @@
+2013-10-23  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31873: Doc/Zsh/builtins.yo: Document conventions for use of
+	command options with builtin commands.
+
 2013-10-21  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 31869: Src/input.c: reduce WINCH-twaddling in shingetline()
