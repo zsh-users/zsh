@@ -1,5 +1,7 @@
 2013-10-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 31889: Test/D02glob.ztst: tests for disable -p.
+
 	* 31877: Src/pattern.c: fix behaviour of disable -p for
 	entities with parentheses.
 

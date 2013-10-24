@@ -433,3 +433,61 @@
  print glob.tmp/dir5/N<->(N)
 0:Numeric glob is not usurped by process substitution.
 >glob.tmp/dir5/N123
+
+ tpd() {
+   [[ $1 = $~2 ]]
+  print -r "$1, $2: $?"
+ }
+ test_pattern_disables() {
+   emulate -L zsh
+   tpd 'forthcoming' 'f*g'
+   disable -p '*'
+   tpd 'forthcoming' 'f*g'
+   tpd 'f*g' 'f*g'
+   tpd '[frog]' '[frog]'
+   tpd '[frog]' '\[[f]rog\]'
+   disable -p '['
+   tpd '[frog]' '[frog]'
+   tpd '[frog]' '\[[f]rog\]'
+   setopt extendedglob
+   tpd 'foo' '^bar'
+   disable -p '^'
+   tpd 'foo' '^bar'
+   tpd '^bar' '^bar'
+   tpd 'rumble' '(rumble|bluster)'
+   tpd '(thunder)' '(thunder)'
+   disable -p '('
+   tpd 'rumble' '(rumble|bluster)'
+   tpd '(thunder)' '(thunder)'
+   setopt kshglob
+   tpd 'scramble' '@(panic|frenzy|scramble)'
+   tpd '@(scrimf)' '@(scrimf)'
+   disable -p '@('
+   tpd 'scramble' '@(panic|frenzy|scramble)'
+   tpd '@(scrimf)' '@(scrimf)'
+   disable -p
+ }
+ test_pattern_disables
+ print Nothing should be disabled.
+ disable -p
+0:disable -p
+>forthcoming, f*g: 0
+>forthcoming, f*g: 1
+>f*g, f*g: 0
+>[frog], [frog]: 1
+>[frog], \[[f]rog\]: 0
+>[frog], [frog]: 0
+>[frog], \[[f]rog\]: 1
+>foo, ^bar: 0
+>foo, ^bar: 1
+>^bar, ^bar: 0
+>rumble, (rumble|bluster): 0
+>(thunder), (thunder): 1
+>rumble, (rumble|bluster): 1
+>(thunder), (thunder): 0
+>scramble, @(panic|frenzy|scramble): 0
+>@(scrimf), @(scrimf): 1
+>scramble, @(panic|frenzy|scramble): 1
+>@(scrimf), @(scrimf): 0
+>'(' '*' '[' '^' '@('
+>Nothing should be disabled.
