@@ -1,3 +1,8 @@
+2013-10-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31877: Src/pattern.c: fix behaviour of disable -p for
+	entities with parentheses.
+
 2013-10-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 31888: Test/A05execution.ztst: add test of pipestatus

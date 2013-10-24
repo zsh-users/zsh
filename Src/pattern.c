@@ -748,7 +748,7 @@ patcompswitch(int paren, int *flagp)
 	starter = 0;
 
     br = patnode(P_BRANCH);
-    if (!patcompbranch(&flags))
+    if (!patcompbranch(&flags, paren))
 	return 0;
     if (patglobflags != (int)savglobflags)
 	gfchanged++;
@@ -839,7 +839,7 @@ patcompswitch(int paren, int *flagp)
 		patglobflags = (int)savglobflags;
 	    }
 	}
-	newbr = patcompbranch(&flags);
+	newbr = patcompbranch(&flags, paren);
 	if (tilde == 2) {
 	    /* restore special treatment of / */
 	    zpc_special[ZPC_SLASH] = '/';
@@ -902,7 +902,7 @@ patcompswitch(int paren, int *flagp)
 
 /**/
 static long
-patcompbranch(int *flagp)
+patcompbranch(int *flagp, int paren)
 {
     long chain, latest = 0, starter;
     int flags = 0;
@@ -973,7 +973,7 @@ patcompbranch(int *flagp)
 	    patparse++;
 	    latest = patcompnot(0, &flags);
 	} else
-	    latest = patcomppiece(&flags);
+	    latest = patcomppiece(&flags, paren);
 	if (!latest)
 	    return 0;
 	if (!starter)
@@ -1221,7 +1221,7 @@ pattern_range_to_string(char *rangestr, char *outstr)
 
 /**/
 static long
-patcomppiece(int *flagp)
+patcomppiece(int *flagp, int paren)
 {
     long starter = 0, next, op, opnd;
     int flags, flags2, kshchar, len, ch, patch, nmeta;
@@ -1253,17 +1253,25 @@ patcomppiece(int *flagp)
 	}
 
 	/*
-	 * End of string (or no string at all) if ksh-type parentheses,
-	 * or special character, unless that character is a tilde and
-	 * the character following is an end-of-segment character.  Thus
-	 * tildes are not special if there is nothing following to
-	 * be excluded.
+	 * If '(' is disabled as a pattern char, allow ')' as
+	 * an ordinary string character if there are no parentheses to
+	 * close.  Don't allow it otherwise, it changes the syntax.
 	 */
-	if (kshchar || (memchr(zpc_special, *patparse, ZPC_COUNT) &&
-			(*patparse != zpc_special[ZPC_TILDE] ||
-			 patparse[1] == '/' ||
-			 !memchr(zpc_special, patparse[1], ZPC_SEG_COUNT))))
-	    break;
+	if (zpc_special[ZPC_INPAR] != Marker || *patparse != Outpar ||
+	    paren) {
+	    /*
+	     * End of string (or no string at all) if ksh-type parentheses,
+	     * or special character, unless that character is a tilde and
+	     * the character following is an end-of-segment character.  Thus
+	     * tildes are not special if there is nothing following to
+	     * be excluded.
+	     */
+	    if (kshchar || (memchr(zpc_special, *patparse, ZPC_COUNT) &&
+			    (*patparse != zpc_special[ZPC_TILDE] ||
+			     patparse[1] == '/' ||
+			     !memchr(zpc_special, patparse[1], ZPC_SEG_COUNT))))
+		break;
+    	}
 
 	/* Remember the previous character for backtracking */
 	patprev = patparse;
@@ -1438,7 +1446,7 @@ patcomppiece(int *flagp)
 	    patadd(NULL, 0, 1, 0);
 	    break;
 	case Inpar:
-	    DPUTS(zpc_special[ZPC_INPAR] == Marker,
+	    DPUTS(!kshchar && zpc_special[ZPC_INPAR] == Marker,
 		  "Treating '(' as pattern character although disabled");
 	    DPUTS(isset(SHGLOB) && !kshchar,
 		  "Treating bare '(' as pattern character with SHGLOB");
@@ -1523,7 +1531,7 @@ patcomppiece(int *flagp)
 	     * Marker for restoring a backslash in output:
 	     * does not match a character.
 	     */
-	    next = patcomppiece(flagp);
+	    next = patcomppiece(flagp, paren);
 	    /*
 	     * Can't match a pure string since we need to do this
 	     * as multiple chunks.
@@ -1710,7 +1718,7 @@ patcompnot(int paren, int *flagsp)
     pattail(starter, excl = patnode(P_EXCLUDE));
     up.p = NULL;
     patadd((char *)&up, 0, sizeof(up), 0);
-    if (!(br = (paren ? patcompswitch(1, &dummy) : patcompbranch(&dummy))))
+    if (!(br = (paren ? patcompswitch(1, &dummy) : patcompbranch(&dummy, 0))))
 	return 0;
     pattail(br, patnode(P_EXCEND));
     n = patnode(P_NOTHING); /* just so much easier */
