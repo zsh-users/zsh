@@ -826,7 +826,6 @@ callcompfunc(char *s, char *fn)
 	sfcontext = SFC_CWIDGET;
 	NEWHEAPS(compheap) {
 	    LinkList largs = NULL;
-	    int olv = lastval;
 
 	    if (*cfargs) {
 		char **p = cfargs;
@@ -836,9 +835,7 @@ callcompfunc(char *s, char *fn)
 		while (*p)
 		    addlinknode(largs, dupstring(*p++));
 	    }
-	    doshfunc(shfunc, largs, 0);
-	    cfret = lastval;
-	    lastval = olv;
+	    cfret = doshfunc(shfunc, largs, 1);
 	} OLDHEAPS;
 	sfcontext = osc;
 	endparamscope();

@@ -1,5 +1,8 @@
 2013-10-24  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 31882: Src/Zle/compcore.c: better insulation of
+	completion widget excecution against job environment.
+
 	* 31884: Test/A05execution.ztst: eliminate variable output
 	from test due to vagaries of uniq implementation.
 
