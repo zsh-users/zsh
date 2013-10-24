@@ -189,3 +189,10 @@
 >2048 0 0 0
 F:This test checks for a bug in `$pipestatus[]' handling.  If it breaks then
 F:the bug is still there or it reappeared. See workers-29973 for details.
+
+  externFunc() { awk >/dev/null 2>&1; true; }
+  false | true | false | true | externFunc
+  echo $pipestatus
+0:Check $pipestatus with a known difficult case
+>1 0 1 0 0
+F:This similar test was triggering a reproducible failure with pipestatus.

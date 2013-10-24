@@ -1,5 +1,8 @@
 2013-10-24  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 31888: Test/A05execution.ztst: add test of pipestatus
+	that was reliable failing before 31879.
+
 	* 31882: Src/Zle/compcore.c: better insulation of
 	completion widget excecution against job environment.
 
