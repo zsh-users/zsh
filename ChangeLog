@@ -1,3 +1,11 @@
+2013-10-23  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31879: Src/jobs.c: improve $pipestatus behavior when the last
+	command in the pipeline is executed within the current shell
+
+	* unposted (cf. Frank Terbeck: 30047): Test/A05redirect.ztst:
+	stress test for $pipestatus handling
+
 2013-10-23  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 31873: Doc/Zsh/builtins.yo: Document conventions for use of

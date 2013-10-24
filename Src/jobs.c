@@ -376,6 +376,30 @@ check_cursh_sig(int sig)
     }
 }
 
+/**/
+int
+storepipestats(Job jn, int inforeground)
+{
+    int i, pipefail = 0, jpipestats[MAX_PIPESTATS];
+    Process p;
+
+    for (p = jn->procs, i = 0; p && i < MAX_PIPESTATS; p = p->next, i++) {
+	jpipestats[i] = ((WIFSIGNALED(p->status)) ?
+			 0200 | WTERMSIG(p->status) :
+			 WEXITSTATUS(p->status));
+	if (jpipestats[i])
+	    pipefail = jpipestats[i];
+    }
+    if (inforeground) {
+	memcpy(pipestats, jpipestats, sizeof(int)*i);
+	if ((jn->stat & STAT_CURSH) && i < MAX_PIPESTATS)
+	    pipestats[i++] = lastval;
+	numpipestats = i;
+    }
+
+    return pipefail;
+}
+
 /* Update status of job, possibly printing it */
 
 /**/
@@ -507,24 +531,16 @@ update_job(Job jn)
 	return;
     jn->stat |= (somestopped) ? STAT_CHANGED | STAT_STOPPED :
 	STAT_CHANGED | STAT_DONE;
-    if (job == thisjob && (jn->stat & STAT_DONE)) {
-	int i, newlastval = 0;
-	Process p;
+    if (jn->stat & STAT_DONE) {
+	int newlastval = storepipestats(jn, inforeground);
 
-	for (p = jn->procs, i = 0; p && i < MAX_PIPESTATS; p = p->next, i++) {
-	    pipestats[i] = ((WIFSIGNALED(p->status)) ?
-			    0200 | WTERMSIG(p->status) :
-			    WEXITSTATUS(p->status));
-	    if (pipestats[i])
-		newlastval = pipestats[i];
-	}
-	if ((jn->stat & STAT_CURSH) && i < MAX_PIPESTATS) {
-	    pipestats[i++] = lastval;
-	    if (!lastval && isset(PIPEFAIL))
+	if (job == thisjob) {
+	    if (jn->stat & STAT_CURSH) {
+		if (!lastval && isset(PIPEFAIL))
+		    lastval = newlastval;
+	    } else if (isset(PIPEFAIL))
 		lastval = newlastval;
-	} else if (isset(PIPEFAIL))
-	    lastval= newlastval;
-	numpipestats = i;
+	}
     }
     if (!inforeground &&
 	(jn->stat & (STAT_SUBJOB | STAT_DONE)) == (STAT_SUBJOB | STAT_DONE)) {
@@ -975,6 +991,7 @@ printjob(Job jn, int lng, int synch)
 
     if (skip_print) {
 	if (jn->stat & STAT_DONE) {
+	  (void) storepipestats(jn, job == thisjob);
 	    if (should_report_time(jn))
 		dumptime(jn);
 	    deletejob(jn, 0);
@@ -1105,6 +1122,7 @@ printjob(Job jn, int lng, int synch)
 /* delete job if done */
 
     if (jn->stat & STAT_DONE) {
+	(void) storepipestats(jn, job == thisjob);
 	if (should_report_time(jn))
 	    dumptime(jn);
 	deletejob(jn, 0);

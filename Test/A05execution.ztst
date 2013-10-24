@@ -178,3 +178,14 @@
   kill $!
 0:Status reset by starting a backgrounded command
 >0
+
+  repeat 2048; do (: | : | while false; do
+                             break
+                           done;
+                   print "${pipestatus[@]}")
+	ZTST_hashmark
+  done | sort | uniq -c
+0:Check whether `$pipestatus[]' behaves.
+>   2048 0 0 0
+F:This test checks for a bug in `$pipestatus[]' handling.  If it breaks then
+F:the bug is still there or it reappeared. See workers-29973 for details.
