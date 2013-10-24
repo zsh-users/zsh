@@ -1,3 +1,8 @@
+2013-10-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31884: Test/A05execution.ztst: eliminate variable output
+	from test due to vagaries of uniq implementation.
+
 2013-10-23  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 31879: Src/jobs.c: improve $pipestatus behavior when the last

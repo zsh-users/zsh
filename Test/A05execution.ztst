@@ -184,8 +184,8 @@
                            done;
                    print "${pipestatus[@]}")
 	ZTST_hashmark
-  done | sort | uniq -c
+  done | sort | uniq -c | sed 's/^ *//'
 0:Check whether `$pipestatus[]' behaves.
->   2048 0 0 0
+>2048 0 0 0
 F:This test checks for a bug in `$pipestatus[]' handling.  If it breaks then
 F:the bug is still there or it reappeared. See workers-29973 for details.
