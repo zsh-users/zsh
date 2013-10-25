@@ -1,3 +1,8 @@
+2013-10-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31890 (with Mikael's fixes in 31891): NEWS: add descriptions
+	of new features since 5.0.2.
+
 2013-10-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31889: Test/D02glob.ztst: tests for disable -p.

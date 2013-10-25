@@ -17,6 +17,21 @@ similar to "functions -t" except that tracing is turned off for any
 functions called from the specified one(s) that don't also have the -t
 or -T flag.
 
+The option FORCE_FLOAT has been added to force all arithmetic constants
+to be treated as floating point.  This is most useful locally within
+functions or scripts performing floating point calculations.
+
+Individual pattern characters can be disabled.  For example, to allow '^'
+to be an ordinary character even if the option EXTENDED_GLOB is set, use
+"disable -p '^'".
+
+The variable editing builtin vared can be given custom editing widgets
+for initialisation and finishing.
+
+Hooks for adding history (the function zshaddhistory and the
+array zshaddhistory_functions) can return status 2 to indicate that
+history is to be saved internally within the shell but not written.
+
 In file completion, the recursive-files style can be set to an array of
 patterns to match against "$PWD/".  In any matched location, it is
 possibly to complete files in arbitrarily deep subdirectories without
