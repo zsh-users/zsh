@@ -377,8 +377,8 @@ check_cursh_sig(int sig)
 }
 
 /**/
-int
-storepipestats(Job jn, int inforeground)
+void
+storepipestats(Job jn, int inforeground, int fixlastval)
 {
     int i, pipefail = 0, jpipestats[MAX_PIPESTATS];
     Process p;
@@ -397,7 +397,13 @@ storepipestats(Job jn, int inforeground)
 	numpipestats = i;
     }
 
-    return pipefail;
+    if (fixlastval) {
+      if (jn->stat & STAT_CURSH) {
+	if (!lastval && isset(PIPEFAIL))
+	  lastval = pipefail;
+      } else if (isset(PIPEFAIL))
+	lastval = pipefail;
+    }
 }
 
 /* Update status of job, possibly printing it */
@@ -532,15 +538,12 @@ update_job(Job jn)
     jn->stat |= (somestopped) ? STAT_CHANGED | STAT_STOPPED :
 	STAT_CHANGED | STAT_DONE;
     if (jn->stat & STAT_DONE) {
-	int newlastval = storepipestats(jn, inforeground);
-
-	if (job == thisjob) {
-	    if (jn->stat & STAT_CURSH) {
-		if (!lastval && isset(PIPEFAIL))
-		    lastval = newlastval;
-	    } else if (isset(PIPEFAIL))
-		lastval = newlastval;
-	}
+	/* This may be redundant with printjob() but note that inforeground
+	 * is true here for STAT_CURSH jobs even when job != thisjob, most
+	 * likely because thisjob = -1 from exec.c:execsimple() trickery.
+	 * However, if we reset lastval here we break it for printjob().
+	 */
+	storepipestats(jn, inforeground, 0);
     }
     if (!inforeground &&
 	(jn->stat & (STAT_SUBJOB | STAT_DONE)) == (STAT_SUBJOB | STAT_DONE)) {
@@ -991,7 +994,8 @@ printjob(Job jn, int lng, int synch)
 
     if (skip_print) {
 	if (jn->stat & STAT_DONE) {
-	  (void) storepipestats(jn, job == thisjob);
+	    /* This looks silly, but see update_job() */
+	    storepipestats(jn, job == thisjob, job == thisjob);
 	    if (should_report_time(jn))
 		dumptime(jn);
 	    deletejob(jn, 0);
@@ -1107,9 +1111,9 @@ printjob(Job jn, int lng, int synch)
 	fflush(fout);
     }
 
-/* print "(pwd now: foo)" messages: with (lng & 4) we are printing
- * the directory where the job is running, otherwise the current directory
- */
+    /* print "(pwd now: foo)" messages: with (lng & 4) we are printing
+     * the directory where the job is running, otherwise the current directory
+     */
 
     if ((lng & 4) || (interact && job == thisjob &&
 		      jn->pwd && strcmp(jn->pwd, pwd))) {
@@ -1119,10 +1123,12 @@ printjob(Job jn, int lng, int synch)
 	fprintf(fout, ")\n");
 	fflush(fout);
     }
-/* delete job if done */
+
+    /* delete job if done */
 
     if (jn->stat & STAT_DONE) {
-	(void) storepipestats(jn, job == thisjob);
+	/* This looks silly, but see update_job() */
+	storepipestats(jn, job == thisjob, job == thisjob);
 	if (should_report_time(jn))
 	    dumptime(jn);
 	deletejob(jn, 0);
