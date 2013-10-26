@@ -1,3 +1,14 @@
+2013-10-26  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31906: Src/jobs.c, Test/A05execution.ztst: printjob() should not
+	reference oldjobtab for job numbers unless it is being called from
+	bin_fg().  Add a DPUTS check in case this goes horribly wrong.
+	printjob() also must not attempt to update pipestats when called
+	from bin_fg().  Finally, acquire_pgrp() cannot acquire the tty
+	group leader if the shell is not interactive, so avoid looping
+	infinitely in the attempt.  Update the $pipestatus stress test so
+	that it also exercises the oldjobtab repair.
+
 2013-10-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31890 (with Mikael's fixes in 31891): NEWS: add descriptions

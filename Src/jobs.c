@@ -941,10 +941,13 @@ printjob(Job jn, int lng, int synch)
     int doneprint = 0, skip_print = 0;
     FILE *fout = (synch == 2 || !shout) ? stdout : shout;
 
-    if (oldjobtab != NULL)
+    if (synch > 1 && oldjobtab != NULL)
 	job = jn - oldjobtab;
     else
 	job = jn - jobtab;
+    DPUTS3(job < 0 || job > (synch > 1 ? oldmaxjob : maxjob),
+	   "bogus job number, jn = %L, jobtab = %L, oldjobtab = %L",
+	   (long)jn, (long)jobtab, (long)oldjobtab);
 
     if (jn->stat & STAT_NOPRINT) {
 	skip_print = 1;
@@ -995,7 +998,8 @@ printjob(Job jn, int lng, int synch)
     if (skip_print) {
 	if (jn->stat & STAT_DONE) {
 	    /* This looks silly, but see update_job() */
-	    storepipestats(jn, job == thisjob, job == thisjob);
+	    if (synch <= 1)
+		storepipestats(jn, job == thisjob, job == thisjob);
 	    if (should_report_time(jn))
 		dumptime(jn);
 	    deletejob(jn, 0);
@@ -1128,7 +1132,8 @@ printjob(Job jn, int lng, int synch)
 
     if (jn->stat & STAT_DONE) {
 	/* This looks silly, but see update_job() */
-	storepipestats(jn, job == thisjob, job == thisjob);
+	if (synch <= 1)
+	    storepipestats(jn, job == thisjob, job == thisjob);
 	if (should_report_time(jn))
 	    dumptime(jn);
 	deletejob(jn, 0);
@@ -2610,6 +2615,8 @@ acquire_pgrp(void)
 	while ((ttpgrp = gettygrp()) != -1 && ttpgrp != mypgrp) {
 	    mypgrp = GETPGRP();
 	    if (mypgrp == mypid) {
+		if (!interact)
+		    break; /* attachtty() will be a no-op, give up */
 		signal_setmask(oldset);
 		attachtty(mypgrp); /* Might generate SIGT* */
 		signal_block(blockset);
