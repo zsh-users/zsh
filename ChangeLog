@@ -9,6 +9,11 @@
 	infinitely in the attempt.  Update the $pipestatus stress test so
 	that it also exercises the oldjobtab repair.
 
+2013-10-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Jun T: 31902: rationalise gamma function in mathfunc for
+	consistency with various libraries and user expectations.
+
 2013-10-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31890 (with Mikael's fixes in 31891): NEWS: add descriptions

@@ -340,7 +340,16 @@ math_func(char *name, int argc, mnumber *argv, int id)
       break;
 
   case MF_GAMMA:
+#ifdef HAVE_TGAMMA
+      retd = tgamma(argd);
+#else
+#ifdef HAVE_SIGNGAM
+      retd = lgamma(argd);
+      retd = signgam*exp(retd);
+#else /*XXX assume gamma(x) returns Gamma(x), not log(|Gamma(x)|) */
       retd = gamma(argd);
+#endif
+#endif
       break;
 
   case MF_HYPOT:

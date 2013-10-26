@@ -1222,7 +1222,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       getrlimit getrusage \
 	       setlocale \
 	       uname \
-	       signgam \
+	       signgam tgamma \
 	       putenv getenv setenv unsetenv xw\
 	       brk sbrk \
 	       pathconf sysconf \

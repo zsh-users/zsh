@@ -33,7 +33,7 @@ returns an integer.
 The function tt(signgam) takes no arguments, and returns an integer, which
 is the C variable of the same name, as described in manref(gamma)(3).  Note
 that it is therefore only useful immediately after a call to tt(gamma) or
-tt(lgamma).  Note also that `tt(signgam+LPAR()RPAR)' and `tt(signgam)' are
+tt(lgamma).  Note also that `tt(signgam+LPAR()RPAR())' and `tt(signgam)' are
 distinct expressions.
 
 The following functions take two floating point arguments: tt(copysign),
