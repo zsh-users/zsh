@@ -136,3 +136,9 @@ F:This test fails if your math library doesn't have erand48().
   done
   (( ok ))
 0:Test random number generator distributions are not grossly broken
+
+  float -F 5 g l
+  (( g = gamma(2), l = lgamma(2) ))
+  print $g, $l
+0:Test Gamma function gamma and lgamma
+>1.00000, 0.00000
