@@ -1584,6 +1584,7 @@ zsh_main(UNUSED(int argc), char **argv)
 
     fdtable_size = zopenmax();
     fdtable = zshcalloc(fdtable_size*sizeof(*fdtable));
+    fdtable[0] = fdtable[1] = fdtable[2] = FDT_EXTERNAL;
 
     createoptiontable();
     emulate(zsh_name, 1, &emulation, opts);   /* initialises most options */

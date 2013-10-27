@@ -1,11 +1,18 @@
 2013-10-27  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* unposted (cf. users/18063): Functions/Zle/keeper: clean up
-	some syntax nits, add working link to old Unix Review article
-
 	* 31912: Src/exec.c: in closemn(), distinguish closing for >&-
 	from closing for a real redirect.  Fixes knock-on multios bug
 	introduced by workers/20666 way back in 2005.
+
+	* unposted (cf. users/18063): Functions/Zle/keeper: clean up
+	some syntax nits, add working link to old Unix Review article
+
+	* 31919: Src/exec.c, Src/init.c: fix deadlock when a shell builtin
+	with a multio redirection is used on the left side of a pipeline,
+	by making sure stdin/out/err file descriptors are closed for the
+	multio copy process, which means not re-using those descriptors
+	after they are closed and marked FDT_UNUSED in fdtable[].  For
+	completeness, initialize their fdtable[] state to FDT_EXTERNAL.
 
 2013-10-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
@@ -146,7 +153,7 @@
 	internal history from the HISTFILE at write time.
 
 	* 31832: Src/exec.c: make execrestore() more signal-safe.
-	
+
 2013-10-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 31830: Doc/Zsh/func.yo, README, Src/hist.c, Src/zsh.h:
@@ -247,7 +254,7 @@
 	a listing, treat the separator as part of the description rather
 	than as part of the match, and account for lines that have already
 	wrapped due to very long matches.
-	
+
 	* 31781: Src/Zle/computil.c: "compdescribe -i" must clear the
 	completion list column padding width along with the rest of the
 	description state.  Cf. 31782.

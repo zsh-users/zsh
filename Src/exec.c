@@ -3123,7 +3123,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    int fd = fn->fd2;
 		    if(fd == -2)
 			fd = (fn->type == REDIR_MERGEOUT) ? coprocout : coprocin;
-		    fil = dup(fd);
+		    fil = movefd(dup(fd));
 		}
 		if (fil == -1) {
 		    char fdstr[4];
@@ -3151,7 +3151,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		else
 		    fil = clobber_open(fn);
 		if(fil != -1 && IS_ERROR_REDIR(fn->type))
-		    dfil = dup(fil);
+		    dfil = movefd(dup(fil));
 		else
 		    dfil = 0;
 		if (fil == -1 || dfil == -1) {
