@@ -1,3 +1,7 @@
+2013-10-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31909: Jun T: Completion/Unix/Command/_cat: new completion.
+
 2013-10-26  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 31906: Src/jobs.c, Test/A05execution.ztst: printjob() should not
