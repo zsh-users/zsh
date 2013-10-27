@@ -1967,7 +1967,7 @@ clobber_open(struct redir *f)
 
 /**/
 static void
-closemn(struct multio **mfds, int fd)
+closemn(struct multio **mfds, int fd, int type)
 {
     if (fd >= 0 && mfds[fd] && mfds[fd]->ct >= 2) {
 	struct multio *mn = mfds[fd];
@@ -2026,7 +2026,7 @@ closemn(struct multio **mfds, int fd)
 		}
 	}
 	_exit(0);
-    } else if (fd >= 0)
+    } else if (fd >= 0 && type == REDIR_CLOSE)
 	mfds[fd] = NULL;
 }
 
@@ -3093,7 +3093,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    }
 		}
 		if (fn->fd1 < 10)
-		    closemn(mfds, fn->fd1);
+		    closemn(mfds, fn->fd1, REDIR_CLOSE);
 		if (!closed && zclose(fn->fd1) < 0) {
 		    zwarn("failed to close file descriptor %d: %e",
 			  fn->fd1, errno);
@@ -3102,7 +3102,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    case REDIR_MERGEIN:
 	    case REDIR_MERGEOUT:
 		if (fn->fd2 < 10)
-		    closemn(mfds, fn->fd2);
+		    closemn(mfds, fn->fd2, fn->type);
 		if (!checkclobberparam(fn))
 		    fil = -1;
 		else if (fn->fd2 > 9 &&
@@ -3181,7 +3181,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
      * spawning tee/cat processes as necessary.         */
     for (i = 0; i < 10; i++)
 	if (mfds[i] && mfds[i]->ct >= 2)
-	    closemn(mfds, i);
+	    closemn(mfds, i, REDIR_CLOSE);
 
     if (nullexec) {
 	if (nullexec == 1) {

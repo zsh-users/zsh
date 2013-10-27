@@ -1,3 +1,9 @@
+2013-10-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31912: Src/exec.c: in closemn(), distinguish closing for >&-
+	from closing for a real redirect.  Fixes knock-on multios bug
+	introduced by workers/20666 way back in 2005.
+
 2013-10-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31909: Jun T: Completion/Unix/Command/_cat: new completion.
