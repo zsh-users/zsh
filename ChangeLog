@@ -1,5 +1,8 @@
 2013-10-27  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted (cf. users/18063): Functions/Zle/keeper: clean up
+	some syntax nits, add working link to old Unix Review article
+
 	* 31912: Src/exec.c: in closemn(), distinguish closing for >&-
 	from closing for a real redirect.  Fixes knock-on multios bug
 	introduced by workers/20666 way back in 2005.

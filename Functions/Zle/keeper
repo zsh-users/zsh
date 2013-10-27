@@ -4,6 +4,9 @@
 # Shell Corner column on UnixReview.com in January 2005 at the URL
 # <http://www.unixreview.com/documents/s=9513/ur0501a/ur0501a.htm>
 #
+# Article still available on the Wayback Machine:
+# <http://web.archive.org/web/20050207041146/http://www.unixreview.com/documents/s=9513/ur0501a/ur0501a.htm>
+#
 # A few minor edits have been made to those functions for this file.  Key
 # bindings are commented out to avoid clashes with any existing bindings.
 ##
@@ -69,17 +72,21 @@ zstyle ':completion:expand-kept-result:*' completer _insert_kept
 # "_insert_kept".
 
 _expand_word_and_keep() {
-    function compadd() {
-        local -A args
-        zparseopts -E -A args J:
-        if [[ $args[-J] == all-expansions ]]
-        then
-            builtin compadd -A kept "$@"
-            kept=( ${(Q)${(z)kept}} )
-        fi
-        builtin compadd "$@"
+    {
+        function compadd {
+            local -A args
+            zparseopts -E -A args J:
+            if [[ $args[-J] == all-expansions ]]
+            then
+                builtin compadd -A kept "$@"
+                kept=( ${(Q)${(z)kept}} )
+            fi
+            builtin compadd "$@"
+        }
+        _expand_word
+    } always {
+        unfunction compadd
     }
-    { _expand_word } always { unfunction compadd }
 }
 
 zle -C _expand_word complete-word _expand_word_and_keep
