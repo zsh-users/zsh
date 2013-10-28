@@ -1,3 +1,7 @@
+2013-10-28  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: NEWS: mention HISTORY_IGNORE
+
 2013-10-28  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 31922: Src/Zle/zle_utils.c (zlecharasstring): missing

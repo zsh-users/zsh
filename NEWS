@@ -42,6 +42,11 @@ The _user_expand completer now allows expansion functions in the
 user-expand files to return a string in REPLY that will be used to name
 the set of expansions returned.
 
+The parameter HISTORY_IGNORE may be set to a pattern which matches
+lines in the internal history that are to be omitted from the history
+file at file write time.  This differs from history changes made in
+the zshaddhistory hook or by the HIST_IGNORE_* options, all of which
+take effect immediately on the internal history list itself.
 
 Changes between 4.2 and 5.0.0
 -----------------------------
