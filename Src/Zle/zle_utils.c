@@ -145,6 +145,7 @@ zlecharasstring(ZLE_CHAR_T inchar, char *buf)
 		ptr2--;
 	    }
 	    *ptr = Meta;
+	    ptr[1] ^= 32;
 	    ret++;
 	}
 

@@ -1,3 +1,8 @@
+2013-10-28  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31922: Src/Zle/zle_utils.c (zlecharasstring): missing
+	flip of bit five when Meta marker inserted.
+
 2013-10-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 31912: Src/exec.c: in closemn(), distinguish closing for >&-
