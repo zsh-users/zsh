@@ -1,3 +1,7 @@
+2013-10-29  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31929: Src/jobs.c: fix DPUTS3() test condition from 31906.
+
 2013-10-28  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: NEWS: mention HISTORY_IGNORE

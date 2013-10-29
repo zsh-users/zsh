@@ -945,7 +945,7 @@ printjob(Job jn, int lng, int synch)
 	job = jn - oldjobtab;
     else
 	job = jn - jobtab;
-    DPUTS3(job < 0 || job > (synch > 1 ? oldmaxjob : maxjob),
+    DPUTS3(job < 0 || job > (oldjobtab && synch > 1 ? oldmaxjob : maxjob),
 	   "bogus job number, jn = %L, jobtab = %L, oldjobtab = %L",
 	   (long)jn, (long)jobtab, (long)oldjobtab);
 
