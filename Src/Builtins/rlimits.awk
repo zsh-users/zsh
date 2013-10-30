@@ -55,6 +55,10 @@ BEGIN {limidx = 0}
 	    if (limnam == "NICE") { msg[limnum] = "Nnice" }
 	    if (limnam == "RTPRIO") { msg[limnum] = "Nrt_priority" }
 	    if (limnam == "RTTIME") { msg[limnum] = "Urt_time" }
+	    if (limnam == "POSIXLOCKS") { msg[limnum] = "Nposixlocks" }
+	    if (limnam == "NPTS")    { msg[limnum] = "Npseudoterminals" }
+	    if (limnam == "SWAP")    { msg[limnum] = "Mswapuse" }
+	    if (limnam == "KQUEUES") { msg[limnum] = "Nkqueues" }
         }
     }
 }

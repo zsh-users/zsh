@@ -1013,6 +1013,10 @@ sitem(tt(sigpending))(Maximum number of pending signals.)
 sitem(tt(sockbufsize))(Maximum size of all socket buffers.)
 sitem(tt(stacksize))(Maximum stack size for each process.)
 sitem(tt(vmemorysize))(Maximum amount of virtual memory.)
+sitem(tt(posixlocks))(Maximum number of POSIX locks per user.)
+sitem(tt(pseudoterminals))(Maximum number of pseudo-terminals.)
+sitem(tt(swapuse))(Maximum amount of swap used.)
+sitem(tt(kqueues))(Maximum number of kqueues allocated.)
 endsitem()
 
 Which of these resource limits are available depends on the system.
@@ -1893,7 +1897,7 @@ enditem()
 findex(ulimit)
 cindex(resource limits)
 cindex(limits, resource)
-item(tt(ulimit) [ [ tt(-SHacdfilmnpqrstvx) | tt(-N) var(resource) [ var(limit) ] ... ])(
+item(tt(ulimit) [ [ tt(-SHacdfikKlmnpqrstvwx) | tt(-N) var(resource) [ var(limit) ] ... ])(
 Set or display resource limits of the shell and the processes started by
 the shell.  The value of var(limit) can be a number in the unit specified
 below or one of the values `tt(unlimited)', which removes the limit on the
@@ -1924,9 +1928,13 @@ sitem(tt(-c))(512-byte blocks on the size of core dumps.)
 sitem(tt(-d))(Kilobytes on the size of the data segment.)
 sitem(tt(-f))(512-byte blocks on the size of files written.)
 sitem(tt(-i))(The number of pending signals.)
+sitem(tt(-k))(Maximum number of kqueues allocated.)
+sitem(tt(-K))(Maximum number of POSIX locks per user.  Note this is
+tt(-k) in some other shells.)
 sitem(tt(-l))(Kilobytes on the size of locked-in memory.)
 sitem(tt(-m))(Kilobytes on the size of physical memory.)
 sitem(tt(-n))(open file descriptors.)
+sitem(tt(-p))(Maximum number of pseudo-terminals.)
 sitem(tt(-q))(Bytes in POSIX message queues.)
 sitem(tt(-s))(Kilobytes on the size of the stack.)
 sitem(tt(-t))(CPU seconds to be used.)
@@ -1934,6 +1942,7 @@ sitem(tt(-r))(The number of simultaneous threads available to the user.)
 sitem(tt(-u))(The number of processes available to the user.)
 sitem(tt(-v))(Kilobytes on the size of virtual memory.  On some systems this
 refers to the limit called `address space'.)
+sitem(tt(-w))(Maximum amount of swap memory.)
 sitem(tt(-x))(The number of locks on files.)
 endsitem()
 

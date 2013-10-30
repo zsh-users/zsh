@@ -1,3 +1,10 @@
+2013-10-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Stefan Neudorf: 31930 / 31934: Doc/Zsh/builtins.yo,
+	Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c, configure.ac,
+	Src/Builtins/rlimits.c:  New BSD limits; avoid clash with
+	ulimit -k.
+
 2013-10-29  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 31929: Src/jobs.c: fix DPUTS3() test condition from 31906.
