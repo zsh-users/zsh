@@ -32,6 +32,10 @@
 
 #if defined(HAVE_GETRLIMIT) && defined(RLIM_INFINITY)
 
+#ifdef RLIMIT_POSIXLOCKS
+#  define RLIMIT_LOCKS		RLIMIT_POSIXLOCKS
+#endif
+
 enum {
     ZLIMTYPE_MEMORY,
     ZLIMTYPE_NUMBER,
@@ -386,12 +390,6 @@ printulimit(char *nam, int lim, int hard, int head)
 	    printf("-r: max rt priority                 ");
 	break;
 # endif /* HAVE_RLIMIT_RTPRIO */
-# ifdef HAVE_RLIMIT_POSIXLOCKS
-    case RLIMIT_POSIXLOCKS:
-	if (head)
-	    printf("-K: posixlocks                      ");
-	break;
-# endif /* HAVE_RLIMIT_POSIXLOCKS */
 # ifdef HAVE_RLIMIT_NPTS
     case RLIMIT_NPTS:
 	if (head)
@@ -401,7 +399,7 @@ printulimit(char *nam, int lim, int hard, int head)
 # ifdef HAVE_RLIMIT_SWAP
     case RLIMIT_SWAP:
 	if (head)
-	    printf("-w: swap limit (kbytes)             ");
+	    printf("-w: swap size (kbytes)              ");
 	if (limit != RLIM_INFINITY)
 	    limit /= 1024;
 	break;
@@ -868,11 +866,6 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 # ifdef HAVE_RLIMIT_RTPRIO
 		case 'r':
 		    res = RLIMIT_RTPRIO;
-		    break;
-# endif
-# ifdef HAVE_RLIMIT_POSIXLOCKS
-		case 'K':
-		    res = RLIMIT_POSIXLOCKS;
 		    break;
 # endif
 # ifdef HAVE_RLIMIT_NPTS

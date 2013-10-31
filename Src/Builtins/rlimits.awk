@@ -57,7 +57,7 @@ BEGIN {limidx = 0}
 	    if (limnam == "RTTIME") { msg[limnum] = "Urt_time" }
 	    if (limnam == "POSIXLOCKS") { msg[limnum] = "Nposixlocks" }
 	    if (limnam == "NPTS")    { msg[limnum] = "Npseudoterminals" }
-	    if (limnam == "SWAP")    { msg[limnum] = "Mswapuse" }
+	    if (limnam == "SWAP")    { msg[limnum] = "Mswapsize" }
 	    if (limnam == "KQUEUES") { msg[limnum] = "Nkqueues" }
         }
     }
