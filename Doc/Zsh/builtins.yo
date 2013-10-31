@@ -1897,7 +1897,7 @@ enditem()
 findex(ulimit)
 cindex(resource limits)
 cindex(limits, resource)
-item(tt(ulimit) [ [ tt(-SHacdfiklmnpqrstvwx) | tt(-N) var(resource) [ var(limit) ] ... ])(
+item(tt(ulimit) [ [ tt(-SHacdfiklmnpqsTtvwx) | tt(-N) var(resource) [ var(limit) ] ... ])(
 Set or display resource limits of the shell and the processes started by
 the shell.  The value of var(limit) can be a number in the unit specified
 below or one of the values `tt(unlimited)', which removes the limit on the
@@ -1935,8 +1935,8 @@ sitem(tt(-n))(open file descriptors.)
 sitem(tt(-p))(The number of pseudo-terminals.)
 sitem(tt(-q))(Bytes in POSIX message queues.)
 sitem(tt(-s))(Kilobytes on the size of the stack.)
+sitem(tt(-T))(The number of simultaneous threads available to the user.)
 sitem(tt(-t))(CPU seconds to be used.)
-sitem(tt(-r))(The number of simultaneous threads available to the user.)
 sitem(tt(-u))(The number of processes available to the user.)
 sitem(tt(-v))(Kilobytes on the size of virtual memory.  On some systems this
 refers to the limit called `address space'.)

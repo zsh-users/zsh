@@ -42,7 +42,7 @@ BEGIN {limidx = 0}
 	    if (limnam == "MEMLOCK") { msg[limnum] = "Mmemorylocked" }
 	    if (limnam == "NOFILE")  { msg[limnum] = "Ndescriptors" }
 	    if (limnam == "NPROC")   { msg[limnum] = "Nmaxproc" }
-	    if (limnam == "NTHR")    { msg[limnum] = "Nmaxthr" }
+	    if (limnam == "NTHR")    { msg[limnum] = "Nmaxpthreads" }
 	    if (limnam == "OFILE")   { msg[limnum] = "Ndescriptors" }
 	    if (limnam == "PTHREAD") { msg[limnum] = "Nmaxpthreads" }
 	    if (limnam == "RSS")     { msg[limnum] = "Mresident" }

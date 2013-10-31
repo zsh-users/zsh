@@ -1,5 +1,9 @@
 2013-11-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Stefan Neudorf: 31936: Doc/Zsh/builtins.yo,
+	Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c: rationalise
+	thread limits
+
 	* Stefan Neudorf: 31935: Doc/Zsh/builtins.yo,
 	Src/Builtins/rlimits.awk, Src/Builtins/rlimits.c: further
 	limit updates for 31930, 39134.
