@@ -237,7 +237,7 @@ static const char zpc_chars[ZPC_COUNT] = {
  * NULL means no way of turning this on or off.
  */
 /**/
-const char *zpc_strings[ZPC_COUNT] = {
+mod_export const char *zpc_strings[ZPC_COUNT] = {
    NULL, NULL, "|", NULL, "~", "(", "?", "*", "[", "<",
    "^", "#", NULL, "?(", "*(", "+(", "!(", "@("
 };
@@ -247,7 +247,7 @@ const char *zpc_strings[ZPC_COUNT] = {
  * using "disable -p".
  */
 /**/
-char zpc_disables[ZPC_COUNT];
+mod_export char zpc_disables[ZPC_COUNT];
 
 /*
  * Stack of saved (compressed) zpc_disables for function scope.

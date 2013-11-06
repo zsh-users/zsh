@@ -185,7 +185,7 @@ noholdintr(void)
  * only the given signal           */
  
 /**/
-sigset_t
+mod_export sigset_t
 signal_mask(int sig)
 {
     sigset_t set;
@@ -202,7 +202,8 @@ signal_mask(int sig)
 /**/
 #ifndef BSD_SIGNALS
 
-sigset_t
+/**/
+mod_export sigset_t
 signal_block(sigset_t set)
 {
     sigset_t oset;
@@ -245,7 +246,8 @@ signal_block(sigset_t set)
 /* Unblock the signals in the given signal *
  * set. Return the old signal set.         */
 
-sigset_t
+/**/
+mod_export sigset_t
 signal_unblock(sigset_t set)
 {
     sigset_t oset;

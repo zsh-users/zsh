@@ -41,6 +41,7 @@ V05styles.ztst
 V06parameter.ztst
 V07pcre.ztst
 V08zpty.ztst
+X02zlevi.ztst
 Y01completion.ztst
 Y02compmatch.ztst
 Y03arguments.ztst
