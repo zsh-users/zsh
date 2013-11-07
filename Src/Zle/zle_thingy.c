@@ -781,7 +781,8 @@ bin_zle_fd(char *name, char **args, Options ops, UNUSED(char func))
 	    if (*args && watch_fds[i] != fd)
 		continue;
 	    found = 1;
-	    printf("%s -F %d %s\n", name, watch_fds[i], watch_funcs[i]);
+	    printf("%s -F %s%d %s\n", name, watch_widgets[i] ? "-w " : "",
+		   watch_fds[i], watch_funcs[i]);
 	}
 	/* only return status 1 if fd given and not found */
 	return *args && !found;
@@ -795,6 +796,7 @@ bin_zle_fd(char *name, char **args, Options ops, UNUSED(char func))
 		if (watch_fds[i] == fd) {
 		    zsfree(watch_funcs[i]);
 		    watch_funcs[i] = funcnam;
+		    watch_widgets[i] = OPT_ISSET(ops,'w') ? 1 : 0;
 		    found = 1;
 		    break;
 		}
@@ -807,9 +809,12 @@ bin_zle_fd(char *name, char **args, Options ops, UNUSED(char func))
 					newnwatch * sizeof(int));
 	    watch_funcs = (char **)zrealloc(watch_funcs,
 					    (newnwatch+1) * sizeof(char *));
+	    watch_widgets = (int *)zrealloc(watch_widgets,
+					    newnwatch * sizeof(int));
 	    watch_fds[nwatch] = fd;
 	    watch_funcs[nwatch] = funcnam;
 	    watch_funcs[newnwatch] = NULL;
+	    watch_widgets[nwatch] = OPT_ISSET(ops,'w') ? 1 : 0;
 	    nwatch = newnwatch;
 	}
     } else {
@@ -817,32 +822,39 @@ bin_zle_fd(char *name, char **args, Options ops, UNUSED(char func))
 	for (i = 0; i < nwatch; i++) {
 	    if (watch_fds[i] == fd) {
 		int newnwatch = nwatch-1;
-		int *new_fds;
+		int *new_fds, *new_widgets;
 		char **new_funcs;
 
 		zsfree(watch_funcs[i]);
 		if (newnwatch) {
 		    new_fds = zalloc(newnwatch*sizeof(int));
 		    new_funcs = zalloc((newnwatch+1)*sizeof(char*));
+		    new_widgets = zalloc(newnwatch*sizeof(int));
 		    if (i) {
 			memcpy(new_fds, watch_fds, i*sizeof(int));
 			memcpy(new_funcs, watch_funcs, i*sizeof(char *));
+			memcpy(new_widgets, watch_widgets, i*sizeof(int));
 		    }
 		    if (i < newnwatch) {
 			memcpy(new_fds+i, watch_fds+i+1,
 			       (newnwatch-i)*sizeof(int));
 			memcpy(new_funcs+i, watch_funcs+i+1,
 			       (newnwatch-i)*sizeof(char *));
+			memcpy(new_widgets+i, watch_widgets+i+1,
+			       (newnwatch-i)*sizeof(int));
 		    }
 		    new_funcs[newnwatch] = NULL;
 		} else {
 		    new_fds = NULL;
 		    new_funcs = NULL;
+		    new_widgets = NULL;
 		}
 		zfree(watch_fds, nwatch*sizeof(int));
 		zfree(watch_funcs, (nwatch+1)*sizeof(char *));
+		zfree(watch_widgets, nwatch*sizeof(int));
 		watch_fds = new_fds;
 		watch_funcs = new_funcs;
+		watch_widgets = new_widgets;
 		nwatch = newnwatch;
 		found = 1;
 		break;

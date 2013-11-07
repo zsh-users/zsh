@@ -1643,7 +1643,7 @@ zlecallhook(char *name, char *arg)
 {
     Thingy thingy = rthingy_nocreate(name);
     int saverrflag, savretflag;
-    char *args[3];
+    char *args[2];
 
     if (!thingy)
 	return;
@@ -1651,9 +1651,8 @@ zlecallhook(char *name, char *arg)
     saverrflag = errflag;
     savretflag = retflag;
 
-    args[0] = thingy->nam;
-    args[1] = arg;
-    args[2] = NULL;
+    args[0] = arg;
+    args[1] = NULL;
     execzlefunc(thingy, args, 1);
     unrefthingy(thingy);
 

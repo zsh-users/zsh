@@ -373,7 +373,7 @@ xitem(tt(zle) tt(-R) [ tt(-c) ] [ var(display-string) ] [ var(string) ... ])
 xitem(tt(zle) tt(-M) var(string))
 xitem(tt(zle) tt(-U) var(string))
 xitem(tt(zle) tt(-K) var(keymap))
-xitem(tt(zle) tt(-F) [ tt(-L) ] [ var(fd) [ var(handler) ] ])
+xitem(tt(zle) tt(-F) [ tt(-L) | tt(-w) ] [ var(fd) [ var(handler) ] ])
 xitem(tt(zle) tt(-I))
 xitem(tt(zle) tt(-T) [ tt(tc) var(function) | tt(-r) tt(tc) | tt(-L) ] )
 item(tt(zle) var(widget) tt([ -n) var(num) tt(]) tt([ -Nw ] [ -K) var(keymap) tt(]) var(args) ...)(
@@ -487,7 +487,7 @@ This keymap selection affects the interpretation of following keystrokes
 within this invocation of ZLE.  Any following invocation (e.g., the next
 command line) will start as usual with the `tt(main)' keymap selected.
 )
-item(tt(-F) [ tt(-L) ] [ var(fd) [ var(handler) ] ])(
+item(tt(-F) [ tt(-L) | tt(-w) ] [ var(fd) [ var(handler) ] ])(
 Only available if your system supports one of the `poll' or `select' system
 calls; most modern systems do.
 
@@ -501,6 +501,13 @@ so (see below).  The handler should not attempt to read from the terminal.
 Note that zle makes no attempt to check whether this fd is actually
 readable when installing the handler.  The user must make their own
 arrangements for handling the file descriptor when zle is not active.
+
+If the option tt(-w) is also given, the var(handler) is instead a
+line editor widget, typically a shell function made into a widget using
+tt(zle -N).  In that case var(handler) can use all the facilities of
+zle to update the current editing line.  Note, however, that as handling
+var(fd) takes place at a low level changes to the display will not
+automatically appear; the widget should call tt(zle -R) to force redisplay.
 
 Any number of handlers for any number of readable file descriptors may be
 installed.  Installing a handler for an var(fd) which is already handled

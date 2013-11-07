@@ -201,6 +201,8 @@ int nwatch;		/* Number of fd's we are watching */
 int *watch_fds;		/* The list of fds, not terminated! */
 /**/
 char **watch_funcs;	/* The corresponding functions to call, normal array */
+/**/
+int *watch_widgets;     /* 1 if corresponding function is called as widget */
 
 /* set up terminal */
 
@@ -725,7 +727,9 @@ raw_getbyte(long do_keytmout, char *cptr)
 		int lnwatch = nwatch;
 		int *lwatch_fds = zalloc(lnwatch*sizeof(int));
 		char **lwatch_funcs = zarrdup(watch_funcs);
+		int *lwatch_widgets = zalloc(lnwatch*sizeof(int));
 		memcpy(lwatch_fds, watch_fds, lnwatch*sizeof(int));
+		memcpy(lwatch_widgets, watch_widgets, lnwatch*sizeof(int));
 		for (i = 0; i < lnwatch; i++) {
 		    if (
 # ifdef HAVE_POLL
@@ -735,30 +739,37 @@ raw_getbyte(long do_keytmout, char *cptr)
 # endif
 			) {
 			/* Handle the fd. */
-			LinkList funcargs = znewlinklist();
-			zaddlinknode(funcargs, ztrdup(lwatch_funcs[i]));
+			char *fdbuf;
 			{
 			    char buf[BDIGBUFSIZE];
 			    convbase(buf, lwatch_fds[i], 10);
-			    zaddlinknode(funcargs, ztrdup(buf));
+			    fdbuf = ztrdup(buf);
 			}
+
+			if (lwatch_widgets[i]) {
+			    zlecallhook(lwatch_funcs[i], fdbuf);
+			    zsfree(fdbuf);
+			} else {
+			    LinkList funcargs = znewlinklist();
+			    zaddlinknode(funcargs, ztrdup(lwatch_funcs[i]));
+			    zaddlinknode(funcargs, fdbuf);
 # ifdef HAVE_POLL
 #  ifdef POLLERR
-			if (fds[i+1].revents & POLLERR)
-			    zaddlinknode(funcargs, ztrdup("err"));
+			    if (fds[i+1].revents & POLLERR)
+				zaddlinknode(funcargs, ztrdup("err"));
 #  endif
 #  ifdef POLLHUP
-			if (fds[i+1].revents & POLLHUP)
-			    zaddlinknode(funcargs, ztrdup("hup"));
+			    if (fds[i+1].revents & POLLHUP)
+				zaddlinknode(funcargs, ztrdup("hup"));
 #  endif
 #  ifdef POLLNVAL
-			if (fds[i+1].revents & POLLNVAL)
-			    zaddlinknode(funcargs, ztrdup("nval"));
+			    if (fds[i+1].revents & POLLNVAL)
+				zaddlinknode(funcargs, ztrdup("nval"));
 #  endif
 # endif
-
-
-			callhookfunc(lwatch_funcs[i], funcargs, 0, NULL);
+			    callhookfunc(lwatch_funcs[i], funcargs, 0, NULL);
+			    freelinklist(funcargs, freestr);
+			}
 			if (errflag) {
 			    /* No sensible way of handling errors here */
 			    errflag = 0;
@@ -768,7 +779,6 @@ raw_getbyte(long do_keytmout, char *cptr)
 			     */
 			    errtry = 1;
 			}
-			freelinklist(funcargs, freestr);
 		    }
 		}
 		/* Function may have invalidated the display. */
@@ -1960,7 +1970,7 @@ zle_main_entry(int cmd, va_list ap)
 static struct builtin bintab[] = {
     BUILTIN("bindkey", 0, bin_bindkey, 0, -1, 0, "evaM:ldDANmrsLRp", NULL),
     BUILTIN("vared",   0, bin_vared,   1,  1, 0, "aAcef:hi:M:m:p:r:t:", NULL),
-    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "aAcCDFgGIKlLmMNrRTU", NULL),
+    BUILTIN("zle",     0, bin_zle,     0, -1, 0, "aAcCDFgGIKlLmMNrRTUw", NULL),
 };
 
 /* The order of the entries in this table has to match the *HOOK

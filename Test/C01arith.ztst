@@ -134,11 +134,11 @@
 
   print $(( a = ))
 1:empty assignment
-?(eval):1: bad math expression: operand expected at `'
+?(eval):1: bad math expression: operand expected at end of string
 
   print $(( 3, ))
 1:empty right hand of comma
-?(eval):1: bad math expression: operand expected at `'
+?(eval):1: bad math expression: operand expected at end of string
 
   print $(( 3,,4 ))
 1:empty middle of comma
