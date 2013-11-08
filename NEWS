@@ -28,6 +28,11 @@ to be an ordinary character even if the option EXTENDED_GLOB is set, use
 The variable editing builtin vared can be given custom editing widgets
 for initialisation and finishing.
 
+The line editor's capability for listening on file descriptors
+additional to the terminal has been enhanced so that the handler for
+such file descriptors can be a line editor widget.  Previously the
+handler always behaved as a standard shell function.
+
 Hooks for adding history (the function zshaddhistory and the
 array zshaddhistory_functions) can return status 2 to indicate that
 history is to be saved internally within the shell but not written.

@@ -1,5 +1,7 @@
 2013-11-08  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: NEWS: refer to zle -Fw.
+
 	* 31940: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: add -e option
 	to zcalc to use input from arguments to command.
 
