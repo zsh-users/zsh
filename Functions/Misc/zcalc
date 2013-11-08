@@ -85,10 +85,13 @@
 # similarly -##<base>; they set the default output base, with and without
 # a base discriminator in front, respectively.
 #
-#
-# To do:
-# - separate zcalc history from shell history using arrays --- or allow
-#   zsh to switch internally to and from array-based history.
+# With the option -e, the arguments are evaluated as if entered
+# interactively.  So, for example:
+#   zcalc -e -\#16 -e 1055
+# prints
+#   0x41f
+# Any number of expressions may be given and they are evaluated
+# sequentially just as if read automatically.
 
 emulate -L zsh
 setopt extendedglob
@@ -97,7 +100,8 @@ setopt extendedglob
 # begin with _.
 local line ans base defbase forms match mbegin mend psvar optlist opt arg
 local compcontext="-zcalc-line-"
-integer num outdigits outform=1
+integer num outdigits outform=1 expression_mode
+local -a expressions
 
 # We use our own history file with an automatic pop on exit.
 history -ap "${ZDOTDIR:-$HOME}/.zcalc_history"
@@ -114,7 +118,7 @@ float PI E
 (( PI = 4 * atan(1), E = exp(1) ))
 
 # Process command line
-while [[ -n $1 && $1 = -(|[#-]*|f) ]]; do
+while [[ -n $1 && $1 = -(|[#-]*|f|e) ]]; do
   optlist=${1[2,-1]}
   shift
   [[ $optlist = (|-) ]] && break
@@ -130,11 +134,11 @@ while [[ -n $1 && $1 = -(|[#-]*|f) ]]; do
 	       arg=$1
 	       shift
 	    else
-	       print "-# requires an argument" >&2
+	       print -- "-# requires an argument" >&2
 	       return 1
 	    fi
 	    if [[ $arg != (|\#)[[:digit:]]## ]]; then
-	      print - "-# requires a decimal number as an argument" >&2
+	      print -- "-# requires a decimal number as an argument" >&2
 	      return 1
 	    fi
             defbase="[#${arg}]"
@@ -142,9 +146,17 @@ while [[ -n $1 && $1 = -(|[#-]*|f) ]]; do
 	(f) # Force floating point operation
 	    setopt forcefloat
 	    ;;
+        (e) # Arguments are expressions
+	    (( expression_mode = 1 ));
+	    ;;
     esac
   done
 done
+
+if (( expression_mode )); then
+  expressions=("$@")
+  argv=()
+fi
 
 for (( num = 1; num <= $#; num++ )); do
   # Make sure all arguments have been evaluated.
@@ -156,7 +168,13 @@ done
 
 psvar[1]=$num
 local prev_line cont_prompt
-while vared -cehp "${cont_prompt}${ZCALCPROMPT}" line; do
+while (( expression_mode )) ||
+  vared -cehp "${cont_prompt}${ZCALCPROMPT}" line; do
+  if (( expression_mode )); then
+    (( ${#expressions} )) || break
+    line=$expressions[1]
+    shift expressions
+  fi
   if [[ $line = (|*[^\\])('\\')#'\' ]]; then
     prev_line+=$line[1,-2]
     cont_prompt="..."

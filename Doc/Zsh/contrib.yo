@@ -3155,7 +3155,7 @@ sect(Mathematical Functions)
 
 startitem()
 findex(zcalc)
-item(tt(zcalc) [ var(expression) ... ])(
+item(tt(zcalc) [ tt(-ef) ] [ var(expression) ... ])(
 A reasonably powerful calculator based on zsh's arithmetic evaluation
 facility.  The syntax is similar to that of formulae in most programming
 languages; see
@@ -3194,6 +3194,10 @@ into the global namespace.
 The output base can be initialised by passing the option `tt(-#)var(base)',
 for example `tt(zcalc -#16)' (the `tt(#)' may have to be quoted, depending
 on the globbing options set).
+
+If the option `tt(-e)' is set, the function runs non-interactively:
+the arguments are treated as expressions to be evaluated as if entered
+interactively line by line.
 
 If the option `tt(-f)' is set, all numbers are treated as floating
 point, hence for example the expression `tt(3/4)' evaluates to 0.75

@@ -1,3 +1,8 @@
+2013-11-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31940: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: add -e option
+	to zcalc to use input from arguments to command.
+
 2013-11-07  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 31937: Doc/Zsh/zle.yo, Src/Zle/zle_main.c,
