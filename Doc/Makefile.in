@@ -33,7 +33,9 @@ dir_top = ..
 VPATH           = @srcdir@
 sdir            = @srcdir@
 sdir_top        = @top_srcdir@
+runhelpdir      = @runhelpdir@
 INSTALL         = @INSTALL@
+LN_S            = @LN_S@
 
 @DEFS_MK@
 
@@ -82,7 +84,7 @@ Zsh/seealso.yo Zsh/tcpsys.yo Zsh/zftpsys.yo Zsh/zle.yo
 
 # ========== DEPENDENCIES FOR BUILDING ==========
 
-all: man texi ../META-FAQ
+all: man runhelp texi ../META-FAQ
 .PHONY: all
 
 everything: all dvi html pdf info
@@ -182,6 +184,14 @@ $(sdir)/zsh.texi: $(YODLSRC)
 
 man: $(MAN)
 .PHONY: man
+
+runhelp: man
+	test x"$(runhelpdir)" = x"" || { \
+	    test -r $(sdir)/help.txt && test -r $(sdir)/help/zmodload; \
+	} || perl $(sdir_top)/Util/helpfiles $(lc_ctype) -- \
+	    $(sdir)/zshbuiltins.1 $(sdir)/help $(sdir)/help.txt \
+	    || { rm -f $(sdir)/help.txt $(sdir)/help/zmodload; false; }
+.PHONY: runhelp
 
 $(MAN): zmacros.yo zman.yo
 
@@ -285,12 +295,12 @@ Zsh/manmodmenu.yo: $(MODDOCSRC)
 
 # ========== DEPENDENCIES FOR INSTALLING ==========
 
-# install just installs the manual pages
-install: install.man
+# install just installs the manual and runhelp pages
+install: install.man install.runhelp
 .PHONY: install
 
-# uninstall just unistalls the manual pages
-uninstall: uninstall.man
+# uninstall just uninstalls the manual and runhelp pages
+uninstall: uninstall.man uninstall.runhelp
 .PHONY: uninstall
 
 # install man pages, creating install directory if necessary
@@ -301,6 +311,18 @@ install.man: man
 	    $(INSTALL_DATA) $(sdir)/$$file $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'` || exit 1; \
 	done
 .PHONY: install.man
+
+# install runhelp pages, creating install directory if necessary
+install.runhelp: runhelp
+	if test x"$(runhelpdir)" != x""; then \
+	    ${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(runhelpdir); \
+	    $(INSTALL_DATA) $(sdir)/help/* $(DESTDIR)$(runhelpdir); \
+	    while read from to; do \
+	        rm -f $(DESTDIR)$(runhelpdir)/$$to || : ; \
+	        $(LN_S) $$from $(DESTDIR)$(runhelpdir)/$$to; \
+	    done < $(sdir)/help.txt; \
+	fi
+.PHONY: install.runhelp
 
 # install info pages, creating install directory if necessary
 install.info: texi
@@ -333,6 +355,11 @@ uninstall.man:
 	    rm -f $(DESTDIR)$(mandir)/man1/`echo $$file | sed 's|zsh|$(tzsh)|'`; \
 	done
 .PHONY: uninstall.man
+
+# uninstall runhelp pages
+uninstall.runhelp:
+	test x"$(runhelpdir)" = x"" || rm -rf -- $(DESTDIR)$(runhelpdir)
+.PHONY: uninstall.runhelp
 
 # uninstall info pages
 uninstall.info:

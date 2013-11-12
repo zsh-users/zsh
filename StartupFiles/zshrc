@@ -75,7 +75,7 @@ RPROMPT=' %~'     # prompt for right side of screen
 # Some environment variables
 export MAIL=/var/spool/mail/$USERNAME
 export LESS=-cex3M
-export HELPDIR=/usr/local/lib/zsh/help  # directory for run-help function to find docs
+export HELPDIR=/usr/share/zsh/$ZSH_VERSION/help  # directory for run-help function to find docs
 
 MAILCHECK=300
 HISTSIZE=200
