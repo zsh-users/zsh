@@ -31,7 +31,6 @@ CVS
 .#*
 
 Doc/help.txt
-Doc/help
 Doc/help/[_a-zA-Z0-9]*
 
 Doc/intro.a4.pdf
