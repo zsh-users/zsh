@@ -1,3 +1,8 @@
+2013-11-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 31961: Src/Zle/zle.h, Src/Zle/zle_main.c,
+	Src/Zle/zle_thingy.c: rationalise fd watch to use structures.
+
 2013-11-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: fix ChangeLog to say 5.0.3 instead of 4.0.3.

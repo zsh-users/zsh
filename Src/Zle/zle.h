@@ -497,3 +497,15 @@ typedef REFRESH_ELEMENT *REFRESH_STRING;
 #define METACHECK()
 #define UNMETACHECK()
 #endif
+
+
+typedef struct watch_fd *Watch_fd;
+
+struct watch_fd {
+    /* Function to call */
+    char *func;
+    /* Watched fd */
+    int fd;
+    /* 1 if func is called as a widget */
+    int widget;
+};

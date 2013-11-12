@@ -778,11 +778,12 @@ bin_zle_fd(char *name, char **args, Options ops, UNUSED(char func))
 	    return 1;
 	}
 	for (i = 0; i < nwatch; i++) {
-	    if (*args && watch_fds[i] != fd)
+	    Watch_fd watch_fd = watch_fds + i;
+	    if (*args && watch_fd->fd != fd)
 		continue;
 	    found = 1;
-	    printf("%s -F %s%d %s\n", name, watch_widgets[i] ? "-w " : "",
-		   watch_fds[i], watch_funcs[i]);
+	    printf("%s -F %s%d %s\n", name, watch_fd->widget ? "-w " : "",
+		   watch_fd->fd, watch_fd->func);
 	}
 	/* only return status 1 if fd given and not found */
 	return *args && !found;
@@ -793,10 +794,11 @@ bin_zle_fd(char *name, char **args, Options ops, UNUSED(char func))
 	char *funcnam = ztrdup(args[1]);
 	if (nwatch) {
 	    for (i = 0; i < nwatch; i++) {
-		if (watch_fds[i] == fd) {
-		    zsfree(watch_funcs[i]);
-		    watch_funcs[i] = funcnam;
-		    watch_widgets[i] = OPT_ISSET(ops,'w') ? 1 : 0;
+		Watch_fd watch_fd = watch_fds + i;
+		if (watch_fd->fd == fd) {
+		    zsfree(watch_fd->func);
+		    watch_fd->func = funcnam;
+		    watch_fd->widget = OPT_ISSET(ops,'w') ? 1 : 0;
 		    found = 1;
 		    break;
 		}
@@ -805,56 +807,38 @@ bin_zle_fd(char *name, char **args, Options ops, UNUSED(char func))
 	if (!found) {
 	    /* zrealloc handles NULL pointers, so OK for first time through */
 	    int newnwatch = nwatch+1;
-	    watch_fds = (int *)zrealloc(watch_fds, 
-					newnwatch * sizeof(int));
-	    watch_funcs = (char **)zrealloc(watch_funcs,
-					    (newnwatch+1) * sizeof(char *));
-	    watch_widgets = (int *)zrealloc(watch_widgets,
-					    newnwatch * sizeof(int));
-	    watch_fds[nwatch] = fd;
-	    watch_funcs[nwatch] = funcnam;
-	    watch_funcs[newnwatch] = NULL;
-	    watch_widgets[nwatch] = OPT_ISSET(ops,'w') ? 1 : 0;
+	    Watch_fd new_fd;
+	    watch_fds = (Watch_fd)zrealloc(watch_fds, 
+					   newnwatch * sizeof(struct watch_fd));
+	    new_fd = watch_fds + nwatch;
+	    new_fd->fd = fd;
+	    new_fd->func = funcnam;
+	    new_fd->widget = OPT_ISSET(ops,'w') ? 1 : 0;
 	    nwatch = newnwatch;
 	}
     } else {
 	/* Deleting a handler */
 	for (i = 0; i < nwatch; i++) {
-	    if (watch_fds[i] == fd) {
+	    Watch_fd watch_fd = watch_fds + i;
+	    if (watch_fd->fd == fd) {
 		int newnwatch = nwatch-1;
-		int *new_fds, *new_widgets;
-		char **new_funcs;
+		Watch_fd new_fds;
 
-		zsfree(watch_funcs[i]);
+		zsfree(watch_fd->func);
 		if (newnwatch) {
-		    new_fds = zalloc(newnwatch*sizeof(int));
-		    new_funcs = zalloc((newnwatch+1)*sizeof(char*));
-		    new_widgets = zalloc(newnwatch*sizeof(int));
+		    new_fds = zalloc(newnwatch*sizeof(struct watch_fd));
 		    if (i) {
-			memcpy(new_fds, watch_fds, i*sizeof(int));
-			memcpy(new_funcs, watch_funcs, i*sizeof(char *));
-			memcpy(new_widgets, watch_widgets, i*sizeof(int));
+			memcpy(new_fds, watch_fds, i*sizeof(struct watch_fd));
 		    }
 		    if (i < newnwatch) {
 			memcpy(new_fds+i, watch_fds+i+1,
-			       (newnwatch-i)*sizeof(int));
-			memcpy(new_funcs+i, watch_funcs+i+1,
-			       (newnwatch-i)*sizeof(char *));
-			memcpy(new_widgets+i, watch_widgets+i+1,
-			       (newnwatch-i)*sizeof(int));
+			       (newnwatch-i)*sizeof(struct watch_fd));
 		    }
-		    new_funcs[newnwatch] = NULL;
 		} else {
 		    new_fds = NULL;
-		    new_funcs = NULL;
-		    new_widgets = NULL;
 		}
-		zfree(watch_fds, nwatch*sizeof(int));
-		zfree(watch_funcs, (nwatch+1)*sizeof(char *));
-		zfree(watch_widgets, nwatch*sizeof(int));
+		zfree(watch_fds, nwatch*sizeof(struct watch_fd));
 		watch_fds = new_fds;
-		watch_funcs = new_funcs;
-		watch_widgets = new_widgets;
 		nwatch = newnwatch;
 		found = 1;
 		break;
