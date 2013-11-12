@@ -1,4 +1,5 @@
 Makefile
+help.txt
 version.yo
 zsh*.1
 zsh.texi

@@ -258,6 +258,18 @@ AC_ARG_ENABLE(ansi2knr,
 AC_HELP_STRING([--enable-ansi2knr], [translate source to K&R C before compiling]),
 [ansi2knr="$enableval"], [ansi2knr=default])
 
+ifdef([runhelpdir],[undefine([runhelpdir])])dnl
+AC_ARG_ENABLE(runhelpdir,
+AC_HELP_STRING([--enable-runhelpdir=DIR], [the directory in which to install run-help files]),
+[if test x"$enableval" = xno; then
+  runhelpdir=
+else
+  runhelpdir="$enableval"
+fi], [runhelpdir=yes])
+if test x"$runhelpdir" = xyes; then
+  runhelpdir=${datadir}/${tzsh_name}/'${VERSION}'/help
+fi
+
 ifdef([fndir],[undefine([fndir])])dnl
 AC_ARG_ENABLE(fndir,
 AC_HELP_STRING([--enable-fndir=DIR], [the directory in which to install functions]),
@@ -297,6 +309,7 @@ else
   additionalfpath="${enableval}"
 fi], [additionalfpath=""])
 
+AC_SUBST(runhelpdir)dnl
 AC_SUBST(additionalfpath)dnl
 AC_SUBST(fndir)dnl
 AC_SUBST(sitefndir)dnl
@@ -559,6 +572,7 @@ AC_PROG_MAKE_SET            dnl Does make define $MAKE
 AC_PROG_INSTALL             dnl Check for BSD compatible `install'
 AC_PROG_AWK                 dnl Check for mawk,gawk,nawk, then awk.
 AC_PROG_LN                  dnl Check for working ln, for "make install"
+AC_PROG_LN_S                dnl Use ln -s/ln/cp for "make install.runhelp"
 AC_PROG_EGREP               dnl sets $EGREP to grep -E or egrep
 AC_CHECK_PROGS([YODL], [yodl], [: yodl])
 

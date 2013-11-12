@@ -2,8 +2,10 @@
 
 # helpfiles:  make help files for Z-shell builtins from the manual entries.
 
-# Create help files for zsh commands in the current directory;
-# assumes no other files are present.
+# Create help files for zsh commands for the manpage file of zshbuildins.1
+# passed as the first arg.
+# The second arg is the directory in which the help files will be created.
+# Assumes no other files are present.
 # No overwriting check;  `.' becomes `dot', `:' becomes `colon'.
 
 # Any command claiming to be `same as <foo>' or `equivalent to <foo>'
@@ -11,14 +13,11 @@
 # link to <foo>.  (Arguably the help file should be put at the start
 # instead.)
 
-# Takes one filename argument, or stdin: the zsh manual page as a plain
-# ascii file: `man zshbuiltins | colcrt -' (remember the -) should do
-# the trick.
+# If a third arg is given, the symlink is not created, but a
+# list of symlinks is put into the file specified by that arg.
 
-# If you don't have colcrt, try 'col -bx'.  The x is necessary so that
-# spaces don't turn into tabs, which messes up the calculations of
-# indentation on machines which randomly wrap lines round to the
-# previous line (so you see what we're up against).
+# Optionally, you can pass -fLC_CTYPE as an additional first argument.
+# If do that, this LC_CTYPE is used instead of one specified by a heuristic.
 
 # Example usage:
 #    cd ~/zsh-4.0.1				# or wherever
@@ -39,7 +38,82 @@
 #    }
 # now <Esc>-h works for shell builtins.
 
-while (<>) {
+sub Usage {
+    print(STDERR "Usage: helpfiles [-fLC_CTYPE] zshbuiltins.1 dest-dir [link-file]\n");
+    exit(1);
+}
+
+sub Info {
+    print('helpfiles: ', @_, "\n");
+}
+
+sub Die {
+    print(STDERR 'helpfiles: ', @_, "\n");
+    exit(1);
+}
+
+&Usage() unless(@ARGV);
+delete($ENV{'LC_ALL'});
+$ENV{'LANG'} = 'C';
+if($ARGV[0] =~ /-f(.*)/) {
+    $lc_type = $1;
+    shift(@ARGV);
+    &Usage() unless(@ARGV);
+    if($lc_type eq '') {
+        $lc_type = shift(@ARGV);
+        &Usage() unless(@ARGV);
+    }
+} else {
+    open(LOCALE, '-|', 'locale', '-a') || &Die('cannot execute locale -a');
+    $lc_ctype = '';
+    $choice = 0;
+    while(<LOCALE>) {
+        if(/en.*utf8/i) {
+            $lc_ctype = $_;
+            last;
+        } elsif(/utf8/i) {
+            $lc_ctype = $_;
+            $choice = 2;
+        } elsif(($choice < 1) && (/(en)|\./i)) {
+            $lc_ctype = $_;
+            $choice = 1;
+        }
+    }
+    close(LOCALE);
+}
+&Info("using LC_CTYPE=$lc_ctype");
+$ENV{'LC_CTYPE'} = $lc_ctype unless($lc_ctype eq '');
+shift(@ARGV) if($ARGV[0] eq '--');
+&Usage() unless(@ARGV);
+$manfile = shift(@ARGV);
+&Usage() unless(@ARGV);
+$destdir = shift(@ARGV);
+$linkfile = ((@ARGV) ? shift(@ARGV) : '');
+unless(-d $destdir) {
+    mkdir($destdir) || &Die("$destdir is not a directory and cannot be created");
+}
+
+delete($ENV{'MANPL'});
+delete($ENV{'MANROFFSEQ'});
+$ENV{'MANWIDTH'} = '80';
+$ENV{'GROFF_NO_SGR'} = ''; # We need "classical" formatting of man pages.
+
+unless(open(MANPAGE, '-|', "man $manfile | colcrt -")) {
+    close(MANPAGE);
+    open(MANPAGE, '-|', "man $manfile | col -bx")
+# The x is necessary so that spaces don't turn into tabs, which messes
+# up the calculations of indentation on machines which randomly wrap lines
+# round to the previous line (so you see what we're up against).
+     || &Die('can run neither "man | colcrt -" nor "man | col -bx"');
+}
+
+unless($linkfile eq '') {
+    open(LINKFILE, '>', $linkfile) || &Die("cannot open $linkfile for writing")
+}
+
+chdir($destdir) || &Die("cannot cd to $destdir");
+
+while (<MANPAGE>) {
     last if /^\s*SHELL BUILTIN COMMANDS/;
     /zshbuiltins/ && $zb++;
     last if ($zb && /^\s*DESCRIPTIONS/);
@@ -93,7 +167,7 @@ sub doprint {
     print;
 }
 
-while (<>) { last unless /^\s*$/; }
+while (<MANPAGE>) { last unless /^\s*$/; }
 
 /^(\s+)(\S+)/;
 $indentstr = $1;
@@ -101,13 +175,13 @@ $indent = length($1);
 &newcmd($2);
 print if $print;
 
-BUILTINS: while (<>) {
+BUILTINS: while (<MANPAGE>) {
     next if /^\w/;
 
     undef($undented);
     if (/^\s*$/ || ($undented = (/^(\s*)/  && length($1) < $indent))) {
 	$undented && &doprint($_);
-	while (defined($_ = <>) && /(^\w)|(^\s*$)/) {
+	while (defined($_ = <MANPAGE>) && /(^\w)|(^\s*$)/) {
 	    # NAME is the start of the next section when in zshall.
 	    # (Historical note: we used to exit on the page header,
 	    # but text from the old section can continue to the
@@ -118,11 +192,11 @@ BUILTINS: while (<>) {
 	}
         if (/^\s*Page/ || /^zsh.*\s\d$/) {
 	    do {
-		$_ = <>;
+		$_ = <MANPAGE>;
 	    } while (defined($_) && /^\s*$/);
 	    if (/^\s*ZSHBUILTINS/) {
 		do {
-		    $_ = <>;
+		    $_ = <MANPAGE>;
 		} while (defined($_) && /^\s*$/);
 	    }
 	}
@@ -132,7 +206,7 @@ BUILTINS: while (<>) {
 	    s/^\s*/ /;
 	    $defer = $_;
 	    do {
-		$_ = <>;
+		$_ = <MANPAGE>;
 	    } while (defined($_) && /^\s*$/);
 	    last unless defined($_);
 	}
@@ -157,6 +231,7 @@ BUILTINS: while (<>) {
 
 select STDOUT;
 close OUT;
+close MANPAGE;
 
 foreach $file (<*>) {
     open (IN, $file);
@@ -176,8 +251,16 @@ foreach $file (<*>) {
 
 	# Make this a link to that.
 	unlink $file;
-	symlink ($sameas, $file);
+	if($linkfile eq '') {
+	    symlink ($sameas, $file);
+	} else {
+	    print(LINKFILE "$sameas $file\n");
+	}
     }
 }
+close(LINKFILE) unless($linkfile eq '');
+
+# Make one sanity check
+&Die('not all files were properly generated') unless(-r 'zmodload');
 
 __END__

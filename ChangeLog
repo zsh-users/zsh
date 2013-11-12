@@ -1,5 +1,10 @@
 2013-11-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 31959: .gitignore, Completion/Zsh/Command/_run-help,
+	Doc/.cvsignore, Doc/.distfiles, Doc/Makefile.in, Makefile.in,
+	StartupFiles/zshrc, Util/helpfiles, configure.ac: make
+	help files during installation.
+
 	* 31961: Src/Zle/zle.h, Src/Zle/zle_main.c,
 	Src/Zle/zle_thingy.c: rationalise fd watch to use structures.
 
