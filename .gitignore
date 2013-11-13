@@ -30,6 +30,7 @@ Config/defs.mk
 CVS
 .#*
 
+Doc/help
 Doc/help.txt
 Doc/help/[_a-zA-Z0-9]*
 
