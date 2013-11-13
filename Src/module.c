@@ -3419,12 +3419,15 @@ autofeatures(const char *cmdnam, const char *module, char **features,
     int ret = 0, subret;
     Module defm, m;
     char **modfeatures = NULL;
+    int *modenables = NULL;
     if (module) {
 	defm = (Module)find_module(module,
 				   FINDMOD_ALIASP|FINDMOD_CREATE, NULL);
 	if ((defm->node.flags & MOD_LINKED) ? defm->u.linked :
-	    defm->u.handle)
+	    defm->u.handle) {
 	    (void)features_module(defm, &modfeatures);
+	    (void)enables_module(defm, &modenables);
+	}
     } else
 	defm = NULL;
 
@@ -3544,6 +3547,16 @@ autofeatures(const char *cmdnam, const char *module, char **features,
 		    ret = 1;
 		    continue;
 		}
+		/*
+		 * If the feature is already provided by the module, there's
+		 * nothing more to do.
+		 */
+		if (modenables[ptr-modfeatures])
+		    continue;
+		/*
+		 * Otherwise, marking it for autoload will do the
+		 * right thing when the feature is eventually used.
+		 */
 	    }
 	    if (!m->autoloads) {
 		m->autoloads = znewlinklist();

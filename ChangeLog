@@ -1,5 +1,8 @@
 2013-11-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 31977: Src/module.c: no error if autoloading a feature that
+	is already loaded in a consistent fashion.
+
 	* Jun T.: 31971: locale fix for helpfiles.
 
 	* Martin Vaeth: 31959: .gitignore, Doc/help/.cvsignore,
