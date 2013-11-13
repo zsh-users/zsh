@@ -56,11 +56,11 @@ sub Die {
 delete($ENV{'LC_ALL'});
 $ENV{'LANG'} = 'C';
 if($ARGV[0] =~ /-f(.*)/) {
-    $lc_type = $1;
+    $lc_ctype = $1;
     shift(@ARGV);
     &Usage() unless(@ARGV);
-    if($lc_type eq '') {
-        $lc_type = shift(@ARGV);
+    if($lc_ctype eq '') {
+        $lc_ctype = shift(@ARGV);
         &Usage() unless(@ARGV);
     }
 } else {
@@ -68,10 +68,10 @@ if($ARGV[0] =~ /-f(.*)/) {
     $lc_ctype = '';
     $choice = 0;
     while(<LOCALE>) {
-        if(/en.*utf8/i) {
+        if(/en.*utf-?8/i) {
             $lc_ctype = $_;
             last;
-        } elsif(/utf8/i) {
+        } elsif(/utf-?8/i) {
             $lc_ctype = $_;
             $choice = 2;
         } elsif(($choice < 1) && (/(en)|\./i)) {

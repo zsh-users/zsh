@@ -1,5 +1,7 @@
 2013-11-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Jun T.: 31971: locale fix for helpfiles.
+
 	* Martin Vaeth: 31959: .gitignore, Doc/help/.cvsignore,
 	Doc/help/.distfiles: missed files.
 
