@@ -3,6 +3,13 @@
 	* Martin Vaeth: 31959: .gitignore, Doc/help/.cvsignore,
 	Doc/help/.distfiles: missed files.
 
+2013-11-12  Bart Schaefer  <schaefer@zsh.org>
+
+	* 31966: Util/helpfiles: skip introductory paragraphs processing
+	"man zshbuiltins" by assuming that all real command names start
+	with a lower case letter.  Check "ztcp" file as a guess that all
+	builtins were processed.
+
 2013-11-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Martin Vaeth: 31959: .gitignore,

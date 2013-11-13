@@ -123,7 +123,7 @@ $print = 0;
 
 sub namesub {
     local($cmd) = shift;
-    if ($cmd =~ /^\w+$/) {
+    if ($cmd =~ /^\w*$/ && lc($cmd) eq $cmd) {
 	$cmd;
     } elsif ($cmd eq '.') {
 	'dot';
@@ -261,6 +261,6 @@ foreach $file (<*>) {
 close(LINKFILE) unless($linkfile eq '');
 
 # Make one sanity check
-&Die('not all files were properly generated') unless(-r 'zmodload');
+&Die('not all files were properly generated') unless(-r 'ztcp');
 
 __END__
