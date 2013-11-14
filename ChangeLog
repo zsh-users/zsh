@@ -1,3 +1,9 @@
+2013-11-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 31982: Src/math.c, Test/C01arith.ztst: detection of floating
+	point constants had run rampant in users/17445.  Fix the original
+	problem another way.
+
 2013-11-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31977: Src/module.c: no error if autoloading a feature that

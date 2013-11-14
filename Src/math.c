@@ -448,9 +448,7 @@ lexconstant(void)
     if (*nptr == '-')
 	nptr++;
 
-    if (*nptr == '0' &&
-	(memchr(nptr, '.', strlen(nptr)) == NULL))
-    {
+    if (*nptr == '0') {
 	nptr++;
 	if (*nptr == 'x' || *nptr == 'X') {
 	    /* Let zstrtol parse number with base */
@@ -491,11 +489,8 @@ lexconstant(void)
 	    nptr = ptr2;
 	}
     }
-    else
-    {
-	while (idigit(*nptr) || *nptr == '_')
-	    nptr++;
-    }
+    while (idigit(*nptr) || *nptr == '_')
+	nptr++;
 
     if (*nptr == '.' || *nptr == 'e' || *nptr == 'E') {
 	char *ptr2;

@@ -258,3 +258,11 @@
 >0.5
 >3
 >3.
+
+  print $(( 0x30 + 0.5 ))
+  print $(( 077 + 0.5 ))
+  (setopt octalzeroes; print $(( 077 + 0.5 )) )
+0:Mixed float and non-decimal integer constants
+>48.5
+>77.5
+>63.5
