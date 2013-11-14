@@ -1,5 +1,8 @@
 2013-11-14  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 31983: Src/zsh.mdd: suppress warning from cmp that doesn't
+	indicate a problem when generating patchlevel header.
+
 	* 31982: Src/math.c, Test/C01arith.ztst: detection of floating
 	point constants had run rampant in users/17445.  Fix the original
 	problem another way.
