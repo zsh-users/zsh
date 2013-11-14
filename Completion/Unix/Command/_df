@@ -1,0 +1,79 @@
+#compdef df
+
+local context state state_descr line args spec
+local -A opt_args
+
+if _pick_variant gnu=GNU unix --version; then
+  args=(
+    '(-B --block-size -k)'{-B+,--block-size=}'[specify block size]:size (bytes)'
+    '(-B --block-size -k)-k[like --block-size=1K]'
+    '(-P --portability)'{-P,--portability}'[use the POSIX output format]'
+    '(-h --human-readable -H --si)'{-h,--human-readable}'[print sizes in human readable format]'
+    '(-h --human-readable -H --si)'{-H,--si}'[human readable fomat, but use powers of 1000 not 1024]'
+    '(-i --inodes)'{-i,--inodes}'[list inode information instead of block usage]'
+    '--total[produce a grand total]'
+    '(-T --print-type)'{-T,--print-type}'[print file system type]'
+    '(-a --all)'{-a,--all}'[include dummy file systems]'
+    '(-l --local)'{-l,--local}'[limit listing to local file systems]'
+    '*'{-t+,--type=}'[limit listing to file systems of specified type]:file system type:_file_systems'
+    '*'{-x+,--exclude-type=}'[exclude file systems of specified type]:file system type:_file_systems'
+    '(--no-sync)--sync[invoke sync before getting usage info]'
+    '(--sync)--no-sync[do not invoke sync before getting usage info (default)]'
+    '-v[(ignored)]'
+    '(- : *)--help[display help and exit]'
+    '(- : *)--version[output version information and exit]'
+    '*:files:_files'
+  )
+elif [[ "$OSTYPE" == (darwin|freebsd|dragonfly)* ]]; then
+  args=(
+    '(-b -g -H -h -k -m)-b[use 512-byte blocks (default)]'
+    '(-b -g -H -h -k -m)-g[use 1024^3-byte blocks]'
+    '(-b -g -H -h -k -m)-H[human-readable output (base 10)]'
+    '(-b -g -H -h -k -m)-h[human-readable output (base 2)]'
+    '(-b -g -H -h -k -m)-k[use 1024-byte blocks]'
+    '(-b -g -H -h -k -m)-m[use 1024*1024-byte blocks]'
+    '-P[POSIX compliant output]'
+    '-a[show all mount points]'
+    '-i[include inode usage statistics (default)]'
+    '-l[only display locally-mounted file systems]'
+    '-n[use previously obtained statistics]'
+    '*:files:_files'
+  )
+  spec='[only display file systems of specified types]:file system type:->fslist'
+  case "$OSTYPE" in
+    (darwin*)
+      args+=(
+        "-T+$spec"
+#       '-t[same as -T (obsolete)]:file system type:->fslist'
+      )
+      ;;
+    (freebsd*|dragonfly*)
+      args+=( "-t+$spec" '-T[include file system type]' )
+      ;;
+  esac
+else
+  # POSIX
+  args=(
+    '-k[use 1024-byte blocks]'
+    '-P[POSIX compliant output]'
+    '-t[include total allocated-space figures in the output]'
+    '*:files:_files'
+  )
+fi
+
+_arguments -s -S : $args && return 0
+
+case "$state" in
+  (fslist)
+    local -a fsys used pre disp expl
+    _file_systems -U -O fsys
+    pre=$IPREFIX
+    # offer 'no' only if at the beginning of the list
+    if ! compset -P '*,' && ! compset -P 'no'; then
+      disp=( 'no  -- exclude file system types in the list' )
+      _wanted list-prefix expl 'prefix to list' compadd -d disp 'no'
+    fi
+    used=( ${(s:,:)${${IPREFIX#$pre}#no}} )
+    _wanted fsys-types expl "$state_descr" compadd -qS , -F used -a fsys
+    ;;
+esac

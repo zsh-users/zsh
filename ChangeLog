@@ -1,5 +1,7 @@
 2013-11-14  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Jun T.: 31984: Completion/Unix/Command/_df: new completion.
+
 	* 31983: Src/zsh.mdd: suppress warning from cmp that doesn't
 	indicate a problem when generating patchlevel header.
 
