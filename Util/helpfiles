@@ -61,8 +61,10 @@ unless(-d $destdir) {
     mkdir($destdir) || &Die("$destdir is not a directory and cannot be created");
 }
 
-delete($ENV{'MANPL'});
-delete($ENV{'MANROFFSEQ'});
+foreach (keys %ENV) {
+	delete($ENV{$_}) if(/^((LC_)|(LESS)|(MAN))/);
+}
+$ENV{'LANG'} = 'C';
 $ENV{'MANWIDTH'} = '80';
 $ENV{'GROFF_NO_SGR'} = ''; # We need "classical" formatting of man pages.
 
