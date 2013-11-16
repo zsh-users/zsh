@@ -1,3 +1,8 @@
+2013-11-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Martin Vaeth: 31988: Doc/Makefile.in, Util/helpfiles: remove
+	LC_CTYPE heuristics, assure clean environment, force LANG=C
+
 2013-11-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Jun T.: 31984: Completion/Unix/Command/_df: new completion.

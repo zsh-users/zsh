@@ -188,7 +188,7 @@ man: $(MAN)
 runhelp: man
 	test x"$(runhelpdir)" = x"" || { \
 	    test -r $(sdir)/help.txt && test -r $(sdir)/help/zmodload; \
-	} || perl $(sdir_top)/Util/helpfiles $(lc_ctype) -- \
+	} || perl $(sdir_top)/Util/helpfiles \
 	    $(sdir)/zshbuiltins.1 $(sdir)/help $(sdir)/help.txt \
 	    || { rm -f $(sdir)/help.txt $(sdir)/help/zmodload; false; }
 .PHONY: runhelp

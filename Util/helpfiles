@@ -53,38 +53,6 @@ sub Die {
 }
 
 &Usage() unless(@ARGV);
-delete($ENV{'LC_ALL'});
-$ENV{'LANG'} = 'C';
-if($ARGV[0] =~ /-f(.*)/) {
-    $lc_ctype = $1;
-    shift(@ARGV);
-    &Usage() unless(@ARGV);
-    if($lc_ctype eq '') {
-        $lc_ctype = shift(@ARGV);
-        &Usage() unless(@ARGV);
-    }
-} else {
-    open(LOCALE, '-|', 'locale', '-a') || &Die('cannot execute locale -a');
-    $lc_ctype = '';
-    $choice = 0;
-    while(<LOCALE>) {
-        if(/en.*utf-?8/i) {
-            $lc_ctype = $_;
-            last;
-        } elsif(/utf-?8/i) {
-            $lc_ctype = $_;
-            $choice = 2;
-        } elsif(($choice < 1) && (/(en)|\./i)) {
-            $lc_ctype = $_;
-            $choice = 1;
-        }
-    }
-    close(LOCALE);
-}
-&Info("using LC_CTYPE=$lc_ctype");
-$ENV{'LC_CTYPE'} = $lc_ctype unless($lc_ctype eq '');
-shift(@ARGV) if($ARGV[0] eq '--');
-&Usage() unless(@ARGV);
 $manfile = shift(@ARGV);
 &Usage() unless(@ARGV);
 $destdir = shift(@ARGV);
@@ -231,7 +199,7 @@ BUILTINS: while (<MANPAGE>) {
 
 select STDOUT;
 close OUT;
-close MANPAGE;
+close(MANPAGE) || &Die('piping from man ', $manfile, ' failed');
 
 foreach $file (<*>) {
     open (IN, $file);
