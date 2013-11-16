@@ -16,9 +16,6 @@
 # If a third arg is given, the symlink is not created, but a
 # list of symlinks is put into the file specified by that arg.
 
-# Optionally, you can pass -fLC_CTYPE as an additional first argument.
-# If do that, this LC_CTYPE is used instead of one specified by a heuristic.
-
 # Example usage:
 #    cd ~/zsh-4.0.1				# or wherever
 #    mkdir Help
@@ -39,7 +36,7 @@
 # now <Esc>-h works for shell builtins.
 
 sub Usage {
-    print(STDERR "Usage: helpfiles [-fLC_CTYPE] zshbuiltins.1 dest-dir [link-file]\n");
+    print(STDERR "Usage: helpfiles zshbuiltins.1 dest-dir [link-file]\n");
     exit(1);
 }
 
