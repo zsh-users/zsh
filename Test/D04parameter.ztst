@@ -1551,3 +1551,12 @@
 0:Empty parameter shouldn't cause modifiers to crash the shell
 >
 >
+
+# This used to cause uncontrolled behaviour, but at best
+# you got the wrong output so the check is worth it.
+   args() { print $#; }
+   args ${:*}
+   args ${:|}
+0:Intersection and disjunction with empty parameters
+>0
+>0

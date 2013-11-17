@@ -2941,6 +2941,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		}
 	    }
 	}
+	if (vunset) {
+	    if (unset(UNSET)) {
+		*idend = '\0';
+		zerr("%s: parameter not set", idbeg);
+		return NULL;
+	    }
+	    val = dupstring("");
+	}
     } else {			/* no ${...=...} or anything, but possible modifiers. */
 	/*
 	 * Handler ${+...}.  TODO: strange, why do we handle this only
