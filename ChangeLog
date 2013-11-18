@@ -3,9 +3,14 @@
 	* unposted but see 32012: Doc/help/.cvsignore,
 	Doc/help/.distfiles: were created in the wrong place, so move.
 
+2013-11-18  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 31995: Han Pingtian: Src/glob.c: glob	qualifiers cannot
+	follow an empty pattern, so a leading paren means grouping
+
 2013-11-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 32001: Src/subst.: fix crash on empty arrays with array
+	* 32001: Src/subst.c: fix crash on empty arrays with array
 	intersection and disjunction.
 
 2013-11-15  Barton E. Schaefer  <schaefer@zsh.org>
