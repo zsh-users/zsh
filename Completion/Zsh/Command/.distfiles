@@ -22,6 +22,7 @@ _precommand
 _print
 _prompt
 _read
+_run-help
 _sched
 _set
 _setopt

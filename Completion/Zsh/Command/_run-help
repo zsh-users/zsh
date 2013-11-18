@@ -3,5 +3,5 @@ local d expl
 local HELPDIR=${HELPDIR:-/usr/share/zsh/$ZSH_VERSION/help}
 [[ -d $HELPDIR ]] && {
 	d=($HELPDIR/*(:t))
-	(($#d)) && _wanted commands expl 'command' compadd -a d
+	(($#d)) && d+=('.' ':') && _wanted commands expl 'command' compadd -a d
 } || _man

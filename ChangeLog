@@ -5,6 +5,11 @@
 
 2013-11-18  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32008: Martin Vaeth: Completion/Zsh/Command/.distfiles
+	Completion/Zsh/Command/_run-help Doc/Makefile.in: follow-up to
+	31988 - complete "." and ":" for run-help, distribute _run-help,
+	clean up better during make
+
 	* 31995: Han Pingtian: Src/glob.c: glob	qualifiers cannot
 	follow an empty pattern, so a leading paren means grouping
 

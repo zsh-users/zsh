@@ -187,10 +187,10 @@ man: $(MAN)
 
 runhelp: man
 	test x"$(runhelpdir)" = x"" || { \
-	    test -r $(sdir)/help.txt && test -r $(sdir)/help/zmodload; \
+	    test -r $(sdir)/help.txt && test -r $(sdir)/help/ztcp; \
 	} || perl $(sdir_top)/Util/helpfiles \
 	    $(sdir)/zshbuiltins.1 $(sdir)/help $(sdir)/help.txt \
-	    || { rm -f $(sdir)/help.txt $(sdir)/help/zmodload; false; }
+	    || { rm -f $(sdir)/help.txt $(sdir)/help/*; false; }
 .PHONY: runhelp
 
 $(MAN): zmacros.yo zman.yo
@@ -396,6 +396,7 @@ distclean-here: clean-here
 realclean-here: distclean-here
 	cd $(sdir) && rm -f Zsh/modlist.yo Zsh/modmenu.yo Zsh/manmodmenu.yo
 	cd $(sdir) && rm -f version.yo ../META-FAQ zsh.texi $(MAN)
+	cd $(sdir) && rm -f help.txt help/*
 .PHONY: realclean-here
 
 @CLEAN_MK@
