@@ -1,3 +1,7 @@
+2013-11-19  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32023: Src/utils.c: better interrupt handling at RM_STAR_WAIT
+
 2013-11-18  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted but see 32012: Doc/help/.cvsignore,

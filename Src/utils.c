@@ -2299,6 +2299,8 @@ checkrmall(char *s)
 	sleep(10);
 	fputc('\n', shout);
     }
+    if (errflag)
+      return 0;
     fputs(" [yn]? ", shout);
     fflush(shout);
     zbeep();
