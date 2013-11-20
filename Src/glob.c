@@ -1171,7 +1171,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 		break;
 	    }
 	}
-	if (*s != Inpar || s == str)
+	if (*s != Inpar)
 	    break;
 	if (isset(EXTENDEDGLOB) && !zpc_disables[ZPC_HASH] && s[1] == Pound) {
 	    if (s[2] == 'q') {

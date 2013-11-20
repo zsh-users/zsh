@@ -1,3 +1,8 @@
+2013-11-20  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 32030: revert 31995 as it caused (N) to fail on an empty
+	failed glob.  Add test for this case.
+
 2013-11-19  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32023: Src/utils.c: better interrupt handling at RM_STAR_WAIT

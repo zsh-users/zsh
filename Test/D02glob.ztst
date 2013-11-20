@@ -491,3 +491,11 @@
 >@(scrimf), @(scrimf): 0
 >'(' '*' '[' '^' '@('
 >Nothing should be disabled.
+
+  (
+   setopt nomatch
+   x=( '' )
+   print $^x(N)
+  )
+0:No error with empty null glob with (N).
+>
