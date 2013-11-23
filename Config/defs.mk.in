@@ -51,6 +51,7 @@ sitefndir       = @sitefndir@
 scriptdir       = @scriptdir@
 sitescriptdir   = @sitescriptdir@
 htmldir         = @htmldir@
+runhelpdir      = @runhelpdir@
 
 # compilation
 CC              = @CC@

@@ -10,7 +10,7 @@
 
 emulate -RL zsh
 
-local HELPDIR="${HELPDIR:-/usr/share/zsh/$ZSH_VERSION/help}"
+local HELPDIR="${HELPDIR:-@runhelpdir@}"
 
 [[ $1 == "." ]] && 1="dot"
 [[ $1 == ":" ]] && 1="colon"

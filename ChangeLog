@@ -1,3 +1,10 @@
+2013-11-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 32031 plus missed _run_help: Completion/Zsh/Command/_run-help,
+	Config/defs.mk.in, Config/installfns.sh, Doc/Makefile.in,
+	Functions/Misc/run-help, Makefile.in: turn @runhelpdir@ in
+	installed functions into the actual installation path.
+
 2013-11-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 32030: revert 31995 as it caused (N) to fail on an empty

@@ -33,7 +33,6 @@ dir_top = ..
 VPATH           = @srcdir@
 sdir            = @srcdir@
 sdir_top        = @top_srcdir@
-runhelpdir      = @runhelpdir@
 INSTALL         = @INSTALL@
 LN_S            = @LN_S@
 

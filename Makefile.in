@@ -88,7 +88,7 @@ install.fns:
 	  test x$(sitefndir) != xno && \
 	    $(SHELL) $(sdir_top)/mkinstalldirs $(DESTDIR)$(sitefndir); \
 	  sdir_top="$(sdir_top)" fndir="$(fndir)" dir_top="$(dir_top)" \
-	  scriptdir="$(scriptdir)" \
+	  scriptdir="$(scriptdir)" runhelpdir="$(runhelpdir)" \
 	  FUNCTIONS_SUBDIRS="$(FUNCTIONS_SUBDIRS)" \
 	  INSTALL_DATA="$(INSTALL_DATA)" \
 	  INSTALL_PROGRAM="$(INSTALL_PROGRAM)" \

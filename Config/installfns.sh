@@ -10,6 +10,8 @@ allfuncs="`grep ' functions=.' ${dir_top}/config.modules |
 
 allfuncs="`cd $sdir_top; echo ${allfuncs}`"
 
+test -d installfnsdir || mkdir installfnsdir
+
 # We now have a list of files, but we need to use `test -f' to check
 # (1) the glob got expanded (2) we are not looking at directories.
 for file in $allfuncs; do
@@ -44,8 +46,22 @@ for file in $allfuncs; do
         ;;
       esac
     fi
-    test -d $instdir || /bin/sh $sdir_top/mkinstalldirs $instdir || exit 1
-    $INSTALL_DATA $sdir_top/$file $instdir || exit 1
+    basename=`basename $file`
+    ok=0
+    if test -d $instdir || /bin/sh $sdir_top/mkinstalldirs $instdir; then
+      if sed "s|@runhelpdir@|$runhelpdir|" <$sdir_top/$file \
+        >installfnsdir/$basename; then
+	if $INSTALL_DATA installfnsdir/$basename $instdir; then
+	  ok=1
+	fi
+      fi
+    fi
+    case $ok in
+      0)
+      rm -rf installfnsdir
+      exit 1
+      ;;
+    esac
     read line < $sdir_top/$file
     case "$line" in
       '#!'*)
@@ -54,3 +70,5 @@ for file in $allfuncs; do
     esac
   fi
 done
+
+rm -rf installfnsdir
