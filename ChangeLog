@@ -1,3 +1,8 @@
+2013-11-25  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted, see 32050, 32051: remove non-ASCII characters in
+	installed functions as this causes sed on MacOS problems.
+
 2013-11-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Completion/Unix/Command/.distfiles,

@@ -6,7 +6,7 @@ _arguments -s \
     '-d[print creation date of the database]' \
     '-F[fetch the current database]' \
     '-q[quiet mode]' \
-    '-V[show portaudit version number]' \
+    '-V[show portaudit version number]' \
     '-v[verbose mode]' \
     '-X[download a fresh database from least days old]:days:' \
     '-f[check the packages listed in file]:file:_files' \

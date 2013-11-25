@@ -1,6 +1,6 @@
 #compdef systemctl systemd-loginctl
 
-# Copyright (c) 2011 Foudil Brétel <foudil.newbie+zshsystemctl@gmail.com>
+# Copyright (c) 2011 Foudil Bre'tel <foudil.newbie+zshsystemctl@gmail.com>
 #
 # This file is released under the GPLv3.
 #
