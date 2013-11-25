@@ -83,7 +83,7 @@ Zsh/seealso.yo Zsh/tcpsys.yo Zsh/zftpsys.yo Zsh/zle.yo
 
 # ========== DEPENDENCIES FOR BUILDING ==========
 
-all: man runhelp texi ../META-FAQ
+all: man $(runhelp) texi ../META-FAQ
 .PHONY: all
 
 everything: all dvi html pdf info
@@ -184,13 +184,14 @@ $(sdir)/zsh.texi: $(YODLSRC)
 man: $(MAN)
 .PHONY: man
 
-runhelp: man
-	test x"$(runhelpdir)" = x"" || { \
-	    test -r $(sdir)/help.txt && test -r $(sdir)/help/ztcp; \
-	} || perl $(sdir_top)/Util/helpfiles \
+runhelp: help.txt
+.PHONY: runhelp
+
+help.txt: zshbuiltins.1
+	@-rm -f $(sdir)/help.txt $(sdir)/help/*
+	perl $(sdir_top)/Util/helpfiles \
 	    $(sdir)/zshbuiltins.1 $(sdir)/help $(sdir)/help.txt \
 	    || { rm -f $(sdir)/help.txt $(sdir)/help/*; false; }
-.PHONY: runhelp
 
 $(MAN): zmacros.yo zman.yo
 
@@ -312,7 +313,7 @@ install.man: man
 .PHONY: install.man
 
 # install runhelp pages, creating install directory if necessary
-install.runhelp: runhelp
+install.runhelp: $(runhelp)
 	if test x"$(runhelpdir)" != x""; then \
 	    ${SHELL} $(sdir_top)/mkinstalldirs $(DESTDIR)$(runhelpdir); \
 	    $(INSTALL_DATA) $(sdir)/help/* $(DESTDIR)$(runhelpdir); \

@@ -269,6 +269,11 @@ fi], [runhelpdir=yes])
 if test x"$runhelpdir" = xyes; then
   runhelpdir=${datadir}/${tzsh_name}/'${VERSION}'/help
 fi
+if test x"$runhelpdir" = x; then
+  runhelp=
+else
+  runhelp=runhelp
+fi
 
 ifdef([fndir],[undefine([fndir])])dnl
 AC_ARG_ENABLE(fndir,
@@ -310,6 +315,7 @@ else
 fi], [additionalfpath=""])
 
 AC_SUBST(runhelpdir)dnl
+AC_SUBST(runhelp)dnl
 AC_SUBST(additionalfpath)dnl
 AC_SUBST(fndir)dnl
 AC_SUBST(sitefndir)dnl
