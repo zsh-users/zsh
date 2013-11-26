@@ -1,3 +1,8 @@
+2013-12-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Jun T.: 32056: Completion/Unix/Command/_iconv: Handle
+	different versions of iconv.
+
 2013-12-06  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Daniel Shahaf: 32091: Src/exec.c, Test/E01options.ztst:
