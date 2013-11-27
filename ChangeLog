@@ -19,7 +19,7 @@
 2013-11-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Completion/Unix/Command/.distfiles,
-	Config/version.mk: update for 5.0.3-test-2.
+	Config/version.mk: update for 5.0.2-test-2.
 
 2013-11-25  Barton E. Schaefer  <schaefer@zsh.org>
 
