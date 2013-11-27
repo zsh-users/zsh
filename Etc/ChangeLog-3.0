@@ -1093,20 +1093,20 @@
 	* Src/subst.c: Zoltan's patch for rcexpandparam bug, from
 	zsh-workers 3548.
 
-Thu Sep 26 01:57:07 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Sep 26 01:57:07 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-3.0.5 released
 
 	* Src/rlimits.awk: SunOS 4 nawk doesn't support /re/ || /re/ { ... }
 
-Thu Sep 25 05:00:07 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Sep 25 05:00:07 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Spelling and zrealloc fix from Martin Buchholz <mrb@Eng.Sun.COM>
 	  (3478)
 
 	* After a='a ' ${(o)=a}b should expand to two words, `a' `b'.
 
-Sun Sep 21 07:48:07 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Sep 21 07:48:07 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_main.c, Src/zle_tricky.c: Use gotmult instead of
 	  zmult	!= 1 to test for prefix-arg.  From Bart (3322)
@@ -1130,14 +1130,14 @@ Sun Sep 21 07:48:07 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  determine the file marks.  From Peter (3285) with some fixes by
  	  me.
 
-Sat Sep 20 06:37:55 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Sep 20 06:37:55 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/params.c: typeset -U array; array=(1 2 1) created a
  	  non-unique array.
 
 	* Src/math.c: $((0x1+0x2)) did not work
 
-Fri Sep 19 05:46:49 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Sep 19 05:46:49 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: Remove wrong (int (*)(void)) prototype
  	  from match_username cast.  Go back to no prototype at all, since
@@ -1147,7 +1147,7 @@ Fri Sep 19 05:46:49 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/params.c: Keep the old environment until the new environment
  	  is completely built.
 
-Tue Sep 16 04:43:25 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Sep 16 04:43:25 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: Show explanation if there are no or more
  	  than one possible completions.
@@ -1160,14 +1160,14 @@ Tue Sep 16 04:43:25 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  Src/utils.c: Setting LINES and COLUMNS manually now works, and
  	  it is equivalent to stty rows and stty columns.
 
-Sat Aug  2 20:00:18 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Aug  2 20:00:18 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/subst.c, Src/utils.c, Src/zsh.h: RC_EXPAND_PARAM fixes
 
 	* Src/parse.c: [[ bug bug ]] bug caused BUG: wrong character in
 	  hungetc()
 
-Sun Jul 13 07:53:01 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jul 13 07:53:01 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/glob.c: */ should only glob searchable directories or
  	  directory links.
@@ -1180,7 +1180,7 @@ Sun Jul 13 07:53:01 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: Read builtin cleanup, handle backslashes correctly
 
-Mon Jun 30 04:48:17 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jun 30 04:48:17 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/jobs.c: bg should set STAT_NOSTTY.  From SUZUKI Hisao
  	  <suzuki@otsl.oki.co.jp>
@@ -1188,7 +1188,7 @@ Mon Jun 30 04:48:17 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/exec.c, Src/jobs.c, Src/zsh.h: Ignore tty settings set by
  	  background jobs
 
-Mon Jun 23 05:57:10 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jun 23 05:57:10 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-3.0.4 released
 
@@ -1196,28 +1196,28 @@ Mon Jun 23 05:57:10 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/glob.c: The pattern *a~b did not match aa.  From Peter (3249)
 
-Sun Jun 22 23:08:08 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jun 22 23:08:08 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_refresh.c: zle refresh coredump fix from Geoff (3260)
 
-Sat Jun 21 02:52:35 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Jun 21 02:52:35 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/jobs.c: Do not inherit tty settings from suspended jobs.
 
 	* configure, configure.in: Use case instead of sed hack to test
 	  for aix
 
-Fri Jun 20 03:58:04 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Jun 20 03:58:04 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/jobs.c: Another attempt to get tty settings right
 
-Tue Jun 17 05:53:19 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Jun 17 05:53:19 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/subst.c: paramsubst return the array elements directly
  	  without copying them which can lead to data corruption.  From
  	  Zefram (3250)
 
-Mon Jun 16 05:35:01 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jun 16 05:35:01 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: autoparamkeys and completeinword did not
  	  work well when : is pressed after a successfull completion
@@ -1232,14 +1232,14 @@ Mon Jun 16 05:35:01 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/params.c: Put only valid exported zsh parameters into the
  	  new environment
 
-Fri Jun  6 06:23:29 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Jun  6 06:23:29 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/jobs.c: zsh forgot stty settings when a backgrounded job
  	  terminated while zle was active.  From Peter (3196)
 
 ---- Version 3.1 diverged from 3.0 at this point, later to become 4.0 ----
 
-Tue Jun  3 06:14:14 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Jun  3 06:14:14 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-3.0.3 released
 
@@ -1247,30 +1247,30 @@ Tue Jun  3 06:14:14 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/jobs.c: pg(){ less;};:|pg caused suspended (tty input)
 
-Mon Jun  2 07:17:08 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jun  2 07:17:08 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_refresh.c: Xterm cut & paste fixes from Geoff (3135)
 
 	* Src/hist.c: Fix !# history expansion during completion.  From
  	  Peter (3132)
 
-Sun Jun  1 08:02:19 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jun  1 08:02:19 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/system.h: Use _POSIX_VDISABLE is available.  Fixes ^@ in zle
  	  on some systems.
 
-Thu May 29 05:17:31 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu May 29 05:17:31 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/cond.c: directories are always executable by root
 
 	* META-FAQ: The zsh web page moved.
 
-Tue May 20 05:22:16 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue May 20 05:22:16 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/utils.c: if abort or edit used on a correct prompt, do not
  	  attempt to correct further words on the line.
 
-Sun May 18 18:57:08 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun May 18 18:57:08 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c, Src/exec.c, Src/init.c, Src/signals.c, Src/jobs.c:
  	  Do not handle SIGPIPE specially for shells with job control
@@ -1282,11 +1282,11 @@ Sun May 18 18:57:08 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/exec.c, Src/signals.c: `:`; while true; do; done was
  	  uninterruptible
 
-Mon May 12 09:01:55 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon May 12 09:01:55 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/hist.c: !:2-1 history expansion caused memory corruption
 
-Sun May 11 08:52:00 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun May 11 08:52:00 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/lex.c: $((foo);bar) syntax works
 
@@ -1299,7 +1299,7 @@ Sun May 11 08:52:00 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/builtin.c: make sure zexit is not reentered when its
  	  execution is interrupted by a signal.
 
-Fri May  9 07:59:00 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri May  9 07:59:00 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zsh.texi: @br{} removed
 
@@ -1309,7 +1309,7 @@ Fri May  9 07:59:00 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/jobs.c: printjobs() set errflag when the foreground process
  	  was interrupted.
 
-Thu May  8 09:18:56 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu May  8 09:18:56 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/cond.c: [[ -x file ]] does stat for privileged users
 
@@ -1320,40 +1320,40 @@ Thu May  8 09:18:56 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/zle_tricky.c, Src/hist.c, Src/lex.c, Src/parse.c:
 	  ((foo);bar) now works
 
-Tue May  6 05:56:36 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue May  6 05:56:36 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/signals.c: WINCH traps did not work.  From Peter (3093)
 
-Wed Apr 30 07:40:30 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Apr 30 07:40:30 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/text.c: printing case commands were broken.  From Zefram (3062)
 
-Mon Apr 28 07:28:34 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Apr 28 07:28:34 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c, Src/system.h, acconfig.h, config.h.in, configure,
  	  configure.in, Src/rlimits.c: Use rlim_t if available
 
 	* Etc/FAQ: March 24 1997 FAQ from Peter
 
-Sat Apr 26 06:26:11 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Apr 26 06:26:11 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Functions/zed: Reenter zed if it fails to save the file
 
 	* Functions/zed: Use bindkey -L to temporarily save bindings.
   	  From Zefram (3012)
 
-Fri Apr 25 06:41:36 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Apr 25 06:41:36 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Functions/cdmatch, Misc/compctl-examples: compctl-examples
  	  improvements from Zefram (3006)
 
 	* Src/globals.h: NOTIFY is off in sh/ksh mode.  From Zefram (3003)
 
-Sun Apr 20 07:24:12 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Apr 20 07:24:12 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/init.c, Src/params.c, Src/utils.c: Remove setintenv()
 
-Tue Apr 15 05:51:27 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Apr 15 05:51:27 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_refresh.c: SGTABTYPE can contain more than one bit
  	  set.  From Geoff (2976)
@@ -1366,7 +1366,7 @@ Tue Apr 15 05:51:27 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/builtin.c: vared path caused permanent
  	  allocation in arrayfixenv
 
-Sat Mar  8 00:17:24 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Mar  8 00:17:24 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: Sometimes an incorrect compctl
  	  caused a core dump.  From Peter (2942)
@@ -1380,7 +1380,7 @@ Sat Mar  8 00:17:24 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  terminals centralized in zlevarsetfn().  From Bart and me (2956,
  	  2957)
 
-Fri Mar  7 23:54:18 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Mar  7 23:54:18 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle.h, Src/zle_misc.c, Src/zle_refresh.c,
 	  Src/utils.c: act as if single_line_zle were set when LINES < 3.
@@ -1404,17 +1404,17 @@ Tue Feb 18 20:59:51 1997  Zoltan Hidvegi  <hzoli@vnet.ibm.com>
 
 	* Src/lex.c: eval \$\{$#\} did not work
 
-Mon Jan 27 22:04:29 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jan 27 22:04:29 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/signals.c: temprarily set breaks to zero when executing a trap
 
 	* Src/exec.c: do not reset breaks in doshfunc
 
-Sun Jan 26 02:55:02 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jan 26 02:55:02 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/init.c: set noerrexit to -1 in setupvals()
 
-Sat Jan 25 20:07:46 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Jan 25 20:07:46 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/subst.c, Src/utils.c: some assignments were missing from my
  	  spacesplit fix
@@ -1425,7 +1425,7 @@ Sat Jan 25 20:07:46 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/zle.h, Src/zle_misc.c, Src/zle_refresh.c:
  	  redisplay fix for multiline prompts from Geoff (2817)
 
-Mon Jan 20 21:11:22 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jan 20 21:11:22 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/hashtable.h, acconfig.h, config.h.in, configure,
  	  configure.in: some old compilers cannot initialise a union
@@ -1433,16 +1433,16 @@ Mon Jan 20 21:11:22 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/zle_utils.c: move the mark when characters are
 	  inserted/deleted.  From Peter (2807)
 
-Sat Jan 18 22:34:17 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Jan 18 22:34:17 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* acconfig.h, config.h.in, configure, configure.in: use the
  	  AC_FUNC_STRCOLL builtin autoconf test
 
-Tue Jan 14 13:52:36 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Jan 14 13:52:36 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_move.c: vi-goto-column did not move to the last column
 
-Sat Jan 11 23:45:50 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Jan 11 23:45:50 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/system.h: define lstat(X,Y) instead of lstst if HAVE_LSTAT
  	  is not defined
@@ -1456,12 +1456,12 @@ Sat Jan 11 23:45:50 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: fix bugs when there was no current job after disown
 
-Thu Jan  9 14:44:28 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Jan  9 14:44:28 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/hist.c: Peter's patch broke history expansion in some cases.
   	  From Peter (2755)
 
-Wed Jan  8 22:02:51 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Jan  8 22:02:51 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/globals.h, Src/hist.c, Src/lex.c: hist_ignore_dups did not
  	  work with fc in precmd().  From Peter (2748)
@@ -1469,7 +1469,7 @@ Wed Jan  8 22:02:51 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* configure, configure.in: on NetBSD <sys/time.h> is needed for
  	  rlimit type checks.  Based on article 2742 from Geoff
 
-Tue Jan  7 23:10:24 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Jan  7 23:10:24 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/params.c, Src/builtin.c, Src/exec.c: print error when
 	  changing read-only variables, prevent core dump when assigning
@@ -1477,12 +1477,12 @@ Tue Jan  7 23:10:24 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: compctl -S bugfix
 
-Mon Jan  6 20:43:36 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jan  6 20:43:36 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c, acconfig.h, config.h.in, configure, configure.in:
 	  better /dev/fd filesystem check
 
-Sun Jan  5 23:33:32 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jan  5 23:33:32 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c, Src/system.h, Src/utils.c, acconfig.h,
  	  config.h.in, configure, configure.in: checks for quad_t and
@@ -1496,17 +1496,17 @@ Sun Jan  5 23:33:32 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/zle_main.c: EOF ignored in interactive mode when not in
  	  the first line.  From Peter (2713)
 
-Fri Jan  3 02:26:03 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Jan  3 02:26:03 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Misc/compctl-examples: setopt/unsetopt compctl fixes
 
-Thu Jan  2 20:57:33 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Jan  2 20:57:33 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* configure, configure.in: alpha-linux defines signals in
  	  <asm/signum.h>.  From David Krinsky <krinsky@hcs.harvard.edu>
  	  (2706)
 
-Wed Jan  1 20:04:06 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Jan  1 20:04:06 1997  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/params.c, Src/hashtable.h: remove the struct iparam hack
  	  which assumed that sizeof(long) == sizeof(void*)
@@ -1514,7 +1514,7 @@ Wed Jan  1 20:04:06 1997  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/system.h, configure, configure.in: dgux CLOBBERS_TYPEAHEAD.
   	  From Roderick Schertler <roderick@gate.net> (2623)
 
-Tue Dec 31 02:28:09 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Dec 31 02:28:09 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c, Src/params.c, Src/utils.c: use
  	  dupstrpfx/ztrduppfx
@@ -1523,7 +1523,7 @@ Tue Dec 31 02:28:09 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  foo='echo ' ; alias bar=foo, foo bar should expand to foo echo.
   	  From Peter (2558)
 
-Sun Dec 29 22:34:21 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Dec 29 22:34:21 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zsh.texi, Doc/zshexpn.man, Doc/zshmisc.man, Src/glob.c,
  	  Src/lex.c: brace related bugfixes
@@ -1533,7 +1533,7 @@ Sun Dec 29 22:34:21 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/exec.c, Src/loop.c, Src/parse.c: case argument should not be
  	  globbed
 
-Thu Dec 19 21:37:17 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Dec 19 21:37:17 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* zsh-3.0.2 repacked
 
@@ -1543,7 +1543,7 @@ Thu Dec 19 21:37:17 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Etc/FAQ: FAQ from Peter: Id: zsh.FAQ,v 2.22 1996/12/19 09:52:11
  	  pws Exp
 
-Tue Dec 17 20:08:58 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Dec 17 20:08:58 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-3.0.2 released
 
@@ -1552,7 +1552,7 @@ Tue Dec 17 20:08:58 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/Makefile.in: rlimits.h depends on rlimits.awk.  Cosmetic
  	  changes.  From Zefram (2589)
 
-Mon Dec 16 03:33:12 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Dec 16 03:33:12 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* README: unknown limits should no longer be a problem
 
@@ -1562,14 +1562,14 @@ Mon Dec 16 03:33:12 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/builtin.c: fg %% failed and disabled job control sometimes
  	  when there were no current job
 
-Sun Dec 15 22:09:21 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Dec 15 22:09:21 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zsh.texi, Doc/zshzle.man, Src/zle_hist.c:
  	  insert-last-word with numeric arguments inserts the given word
  	  from the previous history event.  From Bart (2445),
  	  documentation by me.
 
-Sat Dec 14 02:44:21 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Dec 14 02:44:21 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c (execcmd): builtin < / > / closed stdin
 
@@ -1582,7 +1582,7 @@ Sat Dec 14 02:44:21 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* configure, configure.in: working fifos should be tested in /tmp
 
-Wed Dec 11 02:30:39 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Dec 11 02:30:39 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c, Src/builtin.c, Src/exec.c, Src/globals.h,
  	  Src/hist.c, Src/init.c, Src/input.c, Src/lex.c, Src/zsh.h:
@@ -1593,7 +1593,7 @@ Wed Dec 11 02:30:39 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/params.c: use the heap in getstrvalue()
 
-Tue Dec 10 02:27:35 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Dec 10 02:27:35 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_refresh.c: single line zle refresh bugfix from Geoff
  	  (2549)
@@ -1608,7 +1608,7 @@ Tue Dec 10 02:27:35 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: use the heap in zexit()
 
-Sun Dec  8 21:32:06 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Dec  8 21:32:06 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/input.c: no further input should be attempted when lexstop
  	  is true (e.g. after eof).
@@ -1637,7 +1637,7 @@ Sun Dec  8 21:32:06 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/builtin.c: show metafied characters correctly in bad option
  	  errors.  From Zefram (2497)
 
-Tue Nov 26 02:45:15 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Nov 26 02:45:15 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c: the STTY parameter did not work well when pipes were
  	  used.  From Peter (2474)
@@ -1645,11 +1645,11 @@ Tue Nov 26 02:45:15 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Etc/FAQ: FAQ from Peter: Id: zsh.FAQ,v 2.21 1996/11/25 09:13:28
  	  pws Exp
 
-Sun Nov 24 22:44:12 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Nov 24 22:44:12 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_move.c: vi-goto-mark fix from Thorsten
 
-Sat Nov 23 23:34:58 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Nov 23 23:34:58 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c:
 	  ((...)) substituted the expression twice and coredumped on (())
@@ -1657,7 +1657,7 @@ Sat Nov 23 23:34:58 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Doc/zsh.texi, Doc/zshcompctl.man: compctl -e clarification from
  	  Peter (2453)
 
-Wed Nov 20 00:58:06 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Nov 20 00:58:06 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/utils.c: The spell checker always tries to fix as many
  	  leading directory compontents as possible.  From Bart (2429)
@@ -1665,7 +1665,7 @@ Wed Nov 20 00:58:06 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/zle_tricky.c: my spell-word fix used an uninitialised
  	  pointer.  Fix from Bart (2428)
 
-Sun Nov 17 21:21:22 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Nov 17 21:21:22 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/params.c: remove a few memory leaks when initialising the
  	  parameter table.
@@ -1676,7 +1676,7 @@ Sun Nov 17 21:21:22 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/exec.c, Src/parse.c, Src/text.c, Src/zsh.h: do not convert
  	  ((...)) to builtin let internally.
 
-Sat Nov 16 23:57:40 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Nov 16 23:57:40 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: spell-word zle function did not work for word
  	  beginning with a tilde
@@ -1690,11 +1690,11 @@ Sat Nov 16 23:57:40 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/zle_tricky.c: the cursor moved back on TAB when it was on
  	  "".  From Zefram (2415)
 
-Thu Nov 14 12:59:25 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Nov 14 12:59:25 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_refresh.c: one more refresh fix from Geoff (2404)
 
-Wed Nov 13 21:47:28 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Nov 13 21:47:28 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* config.guess, config.sub: recognize i[6-9]86
 
@@ -1709,11 +1709,11 @@ Wed Nov 13 21:47:28 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/zle_refresh.c: zle_refresh scrolling change from Geoff (2351)
 
-Tue Nov 12 21:35:18 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Nov 12 21:35:18 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/init.c, Src/zle_refresh.c: zle-refresh patch from Geoff (2336)
 
-Sun Nov  3 23:00:05 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Nov  3 23:00:05 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/system.h: set OPEN_MAX to 64 if NOFILE is not defined
 
@@ -1723,7 +1723,7 @@ Sun Nov  3 23:00:05 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Functions/pushd: setopt localoptions must come after
 	  emulate -R zsh
 
-Sat Nov  2 22:47:53 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Nov  2 22:47:53 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/compat.c, Src/hashtable.c, Src/utils.c: do not blindly
  	  assume that . and .. are always the first two enrties in a
@@ -1732,7 +1732,7 @@ Sat Nov  2 22:47:53 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/utils.c: max_zsh_fd should not be decreased below zero
 
-Thu Oct 31 01:38:10 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Oct 31 01:38:10 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/hist.c: zsh splitted lines longer than 1022 while reading
  	  the history file
@@ -1741,7 +1741,7 @@ Thu Oct 31 01:38:10 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: read -c ignored its first parameter
 
-Fri Oct 25 20:50:38 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Oct 25 20:50:38 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-3.0.1 released
 
@@ -1751,7 +1751,7 @@ Fri Oct 25 20:50:38 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/zle_main.c: key binding coredump fix from Peter (2131)
 
-Thu Oct 24 10:02:00 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Oct 24 10:02:00 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: A minor bugfix related to alwayslastprompt and
  	  compctl -X from Geoff (2255)
@@ -1760,28 +1760,28 @@ Thu Oct 24 09:15:18 1996  pws  <pws@ihf.de>
 
 	* Etc/FAQ: checked in with -k by hzoli at 1996/10/25 19:57:51
 
-Mon Oct 21 20:39:19 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Oct 21 20:39:19 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zsh.texi, Doc/zshoptions.man: Better documentation of
  	  GLOB_ASSIGN and MAGIC_EQUAL_SUBST from Peter (2164)
 
-Sun Oct 20 00:08:41 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Oct 20 00:08:41 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* configure, configure.in: I made a stupid mistake in the Cray
  	  hacks for nis_list
 
-Sat Oct 19 19:39:12 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Oct 19 19:39:12 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* configure, configure.in: allow cross-compiling
 
-Fri Oct 18 20:34:06 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Oct 18 20:34:06 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zsh.man, Doc/zsh.texi, Doc/zshall.man: Paul Falstad's
  	  preferred E-mail address is pjf@cts.com
 
 	* Src/hist.c: A little simplifiction.
 
-Wed Oct 16 22:58:08 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Oct 16 22:58:08 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Etc/BUGS: sed in HP-UX 10.20 is broken.
 
@@ -1789,7 +1789,7 @@ Wed Oct 16 22:58:08 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  that from the directory stack.  popd should warn when the
  	  directory stack is empty.  From Bart (zsh-users 437)
 
-Tue Oct 15 21:07:03 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Oct 15 21:07:03 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_utils.c: use int instead of char in getzlequery
 
@@ -1811,7 +1811,7 @@ Tue Oct 15 21:07:03 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/zle_refresh.c: bugfix and optimisation for poor terminals
  	  from Geoff (2221)
 
-Tue Oct  8 23:19:38 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Oct  8 23:19:38 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Etc/BUGS, Etc/CONTRIBUTORS, Etc/MACHINES, Etc/NEWS: spell fixes
  	  from Geoff (2190)
@@ -1821,7 +1821,7 @@ Tue Oct  8 23:19:38 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/prototypes.h, acconfig.h, config.h.in, configure,
  	  configure.in: make compilation possible on OSF/1 V4.x with gcc
 
-Tue Oct  8 00:16:29 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Oct  8 00:16:29 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/init.c: PS3 and PS4 were only initialized in non-interactive
  	  shells
@@ -1845,7 +1845,7 @@ Tue Oct  8 00:16:29 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/utils.c: a litle optimization
 
-Sun Oct  6 12:21:08 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Oct  6 12:21:08 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Functions/cdmatch, Functions/cdmatch2, Functions/multicomp: add
  	  emulate -R zsh to some function examples.  From Bart (2172)
@@ -1857,7 +1857,7 @@ Sun Oct  6 12:21:08 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Doc/zsh.texi, Doc/zshexpn.man, Etc/NEWS, Src/glob.c: trailing /
  	  in a glob pattern now works like in other shells.
 
-Thu Oct  3 00:02:35 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Oct  3 00:02:35 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* configure, configure.in: on AIX curses should always be
  	  preferred to termcap
@@ -1870,13 +1870,13 @@ Thu Oct  3 00:02:35 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/glob.c: echo foo(:t:r) gave no matches error
 
-Tue Oct  1 00:50:49 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Oct  1 00:50:49 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c, Src/exec.c, Src/hashtable.h, Src/params.c,
  	  Src/zle_tricky.c: dots no longer appear in place of empty
  	  components of PATH, MANPATH etc.
 
-Sat Sep 28 21:22:31 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Sep 28 21:22:31 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zsh.h, Src/builtin.c, Src/hashtable.h, Src/init.c,
  	  Src/jobs.c, Src/params.c, Src/utils.c, Src/zle_misc.c,
@@ -1895,7 +1895,7 @@ Sat Sep 28 21:22:31 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/init.c: initialise ttystrname in init_io to avoid duplicated
  	  call of ttyname
 
-Tue Sep 24 19:45:30 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Sep 24 19:45:30 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_refresh.c: one character long prompts did not work.
   	  From Geoff (2118)
@@ -1907,7 +1907,7 @@ Tue Sep 24 19:45:30 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/zle_utils.c: ^C answer to a query printed a funny character.
 	  From hoh@approve.se (Goran Larsson) (2144)
 
-Mon Sep 23 23:28:38 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Sep 23 23:28:38 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/lex.c: array assignments stopped working after my previous fix
 
@@ -1922,7 +1922,7 @@ Mon Sep 23 23:28:38 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/builtin.c: POSIX: shift n should fail with error message if
  	  n > $#
 
-Sat Sep 14 04:19:41 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Sep 14 04:19:41 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/utils.c: metafy/unmetafy speedups
 
@@ -1937,13 +1937,13 @@ Sat Sep 14 04:19:41 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/params.c: shift <number> did not work
 
-Fri Sep 13 03:30:51 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Sep 13 03:30:51 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: read builtin simplifications and improvements
 
 	* Src/builtin.c: the read builtin did not handle meta characters
 
-Sat Sep  7 15:19:40 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Sep  7 15:19:40 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/params.c, config.h.in, configure, configure.in:
 	  setting the USERNAME parameter executes initgroups()
@@ -1951,7 +1951,7 @@ Sat Sep  7 15:19:40 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* configure, configure.in: define HAVE_NIS_PLUS only if the
  	  nis_list function is found
 
-Tue Sep  3 20:33:07 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Sep  3 20:33:07 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: autoload has no effect for already defined
  	  functions & other cosmetic changes
@@ -1959,7 +1959,7 @@ Tue Sep  3 20:33:07 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/utils.c: control keys at a query prompt left ^ as a garbage
  	  on the screen.  Fix from hoh@approve.se (Goran Larsson)
 
-Sun Sep  1 22:58:11 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Sep  1 22:58:11 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Etc/NEWS: more news
 
@@ -1970,7 +1970,7 @@ Sun Sep  1 22:58:11 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: umask prints 0222 instead of 222
 
-Sat Aug 31 23:43:06 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Aug 31 23:43:06 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: fc -e should not change lastval
 
@@ -2005,7 +2005,7 @@ Sat Aug 31 23:43:06 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/zle_refresh.c: xterm cut&paste fix from Geoff (2095)
 
-Thu Aug 29 21:07:24 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Aug 29 21:07:24 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/lex.c, Src/zle_tricky.c: run-help always uses the alias
  	  expanded word
@@ -2013,13 +2013,13 @@ Thu Aug 29 21:07:24 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/zle_refresh.c: fixes for slow refresh on some terminals from
  	  Geoff (2091)
 
-Mon Aug 26 00:02:36 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Aug 26 00:02:36 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c: save/restore underscore on execsave/execrestore
 
 	* Src/zle_tricky.c: line was wrongly used unmetafied in getcurcmd()
 
-Sun Aug 25 23:06:43 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Aug 25 23:06:43 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Functions/checkmail, Doc/zsh.texi, Doc/zshmisc.man, Src/cond.c,
  	  Src/parse.c: new -N contitional test to check if the access time
@@ -2027,7 +2027,7 @@ Sun Aug 25 23:06:43 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  checkmail function is also included to check mailpath or the
  	  given forlers for new mails.
 
-	* Src/builtin.c: umask error message fix from J·nos Farkas
+	* Src/builtin.c: umask error message fix from J√°nos Farkas
  	  <chexum@shadow.banki.hu> (2061)
 
 	* Src/mem.c, Src/zsh.h: halloc simplification
@@ -2043,7 +2043,7 @@ Sun Aug 25 23:06:43 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/exec.c, Src/globals.h, Src/signals.c, Src/signals.h,
  	  Src/utils.c: Some little speedups
 
-Fri Aug 23 19:18:43 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Aug 23 19:18:43 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: compctl -X did not work
 
@@ -2053,7 +2053,7 @@ Fri Aug 23 19:18:43 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/params.c: $foo[(i)...], caused invalid subscript error
 
-Thu Aug 22 21:57:47 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Aug 22 21:57:47 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* META-FAQ: ftp.uit.no now mirrors the primary site.
   	  ftp.nis.co.jp should be used instead of shirakaba.nis.co.jp
@@ -2066,7 +2066,7 @@ Thu Aug 22 21:57:47 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Etc/MACHINES: better description of the OSF/1 header bug
 	  workaround
 
-Thu Aug 15 17:40:38 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Aug 15 17:40:38 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-3.0.0 released
 
@@ -2088,7 +2088,7 @@ Thu Aug 15 17:40:38 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c: $(< nosuchfile) dumped core.  From Peter (1985)
 
-Wed Aug 14 17:02:39 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Aug 14 17:02:39 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/parse.c: ignore spaces in case foo in ( f* | b* ) ...
 
@@ -2104,7 +2104,7 @@ Wed Aug 14 17:02:39 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  Doc/zshoptions.man, Src/exec.c, Src/globals.h, Src/hashtable.h,
  	  Src/zsh.h: POSIX_BUILTIN option added
 
-Tue Aug 13 20:36:44 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Aug 13 20:36:44 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zsh.texi, Doc/zshparam.man, Src/init.c, Src/zle_misc.c: PS2
  	  defaults to %_> , %_ prints all shell constructs.  From Peter
@@ -2112,7 +2112,7 @@ Tue Aug 13 20:36:44 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/hist.c: a cast was missing in a debug test
 
-Mon Aug 12 18:01:08 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Aug 12 18:01:08 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: limit fixes for Alpha/Linux 2.0.x from Jeff Blank
  	  <jfblank@mtu.edu> (1951)
@@ -2135,7 +2135,7 @@ Mon Aug 12 18:01:08 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/hist.c, Src/signals.c: Zsh coredumped on auto-logout
 
-Sun Aug 11 19:46:50 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Aug 11 19:46:50 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/input.c: Fix history expansion in foo<!$.  This may also fix
  	  some other rare bugs.  From Peter (1930)
@@ -2151,7 +2151,7 @@ Sun Aug 11 19:46:50 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/zle_tricky.c: Untokenize and quote the current command
  	  before passing it to run-help.  Based on art. 1920 from Bart.
 
-Sun Aug  4 18:28:00 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Aug  4 18:28:00 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-3.0-pre6 released
 
@@ -2167,7 +2167,7 @@ Sun Aug  4 18:28:00 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: do not complete unset special parameters
 
-Sat Aug  3 02:54:46 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Aug  3 02:54:46 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/init.c, Src/builtin.c, Src/globals.h, Src/zsh.h: setopt
  	  prints non-default options.  From Wayne (1907)
@@ -2177,7 +2177,7 @@ Sat Aug  3 02:54:46 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/zle_utils.c: zsfree used on the non-null-terminated vibuf[*].buf
 
-Fri Aug  2 20:05:50 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Aug  2 20:05:50 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zsh.texi: spelling fixes from Mark and added reference to
  	  obtaining precompiled documentation, zsh-doc.tar.gz from Clive
@@ -2204,11 +2204,11 @@ Fri Aug  2 20:05:50 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/hist.c: strinbeg/strinend increases/decreases strin.  This
  	  fixes the here-document within command substitution bug.
 
-Thu Aug  1 17:56:17 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Aug  1 17:56:17 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/lex.c: \" should remain unchanged in here documents
 
-Wed Jul 31 19:10:04 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Jul 31 19:10:04 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-3.0-pre5 released
 
@@ -2249,7 +2249,7 @@ Wed Jul 31 19:10:04 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  message.  This makes debugging easier since a breakpoint can be
  	  set to dputs.
 
-Tue Jul 30 20:28:38 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Jul 30 20:28:38 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/params.c, Src/utils.c: zsh -s dereferenced wordchars while
  	  it was still NULL.  Reported by Peter.
@@ -2260,7 +2260,7 @@ Tue Jul 30 20:28:38 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Doc/zshmisc.man, Src/hashtable.h: MANPATH is not special in
  	  sh/ksh mode
 
-Mon Jul 29 23:44:19 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jul 29 23:44:19 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/mem.c: a little-bit improved ZSH_MEM_WARNING
 
@@ -2282,7 +2282,7 @@ Mon Jul 29 23:44:19 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/parse.c: zsh -c 'echo foo ; & echo bar' should give parse
 	  error.
 
-Sun Jul 28 22:34:08 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jul 28 22:34:08 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zshoptions.man: SH_FILE_EXPN renamed to SH_FILE_EXPANSION,
  	  -s works as SHIN_STDIN again in sh/ksh mode, -t is
@@ -2309,13 +2309,13 @@ Sun Jul 28 22:34:08 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/globals.h: -s is back in sh/ksh mode for SHIN_STDIN
 
-Sat Jul 27 20:24:36 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Jul 27 20:24:36 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/compat.c, Src/glob.c, Src/init.c, Src/mem.c,
  	  Src/zle_tricky.c: changes to make the upcoming gcc-2.8.0 more
  	  silent
 
-Fri Jul 26 21:02:59 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Jul 26 21:02:59 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-3.0-pre4 released
 
@@ -2341,7 +2341,7 @@ Fri Jul 26 21:02:59 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/hashtable.c: print { } for empty funxtion definitions.  From
  	  Peter (1778)
 
-Thu Jul 25 21:50:36 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Jul 25 21:50:36 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/signals.c, Src/subst.c: old compilers do not like char []
  	  automatic initializers
@@ -2375,14 +2375,14 @@ Thu Jul 25 08:08:47 1996  pws  <pws@bolyai.cs.elte.hu>
 
 	* Etc/FAQ: checked in with -k by hzoli at 1996/07/25 20:32:43
 
-Wed Jul 24 15:02:42 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Jul 24 15:02:42 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Etc/NEWS, Src/lex.c: disallow [[-z $foo]] again since it will
  	  cause problems with POSIX character classes (e.g. [[:ALPHA:]]).
 
 	* Src/zle_misc.c: deletechar works at the end of lines.
 
-Tue Jul 23 21:04:22 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Jul 23 21:04:22 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c, Src/exec.c, Src/globals.h, Src/hashtable.c,
  	  Src/jobs.c, Src/signals.c, Src/zsh.h: more signal trap fixes
@@ -2400,7 +2400,7 @@ Tue Jul 23 21:04:22 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/builtin.c: whence -c (and which) tells if the given command
  	  is not found.
 
-Mon Jul 22 20:32:13 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jul 22 20:32:13 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zshexpn.man, Doc/zshoptions.man, Doc/zshparam.man,
  	  Src/globals.h, Src/subst.c, Src/zsh.h: SH_FILE_EXPN option and
@@ -2421,7 +2421,7 @@ Mon Jul 22 20:32:13 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  documentation.  Updated to include changes made to man-pages
  	  pre2 -> pre3.  FIXME: URL for ps & dvi. From Clive (1730)
 
-Mon Jul 22 01:26:09 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jul 22 01:26:09 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c, Doc/zshmisc.man: traps defined by the trap builtin
  	  are unset in subshells
@@ -2444,7 +2444,7 @@ Mon Jul 22 01:26:09 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  reorganization: setopt no_something is the same as unsetopt
  	  something.  From Zefram.
 
-Sat Jul 20 17:07:14 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Jul 20 17:07:14 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* acconfig.h, config.h.in, configure, configure.in: configure
  	  check for working strcoll()
@@ -2468,7 +2468,7 @@ Sat Jul 20 17:07:14 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/lex.c: cmdstack changed bugfix from Zefram (1671)
 
-Fri Jul 19 19:25:14 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Jul 19 19:25:14 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/subst.c: parameter modifier fixes, better diagnostics
 
@@ -2498,11 +2498,11 @@ Fri Jul 19 19:25:14 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/lex.c: do not handle `<' in case patterns specially
 
-Thu Jul 18 23:03:59 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Jul 18 23:03:59 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/subst.c: a little simplification
 
-Mon Jul 15 04:43:43 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jul 15 04:43:43 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-3.0-pre3 released
 
@@ -2534,7 +2534,7 @@ Mon Jul 15 04:43:43 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	  always be raised up to the hard limits of the shell.
 	  Optimization: setrlimit() is only called when necessary.
 
-Sat Jul 13 20:26:35 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Jul 13 20:26:35 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Etc/NEWS, Doc/zshmisc.man, Src/globals.h, Src/hashtable.h,
  	  Src/hist.c, Src/lex.c, Src/parse.c, Src/utils.c,
@@ -2545,7 +2545,7 @@ Sat Jul 13 20:26:35 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/lex.c: parsestr() failed if the string contained a backslash
  	  newline
 
-Fri Jul 12 17:19:02 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Jul 12 17:19:02 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_hist.c, Src/zle_main.c: always execute the zle command
 	  which ended an I-search.  From Wayne (1613)
@@ -2567,7 +2567,7 @@ Fri Jul 12 17:19:02 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  changed to foo () command for ksh and POSIX compatibility.  This
  	  syntax does not require NO_SHORT_LOOPS.
 
-Thu Jul 11 21:03:51 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Jul 11 21:03:51 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c: handle metacharacters in here documents
 
@@ -2584,7 +2584,7 @@ Thu Jul 11 21:03:51 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: fix completing in $(...)
 
-Wed Jul 10 20:52:55 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Jul 10 20:52:55 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/glob.c, Src/subst.c, config.h.in, configure, configure.in:
  	  use strcoll for sorting.  From Andrej Borsenkow
@@ -2592,7 +2592,7 @@ Wed Jul 10 20:52:55 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c: FOO=bar function leaved FOO=bar in the environment
 
-Wed Jul 10 02:34:49 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Jul 10 02:34:49 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c: FOO=bar function leaved FOO=bar in the environment
 
@@ -2603,7 +2603,7 @@ Wed Jul 10 02:34:49 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/utils.c, Src/zle_tricky.c: menu completion after ~/ and
  	  $foo/ fixed
 
-Tue Jul  9 21:09:29 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Jul  9 21:09:29 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zsh.texi, Doc/zshmisc.man, Src/parse.c: case foo in
  	  (pattern) ... syntax documented and parsing improved
@@ -2626,18 +2626,18 @@ Tue Jul  9 21:09:29 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/lex.c: do not call exalias if errflag is true (fixes
  	  push-line-or-edit)
 
-Mon Jul  8 20:37:59 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jul  8 20:37:59 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/init.c: set shout fully buffered
 
-Mon Jul  8 01:56:51 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jul  8 01:56:51 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c, Src/globals.h, Src/hist.c, Src/init.c, Src/input.c,
 	  Src/lex.c, Src/parse.c, Src/zsh.h: doexpandhist() no does not
 	  mess up the history.  Here document are put into the history and
 	  some other here document fixes.
 
-Sun Jul  7 16:03:48 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jul  7 16:03:48 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/init.c: alloc_stackp debug check fix
 
@@ -2646,16 +2646,16 @@ Sun Jul  7 16:03:48 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Doc/zshbuiltins.man: improve ulimit documentation
 
-Sun Jul  7 00:18:17 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jul  7 00:18:17 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/lex.c: remove warning about the new <> behaviour
 
-Sat Jul  6 18:17:13 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Jul  6 18:17:13 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: fix completing in process and command
 	  substitutions
 
-Fri Jul  5 21:58:31 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Jul  5 21:58:31 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c, acconfig.h, config.h.in, configure,
  	  configure.in: configure check for NIS+ and some othe related
@@ -2675,7 +2675,7 @@ Fri Jul  5 21:58:31 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  --enable-etcdir is back.  The customized locations are put into
  	  the manual
 
-Thu Jul  4 20:46:17 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Jul  4 20:46:17 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-3.0-pre2 released
 
@@ -2694,17 +2694,17 @@ Thu Jul  4 20:46:17 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	  PERMALLOC { l = dupstruct(list); } LASTALLOC;
 	  Idea from Bart and Zefram
 
-Thu Jul  4 13:18:11 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Jul  4 13:18:11 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zshoptions.man: >| is preferred to >!
 
-Mon Jul  1 20:59:36 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jul  1 20:59:36 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zshmisc.man, Doc/zshoptions.man, Src/globals.h, Src/parse.c,
  	  Src/zsh.h: CSH_JUNKIE_PAREN option removed.  From Bart Schaefer
  	  (1496) with some modifications
 
-Mon Jul  1 20:13:26 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jul  1 20:13:26 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/mem.c, acconfig.h, config.h.in, configure, configure.in:
 	  check for brk/sbrk prototypes
@@ -2716,7 +2716,7 @@ Mon Jul  1 20:13:26 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/system.h: RLIMIT_ definitions are not hidden in HPUX 10.x
 
-Mon Jul  1 14:01:46 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jul  1 14:01:46 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: ulimit fixes
 
@@ -2726,7 +2726,7 @@ Mon Jul  1 14:01:46 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  DIRSTACKSIZE, KEYTIMEOUT, LISTMAX, LOGCHECK, MAILCHECK, PERIOD,
  	  REPORTTIME, SAVEHIST and TMOUT are no longer special parameters.
 
-Mon Jul  1 02:27:23 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jul  1 02:27:23 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/globals.h, Src/builtin.c, Src/exec.c, Src/init.c, Src/lex.c,
  	  Src/mem.c, Src/signals.c, Src/utils.c, Src/zle_main.c,
@@ -2737,17 +2737,17 @@ Mon Jul  1 02:27:23 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  used instead of return between heapalloc/permalloc and
  	  lastalloc.  From Bart Schaefer (1490) with some modifications
 
-Mon Jul  1 01:13:17 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jul  1 01:13:17 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zshbuiltins.man, Src/builtin.c, Src/exec.c, Src/hashtable.h:
 	  limit/unlimit/ulimit changes, bash/ksh compatible ulimit
 
-Sun Jun 30 21:14:16 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jun 30 21:14:16 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/intro.ms, Doc/zsh.man, Doc/zshall.man:
 	  Paul Falstad's E-mail is pf@software.com
 
-Sun Jun 30 15:46:13 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jun 30 15:46:13 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c (doshfunc): do not change the value of underscore
 
@@ -2761,23 +2761,23 @@ Sun Jun 30 15:46:13 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c: cmdoutpid and cmdoutval added to execstack
 
-Sun Jun 30 01:30:27 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jun 30 01:30:27 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/mem.c: fill freed memory with zeros if ZSH_MEM_DEBUG is defined
 
 	* Src/exec.c, Src/globals.h, Src/jobs.c, Src/signals.c, Src/zsh.h:
  	  cmdoutpid and cmdoutval added to execstack
 
-Sat Jun 29 15:24:54 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Jun 29 15:24:54 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c, Src/hist.c, Src/utils.c: fix problems with quad_t
  	  resource limits.  From Geoff (1444,1471)
 
-Fri Jun 28 17:52:52 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Jun 28 17:52:52 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: use the heap during the execution of chpwd()
 
-Fri Jun 28 15:00:11 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Jun 28 15:00:11 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* ChangeLog: zsh-3.0-pre1 released
 
@@ -2787,25 +2787,25 @@ Fri Jun 28 15:00:11 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Makefile.in: make release changes
 
-Fri Jun 28 14:08:44 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Jun 28 14:08:44 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/Makefile.in: zsh.info and zsh.dvi depends on zsh.texi
 
 	* Doc/zsh.texi: Fixed compctl -d and -e. Added ref to ***/.
 	  HISTCHARS depreciated, use histchars.
 
-Fri Jun 28 13:46:02 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Jun 28 13:46:02 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/glob.c: foo.bar(:r) did not work
 
-Fri Jun 28 01:27:57 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Jun 28 01:27:57 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_misc.c: alwayslastprompt fix when listing in
  	  execute-named-command
 
 	* Doc/zshparam.man, Src/jobs.c: %% represents % in TIMEFMT
 
-Thu Jun 27 23:51:19 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Jun 27 23:51:19 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Etc/BUGS: I hope that all awk problems are solved by now
 
@@ -2830,7 +2830,7 @@ Thu Jun 27 23:51:19 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* INSTALL, acconfig.h, config.h.in, configure, configure.in:
  	  --enable-etcdir added
 
-Wed Jun 26 23:19:48 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Jun 26 23:19:48 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/hist.c, Doc/zshexpn.man: get !# work again.  From Peter
  	  (1218 and 1219)
@@ -2847,7 +2847,7 @@ Wed Jun 26 23:19:48 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Doc/zshbuiltins.man, Src/builtin.c: POSIX conforming kill builtin
 
-Wed Jun 26 08:58:31 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Jun 26 08:58:31 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zsh.man, Doc/zshall.man, Doc/zshbuiltins.man,
  	  Doc/zshcompctl.man, Doc/zshexpn.man, Doc/zshmisc.man,
@@ -2857,11 +2857,11 @@ Wed Jun 26 08:58:31 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Doc/zshbuiltins.man, Doc/zshmisc.man: -, command, exec and
  	  noglob are builtins
 
-Tue Jun 25 23:15:04 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Jun 25 23:15:04 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/lex.c: \<nevline>c was interpreted as \c in dquote_parse()
 
-Tue Jun 25 21:07:59 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Jun 25 21:07:59 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Etc/NEWS: AUTO_PUSHD and IFS change description
 
@@ -2881,31 +2881,31 @@ Tue Jun 25 21:07:59 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/exec.c: save underscore, lastval, noeval and badcshglob in
  	  execsave
 
-Tue Jun 25 19:46:34 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Jun 25 19:46:34 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zshexpn.man: trailing newlines are removed in command
  	  substitution
 
-Tue Jun 25 00:52:10 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Jun 25 00:52:10 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c, Src/signals.c: new function execsave()/execrestore()
  	  used in dotrap()
 
-Mon Jun 24 21:05:00 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jun 24 21:05:00 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c: doshfunc must use the heap
 
 	* Src/signals.c: dotrap should not change allocation state
 
 	* Src/watch.c: do not watch utmp entries without a login name.
-  	  From J·nos Farkas (1432)
+  	  From J√°nos Farkas (1432)
 
 	* Src/utils.c: handle terminals faster than 100000 baud.  From
- 	  J·nos Farkas (1431) with modifications
+ 	  J√°nos Farkas (1431) with modifications
 
 	* Src/subst.c: fix nested $[$[...]] sunstitution
 
-Fri Jun 21 14:40:00 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Jun 21 14:40:00 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zshexpn.man: <> is a redirection operator.
 	  From Mark Borges (1390)
@@ -2925,7 +2925,7 @@ Fri Jun 21 14:40:00 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/glob.c: remove the undocumented [(foo)(bar)] glob feature
 	  since it is the same as (foo|bar).
 
-Thu Jun 20 20:58:14 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Jun 20 20:58:14 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/parse.c: enable < =(...) and > =(...) again
 
@@ -2935,17 +2935,17 @@ Thu Jun 20 20:58:14 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/zle_tricky.c: allow tilde and equals substitution with
 	  compctl -g
 
-Wed Jun 19 20:55:00 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Jun 19 20:55:00 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-2.6-beta21 released
 
-Wed Jun 19 20:51:45 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Jun 19 20:51:45 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: on Solaris RLIMIT_AS == RLIMIT_VMEM
 
 	* configure, configure.in: remove -pedantic from gcc options
 
-Wed Jun 19 20:21:33 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Jun 19 20:21:33 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/hashtable.c: fix printing of the command name tables and
  	  displaying of arrays etc.  From Zefram (1259)
@@ -2954,19 +2954,19 @@ Wed Jun 19 20:21:33 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  integer variables to zero before unsetting.  From Zefram (1258)
 
 
-Wed Jun 19 20:12:37 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Jun 19 20:12:37 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c, Src/params.c, Src/subst.c, Src/utils.c: handle
 	  the case when the first character of IFS is a meta character
 
-Tue Jun 18 21:05:17 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Jun 18 21:05:17 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zshexpn.man: [...] glob documentation
 
 	* Doc/zshoptions.man: SH_GLOB disables numeric globbing on the
  	  result of parameter expansions and in some other cases.
 
-Tue Jun 18 19:28:12 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Jun 18 19:28:12 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/subst.c, Src/utils.c: handle null (but not unset) IFS
 
@@ -2978,11 +2978,11 @@ Tue Jun 18 19:28:12 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  characters.  in notstrcmp(): handle arbitrary big numbers if
  	  NUMERICGLOBSORT is used.
 
-Mon Jun 17 18:33:44 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jun 17 18:33:44 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/lex.c: reset lexstop to zero after most hungetc's
 
-Mon Jun 17 02:14:04 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jun 17 02:14:04 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zsh.texi: a major update from Clive Messer
  	  <clive@epos.demon.co.uk>
@@ -2991,7 +2991,7 @@ Mon Jun 17 02:14:04 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  Src/subst.c, Src/utils.c, Src/ztype.h: ksh/POSIX compatible IFS
  	  behaviour
 
-Sun Jun 16 19:37:01 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jun 16 19:37:01 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/subst.c: ${(Oi)...} should sort case-independently in
 	  descending order.  From Thorsten Meinecke (1337)
@@ -3002,17 +3002,17 @@ Sun Jun 16 19:37:01 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c: make noclobber a bit more secure
 
-Sun Jun 16 18:50:47 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jun 16 18:50:47 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Misc/compctl-examples: compctl for the RedHat rpm utility
 
-Sun Jun 16 14:50:42 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jun 16 14:50:42 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/system.h: include <sys/ioctl.h> if GWINSZ_IN_SYS_IOCTL is
  	  defined.  This in fact just removes an earlier experimental
  	  patch which accicently got into the release.
 
-Sat Jun 15 23:37:44 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat Jun 15 23:37:44 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zshmisc.man, Etc/NEWS, Src/exec.c, Src/glob.c,
  	  Src/globals.h, Src/lex.c, Src/parse.c, Src/text.c, Src/zsh.h:
@@ -3022,7 +3022,7 @@ Sat Jun 15 23:37:44 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: use heapalloc() in reversemenucomplete()
 
-Tue Jun 11 21:03:45 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue Jun 11 21:03:45 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c, Src/glob.c, Src/globals.h, Src/lex.c, Src/parse.c,
  	  Src/text.c, Src/zsh.h: POSIX redirection changes.  Epand word
@@ -3038,7 +3038,7 @@ Tue Jun 11 21:03:45 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: use heapalloc() in do_menucomp()
 
-Mon Jun 10 20:58:16 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jun 10 20:58:16 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/glob.c: treat pattern/ as pattern(-/) instead of pattern(/)
 
@@ -3054,14 +3054,14 @@ Mon Jun 10 20:58:16 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: handle RLIMIT_AS in Linux 2.0
 
-Sun Jun  9 23:30:02 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jun  9 23:30:02 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: compctl -L fixes
 
 	* Src/zle_tricky.c: compctl -l '' foo only worked for the first
  	  argument of foo.
 
-Fri Jun  7 15:24:18 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri Jun  7 15:24:18 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-2.6-beta20
 
@@ -3081,7 +3081,7 @@ Fri Jun  7 15:24:18 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  mailpath, manpath, watch, psvar and path in sh/ksh compatibility
  	  mode.
 
-Thu Jun  6 20:23:23 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu Jun  6 20:23:23 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c (doexpansion): move newlinklist() after heapalloc()
 
@@ -3095,29 +3095,29 @@ Thu Jun  6 20:23:23 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  now only completes enabled commands.  -d, -e documentation
  	  fixed.
 
-Wed Jun  5 22:27:49 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed Jun  5 22:27:49 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: getcurcmd() did not use the heap when it
  	  called the lexer.  I also added some debug tests.
 
-Mon Jun  3 18:53:10 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jun  3 18:53:10 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/hashtable.c, Src/zle_hist.c, Src/zle_main.c,
  	  Src/zle_tricky.c, Src/zle_utils.c: add some (char *) and
  	  (unsigned char *) casts
 
-Mon Jun  3 16:55:44 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jun  3 16:55:44 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-2.6-beta20-test1
 
 	* Src/subst.c: multsub() did not like when prefork() resulted in
  	  an empty list
 
-Mon Jun  3 03:14:06 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jun  3 03:14:06 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/subst.c: fix brace expansion bug
 
-Mon Jun  3 01:42:58 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon Jun  3 01:42:58 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Makefile.in: config.status depends on Src/version.h
 
@@ -3141,7 +3141,7 @@ Mon Jun  3 01:42:58 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  Src/zle_tricky.c, Src/zle_vi.c, Src/zsh.h: reorganized option
  	  handling from Zefram (1227)
 
-Sun Jun  2 23:36:36 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun Jun  2 23:36:36 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c, Src/builtin.c, Src/glob.c, Src/hashtable.h,
  	  Src/subst.c, Src/zsh.h: reorganize execcmd() again.  Glob only
@@ -3161,11 +3161,11 @@ Sun Jun  2 23:36:36 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/parse.c: give warnings when DEBUG is defined and the lexer
  	  is called with !useheap
 
-Fri May 31 14:09:34 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri May 31 14:09:34 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c, Src/utils.c: nicezputs and nicechar fixes
 
-Thu May 30 18:20:46 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu May 30 18:20:46 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c: simplify makecline which also fixes a bug introcuced
  	  by the previous patch
@@ -3176,17 +3176,17 @@ Thu May 30 18:20:46 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
   	  Interpret EXEC=exec ; $EXEC something like other shells.  From
  	  Peter (1229)
 
-Tue May 28 20:49:53 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue May 28 20:49:53 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_misc.c: fix gosmacs-transpose-chars bug when a line has
 	  less than two characters
 
-Mon May 27 23:52:54 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon May 27 23:52:54 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: clwords initialisation after resizing clwords
 	  was wrong.  From Zefram (1173)
 
-Mon May 27 17:43:31 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon May 27 17:43:31 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: typeset -i2 a now works.  Based on art. 1165 from
 	  SUZUKI Hisao <suzuki@oz.fantasy.otsl.oki.co.jp>
@@ -3195,11 +3195,11 @@ Mon May 27 17:43:31 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Doc/zshbuiltins.man: revised read manual entry from Peter (663)
 
-Sun May 26 23:14:07 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun May 26 23:14:07 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Etc/FAQ: New version from Peter
 
-Thu May 23 20:14:05 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu May 23 20:14:05 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: further improve handling of null at the end of
  	  a completion word
@@ -3214,7 +3214,7 @@ Thu May 23 20:14:05 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/zle_tricky.c (quotename): handle the (metafied) null
  	  character.  From Zefram (1143)
 
-Thu May 23 13:40:50 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu May 23 13:40:50 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-2.6-beta19 released
 
@@ -3224,25 +3224,25 @@ Thu May 23 13:40:50 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/glob.c, Src/subst.c, Doc/zshexpn.man: ${...:#...}
 	  substitution now removes matching array elements
 
-Thu May 23 01:29:48 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu May 23 01:29:48 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Doc/zshoptions.man: an attempt was made to document SH_GLOB
 
 	* Src/builtin.c: popd now works even if chaselinks is set.  From
  	  Anthony (1123)
 
-Wed May 22 23:43:01 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed May 22 23:43:01 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/glob.c, Src/zle_tricky.c: add some remnulargs()
 
 	* Src/builtin.c: print -m fixed
 
-Wed May 22 21:00:06 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed May 22 21:00:06 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/glob.c, Src/globals.h, Src/init.c, Src/lex.c, Src/zsh.h:
 	  SH_GLOB option added
 
-Wed May 22 20:19:13 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed May 22 20:19:13 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/signames.awk: revert changes made in beta18.
 
@@ -3250,7 +3250,7 @@ Wed May 22 20:19:13 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c (getoutputfile): open the file before zfork()
 
-Tue May 21 19:39:16 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue May 21 19:39:16 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: zsh-2.6-beta18 released
 
@@ -3265,7 +3265,7 @@ Tue May 21 19:39:16 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* META-FAQ: Ftp site list changes
 
-Mon May 20 01:24:24 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon May 20 01:24:24 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/signames.awk: change #else to \#else since some nawks did
  	  not like the former.  From Johan Danielsson <joda@pdc.kth.se>
@@ -3283,7 +3283,7 @@ Mon May 20 01:24:24 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/zle_tricky.c: Undo Zefram's modifications in quotename() to
 	  fix a bug when completing ~/foo
 
-Sun May 19 23:20:45 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun May 19 23:20:45 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: Reformat and add some comments.
 	  From Zefram (1092)
@@ -3306,7 +3306,7 @@ Sun May 19 23:20:45 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  Make substitution compatible with (ba)sh and other little
  	  cleanups in lex.c.
 
-Fri May 17 20:23:47 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri May 17 20:23:47 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/version.h: 2.6-beta18-test1
 
@@ -3319,7 +3319,7 @@ Fri May 17 20:23:47 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Etc/MACHINES: Note about GNU strip bug on OSF/1
 
-Thu May 16 23:46:44 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu May 16 23:46:44 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_hist.c, Src/zle_utils.c: Some simple cleanups in
 	  doisearch() and hstrnstr()
@@ -3328,12 +3328,12 @@ Thu May 16 23:46:44 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	  repeated on an empty search.  It also fixes a rare isearch bug.
 	  From Wayne (1084)
 
-Thu May 16 00:15:42 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Thu May 16 00:15:42 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* acconfig.h, config.h.in, configure, configure.in, Src/system.h:
 	  configure hacks against SCO bugs
 
-Wed May 15 01:41:33 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Wed May 15 01:41:33 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_hist.c, Src/zle_misc.c: More 8-bit zle changes
 
@@ -3342,7 +3342,7 @@ Wed May 15 01:41:33 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c: compctl fixes from Zefram (1068)
 
-Tue May 14 03:19:34 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue May 14 03:19:34 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/utils.c, Src/zle_hist.c, Src/zle_main.c, Src/zsh.h: Keep
  	  modified history lines until the next accept* function.  Make
@@ -3352,7 +3352,7 @@ Tue May 14 03:19:34 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/exec.c: in getoutputfile() returned the ztrdupped name from
  	  the jobtable From Peter (1061)
 
-Mon May 13 02:17:07 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon May 13 02:17:07 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/zle_tricky.c: temporary 8-bit clean patches
 
@@ -3380,16 +3380,16 @@ Mon May 13 02:17:07 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  Src/utils.c: In metafy use -1 instead of zero if the len is
  	  unknown
 
-Sun May 12 01:46:12 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sun May 12 01:46:12 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/utils.c, Src/zle_hist.c, Src/zle_utils.c:
 	  Incremental search fixes from Wayne (1051)
 
-Sat May 11 00:42:14 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Sat May 11 00:42:14 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* config.guess, configure: Use autoconf-2.10
 
-Fri May 10 21:01:56 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri May 10 21:01:56 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c, Src/glob.c, Src/hashtable.c, Src/utils.c,
  	  Src/zle.h, Src/zle_hist.c, Src/zle_main.c, Src/zle_misc.c,
@@ -3409,7 +3409,7 @@ Fri May 10 21:01:56 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Src/exec.c: Metafy was missing for autoloaded functions
 
-Fri May 10 12:06:23 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri May 10 12:06:23 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Makefile.in: Improve check-rcs and handle dot-files (like
 	  Src/.indent.pro)
@@ -3417,7 +3417,7 @@ Fri May 10 12:06:23 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/zle_tricky.c: Use permanent allocation for cmdstr instead of
 	  the heap to prevent SEGV
 
-Tue May  7 20:49:17 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue May  7 20:49:17 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/builtin.c, Src/glob.c, Src/input.c, Src/zle_misc.c,
  	  Src/zle_tricky.c: Some changes to make Ultrix cc happy (1001)
@@ -3428,11 +3428,11 @@ Tue May  7 20:49:17 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 	* Src/exec.c: Close process substitution file descriptors in the
  	  child process (987)
 
-Tue May  6 23:59:59 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Tue May  6 23:59:59 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* zsh-2.6-beta17 released
 
-Mon May  6 01:37:20 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Mon May  6 01:37:20 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* Src/signals.h: SIGNAL_HANDTYPE is RETSIGTYPE (*)_((int))
 
@@ -3455,7 +3455,7 @@ Mon May  6 01:37:20 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
  	  are marked in fdtable.  Use /dev/fd/ if it is available for
  	  <(...) and >(...) process substitutions.
 
-Fri May  3 03:38:28 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
+Fri May  3 03:38:28 1996  Zolt√°n Hidv√©gi  <hzoli@cs.elte.hu>
 
 	* README, META-FAQ, Util/zsh-development-guide: new maintainer.
 	  Some other changes in the README.
@@ -3878,7 +3878,7 @@ Fri May  3 03:38:28 1996  Zolt·n HidvÈgi  <hzoli@cs.elte.hu>
 
 	* Workaround a bug in GNU autoconf which makes configure think
  	  that there is no -lcourses and -lncurses if the test for
- 	  -ltermcap failed.  From J·nos Farkas <chexum@shadow.banki.hu>
+ 	  -ltermcap failed.  From J√°nos Farkas <chexum@shadow.banki.hu>
  	  (972)
 
 	Sun April 27 1996

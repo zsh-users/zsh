@@ -139,8 +139,8 @@ if (( index_of_find > 0 && index_of_find < CURRENT )); then
         [[ $words[CURRENT-1] == -([HLP]|-(help|version)) ]]) ||
        [[ -d $words[CURRENT-1] ]]; then
     # TODO: all $words[index_of_find,CURRENT-1] must be -d.
-    # But we can perhaps assume that the user hasn’t gone back and changed an
-    # argument without thinking about it carefully…otherwise, all previous
+    # But we can perhaps assume that the user hasn't gone back and changed an
+    # argument without thinking about it carefully...otherwise, all previous
     # words of interest will have passed the -d test.
     _arguments \
       $find_paths \

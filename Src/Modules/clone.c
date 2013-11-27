@@ -3,7 +3,7 @@
  *
  * This file is part of zsh, the Z shell.
  *
- * Copyright (c) 1997 Zolt·n HidvÈgi
+ * Copyright (c) 1997 Zolt√°n Hidv√©gi
  * All rights reserved.
  *
  * Permission is hereby granted, without written agreement and without
@@ -12,16 +12,16 @@
  * purpose, provided that the above copyright notice and the following
  * two paragraphs appear in all copies of this software.
  *
- * In no event shall Zolt·n HidvÈgi or the Zsh Development Group be liable
+ * In no event shall Zolt√°n Hidv√©gi or the Zsh Development Group be liable
  * to any party for direct, indirect, special, incidental, or consequential
  * damages arising out of the use of this software and its documentation,
- * even if Zolt·n HidvÈgi and the Zsh Development Group have been advised of
+ * even if Zolt√°n Hidv√©gi and the Zsh Development Group have been advised of
  * the possibility of such damage.
  *
- * Zolt·n HidvÈgi and the Zsh Development Group specifically disclaim any
+ * Zolt√°n Hidv√©gi and the Zsh Development Group specifically disclaim any
  * warranties, including, but not limited to, the implied warranties of
  * merchantability and fitness for a particular purpose.  The software
- * provided hereunder is on an "as is" basis, and Zolt·n HidvÈgi and the
+ * provided hereunder is on an "as is" basis, and Zolt√°n Hidv√©gi and the
  * Zsh Development Group have no obligation to provide maintenance,
  * support, updates, enhancements, or modifications.
  *

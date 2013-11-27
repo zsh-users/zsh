@@ -1,3 +1,16 @@
+2013-11-27  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted, see 32054 and thread:
+	Completion/Unix/Command/_cdrdao, Completion/Unix/Command/_git,
+	Completion/Unix/Command/_growisofs, Etc/ChangeLog-3.0,
+	Etc/ChangeLog-3.1, LICENCE, Src/Modules/clone.c,
+	Src/Modules/example.c, Src/module.c: Rationalise character
+	encodings: shell functions are strictly ASCII for maximum
+	portability; other files needed for building and documentation
+	are ASCII are UTF-8; test files may use ISO-8859-X (we don't
+	require the Euro symbol) where needed to get single character
+	input with the top bit set.
+
 2013-11-25  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted, see 32050, 32051: remove non-ASCII characters in

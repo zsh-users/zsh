@@ -277,7 +277,7 @@ _cdrdao-copy () {
 # Type completion {{{1
 
 __cdrdao-device () {
-  # Use cdrdao scanbus and also check what OS we’re running under and provide
+  # Use cdrdao scanbus and also check what OS we're running under and provide
   # additional stuff, like devices (/dev/sg0)
   local -a devices
 

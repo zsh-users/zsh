@@ -449,9 +449,9 @@ _git-checkout () {
 
   case $state in
     (branch-or-tree-ish-or-file)
-      # TODO: Something about *:: brings us here when we complete at “-”.  I
+      # TODO: Something about *:: brings us here when we complete at "-".  I
       # guess that this makes sense in a way, as we might want to treat it as
-      # an argument, but I can’t find anything in the documentation about this
+      # an argument, but I can't find anything in the documentation about this
       # behavior.
       [[ $line[CURRENT] = -* ]] && return
       if (( CURRENT == 1 )) && [[ -z $opt_args[(I)--] ]]; then
@@ -642,7 +642,7 @@ _git-commit () {
     reset_author_opt='(--author)--reset-author[make committer the author of the commit]'
   fi
 
-  # TODO: --interactive isn’t explicitly listed in the documentation.
+  # TODO: --interactive isn't explicitly listed in the documentation.
   _arguments -w -S -s \
     '(-a --all --interactive -o --only -i --include *)'{-a,--all}'[stage all modified and deleted paths]' \
     '--fixup=[construct a commit message for use with rebase --autosquash]:' \
@@ -946,7 +946,7 @@ _git-grep () {
     '*:: :->tree-or-file' && ret=0
 
   # TODO: If --cached, --no-index, -O, or --open-files-in-pager was given,
-  # don’t complete treeishs.
+  # don't complete treeishs.
   case $state in
     (tree-or-file)
       integer first_tree last_tree start end
@@ -1176,7 +1176,7 @@ _git-notes () {
             ': :__git_commits' && ret=0
           ;;
         (add)
-          # TODO: Only complete commits that don’t have notes already, unless
+          # TODO: Only complete commits that don't have notes already, unless
           # -f or --force has been given.
           _arguments -w -S -s \
             '*'{-m,--message=}'[use given note message]:message' \
@@ -2333,7 +2333,7 @@ _git-config () {
         # TODO: Is it fine to use functions like this before _describe below,
         # or do we need a tag loop?
         # TODO: It would be nice to output _message -e TYPE label when the
-        # following functions don’t generate any output in the case of
+        # following functions don't generate any output in the case of
         # multi-level options.
         case $IPREFIX in
           (alias.)
@@ -2686,7 +2686,7 @@ _git-config () {
               ;;
             (gitcvs.dbdriver)
               # TODO: Would be nice to only include those that are installed, but I
-              # couldn’t figure out a good way of doing that when I wrote this code.
+              # couldn't figure out a good way of doing that when I wrote this code.
               __git_config_values -t dbi-drivers -l 'DBI driver' -- "$current" "$part[5]" \
                 SQLite:'use the SQLite database driver' \
                 Pg:'use the Pg database driver' && ret=0
@@ -2984,7 +2984,7 @@ _git-reflog () {
 
             case $state in
               (reflog-entry)
-                # TODO: __git_ignore_line doesn’t work here for some reason.
+                # TODO: __git_ignore_line doesn't work here for some reason.
                 __git_ignore_line __git_reflog_entries && ret=0
                 ;;
             esac
@@ -3312,7 +3312,7 @@ _git-rerere () {
 
   case $state in
     (command)
-      # TODO: This isn’t optimal, as forget get confused.
+      # TODO: This isn't optimal, as forget get confused.
       _values command \
         'clear[reset metadata used by rerere]' \
         'forget[resets metadata used by rerere for specific conflict]: :__git_cached_files' \
@@ -4215,9 +4215,9 @@ _git-diff-index () {
   local -a revision_options
   __git_setup_revision_options
 
-  # TODO: Description of -m doesn’t match that for git-rev-list.  What’s going
+  # TODO: Description of -m doesn't match that for git-rev-list.  What's going
   # on here?
-  # TODO: With --cached, shouldn’t we only list files changed in index compared
+  # TODO: With --cached, shouldn't we only list files changed in index compared
   # to given tree-ish?  This should be done for git-diff as well, in that case.
   _arguments -S \
     $revision_options \
@@ -4281,7 +4281,7 @@ _git-diff-tree () {
 (( $+functions[_git-for-each-ref] )) ||
 _git-for-each-ref () {
   # TODO: Better completion for --format: should complete %(field) stuff, that
-  # is, %(refname), %(objecttype), %(objectsize), %(objectname) with optional ‘*’
+  # is, %(refname), %(objecttype), %(objectsize), %(objectname) with optional '*'
   # in front.
   _arguments -w -S -s \
     '--count=[maximum number of refs to iterate over]: :__git_guard_number "maximum number of refs"' \
@@ -4593,7 +4593,7 @@ _git-http-push () {
     '*: :__git_remote_references'
 }
 
-# NOTE: git-parse-remote isn’t a user command.
+# NOTE: git-parse-remote isn't a user command.
 
 (( $+functions[_git-receive-pack] )) ||
 _git-receive-pack () {
@@ -4773,7 +4773,7 @@ _git-patch-id () {
   _message 'no arguments allowed; accepts patch on standard input'
 }
 
-# NOTE: git-sh-setup isn’t a user command.
+# NOTE: git-sh-setup isn't a user command.
 
 (( $+functions[_git-stripspace] )) ||
 _git-stripspace () {
@@ -4831,8 +4831,8 @@ __git_is_treeish () {
 
 (( $+functions[__git_is_committish_range] )) ||
 __git_is_committish_range () {
-  # TODO: This isn’t quite right.  We would like to do parts=${(~s:..(.|))},
-  # but that doesn’t work.  (This would allow us to make sure that parts only
+  # TODO: This isn't quite right.  We would like to do parts=${(~s:..(.|))},
+  # but that doesn't work.  (This would allow us to make sure that parts only
   # contains two elements and then apply __git_is_committish on them.
   [[ $1 == *..(.|)* ]] &&
     __git_is_committish $(__git_committish_range_first $1) &&
@@ -5586,7 +5586,7 @@ __git_references () {
 
   # TODO: depending on what options are on the command-line already, complete
   # only tags or heads
-  # TODO: perhaps caching is unnecessary.  usually won’t contain that much data
+  # TODO: perhaps caching is unnecessary.  usually won't contain that much data
   # TODO: perhaps provide alternative here for both heads and tags (and use
   # __git_heads and __git_tags)
   # TODO: instead of "./.", we should be looking in the repository specified as
@@ -5646,7 +5646,7 @@ __git_files_relative () {
 
   files=()
 
-  # Collapse “//” and “/./” into “/”. Strip any remaining “/.” and “/”.
+  # Collapse "//" and "/./" into "/". Strip any remaining "/." and "/".
   for file in ${${${${${(0)1}//\/\///}//\/.\///}%/.}%/}; do
     integer i n
     (( n = $#file > $#prefix ? $#file : $#prefix ))
@@ -5999,7 +5999,7 @@ __git_setup_revision_options () {
   revision_options=(
     $diff_options
     # TODO: format pretty print format is a lot more advanced than this.
-    # TODO: You can’t actually specify --format without a format.
+    # TODO: You can't actually specify --format without a format.
     '(-v --header)'{--pretty=-,--format=-}'[pretty print commit messages]::format:((oneline\:"commit-ids and subject of messages"
                                                                                     short\:"few headers and only subject of messages"
                                                                                     medium\:"most parts of messages"
@@ -6192,14 +6192,14 @@ __git_config_sections () {
 # -l can be used to specify a label to use (default: boolean).
 #
 # The first argument is the current value, so that the description of the
-# current value can be suffixed with “ (current)”.
+# current value can be suffixed with " (current)".
 #
 # The second argument is the default value, so that the description of the
-# default value can be suffixed with “ (default)”.
+# default value can be suffixed with " (default)".
 #
 # The third argument is the description to use for the true and false values.
 #
-# The rest of the arguments can be used to provide additional “boolean” values
+# The rest of the arguments can be used to provide additional "boolean" values
 # that should be included.  They should be of the form that _describe expects.
 (( $+functions[__git_config_booleans] )) ||
 __git_config_booleans () {
@@ -6225,10 +6225,10 @@ __git_config_booleans () {
 # -l can be used to specify a label to use (default: value).
 #
 # The first argument is the current value, so that the description of the
-# current value can be suffixed with “ (current)”.
+# current value can be suffixed with " (current)".
 #
 # The second argument is the default value, so that the description of the
-# default value can be suffixed with “ (default)”.
+# default value can be suffixed with " (default)".
 #
 # The rest of the arguments are values of the form VALUE:DESCRIPTION to be
 # passed to _describe.
@@ -6432,12 +6432,12 @@ __git_color_attributes () {
   _describe -t attributes attribute attributes $*
 }
 
-# Now, for the main driver…
+# Now, for the main drive...
 _git() {
   if (( CURRENT > 2 )); then
     local -a aliases
     local -A git_aliases
-    # TODO: Should use -z here, but I couldn’t get it to work.
+    # TODO: Should use -z here, but I couldn't get it to work.
     aliases=(${(f)${${${(f)"$(_call_program aliases git config --get-regexp '\^alias\.')"}#alias.}/ /$'\n'}/(#e)/$'\n'})
     (( $#aliases % 2 == 0 )) && git_aliases=($aliases)
 
