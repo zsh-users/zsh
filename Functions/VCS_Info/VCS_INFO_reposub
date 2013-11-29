@@ -5,9 +5,9 @@
 setopt localoptions extendedglob NO_shwordsplit
 local base=${1%%/##}
 
-[[ ${PWD} == ${base}/* ]] || {
+[[ $(pwd -P) == ${base}/* ]] || {
     printf '.'
     return 1
 }
-printf '%s' ${PWD#$base/}
+printf '%s' ${$(pwd -P)#$base/}
 return 0

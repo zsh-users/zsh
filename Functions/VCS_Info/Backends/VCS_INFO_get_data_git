@@ -132,7 +132,7 @@ fi
 
 VCS_INFO_adjust
 VCS_INFO_git_getaction ${gitdir}
-gitbase=${PWD%/${$( ${vcs_comm[cmd]} rev-parse --show-prefix )%/##}}
+gitbase=$( ${vcs_comm[cmd]} rev-parse --show-toplevel )
 rrn=${gitbase:t}
 
 local patchdir=${gitdir}/patches/${gitbranch}
