@@ -1643,6 +1643,7 @@ _git-submodule () {
             '--rebase[rebase current branch onto commit recorded in superproject]' \
             '--reference=[remote repository to clone]: :__git_any_repositories' \
             '--recursive[traverse submodules recursively]' \
+            '--remote[use the status of the submodule''s remote-tracking branch]' \
             '--force[discard local changes by checking out the current up-to-date version]' \
             '--init[initialize uninitialized submodules]' \
             '*: :__git_ignore_line_inside_arguments __git_submodules' && ret=0
