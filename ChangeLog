@@ -1,3 +1,7 @@
+2013-12-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk: 5.0.2-test-3.
+
 2013-11-30  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Hong Xu: 32069: Completion/Unix/Command/_git: completion for
