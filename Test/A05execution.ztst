@@ -179,7 +179,7 @@
 0:Status reset by starting a backgrounded command
 >0
 
-  setopt MONITOR
+  { setopt MONITOR } 2>/dev/null
   [[ -o MONITOR ]] || print -u $ZTST_fd 'Unable to change MONITOR option'
   repeat 2048; do (return 2 |
                    return 1 |
