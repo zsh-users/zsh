@@ -195,7 +195,7 @@
 F:This test checks for a bug in `$pipestatus[]' handling.  If it breaks then
 F:the bug is still there or it reappeared. See workers-29973 for details.
 
-  setopt MONITOR
+  { setopt MONITOR } 2>/dev/null
   externFunc() { awk >/dev/null 2>&1; true; }
   false | true | false | true | externFunc
   echo $pipestatus

@@ -1,6 +1,7 @@
 2013-12-02  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* 32080: Test/A05execution.ztst: suppress any error output from
+	* 32080 (plus unposted second instance of same):
+	Test/A05execution.ztst: suppress any error output from
 	nonessential "setopt MONITOR"
 
 2013-12-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
