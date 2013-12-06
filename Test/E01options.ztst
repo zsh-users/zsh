@@ -83,12 +83,13 @@
 %prep
   mkdir options.tmp && cd options.tmp
 
-  mkdir tmpcd
+  mkdir tmpcd homedir
 
   touch tmpfile1 tmpfile2
 
   mydir=$PWD
   mydirt=`print -P %~`
+  mydirhome=`export HOME=$mydir/homedir; print -P %~`
   catpath=$(which cat)
   lspath==ls
 
@@ -513,10 +514,10 @@
   print *(#q:s/#(#b)tmp(*e)/'scrunchy${match[1]}'/)
   unsetopt histsubstpattern
 0:HIST_SUBST_PATTERN option
->TINGcd TINGfile1 TINGfile2
+>TINGcd TINGfile1 TINGfile2 homedir
 >THUMPcd THUMPfile1 THUMPfile2
 >one.c Two.X Three.X
->scrunchyfile1 scrunchyfile2 tmpcd
+>homedir scrunchyfile1 scrunchyfile2 tmpcd
 
   setopt ignorebraces
   echo X{a,b}Y
@@ -853,6 +854,7 @@
 
 # Do you have any idea how dull this is?
 
+  (export HOME=$mydir/homedir
   pushd $mydir/tmpcd
   pushd
   dirs
@@ -863,11 +865,11 @@
   popd
   pushd
   popd
-  dirs
+  dirs)
 0q:PUSHD_TO_HOME option
->$mydirt $mydirt/tmpcd
->~ $mydirt $mydirt/tmpcd
->$mydirt
+>$mydirhome $mydirhome/tmpcd
+>~ $mydirhome $mydirhome/tmpcd
+>$mydirhome
 
   array=(one two three four)
   setopt rcexpandparam
@@ -1067,6 +1069,7 @@
     fn2() {
       foo3=bar6
     }
+    foo4=bar7 =true
   }
   fn
 0:WARN_CREATE_GLOBAL option

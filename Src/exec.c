@@ -3309,7 +3309,10 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    }
 	    if (type == WC_SIMPLE) {
 		if (varspc) {
-		    addvars(state, varspc, ADDVAR_EXPORT|ADDVAR_RESTRICT);
+		    int addflags = ADDVAR_EXPORT|ADDVAR_RESTRICT;
+		    if (forked)
+			addflags |= ADDVAR_RESTORE;
+		    addvars(state, varspc, addflags);
 		    if (errflag)
 			_exit(1);
 		}

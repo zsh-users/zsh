@@ -1,3 +1,9 @@
+2013-12-06  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Daniel Shahaf: 32091: Src/exec.c, Test/E01options.ztst:
+	WARN_CREATE_GLOBAL false positive for assignment before
+	commands.
+
 2013-12-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Daniel Shahaf: 32089:
@@ -39,7 +45,7 @@
 	Src/Modules/example.c, Src/module.c: Rationalise character
 	encodings: shell functions are strictly ASCII for maximum
 	portability; other files needed for building and documentation
-	are ASCII are UTF-8; test files may use ISO-8859-X (we don't
+	are ASCII or UTF-8; test files may use ISO-8859-X (we don't
 	require the Euro symbol) where needed to get single character
 	input with the top bit set.
 
