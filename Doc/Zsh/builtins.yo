@@ -1113,8 +1113,8 @@ Print the arguments in var(cols) columns.  Unless tt(-a) is also given,
 arguments are printed with the row incrementing first.
 )
 item(tt(-D))(
-Treat the arguments as directory names, replacing prefixes with tt(~)
-expressions, as appropriate.
+Treat the arguments as paths, replacing directory prefixes with tt(~)
+expressions corresponding to directory names, as appropriate.
 )
 item(tt(-i))(
 If given together with tt(-o) or tt(-O), sorting is performed

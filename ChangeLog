@@ -1,5 +1,7 @@
 2013-12-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* users/18210: Doc/Zsh/builtins.yo: document print -D better.
+
 	* 32093: INSTALL: describe the dependency issues fixed
 	by the doc bundle.
 
