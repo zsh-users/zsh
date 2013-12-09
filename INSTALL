@@ -13,6 +13,26 @@ instructions in the first.
 MAKING AND INSTALLING
 =====================
 
+Dependencies
+------------
+
+The main shell can be compiled with tools available on a typical
+Unix-like system including development packages.  However, the
+documentation requires various additional tools that are not so standard:
+
+- YODL, for turning the documentation source files (.yo) into manual
+pages and TeXinfo source for producing PDF and .info formats;
+
+- Perl and interactive manual tools, for turning the zshbuiltins(1)
+manual into help files that can be displayed by the run-help function.
+For example, the colcrt or col tool, not typically required for
+installing software, must be available.
+
+To avoid needing these, the source distribution is supplemented by a
+documentation distribution that may be downloaded from the same place as
+the source.  This provides fully generated documentation with references
+to files in the default locations.
+
 Check MACHINES File
 -------------------
 
