@@ -1,3 +1,8 @@
+2013-12-10  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32099: Src/init.c: fix pointer declaration to avoid compile
+	time error when arithmetic on void * is not allowed.
+
 2013-12-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/18210: Doc/Zsh/builtins.yo: document print -D better.

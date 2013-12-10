@@ -281,7 +281,7 @@ parseargs(char **argv, char **runscript)
 
 /**/
 static void
-parseopts_insert(LinkList optlist, void *base, int optno)
+parseopts_insert(LinkList optlist, char *base, int optno)
 {
     LinkNode node;
     void *ptr = base + (optno < 0 ? -optno : optno);
