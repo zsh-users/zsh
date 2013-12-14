@@ -1,3 +1,7 @@
+2013-12-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: version 5.0.3, finally.
+
 2013-12-13  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Martin Vaeth: 32105: Util/helpfiles: support all combinations of
