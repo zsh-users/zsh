@@ -1,3 +1,8 @@
+2013-12-13  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Aaron Peschel: 32103: Completion/Unix/Type/_hosts: parse
+	host:port format in ssh known_hosts files.
+
 2013-12-10  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32099: Src/init.c: fix pointer declaration to avoid compile
