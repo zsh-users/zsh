@@ -1,5 +1,8 @@
 2013-12-13  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* Martin Vaeth: 32105: Util/helpfiles: support all combinations of
+	man or nroff with colcrt or col.
+
 	* Aaron Peschel: 32103: Completion/Unix/Type/_hosts: parse
 	host:port format in ssh known_hosts files.
 

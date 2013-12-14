@@ -65,13 +65,40 @@ $ENV{'LANG'} = 'C';
 $ENV{'MANWIDTH'} = '80';
 $ENV{'GROFF_NO_SGR'} = ''; # We need "classical" formatting of man pages.
 
-unless(open(MANPAGE, '-|', "man $manfile | colcrt -")) {
-    close(MANPAGE);
-    open(MANPAGE, '-|', "man $manfile | col -bx")
+$mantmp = $destdir . '/man.tmp';
+$coltmpbase = 'col.tmp';
+$coltmp = $destdir . '/' . $coltmpbase;
+$args = "$manfile >$mantmp";
+unlink($mantmp);
+&Info('attempting man ', $args);
+if(system('man ' . $args) || !(-s $mantmp)) {
+    unlink($mantmp);
+    &Info('attempting nroff -man ', $args);
+    if(system('nroff -man ' . $args) || !(-s $mantmp)) {
+        unlink($mantmp);
+        &Die('man and nroff -man both failed for ', $manfile);
+    }
+}
+$args = "$mantmp >$coltmp";
+unlink($coltmp);
+&Info('attempting colcrt ', $args);
+if(system('colcrt ' . $args) || !(-s $coltmp)) {
+    unlink($coltmp);
+    &Info('attempting col -bx <', $args);
 # The x is necessary so that spaces don't turn into tabs, which messes
 # up the calculations of indentation on machines which randomly wrap lines
 # round to the previous line (so you see what we're up against).
-     || &Die('can run neither "man | colcrt -" nor "man | col -bx"');
+    if(system('col -bx <' . $args) || !(-s $coltmp)) {
+        unlink($mantmp);
+        unlink($coltmp);
+        &Die('colcrt and col -bx both failed');
+    }
+}
+unlink($mantmp) || &Die('cannot remove tempfile ', $mantmp);
+
+unless(open(MANPAGE, '<', $coltmp)) {
+    unlink($coltmp);
+    &Die('generated tmpfile cannot be read');
 }
 
 unless($linkfile eq '') {
@@ -198,7 +225,8 @@ BUILTINS: while (<MANPAGE>) {
 
 select STDOUT;
 close OUT;
-close(MANPAGE) || &Die('piping from man ', $manfile, ' failed');
+close(MANPAGE);
+unlink($coltmpbase) || &Die('cannot remove tempfile ', $coltmpbase);
 
 foreach $file (<*>) {
     open (IN, $file);
