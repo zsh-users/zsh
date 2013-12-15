@@ -1,3 +1,8 @@
+2013-12-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* users/18219: Completion/Zsh/Type/_command_names: compadd -Q for
+	builtins, aliases, and reserved words to preserve special chars
+
 2013-12-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: increment version to 5.0.3-dev-0 to avoid confusion

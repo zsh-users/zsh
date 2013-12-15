@@ -27,11 +27,11 @@ else
   [[ "$1" = - ]] && shift
 
   defs=( "$defs[@]"
-    'builtins:builtin command:compadd -k builtins'
+    'builtins:builtin command:compadd -Qk builtins'
     "functions:shell function:compadd -k 'functions$ffilt'"
-    'aliases:alias:compadd -k aliases'
+    'aliases:alias:compadd -Qk aliases'
     'suffix-aliases:suffix alias:_suffix_alias_files'
-    'reserved-words:reserved word:compadd -k reswords'
+    'reserved-words:reserved word:compadd -Qk reswords'
     'jobs:: _jobs -t'
     'parameters:: _parameters -g "^*readonly*" -qS= -r "\n\t\- =["'
   )
