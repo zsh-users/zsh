@@ -1,3 +1,10 @@
+2013-12-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Patrick Oscity + pws: 32114: Doc/Zsh/params.yo,
+	Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c: ZLE_RPROMPT_INDENT
+	allows you to make the right prompt flush if your terminal
+	supports it.
+
 2013-12-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/18219: Completion/Zsh/Type/_command_names: compadd -Q for

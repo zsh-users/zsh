@@ -1504,7 +1504,17 @@ get_comp_string(void)
 	    nnb = s + MB_METACHARLEN(s);
 	else
 	    nnb = s;
-	for (tt = s; tt < s + zlemetacs_qsub - wb;) {
+	tt = s;
+	if (lincmd)
+	{
+	    /*
+	     * Ignore '['s at the start of a command as they're not
+	     * matched by closing brackets.
+	     */
+	    while (*tt == Inbrack && tt < s + zlemetacs_qsub - wb)
+		tt++;
+	}
+	while (tt < s + zlemetacs_qsub - wb) {
 	    if (*tt == Inbrack) {
 		i++;
 		nb = nnb;

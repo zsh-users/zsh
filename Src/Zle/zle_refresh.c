@@ -976,7 +976,8 @@ zrefresh(void)
     int tmppos;			/* t - tmpline				     */
     int tmpalloced;		/* flag to free tmpline when finished	     */
     int remetafy;		/* flag that zle line is metafied	     */
-    int txtchange;		/* attributes set after prompts */
+    int txtchange;		/* attributes set after prompts              */
+    int rprompt_off = 1;	/* Offset of rprompt from right of screen    */
     struct rparams rpms;
 #ifdef MULTIBYTE_SUPPORT
     int width;			/* width of wide character		     */
@@ -1573,10 +1574,23 @@ zrefresh(void)
     if (!more_start) {
 	if (trashedzle && opts[TRANSIENTRPROMPT])
 	    put_rpmpt = 0;
-	else
+	else {
 	    put_rpmpt = rprompth == 1 && rpromptbuf[0] &&
-		!strchr(rpromptbuf, '\t') &&
-		(int)ZR_strlen(nbuf[0]) + rpromptw < winw - 1;
+		!strchr(rpromptbuf, '\t');
+	    if (put_rpmpt)
+	    {
+		struct value vbuf;
+		char *name = "ZLE_RPROMPT_INDENT";
+		if (getvalue(&vbuf, &name, 1)) {
+		    rprompt_off = (int)getintvalue(&vbuf);
+		    /* sanity to avoid horrible things happening */
+		    if (rprompt_off < 0)
+			rprompt_off = 0;
+		}
+		put_rpmpt =
+		    (int)ZR_strlen(nbuf[0]) + rpromptw < winw - rprompt_off;
+	    }
+	}
     } else {
 /* insert >.... on first line if there is more text before start of screen */
 	ZR_memset(nbuf[0], zr_sp, lpromptw);
@@ -1631,9 +1645,9 @@ zrefresh(void)
 	if (put_rpmpt && !iln && !oput_rpmpt) {
 	    int attrchange;
 
-	    moveto(0, winw - 1 - rpromptw);
+	    moveto(0, winw - rprompt_off - rpromptw);
 	    zputs(rpromptbuf, shout);
-	    vcs = winw - 1;
+	    vcs = winw - rprompt_off;
 	/* reset character attributes to that set by the main prompt */
 	    txtchange = pmpt_attr;
 	    /*
