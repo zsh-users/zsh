@@ -1,5 +1,9 @@
 2013-12-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 32136: Src/pattern.c, Src/zsh.h, Test/D02glob.ztst:
+	fix problem with +*, @*, !* when kshglob is set introduced
+	by pattern disable feature.
+
 	* unposted: NEWS: add ZLE_PROMPT_INDENT.
 
 	* Patrick Oscity + pws: 32114: Doc/Zsh/params.yo,

@@ -499,3 +499,30 @@
   )
 0:No error with empty null glob with (N).
 >
+
+  (setopt kshglob
+   test_array=(
+     '+fours'    '+*'
+     '@titude'   '@*'
+     '!bang'     '!*'
+     # and check they work in the real kshglob cases too...
+     '+bus+bus'  '+(+bus|-car)'
+     '@sinhats'  '@(@sinhats|wrensinfens)'
+     '!kerror'   '!(!somethingelse)'
+     # and these don't match, to be sure
+     '+more'      '+(+less)'
+     '@all@all'   '@(@all)'
+     '!goesitall' '!(!goesitall)'
+   )
+   for str pat in $test_array; do
+     eval "[[ $str = $pat ]]" && print "$str matches $pat"
+   done
+   true
+  )
+0:kshglob option does not break +, @, ! without following open parenthesis
+>+fours matches +*
+>@titude matches @*
+>!bang matches !*
+>+bus+bus matches +(+bus|-car)
+>@sinhats matches @(@sinhats|wrensinfens)
+>!kerror matches !(!somethingelse)

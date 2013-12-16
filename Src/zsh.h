@@ -1417,7 +1417,11 @@ enum zpc_chars {
     ZPC_HAT,			/* ^ for exclusion (extended glob) */
     ZPC_HASH,			/* # for repetition (extended glob) */
     ZPC_BNULLKEEP,		/* Special backslashed null not removed */
-    ZPC_KSH_QUEST,              /* ? for ?(...) in KSH_GLOB */
+    /*
+     * These characters are only valid before a parenthesis
+     */
+    ZPC_NO_KSH_GLOB,
+    ZPC_KSH_QUEST = ZPC_NO_KSH_GLOB, /* ? for ?(...) in KSH_GLOB */
     ZPC_KSH_STAR,               /* * for *(...) in KSH_GLOB */
     ZPC_KSH_PLUS,               /* + for +(...) in KSH_GLOB */
     ZPC_KSH_BANG,               /* ! for !(...) in KSH_GLOB */

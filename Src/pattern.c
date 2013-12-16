@@ -1265,12 +1265,18 @@ patcomppiece(int *flagp, int paren)
 	     * the character following is an end-of-segment character.  Thus
 	     * tildes are not special if there is nothing following to
 	     * be excluded.
+	     *
+	     * Don't look for X()-style kshglobs at this point; we've
+	     * checked above for the case with parentheses and we don't
+	     * want to match without parentheses.
 	     */
-	    if (kshchar || (memchr(zpc_special, *patparse, ZPC_COUNT) &&
-			    (*patparse != zpc_special[ZPC_TILDE] ||
-			     patparse[1] == '/' ||
-			     !memchr(zpc_special, patparse[1], ZPC_SEG_COUNT))))
+	    if (kshchar ||
+		(memchr(zpc_special, *patparse, ZPC_NO_KSH_GLOB) &&
+		 (*patparse != zpc_special[ZPC_TILDE] ||
+		  patparse[1] == '/' ||
+		  !memchr(zpc_special, patparse[1], ZPC_SEG_COUNT)))) {
 		break;
+	    }
     	}
 
 	/* Remember the previous character for backtracking */
