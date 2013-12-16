@@ -53,6 +53,12 @@ file at file write time.  This differs from history changes made in
 the zshaddhistory hook or by the HIST_IGNORE_* options, all of which
 take effect immediately on the internal history list itself.
 
+The parameter ZLE_RPROMPT_INDENT can be set to 0 to remove the space
+between the right hand side of the screen (this causes problems with
+some terminals).  It is not special and is not set by default; the
+effect in that case is as if it was 1, as in previous versions.
+
+
 Changes between 4.2 and 5.0.0
 -----------------------------
 
