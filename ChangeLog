@@ -1,3 +1,7 @@
+2013-12-17  Phil Pennock  <pdpennock@users.sourceforge.net>
+
+	* 32143: INSTALL: Fix --enable-custom-patchlevel name in INSTALL
+
 2013-12-16  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Jun Takimoto: 32137: Test/comptest: set pseudo-terminal speed to

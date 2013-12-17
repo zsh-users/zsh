@@ -297,7 +297,7 @@ Modified versions of zsh
 If you are making local modifications to zsh, you are strongly
 advised to configure with the option
 
-  --enable-local-patchlevel="<my-mod-string>"
+  --enable-custom-patchlevel="<my-mod-string>"
 
 so that the variable $ZSH_PATCHLEVEL indicates this is not a standard
 version of the shell.  The argument is arbitrary, but should indicate
