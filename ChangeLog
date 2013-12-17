@@ -11,6 +11,12 @@
 	allows you to make the right prompt flush if your terminal
 	supports it.
 
+2013-12-16  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Jun Takimoto + Bart: 32131: Src/Modules/zpty.c: avoid infinite
+	loop reading pseudo-terminal on platforms that do not buffer pty
+	contents after child process exits
+
 2013-12-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/18219: Completion/Zsh/Type/_command_names: compadd -Q for

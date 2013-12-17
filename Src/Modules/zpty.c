@@ -510,14 +510,14 @@ checkptycmd(Ptycmd cmd)
 
     if (cmd->read != -1 || cmd->fin)
 	return;
-    if ((r = read(cmd->fd, &c, 1)) < 0) {
+    if ((r = read(cmd->fd, &c, 1)) <= 0) {
 	if (kill(cmd->pid, 0) < 0) {
 	    cmd->fin = 1;
 	    zclose(cmd->fd);
 	}
 	return;
     }
-    if (r) cmd->read = (int) c;
+    cmd->read = (int) c;
 }
 
 static int
