@@ -1,3 +1,8 @@
+2013-12-16  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Jun Takimoto: 32137: Test/comptest: set pseudo-terminal speed to
+	prevent padding characters which confuse output parsing.
+
 2013-12-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 32136: Src/pattern.c, Src/zsh.h, Test/D02glob.ztst:

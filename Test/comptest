@@ -34,8 +34,8 @@ comptestinit () {
 "fpath=( $fpath )" \
 "bindkey -$comptest_keymap" \
 'LISTMAX=10000000
+stty 38400 columns 80 rows 24
 TERM=vt100
-stty columns 80 rows 24
 setopt zle
 autoload -U compinit
 compinit -u
