@@ -101,7 +101,7 @@ for _i_exe in $_i_exes; do
   if [[ -e $_i_exe ]] ;then
     if zmodload -F zsh/stat b:zstat 2>/dev/null; then
       local -A _i_stathash
-      if zstat -H _i_stathash /proc/$$/exe &&
+      if zstat -H _i_stathash $_i_exe &&
 	[[ $_i_stathash[uid] -ne 0 ]]; then
 	_i_owners+="u${_i_stathash[uid]}"
       fi

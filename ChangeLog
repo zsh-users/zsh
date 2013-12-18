@@ -1,3 +1,8 @@
+2013-12-18  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32150: Completion/compaudit: Reference loop variable rather
+	than absolute path in executable ownership test
+
 2013-12-17  Phil Pennock  <pdpennock@users.sourceforge.net>
 
 	* 32143: INSTALL: Fix --enable-custom-patchlevel name in INSTALL
