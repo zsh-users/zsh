@@ -977,7 +977,7 @@ zrefresh(void)
     int tmpalloced;		/* flag to free tmpline when finished	     */
     int remetafy;		/* flag that zle line is metafied	     */
     int txtchange;		/* attributes set after prompts              */
-    int rprompt_off = 1;	/* Offset of rprompt from right of screen    */
+    int rprompt_off;		/* Offset of rprompt from right of screen    */
     struct rparams rpms;
 #ifdef MULTIBYTE_SUPPORT
     int width;			/* width of wide character		     */
@@ -1579,16 +1579,12 @@ zrefresh(void)
 		!strchr(rpromptbuf, '\t');
 	    if (put_rpmpt)
 	    {
-		struct value vbuf;
-		char *name = "ZLE_RPROMPT_INDENT";
-		if (getvalue(&vbuf, &name, 1)) {
-		    rprompt_off = (int)getintvalue(&vbuf);
-		    /* sanity to avoid horrible things happening */
-		    if (rprompt_off < 0)
-			rprompt_off = 0;
-		}
-		put_rpmpt =
-		    (int)ZR_strlen(nbuf[0]) + rpromptw < winw - rprompt_off;
+	      rprompt_off = rprompt_indent;
+	      /* sanity to avoid horrible things happening */
+	      if (rprompt_off < 0)
+		rprompt_off = 0;
+	      put_rpmpt =
+		(int)ZR_strlen(nbuf[0]) + rpromptw < winw - rprompt_off;
 	    }
 	}
     } else {
@@ -2127,19 +2123,24 @@ moveto(int ln, int cl)
     const REFRESH_ELEMENT *rep;
 
     if (vcs == winw) {
-	vln++, vcs = 0;
-	if (!hasam) {
-	    zputc(&zr_cr);
-	    zputc(&zr_nl);
+	if (rprompt_indent == 0 && tccan(TCLEFT)) {
+	  tc_leftcurs(1);
+	  vcs--;
 	} else {
-	    if ((vln < nlnct) && nbuf[vln] && nbuf[vln]->chr)
-		rep = nbuf[vln];
-	    else
-		rep = &zr_sp;
-	    zputc(rep);
-	    zputc(&zr_cr);
-	    if ((vln < olnct) && obuf[vln] && obuf[vln]->chr)
-		*obuf[vln] = *rep;
+	    vln++, vcs = 0;
+	    if (!hasam) {
+		zputc(&zr_cr);
+		zputc(&zr_nl);
+	    } else {
+		if ((vln < nlnct) && nbuf[vln] && nbuf[vln]->chr)
+		    rep = nbuf[vln];
+		else
+		    rep = &zr_sp;
+		zputc(rep);
+		zputc(&zr_cr);
+		if ((vln < olnct) && obuf[vln] && obuf[vln]->chr)
+		    *obuf[vln] = *rep;
+	    }
 	}
     }
 

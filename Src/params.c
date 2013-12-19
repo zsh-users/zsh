@@ -97,6 +97,7 @@ zlong lastval,		/* $?           */
      lastpid,		/* $!           */
      zterm_columns,	/* $COLUMNS     */
      zterm_lines,	/* $LINES       */
+     rprompt_indent,	/* $ZLE_RPROMPT_INDENT */
      ppid,		/* $PPID        */
      zsh_subshell;	/* $ZSH_SUBSHELL */
 /**/
@@ -316,8 +317,10 @@ IPDEF4("PPID", &ppid),
 IPDEF4("ZSH_SUBSHELL", &zsh_subshell),
 
 #define IPDEF5(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
+#define IPDEF5U(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
 IPDEF5("COLUMNS", &zterm_columns, zlevar_gsu),
 IPDEF5("LINES", &zterm_lines, zlevar_gsu),
+IPDEF5U("ZLE_RPROMPT_INDENT", &rprompt_indent, zlevar_gsu),
 IPDEF5("OPTIND", &zoptind, varinteger_gsu),
 IPDEF5("SHLVL", &shlvl, varinteger_gsu),
 IPDEF5("TRY_BLOCK_ERROR", &try_errflag, varinteger_gsu),

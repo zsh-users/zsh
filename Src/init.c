@@ -77,7 +77,7 @@ mod_export int tclen[TC_COUNT];
 /**/
 int tclines, tccolumns;
 /**/
-mod_export int hasam, hasxn;
+mod_export int hasam, hasxn, hasye;
 
 /* Value of the Co (max_colors) entry: may not be set */
 
@@ -699,6 +699,7 @@ init_term(void)
 	/* check whether terminal has automargin (wraparound) capability */
 	hasam = tgetflag("am");
 	hasxn = tgetflag("xn"); /* also check for newline wraparound glitch */
+	hasye = tgetflag("YE"); /* print in last column does carriage return */
 
 	tclines = tgetnum("li");
 	tccolumns = tgetnum("co");
@@ -748,6 +749,9 @@ init_term(void)
 	    tcstr[TCCLEARSCREEN] = ztrdup("\14");
 	    tclen[TCCLEARSCREEN] = 1;
 	}
+#if 0	/* This might work, but there may be more to it */
+	rprompt_indent = (hasye || !tccan(TCLEFT)) ? 1 : 0;
+#endif
     }
     return 1;
 }
@@ -999,6 +1003,15 @@ setupvals(void)
     setiparam("COLUMNS", zterm_columns);
     setiparam("LINES", zterm_lines);
 #endif
+    {
+	/* Import from environment, overrides init_term() */
+	struct value vbuf;
+	char *name = "ZLE_RPROMPT_INDENT";
+	if (getvalue(&vbuf, &name, 1) && !(vbuf.flags & PM_UNSET))
+	    rprompt_indent = getintvalue(&vbuf);
+	else
+	    rprompt_indent = 1;
+    }
 
 #ifdef HAVE_GETRLIMIT
     for (i = 0; i != RLIM_NLIMITS; i++) {

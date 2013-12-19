@@ -1,5 +1,12 @@
 2013-12-18  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32157: Doc/Zsh/params.yo, Src/Zle/zle_refresh.c, Src/init.c,
+	Src/params.c: make ZLE_RPROMPT_INDENT a special variable tied to
+	an internal C global, to avoid having the shell variable value
+	fetched on every keystroke and to make it available when testing
+	how to reposition the cursor after the right-prompt is output.
+	Fixes erasure in completion listing when ZLE_RPROMPT_INDENT=0.
+
 	* 32150: Completion/compaudit: Reference loop variable rather
 	than absolute path in executable ownership test
 

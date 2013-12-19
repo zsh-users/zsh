@@ -1548,7 +1548,7 @@ ifzman(zmanref(zshcompsys))\
 ifnzman(noderef(Completion System)).
 )
 vindex(ZLE_RPROMPT_INDENT)
-item(tt(ZLE_RPROMPT_INDENT))(
+item(tt(ZLE_RPROMPT_INDENT <S>))(
 If set, used to give the indentation between the right hand side of
 the right prompt in the line editor as given by tt(RPS1) or tt(RPROMPT)
 and the right hand side of the screen.  If not set, the value 1 is used.
