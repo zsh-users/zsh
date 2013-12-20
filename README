@@ -5,8 +5,9 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.0.3 of the shell.  This is a stable release.
+This is version 5.0.4 of the shell.  This is a stable release.
 There are minor new features as well as bug fixes since 5.0.2.
+5.0.3 was a short-lived release with most of the features of 5.0.3.
 
 Installing Zsh
 --------------
@@ -27,7 +28,7 @@ Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
 
-Incompatibilities between 5.0.2 and 5.0.3
+Incompatibilities between 5.0.2 and 5.0.4
 -----------------------------------------
 
 The "zshaddhistory" hook mechanism documented in the zshmisc manual page

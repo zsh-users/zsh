@@ -1,6 +1,6 @@
 2013-12-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* unposted: release 5.0.4.
+	* unposted: Config/version.mk, Etc/FAQ.yo, README: release 5.0.4.
 
 2013-12-18  Barton E. Schaefer  <schaefer@zsh.org>
 
