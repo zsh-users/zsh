@@ -1,3 +1,7 @@
+2013-12-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: release 5.0.4.
+
 2013-12-18  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32157: Doc/Zsh/params.yo, Src/Zle/zle_refresh.c, Src/init.c,
