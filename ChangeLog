@@ -1,5 +1,7 @@
 2013-12-20  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32172; Test/A05execution.ztst: regression test for 32171
+	
 	* 32171: Src/exec.c: fix leaked pipe descriptor that could
 	deadlock a pipeline from a complex shell construct or function
 	into an external command
