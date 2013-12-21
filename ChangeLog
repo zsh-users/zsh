@@ -1,3 +1,9 @@
+2013-12-20  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32171: Src/exec.c: fix leaked pipe descriptor that could
+	deadlock a pipeline from a complex shell construct or function
+	into an external command
+
 2013-12-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk, Etc/FAQ.yo, README: release 5.0.4.
@@ -31,10 +37,12 @@
 
 	* unposted: NEWS: add ZLE_PROMPT_INDENT.
 
+	* 32119: Src/Zle/zle_tricky.c: left square bracket completed in
+	command position is not part of a subscript expression
+
 	* Patrick Oscity + pws: 32114: Doc/Zsh/params.yo,
-	Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c: ZLE_RPROMPT_INDENT
-	allows you to make the right prompt flush if your terminal
-	supports it.
+	Src/Zle/zle_refresh.c: ZLE_RPROMPT_INDENT allows you to make the
+	right prompt flush if your terminal supports it.
 
 2013-12-16  Barton E. Schaefer  <schaefer@zsh.org>
 

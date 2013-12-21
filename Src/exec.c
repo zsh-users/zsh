@@ -1691,6 +1691,7 @@ execpline2(Estate state, wordcode pcode,
 	execcmd(state, input, output, how, last1 ? 1 : 2);
     else {
 	int old_list_pipe = list_pipe;
+	int subsh_close = -1;
 	Wordcode next = state->pc + (*state->pc), pc;
 	wordcode code;
 
@@ -1738,6 +1739,7 @@ execpline2(Estate state, wordcode pcode,
 	} else {
 	    /* otherwise just do the pipeline normally. */
 	    addfilelist(NULL, pipes[0]);
+	    subsh_close = pipes[0];
 	    execcmd(state, input, pipes[1], how, 0);
 	}
 	zclose(pipes[1]);
@@ -1750,6 +1752,8 @@ execpline2(Estate state, wordcode pcode,
 	execpline2(state, *state->pc++, how, pipes[0], output, last1);
 	list_pipe = old_list_pipe;
 	cmdpop();
+	if (subsh_close != pipes[0])
+	    zclose(pipes[0]);
     }
 }
 
