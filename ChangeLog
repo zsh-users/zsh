@@ -1,3 +1,8 @@
+2013-12-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Config/version.mk: update version to 5.0.4-dev-0 so as
+	not to clash with release.
+
 2013-12-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk, Etc/FAQ.yo, README: release 5.0.4.
