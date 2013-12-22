@@ -2389,7 +2389,7 @@ static void
 execcmd(Estate state, int input, int output, int how, int last1)
 {
     HashNode hn = NULL;
-    LinkList args;
+    LinkList args, filelist = NULL;
     LinkNode node;
     Redir fn;
     struct multio *mfds[10];
@@ -2911,6 +2911,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    flags |= ESUB_KEEPTRAP;
 	if (type == WC_SUBSH && !(how & Z_ASYNC))
 	    flags |= ESUB_JOB_CONTROL;
+	filelist = jobtab[thisjob].filelist;
 	entersubsh(flags);
 	close(synch[1]);
 	forked = 1;
@@ -3264,6 +3265,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
 	    if (is_shfunc) {
 		/* It's a shell function */
+		pipecleanfilelist(filelist);
 		execshfunc((Shfunc) hn, args);
 	    } else {
 		/* It's a builtin */
@@ -3342,6 +3344,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		DPUTS(varspc,
 		      "BUG: assignment before complex command");
 		list_pipe = 0;
+		pipecleanfilelist(filelist);
 		/* If we're forked (and we should be), no need to return */
 		DPUTS(last1 != 1 && !forked, "BUG: not exiting?");
 		DPUTS(type != WC_SUBSH, "Not sure what we're doing.");

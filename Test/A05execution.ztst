@@ -207,10 +207,12 @@ F:This similar test was triggering a reproducible failure with pipestatus.
   coproc { read -Et 5 || kill -INT $$ }
   print -u $ZTST_fd 'This test takes 5 seconds to fail...'
   { printf "%d\n" {1..20000} } | ( read -E )
+  hang(){ printf "%d\n" {2..20000} | cat }; hang | ( read -E )
   print -p done
   read -Ep
 0:Bug regression: piping a shell construct to an external process may hang
 >1
+>2
 >done
 F:This test checks for a file descriptor leak that could cause the left
 F:side of a pipe to block on write after the right side has exited

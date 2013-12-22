@@ -1,3 +1,8 @@
+2013-12-21  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* PWS + Bart: 32176: plug additional descriptor leaks causing
+	deadlock via different code paths; expand regression test
+
 2013-12-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Config/version.mk: update version to 5.0.4-dev-0 so as
