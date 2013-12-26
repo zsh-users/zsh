@@ -1071,7 +1071,7 @@ has_real_token(const char *s)
 static char *
 get_comp_string(void)
 {
-    enum lextok t0, tt0;
+    enum lextok t0, tt0, cmdtok;
     int i, j, k, cp, rd, sl, ocs, ins, oins, ia, parct, varq = 0;
     int ona = noaliases;
     /*
@@ -1146,6 +1146,7 @@ get_comp_string(void)
     linredir = inredir;
     zsfree(cmdstr);
     cmdstr = NULL;
+    cmdtok = NULLTOK;
     zsfree(varname);
     varname = NULL;
     insubscr = 0;
@@ -1264,6 +1265,7 @@ get_comp_string(void)
 	    ins = (tok == REPEAT ? 2 : (tok != STRING));
 	    zsfree(cmdstr);
 	    cmdstr = ztrdup(tokstr);
+	    cmdtok = tok;
 	    /* If everything before is a redirection, don't reset the index */
 	    if (wordpos != redirpos)
 		wordpos = redirpos = 0;
@@ -1271,10 +1273,11 @@ get_comp_string(void)
 	    /*
 	     * A following DOLOOP should cause us to reset to the start
 	     * of the command line.  For some reason we only recognise
-	     * DOLOOP for this purpose (above) if ins is set.  Why?
-	     * Don't ask pointless questions.
+	     * DOLOOP for this purpose (above) if ins is set.  Why?  To
+	     * handle completing multiple SEPER-ated command positions on
+	     * the same command line, e.g., pipelines.
 	     */
-	    ins = 1;
+	    ins = (cmdtok != STRING);
 	}
 	if (!lexflags && tt0 == NULLTOK) {
 	    /* This is done when the lexer reached the word the cursor is on. */
