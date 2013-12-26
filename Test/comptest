@@ -30,6 +30,7 @@ comptestinit () {
 "export LC_ALL=C" \
 "emulate -R zsh" \
 "export ZDOTDIR=$ZTST_testdir" \
+"path=( $ZTST_srcdir:A )" \
 "module_path=( $module_path )" \
 "fpath=( $fpath )" \
 "bindkey -$comptest_keymap" \

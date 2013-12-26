@@ -1,5 +1,8 @@
 2013-12-25  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32183: Test/comptest, Test/Y01completion.ztst: regression tests
+	for 32182 and 31611
+
 	* 32182: Src/Zle/zle_tricky.c: re-enable command completion after
 	a separator (tweak to 31611)
 

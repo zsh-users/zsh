@@ -45,13 +45,33 @@
 >line: {: ~user1}{}
 
   comptest $'echo ;:\C-b\C-b\t'
-0:tilde
+0:directories and files before separator
 >line: {echo }{;:}
 >DESCRIPTION:{file}
 >DI:{dir1}
 >DI:{dir2}
 >FI:{file1}
 >FI:{file2}
+
+# Depends on path assignment in comptestinit
+  comptest $'zt\t'
+0:command
+>line: {ztst.zsh }{}
+
+  comptest $':;zt\t'
+0:command after separator
+>line: {:;ztst.zsh }{}
+F:regression test workers/32182
+
+  comptest $'for f in 1; do < x\C-b\C-b\t'
+0:redirection after "for ...; do"
+>line: {for f in 1; do <}{ x}
+>DESCRIPTION:{file}
+>DI:{dir1}
+>DI:{dir2}
+>FI:{file1}
+>FI:{file2}
+F:regression test workers/31611
 
 %clean
 
