@@ -2619,6 +2619,7 @@ acquire_pgrp(void)
     sigset_t blockset, oldset;
 
     if ((mypgrp = GETPGRP()) > 0) {
+	long lastpgrp = mypgrp;
 	sigemptyset(&blockset);
 	sigaddset(&blockset, SIGTTIN);
 	sigaddset(&blockset, SIGTTOU);
@@ -2639,6 +2640,9 @@ acquire_pgrp(void)
 	    if (read(0, NULL, 0) != 0) {} /* Might generate SIGT* */
 	    signal_block(blockset);
 	    mypgrp = GETPGRP();
+	    if (mypgrp == lastpgrp && !interact)
+		break; /* Unlikely that pgrp will ever change */
+	    lastpgrp = mypgrp;
 	}
 	if (mypgrp != mypid) {
 	    if (setpgrp(0, 0) == 0) {
