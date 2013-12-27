@@ -54,10 +54,12 @@
 >FI:{file2}
 
 # Depends on path assignment in comptestinit
+  comptesteval "path=( $ZTST_srcdir:A )"
   comptest $'zt\t'
 0:command
 >line: {ztst.zsh }{}
 
+  comptesteval "path=( $ZTST_srcdir:A )"
   comptest $':;zt\t'
 0:command after separator
 >line: {:;ztst.zsh }{}
