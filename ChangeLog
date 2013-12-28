@@ -1,5 +1,9 @@
 2013-12-28  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32190 (cf. Alexey Bezhan: 32189): Completion/Zsh/Command/_cd:
+	quote _path_files -W path in case of spaces or special characters
+	when completing relative to ../
+
 	* 32186: Completion/Base/Completer/_expand: fix bad backreference;
 	handle glob patterns that include backslashed quote characters
 

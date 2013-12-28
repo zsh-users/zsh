@@ -100,7 +100,7 @@ else
     # already handled by _command_names (see _autocd)
 
     [[ CURRENT -ne 1 || ( -z "$path[(r).]" && $PREFIX != */* ) ]] &&
-        alt=( "${cdpath+local-}directories:${cdpath+local }directory:_path_files $tmpWpath -/" "$alt[@]" )
+        alt=( "${cdpath+local-}directories:${cdpath+local }directory:_path_files ${(j: :)${(@q)tmpWpath}} -/" "$alt[@]" )
 
     if [[ CURRENT -eq argstart && noopts -eq 0 && $PREFIX = -* ]] &&
       zstyle -t ":completion:${curcontext}:options" complete-options; then
