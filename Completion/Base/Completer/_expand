@@ -103,8 +103,8 @@ subd=("$exp[@]")
 # Now try globbing.
 
 [[ "$force" = *g* ]] || zstyle -T ":completion:${curcontext}:" glob &&
-    eval 'exp=( ${~exp//(#b)\\[ 	
-]/$match[1]} ); exp=( ${(q)exp} )' 2>/dev/null
+    eval 'exp=( ${~exp//(#b)\\([ 	\"'"\'"'
+])/$match[1]} ); exp=( ${(q)exp} )' 2>/dev/null
 
 ### Don't remember why we once used this instead of the (q) above.
 #    eval 'exp=( ${~exp} ); exp=( ${exp//(#b)([][()|*?^#~<>\\=])/\\${match[1]}} )' 2>/dev/null
