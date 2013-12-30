@@ -35,6 +35,9 @@ Apple: MacOS X/Darwin 10.x
 
 	Reported to compile with no problems on 10.4.
 
+	Compiling with GCC on 10.9.1 (Mavericks) reportedly causes a crash
+	due to a libiconv problem.  Compile with clang instead.
+
 	Multibyte support works; you probably wish to set the
 	option COMBINING_CHARS, which is not enabled by default.
 	Problems have been noted when outputting multibyte characters
