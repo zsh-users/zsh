@@ -1,6 +1,9 @@
 2013-12-30  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* unposted (cf. Carlo: 32202):  MACHINES: OS X 10.9.1. gcc problem
+	* 32205: Completion/Zsh/Command/_cd: skip cdpath search when
+	the prefix begins with "../" (bug introduced by 31714)
+
+	* unposted (cf. Carlo: 32202): MACHINES: OS X 10.9.1. gcc problem
 
 2013-12-28  Barton E. Schaefer  <schaefer@zsh.org>
 

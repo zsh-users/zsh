@@ -63,7 +63,7 @@ else
     fi
   fi
 
-  if [[ $PREFIX != (\~|/|./|../)* ]]; then
+  if [[ $PREFIX != (\~|/|./|../)* && $IPREFIX != ../* ]]; then
     local tmpcdpath alt
 
     alt=()
