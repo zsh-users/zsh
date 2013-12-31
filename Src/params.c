@@ -3380,8 +3380,12 @@ arrvarsetfn(Param pm, char **x)
 	*dptr = mkarray(NULL);
     else
 	*dptr = x;
-    if (pm->ename && x)
-	arrfixenv(pm->ename, x);
+    if (pm->ename) {
+	if (x)
+	    arrfixenv(pm->ename, x);
+	else if (*dptr == path)
+	    pathchecked = path;
+    }
 }
 
 /**/

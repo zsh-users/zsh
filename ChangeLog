@@ -1,5 +1,8 @@
 2013-12-30  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32208: Src/params.c: always reset pathchecked when the path
+	array is modified in arrvarsetfn(), to avoid bad dereference
+
 	* 32205: Completion/Zsh/Command/_cd: skip cdpath search when
 	the prefix begins with "../" (bug introduced by 31714)
 
