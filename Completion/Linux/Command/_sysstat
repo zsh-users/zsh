@@ -1,0 +1,150 @@
+#compdef -P mpstat (|cifs)iostat isag sadf sar pidstat
+# -V can appear with other options, so (- *) isn't needed.
+#TODO:
+# sysstat-nfsiostat - there seems to be two nfsiostat(1)s. one from oracle and one by redhat.
+
+_mpstat() {
+  local ret=1
+  _arguments : \
+    '-A[equivalent to -u -I ALL -P ALL]' \
+    '-I[report interrupt statistics]:interrupts:(SUM CPU SCPU ALL)' \
+    '-P[specify processor number]:processor: _values -s "," processor ON ALL' \
+    '-u[report CPU utilization]' \
+    '-V[print version number]' \
+    '1:interval:_guard "[0-9]#" "interval"' \
+    '2:count:_guard "[0-9]#" "count"' && ret=0
+  return ret
+}
+
+_iostat() {
+  local ret=1
+  _arguments : \
+    '-c[display CPU utilization report]' \
+    '-d[display device utilization report]' \
+    '-T[only display global statistics for group_name]' \
+    '-g[display statistics for a group of devices]:group name: _message "group name"' \
+    '-h[human readable device utilization report]' \
+    '-j[display persistent device name]' \
+    '(-m)-k[display statistics in kB/s]' \
+    '(-k)-m[display statistics in MB/s]' \
+    '-N[display registered device mapper names]' \
+    '1:interval:_guard "[0-9]#" "interval"' \
+    '2:count:_guard "[0-9]#" "count"' && ret=0
+  return ret
+}
+
+_cifsiostat() {
+  local ret=1
+  _arguments : \
+    '-h[human readable]' \
+    '(-m)-k[display statistics in kB/s]' \
+    '(-k)-m[display statistics in MB/s]' \
+    '-t[print timestamp for each report]' \
+    '-V[print version number]' \
+    '1:interval:_guard "[0-9]#" "interval"' \
+    '2:count:_guard "[0-9]#" "count"' && ret=0
+  return ret
+}
+
+_isag() {
+  local ret=1 
+  _arguments : \
+    '-p[Pathname to daily data files]:data files: _files -/' \
+    '-c[Specify configuration file]:configuration file: _files' \
+    '-ght[Specify height of the chart]:height: _message "height"' \
+    '-gwd[Specify width of the chart]:width: _message "width"' && ret=0
+  return ret
+}
+
+_sadf() {
+  local ret=1 line state context expl
+  typeset -A opt_args
+  # any options after `--' are for sar(1)
+  if ! (( CURRENT > $words[(i)--] )); then
+    _arguments : \
+      '-C[display comments in file]' \
+      '(-j -p -x)-d[output file in SQL format]' \
+      '-e[set ending time of report]:ending time: _message "ending time in localtime(HH\:MM\:SS 24-hour format)"' \
+      '-H[display only the header of the report]' \
+      '(-j -p -x)-h[print on a single line when used with -d]' \
+      '(-d -p -x)-j[output file in JSON]' \
+      '-P[restrict processor dependant statistics]:processor number(zero indexed) or ALL:(ALL)' \
+      '(-j -x -d)-p[print in format parsable by tools like awk]' \
+      '-s[set starting time of report]:starting time: _message "starting time in localtime(HH\:MM\:SS 24-hour format)"' \
+      '(-t -U)-T[display timestamp in local time]' \
+      '(-T -U)-t[display timestamp in file\''s original localtime]' \
+      '(-t -T)-U[display in seconds from epoch(UTC)]' \
+      '-V[print version number]' \
+      '(-j -d -p)-x[output file in XML]' \
+      '1:interval:_guard "[0-9]#" "interval"' \
+      '2:count:_guard "[0-9]#" "count"' && ret=0 
+  else
+    _arguments : '*::sar: _sar' && ret=0
+  fi
+  return ret
+}
+
+_sar() {
+  local ret=1 
+  _arguments : \
+    '-A[equivalent to -bBdFHqrRSuvwWy -I SUM -I XALL -m ALL -n ALL -u ALL -P ALL]' \
+    '-B[report paging statistics]' \
+    '-b[report I/O and transfer rate statistics]' \
+    '-C[display comments from sadc]' \
+    '-d[report activity for each block device]' \
+    '-e[set ending time of report]:ending time: _message "ending time (HH\:MM\:SS 24-hour format)"' \
+    '-F[display statistics for mounted filesystems]' \
+    '-f[extract records from file]:record:_files' \
+    '-H[report hugepages utilization]' \
+    '-h[display help]' \
+    '*-I[report statistics for interrupts]:interrupts: _values -s "," interrupts 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 SUM ALL XALL' \
+    '-i[select records as close as possible to interval]:interval: _message "interval"' \
+    '-j[display persistent device names]:type:(ID LABEL PATH UUID)' \
+    '-m[report power management statistics]:keywords: _values -s "," keywords CPU FAN FREQ IN TEMP USB ALL' \
+    '-n[report network statistics]:keywords: _values -s "," keywords DEV EDEV NFS NFSD SOCK IP EIP ICMP EICMP TCP ETCP UDP SOCK6 IP6 EIP6 ICMP6 EICMP6 UDP6 ALL' \
+    '-P[report per-processor statistics]:processor: _values -s "," processors ALL' \
+    '-p[pretty-print device names]' \
+    '-q[report queue length and load averages]' \
+    '-R[report memory statistics]' \
+    '-r[report memory utilization statistics]' \
+    '-S[report swap space utilization]' \
+    '-s[set starting time of report]:start time: _message "start time (HH\:MM\:SS 24-hour format)"' \
+    '-u[report CPU utilization]: :(ALL)' \
+    '-V[print version number]' \
+    '-v[report status of kernel tables]' \
+    '-W[report swapping statistics]' \
+    '-w[report task creation and system switching activity]' \
+    '-y[report TTY device activity]' \
+    '1:interval:_guard "[0-9]#" "interval"' \
+    '2:count:_guard "[0-9]#" "count"' && ret=0
+  return ret
+}
+
+_pidstat() {
+  local ret=1
+  _arguments : \
+    '-C[filter tasks by string]:task: _message "string or regex"' \
+    '-d[report I/O statistics]' \
+    '-h[display on horizontally]' \
+    '-I[divide CPU usage by number of processors]' \
+    '-l[display process name along with arguments]' \
+    '-p[select pid]:pid: _pids' \
+    '-r[report page faults and memory]' \
+    '-s[report stack utilization]' \
+    '-T[specifies what to monitor]:type:(TASK CHILD ALL)' \
+    '-t[display statistics for threads]' \
+    '-U[display real username of tasks]::username:_users' \
+    '-u[report cpu utilization]' \
+    '-V[print version number]' \
+    '-v[display values from kernel table]' \
+    '-w[report task switching activity]' && ret=0
+  return ret
+}
+
+_sysstat() {
+  local ret=1                 
+  _call_function ret _$service
+  return ret                  
+}                             
+
+_sysstat "$@"

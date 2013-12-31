@@ -1,3 +1,8 @@
+2013-12-31  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Eric Cook: 32210: Completion/Linux/Command/_sysstat: completion
+	for mpstat, iostat, etc.
+
 2013-12-30  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32208: Src/params.c: always reset pathchecked when the path
