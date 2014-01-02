@@ -561,7 +561,7 @@ if (( ! $+_fs_any )); then
       "degraded[if some of the devices does not exist/has failed/has been replaced, this allow mount the filesystem]"
       "device[scan device for filesystems]:device"
       "discard[enable discard/TRIM on freed blocks]"
-      "enospc_debug[used for debugging problems with "no space left on device"]" 
+      "enospc_debug[used for debugging problems with 'no space left on device']" 
       "fatal_errors[action to take when encountering a fatal error]:action:(bug panic)"
       "inode_cache[enable free inode number caching]"
       "max_inline[set maximum space for inline data]:size (bytes)"
