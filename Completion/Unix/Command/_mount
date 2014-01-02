@@ -567,6 +567,7 @@ if (( ! $+_fs_any )); then
       "max_inline[set maximum space for inline data]:size (bytes)"
       "metadata_ratio[sets the number of data chunks that need to be allocated to force a metadata chunk allocation]:number"
       "nobarrier[disable use of device barriers]"
+      "nodatacow[do not copy-on-write data for newly created files, existing files are unaffected]"
       "nodatasum[disable checksums of new files]"
       "nospace_cache[disables use of space_cache]"
       "notreelog[disable the tree logging used for fsync]"
