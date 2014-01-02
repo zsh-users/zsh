@@ -1,5 +1,5 @@
 #compdef zoneadm
-# Synced with the S11U1 build 19 man page
+# Synced with the S11U1 man page
 
 _zoneadm_bootargs() {
 	# This is a subset of the arguments to kernel(1M)
@@ -15,11 +15,23 @@ _zoneadm() {
 	local -a subcmds fields
 	local -a solaris_attach solaris_install
 	local -a solaris10_attach solaris10_install
+	local -a extended_create_options extended_destroy_options
 	local brand brand_args
 
 	subcmds=(
 		attach boot clone detach halt help install list mark move
 		ready reboot uninstall verify
+	)
+
+	extended_create_options=(
+		"force-zpool-import"
+		"force-zpool-create:ZFS pool: "
+		"force-zpool-create-all"
+	)
+
+	extended_destroy_options=(
+		"force-zpool-destroy:ZFS pool: "
+		"force-zpool-destroy-all"
 	)
 
 	solaris_attach=(
@@ -82,6 +94,7 @@ _zoneadm() {
 		_arguments -A "-*" \
 			'-m[Clone mode]:mode:_values "mode" copy' \
 			'-s[Source snapshot]:snapshot:_zfs_dataset -t snap' \
+			'-x[Extended options]:extended option:_values -w "extended option" $extended_create_options' \
 			':source zone:_zones'
 		;;
 
@@ -94,6 +107,7 @@ _zoneadm() {
 			'-F[Force attach]' \
 			'-n[Path to zone manifest]:path to zone manifest:_path_files' \
 			'-u[Update on attach]' \
+			'-x[Extended options]:extended option:_values -w "extended option" $extended_create_options' \
 			${(P)brand_args}
 		;;
 
@@ -116,6 +130,7 @@ _zoneadm() {
 			brand_args=${brand}_install
 		fi
 		_arguments -A "-*" \
+			'-x[Extended options]:extended option:_values -w "extended option" $extended_create_options' \
 			${(P)brand_args}
 		;;
 
@@ -139,7 +154,8 @@ _zoneadm() {
 
 	("uninstall")
 		_arguments -A "-*" \
-			'-F[Force]'
+			'-F[Force]' \
+			'-x[Extended options]:extended option:_values -w "extended option" $extended_destroy_options'
 		;;
 	esac
 }

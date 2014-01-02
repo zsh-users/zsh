@@ -1,5 +1,5 @@
 #compdef zpool
-# Synced with the S11U1 build 19 man page
+# Synced with the S11U1 man page
 
 _zpool() {
 	local context state line expl
@@ -8,7 +8,7 @@ _zpool() {
 	subcmds=(
 		create destroy add remove list iostat status online
 		offline clear attach detach replace scrub import export
-		upgrade history get set split
+		upgrade history get set split help
 	)
 
 	versions=(
@@ -35,7 +35,9 @@ _zpool() {
 		"dedupditto[Threshold for number of copies]:value:"
 		"delegation[Delegated administration]:value:(on off)"
 		"failmode[Failure-mode behavior]:value:(wait continue panic)"
+		"listshares[Show shares in 'zfs list']:value:(on off)"
 		"listsnaps[Show snapshots in 'zfs list']:value:(on off)"
+		"readonly[Controls whether the pool can be modified]:value:(on off)"
 		"version[Pool version]:version:($versions)"
 	)
 
@@ -97,9 +99,19 @@ _zpool() {
 	fi
 
 	case $service in
+	(help)
+		_arguments -A "-*" \
+			- set1 \
+			':command/property:($subcmds ${fields%%\[*} properties)' \
+			- set2 \
+			'-l[Display property information]' \
+			': :(properties)'
+		;;
+
 	(clear)
 		_arguments -A "-*" \
 			'-F[Discard transactions to allow pool opening]' \
+			'-f[Ignore fmadm acquit and fmadm repair failures]' \
 			'-n[With -F, check if discarding transactions would work]' \
 			':pool name:_zfs_pool' \
 			'*:virtual device:_files'
@@ -216,10 +228,13 @@ _zpool() {
 		_arguments -A "-*" \
 			'-D[Destroyed pools]' \
 			'(-d)*-c[Use cache file]:cache file:_files' \
-			'(-c)*-d[Search for devices or files in directory]:directory:_files -/' \
+			'(-c,-D)*-d[Search for devices or files in directory]:directory:_files -/' \
+			'-F[Recovery mode: discard transactions if required]' \
 			'-f[Force import]' \
 			'-l[Display configuration in /dev/chassis location form]' \
 			'-m[Ignore missing log devices]' \
+			'-N[Import pool without mounting any filesystems]' \
+			'-n[With -F; do not perform input]' \
 			'-R[Alternate root]:alternate root:_files -/' \
 			'-o[Set pool or dataset property]:property:_values -s , "property" $create_properties_dataset $rw_props' \
 			- set1 \

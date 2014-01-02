@@ -1,5 +1,11 @@
 2014-01-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Danek Duvall: 32216: Completion/Solaris/Command/_svcadm,
+	Completion/Solaris/Command/_zoneadm,
+	Completion/Unix/Command/_zfs, Completion/Unix/Command/_zpool,
+	Completion/Unix/Type/_zfs_dataset: updates for Solaris 11,
+	Update 1.
+
 	* 32196: Carl Drougge: Src/Zle/zle_misc.c: copy-prev-shell-word
 	needs an extra flag to work properly.
 

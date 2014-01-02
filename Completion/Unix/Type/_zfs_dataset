@@ -14,6 +14,7 @@ zparseopts -D -E e:=expl_type_arr p=paths_allowed r1=rsrc r2=rdst t+:=type
 [[ -n $type[(r)fs] ]]    && typearg=( filesystem )
 [[ -n $type[(r)vol] ]]   && typearg=( $typearg volume )
 [[ -n $type[(r)snap] ]]  && typearg=( $typearg snapshot )
+[[ -n $type[(r)share] ]]  && typearg=( $typearg share )
 if [[ -n $typearg ]]; then
 	typearg=( -t ${(j:,:)typearg} )
 # We know we're in zfs list if paths_allowed is non-empty.
@@ -34,7 +35,7 @@ if [[ ${#rsrc} -gt 0 ]]; then
 	elif [[ -n $words[(r)-p] ]]; then
 		typearg=( -t filesystem,volume )
 	else
-		typearg=( -t filesystem,snapshot,volume )
+		typearg=( -t filesystem,share,snapshot,volume )
 	fi
 fi
 

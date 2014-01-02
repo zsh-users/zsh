@@ -1,10 +1,13 @@
 #compdef zfs
-# Synced with the S11U1 build 20 man page
+# Synced with the S11U1 man page
 
 _zfs() {
 	local context state line expl
 	typeset -A opt_args
 	local -a subcmds rw_properties rw_propnames ro_properties create_properties
+	local -a share_nfs_ro_properties share_nfs_rw_properties
+	local -a share_smb_ro_properties share_nfs_rw_properties
+	local -a share_ro_properties share_rw_properties
 	local -a difffields delegatable_perms
 
 	subcmds=(
@@ -15,6 +18,115 @@ _zfs() {
 		"diff" "key" "help"
 	)
 
+	share_nfs_ro_properties=(
+		"share.nfs.all"
+	)
+
+	share_nfs_rw_properties=(
+		"share.nfs:value:(on off)"
+		"share.nfs.aclok:value:(on off)"
+		"share.nfs.acflfab:value:(on off)"
+		"share.nfs.anon:uid:"
+		"share.nfs.charset.euc-cn:access-list:"
+		"share.nfs.charset.euc-jpms:access-list:"
+		"share.nfs.charset.euc-kr:access-list:"
+		"share.nfs.charset.euc-tw:access-list:"
+		"share.nfs.charset.iso8859-1:access-list:"
+		"share.nfs.charset.iso8859-2:access-list:"
+		"share.nfs.charset.iso8859-5:access-list:"
+		"share.nfs.charset.iso8859-6:access-list:"
+		"share.nfs.charset.iso8859-7:access-list:"
+		"share.nfs.charset.iso8859-8:access-list:"
+		"share.nfs.charset.iso8859-9:access-list:"
+		"share.nfs.charset.iso8859-13:access-list:"
+		"share.nfs.charset.iso8859-15:access-list:"
+		"share.nfs.charset.koi8-r:access-list:"
+		"share.nfs.index:file:_files"
+		"share.nfs.log:nfslog.conf tag:"
+		"share.nfs.nosub:value:(on off)"
+		"share.nfs.nosuid:value:(on off)"
+		"share.nfs.public:value:(on off)"
+		"share.nfs.sec:security-mode-list:"
+		"share.nfs.sec.default.none:access-list:"
+		"share.nfs.sec.default.ro:access-list:"
+		"share.nfs.sec.default.root:access-list:"
+		"share.nfs.sec.default.root_mapping:uid:"
+		"share.nfs.sec.default.rw:access-list:"
+		"share.nfs.sec.default.window:seconds"
+		"share.nfs.sec.dh.none:access-list:"
+		"share.nfs.sec.dh.ro:access-list:"
+		"share.nfs.sec.dh.root:access-list:"
+		"share.nfs.sec.dh.root_mapping:uid:"
+		"share.nfs.sec.dh.rw:access-list:"
+		"share.nfs.sec.dh.window:seconds"
+		"share.nfs.sec.krb5.none:access-list:"
+		"share.nfs.sec.krb5.ro:access-list:"
+		"share.nfs.sec.krb5.root:access-list:"
+		"share.nfs.sec.krb5.root_mapping:uid:"
+		"share.nfs.sec.krb5.rw:access-list:"
+		"share.nfs.sec.krb5.window:seconds"
+		"share.nfs.sec.krb5i.none:access-list:"
+		"share.nfs.sec.krb5i.ro:access-list:"
+		"share.nfs.sec.krb5i.root:access-list:"
+		"share.nfs.sec.krb5i.root_mapping:uid:"
+		"share.nfs.sec.krb5i.rw:access-list:"
+		"share.nfs.sec.krb5i.window:seconds"
+		"share.nfs.sec.krb5p.none:access-list:"
+		"share.nfs.sec.krb5p.ro:access-list:"
+		"share.nfs.sec.krb5p.root:access-list:"
+		"share.nfs.sec.krb5p.root_mapping:uid:"
+		"share.nfs.sec.krb5p.rw:access-list:"
+		"share.nfs.sec.krb5p.window:seconds"
+		"share.nfs.sec.none.none:access-list:"
+		"share.nfs.sec.none.ro:access-list:"
+		"share.nfs.sec.none.root:access-list:"
+		"share.nfs.sec.none.root_mapping:uid:"
+		"share.nfs.sec.none.rw:access-list:"
+		"share.nfs.sec.none.window:seconds"
+		"share.nfs.sec.sys.none:access-list:"
+		"share.nfs.sec.sys.ro:access-list:"
+		"share.nfs.sec.sys.root:access-list:"
+		"share.nfs.sec.sys.root_mapping:uid:"
+		"share.nfs.sec.sys.rw:access-list:"
+		"share.nfs.sec.sys.window:seconds"
+	)
+
+	share_smb_ro_properties=(
+		"share.smb.all"
+	)
+
+	share_smb_rw_properties=(
+		"share.smb:value:(on off)"
+		"share.smb.ad-container"
+		"share.smb.abe"
+		"share.smb.csc:value:(disabled manual auto vdo)"
+		"share.smb.catia:value:(on off)"
+		"share.smb.dfsroot:value:(on off)"
+		"share.smb.guestok:value:(on off)"
+		"share.smb.ro:access-list:"
+		"share.smb.rw:access-list:"
+		"share.smb.none:access-list:"
+	)
+
+	share_ro_properties=(
+		"share.all"
+		"share.fs"
+		"share.name"
+		"share.point"
+		"share.protocols"
+		"share.state"
+		$share_nfs_ro_properties
+		$share_smb_ro_properties
+	)
+
+	share_rw_properties=(
+		"share.desc:description:"
+		"share.noauto:value:(on off)"
+		"share.path:path:"
+		$share_nfs_rw_properties
+		$share_smb_rw_properties
+	)
+
 	# TODO: userused@ and groupused@ could have more extensive handling
 	ro_properties=(
 		"name" "type" "creation" "used" "available" "referenced"
@@ -22,6 +134,7 @@ _zfs() {
 		"usedbydataset" "usedbyrefreservation" "usedbysnapshots"
 		"defer_destroy" "userused@" "userrefs" "groupused@"
 		"keychangedate" "keystatus" "rekeydate"
+		$share_ro_properties
 	)
 
 	# TODO: Be cleverer about what values can be set.  Is there any way to
@@ -57,8 +170,6 @@ _zfs() {
 		"setuid:value:(on off)"
 		"shadow:value:" # TODO: complete URI|none
 		"share:share properties:"
-		"sharenfs:value:(on off)"
-		"sharesmb:value:(on off)"
 		"snapdir:value:(hidden visible)"
 		"sync:value:(standard always disabled)"
 		"userquota@:value:" # TODO: complete user=size|none
@@ -67,6 +178,7 @@ _zfs() {
 		"vscan:value:(on off)"
 		"xattr:value:(on off)"
 		"zoned:value:(on off)"
+		$share_rw_properties
 	)
 
 	create_properties=(
@@ -246,7 +358,14 @@ _zfs() {
 			- set1 \
 			'-a[Share all available ZFS filesystems]' \
 			- set2 \
-			':filesystem:_zfs_dataset -t fs'
+			'-r[Share filesystems recursively]' \
+			':filesystem:_zfs_dataset -t fs' \
+			- set3 \
+			'*-o[Create a share with these properties]:property:_values -w "share properties" $share_rw_properties' \
+			'-u[Create a share without sharing it]' \
+			':filesystem:_zfs_dataset -t fs' \
+			- set4 \
+			':filesystem:_zfs_dataset -t fs -t mtpt -t share'
 		;;
 
 	("unshare")
@@ -254,7 +373,10 @@ _zfs() {
 			- set1 \
 			'-a[Unshare all shared ZFS filesystems]' \
 			- set2 \
-			':filesystem:_zfs_dataset -t fs -t mtpt'
+			'-r[Unshare filesystems recursively]' \
+			':filesystem:_zfs_dataset -t fs' \
+			- set3 \
+			':filesystem:_zfs_dataset -t fs -t mtpt -t share'
 		;;
 
 	("send")
@@ -410,7 +532,12 @@ _zfs() {
 		;;
 
 	("help")
-		compadd property $subcmds $ro_properties ${rw_properties%%:*}
+		_arguments -A "-*" \
+			- set1 \
+			':command:($subcmds $delegatable_perms $ro_properties ${rw_properties%%:*} properties)' \
+			- set2 \
+			'-l[Display property information]' \
+			': :(properties)'
 		;;
 
 	(*)
