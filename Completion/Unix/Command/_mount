@@ -549,25 +549,37 @@ if (( ! $+_fs_any )); then
       'swidth[specify stripe width]:size'
     )
     _fs_btrfs=(
-      'subvol[mount a subvolume]:path'
-      'subvolid[mount subvolume by id]:id'
-      'device[scan device for filesystems]:device'
-      'nodatasum[disable checksums of new files]'
-      'nobarrier[disable use of device barriers]'
-      'max_inline[set maximum space for inline data]:size (bytes)'
-      'alloc_start[set where on disk allocations start]:number'
-      'thread_pool[number of worker threads to allocate]:number'
-      '(compress-force)compress[enable compression]:algorithm:(zlib lzo no)'
-      '(compress)compress-force[enable compression for all files]:algorithm:(zlib lzo no)'
-      'ssd[optimise behaviour for SSDs]'
-      'ssd_spread[be strict about finding a large unused region for new allocations]'
-      'discard[enable discard/TRIM on freed blocks]'
-      'notreelog[disable the tree logging used for fsync]'
-      metadata_ratio:number {,no}space_cache clear_cache
-      user_subvol_rm_allowed autodefrag inode_cache
-      enospc_debug recovery check_int check_int_data
-      check_int_print_mask:number skip_balance
-      'fatal_errors:action:(bug panic)'
+      "alloc_start[set where on disk allocations start]:number"
+      "autodefrag[will detect random writes into existing files and kick off background defragging]"
+      "check_int_data[switch on integrity checker for data and metadata (if compiled in)]"
+      "check_int_print_mask[number representing mask of events to print]:number"
+      "check_int[switch on integrity checker for metadata (if compiled in)]"
+      "clear_cache[clear all the free space caches during mount]"
+      "commit[set the interval of periodic commit, 30 seconds by default]:number"
+      "(compress)compress-force[enable compression for all files]:algorithm:(zlib lzo no)"
+      "(compress-force)compress[enable compression]:algorithm:(zlib lzo no)"
+      "degraded[if some of the devices does not exist/has failed/has been replaced, this allow mount the filesystem]"
+      "device[scan device for filesystems]:device"
+      "discard[enable discard/TRIM on freed blocks]"
+      "enospc_debug[used for debugging problems with "no space left on device"]" 
+      "fatal_errors[action to take when encountering a fatal error]:action:(bug panic)"
+      "inode_cache[enable free inode number caching]"
+      "max_inline[set maximum space for inline data]:size (bytes)"
+      "metadata_ratio[sets the number of data chunks that need to be allocated to force a metadata chunk allocation]:number"
+      "nobarrier[disable use of device barriers]"
+      "nodatasum[disable checksums of new files]"
+      "nospace_cache[disables use of space_cache]"
+      "notreelog[disable the tree logging used for fsync]"
+      "recovery[enable autorecovery upon mount]"
+      "rescan_uuid_tree[force check and rebuild procedure of the UUID tree]"
+      "skip_balance[skip automatic restart of balance operation after mount]"
+      "space_cache[btrfs stores the free space data on-disk to make the caching of a block group much quicker]"
+      "ssd[optimise behaviour for SSDs]"
+      "ssd_spread[be strict about finding a large unused region for new allocations]"
+      "subvolid[mount subvolume by id]:id"
+      "subvol[mount a subvolume]:path"
+      "thread_pool[number of worker threads to allocate]:number"
+      "user_subvol_rm_allowed[subvolumes may be deleted by a non-root user]"
     )
     ;;
   freebsd*|dragonfly*)
