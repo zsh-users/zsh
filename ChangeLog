@@ -1,5 +1,7 @@
 2014-01-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: README: update another reference to 5.0.5.
+
 	* users/18271 plus some additional rewriting: Etc/FAQ.yo: add
 	FAQ entry to explain pattern exclusions.
 
