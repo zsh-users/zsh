@@ -1,3 +1,8 @@
+2014-01-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: README, Etc/FAQ.yo: update source documentation for
+	5.0.5.
+
 2014-01-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Danek Duvall: 32216: Completion/Solaris/Command/_svcadm,
