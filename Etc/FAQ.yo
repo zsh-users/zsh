@@ -122,6 +122,7 @@ Chapter 3:  How to get various things to work
 3.24. What's wrong with cut and paste on my xterm?
 3.25. How do I get coloured prompts on my colour xterm?
 3.26. Why is my output duplicated with `tt(foo 2>&1 >foo.out | bar)'?
+3.27. What are these `^' and `~' pattern characters, anyway?
 
 Chapter 4:  The mysteries of completion
 4.1. What is completion?
@@ -545,14 +546,8 @@ tt(EXTENDED_GLOB).
       option tt(KSH_GLOB) is in effect; for previous versions you
       must use the table above.
 
-      [1] Note that mytt(~) is the only globbing operator to have a lower
-        precedence than mytt(/).  For example, mytt(**/foo~*bar*) matches any
-        file in a subdirectory called mytt(foo), except where mytt(bar)
-        occurred somewhere in the path (e.g. mytt(users/barstaff/foo) will
-        be excluded by the mytt(~) operator).  As the mytt(**) operator cannot
-        be grouped (inside parentheses it is treated as mytt(*)), this is
-        one way to exclude some subdirectories from matching a mytt(**).
-	The form (^foo/)# also works.
+      [1] See question link(3.27)(327) for more on the mysteries of
+        mytt(~) and mytt(^).
     it()  Unquoted assignments do file expansion after mytt(:)s (intended for
         PATHs). 
     it()* mytt(typeset) and mytt(integer) have special behaviour for
@@ -1452,6 +1447,8 @@ sect(Why does mytt(bindkey ^a command-name) or mytt(stty intr ^-) do something f
   are metacharacters.  tt(^a) matches any file except one called tt(a), so the
   line is interpreted as bindkey followed by a list of files.  Quote the
   tt(^) with a backslash or put quotation marks around tt(^a).
+  See link(3.27)(327) if you want to know more about the pattern
+  character mytt(^).
 
 
 sect(Why can't I bind tt(\C-s) and tt(\C-q) any more?)
@@ -1668,6 +1665,7 @@ sect(How do I prevent the prompt overwriting output when there is no newline?)
   One final alternative is to put a newline in your prompt -- see question
   link(3.13)(313) for that.
 
+
 sect(What's wrong with cut and paste on my xterm?)
 
   On the majority of modern UNIX systems, cutting text from one window and
@@ -1699,6 +1697,7 @@ sect(What's wrong with cut and paste on my xterm?)
      read; all input is read as continuation lines (this may require the
      fixes referred to above in order to be reliable).
   )
+
 
 sect(How do I get coloured prompts on my colour xterm?)
 
@@ -1743,6 +1742,7 @@ sect(How do I get coloured prompts on my colour xterm?)
   `mytt(<ESC>[0m)' puts printing back to normal so that the rest of the line
   is unchanged.
 
+
 sect(Why is my output duplicated with `tt(foo 2>&1 >foo.out | bar)'?)
 
   This is a slightly unexpected effect of the option tt(MULTIOS), which is
@@ -1778,6 +1778,133 @@ sect(Why is my output duplicated with `tt(foo 2>&1 >foo.out | bar)'?)
   first example is exactly the same, however the second redirector is
   disguised as a pipe.  So if you want to turn this effect off, you need
   to unset the option mytt(MULTIOS).
+
+
+sect(What are these `^' and `~' pattern characters, anyway?)
+label(327)
+
+  The characters mytt(^) and mytt(~) are active when the option
+  tt(EXTENDED_GLOB) is set.  Both are used to exclude patterns, i.e.  to
+  say `match something other than ...'.  There are some confusing
+  differences, however.  Here are the descriptions for mytt(^) and mytt(~).
+
+  mytt(^) means `anything except the pattern that follows'.  You can
+  think of the combination tt(^)em(pat) as being like a tt(*) except
+  that it doesn't match em(pat).  So, for example, mytt(myfile^.txt)
+  matches anything that begins with tt(myfile) except tt(myfile.txt).
+  Because it works with patterns, not just strings, mytt(myfile^*.c)
+  matches anything that begins with tt(myfile) unless it ends with
+  tt(.c), whatever comes in the middle --- so it matches tt(myfile1.h)
+  but not tt(myfile1.c).
+
+  Also like mytt(*), mytt(^) doesn't match across directories if you're
+  matching files when `globbing', i.e. when you use an unquoted pattern
+  in an ordinary command line to generate file names.  So
+  mytt(^dir1/^file1) matches any subdirectory of the current directory
+  except one called tt(dir1), and within any directory it matches it
+  picks any file except one called tt(file1).  So the overall pattern
+  matches tt(dir2/file2) but not tt(dir1/file1) nor tt(dir1/file2) nor
+  tt(dir2/file1).  (The rule that all the different bits of the pattern
+  must match is exactly the same as for any other pattern character,
+  it's just a little confusing that what em(does) match in each bit is
+  found by telling the shell em(not) to match something or other.)
+
+  As with any other pattern, a mytt(^) expression doesn't treat the
+  character `tt(/)' specially if it's not matching files, for example
+  when pattern matching in a command like mytt([[ $string = ^pat1/pat2 ]]).
+  Here the whole string tt(pat1/pat2) is treated as the argument that
+  follows the mytt(^).  So anything matches but that one string
+  tt(pat1/pat1).
+
+  It's not obvious what something like mytt([[ $string = ^pat1^pat2 ]])
+  means.  You won't often have cause to use it, but the rule is that
+  each mytt(^) takes em(everything) that follows as an argument (unless
+  it's already inside parentheses --- I'll explain this below).  To see
+  this more clearly, put those arguments in parentheses: the pattern is
+  equivalent to mytt(^(pat1^(pat2))). where now you can see exactly what
+  each mytt(^) takes as its argument.  I'll leave it as an exercise for
+  you to work out what this does and doesn't match.
+  
+  mytt(~) is always used between two patterns --- never right at the
+  beginning or right at the end.  Note that the other special meaning of
+  mytt(~), at the start of a filename to refer to your home directory or
+  to another named directory, doesn't require the option
+  tt(EXTENDED_GLOB) to be set.  (At the end of an argument mytt(~) is
+  never special at all.  This is useful if you have Emacs backup files.)
+  It means `match what's in front of the tilde, but only if it doesn't
+  match what's after the tilde'.  So mytt(*.c~f*) matches any file
+  ending in tt(.c) except one that begins with tt(f).  You'll see that,
+  unlike mytt(^), the parts before and after the mytt(~) both refer
+  separately to the entire test string.
+
+  For matching files by globbing, mytt(~) is the only globbing operator
+  to have a lower precedence than mytt(/).  In other words, when you
+  have mytt(/a/path/to/match~/a/path/not/to/match) the mytt(~) considers
+  what's before as a complete path to a file name, and what's after as a
+  pattern to match against that file.  You can put any other pattern
+  characters in the expressions before and after the mytt(~), but as I
+  said the pattern after the tt(~) is really just a single pattern to
+  match against the name of every file found rather than a pattern to
+  generate a file.  That means, for example, that a tt(*) after the
+  tt(~) em(will) match a tt(/).  If that's confusing, you can think of
+  how mytt(~) works like this: take the pattern on the left, use it as
+  normal to make a list of files, then for each file found see if it
+  matches the pattern on the right and if it does take that file out of
+  the list.  Note, however, that this removal of files happens
+  immediately, before anything else happens to the file list --- before
+  any glob qualifiers are applied, for example.
+
+  One rule that is common to both mytt(^) and mytt(~) is that they can
+  be put inside parentheses and the arguments to them don't extend past
+  the parentheses.  So mytt((^README).txt) matches any file ending in
+  tt(.txt) unless the string before that was tt(README), the same as
+  mytt(*.txt~README.txt) or mytt((*~README).txt).  In fact, you can
+  always turn mytt(^something) into mytt((*~something)), where
+  mytt(something) mustn't contain tt(/) if the pattern is being used for
+  globbing.
+
+  Likewise, mytt(abc(<->~<10-100>).txt) matches a file consisting of
+  tt(abc), then some digits, then tt(.txt), unless the digits happen to
+  match a number from 10 to 100 inclusive (remember the handy mytt(<->)
+  pattern for matching integers with optional limits to the range).  So
+  this pattern matches tt(abc1.txt) or tt(abc200.txt) but not
+  tt(abc20.txt) nor tt(abc100.txt) nor even tt(abc0030.txt).  However,
+  if you're matching files by globbing note you can't put mytt(/)s
+  inside the parentheses since the groups can't stretch across multiple
+  directories.  (You can do that, of course, whenever the character
+  mytt(/) isn't special.)  This means that you need to take care when
+  using exclusions across multiple directories; see some examples below.
+
+  You may like to know that from zsh 5.0.3 you can disable any pattern
+  character separately.  So if you find mytt(^) gets in your way and
+  you're happy using mytt(~), put mytt(disable -p "^") in tt(~/.zshrc).
+  You still need to turn on tt(EXTENDED_GLOB); the tt(disable) command
+  only deactivates things that would otherwise be active, you can't
+  specially enable something not allowed by the syntax options in effect.
+
+  Here are some examples with files to illustrate the points.  We'll
+  assume the option tt(EXTENDED_GLOB) is set and none of the pattern
+  characters is disabled.
+
+  enumerate(
+  myeit() mytt(**/foo~*bar*) matches any file called mytt(foo) in any
+     subdirectory, except where mytt(bar) occurred somewhere in the path.
+     For example, mytt(users/barstaff/foo) will be excluded by the mytt(~)
+     operator.  As the mytt(**) operator cannot be grouped (inside
+     parentheses it is treated as mytt(*)), this is one way to exclude some
+     subdirectories from matching a mytt(**).  Note that this can be quite
+     inefficent because the shell performs a complete search for
+     mytt(**/foo) before it uses the pattern after the mytt(~) to exclude
+     files from the match.  The file is excluded if mytt(bar) occurs
+     em(anywhere), in any directory segment or the final file name.
+  myeit() The form mytt((^foo/)#) can be used to match any hierarchy of
+     directories where none of the path components is tt(foo).  For
+     example, mytt((^CVS/)#) selects all subdirectories to any depth
+     except where one component is named mytt(CVS).  (The form
+     mytt((pat/)#) is very useful in other cases; for example,
+     mytt((../)#.cvsignore) finds the file tt(.cvsignore) if it exists
+     in the current directory or any parent.)
+  )
 
 
 chapter(The mysteries of completion)
