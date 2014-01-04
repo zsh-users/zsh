@@ -1,3 +1,8 @@
+2014-01-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Axel Beckert: 32229: LICENCE: was not correctly referring to
+	Gnu General Public License.
+
 2014-01-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: README: update another reference to 5.0.5.
