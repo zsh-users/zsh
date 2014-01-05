@@ -1,5 +1,9 @@
 2014-01-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Config/version.mk, Doc/Zsh/compsys.yo: update
+	release to 5.0.5 and correct typo in compsys.yo making texinfo
+	format unusable.
+
 	* unposted but c.f. 32231: Doc/Zsh/compsys.yo: the parameter
         'line' doesn't include the original command.
 
