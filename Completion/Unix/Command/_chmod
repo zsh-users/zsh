@@ -57,12 +57,12 @@ case "$state" in
       zmodload -F zsh/stat b:zstat 2>/dev/null
       typeset -i8 ref=$(zstat +mode $opt_args[--reference])
       _wanted files expl file _files -g "*(-.^f${ref#??})" && ret=0
-    elif [[ $words[2] = [0-7]## ]]; then
-      _wanted files expl file _files -g "*(-.^f$words[2])" && ret=0
+    elif [[ $line[1] = [0-7]## ]]; then
+      _wanted files expl file _files -g "*(-.^f$line[1])" && ret=0
     else
       local spec who op priv
       local -a specs
-      for spec in ${(s:,:)words[2]}; do
+      for spec in ${(s:,:)line[1]}; do
 	if [[ ${spec#*[+-=]} != [rwxst]## ]]; then
 	  _files && ret=0
 	  return ret

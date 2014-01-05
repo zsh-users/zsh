@@ -1,5 +1,8 @@
 2014-01-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Jun T: 32231: Completion/Unix/Command/_chmod: was confused by
+	options before the mode argument.
+
 	* Axel Beckert: 32229: LICENCE: was not correctly referring to
 	Gnu General Public License.
 
