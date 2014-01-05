@@ -1,4 +1,4 @@
-texinode(Completion System)(Completion Using compctl)(Completion Widgets)(Top)
+exinode(Completion System)(Completion Using compctl)(Completion Widgets)(Top)
 chapter(Completion System)
 cindex(completion system)
 cindex(completion, programmable)
@@ -3824,10 +3824,10 @@ elements of the array.
 )
 enditem()
 
-During the performance of the action the array `tt(line)'
-will be set to the command name and normal arguments from the command
-line, i.e. the words from the command line excluding all options
-and their arguments.  Options are stored in the associative array
+During the performance of the action the array `tt(line)' will be set to
+the normal arguments from the command line, i.e. the words from the
+command line after the command name excluding all options and their
+arguments.  Options are stored in the associative array
 `tt(opt_args)' with option names as keys and their arguments as
 the values.  For options that have more than one argument these are
 given as one string, separated by colons.  All colons in the original

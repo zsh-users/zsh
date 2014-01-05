@@ -1,5 +1,8 @@
 2014-01-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted but c.f. 32231: Doc/Zsh/compsys.yo: the parameter
+        'line' doesn't include the original command.
+
 	* Jun T: 32231: Completion/Unix/Command/_chmod: was confused by
 	options before the mode argument.
 
