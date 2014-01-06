@@ -1,3 +1,8 @@
+2014-01-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk: update to 5.0.5-dev-0 to avoid
+	installation clash with 5.0.5 release.
+
 2014-01-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk, Doc/Zsh/compsys.yo: update
