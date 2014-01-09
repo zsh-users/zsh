@@ -1,3 +1,8 @@
+2014-01-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/18298 (tidied up): Doc/Zsh/expn.yo, Src/glob.c,
+	Test/D09brace.ztst: add {<char>..<char>} expansion.
+
 2014-01-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Mark Oteiza: 32238: suppress error output completing after ip.

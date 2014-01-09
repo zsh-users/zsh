@@ -1539,6 +1539,16 @@ specified in any of the three numbers, specifying it in the third can be useful
 to pad for example `tt({-99..100..01})' which is not possible to specify by putting a
 0 on either of the first two numbers (i.e. pad to two characters).
 
+An expression of the form `tt({)var(c1)tt(..)var(c2)tt(})', where
+var(c1) and var(c2) are single characters (which may be multibyte
+characters), is expanded to every character in the range from var(c1) to
+var(c2) in whatever character sequence is used internally.  For
+characters with code points below 128 this is US ASCII (this is the only
+case most users will need).  If any intervening character is not
+printable, appropriate quotation is used to render it printable.
+If the character sequence is reversed, the output is in reverse
+order, e.g. `tt({d..a})' is substituted as `tt(d c b a)'.
+
 If a brace expression matches none of the above forms, it is left
 unchanged, unless the option tt(BRACE_CCL) (an abbreviation for `brace
 character class') is set.

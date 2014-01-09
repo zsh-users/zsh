@@ -1895,6 +1895,8 @@ hasbraces(char *str)
 	switch (*str++) {
 	case Inbrace:
 	    if (!lbr) {
+		if (bracechardots(str-1, NULL, NULL))
+		    return 1;
 		lbr = str - 1;
 		if (*str == '-')
 		    str++;
@@ -2027,6 +2029,52 @@ xpandredir(struct redir *fn, LinkList redirtab)
     return ret;
 }
 
+/*
+ * Check for a brace expansion of the form {<char>..<char>}.
+ * On input str must be positioned at an Inbrace, but the sequence
+ * of characters beyond that has not necessarily been checked.
+ * Return 1 if found else 0.
+ *
+ * The other parameters are optionaland if the function returns 1 are
+ * used to return:
+ * - *c1p: the first character in the expansion.
+ * - *c2p: the final character in the expansion.
+ */
+
+/**/
+static int
+bracechardots(char *str, convchar_t *c1p, convchar_t *c2p)
+{
+    convchar_t cstart, cend;
+    char *pnext = str + 1, *pconv, convstr[2];
+    if (itok(*pnext)) {
+	convstr[0] = ztokens[*pnext - Pound];
+	convstr[1] = '\0';
+	pconv = convstr;
+    } else
+	pconv = pnext;
+    MB_METACHARINIT();
+    pnext += MB_METACHARLENCONV(pconv, &cstart);
+    if (cstart == WEOF || pnext[0] != '.' || pnext[1] != '.')
+	return 0;
+    pnext += 2;
+    if (itok(*pnext)) {
+	convstr[0] = ztokens[*pnext - Pound];
+	convstr[1] = '\0';
+	pconv = convstr;
+    } else
+	pconv = pnext;
+    MB_METACHARINIT();
+    pnext += MB_METACHARLENCONV(pconv, &cend);
+    if (cend == WEOF || *pnext != Outbrace)
+	return 0;
+    if (c1p)
+	*c1p = cstart;
+    if (c2p)
+	*c2p = cend;
+    return 1;
+}
+
 /* brace expansion */
 
 /**/
@@ -2060,10 +2108,57 @@ xpandbraces(LinkList list, LinkNode *np)
 	char *dots, *p, *dots2 = NULL;
 	LinkNode olast = last;
 	/* Get the first number of the range */
-	zlong rstart = zstrtol(str+1,&dots,10), rend = 0;
+	zlong rstart, rend;
 	int err = 0, rev = 0, rincr = 1;
-	int wid1 = (dots - str) - 1, wid2 = (str2 - dots) - 2, wid3 = 0;
-	int strp = str - str3;
+	int wid1, wid2, wid3, strp;
+	convchar_t cstart, cend;
+
+	if (bracechardots(str, &cstart, &cend)) {
+	    int lenalloc;
+	    /*
+	     * This is a character range.
+	     */
+	    if (cend < cstart) {
+		convchar_t ctmp = cend;
+		cend = cstart;
+		cstart = ctmp;
+		rev = 1;
+	    }
+	    uremnode(list, node);
+	    strp = str - str3;
+	    lenalloc = strp + strlen(str2+1) + 1;
+	    for (; cend >= cstart; cend--) {
+#ifdef MULTIBYTE_SUPPORT
+		char *ncptr;
+		int nclen;
+		mb_metacharinit();
+		ncptr = wcs_nicechar(cend, NULL, NULL);
+		nclen = strlen(ncptr);
+		p = zhalloc(lenalloc + nclen);
+		memcpy(p, str3, strp);
+		memcpy(p + strp, ncptr, nclen);
+		strcpy(p + strp + nclen, str2 + 1);
+#else
+		p = zhalloc(lenalloc + 1);
+		memcpy(p, str3, strp);
+		sprintf(p + strp, "%c", cend);
+		strcat(p + strp, str2 + 1);
+#endif
+		insertlinknode(list, last, p);
+		if (rev)	/* decreasing:  add in reverse order. */
+		    last = nextnode(last);
+	    }
+	    *np = nextnode(olast);
+	    return;
+	}
+
+	/* Get the first number of the range */
+	rstart = zstrtol(str+1,&dots,10);
+	rend = 0;
+	wid1 = (dots - str) - 1;
+	wid2 = (str2 - dots) - 2;
+	wid3 = 0;
+	strp = str - str3;
 
 	if (dots == str + 1 || *dots != '.' || dots[1] != '.')
 	    err++;

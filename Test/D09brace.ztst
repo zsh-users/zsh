@@ -97,3 +97,18 @@
 0:BRACE_CCL off
 >X{za-q521}Y
 
+  print -r hey{a..j}there
+0:{char..char} ranges, simple case
+>heyathere heybthere heycthere heydthere heyethere heyfthere heygthere heyhthere heyithere heyjthere
+
+  print -r gosh{1,{Z..a},2}cripes
+0:{char..char} ranges, ASCII ordering
+>gosh1cripes goshZcripes gosh[cripes gosh\cripes gosh]cripes gosh^cripes gosh_cripes gosh`cripes goshacripes gosh2cripes
+
+  print -r crumbs{y..p}ooh
+0:{char..char} ranges, reverse
+>crumbsyooh crumbsxooh crumbswooh crumbsvooh crumbsuooh crumbstooh crumbssooh crumbsrooh crumbsqooh crumbspooh
+
+  print -r left{[..]}right
+0:{char..char} ranges with tokenized characters
+>left[right left\right left]right
