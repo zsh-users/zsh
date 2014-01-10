@@ -253,7 +253,7 @@ _mpc_search() {
   local list expl
   list=(album artist title track name genre date composer performer comment disc filename any)
 
-  if [[ $#words -eq 2 ]]; then
+  if ! (( $#words % 2 )); then
     _wanted list expl table compadd $expl -a list
   else
     _message "pattern"

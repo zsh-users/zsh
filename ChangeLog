@@ -1,3 +1,8 @@
+2014-01-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Koen Wilde: 32245: Completion/Unix/Command/_mpc: complete more
+	arguments.
+
 2014-01-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/18298 (tidied up): Doc/Zsh/expn.yo, Src/glob.c,
