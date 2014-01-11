@@ -111,7 +111,7 @@ static struct builtin builtins[] =
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
     BUILTIN("set", BINF_PSPECIAL | BINF_HANDLES_OPTS, bin_set, 0, -1, 0, NULL, NULL),
     BUILTIN("setopt", 0, bin_setopt, 0, -1, BIN_SETOPT, NULL, NULL),
-    BUILTIN("shift", BINF_PSPECIAL, bin_shift, 0, -1, 0, NULL, NULL),
+    BUILTIN("shift", BINF_PSPECIAL, bin_shift, 0, -1, 0, "p", NULL),
     BUILTIN("source", BINF_PSPECIAL, bin_dot, 1, -1, 0, NULL, NULL),
     BUILTIN("suspend", 0, bin_suspend, 0, 0, 0, "f", NULL),
     BUILTIN("test", BINF_HANDLES_OPTS, bin_test, 0, -1, BIN_TEST, NULL, NULL),
@@ -4509,7 +4509,7 @@ bin_print(char *name, char **args, Options ops, int func)
 
 /**/
 int
-bin_shift(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
+bin_shift(char *name, char **argv, Options ops, UNUSED(int func))
 {
     int num = 1, l, ret = 0;
     char **s;
@@ -4533,7 +4533,19 @@ bin_shift(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    ret++;
 		    continue;
 		}
-		s = zarrdup(s + num);
+		if (OPT_ISSET(ops,'p')) {
+		    char **s2, **src, **dst;
+		    int count;
+		    l = arrlen(s);
+		    src = s;
+		    dst = s2 = (char **)zalloc((l - num + 1) * sizeof(char *));
+		    for (count = l - num; count; count--)
+			*dst++ = ztrdup(*src++);
+		    *dst = NULL;
+		    s = s2;
+		} else {
+		    s = zarrdup(s + num);
+		}
                 setaparam(*argv, s);
             }
     } else {
@@ -4542,9 +4554,16 @@ bin_shift(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    ret = 1;
 	} else {
 	    s = zalloc((l - num + 1) * sizeof(char *));
-	    memcpy(s, pparams + num, (l - num + 1) * sizeof(char *));
-	    while (num--)
-		zsfree(pparams[num]);
+	    if (OPT_ISSET(ops,'p')) {
+		memcpy(s, pparams, (l - num) * sizeof(char *));
+		s[l-num] = NULL;
+		while (num--)
+		    zsfree(pparams[l-1-num]);
+	    } else {
+		memcpy(s, pparams + num, (l - num + 1) * sizeof(char *));
+		while (num--)
+		    zsfree(pparams[num]);
+	    }
 	    zfree(pparams, (l + 1) * sizeof(char *));
 	    pparams = s;
 	}

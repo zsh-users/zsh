@@ -1500,12 +1500,15 @@ POSIX standard, but tt(setopt) is not.
 )
 findex(shift)
 cindex(parameters, positional)
-item(tt(shift) [ var(n) ] [ var(name) ... ])(
+item(tt(shift) [ tt(-p) ] [ var(n) ] [ var(name) ... ])(
 The positional parameters tt(${)var(n)PLUS()1tt(}) ... are renamed
 to tt($1) ..., where var(n) is an arithmetic expression that
 defaults to 1.
 If any var(name)s are given then the arrays with these names are
 shifted instead of the positional parameters.
+
+If the option tt(-p) is given arguments are instead removed (popped)
+from the end rather than the start of the array.
 )
 findex(source)
 item(tt(source) var(file) [ var(arg) ... ])(
