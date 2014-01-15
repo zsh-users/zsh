@@ -1,6 +1,7 @@
 #compdef zypper
 #
 # Copyright (C) 2009 Holger Macht <holger@homac.de>
+# Copyright (C) 2013 Thomas Mitterfellner <thomas.mitterfellner@gmail.com>
 #
 # This file is released under the GPLv2.
 #
@@ -9,11 +10,23 @@
 # Toggle verbose completions: zstyle ':completion:*:zypper:*' verbose no
 #                             zstyle ':completion:*:zypper-subcommand:*' verbose no
 #
-#  version 0.1
+#  version 0.2
 #
 # Main dispatcher
 
+function _zypper_caching_policy () {
+   # rebuild if cache is more than a week old
+   if test /var/cache/zypp/raw -nt "$1"; then
+     return 0
+   else
+     return 1
+   fi
+}
+
 _zypper() {
+    typeset -A opt_args
+    local context curcontext="$curcontext" state line
+
     if (( CURRENT > 2 )) && [[ ${words[2]} != "help" ]]; then
         # Remember the subcommand name
 	local cmd=${words[2]}
@@ -46,10 +59,33 @@ _zypper() {
     fi
 }
 
+_all_repos() {
+    local -a repos
+    repos=( $(zypper -q lr | tail -n +3 | cut -d'|' -f 2) )
+    _describe -t repos 'Available repositories' repos && return
+}
+
+_enabled_repos() {
+    repos=( $(zypper -x lr | grep 'enabled="1"' | cut -d\" -f 2) )
+    _describe -t repos 'Available repositories' repos && return
+}
+
+_disabled_repos() {
+    repos=( $(zypper -x lr | grep 'enabled="0"' | cut -d\" -f 2) )
+    _describe -t repos 'Available repositories' repos && return
+}
+
 _zypper_cmd_do() {
+    typeset -A opt_args
+    local context state line
     local hline
     local -a cmdlist
     local tag=0
+    local curcontext="$curcontext"
+
+    zstyle ":completion:${curcontext}:" use-cache on
+    zstyle ":completion:${curcontext}:" cache-policy _zypper_caching_policy
+
     _call_program help-commands LANG=C zypper help $cmd | while read -A hline; do
 	# start parsing from "Options:"
 	[[ $hline =~ "^Command options:" ]] && tag=1
@@ -62,7 +98,81 @@ _zypper_cmd_do() {
     done
 
     if [ -n "$cmdlist" ]; then
+        local -a repos
+
+        # special completion lists for certain options (mainly repos)
+        case ${words[CURRENT - 1]} in
+          --from)
+            repos=( $(zypper -x lr | grep 'enabled="1"' | cut -d\" -f 2) )
+            _describe -t repos 'Available repositories' repos && return
+            ;;
+          (--enable|-e)
+            case $cmd in
+              (mr|modifyrepo) 
+                _disabled_repos && return
+              ;;
+            esac
+            ;;
+          (--disable|-d)
+            case $cmd in
+              (mr|modifyrepo) 
+                _enabled_repos && return
+              ;;
+            esac
+            ;;
+          (--type|-t)
+            local -a types
+            case $cmd in
+              (if|info|se|search|in|install) 
+                types=( pattern srcpackage package patch )
+                _describe -t types 'Package types' types && return
+              ;;
+            esac
+            ;;
+        esac
+
+        # all options available for the active main command
 	_describe -t zypper-commands 'zypper command' cmdlist
+
+        case $cmd in
+          (lr|repos)
+            _all_repos
+            ;;
+          (in|install)
+            local expl
+            _description files expl 'RPM files' 
+            _files "$expl[@]" -g '*.(#i)rpm(.)'
+            ;;
+        esac
+        
+        # only suggest packages if at least one character is given
+        if [[ ${words[CURRENT]} =~ "^[0-9a-zA-Z]" ]] ; then
+          local -a pkglist
+
+          if ( [[ ${+_zypp_all_raw} -eq 0 ]] || _cache_invalid ZYPPER_ALL_RAW ) && ! _retrieve_cache ZYPPER_ALL_RAW;
+          then
+            _zypp_all_raw=$(zypper -x -q se | grep '<solvable ')
+            _zypp_all=( $(echo $_zypp_all_raw | grep 'installed' | cut -d\" -f 4) )
+            _zypp_not_installed=( $(echo $_zypp_all_raw | grep 'not-installed' | cut -d\" -f 4 ) )
+            _zypp_installed=( $(echo $_zypp_all_raw | grep '"installed"' | cut -d\" -f 4 ) )
+            _store_cache ZYPPER_ALL_RAW _zypp_all_raw _zypp_all _zypp_not_installed _zypp_installed
+          fi
+
+          case $cmd in
+            (in|install)
+              pkglist=( $_zypp_not_installed )
+              compadd $pkglist && return
+            ;;
+            (rm|remove|up|update)
+              pkglist=( $_zypp_installed )
+              compadd $pkglist && return
+            ;;
+            (if|info|se|search)
+              pkglist=( $_zypp_all )
+              compadd $pkglist && return
+            ;;
+          esac
+        fi
     else
 	_complete
     fi

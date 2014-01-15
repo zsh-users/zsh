@@ -1,3 +1,8 @@
+2014-01-16  Peter Stephenson  <p.stephenson@samsung.com>
+
+	*  Holger Macht: 32257: Completion/openSUSE/Command/_zypper:
+	updates.
+
 2014-01-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 32255: Completion/Unix/Command/_python: complete for Python
