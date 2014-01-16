@@ -1,3 +1,8 @@
+2014-01-17  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 32264: Functions/VCS_Info/Backends/VCS_INFO_detect_hg: vcs_info,
+	hg: Support detecting repos using ShareExtension
+
 2014-01-16  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Thomas Mitterfellner: 32265: Completion/openSUSE/Command/_zypper:
