@@ -1,3 +1,8 @@
+2014-01-16  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Thomas Mitterfellner: 32265: Completion/openSUSE/Command/_zypper:
+	better handling of large lists of packages
+
 2014-01-16  Peter Stephenson  <p.stephenson@samsung.com>
 
 	*  Holger Macht: 32257: Completion/openSUSE/Command/_zypper:
