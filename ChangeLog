@@ -1,3 +1,8 @@
+2014-01-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* sergio: 32267: Completion/Linux/Command/_modutils: modinfo may
+	not be in user's path, so use explicit path as already done for lsmod.
+
 2014-01-17  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 32264: Functions/VCS_Info/Backends/VCS_INFO_detect_hg: vcs_info,

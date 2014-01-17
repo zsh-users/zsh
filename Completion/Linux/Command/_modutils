@@ -127,7 +127,7 @@ _modutils() {
 		_message -e value 'parameter value'
 	    else
 		local params
-		params=( ${${(M)${(f)"$(_call_program module_parameter modinfo "$words[2]" 2>/dev/null)"}:#parm:*}##parm:[[:space:]]##} )
+		params=( ${${(M)${(f)"$(_call_program module_parameter /sbin/modinfo "$words[2]" 2>/dev/null)"}:#parm:*}##parm:[[:space:]]##} )
 		if [[ $#params -eq 0 ]]; then
 		    _message -e parameter "This modules doesn't have parameters"
 		else
