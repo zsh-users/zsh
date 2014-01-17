@@ -2019,7 +2019,7 @@ specification is prefixed with tt(+), it is added to the existing list.
 Hence it is possible to create increasingly general specifications
 without repetition:
 
-example(zstyle ':completion:*' matcher-list '' '+m{a-z}={A-Z}' '+m{A-Z}={a-z}')
+example(zstyle ':completion:*' matcher-list '' '+m:{a-z}={A-Z}' '+m:{A-Z}={a-z}')
 
 It is possible to create match specifications valid for particular
 completers by using the third field of the context.  For example, to
