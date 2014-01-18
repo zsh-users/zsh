@@ -2500,7 +2500,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		mlbeg--;
 	    }
 	}
-	if ((space = zterm_lines - pl - mhasstat))
+	if ((space = zterm_lines - pl - mhasstat) > 0)
 	    while (mline >= mlbeg + space)
 		if ((mlbeg += step) + space > mlines)
 		    mlbeg = mlines - space;
