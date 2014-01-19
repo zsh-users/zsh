@@ -1,3 +1,7 @@
+2014-03-03  Simon Ruderich  <simon@ruderich.org>
+
+	* 32289: Doc: Add zsh version to footer in HTML documentation.
+
 2014-03-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 32441: Completion/Base/Completer/_extensions, Doc/Zsh/compsys.yo:
