@@ -1,5 +1,12 @@
 2014-01-18  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32285: Src/mem.c (freeheap): when the last-arena-with-free-space
+	pointer (fheap) points to an arena that is going to be discarded
+	because it has become empty, loop back through the entire linked
+	list of arenas to find another partly-filled arena; fixes crash
+	wherein pushheap followed by freeheap could orphan the whole list
+	of arenas in some circumstances
+
 	* 32283: Src/Zle/complist.c: avoid using a negative number for
 	available vertical space when the terminal has only a small number
 	of lines; fixes crash in menu selection

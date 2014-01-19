@@ -367,6 +367,15 @@ freeheap(void)
 	    }
 #endif
 	} else {
+	    if (h == fheap && h != heaps) {
+		/*
+		 * When deallocating the last arena with free space,
+		 * loop back through the list to find another one.
+		 */
+		fheap = NULL;
+		hn = heaps;
+		continue;
+	    }
 #ifdef USE_MMAP
 	    munmap((void *) h, h->size);
 #else
