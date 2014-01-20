@@ -91,13 +91,13 @@ if [[ "$state" = vars_eq ]]; then
       _wanted functions expl 'shell function' compadd -a args
     elif [[ -n $onopts$offopts ]]; then
       if [[ -n $offopts ]]; then
-	args=(${(f)"$(functions +$offopts)"})
+	args=(${(f)"$(functions +${offopts//[^UXkmtTuz]/})"})
       else
 	args=(${(k)functions})
       fi
       if [[ -n $onopts ]]; then
 	local -a funckeys
-	funckeys=(${(f)"$(functions +$onopts)"})
+	funckeys=(${(f)"$(functions +${onopts//[^UXkmtTuz]/})"})
 	args=(${args:|funckeys})
       fi
       if zstyle -t ":completion:${curcontext}:functions" prefix-needed &&
