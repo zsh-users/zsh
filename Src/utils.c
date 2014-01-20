@@ -725,32 +725,36 @@ xsymlinks(char *s)
     char **pp, **opp;
     char xbuf2[PATH_MAX*2], xbuf3[PATH_MAX*2];
     int t0, ret = 0;
+    zulong xbuflen = strlen(xbuf);
 
     opp = pp = slashsplit(s);
-    for (; *pp; pp++) {
-	if (!strcmp(*pp, ".")) {
-	    zsfree(*pp);
+    for (; xbuflen < sizeof(xbuf) && *pp; pp++) {
+	if (!strcmp(*pp, "."))
 	    continue;
-	}
 	if (!strcmp(*pp, "..")) {
 	    char *p;
 
-	    zsfree(*pp);
 	    if (!strcmp(xbuf, "/"))
 		continue;
 	    if (!*xbuf)
 		continue;
-	    p = xbuf + strlen(xbuf);
-	    while (*--p != '/');
+	    p = xbuf + xbuflen;
+	    while (*--p != '/')
+		xbuflen--;
 	    *p = '\0';
 	    continue;
 	}
 	sprintf(xbuf2, "%s/%s", xbuf, *pp);
 	t0 = readlink(unmeta(xbuf2), xbuf3, PATH_MAX);
 	if (t0 == -1) {
-	    strcat(xbuf, "/");
-	    strcat(xbuf, *pp);
-	    zsfree(*pp);
+	    zulong pplen = strlen(*pp) + 1;
+	    if ((xbuflen += pplen) < sizeof(xbuf)) {
+		strcat(xbuf, "/");
+		strcat(xbuf, *pp);
+	    } else {
+		*xbuf = 0;
+		break;
+	    }
 	} else {
 	    ret = 1;
 	    metafy(xbuf3, t0, META_NOALLOC);
@@ -759,10 +763,9 @@ xsymlinks(char *s)
 		xsymlinks(xbuf3 + 1);
 	    } else
 		xsymlinks(xbuf3);
-	    zsfree(*pp);
 	}
     }
-    free(opp);
+    freearray(opp);
     return ret;
 }
 
@@ -779,8 +782,10 @@ xsymlink(char *s)
 	return NULL;
     *xbuf = '\0';
     xsymlinks(s + 1);
-    if (!*xbuf)
+    if (!*xbuf) {
+	zwarn("path expansion failed, using root directory");
 	return ztrdup("/");
+    }
     return ztrdup(xbuf);
 }
 
