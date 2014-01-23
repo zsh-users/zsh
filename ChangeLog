@@ -1,3 +1,10 @@
+2014-01-23  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 32299: Doc/Zsh/arith.yo, Functions/Misc/zcalc, Src/math.c,
+	Src/params.c, Src/subst.c, Test/C01arith.ztst: add
+	ability to use "_" at the end of a [#] arithmetic expression
+	to get underscores to space numeric output.
+
 2014-01-22  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/mem.c: reformulate 32285 to lift the fheap->sp

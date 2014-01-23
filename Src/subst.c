@@ -3754,19 +3754,19 @@ static char *
 arithsubst(char *a, char **bptr, char *rest)
 {
     char *s = *bptr, *t;
-    char buf[BDIGBUFSIZE], *b = buf;
+    char buf[BDIGBUFSIZE], *b;
     mnumber v;
 
     singsub(&a);
     v = matheval(a);
     if ((v.type & MN_FLOAT) && !outputradix)
-	b = convfloat(v.u.d, 0, 0, NULL);
+	b = convfloat_underscore(v.u.d, outputunderscore);
     else {
 	if (v.type & MN_FLOAT)
 	    v.u.l = (zlong) v.u.d;
-	convbase(buf, v.u.l, outputradix);
+	b = convbase_underscore(buf, v.u.l, outputradix, outputunderscore);
     }
-    t = *bptr = (char *) hcalloc(strlen(*bptr) + strlen(b) + 
+    t = *bptr = (char *) hcalloc(strlen(*bptr) + strlen(b) +
 				 strlen(rest) + 1);
     t--;
     while ((*++t = *s++));

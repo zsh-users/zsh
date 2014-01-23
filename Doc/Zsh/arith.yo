@@ -76,6 +76,27 @@ have output base 16, while tt(x) (assuming it does not already exist) is
 implicitly typed by the arithmetic evaluation, where it acquires the output
 base 8.
 
+The var(base) may be replaced or followed by an underscore, which may
+itself be followed by a positive integer (if it is missing the value 3
+is used).  This indicates that underscores should be inserted into the
+output string, grouping the number for visual clarity.  The following
+integer specifies the number of digits to group together.  For example:
+
+example(setopt cbases
+print $(( [#16_4] 65536 ** 2 )))
+
+outputs `tt(0x1_0000_0000)'.
+
+The feature can be used with floating
+point numbers, in which case the base must be omitted; grouping
+is away from the decimal point.  For example,
+
+example(zmodload zsh/mathfunc
+print $(( [#_] sqrt(1e7) )))
+
+outputs `tt(3_162.277_660_168_379_5)' (the number of decimal places
+shown may vary).
+
 pindex(C_BASES, use of)
 pindex(OCTAL_ZEROES, use of)
 If the tt(C_BASES) option is set, hexadecimal numbers in the standard C

@@ -266,3 +266,19 @@
 >48.5
 >77.5
 >63.5
+
+  underscore_integer() {
+    setopt cbases localoptions
+    print $(( [#_] 1000000 ))
+    print $(( [#16_] 65536 ))
+    print $(( [#16_4] 65536 * 32768 ))
+  }
+  underscore_integer
+0:Grouping output with underscores: integers
+>1_000_000
+>0x10_000
+>0x8000_0000
+
+  print $(( [#_] (5. ** 10) / 16. ))
+0:Grouping output with underscores: floating point
+>610_351.562_5

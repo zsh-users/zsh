@@ -556,6 +556,9 @@ lexconstant(void)
 int outputradix;
 
 /**/
+int outputunderscore;
+
+/**/
 static int
 zzlex(void)
 {
@@ -713,7 +716,7 @@ zzlex(void)
 	    return EOI;
 	case '[':
 	    {
-		int n;
+		int n, checkradix = 0;
 
 		if (idigit(*ptr)) {
 		    n = zstrtol(ptr, &ptr, 10);
@@ -730,9 +733,19 @@ zzlex(void)
 			n = -1;
 			ptr++;
 		    }
-		    if (!idigit(*ptr))
+		    if (!idigit(*ptr) && *ptr != '_')
 			goto bofs;
-		    outputradix = n * zstrtol(ptr, &ptr, 10);
+		    if (idigit(*ptr)) {
+			outputradix = n * zstrtol(ptr, &ptr, 10);
+			checkradix = 1;
+		    }
+		    if (*ptr == '_') {
+			ptr++;
+			if (idigit(*ptr))
+			    outputunderscore = zstrtol(ptr, &ptr, 10);
+			else
+			    outputunderscore = 3;
+		    }
 		} else {
 		    bofs:
 		    zerr("bad output format specification");
@@ -740,11 +753,13 @@ zzlex(void)
 		}
 		if(*ptr != ']')
 			goto bofs;
-		n = (outputradix < 0) ? -outputradix : outputradix;
-		if (n < 2 || n > 36) {
-		    zerr("invalid base (must be 2 to 36 inclusive): %d",
-			 outputradix);
-		    return EOI;
+		if (checkradix) {
+		    n = (outputradix < 0) ? -outputradix : outputradix;
+		    if (n < 2 || n > 36) {
+			zerr("invalid base (must be 2 to 36 inclusive): %d",
+			     outputradix);
+			return EOI;
+		    }
 		}
 		ptr++;
 		break;
@@ -1337,9 +1352,9 @@ matheval(char *s)
     char *junk;
     mnumber x;
     int xmtok = mtok;
-    /* maintain outputradix across levels of evaluation */
+    /* maintain outputradix and outputunderscore across levels of evaluation */
     if (!mlevel)
-	outputradix = 0;
+	outputradix = outputunderscore = 0;
 
     if (!*s) {
 	x.type = MN_INTEGER;
