@@ -92,7 +92,7 @@ point numbers, in which case the base must be omitted; grouping
 is away from the decimal point.  For example,
 
 example(zmodload zsh/mathfunc
-print $(( [#_] sqrt(1e7) )))
+print $(( [#_] sqrt+LPAR()1e7+RPAR() )))
 
 outputs `tt(3_162.277_660_168_379_5)' (the number of decimal places
 shown may vary).

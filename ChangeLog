@@ -1,3 +1,8 @@
+2014-01-23  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Doc/Zsh/arith.yo: use LPAR() instead of parens
+	in sqrt example
+
 2014-01-23  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 32299: Doc/Zsh/arith.yo, Functions/Misc/zcalc, Src/math.c,
