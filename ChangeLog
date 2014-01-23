@@ -1,3 +1,8 @@
+2014-01-22  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: Src/mem.c: reformulate 32285 to lift the fheap->sp
+	test out of the loop, improve commentary
+
 2014-01-19  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32294 (plus typo fix): Src/utils.c: prevent buffer overflow when
