@@ -1,3 +1,8 @@
+2014-01-27  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted: Src/zsh.mdd: update 31983 to suppress stdout from
+	cmp, too.
+
 2014-01-23  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/arith.yo: use LPAR() instead of parens
