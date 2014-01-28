@@ -1,3 +1,10 @@
+2014-01-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* users/18368: Completion/Unix/Command/_git: in __git_files,
+	retry ls-files if nothing matched the prefix pattern, to give
+	_multi_parts a shot at the whole file list.  Restores partial
+	path completion inadvertently removed by 31159.
+
 2014-01-27  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Src/zsh.mdd: update 31983 to suppress stdout from
@@ -5,7 +12,7 @@
 
 2014-01-23  Bart Schaefer  <schaefer@zsh.org>
 
-	* unposted: Doc/Zsh/arith.yo: use LPAR() instead of parens
+	* unposted: Doc/Zsh/arith.yo: use LPAR()+RPAR() instead of parens
 	in sqrt example
 
 2014-01-23  Peter Stephenson  <p.stephenson@samsung.com>

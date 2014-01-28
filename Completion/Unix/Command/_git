@@ -5683,8 +5683,16 @@ __git_files () {
   # TODO: --directory should probably be added to $opts when --others is given.
 
   local pref=$gitcdup$gitprefix$PREFIX
+
+  # First allow ls-files to pattern-match in case of remote repository
   files=(${(0)"$(_call_program files git ls-files -z --exclude-standard $opts -- ${pref:+$pref\\\*} 2>/dev/null)"})
   __git_command_successful $pipestatus || return
+
+  # If ls-files succeeded but returned nothing, try again with no pattern
+  if [[ -z "$files" && -n "$pref" ]]; then
+    files=(${(0)"$(_call_program files git ls-files -z --exclude-standard $opts -- 2>/dev/null)"})
+    __git_command_successful $pipestatus || return
+  fi
 
 #  _wanted $tag expl $description _files -g '{'${(j:,:)files}'}' $compadd_opts -
   _wanted $tag expl $description _multi_parts -f $compadd_opts - / files
