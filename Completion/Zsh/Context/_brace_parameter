@@ -185,6 +185,9 @@ if [[ $PREFIX = *'${('[^\)]# ]]; then
   )
   _describe -t flags "parameter flag" flags -Q -S ''
   return
+elif compset -P '*:'; then
+    _history_modifiers p
+    return
 fi
 
 _parameters -e

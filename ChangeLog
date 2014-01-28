@@ -1,3 +1,9 @@
+2014-01-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 32303: Src/Zle/compcore.c, Completion/Zsh/Type/_parameters,
+	Completion/Zsh/Context/_brace_parameter: allow completion
+	of modifiers for parameters in a fairly simplistic way.
+
 2014-01-28  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 32308 (slightly modified to use "a" as the vi command at start
