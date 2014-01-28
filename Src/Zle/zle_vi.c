@@ -67,6 +67,13 @@ int viinsbegin;
 static struct modifier lastmod;
 static int inrepeat, vichgrepeat;
 
+/**
+ * im: >= 0: is an insertmode
+ *    -1: skip setting insert mode
+ *    -2: entering viins at start of editing from clean --- don't use
+ *        inrepeat or lastchar, synthesise an i to enter insert mode.
+ */
+
 /**/
 static void
 startvichange(int im)
@@ -75,7 +82,7 @@ startvichange(int im)
 	insmode = im;
 	vichgflag = 1;
     }
-    if (inrepeat) {
+    if (inrepeat && im != -2) {
 	zmod = lastmod;
 	inrepeat = vichgflag = 0;
 	vichgrepeat = 1;
@@ -84,7 +91,11 @@ startvichange(int im)
 	if (vichgbuf)
 	    free(vichgbuf);
 	vichgbuf = (char *)zalloc(vichgbufsz = 16);
-	vichgbuf[0] = lastchar;
+	if (im == -2) {
+	    vichgbuf[0] = 'a';
+	} else {
+	    vichgbuf[0] = lastchar;
+	}
 	vichgbufptr = 1;
 	vichgrepeat = 0;
     }
@@ -301,6 +312,18 @@ viinsert(UNUSED(char **args))
 {
     startvitext(1);
     return 0;
+}
+
+/*
+ * Go to vi insert mode when we first start the line editor.
+ * Iniialises some other stuff.
+ */
+
+/**/
+void
+viinsert_init(void)
+{
+    startvitext(-2);
 }
 
 /**/

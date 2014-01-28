@@ -1,3 +1,10 @@
+2014-01-28  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 32308 (slightly modified to use "a" as the vi command at start
+	of line): Src/Zle/zle_main.c, Src/Zle/zle_vi.c: improve
+	initialising of vi mode change when entering viins at start of
+	editing.
+
 2014-01-27  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Src/zsh.mdd: update 31983 to suppress stdout from

@@ -1204,7 +1204,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
      * no user operation to indicate this.
      */
     if (openkeymap("main") == openkeymap("viins"))
-	viinsert(NULL);
+	viinsert_init();
     selectlocalmap(NULL);
     fixsuffix();
     if ((s = getlinknode(bufstack))) {
