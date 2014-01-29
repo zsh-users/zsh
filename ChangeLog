@@ -1,3 +1,8 @@
+2014-01-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Christian Hesse: 32316: Completion/Unix/Command/_ssh: complete
+	new ssh key type.
+
 2014-01-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 32303: Src/Zle/compcore.c, Completion/Zsh/Type/_parameters,

@@ -108,7 +108,7 @@ _ssh () {
     _arguments \
       '-q[silence ssh-keygen]' \
       "($cmds -P)-b[specify number of bits in key]:bits in key" \
-      "($cmds -P)-t[specify the type of the key to create]:key type:(rsa1 rsa dsa ecdsa)" \
+      "($cmds -P)-t[specify the type of the key to create]:key type:(rsa1 rsa dsa ecdsa ed25519)" \
       "(${cmds#-p })-N[provide new passphrase]:new passphrase" \
       "($cmds -b -t)-C[provide new comment]:new comment" \
       '(-D)-f[key file]:key file:_files' \
@@ -223,6 +223,7 @@ _ssh () {
               'ecdsa-sha2-nistp256-cert-v01@openssh.com' \
               'ecdsa-sha2-nistp384-cert-v01@openssh.com' \
               'ecdsa-sha2-nistp521-cert-v01@openssh.com' \
+              'ssh-ed25519-cert-v01@openssh.com' \
               'ssh-rsa-cert-v01@openssh.com' \
               'ssh-dss-cert-v01@openssh.com' \
               'ssh-rsa-cert-v00@openssh.com' \
@@ -230,6 +231,7 @@ _ssh () {
               'ecdsa-sha2-nistp256' \
               'ecdsa-sha2-nistp384' \
               'ecdsa-sha2-nistp521' \
+              'ssh-ed25519' \
               'ssh-rsa' \
               'ssh-dss' && ret=0
           ;;
