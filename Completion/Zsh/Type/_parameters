@@ -8,6 +8,11 @@
 
 local expl pattern fakes faked tmp pfilt
 
+if compset -P '*:'; then
+  _history_modifiers p
+  return
+fi
+
 pattern=(-g \*)
 zparseopts -D -K -E g:=pattern
 

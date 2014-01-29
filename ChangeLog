@@ -1,9 +1,22 @@
+2014-01-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 32303: Src/Zle/compcore.c, Completion/Zsh/Type/_parameters,
+	Completion/Zsh/Context/_brace_parameter: allow completion
+	of modifiers for parameters in a fairly simplistic way.
+
+2014-01-28  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 32308 (slightly modified to use "a" as the vi command at start
+	of line): Src/Zle/zle_main.c, Src/Zle/zle_vi.c: improve
+	initialising of vi mode change when entering viins at start of
+	editing.
+
 2014-01-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/18368: Completion/Unix/Command/_git: in __git_files,
 	retry ls-files if nothing matched the prefix pattern, to give
 	_multi_parts a shot at the whole file list.  Restores partial
-	path completion inadvertently removed by 31159.
+	 path completion inadvertently removed by 31159.
 
 2014-01-27  Peter Stephenson  <p.stephenson@samsung.com>
 

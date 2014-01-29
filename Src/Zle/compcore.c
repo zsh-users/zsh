@@ -1260,6 +1260,20 @@ check_param(char *s, int set, int test)
 	    ispar = (br >= 2 ? 2 : 1);
 	    b[we-wb] = '\0';
 	    return b;
+	} else if (offs > e - s && *e == ':') {
+	    /*
+	     * Guess whether we are in modifiers.
+	     * If the name is followed by a : and the stuff after
+	     * that is either colons or alphanumerics we probably are.
+	     * This is a very rough guess.
+	     */
+	    char *offsptr = s + offs;
+	    for (; e < offsptr; e++) {
+		if (*e != ':' && !ialnum(*e))
+		    break;
+	    }
+	    ispar = (br >= 2 ? 2 : 1);
+	    return NULL;
 	}
     }
     return NULL;
