@@ -1,3 +1,8 @@
+2014-01-30  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32322: Completion/Base/Core/_main_complete: display a message
+	when completion is interrupted from the keyboard
+
 2014-01-30  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Jun T: 32300: Completion/Unix/Command/_od: +
