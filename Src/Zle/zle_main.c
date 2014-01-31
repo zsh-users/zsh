@@ -157,10 +157,10 @@ mod_export char *statusline;
 /**/
 int stackhist, stackcs;
 
-/* != 0 if we are making undo records */
+/* position in undo stack from when the current vi change started */
 
 /**/
-int undoing;
+zlong vistartchange;
 
 /* current modifier status */
 
@@ -1080,8 +1080,7 @@ zlecore(void)
 	    if (invicmdmode() && zlecs > findbol() &&
 		(zlecs == zlell || zleline[zlecs] == ZWC('\n')))
 		DECCS();
-	    if (undoing)
-		handleundo();
+	    handleundo();
 	} else {
 	    errflag = 1;
 	    break;
@@ -1190,7 +1189,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     zlereadflags = flags;
     zlecontext = context;
     histline = curhist;
-    undoing = 1;
+    vistartchange = 0;
     zleline = (ZLE_STRING_T)zalloc(((linesz = 256) + 2) * ZLE_CHAR_SIZE);
     *zleline = ZWC('\0');
     virangeflag = lastcmd = done = zlecs = zlell = mark = 0;
@@ -1198,6 +1197,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     viinsbegin = 0;
     statusline = NULL;
     selectkeymap("main", 1);
+    initundo();
     /*
      * If main is linked to the viins keymap, we need to register
      * explicitly that we're now in vi insert mode as there's
@@ -1222,7 +1222,6 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
 	    stackhist = -1;
 	}
     }
-    initundo();
     if (isset(PROMPTCR))
 	putc('\r', shout);
     if (tmout)

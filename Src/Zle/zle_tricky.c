@@ -611,8 +611,7 @@ docomplete(int lst)
     active = 1;
     comprecursive = 0;
     makecommaspecial(0);
-    if (undoing)
-	setlastline();
+    setlastline();
 
     /* From the C-code's point of view, we can only use compctl as a default
      * type of completion. Load it if it hasn't been loaded already and

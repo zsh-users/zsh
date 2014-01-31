@@ -1354,7 +1354,10 @@ handlesuffix(UNUSED(char **args))
 
 /* head of the undo list, and the current position */
 
-static struct change *changes, *curchange;
+/**/
+struct change *curchange;
+
+static struct change *changes;
 
 /* list of pending changes, not yet in the undo system */
 

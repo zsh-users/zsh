@@ -107,7 +107,7 @@ startvitext(int im)
 {
     startvichange(im);
     selectkeymap("main", 1);
-    undoing = 0;
+    vistartchange = (curchange && curchange->prev) ? curchange->prev->changeno : 0;
     viinsbegin = zlecs;
 }
 
@@ -399,7 +399,7 @@ vichange(UNUSED(char **args))
 	forekill(c2 - zlecs, CUT_RAW);
 	selectkeymap("main", 1);
 	viinsbegin = zlecs;
-	undoing = 0;
+	vistartchange = curchange->prev->changeno;
     }
     return ret;
 }
@@ -584,7 +584,13 @@ vicmdmode(UNUSED(char **args))
 {
     if (invicmdmode() || selectkeymap("vicmd", 0))
 	return 1;
-    undoing = 1;
+    struct change *current = curchange->prev;
+    while (current && current->changeno > vistartchange+1) {
+	current->flags |= CH_PREV;
+	current = current->prev;
+	if (!current) break;
+	current->flags |= CH_NEXT;
+    }
     vichgflag = 0;
     if (zlecs != findbol())
 	DECCS();

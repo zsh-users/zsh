@@ -1,3 +1,10 @@
+2013-02-27  Oliver Kiddle <opk@zsh.org>
+
+	* 32314: Src/Zle/zle_main.c, Src/Zle/zle_tricky.c,
+	Src/Zle/zle_utils.c, Src/Zle/zle_vi.c: merge undo events
+	corresponding to vi change in the vi-cmd-mode widget so undo from
+	insert mode is useful again
+
 2014-01-30  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32322: Completion/Base/Core/_main_complete: display a message
