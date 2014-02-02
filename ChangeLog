@@ -1,5 +1,9 @@
 2014-02-02  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32338: Doc/Makefile.in: create Doc/help.txt as an empty file
+	when Util/helpfiles fails, so that the rest of the build does not
+	yeild a spurious error
+
 	* 32337: Src/params.c: initialize several special parameters to
 	unset for better compatibility in emulation modes; for the same
 	reason, remove the readonly flag from $_
