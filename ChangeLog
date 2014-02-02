@@ -1,3 +1,9 @@
+2014-02-02  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32337: Src/params.c: initialize several special parameters to
+	unset for better compatibility in emulation modes; for the same
+	reason, remove the readonly flag from $_
+
 2013-02-27  Oliver Kiddle <opk@zsh.org>
 
 	* 32314: Src/Zle/zle_main.c, Src/Zle/zle_tricky.c,
