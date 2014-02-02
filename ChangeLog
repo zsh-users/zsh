@@ -1,8 +1,11 @@
 2014-02-02  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32341: Src/init.c: guess at best ZLE_RPROMPT_INDENT based on
+	termcap/terminfo description
+
 	* unposted: Src/Zle/zle_tricky.c: whitespace in comment
 
-	* 32340: Src/init.c, Src/Zle/compctl.c:  Add specifics to error
+	* 32340: Src/init.c, Src/Zle/compctl.c:  add specifics to error
 	messages explaining failure of "read -c" / "read -l".
 
 	* 32338: Doc/Makefile.in: create Doc/help.txt as an empty file
