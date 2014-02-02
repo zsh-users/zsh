@@ -1163,7 +1163,7 @@ get_comp_string(void)
      * being separated by tokens | & &! |& || &&).  The loop stops when *
      * the end of the command containing the cursor is reached.  What   *
      * makes this messy is checking for things like redirections, loops *
-    * and whatnot. */
+     * and whatnot. */
 
     do {
         qsub = noword = 0;
