@@ -3,8 +3,6 @@ chapter(Shell Builtin Commands)
 ifzman(\
 sect(Shell Builtin Commands)
 )\
-cindex(builtin commands)
-cindex(commands, builtin)
 def(prefix)(1)(\
 item(tt(ARG1) var(simple command))(
 See noderef(Precommand Modifiers).
@@ -29,6 +27,8 @@ ifnzman(noderef(Zle Builtins)).
 )\
 )\
 
+cindex(builtin commands)
+cindex(commands, builtin)
 Some shell builtin commands take options as described in individual
 entries; these are often referred to in the list below as `tt(flags)' to
 avoid confusion with shell options, which may also have an effect on the

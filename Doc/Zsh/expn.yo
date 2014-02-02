@@ -1,7 +1,7 @@
 texinode(Expansion)(Parameters)(Prompt Expansion)(Top)
 chapter(Expansion)
-cindex(expansion)
 ifnztexi(sect(Description))
+cindex(expansion)
 The following types of expansions are performed in the indicated order in
 five steps:
 

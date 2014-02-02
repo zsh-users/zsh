@@ -1,5 +1,9 @@
 2014-02-02  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo,
+	Doc/Zsh/roadmap.yo: tweak index markers and related whitespace
+	to make appearance consistent with other pages
+
 	* 32341: Src/init.c: guess at best ZLE_RPROMPT_INDENT based on
 	termcap/terminfo description
 

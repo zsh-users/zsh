@@ -1,7 +1,6 @@
 texinode(Roadmap)(Invocation)(Introduction)(Top)
 chapter(Roadmap)
 cindex(roadmap)
-
 The Zsh Manual, like the shell itself, is large and often complicated.
 This section of the manual provides some pointers to areas of the shell
 that are likely to be of particular interest to new users, and indicates
