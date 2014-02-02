@@ -1,5 +1,8 @@
 2014-02-02  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32340: Src/init.c, Src/Zle/compctl.c:  Add specifics to error
+	messages explaining failure of "read -c" / "read -l".
+
 	* 32338: Doc/Makefile.in: create Doc/help.txt as an empty file
 	when Util/helpfiles fails, so that the rest of the build does not
 	yeild a spurious error

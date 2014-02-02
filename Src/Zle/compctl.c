@@ -193,7 +193,7 @@ compctlread(char *name, char **args, Options ops, char *reply)
 
     /* only allowed to be called for completion */
     if (!incompctlfunc) {
-	zwarnnam(name, "option valid only in functions called for completion");
+	zwarnnam(name, "option valid only in functions called via compctl");
 	return 1;
     }
 

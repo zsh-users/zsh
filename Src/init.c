@@ -1535,7 +1535,7 @@ mod_export CompctlReadFn compctlreadptr = fallback_compctlread;
 mod_export int
 fallback_compctlread(char *name, UNUSED(char **args), UNUSED(Options ops), UNUSED(char *reply))
 {
-    zwarnnam(name, "option valid only in functions called from completion");
+    zwarnnam(name, "no loaded module provides read for completion context");
     return 1;
 }
 
