@@ -79,8 +79,9 @@ static void
 startvichange(int im)
 {
     if (im != -1) {
-	insmode = im;
 	vichgflag = 1;
+	if (im > -1)
+	    insmode = im;
     }
     if (inrepeat && im != -2) {
 	zmod = lastmod;
@@ -92,7 +93,8 @@ startvichange(int im)
 	    free(vichgbuf);
 	vichgbuf = (char *)zalloc(vichgbufsz = 16);
 	if (im == -2) {
-	    vichgbuf[0] = 'a';
+	    vichgbuf[0] =
+		zlell ? (insmode ? (zlecs < zlell ? 'i' : 'a') : 'R') : 'o';
 	} else {
 	    vichgbuf[0] = lastchar;
 	}

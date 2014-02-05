@@ -1,5 +1,8 @@
 2014-02-05  Oliver Kiddle <opk@zsh.org>
 
+	* 32342: Src/Zle/zle_main.c, Src/Zle/zle_vi.c: fix overstrike for vi
+	mode and use varying vi commands at line start
+
 	* 32334 (modified so KEEPSUFFIX is unchanged for vi-cmd-mode; based on
 	Jun T: 32324, 32330), 32347, Jun T: 32344, 32349: Src/Zle/iwidgets.list,
 	Src/Zle/zle_main.c, Src/Zle/zle_utils.c, Src/Zle/zle_vi.c
