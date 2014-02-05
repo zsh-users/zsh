@@ -1,3 +1,10 @@
+2014-02-05  Oliver Kiddle <opk@zsh.org>
+
+	* 32334 (modified so KEEPSUFFIX is unchanged for vi-cmd-mode; based on
+	Jun T: 32324, 32330), 32347, Jun T: 32344, 32349: Src/Zle/iwidgets.list,
+	Src/Zle/zle_main.c, Src/Zle/zle_utils.c, Src/Zle/zle_vi.c
+	add split-undo zle widget for configurable breaks in undo sequence
+
 2014-02-02  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/builtins.yo, Doc/Zsh/expn.yo,
@@ -20,7 +27,7 @@
 	unset for better compatibility in emulation modes; for the same
 	reason, remove the readonly flag from $_
 
-2013-02-27  Oliver Kiddle <opk@zsh.org>
+2014-01-31  Oliver Kiddle <opk@zsh.org>
 
 	* 32314: Src/Zle/zle_main.c, Src/Zle/zle_tricky.c,
 	Src/Zle/zle_utils.c, Src/Zle/zle_vi.c: merge undo events

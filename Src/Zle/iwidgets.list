@@ -102,6 +102,7 @@
 "self-insert-unmeta", selfinsertunmeta, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "send-break", sendbreak, 0
 "set-mark-command", setmarkcommand, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
+"split-undo", splitundo, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_NOTCOMMAND
 "spell-word", spellword, 0
 "set-local-history", setlocalhistory, 0
 "transpose-chars", transposechars, 0

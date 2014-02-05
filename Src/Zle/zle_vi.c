@@ -584,13 +584,7 @@ vicmdmode(UNUSED(char **args))
 {
     if (invicmdmode() || selectkeymap("vicmd", 0))
 	return 1;
-    struct change *current = curchange->prev;
-    while (current && current->changeno > vistartchange+1) {
-	current->flags |= CH_PREV;
-	current = current->prev;
-	if (!current) break;
-	current->flags |= CH_NEXT;
-    }
+    mergeundo();
     vichgflag = 0;
     if (zlecs != findbol())
 	DECCS();

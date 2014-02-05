@@ -1632,6 +1632,32 @@ viundochange(char **args)
 	return undo(args);
 }
 
+/**/
+int
+splitundo(char **args)
+{
+    if (vistartchange >= 0) {
+	mergeundo();
+	vistartchange = (curchange && curchange->prev) ?
+	    curchange->prev->changeno : 0;
+    }
+    handleundo();
+    return 0;
+}
+
+/**/
+void
+mergeundo(void)
+{
+    struct change *current;
+    for (current = curchange->prev;
+	    current && current->prev && current->changeno > vistartchange+1;
+	    current = current->prev) {
+	current->flags |= CH_PREV;
+	current->prev->flags |= CH_NEXT;
+    }
+}
+
 /*
  * Call a ZLE hook: a user-defined widget called at a specific point
  * within the line editor.

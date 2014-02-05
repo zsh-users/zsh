@@ -1189,7 +1189,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     zlereadflags = flags;
     zlecontext = context;
     histline = curhist;
-    vistartchange = 0;
+    vistartchange = -1;
     zleline = (ZLE_STRING_T)zalloc(((linesz = 256) + 2) * ZLE_CHAR_SIZE);
     *zleline = ZWC('\0');
     virangeflag = lastcmd = done = zlecs = zlell = mark = 0;
