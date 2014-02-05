@@ -10,6 +10,63 @@
 
 %test
 
+  zletest $'word\euaend'
+0:undo initial change
+>BUFFER: end
+>CURSOR: 3
+
+  zletest $'text\e.'
+0:repeat initial edit
+>BUFFER: text
+>text
+>CURSOR: 8
+
+  comptesteval 'print -z before'
+  zletest $'after\e.'
+0:repeat initial edit with non-blank starting line
+>BUFFER: beforeafterafter
+>CURSOR: 15
+
+  comptesteval 'setopt overstrike;print -z bung'
+  zletest $'ing\e2|.'
+0:repeat initial edit with overstrike set
+>BUFFER: binging
+>CURSOR: 3
+
+  comptesteval 'bindkey "^_" undo'
+  zletest $'undoc\037e'
+0:use of undo in vi insert mode
+>BUFFER: undoe
+>CURSOR: 5
+
+  zletest $'one\euatwo\e0clthree'
+0:vi mode undo of initial and subsequent change
+>BUFFER: threewo
+>CURSOR: 5
+
+  zletest $'xxx\euiyyy\euAz'
+0:undo invoked twice
+>BUFFER: z
+>CURSOR: 1
+
+  comptesteval 'bindkey -a "^R" redo'
+  zletest $'123\C-_\e\C-r'
+0:undo in insert mode, redo in command
+>BUFFER: 123
+>CURSOR: 2
+
+  comptesteval 'bindkey "^Y" redo'
+  zletest $'pre\eA123\C-_\C-y\eu'
+0:undo and redo in insert mode, undo in command
+>BUFFER: pre
+>CURSOR: 2
+
+  comptesteval 'bindkey "^Gu" split-undo'
+  zletest $'one\C-gutwo\eu'
+0:split the undo sequence
+>BUFFER: one
+>CURSOR: 2
+
   zletest $'one two\ebmt3|`tx``'
 0:setting mark and returning to original position
 >BUFFER: one wo

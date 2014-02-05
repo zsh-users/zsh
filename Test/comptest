@@ -72,8 +72,8 @@ zle-finish () {
   print -lr "<WIDGET><finish>" "BUFFER: $BUFFER" "CURSOR: $CURSOR"
   (( region_active )) && print -lr "MARK: $MARK"
   zle -K main
-  zle kill-whole-line
   zle clear-screen
+  zle send-break
   zle -R
 }
 zle -N expand-or-complete-with-report

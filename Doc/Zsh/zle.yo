@@ -1293,8 +1293,11 @@ item(tt(redisplay))(
 Redisplay the command line, remaining in incremental search mode.
 )
 item(tt(vi-cmd-mode))(
-Toggle between the `tt(main)' and `tt(vicmd)' keymaps;
+Select the `tt(vicmd)' keymap;
 the `tt(main)' keymap (insert mode) will be selected initially.
+
+In addition, the modifications that were made while in vi insert mode are
+merged to form a single undo event.
 )
 xitem(tt(vi-repeat-search))
 item(tt(vi-rev-repeat-search))(
@@ -2191,6 +2194,13 @@ tindex(spell-word)
 item(tt(spell-word) (ESC-$ ESC-S ESC-s) (unbound) (unbound))(
 Attempt spelling correction on the current word.
 )
+tindex(split-undo)
+item(tt(split-undo))(
+Breaks the undo sequence at the current change.  This is useful in vi mode as
+changes made in insert mode are coalesced on entering command mode.  Similarly,
+tt(undo) will normally revert as one all the changes made by a user-defined
+widget.
+)
 tindex(undefined-key)
 item(tt(undefined-key))(
 This command is executed when a key sequence that is not bound to any
@@ -2202,6 +2212,10 @@ Incrementally undo the last text modification.  When called from a
 user-defined widget, takes an optional argument indicating a previous state
 of the undo history as returned by the tt(UNDO_CHANGE_NO) variable;
 modifications are undone until that state is reached.
+
+Note that when invoked from vi command mode, the full prior change made in
+insert mode is reverted, the changes having been merged when command mode was
+selected.
 )
 tindex(redo)
 item(tt(redo))(

@@ -1,5 +1,8 @@
 2014-02-05  Oliver Kiddle <opk@zsh.org>
 
+	* 32355: Doc/Zsh/zle.yo Test/X02zlevi.ztst Test/comptest: document
+	and test vi mode undo changes
+
 	* 32342: Src/Zle/zle_main.c, Src/Zle/zle_vi.c: fix overstrike for vi
 	mode and use varying vi commands at line start
 
