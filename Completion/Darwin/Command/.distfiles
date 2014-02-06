@@ -1,4 +1,10 @@
 DISTFILES_SRC='
 .distfiles
-_defaults _fink _hdiutil _open _qtplay _softwareupdate
+_defaults
+_fink
+_hdiutil
+_open
+_qtplay
+_softwareupdate
+_system_profiler
 '
