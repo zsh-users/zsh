@@ -1,3 +1,7 @@
+2014-02-07  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Martin Vaeth: 32356: Util/helpfiles: fix a typo.
+
 2014-02-05  Oliver Kiddle <opk@zsh.org>
 
 	* 32355: Doc/Zsh/zle.yo Test/X02zlevi.ztst Test/comptest: document

@@ -81,8 +81,8 @@ if(system('man ' . $args) || !(-s $mantmp)) {
 }
 $args = "$mantmp >$coltmp";
 unlink($coltmp);
-&Info('attempting colcrt ', $args);
-if(system('colcrt ' . $args) || !(-s $coltmp)) {
+&Info('attempting colcrt - ', $args);
+if(system('colcrt - ' . $args) || !(-s $coltmp)) {
     unlink($coltmp);
     &Info('attempting col -bx <', $args);
 # The x is necessary so that spaces don't turn into tabs, which messes
