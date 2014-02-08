@@ -977,7 +977,7 @@ zrefresh(void)
     int tmpalloced;		/* flag to free tmpline when finished	     */
     int remetafy;		/* flag that zle line is metafied	     */
     int txtchange;		/* attributes set after prompts              */
-    int rprompt_off;		/* Offset of rprompt from right of screen    */
+    int rprompt_off = 1;	/* Offset of rprompt from right of screen    */
     struct rparams rpms;
 #ifdef MULTIBYTE_SUPPORT
     int width;			/* width of wide character		     */

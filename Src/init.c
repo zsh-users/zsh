@@ -77,7 +77,7 @@ mod_export int tclen[TC_COUNT];
 /**/
 int tclines, tccolumns;
 /**/
-mod_export int hasam, hasxn, hasye;
+mod_export int hasam, hasbw, hasxn, hasye;
 
 /* Value of the Co (max_colors) entry: may not be set */
 
@@ -698,6 +698,7 @@ init_term(void)
 
 	/* check whether terminal has automargin (wraparound) capability */
 	hasam = tgetflag("am");
+	hasbw = tgetflag("bw");
 	hasxn = tgetflag("xn"); /* also check for newline wraparound glitch */
 	hasye = tgetflag("YE"); /* print in last column does carriage return */
 
@@ -750,7 +751,7 @@ init_term(void)
 	    tclen[TCCLEARSCREEN] = 1;
 	}
 	/* This might work, but there may be more to it */
-	rprompt_indent = (hasye || !tccan(TCLEFT)) ? 1 : 0;
+	rprompt_indent = ((hasam && !hasbw) || hasye || !tccan(TCLEFT));
     }
     return 1;
 }
