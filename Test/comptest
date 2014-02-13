@@ -69,12 +69,15 @@ comp-finish () {
   zle -R
 }
 zle-finish () {
-  print -lr "<WIDGET><finish>" "BUFFER: $BUFFER" "CURSOR: $CURSOR"
-  (( region_active )) && print -lr "MARK: $MARK"
-  zle -K main
+  local buffer="$BUFFER" cursor="$CURSOR" mark="$MARK"
+  (( region_active)) || unset mark
+  BUFFER=""
+  zle -I
   zle clear-screen
-  zle send-break
-  zle -R
+  zle redisplay
+  print -lr "<WIDGET><finish>" "BUFFER: $buffer" "CURSOR: $cursor"
+  (( $+mark )) && print -lr "MARK: $mark"
+  zle accept-line
 }
 zle -N expand-or-complete-with-report
 zle -N list-choices-with-report
@@ -83,30 +86,45 @@ zle -N zle-finish
 bindkey "^I" expand-or-complete-with-report
 bindkey "^D" list-choices-with-report
 bindkey "^Z" comp-finish
-bindkey "^M" zle-finish
-bindkey -a "^M" zle-finish
+bindkey "^X" zle-finish
+bindkey -a "^X" zle-finish
 '
+}
+
+zpty_flush() {
+  local junk
+  if zpty -r -t zsh junk \*; then
+    (( ZTST_verbose > 2 )) && print -n -u $ZTST_fd "$*: ${(V)junk}"
+    while zpty -r -t zsh junk \* ; do
+      (( ZTST_verbose > 2 )) && print -n -u $ZTST_fd "${(V)junk}"
+    done
+    (( ZTST_verobse > 2 )) && print -u $ZTST_fd ''
+  fi
 }
 
 comptesteval () {
   local tmp=/tmp/comptest.$$
 
   print -lr - "$@" > $tmp
+  zpty_flush Before comptesteval
   zpty -w zsh ". $tmp"
   zpty -r -m zsh log_eval "*<PROMPT>*" || {
     print "prompt hasn't appeared."
     return 1
   }
+  zpty_flush After comptesteval
   rm $tmp
 }
 
 comptest () {
   input="$*"
+  zpty_flush Before comptest
   zpty -n -w zsh "$input"$'\C-Z'
   zpty -r -m zsh log "*<WIDGET><finish>*<PROMPT>*" || {
     print "failed to invoke finish widget."
     return 1
   }
+  zpty_flush After comptest
 
   logs=(${(s:<WIDGET>:)log})
   shift logs
@@ -136,10 +154,12 @@ comptest () {
 
 zletest () {
   input="$*"
-  zpty -n -w zsh "$input"$'\C-M'
+  zpty_flush Before zletest
+  zpty -n -w zsh "$input"$'\C-X'
   zpty -r -m zsh log "*<WIDGET><finish>*<PROMPT>*" || {
     print "failed to invoke finish widget."
     return 1
   }
+  zpty_flush After zletest
   print -lr "${(@)${(ps:\r\n:)log##*<WIDGET><finish>}[1,-2]}"
 }
