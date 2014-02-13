@@ -98,7 +98,7 @@ zpty_flush() {
     while zpty -r -t zsh junk \* ; do
       (( ZTST_verbose > 2 )) && print -n -u $ZTST_fd "${(V)junk}"
     done
-    (( ZTST_verobse > 2 )) && print -u $ZTST_fd ''
+    (( ZTST_verbose > 2 )) && print -u $ZTST_fd ''
   fi
 }
 
