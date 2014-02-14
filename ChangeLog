@@ -1,3 +1,7 @@
+2014-02-14  Oliver Kiddle <opk@zsh.org>
+
+	* 32361: Src/Zle/zle_tricky.c: don't reset lastline before completion
+
 2014-02-13  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* 32377: Test/comptest: change keybindings and PTY control for
