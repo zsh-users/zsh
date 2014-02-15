@@ -3,6 +3,9 @@
 	* 32389 (with Jun Takimoto): Test/X02zlevi.ztst, Test/comptest:
 	additional PTY and keybinding adjustments
 
+	* 32388: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c: zparseopts -K
+	preserves individual associative array elements
+
 2014-02-14  Oliver Kiddle <opk@zsh.org>
 
 	* 32361: Src/Zle/zle_tricky.c: don't reset lastline before completion

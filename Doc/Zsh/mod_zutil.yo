@@ -251,10 +251,12 @@ any not described by the var(specs).  This is similar to using the tt(shift)
 builtin.
 )
 item(tt(-K))(
-With this option, the arrays specified with the tt(-a) and tt(-A)
-options and with the `tt(=)var(array)' forms are kept unchanged when none
-of the var(specs) for them is used.  This allows assignment of default
-values to them before calling tt(zparseopts).
+With this option, the arrays specified with the tt(-a) option and with the
+`tt(=)var(array)' forms are kept unchanged when none of the var(specs) for
+them is used.  Otherwise the entire array is replaced when any of the
+var(specs) is used.  Individual elements of associative arrays specified
+with the tt(-A) option are preserved by tt(-K).  This allows assignment of
+default values to arrays before calling tt(zparseopts).
 )
 item(tt(-M))(
 This changes the assignment rules to implement a map among equivalent

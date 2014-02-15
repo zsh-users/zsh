@@ -1543,6 +1543,45 @@ add_opt_val(Zoptdesc d, char *arg)
     }
 }
 
+/*
+ * For "zparseopts -K -A assoc ..." this function copies the keys and
+ * values from the default and allocates the extra space for any parsed
+ * values having the same keys.  If there are no new values, creates an
+ * empty array.  Returns a pointer to the NULL element marking the end.
+ *
+ *  aval = pointer to the newly allocated array
+ *  assoc = name of the default hash param to copy
+ *  keep = whether we need to make the copy at all
+ *  num = count of new values to add space for
+ */
+static char **
+zalloc_default_array(char ***aval, char *assoc, int keep, int num)
+{
+    char **ap = 0;
+
+    *aval = 0;
+    if (keep && num) {
+	struct value vbuf;
+	Value v = fetchvalue(&vbuf, &assoc, 0,
+			     SCANPM_WANTKEYS|SCANPM_WANTVALS|SCANPM_MATCHMANY);
+	if (v && v->isarr) {
+	    char **dp, **dval = getarrvalue(v);
+	    int dnum = (dval ? arrlen(dval) : 0) + 1;
+	    *aval = (char **) zalloc(((num * 2) + dnum) * sizeof(char *));
+	    for (ap = *aval, dp = dval; dp && *dp; dp++) {
+		*ap = (char *) zalloc(strlen(*dp) + 1);
+		strcpy(*ap++, *dp);
+	    }
+	    *ap = NULL;
+	}
+    }
+    if (!ap) {
+	ap = *aval = (char **) zalloc(((num * 2) + 1) * sizeof(char *));
+	*ap = NULL;
+    }
+    return ap;
+}
+
 static int
 bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
@@ -1825,8 +1864,8 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		num++;
 
 	if (!keep || num) {
-	    aval = (char **) zalloc(((num * 2) + 1) * sizeof(char *));
-	    for (ap = aval, d = opt_descs; d; d = d->next) {
+	    ap = zalloc_default_array(&aval, assoc, keep, num);
+	    for (d = opt_descs; d; d = d->next) {
 		if (d->vals) {
 		    *ap++ = n = (char *) zalloc(strlen(d->name) + 2);
 		    *n = '-';
