@@ -49,8 +49,8 @@
 >BUFFER: z
 >CURSOR: 1
 
-  comptesteval 'bindkey -a "^R" redo'
-  zletest $'123\C-_\e\C-r'
+  comptesteval 'bindkey -a "^K" redo'
+  zletest $'123\C-_\e\C-k'
 0:undo in insert mode, redo in command
 >BUFFER: 123
 >CURSOR: 2

@@ -1,3 +1,8 @@
+2014-02-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32389 (with Jun Takimoto): Test/X02zlevi.ztst, Test/comptest:
+	additional PTY and keybinding adjustments
+
 2014-02-14  Oliver Kiddle <opk@zsh.org>
 
 	* 32361: Src/Zle/zle_tricky.c: don't reset lastline before completion
