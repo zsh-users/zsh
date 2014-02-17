@@ -3,6 +3,9 @@
 	* 32396: Completion/Unix/Command/_git: _git: fix
 	__git_committish_range_{first,last} and __git_is_committish_range
 
+	* 32395: Completion/Unix/Command/_git: _git: diff: refactor and
+	fix wrong completions
+
 2014-02-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted (users/18468): Doc/Zsh/builtins.yo, Doc/Zsh/params.yo:

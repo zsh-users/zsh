@@ -722,63 +722,74 @@ _git-diff () {
 
   case $state in
     (from-to-file)
+      # If "--" is part of $opt_args, this means it was specified before any
+      # $words arguments. This means that no heads are specified in front, so
+      # we need to complete *changed* files only.
+      if [[ -n ${opt_args[(I)--]} ]]; then
+        if [[ -n ${opt_args[(I)--cached|--staged]} ]]; then
+          __git_changed-in-index_files && ret=0
+        else
+          __git_changed-in-working-tree_files && ret=0
+        fi
+        return ret
+      fi
+
+      # Otherwise, more complex conditions need to be checked.
       case $CURRENT in
         (1)
-          if [[ -n ${opt_args[(I)--]} ]]; then
-            if [[ -n ${opt_args[(I)--cached|--staged]} ]]; then
-              __git_changed-in-index_files && ret=0
-            else
-              __git_changed-in-working-tree_files && ret=0
-            fi
-          else
-            local files_alt='files::__git_changed-in-working-tree_files'
-
-            if [[ -n ${opt_args[(I)--cached|--staged]} ]]; then
-              files_alt='files::__git_changed-in-index_files'
-            fi
-
-            _alternative \
-              'commit-ranges::__git_commit_ranges' \
-              'blobs-and-trees-in-treeish::__git_blobs_and_trees_in_treeish' \
-              $files_alt \
-              'blobs::__git_blobs ' && ret=0
+          local files_alt='files::__git_changed-in-working-tree_files'
+          if [[ -n ${opt_args[(I)--cached|--staged]} ]]; then
+            files_alt='files::__git_changed-in-index_files'
           fi
+
+          _alternative \
+            'commit-ranges::__git_commit_ranges' \
+            'blobs-and-trees-in-treeish::__git_blobs_and_trees_in_treeish' \
+            $files_alt \
+            'blobs::__git_blobs ' && ret=0
           ;;
         (2)
+          # Check if first argument is something special. In case of committish ranges and committishs offer a full list compatible completions.
           if __git_is_committish_range $line[1]; then
+            # Example: git diff branch1..branch2 <tab>
             __git_tree_files ${PREFIX:-.} $(__git_committish_range_last $line[1]) && ret=0
           elif __git_is_committish $line[1] || __git_is_treeish $line[1]; then
-            if [[ -n ${opt_args[(I)--]} ]]; then
-              __git_changed-in-working-tree_files && ret=0
-            else
-              _alternative \
-                'commits::__git_commits' \
-                'blobs-and-trees-in-treeish::__git_blobs_and_trees_in_treeish' \
-                'files::__git_changed-in-working-tree_files' && ret=0
-            fi
+            # Example: git diff branch1 <tab>
+            _alternative \
+              'commits::__git_commits' \
+              'blobs-and-trees-in-treeish::__git_blobs_and_trees_in_treeish' \
+              'files::__git_tree_files ${PREFIX:-.} HEAD' && ret=0
           elif __git_is_blob $line[1]; then
-            if [[ -n ${opt_args[(I)--]} ]]; then
-              __git_cached_files && ret=0
-            else
-              _alternative \
-                'files::__git_cached_files' \
-                'blobs::__git_blobs' && ret=0
-            fi
+            _alternative \
+              'files::__git_cached_files' \
+              'blobs::__git_blobs' && ret=0
           elif [[ -n ${opt_args[(I)--cached|--staged]} ]]; then
+            # Example: git diff --cached file1 <tab>
             __git_changed-in-index_files && ret=0
           else
+            # Example: git diff file1 <tab>
             __git_changed-in-working-tree_files && ret=0
           fi
           ;;
         (*)
           if __git_is_committish_range $line[1]; then
+            # Example: git diff branch1..branch2 file1 <tab>
             __git_tree_files ${PREFIX:-.} $(__git_committish_range_last $line[1]) && ret=0
           elif { __git_is_committish $line[1] && __git_is_committish $line[2] } ||
               __git_is_treeish $line[2]; then
+            # Example: git diff branch1 branch2 <tab>
             __git_tree_files ${PREFIX:-.} $line[2] && ret=0
+          elif __git_is_committish $line[1] || __git_is_treeish $line[1]; then
+            # Example: git diff branch file1 <tab>
+            # Example: git diff branch -- f<tab>
+            __git_tree_files ${PREFIX:-.} HEAD && ret=0
           elif __git_is_blob $line[1] && __git_is_blob $line[2]; then
             _nothing
+          elif [[ -n ${opt_args[(I)--cached|--staged]} ]]; then
+            # Example: git diff --cached file1 file2 <tab>
+            __git_changed-in-index_files && ret=0
           else
+            # Example: git diff file1 file2 <tab>
             __git_changed-in-working-tree_files && ret=0
           fi
           ;;
