@@ -4798,12 +4798,12 @@ __git_command_successful () {
 
 (( $+functions[__git_committish_range_first] )) ||
 __git_committish_range_first () {
-  print -r -- ${1%..(.|)*}
+  print -r -- ${${${1%..*}%.}:-HEAD}
 }
 
 (( $+functions[__git_committish_range_last] )) ||
 __git_committish_range_last () {
-  print -r -- ${1##*..(.|)}
+  print -r -- ${${${1#*..}#.}:-HEAD}
 }
 
 (( $+functions[__git_pattern_escape] )) ||
@@ -4832,12 +4832,12 @@ __git_is_treeish () {
 
 (( $+functions[__git_is_committish_range] )) ||
 __git_is_committish_range () {
-  # TODO: This isn't quite right.  We would like to do parts=${(~s:..(.|))},
-  # but that doesn't work.  (This would allow us to make sure that parts only
-  # contains two elements and then apply __git_is_committish on them.
-  [[ $1 == *..(.|)* ]] &&
-    __git_is_committish $(__git_committish_range_first $1) &&
-    __git_is_committish $(__git_committish_range_last $1)
+  [[ $1 == *..(.|)* ]] || return 1
+  local first=$(__git_committish_range_first $1)
+  local last=$(__git_committish_range_last $1)
+  [[ $first != *..* && $last != *..* ]] && \
+    __git_is_committish $first && \
+    __git_is_committish $last
 }
 
 (( $+functions[__git_is_initial_commit] )) ||
