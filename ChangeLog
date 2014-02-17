@@ -1,3 +1,8 @@
+2014-02-17  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted (users/18468): Doc/Zsh/builtins.yo, Doc/Zsh/params.yo:
+	document interactions of "fc -R" etc. with "fc -l" and $HISTCMD
+
 2014-02-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32389 (with Jun Takimoto): Test/X02zlevi.ztst, Test/comptest:

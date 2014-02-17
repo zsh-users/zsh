@@ -599,9 +599,10 @@ group ID by `tt(LPAR()GID=)var(gid)tt(; command+RPAR())'
 )
 vindex(HISTCMD)
 item(tt(HISTCMD))(
-The current history line number in an interactive shell, in other
-words the line number for the command that caused tt($HISTCMD)
-to be read.
+The current history event number in an interactive shell, in other
+words the event number for the command that caused tt($HISTCMD)
+to be read.  If the current history event modifies the history,
+tt(HISTCMD) changes to the new maximum history event number.
 )
 vindex(HOST)
 item(tt(HOST))(

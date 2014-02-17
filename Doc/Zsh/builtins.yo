@@ -683,6 +683,9 @@ If var(first) is not specified, it will be set to -1 (the most recent
 event), or to -16 if the tt(-l) flag is given.
 If var(last) is not specified, it will be set to var(first),
 or to -1 if the tt(-l) flag is given.
+However, if the current event has added entries to the history with
+`tt(print -s)' or `tt(fc -R)', then the default var(last) for tt(-l)
+includes all new history entries since the current event began.
 
 The flag tt(-r) reverses the order of the commands and the
 flag tt(-n) suppresses command numbers when listing.
