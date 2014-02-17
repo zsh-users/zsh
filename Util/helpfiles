@@ -16,24 +16,10 @@
 # If a third arg is given, the symlink is not created, but a
 # list of symlinks is put into the file specified by that arg.
 
-# Example usage:
-#    cd ~/zsh-4.0.1				# or wherever
-#    mkdir Help
-#    cd Help
-#    man zshbuiltins | colcrt - | helpfiles
-#    run-help() {
-#      typeset zhelp=~/zsh-4.0.1/Help		# or wherever
-#      [[ $1 = . ]] && 1=dot
-#      [[ $1 = : ]] && 1=colon
-#      if [[ $1 = compctl ]]; then
-#         man zshcompctl
-#      elif [[ -f $zhelp/$1 ]]; then
-#    	  ${=PAGER:-more} $zhelp/$1
-#      else
-#    	  man $1
-#      fi
-#    }
-# now <Esc>-h works for shell builtins.
+# This script is called automatically during `make install'
+# unless specified otherwise.
+
+# For usage and and more information see zshcontrib(1).
 
 sub Usage {
     print(STDERR "Usage: helpfiles zshbuiltins.1 dest-dir [link-file]\n");
