@@ -67,17 +67,17 @@ if(system('man ' . $args) || !(-s $mantmp)) {
 }
 $args = "$mantmp >$coltmp";
 unlink($coltmp);
-&Info('attempting colcrt - ', $args);
-if(system('colcrt - ' . $args) || !(-s $coltmp)) {
-    unlink($coltmp);
-    &Info('attempting col -bx <', $args);
+&Info('attempting col -bx <', $args);
 # The x is necessary so that spaces don't turn into tabs, which messes
 # up the calculations of indentation on machines which randomly wrap lines
 # round to the previous line (so you see what we're up against).
-    if(system('col -bx <' . $args) || !(-s $coltmp)) {
+if(system('col -bx <' . $args) || !(-s $coltmp)) {
+    unlink($coltmp);
+    &Info('attempting colcrt - ', $args);
+    if(system('colcrt - ' . $args) || !(-s $coltmp)) {
         unlink($mantmp);
         unlink($coltmp);
-        &Die('colcrt and col -bx both failed');
+        &Die('col -bx and colcrt - both failed');
     }
 }
 unlink($mantmp) || &Die('cannot remove tempfile ', $mantmp);

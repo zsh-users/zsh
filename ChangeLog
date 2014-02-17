@@ -1,5 +1,7 @@
 2014-02-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* m0viefreak: Util/helpfiles: 32402: prefer col -bx to colcrt.
+
 	* m0viefreak: Util/helpfiles: 32405: Util/helpfiles: remove old
 	example now shell code is integrated in distribution.
 
