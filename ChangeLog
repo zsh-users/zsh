@@ -6,6 +6,9 @@
 	* 32395: Completion/Unix/Command/_git: _git: diff: refactor and
 	fix wrong completions
 
+	* 32397: Completion/Unix/Command/_git: _git: fix __git_submodules
+	to only use the actual name of the submodule
+
 2014-02-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted (users/18468): Doc/Zsh/builtins.yo, Doc/Zsh/params.yo:

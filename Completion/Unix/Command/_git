@@ -5548,7 +5548,7 @@ __git_submodules () {
   local expl
   declare -a submodules
 
-  submodules=(${${(f)"$(_call_program submodules git submodule 2>/dev/null)"}#* })
+  submodules=(${${${(f)"$(_call_program submodules git submodule 2>/dev/null)"}#?* }%% *})
   __git_command_successful $pipestatus || return 1
 
   _wanted submodules expl submodule compadd $* - $submodules
