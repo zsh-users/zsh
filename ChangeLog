@@ -1,5 +1,7 @@
 2014-02-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* m0viefreak: 32404: Util/helpfiles: use env to find perl.
+
 	* m0viefreak: 32403: Doc/Zsh/contrib.yo: update zshcontrib
 	manual for helpfiles improvements.
 
