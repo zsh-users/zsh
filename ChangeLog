@@ -1,3 +1,8 @@
+2014-02-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* m0viefreak: 32403: Doc/Zsh/contrib.yo: update zshcontrib
+	manual for helpfiles improvements.
+
 2014-02-18  m0viefreak  <m0viefreak.cm@googlemail.com>
 
 	* 32396: Completion/Unix/Command/_git: _git: fix

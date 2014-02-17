@@ -45,9 +45,8 @@ shell features as well.  The autoloadable tt(run-help) function, found in
 tt(Functions/Misc), searches for these helpfiles and performs several
 other tests to produce the most complete help possible for the command.
 
-There may already be a directory of help files on your system; look in
-tt(/usr/share/zsh) or tt(/usr/local/share/zsh) and subdirectories below
-those, or ask your system administrator.
+Help files are installed by default to a subdirectory of tt(/usr/share/zsh)
+or tt(/usr/local/share/zsh).
 
 To create your own help files with tt(helpfiles), choose or create a
 directory where the individual command help files will reside.  For
@@ -55,22 +54,22 @@ example, you might choose tt(~/zsh_help).  If you unpacked the zsh
 distribution in your home directory, you would use the commands:
 
 example(mkdir ~/zsh_help
-cd ~/zsh_help
-man zshall | colcrt - | \ 
-perl ~/zsh-version()/Util/helpfiles)
-
-findex(run-help, use of)
-Next, to use the tt(run-help) function, you need to add lines something
-like the following to your tt(.zshrc) or equivalent startup file:
-
-example(unalias run-help
-autoload run-help
-HELPDIR=~/zsh_help)
+perl ~/zsh-version()/Util/helpfiles ~/zsh_help)
 
 vindex(HELPDIR)
 The tt(HELPDIR) parameter tells tt(run-help) where to look for the help
-files.  If your system already has a help file directory installed, set
-tt(HELPDIR) to the path of that directory instead.
+files. When unset, it uses the default installation path.
+To use your own set of help files, set this to the appropriate path
+in one of your startup files:
+
+example(HELPDIR=~/zsh_help)
+
+findex(run-help, use of)
+To use the tt(run-help) function, you need to add lines something
+like the following to your tt(.zshrc) or equivalent startup file:
+
+example(unalias run-help
+autoload run-help)
 
 Note that in order for `tt(autoload run-help)' to work, the tt(run-help)
 file must be in one of the directories named in your tt(fpath) array (see
