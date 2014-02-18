@@ -1,5 +1,8 @@
 2014-02-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Eric Cook: Completion/Linux/Command/_btrfs: updated completion
+	for subcommands.
+
 	* Eric Cook: Completion/Linux/Command/_btrfs: minor typo.
 
 	* Eric Cook: Completion/Linux/Command/_btrfs: remove hard tabs.
