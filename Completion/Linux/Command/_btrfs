@@ -60,7 +60,7 @@ while (( $#state )); do
         subvolume:snapshot) args+=( '-r[readonly snapshot]' '1:snapshot:_files -/' );;
         subvolume:list) args+=( '-p[include parent ID in output]' '1:path:->mounts' );;
         subvolume:set-default) args+=( '1:id:_guard "[0-9]#" id' '2:path:->mounts' );;
-        filesystem:resize) args+=( '1:size:_guart "(|+|-)[0-9]#[GKM]"' '2:path:->mounts' );;
+        filesystem:resize) args+=( '1:size:_guard "(|+|-)[0-9]#[GKM]"' '2:path:->mounts' );;
         filesystem:defragment)
           args+=(
             '-v[verbose]'
