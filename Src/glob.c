@@ -1362,7 +1362,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 			/* Find matching delimiters */
 			tt = get_strarg(s, &arglen);
 			if (!*tt) {
-			    zerr("missing end of name");
+			    zerr("missing delimiter for 'u' glob qualifier");
 			    data = 0;
 			} else {
 #ifdef USE_GETPWNAM
@@ -1402,7 +1402,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 
 			tt = get_strarg(s, &arglen);
 			if (!*tt) {
-			    zerr("missing end of name");
+			    zerr("missing delimiter for 'g' glob qualifier");
 			    data = 0;
 			} else {
 #ifdef USE_GETGRNAM

@@ -1,3 +1,8 @@
+2014-02-19  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 32414: Src/glob.c: improved error message for missing glob
+	qualifier delimiters.
+
 2014-02-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Eric Cook: 32408: Completion/Linux/Command/_btrfs: additional
