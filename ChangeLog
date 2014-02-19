@@ -1,3 +1,9 @@
+2014-03-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Manuel Presnitz: 32412 modified c.f. 32415:
+	Completion/Zsh/Type/_globquals, Doc/Zsh/expn.yo, Src/glob.c,
+	Src/zsh.h: gigabyte and terabyte units for glob qualifiers.
+
 2014-02-28  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/18531 plus doc etc.: Doc/Zsh/contrib.yo,
@@ -6,7 +12,7 @@
 
 2014-02-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* Jun T: Completion/Base/Core/_description,
+	* Jun T: 32435: Completion/Base/Core/_description,
 	Completion/Unix/Command/_rm: improved quoting for ignore-line
 	style.
 

@@ -120,6 +120,8 @@ typedef struct stat *Statptr;	 /* This makes the Ultrix compiler happy.  Go figu
 #define TT_POSIX_BLOCKS 1
 #define TT_KILOBYTES 2
 #define TT_MEGABYTES 3
+#define TT_GIGABYTES 4
+#define TT_TERABYTES 5
 
 
 typedef int (*TestMatchFunc) _((char *, struct stat *, off_t, char *));
@@ -1486,6 +1488,12 @@ zglob(LinkList list, LinkNode np, int nountok)
 			g_units = TT_KILOBYTES, ++s;
 		    else if (*s == 'm' || *s == 'M')
 			g_units = TT_MEGABYTES, ++s;
+#if defined(ZSH_64_BIT_TYPE) || defined(LONG_IS_64_BIT)
+                    else if (*s == 'g' || *s == 'G')
+                        g_units = TT_GIGABYTES, ++s;
+                    else if (*s == 't' || *s == 'T')
+                        g_units = TT_TERABYTES, ++s;
+#endif
 		  getrange:
 		    /* Get time multiplier */
 		    if (g_amc >= 0) {
@@ -3538,9 +3546,9 @@ qualiscom(UNUSED(char *name), struct stat *buf, UNUSED(off_t mod), UNUSED(char *
 static int
 qualsize(UNUSED(char *name), struct stat *buf, off_t size, UNUSED(char *dummy))
 {
-#if defined(LONG_IS_64_BIT) || defined(OFF_T_IS_64_BIT)
+#if defined(ZSH_64_BIT_TYPE) || defined(LONG_IS_64_BIT)
 # define QS_CAST_SIZE()
-    off_t scaled = buf->st_size;
+    zlong scaled = buf->st_size;
 #else
 # define QS_CAST_SIZE() (unsigned long)
     unsigned long scaled = (unsigned long)buf->st_size;
@@ -3559,6 +3567,16 @@ qualsize(UNUSED(char *name), struct stat *buf, off_t size, UNUSED(char *dummy))
 	scaled += 1048575l;
 	scaled /= 1048576l;
 	break;
+#if defined(ZSH_64_BIT_TYPE) || defined(LONG_IS_64_BIT)
+    case TT_GIGABYTES:
+        scaled += ZLONG_CONST(1073741823);
+        scaled /= ZLONG_CONST(1073741824);
+        break;
+    case TT_TERABYTES:
+        scaled += ZLONG_CONST(1099511627775);
+        scaled /= ZLONG_CONST(1099511627776);
+        break;
+#endif
     }
 
     return (g_range < 0 ? scaled < QS_CAST_SIZE() size :

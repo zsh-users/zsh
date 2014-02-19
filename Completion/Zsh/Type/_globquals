@@ -132,13 +132,13 @@ while [[ -n $PREFIX ]]; do
 
     (L)
     # complete/skip file size
-    if ! compset -P '([kKmMpP]|)([-+]|)<->'; then
+    if ! compset -P '([kKmMgGtTpP]|)([-+]|)<->'; then
       # complete/skip size spec
       alts=()
-      if ! compset -P '[kKmMpP]' && [[ -z $PREFIX ]]; then
+      if ! compset -P '[kKmMgGtTpP]' && [[ -z $PREFIX ]]; then
         alts+=(
           "size-specifiers:size specifier:\
-((k\:kb m\:mb p\:512-byte\ blocks))")
+((k\:kb m\:mb g\:gb t\:tb p\:512-byte\ blocks))")
       fi
       if ! compset -P '[-+]' && [[ -z $PREFIX ]]; then
         alts+=("senses:sense:((-\:less\ than +\:more\ than))")

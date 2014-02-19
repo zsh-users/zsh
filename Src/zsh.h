@@ -33,9 +33,6 @@
 /*
  * Our longest integer type:  will be a 64 bit either if long already is,
  * or if we found some alternative such as long long.
- * Currently we only define this to be longer than a long if
- * --enable-largefile * was given.  That enables internal use of 64-bit
- * types even if no actual large file support is present.
  */
 #ifdef ZSH_64_BIT_TYPE
 typedef ZSH_64_BIT_TYPE zlong;
@@ -47,6 +44,32 @@ typedef unsigned zlong zulong;
 #else
 typedef long zlong;
 typedef unsigned long zulong;
+#endif
+
+/*
+ * Work out how to define large integer constants that will fit
+ * in a zlong.
+ */
+#if defined(ZSH_64_BIT_TYPE) || defined(LONG_IS_64_BIT)
+/* We have some 64-bit type */
+#ifdef LONG_IS_64_BIT
+/* It's long */
+#define ZLONG_CONST(x)  x ## l
+#else
+/* It's long long */
+#ifdef ZLONG_IS_LONG_LONG
+#define ZLONG_CONST(x)  x ## ll
+#else
+/*
+ * There's some 64-bit type, but we don't know what it is.
+ * We'll just cast it and hope the compiler does the right thing.
+ */
+#define ZLONG_CONST(x) ((zlong)x)
+#endif
+#endif
+#else
+/* We're stuck with long */
+#define ZLONG_CONST(x) (x ## l)
 #endif
 
 /*
