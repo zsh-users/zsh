@@ -1,5 +1,8 @@
 2014-02-24  Oliver Kiddle <opk@zsh.org>
 
+	* users/18498: Completion/Base/Completer/_expand_alias: observe
+	add-space style in _expand_alias so suffix can be disabled
+
 	* users/18485: Completion/Unix/Command/_git: add .. as an
 	auto-removable suffix in git revision ranges
 
