@@ -1,3 +1,8 @@
+2014-02-24  Oliver Kiddle <opk@zsh.org>
+
+	* users/18485: Completion/Unix/Command/_git: add .. as an
+	auto-removable suffix in git revision ranges
+
 2014-02-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Sebastien Alaiwan: 32462: Completion/Unix/Command/_bzr:

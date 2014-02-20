@@ -5526,9 +5526,12 @@ __git_remote_branch_names_noprefix () {
 __git_commits () {
   # TODO: deal with things that __git_heads and __git_tags has in common (i.e.,
   # if both exists, they need to be completed to heads/x and tags/x.
+  local -a sopts ropt
+  zparseopts -E -a sopts S: r:=ropt R: q
+  sopts+=( $ropt:q )
   _alternative \
-    'heads::__git_heads' \
-    'commit-tags::__git_commit_tags' \
+    "heads::__git_heads $sopts" \
+    "commit-tags::__git_commit_tags $sopts" \
     'commit-objects::__git_commit_objects'
 }
 
@@ -5595,10 +5598,12 @@ __git_commits2 () {
 
 (( $+functions[__git_commit_ranges] )) ||
 __git_commit_ranges () {
+  local -a suf
   if compset -P '*..(.|)'; then
     __git_commits $*
   else
-    __git_commits $* -qS ..
+    compset -S '..*' || suf=( -qS .. -r '.@~ ^:' )
+    __git_commits $* $suf
   fi
 }
 
