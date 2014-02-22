@@ -25,7 +25,7 @@ curcontext="${curcontext%:*:*}:bzr-$cmd:"
 (( $+functions[_bzr_unknownFiles] )) ||
 _bzr_unknownFiles() {
     local fileList
-    fileList=(${(ps:\0:)"$(bzr ls --null --unknown)"})
+    fileList=(${(ps:\0:)"$(bzr ls --null --unknown -R)"})
     compadd -af fileList
     return 0
 }
@@ -41,7 +41,7 @@ _bzr_unknownRoot() {
 (( $+functions[_bzr_versionedFiles] )) ||
 _bzr_versionedFiles() {
     local fileList
-    fileList=(${(ps:\0:)"$(bzr ls --null --versioned)"})
+    fileList=(${(ps:\0:)"$(bzr ls --null --versioned -R)"})
     compadd -af fileList
     return 0
 }
