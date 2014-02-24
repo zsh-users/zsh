@@ -1,5 +1,8 @@
 2014-02-24  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Hong Xu: 32492: Completion/Unix/Command/_npm: fix outdated
+	completion.
+
 	* Sebastien Alaiwan: 32462: Completion/Unix/Command/_bzr:
 	improve completion with directory path.
 
