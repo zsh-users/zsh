@@ -1,3 +1,10 @@
+2014-02-23  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32427: Doc/Zsh/zle.yo, Src/Zle/zle_main.c: avoid busy loop
+	on closed descriptors for "zle -F" handlers.  Assure that the
+	handlers are called on error conditions and document the extra
+	argument that is passed in the error case.
+
 2014-02-19  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 32414: Src/glob.c: improved error message for missing glob

@@ -492,26 +492,35 @@ Only available if your system supports one of the `poll' or `select' system
 calls; most modern systems do.
 
 Installs var(handler) (the name of a shell function) to handle input from
-file descriptor var(fd).  When zle is attempting to read data, it will
-examine both the terminal and the list of handled var(fd)'s.  If data
-becomes available on a handled var(fd), zle will call var(handler) with
-the fd which is ready for reading as the only argument.  If the handler
-produces output to the terminal, it should call `tt(zle -I)' before doing
-so (see below).  The handler should not attempt to read from the terminal.
-Note that zle makes no attempt to check whether this fd is actually
+file descriptor var(fd).  Installing a handler for an var(fd) which is
+already handled causes the existing handler to be replaced.  Any number of
+handlers for any number of readable file descriptors may be installed.
+Note that zle makes no attempt to check whether this var(fd) is actually
 readable when installing the handler.  The user must make their own
 arrangements for handling the file descriptor when zle is not active.
 
-If the option tt(-w) is also given, the var(handler) is instead a
-line editor widget, typically a shell function made into a widget using
-tt(zle -N).  In that case var(handler) can use all the facilities of
-zle to update the current editing line.  Note, however, that as handling
-var(fd) takes place at a low level changes to the display will not
-automatically appear; the widget should call tt(zle -R) to force redisplay.
+When zle is attempting to read data, it will examine both the terminal and
+the list of handled var(fd)'s.  If data becomes available on a handled
+var(fd), zle calls var(handler) with the fd which is ready for reading
+as the first argument.  Under normal circumstances this is the only
+argument, but if an error was detected, a second argument provides
+details: `tt(hup)' for a disconnect, `tt(nval)' for a closed or otherwise
+invalid descriptor, or `tt(err)' for any other condition.  Systems that
+support only the `select' system call always use `tt(err)'.
 
-Any number of handlers for any number of readable file descriptors may be
-installed.  Installing a handler for an var(fd) which is already handled
-causes the existing handler to be replaced.
+If the option tt(-w) is also given, the var(handler) is instead a line
+editor widget, typically a shell function made into a widget using
+`tt(zle -N)'.  In that case var(handler) can use all the facilities of zle
+to update the current editing line.  Note, however, that as handling var(fd)
+takes place at a low level changes to the display will not automatically
+appear; the widget should call `tt(zle -R)' to force redisplay.  As of this
+writing, widget handlers only support a single argument and thus are never
+passed a string for error state, so widgets must be prepared to test the
+descriptor themselves.
+
+If either type of handler produces output to the terminal, it should call
+`tt(zle -I)' before doing so (see below).  Handlers should not attempt to
+read from the terminal.
 
 If no var(handler) is given, but an var(fd) is present, any handler for
 that var(fd) is removed.  If there is none, an error message is printed
@@ -526,7 +535,8 @@ silently return status 1.
 
 Note that this feature should be used with care.  Activity on one of the
 var(fd)'s which is not properly handled can cause the terminal to become
-unusable.
+unusable.  Removing an var(fd) handler from within a signal trap may cause
+unpredictable behavior.
 
 Here is a simple example of using this feature.  A connection to a remote
 TCP port is created using the ztcp command; see 
@@ -536,6 +546,7 @@ which simply prints out any data which arrives on this connection.  Note
 that `select' will indicate that the file descriptor needs handling
 if the remote side has closed the connection; we handle that by testing
 for a failed read.
+
 example(if ztcp pwspc 2811; then
   tcpfd=$REPLY
   handler+LPAR()RPAR() {
