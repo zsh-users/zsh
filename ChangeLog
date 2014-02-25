@@ -1,5 +1,7 @@
 2014-02-24  Oliver Kiddle <opk@zsh.org>
 
+	* unposted: Doc/Zsh/compsys.yo: fix typo
+
 	* unposted: Completion/X/Command/_x_utils: duplicate local
 	statement was printing variable value
 
