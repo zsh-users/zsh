@@ -1,5 +1,8 @@
 2014-02-24  Oliver Kiddle <opk@zsh.org>
 
+	* unposted: Completion/X/Command/_x_utils: duplicate local
+	statement was printing variable value
+
 	* users/18498: Completion/Base/Completer/_expand_alias: observe
 	add-space style in _expand_alias so suffix can be disabled
 
