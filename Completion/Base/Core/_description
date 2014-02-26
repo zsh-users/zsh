@@ -47,17 +47,19 @@ if [[ -z "$_comp_no_ignore" ]]; then
   zstyle -a ":completion:${curcontext}:$1" ignored-patterns _comp_ignore ||
     _comp_ignore=()
 
-  zstyle -s ":completion:${curcontext}:$1" ignore-line hidden &&
+  if zstyle -s ":completion:${curcontext}:$1" ignore-line hidden; then
+    local -a qwords
+    qwords=( ${words//(#m)[\[\]()\\*?#<>~\^\|]/\\$MATCH} )
     case "$hidden" in
-    true|yes|on|1) _comp_ignore=( "$_comp_ignore[@]" ${(q)"${words[@]}"} );;
-    current)       _comp_ignore=( "$_comp_ignore[@]" "${(q)words[CURRENT]}" );;
+    true|yes|on|1) _comp_ignore+=( $qwords );;
+    current)       _comp_ignore+=( $qwords[CURRENT] );;
     current-shown)
 	    [[ "$compstate[old_list]" = *shown* ]] &&
-            _comp_ignore=( "$_comp_ignore[@]" "${(q)words[CURRENT]}" );;
-    other)         _comp_ignore=( "$_comp_ignore[@]"
-                                  "${(@q)words[1,CURRENT-1]}"
-				  "${(@q)words[CURRENT+1,-1]}" );;
+            _comp_ignore+=( $qwords[CURRENT] );;
+    other)         _comp_ignore+=( $qwords[1,CURRENT-1]
+				   $qwords[CURRENT+1,-1] );;
     esac
+  fi
 
   # Ensure the ignore option is first so we can override it
   # for fake-always.
