@@ -1,7 +1,7 @@
 #compdef -K _expand_alias complete-word \C-xa
 
 local word expl tmp pre sel what
-local -a tmpa
+local -a tmpa suf
 
 eval "$_comp_setup"
 
@@ -58,7 +58,8 @@ if [[ -n $tmp ]]; then
       tmp="\\$tmp"
     fi
   fi
-  $pre _wanted aliases expl alias compadd -UQ -- ${tmp%%[[:blank:]]##}
+  zstyle -T ":completion:${curcontext}:" add-space || suf=( -S '' )
+  $pre _wanted aliases expl alias compadd -UQ "$suf[@]" -- ${tmp%%[[:blank:]]##}
 elif (( $#pre )) && zstyle -t ":completion:${curcontext}:" complete; then
   $pre _aliases -s "$sel" -S ''
 else

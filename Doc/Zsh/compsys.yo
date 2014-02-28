@@ -2344,7 +2344,7 @@ This is used by the tt(_history) completer and the
 tt(_history_complete_word) bindable command to decide which words
 should be completed.  
 
-If it is a singe number, only the last var(N) words from the history
+If it is a single number, only the last var(N) words from the history
 will be completed.
 
 If it is a range of the form `var(max)tt(:)var(slice)',
