@@ -10,6 +10,7 @@ delete-whole-word-match
 down-case-word-match
 down-line-or-beginning-search
 edit-command-line
+expand-absolute-path
 forward-word-match
 history-beginning-search-menu
 history-pattern-search

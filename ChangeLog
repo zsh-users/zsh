@@ -1,3 +1,9 @@
+2014-02-28  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/18531 plus doc etc.: Doc/Zsh/contrib.yo,
+	Functions/Zle/.distfiles, Functions/Zle/expand-absolute-path:
+	new expand-absolute-path ZLE widget.
+
 2014-02-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Hong Xu: 32492: Completion/Unix/Command/_npm: fix outdated

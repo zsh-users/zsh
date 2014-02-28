@@ -1873,6 +1873,12 @@ Edit the command line using your visual editor, as in tt(ksh).
 
 example(bindkey -M vicmd v edit-command-line)
 )
+tindex(expand-absolute-path)
+item(tt(expand-absolute-path))(
+Expand the file name under the cursor to an absolute path, resolving
+symbolic links.  Where possible, the initial path segment is turned
+into a named directory or reference to a user's home directory.
+)
 tindex(history-beginning-search-backward-end)
 tindex(history-beginning-search-forward-end)
 item(tt(history-search-end))(
