@@ -1,5 +1,7 @@
 2014-03-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 32453: Functions/Misc/zcalc: fix default base handling.
+
 	* Manuel Presnitz: 32412 modified c.f. 32415:
 	Completion/Zsh/Type/_globquals, Doc/Zsh/expn.yo, Src/glob.c,
 	Src/zsh.h: gigabyte and terabyte units for glob qualifiers.

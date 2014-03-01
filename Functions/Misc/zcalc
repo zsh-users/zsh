@@ -197,7 +197,7 @@ while (( expression_mode )) ||
   # Set default base if `[#16]' or `[##16]' etc. on its own.
   # Unset it if `[#]' or `[##]'.
   if [[ $line = (#b)[[:blank:]]#('[#'(\#|)((<->|)(|_|_<->))']')[[:blank:]]#(*) ]]; then
-    if [[ -z $match[4] ]]; then
+    if [[ -z $match[6] ]]; then
       if [[ -z $match[3] ]]; then
 	defbase=
       else
