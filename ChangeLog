@@ -1,5 +1,8 @@
 2014-03-03  Oliver Kiddle  <opk@zsh.org>
 
+	* 32450: Src/Zle/zle_hist.c: make get-line set the history
+	number that was saved with the line
+
 	* 32448: Src/Zle/zle_params.c: fix seg fault after recursive-edit
 
 	* 32439 (with Yuri D'Elia): Completion/Base/Core/_main_complete:
