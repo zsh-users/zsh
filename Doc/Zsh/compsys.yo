@@ -3047,6 +3047,15 @@ This function is also a bindable command, see
 ifzman(the section `Bindable Commands' below)\
 ifnzman(noderef(Bindable Commands)).
 )
+findex(_extensions)
+item(tt(_extensions))(
+If the cursor follows the string `tt(*.)', filename extensions are
+completed. The extensions are taken from files in current directory or a
+directory specified at the beginning of the current word. For exact matches,
+completion continues to allow other completers such as tt(_expand) to
+expand the pattern. The standard tt(add-space) and tt(prefix-hidden)
+styles are observed.
+)
 findex(_history)
 item(tt(_history))(
 Complete words from the shell's command  history.  This completer 

@@ -1,5 +1,8 @@
 2014-03-03  Oliver Kiddle  <opk@zsh.org>
 
+	* 32441: Completion/Base/Completer/_extensions, Doc/Zsh/compsys.yo:
+	add completer for file extensions
+
 	* 32450: Src/Zle/zle_hist.c: make get-line set the history
 	number that was saved with the line
 
