@@ -334,6 +334,14 @@ elif [[ nm -eq 0 && -z "$_comp_mesg" &&
   compadd -x "$mesg"
 fi
 
+if zstyle -s ":completion:${curcontext}:" show-ambiguity tmp; then
+  local prefix=${${compstate[unambiguous]}[1,${compstate[unambiguous_cursor]}-1]}
+  local toquote='[=\(\)\|~^?*[\]#<>]'
+  [[ $tmp = (yes|true|on) ]] && tmp=4
+  [[ -n $prefix ]] &&
+    _comp_colors+=( "=(#i)${prefix[1,-2]//?/(}${prefix[1,-2]//(#m)?/${MATCH/$~toquote/\\$MATCH}|)}${prefix[-1]//(#m)$~toquote/\\$MATCH}(#b)(?|)*==$tmp" )
+fi
+
 [[ "$_comp_force_list" = always ||
    ( "$_comp_force_list" = ?*  && nm -ge _comp_force_list ) ]] &&
     compstate[list]="${compstate[list]//messages} force"

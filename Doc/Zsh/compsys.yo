@@ -2440,6 +2440,15 @@ completing words for the dict command. It allows words from different
 dictionary databases to be added separately.
 The default for this style is `false'.
 )
+kindex(show-ambiguity, completion style)
+item(tt(show-ambiguity))(
+If the tt(zsh/complist) module is loaded, this style can be used to
+highlight the first ambiguous character in completion lists. The
+value is either a color indication such as those supported by the
+tt(list-colors) style or, with a value of tt(true), a default of
+underlining is selected. The highlighting is only applied if the
+completion display strings correspond to the actual matches.
+)
 kindex(show-completer, completion style)
 item(tt(show-completer))(
 Tested whenever a new completer is tried.  If it is true, the completion

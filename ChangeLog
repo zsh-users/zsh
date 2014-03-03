@@ -1,5 +1,8 @@
 2014-03-03  Oliver Kiddle  <opk@zsh.org>
 
+	* 32439 (with Yuri D'Elia): Completion/Base/Core/_main_complete:
+	add new show-ambiguity style
+
 	* 32436: Src/Zle/complist.c: allow = to be used in ZLS_COLORS
 	patterns if it is quoted or inside parentheses
 
