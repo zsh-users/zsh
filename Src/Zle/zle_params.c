@@ -363,7 +363,7 @@ get_prebuffer(UNUSED(Param pm))
 static char *
 get_widget(UNUSED(Param pm))
 {
-    return bindk->nam;
+    return bindk ? bindk->nam : "";
 }
 
 /**/
