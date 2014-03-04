@@ -1995,11 +1995,11 @@ only be performed with the `tt(*)' inserted.
 kindex(matcher, completion style)
 item(tt(matcher))(
 This style is tested separately for each tag valid in the current
-context.  Its value is added to any match specifications given by the 
+context.  Its value is tried before any match specifications given by the 
 tt(matcher-list) style.  It should be in the form described in
 ifzman(the section `Completion Matching Control' in zmanref(zshcompwid))\
 ifnzman(noderef(Completion Matching Control))\
-.
+.  For examples of this, see the description of the tt(tag-order) style.
 )
 kindex(matcher-list, completion style)
 item(tt(matcher-list))(
@@ -2022,9 +2022,11 @@ without repetition:
 example(zstyle ':completion:*' matcher-list '' '+m:{a-z}={A-Z}' '+m:{A-Z}={a-z}')
 
 It is possible to create match specifications valid for particular
-completers by using the third field of the context.  For example, to
-use the completers tt(_complete) and tt(_prefix) but only allow
-case-insensitive completion with tt(_complete):
+completers by using the third field of the context.  This applies only
+to completers that override the global matcher-list, which as of this
+writing includes only tt(_prefix) and tt(_ignored).  For example, to
+use the completers tt(_complete) and tt(_prefix) but allow
+case-insensitive completion only with tt(_complete):
 
 example(zstyle ':completion:*' completer _complete _prefix
 zstyle ':completion:*:complete:*' matcher-list \ 
