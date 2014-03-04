@@ -1,6 +1,25 @@
 2014-03-03  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/18550: Doc/Zsh/compsys.yo: matcher-list clarifications
+2014-03-03  Simon Ruderich  <simon@ruderich.org>
+
+	* 32289: Doc: Add zsh version to footer in HTML documentation.
+
+2014-03-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 32441: Completion/Base/Completer/_extensions, Doc/Zsh/compsys.yo:
+	add completer for file extensions
+
+	* 32450: Src/Zle/zle_hist.c: make get-line set the history
+	number that was saved with the line
+
+	* 32448: Src/Zle/zle_params.c: fix seg fault after recursive-edit
+
+	* 32439 (with Yuri D'Elia): Completion/Base/Core/_main_complete:
+	add new show-ambiguity style
+
+	* 32436: Src/Zle/complist.c: allow = to be used in ZLS_COLORS
+	patterns if it is quoted or inside parentheses
 
 2014-03-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
@@ -22,7 +41,7 @@
 	Completion/Unix/Command/_rm: improved quoting for ignore-line
 	style.
 
-2014-02-24  Oliver Kiddle <opk@zsh.org>
+2014-02-24  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Doc/Zsh/compsys.yo: fix typo
 
@@ -104,7 +123,7 @@
 	* 32388: Doc/Zsh/mod_zutil.yo, Src/Modules/zutil.c: zparseopts -K
 	preserves individual associative array elements
 
-2014-02-14  Oliver Kiddle <opk@zsh.org>
+2014-02-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 32361: Src/Zle/zle_tricky.c: don't reset lastline before completion
 
@@ -122,7 +141,7 @@
 
 	* Martin Vaeth: 32356: Util/helpfiles: fix a typo.
 
-2014-02-05  Oliver Kiddle <opk@zsh.org>
+2014-02-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 32355: Doc/Zsh/zle.yo Test/X02zlevi.ztst Test/comptest: document
 	and test vi mode undo changes
@@ -157,7 +176,7 @@
 	unset for better compatibility in emulation modes; for the same
 	reason, remove the readonly flag from $_
 
-2014-01-31  Oliver Kiddle <opk@zsh.org>
+2014-01-31  Oliver Kiddle  <opk@zsh.org>
 
 	* 32314: Src/Zle/zle_main.c, Src/Zle/zle_tricky.c,
 	Src/Zle/zle_utils.c, Src/Zle/zle_vi.c: merge undo events
@@ -1564,7 +1583,7 @@
 	* users/17665: Doc/Zsh/options.yo, Src/math.c, Src/options.c,
 	Src/zsh.h, Test/C01arith.ztst: add FORCE_FLOAT option.
 
-2013-02-27  Oliver Kiddle <opk@zsh.org>
+2013-02-27  Oliver Kiddle  <opk@zsh.org>
 
 	* 31076: Completion/Linux/Command/_yast,
 	Completion/Unix/Type/_pids, Completion/Unix/Type/_pdf:
@@ -1585,7 +1604,7 @@
 	* 31060: Src/builtin.c: "+" before a flag for "functions" or
 	"autoload" should suppress display of function body.
 
-2013-02-21  Oliver Kiddle <opk@zsh.org>
+2013-02-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 31058: Completion/Zsh/Command/_fc, Completion/Unix/Command/_cut,
 	Completion/Unix/Command/_sed, Completion/Unix/Command/_wget,
@@ -1597,7 +1616,7 @@
 	* 31055: Completion/compaudit: missing '$' in search of /proc
 	file system.
 
-2013-02-12  Oliver Kiddle <opk@zsh.org>
+2013-02-12  Oliver Kiddle  <opk@zsh.org>
 
 	* 31041: Test/comptest, Test/X02zlevi.ztst: add support for
 	testing line editor widgets from the test suite
@@ -1605,7 +1624,7 @@
 	* unposted: Etc/zsh-development-guide: remove duplication in
 	git guidelines
 
-2013-02-09  Oliver Kiddle <opk@zsh.org>
+2013-02-09  Oliver Kiddle  <opk@zsh.org>
 
 	* Morita Sho: 31038: Completion/Unix/Type/_terminals:
 	add location of terminfo entries on Debian
@@ -1662,7 +1681,7 @@
 	modifiers :wq operating on an empty string crashed the shell.
 	The shell isn't supposed to crash.
 
-2013-01-20  Oliver Kiddle <opk@zsh.org>
+2013-01-20  Oliver Kiddle  <opk@zsh.org>
 
 	* 30987: Completion/X/Command/_xrandr: only call xrandr when
 	necessary and use _call_program
@@ -1720,7 +1739,7 @@
 
 	* unposted: Config/version.mk: zsh 5.0.1.
 
-2012-12-18  Oliver Kiddle <opk@zsh.org>
+2012-12-18  Oliver Kiddle  <opk@zsh.org>
 
 	* 30877: Etc/zsh-development-guide: document git workflow
 
@@ -1754,7 +1773,7 @@
 	* users/17445: Src/math.c, Test/C01arith.ztst: fix handling of
 	leading zeroes in floating point.
 
-2012-11-20  Oliver Kiddle <opk@zsh.org>
+2012-11-20  Oliver Kiddle  <opk@zsh.org>
 
 	* 30811: Completion/Linux/Command/_btrfs,
 	Completion/Unix/Command/_mount: new completion for btrfs and
@@ -1769,7 +1788,7 @@
 	* users/17042: Src/jobs.c: don't stomp the environment in "jobs -Z"
 	unless we've first copied it to new memory.
 
-2012-11-16  Oliver Kiddle <opk@zsh.org>
+2012-11-16  Oliver Kiddle  <opk@zsh.org>
 
 	* 30802: Completion/Unix/Command/_find: add new command switches
 
@@ -1787,7 +1806,7 @@
 	* 30800: Michal Halenka: Completion/Unix/Command/_arping: fix
 	option.
 
-2012-11-12  Oliver Kiddle <opk@zsh.org>
+2012-11-12  Oliver Kiddle  <opk@zsh.org>
 
 	* 30795: Completion/Unix/Command/_xz,
 	Completion/Unix/Command/_bzip2: new xz completion, new bzip2 options
@@ -1795,7 +1814,7 @@
 	* 30794: Completion/Unix/Command/_irssi,
 	Completion/Unix/Command/_mutt: update for new options
 
-2012-11-11  Oliver Kiddle <opk@zsh.org>
+2012-11-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 30793: Completion/Unix/Command/_getent,
 	Completion/Unix/Command/_iconv, Completion/Unix/Command/_ldd:
@@ -1815,7 +1834,7 @@
 	* 30780: Doc/Zsh/builds.yo: document that set -o failures are
 	hard but setopt failures are soft.
 
-2012-11-07  Oliver Kiddle <opk@zsh.org>
+2012-11-07  Oliver Kiddle  <opk@zsh.org>
 
 	* Benjamin R. Haskell: 30737: Completion/Unix/Command/_git:
 	make custom completion functions for git aliases easier
@@ -1884,7 +1903,7 @@
 	Test/C04funcdef.ztst: emulate command evaluations should apply
 	sticky emulation to autoloads, too.
 
-2012-10-07  Oliver Kiddle <opk@zsh.org>
+2012-10-07  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Unix/Command/_webbrowser,
 	Completion/Unix/Type/_pspdf: add evince, zathura, dwb
@@ -1938,7 +1957,7 @@
 	Functions/VCS_Info/Backends/VCS_INFO_detect_fossil: Fix fossil
 	detection on unix
 
-2012-09-28  Oliver Kiddle <opk@zsh.org>
+2012-09-28  Oliver Kiddle  <opk@zsh.org>
 
 	* 30697: Completion/Unix/Command/_dbus: new completion definition
 

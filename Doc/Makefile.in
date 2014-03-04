@@ -41,7 +41,8 @@ LN_S            = @LN_S@
 MAKEINFO = makeinfo
 TEXI2DVI = texi2dvi
 DVIPS = dvips
-TEXI2HTML = @TEXI2HTML@ --output . --ifinfo --split=chapter --node-files
+TEXI2HTML = @TEXI2HTML@ --output . --ifinfo --split=chapter --node-files \
+            --init-file $(sdir)/texi2html.conf
 
 .SUFFIXES: .yo .1
 
@@ -159,7 +160,7 @@ zsh_a4.ps: zsh.dvi
 html: zsh_toc.html
 .PHONY: html
 
-zsh_toc.html: $(sdir)/zsh.texi
+zsh_toc.html: $(sdir)/zsh.texi $(sdir)/texi2html.conf
 	$(TEXI2HTML) $(sdir)/zsh.texi
 
 zshall.1: zsh.yo
@@ -247,6 +248,10 @@ version.yo: $(sdir_top)/Config/version.mk
 	  echo 'def(zlogout)(0)(@zlogout@)'; \
 	  echo 'IFDEF(DECWSLEVEL)(DECWSLEVEL())(ENDDEF())#' | tr '#' '\\'; \
 	) > $(sdir)/version.yo
+
+texi2html.conf: $(sdir_top)/Config/version.mk
+	echo '$$PRE_BODY_CLOSE = "<font size=\"-1\">Zsh version $(VERSION), released on $(VERSION_DATE).</font>";' \
+	    > $(sdir)/$@
 
 Zsh/modlist.yo: $(MODDOCSRC)
 	( \
@@ -388,6 +393,7 @@ clean-here:
 	rm -f *.aux *.cp *.cps *.fn *.fns *.ky *.log
 	rm -f *.pg *.pgs *.toc *.tp *.tps *.vr *.vrs
 	rm -rf infodir
+	rm -f texi2html.conf
 .PHONY: clean-here
 
 distclean-here: clean-here

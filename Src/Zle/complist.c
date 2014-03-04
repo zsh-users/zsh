@@ -383,12 +383,25 @@ getcoldef(char *s)
     } else if (*s == '=') {
 	char *p = ++s, *t, *cols[MAX_POS];
 	int ncols = 0;
+	int nesting = 0;
 	Patprog prog;
 
 	/* This is for a pattern. */
 
-	while (*s && *s != '=')
-	    s++;
+	while (*s && (nesting || *s != '=')) {
+	    switch (*s++) {
+		case '\\':
+		    if (*s)
+			s++;
+		    break;
+		case '(':
+		    nesting++;
+		    break;
+		case ')':
+		    nesting--;
+		    break;
+	    }
+	}
 	if (!*s)
 	    return s;
 	*s++ = '\0';
