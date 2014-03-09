@@ -1,6 +1,12 @@
+2014-03-09  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32468: Src/Modules/zutil.c: save/restore match/mbegin/mend
+	when doing pattern lookups against zstyle contexts
+
 2014-03-03  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/18550: Doc/Zsh/compsys.yo: matcher-list clarifications
+
 2014-03-03  Simon Ruderich  <simon@ruderich.org>
 
 	* 32289: Doc: Add zsh version to footer in HTML documentation.

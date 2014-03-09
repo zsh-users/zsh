@@ -30,6 +30,55 @@
 #include "zutil.mdh"
 #include "zutil.pro"
 
+typedef struct {
+    char **match;
+    char **mbegin;
+    char **mend;
+} MatchData;
+
+static void
+savematch(MatchData *m)
+{
+    char **a;
+
+    queue_signals();
+    a = getaparam("match");
+    m->match = a ? zarrdup(a) : NULL;
+    a = getaparam("mbegin");
+    m->mbegin = a ? zarrdup(a) : NULL;
+    a = getaparam("mend");
+    m->mend = a ? zarrdup(a) : NULL;
+    unqueue_signals();
+}
+
+static void
+restorematch(MatchData *m)
+{
+    if (m->match)
+	setaparam("match", m->match);
+    else
+	unsetparam("match");
+    if (m->mbegin)
+	setaparam("mbegin", m->mbegin);
+    else
+	unsetparam("mbegin");
+    if (m->mend)
+	setaparam("mend", m->mend);
+    else
+	unsetparam("mend");
+}
+
+static void
+freematch(MatchData *m)
+{
+    if (m->match)
+	freearray(m->match);
+    if (m->mbegin)
+	freearray(m->mbegin);
+    if (m->mend)
+	freearray(m->mend);
+}
+
 /* Style stuff. */
 
 typedef struct stypat *Stypat;
@@ -370,15 +419,21 @@ lookupstyle(char *ctxt, char *style)
 {
     Style s;
     Stypat p;
+    char **found = NULL;
 
     s = (Style)zstyletab->getnode2(zstyletab, style);
-    if (!s)
-	return NULL;
-    for (p = s->pats; p; p = p->next)
-	if (pattry(p->prog, ctxt))
-	    return (p->eval ? evalstyle(p) : p->vals);
+    if (s) {
+	MatchData match;
+	savematch(&match);
+	for (p = s->pats; p; p = p->next)
+	    if (pattry(p->prog, ctxt)) {
+		found = (p->eval ? evalstyle(p) : p->vals);
+		break;
+	    }
+	restorematch(&match);
+    }
 
-    return NULL;
+    return found;
 }
 
 static int
@@ -913,55 +968,6 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 }
 
 /* Zregexparse stuff. */
-
-typedef struct {
-    char **match;
-    char **mbegin;
-    char **mend;
-} MatchData;
-
-static void
-savematch(MatchData *m)
-{
-    char **a;
-
-    queue_signals();
-    a = getaparam("match");
-    m->match = a ? zarrdup(a) : NULL;
-    a = getaparam("mbegin");
-    m->mbegin = a ? zarrdup(a) : NULL;
-    a = getaparam("mend");
-    m->mend = a ? zarrdup(a) : NULL;
-    unqueue_signals();
-}
-
-static void
-restorematch(MatchData *m)
-{
-    if (m->match)
-	setaparam("match", m->match);
-    else
-	unsetparam("match");
-    if (m->mbegin)
-	setaparam("mbegin", m->mbegin);
-    else
-	unsetparam("mbegin");
-    if (m->mend)
-	setaparam("mend", m->mend);
-    else
-	unsetparam("mend");
-}
-
-static void
-freematch(MatchData *m)
-{
-    if (m->match)
-	freearray(m->match);
-    if (m->mbegin)
-	freearray(m->mbegin);
-    if (m->mend)
-	freearray(m->mend);
-}
 
 typedef struct {
     int cutoff;
