@@ -1,5 +1,7 @@
 2014-03-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Kosuke Asami: 32473: Completion/Unix/Command/_pgrep: tidy up
+
 	* Kosuke Asami: 32471: Completion/Unix/Command/_pgrep: handle
 	BSD process options.
 

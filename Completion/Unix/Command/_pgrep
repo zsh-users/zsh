@@ -1,39 +1,37 @@
-#compdef pgrep pkill 
+#compdef pgrep pkill
 
 local context state line ret=1 expl
 typeset -A opt_args
 typeset -a arguments
 
-arguments=('-P[parent process id]:parent process id:->ppid' 
+arguments=('-P[parent process id]:parent process id:->ppid'
      '-F[match only in process in pidfile]:files:_files'
-     '-g[match only in process group ids]:group:->pgid' 
-     '-G[match only real group id]:group:_groups' 
+     '-g[match only in process group ids]:group:->pgid'
+     '-G[match only real group id]:group:_groups'
      '-j[match only in processes inside jails]:jail id:->jid'
      '-M[extract the name list from the specified core]:files:_files'
      '-N[extract the name list from the specified system]:files:_files'
-     '-s[match only session id]:session id:->sid' 
+     '-s[match only session id]:session id:->sid'
      '-t[match only controlled by terminal]:terminal device:->tty'
      '-T[match only in processes specified routing table in rtable]'
-     '-u[match only effective user id]:user:_users' 
-     '-U[match only real user id]:user:_users' 
-           '(-n)-o[oldest process]' 
-     '(-o)-n[newest process]' 
+     '-u[match only effective user id]:user:_users'
+     '-U[match only real user id]:user:_users'
+     '(-n)-o[oldest process]'
+     '(-o)-n[newest process]'
      '-a[include process ancestors in the match list]'
      '-c[print a count of matching processes]'
-     '-f[match against full command line]' 
+     '-f[match against full command line]'
      '-i[ignore case distinctions]'
      '-I[confirmation before attempting to single each process]'
      '-L[given pidfile must be locked]'
      '-q[do not write anything to standard output]'
      '-S[search also in system processes]'
-     '-v[negate matching]' 
+     '-v[negate matching]'
      '-x[match exactly]')
 
-if [[ $service == 'pkill' ]]
-then
+if [[ $service == 'pkill' ]]; then
   arguments+=('-'${^signals}'[signal]')
-elif [[ $service == 'pgrep' ]]
-then
+elif [[ $service == 'pgrep' ]]; then
   arguments+=('-d[output delimiter]:delimiter:compadd ${(s\:\:)IFS}'
         '-l[list name in addition to id]')
 fi
@@ -71,7 +69,7 @@ case $state in
     ttys=( /dev/tty*(N) /dev/pts/*(N) )
     _wanted tty expl 'terminal device' compadd -S ',' -q -F used ${ttys#/dev/}
     ;;
-    
+
   (sid)
     if [[ $OSTYPE == openbsd* ]]; then
       break
@@ -89,7 +87,7 @@ case $state in
 
     _wanted sid expl 'session id' compadd -S ',' -q -F used $sid
     ;;
-  
+
   (jid)
     compset -P '*,'
 
@@ -127,17 +125,15 @@ case $state in
 
     _wanted pgid expl 'process group id' compadd -S ',' -q -F used $pgid
     ;;
-  
+
   (pname)
     local ispat="pattern matching "
-    if (( ${+opt_args[-x]} ))
-    then
+    if (( ${+opt_args[-x]} )); then
       ispat=""
     fi
 
     local command
-    if (( ${+opt_args[-f]} ))
-    then
+    if (( ${+opt_args[-f]} )); then
       if [[ "$OSTYPE" == freebsd* ]] && (( ${+opt_args[-S]} )); then
         command="$(ps -axH -o command=)"
       elif [[ "$OSTYPE" == (freebsd|openbsd|darwin)* ]]; then
@@ -157,7 +153,7 @@ case $state in
       _wanted pname expl $ispat'process name' compadd ${(u)${(f)${command}}}
     fi
     ;;
-  
+
 esac && ret=0
 
 return ret
