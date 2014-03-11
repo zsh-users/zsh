@@ -5,18 +5,29 @@ typeset -A opt_args
 typeset -a arguments
 
 arguments=('-P[parent process id]:parent process id:->ppid' 
+     '-F[match only in process in pidfile]:files:_files'
      '-g[match only in process group ids]:group:->pgid' 
      '-G[match only real group id]:group:_groups' 
+     '-j[match only in processes inside jails]'
+     '-M[extract the name list from the specified core]:files:_files'
+     '-N[extract the name list from the specified system]:files:_files'
      '-s[match only session id]:session id:->sid' 
      '-t[match only controlled by terminal]:terminal device:->tty'
+     '-T[match only in processes specified routing table in rtable]'
      '-u[match only effective user id]:user:_users' 
      '-U[match only real user id]:user:_users' 
            '(-n)-o[oldest process]' 
      '(-o)-n[newest process]' 
+     '-a[include process ancestors in the match list]'
+     '-c[print a count of matching processes]'
      '-f[match against full command line]' 
+     '-i[ignore case distinctions]'
+     '-I[confirmation before attempting to single each process]'
+     '-L[given pidfile must be locked]'
+     '-q[do not write anything to standard output]'
+     '-S[search also in system processes]'
      '-v[negate matching]' 
-     '-x[match exactly]' 
-     '*:process name:->pname')
+     '-x[match exactly]')
 
 if [[ $service == 'pkill' ]]
 then
@@ -26,6 +37,27 @@ then
   arguments+=('-d[output delimiter]:delimiter:compadd ${(s\:\:)IFS}'
         '-l[list name in addition to id]')
 fi
+
+local optchars
+case "$OSTYPE" in
+  linux*)
+    optchars="cflvxdnoPgsuUGt"
+    ;;
+  freebsd*)
+    optchars="LSafilnoqvxFGMNPUdgjstu"
+    ;;
+  openbsd*)
+    optchars="flnoqvxdGgPsTtUu"
+    ;;
+  darwin*)
+    optchars="LafilnoqvxFGPUdgtu"
+    ;;
+  *)
+    optchars="flvxdnoPgsuUGt"
+    ;;
+esac
+arguments=( ${(M)arguments:#(|\*)(|\(*\))-[$optchars]*}
+     '*:process name:->pname')
 
 _arguments -s -w $arguments && ret=0
 

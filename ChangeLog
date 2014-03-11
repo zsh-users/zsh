@@ -1,3 +1,7 @@
+2014-03-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Kosuke Asami: 32472: Completion/Unix/Command/_pgrep: new options.
+
 2014-03-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Jun T: 32480: Src/Zle/zle_vi.c: fix crash in vi mode when too
