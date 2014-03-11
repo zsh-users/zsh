@@ -8,7 +8,7 @@ arguments=('-P[parent process id]:parent process id:->ppid'
      '-F[match only in process in pidfile]:files:_files'
      '-g[match only in process group ids]:group:->pgid' 
      '-G[match only real group id]:group:_groups' 
-     '-j[match only in processes inside jails]'
+     '-j[match only in processes inside jails]:jail id:->jid'
      '-M[extract the name list from the specified core]:files:_files'
      '-N[extract the name list from the specified system]:files:_files'
      '-s[match only session id]:session id:->sid' 
@@ -73,21 +73,43 @@ case $state in
     ;;
     
   (sid)
+    if [[ $OSTYPE == openbsd* ]]; then
+      break
+    fi
+
     compset -P '*,'
 
     local -a used sid
     used=(${(s:,:)IPREFIX})
-    sid=(${(uon)$(ps -A o sid=)})
+    if [[ $OSTYPE == freebsd* ]]; then
+      sid=(${(uon)$(ps -ax -o sid=)})
+    else
+      sid=(${(uon)$(ps -A o sid=)})
+    fi
 
     _wanted sid expl 'session id' compadd -S ',' -q -F used $sid
     ;;
   
+  (jid)
+    compset -P '*,'
+
+    local -a used jid
+    used=(${(s:,:)IPREFIX})
+    jid=(${(uon)$(ps -ax -o jid=)})
+
+    _wanted jid expl 'jail id' compadd -S ',' -q -F used $jid
+    ;;
+
   (ppid)
     compset -P '*,'
 
     local -a used ppid
     used=(${(s:,:)IPREFIX})
-    ppid=(${(uon)$(ps -A o ppid=)})
+    if [[ $OSTYPE == (freebsd|openbsd|darwin)* ]]; then
+      ppid=(${(uon)$(ps -ax -o ppid=)})
+    else
+      ppid=(${(uon)$(ps -A o ppid=)})
+    fi
 
     _wanted ppid expl 'parent process id' compadd -S ',' -q -F used $ppid
     ;;
@@ -97,7 +119,11 @@ case $state in
 
     local -a used pgid
     used=(${(s:,:)IPREFIX})
-    pgid=(${(uon)$(ps -A o pgid=)})
+    if [[ $OSTYPE == (freebsd|openbsd|darwin)* ]]; then
+      pgid=(${(uon)$(ps -ax -o pgid=)})
+    else
+      pgid=(${(uon)$(ps -A o pgid=)})
+    fi
 
     _wanted pgid expl 'process group id' compadd -S ',' -q -F used $pgid
     ;;
@@ -108,11 +134,27 @@ case $state in
     then
       ispat=""
     fi
+
+    local command
     if (( ${+opt_args[-f]} ))
     then
-      _wanted pname expl $ispat'process command line' compadd ${(u)${(f)"$(ps -A o cmd=)"}}
+      if [[ "$OSTYPE" == freebsd* ]] && (( ${+opt_args[-S]} )); then
+        command="$(ps -axH -o command=)"
+      elif [[ "$OSTYPE" == (freebsd|openbsd|darwin)* ]]; then
+        command="$(ps -ax -o command=)"
+      else
+        command="$(ps -A o cmd=)"
+      fi
+      _wanted pname expl $ispat'process command line' compadd ${(u)${(f)${command}}}
     else
-      _wanted pname expl $ispat'process name' compadd ${(u)${(f)"$(ps -A co cmd=)"}}
+      if [[ "$OSTYPE" == freebsd* ]] && (( ${+opt_args[-S]} )); then
+        command="$(ps -axcH -o command=)"
+      elif [[ "$OSTYPE" == (freebsd|openbsd|darwin)* ]]; then
+        command="$(ps -axc -o command=)"
+      else
+        command="$(ps -A co cmd=)"
+      fi
+      _wanted pname expl $ispat'process name' compadd ${(u)${(f)${command}}}
     fi
     ;;
   
