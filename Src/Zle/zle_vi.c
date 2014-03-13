@@ -401,7 +401,7 @@ vichange(UNUSED(char **args))
 	forekill(c2 - zlecs, CUT_RAW);
 	selectkeymap("main", 1);
 	viinsbegin = zlecs;
-	vistartchange = curchange->prev->changeno;
+	vistartchange = (curchange && curchange->prev) ? curchange->prev->changeno : 0;
     }
     return ret;
 }

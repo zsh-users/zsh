@@ -1,3 +1,8 @@
+2014-03-13  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Jun T: 32480: Src/Zle/zle_vi.c: fix crash in vi mode when too
+	few previous changes.
+
 2014-03-09  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32468: Src/Modules/zutil.c: save/restore match/mbegin/mend
