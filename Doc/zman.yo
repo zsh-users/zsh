@@ -69,7 +69,7 @@ def(chapter)(1)(CMT())
 COMMENT(--- the "" works around a yodl bug in versions before 2 ---)
 def(sect)(1)(\
   IFDEF(INCWSLEVEL)(\
-  NOTRANS(.SH )"UPPERCASE(ARG1)(0)"+NL()\
+  NOTRANS(.SH )"UPPERCASE(NOTRANS(ARG1))(0)"+NL()\
   )(\
   NOTRANS(.SH )UPPERCASE(ARG1)(0)""+NL()\
   )\
