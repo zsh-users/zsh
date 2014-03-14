@@ -4688,9 +4688,10 @@ exit_pending;
 int
 bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 {
-    int num = lastval, nump = 0;
+    int num = lastval, nump = 0, implicit;
 
     /* handle one optional numeric argument */
+    implicit = !*argv;
     if (*argv) {
 	num = mathevali(*argv++);
 	nump = 1;
@@ -4721,7 +4722,13 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	    retflag = 1;
 	    breaks = loops;
 	    lastval = num;
-	    if (trap_state == TRAP_STATE_PRIMED && trap_return == -2) {
+	    if (trap_state == TRAP_STATE_PRIMED && trap_return == -2
+		/*
+		 * With POSIX, "return" on its own in a trap doesn't
+		 * update $? --- we keep the status from before the
+		 * trap.
+		 */
+		&& !(isset(POSIXTRAPS) && implicit)) {
 		trap_state = TRAP_STATE_FORCE_RETURN;
 		trap_return = lastval;
 	    }

@@ -1,3 +1,8 @@
+2014-03-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 32479: Src/builtin.c, Src/signals.c: with POSIXTRAPS
+	never propagate an implicit return from within a trap.
+
 2014-03-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Kosuke Asami: 32473: Completion/Unix/Command/_pgrep: tidy up
