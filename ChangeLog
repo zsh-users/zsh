@@ -1,3 +1,8 @@
+2014-03-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Mariusz Fik: 32847: Completion/openSUSE/Command/_zypper: new
+	options.
+
 2014-03-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Doc/Zsh/options.yo: document effect of 32479.
