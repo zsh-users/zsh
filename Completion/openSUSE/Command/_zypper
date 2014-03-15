@@ -2,6 +2,7 @@
 #
 # Copyright (C) 2009 Holger Macht <holger@homac.de>
 # Copyright (C) 2014 Thomas Mitterfellner <thomas.mitterfellner@gmail.com>
+# Copyright (C) 2014 Mariusz Fik <fisiu@opensuse.org>
 #
 # This file is released under the GPLv2.
 #
@@ -45,8 +46,10 @@ _zypper() {
             # start parsing with "Global Options:"
             [[ $hline =~ "^Global Options:" ]] && tag=1
             [[ $tag = 0 ]] && continue
+            # skip empty lines
+            [[ $hline =~ ^\s*$ ]] && continue
             # all commands have to start with lower case letters
-            [[ $hline[1] =~ ^[A-Z] ]] && continue
+            [[ $hline == [[:upper:]]* ]] && continue
             (( ${#hline} < 2 )) && continue
 
             # cut comma at end of command
