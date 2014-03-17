@@ -110,7 +110,7 @@ def(startitem)(0)(\
 def(enditem)(0)(\
   ENDITEM()\
   STDPAR()\
-  +redef(ENDITEM)(0)(NOTRANS(.RE)STDPAR())\
+  +redef(ENDITEM)(0)(NOTRANS(.RE)STDPAR()redef(ENDITEM)(0)(CMT()))\
 )
 def(item)(2)(\
   NOTRANS(.TP)+NL()\
@@ -121,7 +121,7 @@ def(item)(2)(\
   +redef(PARAGRAPH)(0)(\
     NL()NOTRANS(.RS)+NL()NOTRANS(.PP)+NL()\
     STDPAR()\
-    +redef(ENDITEM)(0)(NOTRANS(.RE)STDPAR())\
+    +redef(ENDITEM)(0)(NOTRANS(.RE)STDPAR()redef(ENDITEM)(0)(CMT()))\
   )\
   ARG2\
   +ENDITEM()\
