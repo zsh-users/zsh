@@ -2904,7 +2904,7 @@ file name is matched against the pattern, regardless of how the file
 was passed to the handler.  The file is resolved to a full path using
 the tt(:A) modifier described in
 ifzman(the subsection Modifers in zmanref(zshexpn))\
-ifnzman(noderef(Modifiers)));
+ifnzman(noderef(Modifiers));
 this means that symbolic links are resolved where possible, so that
 links into other file systems behave in the correct fashion.
 )

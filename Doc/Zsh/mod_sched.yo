@@ -48,7 +48,7 @@ enditem()
 
 startitem()
 vindex(zsh_scheduled_events)
-item(zsh_scheduled_events)(
+item(tt(zsh_scheduled_events))(
 A readonly array corresponding to the events scheduled by the
 tt(sched) builtin.  The indices of the array correspond to the numbers
 shown when tt(sched) is run with no arguments (provided that the

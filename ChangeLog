@@ -1,3 +1,9 @@
+2014-03-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Jun T: 32493: Doc/Zsh/contrib.yo, Doc/Zsh/mod_pcre.yo,
+	Doc/Zsh/mod_regex.yo, Doc/Zsh/mod_sched.yo: some formatting
+	fixes.
+
 2014-03-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Mariusz Fik: 32847: Completion/openSUSE/Command/_zypper: new

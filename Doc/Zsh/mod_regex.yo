@@ -4,6 +4,7 @@ Interface to the POSIX regex library.
 cindex(regular expressions)
 cindex(regex)
 The tt(zsh/regex) module makes available the following test condition:
+
 startitem()
 findex(regex-match)
 item(var(expr) tt(-regex-match) var(regex))(
