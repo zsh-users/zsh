@@ -1,3 +1,10 @@
+2014-03-18  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Jun T: 32497: Test/X02zlevi.ztst, Test/comptest: avoid using
+	comptesteval in the middle of a series of tests; the change in
+	control required for sourcing the command file can confuse the
+	simulated interactive input
+
 2014-03-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Jun T: 32494: Doc/zman.yo: Yodl hack to fix indentation

@@ -102,6 +102,14 @@ zpty_flush() {
   fi
 }
 
+zpty_run() {
+  zpty -w zsh "$*"
+  zpty -r -m zsh log "*<PROMPT>*" || {
+    print "prompt hasn't appeared."
+    return 1
+  }
+}
+
 comptesteval () {
   local tmp=/tmp/comptest.$$
 

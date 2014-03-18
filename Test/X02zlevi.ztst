@@ -21,19 +21,19 @@
 >text
 >CURSOR: 8
 
-  comptesteval 'print -z before'
+  zpty_run 'print -z before'
   zletest $'after\e.'
 0:repeat initial edit with non-blank starting line
 >BUFFER: beforeafterafter
 >CURSOR: 15
 
-  comptesteval 'setopt overstrike;print -z bung'
+  zpty_run 'setopt overstrike;print -z bung'
   zletest $'ing\e2|.'
 0:repeat initial edit with overstrike set
 >BUFFER: binging
 >CURSOR: 3
 
-  comptesteval 'bindkey "^_" undo'
+  zpty_run 'bindkey "^_" undo'
   zletest $'undoc\037e'
 0:use of undo in vi insert mode
 >BUFFER: undoe
@@ -49,19 +49,19 @@
 >BUFFER: z
 >CURSOR: 1
 
-  comptesteval 'bindkey -a "^K" redo'
+  zpty_run 'bindkey -a "^K" redo'
   zletest $'123\C-_\e\C-k'
 0:undo in insert mode, redo in command
 >BUFFER: 123
 >CURSOR: 2
 
-  comptesteval 'bindkey "^Y" redo'
+  zpty_run 'bindkey "^Y" redo'
   zletest $'pre\eA123\C-_\C-y\eu'
 0:undo and redo in insert mode, undo in command
 >BUFFER: pre
 >CURSOR: 2
 
-  comptesteval 'bindkey "^Gu" split-undo'
+  zpty_run 'bindkey "^Gu" split-undo'
   zletest $'one\C-gutwo\eu'
 0:split the undo sequence
 >BUFFER: one
