@@ -2223,6 +2223,8 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalen,
 
 	return ret;
     } else {
+	int q = queue_signal_level();
+
 	/*
 	 * Test for a `must match' string, unless we're scanning for a match
 	 * in which case we don't need to do this each time.
@@ -2269,6 +2271,8 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalen,
 	parsfound = 0;
 
 	patinput = patinstart;
+
+	dont_queue_signals();
 
 	if (patmatch((Upat)progstr)) {
 	    /*
@@ -2406,6 +2410,8 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalen,
 	} else
 	    ret = 0;
 
+	restore_queue_signals(q);
+
 	if (tryalloced)
 	    zfree(tryalloced, unmetalen + unmetalenp);
 
@@ -2485,7 +2491,7 @@ patmatch(Upat prog)
     zrange_t from, to, comp;
     patint_t nextch;
 
-    while  (scan) {
+    while  (scan && !errflag) {
 	next = PATNEXT(scan);
 
 	if (!globdots && P_NOTDOT(scan) && patinput == patinstart &&

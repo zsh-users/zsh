@@ -6,6 +6,8 @@
 
 2014-03-18  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32500: Src/pattern.c: handle interrupts during pattern matching
+
 	* Jun T: 32497: Test/X02zlevi.ztst, Test/comptest: avoid using
 	comptesteval in the middle of a series of tests; the change in
 	control required for sourcing the command file can confuse the
