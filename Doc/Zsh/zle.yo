@@ -252,6 +252,9 @@ Bind each var(in-string) to each var(out-string).
 When var(in-string) is typed, var(out-string) will be
 pushed back and treated as input to the line editor.
 When tt(-R) is also used, interpret the var(in-string)s as ranges.
+
+Note that both var(in-string) and var(out-string) are subject to the same
+form of interpretation, as described below.
 )
 item(var(in-string command) ...)(
 Bind each var(in-string) to each var(command).

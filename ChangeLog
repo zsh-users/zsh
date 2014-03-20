@@ -1,5 +1,8 @@
 2014-03-20  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* users/18644: Doc/Zsh/zle.yo: bindkey -s doc should refer to
+	documentation for argument interpretation.
+
 	* Completion/Unix/Command/_perforce: finally, after more than
 	ten years, complete depots after // in file paths as it always
 	should have done.
