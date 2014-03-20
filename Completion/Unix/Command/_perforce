@@ -1203,9 +1203,11 @@ _perforce_files() {
     # probably ought to be optional (you can do it with tags if
     # you really want).
     if [[ $PREFIX = //[^/]# && $whole_path -eq 0 ]]; then
-      # Complete //clientname spec.  Don't complete non-directories...
+      # Complete //clientname or //depot spec.
+      # Don't complete non-directories...
       # I don't actually know if they are valid here.
-      altfiles+=("clients:Perforce client:_perforce_clients")
+      altfiles+=("clients:Perforce client:_perforce_clients"
+	"depots:Perforce depot:_perforce_depots")
     else
       local donefiles=1
       if [[ -z $dodirs ]]; then

@@ -1,3 +1,9 @@
+2014-03-20  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Completion/Unix/Command/_perforce: finally, after more than
+	ten years, complete depots after // in file paths as it always
+	should have done.
+
 2014-03-18  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Jun T: 32497: Test/X02zlevi.ztst, Test/comptest: avoid using
