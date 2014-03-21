@@ -925,7 +925,7 @@ _git-grep () {
     '--untracked[search in untracked files]' \
     '(-a --text)'{-a,--text}'[process binary files as if they were text]' \
     '(--textconv --no-textconv)--textconv[honor textconv filter settings]' \
-    '(--textconv --no-textconv}--no-textconv[do not honor textconv filter settings]' \
+    '(--textconv --no-textconv)--no-textconv[do not honor textconv filter settings]' \
     '(-i --ignore-case)'{-i,--ignore-case}'[ignore case when matching]' \
     '-I[do not match pattern in binary files]' \
     '--max-depth=[descend at most given levels of directories]: :__git_guard_number depth' \

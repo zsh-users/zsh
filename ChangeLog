@@ -1,3 +1,8 @@
+2014-03-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Takeshi Banse: 32502: Completion/Unix/Command/_git: fix typo
+	in argument list.
+
 2014-03-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/18644: Doc/Zsh/zle.yo: bindkey -s doc should refer to
