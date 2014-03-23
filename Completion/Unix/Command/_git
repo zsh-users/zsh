@@ -1536,7 +1536,7 @@ _git-stash () {
             '(--keep-index                )--no-keep-index[all changes already added to the index are undone]' \
             '(-q --quiet)'{-q,--quiet}'[suppress all output]' \
             '(-u --include-untracked)'{-u,--include-untracked}'[include untracked files]' \
-            '::message' && ret=0
+            ':: :_guard "([^-]?#|)" message' && ret=0
           ;;
         (list)
           local -a log_options revision_options
@@ -5602,7 +5602,7 @@ __git_commit_ranges () {
   if compset -P '*..(.|)'; then
     __git_commits $*
   else
-    compset -S '..*' || suf=( -qS .. -r '.@~ ^:' )
+    compset -S '..*' || suf=( -S .. -r '.@~ ^:\t\n\-' )
     __git_commits $* $suf
   fi
 }

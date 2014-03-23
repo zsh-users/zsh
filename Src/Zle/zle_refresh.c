@@ -1046,8 +1046,8 @@ zrefresh(void)
 	region_highlights[1].start = region_highlights[1].end = -1;
     }
     /* check for an active completion suffix */
-    if (suffixnoinslen) {
-	region_highlights[2].start = zlecs - suffixnoinslen;
+    if (suffixlen) {
+	region_highlights[2].start = zlecs - suffixlen;
 	region_highlights[2].end = zlecs;
     } else {
 	region_highlights[2].start = region_highlights[2].end = -1;

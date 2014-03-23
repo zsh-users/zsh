@@ -1131,7 +1131,7 @@ do_single(Cmatch m)
 	    /* If a suffix was added, and is removable, let *
 	     * `,' and `}' remove it.                       */
 	    if (isset(AUTOPARAMKEYS))
-		addsuffix(SUFTYP_POSSTR, 0, ZWS(",}"), 2, suffixnoinslen);
+		addsuffix(SUFTYP_POSSTR, 0, ZWS(",}"), 2, suffixlen);
 	} else if (!menucmp) {
 	    /*{{*/
 	    /* Otherwise, add a `,' suffix, and let `}' remove it. */

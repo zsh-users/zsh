@@ -1249,10 +1249,14 @@ static char *suffixfunc;
 /* Length associated with the suffix function */
 static int suffixfunclen;
 
-/* Length associated with uninsertable characters */
+/* Whether to remove suffix on uninsertable characters */
+/**/
+int suffixnoinsrem;
+
+/* Length of the currently active, auto-removable suffix. */
 /**/
 mod_export int
-suffixnoinslen;
+suffixlen;
 
 /**/
 mod_export void
@@ -1309,7 +1313,8 @@ makesuffix(int n)
     if ((suffixchars = getsparam("ZLE_SPACE_SUFFIX_CHARS")) && *suffixchars)
 	addsuffixstring(SUFTYP_POSSTR, SUFFLAGS_SPACE, suffixchars, n);
 
-    suffixnoinslen = n;
+    suffixlen = n;
+    suffixnoinsrem = 1;
 }
 
 /* Set up suffix for parameter names: the last n characters are a suffix *
@@ -1358,15 +1363,10 @@ makesuffixstr(char *f, char *s, int n)
 	s = metafy(s, i, META_USEHEAP);
 	ws = stringaszleline(s, 0, &i, NULL, NULL);
 
-	if (z)
-	    suffixnoinslen = inv ? 0 : n;
-	else if (inv) {
-	    /*
-	     * negative match, \- wasn't present, so it *should*
-	     * have this suffix length
-	     */
-	    suffixnoinslen = n;
-	}
+	/* Remove suffix on uninsertable characters if  \- was given *
+	 * and the character class wasn't negated -- or vice versa.  */
+	suffixnoinsrem = z ^ inv;
+	suffixlen = n;
 
 	lasts = wptr = ws;
 	while (i) {
@@ -1444,7 +1444,7 @@ iremovesuffix(ZLE_INT_T c, int keep)
 	struct suffixset *ss;
 
 	if (c == NO_INSERT_CHAR) {
-	    sl = suffixnoinslen;
+	    sl = suffixnoinsrem ? suffixlen : 0;
 	} else {
 	    ZLE_CHAR_T ch = c;
 	    /*
@@ -1538,5 +1538,5 @@ fixsuffix(void)
 	suffixlist = next;
     }
 
-    suffixfunclen = suffixnoinslen = 0;
+    suffixfunclen = suffixnoinsrem = suffixlen = 0;
 }
