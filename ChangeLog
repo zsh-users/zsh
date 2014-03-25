@@ -1,3 +1,8 @@
+2014-03-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Danek Duvall: 32505: Completion/Unix/Command/_pgrep: improved
+	Solaris compatibility for pgrep completion.
+
 2014-03-23  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* m0viefreak: users/18660: Src/Zle/compresult.c,

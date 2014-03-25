@@ -9,6 +9,7 @@ arguments=('-P[parent process id]:parent process id:->ppid'
      '-g[match only in process group ids]:group:->pgid'
      '-G[match only real group id]:group:_groups'
      '-j[match only in processes inside jails]:jail id:->jid'
+     '-J[match only in project ids]:project id:->projid'
      '-M[extract the name list from the specified core]:files:_files'
      '-N[extract the name list from the specified system]:files:_files'
      '-s[match only session id]:session id:->sid'
@@ -27,7 +28,8 @@ arguments=('-P[parent process id]:parent process id:->ppid'
      '-q[do not write anything to standard output]'
      '-S[search also in system processes]'
      '-v[negate matching]'
-     '-x[match exactly]')
+     '-x[match exactly]'
+     '-z[match only in zones]:zone:_zones')
 
 if [[ $service == 'pkill' ]]; then
   arguments+=('-'${^signals}'[signal]')
@@ -49,6 +51,13 @@ case "$OSTYPE" in
     ;;
   darwin*)
     optchars="LafilnoqvxFGPUdgtu"
+    ;;
+  solaris*)
+    optchars="flvxdnoPgsuUGJtTcz"
+    arguments=( ${arguments##-T*} )
+    arguments=( ${arguments##-c*} )
+    arguments+=( '-T[match only processes in task ids]:taskid:->task' )
+    arguments+=( '-c[match only processes in contract ids]:taskid:->contract' )
     ;;
   *)
     optchars="flvxdnoPgsuUGt"
@@ -82,7 +91,7 @@ case $state in
     if [[ $OSTYPE == freebsd* ]]; then
       sid=(${(uon)$(ps -ax -o sid=)})
     else
-      sid=(${(uon)$(ps -A o sid=)})
+      sid=(${(uon)$(ps -A -o sid=)})
     fi
 
     _wanted sid expl 'session id' compadd -S ',' -q -F used $sid
@@ -106,7 +115,7 @@ case $state in
     if [[ $OSTYPE == (freebsd|openbsd|darwin)* ]]; then
       ppid=(${(uon)$(ps -ax -o ppid=)})
     else
-      ppid=(${(uon)$(ps -A o ppid=)})
+      ppid=(${(uon)$(ps -A -o ppid=)})
     fi
 
     _wanted ppid expl 'parent process id' compadd -S ',' -q -F used $ppid
@@ -120,10 +129,40 @@ case $state in
     if [[ $OSTYPE == (freebsd|openbsd|darwin)* ]]; then
       pgid=(${(uon)$(ps -ax -o pgid=)})
     else
-      pgid=(${(uon)$(ps -A o pgid=)})
+      pgid=(${(uon)$(ps -A -o pgid=)})
     fi
 
     _wanted pgid expl 'process group id' compadd -S ',' -q -F used $pgid
+    ;;
+
+  (projid)
+    compset -P '*,'
+
+    local -a used projid
+    used=(${(s:,:)IPREFIX})
+    projid=(${(uon)$(ps -A -o project=)})
+
+    _wanted projid expl 'project id' compadd -S ',' -q -F used $projid
+    ;;
+
+  (contract)
+    compset -P '*,'
+
+    local -a used ctid
+    used=(${(s:,:)IPREFIX})
+    ctid=(${(uon)$(ps -A -o ctid=)})
+
+    _wanted ctid expl 'contract id' compadd -S ',' -q -F used $ctid
+    ;;
+
+  (task)
+    compset -P '*,'
+
+    local -a used taskid
+    used=(${(s:,:)IPREFIX})
+    taskid=(${(uon)$(ps -A -o project=)})
+
+    _wanted taskid expl 'task id' compadd -S ',' -q -F used $taskid
     ;;
 
   (pname)
@@ -138,6 +177,8 @@ case $state in
         command="$(ps -axH -o command=)"
       elif [[ "$OSTYPE" == (freebsd|openbsd|darwin)* ]]; then
         command="$(ps -ax -o command=)"
+      elif [[ "$OSTYPE" == solaris* ]]; then
+        command="$(ps -A -o args=)"
       else
         command="$(ps -A o cmd=)"
       fi
@@ -147,6 +188,8 @@ case $state in
         command="$(ps -axcH -o command=)"
       elif [[ "$OSTYPE" == (freebsd|openbsd|darwin)* ]]; then
         command="$(ps -axc -o command=)"
+      elif [[ "$OSTYPE" == solaris* ]]; then
+        command="$(ps -A -o comm=)"
       else
         command="$(ps -A co cmd=)"
       fi
