@@ -266,6 +266,10 @@ autoload -Uz vcs_info
 zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:*' get-revision true
 
+# Alternatively, the following would set only %c, but is faster:
+#zstyle ':vcs_info:*' check-for-changes false
+#zstyle ':vcs_info:*' check-for-staged-changes true
+
 
 # Default to running vcs_info. If possible we prevent running it later for
 # speed reasons. If set to a non empty value vcs_info is run.

@@ -182,6 +182,8 @@ styles=(
   disable                v:vcs
   disable-patterns       v:
   check-for-changes      v:bool
+  check-for-staged-changes
+                         v:bool
   stagedstr              v:
   unstagedstr            v:
   command                v:_command_names

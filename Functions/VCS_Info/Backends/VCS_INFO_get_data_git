@@ -5,6 +5,7 @@
 setopt localoptions extendedglob NO_shwordsplit
 local gitdir gitbase gitbranch gitaction gitunstaged gitstaged gitsha1
 local stgitpatch stgitunapplied
+local -i querystaged queryunstaged
 local -A hook_com
 
 VCS_INFO_git_getaction () {
@@ -120,14 +121,24 @@ if [[ -z ${gitdir} ]] || [[ -z ${gitbranch} ]] ; then
     return 1
 fi
 
-if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" "check-for-changes" && \
+if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" "check-for-changes" ; then
+    querystaged=1
+    queryunstaged=1
+elif zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" "check-for-staged-changes" ; then
+    querystaged=1
+fi
+if (( querystaged || queryunstaged )) && \
    [[ "$(${vcs_comm[cmd]} rev-parse --is-inside-git-dir 2> /dev/null)" != 'true' ]] && \
    ${vcs_comm[cmd]} rev-parse --quiet --verify HEAD &> /dev/null ; then
     # Default: off - these are potentially expensive on big repositories
-    ${vcs_comm[cmd]} diff --no-ext-diff --ignore-submodules --quiet --exit-code ||
-        gitunstaged=1
-    ${vcs_comm[cmd]} diff-index --cached --quiet --ignore-submodules HEAD 2> /dev/null
-    (( $? && $? != 128 )) && gitstaged=1
+    if (( queryunstaged )) ; then
+        ${vcs_comm[cmd]} diff --no-ext-diff --ignore-submodules --quiet --exit-code ||
+            gitunstaged=1
+    fi
+    if (( querystaged )) ; then
+        ${vcs_comm[cmd]} diff-index --cached --quiet --ignore-submodules HEAD 2> /dev/null
+        (( $? && $? != 128 )) && gitstaged=1
+    fi
 fi
 
 VCS_INFO_adjust

@@ -837,6 +837,18 @@ Note, the actions taken if this style is enabled are potentially expensive
 (read: they may be slow, depending on how big the current repository is).
 Therefore, it is disabled by default.
 )
+kindex(check-for-staged-changes)
+item(tt(check-for-staged-changes))(
+This style is like tt(check-for-changes), but it never checks the worktree
+files, only the metadata in the tt(.${vcs}) dir.  Therefore,
+this style initializes only the tt(%c) escape (with tt(stagedstr)) but
+not the tt(%u) escape.  This style is faster than tt(check-for-changes).
+
+In the tt(git) backend, this style checks for changes in the index.
+Other backends do not currently implement this style.
+
+This style is disabled by default.
+)
 kindex(stagedstr)
 item(tt(stagedstr))(
 This string will be used in the tt(%c) escape if there are staged changes in
@@ -941,6 +953,7 @@ sitem(tt(enable))(ALL)
 sitem(tt(disable))((empty list))
 sitem(tt(disable-patterns))((empty list))
 sitem(tt(check-for-changes))(false)
+sitem(tt(check-for-staged-changes))(false)
 sitem(tt(stagedstr))((string: "S"))
 sitem(tt(unstagedstr))((string: "U"))
 sitem(tt(command))((empty string))

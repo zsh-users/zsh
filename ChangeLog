@@ -1,3 +1,9 @@
+2014-04-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 32528: Completion/Zsh/Command/_zstyle, Doc/Zsh/contrib.yo,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
+	Misc/vcs_info-examples: vcs_info: Add check-for-staged-changes
+
 2014-03-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Danek Duvall: 32505: Completion/Unix/Command/_pgrep: improved
