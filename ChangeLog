@@ -4,6 +4,9 @@
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
 	Misc/vcs_info-examples: vcs_info: Add check-for-staged-changes
 
+	* 32528: Doc/Zsh/contrib.yo: vcs_info: Document 'post-backend'
+	hook and bzr 'check-for-changes' support.
+
 2014-03-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Danek Duvall: 32505: Completion/Unix/Command/_pgrep: improved

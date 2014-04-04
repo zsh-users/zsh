@@ -826,12 +826,15 @@ item(tt(check-for-changes))(
 If enabled, this style causes the tt(%c) and tt(%u) format escapes to show
 when the working directory has uncommitted changes. The strings displayed by
 these escapes can be controlled via the tt(stagedstr) and tt(unstagedstr)
-styles. The only backends that currently support this option are tt(git) and
-tt(hg) (tt(hg) only supports unstaged).
+styles. The only backends that currently support this option are tt(git),
+tt(hg), and tt(bzr) (the latter two only support unstaged).
 
 For this style to be evaluated with the tt(hg) backend, the tt(get-revision)
 style needs to be set and the tt(use-simple) style needs to be unset. The
 latter is the default; the former is not.
+
+With tt(bzr) backend, lightweight checkouts only honor this style if
+the tt(use-server) style is set.
 
 Note, the actions taken if this style is enabled are potentially expensive
 (read: they may be slow, depending on how big the current repository is).
@@ -874,7 +877,7 @@ when this style is looked up.
 
 For example, this style can be used to use binaries from non-default
 installation directories. Assume, tt(git) is installed in /usr/bin but
-your sysadmin installed a newer version in /usr/bin/local. Instead of
+your sysadmin installed a newer version in /usr/local/bin. Instead of
 changing the order of your tt($PATH) parameter, you can do this:
 example(zstyle ':vcs_info:git:*:-all-' command /usr/local/bin/git)
 )
@@ -892,6 +895,9 @@ backend is only usable if you have set the environment variable
 tt(P4CONFIG) to a file name and have corresponding files in the root
 directories of each Perforce client.  See comments in the function
 tt(VCS_INFO_detect_p4) for more detail.
+
+The Bazaar backend (tt(bzr)) uses this to permit contacting the server
+about lightweight checkouts, see the tt(check-for-changes) style.
 )
 kindex(use-simple)
 item(tt(use-simple))(
@@ -1332,6 +1338,11 @@ item(tt(no-vcs))(
 This hooks is called when no version control system was detected.
 
 The `hook_com' parameter is not used.
+)
+item(tt(post-backend))(
+Called as soon as the backend has finished collecting information.
+
+The `tt(hook_com)' keys available are as for the tt(set-message) hook.
 )
 item(tt(post-quilt))(
 Called after the tt(quilt) support is done. The following information
