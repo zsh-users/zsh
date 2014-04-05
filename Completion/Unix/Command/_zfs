@@ -221,7 +221,7 @@ _zfs() {
 	("create")
 		_arguments -A "-*" \
 			'-p[Create parent datasets]' \
-			'-o[Set initial properties]:property:_values -s , "property" $create_properties' \
+			'*-o[Set initial properties]:property:_values -s , "property" $create_properties' \
 			- set1 \
 			':filesystem:_zfs_dataset -t fs -e "parent dataset"' \
 			- set2 \
@@ -246,7 +246,7 @@ _zfs() {
 	("snapshot")
 		_arguments -A "-*" \
 			'-r[Recursively snapshot all descendant datasets]' \
-			'-o[Set property]:property:_values -s , "property" $create_properties' \
+			'*-o[Set property]:property:_values -s , "property" $create_properties' \
 			':filesystem/volume:_zfs_dataset -t fs -t vol -S@'
 		;;
 
@@ -263,7 +263,7 @@ _zfs() {
 		_arguments -A "-*" \
 			'-p[Create parent datasets]' \
 			'-K[Create encryption key]' \
-			'-o[Set property]:property:_values -s , "property" $create_properties' \
+			'*-o[Set property]:property:_values -s , "property" $create_properties' \
 			':snapshot:_zfs_dataset -t snap' \
 			':filesystem/volume:_zfs_dataset -t fs -e "parent dataset"'
 		;;

@@ -1,5 +1,8 @@
 2014-04-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 32530: llua: Completion/Unix/Command/_zfs: repeatable -o
+	argument.
+
 	* 32521: Doc/Zsh/params.yo: document that LOGNAME comes
 	from getlogin().
 
