@@ -621,7 +621,9 @@ item(tt(LOGNAME))(
 If the corresponding variable is not set in the environment of the
 shell, it is initialized to the login name corresponding to the
 current login session. This parameter is exported by default but
-this can be disabled using the tt(typeset) builtin.
+this can be disabled using the tt(typeset) builtin.  The value
+is set to the string returned by the manref(getlogin)(3) system call
+if that is available.
 )
 vindex(MACHTYPE)
 item(tt(MACHTYPE))(
