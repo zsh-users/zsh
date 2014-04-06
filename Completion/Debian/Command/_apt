@@ -1,7 +1,8 @@
-#compdef apt-get apt-cache apt-cdrom apt-config
+#compdef apt apt-get apt-cache apt-cdrom apt-config
 
 _apt () {
   case "$service" in
+    apt) _apt-cmd "$@";;
     apt-get) _apt-get "$@";;
     apt-cache) _apt-cache "$@";;
     apt-cdrom) _apt-cdrom "$@";;
@@ -387,6 +388,38 @@ _apt_consume_long () {
   opt="$canonicalize[--$1]"
   (( 0 < num_options[$opt] && num_options[$opt]-- ))
   return 0
+}
+
+_apt-cmd () {
+  _apt_arguments _apt-cmd_sm \
+    -h,--help:bool \
+    -v,--version:bool \
+    -c,--config-file:configfile \
+    -o,--option:arbitem \
+    -t,--target-release:release \
+    -- \
+    /$'list\0'/ \| \
+    /$'search\0'/ /$'[^\0]#\0'/ ':strings:pattern:' \| \
+    /$'show\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \
+    /$'update\0'/ \| \
+    \( \
+    /$'install\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \
+    /$'[^\0/]#/'/ /$'[^\0/]#\0'/ ':release name::_apt_releases' \) \| \
+    /$'remove\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
+    /$'upgrade\0'/ \| \
+    /$'full-upgrade\0'/ \| \
+    /$'edit-sources\0'/ \| \
+    /"[]"/	':argument-1::compadd "$expl_action[@]" list search show update install remove upgrade full-upgrade edit-sources'
+
+  _apt-cmd () {
+    local expl_action expl_packages
+    _description actions expl_action 'action'
+    _description packages expl_packages 'package'
+
+    _apt-cmd_sm
+  }
+
+  _apt-cmd "$@"
 }
 
 _apt-get () {

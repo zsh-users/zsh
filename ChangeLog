@@ -1,5 +1,8 @@
 2014-04-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Alessandro Ghedini: 32532: Completion/Debian/Command/_apt:
+	support 'apt' command.
+
 	* 32530: llua: Completion/Unix/Command/_zfs: repeatable -o
 	argument.
 
