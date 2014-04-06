@@ -1,5 +1,8 @@
 2014-04-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Sebastian Ramacher: 32533: Completion/Debian/Command/_apt: add
+	completion for "apt-mark".
+
 	* Alessandro Ghedini: 32532: Completion/Debian/Command/_apt:
 	support 'apt' command.
 
