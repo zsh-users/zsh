@@ -1764,7 +1764,8 @@ chrealpath(char **junkptr)
 	str++;
     }
 
-    *junkptr = metafy(bicat(real, nonreal), -1, META_HEAPDUP);
+    *junkptr = metafy(str = bicat(real, nonreal), -1, META_HEAPDUP);
+    zsfree(str);
 #ifdef HAVE_CANONICALIZE_FILE_NAME
     free(real);
 #endif

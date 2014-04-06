@@ -444,6 +444,7 @@ void
 set_region_highlight(UNUSED(Param pm), char **aval)
 {
     int len;
+    char **av = aval;
     struct region_highlight *rhp;
 
     len = aval ? arrlen(aval) : 0;
@@ -490,6 +491,8 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 
 	match_highlight(strp, &rhp->atr);
     }
+
+    freearray(av);
 }
 
 

@@ -1,3 +1,9 @@
+2014-04-06  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* 32531: Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c, Src/hist.c:
+	fix memory leaks detected by valgrind, two in ZLE region highlight
+	and one in :A history modifier.
+
 2014-04-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Sebastian Ramacher: 32533: Completion/Debian/Command/_apt: add
