@@ -1,5 +1,7 @@
 2014-04-06  Barton E. Schaefer  <schaefer@brasslantern.com>
 
+	* unposted: Doc/Zsh/options.yo: fix typo in option cross-reference
+
 	* 32531: Src/Zle/zle_refresh.c, Src/Zle/zle_tricky.c, Src/hist.c:
 	fix memory leaks detected by valgrind, two in ZLE region highlight
 	and one in :A history modifier.

@@ -1174,7 +1174,7 @@ pindex(NOHASHEXECUTABLESONLY)
 cindex(hashing, of executables)
 cindex(executables, hashing)
 item(tt(HASH_EXECUTABLES_ONLY))(
-When hashing commands because of tt(HASH_COMMANDS), check that the
+When hashing commands because of tt(HASH_CMDS), check that the
 file to be hashed is actually an executable.  This option
 is unset by default as if the path contains a large number of commands,
 or consists of many remote files, the additional tests can take
