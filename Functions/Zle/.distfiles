@@ -44,5 +44,6 @@ up-case-word-match
 up-line-or-beginning-search
 url-quote-magic
 which-command
+zcalc-auto-insert
 zed-set-file-name
 '

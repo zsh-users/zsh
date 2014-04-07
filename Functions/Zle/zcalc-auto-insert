@@ -1,0 +1,8 @@
+# Bind to a binary operator keystroke for use with zcalc
+
+if [[ -n $ZCALC_ACTIVE ]]; then
+  if [[ $CURSOR -eq 0 || $LBUFFER[-1] = "(" ]]; then
+    LBUFFER+=${ZCALC_AUTO_INSERT_PREFIX:-"ans "}
+  fi
+fi
+zle .self-insert

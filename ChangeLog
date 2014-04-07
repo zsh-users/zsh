@@ -1,3 +1,9 @@
+2014-04-07  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 32527: Doc/Zsh/contrib.yo, Functions/Misc/zcalc,
+	Functions/Zle/zcalc-auto-insert: zcalc-auto-insert widget
+	for key binding in zcalc.
+
 2014-04-06  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/options.yo: fix typo in option cross-reference
