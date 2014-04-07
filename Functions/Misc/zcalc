@@ -96,6 +96,9 @@
 emulate -L zsh
 setopt extendedglob
 
+# For testing in ZLE functions.
+local ZCALC_ACTIVE=1
+
 # TODO: make local variables that shouldn't be visible in expressions
 # begin with _.
 local line ans base defbase forms match mbegin mend psvar optlist opt arg

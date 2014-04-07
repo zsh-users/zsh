@@ -2473,6 +2473,25 @@ The style tt(whence) is available in the context tt(:zle:$WIDGET); this
 may be set to an array to give the command and options that will be used to
 investigate the command word found.  The default is tt(whence -c).
 )
+tindex(zcalc-auto-insert)
+item(tt(zcalc-auto-insert))(
+This function is useful together with the tt(zcalc) function described in
+ifzman(the section Mathematical Functions)\
+ifnzman(noderef(Mathematical Functions)).
+It should be bound to a key representing a binary operator such
+as `tt(PLUS())', `tt(-)', `tt(*)' or `tt(/)'.  When running in zcalc,
+if the key occurs at the start of the line or immediately following
+an open parenthesis, the text tt("ans ") is inserted before the
+representation of the key itself.  This allows easy use of the
+answer from the previous calculation in the current line.  The
+text to be inserted before the symbol typed can be modified by setting
+the variable tt(ZCALC_AUTO_INSERT_PREFIX).
+
+Hence, for example, typing `tt(PLUS()12)' followed by return adds 12
+to the previous result.
+
+When not in zcalc, the key simply inserts the symbol itself.
+)
 enditem()
 
 subsect(Utility Functions)
