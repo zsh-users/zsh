@@ -1,3 +1,8 @@
+2014-05-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 32597: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: Describe detached heads symbolically.
+
 2014-04-29  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Tomoki Sekiyama: 32592: add CORRECT_IGNORE_FILE variable.

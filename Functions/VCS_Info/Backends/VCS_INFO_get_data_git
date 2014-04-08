@@ -97,7 +97,7 @@ VCS_INFO_git_getbranch () {
         gitbranch="$(${(z)gitsymref} 2> /dev/null)"
 
         if [[ $? -ne 0 ]] ; then
-            gitbranch="refs/tags/$(${vcs_comm[cmd]} describe --exact-match HEAD 2>/dev/null)"
+            gitbranch="refs/tags/$(${vcs_comm[cmd]} describe --all --exact-match HEAD 2>/dev/null)"
 
             if [[ $? -ne 0 ]] ; then
                 gitbranch="${${"$(< $gitdir/HEAD)"}[1,7]}..."
