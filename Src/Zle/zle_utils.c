@@ -710,6 +710,27 @@ zle_restore_positions(void)
 }
 
 /*
+ * Discard positions previously saved, the line has been updated.
+ */
+
+/**/
+mod_export void
+zle_free_positions(void)
+{
+    struct zle_position *oldpos = zle_positions;
+    struct zle_region *oldrhp;
+
+    zle_positions = oldpos->next;
+    oldrhp = oldpos->regions;
+    while (oldrhp) {
+	struct zle_region *nextrhp = oldrhp->next;
+	zfree(oldrhp, sizeof(*oldrhp));
+	oldrhp = nextrhp;
+    }
+    zfree(oldpos, sizeof(*oldpos));
+}
+
+/*
  * Basic utility functions for adding to line or removing from line.
  * At this level the counts supplied are raw character counts, so
  * the calling code must be aware of combining characters where

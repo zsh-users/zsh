@@ -2795,7 +2795,7 @@ doexpandhist(void)
     if (!err) {
 	zlemetacs = excs;
 	if (strcmp(zlemetaline, ol)) {
-	    zle_restore_positions();
+	    zle_free_positions();
 	    unmetafy_line();
 	    /* For vi mode -- reset the beginning-of-insertion pointer   *
 	     * to the beginning of the line.  This seems a little silly, *

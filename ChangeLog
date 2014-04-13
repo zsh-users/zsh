@@ -1,3 +1,9 @@
+2014-04-13  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32540: Src/Zle/zle_tricky.c, Src/Zle/zle_utils.c: following
+	successful history expansion, discard saved line position data
+	rather than restoring from it (updates 32531).
+
 2014-04-07  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 32527: Doc/Zsh/contrib.yo, Functions/Misc/zcalc,
