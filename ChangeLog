@@ -21,6 +21,9 @@
 	* 36117: Completion/Unix/Command/_wget: complete headers for
 	--header and add --no-use-server-timestamps
 
+	* 36118: Completion/Unix/Command/_imagemagick: complete all
+	files if image files didn't match
+
 2015-08-11  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36108: NEWS: list of major changes so far since 5.0.8
