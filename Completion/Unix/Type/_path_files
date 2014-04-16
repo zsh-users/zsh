@@ -564,9 +564,10 @@ for prepath in "$prepaths[@]"; do
           ( "$ignpar" != *dir* || "$pats" = '*(-/)' ) &&
           ( "$ignpar" != *..* || "$tmp1[1]" = *../* ) ]]; then
 
-      compfiles -i tmp1 _comp_ignore "$ignpar" "$prepath$realpath$donepath"
+      compfiles -i tmp1 ignore "$ignpar" "$prepath$realpath$donepath"
+      _comp_ignore+=( ${(@)ignore#$prepath$realpath$donepath} )
 
-      (( $#_comp_ignore && $mopts[(I)-F] )) ||
+      (( $#_comp_ignore && ! $mopts[(I)-F] )) &&
           mopts=( "$mopts[@]" -F _comp_ignore )
     fi
 
