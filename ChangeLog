@@ -1,3 +1,8 @@
+2014-04-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Jasper Lievisse Adriaanse: 32558: configure.ac:
+	_XOPEN_SOURCE_EXTENDED now works OK on OpenBSD.
+
 2014-04-20  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32569: Src/loop.c: lastval ($?) should not be reset between
