@@ -1,5 +1,8 @@
 2014-04-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Sebastien Alaiwan: 32562: Completion/Unix/Command/_bzr:
+	updates for bzr completion.
+
 	* Jasper Lievisse Adriaanse: 32558: configure.ac:
 	_XOPEN_SOURCE_EXTENDED now works OK on OpenBSD.
 

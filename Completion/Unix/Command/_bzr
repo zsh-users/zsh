@@ -46,6 +46,14 @@ _bzr_versionedFiles() {
     return 0
 }
 
+(( $+functions[_bzr_modifiedFiles] )) ||
+_bzr_modifiedFiles() {
+    local fileList
+    fileList=(${(ps:\0:)"$(bzr status . --versioned --short | cut -b 5- | tr '\n' '\0')"})
+    compadd -af fileList
+    return 0
+}
+
 (( $+functions[_bzr_completeParents] )) ||
 _bzr_completeParents() {
     local parentFile=$(bzr root 2>/dev/null)/.bzr/branch/parent
@@ -214,7 +222,7 @@ case $cmd in
 	'--unchanged[include unchanged files]'
 	'(-q --quiet -v --verbose)'{--quiet,-q}'[be quiet]'
 	'(-v --verbose -q --quiet)'{--verbose,-v}'[display more information]'
-	'*:modified files:_bzr_versionedFiles'
+	'*:modified files:_bzr_modifiedFiles'
 	)
     ;;
 
@@ -300,7 +308,7 @@ case $cmd in
     args+=(
 	'--no-backup[skip generation of backup~ files]'
 	'(-r --revision)'{--revision=,-r}'[revision]:revision:'
-	'*:file:_bzr_versionedFiles'
+	'*:file:_bzr_modifiedFiles'
 	)
     ;;
 
