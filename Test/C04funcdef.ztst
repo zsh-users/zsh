@@ -208,6 +208,11 @@
 >Da de da
 >Do be do
 
+  () (cat $1 $2) <(print process expanded) =(print expanded to file)
+0:Process substitution with anonymous functions
+>process expanded
+>expanded to file
+
   () { print This has arguments $*; } of all sorts; print After the function
   function { print More stuff $*; } and why not; print Yet more
 0:Anonymous function with arguments

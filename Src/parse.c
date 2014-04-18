@@ -1471,7 +1471,6 @@ par_funcdef(int *complex)
 	if (num == 0) {
 	    /* Anonymous function, possibly with arguments */
 	    incmdpos = 0;
-	    *complex = 1;
 	}
 	zshlex();
     } else if (unset(SHORTLOOPS)) {
@@ -1503,6 +1502,7 @@ par_funcdef(int *complex)
 	    num++;
 	    zshlex();
 	}
+	*complex = (num > 0);
 	ecbuf[parg] = ecused - parg; /*?*/
 	ecbuf[parg+1] = num;
     }
@@ -1736,7 +1736,6 @@ par_simple(int *complex, int nr)
 		if (argc == 0) {
 		    /* Anonymous function, possibly with arguments */
 		    incmdpos = 0;
-		    *complex = 1;
 		}
 		zshlex();
 	    } else {
@@ -1776,6 +1775,7 @@ par_simple(int *complex, int nr)
 		    argc++;
 		    zshlex();
 		}
+		*complex = (argc > 0);
 		ecbuf[parg] = ecused - parg; /*?*/
 		ecbuf[parg+1] = argc;
 	    }

@@ -2346,7 +2346,7 @@ execsubst(LinkList strs)
 {
     if (strs) {
 	prefork(strs, esprefork);
-	if (esglob) {
+	if (esglob && !errflag) {
 	    LinkList ostrs = strs;
 	    globlist(strs, 0);
 	    strs = ostrs;
@@ -3867,8 +3867,10 @@ getoutputfile(char *cmd, char **eptr)
     int fd;
     char *s;
 
-    if (thisjob == -1)
+    if (thisjob == -1){
+	zerr("process substitution %s cannot be used here", cmd);
 	return NULL;
+    }
     if (!(prog = parsecmd(cmd, eptr)))
 	return NULL;
     if (!(nam = gettempname(NULL, 0)))
@@ -3939,11 +3941,13 @@ namedpipe(void)
     char *tnam = gettempname(NULL, 1);
 
 # ifdef HAVE_MKFIFO
-    if (mkfifo(tnam, 0600) < 0)
+    if (mkfifo(tnam, 0600) < 0){
 # else
-    if (mknod(tnam, 0010600, 0) < 0)
+    if (mknod(tnam, 0010600, 0) < 0){
 # endif
+	zerr("failed to create named pipe: %s, %e", tnam, errno);
 	return NULL;
+    }
     return tnam;
 }
 #endif /* ! PATH_DEV_FD && HAVE_FIFOS */
@@ -3966,9 +3970,10 @@ getproc(char *cmd, char **eptr)
 
 #ifndef PATH_DEV_FD
     int fd;
-
-    if (thisjob == -1)
+    if (thisjob == -1) {
+	zerr("process substitution %s cannot be used here", cmd);
 	return NULL;
+    }
     if (!(pnam = namedpipe()))
 	return NULL;
     if (!(prog = parsecmd(cmd, eptr)))
@@ -3993,8 +3998,10 @@ getproc(char *cmd, char **eptr)
 #else /* PATH_DEV_FD */
     int pipes[2], fd;
 
-    if (thisjob == -1)
+    if (thisjob == -1) {
+	zerr("process substitution %s cannot be used here", cmd);
 	return NULL;
+    }
     pnam = hcalloc(strlen(PATH_DEV_FD) + 6);
     if (!(prog = parsecmd(cmd, eptr)))
 	return NULL;
@@ -4234,8 +4241,11 @@ execfuncdef(Estate state, UNUSED(int do_exec))
     plen = nprg * sizeof(wordcode);
     len = plen + (npats * sizeof(Patprog)) + nstrs;
 
-    if (htok && names)
+    if (htok && names) {
 	execsubst(names);
+	if (errflag)
+	    return 1;
+    }
 
     while (!names || (s = (char *) ugetnode(names))) {
 	if (!names) {

@@ -169,7 +169,7 @@ stringsubst(LinkList list, LinkNode node, int pf_flags, int asssub)
 	    if (errflag)
 		return NULL;
 	    if (!subst)
-		subst = "";
+		rest = subst = "";
 
 	    sublen = strlen(subst);
 	    restlen = strlen(rest);

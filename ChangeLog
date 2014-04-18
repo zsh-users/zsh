@@ -1,3 +1,10 @@
+2014-04-17  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Andrew Waldron: 32552 (updated by 32560): Src/exec.c,
+	Src/parse.c, Src/subst.c, Test/C04funcdef.ztst:  fix segfault
+	when using process substitution in anonymous function argument
+	list; disallow process substitution in function name position.
+
 2014-04-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Jun T: 32546: Completion/Unix/Type/_path_files: better handling
