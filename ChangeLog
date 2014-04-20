@@ -1,5 +1,8 @@
 2014-04-20  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32569: Src/loop.c: lastval ($?) should not be reset between
+	word list substitution and loop body execution in for/select.
+
 	* 32568: Src/exec.c, Src/loop.c: consistency in handling of errflag
 	condition during substitutions in for/select word lists, function
 	definition name position, and anonymous function argument lists.

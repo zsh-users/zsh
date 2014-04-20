@@ -73,7 +73,7 @@ execfor(Estate state, int do_exec)
 	    matheval(str);
 	if (errflag) {
 	    state->pc = end;
-	    return lastval = errflag;
+	    return 1;
 	}
 	cond = ecgetstr(state, EC_NODUP, &ctok);
 	advance = ecgetstr(state, EC_NODUP, &atok);
@@ -102,7 +102,7 @@ execfor(Estate state, int do_exec)
 		addlinknode(args, dupstring(*x));
 	}
     }
-    lastval = 0;
+    /* lastval = 0; */
     loops++;
     pushheap();
     cmdpush(CS_FOR);
@@ -241,7 +241,7 @@ execselect(Estate state, UNUSED(int do_exec))
 	return 1;
     }
     loops++;
-    lastval = 0;
+    /* lastval = 0; */
     pushheap();
     cmdpush(CS_SELECT);
     usezle = interact && SHTTY != -1 && isset(USEZLE);
