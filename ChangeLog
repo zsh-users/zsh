@@ -1,3 +1,9 @@
+2014-04-20  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32568: Src/exec.c, Src/loop.c: consistency in handling of errflag
+	condition during substitutions in for/select word lists, function
+	definition name position, and anonymous function argument lists.
+
 2014-04-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Andrew Waldron: 32552 (updated by 32560): Src/exec.c,

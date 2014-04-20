@@ -87,8 +87,13 @@ execfor(Estate state, int do_exec)
 		state->pc = end;
 		return 0;
 	    }
-	    if (htok)
+	    if (htok) {
 		execsubst(args);
+		if (errflag) {
+		    state->pc = end;
+		    return 1;
+		}
+	    }
 	} else {
 	    char **x;
 
@@ -223,8 +228,13 @@ execselect(Estate state, UNUSED(int do_exec))
 	    state->pc = end;
 	    return 0;
 	}
-	if (htok)
+	if (htok) {
 	    execsubst(args);
+	    if (errflag) {
+		state->pc = end;
+		return 1;
+	    }
+	}
     }
     if (!args || empty(args)) {
 	state->pc = end;

@@ -4243,8 +4243,10 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 
     if (htok && names) {
 	execsubst(names);
-	if (errflag)
+	if (errflag) {
+	    state->pc = end;
 	    return 1;
+	}
     }
 
     while (!names || (s = (char *) ugetnode(names))) {
@@ -4301,8 +4303,13 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 	    end += *state->pc++;
 	    args = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok);
 
-	    if (htok && args)
+	    if (htok && args) {
 		execsubst(args);
+		if (errflag) {
+		    state->pc = end;
+		    return 1;
+		}
+	    }
 
 	    if (!args)
 		args = newlinklist();
