@@ -2720,6 +2720,25 @@ savehistfile(char *fn, int err, int writeflags)
 
 static int lockhistct;
 
+static int
+checklocktime(char *lockfile, time_t then)
+{
+    time_t now = time(NULL);
+
+    if (now + 10 < then) {
+	/* File is more than 10 seconds in the future? */
+	errno = EEXIST;
+	return -1;
+    }
+
+    if (now - then < 10)
+	sleep(1);
+    else
+	unlink(lockfile);
+
+    return 0;
+}
+
 /*
  * Lock history file.  Return 0 on success, 1 on failure to lock this
  * time, 2 on permanent failure (e.g. permission).
@@ -2737,9 +2756,7 @@ lockhistfile(char *fn, int keep_trying)
 
 #ifdef HAVE_FCNTL_H
     if (isset(HISTFCNTLLOCK) && flock_fd < 0) {
-	ret = flockhistfile(fn, keep_trying);
-	if (ret)
-	    return ret;
+	return flockhistfile(fn, keep_trying);
     }
 #endif
 
@@ -2776,10 +2793,10 @@ lockhistfile(char *fn, int keep_trying)
 		    continue;
 		break;
 	    }
-	    if (time(NULL) - sb.st_mtime < 10)
-		sleep(1);
-	    else
-		unlink(lockfile);
+	    if (checklocktime(lockfile, sb.st_mtime) < 0) {
+		ret = 1;
+		break;
+	    }
 	}
 	if (fd < 0)
 	    lockhistct--;
@@ -2804,10 +2821,10 @@ lockhistfile(char *fn, int keep_trying)
 			continue;
 		    ret = 2;
 		} else {
-		    if (time(NULL) - sb.st_mtime < 10)
-			sleep(1);
-		    else
-			unlink(lockfile);
+		    if (checklocktime(lockfile, sb.st_mtime) < 0) {
+			ret = 1;
+			break;
+		    }
 		    continue;
 		}
 		lockhistct--;
@@ -2832,10 +2849,10 @@ lockhistfile(char *fn, int keep_trying)
 		ret = 2;
 		break;
 	    }
-	    if (time(NULL) - sb.st_mtime < 10)
-		sleep(1);
-	    else
-		unlink(lockfile);
+	    if (checklocktime(lockfile, sb.st_mtime) < 0) {
+		ret = 1;
+		break;
+	    }
 	}
 	if (fd < 0)
 	    lockhistct--;
