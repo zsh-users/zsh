@@ -6,6 +6,13 @@
 	* Jasper Lievisse Adriaanse: 32558: configure.ac:
 	_XOPEN_SOURCE_EXTENDED now works OK on OpenBSD.
 
+2014-04-25  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32580: Src/hist.c: avoid indefinite wait in lockhistfile() by
+	checking for lock file time stamp far in the future relative to
+	the local clock.  Change behavior of HIST_FCNTL_LOCK to use only
+	fcntl() locking, rather than applying both kinds of lock.
+
 2014-04-20  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32569: Src/loop.c: lastval ($?) should not be reset between
