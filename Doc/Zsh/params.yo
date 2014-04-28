@@ -917,6 +917,14 @@ of file names, as applied by the tt(CORRECT_ALL) option (so with the
 example just given files beginning with `tt(_)' in the current
 directory would still be completed).
 )
+vindex(CORRECT_IGNORE_FILE)
+item(tt(CORRECT_IGNORE_FILE))(
+If set, is treated as a pattern during spelling correction of file names.
+Any file name that matches the pattern is never offered as a correction.
+For example, if the value is `tt(.*)' then dot file names will never be
+offered as spelling corrections.  This is useful with the
+tt(CORRECT_ALL) option.
+)
 vindex(DIRSTACKSIZE)
 item(tt(DIRSTACKSIZE))(
 The maximum size of the directory stack, by default there is no limit.  If the

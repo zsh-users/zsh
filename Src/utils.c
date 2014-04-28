@@ -2491,7 +2491,7 @@ getquery(char *valid_chars, int purge)
 
 static int d;
 static char *guess, *best;
-static Patprog spckpat;
+static Patprog spckpat, spnamepat;
 
 /**/
 static void
@@ -2561,6 +2561,13 @@ spckword(char **s, int hist, int cmd, int ask)
 	spckpat = patcompile(correct_ignore, 0, NULL);
     } else
 	spckpat = NULL;
+
+    if ((correct_ignore = getsparam("CORRECT_IGNORE_FILE")) != NULL) {
+	tokenize(correct_ignore = dupstring(correct_ignore));
+	remnulargs(correct_ignore);
+	spnamepat = patcompile(correct_ignore, 0, NULL);
+    } else
+	spnamepat = NULL;
 
     if (**s == String && !*t) {
 	guess = *s + 1;
@@ -3783,6 +3790,8 @@ mindist(char *dir, char *mindistguess, char *mindistbest)
     if (!(dd = opendir(unmeta(dir))))
 	return mindistd;
     while ((fn = zreaddir(dd, 0))) {
+	if (spnamepat && pattry(spnamepat, fn))
+	    continue;
 	nd = spdist(fn, mindistguess,
 		    (int)strlen(mindistguess) / 4 + 1);
 	if (nd <= mindistd) {

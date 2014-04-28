@@ -1,3 +1,7 @@
+2014-04-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Tomoki Sekiyama: 32592: add CORRECT_IGNORE_FILE variable.
+
 2014-04-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Sebastien Alaiwan: 32562: Completion/Unix/Command/_bzr:

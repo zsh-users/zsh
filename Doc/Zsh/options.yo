@@ -1098,6 +1098,9 @@ pindex(CORRECTALL)
 pindex(NOCORRECTALL)
 item(tt(CORRECT_ALL) (tt(-O)))(
 Try to correct the spelling of all arguments in a line.
+
+The shell variable tt(CORRECT_IGNORE_FILE) may be set to a pattern to
+match file names that will never be offered as corrections.
 )
 pindex(DVORAK)
 pindex(NO_DVORAK)
