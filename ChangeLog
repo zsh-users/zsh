@@ -1,3 +1,9 @@
+2014-05-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* m0viefreak: 32600: Src/Zle/computil.c: fix problem with
+	_arguments thinking -- is a single letter option called '-',
+	which it isn't.
+
 2014-05-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 32597: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:

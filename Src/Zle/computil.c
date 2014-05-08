@@ -1500,9 +1500,11 @@ parse_cadef(char *nam, char **args)
 		nodopts++;
 
 	    /* If this is for single-letter option we also store a
-	     * pointer for the definition in the array for fast lookup. */
+	     * pointer for the definition in the array for fast lookup.
+	     * But don't treat '--' as a single option called '-' */
 
-	    if (single && name[1] && !name[2])
+
+	    if (single && name[1] && !name[2] && name[1] != '-')
 		ret->single[STOUC(name[1])] = opt;
 
 	    if (again == 1) {
@@ -2034,7 +2036,9 @@ ca_parse_line(Cadef d, int multi, int first)
 	    state.optbeg = state.argbeg = state.inopt = cur;
 	    state.argend = argend;
 	    state.singles = (d->single && (!pe || !*pe) &&
-			     state.curopt->name[1] && !state.curopt->name[2]);
+			     state.curopt->name[1] && !state.curopt->name[2] &&
+			     /* Don't treat '--' as a single option called '-' */
+			     state.curopt->name[1] != '-');
 
 	    if (!state.oargs[state.curopt->num])
 		state.oargs[state.curopt->num] = znewlinklist();
