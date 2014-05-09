@@ -1,3 +1,8 @@
+2014-05-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Eric Cook: 32602: Doc/Zsh/grammar.yo: status of try + always
+	block is from the former, not the latter.
+
 2014-05-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* m0viefreak: 32600: Src/Zle/computil.c: fix problem with
