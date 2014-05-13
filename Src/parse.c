@@ -2068,6 +2068,9 @@ par_cond_2(void)
 	    /* one argument: [ foo ] is equivalent to [ -n foo ] */
 	    s1 = tokstr;
 	    condlex();
+	    /* ksh behavior: [ -t ] means [ -t 1 ]; bash disagrees */
+	    if (unset(POSIXBUILTINS) && !strcmp(s1, "-t"))
+		return par_cond_double(s1, dupstring("1"));
 	    return par_cond_double(dupstring("-n"), s1);
 	}
 	if (testargs[1]) {
@@ -2086,6 +2089,10 @@ par_cond_2(void)
 		return par_cond_triple(s1, s2, s3);
 	    }
 	}
+	/*
+	 * We fall through here on any non-numeric infix operator
+	 * or any other time there are at least two arguments.
+	 */
     }
     if (tok == BANG) {
 	/*
@@ -2114,18 +2121,20 @@ par_cond_2(void)
 	condlex();
 	return r;
     }
+    s1 = tokstr;
+    dble = (s1 && *s1 == '-'
+	    && (condlex != testlex
+		|| strspn(s1+1, "abcdefghknoprstuwxzLONGS") == 1)
+	    && !s1[2]);
     if (tok != STRING) {
-	if (tok && tok != LEXERR && condlex == testlex) {
-	    s1 = tokstr;
+	/* Check first argument for [[ STRING ]] re-interpretation */
+	if (s1 /* tok != DOUTBRACK && tok != DAMPER && tok != DBAR */
+	    && tok != LEXERR && (!dble || condlex == testlex)) {
 	    condlex();
-	    return par_cond_double("-n", s1);
+	    return par_cond_double(dupstring("-n"), s1);
 	} else
 	    YYERROR(ecused);
     }
-    s1 = tokstr;
-    if (condlex == testlex)
-	dble = (*s1 == '-' && strspn(s1+1, "abcdefghknoprstuwxzLONGS") == 1
-		  && !s1[2]);
     condlex();
     if (tok == INANG || tok == OUTANG) {
 	enum lextok xtok = tok;
@@ -2140,15 +2149,21 @@ par_cond_2(void)
 	return 1;
     }
     if (tok != STRING) {
-	if (tok != LEXERR && condlex == testlex) {
-	    if (!dble)
-		return par_cond_double("-n", s1);
-	    else if (!strcmp(s1, "-t"))
-		return par_cond_double(s1, "1");
+	/*
+	 * Check second argument in case semantics e.g. [ = -a = ]
+	 * mean we have to go back and fix up the first one
+	 */
+	if (tok != LEXERR) {
+	    if (!dble || condlex == testlex)
+		return par_cond_double(dupstring("-n"), s1);
+	    else
+		return par_cond_multi(s1, newlinklist());
 	} else
 	    YYERROR(ecused);
     }
-    s2 = tokstr;
+    s2 = tokstr;   
+    if (condlex != testlex)
+	dble = (s2 && *s2 == '-' && !s2[2]);
     incond++;			/* parentheses do globbing */
     condlex();
     incond--;			/* parentheses do grouping */

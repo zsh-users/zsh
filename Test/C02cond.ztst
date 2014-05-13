@@ -349,6 +349,14 @@ F:Failures in these cases do not indicate a problem in the shell.
 >0
 >1
 
+  foo=''
+  [[ $foo ]] || print foo is empty
+  foo=full
+  [[ $foo ]] && print foo is full
+0:bash compatibility with single [[ ... ]] argument
+>foo is empty
+>foo is full
+
 %clean
   # This works around a bug in rm -f in some versions of Cygwin
   chmod 644 unmodish

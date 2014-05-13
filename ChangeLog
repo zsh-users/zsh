@@ -1,3 +1,11 @@
+2014-05-13  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32609: Src/parse.c, Test/CO2cond.ztst: [[ $var ]] behaves as
+	[[ -n $var ]] for bash/ksh compatibility; restore ksh [ -t ]
+	compatibility when POSIX_BUILTINS is not set; allow operators
+	defined by modules to be called with no arguments, although
+	this affects only runtime interpretation, not parsing.
+
 2014-05-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Eric Cook: 32602: Doc/Zsh/grammar.yo: status of try + always
