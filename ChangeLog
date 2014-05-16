@@ -1,3 +1,9 @@
+2014-05-16  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Roman Neuhauser: users/18827 (plus tweaks to original
+	comments): Doc/Zsh/contrib.yo: more efficient way of extracting
+	hg bookmarks.
+
 2014-05-13  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32609: Src/parse.c, Test/CO2cond.ztst: [[ $var ]] behaves as

@@ -1504,22 +1504,15 @@ function +vi-hgbookmarks+LPAR()RPAR() {
     # This makes the bookmarks string use only those
     # bookmarks. If there's more than one, it
     # concatenates them using commas.
-    local s i
     # The bookmarks returned by `hg' are available in
-    # the functions positional parameters.
-    (( $# == 0 )) && return 0
-    for i in "$@"; do
-        if [[ $i == sh/* ]]; then
-            [[ -n $s ]] && s=$s,
-            s=${s}$i
-        fi
-    done
+    # the function's positional parameters.
+    local s="${(Mj:,:)@:#sh/*}"
     # Now, the communication with the code that calls
     # the hook functions is done via the hook_com[]
-    # hash. The key, at which the `gen-hg-bookmark-string'
-    # hook looks at is `hg-bookmark-string'. So:
+    # hash. The key at which the `gen-hg-bookmark-string'
+    # hook looks is `hg-bookmark-string'. So:
     hook_com[hg-bookmark-string]=$s
-    # And to signal, that we want to use the sting we
+    # And to signal that we want to use the string we
     # just generated, set the special variable `ret' to
     # something other than the default zero:
     ret=1
