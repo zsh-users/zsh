@@ -186,6 +186,13 @@ true if either var(exp1) or var(exp2) is true.
 )
 enditem()
 
+For compatibility, if there is a single argument that is not
+syntactically significant, typically a variable, the condition is
+treated as a test for whether the expression expands as a string of
+non-zero length.  In other words, tt([[ $var ]]) is the same as tt([[ -n
+$var ]]).  It is recommended that the second, explicit, form be used
+where possible.
+
 Normal shell expansion is performed on the var(file), var(string) and
 var(pattern) arguments, but the result of each expansion is constrained to
 be a single word, similar to the effect of double quotes.

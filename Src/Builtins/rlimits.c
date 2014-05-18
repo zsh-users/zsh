@@ -367,7 +367,7 @@ printulimit(char *nam, int lim, int hard, int head)
 # ifdef HAVE_RLIMIT_SBSIZE
     case RLIMIT_SBSIZE:
 	if (head)
-	    printf("-b: socket buffer size (bytes)      ", RLIMIT_SBSIZE);
+	    printf("-b: socket buffer size (bytes)      ");
 	break;
 # endif /* HAVE_RLIMIT_SBSIZE */
 # ifdef HAVE_RLIMIT_PTHREAD
