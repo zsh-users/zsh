@@ -6,6 +6,8 @@
 	* 32621: Functions/VCS_Info/Backends/VCS_INFO_get_data_svn:
 	vcs_info svn: 'Fix set-branch-format' when in subdirs
 
+	* 32620: Doc/Zsh/contrib.yo: Typo fix after commit eb4c70d
+
 2014-05-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Jun T: 32616: Src/Builtins/rlimits.c: unnecessary printf

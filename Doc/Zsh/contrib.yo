@@ -833,7 +833,7 @@ For this style to be evaluated with the tt(hg) backend, the tt(get-revision)
 style needs to be set and the tt(use-simple) style needs to be unset. The
 latter is the default; the former is not.
 
-With tt(bzr) backend, lightweight checkouts only honor this style if
+With the tt(bzr) backend, em(lightweight checkouts) only honor this style if
 the tt(use-server) style is set.
 
 Note, the actions taken if this style is enabled are potentially expensive
