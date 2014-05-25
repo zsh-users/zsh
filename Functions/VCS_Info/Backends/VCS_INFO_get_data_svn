@@ -7,7 +7,7 @@
 setopt localoptions noksharrays extendedglob NO_shwordsplit
 local svnbase svnbranch a b rrn
 local -i rc
-local -A svninfo parentinfo
+local -A svninfo parentinfo cwdinfo
 local -xA hook_com
 
 svnbase=".";
@@ -28,6 +28,8 @@ done
 #rc=${pipestatus[1]}
 #(( rc != 0 )) && return 1
 
+cwdinfo=(${(kv)svninfo})
+
 while [[ -d "${svnbase}/../.svn" ]]; do
     parentinfo=()
     ${vcs_comm[cmd]} info --non-interactive "${svnbase}/.." | while IFS=: read a b; do parentinfo[${a// /_}]="${b## #}"; done
@@ -40,12 +42,12 @@ svnbase="$(VCS_INFO_realpath ${svnbase})"
 
 rrn=${svnbase:t}
 zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" branchformat svnbranch || svnbranch="%b:%r"
-hook_com=( branch "${svninfo[URL]##*/}" revision "${svninfo[Revision]}" )
+hook_com=( branch "${svninfo[URL]##*/}" revision "${cwdinfo[Revision]}" )
 if VCS_INFO_hook 'set-branch-format' "${svnbranch}"; then
     zformat -f svnbranch "${svnbranch}" "b:${hook_com[branch]}" "r:${hook_com[revision]}"
 else
     svnbranch=${hook_com[branch-replace]}
 fi
 hook_com=()
-VCS_INFO_formats '' "${svnbranch}" "${svnbase}" '' '' "${svninfo[Revision]}" ''
+VCS_INFO_formats '' "${svnbranch}" "${svnbase}" '' '' "${cwdinfo[Revision]}" ''
 return 0

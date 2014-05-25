@@ -1,3 +1,8 @@
+2014-05-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 32619: Functions/VCS_Info/Backends/VCS_INFO_get_data_svn:
+	vcs_info svn: Use the revision of cwd
+
 2014-05-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Jun T: 32616: Src/Builtins/rlimits.c: unnecessary printf
