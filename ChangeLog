@@ -1,5 +1,8 @@
 2014-05-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Keerthan Jai: users/18860: Completion/Unix/Command/_man: man
+	-M overrides manpath.
+
 	* unposted: Src/params.c: use DIGBUFSIZE for pipestatus numeric
 	buffer.
 

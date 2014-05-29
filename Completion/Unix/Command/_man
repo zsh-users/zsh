@@ -29,7 +29,7 @@ _man() {
   if (( index )); then
     local opt
     opt=$words[index+1]
-    _manpath=($_manpath $opt)
+    _manpath=($opt)
   fi
 
   # `sman' is the SGML manual directory for Solaris 7.
