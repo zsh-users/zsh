@@ -1,3 +1,8 @@
+2014-05-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Src/params.c: use DIGBUFSIZE for pipestatus numeric
+	buffer.
+
 2014-05-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 32619: Functions/VCS_Info/Backends/VCS_INFO_get_data_svn:

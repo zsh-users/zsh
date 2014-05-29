@@ -4247,7 +4247,7 @@ static char **
 pipestatgetfn(UNUSED(Param pm))
 {
     char **x = (char **) zhalloc((numpipestats + 1) * sizeof(char *));
-    char buf[20], **p;
+    char buf[DIGBUFSIZE], **p;
     int *q, i;
 
     for (p = x, q = pipestats, i = numpipestats; i--; p++, q++) {
