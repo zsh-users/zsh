@@ -6095,8 +6095,9 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
 }
 
 /* display a time, provided in units of 1/60s, as minutes and seconds */
-#define pttime(X) printf("%ldm%ld.%02lds",((long) (X))/3600,\
-			 ((long) (X))/60%60,((long) (X))*100/60%100)
+#define pttime(X) printf("%ldm%ld.%02lds",((long) (X))/(60 * clktck),\
+			 ((long) (X))/clktck%clktck,\
+			 ((long) (X))*100/clktck%100)
 
 /* times: display, in a two-line format, the times provided by times(3) */
 
@@ -6105,6 +6106,7 @@ int
 bin_times(UNUSED(char *name), UNUSED(char **argv), UNUSED(Options ops), UNUSED(int func))
 {
     struct tms buf;
+    long clktck = get_clktck();
 
     /* get time accounting information */
     if (times(&buf) == -1)

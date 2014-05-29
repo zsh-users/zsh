@@ -1,5 +1,8 @@
 2014-05-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 32624:  Src/builtin.c, Src/jobs.c: use correct scaling factor
+	(clock ticks) for times.
+
 	* Keerthan Jai: users/18860: Completion/Unix/Command/_man: man
 	-M overrides manpath.
 

@@ -618,13 +618,11 @@ setprevjob(void)
 }
 
 /**/
-#ifndef HAVE_GETRUSAGE
-static long clktck = 0;
-
-/**/
-static void
-set_clktck(void)
+long
+get_clktck(void)
 {
+    static long clktck;
+
 #ifdef _SC_CLK_TCK
     if (!clktck)
 	/* fetch clock ticks per second from *
@@ -646,9 +644,9 @@ set_clktck(void)
 #  endif
 # endif
 #endif
+
+     return clktck;
 }
-/**/
-#endif
 
 /**/
 static void
@@ -698,11 +696,13 @@ printtime(struct timeval *real, child_times_t *ti, char *desc)
     percent = 100.0 * total_time
 	/ (real->tv_sec + real->tv_usec / 1000000.0);
 #else
-    set_clktck();
-    user_time    = ti->ut / (double) clktck;
-    system_time  = ti->st / (double) clktck;
-    percent      =  100.0 * (ti->ut + ti->st)
-	/ (clktck * real->tv_sec + clktck * real->tv_usec / 1000000.0);
+    {
+	long clktck = get_clktck();
+	user_time    = ti->ut / (double) clktck;
+	system_time  = ti->st / (double) clktck;
+	percent      =  100.0 * (ti->ut + ti->st)
+	    / (clktck * real->tv_sec + clktck * real->tv_usec / 1000000.0);
+    }
 #endif
 
     queue_signals();
@@ -910,8 +910,10 @@ should_report_time(Job j)
 	reporttime--;
     return reporttime <= 0;
 #else
-    set_clktck();
-    return ((j->procs->ti.ut + j->procs->ti.st) / clktck >= reporttime);
+    {
+	clktck = get_clktck();
+	return ((j->procs->ti.ut + j->procs->ti.st) / clktck >= reporttime);
+    }
 #endif
 }
 
