@@ -128,16 +128,22 @@ elif zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" "check-for-staged-change
     querystaged=1
 fi
 if (( querystaged || queryunstaged )) && \
-   [[ "$(${vcs_comm[cmd]} rev-parse --is-inside-git-dir 2> /dev/null)" != 'true' ]] && \
-   ${vcs_comm[cmd]} rev-parse --quiet --verify HEAD &> /dev/null ; then
+   [[ "$(${vcs_comm[cmd]} rev-parse --is-inside-work-tree 2> /dev/null)" == 'true' ]] ; then
     # Default: off - these are potentially expensive on big repositories
     if (( queryunstaged )) ; then
         ${vcs_comm[cmd]} diff --no-ext-diff --ignore-submodules --quiet --exit-code ||
             gitunstaged=1
     fi
     if (( querystaged )) ; then
-        ${vcs_comm[cmd]} diff-index --cached --quiet --ignore-submodules HEAD 2> /dev/null
-        (( $? && $? != 128 )) && gitstaged=1
+        if ${vcs_comm[cmd]} rev-parse --quiet --verify HEAD &> /dev/null ; then
+            ${vcs_comm[cmd]} diff-index --cached --quiet --ignore-submodules HEAD 2> /dev/null
+            (( $? && $? != 128 )) && gitstaged=1
+        else
+            # empty repository (no commits yet)
+            # 4b825dc642cb6eb9a060e54bf8d69288fbee4904 is the git empty tree.
+            ${vcs_comm[cmd]} diff-index --cached --quiet --ignore-submodules 4b825dc642cb6eb9a060e54bf8d69288fbee4904 2>/dev/null
+            (( $? && $? != 128 )) && gitstaged=1
+        fi
     fi
 fi
 
