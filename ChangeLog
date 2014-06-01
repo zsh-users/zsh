@@ -1,3 +1,8 @@
+2014-06-01  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Daniel Shahaf: users/18857: Doc/Zsh/expn.yo, Src/glob.c,
+	Test/D02glob.ztst: add (Y) glob qualifier
+
 2014-06-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 32640: Doc/Zsh/cond.yo, Doc/Zsh/expn.yo, NEWS, Src/cond.c,

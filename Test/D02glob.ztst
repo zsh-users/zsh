@@ -431,6 +431,7 @@
  mkdir glob.tmp/dir5
  touch glob.tmp/dir5/N123
  print glob.tmp/dir5/N<->(N)
+ rm -rf glob.tmp/dir5
 0:Numeric glob is not usurped by process substitution.
 >glob.tmp/dir5/N123
 
@@ -541,3 +542,13 @@
 >No file beginning with z
 >Multiple files matched
 >Normal string if nullglob not set
+
+ (){ print $#@ } glob.tmp/dir*(Y)
+ (){ print $#@ } glob.tmp/file*(NY)
+ (){ [[ $1 = glob.tmp/dir? ]] && echo "(Y) returns a matching filename" } glob.tmp/dir*(Y)
+ (){ print $@:t } glob.tmp/dir*(Y^Y)
+0:short-circuit modifier
+>1
+>0
+>(Y) returns a matching filename
+>dir1 dir2 dir3 dir4

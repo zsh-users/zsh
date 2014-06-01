@@ -452,8 +452,8 @@ insert(char *s, int checked)
  * tried all of it.                                */
 
 /**/
-static void
-scanner(Complist q)
+static int
+scanner(Complist q, int shortcircuit)
 {
     Patprog p;
     int closure;
@@ -463,14 +463,15 @@ scanner(Complist q)
 
     init_dirsav(&ds);
     if (!q)
-	return;
+	return -1;
 
     if ((closure = q->closure)) {
 	/* (foo/)# - match zero or more dirs */
 	if (q->closure == 2)	/* (foo/)## - match one or more dirs */
 	    q->closure = 1;
 	else
-	    scanner(q->next);
+	    if (scanner(q->next, shortcircuit) == 1)
+		return 1;
     }
     p = q->pat;
     /* Now the actual matching for the current path section. */
@@ -485,13 +486,13 @@ scanner(Complist q)
 	    int err;
 
 	    if (l >= PATH_MAX)
-		return;
+		return -1;
 	    err = lchdir(pathbuf + pathbufcwd, &ds, 0);
 	    if (err == -1)
-		return;
+		return -1;
 	    if (err) {
 		zerr("current directory lost during glob");
-		return;
+		return -1;
 	    }
 	    pathbufcwd = pathpos;
 	}
@@ -516,7 +517,8 @@ scanner(Complist q)
 		if (add) {
 		    addpath(str, l);
 		    if (!closure || !statfullpath("", NULL, 1))
-			scanner((q->closure) ? q : q->next);
+			if (scanner((q->closure) ? q : q->next, shortcircuit) == 1)
+			    return 1;
 		    pathbuf[pathpos = oppos] = '\0';
 		}
 	    }
@@ -524,6 +526,8 @@ scanner(Complist q)
 	    if (str[l])
 		str = dupstrpfx(str, l);
 	    insert(str, 0);
+	    if (shortcircuit)
+		return 1;
 	}
     } else {
 	/* Do pattern matching on current path section. */
@@ -534,7 +538,7 @@ scanner(Complist q)
 	int subdirlen = 0;
 
 	if (lock == NULL)
-	    return;
+	    return -1;
 	while ((fn = zreaddir(lock, 1)) && !errflag) {
 	    /* prefix and suffix are zle trickery */
 	    if (!dirs && !colonmod &&
@@ -614,6 +618,8 @@ scanner(Complist q)
 		} else
 		    /* if the last filename component, just add it */
 		    insert(fn, 1);
+		    if (shortcircuit)
+			return 1;
 	    }
 	}
 	closedir(lock);
@@ -626,7 +632,8 @@ scanner(Complist q)
 		fn += l + 1;
 		memcpy((char *)&errsfound, fn, sizeof(int));
 		fn += sizeof(int);
-		scanner((q->closure) ? q : q->next);  /* scan next level */
+		if (scanner((q->closure) ? q : q->next, shortcircuit) == 1) /* scan next level */
+		    return 1;
 		pathbuf[pathpos = oppos] = '\0';
 	    }
 	    hrealloc(subdirs, subdirlen, 0);
@@ -640,6 +647,7 @@ scanner(Complist q)
 	    close(ds.dirfd);
 	pathbufcwd = pbcwdsav;
     }
+    return 0;
 }
 
 /* This function tokenizes a zsh glob pattern */
@@ -1141,6 +1149,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 					/* and index+1 of the last match */
     struct globdata saved;		/* saved glob state              */
     int nobareglob = !isset(BAREGLOBQUAL);
+    int shortcircuit = 0;
 
     if (unset(GLOBOPT) || !haswilds(ostr) || unset(EXECOPT)) {
 	if (!nountok)
@@ -1491,6 +1500,10 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    /* Numeric glob sort */
 		    gf_numsort = !(sense & 1);
 		    break;
+		case 'Y':
+		    /* Short circuit: just check if there are any matches */
+		    shortcircuit = !(sense & 1);
+		    break;
 		case 'a':
 		    /* Access time in given range */
 		    g_amc = 0;
@@ -1759,7 +1772,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 
     /* The actual processing takes place here: matches go into  *
      * matchbuf.  This is the only top-level call to scanner(). */
-    scanner(q);
+    scanner(q, shortcircuit);
 
     /* Deal with failures to match depending on options */
     if (matchct)
