@@ -1,5 +1,9 @@
 2014-06-01  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32653: Completion/Unix/Command/_php: complete files with the
+	".phar" extension as well as ".php", and respect the suffixes
+	zstyle to change this
+
 	* 32634 (plus doc): Doc/Zsh/options.yo, Doc/Zsh/params.yo,
 	Src/init.c, Src/options.c, Src/params.c, Src/zsh.h: add the
 	POSIX_ARGZERO option to allow toggling between the original
