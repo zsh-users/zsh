@@ -196,8 +196,34 @@ where possible.
 Normal shell expansion is performed on the var(file), var(string) and
 var(pattern) arguments, but the result of each expansion is constrained to
 be a single word, similar to the effect of double quotes.
-Filename generation is not performed on any form of argument to conditions.
-However, pattern metacharacters are active for the var(pattern) arguments;
+
+Filename generation is not performed on any form of argument to
+conditions.  However, it can be forced in any case where normal shell
+expansion is valid and when the option tt(EXTENDED_GLOB) is in effect by
+using an explicit glob qualifier of the form tt(LPAR()#q+RPAR()) at the
+end of the string.  A normal glob qualifier expression may appear
+between the `tt(q)' and the closing parenthesis; if none appears the
+expression has no effect beyond causing filename generation.  The
+results of filename generation are joined together to form a single
+word, as with the results of other forms of expansion.
+
+This special use of filename generation is only available with the
+tt([[) syntax.  If the condition occurs within the tt([) or tt(test)
+builtin commands then globbing occurs instead as part of normal command
+line expansion before the condition is evaluated.  In this case it may
+generate multiple words which are likely to confuse the syntax of the
+test command.
+
+For example,
+
+tt([[ -n file*(#qN) ]])
+
+produces status zero if and only if there is at least one file in the
+current directory beginning with the string `tt(file)'.  The globbing
+qualifier tt(N) ensures that the expression is empty if there is
+no matching file.
+
+Pattern metacharacters are active for the var(pattern) arguments;
 the patterns are the same as those used for filename generation, see
 ifzman(\
 zmanref(zshexpn)\

@@ -37,6 +37,21 @@ static char *condstr[COND_MOD] = {
     "-ne", "-lt", "-gt", "-le", "-ge", "=~"
 };
 
+static void cond_subst(char **strp, int glob_ok)
+{
+    if (glob_ok &&
+	checkglobqual(*strp, strlen(*strp), 1, NULL)) {
+	LinkList args = newlinklist();
+	addlinknode(args, *strp);
+	prefork(args, 0);
+	while (!errflag && args && nonempty(args) &&
+	       has_token((char *)peekfirst(args)))
+	    zglob(args, firstnode(args), 0);
+	*strp = sepjoin(hlinklist2array(args, 0), NULL, 1);
+    } else
+	singsub(strp);
+}
+
 /*
  * Evaluate a conditional expression given the arguments.
  * If fromtest is set, the caller is the test or [ builtin;
@@ -177,13 +192,13 @@ evalcond(Estate state, char *fromtest)
     }
     left = ecgetstr(state, EC_DUPTOK, &htok);
     if (htok) {
-	singsub(&left);
+	cond_subst(&left, !fromtest);
 	untokenize(left);
     }
     if (ctype <= COND_GE && ctype != COND_STREQ && ctype != COND_STRNEQ) {
 	right = ecgetstr(state, EC_DUPTOK, &htok);
 	if (htok) {
-	    singsub(&right);
+	    cond_subst(&right, !fromtest);
 	    untokenize(right);
 	}
     }
@@ -194,7 +209,7 @@ evalcond(Estate state, char *fromtest)
 	    fprintf(xtrerr, " %s ", condstr[ctype]);
 	    if (ctype == COND_STREQ || ctype == COND_STRNEQ) {
 		char *rt = dupstring(ecrawstr(state->prog, state->pc, NULL));
-		singsub(&rt);
+		cond_subst(&rt, !fromtest);
 		quote_tokenized_output(rt, xtrerr);
 	    }
 	    else
@@ -283,7 +298,7 @@ evalcond(Estate state, char *fromtest)
 		right = dupstring(opat = ecrawstr(state->prog, state->pc,
 						  &htok));
 		if (htok)
-		    singsub(&right);
+		    cond_subst(&right, !fromtest);
 		save = (!(state->prog->flags & EF_HEAP) &&
 			!strcmp(opat, right) && pprog != dummy_patprog2);
 
@@ -514,17 +529,6 @@ cond_val(char **args, int num)
 	untokenize(s);
     }
     return mathevali(s);
-}
-
-/**/
-mod_export int
-cond_match(char **args, int num, char *str)
-{
-    char *s = args[num];
-
-    singsub(&s);
-
-    return matchpat(str, s);
 }
 
 /**/

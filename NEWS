@@ -58,6 +58,13 @@ between the right hand side of the screen (this causes problems with
 some terminals).  It is not special and is not set by default; the
 effect in that case is as if it was 1, as in previous versions.
 
+If the option EXTENDED_GLOB is in effect, it is possible to force
+globbing within conditional code using the [[ ... ]] syntax by flagging
+that a certain string is a glob using the (#q) glob qualifier syntax.
+The resulting glob is treated as a single argument.  For example,
+[[ -n *.c(#qN) ]] tests whether there are any .c files in the current
+directory.
+
 
 Changes between 4.2 and 5.0.0
 -----------------------------

@@ -1061,6 +1061,67 @@ insert_glob_match(LinkList list, LinkNode next, char *data)
     insertlinknode(list, next, data);
 }
 
+/*
+ * Return
+ *   1 if str ends in bare glob qualifiers
+ *   2 if str ends in non-bare glob qualifiers (#q)
+ *   0 otherwise.
+ *
+ * str is the string to check.
+ * sl is its length (to avoid recalculation).
+ * nobareglob is 1 if bare glob qualifiers are not allowed.
+ * *sp, if sp is not null, will be a pointer to the opening parenthesis.
+ */
+
+/**/
+int
+checkglobqual(char *str, int sl, int nobareglob, char **sp)
+{
+    char *s;
+    int paren, ret = 1;
+
+    if (str[sl - 1] != Outpar)
+	return 0;
+
+    /* Check these are really qualifiers, not a set of *
+     * alternatives or exclusions.  We can be more     *
+     * lenient with an explicit (#q) than with a bare  *
+     * set of qualifiers.                              */
+    paren = 0;
+    for (s = str + sl - 2; *s && (*s != Inpar || paren); s--) {
+	switch (*s) {
+	case Outpar:
+	    paren++; /*FALLTHROUGH*/
+	case Bar:
+	    if (!zpc_disables[ZPC_BAR])
+		nobareglob = 1;
+	    break;
+	case Tilde:
+	    if (isset(EXTENDEDGLOB) && !zpc_disables[ZPC_TILDE])
+		nobareglob = 1;
+	    break;
+	case Inpar:
+	    paren--;
+	    break;
+	}
+	if (s == str)
+	    break;
+    }
+    if (*s != Inpar)
+	return 0;
+    if (isset(EXTENDEDGLOB) && !zpc_disables[ZPC_HASH] && s[1] == Pound) {
+	if (s[2] != 'q')
+	    return 0;
+	ret = 2;
+    } else if (nobareglob)
+	return 0;
+
+    if (sp)
+	*sp = s;
+
+    return ret;
+}
+
 /* Main entry point to the globbing code for filename globbing. *
  * np points to a node in the list list which will be expanded  *
  * into a series of nodes.                                      */
@@ -1118,7 +1179,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 	   (isset(EXTENDEDGLOB) && !zpc_disables[ZPC_HASH])) {
 	struct qual *newquals;
 	char *s;
-	int sense, paren;
+	int sense, qualsfound;
 	off_t data;
 	char *sdata, *newcolonmod;
 	int (*func) _((char *, Statptr, off_t, char *));
@@ -1148,40 +1209,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 	newquals = qo = qn = ql = NULL;
 
 	sl = strlen(str);
-	if (str[sl - 1] != Outpar)
-	    break;
-
-	/* Check these are really qualifiers, not a set of *
-	 * alternatives or exclusions.  We can be more     *
-	 * lenient with an explicit (#q) than with a bare  *
-	 * set of qualifiers.                              */
-	paren = 0;
-	for (s = str + sl - 2; *s && (*s != Inpar || paren); s--) {
-	    switch (*s) {
-	    case Outpar:
-		paren++; /*FALLTHROUGH*/
-	    case Bar:
-		if (!zpc_disables[ZPC_BAR])
-		    nobareglob = 1;
-		break;
-	    case Tilde:
-		if (isset(EXTENDEDGLOB) && !zpc_disables[ZPC_TILDE])
-		    nobareglob = 1;
-		break;
-	    case Inpar:
-		paren--;
-		break;
-	    }
-	}
-	if (*s != Inpar)
-	    break;
-	if (isset(EXTENDEDGLOB) && !zpc_disables[ZPC_HASH] && s[1] == Pound) {
-	    if (s[2] == 'q') {
-		*s = 0;
-		s += 2;
-	    } else
-		break;
-	} else if (nobareglob)
+	if (!(qualsfound = checkglobqual(str, sl, nobareglob, &s)))
 	    break;
 
 	/* Real qualifiers found. */
@@ -1194,6 +1222,8 @@ zglob(LinkList list, LinkNode np, int nountok)
 
 	str[sl-1] = 0;
 	*s++ = 0;
+	if (qualsfound == 2)
+	    s += 2;
 	while (*s && !newcolonmod) {
 	    func = (int (*) _((char *, Statptr, off_t, char *)))0;
 	    if (idigit(*s)) {

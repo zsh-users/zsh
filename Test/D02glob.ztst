@@ -526,3 +526,18 @@
 >+bus+bus matches +(+bus|-car)
 >@sinhats matches @(@sinhats|wrensinfens)
 >!kerror matches !(!somethingelse)
+
+  (
+    setopt extendedglob
+    cd glob.tmp
+    [[ -n a*(#qN) ]] && print File beginning with a
+    [[ -z z*(#qN) ]] && print No file beginning with z
+    [[ "a b c" = ?(#q) ]] && print Multiple files matched
+    setopt nonomatch
+    [[ -n z*(#q) ]] && print Normal string if nullglob not set
+  )
+0:Force glob expansion in conditions using (#q)
+>File beginning with a
+>No file beginning with z
+>Multiple files matched
+>Normal string if nullglob not set

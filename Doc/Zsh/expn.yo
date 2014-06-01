@@ -2305,7 +2305,11 @@ contained within it are balanced; appearance of `tt(|)', `tt(LPAR())' or
 recognised in this form even if a bare glob qualifier exists at the end of
 the pattern, for example `tt(*(#q*)(.))' will recognise executable regular
 files if both options are set; however, mixed syntax should probably be
-avoided for the sake of clarity.
+avoided for the sake of clarity.  Note that within conditions using the
+`tt([[)' form the presence of a parenthesised expression
+tt(LPAR()#q...+RPAR()) at the end of a string indicates that globbing
+should be performed; the expression may include glob qualifiers, but
+it is also valid if it is simply tt(LPAR()#q+RPAR()).
 
 A qualifier may be any one of the following:
 
