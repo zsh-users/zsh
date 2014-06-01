@@ -541,9 +541,11 @@ The exit status returned by the last command.
 )
 vindex(0)
 item(tt(0) <S>)(
-The name used to invoke the current shell.  If the tt(FUNCTION_ARGZERO) option
-is set, this is set temporarily within a shell function to the name of the
-function, and within a sourced script to the name of the script.
+The name used to invoke the current shell, or as set by the tt(-c) command
+line option upon invocation.  If the tt(FUNCTION_ARGZERO) option is set,
+tt($0) is set upon entry to a shell function to the name of the function,
+and upon entry to a sourced script to the name of the script, and reset to
+its previous value when the function or script returns.
 )
 vindex(status)
 item(tt(status) <S> <Z>)(

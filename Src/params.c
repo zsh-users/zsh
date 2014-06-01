@@ -67,6 +67,7 @@ char **path,		/* $path        */
 /**/
 mod_export
 char *argzero,		/* $0           */
+     *posixzero,	/* $0           */
      *home,		/* $HOME        */
      *nullcmd,		/* $NULLCMD     */
      *oldpwd,		/* $OLDPWD      */
@@ -194,6 +195,8 @@ static const struct gsu_integer euid_gsu =
 static const struct gsu_integer ttyidle_gsu =
 { ttyidlegetfn, nullintsetfn, stdunsetfn };
 
+static const struct gsu_scalar argzero_gsu =
+{ argzerogetfn, nullstrsetfn, nullunsetfn };
 static const struct gsu_scalar username_gsu =
 { usernamegetfn, usernamesetfn, stdunsetfn };
 static const struct gsu_scalar dash_gsu =
@@ -285,6 +288,7 @@ IPDEF2("WORDCHARS", wordchars_gsu, 0),
 IPDEF2("IFS", ifs_gsu, PM_DONTIMPORT),
 IPDEF2("_", underscore_gsu, PM_DONTIMPORT),
 IPDEF2("KEYBOARD_HACK", keyboard_hack_gsu, PM_DONTIMPORT),
+IPDEF2("0", argzero_gsu, 0),
 
 #ifdef USE_LOCALE
 # define LCIPDEF(name) IPDEF2(name, lc_blah_gsu, PM_UNSET)
@@ -340,7 +344,6 @@ IPDEF7U("RPROMPT2", &rprompt2),
 IPDEF7("PS3", &prompt3),
 IPDEF7("PS4", &prompt4),
 IPDEF7("SPROMPT", &sprompt),
-IPDEF7("0", &argzero),
 
 #define IPDEF8(A,B,C,D) {{NULL,A,D|PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(colonarr_gsu),0,0,NULL,C,NULL,0}
 IPDEF8("CDPATH", &cdpath, "cdpath", 0),
@@ -3980,6 +3983,17 @@ lcsetfn(Param pm, char *x)
     unqueue_signals();
 }
 #endif /* USE_LOCALE */
+
+/* Function to get value for special parameter `0' */
+
+/**/
+static char *
+argzerogetfn(UNUSED(Param pm))
+{
+    if (isset(POSIXARGZERO))
+	return posixzero;
+    return argzero;
+}
 
 /* Function to get value for special parameter `HISTSIZE' */
 

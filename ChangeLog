@@ -1,5 +1,10 @@
 2014-06-01  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32634 (plus doc): Doc/Zsh/options.yo, Doc/Zsh/params.yo,
+	Src/init.c, Src/options.c, Src/params.c, Src/zsh.h: add the
+	POSIX_ARGZERO option to allow toggling between the original
+	value of $0 and the value set by FUNCTION_ARGZERO
+
 	* Daniel Shahaf: users/18857: Doc/Zsh/expn.yo, Src/glob.c,
 	Test/D02glob.ztst: add (Y) glob qualifier
 

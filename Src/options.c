@@ -207,6 +207,7 @@ static struct optname optns[] = {
 {{NULL, "pathscript",	      OPT_EMULATE|OPT_BOURNE},	 PATHSCRIPT},
 {{NULL, "pipefail",           OPT_EMULATE},              PIPEFAIL},
 {{NULL, "posixaliases",       OPT_EMULATE|OPT_BOURNE},	 POSIXALIASES},
+{{NULL, "posixargzero",       OPT_EMULATE},              POSIXARGZERO},
 {{NULL, "posixbuiltins",      OPT_EMULATE|OPT_BOURNE},	 POSIXBUILTINS},
 {{NULL, "posixcd",            OPT_EMULATE|OPT_BOURNE},	 POSIXCD},
 {{NULL, "posixidentifiers",   OPT_EMULATE|OPT_BOURNE},	 POSIXIDENTIFIERS},

@@ -1608,7 +1608,10 @@ pindex(NOFUNCTIONARGZERO)
 cindex($0, setting)
 item(tt(FUNCTION_ARGZERO) <C> <Z>)(
 When executing a shell function or sourcing a script, set tt($0)
-temporarily to the name of the function/script.
+temporarily to the name of the function/script.  Note that toggling
+tt(FUNCTION_ARGZERO) from on to off (or off to on) does not change the
+current value of tt($0).  Only the state upon entry to the function or
+script has an effect.  Compare tt(POSIX_ARGZERO).
 )
 pindex(LOCAL_OPTIONS)
 pindex(NO_LOCAL_OPTIONS)
@@ -1944,6 +1947,26 @@ or even `tt(zsh -o posixaliases -c)', the entire command argument is parsed
 as one unit, so aliases defined within the argument are not available even
 in later lines.  If in doubt, avoid use of aliases in non-interactive
 code.
+)
+pindex(POSIX_ARGZERO)
+pindex(NO_POSIX_ARGZERO)
+pindex(POSIXARGZERO)
+pindex(NOPOSIXARGZERO)
+cindex($0, using)
+item(tt(POSIX_ARGZERO))(
+This option may be used to temporarily disable tt(FUNCTION_ARGZERO) and
+thereby restore the value of tt($0) to the name used to invoke the shell
+(or as set by the tt(-c) command line option).  For compatibility with
+previous versions of the shell, emulations use tt(NO_FUNCTION_ARGZERO)
+instead of tt(POSIX_ARGZERO), which may result in unexpected scoping of
+tt($0) if the emulation mode is changed inside a function or script.
+To avoid this, explicitly enable tt(POSIX_ARGZERO) in the tt(emulate)
+command:
+
+example(emulate sh -o POSIX_ARGZERO)
+
+Note that tt(NO_POSIX_ARGZERO) has no effect unless tt(FUNCTION_ARGZERO)
+was already enabled upon entry to the function or script.
 )
 pindex(POSIX_BUILTINS)
 pindex(NO_POSIX_BUILTINS)

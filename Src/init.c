@@ -226,7 +226,7 @@ parseargs(char **argv, char **runscript)
     char **x;
     LinkList paramlist;
 
-    argzero = *argv++;
+    argzero = posixzero = *argv++;
     SHIN = 0;
 
     /* There's a bit of trickery with opts[INTERACTIVE] here.  It starts *
@@ -253,7 +253,7 @@ parseargs(char **argv, char **runscript)
     if (*argv) {
 	if (unset(SHINSTDIN)) {
 	    if (cmd)
-		argzero = *argv;
+		argzero = posixzero = *argv;
 	    else
 		*runscript = *argv;
 	    opts[INTERACTIVE] &= 1;
@@ -275,6 +275,7 @@ parseargs(char **argv, char **runscript)
     while ((*x++ = (char *)getlinknode(paramlist)));
     free(paramlist);
     argzero = ztrdup(argzero);
+    posixzero = ztrdup(posixzero);
 }
 
 /* Insert into list in order of pointer value */
