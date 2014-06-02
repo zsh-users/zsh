@@ -1,6 +1,6 @@
 2014-06-02  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* 36526 (via Jun T. via waltarix on github): when __APPLE__ is
+	* 32656 (via Jun T. via waltarix on github): when __APPLE__ is
 	defined at compile, normalize Unicode filenames in zreaddir()
 
 2014-06-02  Peter Stephenson  <p.stephenson@samsung.com>
