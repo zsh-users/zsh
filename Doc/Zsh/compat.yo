@@ -6,7 +6,7 @@ cindex(ksh compatibility)
 Zsh tries to emulate bf(sh) or bf(ksh) when it is invoked as
 tt(sh) or tt(ksh) respectively; more precisely, it looks at the first
 letter of the name by which it was invoked, excluding any initial `tt(r)'
-(assumed to stand for `restricted'), and if that is `tt(s)' or `tt(k)' it
+(assumed to stand for `restricted'), and if that is `tt(b)', `tt(s)' or `tt(k)' it
 will emulate bf(sh) or bf(ksh).  Furthermore, if invoked as tt(su) (which
 happens on certain systems when the shell is executed by the tt(su)
 command), the shell will try to find an alternative name from the tt(SHELL)

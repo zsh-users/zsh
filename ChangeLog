@@ -1,3 +1,8 @@
+2014-06-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 32666: Doc/Zsh/compat.yo: shell emulation based on executable
+	name incompletely documented.
+
 2014-06-11  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Jun T: 32767: Src/glob.c: another spot to tweak bracechardots()
