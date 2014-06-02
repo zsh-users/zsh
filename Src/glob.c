@@ -297,15 +297,16 @@ statfullpath(const char *s, struct stat *st, int l)
 
 char **inserts;
 
-/* add a match to the list */
+/* add a match to the list.  Return 1 if it was inserted, 0 otherwise. */
 
 /**/
-static void
+static int
 insert(char *s, int checked)
 {
     struct stat buf, buf2, *bp;
     char *news = s;
     int statted = 0;
+    int inserted = 0;
 
     queue_signals();
     inserts = NULL;
@@ -316,7 +317,7 @@ insert(char *s, int checked)
 	checked = statted = 1;
 	if (statfullpath(s, &buf, 1)) {
 	    unqueue_signals();
-	    return;
+	    return inserted;
 	}
 	mode = buf.st_mode;
 	if (gf_follow) {
@@ -340,7 +341,7 @@ insert(char *s, int checked)
 
 	if (!statted && statfullpath(s, &buf, 1)) {
 	    unqueue_signals();
-	    return;
+	    return inserted;
 	}
 	news = dyncat(pathbuf, news);
 
@@ -365,7 +366,7 @@ insert(char *s, int checked)
 		/* Try next alternative, or return if there are no more */
 		if (!(qo = qo->or)) {
 		    unqueue_signals();
-		    return;
+		    return inserted;
 		}
 		qn = qo;
 		continue;
@@ -375,7 +376,7 @@ insert(char *s, int checked)
     } else if (!checked) {
 	if (statfullpath(s, NULL, 1)) {
 	    unqueue_signals();
-	    return;
+	    return inserted;
 	}
 	statted = 1;
 	news = dyncat(pathbuf, news);
@@ -435,6 +436,7 @@ insert(char *s, int checked)
 	}
 	matchptr++;
 
+	inserted = 1;
 	if (++matchct == matchsz) {
 	    matchbuf = (Gmatch )realloc((char *)matchbuf,
 					sizeof(struct gmatch) * (matchsz *= 2));
@@ -445,6 +447,7 @@ insert(char *s, int checked)
 	    break;
     }
     unqueue_signals();
+    return inserted;
 }
 
 /* Do the globbing:  scanner is called recursively *
@@ -525,8 +528,7 @@ scanner(Complist q, int shortcircuit)
 	} else {
 	    if (str[l])
 		str = dupstrpfx(str, l);
-	    insert(str, 0);
-	    if (shortcircuit)
+	    if (insert(str, 0) == 1 && shortcircuit)
 		return 1;
 	}
     } else {
@@ -617,8 +619,7 @@ scanner(Complist q, int shortcircuit)
 		    subdirlen += sizeof(int);
 		} else
 		    /* if the last filename component, just add it */
-		    insert(fn, 1);
-		    if (shortcircuit)
+		    if (insert(fn, 1) == 1 && shortcircuit)
 			return 1;
 	    }
 	}

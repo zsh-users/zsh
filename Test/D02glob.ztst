@@ -546,9 +546,14 @@
  (){ print $#@ } glob.tmp/dir*(Y)
  (){ print $#@ } glob.tmp/file*(NY)
  (){ [[ $1 = glob.tmp/dir? ]] && echo "(Y) returns a matching filename" } glob.tmp/dir*(Y)
+ # Can be negated
  (){ print $@:t } glob.tmp/dir*(Y^Y)
+ (){ [[ $#@ -eq 1 ]] && print Globs before last path component } glob.tmp/dir?/subdir(NY)
+ (){ [[ $#@ -eq 0 ]] && print Respects qualifiers } glob.tmp/dir?/subdir(NY.)
 0:short-circuit modifier
 >1
 >0
 >(Y) returns a matching filename
 >dir1 dir2 dir3 dir4
+>Globs before last path component
+>Respects qualifiers

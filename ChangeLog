@@ -1,3 +1,9 @@
+2014-06-02  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Daniel Sharaf: users/18870: Src/glob.c, Test/D02glob.ztst:
+	glob scanner needed some coaxing with counting matches with (Y)
+	glob qualifier.
+
 2014-06-01  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32653: Completion/Unix/Command/_php: complete files with the
