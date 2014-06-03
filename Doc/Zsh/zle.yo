@@ -730,6 +730,7 @@ vindex(CONTEXT)
 item(tt(CONTEXT) (scalar))(
 The context in which zle was called to read a line; read-only.  One of
 the values:
+
 startitem()
 item(start)(
 The start of a command line (at prompt tt(PS1)).
