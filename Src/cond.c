@@ -532,6 +532,17 @@ cond_val(char **args, int num)
 }
 
 /**/
+mod_export int
+cond_match(char **args, int num, char *str)
+{
+    char *s = args[num];
+
+    singsub(&s);
+
+    return matchpat(str, s);
+}
+
+/**/
 static void
 tracemodcond(char *name, char **args, int inf)
 {
