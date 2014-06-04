@@ -2564,9 +2564,10 @@ item(tt(n))(
 sets the tt(NUMERIC_GLOB_SORT) option for the current pattern
 pindex(NUMERIC_GLOB_SORT, setting in pattern)
 )
-item(tt(Y))(
-enables short-circuit mode: the pattern will expand to just the first
-matching filename, if any.
+item(tt(Y)var(n))(
+enables short-circuit mode: the pattern will expand to at most var(n)
+filenames.  If more than var(n) matches exist, only the first var(n)
+matches in directory traversal order will be considered.
 )
 item(tt(o)var(c))(
 specifies how the names of the files should be sorted. If var(c) is

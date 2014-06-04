@@ -297,16 +297,15 @@ statfullpath(const char *s, struct stat *st, int l)
 
 char **inserts;
 
-/* add a match to the list.  Return 1 if it was inserted, 0 otherwise. */
+/* add a match to the list */
 
 /**/
-static int
+static void
 insert(char *s, int checked)
 {
     struct stat buf, buf2, *bp;
     char *news = s;
     int statted = 0;
-    int inserted = 0;
 
     queue_signals();
     inserts = NULL;
@@ -317,7 +316,7 @@ insert(char *s, int checked)
 	checked = statted = 1;
 	if (statfullpath(s, &buf, 1)) {
 	    unqueue_signals();
-	    return inserted;
+	    return;
 	}
 	mode = buf.st_mode;
 	if (gf_follow) {
@@ -341,7 +340,7 @@ insert(char *s, int checked)
 
 	if (!statted && statfullpath(s, &buf, 1)) {
 	    unqueue_signals();
-	    return inserted;
+	    return;
 	}
 	news = dyncat(pathbuf, news);
 
@@ -366,7 +365,7 @@ insert(char *s, int checked)
 		/* Try next alternative, or return if there are no more */
 		if (!(qo = qo->or)) {
 		    unqueue_signals();
-		    return inserted;
+		    return;
 		}
 		qn = qo;
 		continue;
@@ -376,7 +375,7 @@ insert(char *s, int checked)
     } else if (!checked) {
 	if (statfullpath(s, NULL, 1)) {
 	    unqueue_signals();
-	    return inserted;
+	    return;
 	}
 	statted = 1;
 	news = dyncat(pathbuf, news);
@@ -436,7 +435,6 @@ insert(char *s, int checked)
 	}
 	matchptr++;
 
-	inserted = 1;
 	if (++matchct == matchsz) {
 	    matchbuf = (Gmatch )realloc((char *)matchbuf,
 					sizeof(struct gmatch) * (matchsz *= 2));
@@ -447,7 +445,7 @@ insert(char *s, int checked)
 	    break;
     }
     unqueue_signals();
-    return inserted;
+    return;
 }
 
 /* Do the globbing:  scanner is called recursively *
@@ -455,7 +453,7 @@ insert(char *s, int checked)
  * tried all of it.                                */
 
 /**/
-static int
+static void
 scanner(Complist q, int shortcircuit)
 {
     Patprog p;
@@ -466,15 +464,16 @@ scanner(Complist q, int shortcircuit)
 
     init_dirsav(&ds);
     if (!q)
-	return -1;
+	return;
 
     if ((closure = q->closure)) {
 	/* (foo/)# - match zero or more dirs */
 	if (q->closure == 2)	/* (foo/)## - match one or more dirs */
 	    q->closure = 1;
 	else
-	    if (scanner(q->next, shortcircuit) == 1)
-		return 1;
+	    scanner(q->next, shortcircuit);
+	    if (shortcircuit && shortcircuit == matchct)
+		return;
     }
     p = q->pat;
     /* Now the actual matching for the current path section. */
@@ -489,13 +488,13 @@ scanner(Complist q, int shortcircuit)
 	    int err;
 
 	    if (l >= PATH_MAX)
-		return -1;
+		return;
 	    err = lchdir(pathbuf + pathbufcwd, &ds, 0);
 	    if (err == -1)
-		return -1;
+		return;
 	    if (err) {
 		zerr("current directory lost during glob");
-		return -1;
+		return;
 	    }
 	    pathbufcwd = pathpos;
 	}
@@ -520,16 +519,18 @@ scanner(Complist q, int shortcircuit)
 		if (add) {
 		    addpath(str, l);
 		    if (!closure || !statfullpath("", NULL, 1))
-			if (scanner((q->closure) ? q : q->next, shortcircuit) == 1)
-			    return 1;
+			scanner((q->closure) ? q : q->next, shortcircuit);
+			if (shortcircuit && shortcircuit == matchct)
+			    return;
 		    pathbuf[pathpos = oppos] = '\0';
 		}
 	    }
 	} else {
 	    if (str[l])
 		str = dupstrpfx(str, l);
-	    if (insert(str, 0) == 1 && shortcircuit)
-		return 1;
+	    insert(str, 0);
+	    if (shortcircuit && shortcircuit == matchct)
+		return;
 	}
     } else {
 	/* Do pattern matching on current path section. */
@@ -540,7 +541,7 @@ scanner(Complist q, int shortcircuit)
 	int subdirlen = 0;
 
 	if (lock == NULL)
-	    return -1;
+	    return;
 	while ((fn = zreaddir(lock, 1)) && !errflag) {
 	    /* prefix and suffix are zle trickery */
 	    if (!dirs && !colonmod &&
@@ -619,8 +620,9 @@ scanner(Complist q, int shortcircuit)
 		    subdirlen += sizeof(int);
 		} else
 		    /* if the last filename component, just add it */
-		    if (insert(fn, 1) == 1 && shortcircuit)
-			return 1;
+		    insert(fn, 1);
+		    if (shortcircuit && shortcircuit == matchct)
+			return;
 	    }
 	}
 	closedir(lock);
@@ -633,8 +635,10 @@ scanner(Complist q, int shortcircuit)
 		fn += l + 1;
 		memcpy((char *)&errsfound, fn, sizeof(int));
 		fn += sizeof(int);
-		if (scanner((q->closure) ? q : q->next, shortcircuit) == 1) /* scan next level */
-		    return 1;
+		/* scan next level */
+		scanner((q->closure) ? q : q->next, shortcircuit); 
+		if (shortcircuit && shortcircuit == matchct)
+		    return;
 		pathbuf[pathpos = oppos] = '\0';
 	    }
 	    hrealloc(subdirs, subdirlen, 0);
@@ -648,7 +652,7 @@ scanner(Complist q, int shortcircuit)
 	    close(ds.dirfd);
 	pathbufcwd = pbcwdsav;
     }
-    return 0;
+    return;
 }
 
 /* This function tokenizes a zsh glob pattern */
@@ -1150,7 +1154,8 @@ zglob(LinkList list, LinkNode np, int nountok)
 					/* and index+1 of the last match */
     struct globdata saved;		/* saved glob state              */
     int nobareglob = !isset(BAREGLOBQUAL);
-    int shortcircuit = 0;
+    int shortcircuit = 0;		/* How many files to match;      */
+					/* 0 means no limit              */
 
     if (unset(GLOBOPT) || !haswilds(ostr) || unset(EXECOPT)) {
 	if (!nountok)
@@ -1502,9 +1507,22 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    gf_numsort = !(sense & 1);
 		    break;
 		case 'Y':
-		    /* Short circuit: just check if there are any matches */
+		{
+		    /* Short circuit: limit number of matches */
+		    const char *s_saved = s;
 		    shortcircuit = !(sense & 1);
+		    if (shortcircuit) {
+			/* Parse the argument. */
+			data = qgetnum(&s);
+			if ((shortcircuit = data) != data) {
+			    /* Integer overflow */
+			    zerr("value too big: Y%s", s_saved);
+			    restore_globstate(saved);
+			    return;
+			}
+		    }
 		    break;
+		}
 		case 'a':
 		    /* Access time in given range */
 		    g_amc = 0;

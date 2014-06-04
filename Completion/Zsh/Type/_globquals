@@ -251,6 +251,7 @@ case $state in
     "o:+ sort order, up"
     "O:+ sort order, down"
     "P:prepend word"
+    "Y:+ at most ARG matches"
     "[:+ range of files"
     "):end of qualifiers"
     "\::modifier"

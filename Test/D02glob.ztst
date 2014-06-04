@@ -543,17 +543,22 @@
 >Multiple files matched
 >Normal string if nullglob not set
 
- (){ print $#@ } glob.tmp/dir*(Y)
- (){ print $#@ } glob.tmp/file*(NY)
- (){ [[ $1 = glob.tmp/dir? ]] && echo "(Y) returns a matching filename" } glob.tmp/dir*(Y)
- # Can be negated
- (){ print $@:t } glob.tmp/dir*(Y^Y)
- (){ [[ $#@ -eq 1 ]] && print Globs before last path component } glob.tmp/dir?/subdir(NY)
- (){ [[ $#@ -eq 0 ]] && print Respects qualifiers } glob.tmp/dir?/subdir(NY.)
+ (){ print $#@ } glob.tmp/dir*(Y1)
+ (){ print $#@ } glob.tmp/file*(NY1)
+ (){ [[ "$*" == */dir?\ */dir? ]] && print Returns matching filenames } glob.tmp/dir*(Y2)
+ (){ print "Limit is upper bound:" $@:t } glob.tmp/dir*(Y5)
+ (){ print "Negated:" $@:t } glob.tmp/dir*(Y1^Y)
+ (){ print "Sorting:" $@:t } glob.tmp/dir*(Y4On)
+ (){ [[ $#@ -eq 1 ]] && print Globs before last path component } glob.tmp/dir?/subdir(NY1)
+ (){ [[ $#@ -eq 0 ]] && print Respects qualifiers } glob.tmp/dir*(NY1.)
+ (print -- *(Y)) 2>/dev/null || print "Argument required"
 0:short-circuit modifier
 >1
 >0
->(Y) returns a matching filename
->dir1 dir2 dir3 dir4
+>Returns matching filenames
+>Limit is upper bound: dir1 dir2 dir3 dir4
+>Negated: dir1 dir2 dir3 dir4
+>Sorting: dir4 dir3 dir2 dir1
 >Globs before last path component
 >Respects qualifiers
+>Argument required
