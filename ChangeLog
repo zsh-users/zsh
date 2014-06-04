@@ -1,3 +1,8 @@
+2014-06-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Andrew Magee: 32698: Completion/Unix/Command/_hg: show
+	committable files.
+
 2014-06-05  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32723: Src/glob.c: add braces around some if/else branches
