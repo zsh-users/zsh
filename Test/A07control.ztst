@@ -23,12 +23,12 @@
 >start 255
 >255
 
-  fn() {
+  $ZTST_testdir/../Src/zsh -fc 'fn() {
     continue
   }
-  fn
+  fn'
 1:continue outside loop
-?fn:continue:1 not in while, until, select, or repeat loop
+?fn:continue:1: not in while, until, select, or repeat loop
 
   for outer in 0 1 2 3; do
     print outer $outer

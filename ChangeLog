@@ -1,5 +1,9 @@
 2014-06-04  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32711: Test/A07control.ztst: run "continue" test in a new
+	shell, lest it inadvertently continue the loop that reads the
+	test chunks from this file
+
 	* Daniel Shahaf: 32708: Doc/Zsh/expn.yo, Src/glob.c,
 	Test/D02glob.ztst: glob qualifier (Y) implies (oN), plus
 	incidental patch to avoid adding a meaningless bitvalue to
