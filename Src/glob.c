@@ -1619,9 +1619,10 @@ zglob(LinkList list, LinkNode np, int nountok)
 			restore_globstate(saved);
 			return;
 		    }
+		    if ((sense & 2) &&
+			(t & (GS_SIZE|GS_ATIME|GS_MTIME|GS_CTIME|GS_LINKS)))
+			t <<= GS_SHIFT; /* HERE: GS_EXEC? */
 		    if (t != GS_EXEC) {
-			if ((sense & 2) && !(t & (GS_NAME|GS_DEPTH)))
-			    t <<= GS_SHIFT; /* HERE: GS_EXEC? */
 			if (gf_sorts & t) {
 			    zerr("doubled sort specifier");
 			    restore_globstate(saved);
@@ -1779,7 +1780,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 	return;
     }
     if (!gf_nsorts) {
-	gf_sortlist[0].tp = gf_sorts = GS_NAME;
+	gf_sortlist[0].tp = gf_sorts = (shortcircuit ? GS_NONE : GS_NAME);
 	gf_nsorts = 1;
     }
     /* Initialise receptacle for matched files, *

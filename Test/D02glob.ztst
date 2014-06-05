@@ -546,7 +546,7 @@
  (){ print $#@ } glob.tmp/dir*(Y1)
  (){ print $#@ } glob.tmp/file*(NY1)
  (){ [[ "$*" == */dir?\ */dir? ]] && print Returns matching filenames } glob.tmp/dir*(Y2)
- (){ print "Limit is upper bound:" $@:t } glob.tmp/dir*(Y5)
+ (){ print "Limit is upper bound:" ${(o)@:t} } glob.tmp/dir*(Y5)
  (){ print "Negated:" $@:t } glob.tmp/dir*(Y1^Y)
  (){ print "Sorting:" $@:t } glob.tmp/dir*(Y4On)
  (){ [[ $#@ -eq 1 ]] && print Globs before last path component } glob.tmp/dir?/subdir(NY1)

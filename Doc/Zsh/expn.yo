@@ -2568,10 +2568,12 @@ item(tt(Y)var(n))(
 enables short-circuit mode: the pattern will expand to at most var(n)
 filenames.  If more than var(n) matches exist, only the first var(n)
 matches in directory traversal order will be considered.
+
+Implies tt(oN) when no tt(o)var(c) qualifier is used.
 )
 item(tt(o)var(c))(
 specifies how the names of the files should be sorted. If var(c) is
-tt(n) they are sorted by name (the default); if it is tt(L) they
+tt(n) they are sorted by name; if it is tt(L) they
 are sorted depending on the size (length) of the files; if tt(l)
 they are sorted by the number of links; if tt(a), tt(m), or tt(c)
 they are sorted by the time of the last access, modification, or
@@ -2585,6 +2587,9 @@ youngest file. Also note that the modifiers tt(^) and tt(-) are used,
 so `tt(*(^-oL))' gives a list of all files sorted by file size in descending
 order, following any symbolic links.  Unless tt(oN) is used, multiple order
 specifiers may occur to resolve ties.
+
+The default sorting is tt(n) (by name) unless the tt(Y) glob qualifier is used,
+in which case it is tt(N) (unsorted).
 
 tt(oe) and tt(o+) are special cases; they are each followed by shell code,
 delimited as for the tt(e) glob qualifier and the tt(+) glob qualifier
