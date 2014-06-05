@@ -465,37 +465,38 @@ shell constructs such as loops or conditions; this somewhat illogical
 behaviour can be recovered by setting the option tt(CONTINUE_ON_ERROR).
 
 Fatal errors found in non-interactive shells include:
-startlist()
-list(Failure to parse shell options passed when invoking the shell)
-list(Failure to change options with the tt(set) builtin)
-list(Parse errors of all sorts, including failures to parse
+
+startitemize()
+itemiz(Failure to parse shell options passed when invoking the shell)
+itemiz(Failure to change options with the tt(set) builtin)
+itemiz(Parse errors of all sorts, including failures to parse
 mathematical expressions)
-list(Failures to set or modify variable behaviour with tt(typeset),
+itemiz(Failures to set or modify variable behaviour with tt(typeset),
 tt(local), tt(declare), tt(export), tt(integer), tt(float))
-list(Execution of incorrectly positioned loop control structures
+itemiz(Execution of incorrectly positioned loop control structures
 (tt(continue), tt(break)))
-list(Attempts to use regular expression with no regular expression
+itemiz(Attempts to use regular expression with no regular expression
 module available)
-list(Disallowed operations when the tt(RESTRICTED) options is set)
-list(Failure to create a pipe needed for a pipeline)
-list(Failure to create a multio)
-list(Failure to autoload a module needed for a declared shell feature)
-list(Errors creating command or process substitutions)
-list(Syntax errors in glob qualifiers)
-list(File generation errors where not caught by the option tt(BAD_PATTERN))
-list(All bad patterns used for matching within case statements)
-list(File generation failures where not caused by tt(NO_MATCH) or
-list(All file generation errors where the pattern was used to create a
+itemiz(Disallowed operations when the tt(RESTRICTED) options is set)
+itemiz(Failure to create a pipe needed for a pipeline)
+itemiz(Failure to create a multio)
+itemiz(Failure to autoload a module needed for a declared shell feature)
+itemiz(Errors creating command or process substitutions)
+itemiz(Syntax errors in glob qualifiers)
+itemiz(File generation errors where not caught by the option tt(BAD_PATTERN))
+itemiz(All bad patterns used for matching within case statements)
+itemiz(File generation failures where not caused by tt(NO_MATCH) or
+itemiz(All file generation errors where the pattern was used to create a
 multio)
-list(Memory errors where detected by the shell)
-list(Invalid subscripts to shell variables)
-list(Attempts to assign read-only variables)
-list(Logical errors with variables such as assignment to the wrong type)
-list(Use of invalid variable names)
-list(Errors in variable substitution syntax)
-list(Failure to convert characters in tt($')...tt(') expressions)
+itemiz(Memory errors where detected by the shell)
+itemiz(Invalid subscripts to shell variables)
+itemiz(Attempts to assign read-only variables)
+itemiz(Logical errors with variables such as assignment to the wrong type)
+itemiz(Use of invalid variable names)
+itemiz(Errors in variable substitution syntax)
+itemiz(Failure to convert characters in tt($')...tt(') expressions)
 similar options)
-endlist()
+enditemize()
 
 If the tt(POSIX_BUILTINS) option is set, more errors associated with
 shell builtin commands are treated as fatal, as specified by the POSIX

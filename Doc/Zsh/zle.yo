@@ -732,16 +732,16 @@ The context in which zle was called to read a line; read-only.  One of
 the values:
 
 startitem()
-item(start)(
+item(tt(start))(
 The start of a command line (at prompt tt(PS1)).
 )
-item(cont)(
+item(tt(cont))(
 A continuation to a command line (at prompt tt(PS2)).
 )
-item(select)(
+item(tt(select))(
 In a tt(select) loop.
 )
-item(vared)(
+item(tt(vared))(
 Editing a variable in tt(vared).
 )
 enditem()
@@ -878,21 +878,21 @@ is needed for character indexing to include tt(PREDISPLAY).
 
 Each string consists of the following parts:
 
-startlist()
-list(Optionally, a `tt(P)' to signify that the start and end offset that
+startitemize()
+itemiz(Optionally, a `tt(P)' to signify that the start and end offset that
 follow include any string set by the tt(PREDISPLAY) special parameter;
 this is needed if the predisplay string itself is to be highlighted.
 Whitespace may follow the `tt(P)'.)
-list(A start offset in the same units as tt(CURSOR), terminated by
+itemiz(A start offset in the same units as tt(CURSOR), terminated by
 whitespace.)
-list(An end offset in the same units as tt(CURSOR), terminated by
+itemiz(An end offset in the same units as tt(CURSOR), terminated by
 whitespace.)
-list(A highlight specification in the same format as
+itemiz(A highlight specification in the same format as
 used for contexts in the parameter tt(zle_highlight),
 ifnzman(noderef(Character Highlighting))\
 ifzman(see Character Highlighting below);
 for example, tt(standout) or tt(fg=red,bold)).
-endlist()
+enditemize()
 
 For example, 
 

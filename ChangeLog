@@ -1,5 +1,8 @@
 2014-06-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Jun T: 32715: Doc/Zsh/calsys.yo, Doc/Zsh/grammar.yo,
+	Doc/Zsh/zle.yo: formatting fixes.
+
 	* 32682 with tweaks: Doc/Zsh/options.yo, Src/hist.c,
 	Src/options.c, Src/zsh.h: INC_APPEND_HISTORY_TIME is new
 	behaviour, with INC_APPEND_HISTORY reverting to its previous
