@@ -1,5 +1,7 @@
 2014-06-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Jun T: 32719: Doc/Zsh/contrib.yo: minor issues.
+
 	* Jun T: 32715: Doc/Zsh/calsys.yo, Doc/Zsh/grammar.yo,
 	Doc/Zsh/zle.yo: formatting fixes.
 
