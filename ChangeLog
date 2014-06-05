@@ -1,3 +1,8 @@
+2014-06-05  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32716 (via Jun T. 31714): Src/utils.c: properly test iconv
+	return values for error conditions
+
 2014-06-04  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32711: Test/A07control.ztst: run "continue" test in a new
