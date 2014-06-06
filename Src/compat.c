@@ -40,7 +40,7 @@ strstr(const char *s, const char *t)
     char *p1, *p2;
 
     for (; *s; s++) {
-        for (p1 = s, p2 = t; *p2; p1++, p2++)
+        for (p1 = (char*)s, p2 = (char*)t; *p2; p1++, p2++)
             if (*p1 != *p2)
                 break;
         if (!*p2)

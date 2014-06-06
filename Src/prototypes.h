@@ -130,5 +130,5 @@ extern char *strerror _((int errnum));
 /***************************************************/
 
 #ifndef HAVE_MEMMOVE
-extern void bcopy _((const void *, void *, int));
+extern void bcopy _((const void *, void *, size_t));
 #endif
