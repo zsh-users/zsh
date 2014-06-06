@@ -708,7 +708,10 @@ struct timezone {
 #endif
 
 #ifndef HAVE_MEMMOVE
-# define memmove(dest, src, len) bcopy((src), (dest), (len))
+void *memmove(void *dest, const void *src, size_t n) {
+	bcopy(src, dest, n);
+	return dest;
+}
 #endif
 
 #ifndef offsetof
