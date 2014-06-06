@@ -369,7 +369,7 @@ signal_suspend(UNUSED(int sig), int wait_cmd)
 #ifdef POSIX_SIGNALS
 # ifdef BROKEN_POSIX_SIGSUSPEND
     sigprocmask(SIG_SETMASK, &set, &oset);
-    pause();
+    ret = pause();
     sigprocmask(SIG_SETMASK, &oset, NULL);
 # else /* not BROKEN_POSIX_SIGSUSPEND */
     ret = sigsuspend(&set);
