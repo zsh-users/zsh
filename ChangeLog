@@ -1,5 +1,7 @@
 2014-06-05  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32723: Src/glob.c: add braces around some if/else branches
+
 	* 32716 (via Jun T. 31714): Src/utils.c: properly test iconv
 	return values for error conditions
 
