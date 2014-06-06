@@ -935,8 +935,10 @@ hbegin(int dohist)
 
     hf = getsparam("HISTFILE");
     /*
-     * For INCAPPENDHISTORY, when interactive, save the history here
+     * For INCAPPENDHISTORYTIME, when interactive, save the history here
      * as it gives a better estimate of the times of commands.
+     *
+     * If INCAPPENDHISTORY is also set we've already done it.
      *
      * If SHAREHISTORY is also set continue to do so in the
      * standard place, because that's safer about reading and
@@ -950,7 +952,8 @@ hbegin(int dohist)
      * so that (correctly) nothing happens here.  But it shows
      * I thought about it.
      */
-    if (isset(INCAPPENDHISTORY) && !isset(SHAREHISTORY) &&
+    if (isset(INCAPPENDHISTORYTIME) && !isset(SHAREHISTORY) &&
+	!isset(INCAPPENDHISTORY) &&
 	!(histactive & HA_NOINC) && !strin && histsave_stack_pos == 0)
 	savehistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
 }
@@ -1378,7 +1381,8 @@ hend(Eprog prog)
      * For normal INCAPPENDHISTORY case and reasoning, see hbegin().
      */
     if (isset(SHAREHISTORY) ? histfileIsLocked() :
-	(isset(INCAPPENDHISTORY) && histsave_stack_pos != 0))
+	(isset(INCAPPENDHISTORY) || (isset(INCAPPENDHISTORYTIME) &&
+				     histsave_stack_pos != 0)))
 	savehistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
     unlockhistfile(hf); /* It's OK to call this even if we aren't locked */
     /*
@@ -2542,7 +2546,7 @@ savehistfile(char *fn, int err, int writeflags)
     }
     if (writeflags & HFILE_USE_OPTIONS) {
 	if (isset(APPENDHISTORY) || isset(INCAPPENDHISTORY)
-	 || isset(SHAREHISTORY))
+	 || isset(INCAPPENDHISTORYTIME) || isset(SHAREHISTORY))
 	    writeflags |= HFILE_APPEND | HFILE_SKIPOLD;
 	else
 	    histfile_linect = 0;
@@ -2578,7 +2582,7 @@ savehistfile(char *fn, int err, int writeflags)
 		tmpfile = NULL;
 		if (err) {
 		    if (isset(APPENDHISTORY) || isset(INCAPPENDHISTORY)
-		     || isset(SHAREHISTORY))
+		     || isset(INCAPPENDHISTORYTIME) || isset(SHAREHISTORY))
 			zerr("rewriting %s would change its ownership -- skipped", fn);
 		    else
 			zerr("rewriting %s would change its ownership -- history not saved", fn);

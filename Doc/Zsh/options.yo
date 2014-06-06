@@ -971,6 +971,23 @@ The file will still be periodically re-written to trim it when the
 number of lines grows 20% beyond the value specified by
 tt($SAVEHIST) (see also the HIST_SAVE_BY_COPY option).
 )
+pindex(INC_APPEND_HISTORY_TIME)
+pindex(NO_INC_APPEND_HISTORY_TIME)
+pindex(INCAPPENDHISTORYTIME)
+pindex(NOINCAPPENDHISTORYTIME)
+cindex(history, incremental appending to a file with time)
+item(tt(INC_APPEND_HISTORY_TIME))(
+This option is a variant of tt(INC_APPEND_HISTORY) in which, where
+possible, the history entry is written out to the file after the
+command is finished, so that the time taken by the command is recorded
+correctly in the history file in tt(EXTENDED_HISTORY) format.  This
+means that the history entry will not be available immediately from
+other instances of the shell that are using the same history file.
+
+This option is only useful if tt(INC_APPEND_HISTORY) and
+tt(SHARE_HISTORY) are turned off.  The three options should be
+considered mutually exclusive.
+)
 pindex(SHARE_HISTORY)
 pindex(NO_SHARE_HISTORY)
 pindex(SHAREHISTORY)
@@ -981,10 +998,10 @@ item(tt(SHARE_HISTORY) <K>)(
 
 This option both imports new commands from the history file, and also
 causes your typed commands to be appended to the history file (the
-latter is like specifying tt(INC_APPEND_HISTORY)).
-The history lines are also output with timestamps ala
-tt(EXTENDED_HISTORY) (which makes it easier to find the spot where
-we left off reading the file after it gets re-written).
+latter is like specifying tt(INC_APPEND_HISTORY), which should be turned
+off if this option is in effect).  The history lines are also output
+with timestamps ala tt(EXTENDED_HISTORY) (which makes it easier to find
+the spot where we left off reading the file after it gets re-written).
 
 By default, history movement commands visit the imported lines as
 well as the local lines, but you can toggle this on and off with the
@@ -994,8 +1011,9 @@ some include them.
 
 If you find that you want more control over when commands
 get imported, you may wish to turn tt(SHARE_HISTORY) off,
-tt(INC_APPEND_HISTORY) on, and then manually import
-commands whenever you need them using `tt(fc -RI)'.
+tt(INC_APPEND_HISTORY) or tt(INC_APPEND_HISTORY_TIME) (see above) on,
+and then manually import commands whenever you need them using `tt(fc
+-RI)'.
 )
 enditem()
 
