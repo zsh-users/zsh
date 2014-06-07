@@ -2712,8 +2712,11 @@ ztrftimebuf(int *bufsizeptr, int decr)
 mod_export int
 ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 {
-    int hr12, decr;
-#ifndef HAVE_STRFTIME
+    int hr12;
+#ifdef HAVE_STRFTIME
+    int decr;
+    char tmp[4];
+#else
     static char *astr[] =
     {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
     static char *estr[] =
@@ -2721,7 +2724,6 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
      "Aug", "Sep", "Oct", "Nov", "Dec"};
 #endif
     char *origbuf = buf;
-    char tmp[4];
 
 
     while (*fmt)

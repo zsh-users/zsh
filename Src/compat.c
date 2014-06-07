@@ -37,7 +37,7 @@
 char *
 strstr(const char *s, const char *t)
 {
-    char *p1, *p2;
+    const char *p1, *p2;
 
     for (; *s; s++) {
         for (p1 = s, p2 = t; *p2; p1++, p2++)

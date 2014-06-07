@@ -1508,7 +1508,7 @@ zsfree(char *p)
 MALLOC_RET_T
 realloc(MALLOC_RET_T p, MALLOC_ARG_T size)
 {
-    struct m_hdr *m = (struct m_hdr *)(((char *)p) - M_ISIZE), *mp, *mt;
+    struct m_hdr *m = (struct m_hdr *)(((char *)p) - M_ISIZE), *mt;
     char *r;
     int i, l = 0;
 
@@ -1524,10 +1524,10 @@ realloc(MALLOC_RET_T p, MALLOC_ARG_T size)
     /* check if we are reallocating a small block, if we do, we have
        to compute the size of the block from the sort of block it is in */
     for (i = 0; i < M_NSMALL; i++) {
-	for (mp = NULL, mt = m_small[i];
+	for (mt = m_small[i];
 	     mt && (((char *)mt) > ((char *)p) ||
 		    (((char *)mt) + mt->len) < ((char *)p));
-	     mp = mt, mt = mt->next);
+	     mt = mt->next);
 
 	if (mt) {
 	    l = M_BSLEN(mt->len);
