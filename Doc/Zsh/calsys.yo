@@ -547,35 +547,36 @@ and status 2 if the wrong number of arguments were passed; it also sets the
 parameter tt(reply) to an empty associative array.  Otherwise,
 it returns status 0 and sets elements of the associative
 array tt(reply) as follows:
+
 startsitem()
-sitem(time)(The time as a string of digits in the same units as
+sitem(tt(time))(The time as a string of digits in the same units as
 tt($EPOCHSECONDS))
-sitem(schedtime)(The regularly scheduled time.  This may differ from
+sitem(tt(schedtime))(The regularly scheduled time.  This may differ from
 the actual event time tt(time) if this is a recurring event and the next
 occurrence has been rescheduled.  Then tt(time) gives the actual time
 and tt(schedtime) the time of the regular recurrence before modification.)
-sitem(text1)(The text from the line not including the date and time of the
+sitem(tt(text1))(The text from the line not including the date and time of the
 event, but including any tt(WARN) or tt(RPT) keywords and values.)
-sitem(warntime)(Any warning time given by the tt(WARN) keyword as a string
+sitem(tt(warntime))(Any warning time given by the tt(WARN) keyword as a string
 of digits containing the time at which to warn in the same units as
 tt($EPOCHSECONDS).  (Note this is an absolute time, not the relative time
 passed down.)  Not set no tt(WARN) keyword and value were
 matched.)
-sitem(warnstr)(The raw string matched after the tt(WARN) keyword, else unset.)
-sitem(rpttime)(Any recurrence time given by the tt(RPT) keyword as a string
+sitem(tt(warnstr))(The raw string matched after the tt(WARN) keyword, else unset.)
+sitem(tt(rpttime))(Any recurrence time given by the tt(RPT) keyword as a string
 of digits containing the time of the recurrence in the same units
 as tt($EPOCHSECONDS).  (Note this is an absolute time.)  Not set if
 no tt(RPT) keyword and value were matched.)
-sitem(schedrpttime)(The next regularly scheduled occurrence of a recurring
+sitem(tt(schedrpttime))(The next regularly scheduled occurrence of a recurring
 event before modification.  This may differ from tt(rpttime), which is the
 actual time of the event that may have been rescheduled from the regular
 time.)
-sitem(rptstr)(The raw string matched after the tt(RPT) keyword, else unset.)
-sitem(text2)(The text from the line after removal of the date and any
+sitem(tt(rptstr))(The raw string matched after the tt(RPT) keyword, else unset.)
+sitem(tt(text2))(The text from the line after removal of the date and any
 keywords and values.)
 )
 endsitem()
-)
+
 findex(calendar_showdate)
 item(tt(calendar_showdate) [ tt(-r) ] [ tt(-f) var(fmt) ] var(date-spec ...))(
 The given var(date-spec) is interpreted and the corresponding date and

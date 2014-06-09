@@ -2712,8 +2712,11 @@ ztrftimebuf(int *bufsizeptr, int decr)
 mod_export int
 ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 {
-    int hr12, decr;
-#ifndef HAVE_STRFTIME
+    int hr12;
+#ifdef HAVE_STRFTIME
+    int decr;
+    char tmp[4];
+#else
     static char *astr[] =
     {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
     static char *estr[] =
@@ -2721,7 +2724,6 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
      "Aug", "Sep", "Oct", "Nov", "Dec"};
 #endif
     char *origbuf = buf;
-    char tmp[4];
 
 
     while (*fmt)
@@ -4287,7 +4289,7 @@ zreaddir(DIR *dir, int ignoredots)
 #if defined(HAVE_ICONV) && defined(__APPLE__)
     if (!conv_ds)
 	conv_ds = iconv_open("UTF-8", "UTF-8-MAC");
-    if (conv_ds) {
+    if (conv_ds != (iconv_t)(-1)) {
 	/* Force initial state in case re-using conv_ds */
 	(void) iconv(conv_ds, 0, &orig_name_len, 0, &conv_name_len);
 
@@ -4298,12 +4300,11 @@ zreaddir(DIR *dir, int ignoredots)
 	conv_name_len = orig_name_len;
 	if (iconv(conv_ds,
 		  &orig_name_ptr, &orig_name_len,
-		  &conv_name_ptr, &conv_name_len) >= 0) {
-	  if (orig_name_len == 0) {
+		  &conv_name_ptr, &conv_name_len) != (size_t)(-1) &&
+	    orig_name_len == 0) {
 	    /* Completely converted, metafy and return */
 	    *conv_name_ptr = '\0';
 	    return metafy(conv_name, -1, META_STATIC);
-	  }
 	}
 	/* Error, or conversion incomplete, keep the original name */
     }

@@ -2,6 +2,43 @@
 
 	* Jun T: 32755: Doc/Zsh/grammar.yo: move line that was in the
 	wrong place.
+2014-06-07  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Nikolas Garofil: 32737: Src/utils.c: properly ifdef declarations
+
+	* Nikolas Garofil: 32736 (tweak per 32741): Src/zsh_system.h:
+	memmove() should return its dest argument
+
+	* Nikolas Garofil: 32735: Src/signals.c: define ret before use
+
+	* Nikolas Garofil: 32734: Src/mem.c: remove unused pointers
+
+	* Nikolas Garofil: 32733: Src/prototypes.h: use size_t in bcopy()
+
+	* Nikolas Garofil: 32732 (tweak per 32739): Src/compat.c: fix
+	const declaration inconsistency
+
+2014-06-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Jun T: 32719: Doc/Zsh/contrib.yo: minor issues.
+
+	* Jun T: 32715: Doc/Zsh/calsys.yo, Doc/Zsh/grammar.yo,
+	Doc/Zsh/zle.yo: formatting fixes.
+
+	* 32682 with tweaks: Doc/Zsh/options.yo, Src/hist.c,
+	Src/options.c, Src/zsh.h: INC_APPEND_HISTORY_TIME is new
+	behaviour, with INC_APPEND_HISTORY reverting to its previous
+	behaviour.
+
+	* Andrew Magee: 32698: Completion/Unix/Command/_hg: show
+	committable files.
+
+2014-06-05  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32723: Src/glob.c: add braces around some if/else branches
+
+	* 32716 (via Jun T. 31714): Src/utils.c: properly test iconv
+	return values for error conditions
 
 2014-06-04  Barton E. Schaefer  <schaefer@zsh.org>
 

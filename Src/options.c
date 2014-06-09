@@ -165,6 +165,7 @@ static struct optname optns[] = {
 {{NULL, "ignoreclosebraces",  OPT_EMULATE},		 IGNORECLOSEBRACES},
 {{NULL, "ignoreeof",	      0},			 IGNOREEOF},
 {{NULL, "incappendhistory",   0},			 INCAPPENDHISTORY},
+{{NULL, "incappendhistorytime",   0},			 INCAPPENDHISTORYTIME},
 {{NULL, "interactive",	      OPT_SPECIAL},		 INTERACTIVE},
 {{NULL, "interactivecomments",OPT_BOURNE},		 INTERACTIVECOMMENTS},
 {{NULL, "ksharrays",	      OPT_EMULATE|OPT_BOURNE},	 KSHARRAYS},

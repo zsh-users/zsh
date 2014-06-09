@@ -462,18 +462,19 @@ scanner(Complist q, int shortcircuit)
     int errssofar = errsfound;
     struct dirsav ds;
 
-    init_dirsav(&ds);
     if (!q)
 	return;
+    init_dirsav(&ds);
 
     if ((closure = q->closure)) {
 	/* (foo/)# - match zero or more dirs */
 	if (q->closure == 2)	/* (foo/)## - match one or more dirs */
 	    q->closure = 1;
-	else
+	else {
 	    scanner(q->next, shortcircuit);
 	    if (shortcircuit && shortcircuit == matchct)
 		return;
+	}
     }
     p = q->pat;
     /* Now the actual matching for the current path section. */
@@ -518,10 +519,11 @@ scanner(Complist q, int shortcircuit)
 		}
 		if (add) {
 		    addpath(str, l);
-		    if (!closure || !statfullpath("", NULL, 1))
+		    if (!closure || !statfullpath("", NULL, 1)) {
 			scanner((q->closure) ? q : q->next, shortcircuit);
 			if (shortcircuit && shortcircuit == matchct)
 			    return;
+		    }
 		    pathbuf[pathpos = oppos] = '\0';
 		}
 	    }
@@ -618,11 +620,12 @@ scanner(Complist q, int shortcircuit)
 		    memcpy(subdirs + subdirlen, (char *)&errsfound,
 			   sizeof(int));
 		    subdirlen += sizeof(int);
-		} else
+		} else {
 		    /* if the last filename component, just add it */
 		    insert(fn, 1);
 		    if (shortcircuit && shortcircuit == matchct)
 			return;
+		}
 	    }
 	}
 	closedir(lock);

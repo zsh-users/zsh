@@ -226,6 +226,16 @@ _hg_modified() {
   _wanted files expl 'modified files' _multi_parts / status_files
 }
 
+_hg_committable() {
+  typeset -a status_files
+  # A file is a candidate for `hg commit` if it is:
+  # - modified (m), or
+  # - added (a), or
+  # - removed (r)
+  _hg_status mar
+  _wanted files expl 'committable files' _multi_parts / status_files
+}
+
 _hg_resolve() {
   local rstate rpath
 
@@ -476,7 +486,7 @@ _hg_cmd_commit() {
   '(--logfile -l)'{-l+,--logfile}'[read commit message from specified file]:log file:_files' \
   '(--date -d)'{-d+,--date}'[record datecode as commit date]:date code:' \
   '(--user -u)'{-u+,--user}'[record user as commiter]:user:' \
-  '*:file:_hg_files'
+  '*:file:_hg_committable'
 }
 
 _hg_cmd_copy() {

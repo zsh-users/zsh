@@ -3411,21 +3411,22 @@ by the prompt theme system (ifzman(see above)\
 ifnzman(noderef(Prompt Themes))).  You seldom should need to run
 tt(colors) more than once.
 
-The eight base colors are: black, red, green, yellow, blue, magenta, cyan,
-and white.  Each of these has codes for foreground and background.  In
-addition there are eight intensity attributes: bold, faint, standout,
-underline, blink, reverse, and conceal.  Finally, there are six codes used
-to negate attributes: none (reset all attributes to the defaults), normal
-(neither bold nor faint), no-standout, no-underline, no-blink, and
-no-reverse.
+The eight base colors are: tt(black), tt(red), tt(green), tt(yellow),
+tt(blue), tt(magenta), tt(cyan), and tt(white).  Each of these has codes for
+foreground and background.  In addition there are seven intensity attributes:
+tt(bold), tt(faint), tt(standout), tt(underline), tt(blink), tt(reverse),
+and tt(conceal).  Finally, there are seven codes used to negate attributes:
+tt(none) (reset all attributes to the defaults), tt(normal)
+(neither bold nor faint), tt(no-standout), tt(no-underline), tt(no-blink),
+tt(no-reverse), and tt(no-conceal).
 
 Some terminals do not support all combinations of colors and intensities.
 
 The associative arrays are:
 
 startitem()
-xitem(color)
-item(colour)(
+xitem(tt(color))
+item(tt(colour))(
 Map all the color names to their integer codes, and integer codes to the
 color names.  The eight base names map to the foreground color codes, as
 do names prefixed with `tt(fg-)', such as `tt(fg-red)'.  Names prefixed
@@ -3436,16 +3437,16 @@ and the tt(bg-) form for backgrounds.
 Although it is a misnomer to call them `colors', these arrays also map the
 other fourteen attributes from names to codes and codes to names.
 )
-xitem(fg)
-xitem(fg_bold)
-item(fg_no_bold)(
+xitem(tt(fg))
+xitem(tt(fg_bold))
+item(tt(fg_no_bold))(
 Map the eight basic color names to ANSI terminal escape sequences that set
 the corresponding foreground text properties.  The tt(fg) sequences change
 the color without changing the eight intensity attributes.
 )
-xitem(bg)
-xitem(bg_bold)
-item(bg_no_bold)(
+xitem(tt(bg))
+xitem(tt(bg_bold))
+item(tt(bg_no_bold))(
 Map the eight basic color names to ANSI terminal escape sequences that set
 the corresponding background properties.  The tt(bg) sequences change the
 color without changing the eight intensity attributes.
