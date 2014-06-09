@@ -485,6 +485,7 @@ list(Syntax errors in glob qualifiers)
 list(File generation errors where not caught by the option tt(BAD_PATTERN))
 list(All bad patterns used for matching within case statements)
 list(File generation failures where not caused by tt(NO_MATCH) or
+similar options)
 list(All file generation errors where the pattern was used to create a
 multio)
 list(Memory errors where detected by the shell)
@@ -494,7 +495,6 @@ list(Logical errors with variables such as assignment to the wrong type)
 list(Use of invalid variable names)
 list(Errors in variable substitution syntax)
 list(Failure to convert characters in tt($')...tt(') expressions)
-similar options)
 endlist()
 
 If the tt(POSIX_BUILTINS) option is set, more errors associated with

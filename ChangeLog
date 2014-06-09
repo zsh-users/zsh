@@ -1,3 +1,8 @@
+2014-06-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Jun T: 32755: Doc/Zsh/grammar.yo: move line that was in the
+	wrong place.
+
 2014-06-04  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32711: Test/A07control.ztst: run "continue" test in a new
