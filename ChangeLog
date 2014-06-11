@@ -1,3 +1,7 @@
+2014-06-11  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Jun T: 32767: Src/glob.c: another spot to tweak bracechardots()
+
 2014-06-10  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32766: Src/glob.c: bracechardots() agrees with xpandbraces()
