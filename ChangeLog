@@ -1,3 +1,7 @@
+2014-06-10  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Jun T: 32765: Src/glob.c: fix build when not MULTIBYTE_SUPPORT
+
 2014-06-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Jun T: 32755: Doc/Zsh/grammar.yo: move line that was in the

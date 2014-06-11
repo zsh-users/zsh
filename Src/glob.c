@@ -2129,7 +2129,13 @@ bracechardots(char *str, convchar_t *c1p, convchar_t *c2p)
 	pconv = pnext;
     MB_METACHARINIT();
     pnext += MB_METACHARLENCONV(pconv, &cstart);
-    if (cstart == WEOF || pnext[0] != '.' || pnext[1] != '.')
+    if (
+#ifdef MULTIBYTE_SUPPORT
+	cstart == WEOF ||
+#else
+	!cstart ||
+#endif
+	pnext[0] != '.' || pnext[1] != '.')
 	return 0;
     pnext += 2;
     if (itok(*pnext)) {
@@ -2140,7 +2146,13 @@ bracechardots(char *str, convchar_t *c1p, convchar_t *c2p)
 	pconv = pnext;
     MB_METACHARINIT();
     pnext += MB_METACHARLENCONV(pconv, &cend);
-    if (cend == WEOF || *pnext != Outbrace)
+    if (
+#ifdef MULTIBYTE_SUPPORT
+	cend == WEOF ||
+#else
+	!cend ||
+#endif
+	*pnext != Outbrace)
 	return 0;
     if (c1p)
 	*c1p = cstart;
