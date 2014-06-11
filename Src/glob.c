@@ -2122,6 +2122,8 @@ bracechardots(char *str, convchar_t *c1p, convchar_t *c2p)
     convchar_t cstart, cend;
     char *pnext = str + 1, *pconv, convstr[2];
     if (itok(*pnext)) {
+	if (*pnext == Inbrace)
+	    return 0;
 	convstr[0] = ztokens[*pnext - Pound];
 	convstr[1] = '\0';
 	pconv = convstr;
