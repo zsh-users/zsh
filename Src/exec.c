@@ -4614,7 +4614,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     char *name = shfunc->node.nam;
     int flags = shfunc->node.flags, ooflags;
     char *fname = dupstring(name);
-    int obreaks, saveemulation, restore_sticky;
+    int obreaks, ocontflag, oloops, saveemulation, restore_sticky;
     Eprog prog;
     struct funcstack fstack;
     static int oflags;
@@ -4626,7 +4626,9 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     pushheap();
 
     oargv0 = NULL;
-    obreaks = breaks;;
+    obreaks = breaks;
+    ocontflag = contflag;
+    oloops = loops;
     if (trap_state == TRAP_STATE_PRIMED)
 	trap_return--;
     oldlastval = lastval;
@@ -4814,6 +4816,17 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	opts[XTRACE] = saveopts[XTRACE];
 	opts[PRINTEXITVALUE] = saveopts[PRINTEXITVALUE];
 	opts[LOCALOPTIONS] = saveopts[LOCALOPTIONS];
+	opts[LOCALLOOPS] = saveopts[LOCALLOOPS];
+    }
+
+    if (opts[LOCALLOOPS]) {
+	if (contflag)
+	    zwarn("`continue' active at end of function scope");
+	if (breaks)
+	    zwarn("`break' active at end of function scope");
+	breaks = obreaks;
+	contflag = ocontflag;
+	loops = oloops;
     }
 
     endtrapscope();

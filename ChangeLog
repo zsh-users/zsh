@@ -1,5 +1,10 @@
 2014-06-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 32768, with further modifications: Doc/Zsh/options.yo,
+	Src/exec.c, Src/options.c, 	Src/zsh.h, Test/E01options.ztst,
+	Test/ztst.zsh:  LOCAL_LOOPS option to restrict effect of
+	continue and break in function scope.
+
 	* 32666: Doc/Zsh/compat.yo: shell emulation based on executable
 	name incompletely documented.
 
@@ -18,6 +23,7 @@
 
 	* Jun T: 32755: Doc/Zsh/grammar.yo: move line that was in the
 	wrong place.
+
 2014-06-07  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Nikolas Garofil: 32737: Src/utils.c: properly ifdef declarations

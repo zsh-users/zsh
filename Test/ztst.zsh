@@ -260,8 +260,12 @@ $ZTST_redir"
 # Execute an indented chunk.  Redirections will already have
 # been set up, but we need to handle the options.
 ZTST_execchunk() {
+  setopt localloops # don't let continue & break propagate out
   options=($ZTST_testopts)
-  eval "$ZTST_code"
+  () {
+      unsetopt localloops
+      eval "$ZTST_code"
+  }
   ZTST_status=$?
   # careful... ksh_arrays may be in effect.
   ZTST_testopts=(${(kv)options[*]})

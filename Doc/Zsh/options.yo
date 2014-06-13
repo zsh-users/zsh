@@ -1631,6 +1631,21 @@ tt(FUNCTION_ARGZERO) from on to off (or off to on) does not change the
 current value of tt($0).  Only the state upon entry to the function or
 script has an effect.  Compare tt(POSIX_ARGZERO).
 )
+pindex(LOCAL_LOOPS)
+pindex(NO_LOCAL_LOOPS)
+pindex(LOCALLOOPS)
+pindex(NOLOCALLOOPS)
+cindex(break, inside function)
+cindex(continue, inside function)
+cinde(function, scope of break and continue)
+item(tt(LOCAL_LOOPS))(
+When this option is not set, the effect of tt(break) and tt(continue)
+commands may propagate outside function scope, affecting loops in
+calling functions.  When the option is set in a calling function, a
+tt(break) or a tt(continue) that is not caught within a called function
+(regardless of the setting of the option within that function)
+produces a warning and the effect is cancelled.
+)
 pindex(LOCAL_OPTIONS)
 pindex(NO_LOCAL_OPTIONS)
 pindex(LOCALOPTIONS)
@@ -1639,10 +1654,10 @@ item(tt(LOCAL_OPTIONS) <K>)(
 If this option is set at the point of return from a shell function,
 most options (including this one) which were in force upon entry to
 the function are restored; options that are not restored are
-tt(PRIVILEGED) and tt(RESTRICTED).  Otherwise, only this option and the
-tt(XTRACE) and tt(PRINT_EXIT_VALUE) options are restored.  Hence
-if this is explicitly unset by a shell function the other options in
-force at the point of return will remain so.
+tt(PRIVILEGED) and tt(RESTRICTED).  Otherwise, only this option,
+and the tt(LOCAL_LOOPS), tt(XTRACE) and tt(PRINT_EXIT_VALUE) options are
+restored.  Hence if this is explicitly unset by a shell function the
+other options in force at the point of return will remain so.
 A shell function can also guarantee itself a known shell configuration
 with a formulation like `tt(emulate -L zsh)'; the tt(-L) activates
 tt(LOCAL_OPTIONS).

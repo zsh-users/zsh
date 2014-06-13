@@ -430,7 +430,7 @@
   foo
   unfunction foo
 0:FUNCTION_ARGZERO option
->My name is ZTST_execchunk
+>My name is (anon)
 >My name is foo
 
   setopt _NO_glob_
@@ -1114,3 +1114,45 @@
 >1
 >1
 >2
+
+  for (( i = 0; i < 10; i++ )); do
+     () {
+        print $i
+        break
+     }
+  done
+0:NO_LOCAL_LOOPS
+>0
+
+  () {
+      emulate -L zsh
+      setopt localloops
+      for (( i = 0; i < 10; i++ )); do
+	  () {
+              setopt nolocalloops # ignored in parent
+              print $i
+              break
+	  }
+      done
+  }
+0:LOCAL_LOOPS
+>0
+>1
+>2
+>3
+>4
+>5
+>6
+>7
+>8
+>9
+?(anon):4: `break' active at end of function scope
+?(anon):4: `break' active at end of function scope
+?(anon):4: `break' active at end of function scope
+?(anon):4: `break' active at end of function scope
+?(anon):4: `break' active at end of function scope
+?(anon):4: `break' active at end of function scope
+?(anon):4: `break' active at end of function scope
+?(anon):4: `break' active at end of function scope
+?(anon):4: `break' active at end of function scope
+?(anon):4: `break' active at end of function scope

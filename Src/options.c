@@ -180,6 +180,7 @@ static struct optname optns[] = {
 {{NULL, "listrowsfirst",      0},			 LISTROWSFIRST},
 {{NULL, "listtypes",	      OPT_ALL},			 LISTTYPES},
 {{NULL, "localoptions",	      OPT_EMULATE|OPT_KSH},	 LOCALOPTIONS},
+{{NULL, "localloops",	      OPT_EMULATE},		 LOCALLOOPS},
 {{NULL, "localpatterns",      OPT_EMULATE},		 LOCALPATTERNS},
 {{NULL, "localtraps",	      OPT_EMULATE|OPT_KSH},	 LOCALTRAPS},
 {{NULL, "login",	      OPT_SPECIAL},		 LOGINSHELL},
