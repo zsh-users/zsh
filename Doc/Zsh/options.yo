@@ -1637,7 +1637,7 @@ pindex(LOCALLOOPS)
 pindex(NOLOCALLOOPS)
 cindex(break, inside function)
 cindex(continue, inside function)
-cinde(function, scope of break and continue)
+cindex(function, scope of break and continue)
 item(tt(LOCAL_LOOPS))(
 When this option is not set, the effect of tt(break) and tt(continue)
 commands may propagate outside function scope, affecting loops in

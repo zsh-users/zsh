@@ -1,3 +1,7 @@
+2014-06-14  Jun T  <takimoto-j@kba.biglobe.ne.jp>
+
+	* 32779: Doc/Zsh/options.yo: fix a typo in options.yo
+
 2014-06-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 32768, with further modifications: Doc/Zsh/options.yo,
