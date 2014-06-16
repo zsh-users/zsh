@@ -1223,7 +1223,7 @@ Thus if `tt(/usr/local/bin)' is in the user's path, and he or she types
 (assuming it exists).
 Commands explicitly beginning with `tt(/)', `tt(./)' or `tt(../)'
 are not subject to the path search.
-This also applies to the `tt(.)' builtin.
+This also applies to the `tt(.)' and tt(source) builtins.
 
 Note that subdirectories of the current directory are always searched for
 executables specified in this form.  This takes place before any search

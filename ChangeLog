@@ -1,3 +1,8 @@
+2014-06-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Jun T: 32781: Doc/Zsh/options.yo: source builtin and path
+	search doc.
+
 2014-06-14  Jun T  <takimoto-j@kba.biglobe.ne.jp>
 
 	* 32779: Doc/Zsh/options.yo: fix a typo in options.yo
