@@ -117,6 +117,17 @@ AC_HELP_STRING([--enable-zsh-heap-debug],
   AC_DEFINE(ZSH_HEAP_DEBUG)
 fi])
 
+dnl Do you want to allow Valgrind to debug heap allocation?
+ifdef([zsh-valgrind],[undefine([zsh-valgrind])])dnl
+AH_TEMPLATE([ZSH_VALGRIND],
+[Define to 1 if you want to add code for valgrind to debug heap memory.])
+AC_ARG_ENABLE(zsh-valgrind,
+AC_HELP_STRING([--enable-zsh-valgrind],
+[turn on support for valgrind debugging of heap memory]),
+[if test x$enableval = xyes;  then
+  AC_DEFINE(ZSH_VALGRIND)
+fi])
+
 dnl Do you want debugging information on internal hash tables.
 dnl This turns on the `hashinfo' builtin command.
 ifdef([zsh-hash-debug],[undefine([zsh-hash-debug])])dnl

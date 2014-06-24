@@ -30,6 +30,8 @@
 #include "zsh.mdh"
 #include "lex.pro"
 
+#define LEX_HEAP_SIZE (32)
+
 /* tokens */
 
 /**/
@@ -721,7 +723,7 @@ gettok(void)
     /* word includes the last character read and possibly \ before ! */
     if (dbparens) {
 	len = 0;
-	bptr = tokstr = (char *) hcalloc(bsiz = 32);
+	bptr = tokstr = (char *) hcalloc(bsiz = LEX_HEAP_SIZE);
 	hungetc(c);
 	cmdpush(CS_MATH);
 	c = dquote_parse(infor ? ';' : ')', 0);
@@ -775,7 +777,7 @@ gettok(void)
 
 	if (lexflags & LEXFLAGS_COMMENTS_KEEP) {
 	    len = 0;
-	    bptr = tokstr = (char *)hcalloc(bsiz = 32);
+	    bptr = tokstr = (char *)hcalloc(bsiz = LEX_HEAP_SIZE);
 	    add(c);
 	}
 	hwend();
@@ -877,7 +879,7 @@ gettok(void)
 	    }
 	    if (incmdpos || (isset(SHGLOB) && !isset(KSHGLOB))) {
 		len = 0;
-		bptr = tokstr = (char *) hcalloc(bsiz = 32);
+		bptr = tokstr = (char *) hcalloc(bsiz = LEX_HEAP_SIZE);
 		switch (cmd_or_math(CS_MATH)) {
 		case 1:
 		    return DINPAR;
@@ -1027,7 +1029,7 @@ gettokstr(int c, int sub)
     peek = STRING;
     if (!sub) {
 	len = 0;
-	bptr = tokstr = (char *) hcalloc(bsiz = 32);
+	bptr = tokstr = (char *) hcalloc(bsiz = LEX_HEAP_SIZE);
     }
     for (;;) {
 	int act;

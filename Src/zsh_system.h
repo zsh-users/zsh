@@ -877,3 +877,8 @@ extern short ospeed;
 #  endif
 # endif
 #endif
+
+#ifdef ZSH_VALGRIND
+# include "valgrind/valgrind.h"
+# include "valgrind/memcheck.h"
+#endif
