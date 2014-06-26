@@ -16,7 +16,6 @@ def(CMT)(0)(NOTRANS(@c))
 
 ATEXIT(\
   NL()\
-  NOTRANS(@contents)+NL()\
   NOTRANS(@bye)NL()\
 )
 

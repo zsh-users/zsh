@@ -41,6 +41,7 @@ permission notice identical to this one.
 Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions.
 texiendtitlepage()
+NOTRANS(@contents)
 )\
 ifnzman(includefile(Zsh/manual.yo))
 includefile(Zsh/intro.yo)
