@@ -32,12 +32,17 @@
 
 #if defined(HAVE_GETRLIMIT) && defined(RLIM_INFINITY)
 
-#ifdef RLIMIT_POSIXLOCKS
+#if defined(HAVE_RLIMIT_POSIXLOCKS) && !defined(HAVE_RLIMIT_LOCKS)
 #  define RLIMIT_LOCKS		RLIMIT_POSIXLOCKS
+#  define HAVE_RLIMIT_LOCKS     1
 #endif
 
-#ifdef RLIMIT_NTHR
+#if defined(HAVE_RLIMIT_NTHR) && !defined(HAVE_RLIMIT_PTHREAD)
 #  define RLIMIT_PTHREAD	RLIMIT_NTHR
+#  define HAVE_RLIMIT_PTHREAD   1
+#  define THREAD_FMT            "-T: threads                         "
+#else
+#  define THREAD_FMT            "-T: threads per process             "
 #endif
 
 enum {
@@ -373,7 +378,7 @@ printulimit(char *nam, int lim, int hard, int head)
 # ifdef HAVE_RLIMIT_PTHREAD
     case RLIMIT_PTHREAD:
 	if (head)
-	    printf("-T: threads per process             ");
+	    printf("%s", THREAD_FMT);
 	break;
 # endif /* HAVE_RLIMIT_PTHREAD */
 # ifdef HAVE_RLIMIT_NICE
@@ -860,6 +865,13 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		case 'r':
 		    res = RLIMIT_RTPRIO;
 		    break;
+# else
+#  ifdef HAVE_RLIMIT_NTHR
+		    /* For compatibility with sh on NetBSD */
+		case 'r':
+		    res = RLIMIT_NTHR;
+		    break;
+#  endif /* HAVE_RLIMIT_NTHR */
 # endif
 # ifdef HAVE_RLIMIT_NPTS
 		case 'p':
@@ -874,6 +886,11 @@ bin_ulimit(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 # ifdef HAVE_RLIMIT_KQUEUES
 		case 'k':
 		    res = RLIMIT_KQUEUES;
+		    break;
+# endif
+# ifdef HAVE_RLIMIT_PTHREAD
+		case 'T':
+		    res = RLIMIT_PTHREAD;
 		    break;
 # endif
 		default:
