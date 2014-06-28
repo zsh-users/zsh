@@ -9,6 +9,10 @@
 	* Daniel Bolton: 32815: Completion/Debian/Command/_aptitude:
 	missing resolver options
 
+	* Sebastian Ramacher: 32814: Completion/Debian/Command/_dpkg:
+	Add --add-architecture, --remove-architecture, and
+	--print-foreign-architectures options.
+
 2014-07-03  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 32821: Completion/Unix/Command/_gcc: Update _gcc as of GCC

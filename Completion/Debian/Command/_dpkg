@@ -50,6 +50,9 @@ _dpkg_actions=(
   '--yet-to-unpack[list uninstalled]'
   '--print-architecture[print target architecture]'
   '--print-installation-architecture'
+  '--print-foreign-architectures[print list of extra architectures]'
+  '--add-architecture[add extra architecture]:architecture:->add_architecture'
+  '--remove-architecture[remove extra architecture]:architecture:->remove_architecture'
   '--compare-versions[compare version numbers]:*::expression:= ->compare_versions'
 )
 
@@ -179,4 +182,13 @@ case "$state" in
     _call_function ret _dpkg_$state && return ret
     _files
   ;;
+  add_architecture)
+    _call_function ret _dpkg_$state && return ret
+    _wanted architecture expl 'extra architecture' \
+      compadd ${(f)"$(dpkg-architecture -L 2>/dev/null)"}
+  ;;
+  remove_architecture)
+    _call_function ret _dpkg_$state && return ret
+    _wanted architecture expl 'extra architecture' \
+      compadd ${(f)"$(dpkg --print-foreign-architectures 2>/dev/null)"}
 esac
