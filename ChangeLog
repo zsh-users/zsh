@@ -3,6 +3,9 @@
 	* Felipe Sateler: 32819: Completion/Debian/Command/_axi-cache:
 	Update for axi-cache completion.
 
+	* Vincent Lefevre: 32818: Completion/Unix/Command/_gzip:
+	--rsyncable option is missing
+
 2014-07-03  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 32821: Completion/Unix/Command/_gcc: Update _gcc as of GCC

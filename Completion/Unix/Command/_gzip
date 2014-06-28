@@ -39,6 +39,7 @@ gzip)
     '(-q --quiet)--silent[suppress all warnings]' \
     '(--recursive)-r[operate recursively on directories]' \
     '(-r)--recursive[operate recursively on directories]' \
+    '--rsyncable[make rsync-friendly archive]' \
     '(--suffix)-S+[specify suffix for compressed files]:suffix:' \
     '(-S)--suffix=[specify suffix for compressed files]:suffix:' \
     '(--test)-t[test compressed file integrity]' \
