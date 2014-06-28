@@ -1,3 +1,8 @@
+2014-07-03  Axel Beckert  <abe@deuxchevaux.org>
+
+	* Felipe Sateler: 32819: Completion/Debian/Command/_axi-cache:
+	Update for axi-cache completion.
+
 2014-07-03  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 32821: Completion/Unix/Command/_gcc: Update _gcc as of GCC
