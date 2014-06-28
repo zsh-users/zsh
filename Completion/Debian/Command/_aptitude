@@ -70,6 +70,8 @@ _arguments -C \
   '--schedule-only[schedule operations to be performed in the future]' \
   '--purge-unused[purge unused packages instead of removing]' \
   '--visual-preview[start up the visual interface and display its preview screen]' \
+  '--full-resolver[attempts to resolve conflicts with a higher risk of breakage]' \
+  '--safe-resolver[attempts to resolve conflicts with a lower risk of breakage]' \
   '-S[load the extended state information from non-standard state file]:state file:_files' \
   '-u[begin updating the package lists as soon as the program starts]' \
   '-i[displays a download preview when the program starts]' \
