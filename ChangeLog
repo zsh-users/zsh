@@ -1,3 +1,8 @@
+2014-07-03  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 32821: Completion/Unix/Command/_gcc: Update _gcc as of GCC
+	4.8.3 for generic options and x86.
+
 2014-07-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Jun T: 32833: Completion/Unix/Command/_python,
