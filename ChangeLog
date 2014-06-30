@@ -1,3 +1,8 @@
+2014-06-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Jun T: 32823: Completion/Unix/Command/_perl: complete file
+	instead of script after -e.
+
 2014-06-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Jun T: 32812: Doc/zsh.yo, Doc/ztexi.yo: put table of contents

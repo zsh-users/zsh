@@ -4,6 +4,7 @@
 # Adam Spiers <adam@spiers.net>
 #
 # Completions currently based on Perl 5.14.1.
+typeset -A opt_args
 
 _perl () {
   _arguments -s \
@@ -40,8 +41,19 @@ _perl () {
     "(-w    -X)-W[enable all warnings (ignores 'no warnings')]" \
     "(-w -W   )-X[disable all warnings (ignores 'use warnings')]" \
     '-x-[strip off text before #!perl line and perhaps cd to directory]:directory to cd to:_files -/' \
-    '1:Perl script:_files -/ -g "*.(p[ml]|PL|t)(-.)"' \
+    '1:script or arg:_script_or_arg' \
     '*::args: _normal'
+}
+
+_script_or_arg () {
+  local expl
+  if [[ -n "$opt_args[(I)-(e|E)]" ]]; then
+    _description arg expl 'file'
+    _files "$expl[@]"
+  else
+    _description script expl 'Perl script'
+    _files "$expl[@]" -/ -g "*.(p[ml]|PL|t)(-.)"
+  fi
 }
 
 _perl_m_opt () {
