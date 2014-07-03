@@ -1,5 +1,8 @@
 2014-07-08  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Dominic Hopf: 32837: Config/defs.mk.in: improve handling of
+	installation location for help directories.
+
 	* 32832: Doc/Zsh/grammar.yo Doc/Zsh/params.yo: attempt to
 	improve documentation for how assignment works.
 

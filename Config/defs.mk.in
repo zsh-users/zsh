@@ -95,7 +95,7 @@ additionalfpath = @additionalfpath@
 MAKEDEFS = \
 prefix='$(prefix)' exec_prefix='$(exec_prefix)' bindir='$(bindir)' \
 libdir='$(libdir)' MODDIR='$(MODDIR)' infodir='$(infodir)' mandir='$(mandir)' \
-datadir='$(datadir)' fndir='$(fndir)' htmldir='$(htmldir)' \
+datadir='$(datadir)' fndir='$(fndir)' htmldir='$(htmldir)' runhelpdir='$(runhelpdir)' \
 CC='$(CC)' CPPFLAGS='$(CPPFLAGS)' DEFS='$(DEFS)' CFLAGS='$(CFLAGS)' \
 LDFLAGS='$(LDFLAGS)' EXTRA_LDFLAGS='$(EXTRA_LDFLAGS)' \
 DLCFLAGS='$(DLCFLAGS)' DLLDFLAGS='$(DLLDFLAGS)' \
