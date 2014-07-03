@@ -8,7 +8,7 @@ typeset -A opt_args
 local -a args opts
 
 args=(
-  '(-)1:script file:_files'
+  '(-)1:script or argument:->script_or_arg'
   '*::script argument: _normal'
 )
 
@@ -18,7 +18,7 @@ opts=(
   '-c[check syntax only]'
   '-C+[cd to directory, before executing your script]:directory:_files -/'
   '(-d --debug)'{-d,--debug}'[set debugging flags (set $DEBUG to true)]'
-  "(1)*-e+[one line of script (several -e's allowed, omit program file)]:one line of script:"
+  "*-e+[one line of script (several -e's allowed, omit program file)]:one line of script:"
   '-F-[split() pattern for autosplit (-a)]:input field separator:'
   '-i-[edit ARGV files in place (make backup if extension supplied)]:suffix for in-place-edit mode:(.bak)'
   '*-I+[specify $LOAD_PATH directory (may be used more than once)]:library directory:_files -/'
@@ -67,6 +67,16 @@ case "$state" in
     dirs=( $(_call_program directories $cmd -e 'puts\ \$:' 2>/dev/null) ${(s.:.)opt_args[-I]} )
     _wanted libraries expl library _path_files -W dirs && ret=0
   ;;
+  script_or_arg)
+    if [[ -n "$opt_args[(I)-e]" ]]; then
+      _description arg expl 'file'
+      _files "$expl[@]" && ret=0
+    else
+      _description script expl 'Ruby script'
+      _files "$expl[@]" && ret=0
+      #_files "$expl[@]" -g "*.rb(-.)" && ret=0
+    fi
+    ;;
 esac
 
 return ret
