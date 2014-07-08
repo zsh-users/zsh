@@ -19,7 +19,11 @@ cindex(simple commands)
 cindex(commands, simple)
 A em(simple command) is a sequence of optional parameter
 assignments followed by blank-separated words,
-with optional redirections interspersed.
+with optional redirections interspersed.  For a description
+of assignment, see the beginning of
+ifnzman(noderef(Parameters))\
+ifzman(zmanref(zshparam)).
+
 The first word is the command to be executed, and the remaining
 words, if any, are arguments to the command.
 If a command name is given, the parameter assignments modify

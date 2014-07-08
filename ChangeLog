@@ -1,3 +1,8 @@
+2014-07-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 32832: Doc/Zsh/grammar.yo Doc/Zsh/params.yo: attempt to
+	improve documentation for how assignment works.
+
 2014-07-03  Axel Beckert  <abe@deuxchevaux.org>
 
 	* Felipe Sateler: 32819: Completion/Debian/Command/_axi-cache:

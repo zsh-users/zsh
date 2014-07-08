@@ -21,14 +21,20 @@ indent(var(name)tt(=)var(value))
 
 If the integer attribute, tt(-i), is set for var(name), the var(value)
 is subject to arithmetic evaluation.  Furthermore, by replacing `tt(=)'
-with `tt(+=)', a parameter can be added or appended to.  See
+with `tt(+=)', a parameter can be added or appended to.
+
+In scalar assignment, var(value) is expanded as a single string, in
+which the elements of arrays are joined together; filename expansion is
+not performed unless the option tt(GLOB_ASSIGN) is set.  See
 noderef(Array Parameters) for additional forms of assignment.
 
 To refer to the value of a parameter, write `tt($)var(name)' or
 `tt(${)var(name)tt(})'.  See
 ifzman(em(Parameter Expansion) in zmanref(zshexpn))\
 ifnzman(noderef(Parameter Expansion))
-for complete details.
+for complete details.  This section also explains the effect
+of the difference between scalar and array assignment on parameter
+expansion.
 
 In the parameter lists that follow, the mark `<S>' indicates that the
 parameter is special.
