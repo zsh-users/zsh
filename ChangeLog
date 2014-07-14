@@ -15,6 +15,11 @@
 	argument to recursive edit and to hide minibuffer edit from
 	undo history.
 
+2014-07-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Koen Wilde: 32863:  Completion/Unix/Command/_mpc: mpc "insert"
+	command.
+
 2014-07-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Dominic Hopf: 32837: Config/defs.mk.in: improve handling of
