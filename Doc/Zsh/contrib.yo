@@ -2328,6 +2328,31 @@ The name is a slight misnomer, as in fact the shell's own minibuffer is
 not used.  Hence it is still possible to call tt(executed-named-cmd) and
 similar functions while reading a value.
 )
+tindex(replace-argument)
+tindex(replace-argument-edit)
+item(tt(replace-argument), tt(replace-argument-edit))
+(
+The function tt(replace-argument) can be used to replace a command
+line argument in the current command line or, if the current command
+line is empty, in the last command line executed (the new command line
+is not executed).  Arguments are as delimited by standard shell syntax,
+
+If a numeric argument is given, that specifies the argument to be
+replaced.  0 means the command name, as in history expansion.
+
+If no numeric argument is given, the current argument is replaced;
+this is the last argument if the previous history line is being used.
+
+The function prompts for a replacement argument.
+
+If the widget contains the string tt(edit), for example is defined as
+
+example(zle -N replace-argument-edit replace-argument)
+
+then the function presents the current value of the argument for
+editing, otherwise the editing buffer for the replacement is
+initially empty.
+)
 tindex(replace-string)
 tindex(replace-string-again)
 tindex(replace-pattern)

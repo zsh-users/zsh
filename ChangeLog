@@ -1,3 +1,12 @@
+2014-07-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 32866 (plus extra undo fix in read-from-minibuffer):
+	Doc/Zsh/contrib.yo, Functions/Zle/read-from-minibuffer,
+	Functions/Zle/replace-argument: new replace-argument function;
+	fixes in read-from-minibuffer not to pass through numeric
+	argument to recursive edit and to hide minibuffer edit from
+	undo history.
+
 2014-07-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Dominic Hopf: 32837: Config/defs.mk.in: improve handling of
