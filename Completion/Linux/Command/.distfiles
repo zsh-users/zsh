@@ -23,6 +23,7 @@ _nmcli
 _pkgtool
 _rpmbuild
 _schedtool
+_ss
 _sshfs
 _strace
 _tpb

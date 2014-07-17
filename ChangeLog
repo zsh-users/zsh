@@ -1,5 +1,7 @@
 2014-07-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 32849: Completion/Linux/Command/_ss: new completion function
+
 	* 32848: Completion/Unix/Command/_perl,
 	Completion/Unix/Command/_python, Completion/Unix/Command/_ruby:
 	fix words array before using _normal for script arguments
