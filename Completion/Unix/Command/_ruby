@@ -1,43 +1,78 @@
-#compdef ruby -P -value-,RUBY(LIB|OPT|PATH),-default-
+#compdef ruby irb erb -P (ruby|[ei]rb)[0-9.]# -value-,RUBY(LIB|OPT|PATH),-default-
 
-# ruby 1.8.2 (2004-12-25) [i686-linux]
-
-local curcontext="$curcontext" state line expl ret=1
+local curcontext="$curcontext" state line expl desc RUBY ret=1
 typeset -A opt_args
+local -a opts irb all common charsets suf
 
-local -a args opts
+all=(
+  '*-r+[require the library before executing your script]:library name:->library'
+  '(--internal-encoding)-U[set internal encoding to UTF-8]'
+  '(-E --encoding -K --external-encoding)'{-E+,--encoding=}'[specify default external and internal character encodings]:charset:->charsets'
+  '(1 * -)'{-h,--help}'[print help message]'
+  '(1 * -)--version[print the version]'
+)
 
-args=(
-  '(-)1:script or argument:->script_or_arg'
-  '*::script argument: _normal'
+common=(
+  '*-I+[specify $LOAD_PATH directory (may be used more than once)]:library directory:_files -/'
+  '-w[turn warnings on for your script]'
+  '-W-[set warning level]:warning level:((0\:silent 1\:medium 2\:verbose))'
+  '(-)1:ruby script:_files -g "*.rb(-.)"'
+  '*::script argument:= ->normal'
 )
 
 opts=(
-  '-0-[specify record separator]:input record separator in octal (default \0):'
+  '-0-[specify record separator]:input record separator in octal [default \0]'
   '-a[autosplit mode with -n or -p (splits $_ into $F)]'
   '-c[check syntax only]'
-  '-C+[cd to directory, before executing your script]:directory:_files -/'
+  '-C+[cd to directory before executing your script]:directory:_files -/'
   '(-d --debug)'{-d,--debug}'[set debugging flags (set $DEBUG to true)]'
-  "*-e+[one line of script (several -e's allowed, omit program file)]:one line of script:"
+  "(1)*-e+[one line script (several -e's allowed, omit program file)]:one line of script"
   '-F-[split() pattern for autosplit (-a)]:input field separator:'
   '-i-[edit ARGV files in place (make backup if extension supplied)]:suffix for in-place-edit mode:(.bak)'
-  '*-I+[specify $LOAD_PATH directory (may be used more than once)]:library directory:_files -/'
   '-K-[specifies KANJI (Japanese) code-set]:KANJI encoding:((e\:EUC-JP s\:Shift_JIS u\:UTF-8 N\:None))'
   "-l[assume 'while gets(); ... end' loop around your script]"
   "(-p)-n[assume 'while gets(); ... end' loop around your script]"
   '(-n)-p[assume loop like -n but print line also like sed]'
-  '*-r+[require the library, before executing your script]:library name:->library'
   '-s[enable some switch parsing for switches after script name]'
   '-S[look for the script using PATH environment variable]'
-  '-T-[turn on tainting checks]:taint level (default 0):((0\:strings\ from\ streams/environment/ARGV\ are\ tainted 1\:no\ dangerous\ operation\ by\ tainted\ value 2\:process/file\ operations\ prohibited 3\:all\ generated\ objects\ are\ tainted 4\:no\ global\ \(non-tainted\)\ variable\ modification/no\ direct\ output))'
+  '-T-[turn on tainting checks]:taint level:((0\:strings\ from\ streams/environment/ARGV\ are\ tainted 1\:no\ dangerous\ operation\ by\ tainted\ value 2\:process/file\ operations\ prohibited 3\:all\ generated\ objects\ are\ tainted 4\:no\ global\ \(non-tainted\)\ variable\ modification/no\ direct\ output))'
   '(-v --verbose)'{-v,--verbose}'[print version number, then turn on verbose mode]'
-  '-w[turn warnings on for your script]'
-  '-W-[set warning level]:warning level (default 2):((0\:silent 1\:medium 2\:verbose))'
-  '(-y --yydebug)'{-y,--yydebug}'[enable yacc debugging in the parser]'
   '-x-[strip off text before #!ruby line and perhaps cd to directory]:directory:_files -/'
   '(1 * -)--copyright[print the copyright]'
-  '(1 * -)'{-h,--help}'[print help message]'
-  '(1 * -)--version[print the version]'
+  --{en,dis}able-{gems,rubyopt,all}
+  --{external,internal}'-encoding=:charset:->charsets'
+  '!'{-y,--yydebug}
+  '!--dump=:target:(version copyright usage yydebug syntax parsetree parsetree_with_comment insns)'
+)
+
+irb=(
+  '-f[suppress read of ~/.irbrc]'
+  '(--noinspect)-m[bc mode (load mathn, fraction, matrix)]'
+  $opts[(r)*-d\[*]
+  '(--noinspect)--inspect[use inspect for output]'
+  "(--inspect)--noinspect[don't use inspect for output]"
+  '(--noreadline)--readline[use readline extension]'
+  "(--readline)--noreadline[don't use readline extension]"
+  '(--prompt --prompt-mode --inf-ruby-mode --simple-prompt --noprompt)'{--prompt,--prompt-mode}'[switch prompt mode]:prompt mode:(default simple xmp inf-ruby)'
+  '(--prompt --prompt-mode --inf-ruby-mode --simple-prompt --noprompt)'{--inf-ruby-mode,--simple-prompt,--noprompt}
+  '--tracer[display trace for each command execution]'
+  '--back-trace-limit[set limit for backtraces]:limit [16]:'
+  '!--irb_debug:level'
+  '--context-mode:n'
+  '(--noecho)--echo[show result]'
+  "(--echo)--noecho[don't show result]"
+  '--single-irb[share self with sub-irb]'
+  '(--noverbose)--verbose[show details]'
+  "(--verbose)--noverbose[don't show details]"
+)
+
+erb=(
+  "-P[don't evaluate lines which start with %]"
+  '-S[specify safe level for running script]:level:(1 2 3 4)'
+  '-T[specify trim mode]:mode [0]:((0\:EOL\ remains 1\:EOL\ removed\ if\ line\ ends\ with\ %\> 2\:EOL\ removed\ if\ line\ starts\ with\ \<%\ and\ ends\ with\ %\> -\:EOL\ is\ removed\ if\ line\ ends\ with\ -%\>,\ leading\ whitespace\ removed\ after\ \<%-))'
+  '(-d --debug)'{-d,--debug}'[set debugging flags (set $DEBUG to true)]'
+  '-n[used with -x, prepends line number to output]'
+  '-x[convert eRuby to Ruby]'
 )
 
 case "$service" in
@@ -49,34 +84,50 @@ case "$service" in
     words=( fake "$words[@]" )
     (( CURRENT++ ))
     _arguments -C -s : "${(@M)opts:#*-[IdvwrK](|[-+])\[*}" && ret=0
+    RUBY=ruby
   ;;
-  ruby)
-    _arguments -C -s -S : "$opts[@]" "$args[@]" && ret=0
+  ruby[0-9.]#)
+    RUBY=$words[1]
+    _arguments -C -s -S : $opts $all $common && ret=0
+  ;;
+  irb[0-9.]#)
+    RUBY=${words[1]/irb/ruby}
+    _arguments -C -s : $irb $all $common && ret=0
+  ;;
+  erb[0-9.]#)
+    RUBY=${words[1]/irb/ruby}
+    _arguments -C -s : $erb $all \
+      '*:erb file:_files -g "*.erb(-.)"' && ret=0
   ;;
 esac
 
 case "$state" in
+  normal)
+    if (( ! $+opt_args[-e] )); then
+      shift words
+      (( CURRENT-- ))
+    fi
+    _normal && ret=0
+  ;;
+  charsets)
+    charsets=( $(_call_program charsets $RUBY -e 'puts\ Encoding.list' 2>/dev/null) )
+    # could also add Encoding.aliases.map(&:first) for aliases
+    desc='charset'
+    if [[ $curcontext = *option-E-1 ]]; then
+      if compset -P '*:'; then
+	desc='internal charset'
+      else
+	desc='external charset'
+	compset -S ':*' || suf=( -S: )
+      fi
+    fi
+    _wanted charsets expl $desc compadd $suf -a charsets && ret=0
+  ;;
   library)
     local -a dirs
-    local cmd
-    if [[ "$service" = *RUBYOPT* ]]; then
-      cmd=ruby
-    else
-      cmd=$words[1]
-    fi
-    dirs=( $(_call_program directories $cmd -e 'puts\ \$:' 2>/dev/null) ${(s.:.)opt_args[-I]} )
+    dirs=( $(_call_program libraries $RUBY -e 'puts\ \$:' 2>/dev/null) ${(s.:.)opt_args[-I]} )
     _wanted libraries expl library _path_files -W dirs && ret=0
   ;;
-  script_or_arg)
-    if [[ -n "$opt_args[(I)-e]" ]]; then
-      _description arg expl 'file'
-      _files "$expl[@]" && ret=0
-    else
-      _description script expl 'Ruby script'
-      _files "$expl[@]" && ret=0
-      #_files "$expl[@]" -g "*.rb(-.)" && ret=0
-    fi
-    ;;
 esac
 
 return ret

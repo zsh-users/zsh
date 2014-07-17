@@ -17,8 +17,8 @@ _perl () {
     '(-d -dt     -dt:)-d\:-[run under control of a debugging/tracing module]:debugging/tracing module:_perl_modules --strip-prefix --perl-hierarchy=Devel' \
     '(-d -dt -d:     )-dt\:-[run under control of a debugging/tracing module (debugged coded uses threads)]:debugging/tracing module:_perl_modules --strip-prefix --perl-hierarchy=Devel' \
     '-D-[set debugging flags]: :_perl_debugging_flags' \
-    '(   -E)*-e+[run one line of program]:one line of program' \
-    '(-e   )*-E+[like -e but enable all optional features]:one line of program: ' \
+    '(1 -E)*-e+[run one line of program]:one line of program' \
+    '(1 -e)*-E+[like -e but enable all optional features]:one line of program' \
     '-f[disable executing $Config{sitelib}/sitecustomize.pl at startup]' \
     '-F-[split() pattern for autosplit (-a)]:split() pattern, // is optional' \
     '-h[list help summary]' \
@@ -28,32 +28,29 @@ _perl () {
     \*{-m,-M}"-[module.. executes \`use/no module...' before executing your script]:module:_perl_m_opt" \
     "-n[assume 'while (<>) { ... }' loop around your script]" \
     "-p[assume loop like -n but print line also like sed]" \
-    '-P[run script through C preprocessor before compilation (deprecated)]' \
     "-s[enable some switch parsing for switches after script name]" \
     "-S[look for the script using PATH environment variable]" \
     '(   -T)-t[turn on taint checks but only issue warnings]' \
     '(-t   )-T[turn on taint checks]' \
     "-u[dump core after parsing script]" \
     "-U[allow unsafe operations]" \
-    "-v[print version number, patchlevel plus VERY IMPORTANT perl info]" \
+    "-v[print version, patchlevel and license]" \
     "-V-[print perl configuration information]:configuration keys:_perl_config_vars" \
     '(   -W -X)-w[turn warnings on for compilation of your script (recommended)]' \
     "(-w    -X)-W[enable all warnings (ignores 'no warnings')]" \
     "(-w -W   )-X[disable all warnings (ignores 'use warnings')]" \
-    '-x-[strip off text before #!perl line and perhaps cd to directory]:directory to cd to:_files -/' \
-    '1:script or arg:_script_or_arg' \
-    '*::args: _normal'
+    '-x-[ignore text before #!perl line and optionally cd to directory]:directory to cd to:_files -/' \
+    '1:Perl script:_files -g "*.(p[ml]|PL|t)(-.)"' \
+    '*::args:= _perl_normal'
 }
 
-_script_or_arg () {
+_perl_normal() {
   local expl
-  if [[ -n "$opt_args[(I)-(e|E)]" ]]; then
-    _description arg expl 'file'
-    _files "$expl[@]"
-  else
-    _description script expl 'Perl script'
-    _files "$expl[@]" -/ -g "*.(p[ml]|PL|t)(-.)"
+  if [[ -z "$opt_args[(I)-(e|E)]" ]]; then
+    shift words
+    (( CURRENT-- ))
   fi
+  _normal && ret=0
 }
 
 _perl_m_opt () {
