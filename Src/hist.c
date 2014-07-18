@@ -2308,8 +2308,7 @@ readhistline(int start, char **bufp, int *bufsiz, FILE *in)
 	}
 	else {
 	    buf[len - 1] = '\0';
-	    if (len > 1 && buf[len - 2] == '\\' &&
-		(len < 3 || buf[len - 3] != '\\')) {
+	    if (len > 1 && buf[len - 2] == '\\') {
 		buf[--len - 1] = '\n';
 		if (!feof(in))
 		    return readhistline(len, bufp, bufsiz, in);
@@ -2618,6 +2617,8 @@ savehistfile(char *fn, int err, int writeflags)
 
 	ret = 0;
 	for (; he && he->histnum <= xcurhist; he = down_histent(he)) {
+	    int count_backslashes = 0;
+
 	    if ((writeflags & HFILE_SKIPDUPS && he->node.flags & HIST_DUP)
 	     || (writeflags & HFILE_SKIPFOREIGN && he->node.flags & HIST_FOREIGN)
 	     || he->node.flags & HIST_TMPSTORE)
@@ -2649,9 +2650,18 @@ savehistfile(char *fn, int err, int writeflags)
 		if (*t == '\n')
 		    if ((ret = fputc('\\', out)) < 0)
 			break;
+		if (*t == '\\')
+		    count_backslashes++;
+		else
+		    count_backslashes = 0;
 		if ((ret = fputc(*t, out)) < 0)
 		    break;
 	    }
+	    if (ret < 0)
+	    	break;
+	    if (count_backslashes && (count_backslashes % 2 == 0))
+		if ((ret = fputc(' ', out)) < 0)
+		    break;
 	    if (ret < 0 || (ret = fputc('\n', out)) < 0)
 		break;
 	}

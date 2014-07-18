@@ -1,3 +1,10 @@
+2014-07-17  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32882 (cf. Augie Fackler 32879): Src/hist.c: restore correct
+	reload of backslash-continuation lines from history, broken by
+	workers/30443 just before the zsh 5.0.0 release; fix bad history
+	write of events ending with an even number of backslashes.
+
 2014-07-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 32849: Completion/Linux/Command/_ss: new completion function
