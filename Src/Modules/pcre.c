@@ -274,7 +274,7 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     int return_value = 1;
     /* The subject length and offset start are both int values in pcre_exec */
     int subject_len;
-    int offset_start = 0;
+    int offset_start = -1;
     int want_offset_pair = 0;
 
     if (pcre_pattern == NULL) {
@@ -289,14 +289,11 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
 	matched_portion = OPT_ARG(ops,c);
     }
     if(OPT_HASARG(ops,c='n')) { /* The offset position to start the search, in bytes. */
-	offset_start = getposint(OPT_ARG(ops,c), nam);
+	if ((offset_start = getposint(OPT_ARG(ops,c), nam) < 0))
+	    return 1;
     }
     /* For the entire match, 'Return' the offset byte positions instead of the matched string */
     if(OPT_ISSET(ops,'b')) want_offset_pair = 1; 
-
-    if(!*args) {
-	zwarnnam(nam, "not enough arguments");
-    }
     
     if ((ret = pcre_fullinfo(pcre_pattern, pcre_hints, PCRE_INFO_CAPTURECOUNT, &capcount)))
     {
@@ -311,7 +308,7 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     unmetafy(plaintext, NULL);
     subject_len = (int)strlen(plaintext);
 
-    if (offset_start < 0 || offset_start >= subject_len)
+    if (offset_start > 0 && offset_start >= subject_len)
 	ret = PCRE_ERROR_NOMATCH;
     else
 	ret = pcre_exec(pcre_pattern, pcre_hints, plaintext, subject_len, offset_start, 0, ovec, ovecsize);
@@ -345,6 +342,8 @@ cond_pcre_match(char **a, int id)
 
     if (zpcre_utf8_enabled())
 	pcre_opts |= PCRE_UTF8;
+    if (isset(REMATCHPCRE) && !isset(CASEMATCH))
+	pcre_opts |= PCRE_CASELESS;
 
     lhstr = cond_str(a,0,0);
     rhre = cond_str(a,1,0);

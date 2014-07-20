@@ -80,6 +80,14 @@ Matches a string against a perl-compatible regular expression.
 
 For example,
 
-[[ "$text" -pcre-match ^d+$ ]] && print text variable contains only "d's".
+example([[ "$text" -pcre-match ^d+$ ]] &&
+print text variable contains only "d's".)
+
+pindex(REMATCH_PCRE)
+pindex(NO_CASE_MATCH)
+If the tt(REMATCH_PCRE) option is set, the tt(=~) operator is equivalent to
+tt(-pcre-match), and the tt(NO_CASE_MATCH) option may be used.  Note that
+tt(NO_CASE_MATCH) never applies to the tt(pcre_match) builtin, instead use
+the tt(-i) switch of tt(pcre_compile).
 )
 enditem()
