@@ -653,7 +653,7 @@ cindex(history, editing)
 cindex(editing history)
 xitem(tt(fc) [ tt(-e) var(ename) ] [ tt(-m) var(match) ] [ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
 xitem(tt(fc) tt(-l) [ tt(-nrdfEiD) ] [ tt(-t) var(timefmt) ] [ tt(-m) var(match) ])
-xitem(      [ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
+xitem(tt(      )[ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
 xitem(tt(fc) tt(-p) [ tt(-a) ] [ var(filename) [ var(histsize) [ var(savehistsize) ] ] ])
 xitem(tt(fc) tt(-P))
 item(tt(fc) tt(-ARWI) [ var(filename) ])(

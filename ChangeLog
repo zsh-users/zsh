@@ -1,5 +1,8 @@
 2014-07-20  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Doc/Zsh/builtins.yo: force retention of whitespace
+	in "fc" item prototype
+
 	* 32891: Doc/Zsh/mod_pcre.yo Src/Modules/pcre.c: the CASE_MATCH
 	option should apply to =~ when using pcre; fix pcre_match bug
 	with handling of empty string argument.
