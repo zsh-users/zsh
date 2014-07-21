@@ -1,3 +1,8 @@
+2014-07-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Jai Keerthan: users/18981: Completion/Unix/Command/_tmux:
+	improved function completion.
+
 2014-07-23  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32898 (credit Jun T.): Doc/Zsh/mod_pcre.yo: fix bug in 32891.

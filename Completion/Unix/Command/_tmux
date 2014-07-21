@@ -573,12 +573,13 @@ function _tmux-new-session() {
     local -a args
     args=(
         '-d[do not attach new session to current terminal]'
+        '-A[attach to existing session if it already exists]'
         '-n[name the initial window]:window name'
-        '-s[name the session]:session name'
+        '-s[name the session]:session name:__tmux-sessions'
         '-t[specify target session]:sessions:__tmux-sessions'
         '*:: :_command'
     )
-    _arguments ${args}
+    _arguments -s ${args}
 }
 
 function _tmux-new-window() {
