@@ -2,6 +2,11 @@
 
 	* 32898 (credit Jun T.): Doc/Zsh/mod_pcre.yo: fix bug in 32891.
 
+2014-07-23  Ansgar Burchardt  <ansgar@debian.org>
+
+	* 32895: Completion/Unix/Command/_nm: Match more shared library
+	names.
+
 2014-07-20  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/builtins.yo: force retention of whitespace
