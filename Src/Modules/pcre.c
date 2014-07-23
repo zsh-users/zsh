@@ -274,7 +274,7 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     int return_value = 1;
     /* The subject length and offset start are both int values in pcre_exec */
     int subject_len;
-    int offset_start = -1;
+    int offset_start = 0;
     int want_offset_pair = 0;
 
     if (pcre_pattern == NULL) {
