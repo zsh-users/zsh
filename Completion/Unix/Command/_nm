@@ -21,7 +21,7 @@ case $state in
   _alternative \
     "object-files:object file:_path_files -g '*.o'" \
     "executable-files:executable file:_path_files -g '*(*)'" \
-    "dynamic-libraries:dynamic library:_path_files -g '*.so'" \
+    "dynamic-libraries:dynamic library:_path_files -g '*.so(.*)#'" \
     "static-libraries:static library:_path_files -g '*.a'" \
     "directories:directory:_path_files -g '*(/)'" && ret=0
   ;;
