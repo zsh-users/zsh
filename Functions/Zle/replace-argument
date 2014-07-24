@@ -12,21 +12,23 @@ if (( ${#BUFFER} == 0 )); then
   CURSOR=${#BUFFER}
 fi
 
-local widget=$WIDGET
-integer numeric cursor=CURSOR
+local widget=$WIDGET numeric
+integer cursor=CURSOR
 if (( ${+NUMERIC} )); then
   numeric=$NUMERIC
-else
-  numeric=-1
 fi
 local reply REPLY REPLY2
 integer index
 split-shell-arguments
 
-if (( numeric >= 0 )); then
-  index=$(( 2 + 2*numeric ))
+if [[ -n $numeric ]]; then
+  if (( numeric < 0 )); then
+    (( index = ${#reply} - 1 + 2*(numeric+1) ))
+  else
+    (( index = 2 + 2*numeric ))
+  fi
 else
-  index=$((REPLY & ~1 ))
+  (( index = REPLY & ~1 ))
 fi
 
 local edit

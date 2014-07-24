@@ -2339,6 +2339,7 @@ is not executed).  Arguments are as delimited by standard shell syntax,
 
 If a numeric argument is given, that specifies the argument to be
 replaced.  0 means the command name, as in history expansion.
+A negative numeric argument counts backward from the last word.
 
 If no numeric argument is given, the current argument is replaced;
 this is the last argument if the previous history line is being used.
