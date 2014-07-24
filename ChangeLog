@@ -1,5 +1,7 @@
 2014-07-24  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted (see 32892): Src/builtins.c: 'fc -I' is an error
+
 	* 32903: Src/Modules/parameter.c: new empty (unset) elements in
 	the special parameter hash tables are special themselves, so that
 	adding elements via assignment syntax handles them correctly.

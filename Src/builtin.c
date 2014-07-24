@@ -1422,6 +1422,10 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 	unqueue_signals();
 	return 0;
     }
+    if (OPT_ISSET(ops,'I')) {
+	zwarnnam(nam, "-I requires one of -R/-W/-A");
+	return 1;
+    }
 
     if (zleactive) {
 	zwarnnam(nam, "no interactive history within ZLE");
