@@ -106,7 +106,7 @@ getpmparameter(UNUSED(HashTable ht), const char *name)
 	pm->u.str = paramtypestr(rpm);
     else {
 	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     }
     return &pm->node;
 }
@@ -224,7 +224,7 @@ getpmcommand(UNUSED(HashTable ht), const char *name)
 	}
     } else {
 	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     }
     return &pm->node;
 }
@@ -410,7 +410,7 @@ getfunction(UNUSED(HashTable ht), const char *name, int dis)
 	}
     } else {
 	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     }
     return &pm->node;
 }
@@ -661,7 +661,7 @@ getbuiltin(UNUSED(HashTable ht), const char *name, int dis)
 	pm->u.str = dupstring(t);
     } else {
 	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     }
     return &pm->node;
 }
@@ -876,7 +876,7 @@ getpmoption(UNUSED(HashTable ht), const char *name)
     }
     else {
 	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     }
     return &pm->node;
 }
@@ -934,7 +934,7 @@ getpmmodule(UNUSED(HashTable ht), const char *name)
 	pm->u.str = dupstring(type);
     else {
 	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     }
     return &pm->node;
 }
@@ -1048,7 +1048,7 @@ getpmhistory(UNUSED(HashTable ht), const char *name)
 	pm->u.str = dupstring(he->node.nam);
     else {
 	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     }
     return &pm->node;
 }
@@ -1158,7 +1158,7 @@ getpmjobtext(UNUSED(HashTable ht), const char *name)
 	pm->u.str = pmjobtext(job);
     else {
 	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     }
     return &pm->node;
 }
@@ -1259,7 +1259,7 @@ getpmjobstate(UNUSED(HashTable ht), const char *name)
 	pm->u.str = pmjobstate(job);
     else {
 	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     }
     return &pm->node;
 }
@@ -1325,7 +1325,7 @@ getpmjobdir(UNUSED(HashTable ht), const char *name)
 	pm->u.str = pmjobdir(job);
     else {
 	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     }
     return &pm->node;
 }
@@ -1451,7 +1451,7 @@ getpmnameddir(UNUSED(HashTable ht), const char *name)
 	pm->u.str = dupstring(nd->dir);
     else {
 	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     }
     return &pm->node;
 }
@@ -1502,7 +1502,7 @@ getpmuserdir(UNUSED(HashTable ht), const char *name)
 	pm->u.str = dupstring(nd->dir);
     else {
 	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     }
     return &pm->node;
 }
@@ -1754,7 +1754,7 @@ getalias(HashTable alht, UNUSED(HashTable ht), const char *name, int flags)
 	pm->u.str = dupstring(al->text);
     else {
 	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     }
     return &pm->node;
 }
@@ -1950,7 +1950,7 @@ getpmusergroups(UNUSED(HashTable ht), const char *name)
     if (!gs) {
 	zerr("failed to retrieve groups for user: %e", errno);
 	pm->u.str = dupstring("");
-	pm->node.flags |= PM_UNSET;
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
 	return &pm->node;
     }
 
@@ -1965,7 +1965,7 @@ getpmusergroups(UNUSED(HashTable ht), const char *name)
     }
 
     pm->u.str = dupstring("");
-    pm->node.flags |= PM_UNSET;
+    pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     return &pm->node;
 }
 
