@@ -140,6 +140,16 @@ AC_HELP_STRING([--enable-zsh-hash-debug], [turn on debugging of internal hash ta
   AC_DEFINE(ZSH_HASH_DEBUG)
 fi])
 
+dnl Do you want to dynamically allocate memory on the stack where possible?
+ifdef([stack-allocation],[undefine([stack-allocation])])dnl
+AH_TEMPLATE([USE_STACK_ALLOCATION],
+[Define to 1 if you want to allocate stack memory e.g. with `alloca'.])
+AC_ARG_ENABLE(stack-allocation,
+AC_HELP_STRING([--enable-stack-allocation], [allocate stack memory e.g. with `alloca']),
+[if test x$enableval = xyes; then
+  AC_DEFINE(USE_STACK_ALLOCATION)
+fi])
+
 dnl Pathnames for global zsh scripts
 ifdef([etcdir],[undefine([etcdir])])dnl
 AC_ARG_ENABLE(etcdir,

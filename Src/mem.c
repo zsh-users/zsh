@@ -950,7 +950,10 @@ zrealloc(void *ptr, size_t size)
 	ptr = NULL;
     } else {
 	/* If ptr is NULL, then behave like malloc */
-	ptr = malloc(size);
+        if (!(ptr = (void *) malloc(size))) {
+            zerr("fatal error: out of memory");
+            exit(1);
+        }
     }
     unqueue_signals();
 

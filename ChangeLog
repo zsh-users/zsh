@@ -1,5 +1,9 @@
 2014-07-24  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 32853: configure.ac, Src/mem.c, Src/zsh_system.h: redefine
+	the VARARR() macro to use heap rather than stack allocation;
+	enable old behavior via "configure --with-stack-allocation"
+
 	* unposted (see 32892): Src/builtins.c: 'fc -I' is an error
 
 	* 32903: Src/Modules/parameter.c: new empty (unset) elements in

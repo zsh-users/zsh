@@ -286,10 +286,14 @@ struct timezone {
 # include <limits.h>
 #endif
 
+#ifdef USE_STACK_ALLOCATION
 #ifdef HAVE_VARIABLE_LENGTH_ARRAYS
 # define VARARR(X,Y,Z)	X (Y)[Z]
 #else
 # define VARARR(X,Y,Z)	X *(Y) = (X *) alloca(sizeof(X) * (Z))
+#endif
+#else
+# define VARARR(X,Y,Z)	X *(Y) = (X *) zhalloc(sizeof(X) * (Z))
 #endif
 
 /* we should handle unlimited sizes from pathconf(_PC_PATH_MAX) */
