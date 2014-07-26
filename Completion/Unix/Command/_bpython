@@ -1,4 +1,4 @@
-#compdef bpython bpython-gtk bpython-urwid
+#compdef bpython bpython-gtk bpython-urwid bpython2 bpython2-gtk bpython2-urwid bpython3 bpython3-gtk bpython3-urwid
 
 local -a all_opts urwid_opts gtk_opts
 
@@ -24,18 +24,18 @@ gtk_opts=(
 )
 
 case "$service" in
-  bpython)
+  bpython|bpython2|bpython3)
     _arguments \
       "$all_opts[@]" && return 0
   ;;
 
-  bpython-urwid)
+  bpython-urwid|bpython2-urwid|bpython3-urwid)
     _arguments \
       "$all_opts[@]" \
       "$urwid_opts[@]" && return 0
   ;;
 
-  bpython-gtk)
+  bpython-gtk|bpython2-gtk|bpython3-gtk)
     _arguments \
       "$all_opts[@]" \
       "$gtk_opts[@]" && return 0
