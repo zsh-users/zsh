@@ -1,3 +1,12 @@
+2014-07-26  Axel Beckert  <abe@deuxchevaux.org>
+
+	* Omari Norman: 32817: Add completion for moosic.
+
+	* Sebastian Ramacher: 32816: Add completion for bpython and
+	variants.
+
+	* 32911: Expand bpython completion to bpython2 and bpython3.
+
 2014-07-26  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32910: Src/mkmakemod.sh: quiet update of timestamp files
