@@ -307,10 +307,10 @@ if $first_stage; then
 	echo "\$(SYMS_${mddname}): \$(PROTODEPS)"
 	echo
 	echo "${mddname}.export: \$(SYMS_${mddname})"
-	echo "	( echo '#!'; cat \$(SYMS_${mddname}) | sed -n '/^X/{s/^X//;p;}' | sort -u ) > \$@"
+	echo "	@( echo '#!'; cat \$(SYMS_${mddname}) | sed -n '/^X/{s/^X//;p;}' | sort -u ) > \$@"
 	echo
 	echo "modobjs.${mddname}: \$(MODOBJS_${mddname})"
-	echo "	echo '' \$(MODOBJS_${mddname}) $modobjs_sed>> \$(dir_src)/stamp-modobjs.tmp"
+	echo "	@echo '' \$(MODOBJS_${mddname}) $modobjs_sed>> \$(dir_src)/stamp-modobjs.tmp"
 	echo
 	if test -z "$alwayslink"; then
 	    case " $all_modules" in *" ${mddname}."*)

@@ -1,3 +1,7 @@
+2014-07-26  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32910: Src/mkmakemod.sh: quiet update of timestamp files
+
 2014-07-24  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32853: configure.ac, Src/mem.c, Src/zsh_system.h: redefine
