@@ -47,7 +47,7 @@ _arguments \
   '-S[do not start CPU at startup]' \
   '-d[output log in /tmp/qemu.log]:log items:_qemu_log_items' \
   '-hdachs[force hard disk 0 geometry (usually qemu can guess it)]:hd0 geometry c,h,s:' \
-  '-std-vga[simulate standard VGA]' \
+  '-vga[select video card type]:card type:(std cirrus vmware qxl xenfb none)' \
   '-no-acpi[disable ACPI]' \
   '-loadvm[start right away with a saved state]:file:_files' \
   '-g[set initial graphic mode]:graphic mode:' \

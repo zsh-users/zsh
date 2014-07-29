@@ -1,3 +1,7 @@
+2014-07-28  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32593: Completion/Unix/Command/_qemu: update --vga option
+
 2014-07-26  Axel Beckert  <abe@deuxchevaux.org>
 
 	* Omari Norman: 32817: Add completion for moosic.
