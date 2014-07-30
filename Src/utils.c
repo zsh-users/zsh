@@ -2710,7 +2710,7 @@ ztrftimebuf(int *bufsizeptr, int decr)
 
 /**/
 mod_export int
-ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
+ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm, long usec)
 {
     int hr12;
 #ifdef HAVE_STRFTIME
@@ -2729,6 +2729,7 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
     while (*fmt)
 	if (*fmt == '%') {
 	    int strip;
+	    int digs = 3;
 
 	    fmt++;
 	    if (*fmt == '-') {
@@ -2736,6 +2737,17 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 		fmt++;
 	    } else
 		strip = 0;
+	    if (idigit(*fmt)) {
+		/* Digit --- only useful with . */
+		char *dstart = fmt;
+		char *dend = fmt+1;
+		while (idigit(*dend))
+		    dend++;
+		if (*dend == '.') {
+		    fmt = dend;
+		    digs = atoi(dstart);
+		}
+	    }
 	    /*
 	     * Assume this format will take up at least two
 	     * characters.  Not always true, but if that matters
@@ -2745,6 +2757,20 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm)
 	    if (ztrftimebuf(&bufsize, 2))
 		return -1;
 	    switch (*fmt++) {
+	    case '.':
+		if (ztrftimebuf(&bufsize, digs))
+		    return -1;
+		if (digs > 6)
+		    digs = 6;
+		if (digs < 6) {
+		    int trunc;
+		    for (trunc = 5 - digs; trunc; trunc--)
+			usec /= 10;
+		    usec  = (usec + 5) / 10;
+		}
+		sprintf(buf, "%0*ld", digs, usec);
+		buf += digs;
+		break;
 	    case 'd':
 		if (tm->tm_mday > 9 || !strip)
 		    *buf++ = '0' + tm->tm_mday / 10;

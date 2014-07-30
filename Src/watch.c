@@ -330,7 +330,7 @@ watchlog2(int inout, WATCH_STRUCT_UTMP *u, char *fmt, int prnt, int fini)
 		    }
 		    timet = getlogtime(u, inout);
 		    tm = localtime(&timet);
-		    ztrftime(buf, 40, fm2, tm);
+		    ztrftime(buf, 40, fm2, tm, 0L);
 		    printf("%s", (*buf == ' ') ? buf + 1 : buf);
 		    break;
 		case '%':

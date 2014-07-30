@@ -1731,7 +1731,7 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
 	    if (tdfmt != NULL) {
 		struct tm *ltm;
 		ltm = localtime(&ent->stim);
-		if (ztrftime(timebuf, 256, tdfmt, ltm))
+		if (ztrftime(timebuf, 256, tdfmt, ltm, 0L))
 		    fprintf(f, "%s  ", timebuf);
 	    }
 	    /* display the time taken by the command, if required */

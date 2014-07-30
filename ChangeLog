@@ -1,3 +1,9 @@
+2014-07-30  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 32918: Doc/Zsh/prompt.yo, Functions/TCP/tcp_output,
+	Src/builtin.c,Src/prompt.c, Src/utils.c, Src/watch.c: add
+	ability to display times with fractions of a second in prompts.
+
 2014-07-28  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32593: Completion/Unix/Command/_qemu: update --vga option

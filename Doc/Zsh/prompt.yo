@@ -185,6 +185,13 @@ sitem(tt(%K))(the hour of the day on the 24-hour clock)
 sitem(tt(%L))(the hour of the day on the 12-hour clock)
 endsitem()
 
+In addition, if the system supports the POSIX tt(gettimeofday) system
+call, tt(%.) provides decimal fractions of a second since the epoch with
+leading zeroes.  By default three decimal places are provided, but a
+number of digits up to 6 may be given following the tt(%); hence tt(%6.)
+outputs microseconds.  A typical example of this is the format
+`tt(%D{%H:%M:%S.%.})'.
+
 The GNU extension that a `tt(-)' between the tt(%) and the
 format character causes a leading zero or space to be stripped
 is handled directly by the shell for the format characters tt(d), tt(f),
