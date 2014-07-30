@@ -198,7 +198,7 @@ stattimeprint(time_t tim, char *outbuf, int flags)
     if (flags & STF_STRING) {
 	char *oend = outbuf + strlen(outbuf);
 	ztrftime(oend, 40, timefmt, (flags & STF_GMT) ? gmtime(&tim) :
-		 localtime(&tim));
+		 localtime(&tim), 0L);
 	if (flags & STF_RAW)
 	    strcat(oend, ")");
     }

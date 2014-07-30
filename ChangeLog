@@ -1,5 +1,8 @@
 2014-07-30  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Src/Builtins/sched.c, Src/Modules/datetime.c,
+	Src/Modules/stat.c: missed updates to ztrftime().
+
 	* 32919: Doc/Zsh/tcpsys.yo Functions/TCP/tcp_output: %P
 	at start of prompt in TCP function system causes standard
 	%-style substitution.

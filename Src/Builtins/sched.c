@@ -211,7 +211,7 @@ bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 
 	    t = sch->time;
 	    tmp = localtime(&t);
-	    ztrftime(tbuf, 40, "%a %b %e %k:%M:%S", tmp);
+	    ztrftime(tbuf, 40, "%a %b %e %k:%M:%S", tmp, 0L);
 	    if (sch->flags & SCHEDFLAG_TRASH_ZLE)
 		flagstr = "-o ";
 	    else

@@ -130,7 +130,7 @@ bin_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
     buffer = zalloc(bufsize);
 
     for (x=0; x < 4; x++) {
-        if (ztrftime(buffer, bufsize, argv[0], t) >= 0)
+        if (ztrftime(buffer, bufsize, argv[0], t, 0L) >= 0)
 	    break;
 	buffer = zrealloc(buffer, bufsize *= 2);
     }
