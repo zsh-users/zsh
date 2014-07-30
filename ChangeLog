@@ -1,8 +1,12 @@
 2014-07-30  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* 32918: Doc/Zsh/prompt.yo, Functions/TCP/tcp_output,
-	Src/builtin.c,Src/prompt.c, Src/utils.c, Src/watch.c: add
-	ability to display times with fractions of a second in prompts.
+	* 32919: Doc/Zsh/tcpsys.yo Functions/TCP/tcp_output: %P
+	at start of prompt in TCP function system causes standard
+	%-style substitution.
+
+	* 32918: Doc/Zsh/prompt.yo, Src/builtin.c,Src/prompt.c,
+	Src/utils.c, Src/watch.c: add ability to display times with
+	fractions of a second in prompts.
 
 2014-07-28  Barton E. Schaefer  <schaefer@zsh.org>
 

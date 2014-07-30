@@ -666,6 +666,10 @@ expression `tt(%c)' expands to 1 if the session being read is the current
 session, else 0; this is most useful in ternary expressions such as
 `tt(%LPAR()c.-.PLUS()RPAR())' which outputs `tt(PLUS())' if the session is
 the current one, else `tt(-)'.
+
+If the prompt starts with tt(%P), this is stripped and the complete
+result of the previous stage is passed through standard prompt tt(%)-style
+formatting before being output.
 )
 vindex(TCP_READ_DEBUG)
 item(tt(TCP_READ_DEBUG))(

@@ -35,6 +35,9 @@ if [[ -n $tprompt ]]; then
       cursess="c:0"
   fi
   zformat -f REPLY $tprompt "s:$sess" "f:$read_fd" $cursess
+  if [[ $REPLY = %P* ]]; then
+    REPLY=${(%)${REPLY##%P}}
+  fi
   # We will pass this back up.
   REPLY="$REPLY$*"
 else
