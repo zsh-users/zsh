@@ -636,6 +636,30 @@ Similar to the preceding subsitution, but in the opposite sense,
 so that entries present in both the original substitution and as
 elements of var(arrayname) are retained and others removed.
 )
+xitem(tt(${)var(name)tt(:^)var(arrayname)tt(}))
+item(tt(${)var(name)tt(:^^)var(arrayname)tt(}))(
+Zips two arrays, such that the output array is twice as long as the
+shortest (longest for `tt(:^^)') of tt(name) and tt(arrayname), with
+the elements alternatingly being picked from them. For `tt(:^)', if one
+of the input arrays is longer, the output will stop when the end of the
+shorter array is reached.  Thus,
+
+example(a=(1 2 3 4); b=(a b); print ${a:^b})
+
+will output `tt(1 a 2 b)'.  For `tt(:^^)', then the input is repeated
+until all of the longer array has been used up and the above will output
+`tt(1 a 2 b 3 a 4 b)'.
+
+Either or both inputs may be a scalar, they will be treated as an array
+of length 1 with the scalar as the only element. If either array is empty,
+the other array is output with no extra elements inserted.
+
+Currently the following code will output `tt(a b)' and `tt(1)' as two separate
+elements, which can be unexpected. The second print provides a workaround which
+should continue to work if this is changed.
+
+example(a=(a b); b=(1 2); print -l "${a:^b}"; print -l "${${a:^b}}")
+)
 xitem(tt(${)var(name)tt(:)var(offset)tt(}))
 item(tt(${)var(name)tt(:)var(offset)tt(:)var(length)tt(}))(
 This syntax gives effects similar to parameter subscripting

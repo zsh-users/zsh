@@ -2878,6 +2878,67 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	    }
 	    break;
 	}
+    } else if (inbrace && (*s == '^' || *s == Hat)) {
+	char **zip, **ap, **apsrc;
+	int shortest = 1;
+	++s;
+	if (*s == '^' || *s == Hat) {
+	    shortest = 0;
+	    ++s;
+	}
+	if (*itype_end(s, IIDENT, 0)) {
+	    untokenize(s);
+	    zerr("not an identifier: %s", s);
+	    return NULL;
+	}
+	if (vunset) {
+	    if (unset(UNSET)) {
+		*idend = '\0';
+		zerr("%s: parameter not set", idbeg);
+		return NULL;
+	    }
+	    val = dupstring("");
+	} else {
+	    char *sval;
+	    zip = getaparam(s);
+	    if (!zip) {
+		sval = getsparam(s);
+		if (sval)
+		    zip = hmkarray(sval);
+	    }
+	    if (!isarr) aval = mkarray(val);
+	    if (zip) {
+		char **out;
+		int alen, ziplen, outlen, i = 0;
+		alen = arrlen(aval);
+		ziplen = arrlen(zip);
+		outlen = shortest ^ (alen > ziplen) ? alen : ziplen;
+		if (!shortest && (alen == 0 || ziplen == 0)) {
+		    if (ziplen)
+			aval = arrdup(zip);
+		} else {
+		    out = zhalloc(sizeof(char *) * (2 * outlen + 1));
+		    while (i < outlen) {
+			if (copied)
+			    out[i*2] = aval[i % alen];
+			else
+			    out[i*2] = dupstring(aval[i % alen]);
+			out[i*2+1] = dupstring(zip[i % ziplen]);
+			i++;
+		    }
+		    out[i*2] = NULL;
+		    aval = out;
+		    copied = 1;
+		    isarr = 1;
+		}
+	    } else {
+		if (unset(UNSET)) {
+		    zerr("%s: parameter not set", s);
+		    return NULL;
+		}
+		val = dupstring("");
+	    }
+	}
     } else if (inbrace && (*s == '|' || *s == Bar ||
 			   *s == '*' || *s == Star)) {
 	int intersect = (*s == '*' || *s == Star);

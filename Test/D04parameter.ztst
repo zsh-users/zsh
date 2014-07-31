@@ -1560,3 +1560,79 @@
 0:Intersection and disjunction with empty parameters
 >0
 >0
+
+  foo=(a b c)
+  bar=(1 2 3)
+  print ${foo:^bar}
+  print ${foo:^^bar}
+  foo=(a b c d)
+  bar=(1 2)
+  print ${foo:^bar}
+  print ${foo:^^bar}
+  foo=('a a' b)
+  bar=(1 '2 2')
+  print -l "${foo:^bar}"
+  print -l "${(@)foo:^bar}"
+0:Zipping arrays, correct output
+>a 1 b 2 c 3
+>a 1 b 2 c 3
+>a 1 b 2
+>a 1 b 2 c 1 d 2
+# maybe this should be changed to output "a a b 1"
+>a a b
+>1
+>a a
+>1
+>b
+>2 2
+
+  foo=(a b c)
+  bar=()
+  print ${foo:^bar}
+  print ${foo:^^bar}
+  print ${bar:^foo}
+  print ${bar:^^foo}
+  print ${bar:^bar}
+  print ${bar:^^bar}
+0:Zipping arrays, one or both inputs empty
+>
+>a b c
+>
+>a b c
+>
+>
+
+  foo=text
+  bar=()
+  print ${foo:^bar}
+  print ${bar:^^foo}
+  bar=other
+  print ${foo:^bar}
+  bar=(array elements)
+  print ${foo:^bar}
+  print ${foo:^^bar}
+  print ${bar:^foo}
+  print ${bar:^^foo}
+0:Zipping arrays, scalar input
+>
+>text
+>text other
+>text array
+>text array text elements
+>array text
+>array text elements text
+
+  foo=(a b c)
+  print ${foo:^^^bar}
+1:Zipping arrays, parsing
+?(eval):2: not an identifier: ^bar
+
+  (setopt nounset
+  print ${foo:^noexist})
+1:Zipping arrays, NO_UNSET part 1
+?(eval):2: noexist: parameter not set
+
+  (setopt nounset
+  print ${noexist:^foo})
+1:Zipping arrays, NO_UNSET part 2
+?(eval):2: noexist: parameter not set

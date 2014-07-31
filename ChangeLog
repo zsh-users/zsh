@@ -1,3 +1,8 @@
+2014-08-04  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 32949 (wip 32928, 32937): Doc/Zsh/expn.yo, Src/subst.c,
+	Test/D04parameter.ztst: Add :^ and :^^ for zipping arrays.
+
 2014-08-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Doc/Zsh/builtins.yo: 32944: Doc/Zsh/builtins.yo: read -qs is
