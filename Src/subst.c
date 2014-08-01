@@ -2935,7 +2935,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	     */
 	    if (!vunset) {
 		if (isarr) {
-		    aval = mkarray(NULL);
+		    aval = hmkarray(NULL);
 		} else {
 		    val = dupstring("");
 		}

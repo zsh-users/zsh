@@ -1,3 +1,8 @@
+2014-08-01  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 32932: Src/glob.c, Src/utils.c: add hmkarray() and
+	use to fix leak.
+
 2014-07-31  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32931: Src/glob.c: with NO_NOMATCH, using a subscript glob

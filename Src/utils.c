@@ -3372,6 +3372,17 @@ mkarray(char *s)
 }
 
 /**/
+mod_export char **
+hmkarray(char *s)
+{
+    char **t = (char **) zhalloc((s) ? (2 * sizeof s) : (sizeof s));
+
+    if ((*t = s))
+	t[1] = NULL;
+    return t;
+}
+
+/**/
 mod_export void
 zbeep(void)
 {
