@@ -1906,6 +1906,8 @@ zglob(LinkList list, LinkNode np, int nountok)
 		matchptr++;
 	    }
 	}
+    } else if (!badcshglob && !isset(NOMATCH) && matchct == 1) {
+	insert_glob_match(list, node, (--matchptr)->name);
     }
     free(matchbuf);
 

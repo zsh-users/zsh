@@ -1,3 +1,9 @@
+2014-07-31  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 32931: Src/glob.c: with NO_NOMATCH, using a subscript glob
+	qualifier on a not-matching pattern should still return the
+	original pattern
+
 2014-07-30  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Src/Builtins/sched.c, Src/Modules/datetime.c,
