@@ -1288,8 +1288,7 @@ continuation and backslashes in the line don't quote the following
 character and are not removed.
 )
 item(tt(-s))(
-Don't echo back characters if reading from the terminal.  Currently does
-not work with the tt(-q) option.
+Don't echo back characters if reading from the terminal.
 )
 item(tt(-q))(
 Read only one character from the terminal and set var(name) to
