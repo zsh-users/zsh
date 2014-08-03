@@ -1,3 +1,8 @@
+2014-08-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/19006: Doc/Zsh/expn.yo: document position of
+	RC_EXPAND_PARAM handling during parameter substitution.
+
 2014-08-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 32932: Src/glob.c, Src/utils.c: add hmkarray() and

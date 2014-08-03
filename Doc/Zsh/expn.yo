@@ -1407,16 +1407,21 @@ item(tt(19.) em(Ordering))(
 If the result is still an array and one of the `tt((o))' or `tt((O))' flags
 was present, the array is reordered.
 )
-item(tt(20.) em(Re-evaluation))(
+item(tt(20.) tt(RC_EXPAND_PARAM))(
+At this point the decision is made whether any resulting array elements
+are to be combined element by element with surrounding text, as given
+by either the tt(RC_EXPAND_PARAM) option or the `tt(^)' flag.
+)
+item(tt(21.) em(Re-evaluation))(
 Any `tt((e))' flag is applied to the value, forcing it to be re-examined
 for new parameter substitutions, but also for command and arithmetic
 substitutions.
 )
-item(tt(21.) em(Padding))(
+item(tt(22.) em(Padding))(
 Any padding of the value by the `tt(LPAR()l.)var(fill)tt(.RPAR())' or
 `tt(LPAR()r.)var(fill)tt(.RPAR())' flags is applied.
 )
-item(tt(22.) em(Semantic joining))(
+item(tt(23.) em(Semantic joining))(
 In contexts where expansion semantics requires a single word to
 result, all words are rejoined with the first character of tt(IFS)
 between.  So in `tt(${LPAR()P)tt(RPAR()${LPAR()f)tt(RPAR()lines}})'
@@ -1425,7 +1430,7 @@ joined again before the tt(P) flag can be applied.
 
 If a single word is not required, this rule is skipped.
 )
-item(tt(23.) em(Empty argument removal))(
+item(tt(24.) em(Empty argument removal))(
 If the substitution does not appear in double quotes, any resulting
 zero-length argument, whether from a scalar or an element of an array,
 is elided from the list of arguments inserted into the command line.
