@@ -1,3 +1,7 @@
+2014-08-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Src/subst.c:  remove unused variables.
+
 2014-08-04  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 32949 (wip 32928, 32937): Doc/Zsh/expn.yo, Src/subst.c,

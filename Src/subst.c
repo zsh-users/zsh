@@ -2879,7 +2879,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	    break;
 	}
     } else if (inbrace && (*s == '^' || *s == Hat)) {
-	char **zip, **ap, **apsrc;
+	char **zip;
 	int shortest = 1;
 	++s;
 	if (*s == '^' || *s == Hat) {
