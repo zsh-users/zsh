@@ -297,8 +297,7 @@ evalcond(Estate state, char *fromtest)
 
 		right = dupstring(opat = ecrawstr(state->prog, state->pc,
 						  &htok));
-		if (htok)
-		    cond_subst(&right, !fromtest);
+		singsub(&right);
 		save = (!(state->prog->flags & EF_HEAP) &&
 			!strcmp(opat, right) && pprog != dummy_patprog2);
 

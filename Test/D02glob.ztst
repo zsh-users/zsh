@@ -533,14 +533,12 @@
     cd glob.tmp
     [[ -n a*(#qN) ]] && print File beginning with a
     [[ -z z*(#qN) ]] && print No file beginning with z
-    [[ "a b c" = ?(#q) ]] && print Multiple files matched
     setopt nonomatch
     [[ -n z*(#q) ]] && print Normal string if nullglob not set
   )
 0:Force glob expansion in conditions using (#q)
 >File beginning with a
 >No file beginning with z
->Multiple files matched
 >Normal string if nullglob not set
 
  (){ print $#@ } glob.tmp/dir*(Y1)
@@ -562,3 +560,8 @@
 >Globs before last path component
 >Respects qualifiers
 >Argument required
+
+  [[ "ce fichier n'existe pas"  = (#b)ce\ (f[^ ]#)\ *s(#q./) ]]
+  print $match[1]
+0:(#q) is ignored completely in conditional pattern matching
+>fichier

@@ -1,5 +1,9 @@
 2014-08-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 32954 (plus new test): Src/cond.c, Test/D02glob.ztst:
+	(#q) on patterns with [[ ... = ... ] and [[ ... != ... ]]
+	shouldn't force a glob, it should simply be ignored.
+
 	* unposted: Src/subst.c:  remove unused variables.
 
 2014-08-04  Mikael Magnusson  <mikachu@gmail.com>
