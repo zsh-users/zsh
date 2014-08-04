@@ -5,8 +5,7 @@
 
 2014-08-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* Doc/Zsh/builtins.yo: 32944: Doc/Zsh/builtins.yo: read -qs is
-	handled properly.
+	* 32944: Doc/Zsh/builtins.yo: read -qs is handled properly.
 
 	* users/19006: Doc/Zsh/expn.yo: document position of
 	RC_EXPAND_PARAM handling during parameter substitution.
