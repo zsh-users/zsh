@@ -3391,7 +3391,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 		    mflags |= CMF_FILE;
 		    for (n = firstnode(l); n; incnode(n))
 			addmatch(getdata(n), NULL);
-		    mflags &= !CMF_FILE;
+		    mflags &= ~CMF_FILE;
 		}
 		opts[NULLGLOB] = ng;
 	    } else {

@@ -1,3 +1,7 @@
+2014-08-04  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* Miles Ohlrich: 32958: Src/Zle/compctl.c: bitwise logic fix
+
 2014-08-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 32954: Doc/Zsh/expn.yo: missed this.
