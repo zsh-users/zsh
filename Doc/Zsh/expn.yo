@@ -2338,7 +2338,9 @@ avoided for the sake of clarity.  Note that within conditions using the
 `tt([[)' form the presence of a parenthesised expression
 tt(LPAR()#q...+RPAR()) at the end of a string indicates that globbing
 should be performed; the expression may include glob qualifiers, but
-it is also valid if it is simply tt(LPAR()#q+RPAR()).
+it is also valid if it is simply tt(LPAR()#q+RPAR()).  This does
+not apply to the right hand side of pattern match operators as the
+syntax already has special significance.
 
 A qualifier may be any one of the following:
 
