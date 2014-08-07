@@ -302,7 +302,8 @@ sitem(tt(g))(True if the effective gid of the current process is var(n).)
 sitem(tt(j))(True if the number of jobs is at least var(n).)
 sitem(tt(L))(True if the tt(SHLVL) parameter is at least var(n).)
 sitem(tt(l))(True if at least var(n) characters have already been
-printed on the current line.)
+printed on the current line.  When var(n) is negative, true if at least
+tt(abs)tt(LPAR())var(n)tt(RPAR()) characters remain before the right margin.)
 sitem(tt(S))(True if the tt(SECONDS) parameter is at least var(n).)
 sitem(tt(T))(True if the time in hours is equal to var(n).)
 sitem(tt(t))(True if the time in minutes is equal to var(n).)
@@ -318,12 +319,20 @@ item(tt(%[)var(xstring)tt(]))(
 Specifies truncation behaviour for the remainder of the prompt string.
 The third, deprecated, form is equivalent to `tt(%)var(xstringx)',
 i.e. var(x) may be `tt(<)' or `tt(>)'.
-The numeric argument, which in the third form may appear immediately
-after the `tt([)', specifies the maximum permitted length of
-the various strings that can be displayed in the prompt.
 The var(string) will be displayed in
 place of the truncated portion of any string; note this does not
 undergo prompt expansion.
+
+The numeric argument, which in the third form may appear immediately
+after the `tt([)', specifies the maximum permitted length of
+the various strings that can be displayed in the prompt.
+In the first two forms, this numeric argument may be negative, in which
+case the truncation length is determined by subtracting the absolute
+value of the numeric argument from the number of character positions
+remaining on the current prompt line.  If this results in a zero or
+negative length, a length of 1 is used.  In other words, a negative
+argument arranges that after truncation at least var(n) characters
+remain before the right margin.
 
 The forms with `tt(<)' truncate at the left of the string,
 and the forms with `tt(>)' truncate at the right of the string.
@@ -344,11 +353,19 @@ string, or to the end of the next enclosing group of the `tt(%LPAR())'
 construct, or to the next truncation encountered at the same grouping
 level (i.e. truncations inside a `tt(%LPAR())' are separate), which
 ever comes first.  In particular, a truncation with argument zero
-(e.g. `tt(%<<)') marks the end of the range of the string to be
+(e.g., `tt(%<<)') marks the end of the range of the string to be
 truncated while turning off truncation from there on. For example, the
 prompt '%10<...<%~%<<%# ' will print a truncated representation of the
 current directory, followed by a `tt(%)' or `tt(#)', followed by a
 space.  Without the `tt(%<<)', those two characters would be included
-in the string to be truncated.
+in the string to be truncated.  Note that `tt(%-0<<)' is a distinct
+
+Truncation applies only within each individual line of the prompt, as
+delimited by embedded newlines (if any).  If the total length of any line
+of the prompt after truncation is greater than the terminal width, or if
+the part to be truncated contains embedded newlines, truncation behavior
+is undefined and may change in a future version of the shell.  Use
+`tt(%-var(n)LPAR()l.var(true-text).var(false-text)RPAR())' to remove parts
+of the prompt when the available space is less than var(n).
 )
 enditem()
