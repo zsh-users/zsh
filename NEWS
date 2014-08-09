@@ -65,6 +65,13 @@ The resulting glob is treated as a single argument.  For example,
 [[ -n *.c(#qN) ]] tests whether there are any .c files in the current
 directory.
 
+In prompt strings, the %N(l.true.false) conditional (line length) and
+the %N<..< and %N>..> truncation operators now accept negative values
+of N, which count the remaining space to the opposite margin (positive
+values of N still count the space used since the start of the prompt).
+In PS1 and PROMPT, this counts to the right margin, whereas in RPS1 and
+RPROMPT, it counts to the left margin (not to the opposite prompt).
+
 
 Changes between 4.2 and 5.0.0
 -----------------------------

@@ -1,3 +1,8 @@
+2014-08-08  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: NEWS, Doc/Zsh/prompt.yo: mention 32971 in NEWS,
+	clarify RPROMPT behavior in docs.
+
 2014-08-07  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32971 (plus doc tweak): Doc/Zsh/prompt.yo, Src/prompt.c:

@@ -280,7 +280,8 @@ and var(false-text) may both contain arbitrarily-nested escape
 sequences, including further ternary expressions.
 
 The left parenthesis may be preceded or followed by a positive integer var(n),
-which defaults to zero.  A negative integer will be multiplied by -1.
+which defaults to zero.  A negative integer will be multiplied by -1, except
+as noted below for `tt(l)'.
 The test character var(x) may be any of the following:
 
 startsitem()
@@ -303,7 +304,8 @@ sitem(tt(j))(True if the number of jobs is at least var(n).)
 sitem(tt(L))(True if the tt(SHLVL) parameter is at least var(n).)
 sitem(tt(l))(True if at least var(n) characters have already been
 printed on the current line.  When var(n) is negative, true if at least
-tt(abs)tt(LPAR())var(n)tt(RPAR()) characters remain before the right margin.)
+tt(abs)tt(LPAR())var(n)tt(RPAR()) characters remain before the opposite
+margin (thus the left margin for tt(RPROMPT)).)
 sitem(tt(S))(True if the tt(SECONDS) parameter is at least var(n).)
 sitem(tt(T))(True if the time in hours is equal to var(n).)
 sitem(tt(t))(True if the time in minutes is equal to var(n).)
@@ -332,7 +334,7 @@ value of the numeric argument from the number of character positions
 remaining on the current prompt line.  If this results in a zero or
 negative length, a length of 1 is used.  In other words, a negative
 argument arranges that after truncation at least var(n) characters
-remain before the right margin.
+remain before the right margin (left margin for tt(RPROMPT)).
 
 The forms with `tt(<)' truncate at the left of the string,
 and the forms with `tt(>)' truncate at the right of the string.
