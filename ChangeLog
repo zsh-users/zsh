@@ -1,3 +1,7 @@
+2014-08-10  Axel Beckert  <abe@deuxchevaux.org>
+
+	* unposted: Doc/Zsh/expn.yo: Fix typo.
+
 2014-08-08  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: NEWS, Doc/Zsh/prompt.yo: mention 32971 in NEWS,

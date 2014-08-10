@@ -2001,7 +2001,7 @@ except that recursive directory searching is not supported.)
 )
 item(tt(PLUS()LPAR())...tt(RPAR()))(
 Match at least one occurrence.  (Like `tt(LPAR())...tt(RPAR()##)',
-except that recursive directory searching is not supported..)
+except that recursive directory searching is not supported.)
 )
 item(tt(?LPAR())...tt(RPAR()))(
 Match zero or one occurrence.  (Like `tt(LPAR()|)...tt(RPAR())'.)
