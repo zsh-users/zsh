@@ -54,7 +54,7 @@ the zshaddhistory hook or by the HIST_IGNORE_* options, all of which
 take effect immediately on the internal history list itself.
 
 The parameter ZLE_RPROMPT_INDENT can be set to 0 to remove the space
-between the right hand side of the screen (this causes problems with
+before the right hand side of the screen (this causes problems with
 some terminals).  It is not special and is not set by default; the
 effect in that case is as if it was 1, as in previous versions.
 
@@ -76,7 +76,7 @@ Another new prompt feature is the %. escape within time strings, for
 example %D{%H:%M:%S.%.}.  It provides zero-padded decimal fractions of
 second; by default milliseconds are shown, but the number of digits may
 be indicated from 1 to 6, e.g. "%6.".  (Note this is part of the
-extensions to strftime() formats rather of basic prompt escapes.)
+extensions to strftime() formats rather than basic prompt escapes.)
 
 
 Changes between 4.2 and 5.0.0
