@@ -32,6 +32,7 @@ narrow-to-region-invisible
 predict-on
 quote-and-complete-word
 read-from-minibuffer
+replace-argument
 replace-string
 replace-string-again
 select-word-style

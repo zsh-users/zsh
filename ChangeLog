@@ -1,3 +1,11 @@
+2014-08-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Completion/Base/Completer/.distfiles,
+	Completion/Linux/Command/.distfiles,
+	Completion/Unix/Command/.distfiles, Config/version.mk,
+	Etc/.distfiles, Etc/FAQ.yo, Functions/Zle/.distfiles, NEWS,
+	README: updates for 5.0.5-dev-1 and 5.0.6 release.
+
 2014-08-10  Axel Beckert  <abe@deuxchevaux.org>
 
 	* unposted: Doc/Zsh/expn.yo: Fix typo.

@@ -5,10 +5,8 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.0.5 of the shell.  This is a stable release.
-There are minor new features as well as bug fixes since 5.0.2.
-5.0.3 and 5.0.4 were short-lived releases with most of the features of
-5.0.5 that were replaced owing to significant bugs.
+This is version 5.0.6 of the shell.  This is a stable release.
+There are minor new features as well as bug fixes since 5.0.5.
 
 Installing Zsh
 --------------

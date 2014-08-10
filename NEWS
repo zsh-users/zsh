@@ -72,6 +72,12 @@ values of N still count the space used since the start of the prompt).
 In PS1 and PROMPT, this counts to the right margin, whereas in RPS1 and
 RPROMPT, it counts to the left margin (not to the opposite prompt).
 
+Another new prompt feature is the %. escape within time strings, for
+example %D{%H:%M:%S.%.}.  It provides zero-padded decimal fractions of
+second; by default milliseconds are shown, but the number of digits may
+be indicated from 1 to 6, e.g. "%6.".  (Note this is part of the
+extensions to strftime() formats rather of basic prompt escapes.)
+
 
 Changes between 4.2 and 5.0.0
 -----------------------------

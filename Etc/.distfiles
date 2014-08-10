@@ -26,3 +26,7 @@ relnote_4.3.12.txt
 relnote_5.0.0.txt
 zsh-development-guide
 '
+
+DISTFILES_DOC='
+FAQ*.html
+'
