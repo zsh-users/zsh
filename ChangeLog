@@ -22,6 +22,12 @@
 	truncation calculates space available before right margin
 	(positive argument still counts space used since left margin).
 
+2014-08-06  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted, see 32968: Completion/openSUSE/Command/.distfiles
+	Completion/openSUSE/Command/_SuSEconfig ->
+	Completion/openSUSE/Command/_SUSEconfig: rename file.
+
 2014-08-04  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* Miles Ohlrich: 32958: Src/Zle/compctl.c: bitwise logic fix
