@@ -1,3 +1,8 @@
+2014-08-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Axel Beckert: 32975, 32984: Doc/Zsh/Makefile.in: texi2html.conf
+	location was inconsistent when building out of tree.
+
 2014-08-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Completion/Base/Completer/.distfiles,
