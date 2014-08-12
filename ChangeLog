@@ -1,3 +1,7 @@
+2014-08-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Config/version.mk: update to 5.0.5-dev-2.
+
 2014-08-12  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 32985: NEWS: Add NEWS entry for array zipping operators.
