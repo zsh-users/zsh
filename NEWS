@@ -7,82 +7,82 @@ Note also the list of incompatibilities in the README file.
 Changes since 5.0.0
 -------------------
 
-Numeric constants encountered in mathematical expressions (but not other
-contexts) can contain underscores as separators that will be ignored on
-evaluation, as allowed in other scripting languages.  For example,
-0xFFFF_FFFF, or 3.141_592_654.
-
-"functions -T" turns on tracing for the specified function(s) only,
-similar to "functions -t" except that tracing is turned off for any
-functions called from the specified one(s) that don't also have the -t
-or -T flag.
-
-The option FORCE_FLOAT has been added to force all arithmetic constants
-to be treated as floating point.  This is most useful locally within
-functions or scripts performing floating point calculations.
-
-Individual pattern characters can be disabled.  For example, to allow '^'
-to be an ordinary character even if the option EXTENDED_GLOB is set, use
-"disable -p '^'".
-
-The variable editing builtin vared can be given custom editing widgets
-for initialisation and finishing.
-
-The line editor's capability for listening on file descriptors
-additional to the terminal has been enhanced so that the handler for
-such file descriptors can be a line editor widget.  Previously the
-handler always behaved as a standard shell function.
-
-Hooks for adding history (the function zshaddhistory and the
-array zshaddhistory_functions) can return status 2 to indicate that
-history is to be saved internally within the shell but not written.
-
-In file completion, the recursive-files style can be set to an array of
-patterns to match against "$PWD/".  In any matched location, it is
-possibly to complete files in arbitrarily deep subdirectories without
-needing to type the directory prefix.  See example in the zshcompsys
-manual.
-
-The _user_expand completer now allows expansion functions in the
-user-expand files to return a string in REPLY that will be used to name
-the set of expansions returned.
-
-The parameter HISTORY_IGNORE may be set to a pattern which matches
-lines in the internal history that are to be omitted from the history
-file at file write time.  This differs from history changes made in
-the zshaddhistory hook or by the HIST_IGNORE_* options, all of which
-take effect immediately on the internal history list itself.
-
-The parameter ZLE_RPROMPT_INDENT can be set to 0 to remove the space
-before the right hand side of the screen (this causes problems with
-some terminals).  It is not special and is not set by default; the
-effect in that case is as if it was 1, as in previous versions.
-
-If the option EXTENDED_GLOB is in effect, it is possible to force
-globbing within conditional code using the [[ ... ]] syntax by flagging
-that a certain string is a glob using the (#q) glob qualifier syntax.
-The resulting glob is treated as a single argument.  For example,
-[[ -n *.c(#qN) ]] tests whether there are any .c files in the current
-directory.
-
-In prompt strings, the %N(l.true.false) conditional (line length) and
-the %N<..< and %N>..> truncation operators now accept negative values
-of N, which count the remaining space to the opposite margin (positive
-values of N still count the space used since the start of the prompt).
-In PS1 and PROMPT, this counts to the right margin, whereas in RPS1 and
-RPROMPT, it counts to the left margin (not to the opposite prompt).
-
-Another new prompt feature is the %. escape within time strings, for
-example %D{%H:%M:%S.%.}.  It provides zero-padded decimal fractions of
-second; by default milliseconds are shown, but the number of digits may
-be indicated from 1 to 6, e.g. "%6.".  (Note this is part of the
-extensions to strftime() formats rather than basic prompt escapes.)
-
-The operators :^ and :^^ in parameter substitution allow for array
-zipping in the form ${name:^array}. With the :^ operator, all entries
-in $name and $array will be output in alternating order. With :^ the
-longer array is trimmed whereas the :^^ operator repeats the shorter
-array enough to match the longer array.
+- Numeric constants encountered in mathematical expressions (but not other
+  contexts) can contain underscores as separators that will be ignored on
+  evaluation, as allowed in other scripting languages.  For example,
+  0xFFFF_FFFF, or 3.141_592_654.
+ 
+- "functions -T" turns on tracing for the specified function(s) only,
+  similar to "functions -t" except that tracing is turned off for any
+  functions called from the specified one(s) that don't also have the -t
+  or -T flag.
+ 
+- The option FORCE_FLOAT has been added to force all arithmetic constants
+  to be treated as floating point.  This is most useful locally within
+  functions or scripts performing floating point calculations.
+ 
+- Individual pattern characters can be disabled.  For example, to allow '^'
+  to be an ordinary character even if the option EXTENDED_GLOB is set, use
+  "disable -p '^'".
+ 
+- The variable editing builtin vared can be given custom editing widgets
+  for initialisation and finishing.
+ 
+- The line editor's capability for listening on file descriptors
+  additional to the terminal has been enhanced so that the handler for
+  such file descriptors can be a line editor widget.  Previously the
+  handler always behaved as a standard shell function.
+ 
+- Hooks for adding history (the function zshaddhistory and the
+  array zshaddhistory_functions) can return status 2 to indicate that
+  history is to be saved internally within the shell but not written.
+ 
+- In file completion, the recursive-files style can be set to an array of
+  patterns to match against "$PWD/".  In any matched location, it is
+  possibly to complete files in arbitrarily deep subdirectories without
+  needing to type the directory prefix.  See example in the zshcompsys
+  manual.
+ 
+- The _user_expand completer now allows expansion functions in the
+  user-expand files to return a string in REPLY that will be used to name
+  the set of expansions returned.
+ 
+- The parameter HISTORY_IGNORE may be set to a pattern which matches
+  lines in the internal history that are to be omitted from the history
+  file at file write time.  This differs from history changes made in
+  the zshaddhistory hook or by the HIST_IGNORE_* options, all of which
+  take effect immediately on the internal history list itself.
+ 
+- The parameter ZLE_RPROMPT_INDENT can be set to 0 to remove the space
+  before the right hand side of the screen (this causes problems with
+  some terminals).  It is not special and is not set by default; the
+  effect in that case is as if it was 1, as in previous versions.
+ 
+- If the option EXTENDED_GLOB is in effect, it is possible to force
+  globbing within conditional code using the [[ ... ]] syntax by flagging
+  that a certain string is a glob using the (#q) glob qualifier syntax.
+  The resulting glob is treated as a single argument.  For example,
+  [[ -n *.c(#qN) ]] tests whether there are any .c files in the current
+  directory.
+ 
+- In prompt strings, the %N(l.true.false) conditional (line length) and
+  the %N<..< and %N>..> truncation operators now accept negative values
+  of N, which count the remaining space to the opposite margin (positive
+  values of N still count the space used since the start of the prompt).
+  In PS1 and PROMPT, this counts to the right margin, whereas in RPS1 and
+  RPROMPT, it counts to the left margin (not to the opposite prompt).
+ 
+- Another new prompt feature is the %. escape within time strings, for
+  example %D{%H:%M:%S.%.}.  It provides zero-padded decimal fractions of
+  second; by default milliseconds are shown, but the number of digits may
+  be indicated from 1 to 6, e.g. "%6.".  (Note this is part of the
+  extensions to strftime() formats rather than basic prompt escapes.)
+ 
+- The operators :^ and :^^ in parameter substitution allow for array
+  zipping in the form ${name:^array}. With the :^ operator, all entries
+  in $name and $array will be output in alternating order. With :^ the
+  longer array is trimmed whereas the :^^ operator repeats the shorter
+  array enough to match the longer array.
 
 Changes between 4.2 and 5.0.0
 -----------------------------
