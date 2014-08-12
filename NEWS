@@ -78,6 +78,11 @@ second; by default milliseconds are shown, but the number of digits may
 be indicated from 1 to 6, e.g. "%6.".  (Note this is part of the
 extensions to strftime() formats rather than basic prompt escapes.)
 
+The operators :^ and :^^ in parameter substitution allow for array
+zipping in the form ${name:^array}. With the :^ operator, all entries
+in $name and $array will be output in alternating order. With :^ the
+longer array is trimmed whereas the :^^ operator repeats the shorter
+array enough to match the longer array.
 
 Changes between 4.2 and 5.0.0
 -----------------------------

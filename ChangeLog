@@ -1,3 +1,7 @@
+2014-08-12  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 32985: NEWS: Add NEWS entry for array zipping operators.
+
 2014-08-12  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Axel Beckert: 32975, 32984: Doc/Zsh/Makefile.in: texi2html.conf
