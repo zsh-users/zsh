@@ -20,25 +20,30 @@ else
   nm="$compstate[nmatches]"
 fi
 
-out=( "${(@f)$(_call_program processes ps 2>/dev/null)}" )
-desc="$out[1]"
-out=( "${(@M)out[2,-1]:#${~match}}" )
+while _tags; do
+  if _requested processes; then
+    while _next_label processes expl 'process ID'; do
+      out=( "${(@f)$(_call_program $curtag ps 2>/dev/null)}" )
+      desc="$out[1]"
+      out=( "${(@M)out[2,-1]:#${~match}}" )
 
-if [[ "$desc" = (#i)(|*[[:blank:]])pid(|[[:blank:]]*) ]]; then
-  pids=( "${(@)${(@M)out#${(l.${#desc[1,(r)(#i)[[:blank:]]pid]}..?.)~:-}[^[:blank:]]#}##*[[:blank:]]}" )
-else
-  pids=( "${(@)${(@M)out##[^0-9]#[0-9]#}##*[[:blank:]]}" )
-fi
+      if [[ "$desc" = (#i)(|*[[:blank:]])pid(|[[:blank:]]*) ]]; then
+	pids=( "${(@)${(@M)out#${(l.${#desc[1,(r)(#i)[[:blank:]]pid]}..?.)~:-}[^[:blank:]]#}##*[[:blank:]]}" )
+      else
+	pids=( "${(@)${(@M)out##[^0-9]#[0-9]#}##*[[:blank:]]}" )
+      fi
 
-if zstyle -T ":completion:${curcontext}:processes" verbose; then
-  list=( "${(@Mr:COLUMNS-1:)out}" )
-  desc=(-ld list)
-else
-  desc=()
-fi
-
-_wanted -V processes expl 'process ID' \
-    compadd "$@" "$desc[@]" "$all[@]" -a - pids && ret=0
+      if zstyle -T ":completion:${curcontext}:$curtag" verbose; then
+	list=( "${(@Mr:COLUMNS-1:)out}" )
+	desc=(-ld list)
+      else
+	desc=()
+      fi
+      compadd "$@" "$expl[@]" "$desc[@]" "$all[@]" -a pids && ret=0
+    done
+  fi
+  (( ret )) || break
+done
 
 if [[ -n "$all" ]]; then
   zstyle -s ":completion:${curcontext}:processes" insert-ids out || out=menu
