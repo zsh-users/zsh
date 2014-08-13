@@ -22,7 +22,7 @@ _arguments -C \
   '-iR[scan random hosts]:num hosts' \
   '-p[specify ports to try]:port numbers' \
   '-F[scan only ports listed in services file]' \
-  '-D[perform decoy scan]:host list:->host-list' \
+  '-D[perform decoy scan]:host list:_sequence -s, _hosts' \
   '-S[specify source address]:address:_hosts' \
   '-e[specify interface to use]:network interface:_net_interfaces' \
   '-g[specify source port number]:port number' \

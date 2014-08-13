@@ -70,13 +70,9 @@ _arguments -s -w $arguments && ret=0
 
 case $state in
   (tty)
-    compset -P '*,'
-
-    local -a used ttys
-    used=(${(s:,:)IPREFIX})
-
+    local -a ttys
     ttys=( /dev/tty*(N) /dev/pts/*(N) )
-    _wanted tty expl 'terminal device' compadd -S ',' -q -F used ${ttys#/dev/}
+    _sequence -s , _wanted tty expl 'terminal device' compadd - ${ttys#/dev/}
     ;;
 
   (sid)

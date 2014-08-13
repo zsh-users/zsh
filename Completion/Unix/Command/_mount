@@ -688,7 +688,7 @@ if [[ "$service" = mount ]]; then
       "($excl -r -w --rw)"{-w,--rw}'[mount read/write]'
       "($excl)-L+[mount partition with specified label]:label:->labels"
       "($excl)-U+[mount partition with specified uuid]:uuid"
-      "($excl -t --types)"{-t+,--types=}'[specify file system type]:file system type:->fslist'
+      "($excl -t --types)"{-t+,--types=}'[specify file system type]:file system type:_sequence -s , _file_systems'
       "($excl -O --test-opts)"{-O+,--test-opts=}'[with -a, restrict filesystems by options]:file system option:->fsopt'
       "($excl -a -O -o --options)"{-o+,--options=}'[specify file system options]:file system option:->fsopt'
       '(: -)'{-B,--bind}'[remount part of filesystem elsewhere]:old directory:_directories:new directory:_directories'
@@ -743,7 +743,7 @@ if [[ "$service" = mount ]]; then
       '-o[specify file system options]:file system option:->fsopt'
       '-p[print mounted file systems]'
       '-r[mount readonly]'
-      '-t[specify file system type]:file system type:->fslist'
+      '-t[specify file system type]:file system type:_sequence -s, _file_systems'
       '-u[change status of already mounted filesystem]'
       '-v[verbose mode]'
       '-w[mount read/write]'
@@ -817,7 +817,7 @@ else
 	'-A[unmount all mounted file systems except the root]'
 	'-f[force unmount]'
 	'-h[unmount all filesystems associated with host]:host:_hosts'
-	'-t[unmount all filesystems of specified type]:file system type:->fslist'
+	'-t[unmount all filesystems of specified type]:file system type:_sequence -s, _file_systems'
 	'-v[verbose mode]'
 	'*:dev or dir:->udevordir'
       )
@@ -846,11 +846,6 @@ else
 fi
 
 case "$state" in
-fslist)
-  compset -P '*,'
-  compset -S ',*' || suf=','
-  _file_systems -qS "$suf"
-;;
 fsopt)
   _tags options || return 1
 

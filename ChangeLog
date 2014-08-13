@@ -1,3 +1,10 @@
+2014-08-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 32997: Completion/Base/Utility/_sequence, Doc/Zsh/compsys.yo,
+	Completion/Unix/Command/_mount, Completion/Unix/Command/_nmap,
+	Completion/Unix/Command/_pgrep, Completion/Unix/Command/_zip:
+	add completion utility function for lists
+
 2014-08-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 33002: Doc/Zsh/tcpsys.yo, Functions/TCP/tcp_expect: add option

@@ -4741,6 +4741,19 @@ This function accepts the tt(compadd) options `tt(-V)', `tt(-J)',
 `tt(-r)', `tt(-R)', and `tt(-q)' and passes them on to the tt(compadd)
 builtin used to add the matches.
 )
+findex(_sequence)
+item(tt(_sequence) [ tt(-s) var(sep) ] [ tt(-n) var(max) ] [ tt(-d) ] var(function) [ tt(-) ] ...)(
+This function is a wrapper to other functions for completing items in a
+separated list. The same function is used to complete each item in the
+list. The separator is specified with the tt(-s) option. If tt(-s) is
+omitted it will use `tt(,)'. Duplicate values are not matched unless
+tt(-d) is specified. If there is a fixed or maximum number of items in
+the list, this can be specified with the tt(-n) option.
+
+Common tt(compadd) options are passed on to the function. It is possible
+to use tt(compadd) directly with tt(_sequence), though tt(_values) may
+be more appropriate in this situation.
+)
 findex(_setup)
 item(tt(_setup) var(tag) [ var(group) ])(
 This function sets up the special

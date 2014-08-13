@@ -104,11 +104,8 @@ fi
 
 case $state in
   suffixes)
-    compset -P '*:'
-    compset -S ':*' || suf=":."
     suffixes=( *.*(N:e) )
-    _wanted suffixes expl suffixes \
-	compadd -S "$suf" -r ": \t" .$^suffixes && return
+    _sequence -s : _wanted -x suffixes expl suffix compadd - .$^suffixes && return
   ;;
   files)
     if [[ $service = zip ]] && (( ! ${+opt_args[-d]} )); then
