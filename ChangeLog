@@ -1,5 +1,8 @@
 2014-08-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 32925: Completion/Zsh/Command/_kill: complete process groups,
+	partly as a way to suppress insertion of ambiguous PID prefix
+
 	* 32893: Completion/Unix/Type/_pids: move use of _call_program
 	inside the _tags loop to allow processes to be separated
 

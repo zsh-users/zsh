@@ -1,6 +1,7 @@
 #compdef kill
 
 local curcontext="$curcontext" line state ret=1
+typeset -A opt_args
 
 _arguments -C \
   '(-s -l 1)-n[specify signal number]:signal number' \
@@ -10,9 +11,12 @@ _arguments -C \
   '*:processes:->processes' && ret=0
   
 if [[ -n "$state" ]]; then
+  local pgrp='process-groups:: _wanted '
+  [[ -n "$opt_args[(i)-[ns]]${${(@)line:#--}}" && -prefix - ]] && pgrp+='-x '
+  pgrp+="process-groups expl 'process-group' compadd - 0"
   _alternative \
     'processes:: _pids' \
-    'jobs:: _jobs -t' && ret=0
+    'jobs:: _jobs -t' $pgrp && ret=0
 fi
 
 return ret
