@@ -25,6 +25,15 @@
 #	   set it to 0.
 #	   To avoid namespace clashes, the parameter's name must
 #	   not begin with `_expect'.
+#   -P pv  This is similar to -p, however in this case the
+#          arguments to tcp_expect following the options are expected
+#          to start with a prefix "<tag>:".  The parameter $pv is
+#          then set to the value "<tag>" rather than the numeric
+#          index of the parameter.  The string "timeout" is used
+#          as the tag for a timeout specified by -t and -T and
+#          on a failed match the variable is set to the empty string.
+#          It is not an error for multiple arguments to have
+#          the same tag or to use a reserved value of the tag.
 #   -q     Quiet, passed down to tcp_read.  Bad option and argument
 #          usage is always reported.
 #   -s sess
@@ -45,18 +54,18 @@ if [[ ${(t)SECONDS} != float* ]]; then
 fi
 
 # Variables are all named _expect_* to avoid problems with the -p param.
-local _expect_opt _expect_pvar
+local _expect_opt _expect_pvar _expect_state _expect_arg _expect_ind
 local -a _expect_read_args
 float _expect_to1 _expect_to_all _expect_to _expect_new_to
-integer _expect_i _expect_stat
+integer _expect_i _expect_stat _expect_states
 
-while getopts "al:p:qs:t:T:" _expect_opt; do
+while getopts "al:p:P:qs:t:T:" _expect_opt; do
   case $_expect_opt in
     (a) _expect_read_args+=(-a)
 	;;
     (l) _expect_read_args+=(-l $OPTARG)
         ;;
-    (p) _expect_pvar=$OPTARG
+    ([pP]) _expect_pvar=$OPTARG
 	if [[ $_expect_pvar != [a-zA-Z_][a-zA-Z_0-9]# ]]; then
 	  print "invalid parameter name: $_expect_pvar" >&2
 	  return 1
@@ -65,7 +74,12 @@ while getopts "al:p:qs:t:T:" _expect_opt; do
 	  print "$0: parameter names staring \`_expect' are reserved."
 	  return 1
 	fi
-	eval "$_expect_pvar=0"
+	if [[ $_expect_opt = "P" ]]; then
+	  eval "$_expect_pvar=0"
+	  _expect_states=1
+	else
+	  eval "$_expect_pvar="
+	fi
 	;;
     (q) _expect_read_args+=(-q)
         ;;
@@ -112,8 +126,15 @@ while true; do
   fi
   tcp_expect_lines+=($TCP_LINE)
   for (( _expect_i = 1; _expect_i <= $#; _expect_i++ )); do
-    if [[ "$TCP_LINE" = ${~argv[_expect_i]} ]]; then
-      [[ -n $_expect_pvar ]] && eval "$_expect_pvar=\$_expect_i"
+    if [[ _expect_states -ne 0 && $argv[_expect_i] = (#b)([^:]#):(*) ]]; then
+      _expect_ind=$match[1]
+      _expect_arg=$match[2]
+    else
+      _expect_ind=$_expect_i
+      _expect_arg=$argv[_expect_i]
+    fi
+    if [[ "$TCP_LINE" = ${~_expect_arg} ]]; then
+      [[ -n $_expect_pvar ]] && eval "$_expect_pvar=\$_expect_ind"
       return 0
     fi
   done

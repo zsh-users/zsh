@@ -299,7 +299,7 @@ programme or function it is generally better to handle reading data by a
 more explicit method.
 )
 findex(tcp_expect)
-xitem(tt(tcp_expect [ -q ] [ -p) var(var) tt(] [ -t ) var(to) tt(| -T) var(TO)tt(]))
+xitem(tt(tcp_expect [ -q ] [ -p ) var(var) tt( | -P ) var(var) tt(] [ -t ) var(to) tt(| -T) var(TO)tt(]))
 item(tt(    [ -a | -s) var(sess) tt(... | -l) var(sess)tt(,... ]) var(pattern) ...)(
 Wait for input matching any of the given var(pattern)s from any of the
 specified sessions.  Input is ignored until an input line matches one of
@@ -332,7 +332,16 @@ the caller needs to know which of the patterns matched, the option tt(-p)
 var(var) can be used; on return, tt($var) is set to the number of the
 pattern using ordinary zsh indexing, i.e. the first is 1, and so on.  Note
 the absence of a `tt($)' in front of var(var).  To avoid clashes, the
-parameter cannot begin with `tt(_expect)'.
+parameter cannot begin with `tt(_expect)'.  The index -1 is used if
+there is a timeout and 0 if there is no match.
+
+The option tt(-P) var(var) works similarly to tt(-p), but instead of
+numerical indexes the regular arguments must begin with a prefix
+followed by a colon: that prefix is then used as a tag to which var(var)
+is set when the argument matches.  The tag tt(timeout) is used if there
+is a timeout and the empty string if there is no match.  Note it is
+acceptable for different arguments to start with the same prefix if the
+matches do not need to be distinguished.
 
 The option tt(-q) is passed directly down to tt(tcp_read).
 

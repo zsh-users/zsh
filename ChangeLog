@@ -1,3 +1,9 @@
+2014-08-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 33002: Doc/Zsh/tcpsys.yo, Functions/TCP/tcp_expect: add option
+	-P to tcp_expect for tagging matches with a string rather than
+	a parameter index.
+
 2014-08-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 32925: Completion/Zsh/Command/_kill: complete process groups,
