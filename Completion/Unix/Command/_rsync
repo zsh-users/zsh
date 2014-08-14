@@ -74,7 +74,8 @@ _rsync() {
   _arguments -s \
     '*'{-v,--verbose}'[increase verbosity]' \
     {--no-v,--no-verbose}'[turn off --verbose]' \
-    '--bwlimit=[limit I/O bandwidth]:KBytes (etc.) per second' \
+    '--bwlimit=[limit I/O bandwidth]:limit (KiB per second)' \
+    '--outbuf=[set output buffering]:buffering:(none line block)' \
     '--port=[specify alternate port number]:port:(873)' \
     '--address=[bind to the specified address]:bind address:_bind_addresses' \
     '(-T --temp-dir)'{-T,--temp-dir=}'[create temporary files in specified directory]:directory:_directories' \
@@ -213,6 +214,7 @@ _rsync() {
     '--protocol=[force an older protocol version to be used]:number' \
     '--info=[fine-grained informational verbosity]:comma-separated list' \
     '--debug=[fine-grained debug verbosity]:comma-separated list' \
+    '--msgs2stderr[special output handling for debugging]' \
     '--munge-links[munge symlinks to make them safer, but unusable]' \
     '--ignore-missing-args[ignore missing source args without error]' \
     '--delete-missing-args[delete missing source args from destination]' \
@@ -222,6 +224,7 @@ _rsync() {
     '*'{-M=,--remote-option=}'[send option to the remote side only]:option string' \
     '--preallocate[preallocate the full length of new files]' \
     '--iconv=[request charset conversion of filenames]:number' \
+    '--checksum-seed=:number' \
     '--read-batch=[read a batched update from the specified file]:file:_files'
 }
 

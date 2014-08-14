@@ -14,6 +14,7 @@ _arguments -C -s \
   '(--quiet -q --verbose -v --no-verbose -nv)'{--quiet,-q}'[turn off output]' \
   '(--quiet -q --verbose -v --no-verbose -nv)'{--verbose,-v}'[turn on verbose output]' \
   '*-n+[turn off flags]:flags:->noflags' \
+  '--report-speed=:type:(bits)' \
   '(--input-file -i)'{--input-file=,-i+}'[specify input file]:file containing URLs:_files' \
   '(--force-html -F)'{--force-html,-F}'[treat input file as html]' \
   '(--base -B)'{--base=,-B+}'[prepend URL to relative links]:base URL:_urls' \
@@ -47,6 +48,7 @@ _arguments -C -s \
   '--prefer-family[connect first to addresses of specified family]:address family:(IPv6 IPv4 none)' \
   '(--http-user --ftp-user)--user[set both ftp and http user]:user' \
   '(--http-password --ftp-password)--password[set both ftp and http password]:password' \
+  '(--password --http-password --ftp-password)--ask-password:[prompt for passwords]' \
   '--no-iri[turn off IRI support]' \
   '--local-encoding=[specify local encoding for IRIs]:encoding' \
   '--remote-encoding=[specify default remote encoding]:encoding' \
@@ -56,12 +58,13 @@ _arguments -C -s \
   '(--directory-prefix -P)'{--directory-prefix=,-P+}'[specify prefix to save files to]:prefix:_files -/' \
   '--cut-dirs=:number:' \
   '(--user)--http-user=:user' \
-  '(--password)--http-password=:password' \
+  '(--password --ask-password)--http-password=:password' \
   '--no-cache[disallow server-cached data]' \
   '--default-page=[specify default page name, normally index.html]' \
   '(--adjust-extension -E)'{--adjust-extension,-E}'[save all HTML/CSS documents with proper extensions]' \
   "--ignore-length[ignore \`Content-Length' header field]" \
   '*--header=:string' \
+  '--max-redirect=:number' \
   '--proxy-user=:user' \
   '--proxy-password=:password' \
   '--referer=:URL:_urls' \
@@ -74,9 +77,14 @@ _arguments -C -s \
   '--keep-session-cookies[load and save session cookies]' \
   '--post-data=[use the POST method with specified data]:data to send' \
   '--post-file=[use the POST method; sending contents of a file]:file:_files' \
+  '--method=[use specified HTTP method]:method:(GET POST HEAD DELETE)' \
+  '(--body-file)--body-data=[send string as data]:string' \
+  '(--body-data)--body-file=[send contents of file]:file:_files' \
   '--content-disposition[honor the Content-Disposition header when choosing local file names]'  \
+  '--content-on-error[output received content on server errors]' \
   "--auth-no-challenge[send basic HTTP authentication without first waiting for server's challenge]" \
   '--secure-protocol=[choose secure protocol]:protocol:(SSLv2 SSLv3 TLSv1)' \
+  --https-only \
   "--no-check-certificate=[don't check the server certificate]" \
   '--certificate=[specify client certificate]:client certificate file:_files' \
   '--certificate-type=[specify client certificate type]:certificate type:(PEM DER)' \
@@ -87,22 +95,27 @@ _arguments -C -s \
   '--random-file[specify file with random data for seeding generator]:file:_files' \
   '--egd-file=[specify filename of EGD socket]:file:_files' \
   '(--user)--ftp-user=:user' \
-  '(--password)--ftp-password=:password' \
+  '(--password --ask-password)--ftp-password=:password' \
   "--no-remove-listing[don't remove \`.listing' files]" \
   '--no-glob[turn off FTP file name globbing]' \
   '--no-passive-ftp' \
-  '--retr-symlinks' \
   '--preserve-permissions[preserve remote file permissions with ftp]' \
+  '--retr-symlinks' \
+  '--warc-file=:file:_files' --warc-header=:string --warc-max-size=:number \
+  --warc-cdx --warc-dedup=:file:_files --no-warc-compression --no-warc-digests \
+  --no-warc-keep-log --warc-tempdir=:directory:_directories \
   '(--recursive -r)'{--recursive,-r}'[recurse subdirectories]' \
   '(--level -l)'{--level=,-l+}'[specify maximum recursion depth]:level' \
   '--delete-after' \
   '(--convert-links -k)'{--convert-links,-k}'[convert links to be relative]' \
+  '--backups=:max backups' \
   '(--backup-converted -K)'{--backup-converted,-K}'[backup files before conversion]' \
   '(--mirror -m -r -N -l)'{--mirror,-m}'[mirror (-r -N -l inf --no-remove-listing)]' \
   '(--page-requisites -p)'{--page-requisites,-p}'[get all images needed to display page]' \
   '--strict-comments[turn on strict (SGML) handling of HTML comments]' \
   '(--accept -A)'{--accept=,-A+}'[specify accepted extensions]:extensions' \
   '(--reject -R)'{--reject=,-R+}'[specify rejected extensions]:extensions' \
+  --{accept,reject}-regex=:regex '--regex-type=:regex type:(posix pcre)' \
   '(--domains -D)'{--domains=,-D+}'[specify accepted domains]:domains:_domains' \
   '--exclude-domains=:rejected domains:_domains' \
   '--follow-ftp' \

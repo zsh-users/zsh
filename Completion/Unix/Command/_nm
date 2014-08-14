@@ -1,30 +1,62 @@
 #compdef nm
 
-# This is a stub.  It's main reason for existence is to offer
-# object files with nm.  Feel free to extend it.  If you do, remove
-# this comment.
+local args files
 
-local state context line expl
-local -A opt_args
-local -a args
-integer ret=1
+_nm_object_file() {
+  [[ -x $REPLY || $REPLY = *.([ao]|so) ]]
+}
 
-if _pick_variant gnu='Free Soft' unix --version; then
-  args+=(-s --)
+files="*:object file:_path_files -g '*(-.e:_nm_object_file:)'"
+args=(
+  '(-A -o --print-file-name)'{-A,-o,--print-file-name}'[print name of input file on each line]'
+  '(--demangle)-C[decode symbol names]'
+  '(-D --dynamic)'{-D,--dynamic}'[display dynamic symbols instead of normal ones]'
+  '(-g --extern-only)'{-g,--extern-only}'[display only global symbols]'
+  '(-t --radix -o -x)'{-t,--radix}'[specify radix for numeric values]:radix:((d\:decimal o\:octal x\:hexadecimal))'
+)
+
+if _pick_variant gnu=GNU unix -V; then
+  compset -P '@' && files='*:options file:_files'
+  args+=(
+    '(- *)--help[display help information]'
+    '(- *)--version[display version information]'
+    '(-f --format -P --portability)-B[same as --format=bsd]'
+    '(-C --no-demangle)--demangle=-[decode symbol names]::style:(auto gnu lucid arm hp edg gnu-v3 java gnat)'
+    "(-C --demangle)--no-demangle[don't decode symbol names]"
+    '(-u --undefined-only)--defined-only[display only defined symbols]'
+    '(-f --format -P)'{-f+,--format=}'[specify output format]:format:(bsd sysv posix)'
+    '(-l --line-numbers)'{-l,--line-numbers}'[display source file and line numbers from debug information]'
+    '(-n --numeric-sort -p --no-sort --size-sort)'{-n,--numeric-sort}'[sort symbols numerically by address]'
+    '(-p --no-sort -n --numeric-sort -r -P --reverse-sort --size-sort)'{-p,--no-sort}'[do not sort symbols]'
+    '(-P --portability -B -f --format)'{-P,--portability}'[same as --format=posix]'
+    '(-r --reverse-sort -p --no-sort --size-sort)'{-r,--reverse-sort}'[reverse sort order]'
+    '--plugin[load specified plugin]:plugin'
+    '(-u --undefined-only --defined-only)'{-u,--undefined-only}'[display only undefined symbols]'
+    "--target=[target object format]:targets:(${${(@M)${(f)$(_call_program targets nm --help)}:#*supported targets:*}##*: })"
+    '(-a --debug-syms)'{-a,--debug-syms}'[display debugger-only symbols]'
+    '(-S --print-size)'{-S,--print-size}'[print size of defined symbols]'
+    '(-s --print-armap)'{-s,--print-armap}'[include index for symbols from archive members]'
+    '(-p --no-sort -n --numeric-sort -r)--size-sort[sort symbols by size]'
+    '--special-syms[include special symbols in the output]'
+    '--synthetic[display synthetic symbols as well]'
+  )
+else
+  # following flags are accurate for Solaris
+  args=( ${args:#(|*\)(\*|))-[o-]*}
+    "-h[don't display column headers]"
+    '-l[distinguish WEAK symbols with * character]'
+    '(-t -x)-o[print values in octal]'
+    '(-v)-n[sort symbols by name]'
+    '(-P)-p[produce parsable output]'
+    '(-p)-P[portable output format]'
+    '(-r)-R[print archive name, object file and symbol name]'
+    '-r[prepend name of input file to each symbol name]'
+    '-s[print section name instead of index]'
+    '-u[print undefined symbols only]'
+    '(-n)-v[sort external symbols by value]'
+    '-V[display version of the nm command]'
+    '(-o -t)-x[print values in hexadecimal]'
+  )
 fi
-args+=('*:file:->file')
 
-_arguments "$args[@]" && ret=0
-
-case $state in
-  (file)
-  _alternative \
-    "object-files:object file:_path_files -g '*.o'" \
-    "executable-files:executable file:_path_files -g '*(*)'" \
-    "dynamic-libraries:dynamic library:_path_files -g '*.so(.*)#'" \
-    "static-libraries:static library:_path_files -g '*.a'" \
-    "directories:directory:_path_files -g '*(/)'" && ret=0
-  ;;
-esac
-
-return ret
+_arguments -s "$args[@]" $files

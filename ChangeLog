@@ -1,5 +1,9 @@
 2014-08-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 32998: Completion/Unix/Command/_dsh, Completion/Unix/Command/_nm,
+	Completion/Unix/Command/_mosh, Completion/Unix/Command/_rsync,
+	Completion/Unix/Command/_wget: completion function updates
+
 	* 32997: Completion/Base/Utility/_sequence, Doc/Zsh/compsys.yo,
 	Completion/Unix/Command/_mount, Completion/Unix/Command/_nmap,
 	Completion/Unix/Command/_pgrep, Completion/Unix/Command/_zip:

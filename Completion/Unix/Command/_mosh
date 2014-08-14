@@ -1,12 +1,26 @@
 #compdef mosh
 
+local curcontext="$curcontext" state line
+local -a suf
+
 _arguments \
-  '--client=:client helper:_command_names -e' \
-  '--server=:server helper:_files' \
-  '--ssh=:ssh command to run:_files' \
-  '(-a -n)--predict=:when:(adaptive always never)' \
-  '(--predict -n)-a[predict always]' \
-  '(--predict -a)-n[predict never]' \
-  {-p,--port=}':port:_ports' \
-  ':remote:_hosts' \
-  ':remote command:_command_names -e'
+  '(-)--help[display help information]' \
+  '(-)--version[display version information]' \
+  "--no-init[don't set terminal init string]" \
+  '--ssh=[specify ssh command to setup session]:ssh command:_normal' \
+  '--port=[specify server-side port range]:port:_sequence -n 2 -s \: _ports' \
+  '(-a -n)--predict=[control speculative local echo]:mode:(adaptive always never)' \
+  '(--predict -n)-a[synonym for --predict=always]' \
+  '(--predict -a)-n[synonym for --predict=never]' \
+  '--server[specify command to run server helper]:remote file:_files' \
+  '--client[specify command to run client helper]:_command_names -e' \
+  '1:remote host name:->userhost' \
+  '*:::args:_normal' && return
+
+case $state in
+  userhost)
+    _hosts || _user_at_host && return
+  ;;
+esac
+
+return 1
