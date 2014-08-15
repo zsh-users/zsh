@@ -209,7 +209,7 @@ F:This similar test was triggering a reproducible failure with pipestatus.
   { printf "%d\n" {1..20000} } | ( read -E )
   hang(){ printf "%d\n" {2..20000} | cat }; hang | ( read -E )
   print -p done
-  read -Ep
+  read -Et 6 -p
 0:Bug regression: piping a shell construct to an external process may hang
 >1
 >2
