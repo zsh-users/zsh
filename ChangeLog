@@ -1,3 +1,9 @@
+2014-08-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33012: Src/utils.c: add an error return value (-1) to xsymlinks()
+	to differentiate when xbuf is set to the empty string; silences
+	bogus warning about failed expansion
+
 2014-08-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 32998: Completion/Unix/Command/_dsh, Completion/Unix/Command/_nm,

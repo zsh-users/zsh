@@ -716,7 +716,6 @@ slashsplit(char *s)
 }
 
 /* expands symlinks and .. or . expressions */
-/* if flag = 0, only expand .. and . expressions */
 
 /**/
 static int
@@ -753,6 +752,7 @@ xsymlinks(char *s)
 		strcat(xbuf, *pp);
 	    } else {
 		*xbuf = 0;
+		ret = -1;
 		break;
 	    }
 	} else {
@@ -760,9 +760,11 @@ xsymlinks(char *s)
 	    metafy(xbuf3, t0, META_NOALLOC);
 	    if (*xbuf3 == '/') {
 		strcpy(xbuf, "");
-		xsymlinks(xbuf3 + 1);
+		if (xsymlinks(xbuf3 + 1) < 0)
+		    ret = -1;
 	    } else
-		xsymlinks(xbuf3);
+		if (xsymlinks(xbuf3) < 0)
+		    ret = -1;
 	}
     }
     freearray(opp);
@@ -781,11 +783,10 @@ xsymlink(char *s)
     if (*s != '/')
 	return NULL;
     *xbuf = '\0';
-    xsymlinks(s + 1);
-    if (!*xbuf) {
+    if (xsymlinks(s + 1) < 0)
 	zwarn("path expansion failed, using root directory");
+    if (!*xbuf)
 	return ztrdup("/");
-    }
     return ztrdup(xbuf);
 }
 
@@ -795,7 +796,7 @@ print_if_link(char *s)
 {
     if (*s == '/') {
 	*xbuf = '\0';
-	if (xsymlinks(s + 1))
+	if (xsymlinks(s + 1) > 0)
 	    printf(" -> "), zputs(*xbuf ? xbuf : "/", stdout);
     }
 }
