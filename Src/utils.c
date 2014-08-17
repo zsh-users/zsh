@@ -722,7 +722,7 @@ static int
 xsymlinks(char *s)
 {
     char **pp, **opp;
-    char xbuf2[PATH_MAX*2], xbuf3[PATH_MAX*2];
+    char xbuf2[PATH_MAX*3], xbuf3[PATH_MAX*2];
     int t0, ret = 0;
     zulong xbuflen = strlen(xbuf);
 
