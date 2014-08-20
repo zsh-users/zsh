@@ -1,7 +1,7 @@
 2014-08-20  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* Lokesh Mandvekar: 33032: Completion/Linux/Command/_docker: new
-	completion for docker
+	* Lokesh Mandvekar: 33032: Completion/Linux/Command/_docker,
+	Completion/Linux/Command/.distfiles: new completion for docker
 
 2014-08-15  Barton E. Schaefer  <schaefer@zsh.org>
 
