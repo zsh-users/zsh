@@ -84,6 +84,13 @@ Changes since 5.0.0
   longer array is trimmed whereas the :^^ operator repeats the shorter
   array enough to match the longer array.
 
+- The value of $? when a job becomes stopped is now the signal number plus
+  128, for compatibility with other shells.  Note that different operating
+  systems use different values e.g. for SIGTSTP, so it is not possible in
+  portable scripts to detect stopped jobs by comparing to a fixed number.
+  Also, the value of $pipestatus is now updated when a job stops, not just
+  when it exits.
+
 Changes between 4.2 and 5.0.0
 -----------------------------
 

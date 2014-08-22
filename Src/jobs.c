@@ -384,9 +384,11 @@ storepipestats(Job jn, int inforeground, int fixlastval)
     Process p;
 
     for (p = jn->procs, i = 0; p && i < MAX_PIPESTATS; p = p->next, i++) {
-	jpipestats[i] = ((WIFSIGNALED(p->status)) ?
+	jpipestats[i] = (WIFSIGNALED(p->status) ?
 			 0200 | WTERMSIG(p->status) :
-			 WEXITSTATUS(p->status));
+			 (WIFSTOPPED(p->status) ?
+			  0200 | WEXITSTATUS(p->status) :
+			  WEXITSTATUS(p->status)));
 	if (jpipestats[i])
 	    pipefail = jpipestats[i];
     }
@@ -436,8 +438,11 @@ update_job(Job jn)
 	if (WIFSTOPPED(pn->status))        /* some processes are stopped                   */
 	    somestopped = 1;               /* so job is not done, but entry needs updating */
 	if (!pn->next)                     /* last job in pipeline determines exit status  */
-	    val = (WIFSIGNALED(pn->status)) ? 0200 | WTERMSIG(pn->status) :
-		WEXITSTATUS(pn->status);
+	    val = (WIFSIGNALED(pn->status) ?
+		   0200 | WTERMSIG(pn->status) :
+		   (WIFSTOPPED(pn->status) ?
+		    0200 | WEXITSTATUS(pn->status) :
+		    WEXITSTATUS(pn->status)));
 	if (pn->pid == jn->gleader)        /* if this process is process group leader      */
 	    status = pn->status;
     }
@@ -537,7 +542,7 @@ update_job(Job jn)
 	return;
     jn->stat |= (somestopped) ? STAT_CHANGED | STAT_STOPPED :
 	STAT_CHANGED | STAT_DONE;
-    if (jn->stat & STAT_DONE) {
+    if (jn->stat & (STAT_DONE|STAT_STOPPED)) {
 	/* This may be redundant with printjob() but note that inforeground
 	 * is true here for STAT_CURSH jobs even when job != thisjob, most
 	 * likely because thisjob = -1 from exec.c:execsimple() trickery.

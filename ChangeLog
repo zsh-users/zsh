@@ -1,3 +1,8 @@
+2014-08-22  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33042: NEWS, Src/jobs.c: $? and $pipestatus report 128+signal
+	number for stopped jobs as well as terminated jobs
+
 2014-08-20  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Lokesh Mandvekar: 33032: Completion/Linux/Command/_docker,
