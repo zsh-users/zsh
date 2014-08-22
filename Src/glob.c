@@ -2219,7 +2219,7 @@ xpandbraces(LinkList list, LinkNode *np)
 	    uremnode(list, node);
 	    strp = str - str3;
 	    lenalloc = strp + strlen(str2+1) + 1;
-	    for (; cend >= cstart; cend--) {
+	    do {
 #ifdef MULTIBYTE_SUPPORT
 		char *ncptr;
 		int nclen;
@@ -2239,7 +2239,7 @@ xpandbraces(LinkList list, LinkNode *np)
 		insertlinknode(list, last, p);
 		if (rev)	/* decreasing:  add in reverse order. */
 		    last = nextnode(last);
-	    }
+	    } while (cend-- > cstart);
 	    *np = nextnode(olast);
 	    return;
 	}
