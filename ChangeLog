@@ -1,3 +1,9 @@
+2014-08-23  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33046: Completion/Unix/Command/.distfiles,
+	Completion/Unix/Command/_chsh, Completion/Unix/Type/_users: new
+	completion for "chsh"
+
 2014-08-22  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33042: NEWS, Src/jobs.c: $? and $pipestatus report 128+signal

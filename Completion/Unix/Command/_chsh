@@ -1,0 +1,40 @@
+#compdef chsh chpass
+case $OSTYPE in
+(darwin*|*bsd*)
+  _arguments : \
+      '-s[Specify user login shell]:shell:(${(Z+Cn+)"$(</etc/shells)"})' \
+      "-l[Specify location of user]:node:" \
+      "-u[Specify authentication name]:auth user:" \
+      "1:user name:_users"
+  ;;
+(linux-gnu)
+  if { =chsh -v } >&/dev/null
+  then
+      local -a opts shells
+      shells=( $(=chsh -l) )
+      _arguments : \
+	  "(-)-s[Specify your login shell]:shell:($shells)" \
+	  "(-)--shell[Specify your login shell]:shell:($shells)" \
+	  "(-)-l[Print shells in /etc/shells]" \
+	  "(-)--list-shells[Print shells in /etc/shells]" \
+	  "(-)-u[Print a usage message and exit]" \
+	  "(-)--help[Print a usage message and exit]" \
+	  "(-)-v[Print version information and exit]" \
+	  "(-)--version[Print version information and exit]" \
+	  "1:user name:_users"
+      return
+  fi
+  # else fall through
+  ;&
+(*)
+  local s=''
+  # Use $s to cause all options to be treated as mutually exclusive
+  [[ $words[CURRENT-1] = -* ]] && s="(-)$words[CURRENT-1]"
+  # This fiddling with $s is a hack to cause "_arguments  : --" to use
+  # the /etc/shells listing for -s or --shell even when the description
+  # of that option has been pulled from the GNU --help output.
+  [[ $words[CURRENT-1] = (-s|--shell) ]] &&
+    s="$s"'[ ]:shell:(${(Z+Cn+)"$(</etc/shells)"})'
+  _arguments : $s "1:user name:_users" --
+  ;;
+esac

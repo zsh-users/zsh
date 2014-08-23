@@ -29,6 +29,7 @@ _cdrecord
 _chkconfig
 _chmod
 _chown
+_chsh
 _clay
 _comm
 _compress
