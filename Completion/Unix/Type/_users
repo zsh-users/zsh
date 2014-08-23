@@ -1,4 +1,4 @@
-#compdef passwd groups userdel chage chfn chsh
+#compdef passwd groups userdel chage chfn
 
 local expl users
 
