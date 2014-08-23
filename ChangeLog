@@ -1,3 +1,7 @@
+2014-08-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Etc/.gitignore: ignore generated FAQ*.html files.
+
 2014-08-22  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33042: NEWS, Src/jobs.c: $? and $pipestatus report 128+signal
