@@ -1,7 +1,2 @@
 DISTFILES_SRC='
-.distfiles
-_bash_completions       _correct_filename       _history_complete_word
-_complete_debug         _correct_word           _most_recent_file
-_complete_help          _expand_word            _next_tags
-_complete_tag           _generic                _read_comp
 '

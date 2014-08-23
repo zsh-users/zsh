@@ -1,7 +1,2 @@
 DISTFILES_SRC='
-.distfiles
-tcp_command tcp_log        tcp_proxy   tcp_send    tcp_talk
-tcp_alias  tcp_expect	   tcp_open    tcp_read    tcp_sess  tcp_wait
-tcp_close  tcp_fd_handler  tcp_output  tcp_rename  tcp_spam
-tcp_point  tcp_shoot
 '

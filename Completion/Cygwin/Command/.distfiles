@@ -1,7 +1,2 @@
 DISTFILES_SRC='
-.distfiles
-_cygcheck       _cygpath        _cygrunsrv      _cygserver
-_cygstart       _dumper         _getclip
-_mkshortcut     _mkzsh          _pscp           _putclip
-_readshortcut
 '

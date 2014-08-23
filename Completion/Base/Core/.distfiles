@@ -1,6 +1,2 @@
 DISTFILES_SRC='
-.distfiles
-_all_labels     _main_complete  _next_label     _requested      _tags
-_description    _message        _normal         _setup          _wanted
-_dispatch
 '

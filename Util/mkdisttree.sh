@@ -51,9 +51,15 @@ trap 'rm -f $filelist; rm -rf $disttree; exit 1' 1 2 15
 ( while read dfn; do
     subdir=`echo $dfn | sed 's,/\.distfiles$,,'`
     echo >&2 "Processing directory $subdir..."
-    eval "DISTFILES_$type="
+    eval "DISTFILES_$type= DISTFILES_NOT="
     . $sdir_top/$dfn
     eval "distfiles=\$DISTFILES_$type"
+    if [ $type = SRC ]; then
+	# All files in git appear in the source bundle, unless
+	# explicitly excluded with DISTFILES_NOT.
+	distfiles="$distfiles
+        `cd $sdir_top/$subdir; git ls-files | grep -v /`"
+    fi
     if test -n "$distfiles"; then
 	cmds=`echo "$distfiles" | sed -e "$sed_separate"`
 	eval "$cmds"
@@ -62,6 +68,11 @@ trap 'rm -f $filelist; rm -rf $disttree; exit 1' 1 2 15
 	fi
 	$sdir_top/mkinstalldirs $disttree/$subdir || exit 1
 	for f in $deplist `test -z "$globlist" || ( cd $dir_top/$subdir && eval "echo $globlist")`; do
+	    for fnot in $DISTFILES_NOT; do
+		if [ $fnot = $f ]; then
+		    continue 2
+		fi
+	    done
 	    if test -f $dir_top/$subdir/$f; then
 #		ln $dir_top/$subdir/$f $disttree/$subdir/$f || \
 		    cp -p $dir_top/$subdir/$f $disttree/$subdir/$f || exit 1

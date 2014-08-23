@@ -1,8 +1,4 @@
 DISTFILES_SRC='
-    .cvsignore .distfiles .editorconfig .gitignore .preconfig Makefile.in
-    ChangeLog
-    FEATURES INSTALL LICENCE MACHINES META-FAQ NEWS README
-    aclocal.m4 aczsh.m4 configure.ac
+    META-FAQ
     configure config.h.in stamp-h.in
-    config.guess config.sub install-sh mkinstalldirs 
 '

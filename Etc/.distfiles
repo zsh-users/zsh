@@ -1,30 +1,5 @@
 DISTFILES_SRC='
-.cvsignore
-.distfiles
-BUGS
-CONTRIBUTORS
-ChangeLog-3.0
-ChangeLog-3.1
-ChangeLog-4.1
-ChangeLog-4.3
 FAQ
-FAQ.yo
-FTP-README
-Makefile.in
-NEWS-4.3
-STD-TODO TODO
-changelog2html.pl
-completion-style-guide
-pubring.pgp
-relnote_4.3.5.txt
-relnote_4.3.6.txt
-relnote_4.3.7.txt
-relnote_4.3.8.txt
-relnote_4.3.9.txt
-relnote_4.3.10.txt
-relnote_4.3.12.txt
-relnote_5.0.0.txt
-zsh-development-guide
 '
 
 DISTFILES_DOC='

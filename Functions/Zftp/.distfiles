@@ -1,10 +1,2 @@
 DISTFILES_SRC='
-.distfiles
-zfanon         zfdir          zfinit         zfrglob        zftype
-zfautocheck    zffcache       zfls           zfrtime        zfuget
-zfcd           zfgcp          zfmark         zfsession      zfuput
-zfcd_match     zfget          zfopen         zfstat
-zfcget         zfget_match    zfparams       zftp_chpwd
-zfclose        zfgoto         zfpcp          zftp_progress
-zfcput         zfhere         zfput          zftransfer
 '

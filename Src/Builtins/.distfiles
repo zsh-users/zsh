@@ -1,5 +1,2 @@
 DISTFILES_SRC='
-    .cvsignore .distfiles .exrc
-    rlimits.mdd rlimits.c rlimits.awk
-    sched.mdd sched.c
 '

@@ -1,14 +1,2 @@
 DISTFILES_SRC='
-    .cvsignore .distfiles .exrc
-    comp.h complete.mdd complete.c
-    compcore.c compmatch.c compresult.c
-    compctl.mdd compctl.c compctl.h
-    complist.mdd complist.c
-    computil.mdd computil.c
-    deltochar.mdd deltochar.c
-    zleparameter.mdd zleparameter.c
-    zle.mdd iwidgets.list zle.h zle_bindings.c zle_hist.c
-    zle_keymap.c zle_main.c zle_misc.c zle_move.c zle_params.c
-    zle_refresh.c zle_things.sed zle_thingy.c zle_tricky.c
-    zle_utils.c zle_vi.c zle_widget.sed zle_word.c
 '

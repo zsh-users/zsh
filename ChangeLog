@@ -1,5 +1,53 @@
 2014-08-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 33047: .distfiles, Completion/.distfiles,
+	Completion/AIX/.distfiles, Completion/AIX/Command/.distfiles,
+	Completion/AIX/Type/.distfiles, Completion/BSD/.distfiles,
+	Completion/BSD/Command/.distfiles, Completion/Base/.distfiles,
+	Completion/Base/Completer/.distfiles,
+	Completion/Base/Core/.distfiles,
+	Completion/Base/Utility/.distfiles,
+	Completion/Base/Widget/.distfiles,
+	Completion/Cygwin/Command/.distfiles,
+	Completion/Darwin/Command/.distfiles,
+	Completion/Darwin/Type/.distfiles, Completion/Debian/.distfiles,
+	Completion/Debian/Command/.distfiles,
+	Completion/Debian/Type/.distfiles,
+	Completion/Linux/Command/.distfiles,
+	Completion/Linux/Type/.distfiles,
+	Completion/Mandriva/.distfiles,
+	Completion/Mandriva/Command/.distfiles,
+	Completion/Redhat/.distfiles,
+	Completion/Redhat/Command/.distfiles,
+	Completion/Solaris/Command/.distfiles,
+	Completion/Solaris/Type/.distfiles, Completion/Unix/.distfiles,
+	Completion/Unix/Command/.distfiles,
+	Completion/Unix/Type/.distfiles, Completion/X/.distfiles,
+	Completion/X/Command/.distfiles, Completion/X/Type/.distfiles,
+	Completion/X/Utility/.distfiles, Completion/Zsh/.distfiles,
+	Completion/Zsh/Command/.distfiles,
+	Completion/Zsh/Context/.distfiles,
+	Completion/Zsh/Function/.distfiles,
+	Completion/Zsh/Type/.distfiles,
+	Completion/openSUSE/Command/.distfiles, Config/.distfiles,
+	Doc/.distfiles,Doc/Zsh/.distfiles, Doc/help/.distfiles,
+	Etc/.distfiles, Functions/.distfiles,
+	Functions/Calendar/.distfiles, Functions/Chpwd/.distfiles,
+	Functions/Compctl/.distfiles, Functions/Example/.distfiles,
+	Functions/Exceptions/.distfiles, Functions/MIME/.distfiles,
+	Functions/Misc/.distfiles, Functions/Newuser/.distfiles,
+	Functions/Prompts/.distfiles, Functions/TCP/.distfiles,
+	Functions/VCS_Info/.distfiles,
+	Functions/VCS_Info/Backends/.distfiles,
+	Functions/Zftp/.distfiles, Functions/Zle/.distfiles,
+	Misc/.distfiles, Scripts/.distfiles, Src/.distfiles,
+	Src/Builtins/.distfiles, Src/Modules/.distfiles,
+	Src/Zle/.distfiles, StartupFiles/.distfiles, Test/.distfiles,
+	Util/.distfiles, Util/mkdisttree.sh: Files controlled by git
+	are part of the source distribution unless explicitly included
+	in DISTFILES_NOT.  The .distfiles file is still needed for
+	the directory to be processed.
+
 	* unposted: Etc/.gitignore: ignore generated FAQ*.html files.
 
 2014-08-23  Barton E. Schaefer  <schaefer@zsh.org>
