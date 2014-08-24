@@ -6224,8 +6224,8 @@ __git_setup_merge_options () {
     '--ff-only[refuse to merge unless HEAD is up to date or merge can be resolved as a fast-forward]'
     '*'{-s,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies'
     '*'{-X,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]'
-    '(--verify-signatures)--no-verify-signatures[verify the commits being merged or abort]'
-    '(--no-verify-signatures)--verify-signatures[do not verify the commits being merged]'
+    '(--verify-signatures)--verify-signatures[verify the commits being merged or abort]'
+    '(--no-verify-signatures)--no-verify-signatures[do not verify the commits being merged]'
     '(-q --quiet -v --verbose)'{-q,--quiet}'[suppress all output]'
     '(-q --quiet -v --verbose)'{-v,--verbose}'[output additional information]')
 }

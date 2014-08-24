@@ -1,3 +1,8 @@
+2014-08-24  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted (see 33050): Completion/Unix/Command/_git: un-transpose
+	help text for git merge -{-no,}-verify
+
 2014-08-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 33047: .distfiles, Completion/.distfiles,
