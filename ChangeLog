@@ -1,5 +1,8 @@
 2014-08-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 33062: Etc/zsh-development-guide: update note on use of
+	.distfiles based on 33047.
+
 	* unposted: Config/version.mk: update to 5.0.6-dev-0 for new
 	commits post release.
 

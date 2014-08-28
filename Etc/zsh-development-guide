@@ -931,18 +931,22 @@ freely available tools.
 To indicate which files should be distributed, each directory in the git
 tree includes a file .distfiles that sets any number of a set of Bourne
 shell (scalar) parameters.  The value of the parameter is expanded as a
-set of standard command line arguments.  Basic globbing is allowed in the
-values.
+set of standard command line arguments.  Apart from DISTFILES_NOT, which
+must be an explicit list of files separated by whitespace, basic
+globbing is allowed in the values.
+
+Because of the way DISTFILES_SRC is constructed it is only possible
+to make a release from a git checkout.
 
 The following parameters are currently used:
 
 - DISTFILES_SRC is a list of files from the directory for the "src"
-  distribution.
+  distribution.  However, if the file .distfiles is present in
+  a directory, all files known to git will be added to DISTFILES_SRC
+  except for files listed explicitly in DISTFILES_NOT.
 
 - DISTFILES_DOC is a list of files from the directory for the "doc"
   distribution.
 
 - DISTFILES_NOT is a list of files that will not be included in a
-  distribution, but that need to be present in the git tree.  This
-  variable is not used by the zsh build process and is present for
-  the convenience of external checks.
+  distribution even though they are present in the git tree.
