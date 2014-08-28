@@ -1,5 +1,8 @@
 2014-08-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Config/version.mk: update to 5.0.6-dev-0 for new
+	commits post release.
+
 	* unposted: Config/version.mk: 5.0.6.
 
 2014-08-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
