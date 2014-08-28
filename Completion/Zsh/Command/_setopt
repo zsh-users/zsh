@@ -1,10 +1,16 @@
-#compdef setopt
+#compdef setopt unsetopt
 
-# If you first want to complete only unset options, un-comment the lines
-# setting the _options_unset  array and then use:
-#
-#   _options_unset || _options
-#
-# here.
+local expl ret=1
+local -a onopts offopts
+onopts=( ${(k)_comp_caller_options[(R)on]} )
+offopts=( ${(k)_comp_caller_options[(R)off]} )
+case $service in
+  setopt) onopts=(no$onopts) ;;
+  unsetopt) offopts=(no$offopts) ;;
+esac
+_wanted zsh-options expl 'zsh options (set)' \
+    compadd -J 'enabled options' -M 'M:_= M:{A-Z}={a-z}' -k - onopts && ret=0
+_wanted zsh-options expl 'zsh options (unset)' \
+    compadd -J 'disabled options' -M 'M:_= M:{A-Z}={a-z}' -k - offopts && ret=0
 
-_options
+return ret

@@ -1,3 +1,9 @@
+2014-08-21  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 33061: Completion/Zsh/Command/_setopt,
+	Completion/Zsh/Command/_unsetopt: More useful setopt / unsetopt
+	completion.
+
 2014-09-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 33110: Doc/Zsh/expn.yo: document use of $IFS[1] for variable
