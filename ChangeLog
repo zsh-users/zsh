@@ -1,3 +1,8 @@
+2014-08-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 33057: Doc/Zsh/prompt.yo, Src/prompt.c: %e in prompts shows
+	evaluation / execution depth.
+
 2014-08-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 33062: Etc/zsh-development-guide: update note on use of

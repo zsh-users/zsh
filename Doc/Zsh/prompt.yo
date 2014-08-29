@@ -108,6 +108,12 @@ the full path;
 ifzman(see em(Dynamic) and em(Static named directories) in zmanref(zshexpn))\
 ifnzman(noderef(Filename Expansion)).
 )
+item(tt(%e))(
+Evaluation depth of the current sourced file, shell function, or tt(eval).
+This is incremented or decremented every time the value of tt(%N) is
+set or reverted to a previous value, respectively.  This is most useful
+for debugging as part of tt($PS4).
+)
 xitem(tt(%h))
 item(tt(%!))(
 Current history event number.

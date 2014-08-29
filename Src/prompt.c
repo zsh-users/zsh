@@ -786,6 +786,19 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		if(bv->Rstring)
 		    stradd(bv->Rstring);
 		break;
+	    case 'e':
+	    {
+		int depth = 0;
+		Funcstack fsptr = funcstack;
+		while (fsptr) {
+		    depth++;
+		    fsptr = fsptr->prev;
+		}
+		addbufspc(DIGBUFSIZE);
+		sprintf(bv->bp, "%d", depth);
+		bv->bp += strlen(bv->bp);
+		break;
+	    }
 	    case 'I':
 		if (funcstack && funcstack->tp != FS_SOURCE &&
 		    !IN_EVAL_TRAP()) {
