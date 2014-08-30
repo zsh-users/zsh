@@ -1,3 +1,9 @@
+2014-08-30  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33069: Completion/Base/Completer/_expand_alias: remove internal
+	quoting	before looking up aliases when expanding aliases in an
+	unquoted word
+
 2014-08-29  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 33057: Doc/Zsh/prompt.yo, Src/prompt.c: %e in prompts shows
