@@ -372,6 +372,17 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		    if (t0 >= arg)
 			test = 1;
 		    break;
+		case 'e':
+		    {
+			Funcstack fsptr = funcstack;
+			test = arg;
+			while (fsptr && test > 0) {
+			    test--;
+			    fsptr = fsptr->prev;
+			}
+			test = !test;
+		    }
+		    break;
 		case 'L':
 		    if (shlvl >= arg)
 			test = 1;
