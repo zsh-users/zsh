@@ -204,12 +204,12 @@ F:the bug is still there or it reappeared. See workers-29973 for details.
 F:This similar test was triggering a reproducible failure with pipestatus.
 
   { unsetopt MONITOR } 2>/dev/null
-  coproc { read -Et 5 || kill -INT $$ }
+  coproc { read -et 5 || { print -u $ZTST_fd KILLED; kill -HUP -$$ } }
   print -u $ZTST_fd 'This test takes 5 seconds to fail...'
-  { printf "%d\n" {1..20000} } | ( read -E )
-  hang(){ printf "%d\n" {2..20000} | cat }; hang | ( read -E )
+  { printf "%d\n" {1..20000} } | ( read -e )
+  hang(){ printf "%d\n" {2..20000} | cat }; hang | ( read -e )
   print -p done
-  read -Et 6 -p
+  read -et 6 -p
 0:Bug regression: piping a shell construct to an external process may hang
 >1
 >2

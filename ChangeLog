@@ -1,5 +1,8 @@
 2014-08-31  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Test/A05execution.ztst: further tweaking of the
+	descriptor leak regression test that sometimes hangs
+
 	* 33077: Src/exec.c: SHTTY = -1 when closing it in closem()
 
 2014-08-30  Barton E. Schaefer  <schaefer@zsh.org>
