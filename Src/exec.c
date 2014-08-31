@@ -3569,8 +3569,11 @@ closem(int how)
 
     for (i = 10; i <= max_zsh_fd; i++)
 	if (fdtable[i] != FDT_UNUSED &&
-	    (how == FDT_UNUSED || fdtable[i] == how))
+	    (how == FDT_UNUSED || fdtable[i] == how)) {
+	    if (i == SHTTY)
+		SHTTY = -1;
 	    zclose(i);
+	}
 }
 
 /* convert here document into a here string */
