@@ -1,3 +1,8 @@
+2014-09-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Mark Oteiza: 33081: Completion/Unix/Type/_mime_types: suppress
+	error message if unnecessary file not found.
+
 2014-08-31  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Test/A05execution.ztst: further tweaking of the

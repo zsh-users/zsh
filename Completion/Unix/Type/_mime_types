@@ -33,10 +33,10 @@ if [[ $PREFIX = (#b)([^/]##)/* ]]; then
   compset -p $(( ${#maintype} + 1 ))
   _wanted mime-subtypes expl 'MIME subtype' \
       compadd -- $(sed -ne "s%^\(type=\|\)${maintype}/\([^ 	]*\).*$%\2%p" \
-      $type_files)
+      $type_files 2>/dev/null)
 else
   # Search for main type.
   _wanted mime-types expl 'MIME type' \
     compadd -S/ -- $(sed -ne "s/^type=//" \
-      -e "s%^\(${PREFIX:-[a-z]}[^=\"]*\)/.*$%\1%p" $type_files)
+      -e "s%^\(${PREFIX:-[a-z]}[^=\"]*\)/.*$%\1%p" $type_files 2>/dev/null)
 fi
