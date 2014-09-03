@@ -3050,7 +3050,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		break;
 	    case REDIR_CLOSE:
 		if (fn->varid) {
-		    char *s = fn->varid;
+		    char *s = fn->varid, *t;
 		    struct value vbuf;
 		    Value v;
 		    int bad = 0;
@@ -3060,13 +3060,25 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    } else if (v->pm->node.flags & PM_READONLY) {
 			bad = 2;
 		    } else {
-			fn->fd1 = (int)getintvalue(v);
+			s = getstrvalue(v);
 			if (errflag)
 			    bad = 1;
-			else if (fn->fd1 <= max_zsh_fd) {
-			    if (fn->fd1 >= 10 &&
-				 fdtable[fn->fd1] == FDT_INTERNAL)
-				bad = 3;
+			else {
+			    fn->fd1 = zstrtol(s, &t, 0);
+			    if (s == t)
+				bad = 1;
+			    else if (*t) {
+				/* Check for base#number format */
+				if (*t == '#' && *s != '0')
+				    fn->fd1 = zstrtol(s = t+1, &t, fn->fd1);
+				if (s == t || *t)
+				    bad = 1;
+			    }
+			    if (!bad && fn->fd1 <= max_zsh_fd) {
+				if (fn->fd1 >= 10 &&
+				    fdtable[fn->fd1] == FDT_INTERNAL)
+				    bad = 3;
+			    }
 			}
 		    }
 		    if (bad) {
