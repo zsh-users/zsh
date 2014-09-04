@@ -1,3 +1,8 @@
+2014-09-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 33110: Doc/Zsh/expn.yo: document use of $IFS[1] for variable
+	padding.
+
 2014-09-04  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Alexandre Rames: 33108: Completion/Unix/Command/_stgit:

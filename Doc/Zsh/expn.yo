@@ -1155,6 +1155,10 @@ var(string1) and var(string2) are given, tt(string2) is inserted once
 directly to the left of each word, truncated if necessary, before
 var(string1) is used to produce any remaining padding.
 
+If either of var(string1) or tt(string2) is present but empty,
+i.e. there are two delimiters together at that point, the first
+character of tt($IFS) is used instead.
+
 If the tt(MULTIBYTE) option is in effect, the flag tt(m) may also
 be given, in which case widths will be used for the calculation of
 padding; otherwise individual multibyte characters are treated as occupying
