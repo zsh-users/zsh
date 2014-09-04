@@ -1,5 +1,8 @@
 2014-09-04  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Alexandre Rames: 33108: Completion/Unix/Command/_stgit:
+	--patch completion.
+
 	* 33091: Doc/Zsh/builtins.yo: improve documentation for ttyctl.
 
 2014-09-03  Barton E. Schaefer  <schaefer@zsh.org>

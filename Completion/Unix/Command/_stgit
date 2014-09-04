@@ -32,6 +32,17 @@ else
 	compadd $(stg series --noprefix 2> /dev/null) \
 		&& ret=0
     ;;
+    (ref*)
+      last_word="$words[$CURRENT-1]"
+      refresh_patch_options=( -p --patch )
+      if [[ -n ${refresh_patch_options[(r)$last_word]} ]]; then
+	_wanted -V "applied patches" expl "patch" \
+	  compadd ${${(M)${(f)"$(stg series 2> /dev/null)"}##[+>] *}#[+>] } \
+		  && ret=0
+      else
+	_files
+      fi
+    ;;
     (*)
       _files
     ;;
