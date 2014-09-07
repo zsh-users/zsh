@@ -1126,13 +1126,14 @@ in string arguments to any of the flags described below that
 follow this argument.
 )
 item(tt(~))(
-Force string arguments to any of the flags below that follow within
-the parentheses to be treated as patterns.  Compare with a tt(~)
+Strings inserted into the expansion by any of the flags below are to
+be treated as patterns.  This applies to the string arguments of flags
+that follow tt(~) within the same set of parentheses.  Compare with tt(~)
 outside parentheses, which forces the entire substituted string to
 be treated as a pattern.  Hence, for example,
 example([[ "?" = ${(~j.|.)array} ]])
-with the tt(EXTENDED_GLOB) option set succeeds if and only if tt($array)
-contains the string `tt(?)' as an element.  The argument may be
+treats `tt(|)' as a pattern and succeeds if and only if tt($array)
+contains the string `tt(?)' as an element.  The tt(~) may be
 repeated to toggle the behaviour; its effect only lasts to the
 end of the parenthesised group.
 )

@@ -7,6 +7,8 @@
 	* 33116: Src/hist.c: followup to 32580 to prevent double-locking
 	with shared or incremental history
 
+	* unposted: Doc/Zsh/expn.yo: clarify ${(~j.|.)array} example
+
 2014-08-21  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 33061: Completion/Zsh/Command/_setopt,
