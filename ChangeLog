@@ -1,5 +1,9 @@
 2014-09-06  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 33118: Src/subst.c: record original param unset state when
+	${name:#word} et al. need to treat empty the same as unset, to
+	avoid incorrect NO_UNSET error
+
 	* 33116: Src/hist.c: followup to 32580 to prevent double-locking
 	with shared or incremental history
 

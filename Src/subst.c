@@ -1522,6 +1522,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
      * unset.  I don't quite understand why (v == NULL) isn't
      * good enough, but there are places where we seem to need
      * to second guess whether a value is a real value or not.
+     * See in particular the (colf && !vunset) test below.
      */
     int vunset = 0;
     /*
@@ -2638,8 +2639,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	 * - (array) contains no elements
 	 * - (scalar) contains an empty string
 	 */
-	if (colf && !vunset)
+	if (colf && !vunset) {
 	    vunset = (isarr) ? !*aval : !*val || (*val == Nularg && !val[1]);
+	    vunset *= -1; /* Record that vunset was originally false */
+	}
 
 	switch (s[-1]) {
 	case '+':
@@ -2862,7 +2865,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		getmatcharr(&aval, s, flags, flnum, replstr);
 	    } else {
 		if (vunset) {
-		    if (unset(UNSET)) {
+		    if (vunset > 0 && unset(UNSET)) {
 			*idend = '\0';
 			zerr("%s: parameter not set", idbeg);
 			return NULL;
@@ -2892,7 +2895,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	    return NULL;
 	}
 	if (vunset) {
-	    if (unset(UNSET)) {
+	    if (vunset > 0 && unset(UNSET)) {
 		*idend = '\0';
 		zerr("%s: parameter not set", idbeg);
 		return NULL;
@@ -2974,7 +2977,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		*ap = NULL;
 	    } else {
 		if (vunset) {
-		    if (unset(UNSET)) {
+		    if (vunset > 0 && unset(UNSET)) {
 			*idend = '\0';
 			zerr("%s: parameter not set", idbeg);
 			deletehashtable(ht);
@@ -3003,7 +3006,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	    }
 	}
 	if (vunset) {
-	    if (unset(UNSET)) {
+	    if (vunset > 0 && unset(UNSET)) {
 		*idend = '\0';
 		zerr("%s: parameter not set", idbeg);
 		return NULL;
@@ -3020,7 +3023,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	    val = dupstring(vunset ? "0" : "1");
 	    isarr = 0;
 	} else if (vunset) {
-	    if (unset(UNSET)) {
+	    if (vunset > 0 && unset(UNSET)) {
 		*idend = '\0';
 		zerr("%s: parameter not set", idbeg);
 		return NULL;
