@@ -2490,6 +2490,9 @@ flockhistfile(char *fn, int keep_trying)
     struct flock lck;
     int ctr = keep_trying ? 9 : 0;
 
+    if (flock_fd >= 0)
+	return 0; /* already locked */
+
     if ((flock_fd = open(unmeta(fn), O_RDWR | O_NOCTTY)) < 0)
 	return errno == ENOENT ? 0 : 2; /* "successfully" locked missing file */
 
@@ -2768,12 +2771,6 @@ lockhistfile(char *fn, int keep_trying)
     if (!fn && !(fn = getsparam("HISTFILE")))
 	return 1;
 
-#ifdef HAVE_FCNTL_H
-    if (isset(HISTFCNTLLOCK) && flock_fd < 0) {
-	return flockhistfile(fn, keep_trying);
-    }
-#endif
-
     if (!lockhistct++) {
 	struct stat sb;
 	int fd;
@@ -2784,6 +2781,11 @@ lockhistfile(char *fn, int keep_trying)
 # else
 	char *tmpfile;
 # endif
+#endif
+
+#ifdef HAVE_FCNTL_H
+	if (isset(HISTFCNTLLOCK))
+	    return flockhistfile(fn, keep_trying);
 #endif
 
 	lockfile = bicat(unmeta(fn), ".LOCK");
