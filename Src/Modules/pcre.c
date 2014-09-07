@@ -289,7 +289,7 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
 	matched_portion = OPT_ARG(ops,c);
     }
     if(OPT_HASARG(ops,c='n')) { /* The offset position to start the search, in bytes. */
-	if ((offset_start = getposint(OPT_ARG(ops,c), nam) < 0))
+	if ((offset_start = getposint(OPT_ARG(ops,c), nam)) < 0)
 	    return 1;
     }
     /* For the entire match, 'Return' the offset byte positions instead of the matched string */

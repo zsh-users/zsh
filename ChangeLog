@@ -1,3 +1,8 @@
+2014-09-07  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33122: Src/Modules/pcre.c, Test/V07pcre.ztst: typo from 32891
+	caused incorrect matches for pcre_match -n
+
 2014-09-06  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33118: Src/subst.c: record original param unset state when

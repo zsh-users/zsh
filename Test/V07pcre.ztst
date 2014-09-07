@@ -108,3 +108,12 @@
 >1
 >0 xo→t →t
 >0 Xo→t →t
+
+  string="The following zip codes: 78884 90210 99513"
+  pcre_compile -m "\d{5}"
+  pcre_match -b -- $string && print "$MATCH; ZPCRE_OP: $ZPCRE_OP"
+  pcre_match -b -n $ZPCRE_OP[(w)2] -- $string || print failed
+  print "$MATCH; ZPCRE_OP: $ZPCRE_OP"
+0:pcre_match -b and pcre_match -n
+>78884; ZPCRE_OP: 25 30
+>90210; ZPCRE_OP: 31 36
