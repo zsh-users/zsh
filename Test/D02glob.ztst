@@ -565,3 +565,10 @@
   print $match[1]
 0:(#q) is ignored completely in conditional pattern matching
 >fichier
+
+# The following should not cause excessive slowdown.
+  print glob.tmp/*.*
+  print glob.tmp/**************************.*************************
+0:Optimisation to squeeze multiple *'s used as ordinary glob wildcards.
+>glob.tmp/ra=1.0_et=3.5
+>glob.tmp/ra=1.0_et=3.5

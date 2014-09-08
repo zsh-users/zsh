@@ -3012,6 +3012,16 @@ patmatch(Upat prog)
 	    break;
 	case P_STAR:
 	    /* Handle specially for speed, although really P_ONEHASH+P_ANY */
+	    while (P_OP(next) == P_STAR) {
+		/*
+		 * If there's another * following we can optimise it
+		 * out.  Chains of *'s can give pathologically bad
+		 * performance.
+		 */
+		scan = next;
+		next = PATNEXT(scan);
+	    }
+	    /*FALLTHROUGH*/
 	case P_ONEHASH:
 	case P_TWOHASH:
 	    /*

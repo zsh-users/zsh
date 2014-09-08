@@ -1,3 +1,9 @@
+2014-09-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/19059 based on users/19058 (Paulo César Pereira de
+	Andrade): Src/pattern.c, Test/D02glob.ztst: remove inefficiency
+	with multiple "*"s in pattern matching and add test.
+
 2014-09-07  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33122: Src/Modules/pcre.c, Test/V07pcre.ztst: typo from 32891
