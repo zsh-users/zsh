@@ -1,3 +1,8 @@
+2014-09-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Eric Cook: 33132: Completion/Unix/Type/_net_interfaces: use ip
+	on Linux to get interface names.
+
 2014-09-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/19059 based on users/19058 (Paulo César Pereira de
