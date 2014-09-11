@@ -2711,6 +2711,10 @@ example(ls *(-/))
 lists all directories and symbolic links that point to directories,
 and
 
+example(ls *(-@))
+
+lists all broken symbolic links, and
+
 example(ls *(%W))
 
 lists all world-writable device files in the current directory, and

@@ -1,3 +1,7 @@
+2014-11-28  Wayne Davison  <wayned@users.sourceforge.net>
+
+	* 33139: Doc/Zsh/expn.yo: add example for finding broken symlinks.
+
 2014-11-28  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 33815: Src/Zle/zle_word.c: fix word transposition bug where
