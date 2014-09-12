@@ -1,3 +1,7 @@
+2014-09-12  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33143: Src/init.c: POSIX_ARGZERO more closely matches bash et al.
+
 2014-09-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/19075: Doc/Zsh/mod_parameter.yo,
@@ -249,7 +253,7 @@
 	Completion/openSUSE/Command/_SuSEconfig ->
 	Completion/openSUSE/Command/_SUSEconfig: rename file.
 
-2014-08-04  Barton E. Schaefer  <schaefer@brasslantern.com>
+2014-08-04  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Miles Ohlrich: 32958: Src/Zle/compctl.c: bitwise logic fix
 

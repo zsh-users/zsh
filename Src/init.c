@@ -252,8 +252,9 @@ parseargs(char **argv, char **runscript)
     paramlist = znewlinklist();
     if (*argv) {
 	if (unset(SHINSTDIN)) {
+	    posixzero = *argv;
 	    if (cmd)
-		argzero = posixzero = *argv;
+		argzero = *argv;
 	    else
 		*runscript = *argv;
 	    opts[INTERACTIVE] &= 1;
