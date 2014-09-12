@@ -3683,7 +3683,7 @@ _git-send-email () {
     '(--suppress-from                   )--no-suppress-from[add the From: address to the Cc: list]' \
     '(         --no-thread)--thread[set In-Reply-To: and References: headers]' \
     '(--thread            )--no-thread[do not set In-Reply-To: and References: headers]' \
-    '--confirm[specify type of confirmation required before sending]: :__git_sendemail_confirm' \
+    '--confirm[specify type of confirmation required before sending]: :__git_sendemail_confirm_values' \
     '--dry-run[do everything except actually sending the emails]' \
     '(               --no-format-patch)--format-patch[interpret ambiguous arguments as format-patch arguments]' \
     '(--format-patch                  )--no-format-patch[interpret ambiguous arguments file-name arguments]' \
