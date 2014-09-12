@@ -1,3 +1,9 @@
+2014-09-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/19075: Doc/Zsh/mod_parameter.yo,
+	Src/Modules/parameter.c: $functypestack gives "function",
+	"source" or "eval" for parallel element of $funcstack.
+
 2014-09-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Eric Cook: 33132: Completion/Unix/Type/_net_interfaces: use ip

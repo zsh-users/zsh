@@ -640,6 +640,41 @@ funcfiletracegetfn(UNUSED(Param pm))
     return ret;
 }
 
+/* Functions for the functypestack special parameter. */
+
+static char **
+functypestackgetfn(UNUSED(Param pm))
+{
+    Funcstack f;
+    int num;
+    char **ret, **p;
+
+    for (f = funcstack, num = 0; f; f = f->prev, num++);
+
+    ret = (char **) zhalloc((num + 1) * sizeof(char *));
+
+    for (f = funcstack, p = ret; f; f = f->prev, p++)
+    {
+	switch (f->tp)
+	{
+	case FS_SOURCE:
+	    *p = "source";
+	    break;
+
+	case FS_FUNC:
+	    *p = "function";
+	    break;
+
+	case FS_EVAL:
+	    *p = "eval";
+	    break;
+	}
+    }
+    *p = NULL;
+
+    return ret;
+}
+
 /* Functions for the builtins special parameter. */
 
 /**/
@@ -2046,6 +2081,8 @@ static const struct gsu_array funcsourcetrace_gsu =
 { funcsourcetracegetfn, arrsetfn, stdunsetfn };
 static const struct gsu_array funcfiletrace_gsu =
 { funcfiletracegetfn, arrsetfn, stdunsetfn };
+static const struct gsu_array functypestack_gsu =
+{ functypestackgetfn, arrsetfn, stdunsetfn };
 static const struct gsu_array reswords_gsu =
 { reswordsgetfn, arrsetfn, stdunsetfn };
 static const struct gsu_array disreswords_gsu =
@@ -2090,6 +2127,8 @@ static struct paramdef partab[] = {
 		 scanpmfunctions),
     SPECIALPMDEF("functrace", PM_ARRAY|PM_READONLY,
 	    &functrace_gsu, NULL, NULL),
+    SPECIALPMDEF("functypestack", PM_ARRAY|PM_READONLY,
+		 &functypestack_gsu, NULL, NULL),
     SPECIALPMDEF("galiases", 0,
 	    &pmgaliases_gsu, getpmgalias, scanpmgaliases),
     SPECIALPMDEF("history", PM_READONLY,
