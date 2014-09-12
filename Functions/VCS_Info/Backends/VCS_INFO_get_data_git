@@ -62,6 +62,11 @@ VCS_INFO_git_getaction () {
         return 0
     fi
 
+    if [[ -d "${gitdir}/sequencer" ]] ; then
+         gitaction="cherry-or-revert"
+         return 0
+    fi
+
     return 1
 }
 
