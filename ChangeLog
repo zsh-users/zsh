@@ -8,6 +8,9 @@
 	* 33147: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	vcs_info git: detect revert or cherry-pick with multiple commits
 
+	* 33148: Functions/VCS_Info/VCS_INFO_quilt: vcs_info quilt:
+	refactor standalone detection
+
 2014-09-12  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33143: Src/init.c: POSIX_ARGZERO more closely matches bash et al.

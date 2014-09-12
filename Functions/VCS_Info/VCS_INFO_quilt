@@ -70,13 +70,11 @@ function VCS_INFO_quilt-dirfind() {
 
     olddir=${vcs_comm[basedir]}
     vcs_comm[basedir]=''
-    if [[ -n "${file}" ]]; then
-        oldfile=${vcs_comm[detect_need_file]}
-        vcs_comm[detect_need_file]=${file}
-    fi
+    oldfile=${vcs_comm[detect_need_file]}
+    vcs_comm[detect_need_file]=${file}
     VCS_INFO_bydir_detect ${dir}
     ret=$?
-    [[ -n "${file}" ]] && vcs_comm[detect_need_file]=${oldfile}
+    vcs_comm[detect_need_file]=${oldfile}
     printf '%s' ${vcs_comm[basedir]}
     vcs_comm[basedir]="${olddir}"
     return ${ret}
