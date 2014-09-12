@@ -176,7 +176,7 @@ then
             stgitpatch=""
         fi
     else
-        stgitpatch=${hook_com[patch-string]}
+        stgitpatch=${hook_com[applied-string]}
     fi
     hook_com=()
     if VCS_INFO_hook 'gen-unapplied-string' "${stgit_unapplied[@]}"; then
