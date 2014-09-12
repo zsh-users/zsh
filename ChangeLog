@@ -2,6 +2,9 @@
 
 	* 33149: Misc/vcs_info-examples: vcs_info examples: fix typo
 
+	* 33151: Completion/Unix/Command/_git: completion git: support
+	aliases when \n exist
+
 2014-09-12  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33143: Src/init.c: POSIX_ARGZERO more closely matches bash et al.

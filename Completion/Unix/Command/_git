@@ -6560,9 +6560,13 @@ _git() {
   if (( CURRENT > 2 )); then
     local -a aliases
     local -A git_aliases
-    # TODO: Should use -z here, but I couldn't get it to work.
-    aliases=(${(f)${${${(f)"$(_call_program aliases git config --get-regexp '\^alias\.')"}#alias.}/ /$'\n'}/(#e)/$'\n'})
-    (( $#aliases % 2 == 0 )) && git_aliases=($aliases)
+    local k v
+    aliases=(${(0)"$(_call_program aliases git config -z --get-regexp '\^alias\.')"})
+    for a in ${aliases}; do
+        k="${${a/$'\n'*}/alias.}"
+        v="${a#*$'\n'}"
+        git_aliases[$k]="$v"
+    done
 
     if (( $+git_aliases[$words[2]] && !$+commands[git-$words[2]] && !$+functions[_git-$words[2]] )); then
       local -a tmpwords expalias
