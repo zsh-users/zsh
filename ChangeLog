@@ -1,3 +1,7 @@
+2014-09-14  Marc Finet  <m.dreadlock@gmail.com>
+
+	* 33149: Misc/vcs_info-examples: vcs_info examples: fix typo
+
 2014-09-12  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33143: Src/init.c: POSIX_ARGZERO more closely matches bash et al.

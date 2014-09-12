@@ -301,7 +301,7 @@ zstyle ':vcs_info:*+pre-get-data:*' hooks pre-get-data
 
     # If we got to this point, running vcs_info was not forced, so now we
     # default to not running it and selectively choose when we want to run
-    # it (ret=1 means run it, ret=0 means don't).
+    # it (ret=0 means run it, ret=1 means don't).
     ret=1
     # If a git/hg command was run then run vcs_info as the status might
     # need to be updated.
