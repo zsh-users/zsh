@@ -3986,6 +3986,7 @@ _git-apply () {
 
   _arguments -w -S -s \
     $apply_options \
+    '(--index --cached --reject)'{-3,--3way}'[fall back on 3-way merge if patch fails]' \
     '--stat[output diffstat for input (turns off "apply")]' \
     '--numstat[same as --stat but in decimal notation and complete pathnames (turns off "apply")]' \
     '--summary[output summary of git-diff extended headers (turns off "apply")]' \

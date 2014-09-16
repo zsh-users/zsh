@@ -9,6 +9,9 @@
 
 	* 33177: Completion/Unix/Command/_git: _git: fix typo in git-apply
 
+	* 33180: Completion/Unix/Command/_git: _git: add missing --3way
+	option
+
 2014-09-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: NEWS: more minor tweaks.
