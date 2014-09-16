@@ -1,3 +1,7 @@
+2014-09-23  Øystein Walle  <oystwa@gmail.com>
+
+	* 33179: Completion/Unix/Command/_git: _git: updates for Git 2.0.0
+
 2014-09-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: NEWS: more minor tweaks.

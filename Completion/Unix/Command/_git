@@ -104,6 +104,8 @@ _git-am () {
   # undocumented (and not implemented here).
   _arguments -S \
     '(-s --signoff)'{-s,--signoff}'[add Signed-off-by: line to the commit message]' \
+    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=}'[GPG-sign the commit]::key id' \
+    '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
     '(-k --keep)'{-k,--keep}'[pass -k to git mailinfo]' \
     '--keep-non-patch[pass -b to git mailinfo]' \
     '(          --no-keep-cr)--keep-cr[pass --keep-cr to git mailsplit]' \
@@ -508,6 +510,8 @@ _git-cherry-pick () {
     '(-m --mainline)'{-m,--mainline}'[specify mainline when cherry-picking a merge commit]:parent number' \
     '(-n --no-commit --ff)'{-n,--no-commit}'[do not make the actually commit]' \
     '(-s --signoff --ff)'{-s,--signoff}'[add Signed-off-by line at the end of the commit message]' \
+    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=}'[GPG-sign the commit]::key id' \
+    '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
     '*'{-s,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
     '*'{-X,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]' \
     '(-e --edit -x -n --no-commit -s --signoff)--ff[fast forward, if possible]' \
@@ -663,6 +667,7 @@ _git-commit () {
     '--cleanup=[specify how the commit message should be cleaned up]:mode:((verbatim\:"do not change the commit message at all"
                                                                             whitespace\:"remove leading and trailing whitespace lines"
                                                                             strip\:"remove both whitespace and commentary lines"
+                                                                            scissors\:"same as whitespace but cut from scissor line"
                                                                             default\:"act as '\''strip'\'' if the message is to be edited and as '\''whitespace'\'' otherwise"))' \
     '(-e --edit --no-edit)'{-e,--edit}'[edit the commit message before committing]' \
     '(-e --edit --no-edit)--no-edit[do not edit the commit message before committing]' \
@@ -677,7 +682,8 @@ _git-commit () {
     '--dry-run[only show list of paths that are to be commited or not, and any untracked]' \
     '(         --no-status)--status[include the output of git status in the commit message template]' \
     '(--status            )--no-status[do not include the output of git status in the commit message template]' \
-    '(-S --gpg-sign)'{-S-,--gpg-sign=}'[GPG-sign the commit]::key id' \
+    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=}'[GPG-sign the commit]::key id' \
+    '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
     '(-a --all --interactive -o --only -i --include *)--interactive[interactively update paths in the index file]' \
     '*: :__git_ignore_line_inside_arguments __git_changed_files' \
     - '(message)' \
@@ -1317,6 +1323,8 @@ _git-rebase () {
     '--keep-empty[keep empty commits in the result]' \
     '(- :)--skip[skip the current patch]' \
     '(-m --merge)'{-m,--merge}'[use merging strategies to rebase]' \
+    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=}'[GPG-sign the commit]::key id' \
+    '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
     '*'{-s,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
     '*'{-X,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]' \
     '(-q --quiet -v --verbose --stat -n --no-stat)'{-q,--quiet}'[suppress all output]' \
@@ -1349,6 +1357,7 @@ _git-reset () {
   _arguments -w -C -s \
       '(       --mixed --hard --merge --keep -p --patch -- *)--soft[do not touch the index file nor the working tree]' \
       '(--soft         --hard --merge --keep -p --patch -- *)--mixed[reset the index but not the working tree (default)]' \
+      '(--soft         --hard --merge --keep -p --patch -- *)-N[keep --intent-to-add entries in the index]' \
       '(--soft --mixed        --merge --keep -p --patch -- *)--hard[match the working tree and index to the given tree]' \
       '(--soft --mixed --hard         --keep -p --patch -- *)--merge[reset out of a conflicted merge]' \
       '(--soft --mixed --hard --merge        -p --patch -- *)--keep[like --hard, but keep local working tree changes]' \
@@ -1382,6 +1391,8 @@ _git-revert () {
     '(-m --mainline)'{-m+,--mainline=}'[pick which parent is mainline]:parent number' \
     '(-n --no-commit)'{-n,--no-commit}'[do not commit the reversion]' \
     '(-s --signoff)'{-s,--signoff}'[add Signed-off-by line at the end of the commit message]' \
+    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=}'[GPG-sign the commit]::key id' \
+    '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
     ': :__git_commits'
 }
 
@@ -1757,6 +1768,8 @@ _git-tag () {
       '(--column)--no-column[do not display in columns]' \
       '--contains=[only list tags which contain the specified commit]: :__git_commits' \
       '--points-at=[only list tags of the given object]: :__git_commits' \
+      '--sort=[specify how the tags should be sorted]:mode:((refname\:"lexicographic order"
+                                                             version\\\:refname\:"tag names are treated as version numbers"))' \
       '::pattern' \
     - verification \
       '-v[verifies gpg signutare of tags]' \
@@ -1969,6 +1982,7 @@ _git-config () {
     color.status.nobranch:'color of no-branch warning::->color'
     color.ui:'color output of capable git commands::->color-bool:auto'
     commit.cleanup:'default --cleanup option::->commit.cleanup:default'
+    commit.gpgsign:'always GPG-sign commits::->bool:false'
     commit.status:'include status information in commit message template::->bool:true'
     commit.template:'template file for commit messages:template:_files'
     'diff.*.binary:make the diff driver treat files as binary::->bool:false'
@@ -2017,6 +2031,7 @@ _git-config () {
     format.signoff:'enable --signoff by default::->bool:false'
     'gc.*.reflogexpire:grace period for git reflog expire::->days:90'
     'gc.*.reflogexpireunreachable:grace period for git reflog expire for unreachable entries::->days:30'
+    gc.aggressiveDepth:'maximum delta depth:maximum delta depth::->int:250'
     gc.aggressiveWindow:'window size used in delta compression algorithm::->int:250'
     gc.auto:'minimum limit for packing loose objects with --auto::->int:6700'
     gc.autopacklimit:'minimum limit for packing packs with --auto::->int:50'
@@ -2192,10 +2207,11 @@ _git-config () {
     pack.threads:'number of threads to use for searching for best delta matches:number of threads:->int'
     pack.indexVersion:'default pack index version:index version:->string'
     pack.packSizeLimit:'maximum size of packs:maximum size of packs:->bytes'
+    pull.ff:'accept fast-forwards only::->bool:false'
     pull.octopus:'default merge strategy to use when pulling multiple branches::__git_merge_strategies'
     pull.rebase:'rebase branches on top of the fetched branch, instead of merging::->pull.rebase:false'
     pull.twohead:'default merge strategy to use when pulling a single branch::__git_merge_strategies'
-    push.default:'action git push should take if no refspec is given::->push.default:matching'
+    push.default:'action git push should take if no refspec is given::->push.default:simple'
     rebase.stat:'show a diffstat of what changed upstream since last rebase::->bool:false'
     rebase.autosquash:'autosquash by default::->bool:false'
     rebase.autostash:'autostash by default::->bool:false'
@@ -2319,6 +2335,7 @@ _git-config () {
     transfer.hiderefs:'string(s) to decide which refs to omit from initial advertisements:hidden refs:->string'
     uploadpack.hiderefs:'string(s) upload-pack uses to decide which refs to omit from its initial advertisement:hidden refs:->string'
     uploadpack.allowtipsha1inwant:'allow upload-pack to accept a fetch request that asks for an object at the tip of a hidden ref::->bool:false'
+    uploadarchive.allowUnreachable:'allow git-upload-archive to accept an archive requests that ask for unreachable objects::->bool:false'
     'url.*.insteadOf:string to start URLs with:prefix:->string'
     'url.*.pushInsteadOf:string to start URLs to push to with:prefix:->string'
     user.email:'email address used for commits::_email_addresses'
@@ -2516,6 +2533,7 @@ _git-config () {
           tar:'git tar-tree options'
           transfer:'options controlling transfers'
           uploadpack:'git upload-pack options'
+          uploadarchive:'git upload-archive options'
           url:'URL prefixes'
           user:'options controlling user identity'
           web:'web options'
@@ -6135,7 +6153,8 @@ __git_setup_revision_options () {
     '--parents[display parents of commit]'
     '--children[display children of commit]'
     '--left-right[mark which side of symmetric diff commit is reachable from]'
-    '--graph[display graphical representation of commit history]'
+    '(--show-linear-break        )--graph[display graphical representation of commit history]'
+    '(                    --graph)--show-linear-break=[show a barrier between commits from different branches]:barrier'
     '--count[display how many commits would have been listed]'
     '(-n --max-count)'{-n+,--max-count=}'[maximum number of commits to display]: :__git_guard_number'
     '--skip=[skip given number of commits before output]: :__git_guard_number'
@@ -6222,6 +6241,8 @@ __git_setup_merge_options () {
     '(         --no-squash)--squash[merge, but do not commit]'
     '(--squash            )--no-squash[merge and commit]'
     '--ff-only[refuse to merge unless HEAD is up to date or merge can be resolved as a fast-forward]'
+    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=}'[GPG-sign the commit]::key id' \
+    '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
     '*'{-s,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies'
     '*'{-X,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]'
     '(--verify-signatures)--verify-signatures[verify the commits being merged or abort]'
