@@ -115,6 +115,8 @@ VCS_INFO_git_getbranch () {
 
 gitdir=${vcs_comm[gitdir]}
 VCS_INFO_git_getbranch ${gitdir}
+gitbase=$( ${vcs_comm[cmd]} rev-parse --show-toplevel )
+rrn=${gitbase:t}
 if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision ; then
     gitsha1=$(${vcs_comm[cmd]} rev-parse --quiet --verify HEAD)
 else
@@ -154,8 +156,6 @@ fi
 
 VCS_INFO_adjust
 VCS_INFO_git_getaction ${gitdir}
-gitbase=$( ${vcs_comm[cmd]} rev-parse --show-toplevel )
-rrn=${gitbase:t}
 
 local patchdir=${gitdir}/patches/${gitbranch}
 if [[ -d $patchdir ]] && [[ -f $patchdir/applied ]] \
