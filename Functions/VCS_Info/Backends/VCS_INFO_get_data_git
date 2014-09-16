@@ -3,9 +3,9 @@
 ## Distributed under the same BSD-ish license as zsh itself.
 
 setopt localoptions extendedglob NO_shwordsplit
-local gitdir gitbase gitbranch gitaction gitunstaged gitstaged gitsha1
-local stgitpatch stgitunapplied
+local gitdir gitbase gitbranch gitaction gitunstaged gitstaged gitsha1 gitmisc
 local -i querystaged queryunstaged
+local -a git_patches_applied git_patches_unapplied
 local -A hook_com
 
 VCS_INFO_git_getaction () {
@@ -113,6 +113,44 @@ VCS_INFO_git_getbranch () {
     return 0
 }
 
+VCS_INFO_git_handle_patches () {
+    local git_applied_s git_unapplied_s gitmsg git_all
+    git_patches_applied=(${(Oa)git_patches_applied})
+    git_patches_unapplied=(${(Oa)git_patches_unapplied})
+    (( git_all = ${#git_patches_applied} + ${#git_patches_unapplied} ))
+
+    if VCS_INFO_hook 'gen-applied-string' "${git_patches_applied[@]}"; then
+        if (( ${#git_patches_applied} )); then
+            git_applied_s=${git_patches_applied[1]}
+        else
+            git_applied_s=""
+        fi
+    else
+        git_applied_s=${hook_com[applied-string]}
+    fi
+    hook_com=()
+    if VCS_INFO_hook 'gen-unapplied-string' "${git_patches_unapplied[@]}"; then
+        git_patches_unapplied=${#git_patches_unapplied}
+    else
+        git_patches_unapplied=${hook_com[unapplied-string]}
+    fi
+
+    if (( ${#git_patches_applied} )); then
+        zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" patch-format gitmsg || gitmsg="%p (%n applied)"
+    else
+        zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" nopatch-format gitmsg || gitmsg="no patch applied"
+    fi
+    hook_com=( applied "${git_applied_s}"     unapplied "${git_patches_unapplied}"
+               applied-n ${#git_patches_applied} unapplied-n ${#git_patches_unapplied} all-n ${git_all} )
+    if VCS_INFO_hook 'set-patch-format' "${gitmsg}"; then
+        zformat -f gitmisc "${gitmsg}" "p:${hook_com[applied]}" "u:${hook_com[unapplied]}" \
+                                          "n:${#git_patches_applied}" "c:${#git_patches_unapplied}" "a:${git_all}"
+    else
+        gitmisc=${hook_com[patch-replace]}
+    fi
+    hook_com=()
+}
+
 gitdir=${vcs_comm[gitdir]}
 VCS_INFO_git_getbranch ${gitdir}
 gitbase=$( ${vcs_comm[cmd]} rev-parse --show-toplevel )
@@ -157,52 +195,46 @@ fi
 VCS_INFO_adjust
 VCS_INFO_git_getaction ${gitdir}
 
+
+VCS_INFO_get_get_rebase()
+{
+    if [[ -f "$1" ]]; then
+       echo "$(< "$1")"
+    fi
+}
+
 local patchdir=${gitdir}/patches/${gitbranch}
 if [[ -d $patchdir ]] && [[ -f $patchdir/applied ]] \
    && [[ -f $patchdir/unapplied ]]
 then
-    local -a stgit_applied stgit_unapplied stgit_all
+    git_patches_applied=(${(f)"$(< "${patchdir}/applied")"})
+    git_patches_unapplied=(${(f)"$(< "${patchdir}/unapplied")"})
+    VCS_INFO_git_handle_patches
+elif [[ -d "${gitdir}/rebase-merge" ]]; then
+    patchdir="${gitdir}/rebase-merge"
+    local p
+    for p in ${(f)"$(< "${patchdir}/done")"}; do
+        # remove action
+        git_patches_applied+=("${${(s: :)p}[2,-1]}")
+    done
+    git_patches_unapplied=(${(f)"$(grep -v '^$' "${patchdir}/git-rebase-todo" | grep -v '^#')"})
+    VCS_INFO_git_handle_patches
+elif [[ -d "${gitdir}/rebase-apply" ]]; then
+    # Fake patch names for all but current patch
+    patchdir="${gitdir}/rebase-apply"
+    local cur=$(< "${patchdir}/next")
+    local p
+    for p in $(seq $(($cur - 1))); do
+        git_patches_applied+=("$(printf "%04d" $p) ?")
+    done
+    git_patches_applied+=("$(< "${patchdir}/original-commit") ${${(f)$(< "${patchdir}/msg-clean")}[1]}")
+    git_patches_unapplied=($(seq $cur $(< "${patchdir}/last")))
 
-    stgit_applied=(${(f)"$(< "${patchdir}/applied")"})
-    stgit_applied=( ${(Oa)stgit_applied} )
-    stgit_unapplied=(${(f)"$(< "${patchdir}/unapplied")"})
-    stgit_unapplied=( ${(oa)stgit_unapplied} )
-    stgit_all=( ${(Oa)stgit_applied} ${stgit_unapplied} )
-
-    if VCS_INFO_hook 'gen-applied-string' "${stgit_applied[@]}"; then
-        if (( ${#stgit_applied} )); then
-            stgitpatch=${stgit_applied[1]}
-        else
-            stgitpatch=""
-        fi
-    else
-        stgitpatch=${hook_com[applied-string]}
-    fi
-    hook_com=()
-    if VCS_INFO_hook 'gen-unapplied-string' "${stgit_unapplied[@]}"; then
-        stgitunapplied=${#stgit_unapplied}
-    else
-        stgitunapplied=${hook_com[unapplied-string]}
-    fi
-
-    if (( ${#stgit_applied} )); then
-        zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" patch-format stgitmsg || stgitmsg="%p (%n applied)"
-    else
-        zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" nopatch-format stgitmsg || stgitmsg="no patch applied"
-    fi
-    hook_com=( applied "${stgitpatch}"     unapplied "${stgitunapplied}"
-               applied-n ${#stgit_applied} unapplied-n ${#stgit_unapplied} all-n ${#stgit_all} )
-    if VCS_INFO_hook 'set-patch-format' "${stgitmsg}"; then
-        zformat -f stgitmsg "${stgitmsg}" "p:${hook_com[applied]}" "u:${hook_com[unapplied]}" \
-                                          "n:${#stgit_applied}" "c:${#stgit_unapplied}" "a:${#stgit_all}"
-    else
-        stgitmsg=${hook_com[patch-replace]}
-    fi
-    hook_com=()
+    VCS_INFO_git_handle_patches
 else
-    stgitmsg=''
+    gitmisc=''
 fi
 
-backend_misc[patches]="${stgitmsg}"
-VCS_INFO_formats "${gitaction}" "${gitbranch}" "${gitbase}" "${gitstaged}" "${gitunstaged}" "${gitsha1}" "${stgitmsg}"
+backend_misc[patches]="${gitmisc}"
+VCS_INFO_formats "${gitaction}" "${gitbranch}" "${gitbase}" "${gitstaged}" "${gitunstaged}" "${gitsha1}" "${gitmisc}"
 return 0

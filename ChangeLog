@@ -3,6 +3,10 @@
 	* 33188: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	vcs_info git: set rrn before using it
 
+	* 33184: Doc/Zsh/contrib.yo,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git: vcs_info git:
+	consider patches for rebase
+
 2014-09-16  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 33136: Doc/Zsh/expn.yo, Src/glob.c: P glob qualifier appends

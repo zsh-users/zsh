@@ -1296,10 +1296,10 @@ tt(formats) and tt(actionformats) and will be availabe in the global
 tt(backend_misc) array as tt(${backend_misc[bookmarks]}).
 )
 item(tt(gen-applied-string))(
-Called in the tt(git) (with tt(stgit)), and tt(hg) (with tt(mq)) backends
-and in tt(quilt) support when the tt(applied-string) is generated; the
-tt(use-quilt) zstyle must be true for tt(quilt) (the tt(mq) and tt(stgit)
-backends are active by default).
+Called in the tt(git) (with tt(stgit) or during rebase), and tt(hg)
+(with tt(mq)) backends and in tt(quilt) support when the tt(applied-string)
+is generated; the tt(use-quilt) zstyle must be true for tt(quilt) (the tt(mq)
+and tt(stgit) backends are active by default).
 
 This hook gets the names of all applied patches which tt(vcs_info) collected
 so far in the opposite order, which means that the first argument is the
@@ -1312,9 +1312,9 @@ tt(backend_misc) array as tt($backend_misc[patches]}); and it will be
 available as tt(%p) in the tt(patch-format) and tt(nopatch-format) styles.
 )
 item(tt(gen-unapplied-string))(
-Called in the tt(git) (with tt(stgit)), and tt(hg) (with tt(mq)) backend
-and in tt(quilt) support when the tt(unapplied-string) is generated; the
-tt(get-unapplied) style must be true.
+Called in the tt(git) (with tt(stgit) or during rebase), and tt(hg) (with
+tt(mq)) backend and in tt(quilt) support when the tt(unapplied-string) is
+generated; the tt(get-unapplied) style must be true.
 
 This hook gets the names of all unapplied patches which tt(vcs_info)
 collected so far in the opposite order, which mean that the first argument is
