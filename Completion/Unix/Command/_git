@@ -3992,7 +3992,7 @@ _git-apply () {
     '--check[check if patches are applicable (turns off "apply")]' \
     '(        --cached)--index[make sure that patch is applicable to index]' \
     '(--index         )--cached[apply patches without touching working tree]' \
-    '--build-face-ancestor[build temporary index for blobs with ambiguous origin]:index:_files' \
+    '--build-fake-ancestor[build temporary index for blobs with ambiguous origin]:index:_files' \
     '(-R --reverse)'{-R,--reverse}'[apply patches in reverse]' \
     '-z[use NUL termination on output]' \
     '--unidiff-zero[disable unified-diff-context check]' \
