@@ -5,6 +5,8 @@
 	* 33176: Completion/Unix/Command/_git: _git: Add missing --list to
 	git-tag
 
+	* 33178: Completion/Unix/Command/_git: _git: updates for Git 2.1.0
+
 2014-09-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: NEWS: more minor tweaks.
