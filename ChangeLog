@@ -1,3 +1,9 @@
+2014-09-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/19097: Doc/Zsh/mod_parameter.yo,
+	Src/Modules/parameter.c: remove functypetrace and instead add
+	cross-reference to zsh_eval_context.
+
 2014-09-16  Marc Finet  <m.dreadlock@gmail.com>
 
 	* 33188: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
