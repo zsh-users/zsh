@@ -33,12 +33,12 @@ arguments are like the definition arguments to tt(_describe) itself.
 
 Once tt(compdescribe) has been called with either the tt(-i) or the
 tt(-I) option, it can be repeatedly called with the tt(-g) option and
-the names of five arrays as its arguments.  This will step through the
-different sets of matches and store the options in the first array,
-the strings with descriptions in the second, the matches for these in
-the third, the strings without descriptions in the fourth, and the
-matches for them in the fifth array.  These are then directly given to
-tt(compadd) to register the matches with the completion code.
+the names of four parameters as its arguments.  This will step through
+the different sets of matches and store the value of tt(compstate[list])
+in the first scalar, the options for tt(compadd) in the second array,
+the matches in the third array, and the strings to be displayed in the
+completion listing in the fourth array.  The arrays may then be directly
+given to tt(compadd) to register the matches with the completion code.
 )
 findex(compfiles)
 item(tt(compfiles))(
