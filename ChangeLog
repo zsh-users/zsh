@@ -1,5 +1,7 @@
 2014-09-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 33214 (modified yet further): configure.ac: test prefixes better.
+
 	* 33213: configure.ac, Config/defs.mk.in: try again.
 
 	* 33212: Src/zsh.mdd: Src/init.c, Src/zsh.mdd, configure.ac: add
