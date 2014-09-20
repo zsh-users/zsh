@@ -315,16 +315,11 @@ else
   sitefndir="$enableval"
 fi], [sitefndir=${datadir}/${tzsh_name}/site-functions])
 
-dnl Add /usr/local/share/zsh/site-functions if not yet present.
-dnl It might be present owing to an explicit sitefndir or the install
-dnl prefix if the shell is installed under the name "zsh".
-if test X$sitefndir = X/usr/local/zsh/site-functions
+dnl Add /usr/local/share/zsh/site-functions if not yet present
+dnl owing to $sitefndir, whether or not explicitly given.
+if test X$sitefndir = X/usr/local/share/zsh/site-functions
 then fixed_sitefndir=''
-elif test X$ac_default_prefix != X/usr/local
-then fixed_sitefndir=/usr/local/zsh/site-functions
-elif test X$tzsh_name != Xzsh
-then fixed_sitefndir=/usr/local/zsh/site-functions
-else fixed_sitefndir=''
+else fixed_sitefndir=/usr/local/share/zsh/site-functions
 fi
 
 ifdef([function_subdirs],[undefine([function_subdirs])])

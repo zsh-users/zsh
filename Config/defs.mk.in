@@ -47,6 +47,7 @@ mandir          = @mandir@
 datarootdir     = @datarootdir@
 datadir         = @datadir@
 fndir           = @fndir@
+fixed_sitefndir = @fixed_sitefndir@
 sitefndir       = @sitefndir@
 scriptdir       = @scriptdir@
 sitescriptdir   = @sitescriptdir@
