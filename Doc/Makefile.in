@@ -119,8 +119,10 @@ texi: $(sdir)/zsh.texi
 .PHONY: texi
 
 $(sdir)/zsh.texi: version.yo
-	$(YODL) -o $@ -I$(sdir) -w ztexi.yo version.yo zsh.yo; \
-	test -f $@
+	case '$(YODL)' in :*) touch $@ ;; *) \
+	    $(YODL) -o $@ -I$(sdir) -w ztexi.yo version.yo zsh.yo; \
+	    test -f $@ \
+	;; esac
 
 info: zsh.info
 .PHONY: info

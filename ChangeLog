@@ -1,3 +1,8 @@
+2014-09-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Tanu Kaskinen: 33209: Doc/Makefile.in: don't fail
+	catastrophically when builing zsh.texi if yodl isn't available.
+
 2014-09-19  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33206: Doc/Zsh/mod_computil.yo: fix compdescribe doc
