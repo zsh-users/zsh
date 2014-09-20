@@ -3200,9 +3200,12 @@ AC_OUTPUT
 
 eval "zshbin1=${bindir}"
 eval "zshbin2=${zshbin1}"
-eval "zshman=${mandir}"
-eval "zshinfo=${infodir}"
-eval "zshfndir=${fndir}"
+eval "zshman1=${mandir}"
+eval "zshman2=${zshman1}"
+eval "zshinfo1=${infodir}"
+eval "zshinfo2=${zshinfo1}"
+eval "zshfndir1=${fndir}"
+eval "zshfndir2=${zshfndir1}"
 
 echo "
 zsh configuration
@@ -3227,10 +3230,10 @@ echo "\
 library flags             : ${LIBS}
 installation basename     : ${tzsh_name}
 binary install path       : ${zshbin2}
-man page install path     : ${zshman}
-info install path         : ${zshinfo}"
-if test "$zshfndir" != no; then
-  echo "functions install path    : ${zshfndir}"
+man page install path     : ${zshman2}
+info install path         : ${zshinfo2}"
+if test "$zshfndir2" != no; then
+  echo "functions install path    : ${zshfndir2}"
 fi
 if test "x$additionalfpath" != x; then
   echo "additional fpath entries  : ${additionalfpath}"
