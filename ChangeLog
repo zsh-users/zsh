@@ -1,5 +1,10 @@
 2014-09-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 33212: Src/zsh.mdd: Src/init.c, Src/zsh.mdd, configure.ac: add
+	/usr/local/share/zsh/site-functions to head of fpath if not
+	present in configurable.  Not configurable as serves as fallback
+	only if no handling /etc/zshenv.
+
 	* Tanu Kaskinen: 33209: Doc/Makefile.in: don't fail
 	catastrophically when builing zsh.texi if yodl isn't available.
 

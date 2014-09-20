@@ -770,7 +770,8 @@ setupvals(void)
     struct timezone dummy_tz;
     char *ptr;
     int i, j;
-#if defined(SITEFPATH_DIR) || defined(FPATH_DIR) || defined (ADDITIONAL_FPATH)
+#if defined(SITEFPATH_DIR) || defined(FPATH_DIR) || defined (ADDITIONAL_FPATH) || defined(FIXED_FPATH_DIR)
+#define FPATH_NEEDS_INIT 1
     char **fpathptr;
 # if defined(FPATH_DIR) && defined(FPATH_SUBDIRS)
     char *fpath_subdirs[] = FPATH_SUBDIRS;
@@ -779,11 +780,17 @@ setupvals(void)
     char *more_fndirs[] = ADDITIONAL_FPATH;
     int more_fndirs_len;
 # endif
-# ifdef SITEFPATH_DIR
-    int fpathlen = 1;
+# ifdef FIXED_FPATH_DIR
+#  define FIXED_FPATH_LEN 1
 # else
-    int fpathlen = 0;
+#  define FIXED_FPATH_LEN 0
 # endif
+# ifdef SITEFPATH_DIR
+#  define SITE_FPATH_LEN 1
+# else
+#  define SITE_FPATH_LEN 0
+# endif
+    int fpathlen = FIXED_FPATH_LEN + SITE_FPATH_LEN;
 #endif
     int close_fds[10], tmppipe[2];
 
@@ -862,23 +869,27 @@ setupvals(void)
     manpath  = mkarray(NULL);
     fignore  = mkarray(NULL);
 
-#if defined(SITEFPATH_DIR) || defined(FPATH_DIR) || defined(ADDITIONAL_FPATH)
+#ifdef FPATH_NEEDS_INIT
 # ifdef FPATH_DIR
 #  ifdef FPATH_SUBDIRS
     fpathlen += sizeof(fpath_subdirs)/sizeof(char *);
-#  else
+#  else /* FPATH_SUBDIRS */
     fpathlen++;
-#  endif
-# endif
+#  endif /* FPATH_SUBDIRS */
+# endif /* FPATH_DIR */
 # if defined(ADDITIONAL_FPATH)
     more_fndirs_len = sizeof(more_fndirs)/sizeof(char *);
     fpathlen += more_fndirs_len;
-# endif
+# endif /* ADDITONAL_FPATH */
     fpath = fpathptr = (char **)zalloc((fpathlen+1)*sizeof(char *));
+# ifdef FIXED_FPATH_DIR
+    *fpathptr++ = ztrdup(FIXED_FPATH_DIR);
+    fpathlen--;
+# endif
 # ifdef SITEFPATH_DIR
     *fpathptr++ = ztrdup(SITEFPATH_DIR);
     fpathlen--;
-# endif
+# endif /* SITEFPATH_DIR */
 # if defined(ADDITIONAL_FPATH)
     for (j = 0; j < more_fndirs_len; j++)
 	*fpathptr++ = ztrdup(more_fndirs[j]);
@@ -897,9 +908,9 @@ setupvals(void)
 #  endif
 # endif
     *fpathptr = NULL;
-#else
+#else /* FPATH_NEEDS_INIT */
     fpath    = mkarray(NULL);
-#endif
+#endif /* FPATH_NEEDS_INIT */
 
     mailpath = mkarray(NULL);
     watch    = mkarray(NULL);

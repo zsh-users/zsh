@@ -73,6 +73,9 @@ zshpaths.h: Makemod $(CONFIG_INCS)
 	@if test x$(sitefndir) != xno; then \
 	  echo '#define SITEFPATH_DIR "'$(sitefndir)'"' >> zshpaths.h.tmp; \
 	fi
+	@if test x$(fixed_sitefndir) != x; then \
+	  echo '#define FIXED_FPATH_DIR "'$(fixed_sitefndir)'"' >> zshpaths.h.tmp; \
+        fi
 	@if test x$(fndir) != xno; then \
 	  echo '#define FPATH_DIR "'$(fndir)'"' >> zshpaths.h.tmp; \
 	  if test x$(FUNCTIONS_SUBDIRS) != x && \

@@ -315,6 +315,18 @@ else
   sitefndir="$enableval"
 fi], [sitefndir=${datadir}/${tzsh_name}/site-functions])
 
+dnl Add /usr/local/share/zsh/site-functions if not yet present.
+dnl It might be present owing to an explicit sitefndir or the install
+dnl prefix if the shell is installed under the name "zsh".
+if test X$sitefndir = X/usr/local/zsh/site-functions
+then fixed_sitefndir=''
+elif test X$ac_default_prefix != X/usr/local
+then fixed_sitefndir=/usr/local/zsh/site-functions
+elif test X$tzsh_name != Xzsh
+then fixed_sitefndir=/usr/local/zsh/site-functions
+else fixed_sitefndir=''
+fi
+
 ifdef([function_subdirs],[undefine([function_subdirs])])
 AC_ARG_ENABLE(function-subdirs,
 AC_HELP_STRING([--enable-function-subdirs], [install functions in subdirectories]))
@@ -340,6 +352,7 @@ AC_SUBST(runhelp)dnl
 AC_SUBST(additionalfpath)dnl
 AC_SUBST(fndir)dnl
 AC_SUBST(sitefndir)dnl
+AC_SUBST(fixed_sitefndir)dnl
 AC_SUBST(FUNCTIONS_SUBDIRS)dnl
 
 dnl Directories for scripts such as newuser.
