@@ -1,5 +1,7 @@
 2014-09-22  Oliver Kiddle  <opk@zsh.org>
 
+	* 33198: Completion/Unix/Command/_augeas: new augtool completion
+
 	* users/19113: Completion/Linux/_cryptsetup: reorganised function
 
 2014-09-22  Daniel Hahler  <dhahler@gmail.com>
