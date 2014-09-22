@@ -1,3 +1,8 @@
+2014-09-22  Daniel Hahler  <dhahler@gmail.com>
+
+	* 33217: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info: use `--ignore-submodules=dirty` with diff/diff-index
+
 2014-09-22  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 33208: Tanu Kaskinen: 
