@@ -1,3 +1,8 @@
+2014-09-23  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Richard Hartmann: 33218: Completion/X/Command/_mplayer:
+	complete m4a files.
+
 2014-09-22  Oliver Kiddle  <opk@zsh.org>
 
 	* 33198: Completion/Unix/Command/_augeas: new augtool completion
@@ -11,7 +16,8 @@
 
 2014-09-22  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* 33208: Tanu Kaskinen: 
+	* 33208: Tanu Kaskinen: improve printing of paths at end of
+	configuration.
 
 2014-09-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
