@@ -1,3 +1,7 @@
+2014-09-22  Oliver Kiddle  <opk@zsh.org>
+
+	* users/19113: Completion/Linux/_cryptsetup: reorganised function
+
 2014-09-22  Daniel Hahler  <dhahler@gmail.com>
 
 	* 33217: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
