@@ -1,4 +1,4 @@
-#compdef dvips dvibook dviconcat dvicopy dvidvi dviselect dvitodvi dvitype
+#compdef dvips dvibook dviconcat dvicopy dvidvi dvipdf dviselect dvitodvi dvitype
 
 local expl args
 
