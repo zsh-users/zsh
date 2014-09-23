@@ -1,5 +1,7 @@
 2014-09-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: NEWS: mention numeric output with underscore separators.
+
 	* unposted: NEWS: mention new
 	/usr/local/share/zsh/site-functions default.
 

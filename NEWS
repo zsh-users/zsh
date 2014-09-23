@@ -10,7 +10,11 @@ Changes since 5.0.0
 - Numeric constants encountered in mathematical expressions (but not other
   contexts) can contain underscores as separators that will be ignored on
   evaluation, as allowed in other scripting languages.  For example,
-  0xFFFF_FFFF, or 3.141_592_654.
+  0xFFFF_FFFF, or 3.141_592_654.  From 5.0.6 this is also available
+  in output, e.g.
+    setopt cbases
+    zmodload zsh/mathfunc
+    print $(( [#16_4] 2**32 - 1 )) $(( [#_3] 4 * atan(1.0) )) 
  
 - "functions -T" turns on tracing for the specified function(s) only,
   similar to "functions -t" except that tracing is turned off for any
