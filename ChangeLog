@@ -1,5 +1,10 @@
 2014-09-23  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 33221 (including 33173 from Anthony Heading):
+	Completion/Unix/Command/_perforce: complete directories
+	when handling unmaintained files and rationalise code that does
+	this.
+
 	* unposted: Completion/Unix/Command/_dvi: add dvipdf to list of
 	commands.
 

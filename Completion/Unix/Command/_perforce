@@ -1231,10 +1231,15 @@ _perforce_files() {
 #      "subdirs:subdirectory search:_perforce_subdirs"
     )
     _alternative $altfiles
-  elif [[ -n $unmaintained && -z $dodirs ]]; then
-    # a la _cvs_nonentried_files: directories are never maintained,
-    # so skip 'em.  Unmaintained files can't be integrated, opened
-    # or resolved, so treat as exclusive (just as well, since
+  elif [[ -n $unmaintained ]]; then
+    # As directories are always umaintained, but may contain files
+    # we want to add, we'll always complete directories here.  That's
+    # neater than the alternative of excluding them here and requesting
+    # them separately in the caller.  The only client for this
+    # branch is currently 'p4 add'.
+    #
+    # Unmaintained files can't be integrated, opened
+    # or resolved, so treat as exclusive to other options (just as well, since
     # this bit's messy).
     local MATCH MBEGIN MEND
     local -a omitpats
@@ -1253,7 +1258,7 @@ _perforce_files() {
 
     [[ $#omitpats -eq 1 && $omitpats[1] = '' ]] && omitpats=()
     if (( ${#omitpats} )); then
-      _path_files -g "*~(*/|)(${(j:|:)~omitpats})(D.)"
+      _path_files -g "*~(*/|)(${(j:|:)~omitpats})(D)"
     else
       _path_files
     fi
