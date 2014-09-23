@@ -1,3 +1,8 @@
+2014-09-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Eric Cook: 33224: Completion/Linux/Command/_btrfs: complete
+	directory as second argument.
+
 2014-09-23  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33223: Completion/Base/Utility/_call_program: discard stderr

@@ -125,7 +125,8 @@ while (( $#state )); do
           args+=( 
             '-r[readonly snapshot]'
             '*-i[assign to qgroup]:qgroup: _message "qgroup"'
-            '1:snapshot:_files -/' 
+            '1:source directory:_files -/'
+            '2:snapshot name or destination:_files -/'
           )
           ;;
         subvolume:list) 
