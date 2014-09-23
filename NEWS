@@ -50,7 +50,7 @@ Changes since 5.0.0
  
 - In file completion, the recursive-files style can be set to an array of
   patterns to match against "$PWD/".  In any matched location, it is
-  possibly to complete files in arbitrarily deep subdirectories without
+  possible to complete files in arbitrarily deep subdirectories without
   needing to type the directory prefix.  See example in the zshcompsys
   manual.
  
@@ -82,13 +82,17 @@ Changes since 5.0.0
   values of N still count the space used since the start of the prompt).
   In PS1 and PROMPT, this counts to the right margin, whereas in RPS1 and
   RPROMPT, it counts to the left margin (not to the opposite prompt).
- 
+
+- Also in prompt strings, %e or the equivalent test %(e..) are used to
+  output or test the execution / evaluation depth of a shell
+  construct within functions etc.  This is useful in $PS4.
+
 - Another new prompt feature is the %. escape within time strings, for
-  example %D{%H:%M:%S.%.}.  It provides zero-padded decimal fractions of
+  example %D{%H:%M:%S.%.}.  It provides zero-padded decimal fractions of a
   second; by default milliseconds are shown, but the number of digits may
   be indicated from 1 to 6, e.g. "%6.".  (Note this is part of the
   extensions to strftime() formats rather than basic prompt escapes.)
- 
+
 - The operators :^ and :^^ in parameter substitution allow for array
   zipping in the form ${name:^array}. With the :^ operator, all entries
   in $name and $array will be output in alternating order. With :^ the
