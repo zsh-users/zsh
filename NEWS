@@ -21,6 +21,13 @@ Changes since 5.0.0
   to be treated as floating point.  This is most useful locally within
   functions or scripts performing floating point calculations.
  
+- The default $fpath/$FPATH is now designed always to include
+  /usr/local/share/zsh/site-functions.  This does not need to exist and
+  sites that use an explicit configuration can put that in /etc/zshenv as
+  before.  The intention of the new path element is to increase the
+  likelihood that locally added functions can be found with the shell
+  running "out of the box" however the shell was configured.
+
 - Individual pattern characters can be disabled.  For example, to allow '^'
   to be an ordinary character even if the option EXTENDED_GLOB is set, use
   "disable -p '^'".

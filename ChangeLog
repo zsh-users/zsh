@@ -1,3 +1,8 @@
+2014-09-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: NEWS: mention new
+	/usr/local/share/zsh/site-functions default.
+
 2014-09-23  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 33221 (including 33173 from Anthony Heading):
