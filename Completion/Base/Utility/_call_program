@@ -1,6 +1,13 @@
 #autoload +X
 
-local tmp
+local tmp err_fd=-1
+
+if (( ${debug_fd:--1} > 2 ))
+then exec {err_fd}>&2	# debug_fd is saved stderr, 2 is log file
+else exec {err_fd}>/dev/null
+fi
+
+{	# Begin "always" block
 
 if zstyle -s ":completion:${curcontext}:${1}" command tmp; then
   if [[ "$tmp" = -* ]]; then
@@ -10,4 +17,10 @@ if zstyle -s ":completion:${curcontext}:${1}" command tmp; then
   fi
 else
   eval "$argv[2,-1]"
-fi
+fi 2>&$err_fd
+
+} always {
+
+exec {err_fd}>&-
+
+}

@@ -1,3 +1,8 @@
+2014-09-23  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33223: Completion/Base/Utility/_call_program: discard stderr
+	except when _complete_debug is in progress.
+
 2014-09-23  Øystein Walle  <oystwa@gmail.com>
 
 	* 33179: Completion/Unix/Command/_git: _git: updates for Git 2.0.0
