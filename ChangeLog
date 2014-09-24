@@ -1,3 +1,7 @@
+2014-09-24  Oliver Kiddle  <opk@zsh.org>
+
+	* 33238: Completion/Unix/Command/_quilt: correct return values
+
 2014-09-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Eric Cook: 33224: Completion/Linux/Command/_btrfs: complete
