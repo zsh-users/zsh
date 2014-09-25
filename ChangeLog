@@ -1,3 +1,8 @@
+2014-09-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/19143: Src/glob.c: **/*(odonT) didn't work because
+	the trailing slash wasn't properly ignored.
+
 2014-09-25  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: NEWS: tweak last change.

@@ -900,6 +900,9 @@ gmatchcmp(Gmatch a, Gmatch b)
 		/* Count slashes.  Trailing slashes don't count. */
 		while (*aptr && *aptr == *bptr)
 		    aptr++, bptr++;
+		/* Like I just said... */
+		if ((!*aptr || !*bptr) && aptr > a->name && aptr[-1] == '/')
+		    aptr--, bptr--;
 		if (*aptr)
 		    for (; aptr[1]; aptr++)
 			if (*aptr == '/') {
