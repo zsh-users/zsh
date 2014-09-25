@@ -1,3 +1,7 @@
+2014-09-25  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted: NEWS: tweak last change.
+
 2014-09-24  Oliver Kiddle  <opk@zsh.org>
 
 	* 33238: Completion/Unix/Command/_quilt: correct return values
