@@ -13,6 +13,9 @@ _notmuch_commands()
     'dump:creates a plain-text dump of the tags of each message'
     'restore:restores the tags from the given file'
     'help:show details on a command'
+    'compact:compact the notmuch database'
+    'config:access the notmuch configuration file'
+    'count:count messages matching the given search terms'
   )
 
   _describe -t command 'command' notmuch_commands
