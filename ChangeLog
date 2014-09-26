@@ -1,5 +1,9 @@
 2014-09-26  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 33242: Src/parse.c: don't treat tokens immediately following
+	end of shell constructs for, while, repeat, if as being in
+	command position.
+
 	* Wieland Hoffmann: 33252: Completion/Unix/Command/_notmuch:
 	complete more subcommands.
 

@@ -997,17 +997,20 @@ par_for(int *complex)
 	par_save_list(complex);
 	if (tok != DONE)
 	    YYERRORV(oecused);
+	incmdpos = 0;
 	zshlex();
     } else if (tok == INBRACE) {
 	zshlex();
 	par_save_list(complex);
 	if (tok != OUTBRACE)
 	    YYERRORV(oecused);
+	incmdpos = 0;
 	zshlex();
     } else if (csh || isset(CSHJUNKIELOOPS)) {
 	par_save_list(complex);
 	if (tok != ZEND)
 	    YYERRORV(oecused);
+	incmdpos = 0;
 	zshlex();
     } else if (unset(SHORTLOOPS)) {
 	YYERRORV(oecused);
@@ -1186,9 +1189,12 @@ par_if(int *complex)
     for (;;) {
 	xtok = tok;
 	cmdpush(xtok == IF ? CS_IF : CS_ELIF);
-	zshlex();
-	if (xtok == FI)
+	if (xtok == FI) {
+	    incmdpos = 0;
+	    zshlex();
 	    break;
+	}
+	zshlex();
 	if (xtok == ELSE)
 	    break;
 	while (tok == SEPER)
@@ -1229,6 +1235,7 @@ par_if(int *complex)
 		YYERRORV(oecused);
 	    }
 	    ecbuf[pp] = WCB_IF(type, ecused - 1 - pp);
+	    /* command word (else) allowed to follow immediately */
 	    zshlex();
 	    incmdpos = 1;
 	    if (tok == SEPER)
@@ -1266,6 +1273,7 @@ par_if(int *complex)
 		YYERRORV(oecused);
 	    }
 	}
+	incmdpos = 0;
 	ecbuf[pp] = WCB_IF(WC_IF_ELSE, ecused - 1 - pp);
 	zshlex();
 	cmdpop();
@@ -1296,12 +1304,14 @@ par_while(int *complex)
 	par_save_list(complex);
 	if (tok != DONE)
 	    YYERRORV(oecused);
+	incmdpos = 0;
 	zshlex();
     } else if (tok == INBRACE) {
 	zshlex();
 	par_save_list(complex);
 	if (tok != OUTBRACE)
 	    YYERRORV(oecused);
+	incmdpos = 0;
 	zshlex();
     } else if (isset(CSHJUNKIELOOPS)) {
 	par_save_list(complex);
@@ -1340,12 +1350,14 @@ par_repeat(int *complex)
 	par_save_list(complex);
 	if (tok != DONE)
 	    YYERRORV(oecused);
+	incmdpos = 0;
 	zshlex();
     } else if (tok == INBRACE) {
 	zshlex();
 	par_save_list(complex);
 	if (tok != OUTBRACE)
 	    YYERRORV(oecused);
+	incmdpos = 0;
 	zshlex();
     } else if (isset(CSHJUNKIELOOPS)) {
 	par_save_list(complex);
