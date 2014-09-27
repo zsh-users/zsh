@@ -1316,12 +1316,11 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar,
 			     */
 			    for (;;) {
 				*ptr++ = *fulltextptr;
-				if (*fulltextptr == Outpar ||
-				    *fulltextptr == '\0')
+				if (*fulltextptr == '\0' ||
+				    *fulltextptr++ == Outpar)
 				    break;
-				if (*fulltextptr == Nularg)
+				if (fulltextptr[-1] == Nularg)
 				    remw--;
-				fulltextptr++;
 			    }
 			} else {
 #ifdef MULTIBYTE_SUPPORT
@@ -1397,12 +1396,11 @@ prompttrunc(int arg, int truncchar, int doprint, int endchar,
 			if (*skiptext == Inpar) {
 			    /* see comment on left truncation above */
 			    for (;;) {
-				if (*skiptext == Outpar ||
-				    *skiptext == '\0')
+				if (*skiptext == '\0' ||
+				    *skiptext++ == Outpar)
 				    break;
-				if (*skiptext == Nularg)
+				if (skiptext[-1] == Nularg)
 				    maxwidth--;
-				skiptext++;
 			    }
 			} else {
 #ifdef MULTIBYTE_SUPPORT
