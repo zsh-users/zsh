@@ -491,3 +491,19 @@
 >	print I want to tell you about $var
 >	print Also, this might be an error >&2
 >} < input2 > output2 2>&1
+
+  1func 2func 3func() { print Ich heisse $0 } >output3
+  for i in 1 2 3; do
+    f=${i}func
+    print Running $f
+    $f
+    cat output3
+    unfunction $f
+  done
+0:multiply named functions with redirection
+>Running 1func
+>Ich heisse 1func
+>Running 2func
+>Ich heisse 2func
+>Running 3func
+>Ich heisse 3func

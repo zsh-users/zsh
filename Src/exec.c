@@ -4306,6 +4306,7 @@ execfuncdef(Estate state, Eprog redir_prog)
     Shfunc shf;
     char *s = NULL;
     int signum, nprg, sbeg, nstrs, npats, len, plen, i, htok = 0, ret = 0;
+    int nfunc = 0;
     Wordcode beg = state->pc, end;
     Eprog prog;
     Patprog *pp;
@@ -4330,6 +4331,8 @@ execfuncdef(Estate state, Eprog redir_prog)
 	}
     }
 
+    DPUTS(!names && redir_prog,
+	  "Passing redirection to anon function definition.");
     while (!names || (s = (char *) ugetnode(names))) {
 	if (!names) {
 	    prog = (Eprog) zhalloc(sizeof(*prog));
@@ -4371,7 +4374,15 @@ execfuncdef(Estate state, Eprog redir_prog)
 	shf->node.flags = 0;
 	shf->filename = ztrdup(scriptfilename);
 	shf->lineno = lineno;
-	shf->redir = redir_prog;
+	/*
+	 * redir_prog is permanently allocated --- but if
+	 * this function has multiple names we need an additional
+	 * one.
+	 */
+	if (nfunc++ && redir_prog)
+	    shf->redir = dupeprog(redir_prog, 0);
+	else
+	    shf->redir = redir_prog;
 	shfunc_set_sticky(shf);
 
 	if (!names) {
@@ -4426,6 +4437,10 @@ execfuncdef(Estate state, Eprog redir_prog)
 	    }
 	    shfunctab->addnode(shfunctab, ztrdup(s), shf);
 	}
+    }
+    if (!nfunc && redir_prog) {
+	/* For completeness, shouldn't happen */
+	freeeprog(redir_prog);
     }
     state->pc = end;
     return ret;
