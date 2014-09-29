@@ -1,3 +1,8 @@
+2014-09-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 33276: Src/params.c, Src/zsh.h: safer import of numerical
+	variables from environment.
+
 2014-09-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33256: Src/prompt.c: fix prompttrunc() counting of %{ %} spans

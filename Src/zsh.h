@@ -1820,7 +1820,8 @@ struct paramdef {
  */
 enum {
     ASSPM_AUGMENT = 1 << 0,
-    ASSPM_WARN_CREATE = 1 << 1
+    ASSPM_WARN_CREATE = 1 << 1,
+    ASSPM_ENV_IMPORT = 1 << 2
 };
 
 /* node for named directory hash table (nameddirtab) */
