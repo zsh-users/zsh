@@ -1,3 +1,8 @@
+2014-09-28  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33268: Src/exec.c, Src/init.c, Src/signals.c: interactive shells
+	treat SIGPIPE like SIGHUP if and only if SHTTY is disconnected
+
 2014-09-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33256: Src/prompt.c: fix prompttrunc() counting of %{ %} spans

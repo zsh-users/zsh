@@ -594,6 +594,17 @@ zhandler(int sig)
 	wait_for_processes();
         break;
  
+    case SIGPIPE:
+	if (!handletrap(SIGPIPE)) {
+	    if (!interact)
+		_exit(SIGPIPE);
+	    else if (!isatty(SHTTY)) {
+		stopmsg = 1;
+		zexit(SIGPIPE, 1);
+	    }
+	}
+	break;
+
     case SIGHUP:
         if (!handletrap(SIGHUP)) {
             stopmsg = 1;
@@ -896,6 +907,8 @@ removetrap(int sig)
         intr();
 	noholdintr();
     } else if (sig == SIGHUP)
+        install_handler(sig);
+    else if (sig == SIGPIPE && interact && !forklevel)
         install_handler(sig);
     else if (sig && sig <= SIGCOUNT &&
 #ifdef SIGWINCH

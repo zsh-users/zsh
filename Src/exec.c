@@ -1005,6 +1005,8 @@ entersubsh(int flags)
 	signal_default(SIGTERM);
 	if (!(sigtrapped[SIGINT] & ZSIG_IGNORED))
 	    signal_default(SIGINT);
+	if (!(sigtrapped[SIGPIPE]))
+	    signal_default(SIGPIPE);
     }
     if (!(sigtrapped[SIGQUIT] & ZSIG_IGNORED))
 	signal_default(SIGQUIT);

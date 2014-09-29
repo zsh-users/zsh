@@ -1134,6 +1134,7 @@ init_signals(void)
     winch_block();	/* See utils.c:preprompt() */
 #endif
     if (interact) {
+	install_handler(SIGPIPE);
 	install_handler(SIGALRM);
 	signal_ignore(SIGTERM);
     }
