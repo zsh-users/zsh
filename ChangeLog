@@ -1,3 +1,8 @@
+2014-09-29  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 33277: Functions/VCS_Info/VCS_INFO_reposub: Fix
+	VCS_INFO_reposub's command expansion
+
 2014-09-29  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/19183: Src/hist.c: handle unlikely error case with

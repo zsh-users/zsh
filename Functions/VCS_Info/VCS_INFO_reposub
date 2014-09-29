@@ -3,11 +3,12 @@
 ## Distributed under the same BSD-ish license as zsh itself.
 
 setopt localoptions extendedglob NO_shwordsplit
-local base=${1%%/##}
+local base=${1%%/##} tmp
 
-[[ $(pwd -P) == ${base}/* ]] || {
+tmp="$(pwd -P)"
+[[ $tmp == ${base}/* ]] || {
     printf '.'
     return 1
 }
-printf '%s' ${$(pwd -P)#$base/}
+printf '%s' ${tmp#$base/}
 return 0
