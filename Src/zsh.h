@@ -1139,6 +1139,7 @@ struct shfunc {
     char *filename;             /* Name of file located in */
     zlong lineno;		/* line number in above file */
     Eprog funcdef;		/* function definition    */
+    Eprog redir;                /* redirections to apply */
     Emulation_options sticky;   /* sticky emulation definitions, if any */
 };
 

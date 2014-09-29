@@ -1,3 +1,9 @@
+2014-09-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 33285: NEWS, Src/exec.c, Src/hashtable.c, Src/parse.c,
+	Src/signals.c, Src/zsh.h, Test/A04redirect.ztst: redirections in
+	function definitions are applied at execution not definition.
+
 2014-09-29  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 33277: Functions/VCS_Info/VCS_INFO_reposub: Fix

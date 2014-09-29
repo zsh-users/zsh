@@ -198,7 +198,8 @@ static char *blank_env[] = { NULL };
 /* Execution functions. */
 
 static int (*execfuncs[WC_COUNT-WC_CURSH]) _((Estate, int)) = {
-    execcursh, exectime, execfuncdef, execfor, execselect,
+    execcursh, exectime, NULL /* execfuncdef handled specially */,
+    execfor, execselect,
     execwhile, execrepeat, execcase, execif, execcond,
     execarith, execautofn, exectry
 };
@@ -1116,8 +1117,11 @@ execsimple(Estate state)
 	    fflush(xtrerr);
 	}
 	lv = (errflag ? errflag : cmdoutval);
-    } else
+    } else if (code == WC_FUNCDEF) {
+	lv = execfuncdef(state, NULL);
+    } else {
 	lv = (execfuncs[code - WC_CURSH])(state, 0);
+    }
 
     thisjob = otj;
 
@@ -2790,6 +2794,42 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	return;
     }
 
+    if (type == WC_FUNCDEF) {
+	/*
+	 * The first word of a function definition is a list of
+	 * names.  If this is empty, we're doing an anonymous function:
+	 * in that case redirections are handled normally.
+	 * If not, it's a function definition: then we don't do
+	 * redirections here but pass in the list of redirections to
+	 * be stored for recall with the function.
+	 */
+	if (*state->pc != 0) {
+	    /* Nonymous, don't do redirections here */
+	    redir = NULL;
+	}
+    } else if (is_shfunc) {
+	Shfunc shf = (Shfunc)hn;
+	/*
+	 * A function definition may have a list of additional
+	 * redirections to apply, so retrieve it.
+	 */
+	if (shf->redir) {
+	    struct estate s;
+	    LinkList redir2;
+
+	    s.prog = shf->redir;
+	    s.pc = shf->redir->prog;
+	    s.strs = shf->redir->strs;
+	    redir2 = ecgetredirs(&s);
+	    if (!redir)
+		redir = redir2;
+	    else {
+		while (nonempty(redir2))
+		    addlinknode(redir, ugetnode(redir2));
+	    }
+	}
+    }
+
     if (type == WC_SIMPLE && !nullexec) {
 	char *s;
 	char trycd = (isset(AUTOCD) && isset(SHINSTDIN) &&
@@ -3238,7 +3278,33 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		flags |= ESUB_REVERTPGRP;
 	    entersubsh(flags);
 	}
-	if (type >= WC_CURSH) {
+	if (type == WC_FUNCDEF) {
+	    Eprog redir_prog;
+	    if (!redir && wc_code(*beg) == WC_REDIR)  {
+		/*
+		 * We're not using a redirection from the currently
+		 * parsed environment, which is what we'd do for an
+		 * anonymous function, but there are redirections we
+		 * should store with the new function.
+		 */
+		struct estate s;
+
+		s.prog = state->prog;
+		s.pc = beg;
+		s.strs = state->prog->strs;
+
+		/*
+		 * The copy uses the wordcode parsing area, so save and
+		 * restore state.
+		 */
+		lexsave();
+		redir_prog = eccopyredirs(&s);
+		lexrestore();
+	    } else
+		redir_prog = NULL;
+	    
+	    lastval = execfuncdef(state, redir_prog);
+	} else if (type >= WC_CURSH) {
 	    if (last1 == 1)
 		do_exec = 1;
 	    lastval = (execfuncs[type - WC_CURSH])(state, do_exec);
@@ -4235,7 +4301,7 @@ exectime(Estate state, UNUSED(int do_exec))
 
 /**/
 static int
-execfuncdef(Estate state, UNUSED(int do_exec))
+execfuncdef(Estate state, Eprog redir_prog)
 {
     Shfunc shf;
     char *s = NULL;
@@ -4305,6 +4371,7 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 	shf->node.flags = 0;
 	shf->filename = ztrdup(scriptfilename);
 	shf->lineno = lineno;
+	shf->redir = redir_prog;
 	shfunc_set_sticky(shf);
 
 	if (!names) {
@@ -4335,6 +4402,8 @@ execfuncdef(Estate state, UNUSED(int do_exec))
 	    ret = lastval;
 
 	    freeeprog(shf->funcdef);
+	    if (shf->redir) /* shouldn't be */
+		freeeprog(shf->redir);
 	    zsfree(shf->filename);
 	    zfree(shf, sizeof(*shf));
 	    break;

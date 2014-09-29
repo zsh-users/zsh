@@ -54,7 +54,7 @@
 0:Here-documents stripping tabs
 >barbar
 
-  cat <<-$'$HERE '`$(THERE) `'$((AND)) '"\EVERYWHERE"
+  cat <<-$'$HERE '`$(THERE) `'$((AND)) '"\EVERYWHERE" #
 # tabs again.  sorry about the max miller.
 	Here's a funny thing.  Here is a funny thing.
 	I went home last night.  There's a funny thing.
@@ -455,3 +455,39 @@
 
   [</dev/null ]
 1:check behaviour with square brackets
+
+  print any old rubbish >input1
+  () {
+    local var
+    read var
+    print I just read $var
+  } <input1 >output1
+  print Nothing output yet
+  cat output1
+0:anonymous function redirections are applied immediately
+>Nothing output yet
+>I just read any old rubbish
+
+  redirfn() {
+    local var
+    read var
+    print I want to tell you about $var
+    print Also, this might be an error >&2
+  } <input2 >output2 2>&1
+  print something I heard on the radio >input2
+  redirfn
+  print No output until after this
+  cat output2
+0:redirections with normal function definition
+>No output until after this
+>I want to tell you about something I heard on the radio
+>Also, this might be an error
+
+  which redirfn
+0:text output of function with redirections
+>redirfn () {
+>	local var
+>	read var
+>	print I want to tell you about $var
+>	print Also, this might be an error >&2
+>} < input2 > output2 2>&1
