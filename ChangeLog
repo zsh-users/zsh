@@ -1,5 +1,9 @@
 2014-09-30  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 33294: Src/Modules/parameter.c, Test/A04redirect.ztst:
+	functions[func] value for functions with redirections and
+	extra tests.
+
 	* 33293: Src/Zle/compctl.c, Src/Zle/zle_refresh.c: fix warnings
 	from swish new compilers with a contemporary outlook.
 

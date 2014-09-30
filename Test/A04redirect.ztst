@@ -507,3 +507,27 @@
 >Ich heisse 2func
 >Running 3func
 >Ich heisse 3func
+
+  redirfn2() { print The latest output; } >&3
+  redirfn2 3>output4
+  print No output yet
+  cat output4
+0:Redirections in both function definition and command line
+>No output yet
+>The latest output
+
+# This relies on the fact that the test harness always loads
+# the zsh/parameter module.
+  print $functions[redirfn]
+0:Output from $functions[] for definition with redirection
+>{
+>	local var
+>	read var
+>	print I want to tell you about $var
+>	print Also, this might be an error >&2
+>} < input2 > output2 2>&1
+
+  noredirfn() { print This rather boring function has no redirection.; }
+  print $functions[noredirfn]
+0:Output from $functions[] for definition with no redirection
+>	print This rather boring function has no redirection.

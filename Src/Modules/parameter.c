@@ -392,19 +392,35 @@ getfunction(UNUSED(HashTable ht), const char *name, int dis)
 				((shf->node.flags & PM_TAGGED) ? "t" : "")));
 	} else {
 	    char *t = getpermtext(shf->funcdef, NULL, 1), *n, *h;
+	    char *start;
+
+	    if (shf->redir)
+		start = "{\n\t";
+	    else
+		start = "\t";
 
 	    if (shf->funcdef->flags & EF_RUN) {
 		n = nicedupstring(name);
-		h = (char *) zhalloc(strlen(t) + strlen(n) + 9);
-		h[0] = '\t';
-		strcpy(h + 1, t);
+		h = (char *) zhalloc(strlen(start) + strlen(t) + strlen(n) + 8);
+		strcpy(h, start);
+		strcat(h, t);
 		strcat(h, "\n\t");
 		strcat(h, n);
 		strcat(h, " \"$@\"");
 	    } else
-		h = dyncat("\t", t);
+		h = dyncat(start, t);
 	    zsfree(t);
+	    /*
+	     * TBD: Is this unmetafy correct?  Surely as this
+	     * is a parameter value it stays metafied?
+	     */
 	    unmetafy(h, NULL);
+
+	    if (shf->redir) {
+		t = getpermtext(shf->redir, NULL, 1);
+		h = zhtricat(h, "\n}", t);
+		zsfree(t);
+	    }
 
 	    pm->u.str = h;
 	}
@@ -456,21 +472,38 @@ scanfunctions(UNUSED(HashTable ht), ScanFunc func, int flags, int dis)
 				    ((shf->node.flags & PM_TAGGED) ? "Ut" : "U") :
 				    ((shf->node.flags & PM_TAGGED) ? "t" : "")));
 		    } else {
-			char *t = getpermtext(((Shfunc) hn)->funcdef, NULL, 1);
-			char *n;
+			Shfunc shf = (Shfunc)hn;
+			char *t = getpermtext(shf->funcdef, NULL, 1);
+			char *n, *start;
 
-			if (((Shfunc) hn)->funcdef->flags & EF_RUN) {
+			if (shf->redir)
+			    start = "{\n\t";
+			else
+			    start = "\t";
+
+			if (shf->funcdef->flags & EF_RUN) {
 			    n = nicedupstring(hn->nam);
-			    pm.u.str = (char *) zhalloc(strlen(t) + strlen(n) + 9);
-			    pm.u.str[0] = '\t';
-			    strcpy(pm.u.str + 1, t);
+			    pm.u.str = (char *) zhalloc(
+				strlen(start) + strlen(t) + strlen(n) + 8);
+			    strcpy(pm.u.str, start);
+			    strcat(pm.u.str, t);
 			    strcat(pm.u.str, "\n\t");
 			    strcat(pm.u.str, n);
 			    strcat(pm.u.str, " \"$@\"");
 			} else
-			    pm.u.str = dyncat("\t", t);
+			    pm.u.str = dyncat(start, t);
+			/*
+			 * TBD: Is this unmetafy correct?  Surely as this
+			 * is a parameter value it stays metafied?
+			 */
 			unmetafy(pm.u.str, NULL);
 			zsfree(t);
+
+			if (shf->redir) {
+			    t = getpermtext(shf->redir, NULL, 1);
+			    pm.u.str = zhtricat(pm.u.str, "\n}", t);
+			    zsfree(t);
+			}
 		    }
 		}
 		func(&pm.node, flags);
