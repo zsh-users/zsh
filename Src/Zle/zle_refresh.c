@@ -258,7 +258,6 @@ static const REFRESH_ELEMENT zr_cr = { ZWC('\r'), 0 };
 static const REFRESH_ELEMENT zr_dt = { ZWC('.'), 0 };
 static const REFRESH_ELEMENT zr_nl = { ZWC('\n'), 0 };
 static const REFRESH_ELEMENT zr_sp = { ZWC(' '), 0 };
-static const REFRESH_ELEMENT zr_ht = { ZWC('\t'), 0 };
 static const REFRESH_ELEMENT zr_zr = { ZWC('\0'), 0 };
 
 /*
@@ -429,7 +428,7 @@ get_region_highlight(UNUSED(Param pm))
 		digbuf1, digbuf2);
 	(void)output_highlight(rhp->atr, *arrp + strlen(*arrp));
     }
-    *arrp = '\0';
+    *arrp = NULL;
     return retarr;
 }
 

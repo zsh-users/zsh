@@ -1,3 +1,8 @@
+2014-09-30  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 33293: Src/Zle/compctl.c, Src/Zle/zle_refresh.c: fix warnings
+	from swish new compilers with a contemporary outlook.
+
 2014-09-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 33286: Src/exec.c, Test/A04redirect.ztst: handle redirections

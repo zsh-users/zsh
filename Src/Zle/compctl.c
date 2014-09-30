@@ -3416,7 +3416,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 			    *npp++ = tp;
 			    pp++;
 			}
-			*npp = '\0';
+			*npp = NULL;
 		    }
 		}
 		if (!dirs) {
