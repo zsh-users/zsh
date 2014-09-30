@@ -46,7 +46,7 @@
  
 /**/
 mod_export int locallevel;
- 
+
 /* Variables holding values of special parameters */
  
 /**/
@@ -325,9 +325,12 @@ IPDEF4("ZSH_SUBSHELL", &zsh_subshell),
 IPDEF5("COLUMNS", &zterm_columns, zlevar_gsu),
 IPDEF5("LINES", &zterm_lines, zlevar_gsu),
 IPDEF5U("ZLE_RPROMPT_INDENT", &rprompt_indent, zlevar_gsu),
-IPDEF5("OPTIND", &zoptind, varinteger_gsu),
 IPDEF5("SHLVL", &shlvl, varinteger_gsu),
-IPDEF5("TRY_BLOCK_ERROR", &try_errflag, varinteger_gsu),
+
+/* Don't import internal integer status variables. */
+#define IPDEF6(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
+IPDEF6("OPTIND", &zoptind, varinteger_gsu),
+IPDEF6("TRY_BLOCK_ERROR", &try_errflag, varinteger_gsu),
 
 #define IPDEF7(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
 #define IPDEF7U(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
@@ -742,7 +745,8 @@ createparamtable(void)
 	    if (!idigit(*iname) && isident(iname) && !strchr(iname, '[')) {
 		if ((!(pm = (Param) paramtab->getnode(paramtab, iname)) ||
 		     !(pm->node.flags & PM_DONTIMPORT || pm->node.flags & PM_EXPORTED)) &&
-		    (pm = setsparam(iname, metafy(ivalue, -1, META_DUP)))) {
+		    (pm = assignsparam(iname, metafy(ivalue, -1, META_DUP),
+				       ASSPM_ENV_IMPORT))) {
 		    pm->node.flags |= PM_EXPORTED;
 		    if (pm->node.flags & PM_SPECIAL)
 			pm->env = mkenvstr (pm->node.nam,
@@ -2271,6 +2275,13 @@ export_param(Param pm)
 mod_export void
 setstrvalue(Value v, char *val)
 {
+    assignstrvalue(v, val, 0);
+}
+
+/**/
+mod_export void
+assignstrvalue(Value v, char *val, int flags)
+{
     if (unset(EXECOPT))
 	return;
     if (v->pm->node.flags & PM_READONLY) {
@@ -2347,7 +2358,13 @@ setstrvalue(Value v, char *val)
 	break;
     case PM_INTEGER:
 	if (val) {
-	    v->pm->gsu.i->setfn(v->pm, mathevali(val));
+	    zlong ival;
+	    if (flags & ASSPM_ENV_IMPORT) {
+		char *ptr;
+		ival = zstrtol_underscore(val, &ptr, 0, 1);
+	    } else
+		ival = mathevali(val);
+	    v->pm->gsu.i->setfn(v->pm, ival);
 	    if ((v->pm->node.flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) &&
 		!v->pm->width)
 		v->pm->width = strlen(val);
@@ -2359,7 +2376,13 @@ setstrvalue(Value v, char *val)
     case PM_EFLOAT:
     case PM_FFLOAT:
 	if (val) {
-	    mnumber mn = matheval(val);
+	    mnumber mn;
+	    if (flags & ASSPM_ENV_IMPORT) {
+		char *ptr;
+		mn.type = MN_FLOAT;
+		mn.u.d = strtod(val, &ptr);
+	    } else
+		mn = matheval(val);
 	    v->pm->gsu.f->setfn(v->pm, (mn.type & MN_FLOAT) ? mn.u.d :
 			       (double)mn.u.l);
 	    if ((v->pm->node.flags & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) &&
@@ -2742,8 +2765,8 @@ assignsparam(char *s, char *val, int flags)
 	    }
 	}
     }
-    
-    setstrvalue(v, val);
+
+    assignstrvalue(v, val, flags);
     unqueue_signals();
     return v->pm;
 }

@@ -107,6 +107,13 @@ Changes since 5.0.0
   Also, the value of $pipestatus is now updated when a job stops, not just
   when it exits.
 
+- Redirections applied to function definitions take effect when the
+  function is executed, not when it is defined.  Other shells already
+  work this way.  For example,
+    fn() { echo hello } >~/logfile
+  Running fn writes "hello" to logfile.  In older versions of the shell
+  it would create an empty file at the point of definition.
+
 Changes between 4.2 and 5.0.0
 -----------------------------
 

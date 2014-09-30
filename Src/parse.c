@@ -375,6 +375,8 @@ init_parse(void)
 
 /* Build eprog. */
 
+/* careful: copy_ecstr is from arg1 to arg2, unlike memcpy */
+
 static void
 copy_ecstr(Eccstr s, char *p)
 {
@@ -386,24 +388,25 @@ copy_ecstr(Eccstr s, char *p)
 }
 
 static Eprog
-bld_eprog(void)
+bld_eprog(int heap)
 {
     Eprog ret;
     int l;
 
     ecadd(WCB_END());
 
-    ret = (Eprog) zhalloc(sizeof(*ret));
+    ret = heap ? (Eprog) zhalloc(sizeof(*ret)) : (Eprog) zalloc(sizeof(*ret));
     ret->len = ((ecnpats * sizeof(Patprog)) +
 		(ecused * sizeof(wordcode)) +
 		ecsoffs);
     ret->npats = ecnpats;
-    ret->nref = -1;		/* Eprog is on the heap */
-    ret->pats = (Patprog *) zhalloc(ret->len);
+    ret->nref = heap ? -1 : 1;
+    ret->pats = heap ? (Patprog *) zhalloc(ret->len) :
+	(Patprog *) zshcalloc(ret->len);
     ret->prog = (Wordcode) (ret->pats + ecnpats);
     ret->strs = (char *) (ret->prog + ecused);
     ret->shf = NULL;
-    ret->flags = EF_HEAP;
+    ret->flags = heap ? EF_HEAP : EF_REAL;
     ret->dump = NULL;
     for (l = 0; l < ecnpats; l++)
 	ret->pats[l] = dummy_patprog1;
@@ -455,7 +458,7 @@ parse_event(void)
         clear_hdocs();
         return NULL;
     }
-    return bld_eprog();
+    return bld_eprog(1);
 }
 
 /**/
@@ -534,7 +537,7 @@ parse_list(void)
 	yyerror(0);
 	return NULL;
     }
-    return bld_eprog();
+    return bld_eprog(1);
 }
 
 /*
@@ -553,7 +556,7 @@ parse_cond(void)
         clear_hdocs();
 	return NULL;
     }
-    return bld_eprog();
+    return bld_eprog(1);
 }
 
 /* This adds a list wordcode. The important bit about this is that it also
@@ -2554,6 +2557,73 @@ ecgetredirs(Estate s)
     return ret;
 }
 
+/*
+ * Copy the consecutive set of redirections in the state at s.
+ * Return NULL if none, else an Eprog consisting only of the
+ * redirections from permanently allocated memory.
+ *
+ * s is left in the state ready for whatever follows the redirections.
+ */
+
+/**/
+Eprog
+eccopyredirs(Estate s)
+{
+    Wordcode pc = s->pc;
+    wordcode code = *pc;
+    int ncode, ncodes = 0, r, type;
+
+    if (wc_code(code) != WC_REDIR)
+	return NULL;
+
+    init_parse();
+
+    while (wc_code(code) == WC_REDIR) {
+	type = WC_REDIR_TYPE(code);
+
+	DPUTS(type == REDIR_HEREDOC || type == REDIR_HEREDOCDASH,
+	      "unexpanded here document");
+
+	if (WC_REDIR_FROM_HEREDOC(code))
+	    ncode = 5;
+	else
+	    ncode = 3;
+	if (WC_REDIR_VARID(code))
+	    ncode++;
+	pc += ncode;
+	ncodes += ncode;
+	code = *pc;
+    }
+    r = ecused;
+    ecispace(r, ncodes);
+
+    code = *s->pc;
+    while (wc_code(code) == WC_REDIR) {
+	s->pc++;
+
+	ecbuf[r++] = code;
+	/* fd1 */
+	ecbuf[r++] = *s->pc++;
+	/* name or HERE string */
+	/* No DUP needed as we'll copy into Eprog immediately below */
+	ecbuf[r++] = ecstrcode(ecgetstr(s, EC_NODUP, NULL));
+	if (WC_REDIR_FROM_HEREDOC(code))
+	{
+	    /* terminator, raw */
+	    ecbuf[r++] = ecstrcode(ecgetstr(s, EC_NODUP, NULL));
+	    /* terminator, munged */
+	    ecbuf[r++] = ecstrcode(ecgetstr(s, EC_NODUP, NULL));
+	}
+	if (WC_REDIR_VARID(code))
+	    ecbuf[r++] = ecstrcode(ecgetstr(s, EC_NODUP, NULL));
+
+	code = *s->pc;
+    }
+
+    /* bld_eprog() appends a useful WC_END marker */
+    return bld_eprog(0);
+}
+
 /**/
 mod_export struct eprog dummy_eprog;
 
@@ -3546,4 +3616,3 @@ dump_autoload(char *nam, char *file, int on, Options ops, int func)
     }
     return ret;
 }
-

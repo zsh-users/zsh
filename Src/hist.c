@@ -2593,7 +2593,12 @@ savehistfile(char *fn, int err, int writeflags)
 		out = NULL;
 	    } else {
 		int fd = open(tmpfile, O_CREAT | O_WRONLY | O_EXCL, 0600);
-		out = fd >= 0 ? fdopen(fd, "w") : NULL;
+		if (fd >=0) {
+		    out = fdopen(fd, "w");
+		    if (!out)
+			close(fd);
+		} else
+		    out = NULL;
 	    }
 
 #ifdef HAVE_FCHMOD

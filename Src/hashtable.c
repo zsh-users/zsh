@@ -887,6 +887,8 @@ freeshfuncnode(HashNode hn)
     zsfree(shf->node.nam);
     if (shf->funcdef)
 	freeeprog(shf->funcdef);
+    if (shf->redir)
+	freeeprog(shf->redir);
     zsfree(shf->filename);
     if (shf->sticky) {
 	if (shf->sticky->n_on_opts)
@@ -954,10 +956,19 @@ printshfuncnode(HashNode hn, int printflags)
 		printf(" \"$@\"");
 	    }
 	}   
-	printf("\n}\n");
+	printf("\n}");
     } else {
-	printf(" () { }\n");
+	printf(" () { }");
     }
+    if (f->redir) {
+	t = getpermtext(f->redir, NULL, 1);
+	if (t) {
+	    zputs(t, stdout);
+	    zsfree(t);
+	}
+    }
+
+    putchar('\n');
 }
 
 /**************************************/

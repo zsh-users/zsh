@@ -1,3 +1,25 @@
+2014-09-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 33286: Src/exec.c, Test/A04redirect.ztst: handle redirections
+	for multiple named functions.
+
+	* 33285: NEWS, Src/exec.c, Src/hashtable.c, Src/parse.c,
+	Src/signals.c, Src/zsh.h, Test/A04redirect.ztst: redirections in
+	function definitions are applied at execution not definition.
+
+2014-09-29  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 33277: Functions/VCS_Info/VCS_INFO_reposub: Fix
+	VCS_INFO_reposub's command expansion
+
+2014-09-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/19183: Src/hist.c: handle unlikely error case with
+	fdopen() better.
+
+	* 33276: Src/params.c, Src/zsh.h: safer import of numerical
+	variables from environment.
+
 2014-09-28  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33268: Src/exec.c, Src/init.c, Src/signals.c: interactive shells
