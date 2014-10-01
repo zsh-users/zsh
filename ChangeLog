@@ -1,3 +1,8 @@
+2014-10-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 33312: Doc/Zsh/builtins.yo, Doc/Zsh/grammar.yo: document
+	redirections applied to function definitions.
+
 2014-09-30  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33298: Src/lex.c: make lexrestore() more signal-safe

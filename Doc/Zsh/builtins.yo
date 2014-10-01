@@ -2174,6 +2174,20 @@ match one of these patterns will be written. If no var(name) is given,
 the definitions of all functions currently defined or marked as
 autoloaded will be written.
 
+Note the second form cannot be used for compiling functions that
+include redirections as part of the definition rather than within
+the body of the function; for example
+
+example(fn1() { { ... } >~/logfile })
+
+can be compiled but
+
+example(fn1() { ... } >~/logfile)
+
+cannot.  It is possible to use the first form of tt(zcompile) to compile
+autoloadable functions that include the full function definition instead
+of just the body of the function.
+
 The third form, with the tt(-t) option, examines an existing
 compiled file.  Without further arguments, the names of the original
 files compiled into it are listed.  The first line of output shows

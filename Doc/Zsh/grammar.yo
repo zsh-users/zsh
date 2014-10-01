@@ -352,6 +352,15 @@ If the option tt(SH_GLOB) is set for compatibility with other shells, then
 whitespace may appear between between the left and right parentheses when
 there is a single var(word);  otherwise, the parentheses will be treated as
 forming a globbing pattern in that case.
+
+In any of the forms above, a redirection may appear outside the
+function body, for example
+
+example(func() { ... } 2>&1)
+
+The redirection is stored with the function and applied whenever the
+function is executed.  Any variables in the redirection are expanded
+at the point the function is executed, but outside the function scope.
 )
 cindex(timing)
 findex(time)
