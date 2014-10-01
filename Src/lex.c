@@ -325,66 +325,70 @@ lexsave(void)
 mod_export void
 lexrestore(void)
 {
-    struct lexstack *ln;
+    struct lexstack *ln = lstack;
 
     DPUTS(!lstack, "BUG: lexrestore() without lexsave()");
-    incmdpos = lstack->incmdpos;
-    incond = lstack->incond;
-    incasepat = lstack->incasepat;
-    dbparens = lstack->dbparens;
-    isfirstln = lstack->isfirstln;
-    isfirstch = lstack->isfirstch;
-    histactive = lstack->histactive;
-    histdone = lstack->histdone;
-    lexflags = lstack->lexflags;
-    stophist = lstack->stophist;
-    chline = lstack->hline;
-    hptr = lstack->hptr;
-    if (cmdstack)
-	free(cmdstack);
-    cmdstack = lstack->cstack;
-    cmdsp = lstack->csp;
-    tok = lstack->tok;
-    isnewlin = lstack->isnewlin;
-    tokstr = lstack->tokstr;
-    zshlextext = lstack->zshlextext;
-    bptr = lstack->bptr;
-    bsiz = lstack->bsiz;
-    len = lstack->len;
-    chwords = lstack->chwords;
-    chwordlen = lstack->chwordlen;
-    chwordpos = lstack->chwordpos;
-    hwgetword = lstack->hwgetword;
-    lexstop = lstack->lexstop;
-    hdocs = lstack->hdocs;
-    hgetc = lstack->hgetc;
-    hungetc = lstack->hungetc;
-    hwaddc = lstack->hwaddc;
-    hwbegin = lstack->hwbegin;
-    hwend = lstack->hwend;
-    addtoline = lstack->addtoline;
-    if (ecbuf)
-	zfree(ecbuf, eclen);
-    eclen = lstack->eclen;
-    ecused = lstack->ecused;
-    ecnpats = lstack->ecnpats;
-    ecbuf = lstack->ecbuf;
-    ecstrs = lstack->ecstrs;
-    ecsoffs = lstack->ecsoffs;
-    ecssub = lstack->ecssub;
-    ecnfunc = lstack->ecnfunc;
-    hlinesz = lstack->hlinesz;
-    toklineno = lstack->toklineno;
-    errflag = 0;
 
-    ln = lstack->next;
-    if (!ln) {
+    queue_signals();
+    lstack = lstack->next;
+
+    if (!lstack) {
 	/* Back to top level: don't need special ZLE value */
-	DPUTS(chline != zle_chline, "BUG: Ouch, wrong chline for ZLE");
+	DPUTS(ln->hline != zle_chline, "BUG: Ouch, wrong chline for ZLE");
 	zle_chline = NULL;
     }
-    free(lstack);
-    lstack = ln;
+
+    incmdpos = ln->incmdpos;
+    incond = ln->incond;
+    incasepat = ln->incasepat;
+    dbparens = ln->dbparens;
+    isfirstln = ln->isfirstln;
+    isfirstch = ln->isfirstch;
+    histactive = ln->histactive;
+    histdone = ln->histdone;
+    lexflags = ln->lexflags;
+    stophist = ln->stophist;
+    chline = ln->hline;
+    hptr = ln->hptr;
+    if (cmdstack)
+	zfree(cmdstack, CMDSTACKSZ);
+    cmdstack = ln->cstack;
+    cmdsp = ln->csp;
+    tok = ln->tok;
+    isnewlin = ln->isnewlin;
+    tokstr = ln->tokstr;
+    zshlextext = ln->zshlextext;
+    bptr = ln->bptr;
+    bsiz = ln->bsiz;
+    len = ln->len;
+    chwords = ln->chwords;
+    chwordlen = ln->chwordlen;
+    chwordpos = ln->chwordpos;
+    hwgetword = ln->hwgetword;
+    lexstop = ln->lexstop;
+    hdocs = ln->hdocs;
+    hgetc = ln->hgetc;
+    hungetc = ln->hungetc;
+    hwaddc = ln->hwaddc;
+    hwbegin = ln->hwbegin;
+    hwend = ln->hwend;
+    addtoline = ln->addtoline;
+    if (ecbuf)
+	zfree(ecbuf, eclen);
+    eclen = ln->eclen;
+    ecused = ln->ecused;
+    ecnpats = ln->ecnpats;
+    ecbuf = ln->ecbuf;
+    ecstrs = ln->ecstrs;
+    ecsoffs = ln->ecsoffs;
+    ecssub = ln->ecssub;
+    ecnfunc = ln->ecnfunc;
+    hlinesz = ln->hlinesz;
+    toklineno = ln->toklineno;
+    errflag = 0;
+    free(ln);
+
+    unqueue_signals();
 }
 
 /**/
