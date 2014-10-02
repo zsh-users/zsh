@@ -1,5 +1,7 @@
 2014-10-02  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: remove "major".
+
 	* 33330: README, Etc/FAQ.yo: information for forthcoming 5.0.7
 	release.
 
