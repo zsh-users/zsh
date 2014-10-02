@@ -702,6 +702,7 @@ callcompfunc(char *s, char *fn)
 	}
 	zsfree(compprefix);
 	zsfree(compsuffix);
+	makebangspecial(0);
 	if (unset(COMPLETEINWORD)) {
 	    tmp = (linwhat == IN_MATH ? dupstring(s) : multiquote(s, 0));
 	    untokenize(tmp);
@@ -722,6 +723,7 @@ callcompfunc(char *s, char *fn)
 	    untokenize(ss);
 	    compsuffix = ztrdup(ss);
 	}
+	makebangspecial(1);
         zsfree(complastprefix);
         zsfree(complastsuffix);
         complastprefix = ztrdup(compprefix);

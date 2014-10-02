@@ -3424,12 +3424,12 @@ equalsplit(char *s, char **t)
     return 0;
 }
 
-static int specialcomma;
 
 /* the ztypes table */
 
 /**/
 mod_export short int typtab[256];
+static int typtab_flags = 0;
 
 /* initialize the ztypes table */
 
@@ -3440,8 +3440,15 @@ inittyptab(void)
     int t0;
     char *s;
 
-    for (t0 = 0; t0 != 256; t0++)
-	typtab[t0] = 0;
+    if (!(typtab_flags & ZTF_INIT)) {
+	typtab_flags = ZTF_INIT;
+	if (interact && isset(SHINSTDIN))
+	    typtab_flags |= ZTF_INTERACT;
+    }
+
+    queue_signals();
+
+    memset(typtab, 0, sizeof(typtab));
     for (t0 = 0; t0 != 32; t0++)
 	typtab[t0] = typtab[t0 + 128] = ICNTRL;
     typtab[127] = ICNTRL;
@@ -3514,20 +3521,43 @@ inittyptab(void)
 #endif
     for (s = SPECCHARS; *s; s++)
 	typtab[STOUC(*s)] |= ISPECIAL;
-    if (specialcomma)
+    if (typtab_flags & ZTF_SP_COMMA)
 	typtab[STOUC(',')] |= ISPECIAL;
-    if (isset(BANGHIST) && bangchar && interact && isset(SHINSTDIN))
+    if (isset(BANGHIST) && bangchar && (typtab_flags & ZTF_INTERACT)) {
+	typtab_flags |= ZTF_BANGCHAR;
 	typtab[bangchar] |= ISPECIAL;
+    } else
+	typtab_flags &= ~ZTF_BANGCHAR;
+
+    unqueue_signals();
 }
 
 /**/
 mod_export void
 makecommaspecial(int yesno)
 {
-    if ((specialcomma = yesno) != 0)
+    if (yesno != 0) {
+	typtab_flags |= ZTF_SP_COMMA;
 	typtab[STOUC(',')] |= ISPECIAL;
-    else
+    } else {
+	typtab_flags &= ~ZTF_SP_COMMA;
 	typtab[STOUC(',')] &= ~ISPECIAL;
+    }
+}
+
+/**/
+mod_export void
+makebangspecial(int yesno)
+{
+    /* Name and call signature for congruence with makecommaspecial(),
+     * but in this case when yesno is nonzero we defer to the state
+     * saved by inittyptab().
+     */ 
+    if (yesno == 0) {
+	typtab[bangchar] &= ~ISPECIAL;
+    } else if (typtab_flags & ZTF_BANGCHAR) {
+	typtab[bangchar] |= ISPECIAL;
+    }
 }
 
 

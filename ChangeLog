@@ -1,3 +1,11 @@
+2014-10-02  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33320 (cf. PWS 33311): Completion/Base/Completer/_expand_alias,
+	Src/Zle/compcore.c, Src/utils.c, Src/ztype.h: revert 33069; add
+	typtab_flags bits (replaces specialcomma boolean) to record any
+	unusual handling of typtab entries; signal safety; make bangchar
+	non-special during completion lexing of the command line.
+
 2014-10-02  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 33325: Src/exec.c, Test/A05execution.ztst: fix ksh autoloads

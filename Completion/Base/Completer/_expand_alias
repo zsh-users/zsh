@@ -25,8 +25,6 @@ else
   pre=(_main_complete - aliases)
 fi
 
-[[ "$compstate[quoting]" = (single|double) ]] || word="${(Q)word}"
-
 zstyle -s ":completion:${curcontext}:" regular tmp || tmp=yes
 case $tmp in
 always) sel=r;;

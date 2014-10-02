@@ -59,6 +59,15 @@
 #define iwsep(X) zistype(X,IWSEP)
 #define inull(X) zistype(X,INULL)
 
+/*
+ * Bit flags for typtab_flags --- preserved after
+ * shell initialisation.
+ */
+#define ZTF_INIT     (0x0001) /* One-off initialisation done */
+#define ZTF_INTERACT (0x0002) /* Shell interative and reading from stdin */
+#define ZTF_SP_COMMA (0x0004) /* Treat comma as a special characters */
+#define ZTF_BANGCHAR (0x0008) /* Treat bangchar as a special character */
+
 #ifdef MULTIBYTE_SUPPORT
 #define WC_ZISTYPE(X,Y) wcsitype((X),(Y))
 #define WC_ISPRINT(X)	iswprint(X)
