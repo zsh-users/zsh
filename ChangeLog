@@ -1,3 +1,7 @@
+2014-10-02  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 33332: Test/C01arith.ztst: test numeric import fix in 33276.
+
 2014-10-02  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33320 (cf. PWS 33311): Completion/Base/Completer/_expand_alias,

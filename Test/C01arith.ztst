@@ -282,3 +282,7 @@
   print $(( [#_] (5. ** 10) / 16. ))
 0:Grouping output with underscores: floating point
 >610_351.562_5
+
+  env SHLVL=1+RANDOM $ZTST_testdir/../Src/zsh -f -c 'print $SHLVL'
+0:Imported integer functions are not evaluated
+>2
