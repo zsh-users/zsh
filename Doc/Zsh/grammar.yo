@@ -356,7 +356,7 @@ forming a globbing pattern in that case.
 In any of the forms above, a redirection may appear outside the
 function body, for example
 
-example(func() { ... } 2>&1)
+example(func+LPAR()RPAR() { ... } 2>&1)
 
 The redirection is stored with the function and applied whenever the
 function is executed.  Any variables in the redirection are expanded
