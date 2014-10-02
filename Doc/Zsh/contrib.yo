@@ -1156,8 +1156,8 @@ item(tt(vcs_info_hookdel))(
 Remove hook-functions from a given hook. The hook needs to be given as the
 first non-option argument; what follows is a list of hook-function
 names to un-register from the hook. If `tt(-a)' is used as the first
-argument, tt(all) occurances of the functions are unregistered. Otherwise
-only the last occurance is removed (if a function was registered to a hook
+argument, tt(all) occurrences of the functions are unregistered. Otherwise
+only the last occurrence is removed (if a function was registered to a hook
 more than once) . The `tt(+vi-)' prefix needs to be left out here. See
 bf(Hooks in vcs_info) below for details.
 )
@@ -1292,7 +1292,7 @@ tt(vcs_info) collected from `hg'.
 
 When setting tt(ret) to non-zero, the string in
 tt(${hook_com[hg-bookmark-string]}) will be used in the tt(%m) escape in
-tt(formats) and tt(actionformats) and will be availabe in the global
+tt(formats) and tt(actionformats) and will be available in the global
 tt(backend_misc) array as tt(${backend_misc[bookmarks]}).
 )
 item(tt(gen-applied-string))(
@@ -2965,7 +2965,7 @@ types even if they are executable.  As this example shows, the complete
 file name is matched against the pattern, regardless of how the file
 was passed to the handler.  The file is resolved to a full path using
 the tt(:A) modifier described in
-ifzman(the subsection Modifers in zmanref(zshexpn))\
+ifzman(the subsection Modifiers in zmanref(zshexpn))\
 ifnzman(noderef(Modifiers));
 this means that symbolic links are resolved where possible, so that
 links into other file systems behave in the correct fashion.

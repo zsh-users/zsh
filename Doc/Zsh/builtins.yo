@@ -603,7 +603,7 @@ tt(enable -p) reenables patterns disabled with tt(disable -p).  Note
 that it does not override globbing options; for example, `tt(enable -p
 "~")' does not cause the pattern character tt(~) to be active unless
 the tt(EXTENDED_GLOB) option is also set.  To enable all possible
-patterns (so that they may be invidually disabled with tt(disable -p)),
+patterns (so that they may be individually disabled with tt(disable -p)),
 use `tt(setopt EXTENDED_GLOB KSH_GLOB NO_SH_GLOB)'.
 )
 findex(eval)

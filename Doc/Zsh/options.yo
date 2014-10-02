@@ -1780,7 +1780,7 @@ cindex(tracing, of commands)
 cindex(commands, tracing)
 item(tt(XTRACE) (tt(-x), ksh: tt(-x)))(
 Print commands and their arguments as they are executed.  The
-output is proceded by the value of tt($PS4), formatted as described
+output is preceded by the value of tt($PS4), formatted as described
 in
 ifzman(the section EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
 ifnzman(noderef(Prompt Expansion)).
@@ -2079,7 +2079,7 @@ variables, or in arguments to external programs.
 
 When this option is set, the tt($')var(...)tt(') expression is truncated at
 the null character.  Note that remaining parts of the same string
-beyond the termination of the quotes are not trunctated.
+beyond the termination of the quotes are not truncated.
 
 For example, the command line argument tt(a$'b\0c'd) is treated with
 the option off as the characters tt(a), tt(b), null, tt(c), tt(d),

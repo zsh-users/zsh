@@ -1042,7 +1042,7 @@ backquotes only.  Should the chosen character be one of singlequote,
 doublequote or backquote, there must also be an odd number of them
 on the command line for the last one to be removed.
 
-For backward compabitility, if the tt(SUNKEYBOARDHACK) option is
+For backward compatibility, if the tt(SUNKEYBOARDHACK) option is
 explicitly set, the value of tt(KEYBOARD_HACK) reverts to backquote.
 If the option is explicitly unset, this variable is set to empty.
 )

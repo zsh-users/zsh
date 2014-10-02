@@ -316,7 +316,7 @@ the rightmost `tt(?)' in a context scan can similarly be omitted.  Note
 the same record of the last var(l) and var(r) is maintained across all
 forms of expansion.
 
-Note that if a `tt(&)' is used within glob qualifers an extra backslash
+Note that if a `tt(&)' is used within glob qualifiers an extra backslash
 is needed as a tt(&) is a special character in this case.
 
 If the option tt(HIST_SUBST_PATTERN) is set, var(l) is treated as
@@ -475,7 +475,7 @@ spawned from the parent shell which will wait for their completion.
 Another problem arises any time a job with a substitution that requires
 a temporary file is disowned by the shell, including the case where
 `tt(&!)' or `tt(&|)' appears at the end of a command containing a
-subsitution.  In that case the temporary file will not be cleaned up as
+substitution.  In that case the temporary file will not be cleaned up as
 the shell no longer has any memory of the job.  A workaround is to use
 a subshell, for example,
 
@@ -632,7 +632,7 @@ quoted, the elements of var(arrayname) are instead tested against the
 entire expression.
 )
 item(tt(${)var(name)tt(:*)var(arrayname)tt(}))(
-Similar to the preceding subsitution, but in the opposite sense,
+Similar to the preceding substitution, but in the opposite sense,
 so that entries present in both the original substitution and as
 elements of var(arrayname) are retained and others removed.
 )
@@ -701,7 +701,7 @@ print ${foo:$(( 1 + 2))}
 print ${foo:$(echo 1 + 2)})
 
 all have the same effect, extracting the string starting at the fourth
-character of tt($foo) if the substution would otherwise return a scalar,
+character of tt($foo) if the substitution would otherwise return a scalar,
 or the array starting at the fourth element if tt($foo) would return an
 array.  Note that with the option tt(KSH_ARRAYS) tt($foo) always returns
 a scalar (regardless of the use of the offset syntax) and a form
@@ -924,7 +924,7 @@ that result from field splitting.
 item(tt(D))(
 Assume the string or array elements contain directories and attempt
 to substitute the leading part of these by names.  The remainder of
-the path (the whole of it if the leading part was not subsituted)
+the path (the whole of it if the leading part was not substituted)
 is then quoted so that the whole string can be used as a shell
 argument.  This is the reverse of `tt(~)' substitution:  see
 ifnzman(noderef(Filename Expansion))\

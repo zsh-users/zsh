@@ -265,7 +265,7 @@ string var(array) is interpreted as the name of another var(spec),
 which is used to choose where to store the values.  If no other var(spec)
 is found, the values are stored as usual.  This changes only the way the
 values are stored, not the way tt($*) is parsed, so results may be
-unpredicable if the `var(name)tt(+)' specifier is used inconsistently.
+unpredictable if the `var(name)tt(+)' specifier is used inconsistently.
 )
 item(tt(-E))(
 This changes the parsing rules to em(not) stop at the first string
