@@ -2789,13 +2789,6 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    errflag = 1;
     }
 
-    if (errflag) {
-	lastval = 1;
-	if (oautocont >= 0)
-	    opts[AUTOCONTINUE] = oautocont;
-	return;
-    }
-
     if (type == WC_FUNCDEF) {
 	/*
 	 * The first word of a function definition is a list of
@@ -2809,8 +2802,24 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    /* Nonymous, don't do redirections here */
 	    redir = NULL;
 	}
-    } else if (is_shfunc) {
-	Shfunc shf = (Shfunc)hn;
+    } else if (is_shfunc || type == WC_AUTOFN) {
+	Shfunc shf;
+	if (is_shfunc)
+	    shf = (Shfunc)hn;
+	else {
+	    shf = loadautofn(state->prog->shf, 1, 0);
+	    if (shf)
+		state->prog->shf = shf;
+	    else {
+		/*
+		 * This doesn't set errflag, so just return now.
+		 */
+		lastval = 1;
+		if (oautocont >= 0)
+		    opts[AUTOCONTINUE] = oautocont;
+		return;
+	    }
+	}
 	/*
 	 * A function definition may have a list of additional
 	 * redirections to apply, so retrieve it.
@@ -2830,6 +2839,13 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    addlinknode(redir, ugetnode(redir2));
 	    }
 	}
+    }
+
+    if (errflag) {
+	lastval = 1;
+	if (oautocont >= 0)
+	    opts[AUTOCONTINUE] = oautocont;
+	return;
     }
 
     if (type == WC_SIMPLE && !nullexec) {
@@ -3306,10 +3322,18 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		redir_prog = NULL;
 	    
 	    lastval = execfuncdef(state, redir_prog);
-	} else if (type >= WC_CURSH) {
+	} 
+	else if (type >= WC_CURSH) {
 	    if (last1 == 1)
 		do_exec = 1;
-	    lastval = (execfuncs[type - WC_CURSH])(state, do_exec);
+	    if (type == WC_AUTOFN) {
+		/*
+		 * We pre-loaded this to get any redirs.
+		 * So we execuate a simplified function here.
+		 */
+		lastval =  execautofn_basic(state, do_exec);
+	    } else
+		lastval = (execfuncs[type - WC_CURSH])(state, do_exec);
 	} else if (is_builtin || is_shfunc) {
 	    LinkList restorelist = 0, removelist = 0;
 	    /* builtin or shell function */
@@ -4540,21 +4564,28 @@ execshfunc(Shfunc shf, LinkList args)
 	deletefilelist(last_file_list, 0);
 }
 
-/* Function to execute the special type of command that represents an *
- * autoloaded shell function.  The command structure tells us which   *
- * function it is.  This function is actually called as part of the   *
- * execution of the autoloaded function itself, so when the function  *
- * has been autoloaded, its list is just run with no frills.          */
+/*
+ * Function to execute the special type of command that represents an
+ * autoloaded shell function.  The command structure tells us which
+ * function it is.  This function is actually called as part of the
+ * execution of the autoloaded function itself, so when the function
+ * has been autoloaded, its list is just run with no frills.
+ *
+ * There are two cases because if we are doing all-singing, all-dancing
+ * non-simple code we load the shell function early in execcmd() (the
+ * action also present in the non-basic version) to check if
+ * there are redirections that need to be handled at that point.
+ * Then we call execautofn_basic() to do the rest.
+ */
 
 /**/
 static int
-execautofn(Estate state, UNUSED(int do_exec))
+execautofn_basic(Estate state, UNUSED(int do_exec))
 {
     Shfunc shf;
     char *oldscriptname, *oldscriptfilename;
 
-    if (!(shf = loadautofn(state->prog->shf, 1, 0)))
-	return 1;
+    shf = state->prog->shf;
 
     /*
      * Probably we didn't know the filename where this function was
@@ -4571,6 +4602,19 @@ execautofn(Estate state, UNUSED(int do_exec))
     scriptfilename = oldscriptfilename;
 
     return lastval;
+}
+
+/**/
+static int
+execautofn(Estate state, UNUSED(int do_exec))
+{
+    Shfunc shf;
+
+    if (!(shf = loadautofn(state->prog->shf, 1, 0)))
+	return 1;
+
+    state->prog->shf = shf;
+    return execautofn_basic(state, 0);
 }
 
 /**/
