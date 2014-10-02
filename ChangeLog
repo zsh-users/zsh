@@ -1,7 +1,7 @@
 2014-10-02  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 33325: Src/exec.c, Test/A05execution.ztst: fix ksh autoloads
-	with redirections on functiond definitions.
+	with redirections on function definitions.
 
 2014-10-01  Barton E. Schaefer  <schaefer@zsh.org>
 
