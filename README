@@ -5,8 +5,14 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.0.6 of the shell.  This is a stable release.
-There are minor new features as well as bug fixes since 5.0.5.
+This is version 5.0.7 of the shell.  This is a stable release.
+There are minor new features as well as bug fixes since 5.0.6.
+
+Note in particular there is a security fix to disallow evaluation of the
+initial values of integer variables imported from the environment (they
+are instead treated as literal numbers).  Although no major exploits are
+currently known with this issue it is recommended to upgrade as soon as
+possible.
 
 Installing Zsh
 --------------
