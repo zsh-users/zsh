@@ -1,9 +1,9 @@
 #compdef sysctl
 
 case $OSTYPE in
-  *freebsd[5-9].*|freebsd4.[4-9]*)
+  *freebsd<5->.*|freebsd4.[4-9]*)
     local -a sysctlvars
-    sysctlvars=( $(sysctl -aN) )
+    sysctlvars=( $(_call_program sysctl-variables sysctl -aN) )
     _arguments -s -A "-*" \
       '(*)-a[list all]' \
       '-b[binary output]' \
@@ -41,5 +41,8 @@ case $OSTYPE in
       '(-w)-n[show only values]' \
       '(-a -A -n)-w[write variable]' \
       '(-a -A)*:sysctl variable:_multi_parts ${words[(r)-w]:+-S=} -i . _cache_sysctlvars'
-    ;;
+  ;;
+  *)
+    _default
+  ;;
 esac
