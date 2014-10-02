@@ -1,3 +1,7 @@
+2014-10-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: 5.0.6-dev-1.
+
 2014-10-02  Oliver Kiddle  <opk@zsh.org>
 
 	* 33323: Completion/Zsh/Command/_typeset, Doc/Zsh/builtins.yo,
