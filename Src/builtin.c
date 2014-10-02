@@ -2759,7 +2759,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 		tokenize(*argv);
 		if ((pprog = patcompile(*argv, PAT_STATIC, 0))) {
 		    queue_signals();
-		    for (p = mathfuncs, q = NULL; p; q = p, p = p->next) {
+		    for (p = mathfuncs, q = NULL; p; q = p) {
 			MathFunc next;
 			do {
 			    next = NULL;
@@ -2774,6 +2774,8 @@ bin_functions(char *name, char **argv, Options ops, int func)
 			    }
 			    /* if we deleted one, retry with the new p */
 			} while (next);
+			if (p)
+			    p = p->next;
 		    }
 		    unqueue_signals();
 		} else {

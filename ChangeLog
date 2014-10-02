@@ -1,3 +1,12 @@
+2014-10-02  Oliver Kiddle  <opk@zsh.org>
+
+	* 33323: Completion/Zsh/Command/_typeset, Doc/Zsh/builtins.yo,
+	Src/builtin.c: fix bug in removing math functions and complete
+	-M option to functions
+
+	* 33315: Completion/Unix/Command/_sysctl: fix pattern to
+	match freebsd10 and later
+
 2014-10-02  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: remove "major".

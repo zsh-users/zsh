@@ -773,7 +773,7 @@ findex(functions)
 xitem(tt(functions) [ {tt(PLUS())|tt(-)}tt(UXkmtTuz) ] [ var(name) ... ])
 xitem(tt(functions -M) var(mathfn) [ var(min) [ var(max) [ var(shellfn) ] ] ])
 xitem(tt(functions -M) [ tt(-m) var(pattern) ... ])
-item(tt(functions +M) [ tt(-m) ] var(mathfn))(
+item(tt(functions +M) [ tt(-m) ] var(mathfn) ... )(
 Equivalent to tt(typeset -f), with the exception of the tt(-M) option.
 Use of the tt(-M) option may not be combined with any of the options
 handled by tt(typeset -f).
