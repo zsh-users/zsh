@@ -1,3 +1,8 @@
+2014-10-02  Axel Beckert  <abe@deuxchevaux.org>
+
+	* 33284: Mathieu Malaterre: Completion/Unix/Command/_{graphics,
+	image}magick: Add missing JPEG 2000 file extensions.
+
 2014-10-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 33312: Doc/Zsh/builtins.yo, Doc/Zsh/grammar.yo: document
