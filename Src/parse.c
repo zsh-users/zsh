@@ -729,7 +729,7 @@ par_pline(int *complex)
 
     p = ecadd(0);
 
-    if (!par_cmd(complex)) {
+    if (!par_cmd(complex, 0)) {
 	ecused--;
 	return 0;
     }
@@ -780,11 +780,15 @@ par_pline(int *complex)
 /*
  * cmd	: { redir } ( for | case | if | while | repeat |
  *				subsh | funcdef | time | dinbrack | dinpar | simple ) { redir }
+ *
+ * With zsh_construct non-zero, we're doing a zsh special in which
+ * the following token is not considered in command position.  This
+ * is used for arguments of anonymous functions.
  */
 
 /**/
 static int
-par_cmd(int *complex)
+par_cmd(int *complex, int zsh_construct)
 {
     int r, nr = 0;
 
@@ -839,12 +843,12 @@ par_cmd(int *complex)
     case INPAR:
 	*complex = 1;
 	cmdpush(CS_SUBSH);
-	par_subsh(complex);
+	par_subsh(complex, zsh_construct);
 	cmdpop();
 	break;
     case INBRACE:
 	cmdpush(CS_CURSH);
-	par_subsh(complex);
+	par_subsh(complex, zsh_construct);
 	cmdpop();
 	break;
     case FUNC:
@@ -1378,11 +1382,13 @@ par_repeat(int *complex)
 /*
  * subsh	: INPAR list OUTPAR |
  *                INBRACE list OUTBRACE [ "always" INBRACE list OUTBRACE ]
+ *
+ * zsh_construct is passed through to par_cmd(), q.v.
  */
 
 /**/
 static void
-par_subsh(int *complex)
+par_subsh(int *complex, int zsh_construct)
 {
     enum lextok otok = tok;
     int oecused = ecused, p, pp;
@@ -1395,7 +1401,7 @@ par_subsh(int *complex)
     ecadd(WCB_END());
     if (tok != ((otok == INPAR) ? OUTPAR : OUTBRACE))
 	YYERRORV(oecused);
-    incmdpos = 1;
+    incmdpos = !zsh_construct;
     zshlex();
 
     /* Optional always block.  No intervening SEPERs allowed. */
@@ -1760,9 +1766,20 @@ par_simple(int *complex, int nr)
 		sl = ecadd(0);
 		(void)ecadd(WCB_PIPE(WC_PIPE_END, 0));
 
-		if (!par_cmd(&c)) {
+		if (!par_cmd(&c, argc == 0)) {
 		    cmdpop();
 		    YYERROR(oecused);
+		}
+		if (argc == 0) {
+		    /*
+		     * Anonymous function, possibly with arguments.
+		     * N.B. for complex structures in particular
+		     * ( ... ) we rely on lower level code doing this
+		     * to get the immediately following word (the
+		     * first token after the ")" has already been
+		     * read).
+		     */
+		    incmdpos = 0;
 		}
 
 		set_sublist_code(sl, WC_SUBLIST_END, 0, ecused - 1 - sl, c);

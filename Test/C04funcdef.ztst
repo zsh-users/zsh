@@ -272,6 +272,12 @@
 >ignorebraces is off
 >ignorebraces is still on here
 
+# lsfoo should not be expanded as an anonymous function argument
+ alias lsfoo='This is not ls.'
+ () (echo anon func; echo "$@") lsfoo
+0:Anonmous function with arguments in a form nobody sane would ever use but unfortunately we have to support anyway
+>anon func
+>lsfoo
 
 %clean
 
