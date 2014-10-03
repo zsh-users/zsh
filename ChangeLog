@@ -1,3 +1,10 @@
+2014-10-03  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted: src/parse.c: comments were the wrong way round.
+
+	* 33343: Src/parse.c, Test/C04funcdef.ztst: variant anonymous
+	function syntax with arguments.
+
 2014-10-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: 5.0.6-dev-1.

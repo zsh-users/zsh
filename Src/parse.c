@@ -781,9 +781,7 @@ par_pline(int *complex)
  * cmd	: { redir } ( for | case | if | while | repeat |
  *				subsh | funcdef | time | dinbrack | dinpar | simple ) { redir }
  *
- * With zsh_construct non-zero, we're doing a zsh special in which
- * the following token is not considered in command position.  This
- * is used for arguments of anonymous functions.
+ * zsh_construct is passed through to par_subsh(), q.v.
  */
 
 /**/
@@ -1383,7 +1381,9 @@ par_repeat(int *complex)
  * subsh	: INPAR list OUTPAR |
  *                INBRACE list OUTBRACE [ "always" INBRACE list OUTBRACE ]
  *
- * zsh_construct is passed through to par_cmd(), q.v.
+ * With zsh_construct non-zero, we're doing a zsh special in which
+ * the following token is not considered in command position.  This
+ * is used for arguments of anonymous functions.
  */
 
 /**/
