@@ -1,5 +1,9 @@
 2014-10-03  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 33345: Src/parse.c, Test/C04funcdef.ztst: fix longstanding
+	anonoymous function corruption of "complex" state that allowed
+	complex wordcode to be passed to execsimple(), causing crash.
+
 	* unposted: src/parse.c: comments were the wrong way round.
 
 	* 33343: Src/parse.c, Test/C04funcdef.ztst: variant anonymous

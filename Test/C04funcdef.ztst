@@ -279,6 +279,10 @@
 >anon func
 >lsfoo
 
+ print foo | () cat
+0:Simple anonymous function should not simplify enclosing pipeline
+>foo
+
 %clean
 
  rm -f file.in file.out
