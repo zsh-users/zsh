@@ -1,3 +1,7 @@
+2014-10-03  Bart Schaefer  <schaefer@zsh.org>
+
+	* 33346: Src/parse.c: another bit of the 33345 repair
+
 2014-10-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 33345: Src/parse.c, Test/C04funcdef.ztst: fix longstanding

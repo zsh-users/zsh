@@ -1523,7 +1523,8 @@ par_funcdef(int *cmplx)
 	    num++;
 	    zshlex();
 	}
-	*cmplx = (num > 0);
+	if (num > 0)
+	    *cmplx = 1;
 	ecbuf[parg] = ecused - parg; /*?*/
 	ecbuf[parg+1] = num;
     }
