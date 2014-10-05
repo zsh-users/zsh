@@ -217,6 +217,21 @@ F:This similar test was triggering a reproducible failure with pipestatus.
 F:This test checks for a file descriptor leak that could cause the left
 F:side of a pipe to block on write after the right side has exited
 
+  { setopt MONITOR } 2>/dev/null
+  if [[ -o MONITOR ]]
+  then
+   ( while :; do print "This is a line"; done ) | () : &
+   sleep 1
+   jobs -l
+  else
+   print -u $ZTST_fd "Skipping pipe leak test, requires MONITOR option"
+   print "[0] 0 0"
+  fi
+0:Bug regression: piping to anonymous function; piping to backround function
+*>\[<->\] <-> <->
+F:This test checks for two different bugs, a parser segfault piping to an
+F:anonymous function, and a descriptor leak when backgrounding a pipeline
+
   print "autoload_redir() { print Autoloaded ksh style; } >autoload.log" >autoload_redir
   autoload -Uk autoload_redir
   autoload_redir

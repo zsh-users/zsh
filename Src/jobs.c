@@ -1627,8 +1627,10 @@ spawnjob(void)
     }
     if (!hasprocs(thisjob))
 	deletejob(jobtab + thisjob, 0);
-    else
+    else {
 	jobtab[thisjob].stat |= STAT_LOCKED;
+	pipecleanfilelist(jobtab[thisjob].filelist);
+    }
     thisjob = -1;
 }
 

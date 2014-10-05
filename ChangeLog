@@ -1,3 +1,9 @@
+2014-10-04  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33354: Src/jobs.c, Test/A05execution.ztst: when backgrounding
+	a pipeline, close all pipe descriptors in the parent; add test
+	for both this and 33345+33346
+	
 2014-10-03  Bart Schaefer  <schaefer@zsh.org>
 
 	* 33346: Src/parse.c: another bit of the 33345 repair
