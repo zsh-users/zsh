@@ -1,3 +1,8 @@
+2014-10-06  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted (discussed offline): README: update description of
+	integer import problem.
+
 2014-10-04  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33354: Src/jobs.c, Test/A05execution.ztst: when backgrounding
