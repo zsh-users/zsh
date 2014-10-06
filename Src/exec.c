@@ -3201,7 +3201,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    fil = movefd(dup(fd));
 		}
 		if (fil == -1) {
-		    char fdstr[4];
+		    char fdstr[DIGBUFSIZE];
 
 		    closemnodes(mfds);
 		    fixfds(save);
