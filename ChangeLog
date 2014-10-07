@@ -2,6 +2,11 @@
 
 	* unposted: Config/version.mk: 5.0.7
 
+2014-10-06  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 33365: Src/exec.c: avoid buffer overflow for very long fds in >&
+	fd syntax.
+
 2014-10-06  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted (discussed offline): README: update description of
