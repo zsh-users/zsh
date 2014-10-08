@@ -1,3 +1,8 @@
+2014-10-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk: update to 5.0.7-dev-0 to avoid
+	installation clashes with 5.0.7.
+
 2014-10-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk: 5.0.7
