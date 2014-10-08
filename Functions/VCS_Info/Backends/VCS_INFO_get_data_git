@@ -195,14 +195,6 @@ fi
 VCS_INFO_adjust
 VCS_INFO_git_getaction ${gitdir}
 
-
-VCS_INFO_get_get_rebase()
-{
-    if [[ -f "$1" ]]; then
-       echo "$(< "$1")"
-    fi
-}
-
 local patchdir=${gitdir}/patches/${gitbranch}
 if [[ -d $patchdir ]] && [[ -f $patchdir/applied ]] \
    && [[ -f $patchdir/unapplied ]]
@@ -223,11 +215,16 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
     # Fake patch names for all but current patch
     patchdir="${gitdir}/rebase-apply"
     local cur=$(< "${patchdir}/next")
-    local p
+    local p subject
     for p in $(seq $(($cur - 1))); do
         git_patches_applied+=("$(printf "%04d" $p) ?")
     done
-    git_patches_applied+=("$(< "${patchdir}/original-commit") ${${(f)$(< "${patchdir}/msg-clean")}[1]}")
+    subject="${$(< "${patchdir}/msg-clean")[(f)1]}"
+    if [[ -f "${patchdir}/original-commit" ]]; then
+        git_patches_applied+=("$(< ${patchdir}/original-commit) $subject")
+    else
+        git_patches_applied+=("? $subject")
+    fi
     git_patches_unapplied=($(seq $cur $(< "${patchdir}/last")))
 
     VCS_INFO_git_handle_patches
