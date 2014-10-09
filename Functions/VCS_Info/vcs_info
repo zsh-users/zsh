@@ -94,6 +94,7 @@ vcs_info () {
 
     for pat in ${dps} ; do
         if [[ ${PWD} == ${~pat} ]] ; then
+            VCS_INFO_maxexports
             [[ -n ${vcs_info_msg_0_} ]] && VCS_INFO_set --nvcs
             return 0
         fi

@@ -1,3 +1,8 @@
+2014-10-09  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 33405: Functions/VCS_Info/vcs_info: Make sure maxexports
+	is set when VCS_INFO_set is called
+
 2014-10-09  Marc Finet  <m.dreadlock@gmail.com>
 
 	* 33391: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
