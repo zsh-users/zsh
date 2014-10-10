@@ -1,5 +1,7 @@
 2014-10-10  Oliver Kiddle  <opk@zsh.org>
 
+	* Daniel Shahaf: 33396: Completion/Unix/Command/_xxd: new completion
+
 	* Yuri D'Elia: 33397: Completion/X/Command/_xautolock: new completion
 
 2014-10-09  Frank Terbeck  <ft@bewatermyfriend.org>
