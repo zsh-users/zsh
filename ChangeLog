@@ -1,3 +1,7 @@
+2014-10-10  Oliver Kiddle  <opk@zsh.org>
+
+	* Yuri D'Elia: 33397: Completion/X/Command/_xautolock: new completion
+
 2014-10-09  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 33405: Functions/VCS_Info/vcs_info: Make sure maxexports
