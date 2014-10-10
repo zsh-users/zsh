@@ -1,5 +1,8 @@
 2014-10-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 33420: Completion/Zsh/Command/_zmodload: complete -R/-m options and
+	fix feature completion
+
 	* fREW Schmidt: 33375: Completion/Unix/Command/_runit: sv completion
 
 	* Daniel Shahaf: 33396: Completion/Unix/Command/_xxd: new completion
