@@ -2,8 +2,8 @@
 
 local tmp err_fd=-1
 
-if (( ${debug_fd:--1} > 2 ))
-then exec {err_fd}>&2	# debug_fd is saved stderr, 2 is log file
+if (( ${debug_fd:--1} > 2 )) || [[ ! -t 2 ]]
+then exec {err_fd}>&2	# debug_fd is saved stderr, 2 is trace or redirect
 else exec {err_fd}>/dev/null
 fi
 
