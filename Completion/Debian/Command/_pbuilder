@@ -14,8 +14,8 @@ else
     '--buildresult:location:_files -/' \
     '--mirror:URL:_urls' \
     '--othermirror:URL:_urls' \
-    '--distribution:suite:(breezy dapper edgy etch feisty gutsy hardy hoary intrepid jaunty karmic lenny lucid potato sarge sid squeeze warty woody' \
-    '--architecture:architecture:(alpha amd64 armel hppa hurd-i386 i386 ia64 m68k mips mipsel powerpc s390 sparc)' \
+    '--distribution:suite:(breezy dapper edgy etch feisty gutsy hardy hoary intrepid jaunty jessie karmic lenny lucid potato sarge sid squeeze warty woody' \
+    '--architecture:architecture:i_deb_architectures' \
     '--components:component:(main contrib non-free)' \
     '--override-config' \
     '--hookdir:location:_files -/' \

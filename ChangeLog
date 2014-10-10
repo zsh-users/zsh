@@ -1,3 +1,14 @@
+2014-10-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 33424: Completion/Debian/Type/_deb_architectures,
+	Completion/Debian/Command/_apt-file,
+	Completion/Debian/Command/_dak, Completion/Debian/Command/_madison,
+	Completion/Debian/Command/_dpkg-buildpackage,
+	Completion/Debian/Command/_pbuilder,
+	Completion/Debian/Command/_reprepro,
+	Completion/Debian/Command/_svn-buildpackage: use common function
+	for completing Debian architectures
+
 2014-10-10  Oliver Kiddle  <opk@zsh.org>
 
 	* 33420: Completion/Zsh/Command/_zmodload: complete -R/-m options and

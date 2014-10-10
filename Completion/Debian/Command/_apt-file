@@ -1,55 +1,59 @@
 #compdef apt-file
 
-_apt-file() {
-  local -a arguments
-  local state line cmds 
-  arguments=(
-    '(--cache -c)'{--cache,-c}'[cache directory]:directory:_directories'
-    '(-v --verbose)'{-v,--verbose}'[verbose]'
-     '(--cdrom-mount -d)'{--cdrom-mount,-d}'[cdrom mount point]:directory:_directories'
-     '(--ignore-case -i)'{--ignore-case,-i}'[ignore case]'
-     '(--regexp -r)'{--regexp,-r}'[regular expression]'
-     '(-V --version)'{-V,--version}'[version]'
-     '(-a --architecture)'{-a,--architecture}'[architecture]:architecture:(alpha arm hppa hurd-i386 i386 ia64 m68k mips mipsel powerpc s390 sparc)'
-    '(-s --sources-list)'{-s,--sources-list}'[source.list file]:file:_files'
-    '(-l --package-only)'{-l,--package-only}'[only display package name]'
-    '(-F --fixed-string)'{-F,--fixed-string}'[do not expand search pattern]'
-    '(-y --dummy)'{-y,--dummy}'[run in dummy mode]'
-    '(-h --help)'{-h,--help}'[display help screen]'
-    '1: :->cmds'
-    '*: :->args'
-  )
-    _arguments -S $arguments
+local curcontext="$curcontext" state line expl cmds ret=1
+typeset -A opt_args
 
-    case $state in
-      cmds)
-        cmds=(
-            'update:resynchronize package contents'
-            'search:search in which package file is included'
-            'list:list contents of a package'
-            'show:alias for list'
-            'purge:remove all Contents-<ARCH>.gz files in cache directory'
-        )
-        _describe -t commands 'apt-list command' cmds && ret=0
+_arguments -C -S \
+  '(--cache -c)'{--cache,-c}'[cache directory]:directory:_directories' \
+  '(-v --verbose)'{-v,--verbose}'[verbose]' \
+  '(--cdrom-mount -d)'{--cdrom-mount,-d}'[cdrom mount point]:directory:_directories' \
+  '(--from-file -f --from-deb -D)'{--from-file,-f}'[read patterns from given file]' \
+  '(--from-deb -D --from-file -f)'{--from-dev,-D}'[use contents of given .deb archives as patterns]' \
+  '(--ignore-case -i)'{--ignore-case,-i}'[ignore case]' \
+  '(--regexp -x)'{--regexp,-x}'[regular expression]' \
+  '(-V --version)'{-V,--version}'[version]' \
+  '(-a --architecture)'{-a,--architecture}'[architecture]:architecture:_deb_architectures' \
+  '(-s --sources-list)'{-s,--sources-list}'[source.list file]:file:_files' \
+  '(-l --package-only)'{-l,--package-only}'[only display package name]' \
+  '(-N --non-interactive)'{-N,--non-interactive}'[skip schemes requiring user input]' \
+  '(-F --fixed-string)'{-F,--fixed-string}'[do not expand search pattern]' \
+  '(-y --dummy)'{-y,--dummy}'[run in dummy mode]' \
+  '(-)'{-h,--help}'[display help screen]' \
+  '1: :->cmds' \
+  '*: :->args' && ret=0
+
+case $state in
+  cmds)
+    cmds=(
+      'update:resynchronize package contents'
+      {find,search}:'search in which package file is included'
+      {list,show}:'list contents of a package'
+      'purge:remove all Contents-<ARCH>.gz files in cache directory'
+    )
+    _describe -t commands 'apt-list command' cmds
+  ;;
+  args)
+    case $line[1] in
+      search|find)
+	if (( $#opt_args[(I)(-D|--from-deb)] )); then
+	  _wanted files expl 'debian package' _files -g '*.deb(-.)'
+	elif (( $#opt_args[(I)(-f|--from-file)] )); then
+          _files
+	else
+	  _message -e patterns "pattern"
+	fi
       ;;
-      args)
-        case $line[1] in
-            search)
-                _message "pattern"
-            ;;
-            list|show)
-               _deb_packages avail 
-            ;;
-            update|purge)
-                # do nothing
-            ;;
-            *)
-                _message "command $line[1] not available"
-            ;;
-        esac
+      list|show)
+	_deb_packages avail
+      ;;
+      update|purge)
+	# do nothing
+      ;;
+      *)
+	_message "command $line[1] not available"
       ;;
     esac
+  ;;
+esac && ret=0
 
-}
-
-_apt-file "$@"
+return ret

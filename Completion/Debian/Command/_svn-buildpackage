@@ -28,8 +28,8 @@ _arguments \
   '-B[binary-only build, no source or arch-indep binaries]' \
   '-S[source-only build, no binaries]' \
   '-s-:source generation:((i\:default a\:force\ inclusion\ of\ original\ source d\:force\ exclusion\ of\ original\ source))' \
-  '-a-:architecture:(alpha amd64 arm hppa hurd-i386 i386 ia64 m68k mips mipsel powerpc s390 sparc)' \
-  '-v-:version:' \
+  '-a-:architecture:_deb_architectures' \
+  '-v-:version' \
   '-C-:changes description:_files' \
   '-m-:maintainer address:_email_addresses' \
   '-e-:maintainer address:_email_addresses' \
