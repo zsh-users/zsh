@@ -1,3 +1,7 @@
+2014-10-11  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: Test/B06fc.ztst: tests for 33429.
+
 2014-10-10  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33429: Src/builtin.c, Src/hist.c: disallow non-integer values
