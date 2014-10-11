@@ -1363,10 +1363,19 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 	if (*argv) {
 	    hf = *argv++;
 	    if (*argv) {
-		hs = zstrtol(*argv++, NULL, 10);
-		if (*argv)
-		    shs = zstrtol(*argv++, NULL, 10);
-		else
+		char *check;
+		hs = zstrtol(*argv++, &check, 10);
+		if (*check) {
+		    zwarnnam("fc", "HISTSIZE must be an integer");
+		    return 1;
+		}
+		if (*argv) {
+		    shs = zstrtol(*argv++, &check, 10);
+		    if (*check) {
+			zwarnnam("fc", "SAVEHIST must be an integer");
+			return 1;
+		    }
+		} else
 		    shs = hs;
 		if (*argv) {
 		    zwarnnam("fc", "too many arguments");

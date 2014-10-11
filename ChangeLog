@@ -1,3 +1,9 @@
+2014-10-10  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33429: Src/builtin.c, Src/hist.c: disallow non-integer values
+	for the temporary HISTSIZE and SAVEHIST of "fc -p", and fix
+	crash on zero values for same
+
 2014-10-09  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 33405: Functions/VCS_Info/vcs_info: Make sure maxexports

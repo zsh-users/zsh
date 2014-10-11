@@ -1110,8 +1110,11 @@ static void
 putoldhistentryontop(short keep_going)
 {
     static Histent next = NULL;
-    Histent he = keep_going? next : hist_ring->down;
-    next = he->down;
+    Histent he = (keep_going || !hist_ring) ? next : hist_ring->down;
+    if (he)
+	next = he->down;
+    else
+	return;
     if (isset(HISTEXPIREDUPSFIRST) && !(he->node.flags & HIST_DUP)) {
 	static zlong max_unique_ct = 0;
 	if (!keep_going)
@@ -1151,7 +1154,7 @@ prepnexthistent(void)
 	freehistnode(&hist_ring->node);
     }
 
-    if (histlinect < histsiz) {
+    if (histlinect < histsiz || !hist_ring) {
 	he = (Histent)zshcalloc(sizeof *he);
 	if (!hist_ring)
 	    hist_ring = he->up = he->down = he;
