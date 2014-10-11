@@ -1,10 +1,10 @@
 #compdef reprepro
 
-local context state line distfile
+local curcontext="$curcontext" state line expl distfile ret=1
 typeset -A opt_args
 local -a codenames
 
-_arguments \
+_arguments -C \
   '(-h --help)'{-h,--help}'[display help]' \
   '*'{-v,-V,--verbose}'[be more verbose]' \
   '--silent[be less verbose]' \
@@ -17,7 +17,7 @@ _arguments \
   '--listdir:list dir:_files -/' \
   '--methoddir:method dir:_files -/' \
   '(-C --component)'{-C,--component}':component:(component1 component2)' \
-  '(-A --architecture)'{-A,--architecture}':architecture:(amd64 sparc)' \
+  '(-A --architecture)'{-A,--architecture}':architecture:_sequence -s "|" _deb_architectures -' \
   '(-T --type)'{-T,--type}':file type:(dsc deb udeb)' \
   '(-S --section)'{-S,--section}':section:(section1 section2)' \
   '(-P --priority)'{-P,--priority}':priority:(high low)' \
@@ -40,12 +40,11 @@ _arguments \
     rereference dumpreferences dumpunreferenced deleteunreferenced
     reoverride dumptracks retrack removealltracks removetrack tidytracks
     copy clearvanished gensnapshot rerunnotifiers)' \
-  '*::subcmd:->subcmd' && return 0
+  '*::subcmd:->subcmd' && ret=0
 
 case "$state" in
-    (subcmd)
-
-  case "$words[1]" in
+  subcmd)
+    case "$words[1]" in
       (export|update|iteratedupdate|checkupdate|predelete|pull|checkpull|check)
         if [[ -n "$opt_args[--confdir]" ]]; then
 	  distfile=${opt_args[--confdir]}/distributions
@@ -60,11 +59,13 @@ case "$state" in
 	fi
 
         codenames=($(awk '/^[Cc][Oo][Dd][Ee][Nn][Aa][Mm][Ee]: / {$1="";print}' "$distfile"))
-      	_wanted -V 'codenames' expl 'codename' compadd -a codenames
-	;;
+	_wanted -V 'codenames' expl 'codename' compadd -a codenames && ret=0
+      ;;
       (*)
-    	_files
-    	;;
-  esac
+	_files && ret=0
+      ;;
+    esac
   ;;
 esac
+
+return ret

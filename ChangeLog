@@ -4,6 +4,28 @@
 	for the temporary HISTSIZE and SAVEHIST of "fc -p", and fix
 	crash on zero values for same
 
+2014-10-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 33424: Completion/Debian/Type/_deb_architectures,
+	Completion/Debian/Command/_apt-file,
+	Completion/Debian/Command/_dak, Completion/Debian/Command/_madison,
+	Completion/Debian/Command/_dpkg-buildpackage,
+	Completion/Debian/Command/_pbuilder,
+	Completion/Debian/Command/_reprepro,
+	Completion/Debian/Command/_svn-buildpackage: use common function
+	for completing Debian architectures
+
+2014-10-10  Oliver Kiddle  <opk@zsh.org>
+
+	* 33420: Completion/Zsh/Command/_zmodload: complete -R/-m options and
+	fix feature completion
+
+	* fREW Schmidt: 33375: Completion/Unix/Command/_runit: sv completion
+
+	* Daniel Shahaf: 33396: Completion/Unix/Command/_xxd: new completion
+
+	* Yuri D'Elia: 33397: Completion/X/Command/_xautolock: new completion
+
 2014-10-09  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 33405: Functions/VCS_Info/vcs_info: Make sure maxexports

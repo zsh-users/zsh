@@ -1,31 +1,26 @@
 #compdef dak
 
-local curcontext="$curcontext" state line expl cmd args ret=1
-typeset -A opt_args
+local expl cmd args ret=1
 
-_arguments -C \
-    '1: :->cmd' \
-    '*:: :->args' && ret=0
-
-if (( ! $+_dak_cmds )); then
+if (( CURRENT == 2 )); then
+  if (( ! $+_dak_cmds )); then
     typeset -gH _dak_cmds
     _dak_cmds=(${${${(f)${"$(_call_program dak dak --help)"#*Availa#ble commands:}}#[^a-z] ##}%%[ 	]*})
+  fi
+
+  _describe -t subcommands 'subcommand' _dak_cmds
+  return
 fi
 
-if [[ $state != 'args' ]]; then
-    _describe -t subcommand 'subcommand' _dak_cmds
-    return 0
-fi
-
-cmd="$words[1]"
-curcontext="${curcontext%:*:*}:dak-$cmd:"
+cmd="$words[2]"
+local curcontext="${curcontext%:*:*}:dak-$cmd:"
 
 args=( '(-)'{--help,-h}'[show help message]' )
 
 case $cmd in
 (ls)
     args+=(
-  '(-a --architecture)'{-a,--architecture=}':arch:_values -s , "architecture list" source all alpha amd64 arm hppa hurd-i386 i386 ia64 mips mipsel'
+  '(-a --architecture)'{-a,--architecture=}':arch:_sequence _deb_architectures -a "all source"'
   '(-b --binary-type)'{-b,--binary-type=}':type:(deb udeb)'
   '(-c --component)'{-c,--component=}':component:_values -s , "component list" main contrib non-free'
   '(-g --greaterorequal)'{-g,--greaterorequal}
@@ -70,7 +65,7 @@ case $cmd in
     ;;
 (rm)
     args+=(
-  '(-a --architecture)'{-a,--architecture=}':arch:_values -s , "architecture list" source all alpha amd64 arm hppa hurd-i386 i386 ia64 mips mipsel'
+  '(-a --architecture)'{-a,--architecture=}':arch:_sequence _deb_architectures -a "all source"'
   '(-b --binary)'{-b,--binary}'[remove binaries only]'
   '(-c --component)'{-c,--component=}':component:_values -s , "component list" main contrib non-free'
   '(-C --carbon-copy)'{-C,--carbon-copy=}':cc address:_email_addresses'
@@ -96,7 +91,7 @@ case $cmd in
 
 (make-suite-file-list)
     args+=(
-   '(-a --architecture)'{-a,--architecture=}':arch:_values -s , "architecture list" source all alpha amd64 arm hppa hurd-i386 i386 ia64 mips mipsel'
+   '(-a --architecture)'{-a,--architecture=}':arch:_sequence _deb_architectures -a "all source"'
   '(-c --component)'{-c,--component=}':component:_values -s , "component list" main contrib non-free'
   '(-n --no-delete)'{-n,--no-delete}'[do not delete older versions]'
   '(-s --suite)'{-s,--suite=}':suite:_values -s , "suite list" oldstable stable testing unstable experimental'
@@ -239,10 +234,10 @@ case $cmd in
     ;;
 
     (*)
-    _files
+      args+=( '*: :_default' )
     ;;
 
 esac
 
 _arguments -s "$args[@]" && ret=0
-return $ret
+return ret

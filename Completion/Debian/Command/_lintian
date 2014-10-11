@@ -31,7 +31,7 @@ case "$service" in
       '--archivedir:archive directory:_files -/' \
       '--dist:distribution:(woody sarge sid)' \
       '--section:release:(main contrib non-free)' \
-      '--arch:architecture:(alpha arm hppa hurd-i386 i386 ia64 m68k mips mipsel powerpc s390 sparc)' \
+      '--arch:architecture:_deb_architectures' \
       '--root:root directory:_files -/' \
       '(-a --all)'{-a,--all}'[check all packages in the distribution]' \
       '(-b --binary)'{-b,--binary}'[the following packages are binary]' \
