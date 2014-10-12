@@ -1,3 +1,9 @@
+2014-10-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 33423: Doc/Zsh/expn.yo, Src/subst.c: parameter expansion
+	(p) flag allows delimited strings to contain simple $param
+	expansions.
+
 2014-10-11  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Test/B06fc.ztst: tests for 33429.

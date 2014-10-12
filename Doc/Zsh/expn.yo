@@ -1124,6 +1124,19 @@ item(tt(p))(
 Recognize the same escape sequences as the tt(print) builtin
 in string arguments to any of the flags described below that
 follow this argument.
+
+Alternatively, with this option string arguments may be in the form
+tt($)var(var) in which case the value of the variable is substituted.
+Note this form is strict; the string argument does not undergo general
+parameter expansion.
+
+For example,
+
+example(sep=:
+val=a:b:c
+print ${+LPAR()ps.$sep.+RPAR()val})
+
+splits the variable on a tt(:).
 )
 item(tt(~))(
 Strings inserted into the expansion by any of the flags below are to

@@ -1385,12 +1385,23 @@ static char *
 untok_and_escape(char *s, int escapes, int tok_arg)
 {
     int klen;
-    char *dst;
+    char *dst = NULL;
 
-    untokenize(dst = dupstring(s));
-    if (escapes) {
-	dst = getkeystring(dst, &klen, GETKEYS_SEP, NULL);
-	dst = metafy(dst, klen, META_HREALLOC);
+    if (escapes && (*s == String || *s == Qstring) && s[1]) {
+	char *pstart = s+1, *pend;
+	for (pend = pstart; *pend; pend++)
+	    if (!iident(*pend))
+		break;
+	if (!*pend) {
+	    dst = dupstring(getsparam(pstart));
+	}
+    }
+    if (dst == NULL) {
+	untokenize(dst = dupstring(s));
+	if (escapes) {
+	    dst = getkeystring(dst, &klen, GETKEYS_SEP, NULL);
+	    dst = metafy(dst, klen, META_HREALLOC);
+	}
     }
     if (tok_arg)
 	shtokenize(dst);
