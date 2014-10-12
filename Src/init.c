@@ -243,11 +243,23 @@ parseargs(char **argv, char **runscript)
      */
     opts[MONITOR] = 2;   /* may be unset in init_io() */
     opts[HASHDIRS] = 2;  /* same relationship to INTERACTIVE */
+    opts[USEZLE] = 1;    /* see below, related to SHINSTDIN */
     opts[SHINSTDIN] = 0;
     opts[SINGLECOMMAND] = 0;
 
     if (parseopts(NULL, &argv, opts, &cmd, NULL))
 	exit(1);
+
+    /*
+     * USEZLE remains set if the shell has access to a terminal and
+     * is not reading from some other source as indicated by SHINSTDIN.
+     * SHINSTDIN becomes set below if there is no command argument,
+     * but it is the explicit setting (or not) that matters to USEZLE.
+     * USEZLE may also become unset in init_io() if the shell is not
+     * interactive or the terminal cannot be re-opened read/write.
+     */
+    if (opts[SHINSTDIN])
+	opts[USEZLE] = (opts[USEZLE] && isatty(0));
 
     paramlist = znewlinklist();
     if (*argv) {
@@ -603,7 +615,7 @@ init_shout(void)
 
     if (SHTTY == -1)
     {
-	/* Since we're interative, it's nice to have somewhere to write. */
+	/* Since we're interactive, it's nice to have somewhere to write. */
 	shout = stderr;
 	return;
     }
@@ -616,7 +628,8 @@ init_shout(void)
     /* Associate terminal file descriptor with a FILE pointer */
     shout = fdopen(SHTTY, "w");
 #ifdef _IOFBF
-    setvbuf(shout, shoutbuf, _IOFBF, BUFSIZ);
+    if (shout)
+	setvbuf(shout, shoutbuf, _IOFBF, BUFSIZ);
 #endif
   
     gettyinfo(&shttyinfo);	/* get tty state */
@@ -1608,8 +1621,7 @@ zsh_main(UNUSED(int argc), char **argv)
     emulate(zsh_name, 1, &emulation, opts);   /* initialises most options */
     opts[LOGINSHELL] = (**argv == '-');
     opts[PRIVILEGED] = (getuid() != geteuid() || getgid() != getegid());
-    opts[USEZLE] = 1;   /* may be unset in init_io() */
-    /* sets INTERACTIVE, SHINSTDIN and SINGLECOMMAND */
+    /* sets ZLE, INTERACTIVE, SHINSTDIN and SINGLECOMMAND */
     parseargs(argv, &runscript);
 
     SHTTY = -1;

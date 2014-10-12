@@ -1,3 +1,8 @@
+2014-10-12  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33445: Src/init.c: fix handling of SHIN_STDIN (-s) when combined
+	with INTERACTIVE (-i) on the shell invocation command line
+
 2014-10-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 33423: Doc/Zsh/expn.yo, Src/subst.c: parameter expansion
