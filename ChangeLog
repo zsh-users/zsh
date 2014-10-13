@@ -1,3 +1,9 @@
+2014-10-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 33438: Completion/Base/Utility/_sequence: use the new way of
+	splitting strings with a dynamic separator from 33423 and quote
+	separators where needed
+
 2014-10-12  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33445: Src/init.c: fix handling of SHIN_STDIN (-s) when combined
