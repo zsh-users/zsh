@@ -1636,3 +1636,23 @@
   print ${noexist:^foo})
 1:Zipping arrays, NO_UNSET part 2
 ?(eval):2: noexist: parameter not set
+
+  expr="a@b,c@d:e@f,g@h:i@j,k@l"
+  for sep in : , @; do
+    print -l ${(ps.$sep.)expr}
+  done
+0:Use of variable to get separator when splitting parameter
+>a@b,c@d
+>e@f,g@h
+>i@j,k@l
+>a@b
+>c@d:e@f
+>g@h:i@j
+>k@l
+>a
+>b,c
+>d:e
+>f,g
+>h:i
+>j,k
+>l

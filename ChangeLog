@@ -1,3 +1,8 @@
+2014-10-13  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 33459: Test/D04parameter.ztst: test for variable substitution
+	in variable splitting.
+
 2014-10-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 33438: Completion/Base/Utility/_sequence: use the new way of
