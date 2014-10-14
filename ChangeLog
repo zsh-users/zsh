@@ -1,5 +1,8 @@
 2014-10-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 33455: Syohei YOSHIDA: Completion/Unix/Command/_global:
+	update GNU global option completion
+
 	* 33467: Completion/Debian/Command/_apt-move,
 	Completion/Debian/Command/_bts, Completion/Linux/Command/_sysstat,
 	Completion/Mandriva/Command/_urpmi, Completion/Redhat/Command/_rpm,
