@@ -35,10 +35,10 @@ if compset -P '*::*/' || compset -P 'rsync://*/*/'; then
   # attrs  size  date  time  name
 
   _wanted files expl 'remote file or directory' \
-      compadd -d remdispf ${${${${remdispf##[^ ]## ##}##[^ ]## ##}##[^ ]## ##}##[^ ]## ##}
+      compadd -d remdispf ${${${${remdispf##[^ ]## ##}##[^ ]## ##}##[^ ]## ##}##[^ ]## ##} && ret=0
 
   _wanted files expl 'remote file or directory' \
-      compadd -S/ -d remdispd ${${${${remdispd##[^ ]## ##}##[^ ]## ##}##[^ ]## ##}##[^ ]## ##}
+      compadd -S/ -d remdispd ${${${${remdispd##[^ ]## ##}##[^ ]## ##}##[^ ]## ##}##[^ ]## ##} || (( ! ret ))
 
 elif compset -P 1 '*::' || compset -P 1 'rsync://*/'; then
 

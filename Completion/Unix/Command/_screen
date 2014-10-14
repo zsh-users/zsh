@@ -1,19 +1,7 @@
 #compdef screen
 
-local curcontext="$curcontext" state line expl
+local curcontext="$curcontext" state line expl ret=1
 local scr_cmds sessions
-
-function __screen_normal() {
-    if (( CURRENT == 1 )) && [[ $PREFIX == /dev/* ]]; then
-        _path_files -g '*(%)'
-    elif (( CURRENT == 2 )) && [[ ${words[1]} == /dev/* ]]; then
-        _message "baud rate"
-    elif (( CURRENT > 2 )) && [[ ${words[1]} == /dev/* ]]; then
-        _message "no more parameters"
-    else
-        _normal "$@"
-    fi
-}
 
 scr_cmds=(
   acladd            aclchg            acldel            aclgrp
@@ -103,10 +91,21 @@ _arguments -C \
   '-Dx: :->any-sessions' \
   '-dx: :->any-sessions' \
   '-X[execute command as a screen command in the specified session]:screencmd:(${scr_cmds[@]})' \
-  '*::arguments: __screen_normal'
+  '*:: :->normal' && ret=0
 
 if [[ -n $state ]]; then
   case $state in
+    normal)
+      if (( CURRENT == 1 )) && [[ $PREFIX == /dev/* ]]; then
+	  _path_files -g '*(%)'
+      elif (( CURRENT == 2 )) && [[ ${words[1]} == /dev/* ]]; then
+	  _message "baud rate"
+      elif (( CURRENT > 2 )) && [[ ${words[1]} == /dev/* ]]; then
+	  _message "no more parameters"
+      else
+	  _normal
+      fi
+    ;;
     attached-sessions)
       sessions=(
         ${${${(M)${(f)"$(_call_program screen-sessions $words[1] \
@@ -134,4 +133,6 @@ if [[ -n $state ]]; then
     _wanted screen-sessions expl "${state%-*} screen process" \
 	compadd ${sessions#*.}
   fi
-fi
+fi && ret=0
+
+return ret

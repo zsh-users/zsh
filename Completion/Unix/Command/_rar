@@ -38,7 +38,7 @@ common=(
 case $service in
   unrar)
     if (( CURRENT == 2 )); then
-       _values 'rar command' \
+      _values 'rar command' \
 	'e[extract files to current directory]' \
 	'l[list archive]' \
 	'lt[list archive (technical format)]' \
@@ -48,7 +48,7 @@ case $service in
 	'v[verbosely list archive]' \
 	'vt[verbosely list archive (technical format)]' \
 	'vb[verbosely list archive (bare format)]' \
-	'x[extract files with full path]' && return
+	'x[extract files with full path]'
     else
       _arguments -S \
 	'-ep3[expand paths to full including the drive letter]' \
@@ -58,7 +58,7 @@ case $service in
 	'-n+:file to include:_files' \
 	'-n@+:file of files to include:_files' \
         "$common[@]" \
-        '*:RAR files:_files -g \*.rar\(-.\)' && return
+        '*:RAR files:_files -g \*.rar\(-.\)'
     fi
   ;;
   rar)
@@ -89,7 +89,7 @@ case $service in
 	'v[verbosely list archive]' \
 	'vt[verbosely list archive (technical format)]' \
 	'vb[verbosely list archive (bare format)]' \
-	'x[extract files with full path]' && return
+	'x[extract files with full path]'
     else
       _arguments -S \
 	'-ag[generate archive name using the current date]' \
@@ -126,7 +126,7 @@ case $service in
 	'-w+[assign work directory]:work directory:_files -/' \
 	"$common[@]" \
 	'-z+[read archive comment from file]:comment file:_files' \
-	'*:files:_files' && return
+	'*:files:_files'
     fi
   ;;
 esac

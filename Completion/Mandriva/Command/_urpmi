@@ -1,24 +1,8 @@
 #compdef urpme urpmi urpmi.addmedia urpmi.removemedia urpmi.update urpmq urpmf parsehdlist
 
 _urpmi_media() {
-  local ret=1  single=0
-  local -a all_sources opts
-
-  if [[ $1 = -s ]]; then
-    single=1
-    shift
-  fi
-
   # TODO should we probe for active media only?
-  all_sources=( ${(f)"$(urpmq --list-media 2> /dev/null)"} )
-  
-  if (( single )); then
-    compadd "$expl[@]" -a all_sources && ret=0
-  else
-    _values -s , 'urpmi media' "$all_sources[@]" && ret=0
-  fi
-
-  return $ret
+  compadd "$@" - ${(f)"$(urpmq --list-media 2> /dev/null)"}
 }
 
 _urpmi_rpms() {
@@ -40,7 +24,7 @@ _urpmi_rpms() {
 
     _requested files expl '(S)RPM file' \
       _files -g '*.(#i)rpm(-.)' && ret=0
-  
+
     (( ret )) || break
   done
 
@@ -65,12 +49,12 @@ _urpmi_media_url() {
     fi
   fi
 
-  return $ret
+  return ret
 }
 
 _urpme_package() {
   local -a _rpms
-  _rpms=( $(_call_program packages rpm -qa 2>/dev/null) )
+  _rpms=( $(_call_program packages rpm -qa) )
   compadd "$@" -a _rpms
 }
 
@@ -80,12 +64,11 @@ _urpmi_parallel_alias() {
 }
 
 _urpmi() {
-  local state context line ret=1 help="--help -h"
-
-  local -a opts_help  opts_net opts_verbose opts_inst_rem opts_search opts_media
+  local ret=1 help="--help -h"
+  local -a opts_help opts_net opts_verbose opts_inst_rem opts_search opts_media
 
   opts_help=(
-    "($help : -)"{--help,-h}"[print usage information]"
+    "(: -)"{--help,-h}"[print usage information]"
   )
 
   opts_net=(
@@ -116,10 +99,10 @@ _urpmi() {
   )
 
   opts_media=(
-    "($help)--excludemedia[do not use the given media]:urpmi media: _urpmi_media"
-    "($help --update --use-distrib)--media[use only the media listed by comma]:urpmi media: _urpmi_media"
-    "($help)--searchmedia[use only the given media to search requested (or updated) packages]:urpmi media: _urpmi_media -s"
-    "($help)--sortmedia[sort media according to substrings separated by comma]:urpmi media: _urpmi_media"
+    "($help)--excludemedia[do not use the given media]:urpmi media:_sequence _urpmi_media"
+    "($help --update --use-distrib)--media[use only the media listed by comma]:urpmi media:_sequence _urpmi_media"
+    "($help)--searchmedia[use only the given media to search requested (or updated) packages]:urpmi media:_urpmi_media"
+    "($help)--sortmedia[sort media according to substrings separated by comma]:urpmi media:_sequence _urpmi_media"
     "($help)--synthesis[use the given synthesis instead of urpmi db]:synthesis file:_url"
     "($help --media --use-distrib)--update[use only update media]"
     "($help --media --update)--use-distrib[configure urpmi on the fly from a distrib tree]:installation media:_urpmi_media_url"
@@ -132,7 +115,7 @@ _urpmi() {
         $opts_inst_rem \
 	"--auto[do not ask any question]" \
 	"-v[verbose]" \
-	": :_urpme_package"
+	": :_urpme_package" && ret=0
     ;;
     urpmi.addmedia )
       _arguments -A '-*' \
@@ -165,7 +148,7 @@ _urpmi() {
 	"($help :)-a[select all media]" \
 	"($help)-c[clean headers cache directory]" \
 	"($help)-y[fuzzy mathing on media names]" \
-	"(-a)"{,\*}": : _urpmi_media" \
+	"(-a)"{,\*}":media:_sequence _urpmi_media" \
        && ret=0
     ;;
     urpmi.update )
@@ -179,7 +162,7 @@ _urpmi() {
 	"($help --update :)-a[select all non-removable media]" \
 	"($help)-c[clean /var/cache/urpmi/headers on exit]" \
 	"($help)*-f[force generation of hdlist files]" \
-	"($help -a)"{,\*}": : _urpmi_media" \
+	"($help -a)"{,\*}":media:_sequence _urpmi_media" \
        && ret=0
     ;;
     urpmi )
@@ -308,7 +291,7 @@ _urpmi() {
     ;;
   esac
 
-  return $ret
+  return ret
 }
 
 _urpmi "$@"

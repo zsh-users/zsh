@@ -1,6 +1,6 @@
 #compdef strip
 
-local curcontext=$curcontext state line ret=0
+local curcontext=$curcontext state line ret=1
 declare -A opt_args
 declare -a args
 
@@ -11,8 +11,8 @@ if _pick_variant gnu=GNU solaris --version; then
     local expl
 
     _description files expl 'command-line-options file'
-    _files $expl && ret=0
-    return $ret
+    _files "$expl[@]"
+    return
   fi
   args=(
     '(-F --target)'{-F+,--target=}'[object code format to use]:bfd name:->bfdnames'
@@ -52,9 +52,9 @@ case $state in
     local expl
     declare -a bfdnames
 
-    bfdnames=(${=${(M)${(f)"$(_call_program bfdnames strip --help 2>/dev/null)"}:#strip: supported targets: *}#strip: supported targets: })
+    bfdnames=(${=${(M)${(f)"$(_call_program bfdnames strip --help)"}:#strip: supported targets: *}#strip: supported targets: })
     _describe -t bfdnames 'bfd name' bfdnames && ret=0
     ;;
 esac
 
-return $ret
+return ret

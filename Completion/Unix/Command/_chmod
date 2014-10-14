@@ -49,7 +49,7 @@ case "$state" in
       compset -P '*'
       _alternative -O suf \
 	'who:who:((u\:user g\:group a\:all o\:others))' \
-	'operators:operator:(+ - =)'
+	'operators:operator:(+ - =)' && ret=0
     fi
   ;;
   files)

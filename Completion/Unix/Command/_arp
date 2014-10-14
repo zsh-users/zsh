@@ -1,6 +1,6 @@
 #compdef arp
 
-local state line expl curcontext="$curcontext"
+local state line expl curcontext="$curcontext" ret=1
 local -a cmds
 
 cmds=(-a --display -d --delete -s --set -f --file)
@@ -15,7 +15,9 @@ _arguments -C \
   '(-H --hw-type -d --delete)'{-H,--hw-type}'[class of entries to check for]:class:(ether arcnet pronet ax25 netrom)' \
   '(-n --numeric -d --delete -s --set -f --file)'{-n,--numeric}'[shows numerical addresses]' \
   '(-v --verbose)'{-v,--verbose}'[be verbose]' \
-  '(-a)1:host:->hostintable'
+  '(-a)1:host:->hostintable' && ret=0
 
 [[ "$state" = hostintable ]] &&
-  _wanted hosts expl 'host' compadd ${${${(f)"$(${words[1]} -an)"}##[ ?(]#}%%[ )]*}
+  _wanted hosts expl 'host' compadd ${${${(f)"$(${words[1]} -an)"}##[ ?(]#}%%[ )]*} && ret=0
+
+return ret

@@ -40,11 +40,11 @@ else
 	  compadd ${${(M)${(f)"$(stg series 2> /dev/null)"}##[+>] *}#[+>] } \
 		  && ret=0
       else
-	_files
+	_files && ret=0
       fi
     ;;
     (*)
-      _files
+      _files && ret=0
     ;;
   esac
 fi

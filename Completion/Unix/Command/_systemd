@@ -132,9 +132,9 @@ _hosts_or_user_at_host()
   )
 
   if (( CURRENT == 1 )); then
-    _describe -t commands 'systemctl command' _systemctl_cmds || compadd "$@"
+    _describe -t commands 'systemctl command' _systemctl_cmds
   else
-    local curcontext="$curcontext"
+    local curcontext="$curcontext" ret
 
     cmd="${${_systemctl_cmds[(r)$words[1]:*]%%:*}}"
     # Deal with any aliases

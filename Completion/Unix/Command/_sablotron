@@ -20,15 +20,8 @@ _arguments -C \
 if [[ -n "$state" ]]; then
   mode="${opt_args[(i)-c|--chain-xsl]:+chain}${opt_args[(i)-x|--batch-xml]:+batch-x}${opt_args[(i)-s|--batch-xsl]:+batch-s}"
   [[ $mode = (chain|batch-[xs]) ]] || mode=default
-  _tags assignments files
+  _tags files assignments
   while _tags; do
-    if _requested assignments; then
-      if [[ -prefix *= ]]; then
-        _message -e value value
-      else
-        _message -e parameter 'parameter name'
-      fi
-    fi
     if _requested files; then
       case $mode:${#words[1,CURRENT-1]:#(-*|*=*)}; in
         default:1|chain:<3->|batch-x:2|batch-s:1)
@@ -44,6 +37,13 @@ if [[ -n "$state" ]]; then
 	  _files "$expl[@]" && ret=0
 	;;
       esac
+    fi
+    if _requested assignments; then
+      if [[ -prefix *= ]]; then
+	_message -e value value
+      else
+	_message -e parameter 'parameter name' && ret=0
+      fi
     fi
     (( ret )) || break
   done

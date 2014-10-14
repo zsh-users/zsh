@@ -1,6 +1,6 @@
 #compdef apt-move
 
-local curcontext="$curcontext" state line cmds ret=1
+local curcontext="$curcontext" state line expl cmds ret=1
 typeset -A opt_args
 
 _arguments -C \
@@ -45,7 +45,10 @@ case $state in
         _files -g "*.d(sc|eb)(-.)" && ret=0
       ;;
       listbin)
-        _wanted lists expl list compadd mirror sync repo
+        _wanted lists expl list compadd mirror sync repo && ret=0
+      ;;
+      *)
+	_default && ret=0
       ;;
     esac
   ;;

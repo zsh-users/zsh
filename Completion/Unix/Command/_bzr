@@ -11,12 +11,12 @@ _arguments -C \
 
 if (( ! $+_bzr_cmds )); then
     typeset -gH _bzr_cmds
-    _bzr_cmds=(${(f)"$(_call_program bzr bzr shell-complete)"})
+    _bzr_cmds=(${(f)"$(_call_program subcommands bzr shell-complete)"})
 fi
 
 if [[ $state != 'args' ]]; then
-    _describe -t subcommand 'subcommand' _bzr_cmds
-    return 0
+    _describe -t subcommands 'subcommand' _bzr_cmds
+    return
 fi
 
 cmd="$words[1]"
@@ -25,39 +25,35 @@ curcontext="${curcontext%:*:*}:bzr-$cmd:"
 (( $+functions[_bzr_unknownFiles] )) ||
 _bzr_unknownFiles() {
     local fileList
-    fileList=(${(ps:\0:)"$(bzr ls --null --unknown -R)"})
+    fileList=(${(ps:\0:)"$(_call_program files bzr ls --null --unknown -R)"})
     compadd -af fileList
-    return 0
 }
 
 (( $+functions[_bzr_unknownRoot] )) ||
 _bzr_unknownRoot() {
-    local fileList
-    fileList=(${(ps:\0:)"$(bzr ls --null --from-root --unknown)"})
+    local -a fileList
+    fileList=(${(ps:\0:)"$(_call_program files bzr ls --null --from-root --unknown)"})
     compadd -af fileList
-    return 0
 }
 
 (( $+functions[_bzr_versionedFiles] )) ||
 _bzr_versionedFiles() {
     local fileList
-    fileList=(${(ps:\0:)"$(bzr ls --null --versioned -R)"})
+    fileList=(${(ps:\0:)"$(_call_program files bzr ls --null --versioned -R)"})
     compadd -af fileList
-    return 0
 }
 
 (( $+functions[_bzr_modifiedFiles] )) ||
 _bzr_modifiedFiles() {
     local fileList
-    fileList=(${(ps:\0:)"$(bzr status . --versioned --short | cut -b 5- | tr '\n' '\0')"})
+    fileList=(${(ps:\0:)"$(_call_program files bzr status . --versioned --short | cut -b 5- | tr '\n' '\0')"})
     compadd -af fileList
-    return 0
 }
 
 (( $+functions[_bzr_completeParents] )) ||
 _bzr_completeParents() {
-    local parentFile=$(bzr root 2>/dev/null)/.bzr/branch/parent
-    [[ -r $parentFile ]] && compadd -X "Completing parents" $(cat $parentFile)
+    local parentFile=$(_call_program parents bzr root)/.bzr/branch/parent
+    [[ -r $parentFile ]] && _wanted parents expl parent compadd -- $(<$parentFile)
 }
 
 args=( '(-)'{--help,-h}'[show help message]' )
@@ -99,7 +95,7 @@ case $cmd in
 	'--lightweight[perform a lightweight checkout]'
 	'(-r --revision)'{--revision=,-r}'[the revision to get]:rev:'
 	)
-    _bzr_completeParents
+    _bzr_completeParents && ret=0
     ;;
 
 (rename|move|mv)
@@ -194,7 +190,7 @@ case $cmd in
 	'(-v --verbose)'{--verbose,-v}'[display more information]'
 	'*:local repository:_files -/'
 	)
-    _bzr_completeParents
+    _bzr_completeParents && ret=0
     ;;
 
 (missing)
@@ -210,7 +206,7 @@ case $cmd in
 	'(-v --verbose)'{--verbose,-v}'[display more information]'
 	'*:local repository:_files -/'
 	)
-    _bzr_completeParents
+    _bzr_completeParents && ret=0
     ;;
 
 (commit|checkin|ci)
@@ -227,7 +223,7 @@ case $cmd in
     ;;
 
 (bind|break-lock|reconcile)
-    _bzr_completeParents
+    _bzr_completeParents && ret=0
     ;;
 
 (register-branch)
@@ -240,7 +236,7 @@ case $cmd in
 	'--link-bug=[the bug this branch fixes]:bug-ID:'
 	'--product=[launchpad product short name to associate with the branch]:product:'
 	)
-    _bzr_completeParents
+    _bzr_completeParents && ret=0
     ;;
 
 (remerge)
@@ -249,7 +245,7 @@ case $cmd in
 	'--reprocess[reprocess to reduce spurious conflicts]'
 	'--show-base[show base revision text in conflicts]'
 	)
-    _bzr_completeParents
+    _bzr_completeParents && ret=0
     ;;
 
 (conflicts|added|deleted|modified|unknowns|directories|ignored|unbind|nick|revno|version)
@@ -322,7 +318,7 @@ case $cmd in
 	'--show-base[show base revision text in conflicts]'
 	'*:local repository:_files -/'
 	)
-    _bzr_completeParents
+    _bzr_completeParents && ret=0
     ;;
 
 (ls)
@@ -346,7 +342,7 @@ case $cmd in
 	'(-v --verbose -q --quiet)'{--verbose,-v}'[display more information]'
 	'*:local repository:_files -/'
 	)
-    _bzr_completeParents
+    _bzr_completeParents && ret=0
     ;;
 
 (help)
@@ -355,8 +351,8 @@ case $cmd in
 	'*:subcmds:->cmds'
 	)
     _arguments -s "$args[@]" && ret=0
-    _describe -t subcommand 'subcommand' _bzr_cmds
-    return 0
+    _describe -t subcommands 'subcommand' _bzr_cmds && ret=0
+    return ret
     ;;
 
     # Plugins
@@ -380,7 +376,7 @@ case $cmd in
 	'--remember[remember the specified location as a default]'
 	'*:local repository:_files -/'
 	)
-    _bzr_completeParents
+    _bzr_completeParents && ret=0
     ;;
 
 (clean-tree)
@@ -409,10 +405,11 @@ case $cmd in
     ;;
 
 (*)
-    _message "unknown bzr command completion: $cmd"
-    return 1
+    _default
+    return
     ;;
 esac
 
 _arguments -s "$args[@]" && ret=0
-return $ret
+
+return ret

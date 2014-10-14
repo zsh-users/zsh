@@ -12,8 +12,8 @@ if (( ! $+_telnet_args )); then
   local help="$(_call_program options 'telnet -\?' < /dev/null 2>&1)"
   local -A optionmap
   optionmap=(
-    '*\[-4\]*' '-4[Force IPv4 address resolution]'
-    '*\[-6\]*' '-6[Force IPv6 address resolution]'
+    '*\[-4\]*' '-4[force IPv4 address resolution]'
+    '*\[-6\]*' '-6[force IPv6 address resolution]'
     '*\[-8\]*' '-8[allow 8-Bit data]'
     '*\[-E\]*' '-E[disable an escape character]'
     '*\[-K\]*' '-K[no automatic login]'
@@ -52,16 +52,16 @@ _arguments -C -s \
 case "$state" in
 ssl)
   _values -w 'SSL parameter' \
-    'debug[Send SSL debugging info to stderr]' \
-    '(nossl)ssl[Negotiate SSL connection]' \
-    '(ssl)nossl[Switch off SSL negotiation]' \
-    'certrequired[Require server certificate]' \
-    'secure[No fallback to unencrypted mode]' \
-    'verbose[Be verbose about certificates, etc.]' \
-    'verify[Set SSL verify flags]:int:' \
-    'cert[Specify certificate file]:certificate file:_path_files' \
-    'key[Specify key file]:key file:_path_files' \
-    'cipher[Set preferred cipher list]:ciphers:'
+    'debug[send SSL debugging info to stderr]' \
+    '(nossl)ssl[negotiate SSL connection]' \
+    '(ssl)nossl[switch off SSL negotiation]' \
+    'certrequired[require server certificate]' \
+    'secure[no fallback to unencrypted mode]' \
+    'verbose[be verbose about certificates, etc.]' \
+    'verify[set SSL verify flags]:int' \
+    'cert[specify certificate file]:certificate file:_path_files' \
+    'key[specify key file]:key file:_path_files' \
+    'cipher[set preferred cipher list]:cipher' && ret=0
   ;;
 
 hosts)

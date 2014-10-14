@@ -1,26 +1,23 @@
 #compdef django-admin.py django-admin manage.py
 
-local ret=1 state
+local curcontext="$curcontext" state line expl ret=1
 
-if [ "$service" = "manage.py" ] && [ ! -x ./manage.py ]; then
-  return 0
+if [[ "$service" = "manage.py" && ! -x ./manage.py ]]; then
+  _default
+  return
 fi
 
 declare -ga common_args
 common_args=(
   '--help[display help information]'
   '--version[display version information]'
-  '--pythonpath=[directory to add to the Python path]:directory:_directories'
-  '--settings=[Python path to settings module]:settings'
+  '--pythonpath=[directory to add to the Python path]:directory:_directories -W / -P /'
+  '--settings=[python path to settings module]:settings'
   '--traceback[print traceback on exception]'
 )
 
-_directories () {
-  _wanted directories expl directory _path_files -/ "$@" -
-}
-
 typeset -A opt_args
-_arguments \
+_arguments -C \
   $common_args \
   ':subcommand:->subcommand' \
   '*::options:->options' && ret=0
@@ -66,7 +63,7 @@ case $state in
             subcommands+=($cmd)
         fi
     done
-    
+
     _describe -t subcommands 'django admin subcommand' subcommands && ret=0
     ;;
 
@@ -101,8 +98,8 @@ case $state in
           settings="${DJANGO_SETTINGS_MODULE}"
       else
         return 0
-      fi 
-     
+      fi
+
       _wanted appname expl appname compadd - $(command \
         sed -n "/INSTALLED_APPS\s*=\s*(/,/)/p" ${settings} | \
         sed -n "s/^\s*'\(.*\.\)*\(.*\)'.*$/\2 /pg")
@@ -205,7 +202,7 @@ case $state in
         ;;
     esac
 
-    _arguments $args && ret=0
+    _arguments -C $args && ret=0
     ;;
 esac
 

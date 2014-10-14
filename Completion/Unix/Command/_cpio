@@ -1,17 +1,17 @@
 #compdef cpio
 
 local args ig curcontext="$curcontext" state line
-local expl ret
+local expl ret=1
 local fmts='(bar bin odc newc crc tar ustar hpbin hpodc)'
 
 _pick_variant -r ig gnu=GNU unix --version
 
 if (( CURRENT == 2 )); then
-   # Complete arguments 
+   # Complete arguments
    args=('-o[create archive]' '-i[extract from archive]'
    '-p[run as filter on directory tree]')
    [[ $ig = gnu ]] && args=($args '--create[create archive]'
-   '--extract[extract from archive]' 
+   '--extract[extract from archive]'
    '--pass-through[run as filter on directory tree]'
    '--help[show help text]' '--version[show version information]')
 else
@@ -23,13 +23,13 @@ else
 	   "--format=:format type:$fmts"
 	   '--message=:message at end of volume:'
 	   '--null' '--reset-access-time'
-	   '--verbose' '--dot' '--append' 
+	   '--verbose' '--dot' '--append'
 	   '--block-size=:block size in 512 byte units:'
 	   '--dereference'
 	   '--io-size=:block size in bytes'
 	   '--quiet' '--force-local'  '--help'   '--version')
     fi
-    args=($args
+    args+=(
 	  '-A[append files to archive]'
 	  '-B[block size 5120 bytes with special file]'
 	  '-C[set block size per record]:block size in bytes:(8192)'
@@ -44,10 +44,10 @@ else
     if [[ $ig = gnu ]]; then
       args=('--file=:archive file:->afile'
 	    "--format=:format type:$fmts"
-	    '--make-directories' '--nonmatching' 
+	    '--make-directories' '--nonmatching'
             '--preserve-modification-time' '--numeric'
 	    '--rename' '--list' '--swap-bytes' '--swap-halfwords'
-	    '--dot' '--unconditional' '--verbose' 
+	    '--dot' '--unconditional' '--verbose'
 	    '--block-size=:block size in 512 byte units:'
 	    '--swap-halfwords'
 	    '--io-size=:block size in bytes:'
@@ -58,7 +58,7 @@ else
 	    '--no-absolute-filenames' '--sparse' '--only-verify-crc'
 	    '--quiet' '--help' '--version')
     fi
-    args=($args
+    args+=(
 	  '-b[reverse bytes in word]'
 	  '-B[block size 5120 bytes with special file]'
 	  '-d[create directories as needed]'
@@ -87,7 +87,7 @@ else
 	    '--owner=:user (and group) for files:->user'
 	    '--no-preserve-owner' '--sparse'  '--help'  '--version')
     fi
-    args=($args
+    args+=(
 	  '-d[create directories as needed]'
 	  '-l[link files instead of copying]'
 	  '-L[follow symbolic links]'
@@ -98,12 +98,11 @@ else
   else
     return 1
   fi
-  args=($args
+  args+=(
 	'-a[reset access time of input files]'
 	)
-fi 
+fi
 
-ret=1
 _arguments -C -s "$args[@]" && ret=0
 
 if [[ $state = afile ]]; then
@@ -121,12 +120,12 @@ if [[ $state = afile ]]; then
   fi
 elif [[ $state = user ]]; then
   if compset -P '*[:.]'; then
-    _groups
+    _groups && ret=0
   else
     local suf=.
     [[ $OSTYPE = (solaris|hpux)* ]] && suf=:
     compset -S '.*' && unset suf
-    _users -S "$suf" -q
+    _users -S "$suf" -q && ret=0
   fi
 fi
 

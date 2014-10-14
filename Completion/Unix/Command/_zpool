@@ -12,7 +12,7 @@ _zpool() {
 	)
 
 	versions=(
-		${${${(M)"${(f)$(zpool upgrade -v)}":#[[:space:]]#<->*}##[[:space:]]}%%[[:space:]]*}
+		${${${(M)"${(f)$(_call_program versions zpool upgrade -v)}":#[[:space:]]#<->*}##[[:space:]]}%%[[:space:]]*}
 	)
 
 	ro_props=(
@@ -87,15 +87,12 @@ _zpool() {
 
 	if [[ $service == "zpool" ]]; then
 		_arguments -C -A "-*" \
-			'-\?[Help]' \
-			'*::command:->subcmd' && return 0
+			'-\?[show help information]' \
+			'1:subcommand:compadd -a subcmds' \
+			'*:: :->subcmd' && return
 
-		if (( CURRENT == 1 )); then
-			_wanted commands expl "zpool subcommand" compadd -a subcmds
-			return
-		fi
 		service="$words[1]"
-		curcontext="${curcontext%:*}=$service:"
+		curcontext="${curcontext%:*}-$service:"
 	fi
 
 	case $service in

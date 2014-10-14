@@ -24,8 +24,8 @@ if compset -P '+[-0-9]#'; then
     g:goto\ line
     F:scroll\ to\ end\ and\ keep\ reading\ file
     G:go\ to\ end\ of\ file
-    %:go\ to\ position\ in\ file 
-    p:go\ to\ position\ in\ file 
+    %:go\ to\ position\ in\ file
+    p:go\ to\ position\ in\ file
   )'
   return
 fi
@@ -101,9 +101,9 @@ if [[ -n "$state" ]]; then
     ;;
     tags)
       if (( $+LESSGLOBALTAGS )); then
-        _global_tags
+        _global_tags && ret=0
       else
-        _ctags_tags
+        _ctags_tags && ret=0
       fi
     ;;
   esac

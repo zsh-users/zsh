@@ -5262,12 +5262,10 @@ __git_gpg_secret_keys () {
 (( $+functions[__git_merge_strategies] )) ||
 __git_merge_strategies () {
   local expl
-  local -a merge_strategies
 
-  merge_strategies=(${=${${(M)${(f)"$(_call_program merge-strategies "git merge -s '' 2>&1")"}:#[Aa]vailable (custom )#strategies are: *}#[Aa]vailable (custom )#strategies are: }%.})
-  __git_command_successful $pipestatus || return 1
-
-  _wanted merge-strategies expl 'merge strategy' compadd $* - $merge_strategies
+  _wanted merge-strategies expl 'merge strategy' compadd "$@" - \
+      ${=${${${(M)${(f)"$(_call_program merge-strategies \
+      "git merge -s '' 2>&1")"}:#[Aa]vailable (custom )#strategies are: *}#[Aa]vailable (custom )#strategies are: }%.}:-octopus ours recursive resolve subtree}
 }
 
 (( $+functions[__git_encodings] )) ||
@@ -5299,8 +5297,9 @@ __git_remotes () {
   local remotes expl
 
   remotes=(${(f)"$(_call_program remotes git remote 2>/dev/null)"})
+  __git_command_successful $pipestatus || return 1
 
-  _wanted remotes expl remote compadd $* - $remotes
+  _wanted remotes expl remote compadd "$@" -a - remotes
 }
 
 (( $+functions[__git_ref_specs] )) ||
@@ -5431,13 +5430,7 @@ __git_reflog_entries () {
   reflog_entries=(${${${(f)"$(_call_program reflog-entries git reflog 2>/dev/null)"}#* }%%:*})
   __git_command_successful $pipestatus || return 1
 
-  if compset -P '*@'; then
-    reflog_entries=(${${(M)reflog_entries:#$IPREFIX*}#$IPREFIX})
-    _wanted reflog-entries expl 'reflog entry' compadd $* - $reflog_entries
-  else
-    reflog_entries=(${reflog_entries%@*})
-    _wanted reflog-entries expl 'reflog entry' compadd -qS @ $* - $reflog_entries
-  fi
+  _wanted reflog-entries expl 'reflog entry' _multi_parts @ reflog_entries
 }
 
 (( $+functions[__git_ref_sort_keys] )) ||
@@ -5492,7 +5485,7 @@ __git_stashes () {
   stashes=(${${(f)"$(_call_program stashes git stash list 2>/dev/null)"}/: */})
   __git_command_successful $pipestatus || return 1
 
-  _wanted stashes expl stash compadd $* - $stashes
+  _wanted stashes expl stash compadd "$@" -a - stashes
 }
 
 (( $+functions[__git_svn_revisions] )) ||
@@ -5531,7 +5524,7 @@ __git_branch_names () {
   branch_names=(${${(f)"$(_call_program branchrefs git for-each-ref --format='"%(refname)"' refs/heads 2>/dev/null)"}#refs/heads/})
   __git_command_successful $pipestatus || return 1
 
-  _wanted branch-names expl branch-name compadd $* - $branch_names
+  _wanted branch-names expl branch-name compadd "$@" -a - branch_names
 }
 
 (( $+functions[__git_remote_branch_names] )) ||
@@ -5542,7 +5535,7 @@ __git_remote_branch_names () {
   branch_names=(${${(f)"$(_call_program remote-branch-refs git for-each-ref --format='"%(refname)"' refs/remotes 2>/dev/null)"}#refs/remotes/})
   __git_command_successful $pipestatus || return 1
 
-  _wanted remote-branch-names expl 'remote branch name' compadd $* - $branch_names
+  _wanted remote-branch-names expl 'remote branch name' compadd "$@" -a - branch_names
 }
 
 (( $+functions[__git_remote_branch_names_noprefix] )) ||
@@ -5553,7 +5546,7 @@ __git_remote_branch_names_noprefix () {
   branch_names=(${${${(f)"$(_call_program remote-branch-refs-noprefix git for-each-ref --format='"%(refname)"' refs/remotes 2>/dev/null)"}##*/}:#HEAD})
   __git_command_successful $pipestatus || return 1
 
-  _wanted remote-branch-names-noprefix expl 'remote branch name' compadd $* - $branch_names
+  _wanted remote-branch-names-noprefix expl 'remote branch name' compadd "$@" -a - branch_names
 }
 
 (( $+functions[__git_commits] )) ||
@@ -5582,7 +5575,7 @@ __git_heads () {
     done
   fi
 
-  _wanted heads expl head compadd $* - $heads
+  _wanted heads expl head compadd "$@" -a - heads
 }
 
 (( $+functions[__git_commit_objects] )) ||
@@ -5678,7 +5671,7 @@ __git_submodules () {
   submodules=(${${${(f)"$(_call_program submodules git submodule 2>/dev/null)"}#?* }%% *})
   __git_command_successful $pipestatus || return 1
 
-  _wanted submodules expl submodule compadd $* - $submodules
+  _wanted submodules expl submodule compadd "$@" -a - submodules
 }
 
 # Tag Argument Types
@@ -5691,7 +5684,7 @@ __git_tags () {
   tags=(${${(f)"$(_call_program tagrefs git for-each-ref --format='"%(refname)"' refs/tags 2>/dev/null)"}#refs/tags/})
   __git_command_successful $pipestatus || return 1
 
-  _wanted tags expl tag compadd $* - $tags
+  _wanted tags expl tag compadd "$@" -a - tags
 }
 
 (( $+functions[__git_commit_tags] )) ||
@@ -5714,7 +5707,7 @@ __git_tags_of_type () {
   tags=(${${(M)${(f)"$(_call_program $type-tag-refs "git for-each-ref --format='%(*objecttype)%(objecttype) %(refname)' refs/tags 2>/dev/null")"}:#$type(tag|) *}#$type(tag|) refs/tags/})
   __git_command_successful $pipestatus || return 1
 
-  _wanted $type-tags expl "$type tag" compadd $* - $tags
+  _wanted $type-tags expl "$type tag" compadd "$@" -a - tags
 }
 
 # Reference Argument Types
@@ -5737,7 +5730,7 @@ __git_references () {
     _git_refs_cache_pwd=$PWD
   fi
 
-  _wanted references expl 'references' compadd - $_git_refs_cache
+  _wanted references expl 'reference' compadd -a - _git_refs_cache
 }
 
 (( $+functions[__git_local_references] )) ||
@@ -5750,7 +5743,7 @@ __git_local_references () {
     _git_local_refs_cache_pwd=$PWD
   fi
 
-  _wanted references expl 'references' compadd - $_git_local_refs_cache
+  _wanted references expl 'reference' compadd -a - _git_local_refs_cache
 }
 
 (( $+functions[__git_remote_references] )) ||
@@ -5766,7 +5759,7 @@ __git_notes_refs () {
   notes_refs=(${${(f)"$(_call_program notes-refs git for-each-ref --format='"%(refname)"' refs/notes 2>/dev/null)"}#$type refs/notes/})
   __git_command_successful $pipestatus || return 1
 
-  _wanted notes-refs expl 'notes ref' compadd $* - $notes_refs
+  _wanted notes-refs expl 'notes ref' compadd "$@" -a - notes_refs
 }
 
 # File Argument Types
@@ -6406,7 +6399,6 @@ __git_config_values () {
 # Git Config Sections and Types
 (( $+functions[__git_browsers] )) ||
 __git_browsers () {
-  integer ret=1
   local expl
   declare -a userbrowsers builtinbrowsers
 
@@ -6431,16 +6423,9 @@ __git_browsers () {
     cygstart
     xdg-open)
 
-  _tags user-browsers builtin-browsers
-
-  while _tags; do
-    _requested user-browsers expl 'user-defined browser' compadd $* - $userbrowsers && ret=0
-    _requested builtin-browsers expl 'builtin browser' compadd $* - $builtinbrowsers && ret=0
-
-    (( ret )) || break
-  done
-
-  return ret
+  _alternative \
+    'user-browsers:user-defined browser:compadd -a - userbrowsers' \
+    'builtin-browsers:builtin browser:compadd -a - builtinbrowsers'
 }
 
 (( $+functions[__git_difftools] )) ||
@@ -6483,10 +6468,10 @@ __git_diff-or-merge-tools () {
   esac
 
   while _tags; do
-    _requested user-difftools expl 'user-defined difftool' compadd $* - $userdifftools && ret=0
-    _requested user-mergetools expl 'user-defined mergetool' compadd $* - $usermergetools && ret=0
-    _requested builtin-difftools expl 'builtin difftool' compadd $* - $builtindifftools && ret=0
-    _requested builtin-mergetools expl 'builtin mergetool' compadd $* - $builtinmergetools && ret=0
+    _requested user-difftools expl 'user-defined difftool' compadd "$@" -a - userdifftools && ret=0
+    _requested user-mergetools expl 'user-defined mergetool' compadd "$@" -a - usermergetools && ret=0
+    _requested builtin-difftools expl 'builtin difftool' compadd "$@" -a - builtindifftools && ret=0
+    _requested builtin-mergetools expl 'builtin mergetool' compadd "$@" -a - builtinmergetools && ret=0
 
     (( ret )) || break
   done
@@ -6577,20 +6562,18 @@ __git_sendemail_suppresscc_values () {
 
 (( $+functions[__git_colors] )) ||
 __git_colors () {
-  declare -a colors
+  declare -a expl
 
-  colors=(black red green yellow blue magenta cyan white)
-
-  _describe -t colors color colors $*
+  _wanted colors expl color compadd "$@" - \
+      black red green yellow blue magenta cyan white
 }
 
 (( $+functions[__git_color_attributes] )) ||
 __git_color_attributes () {
-  declare -a attributes
+  declare -a expl
 
-  attributes=(bold dim ul blink reverse)
-
-  _describe -t attributes attribute attributes $*
+  _wanted attributes expl attribute compadd "$@" - \
+      bold dim ul blink reverse
 }
 
 # Now, for the main drive...
@@ -6657,12 +6640,12 @@ _git() {
       (option-or-argument)
         curcontext=${curcontext%:*:*}:git-$words[1]:
 
-        if (( $+functions[_git-$words[1]] )); then
-          _call_function ret _git-$words[1]
-        elif zstyle -T :completion:$curcontext: use-fallback; then
-          _files && ret=0
-        else
-          _message 'unknown sub-command'
+	if ! _call_function ret _git-$words[1]; then
+	  if zstyle -T :completion:$curcontext: use-fallback; then
+	    _default && ret=0
+	  else
+	    _message "unknown sub-command: $words[1]"
+	  fi
         fi
         ;;
     esac

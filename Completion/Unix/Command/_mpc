@@ -68,21 +68,21 @@ _mpc_command() {
   )
 
   if (( CURRENT == 1 )); then
-    _describe -t command "mpc commands" mpc_cmds
+    _describe -t commands "mpc command" mpc_cmds
   else
-    local curcontext="$curcontext"
+    local cmd=$words[1]
+    local curcontext="${curcontext%:*}:mpc-${cmd}" ret=1
+    if ! _call_function ret _mpc_$cmd; then
+      _default && ret=0
+    fi
+    return ret
   fi
-
-  local cmd=$words[1]
-
-  local curcontext="${curcontext%:*}:mpc-${cmd}"
-  _call_function ret _mpc_$cmd
 }
 
 _mpc_helper_bool() {
   local expl states
   states=(on off yes no 1 0 true false)
-  _wanted states expl boolean compadd $expl -a states
+  _wanted states expl boolean compadd -a states
 }
 
 (( $+functions[_mpc_helper_songnumbers] )) ||
@@ -100,7 +100,7 @@ _mpc_helper_songnumbers() {
     NM="$compstate[nmatches]"
   fi
 
-  out=("${(@f)$(_call_program song-numbers mpc $foo playlist 2>/dev/null)}")
+  out=("${(@f)$(_call_program song-numbers mpc $foo playlist)}")
   out=("${(@M)out[@]:#${~MATCH}}")
 
   sn=("${(@)${(@M)out}//(#b)(#s)(\#|[ >]#)([0-9]#)*/$match[2]}")

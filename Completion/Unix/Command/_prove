@@ -45,7 +45,7 @@ _arguments \
   '--source=[load or configure a SourceHandler]:source:' \
   {-a,--archive}'[store output in archive file]:file:_files' \
   {-j,--jobs}'[run N jobs in parallel]:jobs:' \
-  '*--state=[control persistent state]:state:' \
+  '*--state=[control persistent state]: :_values -s , state last failed passed all hot todo slow fast new old fresh save' \
   '--rc=[custom rcfile]:file:_files' \
-  '*:file or directory:_files' \
-  && return 0
+  '*--rules=[limit tests run (or not) in parallel]:rules' \
+  '*:file or directory:_files'

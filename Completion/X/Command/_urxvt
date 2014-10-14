@@ -1,6 +1,6 @@
-#compdef rxvt urxvt urxvtc
+#compdef rxvt urxvt urxvtc urxvt256c urxvt256cc urxvt256c-ml urxvt256c-mlc
 
-local curcontext="$curcontext" state line expl
+local curcontext="$curcontext" state line expl ret=1
 local -a suf long_args
 typeset -A opt_args
 typeset -U extensions

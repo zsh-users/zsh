@@ -1490,7 +1490,7 @@ function __tmux-windows() {
 # And here is the actual _tmux(), that puts it all together:
 function _tmux() {
     local curcontext="${curcontext}"
-    local mode state ret
+    local mode state ret=1
     local -a args
     local -x tmuxcommand
     unset tmux_describe
@@ -1508,22 +1508,22 @@ function _tmux() {
         '-v[request verbose logging]'
         '*:: :->subcommand_or_options'
     )
-    _arguments -C -s -w ${args} && return
+    _arguments -C -s -w ${args} && ret=0
 
     if [[ ${state} == "subcommand_or_options" ]]; then
         if (( CURRENT == 1 )) ; then
             zstyle -s ":completion:${curcontext}:subcommands" mode mode || mode='both'
             if [[ ${mode} == 'commands' ]]; then
-                _describe -t subcommands 'tmux commands' _tmux_commands
+                _describe -t subcommands 'tmux commands' _tmux_commands && ret=0
             elif [[ ${mode} == 'aliases' ]]; then
-                _describe -t subcommands 'tmux aliases' _tmux_aliases
+                _describe -t subcommands 'tmux aliases' _tmux_aliases && ret=0
             else
-                _describe -t subcommands 'tmux commands and aliases' _tmux_commands -- _tmux_aliases
+                _describe -t subcommands 'tmux commands and aliases' _tmux_commands -- _tmux_aliases && ret=0
             fi
         else
             if (( ${+commands[tmux]} == 0 )); then
                 _message '`tmux'\'' not found in $path; sub-cmd completions disabled.'
-                return 0
+                return
             fi
             tmuxcommand="${words[1]}"
             if [[ -n ${_tmux_aliasmap[$tmuxcommand]} ]] ; then
@@ -1545,6 +1545,7 @@ function _tmux() {
             _call_function ret _tmux-${tmuxcommand}
         fi
     fi
+    return ret
 }
 
 # description generation follows; only done on 1st _tmux call.

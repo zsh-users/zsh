@@ -1,7 +1,5 @@
 #compdef bogoutil bogotune bogofilter
 
-local expl ret bogotokens
-
 _bogoutil_caching_policy () {
   local -a oldp
 
@@ -14,6 +12,7 @@ _bogoutil_caching_policy () {
 
 _bogoutil() {
 
+  local bogotokens expl ret=1
 	typeset -a _bogoutil_actions
 	_bogoutil_actions=(-h --help -V --version -d --dump -l --load -u
 		--upgrade -m -w -p -H --db-verify -r -R --db-prune --db-recover
@@ -46,30 +45,27 @@ _bogoutil() {
 	"($_bogoutil_actions)"'--db-remove-environment:database:_files -/' \
 	'--db_lk_max_locks[set max lock count]' \
 	'--db_lk_max_objects[set max object count]' \
-  	"($_bogoutil_actions)"'-h[help]' \
-  	"($_bogoutil_actions)"'--help' \
-  	"($_bogoutil_actions)"'-V[version]' \
-  	"($_bogoutil_actions)"'--version' \
+	"($_bogoutil_actions)"{-h,--help}'[help]' \
+	"($_bogoutil_actions)"{-V,--version}'[version]' \
   	'*:tokens:->tokens' && ret=0
 
   zstyle -s ":completion:${curcontext}:" cache-policy update_policy
   if [[ -z "$update_policy" ]]; then
     zstyle ":completion:${curcontext}:" cache-policy _bogoutil_caching_policy
   fi
-  
+
   case $state in
   	(tokens)
   	if ( [[ -z "$bogotokens" ]] || _cache_invalid bogotokens ) &&
   	  ! _retrieve_cache bogotokens; then
-  	  bogotokens=(${${(f)"$(_call_program bogoutil bogoutil -d ~/.bogofilter/wordlist.db -c 50)"}%% *})
+          bogotokens=(${${(f)"$(_call_program bogotokens bogoutil -d ~/.bogofilter/wordlist.db -c 50)"}%% *})
   	  _store_cache bogotokens bogotokens
-  	else
-  	  :
   	fi
-  	  _wanted tokens expl "token" \
-  	     compadd -a bogotokens
+          _wanted tokens expl "token" compadd -a bogotokens && ret=0
   	;;
   esac
+
+  return ret
 }
 
 case $service in

@@ -52,9 +52,9 @@ _module()
   )
 
   if (( CURRENT == 1 )); then
-    _describe -t commands 'module command' _module_cmds || compadd "$@"
+    _describe -t commands 'module command' _module_cmds
   else
-    local curcontext="$curcontext"
+    local curcontext="$curcontext" ret
 
     cmd="${${_module_cmds[(r)$words[1]:*]%%:*}}"
     # Deal with any aliases
@@ -65,7 +65,7 @@ _module()
       show) cmd="display";;
       keyword) cmd="apropos";;
     esac
-                
+
     if (( $#cmd ));
     then
       local update_policy
@@ -132,7 +132,7 @@ _module_available_modules()
 {
   _arguments -s \
     '(-a --append)'{--append,-a}'[append the directories instead of prepending]' \
-    '*:directory:_files -/'    
+    '*:directory:_files -/'
 }
 
 # Completion function for unuse

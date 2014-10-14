@@ -123,6 +123,4 @@ _arguments \
   '--css-prefix:CSS class name:' \
   '--accessibility-check:priority level:(${access[@]})' \
   '--newline:newline character:(LF CRLF CR)' \
-  '*:file:_files' && return
-
-return 1
+  '*:file:_files'

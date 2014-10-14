@@ -1,6 +1,6 @@
 #compdef df
 
-local context state state_descr line args spec
+local curcontext="$curcontext" state state_descr line args spec ret=1
 local -A opt_args
 
 if _pick_variant gnu=GNU unix --version; then
@@ -34,6 +34,7 @@ elif [[ "$OSTYPE" == (darwin|freebsd|dragonfly)* ]]; then
     '(-b -g -H -h -k -m)-m[use 1024*1024-byte blocks]'
     '-P[POSIX compliant output]'
     '-a[show all mount points]'
+    '-c[display a grand total]'
     '-i[include inode usage statistics (default)]'
     '-l[only display locally-mounted file systems]'
     '-n[use previously obtained statistics]'
@@ -44,7 +45,7 @@ elif [[ "$OSTYPE" == (darwin|freebsd|dragonfly)* ]]; then
     (darwin*)
       args+=(
         "-T+$spec"
-#       '-t[same as -T (obsolete)]:file system type:->fslist'
+        "!-t+$spec" # obsolete
       )
       ;;
     (freebsd*|dragonfly*)
@@ -61,19 +62,15 @@ else
   )
 fi
 
-_arguments -s -S : $args && return 0
+_arguments -C -s -S : $args && ret=0
 
 case "$state" in
   (fslist)
-    local -a fsys used pre disp expl
-    _file_systems -U -O fsys
-    pre=$IPREFIX
-    # offer 'no' only if at the beginning of the list
-    if ! compset -P '*,' && ! compset -P 'no'; then
-      disp=( 'no  -- exclude file system types in the list' )
-      _wanted list-prefix expl 'prefix to list' compadd -d disp 'no'
-    fi
-    used=( ${(s:,:)${${IPREFIX#$pre}#no}} )
-    _wanted fsys-types expl "$state_descr" compadd -qS , -F used -a fsys
+    [[ ! -prefix *, ]] && ! compset -P 'no' &&
+        _describe -t list-prefixes 'prefix to list' \
+        '( no:exclude\ file\ system\ types\ in\ the\ list )' && ret=0
+    _sequence -s , _file_systems && ret=0
     ;;
 esac
+
+return ret

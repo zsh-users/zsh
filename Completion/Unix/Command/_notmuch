@@ -57,12 +57,15 @@ _notmuch_search()
 
 _notmuch()
 {
+  local ret=1
   if (( CURRENT > 2 )) ; then
     local cmd=${words[2]}
     curcontext="${curcontext%:*:*}:notmuch-$cmd"
     (( CURRENT-- ))
     shift words
-    _call_function ret _notmuch_$cmd
+    if ! _call_function ret _notmuch_$cmd; then
+      _default && ret=0
+    fi
     return ret
   else
     _notmuch_commands

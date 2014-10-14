@@ -122,7 +122,7 @@ _rpm () {
     query)
       # --dump requires one of -{l,c,d}
       # --triggers requires --script
-      _arguments -s \
+      _arguments -s -C \
 	\!{-q,--query} "${commonopts[@]}" "${selectopts[@]}" "${pathopts[@]}" \
 	"($sopts)--specfile[query specified spec file as if it were a package]" \
 	'(-i --info)'{-i,--info}'[display package information]' \
@@ -140,10 +140,10 @@ _rpm () {
 	{--triggers,--triggerscripts}'[show trigger scripts]' && ret=0
       ;;
     setattrs)
-      _arguments -s --set{perm,ugids} "${selectopts[@]}" && ret = 0
+      _arguments -s -C --set{perm,ugids} "${selectopts[@]}" && ret=0
       ;;
     verify)
-      _arguments -s \!-{y,V} \
+      _arguments -s -C \!-{y,V} \
 	"${commonopts[@]}" "${selectopts[@]}" "${pathopts[@]}" \
 	--no{deps,files,scripts,digest,signature,linkto,md5,size,user,group,mtime,mode,rdev} && ret=0
       ;;
@@ -151,7 +151,7 @@ _rpm () {
       tmp=( '(--force)--oldpackage' )
       ;&
     install)
-      _arguments -s \!-{i,U} "$tmp[@]" \
+      _arguments -s -C \!-{i,U} "$tmp[@]" \
 	"${commonopts[@]}" "${pathopts[@]}" \
 	'--excludepath:file to exclude:_files -/' \
 	'--relocate:relocate:->relocate' \
@@ -165,7 +165,7 @@ _rpm () {
 	'*:pkg file:->package_file' && ret=0
       ;;
     uninstall)
-      _arguments -s \!-e \
+      _arguments -s -C \!-e \
 	"${commonopts[@]}" "${pathopts[@]}" \
 	--{allmatches,justdb,repackage,test} \
 	--no{deps,scripts,preun,postun,trigger{s,un,postun}} \
@@ -177,7 +177,7 @@ _rpm () {
     build_t)
       (( $#tmp )) || tmp=( '*:tar file:_files -g "*.(#i)tar(.*|)(-.)"' )
 
-      _arguments -s \
+      _arguments -s -C \
 	"${commonopts[@]}" "${pathopts[@]}" \
 	--{short-circuit,clean,nobuild,rmsource,sign,test} \
 	'--target:specify a build target:->target'\
@@ -187,13 +187,13 @@ _rpm () {
 	'--timecheck:time check (seconds):' "$tmp[1]" && ret=0
       ;;
     sigcheck)
-      _arguments -s \!-K \
+      _arguments -s -C \!-K \
 	"${commonopts[@]}" \
 	--no{gpg,pgp,md5,signature,digest} \
 	'*:package file:->package_file' && ret=0
       ;;
     rebuild)
-      _arguments -s \
+      _arguments -s -C \
 	"${commonopts[@]}" "${pathopts[@]}" \
 	'*:source package file:->package_file' && ret=0
       ;;
@@ -286,7 +286,7 @@ _rpm () {
       ;;
     capabilities)
       _wanted capabilities expl capability compadd \
-	  ${(f)"$(_call_program capabilities rpm -qa --queryformat '%\{requirename}\\n' 2>/dev/null)"}
+	  ${(f)"$(_call_program capabilities rpm -qa --queryformat '%\{requirename}\\n' 2>/dev/null)"} && ret=0
       ;;
     relocate)
       if compset -P '*='; then

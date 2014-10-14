@@ -5,16 +5,16 @@ if (( CURRENT == 2 )); then
 
     local lhacmds
     lhacmds=(
-	'(  x l v u d m c p t)a[Add \(Or replace\) to archive]'
-	'(a   l v u d m c p t)x[EXtract from archive]'
-	'(a x   v u d m c p t)l[List]'
-	'(a x l   u d m c p t)v[Verbose List]'
-	'(a x l v   d m c p t)u[Update newer files to archive]'
-	'(a x l v u   m c p t)d[Delete from archive]'
-	'(a x l v u d   c p t)m[Move to archive]'
-	'(a x l v u d m   p t)c[re-Construct new archive]'
-	'(a x l v u d m c   t)p[Print to STDOUT from archive]'
-	'(a x l v u d m c p  )t[Test file CRC in archive]'
+	'(  x l v u d m c p t)a[add \(or replace\) to archive]'
+	'(a   l v u d m c p t)x[extract from archive]'
+	'(a x   v u d m c p t)l[list]'
+	'(a x l   u d m c p t)v[verbose List]'
+	'(a x l v   d m c p t)u[update newer files to archive]'
+	'(a x l v u   m c p t)d[delete from archive]'
+	'(a x l v u d   c p t)m[move to archive]'
+	'(a x l v u d m   p t)c[re-construct new archive]'
+	'(a x l v u d m c   t)p[print to stdout from archive]'
+	'(a x l v u d m c p  )t[test file CRC in archive]'
     )
 
     if [ "${words[2]#-}" != "" ]; then
@@ -23,22 +23,22 @@ if (( CURRENT == 2 )); then
 	    'q[quiet]'
 	    'n[not execute]'
 	    'f[force\(over write at extract\)]'
-	    't[FILES are TEXT file]'
-	    'e[TEXT code convert from/to EUC]'
-	    'g[Generic format \(for compatibility\)]'
+	    't[files are text files]'
+	    'e[text code convert from/to EUC]'
+	    'g[use generic format \(for compatibility\)]'
 	)
 	case ${words[2]#-} in
 	    a*|u*)
 		lhacmds=($lhacmds
-		    'd[delete FILES after]'
-		    'z[files not compress]'
+		    'd[delete files after]'
+		    "z[don't compress files]"
 		    '(  1 2)0[header level 0]'
 		    '(0   2)1[header level 1]'
 		    '(0 1  )2[header level 2]'
 		)
 		;;
 	    c*)
-		lhacmds=($lhacmds 'd[delete FILES after]')
+		lhacmds=($lhacmds 'd[delete files after]')
 		;;
 	    x*)
 		lhacmds=($lhacmds 'i[ignore directory path]')
@@ -46,32 +46,25 @@ if (( CURRENT == 2 )); then
 	esac
     fi
 
-    _values -s '' 'lha command' \
-	$lhacmds \
-	&& return 0
+    _values -s '' 'lha command' $lhacmds
 elif (( CURRENT == 3 )); then
-    _arguments -C \
-	'*:LHA file:_files -g \*.lzh' && return 0
+    _wanted files expl 'lha file' _files -g '*.lzh(-.)'
 else
     case ${words[2]#-} in
 	l*|x*|d*)
 	    if [ -f "$words[3]" ]; then
-		_lzh_cache_list=`$words[1] lq $words[3] | awk '{print $8}'`
+		_lzh_cache_list=`$words[1] lq $words[3] | awk '{print $NF}'`
 		_lzh_cache_list=("${(@f)${_lzh_cache_list}}")
 		
 		_wanted files expl 'file from archive' _multi_parts / _lzh_cache_list
-
-		return 0
 	    else
-		_message -r "Archive file is not found : ${words[3]}"
+		_message -r "archive file is not found : ${words[3]}"
 		return 1
 	    fi
 		
 	    ;;
 	*)
-	    _arguments -C \
-		'*:file:_files' && return 0
+	    _files
+	;;
     esac
 fi
-
-return 0

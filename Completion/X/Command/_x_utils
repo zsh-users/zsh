@@ -1,12 +1,13 @@
 #compdef xdpyinfo xwininfo xkill xfontsel xfd xev xhost xon xsetroot xwd xwud xrdb xprop xlsatoms
 
-local ret=1 oret expl
+local curcontext="$curcontext" state line expl ret=1
 
 case "$service" in
 xdpyinfo)
   _x_arguments \
     -queryExtensions \
-    '-ext:extension: _x_extension -a'
+    '-ext:extension: _x_extension -a' \
+    -version
   ;;
 xwininfo)
   _x_arguments \
@@ -16,7 +17,7 @@ xwininfo)
     '(-name -root)-id:id: _x_window'
   ;;
 xprop)
-  _x_arguments \
+  _x_arguments -C \
     -{help,frame,notype,spy} \
     '-grammar[show grammar for command line options]' \
     '(-id -name)-root[use the root window as the target window]' \
@@ -28,16 +29,17 @@ xprop)
     '*-remove[specify an atom to remove from the target window]:atoms:->atoms' \
     '*-set[specify an atom and a value to set on the target window]:atoms:->atoms:value' \
     '*-f:atoms:->atoms:format: ::dformat' \
-    '*:atoms:->atoms' && ret=0
+    '*:atoms:->atoms'
   ;;
 xlsatoms)
-  _x_arguments \
+  _x_arguments -C \
     '*-format[printf-style format to use]:format' \
     '*-range[atom values to list]:[num]-[num]' \
     '*-name[name of single atom to print]:atom:->atoms'
   ;;
 xkill)
   _x_arguments \
+    -version \
     -frame \
     '(-id)-all' \
     '(-all)-id:window: _x_window' \
@@ -45,14 +47,16 @@ xkill)
   ;;
 xfontsel)
   _xt_arguments \
-    -{print,noscaled} \
+    -{print,scaled} \
     '-pattern:font pattern:_x_font' \
     '-sample:sample text' \
-    '-sample16:16-bit sample text'
+    '-sample16:16-bit sample text' \
+    '-sampleUCS:ISO10646 sample text'
   ;;
 xfd)
   _xt_arguments \
     '-fn:font: _x_font' \
+    '-fa:font: _xft_fonts' \
     -{box,center} \
     '-start:first character number' \
     '-bc:box border color:_x_color' \
@@ -66,7 +70,8 @@ xev)
     '-id:id:_x_window' \
     '-s[use save-under]' \
     '-name:window name' \
-    '-rv'
+    '-rv' \
+    '*-event:event mask:(keyboard mouse expose visibility structure substructure focus property colormap owner_grab_button randr)'
   ;;
 xhost)
   local type tmp match
@@ -120,8 +125,8 @@ xhost)
           'types:name family:compadd -S: - inet dnet nis krb' \
 	  'hosts:: _hosts' && ret=0
     fi
-    return ret
   fi
+  return ret
   ;;
 xon)
   _arguments \
@@ -165,7 +170,7 @@ xwud)
   ;;
 xrdb)
   _x_arguments \
-    -{help,quiet,symbols,retain} \
+    -{help,quiet,symbols,retain,version} \
     '(-all -screen -screens)-global' \
     '(-global -screen -screens)-all' \
     '(-global -all -screens)-screen' \
@@ -185,12 +190,10 @@ xrdb)
     '*-I-:include directory:_files -/' \
     '*:defaults file:_files'
   ;;
-esac
+esac && ret=0
 
-oret=$?
 if [[ $state == atoms ]]; then
   _wanted atoms expl atoms compadd ${${(f)"$(_call_program atoms xlsatoms 2> /dev/null)"}#*$'\t'} && ret=0
-else
-  ret=$oret
 fi
+
 return ret

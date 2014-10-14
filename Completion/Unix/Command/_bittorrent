@@ -21,7 +21,7 @@ case $service in
    ;&
  btlaunchmanycurses)
   _arguments -s -S \
-      '(--responsefile)--responsefile+[specify file for server response]:file:_files -g "*"'\
+      '(--responsefile)--responsefile+[specify file for server response]:file:_files'\
       "--url+[specify URL of torrent file]:URL:_urls"\
       '(-i --ip)'{-i+,--ip+}'[specify ip address to report as]:ip address'\
       "--bind+[specify ip to bind to instead of default]:ip:_bind_addresses"\
@@ -50,18 +50,18 @@ case $service in
       "--max_initiate+[specify peers needed before stopping initiating new connections]:peers:"\
       "--report_hash_failures+[report hash failures to user]:enable:(0 1)"\
       "--rarest_first_priority_cutoff+[specify peers which need to have a piece before other partials take priority over rarest first]:peers:"\
-      ':torrent file:_files -g "*.torrent(-.)"' \
-      && return 0
+      ':torrent file:_files -g "*.torrent(-.)"'
+    return
   ;;
 
 # Next up are the torrent file manipulation programs.
 
   btshowmetainfo)
-   _files -g "*.torrent(-.)" && return 0
-   ;;
+    _files -g "*.torrent(-.)" && return
+  ;;
 
   btrename)
-   _files -g '*.torrent(-.)' && return 0
+    _files -g '*.torrent(-.)' && return
   ;;
 
   btmakemetafile)
@@ -69,12 +69,12 @@ case $service in
       '--piece_size_pow2+[specify power of 2 to set the piece size to]:power:' \
       "--comment+[specify human-readable comment to put in .torrent]:comment:"\
       "--target+[specify target file for the torrent]:file:_files"\
-      ':file:_files -g "*"' \
-      && return 0;
+      ':file:_files -g "*"'
+    return
   ;;
 
   btreannounce)
-   _files -g '*.torrent(-.)' && return 0
+    _files -g '*.torrent(-.)' && return
   ;;
 
 # Lastly the tracker.
@@ -94,7 +94,7 @@ case $service in
       "--min_time_between_log_flushes+[specify minimum time between log flushes]:time (s):" \
       "--allowed_dir+[specify directory having downloadable torrents]:directory:_files -/" \
       "--parse_allowed_interval+[specify interval between reloading allowed_dir]:time (min):" \
-      "--show_names+[display names from allowed dir]:enable:(0 1)"\
-      && return 0
-    ;;
+      "--show_names+[display names from allowed dir]:enable:(0 1)"
+    return
+  ;;
 esac

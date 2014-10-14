@@ -1,3 +1,30 @@
+2014-10-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 33467: Completion/Debian/Command/_apt-move,
+	Completion/Debian/Command/_bts, Completion/Linux/Command/_sysstat,
+	Completion/Mandriva/Command/_urpmi, Completion/Redhat/Command/_rpm,
+	Completion/Solaris/Command/_ptree, Completion/Unix/Command/_arp,
+	Completion/Unix/Command/_at, Completion/Unix/Command/_bittorrent,
+	Completion/Unix/Command/_bogofilter, Completion/Unix/Command/_bpython,
+	Completion/Unix/Command/_bzr, Completion/Unix/Command/_cdrdao,
+	Completion/Unix/Command/_chmod, Completion/Unix/Command/_cpio,
+	Completion/Unix/Command/_df, Completion/Unix/Command/_django,
+	Completion/Unix/Command/_git, Completion/Unix/Command/_less,
+	Completion/Unix/Command/_lha, Completion/Unix/Command/_metaflac,
+	Completion/Unix/Command/_module, Completion/Unix/Command/_monotone,
+	Completion/Unix/Command/_mpc, Completion/Unix/Command/_netcat,
+	Completion/Unix/Command/_notmuch, Completion/Unix/Command/_pkg-config,
+	Completion/Unix/Command/_prove, Completion/Unix/Command/_rar,
+	Completion/Unix/Command/_rsync, Completion/Unix/Command/_rubber,
+	Completion/Unix/Command/_sablotron, Completion/Unix/Command/_screen,
+	Completion/Unix/Command/_stgit, Completion/Unix/Command/_strip,
+	Completion/Unix/Command/_systemd, Completion/Unix/Command/_telnet,
+	Completion/Unix/Command/_tidy, Completion/Unix/Command/_tmux,
+	Completion/Unix/Command/_vcsh, Completion/Unix/Command/_zpool,
+	Completion/Unix/Type/_users, Completion/X/Command/_urxvt,
+	Completion/X/Command/_x_utils: correct return status on functions
+	and numerous other minor fixes
+
 2014-10-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 33459: Test/D04parameter.ztst: test for variable substitution

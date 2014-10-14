@@ -40,10 +40,12 @@ case "$words[1]" in
   ;;
   (show|bugs)
     if [[ CURRENT -eq 2 ]]; then
-      _wanted package expl 'package' _deb_packages avail
-      _wanted maintainer expl 'package maintainer' compadd $DEBEMAIL
+      _alternative \
+	'packages:package:_deb_packages avail' \
+        "emails:package maintainer:compadd $DEBEMAIL"
+    else
+      _wanted sep expl 'separator' compadd -S ' ' , .
     fi
-    _wanted sep expl 'separator' compadd -S ' ' , .
   ;;
   reopen)
     if [[ CURRENT -eq 2 ]]; then

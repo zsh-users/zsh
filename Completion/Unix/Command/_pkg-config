@@ -1,6 +1,6 @@
 #compdef pkg-config
 
-local arguments packages curcontext="$curcontext" stat line
+local arguments packages curcontext="$curcontext" state line ret=1
 declare -A opt_args
 
 arguments=(
@@ -11,31 +11,33 @@ arguments=(
       "--print-errors[cause errors to be printed]"
       "--silence-errors[prevent the printing of errors]"
       "--errors-to-stdout[print errors to stdout rather than stderr]"
-      "--cflags[prints the preprocessor and compile flags]"
+      "--cflags[print the preprocessor and compiler flags]"
       "--cflags-only-I[output -I flags only]"
       "--cflags-only-other[output cflags not covered by the cflags-only-I option]"
       "--debug[show verbose debug information]"
-      "--libs[prints the link flags]"
-      "--libs-only-L[prints the -L and -R parts of \"--libs\"]"
-      "--libs-only-l[prints the -l part of \"--libs\"]"
+      "--libs[print the link flags]"
+      "--libs-only-L[print the -L and -R parts of \"--libs\"]"
+      "--libs-only-l[print the -l part of \"--libs\"]"
       "--libs-only-other[output other libs]"
       "--list-all[list all known packages]"
       "--variable=[return the value of the specified variable]:variable"
       "--define-variable=[set the global value for a variable]:name value pair"
-      "--uninstalled[return successfully if any \"-uninstalled\" packages are being used and fails otherwise]"
-      "--exists[tests whether the package exists or not]"
+      "--uninstalled[return success if any \"-uninstalled\" packages are being used]"
+      "--exists[test whether the package exists or not]"
       "--atleast-version=[test whether the version is at least that of the specified value]:least value"
       "--exact-version=[test whether the version is exactly that of the specified value]:exact value"
       "--max-version=[test whether the version is no greater than some specific value]:max version"
 #      "--msvc-syntax[output linker flags in a form compatible with MSVC++ (Windows only)]"
 #      "--dont-define-prefix[disables automatic overiding of the variable \"prefix\" (Windows only)]"
 #      "--prefix-variable=[set the name of the variable \"prefix\" (Windows only)]:prefix value"
-      "*:package name:->package"
+      "*: :->packages"
 )
 
-_arguments -C $arguments
+_arguments -C $arguments && ret=0
 
 if [[ -n $state ]] ; then
-    packages=( ${(f)"$((pkg-config --list-all | cut -d' ' -f1) 2>/dev/null)"} )
-    compadd -a - packages
+  packages=( ${${(f)"$(_call_program packages pkg-config --list-all)"}%% *} )
+  _wanted packages expl 'package' compadd -a - packages && ret=0
 fi
+
+return ret

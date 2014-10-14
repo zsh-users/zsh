@@ -13,10 +13,10 @@ all_opts=(
 )
 
 urwid_opts=(
-  '(-r --reactor)'{-r,--reactor}'[use Twisted reactor instead of the event loop]:reactor:'
+  '(-r --reactor)'{-r,--reactor}'[use twisted reactor instead of the event loop]:reactor'
   '--help-reactors[display list of available Twisted reactors]'
-  '(-p --plugin)'{-p,--plugin}'[exectue a twistd plugin]:plugin:'
-  '(-s --server)'{-s,--server}'[run an eval server on the given port]:port:'
+  '(-p --plugin)'{-p,--plugin}'[execute a twisted plugin]:plugin'
+  '(-s --server)'{-s,--server}'[run an eval server on the given port]:port:_ports'
 )
 
 gtk_opts=(
@@ -26,19 +26,19 @@ gtk_opts=(
 case "$service" in
   bpython|bpython2|bpython3)
     _arguments \
-      "$all_opts[@]" && return 0
+      "$all_opts[@]"
   ;;
 
   bpython-urwid|bpython2-urwid|bpython3-urwid)
     _arguments \
       "$all_opts[@]" \
-      "$urwid_opts[@]" && return 0
+      "$urwid_opts[@]"
   ;;
 
   bpython-gtk|bpython2-gtk|bpython3-gtk)
     _arguments \
       "$all_opts[@]" \
-      "$gtk_opts[@]" && return 0
+      "$gtk_opts[@]"
   ;;
 esac
 
