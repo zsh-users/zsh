@@ -766,7 +766,17 @@ dosetopt(int optno, int value, int force, char *new_opts)
 #ifdef HAVE_SETUID
 	setuid(getuid());
 	setgid(getgid());
-#endif /* HAVE_SETUID */
+        if (setuid(getuid())) {
+            zwarn("failed to change user ID: %e", errno);
+            return -1;
+	} else if (setgid(getgid())) {
+            zwarn("failed to change group ID: %e", errno);
+            return -1;
+        }
+#else
+        zwarn("setuid not available");
+        return -1;
+#endif /* not HAVE_SETUID */
 #ifdef JOB_CONTROL
     } else if (!force && optno == MONITOR && value) {
 	if (new_opts[optno] == value)

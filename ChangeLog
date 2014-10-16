@@ -1,3 +1,8 @@
+2014-10-31  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* via private email: Jérémie Roquet: Src/options.c: more care
+	with errors using setuid().
+
 2014-10-30  Oliver Kiddle  <opk@zsh.org>
 
 	* 33570, 33576: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list, Src/Zle/zle.h,
