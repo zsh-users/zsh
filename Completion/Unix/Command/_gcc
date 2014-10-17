@@ -13,7 +13,7 @@ if [[ "$service" = -value-* ]]; then
     args2=()
   fi
 else
-  args2=( '*:input file:_files -g "*.([cCmisSoak]|cc|cxx|ii|k[ih])(-.)"' )
+  args2=( '*:input file:_files -g "*.([cCmisSoak]|cc|cpp|cxx|ii|k[ih])(-.)"' )
 fi
 
 args=()

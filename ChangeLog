@@ -1,3 +1,8 @@
+2014-10-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* see 33475: Completion/Unix/Command/_gcc: allow .cpp files as
+	input.
+
 2014-10-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 33455: Syohei YOSHIDA: Completion/Unix/Command/_global:
