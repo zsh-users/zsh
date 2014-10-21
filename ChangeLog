@@ -1,5 +1,7 @@
 2014-10-21  Oliver Kiddle  <opk@zsh.org>
 
+	* 33486: Completion/X/Command/_rdesktop: new completion function
+
 	* 33485: Completion/BSD/Command/_portsnap,
 	Completion/Darwin/Command/_defaults,
 	Completion/Darwin/Command/_fink, Completion/Debian/Command/_dchroot,
