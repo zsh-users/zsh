@@ -3,7 +3,7 @@
 local curcontext="$curcontext" state line ret=1
 typeset -A opt_args
 
-_arguments \
+_arguments -C \
   '(- *)'{-h,--help}'[print help information and exit]' \
   '(- *)'{-v,--version}'[display the version of ri]' \
   '*'{-d,--doc-dir}'[directory to search for documentation]:ri doc directory:_files -/' \
@@ -42,8 +42,6 @@ if [[ "$state" = ri-name ]]; then
 
   if compset -P '?*(::|\#|.)'; then
     class_dir=${IPREFIX//(::|\#|.)/\/}
-    #else
-    #	:
   fi
   esc_name=${${(Q)PREFIX}//(#b)([^A-Za-z0-9_])/$(printf %%%x ${(qq)match[1]})}
 

@@ -1,6 +1,6 @@
 #compdef pgrep pkill
 
-local context state line ret=1 expl
+local curcontext="$curcontext" state line ret=1 expl
 typeset -A opt_args
 typeset -a arguments
 
@@ -66,7 +66,7 @@ esac
 arguments=( ${(M)arguments:#(|\*)(|\(*\))-[$optchars]*}
      '*:process name:->pname')
 
-_arguments -s -w $arguments && ret=0
+_arguments -C -s -w $arguments && ret=0
 
 case $state in
   (tty)

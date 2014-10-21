@@ -1,9 +1,9 @@
 #compdef make-kpkg
 
-local context state line
+local curcontext="$curcontext" state line
 typeset -A opt_args
 
-_arguments \
+_arguments -C \
    '--help[display help message]' \
    '--revision[change Debian revision number]:number:' \
    '--append-to-version[specify additional kernel sub-version]:suffix:' \
@@ -45,7 +45,7 @@ _arguments \
         configure\:"configure the kernel" \
         debian\:"creates the debian/ directory" \
         libc-kheaders\:"create the kernel headers package needed by libc" \
-        ))' && return 0
+    ))' && return
 
 case "$state" in
   (addedmodules)

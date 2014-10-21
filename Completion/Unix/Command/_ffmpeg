@@ -1,6 +1,6 @@
 #compdef ffmpeg
 
-local context state line expl
+local curcontext="$curcontext" state line expl
 typeset -A opt_args
 
 (( $+functions[_ffmpeg_presets] )) || _ffmpeg_presets() {
@@ -33,14 +33,10 @@ typeset -A opt_args
     _wanted ffmpeg-formats expl 'force format' compadd -a formats
 }
 
-(( $+functions[_ffmpeg_list_pix_fmts] )) || _ffmpeg_list_pix_fmts() {
-    echo - ${${${(M)${(f)"$(_call_program formats $words[1] -pix_fmts 2>/dev/null)"}:#[I.][O.][H.][P.][B.] [^=[:space:]]*}#* }%% *}
-}
-
 (( $+functions[_ffmpeg_pix_fmts] )) || _ffmpeg_pix_fmts() {
     local pix_fmts
-    pix_fmts=($(_ffmpeg_list_pix_fmts))
-    _wanted ffmpeg-pix-fmts expl 'set pixel format' compadd -a pix_fmts
+    _wanted ffmpeg-pix-fmts expl 'pixel format' compadd "$@" - \
+        ${${${(M)${(f)"$(_call_program formats $words[1] -pix_fmts 2>/dev/null)"}:#[I.][O.][H.][P.][B.] [^=[:space:]]*}#* }%% *}
 }
 
 (( $+functions[_ffmpeg_bsfs] )) || _ffmpeg_bsfs() {
@@ -71,10 +67,10 @@ typeset -A _ffmpeg_flags
     local match mbegin mend
     integer ret=1
 
-    if [[ $PREFIX = (#b)(*)[-+]([^-+]#) ]]; then 
+    if [[ $PREFIX = (#b)(*)[-+]([^-+]#) ]]; then
         if [[ -n ${flag_options[(R)$match[2]]} ]]; then
             _ffmpeg_new_flag_options && ret=0
-        fi 
+        fi
         if [[ -n ${flag_options[(R)$match[2]?*]} ]]; then
             _ffmpeg_more_flag_options ${#match[1]} && ret=0
         fi
@@ -82,7 +78,7 @@ typeset -A _ffmpeg_flags
         _ffmpeg_flag_options && ret=0
     fi
 
-    return $ret
+    return ret
 }
 
 (( $+functions[_ffmpeg_register_lastopt_values] )) || _ffmpeg_register_lastopt_values() {
@@ -150,7 +146,7 @@ local -a _ffmpeg_argspecs
                 elif [[ $lastopt == -pix_fmt ]]; then
                     lastopt_takesargs=0
                     lastopt="*$lastopt"
-                    lastopt+=": :_ffmpeg_pix_fmts"
+                    lastopt+=":set pixel format:_ffmpeg_pix_fmts"
                 elif [[ $example == bitstream_filter ]]; then
                     lastopt_takesargs=0
                     lastopt+=": :_ffmpeg_bsfs"
@@ -175,17 +171,17 @@ local -a _ffmpeg_argspecs
     [[ -n $lastopt ]] && _ffmpeg_register_lastopt_values
 }
 
-_arguments -S \
+_arguments -C -S \
     "${_ffmpeg_argspecs[@]}" \
     '*:output file:_files' \
-    && return 0
+    && return
 
 [[ "$state" == "vfilters" ]] &&
     _values -s , -S = 'video filters' \
     'aspect:set aspect ratio (rational number X\:Y or decimal number):' \
     'crop:crop input video (x\:y\:width\:height):' \
-    'format: :->format' \
-    'noformat: :->noformat' \
+    'format: :_sequence -s : _ffmpeg_pix_fmts' \
+    'noformat: :_sequence -s : _ffmpeg_pix_fmts' \
     'null' \
     'pad:add pads to the input image (width\:height\:x\:y\:color_string):' \
     'pixelaspect:set pixel aspect ratio (rational number X\:Y or decimal number):' \
@@ -196,15 +192,9 @@ _arguments -S \
     'buffer' \
     'nullsrc' \
     'nullsink' \
-    && return 0
-
-[[ "$state" == "format" ]] &&
-    _values -s : -S = 'convert input video to one of the specified pixel formats' $(_ffmpeg_list_pix_fmts) && return 0
-
-[[ "$state" == "noformat" ]] &&
-    _values -s : -S = 'disable specified pixel formats by force' $(_ffmpeg_list_pix_fmts) && return 0
+    && return
 
 [[ -n $state && -n $_ffmpeg_flags[$state] ]] &&
-    _ffmpeg_flags $state && return 0
+    _ffmpeg_flags $state && return
 
 return 1

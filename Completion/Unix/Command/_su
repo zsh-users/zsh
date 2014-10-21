@@ -1,9 +1,9 @@
 #compdef su
 
 local -A opt_args
-local -a args state context
+local -a args context state line expl
 local shell=${words[(i)(-s|--shell=*)]} first='1:user name:_users'
-local usr=root line
+local usr=root
 
 if _pick_variant gnu="Free Software Foundation" unix --version; then
   args=(
@@ -20,10 +20,20 @@ if _pick_variant gnu="Free Software Foundation" unix --version; then
   )
 else
   args=(
-    '-c[pass command to shell]:command string:->command'
     '-l[use a login shell]'
     '-s[run the specified shell]:shell:->shell'
   )
+  case $OSTYPE in
+  freebsd*)
+    args=(
+      '-c[use settings from specified login class]:class'
+      '-f[if the invoked shell is csh, prevent it from reading .cshrc]'
+      '-l[use a login shell]'
+      '-m[do not reset environment]'
+      '-s[set the MAC label]'
+    )
+  *) args+=( '-c[pass command to shell]:command string:->command' ) ;;
+  esac
 fi
 
 if [[ $#words -ge 2 && $words[2] != -* && CURRENT -ne 2 ]]; then
@@ -50,11 +60,11 @@ case $state in
         return
         ;;
     (shell)
-        compadd ${(f)^"$(</etc/shells)"}(N)
+        _wanted -C $context shells expl shell compadd ${(f)^"$(</etc/shells)"}(N)
         return
         ;;
     (rest)
-        if [[ -z $shell || $shell = */nologin ]]; then
+        if [[ -z $shell || $shell = */(nologin|false) ]]; then
             _arguments "-s[run the specified shell, $usr has no shell]" ||
                 _message "-s option required, $usr has no shell"
             compstate[insert]=

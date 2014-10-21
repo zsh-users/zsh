@@ -1,6 +1,6 @@
 #compdef update-alternatives
 
-local curcontext="$curcontext" context state line alterdir
+local curcontext="$curcontext" state line alterdir ret
 
 if [[ -d /var/lib/dpkg/alternatives ]]; then
   alterdir=/var/lib/dpkg/alternatives

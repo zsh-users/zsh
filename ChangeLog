@@ -1,5 +1,20 @@
 2014-10-21  Oliver Kiddle  <opk@zsh.org>
 
+	* 33485: Completion/BSD/Command/_portsnap,
+	Completion/Darwin/Command/_defaults,
+	Completion/Darwin/Command/_fink, Completion/Debian/Command/_dchroot,
+	Completion/Debian/Command/_dchroot-dsa,
+	Completion/Debian/Command/_make-kpkg,
+	Completion/Debian/Command/_update-alternatives,
+	Completion/Debian/Command/_vim-addons, Completion/Unix/Command/_du,
+	Completion/Unix/Command/_ecasound, Completion/Unix/Command/_ffmpeg,
+	Completion/Unix/Command/_ln, Completion/Unix/Command/_mail,
+	Completion/Unix/Command/_mosh, Completion/Unix/Command/_mysqldiff,
+	Completion/Unix/Command/_od, Completion/Unix/Command/_pgrep,
+	Completion/Unix/Command/_pydoc, Completion/Unix/Command/_ri,
+	Completion/Unix/Command/_su, Completion/Zsh/Command/_tcpsys,
+	Completion/Zsh/Command/_zattr: fixes for zstyle context handling
+
 	* 33481: Completion/Mandriva/Command/_rebootin,
 	Completion/Unix/Type/_directories, Completion/Unix/Type/_pdf,
 	Completion/Unix/Type/_pids, Completion/openSUSE/Command/_yast,

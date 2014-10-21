@@ -1,16 +1,16 @@
 #compdef tcp_open
 
-local context line expl nm=$compstate[nmatches]
-local -a state argargs sesslist
+local curcontext="$curcontext" state line expl
 local -A opt_args
+local -a argargs sesslist
 
 case $service in
   (tcp_open)
   argargs=(
     '(-a -f -l)-s[open session(s)]'
     '(-a -f -s)-l[open list of sessions]'
-    '(-f -s -l)-a[open session for accept on fd]:fd:->fd'
-    '(-a -s -l)-f[open session for accept on fd]:fd:->fd'
+    '(-f -s -l)-a[open session for accept on fd]:fd'
+    '(-a -s -l)-f[open session for accept on fd]:fd'
     '-q[quiet mode]'
     '-z[no zle handler]'
   )
@@ -19,7 +19,7 @@ case $service in
   elif [[ -n $words[(R)-(l|s)*] ]]; then
     argargs+=('*:session:->session')
   else
-    argargs+=(':host:->host' ':port:->port' '*:session:->session')
+    argargs+=(':host:_hosts' ':port:_ports' '*:session:->session')
   fi
   _arguments -C $argargs
   ;;
@@ -27,14 +27,6 @@ esac
 
 while (( $#state )); do
   case "$state[1]" in
-    (host)
-    _hosts
-    ;;
-
-    (port)
-    _ports
-    ;;
-
     (sessionlist)
     compset -P '*,'
     ;&

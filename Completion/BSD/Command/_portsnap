@@ -1,6 +1,6 @@
 #compdef portsnap
 
-local context state line
+local curcontext="$curcontext" state line
 typeset -A opt_args
 
 flags=(

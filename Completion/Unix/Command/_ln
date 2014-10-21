@@ -3,10 +3,17 @@
 local curcontext="$curcontext" state line ret=1
 local -A opt_args
 
-local -a args
+local -a args bsd
 args=(
   '-f[remove existing destination files]'
-  '-s[create symbolic links instead of hard links]')
+  '-s[create symbolic links instead of hard links]'
+)
+bsd=(
+  '-F[remove existing destination directories]'
+  {-h,-n}'[do not dereference destination]'
+  '-i[prompt before removing destination files]'
+  '-v[print name of each linked file]'
+)
 
 local -a opts
 
@@ -44,14 +51,16 @@ elif (( ${+builtins[ln]} )); then
     {-h,-n}'[do not dereference destination]'
     '-i[prompt before removing destination files]')
 elif [[ $OSTYPE == darwin* ]]; then
-  args+=(
-    '-F[remove existing destination directories]'
-    {-h,-n}'[do not dereference destination]'
-    '-i[prompt before removing destination files]'
-    '-v[print name of each linked file]')
+  args+=( $bsd )
+elif [[ $OSTYPE == freebsd* ]]; then
+  args+=( $bsd
+    '(-L)-P[create hard links directly to symbolic links]'
+    '(-P)-L[create hard links to symbolic link references]'
+    "-w[warn if source of a symbolic link doesn't currently exist]"
+  )
 fi
 
-_arguments -s $opts \
+_arguments -C -s $opts \
   $args \
   ':link target:_files' \
   '*:: :->files' && ret=0

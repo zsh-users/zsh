@@ -1,9 +1,9 @@
 #compdef ecasound
 
-local curcontext="$curcontext" state line expl
+local curcontext="$curcontext" state line expl ret=1
 typeset -A opt_args
 
-_arguments \
+_arguments -C \
   '-c[start in interactive mode]' \
   '(-q)-d\:-[debug level]:debug level' \
   '-D[print all debug information to stderr]' \
@@ -53,7 +53,7 @@ _arguments \
   '*-eli\:-[LADSPA Plugin]: :->el' \
   '*-gc\:-[time crop gate]: :->gc' \
   '*-ge\:-[threshold gate]: :->ge' \
-  && return 0
+  ':input source:->io' && ret=0
 
 case $state in
   filters)
@@ -82,12 +82,12 @@ case $state in
       'r[reverb effect]: :->etr'
   ;;
   emod)
-    _values -S : 'envelopme modulation' \
+    _values -S : 'envelope modulation' \
       'b[pulse gate]: :->eemb' \
       'p[pulse gate (hz)]: :->eemp' \
       't[tremolo effect]: :->eemt'
   ;;
-esac
+esac && ret=0
 
 case $state in
   b)
@@ -173,12 +173,12 @@ case $state in
     typeset -A msgs
     local str
     msgs=(
-      eac  'amplification value (percent):channel'								     				  
-      eaw  'amplification value (percent):channel:max-clipped-samples'						     				  
-      ec   'compression rate (decibels):threshold (0.0-1.0)'							     				  
-      eca  'peak-level:release-time (seconds):fast compression rate (0.0-1.0):compression rate'		     				  
-      enm  'threshold-level:pre-hold-time (msec):attack-time (msec):post-hold-time (msec):release-time (msec)'     				  
-      ezx  'left DC fix value:right CD fix value'								     				  
+      eac  'amplification value (percent):channel'
+      eaw  'amplification value (percent):channel:max-clipped-samples'
+      ec   'compression rate (decibels):threshold (0.0-1.0)'
+      eca  'peak-level:release-time (seconds):fast compression rate (0.0-1.0):compression rate'
+      enm  'threshold-level:pre-hold-time (msec):attack-time (msec):post-hold-time (msec):release-time (msec)'
+      ezx  'left DC fix value:right CD fix value'
       eemb 'pulse frequency (beats per minute):on time (msec)'
       eemp 'pulse frequency (hz):on time (percent)'
       eemt 'tremolo speed (beats per second):depth (percent)'
@@ -206,5 +206,7 @@ case $state in
       str="${str#*:}"
     done
     _message "${str%%:*}"
-  ;;      
-esac
+  ;;
+esac && ret=0
+
+return ret

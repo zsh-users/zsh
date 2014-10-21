@@ -1,16 +1,19 @@
 #compdef pydoc
 
-local context state line
+local context state line ret=1
 typeset -A opt_args
 
 _arguments \
-  '-k[keyword]:keyword:' \
-  '-p[port]:port:_ports' \
-  '-g[gui]' \
-  '-w[write out HTML]:file or dir:_files' \
-  ':keyword, topic, module, package, or dotted reference:->lookup' && return 0
+  '(-)-k[search keyword]:keyword' \
+  '(- *)-p[start web server on specified port]:port number' \
+  '(- *)-g[start gui]' \
+  '(-)-w[write out HTML]:file or dir:_files' \
+  '(- *)-h[show help information]' \
+  '*: :->lookup' && ret=0
 
-_alternative \
-  'keywords:keyword:compadd ${=${${(f)"$(pydoc keywords)"}[2,-1]}}' \
-  'topics:topic:compadd ${=${${(f)"$(pydoc topics)"}[2,-1]}}' \
-  'modules:module:'
+[[ -n $state ]] && _alternative -C $context \
+  'keywords:keyword:compadd ${=${${(f)"$(_call_program keywords pydoc keywords)"}[2,-1]}}' \
+  'topics:topic:compadd ${=${${(f)"$(_call_program topics pydoc topics)"}[2,-1]}}' \
+  'modules:module:' && ret=0
+
+return ret

@@ -1,9 +1,8 @@
 #compdef mosh
 
 local curcontext="$curcontext" state line
-local -a suf
 
-_arguments \
+_arguments -C \
   '(-)--help[display help information]' \
   '(-)--version[display version information]' \
   "--no-init[don't set terminal init string]" \

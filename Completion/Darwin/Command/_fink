@@ -86,7 +86,7 @@ _fink(){
     'cleanup:removes obsolete package files'
   )
 
-  local context state line expl
+  local curcontext="$curcontext" state line expl
   local -A opt_args
 
   _arguments \
@@ -136,8 +136,8 @@ _fink(){
         '(-t --tab)'{-t,--tab}'[output the list with tabs as field delimiter]' \
         '(-w --width)'{-w=,--width=}'[width of display]:number or "auto"' \
         '(1 : -)'{-h,--help}'[display help text]' \
-        '1: :->pkgs' && return 0
-        
+        '1: :->pkgs' && return
+
         if [[ "$state" == pkgs ]]; then
           _fink_get_packages
           _wanted packages expl 'package hint' compadd -a packages
@@ -161,6 +161,7 @@ _fink(){
     #scanpackages)
     #checksums)
     #cleanup)
+    *) _default ;;
   esac
 }
 

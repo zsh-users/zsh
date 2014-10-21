@@ -25,8 +25,9 @@ _defaults(){
   _1st_arguments=( read read-type write rename delete domains find help )
 
   local curcontext="$curcontext" state line expl
+  typeset -A opt_args
 
-  _arguments -A '-*' \
+  _arguments -C -A '-*' \
     '(-currentHost)-host:host:_hosts' \
     '(-host)-currentHost' \
     '*::command:->subcmd' && return 0

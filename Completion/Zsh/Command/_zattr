@@ -1,7 +1,6 @@
 #compdef zgetattr zsetattr zdelattr zlistattr
 
-local state line expl ret=1 REPLY
-local -a args privs
+local context state line expl ret=1 REPLY
 
 case $service in
 zgetattr)
@@ -30,5 +29,7 @@ esac && ret=0
 
 if [[ $state = attrs ]]; then
   zlistattr ${~${(Q)line[1]}} REPLY 2> /dev/null
-  _wanted attrs expl 'attribute' compadd $REPLY
+  _wanted -C "$context[1]" attrs expl 'attribute' compadd -a REPLY && ret=0
 fi
+
+return ret

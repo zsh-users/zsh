@@ -20,8 +20,8 @@ _arguments -S \
        '*::arguments: _normal' && return 0
 
 case "$state" in
-	(chroot)
-	_wanted tag expl 'chroot' \
-	compadd ${(os:,:)${${${"$(dchroot -l )"#*: }// /}//[[\]]/,}}
-	;;
+  chroot)
+    _wanted -C $context chroots expl 'chroot' \
+	compadd ${(os:,:)${${${"$(_call_program chroots dchroot -l )"#*: }// /}//[[\]]/,}}
+  ;;
 esac

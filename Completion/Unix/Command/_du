@@ -1,7 +1,7 @@
 #compdef du
 
 if _pick_variant gnu=Free\ Soft unix --version /dummy/no-such-file; then
-  local ret=1
+  local context state line expl ret=1
 
   _arguments -s \
     '(-a --all -s --summarize)'{-a,--all}'[write counts for all files]' \
@@ -24,7 +24,7 @@ if _pick_variant gnu=Free\ Soft unix --version /dummy/no-such-file; then
     \*{-X+,--exclude-from=}'[exclude files matching any pattern in file]:file:_files' \
     '*--exclude=[exclude files matching pattern]:pattern' \
     '(-s --summarize)--max-depth=[maximum levels to recurse]:levels' \
-    '--files0-from=[use NUL-terminated list of files from file]:file' \
+    '--files0-from=[use NUL-terminated list of files from file]:file:_files' \
     '--time-style=[show times using given style, +FORMAT for strftime formatted args]:style:->timestyle' \
     '--time=-[show time of last modification of any file in the directory]:property:->time' \
     '(* -)--help[display help information]' \
@@ -35,14 +35,14 @@ if _pick_variant gnu=Free\ Soft unix --version /dummy/no-such-file; then
     (time)
       local -a property
       property=(atime access use ctime status)
-      _wanted property expl property compadd -a property && ret=0
-      ;;
+      _wanted -C $context property expl property compadd -a property && ret=0
+    ;;
     (timestyle)
       local -a style desc
       style=(full-iso long-iso iso +)
       desc=('full-iso' 'long-iso' 'iso' '+FORMAT like `date'\''')
-      _wanted -V style expl style compadd -d desc -a style && ret=0
-      ;;
+      _wanted -C $context -V style expl style compadd -d desc -a style && ret=0
+    ;;
   esac
 
   return ret

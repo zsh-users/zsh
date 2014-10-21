@@ -1,8 +1,5 @@
 #compdef mysqldiff
 
-local curcontext="$curcontext" state line expl
-typeset -A opt_args
-
 _mysqldiff () {
   _arguments -s \
     {-h{,1,2},--host{,1,2}=}':server hostname:_mysql_hosts' \

@@ -1,6 +1,6 @@
 #compdef od
 
-local context state state_descr line args ret=1
+local curcontext="$curcontext" state state_descr line args ret=1
 local -A opt_args
 
 args=(
@@ -49,7 +49,7 @@ else
   esac
 fi
 
-_arguments -s -S : "$args[@]" && return 0
+_arguments -C -s -S : "$args[@]" && return 0
 
 case "$state" in
   (format)
