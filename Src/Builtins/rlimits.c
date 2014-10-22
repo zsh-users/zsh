@@ -518,7 +518,7 @@ do_limit(char *nam, int lim, rlim_t val, int hard, int soft, int set)
 		}
 	    } else
 		limits[lim].rlim_cur = val;
-	    if (set && zsetlimit(lim, "limit"))
+	    if (set && zsetlimit(lim, nam))
 		return 1;
 	}
     }

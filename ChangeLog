@@ -1,3 +1,9 @@
+2014-10-22  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33493: Src/Builtins/rlimits.c, Src/exec.c: use correct command
+	name in error messages about "ulimit" failure; restore internal
+	copy of limits if setrlimit() fails, so the error won't repeat
+
 2014-10-21  Oliver Kiddle  <opk@zsh.org>
 
 	* 33486: Completion/X/Command/_rdesktop: new completion function

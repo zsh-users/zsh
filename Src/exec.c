@@ -250,6 +250,7 @@ zsetlimit(int limnum, char *nam)
 	if (setrlimit(limnum, limits + limnum)) {
 	    if (nam)
 		zwarnnam(nam, "setrlimit failed: %e", errno);
+	    limits[limnum] = current_limits[limnum];
 	    return -1;
 	}
 	current_limits[limnum] = limits[limnum];
