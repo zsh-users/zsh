@@ -1,5 +1,9 @@
 2014-10-23  Oliver Kiddle  <opk@zsh.org>
 
+	* 33518: Doc/Zsh/zle.yo, Src/Zle/zle.h, Src/Zle/zle_utils.c,
+	Src/Zle/zle_vi.c, Test/X02zlevi.ztst: add support for "_ vi
+	buffer and arguments to vi-set-buffer from a zle widget
+
 	* 33514: Src/Zle/zle_utils.c: even with a named vi buffer, we
 	should update the default buffer
 

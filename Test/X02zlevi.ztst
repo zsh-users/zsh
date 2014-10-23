@@ -10,6 +10,66 @@
 
 %test
 
+  zletest $'yankee doodle\ebhDyy0"1P'
+0:paste register 1 to get last deletion
+>BUFFER:  doodleyankee
+>CURSOR: 6
+
+  zletest $'yankee\eyyodoodle\edd"0p'
+0:paste register 0 to get last yank
+>BUFFER: yankee
+>yankee
+>CURSOR: 7
+
+  zletest $'err\eddahello\e"hddP'
+0:setting named register also sets unnamed register
+>BUFFER: hello
+>CURSOR: 0
+
+  zletest $'first\e"ay0ddasecond\e"Add"aP'
+0:appending to named register
+>BUFFER: firs
+>second
+>CURSOR: 0
+
+  zletest $'word\e"a"byy"bp'
+0:set one and then a different register
+>BUFFER: word
+>word
+>CURSOR: 5
+
+  zletest $'i\exaar\e0"a"_cewn\eP'
+0:set register then set black hole register
+>BUFFER: win
+>CURSOR: 1
+
+  zletest $'double\eyy"_"0P'
+0:reset register after selecting black hole
+>BUFFER: double
+>double
+>CURSOR: 0
+
+# zsh works like vi here; in vim you get the concatenated string
+  zletest $'first\e"addasecond\eddP'
+0:retrieve unnamed register after appending
+>BUFFER: second
+>CURSOR: 0
+
+  zletest $'Z\exayankee doodle\e"_db0"_yeP'
+0:yank and delete to black hole register
+>BUFFER: Zyankee e
+>CURSOR: 0
+
+  zletest $'foo\eddabar\e"_p..'
+0:paste from black hole register and repeat
+>BUFFER: bar
+>CURSOR: 2
+
+  zletest $'start\eFa"ac2lnew\eX"ap..'
+0:repeat paste from named register
+>BUFFER: stnwararart
+>CURSOR: 9
+
   zletest $'word\euaend'
 0:undo initial change
 >BUFFER: end

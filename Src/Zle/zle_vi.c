@@ -782,7 +782,7 @@ viputbefore(UNUSED(char **args))
     int n = zmult;
 
     startvichange(-1);
-    if (n < 0)
+    if (n < 0 || zmod.flags & MOD_NULL)
 	return 1;
     if (zmod.flags & MOD_VIBUF)
 	buf = &vibuf[zmod.vibuf];
@@ -814,7 +814,7 @@ viputafter(UNUSED(char **args))
     int n = zmult;
 
     startvichange(-1);
-    if (n < 0)
+    if (n < 0 || zmod.flags & MOD_NULL)
 	return 1;
     if (zmod.flags & MOD_VIBUF)
 	buf = &vibuf[zmod.vibuf];
@@ -905,14 +905,26 @@ vicapslockpanic(UNUSED(char **args))
 
 /**/
 int
-visetbuffer(UNUSED(char **args))
+visetbuffer(char **args)
 {
     ZLE_INT_T ch;
 
-    if ((zmod.flags & MOD_VIBUF) ||
-	(((ch = getfullchar(0)) < ZWC('0') || ch > ZWC('9')) &&
+    if (*args) {
+	ch = **args;
+	if (args[1] || (ch && (*args)[1]))
+	    return 1;
+    } else {
+	ch = getfullchar(0);
+    }
+    if (ch == ZWC('_')) {
+	zmod.flags |= MOD_NULL;
+	prefixflag = 1;
+	return 0;
+    } else
+	zmod.flags &= ~MOD_NULL;
+    if ((ch < ZWC('0') || ch > ZWC('9')) &&
 	 (ch < ZWC('a') || ch > ZWC('z')) &&
-	 (ch < ZWC('A') || ch > ZWC('Z'))))
+	 (ch < ZWC('A') || ch > ZWC('Z')))
 	return 1;
     if (ch >= ZWC('A') && ch <= ZWC('Z'))	/* needed in cut() */
 	zmod.flags |= MOD_VIAPP;

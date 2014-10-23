@@ -914,7 +914,7 @@ cut(int i, int ct, int flags)
 void
 cuttext(ZLE_STRING_T line, int ct, int flags)
 {
-    if (!ct)
+    if (!ct || zmod.flags & MOD_NULL)
 	return;
 
     UNMETACHECK();

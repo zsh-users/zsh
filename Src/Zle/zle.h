@@ -240,6 +240,7 @@ struct modifier {
 #define MOD_VIBUF (1<<2)   /* a vi cut buffer has been selected */
 #define MOD_VIAPP (1<<3)   /* appending to the vi cut buffer */
 #define MOD_NEG   (1<<4)   /* last command was negate argument */
+#define MOD_NULL  (1<<5)   /* throw away text for the vi cut buffer */
 
 /* current modifier status */
 
