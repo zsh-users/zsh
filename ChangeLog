@@ -1,5 +1,7 @@
 2014-10-23  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: .editorconfig: specify 8 char indent for ChangeLog
+
 	* 33519: Src/Zle/zle_move.c, Test/X02zlevi.ztst: last character
 	in the buffer can be cut, changed or yanked using vi-forward-char
 
