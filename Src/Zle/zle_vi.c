@@ -457,7 +457,14 @@ viyank(UNUSED(char **args))
 	ret = 0;
     }
     vichgflag = 0;
-    zlecs = oldcs;
+    /* cursor now at the start of the range yanked. For line mode
+     * restore the column position */
+    if (vilinerange) {
+	while (oldcs > 0 && zleline[oldcs - 1] != ZWC('\n') &&
+		zlecs != zlell && zleline[zlecs] != ZWC('\n')) {
+	    ++zlecs; --oldcs;
+	}
+    }
     return ret;
 }
 

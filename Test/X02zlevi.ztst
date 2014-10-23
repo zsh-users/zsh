@@ -15,6 +15,28 @@
 >BUFFER: good
 >CURSOR: 4
 
+  zletest $'one two\eyb'
+0:yank left moves the cursor
+>BUFFER: one two
+>CURSOR: 4
+
+  zletest $'one two\e0ye'
+0:yank right leaves the cursor
+>BUFFER: one two
+>CURSOR: 0
+
+  zletest $'short\eoand longer\eyk'
+0:yank up line moves cursor up but not to buffer start
+>BUFFER: short
+>and longer
+>CURSOR: 4
+
+  zletest $'one\eotwo\ekyj'
+0:yank down line leaves the cursor
+>BUFFER: one
+>two
+>CURSOR: 2
+
   zletest $'yankee doodle\ebhDyy0"1P'
 0:paste register 1 to get last deletion
 >BUFFER:  doodleyankee

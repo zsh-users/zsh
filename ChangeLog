@@ -1,5 +1,8 @@
 2014-10-23  Oliver Kiddle  <opk@zsh.org>
 
+	* 33520: Src/Zle/zle_vi.c, Test/X02zlevi.ztst: correct cursor
+	positioning following a vi mode yank operation
+
 	* unposted: .editorconfig: specify 8 char indent for ChangeLog
 
 	* 33519: Src/Zle/zle_move.c, Test/X02zlevi.ztst: last character
