@@ -2128,7 +2128,7 @@ finish_(UNUSED(Module m))
 	    free(kring[i].buf);
 	zfree(kring, kringsize * sizeof(struct cutbuffer));
     }
-    for(i = 35; i--; )
+    for(i = 36; i--; )
 	zfree(vibuf[i].buf, vibuf[i].len);
 
     /* editor entry points */

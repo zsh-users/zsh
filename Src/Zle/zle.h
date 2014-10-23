@@ -256,6 +256,7 @@ struct modifier {
 			      * of visible characters directly input by
 			      * the user.
 			      */
+#define CUT_YANK    (1<<3)   /* vi yank: use register 0 instead of 1-9 */
 
 /* undo system */
 

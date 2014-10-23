@@ -43,10 +43,10 @@ struct cutbuffer *kring;
 int kringsize, kringnum;
 
 /* Vi named cut buffers.  0-25 are the named buffers "a to "z, and *
- * 26-34 are the numbered buffer stack "1 to "9.                   */
+ * 26-35 are the numbered buffer stack "0 to "9.                   */
 
 /**/
-struct cutbuffer vibuf[35];
+struct cutbuffer vibuf[36];
 
 /* the line before last mod (for undo purposes) */
 
@@ -942,16 +942,23 @@ cuttext(ZLE_STRING_T line, int ct, int flags)
 	    b->len = len + ct;
 	}
 	return;
-    } else {
-	/* Save in "1, shifting "1-"8 along to "2-"9 */
-	int n;
-	free(vibuf[34].buf);
-	for(n=34; n>26; n--)
-	    vibuf[n] = vibuf[n-1];
+    } else if (flags & CUT_YANK) {
+	/* Save in "0 */
+	free(vibuf[26].buf);
 	vibuf[26].buf = (ZLE_STRING_T)zalloc(ct * ZLE_CHAR_SIZE);
 	ZS_memcpy(vibuf[26].buf, line, ct);
 	vibuf[26].len = ct;
 	vibuf[26].flags = vilinerange ? CUTBUFFER_LINE : 0;
+    } else {
+	/* Save in "1, shifting "1-"8 along to "2-"9 */
+	int n;
+	free(vibuf[34].buf);
+	for(n=35; n>27; n--)
+	    vibuf[n] = vibuf[n-1];
+	vibuf[27].buf = (ZLE_STRING_T)zalloc(ct * ZLE_CHAR_SIZE);
+	ZS_memcpy(vibuf[27].buf, line, ct);
+	vibuf[27].len = ct;
+	vibuf[27].flags = vilinerange ? CUTBUFFER_LINE : 0;
     }
     if (!cutbuf.buf) {
 	cutbuf.buf = (ZLE_STRING_T)zalloc(ZLE_CHAR_SIZE);

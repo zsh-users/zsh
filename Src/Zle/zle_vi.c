@@ -453,7 +453,7 @@ viyank(UNUSED(char **args))
 
     startvichange(1);
     if ((c2 = getvirange(0)) != -1) {
-	cut(zlecs, c2 - zlecs, 0);
+	cut(zlecs, c2 - zlecs, CUT_YANK);
 	ret = 0;
     }
     vichgflag = 0;
@@ -470,7 +470,7 @@ viyankeol(UNUSED(char **args))
     startvichange(-1);
     if (x == zlecs)
 	return 1;
-    cut(zlecs, x - zlecs, 0);
+    cut(zlecs, x - zlecs, CUT_YANK);
     return 0;
 }
 
@@ -492,7 +492,7 @@ viyankwholeline(UNUSED(char **args))
      zlecs = findeol() + 1;
     }
     vilinerange = 1;
-    cut(bol, zlecs - bol - 1, 0);
+    cut(bol, zlecs - bol - 1, CUT_YANK);
     zlecs = oldcs;
     return 0;
 }
@@ -910,7 +910,7 @@ visetbuffer(UNUSED(char **args))
     ZLE_INT_T ch;
 
     if ((zmod.flags & MOD_VIBUF) ||
-	(((ch = getfullchar(0)) < ZWC('1') || ch > ZWC('9')) &&
+	(((ch = getfullchar(0)) < ZWC('0') || ch > ZWC('9')) &&
 	 (ch < ZWC('a') || ch > ZWC('z')) &&
 	 (ch < ZWC('A') || ch > ZWC('Z'))))
 	return 1;
@@ -920,8 +920,8 @@ visetbuffer(UNUSED(char **args))
 	zmod.flags &= ~MOD_VIAPP;
     /* FIXME how portable is it for multibyte encoding? */
     zmod.vibuf = ZC_tolower(ch);
-    if (ch >= ZWC('1') && ch <= ZWC('9'))
-	zmod.vibuf += - (int)ZWC('1') + 26;
+    if (ch >= ZWC('0') && ch <= ZWC('9'))
+	zmod.vibuf += - (int)ZWC('0') + 26;
     else
 	zmod.vibuf += - (int)ZWC('a');
     zmod.flags |= MOD_VIBUF;
