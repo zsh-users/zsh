@@ -1014,6 +1014,7 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
 	   Brinfo *bpl, int bcp, Brinfo *bsl, int bcs, int *exact)
 {
     char *r = NULL;
+    int onoerrs = noerrs;
 
     if (cp) {
 	/* We have a globcomplete-like pattern, just use that. */
@@ -1033,12 +1034,14 @@ comp_match(char *pfx, char *sfx, char *w, Patprog cp, Cline *clp, int qu,
 	     */
 	    teststr = dupstring(r);
 	    tokenize(teststr);
+	    noerrs = 1;
 	    if (parse_subst_string(teststr))
 		teststr = r;
 	    else {
 		remnulargs(teststr);
 		untokenize(teststr);
 	    }
+	    noerrs = onoerrs;
 	} else
 	    teststr = r;
 	if (!pattry(cp, teststr))

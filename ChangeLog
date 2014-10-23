@@ -1,5 +1,8 @@
 2014-10-22  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 33515: Src/Zle/compmatch.c: suppress parser error messages in
+	comp_match()
+
 	* 33493: Src/Builtins/rlimits.c, Src/exec.c: use correct command
 	name in error messages about "ulimit" failure; restore internal
 	copy of limits if setrlimit() fails, so the error won't repeat
