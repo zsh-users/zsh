@@ -599,7 +599,7 @@ vimatchbracket(UNUSED(char **args))
 int
 viforwardchar(char **args)
 {
-    int lim = findeol() - invicmdmode();
+    int lim = findeol() - invicmdmode() + virangeflag;
     int n = zmult;
 
     if (n < 0) {

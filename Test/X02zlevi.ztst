@@ -10,6 +10,11 @@
 
 %test
 
+  zletest $'goox\ecld'
+0:change last character in buffer
+>BUFFER: good
+>CURSOR: 4
+
   zletest $'yankee doodle\ebhDyy0"1P'
 0:paste register 1 to get last deletion
 >BUFFER:  doodleyankee

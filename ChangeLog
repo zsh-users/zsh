@@ -1,5 +1,8 @@
 2014-10-23  Oliver Kiddle  <opk@zsh.org>
 
+	* 33519: Src/Zle/zle_move.c, Test/X02zlevi.ztst: last character
+	in the buffer can be cut, changed or yanked using vi-forward-char
+
 	* 33518: Doc/Zsh/zle.yo, Src/Zle/zle.h, Src/Zle/zle_utils.c,
 	Src/Zle/zle_vi.c, Test/X02zlevi.ztst: add support for "_ vi
 	buffer and arguments to vi-set-buffer from a zle widget
