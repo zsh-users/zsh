@@ -941,7 +941,6 @@ cuttext(ZLE_STRING_T line, int ct, int flags)
 	    ZS_memcpy(b->buf + len, line, ct);
 	    b->len = len + ct;
 	}
-	return;
     } else if (flags & CUT_YANK) {
 	/* Save in "0 */
 	free(vibuf[26].buf);
