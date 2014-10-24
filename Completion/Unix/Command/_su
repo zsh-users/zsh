@@ -32,6 +32,7 @@ else
       '-m[do not reset environment]'
       '-s[set the MAC label]'
     )
+  ;;
   *) args+=( '-c[pass command to shell]:command string:->command' ) ;;
   esac
 fi
