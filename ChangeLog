@@ -1,3 +1,8 @@
+2014-10-24  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33526: Completion/Unix/Type/_path_files: fix path prefix
+	handling when NO_CASE_GLOB is in effect
+
 2014-10-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 33480 slightly tweaked: Src/Zle/zle_tricky.c: fix completion

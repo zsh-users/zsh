@@ -609,8 +609,15 @@ for prepath in "$prepaths[@]"; do
   tmp3="$pre$suf"
   tpre="$pre"
   tsuf="$suf"
-  [[ -n "${prepath}${realpath}${testpath}" ]] &&
+  if [[ -n "${prepath}${realpath}${testpath}" ]]
+  then
+    if [[ -o nocaseglob ]]
+    then
+      tmp1=( "${(@)tmp1#(#i)${prepath}${realpath}${testpath}}" )
+    else
       tmp1=( "${(@)tmp1#${prepath}${realpath}${testpath}}" )
+    fi
+  fi
 
   while true; do
 
