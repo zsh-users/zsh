@@ -662,8 +662,9 @@ docomplete(int lst)
      * NOTE: get_comp_string() calls pushheap(), but not popheap(). */
     noerrs = 1;
     s = get_comp_string();
-    DPUTS(wb < 0 || zlemetacs < wb || zlemetacs > we,
-	  "BUG: 0 <= wb <= zlemetacs <= we is not true!");
+    DPUTS3(wb < 0 || zlemetacs < wb || zlemetacs > we,
+	  "BUG: 0 <= wb (%d) <= zlemetacs (%d) <= we (%d) is not true!",
+	   wb, zlemetacs, we);
     noerrs = ne;
     /* For vi mode, reset the start-of-insertion pointer to the beginning *
      * of the word being completed, if it is currently later.  Vi itself  *
@@ -1720,9 +1721,11 @@ get_comp_string(void)
 	    for (pe = p + 2; *pe && *pe != Snull && i + (pe - p) < zlemetacs;
 		 pe++)
 		;
-	    if (!*pe) {
+	    if (*pe != Snull) {
 		/* no terminating Snull, can't substitute */
 		skipchars = 2;
+		if (*pe)
+		    j = 1;
 	    } else {
 		/*
 		 * Try and substitute the $'...' expression.
@@ -1795,6 +1798,10 @@ get_comp_string(void)
 		     * first clue how the completion system actually works.
 		     */
 		    skipchars = 2;
+		    /*
+		     * Also pretend we're in single quotes.
+		     */
+		    j = 1;
 		}
 	    }
 	}
@@ -1817,7 +1824,7 @@ get_comp_string(void)
 		    ocs = zlemetacs;
 		    zlemetacs = i;
 		    foredel(skipchars, CUT_RAW);
-		    if ((zlemetacs = ocs) > (i -= skipchars))
+		    if ((zlemetacs = ocs) > --i)
 			zlemetacs -= skipchars;
 		    we -= skipchars;
 		}

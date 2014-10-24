@@ -1,3 +1,8 @@
+2014-10-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 33480 slightly tweaked: Src/Zle/zle_tricky.c: fix completion
+	after $' but before closing quote (if any).
+
 2014-10-24  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 33485: Completion/Unix/Command/_su: fix a missing ;; case
