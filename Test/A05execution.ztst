@@ -254,7 +254,7 @@ F:anonymous function, and a descriptor leak when backgrounding a pipeline
 # other words, we rely on the test working repeatedly rather than just
 # once.  The monitor option is irrelevant to the logic, so we'll make
 # our job easier by turning it off.
-  unsetopt monitor
+  { unsetopt MONITOR } 2>/dev/null
   (exit 1) &
   one=$!
   (exit 2) &
