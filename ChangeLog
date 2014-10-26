@@ -1,5 +1,7 @@
 2014-10-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 33542: Test/A05execution.ztst: test previous patch.
+
 	* 33531 (plus fix to test job pointer and removing
 	lastpid_status): Doc/Zsh/builtins.yo, Doc/Zsh/options.yo,
 	Src/exec.c, Src/init.c, Src/jobs.c, Src/linklist.c,
