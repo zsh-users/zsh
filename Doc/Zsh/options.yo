@@ -1434,10 +1434,10 @@ shell is saved for output within a subshell (for example, within a
 pipeline).  When the option is set, the output of tt(jobs) is empty
 until a job is started within the subshell.
 
-When the option is set, it becomes possible to use the tt(wait) builtin to
-wait for the last job started in the background (as given by tt($!)) even
-if that job has already exited.  This works even if the option is turned
-on temporarily around the use of the tt(wait) builtin.
+In previous versions of the shell, it was necessary to enable
+tt(POSIX_JOBS) in order for the builtin command tt(wait) to return the
+status of background jobs that had already exited.  This is no longer
+the case.
 )
 enditem()
 

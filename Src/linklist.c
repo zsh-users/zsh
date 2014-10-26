@@ -118,6 +118,8 @@ znewlinklist(void)
     LinkList list;
 
     list = (LinkList) zalloc(sizeof *list);
+    if (!list)
+	return NULL;
     list->list.first = NULL;
     list->list.last = &list->node;
     list->list.flags = 0;
@@ -152,6 +154,8 @@ zinsertlinknode(LinkList list, LinkNode node, void *dat)
 
     tmp = node->next;
     node->next = new = (LinkNode) zalloc(sizeof *tmp);
+    if (!new)
+	return NULL;
     new->prev = node;
     new->dat = dat;
     new->next = tmp;

@@ -1049,7 +1049,6 @@ setupvals(void)
     bufstack = znewlinklist();
     hsubl = hsubr = NULL;
     lastpid = 0;
-    lastpid_status = -1L;
 
     get_usage();
 

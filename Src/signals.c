@@ -522,14 +522,14 @@ wait_for_processes(void)
 	    get_usage();
 	}
 	/*
-	 * Remember the status associated with $!, so we can
-	 * wait for it even if it's exited.  This value is
-	 * only used if we can't find the PID in the job table,
-	 * so it doesn't matter that the value we save here isn't
-	 * useful until the process has exited.
+	 * Accumulate a list of older jobs.  We only do this for
+	 * background jobs, which is something in the job table
+	 * that's not marked as in the current shell or as shell builtin
+	 * and is not equal to the current foreground job.
 	 */
-	if (pn != NULL && pid == lastpid && lastpid_status != -1L)
-	    lastpid_status = lastval2;
+	if (jn && !(jn->stat & (STAT_CURSH|STAT_BUILTIN)) &&
+	    jn - jobtab != thisjob)
+	    addbgstatus(pid, (int)lastval2);
     }
 }
 
