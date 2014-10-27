@@ -702,8 +702,10 @@ printtime(struct timeval *real, child_times_t *ti, char *desc)
 #endif
 
     queue_signals();
-    if (!(s = unmetafy(getsparam("TIMEFMT"), NULL)))
+    if (!(s = getsparam("TIMEFMT")))
 	s = DEFAULT_TIMEFMT;
+    else
+	s = unmetafy(s, NULL);
 
     for (; *s; s++)
 	if (*s == '%')
