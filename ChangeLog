@@ -1,3 +1,7 @@
+2014-10-27  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 33561: Src/jobs.c: The time builtin forgot to unmetafy TIMEFMT.
+
 2014-10-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 33564: Test/A05execution.ztst: more care with monitor option.
