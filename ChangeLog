@@ -1,3 +1,10 @@
+2014-10-29  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33563: Completion/Base/Core/_main_complete, Src/Zle/complist.c:
+	fix thinko in status message for INT/QUIT signals; check errflag
+	in output loops so that unexpectedly long completion listings can
+	be interrupted
+
 2014-10-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 33564: Test/A05execution.ztst: more care with monitor option.

@@ -1375,7 +1375,7 @@ compprintlist(int showall)
 	tcout(TCCLEAREOD);
 
     g = ((lasttype && lastg) ? lastg : amatches);
-    while (g) {
+    while (g && !errflag) {
 	char **pp = g->ylist;
 
 #ifdef ZSH_HEAP_DEBUG
@@ -1389,7 +1389,7 @@ compprintlist(int showall)
 		ml = lastml;
 		lastused = 1;
 	    }
-	    while (*e) {
+	    while (*e && !errflag) {
 		if (((*e)->count || (*e)->always) &&
 		    (!listdat.onlyexpl ||
 		     (listdat.onlyexpl & ((*e)->always > 0 ? 2 : 1)))) {
@@ -1469,11 +1469,11 @@ compprintlist(int showall)
 
 		nl = nc = g->lins;
 
-		while (n && nl--) {
+		while (n && nl-- && !errflag) {
 		    i = g->cols;
 		    mc = 0;
 		    pq = pp;
-		    while (n && i--) {
+		    while (n && i-- && !errflag) {
 			if (pq - g->ylist >= g->lcount)
 			    break;
 			if (compzputs(*pq, mscroll))
@@ -1582,7 +1582,7 @@ compprintlist(int showall)
 	    } else
 		p = skipnolist(g->matches, showall);
 
-	    while (n && nl--) {
+	    while (n && nl-- && !errflag) {
 		if (!lasttype && ml >= mlbeg) {
 		    lasttype = 3;
 		    lastg = g;
@@ -1596,7 +1596,7 @@ compprintlist(int showall)
 		i = g->cols;
 		mc = 0;
 		q = p;
-		while (n && i--) {
+		while (n && i-- && !errflag) {
 		    wid = (g->widths ? g->widths[mc] : g->width);
 		    if (!(m = *q)) {
 			if (clprintm(g, NULL, mc, ml, (!i), wid))

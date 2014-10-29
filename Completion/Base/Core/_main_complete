@@ -128,7 +128,7 @@ _completer_num=1
 
 # We assume localtraps to be in effect here ...
 integer SECONDS=0
-trap 'zle -M "Killed by signal in ${funcstack[0]} after ${SECONDS}s";
+trap 'zle -M "Killed by signal in ${funcstack[1]} after ${SECONDS}s";
       zle -R; return 130' INT QUIT
 
 # Call the pre-functions.
