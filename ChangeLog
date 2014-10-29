@@ -1,5 +1,7 @@
 2014-10-29  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 33566: Jun T.: Src/Modules/zselect.c: quash compiler warning
+
 	* 33563: Completion/Base/Core/_main_complete, Src/Zle/complist.c:
 	fix thinko in status message for INT/QUIT signals; check errflag
 	in output loops so that unexpectedly long completion listings can

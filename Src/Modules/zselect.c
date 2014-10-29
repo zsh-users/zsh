@@ -251,7 +251,7 @@ bin_zselect(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     outptr = outdata = (char **)zalloc((fdcount+1)*sizeof(char *));
     while (nonempty(fdlist))
 	*outptr++ = getlinknode(fdlist);
-    *outptr = '\0';
+    *outptr = NULL;
     /* and store in array parameter */
     if (outhash)
 	sethparam(outhash, outdata);
