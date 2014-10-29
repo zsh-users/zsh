@@ -248,6 +248,7 @@ getvirange(int wf)
      * point we just need to make the range encompass entire lines.   */
     if(vilinerange) {
 	int newcs = findbol();
+	lastcol = zlecs - newcs;
 	zlecs = pos;
 	pos = findeol();
 	zlecs = newcs;
@@ -348,6 +349,7 @@ videlete(UNUSED(char **args))
 	forekill(c2 - zlecs, CUT_RAW);
 	ret = 0;
 	if (vilinerange && zlell) {
+	    lastcol = -1;
 	    if (zlecs == zlell)
 		DECCS();
 	    foredel(1, 0);
@@ -449,7 +451,7 @@ vichangewholeline(char **args)
 int
 viyank(UNUSED(char **args))
 {
-    int oldcs = zlecs, c2, ret = 1;
+    int c2, ret = 1;
 
     startvichange(1);
     if ((c2 = getvirange(0)) != -1) {
@@ -459,11 +461,19 @@ viyank(UNUSED(char **args))
     vichgflag = 0;
     /* cursor now at the start of the range yanked. For line mode
      * restore the column position */
-    if (vilinerange) {
-	while (oldcs > 0 && zleline[oldcs - 1] != ZWC('\n') &&
-		zlecs != zlell && zleline[zlecs] != ZWC('\n')) {
-	    ++zlecs; --oldcs;
+    if (vilinerange && lastcol != -1) {
+	int x = findeol();
+
+	if ((zlecs += lastcol) >= x) {
+	    zlecs = x;
+	    if (zlecs > findbol() && invicmdmode())
+		DECCS();
 	}
+#ifdef MULTIBYTE_SUPPORT
+	else
+	    CCRIGHT();
+#endif
+	lastcol = -1;
     }
     return ret;
 }

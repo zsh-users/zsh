@@ -1,3 +1,9 @@
+2014-10-29  Oliver Kiddle  <opk@zsh.org>
+
+	* 33528: Src/Zle/iwidgets.list, Src/Zle/zle_vi.c,
+	Test/X02zlevi.ztst: take notice of last column position when
+	using vi-yank and an upward cursor movement
+
 2014-10-27  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 33561, 33562: Src/jobs.c: The time builtin forgot to unmetafy

@@ -37,6 +37,25 @@
 >two
 >CURSOR: 2
 
+  zletest $'long\eo  s\eolong\ekjy-k'
+0:yank up clears lastcol
+>BUFFER: long
+>  s
+>long
+>CURSOR: 2
+
+  zletest $'long\eos\eklljyk'
+0:yank up honours lastcol
+>BUFFER: long
+>s
+>CURSOR: 2
+
+  zletest $'long\eolong\eo  s\eolong\ekjd-k'
+0:delete up clears lastcol
+>BUFFER: long
+>long
+>CURSOR: 0
+
   zletest $'yankee doodle\ebhDyy0"1P'
 0:paste register 1 to get last deletion
 >BUFFER:  doodleyankee

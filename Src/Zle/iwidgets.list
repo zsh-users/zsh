@@ -102,9 +102,9 @@
 "self-insert-unmeta", selfinsertunmeta, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "send-break", sendbreak, 0
 "set-mark-command", setmarkcommand, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
-"split-undo", splitundo, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_NOTCOMMAND
+"split-undo", splitundo, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND
 "spell-word", spellword, 0
-"set-local-history", setlocalhistory, 0
+"set-local-history", setlocalhistory, ZLE_LASTCOL
 "transpose-chars", transposechars, 0
 "transpose-words", transposewords, 0
 "undefined-key", undefinedkey, 0
@@ -122,12 +122,12 @@
 "vi-backward-kill-word", vibackwardkillword, ZLE_KEEPSUFFIX
 "vi-backward-word", vibackwardword, 0
 "vi-beginning-of-line", vibeginningofline, 0
-"vi-caps-lock-panic", vicapslockpanic, 0
-"vi-change", vichange, 0
+"vi-caps-lock-panic", vicapslockpanic, ZLE_LASTCOL
+"vi-change", vichange, ZLE_LASTCOL
 "vi-change-eol", vichangeeol, 0
 "vi-change-whole-line", vichangewholeline, 0
 "vi-cmd-mode", vicmdmode, 0
-"vi-delete", videlete, ZLE_KEEPSUFFIX
+"vi-delete", videlete, ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "vi-delete-char", videletechar, ZLE_KEEPSUFFIX
 "vi-digit-or-beginning-of-line", vidigitorbeginningofline, 0
 "vi-down-line-or-history", vidownlineorhistory, ZLE_LINEMOVE
@@ -148,7 +148,7 @@
 "vi-goto-mark-line", vigotomarkline, 0
 "vi-history-search-backward", vihistorysearchbackward, 0
 "vi-history-search-forward", vihistorysearchforward, 0
-"vi-indent", viindent, 0
+"vi-indent", viindent, ZLE_LASTCOL
 "vi-insert", viinsert, 0
 "vi-insert-bol", viinsertbol, 0
 "vi-join", vijoin, 0
@@ -157,7 +157,7 @@
 "vi-match-bracket", vimatchbracket, 0
 "vi-open-line-above", viopenlineabove, 0
 "vi-open-line-below", viopenlinebelow, 0
-"vi-oper-swap-case", vioperswapcase, 0
+"vi-oper-swap-case", vioperswapcase, ZLE_LASTCOL
 "vi-pound-insert", vipoundinsert, 0
 "vi-put-after", viputafter, ZLE_YANK | ZLE_KEEPSUFFIX
 "vi-put-before", viputbefore, ZLE_YANK | ZLE_KEEPSUFFIX
@@ -172,11 +172,11 @@
 "vi-set-buffer", visetbuffer, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "vi-set-mark", visetmark, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "vi-substitute", visubstitute, 0
-"vi-swap-case", viswapcase, 0
+"vi-swap-case", viswapcase, ZLE_LASTCOL
 "vi-undo-change", viundochange, ZLE_KEEPSUFFIX
-"vi-unindent", viunindent, 0
+"vi-unindent", viunindent, ZLE_LASTCOL
 "vi-up-line-or-history", viuplineorhistory, ZLE_LINEMOVE
-"vi-yank", viyank, 0
+"vi-yank", viyank, ZLE_LASTCOL
 "vi-yank-eol", viyankeol, 0
 "vi-yank-whole-line", viyankwholeline, 0
 "what-cursor-position", whatcursorposition, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
