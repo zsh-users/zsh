@@ -159,8 +159,8 @@
 "vi-open-line-below", viopenlinebelow, 0
 "vi-oper-swap-case", vioperswapcase, ZLE_LASTCOL
 "vi-pound-insert", vipoundinsert, 0
-"vi-put-after", viputafter, ZLE_YANK | ZLE_KEEPSUFFIX
-"vi-put-before", viputbefore, ZLE_YANK | ZLE_KEEPSUFFIX
+"vi-put-after", viputafter, ZLE_YANKAFTER | ZLE_KEEPSUFFIX
+"vi-put-before", viputbefore, ZLE_YANKBEFORE | ZLE_KEEPSUFFIX
 "vi-quoted-insert", viquotedinsert, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "vi-repeat-change", virepeatchange, 0
 "vi-repeat-find", virepeatfind, 0
@@ -182,5 +182,5 @@
 "what-cursor-position", whatcursorposition, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "where-is", whereis, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "which-command", processcmd, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
-"yank", yank, ZLE_YANK | ZLE_KEEPSUFFIX
-"yank-pop", yankpop, ZLE_YANK | ZLE_KEEPSUFFIX
+"yank", yank, ZLE_YANKBEFORE | ZLE_KEEPSUFFIX
+"yank-pop", yankpop, ZLE_KEEPSUFFIX | ZLE_NOTCOMMAND

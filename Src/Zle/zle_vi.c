@@ -75,7 +75,7 @@ static int inrepeat, vichgrepeat;
  */
 
 /**/
-static void
+void
 startvichange(int im)
 {
     if (im != -1) {
@@ -788,72 +788,6 @@ vikillline(UNUSED(char **args))
     if (viinsbegin > zlecs)
 	return 1;
     backdel(zlecs - viinsbegin, CUT_RAW);
-    return 0;
-}
-
-/**/
-int
-viputbefore(UNUSED(char **args))
-{
-    Cutbuffer buf = &cutbuf;
-    int n = zmult;
-
-    startvichange(-1);
-    if (n < 0 || zmod.flags & MOD_NULL)
-	return 1;
-    if (zmod.flags & MOD_VIBUF)
-	buf = &vibuf[zmod.vibuf];
-    if (!buf->buf)
-	return 1;
-    if(buf->flags & CUTBUFFER_LINE) {
-	zlecs = findbol();
-	spaceinline(buf->len + 1);
-	ZS_memcpy(zleline + zlecs, buf->buf, buf->len);
-	zleline[zlecs + buf->len] = ZWC('\n');
-	vifirstnonblank(zlenoargs);
-    } else {
-	while (n--) {
-	    spaceinline(buf->len);
-	    ZS_memcpy(zleline + zlecs, buf->buf, buf->len);
-	    zlecs += buf->len;
-	}
-	if (zlecs)
-	    DECCS();
-    }
-    return 0;
-}
-
-/**/
-int
-viputafter(UNUSED(char **args))
-{
-    Cutbuffer buf = &cutbuf;
-    int n = zmult;
-
-    startvichange(-1);
-    if (n < 0 || zmod.flags & MOD_NULL)
-	return 1;
-    if (zmod.flags & MOD_VIBUF)
-	buf = &vibuf[zmod.vibuf];
-    if (!buf->buf)
-	return 1;
-    if(buf->flags & CUTBUFFER_LINE) {
-	zlecs = findeol();
-	spaceinline(buf->len + 1);
-	zleline[zlecs++] = ZWC('\n');
-	ZS_memcpy(zleline + zlecs, buf->buf, buf->len);
-	vifirstnonblank(zlenoargs);
-    } else {
-	if (zlecs != findeol())
-	    INCCS();
-	while (n--) {
-	    spaceinline(buf->len);
-	    ZS_memcpy(zleline + zlecs, buf->buf, buf->len);
-	    zlecs += buf->len;
-	}
-	if (zlecs)
-	    DECCS();
-    }
     return 0;
 }
 

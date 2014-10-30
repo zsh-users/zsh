@@ -1786,7 +1786,7 @@ tindex(yank-pop)
 item(tt(yank-pop) (ESC-y) (unbound) (unbound))(
 Remove the text just yanked, rotate the kill-ring (the history of
 previously killed text) and yank the new top.  Only works following
-tt(yank) or tt(yank-pop).
+tt(yank), tt(vi-put-before), tt(vi-put-after) or tt(yank-pop).
 )
 tindex(vi-yank)
 item(tt(vi-yank) (unbound) (y) (unbound))(

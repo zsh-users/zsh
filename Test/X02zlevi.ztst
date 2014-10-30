@@ -116,6 +116,34 @@
 >BUFFER: stnwararart
 >CURSOR: 9
 
+  zpty_run 'bindkey -a "^P" yank-pop'
+  zletest $'word\C-wline\eddiSE\eP\C-P'
+0:line based put before followed by character based yank-pop
+>BUFFER: SwordE
+>CURSOR: 4
+
+  zletest $'line\eddiword\C-w\eiSE\eP\C-P'
+0:character based put before followed by line based yank-pop
+>BUFFER: line
+>SE
+>CURSOR: 0
+
+  zletest $'one two three\C-w\C-w\C-wSE\e0p\C-P\C-P'
+0:put after cycled twice with yank-pop
+>BUFFER: SthreeE
+>CURSOR: 5
+
+  zletest $'word\C-wline\eddiSE\ehp\C-P'
+0:line based put after followed by character based yank-pop
+>BUFFER: SwordE
+>CURSOR: 5
+
+  zletest $'line\eddiword\C-w\eiSE\ehp\C-P'
+0:character based after before followed by line based yank-pop
+>BUFFER: SE
+>line
+>CURSOR: 3
+
   zletest $'word\euaend'
 0:undo initial change
 >BUFFER: end

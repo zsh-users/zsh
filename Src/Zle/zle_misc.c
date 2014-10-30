@@ -475,8 +475,10 @@ copyregionaskill(char **args)
 /*
  * kct: index into kill ring, or -1 for original cutbuffer of yank.
  * yankb, yanke: mark the start and end of last yank in editing buffer.
+ * yankcs marks the cursor position preceding the last yank
  */
-static int kct, yankb, yanke;
+static int kct, yankb, yanke, yankcs;
+
 /* The original cutbuffer, either cutbuf or one of the vi buffers. */
 static Cutbuffer kctbuf;
 
@@ -494,8 +496,7 @@ yank(UNUSED(char **args))
 	kctbuf = &cutbuf;
     if (!kctbuf->buf)
 	return 1;
-    mark = zlecs;
-    yankb = zlecs;
+    yankb = yankcs = mark = zlecs;
     while (n--) {
 	kct = -1;
 	spaceinline(kctbuf->len);
@@ -506,11 +507,87 @@ yank(UNUSED(char **args))
     return 0;
 }
 
+static void pastebuf(Cutbuffer buf, int mult, int after)
+{
+    int cc;
+    if (buf->flags & CUTBUFFER_LINE) {
+	if (after) {
+	    yankb = zlecs = findeol();
+	    spaceinline(buf->len + 1);
+	    zleline[zlecs++] = ZWC('\n');
+	    yanke = zlecs + buf->len;
+	    ZS_memcpy(zleline + zlecs, buf->buf, buf->len);
+	} else {
+	    yankb = zlecs = findbol();
+	    spaceinline(buf->len + 1);
+	    ZS_memcpy(zleline + zlecs, buf->buf, buf->len);
+	    yanke = zlecs + buf->len + 1;
+	    zleline[zlecs + buf->len] = ZWC('\n');
+	}
+	vifirstnonblank(zlenoargs);
+    } else {
+	if (after && zlecs != findeol())
+	    INCCS();
+	yankb = zlecs;
+	cc = buf->len;
+	while (mult--) {
+	    spaceinline(cc);
+	    ZS_memcpy(zleline + zlecs, buf->buf, cc);
+	    zlecs += cc;
+	}
+	yanke = zlecs;
+	if (zlecs)
+	    DECCS();
+    }
+}
+
+/**/
+int
+viputbefore(UNUSED(char **args))
+{
+    int n = zmult;
+
+    startvichange(-1);
+    if (n < 0 || zmod.flags & MOD_NULL)
+	return 1;
+    if (zmod.flags & MOD_VIBUF)
+	kctbuf = &vibuf[zmod.vibuf];
+    else
+	kctbuf = &cutbuf;
+    if (!kctbuf->buf)
+	return 1;
+    kct = -1;
+    yankcs = zlecs;
+    pastebuf(kctbuf, n, 0);
+    return 0;
+}
+
+/**/
+int
+viputafter(UNUSED(char **args))
+{
+    int n = zmult;
+
+    startvichange(-1);
+    if (n < 0 || zmod.flags & MOD_NULL)
+	return 1;
+    if (zmod.flags & MOD_VIBUF)
+	kctbuf = &vibuf[zmod.vibuf];
+    else
+	kctbuf = &cutbuf;
+    if (!kctbuf->buf)
+	return 1;
+    kct = -1;
+    yankcs = zlecs;
+    pastebuf(kctbuf, n, 1);
+    return 0;
+}
+
 /**/
 int
 yankpop(UNUSED(char **args))
 {
-    int cc, kctstart = kct;
+    int kctstart = kct;
     Cutbuffer buf;
 
     if (!(lastcmd & ZLE_YANK) || !kring || !kctbuf) {
@@ -557,11 +634,8 @@ yankpop(UNUSED(char **args))
 
     zlecs = yankb;
     foredel(yanke - yankb, CUT_RAW);
-    cc = buf->len;
-    spaceinline(cc);
-    ZS_memcpy(zleline + zlecs, buf->buf, cc);
-    zlecs += cc;
-    yanke = zlecs;
+    zlecs = yankcs;
+    pastebuf(buf, 1, lastcmd & ZLE_YANKAFTER);
     return 0;
 }
 
