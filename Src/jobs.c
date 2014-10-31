@@ -1813,7 +1813,9 @@ static int hackspace;
 void
 init_jobs(char **argv, char **envp)
 {
+#ifndef HAVE_SETPROCTITLE
     char *p, *q;
+#endif
     size_t init_bytes = MAXJOBS_ALLOC*sizeof(struct job);
 
     /*
