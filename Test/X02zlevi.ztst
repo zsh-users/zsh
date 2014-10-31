@@ -136,7 +136,7 @@
   zletest $'word\C-wline\eddiSE\ehp\C-P'
 0:line based put after followed by character based yank-pop
 >BUFFER: SwordE
->CURSOR: 5
+>CURSOR: 4
 
   zletest $'line\eddiword\C-w\eiSE\ehp\C-P'
 0:character based after before followed by line based yank-pop

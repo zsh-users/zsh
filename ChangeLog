@@ -1,3 +1,7 @@
+2014-10-31  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Test/X02zlevi.ztst: correct cursor position in test
+
 2014-10-31  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: .gitignore: add /.project for GitEye.
