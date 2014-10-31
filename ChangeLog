@@ -1,5 +1,8 @@
 2014-10-31  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 33582: Src/Modules/zftp.c: don't include tcp.mdh in zftp.c as
+	it only contains private module definitions.
+
 	* via private email: Jérémie Roquet: Src/options.c: more care
 	with errors using setuid().
 
