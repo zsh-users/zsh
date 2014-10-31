@@ -1,5 +1,7 @@
 2014-10-31  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: .gitignore: add /.project for GitEye.
+
 	* 33582: Src/Modules/zftp.c: don't include tcp.mdh in zftp.c as
 	it only contains private module definitions.
 

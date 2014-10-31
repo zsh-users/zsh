@@ -149,3 +149,4 @@ Src/Zle/zle_things.h
 Src/Zle/zle_widget.h
 
 Test/*.tmp
+/.project
