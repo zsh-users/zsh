@@ -785,6 +785,8 @@ spaceinline(int ct)
 
 	if (mark > zlecs)
 	    mark += ct;
+	if (viinsbegin > zlecs)
+	    viinsbegin = 0;
 
 	if (region_highlights) {
 	    for (rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
@@ -1104,6 +1106,7 @@ setline(char *s, int flags)
      */
     free(zleline);
 
+    viinsbegin = 0;
     zleline = stringaszleline(scp, 0, &zlell, &linesz, NULL);
 
     if ((flags & ZSL_TOEND) && (zlecs = zlell) && invicmdmode())

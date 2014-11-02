@@ -1,3 +1,8 @@
+2014-11-02  Oliver Kiddle  <opk@zsh.org>
+
+	* 33575: Src/Zle/zle_params.c, Src/Zle/zle_utils.c: reset vi change
+	start position if text is inserted before it or on history movement
+
 2014-11-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 33591: Src/exec.c, Test/D04parameter.ztst: don't treat an exec
