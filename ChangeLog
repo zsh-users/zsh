@@ -1,5 +1,8 @@
 2014-11-02  Oliver Kiddle  <opk@zsh.org>
 
+	* 33593: Src/Zle/zle_vi.c, Test/X02zlevi.ztst:
+	support numeric argument to vi-join
+
 	* 33575: Src/Zle/zle_params.c, Src/Zle/zle_utils.c: reset vi change
 	start position if text is inserted before it or on history movement
 

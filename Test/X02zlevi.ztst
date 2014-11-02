@@ -15,6 +15,18 @@
 >BUFFER: good
 >CURSOR: 4
 
+  zletest $' four\eO\C-v\tthree\eO  two\eOone\e3J'
+0:join lines with line count
+>BUFFER: one two three
+> four
+>CURSOR: 7
+
+# like real vi, we just join as many as possible, in vim this beeps
+  zletest $'two\eOone\e3J'
+0:join more lines than possible
+>BUFFER: one two
+>CURSOR: 3
+
   zletest $'one two\eyb'
 0:yank left moves the cursor
 >BUFFER: one two

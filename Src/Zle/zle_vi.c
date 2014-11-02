@@ -796,26 +796,33 @@ int
 vijoin(UNUSED(char **args))
 {
     int x, pos;
+    int n = zmult;
 
     startvichange(-1);
+    if (n < 1)
+	return 1;
     if ((x = findeol()) == zlell)
 	return 1;
-    zlecs = x + 1;
-    pos = zlecs;
-    for (; zlecs != zlell && ZC_iblank(zleline[zlecs]); INCPOS(zlecs))
-	;
-    x = 1 + (zlecs - pos);
-    backdel(x, CUT_RAW);
-    if (zlecs) {
-	int pos = zlecs;
-	DECPOS(pos);
-	if (ZC_iblank(zleline[pos])) {
-	    zlecs = pos;
-	    return 0;
+    while (n) {
+	zlecs = x + 1;
+	pos = zlecs;
+	for (; zlecs != zlell && ZC_iblank(zleline[zlecs]); INCPOS(zlecs))
+	    ;
+	x = 1 + (zlecs - pos);
+	backdel(x, CUT_RAW);
+	if (zlecs) {
+	    int pos = zlecs;
+	    DECPOS(pos);
+	    if (ZC_iblank(zleline[pos])) {
+		zlecs = pos;
+		return 0;
+	    }
 	}
+	spaceinline(1);
+	zleline[zlecs] = ZWC(' ');
+	if (--n < 2 || (x = findeol()) == zlell)
+	    return 0;
     }
-    spaceinline(1);
-    zleline[zlecs] = ZWC(' ');
     return 0;
 }
 
