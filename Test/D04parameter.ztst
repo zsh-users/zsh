@@ -1548,7 +1548,7 @@
    foo=
    print ${foo:wq}
    print ${:wq}
-0:Empty parameter shouldn't cause modifiers to crash the shell
+0:Empty parameter should not cause modifiers to crash the shell
 >
 >
 
@@ -1656,3 +1656,10 @@
 >h:i
 >j,k
 >l
+
+  SHLVL=1
+  $ZTST_testdir/../Src/zsh -c 'echo $SHLVL'
+  $ZTST_testdir/../Src/zsh -c '(echo $SHLVL)'
+0:SHLVL appears sensible when about to exit shell
+>2
+>2

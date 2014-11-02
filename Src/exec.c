@@ -2995,6 +2995,15 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	 * Note that any form of exec means that the subshell is fake *
 	 * (but we may be in a subshell already).                     */
 	is_exec = 1;
+	/*
+	 * If we are in a subshell environment anyway, say we're forked,
+	 * even if we're actually not forked because we know the
+	 * subshell is exiting.  This ensures SHLVL reflects the current
+	 * shell, and also optimises out any save/restore we'd need to
+	 * do if we were returning to the main shell.
+	 */
+	if (type == WC_SUBSH)
+	    forked = 1;
     }
 
     if ((esglob = !(cflags & BINF_NOGLOB)) && args && htok) {

@@ -1,3 +1,9 @@
+2014-11-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 33591: Src/exec.c, Test/D04parameter.ztst: don't treat an exec
+	within an subshell as an exec of the parent shell even if about
+	to exit.  Fixes incorrect SHLVL in subshell.
+
 2014-10-31  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Src/jobs.c: quash compiler warning
