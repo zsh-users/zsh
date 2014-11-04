@@ -1435,7 +1435,7 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 	    loc = ((f = keybind(localkeymap, keybuf, &s)) != t_undefinedkey);
 	    ispfx = keyisprefix(localkeymap, keybuf);
 	}
-	if (!loc)
+	if (!loc && !ispfx)
 	    f = keybind(km, keybuf, &s);
 	ispfx |= keyisprefix(km, keybuf);
 
