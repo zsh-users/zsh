@@ -207,6 +207,12 @@
 >BUFFER: pre
 >CURSOR: 2
 
+  zletest $'two\eOone\eo\euo\eu'
+0:undo starting with a next change in the change list
+>BUFFER: one
+>two
+>CURSOR: 2
+
   zpty_run 'bindkey "^Gu" split-undo'
   zletest $'one\C-gutwo\eu'
 0:split the undo sequence

@@ -1395,7 +1395,8 @@ static struct change *nextchanges, *endnextchanges;
 
 /* incremented to provide a unique change number */
 
-static zlong undo_changeno;
+/**/
+zlong undo_changeno;
 
 /* If non-zero, the last increment to undo_changeno was for the variable */
 
@@ -1668,8 +1669,7 @@ splitundo(char **args)
 {
     if (vistartchange >= 0) {
 	mergeundo();
-	vistartchange = (curchange && curchange->prev) ?
-	    curchange->prev->changeno : 0;
+	vistartchange = undo_changeno;
     }
     handleundo();
     return 0;

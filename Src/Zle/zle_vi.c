@@ -109,7 +109,7 @@ startvitext(int im)
 {
     startvichange(im);
     selectkeymap("main", 1);
-    vistartchange = (curchange && curchange->prev) ? curchange->prev->changeno : 0;
+    vistartchange = undo_changeno;
     viinsbegin = zlecs;
 }
 
@@ -403,7 +403,7 @@ vichange(UNUSED(char **args))
 	forekill(c2 - zlecs, CUT_RAW);
 	selectkeymap("main", 1);
 	viinsbegin = zlecs;
-	vistartchange = (curchange && curchange->prev) ? curchange->prev->changeno : 0;
+	vistartchange = undo_changeno;
     }
     return ret;
 }
