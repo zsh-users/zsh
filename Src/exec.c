@@ -4555,6 +4555,7 @@ execshfunc(Shfunc shf, LinkList args)
 	fputc('\n', xtrerr);
 	fflush(xtrerr);
     }
+    queue_signals();
     ocs = cmdstack;
     ocsp = cmdsp;
     cmdstack = (unsigned char *) zalloc(CMDSTACKSZ);
@@ -4562,7 +4563,11 @@ execshfunc(Shfunc shf, LinkList args)
     if ((osfc = sfcontext) == SFC_NONE)
 	sfcontext = SFC_DIRECT;
     xtrerr = stderr;
+    unqueue_signals();
+
     doshfunc(shf, args, 0);
+
+    queue_signals();
     sfcontext = osfc;
     free(cmdstack);
     cmdstack = ocs;
@@ -4570,6 +4575,7 @@ execshfunc(Shfunc shf, LinkList args)
 
     if (!list_pipe)
 	deletefilelist(last_file_list, 0);
+    unqueue_signals();
 }
 
 /*
