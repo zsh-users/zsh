@@ -98,36 +98,33 @@ static int
 bin_getattr(char *nam, char **argv, Options ops, UNUSED(int func))
 {
     int ret = 0;
-    int list_len, val_len = 0, attr_len = 0, slen;
+    int val_len = 0, attr_len = 0, slen;
     char *value, *file = argv[0], *attr = argv[1], *param = argv[2];
     int symlink = OPT_ISSET(ops, 'h');
 
     unmetafy(file, &slen);
     unmetafy(attr, NULL);
-    list_len = xlistxattr(file, NULL, 0, symlink);
-    if (list_len > 0) {
-        val_len = xgetxattr(file, attr, NULL, 0, symlink);
-        if (val_len == 0) {
-            if (param)
-                unsetparam(param);
-            return 0;
-        }
-        if (val_len > 0) {
-            value = (char *)zalloc(val_len+1);
-            attr_len = xgetxattr(file, attr, value, val_len, symlink);
-            if (attr_len > 0 && attr_len <= val_len) {
-                value[attr_len] = '\0';
-                if (param)
-                    setsparam(param, metafy(value, attr_len, META_DUP));
-                else
-                    printf("%s\n", value);
-            }
-            zfree(value, val_len+1);
-        }
+    val_len = xgetxattr(file, attr, NULL, 0, symlink);
+    if (val_len == 0) {
+        if (param)
+            unsetparam(param);
+        return 0;
     }
-    if (list_len < 0 || val_len < 0 || attr_len < 0 || attr_len > val_len)  {
+    if (val_len > 0) {
+        value = (char *)zalloc(val_len+1);
+        attr_len = xgetxattr(file, attr, value, val_len, symlink);
+        if (attr_len > 0 && attr_len <= val_len) {
+            value[attr_len] = '\0';
+            if (param)
+                setsparam(param, metafy(value, attr_len, META_DUP));
+            else
+                printf("%s\n", value);
+        }
+        zfree(value, val_len+1);
+    }
+    if (val_len < 0 || attr_len < 0 || attr_len > val_len)  {
         zwarnnam(nam, "%s: %e", metafy(file, slen, META_NOALLOC), errno);
-        ret = 1 + (attr_len > val_len || attr_len < 0);
+        ret = 1 + ((val_len > 0 && attr_len > val_len) || attr_len < 0);
     }
     return ret;
 }
@@ -189,24 +186,20 @@ bin_listattr(char *nam, char **argv, Options ops, UNUSED(int func))
         if (list_len > 0 && list_len <= val_len) {
             char *p = value;
             if (param) {
-                if (strlen(value) + 1 == list_len)
-                    setsparam(param, metafy(value, list_len-1, META_DUP));
-                else {
-                    int arrlen = 0;
-                    char **array = NULL, **arrptr = NULL;
+                int arrlen = 0;
+                char **array = NULL, **arrptr = NULL;
 
-                    while (p < &value[list_len]) {
-                        arrlen++;
-                        p += strlen(p) + 1;
-                    }
-                    arrptr = array = (char **)zshcalloc((arrlen+1) * sizeof(char *));
-                    p = value;
-                    while (p < &value[list_len]) {
-                        *arrptr++ = metafy(p, -1, META_DUP);
-                        p += strlen(p) + 1;
-                    }
-                    setaparam(param, array);
+                while (p < &value[list_len]) {
+                    arrlen++;
+                    p += strlen(p) + 1;
                 }
+                arrptr = array = (char **)zshcalloc((arrlen+1) * sizeof(char *));
+                p = value;
+                while (p < &value[list_len]) {
+                    *arrptr++ = metafy(p, -1, META_DUP);
+                    p += strlen(p) + 1;
+                }
+                setaparam(param, array);
             } else while (p < &value[list_len]) {
                 printf("%s\n", p);
                 p += strlen(p) + 1;
