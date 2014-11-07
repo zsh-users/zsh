@@ -1,3 +1,7 @@
+2014-11-06  Oliver Kiddle  <opk@zsh.org>
+
+	* 33624: Src/Zle/zle_utils.c: keep region active when widget fails
+
 2014-11-07  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 33607: Src/Modules/attr.c: Fix some minor problems in zattr module

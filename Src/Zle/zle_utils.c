@@ -1365,7 +1365,6 @@ int
 handlefeep(UNUSED(char **args))
 {
     zbeep();
-    region_active = 0;
     return 0;
 }
 
