@@ -1,3 +1,8 @@
+2014-11-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 33653: Src/builtin.c: handle -a option to whence in
+	combination with -m.
+
 2014-11-08  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33648: Completion/Unix/Command/_gpg: complete for gpg2 as well

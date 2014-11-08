@@ -3228,11 +3228,47 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 		scanmatchtable(builtintab, pprog, 1, 0, DISABLED,
 			       builtintab->printnode, printflags);
 	    }
-	    /* Done search for `internal' commands, if the -p option *
-	     * was not used.  Now search the path.                   */
-	    cmdnamtab->filltable(cmdnamtab);
-	    scanmatchtable(cmdnamtab, pprog, 1, 0, 0,
-			   cmdnamtab->printnode, printflags);
+	    if (all) {
+		char **pp, *buf, *fn;
+		DIR *od;
+
+		pushheap();
+		for (pp = path; *pp; pp++) {
+		    if (!**pp)
+			continue;
+		    od = opendir(*pp);
+		    if (!od)
+			continue;
+
+		    while ((fn = zreaddir(od, 0))) {
+			if (!pattry(pprog, fn))
+			    continue;
+
+			buf = zhtricat(*pp, "/", fn);
+
+			if (iscom(buf)) {
+			    if (wd) {
+				printf("%s: command\n", fn);
+			    } else {
+				if (v && !csh)
+				    zputs(fn, stdout), fputs(" is ", stdout);
+				zputs(buf, stdout);
+				if (OPT_ISSET(ops,'s'))
+				    print_if_link(buf);
+				fputc('\n', stdout);
+			    }
+			}
+		    }
+		    closedir(od);
+		}
+		popheap();
+	    } else {
+		/* Done search for `internal' commands, if the -p option *
+		 * was not used.  Now search the path.                   */
+		cmdnamtab->filltable(cmdnamtab);
+		scanmatchtable(cmdnamtab, pprog, 1, 0, 0,
+			       cmdnamtab->printnode, printflags);
+	    }
 
 	    unqueue_signals();
 	}
