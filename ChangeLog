@@ -1,5 +1,7 @@
 2014-11-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 33655: Src/zsh.h: remove overlap of node flags.
+
 	* 33653: Src/builtin.c: handle -a option to whence in
 	combination with -m.
 

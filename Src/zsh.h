@@ -1865,9 +1865,9 @@ typedef groupset *Groupset;
 #define PRINT_TYPESET		(1<<5)
 
 /* flags for printing for the whence builtin */
-#define PRINT_WHENCE_CSH	(1<<5)
-#define PRINT_WHENCE_VERBOSE	(1<<6)
-#define PRINT_WHENCE_SIMPLE	(1<<7)
+#define PRINT_WHENCE_CSH	(1<<6)
+#define PRINT_WHENCE_VERBOSE	(1<<7)
+#define PRINT_WHENCE_SIMPLE	(1<<8)
 #define PRINT_WHENCE_FUNCDEF	(1<<9)
 #define PRINT_WHENCE_WORD	(1<<10)
 
