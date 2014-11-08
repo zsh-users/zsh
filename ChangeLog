@@ -1,3 +1,7 @@
+2014-11-08  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33648: Completion/Unix/Command/_gpg: complete for gpg2 as well
+
 2014-11-06  Oliver Kiddle  <opk@zsh.org>
 
 	* 33624: Src/Zle/zle_utils.c: keep region active when widget fails

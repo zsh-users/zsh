@@ -1,4 +1,4 @@
-#compdef gpg gpgv gpg-zip
+#compdef gpg gpgv gpg-zip gpg2
 
 local curcontext="$curcontext" state line expl ret=1
 local -a gpgbasic gpgextra gpgv gpgzip
