@@ -1,3 +1,8 @@
+2014-11-09  Oliver Kiddle  <opk@zsh.org>
+
+	* 33659: Completion/Unix/Command/_gpg: use --dump-options to get
+	most of the gpg options to complete
+
 2014-11-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 33655: Src/zsh.h: remove overlap of node flags.

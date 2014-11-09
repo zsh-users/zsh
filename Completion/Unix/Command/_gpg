@@ -1,23 +1,30 @@
-#compdef gpg gpgv gpg-zip gpg2
+#compdef gpg gpgv gpg-zip gpg2=gpg
 
 local curcontext="$curcontext" state line expl ret=1
-local -a gpgbasic gpgextra gpgv gpgzip
+local -a args allopts dups
 typeset -A opt_args
 
-gpgv=('(-q --quiet)*'{-v,--verbose}'[increase amount of output]'
-  '(-q --quiet -v --verbose)'{-q,--quiet}'[reduce amount of output]'
-  '--keyring=[add specified file to list of keyrings]:file:_files'
-  '--'{status,logger}'-fd:file descriptor:_file_descriptors'
-  '--ignore-time-conflict'
-  '--homedir:directory:_directories')
+if [[ $service = gpg-zip ]]; then
+  args=(
+    '--gpg[command to use instead of gpg]:command:_command'
+    '--gpg-args[gpg arguments]:gpg arguments:'
+    '--tar[command to use instead of tar]:command:_command'
+    '--tar-args[tar arguments]:tar arguments:'
+    '--list-archive[list archive contents]'
+  )
+else
+  allopts=( $(_call_program options $words[1] --dump-options) )
+  args=(
+    '(-q --quiet)*'{-v,--verbose}'[increase amount of output]'
+    '(-q --quiet -v --verbose)'{-q,--quiet}'[reduce amount of output]'
+    '--keyring=[add specified file to list of keyrings]:file:_files'
+    '--'{status,logger}'-fd:file descriptor:_file_descriptors'
+    '--homedir:directory:_directories'
+  )
+fi
 
-gpgzip=('--gpg[command to use instead of gpg]:command:_command'
-  '--gpg-args[gpg arguments]:gpg arguments:'
-  '--tar[command to use instead of tar]:command:_command'
-  '--tar-args[tar arguments]:tar arguments:'
-  '--list-archive[list archive contents]')
-
-gpgbasic=('(-e --encrypt)'{-e,--encrypt}'[encrypt data. this option may be combined  with --sign]'
+[[ $service = gpgv ]] || args+=(
+  '(-e --encrypt)'{-e,--encrypt}'[encrypt data. this option may be combined  with --sign]'
   {-d,--decrypt}'[decrypt file or stdin]'
   '(-c --symmetric)'{-c,--symmetric}'[encrypt with symmetric cypher only]'
   '(-s --sign)'{-s,--sign}'[make a signature]'
@@ -25,9 +32,11 @@ gpgbasic=('(-e --encrypt)'{-e,--encrypt}'[encrypt data. this option may be combi
   '(-u --local-user)'{-u+,--local-user}'[use name as the user ID to sign]:user attachment:_users'
   '(-o --output)'{-o+,--output}'[write output to file]:output file:_files'
   '(-h --help)'{-h,--help}'[display usage information]'
-  '--version[print info on program version and supported algorithms]')
+  '--version[print info on program version and supported algorithms]'
+)
 
-gpgextra=('--decrypt-files[decrypt multiple files]'
+[[ $service = gpg ]] && args+=(
+  '--decrypt-files[decrypt multiple files]'
   '(-b --detach-sign)'{-b,--detach-sign}'[make a detached signature]'
   '--clearsign[make a clear text signature]'
   '--store[store only]'
@@ -46,16 +55,14 @@ gpgextra=('--decrypt-files[decrypt multiple files]'
   '--edit-key[a menu for edit yours keys]:key attachment:->public-keys'
   '--sign-key[sign a key]:key attachment:->public-keys'
   '--lsign-key[sign a key but mark as non-exportable]:key attachment:->public-keys'
-  '--nrsign-key[sign a key non-revocably]'
-  '--delete-key[remove key from public keyring]:key attachment:->public-keys'
-  '--delete-secret-key[remove key from public & private keyring]:key attachment:->secret-keys'
-  '--delete-secret-and-public-key:key attachment:->secret-keys'
+  '--delete-keys[remove key from public keyring]:key attachment:->public-keys'
+  '--delete-secret-keys[remove key from public & private keyring]:key attachment:->secret-keys'
+  '--delete-secret-and-public-keys:key attachment:->secret-keys'
   '--gen-revoke[generate a revocation certificate]'
   '--desig-revoke[generate a designated revocation certificate]'
   '--export[export all key from all keyrings]'
   '--send-keys[send keys to a keyserver]:key attachment:->public-keyids'
-  '--export-all[export all key and not OpenPGP compatible keys]'
-  '--export-secret-keys:key attachment:->secret-keys'
+  '--export-secret-keys:key attahment:->secret-keys'
   '--export-secret-subkeys:key attachment:->secret-keys'
   '--import[import a gpg key from a file]:_files attachment:_files'
   '--fast-import[import a file without build trustdb]:_files attachment:_files'
@@ -81,7 +88,7 @@ gpgextra=('--decrypt-files[decrypt multiple files]'
   '--no-default-recipient[reset default recipient]'
   '*--encrypt-to[specify recipient]:key:->public-keys'
   '(--encrypt-to)--no-encrypt-to[disable the use of all --encrypt-to keys]'
-  '(-z --compress)'{-z,--compress}'[specify compression level]:compression level:((0\:no\ compression 1\:minimum 2 3 4 5 6\:default 7 8 9\:maximum))'
+  '-z[specify compression level]:compression level:((0\:no\ compression 1\:minimum 2 3 4 5 6\:default 7 8 9\:maximum))'
   '(-t --textmode)'{-t,--textmode}'[use canonical text mode]'
   '(-n --dry-run)'{-n,--dry-run}"[don't make any changes]"
   '(-i --interactive --batch)'{-i,--interactive}'[prompt before overwriting files]'
@@ -97,7 +104,7 @@ gpgextra=('--decrypt-files[decrypt multiple files]'
   '--keyserver-options[specify keyserver options]:options'
   '--import-options[specify options for importing keys]:options'
   '--export-options[specify options for exporting keys]:options'
-  '--show-photos' '--no-show-photos' '--photo-viewer:command:_command_names -e'
+  '--photo-viewer:command:_command_names -e'
   '--exec-path:path:_dir_list'
   '--show-keyring[display keyring name when listing keys]'
   '--secret-keyring[add specified file to list of secret keyrings]:file:_files'
@@ -113,70 +120,45 @@ gpgextra=('--decrypt-files[decrypt multiple files]'
   '(--no-show-notation)--show-notation[show key signature notations]'
   "(--show-notation)--no-show-notation[don't show key signature notations]"
   '--set-policy-url:policy URL'
-  '(--no-show-policy-url)--show-policy-url'
-  '(--show-policy-url)--no-show-policy-url'
   '--set-filename[specify file which is stored in messages]:file:_files'
-  '(--for-your-eyes-only)--for-your-eyes-only'
-  '(--for-your-eyes-only)--no-for-your-eyes-only'
   '--completes-needed:number' '--marginals-needed:number' '--max-cert-depth:number'
   '--'{{,disable-,s2k-}cipher,{,s2k-,cert-}digest,disable-pubkey}'-algo:cipher:->ciphers'
-  '--s2k-mode:value' '--simple-sk-checksum'
+  '--s2k-mode:value'
   '--compress-algo:compression algorithm:((0\:disable\ compression 1\:zlib 2\:rfc1950))'
-  '--no-sig-cache' '--no-sig-create-check' '--'{,no-}'auto-check-trustdb' '--throw-keyid'
-  '--not-dash-escaped' '--'{,no-}'escape-from-lines' '--'{,no-}'use-agent'
-  '--rfc1991' '--'{,no-}'pgp2' '--'{,no}'pgp6' '--'{,no}'pgp7' '--openpgp'
-  '--'{,no-}'force-v3-sigs' '--'{,no}'force-v4-certs' '--force-mdc' '--disable-mdc'
-  '--'{,no-}'allow-non-selfsigned-uid' '--allow-freeform-uid'
-  '--ignore-valid-from'
-  '--ignore-crc-error' '--ignore-mdc-error' '--lock-once' '--lock-multiple' '--lock-never'
-  '--no-random-seed-file' '--no-verbose' '--no-greeting' '--no-secmem-warning'
-  '--no-permission-warning' '--no-mdc-warning' '--no-armor' '--no-default-keyring'
-  '--skip-verify' '--with-colons' '--with-key-data' '--with-fingerprint'
-  '--fast-list-mode' '--fixed-list-mode' '--list-only' '--no-literal' '--set-filesize'
-  '--emulate-md-encode-bug' '--show-session-key' '--override-session-key:string'
-  '--'{,no-}'ask-sig-expire' '--'{,no}'ask-cert-expire' '--'{,no}'expert'
-  '--merge-only' '--allow-secret-key-import' '--try-all-secrets'
-  '--enable-special-filenames' '--no-expensive-trust-checks' '--group:name=value'
-  '--preserve-permissions' '--personal-'{cipher,digest,compress}'-preferences:string'
+  '--personal-'{cipher,digest,compress}'-preferences:string'
   '--card-edit[present smartcard menu]' '--card-status[show smartcard content]'
   '--change-pin[present menu to change smartcard pin]'
   '--list-config[display internal configuration parameters]'
   '--hidden-recipient[hidden recipient]:recipient:->public-keys'
   '--dump-options[show all options]' '--default-preference-list:string'
-  '--fetch-keys:URIs:' '--gpgconf-list' '--gpgconf-test'
+  '--fetch-keys:URIs'
   '--hidden-encrypt-to:recipient:->public-keys'
-  '--compress-level:integer:'
-  '--bzip2-compress-level:integer:' '--bzip2-decompress-lowmem'
-  '--default-sig-expire' '--default-cert-expire' '--no-ask-cert-expire'
-  '--default-cert-level:integer:'
-  '--min-cert-level' '--ask-cert-level' '--no-ask-cert-level'
+  '--compress-level:integer'
+  '--bzip2-compress-level:integer'
+  '--default-cert-level:integer'
   '--max-output[maximum output generated when processing file]:bytes:'
   '--gpg-agent-info[override GPG_AGENT_INFO]:'
   '--primary-keyring:file:_files'
-  '--'{,no-}'verify-options:parameters:_multi_parts -q -S, ","
+  '--verify-options:parameters:_multi_parts -q -S, ","
     "(show-photos show-policy-urls show-notations show-std-notations
     show-user-notations show-keyserver-urls show-uid-validity show-unusable-uids
     show-primary-uid-only pka-lookups pka-trust-increase)"'
-  '--debug:flags:' '--debug-all' '--status-file:file:'
-  '--attribute-file:file:' '--load-extension:file:_files'
-  '--gnupg' '--rfc2440' '--rfc4880' '--pgp8'
-  '--s2k-count:integer:' '--'{,no-}'throw-keyids'
+  '--debug:flags:' '--status-file:file:_files'
+  '--attribute-file:file:_files' '--load-extension:file:_files'
+  '--s2k-count:integer'
   '--sig-notation:name=value:' '--cert-notation:name=value:'
   '--passphrase-file:file:_files' '--passphrase-repeat:integer:'
   '--command-file:file:_files' '--trustdb-name:file:_files'
-  '--'{,no-}'require-secmem'
   '--trust-model:trust model:((pgp classic direct always auto))'
   '--sig-policy-url:string:' '--cert-policy-url:string:'
   '--sig-keyserver-url:string:' '--comment[comment]:comment:'
   '--no-comments[disable comments]'
   '--logger-file[write log to file]:file:_files'
-  '--'{,no-}'use-embedded-filename'
   '--rebuild-keydb-caches[create signature caches in keyring]'
   '--default-keyserver-url:name:'
   '--display-charset[set native charset]:charset:((iso-8859-1 iso-8859-2 iso-8859-15 koi8-r utf-8))'
   '--ungroup[remove group]:group name:'
   '--no-groups[remove all entries from --group list]'
-  '--'{,no}'mangle-dos-filenames'
   '--enable-progress-filter[enable progress status output]'
   '--multifile[process multiple files]'
   '--keyid-format[key id format]:key format:((short 0xshort long 0xlong))'
@@ -185,25 +167,13 @@ gpgextra=('--decrypt-files[decrypt multiple files]'
   '--reader-port[card reader port]:port:'
   '--ctapi-driver[file to use to access smartcard reader]:file:_files'
   '--pcsc-driver[file to use to access smartcard reader]:file:_files'
-  '--disable-ccid' '--debug-ccid-driver'
-  '--'{enable,disable}'-dsa2'
-  '--'{,no-}'allow-multiple-messages' '--'{,no-}'require-cross-certification'
-  '--auto-key-locate:parameters:' '--no-auto-key-locate'
-  '--dump-options[show all options]')
+  '--auto-key-locate:parameters'
+  '--dump-options[show all options]'
+)
 
-case "$service" in
-  gpg)
-    _arguments -C -s -S -A "-*" $gpgbasic $gpgextra $gpgv '*:args:->args' && ret=0
-    ;;
-
-  gpgv)
-    _arguments -C -s -S -A "-*" $gpgv '*:args:->args' && ret=0
-    ;;
-
-  gpg-zip)
-    _arguments -C -s -S -A "-*" $gpgbasic $gpgzip '*:args:->args' && ret=0
-    ;;
-esac
+extra=( ${${${args#\([^\)]#\)}#\*}%%[:=\[]*} )
+extra=( ${allopts:|extra} )
+_arguments -C -s -S -A "-*" $args $extra '*:args:->args' && ret=0
 
 if [[ $state = args ]]; then
   if (( ${+opt_args[--export]} || ${+opt_args[--list-keys]} || ${+opt_args[--list-public-keys]} )); then
