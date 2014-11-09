@@ -1,5 +1,8 @@
 2014-11-09  Oliver Kiddle  <opk@zsh.org>
 
+	* 33599: Jun T.: Test/comptest: workaround zpty issue that
+	causes vi test cases to fail on MacOS and FreeBSD
+
 	* 33640: clutton: Completion/BSD/Command/_kld: look in
 	/boot/modules instead of /modules for third-party modules
 
