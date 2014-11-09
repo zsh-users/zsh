@@ -15,6 +15,21 @@
 >BUFFER: good
 >CURSOR: 4
 
+  zletest $'{ ({[}]) }\e0c%chg'
+0:change forward to matching bracket
+>BUFFER: chg
+>CURSOR: 3
+
+  zletest $'s( match )\ed%'
+0:delete backwards to matching bracket
+>BUFFER: s
+>CURSOR: 0
+
+  zletest $'one\eo\edd'
+0:delete empty line
+>BUFFER: one
+>CURSOR: 0
+
   zletest $' four\eO\C-v\tthree\eO  two\eOone\e3J'
 0:join lines with line count
 >BUFFER: one two three

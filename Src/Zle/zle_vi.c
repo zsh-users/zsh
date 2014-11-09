@@ -202,7 +202,6 @@ getvirange(int wf)
 	    zmult = mult1 * zmod.tmult;
     } while(prefixflag && !ret);
     wordflag = 0;
-    virangeflag = 0;
 
     /* It is an error to use a non-movement command to delimit the *
      * range.  We here reject the case where the command modified  *
@@ -222,14 +221,9 @@ getvirange(int wf)
     /* vi-match-bracket changes the value of virangeflag when *
      * moving to the opening bracket, meaning that we need to *
      * change the *starting* position.                        */
-    if(virangeflag == -1)
-    {
-	int origcs = zlecs;
-	zlecs = pos;
-	INCCS();
-	pos = zlecs;
-	zlecs = origcs;
-    }
+    if (virangeflag == -1)
+	INCPOS(pos);
+    virangeflag = 0;
 
     /* Get the range the right way round.  zlecs is placed at the *
      * start of the range, and pos (the return value of this   *

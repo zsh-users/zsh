@@ -1,5 +1,8 @@
 2014-11-09  Oliver Kiddle  <opk@zsh.org>
 
+	* 33639: Src/Zle/zle_vi.c, Test/X02zlevi.ztst: fix bug with vi
+	operators on a blank line and with backward bracket matching
+
 	* 33659: Completion/Unix/Command/_gpg: use --dump-options to get
 	most of the gpg options to complete
 
