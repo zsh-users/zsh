@@ -1,5 +1,8 @@
 2014-11-09  Oliver Kiddle  <opk@zsh.org>
 
+	* 33643: Doc/Zsh/options.yo: elaborate documentation of
+	the PRIVILEGED option
+
 	* 33639: Src/Zle/zle_vi.c, Test/X02zlevi.ztst: fix bug with vi
 	operators on a blank line and with backward bracket matching
 

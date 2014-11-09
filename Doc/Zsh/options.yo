@@ -2195,10 +2195,22 @@ pindex(NOPRIVILEGED)
 cindex(privileged mode)
 cindex(mode, privileged)
 item(tt(PRIVILEGED) (tt(-p), ksh: tt(-p)))(
-Turn on privileged mode. This is enabled automatically on startup if the
-effective user (group) ID is not equal to the real user (group) ID.  Turning
-this option off causes the effective user and group IDs to be set to the
-real user and group IDs. This option disables sourcing user startup files.
+Turn on privileged mode. Typically this is used when script is to be run
+with elevated privileges. This should be done as follows directly with
+the tt(-p) option to zsh so that it takes effect during startup.
+
+example(#!/bin/zsh -p)
+
+The option is enabled automatically on startup if the effective user
+(group) ID is not equal to the real user (group) ID. In this case,
+turning the option off causes the effective user and group IDs to be set
+to the real user and group IDs. Be aware that if that fails the shell may
+be running with different IDs than was intended so a script should check
+for failure and act accordingly, for example:
+
+example(unsetopt privileged || exit)
+
+The tt(PRIVILEGED) option disables sourcing user startup files.
 If zsh is invoked as `tt(sh)' or `tt(ksh)' with this option set,
 tt(/etc/suid_profile) is sourced (after tt(/etc/profile) on interactive
 shells). Sourcing tt(~/.profile) is disabled and the contents of the
