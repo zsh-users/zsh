@@ -4,7 +4,7 @@
 _kld_module() {
   local ret=1
 
-  compadd "$@" - /boot/kernel/*.ko(-.:t) /modules/*.ko(-.:t) && ret=0
+  compadd "$@" - /boot/{kernel,modules}/*.ko(-.:t) && ret=0
   _files "$@" -g '*.ko(-.)' && ret=0
 
   return ret

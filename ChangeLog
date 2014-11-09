@@ -1,5 +1,8 @@
 2014-11-09  Oliver Kiddle  <opk@zsh.org>
 
+	* 33640: clutton: Completion/BSD/Command/_kld: look in
+	/boot/modules instead of /modules for third-party modules
+
 	* 33643: Doc/Zsh/options.yo: elaborate documentation of
 	the PRIVILEGED option
 
