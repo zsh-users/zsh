@@ -1,3 +1,7 @@
+2014-11-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 33658: Doc/Zsh/options.yo: AUTO_CD depends on SHIN_STDIN.
+
 2014-11-09  Oliver Kiddle  <opk@zsh.org>
 
 	* 33599: Jun T.: Test/comptest: workaround zpty issue that
