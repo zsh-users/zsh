@@ -1,5 +1,7 @@
 2014-11-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Artur Penttinen: 19371 plus tweak: run-help helper for ip.
+
 	* Marc Finet: 33687 (first and last patches): ensure length of
 	working directory is correct and return as soon as there's
 	an error chasing symlinks.
