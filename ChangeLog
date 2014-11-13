@@ -1,3 +1,8 @@
+2014-11-13  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33656: Src/builtin.c: different algorithm for "whence -am" to
+	produce results more consistent with "whence -m"
+
 2014-11-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 33669: Src/Zle/zle_utils.c, Test/X02zlevi.ztst: allow an empty
