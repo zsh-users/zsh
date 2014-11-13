@@ -1,3 +1,8 @@
+2014-11-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 33669: Src/Zle/zle_utils.c, Test/X02zlevi.ztst: allow an empty
+	line to be yanked with yy by allocating 1 byte instead of 0
+
 2014-11-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 33658: Doc/Zsh/options.yo: AUTO_CD depends on SHIN_STDIN.

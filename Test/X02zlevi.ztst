@@ -30,6 +30,13 @@
 >BUFFER: one
 >CURSOR: 0
 
+  zletest $'1\eo\eyya2\epa3'
+0:yank and paste blank line
+>BUFFER: 1
+>2
+>3
+>CURSOR: 5
+
   zletest $' four\eO\C-v\tthree\eO  two\eOone\e3J'
 0:join lines with line count
 >BUFFER: one two three

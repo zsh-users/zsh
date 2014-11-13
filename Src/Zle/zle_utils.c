@@ -916,7 +916,7 @@ cut(int i, int ct, int flags)
 void
 cuttext(ZLE_STRING_T line, int ct, int flags)
 {
-    if (!ct || zmod.flags & MOD_NULL)
+    if (!(ct || vilinerange) ||  zmod.flags & MOD_NULL)
 	return;
 
     UNMETACHECK();
@@ -989,8 +989,9 @@ cuttext(ZLE_STRING_T line, int ct, int flags)
 	cutbuf.buf = s;
 	cutbuf.len += ct;
     } else {
+	/* don't alloc 0 bytes; length 0 occurs for blank lines in vi mode */
 	cutbuf.buf = realloc((char *)cutbuf.buf,
-			     (cutbuf.len + ct) * ZLE_CHAR_SIZE);
+			     (cutbuf.len + (ct ? ct : 1)) * ZLE_CHAR_SIZE);
 	ZS_memcpy(cutbuf.buf + cutbuf.len, line, ct);
 	cutbuf.len += ct;
     }
