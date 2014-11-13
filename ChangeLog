@@ -1,5 +1,7 @@
 2014-11-13  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 33686: Test/B06fc.ztst: set PS1 before pattern-matching for it
+
 	* 33656: Src/builtin.c: different algorithm for "whence -am" to
 	produce results more consistent with "whence -m"
 
