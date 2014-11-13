@@ -1,3 +1,9 @@
+2014-11-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Marc Finet: 33687 (first and last patches): ensure length of
+	working directory is correct and return as soon as there's
+	an error chasing symlinks.
+
 2014-11-13  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33686: Test/B06fc.ztst: set PS1 before pattern-matching for it

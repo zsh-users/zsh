@@ -727,7 +727,7 @@ xsymlinks(char *s)
     zulong xbuflen = strlen(xbuf);
 
     opp = pp = slashsplit(s);
-    for (; xbuflen < sizeof(xbuf) && *pp; pp++) {
+    for (; xbuflen < sizeof(xbuf) && *pp && ret >= 0; pp++) {
 	if (!strcmp(*pp, "."))
 	    continue;
 	if (!strcmp(*pp, "..")) {
@@ -762,9 +762,13 @@ xsymlinks(char *s)
 		strcpy(xbuf, "");
 		if (xsymlinks(xbuf3 + 1) < 0)
 		    ret = -1;
+		else
+		    xbuflen = strlen(xbuf);
 	    } else
 		if (xsymlinks(xbuf3) < 0)
 		    ret = -1;
+		else
+		    xbuflen = strlen(xbuf);
 	}
     }
     freearray(opp);
