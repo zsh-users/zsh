@@ -1049,6 +1049,11 @@ item(tt(vi-backward-blank-word) (unbound) (B) (unbound))(
 Move backward one word, where a word is defined as a series of
 non-blank characters.
 )
+tindex(vi-backward-blank-word-end)
+item(tt(vi-backward-blank-word-end) (unbound) (unbound) (unbound))(
+Move to the end of the previous word, where a word is defined as a
+series of non-blank characters.
+)
 tindex(backward-char)
 item(tt(backward-char) (^B ESC-[D) (unbound) (unbound))(
 Move backward one character.
@@ -1068,6 +1073,10 @@ Move to the beginning of the previous word.
 tindex(vi-backward-word)
 item(tt(vi-backward-word) (unbound) (b) (unbound))(
 Move to the beginning of the previous word, vi-style.
+)
+tindex(vi-backward-word-end)
+item(tt(vi-backward-word-end) (unbound) (unbound) (unbound))(
+Move to the end of the previous word, vi-style.
 )
 tindex(beginning-of-line)
 item(tt(beginning-of-line) (^A) (unbound) (unbound))(

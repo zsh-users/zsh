@@ -148,8 +148,13 @@ viforwardblankwordend(UNUSED(char **args))
 {
     int n = zmult;
 
-    if (n < 0)
-	return 1;
+    if (n < 0) {
+	int ret;
+	zmult = -n;
+	ret = viforwardblankwordend(args);
+	zmult = n;
+	return ret;
+    }
     while (n--) {
 	while (zlecs != zlell) {
 	    int pos = zlecs;
@@ -180,7 +185,7 @@ viforwardwordend(char **args)
     if (n < 0) {
 	int ret;
 	zmult = -n;
-	ret = backwardword(args);
+	ret = vibackwardwordend(args);
 	zmult = n;
 	return ret;
     }
@@ -330,6 +335,62 @@ vibackwardblankword(char **args)
 		break;
 	    zlecs = pos;
 	}
+    }
+    return 0;
+}
+
+/**/
+int
+vibackwardwordend(char **args)
+{
+    int n = zmult;
+
+    if (n < 0) {
+	int ret;
+	zmult = -n;
+	ret = viforwardwordend(args);
+	zmult = n;
+	return ret;
+    }
+    while (n-- && zlecs > 1) {
+	int start = 0;
+	if (Z_vialnum(zleline[zlecs]))
+	    start = 1;
+	else if (!ZC_iblank(zleline[zlecs]))
+	    start = 2;
+	DECCS();
+	while (zlecs) {
+	    int same = (start != 1) && ZC_iblank(zleline[zlecs]);
+	    if (start)
+		same |= Z_vialnum(zleline[zlecs]);
+	    if (same == (start == 2))
+		break;
+	    DECCS();
+	}
+	while (zlecs && ZC_iblank(zleline[zlecs]))
+	    DECCS();
+    }
+    return 0;
+}
+
+/**/
+int
+vibackwardblankwordend(char **args)
+{
+    int n = zmult;
+
+    if (n < 0) {
+	int ret;
+	zmult = -n;
+	ret = viforwardblankwordend(args);
+	zmult = n;
+	return ret;
+    }
+    while (n--) {
+	while (zlecs && !ZC_iblank(zleline[zlecs]))
+	    DECCS();
+	while (zlecs && ZC_iblank(zleline[zlecs]))
+	    DECCS();
     }
     return 0;
 }

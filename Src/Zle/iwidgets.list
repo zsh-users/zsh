@@ -123,6 +123,8 @@
 "vi-backward-delete-char", vibackwarddeletechar, ZLE_KEEPSUFFIX
 "vi-backward-kill-word", vibackwardkillword, ZLE_KEEPSUFFIX
 "vi-backward-word", vibackwardword, 0
+"vi-backward-word-end", vibackwardwordend, 0
+"vi-backward-blank-word-end", vibackwardblankwordend, 0
 "vi-beginning-of-line", vibeginningofline, 0
 "vi-caps-lock-panic", vicapslockpanic, ZLE_LASTCOL
 "vi-change", vichange, ZLE_LASTCOL
