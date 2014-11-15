@@ -1,5 +1,8 @@
 2014-11-15  Oliver Kiddle  <opk@zsh.org>
 
+	* 33696: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list, Src/Zle/zle_hist.c:
+	simple up/down line widgets that don't go through history lines
+
 	* 33695: Src/Zle/zle_vi.c, Test/X02zlevi.ztst, Test/comptest:
 	fix various vi-indent problems and vi-swap-case on a blank line
 

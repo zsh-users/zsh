@@ -1078,6 +1078,10 @@ tindex(vi-beginning-of-line)
 item(tt(vi-beginning-of-line))(
 Move to the beginning of the line, without changing lines.
 )
+tindex(down-line)
+item(tt(down-line) (unbound) (unbound) (unbound))(
+Move down a line in the buffer.
+)
 tindex(end-of-line)
 item(tt(end-of-line) (^E) (unbound) (unbound))(
 Move to the end of the line.  If already at the end
@@ -1169,6 +1173,10 @@ Repeat the last tt(vi-find) command.
 tindex(vi-rev-repeat-find)
 item(tt(vi-rev-repeat-find) (unbound) (,) (unbound))(
 Repeat the last tt(vi-find) command in the opposite direction.
+)
+tindex(up-line)
+item(tt(up-line) (unbound) (unbound) (unbound))(
+Move up a line in the buffer.
 )
 enditem()
 texinode(History Control)(Modifying Text)(Movement)(Zle Widgets)

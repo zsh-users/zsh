@@ -227,14 +227,14 @@ uphistory(UNUSED(char **args))
 }
 
 /**/
-static int
-upline(void)
+int
+upline(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
 	zmult = -zmult;
-	n = -downline();
+	n = -downline(args);
 	zmult = -zmult;
 	return n;
     }
@@ -270,7 +270,7 @@ int
 uplineorhistory(char **args)
 {
     int ocs = zlecs;
-    int n = upline();
+    int n = upline(args);
     if (n) {
 	int m = zmult, ret;
 
@@ -300,7 +300,7 @@ int
 uplineorsearch(char **args)
 {
     int ocs = zlecs;
-    int n = upline();
+    int n = upline(args);
     if (n) {
 	int m = zmult, ret;
 
@@ -316,14 +316,14 @@ uplineorsearch(char **args)
 }
 
 /**/
-static int
-downline(void)
+int
+downline(char **args)
 {
     int n = zmult;
 
     if (n < 0) {
 	zmult = -zmult;
-	n = -upline();
+	n = -upline(args);
 	zmult = -zmult;
 	return n;
     }
@@ -358,7 +358,7 @@ int
 downlineorhistory(char **args)
 {
     int ocs = zlecs;
-    int n = downline();
+    int n = downline(args);
     if (n) {
 	int m = zmult, ret;
 
@@ -388,7 +388,7 @@ int
 downlineorsearch(char **args)
 {
     int ocs = zlecs;
-    int n = downline();
+    int n = downline(args);
     if (n) {
 	int m = zmult, ret;
 
