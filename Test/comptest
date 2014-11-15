@@ -167,5 +167,5 @@ zletest () {
     return 1
   }
   # zpty_flush After zletest
-  print -lr "${(@)${(ps:\r\n:)log##*<WIDGET><finish>}[1,-2]}"
+  print -lr "${(@)${(@ps:\r\n:)log##*<WIDGET><finish>}[2,-2]}"
 }

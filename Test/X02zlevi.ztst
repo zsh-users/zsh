@@ -49,6 +49,24 @@
 >BUFFER: one two
 >CURSOR: 3
 
+  zletest $'fi\eO\eOif\e2>j'
+0:don't indent blank lines
+>BUFFER: 	if
+>
+>	fi
+>CURSOR: 1
+
+  zletest $'\C-v\ti\e>>'
+0:additional indentation
+>BUFFER: 		i
+>CURSOR: 2
+
+  zletest $'one\eox\e>k'
+0:indent with one character on final line
+>BUFFER: 	one
+>	x
+>CURSOR: 1
+
   zletest $'one two\eyb'
 0:yank left moves the cursor
 >BUFFER: one two
@@ -104,12 +122,14 @@
   zletest $'err\eddahello\e"hddP'
 0:setting named register also sets unnamed register
 >BUFFER: hello
+>
 >CURSOR: 0
 
   zletest $'first\e"ay0ddasecond\e"Add"aP'
 0:appending to named register
 >BUFFER: firs
 >second
+>
 >CURSOR: 0
 
   zletest $'word\e"a"byy"bp'
@@ -133,6 +153,7 @@
   zletest $'first\e"addasecond\eddP'
 0:retrieve unnamed register after appending
 >BUFFER: second
+>
 >CURSOR: 0
 
   zletest $'Z\exayankee doodle\e"_db0"_yeP'

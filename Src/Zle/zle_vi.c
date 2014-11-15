@@ -700,10 +700,14 @@ viindent(UNUSED(char **args))
     }
     oldcs = zlecs;
     /* add a tab to the beginning of each line within range */
-    while (zlecs < c2) {
-	spaceinline(1);
-	zleline[zlecs] = '\t';
-	zlecs = findeol() + 1;
+    while (zlecs <= c2 + 1) {
+	if (zleline[zlecs] == '\n') { /* leave blank lines alone */
+	    ++zlecs;
+	} else {
+	    spaceinline(1);
+	    zleline[zlecs] = '\t';
+	    zlecs = findeol() + 1;
+	}
     }
     /* go back to the first line of the range */
     zlecs = oldcs;
@@ -830,6 +834,8 @@ viswapcase(UNUSED(char **args))
     if (n < 1)
 	return 1;
     eol = findeol();
+    if (zlecs == eol)
+	return 1;
     while (zlecs < eol && n--) {
 	if (ZC_ilower(zleline[zlecs]))
 	    zleline[zlecs] = ZC_toupper(zleline[zlecs]);
