@@ -1,5 +1,7 @@
 2014-11-16  Oliver Kiddle  <opk@zsh.org>
 
+	* 33633: Src/Zle/zle_vi.c: support vim style text objects
+
 	* 33632: Src/Zle/zle_main.c, Src/Zle/zle_vi.c: use viopp and visual
 	local keymaps if they exist
 

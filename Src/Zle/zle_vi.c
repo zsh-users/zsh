@@ -161,12 +161,13 @@ vigetkey(void)
 static int
 getvirange(int wf)
 {
-    int pos = zlecs, ret = 0;
+    int pos = zlecs, mpos = mark, ret = 0;
     int mult1 = zmult, hist1 = histline;
     Thingy k2;
 
     virangeflag = 1;
     wordflag = wf;
+    mark = -1;
     /* use operator-pending keymap if one exists */
     Keymap km = openkeymap("viopp");
     if (km)
@@ -191,6 +192,7 @@ getvirange(int wf)
 		k2 == Th(z_sendbreak)) {
 	    wordflag = 0;
 	    virangeflag = 0;
+	    mark = mpos;
 	    return -1;
 	}
 	/*
@@ -214,13 +216,16 @@ getvirange(int wf)
 	histline = hist1;
 	ZS_memcpy(zleline, lastline, zlell = lastll);
 	zlecs = pos;
+        mark = mpos;
 	return -1;
     }
 
     /* Can't handle an empty file.  Also, if the movement command *
      * failed, or didn't move, it is an error.                    */
-    if (!zlell || (zlecs == pos && virangeflag != 2) || ret == -1)
+    if (!zlell || (zlecs == pos && mark == -1 && virangeflag != 2) || ret == -1) {
+        mark = mpos;
 	return -1;
+    }
 
     /* vi-match-bracket changes the value of virangeflag when *
      * moving to the opening bracket, meaning that we need to *
@@ -229,6 +234,12 @@ getvirange(int wf)
 	INCPOS(pos);
     virangeflag = 0;
     selectlocalmap(NULL);
+
+    /* if the mark has moved, ignore the original cursor position *
+     * and use the mark. */
+    if (mark != -1)
+	pos = mark;
+    mark = mpos;
 
     /* Get the range the right way round.  zlecs is placed at the *
      * start of the range, and pos (the return value of this   *
