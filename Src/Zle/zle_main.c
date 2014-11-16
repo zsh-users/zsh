@@ -1067,6 +1067,7 @@ getrestchar(int inchar)
 void
 zlecore(void)
 {
+    Keymap km;
 #if !defined(HAVE_POLL) && defined(HAVE_SELECT)
     struct timeval tv;
     fd_set foofd;
@@ -1088,8 +1089,10 @@ zlecore(void)
 	statusline = NULL;
 	vilinerange = 0;
 	reselectkeymap();
-	selectlocalmap(NULL);
+	selectlocalmap(invicmdmode() && region_active && (km = openkeymap("visual"))
+	    ? km : NULL);
 	bindk = getkeycmd();
+	selectlocalmap(NULL);
 	if (bindk) {
 	    if (!zlell && isfirstln && !(zlereadflags & ZLRF_IGNOREEOF) &&
 		lastchar == eofchar) {

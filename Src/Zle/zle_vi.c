@@ -167,6 +167,10 @@ getvirange(int wf)
 
     virangeflag = 1;
     wordflag = wf;
+    /* use operator-pending keymap if one exists */
+    Keymap km = openkeymap("viopp");
+    if (km)
+	selectlocalmap(km);
     /* Now we need to execute the movement command, to see where it *
      * actually goes.  virangeflag here indicates to the movement   *
      * function that it should place the cursor at the end of the   *
@@ -224,6 +228,7 @@ getvirange(int wf)
     if (virangeflag == -1)
 	INCPOS(pos);
     virangeflag = 0;
+    selectlocalmap(NULL);
 
     /* Get the range the right way round.  zlecs is placed at the *
      * start of the range, and pos (the return value of this   *

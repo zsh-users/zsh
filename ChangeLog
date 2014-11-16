@@ -1,3 +1,8 @@
+2014-11-16  Oliver Kiddle  <opk@zsh.org>
+
+	* 33632: Src/Zle/zle_main.c, Src/Zle/zle_vi.c: use viopp and visual
+	local keymaps if they exist
+
 2014-11-15  Oliver Kiddle  <opk@zsh.org>
 
 	* 33697: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list, Src/Zle/zle_word.c:
