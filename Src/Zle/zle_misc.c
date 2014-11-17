@@ -446,9 +446,12 @@ killregion(UNUSED(char **args))
     if (mark > zlell)
 	mark = zlell;
     if (mark > zlecs)
-	forekill(mark - zlecs, CUT_RAW);
-    else
+	forekill(mark - zlecs + invicmdmode(), CUT_RAW);
+    else {
+	if (invicmdmode())
+	    INCCS();
 	backkill(zlecs - mark, CUT_FRONT|CUT_RAW);
+    }
     return 0;
 }
 
@@ -465,9 +468,9 @@ copyregionaskill(char **args)
 	if (mark > zlell)
 	    mark = zlell;
 	if (mark > zlecs)
-	    cut(zlecs, mark - zlecs, 0);
+	    cut(zlecs, mark - zlecs + invicmdmode(), 0);
 	else
-	    cut(mark, zlecs - mark, CUT_FRONT);
+	    cut(mark, zlecs - mark + invicmdmode(), CUT_FRONT);
     }
     return 0;
 }
@@ -1016,7 +1019,8 @@ quoteregion(UNUSED(char **args))
 	mark = zlecs;
 	zlecs = tmp;
     }
-    str = (ZLE_STRING_T)hcalloc((len = mark - zlecs) * ZLE_CHAR_SIZE);
+    str = (ZLE_STRING_T)hcalloc((len = mark - zlecs + invicmdmode()) *
+	ZLE_CHAR_SIZE);
     ZS_memcpy(str, zleline + zlecs, len);
     foredel(len, CUT_RAW);
     str = makequote(str, &len);

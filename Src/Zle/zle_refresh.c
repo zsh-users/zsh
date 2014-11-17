@@ -1037,6 +1037,8 @@ zrefresh(void)
 	    region_highlights[0].start = mark;
 	    region_highlights[0].end = zlecs;
 	}
+	if (invicmdmode())
+	    INCPOS(region_highlights[0].end);
     } else {
 	region_highlights[0].start = region_highlights[0].end = -1;
     }

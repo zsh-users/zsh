@@ -1,5 +1,9 @@
 2014-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 33635: Src/Zle/iwidgets.list, Src/Zle/zle_misc.c,
+	Src/Zle/zle_move.c, Src/Zle/zle_refresh.c, Src/Zle/zle_vi.c:
+	adapt region to function as vim style visual selection mode
+
 	* 33700: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list,
 	Src/Zle/zle_misc.c, Src/Zle/zle_utils.c: new widget
 	for put in vim style visual selection mode

@@ -162,8 +162,13 @@ static int
 getvirange(int wf)
 {
     int pos = zlecs, mpos = mark, ret = 0;
+    int visual = region_active; /* don't trust movement cmd not to change it */
     int mult1 = zmult, hist1 = histline;
     Thingy k2;
+
+    if (visual) {
+	pos = mark;
+    } else {
 
     virangeflag = 1;
     wordflag = wf;
@@ -239,6 +244,7 @@ getvirange(int wf)
      * and use the mark. */
     if (mark != -1)
 	pos = mark;
+    }
     mark = mpos;
 
     /* Get the range the right way round.  zlecs is placed at the *
@@ -248,6 +254,11 @@ getvirange(int wf)
 	int tmp = zlecs;
 	zlecs = pos;
 	pos = tmp;
+    }
+
+    if (visual && invicmdmode()) {
+	region_active = 0;
+	INCPOS(pos);
     }
 
     /* Was it a line-oriented move?  If so, the command will have set *
@@ -377,6 +388,10 @@ videletechar(char **args)
     int n = zmult;
 
     startvichange(-1);
+
+    if (region_active)
+	return killregion(args);
+
     /* handle negative argument */
     if (n < 0) {
 	int ret;
@@ -430,12 +445,16 @@ visubstitute(UNUSED(char **args))
     /* it is an error to be on the end of line */
     if (zlecs == zlell || zleline[zlecs] == '\n')
 	return 1;
-    /* Put argument into the acceptable range -- it is not an error to  *
-     * specify a greater count than the number of available characters. */
-    if (n > findeol() - zlecs)
-	n = findeol() - zlecs;
-    /* do the substitution */
-    forekill(n, CUT_RAW);
+    if (region_active) {
+	killregion(zlenoargs);
+    } else {
+	/* Put argument into the acceptable range -- it is not an error to  *
+	* specify a greater count than the number of available characters. */
+	if (n > findeol() - zlecs)
+	    n = findeol() - zlecs;
+	/* do the substitution */
+	forekill(n, CUT_RAW);
+    }
     startvitext(1);
     return 0;
 }
@@ -770,6 +789,10 @@ vibackwarddeletechar(char **args)
 
     if (invicmdmode())
 	startvichange(-1);
+
+    if (region_active)
+	return killregion(args);
+
     /* handle negative argument */
     if (n < 0) {
 	int ret;
@@ -811,12 +834,21 @@ vijoin(UNUSED(char **args))
 {
     int x, pos;
     int n = zmult;
+    int visual = region_active;
 
     startvichange(-1);
     if (n < 1)
 	return 1;
-    if ((x = findeol()) == zlell)
+    if (visual && zlecs > mark) {
+	exchangepointandmark(zlenoargs);
+	x = findeol();
+	if (x >= mark) {
+	    exchangepointandmark(zlenoargs);
+	    return 1;
+	}
+    } else if ((x = findeol()) == zlell || (visual && x >= mark))
 	return 1;
+
     while (n) {
 	zlecs = x + 1;
 	pos = zlecs;
@@ -834,7 +866,7 @@ vijoin(UNUSED(char **args))
 	}
 	spaceinline(1);
 	zleline[zlecs] = ZWC(' ');
-	if (--n < 2 || (x = findeol()) == zlell)
+	if ((!visual && --n < 2) || (x = findeol()) == zlell || (visual && x >= mark))
 	    return 0;
     }
     return 0;
