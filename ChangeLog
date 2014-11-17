@@ -1,3 +1,8 @@
+2014-11-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 33699: Test/X02zlevi.ztst, Test/comptest: support short
+	delays in zle tests where we need KEYTIMEOUT to elapse
+
 2014-11-16  Oliver Kiddle  <opk@zsh.org>
 
 	* 33633: Src/Zle/zle_vi.c: support vim style text objects

@@ -36,6 +36,7 @@ comptestinit () {
 'LISTMAX=10000000
 stty 38400 columns 80 rows 24 werase undef
 TERM=vt100
+KEYTIMEOUT=1
 setopt zle
 autoload -U compinit
 compinit -u
@@ -159,9 +160,14 @@ comptest () {
 }
 
 zletest () {
-  input="$*"
-  # zpty_flush Before zletest
-  zpty -n -w zsh "$input"$'\C-X'
+  local first=0
+  for input; do
+    # sleep for $KEYTIMEOUT
+    (( first++ )) && read -t 0.011 -k 1 < /dev/null
+    # zpty_flush Before zletest
+    zpty -n -w zsh "$input"
+  done
+  zpty -n -w zsh $'\C-X'
   zpty -r -m zsh log "*<WIDGET><finish>*<PROMPT>*" || {
     print "failed to invoke finish widget."
     return 1
