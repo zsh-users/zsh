@@ -1,5 +1,9 @@
 2014-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 33700: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list,
+	Src/Zle/zle_misc.c, Src/Zle/zle_utils.c: new widget
+	for put in vim style visual selection mode
+
 	* 33699: Test/X02zlevi.ztst, Test/comptest: support short
 	delays in zle tests where we need KEYTIMEOUT to elapse
 

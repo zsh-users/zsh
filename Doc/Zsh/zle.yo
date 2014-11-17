@@ -1721,6 +1721,13 @@ Insert the contents of the kill buffer after the cursor.
 If the kill buffer contains a sequence of lines (as opposed to characters),
 paste it below the current line.
 )
+tindex(put-replace-selection)
+item(tt(put-replace-selection) (unbound) (unbound) (unbound))(
+Replace the contents of the current region or selection with the
+contents of the kill buffer. If the kill buffer contains a sequence of
+lines (as opposed to characters), the current line will be split by the
+pasted lines.
+)
 tindex(quoted-insert)
 item(tt(quoted-insert) (^V) (unbound) (unbound))(
 Insert the next character typed into the buffer literally.

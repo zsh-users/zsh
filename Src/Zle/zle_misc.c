@@ -507,11 +507,26 @@ yank(UNUSED(char **args))
     return 0;
 }
 
-static void pastebuf(Cutbuffer buf, int mult, int after)
+/* position: 0 is before, 1 after, 2 split the line */
+static void pastebuf(Cutbuffer buf, int mult, int position)
 {
     int cc;
     if (buf->flags & CUTBUFFER_LINE) {
-	if (after) {
+	if (position == 2) {
+	    if (!zlecs)
+		position = 0;
+	    else if (zlecs == zlell)
+		position = 1;
+	}
+	if (position == 2) {
+	    yankb = zlecs;
+	    spaceinline(buf->len + 2);
+	    zleline[zlecs++] = ZWC('\n');
+	    ZS_memcpy(zleline + zlecs, buf->buf, buf->len);
+	    zlecs += buf->len;
+	    zleline[zlecs] = ZWC('\n');
+	    yanke = zlecs + 1;
+	} else if (position != 0) {
 	    yankb = zlecs = findeol();
 	    spaceinline(buf->len + 1);
 	    zleline[zlecs++] = ZWC('\n');
@@ -526,7 +541,7 @@ static void pastebuf(Cutbuffer buf, int mult, int after)
 	}
 	vifirstnonblank(zlenoargs);
     } else {
-	if (after && zlecs != findeol())
+	if (position == 1 && zlecs != findeol())
 	    INCCS();
 	yankb = zlecs;
 	cc = buf->len;
@@ -585,6 +600,44 @@ viputafter(UNUSED(char **args))
 
 /**/
 int
+putreplaceselection(UNUSED(char **args))
+{
+    int n = zmult;
+    struct cutbuffer prevbuf;
+    Cutbuffer putbuf;
+    int clear = 0;
+    int pos = 2;
+
+    startvichange(-1);
+    if (n < 0 || zmod.flags & MOD_NULL)
+	return 1;
+    putbuf = (zmod.flags & MOD_VIBUF) ? &vibuf[zmod.vibuf] : &cutbuf;
+    if (!putbuf->buf)
+	return 1;
+    memcpy(&prevbuf, putbuf, sizeof(prevbuf));
+
+    /* if "9 was specified, prevent killregion from freeing it */
+    if (zmod.vibuf == 35) {
+	putbuf->buf = 0;
+	clear = 1;
+    }
+
+    zmod.flags = 0; /* flags apply to paste not kill */
+    if (region_active == 2 && prevbuf.flags & CUTBUFFER_LINE) {
+	int a, b;
+	regionlines(&a, &b);
+	pos = (b == zlell);
+    }
+    killregion(zlenoargs);
+
+    pastebuf(&prevbuf, n, pos);
+    if (clear)
+	free(prevbuf.buf);
+    return 0;
+}
+
+/**/
+int
 yankpop(UNUSED(char **args))
 {
     int kctstart = kct;
@@ -635,7 +688,7 @@ yankpop(UNUSED(char **args))
     zlecs = yankb;
     foredel(yanke - yankb, CUT_RAW);
     zlecs = yankcs;
-    pastebuf(buf, 1, lastcmd & ZLE_YANKAFTER);
+    pastebuf(buf, 1, !!(lastcmd & ZLE_YANKAFTER));
     return 0;
 }
 

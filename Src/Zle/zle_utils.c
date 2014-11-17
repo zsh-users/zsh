@@ -953,7 +953,7 @@ cuttext(ZLE_STRING_T line, int ct, int flags)
     } else {
 	/* Save in "1, shifting "1-"8 along to "2-"9 */
 	int n;
-	free(vibuf[34].buf);
+	free(vibuf[35].buf);
 	for(n=35; n>27; n--)
 	    vibuf[n] = vibuf[n-1];
 	vibuf[27].buf = (ZLE_STRING_T)zalloc(ct * ZLE_CHAR_SIZE);

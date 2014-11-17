@@ -89,6 +89,7 @@
 "push-input", pushinput, 0
 "push-line", pushline, 0
 "push-line-or-edit", pushlineoredit, 0
+"put-replace-selection", putreplaceselection, ZLE_KEEPSUFFIX
 "quoted-insert", quotedinsert, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "quote-line", quoteline, 0
 "quote-region", quoteregion, 0
