@@ -171,81 +171,80 @@ getvirange(int wf)
 	vilinerange = (visual == 2);
 	region_active = 0;
     } else {
+	virangeflag = 1;
+	wordflag = wf;
+	mark = -1;
+	/* use operator-pending keymap if one exists */
+	Keymap km = openkeymap("viopp");
+	if (km)
+	    selectlocalmap(km);
+	/* Now we need to execute the movement command, to see where it *
+	* actually goes.  virangeflag here indicates to the movement   *
+	* function that it should place the cursor at the end of the   *
+	* range, rather than where the cursor would actually go if it  *
+	* were executed normally.  This makes a difference to some     *
+	* commands, but not all.  For example, if searching forward    *
+	* for a character, under normal circumstances the cursor lands *
+	* on the character.  For a range, the range must include the   *
+	* character, so the cursor gets placed after the character if  *
+	* virangeflag is set.  vi-match-bracket needs to change the    *
+	* value of virangeflag under some circumstances, meaning that  *
+	* we need to change the *starting* position.                   */
+	zmod.flags &= ~MOD_TMULT;
+	do {
+	    vilinerange = 0;
+	    prefixflag = 0;
+	    if (!(k2 = getkeycmd()) || (k2->flags & DISABLED) ||
+		    k2 == Th(z_sendbreak)) {
+		wordflag = 0;
+		virangeflag = 0;
+		mark = mpos;
+		return -1;
+	    }
+	    /*
+	    * With k2 == bindk, the command key is repeated:
+	    * a number of lines is used.  If the function used
+	    * returns 1, we fail.
+	    */
+	    if ((k2 == bindk) ? dovilinerange() : execzlefunc(k2, zlenoargs, 1))
+		ret = -1;
+	    if(vichgrepeat)
+		zmult = mult1;
+	    else
+		zmult = mult1 * zmod.tmult;
+	} while(prefixflag && !ret);
+	wordflag = 0;
+	selectlocalmap(NULL);
 
-    virangeflag = 1;
-    wordflag = wf;
-    mark = -1;
-    /* use operator-pending keymap if one exists */
-    Keymap km = openkeymap("viopp");
-    if (km)
-	selectlocalmap(km);
-    /* Now we need to execute the movement command, to see where it *
-     * actually goes.  virangeflag here indicates to the movement   *
-     * function that it should place the cursor at the end of the   *
-     * range, rather than where the cursor would actually go if it  *
-     * were executed normally.  This makes a difference to some     *
-     * commands, but not all.  For example, if searching forward    *
-     * for a character, under normal circumstances the cursor lands *
-     * on the character.  For a range, the range must include the   *
-     * character, so the cursor gets placed after the character if  *
-     * virangeflag is set.  vi-match-bracket needs to change the    *
-     * value of virangeflag under some circumstances, meaning that  *
-     * we need to change the *starting* position.                   */
-    zmod.flags &= ~MOD_TMULT;
-    do {
-	vilinerange = 0;
-	prefixflag = 0;
-	if (!(k2 = getkeycmd()) || (k2->flags & DISABLED) ||
-		k2 == Th(z_sendbreak)) {
-	    wordflag = 0;
-	    virangeflag = 0;
+	/* It is an error to use a non-movement command to delimit the *
+	* range.  We here reject the case where the command modified  *
+	* the line, or selected a different history line.             */
+	if (histline != hist1 || zlell != lastll || memcmp(zleline, lastline, zlell)) {
+	    histline = hist1;
+	    ZS_memcpy(zleline, lastline, zlell = lastll);
+	    zlecs = pos;
 	    mark = mpos;
 	    return -1;
 	}
-	/*
-	 * With k2 == bindk, the command key is repeated:
-	 * a number of lines is used.  If the function used
-	 * returns 1, we fail.
-	 */
-	if ((k2 == bindk) ? dovilinerange() : execzlefunc(k2, zlenoargs, 1))
-	    ret = -1;
-	if(vichgrepeat)
-	    zmult = mult1;
-	else
-	    zmult = mult1 * zmod.tmult;
-    } while(prefixflag && !ret);
-    wordflag = 0;
 
-    /* It is an error to use a non-movement command to delimit the *
-     * range.  We here reject the case where the command modified  *
-     * the line, or selected a different history line.             */
-    if (histline != hist1 || zlell != lastll || memcmp(zleline, lastline, zlell)) {
-	histline = hist1;
-	ZS_memcpy(zleline, lastline, zlell = lastll);
-	zlecs = pos;
-        mark = mpos;
-	return -1;
-    }
+	/* Can't handle an empty file.  Also, if the movement command *
+	* failed, or didn't move, it is an error.                    */
+	if (!zlell || (zlecs == pos && mark == -1 && virangeflag != 2) || ret == -1) {
+	    mark = mpos;
+	    return -1;
+	}
 
-    /* Can't handle an empty file.  Also, if the movement command *
-     * failed, or didn't move, it is an error.                    */
-    if (!zlell || (zlecs == pos && mark == -1 && virangeflag != 2) || ret == -1) {
-        mark = mpos;
-	return -1;
-    }
+	/* vi-match-bracket changes the value of virangeflag when *
+	* moving to the opening bracket, meaning that we need to *
+	* change the *starting* position.                        */
+	if (virangeflag == -1)
+	    INCPOS(pos);
+	virangeflag = 0;
 
-    /* vi-match-bracket changes the value of virangeflag when *
-     * moving to the opening bracket, meaning that we need to *
-     * change the *starting* position.                        */
-    if (virangeflag == -1)
-	INCPOS(pos);
-    virangeflag = 0;
-    selectlocalmap(NULL);
-
-    /* if the mark has moved, ignore the original cursor position *
-     * and use the mark. */
-    if (mark != -1)
-	pos = mark;
+	/* if the mark has moved, ignore the original cursor position *
+	* and use the mark. */
+	if (mark != -1)
+	    pos = mark;
     }
     mark = mpos;
 
