@@ -527,6 +527,25 @@ visualmode(UNUSED(char **args))
 
 /**/
 int
+visuallinemode(UNUSED(char **args))
+{
+    switch (region_active) {
+    case 2:
+	region_active = 0;
+	break;
+    case 0:
+	mark = zlecs;
+	/* fall through */
+    case 1:
+	region_active = 2;
+	break;
+    }
+    return 0;
+}
+
+
+/**/
+int
 vigotocolumn(UNUSED(char **args))
 {
     int x, y, n = zmult;

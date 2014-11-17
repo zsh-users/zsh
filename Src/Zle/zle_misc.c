@@ -440,12 +440,44 @@ killline(char **args)
 }
 
 /**/
+void
+regionlines(int *start, int *end)
+{
+    int origcs = zlecs;
+
+    UNMETACHECK();
+    if (zlecs < mark) {
+	*start = findbol();
+        zlecs = (mark > zlell) ? zlell : mark;
+	*end = findeol();
+    } else {
+	*end = findeol();
+        zlecs = mark;
+	*start = findbol();
+    }
+    zlecs = origcs;
+}
+
+/**/
 int
 killregion(UNUSED(char **args))
 {
     if (mark > zlell)
 	mark = zlell;
-    if (mark > zlecs)
+    if (region_active == 2) {
+	int a, b;
+	regionlines(&a, &b);
+	zlecs = a;
+	region_active = 0;
+	cut(zlecs, b - zlecs, CUT_RAW);
+	shiftchars(zlecs, b - zlecs);
+	if (zlell) {
+	    if (zlecs == zlell)
+		DECCS();
+	    foredel(1, 0);
+	    vifirstnonblank(zlenoargs);
+	}
+    } else if (mark > zlecs)
 	forekill(mark - zlecs + invicmdmode(), CUT_RAW);
     else {
 	if (invicmdmode())
@@ -1011,15 +1043,22 @@ quoteregion(UNUSED(char **args))
 {
     ZLE_STRING_T str;
     size_t len;
+    int extra = invicmdmode();
 
     if (mark > zlell)
 	mark = zlell;
-    if (mark < zlecs) {
+    if (region_active == 2) {
+	int a, b;
+	regionlines(&a, &b);
+	zlecs = a;
+	mark = b;
+	extra = 0;
+    } else if (mark < zlecs) {
 	int tmp = mark;
 	mark = zlecs;
 	zlecs = tmp;
     }
-    str = (ZLE_STRING_T)hcalloc((len = mark - zlecs + invicmdmode()) *
+    str = (ZLE_STRING_T)hcalloc((len = mark - zlecs + extra) *
 	ZLE_CHAR_SIZE);
     ZS_memcpy(str, zleline + zlecs, len);
     foredel(len, CUT_RAW);

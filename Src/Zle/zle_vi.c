@@ -162,12 +162,14 @@ static int
 getvirange(int wf)
 {
     int pos = zlecs, mpos = mark, ret = 0;
-    int visual = region_active; /* don't trust movement cmd not to change it */
+    int visual = region_active; /* movement command might set it */
     int mult1 = zmult, hist1 = histline;
     Thingy k2;
 
     if (visual) {
 	pos = mark;
+	vilinerange = (visual == 2);
+	region_active = 0;
     } else {
 
     virangeflag = 1;
@@ -256,10 +258,8 @@ getvirange(int wf)
 	pos = tmp;
     }
 
-    if (visual && invicmdmode()) {
-	region_active = 0;
+    if (visual && invicmdmode())
 	INCPOS(pos);
-    }
 
     /* Was it a line-oriented move?  If so, the command will have set *
      * the vilinerange flag.  In this case, entire lines are taken,   *
@@ -463,7 +463,15 @@ visubstitute(UNUSED(char **args))
 int
 vichangeeol(UNUSED(char **args))
 {
-    forekill(findeol() - zlecs, CUT_RAW);
+    int a, b;
+    if (region_active) {
+	regionlines(&a, &b);
+	zlecs = a;
+	region_active = 0;
+	cut(zlecs, b - zlecs, CUT_RAW);
+	shiftchars(zlecs, b - zlecs);
+    } else
+	forekill(findeol() - zlecs, CUT_RAW);
     startvitext(1);
     return 0;
 }
@@ -721,8 +729,11 @@ viindent(UNUSED(char **args))
 {
     int oldcs = zlecs, c2;
 
-    /* get the range */
     startvichange(1);
+    /* force line range */
+    if (region_active == 1)
+	region_active = 2;
+    /* get the range */
     if ((c2 = getvirange(0)) == -1) {
 	vichgflag = 0;
 	return 1;
@@ -756,8 +767,11 @@ viunindent(UNUSED(char **args))
 {
     int oldcs = zlecs, c2;
 
-    /* get the range */
     startvichange(1);
+    /* force line range */
+    if (region_active == 1)
+	region_active = 2;
+    /* get the range */
     if ((c2 = getvirange(0)) == -1) {
 	vichgflag = 0;
 	return 1;

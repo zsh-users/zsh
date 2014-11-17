@@ -1039,6 +1039,14 @@ zrefresh(void)
 	}
 	if (invicmdmode())
 	    INCPOS(region_highlights[0].end);
+	if (region_active == 2) {
+	    int origcs = zlecs;
+	    zlecs = region_highlights[0].end;
+	    region_highlights[0].end = findeol();
+	    zlecs = region_highlights[0].start;
+	    region_highlights[0].start = findbol();
+	    zlecs = origcs;
+	}
     } else {
 	region_highlights[0].start = region_highlights[0].end = -1;
     }

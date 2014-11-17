@@ -184,7 +184,8 @@
 "vi-yank", viyank, ZLE_LASTCOL
 "vi-yank-eol", viyankeol, 0
 "vi-yank-whole-line", viyankwholeline, 0
-"visual-mode", visualmode, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
+"visual-line-mode", visuallinemode, ZLE_MENUCMP | ZLE_LASTCOL
+"visual-mode", visualmode, ZLE_MENUCMP | ZLE_LASTCOL
 "what-cursor-position", whatcursorposition, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "where-is", whereis, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "which-command", processcmd, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL

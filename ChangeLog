@@ -1,5 +1,9 @@
 2014-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 33636: Src/Zle/iwidgets.list, Src/Zle/zle_misc.c,
+	Src/Zle/zle_move.c, Src/Zle/zle_refresh.c, Src/Zle/zle_vi.c:
+	add support for a linewise visual selection mode
+
 	* 33635: Src/Zle/iwidgets.list, Src/Zle/zle_misc.c,
 	Src/Zle/zle_move.c, Src/Zle/zle_refresh.c, Src/Zle/zle_vi.c:
 	adapt region to function as vim style visual selection mode
