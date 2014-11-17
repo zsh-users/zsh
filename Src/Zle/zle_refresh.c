@@ -1037,8 +1037,6 @@ zrefresh(void)
 	    region_highlights[0].start = mark;
 	    region_highlights[0].end = zlecs;
 	}
-	if (invicmdmode())
-	    INCPOS(region_highlights[0].end);
 	if (region_active == 2) {
 	    int origcs = zlecs;
 	    zlecs = region_highlights[0].end;
@@ -1046,7 +1044,8 @@ zrefresh(void)
 	    zlecs = region_highlights[0].start;
 	    region_highlights[0].start = findbol();
 	    zlecs = origcs;
-	}
+	} else if (invicmdmode())
+	    INCPOS(region_highlights[0].end);
     } else {
 	region_highlights[0].start = region_highlights[0].end = -1;
     }

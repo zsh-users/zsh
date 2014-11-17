@@ -258,7 +258,7 @@ getvirange(int wf)
 	pos = tmp;
     }
 
-    if (visual && invicmdmode())
+    if (visual == 1 && invicmdmode())
 	INCPOS(pos);
 
     /* Was it a line-oriented move?  If so, the command will have set *
@@ -388,9 +388,6 @@ videletechar(char **args)
     int n = zmult;
 
     startvichange(-1);
-
-    if (region_active)
-	return killregion(args);
 
     /* handle negative argument */
     if (n < 0) {
@@ -803,9 +800,6 @@ vibackwarddeletechar(char **args)
 
     if (invicmdmode())
 	startvichange(-1);
-
-    if (region_active)
-	return killregion(args);
 
     /* handle negative argument */
     if (n < 0) {

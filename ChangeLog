@@ -1,5 +1,10 @@
 2014-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 33704: Doc/Zsh/zle.yo, Src/Zle/zle_bindings.c,
+	Src/Zle/zle_keymap.c, Src/Zle/zle_refresh.c, Src/Zle/zle_vi.c,
+	Test/X02zlevi.ztst, Test/comptest: key bindings, documentation,
+	tests and minor fixes for vim style visual selection changes
+
 	* 33636: Src/Zle/iwidgets.list, Src/Zle/zle_misc.c,
 	Src/Zle/zle_move.c, Src/Zle/zle_refresh.c, Src/Zle/zle_vi.c:
 	add support for a linewise visual selection mode

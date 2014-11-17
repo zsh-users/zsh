@@ -1277,8 +1277,10 @@ default_bindings(void)
     Keymap vmap = newkeymap(NULL, "viins");
     Keymap emap = newkeymap(NULL, "emacs");
     Keymap amap = newkeymap(NULL, "vicmd");
+    Keymap oppmap = newkeymap(NULL, "viopp");
+    Keymap vismap = newkeymap(NULL, "visual");
     Keymap smap = newkeymap(NULL, ".safe");
-    Keymap vimaps[2], kptr;
+    Keymap vimaps[2], vilmaps[2], kptr;
     char buf[3], *ed;
     int i;
 
@@ -1332,6 +1334,22 @@ default_bindings(void)
 	add_cursor_key(kptr, TCLEFTCURSOR, t_vibackwardchar, 'D');
 	add_cursor_key(kptr, TCRIGHTCURSOR, t_viforwardchar, 'C');
     }
+    vilmaps[0] = oppmap;
+    vilmaps[1] = vismap;
+    for (i = 0; i < 2; i++) {
+	/* vi visual selection and operator pending local maps */
+	kptr = vilmaps[i];
+	add_cursor_key(kptr, TCUPCURSOR, t_upline, 'A');
+	add_cursor_key(kptr, TCDOWNCURSOR, t_downline, 'B');
+	bindkey(kptr, "k", refthingy(t_upline), NULL);
+	bindkey(kptr, "j", refthingy(t_downline), NULL);
+    }
+    /* escape in operator pending cancels the operation */
+    bindkey(oppmap, "\33", refthingy(t_vicmdmode), NULL);
+    bindkey(vismap, "o", refthingy(t_exchangepointandmark), NULL);
+    bindkey(vismap, "p", refthingy(t_putreplaceselection), NULL);
+    bindkey(vismap, "x", refthingy(t_videlete), NULL);
+    bindkey(vismap, "~", refthingy(t_vioperswapcase), NULL);
 
     /* emacs mode: arrow keys */ 
     add_cursor_key(emap, TCUPCURSOR, t_uplineorhistory, 'A');
@@ -1373,6 +1391,8 @@ default_bindings(void)
     linkkeymap(vmap, "viins", 0);
     linkkeymap(emap, "emacs", 0);
     linkkeymap(amap, "vicmd", 0);
+    linkkeymap(oppmap, "viopp", 0);
+    linkkeymap(vismap, "visual", 0);
     linkkeymap(smap, ".safe", 1);
     if (((ed = zgetenv("VISUAL")) && strstr(ed, "vi")) ||
 	((ed = zgetenv("EDITOR")) && strstr(ed, "vi")))

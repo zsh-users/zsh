@@ -273,6 +273,115 @@
 >BUFFER: one wo
 >CURSOR: 2
 
+  zletest $'one two\evbcx'
+0:change selection
+>BUFFER: one x
+>CURSOR: 5
+
+  zletest $'four\eOthree\eOtwo\eOone\evjjhCnew'
+0:change character wise selection with C acts linewise
+>BUFFER: new
+>four
+>CURSOR: 3
+
+  zletest $'x testing\ehvbx'
+0:x kills selections
+>BUFFER: x g
+>CURSOR: 2
+
+  zletest $'one two\eyb0vep'
+0:put over selection at start of buffer
+>BUFFER: tw two
+>CURSOR: 1
+
+  zletest $'hello\C-wbye\evhp'
+0:put over selection at end of buffer
+>BUFFER: bhello
+>CURSOR: 5
+
+  zletest $'one\eotwo\eyykVp'
+0:yank linewise and put over linewise selection at start of buffer
+>BUFFER: two
+>two
+>CURSOR: 0
+
+  zletest $'one\eotwo\eothree\eyykVp'
+0:yank linewise and put over linewise selection in middle of buffer
+>BUFFER: one
+>three
+>three
+>CURSOR: 4
+
+  zletest $'two\eOone\eyyjVp'
+0:yank linewise and put over linewise selection at end of buffer
+>BUFFER: one
+>one
+>CURSOR: 4
+
+  zletest $'one\eyhVp'
+0:yank character-wise and put over linewise selection
+>BUFFER: n
+>CURSOR: 0
+
+# vim puts a blank line above in this test
+  zletest $'one\eotwo\eyy0kvlp'
+0:yank linewise and put over character-wise selection at start of buffer
+>BUFFER: two
+>e
+>two
+>CURSOR: 0
+
+  zletest $'one\eyyhvp'
+0:yank linewise and put over character-wise selection in middle of buffer
+>BUFFER: o
+>one
+>e
+>CURSOR: 2
+
+# vim behaviour on this one really looks like a bug
+  zletest $'two\eOone\eyyjvhp'
+0:yank linewise and put over character-wise selection at end of buffer
+>BUFFER: one
+>t
+>one
+>CURSOR: 6
+
+  zletest $'abc123456789\exxxxxxxxxhv"9p0P'
+0:paste last (9th) register over a selection
+>BUFFER: ba9c
+>CURSOR: 0
+
+  zletest $'one\eo\eo\eotwo\ekkVdvd'
+0:delete blank line using selection
+>BUFFER: one
+>two
+>CURSOR: 4
+
+  zletest $'One Two Three\e2bvw~'
+0:toggle case of selection
+>BUFFER: One tWO three
+>CURSOR: 4
+
+  zletest $'    ----word    ----    word    word----    ----\e42|daw30|daw22|daw14|daw2|daw'
+0:delete all word on blanks
+>BUFFER: word
+>CURSOR: 0
+
+  zletest $'    word----word    word----word    word    \e38|daw30|daw22|daw14|daw6|daw'
+0:delete all word on alphanumerics
+>BUFFER:     --------
+>CURSOR: 4
+
+  zletest $'    ----word----    ----word----    ----    \e38|daw30|daw22|daw14|daw6|daw'
+0:delete all word on other characters
+>BUFFER:     wordword
+>CURSOR: 4
+
+  zletest $'- word word\e4|2daw'
+0:delete all word with numeric argument
+>BUFFER: -
+>CURSOR: 0
+
 %clean
 
   zmodload -ui zsh/zpty

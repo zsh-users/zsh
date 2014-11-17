@@ -34,7 +34,7 @@ comptestinit () {
 "fpath=( $fpath )" \
 "bindkey -$comptest_keymap" \
 'LISTMAX=10000000
-stty 38400 columns 80 rows 24 werase undef
+stty 38400 columns 80 rows 24 werase undef tabs
 TERM=vt100
 KEYTIMEOUT=1
 setopt zle

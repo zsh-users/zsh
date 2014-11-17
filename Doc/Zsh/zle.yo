@@ -60,12 +60,14 @@ or more names.  If all of a keymap's names are deleted, it disappears.
 findex(bindkey, use of)
 tt(bindkey) can be used to manipulate keymap names.
 
-Initially, there are six keymaps:
+Initially, there are eight keymaps:
 
 startsitem()
 sitem(tt(emacs))(EMACS emulation)
 sitem(tt(viins))(vi emulation - insert mode)
 sitem(tt(vicmd))(vi emulation - command mode)
+sitem(tt(viopp))(vi emulation - operator pending)
+sitem(tt(visual))(vi emulation - selection active)
 sitem(tt(isearch))(incremental search mode)
 sitem(tt(command))(read a command name)
 sitem(tt(.safe))(fallback keymap)
@@ -122,6 +124,21 @@ in user-defined widgets with the tt(read-command) widget, described
 ifzman(below)\
 ifnzman(in noderef(Miscellaneous) below)\
 .
+subsect(Local Keymaps)
+cindex(local keymaps)
+While for normal editing a single keymap is used exclusively, in many
+modes a local keymap allows for some keys to be customised. For example,
+in an incremental search mode, a binding in the tt(isearch) keymap will
+override a binding in the tt(main) keymap but all keys that are not
+overriden can still be used.
+
+If a key sequence is defined in a local keymap, it will hide a key
+sequence in the global keymap that is a prefix of that sequence. An
+example of this occurs with the binding of tt(iw) in tt(viopp) as this
+hides the binding of tt(i) in tt(vicmd). However, a longer sequence in
+the global keymap that shares the same prefix can still apply so for
+example the binding of tt(^Xa) in the global keymap will be unaffected
+by the binding of tt(^Xb) in the local keymap.
 
 texinode(Zle Builtins)(Zle Widgets)(Keymaps)(Zsh Line Editor)
 sect(Zle Builtins)
@@ -817,7 +834,10 @@ cursor remains between the new tt($LBUFFER) and the old tt($RBUFFER).
 )
 vindex(MARK)
 item(tt(MARK) (integer))(
-Like tt(CURSOR), but for the mark.
+Like tt(CURSOR), but for the mark. With vi-mode operators that wait for
+a movement command to select a region of text, setting tt(MARK) allows
+the selection to extend in both directions from the the initial cursor
+position.
 )
 vindex(NUMERIC)
 item(tt(NUMERIC) (integer))(
@@ -863,7 +883,9 @@ cursor remains between the old tt($LBUFFER) and the new tt($RBUFFER).
 vindex(REGION_ACTIVE)
 item(tt(REGION_ACTIVE) (integer))(
 Indicates if the region is currently active.  It can be assigned 0 or 1
-to deactivate and activate the region respectively;
+to deactivate and activate the region respectively. A value of 2
+activates the region in line-wise mode with the highlighted text
+extending for whole lines only;
 ifzman(see em(Character Highlighting) below)\
 ifnzman(noderef(Character Highlighting)).
 )
@@ -2274,6 +2296,16 @@ tindex(vi-undo-change)
 item(tt(vi-undo-change) (unbound) (u) (unbound))(
 Undo the last text modification.
 If repeated, redo the modification.
+)
+tindex(visual-mode)
+item(tt(visual-mode) (unbound) (v) (unbound))(
+Toggle vim-style visual selection mode. If line-wise visual mode is
+currently enabled then it is changed to being character-wise.
+)
+tindex(visual-line-mode)
+item(tt(visual-line-mode) (unbound) (V) (unbound))(
+Toggle vim-style line-wise visual selection mode. If character-wise
+visual mode is currently enabled then it is changed to being line-wise.
 )
 tindex(what-cursor-position)
 item(tt(what-cursor-position) (^X=) (unbound) (unbound))(
