@@ -1,7 +1,13 @@
+2014-11-19  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 33679: Doc/Zsh/grammar.yo: Note that alternation in case
+	patterns works just like filename generation, despite
+	appearances to the contrary.
+
 2014-11-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 33704: Doc/Zsh/zle.yo, Src/Zle/zle_bindings.c,
-	Src/Zle/zle_keymap.c, Src/Zle/zle_refresh.c, Src/Zle/zle_vi.c,
+	Src/Zle/zle_keX4aymap.c, Src/Zle/zle_refresh.c, Src/Zle/zle_vi.c,
 	Test/X02zlevi.ztst, Test/comptest: key bindings, documentation,
 	tests and minor fixes for vim style visual selection changes
 
