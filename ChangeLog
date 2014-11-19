@@ -1,5 +1,8 @@
 2014-11-19  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* users/19404: Etc/FAQ.yo: login shells are not after all
+	necessarily interactive.
+
 	* 33679: Doc/Zsh/grammar.yo: Note that alternation in case
 	patterns works just like filename generation, despite
 	appearances to the contrary.

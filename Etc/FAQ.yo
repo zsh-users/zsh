@@ -1017,19 +1017,26 @@ sect(In which startup file do I put...?)
   reason it is important for administrators to make sure tt(/etc/zshenv)
   is as brief as possible.
 
-  The order in which the four files are searched (none of them myem(need)
-  to exist) is the one just given.  However, tt(.zprofile) and tt(.zlogin)
-  are only run when the shell is a login shell --- when you first login,
-  of course, and whenever you start zsh with the tt(-l) option.  All
-  login shells are interactive.  The order is the only difference
-  between those; you should decide whether you need things set before or
-  after tt(.zshrc).  These files are a good place to set environment
-  variables (i.e. mytt(export) commands), since they are passed on to
-  all shells without you having to set them again, and also to check
-  that your terminal is set up properly (except that if you want to
-  change settings for terminal emulator windows like tt(xterm) you will
-  need to put those in tt(.zshrc), since usually you do not get a login
-  shell here).  
+  The order in which the four files are searched (none of them
+  myem(need) to exist) is the one just given.  However, tt(.zprofile)
+  and tt(.zlogin) are only run when the shell is a login shell --- when
+  you first login, of course, and whenever you start zsh with the tt(-l)
+  option.  The order is the only difference between those; you should
+  decide whether you need things set before or after tt(.zshrc).  These
+  files are a good place to set environment variables (i.e. mytt(export)
+  commands), since they are passed on to all shells without you having
+  to set them again, and also to check that your terminal is set up
+  properly (except that if you want to change settings for terminal
+  emulator windows like tt(xterm) you will need to put those in
+  tt(.zshrc), since usually you do not get a login shell here).
+
+  Login shells are often interactive, but this is not necessarily the
+  case.  It is the programme that starts the shell that decides if it is
+  to be a login shell, and it is not required that the shell be run
+  interactively.  A possible example is a display manager that starts a
+  shell to initialise your environment before running the window manager
+  to create terminals: it might run this as a login shell but with no
+  terminal, so it is not interactive.
 
   The only file you can alter which is started with every zsh (unless
   you use the tt(-f) option) is tt(.zshenv), so this is a good place to \
