@@ -1763,7 +1763,7 @@ sect(Why is my output duplicated with `tt(foo 2>&1 >foo.out | bar)'?)
   actually see is that the output is going both to the pipe and into the
   file.  To be more explicit, here's the same example with real commands:
   verb(
-    % { print output; print error >&2 } 2>&1 >foo.out | sed 's/error/erratic'
+    % { print output; print error >&2 } 2>&1 >foo.out | sed 's/error/erratic/'
     erratic
     output
     % cat foo.out

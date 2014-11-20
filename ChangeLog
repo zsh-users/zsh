@@ -1,3 +1,8 @@
+2014-11-20  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted but see 33723: Etc/FAQ.yo: typo in sed command that's
+	been there about twenty years.
+
 2014-11-19  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/19404: Etc/FAQ.yo: login shells are not after all
