@@ -1,5 +1,7 @@
 2014-11-21  Oliver Kiddle  <opk@zsh.org>
 
+	* saga.xu: 33712: Completion/Debian/_apt: add --auto-remove
+
 	* 33738: Src/Zle/zle_vi.c, Test/X02zlevi.ztst: account for a
 	selection in vi-replace-chars
 

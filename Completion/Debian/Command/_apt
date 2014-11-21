@@ -455,6 +455,7 @@ _apt-get () {
     --tar-only:bool \
     --arch-only:bool \
     --allow-unauthenticated:bool \
+    --auto-remove:bool \
     -- \
     /$'update\0'/ \| \
     /$'upgrade\0'/ \| \
