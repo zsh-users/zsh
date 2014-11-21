@@ -1,3 +1,9 @@
+2014-11-21  Oliver Kiddle  <opk@zsh.org>
+
+	* 33730: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list,
+	Src/Zle/textobjects.c, Src/Zle/zle.mdd, Src/Zle/zle_keymap.c,
+	Test/X02zlevi.ztst: vim style text objects for selecting words
+
 2014-11-21  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Sebastien Alaiwan: 33728: Completion/Unix/Command/_bzr:
@@ -20,7 +26,7 @@
 2014-11-17  Oliver Kiddle  <opk@zsh.org>
 
 	* 33704: Doc/Zsh/zle.yo, Src/Zle/zle_bindings.c,
-	Src/Zle/zle_keX4aymap.c, Src/Zle/zle_refresh.c, Src/Zle/zle_vi.c,
+	Src/Zle/zle_keymap.c, Src/Zle/zle_refresh.c, Src/Zle/zle_vi.c,
 	Test/X02zlevi.ztst, Test/comptest: key bindings, documentation,
 	tests and minor fixes for vim style visual selection changes
 

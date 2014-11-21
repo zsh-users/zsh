@@ -1975,7 +1975,7 @@ When a previous completion displayed a list below the prompt, this
 widget can be used to move the prompt below the list.
 )
 enditem()
-texinode(Miscellaneous)()(Completion)(Zle Widgets)
+texinode(Miscellaneous)(Text Objects)(Completion)(Zle Widgets)
 subsect(Miscellaneous)
 startitem()
 tindex(accept-and-hold)
@@ -2331,6 +2331,50 @@ tindex(vi-digit-or-beginning-of-line)
 item(tt(vi-digit-or-beginning-of-line) (unbound) (0) (unbound))(
 If the last command executed was a digit as part of an argument,
 continue the argument.  Otherwise, execute vi-beginning-of-line.
+)
+enditem()
+texinode(Text Objects)()(Miscellaneous)(Zle Widgets)
+subsect(Text Objects)
+cindex(text objects)
+Text objects are commands that can be used to select a block of text
+according to some criteria. They are a feature of the vim text editor
+and so are primarily intended for use with vi operators or from visual
+selection mode. However, they can also be used from vi-insert or emacs
+mode. Key bindings listed below apply to the tt(viopp) and tt(visual)
+keymaps.
+
+startitem()
+tindex(select-a-blank-word)
+item(tt(select-a-blank-word) (aW))(
+Select a word including adjacent blanks, where a word is defined as a
+series of non-blank characters. With a numeric argument, multiple words
+will be selected.
+)
+tindex(select-a-shell-word)
+item(tt(select-a-shell-word) (aa))(
+Select the current command argument applying the normal rules for
+quoting.
+)
+tindex(select-a-word)
+item(tt(select-a-word) (aw))(
+Select a word including adjacent blanks, using the normal vi-style word
+definition. With a numeric argument, multiple words will be selected.
+)
+tindex(select-in-blank-word)
+item(tt(select-in-blank-word) (iW))(
+Select a word, where a word is defined as a series of non-blank
+characters. With a numeric argument, multiple words will be selected.
+)
+tindex(select-in-shell-word)
+item(tt(select-in-shell-word) (ia))(
+Select the current command argument applying the normal rules for
+quoting. If the argument begins and ends with matching quote characters,
+these are not included in the selection.
+)
+tindex(select-in-word)
+item(tt(select-in-word) (iw))(
+Select a word, using the normal vi-style word definition. With a numeric
+argument, multiple words will be selected.
 )
 enditem()
 

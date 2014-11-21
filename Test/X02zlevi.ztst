@@ -382,6 +382,45 @@
 >BUFFER: -
 >CURSOR: 0
 
+  zletest $'----    word    ----word\eo    \eo----\eodone\eh' \
+      'vhawmaawmbawmcawmdawmeawmfawmgv`ara`brb`crc$r$`drd`ere`frf`grg'
+0:all word with existing selection and cursor before mark
+>BUFFER: g---f   worde   ----dord
+>c  $
+>b---
+>aone
+>CURSOR: 0
+
+  zletest $'----    word    word----\e0lvlawmaawmbawmcawvrd`ara`brb`crc'
+0:all word with existing selection and mark before cursor
+>BUFFER: ----   aword   bworc---d
+>CURSOR: 19
+
+  zletest $' --ww  ww---\eo\eoww\evhiwiw' m{a,b,c,d,e}iw vrE \`{a,b,c,d,e}r.
+0:in word with existing selection and cursor before mark
+>BUFFER: E.-.w. .w.--
+>
+>ww
+>CURSOR: 1
+
+  zletest $'  --ww  ww--\eO  \ev0o' m{a,b,c,d,e}iw vrE \`{a,b,c,d,e}r.
+0:in word with existing selection and mark before cursor
+>BUFFER:  .
+> .-.w. .wE--
+>CURSOR: 10
+
+  zletest $'  `one`  $(echo two) " three " $\'four\'\C-v\tfive ${six:-6}\e' \
+      vaaom{a,b,c,d,e,f}v \`{a,b,c,d,e,f}rX
+0:all argument for different arguments
+>BUFFER: X `one`X $(echo two)X" three "X$'four'XfiveX${six:-6}
+>CURSOR: 0
+
+  zletest $'{ls `echo x`  $((3+4)) "a b" $\'\\t\\n\' ${d%/}\e' \
+      cia{6,5,4,3,2,1}$'\eBB'
+0:in argument for different arguments
+>BUFFER: 1ls `2`  $(3) "4" $'5' ${6}
+>CURSOR: 0
+
 %clean
 
   zmodload -ui zsh/zpty

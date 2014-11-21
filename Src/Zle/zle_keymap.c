@@ -1343,6 +1343,12 @@ default_bindings(void)
 	add_cursor_key(kptr, TCDOWNCURSOR, t_downline, 'B');
 	bindkey(kptr, "k", refthingy(t_upline), NULL);
 	bindkey(kptr, "j", refthingy(t_downline), NULL);
+	bindkey(kptr, "aa", refthingy(t_selectashellword), NULL);
+	bindkey(kptr, "ia", refthingy(t_selectinshellword), NULL);
+	bindkey(kptr, "aw", refthingy(t_selectaword), NULL);
+	bindkey(kptr, "iw", refthingy(t_selectinword), NULL);
+	bindkey(kptr, "aW", refthingy(t_selectablankword), NULL);
+	bindkey(kptr, "iW", refthingy(t_selectinblankword), NULL);
     }
     /* escape in operator pending cancels the operation */
     bindkey(oppmap, "\33", refthingy(t_vicmdmode), NULL);

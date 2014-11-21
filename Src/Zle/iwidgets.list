@@ -100,6 +100,12 @@
 "reset-prompt", resetprompt, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
 "reverse-menu-complete", reversemenucomplete, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP
 "run-help", processcmd, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL
+"select-a-word", selectword, ZLE_KEEPSUFFIX
+"select-in-word", selectword, ZLE_KEEPSUFFIX
+"select-a-blank-word", selectword, ZLE_KEEPSUFFIX
+"select-in-blank-word", selectword, ZLE_KEEPSUFFIX
+"select-a-shell-word", selectargument, ZLE_KEEPSUFFIX
+"select-in-shell-word", selectargument, ZLE_KEEPSUFFIX
 "self-insert", selfinsert, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "self-insert-unmeta", selfinsertunmeta, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "send-break", sendbreak, 0
