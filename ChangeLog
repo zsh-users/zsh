@@ -1,3 +1,7 @@
+2014-11-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Daniel Hahler: 33746: Doc/Zsh/builtins.yo: read -q refers to -t.
+
 2014-11-24  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 33785: Src/Modules/tcp.c: Fix leaks of desthost in ztcp.

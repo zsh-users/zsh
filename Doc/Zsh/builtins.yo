@@ -1294,10 +1294,10 @@ item(tt(-q))(
 Read only one character from the terminal and set var(name) to
 `tt(y)' if this character was `tt(y)' or `tt(Y)' and to `tt(n)' otherwise.
 With this flag set the return status is zero only if the character was
-`tt(y)' or `tt(Y)'.  This option may be used with a timeout; if
-the read times out, or encounters end of file, status 2 is returned.
-Input is read from the terminal unless one of tt(-u)
-or tt(-p) is present.  This option may also be used within zle widgets.
+`tt(y)' or `tt(Y)'.  This option may be used with a timeout (see tt(-t)); if
+the read times out, or encounters end of file, status 2 is returned.  Input is
+read from the terminal unless one of tt(-u) or tt(-p) is present.  This option
+may also be used within zle widgets.
 )
 item(tt(-k) [ var(num) ])(
 Read only one (or var(num)) characters.  All are assigned to the first
