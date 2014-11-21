@@ -257,6 +257,7 @@ getvirange(int wf)
 	pos = tmp;
     }
 
+    /* visual selection mode needs to include additional position */
     if (visual == 1 && invicmdmode())
 	INCPOS(pos);
 
@@ -576,16 +577,40 @@ vireplacechars(UNUSED(char **args))
     int n = zmult, fail = 0, newchars = 0;
 
     if (n > 0) {
-	int pos = zlecs;
-	while (n-- > 0) {
-	    if (pos == zlell || zleline[pos] == ZWC('\n')) {
-		fail = 1;
-		break;
+	if (region_active) {
+	    int a, b;
+	    if (region_active == 1) {
+		if (mark > zlecs) {
+		    a = zlecs;
+		    b = mark;
+		} else {
+		    a = mark;
+		    b = zlecs;
+		}
+		INCPOS(b);
+	    } else
+		regionlines(&a, &b);
+	    zlecs = a;
+	    if (b > zlell)
+		b = zlell;
+	    n = b - a;
+	    while (a < b) {
+		newchars++;
+		INCPOS(a);
+            }
+	    region_active = 0;
+	} else {
+	    int pos = zlecs;
+	    while (n-- > 0) {
+		if (pos == zlell || zleline[pos] == ZWC('\n')) {
+		    fail = 1;
+		    break;
+		}
+		newchars++;
+		INCPOS(pos);
 	    }
-	    newchars++;
-	    INCPOS(pos);
+	    n = pos - zlecs;
 	}
-	n = pos - zlecs;
     }
     startvichange(1);
     /* check argument range */
@@ -617,6 +642,8 @@ vireplacechars(UNUSED(char **args))
 	 * buffer offset.
 	 * Use shiftchars so as not to adjust the cursor position;
 	 * we are overwriting anything that remains directly.
+	 * With a selection this will replace newlines which vim
+	 * doesn't do but this simplifies things a lot.
 	 */
 	if (n > newchars)
 	    shiftchars(zlecs, n - newchars);

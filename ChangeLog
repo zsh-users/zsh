@@ -1,5 +1,8 @@
 2014-11-21  Oliver Kiddle  <opk@zsh.org>
 
+	* 33738: Src/Zle/zle_vi.c, Test/X02zlevi.ztst: account for a
+	selection in vi-replace-chars
+
 	* 33730: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list,
 	Src/Zle/textobjects.c, Src/Zle/zle.mdd, Src/Zle/zle_keymap.c,
 	Test/X02zlevi.ztst: vim style text objects for selecting words
