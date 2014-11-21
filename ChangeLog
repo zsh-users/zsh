@@ -1,3 +1,8 @@
+2014-11-21  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Sebastien Alaiwan: 33728: Completion/Unix/Command/_bzr:
+	complete bzr shelve.
+
 2014-11-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted but see 33723: Etc/FAQ.yo: typo in sed command that's

@@ -222,6 +222,17 @@ case $cmd in
 	)
     ;;
 
+(shelve)
+    args+=(
+	'--destroy[Destroy removed changes instead of shelving them]'
+	'(-m --message)'{--message=,-m}'[shelve message]:message text:'
+	'--all[shelve all changes]'
+	'(-q --quiet)'{--quiet,-q}'[be quiet]'
+	'(-v --verbose)'{--verbose,-v}'[display more information]'
+	'*:modified files:_bzr_modifiedFiles'
+	)
+    ;;
+
 (bind|break-lock|reconcile)
     _bzr_completeParents && ret=0
     ;;
