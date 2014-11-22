@@ -1,3 +1,7 @@
+2014-11-21  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: Doc/Zsh/zle.yo: add menu reference to Text Objects
+
 2014-11-21  Oliver Kiddle  <opk@zsh.org>
 
 	* saga.xu: 33712: Completion/Debian/_apt: add --auto-remove
