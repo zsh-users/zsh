@@ -178,6 +178,7 @@ used.
 vindex(sysparams)
 item(tt(sysparams))(
 A readonly associative array.  The keys are:
+
 startitem()
 item(tt(pid))(
 Returns the process ID of the current process, even in subshells.  Compare

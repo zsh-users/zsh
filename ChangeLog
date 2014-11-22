@@ -1,3 +1,8 @@
+2014-11-22  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33763 (cf. Baptiste Daroussin 33747): Doc/Zsh/mod_system.yo:
+	fix nested item list in generated zshmodules.1 man page.
+
 2014-11-21  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33750: Src/text.c: handle function autoloads for DEBUG_BEFORE_CMD
