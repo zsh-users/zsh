@@ -1,5 +1,7 @@
 2014-11-21  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 33750: Src/text.c: handle function autoloads for DEBUG_BEFORE_CMD
+
 	* unposted: Doc/Zsh/zle.yo: add menu reference to Text Objects
 
 2014-11-21  Oliver Kiddle  <opk@zsh.org>

@@ -834,6 +834,10 @@ gettext2(Estate state)
 	    taddstr("))");
 	    stack = 1;
 	    break;
+	case WC_AUTOFN:
+	    taddstr("builtin autoload -X");
+	    stack = 1;
+	    break;
 	case WC_TRY:
 	    if (!s) {
 		taddstr("{");
