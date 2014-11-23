@@ -3161,7 +3161,15 @@ _git-remote () {
             '(-m --master)'{-m,--master=}'[set HEAD of remote to point to given master branch]: :__git_branch_names' \
             '--mirror[do not use separate remotes]' \
             ':name:__git_remotes' \
-            ':url:_urls' && ret=0
+            ':repository:->repository' && ret=0
+	  case $state in
+	    (repository)
+            _alternative \
+              'local-repositories::__git_local_repositories' \
+              'remote-repositories::__git_remote_repositories' \
+	      'urls::_urls' && ret=0
+	    ;;
+	  esac
           ;;
         (rename)
           _arguments \
