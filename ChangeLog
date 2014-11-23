@@ -1,5 +1,7 @@
 2014-11-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 33740: Stephane: Doc/Zsh/expn.yo: "hideval" parameter type.
+
 	* 33740: Stephane: Etc/FAQ.yo: Another way of avoiding MULTIO
 	effects on pipes.
 
