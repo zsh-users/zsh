@@ -623,6 +623,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	zthost = zsh_getipnodebyname(desthost, AF_INET, 0, &herrno);
 	if (!zthost || errflag) {
 	    zwarnnam(nam, "host resolution failure: %s", desthost);
+	    zsfree(desthost);
 	    return 1;
 	}
 	
@@ -630,6 +631,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 
 	if (!sess) {
 	    zwarnnam(nam, "unable to allocate a TCP session slot");
+	    zsfree(desthost);
 	    return 1;
 	}
 
@@ -665,6 +667,8 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 		sess->fd = redup(sess->fd, targetfd);
 		if (sess->fd < 0) {
 		    zerrnam(nam, "could not duplicate socket fd to %d: %e", targetfd, errno);
+		    zsfree(desthost);
+		    tcp_close(sess);
 		    return 1;
 		}
 	    }
