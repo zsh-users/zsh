@@ -1784,7 +1784,14 @@ sect(Why is my output duplicated with `tt(foo 2>&1 >foo.out | bar)'?)
   to both files when the redirector appears twice.  What's going on in the
   first example is exactly the same, however the second redirector is
   disguised as a pipe.  So if you want to turn this effect off, you need
-  to unset the option mytt(MULTIOS).
+  to unset the option mytt(MULTIOS), or alternatively write the following:
+  verb(
+    % { print output; print error >&2 } 2>&1 >&- >foo.out | sed 's/error/erratic/'
+    erratic
+  )
+  By closing stdout with tt(>&-), we're cancelling the previous redirections
+  (to the pipe) and start anew with tt(>foo.out) instead of adding it as a
+  redirection target to stdout.
 
 
 sect(What are these `^' and `~' pattern characters, anyway?)
