@@ -1291,6 +1291,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       pcre_compile pcre_study pcre_exec \
 	       nl_langinfo \
 	       erand48 open_memstream \
+	       posix_openpt \
 	       wctomb iconv \
 	       grantpt unlockpt ptsname \
 	       htons ntohs \

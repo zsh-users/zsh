@@ -1,3 +1,8 @@
+2014-11-23  Oliver Kiddle  <opk@zsh.org>
+
+	* 33743: Src/Modules/zpty.c, configure.ac: use posix_openpt
+	if it is available
+
 2014-11-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 33729: Completion/Unix/Command/_git: "git remote add" should
