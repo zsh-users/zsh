@@ -1,3 +1,9 @@
+2014-11-25  Oliver Kiddle  <opk@zsh.org>
+
+	* users/19365 (credit Death Jester and Jan Larres):
+	Completion/Base/Completer/_external_pwds;
+	completer for current directory of other shell processes
+
 2014-11-25  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33791: Src/loop.c: fatal errors in the try-block part of an
