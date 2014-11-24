@@ -3840,8 +3840,8 @@ getoutput(char *cmd, int qt)
 	    return NULL;
 	untokenize(s);
 	if ((stream = open(unmeta(s), O_RDONLY | O_NOCTTY)) == -1) {
-	    zerr("%e: %s", errno, s);
-	    return NULL;
+	    zwarn("%e: %s", errno, s);
+	    return newlinklist();
 	}
 	return readoutput(stream, qt);
     }

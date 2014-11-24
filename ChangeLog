@@ -1,3 +1,7 @@
+2014-11-23  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33775: Src/exec.c: error opening file in $(<...) is not fatal
+
 2014-11-23  Oliver Kiddle  <opk@zsh.org>
 
 	* 33743: Src/Modules/zpty.c, configure.ac: use posix_openpt
