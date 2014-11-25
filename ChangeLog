@@ -1,5 +1,8 @@
 2014-11-25  Oliver Kiddle  <opk@zsh.org>
 
+	* Jun T: 33769: Test/comptest: workaround for KEYTIMEOUT to
+	work from test cases on Darwin and FreeBSD
+
 	* 33770: Src/Zle/zle_main.c: avoid calling identical FIONREAD
 	ioctl twice in succession
 
