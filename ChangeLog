@@ -1,5 +1,8 @@
 2014-11-25  Oliver Kiddle  <opk@zsh.org>
 
+	* 33770: Src/Zle/zle_main.c: avoid calling identical FIONREAD
+	ioctl twice in succession
+
 	* users/19365 (credit Death Jester and Jan Larres):
 	Completion/Base/Completer/_external_pwds;
 	completer for current directory of other shell processes

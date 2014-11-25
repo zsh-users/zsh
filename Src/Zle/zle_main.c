@@ -238,9 +238,9 @@ zsetterm(void)
 	 * we can't set up the terminal for zle *at all* until
 	 * we are sure there is no more typeahead to come.  So
 	 * if there is typeahead, we set the flag delayzsetterm.
-	 * Then getbyte() performs another FIONREAD call; if that is
-	 * 0, we have finally used up all the typeahead, and it is
-	 * safe to alter the terminal, which we do at that point.
+	 * Then getbyte() calls here to performs another FIONREAD call;
+	 * if that is 0, we have finally used up all the typeahead, and
+	 * it is safe to alter the terminal, which we do at that point.
 	 */
 	delayzsetterm = 1;
 	return;
@@ -884,12 +884,8 @@ getbyte(long do_keytmout, int *timeout)
 	ret = STOUC(kungetbuf[--kungetct]);
     else {
 #ifdef FIONREAD
-	if (delayzsetterm) {
-	    int val;
-	    ioctl(SHTTY, FIONREAD, (char *)&val);
-	    if (!val)
-		zsetterm();
-	}
+	if (delayzsetterm)
+	    zsetterm();
 #endif
 	for (;;) {
 	    int q = queue_signal_level();
