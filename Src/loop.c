@@ -659,8 +659,9 @@ exectry(Estate state, int do_exec)
 
     try_tryflag = save_try_tryflag;
 
-    /* Don't record errflag here, may be reset. */
-    endval = lastval;
+    /* Don't record errflag here, may be reset.  However, */
+    /* endval should show failure when there is an error. */
+    endval = lastval ? lastval : errflag;
 
     freeheap();
 

@@ -1,3 +1,9 @@
+2014-11-25  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33791: Src/loop.c: fatal errors in the try-block part of an
+	"always" construct cause the entire construct to have nonzero
+	status, even when TRY_BLOCK_ERROR is used to suppress the error.
+
 2014-11-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Daniel Hahler: 33746: Doc/Zsh/builtins.yo: read -q refers to -t.
