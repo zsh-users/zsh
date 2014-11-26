@@ -1,3 +1,8 @@
+2014-11-26  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 33793: Src/math.c, Src/utils.c, Doc/Zsh/arith.yo: Arithmetic
+	constants beginning 0b specify binary.
+
 2014-11-25  Oliver Kiddle  <opk@zsh.org>
 
 	* Jun T: 33769: Test/comptest: workaround for KEYTIMEOUT to

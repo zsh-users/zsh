@@ -449,12 +449,14 @@ lexconstant(void)
 	nptr++;
 
     if (*nptr == '0') {
+	int lowchar;
 	nptr++;
-	if (*nptr == 'x' || *nptr == 'X') {
+	lowchar = tolower(*nptr);
+	if (lowchar == 'x' || lowchar == 'b') {
 	    /* Let zstrtol parse number with base */
 	    yyval.u.l = zstrtol_underscore(ptr, &ptr, 0, 1);
 	    /* Should we set lastbase here? */
-	    lastbase = 16;
+	    lastbase = (lowchar == 'b') ? 2 : 16;
 	    if (isset(FORCEFLOAT))
 	    {
 		yyval.type = MN_FLOAT;

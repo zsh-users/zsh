@@ -2082,6 +2082,8 @@ zstrtol_underscore(const char *s, char **t, int base, int underscore)
 	    base = 10;
 	else if (*++s == 'x' || *s == 'X')
 	    base = 16, s++;
+	else if (*s == 'b' || *s == 'B')
+	    base = 2, s++;
 	else
 	    base = 8;
     }

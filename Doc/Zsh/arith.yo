@@ -39,7 +39,8 @@ zero status.
 cindex(arithmetic base)
 cindex(bases, in arithmetic)
 Integers can be in bases other than 10.
-A leading `tt(0x)' or `tt(0X)' denotes hexadecimal.
+A leading `tt(0x)' or `tt(0X)' denotes hexadecimal and a leading
+`tt(0b)' or `tt(0B) binary.
 Integers may also be of the form `var(base)tt(#)var(n)',
 where var(base) is a decimal number between two and thirty-six
 representing the arithmetic base and var(n)
