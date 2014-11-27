@@ -690,7 +690,6 @@ transposewords(UNUSED(char **args))
 	    DECPOS(pos);
 	    if (zleline[pos] == ZWC('\n'))
 		return 1;
-	    x = pos;
 	}
 	for (p4 = x; p4 != zlell && ZC_iword(zleline[p4]); INCPOS(p4))
 	    ;

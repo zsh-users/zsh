@@ -1,3 +1,8 @@
+2014-11-28  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 33815: Src/Zle/zle_word.c: fix word transposition bug where
+	wrong words could be transposed.
+
 2014-11-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33805: Doc/Zsh/params.yo: rewrite intro, tweak formatting
