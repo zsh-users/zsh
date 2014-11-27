@@ -1,48 +1,82 @@
 texinode(Parameters)(Options)(Expansion)(Top)
 chapter(Parameters)
 cindex(parameters)
+cindex(variables)
 sect(Description)
 A parameter has a name, a value, and a number of attributes.
 A name may be any sequence of alphanumeric
 characters and underscores, or the single characters
 `tt(*)', `tt(@)', `tt(#)', `tt(?)', `tt(-)', `tt($)', or `tt(!)'.
-The value may be a em(scalar) (a string),
-an integer, an array (indexed numerically), or an em(associative)
-array (an unordered set of name-value pairs, indexed by name).  To declare
-the type of a parameter, or to assign a scalar or integer value to a
-parameter, use the tt(typeset) builtin.
+A parameter whose name begins with an alphanumeric or underscore is also
+referred to as a em(variable).
+
+cindex(scalar)
+cindex(parameters, scalar)
+cindex(parameters, array)
+cindex(parameters, associative array)
+cindex(hash)
+The attributes of a parameter determine the em(type) of its value, often
+referred to as the parameter type or variable type, and also control
+other processing that may be applied to the value when it is referenced.
+The value type may be a em(scalar) (a string, an integer, or a floating
+point number), an array (indexed numerically), or an em(associative)
+array (an unordered set of name-value pairs, indexed by name, also
+referred to as a em(hash)).
+
+cindex(export)
+cindex(environment)
+cindex(environment variables)
+cindex(variables, environment)
+Named scalar parameters may have the em(exported), tt(-x), attribute, to
+copy them into the process environment, which is then passed from the
+shell to any new processes that it starts.  Exported parameters are called
+em(environment variables). The shell also em(imports) environment variables
+at startup time and automatically marks the corresponding parameters as
+exported.  Some environment variables are not imported for reasons of
+security or because they would interfere with the correct operation of
+other shell features.
+
+cindex(special parameters)
+cindex(parameters, special)
+Parameters may also be em(special), that is, they have a predetermined
+meaning to the shell.  Special parameters cannot have their type changed
+or their readonly attribute turned off, and if a special parameter is
+unset, then later recreated, the special properties will be retained.
+
+To declare the type of a parameter, or to assign a string or numeric value
+to a scalar parameter, use the tt(typeset) builtin.
 findex(typeset, use of)
 
 The value of a scalar or integer parameter may also be assigned by
 writing:
 cindex(assignment)
-
+ifzman()
 indent(var(name)tt(=)var(value))
-
-If the integer attribute, tt(-i), is set for var(name), the var(value)
-is subject to arithmetic evaluation.  Furthermore, by replacing `tt(=)'
-with `tt(+=)', a parameter can be added or appended to.
 
 In scalar assignment, var(value) is expanded as a single string, in
 which the elements of arrays are joined together; filename expansion is
-not performed unless the option tt(GLOB_ASSIGN) is set.  See
-noderef(Array Parameters) for additional forms of assignment.
+not performed unless the option tt(GLOB_ASSIGN) is set.
 
-To refer to the value of a parameter, write `tt($)var(name)' or
+When the integer attribute, tt(-i), or a floating point attribute, tt(-E)
+or tt(-F), is set for var(name), the var(value) is subject to arithmetic
+evaluation.  Furthermore, by replacing `tt(=)' with `tt(+=)', a parameter
+can be incremented or appended to.  See noderef(Array Parameters) and
+ifzman(em(Arithmetic Evaluation) LPAR()in zmanref(zshexpn)RPAR())\
+ifnzman(noderef(Arithmetic Evaluation))
+for additional forms of assignment.
+
+Note that assignment may implicitly change the attributes of a parameter.
+For example, assigning a number to a variable in arithmetic evaluation may
+change its type to integer or float, and with tt(GLOB_ASSIGN) assigning a
+pattern to a variable may change its type to an array.
+
+To reference the value of a parameter, write `tt($)var(name)' or
 `tt(${)var(name)tt(})'.  See
 ifzman(em(Parameter Expansion) in zmanref(zshexpn))\
 ifnzman(noderef(Parameter Expansion))
-for complete details.  This section also explains the effect
+for complete details.  That section also explains the effect
 of the difference between scalar and array assignment on parameter
 expansion.
-
-In the parameter lists that follow, the mark `<S>' indicates that the
-parameter is special.
-Special parameters cannot have their type changed or their
-readonly attribute turned off, and if a special parameter is unset, then
-later recreated, the special properties will be retained.  `<Z>' indicates
-that the parameter does not exist when the shell initializes in tt(sh) or
-tt(ksh) emulation mode.
 startmenu()
 menu(Array Parameters)
 menu(Positional Parameters)
@@ -55,7 +89,7 @@ sect(Array Parameters)
 To assign an array value, write one of:
 findex(set, use of)
 cindex(array assignment)
-
+ifzman()
 indent(tt(set -A) var(name) var(value) ...)
 indent(var(name)tt(=LPAR())var(value) ...tt(RPAR()))
 
@@ -63,16 +97,16 @@ If no parameter var(name) exists, an ordinary array parameter is created.
 If the parameter var(name) exists and is a scalar, it is replaced by a new
 array.  Ordinary array parameters may also be explicitly declared with:
 findex(typeset, use of)
-
+ifzman()
 indent(tt(typeset -a) var(name))
 
 Associative arrays em(must) be declared before assignment, by using:
-
+ifzman()
 indent(tt(typeset -A) var(name))
 
 When var(name) refers to an associative array, the list in an assignment
 is interpreted as alternating keys and values:
-
+ifzman()
 indent(set -A var(name) var(key) var(value) ...)
 indent(var(name)tt(=LPAR())var(key) var(value) ...tt(RPAR()))
 
@@ -81,13 +115,12 @@ assigns to the entire array, deleting any elements that do not appear
 in the list.
 
 To create an empty array (including associative arrays), use one of:
-
+ifzman()
 indent(tt(set -A) var(name))
 indent(var(name)tt(=LPAR()RPAR()))
 
 subsect(Array Subscripts)
 cindex(subscripts)
-
 Individual elements of an array may be selected using a subscript.  A
 subscript of the form `tt([)var(exp)tt(])' selects the single element
 var(exp), where var(exp) is an arithmetic expression which will be subject
@@ -150,7 +183,7 @@ For example, if tt(FOO) is set to `tt(foobar)', then
 subsect(Array Element Assignment)
 
 A subscript may be used on the left side of an assignment like so:
-
+ifzman()
 indent(var(name)tt([)var(exp)tt(]=)var(value))
 
 In this form of assignment the element or range specified by var(exp)
@@ -162,7 +195,7 @@ other elements to accommodate the new values.  (This is not supported for
 associative arrays.)
 
 This syntax also works as an argument to the tt(typeset) command:
-
+ifzman()
 indent(tt(typeset) tt(")var(name)tt([)var(exp)tt(]"=)var(value))
 
 The var(value) may em(not) be a parenthesized list in this case; only
@@ -174,7 +207,7 @@ could be used instead.
 To delete an element of an ordinary array, assign `tt(LPAR()RPAR())' to
 that element.  To delete an element of an associative array, use the
 tt(unset) command:
-
+ifzman()
 indent(tt(unset) tt(")var(name)tt([)var(exp)tt(]"))
 
 subsect(Subscript Flags)
@@ -493,6 +526,10 @@ were never exported has been removed.
 
 texinode(Parameters Set By The Shell)(Parameters Used By The Shell)(Local Parameters)(Parameters)
 sect(Parameters Set By The Shell)
+In the parameter lists that follow, the mark `<S>' indicates that the
+parameter is special.  `<Z>' indicates that the parameter does not exist
+when the shell initializes in tt(sh) or tt(ksh) emulation mode.
+
 The following parameters are automatically set by the shell:
 
 startitem()
@@ -870,7 +907,9 @@ The version number of the release of zsh.
 enditem()
 texinode(Parameters Used By The Shell)()(Parameters Set By The Shell)(Parameters)
 sect(Parameters Used By The Shell)
-The following parameters are used by the shell.
+The following parameters are used by the shell.  Again, `<S>' indicates
+that the parameter is special and `<Z>' indicates that the parameter does
+not exist when the shell initializes in tt(sh) or tt(ksh) emulation mode.
 
 In cases where there are two parameters with an upper- and lowercase
 form of the same name, such as tt(path) and tt(PATH), the lowercase form

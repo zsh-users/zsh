@@ -1,5 +1,7 @@
 2014-11-27  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 33805: Doc/Zsh/params.yo: rewrite intro, tweak formatting
+
 	* 33804: Completion/compinit: hide values of large arrays in
 	typeset output by declaring with the -H attribute
 
