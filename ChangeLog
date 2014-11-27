@@ -1,3 +1,8 @@
+2014-11-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33804: Completion/compinit: hide values of large arrays in
+	typeset output by declaring with the -H attribute
+
 2014-11-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Test/C01arith.ztst: test binary input using 0b.

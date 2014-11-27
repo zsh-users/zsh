@@ -105,17 +105,17 @@ done
 # The associative arrays containing the definitions for the commands and
 # services.
 
-typeset -gA _comps _services _patcomps _postpatcomps
+typeset -gHA _comps _services _patcomps _postpatcomps
 
 # `_compautos' contains the names and options for autoloaded functions
 # that get options.
 
-typeset -gA _compautos
+typeset -gHA _compautos
 
 # The associative array use to report information about the last
 # completion to the outside.
 
-typeset -gA _lastcomp
+typeset -gHA _lastcomp
 
 # Remember dumpfile.
 if [[ -n $_i_dumpfile ]]; then
@@ -127,7 +127,7 @@ fi
 
 # The standard options set in completion functions.
 
-typeset -ga _comp_options
+typeset -gHa _comp_options
 _comp_options=(
        bareglobqual
        extendedglob
@@ -161,7 +161,7 @@ _comp_options=(
 # have a valid stdin descriptor (zle closes it before calling widgets)
 # and don't get confused by user's ZERR trap handlers.
 
-typeset -g _comp_setup='local -A _comp_caller_options;
+typeset -gH _comp_setup='local -A _comp_caller_options;
              _comp_caller_options=(${(kv)options[@]});
              setopt localoptions localtraps localpatterns ${_comp_options[@]};
              local IFS=$'\'\ \\t\\r\\n\\0\''
