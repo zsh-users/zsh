@@ -1,5 +1,9 @@
 2014-11-28  Wayne Davison  <wayned@users.sourceforge.net>
 
+	* unposted: avoid compiler warning about a set-but-not-used var.
+
+2014-11-28  Wayne Davison  <wayned@users.sourceforge.net>
+
 	* 33139: Doc/Zsh/expn.yo: add example for finding broken symlinks.
 
 2014-11-28  Peter Stephenson  <p.stephenson@samsung.com>

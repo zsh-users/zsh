@@ -2590,7 +2590,7 @@ eccopyredirs(Estate s)
 {
     Wordcode pc = s->pc;
     wordcode code = *pc;
-    int ncode, ncodes = 0, r, type;
+    int ncode, ncodes = 0, r;
 
     if (wc_code(code) != WC_REDIR)
 	return NULL;
@@ -2598,7 +2598,9 @@ eccopyredirs(Estate s)
     init_parse();
 
     while (wc_code(code) == WC_REDIR) {
-	type = WC_REDIR_TYPE(code);
+#ifdef DEBUG
+	int type = WC_REDIR_TYPE(code);
+#endif
 
 	DPUTS(type == REDIR_HEREDOC || type == REDIR_HEREDOCDASH,
 	      "unexpanded here document");
