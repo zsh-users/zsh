@@ -1,3 +1,11 @@
+2014-11-28  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* 33819: Test/A06assign.ztst: regression tests for 33816
+
+	* 33816 (2nd part): Src/exec.c: GLOB_ASSIGN changes integer and
+	floating type variables to string scalars rather than treat single
+	match file names as arithmetic expressions
+
 2014-11-28  Wayne Davison  <wayned@users.sourceforge.net>
 
 	* unposted: avoid compiler warning about a set-but-not-used var.
