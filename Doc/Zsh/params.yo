@@ -47,8 +47,7 @@ To declare the type of a parameter, or to assign a string or numeric value
 to a scalar parameter, use the tt(typeset) builtin.
 findex(typeset, use of)
 
-The value of a scalar or integer parameter may also be assigned by
-writing:
+The value of a scalar parameter may also be assigned by writing:
 cindex(assignment)
 ifzman()
 indent(var(name)tt(=)var(value))
