@@ -1702,11 +1702,12 @@ int
 chrealpath(char **junkptr)
 {
     char *str;
-#ifdef HAVE_CANONICALIZE_FILE_NAME
+#ifdef HAVE_REALPATH
+# ifdef REALPATH_ACCEPTS_NULL
     char *lastpos, *nonreal, *real;
-#else
-# ifdef HAVE_REALPATH
-    char *lastpos, *nonreal, real[PATH_MAX];
+# else
+    char *lastpos, *nonreal, pathbuf[PATH_MAX];
+    char *real = pathbuf;
 # endif
 #endif
 
@@ -1717,7 +1718,7 @@ chrealpath(char **junkptr)
     if (!chabspath(junkptr))
 	return 0;
 
-#if !defined(HAVE_REALPATH) && !defined(HAVE_CANONICALIZE_FILE_NAME)
+#ifndef HAVE_REALPATH
     return 1;
 #else
     /*
@@ -1733,29 +1734,21 @@ chrealpath(char **junkptr)
     nonreal = lastpos + 1;
 
     while (!
-#ifdef HAVE_CANONICALIZE_FILE_NAME
-	   /*
-	    * This is a GNU extension to realpath(); it's the
-	    * same as calling realpath() with a NULL second argument
-	    * which uses malloc() to get memory.  The alternative
-	    * interface is easier to test for, however.
-	    */
-	   (real = canonicalize_file_name(*junkptr))
+#ifdef REALPATH_ACCEPTS_NULL
+	   /* realpath() with a NULL second argument uses malloc() to get
+	    * memory so we don't need to worry about overflowing PATH_MAX */
+	   (real = realpath(*junkptr, NULL))
 #else
 	   realpath(*junkptr, real)
 #endif
 	) {
-	if (errno == EINVAL || errno == ELOOP ||
-	    errno == ENAMETOOLONG || errno == ENOMEM)
+	if (errno == EINVAL || errno == ENOMEM)
 	    return 0;
-
-#ifdef HAVE_CANONICALIZE_FILE_NAME
-	if (!real)
-	    return 0;
-#endif
 
 	if (nonreal == *junkptr) {
-	    *real = '\0';
+#ifndef REALPATH_ACCEPTS_NULL
+	    real = NULL;
+#endif
 	    break;
 	}
 
@@ -1771,11 +1764,15 @@ chrealpath(char **junkptr)
 	str++;
     }
 
-    *junkptr = metafy(str = bicat(real, nonreal), -1, META_HEAPDUP);
-    zsfree(str);
-#ifdef HAVE_CANONICALIZE_FILE_NAME
-    free(real);
+    if (real) {
+	*junkptr = metafy(str = bicat(real, nonreal), -1, META_HEAPDUP);
+	zsfree(str);
+#ifdef REALPATH_ACCEPTS_NULL
+	free(real);
 #endif
+    } else {
+	*junkptr = metafy(nonreal, lastpos - nonreal + 1, META_HEAPDUP);
+    }
 #endif
 
     return 1;

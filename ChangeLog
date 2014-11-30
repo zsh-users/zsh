@@ -1,5 +1,8 @@
 2014-11-30  Oliver Kiddle  <opk@zsh.org>
 
+	* 33820: configure.ac, Src/hist.c: detect support for realpath()
+	with a NULL argument and fixes to the use of it
+
 	* 33800: Src/Zle/zle_main.c: remove old workaround for ancient
 	systems to consume typeahead before setting up the terminal
 

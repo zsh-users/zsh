@@ -1302,6 +1302,23 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       cygwin_conv_path)
 AC_FUNC_STRCOLL
 
+AH_TEMPLATE([REALPATH_ACCEPTS_NULL],
+[Define if realpath() accepts NULL as its second argument.])
+AC_CACHE_CHECK([if realpath accepts NULL],
+zsh_cv_func_realpath_accepts_null,
+[AC_RUN_IFELSE([AC_LANG_PROGRAM([
+#include <stdlib.h>
+#include <limits.h>
+],[
+exit(!realpath("/", (char*)0));
+])],
+[zsh_cv_func_realpath_accepts_null=yes],
+[zsh_cv_func_realpath_accepts_null=no],
+[zsh_cv_func_realpath_accepts_null=$ac_cv_func_canonicalize_file_name])])
+if test x$zsh_cv_func_realpath_accepts_null = xyes; then
+  AC_DEFINE(REALPATH_ACCEPTS_NULL)
+fi
+
 if test x$enable_cap = xyes; then
   AC_CHECK_FUNCS(cap_get_proc)
 fi
