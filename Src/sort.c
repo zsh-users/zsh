@@ -368,7 +368,7 @@ strmetasort(char **array, int sortwhat, int *unmetalenp)
     sortdir = (sortwhat & SORTIT_BACKWARDS) ? -1 : 1;
     sortnumeric = (sortwhat & SORTIT_NUMERICALLY) ? 1 : 0;
 
-    qsort(sortptrarr, nsort, sizeof(SortElt *), eltpcmp);
+    qsort(sortptrarr, nsort, sizeof(SortElt), eltpcmp);
 
     sortnumeric = oldsortnumeric;
     sortdir = oldsortdir;

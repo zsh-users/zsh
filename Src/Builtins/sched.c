@@ -346,7 +346,7 @@ schedgetfn(UNUSED(Param pm))
     for (i = 0, sch = schedcmds; sch; sch = sch->next, i++)
 	;
 
-    aptr = ret = zhalloc(sizeof(char **) * (i+1));
+    aptr = ret = zhalloc(sizeof(char *) * (i+1));
     for (sch = schedcmds; sch; sch = sch->next, aptr++) {
 	char tbuf[40], *flagstr;
 	time_t t;

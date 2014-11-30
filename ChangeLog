@@ -1,3 +1,9 @@
+2014-11-30  Oliver Kiddle  <opk@zsh.org>
+
+	* 33818: Src/Builtins/sched.c, Src/Zle/complist.c,
+	Src/exec.c, Src/sort.c, Src/utils.c: fix types passed to sizeof
+	detected by coverity as being wrong
+
 2014-11-28  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* 33819: Test/A06assign.ztst: regression tests for 33816

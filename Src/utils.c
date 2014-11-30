@@ -693,12 +693,12 @@ slashsplit(char *s)
     int t0;
 
     if (!*s)
-	return (char **) zshcalloc(sizeof(char **));
+	return (char **) zshcalloc(sizeof(char *));
 
     for (t = s, t0 = 0; *t; t++)
 	if (*t == '/')
 	    t0++;
-    q = r = (char **) zalloc(sizeof(char **) * (t0 + 2));
+    q = r = (char **) zalloc(sizeof(char *) * (t0 + 2));
 
     while ((t = strchr(s, '/'))) {
 	*q++ = ztrduppfx(s, t - s);
@@ -2955,7 +2955,7 @@ colonsplit(char *s, int uniq)
     for (t = s, ct = 0; *t; t++) /* count number of colons */
 	if (*t == ':')
 	    ct++;
-    ptr = ret = (char **) zalloc(sizeof(char **) * (ct + 2));
+    ptr = ret = (char **) zalloc(sizeof(char *) * (ct + 2));
 
     t = s;
     do {

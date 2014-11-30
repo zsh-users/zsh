@@ -2299,13 +2299,13 @@ addvars(Estate state, Wordcode pc, int addflags)
 	    continue;
 	}
 	if (vl) {
-	    ptr = arr = (char **) zalloc(sizeof(char **) *
+	    ptr = arr = (char **) zalloc(sizeof(char *) *
 					 (countlinknodes(vl) + 1));
 
 	    while (nonempty(vl))
 		*ptr++ = ztrdup((char *) ugetnode(vl));
 	} else
-	    ptr = arr = (char **) zalloc(sizeof(char **));
+	    ptr = arr = (char **) zalloc(sizeof(char *));
 
 	*ptr = NULL;
 	if (xtr) {

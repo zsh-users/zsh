@@ -2059,8 +2059,8 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 
 	i = zterm_columns * listdat.nlines;
 	free(mtab);
-	mtab = (Cmatch **) zalloc(i * sizeof(Cmatch **));
-	memset(mtab, 0, i * sizeof(Cmatch **));
+	mtab = (Cmatch **) zalloc(i * sizeof(Cmatch *));
+	memset(mtab, 0, i * sizeof(Cmatch *));
 	free(mgtab);
 	mgtab = (Cmgroup *) zalloc(i * sizeof(Cmgroup));
 #ifdef DEBUG
