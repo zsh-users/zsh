@@ -1,5 +1,8 @@
 2014-11-30  Oliver Kiddle  <opk@zsh.org>
 
+	* 33800: Src/Zle/zle_main.c: remove old workaround for ancient
+	systems to consume typeahead before setting up the terminal
+
 	* 33818: Src/Builtins/sched.c, Src/Zle/complist.c,
 	Src/exec.c, Src/sort.c, Src/utils.c: fix types passed to sizeof
 	detected by coverity as being wrong

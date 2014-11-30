@@ -187,10 +187,6 @@ mod_export char *zlenoargs[1] = { NULL };
 
 static char **raw_lp, **raw_rp;
 
-#ifdef FIONREAD
-static int delayzsetterm;
-#endif
-
 /*
  * File descriptors we are watching as well as the terminal fd. 
  * These are all for reading; we don't watch for writes or exceptions.
@@ -210,9 +206,6 @@ mod_export void
 zsetterm(void)
 {
     struct ttyinfo ti;
-#if defined(FIONREAD)
-    int val;
-#endif
 
     if (fetchttyinfo) {
 	/*
@@ -223,30 +216,6 @@ zsetterm(void)
 	    gettyinfo(&shttyinfo);
 	fetchttyinfo = 0;
     }
-
-#if defined(FIONREAD)
-    ioctl(SHTTY, FIONREAD, (char *)&val);
-    if (val) {
-	/*
-	 * Problems can occur on some systems when switching from
-	 * canonical to non-canonical input.  The former is usually
-	 * set while running programmes, but the latter is necessary
-	 * for zle.  If there is input in canonical mode, then we
-	 * need to read it without setting up the terminal.  Furthermore,
-	 * while that input gets processed there may be more input
-	 * being typed (i.e. further typeahead).  This means that
-	 * we can't set up the terminal for zle *at all* until
-	 * we are sure there is no more typeahead to come.  So
-	 * if there is typeahead, we set the flag delayzsetterm.
-	 * Then getbyte() calls here to performs another FIONREAD call;
-	 * if that is 0, we have finally used up all the typeahead, and
-	 * it is safe to alter the terminal, which we do at that point.
-	 */
-	delayzsetterm = 1;
-	return;
-    } else
-	delayzsetterm = 0;
-#endif
 
 /* sanitize the tty */
 #ifdef HAS_TIO
@@ -343,7 +312,7 @@ zsetterm(void)
 	ti.ltchars.t_dsuspc = ti.ltchars.t_lnextc = -1;
 #endif
 
-#if defined(TTY_NEEDS_DRAINING) && defined(TIOCOUTQ) && defined(HAVE_SELECT)
+#if defined(TIOCOUTQ) && defined(HAVE_SELECT)
     if (baud) {			/**/
 	int n = 0;
 
@@ -541,11 +510,7 @@ raw_getbyte(long do_keytmout, char *cptr)
      * timeouts may be external, so we may have both a permanent watched
      * fd and a long-term timeout.
      */
-    if ((nwatch || tmout.tp != ZTM_NONE)
-#ifdef FIONREAD
-	&& ! delayzsetterm
-#endif
-	) {
+    if ((nwatch || tmout.tp != ZTM_NONE)) {
 #if defined(HAVE_SELECT) || defined(HAVE_POLL)
 	int i, errtry = 0, selret;
 # ifdef HAVE_POLL
@@ -883,10 +848,6 @@ getbyte(long do_keytmout, int *timeout)
     if (kungetct)
 	ret = STOUC(kungetbuf[--kungetct]);
     else {
-#ifdef FIONREAD
-	if (delayzsetterm)
-	    zsetterm();
-#endif
 	for (;;) {
 	    int q = queue_signal_level();
 	    dont_queue_signals();
