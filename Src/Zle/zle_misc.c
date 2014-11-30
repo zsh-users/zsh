@@ -47,13 +47,13 @@ doinsert(ZLE_STRING_T zstr, int len)
     iremovesuffix(c1, 0);
     invalidatelist();
 
-    if (insmode)
+    /* In overwrite mode, don't replace newlines. */
+    if (insmode || zleline[zlecs] == ZWC('\n'))
 	spaceinline(m * len);
     else
-#ifdef MULTIBYTE_SUPPORT
     {
 	int pos = zlecs, diff, i;
-
+#ifdef MULTIBYTE_SUPPORT
 	/*
 	 * Calculate the number of character positions we are
 	 * going to be using.  The algorithm is that
@@ -68,15 +68,18 @@ doinsert(ZLE_STRING_T zstr, int len)
 	 * useful there anyway and this doesn't cause any
 	 * particular harm.
 	 */
-	for (i = 0, count = 0; i < len; i++) {
+	for (i = 0, count = 0; i < len * m; i++) {
 	    if (!IS_COMBINING(zstr[i]))
 		count++;
 	}
+#else
+	count = len * m;
+#endif
 	/*
-	 * Ensure we replace a complete combining character
-	 * for each character we overwrite.
+	 * Ensure we replace a complete combining characterfor each
+	 * character we overwrite. Switch to inserting at first newline.
 	 */
-	for (i = count; pos < zlell && i--; ) {
+	for (i = count; pos < zlell && zleline[pos] != ZWC('\n') && i--; ) {
 	    INCPOS(pos);
 	}
 	/*
@@ -96,10 +99,6 @@ doinsert(ZLE_STRING_T zstr, int len)
 	    shiftchars(zlecs, diff);
 	}
     }
-#else
-    if (zlecs + m * len > zlell)
-	spaceinline(zlecs + m * len - zlell);
-#endif
     while (m--)
 	for (s = zstr, count = len; count; s++, count--)
 	    zleline[zlecs++] = *s;

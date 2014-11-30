@@ -1,5 +1,8 @@
 2014-11-30  Oliver Kiddle  <opk@zsh.org>
 
+	* 33823: Src/Zle/zle_misc.c, Test/X02zlevi.ztst: overwrite mode
+	shouldn't replace newlines
+
 	* 33820: configure.ac, Src/hist.c: detect support for realpath()
 	with a NULL argument and fixes to the use of it
 

@@ -43,6 +43,19 @@
 >
 >CURSOR: 2
 
+  zletest $'\eOword\eO\eraok\ejrxj.rae'
+0:replace character when at end of buffer or newline
+>BUFFER: ok
+>wxrd
+>e
+>CURSOR: 9
+
+  zletest $'two\eOone\ehRreplace'
+0:replace acts like insert at newline
+>BUFFER: oreplace
+>two
+>CURSOR: 8
+
   zletest $' four\eO\C-v\tthree\eO  two\eOone\e3J'
 0:join lines with line count
 >BUFFER: one two three
