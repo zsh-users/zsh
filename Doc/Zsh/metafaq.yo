@@ -27,10 +27,10 @@ cindex(acquiring zsh by FTP)
 cindex(availability of zsh)
 INCLUDEFILE(Zsh/ftp_sites.yo)\
 
-The up-to-date source code is available via anonymous CVS and Git from
-Sourceforge.  See tt(http://sourceforge.net/projects/zsh/) for details.
-A summary of instructions for the CVS and Git archives can be found at
-tt(http://zsh.sourceforget.net/).
+The up-to-date source code is available via Git from Sourceforge.  See
+tt(http://sourceforge.net/projects/zsh/) for details.  A summary of
+instructions for the archive can be found at
+tt(http://zsh.sourceforge.net/).
 
 texinode(Mailing Lists)(The Zsh FAQ)(Availability)(Introduction)
 sect(Mailing Lists)

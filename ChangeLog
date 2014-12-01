@@ -1,3 +1,8 @@
+2014-12-01  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Jun T: 33830 plus CVS removal: Doc/Zsh/metafaq.yo: typo in
+	sourceforge URL; don't mention CVS.
+
 2014-11-30  Oliver Kiddle  <opk@zsh.org>
 
 	* 33823: Src/Zle/zle_misc.c, Test/X02zlevi.ztst: overwrite mode
