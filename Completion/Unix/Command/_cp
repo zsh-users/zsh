@@ -19,7 +19,7 @@ if _pick_variant gnu=GNU unix --version; then
     '--no-preserve=[don'\''t preserve specified attributes]:attributes not to preserve:_values -s , mode timestamps ownership links context xattr all' \
     '--parents[append source path to target directory]' \
     '(-R -r --recursive)'{-R,-r,--recursive}'[copy directories recursively]' \
-    '--reflink=[control clone/CoW copies]:when to perform a lightweight copy:(always auto)' \
+    '--reflink=-[control clone/CoW copies]::when to perform a lightweight copy:(always auto)' \
     '--remove-destination[remove each existing destination file before attempting to open it]' \
     '--sparse=[control creation of sparse files]:when to create sparse files:(auto always never)' \
     '--strip-trailing-slashes[remove any trailing slashes from each source argument]' \

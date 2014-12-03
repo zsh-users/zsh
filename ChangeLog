@@ -1,3 +1,8 @@
+2014-12-03  Mikael Magnusson  <mikachu@gmail.com>
+
+	* Eric Cook: 33689: Completion/Unix/Command/_cp: make cp
+	--reflink's argument optional
+
 2014-12-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Jun T: 33830 plus CVS removal: Doc/Zsh/metafaq.yo: typo in
