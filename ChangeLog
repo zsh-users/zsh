@@ -1,3 +1,7 @@
+2014-12-04  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33841: Doc/Zsh/params.yo: explain array append a bit better
+
 2014-12-03  Mikael Magnusson  <mikachu@gmail.com>
 
 	* Eric Cook: 33689: Completion/Unix/Command/_cp: make cp
@@ -23,7 +27,7 @@
 	Src/exec.c, Src/sort.c, Src/utils.c: fix types passed to sizeof
 	detected by coverity as being wrong
 
-2014-11-28  Barton E. Schaefer  <schaefer@brasslantern.com>
+2014-11-28  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33819: Test/A06assign.ztst: regression tests for 33816
 

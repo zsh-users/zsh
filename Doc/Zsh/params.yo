@@ -94,7 +94,12 @@ indent(var(name)tt(=LPAR())var(value) ...tt(RPAR()))
 
 If no parameter var(name) exists, an ordinary array parameter is created.
 If the parameter var(name) exists and is a scalar, it is replaced by a new
-array.  Ordinary array parameters may also be explicitly declared with:
+array.  To append to an array without changing the existing values, use
+the syntax:
+ifzman()
+indent(var(name)tt(+=LPAR())var(value) ...tt(RPAR()))
+
+Ordinary array parameters may also be explicitly declared with:
 findex(typeset, use of)
 ifzman()
 indent(tt(typeset -a) var(name))
@@ -110,8 +115,13 @@ indent(set -A var(name) var(key) var(value) ...)
 indent(var(name)tt(=LPAR())var(key) var(value) ...tt(RPAR()))
 
 Every var(key) must have a var(value) in this case.  Note that this
-assigns to the entire array, deleting any elements that do not appear
-in the list.
+assigns to the entire array, deleting any elements that do not appear in
+the list.  The append syntax may also be used with an associative array:
+ifzman()
+indent(var(name)tt(+=LPAR())var(key) var(value) ...tt(RPAR()))
+
+This adds a new key/value pair if the key is not already present, and
+replaces the value for the existing key if it is.
 
 To create an empty array (including associative arrays), use one of:
 ifzman()
@@ -211,7 +221,6 @@ indent(tt(unset) tt(")var(name)tt([)var(exp)tt(]"))
 
 subsect(Subscript Flags)
 cindex(subscript flags)
-
 If the opening bracket, or the comma in a range, in any subscript
 expression is directly followed by an opening parenthesis, the string up
 to the matching closing one is considered to be a list of flags, as in
@@ -351,15 +360,12 @@ patterns used for reverse subscripting (the `tt(r)', `tt(R)', `tt(i)',
 etc. flags), but it may also affect parameter substitutions that appear
 as part of an arithmetic expression in an ordinary subscript.
 
-It is possible to avoid the use of subscripts in assignments to associative
-array elements by using the syntax:
+To avoid subscript parsing limitations in assignments to associative array
+elements, use the append syntax:
 
 example(
    aa+=('key with "*strange*" characters' 'value string')
 )
-
-This adds a new key/value pair if the key is not already present, and
-replaces the value for the existing key if it is.
 
 The basic rule to remember when writing a subscript expression is that all
 text between the opening `tt([)' and the closing `tt(])' is interpreted
