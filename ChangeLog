@@ -34,6 +34,11 @@
 	* 33859 with typo fix: Completion/Base/Core/_main_complete: to
 	propagate signal from trap we need to use function style.
 
+2014-12-05  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33854: Src/glob.c: errors end recursion through scanner(), which
+	makes **/ more easily interruptible
+
 2014-12-04  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33841: Doc/Zsh/params.yo: explain array append a bit better

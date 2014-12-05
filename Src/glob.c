@@ -463,7 +463,7 @@ scanner(Complist q, int shortcircuit)
     int errssofar = errsfound;
     struct dirsav ds;
 
-    if (!q)
+    if (!q || errflag)
 	return;
     init_dirsav(&ds);
 
