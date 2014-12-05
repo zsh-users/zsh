@@ -286,6 +286,7 @@ selectargument(UNUSED(char **args))
     /* convert offsets for mark and zlecs back to ZLE internal format */
     linein[wend] = '\0'; /* a bit of a hack to get two offsets */
     free(stringaszleline(linein, wstarts[wcur], &zlecs, &tmpsz, &mark));
+    free(linein);
 
     if (bindk == t_selectinshellword) {
 	ZLE_CHAR_T *match = ZWS("`\'\"");

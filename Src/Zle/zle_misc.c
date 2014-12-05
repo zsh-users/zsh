@@ -476,9 +476,11 @@ killregion(UNUSED(char **args))
 	    foredel(1, 0);
 	    vifirstnonblank(zlenoargs);
 	}
-    } else if (mark > zlecs)
-	forekill(mark - zlecs + invicmdmode(), CUT_RAW);
-    else {
+    } else if (mark > zlecs) {
+	if (invicmdmode())
+	    INCPOS(mark);
+	forekill(mark - zlecs, CUT_RAW);
+    } else {
 	if (invicmdmode())
 	    INCCS();
 	backkill(zlecs - mark, CUT_FRONT|CUT_RAW);
@@ -490,6 +492,7 @@ killregion(UNUSED(char **args))
 int
 copyregionaskill(char **args)
 {
+    int start, end;
     if (*args) {
         int len;
         ZLE_STRING_T line = stringaszleline(*args, 0, &len, NULL, NULL);
@@ -498,10 +501,16 @@ copyregionaskill(char **args)
     } else {
 	if (mark > zlell)
 	    mark = zlell;
-	if (mark > zlecs)
-	    cut(zlecs, mark - zlecs + invicmdmode(), 0);
-	else
-	    cut(mark, zlecs - mark + invicmdmode(), CUT_FRONT);
+	if (mark > zlecs) {
+	    start = zlecs;
+	    end = mark;
+	} else {
+	    start = mark;
+	    end = zlecs;
+	}
+	if (invicmdmode())
+	    INCPOS(end);
+	cut(start, end - start, mark > zlecs ? 0 : CUT_FRONT);
     }
     return 0;
 }
@@ -1057,7 +1066,9 @@ quoteregion(UNUSED(char **args))
 	mark = zlecs;
 	zlecs = tmp;
     }
-    str = (ZLE_STRING_T)hcalloc((len = mark - zlecs + extra) *
+    if (extra)
+	INCPOS(mark);
+    str = (ZLE_STRING_T)hcalloc((len = mark - zlecs) *
 	ZLE_CHAR_SIZE);
     ZS_memcpy(str, zleline + zlecs, len);
     foredel(len, CUT_RAW);

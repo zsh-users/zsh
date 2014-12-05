@@ -575,7 +575,8 @@ vimatchbracket(UNUSED(char **args))
 
     if ((zlecs == zlell || zleline[zlecs] == '\n') && zlecs > 0)
 	DECCS();
-
+    if (virangeflag)
+	mark = zlecs;
   otog:
     if (zlecs == zlell || zleline[zlecs] == '\n') {
 	zlecs = ocs;
@@ -587,7 +588,6 @@ vimatchbracket(UNUSED(char **args))
 	oth = '}';
 	break;
     case /*{*/ '}':
-	virangeflag = -virangeflag;
 	dir = -1;
 	oth = '{'; /*}*/
 	break;
@@ -596,7 +596,6 @@ vimatchbracket(UNUSED(char **args))
 	oth = ')';
 	break;
     case ')':
-	virangeflag = -virangeflag;
 	dir = -1;
 	oth = '(';
 	break;
@@ -605,7 +604,6 @@ vimatchbracket(UNUSED(char **args))
 	oth = ']';
 	break;
     case ']':
-	virangeflag = -virangeflag;
 	dir = -1;
 	oth = '[';
 	break;
@@ -613,6 +611,8 @@ vimatchbracket(UNUSED(char **args))
 	INCCS();
 	goto otog;
     }
+    if (virangeflag && dir < 0)
+	INCPOS(mark); /* include starting position when going backwards */
     ct = 1;
     while (zlecs >= 0 && zlecs < zlell && ct) {
 	if (dir < 0)
@@ -636,7 +636,7 @@ vimatchbracket(UNUSED(char **args))
 int
 viforwardchar(char **args)
 {
-    int lim = findeol() - invicmdmode() + virangeflag;
+    int lim = findeol();
     int n = zmult;
 
     if (n < 0) {
@@ -646,6 +646,8 @@ viforwardchar(char **args)
 	zmult = n;
 	return ret;
     }
+    if (invicmdmode() && !virangeflag)
+	DECPOS(lim);
     if (zlecs >= lim)
 	return 1;
     while (n-- && zlecs < lim)

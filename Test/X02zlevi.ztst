@@ -317,6 +317,16 @@
 >BUFFER: bhello
 >CURSOR: 5
 
+  zletest $'old\C-w\evyvP'
+0:yank empty selection
+>BUFFER: old
+>CURSOR: 2
+
+  zletest $'old\C-w\evdvP'
+0:delete empty selection
+>BUFFER: old
+>CURSOR: 2
+
   zletest $'one\eotwo\eyykVp'
 0:yank linewise and put over linewise selection at start of buffer
 >BUFFER: two

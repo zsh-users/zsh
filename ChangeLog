@@ -1,5 +1,9 @@
 2014-12-05  Oliver Kiddle  <opk@zsh.org>
 
+	* 33860: Src/Zle/textobjects.c, Src/Zle/zle_misc.c,
+	Src/Zle/zle_move.c, Src/Zle/zle_vi.c, Test/X02zlevi.ztst:
+	minor fixes to vi mode changes
+
 	* 33845: Src/Zle/zle_hist.c: save correct cursor position with
 	push-line from vi command mode
 
