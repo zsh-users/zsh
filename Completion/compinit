@@ -133,6 +133,7 @@ _comp_options=(
        extendedglob
        glob
        multibyte
+       multifuncdef
        nullglob
        rcexpandparam
        unset

@@ -1,5 +1,8 @@
 2014-12-05  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 33866: Completion/compinit: need multifuncdef for TRAPINT
+	TRAPQUIT definition.
+
 	* 33859 with typo fix: Completion/Base/Core/_main_complete: to
 	propagate signal from trap we need to use function style.
 
