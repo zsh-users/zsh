@@ -1,20 +1,35 @@
 #compdef lsof
 
-_arguments -s -S \
+local curcontext="$curcontext" state line fields args
+
+case $OSTYPE in
+  linux*) args=( '-X[skip reporting of info on network connections]' ) ;;
+  solaris*)
+    args=(
+      '-X[include deleted files]'
+      '-z[zone information]::zone:_zones'
+    )
+  ;;
+esac
+
+_arguments -C -s -S $args \
   '(-)'{-\?,-h}'[list help]' \
   '-a[AND selections]' \
   '-b[avoid kernel blocks]' \
   '-C[disable reporting of path name components]' \
-  '-c[list files for command beginning with specified char]:char' \
+  '+c[truncate command name to specified characters]:characters' \
+  '-c[list files with specified command name beginning]:command name' \
   '+d[search for open instances for contents of specified dir]:search directory:_files -/' \
-  '-d[specify list of file descriptors to exclude/include]:file descriptors' \
+  '-d[specify list of file descriptors to exclude/include]:file descriptors:->filedes' \
   '+D[recursively search from specified dir]:search directory:_files -/' \
   '-D[direct use of device cache file]:function:((\?\:report\ device\ cache\ file\ paths b\:build\ the\ device\ cache\ file i\:ignore\ the\ device\ cache\ file r\:read\ the\ device\ cache\ file u\:read\ and\ update\ the\ device\ cache\ file))' \
-  '-f[inhibit listing of kernel file structure info]::info type or path' \
-  '+f[enable listing of kernel file structure info]::info type' \
-  '-F[select output fields]:fields' \
+  '*-+e[exempt filesystem from blocking kernel calls]:file system:_directories' \
+  '-f[inhibit listing of kernel file structure info]::info type or path:(c f g G n)' \
+  '+f[enable listing of kernel file structure info]::info type:(c f g G n)' \
+  '-F[select output fields]:fields:->fields' \
   '-g[select by process group id]::process group id' \
   '*-i[select internet files]:address' \
+  '-K[select listing of tasks of processes]' \
   '-k[specify kernel name list file]:kernel file:_files' \
   '-l[inhibit conversion of UIDs to user names]' \
   '-L[list no link counts]' \
@@ -24,10 +39,10 @@ _arguments -s -S \
   '+M[enable reporting of portmapper registrations]' \
   '-n[inhibit conversion of network numbers to hostnames]' \
   '-N[select listing of NFS files]' \
-  '(-s)-o[list file offset]' \
+  '(-s)-o[list file offset]::digits for file offset' \
   '-O[avoid overheads of bypassing potential blocking]' \
   '-P[inhibit conversion of port numbers to port names]' \
-  '-p[list files for specified processes]:process ID:_pids' \
+  '-p[list files for specified processes]:process ID:_sequence -s , _pids' \
   '-r[repeat listing endlessly]::delay (seconds)' \
   '+r[repeat listing until no files listed]::delay (seconds)' \
   '-R[list parent PID]' \
@@ -41,4 +56,19 @@ _arguments -s -S \
   '-V[indicate unsuccessfully searched for items]' \
   '(-t)+w[suppress warnings]' \
   '(-t)-w[enable warnings]' \
-  '*:file:_files'
+  '-x[cross filesystems/traverse symlinks with +d/+D]::type:((f\:filesystems s\:symlinks))' \
+  '*:file:_files' && return
+
+case $state in
+  fields)
+    fields=( ${${${${(f)"$($words[1] -F \? 2>&1)"}[2,-1]#??}//  ##/:}:#(#s)[${PREFIX:-:}]:*} )
+    compset -P '*'
+    _describe -t fields "field" fields -S '' && return
+  ;;
+  filedes)
+    _sequence -s , _wanted -x file-descriptors expl "file descriptor" compadd - \
+        cwd err jld ltz mem mmap pd rtd tr txt v86 && return
+  ;;
+esac
+
+return 1

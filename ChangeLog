@@ -1,5 +1,8 @@
 2014-12-05  Oliver Kiddle  <opk@zsh.org>
 
+	* 33861: Completion/Unix/Command/_lsof:
+	update lsof completion for new options
+
 	* 33860: Src/Zle/textobjects.c, Src/Zle/zle_misc.c,
 	Src/Zle/zle_move.c, Src/Zle/zle_vi.c, Test/X02zlevi.ztst:
 	minor fixes to vi mode changes
