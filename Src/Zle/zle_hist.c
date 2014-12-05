@@ -821,6 +821,8 @@ pushline(UNUSED(char **args))
     zpushnode(bufstack, zlelineasstring(zleline, zlell, 0, NULL, NULL, 0));
     while (--n)
 	zpushnode(bufstack, ztrdup(""));
+    if (invicmdmode())
+	INCCS();
     stackcs = zlecs;
     *zleline = ZWC('\0');
     zlell = zlecs = 0;

@@ -1,3 +1,8 @@
+2014-12-05  Oliver Kiddle  <opk@zsh.org>
+
+	* 33845: Src/Zle/zle_hist.c: save correct cursor position with
+	push-line from vi command mode
+
 2014-12-05  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 33866: Completion/compinit: need multifuncdef for TRAPINT
