@@ -213,7 +213,7 @@ case $state in
     ".:plain files"
     "@:symbolic links"
     "=:sockets"
-    "p:name pipes (FIFOS)"
+    "p:named pipes (FIFOs)"
     "*:executable plain files"
     "%:device files"
     "r:owner-readable"

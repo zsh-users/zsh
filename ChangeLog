@@ -1,6 +1,12 @@
+2014-12-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Daniel Shahaf: 33883: Doc/Zsh/expn.yo,
+	Completion/Zsh/Type/_globquals: documentation for (*) glob
+	qualifier.
+
 2014-12-07  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
-	* 33829: Test/X02zlevi.ztst, Test/comptest: unbind ESC~ as
+	* 33829: Test/X02zlevi.ztst, Test/comptest: unbind ESC~ asa
 	a more reliable workaround
 
 2014-12-06  Mikael Magnusson  <mikachu@gmail.com>
