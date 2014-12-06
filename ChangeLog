@@ -1,3 +1,8 @@
+2014-12-06  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 33882: Completion/Unix/Command/_gcc: Complete CXXFLAGS as
+	CFLAGS too
+
 2014-12-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 33861: Completion/Unix/Command/_lsof:

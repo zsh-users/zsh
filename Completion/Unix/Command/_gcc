@@ -1,4 +1,4 @@
-#compdef gcc g++ cc c++ llvm-gcc llvm-g++ clang clang++ -value-,LDFLAGS,-default- -value-,CFLAGS,-default- -value-,CPPFLAGS,-default-
+#compdef gcc g++ cc c++ llvm-gcc llvm-g++ clang clang++ -value-,LDFLAGS,-default- -value-,CFLAGS,-default- -value-,CXXFLAGS,-default- -value-,CPPFLAGS,-default-
 
 local curcontext="$curcontext" state line ret=1 expl args args2 march
 typeset -A opt_args
