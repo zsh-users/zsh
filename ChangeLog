@@ -1,5 +1,8 @@
 2014-12-07  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 33901: Completion/Base/Core/_main_complete: fix warning message
+	reference to funcstack (updates 33859)
+
 	* 33894: Src/utils.c: boundary conditions in unmeta(), unmetafy()
 
 2014-12-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
