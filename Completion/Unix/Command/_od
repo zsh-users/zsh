@@ -19,7 +19,6 @@ args=(
   {-l,-I,-L}'[output decimal longs (-t dL)]'
   {-o,-B}'[output octal shorts (-t o2)]'
   '-s[output decimal shorts (-t d2)]'
-  '*:files:_files'
 )
 
 if _pick_variant gnu=GNU unix --version; then
@@ -49,7 +48,7 @@ else
   esac
 fi
 
-_arguments -C -s -S : "$args[@]" && return 0
+_arguments -C -s -S : "$args[@]" '*:files:_files' && return 0
 
 case "$state" in
   (format)
