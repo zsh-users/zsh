@@ -37,6 +37,7 @@
 >3
 >CURSOR: 5
 
+  zpty_run 'bindkey -r "\e~"'
   zletest $'\e' $'~aI\e' $'~o\e' \~
 0:swap case on a blank line
 >BUFFER: i
