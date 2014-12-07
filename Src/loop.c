@@ -643,7 +643,7 @@ exectry(Estate state, int do_exec)
 {
     Wordcode end, always;
     int endval;
-    int save_retflag, save_breaks, save_contflag;
+    int save_retflag, save_breaks, save_contflag, try_interrupt;
     zlong save_try_errflag, save_try_tryflag;
 
     end = state->pc + WC_TRY_SKIP(state->pc[-1]);
@@ -671,8 +671,10 @@ exectry(Estate state, int do_exec)
 
     /* The always clause. */
     save_try_errflag = try_errflag;
-    try_errflag = (zlong)errflag;
-    errflag &= ~ERRFLAG_ERROR;
+    try_errflag = (zlong)(errflag & ERRFLAG_ERROR);
+    try_interrupt = errflag & ERRFLAG_INT;
+    /* We need to reset all errors to allow the block to execute */
+    errflag = 0;
     save_retflag = retflag;
     retflag = 0;
     save_breaks = breaks;
@@ -687,6 +689,17 @@ exectry(Estate state, int do_exec)
 	errflag |= ERRFLAG_ERROR;
     else
 	errflag &= ~ERRFLAG_ERROR;
+    /*
+     * TODO: currently, we always restore the interrupt
+     * error status.  We should have a way of clearing it.
+     * Doing this with try_errflag (the shell variable TRY_BLOCK_ERROR)
+     * is probably not a good idea since currently that's documented
+     * such that setting it to 0 clears errors, and we don't want
+     * to clear interrupts as a side effect.  So it probably needs
+     * a different variable.
+     */
+    if (try_interrupt)
+	errflag |= ERRFLAG_INT;
     try_errflag = save_try_errflag;
     if (!retflag)
 	retflag = save_retflag;
