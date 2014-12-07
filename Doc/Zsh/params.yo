@@ -754,6 +754,17 @@ It may be reset, clearing the error condition.  See
 ifzman(em(Complex Commands) in zmanref(zshmisc))\
 ifnzman(noderef(Complex Commands))
 )
+vinde(TRY_BLOCK_INTERRUPT)
+item(tt(TRY_BLOCK_INTERRUPT) <S>)(
+This variable works in a similar way to tt(TRY_BLOCK_ERROR), but
+represents the status of an interrupt from the signall SIGINT, which
+typically comes from the keyboard when the user types tt(^C).  If set to
+0, any such interrupt will be reset; otherwise, the interrupt is
+propagated after the tt(always) block.
+
+Note that it is possible that an interrupt arrives during the execution
+of the tt(always) block; this interrupt is also propagated.
+)
 vindex(TTY)
 item(tt(TTY))(
 The name of the tty associated with the shell, if any.
