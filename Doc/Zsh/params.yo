@@ -757,7 +757,7 @@ ifnzman(noderef(Complex Commands))
 vinde(TRY_BLOCK_INTERRUPT)
 item(tt(TRY_BLOCK_INTERRUPT) <S>)(
 This variable works in a similar way to tt(TRY_BLOCK_ERROR), but
-represents the status of an interrupt from the signall SIGINT, which
+represents the status of an interrupt from the signal SIGINT, which
 typically comes from the keyboard when the user types tt(^C).  If set to
 0, any such interrupt will be reset; otherwise, the interrupt is
 propagated after the tt(always) block.
