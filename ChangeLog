@@ -1,3 +1,7 @@
+2014-12-07  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 33894: Src/utils.c: boundary conditions in unmeta(), unmetafy()
+
 2014-12-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Daniel Shahaf: 33883: Doc/Zsh/expn.yo,

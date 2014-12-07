@@ -4164,7 +4164,7 @@ unmetafy(char *s, int *len)
 
     for (p = s; *p && *p != Meta; p++);
     for (t = p; (*t = *p++);)
-	if (*t++ == Meta)
+	if (*t++ == Meta && *p)
 	    t[-1] = *p++ ^ 32;
     if (len)
 	*len = t - s;
@@ -4208,8 +4208,10 @@ unmeta(const char *file_name)
     
     meta = 0;
     for (t = file_name; *t; t++) {
-	if (*t == Meta)
-	    meta = 1;
+	if (*t == Meta) {
+	    meta = t[1];
+	    break;
+	}
     }
     if (!meta) {
 	/*
