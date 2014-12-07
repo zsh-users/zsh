@@ -682,7 +682,7 @@ parsecomplist(char *instr)
 	/* Now get the next path component if there is one. */
 	l1 = (Complist) zhalloc(sizeof *l1);
 	if ((l1->next = parsecomplist(instr)) == NULL) {
-	    errflag = 1;
+	    errflag |= ERRFLAG_ERROR;
 	    return NULL;
 	}
 	l1->pat = patcompile(NULL, compflags | PAT_ANY, NULL);
@@ -728,7 +728,7 @@ parsecomplist(char *instr)
 	    return (ef && !l1->next) ? NULL : l1;
 	}
     }
-    errflag = 1;
+    errflag |= ERRFLAG_ERROR;
     return NULL;
 }
 
@@ -1790,7 +1790,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 	    insertlinknode(list, node, ostr);
 	    return;
 	}
-	errflag = 0;
+	errflag &= ~ERRFLAG_ERROR;
 	zerr("bad pattern: %s", ostr);
 	return;
     }
@@ -1873,7 +1873,8 @@ zglob(LinkList list, LinkNode np, int nountok)
 				tmpptr->sortstrs[iexec] = tmpptr->name;
 			}
 
-			errflag = ef;
+			/* Retain any user interrupt error status */
+			errflag = ef | (errflag & ERRFLAG_INT);
 			lastval = lv;
 		    } else {
 			/* Failed, let's be safe */
@@ -3733,7 +3734,8 @@ qualsheval(char *name, UNUSED(struct stat *buf), UNUSED(off_t days), char *str)
 	execode(prog, 1, 0, "globqual");
 
 	ret = lastval;
-	errflag = ef;
+	/* Retain any user interrupt error status */
+	errflag = ef | (errflag & ERRFLAG_INT);
 	lastval = lv;
 
 	if (!(inserts = getaparam("reply")) &&

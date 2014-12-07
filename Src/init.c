@@ -123,6 +123,11 @@ loop(int toplevel, int justonce)
 		    hbegin(1);
 		else
 		    stophist = hstop;
+		/*
+		 * Reset all errors, including user interupts.
+		 * This is what allows ^C in an interactive shell
+		 * to return us to the command line.
+		 */
 		errflag = 0;
 	    }
 	}
@@ -178,7 +183,15 @@ loop(int toplevel, int justonce)
 
 		/* The only permanent storage is from getpermtext() */
 		zsfree(cmdstr);
-		errflag = 0;
+		/*
+		 * Note this does *not* remove a user interrupt error
+		 * condition, even though we're at the top level loop:
+		 * that would be inconsistent with the case where
+		 * we didn't execute a preexec function.  This is
+		 * an implementation detail that an interrupting user
+		 * does't care about.
+		 */
+		errflag &= ~ERRFLAG_ERROR;
 	    }
 	    if (stopmsg)	/* unset 'you have stopped jobs' flag */
 		stopmsg--;
@@ -689,7 +702,7 @@ init_term(void)
     {
 	if (isset(INTERACTIVE))
 	    zerr("can't find terminal definition for %s", term);
-	errflag = 0;
+	errflag &= ~ERRFLAG_ERROR;
 	termflags |= TERM_BAD;
 	return 0;
     } else {
@@ -1336,7 +1349,7 @@ source(char *s)
 
     if (prog) {
 	pushheap();
-	errflag = 0;
+	errflag &= ~ERRFLAG_ERROR;
 	execode(prog, 1, 0, "filecode");
 	popheap();
 	if (errflag)
@@ -1379,7 +1392,7 @@ source(char *s)
     lineno = oldlineno;              /* our current lineno                   */
     loops = oloops;                  /* the # of nested loops we are in      */
     dosetopt(SHINSTDIN, oldshst, 1, opts); /* SHINSTDIN option               */
-    errflag = 0;
+    errflag &= ~ERRFLAG_ERROR;
     if (!exit_pending)
 	retflag = 0;
     scriptname = old_scriptname;

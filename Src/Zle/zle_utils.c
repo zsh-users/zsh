@@ -1715,7 +1715,8 @@ zlecallhook(char *name, char *arg)
     execzlefunc(thingy, args, 1);
     unrefthingy(thingy);
 
-    errflag = saverrflag;
+    /* Retain any user interrupt error status */
+    errflag = saverrflag | (errflag & ERRFLAG_INT);
     retflag = savretflag;
 }
 

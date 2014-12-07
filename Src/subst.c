@@ -2822,7 +2822,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		haserr = parse_subst_string(s);
 		noerrs = one;
 		if (!quoteerr) {
-		    errflag = oef;
+		    /* Retain user interrupt error status */
+		    errflag = oef | (errflag & ERRFLAG_INT);
 		    if (haserr)
 			shtokenize(s);
 		} else if (haserr || errflag) {
@@ -3249,8 +3250,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		haserr = 1;
 	}
 	noerrs = one;
-	if (!quoteerr)
-	    errflag = oef;
+	if (!quoteerr) {
+	    /* Retain user interrupt error status */
+	    errflag = oef | (errflag & ERRFLAG_INT);
+	}
 	if (haserr || errflag)
 	    return NULL;
     }
@@ -3483,8 +3486,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		    untokenize(*ap);
 		}
 		noerrs = one;
-		if (!quoteerr)
-		    errflag = oef;
+		if (!quoteerr) {
+		    /* Retain any user interrupt error status */
+		    errflag = oef | (errflag & ERRFLAG_INT);
+		}
 		else if (haserr || errflag) {
 		    zerr("parse error in parameter value");
 		    return NULL;
@@ -3516,8 +3521,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		    noerrs = 1;
 		haserr = parse_subst_string(val);
 		noerrs = one;
-		if (!quoteerr)
-		    errflag = oef;
+		if (!quoteerr) {
+		    /* Retain any user interrupt error status */
+		    errflag = oef | (errflag & ERRFLAG_INT);
+		}
 		else if (haserr || errflag) {
 		    zerr("parse error in parameter value");
 		    return NULL;
@@ -4086,7 +4093,8 @@ modify(char **str, char **ptr)
 			    noerrs = 1;
 			    parse_subst_string(copy);
 			    noerrs = one;
-			    errflag = oef;
+			    /* Retain any user interrupt error status */
+			    errflag = oef | (errflag & ERRFLAG_INT);
 			    remnulargs(copy);
 			    untokenize(copy);
 			}
@@ -4161,7 +4169,8 @@ modify(char **str, char **ptr)
 			noerrs = 1;
 			parse_subst_string(*str);
 			noerrs = one;
-			errflag = oef;
+			/* Retain any user interrupt error status */
+			errflag = oef | (errflag & ERRFLAG_INT);
 			remnulargs(*str);
 			untokenize(*str);
 		    }

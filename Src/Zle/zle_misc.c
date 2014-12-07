@@ -1041,7 +1041,7 @@ copyprevshellword(UNUSED(char **args))
 int
 sendbreak(UNUSED(char **args))
 {
-    errflag = 1;
+    errflag |= ERRFLAG_ERROR;
     return 1;
 }
 

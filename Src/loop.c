@@ -259,7 +259,8 @@ execselect(Estate state, UNUSED(int do_exec))
 				   0, ZLCON_SELECT);
 		    if (errflag)
 			str = NULL;
-		    errflag = oef;
+		    /* Keep any user interrupt error status */
+		    errflag = oef | (errflag & ERRFLAG_INT);
 	    	} else {
 		    str = promptexpand(prompt3, 0, NULL, NULL, NULL);
 		    zputs(str, stderr);
@@ -671,7 +672,7 @@ exectry(Estate state, int do_exec)
     /* The always clause. */
     save_try_errflag = try_errflag;
     try_errflag = (zlong)errflag;
-    errflag = 0;
+    errflag &= ~ERRFLAG_ERROR;
     save_retflag = retflag;
     retflag = 0;
     save_breaks = breaks;
@@ -682,7 +683,10 @@ exectry(Estate state, int do_exec)
     state->pc = always;
     execlist(state, 1, do_exec);
 
-    errflag = try_errflag ? 1 : 0;
+    if (try_errflag)
+	errflag |= ERRFLAG_ERROR;
+    else
+	errflag &= ~ERRFLAG_ERROR;
     try_errflag = save_try_errflag;
     if (!retflag)
 	retflag = save_retflag;

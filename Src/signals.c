@@ -619,7 +619,7 @@ zhandler(int sig)
 		zexit(SIGINT, 1);
             if (list_pipe || chline || simple_pline) {
                 breaks = loops;
-                errflag = 1;
+                errflag |= ERRFLAG_INT;
 		inerrflush();
 		check_cursh_sig(SIGINT);
             }
@@ -640,6 +640,11 @@ zhandler(int sig)
 	    if (idle >= 0 && idle < tmout)
 		alarm(tmout - idle);
 	    else {
+		/*
+		 * We want to exit now.
+		 * Cancel all errors, including a user interrupt
+		 * which is now redundant.
+		 */
 		errflag = noerrs = 0;
 		zwarn("timeout");
 		stopmsg = 1;
@@ -1267,7 +1272,18 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	!(isfunc && new_trap_return == 0)) {
 	if (isfunc) {
 	    breaks = loops;
-	    errflag = 1;
+	    /*
+	     * For SIGINT we behave the same as the default behaviour
+	     * i.e. we set the error bit indicating an interrupt.
+	     * We do this with SIGQUIT, too, even though we don't
+	     * handle SIGQUIT by default.  That's to try to make
+	     * it behave a bit more like its normal behaviour when
+	     * the trap handler has told us that's what it wants.
+	     */
+	    if (sig == SIGINT || sig == SIGQUIT)
+		errflag |= ERRFLAG_INT;
+	    else
+		errflag |= ERRFLAG_ERROR;
 	}
 	lastval = new_trap_return;
 	/* return triggered */
@@ -1282,8 +1298,12 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	     */
 	    lastval = olastval;
 	}
-	if (try_tryflag)
-	    errflag = traperr;
+	if (try_tryflag) {
+	    if (traperr)
+		errflag |= ERRFLAG_ERROR;
+	    else
+		errflag &= ~ERRFLAG_ERROR;
+	}
 	breaks += obreaks;
 	/* return not triggered: restore old flag */
 	retflag = oretflag;

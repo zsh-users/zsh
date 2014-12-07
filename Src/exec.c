@@ -59,7 +59,7 @@ mod_export int noerrs;
 /**/
 int nohistsave;
 
-/* error/break flag */
+/* error flag: bits from enum errflag_bits */
 
 /**/
 mod_export int errflag;
@@ -1601,7 +1601,8 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			    (killpg(jobtab[list_pipe_job].gleader, 0) == -1 ? 2 : 1);
 			list_pipe_pid = pid;
 			list_pipe_start = bgtime;
-			nowait = errflag = 1;
+			nowait = 1;
+			errflag |= ERRFLAG_ERROR;
 			breaks = loops;
 			close(synch[1]);
 			read_loop(synch[0], &dummy, 1);
@@ -1634,7 +1635,10 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			list_pipe_child = 1;
 			opts[INTERACTIVE] = 0;
 			if (errbrk_saved) {
-			    errflag = prev_errflag;
+			    /*
+			     * Keep any user interrupt bit in errflag.
+			     */
+			    errflag = prev_errflag | (errflag & ERRFLAG_INT);
 			    breaks = prev_breaks;
 			}
 			break;
@@ -1719,12 +1723,14 @@ execpline2(Estate state, wordcode pcode,
 
 	    if (pipe(synch) < 0) {
 		zerr("pipe failed: %e", errno);
-		lastval = errflag = 1;
+		lastval = 1;
+		errflag |= ERRFLAG_ERROR;
 		return;
 	    } else if ((pid = zfork(&bgtime)) == -1) {
 		close(synch[0]);
 		close(synch[1]);
-		lastval = errflag = 1;
+		lastval = 1;
+		errflag |= ERRFLAG_ERROR;
 		return;
 	    } else if (pid) {
 		char dummy, *text;
@@ -2560,7 +2566,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		while (next && *next == '-' && strlen(next) >= 2) {
 		    if (!firstnode(args)) {
 			zerr("exec requires a command to execute");
-			errflag = lastval = 1;
+			lastval = 1;
+			errflag |= ERRFLAG_ERROR;
 			goto done;
 		    }
 		    uremnode(args, firstnode(args));
@@ -2577,12 +2584,14 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			    } else {
 				if (!firstnode(args)) {
 				    zerr("exec requires a command to execute");
-				    errflag = lastval = 1;
+				    lastval = 1;
+				    errflag |= ERRFLAG_ERROR;
 				    goto done;
 				}
 				if (!nextnode(firstnode(args))) {
 				    zerr("exec flag -a requires a parameter");
-				    errflag = lastval = 1;
+				    lastval = 1;
+				    errflag |= ERRFLAG_ERROR;
 				    goto done;
 				}
 				exec_argv0 = (char *)
@@ -2598,7 +2607,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			    break;
 			default:
 			    zerr("unknown exec flag -%c", *cmdopt);
-			    errflag = lastval = 1;
+			    lastval = 1;
+			    errflag |= ERRFLAG_ERROR;
 			    return;
 			}
 		    }
@@ -2661,7 +2671,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    } else if (!nullcmd || !*nullcmd || opts[CSHNULLCMD] ||
 			       (cflags & BINF_PREFIX)) {
 			zerr("redirection with no command");
-			errflag = lastval = 1;
+			lastval = 1;
+			errflag |= ERRFLAG_ERROR;
 			return;
 		    } else if (!nullcmd || !*nullcmd || opts[SHNULLCMD]) {
 			if (!args)
@@ -2691,7 +2702,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    if (varspc)
 			addvars(state, varspc, 0);
 		    if (errflag)
-			lastval = errflag;
+			lastval = errflag ? 1 : 0;
 		    else
 			lastval = cmdoutval;
 		    if (isset(XTRACE)) {
@@ -2795,7 +2806,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    }
 	}
 	if (!nextnode(firstnode(args)))
-	    errflag = 1;
+	    errflag |= ERRFLAG_ERROR;
     }
 
     if (type == WC_FUNCDEF) {
@@ -2940,7 +2951,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	} else if ((pid = zfork(&bgtime)) == -1) {
 	    close(synch[0]);
 	    close(synch[1]);
-	    lastval = errflag = 1;
+	    lastval = 1;
+	    errflag |= ERRFLAG_ERROR;
 	    goto fatal;
 	}
 	if (pid) {
@@ -3529,7 +3541,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		else
 		    exit(1);
 	    }
-	    errflag = 1;
+	    errflag |= ERRFLAG_ERROR;
 	}
     }
     if (newxtrerr) {
@@ -3759,8 +3771,10 @@ gethere(char **strp, int typ)
 
 	parsestr(buf);
 
-	if (!errflag)
-	    errflag = ef;
+	if (!errflag) {
+	    /* Retain any user interrupt error */
+	    errflag = ef | (errflag & ERRFLAG_INT);
+	}
     }
     s = dupstring(buf);
     zfree(buf, bsiz);
@@ -3854,7 +3868,7 @@ getoutput(char *cmd, int qt)
 	return readoutput(stream, qt);
     }
     if (mpipe(pipes) < 0) {
-	errflag = 1;
+	errflag |= ERRFLAG_ERROR;
 	cmdoutpid = 0;
 	return NULL;
     }
@@ -3864,7 +3878,7 @@ getoutput(char *cmd, int qt)
 	/* fork error */
 	zclose(pipes[0]);
 	zclose(pipes[1]);
-	errflag = 1;
+	errflag |= ERRFLAG_ERROR;
 	cmdoutpid = 0;
 	child_unblock();
 	return NULL;
@@ -4274,7 +4288,7 @@ execcond(Estate state, UNUSED(int do_exec))
      * into a shell error.
      */
     if (stat == 2)
-	errflag = 1;
+	errflag |= ERRFLAG_ERROR;
     cmdpop();
     if (isset(XTRACE)) {
 	fprintf(xtrerr, " ]]\n");
@@ -4314,7 +4328,7 @@ execarith(Estate state, UNUSED(int do_exec))
 	fflush(xtrerr);
     }
     if (errflag) {
-	errflag = 0;
+	errflag &= ~ERRFLAG_ERROR;
 	return 2;
     }
     /* should test for fabs(val.u.d) < epsilon? */
@@ -4932,7 +4946,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 						(name = fname)))) {
 	    zwarn("%s: function not defined by file", name);
 	    if (noreturnval)
-		errflag = 1;
+		errflag |= ERRFLAG_ERROR;
 	    else
 		lastval = 1;
 	    goto doneshfunc;

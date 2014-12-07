@@ -385,7 +385,7 @@ lexrestore(void)
     ecnfunc = ln->ecnfunc;
     hlinesz = ln->hlinesz;
     toklineno = ln->toklineno;
-    errflag = 0;
+    errflag &= ~ERRFLAG_ERROR;
     free(ln);
 
     unqueue_signals();
@@ -1725,7 +1725,8 @@ parse_subst_string(char *s)
     inpop();
     DPUTS(cmdsp, "BUG: parse_subst_string: cmdstack not empty.");
     lexrestore();
-    errflag = err;
+    /* Keep any interrupt error status */
+    errflag = err | (errflag & ERRFLAG_INT);
     if (ctok == LEXERR) {
 	untokenize(s);
 	return 1;

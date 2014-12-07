@@ -829,7 +829,7 @@ docomplete(int lst)
 	    if (olst == COMP_EXPAND_COMPLETE &&
 		!strcmp(ol, zlemetaline)) {
 		zlemetacs = ocs;
-		errflag = 0;
+		errflag &= ~ERRFLAG_ERROR;
 
 		if (!compfunc) {
 		    char *p;
@@ -877,6 +877,19 @@ docomplete(int lst)
 
     active = 0;
     makecommaspecial(0);
+
+    /*
+     * As a special case, we reset user interrupts here.
+     * That's because completion is an intensive piece of
+     * computation that the user might want to interrupt separately
+     * from anything else going on.  If they do, they probably
+     * want to keep the line edit buffer intact.
+     *
+     * There's a race here that the user might hit ^C just
+     * after completion exited anyway, but that's inevitable.
+     */
+    errflag &= ~ERRFLAG_INT;
+
     return dat[1];
 }
 
@@ -1394,7 +1407,8 @@ get_comp_string(void)
     }
     strinend();
     inpop();
-    errflag = lexflags = 0;
+    lexflags = 0;
+    errflag &= ~ERRFLAG_ERROR;
     if (parbegin != -1) {
 	/* We are in command or process substitution if we are not in
 	 * a $((...)). */
@@ -2917,7 +2931,7 @@ getcurcmd(void)
     popheap();
     strinend();
     inpop();
-    errflag = 0;
+    errflag &= ~ERRFLAG_ERROR;
     unmetafy_line();
     lexrestore();
 

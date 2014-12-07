@@ -291,7 +291,8 @@ inputline(void)
     }
     if (errflag) {
 	free(ingetcline);
-	return lexstop = errflag = 1;
+	errflag |= ERRFLAG_ERROR;
+	return lexstop = 1;
     }
     if (isset(VERBOSE)) {
 	/* Output the whole line read so far. */

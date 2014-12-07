@@ -153,7 +153,7 @@ VA_DCL
 
     if (errflag || noerrs) {
 	if (noerrs < 2)
-	    errflag = 1;
+	    errflag |= ERRFLAG_ERROR;
 	return;
     }
 
@@ -161,7 +161,7 @@ VA_DCL
     VA_GET_ARG(ap, fmt, const char *);
     zwarning(NULL, fmt, ap);
     va_end(ap);
-    errflag = 1;
+    errflag |= ERRFLAG_ERROR;
 }
 
 /**/
@@ -181,7 +181,7 @@ VA_DCL
     VA_GET_ARG(ap, fmt, const char *);
     zwarning(cmd, fmt, ap);
     va_end(ap);
-    errflag = 1;
+    errflag |= ERRFLAG_ERROR;
 }
 
 /**/
@@ -330,7 +330,7 @@ zerrmsg(FILE *file, const char *fmt, va_list ap)
 		num = va_arg(ap, int);
 		if (num == EINTR) {
 		    fputs("interrupt\n", file);
-		    errflag = 1;
+		    errflag |= ERRFLAG_ERROR;
 		    return;
 		}
 		errmsg = strerror(num);

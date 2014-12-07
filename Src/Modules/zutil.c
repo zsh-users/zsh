@@ -301,7 +301,8 @@ setstypat(Style s, char *pat, Patprog prog, char **vals, int eval)
 	int ef = errflag;
 
 	eprog = parse_string(zjoin(vals, ' ', 1), 0);
-	errflag = ef;
+	/* Keep any user interrupt error status */
+	errflag = ef | (errflag & ERRFLAG_INT);
 
 	if (!eprog)
 	{
@@ -394,10 +395,11 @@ evalstyle(Stypat p)
     unsetparam("reply");
     execode(p->eval, 1, 0, "style");
     if (errflag) {
-	errflag = ef;
+	/* Keep any user interrupt error status */
+	errflag = ef | (errflag & ERRFLAG_INT);
 	return NULL;
     }
-    errflag = ef;
+    errflag = ef | (errflag & ERRFLAG_INT);
 
     queue_signals();
     if ((ret = getaparam("reply")))

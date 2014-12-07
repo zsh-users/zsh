@@ -275,7 +275,7 @@ selectargument(UNUSED(char **args))
     noaliases = ona;
     strinend();
     inpop();
-    errflag = 0;
+    errflag &= ~ERRFLAG_ERROR;
     noerrs = ne;
     lexrestore();
     zlemetacs = ocs;

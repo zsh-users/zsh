@@ -1879,7 +1879,7 @@ ccmakehookfn(UNUSED(Hookdef dummy), struct ccmakedat *dat)
 	if (!m || !(m = m->next))
 	    break;
 
-	errflag = 0;
+	errflag &= ~ERRFLAG_ERROR;
     }
     redup(osi, 0);
     dat->lst = 1;
@@ -2121,7 +2121,7 @@ getreal(char *str)
     if (!errflag && nonempty(l) &&
 	((char *) peekfirst(l)) && ((char *) peekfirst(l))[0])
 	return dupstring(peekfirst(l));
-    errflag = 0;
+    errflag &= ~ERRFLAG_ERROR;
 
     return dupstring(str);
 }
@@ -2599,7 +2599,7 @@ makecomplistlist(Compctl cc, char *s, int incmd, int compadd)
 	makecomplistflags(cc, s, incmd, compadd);
 
     /* Reset some information variables for the next try. */
-    errflag = 0;
+    errflag &= ~ERRFLAG_ERROR;
     offs = oloffs;
     wb = owb;
     we = owe;
@@ -2847,7 +2847,7 @@ sep_comp_string(char *ss, char *s, int noffs)
     noaliases = ona;
     strinend();
     inpop();
-    errflag = 0;
+    errflag &= ~ERRFLAG_ERROR;
     noerrs = ne;
     lexrestore();
     wb = owb;
@@ -3725,7 +3725,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	noaliases = ona;
 	strinend();
 	inpop();
-	errflag = 0;
+	errflag &= ~ERRFLAG_ERROR;
 	lexrestore();
 	/* Fine, now do full expansion. */
 	prefork(foo, 0);

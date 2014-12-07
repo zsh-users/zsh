@@ -2654,7 +2654,7 @@ assignsparam(char *s, char *val, int flags)
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
 	zsfree(val);
-	errflag = 1;
+	errflag |= ERRFLAG_ERROR;
 	return NULL;
     }
     queue_signals();
@@ -2783,7 +2783,7 @@ assignaparam(char *s, char **val, int flags)
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
 	freearray(val);
-	errflag = 1;
+	errflag |= ERRFLAG_ERROR;
 	return NULL;
     }
     queue_signals();
@@ -2799,7 +2799,7 @@ assignaparam(char *s, char **val, int flags)
 	    zerr("%s: attempt to set slice of associative array",
 		 v->pm->node.nam);
 	    freearray(val);
-	    errflag = 1;
+	    errflag |= ERRFLAG_ERROR;
 	    return NULL;
 	}
 	v = NULL;
@@ -2870,13 +2870,13 @@ sethparam(char *s, char **val)
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
 	freearray(val);
-	errflag = 1;
+	errflag |= ERRFLAG_ERROR;
 	return NULL;
     }
     if (strchr(s, '[')) {
 	freearray(val);
 	zerr("nested associative arrays not yet supported");
-	errflag = 1;
+	errflag |= ERRFLAG_ERROR;
 	return NULL;
     }
     if (unset(EXECOPT))
@@ -2916,7 +2916,7 @@ setnparam(char *s, mnumber val)
 
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
-	errflag = 1;
+	errflag |= ERRFLAG_ERROR;
 	return NULL;
     }
     if (unset(EXECOPT))
