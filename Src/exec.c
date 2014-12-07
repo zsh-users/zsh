@@ -2702,7 +2702,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    if (varspc)
 			addvars(state, varspc, 0);
 		    if (errflag)
-			lastval = errflag ? 1 : 0;
+			lastval = 1;
 		    else
 			lastval = cmdoutval;
 		    if (isset(XTRACE)) {
