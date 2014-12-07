@@ -853,8 +853,10 @@ pushlineoredit(char **args)
 	free(zhline);
     }
     ret = pushline(args);
-    if (!isfirstln)
-	errflag = done = 1;
+    if (!isfirstln) {
+	errflag |= ERRFLAG_ERROR;
+	done = 1;
+    }
     clearlist = 1;
     return ret;
 }

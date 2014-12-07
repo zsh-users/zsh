@@ -308,7 +308,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 
     prog = parse_string(zjoin(args, ' ', 1), 0);
     if (!prog) {
-	errflag = 0;
+	errflag &= ~ERRFLAG_ERROR;
 	scriptname = oscriptname;
 	ineval = oineval;
 	return 1;

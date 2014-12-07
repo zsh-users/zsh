@@ -422,7 +422,7 @@ execbuiltin(LinkList args, Builtin bn)
 	argc -= argv - argarr;
 
 	if (errflag) {
-	    errflag = 0;
+	    errflag &= ~ERRFLAG_ERROR;
 	    return 1;
 	}
 
@@ -3136,7 +3136,7 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		    }
 		}
 		returnval = errflag;
-		errflag = 0;
+		errflag &= ~ERRFLAG_ERROR;
 	    } else {
 		zerrnam(name, "%s: invalid element for unset", s);
 		returnval = 1;
@@ -4242,7 +4242,7 @@ bin_print(char *name, char **args, Options ops, int func)
 		if (*argp) {
 		    width = (int)mathevali(*argp++);
 		    if (errflag) {
-			errflag = 0;
+			errflag &= ~ERRFLAG_ERROR;
 			ret = 1;
 		    }
 		}
@@ -4272,7 +4272,7 @@ bin_print(char *name, char **args, Options ops, int func)
 		    if (*argp) {
 			prec = (int)mathevali(*argp++);
 			if (errflag) {
-			    errflag = 0;
+			    errflag &= ~ERRFLAG_ERROR;
 			    ret = 1;
 			}
 		    }
@@ -4452,7 +4452,7 @@ bin_print(char *name, char **args, Options ops, int func)
 			zlongval = (curarg) ? mathevali(curarg) : 0;
 			if (errflag) {
 			    zlongval = 0;
-			    errflag = 0;
+			    errflag &= ~ERRFLAG_ERROR;
 			    ret = 1;
 			}
 			print_val(zlongval)
@@ -4481,7 +4481,7 @@ bin_print(char *name, char **args, Options ops, int func)
 			} else doubleval = 0;
 			if (errflag) {
 			    doubleval = 0;
-			    errflag = 0;
+			    errflag &= ~ERRFLAG_ERROR;
 			    ret = 1;
 			}
 			print_val(doubleval)
@@ -4494,7 +4494,7 @@ bin_print(char *name, char **args, Options ops, int func)
 			zulongval = (curarg) ? mathevali(curarg) : 0;
 			if (errflag) {
 			    zulongval = 0;
-			    errflag = 0;
+			    errflag &= ~ERRFLAG_ERROR;
 			    ret = 1;
 			}
 			print_val(zulongval)
@@ -4871,7 +4871,7 @@ zexit(int val, int from_where)
     in_exit = -1;
     /*
      * We want to do all remaining processing regardless of preceding
-     * errors.
+     * errors, even user interrupts.
      */
     errflag = 0;
 
@@ -5074,7 +5074,7 @@ eval(char **argv)
     if (fpushed)
 	funcstack = funcstack->prev;
 
-    errflag = 0;
+    errflag &= ~ERRFLAG_ERROR;
     scriptname = oscriptname;
     ineval = oineval;
 
@@ -6101,7 +6101,7 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
     condlex = zshlex;
 
     if (errflag) {
-	errflag = 0;
+	errflag &= ~ERRFLAG_ERROR;
 	lexrestore();
 	return 1;
     }
@@ -6278,7 +6278,7 @@ bin_let(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int func))
     while (*argv)
 	val = matheval(*argv++);
     /* Errors in math evaluation in let are non-fatal. */
-    errflag = 0;
+    errflag &= ~ERRFLAG_ERROR;
     /* should test for fabs(val.u.d) < epsilon? */
     return (val.type == MN_INTEGER) ? val.u.l == 0 : val.u.d == 0.0;
 }

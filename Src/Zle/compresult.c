@@ -1092,7 +1092,7 @@ do_single(Cmatch m)
 			noerrs = 1;
 			parsestr(p);
 			singsub(&p);
-			errflag = 0;
+			errflag &= ~ERRFLAG_ERROR;
 			noerrs = ne;
 		    }
 		} else {

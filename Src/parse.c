@@ -71,13 +71,14 @@ struct heredocs *hdocs;
 
 #define YYERROR(O)  { tok = LEXERR; ecused = (O); return 0; }
 #define YYERRORV(O) { tok = LEXERR; ecused = (O); return; }
-#define COND_ERROR(X,Y) do { \
-  zwarn(X,Y); \
-  herrflush(); \
-  if (noerrs != 2) \
-    errflag = 1; \
-  YYERROR(ecused) \
-} while(0)
+#define COND_ERROR(X,Y) \
+    do {					\
+	zwarn(X,Y);				\
+	herrflush();				\
+	if (noerrs != 2)			\
+	    errflag |= ERRFLAG_ERROR;		\
+	YYERROR(ecused)				\
+	    } while(0)
 
 
 /* 
@@ -506,7 +507,7 @@ par_event(void)
 	yyerror(1);
 	herrflush();
 	if (noerrs != 2)
-	    errflag = 1;
+	    errflag |= ERRFLAG_ERROR;
 	ecused--;
 	return 0;
     } else {
@@ -2339,7 +2340,7 @@ yyerror(int noerr)
 	    zwarn("parse error");
     }
     if (!noerr && noerrs != 2)
-	errflag = 1;
+	errflag |= ERRFLAG_ERROR;
 }
 
 /*
@@ -3031,7 +3032,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 	file = metafy(file, flen, META_REALLOC);
 
 	if (!(prog = parse_string(file, 1)) || errflag) {
-	    errflag = 0;
+	    errflag &= ~ERRFLAG_ERROR;
 	    close(dfd);
 	    zfree(file, flen);
 	    zwarnnam(nam, "can't read file: %s", *files);
@@ -3141,7 +3142,7 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map,
 	    for (hn = shfunctab->nodes[i]; hn; hn = hn->next)
 		if (cur_add_func(nam, (Shfunc) hn, lnames, progs,
 				 &hlen, &tlen, what)) {
-		    errflag = 0;
+		    errflag &= ~ERRFLAG_ERROR;
 		    close(dfd);
 		    unlink(dump);
 		    return 1;
@@ -3166,7 +3167,7 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map,
 			pattry(pprog, hn->nam) &&
 			cur_add_func(nam, (Shfunc) hn, lnames, progs,
 				     &hlen, &tlen, what)) {
-			errflag = 0;
+			errflag &= ~ERRFLAG_ERROR;
 			close(dfd);
 			unlink(dump);
 			return 1;
@@ -3177,13 +3178,13 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map,
 	    if (errflag ||
 		!(shf = (Shfunc) shfunctab->getnode(shfunctab, *names))) {
 		zwarnnam(nam, "unknown function: %s", *names);
-		errflag = 0;
+		errflag &= ~ERRFLAG_ERROR;
 		close(dfd);
 		unlink(dump);
 		return 1;
 	    }
 	    if (cur_add_func(nam, shf, lnames, progs, &hlen, &tlen, what)) {
-		errflag = 0;
+		errflag &= ~ERRFLAG_ERROR;
 		close(dfd);
 		unlink(dump);
 		return 1;
@@ -3192,7 +3193,7 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map,
     }
     if (empty(progs)) {
 	zwarnnam(nam, "no functions");
-	errflag = 0;
+	errflag &= ~ERRFLAG_ERROR;
 	close(dfd);
 	unlink(dump);
 	return 1;

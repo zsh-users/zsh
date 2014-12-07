@@ -504,6 +504,16 @@ mod_export void
 selectlocalmap(Keymap m)
 {
     localkeymap = m;
+    if (!m)
+    {
+	/*
+	 * No local keymap; so we are returning to the global map.  If
+	 * the user ^Ced in the local map, they probably just want to go
+	 * back to normal editing.  So remove the interrupt error
+	 * status.
+	 */
+	errflag &= ~ERRFLAG_INT;
+    }
 }
 
 /* Reopen the currently selected keymap, in case it got deleted.  This *

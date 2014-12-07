@@ -287,7 +287,8 @@ ihgetc(void)
 	c = histsubchar(c);
 	if (c < 0) {
 	    /* bad expansion */
-	    errflag = lexstop = 1;
+	    lexstop = 1;
+	    errflag |= ERRFLAG_ERROR;
 	    return ' ';
 	}
     }
@@ -721,7 +722,7 @@ histsubchar(int c)
 		    noerrs = 1;
 		    parse_subst_string(sline);
 		    noerrs = one;
-		    errflag = oef;
+		    errflag = oef | (errflag & ERRFLAG_INT);
 		    remnulargs(sline);
 		    untokenize(sline);
 		}
@@ -880,7 +881,8 @@ hbegin(int dohist)
     char *hf;
 
     isfirstln = isfirstch = 1;
-    errflag = histdone = 0;
+    errflag &= ~ERRFLAG_ERROR;
+    histdone = 0;
     if (!dohist)
 	stophist = 2;
     else if (dohist != 2)
@@ -3182,7 +3184,7 @@ bufferwords(LinkList list, char *buf, int *index, int flags)
     noaliases = ona;
     strinend();
     inpop();
-    errflag = 0;
+    errflag &= ~ERRFLAG_ERROR;
     nocomments = onc;
     noerrs = ne;
     lexrestore();

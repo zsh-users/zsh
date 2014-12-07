@@ -744,7 +744,7 @@ raw_getbyte(long do_keytmout, char *cptr)
 			}
 			if (errflag) {
 			    /* No sensible way of handling errors here */
-			    errflag = 0;
+			    errflag &= ~ERRFLAG_ERROR;
 			    /*
 			     * Paranoia: don't run the hooks again this
 			     * time.
@@ -882,7 +882,7 @@ getbyte(long do_keytmout, int *timeout)
 		die = 0;
 		if (!errflag && !retflag && !breaks && !exit_pending)
 		    continue;
-		errflag = 0;
+		errflag &= ~ERRFLAG_ERROR;
 		breaks = obreaks;
 		errno = old_errno;
 		return lastchar = EOF;
@@ -1075,7 +1075,7 @@ zlecore(void)
 		DECCS();
 	    handleundo();
 	} else {
-	    errflag = 1;
+	    errflag |= ERRFLAG_ERROR;
 	    break;
 	}
 #ifdef HAVE_POLL
@@ -1233,6 +1233,10 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
 
     zleactive = 1;
     resetneeded = 1;
+    /*
+     * Start of the main zle read.
+     * Fully reset error conditions, including user interrupt.
+     */
     errflag = retflag = 0;
     lastcol = -1;
     initmodifier(&zmod);
@@ -1658,7 +1662,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
     }
     if (!t || errflag) {
 	/* error in editing */
-	errflag = 0;
+	errflag &= ~ERRFLAG_ERROR;
 	breaks = obreaks;
 	if (t)
 	    zsfree(t);
@@ -1778,7 +1782,7 @@ recursiveedit(UNUSED(char **args))
     zrefresh();
     zlecore();
 
-    locerror = errflag;
+    locerror = errflag ? 1 : 0;
     errflag = done = eofsent = 0;
 
     return locerror;

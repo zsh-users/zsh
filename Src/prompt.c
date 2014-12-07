@@ -192,8 +192,11 @@ promptexpand(char *s, int ns, char *rs, char *Rs, unsigned int *txtchangep)
 	if (*s == Nularg && s[1] == '\0')
 	    *s = '\0';
 
-	/* Ignore errors and status change in prompt substitution */
-	errflag = olderr;
+	/*
+	 * Ignore errors and status change in prompt substitution.
+	 * However, keep any user interrupt error that occurred.
+	 */
+	errflag = olderr | (errflag & ERRFLAG_INT);
 	lastval = oldval;
     }
 

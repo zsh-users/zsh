@@ -2623,6 +2623,20 @@ enum trap_state {
 #define IN_EVAL_TRAP() \
     (intrap && !trapisfunc && traplocallevel == locallevel)
 
+/*
+ * Bits in the errflag variable.
+ */
+enum errflag_bits {
+    /*
+     * Standard internal error bit.
+     */
+    ERRFLAG_ERROR = 1,
+    /*
+     * User interrupt.
+     */
+    ERRFLAG_INT = 2
+};
+
 /***********/
 /* Sorting */
 /***********/

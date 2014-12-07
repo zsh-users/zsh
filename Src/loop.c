@@ -259,7 +259,8 @@ execselect(Estate state, UNUSED(int do_exec))
 				   0, ZLCON_SELECT);
 		    if (errflag)
 			str = NULL;
-		    errflag = oef;
+		    /* Keep any user interrupt error status */
+		    errflag = oef | (errflag & ERRFLAG_INT);
 	    	} else {
 		    str = promptexpand(prompt3, 0, NULL, NULL, NULL);
 		    zputs(str, stderr);
@@ -632,6 +633,14 @@ execcase(Estate state, int do_exec)
 zlong
 try_errflag = -1;
 
+/**
+ * Corresponding interrupt error status form `try' block.
+ */
+
+/**/
+zlong
+try_interrupt = -1;
+
 /**/
 zlong
 try_tryflag = 0;
@@ -643,7 +652,7 @@ exectry(Estate state, int do_exec)
     Wordcode end, always;
     int endval;
     int save_retflag, save_breaks, save_contflag;
-    zlong save_try_errflag, save_try_tryflag;
+    zlong save_try_errflag, save_try_tryflag, save_try_interrupt;
 
     end = state->pc + WC_TRY_SKIP(state->pc[-1]);
     always = state->pc + 1 + WC_TRY_SKIP(*state->pc);
@@ -670,7 +679,10 @@ exectry(Estate state, int do_exec)
 
     /* The always clause. */
     save_try_errflag = try_errflag;
-    try_errflag = (zlong)errflag;
+    save_try_interrupt = try_interrupt;
+    try_errflag = (zlong)(errflag & ERRFLAG_ERROR);
+    try_interrupt = (zlong)((errflag & ERRFLAG_INT) ? 1 : 0);
+    /* We need to reset all errors to allow the block to execute */
     errflag = 0;
     save_retflag = retflag;
     retflag = 0;
@@ -682,8 +694,16 @@ exectry(Estate state, int do_exec)
     state->pc = always;
     execlist(state, 1, do_exec);
 
-    errflag = try_errflag ? 1 : 0;
+    if (try_errflag)
+	errflag |= ERRFLAG_ERROR;
+    else
+	errflag &= ~ERRFLAG_ERROR;
+    if (try_interrupt)
+	errflag |= ERRFLAG_INT;
+    else
+	errflag &= ~ERRFLAG_INT;
     try_errflag = save_try_errflag;
+    try_interrupt = save_try_interrupt;
     if (!retflag)
 	retflag = save_retflag;
     if (!breaks)

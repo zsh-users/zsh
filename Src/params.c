@@ -331,6 +331,7 @@ IPDEF5("SHLVL", &shlvl, varinteger_gsu),
 #define IPDEF6(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
 IPDEF6("OPTIND", &zoptind, varinteger_gsu),
 IPDEF6("TRY_BLOCK_ERROR", &try_errflag, varinteger_gsu),
+IPDEF6("TRY_BLOCK_INTERRUPT", &try_interrupt, varinteger_gsu),
 
 #define IPDEF7(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
 #define IPDEF7U(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
@@ -2654,7 +2655,7 @@ assignsparam(char *s, char *val, int flags)
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
 	zsfree(val);
-	errflag = 1;
+	errflag |= ERRFLAG_ERROR;
 	return NULL;
     }
     queue_signals();
@@ -2783,7 +2784,7 @@ assignaparam(char *s, char **val, int flags)
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
 	freearray(val);
-	errflag = 1;
+	errflag |= ERRFLAG_ERROR;
 	return NULL;
     }
     queue_signals();
@@ -2799,7 +2800,7 @@ assignaparam(char *s, char **val, int flags)
 	    zerr("%s: attempt to set slice of associative array",
 		 v->pm->node.nam);
 	    freearray(val);
-	    errflag = 1;
+	    errflag |= ERRFLAG_ERROR;
 	    return NULL;
 	}
 	v = NULL;
@@ -2870,13 +2871,13 @@ sethparam(char *s, char **val)
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
 	freearray(val);
-	errflag = 1;
+	errflag |= ERRFLAG_ERROR;
 	return NULL;
     }
     if (strchr(s, '[')) {
 	freearray(val);
 	zerr("nested associative arrays not yet supported");
-	errflag = 1;
+	errflag |= ERRFLAG_ERROR;
 	return NULL;
     }
     if (unset(EXECOPT))
@@ -2916,7 +2917,7 @@ setnparam(char *s, mnumber val)
 
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
-	errflag = 1;
+	errflag |= ERRFLAG_ERROR;
 	return NULL;
     }
     if (unset(EXECOPT))

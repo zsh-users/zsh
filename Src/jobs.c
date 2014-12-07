@@ -509,7 +509,7 @@ update_job(Job jn)
 			prev_errflag = errflag;
 		    }
 		    breaks = loops;
-		    errflag = 1;
+		    errflag |= ERRFLAG_INT;
 		    inerrflush();
 		}
 	    } else {
@@ -526,7 +526,7 @@ update_job(Job jn)
 	    prev_errflag = errflag;
 	}
 	breaks = loops;
-	errflag = 1;
+	errflag |= ERRFLAG_INT;
 	inerrflush();
     }
     if (somestopped && jn->stat & STAT_SUPERJOB)
@@ -581,7 +581,7 @@ update_job(Job jn)
 		    breaks = loops;
 	    } else {
 		breaks = loops;
-		errflag = 1;
+		errflag |= ERRFLAG_INT;
 	    }
 	    check_cursh_sig(sig);
 	}
@@ -1444,12 +1444,19 @@ zwaitjob(int job, int wait_cmd)
 		restore_queue_signals(q);
 		return 128 + last_signal;
 	    }
-	    /* Commenting this out makes ^C-ing a job started by a function
-	       stop the whole function again.  But I guess it will stop
-	       something else from working properly, we have to find out
-	       what this might be.  --oberon
+           /* Commenting this out makes ^C-ing a job started by a function
+              stop the whole function again.  But I guess it will stop
+              something else from working properly, we have to find out
+              what this might be.  --oberon
 
-	    errflag = 0; */
+	      When attempting to separate errors and interrupts, we
+	      assumed because of the previous comment it would be OK
+	      to remove ERRFLAG_ERROR and leave ERRFLAG_INT set, since
+	      that's the one related to ^C.  But that doesn't work.
+	      There's something more here we don't understand.  --pws
+
+           errflag = 0; */
+
 	    if (subsh) {
 		killjb(jn, SIGCONT);
 		jn->stat &= ~STAT_STOPPED;

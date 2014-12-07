@@ -1,3 +1,19 @@
+2014-12-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 33876: etc.:  Completion/Base/Core/_main_complete,
+	Doc/Zsh/params.yo, Src/Modules/zpty.c,  Src/Modules/zutil.c,
+	Src/Zle/compcore.c, Src/Zle/compctl.c, Src/Zle/compresult.c,
+	Src/Zle/textobjects.c, Src/Zle/zle_hist.c, Src/Zle/zle_keymap.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_misc.c, Src/Zle/zle_tricky.c,
+	Src/Zle/zle_utils.c, Src/builtin.c, Src/exec.c, Src/glob.c,
+	Src/hist.c, Src/init.c, Src/input.c, Src/jobs.c, Src/lex.c,
+	Src/loop.c, Src/params.c, Src/parse.c, Src/prompt.c,
+	Src/signals.c, Src/subst.c, Src/utils.c, Src/zsh.h: Separate
+	shell errors and user interrupt flags into different bits of
+	errflag: ERRFLAG_ERROR and ERRFLAG_INT.  Various
+	rationalisations to make keyboard interrupts work smoothly.
+	Work done on interrupt_abort branch.
+
 2014-12-10  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 33948: Completion/Unix/Command/_getent,
@@ -612,7 +628,7 @@
 	* 33354: Src/jobs.c, Test/A05execution.ztst: when backgrounding
 	a pipeline, close all pipe descriptors in the parent; add test
 	for both this and 33345+33346
-	
+
 2014-10-03  Bart Schaefer  <schaefer@zsh.org>
 
 	* 33346: Src/parse.c: another bit of the 33345 repair
@@ -2083,7 +2099,7 @@
 2013-12-20  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 32172; Test/A05execution.ztst: regression test for 32171
-	
+
 	* 32171: Src/exec.c: fix leaked pipe descriptor that could
 	deadlock a pipeline from a complex shell construct or function
 	into an external command
