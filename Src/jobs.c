@@ -509,7 +509,7 @@ update_job(Job jn)
 			prev_errflag = errflag;
 		    }
 		    breaks = loops;
-		    errflag |= ERRFLAG_ERROR;
+		    errflag |= ERRFLAG_INT;
 		    inerrflush();
 		}
 	    } else {
@@ -526,7 +526,7 @@ update_job(Job jn)
 	    prev_errflag = errflag;
 	}
 	breaks = loops;
-	errflag |= ERRFLAG_ERROR;
+	errflag |= ERRFLAG_INT;
 	inerrflush();
     }
     if (somestopped && jn->stat & STAT_SUPERJOB)
@@ -581,7 +581,7 @@ update_job(Job jn)
 		    breaks = loops;
 	    } else {
 		breaks = loops;
-		errflag |= ERRFLAG_ERROR;
+		errflag |= ERRFLAG_INT;
 	    }
 	    check_cursh_sig(sig);
 	}
