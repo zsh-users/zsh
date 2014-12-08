@@ -118,6 +118,14 @@ loop(int toplevel, int justonce)
 	    if (interact && toplevel) {
 	        int hstop = stophist;
 		stophist = 3;
+		/*
+		 * Reset all errors including the interrupt error status
+		 * immediately, so preprompt runs regardless of what
+		 * just happened.  We'll reset again below as a
+		 * precaution to ensure we get back to the command line
+		 * no matter what.
+		 */
+		errflag = 0;
 		preprompt();
 		if (stophist != 3)
 		    hbegin(1);
