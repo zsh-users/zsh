@@ -754,7 +754,7 @@ It may be reset, clearing the error condition.  See
 ifzman(em(Complex Commands) in zmanref(zshmisc))\
 ifnzman(noderef(Complex Commands))
 )
-vinde(TRY_BLOCK_INTERRUPT)
+vindex(TRY_BLOCK_INTERRUPT)
 item(tt(TRY_BLOCK_INTERRUPT) <S>)(
 This variable works in a similar way to tt(TRY_BLOCK_ERROR), but
 represents the status of an interrupt from the signal SIGINT, which

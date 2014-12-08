@@ -634,7 +634,7 @@ zlong
 try_errflag = -1;
 
 /**
- * Corrresponding interrupt error status form `try' block.
+ * Corresponding interrupt error status form `try' block.
  */
 
 /**/
