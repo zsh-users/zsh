@@ -1235,7 +1235,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     resetneeded = 1;
     /*
      * Start of the main zle read.
-     * Fully reset error conditions, including error interrupt.
+     * Fully reset error conditions, including user interrupt.
      */
     errflag = retflag = 0;
     lastcol = -1;
