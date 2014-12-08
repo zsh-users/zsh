@@ -1,5 +1,8 @@
 2014-12-08  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 33927: Completion/Unix/Command/_nm: .elf files and
+	directories.
+
 	* 33843: Completion/Unix/Type/_files: minor optimisation for
 	recursive-files.
 
