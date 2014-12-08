@@ -121,9 +121,13 @@ for def in "$pats[@]"; do
           if _path_files -g "$pat" "$opts[@]" "$expl[@]"; then
 	    ret=0
 	  elif [[ $PREFIX$SUFFIX != */* ]] && zstyle -a ":completion:${curcontext}:$tag" recursive-files rfiles; then
+	    local subtree
 	    for rfile in $rfiles; do
 	      if [[ $PWD/ = ${~rfile} ]]; then
-		for prepath in **/*(/); do
+		if [[ -z $subtree ]]; then
+		  subtree=( **/*(/) )
+		fi
+		for prepath in $subtree; do
 		  oprefix=$PREFIX
 		  PREFIX=$prepath/$PREFIX
 		  _path_files -g "$pat" "$opts[@]" "$expl[@]" && ret=0
