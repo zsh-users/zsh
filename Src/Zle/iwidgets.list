@@ -156,7 +156,7 @@
 "vi-forward-word-end", viforwardwordend, 0
 "vi-goto-column", vigotocolumn, 0
 "vi-goto-mark", vigotomark, 0
-"vi-goto-mark-line", vigotomarkline, 0
+"vi-goto-mark-line", vigotomarkline, ZLE_LINEMOVE
 "vi-history-search-backward", vihistorysearchbackward, 0
 "vi-history-search-forward", vihistorysearchforward, 0
 "vi-indent", viindent, ZLE_LASTCOL

@@ -511,6 +511,12 @@ exchangepointandmark(UNUSED(char **args))
 int
 visualmode(UNUSED(char **args))
 {
+    if (virangeflag) {
+	prefixflag = 1;
+	zmod.flags &= ~MOD_LINE;
+	zmod.flags |= MOD_CHAR;
+	return 0;
+    }
     switch (region_active) {
     case 1:
 	region_active = 0;
@@ -529,6 +535,12 @@ visualmode(UNUSED(char **args))
 int
 visuallinemode(UNUSED(char **args))
 {
+    if (virangeflag) {
+	prefixflag = 1;
+	zmod.flags &= ~MOD_CHAR;
+	zmod.flags |= MOD_LINE;
+	return 0;
+    }
     switch (region_active) {
     case 2:
 	region_active = 0;

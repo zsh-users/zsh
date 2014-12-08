@@ -2301,12 +2301,16 @@ If repeated, redo the modification.
 tindex(visual-mode)
 item(tt(visual-mode) (unbound) (v) (unbound))(
 Toggle vim-style visual selection mode. If line-wise visual mode is
-currently enabled then it is changed to being character-wise.
+currently enabled then it is changed to being character-wise. If used
+following an operator, it forces the subsequent movement command to be
+treated as a character-wise movement.
 )
 tindex(visual-line-mode)
 item(tt(visual-line-mode) (unbound) (V) (unbound))(
 Toggle vim-style line-wise visual selection mode. If character-wise
-visual mode is currently enabled then it is changed to being line-wise.
+visual mode is currently enabled then it is changed to being line-wise. If used
+following an operator, it forces the subsequent movement command to be
+treated as a line-wise movement.
 )
 tindex(what-cursor-position)
 item(tt(what-cursor-position) (^X=) (unbound) (unbound))(

@@ -259,15 +259,24 @@ getvirange(int wf)
     /* Was it a line-oriented move?  If so, the command will have set *
      * the vilinerange flag.  In this case, entire lines are taken,   *
      * rather than just the sequence of characters delimited by pos   *
-     * and zlecs.  The terminating newline is left out of the range,     *
+     * and zlecs.  The terminating newline is left out of the range,  *
      * which the real command must deal with appropriately.  At this  *
      * point we just need to make the range encompass entire lines.   */
-    if(vilinerange) {
+    vilinerange = (zmod.flags & MOD_LINE) ||
+	    (vilinerange && !(zmod.flags & MOD_CHAR));
+    if (vilinerange) {
 	int newcs = findbol();
 	lastcol = zlecs - newcs;
 	zlecs = pos;
 	pos = findeol();
 	zlecs = newcs;
+    } else if (!visual) {
+	/* for a character-wise move don't include a newline at the *
+	 * end of the range                                         */
+	int prev = pos;
+	DECPOS(prev);
+	if (zleline[prev] == ZWC('\n'))
+	    pos = prev;
     }
     return pos;
 }

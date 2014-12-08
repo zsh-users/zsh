@@ -1,3 +1,9 @@
+2014-12-08  Oliver Kiddle  <opk@zsh.org>
+
+	* 33924: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list, Src/Zle/zle.h,
+	Src/Zle/zle_move.c, Src/Zle/zle_vi.c, Test/X02zlevi.ztst:
+	allow vi line/characterwise mode to be forced
+
 2014-12-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 33927: Completion/Unix/Command/_nm: .elf files and

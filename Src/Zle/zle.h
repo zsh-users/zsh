@@ -243,6 +243,8 @@ struct modifier {
 #define MOD_VIAPP (1<<3)   /* appending to the vi cut buffer */
 #define MOD_NEG   (1<<4)   /* last command was negate argument */
 #define MOD_NULL  (1<<5)   /* throw away text for the vi cut buffer */
+#define MOD_CHAR  (1<<6)   /* force character-wise movement */
+#define MOD_LINE  (1<<7)   /* force line-wise movement */
 
 /* current modifier status */
 

@@ -287,6 +287,27 @@
 >BUFFER: one wo
 >CURSOR: 2
 
+  zletest $'keepnot\eo  unwanted\ekhhcvj '
+0:force character-wise change to join lines
+>BUFFER: keep wanted
+>CURSOR: 5
+
+  zletest $'}\eOkeep{del\eF{dvj'
+0:character-wise delete to beginning of line leaves the newline'
+>BUFFER: keep
+>}
+>CURSOR: 3
+
+  zletest $'keep\eOdel\edVh'
+0:force line-wise delete of line
+>BUFFER: keep
+>CURSOR: 0
+
+  zletest $'one two three\eFwdVawaX'
+0:line-wise force of a text object
+>BUFFER: X
+>CURSOR: 1
+
   zletest $'one two\evbcx'
 0:change selection
 >BUFFER: one x
