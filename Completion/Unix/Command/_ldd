@@ -1,6 +1,6 @@
 #compdef ldd
 
-if _pick_variant gnu='(GNU|EGLIBC)' solaris --version; then
+if _pick_variant gnu='(GNU|EGLIBC|Gentoo)' solaris --version; then
   args=(
     '(- *)--version[display version information]'
     '(- *)--help[display help information]'

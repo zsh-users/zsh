@@ -2,7 +2,7 @@
 
 local expl curcontext="$curcontext" state line ret=1
 
-if _pick_variant libiconv='GNU*libiconv' glibc='(GNU*libc|EGLIBC)' unix --version; then
+if _pick_variant libiconv='GNU*libiconv' glibc='(GNU*libc|EGLIBC|Gentoo)' unix --version; then
   local -a args
   local exargs="-l --list -? --help --usage --version -V"
 

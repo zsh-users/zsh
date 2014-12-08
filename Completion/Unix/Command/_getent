@@ -5,7 +5,7 @@ local services databases keys
 local -a args
 typeset -A opt_args
 
-if _pick_variant -r is_gnu gnu='(GNU|EGLIBC)' unix --version; then
+if _pick_variant -r is_gnu gnu='(GNU|EGLIBC|Gentoo)' unix --version; then
   args+=(
     '(- 1 *)'{-\?,--help}'[display help information]'
     '(- 1 *)--usage[display a short usage message]'

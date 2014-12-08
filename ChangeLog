@@ -1,3 +1,9 @@
+2014-12-10  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 33948: Completion/Unix/Command/_getent,
+	Completion/Unix/Command/_iconv, Completion/Unix/Command/_ldd:
+	Parse "Gentoo" as being GNU libc
+
 2014-12-10  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 33940: Src/lex.c: handle backslash-meta correctly in lexer
