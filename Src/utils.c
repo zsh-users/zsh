@@ -4208,10 +4208,8 @@ unmeta(const char *file_name)
     
     meta = 0;
     for (t = file_name; *t; t++) {
-	if (*t == Meta) {
-	    meta = t[1];
-	    break;
-	}
+	if (*t == Meta)
+	    meta = 1;
     }
     if (!meta) {
 	/*
@@ -4250,7 +4248,7 @@ unmeta(const char *file_name)
     }
 
     for (t = file_name, p = fn; *t; p++)
-	if ((*p = *t++) == Meta)
+	if ((*p = *t++) == Meta && *t)
 	    *p = *t++ ^ 32;
     *p = '\0';
     return fn;

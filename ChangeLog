@@ -1,3 +1,7 @@
+2014-12-09  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 33932: Src/utils.c: revise boundary check in unmeta()
+
 2014-12-08  Oliver Kiddle  <opk@zsh.org>
 
 	* 33924: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list, Src/Zle/zle.h,
