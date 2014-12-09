@@ -1326,8 +1326,20 @@ gettokstr(int c, int sub)
 		c = hgetc();
 		if (!lexstop)
 		    continue;
-	    } else
+	    } else {
 		add(Bnull);
+		if (c == STOUC(Meta)) {
+		    c = hgetc();
+#ifdef DEBUG
+		    if (lexstop) {
+			fputs("BUG: input terminated by Meta\n", stderr);
+			fflush(stderr);
+			goto brk;
+		    }
+#endif
+		    add(Meta);
+		}
+	    }
 	    if (lexstop)
 		goto brk;
 	    break;

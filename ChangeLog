@@ -1,3 +1,7 @@
+2014-12-10  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 33940: Src/lex.c: handle backslash-meta correctly in lexer
+
 2014-12-09  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 33932: Src/utils.c: revise boundary check in unmeta()
