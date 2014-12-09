@@ -43,6 +43,8 @@ local -a precommands
 
 typeset -U _lastdescr _comp_ignore _comp_colors
 
+{
+
 [[ -z "$curcontext" ]] && curcontext=:::
 
 zstyle -s ":completion:${curcontext}:" insert-tab tmp || tmp=yes
@@ -349,17 +351,20 @@ fi
    ( "$_comp_force_list" = ?*  && nm -ge _comp_force_list ) ]] &&
     compstate[list]="${compstate[list]//messages} force"
 
-if [[ "$compstate[old_list]" = keep ]]; then
-  if [[ $_saved_colors_set = 1 ]]; then
-    ZLS_COLORS="$_saved_colors"
+} always {
+  # Stuff we always do to clean up.
+  if [[ "$compstate[old_list]" = keep ]]; then
+    if [[ $_saved_colors_set = 1 ]]; then
+      ZLS_COLORS="$_saved_colors"
+    else
+      unset ZLS_COLORS
+    fi
+  elif (( $#_comp_colors )); then
+    ZLS_COLORS="${(j.:.)_comp_colors}"
   else
     unset ZLS_COLORS
   fi
-elif (( $#_comp_colors )); then
-  ZLS_COLORS="${(j.:.)_comp_colors}"
-else
-  unset ZLS_COLORS
-fi
+}
 
 # Now call the post-functions.
 
