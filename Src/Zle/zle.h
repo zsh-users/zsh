@@ -207,11 +207,12 @@ struct widget {
 #define ZLE_YANKBEFORE	(1<<4)
 #define ZLE_YANK        (ZLE_YANKAFTER | ZLE_YANKBEFORE)
 #define ZLE_LINEMOVE	(1<<5)	/* command is a line-oriented movement */
-#define ZLE_LASTCOL     (1<<6)	/* command maintains lastcol correctly */
-#define ZLE_KILL	(1<<7)
-#define ZLE_KEEPSUFFIX	(1<<8)	/* DON'T remove added suffix */
-#define ZLE_NOTCOMMAND  (1<<9)	/* widget should not alter lastcmd */
-#define ZLE_ISCOMP      (1<<10)	/* usable for new style completion */
+#define ZLE_VIOPER	(1<<6)  /* widget reads further keys so wait if prefix */
+#define ZLE_LASTCOL     (1<<7)	/* command maintains lastcol correctly */
+#define ZLE_KILL	(1<<8)
+#define ZLE_KEEPSUFFIX	(1<<9)	/* DON'T remove added suffix */
+#define ZLE_NOTCOMMAND  (1<<10)	/* widget should not alter lastcmd */
+#define ZLE_ISCOMP      (1<<11)	/* usable for new style completion */
 
 /* thingies */
 

@@ -1,3 +1,8 @@
+2014-12-12  Oliver Kiddle  <opk@zsh.org>
+
+	* 33950: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list, Src/Zle/zle.h,
+	Src/Zle/zle_keymap.c: ignore KEYTIMEOUT for vi operators
+
 2014-12-11  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 33876: etc.:  Completion/Base/Core/_main_complete,

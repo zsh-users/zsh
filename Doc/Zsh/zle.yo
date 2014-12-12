@@ -1605,6 +1605,13 @@ Read a movement command from the keyboard, and kill
 from the cursor position to the endpoint of the movement.
 Then enter insert mode.
 If the command is tt(vi-change), change the current line.
+
+For compatibility with vi, if the command is tt(vi-forward-word)
+or tt(vi-forward-blank-word), the whitespace after the word is not
+included. If you prefer the more consistent behaviour with the
+whitespace included use the following key binding:
+
+example(bindkey -a -s cw dwi)
 )
 tindex(vi-change-eol)
 item(tt(vi-change-eol) (unbound) (C) (unbound))(

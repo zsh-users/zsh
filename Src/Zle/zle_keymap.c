@@ -1444,6 +1444,7 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
     Thingy func = t_undefinedkey;
     char *str = NULL;
     int lastlen = 0, lastc = lastchar;
+    int timeout = 0;
 
     keybuflen = 0;
     keybuf[0] = 0;
@@ -1461,7 +1462,7 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
      * argument to bindkey is in the correct form for the locale.
      * That's beyond our control.
      */
-    while(getkeybuf(!!lastlen) != EOF) {
+    while(getkeybuf(timeout) != EOF) {
 	char *s;
 	Thingy f;
 	int loc = !!localkeymap;
@@ -1480,6 +1481,11 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 	    func = f;
 	    str = s;
 	    lastc = lastchar;
+
+	    /* can be patient with vi commands that need a motion operator: *
+	     * they wait till a key is pressed for the movement anyway      */
+	    timeout = !(!virangeflag && !region_active && f && f->widget &&
+		    f->widget->flags & ZLE_VIOPER);
 	}
 	if (!ispfx)
 	    break;
