@@ -278,7 +278,7 @@ int viinsbind[32] = {
     /* ^U */ z_vikillline,
     /* ^V */ z_viquotedinsert,
     /* ^W */ z_vibackwardkillword,
-    /* ^X */ z_selfinsert,
+    /* ^X */ z_undefinedkey,
     /* ^Y */ z_selfinsert,
     /* ^Z */ z_selfinsert,
     /* ^[ */ z_vicmdmode,

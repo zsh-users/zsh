@@ -1073,7 +1073,7 @@ Move backward one word, where a word is defined as a series of
 non-blank characters.
 )
 tindex(vi-backward-blank-word-end)
-item(tt(vi-backward-blank-word-end) (unbound) (unbound) (unbound))(
+item(tt(vi-backward-blank-word-end) (unbound) (gE) (unbound))(
 Move to the end of the previous word, where a word is defined as a
 series of non-blank characters.
 )
@@ -1098,7 +1098,7 @@ item(tt(vi-backward-word) (unbound) (b) (unbound))(
 Move to the beginning of the previous word, vi-style.
 )
 tindex(vi-backward-word-end)
-item(tt(vi-backward-word-end) (unbound) (unbound) (unbound))(
+item(tt(vi-backward-word-end) (unbound) (ge) (unbound))(
 Move to the end of the previous word, vi-style.
 )
 tindex(beginning-of-line)
@@ -1215,7 +1215,7 @@ texinode(History Control)(Modifying Text)(Movement)(Zle Widgets)
 subsect(History Control)
 startitem()
 tindex(beginning-of-buffer-or-history)
-item(tt(beginning-of-buffer-or-history) (ESC-<) (unbound) (unbound))(
+item(tt(beginning-of-buffer-or-history) (ESC-<) (gg) (unbound))(
 Move to the beginning of the buffer, or if already there,
 move to the first event in the history list.
 )
@@ -1728,7 +1728,7 @@ item(tt(vi-open-line-below) (unbound) (o) (unbound))(
 Open a line below the cursor and enter insert mode.
 )
 tindex(vi-oper-swap-case)
-item(tt(vi-oper-swap-case))(
+item(tt(vi-oper-swap-case) (unbound) (g~) (unbound))(
 Read a movement command from the keyboard, and swap
 the case of all characters
 from the cursor position to the endpoint of the movement.
@@ -2286,7 +2286,7 @@ This command is executed when a key sequence that is not bound to any
 command is typed.  By default it beeps.
 )
 tindex(undo)
-item(tt(undo) (^_ ^Xu ^X^U) (unbound) (unbound))(
+item(tt(undo) (^_ ^Xu ^X^U) (u) (unbound))(
 Incrementally undo the last text modification.  When called from a
 user-defined widget, takes an optional argument indicating a previous state
 of the undo history as returned by the tt(UNDO_CHANGE_NO) variable;
@@ -2297,11 +2297,11 @@ insert mode is reverted, the changes having been merged when command mode was
 selected.
 )
 tindex(redo)
-item(tt(redo))(
+item(tt(redo) (unbound) (^R) (unbound))(
 Incrementally redo undone text modifications.
 )
 tindex(vi-undo-change)
-item(tt(vi-undo-change) (unbound) (u) (unbound))(
+item(tt(vi-undo-change) (unbound) (unbound) (unbound))(
 Undo the last text modification.
 If repeated, redo the modification.
 )
@@ -2320,7 +2320,7 @@ following an operator, it forces the subsequent movement command to be
 treated as a line-wise movement.
 )
 tindex(what-cursor-position)
-item(tt(what-cursor-position) (^X=) (unbound) (unbound))(
+item(tt(what-cursor-position) (^X=) (ga) (unbound))(
 Print the character under the cursor, its code as an octal, decimal and
 hexadecimal number, the current cursor position within the buffer and the
 column of the cursor in the current line.

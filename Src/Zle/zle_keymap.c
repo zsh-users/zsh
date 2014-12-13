@@ -1373,6 +1373,7 @@ default_bindings(void)
     bindkey(amap, "gE", refthingy(t_vibackwardblankwordend), NULL);
     bindkey(amap, "gg", refthingy(t_beginningofbufferorhistory), NULL);
     bindkey(amap, "g~", refthingy(t_vioperswapcase), NULL);
+    bindkey(amap, "g~~", NULL, "g~g~");
 
     /* emacs mode: arrow keys */ 
     add_cursor_key(emap, TCUPCURSOR, t_uplineorhistory, 'A');
