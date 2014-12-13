@@ -1,6 +1,6 @@
 #compdef sudo sudoedit
 
-local curcontext="$curcontext" environ e
+local environ e
 local -a args
 
 zstyle -a ":completion:${curcontext}:" environ environ
@@ -10,33 +10,39 @@ do local -x "$e"
 done
 
 args=(
-       '-V[show version]'
-       '-l[list allowed commands]'
-       '-L[list options from Default section]'
-       '-a[BSD auth type]:BSD auth type:'
-       '-c[BSD login class]:BSD login class:'
-       '-h[show help]'
-       '-v[validate user timestamp]'
-       '-k[invalidate user timestamp]'
-       '-K[remove user timestamp]'
-       '-r[Kerberos realm]:Kerberos realm:'
-       '-p[password prompt]:password prompt:'
-       '-u[user name]:user name:_users'
-       '-S[read password from stdin]'
+  '(-A --askpass)'{-A,--askpass}'[use a helper program for password prompting]'
+  '(-C --close-from)'{-C+,--close-from=}'[close file descriptors]:lowest fd to close'
+  '(-g --group)'{-g+,--group=}'[run command as the specified group name or ID]:group:_groups'
+  '(-)'{-h,--help}'[display help message and exit]'
+  '(-h --host)'{-h+,--host=}'[run command on host]:host:_hosts'
+  '(-K --remove-timestamp)'{-K,--remove-timestamp}'[remove timestamp file completely]'
+  '(-k --reset-timestamp)'{-k,--reset-timestamp}'[invalidate timestamp file]'
+  \*{-l,--list}"[list user's privileges or check a specific command]"
+  '(-n --non-interactive)'{-n,--non-interactive}'[non-interactive mode, no prompts are used]'
+  '(-p --prompt)'{-p+,--prompt=}'[use the specified password prompt]:prompt'
+  '(-r --role)'{-r+,--role=}'[create SELinux security context with specified role]:role'
+  '(-S --stdin)'{-S,--stdin}'[read password from standard input]'
+  '(-t --type)'{-t+,--type=}'[create SELinux security context with specified type]:type'
+  '(-U --other-user)'{-U+,--other-user=}'[in list mode, display privileges for user]:user:_users'
+  '(-u --user)'{-u+,--user=}'[run command (or edit file) as specified user]:user:_users'
+  '(-)'{-V,--version}'[display version information and exit]'
+  '(-v --validate)'{-v,--validate}"[update user's timestamp without running a command]"
 )
 
-if [[ $service = sudoedit ]]; then
-  _arguments $args \
-    '*:file: _files'
+if [[ $service = sudoedit || -n ${words[(r)-e]} ]]; then
+  args=( -A "-*" $args '!(-V --version -h --help)-e' '*:file:_files' )
 else
-  _arguments $args \
-    '(- :)-e[edit file]:*:file:_files' \
-    '(- :)-s[run SHELL]' \
-    '(- :)-i[simulate login]' \
-    '(-i -s -e)-b[run command in background]' \
-    '(-i -s -e)-E[preserve environment]' \
-    '(-i -s -e)-H[set HOME environment variable]' \
-    '(-i -s -e)-P[preserve group vector]' \
-    '(-):command: _command_names -e' \
+  args+=(
+    '(-e --edit 1 *)'{-e,--edit}'[edit files instead of running a command]' \
+    '(-s --shell)'{-s,--shell}'[run shell as the target user; a command may also be specified]' \
+    '(-i --login)'{-i,--login}'[run login shell as the target user; a command may also be specified]' \
+    '(-b --background -i --login -s --shell -e --edit)'{-b,--background}'[run command in the background]' \
+    '(-E --preserve-env -i --login -s --shell -e --edit)'{-E,--preserve-env}'[preserve user environment when running command]' \
+    '(-H --set-home -i --login -s --shell -e --edit)'{-H,--set-home}"[set HOME variable to target user's home dir]" \
+    '(-P --preserve-groups -i -login -s --shell -e --edit)'{-P,--preserve-groups}"[preserve group vector instead of setting to target's]" \
+    '(-)1:command: _command_names -e'
     '*::arguments: _normal'
+  )
 fi
+
+_arguments -s -S $args

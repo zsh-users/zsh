@@ -1,5 +1,11 @@
 2014-12-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 33958: Completion/Unix/Command/_sudo: update for newer options
+
+	* 33956: Doc/Zsh/zle.yo, Src/Zle/zle_bindings.c,
+	Src/Zle/zle_keymap.c: document key binding changes and remove
+	^X binding
+
 	* 33846: Src/Zle/iwidgets.list, Src/Zle/zle_bindings.c,
 	Src/Zle/zle_keymap.c: additional default vi-mode key bindings
 
