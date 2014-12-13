@@ -1,3 +1,8 @@
+2014-12-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 33846: Src/Zle/iwidgets.list, Src/Zle/zle_bindings.c,
+	Src/Zle/zle_keymap.c: additional default vi-mode key bindings
+
 2014-12-12  Oliver Kiddle  <opk@zsh.org>
 
 	* 33950: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list, Src/Zle/zle.h,

@@ -1367,6 +1367,13 @@ default_bindings(void)
     bindkey(vismap, "x", refthingy(t_videlete), NULL);
     bindkey(vismap, "~", refthingy(t_vioperswapcase), NULL);
 
+    /* vi mode: some common vim bindings */
+    bindkey(amap, "ga", refthingy(t_whatcursorposition), NULL);
+    bindkey(amap, "ge", refthingy(t_vibackwardwordend), NULL);
+    bindkey(amap, "gE", refthingy(t_vibackwardblankwordend), NULL);
+    bindkey(amap, "gg", refthingy(t_beginningofbufferorhistory), NULL);
+    bindkey(amap, "g~", refthingy(t_vioperswapcase), NULL);
+
     /* emacs mode: arrow keys */ 
     add_cursor_key(emap, TCUPCURSOR, t_uplineorhistory, 'A');
     add_cursor_key(emap, TCDOWNCURSOR, t_downlineorhistory, 'B');
