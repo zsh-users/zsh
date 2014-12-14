@@ -959,27 +959,9 @@ udevordir)
   esac
 
   local MATCH MBEGIN MEND
-  # "Mummy, why is mount point matching full of squiggles?"
-  #
-  # "Well, dear, the clever people who wrote Linux decided that some
-  # funny characters that might confuse programmes looking at the names
-  # would be encoded as octal escapes, like for example \040 for space.
-  # The clever people who wrote zsh decided that nothing would
-  # ever be quite as simple as it should be, so to substitute octal
-  # escapes everywhere in a string, even though the shell understands
-  # them natively in print escapes, needs some hackery where you match
-  # the octal number using the numeric closure syntax introduced after
-  # 4.3.4, then reinput the number in a standard math mode format as 8#OOO,
-  # and turn that into a character using the (#) parameter flag."
-  #
-  # "Mummy, why is nothing ever quite as simple as it should be?"
-  #
-  # "Well, dear, if it was then the clever people who write programmes would
-  # have been replaced by intelligent monkeys and then they'd be out
-  # of working roaming the streets, and we wouldn't want that, would we?"
-  mp_tmp=("${(@q)mp_tmp//(#m)\\[0-7](#c3)/${(#)$(( 8#${MATCH[2,-1]} ))}}")
-  dpath_tmp=( "${(@Mq)dev_tmp:#/*}" )
-  dev_tmp=( "${(@q)dev_tmp:#/*}" )
+  mp_tmp=("${(@qg::)mp_tmp}")
+  dpath_tmp=( "${(@Mqg::)dev_tmp:#/*}" )
+  dev_tmp=( "${(@qg::)dev_tmp:#/*}" )
 
   _alternative \
     'device-labels:device label:compadd -a dev_tmp' \
