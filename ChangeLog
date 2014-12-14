@@ -1,3 +1,8 @@
+2014-12-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Test/D04parameter.ztst: need -f for starting zsh
+	to avoid problems from user config files.
+
 2014-12-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 33958: Completion/Unix/Command/_sudo: update for newer options

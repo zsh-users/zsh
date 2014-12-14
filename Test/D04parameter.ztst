@@ -1658,8 +1658,8 @@
 >l
 
   SHLVL=1
-  $ZTST_testdir/../Src/zsh -c 'echo $SHLVL'
-  $ZTST_testdir/../Src/zsh -c '(echo $SHLVL)'
+  $ZTST_testdir/../Src/zsh -fc 'echo $SHLVL'
+  $ZTST_testdir/../Src/zsh -fc '(echo $SHLVL)'
 0:SHLVL appears sensible when about to exit shell
 >2
 >2
