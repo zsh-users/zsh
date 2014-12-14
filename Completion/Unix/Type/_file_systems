@@ -12,7 +12,7 @@ case $OSTYPE in
     [[ -r /proc/filesystems ]] &&
         fss+=( ${$(</proc/filesystems)#nodev} )
     [[ -r /etc/filesystems ]] &&
-        fss+=( ${$(</etc/filesystems)#\*} )
+        fss+=( ${${${(f)"$(</etc/filesystems)"}:#\#*}#\*} )        
   ;;
   osf*) fss=( advfs ufs nfs mfs cdfs ) ;;
   solaris*) fss=( ufs nfs hsfs s5fs pcfs cachefs tmpfs ) ;;
