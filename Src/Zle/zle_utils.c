@@ -675,35 +675,42 @@ zle_restore_positions(void)
 	zlell = oldpos->ll;
     }
 
-    /* Count number of regions and see if the array needs resizing */
-    for (nreg = 0, oldrhp = oldpos->regions;
-	 oldrhp;
-	 nreg++, oldrhp = oldrhp->next)
-	;
-    if (nreg + N_SPECIAL_HIGHLIGHTS != n_region_highlights) {
-	n_region_highlights = nreg + N_SPECIAL_HIGHLIGHTS;
-	region_highlights = (struct region_highlight *)
-	    zrealloc(region_highlights,
-		     sizeof(struct region_highlight) * n_region_highlights);
-    }
-    oldrhp = oldpos->regions;
-    rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
-    while (oldrhp) {
-	struct zle_region *nextrhp = oldrhp->next;
-
-	rhp->atr = oldrhp->atr;
-	rhp->flags = oldrhp->flags;
-	if (zlemetaline) {
-	    rhp->start_meta = oldrhp->start;
-	    rhp->end_meta = oldrhp->end;
-	} else {
-	    rhp->start = oldrhp->start;
-	    rhp->end = oldrhp->end;
+    if (oldpos->regions) {
+	/* Count number of regions and see if the array needs resizing */
+	for (nreg = 0, oldrhp = oldpos->regions;
+	     oldrhp;
+	     nreg++, oldrhp = oldrhp->next)
+	    ;
+	if (nreg + N_SPECIAL_HIGHLIGHTS != n_region_highlights) {
+	    n_region_highlights = nreg + N_SPECIAL_HIGHLIGHTS;
+	    region_highlights = (struct region_highlight *)
+		zrealloc(region_highlights,
+			 sizeof(struct region_highlight) * n_region_highlights);
 	}
+	oldrhp = oldpos->regions;
+	rhp = region_highlights + N_SPECIAL_HIGHLIGHTS;
+	while (oldrhp) {
+	    struct zle_region *nextrhp = oldrhp->next;
 
-	zfree(oldrhp, sizeof(*oldrhp));
-	oldrhp = nextrhp;
-	rhp++;
+	    rhp->atr = oldrhp->atr;
+	    rhp->flags = oldrhp->flags;
+	    if (zlemetaline) {
+		rhp->start_meta = oldrhp->start;
+		rhp->end_meta = oldrhp->end;
+	    } else {
+		rhp->start = oldrhp->start;
+		rhp->end = oldrhp->end;
+	    }
+
+	    zfree(oldrhp, sizeof(*oldrhp));
+	    oldrhp = nextrhp;
+	    rhp++;
+	}
+    } else if (region_highlights) {
+	zfree(region_highlights, sizeof(struct region_highlight) *
+	      n_region_highlights);
+	region_highlights  = NULL;
+	n_region_highlights = 0;
     }
 
     zfree(oldpos, sizeof(*oldpos));

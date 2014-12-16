@@ -396,8 +396,9 @@ get_region_highlight(UNUSED(Param pm))
     struct region_highlight *rhp;
 
     /* region_highlights may not have been set yet */
-    if (arrsize)
-	arrsize -= N_SPECIAL_HIGHLIGHTS;
+    if (!arrsize)
+	return hmkarray(NULL);
+    arrsize -= N_SPECIAL_HIGHLIGHTS;
     arrp = retarr = (char **)zhalloc((arrsize+1)*sizeof(char *));
 
     /* ignore special highlighting */
@@ -1027,6 +1028,8 @@ zrefresh(void)
 
     /* this will create region_highlights if it's still NULL */
     zle_set_highlight();
+
+    DPUTS(!region_highlights, "region_highlights not created");
 
     /* check for region between point ($CURSOR) and mark ($MARK) */
     if (region_active) {
