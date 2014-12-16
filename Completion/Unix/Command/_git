@@ -5206,20 +5206,60 @@ _git_commands () {
 
   integer ret=1
 
-  # TODO: Is this the correct way of doing it?  Should we be using _alternative
-  # and separate functions for each set of commands instead?
-  _describe -t aliases alias unique_aliases && ret=0
-  _describe -t main-porcelain-commands 'main porcelain command' main_porcelain_commands && ret=0
-  _describe -t user-commands 'user command' user_commands && ret=0
-  _describe -t third-party-commands 'third-party command' third_party_commands && ret=0
-  _describe -t ancillary-manipulator-commands 'ancillary manipulator command' ancillary_manipulator_commands && ret=0
-  _describe -t ancillary-interrogator-commands 'ancillary interrogator command' ancillary_interrogator_commands && ret=0
-  _describe -t interaction-commands 'interaction command' interaction_commands && ret=0
-  _describe -t plumbing-manipulator-commands 'plumbing manipulator command' plumbing_manipulator_commands && ret=0
-  _describe -t plumbing-interrogator-commands 'plumbing interrogator command' plumbing_interrogator_commands && ret=0
-  _describe -t plumbing-sync-commands 'plumbing sync command' plumbing_sync_commands && ret=0
-  _describe -t plumbing-sync-helper-commands 'plumbing sync helper command' plumbing_sync_helper_commands && ret=0
-  _describe -t plumbing-internal-helper-commands 'plumbing internal helper command' plumbing_internal_helper_commands && ret=0
+  _tags \
+    aliases \
+    main-porcelain-commands \
+    user-commands \
+    third-party-commands \
+    ancillary-manipulator-commands \
+    ancillary-interrogator-commands \
+    interaction-commands \
+    plumbing-manipulator-commands \
+    plumbing-interrogator-commands \
+    plumbing-sync-commands \
+    plumbing-sync-helper-commands \
+    plumbing-internal-helper-commands
+ 
+  while _tags; do
+
+    _requested aliases && \
+      _describe -t aliases 'alias' unique_aliases && ret=0
+
+    _requested main-porcelain-commands && \
+      _describe -t main-porcelain-commands 'main porcelain command' main_porcelain_commands && ret=0
+
+    _requested user-commands && \
+      _describe -t user-commands 'user command' user_commands && ret=0
+
+    _requested third-party-commands && \
+      _describe -t third-party-commands 'third-party command' third_party_commands && ret=0
+
+    _requested ancillary-manipulator-commands && \
+      _describe -t ancillary-manipulator-commands 'ancillary manipulator command' ancillary_manipulator_commands && ret=0
+
+    _requested ancillary-interrogator-commands && \
+      _describe -t ancillary-interrogator-commands 'ancillary interrogator command' ancillary_interrogator_commands && ret=0
+
+    _requested interaction-commands && \
+      _describe -t interaction-commands 'interaction command' interaction_commands && ret=0
+
+    _requested plumbing-manipulator-commands && \
+      _describe -t plumbing-manipulator-commands 'plumbing manipulator command' plumbing_manipulator_commands && ret=0
+
+    _requested plumbing-interrogator-commands && \
+      _describe -t plumbing-interrogator-commands 'plumbing interrogator command' plumbing_interrogator_commands && ret=0
+
+    _requested plumbing-sync-commands && \
+      _describe -t plumbing-sync-commands 'plumbing sync command' plumbing_sync_commands && ret=0
+
+    _requested plumbing-sync-helper-commands && \
+      _describe -t plumbing-sync-helper-commands 'plumbing sync helper command' plumbing_sync_helper_commands && ret=0
+
+    _requested plumbing-internal-helper-commands && \
+      _describe -t plumbing-internal-helper-commands 'plumbing internal helper command' plumbing_internal_helper_commands && ret=0
+
+    (( ret )) || break
+  done
 
   return ret
 }

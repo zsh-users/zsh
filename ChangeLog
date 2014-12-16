@@ -1,3 +1,8 @@
+2015-01-05  Daniel Shahaf <d.s@daniel.shahaf.name>
+
+	* 34042: Completion/Unix/Command/_git: Respect tags for subcommand
+	completion.
+
 2015-01-05  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Timofey Titovets: 34053: Completion/Linux/Command/_modutils:
