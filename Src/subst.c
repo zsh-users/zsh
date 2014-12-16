@@ -298,7 +298,7 @@ stringsubst(LinkList list, LinkNode node, int pf_flags, int asssub)
 	    if (endchar == Outpar)
 		str2--;
 	    if (!(s = (char *) ugetnode(pl))) {
-		str = strcpy(str2, str);
+		str = (char *)memmove(str2, str, strlen(str)+1);
 		continue;
 	    }
 	    if (!qt && (pf_flags & PREFORK_SINGLE) && isset(GLOBSUBST))
