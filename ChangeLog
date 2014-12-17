@@ -1,3 +1,8 @@
+2014-12-18  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 33978: Src/Zle/complist.c: update command line when accept-
+	and-hold is called in interactive mode of menu select
+
 2014-12-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/19551: Doc/builtins.yo, Doc/Zsh/roadmap.yo: better

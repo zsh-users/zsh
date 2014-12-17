@@ -2790,7 +2790,9 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    Menustack s = (Menustack) zhalloc(sizeof(*s));
 	    int ol;
 
-            mode = 0;
+	    if (mode == MM_INTER)
+		do_single(*minfo.cur);
+	    mode = 0;
 	    s->prev = u;
 	    u = s;
 	    s->line = dupstring(zlemetaline);
