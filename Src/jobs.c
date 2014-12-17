@@ -2734,7 +2734,7 @@ acquire_pgrp(void)
     long ttpgrp;
     sigset_t blockset, oldset;
 
-    if ((mypgrp = GETPGRP()) > 0) {
+    if ((mypgrp = GETPGRP()) >= 0) {
 	long lastpgrp = mypgrp;
 	sigemptyset(&blockset);
 	sigaddset(&blockset, SIGTTIN);

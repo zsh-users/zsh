@@ -1,3 +1,8 @@
+2014-12-16  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* Chirantan Ekbote: 33982: Src/jobs.c: minimal support for pid
+	namespaces by recognizing that GETPGRP() may return 0
+
 2014-12-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 33976: Src/subst.c: fix overlapping strcpy()
