@@ -1,3 +1,9 @@
+2014-12-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Lokesh Mandvekar: 33999: Completion/Linux/Command/_docker:
+	remove completion as the version supplied with docker is
+	authoritative.
+
 2014-12-18  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 33978: Src/Zle/complist.c: update command line when accept-
