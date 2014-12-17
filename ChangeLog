@@ -1,4 +1,7 @@
-2014-12-16  Barton E. Schaefer  <schaefer@brasslantern.com>
+2014-12-16  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Jun Kuriyama: 33984: Src/builtin.c: bin_dirs() should use
+	zputs() to print metafied directory names
 
 	* Chirantan Ekbote: 33982: Src/jobs.c: minimal support for pid
 	namespaces by recognizing that GETPGRP() may return 0

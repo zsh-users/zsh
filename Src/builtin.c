@@ -719,7 +719,7 @@ bin_dirs(UNUSED(char *name), char **argv, Options ops, UNUSED(int func))
 	for (node = firstnode(dirstack); node; incnode(node)) {
 	    printf(fmt, pos++);
 	    if (OPT_ISSET(ops,'l'))
-		fputs(getdata(node), stdout);
+		zputs(getdata(node), stdout);
 	    else
 		fprintdir(getdata(node), stdout);
 
