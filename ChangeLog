@@ -1,3 +1,9 @@
+2014-12-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/19551: Doc/builtins.yo, Doc/Zsh/roadmap.yo: better
+	documentation that history file reading and writing is only
+	done in interactive shells.
+
 2014-12-16  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Jun Kuriyama: 33984: Src/builtin.c: bin_dirs() should use

@@ -41,7 +41,9 @@ set appropriate variables, and the number of history lines retained by
 default is quite small (30 lines).  See the description of the shell
 variables (referred to in the documentation as parameters) tt(HISTFILE),
 tt(HISTSIZE) and tt(SAVEHIST) in ifzman(zmanref(zshparam))\
-ifnzman(noderef(Parameters Used By The Shell)).
+ifnzman(noderef(Parameters Used By The Shell)).  Note that it's
+currently only possible to read and write files saving history
+when the shell is interactive, i.e. it does not work from scripts.
 
 The shell now supports the UTF-8 character set (and also others if
 supported by the operating system).  This is (mostly) handled transparently

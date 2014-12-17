@@ -657,6 +657,12 @@ xitem(tt(      )[ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
 xitem(tt(fc) tt(-p) [ tt(-a) ] [ var(filename) [ var(histsize) [ var(savehistsize) ] ] ])
 xitem(tt(fc) tt(-P))
 item(tt(fc) tt(-ARWI) [ var(filename) ])(
+The tt(fc) command controls the interactive history mechanism.  Note
+that reading and writing of history options is only performed if the
+shell is interactive.  Usually this is detected automatically, but
+it can be forced by setting the tt(interactive) option when starting the
+shell.
+
 Select a range of commands from var(first) to var(last) from the
 history list.
 The arguments var(first) and var(last) may be specified as a
