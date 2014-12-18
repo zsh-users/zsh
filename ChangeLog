@@ -1,5 +1,8 @@
 2014-12-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 34006: Src/params.c: unmetafy anything put into the
+	environment.
+
 	* Lokesh Mandvekar: 33999: Completion/Linux/Command/_docker:
 	remove completion as the version supplied with docker is
 	authoritative.

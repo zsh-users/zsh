@@ -4357,7 +4357,18 @@ arrfixenv(char *s, char **t)
 int
 zputenv(char *str)
 {
+    char *ptr;
     DPUTS(!str, "Attempt to put null string into environment.");
+    /*
+     * The environment uses NULL-terminated strings, so just
+     * unmetafy and ignore the length.
+     */
+    for (ptr = str; *ptr && *ptr != Meta; ptr++)
+	;
+    if (*ptr == Meta) {
+	str = dupstring(str);
+	unmetafy(str, NULL);
+    }
 #ifdef USE_SET_UNSET_ENV
     /*
      * If we are using unsetenv() to remove values from the
@@ -4366,7 +4377,6 @@ zputenv(char *str)
      * Unfortunately this is a slightly different interface
      * from what zputenv() assumes.
      */
-    char *ptr;
     int ret;
 
     for (ptr = str; *ptr && *ptr != '='; ptr++)
