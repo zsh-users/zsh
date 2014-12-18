@@ -641,7 +641,7 @@ split_env_string(char *env, char **name, char **value)
     if (!env || !name || !value)
 	return 0;
 
-    tenv = strcpy(zhalloc(strlen(env) + 1), env);
+    tenv = metafy(env, strlen(env), META_HEAPDUP);
     for (str = tenv; *str && *str != '='; str++)
 	;
     if (str != tenv && *str == '=') {

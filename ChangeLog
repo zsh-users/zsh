@@ -1,5 +1,8 @@
 2014-12-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 34008: Src/params.c: also metafy anything arriving from the
+	environment.
+
 	* 34006: Src/params.c: unmetafy anything put into the
 	environment.
 
