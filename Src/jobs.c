@@ -2779,8 +2779,11 @@ void
 release_pgrp(void)
 {
     if (origpgrp != mypgrp) {
-	attachtty(origpgrp);
-	setpgrp(0, origpgrp);
+	/* in linux pid namespaces, origpgrp may never have been set */
+	if (origpgrp) {
+	    attachtty(origpgrp);
+	    setpgrp(0, origpgrp);
+	}
 	mypgrp = origpgrp;
     }
 }
