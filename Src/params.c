@@ -641,9 +641,17 @@ split_env_string(char *env, char **name, char **value)
     if (!env || !name || !value)
 	return 0;
 
-    tenv = metafy(env, strlen(env), META_HEAPDUP);
-    for (str = tenv; *str && *str != '='; str++)
-	;
+    tenv = strcpy(zhalloc(strlen(env) + 1), env);
+    for (str = tenv; *str && *str != '='; str++) {
+	if (STOUC(*str) >= 128) {
+	    /*
+	     * We'll ignore environment variables with names not
+	     * from the portable character set since we don't
+	     * know of a good reason to accept them.
+	     */
+	    return 0;
+	}
+    }
     if (str != tenv && *str == '=') {
 	*str = '\0';
 	*name = tenv;
@@ -4357,18 +4365,7 @@ arrfixenv(char *s, char **t)
 int
 zputenv(char *str)
 {
-    char *ptr;
     DPUTS(!str, "Attempt to put null string into environment.");
-    /*
-     * The environment uses NULL-terminated strings, so just
-     * unmetafy and ignore the length.
-     */
-    for (ptr = str; *ptr && *ptr != Meta; ptr++)
-	;
-    if (*ptr == Meta) {
-	str = dupstring(str);
-	unmetafy(str, NULL);
-    }
 #ifdef USE_SET_UNSET_ENV
     /*
      * If we are using unsetenv() to remove values from the
@@ -4377,11 +4374,21 @@ zputenv(char *str)
      * Unfortunately this is a slightly different interface
      * from what zputenv() assumes.
      */
+    char *ptr;
     int ret;
 
-    for (ptr = str; *ptr && *ptr != '='; ptr++)
+    for (ptr = str; *ptr && STOUC(*ptr) < 128 && *ptr != '='; ptr++)
 	;
-    if (*ptr) {
+    if (STOUC(*ptr) >= 128) {
+	/*
+	 * Environment variables not in the portable character
+	 * set are non-standard and we don't really know of
+	 * a use for them.
+	 *
+	 * We'll disable until someone complains.
+	 */
+	return 1;
+    } else if (*ptr) {
 	*ptr = '\0';
 	ret = setenv(str, ptr+1, 1);
 	*ptr = '=';

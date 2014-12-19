@@ -1,5 +1,9 @@
 2014-12-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 34015: Src/params.c: back off yesterday's mess and
+	disallow environment variables with characters with the
+	top bit set.
+
 	* 34005: Src/Zle/zle_refresh.c: Zero uninitialised memory when
 	realloc'ing region_highlights.
 
