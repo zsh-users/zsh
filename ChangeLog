@@ -1,3 +1,8 @@
+2014-12-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34005: Src/Zle/zle_refresh.c: Zero uninitialised memory when
+	realloc'ing region_highlights.
+
 2014-12-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34008: Src/params.c: also metafy anything arriving from the

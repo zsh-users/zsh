@@ -399,6 +399,7 @@ get_region_highlight(UNUSED(Param pm))
     if (!arrsize)
 	return hmkarray(NULL);
     arrsize -= N_SPECIAL_HIGHLIGHTS;
+    DPUTS(arrsize < 0, "arrsize is negative from n_region_highlights");
     arrp = retarr = (char **)zhalloc((arrsize+1)*sizeof(char *));
 
     /* ignore special highlighting */
@@ -450,10 +451,15 @@ set_region_highlight(UNUSED(Param pm), char **aval)
     len = aval ? arrlen(aval) : 0;
     if (n_region_highlights != len + N_SPECIAL_HIGHLIGHTS) {
 	/* no null termination, but include special highlighting at start */
-	n_region_highlights = len + N_SPECIAL_HIGHLIGHTS;
+	int newsize = len + N_SPECIAL_HIGHLIGHTS;
+	int diffsize = newsize - n_region_highlights;
 	region_highlights = (struct region_highlight *)
 	    zrealloc(region_highlights,
-		     sizeof(struct region_highlight) * n_region_highlights);
+		     sizeof(struct region_highlight) * newsize);
+	if (diffsize > 0)
+	    memset(region_highlights + newsize, 0,
+		   sizeof(struct region_highlight) * diffsize);
+	n_region_highlights = newsize;
     }
 
     if (!aval)
