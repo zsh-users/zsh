@@ -1201,7 +1201,7 @@ init_keymaps(void)
 {
     createkeymapnamtab();
     default_bindings();
-    keybuf = (char *)zalloc(keybufsz);
+    keybuf = (char *)zshcalloc(keybufsz);
     lastnamed = refthingy(t_undefinedkey);
 }
 
