@@ -26,6 +26,7 @@ _arguments -C -s -S \
   '(-l -L -d -D -A -N -m -s *)-r[unbind specified in-strings]:*:in-string' \
   '(-l -L -d -D -A -N -m -p -r *)-s[bind each in-string to each out-string]:*:key string' \
   '(-e -v -a -M -l -L -d -D -A -N -m -p)-R[interpret in-strings as ranges]' \
+  '(-l -L -d -A -N -m -p -r -s):in-string' \
   '(-l -L -d -A -N -m -p -r -s)*::widgets:->widget' && ret=0
 
 case $state in
