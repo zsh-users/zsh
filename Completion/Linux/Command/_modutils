@@ -107,7 +107,7 @@ _modutils() {
 	    if _cache_invalid modules-$kver || ! _retrieve_cache modules-$kver;
 	    then 
 		# 2011-01-02 gi1242: Do we need .o files? Or is .ko enough?
-		modules=( $modules_dir/$kver/(*~(source|build))/**/*.(o|ko|ko.gz)(.:t:r:r) )
+		modules=( $modules_dir/$kver/(*~(source|build))/**/*.(o|ko|ko.gz|.ko.xz)(.:t:r:r) )
 		_store_cache modules-$kver modules
 	    fi
 

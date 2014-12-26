@@ -1,3 +1,8 @@
+2015-01-05  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Timofey Titovets: 34053: Completion/Linux/Command/_modutils:
+	additional compression option for kernel modules.
+
 2015-01-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34092: Src/utils.c: miscount of buffer length in symlink
