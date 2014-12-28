@@ -1958,8 +1958,8 @@ if [[ -z $ifile || -d $ifile ]] ||
 fi
 
 local tmpout=${TMPPREFIX:-/tmp/zsh}compinstall$$
-mv -f =(:) $tmpout &&	# safe tempfile creation
-mv -f =(:) ${tmpout}x || return 1
+mv -f =(<<<'') $tmpout &&	# safe tempfile creation
+mv -f =(<<<'') ${tmpout}x || return 1
 
 #
 # Assemble the complete set of lines to

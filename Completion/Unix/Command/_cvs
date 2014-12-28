@@ -704,15 +704,18 @@ _cvs_sub_modules() {
 _cvs_run() {
   local cvsroot="$1" dir="$2"
   shift 2
-  local d=/tmp/zsh-cvs-work-$$
-  mkdir $d >&/dev/null
-  cd $d
-  mkdir CVS >&/dev/null
+  local d=${TMPPREFIX:-/tmp/zsh}-cvs-work-$$
+  rm -rf $d
+  mkdir $d &&
+  (
+  chmod 0700 $d &&
+  builtin cd -q $d &&
+  mkdir CVS >&/dev/null || return 1
   print -r - "$cvsroot" > CVS/Root
   print "$dir" > CVS/Repository
   print D > CVS/Entries
   CVS_IGNORE_REMOTE_ROOT= cvs "$@"
-  cd $OLDPWD
+  )
   rm -rf $d
 }
 

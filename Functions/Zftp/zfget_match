@@ -10,7 +10,7 @@ fi
 if [[ $ZFTP_SYSTEM == UNIX* && $1 == */* ]]; then
   setopt localoptions clobber
   local tmpf=${TMPPREFIX}zfgm$$
-  mv -f =(:) $tmpf
+  mv -f =(<<<'') $tmpf
 	
   if [[ -n $WIDGET ]]; then
     local dir=${1:h}

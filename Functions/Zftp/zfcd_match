@@ -29,7 +29,7 @@ if [[ $ZFTP_SYSTEM = UNIX* ]]; then
 #  () {
 #    zftp ls -LF $dir >|$1
 #    reply=($(awk '/\/$/ { print substr($1, 1, length($1)-1) }' $1))
-#  } =(:)
+#  } =(<<<'')
   [[ -n $dir && $dir != */ ]] && dir="$dir/"
   if [[ -n $WIDGET ]]; then
     _wanted directories expl 'remote directory' \

@@ -58,7 +58,7 @@ for rem in $*; do
     zftp remote $rem >|$1
     rstat=$?
     remstats=($(<$1))
-  } =(: temporary file)
+  } =(<<<'temporary file')
   if [[ $rstat = 2 ]]; then
     print "Server does not implement full command set required." 1>&2
     return 1

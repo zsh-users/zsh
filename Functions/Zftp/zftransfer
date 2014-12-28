@@ -47,7 +47,7 @@ if [[ -n $style && $style != none ]]; then
   () {
     zftp remote $file1 >|$1 2>/dev/null
     array=($(<$1))
-  } =(: temporary file)
+  } =(<<<'temporary file')
   [[ $#array -eq 2 ]] && ZFTP_TSIZE=$array[1]
 fi
 

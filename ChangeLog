@@ -1,3 +1,14 @@
+2014-12-28  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34068: Completion/Base/Widget/_complete_debug,
+	Completion/Unix/Command/_cvs, Completion/compinstall,
+	Functions/Calendar/calendar, Functions/Zftp/zfcd_match,
+	Functions/Zftp/zfcget, Functions/Zftp/zfcput,
+	Functions/Zftp/zfget_match, Functions/Zftp/zfrglob,
+	Functions/Zftp/zftransfer, Functions/Zftp/zfuget,
+	Functions/Zftp/zfuput: create tempfiles without forking, and
+	safe temp directory creation
+
 2014-12-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34067: Completion/Base/Widget/_complete_debug,

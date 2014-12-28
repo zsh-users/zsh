@@ -254,7 +254,7 @@ if (( verbose )); then
 fi
 
 local mycmds="${TMPPREFIX:-/tmp/zsh}.calendar_cmds.$$"
-mv -f =(:) $mycmds
+mv -f =(<<<'') $mycmds
 
 # start of subshell for OS file locking
 (

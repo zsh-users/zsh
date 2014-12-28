@@ -38,7 +38,7 @@ if [[ $zfrglob != '' ]]; then
   () {
     zftp ls "$pat" >|$1 2>/dev/null
     eval "$1=(\$(<\$1))"
-  } =(: temporary file)
+  } =(<<<'temporary file')
 else
   if [[ $ZFTP_SYSTEM = UNIX* && $pat = */* ]]; then
     # not the current directory and we know how to handle paths
@@ -52,7 +52,7 @@ else
     () {
       zftp ls "$dir" 2>/dev/null >|$1
       files=($(<$1))
-    } =(: temporary file)
+    } =(<<<'temporary file')
     files=(${files:t})
   else
     # we just have to do an ls and hope that's right

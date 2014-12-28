@@ -43,7 +43,7 @@ for remlist in $*; do
 	  zftp remote $rem >|$1
 	  rstat=$?
 	  remst=($(<$1))
-	} =(: temporary file)
+	} =(<<<'temporary file')
 	if [[ $rstat = 2 ]]; then
 	  print "Server does not support SIZE command.\n" \
 	  "Assuming you know what you're doing..." 2>&1
