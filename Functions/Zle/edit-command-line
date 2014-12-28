@@ -6,12 +6,10 @@
 # will give ksh-like behaviour for that key,
 # except that it will handle multi-line buffers properly.
 
-local tmpfile=${TMPPREFIX:-/tmp/zsh}ecl$$
+() {
+  exec </dev/tty
+  ${=${VISUAL:-${EDITOR:-vi}}} $1
+  print -Rz - "$(<$1)" 
+} =(<<<"$PREBUFFER$BUFFER")
 
-print -R - "$PREBUFFER$BUFFER" >$tmpfile
-exec </dev/tty
-${=${VISUAL:-${EDITOR:-vi}}} $tmpfile
-print -Rz - "$(<$tmpfile)" 
-
-command rm -f $tmpfile
 zle send-break		# Force reload from the buffer stack

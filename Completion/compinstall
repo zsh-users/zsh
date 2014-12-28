@@ -1958,11 +1958,14 @@ if [[ -z $ifile || -d $ifile ]] ||
 fi
 
 local tmpout=${TMPPREFIX:-/tmp/zsh}compinstall$$
+mv -f =(:) $tmpout &&	# safe tempfile creation
+mv -f =(:) ${tmpout}x || return 1
+
 #
 # Assemble the complete set of lines to
 # insert.
 #
-__ci_output >$tmpout
+__ci_output >>$tmpout
 
 if [[ -n $ifile ]]; then
   if [[ $ifile != *(zshrc|zlogin|zshenv) ]]; then 
@@ -1984,15 +1987,15 @@ future use."
   fi
   if { { grep "$endline" $ifile >/dev/null 2>&1 &&
          sed -e "/^[ 	]*$endline/r $tmpout
-/^[ 	]*$startline/,/^[ 	]*$endline/d" $ifile >${tmpout}2 } || 
-        { cp $ifile ${tmpout}2 && cat $tmpout >>${tmpout}2 } } &&
-  cp ${tmpout}2 $ifile && rm -f ${tmpout}2; then
+/^[ 	]*$startline/,/^[ 	]*$endline/d" $ifile >>${tmpout}x } || 
+        { cp $ifile ${tmpout}x && cat $tmpout >>${tmpout}x } } &&
+  cp ${tmpout}x $ifile && rm -f ${tmpout}x; then
     print "\nSuccessfully added compinstall lines to $ifile."
     rm -f $tmpout
   else
     print "\nFailure adding lines to $ifile.  Lines left in \`$tmpout'"
   fi
-  rm -f ${tmpout}2
+  rm -f ${tmpout}x
 elif read -q key'?Print them to stdout instead ([y]es, [n]o)? '; then
   cat $tmpout
   rm -f $tmpout

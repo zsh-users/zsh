@@ -1,13 +1,11 @@
 # function zftype {
-local type zftmp=${TMPPREFIX}zftype$$
+local type
 [[ $curcontext = :zf* ]] || local curcontext=:zftype
 
 zfautocheck -d
 
 if (( $# == 0 )); then
-  zftp type >$zftmp
-  type=$(<$zftmp)
-  rm -f $zftmp
+  type=$(zftp type)
   if [[ $type = I ]]; then
     print "Current type is image (binary)"
     return 0

@@ -19,8 +19,5 @@ fi
 if [[ $1 = -d ]]; then
   unset $fcache_name
 elif (( ${(P)#fcache_name} == 0 )); then
-  local tmpf=${TMPPREFIX}zffcache$$
-  zftp ls >$tmpf
-  eval "$fcache_name=(\${(f)\"\$(<\$tmpf)\"})"
-  rm -f $tmpf
+  eval "$fcache_name=(\${(f)\"\$(zftp ls)\"})"
 fi

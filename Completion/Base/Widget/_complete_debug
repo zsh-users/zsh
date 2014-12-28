@@ -9,6 +9,7 @@ local pager w="${(qq)words}"
 integer debug_fd=-1
 {
   if [[ -t 2 ]]; then
+    mv -f =(:) $tmp &&
     exec {debug_fd}>&2 2>| $tmp
   fi
 

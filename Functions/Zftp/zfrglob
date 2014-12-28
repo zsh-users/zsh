@@ -33,12 +33,12 @@ if [[ $pat != *[][*?]* &&
   ( -n $zfrglob || $pat != *[(|)#^]* ) ]]; then
   return 0
 fi
-local tmpf=${TMPPREFIX}zfrglob$$
 
 if [[ $zfrglob != '' ]]; then
-  zftp ls "$pat" >$tmpf 2>/dev/null
-  eval "$1=(\$(<\$tmpf))"
-  rm -f $tmpf
+  () {
+    zftp ls "$pat" >|$1 2>/dev/null
+    eval "$1=(\$(<\$1))"
+  } =(: temporary file)
 else
   if [[ $ZFTP_SYSTEM = UNIX* && $pat = */* ]]; then
     # not the current directory and we know how to handle paths
@@ -49,10 +49,11 @@ else
       dir=/
     fi
     nondir=${pat##*/}
-    zftp ls "$dir" 2>/dev/null >$tmpf
-    files=($(<$tmpf))
+    () {
+      zftp ls "$dir" 2>/dev/null >|$1
+      files=($(<$1))
+    } =(: temporary file)
     files=(${files:t})
-    rm -f $tmpf
   else
     # we just have to do an ls and hope that's right
     local fcache_name

@@ -14,7 +14,6 @@ emulate -L zsh
 
 [[ $curcontext = :zf* ]] || local curcontext=:zfcput
 local loc rem stat=0 locst remst offs tailtype
-local tmpfile=${TMPPREFIX}zfcget$$ rstat
 
 # find how tail works.  this is intensely annoying, since it's completely
 # standard in C.  od's no use, since we can only skip whole blocks.
@@ -40,10 +39,11 @@ for loc in $*; do
   else
     # Compare the sizes.
     locst=($(zftp local $loc))
-    zftp remote $rem >$tmpfile
-    rstat=$?
-    remst=($(<$tmpfile))
-    rm -f $tmpfile
+    () {
+      zftp remote $rem >|$1
+      rstat=$?
+      remst=($(<$1))
+    } =(: temporary file)
     if [[ $rstat = 2 ]]; then
       print "Server does not support remote status commands.\n" \
       "You will have to find out the size by hand and use zftp append." 2>&1

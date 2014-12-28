@@ -14,7 +14,7 @@ emulate -L zsh
 
 [[ $curcontext = :zf* ]] || local curcontext=:zfcget
 local loc rem stat=0 opt opt_G opt_t remlist locst remst
-local tmpfile=${TMPPREFIX}zfcget$$ rstat tsize
+local rstat tsize
 
 while getopts :Gt opt; do
   [[ $opt = '?' ]] && print "zfcget: bad option: -$OPTARG" && return 1
@@ -39,10 +39,11 @@ for remlist in $*; do
       else
 	# Compare the sizes.
 	locst=($(zftp local $loc))
-	zftp remote $rem >$tmpfile
-	rstat=$?
-	remst=($(<$tmpfile))
-	rm -f $tmpfile
+	() {
+	  zftp remote $rem >|$1
+	  rstat=$?
+	  remst=($(<$1))
+	} =(: temporary file)
 	if [[ $rstat = 2 ]]; then
 	  print "Server does not support SIZE command.\n" \
 	  "Assuming you know what you're doing..." 2>&1

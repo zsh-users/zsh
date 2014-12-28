@@ -43,10 +43,11 @@ zfautocheck || return 1
 local style
 zstyle -s ':zftp:zftransfer' progress style
 if [[ -n $style && $style != none ]]; then
-  local ZFTP_TSIZE array tmpfile=${TMPPREFIX}zft$$
-  zftp remote $file1 >$tmpfile 2>/dev/null
-  array=($(<$tmpfile))
-  rm -f $tmpfile
+  local ZFTP_TSIZE array
+  () {
+    zftp remote $file1 >|$1 2>/dev/null
+    array=($(<$1))
+  } =(: temporary file)
   [[ $#array -eq 2 ]] && ZFTP_TSIZE=$array[1]
 fi
 

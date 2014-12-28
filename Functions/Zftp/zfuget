@@ -26,7 +26,7 @@
 emulate -L zsh
 
 [[ $curcontext = :zf* ]] || local curcontext=:zfuget
-local loc rem locstats remstats doit tmpfile=${TMPPREFIX}zfuget$$
+local loc rem locstats remstats doit
 local rstat remlist opt opt_v opt_s opt_G opt_t
 integer stat do_close
 
@@ -66,12 +66,13 @@ for remlist in $*; do
       doit=y
       remstats=()
       if [[ -f $loc ]]; then
-	zftp local $loc >$tmpfile
-	locstats=($(<$tmpfile))
-	zftp remote $rem >$tmpfile
-	rstat=$?
-	remstats=($(<$tmpfile))
-	rm -f $tmpfile
+	() {
+	  zftp local $loc >|$1
+	  locstats=($(<$1))
+	  zftp remote $rem >|$1
+	  rstat=$?
+	  remstats=($(<$1))
+	} =(: temporary file)
 	if [[ $rstat = 2 ]]; then
 	  print "Server does not implement full command set required." 1>&2
 	  return 1

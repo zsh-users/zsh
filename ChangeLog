@@ -1,5 +1,14 @@
 2014-12-27  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 34067: Completion/Base/Widget/_complete_debug,
+	Completion/compinstall, Functions/Calendar/calendar,
+	Functions/Zftp/zfcd_match, Functions/Zftp/zfcget,
+	Functions/Zftp/zfcput, Functions/Zftp/zffcache,
+	Functions/Zftp/zfget_match, Functions/Zftp/zfrglob,
+	Functions/Zftp/zftransfer, Functions/Zftp/zftype,
+	Functions/Zftp/zfuget, Functions/Zftp/zfuput,
+	Functions/Zle/edit-command-line: safe tempfile creation
+
 	* unposted: Test/A05execution.ztst: regressions for 34065
 
 	* 34065: Src/exec.c, Src/loop.c: following an "if" condition, do
