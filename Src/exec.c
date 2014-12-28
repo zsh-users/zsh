@@ -2294,6 +2294,8 @@ addvars(Estate state, Wordcode pc, int addflags)
 		}
 		allexp = opts[ALLEXPORT];
 		opts[ALLEXPORT] = 1;
+		if (isset(KSHARRAYS))
+		    unsetparam(name);
 	    	pm = assignsparam(name, val, myflags);
 		opts[ALLEXPORT] = allexp;
 	    } else

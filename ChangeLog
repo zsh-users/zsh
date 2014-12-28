@@ -5,6 +5,9 @@
 	* 34065: Src/exec.c, Src/loop.c: following an "if" condition, do
 	not test lastval for ERR_EXIT until a new command is run
 
+	* Takeshi Banse: 34064: Src/exec.c, Test/A06assign.ztst: assignment
+	before command replaces array with export even when KSH_ARRAYS
+
 2014-12-21  Oliver Kiddle  <opk@zsh.org>
 
 	* Daniel Shahaf: 33977: Completion/Zsh/Command/_bindkey:

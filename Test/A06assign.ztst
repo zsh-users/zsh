@@ -433,3 +433,21 @@
 >n=(tmpfile1 tmpfile2)
 >typeset x=tmpfile2
 >typeset -E f=4.000000000e+00
+
+ A=(first second)
+ A="${A[*]}" /bin/sh -c 'echo $A'
+ print -l "${A[@]}"
+0:command execution with assignments shadowing array parameter
+>first second
+>first
+>second
+
+ setopt ksharrays
+ A=(first second)
+ A="${A[*]}" /bin/sh -c 'echo $A'
+ print -l "${A[@]}"
+ unsetopt ksharrays
+0:command execution with assignments shadowing array parameter with ksharrays
+>first second
+>first
+>second
