@@ -269,3 +269,20 @@ F:anonymous function, and a descriptor leak when backgrounding a pipeline
 1:The status of recently exited background jobs is recorded
 >3
 >2
+
+# Regression test for workers/34060 (patch in 34065)
+  setopt ERR_EXIT NULL_GLOB
+  if false; then :; else echo if:$?; fi
+  if false; then :; else for x in _*_; do :; done; echo for:$?; fi
+0:False "if" condition handled correctly by "for" loops with ERR_EXIT
+>if:1
+>for:0
+
+# Regression test for workers/34065 (uses setopt from preceding test)
+  select x; do :; done; echo $?
+  select x in; do :; done; echo $?
+  select x in _*_; do :; done; echo $?
+0:The status of "select" is zero when the loop body does not execute
+>0
+>0
+>0

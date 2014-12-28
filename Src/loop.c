@@ -102,7 +102,10 @@ execfor(Estate state, int do_exec)
 		addlinknode(args, dupstring(*x));
 	}
     }
-    /* lastval = 0; */
+
+    if (!args || empty(args))
+	lastval = 0;
+
     loops++;
     pushheap();
     cmdpush(CS_FOR);
@@ -238,10 +241,10 @@ execselect(Estate state, UNUSED(int do_exec))
     }
     if (!args || empty(args)) {
 	state->pc = end;
-	return 1;
+	return 0;
     }
     loops++;
-    /* lastval = 0; */
+
     pushheap();
     cmdpush(CS_SELECT);
     usezle = interact && SHTTY != -1 && isset(USEZLE);
@@ -519,14 +522,17 @@ execif(Estate state, int do_exec)
 	s = 1;
 	state->pc = next;
     }
-    noerrexit = olderrexit;
 
     if (run) {
+	/* we need to ignore lastval until we reach execcmd() */
+	noerrexit = olderrexit ? olderrexit : lastval ? 2 : 0;
 	cmdpush(run == 2 ? CS_ELSE : (s ? CS_ELIFTHEN : CS_IFTHEN));
 	execlist(state, 1, do_exec);
 	cmdpop();
-    } else
+    } else {
+	noerrexit = olderrexit;
 	lastval = 0;
+    }
     state->pc = end;
 
     return lastval;

@@ -1,3 +1,10 @@
+2014-12-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: Test/A05execution.ztst: regressions for 34065
+
+	* 34065: Src/exec.c, Src/loop.c: following an "if" condition, do
+	not test lastval for ERR_EXIT until a new command is run
+
 2014-12-21  Oliver Kiddle  <opk@zsh.org>
 
 	* Daniel Shahaf: 33977: Completion/Zsh/Command/_bindkey:

@@ -2632,6 +2632,10 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	}
     }
 
+    /* if we get this far, it is OK to pay attention to lastval again */
+    if (noerrexit == 2 && !is_shfunc)
+	noerrexit = 0;
+
     /* Do prefork substitutions */
     esprefork = (assign || isset(MAGICEQUALSUBST)) ? PREFORK_TYPESET : 0;
     if (args && htok)
