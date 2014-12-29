@@ -457,7 +457,7 @@ set_region_highlight(UNUSED(Param pm), char **aval)
 	    zrealloc(region_highlights,
 		     sizeof(struct region_highlight) * newsize);
 	if (diffsize > 0)
-	    memset(region_highlights + newsize, 0,
+	    memset(region_highlights + newsize - diffsize, 0,
 		   sizeof(struct region_highlight) * diffsize);
 	n_region_highlights = newsize;
     }
