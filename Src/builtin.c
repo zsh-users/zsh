@@ -3315,7 +3315,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 
 	/* Option -a is to search the entire path, *
 	 * rather than just looking for one match. */
-	if (all) {
+	if (all && **argv != '/') {
 	    char **pp, *buf;
 
 	    pushheap();
