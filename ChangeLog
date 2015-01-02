@@ -1,5 +1,8 @@
 2015-01-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* users/19667: Doc/Zsh/builtins.yo, Src/builtin.c, Src/utils.c:
+	whence -S shows intermediate steps in symlink expansion.
+
 	* 34077: Test/A07control.ztst: add some further tests for
 	return status from "for" loops.
 

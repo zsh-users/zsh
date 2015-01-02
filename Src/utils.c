@@ -719,7 +719,7 @@ slashsplit(char *s)
 
 /**/
 static int
-xsymlinks(char *s)
+xsymlinks(char *s, int full)
 {
     char **pp, **opp;
     char xbuf2[PATH_MAX*3], xbuf3[PATH_MAX*2];
@@ -758,14 +758,49 @@ xsymlinks(char *s)
 	} else {
 	    ret = 1;
 	    metafy(xbuf3, t0, META_NOALLOC);
+	    if (!full) {
+		/*
+		 * If only one expansion requested, ensure the
+		 * full path is in xbuf.
+		 */
+		zulong len = xbuflen;
+		if (*xbuf3 == '/')
+		    strcpy(xbuf, xbuf3);
+		else if ((len += strlen(xbuf3) + 1) < sizeof(xbuf)) {
+		    strcpy(xbuf + xbuflen, "/");
+		    strcpy(xbuf + xbuflen + 1, xbuf3);
+		} else {
+		    *xbuf = 0;
+		    ret = -1;
+		    break;
+		}
+
+		while (*++pp) {
+		    zulong newlen = len + strlen(*pp) + 1;
+		    if (newlen < sizeof(xbuf)) {
+			strcpy(xbuf + len, "/");
+			strcpy(xbuf + len + 1, *pp);
+			len = newlen;
+		    } else {
+			*xbuf = 01;
+			ret = -1;
+			break;
+		    }
+		}
+		/*
+		 * No need to update xbuflen, we're finished
+		 * the expansion (for now).
+		 */
+		break;
+	    }
 	    if (*xbuf3 == '/') {
 		strcpy(xbuf, "");
-		if (xsymlinks(xbuf3 + 1) < 0)
+		if (xsymlinks(xbuf3 + 1, 0) < 0)
 		    ret = -1;
 		else
 		    xbuflen = strlen(xbuf);
 	    } else
-		if (xsymlinks(xbuf3) < 0)
+		if (xsymlinks(xbuf3, 0) < 0)
 		    ret = -1;
 		else
 		    xbuflen = strlen(xbuf);
@@ -787,7 +822,7 @@ xsymlink(char *s)
     if (*s != '/')
 	return NULL;
     *xbuf = '\0';
-    if (xsymlinks(s + 1) < 0)
+    if (xsymlinks(s + 1, 1) < 0)
 	zwarn("path expansion failed, using root directory");
     if (!*xbuf)
 	return ztrdup("/");
@@ -796,12 +831,30 @@ xsymlink(char *s)
 
 /**/
 void
-print_if_link(char *s)
+print_if_link(char *s, int all)
 {
     if (*s == '/') {
 	*xbuf = '\0';
-	if (xsymlinks(s + 1) > 0)
-	    printf(" -> "), zputs(*xbuf ? xbuf : "/", stdout);
+	if (all) {
+	    char *start = s + 1;
+	    char xbuflink[PATH_MAX];
+	    for (;;) {
+		if (xsymlinks(start, 0) > 0) {
+		    printf(" -> ");
+		    zputs(*xbuf ? xbuf : "/", stdout);
+		    if (!*xbuf)
+			break;
+		    strcpy(xbuflink, xbuf);
+		    start = xbuflink + 1;
+		    *xbuf = '\0';
+		} else {
+		    break;
+		}
+	    }
+	} else {
+	    if (xsymlinks(s + 1, 1) > 0)
+		printf(" -> "), zputs(*xbuf ? xbuf : "/", stdout);
+	}
     }
 }
 

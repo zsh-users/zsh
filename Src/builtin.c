@@ -119,7 +119,7 @@ static struct builtin builtins[] =
     BUILTIN("times", BINF_PSPECIAL, bin_times, 0, 0, 0, NULL, NULL),
     BUILTIN("trap", BINF_PSPECIAL | BINF_HANDLES_OPTS, bin_trap, 0, -1, 0, NULL, NULL),
     BUILTIN("true", 0, bin_true, 0, -1, 0, NULL, NULL),
-    BUILTIN("type", 0, bin_whence, 0, -1, 0, "ampfsw", "v"),
+    BUILTIN("type", 0, bin_whence, 0, -1, 0, "ampfsSw", "v"),
     BUILTIN("typeset", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klprtuxmz", NULL),
     BUILTIN("umask", 0, bin_umask, 0, 1, 0, "S", NULL),
     BUILTIN("unalias", 0, bin_unhash, 1, -1, 0, "ms", "a"),
@@ -128,7 +128,7 @@ static struct builtin builtins[] =
     BUILTIN("unset", BINF_PSPECIAL, bin_unset, 1, -1, 0, "fmv", NULL),
     BUILTIN("unsetopt", 0, bin_setopt, 0, -1, BIN_UNSETOPT, NULL, NULL),
     BUILTIN("wait", 0, bin_fg, 0, -1, BIN_WAIT, NULL, NULL),
-    BUILTIN("whence", 0, bin_whence, 0, -1, 0, "acmpvfsw", NULL),
+    BUILTIN("whence", 0, bin_whence, 0, -1, 0, "acmpvfsSw", NULL),
     BUILTIN("where", 0, bin_whence, 0, -1, 0, "pmsw", "ca"),
     BUILTIN("which", 0, bin_whence, 0, -1, 0, "ampsw", "c"),
     BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "AFRILP:abcfdilmpue", NULL),
@@ -3331,8 +3331,8 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 			if (v && !csh)
 			    zputs(*argv, stdout), fputs(" is ", stdout);
 			zputs(buf, stdout);
-			if (OPT_ISSET(ops,'s'))
-			    print_if_link(buf);
+			if (OPT_ISSET(ops,'s') || OPT_ISSET(ops, 'S'))
+			    print_if_link(buf, OPT_ISSET(ops, 'S'));
 			fputc('\n', stdout);
 		    }
 		    informed = 1;
@@ -3352,8 +3352,8 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 		if (v && !csh)
 		    zputs(*argv, stdout), fputs(" is ", stdout);
 		zputs(cnam, stdout);
-		if (OPT_ISSET(ops,'s'))
-		    print_if_link(cnam);
+		if (OPT_ISSET(ops,'s') || OPT_ISSET(ops,'S'))
+		    print_if_link(cnam, OPT_ISSET(ops,'S'));
 		fputc('\n', stdout);
 	    }
 	} else {

@@ -1667,7 +1667,7 @@ See also the shell variable tt(STTY) for a means of initialising
 the tty before running external commands.
 )
 findex(type)
-item(tt(type) [ tt(-wfpams) ] var(name) ...)(
+item(tt(type) [ tt(-wfpamsS) ] var(name) ...)(
 Equivalent to tt(whence -v).
 )
 findex(typeset)
@@ -2083,7 +2083,7 @@ the user is potentially interested in both, so this problem is intrinsic
 to process IDs.
 )
 findex(whence)
-item(tt(whence) [ tt(-vcwfpams) ] var(name) ...)(
+item(tt(whence) [ tt(-vcwfpamsS) ] var(name) ...)(
 For each name, indicate how it would be interpreted if used as a
 command name.
 
@@ -2125,6 +2125,11 @@ of these patterns.
 )
 item(tt(-s))(
 If a pathname contains symlinks, print the symlink-free pathname as well.
+)
+item(tt(-S))(
+As tt(-s), but if the pathname had to be resolved by following
+multiple symlinks, the intermediate steps are printed, too.  The
+symlink resolved at each step might be anywhere in the path.
 )
 enditem()
 )
