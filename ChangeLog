@@ -1,3 +1,8 @@
+2015-01-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34077: Test/A07control.ztst: add some further tests for
+	return status from "for" loops.
+
 2014-12-29  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 33963: Completion/Unix/Command/_mount: remove work of art

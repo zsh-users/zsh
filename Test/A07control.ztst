@@ -110,3 +110,56 @@
   done
 1:break error case -1
 ?(eval):break:2: argument is not positive: -1
+
+  false
+  for x in; do
+    print nothing executed
+  done
+0:Status 0 from for with explicit empty list
+
+  set --
+  false
+  for x; do
+    print nothing executed
+  done
+0:Status 0 from for with implicit empty list
+
+  (exit 2)
+  for x in 1 2; do
+    print $?
+  done
+0:Status from previous command propagated into for loop
+>2
+>0
+
+  false
+  for x in $(echo 1 2; (exit 3)); do
+    print $?
+  done
+0:Status from expansion propagated into for loop
+>3
+>0
+
+  false
+  for x in $(exit 4); do
+    print not executed
+  done
+0:Status from expansion not propagated after unexecuted for loop
+  
+  false
+  for x in NonExistentFilePrefix*(N); do
+    print not executed, either
+  done
+0:Status from before for loop not propagated if empty after expansion
+
+  for x in $(echo 1; false); do
+  done
+0:Status reset by empty list in for loop
+
+  false
+  for x in $(echo 1; false); do
+    echo $?
+    (exit 4)  
+  done
+4:Last status from loop body is kept even with other funny business going on
+>1
