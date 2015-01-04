@@ -741,6 +741,8 @@ xsymlinks(char *s, int full)
 	    while (*--p != '/')
 		xbuflen--;
 	    *p = '\0';
+	    /* The \0 isn't included in the length */
+	    xbuflen--;
 	    continue;
 	}
 	sprintf(xbuf2, "%s/%s", xbuf, *pp);
