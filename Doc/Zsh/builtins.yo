@@ -2087,6 +2087,11 @@ item(tt(whence) [ tt(-vcwfpamsS) ] var(name) ...)(
 For each name, indicate how it would be interpreted if used as a
 command name.
 
+tt(whence) is most useful when var(name) is only the last path component
+of a command, i.e. does not include a `tt(/)'; in particular, pattern
+matching only succeeds if just the non-directory component of the command is
+passed.
+
 startitem()
 item(tt(-v))(
 Produce a more verbose report.
@@ -2119,7 +2124,7 @@ throughout the command path.
 Normally only the first occurrence is printed.
 )
 item(tt(-m))(
-The arguments are taken as patterns (should be
+The arguments are taken as patterns (pattern characters should be
 quoted), and the information is displayed for each command matching one
 of these patterns.
 )

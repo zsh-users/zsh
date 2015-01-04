@@ -1,7 +1,12 @@
+2015-01-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/19682: Doc/Zsh/builtins.yo: document recommended use of
+	whence.
+
 2015-01-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 19671: Src/builtin.c: whence -a should still work if there's a
-	full path already.
+	* users/19671: Src/builtin.c: whence -a should still work if
+	there's a full path already.
 
 	* users/19667: Doc/Zsh/builtins.yo, Src/builtin.c, Src/utils.c:
 	whence -S shows intermediate steps in symlink expansion.
