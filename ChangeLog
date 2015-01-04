@@ -1,5 +1,7 @@
 2015-01-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 34091: Src/utils.c: typo with "whence -s" expansions.
+
 	* users/19682: Doc/Zsh/builtins.yo: document recommended use of
 	whence.
 

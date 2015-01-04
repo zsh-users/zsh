@@ -795,12 +795,12 @@ xsymlinks(char *s, int full)
 	    }
 	    if (*xbuf3 == '/') {
 		strcpy(xbuf, "");
-		if (xsymlinks(xbuf3 + 1, 0) < 0)
+		if (xsymlinks(xbuf3 + 1, 1) < 0)
 		    ret = -1;
 		else
 		    xbuflen = strlen(xbuf);
 	    } else
-		if (xsymlinks(xbuf3, 0) < 0)
+		if (xsymlinks(xbuf3, 1) < 0)
 		    ret = -1;
 		else
 		    xbuflen = strlen(xbuf);
