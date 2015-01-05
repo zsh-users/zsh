@@ -1,3 +1,8 @@
+2015-01-06  Barton E. Schaefer  <schaefer@zsh.org>
+
+        * 34103: Src/subst.c: fix ancient (workers/15872) thinko that
+        doesn't seem to have mattered, but must in some obscure cases
+
 2015-01-05  Daniel Shahaf <d.s@daniel.shahaf.name>
 
 	* 34042: Completion/Unix/Command/_git: Respect tags for subcommand
@@ -7,6 +12,11 @@
 
 	* Timofey Titovets: 34053: Completion/Linux/Command/_modutils:
 	additional compression option for kernel modules.
+
+2015-01-04  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34093: Src/builtins.c: "whence" should always return nonzero
+	when it finds that nothing matches its arguments
 
 2015-01-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 

@@ -3173,7 +3173,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
     int printflags = 0;
     int aliasflags;
     int csh, all, v, wd;
-    int informed;
+    int informed = 0;
     char *cnam, **allmatched = 0;
 
     /* Check some option information */
@@ -3207,6 +3207,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 
     /* With -m option -- treat arguments as a glob patterns */
     if (OPT_ISSET(ops,'m')) {
+	cmdnamtab->filltable(cmdnamtab);
 	if (all) {
 	    pushheap();
 	    matchednodes = newlinklist();
@@ -3225,17 +3226,19 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 		/* -p option is for path search only.    *
 		 * We're not using it, so search for ... */
 
+		informed = /* logical OR of what follows */
+
 		/* aliases ... */
 		scanmatchtable(aliastab, pprog, 1, 0, DISABLED,
-			       aliastab->printnode, printflags);
+			       aliastab->printnode, printflags) ||
 
 		/* and reserved words ... */
 		scanmatchtable(reswdtab, pprog, 1, 0, DISABLED,
-			       reswdtab->printnode, printflags);
+			       reswdtab->printnode, printflags) ||
 
 		/* and shell functions... */
 		scanmatchtable(shfunctab, pprog, 1, 0, DISABLED,
-			       shfunctab->printnode, printflags);
+			       shfunctab->printnode, printflags) ||
 
 		/* and builtins. */
 		scanmatchtable(builtintab, pprog, 1, 0, DISABLED,
@@ -3243,7 +3246,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 	    }
 	    /* Done search for `internal' commands, if the -p option *
 	     * was not used.  Now search the path.                   */
-	    cmdnamtab->filltable(cmdnamtab);
+	    informed +=
 	    scanmatchtable(cmdnamtab, pprog, 1, 0, 0,
 			   (all ? fetchcmdnamnode : cmdnamtab->printnode),
 			   printflags);
@@ -3255,61 +3258,59 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 	    matchednodes = NULL;
 	    popheap();
 	} else
-	    return returnval;
+	    return returnval || !informed;
     }
 
     /* Take arguments literally -- do not glob */
     queue_signals();
     for (; *argv; argv++) {
-	informed = 0;
-
 	if (!OPT_ISSET(ops,'p') && !allmatched) {
 	    char *suf;
 
 	    /* Look for alias */
 	    if ((hn = aliastab->getnode(aliastab, *argv))) {
 		aliastab->printnode(hn, aliasflags);
+		informed = 1;
 		if (!all)
 		    continue;
-		informed = 1;
 	    }
 	    /* Look for suffix alias */
 	    if ((suf = strrchr(*argv, '.')) && suf[1] &&
 		suf > *argv && suf[-1] != Meta &&
 		(hn = sufaliastab->getnode(sufaliastab, suf+1))) {
 		sufaliastab->printnode(hn, printflags);
+		informed = 1;
 		if (!all)
 		    continue;
-		informed = 1;
 	    }
 	    /* Look for reserved word */
 	    if ((hn = reswdtab->getnode(reswdtab, *argv))) {
 		reswdtab->printnode(hn, printflags);
+		informed = 1;
 		if (!all)
 		    continue;
-		informed = 1;
 	    }
 	    /* Look for shell function */
 	    if ((hn = shfunctab->getnode(shfunctab, *argv))) {
 		shfunctab->printnode(hn, printflags);
+		informed = 1;
 		if (!all)
 		    continue;
-		informed = 1;
 	    }
 	    /* Look for builtin command */
 	    if ((hn = builtintab->getnode(builtintab, *argv))) {
 		builtintab->printnode(hn, printflags);
+		informed = 1;
 		if (!all)
 		    continue;
-		informed = 1;
 	    }
 	    /* Look for commands that have been added to the *
 	     * cmdnamtab with the builtin `hash foo=bar'.    */
 	    if ((hn = cmdnamtab->getnode(cmdnamtab, *argv)) && (hn->flags & HASHED)) {
 		cmdnamtab->printnode(hn, printflags);
+		informed = 1;
 		if (!all)
 		    continue;
-		informed = 1;
 	    }
 	}
 
@@ -3356,6 +3357,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 		    print_if_link(cnam, OPT_ISSET(ops,'S'));
 		fputc('\n', stdout);
 	    }
+	    informed = 1;
 	} else {
 	    /* Not found at all. */
 	    if (v || csh || wd)
@@ -3367,7 +3369,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 	freearray(allmatched);
 
     unqueue_signals();
-    return returnval;
+    return returnval || !informed;
 }
 
 /**** command & named directory hash table builtins ****/
