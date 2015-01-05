@@ -2718,7 +2718,7 @@ findjobnam(const char *s)
     for (jobnum = maxjob; jobnum >= 0; jobnum--)
 	if (!(jobtab[jobnum].stat & (STAT_SUBJOB | STAT_NOPRINT)) &&
 	    jobtab[jobnum].stat && jobtab[jobnum].procs && jobnum != thisjob &&
-	    jobtab[jobnum].procs->text && strpfx(s, jobtab[jobnum].procs->text))
+	    jobtab[jobnum].procs->text[0] && strpfx(s, jobtab[jobnum].procs->text))
 	    return jobnum;
     return -1;
 }
