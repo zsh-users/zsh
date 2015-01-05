@@ -3111,7 +3111,7 @@ bufferwords(LinkList list, char *buf, int *index, int flags)
 		     * double quotes.  Whitespace in the middle is
 		     * similarly retained, so just add the parentheses back.
 		     */
-		    p = tricat("((", tokstr, "))");
+		    p = zhtricat("((", tokstr, "))");
 		}
 		break;
 
