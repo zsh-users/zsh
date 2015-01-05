@@ -1,5 +1,7 @@
 2015-01-06  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 34113: Src/builtin.c: whence: use dupstring to not leak memory
+
 	* 34119: Src/Zle/complist.c: Fix leak of string in clnicezputs
 
 	* 34105: Src/subst.c: remove dead code

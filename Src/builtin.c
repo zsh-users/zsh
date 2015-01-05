@@ -3323,7 +3323,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 	    for (pp = path; *pp; pp++) {
 		if (**pp) {
 		    buf = zhtricat(*pp, "/", *argv);
-		} else buf = ztrdup(*argv);
+		} else buf = dupstring(*argv);
 
 		if (iscom(buf)) {
 		    if (wd) {
