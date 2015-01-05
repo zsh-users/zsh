@@ -1515,7 +1515,7 @@ printcompctl(char *s, Compctl cc, int printflags, int ispat)
 	if (cclist & COMP_LIST)
 	    printf(" --");
     }
-    if (cc && cc->xor) {
+    if (cc->xor) {
 	/* print xor'd (+) completions */
 	printf(" +");
 	if (cc->xor != &cc_default)
