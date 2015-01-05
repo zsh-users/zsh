@@ -117,7 +117,7 @@ int
 zlecharasstring(ZLE_CHAR_T inchar, char *buf)
 {
 #ifdef MULTIBYTE_SUPPORT
-    size_t ret;
+    int ret;
     char *ptr;
 
 #ifdef __STDC_ISO_10646__

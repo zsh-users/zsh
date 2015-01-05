@@ -1,5 +1,7 @@
 2015-01-06  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 34117: Src/Zle/zle_utils.c: size_t is unsigned, use int instead
+
 	* 34116: Src/Zle/computil.c: Check for NULL before passing
 	to strlen
 
