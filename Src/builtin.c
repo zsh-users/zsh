@@ -2510,6 +2510,8 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 							  asg->name),
 				 func, (on | PM_ARRAY) & ~PM_EXPORTED,
 				 off, roff, asg->value, NULL, ops, 0))) {
+	    if (oldval)
+		zsfree(oldval);
 	    unqueue_signals();
 	    return 1;
 	}
