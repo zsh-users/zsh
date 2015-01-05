@@ -367,6 +367,7 @@ getsubsargs(char *subline, int *gbalp, int *cflagp)
 	zsfree(hsubl);
 	hsubl = ptr1;
     } else if (!hsubl) {		/* fail silently on this */
+	zsfree(ptr1);
 	zsfree(ptr2);
 	return 0;
     }
