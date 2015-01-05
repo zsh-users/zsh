@@ -4060,7 +4060,8 @@ cfp_test_exact(LinkList names, char **accept, char *skipped)
     if (sl > PATH_MAX2)
 	return NULL;
 
-    suf = dyncat(skipped, rembslash(dyncat(compprefix, compsuffix)));
+    suf = dyncat(skipped, rembslash(dyncat(compprefix ? compprefix : "",
+		                           compsuffix ? compsuffix : "")));
 
     for (node = firstnode(names); node; incnode(node)) {
 	l = strlen(p = (char *) getdata(node));

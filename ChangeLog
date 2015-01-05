@@ -1,5 +1,8 @@
 2015-01-06  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 34116: Src/Zle/computil.c: Check for NULL before passing
+	to strlen
+
 	* 34118: Src/hist.c: Don't crash when writing out history if
 	HOST is unset
 
