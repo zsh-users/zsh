@@ -1098,7 +1098,7 @@ do_single(Cmatch m)
 		} else {
 		    p = (char *) zhalloc(strlen(prpre) + strlen(str) +
 				 strlen(psuf) + 3);
-		    sprintf(p, "%s%s%s", ((prpre && *prpre) ?
+		    sprintf(p, "%s%s%s", (*prpre ?
 					  prpre : "./"), str, psuf);
 		}
 		/* And do the stat. */
