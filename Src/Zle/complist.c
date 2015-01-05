@@ -780,6 +780,7 @@ clnicezputs(int do_colors, char *s, int ml)
 	    /* Is the screen full? */
 	    if (ml == mlend - 1 && col == zterm_columns - 1) {
 		mlprinted = ml - oml;
+		free(ums);
 		return 0;
 	    }
 	    if (t < wptr) {
@@ -804,6 +805,7 @@ clnicezputs(int do_colors, char *s, int ml)
 		ml++;
 		if (mscroll && !--mrestlines && (ask = asklistscroll(ml))) {
 		    mlprinted = ml - oml;
+		    free(ums);
 		    return ask;
 		}
 		col -= zterm_columns;
