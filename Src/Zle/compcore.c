@@ -3492,7 +3492,7 @@ freematch(Cmatch m, int nbeg, int nend)
     if (m->brsl)
 	zfree(m->brsl, nend * sizeof(int));
 
-    zfree(m, sizeof(m));
+    zfree(m, sizeof(*m));
 }
 
 /* This frees the groups of matches. */
