@@ -5173,7 +5173,7 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
     if (cmd) {
 	if (opt_L) {
 	    zwarnnam("emulate", "option -L incompatible with -c");
-	    goto restore;
+	    goto restore2;
 	}
 	*--argv = cmd;	/* on stack, never free()d, see execbuiltin() */
     } else
@@ -5211,6 +5211,7 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
     }
     ret = eval(argv);
     sticky = save_sticky;
+restore2:
     emulation = saveemulation;
     memcpy(opts, saveopts, sizeof(opts));
     restorepatterndisables(savepatterns);
