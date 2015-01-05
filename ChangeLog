@@ -1,5 +1,7 @@
 2015-01-06  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 34134: Src/exec.c: anon funcs: don't leak shf and related data
+
 	* 34112: Src/builtin.c: typeset: fix leak of oldval
 
 	* 34106: Src/hist.c: use zhtricat instead of tricat

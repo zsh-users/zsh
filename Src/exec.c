@@ -4461,6 +4461,11 @@ execfuncdef(Estate state, Eprog redir_prog)
 	    if (htok && args) {
 		execsubst(args);
 		if (errflag) {
+		    freeeprog(shf->funcdef);
+		    if (shf->redir) /* shouldn't be */
+			freeeprog(shf->redir);
+		    zsfree(shf->filename);
+		    zfree(shf, sizeof(*shf));
 		    state->pc = end;
 		    return 1;
 		}
@@ -4486,6 +4491,7 @@ execfuncdef(Estate state, Eprog redir_prog)
 		(signum = getsignum(s + 4)) != -1) {
 		if (settrap(signum, NULL, ZSIG_FUNC)) {
 		    freeeprog(shf->funcdef);
+		    zsfree(shf->filename);
 		    zfree(shf, sizeof(*shf));
 		    state->pc = end;
 		    return 1;
