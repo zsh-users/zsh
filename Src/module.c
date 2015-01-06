@@ -3367,7 +3367,7 @@ mod_export int
 handlefeatures(Module m, Features f, int **enables)
 {
     if (!enables || *enables)
-	return setfeatureenables(m, f, *enables);
+	return setfeatureenables(m, f, enables ? *enables : NULL);
     *enables = getfeatureenables(m, f);
     return 0;
 }
