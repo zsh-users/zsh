@@ -2801,7 +2801,8 @@ lockhistfile(char *fn, int keep_trying)
 #ifdef HAVE_LINK
 # ifdef HAVE_SYMLINK
 	sprintf(pidbuf, "/pid-%ld/host-", (long)mypid);
-	lnk = bicat(pidbuf, getsparam("HOST"));
+	lnk = getsparam("HOST");
+	lnk = bicat(pidbuf, lnk ? lnk : "");
 	/* We'll abuse fd as our success flag. */
 	while ((fd = symlink(lnk, lockfile)) < 0) {
 	    if (errno != EEXIST) {

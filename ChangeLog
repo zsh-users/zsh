@@ -1,5 +1,8 @@
 2015-01-06  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 34118: Src/hist.c: Don't crash when writing out history if
+	HOST is unset
+
 	* 34114: Src/builtin.c: emulate: Handle aborting from mixed
 	-L/-c correctly
 
