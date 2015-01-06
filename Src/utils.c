@@ -3543,7 +3543,7 @@ inittyptab(void)
     for (t0 = (int)STOUC(Snull); t0 <= (int)STOUC(Nularg); t0++)
 	typtab[t0] |= ITOK | IMETA | INULL;
     for (s = ifs ? ifs : EMULATION(EMULATE_KSH|EMULATE_SH) ?
-	ztrdup(DEFAULT_IFS_SH) : ztrdup(DEFAULT_IFS); *s; s++) {
+	DEFAULT_IFS_SH : DEFAULT_IFS; *s; s++) {
 	int c = STOUC(*s == Meta ? *++s ^ 32 : *s);
 #ifdef MULTIBYTE_SUPPORT
 	if (!isascii(c)) {
@@ -3578,7 +3578,7 @@ inittyptab(void)
 #ifdef MULTIBYTE_SUPPORT
     set_widearray(wordchars, &wordchars_wide);
     set_widearray(ifs ? ifs : EMULATION(EMULATE_KSH|EMULATE_SH) ?
-	ztrdup(DEFAULT_IFS_SH) : ztrdup(DEFAULT_IFS), &ifs_wide);
+	DEFAULT_IFS_SH : DEFAULT_IFS, &ifs_wide);
 #endif
     for (s = SPECCHARS; *s; s++)
 	typtab[STOUC(*s)] |= ISPECIAL;
