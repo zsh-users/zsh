@@ -1333,14 +1333,16 @@ subst_parse_str(char **sp, int single, int err)
 	if (!single) {
             int qt = 0;
 
-	    for (; *s; s++)
+	    for (; *s; s++) {
 		if (!qt) {
 		    if (*s == Qstring)
 			*s = String;
 		    else if (*s == Qtick)
 			*s = Tick;
-                } else if (*s == Dnull)
+                }
+		if (*s == Dnull)
                     qt = !qt;
+	    }
 	}
 	return 0;
     }
