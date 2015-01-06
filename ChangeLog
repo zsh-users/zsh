@@ -45,8 +45,8 @@
 
 2015-01-06  Barton E. Schaefer  <schaefer@zsh.org>
 
-        * 34103: Src/subst.c: fix ancient (workers/15872) thinko that
-        doesn't seem to have mattered, but must in some obscure cases
+	* 34103: Src/subst.c: fix ancient (workers/15872) thinko that
+	doesn't seem to have mattered, but must in some obscure cases
 
 2015-01-05  Daniel Shahaf <d.s@daniel.shahaf.name>
 
@@ -2223,7 +2223,7 @@
 	format unusable.
 
 	* unposted but c.f. 32231: Doc/Zsh/compsys.yo: the parameter
-        'line' doesn't include the original command.
+	'line' doesn't include the original command.
 
 	* Jun T: 32231: Completion/Unix/Command/_chmod: was confused by
 	options before the mode argument.
@@ -3426,7 +3426,7 @@
 	completion: functions.
 
 	* 31155: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: minor
-        extra zcalc features and documentation.
+	extra zcalc features and documentation.
 
 2013-03-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
