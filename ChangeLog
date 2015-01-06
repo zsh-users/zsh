@@ -1,5 +1,7 @@
 2015-01-06  Mikael Magnusson  <mikachu@gmail.com>
 
+	* 34105: Src/subst.c: remove dead code
+
 	* 34121: Src/Zle/compresult.c: Remove unneeded NULL check
 
 	* 34104: Src/Zle/compctl.c: Remove pointless check

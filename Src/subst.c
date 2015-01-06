@@ -1317,7 +1317,7 @@ get_intarg(char **s, int *delmatchp)
     if (ret < 0)
 	ret = -ret;
     *delmatchp = arglen;
-    return ret < 0 ? -ret : ret;
+    return ret;
 }
 
 /* Parsing for the (e) flag. */
