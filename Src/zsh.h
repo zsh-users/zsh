@@ -421,6 +421,15 @@ enum {
 #define META_HEAPDUP	6
 #define META_HREALLOC	7
 
+/* Context to save and restore (bit fields) */
+enum {
+    /* History mechanism */
+    ZCONTEXT_HIST       = (1<<0),
+    /* Lexical analyser */
+    ZCONTEXT_LEX        = (1<<1),
+    /* Parser */
+    ZCONTEXT_PARSE      = (1<<2)
+};
 
 /**************************/
 /* Abstract types for zsh */

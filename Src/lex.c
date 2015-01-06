@@ -148,6 +148,16 @@ mod_export int parend;
 /**/
 mod_export int nocomments;
 
+/* add raw input characters while parsing command substitution */
+
+/**/
+static int lex_add_raw;
+
+/* variables associated with the above */
+
+static char *tokstr_raw, *bptr_raw;
+static int len_raw, bsiz_raw;
+
 /* text of punctuation tokens */
 
 /**/
@@ -216,6 +226,11 @@ struct lexstack {
     char *bptr;
     int bsiz;
     int len;
+    int lex_add_raw;
+    char *tokstr_raw;
+    char *bptr_raw;
+    int bsiz_raw;
+    int len_raw;
     short *chwords;
     int chwordlen;
     int chwordpos;
@@ -241,89 +256,121 @@ struct lexstack {
 
 static struct lexstack *lstack = NULL;
 
-/* save the lexical state */
+/* save the context or parts thereof */
 
 /* is this a hack or what? */
 
 /**/
 mod_export void
-lexsave(void)
+lexsave_partial(int parts)
 {
     struct lexstack *ls;
 
     ls = (struct lexstack *)malloc(sizeof(struct lexstack));
 
-    ls->incmdpos = incmdpos;
-    ls->incond = incond;
-    ls->incasepat = incasepat;
-    ls->dbparens = dbparens;
-    ls->isfirstln = isfirstln;
-    ls->isfirstch = isfirstch;
-    ls->histactive = histactive;
-    ls->histdone = histdone;
-    ls->lexflags = lexflags;
-    ls->stophist = stophist;
-    stophist = 0;
-    if (!lstack) {
-	/* top level, make this version visible to ZLE */
-	zle_chline = chline;
-	/* ensure line stored is NULL-terminated */
-	if (hptr)
-	    *hptr = '\0';
+    if (parts & ZCONTEXT_LEX) {
+	ls->incmdpos = incmdpos;
+	ls->incond = incond;
+	ls->incasepat = incasepat;
+	ls->dbparens = dbparens;
+	ls->isfirstln = isfirstln;
+	ls->isfirstch = isfirstch;
+	ls->lexflags = lexflags;
+
+	ls->tok = tok;
+	ls->isnewlin = isnewlin;
+	ls->tokstr = tokstr;
+	ls->zshlextext = zshlextext;
+	ls->bptr = bptr;
+	ls->bsiz = bsiz;
+	ls->len = len;
+	ls->lex_add_raw = lex_add_raw;
+	ls->tokstr_raw = tokstr_raw;
+	ls->bptr_raw = bptr_raw;
+	ls->bsiz_raw = bsiz_raw;
+	ls->len_raw = len_raw;
+	ls->lexstop = lexstop;
+	ls->toklineno = toklineno;
+
+	tokstr = zshlextext = bptr = NULL;
+	bsiz = 256;
+	tokstr_raw = bptr_raw = NULL;
+	bsiz_raw = len_raw = lex_add_raw = 0;
+
+	inredir = 0;
     }
-    ls->hline = chline;
-    chline = NULL;
-    ls->hptr = hptr;
-    hptr = NULL;
-    ls->hlinesz = hlinesz;
-    ls->cstack = cmdstack;
-    ls->csp = cmdsp;
-    cmdstack = (unsigned char *)zalloc(CMDSTACKSZ);
-    ls->tok = tok;
-    ls->isnewlin = isnewlin;
-    ls->tokstr = tokstr;
-    ls->zshlextext = zshlextext;
-    ls->bptr = bptr;
-    tokstr = zshlextext = bptr = NULL;
-    ls->bsiz = bsiz;
-    bsiz = 256;
-    ls->len = len;
-    ls->chwords = chwords;
-    ls->chwordlen = chwordlen;
-    ls->chwordpos = chwordpos;
-    ls->hwgetword = hwgetword;
-    ls->lexstop = lexstop;
-    ls->hdocs = hdocs;
-    ls->hgetc = hgetc;
-    ls->hungetc = hungetc;
-    ls->hwaddc = hwaddc;
-    ls->hwbegin = hwbegin;
-    ls->hwend = hwend;
-    ls->addtoline = addtoline;
-    ls->eclen = eclen;
-    ls->ecused = ecused;
-    ls->ecnpats = ecnpats;
-    ls->ecbuf = ecbuf;
-    ls->ecstrs = ecstrs;
-    ls->ecsoffs = ecsoffs;
-    ls->ecssub = ecssub;
-    ls->ecnfunc = ecnfunc;
-    ls->toklineno = toklineno;
-    cmdsp = 0;
-    inredir = 0;
-    hdocs = NULL;
-    histactive = 0;
-    ecbuf = NULL;
+    if (parts & ZCONTEXT_HIST) {
+	if (!lstack) {
+	    /* top level, make this version visible to ZLE */
+	    zle_chline = chline;
+	    /* ensure line stored is NULL-terminated */
+	    if (hptr)
+		*hptr = '\0';
+	}
+	ls->histactive = histactive;
+	ls->histdone = histdone;
+	ls->stophist = stophist;
+	ls->hline = chline;
+	ls->hptr = hptr;
+	ls->chwords = chwords;
+	ls->chwordlen = chwordlen;
+	ls->chwordpos = chwordpos;
+	ls->hwgetword = hwgetword;
+	ls->hgetc = hgetc;
+	ls->hungetc = hungetc;
+	ls->hwaddc = hwaddc;
+	ls->hwbegin = hwbegin;
+	ls->hwend = hwend;
+	ls->addtoline = addtoline;
+	ls->hlinesz = hlinesz;
+	/*
+	 * We save and restore the command stack with history
+	 * as it's visible to the user interactively, so if
+	 * we're preserving history state we'll continue to
+	 * show the current set of commands from input.
+	 */
+	ls->cstack = cmdstack;
+	ls->csp = cmdsp;
+
+	stophist = 0;
+	chline = NULL;
+	hptr = NULL;
+	histactive = 0;
+	cmdstack = (unsigned char *)zalloc(CMDSTACKSZ);
+	cmdsp = 0;
+    }
+    if (parts & ZCONTEXT_PARSE) {
+	ls->hdocs = hdocs;
+	ls->eclen = eclen;
+	ls->ecused = ecused;
+	ls->ecnpats = ecnpats;
+	ls->ecbuf = ecbuf;
+	ls->ecstrs = ecstrs;
+	ls->ecsoffs = ecsoffs;
+	ls->ecssub = ecssub;
+	ls->ecnfunc = ecnfunc;
+	ecbuf = NULL;
+	hdocs = NULL;
+    }
 
     ls->next = lstack;
     lstack = ls;
 }
 
-/* restore lexical state */
+/* save context in full */
 
 /**/
 mod_export void
-lexrestore(void)
+lexsave(void)
+{
+    lexsave_partial(ZCONTEXT_HIST|ZCONTEXT_LEX|ZCONTEXT_PARSE);
+}
+
+/* restore context or part therefore */
+
+/**/
+mod_export void
+lexrestore_partial(int parts)
 {
     struct lexstack *ln = lstack;
 
@@ -332,63 +379,87 @@ lexrestore(void)
     queue_signals();
     lstack = lstack->next;
 
-    if (!lstack) {
-	/* Back to top level: don't need special ZLE value */
-	DPUTS(ln->hline != zle_chline, "BUG: Ouch, wrong chline for ZLE");
-	zle_chline = NULL;
+    if (parts & ZCONTEXT_LEX) {
+	incmdpos = ln->incmdpos;
+	incond = ln->incond;
+	incasepat = ln->incasepat;
+	dbparens = ln->dbparens;
+	isfirstln = ln->isfirstln;
+	isfirstch = ln->isfirstch;
+	lexflags = ln->lexflags;
+	tok = ln->tok;
+	isnewlin = ln->isnewlin;
+	tokstr = ln->tokstr;
+	zshlextext = ln->zshlextext;
+	bptr = ln->bptr;
+	bsiz = ln->bsiz;
+	len = ln->len;
+	lex_add_raw = ln->lex_add_raw;
+	tokstr_raw = ln->tokstr_raw;
+	bptr_raw = ln->bptr_raw;
+	bsiz_raw = ln->bsiz_raw;
+	len_raw = ln->len_raw;
+	lexstop = ln->lexstop;
+	toklineno = ln->toklineno;
     }
 
-    incmdpos = ln->incmdpos;
-    incond = ln->incond;
-    incasepat = ln->incasepat;
-    dbparens = ln->dbparens;
-    isfirstln = ln->isfirstln;
-    isfirstch = ln->isfirstch;
-    histactive = ln->histactive;
-    histdone = ln->histdone;
-    lexflags = ln->lexflags;
-    stophist = ln->stophist;
-    chline = ln->hline;
-    hptr = ln->hptr;
-    if (cmdstack)
-	zfree(cmdstack, CMDSTACKSZ);
-    cmdstack = ln->cstack;
-    cmdsp = ln->csp;
-    tok = ln->tok;
-    isnewlin = ln->isnewlin;
-    tokstr = ln->tokstr;
-    zshlextext = ln->zshlextext;
-    bptr = ln->bptr;
-    bsiz = ln->bsiz;
-    len = ln->len;
-    chwords = ln->chwords;
-    chwordlen = ln->chwordlen;
-    chwordpos = ln->chwordpos;
-    hwgetword = ln->hwgetword;
-    lexstop = ln->lexstop;
-    hdocs = ln->hdocs;
-    hgetc = ln->hgetc;
-    hungetc = ln->hungetc;
-    hwaddc = ln->hwaddc;
-    hwbegin = ln->hwbegin;
-    hwend = ln->hwend;
-    addtoline = ln->addtoline;
-    if (ecbuf)
-	zfree(ecbuf, eclen);
-    eclen = ln->eclen;
-    ecused = ln->ecused;
-    ecnpats = ln->ecnpats;
-    ecbuf = ln->ecbuf;
-    ecstrs = ln->ecstrs;
-    ecsoffs = ln->ecsoffs;
-    ecssub = ln->ecssub;
-    ecnfunc = ln->ecnfunc;
-    hlinesz = ln->hlinesz;
-    toklineno = ln->toklineno;
-    errflag &= ~ERRFLAG_ERROR;
+    if (parts & ZCONTEXT_HIST) {
+	if (!lstack) {
+	    /* Back to top level: don't need special ZLE value */
+	    DPUTS(ln->hline != zle_chline, "BUG: Ouch, wrong chline for ZLE");
+	    zle_chline = NULL;
+	}
+	histactive = ln->histactive;
+	histdone = ln->histdone;
+	stophist = ln->stophist;
+	chline = ln->hline;
+	hptr = ln->hptr;
+	chwords = ln->chwords;
+	chwordlen = ln->chwordlen;
+	chwordpos = ln->chwordpos;
+	hwgetword = ln->hwgetword;
+	hgetc = ln->hgetc;
+	hungetc = ln->hungetc;
+	hwaddc = ln->hwaddc;
+	hwbegin = ln->hwbegin;
+	hwend = ln->hwend;
+	addtoline = ln->addtoline;
+	hlinesz = ln->hlinesz;
+	if (cmdstack)
+	    zfree(cmdstack, CMDSTACKSZ);
+	cmdstack = ln->cstack;
+	cmdsp = ln->csp;
+    }
+
+    if (parts & ZCONTEXT_PARSE) {
+	if (ecbuf)
+	    zfree(ecbuf, eclen);
+
+	hdocs = ln->hdocs;
+	eclen = ln->eclen;
+	ecused = ln->ecused;
+	ecnpats = ln->ecnpats;
+	ecbuf = ln->ecbuf;
+	ecstrs = ln->ecstrs;
+	ecsoffs = ln->ecsoffs;
+	ecssub = ln->ecssub;
+	ecnfunc = ln->ecnfunc;
+
+	errflag &= ~ERRFLAG_ERROR;
+    }
+
     free(ln);
 
     unqueue_signals();
+}
+
+/* complete restore context */
+
+/**/
+mod_export void
+lexrestore(void)
+{
+    lexrestore_partial(ZCONTEXT_HIST|ZCONTEXT_LEX|ZCONTEXT_PARSE);
 }
 
 /**/
@@ -1905,80 +1976,151 @@ exalias(void)
     return 0;
 }
 
-/* skip (...) */
+/**/
+void
+zshlex_raw_add(int c)
+{
+    if (!lex_add_raw)
+	return;
+
+    *bptr_raw++ = c;
+    if (bsiz_raw == ++len_raw) {
+	int newbsiz = bsiz_raw * 2;
+
+	tokstr_raw = (char *)hrealloc(tokstr_raw, bsiz_raw, newbsiz);
+	bptr_raw = tokstr_raw + len_raw;
+	memset(bptr_raw, 0, newbsiz - bsiz_raw);
+	bsiz_raw = newbsiz;
+    }
+}
+
+/**/
+void
+zshlex_raw_back(void)
+{
+    if (!lex_add_raw)
+	return;
+    bptr_raw--;
+    len_raw--;
+}
+
+/*
+ * Skip (...) for command-style substitutions: $(...), <(...), >(...)
+ *
+ * In order to ensure we don't stop at closing parentheses with
+ * some other syntactic significance, we'll parse the input until
+ * we find an unmatched closing parenthesis.  However, we'll throw
+ * away the result of the parsing and just keep the string we've built
+ * up on the way.
+ */
 
 /**/
 static int
 skipcomm(void)
 {
-    int pct = 1, c, start = 1;
+    char *new_tokstr, *new_bptr = bptr_raw;
+    int new_len, new_bsiz, new_lexstop, new_lex_add_raw;
 
     cmdpush(CS_CMDSUBST);
     SETPARBEGIN
-    c = Inpar;
-    do {
-	int iswhite;
-	add(c);
-	c = hgetc();
-	if (itok(c) || lexstop)
-	    break;
-	iswhite = inblank(c);
-	switch (c) {
-	case '(':
-	    pct++;
-	    break;
-	case ')':
-	    pct--;
-	    break;
-	case '\\':
-	    add(c);
-	    c = hgetc();
-	    break;
-	case '\'': {
-	    int strquote = bptr[-1] == '$';
-	    add(c);
-	    STOPHIST
-	    while ((c = hgetc()) != '\'' && !lexstop) {
-		if (c == '\\' && strquote) {
-		    add(c);
-		    c = hgetc();
-		}
-		add(c);
-	    }
-	    ALLOWHIST
-	    break;
-	}
-	case '\"':
-	    add(c);
-	    while ((c = hgetc()) != '\"' && !lexstop)
-		if (c == '\\') {
-		    add(c);
-		    add(hgetc());
-		} else
-		    add(c);
-	    break;
-	case '`':
-	    add(c);
-	    while ((c = hgetc()) != '`' && !lexstop)
-		if (c == '\\')
-		    add(c), add(hgetc());
-		else
-		    add(c);
-	    break;
-	case '#':
-	    if (start) {
-		add(c);
-		while ((c = hgetc()) != '\n' && !lexstop)
-		    add(c);
-		iswhite = 1;
-	    }
-	    break;
-	}
-	start = iswhite;
+    add(Inpar);
+
+    new_lex_add_raw = lex_add_raw + 1;
+    if (!lex_add_raw) {
+	/*
+	 * We'll combine the string so far with the input
+	 * read in for the command substitution.  To do this
+	 * we'll just propagate the current tokstr etc. as the
+	 * variables used for adding raw input, and
+	 * ensure we swap those for the real tokstr etc. at the end.
+	 *
+	 * However, we need to save and restore the rest of the
+	 * lexical and parse state as we're effectively parsing
+	 * an internal string.  Because we're still parsing it from
+	 * the original input source (we have to --- we don't know
+	 * when to stop inputting it otherwise and can't rely on
+	 * the input being recoverable until we've read it) we need
+	 * to keep the same history context.
+	 */
+	new_tokstr = tokstr;
+	new_bptr = bptr;
+	new_len = len;
+	new_bsiz = bsiz;
+
+	lexsave_partial(ZCONTEXT_LEX|ZCONTEXT_PARSE);
+    } else {
+	/*
+	 * Set up for nested command subsitution, however
+	 * we don't actually need the string until we get
+	 * back to the top level and recover the lot.
+	 * The $() body just appears empty.
+	 *
+	 * We do need to propagate the raw variables which would
+	 * otherwise by cleared, though.
+	 */
+	new_tokstr = tokstr_raw;
+	new_bptr = bptr_raw;
+	new_len = len_raw;
+	new_bsiz = bsiz_raw;
+
+	lexsave_partial(ZCONTEXT_LEX|ZCONTEXT_PARSE);
     }
-    while (pct);
+    tokstr_raw = new_tokstr;
+    bsiz_raw = new_bsiz;
+    len_raw = new_len;
+    bptr_raw = new_bptr;
+    lex_add_raw = new_lex_add_raw;
+
+    if (!parse_event(OUTPAR) || tok != OUTPAR)
+	lexstop = 1;
+     /* Outpar lexical token gets added in caller if present */
+
+    /*
+     * We're going to keep the full raw input string
+     * as the current token string after popping the stack.
+     */
+    new_tokstr = tokstr_raw;
+    new_bptr = bptr_raw;
+    new_len = len_raw;
+    new_bsiz = bsiz_raw;
+    /*
+     * We're also going to propagate the lexical state:
+     * if we couldn't parse the command substitution we
+     * can't continue.
+     */
+    new_lexstop = lexstop;
+
+    lexrestore_partial(ZCONTEXT_LEX|ZCONTEXT_PARSE);
+
+    if (lex_add_raw) {
+	/*
+	 * Keep going, so retain the raw variables.
+	 */
+	tokstr_raw = new_tokstr;
+	bptr_raw = new_bptr;
+	len_raw = new_len;
+	bsiz_raw = new_bsiz;
+    } else {
+	if (!new_lexstop) {
+	    /* Ignore the ')' added on input */
+	    new_len--;
+	    *--new_bptr = '\0';
+	}
+
+	/*
+	 * Convince the rest of lex.c we were examining a string
+	 * all along.
+	 */
+	tokstr = new_tokstr;
+	bptr = new_bptr;
+	len = new_len;
+	bsiz = new_bsiz;
+	lexstop = new_lexstop;
+    }
+
     if (!lexstop)
 	SETPAREND
     cmdpop();
+
     return lexstop;
 }

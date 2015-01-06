@@ -361,7 +361,8 @@ ecstrcode(char *s)
 
 /* Initialise wordcode buffer. */
 
-static void
+/**/
+void
 init_parse(void)
 {
     if (ecbuf) zfree(ecbuf, eclen);
@@ -443,11 +444,15 @@ clear_hdocs()
  * event	: ENDINPUT
  *			| SEPER
  *			| sublist [ SEPER | AMPER | AMPERBANG ]
+ *
+ * cmdsubst indicates our event is part of a command-style
+ * substitution terminated by the token indicationg, usual closing
+ * parenthesis.  In other cases endtok is ENDINPUT.
  */
 
 /**/
 Eprog
-parse_event(void)
+parse_event(int endtok)
 {
     tok = ENDINPUT;
     incmdpos = 1;
@@ -455,36 +460,42 @@ parse_event(void)
     zshlex();
     init_parse();
 
-    if (!par_event()) {
+    if (!par_event(endtok)) {
         clear_hdocs();
         return NULL;
+    }
+    if (endtok != ENDINPUT) {
+	/* don't need to build an eprog for this */
+	return &dummy_eprog;
     }
     return bld_eprog(1);
 }
 
 /**/
-static int
-par_event(void)
+int
+par_event(int endtok)
 {
     int r = 0, p, c = 0;
 
     while (tok == SEPER) {
-	if (isnewlin > 0)
+	if (isnewlin > 0 && endtok == ENDINPUT)
 	    return 0;
 	zshlex();
     }
     if (tok == ENDINPUT)
 	return 0;
+    if (tok == endtok)
+	return 0;
 
     p = ecadd(0);
 
     if (par_sublist(&c)) {
-	if (tok == ENDINPUT) {
+	if (tok == ENDINPUT || tok == endtok) {
 	    set_list_code(p, Z_SYNC, c);
 	    r = 1;
 	} else if (tok == SEPER) {
 	    set_list_code(p, Z_SYNC, c);
-	    if (isnewlin <= 0)
+	    if (isnewlin <= 0 || endtok != ENDINPUT)
 		zshlex();
 	    r = 1;
 	} else if (tok == AMPER) {
@@ -513,7 +524,7 @@ par_event(void)
     } else {
 	int oec = ecused;
 
-	if (!par_event()) {
+	if (!par_event(endtok)) {
 	    ecused = oec;
 	    ecbuf[p] |= wc_bdata(Z_END);
 	}

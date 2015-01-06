@@ -106,3 +106,45 @@
 >34
 >"
 >" OK
+
+ echo $(case foo in
+ foo)
+ echo This test worked.
+ ;;
+ bar)
+ echo This test failed in a rather bizarre way.
+ ;;
+ *)
+ echo This test failed.
+ ;;
+ esac)
+0:Parsing of command substitution with unmatched parentheses: case, basic
+>This test worked.
+
+ echo "$(case bar in
+ foo)
+ echo This test spoobed.
+ ;;
+ bar)
+ echo This test plurbled.
+ ;;
+ *)
+ echo This test bzonked.
+ ;;
+ esac)"
+0:Parsing of command substitution with unmatched parentheses: case with quotes
+>This test plurbled.
+
+ echo before $(
+ echo start; echo unpretentious |
+ while read line; do
+   case $line in
+   u*)
+   print Word began with u
+   print and ended with a crunch
+   ;;
+   esac
+ done | sed -e 's/Word/Universe/'; echo end
+ ) after
+0:Parsing of command substitution with ummatched parentheses: with frills
+>before start Universe began with u and ended with a crunch end after

@@ -179,12 +179,12 @@ shingetline(void)
 /* Get the next character from the input.
  * Will call inputline() to get a new line where necessary.
  */
-  
+
 /**/
 int
 ingetc(void)
 {
-    int lastc;
+    int lastc = ' ';
 
     if (lexstop)
 	return ' ';
@@ -196,7 +196,7 @@ ingetc(void)
 		continue;
 	    if (((inbufflags & INP_LINENO) || !strin) && lastc == '\n')
 		lineno++;
-	    return lastc;
+	    break;
 	}
 
 	/*
@@ -208,7 +208,7 @@ ingetc(void)
 	 */
 	if (!inbufct && (strin || errflag)) {
 	    lexstop = 1;
-	    return ' ';
+	    break;
 	}
 	/* If the next element down the input stack is a continuation of
 	 * this, use it.
@@ -219,8 +219,10 @@ ingetc(void)
 	}
 	/* As a last resort, get some more input */
 	if (inputline())
-	    return ' ';
+	    break;
     }
+    zshlex_raw_add(lastc);
+    return lastc;
 }
 
 /* Read a line from the current command stream and store it as input */
@@ -426,6 +428,7 @@ inungetc(int c)
 	    inbufleft = 0;
 	    inbuf = inbufptr = "";
 	}
+	zshlex_raw_back();
     }
 }
 

@@ -142,7 +142,8 @@ loop(int toplevel, int justonce)
 	use_exit_printed = 0;
 	intr();			/* interrupts on            */
 	lexinit();              /* initialize lexical state */
-	if (!(prog = parse_event())) {	/* if we couldn't parse a list */
+	if (!(prog = parse_event(ENDINPUT))) {
+	    /* if we couldn't parse a list */
 	    hend(NULL);
 	    if ((tok == ENDINPUT && !errflag) ||
 		(tok == LEXERR && (!isset(SHINSTDIN) || !toplevel)) ||
