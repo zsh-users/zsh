@@ -566,7 +566,7 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
 	    return buf;
 	}
 	if (swidep)
-	    *swidep = buf + *widthp;
+	    *swidep = widthp ? buf + *widthp : buf;
 	return buf;
     }
 
