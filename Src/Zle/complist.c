@@ -2884,7 +2884,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    brend = dupbrinfo(u->brend, &lastbrend, 0);
 	    nbrbeg = u->nbrbeg;
 	    nbrend = u->nbrend;
-	    origline = u->origline;
+	    zsfree(origline);
+	    origline = ztrdup(u->origline);
 	    origcs = u->origcs;
 	    origll = u->origll;
             strcpy(status, u->status);
@@ -3238,7 +3239,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 		 * don't want that, just what the user typed,
 		 * so restore the information.
 		 */
-                origline = modeline;
+		zsfree(origline);
+		origline = ztrdup(modeline);
                 origcs = modecs;
                 origll = modell;
                 zlemetacs = 0;

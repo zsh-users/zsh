@@ -634,7 +634,8 @@ docomplete(int lst)
     metafy_line();
 
     ocs = zlemetacs;
-    origline = dupstring(zlemetaline);
+    zsfree(origline);
+    origline = ztrdup(zlemetaline);
     origcs = zlemetacs;
     origll = zlemetall;
     if (!isfirstln && (chline != NULL || zle_chline != NULL)) {
