@@ -1,3 +1,9 @@
+2015-01-07  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34154 (tweaked per 34155): Src/builtin.c: reorder bin_print() to
+	avoid leaking the output descriptor when incorrect/incompatible
+	options were passed
+
 2015-01-07  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 34144: Src/Zle/zle_tricky.c, Src/Zle/complist.c: allocate

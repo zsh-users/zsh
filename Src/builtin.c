@@ -3724,7 +3724,7 @@ int
 bin_print(char *name, char **args, Options ops, int func)
 {
     int flen, width, prec, type, argc, n, narg, curlen = 0;
-    int nnl = 0, fmttrunc = 0, ret = 0, maxarg = 0;
+    int nnl = 0, fmttrunc = 0, ret = 0, maxarg = 0, nc = 0;
     int flags[5], *len;
     char *start, *endptr, *c, *d, *flag, *buf, spec[13], *fmt = NULL;
     char **first, **argp, *curarg, *flagch = "0+- #", save = '\0', nullstr = '\0';
@@ -3837,8 +3837,38 @@ bin_print(char *name, char **args, Options ops, int func)
 	}
     }
 
+    /* -o and -O -- sort the arguments */
+    if (OPT_ISSET(ops,'o') || OPT_ISSET(ops,'O')) {
+	int flags;
+
+	if (fmt && !*args)
+	    return 0;
+	flags = OPT_ISSET(ops,'i') ? SORTIT_IGNORING_CASE : 0;
+	if (OPT_ISSET(ops,'O'))
+	    flags |= SORTIT_BACKWARDS;
+	strmetasort(args, flags, len);
+    }
+
+    /* -C -- number of columns */
+    if (!fmt && OPT_ISSET(ops,'C')) {
+	char *eptr, *argptr = OPT_ARG(ops,'C');
+	nc = (int)zstrtol(argptr, &eptr, 10);
+	if (*eptr) {
+	    zwarnnam(name, "number expcted after -%c: %s", 'C', argptr);
+	    return 1;
+	}
+	if (nc <= 0) {
+	    zwarnnam(name, "invalid number of columns: %s", argptr);
+	    return 1;
+	}
+    }
+
     /* -u and -p -- output to other than standard output */
-    if (OPT_HASARG(ops,'u') || OPT_ISSET(ops,'p')) {
+    if ((OPT_HASARG(ops,'u') || OPT_ISSET(ops,'p')) &&
+	/* rule out conflicting options -- historical precedence */
+	((!fmt && (OPT_ISSET(ops,'c') || OPT_ISSET(ops,'C'))) ||
+	!(OPT_ISSET(ops, 'z') ||
+	  OPT_ISSET(ops, 's') || OPT_ISSET(ops, 'S')))) {
 	int fdarg, fd;
 
 	if (OPT_ISSET(ops, 'p')) {
@@ -3877,24 +3907,9 @@ bin_print(char *name, char **args, Options ops, int func)
 	}
     }
 
-    /* -o and -O -- sort the arguments */
-    if (OPT_ISSET(ops,'o') || OPT_ISSET(ops,'O')) {
-	int flags;
-
-	if (fmt && !*args) {
-	    if (fout != stdout)
-	        fclose(fout);
-	    return 0;
-	}
-	flags = OPT_ISSET(ops,'i') ? SORTIT_IGNORING_CASE : 0;
-	if (OPT_ISSET(ops,'O'))
-	    flags |= SORTIT_BACKWARDS;
-	strmetasort(args, flags, len);
-    }
-
     /* -c -- output in columns */
     if (!fmt && (OPT_ISSET(ops,'c') || OPT_ISSET(ops,'C'))) {
-	int l, nc, nr, sc, n, t, i;
+	int l, nr, sc, n, t, i;
 #ifdef MULTIBYTE_SUPPORT
 	int *widths;
 
@@ -3965,19 +3980,9 @@ bin_print(char *name, char **args, Options ops, int func)
 #endif
 
 	if (OPT_ISSET(ops,'C')) {
-	    char *eptr, *argptr = OPT_ARG(ops,'C');
-	    nc = (int)zstrtol(argptr, &eptr, 10);
-	    if (*eptr) {
-		zwarnnam(name, "number expcted after -%c: %s", 'C', argptr);
-		return 1;
-	    }
-	    if (nc <= 0) {
-		zwarnnam(name, "invalid number of columns: %s", argptr);
-		return 1;
-	    }
 	    /*
 	     * n: number of elements
-	     * nc: number of columns
+	     * nc: number of columns (above)
 	     * nr: number of rows
 	     */
 	    n = arrlen(args);
