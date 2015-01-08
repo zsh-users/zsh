@@ -9,7 +9,8 @@ alwayslink=1
 
 # autobins not specified because of alwayslink
 
-objects="builtin.o compat.o cond.o exec.o glob.o hashtable.o hashnameddir.o \
+objects="builtin.o compat.o cond.o context.o \
+exec.o glob.o hashtable.o hashnameddir.o \
 hist.o init.o input.o jobs.o lex.o linklist.o loop.o math.o \
 mem.o module.o options.o params.o parse.o pattern.o prompt.o signals.o \
 signames.o sort.o string.o subst.o text.o utils.o watch.o"

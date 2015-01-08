@@ -6102,7 +6102,7 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
 	}
     }
 
-    lexsave();
+    zcontext_save();
     testargs = argv;
     tok = NULLTOK;
     condlex = testlex;
@@ -6112,16 +6112,16 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
 
     if (errflag) {
 	errflag &= ~ERRFLAG_ERROR;
-	lexrestore();
+	zcontext_restore();
 	return 1;
     }
 
     if (!prog || tok == LEXERR) {
 	zwarnnam(name, tokstr ? "parse error" : "argument expected");
-	lexrestore();
+	zcontext_restore();
 	return 1;
     }
-    lexrestore();
+    zcontext_restore();
 
     if (*curtestarg) {
 	zwarnnam(name, "too many arguments");

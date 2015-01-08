@@ -222,6 +222,85 @@ static int histsave_stack_pos = 0;
 
 static zlong histfile_linect;
 
+/* save history context */
+
+/**/
+void
+hist_context_save(struct hist_stack *hs, int toplevel)
+{
+    if (toplevel) {
+	/* top level, make this version visible to ZLE */
+	zle_chline = chline;
+	/* ensure line stored is NULL-terminated */
+	if (hptr)
+	    *hptr = '\0';
+    }
+    hs->histactive = histactive;
+    hs->histdone = histdone;
+    hs->stophist = stophist;
+    hs->hline = chline;
+    hs->hptr = hptr;
+    hs->chwords = chwords;
+    hs->chwordlen = chwordlen;
+    hs->chwordpos = chwordpos;
+    hs->hwgetword = hwgetword;
+    hs->hgetc = hgetc;
+    hs->hungetc = hungetc;
+    hs->hwaddc = hwaddc;
+    hs->hwbegin = hwbegin;
+    hs->hwend = hwend;
+    hs->addtoline = addtoline;
+    hs->hlinesz = hlinesz;
+    /*
+     * We save and restore the command stack with history
+     * as it's visible to the user interactively, so if
+     * we're preserving history state we'll continue to
+     * show the current set of commands from input.
+     */
+    hs->cstack = cmdstack;
+    hs->csp = cmdsp;
+
+    stophist = 0;
+    chline = NULL;
+    hptr = NULL;
+    histactive = 0;
+    cmdstack = (unsigned char *)zalloc(CMDSTACKSZ);
+    cmdsp = 0;
+}
+
+/**/
+void
+hist_context_restore(const struct hist_stack *hs, int toplevel)
+{
+    if (toplevel) {
+	/* Back to top level: don't need special ZLE value */
+	DPUTS(hs->hline != zle_chline, "BUG: Ouch, wrong chline for ZLE");
+	zle_chline = NULL;
+    }
+    histactive = hs->histactive;
+    histdone = hs->histdone;
+    stophist = hs->stophist;
+    chline = hs->hline;
+    hptr = hs->hptr;
+    chwords = hs->chwords;
+    chwordlen = hs->chwordlen;
+    chwordpos = hs->chwordpos;
+    hwgetword = hs->hwgetword;
+    hgetc = hs->hgetc;
+    hungetc = hs->hungetc;
+    hwaddc = hs->hwaddc;
+    hwbegin = hs->hwbegin;
+    hwend = hs->hwend;
+    addtoline = hs->addtoline;
+    hlinesz = hs->hlinesz;
+    if (cmdstack)
+	zfree(cmdstack, CMDSTACKSZ);
+    cmdstack = hs->cstack;
+    cmdsp = hs->csp;
+}
+
+/* restore history context */
+
 /* add a character to the current history word */
 
 static void
@@ -815,6 +894,11 @@ strinbeg(int dohist)
     strin++;
     hbegin(dohist);
     lexinit();
+    /*
+     * Also initialise some variables owned by the parser but
+     * used for communication between the parser and lexer.
+     */
+    init_parse_status();
 }
 
 /* done reading a string */
@@ -2992,7 +3076,7 @@ bufferwords(LinkList list, char *buf, int *index, int flags)
     opts[RCQUOTES] = 0;
     addedx = 0;
     noerrs = 1;
-    lexsave();
+    zcontext_save();
     lexflags = flags | LEXFLAGS_ACTIVE;
     /*
      * Are we handling comments?
@@ -3189,7 +3273,7 @@ bufferwords(LinkList list, char *buf, int *index, int flags)
     errflag &= ~ERRFLAG_ERROR;
     nocomments = onc;
     noerrs = ne;
-    lexrestore();
+    zcontext_restore();
     zlemetacs = ocs;
     zlemetall = oll;
     wb = owb;

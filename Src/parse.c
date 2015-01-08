@@ -31,7 +31,7 @@
 #include "parse.pro"
 
 /* != 0 if we are about to read a command word */
- 
+
 /**/
 mod_export int incmdpos;
 
@@ -242,6 +242,67 @@ int ecsoffs, ecssub, ecnfunc;
 #define EC_DOUBLE_THRESHOLD  32768
 #define EC_INCREMENT         1024
 
+/* save parse context */
+
+/**/
+void
+parse_context_save(struct parse_stack *ps, int toplevel)
+{
+    (void)toplevel;
+
+    ps->incmdpos = incmdpos;
+    ps->aliasspaceflag = aliasspaceflag;
+    ps->incond = incond;
+    ps->inredir = inredir;
+    ps->incasepat = incasepat;
+    ps->isnewlin = isnewlin;
+    ps->infor = infor;
+
+    ps->hdocs = hdocs;
+    ps->eclen = eclen;
+    ps->ecused = ecused;
+    ps->ecnpats = ecnpats;
+    ps->ecbuf = ecbuf;
+    ps->ecstrs = ecstrs;
+    ps->ecsoffs = ecsoffs;
+    ps->ecssub = ecssub;
+    ps->ecnfunc = ecnfunc;
+    ecbuf = NULL;
+    hdocs = NULL;
+}
+
+/* restore parse context */
+
+/**/
+void
+parse_context_restore(const struct parse_stack *ps, int toplevel)
+{
+    (void)toplevel;
+
+    if (ecbuf)
+	zfree(ecbuf, eclen);
+
+    incmdpos = ps->incmdpos;
+    aliasspaceflag = ps->aliasspaceflag;
+    incond = ps->incond;
+    inredir = ps->inredir;
+    incasepat = ps->incasepat;
+    incasepat = ps->incasepat;
+    isnewlin = ps->isnewlin;
+    infor = ps->infor;
+
+    hdocs = ps->hdocs;
+    eclen = ps->eclen;
+    ecused = ps->ecused;
+    ecnpats = ps->ecnpats;
+    ecbuf = ps->ecbuf;
+    ecstrs = ps->ecstrs;
+    ecsoffs = ps->ecsoffs;
+    ecssub = ps->ecssub;
+    ecnfunc = ps->ecnfunc;
+
+    errflag &= ~ERRFLAG_ERROR;
+}
 
 /* Adjust pointers in here-doc structs. */
 
@@ -359,6 +420,21 @@ ecstrcode(char *s)
     } while (0)
 
 
+/**/
+mod_export void
+init_parse_status(void)
+{
+    /*
+     * These variables are currently declared by the parser, so we
+     * initialise them here.  Possibly they are more naturally declared
+     * by the lexical anaylser; however, as they are used for signalling
+     * between the two it's a bit ambiguous.  We clear them when
+     * using the lexical analyser for strings as well as here.
+     */
+    incasepat = incond = inredir = infor = 0;
+    incmdpos = 1;
+}
+
 /* Initialise wordcode buffer. */
 
 /**/
@@ -373,6 +449,8 @@ init_parse(void)
     ecsoffs = ecnpats = 0;
     ecssub = 0;
     ecnfunc = 0;
+
+    init_parse_status();
 }
 
 /* Build eprog. */
@@ -539,9 +617,8 @@ parse_list(void)
     int c = 0;
 
     tok = ENDINPUT;
-    incmdpos = 1;
-    zshlex();
     init_parse();
+    zshlex();
     par_list(&c);
     if (tok != ENDINPUT) {
         clear_hdocs();

@@ -2691,6 +2691,71 @@ struct sortelt {
 
 typedef struct sortelt *SortElt;
 
+/*********************************************************/
+/* Structures to save and restore for individual modules */
+/*********************************************************/
+
+/* History */
+struct hist_stack {
+    int histactive;
+    int histdone;
+    int stophist;
+    int hlinesz;
+    char *hline;
+    char *hptr;
+    short *chwords;
+    int chwordlen;
+    int chwordpos;
+    int hwgetword;
+    int (*hgetc) _((void));
+    void (*hungetc) _((int));
+    void (*hwaddc) _((int));
+    void (*hwbegin) _((int));
+    void (*hwend) _((void));
+    void (*addtoline) _((int));
+    unsigned char *cstack;
+    int csp;
+};
+
+/* Lexical analyser */
+struct lex_stack {
+    int dbparens;
+    int isfirstln;
+    int isfirstch;
+    int lexflags;
+    enum lextok tok;
+    char *tokstr;
+    char *zshlextext;
+    char *bptr;
+    int bsiz;
+    int len;
+    int lex_add_raw;
+    char *tokstr_raw;
+    char *bptr_raw;
+    int bsiz_raw;
+    int len_raw;
+    int lexstop;
+    zlong toklineno;
+};
+
+/* Parser */
+struct parse_stack {
+    struct heredocs *hdocs;
+
+    int incmdpos;
+    int aliasspaceflag;
+    int incond;
+    int inredir;
+    int incasepat;
+    int isnewlin;
+    int infor;
+
+    int eclen, ecused, ecnpats;
+    Wordcode ecbuf;
+    Eccstr ecstrs;
+    int ecsoffs, ecssub, ecnfunc;
+};
+
 /************************/
 /* Flags to casemodifiy */
 /************************/

@@ -1,3 +1,12 @@
+2015-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34189:  Src/Zle/compcore.c, Src/Zle/compctl.c,
+	Src/Zle/textobjects.c, Src/Zle/zle_tricky.c, Src/builtin.c,
+	Src/context.c, Src/exec.c, Src/hist.c, Src/init.c, Src/lex.c,
+	Src/parse.c, Src/signals.c, Src/zsh.h, Src/zsh.mdd:
+	vain attempt to make context save and restore neater and
+	control the status variables thereby managed.
+
 2015-01-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34182: Doc/Zsh/mod_files.yo: to add zf_* builtins you can

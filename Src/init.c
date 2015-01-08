@@ -107,7 +107,7 @@ loop(int toplevel, int justonce)
 
     pushheap();
     if (!toplevel)
-	lexsave();
+	zcontext_save();
     for (;;) {
 	freeheap();
 	if (stophist == 3)	/* re-entry via preprompt() */
@@ -227,7 +227,7 @@ loop(int toplevel, int justonce)
     }
     err = errflag;
     if (!toplevel)
-	lexrestore();
+	zcontext_restore();
     popheap();
 
     if (err)

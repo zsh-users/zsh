@@ -698,7 +698,7 @@ docomplete(int lst)
     freeheap();
     /* Save the lexer state, in case the completion code uses the lexer *
      * somewhere (e.g. when processing a compctl -s flag).              */
-    lexsave();
+    zcontext_save();
     if (inwhat == IN_ENV)
 	lincmd = 0;
     if (s) {
@@ -868,7 +868,7 @@ docomplete(int lst)
     } else
 	ret = 1;
     /* Reset the lexer state, pop the heap. */
-    lexrestore();
+    zcontext_restore();
     popheap();
 
     dat[0] = lst;
@@ -1164,7 +1164,7 @@ get_comp_string(void)
     varname = NULL;
     insubscr = 0;
     clwpos = -1;
-    lexsave();
+    zcontext_save();
     lexflags = LEXFLAGS_ZLE;
     inpush(dupstrspace(linptr), 0, NULL);
     strinbeg(0);
@@ -1422,7 +1422,7 @@ get_comp_string(void)
 		zlemetall -= parend;
 		zlemetaline[zlemetall + addedx] = '\0';
 	    }
-	    lexrestore();
+	    zcontext_restore();
 	    tt = NULL;
 	    goto start;
 	}
@@ -1496,12 +1496,12 @@ get_comp_string(void)
 	if (tmp) {
 	    tmp = NULL;
 	    linptr = zlemetaline;
-	    lexrestore();
+	    zcontext_restore();
 	    addedx = 0;
 	    goto start;
 	}
 	noaliases = ona;
-	lexrestore();
+	zcontext_restore();
 	return NULL;
     }
 
@@ -2151,7 +2151,7 @@ get_comp_string(void)
 	    offs = boffs;
 	}
     }
-    lexrestore();
+    zcontext_restore();
 
     return (char *)s;
 }
@@ -2791,7 +2791,7 @@ doexpandhist(void)
     expanding = 1;
     excs = zlemetacs;
     zlemetall = zlemetacs = 0;
-    lexsave();
+    zcontext_save();
     /* We push ol as it will remain unchanged */
     inpush(ol, 0, NULL);
     strinbeg(1);
@@ -2803,7 +2803,7 @@ doexpandhist(void)
     } while (tok != ENDINPUT && tok != LEXERR);
     while (!lexstop)
 	hgetc();
-    /* We have to save errflags because it's reset in lexrestore. Since  *
+    /* We have to save errflags because it's reset in zcontext_restore. Since  *
      * noerrs was set to 1 errflag is true if there was a habort() which *
      * means that the expanded string is unusable.                       */
     err = errflag;
@@ -2811,7 +2811,7 @@ doexpandhist(void)
     noaliases = ona;
     strinend();
     inpop();
-    lexrestore();
+    zcontext_restore();
     expanding = 0;
 
     if (!err) {
@@ -2910,7 +2910,7 @@ getcurcmd(void)
     int curlincmd;
     char *s = NULL;
 
-    lexsave();
+    zcontext_save();
     lexflags = LEXFLAGS_ZLE;
     metafy_line();
     inpush(dupstrspace(zlemetaline), 0, NULL);
@@ -2934,7 +2934,7 @@ getcurcmd(void)
     inpop();
     errflag &= ~ERRFLAG_ERROR;
     unmetafy_line();
-    lexrestore();
+    zcontext_restore();
 
     return s;
 }

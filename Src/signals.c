@@ -1210,7 +1210,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     intrap++;
     *sigtr |= ZSIG_IGNORED;
 
-    lexsave();
+    zcontext_save();
     /* execsave will save the old trap_return and trap_state */
     execsave();
     breaks = retflag = 0;
@@ -1265,7 +1265,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     new_trap_return = trap_return;
 
     execrestore();
-    lexrestore();
+    zcontext_restore();
 
     if (new_trap_state == TRAP_STATE_FORCE_RETURN &&
 	/* zero return from function isn't special */

@@ -217,7 +217,7 @@ parse_string(char *s, int reset_lineno)
     Eprog p;
     zlong oldlineno;
 
-    lexsave();
+    zcontext_save();
     inpush(s, INP_LINENO, NULL);
     strinbeg(0);
     oldlineno = lineno;
@@ -229,7 +229,7 @@ parse_string(char *s, int reset_lineno)
 	lastval = 1;
     strinend();
     inpop();
-    lexrestore();
+    zcontext_restore();
     return p;
 }
 
@@ -3349,9 +3349,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		 * The copy uses the wordcode parsing area, so save and
 		 * restore state.
 		 */
-		lexsave();
+		zcontext_save();
 		redir_prog = eccopyredirs(&s);
-		lexrestore();
+		zcontext_restore();
 	    } else
 		redir_prog = NULL;
 	    

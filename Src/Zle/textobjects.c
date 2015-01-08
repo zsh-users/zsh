@@ -241,7 +241,7 @@ selectargument(UNUSED(char **args))
 
     addedx = 0;
     noerrs = 1;
-    lexsave();
+    zcontext_save();
     lexflags = LEXFLAGS_ACTIVE;
     linein = zlegetline(&ll, &cs);
     zlemetall = ll;
@@ -277,7 +277,7 @@ selectargument(UNUSED(char **args))
     inpop();
     errflag &= ~ERRFLAG_ERROR;
     noerrs = ne;
-    lexrestore();
+    zcontext_restore();
     zlemetacs = ocs;
     wb = owb;
     we = owe;

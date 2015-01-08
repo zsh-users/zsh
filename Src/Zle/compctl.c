@@ -2795,7 +2795,7 @@ sep_comp_string(char *ss, char *s, int noffs)
      * get the words we have to expand.                        */
     addedx = 1;
     noerrs = 1;
-    lexsave();
+    zcontext_save();
     lexflags = LEXFLAGS_ZLE;
     tmp = (char *) zhalloc(tl = sl + 3 + strlen(s));
     strcpy(tmp, ss);
@@ -2849,7 +2849,7 @@ sep_comp_string(char *ss, char *s, int noffs)
     inpop();
     errflag &= ~ERRFLAG_ERROR;
     noerrs = ne;
-    lexrestore();
+    zcontext_restore();
     wb = owb;
     we = owe;
     zlemetacs = ocs;
@@ -3707,7 +3707,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 
 	/* Put the string in the lexer buffer and call the lexer to *
 	 * get the words we have to expand.                        */
-	lexsave();
+	zcontext_save();
 	lexflags = LEXFLAGS_ZLE;
 	tmpbuf = (char *)zhalloc(strlen(cc->str) + 5);
 	sprintf(tmpbuf, "foo %s", cc->str); /* KLUDGE! */
@@ -3726,7 +3726,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	strinend();
 	inpop();
 	errflag &= ~ERRFLAG_ERROR;
-	lexrestore();
+	zcontext_restore();
 	/* Fine, now do full expansion. */
 	prefork(foo, 0);
 	if (!errflag) {

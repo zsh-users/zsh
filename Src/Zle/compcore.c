@@ -1524,7 +1524,7 @@ set_comp_sep(void)
     ol = zlemetaline;
     addedx = 1;
     noerrs = 1;
-    lexsave();
+    zcontext_save();
     lexflags = LEXFLAGS_ZLE;
     /*
      * tl is the length of the temporary string including
@@ -1673,7 +1673,7 @@ set_comp_sep(void)
     inpop();
     errflag &= ~ERRFLAG_ERROR;
     noerrs = ne;
-    lexrestore();
+    zcontext_restore();
     wb = owb;
     we = owe;
     zlemetaline = ol;
