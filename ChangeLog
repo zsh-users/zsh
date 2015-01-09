@@ -13,6 +13,9 @@
 
 2015-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 34194: Doc/Zsh/arith.yo: add paragraph about integer
+	promotion.
+
 	* 34189:  Src/Zle/compcore.c, Src/Zle/compctl.c,
 	Src/Zle/textobjects.c, Src/Zle/zle_tricky.c, Src/builtin.c,
 	Src/context.c, Src/exec.c, Src/hist.c, Src/init.c, Src/lex.c,

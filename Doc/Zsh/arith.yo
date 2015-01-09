@@ -233,6 +233,15 @@ necessary.  In addition, if any operator which requires an integer
 equivalents with assignment) is given a floating point argument, it will be
 silently rounded down to the next integer.
 
+Users should beware that, in common with many other programming
+languages but not software designed for calculation, the evaluation of
+an expression in zsh is taken a term at a time and promotion of integers
+to floating point does not occur in terms only containing integers.  A
+typical result of this is that a division such as tt(6/8) is truncated,
+in this being rounded down to 0.  The tt(FORCE_FLOAT) shell option can
+be used in scripts or functions where floating point evaluation is
+required throughout.
+
 Scalar variables can hold integer or floating point values at different
 times; there is no memory of the numeric type in this case.
 
