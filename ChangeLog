@@ -1,3 +1,8 @@
+2015-01-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34182: Doc/Zsh/mod_files.yo: to add zf_* builtins you can
+	use zmodload -m -F.
+
 2015-01-09  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 30568: Doc/Zsh/contrib.yo, Functions/Misc/tetriscurses: Add

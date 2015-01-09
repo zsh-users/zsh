@@ -10,7 +10,10 @@ all features now required by relevant standards committees.
 
 For all commands, a variant beginning tt(zf_) is also available and loaded
 automatically.  Using the features capability of zmodload will let you load
-only those names you want.
+only those names you want.  Note that it's possible to load only the
+builtins with zsh-specific names using the following command:
+
+example(zmodload -m -F zsh/files b:zf_\*)
 
 The commands loaded by default are:
 
