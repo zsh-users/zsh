@@ -3784,7 +3784,7 @@ bin_print(char *name, char **args, Options ops, int func)
     /* compute lengths, and interpret according to -P, -D, -e, etc. */
     argc = arrlen(args);
     len = (int *) hcalloc(argc * sizeof(int));
-    for(n = 0; n < argc; n++) {
+    for (n = 0; n < argc; n++) {
 	/* first \ sequences */
 	if (fmt ||
 	    (!OPT_ISSET(ops,'e') &&
@@ -3854,7 +3854,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	char *eptr, *argptr = OPT_ARG(ops,'C');
 	nc = (int)zstrtol(argptr, &eptr, 10);
 	if (*eptr) {
-	    zwarnnam(name, "number expcted after -%c: %s", 'C', argptr);
+	    zwarnnam(name, "number expected after -%c: %s", 'C', argptr);
 	    return 1;
 	}
 	if (nc <= 0) {
@@ -3881,7 +3881,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	    char *argptr = OPT_ARG(ops,'u'), *eptr;
 	    /* Handle undocumented feature that -up worked */
 	    if (!strcmp(argptr, "p")) {
-		fdarg= coprocout;
+		fdarg = coprocout;
 		if (fdarg < 0) {
 		    zwarnnam(name, "-p: no coprocess");
 		    return 1;
