@@ -269,7 +269,7 @@ execselect(Estate state, UNUSED(int do_exec))
 		    zputs(str, stderr);
 		    free(str);
 		    fflush(stderr);
-		    str = fgets(zalloc(256), 256, inp);
+		    str = fgets(zhalloc(256), 256, inp);
 	    	}
 	    } else
 		str = (char *)getlinknode(bufstack);
