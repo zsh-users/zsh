@@ -2263,7 +2263,6 @@ quote(char **tr)
 	    *rptr++ = *ptr;
     *rptr++ = '\'';
     *rptr++ = 0;
-    str[1] = NULL;
     return 0;
 }
 
