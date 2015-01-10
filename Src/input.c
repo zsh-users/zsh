@@ -537,6 +537,12 @@ inpush(char *str, int flags, Alias inalias)
 static void
 inpoptop(void)
 {
+    if (!lexstop) {
+	inbufflags &= ~INP_ALCONT;
+	while (inbufptr > inbuf)
+	    inungetc(inbufptr[-1]);
+    }
+
     if (inbuf && (inbufflags & INP_FREE))
 	free(inbuf);
 

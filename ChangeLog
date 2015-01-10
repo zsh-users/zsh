@@ -1,5 +1,8 @@
 2015-01-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 34220: Src/input.c: new $(...) parsing didn't back up over
+	alias expansions.
+
 	* unposted: Src/context.c: update copyright.
 
 	* 34195: Thomas Mitterfellner: Completion/Linux/Command/_qdbus:
