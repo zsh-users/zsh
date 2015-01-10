@@ -1935,7 +1935,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
      * even if that's unset
      */
     if (pm && (pm->node.flags & PM_SPECIAL))
-	usepm = 1;
+	usepm = 2;	/* indicate that we preserve the PM_UNSET flag */
 
     /*
      * Don't use an existing param if
@@ -2072,7 +2072,11 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 		    arrfixenv(pm->node.nam, x);
 	    }
 	}
-	pm->node.flags = (pm->node.flags | (on & ~PM_READONLY)) & ~(off | PM_UNSET);
+	if (usepm == 2)		/* do not change the PM_UNSET flag */
+	    pm->node.flags = (pm->node.flags | (on & ~PM_READONLY)) & ~off;
+	else
+	    pm->node.flags = (pm->node.flags |
+			      (on & ~PM_READONLY)) & ~(off | PM_UNSET);
 	if (on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
 	    if (typeset_setwidth(cname, pm, ops, on, 0))
 		return NULL;

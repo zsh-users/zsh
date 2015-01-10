@@ -1,3 +1,8 @@
+2015-01-10  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34212: Src/builtin.c: do not change unset-ness of special
+	parameters when exporting them
+
 2015-01-09  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34202: Completion/Base/Widget/_complete_debug,
