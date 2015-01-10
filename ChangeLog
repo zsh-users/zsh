@@ -1,5 +1,7 @@
 2015-01-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Test/C04funcdef.ztst: test for the foregoing
+
 	* 34220: Src/input.c: new $(...) parsing didn't back up over
 	alias expansions.
 

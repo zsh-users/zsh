@@ -271,6 +271,7 @@
 >OK
 >ignorebraces is off
 >ignorebraces is still on here
+#` (matching error message for editors parsing the file)
 
 # lsfoo should not be expanded as an anonymous function argument
  alias lsfoo='This is not ls.'
@@ -282,6 +283,17 @@
  print foo | () cat
 0:Simple anonymous function should not simplify enclosing pipeline
 >foo
+
+ alias fooalias=barexpansion
+ funcwithalias() { echo $(fooalias); }
+ functions funcwithalias
+ barexpansion() { print This is the correct output.; }
+ funcwithalias
+0:Alias expanded in command substitution does not appear expanded in text
+>funcwithalias () {
+>	echo $(fooalias)
+>}
+>This is the correct output.
 
 %clean
 
