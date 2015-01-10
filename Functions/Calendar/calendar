@@ -12,6 +12,7 @@ local -A reply
 
 zmodload -i zsh/datetime || return 1
 zmodload -i zsh/zutil || return 1
+zmodload -m -F zsh/files b:zf_ln || return 1
 
 autoload -Uz calendar_{add,parse,read,scandate,show,lockfiles}
 
@@ -254,7 +255,7 @@ if (( verbose )); then
 fi
 
 local mycmds="${TMPPREFIX:-/tmp/zsh}.calendar_cmds.$$"
-mv -f =(<<<'') $mycmds
+zf_ln -fn =(<<<'') $mycmds || return 1
 
 # start of subshell for OS file locking
 (
