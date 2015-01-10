@@ -533,21 +533,41 @@ generated.
 subsect(Overview)
 
 When completion is attempted somewhere on the command line the
-completion system first works out the context.  This takes account of a
+completion system begins building the context.  The context represents
+everything that the shell knows about the meaning of the command line
+and the significance of the cursor position.  This takes account of a
 number of things including the command word (such as `tt(grep)' or
 `tt(zsh)') and options to which the current word may be an argument
 (such as the `tt(-o)' option to tt(zsh) which takes a shell option as an
 argument).
 
-This context information is condensed into a string consisting of
-multiple fields separated by colons, referred to simply as `the context'
-in the remainder of the documentation.  This is used to look up
-em(styles), context-sensitive options that can be used to configure the
-completion system.  The context used for lookup may vary during the same
-call to the completion system.
+The context starts out very generic ("we are beginning a completion")
+and becomes more specific as more is learned ("the current word is in a
+position that is usually a command name" or "the current word might be a
+variable name" and so on).  Therefore the context will vary during the
+same call to the completion system.
+
+This context information is condensed into a string consisting of multiple
+fields separated by colons, referred to simply as `the context' in the
+remainder of the documentation.  Note that a user of the completion system
+rarely needs to compose a context string, unless for example a new
+function is being written to perform completion for a new command.  What a
+user may need to do is compose a em(style) pattern, which is matched
+against a context when needed to look up context-sensitive options that
+configure the completion system.
+
+The next few paragraphs explain how a context is composed within the
+completion function suite.  Following that is discussion of how em(styles)
+are defined.  Styles determine such things as how the matches are
+generated, similarly to shell options but with much more control.  They
+are defined with the tt(zstyle) builtin command (\
+ifzman(see zmanref(zshmodules))\
+ifnzman(noderef(The zsh/zutil Module))).
 
 The context string always consists of a fixed set of fields, separated
-by colons and with a leading colon before the first, in the form
+by colons and with a leading colon before the first.  Fields which are
+not yet known are left empty, but the surrounding colons appear anyway.
+The fields are always in the order
 tt(:completion:)var(function)tt(:)var(completer)tt(:)var(command)tt(:)var(argument)tt(:)tt(tag).  These have the following meaning:
 
 startitemize()
@@ -628,17 +648,13 @@ described in
 ifzman(the section `Bindable Commands' below)\
 ifnzman(noderef(Bindable Commands)).
 
-Styles determine such things as how the matches are generated, similarly
-to shell options but with much more control.  They can have any number
-of strings as their value.  They are defined with the tt(zstyle) builtin
-command (\
-ifzman(see zmanref(zshmodules))\
-ifnzman(noderef(The zsh/zutil Module))).
-
 When looking up styles the completion system uses full context names,
-including the tag.  Looking up the value of a style therefore consists
-of two things:  the context, which may be matched as a pattern, and the
-name of the style itself, which must be given exactly.
+including the tag.  Looking up the value of a style therefore consists of
+two things: the context, which is matched to the most specific (best
+fitting) style pattern, and the name of the style itself, which must be
+matched exactly.  The following examples demonstrate that style patterns
+may be loosely defined for styles that apply broadly, or as tightly
+defined as desired for styles that apply in narrower circumstances.
 
 For example, many completion functions can generate matches in a
 simple and a verbose form and use the tt(verbose) style to decide

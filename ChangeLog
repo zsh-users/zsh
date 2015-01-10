@@ -1,3 +1,11 @@
+2015-01-09  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34202: Completion/Base/Widget/_complete_debug,
+	Completion/compinstall, Functions/Calendar/calendar,
+	Functions/Zftp/zfget_match: safe tempfile creation part 3
+
+	* users/19721: Doc/Zsh/compsys.yo: clarify context vs. style
+
 2015-01-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34189:  Src/Zle/compcore.c, Src/Zle/compctl.c,
