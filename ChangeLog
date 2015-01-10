@@ -35,11 +35,11 @@
 
 2015-01-08  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* Src/init.c, Src/input.c, Src/lex.c, Src/parse.c, Src/zsh.h,
-	Test/D08cmdsubst.ztst: fix the problem that command and similar
-	substitutions weren't properly parsed so could end prematurely.
-	Use improved resolution in context save and restore to allow
-	parsing the substitution while tracking the string.
+	* 34160: Src/init.c, Src/input.c, Src/lex.c, Src/parse.c,
+	Src/zsh.h, Test/D08cmdsubst.ztst: fix the problem that command
+	and similar substitutions weren't properly parsed so could end
+	prematurely.  Use improved resolution in context save and restore
+	to allow parsing the substitution while tracking the string.
 
 2015-01-07  Barton E. Schaefer  <schaefer@zsh.org>
 
