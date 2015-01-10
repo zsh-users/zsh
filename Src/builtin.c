@@ -1934,7 +1934,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
      * We need to compare types with an existing pm if special,
      * even if that's unset
      */
-    if (pm && (pm->node.flags & PM_SPECIAL))
+    if (!usepm && pm && (pm->node.flags & PM_SPECIAL))
 	usepm = 2;	/* indicate that we preserve the PM_UNSET flag */
 
     /*
