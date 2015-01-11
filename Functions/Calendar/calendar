@@ -12,7 +12,7 @@ local -A reply
 
 zmodload -i zsh/datetime || return 1
 zmodload -i zsh/zutil || return 1
-zmodload -m -F zsh/files b:zf_ln || return 1
+zmodload -F zsh/files b:zf_ln || return 1
 
 autoload -Uz calendar_{add,parse,read,scandate,show,lockfiles}
 

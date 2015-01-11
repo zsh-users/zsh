@@ -1,7 +1,7 @@
 # function zfget_match {
 
 emulate -L zsh
-zmodload -m -F zsh/files b:zf_ln || return 1
+zmodload -F zsh/files b:zf_ln || return 1
 
 # the zfcd hack:  this may not be necessary here
 if [[ $1 == $HOME || $1 == $HOME/* ]]; then

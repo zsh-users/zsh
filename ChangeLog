@@ -12,6 +12,10 @@
 
 2015-01-10  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted (cf. 34218): Completion/Base/Widget/_complete_debug,
+	Completion/compinstall, Functions/Calendar/calendar,
+	Functions/Zftp/zfget_match: remove -m from zmodload calls
+
 	* 34212, 34313: Src/builtin.c: do not change unset-ness of special
 	parameters when exporting them
 

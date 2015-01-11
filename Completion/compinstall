@@ -3,7 +3,7 @@
 emulate -L zsh
 setopt extendedglob
 
-zmodload -m -F zsh/files b:zf_ln || return 1
+zmodload -F zsh/files b:zf_ln || return 1
 
 local key
 local compcontext=-default-

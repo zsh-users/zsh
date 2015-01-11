@@ -9,7 +9,7 @@ local pager w="${(qq)words}"
 integer debug_fd=-1
 {
   if [[ -t 2 ]]; then
-    zmodload -m -F zsh/files b:zf_ln 2>/dev/null &&
+    zmodload -F zsh/files b:zf_ln 2>/dev/null &&
     zf_ln -fn =(<<<'') $tmp &&
     exec {debug_fd}>&2 2>| $tmp
   fi
