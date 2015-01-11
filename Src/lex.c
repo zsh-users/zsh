@@ -155,8 +155,8 @@ static int lex_add_raw;
 
 /* variables associated with the above */
 
-static char *tokstr_raw, *bptr_raw;
-static int len_raw, bsiz_raw;
+static char *tokstr_raw;
+static struct lexbufstate lexbuf_raw;
 
 /* text of punctuation tokens */
 
@@ -200,8 +200,7 @@ mod_export char *tokstrings[WHILE + 1] = {
 /* lexical state */
 
 static int dbparens;
-static int len = 0, bsiz = 256;
-static char *bptr;
+static struct lexbufstate lexbuf = { NULL, 256, 0 };
 
 /* save lexical context */
 
@@ -219,21 +218,17 @@ lex_context_save(struct lex_stack *ls, int toplevel)
     ls->tok = tok;
     ls->tokstr = tokstr;
     ls->zshlextext = zshlextext;
-    ls->bptr = bptr;
-    ls->bsiz = bsiz;
-    ls->len = len;
+    ls->lexbuf = lexbuf;
     ls->lex_add_raw = lex_add_raw;
     ls->tokstr_raw = tokstr_raw;
-    ls->bptr_raw = bptr_raw;
-    ls->bsiz_raw = bsiz_raw;
-    ls->len_raw = len_raw;
+    ls->lexbuf_raw = lexbuf_raw;
     ls->lexstop = lexstop;
     ls->toklineno = toklineno;
 
-    tokstr = zshlextext = bptr = NULL;
-    bsiz = 256;
-    tokstr_raw = bptr_raw = NULL;
-    bsiz_raw = len_raw = lex_add_raw = 0;
+    tokstr = zshlextext = lexbuf.ptr = NULL;
+    lexbuf.siz = 256;
+    tokstr_raw = lexbuf_raw.ptr = NULL;
+    lexbuf_raw.siz = lexbuf_raw.len = lex_add_raw = 0;
 }
 
 /* restore lexical context */
@@ -251,14 +246,10 @@ lex_context_restore(const struct lex_stack *ls, int toplevel)
     tok = ls->tok;
     tokstr = ls->tokstr;
     zshlextext = ls->zshlextext;
-    bptr = ls->bptr;
-    bsiz = ls->bsiz;
-    len = ls->len;
+    lexbuf = ls->lexbuf;
     lex_add_raw = ls->lex_add_raw;
     tokstr_raw = ls->tokstr_raw;
-    bptr_raw = ls->bptr_raw;
-    bsiz_raw = ls->bsiz_raw;
-    len_raw = ls->len_raw;
+    lexbuf_raw = ls->lexbuf_raw;
     lexstop = ls->lexstop;
     toklineno = ls->toklineno;
 }
@@ -445,17 +436,18 @@ lexinit(void)
 void
 add(int c)
 {
-    *bptr++ = c;
-    if (bsiz == ++len) {
-	int newbsiz = bsiz * 2;
+    *lexbuf.ptr++ = c;
+    if (lexbuf.siz == ++lexbuf.len) {
+	int newbsiz = lexbuf.siz * 2;
 
-	if (newbsiz > inbufct && inbufct > bsiz)
+	if (newbsiz > inbufct && inbufct > lexbuf.siz)
 	    newbsiz = inbufct;
 
-	bptr = len + (tokstr = (char *)hrealloc(tokstr, bsiz, newbsiz));
+	tokstr = (char *)hrealloc(tokstr, lexbuf.siz, newbsiz);
+	lexbuf.ptr = tokstr + lexbuf.len;
 	/* len == bsiz, so bptr is at the start of newly allocated memory */
-	memset(bptr, 0, newbsiz - bsiz);
-	bsiz = newbsiz;
+	memset(lexbuf.ptr, 0, newbsiz - lexbuf.siz);
+	lexbuf.siz = newbsiz;
     }
 }
 
@@ -482,13 +474,13 @@ add(int c)
 static int
 cmd_or_math(int cs_type)
 {
-    int oldlen = len;
+    int oldlen = lexbuf.len;
     int c;
 
     cmdpush(cs_type);
     c = dquote_parse(')', 0);
     cmdpop();
-    *bptr = '\0';
+    *lexbuf.ptr = '\0';
     if (!c) {
 	/* Successfully parsed, see if it was math */
 	c = hgetc();
@@ -504,9 +496,10 @@ cmd_or_math(int cs_type)
     /* else unsuccessful: unget the whole thing */
     hungetc(c);
     lexstop = 0;
-    while (len > oldlen) {
-	len--;
-	hungetc(itok(*--bptr) ? ztokens[*bptr - Pound] : *bptr);
+    while (lexbuf.len > oldlen) {
+	lexbuf.len--;
+	hungetc(itok(*--lexbuf.ptr) ?
+		ztokens[*lexbuf.ptr - Pound] : *lexbuf.ptr);
     }
     hungetc('(');
     return 0;
@@ -531,8 +524,8 @@ cmd_or_math_sub(void)
 	}
 	if (ret == 2)
 	    return 1;
-	bptr -= 2;
-	len -= 2;
+	lexbuf.ptr -= 2;
+	lexbuf.len -= 2;
     } else {
 	hungetc(c);
 	lexstop = 0;
@@ -596,13 +589,13 @@ gettok(void)
     hwbegin(-1-(qbang && c == bangchar));
     /* word includes the last character read and possibly \ before ! */
     if (dbparens) {
-	len = 0;
-	bptr = tokstr = (char *) hcalloc(bsiz = LEX_HEAP_SIZE);
+	lexbuf.len = 0;
+	lexbuf.ptr = tokstr = (char *) hcalloc(lexbuf.siz = LEX_HEAP_SIZE);
 	hungetc(c);
 	cmdpush(CS_MATH);
 	c = dquote_parse(infor ? ';' : ')', 0);
 	cmdpop();
-	*bptr = '\0';
+	*lexbuf.ptr = '\0';
 	if (!c && infor) {
 	    infor--;
 	    return DINPAR;
@@ -650,8 +643,9 @@ gettok(void)
 	 * newlines being inserted into the history. */
 
 	if (lexflags & LEXFLAGS_COMMENTS_KEEP) {
-	    len = 0;
-	    bptr = tokstr = (char *)hcalloc(bsiz = LEX_HEAP_SIZE);
+	    lexbuf.len = 0;
+	    lexbuf.ptr = tokstr =
+		(char *)hcalloc(lexbuf.siz = LEX_HEAP_SIZE);
 	    add(c);
 	}
 	hwend();
@@ -666,7 +660,7 @@ gettok(void)
 	    peek = LEXERR;
 	else {
 	    if (lexflags & LEXFLAGS_COMMENTS_KEEP) {
-		*bptr = '\0';
+		*lexbuf.ptr = '\0';
 		if (!lexstop)
 		    hungetc(c);
 		peek = STRING;
@@ -752,8 +746,9 @@ gettok(void)
 		return DINPAR;
 	    }
 	    if (incmdpos || (isset(SHGLOB) && !isset(KSHGLOB))) {
-		len = 0;
-		bptr = tokstr = (char *) hcalloc(bsiz = LEX_HEAP_SIZE);
+		lexbuf.len = 0;
+		lexbuf.ptr = tokstr = (char *)
+		    hcalloc(lexbuf.siz = LEX_HEAP_SIZE);
 		switch (cmd_or_math(CS_MATH)) {
 		case 1:
 		    return DINPAR;
@@ -902,8 +897,8 @@ gettokstr(int c, int sub)
 
     peek = STRING;
     if (!sub) {
-	len = 0;
-	bptr = tokstr = (char *) hcalloc(bsiz = LEX_HEAP_SIZE);
+	lexbuf.len = 0;
+	lexbuf.ptr = tokstr = (char *) hcalloc(lexbuf.siz = LEX_HEAP_SIZE);
     }
     for (;;) {
 	int act;
@@ -939,7 +934,7 @@ gettokstr(int c, int sub)
 	    if (fdpar) {
 		/* this is a single word `(   )', treat as INOUTPAR */
 		add(c);
-		*bptr = '\0';
+		*lexbuf.ptr = '\0';
 		return INOUTPAR;
 	    }
 	    if ((sub || in_brace_param) && isset(SHGLOB))
@@ -1014,9 +1009,9 @@ gettokstr(int c, int sub)
 	    if (isset(SHGLOB)) {
 		if (sub || in_brace_param)
 		    break;
-		if (incasepat && !len)
+		if (incasepat && !lexbuf.len)
 		    return INPAR;
-		if (!isset(KSHGLOB) && len)
+		if (!isset(KSHGLOB) && lexbuf.len)
 		    goto brk;
 	    }
 	    if (!in_brace_param) {
@@ -1073,9 +1068,9 @@ gettokstr(int c, int sub)
 	    if (isset(IGNOREBRACES) || sub)
 		c = '{';
 	    else {
-		if (!len && incmdpos) {
+		if (!lexbuf.len && incmdpos) {
 		    add('{');
-		    *bptr = '\0';
+		    *lexbuf.ptr = '\0';
 		    return STRING;
 		}
 		if (in_brace_param) {
@@ -1161,23 +1156,23 @@ gettokstr(int c, int sub)
 			   incmdpos && !bct && !brct) {
 		    char *t = tokstr;
 		    if (idigit(*t))
-			while (++t < bptr && idigit(*t));
+			while (++t < lexbuf.ptr && idigit(*t));
 		    else {
-			int sav = *bptr;
-			*bptr = '\0';
+			int sav = *lexbuf.ptr;
+			*lexbuf.ptr = '\0';
 			t = itype_end(t, IIDENT, 0);
-			if (t < bptr) {
+			if (t < lexbuf.ptr) {
 			    skipparens(Inbrack, Outbrack, &t);
 			} else {
-			    *bptr = sav;
+			    *lexbuf.ptr = sav;
 			}
 		    }
 		    if (*t == '+')
 			t++;
-		    if (t == bptr) {
+		    if (t == lexbuf.ptr) {
 			e = hgetc();
 			if (e == '(' && incmdpos) {
-			    *bptr = '\0';
+			    *lexbuf.ptr = '\0';
 			    return ENVARRAY;
 			}
 			hungetc(e);
@@ -1214,7 +1209,7 @@ gettokstr(int c, int sub)
 		goto brk;
 	    break;
 	case LX2_QUOTE: {
-	    int strquote = (len && bptr[-1] == String);
+	    int strquote = (lexbuf.len && lexbuf.ptr[-1] == String);
 
 	    add(Snull);
 	    cmdpush(CS_QUOTE);
@@ -1237,8 +1232,8 @@ gettokstr(int c, int sub)
 			else
 			    add('\\');
 		    } else if (!sub && isset(CSHJUNKIEQUOTES) && c == '\n') {
-			if (bptr[-1] == '\\')
-			    bptr--, len--;
+			if (lexbuf.ptr[-1] == '\\')
+			    lexbuf.ptr--, lexbuf.len--;
 			else
 			    break;
 		    }
@@ -1328,15 +1323,16 @@ gettokstr(int c, int sub)
 	while(bct-- >= in_brace_param)
 	    cmdpop();
 	zerr("closing brace expected");
-    } else if (unset(IGNOREBRACES) && !sub && len > 1 &&
-	       peek == STRING && bptr[-1] == '}' && bptr[-2] != Bnull) {
+    } else if (unset(IGNOREBRACES) && !sub && lexbuf.len > 1 &&
+	       peek == STRING && lexbuf.ptr[-1] == '}' &&
+	       lexbuf.ptr[-2] != Bnull) {
 	/* hack to get {foo} command syntax work */
-	bptr--;
-	len--;
+	lexbuf.ptr--;
+	lexbuf.len--;
 	lexstop = 0;
 	hungetc('}');
     }
-    *bptr = '\0';
+    *lexbuf.ptr = '\0';
     DPUTS(cmdsp != ocmdsp, "BUG: gettok: cmdstack changed.");
     return peek;
 }
@@ -1528,11 +1524,11 @@ parsestrnoerr(char *s)
     untokenize(s);
     inpush(dupstring(s), 0, NULL);
     strinbeg(0);
-    len = 0;
-    bptr = tokstr = s;
-    bsiz = l + 1;
+    lexbuf.len = 0;
+    lexbuf.ptr = tokstr = s;
+    lexbuf.siz = l + 1;
     err = dquote_parse('\0', 1);
-    *bptr = '\0';
+    *lexbuf.ptr = '\0';
     strinend();
     inpop();
     DPUTS(cmdsp, "BUG: parsestr: cmdstack not empty.");
@@ -1559,18 +1555,18 @@ parse_subscript(char *s, int sub, int endchar)
     untokenize(t = dupstring(s));
     inpush(t, 0, NULL);
     strinbeg(0);
-    len = 0;
-    bptr = tokstr = s;
-    bsiz = l + 1;
+    lexbuf.len = 0;
+    lexbuf.ptr = tokstr = s;
+    lexbuf.siz = l + 1;
     err = dquote_parse(endchar, sub);
     if (err) {
-	err = *bptr;
-	*bptr = '\0';
+	err = *lexbuf.ptr;
+	*lexbuf.ptr = '\0';
 	untokenize(s);
-	*bptr = err;
+	*lexbuf.ptr = err;
 	s = NULL;
     } else {
-	s = bptr;
+	s = lexbuf.ptr;
     }
     strinend();
     inpop();
@@ -1597,9 +1593,9 @@ parse_subst_string(char *s)
     untokenize(s);
     inpush(dupstring(s), 0, NULL);
     strinbeg(0);
-    len = 0;
-    bptr = tokstr = s;
-    bsiz = l + 1;
+    lexbuf.len = 0;
+    lexbuf.ptr = tokstr = s;
+    lexbuf.siz = l + 1;
     c = hgetc();
     ctok = gettokstr(c, 1);
     err = errflag;
@@ -1615,7 +1611,7 @@ parse_subst_string(char *s)
     }
 #ifdef DEBUG
     /*
-     * Historical note: we used to check here for olen (the value of len
+     * Historical note: we used to check here for olen (the value of lexbuf.len
      * before zcontext_restore()) == l, but that's not necessarily the case if
      * we stripped an RCQUOTE.
      */
@@ -1782,14 +1778,14 @@ zshlex_raw_add(int c)
     if (!lex_add_raw)
 	return;
 
-    *bptr_raw++ = c;
-    if (bsiz_raw == ++len_raw) {
-	int newbsiz = bsiz_raw * 2;
+    *lexbuf_raw.ptr++ = c;
+    if (lexbuf_raw.siz == ++lexbuf_raw.len) {
+	int newbsiz = lexbuf_raw.siz * 2;
 
-	tokstr_raw = (char *)hrealloc(tokstr_raw, bsiz_raw, newbsiz);
-	bptr_raw = tokstr_raw + len_raw;
-	memset(bptr_raw, 0, newbsiz - bsiz_raw);
-	bsiz_raw = newbsiz;
+	tokstr_raw = (char *)hrealloc(tokstr_raw, lexbuf_raw.siz, newbsiz);
+	lexbuf_raw.ptr = tokstr_raw + lexbuf_raw.len;
+	memset(lexbuf_raw.ptr, 0, newbsiz - lexbuf_raw.siz);
+	lexbuf_raw.siz = newbsiz;
     }
 }
 
@@ -1799,8 +1795,8 @@ zshlex_raw_back(void)
 {
     if (!lex_add_raw)
 	return;
-    bptr_raw--;
-    len_raw--;
+    lexbuf_raw.ptr--;
+    lexbuf_raw.len--;
 }
 
 /*
@@ -1817,8 +1813,9 @@ zshlex_raw_back(void)
 static int
 skipcomm(void)
 {
-    char *new_tokstr, *new_bptr = bptr_raw;
-    int new_len, new_bsiz, new_lexstop, new_lex_add_raw;
+    char *new_tokstr;
+    int new_lexstop, new_lex_add_raw;
+    struct lexbufstate new_lexbuf;
 
     cmdpush(CS_CMDSUBST);
     SETPARBEGIN
@@ -1842,9 +1839,7 @@ skipcomm(void)
 	 * to keep the same history context.
 	 */
 	new_tokstr = tokstr;
-	new_bptr = bptr;
-	new_len = len;
-	new_bsiz = bsiz;
+	new_lexbuf = lexbuf;
 
 	zcontext_save_partial(ZCONTEXT_LEX|ZCONTEXT_PARSE);
     } else {
@@ -1858,16 +1853,12 @@ skipcomm(void)
 	 * otherwise by cleared, though.
 	 */
 	new_tokstr = tokstr_raw;
-	new_bptr = bptr_raw;
-	new_len = len_raw;
-	new_bsiz = bsiz_raw;
+	new_lexbuf = lexbuf_raw;
 
 	zcontext_save_partial(ZCONTEXT_LEX|ZCONTEXT_PARSE);
     }
     tokstr_raw = new_tokstr;
-    bsiz_raw = new_bsiz;
-    len_raw = new_len;
-    bptr_raw = new_bptr;
+    lexbuf_raw = new_lexbuf;
     lex_add_raw = new_lex_add_raw;
 
     if (!parse_event(OUTPAR) || tok != OUTPAR)
@@ -1879,9 +1870,7 @@ skipcomm(void)
      * as the current token string after popping the stack.
      */
     new_tokstr = tokstr_raw;
-    new_bptr = bptr_raw;
-    new_len = len_raw;
-    new_bsiz = bsiz_raw;
+    new_lexbuf = lexbuf_raw;
     /*
      * We're also going to propagate the lexical state:
      * if we couldn't parse the command substitution we
@@ -1896,14 +1885,12 @@ skipcomm(void)
 	 * Keep going, so retain the raw variables.
 	 */
 	tokstr_raw = new_tokstr;
-	bptr_raw = new_bptr;
-	len_raw = new_len;
-	bsiz_raw = new_bsiz;
+	lexbuf_raw = new_lexbuf;
     } else {
 	if (!new_lexstop) {
 	    /* Ignore the ')' added on input */
-	    new_len--;
-	    *--new_bptr = '\0';
+	    new_lexbuf.len--;
+	    *--new_lexbuf.ptr = '\0';
 	}
 
 	/*
@@ -1911,9 +1898,7 @@ skipcomm(void)
 	 * all along.
 	 */
 	tokstr = new_tokstr;
-	bptr = new_bptr;
-	len = new_len;
-	bsiz = new_bsiz;
+	lexbuf = new_lexbuf;
 	lexstop = new_lexstop;
     }
 

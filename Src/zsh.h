@@ -2717,6 +2717,27 @@ struct hist_stack {
     int csp;
 };
 
+/*
+ * State of a lexical token buffer.
+ *
+ * It would be neater to include the pointer to the start of the buffer,
+ * however the current code structure means that the standard instance
+ * of this, tokstr, is visible in lots of places, so that's not
+ * convenient.
+ */
+
+struct lexbufstate {
+    /*
+     * Next character to be added.
+     * Set to NULL when the buffer is to be visible from elsewhere.
+     */
+    char *ptr;
+    /* Allocated buffer size */
+    int siz;
+    /* Length in use */
+    int len;
+};
+
 /* Lexical analyser */
 struct lex_stack {
     int dbparens;
@@ -2726,14 +2747,10 @@ struct lex_stack {
     enum lextok tok;
     char *tokstr;
     char *zshlextext;
-    char *bptr;
-    int bsiz;
-    int len;
+    struct lexbufstate lexbuf;
     int lex_add_raw;
     char *tokstr_raw;
-    char *bptr_raw;
-    int bsiz_raw;
-    int len_raw;
+    struct lexbufstate lexbuf_raw;
     int lexstop;
     zlong toklineno;
 };

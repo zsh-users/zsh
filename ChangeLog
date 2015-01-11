@@ -1,5 +1,8 @@
 2015-01-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 34234: Src/lex.c, Src/zsh.h: use structures for normal and raw
+	lexical buffer state.
+
 	* 34233: Completion/Linux/Command/_qdbus: add _qdbus "$@" trick.
 
 2015-01-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
