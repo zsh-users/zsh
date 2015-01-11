@@ -288,11 +288,11 @@ static int type[TOKCOUNT] =
 {
 /*  0 */  LR, LR|OP_OP|OP_OPF, RL, RL, RL|OP_OP|OP_OPF,
 /*  5 */  RL|OP_OP|OP_OPF, RL, RL, LR|OP_A2IO, LR|OP_A2IO,
-/* 10 */  LR|OP_A2IO, LR|OP_A2, LR|OP_A2, LR|OP_A2IO, LR|OP_A2,
+/* 10 */  LR|OP_A2IO, LR|OP_A2, LR|OP_A2, LR|OP_A2, LR|OP_A2,
 /* 15 */  LR|OP_A2, LR|OP_A2IO, LR|OP_A2IO, LR|OP_A2IR, LR|OP_A2IR,
 /* 20 */  LR|OP_A2IR, LR|OP_A2IR, LR|OP_A2IR, LR|OP_A2IR, BOOL|OP_A2IO,
 /* 25 */  BOOL|OP_A2IO, LR|OP_A2IO, RL|OP_OP, RL|OP_OP, RL|OP_E2,
-/* 30 */  RL|OP_E2, RL|OP_E2, RL|OP_E2, RL|OP_E2, RL|OP_E2IO,
+/* 30 */  RL|OP_E2, RL|OP_E2, RL|OP_E2, RL|OP_E2, RL|OP_E2,
 /* 35 */  RL|OP_E2IO, RL|OP_E2IO, RL|OP_E2IO, RL|OP_E2IO, RL|OP_E2IO,
 /* 40 */  BOOL|OP_E2IO, BOOL|OP_E2IO, RL|OP_A2IO, RL|OP_A2, RL|OP_OP,
 /* 45 */  RL, RL, LR|OP_OPF, LR|OP_OPF, RL|OP_A2,
@@ -1133,7 +1133,9 @@ op(int what)
 		 * Any integer mod -1 is the same as any integer mod 1
 		 * i.e. zero.
 		 */
-		if (b.u.l == -1)
+		if (c.type == MN_FLOAT)
+		    c.u.d = fmod(a.u.d, b.u.d);
+		else if (b.u.l == -1)
 		    c.u.l = 0;
 		else
 		    c.u.l = a.u.l % b.u.l;

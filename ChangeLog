@@ -1,3 +1,7 @@
+2015-01-11  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34230: Src/math.c: call fmod() for modulo with floats
+
 2015-01-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34234: Src/lex.c, Src/zsh.h: use structures for normal and raw
