@@ -110,3 +110,5 @@ _qdbus() {
     ;;
   esac
 }
+
+_qdbus "$@"
