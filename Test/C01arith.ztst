@@ -18,6 +18,12 @@
 0:basic floating point arithmetic
 >31415.
 
+  integer rnd
+  (( rnd = ((29.1 % 13.0 * 10) + 0.5) ))
+  print $rnd
+0:Test floating point modulo function
+>31
+
   print $(( 0x10 + 0X01 + 2#1010 ))
 0:base input
 >27

@@ -1,5 +1,7 @@
 2015-01-11  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 34247: Test/C01arith.ztst: regression test for 34230.
+
 	* 34230: Src/math.c: call fmod() for modulo with floats
 
 2015-01-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
