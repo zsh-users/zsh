@@ -35,6 +35,54 @@ Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
 
+Incompatibilites between 5.0.7 and 5.0.8
+----------------------------------------
+
+A couple of arithmetic operations have changed: the new behaviour
+is intended to be more consistent, but is not compatible with the old.
+
+Previously, the modulus operation, `%', implicitly converted the
+operation to integer and output an integer result, even if one
+or both of the arguments were floating point.  Now, the C math
+library fmod() operator is used to implement the operation where
+one of the arguments is floating point.  For example:
+
+Old behavour:
+
+% print $(( 5.5 % 2 ))
+1
+
+New behaviour:
+
+% print $(( 5.5 % 2 ))
+1.5
+
+Previously, assignments to variables assigned the correct type to
+variables declared as floating point or integer, but this type was
+not propagated to the value of the expression, as a C programmer
+would naturally expect.  Now, the type of the variable is propagated
+so long as the variable is declared as a numeric type (however this
+happened, e.g. the variable may have been implicitly typed by a
+previous assignment).  For example:
+
+Old behaviour:
+
+% integer var
+% print $(( var = 5.5 / 2.0 ))
+2.2000000000000002
+% print $var
+2
+
+(the actual rounding error may vary).
+
+New behaviour:
+
+% integer var
+% print $(( var = 5.5 / 2.0 ))
+2
+% print $var
+2
+
 Incompatibilities between 5.0.2 and 5.0.5
 -----------------------------------------
 

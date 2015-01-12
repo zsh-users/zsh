@@ -16,7 +16,7 @@
   print -- $(( rnd = there * 10000 ))
 # save rounding problems by converting to integer
 0:basic floating point arithmetic
->31415.
+>31415
 
   integer rnd
   (( rnd = ((29.1 % 13.0 * 10) + 0.5) ))
@@ -300,3 +300,11 @@
   print $(( 0b2 ))
 1:Binary numbers don't tend to have 2's in
 ?(eval):1: bad math expression: operator expected at `2 '
+
+  integer varassi
+  print $(( varassi = 5.5 / 2.0 ))
+  print $varassi
+0:Integer variable assignment converts result to integer
+>2
+>2
+# It's hard to test for integer to float.

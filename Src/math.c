@@ -880,6 +880,8 @@ getcvar(char *s)
 static mnumber
 setmathvar(struct mathvalue *mvp, mnumber v)
 {
+    Param pm;
+
     if (mvp->pval) {
 	/*
 	 * This value may have been hanging around for a while.
@@ -909,7 +911,32 @@ setmathvar(struct mathvalue *mvp, mnumber v)
     if (noeval)
 	return v;
     untokenize(mvp->lval);
-    setnparam(mvp->lval, v);
+    pm = setnparam(mvp->lval, v);
+    if (pm) {
+	/*
+	 * If we are performing an assignment, we return the
+	 * number with the same type as the parameter we are
+	 * assigning to, in the spirit of the way assignments
+	 * in C work.  Note this was a change to long-standing
+	 * zsh behaviour.
+	 */
+	switch (PM_TYPE(pm->node.flags)) {
+	case PM_INTEGER:
+	    if (v.type != MN_INTEGER) {
+		v.u.l = (zlong)v.u.d;
+		v.type = MN_INTEGER;
+	    }
+	    break;
+
+	case PM_EFLOAT:
+	case PM_FFLOAT:
+	    if (v.type != MN_FLOAT) {
+		v.u.d = (double)v.u.l;
+		v.type = MN_FLOAT;
+	    }
+	    break;
+	}
+    }
     return v;
 }
 

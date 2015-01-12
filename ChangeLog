@@ -1,5 +1,8 @@
 2015-01-12  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34255: README, Src/math.c, Test/C01arith.ztst: propagate type
+	from variable assignment.  Also note 34230 in README.
+
 	* 34253: Doc/Zsh/contrib.yo: warning on integer arithmetic
 	for zcalc, c.f. 34194.
 
