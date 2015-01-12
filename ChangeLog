@@ -1,3 +1,8 @@
+2015-01-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34253: Doc/Zsh/contrib.yo: warning on integer arithmetic
+	for zcalc, c.f. 34194.
+
 2015-01-11  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34247: Test/C01arith.ztst: regression test for 34230.

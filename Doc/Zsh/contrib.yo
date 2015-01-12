@@ -3227,8 +3227,18 @@ A reasonably powerful calculator based on zsh's arithmetic evaluation
 facility.  The syntax is similar to that of formulae in most programming
 languages; see
 ifzman(the section `Arithmetic Evaluation' in zmanref(zshmisc))\
-ifnzman(noderef(Arithmetic Evaluation)) for details.  The mathematical
-library tt(zsh/mathfunc) will be loaded if it is available; see
+ifnzman(noderef(Arithmetic Evaluation)) for details.
+
+Non-programmers should note that, as in many other programming
+languages, expressions involving only integers (whether constants
+without a `tt(.)', variables containing such constants as strings, or
+variables declared to be integers) are by default evaluated using
+integer arithmetic, which is not how an ordinary desk calculator
+operates.  To force floating point operation, pass the option tt(-f);
+see further notes below.
+
+The mathematical library tt(zsh/mathfunc) will be loaded if it is
+available; see
 ifzman(the section `The zsh/mathfunc Module' in zmanref(zshmodules))\
 ifnzman(noderef(The zsh/mathfunc Module)).  The mathematical functions
 correspond to the raw system libraries, so trigonometric functions are
