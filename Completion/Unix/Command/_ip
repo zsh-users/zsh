@@ -38,6 +38,7 @@ subcmd_ipaddrs=(
   /$'(<->(.<->(.<->(.<->|)|)|)|[:[:xdigit]]#:[:[:xdigit:]]#)(|/<->)\0'/
   ":ipaddress:IP address (v4 or v6) currently set:( $(ip addr show | sed -n 's/^ *inet6* \([0-9a-f\.:/]*\) .*$/\1/p') )"
 )
+local -a subcmd_prefix_label
 subcmd_prefix_label=(
   /$'(<->(.<->(.<->(.<->|)|)|)|[:[:xdigit]]#:[:[:xdigit:]]#)(|/<->)\0'/
   ":ipaddresslabel:IP addrlabel prefix currently set:( $(ip -6 addrlabel list 2>/dev/null | sed -n 's/^prefix \([0-9a-f\.:/]*\) .*$/\1/p') )"
@@ -98,7 +99,7 @@ _regex_words nexthop 'nexthop route keyword' \
     'weight:specify relative quality of route:$subcmd_number'
 subcmd_nexthop=("$reply[@]" "#")
 
-local -a subcmd_rtproto
+local -a subcmd_rtprotocol
 _regex_words rtprotocol 'route protocol' \
   'redirect:installed from ICMP redirect' \
   'kernel:installed automatically by kernel' \

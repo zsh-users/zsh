@@ -1,3 +1,8 @@
+2015-01-13  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34259: Eric Cook: Completion/Unix/Command/_ip: fix variable
+	declarations.
+
 2015-01-12  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34255: README, Src/math.c, Test/C01arith.ztst: propagate type
