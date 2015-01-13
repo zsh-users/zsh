@@ -9,7 +9,7 @@
 # Values encoding simple types
 #
 local -a subcmd_dev
-subcmd_dev=(/$'[[:alpha:]]##[[:digit:]]##(\.[[:digit:]]##)#\0'/ ':interfaces:network interface:_net_interfaces')
+subcmd_dev=(/$'[[:alnum:][:punct:][:cntrl:][:digit:]]##\0'/ ':interfaces:network interface:_net_interfaces')
 
 local -a subcmd_onoff
 subcmd_onoff=(/$'(on|off)\0'/ ':onoff:state (on or off):(on off)')

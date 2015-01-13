@@ -1,5 +1,8 @@
 2015-01-13  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34260: Eric Cook: Completion/Unix/Command/_ip: relax
+	restriction on interface names.
+
 	* 34259: Eric Cook: Completion/Unix/Command/_ip: fix variable
 	declarations.
 
