@@ -8,6 +8,8 @@
 
 2015-01-12  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: .gitignore: add Src/zsh.exe for Cygwin.
+
 	* 34255: README, Src/math.c, Test/C01arith.ztst: propagate type
 	from variable assignment.  Also note 34230 in README.
 
