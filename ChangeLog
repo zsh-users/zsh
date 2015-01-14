@@ -1,3 +1,9 @@
+2015-01-13  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34273: Doc/Zsh/compsys.yo: use a sufficient number of colons
+	in example style patterns to assure fixed strings can't match
+	the wrong field positions
+
 2015-01-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34260: Eric Cook: Completion/Unix/Command/_ip: relax

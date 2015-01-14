@@ -677,7 +677,7 @@ completion for the tt(kill) builtin.  If the style is set, the builtin
 lists full job texts and process command lines; otherwise it shows the
 bare job numbers and PIDs.  To turn the style off for this use only:
 
-example(zstyle ':completion:*:*:kill:*' verbose no)
+example(zstyle ':completion:*:*:kill:*:*' verbose no)
 
 For even more control, the style can use one of the tags `tt(jobs)' or
 `tt(processes)'.  To turn off verbose display only for jobs:
@@ -704,9 +704,14 @@ as tt(menu) and tt(list-rows-first).
 Note that the order in which styles are em(defined) does not matter; the
 style mechanism uses the most specific possible match for a particular
 style to determine the set of values.  More precisely, strings are
-preferred over patterns (for example, `tt(:completion::complete:foo)' is
-more specific than `tt(:completion::complete:*')), and longer patterns are
+preferred over patterns (for example, `tt(:completion::complete:::foo)' is
+more specific than `tt(:completion::complete:::*')), and longer patterns are
 preferred over shorter patterns.
+
+A good rule of thumb is that any completion style pattern that needs to
+include more than one wildcard (tt(*)) and that does not end in a tag
+name, should include all six colons (tt(:)), possibly surrounding
+additional wildcards.
 
 Style names like those of tags are arbitrary and depend on the completion
 function.  However, the following two sections list some of the most
@@ -1507,7 +1512,7 @@ For example, to make the tt(rm) command first complete only names of
 object files and then the names of all files if there is no matching
 object file:
 
-example(zstyle ':completion:*:*:rm:*' file-patterns \ 
+example(zstyle ':completion:*:*:rm:*:*' file-patterns \ 
     '*.o:object-files' '%p:all-files')
 
 To alter the default behaviour of file completion DASH()- offer files
@@ -1659,7 +1664,7 @@ For example, to have names of builtin commands, shell functions and
 external commands appear in that order when completing in command
 position:
 
-example(zstyle ':completion:*:*:-command-:*' group-order \ 
+example(zstyle ':completion:*:*:-command-:*:*' group-order \ 
        builtins functions commands)
 )
 kindex(groups, completion style)
@@ -2045,7 +2050,7 @@ use the completers tt(_complete) and tt(_prefix) but allow
 case-insensitive completion only with tt(_complete):
 
 example(zstyle ':completion:*' completer _complete _prefix
-zstyle ':completion:*:complete:*' matcher-list \ 
+zstyle ':completion:*:complete:*:*:*' matcher-list \ 
        '' 'm:{a-zA-Z}={A-Za-z}')
 
 User-defined names, as explained for the tt(completer) style, are
@@ -2056,9 +2061,9 @@ with case-insensitive matching, then correction, and finally
 partial-word completion:
 
 example(zstyle ':completion:*' completer _complete _correct _complete:foo
-zstyle ':completion:*:complete:*' matcher-list \ 
+zstyle ':completion:*:complete:*:*:*' matcher-list \ 
     '' 'm:{a-zA-Z}={A-Za-z}'
-zstyle ':completion:*:foo:*' matcher-list \ 
+zstyle ':completion:*:foo:*:*:*' matcher-list \ 
     'm:{a-zA-Z}={A-Za-z} r:|[-_./]=* r:|=*')
 
 If the style is unset in any context no match specification is applied.
@@ -2581,7 +2586,7 @@ an exception to this behavior.)
 
 For example:
 
-example(zstyle ':completion:*:complete:-command-:*' tag-order \ 
+example(zstyle ':completion:*:complete:-command-:*:*' tag-order \ 
     'commands functions')
 
 specifies that completion in command position first offers
@@ -2640,7 +2645,7 @@ repeat them all.  For example, to make completion of function names in
 command position ignore all the completion functions starting with an
 underscore the first time completion is tried:
 
-example(zstyle ':completion:*:*:-command-:*' tag-order \ 
+example(zstyle ':completion:*:*:-command-:*:*' tag-order \ 
     'functions:-non-comp *' functions
 zstyle ':completion:*:functions-non-comp' ignored-patterns '_*')
 
@@ -2676,7 +2681,7 @@ try normal completion without any match specification and, if that
 generates no matches, try again with case-insensitive matching, restricting
 the effect to arguments of the command tt(foo):
 
-example(zstyle ':completion:*:*:foo:*' tag-order '*' '*:-case'
+example(zstyle ':completion:*:*:foo:*:*' tag-order '*' '*:-case'
 zstyle ':completion:*-case' matcher 'm:{a-z}={A-Z}')
 
 First, all the tags offered when completing after tt(foo) are tried using
