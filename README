@@ -69,11 +69,9 @@ Old behaviour:
 
 % integer var
 % print $(( var = 5.5 / 2.0 ))
-2.2000000000000002
+2.75
 % print $var
 2
-
-(the actual rounding error may vary).
 
 New behaviour:
 

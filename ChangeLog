@@ -12,6 +12,10 @@
 	in example style patterns to assure fixed strings can't match
 	the wrong field positions
 
+2015-01-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: README: fix deliberate error in previous update.
+
 2015-01-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34260: Eric Cook: Completion/Unix/Command/_ip: relax
