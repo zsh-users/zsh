@@ -1,5 +1,7 @@
 2015-01-14  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34283: Test/X02zlevi.ztst: also needs zpty.
+
 	* 34275: Test/V08zpty.ztst,  Test/Y01completion.ztst,
 	Test/Y02compmatch.ztst,  Test/Y03arguments.ztst: assume zpty
 	doesn't work under Cygwin.
