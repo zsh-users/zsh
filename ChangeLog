@@ -1,3 +1,9 @@
+2015-01-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34275: Test/V08zpty.ztst,  Test/Y01completion.ztst,
+	Test/Y02compmatch.ztst,  Test/Y03arguments.ztst: assume zpty
+	doesn't work under Cygwin.
+
 2015-01-13  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34273: Doc/Zsh/compsys.yo: use a sufficient number of colons

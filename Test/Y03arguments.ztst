@@ -1,7 +1,9 @@
 # Tests for _arguments.
 
 %prep
-  if ( zmodload -i zsh/zpty ) >/dev/null 2>&1; then
+  if [[ $OSTYPE = cygwin ]]; then
+    ZTST_unimplemented="the zsh/zpty module does not work on Cygwin"
+  elif ( zmodload -i zsh/zpty ) >/dev/null 2>&1; then
     . $ZTST_srcdir/comptest
     mkdir comp.tmp
     cd comp.tmp
