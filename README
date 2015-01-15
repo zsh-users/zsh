@@ -38,10 +38,12 @@ details, see the documentation.
 Incompatibilites between 5.0.7 and 5.0.8
 ----------------------------------------
 
-A couple of arithmetic operations have changed: the new behaviour
-is intended to be more consistent, but is not compatible with the old.
+Various arithmetic operations have changed, in particular with respect
+to the choice of integer or floating point operations.  The new
+behaviour is intended to be more consistent, but is not compatible with
+the old.
 
-Previously, the modulus operation, `%', implicitly converted the
+1) Previously, the modulus operation, `%', implicitly converted the
 operation to integer and output an integer result, even if one
 or both of the arguments were floating point.  Now, the C math
 library fmod() operator is used to implement the operation where
@@ -57,7 +59,8 @@ New behaviour:
 % print $(( 5.5 % 2 ))
 1.5
 
-Previously, assignments to variables assigned the correct type to
+
+2) Previously, assignments to variables assigned the correct type to
 variables declared as floating point or integer, but this type was
 not propagated to the value of the expression, as a C programmer
 would naturally expect.  Now, the type of the variable is propagated
@@ -80,6 +83,44 @@ New behaviour:
 2
 % print $var
 2
+
+
+3) Previously, the FORCE_FLOAT option only forced the use of floating
+point in arithmetic expressions for integer constants, i.e. numbers
+typed directly into the expression, but not for variables.  Hence
+an operation involving only integer variables (or string variables
+containing integers) was not forced to be performed with floating point
+arithmetic.  Now, operations involving variables are also forced to
+floating point.  For example:
+
+Old behaviour:
+
+% unsetopt FORCE_FLOAT
+% print $(( 1 / 2 ))
+0
+% integer i=1 j=2
+% print $(( i / j ))
+0
+% setopt FORCE_FLOAT
+% print $(( 1 / 2 ))
+0.5
+% print $(( i / j ))
+0
+
+New behaviour:
+
+% unsetopt FORCE_FLOAT
+% print $(( 1 / 2 ))
+0
+% integer i=1 j=2
+% print $(( i / j ))
+0
+% setopt FORCE_FLOAT
+% print $(( 1 / 2 ))
+0.5
+% print $(( i / j ))
+0.5
+
 
 Incompatibilities between 5.0.2 and 5.0.5
 -----------------------------------------

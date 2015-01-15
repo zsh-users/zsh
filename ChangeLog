@@ -1,5 +1,7 @@
 2015-01-15  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34290 (correcting typo): README: note FORCE_FLOAT behaviour change.
+
 	* 34280: Doc/Zsh/options.yo, Src/math.c, Test/C01arith.ztst:
 	make FORCE_FLOAT option also cover variables when read for
 	use in arithmetic expressions.
