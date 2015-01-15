@@ -336,16 +336,27 @@ enum prec_type {
 static mnumber
 getmathparam(struct mathvalue *mptr)
 {
+    mnumber result;
     if (!mptr->pval) {
 	char *s = mptr->lval;
 	mptr->pval = (Value)zhalloc(sizeof(struct value));
 	if (!getvalue(mptr->pval, &s, 1))
 	{
 	    mptr->pval = NULL;
+	    if (isset(FORCEFLOAT)) {
+		result.type = MN_FLOAT;
+		result.u.d = 0.0;
+		return result;
+	    }
 	    return zero_mnumber;
 	}
     }
-    return getnumvalue(mptr->pval);
+    result = getnumvalue(mptr->pval);
+    if (isset(FORCEFLOAT) && result.type == MN_INTEGER) {
+	result.type = MN_FLOAT;
+	result.u.d = (double)result.u.l;
+    }
+    return result;
 }
 
 static mnumber

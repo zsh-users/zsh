@@ -496,9 +496,10 @@ pindex(NOFORCEFLOAT)
 cindex(floating point, forcing use of)
 cindex(forcing use of floating point)
 item(tt(FORCE_FLOAT))(
-Constants in arithmetic evaluation will be treated as floating point
-even without the use of a decimal point.  Integers in any base
-will be converted.
+Constants in arithmetic evaluation will be treated as
+floating point even without the use of a decimal point; the
+values of integer variables will be converted to floating point when
+used in arithmetic expressions.  Integers in any base will be converted.
 )
 pindex(GLOB)
 pindex(NO_GLOB)

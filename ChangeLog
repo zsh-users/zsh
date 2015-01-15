@@ -1,5 +1,9 @@
 2015-01-15  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34280: Doc/Zsh/options.yo, Src/math.c, Test/C01arith.ztst:
+	make FORCE_FLOAT option also cover variables when read for
+	use in arithmetic expressions.
+
 	* 34287 (see 34286 from Markus Trippelsdorf): Src/zsh.mdd:
 	use -E argument for generating signal names if gcc is
 	preprocessor.

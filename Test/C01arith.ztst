@@ -308,3 +308,13 @@
 >2
 >2
 # It's hard to test for integer to float.
+
+  integer ff1=3 ff2=4
+  print $(( ff1/ff2 ))
+  setopt force_float
+  print $(( ff1/ff2 ))
+  unsetopt force_float
+0:Variables are forced to floating point where necessary
+# 0.75 is exactly representable, don't expect rounding error.
+>0
+>0.75
