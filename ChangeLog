@@ -1,3 +1,9 @@
+2015-01-15  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34287 (see 34286 from Markus Trippelsdorf): Src/zsh.mdd:
+	use -E argument for generating signal names if gcc is
+	preprocessor.
+
 2015-01-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34283: Test/X02zlevi.ztst: also needs zpty.
