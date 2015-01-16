@@ -270,6 +270,8 @@ hist_context_save(struct hist_stack *hs, int toplevel)
     cmdsp = 0;
 }
 
+/* restore history context */
+
 /**/
 void
 hist_context_restore(const struct hist_stack *hs, int toplevel)
@@ -320,8 +322,6 @@ hist_in_word(int yesno)
     else
 	histactive &= ~HA_INWORD;
 }
-
-/* restore history context */
 
 /* add a character to the current history word */
 

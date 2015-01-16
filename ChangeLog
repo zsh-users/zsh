@@ -1,5 +1,7 @@
 2015-01-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Src/hist.c: fix another dubious comment.
+
 	* unposted: Src/hist.c: improve confusing comment in previous
 	commit.
 
