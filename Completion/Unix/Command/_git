@@ -3729,7 +3729,7 @@ _git-send-email () {
     '(--format-patch                  )--no-format-patch[interpret ambiguous arguments file-name arguments]' \
     '--quiet[be less verbose]' \
     '(           --no-validate)--validate[perform sanity checks on patches]' \
-    '(--validate              )--validate[do not perform sanity checks on patches]' \
+    '(--validate              )--no-validate[do not perform sanity checks on patches]' \
     '--force[send emails even if safety checks would prevent it]' \
     '*: :_files'
 }
