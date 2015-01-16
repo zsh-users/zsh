@@ -1,3 +1,8 @@
+2015-01-16  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34304: Src/lex.c: improve use of new command substitution
+	parsing in completion.
+
 2015-01-15  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34290 (correcting typo): README: note FORCE_FLOAT behaviour change.

@@ -90,6 +90,12 @@ int inalmore;
 int nocorrect;
 
 /*
+ * TBD: the following exported variables are part of the non-interface
+ * with ZLE for completion.  They are poorly named and the whole
+ * scheme is incredibly brittle.  One piece of robustness is applied:
+ * the variables are only set if LEXFLAGS_ZLE is set.  Improvements
+ * should therefore concentrate on areas with this flag set.
+ *
  * Cursor position and line length in zle when the line is
  * metafied for access from the main shell.
  */
@@ -113,6 +119,16 @@ mod_export int addedx;
 /**/
 mod_export int wb, we;
 
+/**/
+mod_export int wordbeg;
+
+/**/
+mod_export int parbegin;
+
+/**/
+mod_export int parend;
+
+
 /* 1 if aliases should not be expanded */
 
 /**/
@@ -133,15 +149,6 @@ mod_export int noaliases;
 
 /**/
 mod_export int lexflags;
-
-/**/
-mod_export int wordbeg;
-
-/**/
-mod_export int parbegin;
-
-/**/
-mod_export int parend;
 
 /* don't recognize comments */
 
@@ -585,7 +592,8 @@ gettok(void)
     if (lexstop)
 	return (errflag) ? LEXERR : ENDINPUT;
     isfirstln = 0;
-    wordbeg = inbufct - (qbang && c == bangchar);
+    if ((lexflags & LEXFLAGS_ZLE))
+	wordbeg = inbufct - (qbang && c == bangchar);
     hwbegin(-1-(qbang && c == bangchar));
     /* word includes the last character read and possibly \ before ! */
     if (dbparens) {
@@ -1813,6 +1821,78 @@ zshlex_raw_back(void)
 static int
 skipcomm(void)
 {
+#ifdef ZSH_OLD_SKIPCOMM
+    int pct = 1, c, start = 1;
+
+    cmdpush(CS_CMDSUBST);
+    SETPARBEGIN
+    c = Inpar;
+    do {
+	int iswhite;
+	add(c);
+	c = hgetc();
+	if (itok(c) || lexstop)
+	    break;
+	iswhite = inblank(c);
+	switch (c) {
+	case '(':
+	    pct++;
+	    break;
+	case ')':
+	    pct--;
+	    break;
+	case '\\':
+	    add(c);
+	    c = hgetc();
+	    break;
+	case '\'': {
+	    int strquote = lexbuf.ptr[-1] == '$';
+	    add(c);
+	    STOPHIST
+	    while ((c = hgetc()) != '\'' && !lexstop) {
+		if (c == '\\' && strquote) {
+		    add(c);
+		    c = hgetc();
+		}
+		add(c);
+	    }
+	    ALLOWHIST
+	    break;
+	}
+	case '\"':
+	    add(c);
+	    while ((c = hgetc()) != '\"' && !lexstop)
+		if (c == '\\') {
+		    add(c);
+		    add(hgetc());
+		} else
+		    add(c);
+	    break;
+	case '`':
+	    add(c);
+	    while ((c = hgetc()) != '`' && !lexstop)
+		if (c == '\\')
+		    add(c), add(hgetc());
+		else
+		    add(c);
+	    break;
+	case '#':
+	    if (start) {
+		add(c);
+		while ((c = hgetc()) != '\n' && !lexstop)
+		    add(c);
+		iswhite = 1;
+	    }
+	    break;
+	}
+	start = iswhite;
+    }
+    while (pct);
+    if (!lexstop)
+	SETPAREND
+    cmdpop();
+    return lexstop;
+#else
     char *new_tokstr;
     int new_lexstop, new_lex_add_raw;
     struct lexbufstate new_lexbuf;
@@ -1860,6 +1940,18 @@ skipcomm(void)
     tokstr_raw = new_tokstr;
     lexbuf_raw = new_lexbuf;
     lex_add_raw = new_lex_add_raw;
+    /*
+     * Don't do any ZLE specials down here: they're only needed
+     * when we return the string from the recursive parse.
+     * (TBD: this probably means we should be initialising lexflags
+     * more consistently.)
+     *
+     * Note that in that case we're still using the ZLE line reading
+     * function at the history layer --- this is consistent with the
+     * intention of maintaining the history and input layers across
+     * the recursive parsing.
+     */
+    lexflags &= ~LEXFLAGS_ZLE;
 
     if (!parse_event(OUTPAR) || tok != OUTPAR)
 	lexstop = 1;
@@ -1907,4 +1999,5 @@ skipcomm(void)
     cmdpop();
 
     return lexstop;
+#endif
 }
