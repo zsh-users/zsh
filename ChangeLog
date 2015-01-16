@@ -1,3 +1,8 @@
+2015-01-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34313: Src/hist.c, Src/lex.c: need to turn off history
+	word markers when parsing command substitution.
+
 2015-01-16  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34304: Src/lex.c: improve use of new command substitution

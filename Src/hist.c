@@ -134,6 +134,8 @@ mod_export int hist_skip_flags;
 /* Bits of histactive variable */
 #define HA_ACTIVE	(1<<0)	/* History mechanism is active */
 #define HA_NOINC	(1<<1)	/* Don't store, curhist not incremented */
+#define HA_INWORD       (1<<2)  /* We're inside a word, don't add
+				   start and end markers */
 
 /* Array of word beginnings and endings in current history line. */
 
@@ -297,6 +299,22 @@ hist_context_restore(const struct hist_stack *hs, int toplevel)
 	zfree(cmdstack, CMDSTACKSZ);
     cmdstack = hs->cstack;
     cmdsp = hs->csp;
+}
+
+/*
+ * Mark that the current level of history is or is not
+ * within a word, whatever turns up.  This is used for nested
+ * parsing of substitutions.
+ */
+
+/**/
+void
+hist_in_word(int yesno)
+{
+    if (yesno)
+	histactive |= HA_INWORD;
+    else
+	histactive &= ~HA_INWORD;
 }
 
 /* restore history context */
@@ -1496,7 +1514,7 @@ int hwgetword = -1;
 void
 ihwbegin(int offset)
 {
-    if (stophist == 2)
+    if (stophist == 2 || (histactive & HA_INWORD))
 	return;
     if (chwordpos%2)
 	chwordpos--;	/* make sure we're on a word start, not end */
@@ -1516,7 +1534,7 @@ ihwbegin(int offset)
 void
 ihwend(void)
 {
-    if (stophist == 2)
+    if (stophist == 2 || (histactive & HA_INWORD))
 	return;
     if (chwordpos%2 && chline) {
 	/* end of word reached and we've already begun a word */

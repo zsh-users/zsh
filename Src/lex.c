@@ -1922,6 +1922,7 @@ skipcomm(void)
 	new_lexbuf = lexbuf;
 
 	zcontext_save_partial(ZCONTEXT_LEX|ZCONTEXT_PARSE);
+	hist_in_word(1);
     } else {
 	/*
 	 * Set up for nested command subsitution, however
@@ -1992,6 +1993,7 @@ skipcomm(void)
 	tokstr = new_tokstr;
 	lexbuf = new_lexbuf;
 	lexstop = new_lexstop;
+	hist_in_word(0);
     }
 
     if (!lexstop)
