@@ -302,9 +302,13 @@ hist_context_restore(const struct hist_stack *hs, int toplevel)
 }
 
 /*
- * Mark that the current level of history is or is not
- * within a word, whatever turns up.  This is used for nested
+ * Mark that the current level of history is within a word whatever
+ * characters turn up, or turn that mode off.  This is used for nested
  * parsing of substitutions.
+ *
+ * The caller takes care only to turn this on or off at the start
+ * or end of recursive use of the same mode, so a single flag is
+ * good enough here.
  */
 
 /**/

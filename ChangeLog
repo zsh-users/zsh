@@ -1,5 +1,8 @@
 2015-01-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Src/hist.c: improve confusing comment in previous
+	commit.
+
 	* 34313: Src/hist.c, Src/lex.c: need to turn off history
 	word markers when parsing command substitution.
 
