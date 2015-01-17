@@ -1,3 +1,8 @@
+2015-01-17  Axel Beckert  <abe@deuxchevaux.org>
+
+	* 34314: Wieland Hoffmann: Completion/Unix/Command/_git: Change
+	one --validate to --no-validate
+
 2015-01-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Src/hist.c: fix another dubious comment.
