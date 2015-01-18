@@ -1,6 +1,6 @@
 2015-01-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 34319: Src/hist.c, Src/lex.c: alias expansion in history of
+	* 34320: Src/hist.c, Src/lex.c: alias expansion in history of
 	command substitution.
 
 2015-01-17  Axel Beckert  <abe@deuxchevaux.org>
