@@ -1674,7 +1674,7 @@ parse_subst_string(char *s)
 /* Called below to report word positions. */
 
 /**/
-mod_export void
+static void
 gotword(void)
 {
     we = zlemetall + 1 - inbufct + (addedx == 2 ? 1 : 0);

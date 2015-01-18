@@ -329,7 +329,16 @@ static void
 ihwaddc(int c)
 {
     /* Only if history line exists and lexing has not finished. */
-    if (chline && !(errflag || lexstop)) {
+    if (chline && !(errflag || lexstop) &&
+	/*
+	 * If we're reading inside a word for command substitution
+	 * we allow the lexer to expand aliases but don't deal
+	 * with them here.  Note matching code in ihungetc().
+	 * TBD: it might be neater to deal with all aliases in this
+	 * fashion as we never need the expansion in the history
+	 * line, only in the lexer and above.
+	 */
+	!((histactive & HA_INWORD) && (inbufflags & INP_ALIAS))) {
 	/* Quote un-expanded bangs in the history line. */
 	if (c == bangchar && stophist < 2 && qbang)
 	    /* If qbang is not set, we do not escape this bangchar as it's *
@@ -892,11 +901,16 @@ ihungetc(int c)
 	    zlemetall--;
 	    exlast++;
 	}
-	DPUTS(hptr <= chline, "BUG: hungetc attempted at buffer start");
-	hptr--;
-	DPUTS(*hptr != (char) c, "BUG: wrong character in hungetc() ");
-	qbang = (c == bangchar && stophist < 2 &&
-		 hptr > chline && hptr[-1] == '\\');
+	if (!(histactive & HA_INWORD) || !(inbufflags & INP_ALIAS)) {
+	    DPUTS(hptr <= chline, "BUG: hungetc attempted at buffer start");
+	    hptr--;
+	    DPUTS(*hptr != (char) c, "BUG: wrong character in hungetc() ");
+	    qbang = (c == bangchar && stophist < 2 &&
+		     hptr > chline && hptr[-1] == '\\');
+	} else {
+	    /* No active bangs in aliases */
+	    qbang = 0;
+	}
 	if (doit)
 	    inungetc(c);
 	if (!qbang)
