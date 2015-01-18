@@ -1090,7 +1090,8 @@ do_single(Cmatch m)
 		    }
 		    if (tryit) {
 			noerrs = 1;
-			parsestr(p);
+			p = dupstring(p);
+			parsestr(&p);
 			singsub(&p);
 			errflag &= ~ERRFLAG_ERROR;
 			noerrs = ne;

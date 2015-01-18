@@ -183,7 +183,7 @@ promptexpand(char *s, int ns, char *rs, char *Rs, unsigned int *txtchangep)
 	int oldval = lastval;
 
 	s = dupstring(s);
-	if (!parsestr(s))
+	if (!parsestr(&s))
 	    singsub(&s);
 	/*
 	 * We don't need the special Nularg hack here and we're

@@ -1,5 +1,11 @@
 2015-01-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 34322: Src/Zle/compctl.c, Src/Zle/compresult.c, Src/exec.c,
+	Src/init.c, Src/lex.c, Src/params.c, Src/prompt.c, Src/subst.c,
+	Src/utils.c, Test/D04parameter.ztst: update interface to
+	parsestr()/parsestrnoerr() to ensure correct token string
+	is passed back.
+
 	* 34320: Src/hist.c, Src/lex.c: alias expansion in history of
 	command substitution.
 

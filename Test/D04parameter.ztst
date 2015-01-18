@@ -1663,3 +1663,10 @@
 0:SHLVL appears sensible when about to exit shell
 >2
 >2
+
+# The following tests the return behaviour of parsestr/parsestrnoerr
+  alias param-test-alias='print $'\''\x45xpanded in substitution'\' 
+  param='$(param-test-alias)'
+  print ${(e)param}
+0:Alias expansion in command substitution in parameter evaluation
+>Expanded in substitution

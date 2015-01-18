@@ -3853,7 +3853,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	    yaptr = get_user_var(uv);
 	if ((tt = cc->explain)) {
 	    tt = dupstring(tt);
-	    if ((cc->mask & CC_EXPANDEXPL) && !parsestr(tt)) {
+	    if ((cc->mask & CC_EXPANDEXPL) && !parsestr(&tt)) {
 		singsub(&tt);
 		untokenize(tt);
 	    }
@@ -3873,7 +3873,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	}
     } else if ((tt = cc->explain)) {
 	tt = dupstring(tt);
-	if ((cc->mask & CC_EXPANDEXPL) && !parsestr(tt)) {
+	if ((cc->mask & CC_EXPANDEXPL) && !parsestr(&tt)) {
 	    singsub(&tt);
 	    untokenize(tt);
 	}

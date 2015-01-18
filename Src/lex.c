@@ -1503,17 +1503,27 @@ dquote_parse(char endchar, int sub)
     return err;
 }
 
-/* Tokenize a string given in s. Parsing is done as in double *
- * quotes.  This is usually called before singsub().          */
+/*
+ * Tokenize a string given in s. Parsing is done as in double
+ * quotes.  This is usually called before singsub().
+ *
+ * parsestr() is noisier, reporting an error if the parse failed.
+ *
+ * On entry, *s must point to a string allocated from the stack of
+ * exactly the right length, i.e. strlen(*s) + 1, as the string
+ * is used as the lexical token string whose memory management
+ * demands this.  Usually the input string will therefore be
+ * the result of an immediately preceding dupstring().
+ */
 
 /**/
 mod_export int
-parsestr(char *s)
+parsestr(char **s)
 {
     int err;
 
     if ((err = parsestrnoerr(s))) {
-	untokenize(s);
+	untokenize(*s);
 	if (err > 32 && err < 127)
 	    zerr("parse error near `%c'", err);
 	else
@@ -1524,18 +1534,20 @@ parsestr(char *s)
 
 /**/
 mod_export int
-parsestrnoerr(char *s)
+parsestrnoerr(char **s)
 {
-    int l = strlen(s), err;
+    int l = strlen(*s), err;
 
     zcontext_save();
-    untokenize(s);
-    inpush(dupstring(s), 0, NULL);
+    untokenize(*s);
+    inpush(dupstring(*s), 0, NULL);
     strinbeg(0);
     lexbuf.len = 0;
-    lexbuf.ptr = tokstr = s;
+    lexbuf.ptr = tokstr = *s;
     lexbuf.siz = l + 1;
     err = dquote_parse('\0', 1);
+    if (tokstr)
+	*s = tokstr;
     *lexbuf.ptr = '\0';
     strinend();
     inpop();

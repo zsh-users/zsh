@@ -1306,7 +1306,7 @@ get_intarg(char **s, int *delmatchp)
     p = dupstring(*s + arglen);
     *s = t + arglen;
     *t = sav;
-    if (parsestr(p))
+    if (parsestr(&p))
 	return -1;
     singsub(&p);
     if (errflag)
@@ -1329,7 +1329,8 @@ subst_parse_str(char **sp, int single, int err)
 
     *sp = s = dupstring(*sp);
 
-    if (!(err ? parsestr(s) : parsestrnoerr(s))) {
+    if (!(err ? parsestr(&s) : parsestrnoerr(&s))) {
+	*sp = s;
 	if (!single) {
             int qt = 0;
 
@@ -1439,7 +1440,8 @@ check_colon_subscript(char *str, char **endp)
     }
     sav = **endp;
     **endp = '\0';
-    if (parsestr(str = dupstring(str)))
+    str = dupstring(str);
+    if (parsestr(&str))
 	return NULL;
     singsub(&str);
     remnulargs(str);

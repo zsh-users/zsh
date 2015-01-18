@@ -1260,7 +1260,8 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
     if (ishash && (keymatch || !rev))
 	remnulargs(s);
     if (needtok) {
-	if (parsestr(s))
+	s = dupstring(s);
+	if (parsestr(&s))
 	    return 0;
 	singsub(&s);
     } else if (rev)

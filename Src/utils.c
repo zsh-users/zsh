@@ -1515,7 +1515,7 @@ checkmailpath(char **s)
 		    setunderscore(*s);
 
 		    u = dupstring(u);
-		    if (! parsestr(u)) {
+		    if (!parsestr(&u)) {
 			singsub(&u);
 			zputs(u, shout);
 			fputc('\n', shout);

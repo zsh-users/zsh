@@ -1197,10 +1197,13 @@ run_init_scripts(void)
 	    if (islogin)
 		sourcehome(".profile");
 	    noerrs = 2;
-	    if (s && !parsestr(s)) {
-		singsub(&s);
-		noerrs = 0;
-		source(s);
+	    if (s) {
+		s = dupstring(s);
+		if (!parsestr(&s)) {
+		    singsub(&s);
+		    noerrs = 0;
+		    source(s);
+		}
 	    }
 	    noerrs = 0;
 	} else

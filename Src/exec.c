@@ -3772,19 +3772,20 @@ gethere(char **strp, int typ)
 	*bptr++ = '\n';
     }
     *t = '\0';
+    s = buf;
+    buf = dupstring(buf);
+    zfree(s, bsiz);
     if (!qt) {
 	int ef = errflag;
 
-	parsestr(buf);
+	parsestr(&buf);
 
 	if (!errflag) {
 	    /* Retain any user interrupt error */
 	    errflag = ef | (errflag & ERRFLAG_INT);
 	}
     }
-    s = dupstring(buf);
-    zfree(buf, bsiz);
-    return s;
+    return buf;
 }
 
 /* open here string fd */
