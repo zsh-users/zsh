@@ -1,5 +1,8 @@
 2015-01-20  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* users/19756: Test/A04redirect.ztst: add test for case of
+	closing file descriptor with no error message.
+
 	* users/19751: Src/exec.c, Test/A04redirect.ztst: remove error
 	on closing file descriptors via number but keep it for those
 	controlled by variable.
