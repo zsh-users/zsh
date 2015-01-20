@@ -1,5 +1,8 @@
 2015-01-20  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34329: Doc/Zsh/builtins.yo, Src/builtin.c: add -S option
+	to which and where.
+
 	* users/19756: Test/A04redirect.ztst: add test for case of
 	closing file descriptor with no error message.
 

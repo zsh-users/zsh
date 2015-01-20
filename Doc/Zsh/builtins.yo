@@ -2139,11 +2139,11 @@ symlink resolved at each step might be anywhere in the path.
 enditem()
 )
 findex(where)
-item(tt(where) [ tt(-wpms) ] var(name) ...)(
+item(tt(where) [ tt(-wpmsS) ] var(name) ...)(
 Equivalent to tt(whence -ca).
 )
 findex(which)
-item(tt(which) [ tt(-wpams) ] var(name) ...)(
+item(tt(which) [ tt(-wpamsS) ] var(name) ...)(
 Equivalent to tt(whence -c).
 )
 findex(zcompile)
