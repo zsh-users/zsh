@@ -1,3 +1,8 @@
+2015-01-22  Marc Finet  <m.dreadlock@gmail.com>
+
+	* Functions/VCS_Info/VCS_INFO_quilt: PATCH: 34333: vcs_info quilt:
+	fix unapplied detection in subdir
+
 2015-01-22  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 34327: _perl_modules: fix cache identifier used in

@@ -87,7 +87,7 @@ function VCS_INFO_quilt() {
     local patches pc tmp qstring root
     local -i ret
     local -x context
-    local -a applied unapplied all applied_string unapplied_string quiltcommand
+    local -a applied unapplied all applied_string unapplied_string quiltcommand quilt_env
     local -Ax hook_com
 
     context=":vcs_info:${vcs}.quilt-${mode}:${usercontext}:${rrn}"
@@ -105,17 +105,6 @@ function VCS_INFO_quilt() {
         ;;
     esac
 
-    zstyle -s "${context}" quilt-patch-dir patches || patches="${QUILT_PATCHES}"
-    if [[ "${patches}" != /* ]]; then
-        tmp=${patches:-patches}
-        patches="$(VCS_INFO_quilt-dirfind "${tmp}")"
-        ret=$?
-        (( ret )) && return ${ret}
-        patches=${patches}/${tmp}
-    else
-        [[ -d ${patches} ]] || return 1
-    fi
-
     pc="$(VCS_INFO_quilt-dirfind .pc .version)"
     ret=$?
     if (( ret == 0 )); then
@@ -129,12 +118,27 @@ function VCS_INFO_quilt() {
         else
             applied=()
         fi
+        patches=$(<$pc/.quilt_patches)
     fi
     if zstyle -t "${context}" get-unapplied; then
         # This zstyle call needs to be moved further up if `quilt' needs
         # to be run in more places than this one.
         zstyle -s "${context}" quiltcommand quiltcommand || quiltcommand='quilt'
-        unapplied=( ${(f)"$(QUILT_PATCHES=$patches $quiltcommand --quiltrc /dev/null unapplied 2> /dev/null)"} )
+        quilt_env=(env)
+        if [ -z "$patches" ]; then
+            zstyle -s "${context}" quilt-patch-dir patches || patches="${QUILT_PATCHES}"
+            if [[ "${patches}" != /* ]]; then
+                tmp=${patches:-patches}
+                patches="$(VCS_INFO_quilt-dirfind "${tmp}")"
+                ret=$?
+                (( ret )) && return ${ret}
+                patches=${patches}/${tmp}
+            else
+                [[ -d ${patches} ]] || return 1
+            fi
+            quilt_env+=(QUILT_PATCHES="$patches")
+        fi
+        unapplied=( ${(f)"$(${quilt_env[@]} $quiltcommand --quiltrc /dev/null unapplied 2> /dev/null)"} )
         unapplied=( ${unapplied:#} )
     else
         unapplied=()
