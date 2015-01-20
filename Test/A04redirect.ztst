@@ -152,11 +152,13 @@
 >hello
 >goodbye
 
-  ({ exec 3<&- } 2>/dev/null
-  exec 3<&-
-  read foo <&-)
+  (exec {varid}<&0
+  exec {varid}<&-
+  print About to close a second time >&2
+  read {varid}<&-)
 1:'<&-' redirection
-*?\(eval\):*: failed to close file descriptor 3:*
+?About to close a second time
+*?\(eval\):*: failed to close file descriptor *
 
   print foo >&-
 0:'>&-' redirection

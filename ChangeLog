@@ -1,3 +1,9 @@
+2015-01-20  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/19751: Src/exec.c, Test/A04redirect.ztst: remove error
+	on closing file descriptors via number but keep it for those
+	controlled by variable.
+
 2015-01-18  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34322: Src/Zle/compctl.c, Src/Zle/compresult.c, Src/exec.c,

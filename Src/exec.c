@@ -3203,7 +3203,12 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		}
 		if (fn->fd1 < 10)
 		    closemn(mfds, fn->fd1, REDIR_CLOSE);
-		if (!closed && zclose(fn->fd1) < 0) {
+		/*
+		 * Only report failures to close file descriptors
+		 * if they're under user control as we don't know
+		 * what the previous status of others was.
+		 */
+		if (!closed && zclose(fn->fd1) < 0 && fn->varid) {
 		    zwarn("failed to close file descriptor %d: %e",
 			  fn->fd1, errno);
 		}
