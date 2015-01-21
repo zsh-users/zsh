@@ -1,3 +1,8 @@
+2015-01-22  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 34327: _perl_modules: fix cache identifier used in
+	_cache_invalid
+
 2015-01-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34329: Doc/Zsh/builtins.yo, Src/builtin.c: add -S option

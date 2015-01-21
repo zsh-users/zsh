@@ -71,7 +71,7 @@ _perl_modules () {
     perl_modules=_unknown_perl_modules$with_pod
   fi
 
-  if ( [[ ${(P)+perl_modules} -eq 0 ]] || _cache_invalid $perl_modules ) &&
+  if ( [[ ${(P)+perl_modules} -eq 0 ]] || _cache_invalid ${perl_modules#_} ) &&
      ! _retrieve_cache ${perl_modules#_};
   then
     if zstyle -t ":completion:${curcontext}:modules" try-to-use-pminst &&
