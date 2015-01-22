@@ -1,7 +1,11 @@
+2015-01-22  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34338: Test/V07pcre.ztst: check feature availability
+
 2015-01-22  Marc Finet  <m.dreadlock@gmail.com>
 
-	* Functions/VCS_Info/VCS_INFO_quilt: PATCH: 34333: vcs_info quilt:
-	fix unapplied detection in subdir
+	* 34333: Functions/VCS_Info/VCS_INFO_quilt: fix unapplied
+	detection in subdir
 
 2015-01-22  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
