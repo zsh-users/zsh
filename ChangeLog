@@ -1,3 +1,8 @@
+2015-01-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34331: Src/builtin.c, Src/utils.c: don't trip over
+	NULL pointer in cd in rare cases where file system goes AWOL.
+
 2015-01-22  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34344: Test/V07pcre.ztst: fix 34338, builtins need loading too

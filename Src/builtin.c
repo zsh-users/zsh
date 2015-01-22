@@ -1156,9 +1156,11 @@ cd_new_pwd(int func, LinkNode dir, int quiet)
 	zsfree(getlinknode(dirstack));
 
     if (chasinglinks) {
-	s = new_pwd;
-	new_pwd = findpwd(s);
-	zsfree(s);
+	s = findpwd(new_pwd);
+	if (s) {
+	    zsfree(new_pwd);
+	    new_pwd = s;
+	}
     }
     if (isset(PUSHDIGNOREDUPS)) {
 	LinkNode n;

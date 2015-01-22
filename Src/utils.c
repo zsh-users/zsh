@@ -1108,10 +1108,13 @@ getnameddir(char *name)
 	if ((pw = getpwnam(name))) {
 	    char *dir = isset(CHASELINKS) ? xsymlink(pw->pw_dir)
 		: ztrdup(pw->pw_dir);
-	    adduserdir(name, dir, ND_USERNAME, 1);
-	    str = dupstring(dir);
-	    zsfree(dir);
-	    return str;
+	    if (dir) {
+		adduserdir(name, dir, ND_USERNAME, 1);
+		str = dupstring(dir);
+		zsfree(dir);
+		return str;
+	    } else
+		return ztrdup(pw->pw_dir);
 	}
     }
 #endif /* HAVE_GETPWNAM */
