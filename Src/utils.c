@@ -2275,6 +2275,10 @@ setblock_stdin(void)
  * Note that apart from setting (and restoring) non-blocking input,
  * this function does not change the input mode.  The calling function
  * should have set cbreak mode if necessary.
+ *
+ * fd may be -1 to sleep until the timeout in microseconds.  This is a
+ * fallback for old systems that don't have nanosleep().  Some very old
+ * systems might not have select: get with it, daddy-o.
  */
 
 /**/
@@ -2296,6 +2300,8 @@ read_poll(int fd, int *readchar, int polltty, zlong microseconds)
     struct ttyinfo ti;
 #endif
 
+     if (fd < 0)
+	 polltty = 0;		/* no tty to poll */
 
 #if defined(HAS_TIO) && !defined(__CYGWIN__)
     /*
@@ -2317,7 +2323,7 @@ read_poll(int fd, int *readchar, int polltty, zlong microseconds)
      * as plausible as it sounds, but it seems the right way to guess.
      *		pws 2000/06/26
      */
-    if (polltty) {
+    if (fd >= 0) {
 	gettyinfo(&ti);
 	if ((polltty = ti.tio.c_cc[VMIN])) {
 	    ti.tio.c_cc[VMIN] = 0;
@@ -2333,16 +2339,24 @@ read_poll(int fd, int *readchar, int polltty, zlong microseconds)
     expire_tv.tv_sec = (int) (microseconds / (zlong)1000000);
     expire_tv.tv_usec = microseconds % (zlong)1000000;
     FD_ZERO(&foofd);
-    FD_SET(fd, &foofd);
-    ret = select(fd+1, (SELECT_ARG_2_T) &foofd, NULL, NULL, &expire_tv);
+    if (fd > -1) {
+	FD_SET(fd, &foofd);
+	ret = select(fd+1, (SELECT_ARG_2_T) &foofd, NULL, NULL, &expire_tv);
+    } else
+	ret = select(0, NULL, NULL, NULL, &expire_tv);
 #else
+    if (fd < 0) {
+	/* OK, can't do that.  Just quietly sleep for a second. */
+	sleep(1);
+	return 1;
+    }
 #ifdef FIONREAD
     if (ioctl(fd, FIONREAD, (char *) &val) == 0)
 	ret = (val > 0);
 #endif
 #endif
 
-    if (ret < 0) {
+    if (fd >= 0 && ret < 0) {
 	/*
 	 * Final attempt: set non-blocking read and try to read a character.
 	 * Praise Bill, this works under Cygwin (nothing else seems to).
@@ -2362,6 +2376,80 @@ read_poll(int fd, int *readchar, int polltty, zlong microseconds)
     }
 #endif
     return (ret > 0);
+}
+
+/*
+ * Sleep for the given number of microseconds --- must be within
+ * range of a long at the moment, but this is only used for
+ * limited internal purposes.
+ */
+
+/**/
+int
+zsleep(long us)
+{
+#ifdef HAVE_NANOSLEEP
+    struct timespec sleeptime;
+
+    sleeptime.tv_sec = (time_t)us / (time_t)1000000;
+    sleeptime.tv_nsec = (us % 1000000L) * 1000L;
+    for (;;) {
+	struct timespec rem;
+	int ret = nanosleep(&sleeptime, &rem);
+
+	if (ret == 0)
+	    return 1;
+	else if (errno != EINTR)
+	    return 0;
+	sleeptime = rem;
+    }
+#else
+    int dummy;
+    return read_poll(-1, &dummy, 0, us);
+#endif
+}
+
+/**
+ * Sleep for time (fairly) randomly up to max_us microseconds.
+ * Don't let the wallclock time extend beyond end_time.
+ * Return 1 if that seemed to work, else 0.
+ *
+ * For best results max_us should be a multiple of 2**16 or large
+ * enough that it doesn't matter.
+ */
+
+/**/
+int
+zsleep_random(long max_us, time_t end_time)
+{
+    long r;
+    time_t now = time(NULL);
+
+    /*
+     * Randomish backoff.  Doesn't need to be fundamentally
+     * unpredictable, just probably unlike the value another
+     * exiting shell is using.  On some systems the bottom 16
+     * bits aren't that random but the use here doesn't
+     * really care.
+     */
+    r = (long)(rand() & 0xFFFF);
+    /*
+     * Turn this into a fraction of sleep_us.  Again, this
+     * doesn't need to be particularly accurate and the base time
+     * is sufficient that we can do the division first and not
+     * worry about the range.
+     */
+    r = (max_us >> 16) * r;
+    /*
+     * Don't sleep beyond timeout.
+     * Not that important as timeout is ridiculously long, but
+     * if there's an interface, interface to it...
+     */
+    while (r && now + (time_t)(r / 1000000) > end_time)
+	r >>= 1;
+    if (r) /* pedantry */
+	return zsleep(r);
+    return 0;
 }
 
 /**/

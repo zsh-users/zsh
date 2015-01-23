@@ -1299,7 +1299,8 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       gdbm_open getxattr \
 	       realpath canonicalize_file_name \
 	       symlink getcwd \
-	       cygwin_conv_path)
+	       cygwin_conv_path \
+	       nanosleep)
 AC_FUNC_STRCOLL
 
 AH_TEMPLATE([REALPATH_ACCEPTS_NULL],

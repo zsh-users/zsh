@@ -2610,7 +2610,8 @@ static int
 flockhistfile(char *fn, int keep_trying)
 {
     struct flock lck;
-    int ctr = keep_trying ? 9 : 0;
+    long sleep_us = 0x10000; /* about 67 ms */
+    time_t end_time;
 
     if (flock_fd >= 0)
 	return 0; /* already locked */
@@ -2623,13 +2624,22 @@ flockhistfile(char *fn, int keep_trying)
     lck.l_start = 0;
     lck.l_len = 0;  /* lock the whole file */
 
+    /*
+     * Timeout is ten seconds.
+     */
+    end_time = time(NULL) + (time_t)10;
     while (fcntl(flock_fd, F_SETLKW, &lck) == -1) {
-	if (--ctr < 0) {
+	if (!keep_trying || time(NULL) >= end_time ||
+	    /*
+	     * Randomise wait to minimise clashes with shells exiting at
+	     * the same time.
+	     */
+	    !zsleep_random(sleep_us, end_time)) {
 	    close(flock_fd);
 	    flock_fd = -1;
 	    return 1;
 	}
-	sleep(1);
+	sleep_us <<= 1;
     }
 
     return 0;
@@ -2865,7 +2875,7 @@ savehistfile(char *fn, int err, int writeflags)
 static int lockhistct;
 
 static int
-checklocktime(char *lockfile, time_t then)
+checklocktime(char *lockfile, long *sleep_usp, time_t then)
 {
     time_t now = time(NULL);
 
@@ -2875,9 +2885,19 @@ checklocktime(char *lockfile, time_t then)
 	return -1;
     }
 
-    if (now - then < 10)
-	sleep(1);
-    else
+    if (now - then < 10) {
+	/*
+	 * To give the effect of a gradually increasing backoff,
+	 * we'll sleep a period based on the time we've spent so far.
+	 */
+	DPUTS(now < then, "time flowing backwards through history");
+	/*
+	 * Randomise to minimise clashes with shells exiting at the same
+	 * time.
+	 */
+	(void)zsleep_random(*sleep_usp, then + 10);
+	*sleep_usp <<= 1;
+    } else
 	unlink(lockfile);
 
     return 0;
@@ -2894,6 +2914,7 @@ lockhistfile(char *fn, int keep_trying)
 {
     int ct = lockhistct;
     int ret = 0;
+    long sleep_us = 0x10000; /* about 67 ms */
 
     if (!fn && !(fn = getsparam("HISTFILE")))
 	return 1;
@@ -2937,7 +2958,7 @@ lockhistfile(char *fn, int keep_trying)
 		    continue;
 		break;
 	    }
-	    if (checklocktime(lockfile, sb.st_mtime) < 0) {
+	    if (checklocktime(lockfile, &sleep_us, sb.st_mtime) < 0) {
 		ret = 1;
 		break;
 	    }
@@ -2965,7 +2986,7 @@ lockhistfile(char *fn, int keep_trying)
 			continue;
 		    ret = 2;
 		} else {
-		    if (checklocktime(lockfile, sb.st_mtime) < 0) {
+		    if (checklocktime(lockfile, &sleep_us, sb.st_mtime) < 0) {
 			ret = 1;
 			break;
 		    }
@@ -2993,7 +3014,7 @@ lockhistfile(char *fn, int keep_trying)
 		ret = 2;
 		break;
 	    }
-	    if (checklocktime(lockfile, sb.st_mtime) < 0) {
+	    if (checklocktime(lockfile, &sleep_us, sb.st_mtime) < 0) {
 		ret = 1;
 		break;
 	    }
