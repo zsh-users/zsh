@@ -85,15 +85,14 @@ _yum()
   	fi
 }
 
-# Fills the installed pkg cache
+# Fills the all pkg cache
 _yum_all_pkgs()
 {
 	if ( [[ ${+_all_pkgs} -eq 0 ]] || _cache_invalid ALL ) &&
 		! _retrieve_cache ALL;
 	then
-		local prog="yum -C list all | sed 's/\s.*//' | grep '\.'"
-		_all_pkgs=( $(kages $prog 2>/dev/null) )
-		_store_cache ALL _all_pkg
+		_all_pkgs=( $(yum -C list all | sed 's/\s.*//' | grep '\.' 2>/dev/null) )
+		_store_cache ALL _all_pkgs
 	fi
 }
 
@@ -227,8 +226,9 @@ _yum_list_or_info()
 	else
 	    local subcmd
 		subcmd="${${listlist[(r)$words[2]:*]%%:*}}"
-		# Deal with any aliases
+		# offer packages selected by the subcommand
 		case $subcmd in
+			all) _yum_all;;
 			installed) _yum_erase;;
 			available) _yum_install;;
 			updates) _yum_update;;
