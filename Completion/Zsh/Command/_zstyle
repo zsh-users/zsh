@@ -549,7 +549,7 @@ while (( $#state )); do
         compset -P '*%'
         _values -s '' 'format replacement' \
           'b[the current branch]' \
-          'r[current revision number]' \
+          'r[current revision number]'
       else
         _message -e formats 'vcs format'
       fi
