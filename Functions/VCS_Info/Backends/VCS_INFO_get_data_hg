@@ -6,6 +6,7 @@
 setopt localoptions extendedglob NO_shwordsplit
 
 local hgbase bmfile branchfile rebasefile dirstatefile mqseriesfile \
+    curbmfile curbm \
     mqstatusfile mqguardsfile patchdir mergedir \
     r_csetid r_lrev r_branch i_bmhash i_bmname \
     revformat branchformat hgactionstring hgchanges \
@@ -24,6 +25,7 @@ r_lrev='' # local revision
 patchdir="${hgbase}/.hg/patches"
 mergedir="${hgbase}/.hg/merge/"
 bmfile="${hgbase}/.hg/bookmarks"
+curbmfile="${hgbase}/.hg/bookmarks.current"
 branchfile="${hgbase}/.hg/branch"
 rebasefile="${hgbase}/.hg/rebasestate"
 dirstatefile="${hgbase}/.hg/dirstate"
@@ -125,8 +127,23 @@ if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-bookmarks \
         [[ $i_bmhash == $r_csetid* ]] && hgbmarks+=( $i_bmname )
     done < ${bmfile}
 
+    if [[ -r "$curbmfile" ]] ; then
+        curbm=$(<"${curbmfile}")
+        hook_com[hg-active-bookmark]=$curbm
+    else
+        # leave curbm empty and [hg-active-bookmark] undefined.
+    fi
+
     if VCS_INFO_hook 'gen-hg-bookmark-string' "${hgbmarks[@]}"; then
+        # If there is an active bookmark, annotate it and put it first.
+        if [[ -n $curbm ]] ; then
+            hgbmarks[(i)$curbm]=()
+            hgbmarks[1,0]="${curbm}*"
+        fi
         hgbmstring=${(j:, :)hgbmarks}
+        # Deannotate the array, in case later code expects it to be valid.
+        # (The order is not restored.)
+        [[ -n $curbm ]] && hgbmarks[1]=${${hgbmarks[1]}[1,-2]}
     else
         hgbmstring=${hook_com[hg-bookmark-string]}
     fi

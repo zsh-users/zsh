@@ -927,6 +927,10 @@ kindex(get-bookmarks)
 item(tt(get-bookmarks))(
 If set to true, the tt(hg) backend will try to get a list of current
 bookmarks. They will be available via the `tt(%m)' replacement.
+
+The default is to generate a comma-separated list of all bookmark names
+that refer to the currently checked out revision.  If a bookmark is active,
+its name is suffixed an asterisk and placed first in the list.
 )
 kindex(use-prompt-escapes)
 item(tt(use-prompt-escapes))(
@@ -1289,6 +1293,9 @@ tt(get-revision) and tt(get-bookmarks) styles must be true.
 
 This hook gets the names of the Mercurial bookmarks that
 tt(vcs_info) collected from `hg'.
+
+If a bookmark is active, the key tt(${hook_com[hg-active-bookmark]}) is
+set to its name.  The key is otherwise unset.
 
 When setting tt(ret) to non-zero, the string in
 tt(${hook_com[hg-bookmark-string]}) will be used in the tt(%m) escape in

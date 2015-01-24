@@ -1,3 +1,9 @@
+2015-01-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* Doc/Zsh/contrib.yo,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg: vcs_info hg:
+	Support inactive bookmarks
+
 2015-01-23  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 34335: _yum: fix bugs in _yum_all_pkgs
