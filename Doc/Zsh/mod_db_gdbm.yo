@@ -1,0 +1,27 @@
+COMMENT(!MOD!zsh/db/gdbm
+Builtins for managing associative array parameters tied to GDBM databases.
+!MOD!)
+The tt(zsh/db/gdbm) module is used to create "tied" associative arrays
+that interface to database files.  If the GDBM interface is not available,
+the builtins defined by this module will report an error.  This module is
+also intended as a prototype for creating additional database interfaces,
+so the tt(ztie) builtin may move to a more generic module in the future.
+
+The builtins in this module are:
+
+startitem()
+findex(ztie)
+cindex(tied array, creating)
+item(tt(ztie -d db/gdbm -f) var(filename) var(arrayname))(
+Open the GDBM database identified by var(filename) and, if successful,
+create the associative array var(arrayname) linked to the file.  Note
+that var(arrayname) must be unset at the time tt(ztie) is called, and
+is always created as a global parameter (as if with `tt(typeset -g)').
+)
+findex(zuntie)
+cindex(tied array, destroying)
+item(tt(zuntie) var(arrayname) ...)(
+Close the GDBM database associated with each var(arrayname) and then
+unset the variable.
+)
+enditem()

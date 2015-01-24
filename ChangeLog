@@ -38,6 +38,13 @@
 	* 34368: Completion/Zsh/Command/_zstyle: _zstyle vcs_info
 	completion: Add missing styles
 
+2015-01-24  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34350, 34353: Doc/Makefile.in, Doc/Zsh/mod_db_gdbm.yo,
+	Src/Modules/db_gdbm.c: document zsh/db/gdbm module, clean up a few
+	things in the code.  Still core dumps if the tied parameter is
+	forced to be a local and is not untied before end of scope.
+
 2015-01-23  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 34335: _yum: fix bugs in _yum_all_pkgs

@@ -39,9 +39,7 @@
 
 #include <gdbm.h>
 
-#if 0 /* what is this for? */
 static char *backtype = "db/gdbm";
-#endif
 
 static const struct gsu_scalar gdbm_gsu =
 { gdbmgetfn, gdbmsetfn, gdbmunsetfn };
@@ -60,30 +58,35 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
     Param tied_param;
 
     if(!OPT_ISSET(ops,'d')) {
-        zwarnnam(nam, "you must pass `-d db/gdbm' to ztie", NULL);
+        zwarnnam(nam, "you must pass `-d %s'", backtype);
 	return 1;
     }
     if(!OPT_ISSET(ops,'f')) {
-        zwarnnam(nam, "you must pass `-f' with a filename to ztie", NULL);
+        zwarnnam(nam, "you must pass `-f' with a filename", NULL);
 	return 1;
     }
 
     /* Here should be a lookup of the backend type against
      * a registry.
      */
+    if (strcmp(OPT_ARG(ops, 'd'), backtype) != 0) {
+        zwarnnam(nam, "unsupported backend type `%s'", OPT_ARG(ops, 'd'));
+	return 1;
+    }
 
     pmname = ztrdup(*args);
 
     resource_name = OPT_ARG(ops, 'f');
 
-    if (!(tied_param = createspecialhash(pmname, &getgdbmnode, &scangdbmkeys, 0))) {
-        zwarnnam(nam, "cannot create the requested parameter name", NULL);
-	return 1;
-    }
-
     dbf = gdbm_open(resource_name, 0, GDBM_WRCREAT | GDBM_SYNC, 0666, 0);
     if(!dbf) {
         zwarnnam(nam, "error opening database file %s", resource_name);
+	return 1;
+    }
+
+    if (!(tied_param = createspecialhash(pmname, &getgdbmnode, &scangdbmkeys, 0))) {
+        zwarnnam(nam, "cannot create the requested parameter %s", pmname);
+	gdbm_close(dbf);
 	return 1;
     }
 
@@ -98,19 +101,25 @@ bin_zuntie(char *nam, char **args, Options ops, UNUSED(int func))
 {
     Param pm;
     GDBM_FILE dbf;
+    char *pmname;
+    int ret = 0;
 
-    pm = (Param) paramtab->getnode(paramtab, args[0]);
-    if(!pm) {
-        zwarnnam(nam, "cannot untie %s", args[0]);
-	return 1;
+    for (pmname = *args; *args++; pmname = *args) {
+	pm = (Param) paramtab->getnode(paramtab, pmname);
+	if(!pm) {
+	    zwarnnam(nam, "cannot untie %s", pmname);
+	    ret = 1;
+	    continue;
+	}
+
+	dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
+	gdbm_close(dbf);
+	/* free(pm->u.hash->tmpdata); */
+	pm->u.hash->tmpdata = NULL;
+	paramtab->removenode(paramtab, pm->node.nam);
     }
 
-    dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
-    gdbm_close(dbf);
-/*    free(pm->u.hash->tmpdata); */
-    paramtab->removenode(paramtab, pm->node.nam);
-
-    return 0;
+    return ret;
 }
 
 /**/
