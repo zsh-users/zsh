@@ -112,7 +112,20 @@ set_widearray(char *mb_array, Widechar_array wca)
 #endif
 
 
-/* Print an error */
+/* Print an error
+
+   The following functions use the following printf-like format codes
+   (implemented by zerrmsg()):
+
+   Code	Argument types		Prints
+   %s	const char *		C string (null terminated)
+   %l	const char *, int	C string of given length (null not required)
+   %L	long			decimal value
+   %d	int			decimal value
+   %%	(none)			literal '%'
+   %c	int			character at that codepoint
+   %e	int			strerror() message (argument is typically 'errno')
+ */
 
 static void
 zwarning(const char *cmd, const char *fmt, va_list ap)
@@ -343,6 +356,7 @@ zerrmsg(FILE *file, const char *fmt, va_list ap)
 		    fputs(errmsg + 1, file);
 		}
 		break;
+	    /* When adding format codes, update the comment above zwarning(). */
 	    }
 	} else {
 	    putc(*fmt == Meta ? *++fmt ^ 32 : *fmt, file);
