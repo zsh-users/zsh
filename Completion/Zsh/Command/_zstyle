@@ -20,6 +20,9 @@ _completers() {
       compadd "$@" "$disp[@]" - "$us${^list[@]}"
 }
 
+_vcs_info_hooks() {
+  compadd - ${functions[(I)+vi-*]#+vi-}
+}
 # Assoc array of styles; the values give the possible top-level
 # contexts:
 #   c   completion
@@ -176,7 +179,10 @@ styles=(
   actionformats          v:vcs-format
   branchformat           v:branch-format
   nvcsformats            v:
+  hgrevformat            v:hgrev-format
   stgitformat            v:stg-format
+  patch-format           v:patch-format
+  nopatch-format         v:patch-format
   max-exports            v:
   enable                 v:vcs
   disable                v:vcs
@@ -190,7 +196,16 @@ styles=(
   use-server             v:bool
   use-simple             v:bool
   get-revision           v:bool
+  get-mq                 v:bool
+  get-bookmarks          v:bool
+  get-unapplied          v:bool
+  debug                  v:bool
+  hooks                  v:_vcs_info_hooks
   use-prompt-escapes     v:bool
+  use-quilt              v:bool
+  quilt-standalone       v:bool
+  quilt-patch-dir        v:_directories
+  quiltcommand           v:_command_names
 
   chpwd			 z:bool
   progress		 z:progress
@@ -555,12 +570,39 @@ while (( $#state )); do
       fi
       ;;
 
+    (hgrev-format)
+      if [[ $PREFIX = *% ]]; then
+        compset -P '*%'
+        _values -s '' 'format replacement' \
+          'h[current revision hash (global)]' \
+          'r[current revision number (local)]'
+      else
+        _message -e formats 'vcs format'
+      fi
+      ;;
+
     (stg-format)
       if [[ $PREFIX = *% ]]; then
         compset -P '*%'
         _values -s '' 'format replacement' \
           'p[patch currently on top of the stack]' \
           'c[the number of unapplied patches]'
+      else
+        _message -e formats 'vcs format'
+      fi
+      ;;
+
+    (patch-format)
+      if [[ $PREFIX = *% ]]; then
+        compset -P '*%'
+        _values -s '' 'format replacement' \
+          'p[name of top-most patch (applied-string)]' \
+          'u[number of unapplied patches (unapplied-string)]' \
+          'n[number of applied patches]' \
+          'c[number of unapplied patches.]' \
+          'a[number of all patches]' \
+          'g[names of active mq guards (hg backend)]' \
+          'G[number of active mq guards (hg backend)]'
       else
         _message -e formats 'vcs format'
       fi

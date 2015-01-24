@@ -7,6 +7,9 @@
 	* Completion/Zsh/Command/_zstyle: _zstyle vcs_info: Unbreak
 	branchformat completion
 
+	* Completion/Zsh/Command/_zstyle: _zstyle vcs_info completion: Add
+	missing styles
+
 2015-01-23  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 34335: _yum: fix bugs in _yum_all_pkgs
