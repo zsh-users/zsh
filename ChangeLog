@@ -1,3 +1,8 @@
+2015-01-27  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 34382: Src/module.c: Handle NULL return from dlerror() more
+	gracefully
+
 2015-01-26  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34402: Src/Modules/db_gdbm.c: make unsetting a tied gdbm
