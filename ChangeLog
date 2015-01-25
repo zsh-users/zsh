@@ -1,14 +1,19 @@
+2015-01-25  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* unposted: ChangeLog: Forgot X-Seq: numbers with Daniel's last
+	few patches
+
 2015-01-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
-	* Doc/Zsh/contrib.yo,
+	* 34366: Doc/Zsh/contrib.yo,
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg: vcs_info hg:
 	Support inactive bookmarks
 
-	* Completion/Zsh/Command/_zstyle: _zstyle vcs_info: Unbreak
+	* 34367: Completion/Zsh/Command/_zstyle: _zstyle vcs_info: Unbreak
 	branchformat completion
 
-	* Completion/Zsh/Command/_zstyle: _zstyle vcs_info completion: Add
-	missing styles
+	* 34368: Completion/Zsh/Command/_zstyle: _zstyle vcs_info
+	completion: Add missing styles
 
 2015-01-23  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
