@@ -1,3 +1,7 @@
+2015-01-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 34381: Doc/Zsh/contrib.yo: vcs_info: Documentation update
+
 2015-01-25  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* unposted: ChangeLog: Forgot X-Seq: numbers with Daniel's last

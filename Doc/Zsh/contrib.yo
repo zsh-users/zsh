@@ -948,6 +948,21 @@ item(tt(hooks))(
 A list style that defines hook-function names. See bf(Hooks in vcs_info)
 below for details.
 )
+kindex(patch-format)
+kindex(nopatch-format)
+xitem(tt(patch-format))
+item(tt(nopatch-format))(
+This pair of styles format the patch information used by the tt(%m) expando in
+formats and actionformats for the tt(git) and tt(hg) backends.  The value is
+subject to certain tt(%)-expansions described below.
+)
+kindex(get-unapplied)
+item(tt(get-unapplied))(
+This boolean style controls whether a backend should attempt to gather a list
+of unapplied patches (for example with Mercurial Queue patches).
+
+Used by the tt(quilt) and tt(hg) backends.
+)
 enditem()
 
 The default values for these styles in all contexts are:
@@ -979,6 +994,9 @@ sitem(tt(use-quilt))(false)
 sitem(tt(quilt-standalone))(false)
 sitem(tt(quilt-patch-dir))(empty - use tt($QUILT_PATCHES))
 sitem(tt(quiltcommand))(quilt)
+sitem(tt(patch-format))(var(backend dependent))
+sitem(tt(nopatch-format))(var(backend dependent))
+sitem(tt(get-unapplied))(false)
 endsitem()
 
 In normal tt(formats) and tt(actionformats) the following replacements are
@@ -1000,11 +1018,26 @@ sitem(tt(%r))(The repository name. If tt(%R) is tt(/foo/bar/repoXY), tt(%r)
 is tt(repoXY).)
 sitem(tt(%S))(A subdirectory within a repository. If tt($PWD) is
 tt(/foo/bar/repoXY/beer/tasty), tt(%S) is tt(beer/tasty).)
-sitem(tt(%m))(A "misc" replacement. It is at the discretion of the backend to
-decide what this replacement expands to. It is currently used by the tt(hg)
-and tt(git) backends to display patch information from the tt(mq) and
-tt(stgit) extensions.)
 endsitem()
+startitem()
+item(tt(%m))(
+A "misc" replacement. It is at the discretion of the backend to
+decide what this replacement expands to.
+
+The tt(hg) and tt(git) backends use this expando to display patch information.
+tt(hg) sources patch information from the tt(mq) extensions; tt(git) from the
+tt(rebase) command and from the and tt(stgit) extension.  The tt(patch-format)
+and tt(nopatch-format) styles control the generated string.  The former is used
+when at least one patch from the patch queue has been applied, and the latter
+otherwise.
+
+The tt(hg) backend displays bookmark information in this expando (in addition
+to tt(mq) information).  See the tt(get-mq) and tt(get-bookmarks) styles.  Both
+of these styles may be enabled at the same time.  If both are enabled, both
+resulting strings will be shown separated by a semicolon (that cannot currently
+be customized).
+)
+enditem()
 
 In tt(branchformat) these replacements are done:
 
@@ -1383,6 +1416,30 @@ change will be used directly when the actual replacement is done.
 If tt(ret) is set to non-zero, the string in
 tt(${hook_com[rev-replace]}) will be used unchanged as the
 `tt(%i)' replacement in the variables set by tt(vcs_info).
+)
+item(tt(pre-addon-quilt))(
+This hook is used when tt(vcs_info)'s quilt functionality is active in "addon"
+mode (quilt used on top of a real version control system). It is activated
+right before any quilt specific action is taken.
+
+Setting the `tt(ret)' variable in this hook to a non-zero value avoids the
+quilt specific to be run at all.
+)
+item(tt(set-patch-format))(
+This hook is used to control some of the possible expansions in
+tt(patch-format) and tt(nopatch-format) styles with patch queue systems such as
+quilt, mqueue and the like.
+
+This hook is used in the tt(git), tt(hg) and tt(quilt) backends.
+
+The hook allows the control of the tt(%p) (tt(${hook_com[applied]})) and tt(%u)
+(tt(${hook_com[unapplied]})) expansion in all backends that use the hook. With
+the mercurial backend, the tt(%g) (tt(${hook_com[guards]})) expansion is
+controllable in addition to that.
+
+If tt(ret) is set to non-zero, the string in tt(${hook_com[patch-replace]})
+will be used unchanged instead of an expanded format from tt(patch-format) or
+tt(nopatch-format).
 )
 item(tt(set-message))(
 Called each time before a `tt(vcs_info_msg_N_)' message is set.
