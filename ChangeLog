@@ -3,6 +3,9 @@
 	* 34382: Src/module.c: Handle NULL return from dlerror() more
 	gracefully
 
+	* 34387: Src/module.c: Avoid loading the main zsh binary as
+	a module
+
 2015-01-26  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34402: Src/Modules/db_gdbm.c: make unsetting a tied gdbm
