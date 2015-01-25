@@ -66,6 +66,7 @@ while true; do
       list+=(
 	"a:absolute path"
 	"A:absolute path resolving symbolic links"
+	"c:PATH search for command"
 	"g:globally apply s or &"
 	"h:head - strip trailing path element"
 	"t:tail - strip directories"

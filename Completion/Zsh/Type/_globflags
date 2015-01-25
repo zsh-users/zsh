@@ -4,10 +4,16 @@ local ret=1
 local -a flags
 
 if compset -P a; then
-  _message -e numbers 'errors'
+  _message -e number 'errors'
   return
 elif compset -P q; then
   _globquals
+  return
+elif compset -P 'c[0-9]##,'; then
+  _message -e number 'max repetitions'
+  return
+elif compset -P c; then
+  _message -e number 'repetitions (min or exact)'
   return
 fi
 
@@ -17,6 +23,8 @@ flags=(
   'I:case sensitive matching'
   's:match start of string'
   'e:match end of string'
+  'U:consider all characters to be one byte'
+  'u:support multibyte characters in pattern'
 )
 [[ $compstate[context] = condition ]] && flags+=(
   'b:activate backreferences'
@@ -29,6 +37,7 @@ _describe -t globflags "glob flag" flags -Q -S ')' && ret=0
 flags=(
   'a:approximate matching'
   'q:introduce glob qualifier'
+  'c:match repetitions of preceding pattern'
 )
 _describe -t globflags "glob flag" flags -Q -S '' && ret=0
 

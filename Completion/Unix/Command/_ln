@@ -1,4 +1,4 @@
-#compdef ln gln
+#compdef ln gln zf_ln
 
 local curcontext="$curcontext" state line ret=1
 local -A opt_args

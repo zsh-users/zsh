@@ -1,3 +1,16 @@
+2015-01-25  Oliver Kiddle  <opk@zsh.org>
+
+	* 34373, 34374: Completion/Unix/Command/_chown,
+	Completion/Unix/Command/_ln, Completion/Unix/Type/_directories,
+	Completion/Zsh/Command/_command, Completion/Zsh/Command/_fc,
+	Completion/Zsh/Command/_typeset, Completion/Zsh/Command/_unhash,
+	Completion/Zsh/Command/_which, Completion/Zsh/Command/_zle,
+	Completion/Zsh/Command/_zstyle, Completion/Zsh/Context/_subscript,
+	Completion/Zsh/Type/_globflags, Doc/Zsh/builtins.yo,
+	Completion/Zsh/Context/_brace_parameter,
+	Completion/Zsh/Type/_history_modifiers: update completion of
+	builtin commands, modifiers, parameter and globbing flags
+
 2015-01-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 34381: Doc/Zsh/contrib.yo: vcs_info: Documentation update

@@ -23,7 +23,7 @@ if [[ $BUFFER[1,pos-1] = (|*[[:space:]:=]##)\~\[ ]]; then
 elif [[ "$PREFIX" = :* ]]; then
   _wanted characters expl 'character class' \
       compadd -p: -S ':]' alnum alpha ascii blank cntrl digit graph \
-                          lower print punct space upper xdigit
+      lower print punct space upper xdigit IFS IDENT IFSSPACE WORD
 elif compset -P '\('; then
   local match
   compset -S '\)*'

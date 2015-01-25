@@ -6,7 +6,8 @@ cargs=( \
   '(-v -c)-w[print command type]' \
   '-p[always do a path search]' \
   '-m[treat the arguments as patterns]' \
-  '-s[print symlink free path as well]' \
+  '(-S)-s[print symlink free path as well]' \
+  '(-s)-S[show steps in the resolution of symlinks]' \
   '*:commands:->command' )
 farg='-f[output contents of functions]'
 aarg='-a[print all occurrences in path]'

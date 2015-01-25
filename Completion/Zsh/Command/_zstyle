@@ -322,7 +322,7 @@ while (( $#state )); do
 
     (cmdorcont)
       _alternative -O suf \
-        'commands:command:_command ' \
+        'commands:command:_path_commands' \
         'contexts:context:(-array-value- -brace-parameter- -command- -condition- -math- -parameter- -redirect- -subscript- -value-)'
      ;;
 

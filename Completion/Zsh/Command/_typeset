@@ -46,7 +46,7 @@ use="AEFHLRTUZafghiklmprtuxz"
 
 case ${service} in
   autoload)
-    use="UXktwz"
+    use="UTXktwz"
     func=f
   ;;
   float) use="EFHghlprtux";;

@@ -104,9 +104,9 @@ if [[ $PREFIX = *'${('[^\)]# ]]; then
   done
 
   if [[ -z $found_percent ]]; then
-    flags=("%:Expand prompt sequences")
+    flags=("%:expand prompt sequences")
   else
-    flags=("%:Expand prompts respecting options")
+    flags=("%:expand prompts respecting options")
   fi
   case $q_last in
     (0)
@@ -134,58 +134,74 @@ if [[ $PREFIX = *'${('[^\)]# ]]; then
     flags+=("Q:remove one level of quoting")
   fi
   if [[ -z $found_m ]]; then
-    flags+=("m:Count multibyte width in padding calculation")
+    flags+=("m:count multibyte width in padding calculation")
   else
-    flags+=("m:Count number of character code points in padding calculation")
+    flags+=("m:count number of character code points in padding calculation")
   fi
   flags+=(
-    "#:Evaluate as numeric expression"
-    "@:Double-quoted splitting of scalars"
-    "A:Create array parameter"
-    "a:Sort in array index order (with O to reverse)"
-    "c:Count characters in an array (with \${(c)#...})"
-    "C:Capitalize words"
-    "D:Perform directory name abbreviation"
-    "e:Perform single-word shell expansions"
-    "f:Split the result on newlines"
-    "F:Join arrays with newlines"
-    "g:Process echo array sequences (needs options)"
-    "i:Sort case-insensitively"
-    "k:Subsitute keys of associative arrays"
-    "L:Lower case all letters"
-    "n:Sort decimal integers numerically"
-    "o:Sort in ascending order (lexically if no other sort option)"
-    "O:Sort in descending order (lexically if no other sort option)"
-    "P:Use parameter value as name of parameter for redirected lookup"
-    "t:Substitute type of parameter"
-    "u:Substitute first occurrence of each unique word"
-    "U:Upper case all letters"
-    "v:Substitute values of associative arrays (with (k))"
-    "V:Visibility enhancements for special characters"
-    "w:Count words in array or string (with \${(w)#...})"
-    "W:Count words including empty words (with \${(W)#...})"
-    "X:Report parsing errors and eXit substitution"
-    "z:Split words as if zsh command line"
-    "0:Split words on null bytes"
-    "p:Handle print escapes in parameter flag arguments"
-    "~:Treat strings in parameter flag arguments as patterns"
-    "j:Join arrays with specified string"
-    "l:Left-pad resulting words"
-    "r:Right-pad resulting words"
-    "s:Split words on specified string"
-    "Z:Split words as if zsh command line (with options)"
-    # "_:Extended flags, for future expansion"
-    "S:Search substrings in #, %, / expressions"
-    "I:Search <argument>th match in #, %, / expressions"
-    "B:Include index of beginning of match in #, %, / expressions"
-    "E:Include index of end of match in #, %, / expressions"
-    "M:Include matched portion in #, %, / expressions"
-    "N:Include length of match in #, %,  expressions"
-    "R:Include rest (unmatched portion) in #, %, / expressions"
+    "#:evaluate as numeric expression"
+    "@:double-quoted splitting of scalars"
+    "A:create array parameter"
+    "a:sort in array index order (with O to reverse)"
+    "c:count characters in an array (with \${(c)#...})"
+    "C:capitalize words"
+    "D:perform directory name abbreviation"
+    "e:perform single-word shell expansions"
+    "f:split the result on newlines"
+    "F:join arrays with newlines"
+    "g:process echo array sequences (needs options)"
+    "i:sort case-insensitively"
+    "k:subsitute keys of associative arrays"
+    "L:lower case all letters"
+    "n:sort decimal integers numerically"
+    "o:sort in ascending order (lexically if no other sort option)"
+    "O:sort in descending order (lexically if no other sort option)"
+    "P:use parameter value as name of parameter for redirected lookup"
+    "t:substitute type of parameter"
+    "u:substitute first occurrence of each unique word"
+    "U:upper case all letters"
+    "v:substitute values of associative arrays (with (k))"
+    "V:visibility enhancements for special characters"
+    "w:count words in array or string (with \${(w)#...})"
+    "W:count words including empty words (with \${(W)#...})"
+    "X:report parsing errors and eXit substitution"
+    "z:split words as if zsh command line"
+    "0:split words on null bytes"
+    "p:handle print escapes or variables in parameter flag arguments"
+    "~:treat strings in parameter flag arguments as patterns"
+    "j:join arrays with specified string"
+    "l:left-pad resulting words"
+    "r:right-pad resulting words"
+    "s:split words on specified string"
+    "Z:split words as if zsh command line (with options)"
+    # "_:extended flags, for future expansion"
+    "S:search substrings in #, %, / expressions"
+    "I:search <argument>th match in #, %, / expressions"
+    "B:include index of beginning of match in #, %, / expressions"
+    "E:include index of end of match in #, %, / expressions"
+    "M:include matched portion in #, %, / expressions"
+    "N:include length of match in #, % expressions"
+    "R:include rest (unmatched portion) in #, %, / expressions"
   )
   _describe -t flags "parameter flag" flags -Q -S ''
   return
+elif compset -P '*:([\|\*\^]|\^\^)'; then
+  _arrays
+  return
 elif compset -P '*:'; then
+    flags=(
+      '-:substitute alternate value if parameter is null'
+      '+:susbtitute alternate value if parameter is non-null'
+      '=:substitute and assign alternate value if parameter is null'
+      '\:=:unconditionally assign value to parameter'
+      '?:print error if parameter is set and non-null'
+      '#:filter value matching pattern'
+      '|:set difference'
+      '*:set intersection'
+      '^:zip arrays'
+      '^^:zip arrays reusing values from shorter array'
+    )
+    _describe -t flags "operator" flags -Q -S ''
     _history_modifiers p
     return
 fi

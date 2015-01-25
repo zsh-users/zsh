@@ -142,7 +142,7 @@ ifnzman(noderef(Aliasing)).
 findex(autoload)
 cindex(functions, autoloading)
 cindex(autoloading functions)
-item(tt(autoload) [ {tt(PLUS())|tt(-)}tt(UXkmtz) ] [ tt(-w) ] [ var(name) ... ])(
+item(tt(autoload) [ {tt(PLUS())|tt(-)}tt(TUXkmtz) ] [ tt(-w) ] [ var(name) ... ])(
 Equivalent to tt(functions -u), with the exception of tt(-X)/tt(+X) and
 tt(-w).
 
