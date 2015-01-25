@@ -1,3 +1,8 @@
+2015-01-25  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34389: Src/hist.c: fix parsing of ">!" when read from histfile
+	with HIST_LEX_WORDS in effect
+
 2015-01-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34369: Daniel Shahaf: document error / warning codes.

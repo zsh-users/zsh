@@ -3473,7 +3473,8 @@ histsplitwords(char *lineptr, short **wordsp, int *nwordsp, int *nwordposp,
 			if (*lptr == *wptr ||
 			    (*lptr == '!' && *wptr == '|')) {
 			    lptr++;
-			    wptr++;
+			    if (!*++wptr)
+				break;
 			} else if (lptr[0] == '\\' &&
 				   lptr[1] == '\n') {
 			    /*
