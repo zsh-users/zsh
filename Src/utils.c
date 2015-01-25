@@ -1114,7 +1114,7 @@ getnameddir(char *name)
 		zsfree(dir);
 		return str;
 	    } else
-		return ztrdup(pw->pw_dir);
+		return dupstring(pw->pw_dir);
 	}
     }
 #endif /* HAVE_GETPWNAM */

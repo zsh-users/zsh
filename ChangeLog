@@ -1,3 +1,7 @@
+2015-01-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34383: Src/utils.c: new ztrdup() shoud be dupstring().
+
 2015-01-25  Oliver Kiddle  <opk@zsh.org>
 
 	* 34373, 34374: Completion/Unix/Command/_chown,
