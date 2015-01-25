@@ -162,15 +162,24 @@ _hg_revrange() {
   _hg_tags "$@"
 }
 
-_hg_tags() {
-  typeset -a tags
-  local tag rev
+_hg_tags_internal() {
+  local expl
+  typeset -a hgtags
+  hgtags=( ${(f)"$(_hg_cmd tags -q 2>/dev/null)"} )
+  _wanted tags expl 'tags' compadd -a - hgtags
+}
 
-  _hg_cmd tags 2> /dev/null | while read tag
-  do
-    tags+=(${tag/ #    [0-9]#:*})
-  done
-  (( $#tags )) && _describe -t tags 'tags' tags
+_hg_bookmarks_internal() {
+  local expl
+  typeset -a hgbookmarks
+  hgbookmarks=( ${(f)"$(_hg_cmd bookmarks -q 2>/dev/null)"} )
+  _wanted bookmarks expl 'bookmarks' compadd -a - hgbookmarks
+}
+
+_hg_tags() {
+  _alternative \
+    'bookmarks:bookmark:_hg_bookmarks_internal' \
+    'tags:tag:_hg_tags_internal'
 }
 
 # likely merge candidates

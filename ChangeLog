@@ -1,3 +1,8 @@
+2015-02-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 34411: Completion/Unix/Command/_hg: _hg completion: Complete
+	bookmark names for -r
+
 2015-01-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34439: Src/Modules/db_gdbm.c: unset parameter that's about to
