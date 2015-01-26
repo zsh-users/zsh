@@ -1,3 +1,9 @@
+2015-01-26  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34402: Src/Modules/db_gdbm.c: make unsetting a tied gdbm
+	variable work and hence allow tied variables in nested scope.
+	Untying still doesn't uncover scope properly.
+
 2015-01-25  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34399: Src/utils.c: fix polltty thinko from 34365

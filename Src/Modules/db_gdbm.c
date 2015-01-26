@@ -43,6 +43,9 @@ static char *backtype = "db/gdbm";
 
 static const struct gsu_scalar gdbm_gsu =
 { gdbmgetfn, gdbmsetfn, gdbmunsetfn };
+/**/
+static const struct gsu_hash gdbm_hash_gsu =
+{ hashgetfn, hashsetfn, gdbmhashunsetfn };
 
 static struct builtin bintab[] = {
     BUILTIN("ztie", 0, bin_ztie, 1, -1, 0, "d:f:", NULL),
@@ -84,12 +87,14 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 	return 1;
     }
 
-    if (!(tied_param = createspecialhash(pmname, &getgdbmnode, &scangdbmkeys, 0))) {
+    if (!(tied_param = createspecialhash(pmname, &getgdbmnode, &scangdbmkeys,
+					 PM_REMOVABLE))) {
         zwarnnam(nam, "cannot create the requested parameter %s", pmname);
 	gdbm_close(dbf);
 	return 1;
     }
 
+    tied_param->gsu.h = &gdbm_hash_gsu;
     tied_param->u.hash->tmpdata = (void *)dbf;
 
     return 0;
@@ -223,6 +228,25 @@ scangdbmkeys(HashTable ht, ScanFunc func, int flags)
         key = gdbm_nextkey(dbf, key);
     }
 
+}
+
+/**/
+static void
+gdbmhashunsetfn(Param pm, UNUSED(int exp))
+{
+    GDBM_FILE dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
+
+    if (!dbf) /* paranoia */
+	return;
+
+    gdbm_close(dbf);
+    pm->u.hash->tmpdata = NULL;
+
+    /* hash table is now normal, so proceed normally... */
+    pm->node.flags &= ~PM_SPECIAL;
+    pm->gsu.h = &stdhash_gsu;
+    pm->gsu.h->setfn(pm, NULL);
+    pm->node.flags |= PM_UNSET;
 }
 
 #else
