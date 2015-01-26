@@ -2323,7 +2323,7 @@ read_poll(int fd, int *readchar, int polltty, zlong microseconds)
      * as plausible as it sounds, but it seems the right way to guess.
      *		pws 2000/06/26
      */
-    if (fd >= 0) {
+    if (polltty && fd >= 0) {
 	gettyinfo(&ti);
 	if ((polltty = ti.tio.c_cc[VMIN])) {
 	    ti.tio.c_cc[VMIN] = 0;

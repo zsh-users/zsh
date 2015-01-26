@@ -1,5 +1,7 @@
 2015-01-25  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 34399: Src/utils.c: fix polltty thinko from 34365
+
 	* 34389: Src/hist.c: fix parsing of ">!" when read from histfile
 	with HIST_LEX_WORDS in effect
 
@@ -7,6 +9,10 @@
 
 	* 34369: Daniel Shahaf: document error / warning codes.
 
+	* 34365: configure.ac, Src/hist.c, Src/utils.c: History lockfile
+	backoff: randomised time.  zsleep() provides microsecond
+	resolution for sleep.
+	
 	* 34383: Src/utils.c: new ztrdup() shoud be dupstring().
 
 2015-01-25  Oliver Kiddle  <opk@zsh.org>
