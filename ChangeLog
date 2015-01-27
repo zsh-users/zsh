@@ -1,3 +1,8 @@
+2015-01-27  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Daniel Shahaf: 34412: Completion/Unix/Command/_chown: complete
+	all groups if running as sudo.
+
 2015-01-27  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 34382: Src/module.c: Handle NULL return from dlerror() more
