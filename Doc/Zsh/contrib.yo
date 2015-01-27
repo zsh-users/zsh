@@ -1422,8 +1422,8 @@ This hook is used when tt(vcs_info)'s quilt functionality is active in "addon"
 mode (quilt used on top of a real version control system). It is activated
 right before any quilt specific action is taken.
 
-Setting the `tt(ret)' variable in this hook to a non-zero value avoids the
-quilt specific to be run at all.
+Setting the `tt(ret)' variable in this hook to a non-zero value avoids any
+quilt specific actions from being run at all.
 )
 item(tt(set-patch-format))(
 This hook is used to control some of the possible expansions in

@@ -1,3 +1,7 @@
+2015-01-27  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 34419: Doc/Zsh/contrib.yo: vcs_info documentation: Fix wording
+
 2015-01-27  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Daniel Shahaf: 34412: Completion/Unix/Command/_chown: complete
