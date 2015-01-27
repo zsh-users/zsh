@@ -35,6 +35,11 @@
 
 2015-01-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 34365: configure.ac, Src/hist.c, Src/utils.c; random doubling
+	backoff on history lock failure.  Add zsleep() to provide
+	microsecond sleeps, via nanosleep() available else select() in
+	tty_poll().
+
 	* 34369: Daniel Shahaf: document error / warning codes.
 
 	* 34365: configure.ac, Src/hist.c, Src/utils.c: History lockfile
