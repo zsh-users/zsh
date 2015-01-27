@@ -2300,8 +2300,8 @@ read_poll(int fd, int *readchar, int polltty, zlong microseconds)
     struct ttyinfo ti;
 #endif
 
-     if (fd < 0)
-	 polltty = 0;		/* no tty to poll */
+    if (fd < 0 || (polltty && !isatty(fd)))
+	polltty = 0;		/* no tty to poll */
 
 #if defined(HAS_TIO) && !defined(__CYGWIN__)
     /*

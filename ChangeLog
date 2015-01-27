@@ -6,6 +6,11 @@
 	* 34387: Src/module.c: Avoid loading the main zsh binary as
 	a module
 
+2015-01-26  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34403: Src/utils.c: refine 34399 to avoid settyinfo() when the
+	input descriptor is not a TTY
+
 2015-01-26  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34402: Src/Modules/db_gdbm.c: make unsetting a tied gdbm
