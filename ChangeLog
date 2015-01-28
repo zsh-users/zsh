@@ -1,3 +1,7 @@
+2015-01-28  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34421: Doc/Zsh/builtins.yo: clean up typeset documentation
+
 2015-01-28  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 34415: Completion/Unix/Type/_python_modules,
@@ -51,10 +55,6 @@
 	tty_poll().
 
 	* 34369: Daniel Shahaf: document error / warning codes.
-
-	* 34365: configure.ac, Src/hist.c, Src/utils.c: History lockfile
-	backoff: randomised time.  zsleep() provides microsecond
-	resolution for sleep.
 	
 	* 34383: Src/utils.c: new ztrdup() shoud be dupstring().
 

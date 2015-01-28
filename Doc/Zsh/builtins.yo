@@ -1708,59 +1708,87 @@ newly-created parameters, or when any attribute flags listed below are
 given along with the var(name).  Using `tt(PLUS())' instead of minus to
 introduce an attribute turns it off.
 
-If the tt(-p) option is given, parameters and values are printed in the
-form of a typeset command and an assignment (which will be printed
-separately for arrays and associative arrays), regardless of other flags
-and options.  Note that the tt(-h) flag on parameters is respected; no
-value will be shown for these parameters.
-
-If the tt(-T) option is given, two or three arguments must be present (an
-exception is that zero arguments are allowed to show the list of parameters
-created in this fashion).  The first two are the name of a scalar and an
-array parameter (in that order) that will be tied together in the manner of
-tt($PATH) and tt($path).  The optional third argument is a single-character
-separator which will be used to join the elements of the array to form the
-scalar; if absent, a colon is used, as with tt($PATH).  Only the first
-character of the separator is significant; any remaining characters are
-ignored.  Only the scalar parameter may be assigned an initial value.  Both
-the scalar and the array may otherwise be manipulated as normal.  If one is
-unset, the other will automatically be unset too.  There is no way of
-untying the variables without unsetting them, or converting the type of one
-of them with another tt(typeset) command; tt(+T) does not work, assigning
-an array to var(SCALAR) is an error, and assigning a scalar to var(array)
-sets it to be a single-element array.  Note that both `tt(typeset -xT ...)'
-and `tt(export -T ...)' work, but only the scalar will be marked for
-export.  Setting the value using the scalar version causes a split on all
-separators (which cannot be quoted).  It is possible to use the
-same two tied variables with a different separator character in which
-case the variables remain joined as before but the separator is changed.
-This flag has a different meaning when used with tt(-f); see below.
-
-The tt(-g) (global) flag is treated specially: it means that any
-resulting parameter will not be restricted to local scope.  Note that this
-does not necessarily mean that the parameter will be global, as the flag
-will apply to any existing parameter (even if unset) from an enclosing
-function.  This flag does not affect the parameter after creation, hence it
-has no effect when listing existing parameters, nor does the flag tt(+g)
-have any effect except in combination with tt(-m) (see below).
-
 If no var(name) is present, the names and values of all parameters are
 printed.  In this case the attribute flags restrict the display to only
 those parameters that have the specified attributes, and using `tt(PLUS())'
 rather than `tt(-)' to introduce the flag suppresses printing of the values
-of parameters when there is no parameter name.  Also, if the last option
-is the word `tt(PLUS())', then names are printed but values are not.
+of parameters when there is no parameter name.
 
+The following control flags change the behavior of tt(typeset):
+
+startitem()
+item(tt(PLUS()))(
+If `tt(PLUS())' appears by itself in a separate word as the last option,
+then the names of all parameters (functions with tt(-f)) are printed, but
+the values (function bodies) are not.  No var(name) arguments may appear,
+and it is an error for any other options to follow `tt(PLUS())'.  The
+effect of `tt(PLUS())' is as if all attribute flags which precede it were
+given with a `tt(PLUS())' prefix.  For example, `tt(typeset -U PLUS())' is
+equivalent to `tt(typeset +U)' and displays the names of all arrays having
+the uniqueness attribute, whereas `tt(typeset -f -U PLUS())' displays the
+names of all autoloadable functions.  If tt(PLUS()) is the only option,
+then type information (array, readonly, etc.) is also printed for each
+parameter.
+)
+item(tt(-g))(
+The tt(-g) (global) means that any resulting parameter will not be
+restricted to local scope.  Note that this does not necessarily mean that
+the parameter will be global, as the flag will apply to any existing
+parameter (even if unset) from an enclosing function.  This flag does not
+affect the parameter after creation, hence it has no effect when listing
+existing parameters, nor does the flag tt(+g) have any effect except in
+combination with tt(-m) (see below).
+)
+item(tt(-m))(
 If the tt(-m) flag is given the var(name) arguments are taken as patterns
-(which should be quoted).  With no attribute flags, all parameters (or
-functions with the tt(-f) flag) with matching names are printed (the shell
-option tt(TYPESET_SILENT) is not used in this case).  Note that tt(-m) is
-ignored if no patterns are given.  If the tt(+g) flag is combined with
-tt(-m), a new local parameter is created for every matching parameter that
-is not already local.  Otherwise tt(-m) applies all other flags or
-assignments to the existing parameters.  Except when assignments are made
-with var(name)tt(=)var(value), using tt(+m) forces the matching parameters
-to be printed, even inside a function.
+(use quoting to prevent these from being interpreted as file patterns).
+With no attribute flags, all parameters (or functions with the tt(-f)
+flag) with matching names are printed (the shell option tt(TYPESET_SILENT)
+is not used in this case).
+
+If the tt(+g) flag is combined with tt(-m), a new local parameter is
+created for every matching parameter that is not already local.  Otherwise
+tt(-m) applies all other flags or assignments to the existing parameters.
+
+Except when assignments are made with var(name)tt(=)var(value), using
+tt(+m) forces the matching parameters to be printed, even inside a
+function.  Note that tt(-m) is ignored if no patterns are given.
+)
+item(tt(-p))(
+If the tt(-p) option is given, parameters and values are printed in the
+form of a typeset command and an assignment (which will be printed
+separately for arrays and associative arrays), regardless of other flags
+and options.  Note that the tt(-H) flag on parameters is respected; no
+value will be shown for these parameters.
+)
+item(tt(-T) [ var(scalar)[tt(=)var(value)] var(array) [ var(sep) ] ])(
+This flag has a different meaning when used with tt(-f); see below.
+Otherwise the tt(-T) option requires zero, two, or three arguments to be
+present.  With no arguments, the list of parameters created in this
+fashion is shown.  With two or three arguments, the first two are the name
+of a scalar and of an array parameter (in that order) that will be tied
+together in the manner of tt($PATH) and tt($path).  The optional third
+argument is a single-character separator which will be used to join the
+elements of the array to form the scalar; if absent, a colon is used, as
+with tt($PATH).  Only the first character of the separator is significant;
+any remaining characters are ignored.
+
+Only the scalar parameter may be assigned an initial value.  Both the
+scalar and the array may otherwise be manipulated as normal.  If one is
+unset, the other will automatically be unset too.  There is no way of
+untying the variables without unsetting them, nor of converting the type
+of one of them with another tt(typeset) command; tt(+T) does not work,
+assigning an array to var(scalar) is an error, and assigning a scalar to
+var(array) sets it to be a single-element array.
+
+Note that both `tt(typeset -xT ...)'  and `tt(export -T ...)' work, but
+only the scalar will be marked for export.  Setting the value using the
+scalar version causes a split on all separators (which cannot be quoted).
+It is possible to apply tt(-T) to two previously tied variables but with a
+different separator character, in which case the variables remain joined
+as before but the separator is changed.
+)
+enditem()
 
 If no attribute flags are given and either no tt(-m) flag is present or
 the tt(+m) form was used, each parameter name printed is preceded by a
