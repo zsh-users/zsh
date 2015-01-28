@@ -1,5 +1,11 @@
 2015-01-28  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
+	* 34415: Completion/Unix/Type/_python_modules,
+	Completion/Unix/Command/_python, Completion/Unix/Command/_pydoc:
+	cache list of all python modules
+
+2015-01-28  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
 	* 34423: _ruby: fix a typo
 
 2015-01-27  Frank Terbeck  <ft@bewatermyfriend.org>
