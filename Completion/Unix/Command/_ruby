@@ -95,7 +95,7 @@ case "$service" in
     _arguments -C -s : $irb $all $common && ret=0
   ;;
   erb[0-9.]#)
-    RUBY=${words[1]/irb/ruby}
+    RUBY=${words[1]/erb/ruby}
     _arguments -C -s : $erb $all \
       '*:erb file:_files -g "*.erb(-.)"' && ret=0
   ;;
