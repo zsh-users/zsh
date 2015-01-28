@@ -1714,6 +1714,15 @@ those parameters that have the specified attributes, and using `tt(PLUS())'
 rather than `tt(-)' to introduce the flag suppresses printing of the values
 of parameters when there is no parameter name.
 
+If no attribute flags are given, and either no var(name) arguments are
+present or the flag tt(+m) is used, then each parameter name printed is
+preceded by a list of the attributes of that parameter (tt(array),
+tt(association), tt(exported), tt(float), tt(integer), tt(readonly),
+or tt(undefined) for autoloaded parameters not yet loaded).  If tt(+m) is
+used with attribute flags, and all those flags are introduced with
+tt(PLUS()), the matching parameter names are printed but their values
+are not.
+
 The following control flags change the behavior of tt(typeset):
 
 startitem()
@@ -1728,7 +1737,7 @@ equivalent to `tt(typeset +U)' and displays the names of all arrays having
 the uniqueness attribute, whereas `tt(typeset -f -U PLUS())' displays the
 names of all autoloadable functions.  If tt(PLUS()) is the only option,
 then type information (array, readonly, etc.) is also printed for each
-parameter.
+parameter, in the same manner as `tt(typeset +m "*")'.
 )
 item(tt(-g))(
 The tt(-g) (global) means that any resulting parameter will not be
@@ -1751,8 +1760,10 @@ created for every matching parameter that is not already local.  Otherwise
 tt(-m) applies all other flags or assignments to the existing parameters.
 
 Except when assignments are made with var(name)tt(=)var(value), using
-tt(+m) forces the matching parameters to be printed, even inside a
-function.  Note that tt(-m) is ignored if no patterns are given.
+tt(+m) forces the matching parameters and their attributes to be printed,
+even inside a function.  Note that tt(-m) is ignored if no patterns are
+given, so `tt(typeset -m)' displays attributes but `tt(typeset -a +m)'
+does not.
 )
 item(tt(-p))(
 If the tt(-p) option is given, parameters and values are printed in the
@@ -1789,13 +1800,6 @@ different separator character, in which case the variables remain joined
 as before but the separator is changed.
 )
 enditem()
-
-If no attribute flags are given and either no tt(-m) flag is present or
-the tt(+m) form was used, each parameter name printed is preceded by a
-list of the attributes of that parameter (tt(array), tt(association),
-tt(exported), tt(integer), tt(readonly)).  If tt(+m) is used with attribute
-flags, and all those flags are introduced with tt(PLUS()), the matching
-parameter names are printed but their values are not.
 
 Attribute flags that transform the final value (tt(-L), tt(-R), tt(-Z),
 tt(-l), tt(u)) are only applied to the expanded value at the point
