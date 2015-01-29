@@ -927,7 +927,15 @@ shempty(void)
 {
 }
 
-/* Create a simple special hash parameter. */
+/*
+ * Create a simple special hash parameter.
+ *
+ * This is for hashes added internally --- it's not possible to add
+ * special hashes from shell commands.  It's currently used
+ * - by addparamdef() for special parameters in the zsh/parameter
+ *   module
+ * - by ztie for special parameters tied to databases.
+ */
 
 /**/
 mod_export Param
@@ -939,7 +947,22 @@ createspecialhash(char *name, GetNodeFunc get, ScanTabFunc scan, int flags)
     if (!(pm = createparam(name, PM_SPECIAL|PM_HASHED|flags)))
 	return NULL;
 
-    pm->level = pm->old ? locallevel : 0;
+    /*
+     * If there's an old parameter, we'll put the new one at
+     * the current locallevel, so that the old parameter is
+     * exposed again after leaving the function.  Otherwise,
+     * we'll leave it alone.  Usually this means the parameter
+     * will stay in place until explicitly unloaded, however
+     * if the parameter was previously unset within a function
+     * we'll inherit the level of that function and follow the
+     * standard convention that the parameter remains local
+     * even if unset.
+     *
+     * These semantics are similar to those of a normal parameter set
+     * within a function without a local definition.
+     */
+    if (pm->old)
+	pm->level = locallevel;
     pm->gsu.h = (flags & PM_READONLY) ? &stdhash_gsu :
 	&nullsethash_gsu;
     pm->u.hash = ht = newhashtable(0, name, NULL);

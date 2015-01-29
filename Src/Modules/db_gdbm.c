@@ -105,7 +105,6 @@ static int
 bin_zuntie(char *nam, char **args, Options ops, UNUSED(int func))
 {
     Param pm;
-    GDBM_FILE dbf;
     char *pmname;
     int ret = 0;
 
@@ -116,12 +115,18 @@ bin_zuntie(char *nam, char **args, Options ops, UNUSED(int func))
 	    ret = 1;
 	    continue;
 	}
+	if (pm->gsu.h != &gdbm_hash_gsu) {
+	    zwarnnam(nam, "not a tied gdbm hash: %s", pmname);
+	    ret = 1;
+	    continue;
+	}
 
-	dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
-	gdbm_close(dbf);
-	/* free(pm->u.hash->tmpdata); */
-	pm->u.hash->tmpdata = NULL;
-	paramtab->removenode(paramtab, pm->node.nam);
+	queue_signals();
+	if (unsetparam_pm(pm, 0, 1)) {
+	    /* assume already reported */
+	    ret = 1;
+	}
+	unqueue_signals();
     }
 
     return ret;

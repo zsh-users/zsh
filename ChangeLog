@@ -1,7 +1,12 @@
+2015-01-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34430: Src/Modules/db_gdbm.c, Src/params.c: various bug fixes
+	and safety additions for gdbm tied hashes.
+
 2015-01-28  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/builtins.yo: fix other typeset doc errors
-	
+
 	* 34421: Doc/Zsh/builtins.yo: clean up typeset documentation
 
 2015-01-28  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
