@@ -10,8 +10,7 @@ if [[ $service == zsh ]]; then
 fi
 
 if (( CURRENT == ${words[(i)-c]} + 1 )); then
-  compset -q
-  _normal
+  _cmdstring
 else
   local n=${words[(b:2:i)[^-]*]}
   if (( n <= CURRENT )); then
