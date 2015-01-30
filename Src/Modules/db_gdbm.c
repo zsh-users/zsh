@@ -77,8 +77,6 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 	return 1;
     }
 
-    pmname = ztrdup(*args);
-
     resource_name = OPT_ARG(ops, 'f');
 
     dbf = gdbm_open(resource_name, 0, GDBM_WRCREAT | GDBM_SYNC, 0666, 0);
@@ -87,6 +85,21 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 	return 1;
     }
 
+    pmname = ztrdup(*args);
+
+    if ((tied_param = (Param)paramtab->getnode(paramtab, pmname)) &&
+	!(tied_param->node.flags & PM_UNSET)) {
+	/*
+	 * Unset any existing parameter.  Note there's no implicit
+	 * "local" here, but if the existing parameter is local
+	 * that will be reflected in the new one.
+	 */
+	if (unsetparam_pm(tied_param, 0, 1)) {
+	    zsfree(pmname);
+	    gdbm_close(dbf);
+	    return 1;
+	}
+    }
     if (!(tied_param = createspecialhash(pmname, &getgdbmnode, &scangdbmkeys,
 					 PM_REMOVABLE))) {
         zwarnnam(nam, "cannot create the requested parameter %s", pmname);

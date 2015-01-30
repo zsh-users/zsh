@@ -1,3 +1,8 @@
+2015-01-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34439: Src/Modules/db_gdbm.c: unset parameter that's about to
+	be tied when necessary.
+
 2015-01-30  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34435: Completion/Unix/Command/_sh,
