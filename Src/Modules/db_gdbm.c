@@ -48,8 +48,8 @@ static const struct gsu_hash gdbm_hash_gsu =
 { hashgetfn, hashsetfn, gdbmhashunsetfn };
 
 static struct builtin bintab[] = {
-    BUILTIN("ztie", 0, bin_ztie, 1, -1, 0, "d:f:", NULL),
-    BUILTIN("zuntie", 0, bin_zuntie, 1, -1, 0, NULL, NULL),
+    BUILTIN("ztie", 0, bin_ztie, 1, -1, 0, "d:f:r", NULL),
+    BUILTIN("zuntie", 0, bin_zuntie, 1, -1, 0, "u", NULL),
 };
 
 /**/
@@ -58,6 +58,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 {
     char *resource_name, *pmname;
     GDBM_FILE dbf = NULL;
+    int read_write = GDBM_SYNC, pmflags = PM_REMOVABLE;
     Param tied_param;
 
     if(!OPT_ISSET(ops,'d')) {
@@ -67,6 +68,12 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
     if(!OPT_ISSET(ops,'f')) {
         zwarnnam(nam, "you must pass `-f' with a filename", NULL);
 	return 1;
+    }
+    if (OPT_ISSET(ops,'r')) {
+	read_write |= GDBM_READER;
+	pmflags |= PM_READONLY;
+    } else {
+	read_write |= GDBM_WRCREAT;
     }
 
     /* Here should be a lookup of the backend type against
@@ -79,9 +86,9 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 
     resource_name = OPT_ARG(ops, 'f');
 
-    dbf = gdbm_open(resource_name, 0, GDBM_WRCREAT | GDBM_SYNC, 0666, 0);
+    dbf = gdbm_open(resource_name, 0, read_write, 0666, 0);
     if(!dbf) {
-        zwarnnam(nam, "error opening database file %s", resource_name);
+	zwarnnam(nam, "error opening database file %s", resource_name);
 	return 1;
     }
 
@@ -101,7 +108,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 	}
     }
     if (!(tied_param = createspecialhash(pmname, &getgdbmnode, &scangdbmkeys,
-					 PM_REMOVABLE))) {
+					 pmflags))) {
         zwarnnam(nam, "cannot create the requested parameter %s", pmname);
 	gdbm_close(dbf);
 	return 1;
@@ -135,6 +142,8 @@ bin_zuntie(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 
 	queue_signals();
+	if (OPT_ISSET(ops,'u'))
+	    gdbmuntie(pm);	/* clear read-only-ness */
 	if (unsetparam_pm(pm, 0, 1)) {
 	    /* assume already reported */
 	    ret = 1;
@@ -250,19 +259,30 @@ scangdbmkeys(HashTable ht, ScanFunc func, int flags)
 
 /**/
 static void
-gdbmhashunsetfn(Param pm, UNUSED(int exp))
+gdbmuntie(Param pm)
 {
     GDBM_FILE dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
+    HashTable ht = pm->u.hash;
 
-    if (!dbf) /* paranoia */
-	return;
+    if (dbf) /* paranoia */
+	gdbm_close(dbf);
 
-    gdbm_close(dbf);
-    pm->u.hash->tmpdata = NULL;
+    ht->tmpdata = NULL;
 
-    /* hash table is now normal, so proceed normally... */
-    pm->node.flags &= ~PM_SPECIAL;
+    /* for completeness ... createspecialhash() should have an inverse */
+    ht->getnode = ht->getnode2 = gethashnode2;
+    ht->scantab = NULL;
+
+    pm->node.flags &= ~(PM_SPECIAL|PM_READONLY);
     pm->gsu.h = &stdhash_gsu;
+}
+
+/**/
+static void
+gdbmhashunsetfn(Param pm, UNUSED(int exp))
+{
+    gdbmuntie(pm);
+    /* hash table is now normal, so proceed normally... */
     pm->gsu.h->setfn(pm, NULL);
     pm->node.flags |= PM_UNSET;
 }

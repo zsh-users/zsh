@@ -1,3 +1,9 @@
+2015-02-01  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34446: Doc/Zsh/mod_db_gdbm.yo, Src/Modules/db_gdbm.c: add
+	"ztie -r" and "zuntie -u", update documentation for this and
+	for 34430,34439.
+
 2015-02-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 34411: Completion/Unix/Command/_hg: _hg completion: Complete
