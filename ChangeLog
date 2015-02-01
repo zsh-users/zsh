@@ -1,3 +1,8 @@
+2015-02-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 34444: Completion/Unix/Command/_git: git completion: minor
+	improvements to 'commit' and 'rebase'
+
 2015-02-01  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34446: Doc/Zsh/mod_db_gdbm.yo, Src/Modules/db_gdbm.c: add

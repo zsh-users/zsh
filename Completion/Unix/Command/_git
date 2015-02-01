@@ -651,8 +651,8 @@ _git-commit () {
   # TODO: --interactive isn't explicitly listed in the documentation.
   _arguments -w -S -s \
     '(-a --all --interactive -o --only -i --include *)'{-a,--all}'[stage all modified and deleted paths]' \
-    '--fixup=[construct a commit message for use with rebase --autosquash]:' \
-    '--squash=[construct a commit message for use with rebase --autosquash]:' \
+    '--fixup=[construct a commit message for use with rebase --autosquash]:commit to be amended:' \
+    '--squash=[construct a commit message for use with rebase --autosquash]:commit to be amended:' \
     $reset_author_opt \
     '(        --porcelain --dry-run)--short[output dry run in short format]' \
     '(--short             --dry-run)--porcelain[output dry run in porcelain-ready format]' \
@@ -1339,13 +1339,13 @@ _git-rebase () {
     '(-i --interactive --ignore-whitespace --whitespace --committer-date-is-author-date)'{-i,--interactive}'[make a list of commits to be rebased and open in $EDITOR]' \
     '--edit-todo[edit interactive instruction sheet in an editor]' \
     '(-p --preserve-merges --interactive)'{-p,--preserve-merges}'[try to recreate merges instead of ignoring them]' \
-    {-x,--exec}'[with -i\: append "exec <cmd>" after each line]:command' \
+    {-x,--exec=}'[with -i\: append "exec <cmd>" after each line]:command' \
     '(1)--root[rebase all reachable commits]' \
     $autosquash_opts \
     '(--autostash --no-autostash)--autostash[stash uncommitted changes before rebasing and apply them afterwards]' \
     '(--autostash --no-autostash)--no-autostash[do not stash uncommitted changes before rebasing and apply them afterwards]' \
     '--no-ff[cherry-pick all rebased commits with --interactive, otherwise synonymous to --force-rebase]' \
-    '--onto[start new branch with HEAD equal to given revision]:newbase:__git_revisions' \
+    '--onto=[start new branch with HEAD equal to given revision]:newbase:__git_revisions' \
     ':upstream branch:__git_revisions' \
     '::working branch:__git_branch_names'
 }
