@@ -1,3 +1,8 @@
+2015-02-02  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34447: Src/Modules/db_gdbm.c: fix assignment of key-value array
+	to ztie'd parameter.
+
 2015-02-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 34444: Completion/Unix/Command/_git: git completion: minor

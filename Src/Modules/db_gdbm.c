@@ -45,7 +45,7 @@ static const struct gsu_scalar gdbm_gsu =
 { gdbmgetfn, gdbmsetfn, gdbmunsetfn };
 /**/
 static const struct gsu_hash gdbm_hash_gsu =
-{ hashgetfn, hashsetfn, gdbmhashunsetfn };
+{ hashgetfn, gdbmhashsetfn, gdbmhashunsetfn };
 
 static struct builtin bintab[] = {
     BUILTIN("ztie", 0, bin_ztie, 1, -1, 0, "d:f:r", NULL),
@@ -194,7 +194,7 @@ gdbmsetfn(Param pm, char *val)
 
 /**/
 static void
-gdbmunsetfn(Param pm, int um)
+gdbmunsetfn(Param pm, UNUSED(int um))
 {
     datum key;
     GDBM_FILE dbf;
@@ -232,9 +232,7 @@ scangdbmkeys(HashTable ht, ScanFunc func, int flags)
 {
     Param pm = NULL;
     datum key, content;
-    GDBM_FILE dbf;
-
-    dbf = (GDBM_FILE)(ht->tmpdata);
+    GDBM_FILE dbf = (GDBM_FILE)(ht->tmpdata);
 
     pm = (Param) hcalloc(sizeof(struct param));
 
@@ -255,6 +253,59 @@ scangdbmkeys(HashTable ht, ScanFunc func, int flags)
         key = gdbm_nextkey(dbf, key);
     }
 
+}
+
+/**/
+static void
+gdbmhashsetfn(Param pm, HashTable ht)
+{
+    int i;
+    HashNode hn;
+    GDBM_FILE dbf;
+    datum key, content;
+
+    if (!pm->u.hash || pm->u.hash == ht)
+	return;
+
+    if (!(dbf = (GDBM_FILE)(pm->u.hash->tmpdata)))
+	return;
+
+    key = gdbm_firstkey(dbf);
+    while (key.dptr) {
+	queue_signals();
+	(void)gdbm_delete(dbf, key);
+	free(key.dptr);
+	unqueue_signals();
+	key = gdbm_firstkey(dbf);
+    }
+
+    /* just deleted everything, clean up */
+    (void)gdbm_reorganize(dbf);
+
+    if (!ht)
+	return;
+
+    for (i = 0; i < ht->hsize; i++)
+	for (hn = ht->nodes[i]; hn; hn = hn->next) {
+	    struct value v;
+
+	    v.isarr = v.flags = v.start = 0;
+	    v.end = -1;
+	    v.arr = NULL;
+	    v.pm = (Param) hn;
+
+	    key.dptr = v.pm->node.nam;
+	    key.dsize = strlen(key.dptr) + 1;
+
+	    queue_signals();
+
+	    content.dptr = getstrvalue(&v);
+	    content.dsize = strlen(content.dptr) + 1;
+
+	    (void)gdbm_store(dbf, key, content, GDBM_REPLACE);	
+
+	    unqueue_signals();
+	}
 }
 
 /**/
