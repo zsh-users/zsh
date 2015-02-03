@@ -4,6 +4,8 @@
 
 2015-02-03  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* users/19800: Doc/Zsh/params.yo: more help on $HISTORY_IGNORE.
+
 	* 34455: Src/Modules/db_gdbm.c: some further parameter bug fixes
 	including memory leak and unsetting old parameter too late.
 

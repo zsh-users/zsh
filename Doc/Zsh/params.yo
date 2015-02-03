@@ -1052,10 +1052,25 @@ item(tt(HISTORY_IGNORE))(
 If set, is treated as a pattern at the time history files are written.
 Any potential history entry that matches the pattern is skipped.  For
 example, if the value is `tt(fc *)' then commands that invoke the
-interactive history editor are never written to the history file (compare
-the tt(HIST_NO_STORE) option or the tt(zshaddhistory) hook, either of
-which would prevent such commands from being added to the interactive
-history at all).
+interactive history editor are never written to the history file.
+
+Note that tt(HISTORY_IGNORE) defines a single pattern: to
+specify alternatives use the `tt(+LPAR()first|second|...+RPAR())'
+syntax.
+
+Compare the tt(HIST_NO_STORE) option or the tt(zshaddhistory) hook,
+either of which would prevent such commands from being added to the
+interactive history at all.  If you wish to use tt(HISTORY_IGNORE) to
+stop history being added in the first place, you can define the
+following hook:
+
+example(zshaddhistory+LPAR()RPAR() {
+  emulate -L zsh
+  ## uncomment if HISTORY_IGNORE
+  ## should use EXTENDED_GLOB syntax
+  # setopt extendedglob
+  [[ $1 != ${~HISTORY_IGNORE} ]]
+})
 )
 vindex(HISTSIZE)
 item(tt(HISTSIZE) <S>)(
