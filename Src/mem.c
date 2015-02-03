@@ -79,6 +79,10 @@
 
 #include <sys/mman.h>
 
+#if defined(MAP_ANON) && !defined(MAP_ANONYMOUS)
+#define MAP_ANONYMOUS MAP_ANON
+#endif
+
 #if defined(MAP_ANONYMOUS) && defined(MAP_PRIVATE)
 
 #define USE_MMAP 1

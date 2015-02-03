@@ -1,3 +1,7 @@
+2015-02-03  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 34451: Src/mem.c: use mmap() also on Mac OS X
+
 2015-02-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34455: Src/Modules/db_gdbm.c: some further parameter bug fixes
