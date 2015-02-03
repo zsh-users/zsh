@@ -1,3 +1,8 @@
+2015-02-03  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34455: Src/Modules/db_gdbm.c: some further parameter bug fixes
+	including memory leak and unsetting old parameter too late.
+
 2015-02-02  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34447: Src/Modules/db_gdbm.c: fix assignment of key-value array

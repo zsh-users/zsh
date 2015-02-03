@@ -85,14 +85,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
     }
 
     resource_name = OPT_ARG(ops, 'f');
-
-    dbf = gdbm_open(resource_name, 0, read_write, 0666, 0);
-    if(!dbf) {
-	zwarnnam(nam, "error opening database file %s", resource_name);
-	return 1;
-    }
-
-    pmname = ztrdup(*args);
+    pmname = *args;
 
     if ((tied_param = (Param)paramtab->getnode(paramtab, pmname)) &&
 	!(tied_param->node.flags & PM_UNSET)) {
@@ -100,13 +93,24 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 	 * Unset any existing parameter.  Note there's no implicit
 	 * "local" here, but if the existing parameter is local
 	 * that will be reflected in the new one.
+	 *
+	 * We need to do this before attempting to open the DB
+	 * in case this variable is already tied to a DB.
+	 *
+	 * This can fail if the variable is readonly or restricted.
+	 * We could call unsetparam() and check errflag instead
+	 * of the return status.
 	 */
-	if (unsetparam_pm(tied_param, 0, 1)) {
-	    zsfree(pmname);
-	    gdbm_close(dbf);
+	if (unsetparam_pm(tied_param, 0, 1))
 	    return 1;
-	}
     }
+
+    dbf = gdbm_open(resource_name, 0, read_write, 0666, 0);
+    if(!dbf) {
+	zwarnnam(nam, "error opening database file %s", resource_name);
+	return 1;
+    }
+
     if (!(tied_param = createspecialhash(pmname, &getgdbmnode, &scangdbmkeys,
 					 pmflags))) {
         zwarnnam(nam, "cannot create the requested parameter %s", pmname);
