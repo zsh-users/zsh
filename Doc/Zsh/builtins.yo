@@ -54,13 +54,13 @@ in a group before any non-option arguments; once the first non-option
 argument has been found, option processing is terminated.
 
 All builtin commands other than precommand modifiers, even those that
-have no options, can be given the argument `tt(--)' to terminate option
+have no options, can be given the argument `tt(-)tt(-)' to terminate option
 processing.  This indicates that the following words are non-option
 arguments, but is otherwise ignored.  This is useful in cases where
 arguments to the command may begin with `tt(-)'.  For historical
 reasons, most builtin commands also recognize a single `tt(-)' in a
 separate word for this purpose; note that this is less standard and
-use of `tt(--) is recommended.
+use of `tt(-)tt(-)' is recommended.
 
 startitem()
 prefix(-)
