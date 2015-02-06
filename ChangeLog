@@ -1,3 +1,7 @@
+2015-02-03  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 34456: _arguments: lopts should be initialized as an array
+
 2015-02-06  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/19825: Doc/Zsh/manual.yo: clear statement that zsh is

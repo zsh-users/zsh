@@ -26,7 +26,7 @@ if (( long )); then
 
   if (( ! ${(P)+name} )); then
     local iopts sopts pattern tmpo dir cur cache
-    typeset -U lopts
+    typeset -Ua lopts
 
     cache=()
 
