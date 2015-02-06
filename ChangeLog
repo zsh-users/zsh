@@ -1,3 +1,8 @@
+2015-02-06  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/19825: Doc/Zsh/manual.yo: clear statement that zsh is
+	not by default POSIX compatible.
+
 2015-02-03  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/builtins.yo: fix formatting of "--".
