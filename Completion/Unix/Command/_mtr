@@ -4,13 +4,19 @@ _arguments -C \
   '(-h --help)'{-h,--help}'[help]' \
   '(-v --version)'{-v,--version}'[version]' \
   '(-r --report)'{-r,--report}'[report mode]' \
+  '(-w --report-wide)'{-w,--report-wide}'[wide report mode\: do not truncate hostnames]' \
   '(-c --report-cycles)'{-c,--report-cycles}'[report cycles]:number of pings' \
-  '(-p --psize)'{-p,--psize}'[packet size]:number of bytes' \
+  '(-s --psize)'{-s,--psize}'[packet size]:number of bytes' \
   '(-t --curses)'{-t,--curses}'[curses UI]' \
+  '(-e --mpls)'{-e,--mpls}'[display ICMP MPLS information]' \
+  '(-o --order)'{-o,--order}'[order output fields]:fields order' \
   '(-n --no-dns)'{-n,--no-dns}'[no DNS lookups]' \
   '(-g --gtk)'{-g,--gtk}'[GTK+ UI]' \
-  '(-s --split)'{-s,--split}'[output for a split-user interface]' \
+  '(-p --split)'{-p,--split}'[output for a split-user interface]' \
   '(-l --raw)'{-l,--raw}'[raw output format]' \
   '(-a --address)'{-a,--address}'[source address]:source IP:_hosts' \
   '(-i --interval)'{-i,--interval}'[ping interval]:number of seconds' \
+  '-u[use UDP instead of ICMP echo]' \
+  '-4[use IPv4 only]' \
+  '-6[use IPv6 only]' \
   ':destination host:_hosts'
