@@ -5621,6 +5621,7 @@ __git_heads () {
     for f in HEAD FETCH_HEAD ORIG_HEAD MERGE_HEAD; do
       [[ -f $gitdir/$f ]] && heads+=$f
     done
+    [[ -f $gitdir/refs/stash ]] && heads+=stash
   fi
 
   _wanted heads expl head compadd "$@" -a - heads
