@@ -2460,7 +2460,7 @@ checkrmall(char *s)
 	return 1;
     fprintf(shout, "zsh: sure you want to delete all the files in ");
     if (*s != '/') {
-	nicezputs(pwd[1] ? unmeta(pwd) : "", shout);
+	nicezputs(pwd[1] ? pwd : "", shout);
 	fputc('/', shout);
     }
     nicezputs(s, shout);
