@@ -1519,6 +1519,7 @@ _git-stash () {
   case $state in
     (command)
       local -a commands
+      local -a save_arguments
 
       commands=(
         save:'save your local modifications to a new stash'
@@ -1531,19 +1532,24 @@ _git-stash () {
         drop:'remove a single stashed state from the stash list'
         create:'create a stash without storing it in the ref namespace')
 
+      save_arguments=(
+        '(--keep-index)--patch[interactively select hunks from diff between HEAD and working tree to stash]' \
+          '(             --no-keep-index)--keep-index[all changes already added to the index are left intact]' \
+          '(--keep-index                )--no-keep-index[all changes already added to the index are undone]' \
+          '(-q --quiet)'{-q,--quiet}'[suppress all output]' \
+          '(-u --include-untracked)'{-u,--include-untracked}'[include untracked files]' \
+      )
       _describe -t commands command commands && ret=0
+      _arguments -S $save_arguments && ret=0  # "stash" defaults to "save", but without "message".
       ;;
     (option-or-argument)
       curcontext=${curcontext%:*}-$line[1]:
 
       case $line[1] in
         (save)
+          _arguments -S $save_arguments && ret=0
           _arguments -S \
-            '(--keep-index)--patch[interactively select hunks from diff between HEAD and working tree to stash]' \
-            '(             --no-keep-index)--keep-index[all changes already added to the index are left intact]' \
-            '(--keep-index                )--no-keep-index[all changes already added to the index are undone]' \
-            '(-q --quiet)'{-q,--quiet}'[suppress all output]' \
-            '(-u --include-untracked)'{-u,--include-untracked}'[include untracked files]' \
+            $save_arguments \
             ':: :_guard "([^-]?#|)" message' && ret=0
           ;;
         (list)

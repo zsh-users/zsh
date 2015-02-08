@@ -9,6 +9,9 @@
 	* 34467: Completion/Unix/Command/_git: completion: git: minor doc
 	fixes
 
+	* 34468: Completion/Unix/Command/_git: completion: git: stash:
+	handle 'save' being the default
+
 2015-02-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 34464: Completion/Unix/Command/_mtr: Update mtr completion
