@@ -4,7 +4,7 @@
 #
 # Say you got your own git sub-commands (git will run a program `git-foo'
 # when you run "git foo") and you want "git f<tab>" to complete that sub
-# commands name for you. You can make that sub-command know to the completion
+# commands name for you. You can make that sub-command known to the completion
 # via the user-command style:
 #
 #     % zstyle ':completion:*:*:git:*' user-commands foo:'description for foo'
@@ -20,16 +20,12 @@
 # completion as well.  Place such a function inside an autoloaded #compdef file
 # and you should be all set.  You can add a description to such a function by
 # adding a line matching
-# 
+#
 #     #description DESCRIPTION
 #
 # as the second line in the file.  See
 # Completion/Debian/Command/_git-buildpackage in the Zsh sources for an
 # example.
-#
-# As this solution is so much better than the user-commands zstyle method, the
-# zstyle method is now DEPRECATED.  It will most likely be removed in the next
-# major release of Zsh (5.0).
 #
 # When _git does not know a given sub-command (say `bar'), it falls back to
 # completing file names for all arguments to that sub command. I.e.:
@@ -5219,7 +5215,7 @@ _git_commands () {
     plumbing-sync-commands \
     plumbing-sync-helper-commands \
     plumbing-internal-helper-commands
- 
+
   while _tags; do
 
     _requested aliases && \
