@@ -3,6 +3,9 @@
 	* 34469: Completion/Unix/Command/_git: git completion: add "stash"
 	from refs/stash to __git_heads
 
+	* 34470: Completion/Unix/Command/_adb: completion: adb: add
+	"sideload" command
+
 2015-02-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 34464: Completion/Unix/Command/_mtr: Update mtr completion
