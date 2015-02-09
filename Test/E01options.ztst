@@ -783,14 +783,24 @@
 >print is a shell builtin
 ?(eval):8: command not found: print
 
-# This option seems to be problematic.  I don't quite know how it works.
-##   func() {
-##     setopt localoptions printexitvalue
-##     false
-##   }
-##   func
-## 1:PRINT_EXIT_VALUE option
-## ?(eval):2: exit 1
+# PRINTEXITVALUE only works if shell input is coming from standard input.
+# Goodness only knows why.
+  $ZTST_testdir/../Src/zsh -f <<<'
+      setopt printexitvalue
+      func() {
+	  false
+      }
+      func
+  '
+1:PRINT_EXIT_VALUE option
+?zsh: exit 1
+
+  $ZTST_testdir/../Src/zsh -f <<<'
+      setopt printexitvalue
+      () { false; }
+  '
+1:PRINT_EXIT_VALUE option for anonymous function
+?zsh: exit 1
 
   setopt promptbang
   print -P !

@@ -1,3 +1,11 @@
+2015-02-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34485: Src/exec.c, Src/parse.c, Test/E01options.ztst:
+	rationalise some more anonymous function behaviour:
+	don't try to handle as "simple" case as there are too
+	many hidden problems; pull out some post-execution
+	functions to common cases in execcmd().
+
 2015-02-09  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 34466: Src/utils.c: Fix double unmeta in rm verification

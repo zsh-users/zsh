@@ -2427,6 +2427,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
     wordcode code;
     Wordcode beg = state->pc, varspc;
     FILE *oxtrerr = xtrerr, *newxtrerr = NULL;
+    LinkList restorelist = 0, removelist = 0;
 
     doneps4 = 0;
     redir = (wc_code(*state->pc) == WC_REDIR ? ecgetredirs(state) : NULL);
@@ -3359,9 +3360,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		zcontext_restore();
 	    } else
 		redir_prog = NULL;
-	    
+
 	    lastval = execfuncdef(state, redir_prog);
-	} 
+	}
 	else if (type >= WC_CURSH) {
 	    if (last1 == 1)
 		do_exec = 1;
@@ -3374,7 +3375,6 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    } else
 		lastval = (execfuncs[type - WC_CURSH])(state, do_exec);
 	} else if (is_builtin || is_shfunc) {
-	    LinkList restorelist = 0, removelist = 0;
 	    /* builtin or shell function */
 
 	    if (!forked && ((cflags & BINF_COMMAND) ||
@@ -3424,29 +3424,6 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		} else
 		    clearerr(stdout);
 	    }
-	    if (isset(PRINTEXITVALUE) && isset(SHINSTDIN) &&
-		lastval && !subsh) {
-#if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
-		fprintf(stderr, "zsh: exit %lld\n", lastval);
-#else
-		fprintf(stderr, "zsh: exit %ld\n", (long)lastval);
-#endif
-		fflush(stderr);
-	    }
-
-	    if (do_exec) {
-		if (subsh)
-		    _exit(lastval);
-
-		/* If we are exec'ing a command, and we are not in a subshell, *
-		 * then check if we should save the history file.              */
-		if (isset(RCS) && interact && !nohistsave)
-		    savehistfile(NULL, 1, HFILE_USE_OPTIONS);
-		exit(lastval);
-	    }
-	    if (restorelist)
-		restore_params(restorelist, removelist);
-
 	} else {
 	    if (!forked)
 		setiparam("SHLVL", --shlvl);
@@ -3496,6 +3473,28 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		execlist(state, 0, 1);
 	    }
 	}
+	if (isset(PRINTEXITVALUE) && isset(SHINSTDIN) &&
+	    lastval && !subsh) {
+#if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
+	    fprintf(stderr, "zsh: exit %lld\n", lastval);
+#else
+	    fprintf(stderr, "zsh: exit %ld\n", (long)lastval);
+#endif
+	    fflush(stderr);
+	}
+
+	if (do_exec) {
+	    if (subsh)
+		_exit(lastval);
+
+	    /* If we are exec'ing a command, and we are not in a subshell, *
+	     * then check if we should save the history file.              */
+	    if (isset(RCS) && interact && !nohistsave)
+		savehistfile(NULL, 1, HFILE_USE_OPTIONS);
+	    exit(lastval);
+	}
+	if (restorelist)
+	    restore_params(restorelist, removelist);
     }
 
   err:
