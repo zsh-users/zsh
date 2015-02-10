@@ -3,6 +3,8 @@
 	* 34488: Src/builtin.c: Fix use-after-free for print -zf and
 	print -sf
 
+	* 34490: Src/builtin.c: Fix leak on print -zf/-sf error
+
 2015-02-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34485: Src/exec.c, Src/parse.c, Test/E01options.ztst:
