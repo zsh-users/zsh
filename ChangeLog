@@ -1,3 +1,8 @@
+2015-02-10  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 34488: Src/builtin.c: Fix use-after-free for print -zf and
+	print -sf
+
 2015-02-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34485: Src/exec.c, Src/parse.c, Test/E01options.ztst:

@@ -4527,7 +4527,8 @@ bin_print(char *name, char **args, Options ops, int func)
     if (OPT_ISSET(ops,'z') || OPT_ISSET(ops,'s')) {
 #ifdef HAVE_OPEN_MEMSTREAM
 	putc(0, fout);
-	fflush(fout);
+	fclose(fout);
+	fout = NULL;
 #else
 	rewind(fout);
 	buf = (char *)zalloc(count + 1);
@@ -4548,11 +4549,16 @@ bin_print(char *name, char **args, Options ops, int func)
 	unqueue_signals();
     }
 
-    /* Testing EBADF special-cases >&- redirections */
-    if ((fout != stdout) ? (fclose(fout) != 0) :
-	(fflush(fout) != 0 && errno != EBADF)) {
-	zwarnnam(name, "write error: %e", errno);
-	ret = 1;
+#ifdef HAVE_OPEN_MEMSTREAM
+    if (fout)
+#endif
+    {
+	/* Testing EBADF special-cases >&- redirections */
+	if ((fout != stdout) ? (fclose(fout) != 0) :
+	    (fflush(fout) != 0 && errno != EBADF)) {
+	    zwarnnam(name, "write error: %e", errno);
+	    ret = 1;
+	}
     }
     return ret;
 }
