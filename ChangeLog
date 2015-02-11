@@ -1,3 +1,8 @@
+2015-02-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/19850: Doc/Zsh/params.yo, Src/watch.c: watch variable
+	supports patterns for user, tty and host names.
+
 2015-02-10  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 34488: Src/builtin.c: Fix use-after-free for print -zf and

@@ -1472,15 +1472,27 @@ vindex(watch)
 vindex(WATCH)
 item(tt(watch) <S> <Z> (tt(WATCH) <S>))(
 An array (colon-separated list) of login/logout events to report.
+
 If it contains the single word `tt(all)', then all login/logout events
 are reported.  If it contains the single word `tt(notme)', then all
 events are reported as with `tt(all)' except tt($USERNAME).
+
 An entry in this list may consist of a username,
 an `tt(@)' followed by a remote hostname,
-and a `tt(%)' followed by a line (tty).
+and a `tt(%)' followed by a line (tty).  Any of these may
+be a pattern (be sure to quote this during the assignment to
+tt(watch) so that it does not immediately perform file generation);
+the setting of the tt(EXTENDED_GLOB) option is respected.
 Any or all of these components may be present in an entry;
 if a login/logout event matches all of them,
 it is reported.
+
+For example, with the tt(EXTENDED_GLOB) option set, the following:
+
+example(watch=('^(pws|barts)'))
+
+causes reports for activity assoicated with any user other than tt(pws)
+or tt(barts).
 )
 vindex(WATCHFMT)
 item(tt(WATCHFMT))(
