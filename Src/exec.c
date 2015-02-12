@@ -4456,7 +4456,7 @@ execfuncdef(Estate state, Eprog redir_prog)
 	if (!names) {
 	    /*
 	     * Anonymous function, execute immediately.
-	     * Function name is "(anon)", parameter list is empty.
+	     * Function name is "(anon)".
 	     */
 	    LinkList args;
 
@@ -4476,6 +4476,9 @@ execfuncdef(Estate state, Eprog redir_prog)
 		    return 1;
 		}
 	    }
+
+	    setunderscore((args && nonempty(args)) ?
+			  ((char *) getdata(lastnode(args))) : "");
 
 	    if (!args)
 		args = newlinklist();

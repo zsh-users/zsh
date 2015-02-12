@@ -1,3 +1,8 @@
+2015-02-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34519: Src/exec.c: handle $_ with arguments to anonymous
+	function.
+
 2015-02-12  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34514: Src/exec.c, Src/parse.c, Test/E01options.ztst:
