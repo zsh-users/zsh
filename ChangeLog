@@ -1,3 +1,9 @@
+2015-02-12  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34514: Src/exec.c, Src/parse.c, Test/E01options.ztst:
+	Back out 34485, an alternate solution needs to be worked
+	out.  (Tweaked to keep the unrelated hunk of the E01 test.)
+
 2015-02-11  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/19850: Doc/Zsh/params.yo, Src/watch.c: watch variable

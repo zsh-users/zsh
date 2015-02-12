@@ -1612,7 +1612,8 @@ par_funcdef(int *cmplx)
 	    num++;
 	    zshlex();
 	}
-	*cmplx = 1;
+	if (num > 0)
+	    *cmplx = 1;
 	ecbuf[parg] = ecused - parg; /*?*/
 	ecbuf[parg+1] = num;
     }
@@ -1896,7 +1897,8 @@ par_simple(int *cmplx, int nr)
 		    argc++;
 		    zshlex();
 		}
-		*cmplx = 1;
+		if (argc > 0)
+		    *cmplx = 1;
 		ecbuf[parg] = ecused - parg; /*?*/
 		ecbuf[parg+1] = argc;
 	    }
