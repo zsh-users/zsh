@@ -4,6 +4,10 @@
 	Back out 34485, an alternate solution needs to be worked
 	out.  (Tweaked to keep the unrelated hunk of the E01 test.)
 
+	* 34476: Completion/Base/Utility/_store_cache: change the
+	assignment format to avoid potentially expensive lexical
+	analysis of the array values
+
 2015-02-11  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/19850: Doc/Zsh/params.yo, Src/watch.c: watch variable
