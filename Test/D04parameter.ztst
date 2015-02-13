@@ -1670,3 +1670,32 @@
   print ${(e)param}
 0:Alias expansion in command substitution in parameter evaluation
 >Expanded in substitution
+
+  a=1 b=2 c=3
+  : One;
+  function {
+      : Two
+      echo $_
+      print -l $argv
+  } $_ Three
+  print -l $_ Four;
+0:$_ with anonymous function
+>Two
+>One
+>Three
+>Three
+>Four
+
+  a=1 b=2 c=3
+  : One
+  function {
+      : Two
+      echo $_
+      print -l $argv
+  }
+  print -l "$_" Four
+0:$_ with anonymous function without arguments
+>Two
+>
+>
+>Four

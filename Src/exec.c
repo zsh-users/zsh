@@ -2784,9 +2784,14 @@ execcmd(Estate state, int input, int output, int how, int last1)
     else
 	text = NULL;
 
-    /* Set up special parameter $_ */
-
-    setunderscore((args && nonempty(args)) ? ((char *) getdata(lastnode(args))) : "");
+    /*
+     * Set up special parameter $_
+     * For execfuncdef we may need to take account of an
+     * anonymous function with arguments.
+     */
+    if (type != WC_FUNCDEF)
+	setunderscore((args && nonempty(args)) ?
+		      ((char *) getdata(lastnode(args))) : "");
 
     /* Warn about "rm *" */
     if (type == WC_SIMPLE && interact && unset(RMSTARSILENT) &&
@@ -4374,7 +4379,7 @@ execfuncdef(Estate state, Eprog redir_prog)
     Shfunc shf;
     char *s = NULL;
     int signum, nprg, sbeg, nstrs, npats, len, plen, i, htok = 0, ret = 0;
-    int nfunc = 0;
+    int nfunc = 0, anon_func = 0;
     Wordcode beg = state->pc, end;
     Eprog prog;
     Patprog *pp;
@@ -4460,6 +4465,8 @@ execfuncdef(Estate state, Eprog redir_prog)
 	     */
 	    LinkList args;
 
+	    anon_func = 1;
+
 	    state->pc = end;
 	    end += *state->pc++;
 	    args = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok);
@@ -4515,6 +4522,8 @@ execfuncdef(Estate state, Eprog redir_prog)
 	    shfunctab->addnode(shfunctab, ztrdup(s), shf);
 	}
     }
+    if (!anon_func)
+	setunderscore("");
     if (!nfunc && redir_prog) {
 	/* For completeness, shouldn't happen */
 	freeeprog(redir_prog);
