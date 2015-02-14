@@ -503,13 +503,15 @@ cmd_or_math(int cs_type)
     /* else unsuccessful: unget the whole thing */
     hungetc(c);
     lexstop = 0;
-    while (lexbuf.len > oldlen) {
+    while (lexbuf.len > oldlen && !errflag) {
 	lexbuf.len--;
 	hungetc(itok(*--lexbuf.ptr) ?
 		ztokens[*lexbuf.ptr - Pound] : *lexbuf.ptr);
     }
+    if (errflag)
+	return 2;
     hungetc('(');
-    return 0;
+    return errflag ? 2 : 0;
 }
 
 

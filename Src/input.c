@@ -393,12 +393,14 @@ inungetc(int c)
 	    if (((inbufflags & INP_LINENO) || !strin) && c == '\n')
 		lineno--;
 	}
-#ifdef DEBUG
         else if (!(inbufflags & INP_CONT)) {
+#ifdef DEBUG
 	    /* Just for debugging */
 	    fprintf(stderr, "Attempt to inungetc() at start of input.\n");
-	}
 #endif
+	    zerr("Garbled input at %c (binary file as commands?)", c);
+	    return;
+	}
 	else {
 	    /*
 	     * The character is being backed up from a previous input stack
