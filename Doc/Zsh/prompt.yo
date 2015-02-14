@@ -93,7 +93,7 @@ continuation lines and tt(PS4) for debugging with the tt(XTRACE) option; in
 the latter case it will also work non-interactively.
 )
 xitem(tt(%d))
-item(tt(/))(
+item(tt(%/))(
 Current working directory.  If an integer follows the `tt(%)',
 it specifies a number of trailing components of the current working
 directory to show; zero means the whole path.  A negative integer

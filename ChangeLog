@@ -1,3 +1,7 @@
+2015-02-14  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: Doc/Zsh/prompt.yo: Fix typo from 28487.
+
 2015-02-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34546: Src/exec.c, Test/D04parameter.ztst: fix another
