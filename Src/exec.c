@@ -3364,9 +3364,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		zcontext_restore();
 	    } else
 		redir_prog = NULL;
-	    
+
 	    lastval = execfuncdef(state, redir_prog);
-	} 
+	}
 	else if (type >= WC_CURSH) {
 	    if (last1 == 1)
 		do_exec = 1;
@@ -4494,6 +4494,16 @@ execfuncdef(Estate state, Eprog redir_prog)
 
 	    execshfunc(shf, args);
 	    ret = lastval;
+
+	    if (isset(PRINTEXITVALUE) && isset(SHINSTDIN) &&
+		lastval) {
+#if defined(ZLONG_IS_LONG_LONG) && defined(PRINTF_HAS_LLD)
+		fprintf(stderr, "zsh: exit %lld\n", lastval);
+#else
+		fprintf(stderr, "zsh: exit %ld\n", (long)lastval);
+#endif
+		fflush(stderr);
+	    }
 
 	    freeeprog(shf->funcdef);
 	    if (shf->redir) /* shouldn't be */

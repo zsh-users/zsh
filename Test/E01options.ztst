@@ -795,12 +795,12 @@
 1:PRINT_EXIT_VALUE option
 ?zsh: exit 1
 
-#  $ZTST_testdir/../Src/zsh -f <<<'
-#      setopt printexitvalue
-#      () { false; }
-#  '
-#1:PRINT_EXIT_VALUE option for anonymous function
-#?zsh: exit 1
+  $ZTST_testdir/../Src/zsh -f <<<'
+      setopt printexitvalue
+      () { false; }
+  '
+1:PRINT_EXIT_VALUE option for anonymous function
+?zsh: exit 1
 
   setopt promptbang
   print -P !

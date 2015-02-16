@@ -17,6 +17,11 @@
 	* 34546: Src/exec.c, Test/D04parameter.ztst: fix another
 	oddity with $_ and anonymous functions and add tests.
 
+2015-02-13  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34530: Src/exec.c, Test/E01options.ztst: revised fix
+	for PRINT_EXIT_VALUE from anonymous functions.
+
 2015-02-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34519: Src/exec.c: handle $_ with arguments to anonymous
