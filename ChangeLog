@@ -1,3 +1,8 @@
+2015-02-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 34588: Completion/Unix/Command/_user_admin: Complete
+	'usermod -a'
+
 2015-02-23  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34623: Src/hist.c: free history more often in previous case.

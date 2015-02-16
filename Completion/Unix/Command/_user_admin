@@ -45,6 +45,7 @@ if [[ $service = user* ]]; then
 	"(-L -p)-U[unlock user's password]"
     )
     args+=(
+      '-a[append groups]'
       '-l[specify new user name]:new username'
       ':username:_users'
     )
