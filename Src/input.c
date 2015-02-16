@@ -330,8 +330,37 @@ inputline(void)
 	}
     }
     isfirstch = 1;
-    /* Put this into the input channel. */
-    inputsetline(ingetcline, INP_FREE);
+    if ((inbufflags & INP_APPEND) && inbuf) {
+	/*
+	 * We need new input but need to be able to back up
+	 * over the old input, so append this line.
+	 * Pushing the line onto the stack doesn't have the right
+	 * effect.
+	 *
+	 * This is quite a simple and inefficient fix, but currently
+	 * we only need it when backing up over a multi-line $((...
+	 * that turned out to be a command substitution rather than
+	 * a math substitution, which is a very special case.
+	 * So it's not worth rewriting.
+	 */
+	char *oinbuf = inbuf;
+	int newlen = strlen(ingetcline);
+	int oldlen = (int)(inbufptr - inbuf) + inbufleft;
+	if (inbufflags & INP_FREE) {
+	    inbuf = realloc(inbuf, oldlen + newlen + 1);
+	    inbufptr += inbuf - oinbuf;
+	    strcpy(inbuf + oldlen, ingetcline);
+	} else {
+	    /* Paranoia: don't think this is used */
+	    DPUTS(1, "Appending to unallocated input line.");
+	}
+	inbufleft += newlen;
+	inbufct += newlen;
+	inbufflags |= INP_FREE;
+    } else {
+	/* Put this into the input channel. */
+	inputsetline(ingetcline, INP_FREE);
+    }
 
     return 0;
 }

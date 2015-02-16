@@ -318,3 +318,38 @@
 # 0.75 is exactly representable, don't expect rounding error.
 >0
 >0.75
+
+  # The following tests for a bug that only happens when
+  # backing up over input read a line at a time, so we'll
+  # read the input from stdin.
+  $ZTST_testdir/../Src/zsh -f <<<'
+  print $((echo first command
+  ); echo second command)
+  print third command
+  '
+0:Backing up a line of input when finding out it's not arithmetic
+>first command second command
+>third command
+
+  $ZTST_testdir/../Src/zsh -f <<<'
+  print $((3 +
+  4))
+  print next line
+  '
+0:Not needing to back up a line when reading multiline arithmetic
+>7
+>next line
+
+  $ZTST_testdir/../Src/zsh -f <<<'
+  print $((case foo in
+  bar)
+  echo not this no, no
+  ;;
+  foo)
+  echo yes, this one
+  ;;
+  esac)
+  print after case in subshell)
+  '
+0:Non-arithmetic subst with command subsitution parse from hell
+>yes, this one after case in subshell

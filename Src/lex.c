@@ -483,9 +483,13 @@ cmd_or_math(int cs_type)
 {
     int oldlen = lexbuf.len;
     int c;
+    int oinflags = inbufflags;
 
     cmdpush(cs_type);
+    inbufflags |= INP_APPEND;
     c = dquote_parse(')', 0);
+    if (!(oinflags & INP_APPEND))
+	inbufflags &= ~INP_APPEND;
     cmdpop();
     *lexbuf.ptr = '\0';
     if (!c) {

@@ -1,5 +1,7 @@
 2015-02-16  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34560: Src/input. Src/lex.c, Src/zsh.h, Test/C01arith.ztst: 
+
 	* 34558: Doc/Zsh/func.yo: preexec doc erroneously claimed $1
 	was empty if line removed from history.
 
