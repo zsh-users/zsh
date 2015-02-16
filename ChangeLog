@@ -1,3 +1,8 @@
+2015-02-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34551: Src/builtin.c: Avoid adding an extra "/" to the
+	target path in cd_try_chdir() when the current directory is "/"
+
 2015-02-14  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34543: Src/input.c, Src/lex.c: Fix crash on garbage bytes
