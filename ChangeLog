@@ -1,6 +1,12 @@
+2015-02-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34563: Src/input.c: Fix up memory allocation in 34560.
+
 2015-02-16  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* 34560: Src/input. Src/lex.c, Src/zsh.h, Test/C01arith.ztst: 
+	* 34560: Src/input. Src/lex.c, Src/zsh.h, Test/C01arith.ztst:
+	case of $(( that turned into a $(...) and a (...) with
+	multiple lines read before it found out.
 
 	* 34558: Doc/Zsh/func.yo: preexec doc erroneously claimed $1
 	was empty if line removed from history.

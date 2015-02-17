@@ -348,12 +348,13 @@ inputline(void)
 	int oldlen = (int)(inbufptr - inbuf) + inbufleft;
 	if (inbufflags & INP_FREE) {
 	    inbuf = realloc(inbuf, oldlen + newlen + 1);
-	    inbufptr += inbuf - oinbuf;
-	    strcpy(inbuf + oldlen, ingetcline);
 	} else {
-	    /* Paranoia: don't think this is used */
-	    DPUTS(1, "Appending to unallocated input line.");
+	    inbuf = zalloc(oldlen + newlen + 1);
+	    memcpy(inbuf, oinbuf, oldlen);
 	}
+	inbufptr += inbuf - oinbuf;
+	strcpy(inbuf + oldlen, ingetcline);
+	free(ingetcline);
 	inbufleft += newlen;
 	inbufct += newlen;
 	inbufflags |= INP_FREE;
