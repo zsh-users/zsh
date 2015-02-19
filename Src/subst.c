@@ -264,7 +264,7 @@ stringsubst(LinkList list, LinkNode node, int pf_flags, int asssub)
 		while (*str != Outparmath && *str)
 		    str++;
 		if (*str != Outparmath) {
-		    zerr("Failed to find end of math substitution");
+		    zerr("failed to find end of math substitution");
 		    return NULL;
 		}
 		str[-1] = '\0';
@@ -278,8 +278,12 @@ stringsubst(LinkList list, LinkNode node, int pf_flags, int asssub)
 		endchar = c;
 		*str = '\0';
 
-		while (*++str != endchar)
-		    DPUTS(!*str, "BUG: parse error in command substitution");
+		while (*++str != endchar) {
+		    if (!*str) {
+			zerr("failed to find end of command substitution");
+			return NULL;
+		    }
+		}
 	    }
 	    *str++ = '\0';
 

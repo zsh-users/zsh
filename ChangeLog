@@ -1,5 +1,8 @@
 2015-02-19  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34573: Src/subst.c: safer handling of failure to perform
+	command substitution.
+
 	* 34570: Config/version.mk, Src/lex.c, Src/subst.c, Src/zsh.h,
 	Test/C01arith.ztst: mark arithmetic substitutions with tokens
 	so the substitution code knows what to do.
