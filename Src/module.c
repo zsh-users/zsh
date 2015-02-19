@@ -1601,7 +1601,7 @@ do_load_module(char const *name, int silent)
 #ifdef HAVE_DLERROR
 	char *errstr = dlerror();
 	zwarn("failed to load module `%s': %s", name,
-	      errstr ? metafy(errstr, -1, META_USEHEAP) : "empty module path");
+	      errstr ? metafy(errstr, -1, META_HEAPDUP) : "empty module path");
 #else
 	zwarn("failed to load module: %s", name);
 #endif

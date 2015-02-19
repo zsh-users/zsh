@@ -1,3 +1,8 @@
+2015-02-19  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34568: Src/Module.c: use META_HEAPDUP when passing dlerror()
+	string to metafy()
+
 2015-02-19  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Config/version.mk: Mikael says it's 2015,
