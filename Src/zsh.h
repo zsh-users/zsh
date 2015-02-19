@@ -163,40 +163,42 @@ struct mathfunc {
 #define Hat		((char) 0x86)
 #define Star		((char) 0x87)
 #define Inpar		((char) 0x88)
-#define Outpar		((char) 0x89)
-#define Qstring	        ((char) 0x8a)
-#define Equals		((char) 0x8b)
-#define Bar	      	((char) 0x8c)
-#define Inbrace	        ((char) 0x8d)
-#define Outbrace	((char) 0x8e)
-#define Inbrack	        ((char) 0x8f)
-#define Outbrack	((char) 0x90)
-#define Tick		((char) 0x91)
-#define Inang		((char) 0x92)
-#define Outang		((char) 0x93)
-#define OutangProc	((char) 0x94)
-#define Quest		((char) 0x95)
-#define Tilde		((char) 0x96)
-#define Qtick		((char) 0x97)
-#define Comma		((char) 0x98)
+#define Inparmath	((char) 0x89)
+#define Outpar		((char) 0x8a)
+#define Outparmath	((char) 0x8b)
+#define Qstring	        ((char) 0x8c)
+#define Equals		((char) 0x8d)
+#define Bar	      	((char) 0x8e)
+#define Inbrace	        ((char) 0x8f)
+#define Outbrace	((char) 0x90)
+#define Inbrack	        ((char) 0x91)
+#define Outbrack	((char) 0x92)
+#define Tick		((char) 0x93)
+#define Inang		((char) 0x94)
+#define Outang		((char) 0x95)
+#define OutangProc	((char) 0x96)
+#define Quest		((char) 0x97)
+#define Tilde		((char) 0x98)
+#define Qtick		((char) 0x99)
+#define Comma		((char) 0x9a)
 /*
  * Null arguments: placeholders for single and double quotes
  * and backslashes.
  */
-#define Snull		((char) 0x99)
-#define Dnull		((char) 0x9a)
-#define Bnull		((char) 0x9b)
+#define Snull		((char) 0x9b)
+#define Dnull		((char) 0x9c)
+#define Bnull		((char) 0x9d)
 /*
  * Backslash which will be returned to "\" instead of being stripped
  * when we turn the string into a printable format.
  */
-#define Bnullkeep       ((char) 0x9c)
+#define Bnullkeep       ((char) 0x9e)
 /*
  * Null argument that does not correspond to any character.
  * This should be last as it does not appear in ztokens and
  * is used to initialise the IMETA type in inittyptab().
  */
-#define Nularg		((char) 0x9d)
+#define Nularg		((char) 0x9f)
 
 /*
  * Take care to update the use of IMETA appropriately when adding

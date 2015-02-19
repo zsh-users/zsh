@@ -353,3 +353,26 @@
   '
 0:Non-arithmetic subst with command subsitution parse from hell
 >yes, this one after case in subshell
+
+  print "a$((echo one subst)
+  (echo two subst))b"
+0:Another tricky case that is actually a command substitution
+>aone subst
+>two substb
+
+  print "x$((echo one frob); (echo two frob))y"
+0:Same on a single line
+>xone frob
+>two froby
+
+  # This case actually only works by accident: if it wasn't for the
+  # unbalanced parenthesis this would be a valid math substitution.
+  # Hence it's definitely not recommended code.  However, it does give
+  # the algorithm an extra check.
+  print $((case foo in
+  foo)
+  print Worked OK
+  ;;
+  esac))
+0:Would-be math expansion with extra parenthesis making it a cmd subst
+>Worked OK

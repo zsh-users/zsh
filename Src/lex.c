@@ -35,7 +35,7 @@
 /* tokens */
 
 /**/
-mod_export char ztokens[] = "#$^*()$=|{}[]`<>>?~`,'\"\\\\";
+mod_export char ztokens[] = "#$^*(())$=|{}[]`<>>?~`,'\"\\\\";
 
 /* parts of the current token */
 
@@ -473,8 +473,14 @@ add(int c)
 	}							      \
     }
 
+enum {
+    CMD_OR_MATH_CMD,
+    CMD_OR_MATH_MATH,
+    CMD_OR_MATH_ERR
+};
+
 /*
- * Return 1 for math, 0 for a command, 2 for an error.  If it couldn't be
+ * Return one of the above.  If it couldn't be
  * parsed as math, but there was no gross error, it's a command.
  */
 
@@ -496,13 +502,13 @@ cmd_or_math(int cs_type)
 	/* Successfully parsed, see if it was math */
 	c = hgetc();
 	if (c == ')')
-	    return 1; /* yes */
+	    return CMD_OR_MATH_MATH; /* yes */
 	hungetc(c);
 	lexstop = 0;
 	c = ')';
     } else if (lexstop) {
 	/* we haven't got anything to unget */
-	return 2;
+	return CMD_OR_MATH_ERR;
     }
     /* else unsuccessful: unget the whole thing */
     hungetc(c);
@@ -513,15 +519,15 @@ cmd_or_math(int cs_type)
 		ztokens[*lexbuf.ptr - Pound] : *lexbuf.ptr);
     }
     if (errflag)
-	return 2;
+	return CMD_OR_MATH_ERR;
     hungetc('(');
-    return errflag ? 2 : 0;
+    return errflag ? CMD_OR_MATH_ERR : CMD_OR_MATH_CMD;
 }
 
 
 /*
  * Parse either a $(( ... )) or a $(...)
- * Return 0 on success, 1 on failure.
+ * Return the same as cmd_or_math().
  */
 static int
 cmd_or_math_sub(void)
@@ -529,21 +535,23 @@ cmd_or_math_sub(void)
     int c = hgetc(), ret;
 
     if (c == '(') {
+	int lexpos = (int)(lexbuf.ptr - tokstr);
 	add(Inpar);
 	add('(');
-	if ((ret = cmd_or_math(CS_MATHSUBST)) == 1) {
+	if ((ret = cmd_or_math(CS_MATHSUBST)) == CMD_OR_MATH_MATH) {
+	    tokstr[lexpos] = Inparmath;
 	    add(')');
-	    return 0;
+	    return CMD_OR_MATH_MATH;
 	}
-	if (ret == 2)
-	    return 1;
+	if (ret == CMD_OR_MATH_ERR)
+	    return CMD_OR_MATH_ERR;
 	lexbuf.ptr -= 2;
 	lexbuf.len -= 2;
     } else {
 	hungetc(c);
 	lexstop = 0;
     }
-    return skipcomm();
+    return skipcomm() ? CMD_OR_MATH_ERR : CMD_OR_MATH_CMD;
 }
 
 /* Check whether we're looking at valid numeric globbing syntax      *
@@ -764,10 +772,10 @@ gettok(void)
 		lexbuf.ptr = tokstr = (char *)
 		    hcalloc(lexbuf.siz = LEX_HEAP_SIZE);
 		switch (cmd_or_math(CS_MATH)) {
-		case 1:
+		case CMD_OR_MATH_MATH:
 		    return DINPAR;
 
-		case 0:
+		case CMD_OR_MATH_CMD:
 		    /*
 		     * Not math, so we don't return the contents
 		     * as a string in this case.
@@ -987,12 +995,19 @@ gettokstr(int c, int sub)
 		c = Outbrack;
 	    } else if (e == '(') {
 		add(String);
-		c = cmd_or_math_sub();
-		if (c) {
+		switch (cmd_or_math_sub()) {
+		case CMD_OR_MATH_CMD:
+		    c = Outpar;
+		    break;
+
+		case CMD_OR_MATH_MATH:
+		    c = Outparmath;
+		    break;
+
+		default:
 		    peek = LEXERR;
 		    goto brk;
 		}
-		c = Outpar;
 	    } else {
 		if (e == '{') {
 		    add(c);
@@ -1400,8 +1415,19 @@ dquote_parse(char endchar, int sub)
 	    c = hgetc();
 	    if (c == '(') {
 		add(Qstring);
-		err = cmd_or_math_sub();
-		c = Outpar;
+		switch (cmd_or_math_sub()) {
+		case CMD_OR_MATH_CMD:
+		    c = Outpar;
+		    break;
+
+		case CMD_OR_MATH_MATH:
+		    c = Outparmath;
+		    break;
+
+		default:
+		    err = 1;
+		    break;
+		}
 	    } else if (c == '[') {
 		add(String);
 		add(Inbrack);

@@ -195,7 +195,7 @@ stringsubst(LinkList list, LinkNode node, int pf_flags, int asssub)
 
     while (!errflag && (c = *str)) {
 	if ((qt = c == Qstring) || c == String) {
-	    if ((c = str[1]) == Inpar) {
+	    if ((c = str[1]) == Inpar || c == Inparmath) {
 		if (!qt)
 		    list->list.flags |= LF_ARRAY;
 		str++;
@@ -258,6 +258,22 @@ stringsubst(LinkList list, LinkNode node, int pf_flags, int asssub)
 		skipparens(Inpar, Outpar, &str);
 #endif
 		str--;
+	    } else if (c == Inparmath) {
+		/* Math substitution of the form $((...)) */
+		str[-1] = '\0';
+		while (*str != Outparmath && *str)
+		    str++;
+		if (*str != Outparmath) {
+		    zerr("Failed to find end of math substitution");
+		    return NULL;
+		}
+		str[-1] = '\0';
+		if (isset(EXECOPT))
+		    str = arithsubst(str2 + 2, &str3, str+1);
+		else
+		    strncpy(str3, str2, 1);
+		setdata(node, (void *) str3);
+		continue;
 	    } else {
 		endchar = c;
 		*str = '\0';
@@ -266,16 +282,6 @@ stringsubst(LinkList list, LinkNode node, int pf_flags, int asssub)
 		    DPUTS(!*str, "BUG: parse error in command substitution");
 	    }
 	    *str++ = '\0';
-	    if (endchar == Outpar && str2[1] == '(' && str[-2] == ')') {
-		/* Math substitution of the form $((...)) */
-		str[-2] = '\0';
-		if (isset(EXECOPT))
-		    str = arithsubst(str2 + 2, &str3, str);
-		else
-		    strncpy(str3, str2, 1);
-		setdata(node, (void *) str3);
-		continue;
-	    }
 
 	    /* It is a command substitution, which will be parsed again   *
 	     * by the lexer, so we untokenize it first, but we cannot use *

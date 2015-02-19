@@ -1,3 +1,9 @@
+2015-02-19  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34570: Config/version.mk, Src/lex.c, Src/subst.c, Src/zsh.h,
+	Test/C01arith.ztst: mark arithmetic substitutions with tokens
+	so the substitution code knows what to do.
+
 2015-02-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34563: Src/input.c: Fix up memory allocation in 34560.
