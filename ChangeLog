@@ -1,5 +1,8 @@
 2015-02-19  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Config/version.mk: Mikael says it's 2015,
+	apparently.
+
 	* 34573: Src/subst.c: safer handling of failure to perform
 	command substitution.
 
