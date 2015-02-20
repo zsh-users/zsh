@@ -448,20 +448,30 @@
 0:read passes through invalid multibyte characters
 >0xC5
 
-  word=abcま          
+  word=abcま
   word[-1]=
   print $word
-  word=abcま 
+  word=abcま
   word[-2]=
   print $word
-  word=abcま 
+  word=abcま
   word[4]=d
   print $word
-  word=abcま 
+  word=abcま
   word[3]=not_c
-  print $word  
+  print $word
 0:assignment with negative indices
 >abc
 >abま
 >abcd
 >abnot_cま
+
+  # The following doesn't necessarily need UTF-8, but this gives
+  # us the full effect --- if we parse this wrongly the \xe9
+  # in combination with the tokenized input afterwards looks like a
+  # valid UTF-8 character.  But it isn't.
+  print $'$\xe9#``' >test_bad_param
+  (setopt nonomatch
+  . ./test_bad_param)
+127:Invalid parameter name with following tokenized input
+?./test_bad_param:1: command not found: $\M-i#

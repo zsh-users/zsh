@@ -4797,6 +4797,14 @@ mb_metacharlenconv_r(const char *s, wint_t *wcp, mbstate_t *mbsp)
 	    inchar = *++ptr ^ 32;
 	    DPUTS(!*ptr,
 		  "BUG: unexpected end of string in mb_metacharlen()\n");
+	} else if (imeta(*ptr)) {
+	    /*
+	     * As this is metafied input, this is a token --- this
+	     * can't be a part of the string.  It might be
+	     * something on the end of an unbracketed parameter
+	     * reference, for example.
+	     */
+	    break;
 	} else
 	    inchar = *ptr;
 	ptr++;
