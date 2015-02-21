@@ -2337,6 +2337,7 @@ addvars(Estate state, Wordcode pc, int addflags)
 void
 setunderscore(char *str)
 {
+    queue_signals();
     if (str && *str) {
 	int l = strlen(str) + 1, nl = (l + 31) & ~31;
 
@@ -2354,6 +2355,7 @@ setunderscore(char *str)
 	*zunderscore = '\0';
 	underscoreused = 1;
     }
+    unqueue_signals();
 }
 
 /* These describe the type of expansions that need to be done on the words
@@ -5319,7 +5321,7 @@ execsave(void)
 {
     struct execstack *es;
 
-    es = (struct execstack *) malloc(sizeof(struct execstack));
+    es = (struct execstack *) zalloc(sizeof(struct execstack));
     es->list_pipe_pid = list_pipe_pid;
     es->nowait = nowait;
     es->pline_level = pline_level;

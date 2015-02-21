@@ -1,3 +1,8 @@
+2015-02-20  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34590: Src/exec.c, Src/text.c: queue_signals() around more
+	scopes that manipulate global state
+
 2015-02-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34587: Src/utils.c, Test/D07multibyte.ztst: ensure multibyte

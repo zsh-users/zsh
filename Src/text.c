@@ -173,6 +173,8 @@ getpermtext(Eprog prog, Wordcode c, int start_indent)
 {
     struct estate s;
 
+    queue_signals();
+
     if (!c)
 	c = prog->prog;
 
@@ -193,6 +195,9 @@ getpermtext(Eprog prog, Wordcode c, int start_indent)
     *tptr = '\0';
     freeeprog(prog);		/* mark as unused */
     untokenize(tbuf);
+
+    unqueue_signals();
+
     return tbuf;
 }
 
@@ -205,6 +210,8 @@ getjobtext(Eprog prog, Wordcode c)
     static char jbuf[JOBTEXTSIZE];
 
     struct estate s;
+
+    queue_signals();
 
     if (!c)
 	c = prog->prog;
@@ -224,6 +231,9 @@ getjobtext(Eprog prog, Wordcode c)
     *tptr = '\0';
     freeeprog(prog);		/* mark as unused */
     untokenize(jbuf);
+
+    unqueue_signals();
+
     return jbuf;
 }
 
@@ -883,6 +893,9 @@ getredirs(LinkList redirs)
 	">", ">|", ">>", ">>|", "&>", "&>|", "&>>", "&>>|", "<>", "<",
 	"<<", "<<-", "<<<", "<&", ">&", NULL /* >&- */, "<", ">"
     };
+
+    queue_signals();
+
     taddchr(' ');
     for (n = firstnode(redirs); n; incnode(n)) {
 	Redir f = (Redir) getdata(n);
@@ -970,4 +983,6 @@ getredirs(LinkList redirs)
 	}
     }
     tptr--;
+
+    unqueue_signals();
 }
