@@ -1,3 +1,8 @@
+2015-02-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34604: Src/hist.c: Work around problem with changes in Meta
+	affecting history file when read in.
+
 2015-02-21  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34597: Doc/Zsh/mod_datetime.yo: Revise strftime description to

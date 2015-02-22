@@ -3377,11 +3377,45 @@ histsplitwords(char *lineptr, short **wordsp, int *nwordsp, int *nwordposp,
     char *start = lineptr;
 
     if (uselex) {
-	LinkList wordlist = bufferwords(NULL, lineptr, NULL,
-					LEXFLAGS_COMMENTS_KEEP);
+	LinkList wordlist;
 	LinkNode wordnode;
-	int nwords_max;
+	int nwords_max, remeta = 0;
+	char *ptr;
 
+	/*
+	 * Handle the special case that we're reading from an
+	 * old shell with fewer meta characters, so we need to
+	 * metafy some more.  (It's not clear why the history
+	 * file is metafied at all; some would say this is plain
+	 * stupid.  But we're stuck with it now without some
+	 * hairy workarounds for compatibility).
+	 *
+	 * This is rare so doesn't need to be that efficient; just
+	 * allocate space off the heap.
+	 *
+	 * Note that our it's currently believed this all comes out in
+	 * the wash in the non-uselex case owing to where unmetafication
+	 * and metafication happen.
+	 */
+	for (ptr = lineptr; *ptr; ptr++) {
+	    if (*ptr != Meta && imeta(*ptr))
+		remeta++;
+	}
+	if (remeta) {
+	    char *ptr2, *line2;
+	    ptr2 = line2 = (char *)zhalloc((ptr - lineptr) + remeta + 1);
+	    for (ptr = lineptr; *ptr; ptr++) {
+		if (*ptr != Meta && imeta(*ptr)) {
+		    *ptr2++ = Meta;
+		    *ptr2++ = *ptr ^ 32;
+		} else
+		    *ptr2++ = *ptr;
+	    }
+	    lineptr = line2;
+	}
+
+	wordlist = bufferwords(NULL, lineptr, NULL,
+			       LEXFLAGS_COMMENTS_KEEP);
 	nwords_max = 2 * countlinknodes(wordlist);
 	if (nwords_max > nwords) {
 	    *nwordsp = nwords = nwords_max;
