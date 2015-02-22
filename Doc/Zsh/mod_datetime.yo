@@ -8,25 +8,46 @@ findex(strftime)
 cindex(date string, printing)
 xitem(tt(strftime) [ tt(-s) var(scalar) ] var(format) var(epochtime) )
 item(tt(strftime) tt(-r) [ tt(-q) ] [ tt(-s) var(scalar) ] var(format) var(timestring) )(
-Output the date denoted by var(epochtime) in the var(format)
-specified.
+Output the date denoted by var(epochtime) in the var(format) specified.
+See manref(strftime)(3) for details.  The zsh extensions described in
+ifzman(the section EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
+ifnzman(noderef(Prompt Expansion)) are also available.
 
-With the option tt(-r) (reverse), use the format var(format) to parse the
-input string var(timestring) and output the number of seconds since the
-epoch at which the time occurred.  If no timezone is parsed, the current
-timezone is used; other parameters are set to zero if not present.  If
-var(timestring) does not match var(format) the command returns status 1; it
-will additionally print an error message unless the option tt(-q) (quiet)
-is given.  If var(timestring) matches var(format) but not all characters in
-var(timestring) were used, the conversion succeeds; however, a warning is
-issued unless the option tt(-q) is given.  The matching is implemented by
-the system function tt(strptime); see manref(strptime)(3).  This means that
-zsh format extensions are not available, however for reverse lookup they
-are not required.  If the function is not implemented, the command returns
-status 2 and (unless tt(-q) is given) prints a message.
+startitem()
+item(tt(-q))(
+Run quietly; suppress printing of all error messages described below.
+Errors for invalid var(epochtime) values are always printed.
+)
+item(tt(-r))(
+With the option tt(-r) (reverse), use var(format) to parse the input
+string var(timestring) and output the number of seconds since the epoch at
+which the time occurred.  The parsing is implemented by the system
+function tt(strptime); see manref(strptime)(3).  This means that zsh
+format extensions are not available, but for reverse lookup they are not
+required.
 
-If tt(-s) var(scalar) is given, assign the date string (or epoch time
-in seconds if tt(-r) is given) to var(scalar) instead of printing it.
+In most implementations of tt(strftime) any timezone in the
+var(timestring) is ignored and the local timezone declared by the tt(TZ)
+environment variable is used; other parameters are set to zero if not
+present.
+
+If var(timestring) does not match var(format) the command returns status 1
+and prints an error message.  If var(timestring) matches var(format) but
+not all characters in var(timestring) were used, the conversion succeeds
+but also prints an error message.
+
+If either of the system functions tt(strptime) or tt(mktime) is not
+available, status 2 is returned and an error message is printed.
+)
+item(tt(-s) var(scalar))(
+Assign the date string (or epoch time in seconds if tt(-r) is given) to
+var(scalar) instead of printing it.
+)
+enditem()
+
+Note that depending on the system's declared integral time type,
+tt(strftime) may produce incorrect results for epoch times greater than
+2147483647 which corresponds to 2038-01-19 03:14:07 +0000.
 )
 enditem()
 

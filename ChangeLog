@@ -1,3 +1,8 @@
+2015-02-21  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34597: Doc/Zsh/mod_datetime.yo: Revise strftime description to
+	correctly explain timezone handling and note signed int rollover
+
 2015-02-20  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34590: Src/exec.c, Src/text.c: queue_signals() around more
