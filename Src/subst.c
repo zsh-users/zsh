@@ -2217,12 +2217,28 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
      */
     idbeg = s;
     if ((subexp = (inbrace && s[-1] && isstring(*s) &&
-		   (s[1] == Inbrace || s[1] == Inpar)))) {
+		   (s[1] == Inbrace || s[1] == Inpar || s[1] == Inparmath)))) {
 	int sav;
 	int quoted = *s == Qstring;
+	int outtok;
 
 	val = s++;
-	skipparens(*s, *s == Inpar ? Outpar : Outbrace, &s);
+	switch (*s) {
+	case Inbrace:
+	    outtok = Outbrace;
+	    break;
+	case Inpar:
+	    outtok = Outpar;
+	    break;
+	case Inparmath:
+	    outtok = Outparmath;
+	    break;
+	default:
+	    /* "Can't Happen" (TM) */
+	    DPUTS(1, "Nested substitution: This Can't Happen (TM)");
+	    return NULL;
+	}
+	skipparens(*s, outtok, &s);
 	sav = *s;
 	*s = 0;
 	/*

@@ -300,6 +300,7 @@
   print $(( 0b2 ))
 1:Binary numbers don't tend to have 2's in
 ?(eval):1: bad math expression: operator expected at `2 '
+# ` for emacs shell mode
 
   integer varassi
   print $(( varassi = 5.5 / 2.0 ))
@@ -376,3 +377,10 @@
   esac))
 0:Would-be math expansion with extra parenthesis making it a cmd subst
 >Worked OK
+
+  (setopt extendedglob
+  set -- 32.463
+  print ${$(( $1 * 100 ))%%.[0-9]#})
+0:Arithmetic substitution nested in parameter substitution
+>3246
+ 

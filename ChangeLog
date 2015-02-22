@@ -1,5 +1,8 @@
 2015-02-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 34606: Src/subst.c, Test/C01arith.ztst: fix up arithmetic
+	nested in parameter substitution.
+
 	* 34604: Src/hist.c: Work around problem with changes in Meta
 	affecting history file when read in.
 
