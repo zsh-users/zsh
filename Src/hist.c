@@ -2593,8 +2593,6 @@ readhistfile(char *fn, int err, int readflags)
 	    start = pt;
 	    uselex = isset(HISTLEXWORDS) && !(readflags & HFILE_FAST);
 	    histsplitwords(pt, &words, &nwords, &nwordpos, uselex);
-	    if (uselex)
-		freeheap();
 
 	    he->nwords = nwordpos/2;
 	    if (he->nwords) {
@@ -2607,6 +2605,12 @@ readhistfile(char *fn, int err, int readflags)
 		freehistnode(&he->node);
 		curhist--;
 	    }
+	    /*
+	     * Do this last out of paranoia in case use of
+	     * heap is disguised...
+	     */
+	    if (uselex || remeta)
+		freeheap();
 	}
 	if (start && readflags & HFILE_USE_OPTIONS) {
 	    zsfree(lasthist.text);

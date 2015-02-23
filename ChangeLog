@@ -1,3 +1,7 @@
+2015-02-23  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34623: Src/hist.c: free history more often in previous case.
+
 2015-02-23  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 34615 + 34619: Src/hist.c: Remeta one frame earlier
