@@ -1,3 +1,7 @@
+2015-02-23  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 34615 + 34619: Src/hist.c: Remeta one frame earlier
+
 2015-02-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34606: Src/subst.c, Test/C01arith.ztst: fix up arithmetic
