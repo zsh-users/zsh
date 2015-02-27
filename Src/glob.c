@@ -708,7 +708,8 @@ parsecomplist(char *instr)
 	    }
 	    l1 = (Complist) zhalloc(sizeof *l1);
 	    l1->pat = p1;
-	    l1->closure = 1 + pdflag;
+	    /* special case (/)# to avoid infinite recursion */
+	    l1->closure = (*((char *)p1 + p1->startoff)) ? 1 + pdflag : 0;
 	    l1->follow = 0;
 	    l1->next = parsecomplist(instr);
 	    return (l1->pat) ? l1 : NULL;

@@ -1,3 +1,7 @@
+2015-02-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34634: Src/glob.c: avoid infinite recursion on (/)# extendedglob
+
 2015-02-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 34588: Completion/Unix/Command/_user_admin: Complete
