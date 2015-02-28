@@ -1,3 +1,7 @@
+2015-02-28  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* users/19934: Doc/Zsh/params.yo: document %D{...} for WATCHFMT
+
 2015-02-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34634: Src/glob.c: avoid infinite recursion on (/)# extendedglob
