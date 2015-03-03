@@ -1,3 +1,8 @@
+2015-03-03  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Matthew Martin: 34637: Completion/BSD/Command/_mixerctl:
+	new completion.
+
 2015-02-28  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/19934: Doc/Zsh/params.yo: document %D{...} for WATCHFMT
