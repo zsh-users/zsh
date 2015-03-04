@@ -2567,6 +2567,8 @@ AH_TEMPLATE([MULTIBYTE_SUPPORT],
 [Define to 1 if you want support for multibyte character sets.])
 AH_TEMPLATE([BROKEN_WCWIDTH],
 [Define to 1 if the wcwidth() function is present but broken.])
+AH_TEMPLATE([BROKEN_ISPRINT],
+[Define to 1 if the isprint() function is broken under UTF-8 locale.])
 if test x$zsh_cv_c_unicode_support = xyes; then
   AC_DEFINE(MULTIBYTE_SUPPORT)
 
@@ -2621,6 +2623,38 @@ if test x$zsh_cv_c_unicode_support = xyes; then
   zsh_cv_c_broken_wcwidth=no)])
   if test x$zsh_cv_c_broken_wcwidth = xyes; then
     AC_DEFINE(BROKEN_WCWIDTH)
+  fi
+
+  dnl Check if isprint() behaves correctly under UTF-8 locale.
+  dnl On some platform (maybe only on Mac OS X), isprint() returns
+  dnl true for all characters in the range from 0xa0 to 0xff if
+  dnl called under UTF-8 locale.
+  [locale_prog='char *my_locales[] = {
+  "en_US.UTF-8", "en_GB.UTF-8", "en.UTF-8", '
+  locale_prog="$locale_prog"`locale -a 2>/dev/null | \
+    sed -e 's/utf8/UTF-8/' | grep UTF-8 | \
+    while read line; do echo " \"$line\","; done;`
+  locale_prog="$locale_prog 0 };
+  #include <locale.h>
+  #include <ctype.h>
+
+  int main() {
+    char **localep;
+    for (localep = my_locales; *localep; localep++)
+      if (setlocale(LC_ALL, *localep) && isprint(0xa0))
+	return 0;
+    return 1;
+  }
+  "]
+
+  AC_CACHE_CHECK(if the isprint() function is broken,
+  zsh_cv_c_broken_isprint,
+  [AC_TRY_RUN([$locale_prog],
+  zsh_cv_c_broken_isprint=yes,
+  zsh_cv_c_broken_isprint=no,
+  zsh_cv_c_broken_isprint=no)])
+  if test x$zsh_cv_c_broken_isprint = xyes; then
+    AC_DEFINE(BROKEN_ISPRINT)
   fi
 fi
 

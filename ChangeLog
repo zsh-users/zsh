@@ -1,3 +1,8 @@
+2015-03-05  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 34636: Src/compat.c, Src/pattern.c, Src/utils.c, Src/ztype.c,
+	configure.ac: replace broken isprint() on Mac OS X.
+
 2015-03-04  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34641: Src/lex.c, Test/A02alias.ztst: make it possible to

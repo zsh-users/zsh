@@ -75,3 +75,9 @@
 #define WC_ZISTYPE(X,Y)	zistype((X),(Y))
 #define WC_ISPRINT(X)	isprint(X)
 #endif
+
+#if defined(__APPLE__) && defined(BROKEN_ISPRINT)
+#define ISPRINT(c)  isprint_ascii(c)
+#else
+#define ISPRINT(c)  isprint(c)
+#endif

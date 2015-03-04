@@ -414,7 +414,7 @@ nicechar(int c)
     static char buf[6];
     char *s = buf;
     c &= 0xff;
-    if (isprint(c))
+    if (ISPRINT(c))
 	goto done;
     if (c & 0x80) {
 	if (isset(PRINTEIGHTBIT))
@@ -423,7 +423,7 @@ nicechar(int c)
 	*s++ = 'M';
 	*s++ = '-';
 	c &= 0x7f;
-	if(isprint(c))
+	if(ISPRINT(c))
 	    goto done;
     }
     if (c == 0x7f) {

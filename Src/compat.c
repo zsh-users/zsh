@@ -951,3 +951,18 @@ int mk_wcswidth_cjk(const wchar_t *pwcs, size_t n)
 /**/
 #endif /* BROKEN_WCWIDTH && (__STDC_ISO_10646__ || __APPLE__) */
 
+/**/
+#if defined(__APPLE__) && defined(BROKEN_ISPRINT)
+
+/**/
+int
+isprint_ascii(int c)
+{
+    if (!strcmp(nl_langinfo(CODESET), "UTF-8"))
+	return (c >= 0x20 && c <= 0x7e);
+    else
+	return isprint(c);
+}
+
+/**/
+#endif /* __APPLE__ && BROKEN_ISPRINT */
