@@ -1,3 +1,8 @@
+2015-03-04  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Daniel Shahaf: 34640: Doc/Zsh/compsys.yo: clarify
+	documentation for _guard function.
+
 2015-03-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Matthew Martin: 34637: Completion/BSD/Command/_mixerctl:

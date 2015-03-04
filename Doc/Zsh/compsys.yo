@@ -4278,12 +4278,12 @@ option `tt(-)tt(-help)'.
 )
 findex(_guard)
 item(tt(_guard) [ var(options) ] var(pattern descr))(
-This function is intended to be used in the var(action) for
-the specifications passed to tt(_arguments) and similar functions.  It
-returns immediately with a non-zero return status if
-the string to be completed does not match the var(pattern).  If the
-pattern matches, the var(descr) is displayed; the function then returns
-status zero if the word to complete is not empty, non-zero otherwise.
+This function displays var(descr) if var(pattern) matches the string to
+be completed.  It is intended to be used in the var(action) for the
+specifications passed to tt(_arguments) and similar functions.
+
+The return status is zero if the message was displayed and the word to
+complete is not empty, and non-zero otherwise.
 
 The var(pattern) may be preceded by any of the options understood by
 tt(compadd) that are passed down from tt(_description), namely tt(-M),
