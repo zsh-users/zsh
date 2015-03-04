@@ -1,5 +1,8 @@
 2015-03-04  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34641: Src/lex.c, Test/A02alias.ztst: make it possible to
+	alias tokens.
+
 	* Daniel Shahaf: 34640: Doc/Zsh/compsys.yo: clarify
 	documentation for _guard function.
 

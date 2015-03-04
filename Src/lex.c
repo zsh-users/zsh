@@ -1728,13 +1728,48 @@ gotword(void)
     }
 }
 
+/* Check if current lex text matches an alias: 1 if so, else 0 */
+
+static int
+checkalias(void)
+{
+    Alias an;
+
+    if (!noaliases && isset(ALIASESOPT) &&
+	(!isset(POSIXALIASES) ||
+	 !reswdtab->getnode(reswdtab, zshlextext))) {
+	char *suf;
+
+	an = (Alias) aliastab->getnode(aliastab, zshlextext);
+	if (an && !an->inuse &&
+	    ((an->node.flags & ALIAS_GLOBAL) || incmdpos || inalmore)) {
+	    inpush(an->text, INP_ALIAS, an);
+	    if (an->text[0] == ' ' && !(an->node.flags & ALIAS_GLOBAL))
+		aliasspaceflag = 1;
+	    lexstop = 0;
+	    return 1;
+	}
+	if ((suf = strrchr(zshlextext, '.')) && suf[1] &&
+	    suf > zshlextext && suf[-1] != Meta &&
+	    (an = (Alias)sufaliastab->getnode(sufaliastab, suf+1)) &&
+	    !an->inuse && incmdpos) {
+	    inpush(dupstring(zshlextext), INP_ALIAS, NULL);
+	    inpush(" ", INP_ALIAS, NULL);
+	    inpush(an->text, INP_ALIAS, an);
+	    lexstop = 0;
+	    return 1;
+	}
+    }
+
+    return 0;
+}
+
 /* expand aliases and reserved words */
 
 /**/
 int
 exalias(void)
 {
-    Alias an;
     Reswd rw;
 
     hwend();
@@ -1746,7 +1781,7 @@ exalias(void)
     if (!tokstr) {
 	zshlextext = tokstrings[tok];
 
-	return 0;
+	return checkalias();
     } else {
 	VARARR(char, copy, (strlen(tokstr) + 1));
 
@@ -1772,34 +1807,10 @@ exalias(void)
 
 	if (tok == STRING) {
 	    /* Check for an alias */
-	    if (!noaliases && isset(ALIASESOPT) &&
-		(!isset(POSIXALIASES) ||
-		 !reswdtab->getnode(reswdtab, zshlextext))) {
-		char *suf;
-
-		an = (Alias) aliastab->getnode(aliastab, zshlextext);
-		if (an && !an->inuse &&
-		    ((an->node.flags & ALIAS_GLOBAL) || incmdpos || inalmore)) {
-		    inpush(an->text, INP_ALIAS, an);
-		    if (an->text[0] == ' ' && !(an->node.flags & ALIAS_GLOBAL))
-			aliasspaceflag = 1;
-		    lexstop = 0;
-		    if (zshlextext == copy)
-			zshlextext = tokstr;
-		    return 1;
-		}
-		if ((suf = strrchr(zshlextext, '.')) && suf[1] &&
-		    suf > zshlextext && suf[-1] != Meta &&
-		    (an = (Alias)sufaliastab->getnode(sufaliastab, suf+1)) &&
-		    !an->inuse && incmdpos) {
-		    inpush(dupstring(zshlextext), INP_ALIAS, NULL);
-		    inpush(" ", INP_ALIAS, NULL);
-		    inpush(an->text, INP_ALIAS, an);
-		    lexstop = 0;
-		    if (zshlextext == copy)
-			zshlextext = tokstr;
-		    return 1;
-		}
+	    if (checkalias()) {
+		if (zshlextext == copy)
+		    zshlextext = tokstr;
+		return 1;
 	    }
 
 	    /* Then check for a reserved word */
