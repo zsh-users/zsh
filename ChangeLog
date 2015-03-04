@@ -1,3 +1,8 @@
+2015-03-05  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Daniel Shahaf: 34647: Completion/Zsh/Function/_add-zsh-hook:
+	new completion.
+
 2015-03-05  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 34636: Src/compat.c, Src/pattern.c, Src/utils.c, Src/ztype.c,
