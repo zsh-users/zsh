@@ -32,6 +32,8 @@
 #    complete a RPM package file name
 #  package_or_file
 #    the previous two together
+#  file_or_package
+#    an absolute path to any file (not a package file) or a package
 #  tags
 #    complete a tag name
 #  capability
@@ -66,7 +68,7 @@ _rpm () {
     {-g,--group}'[query packages in one of specified groups]'
     --fileid --hdrid --pkgid --tid --querybynumber
     '--triggeredby'
-    '--whatprovides'
+    '--whatprovides:*:provided file:->file_or_package'
     '--whatrequires'
   )
   sopts=${selectopts%\[*}\ --specfile
@@ -245,6 +247,13 @@ _rpm () {
     ;;
     package_or_file)
       state=package_file
+      ;;
+    file_or_package)
+      if [[ $PREFIX = /* ]]; then
+	_wanted files expl 'file' _files
+      else
+	state=package
+      fi
       ;;
     package)
       if ( [[ ${+_rpms} -eq 0 ]] || _cache_invalid RPMs ) &&
