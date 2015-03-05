@@ -42,3 +42,18 @@
   cat <(echo foo | cat)
 0:Alias expansion works at the end of parsed strings
 >foo
+
+  alias '&&=(){ return $?; } && '
+  alias not_the_print_command=print
+  eval 'print This is output
+  && print And so is this
+  && { print And this too; false; }
+  && print But not this
+  && print Nor this
+  true
+  && not_the_print_command And aliases are expanded'
+0:We can now alias special tokens.  Woo hoo.
+>This is output
+>And so is this
+>And this too
+>And aliases are expanded
