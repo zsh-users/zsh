@@ -1,5 +1,7 @@
 2015-03-05  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34651: Src/lex.c: avoid core dump if no lexical token.
+
 	* Daniel Shahaf: 34647: Completion/Zsh/Function/_add-zsh-hook:
 	new completion.
 

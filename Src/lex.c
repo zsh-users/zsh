@@ -1735,6 +1735,9 @@ checkalias(void)
 {
     Alias an;
 
+    if (!zshlextext)
+	return 0;
+
     if (!noaliases && isset(ALIASESOPT) &&
 	(!isset(POSIXALIASES) ||
 	 !reswdtab->getnode(reswdtab, zshlextext))) {
