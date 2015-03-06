@@ -1094,10 +1094,13 @@ item(  [ tt(-R) [ tt(-en) ]] [ var(arg) ... ])(
 With the `tt(-f)' option the arguments are printed as described by tt(printf).
 With no flags or with the flag `tt(-)', the arguments are printed on
 the standard output as described by tt(echo), with the following differences:
-the escape sequence `tt(\M-)var(x)' metafies the character
+the escape sequence `tt(\M-)var(x)' (or `tt(\M)var(x)') metafies the character
 var(x) (sets the highest bit),
-`tt(\C-)var(x)' produces a control character (`tt(\C-@)' and `tt(\C-?)' give the
-characters NUL and delete), and `tt(\E)' is a synonym for `tt(\e)'.
+`tt(\C-)var(x)' (or `tt(\C)var(x)') produces a control character
+(`tt(\C-@)' and `tt(\C-?)' give the characters NULL and delete),
+a character code in octal is represented by `tt(\)var(NNN)'
+(instead of `tt(\0)var(NNN)'),
+and `tt(\E)' is a synonym for `tt(\e)'.
 Finally, if not in an escape
 sequence, `tt(\)' escapes the following character and is not printed.
 

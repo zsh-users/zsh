@@ -1,3 +1,8 @@
+2015-03-05  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 34643: Doc/Zsh/builtins.yo, Doc/Zsh/zle.yo: clarify which
+	escape sequences are recognized by print and bindkey builtins.
+
 2015-03-06  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34653: Doc/Zsh/zle.yo, Src/Zle/zle_main.c: move aborted vared
