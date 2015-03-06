@@ -187,7 +187,17 @@ from the end of the array tt(foo), and
 Subscripting may also be performed on non-array values, in which
 case the subscripts specify a substring to be extracted.
 For example, if tt(FOO) is set to `tt(foobar)', then
-`tt(echo $FOO[2,5])' prints `tt(ooba)'.
+`tt(echo $FOO[2,5])' prints `tt(ooba)'.  Note that
+some forms of subscripting described below perform pattern matching,
+and in that case the substring extends from the start of the match
+of the first subscript to the end of the match of the second
+subscript.  For example,
+
+example(string="abcdefghijklm"
+print ${string[+LPAR()r+RPAR()d?,+LPAR()r+RPAR()h?]})
+
+prints `tt(defghi)'.  This is an obvious generalisation of the
+rule for single-character matches.
 
 subsect(Array Element Assignment)
 

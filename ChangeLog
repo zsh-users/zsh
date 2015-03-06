@@ -1,3 +1,8 @@
+2015-03-06  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34657: Doc/Zsh/params.yo: document the effect of substring
+	subscripting better.
+
 2015-03-05  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34654: Completion/Redhat/Command/_rpm: complete absolute file
