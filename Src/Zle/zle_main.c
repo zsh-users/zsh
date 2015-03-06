@@ -1253,7 +1253,9 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     zlecore();
 
     if (errflag)
-	setsparam("ZLE_LINE_ABORTED", zlegetline(NULL, NULL));
+	setsparam((zlecontext == ZLCON_VARED) ?
+		  "ZLE_VARED_ABORTED" :
+		  "ZLE_LINE_ABORTED", zlegetline(NULL, NULL));
 
     if (done && !exit_pending && !errflag)
 	zlecallhook(finish, NULL);

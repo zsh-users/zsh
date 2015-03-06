@@ -2223,7 +2223,8 @@ item(tt(send-break) (^G ESC-^G) (unbound) (unbound))(
 Abort the current editor function, e.g. tt(execute-named-command), or the
 editor itself, e.g. if you are in tt(vared). Otherwise abort the parsing of
 the current line; in this case the aborted line is available in the shell
-variable tt(ZLE_LINE_ABORTED).
+variable tt(ZLE_LINE_ABORTED).  If the editor is aborted from within
+tt(vared), the variable tt(ZLE_VARED_ABORTED) is set.
 )
 tindex(run-help)
 item(tt(run-help) (ESC-H ESC-h) (unbound) (unbound))(

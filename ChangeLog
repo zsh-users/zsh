@@ -1,5 +1,8 @@
 2015-03-06  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34653: Doc/Zsh/zle.yo, Src/Zle/zle_main.c: move aborted vared
+	lines to ZLE_VARED_ABORTED.
+
 	* 34657: Doc/Zsh/params.yo: document the effect of substring
 	subscripting better.
 
