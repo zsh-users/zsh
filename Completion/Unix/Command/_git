@@ -647,8 +647,8 @@ _git-commit () {
   # TODO: --interactive isn't explicitly listed in the documentation.
   _arguments -w -S -s \
     '(-a --all --interactive -o --only -i --include *)'{-a,--all}'[stage all modified and deleted paths]' \
-    '--fixup=[construct a commit message for use with rebase --autosquash]:commit to be amended:' \
-    '--squash=[construct a commit message for use with rebase --autosquash]:commit to be amended:' \
+    '--fixup=[construct a commit message for use with rebase --autosquash]:commit to be amended:__git_commits' \
+    '--squash=[construct a commit message for use with rebase --autosquash]:commit to be amended:__git_commits' \
     $reset_author_opt \
     '(        --porcelain --dry-run)--short[output dry run in short format]' \
     '(--short             --dry-run)--porcelain[output dry run in porcelain-ready format]' \
@@ -5631,7 +5631,13 @@ __git_heads () {
 
 (( $+functions[__git_commit_objects] )) ||
 __git_commit_objects () {
-  _guard '[[:xdigit:]](#c,40)' 'commit object name'
+  local gitdir expl start
+  declare -a commits
+
+  : ${(A)commits::=${(f)"$(_call_program commits git --no-pager log -20 --format='%h:%s')"}}
+  __git_command_successful $pipestatus || return 1
+
+  _describe -t commits 'commit object name' commits
 }
 
 (( $+functions[__git_blob_objects] )) ||

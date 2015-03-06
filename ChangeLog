@@ -1,3 +1,8 @@
+2015-03-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 34638: Completion/Unix/Command/_git: 34638 with tweaks:
+	git completion: complete commit hashes and --fixup
+
 2015-03-05  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 34643: Doc/Zsh/builtins.yo, Doc/Zsh/zle.yo: clarify which
