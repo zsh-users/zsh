@@ -5,6 +5,7 @@
 #	- allow negated calls (e.g. -e!write)
 _sys_calls () {
 	local expl
+	local -a sys_calls
 
 	sys_calls=(_llseek _newselect _sysctl accept access acct
 		adjtimex afs_syscall alarm bdflush bind break brk cacheflush
