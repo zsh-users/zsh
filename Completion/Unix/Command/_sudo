@@ -1,5 +1,7 @@
 #compdef sudo sudoedit
 
+setopt localoptions extended_glob
+
 local environ e
 local -a args
 
@@ -29,7 +31,12 @@ args=(
   '(-v --validate)'{-v,--validate}"[update user's timestamp without running a command]"
 )
 
-if [[ $service = sudoedit || -n ${words[(r)-e]} ]]; then
+# Does -e appears before the first word that doesn't begin with a hyphen?
+# The way (i) works in subscripts, the test will always be true if all the
+# words begin with a hyphen.
+# 
+# TODO: use _arguments' $opt_args to detect the cases '-u jrandom -e' and '-Ae'
+if [[ $service = sudoedit ]] || (( $words[(i)-e] < $words[(i)^(*sudo|-[^-]*)] ))  ; then
   args=( -A "-*" $args '!(-V --version -h --help)-e' '*:file:_files' )
 else
   args+=(
