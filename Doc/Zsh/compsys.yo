@@ -4140,7 +4140,7 @@ tt(compadd) when generating matches from the style value, or to
 the functions for the fields if they are called.
 )
 findex(_describe)
-item(tt(_describe) [ tt(-oO) | tt(-t) var(tag) ] var(descr) var(name1) [ var(name2) ] var(opts) ... tt(-)tt(-) ...)(
+item(tt(_describe) [tt(-12JVx)] [ tt(-oO) | tt(-t) var(tag) ] var(descr) var(name1) [ var(name2) ] var(opts) ... tt(-)tt(-) ...)(
 This function associates completions with descriptions.
 Multiple groups separated by tt(-)tt(-) can be supplied, potentially with
 different completion options var(opts).
@@ -4170,6 +4170,9 @@ tt(prefix-needed) style.
 
 With the tt(-t) option a var(tag) can be specified.  The default is
 `tt(values)' or, if the tt(-o) option is given, `tt(options)'.
+
+The options tt(-1), tt(-2), tt(-J), tt(-V), tt(-x) are passed to
+tt(_next_label).
 
 If selected by the tt(list-grouped) style, strings with the same
 description will appear together in the list.

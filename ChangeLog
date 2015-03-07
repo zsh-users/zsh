@@ -1,5 +1,9 @@
 2015-03-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 34671 plus tweaks: Completion/Base/Utility/_describe
+	Completion/Unix/Command/_git Doc/Zsh/compsys.yo: Add -1 -2 -J -V
+	-x to _describe, use them to sort 'git --fixup' hash completions
+
 	* 34671: Completion/Unix/Command/_git: git completion: only
 	offer recent commits' tags/heads for --fixup
 

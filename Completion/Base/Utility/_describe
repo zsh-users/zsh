@@ -6,23 +6,28 @@ local _opt _expl _tmpm _tmpd _mlen _noprefix
 local _type=values _descr _ret=1 _showd _nm _hide _args _grp _sep
 local csl="$compstate[list]" csl2
 local _oargv _argv _new _strs _mats _opts _i _try=0
+local OPTIND OPTARG
+local -a _jvx12
 
 # Get the option.
 
-if [[ "$1" = -o ]]; then
-  _type=options
-  shift
-elif [[ "$1" = -O ]]; then
-  _type=options
-  _noprefix=1
-  shift
-elif [[ "$1" = -t ]]; then
-  _type="$2"
-  shift 2
-elif [[ "$1" = -t* ]]; then
-  _type="${1[3,-1]}"
-  shift
-fi
+while getopts "oOt:12JVx" _opt; do
+  case $_opt in
+    (o)
+      _type=options;;
+    (O)
+      _type=options
+      _noprefix=1
+      ;;
+    (t)
+      _type="$OPTARG"
+      ;;
+    (1|2|J|V|x)
+      _jvx12+=(-$_opt)
+  esac
+done
+shift $(( OPTIND - 1 ))
+unset _opt
 
 [[ "$_type$_noprefix" = options && ! -prefix [-+]* ]] && \
     zstyle -T ":completion:${curcontext}:options" prefix-needed &&
@@ -53,7 +58,7 @@ fi
 
 _tags "$_type"
 while _tags; do
-  while _next_label "$_type" _expl "$_descr"; do
+  while _next_label $_jvx12 "$_type" _expl "$_descr"; do
 
     if (( $#_grp )); then
   
