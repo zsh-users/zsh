@@ -647,8 +647,8 @@ _git-commit () {
   # TODO: --interactive isn't explicitly listed in the documentation.
   _arguments -w -S -s \
     '(-a --all --interactive -o --only -i --include *)'{-a,--all}'[stage all modified and deleted paths]' \
-    '--fixup=[construct a commit message for use with rebase --autosquash]:commit to be amended:__git_commits' \
-    '--squash=[construct a commit message for use with rebase --autosquash]:commit to be amended:__git_commits' \
+    '--fixup=[construct a commit message for use with rebase --autosquash]:commit to be amended:__git_recent_commits' \
+    '--squash=[construct a commit message for use with rebase --autosquash]:commit to be amended:__git_recent_commits' \
     $reset_author_opt \
     '(        --porcelain --dry-run)--short[output dry run in short format]' \
     '(--short             --dry-run)--porcelain[output dry run in porcelain-ready format]' \
@@ -5638,6 +5638,38 @@ __git_commit_objects () {
   __git_command_successful $pipestatus || return 1
 
   _describe -t commits 'commit object name' commits
+}
+
+(( $+functions[__git_recent_commits] )) ||
+__git_recent_commits () {
+  local gitdir expl start
+  declare -a descr tags heads commits
+  local i j k
+
+  # Careful: most %d will expand to the empty string.  Quote properly!
+  : "${(A)commits::=${(@f)"$(_call_program commits git --no-pager log -20 --format='%h%n%d%n%s')"}}"
+  __git_command_successful $pipestatus || return 1
+
+  for i j k in "$commits[@]" ; do
+    descr+=($i:$k)
+    j=${${j# \(}%\)} # strip leading ' (' and trailing ')'
+    for j in ${(s:, :)j}; do
+      if [[ $j == 'tag: '* ]] ; then
+        tags+=( ${j#tag: } )
+      else
+        heads+=( $j )
+      fi
+    done
+  done
+
+  ret=1
+  # Resetting expl to avoid it 'leaking' from one line to the next.
+  expl=()
+  _wanted commit-tags expl 'commit tag' compadd "$@" -a - tags && ret=0
+  expl=()
+  _wanted heads expl 'head' compadd "$@" -a - heads && ret=0
+  expl=()
+  _describe -t commits 'commit object name' descr && ret=0
 }
 
 (( $+functions[__git_blob_objects] )) ||

@@ -1,3 +1,8 @@
+2015-03-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 34671: Completion/Unix/Command/_git: git completion: only
+	offer recent commits' tags/heads for --fixup
+
 2015-03-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34712: Doc/Zsh/grammar.yo: clarify words that may be aliased
