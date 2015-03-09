@@ -205,6 +205,7 @@ then
 elif [[ -d "${gitdir}/rebase-merge" ]]; then
     patchdir="${gitdir}/rebase-merge"
     local p
+    [[ -f "${patchdir}/done" ]] &&
     for p in ${(f)"$(< "${patchdir}/done")"}; do
         # remove action
         git_patches_applied+=("${${(s: :)p}[2,-1]}")

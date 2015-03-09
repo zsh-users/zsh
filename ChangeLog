@@ -1,5 +1,8 @@
 2015-03-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 34673: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: Fix error message when rebase hasn't started
+
 	* 34693: Completion/Unix/Command/_sudo: sudo completion: Don't
 	false positive 'sudo -e' detection
 
