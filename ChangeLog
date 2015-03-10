@@ -1,3 +1,8 @@
+2015-03-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/19985: Doc/Zsh/params.yo: improve doc of substring
+	subscripting further.
+
 2015-03-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 34673: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:

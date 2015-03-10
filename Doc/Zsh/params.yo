@@ -197,7 +197,17 @@ example(string="abcdefghijklm"
 print ${string[+LPAR()r+RPAR()d?,+LPAR()r+RPAR()h?]})
 
 prints `tt(defghi)'.  This is an obvious generalisation of the
-rule for single-character matches.
+rule for single-character matches.  For a single subscript,
+only a single character is referenced (not the range of characters
+covered by the match).
+
+Note that in substring operations the second subscript is handled
+differently by the tt(r) and tt(R) subscript flags: the former takes the
+shortest match as the length and the latter the longest match.  Hence
+in the former case a tt(*) at the end is redundant while in
+the latter case it matches the whole remainder of the string.  This
+does not affect the result of the single subscript case as here the
+length of the match is irrelevant.
 
 subsect(Array Element Assignment)
 
