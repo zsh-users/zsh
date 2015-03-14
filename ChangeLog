@@ -1,3 +1,8 @@
+2015-03-15  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: Completion/Zsh/Command/_zattr: Fix completion of
+	attributes for files with pattern characters.
+
 2015-03-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/19985: Doc/Zsh/params.yo: improve doc of substring

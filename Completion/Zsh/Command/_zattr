@@ -28,7 +28,7 @@ _arguments \
 esac && ret=0
 
 if [[ $state = attrs ]]; then
-  zlistattr ${~${(Q)line[1]}} REPLY 2> /dev/null
+  zlistattr ${(Q)${~line[1]}} REPLY 2> /dev/null
   _wanted -C "$context[1]" attrs expl 'attribute' compadd -a REPLY && ret=0
 fi
 
