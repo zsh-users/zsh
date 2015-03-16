@@ -532,18 +532,34 @@ characters up to a newline to be ignored.
 texinode(Aliasing)(Quoting)(Comments)(Shell Grammar)
 sect(Aliasing)
 cindex(aliasing)
-Every token in the shell input is checked to see if there
+Every eligible em(word) in the shell input is checked to see if there
 is an alias defined for it.
 If so, it is replaced by the text of the alias if it is in command
 position (if it could be the first word of a simple command),
 or if the alias is global.
-If the text ends with a space, the next word in the shell input
+If the replacement text ends with a space, the next word in the shell input
 is treated as though it were in command position for purposes of alias
 expansion.
 findex(alias, use of)
 cindex(aliases, global)
 An alias is defined using the tt(alias) builtin; global aliases
 may be defined using the tt(-g) option to that builtin.
+
+A em(word) is defined as:
+
+startitemize()
+itemiz(Any plain string or glob pattern)
+itemiz(Any quoted string, using any quoting method (note that the quotes
+must be part of the alias definition for this to be eligible))
+itemiz(Any parameter reference or command substitution)
+itemiz(Any series of the foregoing, concatenated without whitespace or
+other tokens between them)
+itemiz(Any reserved word (tt(case), tt(do), tt(else), etc.))
+enditemize()
+
+Reserved words are not eligible for aliasing when tt(POSIX_ALIASES) is set.
+The tt(alias) builtin does not reject ineligible aliases, but they are not
+expanded.
 
 Alias expansion is done on the shell input before any other expansion
 except history expansion.  Therefore, if an alias is defined for the

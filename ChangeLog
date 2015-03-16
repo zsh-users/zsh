@@ -1,3 +1,7 @@
+2015-03-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34712: Doc/Zsh/grammar.yo: clarify words that may be aliased
+
 2015-03-15  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Completion/Zsh/Command/_zattr: Fix completion of
