@@ -1,5 +1,8 @@
 2015-03-16  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34725: NEWS: note thhat common site function directory
+	may be overridden by configuration.
+
 	* 34721: Doc/Zsh/calsys.yo, Functions/Calendar/after,
 	Functions/Calendar/before: new glob qualifier functions.
 

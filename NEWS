@@ -30,8 +30,9 @@ Changes since 5.0.0
   exist.  Sites that set an explicit site directory can put that in
   /etc/zshenv as before.  The intention of the new path element is to
   increase the likelihood that locally added functions can be found with
-  the shell running "out of the box", no matter how the shell was
-  configured.
+  the shell running "out of the box", unless the shell has been
+  deliberately configured differently by the installer for some special
+  purpose.
 
 - Individual pattern characters can be disabled.  For example, to allow '^'
   to be an ordinary character even if the option EXTENDED_GLOB is set, use
