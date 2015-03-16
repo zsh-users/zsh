@@ -10,9 +10,9 @@ or future events, details of which are stored in a text file (typically
 tt(calendar) in the user's home directory).  The version provided here
 includes a mechanism for alerting the user when an event is due.
 
-In addition a function tt(age) is provided that can be used in a glob
-qualifier; it allows files to be selected based on their modification
-times.
+In addition functions tt(age), tt(before) and tt(after) are provided
+that can be used in a glob qualifier; they allow files to be selected
+based on their modification times.
 
 The format of the tt(calendar) file and the dates used there in and in
 the tt(age) function are described first, then the functions that can
@@ -122,10 +122,10 @@ enditemize()
 Here, square brackets indicate optional elements, possibly with
 alternatives.  Fractions of a second are recognised but ignored.  For
 absolute times (the normal format require by the tt(calendar) file and the
-tt(age) function) a date is mandatory but a time of day is not; the time
-returned is at the start of the date.  One variation is allowed: if
-tt(a.m.) or tt(p.m.) or one of their variants is present, an hour without a
-minute is allowed, e.g. tt(3 p.m.).
+tt(age), tt(before) and tt(after) functions) a date is mandatory but a
+time of day is not; the time returned is at the start of the date.  One
+variation is allowed: if tt(a.m.) or tt(p.m.) or one of their variants
+is present, an hour without a minute is allowed, e.g. tt(3 p.m.).
 
 Time zones are not handled, though if one is matched following a time
 specification it will be removed to allow a surrounding date to be
@@ -605,8 +605,10 @@ left in a file with the suffix tt(.old).
 enditem()
 
 subsect(Glob qualifiers)
-findex(age)
 
+startitem()
+item(tt(age))(
+findex(age)
 The function tt(age) can be autoloaded and use separately from
 the calendar system, although it uses the function tt(calendar_scandate)
 for date formatting.  It requires the tt(zsh/stat) builtin, but uses
@@ -675,6 +677,23 @@ example(print *+LPAR()e-age :file1 :file2-+RPAR())
 
 matches all files modified no earlier than tt(file1) and
 no later than tt(file2); precision here is to the nearest second.
+)
+xitem(tt(after))
+item(tt(before))(
+findex(after)
+findex(before)
+The functions tt(after) and tt(before) are simpler versions of tt(age)
+that take just one argument.  The argument is parsed similarly to an
+argument of tt(age); if it is not given the variable tt(AGEREF) is
+consulted.  As the names of the functions suggest, a file matches if its
+modification time is after or before the time and date specified.  If
+a time only is given the date is today.
+
+The two following examples are therefore equivalent:
+example(print *+LPAR()e-after 12:00-RPAR()
+print *+LPAR()e-after today:12:00-RPAR())
+)
+enditem()
 
 texinode(Calendar Styles)(Calendar Utility Functions)(Calendar System User Functions)(Calendar Function System)
 sect(Styles)

@@ -1,3 +1,8 @@
+2015-03-16  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34721: Doc/Zsh/calsys.yo, Functions/Calendar/after,
+	Functions/Calendar/before: new glob qualifier functions.
+
 2015-03-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 34671 plus tweaks: Completion/Base/Utility/_describe
