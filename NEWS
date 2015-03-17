@@ -14,19 +14,21 @@ Changes since 5.0.0
   in output, e.g.
     setopt cbases
     zmodload zsh/mathfunc
-    print $(( [#16_4] 2**32 - 1 )) $(( [#_3] 4 * atan(1.0) )) 
- 
+    print $(( [#16_4] 2**32 - 1 )) $(( [#_3] 4 * atan(1.0) ))
+
 - "functions -T" turns on tracing for the specified function(s) only,
   similar to "functions -t" except that tracing is turned off for any
   functions called from the specified one(s) that don't also have the -t
   or -T flag.
- 
+
 - The option FORCE_FLOAT has been added to force all arithmetic constants
   to be treated as floating point.  This is most useful locally within
   functions or scripts performing floating point calculations.
- 
-- The default $fpath/$FPATH is now designed always to include
-  /usr/local/share/zsh/site-functions.  This directory does not need to
+
+- The default $fpath/$FPATH is now designed to include
+  /usr/local/share/zsh/site-functions unless the installer has
+  specifically decided to use another path, i.e. regardless of
+  the standard installation location.  This directory does not need to
   exist.  Sites that set an explicit site directory can put that in
   /etc/zshenv as before.  The intention of the new path element is to
   increase the likelihood that locally added functions can be found with
@@ -37,47 +39,47 @@ Changes since 5.0.0
 - Individual pattern characters can be disabled.  For example, to allow '^'
   to be an ordinary character even if the option EXTENDED_GLOB is set, use
   "disable -p '^'".
- 
+
 - The variable editing builtin vared can be given custom editing widgets
   for initialisation and finishing.
- 
+
 - The line editor's capability for listening on file descriptors
   additional to the terminal has been enhanced so that the handler for
   such file descriptors can be a line editor widget.  Previously the
   handler always behaved as a standard shell function.
- 
+
 - Hooks for adding history (the function zshaddhistory and the
   array zshaddhistory_functions) can return status 2 to indicate that
   history is to be saved internally within the shell but not written.
- 
+
 - In file completion, the recursive-files style can be set to an array of
   patterns to match against "$PWD/".  In any matched location, it is
   possible to complete files in arbitrarily deep subdirectories without
   needing to type the directory prefix.  See example in the zshcompsys
   manual.
- 
+
 - The _user_expand completer now allows expansion functions in the
   user-expand files to return a string in REPLY that will be used to name
   the set of expansions returned.
- 
+
 - The parameter HISTORY_IGNORE may be set to a pattern which matches
   lines in the internal history that are to be omitted from the history
   file at file write time.  This differs from history changes made in
   the zshaddhistory hook or by the HIST_IGNORE_* options, all of which
   take effect immediately on the internal history list itself.
- 
+
 - The parameter ZLE_RPROMPT_INDENT can be set to 0 to remove the space
   before the right hand side of the screen (this causes problems with
   some terminals).  It is not special and is not set by default; the
   effect in that case is as if it was 1, as in previous versions.
- 
+
 - If the option EXTENDED_GLOB is in effect, it is possible to force
   globbing within conditional code using the [[ ... ]] syntax by flagging
   that a certain string is a glob using the (#q) glob qualifier syntax.
   The resulting glob is treated as a single argument.  For example,
   [[ -n *.c(#qN) ]] tests whether there are any .c files in the current
   directory.
- 
+
 - In prompt strings, the %N(l.true.false) conditional (line length) and
   the %N<..< and %N>..> truncation operators now accept negative values
   of N, which count the remaining space to the opposite margin (positive
@@ -628,7 +630,7 @@ Further enhancements to new completion system:
    different styles
  - Many more supplied completions for standard commands which work out of
    the box, and better handling of command line options/arguments which
-   behave in the usual way   
+   behave in the usual way
  - $fpath now set up to use installed functions by default; functions
    can be loaded just by `autoload -U compinit; compinit'
  - Much improved handling of nested quoting and nested braces
@@ -986,7 +988,7 @@ The shell will drop privileges when this option is unset by resetting its
 euid to uid and its egid to gid.
 
 The =number substitution for accessing the directory stack is changed to
-~number to allow =command substitution when a command name begins with a 
+~number to allow =command substitution when a command name begins with a
 digit.
 
 <> is a redirection operator which opens the standard input for both
