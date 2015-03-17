@@ -763,6 +763,20 @@ args+=(
   '-fpack-struct=-[Set initial maximum structure member alignment]:alignment: '
 )
 
+# More linker options, from gcc man pages
+args+=(
+  '-nostartfiles[Do not use the standard system startup files when linking]'
+  '-nodefaultlibs[Do not use the standard system libraries when linking]'
+  '-nostdlib[Do not use the standard system startup files or libraries when linking]'
+  '-rdynamic[Pass the flag -export-dynamic to the ELF linker, on targets that support it]'
+  '-s[Remove all symbol table and relocation information from the executable]'
+  '-static[On systems that support dynamic linking, this prevents linking with the shared libraries]'
+  '-shared-libgcc[Force shared libgcc]'
+  '-static-libgcc[Force static libgcc]'
+  '-symbolic[Bind references to global symbols when building a shared object.]'
+  '-T:linker script:_files'
+)
+
 # other common options, gcc --help=warnings --help=optimizers --help=common|sed 1,/language-independent/d
 args+=(
 # | grep -v ::
