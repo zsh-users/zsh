@@ -318,7 +318,8 @@ fi], [sitefndir=${datadir}/${tzsh_name}/site-functions])
 dnl Add /usr/local/share/zsh/site-functions if not yet present
 dnl owing to $sitefndir, whether or not explicitly given.
 dnl If not explicitly given, it hasn't been expanded yet.
-if test X$sitefndir = X/usr/local/share/zsh/site-functions
+if test X$sitefndir = X/usr/local/share/zsh/site-functions || \
+   test X$sitefndir = Xno
 then fixed_sitefndir=''
 elif test X$prefix != X/usr/local; then
   if test X$prefix = XNONE && test X$ac_default_prefix = X/usr/local; then

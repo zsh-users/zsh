@@ -1,3 +1,8 @@
+2015-03-18  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34723: configure.ac: turn off fixed site function directory if
+	site function directory explicitly disabled.
+
 2015-03-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: NEWS: rewrite the foregoing.
