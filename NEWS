@@ -117,6 +117,12 @@ Changes since 5.0.0
   Running fn writes "hello" to logfile.  In older versions of the shell
   it would create an empty file at the point of definition.
 
+- Global aliases can be created for syntactic tokens such as command
+  separators (";", "&", "|", "&&", "||"), redirection operators, etc.
+  Use at your own risk!  The POSIX_ALIASES option is interpreted more
+  strictly to prevent expansion of these and other alias names containing
+  quotes, glob metacharacters, parameter references, etc.
+
 Changes between 4.2 and 5.0.0
 -----------------------------
 
