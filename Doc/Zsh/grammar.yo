@@ -538,8 +538,7 @@ If so, it is replaced by the text of the alias if it is in command
 position (if it could be the first word of a simple command),
 or if the alias is global.
 If the replacement text ends with a space, the next word in the shell input
-is treated as though it were in command position for purposes of alias
-expansion.
+is always eligible for purposes of alias expansion.
 findex(alias, use of)
 cindex(aliases, global)
 An alias is defined using the tt(alias) builtin; global aliases
@@ -555,22 +554,32 @@ itemiz(Any parameter reference or command substitution)
 itemiz(Any series of the foregoing, concatenated without whitespace or
 other tokens between them)
 itemiz(Any reserved word (tt(case), tt(do), tt(else), etc.))
+itemiz(With global aliasing, any command separator, any redirection
+operator, and `tt(LPAR())' or `tt(RPAR())' when not part of a glob pattern)
 enditemize()
 
-Reserved words are not eligible for aliasing when tt(POSIX_ALIASES) is set.
-The tt(alias) builtin does not reject ineligible aliases, but they are not
-expanded.
+It is not presently possible to alias the `tt(LPAR()LPAR())' token that
+introduces arithmetic expressions, because until a full statement has been
+parsed, it cannot be distinguished from two consecutive `tt(LPAR())'
+tokens introducing nested subshells.
+
+When tt(POSIX_ALIASES) is set, only plain unquoted strings are eligible
+for aliasing.  The tt(alias) builtin does not reject ineligible aliases,
+but they are not expanded.
 
 Alias expansion is done on the shell input before any other expansion
 except history expansion.  Therefore, if an alias is defined for the
 word tt(foo), alias expansion may be avoided by quoting part of the
 word, e.g. tt(\foo).  Any form of quoting works, although there is
 nothing to prevent an alias being defined for the quoted form such as
-tt(\foo) as well.  For use with completion, which would remove an
-initial backslash followed by a character that isn't special, it may be
-more convenient to quote the word by starting with a single quote,
-i.e. tt('foo); completion will automatically add the trailing single
-quote.
+tt(\foo) as well.  Also, if a separator such as tt(&&) is aliased,
+tt(\&&) turns into the two tokens tt(\&) and tt(&), each of which may
+have been aliased separately.  Similarly for tt(\<<), tt(\>|), etc.
+
+For use with completion, which would remove an initial backslash followed
+by a character that isn't special, it may be more convenient to quote the
+word by starting with a single quote, i.e. tt('foo); completion will
+automatically add the trailing single quote.
 
 There is a commonly encountered problem with aliases
 illustrated by the following code:

@@ -43,7 +43,7 @@
 0:Alias expansion works at the end of parsed strings
 >foo
 
-  alias '&&=(){ return $?; } && '
+  alias -g '&&=(){ return $?; } && '
   alias not_the_print_command=print
   eval 'print This is output
   && print And so is this

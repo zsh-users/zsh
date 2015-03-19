@@ -1,3 +1,10 @@
+2015-03-18  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34734: Doc/Zsh/grammar.yo, Src/lex.c, Test/A02alias.ztst:
+	restrict token aliasing (34641) to global aliases; tighten
+	up POSIX_ALIASES to better match spec; update Aliasing doc
+	to cover this and clarify older behavior
+
 2015-03-18  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34723: configure.ac: turn off fixed site function directory if

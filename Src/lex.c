@@ -1740,12 +1740,13 @@ checkalias(void)
 
     if (!noaliases && isset(ALIASESOPT) &&
 	(!isset(POSIXALIASES) ||
-	 !reswdtab->getnode(reswdtab, zshlextext))) {
+	 (tok == STRING && !reswdtab->getnode(reswdtab, zshlextext)))) {
 	char *suf;
 
 	an = (Alias) aliastab->getnode(aliastab, zshlextext);
 	if (an && !an->inuse &&
-	    ((an->node.flags & ALIAS_GLOBAL) || incmdpos || inalmore)) {
+	    ((an->node.flags & ALIAS_GLOBAL) ||
+	     (incmdpos && tok == STRING) || inalmore)) {
 	    inpush(an->text, INP_ALIAS, an);
 	    if (an->text[0] == ' ' && !(an->node.flags & ALIAS_GLOBAL))
 		aliasspaceflag = 1;
@@ -1784,12 +1785,17 @@ exalias(void)
     if (!tokstr) {
 	zshlextext = tokstrings[tok];
 
+	if (tok == NEWLIN)
+	    return 0;
 	return checkalias();
     } else {
 	VARARR(char, copy, (strlen(tokstr) + 1));
 
 	if (has_token(tokstr)) {
 	    char *p, *t;
+
+	    if (isset(POSIXALIASES))
+		return 0;
 
 	    zshlextext = p = copy;
 	    for (t = tokstr;
