@@ -338,7 +338,8 @@ ihwaddc(int c)
 	 * fashion as we never need the expansion in the history
 	 * line, only in the lexer and above.
 	 */
-	!((histactive & HA_INWORD) && (inbufflags & INP_ALIAS))) {
+	!((histactive & HA_INWORD) &&
+	  (inbufflags & (INP_ALIAS|INP_HIST)) == INP_ALIAS)) {
 	/* Quote un-expanded bangs in the history line. */
 	if (c == bangchar && stophist < 2 && qbang)
 	    /* If qbang is not set, we do not escape this bangchar as it's *
@@ -901,7 +902,8 @@ ihungetc(int c)
 	    zlemetall--;
 	    exlast++;
 	}
-	if (!(histactive & HA_INWORD) || !(inbufflags & INP_ALIAS)) {
+	if (!(histactive & HA_INWORD) ||
+	    (inbufflags & (INP_ALIAS|INP_HIST)) != INP_ALIAS) {
 	    DPUTS(hptr <= chline, "BUG: hungetc attempted at buffer start");
 	    hptr--;
 	    DPUTS(*hptr != (char) c, "BUG: wrong character in hungetc() ");
