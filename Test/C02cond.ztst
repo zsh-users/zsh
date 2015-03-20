@@ -8,10 +8,27 @@
 
   cd cond.tmp
 
-  touch	unmodified
+  typeset -gi isnfs
+  [[ "$(find . -prune -fstype nfs 2>/dev/null)" == "." ]] && isnfs=1
+  if (( isnfs )) &&
+    (cd -q ${TMPPREFIX:h} >/dev/null 2>&1 &&
+     [[ "$(find . -prune -fstype nfs 2>/dev/null)" != "." ]]); then
+    filetmpprefix=${TMPPREFIX}-$$-
+    isnfs=0
+  else
+    filetmpprefix=
+  fi
+  newnewnew=${filetmpprefix}newnewnew
+  unmodified=${filetmpprefix}unmodified
+  zlnfs=${filetmpprefix}zlnfs
+
+  touch $unmodified
 
   touch zerolength
   chgrp $EGID zerolength
+
+  touch $zlnfs
+  chgrp $EGID $zlnfs
 
   print 'Garbuglio' >nonzerolength
 
@@ -131,19 +148,19 @@
 
   print -u $ZTST_fd 'This test takes two seconds...'
   sleep 2
-  cat unmodified
-  touch newnewnew
+  cat $unmodified
+  touch $newnewnew
   if [[ $OSTYPE == "cygwin" ]]; then
     print -u$ZTST_fd "Warning: not testing [[ -N file ]] (not supported on Cygwin)"
     true
-  elif [[ "$(find . -prune -fstype nfs 2>/dev/null)" == "." ]]; then
+  elif (( isnfs )); then
     print -u$ZTST_fd "Warning: not testing [[ -N file ]] (not supported with NFS)"
     true
   elif test -f /etc/mtab && { grep $(df . 2>/dev/null| tail -n1 | awk '{print $1}') /etc/mtab | grep -q noatime; }; then
     print -u$ZTST_fd "Warning: not testing [[ -N file ]] (not supported with noatime file system)"
     true
   else
-    [[ -N newnewnew && ! -N unmodified ]]
+    [[ -N $newnewnew && ! -N $unmodified ]]
   fi
 0:-N cond
 F:This test can fail on NFS-mounted filesystems as the access and
@@ -153,10 +170,10 @@ F:are not recorded.  Also, Linux ext3 filesystems may be mounted
 F:with the noatime option which does not update access times.
 F:Failures in these cases do not indicate a problem in the shell.
 
-  [[ newnewnew -nt zerolength && ! (unmodified -nt zerolength) ]]
+  [[ $newnewnew -nt $zlnfs && ! ($unmodified -nt $zlnfs) ]]
 0:-nt cond
 
-  [[ zerolength -ot newnewnew && ! (zerolength -ot unmodified) ]]
+  [[ $zlnfs -ot $newnewnew && ! ($zlnfs -ot $unmodified) ]]
 0:-ot cond
 
   [[ link -ef zerolength && ! (link -ef nonzerolength) ]]
@@ -234,8 +251,8 @@ F:Failures in these cases do not indicate a problem in the shell.
 
   fn() {
     # careful: first file must exist to trigger bug
-    [[ -e unmodified ]] || print Where\'s my file\?
-    [[ unmodified -nt NonExistentFile ]]
+    [[ -e $unmodified ]] || print Where\'s my file\?
+    [[ $unmodified -nt NonExistentFile ]]
     print status = $?
   }
   fn
@@ -360,3 +377,6 @@ F:Failures in these cases do not indicate a problem in the shell.
 %clean
   # This works around a bug in rm -f in some versions of Cygwin
   chmod 644 unmodish
+  for tmpfile in $newnewnew $unmodified $zlnfs; do
+    [[ -f $tmpfile  ]] && rm -f $tmpfile
+  done

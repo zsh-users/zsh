@@ -1,5 +1,8 @@
 2015-03-20  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34753 / 34754: Test/C02cond.ztst: work around lack
+	of separate file times with NFS.
+
 	* 34752: Src/input.c: history expansion in command substitution
 	*still* didn't work although the command put back into the
 	history was correct.
