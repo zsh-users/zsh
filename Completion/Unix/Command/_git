@@ -6534,21 +6534,28 @@ __git_diff-or-merge-tools () {
   [[ $type == diff ]] && __git_config_get_regexp '^difftool\..+\.cmd$' userdifftools
   __git_config_get_regexp '^mergetool\..+\.cmd$' usermergetools
   builtintools=(
+    araxis
+    bc
+    bc3
+    codecompare
+    deltawalker
+    diffmerge
+    diffuse
+    ecmerge
+    emerge
+    gvimdiff
+    gvimdiff2
+    gvimdiff3
     kdiff3
-    tkdiff
-    xxdiff
     meld
     opendiff
+    p4merge
+    tkdiff
+    tortoisemerge
     vimdiff
-    gvimdiff
     vimdiff2
     vimdiff3
-    gvimdiff2
-    emerge
-    ecmerge
-    diffuse
-    araxis
-    p4merge)
+    xxdiff)
 
   builtindifftools=($builtintools kompare)
   builtinmergetools=($builtintools tortoisemerge)

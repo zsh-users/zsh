@@ -1,3 +1,8 @@
+2015-04-10  Daniel Hahler  <git@thequod.de>
+
+	* 34748: Completion/Unix/Command/_git: completion: git: update
+	list of builtintools
+
 2015-04-07  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 34850: Doc/zman.yo, Doc/ztexi.yo, Doc/META-FAQ.yo,
