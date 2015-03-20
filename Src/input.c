@@ -571,8 +571,20 @@ inpoptop(void)
 {
     if (!lexstop) {
 	inbufflags &= ~INP_ALCONT;
-	while (inbufptr > inbuf)
-	    inungetc(inbufptr[-1]);
+	while (inbufptr > inbuf) {
+	    inbufptr--;
+	    inbufct++;
+	    inbufleft++;
+	    /*
+	     * As elsewhere in input and history mechanisms:
+	     * unwinding aliases and unwinding history have different
+	     * implications as aliases are after the lexer while
+	     * history is before, but they're both pushed onto
+	     * the input stack.
+	     */
+	    if ((inbufflags & (INP_ALIAS|INP_HIST)) == INP_ALIAS)
+		zshlex_raw_back();
+	}
     }
 
     if (inbuf && (inbufflags & INP_FREE))

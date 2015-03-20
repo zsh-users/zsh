@@ -1,3 +1,9 @@
+2015-03-20  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34752: Src/input.c: history expansion in command substitution
+	*still* didn't work although the command put back into the
+	history was correct.
+
 2015-03-19  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34742: Src/hist.c: history expansion in command substitution
