@@ -1,3 +1,9 @@
+2015-03-21  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* users/20034: Completion/Base/Core/_main_complete: adjust
+	PREFIX and SUFFIX for unambiguous_cursor on second completion
+	attempt with GLOB_COMPLETE
+
 2015-03-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34753 / 34754: Test/C02cond.ztst: work around lack

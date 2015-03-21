@@ -68,6 +68,16 @@ if [[ "$compstate[insert]" = tab* ]]; then
   compstate[insert]="${compstate[insert]//tab /}"
 fi
 
+# Second attempt at GLOB_COMPLETE
+
+if [[ "$compstate[pattern_match]" = "*" &&
+      "$_lastcomp[unambiguous]" = "$PREFIX" &&
+      -n "$_lastcomp[unambiguous_cursor]" ]]; then
+  integer upos="$_lastcomp[unambiguous_cursor]"
+  SUFFIX="$PREFIX[upos,-1]$SUFFIX"
+  PREFIX="$PREFIX[1,upos-1]"
+fi
+
 # Special completion contexts after `~' and `='.
 
 if [[ -z "$compstate[quote]" ]]; then
