@@ -1871,6 +1871,25 @@ zshlex_raw_back(void)
     lexbuf_raw.len--;
 }
 
+/**/
+char *
+zshlex_raw_mark(int offset)
+{
+    if (!lex_add_raw)
+	return NULL;
+    return lexbuf_raw.ptr + offset;
+}
+
+/**/
+void
+zshlex_raw_back_to_mark(char *mark)
+{
+    if (!lex_add_raw)
+	return;
+    lexbuf_raw.len -= lexbuf_raw.ptr - mark;
+    lexbuf_raw.ptr = mark;
+}
+
 /*
  * Skip (...) for command-style substitutions: $(...), <(...), >(...)
  *

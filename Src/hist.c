@@ -527,9 +527,19 @@ histsubchar(int c)
     static int marg = -1;
     static zlong mev = -1;
     char *buf, *ptr;
-    char *sline;
+    char *sline, *lexraw_mark;
     Histent ehist;
     size_t buflen;
+
+    /*
+     * If accumulating raw input for use in command substitution,
+     * we don't want the history text, so mark it for later removal.
+     * It would be better to do this at a level above the history
+     * and below the lexer --- but there isn't one.
+     *
+     * Include the character we are attempting to substitute.
+     */
+    lexraw_mark = zshlex_raw_mark(-1); 
 
     /* look, no goto's */
     if (isfirstch && c == hatchar) {
@@ -863,6 +873,8 @@ histsubchar(int c)
 	    break;
 	}
     }
+
+    zshlex_raw_back_to_mark(lexraw_mark);
 
     /*
      * Push the expanded value onto the input stack,

@@ -1,3 +1,9 @@
+2015-03-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34758: Src/hist.c, Src/lex.c: more problems with history
+	interaction with command substitution: rewind over input history
+	text when necessary.
+
 2015-03-21  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/20034: Completion/Base/Core/_main_complete: adjust
