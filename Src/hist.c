@@ -527,7 +527,8 @@ histsubchar(int c)
     static int marg = -1;
     static zlong mev = -1;
     char *buf, *ptr;
-    char *sline, *lexraw_mark;
+    char *sline;
+    int lexraw_mark;
     Histent ehist;
     size_t buflen;
 

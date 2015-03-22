@@ -1,5 +1,7 @@
 2015-03-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 34759: Src/hist.c, Src/lex.c: safer implementation.
+
 	* 34758: Src/hist.c, Src/lex.c: more problems with history
 	interaction with command substitution: rewind over input history
 	text when necessary.

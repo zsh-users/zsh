@@ -1872,22 +1872,22 @@ zshlex_raw_back(void)
 }
 
 /**/
-char *
+int
 zshlex_raw_mark(int offset)
 {
     if (!lex_add_raw)
-	return NULL;
-    return lexbuf_raw.ptr + offset;
+	return 0;
+    return lexbuf_raw.len + offset;
 }
 
 /**/
 void
-zshlex_raw_back_to_mark(char *mark)
+zshlex_raw_back_to_mark(int mark)
 {
     if (!lex_add_raw)
 	return;
-    lexbuf_raw.len -= lexbuf_raw.ptr - mark;
-    lexbuf_raw.ptr = mark;
+    lexbuf_raw.ptr = tokstr_raw + mark;
+    lexbuf_raw.len = mark;
 }
 
 /*
