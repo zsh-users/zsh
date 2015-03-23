@@ -1445,7 +1445,7 @@ sitem(tt(%U))(CPU seconds spent in user mode.)
 sitem(tt(%S))(CPU seconds spent in kernel mode.)
 sitem(tt(%E))(Elapsed time in seconds.)
 sitem(tt(%P))(The CPU percentage, computed as
-(100*tt(%U)PLUS()tt(%S))/tt(%E).)
+100*(tt(%U)PLUS()tt(%S))/tt(%E).)
 sitem(tt(%W))(Number of times the process was swapped.)
 sitem(tt(%X))(The average amount in (shared) text space used in kilobytes.)
 sitem(tt(%D))(The average amount in (unshared) data/stack space used in
