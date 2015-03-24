@@ -1,3 +1,9 @@
+2015-03-23  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34772: Test/W01history.ztst, Test/comptest: add new test
+	suite file for history; fix "read" usage in comptest for case
+	where there is no TTY
+
 2015-03-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34759: Src/hist.c, Src/lex.c: safer implementation.

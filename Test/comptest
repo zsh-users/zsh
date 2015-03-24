@@ -164,7 +164,7 @@ zletest () {
   for input; do
     # zpty_flush Before zletest
     # sleep for $KEYTIMEOUT
-    (( first++ )) && read -t 0.011 -k 1 < /dev/null
+    (( first++ )) && read -t 0.011 -u 0 -k 1 < /dev/null
     zpty -n -w zsh "$input"
   done
   zpty -n -w zsh $'\C-X'

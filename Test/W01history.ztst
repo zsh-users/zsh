@@ -1,0 +1,19 @@
+# Tests for BANG_HIST replacements
+
+%prep
+
+  [[ -t 0 ]] && print -u $ZTST_fd History tests write to /dev/tty
+
+%test
+
+  $ZTST_testdir/../Src/zsh -fis <<<'
+  echo foo bar
+  echo $(!!) again
+  echo more $( !! )' 2>/dev/null
+0:Regression test for history references in command substitution
+>foo bar
+>foo bar again
+>more foo bar again
+*?*
+F:Check that a history bug introduced by workers/34160 is working again.
+F:Discarded line of error output consumes prompts printed by "zsh -i".
