@@ -245,7 +245,6 @@ hist_context_save(struct hist_stack *hs, int toplevel)
     hs->chwords = chwords;
     hs->chwordlen = chwordlen;
     hs->chwordpos = chwordpos;
-    hs->hwgetword = hwgetword;
     hs->hgetc = hgetc;
     hs->hungetc = hungetc;
     hs->hwaddc = hwaddc;
@@ -289,7 +288,6 @@ hist_context_restore(const struct hist_stack *hs, int toplevel)
     chwords = hs->chwords;
     chwordlen = hs->chwordlen;
     chwordpos = hs->chwordpos;
-    hwgetword = hs->hwgetword;
     hgetc = hs->hgetc;
     hungetc = hs->hungetc;
     hwaddc = hs->hwaddc;
@@ -338,8 +336,7 @@ ihwaddc(int c)
 	 * fashion as we never need the expansion in the history
 	 * line, only in the lexer and above.
 	 */
-	!((histactive & HA_INWORD) &&
-	  (inbufflags & (INP_ALIAS|INP_HIST)) == INP_ALIAS)) {
+	(inbufflags & (INP_ALIAS|INP_HIST)) != INP_ALIAS) {
 	/* Quote un-expanded bangs in the history line. */
 	if (c == bangchar && stophist < 2 && qbang)
 	    /* If qbang is not set, we do not escape this bangchar as it's *
@@ -915,8 +912,7 @@ ihungetc(int c)
 	    zlemetall--;
 	    exlast++;
 	}
-	if (!(histactive & HA_INWORD) ||
-	    (inbufflags & (INP_ALIAS|INP_HIST)) != INP_ALIAS) {
+	if ((inbufflags & (INP_ALIAS|INP_HIST)) != INP_ALIAS) {
 	    DPUTS(hptr <= chline, "BUG: hungetc attempted at buffer start");
 	    hptr--;
 	    DPUTS(*hptr != (char) c, "BUG: wrong character in hungetc() ");
@@ -1536,28 +1532,17 @@ hend(Eprog prog)
     return !(flag & HISTFLAG_NOEXEC || errflag);
 }
 
-/* Gives current expansion word if not last word before chwordpos. */
-
-/**/
-int hwgetword = -1;
-
 /* begin a word */
 
 /**/
 void
 ihwbegin(int offset)
 {
-    if (stophist == 2 || (histactive & HA_INWORD))
+    if (stophist == 2 || (histactive & HA_INWORD) ||
+	(inbufflags & (INP_ALIAS|INP_HIST)) == INP_ALIAS)
 	return;
     if (chwordpos%2)
 	chwordpos--;	/* make sure we're on a word start, not end */
-    /* If we're expanding an alias, we should overwrite the expansion
-     * in the history.
-     */
-    if ((inbufflags & INP_ALIAS) && !(inbufflags & INP_HIST))
-	hwgetword = chwordpos;
-    else
-	hwgetword = -1;
     chwords[chwordpos++] = hptr - chline + offset;
 }
 
@@ -1567,7 +1552,8 @@ ihwbegin(int offset)
 void
 ihwend(void)
 {
-    if (stophist == 2 || (histactive & HA_INWORD))
+    if (stophist == 2 || (histactive & HA_INWORD) ||
+	(inbufflags & (INP_ALIAS|INP_HIST)) == INP_ALIAS)
 	return;
     if (chwordpos%2 && chline) {
 	/* end of word reached and we've already begun a word */
@@ -1577,13 +1563,6 @@ ihwend(void)
 		chwords = (short *) realloc(chwords,
 					    (chwordlen += 32) * 
 					    sizeof(short));
-	    }
-	    if (hwgetword > -1 &&
-		(inbufflags & INP_ALIAS) && !(inbufflags & INP_HIST)) {
-		/* We want to reuse the current word position */
-		chwordpos = hwgetword;
-		/* Start from where previous word ended, if possible */
-		hptr = chline + chwords[chwordpos ? chwordpos - 1 : 0];
 	    }
 	} else {
 	    /* scrub that last word, it doesn't exist */
@@ -1608,17 +1587,17 @@ histbackword(void)
 static void
 hwget(char **startptr)
 {
-    int pos = hwgetword > -1 ? hwgetword : chwordpos - 2;
+    int pos = chwordpos - 2;
 
 #ifdef DEBUG
     /* debugging only */
-    if (hwgetword == -1 && !chwordpos) {
+    if (!chwordpos) {
 	/* no words available */
 	DPUTS(1, "BUG: hwget() called with no words");
 	*startptr = "";
 	return;
-    } 
-    else if (hwgetword == -1 && chwordpos%2) {
+    }
+    else if (chwordpos%2) {
 	DPUTS(1, "BUG: hwget() called in middle of word");
 	*startptr = "";
 	return;
@@ -1640,9 +1619,9 @@ hwrep(char *rep)
 
     if (!strcmp(rep, start))
 	return;
-    
+
     hptr = start;
-    chwordpos = (hwgetword > -1) ? hwgetword : chwordpos - 2;
+    chwordpos = chwordpos - 2;
     hwbegin(0);
     qbang = 1;
     while (*rep)
@@ -1670,7 +1649,6 @@ hgetline(void)
     /* reset line */
     hptr = chline;
     chwordpos = 0;
-    hwgetword = -1;
 
     return ret;
 }

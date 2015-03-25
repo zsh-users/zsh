@@ -2709,7 +2709,6 @@ struct hist_stack {
     short *chwords;
     int chwordlen;
     int chwordpos;
-    int hwgetword;
     int (*hgetc) _((void));
     void (*hungetc) _((int));
     void (*hwaddc) _((int));

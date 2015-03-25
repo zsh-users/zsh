@@ -1,3 +1,8 @@
+2015-03-25  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34776: Src/hist.c, Src/zsh.h: suppressing alias expansions
+	from history now uses same mechanism as everyone else.
+
 2015-03-25  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34774: Test/W01history.ztst, Test/comptest: fix %prep and use
