@@ -2,7 +2,7 @@
 
 %prep
 
-  [[ -t 0 ]] && print -u $ZTST_fd History tests write to /dev/tty
+  if [[ -t 0 ]]; then print -u $ZTST_fd History tests write to /dev/tty; fi
 
 %test
 
