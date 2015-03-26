@@ -2248,7 +2248,7 @@ taken as a file to run will instead be treated as a normal positional
 parameter.
 Note that setting or unsetting this option on the command line does not
 necessarily affect the state the option will have while the shell is
-running - that is purely an indicator of whether on not commands are
+running - that is purely an indicator of whether or not commands are
 em(actually) being read from standard input.
 The value of this option can only be changed via flags supplied at
 invocation of the shell.

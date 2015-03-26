@@ -1,5 +1,7 @@
 2015-03-27  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Han Pingtian: 34785: Doc/Zsh/options.yo: fix typo in SHINSTDIN.
+
 	* 34787: Test/W01history.ztst: new tests.
 
 2015-03-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
