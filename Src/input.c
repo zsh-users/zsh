@@ -56,8 +56,9 @@
  * inpop(), which effectively flushes any unread input as well as restoring
  * the previous input state.
  *
- * The internal flag INP_ALCONT shows that the stack element was pushed
- * by an alias expansion; it should not be needed elsewhere.
+ * The internal flags INP_ALCONT and INP_HISTCONT show that the stack
+ * element was pushed by an alias or history expansion; they should not
+ * be needed elsewhere.
  *
  * The global variable inalmore is set to indicate aliases should
  * continue to be expanded because the last alias expansion ended
@@ -446,7 +447,8 @@ inungetc(int c)
 	 * we may need to restore an alias popped from the stack.
 	 * Note this may be a dummy (history expansion) entry.
 	 */
-	if (inbufptr == inbufpush && inbufflags & INP_ALCONT) {
+	if (inbufptr == inbufpush &&
+	    (inbufflags & (INP_ALCONT|INP_HISTCONT))) {
 	    /*
 	     * Go back up the stack over all entries which were alias
 	     * expansions and were pushed with nothing remaining to read.
@@ -455,8 +457,12 @@ inungetc(int c)
 		if (instacktop->alias)
 		    instacktop->alias->inuse = 1;
 		instacktop++;
-	    } while ((instacktop->flags & INP_ALCONT) && !instacktop->bufleft);
-	    inbufflags = INP_CONT|INP_ALIAS;
+	    } while ((instacktop->flags & (INP_ALCONT|INP_HISTCONT))
+		     && !instacktop->bufleft);
+	    if (inbufflags & INP_HISTCONT)
+		inbufflags = INP_CONT|INP_ALIAS|INP_HIST;
+	    else
+		inbufflags = INP_CONT|INP_ALIAS;
 	    inbufleft = 0;
 	    inbuf = inbufptr = "";
 	}
@@ -522,7 +528,7 @@ inpush(char *str, int flags, Alias inalias)
     instacktop->bufptr = inbufptr;
     instacktop->bufleft = inbufleft;
     instacktop->bufct = inbufct;
-    inbufflags &= ~INP_ALCONT;
+    inbufflags &= ~(INP_ALCONT|INP_HISTCONT);
     if (flags & (INP_ALIAS|INP_HIST)) {
 	/*
 	 * Text is expansion for history or alias, so continue
@@ -531,7 +537,10 @@ inpush(char *str, int flags, Alias inalias)
 	 * and mark alias as in use.
 	 */
 	flags |= INP_CONT|INP_ALIAS;
-	instacktop->flags = inbufflags | INP_ALCONT;
+	if (flags & INP_HIST)
+	    instacktop->flags = inbufflags | INP_HISTCONT;
+	else
+	    instacktop->flags = inbufflags | INP_ALCONT;
 	if ((instacktop->alias = inalias))
 	    inalias->inuse = 1;
     } else {
@@ -570,7 +579,7 @@ static void
 inpoptop(void)
 {
     if (!lexstop) {
-	inbufflags &= ~INP_ALCONT;
+	inbufflags &= ~(INP_ALCONT|INP_HISTCONT);
 	while (inbufptr > inbuf) {
 	    inbufptr--;
 	    inbufct++;
@@ -598,7 +607,7 @@ inpoptop(void)
     inbufct = instacktop->bufct;
     inbufflags = instacktop->flags;
 
-    if (!(inbufflags & INP_ALCONT))
+    if (!(inbufflags & (INP_ALCONT|INP_HISTCONT)))
 	return;
 
     if (instacktop->alias) {

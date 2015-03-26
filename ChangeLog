@@ -1,3 +1,8 @@
+2015-03-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34784: Src/input.c, Src/zsh.h: fix old bug with history
+	selection.
+
 2015-03-25  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34779: Test/A02alias.ztst: tests for 34776

@@ -411,8 +411,9 @@ enum {
 #define INP_HIST      (1<<2)	/* expanding history                       */
 #define INP_CONT      (1<<3)	/* continue onto previously stacked input  */
 #define INP_ALCONT    (1<<4)	/* stack is continued from alias expn.     */
-#define INP_LINENO    (1<<5)    /* update line number                      */
-#define INP_APPEND    (1<<6)    /* Append new lines to allow backup        */
+#define INP_HISTCONT  (1<<5)	/* stack is continued from history expn.   */
+#define INP_LINENO    (1<<6)    /* update line number                      */
+#define INP_APPEND    (1<<7)    /* Append new lines to allow backup        */
 
 /* Flags for metafy */
 #define META_REALLOC	0
