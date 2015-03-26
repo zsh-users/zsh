@@ -16,4 +16,4 @@
 >more foo bar again
 *?*
 F:Check that a history bug introduced by workers/34160 is working again.
-F:Discarded line of error output consumes prompts printed by "zsh -i".
+# Discarded line of error output consumes prompts printed by "zsh -i".

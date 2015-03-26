@@ -57,3 +57,27 @@
 >And so is this
 >And this too
 >And aliases are expanded
+
+  $ZTST_testdir/../Src/zsh -fis <<<'
+  PROMPT=""
+  exec 2>&1
+  alias \{=echo
+  { begin
+  {end
+  fc -l -2' 2>/dev/null
+0:Aliasing reserved tokens
+>begin
+>zsh: command not found: echoend
+*>*4*{ begin
+*>*5*{end
+
+  $ZTST_testdir/../Src/zsh -fis <<<'
+  PROMPT=""
+  exec 2>&1
+  alias -g S=\"
+  echo S a string S "
+  fc -l -1' 2>/dev/null
+0:Global aliasing quotes
+> a string S 
+*>*4*echo S a string S "
+# Note there is a trailing space on the "> a string S " line

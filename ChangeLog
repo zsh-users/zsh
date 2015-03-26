@@ -1,3 +1,9 @@
+2015-03-25  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34779: Test/A02alias.ztst: tests for 34776
+
+	* unposted: Test/W01history.ztst: change an F: to a comment
+
 2015-03-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Han Pingtian: 34769: incorrect description of process time
