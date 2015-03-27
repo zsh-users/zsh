@@ -1,3 +1,7 @@
+2015-03-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34788: Src/lex.c: refine errflag handling in cmd_or_math()
+
 2015-03-27  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Han Pingtian: 34785: Doc/Zsh/options.yo: fix typo in SHINSTDIN.
