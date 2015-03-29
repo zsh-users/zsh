@@ -3336,7 +3336,7 @@ _git-count-objects () {
 _git-difftool () {
   # TODO: Is this fine, or do we need to modify the context or similar?
   _git-diff \
-    '--dir-diff[diff a whole tree by prepare a temporary copy]' \
+    '(-d --dir-diff)'{-d,--dir-diff}'[diff a whole tree by preparing a temporary copy]' \
     '(-y --no-prompt --prompt)'{-y,--no-prompt}'[do not prompt before invocation of diff tool]' \
     '(-y --no-prompt)--prompt[prompt before invocation of diff tool]' \
     '(-t --tool -x --extcmd)'{-t,--tool=-}'[merge resolution program to use]: :__git_difftools' \

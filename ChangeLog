@@ -1,3 +1,8 @@
+2015-03-29  Daniel Hahler  <git@thequod.de>
+
+	* 34762: Completion/Unix/Command/_git: completion: git: add
+	short option for '--dir-diff' (_git-difftool)
+
 2015-03-28  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34804: Src/lex.c: refine 34734 POSIX_ALIAS change to preserve
