@@ -247,3 +247,7 @@
 >extendedglob is initially off
 >bareglobqual is still on
 >extendedglob is on, too
+
+ emulate sh -c '[[ a == a ]]'
+0:regression test for POSIX_ALIASES reserved words
+F:Some reserved tokens are handled in alias expansion

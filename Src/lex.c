@@ -1794,9 +1794,6 @@ exalias(void)
 	if (has_token(tokstr)) {
 	    char *p, *t;
 
-	    if (isset(POSIXALIASES))
-		return 0;
-
 	    zshlextext = p = copy;
 	    for (t = tokstr;
 		 (*p++ = itok(*t) ? ztokens[*t++ - Pound] : *t++););
@@ -1816,7 +1813,7 @@ exalias(void)
 
 	if (tok == STRING) {
 	    /* Check for an alias */
-	    if (checkalias()) {
+	    if ((zshlextext != copy || !isset(POSIXALIASES)) && checkalias()) {
 		if (zshlextext == copy)
 		    zshlextext = tokstr;
 		return 1;
