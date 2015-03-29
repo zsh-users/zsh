@@ -1747,6 +1747,16 @@ checkalias(void)
 	if (an && !an->inuse &&
 	    ((an->node.flags & ALIAS_GLOBAL) ||
 	     (incmdpos && tok == STRING) || inalmore)) {
+	    if (!lexstop) {
+		/*
+		 * Tokens that don't require a space after, get one,
+		 * because they are treated as if preceded by one.
+		 */
+		int c = hgetc();
+		hungetc(c);
+		if (!iblank(c))
+		    inpush(" ", INP_ALIAS, 0);
+	    }
 	    inpush(an->text, INP_ALIAS, an);
 	    if (an->text[0] == ' ' && !(an->node.flags & ALIAS_GLOBAL))
 		aliasspaceflag = 1;

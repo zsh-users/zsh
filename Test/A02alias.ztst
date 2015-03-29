@@ -67,7 +67,7 @@
   fc -l -2' 2>/dev/null
 0:Aliasing reserved tokens
 >begin
->zsh: command not found: echoend
+>end
 *>*4*{ begin
 *>*5*{end
 
