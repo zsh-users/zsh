@@ -1,3 +1,7 @@
+2015-03-29  Theo Buehler  <theo@math.ethz.ch>
+
+	* 34792: Src/Modules/langinfo.c: langinfo: Fix pointer type
+
 2015-03-29  Daniel Hahler  <git@thequod.de>
 
 	* 34762: Completion/Unix/Command/_git: completion: git: add

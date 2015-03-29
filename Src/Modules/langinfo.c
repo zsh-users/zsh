@@ -395,7 +395,8 @@ liitem(const char *name)
 static HashNode
 getlanginfo(UNUSED(HashTable ht), const char *name)
 {
-    int len, *elem;
+    int len;
+    nl_item *elem;
     char *listr, *nameu;
     Param pm = NULL;
 
