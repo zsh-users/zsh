@@ -1345,6 +1345,8 @@ gettokstr(int c, int sub)
 	    break;
     }
   brk:
+    if (errflag)
+	return LEXERR;
     hungetc(c);
     if (unmatched)
 	zerr("unmatched %c", unmatched);

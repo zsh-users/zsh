@@ -2604,6 +2604,8 @@ readhistfile(char *fn, int err, int readflags)
 	     */
 	    if (uselex || remeta)
 		freeheap();
+	    if (errflag & ERRFLAG_INT)
+		break;
 	}
 	if (start && readflags & HFILE_USE_OPTIONS) {
 	    zsfree(lasthist.text);
@@ -3331,7 +3333,7 @@ bufferwords(LinkList list, char *buf, int *index, int flags)
 	    got = 1;
 	    cur = num - 1;
 	}
-    } while (tok != ENDINPUT && tok != LEXERR);
+    } while (tok != ENDINPUT && tok != LEXERR && !(errflag & ERRFLAG_INT));
     if (buf && tok == LEXERR && tokstr && *tokstr) {
 	int plen;
 	untokenize((p = dupstring(tokstr)));
@@ -3408,6 +3410,8 @@ histsplitwords(char *lineptr, short **wordsp, int *nwordsp, int *nwordposp,
 
 	wordlist = bufferwords(NULL, lineptr, NULL,
 			       LEXFLAGS_COMMENTS_KEEP);
+	if (errflag)
+	    return;
 	nwords_max = 2 * countlinknodes(wordlist);
 	if (nwords_max > nwords) {
 	    *nwordsp = nwords = nwords_max;

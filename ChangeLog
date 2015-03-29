@@ -1,3 +1,9 @@
+2015-03-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34817: Src/hist.c, Src/lex.c: catch some errors earlier when
+	handling history to avoid knock-on errors and doing too much
+	processing.
+
 2015-03-29  Theo Buehler  <theo@math.ethz.ch>
 
 	* 34792: Src/Modules/langinfo.c: langinfo: Fix pointer type
