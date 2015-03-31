@@ -5,6 +5,11 @@
 	Completion/Unix/Type/_net_interfaces: improve matching of
 	devices already on command line in ip completion.
 
+2015-03-31  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Han Pingtian: 34822: Doc/Zsh/options.yo: correction to
+	GLOB_SUBST doc.
+
 2015-03-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34817: Src/hist.c, Src/lex.c: catch some errors earlier when

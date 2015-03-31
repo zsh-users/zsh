@@ -540,7 +540,7 @@ pindex(GLOBSUBST)
 pindex(NOGLOBSUBST)
 item(tt(GLOB_SUBST) <C> <K> <S>)(
 Treat any characters resulting from parameter expansion as being
-eligible for file expansion and filename generation, and any
+eligible for filename expansion and filename generation, and any
 characters resulting from command substitution as being eligible for
 filename generation.  Braces (and commas in between) do not become eligible
 for expansion.
