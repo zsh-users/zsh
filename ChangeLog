@@ -1,3 +1,10 @@
+2015-03-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* users/20058: Completion/Unix/Command/_ip,
+	Completion/Unix/Type/_find_net_interfaces,
+	Completion/Unix/Type/_net_interfaces: improve matching of
+	devices already on command line in ip completion.
+
 2015-03-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34817: Src/hist.c, Src/lex.c: catch some errors earlier when

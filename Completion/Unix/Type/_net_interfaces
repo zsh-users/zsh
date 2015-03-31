@@ -1,42 +1,9 @@
 #compdef ifup ifdown
 
-local expl list intf sep
-local -a disp
+local expl
+local -a net_intf_disp net_intf_list
 
-# Make sure needed tools are in the path.
-local PATH=$PATH
-PATH=/sbin:$PATH
-
-case $OSTYPE in
-  aix*)
-    intf=( ${(f)"$(lsdev -C -c if -F 'name:description')"} )
-    if zstyle -T ":completion:${curcontext}" verbose; then
-      zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
-      zformat -a list " $sep " "$intf[@]"
-      disp=(-ld list)
-    fi
-  ;;
-  darwin*|freebsd*|dragonfly*) intf=( $(ifconfig -l) ) ;;
-  irix*) intf=( ${${${(f)"$(/usr/etc/netstat -i)"}%% *}[2,-1]} ) ;;
-  *linux*)
-    if (( $+commands[ip] )); then
-      intf=( ${${(m)${(f)"$(ip -o link)"}#*: }%%: *} )
-    fi
-  ;&
-
-  *)
-  if [[ ${#intf} -eq 0 ]]; then
-    # linux's deprecated ifconfig may truncate long interface names
-    intf=( $(ifconfig -a 2>/dev/null | sed -n 's/^\([^ 	:]*\).*/\1/p') )
-    if [[ -d /proc/sys/net/ipv4/conf ]]; then
-      # On linux we used to use the following as the default.
-      # However, we now use ip or ifconfig since it finds additional devices such
-      # as tunnels.  So only do this if that didn't work.
-      intf=( /proc/sys/net/ipv4/conf/*~*(all|default)(N:t) )
-    fi
-  fi
-  ;;
-esac
+_find_net_interfaces
 
 _wanted interfaces expl 'network interface' \
-    compadd "$@" "$disp[@]" - "${(@)intf%%:*}"
+    compadd "$@" "$net_intf_disp[@]" - "${(@)net_intf_list%%:*}"

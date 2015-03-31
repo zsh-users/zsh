@@ -1,0 +1,42 @@
+#autoload
+
+# This can be called independently of completion.  It returns
+# arrays net_intf_disp and net_intf_list which the caller should
+# make local.
+
+local sep list
+
+# Make sure needed tools are in the path.
+local PATH=$PATH
+PATH=/sbin:$PATH
+
+case $OSTYPE in
+  aix*)
+    net_intf_list=( ${(f)"$(lsdev -C -c if -F 'name:description')"} )
+    if zstyle -T ":completion:${curcontext}" verbose; then
+      zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
+      zformat -a list " $sep " "$net_intf_list[@]"
+      net_intf_disp=(-ld list)
+    fi
+  ;;
+  darwin*|freebsd*|dragonfly*) net_intf_list=( $(ifconfig -l) ) ;;
+  irix*) net_intf_list=( ${${${(f)"$(/usr/etc/netstat -i)"}%% *}[2,-1]} ) ;;
+  *linux*)
+    if (( $+commands[ip] )); then
+      net_intf_list=( ${${(m)${(f)"$(ip -o link)"}#*: }%%: *} )
+    fi
+  ;&
+
+  *)
+  if [[ ${#net_intf_list} -eq 0 ]]; then
+    # linux's deprecated ifconfig may truncate long interface names
+    net_intf_list=( $(ifconfig -a 2>/dev/null | sed -n 's/^\([^ 	:]*\).*/\1/p') )
+    if [[ -d /proc/sys/net/ipv4/conf ]]; then
+      # On linux we used to use the following as the default.
+      # However, we now use ip or ifconfig since it finds additional devices such
+      # as tunnels.  So only do this if that didn't work.
+      net_intf_list=( /proc/sys/net/ipv4/conf/*~*(all|default)(N:t) )
+    fi
+  fi
+  ;;
+esac
