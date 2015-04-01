@@ -1,3 +1,8 @@
+2015-04-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 34814: Completion/Unix/Command/_git: completion: git: Fix
+	bug introduced by 34671 [based on patch by Daniel Hahler]
+
 2015-03-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/20058: Completion/Unix/Command/_ip,
