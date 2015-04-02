@@ -1,5 +1,8 @@
 2015-04-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 34885: Completion/Unix/Command/_git: completion: git: Sort
+	"commit object" completions most recent first
+
 	* 34885: Completion/Unix/Command/_git: completion: git: Fix
 	another instance of the 34671 bug fixed in 34814
 
