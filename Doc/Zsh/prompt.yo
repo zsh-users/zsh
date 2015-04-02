@@ -367,7 +367,8 @@ truncated while turning off truncation from there on. For example, the
 prompt '%10<...<%~%<<%# ' will print a truncated representation of the
 current directory, followed by a `tt(%)' or `tt(#)', followed by a
 space.  Without the `tt(%<<)', those two characters would be included
-in the string to be truncated.  Note that `tt(%-0<<)' is a distinct
+in the string to be truncated.  Note that `tt(%-0<<)' is not equivalent
+to `tt(%<<)' but specifies that the prompt is truncated at the right margin.
 
 Truncation applies only within each individual line of the prompt, as
 delimited by embedded newlines (if any).  If the total length of any line
