@@ -386,8 +386,8 @@ insert(char *s, int checked)
     while (!inserts || (news = dupstring(*inserts++))) {
 	if (colonmod) {
 	    /* Handle the remainder of the qualifier:  e.g. (:r:s/foo/bar/). */
-	    s = colonmod;
-	    modify(&news, &s);
+	    char *mod = colonmod;
+	    modify(&news, &mod);
 	}
 	if (!statted && (gf_sorts & GS_NORMAL)) {
 	    statfullpath(s, &buf, 1);

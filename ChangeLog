@@ -1,3 +1,9 @@
+2015-04-03  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34837: Src/glob.c: avoid loss of original file path when applying
+	colon-modifiers in glob qualifiers, that path is still needed for
+	later stat() when sorting.
+
 2015-04-03  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 34840: Doc/Zsh/prompt.yo: minor format fixes
