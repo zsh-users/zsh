@@ -1,3 +1,7 @@
+2015-04-13  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Han Pingtian: users/20078: Doc/Zsh/options.yo: HIST_BEEP doc.
+
 2015-04-10  Clint Adams  <clint@zsh.org>
 
 	* 34874: Completion/Unix/Command/_cabal: completion for cabal
