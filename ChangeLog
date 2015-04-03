@@ -1,4 +1,8 @@
-2015-03-05  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+2015-04-03  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 34840: Doc/Zsh/prompt.yo: minor format fixes
+
+2015-04-02  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 34836: Doc/Zsh/prompt.yo: fix description of '%-0<<'
 

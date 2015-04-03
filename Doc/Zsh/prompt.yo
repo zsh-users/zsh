@@ -274,7 +274,7 @@ The value of the first element of the tt(psvar) array parameter.  Following
 the `tt(%)' with an integer gives that element of the array.  Negative
 integers count from the end of the array.
 )
-item(tt(%LPAR())var(x.true-text.false-text)tt(RPAR()))(
+item(tt(%LPAR())var(x)tt(.)var(true-text)tt(.)var(false-text)tt(RPAR()))(
 Specifies a ternary expression.  The character following the var(x) is
 arbitrary; the same character is used to separate the text for the
 `true' result from that for the `false' result.
@@ -364,7 +364,7 @@ level (i.e. truncations inside a `tt(%LPAR())' are separate), which
 ever comes first.  In particular, a truncation with argument zero
 (e.g., `tt(%<<)') marks the end of the range of the string to be
 truncated while turning off truncation from there on. For example, the
-prompt '%10<...<%~%<<%# ' will print a truncated representation of the
+prompt `tt(%10<...<%~%<<%# )' will print a truncated representation of the
 current directory, followed by a `tt(%)' or `tt(#)', followed by a
 space.  Without the `tt(%<<)', those two characters would be included
 in the string to be truncated.  Note that `tt(%-0<<)' is not equivalent
@@ -375,7 +375,7 @@ delimited by embedded newlines (if any).  If the total length of any line
 of the prompt after truncation is greater than the terminal width, or if
 the part to be truncated contains embedded newlines, truncation behavior
 is undefined and may change in a future version of the shell.  Use
-`tt(%-var(n)LPAR()l.var(true-text).var(false-text)RPAR())' to remove parts
+`tt(%-)var(n)tt(LPAR()l.)var(true-text)tt(.)var(false-text)tt(RPAR())' to remove parts
 of the prompt when the available space is less than var(n).
 )
 enditem()
