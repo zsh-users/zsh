@@ -1,3 +1,8 @@
+2015-04-06  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 34851: Src/builtin.c: fix thinko from 34093 that short-circuited
+	some "whence -m" searches
+
 2015-04-03  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34837: Src/glob.c: avoid loss of original file path when applying

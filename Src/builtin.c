@@ -3236,21 +3236,23 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 		/* -p option is for path search only.    *
 		 * We're not using it, so search for ... */
 
-		informed = /* logical OR of what follows */
-
 		/* aliases ... */
+		informed +=
 		scanmatchtable(aliastab, pprog, 1, 0, DISABLED,
-			       aliastab->printnode, printflags) ||
+			       aliastab->printnode, printflags);
 
 		/* and reserved words ... */
+		informed +=
 		scanmatchtable(reswdtab, pprog, 1, 0, DISABLED,
-			       reswdtab->printnode, printflags) ||
+			       reswdtab->printnode, printflags);
 
 		/* and shell functions... */
+		informed +=
 		scanmatchtable(shfunctab, pprog, 1, 0, DISABLED,
-			       shfunctab->printnode, printflags) ||
+			       shfunctab->printnode, printflags);
 
 		/* and builtins. */
+		informed +=
 		scanmatchtable(builtintab, pprog, 1, 0, DISABLED,
 			       builtintab->printnode, printflags);
 	    }
