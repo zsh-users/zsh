@@ -32,6 +32,7 @@ COMMENT(--- emphasised text ---)
 def(em)(1)(NOTRANS(\fI)ARG1+NOTRANS(\fP))
 def(bf)(1)(NOTRANS(\fB)ARG1+NOTRANS(\fP))
 def(tt)(1)(NOTRANS(\fB)ARG1+NOTRANS(\fP))
+def(uref)(1)(NOTRANS(\fB)ARG1+NOTRANS(\fP))
 def(var)(1)(NOTRANS(\fI)ARG1+NOTRANS(\fP))
 
 COMMENT(--- man page headers ---)

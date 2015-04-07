@@ -28,9 +28,9 @@ cindex(availability of zsh)
 INCLUDEFILE(Zsh/ftp_sites.yo)\
 
 The up-to-date source code is available via Git from Sourceforge.  See
-tt(http://sourceforge.net/projects/zsh/) for details.  A summary of
+uref(http://sourceforge.net/projects/zsh/) for details.  A summary of
 instructions for the archive can be found at
-tt(http://zsh.sourceforge.net/).
+uref(http://zsh.sourceforge.net/).
 
 texinode(Mailing Lists)(The Zsh FAQ)(Availability)(Introduction)
 sect(Mailing Lists)
@@ -75,18 +75,18 @@ maintained by Karsten Thygesen tt(<karthy@kom.auc.dk>).
 The mailing lists are archived; the archives can be accessed via the
 administrative addresses listed above.  There is also a hypertext
 archive, maintained by Geoff Wing tt(<gcw@zsh.org>), available at
-tt(http://www.zsh.org/mla/).
+uref(http://www.zsh.org/mla/).
 texinode(The Zsh FAQ)(The Zsh Web Page)(Mailing Lists)(Introduction)
 sect(The Zsh FAQ)
 Zsh has a list of Frequently Asked Questions (FAQ), maintained by
 Peter Stephenson tt(<pws@zsh.org>).  It is regularly posted to the
 newsgroup bf(comp.unix.shell) and the bf(zsh-announce) mailing list.
 The latest version can be found at any of the Zsh FTP sites, or at
-tt(http://www.zsh.org/FAQ/).  The contact address for FAQ-related matters
+uref(http://www.zsh.org/FAQ/).  The contact address for FAQ-related matters
 is tt(<faqmaster@zsh.org>).
 texinode(The Zsh Web Page)(The Zsh Userguide)(The Zsh FAQ)(Introduction)
 sect(The Zsh Web Page)
-Zsh has a web page which is located at tt(http://www.zsh.org/).  This is
+Zsh has a web page which is located at uref(http://www.zsh.org/).  This is
 maintained by Karsten Thygesen tt(<karthy@zsh.org>), of SunSITE Denmark.
 The contact address for web-related matters is tt(<webmaster@zsh.org>).
 texinode(The Zsh Userguide)(See Also)(The Zsh Web Page)(Introduction)
@@ -95,10 +95,10 @@ A userguide is currently in preparation.  It is intended to complement the
 manual, with explanations and hints on issues where the manual can be
 cabbalistic, hierographic, or downright mystifying (for example, the word
 `hierographic' does not exist).  It can be viewed in its current state at
-tt(http://zsh.sourceforge.net/Guide/).  At the time of writing, chapters
+uref(http://zsh.sourceforge.net/Guide/).  At the time of writing, chapters
 dealing with startup files and their contents and the new completion system
 were essentially complete.
 sect(The Zsh Wiki)
-A `wiki' website for zsh has been created at tt(http://www.zshwiki.org/).
+A `wiki' website for zsh has been created at uref(http://www.zshwiki.org/).
 This is a site which can be added to and modified directly by users without
 any special permission.  You can add your own zsh tips and configurations.

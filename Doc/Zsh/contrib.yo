@@ -595,22 +595,22 @@ In order to do that, you may use the tt(vcs_info) function.
 The following VCSs are supported, showing the abbreviated name by which
 they are referred to within the system:
 startsitem()
-sitem(Bazaar (tt(bzr)))(http://bazaar-vcs.org/)
-sitem(Codeville (tt(cdv)))(http://codeville.org/)
-sitem(Concurrent Versioning System (tt(cvs)))(http://www.nongnu.org/cvs/)
-sitem(Darcs (tt(darcs)))(http://darcs.net/)
-sitem(Fossil (tt(fossil)))(http://fossil-scm.org/)
-sitem(Git (tt(git)))(http://git-scm.com/)
-sitem(GNU arch (tt(tla)))(http://www.gnu.org/software/gnu-arch/)
-sitem(Mercurial (tt(hg)))(http://mercurial.selenic.com/)
-sitem(Monotone (tt(mtn)))(http://monotone.ca/)
-sitem(Perforce (tt(p4)))(http://www.perforce.com/)
-sitem(Subversion (tt(svn)))(http://subversion.tigris.org/)
-sitem(SVK (tt(svk)))(http://svk.bestpractical.com/)
+sitem(Bazaar (tt(bzr)))(uref(http://bazaar.canonical.com/))
+sitem(Codeville (tt(cdv)))(uref(http://freecode.com/projects/codeville/))
+sitem(Concurrent Versioning System (tt(cvs)))(uref(http://www.nongnu.org/cvs/))
+sitem(Darcs (tt(darcs)))(uref(http://darcs.net/))
+sitem(Fossil (tt(fossil)))(uref(http://fossil-scm.org/))
+sitem(Git (tt(git)))(uref(http://git-scm.com/))
+sitem(GNU arch (tt(tla)))(uref(http://www.gnu.org/software/gnu-arch/))
+sitem(Mercurial (tt(hg)))(uref(http://mercurial.selenic.com/))
+sitem(Monotone (tt(mtn)))(uref(http://monotone.ca/))
+sitem(Perforce (tt(p4)))(uref(http://www.perforce.com/))
+sitem(Subversion (tt(svn)))(uref(http://subversion.apache.org/))
+sitem(SVK (tt(svk)))(uref(http://svk.bestpractical.com/))
 endsitem()
 
 There is also support for the patch management system tt(quilt)
-(http://savannah.nongnu.org/projects/quilt). See tt(Quilt Support)
+(uref(http://savannah.nongnu.org/projects/quilt)). See tt(Quilt Support)
 below for details.
 
 To load tt(vcs_info):
@@ -2061,7 +2061,7 @@ accented characters, the two keys are a base character followed by a code
 for the accent, while for other special characters the two characters
 together form a mnemonic for the character to be inserted.  The
 two-character codes are a subset of those given by RFC 1345 (see for
-example tt(http://www.faqs.org/rfcs/rfc1345.html)).
+example uref(http://www.faqs.org/rfcs/rfc1345.html)).
 
 The function may optionally be followed by up to two characters which
 replace one or both of the characters read from the keyboard; if both

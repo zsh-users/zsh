@@ -19,6 +19,7 @@ ARG1
 def(em)(1)(ARG1)
 def(bf)(1)(ARG1)
 def(tt)(1)(ARG1)
+def(uref)(1)(ARG1)
 def(var)(1)(ARG1)
 def(nofill)(1)(ARG1)
 

@@ -1,3 +1,10 @@
+2015-04-07  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 34850: Doc/zman.yo, Doc/ztexi.yo, Doc/META-FAQ.yo,
+	Doc/Zsh/contrib.yo, Doc/Zsh/ftp_sites.yo, Doc/Zsh/manual.yo,
+	Doc/Zsh/metafaq.yo, Doc/Zsh/roadmap.yo: make URLs in html/pdf
+	docs clickable
+
 2015-04-06  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34851: Src/builtin.c: fix thinko from 34093 that short-circuited

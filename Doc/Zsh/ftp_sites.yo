@@ -1,15 +1,15 @@
 startitem()
 item(Primary site)(
-nofill(tt(ftp://ftp.zsh.org/pub/)
-tt(http://www.zsh.org/pub/))
+nofill(uref(ftp://ftp.zsh.org/pub/)
+uref(http://www.zsh.org/pub/))
 )
 item(Australia)(
-nofill(tt(ftp://ftp.zsh.org/pub/)
-tt(http://www.zsh.org/pub/)
-tt(http://mirror.dejanseo.com.au/pub/zsh/))
+nofill(uref(ftp://ftp.zsh.org/pub/)
+uref(http://www.zsh.org/pub/)
+uref(http://mirror.dejanseo.com.au/pub/zsh/))
 )
 item(Hungary)(
-nofill(tt(ftp://ftp.cs.elte.hu/pub/zsh/)
-tt(http://www.cs.elte.hu/pub/zsh/))
+nofill(uref(ftp://ftp.cs.elte.hu/pub/zsh/)
+uref(http://www.cs.elte.hu/pub/zsh/))
 )
 enditem()

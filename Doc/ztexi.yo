@@ -38,6 +38,7 @@ COMMENT(--- emphasised text ---)
 def(em)(1)(+NOTRANS(@emph{)ARG1+NOTRANS(}))
 def(bf)(1)(+NOTRANS(@cite{)ARG1+NOTRANS(}))
 def(tt)(1)(+NOTRANS(@t{)ARG1+NOTRANS(}))
+def(uref)(1)(+NOTRANS(@t{@uref{)ARG1+NOTRANS(}}))
 def(var)(1)(+NOTRANS(@var{)ARG1+NOTRANS(}))
 
 COMMENT(--- man page headers ---)

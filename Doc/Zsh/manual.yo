@@ -185,16 +185,16 @@ produce a nicely formatted printed manual.
 item(The HTML manual)(
 An HTML version of this manual is available at the Zsh web site via:
 
-tt(http://zsh.sourceforge.net/Doc/).
+uref(http://zsh.sourceforge.net/Doc/).
 
 (The HTML version is produced with bf(texi2html), which may be obtained
-from tt(http://www.nongnu.org/texi2html/). The command is
+from uref(http://www.nongnu.org/texi2html/). The command is
 `tt(texi2html --output .  --ifinfo --split=chapter --node-files zsh.texi)'.
 If necessary, upgrade to version 1.78 of texi2html.)
 )
 enditem()
 
 For those who do not have the necessary tools to process texinfo,
-precompiled documentation (PostScript, dvi, info and HTML formats)
+precompiled documentation (PostScript, dvi, PDF, info and HTML formats)
 is available from the zsh archive site or its mirrors, in the file
 tt(zsh-doc.tar.gz). (See noderef(Availability) for a list of sites.)
