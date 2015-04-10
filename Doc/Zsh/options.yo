@@ -1846,8 +1846,8 @@ cindex(history style, csh)
 item(tt(CSH_JUNKIE_HISTORY) <C>)(
 A history reference without an event specifier will always refer to the
 previous command.  Without this option, such a history reference refers
-to the same event as the previous history reference, defaulting to the
-previous command.
+to the same event as the previous history reference on the current 
+command line, defaulting to the previous command.
 )
 pindex(CSH_JUNKIE_LOOPS)
 pindex(NO_CSH_JUNKIE_LOOPS)
