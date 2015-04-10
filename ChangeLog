@@ -1,3 +1,8 @@
+2015-04-10  Clint Adams  <clint@zsh.org>
+
+	* 34874: Completion/Unix/Command/_cabal: completion for cabal
+	command from cabal-install.
+
 2015-04-10  Daniel Hahler  <git@thequod.de>
 
 	* 34748: Completion/Unix/Command/_git: completion: git: update
