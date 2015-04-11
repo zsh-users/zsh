@@ -5634,7 +5634,9 @@ __git_commit_objects () {
   local gitdir expl start
   declare -a commits
 
-  : ${(A)commits::=${(f)"$(_call_program commits git --no-pager log -20 --format='%h:%s')"}}
+  # Note: the after-the-colon part must be unique across the entire array;
+  # see workers/34768
+  : ${(A)commits::=${(f)"$(_call_program commits git --no-pager log -20 --format='%h:\\\[%h\\\]\ %s')"}}
   __git_command_successful $pipestatus || return 1
 
   _describe -t commits 'commit object name' commits || _guard '[[:xdigit:]](#c,40)' 'commit object name'
