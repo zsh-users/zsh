@@ -2097,7 +2097,7 @@ pindex(NOPOSIXTRAPS)
 cindex(traps, on function exit)
 cindex(traps, POSIX compatibility)
 item(tt(POSIX_TRAPS) <K> <S>)(
-When the is option is set, the usual zsh behaviour of executing
+When this option is set, the usual zsh behaviour of executing
 traps for tt(EXIT) on exit from shell functions is suppressed.
 In that case, manipulating tt(EXIT) traps always alters the global
 trap for exiting the shell; the tt(LOCAL_TRAPS) option is

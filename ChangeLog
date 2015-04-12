@@ -1,5 +1,7 @@
 2015-04-13  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Han Pingtian: 34880: Doc/Zsh/options.yo: POSIX_TRAPS doc.
+
 	* Han Pingtian: 34875: Doc/Zsh/options.yo: CSH_JUNKIE_HISTORY doc.
 
 	* Han Pingtian: users/20078: Doc/Zsh/options.yo: HIST_BEEP doc.
