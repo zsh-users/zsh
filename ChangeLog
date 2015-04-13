@@ -1,5 +1,8 @@
 2015-04-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* users/20159: Completion/Zsh/Command/_zstyle: completion: zstyle:
+	Add 'show-ambiguity'
+
 	* 34886: Completion/Unix/Command/_git: completion: git: Complete
 	rebase --exec argument
 

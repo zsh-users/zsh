@@ -125,6 +125,7 @@ styles=(
   select-prompt          c:
   select-scroll          c:
   separate-sections      c:bool
+  show-ambiguity	 c:
   show-completer	 c:bool
   single-ignored         c:single-ignored
   sort			 c:bool
