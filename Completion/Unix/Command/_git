@@ -1335,7 +1335,7 @@ _git-rebase () {
     '(-i --interactive --ignore-whitespace --whitespace --committer-date-is-author-date)'{-i,--interactive}'[make a list of commits to be rebased and open in $EDITOR]' \
     '--edit-todo[edit interactive instruction sheet in an editor]' \
     '(-p --preserve-merges --interactive)'{-p,--preserve-merges}'[try to recreate merges instead of ignoring them]' \
-    {-x,--exec=}'[with -i\: append "exec <cmd>" after each line]:command' \
+    {-x,--exec=}'[with -i\: append "exec <cmd>" after each line]:command:_command_names -e' \
     '(1)--root[rebase all reachable commits]' \
     $autosquash_opts \
     '(--autostash --no-autostash)--autostash[stash uncommitted changes before rebasing and apply them afterwards]' \
