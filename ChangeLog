@@ -1,5 +1,7 @@
 2015-04-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 34901: Test/A04redirect.ztst: Test for the foregoing.
+
 	* 34900: Src/exec.c: assignment before an "exec" with
 	a redirection, with and without POSIXBUILTINS.
 

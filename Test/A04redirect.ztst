@@ -538,3 +538,20 @@
   print $functions[noredirfn]
 0:Output from $functions[] for definition with no redirection
 >	print This rather boring function has no redirection.
+
+  (x=43
+   x=$(print This should appear, really >&2; print Not used) exec >test.log
+   print x=$x)
+   cat test.log
+0:Assignment with exec used for redirection: no POSIX_BUILTINS
+>x=43
+?This should appear, really
+
+  (setopt POSIX_BUILTINS
+   x=45
+   x=$(print This should appear, too >&2; print And this) exec >test.log
+   print x=$x)
+   cat test.log
+0:Assignment with exec used for redirection: POSIX_BUILTINS
+>x=And this
+?This should appear, too
