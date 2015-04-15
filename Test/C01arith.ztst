@@ -383,4 +383,7 @@
   print ${$(( $1 * 100 ))%%.[0-9]#})
 0:Arithmetic substitution nested in parameter substitution
 >3246
- 
+
+  print $((`:`))
+0:Null string in arithmetic evaluation after command substitution
+>0

@@ -1,5 +1,8 @@
 2015-04-15  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34892 (slightly tweaked): Src/math.c, Test/C01arith.ztst: fix
+	math evaluation with empty expression resulting from substitution.
+
 	* 34887: Src/exec, Test/E01options.ztst: assignments before
 	"command special-builtin/func" in POSIX_BUILTINS mode behave as
 	normal command. Tidy up case handling in code and add test.
