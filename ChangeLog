@@ -1,3 +1,8 @@
+2015-04-17  Daniel Hahler  <git@thequod.de>
+
+	* 34899: Completion/Unix/Command/_vim: completion: _vim: add
+	nvim to #compdef
+
 2015-04-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34905: Src/Zle/zle_keymap.c, Src/lex.c, Src/parse.c: suppress
