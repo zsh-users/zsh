@@ -3305,6 +3305,20 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    closemn(mfds, i, REDIR_CLOSE);
 
     if (nullexec) {
+	/*
+	 * If nullexec is 2, we have variables to add with the redirections
+	 * in place.  If nullexec is 1, we may have variables but they
+	 * need the standard restore logic.
+	 */
+	if (varspc) {
+	    LinkList restorelist = 0, removelist = 0;
+	    if (!isset(POSIXBUILTINS) && nullexec != 2)
+		save_params(state, varspc, &restorelist, &removelist);
+	    addvars(state, varspc, 0);
+	    if (restorelist)
+		restore_params(restorelist, removelist);
+	}
+	lastval = errflag ? errflag : cmdoutval;
 	if (nullexec == 1) {
 	    /*
 	     * If nullexec is 1 we specifically *don't* restore the original
@@ -3315,13 +3329,6 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    zclose(save[i]);
 	    goto done;
 	}
-	/*
-	 * If nullexec is 2, we have variables to add with the redirections
-	 * in place.
-	 */
-	if (varspc)
-	    addvars(state, varspc, 0);
-	lastval = errflag ? errflag : cmdoutval;
 	if (isset(XTRACE)) {
 	    fputc('\n', xtrerr);
 	    fflush(xtrerr);
