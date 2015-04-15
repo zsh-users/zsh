@@ -1398,7 +1398,9 @@ matheval(char *s)
     if (!mlevel)
 	outputradix = outputunderscore = 0;
 
-    if (!*s || *s == Nularg) {
+    if (*s == Nularg)
+	s++;
+    if (!*s) {
 	x.type = MN_INTEGER;
 	x.u.l = 0;
 	return x;
@@ -1435,7 +1437,9 @@ mathevalarg(char *s, char **ss)
      *
      * To avoid a more opaque error further in, bail out here.
      */
-    if (!*s || *s == Nularg) {
+    if (*s == Nularg)
+	s++;
+    if (!*s) {
 	zerr("bad math expression: empty string");
 	return (zlong)0;
     }

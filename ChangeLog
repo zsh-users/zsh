@@ -1,5 +1,8 @@
 2015-04-15  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Src/math.c: rewrite last commit to look more
+	like other uses of Nularg.
+
 	* 34892 (slightly tweaked): Src/math.c, Test/C01arith.ztst: fix
 	math evaluation with empty expression resulting from substitution.
 
