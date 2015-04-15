@@ -3384,14 +3384,28 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    LinkList restorelist = 0, removelist = 0;
 	    /* builtin or shell function */
 
-	    if (!forked && ((cflags & BINF_COMMAND) ||
-			    (unset(POSIXBUILTINS) && !assign) ||
-			    (isset(POSIXBUILTINS) && !is_shfunc &&
-			     !(hn->flags & BINF_PSPECIAL)))) {
-		if (varspc)
+	    if (!forked && varspc) {
+		int do_save = 0;
+		if (isset(POSIXBUILTINS)) {
+		    /*
+		     * If it's a function or special builtin --- save
+		     * if it's got "command" in front.
+		     * If it's a normal command --- save.
+		     */
+		    if (is_shfunc || (hn->flags & BINF_PSPECIAL))
+			do_save = (orig_cflags & BINF_COMMAND);
+		    else
+			do_save = 1;
+		} else {
+		    /*
+		     * Save if it's got "command" in front or it's
+		     * not a magic-equals assignment.
+		     */
+		    if ((cflags & BINF_COMMAND) || !assign)
+			do_save = 1;
+		}
+		if (do_save)
 		    save_params(state, varspc, &restorelist, &removelist);
-		else
-		    restorelist = removelist = NULL;
 	    }
 	    if (varspc) {
 		/* Export this if the command is a shell function,

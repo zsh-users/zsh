@@ -783,6 +783,19 @@
 >print is a shell builtin
 ?(eval):8: command not found: print
 
+  # With non-special command: original value restored
+  # With special builtin: new value kept
+  # With special builtin preceeded by "command": original value restored.
+  (setopt posixbuiltins
+  FOO=val0
+  FOO=val1 true; echo $FOO
+  FOO=val2 times 1>/dev/null 2>&1; echo $FOO
+  FOO=val3 command times 1>/dev/null 2>&1; echo $FOO)
+0:POSIX_BUILTINS and restoring variables
+>val0
+>val2
+>val2
+
 # PRINTEXITVALUE only works if shell input is coming from standard input.
 # Goodness only knows why.
   $ZTST_testdir/../Src/zsh -f <<<'
