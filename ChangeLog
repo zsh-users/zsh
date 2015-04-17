@@ -1,3 +1,8 @@
+2015-04-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34905: Src/Zle/zle_keymap.c, Src/lex.c, Src/parse.c: suppress
+	parse errors resulting from keyboard interruption.
+
 2015-04-16  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 34902: Doc/Zsh/compsys.yo, Doc/Zsh/contrib.yo, Doc/Zsh/zle.yo:

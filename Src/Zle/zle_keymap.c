@@ -503,8 +503,9 @@ selectkeymap(char *name, int fb)
 mod_export void
 selectlocalmap(Keymap m)
 {
+    Keymap oldm = localkeymap;
     localkeymap = m;
-    if (!m)
+    if (oldm && !m)
     {
 	/*
 	 * No local keymap; so we are returning to the global map.  If

@@ -2419,7 +2419,7 @@ yyerror(int noerr)
     for (t0 = 0; t0 != 20; t0++)
 	if (!t || !t[t0] || t[t0] == '\n')
 	    break;
-    if (!(histdone & HISTFLAG_NOEXEC)) {
+    if (!(histdone & HISTFLAG_NOEXEC) && !(errflag & ERRFLAG_INT)) {
 	if (t0 == 20)
 	    zwarn("parse error near `%l...'", t, 20);
 	else if (t0)

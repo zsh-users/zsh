@@ -1558,10 +1558,12 @@ parsestr(char **s)
 
     if ((err = parsestrnoerr(s))) {
 	untokenize(*s);
-	if (err > 32 && err < 127)
-	    zerr("parse error near `%c'", err);
-	else
-	    zerr("parse error");
+	if (!(errflag & ERRFLAG_INT)) {
+	    if (err > 32 && err < 127)
+		zerr("parse error near `%c'", err);
+	    else
+		zerr("parse error");
+	}
     }
     return err;
 }
