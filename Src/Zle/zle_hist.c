@@ -854,7 +854,7 @@ pushlineoredit(char **args)
     }
     ret = pushline(args);
     if (!isfirstln) {
-	errflag |= ERRFLAG_ERROR;
+	errflag |= ERRFLAG_ERROR|ERRFLAG_INT;
 	done = 1;
     }
     clearlist = 1;

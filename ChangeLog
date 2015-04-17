@@ -5,6 +5,9 @@
 
 2015-04-17  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34919: Src/Zle/zle_hist.c, Src/Zle/zle_misc.c: similar cases
+	with send-break and push-input.
+
 	* 34905: Src/Zle/zle_keymap.c, Src/lex.c, Src/parse.c: suppress
 	parse errors resulting from keyboard interruption.
 
