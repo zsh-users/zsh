@@ -605,6 +605,7 @@ par_event(int endtok)
 	if (!par_event(endtok)) {
 	    ecused = oec;
 	    ecbuf[p] |= wc_bdata(Z_END);
+	    return errflag ? 0 : 1;
 	}
     }
     return 1;

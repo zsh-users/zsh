@@ -1,3 +1,7 @@
+2015-04-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34921: Src/parse.c: handle error in recursive par_event().
+
 2015-04-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 34920: Etc/zsh-development-guide: info on git pull.
