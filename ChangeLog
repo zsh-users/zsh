@@ -1,3 +1,7 @@
+2015-04-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34920: Etc/zsh-development-guide: info on git pull.
+
 2015-04-17  Daniel Hahler  <git@thequod.de>
 
 	* 34899: Completion/Unix/Command/_vim: completion: _vim: add
