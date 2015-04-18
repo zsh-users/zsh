@@ -32,7 +32,7 @@ else
 fi
 
 fc_hist=(
-  '(-A -R -W -I -a -p -P 2)-m[treat argument as a pattern]'
+  '(-A -R -W -I -a -p -P)-m[treat argument as a pattern]'
   '(-A -R -W -I -e -f -E -i -t -a -p -P)-d[print time-stamps]'
   '(-A -R -W -I -e -d -E -i -t -a -p -P)-f[mm/dd/yyyy format time-stamps]'
   '(-A -R -W -I -e -d -f -i -t -a -p -P)-E[dd.mm.yyyy format time-stamps]'
