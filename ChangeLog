@@ -1,3 +1,8 @@
+2015-04-24  Mikael Magnusson  <mikachu@gmail.com>
+
+	* Oliver: 34940: Completion/Zsh/Command/_fc: fix typo breaking
+	completion for history
+
 2015-04-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34921: Src/parse.c: handle error in recursive par_event().

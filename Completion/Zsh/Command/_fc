@@ -49,7 +49,7 @@ fc_r='(-A -R -W -I -e)-l[list resulting commands on stdout]'
 
 case $service in
   history)
-    _arguments "$fc_common[@]" "$fc_hist[@] && ret=0"
+    _arguments "$fc_common[@]" "$fc_hist[@]" && ret=0
   ;;
   r)
     _arguments "$fc_common[@]" "$fc_r" && ret=0
