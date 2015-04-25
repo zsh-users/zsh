@@ -354,7 +354,7 @@ tt(all): no further completion is attempted; a string
 containing the substring tt(patterns): no pattern completion functions
 will be called; a string containing tt(default): the
 function for the `tt(-default-)' context will not be called, but
-functions defined for commands will
+functions defined for commands will be.
 )
 kindex(-math-, completion context)
 item(tt(-math-))(

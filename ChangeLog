@@ -1,5 +1,7 @@
 2015-04-25  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 34961: Doc/Zsh/compsys.yo: minor wording clarification
+
 	* 34961: Src/Modules/datetime.c: $TZ is implicitly local in
 	builtin strftime (originally workers/34602 from workers/34596)
 
