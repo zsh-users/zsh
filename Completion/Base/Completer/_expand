@@ -87,7 +87,7 @@ if [[ "$force" = *s* ]] ||
 
   setopt aliases
   eval 'exp=( ${${(e)exp//\\[ 	
-]/ }//(#b)([ 	
+]/ }//(#b)([ 	\\
 ])/\\$match[1]} )' 2>/dev/null
   setopt NO_aliases
 else
