@@ -1,5 +1,7 @@
 2015-04-25  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 34965: Src/glob.c: consistent use of zalloc/zrealloc/zfree
+
 	* 34961: Completion/Unix/Command/_mkdir: avoid _message because
 	it aborts completer list too early
 

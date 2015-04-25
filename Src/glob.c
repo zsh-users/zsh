@@ -437,7 +437,7 @@ insert(char *s, int checked)
 	matchptr++;
 
 	if (++matchct == matchsz) {
-	    matchbuf = (Gmatch )realloc((char *)matchbuf,
+	    matchbuf = (Gmatch)zrealloc((char *)matchbuf,
 					sizeof(struct gmatch) * (matchsz *= 2));
 
 	    matchptr = matchbuf + matchct;
@@ -1818,7 +1818,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 	    badcshglob |= 1;	/* at least one cmd. line expansion failed */
 	} else if (isset(NOMATCH)) {
 	    zerr("no matches found: %s", ostr);
-	    free(matchbuf);
+	    zfree(matchbuf, 0);
 	    restore_globstate(saved);
 	    return;
 	} else {
@@ -1923,7 +1923,7 @@ zglob(LinkList list, LinkNode np, int nountok)
     } else if (!badcshglob && !isset(NOMATCH) && matchct == 1) {
 	insert_glob_match(list, node, (--matchptr)->name);
     }
-    free(matchbuf);
+    zfree(matchbuf, 0);
 
     restore_globstate(saved);
 }
