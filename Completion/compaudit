@@ -71,6 +71,7 @@ if [[ -n $_compdir ]]; then
       _i_addfiles=(${_compdir}/*(/^M))
     fi
     for _i_line in {1..$#_i_addfiles}; do
+      (( $_i_line )) || break
       _i_file=${_i_addfiles[$_i_line]}
       [[ -d $_i_file && -z ${fpath[(r)$_i_file]} ]] ||
         _i_addfiles[$_i_line]=
