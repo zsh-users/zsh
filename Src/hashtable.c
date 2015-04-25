@@ -910,7 +910,7 @@ printshfuncnode(HashNode hn, int printflags)
 {
     Shfunc f = (Shfunc) hn;
     char *t = 0;
- 
+
     if ((printflags & PRINT_NAMEONLY) ||
 	((printflags & PRINT_WHENCE_SIMPLE) &&
 	!(printflags & PRINT_WHENCE_FUNCDEF))) {
@@ -922,8 +922,16 @@ printshfuncnode(HashNode hn, int printflags)
     if ((printflags & (PRINT_WHENCE_VERBOSE|PRINT_WHENCE_WORD)) &&
 	!(printflags & PRINT_WHENCE_FUNCDEF)) {
 	nicezputs(f->node.nam, stdout);
-	printf((printflags & PRINT_WHENCE_WORD) ? ": function\n" :
-	       " is a shell function\n");
+	printf((printflags & PRINT_WHENCE_WORD) ? ": function" :
+	       (f->node.flags & PM_UNDEFINED) ?
+	       " is an autoload shell function" :
+	       " is a shell function");
+	if (f->filename && (printflags & PRINT_WHENCE_VERBOSE) &&
+	    strcmp(f->filename, f->node.nam) != 0) {
+	    printf(" from ");
+	    quotedzputs(f->filename, stdout);
+	}
+	putchar('\n');
 	return;
     }
  

@@ -1,5 +1,8 @@
 2015-04-25  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 34966: Src/hashtable.c: "whence -v" for a function reports
+	whether the function is autoloaded or its source file when known
+
 	* 34965: Src/glob.c: consistent use of zalloc/zrealloc/zfree
 
 	* 34961: Completion/Unix/Command/_mkdir: avoid _message because
