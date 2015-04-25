@@ -51,9 +51,14 @@ ISUFFIX=
 # We skip the first element of historywords so the current word doesn't
 # interfere with the completion
 
+local -a hslice
 while [[ $compstate[nmatches] -eq 0 && beg -lt max ]]; do
+  if [[ -n $compstate[quote] ]]
+  then hslice=( ${(Q)historywords[beg,beg+slice]} )
+  else hslice=( ${historywords[beg,beg+slice]} )
+  fi
   _wanted "$opt" history-words expl 'history word' \
-      compadd -Q -a 'historywords[beg,beg+slice]'
+      compadd -Q -a hslice
   (( beg+=slice ))
 done
 
