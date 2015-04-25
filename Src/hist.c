@@ -2255,10 +2255,10 @@ getargs(Histent elist, int arg1, int arg2)
 }
 
 /**/
-int
+static int
 quote(char **tr)
 {
-    char *ptr, *rptr, **str = (char **)tr;
+    char *ptr, *rptr, **str = tr;
     int len = 3;
     int inquotes = 0;
 
@@ -2299,7 +2299,7 @@ quote(char **tr)
 static int
 quotebreak(char **tr)
 {
-    char *ptr, *rptr, **str = (char **)tr;
+    char *ptr, *rptr, **str = tr;
     int len = 3;
 
     for (ptr = *str; *ptr; ptr++, len++)

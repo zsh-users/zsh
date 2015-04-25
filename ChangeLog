@@ -1,5 +1,7 @@
 2015-04-25  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 34961: Src/hist.c: clean up decl's of quote() and quotebreak()
+
 	* 34961: Doc/Zsh/mod_system.yo: sysparams[pid] and sysparams[ppid]
 	added to variables index
 
