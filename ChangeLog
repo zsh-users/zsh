@@ -1,5 +1,8 @@
 2015-04-25  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 34961: Completion/Unix/Command/_mkdir: avoid _message because
+	it aborts completer list too early
+
 	* 34961: Completion/Base/Completer/_history: unquote history words
 	when command line has a quote
 
