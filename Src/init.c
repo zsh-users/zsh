@@ -1409,7 +1409,7 @@ source(char *s)
 	retflag = 0;
     scriptname = old_scriptname;
     scriptfilename = old_scriptfilename;
-    free(cmdstack);
+    zfree(cmdstack, CMDSTACKSZ);
     cmdstack = ocs;
     cmdsp = ocsp;
 

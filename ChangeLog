@@ -1,5 +1,8 @@
 2015-04-25  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 34961: Src/compat.c, Src/init.c: replace a couple of free() with
+	zfree() for consistency.
+
 	* 34961: Completion/Base/Completer/_expand: add backslash to alias
 	expansion matching (related to workers/32186)
 

@@ -443,7 +443,7 @@ zgetcwd(void)
 	ret = getcwd(cwdbuf, PATH_MAX);
 	if (ret)
 	    ret = dupstring(ret);
-	free(cwdbuf);
+	zfree(cwdbuf, PATH_MAX);
 #endif /* GETCWD_CALLS_MALLOC */
     }
 #endif /* HAVE_GETCWD */
