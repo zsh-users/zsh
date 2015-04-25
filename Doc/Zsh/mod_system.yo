@@ -181,10 +181,12 @@ A readonly associative array.  The keys are:
 
 startitem()
 item(tt(pid))(
+vindex(pid, sysparams)
 Returns the process ID of the current process, even in subshells.  Compare
 tt($$), which returns the process ID of the main shell process.
 )
 item(tt(ppid))(
+vindex(ppid, sysparams)
 Returns the process ID of the parent of the current process, even in
 subshells.  Compare tt($PPID), which returns the process ID of the parent
 of the main shell process.
