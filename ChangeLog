@@ -1,5 +1,8 @@
 2015-04-28  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Jared Ahern: 34980: Completion/Unix/Command/_make: expanding
+	make variables was somewhat broken.
+
 	* Jared Ahern: 34980: Completion/Unix/Command/_make: match
 	additional forms of assignment in makefiles.
 
