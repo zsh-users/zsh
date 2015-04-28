@@ -28,8 +28,8 @@ hdrdeps="zshcurses.h zshterm.h"
 # on the option to remove them being the same.
 signames.c: signames1.awk signames2.awk ../config.h @SIGNAL_H@
 	$(AWK) -f $(sdir)/signames1.awk @SIGNAL_H@ >sigtmp.c
-	case "$(CPP)" in \
-	gcc*) \
+	case "`$(CPP) --version </dev/null 2>&1`" in \
+	*"Free Software Foundation"*) \
 	$(CPP) -P sigtmp.c >sigtmp.out;; \
 	*) \
 	$(CPP) sigtmp.c >sigtmp.out;; \

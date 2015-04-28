@@ -1,3 +1,8 @@
+2015-04-28  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34977: Src/zsh.mdd: more reliable test for whether
+	preprocessor is GNU.
+
 2015-04-25  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34966: Src/hashtable.c: "whence -v" for a function reports
