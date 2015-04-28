@@ -1147,6 +1147,7 @@ execlist(Estate state, int dont_change_job, int exiting)
     wordcode code;
     int ret, cj, csp, ltype;
     int old_pline_level, old_list_pipe, old_list_pipe_job;
+    char *old_list_pipe_text;
     zlong oldlineno;
     /*
      * ERREXIT only forces the shell to exit if the last command in a &&
@@ -1160,10 +1161,16 @@ execlist(Estate state, int dont_change_job, int exiting)
     old_pline_level = pline_level;
     old_list_pipe = list_pipe;
     old_list_pipe_job = list_pipe_job;
+    if (*list_pipe_text)
+	old_list_pipe_text = ztrdup(list_pipe_text);
+    else
+	old_list_pipe_text = NULL;
     oldlineno = lineno;
 
-    if (sourcelevel && unset(SHINSTDIN))
+    if (sourcelevel && unset(SHINSTDIN)) {
 	pline_level = list_pipe = list_pipe_job = 0;
+	*list_pipe_text = '\0';
+    }
 
     /* Loop over all sets of comands separated by newline, *
      * semi-colon or ampersand (`sublists').               */
@@ -1399,6 +1406,12 @@ sublist_done:
     pline_level = old_pline_level;
     list_pipe = old_list_pipe;
     list_pipe_job = old_list_pipe_job;
+    if (old_list_pipe_text) {
+	strcpy(list_pipe_text, old_list_pipe_text);
+	zsfree(old_list_pipe_text);
+    } else {
+	*list_pipe_text = '\0';
+    }
     lineno = oldlineno;
     if (dont_change_job)
 	thisjob = cj;

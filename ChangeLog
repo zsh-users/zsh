@@ -1,5 +1,7 @@
 2015-04-28  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 34979: Src/exec.c: preserve job text in shell job fix code.
+
 	* 34977: Src/zsh.mdd: more reliable test for whether
 	preprocessor is GNU.
 
