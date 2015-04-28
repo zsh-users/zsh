@@ -64,18 +64,18 @@ _make-parseMakefile () {
   while read input
   do
     case "$input " in
-      # VARIABLE = value
-      ([[:alnum:]][[:alnum:]_]#[ $TAB]#=*)
-      var=${input%%[ $TAB]#=*}
+      # VARIABLE = value OR VARIABLE ?= value
+      ([[:alnum:]][[:alnum:]_]#[ $TAB]#(\?|)=*)
+      var=${input%%[ $TAB]#(\?|)=*}
       val=${input#*=}
       val=${val##[ $TAB]#}
       VARIABLES[$var]=$val
       ;;
 
-      # VARIABLE := value
+      # VARIABLE := value OR VARIABLE ::= value
       # Evaluated immediately
-      ([[:alnum:]][[:alnum:]_]#[ $TAB]#:=*)
-      var=${input%%[ $TAB]#:=*}
+      ([[:alnum:]][[:alnum:]_]#[ $TAB]#:(:|)=*)
+      var=${input%%[ $TAB]#:(:|)=*}
       val=${input#*=}
       val=${val##[ $TAB]#}
       val=$(_make-expandVars $val)
