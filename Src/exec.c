@@ -2930,6 +2930,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	 * is a directory we should AUTOCD to. */
 	if (!hn && trycd && (s = cancd(peekfirst(args)))) {
 	    peekfirst(args) = (void *) s;
+	    pushnode(args, dupstring("--"));
 	    pushnode(args, dupstring("cd"));
 	    if ((hn = builtintab->getnode(builtintab, "cd")))
 		is_builtin = 1;

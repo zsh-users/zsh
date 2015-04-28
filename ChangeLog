@@ -1,3 +1,8 @@
+2015-04-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 34989: Src/exec.c: AUTOCD needs to pass -- to cd to avoid
+	directory being treated as option.
+
 2015-04-28  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Jared Ahern: 34980: Completion/Unix/Command/_make: expanding
