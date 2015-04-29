@@ -1931,8 +1931,12 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
      * locallevel as an unset one we use the pm struct anyway: that's
      * handled in createparam().  Here we just avoid using it for the
      * present tests if it's unset.
+     *
+     * POSIXBUILTINS horror: we need to retain the 'readonly' flag
+     * of an unset parameter.
      */
-    usepm = pm && !(pm->node.flags & PM_UNSET);
+    usepm = pm && (!(pm->node.flags & PM_UNSET) ||
+		   (isset(POSIXBUILTINS) && (pm->node.flags & PM_READONLY)));
 
     /*
      * We need to compare types with an existing pm if special,
@@ -2032,6 +2036,20 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
     else if (newspecial != NS_NONE && strcmp(pname, "SECONDS") == 0)
 	newspecial = NS_SECONDS;
 
+    if (isset(POSIXBUILTINS)) {
+	/*
+	 * Stricter rules about retaining readonly attribute in this case.
+	 */
+	if ((on & PM_READONLY) && (!usepm || (pm->node.flags & PM_UNSET)) &&
+	    !value)
+	    on |= PM_UNSET;
+	else if (usepm && (pm->node.flags & PM_READONLY) &&
+		 !(on & PM_READONLY)) {
+	    zerr("read-only variable: %s", pm->node.nam);
+	    return NULL;
+	}
+    }
+
     /*
      * A parameter will be local if
      * 1. we are re-using an existing local parameter
@@ -2078,9 +2096,15 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	}
 	if (usepm == 2)		/* do not change the PM_UNSET flag */
 	    pm->node.flags = (pm->node.flags | (on & ~PM_READONLY)) & ~off;
-	else
+	else {
+	    /*
+	     * Keep unset if using readonly in POSIX mode.
+	     */
+	    if (!(on & PM_READONLY) || !isset(POSIXBUILTINS))
+		off |= PM_UNSET;
 	    pm->node.flags = (pm->node.flags |
-			      (on & ~PM_READONLY)) & ~(off | PM_UNSET);
+			      (on & ~PM_READONLY)) & ~off;
+	}
 	if (on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
 	    if (typeset_setwidth(cname, pm, ops, on, 0))
 		return NULL;
@@ -2256,7 +2280,12 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	 * readonly flag
 	 */
 	pm = createparam(pname, on & ~PM_READONLY);
-	DPUTS(!pm, "BUG: parameter not created");
+	if (!pm) {
+	    if (on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z |
+		      PM_INTEGER | PM_EFLOAT | PM_FFLOAT))
+		zerrnam(cname, "can't change variable attribute: %s", pname);
+	    return NULL;
+	}
 	if (on & (PM_LEFT | PM_RIGHT_B | PM_RIGHT_Z)) {
 	    if (typeset_setwidth(cname, pm, ops, on, 0))
 		return NULL;

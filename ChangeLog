@@ -1,3 +1,10 @@
+2015-04-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 34992: Doc/Zsh/builtins.yo, Src/builtin.c, Src/params.c,
+	Test/B02typeset.ztst: With POSXIBUILTINS, parameters can be
+	marked readonly if unset and in any case can't subsequently be
+	marked not readonly.
+
 2015-04-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 34989: Src/exec.c: AUTOCD needs to pass -- to cd to avoid

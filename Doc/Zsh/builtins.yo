@@ -1933,6 +1933,13 @@ item(tt(-r))(
 The given var(name)s are marked readonly.  Note that if var(name) is a
 special parameter, the readonly attribute can be turned on, but cannot then
 be turned off.
+
+If the tt(POSIX_BUILTINS) option is set, the readonly attribute is
+more restrictive: unset variables can be marked readonly and cannot then
+be set; furthermore, the readonly attribute cannot be removed from any
+variable.  Note that in zsh (unlike other shells) it is still possible
+to create a local variable of the same name as this is considered a
+different variable (though this variable, too, can be marked readonly).
 )
 item(tt(-t))(
 Tags the named parameters.  Tags have no special meaning to the shell.

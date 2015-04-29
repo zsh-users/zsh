@@ -468,3 +468,20 @@
 0:retying arrays to same array works
 >foo bar
 >goo car
+
+ (
+   setopt POSIXBUILTINS
+   readonly pbro
+   print ${+pbro} >&2
+   (typeset pbro=3)
+   (pbro=4)
+   typeset -r pbro        # idempotent (no error)...
+   print ${+pbro} >&2     # ...so still readonly...
+   typeset +r pbro        # ...can't turn it off
+ )
+1:Readonly with POSIX_BUILTINS
+?0
+?(eval):5: read-only variable: pbro
+?(eval):6: read-only variable: pbro
+?0
+?(eval):9: read-only variable: pbro

@@ -874,10 +874,14 @@ createparam(char *name, int flags)
 	DPUTS(oldpm && oldpm->level > locallevel,
 	      "BUG: old local parameter not deleted");
 	if (oldpm && (oldpm->level == locallevel || !(flags & PM_LOCAL))) {
+	    if (isset(POSIXBUILTINS) && (oldpm->node.flags & PM_READONLY)) {
+		zerr("read-only variable: %s", name);
+		return NULL;
+	    }
 	    if (!(oldpm->node.flags & PM_UNSET) || (oldpm->node.flags & PM_SPECIAL)) {
 		oldpm->node.flags &= ~PM_UNSET;
 		if ((oldpm->node.flags & PM_SPECIAL) && oldpm->ename) {
-		    Param altpm = 
+		    Param altpm =
 			(Param) paramtab->getnode(paramtab, oldpm->ename);
 		    if (altpm)
 			altpm->node.flags &= ~PM_UNSET;
