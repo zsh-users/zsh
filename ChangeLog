@@ -1,3 +1,8 @@
+2015-05-01  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 35008: Doc/Zsh/builtins.yo: clarify description of 'exec' and
+	'return'
+
 2015-05-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35007: Doc/Zsh/zle.yo: note about scope of ZLE parameters.

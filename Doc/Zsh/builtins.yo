@@ -198,7 +198,7 @@ cindex(exiting loops)
 cindex(loops, exiting)
 item(tt(break) [ var(n) ])(
 Exit from an enclosing tt(for), tt(while),
-tt(until), tt(select) or tt(repeat) loop.  If var(n)
+tt(until), tt(select) or tt(repeat) loop. If an arithmetic expression var(n)
 is specified, then break var(n) levels instead of just one.
 )
 findex(builtin)
@@ -291,7 +291,7 @@ cindex(continuing loops)
 item(tt(continue) [ var(n) ])(
 Resume the next iteration of the enclosing
 tt(for), tt(while), tt(until), tt(select) or
-tt(repeat) loop.  If var(n) is specified, break out of
+tt(repeat) loop. If an arithmetic expression var(n) is specified, break out of
 var(n)-1 loops and resume at the var(n)th enclosing loop.
 )
 alias(declare)(typeset)
@@ -615,16 +615,21 @@ the same as if the commands had been executed directly by the shell;
 if there are no var(args) or they contain no commands (i.e. are
 an empty string or whitespace) the return status is zero.
 )
-item(tt(exec) [ tt(-cl) ] [ tt(-a) var(argv0) ] var(simple command))(
-Replace the current shell with an external command rather than forking.
+item(tt(exec) [ tt(-cl) ] [ tt(-a) var(argv0) ] [ var(command) [ var(arg) ... ]])(
+Replace the current shell with an external var(command) rather than forking.
 With tt(-c) clear the environment; with tt(-l) prepend tt(-) to the
 tt(argv[0]) string of the command executed (to simulate a login shell);
 with tt(-a) var(argv0) set the tt(argv[0]) string of the command
 executed.  See noderef(Precommand Modifiers).
+
+cindex(redirection, current shell's I/O)
+If var(command) is omitted but any redirections are specified,
+then the redirections will take effect in the current shell.
 )
 findex(exit)
 item(tt(exit) [ var(n) ])(
-Exit the shell with the exit status specified by var(n); if none
+Exit the shell with the exit status specified by an arithmetic
+expression var(n); if none
 is specified, use the exit status from the last command executed.
 pindex(IGNORE_EOF, use of)
 An EOF condition will also cause the shell to exit, unless
@@ -1409,7 +1414,8 @@ findex(return)
 cindex(functions, returning from)
 item(tt(return) [ var(n) ])(
 Causes a shell function or `tt(.)' script to return to
-the invoking script with the return status specified by var(n).  If var(n)
+the invoking script with the return status specified by
+an arithmetic expression var(n). If var(n)
 is omitted, the return status is that of the last command
 executed.
 
