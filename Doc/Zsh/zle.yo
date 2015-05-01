@@ -743,6 +743,21 @@ local scope, like parameters created in a function using tt(local).
 Inside completion widgets and traps called while ZLE is active, these
 parameters are available read-only.
 
+Note that the parameters appear as local to any ZLE widget in
+which they appear.  Hence if it is desired to override them this needs
+to be done within a nested function:
+
+example(widget-function+LPAR()+RPAR() {
+  # $WIDGET here refers to the special variable
+  # that is local inside widget-function
+  +LPAR()+RPAR() {
+     # This anonymous nested function allows WIDGET
+     # to be used as a local variable.  The -h
+     # removes the special status of the variable.
+     local -h WIDGET
+  }
+})
+
 startitem()
 vindex(BUFFER)
 item(tt(BUFFER) (scalar))(
