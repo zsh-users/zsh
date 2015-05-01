@@ -5,16 +5,11 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.0.7 of the shell.  This is a stable release.
-There are minor new features as well as bug fixes since 5.0.6.
-
-Note in particular there is a security fix to disallow evaluation of the
-initial values of integer variables imported from the environment (they
-are instead treated as literal numbers).  That could allow local
-privilege escalation, under some specific and atypical conditions where
-zsh is being invoked in privilege elevation contexts when the
-environment has not been properly sanitized, such as when zsh is invoked
-by sudo on systems where "env_reset" has been disabled.
+This is version 5.0.8 of the shell.  This is a stable release.
+There are no significant new features since 5.0.7, but there
+are many bugfixes and some significant internal improvements, notably
+a more predictable effect for keyboard interrupts and proper parsing
+of $(...) expressions.
 
 Installing Zsh
 --------------

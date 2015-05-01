@@ -1,3 +1,7 @@
+2015-05-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 35009: README, Etc/FAQ.yo: updates for 5.0.8.
+
 2015-05-01  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 35008: Doc/Zsh/builtins.yo: clarify description of 'exec' and
