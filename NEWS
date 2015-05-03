@@ -4,8 +4,35 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
-Changes since 5.0.0
--------------------
+Changes from 5.0.7 to 5.0.8
+---------------------------
+
+- Global aliases can be created for syntactic tokens such as command
+  separators (";", "&", "|", "&&", "||"), redirection operators, etc.
+  Use at your own risk!  The POSIX_ALIASES option is interpreted more
+  strictly to prevent expansion of these and other alias names containing
+  quotes, glob metacharacters, parameter references, etc.
+
+- There have been various further improvements to builtin handling
+  with the POSIX_BUILTINS option (off by default) for compatibility with
+  the POSIX standard.
+
+- 'whence -v' is now more informative, and 'whence -S' shows you
+  how a full chain of symbolic links resolves to a command.
+
+- The 'p' parameter flag now allows an argument to be specified
+  as a reference to a variable, e.g. ${(ps.$sep.)foo} to split $foo
+  on a string given by $sep.
+
+- Elements of the watch variable may now be patterns.
+
+- The logic for retrying history locking has been improved.
+
+- Some rationalisations have been made to the zsh/db/gdbm module that
+  should make it more useful and predictable in operation.
+
+Changes from 5.0.0 to 5.0.7
+---------------------------
 
 - Numeric constants encountered in mathematical expressions (but not other
   contexts) can contain underscores as separators that will be ignored on
@@ -116,12 +143,6 @@ Changes since 5.0.0
     fn() { echo hello } >~/logfile
   Running fn writes "hello" to logfile.  In older versions of the shell
   it would create an empty file at the point of definition.
-
-- Global aliases can be created for syntactic tokens such as command
-  separators (";", "&", "|", "&&", "||"), redirection operators, etc.
-  Use at your own risk!  The POSIX_ALIASES option is interpreted more
-  strictly to prevent expansion of these and other alias names containing
-  quotes, glob metacharacters, parameter references, etc.
 
 Changes between 4.2 and 5.0.0
 -----------------------------

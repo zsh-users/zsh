@@ -1,3 +1,7 @@
+2015-05-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 35018 (corrected): NEWS: news.
+
 2015-05-03  Oliver Kiddle  <opk@zsh.org>
 
 	35011: Completion/BSD/Type/_jails, Completion/Solaris/Command/_beadm,
