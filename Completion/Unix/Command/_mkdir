@@ -1,33 +1,23 @@
-#compdef mkdir
+#compdef mkdir gmkdir zf_mkdir
 
-local curcontext="$curcontext" line state \
-  args args_zsh args_cmd variant expl ret=1
-typeset -a opt_args
+local curcontext="$curcontext" state line expl args variant ret=1
+typeset -A opt_args
 
 args=(
   '(-m --mode)'{-m,--mode=}'[set permission mode]:numeric mode'
   '(-p --parents)'{-p,--parents}'[make parent directories as needed]'
-  )
-
-args_zsh=('(-)*: :->directories')
-
-args_cmd=(
-  '(-v --verbose)'{-v,--verbose}'[print message for each created directory]'
-  '(- :)--help[display help information]'
-  '(- :)--version[display version information]'
-  '*: :->directories'
-  )
+  '(-)*: :->directories'
+)
 
 case "$OSTYPE" in
   linux*)
-    args_cmd=(
+    args+=(
       '(-Z --context)'{-Z,--context=}'[set SELinux context]:SELinux context'
-      $args_cmd)
-    ;;
+    )
+  ;;
 esac
 
-_pick_variant -r variant gnu=gnu zsh='\(eval\)' unix --help
-
+_pick_variant -r variant gnu=gnu zsh='\(eval\)' $OSTYPE --help
 # It can still happen that there is a precommand command or builtin in the line.
 # In such cases, the variant has to be modified suitably, after further checking
 # the variant of the _command_ mkdir.
@@ -44,26 +34,34 @@ _pick_variant -r variant gnu=gnu zsh='\(eval\)' unix --help
 #   variant=zsh
 # fi
 
-if [[ $variant == zsh ]]; then
-  args+=($args_zsh)
-else
-  args+=($args_cmd)
-fi
-
-# remove long options?
-[[ $variant != gnu ]] && args=( ${${${args:#(|*\))--*}//--[^ )]#/}/\( #\)/} )
+case $variant in
+  gnu|freebsd*|dragonfly*)
+    args+=(
+      '(-v --verbose)'{-v,--verbose}'[print message for each created directory]'
+    )
+  ;|
+  gnu)
+    args+=(
+      '(- :)--help[display help information]'
+      '(- :)--version[display version information]'
+    )
+  ;;
+  zsh) # remove all options
+    args=( '*: :->directories' )
+  ;;
+  *) # non-GNU: remove long options
+    args=( ${${${args:#(|*\))--*}//--[^ )]#/}/\( #\)/} )
+  ;;
+esac
 
 _arguments -C -s $args && ret=0
 
 case "$state" in
   directories)
-    if (( $ret )) && [[ ! -prefix - ]] || \
-      [[ $variant == zsh && ${#${${words[2,-1]}:#-*}} -gt 0 ]]; then
-      _wanted directories expl \
-        'parent directory (alternatively specify name of directory)' \
-        _path_files -/ && ret=0
-    fi
-    ;;
+    _wanted directories expl \
+      'parent directory (alternatively specify name of directory)' \
+      _path_files -/ && ret=0
+  ;;
 esac
 
 return ret

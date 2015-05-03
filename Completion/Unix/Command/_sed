@@ -1,22 +1,29 @@
-#compdef sed
+#compdef sed gsed psed s2p
 
-local args
+local args inplace extended
 
 args=(
   '(-n --quiet --silent)'{-n,--quiet,--silent}'[suppress automatic printing of pattern space]'
-  '(1)*'{-e,--expression=-}'[add sed commands to run]:sed script'
+  '(1)*'{-e,--expression=-}'[specify sed commands to run]:sed script'
   '(1)*'{-f,--file=-}'[add contents of file to commands to run]:file:_files'
   '(-e)1: :_guard "^-*" sed script'
   '*:input file:_files'
 )
+inplace='[edit files in-place, running scripts separately for each file]::suffix for backup'
+extended='[use extended regular expressions]'
 
-if _pick_variant gnu=GNU unix --version; then
+if [[ $service = (psed|s2p) ]]; then
+  args=(
+    "${(@)args:#(|\(*\))(|\*)--*}"
+    '-a[delay opening files listed with w function]'
+  )
+elif _pick_variant gnu=GNU unix --version; then
   args+=(
     '--follow-symlinks[follow symlinks when processing in place]'
-    '(-i --in-place)'{-i-,--in-place=-}'[edit files in place]::suffix for backup'
+    '(-i --in-place)'{-i-,--in-place=-}$inplace
     '(-l --line-length)'{-l,--line-length=-}'[specify line-wrap length for the l command]'
     '(-r)--posix[disable GNU extensions]'
-    '(-r --regexp-extended)'{-r,--regexp-extended}'[use extended regular expressions]'
+    '(-r --regexp-extended)'{-r,--regexp-extended}$extended
     '(-s --separate)'{-s,--separate}'[consider files separately instead of as a combined stream]'
     '(-u --unbuffered)'{-u,--unbuffered}'[disable data buffering]'
     '(- 1 :)--help[print program usage]'
@@ -24,6 +31,27 @@ if _pick_variant gnu=GNU unix --version; then
   )
 else
   args=( "${(@)args:#(|\(*\))(|\*)--*}" )
+  case $OSTYPE in
+    openbsd*|freebsd*|netbsd*|darwin*|dragonfly*)
+      args+=(
+	'(-r -E)'{-r,-E}$extended
+	'-a[delay opening files listed with w function]'
+      )
+    ;|
+    darwin*|freebsd*|netbsd*)
+      args+=(
+        '-i'$inplace
+	'-l[make output line buffered]'
+      )
+    ;|
+    freebsd*) args+=( '-u[disable data buffering]' ) ;|
+    freebsd*|netbsd*)
+      args+=(
+        '-I[edit files in-place, treating all files as a single input stream]::suffix for backup'
+      )
+    ;;
+    openbsd*) args+=( '-u[make output line buffered]' ) ;;
+  esac
 fi
 
-_arguments "$args[@]"
+_arguments -s "$args[@]"

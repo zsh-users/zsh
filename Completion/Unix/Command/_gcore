@@ -1,0 +1,50 @@
+#compdef gcore
+
+case $OSTYPE in
+  solaris*)
+    local -a content
+
+    content=(
+      'anon[anonymous private mappings]'
+      'ctf[CTF type information]'
+      'data[writable private file mappings]'
+      'dism[DISM mappings]'
+      'heap[process heap]'
+      'ism[ISM mappings]'
+      'rodata[read-only private file mappings]'
+      'shanon[anonymous shared mappings]'
+      'shfile[file-backed shared mappings]'
+      'shm[System V shared memory]'
+      'stack[process stack]'
+      'symtab[symbol table sections for loaded files]'
+      'text[readable and executable private file mappings]'
+    )
+
+    _arguments -s \
+      '(-c -g)-p[use per-process core file repository]' \
+      '(-c -p)-g[use global core file repository]' \
+      '-F[force grabbing the target process]' \
+      '(-p -g)-c[set core file content]: :_values -s + "content" $content' \
+      '-o[set core file base name]:file base name:_files' \
+      '*:pid:_pids'
+  ;;
+  netbsd*)
+    _arguments \
+      '-c+[write core file to specified file]:file:_files' \
+      '*:pid:_pids'
+    ;;
+  freebsd*)
+    _arguments -s \
+      '-c+[write core file to specified file]:file:_files' \
+      '-f[dump all available segments]' \
+      '-s[stop process while gathering image]' \
+      '::executable:' \
+      ':pid:_pids'
+  ;;
+  *)
+    # GNU GDB gcore
+    _arguments \
+      '-o[set core file base name]:file base name:_files' \
+      ':pid:_pids'
+  ;;
+esac

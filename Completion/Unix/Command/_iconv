@@ -1,8 +1,8 @@
 #compdef iconv
 
-local expl curcontext="$curcontext" state line ret=1
+local expl curcontext="$curcontext" state line variant ret=1
 
-if _pick_variant libiconv='GNU*libiconv' glibc='(GNU*libc|EGLIBC|Gentoo)' unix --version; then
+if _pick_variant -r variant libiconv='GNU*libiconv' glibc='(GNU*libc|EGLIBC|Gentoo)' unix --version; then
   local -a args
   local exargs="-l --list -? --help --usage --version -V"
 
@@ -13,22 +13,22 @@ if _pick_variant libiconv='GNU*libiconv' glibc='(GNU*libc|EGLIBC|Gentoo)' unix -
     "($exargs)-c[omit invalid characters from output]"
     "(-s --silent --verbose $exargs)"{-s,--silent}'[suppress warnings]'
     '(-)'{-\?,--help}'[display help information]'
-    '(-)--usage[display a short usage message]'
     '(-)'{-V,--version}'[print program version]'
     '1:input file:_files' 
   )
 
-  case $_cmd_variant[$service] in
+  case $variant in
     (libiconv)
       args=( ${(R)args:#(|\*)(|\(*\))-[V\?]*} )  # remove -V and -?
       args+=(
-       '--byte-subst=[format for unconvertible bytes]:format string:'
-       '--widechar-subst=[format for unconvertible wide chars]:format string:'
-       '--unicode-subst=[format for unconvertible Unicode chars]:format string:'
+        '--byte-subst=[format for unconvertible bytes]:format string'
+        '--widechar-subst=[format for unconvertible wide chars]:format string'
+        '--unicode-subst=[format for unconvertible Unicode chars]:format string'
       )
       ;;
     (glibc)
       args+=( 
+        '(-)--usage[display a short usage message]'
         "(-o --output $exargs)"{-o+,--output=}'[specify output file]:output file:_files'
         "(-s --silent $exargs)--verbose[print progress information]"
       )
@@ -44,7 +44,7 @@ if _pick_variant libiconv='GNU*libiconv' glibc='(GNU*libc|EGLIBC|Gentoo)' unix -
     else
       _wanted codesets expl 'code set' compadd "$@" \
         -M 'm:{a-zA-Z}={A-Za-z} r:|-=* r:|=*' \
-        ${$(_call_program codesets iconv --list)%//} && ret=0
+        ${$(_call_program codesets $words[1] --list)%//} && ret=0
     fi
   fi
 
@@ -55,12 +55,17 @@ else
   local -U codeset
 
   _arguments -C \
-    '-f[specify code set of input file]:code set:->codeset' \
-    '-t[specify code set for output]:code set:->codeset' \
+    '(-l)-f[specify code set of input file]:code set:->codeset' \
+    '(-l)-t[specify code set for output]:code set:->codeset' \
+    '(-l)-c[omit invalid characters from output]' \
+    '(-l)-s[suppress warnings]' \
+    '(- 1)-l[list all character code sets]' \
     '1:file:_files' && return 0
 
   if [[ $state = codeset ]]; then
-    if [[ -f /usr/lib/iconv/iconv_data ]]; then  # IRIX & Solaris
+    if [[ $OSTYPE = freebsd* ]]; then
+      codeset=( $(_call_program codesets $words[1] -l) )
+    elif [[ -f /usr/lib/iconv/iconv_data ]]; then  # IRIX & Solaris
       codeset=( ${${(f)"$(</usr/lib/iconv/iconv_data)"}%%[[:blank:]]*} )
       codeset+=( /usr/lib/iconv/*%*.so(Ne.'reply=( ${${REPLY:t}%%%*} ${${REPLY:r}#*%} )'.) )
     elif [[ -d $LOCPATH/iconv ]]; then  # OSF
@@ -70,7 +75,7 @@ else
       return 1
     fi
 
-    _wanted codesets expl 'code set' compadd "$@" -a codeset
+    _wanted codesets expl 'code set' compadd -a codeset
   fi
 
 fi

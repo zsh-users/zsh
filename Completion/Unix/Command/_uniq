@@ -1,4 +1,4 @@
-#compdef uniq
+#compdef uniq guniq
 
 local args
 
@@ -20,7 +20,7 @@ args=(
 
 if ! _pick_variant gnu=Free\ Soft unix --version; then
   local optchars="cdufs"
-  if [[ "$OSTYPE" == (darwin|freebsd)* ]]; then
+  if [[ "$OSTYPE" == (darwin|dragonfly|freebsd)* ]]; then
     optchars="${optchars}i"
   fi
   args=( ${(M)args:#(|\*)(|\(*\))-[$optchars]*} )

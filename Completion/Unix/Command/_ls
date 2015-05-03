@@ -1,11 +1,8 @@
 #compdef ls gls
-# Ulrik Haugen 2001
 
 local arguments is_gnu
 
-_pick_variant -r is_gnu gnu=gnu unix --help
-
-if [[ "$OSTYPE" = (netbsd*|freebsd*|openbsd*|darwin*) && "$is_gnu" != gnu ]]; then
+if ! _pick_variant gnu=gnu unix --help; then
   arguments=(
     '(-A)-a[list entries starting with .]'
     '(-a)-A[list all except . and ..]'
@@ -14,10 +11,8 @@ if [[ "$OSTYPE" = (netbsd*|freebsd*|openbsd*|darwin*) && "$is_gnu" != gnu ]]; th
     '-R[list subdirectories recursively]'
 
     '(-k)-h[print sizes in human readable form]'
-    '(-h)-k[print sizes of 1k]'
 
     '-i[print file inode numbers]'
-
     '(-l -g -1 -C -m -x)-l[long listing]'
     '(-l -1 -C -m -x)-g[long listing but without owner information]'
     '(-l -g -C -m -x)-1[single column output]'
@@ -25,40 +20,53 @@ if [[ "$OSTYPE" = (netbsd*|freebsd*|openbsd*|darwin*) && "$is_gnu" != gnu ]]; th
     '(-l -g -1 -C -x)-m[comma separated]'
     '(-l -g -1 -C -m)-x[sort horizontally]'
 
-    '-o[display file flags]'
-
     '-s[display size of each file in blocks]'
 
     '(-u)-c[status change time]'
     '(-c)-u[access time]'
 
-    '-f[unsorted, all, short list]'
     '-r[reverse sort order]'
 
-    '(-t)-S[sort by size]'
     '(-S)-t[sort by modification time]'
 
     '(-p)-F[append file type indicators]'
     '(-F)-p[append file type indicators for directory]'
 
-    '-f[output is not sorted]'
-
     '-n[numeric uid, gid]'
 
-    '-T[show complete time information]'
-
-    '(-B -b -w -q)-B[print octal escapes for control characters]'
     '(-B -b -w -q)-b[as -B, but use C escape codes whenever possible]'
     '(-B -b -w -q)-q[hide control chars]'
-    '(-B -b -w -q)-w[print raw characters]'
 
     '*:files:_files'
   )
+  if [[ "$OSTYPE" = (netbsd*|dragonfly*|freebsd*|openbsd*|darwin*) ]]; then
+    arguments+=(
+      '(-h)-k[print sizes of 1k]'
+      '(-t)-S[sort by size]'
+      '-T[show complete time information]'
+      '-o[display file flags]'
+      '-f[output is not sorted]'
+      '(-B -b -w -q)-w[print raw characters]'
+      '(-B -b -w -q)-B[print octal escapes for control characters]'
+    )
+  fi
   if [[ "$OSTYPE" = (freebsd*|darwin*) ]]; then
     arguments+=(
       '-G[enable colorized output]'
       '-H[follow symlinks on the command line]'
       '-P[do not follow symlinks]'
+    )
+  fi
+  if [[ $OSTYPE = solaris* ]]; then
+    arguments+=(
+      '(-l -1 -C -m -x)-o[long listing but without group information]'
+      '(-l -t -s -r -a)-f[interpret each argument as a directory]'
+      '(-E -l)-e[long listing with full and consistent date/time]'
+      '(-e -l)-E[long listing with ISO format date/time]'
+      '-H[follow symlinks on the command line]'
+      '-v[long listing with verbose ACL information]'
+      '-V[long listing with compact ACL information]'
+      '-@[long listing with marker for extended attribute information]'
     )
   fi
 else
@@ -131,10 +139,6 @@ else
     '(- :)--version[display version information]'
     '*:files:_files'
   )
-  # remove long options?
-  if [[ $is_gnu != gnu ]]; then
-    arguments=( ${${${arguments:#(|*\))--*}//--[^ )]#/}/\( #\)/} )
-  fi
 fi
 
 _arguments -s $arguments

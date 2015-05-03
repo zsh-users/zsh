@@ -1,34 +1,52 @@
-#compdef chmod
+#compdef chmod gchmod
 
 local curcontext="$curcontext" state line expl ret=1
 local -a args privs
 
-args=( '*:file:->files' )
-(( $+words[(r)--reference*] )) || args+=( '1:mode:->mode' )
+args=( '*:file:->files' '1:mode:->mode' )
 
 if _pick_variant gnu=Free\ Soft unix --version; then
   args+=(
     '(-v --verbose -c --changes)'{-c,--changes}'[report changes made]'
     '(-v --verbose -c --changes)'{-v,--verbose}'[output a diagnostic for every file processed]'
     '(-f --silent --quiet)'{-f,--silent,--quiet}'[suppress most error messages]'
-    '--reference=[copy permissions of specified file]:file:_files'
+    '(--no-preserve-root)--preserve-root[fail to operate recursively on /]'
+    "(--preserve-root)--no-preserve-root[don't treat / specially (default)]"
+    '(1)--reference=[copy permissions of specified file]:file:_files'
     '(-R --recursive)'{-R,--recursive}'[change files and directories recursively]'
     '(- : *)--help[display help information]'
     '(- : *)--version[display version information]'
   )
-  privs=(
-    'X[execute only if executable to another]'
-    "u[owner's current permissions]"
-    "g[group's current permissions]"
-    "o[other's current permissions]"
-  )
 else
-  # based on $OSTYPE = solaris2.8
   args+=(
     '-f[suppress most error messages]'
     '-R[change files and directories recursively]'
   )
-  privs=( 'l[mandatory locking]' )
+  case $OSTYPE in
+    freebsd*|dragonfly*|darwin*)
+      args+=( '-v[output a diagnostic for every file processed]')
+    ;|
+    freebsd*|netbsd*|darwin*|dragonfly*)
+      args+=( "-h[operate on symlinks them self]" )
+    ;|
+    freebsd*|openbsd*|netbsd*|darwin*|dragonfly*)
+      args+=(
+	'(-H -L -P)-L[follow all symlinks]'
+	'(-H -L -P)-H[follow symlinks on the command line]'
+	'(-H -L -P)-P[do not follow symlinks (default)]'
+      )
+    ;|
+    darwin*)
+      args+=(
+        '(1)-C[returns false if any of the named files have ACLs]'
+	'(1)-N[remove ACLs from specified files]'
+	'(1)-E[read ACL info from stdin as a sequential list of ACEs]'
+	'(1)-i[removes inherited bit from all entries in named files ACLs]'
+        '(1)-I[removes all inherited entries from named files ACLs]'
+      )
+    ;;
+    solaris*) privs=( 'l[mandatory locking]' ) ;;
+  esac
 fi
 
 _arguments -C -s "$args[@]" && ret=0
@@ -43,6 +61,10 @@ case "$state" in
       _values -S '' privilege \
 	'r[read]' 'w[write]' 'x[execute]' \
 	's[set uid/gid]' 't[sticky]' \
+	'X[execute only if directory or executable to another]' \
+	"u[owner's current permissions]" \
+	"g[group's current permissions]" \
+	"o[other's current permissions]" \
 	"$privs[@]" && ret=0
     else
       suf=( -S '' )

@@ -1,4 +1,4 @@
-#compdef grep egrep fgrep -value-,GREP_OPTIONS,-default-
+#compdef grep egrep fgrep bsdgrep zgrep, zegrep, zfgrep -value-,GREP_OPTIONS,-default-
 # Ulrik Haugen 2001
 
 local arguments matchers command

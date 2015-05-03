@@ -103,17 +103,20 @@ if _pick_variant -c $cmd gnu=GNU unix -v; then
 else
   case $OSTYPE in
     solaris2.<9->)
-      args=( '(-c -e -f -C)-u[output a unified diff]' )
+      args=(
+	'(-c -e -f -C -U)-u[output a unified diff]'
+	'(-c -e -f -C -u)-U[output a unified diff]:lines of context'
+      )
     ;&
     solaris*)
       args+=(
 	'-i[case insensitive]'
         '-t[expand tabs to spaces]'
 	'-w[ignore all white space]'
-        '(-c -e -f -n -u -h -D)-C+[output a context diff]:number of lines of copied context'
-	'(-c -e -f -n -u -C -D)-h[do a fast, half-hearted job]'
-	'(-c -e -f -u -h -C -D)-n[reversed ed script]'
-	'(-c -e -f -n -u -h -C)-D[output merged file with preprocessor directives]:preprocessor symbol'
+	'(-c -e -f -n -u -U -h -D)-C+[output a context diff]:lines of context'
+	'(-c -e -f -n -u -U -C -D)-h[do a fast, half-hearted job]'
+	'(-c -e -f -u -U -h -C -D)-n[reversed ed script]'
+	'(-c -e -f -n -u -U -h -C)-D[output merged file with preprocessor directives]:preprocessor symbol'
         '-l[output through pr]'
 	'-s[report on identical files]'
         '-S+[set first file in comparison]:start with file:_files'

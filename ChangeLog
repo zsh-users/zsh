@@ -1,3 +1,28 @@
+2015-05-03  Oliver Kiddle  <opk@zsh.org>
+
+	35011: Completion/BSD/Type/_jails, Completion/Solaris/Command/_beadm,
+	Completion/Solaris/Type/_be_name, Completion/Solaris/Type/_zones,
+	Completion/Unix/Command/_chmod, Completion/Unix/Command/_chown,
+	Completion/Unix/Command/_cmp, Completion/Unix/Command/_comm,
+	Completion/Unix/Command/_cp, Completion/Unix/Command/_cut,
+	Completion/Unix/Command/_date, Completion/Unix/Command/_du,
+	Completion/Unix/Command/_elfdump, Completion/Unix/Command/_find,
+	Completion/Unix/Command/_fuser, Completion/Unix/Command/_gcore,
+	Completion/Unix/Command/_grep, Completion/Unix/Command/_iconv,
+	Completion/Unix/Command/_id, Completion/Unix/Command/_join,
+	Completion/Unix/Command/_last, Completion/Unix/Command/_ldd,
+	Completion/Unix/Command/_ls, Completion/Unix/Command/_md5sum,
+	Completion/Unix/Command/_mkdir, Completion/Unix/Command/_nl,
+	Completion/Unix/Command/_nm, Completion/Unix/Command/_od,
+	Completion/Unix/Command/_patch, Completion/Unix/Command/_ping,
+	Completion/Unix/Command/_ps, Completion/Unix/Command/_readelf,
+	Completion/Unix/Command/_rm, Completion/Unix/Command/_sed,
+	Completion/Unix/Command/_sort, Completion/Unix/Command/_uname,
+	Completion/Unix/Command/_uniq, Completion/Unix/Command/_wc,
+	Completion/Unix/Command/_xargs, Completion/Unix/Type/_diff_options,
+	Completion/Unix/Type/_file_systems: update completions for some
+	common Unix commands, in particular improving FreeBSD support
+
 2015-05-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 35009: README, Etc/FAQ.yo: updates for 5.0.8.

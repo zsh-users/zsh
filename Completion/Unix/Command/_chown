@@ -1,29 +1,42 @@
 #compdef chown chgrp zf_chown=chown zf_chgrp=chgrp
 
 local curcontext="$curcontext" state line expl ret=1
-local suf usr grp req deref args
+local suf usr grp req deref pattern arg args
 
 if _pick_variant gnu=Free\ Soft unix --version; then
   args=(
     '(-c --changes -v --verbose)'{-c,--changes}'[report each change made]'
     '(-c --changes -v --verbose)'{-v,--verbose}'[output info for every file processed]'
     '(-h --no-dereference)--dereference[dereference symlinks]'
-    '(-h --no-dereference --dereference)'{-h,--no-dereference}'[operate on symlinks them self]'
+    '(-h --no-dereference --dereference)'{-h,--no-dereference}'[operate on symlinks themselves]'
     '(-f --silent --quiet)'{-f,--silent,--quiet}"[don't report errors]"
+    '--preserve-root[fail to operate recursively on /]'
     '--reference=[copy ownership of specified file]:file:_files'
     '(-R --recursive)'{-R,--recursive}'[change files and directories recursively]'
+    '(-H -L -P)-L[follow all symlinks]'
+    '(-H -L -P)-H[follow symlinks on the command line]'
+    '(-H -L -P)-P[do not follow symlinks (default)]'
     '(- : *)--help[display help information]'
     '(- : *)--version[display version information]'
   )    
   [[ $service = chown ]] &&
       args+=( '--from=[restrict changes to files by current ownership]: :->owner' )
 else
-  # based on $OSTYPE = solaris2.8
   args=(
     "-f[don't report errors]"
     "-h[operate on symlinks them self]"
     '-R[change files and directories recursively]'
+    '(-H -L -P)-L[follow all symlinks]'
+    '(-H -L -P)-H[follow symlinks on the command line]'
+    '(-H -L -P)-P[do not follow symlinks (default)]'
   )
+  for pattern arg in \
+    'freebsd*' "-x[don't traverse file systems]" \
+    '(darwin|dragonfly|(free|net)bsd)*' '-v[output info for every file processed]' \
+    'solaris2.<11->' '-s[owner and/or group are Windows SID strings]'
+  do
+    [[ $OSTYPE = $~pattern ]] && args+=( $arg )
+  done
 fi
 
 (( $+words[(r)--reference*] )) || args+=( '(--reference)1: :->owner' )

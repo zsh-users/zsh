@@ -1,4 +1,4 @@
-#compdef rm
+#compdef rm grm zf_rm
 
 declare -a opts args
 args=(
@@ -16,12 +16,25 @@ if _pick_variant gnu=gnu unix --help; then
     '--one-file-system[stay within filesystems of files given as arguments]'
     '(                   --preserve-root)--no-preserve-root[do not treat / specially]'
     '(--no-preserve-root                )--preserve-root[do not remove / (default)]'
+    '(-d --dir)'{-d,--dir}'[remove directories as well]'
     '(-v --verbose)'{-v,--verbose}'[explain what is being done]'
     '(- *)--help[display help message and exit]'
     '(- *)--version[output version information and exit]'
   )
 else
   args=(${args:#*--(force|recursive)\[*})
+  case $OSTYPE in
+    freebsd*)
+      args+=(
+        '-d[remove directories as well]'
+	'(-i)-I[prompt when removing many files]'
+	'-P[overwrite files before deleting them]'
+	'-v[explain what is being done]'
+	'-W[attempt to undelete named files]'
+	"-x[don't cross file systems when removing a hierarchy]"
+      )
+    ;;
+  esac
 fi
 
 local curcontext=$curcontext state line ret=1

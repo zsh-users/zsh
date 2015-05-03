@@ -1,4 +1,4 @@
-#compdef od
+#compdef od god
 
 local curcontext="$curcontext" state state_descr line args ret=1
 local -A opt_args
@@ -25,6 +25,8 @@ if _pick_variant gnu=GNU unix --version; then
   # -h -B -I and -L are obsolescent and undocumented
   args=( ${(R)args:#(|\*)(|\(*\))-[hBIL]*} )
   args+=(
+    '--traditional'
+    '--endian=[swap input bytes]:endianess:(big little)'
     {-S+,--strings=-}'[output strings of at least specfied bytes long]:length'
     {-w-,--width=-}'[output specified bytes per line]:bytes'
     '(- : *)--help[display help and exit]'
@@ -33,18 +35,29 @@ if _pick_variant gnu=GNU unix --version; then
 else
   args=( ${(R)args:#(|\*)(|\(*\))--*} )    # remove long options
   case "$OSTYPE" in
-    (darwin*|freebsd*|dragonfly*|openbsd*)
+    darwin*|freebsd*|dragonfly*|openbsd*)
       args+=(
-        '-D[output unsigned decimal ints (-t u4)]'
+        '-D[output unsigned decimal integers (-t u4)]'
         {-e,-F}'[output double-precision floats (-t fD)]'
         {-H,-X}'[output hexadecimal ints (-t x4)]'
         '-O[output octal ints (-t o4)]'
       )
-      ;;
+    ;;
+    solaris*)
+      args=(
+        ${(M)args:#(|\*)(|\(*\))-[AjNtvbcdfosx]*}
+	'-C[output all printable characters and use C-style escapes]'
+	'-D[output unsigned decimal long words (-t u4)]'
+	'-F[output double-precision floats (-t f8)]'
+	'-O[output octal ints (-t o4)]'
+	'-S[output decimal ints (-t d4)]'
+	'-X[output hexadecimal ints (-t x4)]'
+      )
+    ;;
     (*)
       # POSIX options only
       args=( ${(M)args:#(|\*)(|\(*\))-[AjNtvbcdosx]*} )
-      ;;
+    ;;
   esac
 fi
 

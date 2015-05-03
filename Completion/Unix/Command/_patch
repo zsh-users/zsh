@@ -1,7 +1,7 @@
-#compdef patch
+#compdef patch gpatch
 
 if (( ! $+_patch_args )); then
-  local help="$(LC_ALL=C patch --help 2>&1)"
+  local help="$(LC_ALL=C $words[1] --help 2>&1)"
   local -A optionmap
   local arg
   local comp_p='compadd "$expl[@]" -S0 -r "1-9" - ""'

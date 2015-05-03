@@ -1,6 +1,6 @@
-#compdef nm
+#compdef nm eu-nm
 
-local args files
+local args files variant
 
 _nm_object_file() {
   [[ -x $REPLY || $REPLY = *.([ao]|so|elf) ]]
@@ -15,7 +15,7 @@ args=(
   '(-t --radix -o -x)'{-t,--radix}'[specify radix for numeric values]:radix:((d\:decimal o\:octal x\:hexadecimal))'
 )
 
-if _pick_variant gnu=GNU unix -V; then
+if _pick_variant -r variant binutils=GNU elftoolchain=elftoolchain elfutils=elfutils unix -V; then
   compset -P '@' && files='*:options file:_files'
   args+=(
     '(- *)--help[display help information]'
@@ -24,22 +24,47 @@ if _pick_variant gnu=GNU unix -V; then
     '(-C --no-demangle)--demangle=-[decode symbol names]::style:(auto gnu lucid arm hp edg gnu-v3 java gnat)'
     "(-C --demangle)--no-demangle[don't decode symbol names]"
     '(-u --undefined-only)--defined-only[display only defined symbols]'
-    '(-f --format -P)'{-f+,--format=}'[specify output format]:format:(bsd sysv posix)'
-    '(-l --line-numbers)'{-l,--line-numbers}'[display source file and line numbers from debug information]'
-    '(-n --numeric-sort -p --no-sort --size-sort)'{-n,--numeric-sort}'[sort symbols numerically by address]'
+    '(-f --format -P)--format=[specify output format]:format:(bsd sysv posix)'
+    '(-n --numeric-sort -p --no-sort --size-sort -v)'{-n,--numeric-sort}'[sort symbols numerically by address]'
     '(-p --no-sort -n --numeric-sort -r -P --reverse-sort --size-sort)'{-p,--no-sort}'[do not sort symbols]'
     '(-P --portability -B -f --format)'{-P,--portability}'[same as --format=posix]'
-    '(-r --reverse-sort -p --no-sort --size-sort)'{-r,--reverse-sort}'[reverse sort order]'
-    '--plugin[load specified plugin]:plugin'
+    '(-r --reverse-sort -p --no-sort --size-sort -v)'{-r,--reverse-sort}'[reverse sort order]'
     '(-u --undefined-only --defined-only)'{-u,--undefined-only}'[display only undefined symbols]'
-    "--target=[target object format]:targets:(${${(@M)${(f)$(_call_program targets nm --help)}:#*supported targets:*}##*: })"
     '(-a --debug-syms)'{-a,--debug-syms}'[display debugger-only symbols]'
     '(-S --print-size)'{-S,--print-size}'[print size of defined symbols]'
     '(-s --print-armap)'{-s,--print-armap}'[include index for symbols from archive members]'
-    '(-p --no-sort -n --numeric-sort -r)--size-sort[sort symbols by size]'
-    '--special-syms[include special symbols in the output]'
-    '--synthetic[display synthetic symbols as well]'
+    '(-p --no-sort -n --numeric-sort -r -v)--size-sort[sort symbols by size]'
   )
+  case $variant in
+    elftoolchain|binutils)
+      args+=(
+	'(-l --line-numbers)'{-l,--line-numbers}'[display source file and line numbers from debug information]'
+      )
+    ;|
+    elftoolchain)
+      args=( ${args:#*--(portability|extern-only)\[*}
+        '(- *)-h[display help information]'
+	'(-t -x)-o[print values in octal]'
+	'(-t -o)-x[print values in hexadecimal]'
+	'(--size-sort)-v[sort output by value]'
+      )
+    ;;
+    elfutils)
+      args+=(
+        '--mark-special[mark special symbols]'
+	'--color=[use color in output]:color:(always auto never)'
+      )
+    ;;
+    binutils)
+      args+=(
+	'(-f --format -P)-f+[specify output format]:format:(bsd sysv posix)'
+	'--plugin[load specified plugin]:plugin'
+	'--special-syms[include special symbols in the output]'
+	'--synthetic[display synthetic symbols as well]'
+	"--target=[target object format]:targets:(${${(@M)${(f)$(_call_program targets nm --help)}:#*supported targets:*}##*: })"
+      )
+    ;;
+  esac
 else
   # following flags are accurate for Solaris
   args=( ${args:#(|*\)(\*|))-[o-]*}

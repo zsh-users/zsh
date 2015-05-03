@@ -1,82 +1,145 @@
-#compdef find
+#compdef find gfind
 
-_arguments \
-  '(- *)-help' '(-)--help' \
-  '(- *)-version' '(-)--version' \
+local variant args
+
+_pick_variant -r variant gnu=GNU $OSTYPE -version
+
+case $variant in
+  solaris*)
+    args+=(
+      '*-'{n,}'cpio:device:_files'
+      '*-local'
+    )
+  ;|
+  solaris*|darwin*)
+    args+=( '*-xattr' )
+  ;|
+  solaris2.<10->|freebsd*|darwin*)
+    args+=( '*-acl' )
+  ;|
+  solaris2.<11->|freebsd*|dragonfly*|darwin*|openbsd*|gnu)
+    args+=(
+      '*-amin:access time (minutes)'
+      '*-cmin:inode change time (minutes)'
+      '*-mmin:modification time (minutes)'
+      '*-iname:name pattern to match (case insensitive)'
+      '*-print0'
+    )
+  ;|
+  netbsd*|freebsd*|dragonfly*|darwin*|gnu)
+    args+=( '(-H -L)-P[never follow symlinks]' )
+  ;|
+  netbsd*|freebsd*|dragonfly*|openbsd*|darwin*|gnu)
+    args+=( '-d[depth first traversal]' )
+  ;|
+  darwin*|freebsd*|gnu)
+    args+=(
+      '*-Bmin:birth time (minutes)'
+      '*-Bnewer:file to compare (birth time):_files'
+      '*-Btime:birth time (hours)'
+    )
+  ;|
+  freebsd*|dragonfly*|darwin*|openbsd*|gnu)
+    args+=(
+      '*-anewer:file to compare (access time):_files'
+      '*-cnewer:file to compare (inode change time):_files'
+      '*-mnewer:file to compare (modification time):_files'
+      '*-maxdepth:maximum search depth'
+      '*-mindepth:minimum search depth'
+      '*-path:path pattern to search:'
+    )
+  ;|
+  freebsd*|dragonfly*|darwin*|gnu)
+    args+=(
+      '*-delete'
+      '*-empty'
+      '*-execdir:program: _command_names -e:*\;::program arguments: _normal'
+      '*-gid:numeric group ID'
+      '*-uid:numeric user ID'
+      '*-noleaf'
+      '*-lname:link pattern to search'
+      '*-ilname:link pattern to search (case insensitive)'
+      '*-ipath:path pattern to search (case insensitive)'
+      '*-regex:regular expression to search'
+      '*-iregex:regular expression to search (case insensitive)'
+      '*-wholename:full path pattern to search' \
+      '*-iwholename:full path pattern to search (case insensitive)'
+      '*-ignore_readdir_race'
+      '*-noignore_readdir_race'
+      '*-okdir:program: _command_names -e:*\;::program arguments: _normal'
+      '*-samefile:file to compare inode:_files' \
+      '*-true'
+      '*-false'
+      '*-and'
+      '*-or'
+      '*-not'
+    )
+  ;|
+  freebsd*|dragonfly*|gnu) args+=( '*-quit' ) ;|
+  netbsd*|freebsd*|dragonfly*|darwin*)
+    args+=(
+      '-E[use extended regular expressions with -regex/-iregex]'
+      '-X[warn if filename contains characters special to xargs]'
+      '-f[specify file hierarchy to traverse]:path:_directories'
+      '-s[traverse directories in sorted order]'
+      "-x[don't span filesystems]"
+      '*-flags:flags:_chflags'
+    )
+  ;|
+  freebsd*|dragonfly*) args+=( '*-sparse' ) ;|
+  darwin*) args+=( '*-xattrname:name' ) ;|
+  gnu)
+    args+=(
+      '(- *)-help' '(-)--help'
+      '(- *)-version' '(-)--version'
+      '-D[print diagnostics]:debug option:(help tree search stat rates opt exec)'
+      '-O+[enable query optimisation]:level:(1 2 3)'
+      '*-daystart'
+      '-regextype:regexp syntax:(emacs posix-awk posix-basic posix-egrep posix-extended)'
+      '*-warn'
+      '*-nowarn'
+      '*-xautofs'
+      '*-used:access after inode change (days)'
+      '*-executable'
+      '*-readable'
+      '*-writable'
+      '*-xtype:file type:((b\:block\ special\ file c\:character\ special\ file d\:directory p\:named\ pipe f\:normal\ file l\:symbolic\ link s\:socket))'
+      '*-fls:output file:_files'
+      '*-fprint:output file:_files'
+      '*-fprint0:output file:_files'
+      '*-fprintf:output file:_files:output format'
+      '*-printf:output format'
+    )
+    [[ $OSTYPE = linux-gnu ]] && args+=( '*-context:SELinux context' )
+  ;;
+esac
+
+_arguments $args \
   '(-L -P)-H[only follow symlinks when resolving command-line arguments]' \
   '(-H -P)-L[follow symlinks]' \
-  '(-H -L)-P[never follow symlinks]' \
-  '-D[print diagnostics]:deb option:(help tree search stat rates opt exec)' \
-  '-O+[enable query optimisation]:level:(1 2 3)' \
-  '*-daystart' \
-  '*-d' '*-depth' \
+  '*-atime:access time (days)' \
+  '*-ctime:inode change time (days)' \
+  '*-depth' \
+  '*-exec:program: _command_names -e:*\;::program arguments: _normal' \
   '*-follow' \
-  '(-noignore_readdir_race)-ignore_readdir_race' \
-  '*-maxdepth:maximum search depth' \
-  '*-mindepth:minimum search depth' \
-  '*-mount' \
-  '(-ignore_readdir_race)-noignore_readdir_race' \
-  '*-noleaf' \
-  '-regextype:regexp syntax:(emacs posix-awk posix-basic posix-egrep posix-extended)' \
-  '*-warn' \
-  '*-nowarn' \
-  '*-xdev' \
-  '*-amin:access time (minutes):' \
-  '*-cmin:inode change time (minutes):' \
-  '*-mmin:modification time (minutes):' \
-  '*-atime:access time (days):' \
-  '*-ctime:inode change time (days):' \
-  '*-mtime:modification time (days):' \
-  '*-anewer:file to compare (access time):_files' \
-  '*-cnewer:file to compare (inode change time):_files' \
-  '*-newer:file to compare (modification time):_files' \
-  '*-used:access after inode change (days):' \
-  '*-empty' \
-  '*-executable' \
-  '*-false' \
   '*-fstype:file system type:_file_systems' \
-  '*-gid:numeric group ID:' \
   '*-group:group:_groups' \
-  '*-uid:numeric user ID:' \
-  '*-user:user:_users' \
-  '*-lname:link pattern to search:' \
-  '*-ilname:link pattern to search (case insensitive):' \
-  '*-name:name pattern to search:' \
-  '*-iname:name pattern to search (case insensitive):' \
-  '*-path:path pattern to search:' \
-  '*-ipath:path pattern to search (case insensitive):' \
-  '*-regex:regular expression to search:' \
-  '*-iregex:regular expression to search (case insensitive):' \
-  '*-wholename:full path pattern to search:' \
-  '*-iwholename:full path pattern to search (case insensitive):' \
   '*-inum:inode number:' \
   '*-links:number of links:' \
-  '*-nouser' \
-  '*-nogroup' \
-  '*-perm:file permission bits:' \
-  '*-readable' \
-  '*-writable' \
-  '*-size:file size:' \
-  '*-samefile:same inode as:_files' \
-  '*-true' \
-  '*-type:file type:((b\:block\ special\ file c\:character\ special\ file d\:directory p\:named\ pipe f\:normal\ file l\:symbolic\ link s\:socket))' \
-  '*-xtype:file type:((b\:block\ special\ file c\:character\ special\ file d\:directory p\:named\ pipe f\:normal\ file l\:symbolic\ link s\:socket))' \
-  '*-delete' \
-  '*-exec:program: _command_names -e:*\;::program arguments: _normal' \
-  '*-execdir:program: _command_names -e:*\;::program arguments: _normal' \
-  '*-ok:program: _command_names -e:*\;::program arguments: _normal' \
-  '*-okdir:program: _command_names -e:*\;::program arguments: _normal' \
-  '*-fls:output file:_files' \
-  '*-fprint:output file:_files' \
-  '*-fprint0:output file:_files' \
-  '*-fprintf:output file:_files:output format:' \
-  '*-print' \
-  '*-print0' \
-  '*-printf:output format:' \
-  '*-prune' \
-  '*-quit' \
   '*-ls' \
-  '*-and' '*-a' \
-  '*-or' '*-o' \
-  '*-not' \
+  '*-mount' \
+  '*-mtime:modification time (days)' \
+  '*-name:name pattern' \
+  '*-newer:file to compare (modification time):_files' \
+  '*-nogroup' \
+  '*-nouser' \
+  '*-ok:program: _command_names -e:*\;::program arguments: _normal' \
+  '*-perm:file permission bits' \
+  '*-print' \
+  '*-prune' \
+  '*-size:file size (blocks)' \
+  '*-type:file type:((b\:block\ special\ file c\:character\ special\ file d\:directory p\:named\ pipe f\:normal\ file l\:symbolic\ link s\:socket))' \
+  '*-user:user:_users' \
+  '*-xdev' \
+  '*-a' '*-o' \
   '*:directory:_files -/'

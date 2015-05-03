@@ -1,0 +1,5 @@
+#autoload
+
+jails=( ${${${${(f)"$(_call_program jails jls -n)"}##*jid=}/ name=/:}%% *} )
+
+_describe -t jails jail jails "$@"

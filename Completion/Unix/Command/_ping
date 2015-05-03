@@ -33,31 +33,37 @@ if _pick_variant iputils=iputils unix -V; then
 
 else
 
-# FreeBSD 4.11
-
   _arguments \
     '-A[audible for no packet]' \
-    '-Q[somewhat quiet]' \
-    '-R[record route]' \
     '-a[audible for each packet]' \
+    '-c:count' \
+    "-D[set the don't fragment bit]" \
     '-d[set SO_DEBUG on the socket]' \
     '-f[flood ping]' \
-    '-n[numeric output only]' \
-    '-q[quiet]' \
-    '-r[bypass normal routing tables]' \
-    '-v[verbose]' \
-    '-c:count' \
+    '-G[specify maximum size for ICMP payload for sweeping pings]:size' \
+    '-g[specify minimum size for ICMP payload for sweeping pings]:size [0]' \
+    '-h[specify size increment for ICMP payload for sweeping pings]:size [1]' \
     '-i:wait seconds' \
-    '-l:preload number' \
-    '-m:ttl' \
-    '-p:padding pattern' \
-    '-P:IPsec policy' \
-    '-s:packet size in bytes' \
-    '-S:src addr' \
-    '-t:timeout in seconds' \
+    '-I[source interface for multicast packets]:iface:_net_interfaces' \
     '-L[suppress loopback of multicast packets]' \
-    '-I:iface:_net_interfaces' \
+    '-l:preload number' \
+    '-M:icmp:(mask time)' \
+    '-m:ttl' \
+    '-n[numeric output only]' \
+    '-o[exit after receiving one packet]' \
+    '-P:IPsec policy' \
+    '-p:padding pattern' \
+    '-Q[somewhat quiet]' \
+    '-q[quiet]' \
+    '-R[record route]' \
+    '-r[bypass normal routing tables]' \
+    '-S:source address' \
+    '-s:packet size in bytes' \
     '-T:ttl for multicasted packets' \
+    '-t:timeout in seconds' \
+    '-v[verbose]' \
+    '-W:wait time (ms)' \
+    '-z:type of service' \
     ':host:_hosts'
 
 fi

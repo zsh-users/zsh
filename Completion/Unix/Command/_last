@@ -1,17 +1,53 @@
 #compdef last lastb
 
-_arguments -s \
-  '-a[display hostname in last column]' \
-  '-n[number]:number' \
-  '-[number]:number' \
-  '-f[filename]:filename:_files' \
-  '-R[suppress display of hostname field]' \
-  '-d[translate IP to hostname]' \
-  '-i[display IP]' \
-  '-o[read old-format wtmp]' \
-  '-x[display shutdown/runlevel entries]' \
-  '-h[hostname]:host:_hosts' \
-  '-s[report duration in seconds]' \
-  '-t[tty]:tty' \
-  '-w[widen duration field]' \
-  '*:user:_users'
+local pattern arg args ttys
+ttys=( /dev/tty*(N) /dev/pts/*(N) reboot )
+ttys=( ${ttys#/dev/} )
+
+for pattern arg in \
+  '(solaris*|linux-gnu)' '-a[display hostname in last column]' \
+  '((free|net|open)bsd*|darwin*|dragonfly*|linux-gnu)' '-h[limit sessions by hostname]:host:_hosts' \
+  '((free|open)bsd*|linux-gnu)' '-s[report duration in seconds]' \
+  '(freebsd*|openbsd*)' '-d[limit sessions to those active at snapshot time]:time ([[CC]YY][MMDD]hhmm[.SS])' \
+  '((net|free|open)bsd*|darwin*|dragonfly*)' '-t[limit sessions by tty]:tty:compadd -a ttys' \
+  'openbsd*' '-c[calculate total time]' \
+  '^darwin*' '-f[specify account file]:file:_files' \
+  '(solaris*|linux-gnu|freebsd*|openbsd*)' '-n[specify number of lines to show]:number' \
+  '((open|net)bsd*|dragonfly*)' '-T[show more detailed time information including year and seconds]' \
+  'netbsd*' '-x[assume file is in wtmpx(5) format]' \
+  'netbsd*' '-n[show IP of remote hosts]' \
+  'freebsd*' '-w[show seconds in durarion field]' \
+  'freebsd*' '-y[show year in session start time]'
+do
+  [[ $OSTYPE = $~pattern ]] && args+=( $arg )
+done
+
+case $OSTYPE in
+  netbsd*|dragonfly*)
+    args+=(
+      '-H[specify width for host field]:width'
+      '-N[specify width for login name field]:width'
+      '-L[specify width for tty field]:width'
+    )
+  ;;
+  linux-gnu)
+    args+=(
+      '-R[suppress display of hostname field]'
+      '-d[translate IP to hostname]'
+      '-F[show full login and logout times and dates]'
+      '-i[show IP of remote hosts]'
+      '-o[read old-format wtmp]'
+      '-t[limit sessions to those active at snapshot time]:time (YYYYMMDDhhmmss)'
+      '-w[show full user and domain names]'
+      '-x[display shutdown/runlevel entries]'
+    )
+  ;;
+esac
+
+if [[ $OSTYPE = (linux-gnu|solaris*) ]]; then
+  args+=( '*:arg: _alternative "users:user:_users" "ttys:tty:compadd -a ttys"' )
+else
+  args+=( '*:user:_users' )
+fi
+
+_arguments -s $args

@@ -1,4 +1,4 @@
-#compdef date
+#compdef date gdate
 
 local -a args
 
@@ -8,7 +8,7 @@ if _pick_variant gnu="Free Software Foundation" unix --version; then
     '-f[output dates specified in file]:file:_files'
     '-I-[iso-8601]:precision:(date hours minutes seconds)'
     '-r[reference]:file:_files'
-    '-R[rfc-2822]'
+    '-R[RFC2822 format]'
     '-s[set]:time string'
     '--rfc-3339=-[output date and time in RFC 3339 format]:output type:(date seconds ns)'
     --
@@ -20,26 +20,23 @@ else
     solaris*)
       args=( '-a:adjustment' )
     ;;
-    freebsd*|darwin*)
+    freebsd*|darwin*|dragonfly*|netbsd*|openbsd*)
       args=(
 	'-n[only set time on current machine]'
 	'-d:daylight saving time value'
 	'-j[do not try to set date]'
-	'-f:parsing format'
 	'-r:seconds since epoch'
 	'-t:minutes west of GMT'
-	'-v:adjustment value'
       )
+    ;|
+    freebsd*) args+=( '-R[RFC2822 format]' ) ;|
+    freebsd*|dragonfly*|darwin*)
+      args+=( '-f:parsing format' '-v:adjustment value' )
     ;;
     openbsd*)
-      args=(
-	'-n[only set time on current machine]'
-	'-d:daylight saving time value'
-	'-a[gradually skew]'
-	'-r:seconds since epoch'
-	'-t:minutes west of GMT'
-      )
-    ;;
+      args+=( '-z[specify timezone for output]:time zone:_time_zone')
+    ;|
+    openbsd*|netbsd*) args=( '-a[gradually skew]' ) ;;
   esac
 fi
 
