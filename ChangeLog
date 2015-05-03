@@ -1,3 +1,7 @@
+2015-05-04  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 35021: Src/builtin.c: Fix two bugs in typeset_setbase
+
 2015-05-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 35018 (corrected): NEWS: news.

@@ -1868,7 +1868,7 @@ typeset_setbase(const char *name, Param pm, Options ops, int on, int always)
 
     if (arg) {
 	char *eptr;
-	pm->base = (int)zstrtol(arg, &eptr, 10);
+	int base = (int)zstrtol(arg, &eptr, 10);
 	if (*eptr) {
 	    if (on & PM_INTEGER)
 		zwarnnam(name, "bad base value: %s", arg);
@@ -1876,11 +1876,12 @@ typeset_setbase(const char *name, Param pm, Options ops, int on, int always)
 		zwarnnam(name, "bad precision value: %s", arg);
 	    return 1;
 	}
-	if (pm->base < 2 || pm->base > 36) {
+	if ((on & PM_INTEGER) && (base < 2 || base > 36)) {
 	    zwarnnam(name, "invalid base (must be 2 to 36 inclusive): %d",
-		     pm->base);
+		     base);
 	    return 1;
 	}
+	pm->base = base;
     } else if (always)
 	pm->base = 0;
 
