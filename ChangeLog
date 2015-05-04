@@ -1,3 +1,8 @@
+2015-05-04  Oliver Kiddle  <opk@zsh.org>
+
+	* 35029: Src/Zle/zle_word.c, Test/X02zlevi.ztst:
+	improvements to newline handling for vi-mode word movement
+
 2015-05-04  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 35021: Src/builtin.c: Fix two bugs in typeset_setbase

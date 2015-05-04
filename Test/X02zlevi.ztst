@@ -414,6 +414,94 @@
 >BUFFER: One tWO three
 >CURSOR: 4
 
+  zletest $' --ww  ww--\eo\eoww\eo\eo--\eo\eo  ww\e' bi{a,b,c,d,e,f,g,h,i,j,k}$'\e'
+0:backward word
+>BUFFER: k j--iww  hwwg--
+>f
+>eww
+>d
+>c--
+>b
+>  aww
+>CURSOR: 0
+
+  zletest $' --ww  ww--\eo\eoww\eo\eo--\eo\eo  ww\e' Bi{a,b,c,d,e,f,g,h,i}$'\e'
+0:backword blank word
+>BUFFER: i h--ww  gww--
+>f
+>eww
+>d
+>c--
+>b
+>  aww
+>CURSOR: 0
+
+  zletest $' --ww  ww--\eo\eoww\eo\eo--\eo\eo  ww\e' gei{a,=,b,c,=,d,e,=,f}$'\e'
+0:backward word end
+>BUFFER: f -=-wew  wdw-=-
+>c
+>wbw
+>
+>-=-
+>a
+>  ww
+>CURSOR: 0
+
+  zletest $' --ww  ww--\eo\eoww\eo\eo--\eo\eo  ww\e' gEi{=,b,=,d,e}$'\e'
+0:backward blank word end
+>BUFFER: e --wdw  ww-=-
+>
+>wbw
+>
+>-=-
+>
+>  ww
+>CURSOR: 0
+
+  zletest $'  ww\eO\eO--\eO\eOww\eO\eO --ww  ww--\e0' wi{=,a,b,=,c,d,e,=,f,g}$'\e'
+0:forward word
+>BUFFER:  =--aww  bww=--
+>c
+>dww
+>e
+>=--
+>f
+>  gww
+>CURSOR: 32
+
+  zletest $'  ww\eO\eO--\eO\eOww\eO\eO --ww  ww--\e0' Wi{=,a,b,c,d,=,e,f}$'\e'
+0:forward blank word
+>BUFFER:  =--ww  aww--
+>b
+>cww
+>d
+>=--
+>e
+>  fww
+>CURSOR: 30
+
+  zletest $'  ww\eO\eO--\eO\eOww\eO\eO --ww  ww--\e0' ea{a,b,c,d,e,f,g}$'\e'
+0:forward word end
+>BUFFER:  --awwb  wwc--d
+>
+>wwe
+>
+>--f
+>
+>  wwg
+>CURSOR: 31
+
+  zletest $'  ww\eO\eO--\eO\eOww\eO\eO --ww  ww--\e0' Ea{a,b,c,d,e}$'\e'
+0:forward blank word end
+>BUFFER:  --wwa  ww--b
+>
+>wwc
+>
+>--d
+>
+>  wwe
+>CURSOR: 29
+
   zletest $'    ----word    ----    word    word----    ----\e42|daw30|daw22|daw14|daw2|daw'
 0:delete all word on blanks
 >BUFFER: word
