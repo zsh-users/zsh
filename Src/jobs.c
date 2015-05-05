@@ -421,8 +421,10 @@ update_job(Job jn)
 
     for (pn = jn->procs; pn; pn = pn->next) {
 #ifdef WIFCONTINUED
-	if (WIFCONTINUED(pn->status))
+	if (WIFCONTINUED(pn->status)) {
+	    jn->stat &= ~STAT_STOPPED;
 	    pn->status = SP_RUNNING;
+	}
 #endif
 	if (pn->status == SP_RUNNING)      /* some processes in this job are running       */
 	    return;                        /* so no need to update job table entry         */
