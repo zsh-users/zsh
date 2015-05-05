@@ -1,5 +1,8 @@
 2015-05-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Config/version.mk, Etc/FAQ.yo: update for
+	5.0.7-dev-2, including updated FAQ source for newer YODL.
+
 	* 35032: Src/jobs.c: update job status with process status if
 	process detected as continued.
 
