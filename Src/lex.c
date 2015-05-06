@@ -1345,8 +1345,11 @@ gettokstr(int c, int sub)
 	    break;
     }
   brk:
-    if (errflag)
+    if (errflag) {
+	while(bct-- >= in_brace_param)
+	    cmdpop();
 	return LEXERR;
+    }
     hungetc(c);
     if (unmatched)
 	zerr("unmatched %c", unmatched);

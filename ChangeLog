@@ -1,3 +1,8 @@
+2015-05-06  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 35046: Src/lex.c: properly unwind cmdstack when erroring out of
+	lexing a parameter expansion in braces
+
 2015-05-06  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* c.f. 35041 (Axel Beckert): Doc/Zsh/zle.yo: typo.
