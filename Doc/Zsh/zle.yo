@@ -141,7 +141,7 @@ While for normal editing a single keymap is used exclusively, in many
 modes a local keymap allows for some keys to be customised. For example,
 in an incremental search mode, a binding in the tt(isearch) keymap will
 override a binding in the tt(main) keymap but all keys that are not
-overriden can still be used.
+overridden can still be used.
 
 If a key sequence is defined in a local keymap, it will hide a key
 sequence in the global keymap that is a prefix of that sequence. An
