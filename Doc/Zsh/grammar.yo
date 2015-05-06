@@ -191,7 +191,7 @@ use the positional parameters instead of the var(word)s.
 
 More than one parameter var(name) can appear before the list of
 var(word)s.  If var(N) var(name)s are given, then on each execution of the
-loop the next tt(N) var(word)s are assigned to the corresponding
+loop the next var(N) var(word)s are assigned to the corresponding
 parameters.  If there are more var(name)s than remaining var(word)s, the
 remaining parameters are each set to the empty string.  Execution of the
 loop ends when there is no remaining var(word) to assign to the first
@@ -353,7 +353,7 @@ The body of the function is the var(list) between
 the tt({) and tt(}).  See noderef(Functions).
 
 If the option tt(SH_GLOB) is set for compatibility with other shells, then
-whitespace may appear between between the left and right parentheses when
+whitespace may appear between the left and right parentheses when
 there is a single var(word);  otherwise, the parentheses will be treated as
 forming a globbing pattern in that case.
 
@@ -396,8 +396,9 @@ code is a concern.
 The short versions below only work if var(sublist) is of the form `tt({)
 var(list) tt(})' or if the tt(SHORT_LOOPS) option is set.  For the tt(if),
 tt(while) and tt(until) commands, in both these cases the test part of the
-loop must also be suitably delimited, such as by `tt([[ ... ]])' or `tt(((
-... )))', else the end of the test will not be recognized.  For the
+loop must also be suitably delimited, such as by `tt([[) var(...) tt(]])' or
+`tt(LPAR()LPAR()) var(...) tt(RPAR()RPAR())',
+else the end of the test will not be recognized.  For the
 tt(for), tt(repeat), tt(case) and tt(select) commands no such special form
 for the arguments is necessary, but the other condition (the special form
 of var(sublist) or use of the tt(SHORT_LOOPS) option) still applies.
@@ -420,7 +421,7 @@ example(if true {  # Does not work!
 does em(not), since the test is not suitably delimited.
 )
 item(tt(if) var(list) var(sublist))(
-A short form of the alternate `if'.  The same limitations on the form of
+A short form of the alternate tt(if).  The same limitations on the form of
 var(list) apply as for the previous form.
 )
 item(tt(for) var(name) ... tt(LPAR()) var(word) ... tt(RPAR()) var(sublist))(
@@ -451,7 +452,7 @@ This is a short form of tt(repeat).
 item(tt(case) var(word) tt({) [ [tt(LPAR())] var(pattern) [ tt(|) var(pattern) ] ... tt(RPAR()) var(list) (tt(;;)|tt(;&)|tt(;|)) ] ... tt(}))(
 An alternative form of tt(case).
 )
-item(tt(select) var(name) [ tt(in) var(word) var(term) ] var(sublist))(
+item(tt(select) var(name) [ tt(in) var(word) ... var(term) ] var(sublist))(
 where var(term) is at least one newline or tt(;).
 A short form of tt(select).
 )
@@ -617,7 +618,7 @@ code fragment might be re-executed.
 texinode(Quoting)()(Aliasing)(Shell Grammar)
 sect(Quoting)
 cindex(quoting)
-A character may be var(quoted) (that is, made
+A character may be em(quoted) (that is, made
 to stand for itself) by preceding it with a `tt(\)'.
 `tt(\)' followed by a newline is ignored.
 

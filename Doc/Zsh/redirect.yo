@@ -155,7 +155,7 @@ ifnzman(noderef(Simple Commands & Pipelines))
 is a shorthand for `tt(2>&1 |)'.
 
 The various forms of process substitution, `tt(<LPAR())var(list)tt(RPAR())',
-and `tt(=LPAR())var(list)(RPAR())' for input and
+and `tt(=LPAR())var(list)tt(RPAR())' for input and
 `tt(>LPAR())var(list)tt(RPAR())' for output, are often used together with
 redirection.  For example, if var(word) in an output redirection is of the
 form `tt(>LPAR())var(list)tt(RPAR())' then the output is piped to the
@@ -176,7 +176,7 @@ is guaranteed to be at least 10 and set the parameter named by the
 identifier to the file descriptor opened.  No whitespace is allowed
 between the closing brace and the redirection character.  For example:
 
-indent(... {myfd}>&1)
+indent(... tt({myfd}>&1))
 
 This opens a new file descriptor that is a duplicate of file descriptor
 1 and sets the parameter tt(myfd) to the number of the file descriptor,
@@ -275,9 +275,10 @@ If the tt(MULTIOS) option is em(un)set,
 each redirection replaces the previous redirection for that file descriptor.
 However, all files redirected to are actually opened, so
 
-example(echo foo > bar > baz)
+example(echo Hello > bar > baz)
 
-when tt(MULTIOS) is unset will truncate bar, and write `tt(foo)' into baz.
+when tt(MULTIOS) is unset will truncate `tt(bar)', and write `tt(Hello)'
+into `tt(baz)'.
 
 There is a problem when an output multio is attached to an external
 program.  A simple example shows this:

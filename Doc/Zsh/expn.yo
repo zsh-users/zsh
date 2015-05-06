@@ -943,7 +943,7 @@ item(tt(F))(
 Join the words of arrays together using newline as a separator.
 This is a shorthand for `tt(pj:\n:)'.
 )
-item(tt(g:opts:))(
+item(tt(g:)var(opts)tt(:))(
 Process escape sequences like the echo builtin when no options are given
 (tt(g::)).  With the tt(o) option, octal escapes don't take a leading
 zero.  With the tt(c) option, sequences like `tt(^X)' are also processed.
@@ -1168,11 +1168,11 @@ optional; neither, the first, or both may be given.  Note that the same
 pairs of delimiters must be used for each of the three arguments.  The
 space to the left will be filled with var(string1) (concatenated as
 often as needed) or spaces if var(string1) is not given.  If both
-var(string1) and var(string2) are given, tt(string2) is inserted once
+var(string1) and var(string2) are given, var(string2) is inserted once
 directly to the left of each word, truncated if necessary, before
 var(string1) is used to produce any remaining padding.
 
-If either of var(string1) or tt(string2) is present but empty,
+If either of var(string1) or var(string2) is present but empty,
 i.e. there are two delimiters together at that point, the first
 character of tt($IFS) is used instead.
 
@@ -1230,7 +1230,7 @@ example(line="one::three"
 print -l "${(s.:.)line}")
 
 produces two lines of output for tt(one) and tt(three) and elides the
-empty field.  To override this behaviour, supply the "(@)" flag as well,
+empty field.  To override this behaviour, supply the `tt((@))' flag as well,
 i.e.  tt("${(@s.:.)line}").
 )
 item(tt(Z:)var(opts)tt(:))(
@@ -1314,14 +1314,14 @@ enditem()
 subsect(Rules)
 
 Here is a summary of the rules for substitution; this assumes that braces
-are present around the substitution, i.e. tt(${...}).  Some particular
+are present around the substitution, i.e. tt(${)var(...)tt(}).  Some particular
 examples are given below.  Note that the Zsh Development Group accepts
 em(no responsibility) for any brain damage which may occur during the
 reading of the following rules.
 
 startitem()
 item(tt(1.) em(Nested substitution))(
-If multiple nested tt(${...}) forms are present, substitution is
+If multiple nested tt(${)var(...)tt(}) forms are present, substitution is
 performed from the inside outwards.  At each level, the substitution takes
 account of whether the current value is a scalar or an array, whether the
 whole substitution is in double quotes, and what flags are supplied to the
@@ -2233,7 +2233,7 @@ tt(readme) with up to two errors.
 When using the ksh syntax for grouping both tt(KSH_GLOB) and
 tt(EXTENDED_GLOB) must be set and the left parenthesis should be
 preceded by tt(@).  Note also that the flags do not affect letters
-inside tt([...]) groups, in other words tt(LPAR()#i)tt(RPAR()[a-z])
+inside tt([)...tt(]) groups, in other words tt(LPAR()#i)tt(RPAR()[a-z])
 still matches only lowercase letters.  Finally, note that when
 examining whole paths case-insensitively every directory must be
 searched for all files which match, so that a pattern of the form
@@ -2344,7 +2344,8 @@ the glob pattern by doubling the parentheses, in this case producing
 `tt(((^x)))'.
 
 If the option tt(EXTENDED_GLOB) is set, a different syntax for glob
-qualifiers is available, namely `tt((#qx))' where tt(x) is any of the same
+qualifiers is available, namely `tt(LPAR()#q)var(x)tt(RPAR())'
+where var(x) is any of the same
 glob qualifiers used in the other format.  The qualifiers must still appear
 at the end of the pattern.  However, with this syntax multiple glob
 qualifiers may be chained together.  They are treated as a logical AND of
@@ -2357,7 +2358,7 @@ the pattern, for example `tt(*(#q*)(.))' will recognise executable regular
 files if both options are set; however, mixed syntax should probably be
 avoided for the sake of clarity.  Note that within conditions using the
 `tt([[)' form the presence of a parenthesised expression
-tt(LPAR()#q...+RPAR()) at the end of a string indicates that globbing
+tt(LPAR()#q)var(...)tt(RPAR()) at the end of a string indicates that globbing
 should be performed; the expression may include glob qualifiers, but
 it is also valid if it is simply tt(LPAR()#q+RPAR()).  This does
 not apply to the right hand side of pattern match operators as the
@@ -2694,14 +2695,15 @@ whole list matches if at least one of the sublists matches (they are
 however, affect all matches generated, independent of the sublist in
 which they are given.  These are the qualifiers `tt(M)', `tt(T)',
 `tt(N)', `tt(D)', `tt(n)', `tt(o)', `tt(O)' and the subscripts given
-in brackets (`tt([...])').
+in brackets (`tt([)var(...)tt(])').
 
 If a `tt(:)' appears in a qualifier list, the remainder of the expression in
 parenthesis is interpreted as a modifier (see noderef(Modifiers)
 in noderef(History Expansion)).  Each modifier must be introduced by a
 separate `tt(:)'.  Note also that the result after modification does not
 have to be an existing file.  The name of any existing file can be followed
-by a modifier of the form `tt((:..))' even if no actual filename generation
+by a modifier of the form `tt(LPAR():)var(...)tt(RPAR())'
+even if no actual filename generation
 is performed, although note that the presence of the parentheses
 causes the entire expression to be subjected to any global pattern matching
 options such as tt(NULL_GLOB). Thus:

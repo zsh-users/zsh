@@ -792,7 +792,7 @@ Save each command's beginning timestamp (in seconds since the epoch)
 and the duration (in seconds) to the history file.  The format of
 this prefixed data is:
 
-`tt(:) var(<beginning time>)tt(:)var(<elapsed seconds>)tt(;)var(<command>)'.
+`tt(: )var(<beginning time>)tt(:)var(<elapsed seconds>)tt(;)var(<command>)'.
 )
 pindex(HIST_ALLOW_CLOBBER)
 pindex(NO_HIST_ALLOW_CLOBBER)
@@ -932,7 +932,7 @@ pindex(HISTSAVEBYCOPY)
 pindex(NOHISTSAVEBYCOPY)
 item(tt(HIST_SAVE_BY_COPY) <D>)(
 When the history file is re-written, we normally write out a copy of
-the file named $HISTFILE.new and then rename it over the old one.
+the file named tt($HISTFILE.new) and then rename it over the old one.
 However, if this option is unset, we instead truncate the old
 history file and write out the new version in-place.  If one of the
 history-appending options is enabled, this option only has an effect
@@ -974,7 +974,7 @@ are added to the tt($HISTFILE) incrementally (as soon as they are
 entered), rather than waiting until the shell exits.
 The file will still be periodically re-written to trim it when the
 number of lines grows 20% beyond the value specified by
-tt($SAVEHIST) (see also the HIST_SAVE_BY_COPY option).
+tt($SAVEHIST) (see also the tt(HIST_SAVE_BY_COPY) option).
 )
 pindex(INC_APPEND_HISTORY_TIME)
 pindex(NO_INC_APPEND_HISTORY_TIME)
@@ -1483,8 +1483,8 @@ wrap to the next line when a partial line is present (note that this is
 only successful if your terminal has automatic margins, which is typical).
 
 When a partial line is preserved, by default you will see an inverse+bold
-character at the end of the partial line:  a "%" for a normal user or
-a "#" for root.  If set, the shell parameter tt(PROMPT_EOL_MARK) can be
+character at the end of the partial line:  a `tt(%)' for a normal user or
+a `tt(#)' for root.  If set, the shell parameter tt(PROMPT_EOL_MARK) can be
 used to customize how the end of partial lines are shown.
 
 NOTE: if the tt(PROMPT_CR) option is not set, enabling this option will
@@ -1548,7 +1548,7 @@ cindex(operator precedence)
 item(tt(C_PRECEDENCES))(
 This alters the precedence of arithmetic operators to be more
 like C and other programming languages;
-ifnzman(Arithmetic Evaluation)\
+ifnzman(noderef(Arithmetic Evaluation))\
 ifzman(the section ARITHMETIC EVALUATION in zmanref(zshmisc))
 has an explicit list.
 )
@@ -1856,8 +1856,8 @@ pindex(NOCSHJUNKIELOOPS)
 cindex(csh, loop style)
 cindex(loop style, csh)
 item(tt(CSH_JUNKIE_LOOPS) <C>)(
-Allow loop bodies to take the form `var(list); tt(end)' instead of
-`tt(do) var(list); tt(done)'.
+Allow loop bodies to take the form `var(list)tt(; end)' instead of
+`tt(do )var(list)tt(; done)'.
 )
 pindex(CSH_JUNKIE_QUOTES)
 pindex(NO_CSH_JUNKIE_QUOTES)
@@ -2113,7 +2113,7 @@ pindex(NOSHFILEEXPANSION)
 cindex(sh, expansion style)
 cindex(expansion style, sh)
 item(tt(SH_FILE_EXPANSION) <K> <S>)(
-Perform filename expansion (e.g., ~ expansion) em(before)
+Perform filename expansion (e.g., tt(~) expansion) em(before)
 parameter expansion, command substitution, arithmetic expansion
 and brace expansion.
 If this option is unset, it is performed em(after)

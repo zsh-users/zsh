@@ -111,7 +111,7 @@ indent(tt(typeset -A) var(name))
 When var(name) refers to an associative array, the list in an assignment
 is interpreted as alternating keys and values:
 ifzman()
-indent(set -A var(name) var(key) var(value) ...)
+indent(tt(set -A) var(name) var(key) var(value) ...)
 indent(var(name)tt(=LPAR())var(key) var(value) ...tt(RPAR()))
 
 Every var(key) must have a var(value) in this case.  Note that this
@@ -282,14 +282,14 @@ pattern and the result is the first matching array element, substring or
 word (if the parameter is an array, if it is a scalar, or if it is a
 scalar and the `tt(w)' flag is given, respectively).  The subscript used
 is the number of the matching element, so that pairs of subscripts such as
-`tt($foo[(r))var(??)tt(,3])' and `tt($foo[(r))var(??)tt(,(r)f*])' are
+`tt($foo[(r)??,3])' and `tt($foo[(r)??,(r)f*])' are
 possible if the parameter is not an associative array.  If the
 parameter is an associative array, only the value part of each pair is
 compared to the pattern, and the result is that value.
 
 If a search through an ordinary array failed, the search sets the
 subscript to one past the end of the array, and hence
-tt(${array[(r)pattern]}) will substitute the empty string.  Thus the
+tt(${array[(r))var(pattern)tt(]}) will substitute the empty string.  Thus the
 success of a search can be tested by using the tt((i)) flag, for
 example (assuming the option tt(KSH_ARRAYS) is not in effect):
 
@@ -1075,8 +1075,8 @@ example, if the value is `tt(fc *)' then commands that invoke the
 interactive history editor are never written to the history file.
 
 Note that tt(HISTORY_IGNORE) defines a single pattern: to
-specify alternatives use the `tt(+LPAR()first|second|...+RPAR())'
-syntax.
+specify alternatives use the
+`tt(LPAR())var(first)tt(|)var(second)tt(|)var(...)tt(RPAR())' syntax.
 
 Compare the tt(HIST_NO_STORE) option or the tt(zshaddhistory) hook,
 either of which would prevent such commands from being added to the
@@ -1450,7 +1450,7 @@ sitem(tt(%W))(Number of times the process was swapped.)
 sitem(tt(%X))(The average amount in (shared) text space used in kilobytes.)
 sitem(tt(%D))(The average amount in (unshared) data/stack space used in
 kilobytes.)
-sitem(tt(%K))(The total space used (%X+%D) in kilobytes.)
+sitem(tt(%K))(The total space used (tt(%X)PLUS()tt(%D)) in kilobytes.)
 sitem(tt(%M))(The  maximum memory the process had in use at any time in
 megabytes.)
 sitem(tt(%F))(The number of major page faults (page needed to be brought

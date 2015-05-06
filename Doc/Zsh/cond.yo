@@ -123,7 +123,7 @@ tt(MATCH) is set to the substring that matched the pattern and
 the integer parameters tt(MBEGIN) and tt(MEND) to the index of the start
 and end, respectively, of the match in var(string), such that if
 var(string) is contained in variable tt(var) the expression
-`${var[$MBEGIN,$MEND]}' is identical to `$MATCH'.  The setting
+`tt(${var[$MBEGIN,$MEND]})' is identical to `tt($MATCH)'.  The setting
 of the option tt(KSH_ARRAYS) is respected.  Likewise, the array
 tt(match) is set to the substrings that matched parenthesised
 subexpressions and the arrays tt(mbegin) and tt(mend) to the indices of
@@ -132,9 +132,9 @@ var(string).  The arrays are not set if there were no parenthesised
 subexpresssions.  For example, if the string `tt(a short string)' is matched
 against the regular expression `tt(s+LPAR()...RPAR()t)', then (assuming the
 option tt(KSH_ARRAYS) is not set) tt(MATCH), tt(MBEGIN)
-and tt(MEND) are `tt(short)', 3 and 7, respectively, while tt(match),
+and tt(MEND) are `tt(short)', tt(3) and tt(7), respectively, while tt(match),
 tt(mbegin) and tt(mend) are single entry arrays containing
-the strings `tt(hor)', `tt(4)' and `tt(6), respectively.
+the strings `tt(hor)', `tt(4)' and `tt(6)', respectively.
 
 If the option tt(BASH_REMATCH) is set the array
 tt(BASH_REMATCH) is set to the substring that matched the pattern
@@ -216,7 +216,7 @@ test command.
 
 For example,
 
-tt([[ -n file*(#qN) ]])
+example([[ -n file*(#qN) ]])
 
 produces status zero if and only if there is at least one file in the
 current directory beginning with the string `tt(file)'.  The globbing
@@ -243,7 +243,8 @@ even if the underlying system does not support
 the tt(/dev/fd) directory.
 
 In the forms which do numeric comparison, the expressions var(exp)
-undergo arithmetic expansion as if they were enclosed in tt($((...))).
+undergo arithmetic expansion as if they were enclosed in
+tt($LPAR()LPAR())var(...)tt(RPAR()RPAR()).
 
 For example, the following:
 

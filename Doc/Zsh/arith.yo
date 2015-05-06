@@ -7,7 +7,8 @@ cindex(arithmetic evaluation)
 cindex(evaluation, arithmetic)
 findex(let, use of)
 The shell can perform integer and floating point arithmetic, either using
-the builtin tt(let), or via a substitution of the form tt($((...))).  For
+the builtin tt(let), or via a substitution of the form
+tt($LPAR()LPAR())var(...)tt(RPAR()RPAR()).  For
 integers, the shell is usually compiled to use 8-byte precision where this
 is available, otherwise precision is 4 bytes.  This can be tested, for
 example, by giving the command `tt(print - $(( 12345678901 )))'; if the
@@ -40,7 +41,7 @@ cindex(arithmetic base)
 cindex(bases, in arithmetic)
 Integers can be in bases other than 10.
 A leading `tt(0x)' or `tt(0X)' denotes hexadecimal and a leading
-`tt(0b)' or `tt(0B) binary.
+`tt(0b)' or `tt(0B)' binary.
 Integers may also be of the form `var(base)tt(#)var(n)',
 where var(base) is a decimal number between two and thirty-six
 representing the arithmetic base and var(n)
@@ -100,8 +101,8 @@ shown may vary).
 
 pindex(C_BASES, use of)
 pindex(OCTAL_ZEROES, use of)
-If the tt(C_BASES) option is set, hexadecimal numbers in the standard C
-format, for example tt(0xFF) instead of the usual `tt(16#FF)'.  If the
+If the tt(C_BASES) option is set, hexadecimal numbers are output in the standard C
+format, for example `tt(0xFF)' instead of the usual `tt(16#FF)'.  If the
 option tt(OCTAL_ZEROES) is also set (it is not by default), octal numbers
 will be treated similarly and hence appear as `tt(077)' instead of
 `tt(8#77)'.  This option has no effect on the output of bases other than
@@ -175,7 +176,7 @@ endsitem()
 
 Note the precedence of exponentiation in both cases is below
 that of unary operators, hence `tt(-3**2)' evaluates as `tt(9)', not
-tt(-9).  Use parentheses where necessary: `tt(-(3**2))'.  This is
+`tt(-9)'.  Use parentheses where necessary: `tt(-(3**2))'.  This is
 for compatibility with other shells.
 
 cindex(mathematical functions, use of)
@@ -190,12 +191,12 @@ functions.
 
 An expression of the form `tt(##)var(x)' where var(x) is any character
 sequence such as `tt(a)', `tt(^A)', or `tt(\M-\C-x)' gives the value of
-this character and an expression of the form `tt(#)var(foo)' gives the
-value of the first character of the contents of the parameter var(foo).
+this character and an expression of the form `tt(#)var(name)' gives the
+value of the first character of the contents of the parameter var(name).
 Character values are according to the character set used in the current
 locale; for multibyte character handling the option tt(MULTIBYTE) must be
-set.  Note that this form is different from `tt($#)var(foo)', a standard
-parameter substitution which gives the length of the parameter var(foo).
+set.  Note that this form is different from `tt($#)var(name)', a standard
+parameter substitution which gives the length of the parameter var(name).
 `tt(#\)' is accepted instead of `tt(##)', but its use is deprecated.
 
 Named parameters and subscripted arrays can be referenced by name within an
