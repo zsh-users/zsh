@@ -48,7 +48,7 @@ def(enditem)(0)()\
 def(item)(2)(
 ARG1: ARG2)\
 def(nofill)(1)(ARG1)\
-def(uref)(1)(ARG1)\
+def(uref)(1)(url(ARG1)(ARG1))\
 def(LPAR)(0)(CHAR(40))\
 def(RPAR)(1)(CHAR(41))
 myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2010/02/15)
