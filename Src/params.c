@@ -5039,8 +5039,19 @@ printparamnode(HashNode hn, int printflags)
     Param p = (Param) hn;
     char *t, **u;
 
-    if (p->node.flags & PM_UNSET)
-	return;
+    if (p->node.flags & PM_UNSET) {
+	if (isset(POSIXBUILTINS) && (p->node.flags & PM_READONLY) &&
+	    (printflags & PRINT_TYPESET))
+	{
+	    /*
+	     * Special POSIX rules: show the parameter as readonly
+	     * even though it's unset, but with no value.
+	     */
+	    printflags |= PRINT_NAMEONLY;
+	}
+	else
+	    return;
+    }
 
     if (printflags & PRINT_TYPESET)
 	printf("typeset ");

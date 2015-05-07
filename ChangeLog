@@ -1,5 +1,8 @@
 2015-05-07  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35054: Src/params.c, Test/B02typeset.ztst: "readonly -p"
+	displays unset readonly variables with POSIXBUILTINS.
+
 	* Eric Cook: 35052: Completion/BSD/Command/_bsdconfig,
 	Completion/BSD/Command/_bsdinstall,
 	Completion/BSD/Command/_jexec, Completion/BSD/Command/_jls:
