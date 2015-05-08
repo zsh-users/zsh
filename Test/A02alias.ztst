@@ -59,7 +59,8 @@
 >And aliases are expanded
 
   $ZTST_testdir/../Src/zsh -fis <<<'
-  PROMPT=""
+  unsetopt PROMPT_SP
+  PROMPT="" PS2="" PS3="" PS4="" RPS1="" RPS2=""
   exec 2>&1
   alias \{=echo
   { begin
@@ -68,16 +69,17 @@
 0:Aliasing reserved tokens
 >begin
 >end
-*>*4*{ begin
-*>*5*{end
+*>*5*{ begin
+*>*6*{end
 
   $ZTST_testdir/../Src/zsh -fis <<<'
-  PROMPT=""
+  unsetopt PROMPT_SP
+  PROMPT="" PS2="" PS3="" PS4="" RPS1="" RPS2=""
   exec 2>&1
   alias -g S=\"
   echo S a string S "
   fc -l -1' 2>/dev/null
 0:Global aliasing quotes
 > a string S 
-*>*4*echo S a string S "
+*>*5*echo S a string S "
 # Note there is a trailing space on the "> a string S " line

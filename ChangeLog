@@ -1,3 +1,8 @@
+2015-05-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35056: Test/A02alias.ztst: turn off PROMPT_SP for interactive
+	test.
+
 2015-05-08  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 35057: Etc/FAQ.yo: make URL clickable (should have been
