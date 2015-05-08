@@ -1,5 +1,9 @@
 2015-05-08  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35059: Doc/Zsh/builtins.yo, Src/params.c,
+	Test/B02typeset.ztst: fix, document and test "readonly -p"
+	output for arrays and specials.
+
 	* 35056: Test/A02alias.ztst: turn off PROMPT_SP for interactive
 	test.
 

@@ -1785,6 +1785,11 @@ form of a typeset command and an assignment (which will be printed
 separately for arrays and associative arrays), regardless of other flags
 and options.  Note that the tt(-H) flag on parameters is respected; no
 value will be shown for these parameters.
+
+As the intention of this option is to produce output that can restore
+the current state, readonly specials (whose values cannot be
+changed) are not shown and assignments to arrays are shown before
+the tt(typeset) rendering the array readonly.
 )
 item(tt(-T) [ var(scalar)[tt(=)var(value)] var(array) [ var(sep) ] ])(
 This flag has a different meaning when used with tt(-f); see below.

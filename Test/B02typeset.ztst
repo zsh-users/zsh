@@ -487,3 +487,24 @@
 ?typeset -r pbro
 ?0
 ?(eval):10: read-only variable: pbro
+
+  readonly foo=bar novalue
+  readonly -p
+0:readonly -p output (no readonly specials)
+>typeset -r foo=bar
+>typeset -r novalue=''
+
+  local -a a1 a2
+  local -r r1=yes r2=no
+  a1=(one two) a2=(three four)
+  readonly a1
+  typeset -pm 'a[12]'
+  typeset -pm 'r[12]'
+0:readonly -p output
+>typeset -a a1
+>a1=(one two)
+>typeset -ar a1
+>typeset -a a2
+>a2=(three four)
+>typeset -r r1=yes
+>typeset -r r2=no
