@@ -5614,10 +5614,16 @@ __git_commits () {
 
 (( $+functions[__git_heads] )) ||
 __git_heads () {
+  __git_heads_local
+  __git_heads_remote
+}
+
+(( $+functions[__git_heads_local] )) ||
+__git_heads_local () {
   local gitdir expl start
   declare -a heads
 
-  heads=(${${(f)"$(_call_program headrefs git for-each-ref --format='"%(refname)"' refs/heads refs/remotes 2>/dev/null)"}#refs/(heads|remotes)/})
+  heads=(${(f)"$(_call_program headrefs git for-each-ref --format='"%(refname:short)" refs/heads' 2>/dev/null)"})
   gitdir=$(_call_program gitdir git rev-parse --git-dir 2>/dev/null)
   if __git_command_successful $pipestatus; then
     for f in HEAD FETCH_HEAD ORIG_HEAD MERGE_HEAD; do
@@ -5626,7 +5632,17 @@ __git_heads () {
     [[ -f $gitdir/refs/stash ]] && heads+=stash
   fi
 
-  _wanted heads expl head compadd "$@" -a - heads
+  _wanted heads-local expl "local head" compadd "$@" -a - heads
+}
+
+(( $+functions[__git_heads_remote] )) ||
+__git_heads_remote () {
+  local gitdir expl start
+  declare -a heads
+
+  heads=(${(f)"$(_call_program headrefs git for-each-ref --format='"%(refname:short)" refs/remotes' 2>/dev/null)"})
+
+  _wanted heads-remote expl "remote head" compadd "$@" -a - heads
 }
 
 (( $+functions[__git_commit_objects] )) ||

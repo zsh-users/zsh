@@ -117,6 +117,12 @@ New behaviour:
 0.5
 
 
+4) The _git completion used to offer both local and remote heads under the
+tag 'heads'.  The tag has now been split into 'heads-local' and
+'heads-remote' in all contexts that existed in 5.0.7.  The --fixup/--squash
+context still uses the tag 'heads' (but this may change in a future release).
+
+
 Incompatibilities between 5.0.2 and 5.0.5
 -----------------------------------------
 

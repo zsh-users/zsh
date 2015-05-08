@@ -1,3 +1,8 @@
+2015-05-12  Daniel Hahler  <git@thequod.de>
+
+	* 35060 + 35072: Completion/Unix/Command/_git: completion: git: split
+	__git_heads into local and remote
+
 2015-05-12  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 35075: Doc/Zsh/builtins.yo, Doc/Zsh/calsys.yo,
