@@ -1,3 +1,8 @@
+2015-05-09  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 35064: Src/pattern.c, Src/utils.c, Src/ztype.h: rename
+	ISPRINT to ZISPRINT to avoid name conflict
+
 2015-05-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35059: Doc/Zsh/builtins.yo, Src/params.c,

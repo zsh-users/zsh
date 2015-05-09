@@ -3622,7 +3622,7 @@ patmatchrange(char *range, int ch, int *indptr, int *mtp)
 		    return 1;
 		break;
 	    case PP_PRINT:
-		if (ISPRINT(ch))
+		if (ZISPRINT(ch))
 		    return 1;
 		break;
 	    case PP_PUNCT:

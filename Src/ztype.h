@@ -77,7 +77,7 @@
 #endif
 
 #if defined(__APPLE__) && defined(BROKEN_ISPRINT)
-#define ISPRINT(c)  isprint_ascii(c)
+#define ZISPRINT(c)  isprint_ascii(c)
 #else
-#define ISPRINT(c)  isprint(c)
+#define ZISPRINT(c)  isprint(c)
 #endif
