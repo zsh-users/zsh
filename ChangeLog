@@ -1,3 +1,7 @@
+2015-05-10  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 35065: Src/zsh.h: Don't treat NUL as a combining character
+
 2015-05-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 35066: Completion/Unix/Command/_python

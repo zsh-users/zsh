@@ -2978,9 +2978,9 @@ typedef wint_t convchar_t;
  * We can't be quite sure the wcwidth we've provided is entirely
  * in agreement with the system's, so be extra safe.
  */
-#define IS_COMBINING(wc)	(WCWIDTH(wc) == 0 && !iswcntrl(wc))
+#define IS_COMBINING(wc)	(wc != 0 && WCWIDTH(wc) == 0 && !iswcntrl(wc))
 #else
-#define IS_COMBINING(wc)	(WCWIDTH(wc) == 0)
+#define IS_COMBINING(wc)	(wc != 0 && WCWIDTH(wc) == 0)
 #endif
 /*
  * Test for the base of a combining character.
