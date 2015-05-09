@@ -96,7 +96,7 @@ _svn () {
             )
           ;;
           (mergeinfo)
-            args[(r)--show-revs:arg:]=( '--show-revs:revisions:(merged eligible)' )
+            args[(r)--show-revs:arg:]=( '--show-revs=:revisions:(merged eligible)' )
           ;;
 	  (propget|propedit)
 	    args+=(

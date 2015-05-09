@@ -1,3 +1,9 @@
+2015-05-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 35066: Completion/Unix/Command/_python
+	Completion/Unix/Command/_subversion: Minor completion fix for
+	pasted arguments
+
 2015-05-09  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 35064: Src/pattern.c, Src/utils.c, Src/ztype.h: rename
