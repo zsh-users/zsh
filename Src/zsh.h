@@ -215,6 +215,10 @@ struct mathfunc {
 
 #define SPECCHARS "#$^*()=|{}[]`<>?~;&\n\t \\\'\""
 
+/* chars that need to be quoted for pattern matching */
+
+#define PATCHARS "#^*()|[]<>?~"
+
 /*
  * Types of quote.  This is used in various places, so care needs
  * to be taken when changing them.  (Oooh, don't you look surprised.)
@@ -248,6 +252,12 @@ enum {
      * This is only useful as an argument to quotestring().
      */
     QT_SINGLE_OPTIONAL,
+    /*
+     * Only quote pattern characters.
+     * ${(b)foo} guarantees that ${~foo} matches the string
+     * contained in foo.
+     */
+    QT_BACKSLASH_PATTERN,
     /*
      * As QT_BACKSLASH, but a NULL string is shown as ''.
      */

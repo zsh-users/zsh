@@ -1,3 +1,10 @@
+2015-05-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 35067 (doc tweak from Daniel, 35071): Doc/Zsh/expn.yo,
+	Src/subst.c, Src/utils.c, Src/zsh.h, Src/ztype.h,
+	Test/D04parameter.ztst: add ${(b)foo} for backslash
+	quoting of patterns.
+
 2015-05-10  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 35065: Src/zsh.h: Don't treat NUL as a combining character

@@ -1699,3 +1699,7 @@
 >
 >
 >Four
+
+  funnychars='The qu*nk br!wan f@x j/mps o[]r the la~# ^"&;'
+  [[ $funnychars = ${~${(b)funnychars}} ]]
+0:${(b)...} quoting protects from GLOB_SUBST

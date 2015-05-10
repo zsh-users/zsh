@@ -42,6 +42,7 @@
 #define IMETA    (1 << 12)
 #define IWSEP    (1 << 13)
 #define INULL    (1 << 14)
+#define IPATTERN (1 << 15)
 #define zistype(X,Y) (typtab[STOUC(X)] & Y)
 #define idigit(X) zistype(X,IDIGIT)
 #define ialnum(X) zistype(X,IALNUM)
@@ -58,6 +59,7 @@
 #define imeta(X) zistype(X,IMETA)
 #define iwsep(X) zistype(X,IWSEP)
 #define inull(X) zistype(X,INULL)
+#define ipattern(X) zistype(X,IPATTERN)
 
 /*
  * Bit flags for typtab_flags --- preserved after

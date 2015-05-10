@@ -3694,6 +3694,8 @@ inittyptab(void)
 	typtab[bangchar] |= ISPECIAL;
     } else
 	typtab_flags &= ~ZTF_BANGCHAR;
+    for (s = PATCHARS; *s; s++)
+	typtab[STOUC(*s)] |= IPATTERN;
 
     unqueue_signals();
 }
@@ -5075,6 +5077,10 @@ quotestring(const char *s, char **e, int instring)
 	alloclen = slen * 7 + 1;
 	break;
 
+    case QT_BACKSLASH_PATTERN:
+	alloclen = slen * 2  + 1;
+	break;
+
     case QT_SINGLE_OPTIONAL:
 	/*
 	 * Here, we may need to add single quotes.
@@ -5094,7 +5100,7 @@ quotestring(const char *s, char **e, int instring)
     quotestart = v = buf = zshcalloc(alloclen);
 
     DPUTS(instring < QT_BACKSLASH || instring == QT_BACKTICK ||
-	  instring > QT_SINGLE_OPTIONAL,
+	  instring > QT_BACKSLASH_PATTERN,
 	  "BUG: bad quote type in quotestring");
     u = s;
     if (instring == QT_DOLLARS) {
@@ -5134,9 +5140,18 @@ quotestring(const char *s, char **e, int instring)
 		u = uend;
 	    }
 	}
-    }
-    else
-    {
+    } else if (instring == QT_BACKSLASH_PATTERN) {
+	while (*u) {
+	    if (e && !sf && *e == u) {
+		*e = v;
+		sf = 1;
+	    }
+
+	    if (ipattern(*u))
+		*v++ = '\\';
+	    *v++ = *u++;
+	}
+    } else {
 	if (shownull) {
 	    /* We can't show an empty string with just backslash quoting. */
 	    if (!*u) {
