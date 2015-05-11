@@ -160,7 +160,7 @@ if (( CURRENT > 1 )) && [[ $OSTYPE != solaris* || ( $OSTYPE = linux-gnu && $word
       _wanted -C option-k-1 properties expl 'property' _sequence -s , _ps_props -s - && return
     ;;
     *G) _sequence -s , _groups && return ;;
-    *J) _sequence -s , _jails && return ;;
+    *J) _sequence _jails -0 && return ;;
     *[MNW]) _files && return ;;
     *t)
       _wanted -C option-t-1 ttys expl tty _sequence -s , \

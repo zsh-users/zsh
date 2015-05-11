@@ -1,3 +1,10 @@
+2015-05-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 35049 (tweaked to make jname default): Completion/BSD/Type/_jails,
+	Completion/Unix/Command/_ps, Completion/Unix/Command/_pgrep:
+	allow jail completion to include jid 0 for the host and to complete
+	jails by any parameter
+
 2015-05-11  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35078: Src/zsh.h, Test/D04parameter.ztst: also quote backslash
