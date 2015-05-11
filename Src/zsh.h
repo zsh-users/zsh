@@ -217,7 +217,7 @@ struct mathfunc {
 
 /* chars that need to be quoted for pattern matching */
 
-#define PATCHARS "#^*()|[]<>?~"
+#define PATCHARS "#^*()|[]<>?~\\"
 
 /*
  * Types of quote.  This is used in various places, so care needs

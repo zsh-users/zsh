@@ -1,3 +1,8 @@
+2015-05-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35078: Src/zsh.h, Test/D04parameter.ztst: also quote backslash
+	with (b) flag.
+
 2015-05-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 35067 (doc tweak from Daniel, 35071): Doc/Zsh/expn.yo,
