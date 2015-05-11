@@ -1014,25 +1014,6 @@ form of single quoting is used that only quotes the string if needed to
 protect special characters.  Typically this form gives the most readable
 output.
 )
-item(tt(b))(
-Quote with backslashes only characters that are special to pattern
-matching. This is useful when the contents of the variable are to be
-tested using tt(GLOB_SUBST), including the tt(${~)var(...)tt(}) switch.
-
-Quoting using one of the tt(q) family of flags does not work
-for this purpose since quotes are not stripped from non-pattern
-characters by tt(GLOB_SUBST).  In other words,
-
-example(pattern=${(q)str}
-[[ $str = ${~pattern} ]])
-
-works if tt($str) is tt('a*b') but not if it is tt('a b'), whereas
-
-example(pattern=${(b)str}
-[[ $str = ${~pattern} ]])
-
-is always true for any possible value of tt($str).
-)
 item(tt(Q))(
 Remove one level of quotes from the resulting words.
 )
@@ -1166,7 +1147,9 @@ be treated as patterns.  This applies to the string arguments of flags
 that follow tt(~) within the same set of parentheses.  Compare with tt(~)
 outside parentheses, which forces the entire substituted string to
 be treated as a pattern.  Hence, for example,
+
 example([[ "?" = ${(~j.|.)array} ]])
+
 treats `tt(|)' as a pattern and succeeds if and only if tt($array)
 contains the string `tt(?)' as an element.  The tt(~) may be
 repeated to toggle the behaviour; its effect only lasts to the

@@ -31,18 +31,18 @@ PCRE.
 
 Upon successful match,
 if the expression captures substrings within parentheses,
-tt(pcre_match) will set the array var($match) to those
+tt(pcre_match) will set the array tt(match) to those
 substrings, unless the tt(-a) option is given, in which
 case it will set the array var(arr).  Similarly, the variable
-var(MATCH) will be set to the entire matched portion of the
+tt(MATCH) will be set to the entire matched portion of the
 string, unless the tt(-v) option is given, in which case the variable
 var(var) will be set.
 No variables are altered if there is no successful match.
 A tt(-n) option starts searching for a match from the
 byte var(offset) position in var(string).  If the tt(-b) option is given,
-the variable var(ZPCRE_OP) will be set to an offset pair string,
+the variable tt(ZPCRE_OP) will be set to an offset pair string,
 representing the byte offset positions of the entire matched portion
-within the var(string).  For example, a var(ZPCRE_OP) set to "32 45" indicates
+within the var(string).  For example, a tt(ZPCRE_OP) set to "32 45" indicates
 that the matched portion began on byte offset 32 and ended on byte offset 44.
 Here, byte offset position 45 is the position directly after the matched
 portion.  Keep in mind that the byte position isn't necessarily the same
@@ -75,7 +75,7 @@ The tt(zsh/pcre) module makes available the following test condition:
 
 startitem()
 findex(pcre-match)
-item(expr tt(-pcre-match) pcre)(
+item(var(expr) tt(-pcre-match) var(pcre))(
 Matches a string against a perl-compatible regular expression.
 
 For example,

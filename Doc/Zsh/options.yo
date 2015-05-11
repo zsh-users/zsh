@@ -1037,7 +1037,7 @@ pindex(NO_GLOBAL_EXPORT)
 pindex(GLOBALEXPORT)
 pindex(NOGLOBALEXPORT)
 cindex(environment, and local parameters)
-item(tt(GLOBAL_EXPORT) (tt(<Z>)))(
+item(tt(GLOBAL_EXPORT) <Z>)(
 If this option is set, passing the tt(-x) flag to the builtins tt(declare),
 tt(float), tt(integer), tt(readonly) and tt(typeset) (but not tt(local))
 will also set the tt(-g) flag;  hence parameters exported to

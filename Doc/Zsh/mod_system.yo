@@ -8,7 +8,7 @@ subsect(Builtins)
 
 startitem()
 findex(syserror)
-item(tt(syserror) tt([ -e) var(errvar) tt(] [ -p) var(prefix) tt(] [) var(errno) tt(|) var(errname) tt(]))(
+item(tt(syserror) [ tt(-e) var(errvar) ] [ tt(-p) var(prefix) ] [ var(errno) | var(errname) ])(
 This command prints out the error message associated with var(errno), a
 system error number, followed by a newline to standard error.
 
@@ -29,11 +29,12 @@ parameters, and a return status of 2 indicates the error name was
 not recognised (no message is printed for this).
 )
 findex(sysread)
-xitem(tt(sysread [ -c) var(countvar) tt(] [ -i) var(infd) tt(] [ -o) var(outfd) tt(]))
-item(  tt([ -s) var(bufsize) tt(] [ -t) var(timeout) tt(] [) var(param) tt(]))(
+redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
+xitem(tt(sysread )[ tt(-c) var(countvar) ] [ tt(-i) var(infd) ] [ tt(-o) var(outfd) ])
+item(SPACES()[ tt(-s) var(bufsize) ] [ tt(-t) var(timeout) ] [ var(param) ])(
 Perform a single system read from file descriptor var(infd), or zero if
 that is not given.  The result of the read is stored in var(param) or
-var(REPLY) if that is not given.  If var(countvar) is given, the number
+tt(REPLY) if that is not given.  If var(countvar) is given, the number
 of bytes read is assigned to the parameter named by var(countvar).
 
 The maximum number of bytes read is var(bufsize) or 8192 if that is not
@@ -88,7 +89,7 @@ usual rules; no write to var(outfd) is attempted.
 )
 enditem()
 )
-item(tt(syswrite [ -c) var(countvar) tt(] [ -o) var(outfd) tt(]) var(data))(
+item(tt(syswrite) [ tt(-c) var(countvar) ] [ tt(-o) var(outfd) ] var(data))(
 The data (a single string of bytes) are written to the file descriptor
 var(outfd), or 1 if that is not given, using the tt(write) system call.
 Multiple write operations may be used if the first does not write all
@@ -109,7 +110,7 @@ to the command, or 2 for an error on the write; no error message is
 printed in the last case, but the parameter tt(ERRNO) will reflect
 the error that occurred.
 )
-xitem(tt(zsystem flock [ -t) var(timeout) tt(] [ -f) var(var) tt(] [-er]) var(file))
+xitem(tt(zsystem flock) [ tt(-t) var(timeout) ] [ tt(-f) var(var) ] [tt(-er)] var(file))
 item(tt(zsystem flock -u) var(fd_expr))(
 The builtin tt(zsystem)'s subcommand tt(flock) performs advisory file
 locking (via the manref(fcntl)(2) system call) over the entire contents
@@ -126,7 +127,7 @@ the subshell exits.  Status 0 is returned if the lock succeeds, else
 status 1.
 
 In the second form the file descriptor given by the arithmetic
-expression tt(fd_expr) is closed, releasing a lock.  The file descriptor
+expression var(fd_expr) is closed, releasing a lock.  The file descriptor
 can be queried by using the `tt(-f) var(var)' form during the lock;
 on a successful lock, the shell variable var(var) is set to the file
 descriptor used for locking.  The lock will be released if the

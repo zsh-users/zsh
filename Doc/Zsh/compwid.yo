@@ -59,8 +59,8 @@ texinode(Completion Special Parameters)(Completion Builtin Commands)()(Completio
 sect(Completion Special Parameters)
 
 The parameters tt(ZLE_REMOVE_SUFFIX_CHARS) and tt(ZLE_SPACE_SUFFIX_CHARS)
-are used by the completion mechanism, but are not special.
-ifzman(See em(Parameters Used By The Shell) in zmanref(zshparam))\
+are used by the completion mechanism, but are not special. See
+ifzman(em(Parameters Used By The Shell) in zmanref(zshparam))\
 ifnzman(noderef(Parameters Used By The Shell)).
 
 Inside completion widgets, and any functions called from them, some
@@ -445,16 +445,17 @@ sect(Completion Builtin Commands)
 startitem()
 findex(compadd)
 cindex(completion widgets, adding specified matches)
-xitem(tt(compadd) [ tt(-akqQfenUld12C) ] [ tt(-F) var(array) ])
-xitem([ tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
-xitem([ tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
-xitem([ tt(-i) var(ignored-prefix) ] [ tt(-I) var(ignored-suffix) ])
-xitem([ tt(-W) var(file-prefix) ] [ tt(-d) var(array) ])
-xitem([ tt(-J) var(name) ] [ tt(-V) var(name) ] [ tt(-X) var(explanation) ] [ tt(-x) var(message) ])
-xitem([ tt(-r) var(remove-chars) ] [ tt(-R) var(remove-func) ])
-xitem([ tt(-D) var(array) ] [ tt(-O) var(array) ] [ tt(-A) var(array) ])
-xitem([ tt(-E) var(number) ])
-item([ tt(-M) var(match-spec) ] [ tt(-)tt(-) ] [ var(words) ... ])(
+redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
+xitem(tt(compadd )[ tt(-akqQfenUlo12C) ] [ tt(-F) var(array) ])
+xitem(SPACES()[tt(-P) var(prefix) ] [ tt(-S) var(suffix) ])
+xitem(SPACES()[tt(-p) var(hidden-prefix) ] [ tt(-s) var(hidden-suffix) ])
+xitem(SPACES()[tt(-i) var(ignored-prefix) ] [ tt(-I) var(ignored-suffix) ])
+xitem(SPACES()[tt(-W) var(file-prefix) ] [ tt(-d) var(array) ])
+xitem(SPACES()[tt(-J) var(name) ] [ tt(-V) var(name) ] [ tt(-X) var(explanation) ] [ tt(-x) var(message) ])
+xitem(SPACES()[tt(-r) var(remove-chars) ] [ tt(-R) var(remove-func) ])
+xitem(SPACES()[tt(-D) var(array) ] [ tt(-O) var(array) ] [ tt(-A) var(array) ])
+xitem(SPACES()[tt(-E) var(number) ])
+item(SPACES()[tt(-M) var(match-spec) ] [ tt(-)tt(-) ] [ var(words) ... ])(
 
 This builtin command can be used to add matches directly and control
 all the information the completion code stores with each possible
@@ -687,7 +688,7 @@ match.  If no string is given, it will be shown as a string containing
 the strings that would be inserted for the other matches, truncated to 
 the width of the screen.
 )
-item(tt(-E))(
+item(tt(-E) var(number))(
 This option adds var(number) empty matches after the var(words) have
 been added.  An empty match takes up space in completion listings but
 will never be inserted in the line and can't be selected with menu
@@ -821,7 +822,7 @@ texinode(Completion Condition Codes)(Completion Matching Control)(Completion Bui
 sect(Completion Condition Codes)
 cindex(completion widgets, condition codes)
 
-The following additional condition codes for use within the tt([[ ... ]])
+The following additional condition codes for use within the tt([[) var(...) tt(]])
 construct are available in completion widgets.  These work on the special
 parameters.  All of these tests can also be performed by the tt(compset)
 builtin, but in the case of the condition codes the contents of the special
@@ -937,9 +938,9 @@ like normal character classes.  In anchor patterns correspondence classes
 also behave like normal character classes.
 
 The standard `tt([:)var(name)tt(:])' forms described for standard shell
-patterns,
+patterns (see
 ifnzman(noderef(Filename Generation))\
-ifzman(see the section FILENAME GENERATION in zmanref(zshexpn)),
+ifzman(the section FILENAME GENERATION in zmanref(zshexpn)))
 may appear in correspondence classes as well as normal character
 classes.  The only special behaviour in correspondence classes is if
 the form on the left and the form on the right are each one of

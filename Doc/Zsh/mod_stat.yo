@@ -9,9 +9,11 @@ findex(zstat)
 findex(stat)
 cindex(files, listing)
 cindex(files, examining)
-xitem(tt(zstat) [ tt(-gnNolLtTrs) ] [ tt(-f) var(fd) ] \
+redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ ))ifnztexi(      )))
+xitem(tt(zstat )[ tt(-gnNolLtTrs) ] [ tt(-f) var(fd) ] \
     [ tt(-H) var(hash) ] [ tt(-A) var(array) ] \
-    [ tt(-F) var(fmt) ] [ tt(PLUS())var(element) ] [ var(file) ... ])
+    [ tt(-F) var(fmt) ])
+xitem(SPACES()[ tt(PLUS())var(element) ] [ var(file) ... ])
 item(tt(stat) var(...))(
 The command acts as a front end to the tt(stat) system call (see
 manref(stat)(2)).  The same command is provided with two names; as

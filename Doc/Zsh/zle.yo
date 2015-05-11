@@ -339,10 +339,11 @@ by `tt(bindkey -m)'.
 findex(vared)
 cindex(parameters, editing)
 cindex(editing parameters)
-xitem(tt(vared) [ tt(-Aache) ] [ tt(-p) var(prompt) ] [ tt(-r) var(rprompt) ])
-xitem(  [ tt(-M) var(main-keymap) ] [ tt(-m) var(vicmd-keymap) ])
-xitem(  [ tt(-i) var(init-widget) ] [ tt(-f) var(finish-widget) ])
-item(  [ tt(-t) var(tty) ] var(name))(
+redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ ))ifnztexi(      )))
+xitem(tt(vared )[ tt(-Aache) ] [ tt(-p) var(prompt) ] [ tt(-r) var(rprompt) ])
+xitem(SPACES()[ tt(-M) var(main-keymap) ] [ tt(-m) var(vicmd-keymap) ])
+xitem(SPACES()[ tt(-i) var(init-widget) ] [ tt(-f) var(finish-widget) ])
+item(SPACES()[ tt(-t) var(tty) ] var(name))(
 The value of the parameter var(name) is loaded into the edit
 buffer, and the line editor is invoked.  When the editor exits,
 var(name) is set to the string value returned by the editor.

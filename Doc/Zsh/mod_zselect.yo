@@ -7,7 +7,7 @@ startitem()
 findex(zselect)
 cindex(select, system call)
 cindex(file descriptors, waiting for)
-item(tt(zselect) [ tt(-rwe) tt(-t) var(timeout) tt(-a) var(array) ] [ var(fd) ... ])(
+item(tt(zselect) [ tt(-rwe) ] [ tt(-t) var(timeout) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] [ var(fd) ... ])(
 The tt(zselect) builtin is a front-end to the `select' system call, which
 blocks until a file descriptor is ready for reading or writing, or has an
 error condition, with an optional timeout.  If this is not available on
@@ -39,7 +39,7 @@ zselect with no file descriptors and a non-zero timeout for use as a
 finer-grained replacement for `sleep'; note, however, the return status is
 always 1 for a timeout.
 
-The option `tt(-a) var(array)' indicates that tt(array) should be set to
+The option `tt(-a) var(array)' indicates that var(array) should be set to
 indicate the file descriptor+LPAR()s+RPAR() which are ready.  If the option
 is not
 given, the array tt(reply) will be used for this purpose.  The array will
@@ -52,7 +52,7 @@ might return immediately with status 0 and tt($reply) containing `tt(-r 0 -w
 operations.
 
 The option `tt(-A) var(assoc)' indicates that the associative array
-tt(assoc) should be set to indicate the file descriptor+LPAR()s+LPAR()
+var(assoc) should be set to indicate the file descriptor+LPAR()s+RPAR()
 which are ready.  This option overrides the option tt(-a), nor will
 tt(reply) be modified.  The keys of tt(assoc) are the file descriptors, and
 the corresponding values are any of the characters `tt(rwe)' to indicate

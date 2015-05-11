@@ -7,10 +7,10 @@ sect(Description)
 A module tt(zsh/net/tcp) is provided to provide network I/O over
 TCP/IP from within the shell; see its description in
 ifzman(\
-zmanref(zshmodules)
+zmanref(zshmodules)\
 )\
 ifnzman(\
-noderef(Zsh Modules)
+noderef(Zsh Modules)\
 ).  This manual page describes a function suite based on the module.  
 If the module is installed, the functions are usually installed at the
 same time, in which case they will be available for
@@ -19,10 +19,10 @@ tt(zsh/net/tcp) module, the tt(zsh/zselect) module is used to implement
 timeouts on read operations.  For troubleshooting tips, consult the
 corresponding advice for the tt(zftp) functions described in
 ifzman(\
-zmanref(zshzftpsys)
+zmanref(zshzftpsys)\
 )\
 ifnzman(\
-noderef(Zftp Function System)
+noderef(Zftp Function System)\
 ).
 
 There are functions corresponding to the basic I/O operations open, close,
@@ -53,9 +53,9 @@ subsect(Basic I/O)
 
 startitem()
 findex(tcp_open)
-xitem(tt(tcp_open [-qz]) var(host port) tt([) var(sess) tt(]))
-xitem(tt(tcp_open [-qz] [ -s) var(sess) tt(| -l) var(sess)tt(,... ] ... ))
-item(tt(tcp_open [-qz] [-a) var(fd) tt(| -f) var(fd) tt(] [) var(sess) tt(]))(
+xitem(tt(tcp_open) [ tt(-qz) ] var(host port) [ var(sess) ])
+xitem(tt(tcp_open) [ tt(-qz) ] [ tt(-s) var(sess) | tt(-l) var(sess)[tt(,)...] ] ... )
+item(tt(tcp_open) [ tt(-qz) ] [ tt(-a) var(fd) | tt(-f) var(fd) ] [ var(sess) ])(
 Open a new session.  In the first and simplest form, open a TCP connection
 to host var(host) at port var(port); numeric and symbolic forms are
 understood for both.
@@ -102,7 +102,7 @@ will not print informational messages, although it will in any case exit
 with an appropriate status.
 
 If the line editor (zle) is in use, which is typically the case if the
-shell is interactive, tt(tcp_open) installs a handler inside tt(zle) which
+shell is interactive, tt(tcp_open) installs a handler inside zle which
 will check for new data at the same time as it checks for keyboard input.
 This is convenient as the shell consumes no CPU time while waiting; the
 test is performed by the operating system.  Giving the option tt(-z) to
@@ -123,7 +123,7 @@ The function tt(tcp_on_open), if defined, is called when a session
 is opened.  See the description below.
 )
 findex(tcp_close)
-item(tt(tcp_close [-qn] [ -a | -l) var(sess)tt(,... |) var(sess) tt(... ]))(
+item(tt(tcp_close) [ tt(-qn) ] [ tt(-a) | tt(-l) var(sess)[tt(,)...] | var(sess) ... ])(
 Close the named sessions, or the current session if none is given,
 or all open sessions if tt(-a) is given.  The options tt(-l) and tt(-s) are
 both handled for consistency with tt(tcp_open), although the latter is
@@ -142,8 +142,9 @@ session.
 If the option tt(-q) is given, no informational messages will be printed.
 )
 findex(tcp_read)
-xitem(tt(tcp_read [-bdq] [ -t) var(TO) tt(] [ -T) var(TO) tt(]))
-item(    tt([ -a | -u) var(fd) tt(... | -l) var(sess)tt(,... | -s) var(sess) tt(...]))(
+redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ @ ))ifnztexi(         )))
+xitem(tt(tcp_read )[ tt(-bdq) ] [ tt(-t) var(TO) ] [ tt(-T) var(TO) ])
+item(SPACES()[ tt(-a) | tt(-u) var(fd)[tt(,)...] | tt(-l) var(sess)[tt(,)...] | tt(-s) var(sess) ... ])(
 Perform a read operation on the current session, or on a list of
 sessions if any are given with tt(-u), tt(-l) or tt(-s), or all open
 sessions if the option tt(-a) is given.  Any of the tt(-u), tt(-l) or
@@ -189,8 +190,8 @@ non-zero return status indicates some error condition.
 See tt(tcp_log) for how to control where data is sent by tt(tcp_read).
 )
 findex(tcp_send)
-xitem(tt(tcp_send [-cnq] [ -s) var(sess) tt(| -l) var(sess)tt(,... ]) var(data) tt(...))
-item(tt(tcp_send [-cnq] -a) var(data) tt(...))(
+xitem(tt(tcp_send) [ tt(-cnq) ] [ tt(-s) var(sess) | tt(-l) var(sess)[tt(,)...] ] var(data) ...)
+item(tt(tcp_send) [ tt(-cnq) ] tt(-a) var(data) ...)(
 Send the supplied data strings to all the specified sessions in turn.  The
 underlying operation differs little from a `tt(print -r)' to the session's
 file descriptor, although it attempts to prevent the shell from dying owing
@@ -220,9 +221,9 @@ subsect(Session Management)
 
 startitem()
 findex(tcp_alias)
-xitem(tt(tcp_alias [-q]) var(alias)tt(=)var(sess) tt(...))
-xitem(tt(tcp_alias [-q] [) var(alias) tt(] ...))
-item(tt(tcp_alias -d [-q]) var(alias) tt(...))(
+xitem(tt(tcp_alias) [ tt(-q) ] var(alias)tt(=)var(sess) ...)
+xitem(tt(tcp_alias) [ tt(-q) ] [ var(alias) ... ])
+item(tt(tcp_alias) tt(-d) [ tt(-q) ] var(alias) ...)(
 This function is not particularly well tested.
 
 The first form creates an alias for a session name; var(alias) can then be
@@ -238,14 +239,14 @@ The option tt(-q) suppresses an inconsistently chosen subset of error
 messages.
 )
 findex(tcp_log)
-item(tt(tcp_log [-asc] [ -n | -N ] [) var(logfile) tt(]))(
+item(tt(tcp_log) [ tt(-asc) ] [ tt(-n) | tt(-N) ] [ var(logfile) ])(
 With an argument var(logfile), all future input from tt(tcp_read) will be
 logged to the named file.  Unless tt(-a) (append) is given, this file will
 first be truncated or created empty.  With no arguments, show the current
 status of logging.
 
 With the option tt(-s), per-session logging is enabled.  Input from
-tt(tcp_read) is output to the file var(logfile).var(sess).  As the
+tt(tcp_read) is output to the file var(logfile)tt(.)var(sess).  As the
 session is automatically discriminated by the filename, the contents are
 raw (no tt($TCP_PROMPT)).  The option  tt(-a) applies as above.
 Per-session logging and logging of all data in one file are not mutually
@@ -265,7 +266,7 @@ item(tt(tcp_rename) var(old) var(new))(
 Rename session var(old) to session var(new).  The old name becomes invalid.
 )
 findex(tcp_sess)
-item(tt(tcp_sess [) var(sess) tt([) var(command)  tt(... ] ]))(
+item(tt(tcp_sess) [ var(sess) [ var(command) [ var(arg) ... ] ] ])(
 With no arguments, list all the open sessions and associated file
 descriptors.  The current session is marked with a star.  For use in
 functions, direct access to the parameters tt($tcp_by_name), tt($tcp_by_fd)
@@ -275,9 +276,9 @@ With a var(sess) argument, set the current session to var(sess).
 This is equivalent to changing tt($TCP_SESS) directly.
 
 With additional arguments, temporarily set the current session while
-executing the string tt(command ...).  The first argument is re-evaluated
-so as to expand aliases etc., but the remaining arguments are passed
-through as the appear to tt(tcp_sess).  The original session is restored
+executing `var(command) var(arg) ...'.  var(command) is re-evaluated
+so as to expand aliases etc., but the remaining var(arg)s are passed
+through as that appear to tt(tcp_sess).  The original session is restored
 when tt(tcp_sess) exits.
 )
 enditem()
@@ -286,7 +287,7 @@ subsect(Advanced I/O)
 
 startitem()
 findex(tcp_command)
-item(tt(tcp_command) var(send-options) tt(...) var(send-arguments) tt(...))(
+item(tt(tcp_command) var(send-option) ... var(send-argument) ...)(
 This is a convenient front-end to tt(tcp_send).  All arguments are passed
 to tt(tcp_send), then the function pauses waiting for data.  While data is
 arriving at least every tt($TCP_TIMEOUT) (default 0.3) seconds, data is
@@ -299,8 +300,9 @@ programme or function it is generally better to handle reading data by a
 more explicit method.
 )
 findex(tcp_expect)
-xitem(tt(tcp_expect [ -q ] [ -p ) var(var) tt( | -P ) var(var) tt(] [ -t ) var(to) tt(| -T) var(TO)tt(]))
-item(tt(    [ -a | -s) var(sess) tt(... | -l) var(sess)tt(,... ]) var(pattern) ...)(
+redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ @ @ @ ))ifnztexi(           )))
+xitem(tt(tcp_expect )[ tt(-q) ] [ tt(-p) var(var) | tt(-P) var(var) ] [ tt(-t) var(TO) | tt(-T) var(TO) ])
+item(SPACES()[ tt(-a) | tt(-s) var(sess) | tt(-l) var(sess)[tt(,)...] ] var(pattern) ...)(
 Wait for input matching any of the given var(pattern)s from any of the
 specified sessions.  Input is ignored until an input line matches one of
 the given patterns; at this point status zero is returned, the matching
@@ -371,8 +373,8 @@ The command is run in the background, so tt(tcp_proxy) can then accept new
 connections.  It continues to accept new connections until interrupted.
 )
 findex(tcp_spam)
-item(tt(tcp_spam [-ertv] [ -a | -s ) var(sess) tt(| -l) var(sess)tt(,... ]) var(cmd) tt(...))(
-Execute `var(cmd) tt(...)' for each session in turn.  Note this executes
+item(tt(tcp_spam) [ tt(-ertv) ] [ tt(-a) | tt(-s) var(sess) | tt(-l) var(sess)[tt(,)...] ] var(cmd) [ var(arg) ... ])(
+Execute `var(cmd) [ var(arg) ... ]' for each session in turn.  Note this executes
 the command and arguments; it does not send the command line as data
 unless the tt(-t) (transmit) option is given.
 
@@ -389,19 +391,19 @@ tt($tcp_spam_list) array or on the command line are spammed in the order
 given.  The tt(-r) flag reverses the order however it was arrived it.
 
 The tt(-v) flag specifies that a tt($TCP_PROMPT) will be output before each
-session.  This is output after any modification to TCP_SESS by the
+session.  This is output after any modification to tt(TCP_SESS) by the
 user-defined tt(tcp_on_spam) function described below.  (Obviously that
 function is able to generate its own output.)
 
-If the option tt(-e) is present, the line given as var(cmd ...) is executed
+If the option tt(-e) is present, the line given as `var(cmd) [ var(arg) ... ]' is executed
 using tt(eval), otherwise it is executed without any further processing.
 )
 findex(tcp_talk)
 item(tt(tcp_talk))(
 This is a fairly simple-minded attempt to force input to the line editor to
-go straight to the default TCP_SESSION.
+go straight to the default tt(TCP_SESS).
 
-An escape string, tt($TCP_TALK_ESCAPE), default `:', is used to allow
+An escape string, tt($TCP_TALK_ESCAPE), default `tt(:)', is used to allow
 access to normal shell operation.  If it is on its own at the start of the
 line, or followed only by whitespace, the line editor returns to normal
 operation.  Otherwise, the string and any following whitespace are skipped
@@ -507,7 +509,7 @@ This is called after a session has been renamed with the three arguments
 old session name, file descriptor, new session name.
 )
 findex(tcp_on_spam)
-item(tt(tcp_on_spam) var(sess) var(command) tt(...))(
+item(tt(tcp_on_spam) var(sess) var(command ...))(
 This is called once for each session spammed, just em(before) a command is
 executed for a session by tt(tcp_spam).  The arguments are the session name
 followed by the command list to be executed.  If tt(tcp_spam) was called
@@ -554,7 +556,7 @@ tt(tcp_on_read)) to tell if is being called when the shell is otherwise
 idle at the editor prompt.
 )
 findex(tcp_output)
-item(tt(tcp_output [ -q ] -P) var(prompt) tt(-F) var(fd) tt(-S) var(sess))(
+item(tt(tcp_output) [ tt(-q) ] tt(-P) var(prompt) tt(-F) var(fd) tt(-S) var(sess))(
 This function is used for both logging and handling output to standard
 output, from within tt(tcp_read) and (if tt($TCP_OUTPUT) is set)
 tt(tcp_send).
@@ -786,7 +788,7 @@ sect(TCP Examples)
 
 Here is a trivial example using a remote calculator.
 
-TO create a calculator server on port 7337 (see the tt(dc) manual page for
+To create a calculator server on port 7337 (see the tt(dc) manual page for
 quite how infuriating the underlying command is):
 
 example(tcp_proxy 7337 dc)

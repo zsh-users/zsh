@@ -5,7 +5,7 @@ The tt(zsh/zpty) module offers one builtin:
 
 startitem()
 findex(zpty)
-item(tt(zpty) [ tt(-e) ] [ tt(-b) ] var(name) [ var(arg ...) ])(
+item(tt(zpty) [ tt(-e) ] [ tt(-b) ] var(name) [ var(arg) ... ])(
 The arguments following var(name) are concatenated with spaces between,
 then executed as a command, as if passed to the tt(eval) builtin.  The
 command runs under a newly assigned pseudo-terminal; this is useful for
@@ -19,18 +19,18 @@ characters are echoed.
 With the tt(-b) option, input to and output from the pseudo-terminal are
 made non-blocking.
 )
-item(tt(zpty) tt(-d) [ var(names) ... ])(
+item(tt(zpty) tt(-d) [ var(name) ... ])(
 The second form, with the tt(-d) option, is used to delete commands
 previously started, by supplying a list of their var(name)s.  If no
-var(names) are given, all commands are deleted.  Deleting a command causes
+var(name) is given, all commands are deleted.  Deleting a command causes
 the HUP signal to be sent to the corresponding process.
 )
-item(tt(zpty) tt(-w) [ tt(-n) ] var(name) [ var(strings ...) ])(
+item(tt(zpty) tt(-w) [ tt(-n) ] var(name) [ var(string) ... ])(
 The tt(-w) option can be used to send the to command var(name) the given
-var(strings) as input (separated by spaces).  If the tt(-n) option is
+var(string)s as input (separated by spaces).  If the tt(-n) option is
 em(not) given, a newline is added at the end.
 
-If no var(strings) are provided, the standard input is copied to the
+If no var(string) is provided, the standard input is copied to the
 pseudo-terminal; this may stop before copying the full input if the
 pseudo-terminal is non-blocking.
 

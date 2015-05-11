@@ -128,15 +128,15 @@ item(tt(cdup))(
 Change the remote directory to the one higher in the directory tree.
 Note that tt(cd ..) will also work correctly on non-UNIX systems.
 )
-item(tt(dir) [ var(args...) ])(
-Give a (verbose) listing of the remote directory.  The var(args) are
+item(tt(dir) [ var(arg) ... ])(
+Give a (verbose) listing of the remote directory.  The var(arg)s are
 passed directly to the server. The command's behaviour is implementation
-dependent, but a UNIX server will typically interpret var(args) as
+dependent, but a UNIX server will typically interpret var(arg)s as
 arguments to the tt(ls) command and with no arguments return the
 result of `tt(ls -l)'. The directory is listed to standard output.
 )
-item(tt(ls) [ var(args) ])(
-Give a (short) listing of the remote directory.  With no var(args),
+item(tt(ls) [ var(arg) ... ])(
+Give a (short) listing of the remote directory.  With no var(arg),
 produces a raw list of the files in the directory, one per line.
 Otherwise, up to vagaries of the server implementation, behaves
 similar to tt(dir).
@@ -164,8 +164,8 @@ item(tt(mode) [ tt(S) | tt(B) ])(
 Set the mode type to stream (tt(S)) or block (tt(B)).  Stream mode is
 the default; block mode is not widely supported.
 )
-xitem(tt(remote) var(files...))
-item(tt(local) [ var(files...) ])(
+xitem(tt(remote) var(file) ...)
+item(tt(local) [ var(file) ... ])(
 Print the size and last modification time of the remote or local
 files.  If there is more than one item on the list, the name of the
 file is printed first.  The first number is the file size, the second
@@ -185,15 +185,15 @@ arguments, in which case the information comes from examining file
 descriptor zero.  This is the same file as seen by a tt(put) command
 with no further redirection.
 )
-item(tt(get) var(file) [...])(
+item(tt(get) var(file) ...)(
 Retrieve all var(file)s from the server, concatenating them
 and sending them to standard output.
 )
-item(tt(put) var(file) [...])(
+item(tt(put) var(file) ...)(
 For each var(file), read a file from standard input and send that to
 the remote host with the given name.
 )
-item(tt(append) var(file) [...])(
+item(tt(append) var(file) ...)(
 As tt(put), but if the remote var(file) already exists, data is
 appended to it instead of overwriting it.
 )
@@ -206,7 +206,7 @@ useful for appending to an incomplete local file.  However, note that
 this ability is not universally supported by servers (and is not quite
 the behaviour specified by the standard).
 )
-item(tt(delete) var(file) [...])(
+item(tt(delete) var(file) ...)(
 Delete the list of files on the server.
 )
 item(tt(mkdir) var(directory))(
@@ -218,11 +218,11 @@ Delete the directory var(directory)  on the server.
 item(tt(rename) var(old-name) var(new-name))(
 Rename file var(old-name) to var(new-name) on the server.
 )
-item(tt(site) var(args...))(
+item(tt(site) var(arg) ...)(
 Send a host-specific command to the server.  You will probably
 only need this if instructed by the server to use it.
 )
-item(tt(quote) var(args...))(
+item(tt(quote) var(arg) ...)(
 Send the raw FTP command sequence to the server.  You should be
 familiar with the FTP command set as defined in RFC959 before doing
 this.  Useful commands may include tt(STAT) and tt(HELP).  Note also

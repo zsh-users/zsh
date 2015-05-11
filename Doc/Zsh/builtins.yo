@@ -661,10 +661,11 @@ Do nothing and return an exit status of 1.
 findex(fc)
 cindex(history, editing)
 cindex(editing history)
+redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ ))ifnztexi(      )))
 xitem(tt(fc) [ tt(-e) var(ename) ] [ tt(-m) var(match) ] [ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
-xitem(tt(fc) tt(-l) [ tt(-nrdfEiD) ] [ tt(-t) var(timefmt) ] [ tt(-m) var(match) ])
-xitem(tt(      )[ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
-xitem(tt(fc) tt(-p) [ tt(-a) ] [ var(filename) [ var(histsize) [ var(savehistsize) ] ] ])
+xitem(tt(fc -l )[ tt(-nrdfEiD) ] [ tt(-t) var(timefmt) ] [ tt(-m) var(match) ])
+xitem(SPACES()[ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
+xitem(tt(fc -p )[ tt(-a) ] [ var(filename) [ var(histsize) [ var(savehistsize) ] ] ])
 xitem(tt(fc) tt(-P))
 item(tt(fc) tt(-ARWI) [ var(filename) ])(
 The tt(fc) command controls the interactive history mechanism.  Note
@@ -1099,8 +1100,8 @@ and the new directory stack is not printed.  This is useful for calls to
 tt(popd) that do not change the environment seen by an interactive user.
 )
 findex(print)
-xitem(tt(print) [ tt(-abcDilmnNoOpPrsSz) ] [ tt(-u) var(n) ] [ tt(-f) var(format) ] [ tt(-C) var(cols) ])
-item(  [ tt(-R) [ tt(-en) ]] [ var(arg) ... ])(
+xitem(tt(print )[ tt(-abcDilmnNoOpPrsSz) ] [ tt(-u) var(n) ] [ tt(-f) var(format) ] [ tt(-C) var(cols) ])
+item(SPACES()[ tt(-R) [ tt(-en) ]] [ var(arg) ... ])(
 With the `tt(-f)' option the arguments are printed as described by tt(printf).
 With no flags or with the flag `tt(-)', the arguments are printed on
 the standard output as described by tt(echo), with the following differences:
@@ -1288,8 +1289,9 @@ contain symbolic links.
 alias(r)(fc -e -)
 findex(read)
 vindex(IFS, use of)
-ifzman(xitem(tt(read) [ tt(-rszpqAclneE) ] [ tt(-t) [ var(num) ] ] [ tt(-k) [ var(num) ] ] [ tt(-d) var(delim) ]))
-item(ifnzman(tt(read) [ tt(-rszpqAclneE) ] [ tt(-t) [ var(num) ] ] [ tt(-k) [ var(num) ] ] [ tt(-d) var(delim) ]) [ tt(-u) var(n) ] [ var(name)[tt(?)var(prompt)] ] [ var(name) ...  ])(
+redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ ))ifnztexi(     )))
+xitem(tt(read )[ tt(-rszpqAclneE) ] [ tt(-t) [ var(num) ] ] [ tt(-k) [ var(num) ] ] [ tt(-d) var(delim) ])
+item(SPACES()[ tt(-u) var(n) ] [ var(name)[tt(?)var(prompt)] ] [ var(name) ...  ])(
 vindex(REPLY, use of)
 vindex(reply, use of)
 Read one line and break it into fields using the characters
@@ -1441,7 +1443,9 @@ cindex(parameters, positional)
 cindex(parameters, setting array)
 cindex(array parameters, setting)
 pindex(KSH_ARRAYS, use of)
-item(tt(set) [ {tt(PLUS())|tt(-)}var(options) | {tt(PLUS())|tt(-)}tt(o) [ var(option_name) ] ] ... [ {tt(PLUS())|tt(-)}tt(A) [ var(name) ] ] [ var(arg) ... ])(
+redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ ))ifnztexi(    )))
+xitem(tt(set )[ {tt(PLUS())|tt(-)}var(options) | {tt(PLUS())|tt(-)}tt(o) [ var(option_name) ] ] ... [ {tt(PLUS())|tt(-)}tt(A) [ var(name) ] ])
+item(SPACES()[ var(arg) ... ])(
 Set the options for the shell and/or set the positional parameters, or
 declare and set an array.  If the tt(-s) option is given, it causes the
 specified arguments to be sorted before assigning them to the positional
@@ -1687,11 +1691,12 @@ Equivalent to tt(whence -v).
 findex(typeset)
 cindex(parameters, setting)
 cindex(parameters, declaring)
-xitem(tt(typeset) [ {tt(PLUS())|tt(-)}tt(AHUaghlmprtux) ] \
+redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
+xitem(tt(typeset )[ {tt(PLUS())|tt(-)}tt(AHUaghlmprtux) ] \
 [ {tt(PLUS())|tt(-)}tt(EFLRZi) [ var(n) ] ])
-xitem(        [ tt(+) | var(name)[tt(=)var(value)] ... ])
-xitem(tt(typeset) tt(-T) [ {tt(PLUS())|tt(-)}tt(Uglprux) ] [ {tt(PLUS())|tt(-)}tt(LRZ) [ var(n) ] ])
-xitem(           [ tt(+) | var(SCALAR)[tt(=)var(value)] var(array) [ var(sep) ] ])
+xitem(SPACES()[ tt(+) | var(name)[tt(=)var(value)] ... ])
+xitem(tt(typeset )tt(-T) [ {tt(PLUS())|tt(-)}tt(Uglprux) ] [ {tt(PLUS())|tt(-)}tt(LRZ) [ var(n) ] ])
+xitem(SPACES()[ tt(+) | var(SCALAR)[tt(=)var(value)] var(array) [ var(sep) ] ])
 item(tt(typeset) tt(-f) [ {tt(PLUS())|tt(-)}tt(TUkmtuz) ] [ tt(+) | var(name) ... ])(
 Set or display attributes and values for shell parameters.
 

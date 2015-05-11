@@ -22,7 +22,7 @@ are highlighted.  To turn on highlighting an empty value suffices, in
 which case all the default values given below will be used.  The format of
 the value of these parameters is the same as used by the GNU version of the
 tt(ls) command: a colon-separated list of specifications of the form
-`var(name)=var(value)'.  The var(name) may be one of the following strings,
+`var(name)tt(=)var(value)'.  The var(name) may be one of the following strings,
 most of which specify file types for which the var(value) will be used.
 The strings and their default values are:
 
@@ -167,7 +167,7 @@ is the empty string, a default prompt will be used.  The value may
 contain escapes of the form `tt(%x)'.  It supports the escapes
 `tt(%B)', `tt(%b)', `tt(%S)', `tt(%s)', `tt(%U)', `tt(%u)', `tt(%F)',
 `tt(%f)', `tt(%K)', `tt(%k)' and
-`tt(%{...%})' used also in shell prompts as well as three pairs of
+`tt(%{)var(...)tt(%})' used also in shell prompts as well as three pairs of
 additional sequences: a `tt(%l)' or `tt(%L)' is replaced by the number
 of the last line shown and the total number of lines in the form
 `var(number)tt(/)var(total)'; a `tt(%m)' or `tt(%M)' is replaced with
@@ -409,6 +409,6 @@ ifnzman(noderef(The zsh/zle Module))\
 ). For example, to make the return key leave menu selection without
 accepting the match currently selected one could call
 
-indent(tt(bindkey -M menuselect '^M' send-break))
+example(bindkey -M menuselect '^M' send-break)
 
 after loading the tt(zsh/complist) module.

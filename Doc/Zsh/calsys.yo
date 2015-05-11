@@ -272,7 +272,7 @@ When an anchor time is present, there is an extension to handle regular
 events in the form of the var(n)th var(some)day of the month.  Such a
 specification must occur immediately after any year and month
 specification, but before any time of day, and must be in the form
-var(n)tt(LPAR()th|st|rd+RPAR()) var(day), for example tt(1st Tuesday) or
+var(n)(tt(th)|tt(st)|tt(rd)) var(day), for example tt(1st Tuesday) or
 tt(3rd Monday).  As in other places, days are matched case insensitively,
 must be in English, and only the first three letters are significant except
 that a form beginning `month' does not match `Monday'.  No attempt is made
@@ -320,8 +320,11 @@ subsect(Calendar system functions)
 
 startitem()
 findex(calendar)
-xitem(tt(calendar) [ tt(-abdDsv) ] [ tt(-C) var(calfile) ] [ -n var(num) ] [ tt(-S) var(showprog) ] [ [ var(start) ] var(end) ])(
-item(tt(calendar -r) [ tt(-abdDrsv) ] [ tt(-C) var(calfile) ] [ -n var(num) ] [ tt(-S) var(showprog) ] [ var(start) ])(
+redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ @ ))ifnztexi(         )))
+xitem(tt(calendar )[ tt(-abdDsv) ] [ tt(-C) var(calfile) ] [ tt(-n) var(num) ] [ tt(-S) var(showprog) ])
+xitem(SPACES()[ [ var(start) ] var(end) ])
+xitem(tt(calendar -r) [ tt(-abdDrsv) ] [ tt(-C) var(calfile) ] [ tt(-n) var(num) ] [ tt(-S) var(showprog) ])
+item(SPACES()[ var(start) ])(
 Show events in the calendar.
 
 With no arguments, show events from the start of today until the end of
@@ -379,9 +382,9 @@ Show at least var(num) events, if present in the calendar file, regardless
 of the tt(start) and tt(end).
 )
 item(tt(-r))(
-Show all the remaining options in the calendar, ignoring the given tt(end)
-time.  The tt(start) time is respected; any argument given is treated
-as a tt(start) time.
+Show all the remaining options in the calendar, ignoring the given var(end)
+time.  The var(start) time is respected; any argument given is treated
+as a var(start) time.
 )
 item(tt(-s))(
 Use the shell's tt(sched) command to schedule a timed event that
@@ -471,7 +474,7 @@ the dates in the calendar file.
 enditem()
 )
 findex(calendar_add)
-item(tt(calendar_add) [ tt(-BL) ] var(event ...))(
+item(tt(calendar_add) [ tt(-BL) ] var(event) ...)(
 Adds a single event to the calendar in the appropriate location.
 The event can contain multiple lines, as described in
 ifnzman(noderef(Calendar File and Date Formats))\
@@ -578,7 +581,7 @@ keywords and values.)
 endsitem()
 
 findex(calendar_showdate)
-item(tt(calendar_showdate) [ tt(-r) ] [ tt(-f) var(fmt) ] var(date-spec ...))(
+item(tt(calendar_showdate) [ tt(-r) ] [ tt(-f) var(fmt) ] var(date-spec) ...)(
 The given var(date-spec) is interpreted and the corresponding date and
 time printed.  If the initial var(date-spec) begins with a tt(PLUS()) or
 tt(-) it is treated as relative to the current time; var(date-spec)s after

@@ -21,11 +21,11 @@ xitem(tt(zcurses) tt(position) var(targetwin) var(array))
 xitem(tt(zcurses) tt(char) var(targetwin) var(character) )
 xitem(tt(zcurses) tt(string) var(targetwin) var(string) )
 xitem(tt(zcurses) tt(border) var(targetwin) var(border) )
-xitem(tt(zcurses) tt(attr) var(targetwin) [ var({+/-}attribute) | var(fg_col)tt(/)var(bg_col) ] [...])
-xitem(tt(zcurses) tt(bg) var(targetwin) [ var({+/-}attribute) | var(fg_col)tt(/)var(bg_col) | tt(@)var(char) ] [...])
-xitem(tt(zcurses) tt(scroll) var(targetwin) [ tt(on) | tt(off) | {+/-}var(lines) ])
+xitem(tt(zcurses) tt(attr) var(targetwin) [ [tt(+)|tt(-)]var(attribute) | var(fg_col)tt(/)var(bg_col) ] [...])
+xitem(tt(zcurses) tt(bg) var(targetwin) [ [tt(+)|tt(-)]var(attribute) | var(fg_col)tt(/)var(bg_col) | tt(@)var(char) ] [...])
+xitem(tt(zcurses) tt(scroll) var(targetwin) [ tt(on) | tt(off) | [tt(+)|tt(-)]var(lines) ])
 xitem(tt(zcurses) tt(input) var(targetwin) [ var(param) [ var(kparam) [ var(mparam) ] ] ])
-xitem(tt(zcurses) tt(mouse) [ tt(delay) var(num) | {+/-}tt(motion) ])
+xitem(tt(zcurses) tt(mouse) [ tt(delay) var(num) | [tt(+)|tt(-)]tt(motion) ])
 xitem(tt(zcurses) tt(timeout) var(targetwin) var(intval))
 item(tt(zcurses) tt(querychar) var(targetwin) [ var(param) ])(
 Manipulate curses windows.  All uses of this command should be
@@ -135,7 +135,7 @@ turned tt(on) to allow the window to be scrolled.
 The subcommand tt(input) reads a single character from the window
 without echoing it back.  If var(param) is supplied the character is
 assigned to the parameter var(param), else it is assigned to the
-parameter var(REPLY).
+parameter tt(REPLY).
 
 If both var(param) and var(kparam) are supplied, the key is read in
 `keypad' mode.  In this mode special keys such as function keys and

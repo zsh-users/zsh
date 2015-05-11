@@ -8,11 +8,11 @@ The tt(zsh/zutil) module only adds some builtins:
 startitem()
 findex(zstyle)
 xitem(tt(zstyle) [ tt(-L) [ var(pattern) [ var(style) ] ] ])
-xitem(tt(zstyle) [ tt(-e) | tt(-) | tt(-)tt(-) ] var(pattern) var(style) var(strings) ...)
-xitem(tt(zstyle -d) [ var(pattern) [ var(styles) ... ] ])
+xitem(tt(zstyle) [ tt(-e) | tt(-) | tt(-)tt(-) ] var(pattern) var(style) var(string) ...)
+xitem(tt(zstyle -d) [ var(pattern) [ var(style) ... ] ])
 xitem(tt(zstyle -g) var(name) [ var(pattern) [ var(style) ] ])
-xitem(tt(zstyle -abs) var(context) var(style) var(name) [ var(sep) ])
-xitem(tt(zstyle -Tt) var(context) var(style) [ var(strings) ...])
+xitem(tt(zstyle -){tt(a)|tt(b)|tt(s)} var(context) var(style) var(name) [ var(sep) ])
+xitem(tt(zstyle -){tt(T)|tt(t)} var(context) var(style) [ var(string) ... ])
 item(tt(zstyle -m) var(context) var(style) var(pattern))(
 This builtin command is used to define and lookup styles.  Styles are
 pairs of names and values, where the values consist of any number of
@@ -40,16 +40,16 @@ against the string supplied as the pattern for the context; note that
 this means, for example, `tt(zstyle -L ":completion:*")' will
 match any supplied pattern beginning `tt(:completion:)', not
 just tt(":completion:*"):  use tt(":completion:\*") to match that.
-The optional second argument limits the output to a specific style (not a
+The optional second argument limits the output to a specific var(style) (not a
 pattern).  tt(-L) is not compatible with any other options.
 
 The other forms are the following:
 
 startitem()
-item(tt(zstyle) [ tt(-) | tt(-)tt(-) | tt(-e) ] var(pattern) var(style) var(strings) ...)(
+item(tt(zstyle) [ tt(-) | tt(-)tt(-) | tt(-e) ] var(pattern) var(style) var(string) ...)(
 vindex(reply, use of)
-Defines the given var(style) for the var(pattern) with the var(strings) as
-the value.  If the tt(-e) option is given, the var(strings) will be
+Defines the given var(style) for the var(pattern) with the var(string)s as
+the value.  If the tt(-e) option is given, the var(string)s will be
 concatenated (separated by spaces) and the resulting string will be
 evaluated (in the same way as it is done by the tt(eval) builtin
 command) when the style is looked up.  In this case the parameter
@@ -58,16 +58,16 @@ evaluation.  Before evaluating the value, tt(reply) is unset, and
 if it is still unset after the evaluation, the style is treated as if
 it were not set.
 )
-item(tt(zstyle -d) [ var(pattern) [ var(styles) ... ] ])(
+item(tt(zstyle -d) [ var(pattern) [ var(style) ... ] ])(
 Delete style definitions. Without arguments all definitions are deleted,
 with a var(pattern) all definitions for that pattern are deleted and if
-any var(styles) are given, then only those styles are deleted for the
+any var(style)s are given, then only those styles are deleted for the
 var(pattern).
 )
 item(tt(zstyle -g) var(name) [ var(pattern) [ var(style) ] ])(
 Retrieve a style definition. The var(name) is
 used as the name of an array in which the results are stored. Without
-any further arguments, all var(patterns) defined are returned. With a
+any further arguments, all patterns defined are returned. With a
 var(pattern) the styles defined for that pattern are returned and with 
 both a var(pattern) and a var(style), the value strings of that
 combination is returned.
@@ -93,14 +93,14 @@ The value is stored in var(name) as an array. If var(name) is declared
 as an associative array,  the first, third, etc. strings are used as the
 keys and the other strings are used as the values.
 )
-xitem(tt(zstyle -t) var(context) var(style) [ var(strings) ...])
-item(tt(zstyle -T) var(context) var(style) [ var(strings) ...])(
+xitem(tt(zstyle -t) var(context) var(style) [ var(string) ... ])
+item(tt(zstyle -T) var(context) var(style) [ var(string) ... ])(
 Test the value of a style, i.e. the tt(-t) option only returns a status
-(sets tt($?)).  Without any var(strings) the return status is zero if the
+(sets tt($?)).  Without any var(string) the return status is zero if the
 style is defined for at least one matching pattern, has only one string in
 its value, and that is equal to one of `tt(true)', `tt(yes)', `tt(on)' or
-`tt(1)'. If any var(strings) are given the status is zero if and only if
-at least one of the var(strings) is equal to at least one of the strings
+`tt(1)'. If any var(string)s are given the status is zero if and only if
+at least one of the var(string)s is equal to at least one of the strings
 in the value. If the style is defined but doesn't match, the return status
 is tt(1). If the style is not defined, the status is tt(2).
 
@@ -115,12 +115,12 @@ var(pattern) matches at least one of the strings in the value.
 enditem()
 )
 findex(zformat)
-xitem(tt(zformat -f) var(param) var(format) var(specs) ...)
-item(tt(zformat -a) var(array) var(sep) var(specs) ...)(
+xitem(tt(zformat -f) var(param) var(format) var(spec) ...)
+item(tt(zformat -a) var(array) var(sep) var(spec) ...)(
 This builtin provides two different forms of formatting. The first form 
 is selected with the tt(-f) option. In this case the var(format)
 string will be modified by replacing sequences starting with a percent 
-sign in it with strings from the var(specs).  Each var(spec) should be
+sign in it with strings from the var(spec)s.  Each var(spec) should be
 of the form `var(char)tt(:)var(string)' which will cause every
 appearance of the sequence `tt(%)var(char)' in var(format) to be replaced 
 by the var(string).  The `tt(%)' sequence may also contain optional
@@ -132,7 +132,7 @@ width makes the result be padded with spaces to the right if the
 var(string) is shorter than the requested width.  Padding to the left
 can be achieved by giving a negative minimum field width.  If a maximum 
 field width is specified, the var(string) will be truncated after that
-many characters.  After all `tt(%)' sequences for the given var(specs)
+many characters.  After all `tt(%)' sequences for the given var(spec)s
 have been processed, the resulting string is stored in the parameter
 var(param).
 
@@ -162,7 +162,7 @@ specifier tt(c) is 3, agreeing with the digit argument to the ternary
 expression.
 
 The second form, using the tt(-a) option, can be used for aligning
-strings.  Here, the var(specs) are of the form
+strings.  Here, the var(spec)s are of the form
 `var(left)tt(:)var(right)' where `var(left)' and `var(right)' are
 arbitrary strings.  These strings are modified by replacing the colons
 by the var(sep) string and padding the var(left) strings with spaces 
@@ -179,7 +179,7 @@ item(tt(zregexparse))(
 This implements some internals of the tt(_regex_arguments) function.
 )
 findex(zparseopts)
-item(tt(zparseopts) [ tt(-D) ] [ tt(-K) ] [ tt(-M) ] [ tt(-E) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] var(specs))(
+item(tt(zparseopts) [ tt(-DKME) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] var(spec) ...)(
 This builtin simplifies the parsing of options in positional parameters,
 i.e. the set of arguments given by tt($*).  Each var(spec) describes one
 option and must be of the form `var(opt)[tt(=)var(array)]'.  If an option
@@ -191,7 +191,7 @@ Note that it is an error to give any var(spec) without an
 `tt(=)var(array)' unless one of the tt(-a) or tt(-A) options is used.
 
 Unless the tt(-E) option is given, parsing stops at the first string
-that isn't described by one of the var(specs).  Even with tt(-E),
+that isn't described by one of the var(spec)s.  Even with tt(-E),
 parsing always stops at a positional parameter equal to `tt(-)' or
 `tt(-)tt(-)'.
 
@@ -247,14 +247,14 @@ as the values.
 item(tt(-D))(
 If this option is given, all options found are removed from the positional
 parameters of the calling shell or shell function, up to but not including
-any not described by the var(specs).  This is similar to using the tt(shift)
+any not described by the var(spec)s.  This is similar to using the tt(shift)
 builtin.
 )
 item(tt(-K))(
 With this option, the arrays specified with the tt(-a) option and with the
-`tt(=)var(array)' forms are kept unchanged when none of the var(specs) for
+`tt(=)var(array)' forms are kept unchanged when none of the var(spec)s for
 them is used.  Otherwise the entire array is replaced when any of the
-var(specs) is used.  Individual elements of associative arrays specified
+var(spec)s is used.  Individual elements of associative arrays specified
 with the tt(-A) option are preserved by tt(-K).  This allows assignment of
 default values to arrays before calling tt(zparseopts).
 )

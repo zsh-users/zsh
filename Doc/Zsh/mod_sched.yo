@@ -8,7 +8,7 @@ startitem()
 findex(sched)
 cindex(timed execution)
 cindex(execution, timed)
-xitem(tt(sched) [tt(-o)] [tt(PLUS())]var(hh)tt(:)var(mm)[:var(ss)] var(command) ...)
+xitem(tt(sched) [tt(-o)] [tt(PLUS())]var(hh)tt(:)var(mm)[tt(:)var(ss)] var(command) ...)
 xitem(tt(sched) [tt(-o)] [tt(PLUS())]var(seconds) var(command) ...)
 item(tt(sched) [ tt(-)var(item) ])(
 Make an entry in the scheduled list of commands to execute.
@@ -54,7 +54,7 @@ tt(sched) builtin.  The indices of the array correspond to the numbers
 shown when tt(sched) is run with no arguments (provided that the
 tt(KSH_ARRAYS) option is not set).  The value of the array
 consists of the scheduled time in seconds since the epoch
-(see ifnzman(The zsh/datetime Module)\
+(see ifnzman(noderef(The zsh/datetime Module))\
 ifzman(the section `The zsh/datetime Module') for facilities for
 using this number), followed by a colon, followed by any options
 (which may be empty but will be preceded by a `tt(-)' otherwise),

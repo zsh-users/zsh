@@ -23,11 +23,12 @@ the older tt(compctl) command.
 sect(Description)
 findex(compctl)
 )\
+redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
 startlist()
 list(tt(compctl) [ tt(-CDT) ] var(options) [ var(command) ... ])
-list(tt(compctl) [ tt(-CDT) ] var(options) \
-  [ tt(-x) var(pattern) var(options) tt(-) ... tt(-)tt(-) ] \
-  [ tt(PLUS()) var(options) [ tt(-x) ... tt(-)tt(-) ] ... [tt(PLUS())] ] \
+list(tt(compctl )[ tt(-CDT) ] var(options) \
+  [ tt(-x) var(pattern) var(options) tt(-) ... tt(-)tt(-) ])
+list(SPACES()[ tt(PLUS()) var(options) [ tt(-x) ... tt(-)tt(-) ] ... [tt(PLUS())] ] \
   [ var(command) ... ])
 list(tt(compctl) tt(-M) var(match-specs) ...)
 list(tt(compctl) tt(-L) [ tt(-CDTM) ] [ var(command) ... ])
@@ -109,7 +110,8 @@ that completion after `tt(~)' is too slow to be usable), you can use
 example(compctl -T -x 's[~] C[0,[^/]#]' -k friends -S/ -tn)
 
 to complete the strings in the array tt(friends) after a `tt(~)'.
-The tt(C[...]) argument is necessary so that this form of ~-completion is
+The tt(C[)var(...)tt(]) argument is necessary so that this form of
+tt(~)-completion is
 not tried after the directory name is finished.
 )
 item(tt(-L))(
@@ -470,7 +472,7 @@ string.
 
 The sequences tt(%B), tt(%b), tt(%S), tt(%s), tt(%U), and tt(%u) specify
 output attributes (bold, standout, and underline), tt(%F), tt(%f), tt(%K),
-tt(%k) specify foreground and background colours, and tt(%{...%}) can
+tt(%k) specify foreground and background colours, and tt(%{)var(...)tt(%}) can
 be used to include literal escape sequences as in prompts.
 )
 item(tt(-Y) var(explanation))(
@@ -504,7 +506,7 @@ This gives the name of the group the matches should be placed in. Groups
 are listed and sorted separately; likewise, menu completion will offer
 the matches in the groups in the order in which the groups were
 defined. If no group name is explicitly given, the matches are stored in
-a group named var(default). The first time a group name is encountered,
+a group named tt(default). The first time a group name is encountered,
 a group with that name is created. After that all matches with the same
 group name are stored in that group.
 
@@ -565,13 +567,14 @@ Additional options are available that restrict completion to some part
 of the command line; this is referred to as `extended completion'.
 
 sect(Extended Completion)
+redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
 startlist()
-list(tt(compctl) [ tt(-CDT) ] var(options) \
+list(tt(compctl )[ tt(-CDT) ] var(options) \
 tt(-x) var(pattern) var(options) tt(-) ... tt(-)tt(-))
-list(         [ var(command) ... ])
-list(tt(compctl) [ tt(-CDT) ] var(options) \
+list(SPACES()[ var(command) ... ])
+list(tt(compctl )[ tt(-CDT) ] var(options) \
 [ tt(-x) var(pattern) var(options) tt(-) ... tt(-)tt(-) ])
-list(         [ tt(PLUS()) var(options) [ tt(-x) ... tt(-)tt(-) ] ... \
+list(SPACES()[ tt(PLUS()) var(options) [ tt(-x) ... tt(-)tt(-) ] ... \
 [tt(PLUS())] ] [ var(command) ... ])
 endlist()
 
@@ -677,7 +680,7 @@ enditem()
 texinode(Example)()(Extended Completion)(Completion Using compctl)
 sect(Example)
 
-example(compctl -u -x 's[tt(PLUS())] c[-1,-f],s[-f+PLUS()]' \ 
+example(compctl -u -x 's[PLUS()] c[-1,-f],s[-f+PLUS()]' \ 
   -g '~/Mail/*(:t)' - 's[-f],c[-1,-f]' -f -- mail)
 
 This is to be interpreted as follows:

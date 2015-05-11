@@ -1,3 +1,18 @@
+2015-05-12  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 35075: Doc/Zsh/builtins.yo, Doc/Zsh/calsys.yo,
+	Doc/Zsh/compctl.yo, Doc/Zsh/compsys.yo, Doc/Zsh/compwid.yo,
+	Doc/Zsh/contrib.yo, Doc/Zsh/expn.yo, Doc/Zsh/mod_clone.yo,
+	Doc/Zsh/mod_complist.yo, Doc/Zsh/mod_curses.yo,
+	Doc/Zsh/mod_parameter.yo, Doc/Zsh/mod_pcre.yo,
+	Doc/Zsh/mod_sched.yo, Doc/Zsh/mod_stat.yo, Doc/Zsh/mod_system.yo,
+	Doc/Zsh/mod_zftp.yo, Doc/Zsh/mod_zpty.yo, Doc/Zsh/mod_zselect.yo,
+	Doc/Zsh/mod_zutil.yo, Doc/Zsh/options.yo, Doc/Zsh/params.yo,
+	Doc/Zsh/tcpsys.yo, Doc/Zsh/zftpsys.yo, Doc/Zsh/zle.yo: improve
+	manual format
+
+	* unposted: ChangeLog: fixed entry for 35034 (2015-05-06)
+
 2015-05-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 35049 (tweaked to make jname default): Completion/BSD/Type/_jails,
@@ -67,7 +82,10 @@
 
 2015-05-06  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
-	* 35034: improve format in the manual (up to Chapter18)
+	* 35034: Doc/Zsh/arith.yo, Doc/Zsh/builtins.yo, Doc/Zsh/cond.yo,
+	Doc/Zsh/expn.yo, Doc/Zsh/grammar.yo, Doc/Zsh/options.yo,
+	Doc/Zsh/params.yo, Doc/Zsh/redirect.yo, Doc/Zsh/zle.yo: improve
+	format in the manual (up to Chapter18)
 
 2015-05-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
