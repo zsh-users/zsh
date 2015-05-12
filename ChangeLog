@@ -1,3 +1,8 @@
+2015-05-12  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 35086: Doc/Zsh/expn.yo: reapply 35067 which has been
+	mistakenly reverted by 35075
+
 2015-05-12  Daniel Hahler  <git@thequod.de>
 
 	* 35060 + 35072: Completion/Unix/Command/_git: completion: git: split

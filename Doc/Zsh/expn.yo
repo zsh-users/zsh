@@ -1014,6 +1014,25 @@ form of single quoting is used that only quotes the string if needed to
 protect special characters.  Typically this form gives the most readable
 output.
 )
+item(tt(b))(
+Quote with backslashes only characters that are special to pattern
+matching. This is useful when the contents of the variable are to be
+tested using tt(GLOB_SUBST), including the tt(${~)var(...)tt(}) switch.
+
+Quoting using one of the tt(q) family of flags does not work
+for this purpose since quotes are not stripped from non-pattern
+characters by tt(GLOB_SUBST).  In other words,
+
+example(foo='a\ b'
+[[ 'a b' = ${~foo} ]])
+
+fails, whereas
+
+example(foo='a\*b'
+[[ 'a*b' = ${~foo} ]])
+
+succeeds.  The tt(b) flag ensures the correct quoting.
+)
 item(tt(Q))(
 Remove one level of quotes from the resulting words.
 )
