@@ -1023,15 +1023,15 @@ Quoting using one of the tt(q) family of flags does not work
 for this purpose since quotes are not stripped from non-pattern
 characters by tt(GLOB_SUBST).  In other words,
 
-example(foo='a\ b'
-[[ 'a b' = ${~foo} ]])
+example(pattern=${(q)str}
+[[ $str = ${~pattern} ]])
 
-fails, whereas
+works if tt($str) is tt('a*b') but not if it is tt('a b'), whereas
 
-example(foo='a\*b'
-[[ 'a*b' = ${~foo} ]])
+example(pattern=${(b)str}
+[[ $str = ${~pattern} ]])
 
-succeeds.  The tt(b) flag ensures the correct quoting.
+is always true for any possible value of tt($str).
 )
 item(tt(Q))(
 Remove one level of quotes from the resulting words.
