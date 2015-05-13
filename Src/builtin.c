@@ -4788,6 +4788,11 @@ bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int fun
 mod_export int
 exit_pending;
 
+/* Shell level at which we exit if exit_pending */
+/**/
+mod_export int
+exit_level;
+
 /* break, bye, continue, exit, logout, return -- most of these take   *
  * one numeric argument, and the other (logout) is related to return. *
  * (return is treated as a logout when in a login shell.)             */
@@ -4865,6 +4870,7 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 		retflag = 1;
 		breaks = loops;
 		exit_pending = (num << 1) | 1;
+		exit_level = locallevel;
 	    }
 	} else
 	    zexit(num, 0);

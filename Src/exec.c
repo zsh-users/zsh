@@ -5101,7 +5101,15 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     }
     popheap();
 
-    if (exit_pending) {
+    /*
+     * Exit with a tidy up.
+     * Only leave if we're at the end of the appropriate function ---
+     * not a nested function.  As we usually skip the function body,
+     * the only likely case where we need that second test is
+     * when we have an "always" block.  The endparamscope() has
+     * already happened, hence the "+1" here.
+     */
+    if (exit_pending && exit_level == locallevel+1) {
 	if (locallevel > forklevel) {
 	    /* Still functions to return: force them to do so. */
 	    retflag = 1;

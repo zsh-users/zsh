@@ -589,3 +589,25 @@
 >success2
 >read it
 >read it
+
+  (
+  mywrap() { echo BEGIN; true; echo END }
+  mytest() { { exit 3 } always { mywrap }; print Exited before this }
+  mytest
+  print Exited before this, too
+  )
+3:Exit and always block with functions: simple
+>BEGIN
+>END
+
+  (
+  mytrue() { echo mytrue; return 0 }
+  mywrap() { echo BEGIN; mytrue; echo END }
+  mytest() { { exit 4 } always { mywrap }; print Exited before this }
+  mytest
+  print Exited before this, too
+  )
+4:Exit and always block with functions: nested
+>BEGIN
+>mytrue
+>END

@@ -1,3 +1,8 @@
+2015-05-13  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/20203: Src/builtin., Src/exec.c, Test/A01grammar.ztst:
+	nested function in always traps after exit didn't work.
+
 2015-05-12  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 35086: Doc/Zsh/expn.yo: reapply 35067 (with 35071) which
