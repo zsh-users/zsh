@@ -21,6 +21,9 @@
 
 	* 35106: completion: git: unique name for __git_recent_commits.
 
+	* Daniel Shahaf: 35105: Completion/Unix/Command/_git: add
+	distance_from_head to __git_recent_commits.
+
 2015-05-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 35161: Completion/Unix/Command/_git: completion: git: Fix
