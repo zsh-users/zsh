@@ -1,3 +1,9 @@
+2015-05-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 35093: NEWS, Functions/Zle/select-bracketed,
+	Functions/Zle/select-quoted, Functions/Zle/surround:
+	new zle widgets for Vim-style text objects
+
 2015-05-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 35114: Src/Modules/zutil.c: zformat -a multibyte char widths.

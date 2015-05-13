@@ -24,6 +24,15 @@ Changes from 5.0.7 to 5.0.8
   as a reference to a variable, e.g. ${(ps.$sep.)foo} to split $foo
   on a string given by $sep.
 
+- The default binding of 'u' in vi command mode has changed to undo
+  multiple changes when invoked repeatedly. '^R' is now bound to redo
+  changes. To revert to toggling of the last edit use:
+    bindkey -a u vi-undo-change
+
+- Compatibility with Vim has been improved for vi editing mode. Most
+  notably, Vim style text objects are supported and the region can be
+  manipulated with vi commands in the same manner as Vim's visual mode.
+
 - Elements of the watch variable may now be patterns.
 
 - The logic for retrying history locking has been improved.
