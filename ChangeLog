@@ -16,6 +16,9 @@
 	* 35104: Completion/Unix/Command/_git: __git_commit_objects: query
 	1000 commits.  Also, `--all` and `--reflog` is used to get all commits.
 
+	* 35103: Completion/Unix/Command/_git: add %cr to commit objects (all
+	and recent).
+
 2015-05-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 35161: Completion/Unix/Command/_git: completion: git: Fix
