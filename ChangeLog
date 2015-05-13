@@ -13,6 +13,9 @@
 	then, and is meant to only call __git_recent_commits, if there are
 	matches.
 
+	* 35104: Completion/Unix/Command/_git: __git_commit_objects: query
+	1000 commits.  Also, `--all` and `--reflog` is used to get all commits.
+
 2015-05-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 35161: Completion/Unix/Command/_git: completion: git: Fix
