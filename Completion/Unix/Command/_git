@@ -5599,6 +5599,11 @@ __git_remote_branch_names_noprefix () {
   _wanted remote-branch-names-noprefix expl 'remote branch name' compadd "$@" -a - branch_names
 }
 
+(( $+functions[__git_commit_objects_prefer_recent] )) ||
+__git_commit_objects_prefer_recent () {
+  __git_recent_commits || __git_commit_objects
+}
+
 (( $+functions[__git_commits] )) ||
 __git_commits () {
   # TODO: deal with things that __git_heads and __git_tags has in common (i.e.,
@@ -5609,7 +5614,7 @@ __git_commits () {
   _alternative \
     "heads::__git_heads $sopts" \
     "commit-tags::__git_commit_tags $sopts" \
-    'commit-objects::__git_commit_objects'
+    'commit-objects::__git_commit_objects_prefer_recent'
 }
 
 (( $+functions[__git_heads] )) ||
