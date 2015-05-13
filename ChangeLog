@@ -1,3 +1,8 @@
+2015-05-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Christian Hesse: 35107: Completion/Unix/Command/_ip: new ip
+	options.
+
 2015-05-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/20203: Src/builtin., Src/exec.c, Test/A01grammar.ztst:

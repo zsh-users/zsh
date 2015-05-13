@@ -531,6 +531,8 @@ args=(
 )
 
 _regex_words options "ip options" \
+  '-h*uman:output statistics with human readable values' \
+  '-i*ec:print human readable rates in IEC units (ie. 1K = 1024)' \
   '-s*tatistics:output statistics' \
   '-f*amily:select protocol family:$subcmd_family' \
   '-4:IPv4' \
