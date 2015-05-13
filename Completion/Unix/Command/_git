@@ -5655,12 +5655,15 @@ __git_commit_objects () {
   local gitdir expl start
   declare -a commits
 
+  # Abort if the argument does not match a commit hash (including empty).
+  _guard '[[:xdigit:]](#c,40)' || return 1
+
   # Note: the after-the-colon part must be unique across the entire array;
   # see workers/34768
-  : ${(A)commits::=${(f)"$(_call_program commits git --no-pager log -20 --format='%h:\\\[%h\\\]\ %s')"}}
+  : ${(A)commits::=${(f)"$(_call_program commits git --no-pager log -1000 --all --reflog --format='%h:\\\[%h\\\]\ %s')"}}
   __git_command_successful $pipestatus || return 1
 
-  _describe -V -t commits 'commit object name' commits || _guard '[[:xdigit:]](#c,40)' 'commit object name'
+  _describe -V -t commits 'commit object name' commits
 }
 
 (( $+functions[__git_recent_commits] )) ||
