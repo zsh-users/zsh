@@ -5671,6 +5671,7 @@ __git_recent_commits () {
   local gitdir expl start
   declare -a descr tags heads commits
   local i j k
+  integer distance_from_head
 
   # Careful: most %d will expand to the empty string.  Quote properly!
   # NOTE: we could use %D directly, but it's not available in git 1.9.1 at least.
@@ -5680,7 +5681,19 @@ __git_recent_commits () {
   for i j k in "$commits[@]" ; do
     # Note: the after-the-colon part must be unique across the entire array;
     # see workers/34768
-    descr+=("$i:[$i] $k")
+    if (( distance_from_head == 0 )); then
+      descr+=($i:"[HEAD]    $k")
+    elif (( distance_from_head == 1 )); then
+      descr+=($i:"[HEAD^]   $k")
+    elif (( distance_from_head == 2 )); then
+      descr+=($i:"[HEAD^^]  $k")
+    elif (( distance_from_head < 10 )); then
+      descr+=($i:"[HEAD~$distance_from_head]  $k")
+    else
+      descr+=($i:"[HEAD~$distance_from_head] $k")
+    fi
+    (( ++distance_from_head ))
+
     j=${${j# \(}%\)} # strip leading ' (' and trailing ')'
     j=${j/ ->/,}  # Convert " -> master, origin/master".
     for j in ${(s:, :)j}; do
