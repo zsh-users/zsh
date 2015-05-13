@@ -5673,6 +5673,7 @@ __git_recent_commits () {
     # see workers/34768
     descr+=("$i:[$i] $k")
     j=${${j# \(}%\)} # strip leading ' (' and trailing ')'
+    j=${j/ ->/,}  # Convert " -> master, origin/master".
     for j in ${(s:, :)j}; do
       if [[ $j == 'tag: '* ]] ; then
         tags+=( ${j#tag: } )
