@@ -1,5 +1,8 @@
 2015-05-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 35092: Src/Zle/zle_params.c: fix for numeric arguments
+	from vi operator pending mode
+
 	* 35093: NEWS, Functions/Zle/select-bracketed,
 	Functions/Zle/select-quoted, Functions/Zle/surround:
 	new zle widgets for Vim-style text objects
