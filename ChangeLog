@@ -1,5 +1,7 @@
 2015-05-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 35114: Src/Modules/zutil.c: zformat -a multibyte char widths.
+
 	* Christian Hesse: 35107: Completion/Unix/Command/_ip: new ip
 	options.
 

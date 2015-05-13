@@ -914,6 +914,9 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	{
 	    char **ap, *cp;
 	    int nbc = 0, colon = 0, pre = 0, suf = 0;
+#ifdef MULTIBYTE_SUPPORT
+	    int prechars = 0;
+#endif /* MULTIBYTE_SUPPORT */
 
 	    for (ap = args + 2; *ap; ap++) {
 		for (nbc = 0, cp = *ap; *cp && *cp != ':'; cp++)
@@ -921,10 +924,23 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 			cp++, nbc++;
 		if (*cp == ':' && cp[1]) {
 		    int d;
+#ifdef MULTIBYTE_SUPPORT
+		    int dchars = 0;
+#endif /* MULTIBYTE_SUPPORT */
 
 		    colon++;
 		    if ((d = cp - *ap - nbc) > pre)
 			pre = d;
+#ifdef MULTIBYTE_SUPPORT
+		    if (isset(MULTIBYTE)) {
+			*cp = '\0';
+			dchars = MB_METASTRWIDTH(*ap) - nbc;
+			*cp = ':';
+		    } else
+			dchars = d;
+		    if (dchars > prechars)
+			prechars = dchars;
+#endif /* MULTIBYTE_SUPPORT */
 		    if ((d = strlen(cp + 1)) > suf)
 			suf = d;
 		}
@@ -937,8 +953,10 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		ret = (char **) zalloc((arrlen(args + 2) + 1) *
 				       sizeof(char *));
 
+#ifndef MULTIBYTE_SUPPORT
 		memcpy(buf + pre, args[1], sl);
 		suf = pre + sl;
+#endif /* MULTIBYTE_SUPPORT */
 
 		for (rp = ret, ap = args + 2; *ap; ap++) {
 		    copy = dupstring(*ap);
@@ -950,9 +968,27 @@ bin_zformat(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    oldc = *cpp;
 		    *cpp = '\0';
 		    if (((cpp == cp && oldc == ':') || *cp == ':') && cp[1]) {
+#ifdef MULTIBYTE_SUPPORT
+			int rempad;
+			char *ptr;
+			memcpy(buf, copy, (cpp - copy));
+			*cp = '\0';
+			if (isset(MULTIBYTE))
+			    rempad = prechars - MB_METASTRWIDTH(copy);
+			else
+			    rempad = prechars - strlen(copy);
+			ptr = buf + (cpp - copy);
+			if (rempad)
+			    memset(ptr, ' ', rempad);
+			ptr += rempad;
+			memcpy(ptr, args[1], sl);
+			ptr += sl;
+			strcpy(ptr, cp + 1);
+#else /* MULTIBYTE_SUPPORT */
 			memset(buf, ' ', pre);
 			memcpy(buf, copy, (cpp - copy));
 			strcpy(buf + suf, cp + 1);
+#endif /* MULTIBYTE_SUPPORT */
 			*rp++ = ztrdup(buf);
 		    } else
 			*rp++ = ztrdup(copy);
