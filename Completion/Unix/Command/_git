@@ -714,12 +714,14 @@ _git-diff () {
   local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
-  local -a diff_options
+  local -a diff_options diff_stage_options
   __git_setup_diff_options
+  __git_setup_diff_stage_options
 
   _arguments -w -C -s \
     $* \
     $diff_options \
+    $diff_stage_options \
     '(--cached --staged)'{--cached,--staged}'[show diff between index and named commit]' \
     '(-)--[start file arguments]' \
     '*:: :->from-to-file' && ret=0
@@ -4341,11 +4343,13 @@ _git-cat-file () {
 
 (( $+functions[_git-diff-files] )) ||
 _git-diff-files () {
-  declare -a revision_options
+  local -a revision_options diff_stage_options
   __git_setup_revision_options
+  __git_setup_diff_stage_options
 
   _arguments -w -S -s \
     $revision_options \
+    $diff_stage_options \
     ': :__git_changed-in-working-tree_files' \
     ': :__git_changed-in-working-tree_files' \
     '*: :__git_changed-in-working-tree_files'
@@ -6230,14 +6234,20 @@ __git_setup_diff_options () {
     '(--no-prefix)--dst-prefix=[use given prefix for destination]:prefix'
     '(--src-prefix --dst-prefix)--no-prefix[do not show any source or destination prefix]'
 
+    '(-c,--cc)'{-b,--cc}'[combined diff format for merge commits]'
+
+    # TODO: --output is undocumented.
+    '--output[undocumented]:undocumented')
+}
+
+(( $+functions[__git_setup_diff_stage_options] )) ||
+__git_setup_diff_stage_options () {
+  diff_stage_options=(
     '(-0 -1 -2 -3 --base --ours --theirs -c --cc --no-index)'{-1,--base}'[diff against "base" version]'
     '(-0 -1 -2 -3 --base --ours --theirs -c --cc --no-index)'{-2,--ours}'[diff against "our branch" version]'
     '(-0 -1 -2 -3 --base --ours --theirs -c --cc --no-index)'{-3,--theirs}'[diff against "their branch" version]'
     '(-0 -1 -2 -3 --base --ours --theirs -c --cc --no-index)-0[omit diff output for unmerged entries]'
-    '(-0 -1 -2 -3 --base --ours --theirs -c --cc --no-index)'{-c,--cc}'[compare "our branch", "their branch" and working tree files]'
-
-    # TODO: --output is undocumented.
-    '--output[undocumented]:undocumented')
+  )
 }
 
 (( $+functions[__git_setup_revision_options] )) ||
