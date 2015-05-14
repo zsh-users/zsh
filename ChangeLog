@@ -1,5 +1,7 @@
 2015-05-14  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/BSD/Type/.distfiles: include new dir
+
 	* Daniel Hahler: 35062: Completion/Unix/Command/_git:
 	__git_setup_revision_options includes __git_setup_diff_options
 
