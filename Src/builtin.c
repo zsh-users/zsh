@@ -3770,9 +3770,9 @@ bin_print(char *name, char **args, Options ops, int func)
 {
     int flen, width, prec, type, argc, n, narg, curlen = 0;
     int nnl = 0, fmttrunc = 0, ret = 0, maxarg = 0, nc = 0;
-    int flags[5], *len;
-    char *start, *endptr, *c, *d, *flag, *buf = NULL, spec[13], *fmt = NULL;
-    char **first, **argp, *curarg, *flagch = "0+- #", save = '\0', nullstr = '\0';
+    int flags[6], *len;
+    char *start, *endptr, *c, *d, *flag, *buf = NULL, spec[14], *fmt = NULL;
+    char **first, **argp, *curarg, *flagch = "'0+- #", save = '\0', nullstr = '\0';
     size_t rcount, count = 0;
 #ifdef HAVE_OPEN_MEMSTREAM
     size_t mcount;

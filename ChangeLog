@@ -1,5 +1,8 @@
 2015-05-14  Oliver Kiddle  <opk@zsh.org>
 
+	* Øystein Walle: 34841 (tweaked): Src/builtin.c:
+	allow grouping of thousands in printf format string
+
 	* unposted: Completion/BSD/Type/.distfiles: include new dir
 
 	* Daniel Hahler: 35062: Completion/Unix/Command/_git:
