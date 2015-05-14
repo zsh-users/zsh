@@ -1,3 +1,8 @@
+2015-05-14  Oliver Kiddle  <opk@zsh.org>
+
+	* Daniel Hahler: 35016: Completion/Unix/Command/_git:
+	introduce new pretty formats %g[sdD] for reflog information
+
 2015-05-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35110: Src/builtin.c, Doc/Zsh/params.yo: don't

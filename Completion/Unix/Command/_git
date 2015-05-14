@@ -5532,7 +5532,7 @@ __git_stashes () {
   local expl
   declare -a stashes
 
-  stashes=(${${(f)"$(_call_program stashes git stash list 2>/dev/null)"}/: */})
+  stashes=(${(f)"$(_call_program stashes git stash list --pretty=format:%gd 2>/dev/null)"})
   __git_command_successful $pipestatus || return 1
 
   _wanted stashes expl stash compadd "$@" -a - stashes
