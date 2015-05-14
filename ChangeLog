@@ -1,3 +1,8 @@
+2015-05-23  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 35127#1: Src/Zle/compcore.c Src/Zle/computil.c: Fix
+	_describe/compdescribe problem with unsorted groups
+
 2015-05-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 35266: Src/exec.c: test from users/20203 needed changing

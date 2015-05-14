@@ -2996,9 +2996,9 @@ mod_export void
 begcmgroup(char *n, int flags)
 {
     if (n) {
-	Cmgroup p = amatches;
-
-	while (p) {
+	/* If a group named <n> already exists, reuse it. */
+	Cmgroup p;
+	for (p = amatches; p; p = p->next) {
 #ifdef ZSH_HEAP_DEBUG
 	    if (memory_validate(p->heap_id)) {
 		HEAP_ERROR(p->heap_id);
@@ -3016,9 +3016,10 @@ begcmgroup(char *n, int flags)
 
 		return;
 	    }
-	    p = p->next;
 	}
     }
+
+    /* Create a new group. */
     mgroup = (Cmgroup) zhalloc(sizeof(struct cmgroup));
 #ifdef ZSH_HEAP_DEBUG
     mgroup->heap_id = last_heap_id;
