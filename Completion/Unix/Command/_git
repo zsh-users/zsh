@@ -1083,12 +1083,10 @@ _git-log () {
   local -a log_options revision_options diff_options
   __git_setup_log_options
   __git_setup_revision_options
-  __git_setup_diff_options
 
   _arguments -w -C -s \
     $log_options \
     $revision_options \
-    $diff_options \
     '-L+[trace the evolution of a line range or regex within a file]:range' \
     '(-)--[start file arguments]' \
     '*:: :->commit-range-or-file' && ret=0
@@ -1486,10 +1484,9 @@ _git-show () {
   local curcontext=$curcontext state line ret=1
   typeset -A opt_args
 
-  local -a log_options revision_options diff_options
+  local -a log_options revision_options
   __git_setup_log_options
   __git_setup_revision_options
-  __git_setup_diff_options
 
   _arguments -w -C -s \
     $log_options \

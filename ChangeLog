@@ -1,5 +1,8 @@
 2015-05-14  Oliver Kiddle  <opk@zsh.org>
 
+	* Daniel Hahler: 35062: Completion/Unix/Command/_git:
+	__git_setup_revision_options includes __git_setup_diff_options
+
 	* Daniel Hahler: 35061: Completion/Unix/Command/_git:
 	add __git_setup_diff_stage_options and use it with
 	_git-diff-files and _git-diff explicitly
