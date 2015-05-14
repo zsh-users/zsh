@@ -1,3 +1,8 @@
+2015-05-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35110: Src/builtin.c, Doc/Zsh/params.yo: don't
+	implicitly initialize restricted integers to zero.
+
 2015-05-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 35092: Src/Zle/zle_params.c: fix for numeric arguments

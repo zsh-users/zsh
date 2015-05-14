@@ -642,6 +642,9 @@ privileges, you may change the effective group ID of the shell
 process by assigning to this parameter.  Also (assuming sufficient
 privileges), you may start a single command with a different
 effective group ID by `tt(LPAR()EGID=)var(gid)tt(; command+RPAR())'
+
+If this is made local, it is not implicitly set to 0, but may be
+explicitly set locally.
 )
 vindex(EUID)
 item(tt(EUID) <S>)(
@@ -650,6 +653,9 @@ privileges, you may change the effective user ID of the shell process
 by assigning to this parameter.  Also (assuming sufficient privileges),
 you may start a single command with a different
 effective user ID by `tt(LPAR()EUID=)var(uid)tt(; command+RPAR())'
+
+If this is made local, it is not implicitly set to 0, but may be
+explicitly set locally.
 )
 vindex(ERRNO)
 item(tt(ERRNO) <S>)(
@@ -666,6 +672,9 @@ you may change the group ID of the shell process by assigning to this
 parameter.  Also (assuming sufficient privileges), you may start a single
 command under a different
 group ID by `tt(LPAR()GID=)var(gid)tt(; command+RPAR())'
+
+If this is made local, it is not implicitly set to 0, but may be
+explicitly set locally.
 )
 vindex(HISTCMD)
 item(tt(HISTCMD))(
@@ -801,6 +810,9 @@ you may change the user ID of the shell by assigning to this parameter.
 Also (assuming sufficient privileges), you may start a single command
 under a different
 user ID by `tt(LPAR()UID=)var(uid)tt(; command+RPAR())'
+
+If this is made local, it is not implicitly set to 0, but may be
+explicitly set locally.
 )
 vindex(USERNAME)
 item(tt(USERNAME) <S>)(
@@ -1098,6 +1110,9 @@ The maximum number of events stored in the internal history list.
 If you use the tt(HIST_EXPIRE_DUPS_FIRST) option, setting this value
 larger than the tt(SAVEHIST) size will give you the difference as a
 cushion for saving duplicated history events.
+
+If this is made local, it is not implicitly set to 0, but may be
+explicitly set locally.
 )
 vindex(HOME)
 item(tt(HOME) <S>)(
@@ -1392,6 +1407,9 @@ It is expanded in the same way as tt(PS2).
 vindex(SAVEHIST)
 item(tt(SAVEHIST))(
 The maximum number of history events to save in the history file.
+
+If this is made local, it is not implicitly set to 0, but may be
+explicitly set locally.
 )
 vindex(SPROMPT)
 item(tt(SPROMPT) <S>)(

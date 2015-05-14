@@ -2344,7 +2344,12 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    pm->gsu.s->setfn(pm, ztrdup(""));
 	    break;
 	case PM_INTEGER:
-	    pm->gsu.i->setfn(pm, 0);
+	    /*
+	     * Restricted integers are dangerous to initialize to 0,
+	     * so don't do that.
+	     */
+	    if (!(pm->old->node.flags & PM_RESTRICTED))
+		pm->gsu.i->setfn(pm, 0);
 	    break;
 	case PM_EFLOAT:
 	case PM_FFLOAT:
