@@ -1,3 +1,7 @@
+2015-05-15  Oliver Kiddle  <opk@zsh.org>
+
+	* users/20219: Completion/Unix/Command/_git: fix for git options
+
 2015-05-15  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35154: NEWS: news on arithmetic evaluation changes.

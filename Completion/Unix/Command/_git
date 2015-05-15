@@ -1793,7 +1793,7 @@ _tig () {
 (( $+functions[_git-config] )) ||
 _git-config () {
   local name_arg value_arg
-  local curcontext=$curcontext state line ret=1
+  local curcontext=$curcontext state line expl ret=1
   declare -A opt_args
 
   if (( words[(I)--get-regexp] )); then
@@ -2553,7 +2553,7 @@ _git-config () {
         options -M 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' && ret=0
       ;;
     (gettable-option)
-      _describe -t git-options option \
+      _wanted git-options expl option compadd -M 'r:|.=* r:|=*' - \
         ${${${(0)"$(_call_program gettable-options git config -z --list)"}%%$'\n'*}//:/\\:} && ret=0
       ;;
     (gettable-colorbool-option)
