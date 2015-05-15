@@ -387,3 +387,11 @@
   print $((`:`))
 0:Null string in arithmetic evaluation after command substitution
 >0
+
+  print $(( 1 + $(( 2 + 3 )) ))
+  print $(($((3+4))))
+  print $((1*$((2*$((3))*4))*5))
+0:Nested math substitutions.  Yes, I know, very useful.
+>6
+>7
+>120

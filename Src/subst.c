@@ -259,10 +259,19 @@ stringsubst(LinkList list, LinkNode node, int pf_flags, int asssub)
 #endif
 		str--;
 	    } else if (c == Inparmath) {
-		/* Math substitution of the form $((...)) */
+		/*
+		 * Math substitution of the form $((...)).
+		 * These can be nested, for goodness sake...
+		 */
+		int mathpar = 1;
 		str[-1] = '\0';
-		while (*str != Outparmath && *str)
+		while (mathpar && *str) {
 		    str++;
+		    if (*str == Outparmath)
+			mathpar--;
+		    else if (*str == Inparmath)
+			mathpar++;
+		}
 		if (*str != Outparmath) {
 		    zerr("failed to find end of math substitution");
 		    return NULL;
