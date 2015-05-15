@@ -1,5 +1,7 @@
 2015-05-15  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35154: NEWS: news on arithmetic evaluation changes.
+
 	* 35153: Src/subst.c, Test/C01arith.ztst: nested math substitution.
 
 	* 35151: Src/subst.c: improved check for both b and q flags.

@@ -24,6 +24,13 @@ Changes from 5.0.7 to 5.0.8
   as a reference to a variable, e.g. ${(ps.$sep.)foo} to split $foo
   on a string given by $sep.
 
+- The option FORCE_FLOAT now forces variables, not just constants,
+  to floating point in arithmetic expressions.
+
+- The type of an assignment in arithmetic expressions, e.g. the
+  type seen by the variable res in $(( res = a = b )), is now
+  more logical and C-like.
+
 - The default binding of 'u' in vi command mode has changed to undo
   multiple changes when invoked repeatedly. '^R' is now bound to redo
   changes. To revert to toggling of the last edit use:
