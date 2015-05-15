@@ -1845,7 +1845,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		    break;
 
 		case 'q':
-		    if (quotetype == QT_DOLLARS)
+		    if (quotetype == QT_DOLLARS ||
+			quotetype == QT_BACKSLASH_PATTERN)
 			goto flagerr;
 		    if (s[1] == '-') {
 			if (quotemod)

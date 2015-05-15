@@ -1,5 +1,7 @@
 2015-05-15  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35151: Src/subst.c: improved check for both b and q flags.
+
 	* 35131: Src/pattern.c: "[]" in a pattern is treated as an empty
 	character set (matching nothing) if there are no more active "]"
 	is in the pattern.
