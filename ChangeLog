@@ -1,3 +1,9 @@
+2015-05-15  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35131: Src/pattern.c: "[]" in a pattern is treated as an empty
+	character set (matching nothing) if there are no more active "]"
+	is in the pattern.
+
 2015-05-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 35139: Completion/Zsh/Context/_brace_parameter: add (b) flag
