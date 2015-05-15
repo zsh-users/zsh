@@ -1346,8 +1346,10 @@ gettokstr(int c, int sub)
     }
   brk:
     if (errflag) {
-	while(bct-- >= in_brace_param)
-	    cmdpop();
+	if (in_brace_param) {
+	    while(bct-- >= in_brace_param)
+		cmdpop();
+	}
 	return LEXERR;
     }
     hungetc(c);

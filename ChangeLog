@@ -1,3 +1,8 @@
+2015-05-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	*  35155: Src/lex.c: cmdpop() could sometimes get called too
+	often on error.
+
 2015-05-15  Oliver Kiddle  <opk@zsh.org>
 
 	* users/20219: Completion/Unix/Command/_git: fix for git options
