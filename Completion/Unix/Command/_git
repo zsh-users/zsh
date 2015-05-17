@@ -5600,6 +5600,11 @@ __git_remote_branch_names_noprefix () {
   _wanted remote-branch-names-noprefix expl 'remote branch name' compadd "$@" -a - branch_names
 }
 
+(( $+functions[__git_commit_objects_prefer_recent] )) ||
+__git_commit_objects_prefer_recent () {
+  __git_recent_commits || __git_commit_objects
+}
+
 (( $+functions[__git_commits] )) ||
 __git_commits () {
   # TODO: deal with things that __git_heads and __git_tags has in common (i.e.,
@@ -5610,7 +5615,7 @@ __git_commits () {
   _alternative \
     "heads::__git_heads $sopts" \
     "commit-tags::__git_commit_tags $sopts" \
-    'commit-objects::__git_commit_objects'
+    'commit-objects::__git_commit_objects_prefer_recent'
 }
 
 (( $+functions[__git_heads] )) ||
@@ -5651,12 +5656,15 @@ __git_commit_objects () {
   local gitdir expl start
   declare -a commits
 
+  # Abort if the argument does not match a commit hash (including empty).
+  _guard '[[:xdigit:]](#c,40)' || return 1
+
   # Note: the after-the-colon part must be unique across the entire array;
   # see workers/34768
-  : ${(A)commits::=${(f)"$(_call_program commits git --no-pager log -20 --format='%h:\\\[%h\\\]\ %s')"}}
+  : ${(A)commits::=${(f)"$(_call_program commits git --no-pager log -1000 --all --reflog --format='%h:\[%h\]\ %s\ \(%cr\)')"}}
   __git_command_successful $pipestatus || return 1
 
-  _describe -V -t commits 'commit object name' commits || _guard '[[:xdigit:]](#c,40)' 'commit object name'
+  _describe -V -t commits 'commit object name' commits
 }
 
 (( $+functions[__git_recent_commits] )) ||
@@ -5664,16 +5672,31 @@ __git_recent_commits () {
   local gitdir expl start
   declare -a descr tags heads commits
   local i j k
+  integer distance_from_head
 
   # Careful: most %d will expand to the empty string.  Quote properly!
-  : "${(A)commits::=${(@f)"$(_call_program commits git --no-pager log -20 --format='%h%n%d%n%s')"}}"
+  # NOTE: we could use %D directly, but it's not available in git 1.9.1 at least.
+  : "${(A)commits::=${(@f)"$(_call_program commits git --no-pager log -20 --format='%h%n%d%n%s\ \(%cr\)')"}}"
   __git_command_successful $pipestatus || return 1
 
   for i j k in "$commits[@]" ; do
     # Note: the after-the-colon part must be unique across the entire array;
     # see workers/34768
-    descr+=("$i:[$i] $k")
+    if (( distance_from_head == 0 )); then
+      descr+=($i:"[HEAD]    $k")
+    elif (( distance_from_head == 1 )); then
+      descr+=($i:"[HEAD^]   $k")
+    elif (( distance_from_head == 2 )); then
+      descr+=($i:"[HEAD^^]  $k")
+    elif (( distance_from_head < 10 )); then
+      descr+=($i:"[HEAD~$distance_from_head]  $k")
+    else
+      descr+=($i:"[HEAD~$distance_from_head] $k")
+    fi
+    (( ++distance_from_head ))
+
     j=${${j# \(}%\)} # strip leading ' (' and trailing ')'
+    j=${j/ ->/,}  # Convert " -> master, origin/master".
     for j in ${(s:, :)j}; do
       if [[ $j == 'tag: '* ]] ; then
         tags+=( ${j#tag: } )
@@ -5690,7 +5713,7 @@ __git_recent_commits () {
   expl=()
   _wanted heads expl 'head' compadd "$@" -a - heads && ret=0
   expl=()
-  _describe -2Vx -t commits 'commit object name' descr && ret=0
+  _describe -2Vx -t commits 'recent commit object name' descr && ret=0
 }
 
 (( $+functions[__git_blob_objects] )) ||
