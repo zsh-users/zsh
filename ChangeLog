@@ -19,6 +19,8 @@
 	* 35103: Completion/Unix/Command/_git: add %cr to commit objects (all
 	and recent).
 
+	* 35106: completion: git: unique name for __git_recent_commits.
+
 2015-05-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 35161: Completion/Unix/Command/_git: completion: git: Fix

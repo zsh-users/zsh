@@ -5700,7 +5700,7 @@ __git_recent_commits () {
   expl=()
   _wanted heads expl 'head' compadd "$@" -a - heads && ret=0
   expl=()
-  _describe -2Vx -t commits 'commit object name' descr && ret=0
+  _describe -2Vx -t commits 'recent commit object name' descr && ret=0
   return $ret
 }
 
