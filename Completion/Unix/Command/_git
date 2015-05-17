@@ -5691,6 +5691,7 @@ __git_recent_commits () {
   _wanted heads expl 'head' compadd "$@" -a - heads && ret=0
   expl=()
   _describe -2Vx -t commits 'commit object name' descr && ret=0
+  return $ret
 }
 
 (( $+functions[__git_blob_objects] )) ||
