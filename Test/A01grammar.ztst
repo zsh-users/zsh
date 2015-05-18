@@ -543,6 +543,7 @@
   . ./bad_syntax
 126: Attempt to "." file with bad syntax.
 ?./bad_syntax:2: parse error near `\n'
+# `
 
   echo 'false' >dot_false
   . ./dot_false
@@ -650,3 +651,17 @@
 >Pattern matched five
 >Pattern matched six
 >Character class matched abecedinarian
+
+  case grumph in
+    ( no | (grumph) )
+    print 1 OK
+    ;;
+  esac
+  case snruf in
+    ( fleer | (|snr(|[au]f)) )
+    print 2 OK
+    ;;
+  esac
+0: case patterns within words
+>1 OK
+>2 OK

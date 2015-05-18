@@ -1174,8 +1174,6 @@ par_case(int *cmplx)
 	if (!strcmp(tokstr, "esac"))
 	    break;
 	str = dupstring(tokstr);
-	incasepat = 0;
-	incmdpos = 1;
 	type = WC_CASE_OR;
 	pp = ecadd(0);
 	palts = ecadd(0);

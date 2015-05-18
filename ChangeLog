@@ -1,5 +1,8 @@
 2015-05-18  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35184: Src/parse.c, Test/A01grammar.ztst: fix pattern parsing
+	after "|" in 35168.
+
 	* 35168: Completion/Unix/Command/_ant,
 	Completion/Unix/Command/_cp, Completion/Unix/Command/_locate,
 	Completion/Unix/Command/_make, Completion/Unix/Command/_tar,
