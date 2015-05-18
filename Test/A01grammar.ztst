@@ -572,6 +572,7 @@
   $ZTST_testdir/../Src/zsh -f myscript
 127q:PATHSCRIPT option not used.
 ?$ZTST_testdir/../Src/zsh: can't open input file: myscript
+# '
 
   $ZTST_testdir/../Src/zsh -fc 'echo $0; echo $1' myargzero myargone
 0:$0 is traditionally if bizarrely set to the first argument with -c
@@ -611,3 +612,41 @@
 >BEGIN
 >mytrue
 >END
+
+  fn() {
+    case $1 in
+      ( one | two | three )
+      print Matched $1
+      ;;
+      ( fo* | fi* | si* )
+      print Pattern matched $1
+      ;;
+      ( []x | a[b]* )
+      print Character class matched $1
+      ;;
+    esac
+  }
+  which fn
+  fn one
+  fn two
+  fn three
+  fn four
+  fn five
+  fn six
+  fn abecedinarian
+  fn xylophone
+0: case word handling
+>fn () {
+>	case $1 in
+>		(one | two | three) print Matched $1 ;;
+>		(fo* | fi* | si*) print Pattern matched $1 ;;
+>		([]x | a[b]*) print Character class matched $1 ;;
+>	esac
+>}
+>Matched one
+>Matched two
+>Matched three
+>Pattern matched four
+>Pattern matched five
+>Pattern matched six
+>Character class matched abecedinarian

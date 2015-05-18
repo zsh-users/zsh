@@ -13,7 +13,7 @@ if _pick_variant gnu=GNU unix --version; then
     '-H[follow command-line symbolic links]' \
     '(-l --link)'{-l,--link}'[link files instead of copying]' \
     '(-L --dereference)'{-L,--dereference}'[always follow symbolic links]' \
-    (-n --no-clobber -i --interactive){-n,--no-clobber}"[don't overwrite an existing file]" \
+    '(-n --no-clobber -i --interactive)'{-n,--no-clobber}"[don't overwrite an existing file]" \
     '(-P --no-dereference)'{-P,--no-dereference}'[never follow symbolic links]' \
     '-p[same as --preserve=mode,ownership,timestamps]' \
     '--preserve=-[preserve specified attributes]:: :_values -s , attribute mode timestamps ownership links context xattr all' \

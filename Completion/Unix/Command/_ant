@@ -123,8 +123,7 @@ case $state in
                     # Output target again indicating its the default one.
                     print -n "'${default_target}:(Default target) ' "
                 ;;
-                (Searching:*|Main:targets:|Subtargets:|BUILD:SUCCESSFUL|Total:time:
-                *)
+                (Searching:*|Main:targets:|Subtargets:|BUILD:SUCCESSFUL|Total:time:*)
                 ;;
                 (*)
                     # Return target and description

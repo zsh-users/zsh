@@ -761,6 +761,8 @@ gettok(void)
 	lexstop = 0;
 	return BAR;
     case LX1_INPAR:
+	if (incasepat == 2)
+	    return INPAR;
 	d = hgetc();
 	if (d == '(') {
 	    if (infor) {

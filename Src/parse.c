@@ -349,9 +349,8 @@ ecadd(wordcode c)
 	eclen += a;
     }
     ecbuf[ecused] = c;
-    ecused++;
 
-    return ecused - 1;
+    return ecused++;
 }
 
 /* Delete a wordcode. */
@@ -1128,7 +1127,7 @@ par_for(int *cmplx)
 static void
 par_case(int *cmplx)
 {
-    int oecused = ecused, brflag, p, pp, n = 1, type;
+    int oecused = ecused, brflag, p, pp, palts, type, nalts;
     int ona, onc;
 
     p = ecadd(0);
@@ -1153,7 +1152,7 @@ par_case(int *cmplx)
 	YYERRORV(oecused);
     }
     brflag = (tok == INBRACE);
-    incasepat = 1;
+    incasepat = 2;
     incmdpos = 0;
     noaliases = ona;
     nocorrect = onc;
@@ -1166,8 +1165,10 @@ par_case(int *cmplx)
 	    zshlex();
 	if (tok == OUTBRACE)
 	    break;
-	if (tok == INPAR)
+	if (tok == INPAR) {
+	    incasepat = 1;
 	    zshlex();
+	}
 	if (tok != STRING)
 	    YYERRORV(oecused);
 	if (!strcmp(tokstr, "esac"))
@@ -1176,89 +1177,45 @@ par_case(int *cmplx)
 	incasepat = 0;
 	incmdpos = 1;
 	type = WC_CASE_OR;
+	pp = ecadd(0);
+	palts = ecadd(0);
+	nalts = 0;
 	for (;;) {
+	    ecstr(str);
+	    ecadd(ecnpats++);
+	    nalts++;
+
 	    zshlex();
 	    if (tok == OUTPAR) {
 		incasepat = 0;
 		incmdpos = 1;
 		zshlex();
 		break;
-	    } else if (tok == BAR) {
-		char *str2;
-		int sl = strlen(str);
+	    } else if (tok != BAR)
+		YYERRORV(oecused);
 
-		incasepat = 1;
-		incmdpos = 0;
-		str2 = hcalloc(sl + 2);
-		strcpy(str2, str);
-		str2[sl] = Bar;
-		str2[sl+1] = '\0';
-		str = str2;
-	    } else {
-		int sl = strlen(str);
-
-		if (!sl || str[sl - 1] != Bar) {
-		    /* POSIX allows (foo*) patterns */
-		    int pct;
-		    char *s;
-
-		    for (s = str, pct = 0; *s; s++) {
-			if (*s == Inpar)
-			    pct++;
-			if (!pct)
-			    break;
-			if (pct == 1) {
-			    if (*s == Bar || *s == Inpar)
-				while (iblank(s[1]))
-				    chuck(s+1);
-			    if (*s == Bar || *s == Outpar)
-				while (iblank(s[-1]) &&
-				       (s < str + 1 || s[-2] != Meta))
-				    chuck(--s);
-			}
-			if (*s == Outpar)
-			    pct--;
-		    }
-		    if (*s || pct || s == str)
-			YYERRORV(oecused);
-		    /* Simplify pattern by removing surrounding (...) */
-		    sl = strlen(str);
-		    DPUTS(*str != Inpar || str[sl - 1] != Outpar,
-			  "BUG: strange case pattern");
-		    str[sl - 1] = '\0';
-		    chuck(str);
-		    break;
-		} else {
-		    char *str2;
-
-		    if (tok != STRING)
-			YYERRORV(oecused);
-		    str2 = hcalloc(sl + strlen(tokstr) + 1);
-		    strcpy(str2, str);
-		    strcpy(str2 + sl, tokstr);
-		    str = str2;
-		}
-	    }
+	    zshlex();
+	    if (tok != STRING)
+		YYERRORV(oecused);
+	    str = dupstring(tokstr);
 	}
-	pp = ecadd(0);
-	ecstr(str);
-	ecadd(ecnpats++);
 	par_save_list(cmplx);
-	n++;
 	if (tok == SEMIAMP)
 	    type = WC_CASE_AND;
 	else if (tok == SEMIBAR)
 	    type = WC_CASE_TESTAND;
 	ecbuf[pp] = WCB_CASE(type, ecused - 1 - pp);
+	ecbuf[palts] = nalts;
 	if ((tok == ESAC && !brflag) || (tok == OUTBRACE && brflag))
 	    break;
 	if (tok != DSEMI && tok != SEMIAMP && tok != SEMIBAR)
 	    YYERRORV(oecused);
-	incasepat = 1;
+	incasepat = 2;
 	incmdpos = 0;
 	zshlex();
     }
     incmdpos = 1;
+    incasepat = 0;
     zshlex();
 
     ecbuf[p] = WCB_CASE(WC_CASE_HEAD, ecused - 1 - p);

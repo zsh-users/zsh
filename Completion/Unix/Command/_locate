@@ -25,7 +25,7 @@ case $basename in
     ltype=gnu
     ;;
 
-    (*illegal option*)
+    (*"illegal option"*)
     if [[ $OSTYPE == (freebsd|openbsd|dragonfly|darwin)* ]]; then
       ltype=bsd
     else

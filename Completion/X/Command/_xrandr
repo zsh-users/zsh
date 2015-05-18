@@ -51,7 +51,7 @@ _arguments -C \
 case $state in
   value)
     case $words[CURRENT-1] in
-      (scaling* mode)
+      (scaling*" mode")
 	_description value expl "output property 'scaling mode'"
 	compadd "$@" "$expl[@]" None Full Center Full\ aspect && return 0
       ;;

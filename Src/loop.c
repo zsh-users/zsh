@@ -545,7 +545,7 @@ execcase(Estate state, int do_exec)
     Wordcode end, next;
     wordcode code = state->pc[-1];
     char *word, *pat;
-    int npat, save;
+    int npat, save, nalts, ialt, patok;
     Patprog *spprog, pprog;
 
     end = state->pc + WC_CASE_SKIP(code);
@@ -561,60 +561,74 @@ execcase(Estate state, int do_exec)
 	if (wc_code(code) != WC_CASE)
 	    break;
 
-	pat = NULL;
-	pprog = NULL;
 	save = 0;
-	npat = state->pc[1];
-	spprog = state->prog->pats + npat;
-
 	next = state->pc + WC_CASE_SKIP(code);
+	nalts = *state->pc++;
+	ialt = patok = 0;
 
 	if (isset(XTRACE)) {
-	    char *opat;
-
-	    pat = dupstring(opat = ecrawstr(state->prog, state->pc, NULL));
-	    singsub(&pat);
-	    save = (!(state->prog->flags & EF_HEAP) &&
-		    !strcmp(pat, opat) && *spprog != dummy_patprog2);
-
 	    printprompt4();
 	    fprintf(xtrerr, "case %s (", word);
-	    quote_tokenized_output(pat, xtrerr);
+	}
+
+	while (!patok && nalts) {
+	    npat = state->pc[1];
+	    spprog = state->prog->pats + npat;
+	    pprog = NULL;
+	    pat = NULL;
+	
+	    if (isset(XTRACE)) {
+		int htok = 0;
+		pat = dupstring(ecrawstr(state->prog, state->pc, &htok));
+		if (htok)
+		    singsub(&pat);
+
+		if (ialt++)
+		    fprintf(stderr, " | ");
+		quote_tokenized_output(pat, xtrerr);
+	    }
+
+	    if (*spprog != dummy_patprog1 && *spprog != dummy_patprog2)
+		pprog = *spprog;
+
+	    if (!pprog) {
+		if (!pat) {
+		    char *opat;
+		    int htok = 0;
+
+		    pat = dupstring(opat = ecrawstr(state->prog,
+						    state->pc, &htok));
+		    if (htok)
+			singsub(&pat);
+		    save = (!(state->prog->flags & EF_HEAP) &&
+			    !strcmp(pat, opat) && *spprog != dummy_patprog2);
+		}
+		if (!(pprog = patcompile(pat, (save ? PAT_ZDUP : PAT_STATIC),
+					 NULL)))
+		    zerr("bad pattern: %s", pat);
+		else if (save)
+		    *spprog = pprog;
+	    }
+	    if (pprog && pattry(pprog, word))
+		patok = 1;
+	    state->pc += 2;
+	    nalts--;
+	}
+	state->pc += 2 * nalts;
+	if (isset(XTRACE)) {
 	    fprintf(xtrerr, ")\n");
 	    fflush(xtrerr);
 	}
-	state->pc += 2;
-
-	if (*spprog != dummy_patprog1 && *spprog != dummy_patprog2)
-	    pprog = *spprog;
-
-	if (!pprog) {
-	    if (!pat) {
-		char *opat;
-		int htok = 0;
-
-		pat = dupstring(opat = ecrawstr(state->prog,
-						state->pc - 2, &htok));
-		if (htok)
-		    singsub(&pat);
-		save = (!(state->prog->flags & EF_HEAP) &&
-			!strcmp(pat, opat) && *spprog != dummy_patprog2);
-	    }
-	    if (!(pprog = patcompile(pat, (save ? PAT_ZDUP : PAT_STATIC),
-				     NULL)))
-		zerr("bad pattern: %s", pat);
-	    else if (save)
-		*spprog = pprog;
-	}
-	if (pprog && pattry(pprog, word)) {
+	if (patok) {
 	    execlist(state, 1, ((WC_CASE_TYPE(code) == WC_CASE_OR) &&
 				do_exec));
 	    while (!retflag && wc_code(code) == WC_CASE &&
 		   WC_CASE_TYPE(code) == WC_CASE_AND) {
 		state->pc = next;
-		code = *state->pc;
-		state->pc += 3;
-		next = state->pc + WC_CASE_SKIP(code) - 2;
+		code = *state->pc++;
+		next = state->pc + WC_CASE_SKIP(code);
+		nalts = *state->pc++;
+		state->pc += 2 * nalts;
 		execlist(state, 1, ((WC_CASE_TYPE(code) == WC_CASE_OR) &&
 				    do_exec));
 	    }

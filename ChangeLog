@@ -1,3 +1,16 @@
+2015-05-18  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35168: Completion/Unix/Command/_ant,
+	Completion/Unix/Command/_cp, Completion/Unix/Command/_locate,
+	Completion/Unix/Command/_make, Completion/Unix/Command/_tar,
+	Completion/Unix/Type/_path_commands,
+	Completion/X/Command/_xrandr, Config/version.mk, Src/lex.c,
+	Src/loop.c, Src/parse.c, Src/text.c, Test/A01grammar.ztst:
+	Fix parsing of case patterns so "|" is extracted by looking
+	for words; quote completion functions where needed in
+	consequence; add test; updated version number to 5.0.7-dev-3
+	because of wordcode incompatibility.
+
 2015-05-18  Daniel Hahler  <git@thequod.de>
 
 	* 35126: Completion/Unix/Command/_git: __git_recent_commits:

@@ -65,7 +65,7 @@ _make-parseMakefile () {
   do
     case "$input " in
       # VARIABLE = value OR VARIABLE ?= value
-      ([[:alnum:]][[:alnum:]_]#[ $TAB]#(\?|)=*)
+      ([[:alnum:]][[:alnum:]_]#[" "$TAB]#(\?|)=*)
       var=${input%%[ $TAB]#(\?|)=*}
       val=${input#*=}
       val=${val##[ $TAB]#}
@@ -74,7 +74,7 @@ _make-parseMakefile () {
 
       # VARIABLE := value OR VARIABLE ::= value
       # Evaluated immediately
-      ([[:alnum:]][[:alnum:]_]#[ $TAB]#:(:|)=*)
+      ([[:alnum:]][[:alnum:]_]#[" "$TAB]#:(:|)=*)
       var=${input%%[ $TAB]#:(:|)=*}
       val=${input#*=}
       val=${val##[ $TAB]#}
@@ -97,7 +97,7 @@ _make-parseMakefile () {
       ;;
 
       # Include another makefile
-      (${~incl} *)
+      (${~incl}" "*)
       local f=${input##${~incl} ##}
       if [[ $incl == '.include' ]]
       then

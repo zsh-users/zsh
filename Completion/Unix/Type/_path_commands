@@ -25,7 +25,7 @@ return 1
 
 _call_whatis() { 
   case "$(whatis --version)" in
-  (whatis from *)
+  ("whatis from "*)
     local -A args
     zparseopts -D -A args s: r:
     apropos "${args[-r]:-"$@"}" | fgrep "($args[-s]"

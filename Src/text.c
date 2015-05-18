@@ -602,6 +602,7 @@ gettext2(Estate state)
 	case WC_CASE:
 	    if (!s) {
 		Wordcode end = state->pc + WC_CASE_SKIP(code);
+		wordcode nalts;
 
 		taddstr("case ");
 		taddstr(ecgetstr(state, EC_NODUP, NULL));
@@ -622,8 +623,13 @@ gettext2(Estate state)
 			taddchr(' ');
 		    taddstr("(");
 		    code = *state->pc++;
-		    taddstr(ecgetstr(state, EC_NODUP, NULL));
-		    state->pc++;
+		    nalts = *state->pc++;
+		    while (nalts--) {
+			taddstr(ecgetstr(state, EC_NODUP, NULL));
+			state->pc++;
+			if (nalts)
+			    taddstr(" | ");
+		    }
 		    taddstr(") ");
 		    tindent++;
 		    n = tpush(code, 0);
@@ -631,6 +637,7 @@ gettext2(Estate state)
 		    n->pop = (state->pc - 2 + WC_CASE_SKIP(code) >= end);
 		}
 	    } else if (state->pc < s->u._case.end) {
+		wordcode nalts;
 		dec_tindent();
 		switch (WC_CASE_TYPE(code)) {
 		case WC_CASE_OR:
@@ -638,11 +645,11 @@ gettext2(Estate state)
 		    break;
 
 		case WC_CASE_AND:
-		    taddstr(";&");
+		    taddstr(" ;&");
 		    break;
 
 		default:
-		    taddstr(";|");
+		    taddstr(" ;|");
 		    break;
 		}
 		if (tnewlins)
@@ -651,8 +658,13 @@ gettext2(Estate state)
 		    taddchr(' ');
 		taddstr("(");
 		code = *state->pc++;
-		taddstr(ecgetstr(state, EC_NODUP, NULL));
-		state->pc++;
+		nalts = *state->pc++;
+		while (nalts--) {
+		    taddstr(ecgetstr(state, EC_NODUP, NULL));
+		    state->pc++;
+		    if (nalts)
+			taddstr(" | ");
+		}
 		taddstr(") ");
 		tindent++;
 		s->code = code;
@@ -666,11 +678,11 @@ gettext2(Estate state)
 		    break;
 
 		case WC_CASE_AND:
-		    taddstr(";&");
+		    taddstr(" ;&");
 		    break;
 
 		default:
-		    taddstr(";|");
+		    taddstr(" ;|");
 		    break;
 		}
 		dec_tindent();
