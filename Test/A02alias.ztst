@@ -83,3 +83,13 @@
 > a string S 
 *>*5*echo S a string S "
 # Note there is a trailing space on the "> a string S " line
+
+  (
+  unalias -a
+  alias
+  )
+0:unalias -a
+
+  alias -s foo=print
+  unalias -as
+0:unalias -as

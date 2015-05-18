@@ -1,5 +1,8 @@
 2015-05-18  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35193: Doc/Zsh/builtins.yo, Src/builtin.c, Src/hashtable.h,
+	Test/A02alias.ztst: add "unalias -a".
+
 	* 35187: Completion/Unix/Command/_vim: fix unbalanced parentheses.
 
 	* 35184: Src/parse.c, Test/A01grammar.ztst: fix pattern parsing

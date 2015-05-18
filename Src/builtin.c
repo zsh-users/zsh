@@ -122,9 +122,9 @@ static struct builtin builtins[] =
     BUILTIN("type", 0, bin_whence, 0, -1, 0, "ampfsSw", "v"),
     BUILTIN("typeset", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klprtuxmz", NULL),
     BUILTIN("umask", 0, bin_umask, 0, 1, 0, "S", NULL),
-    BUILTIN("unalias", 0, bin_unhash, 1, -1, 0, "ms", "a"),
-    BUILTIN("unfunction", 0, bin_unhash, 1, -1, 0, "m", "f"),
-    BUILTIN("unhash", 0, bin_unhash, 1, -1, 0, "adfms", NULL),
+    BUILTIN("unalias", 0, bin_unhash, 0, -1, BIN_UNALIAS, "ams", NULL),
+    BUILTIN("unfunction", 0, bin_unhash, 1, -1, BIN_UNFUNCTION, "m", "f"),
+    BUILTIN("unhash", 0, bin_unhash, 1, -1, BIN_UNHASH, "adfms", NULL),
     BUILTIN("unset", BINF_PSPECIAL, bin_unset, 1, -1, 0, "fmv", NULL),
     BUILTIN("unsetopt", 0, bin_setopt, 0, -1, BIN_UNSETOPT, NULL, NULL),
     BUILTIN("wait", 0, bin_fg, 0, -1, BIN_WAIT, NULL, NULL),
@@ -3557,25 +3557,53 @@ bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
 
 /**/
 int
-bin_unhash(char *name, char **argv, Options ops, UNUSED(int func))
+bin_unhash(char *name, char **argv, Options ops, int func)
 {
     HashTable ht;
     HashNode hn, nhn;
     Patprog pprog;
-    int match = 0, returnval = 0;
+    int match = 0, returnval = 0, all = 0;
     int i;
 
     /* Check which hash table we are working with. */
-    if (OPT_ISSET(ops,'d'))
+    if (func == BIN_UNALIAS) {
+	if (OPT_ISSET(ops,'s'))
+	    ht = sufaliastab;	/* suffix aliases */
+	else
+	    ht = aliastab;	/* aliases           */
+	if (OPT_ISSET(ops, 'a')) {
+	    if (*argv) {
+		zwarnnam(name, "-a: too many arguments");
+		return 1;
+	    }
+	    all = 1;
+	} else if (!*argv) {
+	    zwarnnam(name, "not enough arguments");
+	    return 1;
+	}
+    } else if (OPT_ISSET(ops,'d'))
 	ht = nameddirtab;	/* named directories */
     else if (OPT_ISSET(ops,'f'))
 	ht = shfunctab;		/* shell functions   */
     else if (OPT_ISSET(ops,'s'))
 	ht = sufaliastab;	/* suffix aliases, must precede aliases */
-    else if (OPT_ISSET(ops,'a'))
+    else if (func == BIN_UNHASH && (OPT_ISSET(ops,'a')))
 	ht = aliastab;		/* aliases           */
     else
 	ht = cmdnamtab;		/* external commands */
+
+    if (all) {
+	queue_signals();
+	for (i = 0; i < ht->hsize; i++) {
+	    for (hn = ht->nodes[i]; hn; hn = nhn) {
+		/* record pointer to next, since we may free this one */
+		nhn = hn->next;
+		ht->freenode(ht->removenode(ht, hn->nam));
+	    }
+	}
+	unqueue_signals();
+	return 0;
+    }
 
     /* With -m option, treat arguments as glob patterns. *
      * "unhash -m '*'" is legal, but not recommended.    */

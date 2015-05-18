@@ -2056,7 +2056,14 @@ the symbolic form the permissions you specify are those which are to be
 allowed (not denied) to the users specified.
 )
 cindex(aliases, removing)
-alias(unalias)(unhash -a)
+item(tt(unalias) [ tt(-ams) ] var(name) ...)(
+Removes aliases.  This command works the same as tt(unhash -a), except that
+the tt(-a) option removes all regular or global aliases, or with tt(-s)
+all suffix aliases: in this case no var(name) arguments may appear.  The
+options tt(-m) (remove by pattern) and tt(-s) without tt(-a) (remove
+listed suffix aliases) behave as for tt(unhash -a).  Note that
+the meaning of tt(-a) is different between tt(unalias) and tt(unhash).
+)
 cindex(functions, removing)
 alias(unfunction)(unhash -f)
 findex(unhash)
