@@ -1,3 +1,8 @@
+2015-05-19  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* users/20222: Completion/Unix/Command/_git: users/20222:
+	completion: git: Add matchspec for heads
+
 2015-05-18  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35193: Doc/Zsh/builtins.yo, Src/builtin.c, Src/hashtable.h,

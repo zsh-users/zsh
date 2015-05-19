@@ -5586,7 +5586,7 @@ __git_remote_branch_names () {
   branch_names=(${${(f)"$(_call_program remote-branch-refs git for-each-ref --format='"%(refname)"' refs/remotes 2>/dev/null)"}#refs/remotes/})
   __git_command_successful $pipestatus || return 1
 
-  _wanted remote-branch-names expl 'remote branch name' compadd "$@" -a - branch_names
+  _wanted remote-branch-names expl 'remote branch name' compadd -M 'r:|/=**' "$@" -a - branch_names
 }
 
 (( $+functions[__git_remote_branch_names_noprefix] )) ||
@@ -5597,7 +5597,7 @@ __git_remote_branch_names_noprefix () {
   branch_names=(${${${(f)"$(_call_program remote-branch-refs-noprefix git for-each-ref --format='"%(refname)"' refs/remotes 2>/dev/null)"}##*/}:#HEAD})
   __git_command_successful $pipestatus || return 1
 
-  _wanted remote-branch-names-noprefix expl 'remote branch name' compadd "$@" -a - branch_names
+  _wanted remote-branch-names-noprefix expl 'remote branch name' compadd -M 'r:|/=**' "$@" -a - branch_names
 }
 
 (( $+functions[__git_commit_objects_prefer_recent] )) ||
@@ -5638,7 +5638,7 @@ __git_heads_local () {
     [[ -f $gitdir/refs/stash ]] && heads+=stash
   fi
 
-  _wanted heads-local expl "local head" compadd "$@" -a - heads
+  _wanted heads-local expl "local head" compadd -M 'r:|/=**' "$@" -a - heads
 }
 
 (( $+functions[__git_heads_remote] )) ||
@@ -5648,7 +5648,7 @@ __git_heads_remote () {
 
   heads=(${(f)"$(_call_program headrefs git for-each-ref --format='"%(refname:short)" refs/remotes' 2>/dev/null)"})
 
-  _wanted heads-remote expl "remote head" compadd "$@" -a - heads
+  _wanted heads-remote expl "remote head" compadd -M 'r:|/=**' "$@" -a - heads
 }
 
 (( $+functions[__git_commit_objects] )) ||
