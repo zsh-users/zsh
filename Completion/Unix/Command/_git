@@ -2947,7 +2947,8 @@ _git-fast-export () {
     '--progress=[insert progress statements]: :__git_guard_number interval' \
     '--signed-tags=[specify how to handle signed tags]:action:((verbatim\:"silently export"
                                                                 warn\:"export, but warn"
-                                                                strip\:"export unsigned tags instead"
+                                                                warn-strip\:"export as unsigned tags, but warn"
+                                                                strip\:"export as unsigned tags instead"
                                                                 abort\:"abort on signed tags (default)"))' \
     '--tag-of-filtered-object=[specify how to handle tags whose tagged object is filtered out]:action:((abort\:"abort on such tags"
                                                                                                         drop\:"omit such tags"
