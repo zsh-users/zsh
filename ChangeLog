@@ -14,6 +14,9 @@
 	* 35211: Completion/Unix/Command/_git: __git_commit_objects:
 	do not use _guard, but only a pattern for skipping.
 
+	* 35217: Completion/Unix/Command/_git: _git-send-email:
+	provide completions from `__git_commit_objects_prefer_recent`.
+
 2015-05-19  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* users/20222: Completion/Unix/Command/_git: users/20222:

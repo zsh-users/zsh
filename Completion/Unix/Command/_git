@@ -3732,7 +3732,7 @@ _git-send-email () {
     '(           --no-validate)--validate[perform sanity checks on patches]' \
     '(--validate              )--no-validate[do not perform sanity checks on patches]' \
     '--force[send emails even if safety checks would prevent it]' \
-    '*: : _alternative
+    '*: : _alternative -O expl
       "files:file:_files"
       "commits:recent commit object name:__git_commit_objects_prefer_recent"'
 }
