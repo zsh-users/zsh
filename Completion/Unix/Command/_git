@@ -5657,7 +5657,7 @@ __git_commit_objects () {
   declare -a commits
 
   # Abort if the argument does not match a commit hash (including empty).
-  _guard '[[:xdigit:]](#c,40)' || return 1
+  [[ "$PREFIX$SUFFIX" == [[:xdigit:]](#c1,40) ]] || return 1
 
   # Note: the after-the-colon part must be unique across the entire array;
   # see workers/34768
