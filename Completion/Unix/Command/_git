@@ -5676,7 +5676,7 @@ __git_recent_commits () {
 
   # Careful: most %d will expand to the empty string.  Quote properly!
   # NOTE: we could use %D directly, but it's not available in git 1.9.1 at least.
-  commits=(${(@f)"$(_call_program commits git --no-pager log -20 --format='%h%n%d%n%s\ \(%cr\)')"})
+  commits=("${(f)"$(_call_program commits git --no-pager log -20 --format='%h%n%d%n%s\ \(%cr\)')"}")
   __git_command_successful $pipestatus || return 1
 
   for i j k in "$commits[@]" ; do

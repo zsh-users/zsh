@@ -3,6 +3,9 @@
 	* 35164: Completion/Unix/Command/_git: fix $pipestatus with
 	__git_commit_objects/__git_recent_commits.
 
+	* 35204: Completion/Unix/Command/_git: fix quoting in previous commit
+	commit (35164).
+
 2015-05-19  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* users/20222: Completion/Unix/Command/_git: users/20222:
