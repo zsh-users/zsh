@@ -1,3 +1,8 @@
+2015-05-20  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Ismail: 35232: Completion/Unix/Type/_urls: matching
+	parentheses.
+
 2015-05-19  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 35224: Completion/Unix/Command/_git: completion: git: Add

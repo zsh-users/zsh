@@ -75,7 +75,7 @@ fi
 scheme="$match[1]"
 
 case "$scheme" in
-  http(|s)|(|s)ftp|scp|gopher)
+  (http(|s)|(|s)ftp|scp|gopher)
     if ! compset -P //; then
       _wanted -C "$scheme" prefixes expl 'end of prefix' compadd -S '' "$@" //
       return
