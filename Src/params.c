@@ -4580,17 +4580,21 @@ addenv(Param pm, char *value)
 static char *
 mkenvstr(char *name, char *value, int flags)
 {
-    char *str, *s;
-    int len_name, len_value;
+    char *str, *s = value;
+    int len_name, len_value = 0;
 
     len_name = strlen(name);
-    for (len_value = 0, s = value;
-	 *s && (*s++ != Meta || *s++ != 32); len_value++);
+    if (s)
+	while (*s && (*s++ != Meta || *s++ != 32))
+	    len_value++;
     s = str = (char *) zalloc(len_name + len_value + 2);
     strcpy(s, name);
     s += len_name;
     *s = '=';
-    copyenvstr(s, value, flags);
+    if (value)
+	copyenvstr(s, value, flags);
+    else
+	*++s = '\0';
     return str;
 }
 
