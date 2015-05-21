@@ -1,3 +1,9 @@
+2015-05-21  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35248: Src/lex.c, Src/parse.c, Test/A01grammar.ztst:
+	treat fully parenthesised zsh patterns as complete
+	case patterns again.
+
 2015-05-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Ismail: 35232: Completion/Unix/Type/_urls: matching

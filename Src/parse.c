@@ -1152,7 +1152,7 @@ par_case(int *cmplx)
 	YYERRORV(oecused);
     }
     brflag = (tok == INBRACE);
-    incasepat = 2;
+    incasepat = 1;
     incmdpos = 0;
     noaliases = ona;
     nocorrect = onc;
@@ -1165,10 +1165,8 @@ par_case(int *cmplx)
 	    zshlex();
 	if (tok == OUTBRACE)
 	    break;
-	if (tok == INPAR) {
-	    incasepat = 1;
+	if (tok == INPAR)
 	    zshlex();
-	}
 	if (tok != STRING)
 	    YYERRORV(oecused);
 	if (!strcmp(tokstr, "esac"))
@@ -1178,19 +1176,96 @@ par_case(int *cmplx)
 	pp = ecadd(0);
 	palts = ecadd(0);
 	nalts = 0;
+	/*
+	 * Hack here.
+	 *
+	 * [Pause for astonished hubbub to subside.]
+	 *
+	 * The next token we get may be
+	 * - ")" or "|" if we're looking at an honest-to-god
+	 *   "case" patten, either because there's no opening
+	 *   parenthesis, or because SH_GLOB is set and we
+	 *   managed to grab an initial "(" to mark the start
+	 *   of the case pattern.
+	 * - Something else --- we don't care what --- because
+	 *   we're parsing a complete "(...)" as a complete
+	 *   zsh pattern.  In that case, we treat this as a
+	 *   single instance of a case pattern but we pretend
+	 *   we're doing proper case parsing --- in which the
+	 *   parentheses and bar are in different words from
+	 *   the string, so may be separated by whitespace.
+	 *   So we quietly massage the whitespace and hope
+	 *   no one noticed.  This is horrible, but it's
+	 *   unfortunately too difficult to comine traditional
+	 *   zsh patterns with a properly parsed case pattern
+	 *   without generating incompatibilities which aren't
+	 *   all that popular (I've discovered).
+	 * - We can also end up with something other than ")" or "|"
+	 *   just because we're looking at garbage.
+	 *
+	 * Because of the second case, what happens next might
+	 * be the start of the command after the pattern, so we
+	 * need to treat it as in command position.  Luckily
+	 * this doesn't affect our ability to match a | or ) as
+	 * these are valid on command lines.
+	 */
+	incasepat = 0;
+	incmdpos = 1;
 	for (;;) {
-	    ecstr(str);
-	    ecadd(ecnpats++);
-	    nalts++;
-
 	    zshlex();
 	    if (tok == OUTPAR) {
+		ecstr(str);
+		ecadd(ecnpats++);
+		nalts++;
+
 		incasepat = 0;
 		incmdpos = 1;
 		zshlex();
 		break;
-	    } else if (tok != BAR)
+	    } else if (tok == BAR) {
+		ecstr(str);
+		ecadd(ecnpats++);
+		nalts++;
+
+		incasepat = 1;
+		incmdpos = 0;
+	    } else {
+		if (!nalts && str[0] == Inpar) {
+		    int pct = 0, sl;
+		    char *s;
+
+		    for (s = str; *s; s++) {
+			if (*s == Inpar)
+			    pct++;
+			if (!pct)
+			    break;
+			if (pct == 1) {
+			    if (*s == Bar || *s == Inpar)
+				while (iblank(s[1]))
+				    chuck(s+1);
+			    if (*s == Bar || *s == Outpar)
+				while (iblank(s[-1]) &&
+				       (s < str + 1 || s[-2] != Meta))
+				    chuck(--s);
+			}
+			if (*s == Outpar)
+			    pct--;
+		    }
+		    if (*s || pct || s == str)
+			YYERRORV(oecused);
+		    /* Simplify pattern by removing surrounding (...) */
+		    sl = strlen(str);
+		    DPUTS(*str != Inpar || str[sl - 1] != Outpar,
+			  "BUG: strange case pattern");
+		    str[sl - 1] = '\0';
+		    chuck(str);
+		    ecstr(str);
+		    ecadd(ecnpats++);
+		    nalts++;
+		    break;
+		}
 		YYERRORV(oecused);
+	    }
 
 	    zshlex();
 	    if (tok != STRING)
@@ -1208,7 +1283,7 @@ par_case(int *cmplx)
 	    break;
 	if (tok != DSEMI && tok != SEMIAMP && tok != SEMIBAR)
 	    YYERRORV(oecused);
-	incasepat = 2;
+	incasepat = 1;
 	incmdpos = 0;
 	zshlex();
     }

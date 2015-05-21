@@ -614,7 +614,8 @@
 >mytrue
 >END
 
-  fn() {
+  (emulate sh -c '
+   fn() {
     case $1 in
       ( one | two | three )
       print Matched $1
@@ -627,6 +628,7 @@
       ;;
     esac
   }
+  '
   which fn
   fn one
   fn two
@@ -635,8 +637,8 @@
   fn five
   fn six
   fn abecedinarian
-  fn xylophone
-0: case word handling
+  fn xylophone)
+0: case word handling in sh emulation (SH_GLOB parentheses)
 >fn () {
 >	case $1 in
 >		(one | two | three) print Matched $1 ;;
@@ -665,3 +667,31 @@
 0: case patterns within words
 >1 OK
 >2 OK
+
+  case horrible in
+    ([a-m])(|[n-z])rr(|ib(um|le|ah)))
+    print It worked
+    ;;
+  esac
+  case "a string with separate words" in
+    (*with separate*))
+    print That worked, too
+    ;;
+  esac
+0:Unbalanced parentheses and spaces with zsh pattern
+>It worked
+>That worked, too
+
+  case horrible in
+    (([a-m])(|[n-z])rr(|ib(um|le|ah)))
+    print It worked
+    ;;
+  esac
+  case "a string with separate words" in
+    (*with separate*)
+    print That worked, too
+    ;;
+  esac
+0:Balanced parentheses and spaces with zsh pattern
+>It worked
+>That worked, too
