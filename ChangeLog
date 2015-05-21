@@ -1,3 +1,8 @@
+2015-05-22  Daniel Hahler  <zsh@thequod.de>
+
+	* 35261: Completion/Unix/Command/_git: make $ret local in
+	__git_recent_commits.
+
 2015-05-21  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35250: Doc/Zsh/grammar.yo: fix case documentation (SH_GLOB).
@@ -20,7 +25,7 @@
 	* 35224: Completion/Unix/Command/_git: completion: git: Add
 	fast-export --signed-tags=warn-strip
 
-2015-06-19  Daniel Hahler  <zsh@thequod.de>
+2015-05-19  Daniel Hahler  <zsh@thequod.de>
 
 	* 35164: Completion/Unix/Command/_git: fix $pipestatus with
 	__git_commit_objects/__git_recent_commits.
