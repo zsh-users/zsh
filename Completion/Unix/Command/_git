@@ -5674,7 +5674,7 @@ __git_commit_objects () {
 __git_recent_commits () {
   local gitdir expl start
   declare -a descr tags heads commits
-  local i j k
+  local i j k ret
   integer distance_from_head
 
   # Careful: most %d will expand to the empty string.  Quote properly!
