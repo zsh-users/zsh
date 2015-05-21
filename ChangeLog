@@ -1,5 +1,7 @@
 2015-05-21  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35250: Doc/Zsh/grammar.yo: fix case documentation (SH_GLOB).
+
 	* 35248: Src/lex.c, Src/parse.c, Test/A01grammar.ztst:
 	treat fully parenthesised zsh patterns as complete
 	case patterns again.

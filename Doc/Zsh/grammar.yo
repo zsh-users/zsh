@@ -239,11 +239,17 @@ item(tt(case) var(word) tt(in) [ [tt(LPAR())] var(pattern) [ tt(|) var(pattern) 
 Execute the var(list) associated with the first var(pattern)
 that matches var(word), if any.  The form of the patterns
 is the same as that used for filename generation.  See
-noderef(Filename Generation).  Note further that the whole
-pattern with alternatives is treated by the shell as equivalent
-to a group of patterns within parentheses, even though in
-the tt(case) syntax whitespace may appear about the parentheses and the
-vertical bar.
+noderef(Filename Generation).
+
+Note further that, unless the tt(SH_GLOB) option is set, the whole
+pattern with alternatives is treated by the shell as equivalent to a
+group of patterns within parentheses, although white space may appear
+about the parentheses and the vertical bar and will be stripped from the
+pattern at those points.  White space may appear elsewhere in the
+pattern; this is not stripped.  If the tt(SH_GLOB) option is set, so
+that an opening parenthesis can be unambiguously treated as part of the
+case syntax, the expression is parsed into separate words and these are
+treated as strict alternatives (as in other shells).
 
 If the var(list) that is executed is terminated with tt(;&) rather than
 tt(;;), the following list is also executed.  The rule for

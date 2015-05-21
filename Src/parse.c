@@ -1183,7 +1183,7 @@ par_case(int *cmplx)
 	 *
 	 * The next token we get may be
 	 * - ")" or "|" if we're looking at an honest-to-god
-	 *   "case" patten, either because there's no opening
+	 *   "case" pattern, either because there's no opening
 	 *   parenthesis, or because SH_GLOB is set and we
 	 *   managed to grab an initial "(" to mark the start
 	 *   of the case pattern.
@@ -1196,7 +1196,7 @@ par_case(int *cmplx)
 	 *   the string, so may be separated by whitespace.
 	 *   So we quietly massage the whitespace and hope
 	 *   no one noticed.  This is horrible, but it's
-	 *   unfortunately too difficult to comine traditional
+	 *   unfortunately too difficult to combine traditional
 	 *   zsh patterns with a properly parsed case pattern
 	 *   without generating incompatibilities which aren't
 	 *   all that popular (I've discovered).
