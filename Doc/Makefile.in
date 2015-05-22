@@ -41,8 +41,7 @@ LN_S            = @LN_S@
 MAKEINFO = makeinfo
 TEXI2DVI = texi2dvi
 DVIPS = dvips
-TEXI2HTML = @TEXI2HTML@ --output . --ifinfo --split=chapter --node-files \
-            --init-file texi2html.conf
+TEXI2HTML = @TEXI2HTML@
 
 .SUFFIXES: .yo .1
 
@@ -163,7 +162,8 @@ html: zsh_toc.html
 .PHONY: html
 
 zsh_toc.html: $(sdir)/zsh.texi texi2html.conf
-	$(TEXI2HTML) $(sdir)/zsh.texi
+	$(TEXI2HTML) --output . --ifinfo --split=chapter --node-files \
+	             --init-file texi2html.conf $(sdir)/zsh.texi
 
 zshall.1: zsh.yo
 	@case $@ in \
@@ -252,8 +252,12 @@ version.yo: $(sdir_top)/Config/version.mk
 	) > $(sdir)/version.yo
 
 texi2html.conf: $(sdir_top)/Config/version.mk
-	echo '$$PRE_BODY_CLOSE = "<font size=\"-1\">Zsh version $(VERSION), released on $(VERSION_DATE).</font>";' \
-	    > $@
+	d=`echo $(VERSION_DATE)`; \
+	v="<font size=\"-1\">Zsh version $(VERSION), released on $$d.</font>"; \
+	case '$(TEXI2HTML)' in \
+	  *texi2any*) echo "set_from_init_file('PRE_BODY_CLOSE','$$v');" ;; \
+	  *) echo "\$$PRE_BODY_CLOSE = '$$v';" ;; \
+	esac > $@
 
 Zsh/modlist.yo: $(MODDOCSRC)
 	( \

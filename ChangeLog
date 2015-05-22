@@ -1,3 +1,8 @@
+2015-05-23  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 35255: configure.sc, Doc/Makefile.in: if available, use
+	texi2any instead of texi2html
+
 2015-05-22  Daniel Hahler  <zsh@thequod.de>
 
 	* 35261: Completion/Unix/Command/_git: make $ret local in

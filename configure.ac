@@ -634,7 +634,12 @@ AC_SUBST(YODL_OPTIONS)
 
 AC_CHECK_PROGS([PDFETEX], [pdfetex], [: pdfetex])
 AC_CHECK_PROGS([TEXI2PDF], [texi2pdf], [])
-AC_CHECK_PROGS([TEXI2HTML], [texi2html], [])
+AC_CHECK_PROGS([TEXI2HTML], [texi2any texi2html], [: texi2html])
+
+if test x"$TEXI2HTML" = xtexi2any; then
+  TEXI2HTML='texi2any -c TEXI2HTML=1'
+fi
+
 AC_CHECK_PROGS([ANSI2KNR], [ansi2knr], [: ansi2knr])
 
 if test x"$ansi2knr" = xyes && test x"$ANSI2KNR" = x": ansi2knr"; then
