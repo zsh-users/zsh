@@ -5109,7 +5109,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
      * when we have an "always" block.  The endparamscope() has
      * already happened, hence the "+1" here.
      */
-    if (exit_pending && exit_level == locallevel+1) {
+    if (exit_pending && exit_level >= locallevel+1) {
 	if (locallevel > forklevel) {
 	    /* Still functions to return: force them to do so. */
 	    retflag = 1;

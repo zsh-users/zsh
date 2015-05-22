@@ -1,3 +1,8 @@
+2015-05-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 35266: Src/exec.c: test from users/20203 needed changing
+	because of jumps in locallevel.
+
 2015-05-23  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 35255: configure.sc, Doc/Makefile.in: if available, use
