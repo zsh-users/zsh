@@ -1,5 +1,9 @@
 2015-06-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 35270: Completion/Base/Utility/_describe: _describe: Document
+	a known issue described in 35229 (which is the same thread as
+	35127 and 34768)
+
 	* 35271: Completion/Unix/Command/_beep: New completion:
 	beep.
 

@@ -1,5 +1,12 @@
 #autoload
 
+# ### Note: Calling this function twice during one completion operation, such
+# ### that in each call there exists a pair of items having the same description
+# ### as each other, and the two calls specify the same $_type, currently leads
+# ### to garbled output; see workers/35229 (May 2015) and its thread (which also
+# ### discusses at least two other issues, that may or may not be related to
+# ### this one).
+
 # This can be used to add options or values with descriptions as matches.
 
 local _opt _expl _tmpm _tmpd _mlen _noprefix
