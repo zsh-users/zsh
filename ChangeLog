@@ -6,6 +6,9 @@
 	* 35286: Completion/Unix/Command/_baz, Completion/Unix/Command/_tla:
 	fix zstyle lookups with _baz and _tla.
 
+	* 35293: Completion/Unix/Command/_php: fix zstyle lookup with
+	_php: use trailing colon.
+
 2015-05-27  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Han Pingtian: 35299: Functions/Zftp/zfdir: improve effect of

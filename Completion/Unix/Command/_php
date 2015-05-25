@@ -9,7 +9,7 @@ typeset -A opt_args
 local -a args
 local exclusions php_suffix
 
-zstyle -s ":completion:$curcontext" suffixes php_suffix '|' || php_suffix='php|phar'
+zstyle -s ":completion:${curcontext}:" suffixes php_suffix '|' || php_suffix='php|phar'
 local php_files=":PHP file:_files -g '*.($php_suffix)(-.)'"
 
 if _pick_variant php5=PHP\ 5 php4 --version; then
