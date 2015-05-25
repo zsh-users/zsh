@@ -1,3 +1,8 @@
+2015-05-27  Daniel Hahler  <zsh@thequod.de>
+
+	* 35285: Functions/Chpwd/_cdr: fix zstyle lookup for
+	recent-dirs-insert.
+
 2015-05-27  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Han Pingtian: 35299: Functions/Zftp/zfdir: improve effect of

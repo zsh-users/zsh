@@ -5,7 +5,7 @@ integer default insert
 
 zstyle -t ':chpwd:' recent-dirs-default && default=1
 if (( default )); then
-  zstyle -s ':completion:${curcontext}' recent-dirs-insert insert_string
+  zstyle -s ":completion:${curcontext}:" recent-dirs-insert insert_string
   case $insert_string in
     (both)
     insert=4
