@@ -173,20 +173,34 @@ yum_repos() {
 # Completion function for install
 (( $+functions[_yum_install] )) || _yum_install()
 {
-	_yum_available_pkgs
-	compadd "$@" -a -- _available_pkgs
+        if ! [[ $PREFIX == */* ]]; then
+          _yum_available_pkgs
+        fi
+
+        local ret=1
+        _tags files packages
+        while _tags; do
+          if _requested files; then
+            compadd "$@" -a -- _available_pkgs
+          fi
+          if _requested packages; then
+            _call_function - _yum_localinstall
+          fi
+          (( ret )) || break
+        done
+        return ret
 }
 
 # Completion function for localinstall
 (( $+functions[_yum_localinstall] )) || _yum_localinstall()
 {
-	_files -g '(#i)*.rpm(-.)'
+	_files -/ -g '(#i)*.rpm(-.)'
 }
 
 # Completion function for localupdate
 (( $+functions[_yum_localupdate] )) || _yum_localupdate()
 {
-	_files -g '(#i)*.rpm(-.)'
+	_files -/ -g '(#i)*.rpm(-.)'
 }
 
 # Completion function for update/upgrade
