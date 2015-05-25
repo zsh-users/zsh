@@ -6,13 +6,13 @@ local baz_version
 local hide_short
 
 # ask the user which version of baz this is
-if ! zstyle -s ":completion:${curcontext}" baz-version baz_version; then
+if ! zstyle -s ":completion:${curcontext}:" baz-version baz_version; then
   # ask baz instead
   baz_version="${${$($BAZ --version)#baz Bazaar version }%% \(thelove@canonical.com*}"
 fi
 
 # test whether to hide short options from completion
-if zstyle -s ":completion:${curcontext}" hide-shortopts hide_short; then
+if zstyle -s ":completion:${curcontext}:" hide-shortopts hide_short; then
   case $hide_short in
     true|yes|on|1) hide_short='!' ;;
     *) hide_short='' ;;
