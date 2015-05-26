@@ -25,7 +25,13 @@ if [[ $ZFTP_SYSTEM = UNIX* ]]; then
   fi
   # If we're using -F, we get away with using a directory
   # to list, but not a glob.  Don't ask me why.
-  reply=(${${(M)${(f)"$(zftp ls -lF $dir)"}:#d*}/(#b)*[[:space:]](*)\//$match[1]})
+  reply=(${(M)${(f)"$(zftp ls -lF $dir)"}:#d([^[:space:]]##[[:space:]]##)(#c8)?##\/})
+
+  # If ls -lF doesn't work, try dir ...
+  if ! (($#reply)); then
+    reply=(${(M)${(f)"$(zftp dir $dir)"}:#d([^[:space:]]##[[:space:]]##)(#c8)?##})
+  fi
+  reply=(${reply/(#b)d([^[:space:]]##[[:space:]]##)(#c8)([^\/]##)\/#/$match[2]})
 #  () {
 #    zftp ls -LF $dir >|$1
 #    reply=($(awk '/\/$/ { print substr($1, 1, length($1)-1) }' $1))
