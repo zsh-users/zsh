@@ -1,5 +1,9 @@
 2015-05-26  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* see 35268: revert 34476 (ae7dcab) as it seems to be having
+	effects beyond the intended optimisation of completion caching.
+	To be investigated further after the release.
+
 	* Han Pingtian: 35295: Functions/Zftp/zfcd_match: be more
 	inventive zftp directory listing.
 
