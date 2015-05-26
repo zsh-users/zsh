@@ -551,8 +551,8 @@ fno
 
 The two functions tt(fni) and tt(fno) are defined with sticky tt(sh)
 emulation.  tt(fno) is then executed, causing options associated
-with emulations to be set to their values in tt(sh).  tt(fni) then
-calls tt(fno); because tt(fno) is also marked for sticky tt(sh)
+with emulations to be set to their values in tt(sh).  tt(fno) then
+calls tt(fni); because tt(fni) is also marked for sticky tt(sh)
 emulation, no option changes take place on entry to or exit from it.
 Hence the option tt(cshnullglob), turned off by tt(sh) emulation, will
 be turned on within tt(fni) and remain on on return to tt(fno).  On exit
