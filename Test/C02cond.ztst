@@ -374,6 +374,20 @@ F:Failures in these cases do not indicate a problem in the shell.
 >foo is empty
 >foo is full
 
+  test -z \( || print Not zero 1
+  test -z \< || print Not zero 2
+  test -n \( && print Not zero 3
+  test -n \) && print Not zero 4
+  [ -n \> ] && print Not zero 5
+  [ -n \! ] && print Not zero 6
+0:test with two arguments and a token
+>Not zero 1
+>Not zero 2
+>Not zero 3
+>Not zero 4
+>Not zero 5
+>Not zero 6
+
 %clean
   # This works around a bug in rm -f in some versions of Cygwin
   chmod 644 unmodish

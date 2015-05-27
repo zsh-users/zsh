@@ -2212,13 +2212,14 @@ par_cond_2(void)
 {
     char *s1, *s2, *s3;
     int dble = 0;
+    int n_testargs = (condlex == testlex) ? arrlen(testargs) + 1 : 0;
 
-    if (condlex == testlex) {
+    if (n_testargs) {
 	/* See the description of test in POSIX 1003.2 */
 	if (tok == NULLTOK)
 	    /* no arguments: false */
 	    return par_cond_double(dupstring("-n"), dupstring(""));
-	if (!*testargs) {
+	if (n_testargs == 1) {
 	    /* one argument: [ foo ] is equivalent to [ -n foo ] */
 	    s1 = tokstr;
 	    condlex();
@@ -2227,7 +2228,7 @@ par_cond_2(void)
 		return par_cond_double(s1, dupstring("1"));
 	    return par_cond_double(dupstring("-n"), s1);
 	}
-	if (testargs[1]) {
+	if (n_testargs > 2) {
 	    /* three arguments: if the second argument is a binary operator, *
 	     * perform that binary test on the first and the third argument  */
 	    if (!strcmp(*testargs, "=")  ||
@@ -2253,7 +2254,7 @@ par_cond_2(void)
 	 * In "test" compatibility mode, "! -a ..." and "! -o ..."
 	 * are treated as "[string] [and] ..." and "[string] [or] ...".
 	 */
-	if (!(condlex == testlex && *testargs && 
+	if (!(n_testargs > 1 &&
 	      (!strcmp(*testargs, "-a") || !strcmp(*testargs, "-o"))))
 	{
 	    condlex();
@@ -2277,19 +2278,27 @@ par_cond_2(void)
     }
     s1 = tokstr;
     dble = (s1 && *s1 == '-'
-	    && (condlex != testlex
+	    && (!n_testargs
 		|| strspn(s1+1, "abcdefghknoprstuwxzLONGS") == 1)
 	    && !s1[2]);
     if (tok != STRING) {
 	/* Check first argument for [[ STRING ]] re-interpretation */
 	if (s1 /* tok != DOUTBRACK && tok != DAMPER && tok != DBAR */
-	    && tok != LEXERR && (!dble || condlex == testlex)) {
+	    && tok != LEXERR && (!dble || n_testargs)) {
 	    condlex();
 	    return par_cond_double(dupstring("-n"), s1);
 	} else
 	    YYERROR(ecused);
     }
     condlex();
+    if (n_testargs == 2 && tok != STRING && tokstr && s1[0] == '-') {
+	/*
+	 * Something like "test -z" followed by a token.
+	 * We'll turn the token into a string (we've also
+	 * checked it does have a string representation).
+	 */
+	tok = STRING;
+    }
     if (tok == INANG || tok == OUTANG) {
 	enum lextok xtok = tok;
 	condlex();
@@ -2308,7 +2317,7 @@ par_cond_2(void)
 	 * mean we have to go back and fix up the first one
 	 */
 	if (tok != LEXERR) {
-	    if (!dble || condlex == testlex)
+	    if (!dble || n_testargs)
 		return par_cond_double(dupstring("-n"), s1);
 	    else
 		return par_cond_multi(s1, newlinklist());
@@ -2316,7 +2325,7 @@ par_cond_2(void)
 	    YYERROR(ecused);
     }
     s2 = tokstr;   
-    if (condlex != testlex)
+    if (!n_testargs)
 	dble = (s2 && *s2 == '-' && !s2[2]);
     incond++;			/* parentheses do globbing */
     condlex();
