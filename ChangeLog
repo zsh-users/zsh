@@ -1,3 +1,8 @@
+2015-05-27  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Han Pingtian: 35299: Functions/Zftp/zfdir: improve effect of
+	zfdir -r.
+
 2015-05-26  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 35289: Doc/Zsh/builtions.yo: fix typos in the description

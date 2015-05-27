@@ -62,7 +62,7 @@ for (( i = 1; i <= $#argv; i++ )); do
   fi
 done
 
-if [[ $# -eq 0 ]]; then
+if [[ $# -eq 0 && $redir -ne 1 ]]; then
   # Cache it in the current directory file.  This means that repeated
   # calls to zfdir with no arguments always use a cached file.
   if [[ -z $curdir ]]; then
@@ -79,11 +79,12 @@ else
   fi
   file=$otherdir
   newargs="$*"
-  if [[ -f $file && $redir != 1 && $force -ne 1 ]]; then
+  if [[ -f $file && -n $newargs && $force -ne 1 ]]; then
     # Don't use the cached file if the arguments changed.
+    # Even in zfdir -r new_args ...
     [[ $newargs = $zfconfig[otherargs_$ZFTP_SESSION] ]] || rm -f $file
   fi
-  zfconfig[otherargs_$ZFTP_SESSION]=$newargs
+  [[ -n $newargs ]] && zfconfig[otherargs_$ZFTP_SESSION]=$newargs
 fi
 
 if [[ $force -eq 1 ]]; then
