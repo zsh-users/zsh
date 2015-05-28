@@ -946,7 +946,7 @@ _git-grep () {
     '(-n --line-number)'{-n,--line-number}'[prefix the line number to matching lines]' \
     '(-l --files-with-matches -L --files-without-match --name-only)'{-l,--files-with-matches,--name-only}'[show only names of matching files]' \
     '(-l --files-with-matches -L --files-without-match)'{-L,--files-without-match}'[show only names of non-matching files]' \
-    '(--cached -O --open-files-in-pager)'{-O,--open-files-in-pager}'=-[open matching files in pager]::_path_commands' \
+    '(--cached -O --open-files-in-pager)'{-O,--open-files-in-pager=}'-[open matching files in pager]:pager:_cmdstring' \
     '(-z --null)'{-z,--null}'[output \0 after filenames]' \
     '(-c --count)'{-c,--count}'[show number of matching lines in files]' \
     '(        --no-color)--color=-[color matches]:: :__git_color_whens' \
@@ -1846,9 +1846,6 @@ _git-config () {
       '(--no-includes)'--includes'[respect "include.*" directives in config files when looking up values]' \
       '(--includes)'--no-includes'[do not respect "include.*" directives]' && ret=0
 
-  # TODO: Most all _path_commands should be able to take arguments and so on.
-  # How do we deal with that and how do we quote the whole argument to git
-  # config?
   # TODO: Add support for merge.*. (merge driver), diff.*. (diff driver), and filter.*. (filter driver) options
   # (see gitattributes(5)).
   # TODO: .path options should take absolute paths.
@@ -1891,7 +1888,7 @@ _git-config () {
     core.safecrlf:'verify that CRLF conversion is reversible::->core.safecrlf:false'
     core.autocrlf:'convert CRLFs to and from system specific::->core.autocrlf:false'
     core.symlinks:'create symbolic links for indexed symbolic links upon creation::->bool:true'
-    core.gitProxy:'command to execute to establish a connection to remote server:proxy command:_path_commands'
+    core.gitProxy:'command to execute to establish a connection to remote server:proxy command:_cmdstring'
     core.ignoreStat:'ignore modification times of files::->bool:false'
     core.preferSymlinkRefs:'use symbolic links for symbolic-reference files::->bool:false'
     core.bare:'use a repository without a working tree::->bool:false'
@@ -1908,9 +1905,9 @@ _git-config () {
     core.deltaBaseCacheLimit:'maximum size of cache for base objects:maximum base objects cache size:->bytes:96m'
     core.bigFileThreshold:'maximum size of files to compress:maximum compress size:->bytes:512m'
     core.excludesfile:'additional file to use for exclusion:excludes file:_files'
-    core.askpass:'program to use for asking for passwords:password command:_path_commands'
-    core.editor:'editor to use for editing messages:editor:_path_commands'
-    core.pager:'pager to use for paginating output:pager:_path_commands'
+    core.askpass:'program to use for asking for passwords:password command:_cmdstring'
+    core.editor:'editor to use for editing messages:editor:_cmdstring'
+    core.pager:'pager to use for paginating output:pager:_cmdstring'
     core.whitespace:'list of common whitespace problems to notice::->core.whitespace'
     core.fsyncobjectfiles:'fsync() when writing object files::->bool:false'
     core.preloadindex:'use parallel index preload for operations like git diff::->bool:true'
@@ -1918,10 +1915,10 @@ _git-config () {
     core.checkstat:'determine which stat fields to match between the index and work tree::->core.checkstat:default'
     core.notesRef:'show notes in given refs:refs:->string:refs/notes/commits'
     core.sparseCheckout:'use sparse checkout::->bool:false'
-    credential.helper:'external helper to be called when a username or password credential is needed::_path_commands'
+    credential.helper:'external helper to be called when a username or password credential is needed::_cmdstring'
     credential.useHttpPath:'consider the "path" component of an http or https URL to be important::->bool:false'
     credential.username:'If no username is set use this username by default:default username:->string'
-    'credential.*.helper:external helper to be called when a username or password credential is needed::_path_commands'
+    'credential.*.helper:external helper to be called when a username or password credential is needed::_cmdstring'
     'credential.*.useHttpPath:consider the "path" component of an http or https URL to be important::->bool:false'
     'credential.*.username:if no username is set use this username by default:default username:->string'
     add.ignore-errors:'ignore indexing errors when adding files::->bool:false'
@@ -1936,7 +1933,7 @@ _git-config () {
     'branch.*.mergeoptions:default options for merging::->branch.mergeoptions'
     'branch.*.pushremote:what remote git push should push to::__git_remotes'
     'branch.*.rebase:rebase on top of fetched branch::->bool:false'
-    'browser.*.cmd:browser command to use:browser:_path_commands'
+    'browser.*.cmd:browser command to use:browser:_cmdstring'
     'browser.*.path:path to use for the browser:absolute browser path:_files -g "*(*)"'
     clean.requireForce:'require --force for git clean to actually do something::->bool:true'
     color.branch:'color output of git branch::->color-bool:false'
@@ -1989,15 +1986,15 @@ _git-config () {
     commit.template:'template file for commit messages:template:_files'
     'diff.*.binary:make the diff driver treat files as binary::->bool:false'
     'diff.*.cachetextconv:make the diff driver cache the text conversion outputs::->bool:false'
-    'diff.*.command:custom diff driver command::_path_commands'
-    'diff.*.textconv:command to generate the text-converted version of a file::_path_commands'
+    'diff.*.command:custom diff driver command::_cmdstring'
+    'diff.*.textconv:command to generate the text-converted version of a file::_cmdstring'
     'diff.*.wordregex:regular expression that the diff driver should use to split words in a line:regular expression:->string'
     'diff.*.xfuncname:regular expression that the diff driver should use to recognize the hunk header:regular expression:->string'
     diff.algorithm:'default diff algorithm::->diff.algorithm:default'
     diff.autorefreshindex:'run git update-index --refresh before git diff::->bool:true'
     diff.context:'default number of context lines::->int:3'
     diff.dirstat:'comma separated list of --dirstat parameters specifying default behaviour:comma-separated list:->string:changes,noncumulative,3'
-    diff.external:'command to generate diff with:diff command:_path_commands'
+    diff.external:'command to generate diff with:diff command:_cmdstring'
     diff.mnemonicprefix:'use mnemonic source and destination prefixes::->bool:false'
     diff.noprefix:'strip source and destination prefixes::->bool:false'
     diff.orderfile:'file to read patch order glob patterns from:order file:_files'
@@ -2008,7 +2005,7 @@ _git-config () {
     diff.submodule:'output format for submodule differences::->diff.submodule:short'
     diff.suppressBlankEmpty:'inhibit printing space before empty output lines::->bool:false'
     diff.tool:'diff tool to use::__git_difftools'
-    'difftool.*.cmd:command to invoke for the diff tool::_path_commands'
+    'difftool.*.cmd:command to invoke for the diff tool::_cmdstring'
     'difftool.*.path:path to use for the diff tool:absolute diff tool path:_files -g "*(*)"'
     difftool.prompt:'prompt before each invocation of the diff tool::->bool:true'
     diff.wordRegex:'regex used to determine what a word is when performing word-by-word diff:regular expression:->string'
@@ -2017,8 +2014,8 @@ _git-config () {
     fetch.unpackLimit:'maximum number of objects to unpack when fetching:unpack limit:->int'
     fetch.recurseSubmodules:'recurse into submodules (as needed) when fetching::->fetch.recurseSubmodules:on-demand'
     fetch.fsckObjects:'check all fetched objects::->bool:false'
-    'filter.*.clean:command which is used to convert the content of a worktree file to a blob upon checkin::_path_commands'
-    'filter.*.smudge:command which is used to convert the content of a blob object to a worktree file upon checkout::_path_commands'
+    'filter.*.clean:command which is used to convert the content of a worktree file to a blob upon checkin::_cmdstring'
+    'filter.*.smudge:command which is used to convert the content of a blob object to a worktree file upon checkout::_cmdstring'
     format.attach:'use multipart/mixed attachments::->bool:false'
     format.coverLetter:'control whether to generate a cover-letter when format-patch is invoked::->bool:false'
     format.numbered:'use sequence numbers in patch subjects::->format.numbered:auto'
@@ -2061,7 +2058,7 @@ _git-config () {
     'gitcvs.*.dbTableNamePrefix:database table name prefix:prefix:->string'
     gitcvs.usecrlfattr:'use end-of-line conversion attributes::->bool:false'
     gitcvs.allbinary:'treat all files from CVS as binary::->bool:false'
-    gpg.program:'use program instead of "gpg" found on $PATH when making or verifying a PGP signature::_path_commands'
+    gpg.program:'use program instead of "gpg" found on $PATH when making or verifying a PGP signature::_cmdstring'
     gui.commitmsgwidth:'width of commit message window:width::->int:75'
     gui.diffcontext:'number of context lines used in diff window:context::->int:5'
     gui.encoding:'encoding to use for displaying file contents::->encoding'
@@ -2074,7 +2071,7 @@ _git-config () {
     gui.copyblamethreshold:'threshold to use in blame location detection:threshold:->string'
     gui.blamehistoryctx:'specify radius of history context in days for selected commit::->days'
     'guitool.*.argprompt:prompt for arguments:argument prompt:->string'
-    'guitool.*.cmd:shell command line to execute::_path_commands'
+    'guitool.*.cmd:shell command line to execute::_cmdstring'
     'guitool.*.confirm:show a confirmation dialog::->bool:false'
     'guitool.*.needsfile:require that a diff is selected for command to be available::->bool:false'
     'guitool.*.noconsole:suppress command output::->bool:false'
@@ -2083,7 +2080,7 @@ _git-config () {
     'guitool.*.prompt:prompt to display:prompt:->string'
     'guitool.*.revunmerged:show only unmerged branches in revprompt::->bool:false'
     'guitool.*.title:title of prompt dialog:prompt title:->string'
-    guitool.cmd:'shell command line to execute::_path_commands'
+    guitool.cmd:'shell command line to execute::_cmdstring'
     guitool.needsfile:'require that a diff is selected for command to be available::->bool:false'
     guitool.noconsole:'suppress command output::->bool:false'
     guitool.norescan:'skip rescanning for changes to the working directory::->bool:false'
@@ -2150,7 +2147,7 @@ _git-config () {
     i18n.commitEncoding:'character encoding commit messages are stored in::->encoding'
     i18n.logOutputEncoding:'character encoding commit messages are output in::->encoding'
     imap.folder:'IMAP folder to use with git imap-send:IMAP folder name::_mailboxes'
-    imap.tunnel:'tunneling command to use for git imap-send:tunnel command:_path_commands'
+    imap.tunnel:'tunneling command to use for git imap-send:tunnel command:_cmdstring'
     imap.host:'host git imap-send should connect to::_hosts'
     # TODO: If imap.host is set, complete users on that system.
     imap.user:'user git imap-send should log in as::_users'
@@ -2161,7 +2158,7 @@ _git-config () {
     imap.authMethod:'authentication method used::->imap.authMethod'
     init.templatedir:'directory from which templates are copied:template directory:_directories'
     instaweb.browser:'browser to use when browsing with gitweb::__git_browsers'
-    instaweb.httpd:'HTTP-daemon command-line to execute for instaweb:daemon:_path_commands'
+    instaweb.httpd:'HTTP-daemon command-line to execute for instaweb:daemon:_cmdstring'
     instaweb.local:'bind to 127.0.0.1::->bool:false'
     instaweb.modulepath:'module path for the Apache HTTP-daemon for instaweb:module directory:_directories'
     instaweb.port:'port to bind HTTP daemon to for instaweb::_ports'
@@ -2175,7 +2172,7 @@ _git-config () {
     mailmap.blob:'like mailmap.file, but consider the value as a reference to a blob in the repository:blob reference:->string'
     mailmap.file:'augmenting mailmap file:mailmap file:_files'
     man.viewer:'man viewer to use for help in man format::__git_man_viewers'
-    'man.*.cmd:the command to invoke the specified man viewer:man command:_path_commands'
+    'man.*.cmd:the command to invoke the specified man viewer:man command:_cmdstring'
     'man.*.path:path to use for the man viewer:absolute man tool path:_files -g "*(*)"'
     merge.branchdesc:'populate the log message with the branch description text as well::->bool:false'
     merge.conflictstyle:'style used for conflicted hunks::->merge.conflictstyle:merge'
@@ -2188,10 +2185,10 @@ _git-config () {
     merge.tool:'tool used by git mergetool during merges::__git_mergetools'
     merge.verbosity:'amount of output shown by recursive merge strategy::->merge.verbosity:2'
     'merge.*.name:human-readable name for custom low-level merge driver:name:->string'
-    'merge.*.driver:command that implements a custom low-level merge driver:merge command:_path_commands'
+    'merge.*.driver:command that implements a custom low-level merge driver:merge command:_cmdstring'
     'merge.*.recursive:low-level merge driver to use when performing internal merge between common ancestors::__git_builtin_merge_drivers'
     'mergetool.*.path:path to use for the merge tool:absolute merge tool path:_files -g "*(*)"'
-    'mergetool.*.cmd:command to invoke for the merge tool:merge command:_path_commands'
+    'mergetool.*.cmd:command to invoke for the merge tool:merge command:_cmdstring'
     'mergetool.*.trustExitCode:trust the exit code of the merge tool::->bool:false'
     mergetool.keepBackup:'keep the original file with conflict markers::->bool:true'
     mergetool.keepTemporaries:'keep temporary files::->bool:false'
@@ -2237,8 +2234,8 @@ _git-config () {
     'remote.*.mirror:push with --mirror::->bool:false'
     'remote.*.skipDefaultUpdate:skip this remote by default::->bool:false'
     'remote.*.skipFetchAll:skip this remote by default::->bool:false'
-    'remote.*.receivepack:default program to execute on remote when pushing:git receive-pack command:_path_commands'
-    'remote.*.uploadpack:default program to execute on remote when fetching:git upload-pack command:_path_commands'
+    'remote.*.receivepack:default program to execute on remote when pushing:git receive-pack command:_cmdstring'
+    'remote.*.uploadpack:default program to execute on remote when fetching:git upload-pack command:_cmdstring'
     'remote.*.tagopt:options for retrieving remote tags::->remote.tagopt'
     'remote.*.vcs:interact with the remote through git-remote helper:remote VCS:->string'
     repack.usedeltabaseoffset:'use delta-base offsets::->bool:true'
@@ -2251,8 +2248,8 @@ _git-config () {
     sendemail.annotate:'review and edit each patch you are about to send::->bool:false'
     sendemail.bcc:'value of Bcc\: header::_email_addresses'
     sendemail.cc:'value of Cc\: header::_email_addresses'
-    sendemail.cccmd:'command to generate Cc\: header with:Cc\: command:_path_commands'
-    sendemail.toccmd:'command to generate To\: header with:To\: command:_path_commands'
+    sendemail.cccmd:'command to generate Cc\: header with:Cc\: command:_cmdstring'
+    sendemail.toccmd:'command to generate To\: header with:To\: command:_cmdstring'
     sendemail.chainreplyto:'send each email as a reply to the previous one::->bool:false'
     sendemail.confirm:'type of confirmation required before sending::->sendemail.confirm:auto'
     sendemail.envelopesender:'envelope sender to send emails as::_email_addresses'
@@ -2276,8 +2273,8 @@ _git-config () {
     'sendemail.*.annotate:review and edit each patch you are about to send::bool->false'
     'sendemail.*.bcc:value of Bcc\: header::_email_addresses'
     'sendemail.*.cc:value of Cc\: header::_email_addresses'
-    'sendemail.*.cccmd:command to generate Cc\: header with:Cc\: command:_path_commands'
-    'sendemail.*.tocmd:command to generate To\: header with:To\: command:_path_commands'
+    'sendemail.*.cccmd:command to generate Cc\: header with:Cc\: command:_cmdstring'
+    'sendemail.*.tocmd:command to generate To\: header with:To\: command:_cmdstring'
     'sendemail.*.chainreplyto:send each email as a reply to the previous one::->bool:false'
     'sendemail.*.confirm:type of confirmation required before sending::->sendemail.confirm:auto'
     'sendemail.*.envelopesender:envelope sender to send emails as::_email_addresses'
@@ -2296,7 +2293,7 @@ _git-config () {
     'sendemail.*.thread:set In-Reply-To\: and References\: headers::->bool:true'
     'sendemail.*.validate:perform sanity checks on patches::->bool:true'
     sendemail.assume8bitEncoding:'encoding to use for non-ASCII messages::__git_encodings'
-    sequence.editor:'text editor used by git rebase -i::_path_commands'
+    sequence.editor:'text editor used by git rebase -i::_cmdstring'
     showbranch.default:'default set of branches for git show-branch::->branch'
     status.relativePaths:'show paths relative to current directory::->bool:false'
     status.showUntrackedFiles:'show untracked files::->status.showUntrackedFiles:normal'
@@ -2331,7 +2328,7 @@ _git-config () {
     'svn-remote.*.branches:branch mappings:branch mapping:->string'
     'svn-remote.*.tags:tag mappings:tag mapping:->string'
     tag.sort:'Default sorting method:->string'
-    'tar.*.command:specify a shell command through which the tar output generated by git archive should be piped::_path_commands'
+    'tar.*.command:specify a shell command through which the tar output generated by git archive should be piped::_cmdstring'
     'tar.*.remote:enable <format> for use by remote clients via git-upload-archive::->bool'
     tar.umask:'umask to apply::->umask'
     transfer.unpackLimit:'default value for fetch.unpackLimit and receive.unpackLimit:unpack limit::->int:100'
@@ -2994,13 +2991,13 @@ _git-filter-branch () {
   # such.
   # TODO: * should be git-rev-arg and git-rev-list arguments.
   _arguments -S -A '-*' \
-    '--env-filter[filter for modifying environment in which commit will be performed]: :_path_commands' \
-    '--tree-filter[filter for rewriting tree and its contents]: :_path_commands' \
-    '--index-filter[filter for rewriting index]: :_path_commands' \
-    '--parent-filter[filter for rewriting parent list of commit]: :_path_commands' \
-    '--msg-filter[filter for rewriting commit messages]: :_path_commands' \
-    '--commit-filter[filter for rewriting commit]: :_path_commands' \
-    '--tag-name-filter[filter for rewriting tag names]: :_path_commands' \
+    '--env-filter[filter for modifying environment in which commit will be performed]: :_cmdstring' \
+    '--tree-filter[filter for rewriting tree and its contents]: :_cmdstring' \
+    '--index-filter[filter for rewriting index]: :_cmdstring' \
+    '--parent-filter[filter for rewriting parent list of commit]: :_cmdstring' \
+    '--msg-filter[filter for rewriting commit messages]: :_cmdstring' \
+    '--commit-filter[filter for rewriting commit]: :_cmdstring' \
+    '--tag-name-filter[filter for rewriting tag names]: :_cmdstring' \
     '--subdirectory-filter[only look at histor that touches given directory]: :_directories' \
     '--prune-empty[ignore empty generated commits]' \
     '--original[namespace where original commits will be stored]:namespace:_directories' \
@@ -3340,7 +3337,7 @@ _git-difftool () {
     '(-y --no-prompt --prompt)'{-y,--no-prompt}'[do not prompt before invocation of diff tool]' \
     '(-y --no-prompt)--prompt[prompt before invocation of diff tool]' \
     '(-t --tool -x --extcmd)'{-t,--tool=-}'[merge resolution program to use]: :__git_difftools' \
-    '(-t --tool -x --extcmd)'{-x,--extcmd=-}'[custom diff command to use]: :_path_commands' \
+    '(-t --tool -x --extcmd)'{-x,--extcmd=-}'[custom diff command to use]: :_cmdstring' \
     '--tool-help[print a list of diff tools that may be used with --tool]' \
     '(--symlinks)--no-symlinks[make copies of instead of symlinks to the working tree]' \
     '(---no-symlinks)--symlinks[make symlinks to instead of copies of the working tree]' \
@@ -3713,8 +3710,8 @@ _git-send-email () {
     '--smtp-ssl-cert-path=[path to ca-certificates (directory or file)]:ca certificates path:_files' \
     '--smtp-user=[specify user to use for SMTP-AUTH]:smtp user:_users' \
     '--smtp-debug=[enable or disable debug output]:smtp debug:((0\:"disable" 1\:"enable"))' \
-    '--cc-cmd=[specify command to generate Cc\: header with]:Cc\: command:_path_commands' \
-    '--to-cmd=[specify command to generate To\: header with]:To\: command:_path_commands' \
+    '--cc-cmd=[specify command to generate Cc\: header with]:Cc\: command:_cmdstring' \
+    '--to-cmd=[specify command to generate To\: header with]:To\: command:_cmdstring' \
     '(                 --no-chain-reply-to)--chain-reply-to[send each email as a reply to previous one]' \
     '(--chain-reply-to                    )--no-chain-reply-to[send all emails after first as replies to first one]' \
     '--identity=[specify configuration identity]: :__git_sendemail_identities' \
@@ -3805,7 +3802,7 @@ _git-svn () {
         '(                --no-follow-parent)--follow-parent[follow parent commit]'
         '(--follow-parent                   )--no-follow-parent[do not follow parent commit]'
         '(-A --authors-file)'{-A,--authors-file}'[specify author-conversion file]:author-conversion file:_files'
-        '--authors-prog=[program used to generate authors]: :_path_commands'
+        '--authors-prog=[program used to generate authors]: :_cmdstring'
         '(-q --quiet)'{-q,--quiet}'[make git-svn less verbose]'
         '--repack=[repack files (for given number of revisions)]:: :__git_guard_number "revision limit"'
         '(--repack-flags --repack-args --repack-opts)'{--repack-flags=,--repack-args=,--repack-opts=}'[flags to pass to git-repack]:git-repack flags'
@@ -3930,7 +3927,7 @@ _git-svn () {
             '--incremental[give output suitable for concatenation]'
             '--show-commit[output git commit SHA-1, as well]'
             '--color[undocumented]'
-            '--pager[undocumented]:pager:_path_commands'
+            '--pager[undocumented]:pager:_cmdstring'
             '--non-recursive[undocumented]')
           ;;
         (blame)

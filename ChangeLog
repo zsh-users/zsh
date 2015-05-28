@@ -1,3 +1,8 @@
+2015-05-28  Oliver Kiddle  <opk@zsh.org>
+
+	* 35315: Completion/Unix/Command/_git, Completion/X/Command/_matlab;
+	replace inappropriate uses of _path_commands
+
 2015-05-28  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35318: Doc/Zsh/builtins.yo, Doc/Zsh/options.yo, Src/builtin.c,
