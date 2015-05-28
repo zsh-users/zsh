@@ -1,3 +1,8 @@
+2015-05-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Han Pingtian: 35311: Doc/Zsh/zftpsys.yo: typo in zfuput
+	behaviour.
+
 2015-05-30  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Oliver Kiddle: 35310 (plus undo 35268 (git 899613f)):

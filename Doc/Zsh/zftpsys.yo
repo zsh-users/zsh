@@ -283,7 +283,7 @@ semantics, since `tt(/)' is used as a directory separator.
 )
 findex(zfuput)
 item(tt(zfuput) [ tt(-vs) ] var(file1) ...)(
-As tt(zfput), but only send files which are newer than their local
+As tt(zfput), but only send files which are newer than their remote
 equivalents, or if the remote file does not exist.  The logic is the same
 as for tt(zfuget), but reversed between local and remote files.
 )
