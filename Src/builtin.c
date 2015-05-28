@@ -4713,6 +4713,10 @@ bin_shift(char *name, char **argv, Options ops, UNUSED(int func))
     return ret;
 }
 
+/*
+ * Position of getopts option within OPTIND argument with multiple options.
+ */
+
 /**/
 int optcind;
 

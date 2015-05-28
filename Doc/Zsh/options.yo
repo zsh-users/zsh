@@ -2038,6 +2038,10 @@ tt(unset).
 In addition, various error conditions associated with the above builtins
 or tt(exec) cause a non-interactive shell to exit and an interactive
 shell to return to its top-level processing.
+
+Furthermore, the tt(getopts) builtin behaves in a POSIX-compatible
+fashion in that the associated variable tt(OPTIND) is not made
+local to functions.
 )
 pindex(POSIX_IDENTIFIERS)
 pindex(NO_POSIX_IDENTIFIERS)

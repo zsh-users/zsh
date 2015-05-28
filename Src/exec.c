@@ -4910,9 +4910,11 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     if (!(flags & PM_UNDEFINED))
 	scriptname = dupstring(name);
     oldzoptind = zoptind;
-    zoptind = 1;
     oldoptcind = optcind;
-    optcind = 0;
+    if (!isset(POSIXBUILTINS)) {
+	zoptind = 1;
+	optcind = 0;
+    }
 
     /* We need to save the current options even if LOCALOPTIONS is *
      * not currently set.  That's because if it gets set in the    *
@@ -5049,8 +5051,10 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	argzero = oargv0;
     }
     pparams = pptab;
-    optcind = oldoptcind;
-    zoptind = oldzoptind;
+    if (!isset(POSIXBUILTINS)) {
+	zoptind = oldzoptind;
+	optcind = oldoptcind;
+    }
     scriptname = oldscriptname;
     oflags = ooflags;
 
