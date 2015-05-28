@@ -1,3 +1,8 @@
+2015-05-28  Daniel Hahler  <zsh@thequod.de>
+
+	* 35098: Completion/Unix/Command/_git: provide --amend also with
+	"message" group.
+
 2015-05-28  Oliver Kiddle  <opk@zsh.org>
 
 	* 35315: Completion/Unix/Command/_git, Completion/X/Command/_matlab;

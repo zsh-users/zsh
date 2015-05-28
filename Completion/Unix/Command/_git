@@ -681,14 +681,14 @@ _git-commit () {
     '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=}'[GPG-sign the commit]::key id' \
     '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
     '(-a --all --interactive -o --only -i --include *)--interactive[interactively update paths in the index file]' \
+    $amend_opt \
     '*: :__git_ignore_line_inside_arguments __git_changed_files' \
     - '(message)' \
       {-C,--reuse-message=}'[use existing commit object with same log message]: :__git_commits' \
       {-c,--reedit-message=}'[use existing commit object and edit log message]: :__git_commits' \
       {-F,--file=}'[read commit message from given file]: :_files' \
       {-m,--message=}'[use the given message as the commit message]:message' \
-      {-t,--template=}'[use file as a template commit message]:template:_files' \
-      $amend_opt
+      {-t,--template=}'[use file as a template commit message]:template:_files'
 }
 
 (( $+functions[_git-describe] )) ||
