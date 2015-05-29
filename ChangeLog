@@ -1,5 +1,8 @@
 2015-05-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Han Pingtian: 35324: Functions/Zftp/zfget_match: better zfget
+	completion with paths.
+
 	* Han Pingtian: 35311: Doc/Zsh/zftpsys.yo: typo in zfuput
 	behaviour.
 
