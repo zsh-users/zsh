@@ -1,6 +1,6 @@
 2015-05-29  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* 20237: Src/Modules/parameter.c: $unctions[foo] shouldn't be
+	* 20237: Src/Modules/parameter.c: $functions[foo] shouldn't be
 	unmetafied when passed as parameter body.
 
 2015-05-28  Daniel Hahler  <zsh@thequod.de>
