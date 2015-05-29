@@ -410,11 +410,6 @@ getfunction(UNUSED(HashTable ht), const char *name, int dis)
 	    } else
 		h = dyncat(start, t);
 	    zsfree(t);
-	    /*
-	     * TBD: Is this unmetafy correct?  Surely as this
-	     * is a parameter value it stays metafied?
-	     */
-	    unmetafy(h, NULL);
 
 	    if (shf->redir) {
 		t = getpermtext(shf->redir, NULL, 1);

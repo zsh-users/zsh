@@ -1,3 +1,8 @@
+2015-05-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 20237: Src/Modules/parameter.c: $unctions[foo] shouldn't be
+	unmetafied when passed as parameter body.
+
 2015-05-28  Daniel Hahler  <zsh@thequod.de>
 
 	* 35098: Completion/Unix/Command/_git: provide --amend also with
