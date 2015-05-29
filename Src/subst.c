@@ -2170,7 +2170,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		     */
 		    || ((cc == '#' || cc == Pound) &&
 			s[2] == Outbrace)
-		    || cc == '-' || (cc == ':' && s[2] == '-')
+		    || (inbrace && (cc == '-' || (cc == ':' && s[2] == '-')))
 		    || (isstring(cc) && (s[2] == Inbrace || s[2] == Inpar)))) {
 	    getlen = 1 + whichlen, s++;
 	    /*

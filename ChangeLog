@@ -1,7 +1,10 @@
 2015-05-29  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* 20237: Src/Modules/parameter.c: $functions[foo] shouldn't be
-	unmetafied when passed as parameter body.
+	* 35326: Src/subst.c, Test/D04parameter.ztst: $#- was misparsed
+	as ${#-}.
+
+	* users/20237: Src/Modules/parameter.c: $functions[foo]
+	shouldn't be unmetafied when passed as parameter body.
 
 2015-05-28  Daniel Hahler  <zsh@thequod.de>
 

@@ -1703,3 +1703,8 @@
   funnychars='The qu*nk br!wan f@x j/mps o[]r \(e la~# ^"&;'
   [[ $funnychars = ${~${(b)funnychars}} ]]
 0:${(b)...} quoting protects from GLOB_SUBST
+
+  set --
+  print $#-1
+0:Avoid confusion after overloaded characters in braceless substitution
+>0-1
