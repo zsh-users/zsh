@@ -1,3 +1,9 @@
+2015-05-30  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* users/20238: Doc/Zsh/builtins.yo, Src/builtin.c: add "fc -L" to
+	operate only on the local shell history when history sharing is
+	in effect.  Also avoid invoking the editor on empty results.
+
 2015-05-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Han Pingtian: 35324: Functions/Zftp/zfget_match: better zfget

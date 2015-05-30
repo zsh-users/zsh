@@ -69,7 +69,7 @@ static struct builtin builtins[] =
      * But that's actually not useful, so it's more consistent to
      * cause an error.
      */
-    BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "aAdDe:EfiIlmnpPrRt:W", NULL),
+    BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "aAdDe:EfiIlLmnpPrRt:W", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
     BUILTIN("float", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "E:%F:%HL:%R:%Z:%ghlprtux", "E"),
     BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "kmMtTuUz", NULL),
@@ -81,7 +81,7 @@ static struct builtin builtins[] =
     BUILTIN("hashinfo", 0, bin_hashinfo, 0, 0, 0, NULL, NULL),
 #endif
 
-    BUILTIN("history", 0, bin_fc, 0, -1, BIN_FC, "adDEfimnpPrt:", "l"),
+    BUILTIN("history", 0, bin_fc, 0, -1, BIN_FC, "adDEfiLmnpPrt:", "l"),
     BUILTIN("integer", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "HL:%R:%Z:%ghi:%lprtux", "i"),
     BUILTIN("jobs", 0, bin_fg, 0, -1, BIN_JOBS, "dlpZrs", NULL),
     BUILTIN("kill", BINF_HANDLES_OPTS, bin_kill, 0, -1, 0, NULL, NULL),
@@ -104,7 +104,7 @@ static struct builtin builtins[] =
     BUILTIN("pushd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_PUSHD, "qsPL", NULL),
     BUILTIN("pushln", 0, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
-    BUILTIN("r", 0, bin_fc, 0, -1, BIN_R, "nrl", NULL),
+    BUILTIN("r", 0, bin_fc, 0, -1, BIN_R, "nrlL", NULL),
     BUILTIN("read", 0, bin_read, 0, -1, 0, "cd:ek:%lnpqrst:%zu:AE", NULL),
     BUILTIN("readonly", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%lptux", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "df", "r"),
@@ -1689,9 +1689,6 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
 	    fclose(f);
 	return 1;
     }
-    /* suppress "no substitution" warning if no substitution is requested */
-    if (!subs)
-	fclistdone = 1;
 
     ent = gethistent(first, first < last? GETHIST_DOWNWARD : GETHIST_UPWARD);
     if (!ent || (first < last? ent->histnum > last : ent->histnum < last)) {
@@ -1726,11 +1723,14 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
     }
 
     for (;;) {
-	s = dupstring(ent->node.nam);
+	if (!OPT_ISSET(ops,'L') || !(ent->node.flags & HIST_FOREIGN))
+	    s = dupstring(ent->node.nam);
+	else
+	    s = NULL;
 	/* this if does the pattern matching, if required */
-	if (!pprog || pattry(pprog, s)) {
+	if (s && (!pprog || pattry(pprog, s))) {
 	    /* perform substitution */
-	    fclistdone |= fcsubs(&s, subs);
+	    fclistdone |= (subs ? fcsubs(&s, subs) : 1);
 
 	    /* do numbering */
 	    if (!OPT_ISSET(ops,'n')) {
@@ -1780,7 +1780,10 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
     if (f != stdout)
 	fclose(f);
     if (!fclistdone) {
-	zwarnnam("fc", "no substitutions performed");
+	if (subs)
+	    zwarnnam("fc", "no substitutions performed");
+	else if (OPT_ISSET(ops,'L') || pprog)
+	    zwarnnam("fc", "no matching events found");
 	return 1;
     }
     return 0;
