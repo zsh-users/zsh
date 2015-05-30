@@ -1,3 +1,8 @@
+2015-05-30  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Oliver Kiddle: 35310 (plus undo 35268 (git 899613f)):
+	Completion/Base/Utility/_store_cache: fix quoting of cached arrays
+
 2015-05-29  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35326: Src/subst.c, Test/D04parameter.ztst: $#- was misparsed
@@ -52,9 +57,10 @@
 
 2015-05-26  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* see 35268: revert 34476 (ae7dcab) as it seems to be having
-	effects beyond the intended optimisation of completion caching.
-	To be investigated further after the release.
+	* see 35268: Completion/Base/Utility/_store_cache: revert 34476
+	(ae7dcab) as it seems to be having effects beyond the intended
+	optimisation of completion caching.  To be investigated further
+	after the release.
 
 	* Han Pingtian: 35295: Functions/Zftp/zfcd_match: be more
 	inventive zftp directory listing.

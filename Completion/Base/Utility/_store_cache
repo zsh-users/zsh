@@ -46,8 +46,15 @@ if zstyle -t ":completion:${curcontext}:" use-cache; then
   for var; do
     case ${(Pt)var} in
     (*readonly*) ;;
-    (*(association|array)*) print -r "$var=( ${(kv@Pqq)^^var} )";;
-    (*)                     print -r "$var=${(Pqq)^^var}";;
+    (*(association|array)*)
+	# Dump the array as a here-document to reduce parsing overhead
+	# when reloading the cache with "source" from _retrieve_cache
+	print -r "$var=( "'${(Q)"${(z)$(<<\EO:'"$var"
+	print -r "${(kv@Pqq)^^var}"
+	print -r "EO:$var"
+	print -r ')}"} )'
+	;;
+    (*) print -r "$var=${(Pqq)^^var}";;
     esac
   done >! "$_cache_dir/$_cache_ident"
 else
