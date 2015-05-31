@@ -777,6 +777,13 @@ This has the side-effect that joining is skipped even in quoted
 forms, which may affect other sub-expressions in var(spec).
 Note that `tt(^)', `tt(=)', and `tt(~)', below, must appear
 to the left of `tt(#)' when these forms are combined.
+
+If the option tt(POSIX_IDENTIFIERS) is not set, and var(spec) is a
+simple name, then the braces are optional; this is true even
+for special parameters so e.g. tt($#-) and tt($#*) take the length
+of the string tt($-) and the array tt($*) respectively.  If
+tt(POSIX_IDENTIFIERS) is set, then braces are required for
+the tt(#) to be treated in this fashion.
 )
 item(tt(${^)var(spec)tt(}))(
 pindex(RC_EXPAND_PARAM, toggle)

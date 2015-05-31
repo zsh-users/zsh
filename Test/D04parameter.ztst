@@ -1704,7 +1704,10 @@
   [[ $funnychars = ${~${(b)funnychars}} ]]
 0:${(b)...} quoting protects from GLOB_SUBST
 
-  set --
-  print $#-1
-0:Avoid confusion after overloaded characters in braceless substitution
+  set -- foo
+  echo $(( $#*3 ))
+  emulate sh -c 'nolenwithoutbrace() { echo $#-1; }'
+  nolenwithoutbrace
+0:Avoid confusion after overloaded characters in braceless substitution in sh
+>13
 >0-1

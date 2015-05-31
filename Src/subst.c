@@ -2156,6 +2156,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		    nojoin = !(ifs && *ifs);
 	    }
 	} else if ((c == '#' || c == Pound) &&
+		   (inbrace || !isset(POSIXIDENTIFIERS)) &&
 		   (itype_end(s+1, IIDENT, 0) != s + 1
 		    || (cc = s[1]) == '*' || cc == Star || cc == '@'
 		    || cc == '?' || cc == Quest
@@ -2170,7 +2171,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		     */
 		    || ((cc == '#' || cc == Pound) &&
 			s[2] == Outbrace)
-		    || (inbrace && (cc == '-' || (cc == ':' && s[2] == '-')))
+		    || cc == '-' || (cc == ':' && s[2] == '-')
 		    || (isstring(cc) && (s[2] == Inbrace || s[2] == Inpar)))) {
 	    getlen = 1 + whichlen, s++;
 	    /*
