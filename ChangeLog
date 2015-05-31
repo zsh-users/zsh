@@ -1,5 +1,7 @@
 2015-05-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Config/version.mk: release 5.0.8, finally.
+
 	* 35343: Doc/Zsh/expn.yo, Doc/Zsh/options.yo, Src/subst.c,
 	Test/D04parameter.ztst: $#foo for any valid identifier
 	is only the length of foo if POSIX_IDENTIFIERS is not set.

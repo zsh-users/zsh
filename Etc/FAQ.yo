@@ -55,10 +55,10 @@ myreport(Z-Shell Frequently-Asked Questions)(Peter Stephenson)(2010/02/15)
 COMMENT(-- the following are for Usenet and must appear first)\
 description(\
 mydit(Archive-Name:) unix-faq/shell/zsh
-mydit(Last-Modified:) 2012/06/15
+mydit(Last-Modified:) 2015/05/31
 mydit(Submitted-By:) email(coordinator@zsh.org (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
-mydit(Copyright:) (C) P.W. Stephenson, 1995--2010 (see end of document)
+mydit(Copyright:) (C) P.W. Stephenson, 1995--2015 (see end of document)
 )
 
 This document contains a list of frequently-asked (or otherwise
