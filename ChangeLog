@@ -1,5 +1,9 @@
 2015-06-02  Oliver Kiddle  <opk@zsh.org>
 
+	* 35356: Completion/Unix/Type/_ttys, Completion/Unix/Command/_ps,
+	Completion/Unix/Command/_last, Completion/Unix/Command/_pgrep,
+	Completion/Unix/Command/_gdb: factor out completion of tty devices
+
 	* Adrien Vergé: 35352 (tweaked): Completion/Redhat/Command/_dnf:
 	completion for new Redhat package manager
 

@@ -1,0 +1,19 @@
+#autoload
+
+# Options:
+#
+# -d  strip /dev/ prefix from matches
+# -D  matches allowed with or without /dev/ prefix
+
+local -a ttys expl pre
+local stripdev optdev
+
+zparseopts -D -K -E d=stripdev D=optdev
+
+ttys=( /dev/tty?*(N) /dev/pts/^ptmx(N) )
+ttys=( ${ttys#/dev/} )
+[[ -z $stripdev ]] && pre=( -p /dev/ )
+
+_description ttys expl 'tty'
+[[ -n $optdev ]] && compadd "$@" "$expl[@]" -M 'r:|/=* r:|=*' -a ttys && return
+compadd "$@" "$expl[@]" "$pre[@]" -M 'r:|/=* r:|=*' -a ttys

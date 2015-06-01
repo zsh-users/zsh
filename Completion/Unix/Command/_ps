@@ -31,7 +31,7 @@ args=(
   '*-G+[select processes by real group]:group:_sequence -s , _groups'
   '*-g+[select processes by effective group or session]:group:_sequence -s , _groups'
   '*-s+[select processes by session leaders]:session leader:_sequence -s , _pids'
-  '*-t+[select processes by attached terminal]:tty:_sequence -s , compadd - /dev/pts/<->(N\:s/\\/dev\\//) /dev/tty*(N\:t)'
+  '*-t+[select processes by attached terminal]:tty:_sequence -s , _ttys -D'
   '*-u+[select processes by effective user]:user:_sequence -s , _users'
   '*-U+[select processes by real user]:user:_sequence -s , _users'
   '-o+[specify output format]:property:_sequence -s , _ps_props -'
@@ -163,8 +163,7 @@ if (( CURRENT > 1 )) && [[ $OSTYPE != solaris* || ( $OSTYPE = linux-gnu && $word
     *J) _sequence _jails -0 && return ;;
     *[MNW]) _files && return ;;
     *t)
-      _wanted -C option-t-1 ttys expl tty _sequence -s , \
-	  compadd - /dev/pts/<->(N\:s/\\/dev\\//) /dev/tty*(N\:t) && return
+      _wanted -C option-t-1 ttys expl tty _sequence -s , _ttys -D && return
     ;;
     *p) _wanted -C option-p-1 processes expl 'process ID' _sequence -s , _pids && return;;
     *U) _wanted -C option-U-1 users expl user _sequence -s , _users && return ;;

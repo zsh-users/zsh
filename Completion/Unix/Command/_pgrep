@@ -13,7 +13,7 @@ arguments=('-P[parent process id]:parent process id:->ppid'
      '-M[extract the name list from the specified core]:files:_files'
      '-N[extract the name list from the specified system]:files:_files'
      '-s[match only session id]:session id:->sid'
-     '-t[match only controlled by terminal]:terminal device:->tty'
+     '-t[match only controlled by terminal]:terminal device:_sequence _ttys -d'
      '-T[match only in processes specified routing table in rtable]'
      '-u[match only effective user id]:user:_users'
      '-U[match only real user id]:user:_users'
@@ -69,12 +69,6 @@ arguments=( ${(M)arguments:#(|\*)(|\(*\))-[$optchars]*}
 _arguments -C -s -w $arguments && ret=0
 
 case $state in
-  (tty)
-    local -a ttys
-    ttys=( /dev/tty*(N) /dev/pts/*(N) )
-    _sequence -s , _wanted tty expl 'terminal device' compadd - ${ttys#/dev/}
-    ;;
-
   (sid)
     if [[ $OSTYPE == openbsd* ]]; then
       break
