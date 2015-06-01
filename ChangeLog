@@ -1,3 +1,8 @@
+2015-06-01  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted: Config/version.mk: update to 5.0.8-dev-0 so
+	dev installs don't trash release.
+
 2015-05-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk: release 5.0.8, finally.
