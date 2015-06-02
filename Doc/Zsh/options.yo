@@ -2057,7 +2057,7 @@ of shell parameters and modules).
 In addition, setting this option limits the effect of parameter
 substitution with no braces, so that the expression tt($#) is treated as
 the parameter tt($#) even if followed by a valid parameter name.
-When it is unset, zsh allows expresions of the form tt($#)var(name)
+When it is unset, zsh allows expressions of the form tt($#)var(name)
 to refer to the length of tt($)var(name), even for special variables,
 for example in expressions such as tt($#-) and tt($#*).
 
