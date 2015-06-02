@@ -1,5 +1,8 @@
 2015-06-02  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Baptiste Daroussin: 35357: Src/Modules/zpty.c:
+	HAVE_POSIX_OPENPT is needed for FreeBSD zpty.
+
 	* 35353: Doc/Zsh/builtins.yo, Src/builtin.c, Src/utils.c,
 	Test/B03print.ztst: print -x and print -X expand tabs.
 

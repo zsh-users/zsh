@@ -154,7 +154,7 @@ getptycmd(char *name)
     return NULL;
 }
 
-#ifdef USE_DEV_PTMX
+#if defined(USE_DEV_PTMX) || defined(HAVE_POSIX_OPENPT)
 
 #ifdef HAVE_SYS_STROPTS_H
 #include <sys/stropts.h>
