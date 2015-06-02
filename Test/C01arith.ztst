@@ -69,11 +69,11 @@
 
   print $(( 3 ? 2 ))
 1:parsing ternary (1)
-?(eval):1: ':' expected
+?(eval):1: bad math expression: ':' expected
 
   print $(( 3 ? 2 : 1 : 4 ))
 1:parsing ternary (2)
-?(eval):1: ':' without '?'
+?(eval):1: bad math expression: ':' without '?'
 
   print $(( 0, 4 ? 3 : 1, 5 ))
 0:comma operator
@@ -86,7 +86,7 @@
 
   print $((##))
 1:## without following character
-?(eval):1: character missing after ##
+?(eval):1: bad math expression: character missing after ##
 
   print $((## ))
 0:## followed by a space
@@ -126,7 +126,7 @@
 
   print $(( 13 = 42 ))
 1:bad lvalue
-?(eval):1: lvalue required
+?(eval):1: bad math expression: lvalue required
 
   x=/bar
   (( x = 32 ))
@@ -395,3 +395,17 @@
 >6
 >7
 >120
+
+  foo="(1)"
+  print $((foo))
+  print $(($foo))
+  print $(((2)))
+  foo="3)"
+  (print $((foo))) 2>&1
+  (print $(($foo))) 2>&1
+1: Good and bad trailing parentheses
+>1
+>1
+>2
+>(eval):6: bad math expression: unexpected ')'
+>(eval):7: bad math expression: unexpected ')'

@@ -1,5 +1,10 @@
 2015-06-02  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35359 (plus changed error strings in tests): Src/math.c,
+	Test/C01arith.ztst: fix math parsing problem that trailing ")"
+	wasn't detected; also improve error messages to indicate they
+	refer to math expressions.
+
 	* Baptiste Daroussin: 35357: Src/Modules/zpty.c:
 	HAVE_POSIX_OPENPT is needed for FreeBSD zpty.
 
