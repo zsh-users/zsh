@@ -99,7 +99,7 @@ static struct builtin builtins[] =
 #endif
 
     BUILTIN("popd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 1, BIN_POPD, "q", NULL),
-    BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "abcC:Df:ilmnNoOpPrRsSu:z-", NULL),
+    BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "abcC:Df:ilmnNoOpPrRsSu:x:X:z-", NULL),
     BUILTIN("printf", 0, bin_print, 1, -1, BIN_PRINTF, NULL, NULL),
     BUILTIN("pushd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_PUSHD, "qsPL", NULL),
     BUILTIN("pushln", 0, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
@@ -4208,11 +4208,40 @@ bin_print(char *name, char **args, Options ops, int func)
 	    return 0;
 	}
 
-	for (; *args; args++, len++) {
-	    fwrite(*args, *len, 1, fout);
-	    if (args[1])
-		fputc(OPT_ISSET(ops,'l') ? '\n' :
-		      OPT_ISSET(ops,'N') ? '\0' : ' ', fout);
+	if (OPT_HASARG(ops, 'x') || OPT_HASARG(ops, 'X')) {
+	    char *eptr;
+	    int expand, startpos = 0;
+	    int all = OPT_HASARG(ops, 'X');
+	    char *xarg = all ? OPT_ARG(ops, 'X') : OPT_ARG(ops, 'x');
+
+	    expand = (int)zstrtol(xarg, &eptr, 10);
+	    if (*eptr || expand <= 0) {
+		zwarnnam(name, "positive integer expected after -%c: %s", 'x',
+			 xarg);
+		return 1;
+	    }
+	    for (; *args; args++, len++) {
+		startpos = zexpandtabs(*args, *len, expand, startpos, fout,
+				       all);
+		if (args[1]) {
+		    if (OPT_ISSET(ops, 'l')) {
+			fputc('\n', fout);
+			startpos = 0;
+		    } else if (OPT_ISSET(ops,'N')) {
+			fputc('\0', fout);
+		    } else {
+			fputc(' ', fout);
+			startpos++;
+		    }
+		}
+	    }
+	} else {
+	    for (; *args; args++, len++) {
+		fwrite(*args, *len, 1, fout);
+		if (args[1])
+		    fputc(OPT_ISSET(ops,'l') ? '\n' :
+			  OPT_ISSET(ops,'N') ? '\0' : ' ', fout);
+	    }
 	}
 	if (!(OPT_ISSET(ops,'n') || nnl))
 	    fputc(OPT_ISSET(ops,'N') ? '\0' : '\n', fout);

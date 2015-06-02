@@ -1106,7 +1106,7 @@ tt(popd) that do not change the environment seen by an interactive user.
 )
 findex(print)
 xitem(tt(print )[ tt(-abcDilmnNoOpPrsSz) ] [ tt(-u) var(n) ] [ tt(-f) var(format) ] [ tt(-C) var(cols) ])
-item(SPACES()[ tt(-R) [ tt(-en) ]] [ var(arg) ... ])(
+item(SPACES()[ tt(-xX) var(tab-stop) ] [ tt(-R) [ tt(-en) ]] [ var(arg) ... ])(
 With the `tt(-f)' option the arguments are printed as described by tt(printf).
 With no flags or with the flag `tt(-)', the arguments are printed on
 the standard output as described by tt(echo), with the following differences:
@@ -1200,6 +1200,27 @@ tt(HIST_LEX_WORDS) option active.
 )
 item(tt(-u) var(n))(
 Print the arguments to file descriptor var(n).
+)
+item(tt(-x) var(tab-stop))(
+Expand leading tabs on each line of output in the printed string
+assuming a tab stop every var(tab-stop) characters.  This is appropriate
+for formatting code that may be indented with tabs.  Note that leading
+tabs of any argument to print, not just the first, are expanded, even if
+tt(print) is using spaces to separate arguments (the column count
+is maintained across arguments but may be incorrect on output
+owing to previous unexpanded tabs).
+
+The start of the output of each print command is assumed to be aligned
+with a tab stop.  Widths of multibyte characters are handled if the
+option tt(MULTIBYTE) is in effect.  This option is ignored if other
+formatting options are in effect, namely column alignment or
+tt(printf) style, or if output is to a special location such as shell
+history or the command line editor.
+)
+item(tt(-X) var(tab-stop))(
+This is similar to tt(-x), except that all tabs in the printed string
+are expanded.  This is appropriate if tabs in the arguments are
+being used to produce a table format.
 )
 item(tt(-z))(
 Push the arguments onto the editing buffer stack, separated by spaces.

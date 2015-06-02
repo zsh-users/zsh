@@ -1,3 +1,8 @@
+2015-06-02  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35353: Doc/Zsh/builtins.yo, Src/builtin.c, Src/utils.c,
+	Test/B03print.ztst: print -x and print -X expand tabs.
+
 2015-06-02  Oliver Kiddle  <opk@zsh.org>
 
 	* 35356: Completion/Unix/Type/_ttys, Completion/Unix/Command/_ps,

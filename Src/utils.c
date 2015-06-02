@@ -4964,6 +4964,108 @@ metacharlenconv(const char *x, int *c)
 /**/
 #endif /* MULTIBYTE_SUPPORT */
 
+/*
+ * Expand tabs to given width, with given starting position on line.
+ * len is length of unmetafied string in bytes.
+ * Output to fout.
+ * Return the end position on the line, i.e. if this is 0 modulo width
+ * the next character is aligned with a tab stop.
+ *
+ * If all is set, all tabs are expanded, else only leading tabs.
+ */
+
+/**/
+mod_export int
+zexpandtabs(const char *s, int len, int width, int startpos, FILE *fout,
+	    int all)
+{
+    int at_start = 1;
+
+#ifdef MULTIBYTE_SUPPORT
+    mbstate_t mbs;
+    size_t ret;
+    wchar_t wc;
+
+    memset(&mbs, 0, sizeof(mbs));
+#endif
+
+    while (len) {
+	if (*s == '\t') {
+	    if (all || at_start) {
+		s++;
+		len--;
+		if (width <= 0 || !(startpos % width)) {
+		    /* always output at least one space */
+		    fputc(' ', fout);
+		    startpos++;
+		}
+		if (width <= 0)
+		    continue;	/* paranoia */
+		while (startpos % width) {
+		    fputc(' ', fout);
+		    startpos++;
+		}
+	    } else {
+		/*
+		 * Leave tab alone.
+		 * Guess width to apply... we might get this wrong.
+		 * This is only needed if there's a following string
+		 * that needs tabs expanding, which is unusual.
+		 */
+		startpos += width - startpos % width;
+		s++;
+		len--;
+		fputc('\t', fout);
+	    }
+	    continue;
+	} else if (*s == '\n' || *s == '\r') {
+	    fputc(*s, fout);
+	    s++;
+	    len--;
+	    startpos = 0;
+	    at_start = 1;
+	    continue;
+	}
+
+	at_start = 0;
+#ifdef MULTIBYTE_SUPPORT
+	if (isset(MULTIBYTE)) {
+	    const char *sstart = s;
+	    ret = mbrtowc(&wc, s, len, &mbs);
+	    if (ret == MB_INVALID) {
+		/* Assume single character per character */
+		memset(&mbs, 0, sizeof(mbs));
+		s++;
+		len--;
+	    } else if (ret == MB_INCOMPLETE) {
+		/* incomplete at end --- assume likewise, best we've got */
+		s++;
+		len--;
+	    } else {
+		s += ret;
+		len -= (int)ret;
+	    }
+	    if (ret == MB_INVALID || ret == MB_INCOMPLETE) {
+		startpos++;
+	    } else {
+		int wcw = WCWIDTH(wc);
+		if (wcw > 0)	/* paranoia */
+		    startpos += wcw;
+	    }
+	    fwrite(sstart, s - sstart, 1, fout);
+
+	    continue;
+	}
+#endif /* MULTIBYTE_SUPPORT */
+	fputc(*s, fout);
+	s++;
+	len--;
+	startpos++;
+    }
+
+    return startpos;
+}
+
 /* check for special characters in the string */
 
 /**/

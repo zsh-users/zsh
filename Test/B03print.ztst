@@ -284,3 +284,16 @@
 >610062
 >6100
 >61
+
+ foo=$'one\ttwo\tthree\tfour\n'
+ foo+=$'\tone\ttwo\tthree\tfour\n'
+ foo+=$'\t\tone\t\ttwo\t\tthree\t\tfour'
+ print -x4 $foo
+ print -X4 $foo
+0:Tab expansion by print
+>one	two	three	four
+>    one	two	three	four
+>        one		two		three		four
+>one two three   four
+>    one two three   four
+>        one     two     three       four
