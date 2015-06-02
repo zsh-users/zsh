@@ -1,3 +1,8 @@
+2015-06-02  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/20243: Completion/compinit: turn off GLOB_ASSIGN in
+	completion system.
+
 2015-06-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 35270: Completion/Base/Utility/_describe: _describe: Document
