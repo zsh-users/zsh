@@ -419,20 +419,39 @@
 >worldliness
 >world
 
- integer i n x
+ (integer i n x
  float f
  setopt globassign
  i=tmpfile1
- n=tmp*
+ n=tmpf*
  x=*2
  f=2+2
- typeset -p i n x f
+ typeset -p i n x f)
 0:GLOB_ASSIGN with numeric types
 >typeset -i i=0
 >typeset -a n
 >n=(tmpfile1 tmpfile2)
 >typeset x=tmpfile2
 >typeset -E f=4.000000000e+00
+
+  setopt globassign
+  foo=tmpf*
+  print $foo
+  unsetopt globassign
+  foo=tmpf*
+  print $foo
+0:GLOB_ASSIGN option
+>tmpfile1 tmpfile2
+>tmpf*
+
+  (setopt globassign
+  typeset -A foo
+  touch gatest1 gatest2
+  foo=(gatest*)
+  print ${(t)foo}
+  rm -rf gatest*)
+0:GLOB_ASSIGN doesn't monkey with type if not scalar assignment.
+>association-local
 
  A=(first second)
  A="${A[*]}" /bin/sh -c 'echo $A'

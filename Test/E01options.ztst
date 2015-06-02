@@ -473,15 +473,7 @@
 >outside2 scalar
 >inside3 scalar-export
 
-  setopt globassign
-  foo=tmp*
-  print $foo
-  unsetopt globassign
-  foo=tmp*
-  print $foo
-0:GLOB_ASSIGN option
->tmpcd tmpfile1 tmpfile2
->tmp*
+# GLOB_ASSIGN is tested in A06assign.ztst.
 
   mkdir onlysomefiles
   touch onlysomefiles/.thisfile onlysomefiles/thatfile

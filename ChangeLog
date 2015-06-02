@@ -1,3 +1,8 @@
+2015-06-02  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35369: Test/A06assign.ztst, Test/E01options.ztst: better
+	GLOB_ASSIGN testing.
+
 2015-06-02  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 35365: Src/exec.c: GLOB_ASSIGN should only affect scalar
