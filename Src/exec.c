@@ -2264,14 +2264,14 @@ addvars(Estate state, Wordcode pc, int addflags)
 		state->pc = opc;
 		return;
 	    }
-	    if (!isstr || (isset(GLOBASSIGN) &&
+	    if (!isstr || (isset(GLOBASSIGN) && isstr &&
 			   haswilds((char *)getdata(firstnode(vl))))) {
 		globlist(vl, 0);
 		/* Unset the parameter to force it to be recreated
 		 * as either scalar or array depending on how many
 		 * matches were found for the glob.
 		 */
-		if (isset(GLOBASSIGN))
+		if (isset(GLOBASSIGN) && isstr)
 		    unsetparam(name);
 	    }
 	    if (errflag) {
