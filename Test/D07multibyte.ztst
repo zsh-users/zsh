@@ -475,3 +475,12 @@
   . ./test_bad_param)
 127:Invalid parameter name with following tokenized input
 ?./test_bad_param:1: command not found: $\M-i#
+
+  lines=$'one\tＺＳＨ\tthree\nfour\tfive\tsix'
+  print -X8 -r -- $lines
+0:Tab expansion with extra-wide characters
+>one     ＺＳＨ  three
+>four    five    six
+# This doesn't look aligned in my editor because actually the characters
+# aren't quite double width, but the arithmetic is correct.
+# It appears just to be an effect of the font.

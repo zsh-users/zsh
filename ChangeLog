@@ -1,3 +1,8 @@
+2015-06-03  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35374: Test/D07multibyte.ztst: add tab expansion test with
+	double width characters.
+
 2015-06-02  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35369: Test/A06assign.ztst, Test/E01options.ztst: better
