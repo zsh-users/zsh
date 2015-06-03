@@ -1,3 +1,8 @@
+2015-06-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 35360 (replacing 35357): configure.ac, Src/Modules/zpty.c:
+	fix for configuring zpty on FreeBSD without pty.ko loaded
+
 2015-06-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35374: Test/D07multibyte.ztst: add tab expansion test with

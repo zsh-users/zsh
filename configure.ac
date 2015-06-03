@@ -2526,7 +2526,7 @@ dnl these is by defining _GNU_SOURCE.
 dnl -------
 AH_TEMPLATE([USE_DEV_PTMX],
 [Define to 1 if all the kit for using /dev/ptmx for ptys is available.])
-if test x$ac_cv_have_dev_ptmx = xyes && \
+if test x$ac_cv_have_dev_ptmx = xyes -o x$ac_cv_func_posix_openpt = xyes && \
    test x$ac_cv_func_grantpt = xyes && \
    test x$ac_cv_func_unlockpt = xyes && \
    test x$ac_cv_func_ptsname = xyes; then
