@@ -4471,15 +4471,45 @@ ztrlen(char const *s)
     for (l = 0; *s; l++) {
 	if (*s++ == Meta) {
 #ifdef DEBUG
-	    if (! *s)
+	    if (! *s) {
 		fprintf(stderr, "BUG: unexpected end of string in ztrlen()\n");
-	    else
+		break;
+	    } else
 #endif
 	    s++;
 	}
     }
     return l;
 }
+
+#ifndef MULTIBYTE_SUPPORT
+/*
+ * ztrlen() but with explicit end point for non-null-terminated
+ * segments.  eptr may not be NULL.
+ */
+
+/**/
+mod_export int
+ztrlenend(char const *s, char const *eptr)
+{
+    int l;
+
+    for (l = 0; s < eptr; l++) {
+	if (*s++ == Meta) {
+#ifdef DEBUG
+	    if (! *s) {
+		fprintf(stderr,
+			"BUG: unexpected end of string in ztrlenend()\n");
+		break;
+	    } else
+#endif
+	    s++;
+	}
+    }
+    return l;
+}
+
+#endif /* MULTIBYTE_SUPPORT */
 
 /* Subtract two pointers in a metafied string. */
 
@@ -4879,11 +4909,16 @@ mb_metacharlenconv(const char *s, wint_t *wcp)
  * If width is 1, return total character width rather than number.
  * If width is greater than 1, return 1 if character has non-zero width,
  * else 0.
+ *
+ * Ends if either *ptr is '\0', the normal case (eptr may be NULL for
+ * this), or ptr is eptr (i.e.  *eptr is where the null would be if null
+ * terminated) for strings not delimited by nulls --- note these are
+ * still metafied.
  */
 
 /**/
 mod_export int
-mb_metastrlen(char *ptr, int width)
+mb_metastrlenend(char *ptr, int width, char *eptr)
 {
     char inchar, *laststart;
     size_t ret;
@@ -4898,7 +4933,7 @@ mb_metastrlen(char *ptr, int width)
     num = num_in_char = 0;
 
     memset(&mb_shiftstate, 0, sizeof(mb_shiftstate));
-    while (*ptr) {
+    while (*ptr && !(eptr && ptr >= eptr)) {
 	if (*ptr == Meta)
 	    inchar = *++ptr ^ 32;
 	else

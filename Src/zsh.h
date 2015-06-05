@@ -2926,9 +2926,11 @@ enum {
 typedef wint_t convchar_t;
 #define MB_METACHARLENCONV(str, cp)	mb_metacharlenconv((str), (cp))
 #define MB_METACHARLEN(str)	mb_metacharlenconv(str, NULL)
-#define MB_METASTRLEN(str)	mb_metastrlen(str, 0)
-#define MB_METASTRWIDTH(str)	mb_metastrlen(str, 1)
-#define MB_METASTRLEN2(str, widthp)	mb_metastrlen(str, widthp)
+#define MB_METASTRLEN(str)	mb_metastrlenend(str, 0, NULL)
+#define MB_METASTRWIDTH(str)	mb_metastrlenend(str, 1, NULL)
+#define MB_METASTRLEN2(str, widthp)	mb_metastrlenend(str, widthp, NULL)
+#define MB_METASTRLEN2END(str, widthp, eptr)	\
+    mb_metastrlenend(str, widthp, eptr)
 
 /*
  * We replace broken implementations with one that uses Unicode
@@ -3011,6 +3013,7 @@ typedef int convchar_t;
 #define MB_METASTRLEN(str)	ztrlen(str)
 #define MB_METASTRWIDTH(str)	ztrlen(str)
 #define MB_METASTRLEN2(str, widthp)	ztrlen(str)
+#define MB_METASTRLEN2END(str, widthp, eptr)	ztrlenend(str, eptr)
 
 #define WCWIDTH_WINT(c)	(1)
 

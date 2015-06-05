@@ -2202,20 +2202,15 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalen,
 		if ((patglobflags & GF_MATCHREF) &&
 		    !(patflags & PAT_FILE)) {
 		    char *str = ztrduppfx(patinstart, patinlen);
-		    char *ptr = patinstart;
-		    int mlen = 0;
+		    int mlen;
 
 		    /*
 		     * Count the characters.  We're not using CHARSUB()
-		     * because the string is still metafied.  We're
-		     * not using mb_metastrlen() because that expects
-		     * the string to be null terminated.
+		     * because the string is still metafied.
 		     */
 		    MB_METACHARINIT();
-		    while (ptr < patinstart + patinlen) {
-			mlen++;
-			ptr += MB_METACHARLEN(ptr);
-		    }
+		    mlen = MB_METASTRLEN2END(patinstart, 0,
+					     patinstart + patinlen);
 
 		    setsparam("MATCH", str);
 		    setiparam("MBEGIN",

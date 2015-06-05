@@ -72,7 +72,7 @@ static struct builtin builtins[] =
     BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "aAdDe:EfiIlLmnpPrRt:W", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
     BUILTIN("float", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "E:%F:%HL:%R:%Z:%ghlprtux", "E"),
-    BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "kmMtTuUz", NULL),
+    BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "kmMtTuUx:z", NULL),
     BUILTIN("getln", 0, bin_read, 0, -1, 0, "ecnAlE", "zr"),
     BUILTIN("getopts", 0, bin_getopts, 2, -1, 0, NULL, NULL),
     BUILTIN("hash", BINF_MAGICEQUALS, bin_hash, 0, -1, 0, "Ldfmrv", NULL),
@@ -128,9 +128,9 @@ static struct builtin builtins[] =
     BUILTIN("unset", BINF_PSPECIAL, bin_unset, 1, -1, 0, "fmv", NULL),
     BUILTIN("unsetopt", 0, bin_setopt, 0, -1, BIN_UNSETOPT, NULL, NULL),
     BUILTIN("wait", 0, bin_fg, 0, -1, BIN_WAIT, NULL, NULL),
-    BUILTIN("whence", 0, bin_whence, 0, -1, 0, "acmpvfsSw", NULL),
-    BUILTIN("where", 0, bin_whence, 0, -1, 0, "pmsSw", "ca"),
-    BUILTIN("which", 0, bin_whence, 0, -1, 0, "ampsSw", "c"),
+    BUILTIN("whence", 0, bin_whence, 0, -1, 0, "acmpvfsSwx:", NULL),
+    BUILTIN("where", 0, bin_whence, 0, -1, 0, "pmsSwx:", "ca"),
+    BUILTIN("which", 0, bin_whence, 0, -1, 0, "ampsSwx:", "c"),
     BUILTIN("zmodload", 0, bin_zmodload, 0, -1, 0, "AFRILP:abcfdilmpue", NULL),
     BUILTIN("zcompile", 0, bin_zcompile, 0, -1, 0, "tUMRcmzka", NULL),
 };
@@ -2749,7 +2749,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
     Patprog pprog;
     Shfunc shf;
     int i, returnval = 0;
-    int on = 0, off = 0, pflags = 0, roff;
+    int on = 0, off = 0, pflags = 0, roff, expand = 0;
 
     /* Do we have any flags defined? */
     if (OPT_PLUS(ops,'u'))
@@ -2785,9 +2785,21 @@ bin_functions(char *name, char **argv, Options ops, int func)
     }
 
     if ((off & PM_UNDEFINED) || (OPT_ISSET(ops,'k') && OPT_ISSET(ops,'z')) ||
+	(OPT_ISSET(ops,'x') && !OPT_HASARG(ops,'x')) ||
 	(OPT_MINUS(ops,'X') && (OPT_ISSET(ops,'m') || *argv || !scriptname))) {
 	zwarnnam(name, "invalid option(s)");
 	return 1;
+    }
+
+    if (OPT_ISSET(ops,'x')) {
+	char *eptr;
+	expand = (int)zstrtol(OPT_ARG(ops,'x'), &eptr, 10);
+	if (*eptr) {
+	    zwarnnam(name, "number expected after -x");
+	    return 1;
+	}
+	if (expand == 0)	/* no indentation at all */
+	    expand = -1;
     }
 
     if (OPT_PLUS(ops,'f') || roff || OPT_ISSET(ops,'+'))
@@ -2948,8 +2960,8 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	} else {
 	    if (OPT_ISSET(ops,'U') && !OPT_ISSET(ops,'u'))
 		on &= ~PM_UNDEFINED;
-	    scanhashtable(shfunctab, 1, on|off, DISABLED, shfunctab->printnode,
-			  pflags);
+	    scanshfunc(1, on|off, DISABLED, shfunctab->printnode,
+		       pflags, expand);
 	}
 	unqueue_signals();
 	return ret;
@@ -2965,8 +2977,8 @@ bin_functions(char *name, char **argv, Options ops, int func)
 		/* with no options, just print all functions matching the glob pattern */
 		queue_signals();
 		if (!(on|off) && !OPT_ISSET(ops,'X')) {
-		    scanmatchtable(shfunctab, pprog, 1, 0, DISABLED,
-				   shfunctab->printnode, pflags);
+		    scanmatchshfunc(pprog, 1, 0, DISABLED,
+				   shfunctab->printnode, pflags, expand);
 		} else {
 		    /* apply the options to all functions matching the glob pattern */
 		    for (i = 0; i < shfunctab->hsize; i++) {
@@ -3008,7 +3020,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 		    returnval = 1;
 	    } else
 		/* no flags, so just print */
-		shfunctab->printnode(&shf->node, pflags);
+		printshfuncexpand(&shf->node, pflags, expand);
 	} else if (on & PM_UNDEFINED) {
 	    int signum = -1, ok = 1;
 
@@ -3222,6 +3234,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
     int aliasflags;
     int csh, all, v, wd;
     int informed = 0;
+    int expand = 0;
     char *cnam, **allmatched = 0;
 
     /* Check some option information */
@@ -3229,6 +3242,17 @@ bin_whence(char *nam, char **argv, Options ops, int func)
     v   = OPT_ISSET(ops,'v');
     all = OPT_ISSET(ops,'a');
     wd  = OPT_ISSET(ops,'w');
+
+    if (OPT_ISSET(ops,'x')) {
+	char *eptr;
+	expand = (int)zstrtol(OPT_ARG(ops,'x'), &eptr, 10);
+	if (*eptr) {
+	    zwarnnam(nam, "number expected after -x");
+	    return 1;
+	}
+	if (expand == 0)	/* no indentation at all */
+	    expand = -1;
+    }
 
     if (OPT_ISSET(ops,'w'))
 	printflags |= PRINT_WHENCE_WORD;
@@ -3286,8 +3310,8 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 
 		/* and shell functions... */
 		informed +=
-		scanmatchtable(shfunctab, pprog, 1, 0, DISABLED,
-			       shfunctab->printnode, printflags);
+		scanmatchshfunc(pprog, 1, 0, DISABLED,
+			       shfunctab->printnode, printflags, expand);
 
 		/* and builtins. */
 		informed +=
@@ -3342,7 +3366,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 	    }
 	    /* Look for shell function */
 	    if ((hn = shfunctab->getnode(shfunctab, *argv))) {
-		shfunctab->printnode(hn, printflags);
+		printshfuncexpand(hn, printflags, expand);
 		informed = 1;
 		if (!all)
 		    continue;

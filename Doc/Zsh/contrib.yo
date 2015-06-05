@@ -3561,7 +3561,7 @@ set to the ANSI terminal escapes that turn off all attributes and turn on
 bold intensity, respectively.
 )
 findex(fned)
-item(tt(fned) var(name))(
+item(tt(fned) [ tt(-x) var(num) ] var(name))(
 Same as tt(zed -f).  This function does not appear in the zsh
 distribution, but can be created by linking tt(zed) to the name tt(fned)
 in some directory in your tt(fpath).
@@ -3749,7 +3749,7 @@ the difference in function between tt(zargs) and tt(xargs)) or run
 tt(zargs) with the tt(-)tt(-help) option.
 )
 findex(zed)
-xitem(tt(zed) [ tt(-f) ] var(name))
+xitem(tt(zed) [ tt(-f) [ tt(-x) var(num) ] var(name))
 item(tt(zed -b))(
 This function uses the ZLE editor to edit a file or function.
 
@@ -3758,7 +3758,10 @@ If the tt(-f) option is given, the name is taken to be that of
 a function; if the function is marked for autoloading, tt(zed) searches
 for it in the tt(fpath) and loads it.  Note that functions edited this way
 are installed into the current shell, but em(not) written back to the
-autoload file.
+autoload file.  In this case the tt(-x) option specifies that leading
+tabs indenting the function according to syntax should be converted into
+the given number of spaces; `tt(-x 2)' is consistent with the layout
+of functions distributed with the shell.
 
 Without tt(-f), var(name) is the path name of the file to edit, which need
 not exist; it is created on write, if necessary.

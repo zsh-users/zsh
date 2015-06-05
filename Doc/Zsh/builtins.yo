@@ -791,11 +791,18 @@ Equivalent to tt(typeset -E), except that options irrelevant to floating
 point numbers are not permitted.
 )
 findex(functions)
-xitem(tt(functions) [ {tt(PLUS())|tt(-)}tt(UkmtTuz) ] [ var(name) ... ])
+xitem(tt(functions) [ {tt(PLUS())|tt(-)}tt(UkmtTuz) ] [ tt(-x) var(num) ] [ var(name) ... ])
 xitem(tt(functions -M) var(mathfn) [ var(min) [ var(max) [ var(shellfn) ] ] ])
 xitem(tt(functions -M) [ tt(-m) var(pattern) ... ])
 item(tt(functions +M) [ tt(-m) ] var(mathfn) ... )(
-Equivalent to tt(typeset -f), with the exception of the tt(-M) option.
+Equivalent to tt(typeset -f), with the exception of the tt(-x) and
+tt(-M) options.
+
+The tt(-x) option indicates that any functions output will have
+each leading tab for indentation, added by the shell to show syntactic
+structure, expanded to the given number var(num) of spaces.  var(num)
+can also be 0 to suppress all indentation.
+
 Use of the tt(-M) option may not be combined with any of the options
 handled by tt(typeset -f).
 
@@ -1927,6 +1934,9 @@ function is first referenced; see noderef(Functions). The tt(-k) and
 tt(-z) flags make the function be loaded using ksh-style or zsh-style
 autoloading respectively. If neither is given, the setting of the
 tt(KSH_AUTOLOAD) option determines how the function is loaded.
+
+Note that the builtin tt(functions) provides the same basic capabilities
+as tt(typeset -f) but gives access to a few extra options.
 )
 item(tt(-h))(
 Hide: only useful for special parameters (those marked `<S>' in the table in
@@ -2180,7 +2190,7 @@ the user is potentially interested in both, so this problem is intrinsic
 to process IDs.
 )
 findex(whence)
-item(tt(whence) [ tt(-vcwfpamsS) ] var(name) ...)(
+item(tt(whence) [ tt(-vcwfpamsS) ] [ tt(-x) var(num) ] var(name) ...)(
 For each var(name), indicate how it would be interpreted if used as a
 command name.
 
@@ -2233,14 +2243,19 @@ As tt(-s), but if the pathname had to be resolved by following
 multiple symlinks, the intermediate steps are printed, too.  The
 symlink resolved at each step might be anywhere in the path.
 )
+item(tt(-x) var(num))(
+Expand tabs when outputting shell functions using the tt(-c) option.
+This has the same effect as the tt(-x) option to the tt(functions)
+builtin.
+)
 enditem()
 )
 findex(where)
-item(tt(where) [ tt(-wpmsS) ] var(name) ...)(
+item(tt(where) [ tt(-wpmsS) ] [ tt(-x) var(num) ] var(name) ...)(
 Equivalent to tt(whence -ca).
 )
 findex(which)
-item(tt(which) [ tt(-wpamsS) ] var(name) ...)(
+item(tt(which) [ tt(-wpamsS) ] [ tt(-x) var(num) ] var(name) ...)(
 Equivalent to tt(whence -c).
 )
 findex(zcompile)

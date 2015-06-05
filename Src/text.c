@@ -30,6 +30,16 @@
 #include "zsh.mdh"
 #include "text.pro"
 
+/*
+ * If non-zero, expand syntactically significant leading tabs in text
+ * to this number of spaces.
+ *
+ * If negative, don't output leading whitespace at all.
+ */
+
+/**/
+int text_expand_tabs;
+
 static char *tptr, *tbuf, *tlim, *tpending;
 static int tsiz, tindent, tnewlins, tjob;
 
@@ -156,13 +166,45 @@ taddnl(int no_semicolon)
     if (tnewlins) {
 	tdopending();
 	taddchr('\n');
-	for (t0 = 0; t0 != tindent; t0++)
-	    taddchr('\t');
+	for (t0 = 0; t0 != tindent; t0++) {
+	    if (text_expand_tabs >= 0) {
+		if (text_expand_tabs) {
+		    int t1;
+		    for (t1 = 0; t1 < text_expand_tabs; t1++)
+			taddchr(' ');
+		} else
+		    taddchr('\t');
+	    }
+	}
     } else if (no_semicolon) {
 	taddstr(" ");
     } else {
 	taddstr("; ");
     }
+}
+
+/*
+ * Output a tab that may be expanded as part of a leading set.
+ * Note this is not part of the text framework; it's for
+ * code that needs to output its own tabs that are to be
+ * consistent with those from getpermtext().
+ *
+ * Note these tabs are only expected to be useful at the
+ * start of the line, so we make no attempt to count columns.
+ */
+
+/**/
+void
+zoutputtab(FILE *outf)
+{
+    if (text_expand_tabs < 0)
+	return;
+    if (text_expand_tabs) {
+	int i;
+	for (i = 0; i < text_expand_tabs; i++)
+	    fputc(' ', outf);
+    } else
+	fputc('\t', outf);
 }
 
 /* get a permanent textual representation of n */

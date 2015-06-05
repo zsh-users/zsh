@@ -1,3 +1,11 @@
+2015-06-05  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35386: Doc/Zsh/builtins.yo, Doc/Zsh/contrib.yo,
+	Functions/Misc/zed, Src/builtin.c, Src/hashtable.c,
+	Src/pattern.c, Src/text.c, Src/utils.c, Src/zsh.h:
+	expand tabs for function output in functions, whence, where,
+	which and also zed -f using -x num option.
+
 2015-06-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 35360 (replacing 35357): configure.ac, Src/Modules/zpty.c:
