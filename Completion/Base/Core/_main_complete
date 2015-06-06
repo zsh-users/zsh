@@ -36,7 +36,8 @@ local func funcs ret=1 tmp _compskip format nm call match min max i num\
       _saved_list="${compstate[list]}" \
       _saved_insert="${compstate[insert]}" \
       _saved_colors="$ZLS_COLORS" \
-      _saved_colors_set=${+ZLS_COLORS}
+      _saved_colors_set=${+ZLS_COLORS} \
+      _ambiguous_color=''
 
 # _precommand sets this to indicate we are following a precommand modifier
 local -a precommands
@@ -349,12 +350,11 @@ elif [[ nm -eq 0 && -z "$_comp_mesg" &&
   compadd -x "$mesg"
 fi
 
-if zstyle -s ":completion:${curcontext}:" show-ambiguity tmp; then
-  local prefix=${${compstate[unambiguous]}[1,${compstate[unambiguous_cursor]}-1]}
+if [[ -n "$_ambiguous_color" ]]; then
   local toquote='[=\(\)\|~^?*[\]#<>]'
-  [[ $tmp = (yes|true|on) ]] && tmp=4
+  local prefix=${${compstate[unambiguous]}[1,${compstate[unambiguous_cursor]}-1]}
   [[ -n $prefix ]] &&
-    _comp_colors+=( "=(#i)${prefix[1,-2]//?/(}${prefix[1,-2]//(#m)?/${MATCH/$~toquote/\\$MATCH}|)}${prefix[-1]//(#m)$~toquote/\\$MATCH}(#b)(?|)*==$tmp" )
+    _comp_colors+=( "=(#i)${prefix[1,-2]//?/(}${prefix[1,-2]//(#m)?/${MATCH/$~toquote/\\$MATCH}|)}${prefix[-1]//(#m)$~toquote/\\$MATCH}(#b)(?|)*==$_ambiguous_color" )
 fi
 
 [[ "$_comp_force_list" = always ||
