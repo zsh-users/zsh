@@ -1,3 +1,9 @@
+2015-06-06  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 35350: Completion/Zsh/Command/_fc, Doc/Zsh/builtins.yo,
+	Src/builtin.c: extend "fc -I" to cover listing of "internal"
+	history events only
+
 2015-06-05  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35386: Doc/Zsh/builtins.yo, Doc/Zsh/contrib.yo,

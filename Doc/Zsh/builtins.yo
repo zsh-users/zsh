@@ -662,8 +662,8 @@ findex(fc)
 cindex(history, editing)
 cindex(editing history)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ ))ifnztexi(      )))
-xitem(tt(fc) [ tt(-e) var(ename) ] [-L] [ tt(-m) var(match) ] [ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
-xitem(tt(fc -l )[ tt(-LnrdfEiD) ] [ tt(-t) var(timefmt) ] [ tt(-m) var(match) ])
+xitem(tt(fc) [ tt(-e) var(ename) ] [ tt(-LI) ] [ tt(-m) var(match) ] [ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
+xitem(tt(fc -l )[ tt(-LI) ] [ tt(-nrdfEiD) ] [ tt(-t) var(timefmt) ] [ tt(-m) var(match) ])
 xitem(SPACES()[ var(old)tt(=)var(new) ... ] [ var(first) [ var(last) ] ])
 xitem(tt(fc -p )[ tt(-a) ] [ var(filename) [ var(histsize) [ var(savehistsize) ] ] ])
 xitem(tt(fc) tt(-P))
@@ -674,31 +674,24 @@ shell is interactive.  Usually this is detected automatically, but
 it can be forced by setting the tt(interactive) option when starting the
 shell.
 
-Select a range of commands from var(first) to var(last) from the
-history list.
-The arguments var(first) and var(last) may be specified as a
-number or as a string.  A negative number is used as an offset
-to the current history event number.
-A string specifies the most recent event beginning with the given string.
-All substitutions var(old)tt(=)var(new), if any, are then performed
-on the commands.
+The first two forms of this command select a range of events from
+var(first) to var(last) from the history list.  The arguments var(first)
+and var(last) may be specified as a number or as a string.  A negative
+number is used as an offset to the current history event number.  A string
+specifies the most recent event beginning with the given string.  All
+substitutions var(old)tt(=)var(new), if any, are then performed on the
+text of the events.
 
-If the tt(-L) flag is given, only the local history is considered (see
+In addition to the the number range,
+startsitem()
+sitem(tt(-I))(restricts to only internal events (not from tt($HISTFILE)))
+sitem(tt(-L))(restricts to only local events (not from other shells, see
 tt(SHARE_HISTORY) in ifzman(zmanref(zshoptions))\
-ifnzman(noderef(Description of Options))).
-If the tt(-m) flag is given, the first argument is taken as a
-pattern (should be quoted) and only the history events matching this
-pattern are considered.
-
-When the tt(-l) flag is given, the resulting commands are listed on
-standard output.
-Otherwise the editor program var(ename) is invoked on a file containing
-these history events.  If var(ename) is not given, the value
-of the parameter tt(FCEDIT) is used; if that is not set the value of the
-parameter tt(EDITOR) is used; if that is not set a builtin default, usually
-`tt(vi)' is used.  If var(ename) is `tt(-)',
-no editor is invoked.  When editing is complete, the edited
-command is executed.
+ifnzman(noderef(Description of Options)) -- note that tt($HISTFILE) is
+considered local when read at startup))
+sitem(tt(-m))(takes the first argument as a pattern (should be quoted) and
+only the history events matching this pattern are considered)
+endsitem()
 
 If var(first) is not specified, it will be set to -1 (the most recent
 event), or to -16 if the tt(-l) flag is given.
@@ -708,12 +701,20 @@ However, if the current event has added entries to the history with
 `tt(print -s)' or `tt(fc -R)', then the default var(last) for tt(-l)
 includes all new history entries since the current event began.
 
-The flag tt(-r) reverses the order of the commands and the
-flag tt(-n) suppresses command numbers when listing.
+When the tt(-l) flag is given, the resulting events are listed on
+standard output.  Otherwise the editor program var(ename) is invoked on a
+file containing these history events.  If var(ename) is not given, the
+value of the parameter tt(FCEDIT) is used; if that is not set the value of
+the parameter tt(EDITOR) is used; if that is not set a builtin default,
+usually `tt(vi)' is used.  If var(ename) is `tt(-)', no editor is invoked.
+When editing is complete, the edited command is executed.
+
+The flag tt(-r) reverses the order of the events and the
+flag tt(-n) suppresses event numbers when listing.
 
 Also when listing,
 startsitem()
-sitem(tt(-d))(prints timestamps for each command)
+sitem(tt(-d))(prints timestamps for each event)
 sitem(tt(-f))(prints full time-date stamps in the US
 `var(MM)tt(/)var(DD)tt(/)var(YY) var(hh):var(mm)' format)
 sitem(tt(-E))(prints full time-date stamps in the European
@@ -725,15 +726,14 @@ var(fmt) is formatted with the strftime function with the zsh extensions
 described for the tt(%D{)var(string)tt(}) prompt format in
 ifzman(the section EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
 ifnzman(noderef(Prompt Expansion)).  The resulting formatted string must be
-no more than 256 characters or will not be printed.
+no more than 256 characters or will not be printed
 )
 sitem(tt(-D))(prints elapsed times; may be combined with one of the
-options above.)
+options above)
 endsitem()
 
 cindex(history, stack)
 cindex(stack, history)
-
 `tt(fc -p)' pushes the current history list onto a stack and switches to a
 new history list.  If the tt(-a) option is also specified, this history list
 will be automatically popped when the current function scope is exited, which

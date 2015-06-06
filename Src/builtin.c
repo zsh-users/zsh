@@ -104,7 +104,7 @@ static struct builtin builtins[] =
     BUILTIN("pushd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_PUSHD, "qsPL", NULL),
     BUILTIN("pushln", 0, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
-    BUILTIN("r", 0, bin_fc, 0, -1, BIN_R, "nrlL", NULL),
+    BUILTIN("r", 0, bin_fc, 0, -1, BIN_R, "IlLnr", NULL),
     BUILTIN("read", 0, bin_read, 0, -1, 0, "cd:ek:%lnpqrst:%zu:AE", NULL),
     BUILTIN("readonly", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%lptux", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "df", "r"),
@@ -1435,10 +1435,6 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 	unqueue_signals();
 	return 0;
     }
-    if (OPT_ISSET(ops,'I')) {
-	zwarnnam(nam, "-I requires one of -R/-W/-A");
-	return 1;
-    }
 
     if (zleactive) {
 	zwarnnam(nam, "no interactive history within ZLE");
@@ -1672,7 +1668,7 @@ static int
 fclist(FILE *f, Options ops, zlong first, zlong last,
        struct asgment *subs, Patprog pprog, int is_command)
 {
-    int fclistdone = 0;
+    int fclistdone = 0, xflags = 0;
     zlong tmp;
     char *s, *tdfmt, *timebuf;
     Histent ent;
@@ -1722,11 +1718,19 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
 	tdfmt = timebuf = NULL;
     }
 
+    /* xflags exclude events */
+    if (OPT_ISSET(ops,'L')) {
+	xflags |= HIST_FOREIGN;
+    }
+    if (OPT_ISSET(ops,'I')) {
+	xflags |= HIST_READ;
+    }
+
     for (;;) {
-	if (!OPT_ISSET(ops,'L') || !(ent->node.flags & HIST_FOREIGN))
-	    s = dupstring(ent->node.nam);
-	else
+	if (ent->node.flags & xflags)
 	    s = NULL;
+	else
+	    s = dupstring(ent->node.nam);
 	/* this if does the pattern matching, if required */
 	if (s && (!pprog || pattry(pprog, s))) {
 	    /* perform substitution */
@@ -1782,7 +1786,7 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
     if (!fclistdone) {
 	if (subs)
 	    zwarnnam("fc", "no substitutions performed");
-	else if (OPT_ISSET(ops,'L') || pprog)
+	else if (xflags || pprog)
 	    zwarnnam("fc", "no matching events found");
 	return 1;
     }

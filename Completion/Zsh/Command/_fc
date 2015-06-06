@@ -12,8 +12,10 @@ words=( "${(@)words[1,CURRENT-1]:#*=*}" "${(@)words[CURRENT,-1]}" )
 
 fc_common=(
   -s -S
-  '(-A -R -W -I -p -P)-r[reverse order of the commands]'
-  '(-A -R -W -I -e -p -P)-n[suppress line numbers]'
+  '(-A -R -W -p -P)-I[include internal (new) events only]'
+  '(-A -R -W -p -P)-L[include local events only]'
+  '(-A -R -W -p -P)-r[reverse order of the events]'
+  '(-A -R -W -e -p -P)-n[suppress line numbers]'
 )
 
 if [[ -n ${words[(r)-[pa](|[ap])]} ]]; then
@@ -32,20 +34,20 @@ else
 fi
 
 fc_hist=(
-  '(-A -R -W -I -a -p -P 2)-m[treat argument as a pattern]'
-  '(-A -R -W -I -e -f -E -i -t -a -p -P)-d[print time-stamps]'
-  '(-A -R -W -I -e -d -E -i -t -a -p -P)-f[mm/dd/yyyy format time-stamps]'
-  '(-A -R -W -I -e -d -f -i -t -a -p -P)-E[dd.mm.yyyy format time-stamps]'
-  '(-A -R -W -I -e -d -f -E -t -a -p -P)-i[yyyy-mm-dd format time-stamps]'
-  '(-A -R -W -I -e -d -f -E -i -a -p -P)-t[print time-stamps in specified format]:date format'
-  '(-A -R -W -I -e -a -p -P)-D[print elapsed times]'
+  '(-A -R -W -a -p -P 2)-m[treat argument as a pattern]'
+  '(-A -R -W -e -f -E -i -t -a -p -P)-d[print time-stamps]'
+  '(-A -R -W -e -d -E -i -t -a -p -P)-f[mm/dd/yyyy format time-stamps]'
+  '(-A -R -W -e -d -f -i -t -a -p -P)-E[dd.mm.yyyy format time-stamps]'
+  '(-A -R -W -e -d -f -E -t -a -p -P)-i[yyyy-mm-dd format time-stamps]'
+  '(-A -R -W -e -d -f -E -i -a -p -P)-t[print time-stamps in specified format]:date format'
+  '(-A -R -W -e -a -p -P)-D[print elapsed times]'
 
   '(-A -R -W -I -e -d -f -i -l -m -n -r -D -E -t -P)-a[with -p, automatically pop history on function return]'
   '(-A -R -W -I -e -d -f -i -l -m -n -r -D -E -t -P)-p[push current history to stack]'
   '(- *)-P[pop history from stack]'
 )
 
-fc_r='(-A -R -W -I -e)-l[list resulting commands on stdout]'
+fc_r='(-A -R -W -e)-l[list resulting commands on stdout]'
 
 case $service in
   history)
@@ -56,12 +58,11 @@ case $service in
   ;;
   *)
     _arguments "$fc_common[@]" "$fc_hist[@]" "$fc_r" \
-      '(-A -R -W -I -a -l -n -d -f -E -i -r -t -D -p -P)-e+[specify editor to invoke]:editor to invoke:_command_names -e' \
-      '(-a -l -m -e -r -n -d -f -t -E -i -R -D -A -W -p -P *)-'{\
+      '(-A -R -W -a -l -n -d -f -E -i -r -t -D -p -P)-e+[specify editor to invoke]:editor to invoke:_command_names -e' \
+      '(-a -l -L -m -e -r -n -d -f -t -E -i -R -D -A -W -p -P *)-'{\
 'R[read history from file]',\
 'A[append history to file]',\
-'W[write history to file]',\
-'I[read/write new events only]'} && ret=0
+'W[write history to file]'} && ret=0
   ;;
 esac
 
