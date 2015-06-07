@@ -169,10 +169,14 @@
 0:%n count zeroed on format reuse
 >1
 
-# this may fill spec string with '%0+- #*.*lld\0' - 13 characters
- printf '%1$0+- #-08.5dx\n' 123
+# this may fill spec string with '%0'+- #*.*lld\0' - 14 characters
+ printf '%1$0'"'+- #-08.5dx\n" 123
 0:maximal length format specification
 >+00123  x
+
+ printf "x:%-20s:y\n" fubar
+0:left-justification of string
+>x:fubar               :y
 
  printf '%*smorning\n' -5 good
 0:negative width specified

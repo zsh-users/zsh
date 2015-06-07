@@ -4518,7 +4518,7 @@ bin_print(char *name, char **args, Options ops, int func)
 			lleft -= chars;
 			ptr += chars;
 		    }
-		    if (width > 0 && flags[2]) width = -width;
+		    if (width > 0 && flags[3]) width = -width;
 		    if (width > 0 && lchars < width)
 		    	count += fprintf(fout, "%*c", width - lchars, ' ');
 		    count += fwrite(b, 1, lbytes, fout);

@@ -1,3 +1,8 @@
+2015-06-07  Oliver Kiddle  <opk@zsh.org>
+
+	* 35412: Src/builtin.c, Test/B03print.ztst: fix for - flag
+	when formating strings with printf that was broken in 34841
+
 2015-06-06  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 35350: Completion/Zsh/Command/_fc, Doc/Zsh/builtins.yo,
