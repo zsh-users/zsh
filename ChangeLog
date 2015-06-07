@@ -1,3 +1,8 @@
+2015-06-08  Daniel Hahler  <zsh@thequod.de>
+
+	* 35216: Completion/Unix/Command/_git: _git-checkout: do not call
+	__git_commits twice.
+
 2015-06-07  Oliver Kiddle  <opk@zsh.org>
 
 	* 35412: Src/builtin.c, Test/B03print.ztst: fix for - flag

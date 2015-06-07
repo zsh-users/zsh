@@ -456,14 +456,13 @@ _git-checkout () {
       [[ $line[CURRENT] = -* ]] && return
       if (( CURRENT == 1 )) && [[ -z $opt_args[(I)--] ]]; then
         # TODO: Allow A...B
-        local branch_arg='branches::__git_revisions' \
+        local branch_arg='' \
               remote_branch_noprefix_arg='remote branches::__git_remote_branch_names_noprefix' \
               tree_ish_arg='tree-ishs::__git_tree_ishs' \
               file_arg='modified-files::__git_modified_files'
 
         if [[ -n ${opt_args[(I)-b|-B|--orphan|--detach]} ]]; then
           remote_branch_noprefix_arg=
-          tree_ish_arg=
           file_arg=
         elif [[ -n $opt_args[(I)--track] ]]; then
           branch_arg='remote-branches::__git_remote_branch_names'
@@ -471,7 +470,6 @@ _git-checkout () {
           tree_ish_arg=
           file_arg=
         elif [[ -n ${opt_args[(I)--ours|--theirs|-m|--conflict|--patch]} ]]; then
-          branch_arg=
           remote_branch_noprefix_arg=
         fi
 
