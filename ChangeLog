@@ -1,3 +1,8 @@
+2015-06-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35416: Src/options.c: Turn on MULTIBYTE in all
+	emulations, including sh.
+
 2015-06-08  Daniel Hahler  <zsh@thequod.de>
 
 	* 35216: Completion/Unix/Command/_git: _git-checkout: do not call
