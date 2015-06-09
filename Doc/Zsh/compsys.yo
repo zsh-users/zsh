@@ -4158,7 +4158,7 @@ the functions for the fields if they are called.
 findex(_describe)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ @ @ ))ifnztexi(          )))
 xitem(tt(_describe )[tt(-12JVx)] [ tt(-oO) | tt(-t) var(tag) ] var(descr) var(name1) [ var(name2) ] [ var(opt) ... ])
-item(SPACES()[ tt(-)tt(-) var(descr) var(name1) [ var(name2) ] [ var(opt) ... ] ... ])(
+item(SPACES()[ tt(-)tt(-) var(name1) [ var(name2) ] [ var(opt) ... ] ... ])(
 This function associates completions with descriptions.
 Multiple groups separated by tt(-)tt(-) can be supplied, potentially with
 different completion options var(opt)s.

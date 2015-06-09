@@ -1,3 +1,8 @@
+2015-06-08  Oliver Kiddle  <opk@zsh.org>
+
+	* 35418: Doc/Zsh/compsys.yo: fix usage synopsis for _describe
+	to be clear that a single description is used
+
 2015-06-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35416: Src/options.c: Turn on MULTIBYTE in all
