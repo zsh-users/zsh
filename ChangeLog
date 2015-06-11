@@ -1,3 +1,8 @@
+2015-06-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35442: Doc/Zsh/options.yo: multibyte option now on
+	everywhere by default.
+
 2015-06-08  Oliver Kiddle  <opk@zsh.org>
 
 	* 35418: Doc/Zsh/compsys.yo: fix usage synopsis for _describe

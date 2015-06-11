@@ -634,7 +634,7 @@ pindex(NO_MULTIBYTE)
 pindex(NOMULTIBYTE)
 cindex(characters, multibyte, in expansion and globbing)
 cindex(multibyte characters, in expansion and globbing)
-item(tt(MULTIBYTE) <C> <K> <Z>)(
+item(tt(MULTIBYTE) <D>)(
 Respect multibyte characters when found in strings.
 When this option is set, strings are examined using the
 system library to determine how many bytes form a character, depending
@@ -642,10 +642,8 @@ on the current locale.  This affects the way characters are counted in
 pattern matching, parameter values and various delimiters.
 
 The option is on by default if the shell was compiled with
-tt(MULTIBYTE_SUPPORT) except in tt(sh) emulation; otherwise it is off by
-default and has no effect if turned on.  The mode is off in tt(sh)
-emulation for compatibility but for interactive use may need to be
-turned on if the terminal interprets multibyte characters.
+tt(MULTIBYTE_SUPPORT); otherwise it is off by default and has no effect
+if turned on.
 
 If the option is off a single byte is always treated as a single
 character.  This setting is designed purely for examining strings
