@@ -2237,7 +2237,7 @@ xpandbraces(LinkList list, LinkNode *np)
 #ifdef MULTIBYTE_SUPPORT
 		char *ncptr;
 		int nclen;
-		mb_metacharinit();
+		mb_charinit();
 		ncptr = wcs_nicechar(cend, NULL, NULL);
 		nclen = strlen(ncptr);
 		p = zhalloc(lenalloc + nclen);
@@ -2805,7 +2805,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 		     * ... now we know whether it's worth looking for the
 		     * shortest, which we do by brute force.
 		     */
-		    mb_metacharinit();
+		    mb_charinit();
 		    for (t = s, umlen = 0; t < s + mlen; ) {
 			set_pat_end(p, *t);
 			if (pattrylen(p, s, t - s, umlen, 0)) {
@@ -2831,7 +2831,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	     * so that match, mbegin, mend and MATCH, MBEGIN, MEND are
 	     * correct.
 	     */
-	    mb_metacharinit();
+	    mb_charinit();
 	    tmatch = NULL;
 	    for (ioff = 0, t = s, umlen = umltot; t < s + l; ioff++) {
 		set_pat_start(p, t-s);
@@ -2855,7 +2855,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	    /* Largest possible match at tail of string:       *
 	     * move forward along string until we get a match. *
 	     * Again there's no optimisation.                  */
-	    mb_metacharinit();
+	    mb_charinit();
 	    for (ioff = 0, t = s, umlen = umltot; t < s + l; ioff++) {
 		set_pat_start(p, t-s);
 		if (pattrylen(p, t, s + l - t, umlen, ioff)) {
@@ -2889,7 +2889,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	    }
 	    ioff = 0;		/* offset into string */
 	    umlen = umltot;
-	    mb_metacharinit();
+	    mb_charinit();
 	    do {
 		/* loop over all matches for global substitution */
 		matched = 0;
@@ -2986,7 +2986,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	     */
 	    nmatches = 0;
 	    tmatch = NULL;
-	    mb_metacharinit();
+	    mb_charinit();
 	    for (ioff = 0, t = s, umlen = umltot; t < s + l; ioff++) {
 		set_pat_start(p, t-s);
 		if (pattrylen(p, t, s + l - t, umlen, ioff)) {
@@ -3002,7 +3002,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 		     * We need to find the n'th last match.
 		     */
 		    n = nmatches - n;
-		    mb_metacharinit();
+		    mb_charinit();
 		    for (ioff = 0, t = s, umlen = umltot; t < s + l; ioff++) {
 			set_pat_start(p, t-s);
 			if (pattrylen(p, t, s + l - t, umlen, ioff) &&

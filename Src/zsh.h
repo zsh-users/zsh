@@ -2921,8 +2921,9 @@ enum {
 #define AFTERTRAPHOOK  (zshhooks + 2)
 
 #ifdef MULTIBYTE_SUPPORT
+/* Metafied input */
 #define nicezputs(str, outs)	(void)mb_niceformat((str), (outs), NULL, 0)
-#define MB_METACHARINIT()	mb_metacharinit()
+#define MB_METACHARINIT()	mb_charinit()
 typedef wint_t convchar_t;
 #define MB_METACHARLENCONV(str, cp)	mb_metacharlenconv((str), (cp))
 #define MB_METACHARLEN(str)	mb_metacharlenconv(str, NULL)
@@ -2931,6 +2932,11 @@ typedef wint_t convchar_t;
 #define MB_METASTRLEN2(str, widthp)	mb_metastrlenend(str, widthp, NULL)
 #define MB_METASTRLEN2END(str, widthp, eptr)	\
     mb_metastrlenend(str, widthp, eptr)
+
+/* Unmetafined input */
+#define MB_CHARINIT()		mb_charinit()
+#define MB_CHARLENCONV(str, len, cp)	mb_charlenconv((str), (len), (cp))
+#define MB_CHARLEN(str, len)	mb_charlenconv((str), (len), NULL)
 
 /*
  * We replace broken implementations with one that uses Unicode
@@ -3014,6 +3020,10 @@ typedef int convchar_t;
 #define MB_METASTRWIDTH(str)	ztrlen(str)
 #define MB_METASTRLEN2(str, widthp)	ztrlen(str)
 #define MB_METASTRLEN2END(str, widthp, eptr)	ztrlenend(str, eptr)
+
+#define MB_CHARINIT()
+#define MB_CHARLENCONV(str, len, cp) charlenconv((str), (len), (cp))
+#define MB_CHARLEN(str, len) ((len) ? 1 : 0)
 
 #define WCWIDTH_WINT(c)	(1)
 

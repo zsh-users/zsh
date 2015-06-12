@@ -765,7 +765,7 @@ zccmd_string(const char *nam, char **args)
     w = (ZCWin)getdata(node);
 
 #ifdef HAVE_WADDWSTR
-    mb_metacharinit();
+    mb_charinit();
     wptr = wstr = zhalloc((strlen(str)+1) * sizeof(wchar_t));
 
     while (*str && (clen = mb_metacharlenconv(str, &wc))) {

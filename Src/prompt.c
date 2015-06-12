@@ -964,7 +964,7 @@ stradd(char *d)
 	    /* FALL THROUGH */
 	default:
 	    /* Take full wide character in one go */
-	    mb_metacharinit();
+	    mb_charinit();
 	    pc = wcs_nicechar(cc, NULL, NULL);
 	    break;
 	}

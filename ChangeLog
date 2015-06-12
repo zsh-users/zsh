@@ -1,3 +1,13 @@
+2015-06-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35448: Src/Modules/curses.c, Src/Modules/regex.c,
+	Src/Zle/complist.c, Src/Zle/zle_utils.c, Src/builtin.c,
+	Src/glob.c, Src/hist.c, Src/prompt.c, Src/utils.c, Src/zsh.h,
+	Test/D07multibyte.ztst: Add non-metafied character length
+	handling and use this for regex module.  Add test.
+	Rename mb_metacharinit() to mb_charinit() since it doesn't
+	involve metafied characters.
+
 2015-06-11  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35442: Doc/Zsh/options.yo: multibyte option now on

@@ -2000,7 +2000,7 @@ casemodify(char *str, int how)
 	VARARR(char, mbstr, MB_CUR_MAX);
 	mbstate_t ps;
 
-	mb_metacharinit();
+	mb_charinit();
 	memset(&ps, 0, sizeof(ps));
 	while (*str) {
 	    wint_t wc;

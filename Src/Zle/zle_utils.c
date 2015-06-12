@@ -1288,7 +1288,7 @@ showmsg(char const *msg)
     p = unmetafy(umsg, &ulen);
     memset(&mbs, 0, sizeof mbs);
 
-    mb_metacharinit();
+    mb_charinit();
     while (ulen > 0) {
 	char const *n;
 	if (*p == '\n') {

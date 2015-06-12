@@ -4582,7 +4582,7 @@ bin_print(char *name, char **args, Options ops, int func)
 		    convchar_t cc;
 #ifdef MULTIBYTE_SUPPORT
 		    if (isset(MULTIBYTE)) {
-			mb_metacharinit();
+			mb_charinit();
 			(void)mb_metacharlenconv(metafy(curarg+1, curlen-1,
 							META_USEHEAP), &cc);
 		    }
@@ -5557,7 +5557,7 @@ bin_read(char *name, char **args, Options ops, UNUSED(int func))
 	wint_t wi;
 
 	if (isset(MULTIBYTE)) {
-	    mb_metacharinit();
+	    mb_charinit();
 	    (void)mb_metacharlenconv(delimstr, &wi);
 	}
 	else

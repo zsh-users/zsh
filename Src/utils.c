@@ -82,7 +82,7 @@ set_widearray(char *mb_array, Widechar_array wca)
 	wchar_t *wcptr = tmpwcs;
 	wint_t wci;
 
-	mb_metacharinit();
+	mb_charinit();
 	while (*mb_array) {
 	    int mblen = mb_metacharlenconv(mb_array, &wci);
 
@@ -332,7 +332,7 @@ zerrmsg(FILE *file, const char *fmt, va_list ap)
 	    case 'c':
 		num = va_arg(ap, int);
 #ifdef MULTIBYTE_SUPPORT
-		mb_metacharinit();
+		mb_charinit();
 		zputs(wcs_nicechar(num, NULL, NULL), file);
 #else
 		zputs(nicechar(num), file);
@@ -461,12 +461,13 @@ static mbstate_t mb_shiftstate;
 
 /*
  * Initialise multibyte state: called before a sequence of
- * wcs_nicechar() or mb_metacharlenconv().
+ * wcs_nicechar(), mb_metacharlenconv(), or
+ * mb_charlenconv().
  */
 
 /**/
 mod_export void
-mb_metacharinit(void)
+mb_charinit(void)
 {
     memset(&mb_shiftstate, 0, sizeof(mb_shiftstate));
 }
@@ -500,7 +501,7 @@ mb_metacharinit(void)
  * (but not both).  (Note the complication that the wide character
  * part may contain metafied characters.)
  *
- * The caller needs to call mb_metacharinit() before the first call, to
+ * The caller needs to call mb_charinit() before the first call, to
  * set up the multibyte shift state for a range of characters.
  */
 
@@ -3832,7 +3833,7 @@ itype_end(const char *ptr, int itype, int once)
 #ifdef MULTIBYTE_SUPPORT
     if (isset(MULTIBYTE) &&
 	(itype != IIDENT || !isset(POSIXIDENTIFIERS))) {
-	mb_metacharinit();
+	mb_charinit();
 	while (*ptr) {
 	    wint_t wc;
 	    int len = mb_metacharlenconv(ptr, &wc);
@@ -4972,6 +4973,65 @@ mb_metastrlenend(char *ptr, int width, char *eptr)
     return num + num_in_char;
 }
 
+/*
+ * The equivalent of mb_metacharlenconv_r() for
+ * strings that aren't metafied and hence have
+ * explicit lengths.
+ */
+
+/**/
+mod_export int
+mb_charlenconv_r(const char *s, int slen, wint_t *wcp, mbstate_t *mbsp)
+{
+    size_t ret = MB_INVALID;
+    char inchar;
+    const char *ptr;
+    wchar_t wc;
+
+    for (ptr = s; slen;  ) {
+	inchar = *ptr;
+	ptr++;
+	slen--;
+	ret = mbrtowc(&wc, &inchar, 1, mbsp);
+
+	if (ret == MB_INVALID)
+	    break;
+	if (ret == MB_INCOMPLETE)
+	    continue;
+	if (wcp)
+	    *wcp = wc;
+	return ptr - s;
+    }
+
+    if (wcp)
+	*wcp = WEOF;
+    /* No valid multibyte sequence */
+    memset(mbsp, 0, sizeof(*mbsp));
+    if (ptr > s) {
+	return 1;	/* Treat as single byte character */
+    } else
+	return 0;		/* Probably shouldn't happen */
+}
+
+/*
+ * The equivalent of mb_metacharlenconv() for
+ * strings that aren't metafied and hence have
+ * explicit lengths;
+ */
+
+/**/
+mod_export int
+mb_charlenconv(const char *s, int slen, wint_t *wcp)
+{
+    if (!isset(MULTIBYTE)) {
+	if (wcp)
+	    *wcp = (wint_t)*s;
+	return 1;
+    }
+
+    return mb_charlenconv_r(s, slen, wcp, &mb_shiftstate);
+}
+
 /**/
 #else
 
@@ -4991,6 +5051,23 @@ metacharlenconv(const char *x, int *c)
 	    *c = x[1] ^ 32;
 	return 2;
     }
+    if (c)
+	*c = (char)*x;
+    return 1;
+}
+
+/* Simple replacement for mb_charlenconv */
+
+/**/
+mod_export int
+charlenconv(const char *x, int len, int *c)
+{
+    if (!len) {
+	if (c)
+	    *c = '\0';
+	return 0;
+    }
+
     if (c)
 	*c = (char)*x;
     return 1;

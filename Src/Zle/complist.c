@@ -728,7 +728,7 @@ clnicezputs(int do_colors, char *s, int ml)
     if (do_colors)
 	initiscol();
 
-    mb_metacharinit();
+    mb_charinit();
     while (umleft > 0) {
 	size_t cnt = eol ? MB_INVALID : mbrtowc(&cc, uptr, umleft, &mbs);
 

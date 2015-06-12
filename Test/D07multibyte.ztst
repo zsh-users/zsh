@@ -484,3 +484,16 @@
 # This doesn't look aligned in my editor because actually the characters
 # aren't quite double width, but the arithmetic is correct.
 # It appears just to be an effect of the font.
+
+  if zmodload -i zsh/regex 2>/dev/null; then
+    [[ $'\ua0' =~ '^.$' ]] && print OK
+    [[ $'\ua0' =~ $'^\ua0$' ]] && print OK
+    [[ $'\ua0'X =~ '^X$' ]] || print OK
+  else
+    print -u$ZTST_fd "Regexp test skipped, regexp library not found."
+    print -l OK OK OK
+  fi
+0:Ensure no confusion on metafied input to regex module
+>OK
+>OK
+>OK
