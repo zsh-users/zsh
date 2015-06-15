@@ -3,6 +3,9 @@
 	* 35477: Completion/Unix/Command/_gdb: _gdb: Allow 'core' to
 	occur anywhere in a coredump filename
 
+	* 35476: Src/params.c: Allow setting $0 when POSIX_ARGZERO is
+	not set	
+
 2015-06-16  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 35493: Src/exec.c: erase $_ when the command line is an assignment

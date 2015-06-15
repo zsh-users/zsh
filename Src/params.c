@@ -196,7 +196,7 @@ static const struct gsu_integer ttyidle_gsu =
 { ttyidlegetfn, nullintsetfn, stdunsetfn };
 
 static const struct gsu_scalar argzero_gsu =
-{ argzerogetfn, nullstrsetfn, nullunsetfn };
+{ argzerogetfn, argzerosetfn, nullunsetfn };
 static const struct gsu_scalar username_gsu =
 { usernamegetfn, usernamesetfn, stdunsetfn };
 static const struct gsu_scalar dash_gsu =
@@ -4043,6 +4043,21 @@ lcsetfn(Param pm, char *x)
     unqueue_signals();
 }
 #endif /* USE_LOCALE */
+
+/* Function to set value for special parameter `0' */
+
+/**/
+static void
+argzerosetfn(UNUSED(Param pm), char *x)
+{
+    if (x) {
+	if (!isset(POSIXARGZERO)) {
+	    zsfree(argzero);
+	    argzero = ztrdup(x);
+	}
+	zsfree(x);
+    }
+}
 
 /* Function to get value for special parameter `0' */
 
