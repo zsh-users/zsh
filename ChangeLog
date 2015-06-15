@@ -1,3 +1,7 @@
+2015-06-14  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 35467: Completion/Unix/Command/_du: complete files for non-GNU du
+
 2015-06-12  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35448: Src/Modules/curses.c, Src/Modules/regex.c,

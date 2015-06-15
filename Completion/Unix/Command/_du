@@ -74,5 +74,5 @@ else
   do
     [[ $OSTYPE = $~pattern ]] && args+=( $arg )
   done
-  _arguments -s -A "-*" $args
+  _arguments -s -A "-*" $args '*:file:_files'
 fi
