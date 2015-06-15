@@ -1,3 +1,8 @@
+2015-06-17  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 35477: Completion/Unix/Command/_gdb: _gdb: Allow 'core' to
+	occur anywhere in a coredump filename
+
 2015-06-14  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 35469: Functions/Zle/smart-insert-last-word: test UNDO_CHANGE_NO
