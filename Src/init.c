@@ -1117,8 +1117,9 @@ setupshin(char *runscript)
 	    exit(127);
 	}
 	scriptfilename = sfname;
-	zsfree(argzero); /* ztrdup'd in parseargs */
-	argzero = runscript;
+	sfname = argzero; /* copy to avoid race condition */
+	argzero = ztrdup(runscript);
+	zsfree(sfname); /* argzero ztrdup'd in parseargs */
     }
     /*
      * We only initialise line numbering once there is a script to
