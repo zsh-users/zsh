@@ -1115,6 +1115,7 @@ execsimple(Estate state)
     if (code == WC_ASSIGN) {
 	cmdoutval = 0;
 	addvars(state, state->pc - 1, 0);
+	setunderscore("");
 	if (isset(XTRACE)) {
 	    fputc('\n', xtrerr);
 	    fflush(xtrerr);
