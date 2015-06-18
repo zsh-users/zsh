@@ -5023,7 +5023,16 @@ __git_ignore_line_inside_arguments () {
 
 (( $+functions[_git_commands] )) ||
 _git_commands () {
-  local -a main_porcelain_commands
+  local -a cmdtypes
+  cmdtypes=( main_porcelain_commands user_commands
+    third_party_commands ancillary_manipulator_commands
+    ancillary_interrogator_commands interaction_commands
+    plumbing_manipulator_commands plumbing_interrogator_commands
+    plumbing_sync_commands plumbing_sync_helper_commands
+    plumbing_internal_helper_commands
+  )
+  local -a $cmdtypes
+
   main_porcelain_commands=(
     add:'add file contents to index'
     am:'apply patches from a mailbox'
@@ -5062,7 +5071,6 @@ _git_commands () {
     submodule:'initialize, update, or inspect submodules'
     tag:'create, list, delete or verify tag object signed with GPG')
 
-  local -a ancillary_manipulator_commands
   ancillary_manipulator_commands=(
     config:'get and set repository or global options'
     fast-export:'data exporter'
@@ -5077,7 +5085,6 @@ _git_commands () {
     repack:'pack unpacked objects in a repository'
     replace:'create, list, delete refs to replace objects')
 
-  local -a ancillary_interrogator_commands
   ancillary_interrogator_commands=(
     blame:'show what revision and author last modified each line of a file'
     cherry:'find commits not merged upstream'
@@ -5095,7 +5102,6 @@ _git_commands () {
     verify-tag:'check GPG signature of tags'
     whatchanged:'show commit-logs and differences they introduce')
 
-  local -a interaction_commands
   interaction_commands=(
     archimport:'import an Arch repository into git'
     cvsexportcommit:'export a single commit to a CVS checkout'
@@ -5107,7 +5113,6 @@ _git_commands () {
     send-email:'send collection of patches as emails'
     svn:'bidirectional operation between a Subversion repository and git')
 
-  local -a plumbing_manipulator_commands
   plumbing_manipulator_commands=(
     apply:'apply patch to files and/or to index'
     checkout-index:'copy files from index to working directory'
@@ -5127,7 +5132,6 @@ _git_commands () {
     update-ref:'update object name stored in a reference safely'
     write-tree:'create tree from the current index')
 
-  local -a plumbing_interrogator_commands
   plumbing_interrogator_commands=(
     cat-file:'provide content or type information for repository objects'
     diff-files:'compare files in working tree and index'
@@ -5147,7 +5151,6 @@ _git_commands () {
     var:'show git logical variable'
     verify-pack:'validate packed git archive files')
 
-  local -a plumbing_sync_commands
   plumbing_sync_commands=(
     daemon:'run a really simple server for git repositories'
     fetch-pack:'receive missing objects from another repository'
@@ -5155,7 +5158,6 @@ _git_commands () {
     send-pack:'push objects over git protocol to another repository'
     update-server-info:'update auxiliary information file to help dumb servers')
 
-  local -a plumbing_sync_helper_commands
   plumbing_sync_helper_commands=(
     http-fetch:'download from remote git repository via HTTP'
     http-push:'push objects over HTTP/DAV to another repository'
@@ -5165,7 +5167,6 @@ _git_commands () {
     upload-archive:'send archive back to git-archive'
     upload-pack:'send objects packed back to git fetch-pack')
 
-  local -a plumbing_internal_helper_commands
   plumbing_internal_helper_commands=(
     check-attr:'display gitattributes information'
     check-ignore:'debug gitignore/exclude files'
@@ -5178,91 +5179,40 @@ _git_commands () {
     patch-id:'compute unique ID for a patch'
     stripspace:'filter out empty lines')
 
-  local -a user_commands
   zstyle -a :completion:$curcontext: user-commands user_commands
 
-  local -a third_party_commands
   local command
   for command in $_git_third_party_commands; do
     (( $+commands[git-${command%%:*}] )) && third_party_commands+=$command
   done
 
-  local -a aliases unique_aliases
+  local -a aliases
   __git_extract_aliases
-  local alias
-  for alias in $aliases; do
-    local name=${alias%%:*}
-    (( main_porcelain_commands[(I)$name:*] ||
-       user_commands[(I)$name:*] ||
-       third_party_commands[(I)$name:*] ||
-       ancillary_manipulator_commands[(I)$name:*] ||
-       ancillary_interrogator_commands[(I)$name:*] ||
-       interaction_commands[(I)$name:*] ||
-       plumbing_manipulator_commands[(I)$name:*] ||
-       plumbing_interrogator_commands[(I)$name:*] ||
-       plumbing_sync_commands[(I)$name:*] ||
-       plumbing_sync_helper_commands[(I)$name:*] ||
-       plumbing_internal_helper_commands[(I)$name:*] )) || unique_aliases+=$alias
+  local cmdtype len dup sep
+  local -a allcmds allmatching alts disp
+
+  zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
+  for cmdtype in $cmdtypes aliases; do
+    if [[ $cmdtype = aliases ]]; then
+      for dup in ${${aliases%:*}:*allcmds}; do
+	aliases=( ${aliases:#$dup:*} )
+      done
+    fi
+    local -a ${cmdtype}_m
+    set -A ${cmdtype}_m ${(P)cmdtype%%:*}
+    allcmds+=( ${(P)${:-${cmdtype}_m}} )
+  done
+  zstyle -T ":completion:${curcontext}:" verbose && disp=(-ld '${cmdtype}_d')
+  compadd -O allmatching -a allcmds
+  len=${#${(O)allmatching//?/.}[1]} # length of longest match
+  for cmdtype in aliases $cmdtypes; do
+    local -a ${cmdtype}_d
+    (( $#disp )) && set -A ${cmdtype}_d \
+        ${${(Pr.COLUMNS-4.)cmdtype/(#s)(#m)[^:]##:/${(r.len.)MATCH[1,-2]} $sep }%% #}
+    alts+=( "${cmdtype//_/-}:${${cmdtype//_/ }%%(e|)s}:compadd ${(e)disp} -a ${cmdtype}_m" )
   done
 
-  integer ret=1
-
-  _tags \
-    aliases \
-    main-porcelain-commands \
-    user-commands \
-    third-party-commands \
-    ancillary-manipulator-commands \
-    ancillary-interrogator-commands \
-    interaction-commands \
-    plumbing-manipulator-commands \
-    plumbing-interrogator-commands \
-    plumbing-sync-commands \
-    plumbing-sync-helper-commands \
-    plumbing-internal-helper-commands
-
-  while _tags; do
-
-    _requested aliases && \
-      _describe -t aliases 'alias' unique_aliases && ret=0
-
-    _requested main-porcelain-commands && \
-      _describe -t main-porcelain-commands 'main porcelain command' main_porcelain_commands && ret=0
-
-    _requested user-commands && \
-      _describe -t user-commands 'user command' user_commands && ret=0
-
-    _requested third-party-commands && \
-      _describe -t third-party-commands 'third-party command' third_party_commands && ret=0
-
-    _requested ancillary-manipulator-commands && \
-      _describe -t ancillary-manipulator-commands 'ancillary manipulator command' ancillary_manipulator_commands && ret=0
-
-    _requested ancillary-interrogator-commands && \
-      _describe -t ancillary-interrogator-commands 'ancillary interrogator command' ancillary_interrogator_commands && ret=0
-
-    _requested interaction-commands && \
-      _describe -t interaction-commands 'interaction command' interaction_commands && ret=0
-
-    _requested plumbing-manipulator-commands && \
-      _describe -t plumbing-manipulator-commands 'plumbing manipulator command' plumbing_manipulator_commands && ret=0
-
-    _requested plumbing-interrogator-commands && \
-      _describe -t plumbing-interrogator-commands 'plumbing interrogator command' plumbing_interrogator_commands && ret=0
-
-    _requested plumbing-sync-commands && \
-      _describe -t plumbing-sync-commands 'plumbing sync command' plumbing_sync_commands && ret=0
-
-    _requested plumbing-sync-helper-commands && \
-      _describe -t plumbing-sync-helper-commands 'plumbing sync helper command' plumbing_sync_helper_commands && ret=0
-
-    _requested plumbing-internal-helper-commands && \
-      _describe -t plumbing-internal-helper-commands 'plumbing internal helper command' plumbing_internal_helper_commands && ret=0
-
-    (( ret )) || break
-  done
-
-  return ret
+  _alternative $alts
 }
 
 (( $+functions[__git_aliases] )) ||
