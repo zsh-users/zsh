@@ -336,7 +336,8 @@ enum lextok {
     THEN,	/* then      */
     TIME,	/* time      */ /* 60 */
     UNTIL,	/* until     */
-    WHILE	/* while     */
+    WHILE,	/* while     */
+    TYPESET     /* typeset or similar */
 };
 
 /* Redirection types.  If you modify this, you may also have to modify *
@@ -671,14 +672,6 @@ struct multio {
     int fds[MULTIOUNIT];	/* list of src/dests redirected to/from this fd */
 };
 
-/* structure for foo=bar assignments */
-
-struct asgment {
-    struct asgment *next;
-    char *name;
-    char *value;
-};
-
 /* lvalue for variable assignment/expansion */
 
 struct value {
@@ -803,6 +796,7 @@ struct eccstr {
 #define WC_ARITH   18
 #define WC_AUTOFN  19
 #define WC_TRY     20
+#define WC_TYPESET 21
 
 /* increment as necessary */
 #define WC_COUNT   21
@@ -849,12 +843,21 @@ struct eccstr {
 #define WC_ASSIGN_SCALAR    0
 #define WC_ASSIGN_ARRAY     1
 #define WC_ASSIGN_NEW       0
+/*
+ * In normal assignment, this indicate += to append.
+ * In assignment following a typeset, where that's not allowed,
+ * we overload this to indicate a variable without an
+ * assignment.
+ */
 #define WC_ASSIGN_INC       1
 #define WC_ASSIGN_NUM(C)    (wc_data(C) >> 2)
 #define WCB_ASSIGN(T,A,N)   wc_bld(WC_ASSIGN, ((T) | ((A) << 1) | ((N) << 2)))
 
 #define WC_SIMPLE_ARGC(C)   wc_data(C)
 #define WCB_SIMPLE(N)       wc_bld(WC_SIMPLE, (N))
+
+#define WC_TYPESET_ARGC(C)  wc_data(C)
+#define WCB_TYPESET(N)      wc_bld(WC_TYPESET, (N))
 
 #define WC_SUBSH_SKIP(C)    wc_data(C)
 #define WCB_SUBSH(O)        wc_bld(WC_SUBSH, (O))
@@ -1140,6 +1143,34 @@ struct alias {
 /* is this an alias for suffix handling? */
 #define ALIAS_SUFFIX	(1<<2)
 
+/* structure for foo=bar assignments */
+
+struct asgment {
+    struct linknode node;
+    char *name;
+    int is_array;
+    union {
+	char *scalar;
+	LinkList array;
+    } value;
+};
+
+/*
+ * Assignment is array?
+ */
+#define ASG_ARRAYP(asg) ((asg)->is_array)
+
+/*
+ * Assignment has value?
+ * We need to arrange for each of the values
+ * to be the same type or the compiler will
+ * get fed up.
+ */
+
+#define ASG_VALUEP(asg) (ASG_ARRAYP(asg) ?			\
+			 ((asg)->value.array != (LinkList)0) :	\
+			 ((asg)->value.scalar != (char *)0))
+
 /* node in command path hash table (cmdnamtab) */
 
 struct cmdnam {
@@ -1268,6 +1299,7 @@ struct options {
  */
 
 typedef int (*HandlerFunc) _((char *, char **, Options, int));
+typedef int (*HandlerFuncAssign) _((char *, char **, LinkList, Options, int));
 #define NULLBINCMD ((HandlerFunc) 0)
 
 struct builtin {
@@ -1311,6 +1343,12 @@ struct builtin {
   * does not terminate options.
   */
 #define BINF_HANDLES_OPTS	(1<<18)
+/*
+ * Handles the assignement interface.  The argv list actually contains
+ * two nested litsts, the first of normal arguments, and the second of
+ * assignment structures.
+ */
+#define BINF_ASSIGN		(1<<19)
 
 struct module {
     struct hashnode node;
@@ -2779,6 +2817,7 @@ struct parse_stack {
     int incasepat;
     int isnewlin;
     int infor;
+    int intypeset;
 
     int eclen, ecused, ecnpats;
     Wordcode ecbuf;

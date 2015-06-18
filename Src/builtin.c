@@ -53,7 +53,7 @@ static struct builtin builtins[] =
     BUILTIN("cd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_CD, "qsPL", NULL),
     BUILTIN("chdir", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_CD, "qsPL", NULL),
     BUILTIN("continue", BINF_PSPECIAL, bin_break, 0, 1, BIN_CONTINUE, NULL, NULL),
-    BUILTIN("declare", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klmprtuxz", NULL),
+    BUILTIN("declare", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klmprtuxz", NULL),
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "clpv", NULL),
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmprs", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
@@ -62,7 +62,7 @@ static struct builtin builtins[] =
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmprs", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
     BUILTIN("exit", BINF_PSPECIAL, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
-    BUILTIN("export", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, BIN_EXPORT, "E:%F:%HL:%R:%TUZ:%afhi:%lprtu", "xg"),
+    BUILTIN("export", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, BIN_EXPORT, "E:%F:%HL:%R:%TUZ:%afhi:%lprtu", "xg"),
     BUILTIN("false", 0, bin_false, 0, -1, 0, NULL, NULL),
     /*
      * We used to behave as if the argument to -e was optional.
@@ -71,7 +71,7 @@ static struct builtin builtins[] =
      */
     BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "aAdDe:EfiIlLmnpPrRt:W", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
-    BUILTIN("float", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "E:%F:%HL:%R:%Z:%ghlprtux", "E"),
+    BUILTIN("float", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "E:%F:%HL:%R:%Z:%ghlprtux", "E"),
     BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "kmMtTuUx:z", NULL),
     BUILTIN("getln", 0, bin_read, 0, -1, 0, "ecnAlE", "zr"),
     BUILTIN("getopts", 0, bin_getopts, 2, -1, 0, NULL, NULL),
@@ -82,11 +82,11 @@ static struct builtin builtins[] =
 #endif
 
     BUILTIN("history", 0, bin_fc, 0, -1, BIN_FC, "adDEfiLmnpPrt:", "l"),
-    BUILTIN("integer", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "HL:%R:%Z:%ghi:%lprtux", "i"),
+    BUILTIN("integer", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "HL:%R:%Z:%ghi:%lprtux", "i"),
     BUILTIN("jobs", 0, bin_fg, 0, -1, BIN_JOBS, "dlpZrs", NULL),
     BUILTIN("kill", BINF_HANDLES_OPTS, bin_kill, 0, -1, 0, NULL, NULL),
     BUILTIN("let", 0, bin_let, 1, -1, 0, NULL, NULL),
-    BUILTIN("local", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%ahi:%lprtux", NULL),
+    BUILTIN("local", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%ahi:%lprtux", NULL),
     BUILTIN("log", 0, bin_log, 0, 0, 0, NULL, NULL),
     BUILTIN("logout", 0, bin_break, 0, 1, BIN_LOGOUT, NULL, NULL),
 
@@ -106,7 +106,7 @@ static struct builtin builtins[] =
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
     BUILTIN("r", 0, bin_fc, 0, -1, BIN_R, "IlLnr", NULL),
     BUILTIN("read", 0, bin_read, 0, -1, 0, "cd:ek:%lnpqrst:%zu:AE", NULL),
-    BUILTIN("readonly", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%lptux", "r"),
+    BUILTIN("readonly", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%lptux", "r"),
     BUILTIN("rehash", 0, bin_hash, 0, 0, 0, "df", "r"),
     BUILTIN("return", BINF_PSPECIAL, bin_break, 0, 1, BIN_RETURN, NULL, NULL),
     BUILTIN("set", BINF_PSPECIAL | BINF_HANDLES_OPTS, bin_set, 0, -1, 0, NULL, NULL),
@@ -120,7 +120,7 @@ static struct builtin builtins[] =
     BUILTIN("trap", BINF_PSPECIAL | BINF_HANDLES_OPTS, bin_trap, 0, -1, 0, NULL, NULL),
     BUILTIN("true", 0, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("type", 0, bin_whence, 0, -1, 0, "ampfsSw", "v"),
-    BUILTIN("typeset", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL, bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klprtuxmz", NULL),
+    BUILTIN("typeset", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klprtuxmz", NULL),
     BUILTIN("umask", 0, bin_umask, 0, 1, 0, "S", NULL),
     BUILTIN("unalias", 0, bin_unhash, 0, -1, BIN_UNALIAS, "ams", NULL),
     BUILTIN("unfunction", 0, bin_unhash, 1, -1, BIN_UNFUNCTION, "m", "f"),
@@ -246,7 +246,7 @@ new_optarg(Options ops)
 
 /**/
 int
-execbuiltin(LinkList args, Builtin bn)
+execbuiltin(LinkList args, LinkList assigns, Builtin bn)
 {
     char *pp, *name, *optstr;
     int flags, sense, argc, execop, xtr = isset(XTRACE);
@@ -447,7 +447,18 @@ execbuiltin(LinkList args, Builtin bn)
 	    fflush(xtrerr);
 	}
 	/* call the handler function, and return its return value */
-	return (*(bn->handlerfunc)) (name, argv, &ops, bn->funcid);
+	if (flags & BINF_ASSIGN)
+	{
+	    /*
+	     * Takes two sets of arguments.
+	     */
+	    HandlerFuncAssign assignfunc = (HandlerFuncAssign)bn->handlerfunc;
+	    return (*(assignfunc)) (name, argv, assigns, &ops, bn->funcid);
+	}
+	else
+	{
+	    return (*(bn->handlerfunc)) (name, argv, &ops, bn->funcid);
+	}
     }
 }
 
@@ -1452,12 +1463,13 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 	if (!asgf)
 	    asgf = asgl = a;
 	else {
-	    asgl->next = a;
+	    asgl->node.next = &a->node;
 	    asgl = a;
 	}
 	a->name = *argv;
-	a->value = s;
-	a->next = NULL;
+	a->is_array = 0;
+	a->value.scalar = s;
+	a->node.next = a->node.prev = NULL;
 	argv++;
     }
     /* interpret and check first history line specifier */
@@ -1631,8 +1643,8 @@ fcsubs(char **sp, struct asgment *sub)
     /* loop through the linked list */
     while (sub) {
 	oldstr = sub->name;
-	newstr = sub->value;
-	sub = sub->next;
+	newstr = sub->value.scalar;
+	sub = (Asgment)sub->node.next;
 	oldpos = s;
 	/* loop over occurences of oldstr in s, replacing them with newstr */
 	while ((newpos = (char *)strstr(oldpos, oldstr))) {
@@ -1820,13 +1832,22 @@ fcedit(char *ename, char *fn)
 
 /**/
 static Asgment
-getasg(char *s)
+getasg(char ***argvp, LinkList assigns)
 {
+    char *s = **argvp;
     static struct asgment asg;
 
     /* sanity check for valid argument */
-    if (!s)
+    if (!s) {
+	if (assigns) {
+	    Asgment asgp = (Asgment)firstnode(assigns);
+	    if (!asgp)
+		return NULL;
+	    (void)uremnode(assigns, &asgp->node);
+	    return asgp;
+	}
 	return NULL;
+    }
 
     /* check if name is empty */
     if (*s == '=') {
@@ -1834,6 +1855,7 @@ getasg(char *s)
 	return NULL;
     }
     asg.name = s;
+    asg.is_array = 0;
 
     /* search for `=' */
     for (; *s && *s != '='; s++);
@@ -1841,11 +1863,12 @@ getasg(char *s)
     /* found `=', so return with a value */
     if (*s) {
 	*s = '\0';
-	asg.value = s + 1;
+	asg.value.scalar = s + 1;
     } else {
 	/* didn't find `=', so we only have a name */
-	asg.value = NULL;
+	asg.value.scalar = NULL;
     }
+    (*argvp)++;
     return &asg;
 }
 
@@ -1927,7 +1950,7 @@ typeset_setwidth(const char * name, Param pm, Options ops, int on, int always)
 /**/
 static Param
 typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
-	       int on, int off, int roff, char *value, Param altpm,
+	       int on, int off, int roff, Asgment asg, Param altpm,
 	       Options ops, int joinchar)
 {
     int usepm, tc, keeplocal = 0, newspecial = NS_NONE, readonly;
@@ -1975,7 +1998,23 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 
     /* attempting a type conversion, or making a tied colonarray? */
     tc = 0;
-    if (usepm || newspecial != NS_NONE) {
+    if (ASG_ARRAYP(asg))
+	on |= PM_ARRAY;
+    if (usepm && ASG_ARRAYP(asg) && newspecial == NS_NONE &&
+	PM_TYPE(pm->node.flags) != PM_ARRAY &&
+	PM_TYPE(pm->node.flags) != PM_HASHED) {
+	if (on & (PM_EFLOAT|PM_FFLOAT|PM_INTEGER)) {
+	    zerrnam(cname, "%s: can't assign array value to non-array", pname);
+	    return NULL;
+	}
+	if (pm->node.flags & PM_SPECIAL) {
+	    zerrnam(cname, "%s: can't assign array value to non-array special", pname);
+	    return NULL;
+	}
+	tc = 1;
+	usepm = 0;
+    }
+    else if (usepm || newspecial != NS_NONE) {
 	int chflags = ((off & pm->node.flags) | (on & ~pm->node.flags)) &
 	    (PM_INTEGER|PM_EFLOAT|PM_FFLOAT|PM_HASHED|
 	     PM_ARRAY|PM_TIED|PM_AUTOLOAD);
@@ -2023,7 +2062,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 			tc = 0;	/* but don't do a normal conversion */
 		    }
 		} else if (!setsecondstype(pm, on, off)) {
-		    if (value && !(pm = setsparam(pname, ztrdup(value))))
+		    if (asg->value.scalar && !(pm = setsparam(pname, ztrdup(asg->value.scalar))))
 			return NULL;
 		    usepm = 1;
 		    err = 0;
@@ -2049,7 +2088,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	 * Stricter rules about retaining readonly attribute in this case.
 	 */
 	if ((on & PM_READONLY) && (!usepm || (pm->node.flags & PM_UNSET)) &&
-	    !value)
+	    !ASG_VALUEP(asg))
 	    on |= PM_UNSET;
 	else if (usepm && (pm->node.flags & PM_READONLY) &&
 		 !(on & PM_READONLY)) {
@@ -2069,7 +2108,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
      */
     if (usepm) {
 	on &= ~PM_LOCAL;
-	if (!on && !roff && !value) {
+	if (!on && !roff && !ASG_VALUEP(asg)) {
 	    if (OPT_ISSET(ops,'p'))
 		paramtab->printnode(&pm->node, PRINT_TYPESET);
 	    else if (!OPT_ISSET(ops,'g') &&
@@ -2123,15 +2162,17 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	}
 	if (!(pm->node.flags & (PM_ARRAY|PM_HASHED))) {
 	    if (pm->node.flags & PM_EXPORTED) {
-		if (!(pm->node.flags & PM_UNSET) && !pm->env && !value)
+		if (!(pm->node.flags & PM_UNSET) && !pm->env && !ASG_VALUEP(asg))
 		    addenv(pm, getsparam(pname));
 	    } else if (pm->env && !(pm->node.flags & PM_HASHELEM))
 		delenv(pm);
-	    if (value && !(pm = setsparam(pname, ztrdup(value))))
+	    DPUTS(ASG_ARRAYP(asg), "BUG: typeset got array value where scalar expected");
+	    if (asg->value.scalar && !(pm = setsparam(pname, ztrdup(asg->value.scalar))))
 		return NULL;
-	} else if (value) {
-	    zwarnnam(cname, "can't assign new value for array %s", pname);
-	    return NULL;
+	} else if (asg->value.array) {
+	    DPUTS(!ASG_ARRAYP(asg), "BUG: typeset got scalar value where array expected");
+	    if (!(pm = setaparam(pname, zlinklist2array(asg->value.array))))
+		return NULL;
 	}
 	pm->node.flags |= (on & PM_READONLY);
 	if (OPT_ISSET(ops,'p'))
@@ -2158,9 +2199,14 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	/*
 	 * Try to carry over a value, but not when changing from,
 	 * to, or between non-scalar types.
+	 *
+	 * (We can do better now, but it does have user-visible
+	 * implications.)
 	 */
-	if (!value && !((pm->node.flags|on) & (PM_ARRAY|PM_HASHED)))
-	    value = dupstring(getsparam(pname));
+	if (!ASG_VALUEP(asg) && !((pm->node.flags|on) & (PM_ARRAY|PM_HASHED))) {
+	    asg->value.scalar = dupstring(getsparam(pname));
+	    asg->is_array = 0;
+	}
 	/* pname may point to pm->nam which is about to disappear */
 	pname = dupstring(pname);
 	unsetparam_pm(pm, 0, 1);
@@ -2251,16 +2297,17 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 		return NULL;
 	    }
 	}
-	if (PM_TYPE(on) == PM_SCALAR) {
+	if (PM_TYPE(on) == PM_SCALAR && !ASG_ARRAYP(asg)) {
 	    /*
 	     * This will either complain about bad identifiers, or will set
 	     * a hash element or array slice.  This once worked by accident,
 	     * creating a stray parameter along the way via createparam(),
 	     * now called below in the isident() branch.
 	     */
-	    if (!(pm = setsparam(pname, ztrdup(value ? value : ""))))
+	    if (!(pm = setsparam(pname, ztrdup(asg->value.scalar ? asg->value.scalar : ""))))
 		return NULL;
-	    value = NULL;
+	    asg->value.scalar = NULL;
+	    asg->is_array = 0;
 	    keeplocal = 0;
 	    on = pm->node.flags;
 	} else {
@@ -2331,9 +2378,10 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	pm->level = keeplocal;
     else if (on & PM_LOCAL)
 	pm->level = locallevel;
-    if (value && !(pm->node.flags & (PM_ARRAY|PM_HASHED))) {
+    if (ASG_VALUEP(asg) && !(pm->node.flags & (PM_ARRAY|PM_HASHED))) {
 	Param ipm = pm;
-	if (!(pm = setsparam(pname, ztrdup(value))))
+	DPUTS(ASG_ARRAYP(asg), "BUG: inconsistent array value for scalar");
+	if (!(pm = setsparam(pname, ztrdup(asg->value.scalar))))
 	    return NULL;
 	if (pm != ipm) {
 	    DPUTS(ipm->node.flags != pm->node.flags,
@@ -2371,11 +2419,10 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	}
     }
     pm->node.flags |= (on & PM_READONLY);
-    if (value && (pm->node.flags & (PM_ARRAY|PM_HASHED))) {
-	zerrnam(cname, "%s: can't assign initial value for array", pname);
-	/* the only safe thing to do here seems to be unset the param */
-	unsetparam_pm(pm, 0, 1);
-	return NULL;
+    if (ASG_VALUEP(asg) && (pm->node.flags & (PM_ARRAY|PM_HASHED))) {
+	DPUTS(!ASG_ARRAYP(asg), "BUG: inconsistent scalar value for array");
+	if (!(pm=setaparam(pname, zlinklist2array(asg->value.array))))
+	    return NULL;
     }
 
     if (OPT_ISSET(ops,'p'))
@@ -2384,11 +2431,18 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
     return pm;
 }
 
-/* declare, export, integer, local, readonly, typeset */
+/*
+ * declare, export, float, integer, local, readonly, typeset
+ *
+ * Note the difference in interface from most builtins, covered by the
+ * BINF_ASSIGN builtin flag.  This is only made use of by builtins
+ * called by reserved word, which only covers declare, local, readonly
+ * and typeset.  Otherwise assigns is NULL.
+ */
 
 /**/
 int
-bin_typeset(char *name, char **argv, Options ops, int func)
+bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 {
     Param pm;
     Asgment asg;
@@ -2469,7 +2523,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
     if (on & PM_TIED) {
 	Param apm;
 	struct asgment asg0;
-	char *oldval = NULL;
+	char *oldval = NULL, *joinstr;
 	int joinchar;
 
 	if (OPT_ISSET(ops,'m')) {
@@ -2484,28 +2538,29 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	    return 1;
 	}
 
-	/*
-	 * Third argument, if given, is character used to join
-	 * the elements of the array in the scalar.
-	 */
-	if (!argv[2])
-	    joinchar = ':';
-	else if (!*argv[2])
-	    joinchar = 0;
-	else if (*argv[2] == Meta)
-	    joinchar = argv[2][1] ^ 32;
-	else
-	    joinchar = *argv[2];
-
-	if (!(asg = getasg(argv[0]))) {
+	if (!(asg = getasg(&argv, assigns))) {
 	    unqueue_signals();
 	    return 1;
 	}
 	asg0 = *asg;
-	if (!(asg = getasg(argv[1]))) {
+	if (ASG_ARRAYP(&asg0)) {
+	    unqueue_signals();
+	    zwarnnam(name, "first argument of tie must be scalar: %s",
+		     asg0.name);
+	    return 1;
+	}
+
+	if (!(asg = getasg(&argv, assigns))) {
 	    unqueue_signals();
 	    return 1;
 	}
+	if (!ASG_ARRAYP(asg) && asg->value.scalar) {
+	    unqueue_signals();
+	    zwarnnam(name, "second argument of tie must be scalar: %s",
+		     asg->name);
+	    return 1;
+	}
+
 	if (!strcmp(asg0.name, asg->name)) {
 	    unqueue_signals();
 	    zerrnam(name, "can't tie a variable to itself: %s", asg0.name);
@@ -2516,6 +2571,31 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	    zerrnam(name, "can't tie array elements: %s", asg0.name);
 	    return 1;
 	}
+
+	/*
+	 * Third argument, if given, is character used to join
+	 * the elements of the array in the scalar.
+	 */
+	if (*argv)
+	    joinstr = *argv;
+	else if (assigns) {
+	    Asgment nextasg = (Asgment)firstnode(assigns);
+	    if (ASG_ARRAYP(nextasg) || ASG_VALUEP(nextasg)) {
+		zwarnnam(name, "third argument of tie must be join character");
+		unqueue_signals();
+		return 1;
+	    }
+	    joinstr = nextasg->name;
+	} else
+	    joinstr = NULL;
+	if (!joinstr)
+	    joinchar = ':';
+	else if (!*joinstr)
+	    joinchar = 0;
+	else if (*joinstr == Meta)
+	    joinchar = joinstr[1] ^ 32;
+	else
+	    joinchar = *joinstr;
 	/*
 	 * Keep the old value of the scalar.  We need to do this
 	 * here as if it is already tied to the same array it
@@ -2537,8 +2617,8 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 		    struct tieddata *tdp = (struct tieddata*)pm->u.data;
 		    /* Update join character */
 		    tdp->joinchar = joinchar;
-		    if (asg0.value)
-			setsparam(asg0.name, ztrdup(asg0.value));
+		    if (asg0.value.scalar)
+			setsparam(asg0.name, ztrdup(asg0.value.scalar));
 		    return 0;
 		} else {
 		    zwarnnam(name, "can't tie already tied scalar: %s",
@@ -2546,7 +2626,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 		}
 		return 1;
 	    }
-	    if (!asg0.value && !(PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)))
+	    if (!asg0.value.scalar && !(PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)))
 		oldval = ztrdup(getsparam(asg0.name));
 	    on |= (pm->node.flags & PM_EXPORTED);
 	}
@@ -2559,7 +2639,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 				 (Param)paramtab->getnode(paramtab,
 							  asg->name),
 				 func, (on | PM_ARRAY) & ~PM_EXPORTED,
-				 off, roff, asg->value, NULL, ops, 0))) {
+				 off, roff, asg, NULL, ops, 0))) {
 	    if (oldval)
 		zsfree(oldval);
 	    unqueue_signals();
@@ -2572,7 +2652,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	if (!(pm=typeset_single(name, asg0.name,
 				(Param)paramtab->getnode(paramtab,
 							 asg0.name),
-				func, on, off, roff, asg0.value, apm,
+				func, on, off, roff, &asg0, apm,
 				ops, joinchar))) {
 	    if (oldval)
 		zsfree(oldval);
@@ -2611,7 +2691,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 		printflags |= PRINT_NAMEONLY;
 	}
 
-	while ((asg = getasg(*argv++))) {
+	while ((asg = getasg(&argv, assigns))) {
 	    LinkList pmlist = newlinklist();
 	    LinkNode pmnode;
 
@@ -2622,7 +2702,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 		returnval = 1;
 		continue;
 	    }
-	    if (OPT_PLUS(ops,'m') && !asg->value) {
+	    if (OPT_PLUS(ops,'m') && !ASG_VALUEP(asg)) {
 		scanmatchtable(paramtab, pprog, 1, on|roff, 0,
 			       paramtab->printnode, printflags);
 		continue;
@@ -2648,7 +2728,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	    for (pmnode = firstnode(pmlist); pmnode; incnode(pmnode)) {
 		pm = (Param) getdata(pmnode);
 		if (!typeset_single(name, pm->node.nam, pm, func, on, off, roff,
-				    asg->value, NULL, ops, 0))
+				    asg, NULL, ops, 0))
 		    returnval = 1;
 	    }
 	}
@@ -2657,7 +2737,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
     }
 
     /* Take arguments literally.  Don't glob */
-    while ((asg = getasg(*argv++))) {
+    while ((asg = getasg(&argv, assigns))) {
 	HashNode hn = (paramtab == realparamtab ?
 		       gethashnode2(paramtab, asg->name) :
 		       paramtab->getnode(paramtab, asg->name));
@@ -2671,7 +2751,7 @@ bin_typeset(char *name, char **argv, Options ops, int func)
 	    continue;
 	}
 	if (!typeset_single(name, asg->name, (Param)hn,
-			    func, on, off, roff, asg->value, NULL,
+			    func, on, off, roff, asg, NULL,
 			    ops, 0))
 	    returnval = 1;
     }
@@ -3514,7 +3594,7 @@ bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
     }
 
     queue_signals();
-    for (;*argv;++argv) {
+    while (*argv) {
 	void *hn;
 	if (OPT_ISSET(ops,'m')) {
 	    /* with the -m option, treat the argument as a glob pattern */
@@ -3529,12 +3609,12 @@ bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
 	    }
             continue;
 	}
-        if (!(asg = getasg(*argv))) {
+        if (!(asg = getasg(&argv, NULL))) {
 	    zwarnnam(name, "bad assignment");
 	    returnval = 1;
-        } else if (asg->value) {
+        } else if (ASG_VALUEP(asg)) {
 	    if(isset(RESTRICTED)) {
-		zwarnnam(name, "restricted: %s", asg->value);
+		zwarnnam(name, "restricted: %s", asg->value.scalar);
 		returnval = 1;
 	    } else {
 		/* The argument is of the form foo=bar, *
@@ -3550,12 +3630,12 @@ bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
 		    } else {
 			Nameddir nd = hn = zshcalloc(sizeof *nd);
 			nd->node.flags = 0;
-			nd->dir = ztrdup(asg->value);
+			nd->dir = ztrdup(asg->value.scalar);
 		    }
 		} else {
 		    Cmdnam cn = hn = zshcalloc(sizeof *cn);
 		    cn->node.flags = HASHED;
-		    cn->u.cmd = ztrdup(asg->value);
+		    cn->u.cmd = ztrdup(asg->value.scalar);
 		}
 		ht->addnode(ht, ztrdup(asg->name), hn);
 		if(OPT_ISSET(ops,'v'))
@@ -3761,12 +3841,12 @@ bin_alias(char *name, char **argv, Options ops, UNUSED(int func))
 
     /* Take arguments literally.  Don't glob */
     queue_signals();
-    while ((asg = getasg(*argv++))) {
-	if (asg->value && !OPT_ISSET(ops,'L')) {
+    while ((asg = getasg(&argv, NULL))) {
+	if (asg->value.scalar && !OPT_ISSET(ops,'L')) {
 	    /* The argument is of the form foo=bar and we are not *
 	     * forcing a listing with -L, so define an alias      */
 	    ht->addnode(ht, ztrdup(asg->name),
-			createaliasnode(ztrdup(asg->value), flags1));
+			createaliasnode(ztrdup(asg->value.scalar), flags1));
 	} else if ((a = (Alias) ht->getnode(ht, asg->name))) {
 	    /* display alias if appropriate */
 	    if (!type_opts || ht == sufaliastab ||

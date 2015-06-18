@@ -155,6 +155,46 @@ taddlist(Estate state, int num)
     }
 }
 
+/* add an assignment */
+
+static void
+taddassign(wordcode code, Estate state, int typeset)
+{
+    /* name */
+    taddstr(ecgetstr(state, EC_NODUP, NULL));
+    /* value... maybe */
+    if (WC_ASSIGN_TYPE2(code) == WC_ASSIGN_INC) {
+	if (typeset) {
+	    /* dummy assignment --- just var name */
+	    (void)ecgetstr(state, EC_NODUP, NULL);
+	    taddchr(' ');
+	    return;
+	}
+	taddchr('+');
+    }
+    taddchr('=');
+    if (WC_ASSIGN_TYPE(code) == WC_ASSIGN_ARRAY) {
+	taddchr('(');
+	taddlist(state, WC_ASSIGN_NUM(code));
+	taddstr(") ");
+    } else {
+	taddstr(ecgetstr(state, EC_NODUP, NULL));
+	taddchr(' ');
+    }
+}
+
+/* add a number of assignments from typeset */
+
+/**/
+static void
+taddassignlist(Estate state, wordcode count)
+{
+    while (count--) {
+	wordcode code = *state->pc++;
+	taddassign(code, state, 1);
+    }
+}
+
 /* add a newline, or something equivalent, to the text buffer */
 
 /**/
@@ -439,20 +479,15 @@ gettext2(Estate state)
 	    }
 	    break;
 	case WC_ASSIGN:
-	    taddstr(ecgetstr(state, EC_NODUP, NULL));
-	    if (WC_ASSIGN_TYPE2(code) == WC_ASSIGN_INC) taddchr('+');
-	    taddchr('=');
-	    if (WC_ASSIGN_TYPE(code) == WC_ASSIGN_ARRAY) {
-		taddchr('(');
-		taddlist(state, WC_ASSIGN_NUM(code));
-		taddstr(") ");
-	    } else {
-		taddstr(ecgetstr(state, EC_NODUP, NULL));
-		taddchr(' ');
-	    }
+	    taddassign(code, state, 0);
 	    break;
 	case WC_SIMPLE:
 	    taddlist(state, WC_SIMPLE_ARGC(code));
+	    stack = 1;
+	    break;
+	case WC_TYPESET:
+	    taddlist(state, WC_TYPESET_ARGC(code));
+	    taddassignlist(state, *state->pc++);
 	    stack = 1;
 	    break;
 	case WC_SUBSH:

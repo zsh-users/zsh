@@ -2437,13 +2437,13 @@ execcmd(Estate state, int input, int output, int how, int last1)
     char *text;
     int save[10];
     int fil, dfil, is_cursh, type, do_exec = 0, redir_err = 0, i, htok = 0;
-    int nullexec = 0, assign = 0, forked = 0;
+    int nullexec = 0, assign = 0, forked = 0, postassigns = 0;
     int is_shfunc = 0, is_builtin = 0, is_exec = 0, use_defpath = 0;
     /* Various flags to the command. */
     int cflags = 0, orig_cflags = 0, checked = 0, oautocont = -1;
     LinkList redir;
     wordcode code;
-    Wordcode beg = state->pc, varspc;
+    Wordcode beg = state->pc, varspc, assignspc = (Wordcode)0;
     FILE *oxtrerr = xtrerr, *newxtrerr = NULL;
 
     doneps4 = 0;
@@ -2464,8 +2464,28 @@ execcmd(Estate state, int input, int output, int how, int last1)
     /* It would be nice if we could use EC_DUPTOK instead of EC_DUP here.
      * But for that we would need to check/change all builtins so that
      * they don't modify their argument strings. */
-    args = (type == WC_SIMPLE ?
-	    ecgetlist(state, WC_SIMPLE_ARGC(code), EC_DUP, &htok) : NULL);
+    switch (type) {
+    case WC_SIMPLE:
+	args = ecgetlist(state, WC_SIMPLE_ARGC(code), EC_DUP, &htok);
+	break;
+
+    case WC_TYPESET:
+	args = ecgetlist(state, WC_TYPESET_ARGC(code), EC_DUP, &htok);
+	postassigns = *state->pc++;
+	assignspc = state->pc;
+	for (i = 0; i < postassigns; i++) {
+	    code = *state->pc;
+	    DPUTS(wc_code(code) != WC_ASSIGN,
+		  "BUG: miscounted typeset assignments");
+	    state->pc += (WC_ASSIGN_TYPE(code) == WC_ASSIGN_SCALAR ?
+			  3 : WC_ASSIGN_NUM(code) + 2);
+	}
+	break;
+
+    default:
+	args = NULL;
+    }
+
     /*
      * If assignment but no command get the status from variable
      * assignment.
@@ -2488,7 +2508,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     /* If the command begins with `%', then assume it is a *
      * reference to a job in the job table.                */
-    if (type == WC_SIMPLE && args && nonempty(args) &&
+    if ((type == WC_SIMPLE || type == WC_TYPESET) && args && nonempty(args) &&
 	*(char *)peekfirst(args) == '%') {
         if (how & Z_DISOWN) {
 	    oautocont = opts[AUTOCONTINUE];
@@ -2517,7 +2537,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
      * command if it contains some tokens (e.g. x=ex; ${x}port), so this *
      * only works in simple cases.  has_token() is called to make sure   *
      * this really is a simple case.                                     */
-    if (type == WC_SIMPLE) {
+    if (type == WC_SIMPLE || type == WC_TYPESET) {
 	while (args && nonempty(args)) {
 	    char *cmdarg = (char *) peekfirst(args);
 	    checked = !has_token(cmdarg);
@@ -2661,7 +2681,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
     if (args && htok)
 	prefork(args, esprefork);
 
-    if (type == WC_SIMPLE) {
+    if (type == WC_SIMPLE || type == WC_TYPESET) {
 	int unglobbed = 0;
 
 	for (;;) {
@@ -2897,7 +2917,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	return;
     }
 
-    if (type == WC_SIMPLE && !nullexec) {
+    if ((type == WC_SIMPLE || type == WC_TYPESET) && !nullexec) {
 	char *s;
 	char trycd = (isset(AUTOCD) && isset(SHINSTDIN) &&
 		      (!redir || empty(redir)) && args && !empty(args) &&
@@ -3457,9 +3477,71 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		execshfunc((Shfunc) hn, args);
 	    } else {
 		/* It's a builtin */
+		LinkList assigns = (LinkList)0;
 		if (forked)
 		    closem(FDT_INTERNAL);
-		lastval = execbuiltin(args, (Builtin) hn);
+		if (postassigns) {
+		    Wordcode opc = state->pc;
+		    state->pc = assignspc;
+		    assigns = newlinklist();
+		    while (postassigns--) {
+			Asgment asg = (Asgment)zhalloc(sizeof(struct asgment));
+			wordcode ac = *state->pc++;
+			int htok;
+			char *name = ecgetstr(state, EC_DUPTOK, &htok);
+			local_list1(svl);
+
+			DPUTS(wc_code(ac) != WC_ASSIGN,
+			      "BUG: bad assignment list for typeset");
+			if (htok)
+			    untokenize(name);
+			asg->name = name;
+			if (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR) {
+			    char *val = ecgetstr(state, EC_DUPTOK, &htok);
+			    asg->is_array = 0;
+			    if (WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC) {
+				/* Fake assignment, no value */
+				asg->value.scalar = NULL;
+			    } else {
+				if (htok) {
+				    init_list1(svl, val);
+				    prefork(&svl, PREFORK_SINGLE|PREFORK_ASSIGN);
+				    if (errflag) {
+					state->pc = opc;
+					break;
+				    }
+				    /*
+				     * No globassign for typeset
+				     * arguments, thank you
+				     */
+				    val = empty(&svl) ? "" :
+					(char *)getdata(firstnode(&svl));
+				}
+				untokenize(val);
+				asg->value.scalar = val;
+			    }
+			} else {
+			    asg->is_array = 1;
+			    asg->value.array =
+				ecgetlist(state, WC_ASSIGN_NUM(ac),
+					  EC_DUPTOK, &htok);
+			    prefork(asg->value.array, PREFORK_ASSIGN);
+			    if (errflag) {
+				state->pc = opc;
+				break;
+			    }
+			    globlist(asg->value.array, 0);
+			    if (errflag) {
+				state->pc = opc;
+				break;
+			    }
+			}
+
+			uaddlinknode(assigns, &asg->node);
+		    }
+		    state->pc = opc;
+		}
+		lastval = execbuiltin(args, assigns, (Builtin) hn);
 		fflush(stdout);
 		if (save[1] == -2) {
 		    if (ferror(stdout)) {
@@ -3501,7 +3583,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		if (!subsh && isset(RCS) && interact && !nohistsave)
 		    savehistfile(NULL, 1, HFILE_USE_OPTIONS);
 	    }
-	    if (type == WC_SIMPLE) {
+	    if (type == WC_SIMPLE || type == WC_TYPESET) {
 		if (varspc) {
 		    int addflags = ADDVAR_EXPORT|ADDVAR_RESTRICT;
 		    if (forked)
