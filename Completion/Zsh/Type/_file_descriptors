@@ -1,28 +1,41 @@
 #autoload
 
-local i fds expl list link sep
+local i fds expl link sep
+local -a list
 
-fds=( /dev/fd/<0-9>(N:t) )
+fds=( /dev/fd/<3->(N:t) )
 
 if zstyle -T ":completion:${curcontext}:" verbose && [[ -h /proc/$$/fd/$fds[1] ]]; then
   zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
-
   if zmodload -F zsh/stat b:zstat; then
     for i in "${fds[@]}"; do
-      zstat +link -A link /proc/$$/fd/$i
-      list+=( "$i $sep ${link[1]}" )
+      if zstat +link -A link /proc/$$/fd/$i; then
+        list+=( "$i $sep ${link[1]}" )
+      else
+        fds[(i)$i]=()
+      fi
     done
   elif (( $+commands[readlink] )); then
     for i in "${fds[@]}"; do
-      list+=( "$i $sep $(readlink /proc/$$/fd/$i)" )
+      if link=$(readlink /proc/$$/fd/$i); then
+        list+=( "$i $sep $link" )
+      else
+        fds[(i)$i]=()
+      fi
     done
   else
     for i in "${fds[@]}"; do
-      list+=( "$i $sep $(ls -l /proc/$$/fd/$i|sed 's/.*-> //' )" )
+      if link=$(ls -l /proc/$$/fd/$i); then
+        list+=( "$i $sep ${link#* -> }" )
+      else
+        fds[(i)$i]=()
+      fi
     done
-  fi
+  fi 2>/dev/null
 
   if (( $list[(I)* $sep ?*] )); then
+    list=( "0 $sep standard input" "1 $sep standard output" "2 $sep standard error" $list )
+    fds=( 0 1 2 $fds )
     _wanted file-descriptors expl 'file descriptor' compadd "$@" -d list -a - fds
     return
   fi

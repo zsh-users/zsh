@@ -1,3 +1,8 @@
+2015-06-18  Oliver Kiddle  <opk@zsh.org>
+
+	* Eric Cook: 35490: Completion/Zsh/Type/_file_descriptors:
+	silence errors and avoid blank match due to missing local
+
 2015-06-17  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 35477: Completion/Unix/Command/_gdb: _gdb: Allow 'core' to
@@ -34,7 +39,7 @@
 	* 35442: Doc/Zsh/options.yo: multibyte option now on
 	everywhere by default.
 
-2015-06-08  Oliver Kiddle  <opk@zsh.org>
+2015-06-09  Oliver Kiddle  <opk@zsh.org>
 
 	* 35418: Doc/Zsh/compsys.yo: fix usage synopsis for _describe
 	to be clear that a single description is used
