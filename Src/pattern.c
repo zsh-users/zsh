@@ -1113,8 +1113,8 @@ range_type(char *start, int len)
     const char **csp;
 
     for (csp = colon_stuffs; *csp; csp++) {
-	if (!strncmp(start, *csp, len))
-	    return (csp - colon_stuffs) + PP_FIRST;
+	if (strlen(*csp) == len && !strncmp(start, *csp, len))
+		return (csp - colon_stuffs) + PP_FIRST;
     }
 
     return PP_UNKWN;
