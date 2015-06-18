@@ -1182,7 +1182,7 @@ gettokstr(int c, int sub)
 			c = Outpar;
 		    }
 		} else if (peek != ENVSTRING &&
-			   incmdpos && !bct && !brct) {
+			   (incmdpos || intypeset) && !bct && !brct) {
 		    char *t = tokstr;
 		    if (idigit(*t))
 			while (++t < lexbuf.ptr && idigit(*t));
@@ -1200,7 +1200,7 @@ gettokstr(int c, int sub)
 			t++;
 		    if (t == lexbuf.ptr) {
 			e = hgetc();
-			if (e == '(' && incmdpos) {
+			if (e == '(') {
 			    *lexbuf.ptr = '\0';
 			    return ENVARRAY;
 			}

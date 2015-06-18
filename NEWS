@@ -4,7 +4,21 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
-Changes from 5.0.7 to 5.0.8
+Changes from 5.0.8 to 5.0.9
+---------------------------
+
+The builtins declare, export, local, readonly and typeset
+now have corresponding reserved words.  When used in
+this form, the builtin syntax is extended so that assignments
+following the reserved word are treated similarly to
+assignments that appear at the start of the command line.
+For example,
+  local scalar=`echo one word` array=(several words)
+creates a local "scalar" containing the text "one word"
+and an array "array" containing the words "several"
+"words".
+
+Changes from 5.0.0 to 5.0.8
 ---------------------------
 
 - Global aliases can be created for syntactic tokens such as command
@@ -46,9 +60,6 @@ Changes from 5.0.7 to 5.0.8
 
 - Some rationalisations have been made to the zsh/db/gdbm module that
   should make it more useful and predictable in operation.
-
-Changes from 5.0.0 to 5.0.7
----------------------------
 
 - Numeric constants encountered in mathematical expressions (but not other
   contexts) can contain underscores as separators that will be ignored on

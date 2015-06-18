@@ -1,3 +1,14 @@
+2015-06-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* various culminating in 35586, c.f. commits on typeset-array
+	branch: Config/version.mk, Doc/Zsh/builtins.yo,
+	Doc/Zsh/grammar.yo, Doc/Zsh/options.yo, NEWS, README,
+	Src/builtin.c, Src/exec.c, Src/hashtable.c, Src/lex.c,
+	Src/options.c, Src/parse.c, Src/text.c, Src/zsh.h,
+	Test/B02typeset.ztst, Test/D01prompt.ztst, Test/E01options.ztst:
+	Implement assignment handling for typeset etc. when matched as
+	reserved words.  Document and test.
+
 2015-06-23  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35573: Completion/compinit: turn off POSIX_BUILTINS

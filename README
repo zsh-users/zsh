@@ -30,6 +30,23 @@ Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
 
+Incompatibilites between 5.0.8 and 5.0.9
+----------------------------------------
+
+As noted in NEWS, the builtins declare, export, float, integer, local,
+readonly and typeset now have corresponding reserved words that provide
+true assignment semantics instead of an approximation by means of normal
+command line arguments.  It is hoped that this additional consistency
+provides a more natural interface.  However, compatbility with older
+versions of zsh can be obtained by turning off the reserved word
+interface, exposing the builtin interface:
+
+  disable -r declare export float integer local readonly typeset
+
+This is also necessary in the unusual eventuality that the builtins are
+to be overridden by shell functions, since reserved words take
+precedence over functions.
+
 Incompatibilites between 5.0.7 and 5.0.8
 ----------------------------------------
 

@@ -172,7 +172,7 @@ static struct optname optns[] = {
 {{NULL, "kshautoload",	      OPT_EMULATE|OPT_BOURNE},	 KSHAUTOLOAD},
 {{NULL, "kshglob",	      OPT_EMULATE|OPT_KSH},	 KSHGLOB},
 {{NULL, "kshoptionprint",     OPT_EMULATE|OPT_KSH},	 KSHOPTIONPRINT},
-{{NULL, "kshtypeset",	      OPT_EMULATE|OPT_KSH},	 KSHTYPESET},
+{{NULL, "kshtypeset",	      0},			 KSHTYPESET},
 {{NULL, "kshzerosubscript",   0},			 KSHZEROSUBSCRIPT},
 {{NULL, "listambiguous",      OPT_ALL},			 LISTAMBIGUOUS},
 {{NULL, "listbeep",	      OPT_ALL},			 LISTBEEP},

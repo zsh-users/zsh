@@ -1928,7 +1928,13 @@ pindex(KSHTYPESET)
 pindex(NOKSHTYPESET)
 cindex(argument splitting, in typeset etc.)
 cindex(ksh, argument splitting in typeset)
-item(tt(KSH_TYPESET) <K>)(
+item(tt(KSH_TYPESET))(
+This option is now obsolete: a better appropximation to the behaviour of
+other shells is obtained with the reserved word interface to
+tt(declare), tt(export), tt(float), tt(integer), tt(local), tt(readonly)
+and tt(typeset).  Note that the option is only applied when the reserved
+word interface is em(not) in use.
+
 Alters the way arguments to the tt(typeset) family of commands, including
 tt(declare), tt(export), tt(float), tt(integer), tt(local) and
 tt(readonly), are processed.  Without this option, zsh will perform normal

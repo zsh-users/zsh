@@ -570,6 +570,15 @@
 >unset
 >globassign
 
+  # This test is now somewhat artificial as
+  # KSH_TYPESET only applies to the builtin
+  # interface.  Tests to the more standard
+  # reserved word interface appear elsewhere.
+  (
+  # reserved words are handled during parsing,
+  # hence eval...
+  disable -r typeset
+  eval '
   setopt kshtypeset
   ktvars=(ktv1 ktv2)
   typeset ktfoo=`echo arg1 arg2` $ktvars
@@ -580,6 +589,8 @@
   print $noktfoo
   print $+noktarg1 $+noktarg2
   unset ktfoo ktv1 ktv2 noktfoo noktarg2
+  '
+  )
 0:KSH_TYPESET option
 >1 1 0
 >arg1 arg2

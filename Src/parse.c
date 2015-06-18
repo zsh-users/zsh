@@ -63,6 +63,11 @@ int isnewlin;
 /**/
 int infor;
 
+/* != 0 if parsing arguments of typeset etc. */
+
+/**/
+int intypeset;
+
 /* list of here-documents */
 
 /**/
@@ -118,10 +123,19 @@ struct heredocs *hdocs;
  *   WC_ASSIGN
  *     - data contains type (scalar, array) and number of array-elements
  *     - followed by name and value
+ *     Note variant for WC_TYPESET assignments: WC_ASSIGN_INC indicates
+ *     a name with no equals, not an =+ which isn't valid here.
  *
  *   WC_SIMPLE
  *     - data contains the number of arguments (plus command)
  *     - followed by strings
+ *
+ *   WC_TYPESET
+ *     Variant of WC_SIMPLE used when TYPESET reserved word found.
+ *     - data contains the number of string arguments (plus command)
+ *     - followed by strings
+ *     - followed by number of assignments
+ *     - followed by assignments if non-zero number.
  *
  *   WC_SUBSH
  *     - data unused
@@ -257,6 +271,7 @@ parse_context_save(struct parse_stack *ps, int toplevel)
     ps->incasepat = incasepat;
     ps->isnewlin = isnewlin;
     ps->infor = infor;
+    ps->intypeset = intypeset;
 
     ps->hdocs = hdocs;
     ps->eclen = eclen;
@@ -290,6 +305,7 @@ parse_context_restore(const struct parse_stack *ps, int toplevel)
     incasepat = ps->incasepat;
     isnewlin = ps->isnewlin;
     infor = ps->infor;
+    intypeset = ps->intypeset;
 
     hdocs = ps->hdocs;
     eclen = ps->eclen;
@@ -430,7 +446,7 @@ init_parse_status(void)
      * between the two it's a bit ambiguous.  We clear them when
      * using the lexical analyser for strings as well as here.
      */
-    incasepat = incond = inredir = infor = 0;
+    incasepat = incond = inredir = infor = intypeset = 0;
     incmdpos = 1;
 }
 
@@ -992,6 +1008,7 @@ par_cmd(int *cmplx, int zsh_construct)
     incmdpos = 1;
     incasepat = 0;
     incond = 0;
+    intypeset = 0;
     return 1;
 }
 
@@ -1709,7 +1726,8 @@ static int
 par_simple(int *cmplx, int nr)
 {
     int oecused = ecused, isnull = 1, r, argc = 0, p, isfunc = 0, sr = 0;
-    int c = *cmplx, nrediradd, assignments = 0;
+    int c = *cmplx, nrediradd, assignments = 0, ppost = 0, is_typeset = 0;
+    wordcode postassigns = 0;
 
     r = ecused;
     for (;;) {
@@ -1717,31 +1735,32 @@ par_simple(int *cmplx, int nr)
 	    *cmplx = c = 1;
 	    nocorrect = 1;
 	} else if (tok == ENVSTRING) {
-	    char *p, *name, *str;
+	    char *ptr, *name, *str;
 
 	    name = tokstr;
-	    for (p = tokstr; *p && *p != Inbrack && *p != '=' && *p != '+';
-	         p++);
-	    if (*p == Inbrack) skipparens(Inbrack, Outbrack, &p);
-	    if (*p == '+') {
-	    	*p++ = '\0';
+	    for (ptr = tokstr;
+		 *ptr && *ptr != Inbrack && *ptr != '=' && *ptr != '+';
+	         ptr++);
+	    if (*ptr == Inbrack) skipparens(Inbrack, Outbrack, &ptr);
+	    if (*ptr == '+') {
+	    	*ptr++ = '\0';
 	    	ecadd(WCB_ASSIGN(WC_ASSIGN_SCALAR, WC_ASSIGN_INC, 0));
 	    } else
 		ecadd(WCB_ASSIGN(WC_ASSIGN_SCALAR, WC_ASSIGN_NEW, 0));
-    	
-	    if (*p == '=') {
-		*p = '\0';
-		str = p + 1;
+
+	    if (*ptr == '=') {
+		*ptr = '\0';
+		str = ptr + 1;
 	    } else
 		equalsplit(tokstr, &str);
-	    for (p = str; *p; p++) {
+	    for (ptr = str; *ptr; ptr++) {
 		/*
 		 * We can't treat this as "simple" if it contains
 		 * expansions that require process subsitution, since then
 		 * we need process handling.
 		 */
-		if (p[1] == Inpar &&
-		    (*p == Equals || *p == Inang || *p == OutangProc)) {
+		if (ptr[1] == Inpar &&
+		    (*ptr == Equals || *ptr == Inang || *ptr == OutangProc)) {
 		    *cmplx = 1;
 		    break;
 		}
@@ -1786,14 +1805,18 @@ par_simple(int *cmplx, int nr)
     p = ecadd(WCB_SIMPLE(0));
 
     for (;;) {
-	if (tok == STRING) {
+	if (tok == STRING || tok == TYPESET) {
 	    int redir_var = 0;
 
 	    *cmplx = 1;
 	    incmdpos = 0;
 
+	    if (tok == TYPESET)
+		intypeset = is_typeset = 1;
+
 	    if (!isset(IGNOREBRACES) && *tokstr == Inbrace)
 	    {
+		/* Look for redirs of the form {var}>file etc. */
 		char *eptr = tokstr + strlen(tokstr) - 1;
 		char *ptr = eptr;
 
@@ -1824,8 +1847,21 @@ par_simple(int *cmplx, int nr)
 
 	    if (!redir_var)
 	    {
-		ecstr(tokstr);
-		argc++;
+		if (postassigns) {
+		    /*
+		     * We're in the variable part of a typeset,
+		     * but this doesn't have an assignment.
+		     * We'll parse it as if it does, but mark
+		     * it specially with WC_ASSIGN_INC.
+		     */
+		    postassigns++;
+		    ecadd(WCB_ASSIGN(WC_ASSIGN_SCALAR, WC_ASSIGN_INC, 0));
+		    ecstr(tokstr);
+		    ecstr("");	/* TBD can possibly optimise out */
+		} else {
+		    ecstr(tokstr);
+		    argc++;
+		}
 		zshlex();
 	    }
 	} else if (IS_REDIROP(tok)) {
@@ -1833,6 +1869,50 @@ par_simple(int *cmplx, int nr)
 	    nrediradd = par_redir(&r, NULL);
 	    p += nrediradd;
 	    sr += nrediradd;
+	} else if (tok == ENVSTRING) {
+	    char *ptr, *name, *str;
+
+	    if (!postassigns++)
+		ppost = ecadd(0);
+
+	    name = tokstr;
+	    for (ptr = tokstr; *ptr && *ptr != Inbrack && *ptr != '=' && *ptr != '+';
+	         ptr++);
+	    if (*ptr == Inbrack) skipparens(Inbrack, Outbrack, &ptr);
+	    ecadd(WCB_ASSIGN(WC_ASSIGN_SCALAR, WC_ASSIGN_NEW, 0));
+
+	    if (*ptr == '=') {
+		*ptr = '\0';
+		str = ptr + 1;
+	    } else
+		equalsplit(tokstr, &str);
+	    ecstr(name);
+	    ecstr(str);
+	    zshlex();
+	} else if (tok == ENVARRAY) {
+	    int n, parr;
+
+	    if (!postassigns++)
+		ppost = ecadd(0);
+
+	    parr = ecadd(0);
+	    ecstr(tokstr);
+	    cmdpush(CS_ARRAY);
+	    /*
+	     * Careful here: this must be the typeset case,
+	     * but we need to tell the lexer not to look
+	     * for assignments until we've finished the
+	     * present one.
+	     */
+	    intypeset = 0;
+	    zshlex();
+	    n = par_nl_wordlist();
+	    ecbuf[parr] = WCB_ASSIGN(WC_ASSIGN_ARRAY, WC_ASSIGN_NEW, n);
+	    cmdpop();
+	    intypeset = 1;
+	    if (tok != OUTPAR)
+		YYERROR(oecused);
+	    zshlex();
 	} else if (tok == INOUTPAR) {
 	    zlong oldlineno = lineno;
 	    int onp, so, oecssub = ecssub;
@@ -1841,7 +1921,7 @@ par_simple(int *cmplx, int nr)
 	    if (!isset(MULTIFUNCDEF) && argc > 1)
 		YYERROR(oecused);
 	    /* Error if preceding assignments */
-	    if (assignments)
+	    if (assignments || postassigns)
 		YYERROR(oecused);
 
 	    *cmplx = c;
@@ -1947,9 +2027,18 @@ par_simple(int *cmplx, int nr)
 	return 0;
     }
     incmdpos = 1;
+    intypeset = 0;
 
-    if (!isfunc)
-	ecbuf[p] = WCB_SIMPLE(argc);
+    if (!isfunc) {
+	if (is_typeset) {
+	    ecbuf[p] = WCB_TYPESET(argc);
+	    if (postassigns)
+		ecbuf[ppost] = postassigns;
+	    else
+		ecadd(0);
+	} else
+	    ecbuf[p] = WCB_SIMPLE(argc);
+    }
 
     return sr + 1;
 }
