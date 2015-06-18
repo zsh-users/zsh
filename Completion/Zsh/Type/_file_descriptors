@@ -1,16 +1,23 @@
 #autoload
 
-local i fds expl link sep
+local i fds expl disp link sep
 local -a list
 
 fds=( /dev/fd/<3->(N:t) )
+fds=( ${(n)fds} )
 
-if zstyle -T ":completion:${curcontext}:" verbose && [[ -h /proc/$$/fd/$fds[1] ]]; then
-  zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
-  if zmodload -F zsh/stat b:zstat; then
+if zstyle -T ":completion:${curcontext}:file-descriptors" verbose; then
+  zstyle -s ":completion:${curcontext}:file-descriptors" list-separator sep || sep=--
+  if [[ $OSTYPE = solaris* ]]; then
+    fds=( ${${(f)"$(pfiles $$|nawk 'NR==1{next} /^ *[0-9]*:/ {printf "\n%s", $1} / *\// {print $1}')"}:#[012]:*} )
+    zformat -a list " $sep " $fds
+    fds=( ${fds%%:*} )
+  elif [[ ! -h /proc/$$/fd/$fds[1] ]]; then
+    :
+  elif zmodload -F zsh/stat b:zstat; then
     for i in "${fds[@]}"; do
       if zstat +link -A link /proc/$$/fd/$i; then
-        list+=( "$i $sep ${link[1]}" )
+        list+=( "${(r.$#fds[-1].)i} $sep ${link[1]}" )
       else
         fds[(i)$i]=()
       fi
@@ -18,7 +25,7 @@ if zstyle -T ":completion:${curcontext}:" verbose && [[ -h /proc/$$/fd/$fds[1] ]
   elif (( $+commands[readlink] )); then
     for i in "${fds[@]}"; do
       if link=$(readlink /proc/$$/fd/$i); then
-        list+=( "$i $sep $link" )
+        list+=( "${(r.$#fds[-1].)i} $sep $link" )
       else
         fds[(i)$i]=()
       fi
@@ -26,19 +33,23 @@ if zstyle -T ":completion:${curcontext}:" verbose && [[ -h /proc/$$/fd/$fds[1] ]
   else
     for i in "${fds[@]}"; do
       if link=$(ls -l /proc/$$/fd/$i); then
-        list+=( "$i $sep ${link#* -> }" )
+        list+=( "${(r.$#fds[-1].)i} $sep ${link#* -> }" )
       else
         fds[(i)$i]=()
       fi
     done
   fi 2>/dev/null
 
-  if (( $list[(I)* $sep ?*] )); then
-    list=( "0 $sep standard input" "1 $sep standard output" "2 $sep standard error" $list )
-    fds=( 0 1 2 $fds )
-    _wanted file-descriptors expl 'file descriptor' compadd "$@" -d list -a - fds
-    return
+  if (( list[(I)* $sep ?*] )); then
+    list=(
+      "${(r.$#fds[-1].):-0} $sep standard input"
+      "${(r.$#fds[-1].):-1} $sep standard output"
+      "${(r.$#fds[-1].):-2} $sep standard error" $list
+    )
+    disp=( -d list )
   fi
+  fds=( 0 1 2 $fds )
 fi
 
-_wanted file-descriptors expl 'file descriptor' compadd -a "$@" - fds
+_description -V file-descriptors expl 'file descriptor'
+compadd $disp "${@/-J/-V}" "$expl[@]" -a fds
