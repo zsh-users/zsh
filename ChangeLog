@@ -1,5 +1,8 @@
 2015-06-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 35504: Completion/Unix/Command/_git: complete % placeholders
+	for git log --format
+
 	* 35521: Completion/Zsh/Type/_file_descriptors: sort matches
 	numerically and use pfiles on Solaris
 

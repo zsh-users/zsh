@@ -6269,6 +6269,95 @@ __git_setup_diff_stage_options () {
   )
 }
 
+(( $+functions[__git_format_placeholders] )) ||
+__git_format_placeholders() {
+  local sep
+  local -a disp names placeholders expl
+  if compset -P 'format:'; then
+    compset -P '(%[^acgCG]|%?[^%]|[^%])#'
+    if compset -P '%C'; then
+      _wanted colors expl color compadd reset red green blue
+      return
+    fi
+    if [[ -prefix %G ]]; then
+      placeholders=(
+	'GG:raw verification message'
+	'G?:indicate [G]ood, [B]ad, [U]ntrusted or [N]o signature'
+	'GS:name of signer'
+	'GK:signing key'
+      )
+      disp=( -l )
+    elif [[ -prefix %g ]]; then
+      placeholders=(
+	gD:'reflog selector'
+	gd:'short reflog selector'
+	gn:'reflog identity'
+	gs:'reflog subject'
+      )
+      disp=( -l )
+    elif [[ $PREFIX = (#b)%([ac]) ]]; then
+      placeholders=(
+	n:'name'
+	N:'name (use .mailmap)'
+	e:'email'
+	E:'email (use .mailmap)'
+	d:'date'
+	D:'date, RFC2822 style'
+	r:'date, relative'
+	t:'date, UNIX timestamp'
+	i:'date, like ISO 8601'
+	I:'date, strict ISO 8601'
+      )
+      placeholders=( $match[1]$^placeholders )
+    else
+      placeholders=(
+	H:commit\ hash
+	h:'abbreviated commit hash'
+	T:'tree hash'
+	t:'abbreviated tree hash'
+	P:'parent hash'
+	p:'abbreviated parent hash'
+	a:'author details'
+	c:'committer details'
+	d:'ref name in brackets'
+	D:'ref name'
+	e:encoding
+	s:subject
+	f:'sanitized subject'
+	g:reflog
+	b:body
+	B:'raw body'
+	N:notes
+	G:GPG\ details
+	C:color
+	m:mark
+	n:newline
+	%:raw\ %
+	x:'hex code'
+	w:'switch line wrapping'
+      )
+    fi
+    names=( ${placeholders%%:*} )
+    if zstyle -T ":completion:${curcontext}:" verbose; then
+      zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
+      zformat -a placeholders " $sep " $placeholders
+      disp+=(-d placeholders)
+    else
+      disp=()
+    fi
+    _wanted placeholders expl placeholder \
+        compadd -p % -S '' "$disp[@]" "$@" - "$names[@]"
+  else
+    _describe -t formats format '( oneline:"commit-ids and subject of messages"
+      short:"few headers and only subject of messages"
+      medium:"most parts of messages"
+      full:"all parts of commit messages"
+      fuller:"like full and includes dates"
+      email:"use email headers like From and Subject"
+      raw:"the raw commits" )' -- '( format:"specify own format" )' -S ':'
+  fi
+}
+
 (( $+functions[__git_setup_revision_options] )) ||
 __git_setup_revision_options () {
   local -a diff_options
@@ -6276,16 +6365,7 @@ __git_setup_revision_options () {
 
   revision_options=(
     $diff_options
-    # TODO: format pretty print format is a lot more advanced than this.
-    # TODO: You can't actually specify --format without a format.
-    '(-v --header)'{--pretty=-,--format=-}'[pretty print commit messages]::format:((oneline\:"commit-ids and subject of messages"
-                                                                                    short\:"few headers and only subject of messages"
-                                                                                    medium\:"most parts of messages"
-                                                                                    full\:"all parts of commit messages"
-                                                                                    fuller\:"like full and includes dates"
-                                                                                    email\:"use email headers like From and Subject"
-                                                                                    raw\:"the raw commits"
-                                                                                    format\:"specify own format"))'
+    '(-v --header)'{--pretty=-,--format=-}'[pretty print commit messages]::format:__git_format_placeholders'
     '(--abbrev-commit --no-abbrev-commit)--abbrev-commit[show only partial prefixes of commit object names]'
     '(--abbrev-commit --no-abbrev-commit)--no-abbrev-commit[show the full 40-byte hexadecimal commit object name]'
     '(--abbrev --no-abbrev)--abbrev=[set minimum SHA1 display-length (for use with --abbrev-commit)]: :__git_guard_number length'
