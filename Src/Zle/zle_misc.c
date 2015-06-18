@@ -736,6 +736,58 @@ yankpop(UNUSED(char **args))
 }
 
 /**/
+char *
+bracketedstring()
+{
+    static const char endesc[] = "\033[201~";
+    int endpos = 0;
+    size_t psize = 64;
+    char *pbuf = zalloc(psize);
+    size_t current = 0;
+    int next, timeout;
+
+    while (endesc[endpos]) {
+	if (current + 1 >= psize)
+	    pbuf = zrealloc(pbuf, psize *= 2);
+	if ((next = getbyte(1L, &timeout)) == EOF)
+	    break;
+	if (!endpos || next != endesc[endpos++])
+	    endpos = (next == *endesc);
+	if (imeta(next)) {
+	    pbuf[current++] = Meta;
+	    pbuf[current++] = next ^ 32;
+	} else if (next == '\r')
+	    pbuf[current++] = '\n';
+	else
+	    pbuf[current++] = next;
+    }
+    pbuf[current-endpos] = '\0';
+    return pbuf;
+}
+
+/**/
+int
+bracketedpaste(char **args)
+{
+    char *pbuf = bracketedstring();
+
+    if (*args) {
+	setsparam(*args, pbuf);
+    } else {
+	int n;
+	ZLE_STRING_T wpaste;
+	wpaste = stringaszleline((zmult == 1) ? pbuf :
+	    quotestring(pbuf, NULL, QT_BACKSLASH), 0, &n, NULL, NULL);
+	zmult = 1;
+	if (region_active)
+	    killregion(zlenoargs);
+	doinsert(wpaste, n);
+	free(pbuf); free(wpaste);
+    }
+    return 0;
+}
+
+/**/
 int
 overwritemode(UNUSED(char **args))
 {
@@ -1264,6 +1316,22 @@ executenamedcommand(char *prmt)
 	    if (listed)
 		clearlist = listshown = 1;
 	    curlist = 0;
+	} else if (cmd == Th(z_bracketedpaste)) {
+	    char *insert = bracketedstring();
+	    size_t inslen = strlen(insert);
+	    if (len + inslen > NAMLEN)
+		feep = 1;
+	    else {
+		strcpy(ptr, insert);
+		len += inslen;
+		ptr += inslen;
+		if (listed) {
+		    clearlist = listshown = 1;
+		    listed = 0;
+		} else
+		    curlist = 0;
+	    }
+	    free(insert);
 	} else {
 	    if(cmd == Th(z_acceptline) || cmd == Th(z_vicmdmode)) {
 		Thingy r;

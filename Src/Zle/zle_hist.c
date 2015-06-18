@@ -1620,6 +1620,21 @@ doisearch(char **args, int dir, int pattern)
 		feep = 1;
 	    else
 		goto ins;
+	} else if (cmd == Th(z_bracketedpaste)) {
+	    char *paste = bracketedstring();
+	    set_isrch_spot(top_spot++, hl, pos, pat_hl, pat_pos, end_pos,
+			   zlemetacs, sbptr, dir, nomatch);
+	    size_t pastelen = strlen(paste);
+	    if (sbptr + pastelen >= sibuf - FIRST_SEARCH_CHAR - 2) {
+		int oldsize = sibuf;
+		sibuf += (pastelen >= sibuf) ? pastelen + 1 : sibuf;
+		ibuf = hrealloc(ibuf, oldsize, sibuf);
+		sbuf = ibuf + FIRST_SEARCH_CHAR;
+	    }
+	    strcpy(sbuf + sbptr, paste);
+	    sbptr += pastelen;
+	    patprog = NULL;
+	    free(paste);
 	} else if (cmd == Th(z_acceptsearch)) {
 	    break;
 	} else {

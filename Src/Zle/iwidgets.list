@@ -28,6 +28,7 @@
 "beginning-of-history", beginningofhistory, 0
 "beginning-of-line", beginningofline, 0
 "beginning-of-line-hist", beginningoflinehist, 0
+"bracketed-paste", bracketedpaste, ZLE_MENUCMP | ZLE_KEEPSUFFIX
 "capitalize-word", capitalizeword, 0
 "clear-screen", clearscreen, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_NOTCOMMAND
 "complete-word", completeword, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP

@@ -1400,6 +1400,11 @@ default_bindings(void)
     bindkey(emap, "\30\30", refthingy(t_exchangepointandmark), NULL);
     bindkey(emap, "\30=",   refthingy(t_whatcursorposition), NULL);
 
+    /* bracketed paste applicable to all keymaps */
+    bindkey(emap, "\33[200~", refthingy(t_bracketedpaste), NULL);
+    bindkey(vmap, "\33[200~", refthingy(t_bracketedpaste), NULL);
+    bindkey(amap, "\33[200~", refthingy(t_bracketedpaste), NULL);
+
     /* emacs mode: ESC sequences, all taken from the meta binding table */
     buf[0] = '\33';
     buf[2] = 0;

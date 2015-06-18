@@ -2269,41 +2269,16 @@ msearchpop(int *backp)
 }
 
 static Cmatch **
-msearch(Cmatch **ptr, int ins, int back, int rep, int *wrapp)
+msearch(Cmatch **ptr, char *ins, int back, int rep, int *wrapp)
 {
-#ifdef MULTIBYTE_SUPPORT
-    /* MB_CUR_MAX may not be constant */
-    VARARR(char, s, MB_CUR_MAX+1);
-#else
-    char s[2];
-#endif
     Cmatch **p, *l = NULL, m;
     int x = mcol, y = mline;
     int ex, ey, wrap = 0, owrap = (msearchstate & MS_WRAPPED);
 
     msearchpush(ptr, back);
 
-    if (ins) {
-#ifdef MULTIBYTE_SUPPORT
-	if (lastchar_wide_valid)
-	{
-	    mbstate_t mbs;
-	    int len;
-
-	    memset(&mbs, 0, sizeof(mbs));
-	    len = wcrtomb(s, lastchar_wide, &mbs);
-	    if (len < 0)
-		len = 0;
-	    s[len] = '\0';
-	} else
-#endif
-	{
-	    s[0] = lastchar;
-	    s[1] = '\0';
-	}
-
-        msearchstr = dyncat(msearchstr, s);
-    }
+    if (ins)
+        msearchstr = dyncat(msearchstr, ins);
     if (back) {
         ex = mcols - 1;
         ey = -1;
@@ -3273,14 +3248,23 @@ domenuselect(Hookdef dummy, Chdata dat)
                    cmd == Th(z_historyincrementalsearchbackward) ||
                    ((mode == MM_FSEARCH || mode == MM_BSEARCH) &&
                     (cmd == Th(z_selfinsert) ||
-                     cmd == Th(z_selfinsertunmeta)))) {
+                     cmd == Th(z_selfinsertunmeta) ||
+		     cmd == Th(z_bracketedpaste)))) {
             Cmatch **np, **op = p;
             int was = (mode == MM_FSEARCH || mode == MM_BSEARCH);
-            int ins = (cmd == Th(z_selfinsert) || cmd == Th(z_selfinsertunmeta));
+            int ins = (cmd == Th(z_selfinsert) || cmd == Th(z_selfinsertunmeta) ||
+		cmd == Th(z_bracketedpaste));
             int back = (cmd == Th(z_historyincrementalsearchbackward));
             int wrap;
 
             do {
+		char *toins = NULL;
+#ifdef MULTIBYTE_SUPPORT
+		/* MB_CUR_MAX may not be constant */
+		VARARR(char, insert, MB_CUR_MAX+1);
+#else
+		char insert[2];
+#endif
                 if (was) {
                     p += wishcol - mcol;
                     mcol = wishcol;
@@ -3297,16 +3281,41 @@ domenuselect(Hookdef dummy, Chdata dat)
                         msearchstack = NULL;
 			msearchstate = MS_OK;
                     }
-                }
-                if (cmd == Th(z_selfinsertunmeta)) {
-		    fixunmeta();
-                }
+                } else {
+		    if (cmd == Th(z_selfinsertunmeta)) {
+			fixunmeta();
+		    }
+		    if (cmd == Th(z_bracketedpaste)) {
+			toins = bracketedstring();
+		    } else {
+			toins = insert;
+#ifdef MULTIBYTE_SUPPORT
+			if (lastchar_wide_valid)
+			{
+			    mbstate_t mbs;
+			    int len;
+
+			    memset(&mbs, 0, sizeof(mbs));
+			    len = wcrtomb(s, lastchar_wide, &mbs);
+			    if (len < 0)
+				len = 0;
+			    insert[len] = '\0';
+			} else
+#endif
+			{
+			    insert[0] = lastchar;
+			    insert[1] = '\0';
+			}
+		    }
+		}
                 wrap = 0;
-                np = msearch(p, ins, (ins ? (mode == MM_BSEARCH) : back),
+                np = msearch(p, toins, (ins ? (mode == MM_BSEARCH) : back),
                              (was && !ins), &wrap);
 
                 if (!ins)
                     mode = (back ? MM_BSEARCH : MM_FSEARCH);
+		else if (cmd == Th(z_bracketedpaste))
+		    free(toins);
 
                 if (*msearchstr) {
                     zsfree(lastsearch);

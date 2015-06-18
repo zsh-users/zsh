@@ -1642,6 +1642,23 @@ item(tt(ZDOTDIR))(
 The directory to search for shell startup files (.zshrc, etc),
 if not tt($HOME).
 )
+vindex(zle_bracketed_paste)
+cindex(bracketed paste)
+cindex(enabling bracketed paste)
+item(tt(zle_bracketed_paste))(
+Many terminal emulators have a feature that allows applications to
+identify when text is pasted into the terminal rather than being typed
+normally. For ZLE, this means that special characters such as tabs
+and newlines can be inserted instead of invoking editor commands.
+Furthermore, pasted text forms a single undo event and if the region is
+active, pasted text will replace the region.
+
+This two-element array contains the terminal escape sequences for
+enabling and disabling the feature. These escape sequences are used to
+enable bracketed paste when ZLE is active and disable it at other times.
+Unsetting the parameter has the effect of ensuring that bracketed paste
+remains disabled.
+)
 vindex(ZLE_LINE_ABORTED)
 item(tt(ZLE_LINE_ABORTED))(
 This parameter is set by the line editor when an error occurs.  It

@@ -1,5 +1,10 @@
 2015-06-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 35474, 35492: Doc/Zsh/params.yo, Doc/Zsh/zle.yo,
+	Src/Zle/complist.c, Src/Zle/iwidgets.list, Src/Zle/zle_hist.c,
+	Src/Zle/zle_keymap.c, Src/Zle/zle_main.c: support the
+	bracketed paste mode of newer terminal emulators
+
 	* 35487, 35496: Doc/Zsh/zle.yo, Src/Zle/complist.c,
 	Src/Zle/zle_hist.c: don't reinstate previous incremental search
 	string when search direction changes
