@@ -1,5 +1,9 @@
 2015-06-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 35487, 35496: Doc/Zsh/zle.yo, Src/Zle/complist.c,
+	Src/Zle/zle_hist.c: don't reinstate previous incremental search
+	string when search direction changes
+
 	* 35510: Completion/Unix/Command/_git: use consistent
 	formatting for git subcommands
 

@@ -1360,7 +1360,9 @@ item(tt(clear-screen))(
 Clear the screen, remaining in incremental search mode.
 )
 item(tt(history-incremental-search-backward))(
-Find the next occurrence of the contents of the mini-buffer.
+Find the next occurrence of the contents of the mini-buffer. If the
+mini-buffer is empty, the most recent previously used search string is
+reinstated.
 )
 item(tt(history-incremental-search-forward))(
 Invert the sense of the search.

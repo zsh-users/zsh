@@ -1598,7 +1598,7 @@ doisearch(char **args, int dir, int pattern)
 	    dir = odir;
 	    skip_pos = 1;
 	rpt:
-	    if (!sbptr && previous_search_len) {
+	    if (!sbptr && previous_search_len && dir == odir) {
 		if (previous_search_len > sibuf - FIRST_SEARCH_CHAR - 2) {
 		    ibuf = hrealloc((char *)ibuf, sibuf,
 				    (sibuf + previous_search_len));

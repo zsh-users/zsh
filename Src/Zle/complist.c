@@ -3287,13 +3287,15 @@ domenuselect(Hookdef dummy, Chdata dat)
                 }
                 if (!ins) {
                     if (was) {
-                        if (!*msearchstr && lastsearch) {
+                        if (!*msearchstr && lastsearch &&
+			    back == (mode == MM_BSEARCH)) {
                             msearchstr = dupstring(lastsearch);
                             mode = 0;
                         }
                     } else {
                         msearchstr = "";
                         msearchstack = NULL;
+			msearchstate = MS_OK;
                     }
                 }
                 if (cmd == Th(z_selfinsertunmeta)) {
