@@ -2525,7 +2525,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 
     if (on & PM_TIED) {
 	Param apm;
-	struct asgment asg0;
+	struct asgment asg0, asg2;
 	char *oldval = NULL, *joinstr;
 	int joinchar, nargs;
 
@@ -2565,7 +2565,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	}
 	if (!ASG_ARRAYP(asg) && asg->value.scalar) {
 	    unqueue_signals();
-	    zwarnnam(name, "second argument of tie must be scalar: %s",
+	    zwarnnam(name, "second argument of tie must be array: %s",
 		     asg->name);
 	    return 1;
 	}
@@ -2578,6 +2578,11 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	if (strchr(asg0.name, '[') || strchr(asg->name, '[')) {
 	    unqueue_signals();
 	    zerrnam(name, "can't tie array elements: %s", asg0.name);
+	    return 1;
+	}
+	if (ASG_VALUEP(asg) && ASG_VALUEP(&asg0)) {
+	    unqueue_signals();
+	    zerrnam(name, "only one tied parameter can have value: %s", asg0.name);
 	    return 1;
 	}
 
@@ -2635,7 +2640,8 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 		}
 		return 1;
 	    }
-	    if (!asg0.value.scalar && !(PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)))
+	    if (!asg0.value.scalar && !asg->value.array &&
+		!(PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)))
 		oldval = ztrdup(getsparam(asg0.name));
 	    on |= (pm->node.flags & PM_EXPORTED);
 	}
@@ -2643,12 +2649,18 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	 * Create the tied array; this is normal except that
 	 * it has the PM_TIED flag set.  Do it first because
 	 * we need the address.
+	 *
+	 * Don't attempt to set it yet, it's too early
+	 * to be exported properly.
 	 */
+	asg2.name = asg->name;
+	asg2.is_array = 0;
+	asg2.value.array = (LinkList)0;
 	if (!(apm=typeset_single(name, asg->name,
 				 (Param)paramtab->getnode(paramtab,
 							  asg->name),
 				 func, (on | PM_ARRAY) & ~PM_EXPORTED,
-				 off, roff, asg, NULL, ops, 0))) {
+				 off, roff, &asg2, NULL, ops, 0))) {
 	    if (oldval)
 		zsfree(oldval);
 	    unqueue_signals();
@@ -2680,7 +2692,9 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	if (apm->ename)
 	    zsfree(apm->ename);
 	apm->ename = ztrdup(asg0.name);
-	if (oldval)
+	if (asg->value.array)
+	    setaparam(asg->name, zlinklist2array(asg->value.array));
+	else if (oldval)
 	    setsparam(asg0.name, oldval);
 	unqueue_signals();
 
