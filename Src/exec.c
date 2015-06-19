@@ -3485,21 +3485,63 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    state->pc = assignspc;
 		    assigns = newlinklist();
 		    while (postassigns--) {
-			Asgment asg = (Asgment)zhalloc(sizeof(struct asgment));
 			wordcode ac = *state->pc++;
-			int htok;
 			char *name = ecgetstr(state, EC_DUPTOK, &htok);
+			Asgment asg;
+			int htok;
 			local_list1(svl);
 
 			DPUTS(wc_code(ac) != WC_ASSIGN,
 			      "BUG: bad assignment list for typeset");
 			if (htok) {
 			    init_list1(svl, name);
+			    if (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR &&
+				WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC) {
+				char *data;
+				/*
+				 * Special case: this is a name only, so
+				 * it's not required to be a single
+				 * expansion.  Furthermore, for
+				 * consistency with the builtin
+				 * interface, it may expand into
+				 * scalar assignments:
+				 *  ass=(one=two three=four)
+				 *  typeset a=b $ass
+				 */
+				/* Unused dummy value for name */
+				(void)ecgetstr(state, EC_DUPTOK, &htok);
+				prefork(&svl, PREFORK_TYPESET);
+				if (errflag) {
+				    state->pc = opc;
+				    break;
+				}
+				globlist(&svl, 0);
+				if (errflag) {
+				    state->pc = opc;
+				    break;
+				}
+				while ((data = ugetnode(&svl))) {
+				    char *ptr;
+				    asg = (Asgment)zhalloc(sizeof(struct asgment));
+				    asg->is_array = 0;
+				    if ((ptr = strchr(data, '='))) {
+					*ptr++ = '\0';
+					asg->name = data;
+					asg->value.scalar = ptr;
+				    } else {
+					asg->name = data;
+					asg->value.scalar = NULL;
+				    }
+				    uaddlinknode(assigns, &asg->node);
+				}
+				continue;
+			    }
 			    prefork(&svl, PREFORK_SINGLE);
-			    name= empty(&svl) ? "" :
+			    name = empty(&svl) ? "" :
 				(char *)getdata(firstnode(&svl));
 			}
 			untokenize(name);
+			asg = (Asgment)zhalloc(sizeof(struct asgment));
 			asg->name = name;
 			if (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR) {
 			    char *val = ecgetstr(state, EC_DUPTOK, &htok);

@@ -231,7 +231,7 @@
 
  typeset -T THIS will not work
 1:Tied array syntax
-?(eval):typeset:1: -T requires names of scalar and array
+?(eval):typeset:1: too many arguments for -T
 
  local array[2]=x
 1:Illegal local array element assignment
