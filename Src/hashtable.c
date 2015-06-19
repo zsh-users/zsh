@@ -1057,6 +1057,7 @@ static struct reswd reswds[] = {
     {{NULL, "else", 0}, ELSE},
     {{NULL, "end", 0}, ZEND},
     {{NULL, "esac", 0}, ESAC},
+    {{NULL, "export", 0}, TYPESET},
     {{NULL, "fi", 0}, FI},
     {{NULL, "for", 0}, FOR},
     {{NULL, "foreach", 0}, FOREACH},

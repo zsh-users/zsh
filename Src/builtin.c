@@ -2587,7 +2587,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	 */
 	if (*argv)
 	    joinstr = *argv;
-	else if (assigns) {
+	else if (assigns && firstnode(assigns)) {
 	    Asgment nextasg = (Asgment)firstnode(assigns);
 	    if (ASG_ARRAYP(nextasg) || ASG_VALUEP(nextasg)) {
 		zwarnnam(name, "third argument of tie must be join character");
