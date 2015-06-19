@@ -1,7 +1,7 @@
 #compdef fc history r
 
 local curcontext="$curcontext" state state_descr line ret=1
-local list events num cmd
+local events num cmd sep
 typeset -A opt_args
 local fc_common fc_hist fc_r
 
@@ -67,21 +67,20 @@ case $service in
 esac
 
 if [[ -n $state ]]; then
+  zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
   if [[ -z ${line:#*=*} ]] && compset -P '*='; then
     _message -e replacements 'replacement'
   elif [[ -prefix [0-9] ]]; then
-    events=( ${(ps.\0.)"$(printf '%s:%s\0' ${(kv)history})"} )
-    zformat -a list " -- " "$events[@]"
-    _wanted -2V events expl "$state_descr" compadd -M "B:0=" -ld list - \
-        "${events[@]%%:*}"
+    events=( ${(0)"$(printf "%-${#HISTNO}.${#HISTNO}s $sep %s\0" "${(kv)history[@]}")"} )
+    _wanted -2V events expl "$state_descr" compadd -M "B:0=" -ld events - \
+        "${events[@]%% *}"
   elif [[ -prefix - ]]; then
-    for num cmd in ${(kv)history}; do
+    for num cmd in "${(kv@)history}"; do
       (( num=num - HISTNO ))
-      events+=( $num:$cmd )
+      events+=( "${(r.1+$#HISTNO.)num} $sep $cmd" )
     done
-    zformat -a list " -- " "$events[@]"
-    _wanted -2V events expl "$state_descr" compadd -ld list - \
-        "${events[@]%%:*}"
+    _wanted -2V events expl "$state_descr" compadd -ld events - \
+        "${events[@]%% *}"
   else
     _wanted events expl "$state_descr" compadd -S '' - \
         ${${history%%[=[:IFS:]]*}:#[0-9-]*} || _guard "[0-9]#" event

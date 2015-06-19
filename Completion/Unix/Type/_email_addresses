@@ -88,7 +88,7 @@ _email-local() {
 _email_addresses() {
   local -a plugins reply list args
   local -A opts files
-  local plugin rcfile muttrc expl ret fret
+  local plugin rcfile muttrc expl sep ret fret
 
   local __specialx='][()<>@,;:\\".'
   local __spacex=" 	"				# Space, tab
@@ -159,7 +159,8 @@ _email_addresses() {
 
 	  if (( fret == 300 )); then
 	    if (( ! $+opts[-c] )) && [[ $opts[-n] = $plugin ]]; then
-	      zformat -a list ' -- ' "${reply[@]}"
+	      zstyle -s ":completion:${curcontext}:$curtag" list-separator sep || sep=--
+	      zformat -a list " $sep " "${reply[@]}"
 	      _wanted mail-aliases expl 'alias' compadd "$@" \
 		  -d list - ${reply%%:*} && ret=0
 	    else

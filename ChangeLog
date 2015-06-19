@@ -1,5 +1,9 @@
 2015-06-19  Oliver Kiddle  <opk@zsh.org>
 
+	* 35527: Completion/Unix/Type/_email_addresses,
+	Completion/Zsh/Command/_fc, Completion/Zsh/Command/_zpty:
+	use list-separator style in cases where separator was hardcoded
+
 	* 35528: Completion/Unix/Type/_pids: allow for IPREFIX
 
 2015-06-18  Oliver Kiddle  <opk@zsh.org>

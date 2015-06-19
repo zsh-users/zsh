@@ -1,6 +1,6 @@
 #compdef zpty
 
-local state line list names expl curcontext="$curcontext"
+local state line list names expl sep curcontext="$curcontext"
 typeset -A opt_args
 
 _arguments -C -s -S \
@@ -50,8 +50,9 @@ if [[ $state = name ]]; then
   fi
   list=( ${${(f)"$(zpty)"}#*\) } )
   names=( ${list%%:*} )
-  if zstyle -T ":completion:${curcontext}" verbose; then
-    zformat -a list ' --' ${${(f)"$(zpty)"}#*\) }
+  if zstyle -T ":completion:${curcontext}:" verbose; then
+    zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
+    zformat -a list " $sep" ${${(f)"$(zpty)"}#*\) }
     _wanted names expl 'zpty command name' compadd -d list -a names
   else
     _wanted names expl 'zpty command name' compadd -a names
