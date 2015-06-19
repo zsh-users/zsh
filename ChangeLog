@@ -1,3 +1,7 @@
+2015-06-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 35528: Completion/Unix/Type/_pids: allow for IPREFIX
+
 2015-06-18  Oliver Kiddle  <opk@zsh.org>
 
 	* 35474, 35492: Doc/Zsh/params.yo, Doc/Zsh/zle.yo,
