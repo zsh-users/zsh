@@ -782,24 +782,24 @@ struct eccstr {
 #define WC_REDIR    4
 #define WC_ASSIGN   5
 #define WC_SIMPLE   6
-#define WC_SUBSH    7
-#define WC_CURSH    8
-#define WC_TIMED    9
-#define WC_FUNCDEF 10
-#define WC_FOR     11
-#define WC_SELECT  12
-#define WC_WHILE   13
-#define WC_REPEAT  14
-#define WC_CASE    15
-#define WC_IF      16
-#define WC_COND    17
-#define WC_ARITH   18
-#define WC_AUTOFN  19
-#define WC_TRY     20
-#define WC_TYPESET 21
+#define WC_TYPESET  7
+#define WC_SUBSH    8
+#define WC_CURSH    9
+#define WC_TIMED   10
+#define WC_FUNCDEF 11
+#define WC_FOR     12
+#define WC_SELECT  13
+#define WC_WHILE   14
+#define WC_REPEAT  15
+#define WC_CASE    16
+#define WC_IF      17
+#define WC_COND    18
+#define WC_ARITH   19
+#define WC_AUTOFN  20
+#define WC_TRY     21
 
 /* increment as necessary */
-#define WC_COUNT   21
+#define WC_COUNT   22
 
 #define WCB_END()           wc_bld(WC_END, 0)
 

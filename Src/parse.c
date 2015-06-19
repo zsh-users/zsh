@@ -1863,8 +1863,8 @@ par_simple(int *cmplx, int nr)
 		} else {
 		    ecstr(tokstr);
 		    argc++;
-		    zshlex();
 		}
+		zshlex();
 	    }
 	} else if (IS_REDIROP(tok)) {
 	    *cmplx = c = 1;
@@ -1890,6 +1890,7 @@ par_simple(int *cmplx, int nr)
 		equalsplit(tokstr, &str);
 	    ecstr(name);
 	    ecstr(str);
+	    zshlex();
 	} else if (tok == ENVARRAY) {
 	    int n, parr;
 
@@ -1905,6 +1906,7 @@ par_simple(int *cmplx, int nr)
 	    cmdpop();
 	    if (tok != OUTPAR)
 		YYERROR(oecused);
+	    zshlex();
 	} else if (tok == INOUTPAR) {
 	    zlong oldlineno = lineno;
 	    int onp, so, oecssub = ecssub;

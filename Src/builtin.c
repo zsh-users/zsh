@@ -2378,11 +2378,17 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	pm->level = keeplocal;
     else if (on & PM_LOCAL)
 	pm->level = locallevel;
-    if (ASG_VALUEP(asg) && !(pm->node.flags & (PM_ARRAY|PM_HASHED))) {
+    if (ASG_VALUEP(asg)) {
 	Param ipm = pm;
-	DPUTS(ASG_ARRAYP(asg), "BUG: inconsistent array value for scalar");
-	if (!(pm = setsparam(pname, ztrdup(asg->value.scalar))))
-	    return NULL;
+	if (pm->node.flags & (PM_ARRAY|PM_HASHED)) {
+	    DPUTS(!ASG_ARRAYP(asg), "BUG: inconsistent scalar value for array");
+	    if (!(pm=setaparam(pname, zlinklist2array(asg->value.array))))
+		return NULL;
+	} else {
+	    DPUTS(ASG_ARRAYP(asg), "BUG: inconsistent array value for scalar");
+	    if (!(pm = setsparam(pname, ztrdup(asg->value.scalar))))
+		return NULL;
+	}
 	if (pm != ipm) {
 	    DPUTS(ipm->node.flags != pm->node.flags,
 		  "BUG: parameter recreated with wrong flags");
@@ -2419,11 +2425,6 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	}
     }
     pm->node.flags |= (on & PM_READONLY);
-    if (ASG_VALUEP(asg) && (pm->node.flags & (PM_ARRAY|PM_HASHED))) {
-	DPUTS(!ASG_ARRAYP(asg), "BUG: inconsistent scalar value for array");
-	if (!(pm=setaparam(pname, zlinklist2array(asg->value.array))))
-	    return NULL;
-    }
 
     if (OPT_ISSET(ops,'p'))
 	paramtab->printnode(&pm->node, PRINT_TYPESET);
@@ -2451,6 +2452,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
     int on = 0, off = 0, roff, bit = PM_ARRAY;
     int i;
     int returnval = 0, printflags = 0;
+    int hasargs;
 
     /* hash -f is really the builtin `functions' */
     if (OPT_ISSET(ops,'f'))
@@ -2503,7 +2505,8 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
     /* Given no arguments, list whatever the options specify. */
     if (OPT_ISSET(ops,'p'))
 	printflags |= PRINT_TYPESET;
-    if (!*argv) {
+    hasargs = *argv != NULL || (assigns && firstnode(assigns));
+    if (!hasargs) {
 	if (!OPT_ISSET(ops,'p')) {
 	    if (!(on|roff))
 		printflags |= PRINT_TYPE;
@@ -2524,7 +2527,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	Param apm;
 	struct asgment asg0;
 	char *oldval = NULL, *joinstr;
-	int joinchar;
+	int joinchar, nargs;
 
 	if (OPT_ISSET(ops,'m')) {
 	    zwarnnam(name, "incompatible options for -T");
@@ -2532,8 +2535,14 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    return 1;
 	}
 	on &= ~off;
-	if (!argv[1] || (argv[2] && argv[3])) {
+	nargs = arrlen(argv) + (assigns ? countlinknodes(assigns) : 0);
+	if (nargs < 2) {
 	    zwarnnam(name, "-T requires names of scalar and array");
+	    unqueue_signals();
+	    return 1;
+	}
+	if (nargs > 3) {
+	    zwarnnam(name, "too many arguments for -T");
 	    unqueue_signals();
 	    return 1;
 	}
@@ -2698,7 +2707,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    tokenize(asg->name);   /* expand argument */
 	    if (!(pprog = patcompile(asg->name, 0, NULL))) {
 		untokenize(asg->name);
-		zwarnnam(name, "bad pattern : %s", argv[-1]);
+		zwarnnam(name, "bad pattern : %s", asg->name);
 		returnval = 1;
 		continue;
 	    }
