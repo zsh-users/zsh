@@ -76,7 +76,8 @@ _adb() {
 	'(-d -e   )-s[serial]: :_adb_device_serial' \
 	'(   -e -s)-d[device]' \
 	'(-d    -s)-e[emulator]' \
-	'*:"options":_adb_options_handler'
+	'1:"options":_adb_options_handler' \
+	'*: : _default'
       
       return;
   }
@@ -99,26 +100,29 @@ _adb_dispatch_command () {
   fi
 
   case ${curcontext} in
-    (*:adb:shell)
+    (*:adb-shell)
       (( $+functions[_adb_dispatch_shell] )) && _adb_dispatch_shell
       ;;
-    (*:adb:connect|*:adb:disconnect)
+    (*:adb-connect|*:adb-disconnect)
       (( $+functions[_adb_dispatch_connection_handling] )) && _adb_dispatch_connection_handling
       ;;
-    (*:adb:logcat)
+    (*:adb-logcat)
       (( $+functions[_adb_dispatch_logcat] )) && _adb_dispatch_logcat
       ;;
-    (*:adb:push)
+    (*:adb-push)
       (( $+functions[_adb_dispatch_push] )) && _adb_dispatch_push
       ;;
-    (*:adb:pull)
+    (*:adb-pull)
       (( $+functions[_adb_dispatch_pull] )) && _adb_dispatch_pull
       ;;
-    (*:adb:install)
+    (*:adb-install)
       (( $+functions[_adb_dispatch_install] )) && _adb_dispatch_install
       ;;
-    (*:adb:uninstall)
+    (*:adb-uninstall)
       (( $+functions[_adb_dispatch_uninstall] )) && _adb_dispatch_uninstall
+      ;;
+    (*:adb-*)
+      _default
       ;;
     (*)
       _arguments \
@@ -143,7 +147,7 @@ _adb_sanitize_context () {
   done
   ##expand unquoted to remove sparse elements
   mywords=( ${mywords[@]} )
-  curcontext="${curcontext}${mywords[-1]}"
+  (( $#mywords )) && curcontext="${curcontext%:*}-${mywords[-1]}:"
 }
 
 (( $+functions[_adb_device_specification] )) ||
@@ -373,9 +377,9 @@ _adb_dispatch_connection_handling () {
   fi
 }
 
-(( $+functions[adb_check_log_redirect] )) ||
+(( $+functions[_adb_check_log_redirect] )) ||
 _adb_check_log_redirect () {
-  LOG_REDIRECT=${$(adb ${=ADB_DEVICE_SPECIFICATION} shell getprop log.redirect-stdio)//
+  LOG_REDIRECT=${$(adb ${=ADB_DEVICE_SPECIFICATION} shell getprop log.redirect-stdio 2>/dev/null)//
 /}
   [[ ${LOG_REDIRECT[1,4]} == "true" ]] &&  _message -r "Notice: stdio log redirection enabled on the device, so some completions will not work"
 }

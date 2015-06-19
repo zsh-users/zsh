@@ -1,5 +1,7 @@
 2015-06-19  Oliver Kiddle  <opk@zsh.org>
 
+	* 35531: Completion/Unix/Command/_adb: fallback on file completion
+
 	* 35527: Completion/Unix/Type/_email_addresses,
 	Completion/Zsh/Command/_fc, Completion/Zsh/Command/_zpty:
 	use list-separator style in cases where separator was hardcoded
