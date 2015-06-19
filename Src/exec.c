@@ -3493,8 +3493,13 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
 			DPUTS(wc_code(ac) != WC_ASSIGN,
 			      "BUG: bad assignment list for typeset");
-			if (htok)
-			    untokenize(name);
+			if (htok) {
+			    init_list1(svl, name);
+			    prefork(&svl, PREFORK_SINGLE);
+			    name= empty(&svl) ? "" :
+				(char *)getdata(firstnode(&svl));
+			}
+			untokenize(name);
 			asg->name = name;
 			if (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR) {
 			    char *val = ecgetstr(state, EC_DUPTOK, &htok);
