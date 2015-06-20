@@ -3488,7 +3488,6 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			wordcode ac = *state->pc++;
 			char *name = ecgetstr(state, EC_DUPTOK, &htok);
 			Asgment asg;
-			int htok;
 			local_list1(svl);
 
 			DPUTS(wc_code(ac) != WC_ASSIGN,

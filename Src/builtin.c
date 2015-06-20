@@ -443,6 +443,28 @@ execbuiltin(LinkList args, LinkList assigns, Builtin bn)
 	        fputc(' ', xtrerr);
 	        quotedzputs(*fullargv++, xtrerr);
 	    }
+	    if (assigns) {
+		LinkNode node;
+		for (node = firstnode(assigns); node; incnode(node)) {
+		    Asgment asg = (Asgment)node;
+		    fputc(' ', xtrerr);
+		    quotedzputs(asg->name, xtrerr);
+		    if (asg->is_array) {
+			LinkNode arrnode;
+			fprintf(xtrerr, "=(");
+			for (arrnode = firstnode(asg->value.array);
+			     arrnode;
+			     incnode(arrnode)) {
+			    fputc(' ', xtrerr);
+			    quotedzputs((char *)getdata(arrnode), xtrerr);
+			}
+			fprintf(xtrerr, " )");
+		    } else if (asg->value.scalar) {
+			fputc('=', xtrerr);
+			quotedzputs(asg->value.scalar, xtrerr);
+		    }
+		}
+	    }
 	    fputc('\n', xtrerr);
 	    fflush(xtrerr);
 	}
