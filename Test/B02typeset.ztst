@@ -508,3 +508,20 @@
 >a2=(three four)
 >typeset -r r1=yes
 >typeset -r r2=no
+
+  one=hidden two=hidden three=hidden four=hidden five=hidden
+  fn() {
+     local bleugh="four=vier"
+     typeset -R10 one=eins two=(zwei dio) three $bleugh five=(cinq cinque)
+     three=drei
+     print -l $one $two $three $four $five
+  }
+  fn
+0:typeset reserved word interface: basic
+>      eins
+>zwei
+>dio
+>      drei
+>      vier
+>cinq
+>cinque
