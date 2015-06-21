@@ -11,6 +11,8 @@
 # Either or both may be empty.
 #   -n           Only replace the text before or after the region with
 #                the -p or -P options if the text was not empty.
+#   -l lbufvar   ) $lbufvar and $rbufvar will contain the value of $LBUFFER and
+#   -r rbufvar   ) $RBUFFER resulting from any recursive edit (i.e. not with -S or -R)
 #   -S statevar
 #   -R statevar
 # Save or restore the state in/from the parameter named statevar.  In
@@ -28,15 +30,19 @@ integer _ntr_start _ntr_end _ntr_swap _ntr_cursor=$CURSOR _ntr_mark=$MARK
 integer _ntr_stat
 
 local _ntr_opt _ntr_pretext _ntr_posttext _ntr_usepretext _ntr_useposttext
-local _ntr_nonempty _ntr_save _ntr_restore
+local _ntr_nonempty _ntr_save _ntr_restore _ntr_lbuffer _ntr_rbuffer
 
-while getopts "np:P:R:S:" _ntr_opt; do
+while getopts "l:np:P:r:R:S:" _ntr_opt; do
   case $_ntr_opt in
+    (l) _ntr_lbuffer=$OPTARG
+	;;
     (n) _ntr_nonempty=1
 	;;
     (p) _ntr_pretext=$OPTARG _ntr_usepretext=1
 	;;
     (P) _ntr_posttext=$OPTARG _ntr_useposttext=1
+	;;
+    (r) _ntr_rbuffer=$OPTARG
 	;;
     (R) _ntr_restore=$OPTARG
         ;;
@@ -101,6 +107,9 @@ fi
 if [[ -z $_ntr_save && -z $_ntr_restore ]]; then
   zle recursive-edit
   _ntr_stat=$?
+
+  [[ -n $_ntr_lbuffer ]] && eval "${_ntr_lbuffer}=\${LBUFFER}"
+  [[ -n $_ntr_rbuffer ]] && eval "${_ntr_rbuffer}=\${RBUFFER}"
 fi
 
 if [[ -n $_ntr_restore || -z $_ntr_save ]]; then

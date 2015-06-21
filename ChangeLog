@@ -1,3 +1,8 @@
+2015-06-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 35545: Functions/Zle/narrow-to-region: Add ability to return
+	buffer components from narrowed region.
+
 2015-06-19  Oliver Kiddle  <opk@zsh.org>
 
 	* 35531: Completion/Unix/Command/_adb: fallback on file completion
