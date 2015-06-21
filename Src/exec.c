@@ -2543,14 +2543,26 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    checked = !has_token(cmdarg);
 	    if (!checked)
 		break;
-	    if (!(cflags & (BINF_BUILTIN | BINF_COMMAND)) &&
-		(hn = shfunctab->getnode(shfunctab, cmdarg))) {
-		is_shfunc = 1;
-		break;
-	    }
-	    if (!(hn = builtintab->getnode(builtintab, cmdarg))) {
-		checked = !(cflags & BINF_BUILTIN);
-		break;
+	    if (type == WC_TYPESET &&
+		(hn = builtintab->getnode2(builtintab, cmdarg))) {
+		/*
+		 * If reserved word for typeset command found (and so
+		 * enabled), use regardless of whether builtin is
+		 * enabled as we share the implementation.
+		 *
+		 * Reserved words take precedence over shell functions.
+		 */
+		checked = 1;
+	    } else {
+		if (!(cflags & (BINF_BUILTIN | BINF_COMMAND)) &&
+		    (hn = shfunctab->getnode(shfunctab, cmdarg))) {
+		    is_shfunc = 1;
+		    break;
+		}
+		if (!(hn = builtintab->getnode(builtintab, cmdarg))) {
+		    checked = !(cflags & BINF_BUILTIN);
+		    break;
+		}
 	    }
 	    orig_cflags |= cflags;
 	    cflags &= ~BINF_BUILTIN & ~BINF_COMMAND;

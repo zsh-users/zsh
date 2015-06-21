@@ -2020,7 +2020,8 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 
     /* attempting a type conversion, or making a tied colonarray? */
     tc = 0;
-    if (ASG_ARRAYP(asg) && PM_TYPE(on) == PM_SCALAR)
+    if (ASG_ARRAYP(asg) && PM_TYPE(on) == PM_SCALAR &&
+	!(usepm && (PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED))))
 	on |= PM_ARRAY;
     if (usepm && ASG_ARRAYP(asg) && newspecial == NS_NONE &&
 	PM_TYPE(pm->node.flags) != PM_ARRAY &&

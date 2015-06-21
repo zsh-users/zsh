@@ -131,13 +131,11 @@ struct heredocs *hdocs;
  *     - followed by strings
  *
  *   WC_TYPESET
- *     Variant of WC_SIMPLE used when trailing assignments are
- *     needed.  N.B.: if they are not, we use WC_SIMPLE even
- *     if this is a TYPESET keyword.
+ *     Variant of WC_SIMPLE used when TYPESET reserved word found.
  *     - data contains the number of string arguments (plus command)
  *     - followed by strings
  *     - followed by number of assignments
- *     - followed by assignments
+ *     - followed by assignments if non-zero number.
  *
  *   WC_SUBSH
  *     - data unused
@@ -1728,7 +1726,7 @@ static int
 par_simple(int *cmplx, int nr)
 {
     int oecused = ecused, isnull = 1, r, argc = 0, p, isfunc = 0, sr = 0;
-    int c = *cmplx, nrediradd, assignments = 0, ppost = 0;
+    int c = *cmplx, nrediradd, assignments = 0, ppost = 0, is_typeset = 0;
     wordcode postassigns = 0;
 
     r = ecused;
@@ -1814,7 +1812,7 @@ par_simple(int *cmplx, int nr)
 	    incmdpos = 0;
 
 	    if (tok == TYPESET)
-		intypeset = 1;
+		intypeset = is_typeset = 1;
 
 	    if (!isset(IGNOREBRACES) && *tokstr == Inbrace)
 	    {
@@ -2024,9 +2022,12 @@ par_simple(int *cmplx, int nr)
     intypeset = 0;
 
     if (!isfunc) {
-	if (postassigns) {
+	if (is_typeset) {
 	    ecbuf[p] = WCB_TYPESET(argc);
-	    ecbuf[ppost] = postassigns;
+	    if (postassigns)
+		ecbuf[ppost] = postassigns;
+	    else
+		ecadd(0);
 	} else
 	    ecbuf[p] = WCB_SIMPLE(argc);
     }
