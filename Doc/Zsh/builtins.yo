@@ -1753,12 +1753,60 @@ tt(typeset vbl=$(echo one two)) is treated as having one argument if
 tt(KSH_TYPESET) is set, but otherwise is treated as having the two arguments
 tt(vbl=one) and tt(two).
 
+If the reserved word tt(declare), tt(export), tt(float), tt(integer),
+tt(local), tt(readonly) or tt(typeset) is matched when the line is
+parsed (N.B. not when it is executed), and the reserved word has not
+been disabled with tt(disable -r), the shell will try to parse arguments
+as assignments, except that the `tt(+=)' syntax and the tt(GLOB_ASSIGN)
+option are not supported. This has two major differences from normal
+command line argument parsing: array assignment is possible, and scalar
+values after tt(=) are not split further into words even if expanded
+(regardless of the setting of the tt(KSH_TYPESET) option).  Here is an
+example:
+
+example(# Reserved word parsing
+typeset svar=$(echo one word) avar=(several words))
+
+The above creates a scalar parameter tt(svar) with the value `tt(one
+word)' and an array parameter tt(avar) with a value containing two
+entries, `tt(several)' and `tt(words)'.  On the other hand:
+
+example(# Normal builtin interface
+cmd=typeset
+$cmd svar=$(echo two words))
+
+The above creates a scalar tt(svar) contain the value tt(two) and
+another scalar parameter tt(words) with no value.  An array value in
+this case would either cause an error or be treated as an obscure set of
+glob qualifiers.
+
+Arbitrary arguments are allowed if they take the form of assignments
+after command line expansion; however, these only perform scalar
+assignment:
+
+example(var='svar=val'
+typeset $var)
+
+The above sets the scalar parameter tt(svar) to the value tt(val).
+Parentheses around the value within tt(var) would not cause array
+assignment as they will be treated as ordinary characters when tt($var)
+is substituted.  Any non-trivial expansion in the name part of the
+assignment causes the argument to be treated in this fashion:
+
+example(typeset {var1,var2,var3}=name)
+
+The above syntax is valid, and has the expected effect of setting the
+three parameters to the same value, but the command line is parsed as
+a set of three normal command line arguments to tt(typeset) after
+expansion.  Hence it is not possible to assign to multiple arrays by
+this means.
+
 If the shell option tt(TYPESET_SILENT) is not set, for each remaining
-var(name) that refers to a parameter that is set, the name and value of the
-parameter are printed in the form of an assignment.  Nothing is printed for
-newly-created parameters, or when any attribute flags listed below are
-given along with the var(name).  Using `tt(PLUS())' instead of minus to
-introduce an attribute turns it off.
+var(name) that refers to a parameter that is already set, the name and
+value of the parameter are printed in the form of an assignment.
+Nothing is printed for newly-created parameters, or when any attribute
+flags listed below are given along with the var(name).  Using
+`tt(PLUS())' instead of minus to introduce an attribute turns it off.
 
 If no var(name) is present, the names and values of all parameters are
 printed.  In this case the attribute flags restrict the display to only
@@ -1829,7 +1877,7 @@ the current state, readonly specials (whose values cannot be
 changed) are not shown and assignments to arrays are shown before
 the tt(typeset) rendering the array readonly.
 )
-item(tt(-T) [ var(scalar)[tt(=)var(value)] var(array) [ var(sep) ] ])(
+item(tt(-T) [ var(scalar)[tt(=)var(value)] var(array)[tt(=)LPAR()var(value...)RPAR()] [ var(sep) ] ])(
 This flag has a different meaning when used with tt(-f); see below.
 Otherwise the tt(-T) option requires zero, two, or three arguments to be
 present.  With no arguments, the list of parameters created in this
@@ -1839,10 +1887,13 @@ together in the manner of tt($PATH) and tt($path).  The optional third
 argument is a single-character separator which will be used to join the
 elements of the array to form the scalar; if absent, a colon is used, as
 with tt($PATH).  Only the first character of the separator is significant;
-any remaining characters are ignored.
+any remaining characters are ignored.  Multibyte characters are not
+yet supported.
 
-Only the scalar parameter may be assigned an initial value.  Both the
-scalar and the array may otherwise be manipulated as normal.  If one is
+Only one of the scalar and array parameters may be assigned an initial
+value (the restrictions on assignment forms described above also apply).
+
+Both the scalar and the array may be manipulated as normal.  If one is
 unset, the other will automatically be unset too.  There is no way of
 untying the variables without unsetting them, nor of converting the type
 of one of them with another tt(typeset) command; tt(+T) does not work,

@@ -472,7 +472,8 @@ word of a command unless quoted or disabled using tt(disable -r):
 
 tt(do done esac then elif else fi for case
 if while function repeat time until
-select coproc nocorrect foreach end ! [[ { })
+select coproc nocorrect foreach end ! [[ { }
+declare export float integer local readonly typeset)
 
 Additionally, `tt(})' is recognized in any position if neither the
 tt(IGNORE_BRACES) option nor the tt(IGNORE_CLOSE_BRACES) option is set.
