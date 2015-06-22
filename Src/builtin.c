@@ -2130,6 +2130,12 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
      *   ii. we are creating a new local parameter
      */
     if (usepm) {
+	if (asg->is_array ?
+	    (asg->value.array && !(PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED))) :
+	    (asg->value.scalar && (PM_TYPE(pm->node.flags & (PM_ARRAY|PM_HASHED))))) {
+	    zerrnam(cname, "%s: inconsistent type for assignment", pname);
+	    return NULL;
+	}
 	on &= ~PM_LOCAL;
 	if (!on && !roff && !ASG_VALUEP(asg)) {
 	    if (OPT_ISSET(ops,'p'))
@@ -2201,6 +2207,13 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	if (OPT_ISSET(ops,'p'))
 	    paramtab->printnode(&pm->node, PRINT_TYPESET);
 	return pm;
+    }
+
+    if (asg->is_array ?
+	(asg->value.array && !(on & (PM_ARRAY|PM_HASHED))) :
+	(asg->value.scalar && (on & (PM_ARRAY|PM_HASHED)))) {
+	zerrnam(cname, "%s: inconsistent type for assignment", pname);
+	return NULL;
     }
 
     /*
