@@ -1743,15 +1743,8 @@ ifnzman(noderef(Local Parameters))\
 retain their special attributes when made local.
 
 For each var(name)tt(=)var(value) assignment, the parameter
-var(name) is set to var(value).  Note that arrays currently cannot be
-assigned in tt(typeset) expressions, only scalars and integers.  Unless
-the option tt(KSH_TYPESET) is set, normal expansion rules apply to
-assignment arguments, so var(value) may be split into separate words; if
-the option is set, assignments which can be recognised when expansion is
-performed are treated as single words.  For example the command
-tt(typeset vbl=$(echo one two)) is treated as having one argument if
-tt(KSH_TYPESET) is set, but otherwise is treated as having the two arguments
-tt(vbl=one) and tt(two).
+var(name) is set to var(value).  All forms of the command
+handle scalar assignment.
 
 If the reserved word tt(declare), tt(export), tt(float), tt(integer),
 tt(local), tt(readonly) or tt(typeset) is matched when the line is
@@ -1761,8 +1754,8 @@ as assignments, except that the `tt(+=)' syntax and the tt(GLOB_ASSIGN)
 option are not supported. This has two major differences from normal
 command line argument parsing: array assignment is possible, and scalar
 values after tt(=) are not split further into words even if expanded
-(regardless of the setting of the tt(KSH_TYPESET) option).  Here is an
-example:
+(regardless of the setting of the tt(KSH_TYPESET) option; this option
+is obsolete).  Here is an example:
 
 example(# Reserved word parsing
 typeset svar=$(echo one word) avar=(several words))
