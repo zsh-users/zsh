@@ -1,3 +1,8 @@
+2015-06-22  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35566: Src/Modules/regex.c: didn't handle faile
+	parenthesis matches.
+
 2015-06-22  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 35554: Doc/Zsh/contrib.yo: Document narrow-to-region -l and -r.

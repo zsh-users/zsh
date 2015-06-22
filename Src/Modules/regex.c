@@ -155,6 +155,11 @@ zcond_regex_match(char **a, int id)
 			 ++n, ++m, ++bptr, ++eptr)
 		    {
 			char buf[DIGBUFSIZE];
+			if (m->rm_so < 0 || m->rm_eo < 0) {
+			    *bptr = ztrdup("-1");
+			    *eptr = ztrdup("-1");
+			    continue;
+			}
 			ptr = lhstr;
 			leftlen = m->rm_so;
 			offs = 0;
