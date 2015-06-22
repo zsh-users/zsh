@@ -1,3 +1,7 @@
+2015-06-22  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 35554: Doc/Zsh/contrib.yo: Document narrow-to-region -l and -r.
+
 2015-06-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 35545: Functions/Zle/narrow-to-region: Add ability to return

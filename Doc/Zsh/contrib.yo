@@ -2272,7 +2272,8 @@ tindex(narrow-to-region)
 tindex(narrow-to-region-invisible)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ ))ifnztexi(                 )))
 xitem(tt(narrow-to-region )[ tt(-p) var(pre) ] [ tt(-P) var(post) ])
-xitem(SPACES()[ tt(-S) var(statepm) | tt(-R) var(statepm) ] [ tt(-n) ] [ var(start) var(end) ])
+xitem(SPACES()[ tt(-S) var(statepm) | tt(-R) var(statepm) | [ tt(-l) var(lbufvar) ] [ tt(-r) var(rbufvar) ] ])
+xitem(SPACES()[ tt(-n) ] [ var(start) var(end) ])
 item(tt(narrow-to-region-invisible))(
 Narrow the editable portion of the buffer to the region between the cursor
 and the mark, which may be in either order.  The region may not be empty.
@@ -2308,9 +2309,15 @@ parameter, except that parameters beginning with the prefix tt(_ntr_) are
 reserved for use within tt(narrow-to-region).  Typically the parameter will
 be local to the calling function.
 
+The options tt(-l) var(lbufvar) and tt(-r) var(rbufvar) may be used to
+specify parameters where the widget will store the resulting text from
+the operation.  The parameter var(lbufvar) will contain var(LBUFFER)
+and var(rbufvar) will contain var(RBUFFER).  Neither of these two options
+may be used with tt(-S) or tt(-R).
+
 tt(narrow-to-region-invisible) is a simple widget which calls
 tt(narrow-to-region) with arguments which replace any text outside the
-region with `tt(...)'.
+region with `tt(...)'.  It does not take any arguments.
 
 The display is restored (and the widget returns) upon any zle command
 which would usually cause the line to be accepted or aborted.  Hence an
