@@ -2,6 +2,9 @@
 
 	* 35554: Doc/Zsh/contrib.yo: Document narrow-to-region -l and -r.
 
+	* 35558: Functions/Zle/narrow-to-region: narrow-to-region:
+	Use unique parameter names for new feature.
+
 2015-06-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 35545: Functions/Zle/narrow-to-region: Add ability to return

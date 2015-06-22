@@ -24,7 +24,7 @@
 emulate -L zsh
 setopt extendedglob
 
-local _ntr_lbuffer _ntr_rbuffer 
+local _ntr_lbuf_return _ntr_rbuf_return
 local _ntr_predisplay=$PREDISPLAY _ntr_postdisplay=$POSTDISPLAY
 integer _ntr_start _ntr_end _ntr_swap _ntr_cursor=$CURSOR _ntr_mark=$MARK
 integer _ntr_stat
@@ -34,7 +34,7 @@ local _ntr_nonempty _ntr_save _ntr_restore _ntr_lbuffer _ntr_rbuffer
 
 while getopts "l:np:P:r:R:S:" _ntr_opt; do
   case $_ntr_opt in
-    (l) _ntr_lbuffer=$OPTARG
+    (l) _ntr_lbuf_return=$OPTARG
 	;;
     (n) _ntr_nonempty=1
 	;;
@@ -42,7 +42,7 @@ while getopts "l:np:P:r:R:S:" _ntr_opt; do
 	;;
     (P) _ntr_posttext=$OPTARG _ntr_useposttext=1
 	;;
-    (r) _ntr_rbuffer=$OPTARG
+    (r) _ntr_rbuf_return=$OPTARG
 	;;
     (R) _ntr_restore=$OPTARG
         ;;
@@ -108,8 +108,8 @@ if [[ -z $_ntr_save && -z $_ntr_restore ]]; then
   zle recursive-edit
   _ntr_stat=$?
 
-  [[ -n $_ntr_lbuffer ]] && eval "${_ntr_lbuffer}=\${LBUFFER}"
-  [[ -n $_ntr_rbuffer ]] && eval "${_ntr_rbuffer}=\${RBUFFER}"
+  [[ -n $_ntr_lbuf_return ]] && eval "${_ntr_lbuf_return}=\${LBUFFER}"
+  [[ -n $_ntr_rbuf_return ]] && eval "${_ntr_rbuf_return}=\${RBUFFER}"
 fi
 
 if [[ -n $_ntr_restore || -z $_ntr_save ]]; then
