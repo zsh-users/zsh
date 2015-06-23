@@ -7,45 +7,76 @@ typeset -A opt_args tmpassoc
 jdb_args=()
 
 case "$service" in
+javac|jar)
+  if compset -P @; then
+    _wanted files expl 'option file' _files
+    return
+  fi
+  ;| # continue
 javac)
   _arguments -C \
     '-g-[generate debugging information]:debug:->debug' \
+    '-A-[specify option to annotation processors]:option' \
+    '-implicit\:-[control generation of class files for implicitly loaded sources]:implicit:(class none)' \
     '-nowarn[generate no warnings]' \
     '-verbose[output messages about what the compiler is doing]' \
     '-deprecation[output source locations where deprecated APIs are used]' \
-    '-classpath[specify where to find user class files]:class path:->classpath' \
+    '(-cp -classpath)'{-cp,-classpath}'[specify where to find user class files]:class path:->classpath' \
     '-sourcepath[specify where to find input source files]:source path:->sourcepath' \
     '-bootclasspath[override location of bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
     '-extdirs[override location of installed extensions]:extensions directories:->extdirs' \
     '-d[specify where to place generated class files]:directory:_files -/' \
     '-encoding[specify character encoding used by source files]:encoding:->encoding' \
-    '-source[provide source compatibility with specified release]:release:(1.{2..5})' \
+    '-proc\:-[control annotation processing]:annotation processing:(none only)' \
+    '-processor[specify annotation processors to run]:class:_files' \
+    '-processorpath[specify where to find annotation processors]:directory:_directories' \
+    '-s[specify directory for generated source files]:directory:_directories' \
+    '-source[provide source compatibility with specified release]:release:(1.{2..8} {5..8})' \
     '-target[specify VM version]:release:(1.{1..5})' \
-    '-help[print a synopsis of standard options]' \
+    '(-)-help[print a synopsis of standard options]' \
+    '(-)-version[print version information]' \
+    '(-)-X[display information about non-standard options]' \
     '*:java source file:_files -g \*.java\(-.\)' && return 0
   ;;
 
 jdb)
   jdb_args=(
     '-host[specify host to connect to]:host:_hosts'
-    '-password[specify password]:password:'
+    '-password[specify password]:password'
+    '-attach[attach to running VM]:address'
+    '-listen[wait for VM to connect]:address'
+    '-listenany[wait for VM to connect at any available address]'
+    '-launch[launch VM immediately]'
+    '-listconnectors[list the connectors available in this VM]'
+    '-connect[connect to target VM]:connector'
+    -dbgtrace -tclient -tserver
+    '-J-[java runtime option]:option'
   )
   ;&
 
 java)
   _arguments -C \
     "$jdb_args[@]" \
+    -client -server -d32 -d64 \
+    '-agentlib\:-:agent library' \
+    '-agentpath\:-:path:_directories' \
+    '-javaagent\:-:path:_directories' \
     '(-cp -classpath)'{-cp,-classpath}'[specify path for user class files]:class path:->classpath' \
     '-D-[specify a property]:property:->property' \
+    \*{-enableassertions,-ea}-::class \
+    \*{-disableassertions,-da}-::class \
+    '(-enablesystemassertions,-esa,-disablesystemassertions,-dsa)'{-enablesystemassertions,-esa,-disablesystemassertions,-dsa} \
     '(-verbose:class)-verbose[print class information]' \
     '(-verbose)-verbose\:class[print class information]' \
     '-verbose\:gc[print gc information]' \
     '-verbose\:jni[print JNI information]' \
-    '-version[print version]' \
-    '-help[print help message]' \
-    '(- 1)-jar[specify a program capsulated as jar]:jar:_files -g \*.jar\(-.\)' \
+    '(- 1)-version[print version]' \
+    '-showversion[print version and contrinue]' \
+    '(- 1)-'{\?,help}'[print help message]' \
+    '(- 1)-X-[non-standard java option]:option' \
+    '(- 1)-jar[specify a program encapsulated as jar]:jar:_files -g \*.jar\(-.\)' \
     '(-):class:_java_class -m main ${(kv)opt_args[(i)(-classpath|-cp)]}' \
-    '*::args: _normal' \
+    '*::args:= _normal' \
      && return 0
   ;;
 
@@ -111,16 +142,20 @@ jar)
       '(c t x  )u[update archive]' \
       'f[specify archive file]' \
       'v[verbose mode]' \
-      'm[specify manifest file]' \
+      '(e)m[specify manifest file]' \
+      '(m)e[specify class of for application entry point]' \
       '0[store only without using ZIP compression]' \
-      'M[do not create manifest file]' && return
+      'M[do not create manifest file]' \
+      'i[generate index information for specified jar files]' && return
   else
     jar_cmd="${words[2]#-}"
     tmpassoc=(
       m ':manifest file:_files'
+      e ':main class'
       f ':archive file:_files -g "*.([ejw]ar|zip)(-.)"'
     )
-    _arguments -C \
+    _arguments '*-C[directory of class file]:directory:_directories' \
+      '-J-[java runtime option]:option' \
       "${jar_cmd/[^-]*/:dummy:}" \
       ${${(s::)jar_cmd}/(#b)(?)/$tmpassoc[$match[1]]} \
       '*:file:->jararg' && return 0
@@ -140,6 +175,7 @@ javah|javah_g)
     '-bootclasspath[specify path for bootstrap class files]:bootstrap class path:->bootstrapclasspath' \
     '-old[generate old JDK1.0-style header files]' \
     '-force[force output]' \
+    '-J-[java runtime option]:option' \
     '*:class:_java_class -m main ${(kv)opt_args[(i)-classpath]}' && return 0
   ;;
 
@@ -558,20 +594,14 @@ docsrc)
   ;;
 
 jararg)
-  if [[ -prefix - ]]; then
-    tmp=('-C:chdir')
-    _describe -o 'option' tmp -- && return
-  elif [[ "$words[CURRENT - 2]" == -C ]]; then
+  if [[ "$words[CURRENT - 2]" == -C ]]; then
     _wanted file expl 'input file' _files -W "($words[CURRENT - 1])" && return
-  elif [[ "$words[CURRENT - 1]" == -C ]]; then
-    _wanted directories expl 'chdir to' _files -/ && return
   elif [[ $words[2] = *x* ]]; then
     jf="$words[3]"
     if [[ $jf != $_jar_cache_name && -f $jf ]]; then
       _jar_cache_list=("${(@f)$($words[1] tf $jf)}")
       _jar_cache_name=$jf
     fi
-
     _wanted files expl 'file from archive' _multi_parts / _jar_cache_list && return
   else
     _wanted files expl 'input file' _files && return

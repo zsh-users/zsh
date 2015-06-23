@@ -1,3 +1,8 @@
+2015-06-23  Oliver Kiddle  <opk@zsh.org>
+
+	* 35529: Completion/Unix/Command/_java: fix filename completion
+	after java -jar
+
 2015-06-22  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35566: Src/Modules/regex.c: didn't handle faile
