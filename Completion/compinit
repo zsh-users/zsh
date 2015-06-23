@@ -152,6 +152,7 @@ _comp_options=(
     NO_kshtypeset
     NO_markdirs
     NO_octalzeroes
+    NO_posixbuiltins
     NO_shwordsplit
     NO_shglob
     NO_warncreateglobal

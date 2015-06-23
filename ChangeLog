@@ -1,5 +1,8 @@
 2015-06-23  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35573: Completion/compinit: turn off POSIX_BUILTINS
+	in completion, needed to get usable OPTIND behaviour.
+
 	* unposted: Src/Zle/zle_misc.c: add missing "void" argument
 	list.
 
