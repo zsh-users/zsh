@@ -1,44 +1,48 @@
 #autoload
 
 local i fds expl disp link sep
-local -a list
+local -a list proc
 
 fds=( /dev/fd/<3->(N:t) )
 fds=( ${(n)fds} )
 
 if zstyle -T ":completion:${curcontext}:file-descriptors" verbose; then
   zstyle -s ":completion:${curcontext}:file-descriptors" list-separator sep || sep=--
-  if [[ $OSTYPE = solaris* ]]; then
-    fds=( ${${(f)"$(pfiles $$|nawk 'NR==1{next} /^ *[0-9]*:/ {printf "\n%s", $1} / *\// {print $1}')"}:#[012]:*} )
+
+  if [[ $OSTYPE = freebsd* ]]; then
+    fds=( ${(f)"$(procstat -f $$|awk -v OFS=: '$3>2 && $3~/[0-9]/ {print $3,$10}')"} )
     zformat -a list " $sep " $fds
     fds=( ${fds%%:*} )
-  elif [[ ! -h /proc/$$/fd/$fds[1] ]]; then
-    :
-  elif zmodload -F zsh/stat b:zstat; then
-    for i in "${fds[@]}"; do
-      if zstat +link -A link /proc/$$/fd/$i; then
-        list+=( "${(r.$#fds[-1].)i} $sep ${link[1]}" )
-      else
-        fds[(i)$i]=()
-      fi
-    done
-  elif (( $+commands[readlink] )); then
-    for i in "${fds[@]}"; do
-      if link=$(readlink /proc/$$/fd/$i); then
-        list+=( "${(r.$#fds[-1].)i} $sep $link" )
-      else
-        fds[(i)$i]=()
-      fi
-    done
-  else
-    for i in "${fds[@]}"; do
-      if link=$(ls -l /proc/$$/fd/$i); then
-        list+=( "${(r.$#fds[-1].)i} $sep ${link#* -> }" )
-      else
-        fds[(i)$i]=()
-      fi
-    done
-  fi 2>/dev/null
+  elif
+    proc=( /proc/$$/(fd|path)/<->(@N[-1]:h) )
+    [[ -n $proc ]]
+  then
+    if zmodload -F zsh/stat b:zstat; then
+      for i in "${fds[@]}"; do
+	if zstat +link -A link $proc/$i; then
+	  list+=( "${(r.$#fds[-1].)i} $sep ${(D)link[1]}" )
+	else
+	  fds[(i)$i]=()
+	fi
+      done
+    elif (( $+commands[readlink] )); then
+      for i in "${fds[@]}"; do
+	if link=$(readlink $proc/$i); then
+	  list+=( "${(r.$#fds[-1].)i} $sep ${(D)link}" )
+	else
+	  fds[(i)$i]=()
+	fi
+      done
+    else
+      for i in "${fds[@]}"; do
+	if link=$(ls -l $proc/$i); then
+	  list+=( "${(r.$#fds[-1].)i} $sep ${(D)link#* -> }" )
+	else
+	  fds[(i)$i]=()
+	fi
+      done
+    fi 2>/dev/null
+  fi
 
   if (( list[(I)* $sep ?*] )); then
     list=(
@@ -48,8 +52,8 @@ if zstyle -T ":completion:${curcontext}:file-descriptors" verbose; then
     )
     disp=( -d list )
   fi
-  fds=( 0 1 2 $fds )
 fi
+fds=( 0 1 2 $fds )
 
 _description -V file-descriptors expl 'file descriptor'
 compadd $disp "${@/-J/-V}" "$expl[@]" -a fds
