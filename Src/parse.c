@@ -1898,10 +1898,18 @@ par_simple(int *cmplx, int nr)
 	    parr = ecadd(0);
 	    ecstr(tokstr);
 	    cmdpush(CS_ARRAY);
+	    /*
+	     * Careful here: this must be the typeset case,
+	     * but we need to tell the lexer not to look
+	     * for assignments until we've finished the
+	     * present one.
+	     */
+	    intypeset = 0;
 	    zshlex();
 	    n = par_nl_wordlist();
 	    ecbuf[parr] = WCB_ASSIGN(WC_ASSIGN_ARRAY, WC_ASSIGN_NEW, n);
 	    cmdpop();
+	    intypeset = 1;
 	    if (tok != OUTPAR)
 		YYERROR(oecused);
 	    zshlex();

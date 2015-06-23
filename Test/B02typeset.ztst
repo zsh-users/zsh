@@ -22,6 +22,8 @@
 
 %prep
 
+  mkdir typeset.tmp && cd typeset.tmp
+
   setopt noglob
 
   scalar=scalar
@@ -517,6 +519,7 @@
      print -l $one $two $three $four $five
   }
   fn
+  print -l $one $two $three $four $five
 0:typeset reserved word interface: basic
 >      eins
 >zwei
@@ -525,3 +528,82 @@
 >      vier
 >cinq
 >cinque
+>hidden
+>hidden
+>hidden
+>hidden
+>hidden
+
+  (
+  setopt glob
+  mkdir -p arrayglob
+  touch arrayglob/{one,two,three,four,five,six,seven}
+  fn() {
+    typeset array=(arrayglob/[tf]*)
+    print -l ${array:t}
+    #
+    typeset {first,second,third}=the_same_value array=(
+    extends
+    over
+    multiple
+    lines
+    )
+    print -l $first $second $third "$array"
+    #
+    integer i=$(echo 1 + 2 + 3 + 4)
+    print $i
+    #
+    # only noted by accident this was broken..
+    # we need to turn off special recognition
+    # of assignments within assignments...
+    typeset careful=( i=1 j=2 k=3 )
+    print -l $careful
+  }
+  fn
+  )
+0:typeset reserved word, more complicated cases
+>five
+>four
+>three
+>two
+>the_same_value
+>the_same_value
+>the_same_value
+>extends over multiple lines
+>10
+>i=1
+>j=2
+>k=3
+
+  (
+     # reserved word is recognised at parsing.
+     # yes, this is documented.
+     # anyway, that means we need to
+     # re-eval the function...
+     fn='
+     fn() {
+        typeset foo=`echo one word=two`
+        print $foo
+        print $word
+     }
+     '
+     print reserved
+     eval $fn; fn
+     print builtin
+     disable -r typeset
+     eval $fn; fn
+     enable -r typeset
+     disable typeset
+     print reserved
+     eval $fn;fn
+  )
+0:reserved word and builtin interfaces
+>reserved
+>one word=two
+>
+>builtin
+>one
+>two
+>reserved
+>one word=two
+>
