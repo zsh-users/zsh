@@ -44,8 +44,8 @@ interface, exposing the builtin interface:
   disable -r declare export float integer local readonly typeset
 
 This is also necessary in the unusual eventuality that the builtins are
-to be replaced by shell functions, since reserved words take precedence
-over functions.
+to be overridden by shell functions, since reserved words take
+precedence over functions.
 
 Incompatibilites between 5.0.7 and 5.0.8
 ----------------------------------------
