@@ -1,3 +1,8 @@
+2015-06-24  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 35550: Src/Zle/complist.c: fix backspace in interactive
+	mode of menu-select
+
 2015-06-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35514: Han Pingtian: Src/pattern.c: [[:foo:]]

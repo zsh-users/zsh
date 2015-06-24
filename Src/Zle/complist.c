@@ -2655,7 +2655,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    s->nbrbeg = nbrbeg;
 	    s->nbrend = nbrend;
 	    s->nmatches = nmatches;
-	    s->origline = origline;
+	    s->origline = dupstring(origline);
 	    s->origcs = origcs;
 	    s->origll = origll;
             s->status = dupstring(status);
@@ -2786,7 +2786,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	    s->nbrbeg = nbrbeg;
 	    s->nbrend = nbrend;
 	    s->nmatches = nmatches;
-	    s->origline = origline;
+	    s->origline = dupstring(origline);
 	    s->origcs = origcs;
 	    s->origll = origll;
             s->status = dupstring(status);
