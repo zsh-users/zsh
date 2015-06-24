@@ -595,7 +595,7 @@
      enable -r typeset
      disable typeset
      print reserved
-     eval $fn;fn
+     eval $fn; fn
   )
 0:reserved word and builtin interfaces
 >reserved
@@ -607,3 +607,47 @@
 >reserved
 >one word=two
 >
+
+  fn() {
+    emulate -L zsh
+    setopt typeset_silent
+    local k
+    typeset -A hash=(k1 v1 k2 v2)
+    typeset foo=word array=(more than one word)
+    for k in ${(ko)hash}; do
+      print $k $hash[$k]
+    done
+    print -l $foo $array
+    typeset -A hash
+    typeset foo array
+    for k in ${(ko)hash}; do
+      print $k $hash[$k]
+    done
+    print -l $foo $array
+    typeset hash=(k3 v3 k4 v4) array=(odd number here)
+    for k in ${(ko)hash}; do
+      print $k $hash[$k]
+    done
+    print -l $array
+  }
+  fn
+0:typeset preserves existing variable types
+>k1 v1
+>k2 v2
+>word
+>more
+>than
+>one
+>word
+>k1 v1
+>k2 v2
+>word
+>more
+>than
+>one
+>word
+>k3 v3
+>k4 v4
+>odd
+>number
+>here
