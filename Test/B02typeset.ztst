@@ -651,3 +651,15 @@
 >odd
 >number
 >here
+
+  fn() { typeset foo bar thing=this stuff=(that other) more=woevva; }
+  which -x2 fn
+  fn2() { typeset assignfirst=(why not); }
+  which -x2 fn2
+0:text output from typeset
+>fn () {
+>  typeset foo bar thing=this stuff=(that other) more=woevva 
+>}
+>fn2 () {
+>  typeset assignfirst=(why not) 
+>}

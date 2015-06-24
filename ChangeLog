@@ -1,5 +1,8 @@
 2015-06-24  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35590: Src/text.c, Test/B02typeset.ztst: tweak and
+	test text output for typeset.
+
 	* various culminating in 35586, c.f. commits on typeset-array
 	branch: Config/version.mk, Doc/Zsh/builtins.yo,
 	Doc/Zsh/grammar.yo, Doc/Zsh/options.yo, NEWS, README,

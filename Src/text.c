@@ -189,6 +189,8 @@ taddassign(wordcode code, Estate state, int typeset)
 static void
 taddassignlist(Estate state, wordcode count)
 {
+    if (count)
+	taddchr(' ');
     while (count--) {
 	wordcode code = *state->pc++;
 	taddassign(code, state, 1);
