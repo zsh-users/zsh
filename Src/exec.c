@@ -3583,15 +3583,18 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			    asg->value.array =
 				ecgetlist(state, WC_ASSIGN_NUM(ac),
 					  EC_DUPTOK, &htok);
-			    prefork(asg->value.array, PREFORK_ASSIGN);
-			    if (errflag) {
-				state->pc = opc;
-				break;
-			    }
-			    globlist(asg->value.array, 0);
-			    if (errflag) {
-				state->pc = opc;
-				break;
+			    if (asg->value.array)
+			    {
+				prefork(asg->value.array, PREFORK_ASSIGN);
+				if (errflag) {
+				    state->pc = opc;
+				    break;
+				}
+				globlist(asg->value.array, 0);
+				if (errflag) {
+				    state->pc = opc;
+				    break;
+				}
 			    }
 			}
 

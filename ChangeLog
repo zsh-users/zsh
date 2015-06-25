@@ -1,3 +1,8 @@
+2015-06-25  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35604: Src/exec.c, Test/B02typeset: create
+	empty arrays in typeset with array=().
+
 2015-06-24  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 35550: Src/Zle/complist.c: fix backspace in interactive

@@ -663,3 +663,16 @@
 >fn2 () {
 >  typeset assignfirst=(why not) 
 >}
+
+  fn() {
+    typeset array=()
+    print ${(t)array} ${#array}
+    typeset gnothergarray=() gnothergarray[1]=yes gnothergarray[2]=no
+    print -l ${(t)gnothergarray} $gnothergarray
+  }
+  fn
+0:can set empty array
+>array-local 0
+>array-local
+>yes
+>no
