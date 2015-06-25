@@ -2141,7 +2141,8 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    if (OPT_ISSET(ops,'p'))
 		paramtab->printnode(&pm->node, PRINT_TYPESET);
 	    else if (!OPT_ISSET(ops,'g') &&
-		     (unset(TYPESETSILENT) || OPT_ISSET(ops,'m')))
+		     (unset(TYPESETSILENT) || OPT_ISSET(ops,'m'))
+		     && !asg->is_array)
 		paramtab->printnode(&pm->node, PRINT_INCLUDEVALUE);
 	    return pm;
 	}

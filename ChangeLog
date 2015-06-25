@@ -1,5 +1,8 @@
 2015-06-25  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35610: Src/builtin.c: typeset is silent if
+	arguments is x=() even if array x already exists.
+
 	* 35604: Src/exec.c, Test/B02typeset: create
 	empty arrays in typeset with array=().
 
