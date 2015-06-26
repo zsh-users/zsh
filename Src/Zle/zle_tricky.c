@@ -1190,6 +1190,12 @@ get_comp_string(void)
 	/* Get the next token. */
 	if (linarr)
 	    incmdpos = 0;
+	/*
+	 * Arrange to parse assignments after typeset etc...
+	 * but not if we're already in an array.
+	 */
+	if (cmdtok == TYPESET)
+	    intypeset = !linarr;
 	ctxtlex();
 
 	if (tok == LEXERR) {
@@ -1272,10 +1278,11 @@ get_comp_string(void)
 	    tt0 = NULLTOK;
 	}
 	if (lincmd && (tok == STRING || tok == FOR || tok == FOREACH ||
-		       tok == SELECT || tok == REPEAT || tok == CASE)) {
+		       tok == SELECT || tok == REPEAT || tok == CASE ||
+		       tok == TYPESET)) {
 	    /* The lexer says, this token is in command position, so *
 	     * store the token string (to find the right compctl).   */
-	    ins = (tok == REPEAT ? 2 : (tok != STRING));
+	    ins = (tok == REPEAT ? 2 : (tok != STRING && tok != TYPESET));
 	    zsfree(cmdstr);
 	    cmdstr = ztrdup(tokstr);
 	    cmdtok = tok;
@@ -1290,7 +1297,7 @@ get_comp_string(void)
 	     * handle completing multiple SEPER-ated command positions on
 	     * the same command line, e.g., pipelines.
 	     */
-	    ins = (cmdtok != STRING);
+	    ins = (cmdtok != STRING && cmdtok != TYPESET);
 	}
 	if (!lexflags && tt0 == NULLTOK) {
 	    /* This is done when the lexer reached the word the cursor is on. */
@@ -1436,7 +1443,7 @@ get_comp_string(void)
 	we = wb = zlemetacs;
 	clwpos = clwnum;
 	t0 = STRING;
-    } else if (t0 == STRING) {
+    } else if (t0 == STRING || t0 == TYPESET) {
 	/* We found a simple string. */
 	s = ztrdup(clwords[clwpos]);
     } else if (t0 == ENVSTRING) {
@@ -1492,7 +1499,7 @@ get_comp_string(void)
 	zlemetaline = tmp;
 	zlemetall = strlen(zlemetaline);
     }
-    if (t0 != STRING && inwhat != IN_MATH) {
+    if (t0 != STRING && t0 != TYPESET && inwhat != IN_MATH) {
 	if (tmp) {
 	    tmp = NULL;
 	    linptr = zlemetaline;

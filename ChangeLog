@@ -1,5 +1,8 @@
 2015-06-26  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35615: Src/lex.c, Src/Zle/zle_tricky.c:
+	fix completion after typeset.
+
 	* 35613: Src/builtin.c, Test/B02typeset: handle
 	array slices in typeset.
 

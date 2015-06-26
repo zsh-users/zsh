@@ -339,6 +339,7 @@ ctxtlex(void)
 	incmdpos = 1;
 	break;
     case STRING:
+    case TYPESET:
  /* case ENVSTRING: */
     case ENVARRAY:
     case OUTPAR:
