@@ -2347,9 +2347,16 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    asg->is_array = 0;
 	    keeplocal = 0;
 	    on = pm->node.flags;
+	} else if (PM_TYPE(on) == PM_ARRAY && ASG_ARRAYP(asg)) {
+	    if (!(pm = setaparam(pname, asg->value.array ? zlinklist2array(asg->value.array) :
+				 mkarray(NULL))))
+		return NULL;
+	    asg->value.array = NULL;
+	    keeplocal = 0;
+	    on = pm->node.flags;
 	} else {
 	    zerrnam(cname,
-		    "%s: array elements must be scalar", pname);
+		    "%s: inconsistent array element or slice assignment", pname);
 	    return NULL;
 	}
     }

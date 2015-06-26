@@ -676,3 +676,18 @@
 >array-local
 >yes
 >no
+
+  array=(nothing to see here)
+  fn() {
+    typeset array=(one two three four five)
+    typeset array[2,4]=(umm er)
+    print ${#array} $array
+    typeset array[2,3]=()
+    print ${#array} $array
+  }
+  fn
+  print ${#array} $array
+0:can update array slices in typeset
+>4 one umm er five
+>2 one five
+>4 nothing to see here
