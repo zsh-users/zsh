@@ -53,6 +53,8 @@ zcontext_save_partial(int parts)
 {
     struct context_stack *cs;
 
+    queue_signals();
+
     cs = (struct context_stack *)malloc(sizeof(struct context_stack));
 
     if (parts & ZCONTEXT_HIST) {
@@ -67,6 +69,8 @@ zcontext_save_partial(int parts)
 
     cs->next = cstack;
     cstack = cs;
+
+    unqueue_signals();
 }
 
 /* save context in full */
