@@ -124,7 +124,7 @@ pindex(POSIXCD)
 pindex(NO_POSIX_CD)
 pindex(NOPOSIXCD)
 cindex(CDPATH, order of checking)
-item(tt(POSIX_CD))(
+item(tt(POSIX_CD) <K> <S>)(
 Modifies the behaviour of tt(cd), tt(chdir) and tt(pushd) commands
 to make them more compatible with the POSIX standard. The behaviour with
 the option unset is described in the documentation for the tt(cd)
