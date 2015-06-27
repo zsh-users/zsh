@@ -2325,7 +2325,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    zerrnam(cname,
 		    "%s: can't create readonly array elements", pname);
 	    return NULL;
-	} else if (on & PM_LOCAL) {
+	} else if ((on & PM_LOCAL) && locallevel) {
 	    *subscript = 0;
 	    pm = (Param) (paramtab == realparamtab ?
 			  gethashnode2(paramtab, pname) :

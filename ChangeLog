@@ -4,6 +4,9 @@
 
 2015-06-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 35635: Src/builtin.c: a bit more consistency about
+	making elements of things local.
+
 	* users/20281: Completion/Base/Core/_main_complete:
 	don't require MULTIFUNCDEF as _main_complete is parsed
 	before we can ensure it's set.
