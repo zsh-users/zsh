@@ -452,11 +452,13 @@ execbuiltin(LinkList args, LinkList assigns, Builtin bn)
 		    if (asg->is_array) {
 			LinkNode arrnode;
 			fprintf(xtrerr, "=(");
-			for (arrnode = firstnode(asg->value.array);
-			     arrnode;
-			     incnode(arrnode)) {
-			    fputc(' ', xtrerr);
-			    quotedzputs((char *)getdata(arrnode), xtrerr);
+			if (asg->value.array) {
+			    for (arrnode = firstnode(asg->value.array);
+				 arrnode;
+				 incnode(arrnode)) {
+				fputc(' ', xtrerr);
+				quotedzputs((char *)getdata(arrnode), xtrerr);
+			    }
 			}
 			fprintf(xtrerr, " )");
 		    } else if (asg->value.scalar) {
@@ -1975,7 +1977,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	       int on, int off, int roff, Asgment asg, Param altpm,
 	       Options ops, int joinchar)
 {
-    int usepm, tc, keeplocal = 0, newspecial = NS_NONE, readonly;
+    int usepm, tc, keeplocal = 0, newspecial = NS_NONE, readonly, dont_set = 0;
     char *subscript;
 
     /*
@@ -2131,8 +2133,9 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
      */
     if (usepm) {
 	if (asg->is_array ?
-	    (asg->value.array && !(PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED))) :
-	    (asg->value.scalar && (PM_TYPE(pm->node.flags & (PM_ARRAY|PM_HASHED))))) {
+	    !(PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)) :
+	    (asg->value.scalar && (PM_TYPE(pm->node.flags &
+					   (PM_ARRAY|PM_HASHED))))) {
 	    zerrnam(cname, "%s: inconsistent type for assignment", pname);
 	    return NULL;
 	}
@@ -2141,8 +2144,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    if (OPT_ISSET(ops,'p'))
 		paramtab->printnode(&pm->node, PRINT_TYPESET);
 	    else if (!OPT_ISSET(ops,'g') &&
-		     (unset(TYPESETSILENT) || OPT_ISSET(ops,'m'))
-		     && !asg->is_array)
+		     (unset(TYPESETSILENT) || OPT_ISSET(ops,'m')))
 		paramtab->printnode(&pm->node, PRINT_INCLUDEVALUE);
 	    return pm;
 	}
@@ -2199,9 +2201,10 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    DPUTS(ASG_ARRAYP(asg), "BUG: typeset got array value where scalar expected");
 	    if (asg->value.scalar && !(pm = setsparam(pname, ztrdup(asg->value.scalar))))
 		return NULL;
-	} else if (asg->value.array) {
-	    DPUTS(!ASG_ARRAYP(asg), "BUG: typeset got scalar value where array expected");
-	    if (!(pm = setaparam(pname, zlinklist2array(asg->value.array))))
+	} else if (asg->is_array) {
+	    if (!(pm = setaparam(pname, asg->value.array ?
+				 zlinklist2array(asg->value.array) :
+				 mkarray(NULL))))
 		return NULL;
 	}
 	pm->node.flags |= (on & PM_READONLY);
@@ -2211,7 +2214,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
     }
 
     if (asg->is_array ?
-	(asg->value.array && !(on & (PM_ARRAY|PM_HASHED))) :
+	!(on & (PM_ARRAY|PM_HASHED)) :
 	(asg->value.scalar && (on & (PM_ARRAY|PM_HASHED)))) {
 	zerrnam(cname, "%s: inconsistent type for assignment", pname);
 	return NULL;
@@ -2343,20 +2346,21 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	     */
 	    if (!(pm = setsparam(pname, ztrdup(asg->value.scalar ? asg->value.scalar : ""))))
 		return NULL;
-	    asg->value.scalar = NULL;
+	    dont_set = 1;
 	    asg->is_array = 0;
 	    keeplocal = 0;
 	    on = pm->node.flags;
 	} else if (PM_TYPE(on) == PM_ARRAY && ASG_ARRAYP(asg)) {
-	    if (!(pm = setaparam(pname, asg->value.array ? zlinklist2array(asg->value.array) :
+	    if (!(pm = setaparam(pname, asg->value.array ?
+				 zlinklist2array(asg->value.array) :
 				 mkarray(NULL))))
 		return NULL;
-	    asg->value.array = NULL;
+	    dont_set = 1;
 	    keeplocal = 0;
 	    on = pm->node.flags;
 	} else {
 	    zerrnam(cname,
-		    "%s: inconsistent array element or slice assignment", pname);
+		    "%s: i1;nconsistent array element or slice assignment", pname);
 	    return NULL;
 	}
     }
@@ -2422,11 +2426,13 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	pm->level = keeplocal;
     else if (on & PM_LOCAL)
 	pm->level = locallevel;
-    if (ASG_VALUEP(asg)) {
+    if (ASG_VALUEP(asg) && !dont_set) {
 	Param ipm = pm;
 	if (pm->node.flags & (PM_ARRAY|PM_HASHED)) {
 	    DPUTS(!ASG_ARRAYP(asg), "BUG: inconsistent scalar value for array");
-	    if (!(pm=setaparam(pname, zlinklist2array(asg->value.array))))
+	    if (!(pm=setaparam(pname, asg->value.array ?
+			       zlinklist2array(asg->value.array) :
+			       mkarray(NULL))))
 		return NULL;
 	} else {
 	    DPUTS(ASG_ARRAYP(asg), "BUG: inconsistent array value for scalar");

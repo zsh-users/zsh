@@ -1,3 +1,9 @@
+2015-06-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 35623: Src/builtin.c, Src/zsh.h, Test/B02typeset.ztst: 35610
+	was incomplete: all is_array asignments should be treated as
+	having a value.
+
 2015-06-26  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 35626: Doc/Zsh/options.yo: update POSIX_CD to note that it is on

@@ -691,3 +691,19 @@
 >4 one umm er five
 >2 one five
 >4 nothing to see here
+
+  array=(no really nothing here)
+  fn() {
+    typeset array=() array[2]=two array[4]=four
+    typeset -p array
+    typeset array=() array[3]=three array[1]=one
+    typeset -p array
+  }
+  fn
+  print $array
+0:setting empty array in typeset
+>typeset -a array
+>array=('' two '' four)
+>typeset -a array
+>array=(one '' three)
+>no really nothing here

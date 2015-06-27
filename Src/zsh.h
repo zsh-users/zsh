@@ -1162,13 +1162,11 @@ struct asgment {
 
 /*
  * Assignment has value?
- * We need to arrange for each of the values
- * to be the same type or the compiler will
- * get fed up.
+ * If the assignment is an arrray, then it certainly has a value --- we
+ * can only tell if there's an expicit assignment.
  */
 
-#define ASG_VALUEP(asg) (ASG_ARRAYP(asg) ?			\
-			 ((asg)->value.array != (LinkList)0) :	\
+#define ASG_VALUEP(asg) (ASG_ARRAYP(asg) ||			\
 			 ((asg)->value.scalar != (char *)0))
 
 /* node in command path hash table (cmdnamtab) */
