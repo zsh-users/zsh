@@ -4277,6 +4277,10 @@ namedpipe(void)
 {
     char *tnam = gettempname(NULL, 1);
 
+    if (!tnam) {
+	zerr("failed to create named pipe: %e", errno);
+	return NULL;
+    }
 # ifdef HAVE_MKFIFO
     if (mkfifo(tnam, 0600) < 0){
 # else

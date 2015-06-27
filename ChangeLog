@@ -1,3 +1,7 @@
+2015-06-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 35634: Src/exec.c: handle failure of gettempname() in namedpipe()
+
 2015-06-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/20281: Completion/Base/Core/_main_complete:
