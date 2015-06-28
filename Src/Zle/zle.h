@@ -352,8 +352,7 @@ struct brinfo {
 #define BEFORECOMPLETEHOOK (zlehooks + 2)
 #define AFTERCOMPLETEHOOK  (zlehooks + 3)
 #define ACCEPTCOMPHOOK     (zlehooks + 4)
-#define REVERSEMENUHOOK    (zlehooks + 5)
-#define INVALIDATELISTHOOK (zlehooks + 6)
+#define INVALIDATELISTHOOK (zlehooks + 5)
 
 /* complete hook data struct */
 

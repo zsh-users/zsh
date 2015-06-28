@@ -1,5 +1,8 @@
 2015-06-29  Oliver Kiddle  <opk@zsh.org>
 
+	* 35637: Src/Zle/zle.h, Src/Zle/zle_main.c, Src/Zle/zle_tricky.c:
+	remove the now unused module hook for reverse-menu-complete
+
 	* 35627: Src/Zle/compcore.c, Src/Zle/compctl.c, Src/Zle/complete.c,
 	Src/Zle/complist.c, Src/Zle/compresult.c, Src/Zle/zle_tricky.c:
 	make reverse-menu-complete start with last match in menu selection

@@ -346,10 +346,7 @@ reversemenucomplete(char **args)
 {
     wouldinstab = 0;
     zmult = -zmult;
-    menucomplete(args);
-
-    runhookdef(REVERSEMENUHOOK, NULL);
-    return 0;
+    return menucomplete(args);
 }
 
 /**/

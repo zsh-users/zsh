@@ -1992,8 +1992,6 @@ mod_export struct hookdef zlehooks[] = {
     HOOKDEF("after_complete", NULL, 0),
     /* ACCEPTCOMPHOOK */
     HOOKDEF("accept_completion", NULL, 0),
-    /* REVERSEMENUHOOK */
-    HOOKDEF("reverse_menu", NULL, 0),
     /* INVALIDATELISTHOOK */
     HOOKDEF("invalidate_list", NULL, 0),
 };
