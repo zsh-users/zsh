@@ -2071,6 +2071,7 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
 	memset(mgtab, 0, i * sizeof(Cmgroup));
 	mlastcols = mcols = zterm_columns;
 	mlastlines = mlines = listdat.nlines;
+	mmtabp = 0;
     }
     last_cap = (char *) zhalloc(max_caplen + 1);
     *last_cap = '\0';
@@ -2562,6 +2563,8 @@ domenuselect(Hookdef dummy, Chdata dat)
 	}
 	p = mmtabp;
 	pg = mgtabp;
+	if (!p) /* selected match not in display, find line */
+	    continue;
 	minfo.cur = *p;
 	minfo.group = *pg;
 	if (setwish)
