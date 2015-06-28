@@ -1625,7 +1625,6 @@ boot_(Module m)
     addhookfunc("before_complete", (Hookfn) before_complete);
     addhookfunc("after_complete", (Hookfn) after_complete);
     addhookfunc("accept_completion", (Hookfn) accept_last);
-    addhookfunc("reverse_menu", (Hookfn) reverse_menu);
     addhookfunc("list_matches", (Hookfn) list_matches);
     addhookfunc("invalidate_list", (Hookfn) invalidate_list);
     (void)addhookdefs(m, comphooks, sizeof(comphooks)/sizeof(*comphooks));
@@ -1640,7 +1639,6 @@ cleanup_(Module m)
     deletehookfunc("before_complete", (Hookfn) before_complete);
     deletehookfunc("after_complete", (Hookfn) after_complete);
     deletehookfunc("accept_completion", (Hookfn) accept_last);
-    deletehookfunc("reverse_menu", (Hookfn) reverse_menu);
     deletehookfunc("list_matches", (Hookfn) list_matches);
     deletehookfunc("invalidate_list", (Hookfn) invalidate_list);
     (void)deletehookdefs(m, comphooks,

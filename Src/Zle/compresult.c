@@ -1220,67 +1220,44 @@ do_menucmp(int lst)
 	was_meta = 1;
 
     /* Otherwise go to the next match in the array... */
-    do {
-	if (!*++(minfo.cur)) {
-	    do {
-		if (!(minfo.group = (minfo.group)->next)) {
-		    minfo.group = amatches;
+    while (zmult) {
+	do {
+	    if (zmult > 0) {
+		if (!*++(minfo.cur)) {
+		    do {
+			if (!(minfo.group = (minfo.group)->next)) {
+			    minfo.group = amatches;
 #ifdef ZSH_HEAP_DEBUG
-		    if (memory_validate(minfo.group->heap_id)) {
-			HEAP_ERROR(minfo.group->heap_id);
-		    }
+			    if (memory_validate(minfo.group->heap_id)) {
+				HEAP_ERROR(minfo.group->heap_id);
+			    }
 #endif
+			}
+		    } while (!(minfo.group)->mcount);
+		    minfo.cur = minfo.group->matches;
 		}
-	    } while (!(minfo.group)->mcount);
-	    minfo.cur = minfo.group->matches;
-	}
-    } while ((menuacc &&
-	      !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr)) ||
-             ((*minfo.cur)->flags & CMF_DUMMY) ||
-	     (((*minfo.cur)->flags & (CMF_NOLIST | CMF_MULT)) &&
-	      (!(*minfo.cur)->str || !*(*minfo.cur)->str)));
+	    } else {
+		if (minfo.cur == (minfo.group)->matches) {
+		    do {
+			if (!(minfo.group = (minfo.group)->prev))
+			    minfo.group = lmatches;
+		    } while (!(minfo.group)->mcount);
+		    minfo.cur = (minfo.group)->matches + (minfo.group)->mcount - 1;
+		} else
+		    minfo.cur--;
+	    }
+	} while ((menuacc &&
+		!hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr)) ||
+		((*minfo.cur)->flags & CMF_DUMMY) ||
+		(((*minfo.cur)->flags & (CMF_NOLIST | CMF_MULT)) &&
+		(!(*minfo.cur)->str || !*(*minfo.cur)->str)));
+	zmult -= (0 < zmult) - (zmult < 0);
+    }
     /* ... and insert it into the command line. */
     do_single(*minfo.cur);
 
     if (!was_meta)
 	unmetafy_line();
-}
-
-/**/
-int
-reverse_menu(UNUSED(Hookdef dummy), UNUSED(void *dummy2))
-{
-    int was_meta;
-
-    if (minfo.cur == NULL)
-	return 1;
-
-    do {
-	if (minfo.cur == (minfo.group)->matches) {
-	    do {
-		if (!(minfo.group = (minfo.group)->prev))
-		    minfo.group = lmatches;
-	    } while (!(minfo.group)->mcount);
-	    minfo.cur = (minfo.group)->matches + (minfo.group)->mcount - 1;
-	} else
-	    minfo.cur--;
-    } while ((menuacc &&
-	      !hasbrpsfx(*(minfo.cur), minfo.prebr, minfo.postbr)) ||
-	     ((*minfo.cur)->flags & CMF_DUMMY) ||
-	     (((*minfo.cur)->flags & (CMF_NOLIST | CMF_MULT)) &&
-	      (!(*minfo.cur)->str || !*(*minfo.cur)->str)));
-    /* May already be metafied if called from within a selection */
-    if (zlemetaline == NULL) {
-	metafy_line();
-	was_meta = 0;
-    }
-    else
-	was_meta = 1;
-    do_single(*(minfo.cur));
-    if (!was_meta)
-	unmetafy_line();
-
-    return 0;
 }
 
 /* Accepts the current completion and starts a new arg, *

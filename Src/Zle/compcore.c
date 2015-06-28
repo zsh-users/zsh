@@ -327,9 +327,7 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
     haspattern = 0;
     complistmax = getiparam("LISTMAX");
     zsfree(complastprompt);
-    complastprompt = ztrdup(((isset(ALWAYSLASTPROMPT) && zmult == 1) ||
-			     (unset(ALWAYSLASTPROMPT) && zmult != 1)) ?
-			    "yes" : "");
+    complastprompt = ztrdup(isset(ALWAYSLASTPROMPT) ? "yes" : "");
     dolastprompt = 1;
     zsfree(complist);
     complist = ztrdup(isset(LISTROWSFIRST) ?
@@ -975,7 +973,7 @@ makecomplist(char *s, int incmd, int lst)
 	mnum = 0;
 	unambig_mnum = -1;
 	isuf = NULL;
-	insmnum = 1;
+	insmnum = zmult;
 #if 0
 	/* group-numbers in compstate[insert] */
 	insgnum = 1;

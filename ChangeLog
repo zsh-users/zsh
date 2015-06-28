@@ -1,5 +1,9 @@
 2015-06-29  Oliver Kiddle  <opk@zsh.org>
 
+	* 35627: Src/Zle/compcore.c, Src/Zle/compctl.c, Src/Zle/complete.c,
+	Src/Zle/complist.c, Src/Zle/compresult.c, Src/Zle/zle_tricky.c:
+	make reverse-menu-complete start with last match in menu selection
+
 	* 35623: Src/Zle/complist.c: fix menu-selection where initial
 	selection would not be displayed without scrolling
 

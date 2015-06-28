@@ -2581,6 +2581,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     getk:
 
     	if (!do_last_key) {
+	    zmult = 1;
 	    cmd = getkeycmd();
 	    if (mtab_been_reallocated) {
 		do_last_key = 1;

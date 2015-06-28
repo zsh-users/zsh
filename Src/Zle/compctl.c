@@ -1803,7 +1803,7 @@ ccmakehookfn(UNUSED(Hookdef dummy), struct ccmakedat *dat)
 	mnum = 0;
 	unambig_mnum = -1;
 	isuf = NULL;
-	insmnum = 1;
+	insmnum = zmult;
 #if 0
 	/* group-numbers in compstate[insert] */
 	insgnum = 1;
