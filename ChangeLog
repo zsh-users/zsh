@@ -1,3 +1,8 @@
+2015-06-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 35643: Src/parse.c: redirections after typeset assignments
+	were broken.
+
 2015-06-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 35642: Src/context.c: signal queueing in zcontext_save_partial()

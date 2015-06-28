@@ -1868,6 +1868,8 @@ par_simple(int *cmplx, int nr)
 	    *cmplx = c = 1;
 	    nrediradd = par_redir(&r, NULL);
 	    p += nrediradd;
+	    if (ppost)
+		ppost += nrediradd;
 	    sr += nrediradd;
 	} else if (tok == ENVSTRING) {
 	    char *ptr, *name, *str;
