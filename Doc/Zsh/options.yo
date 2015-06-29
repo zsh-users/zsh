@@ -1794,7 +1794,7 @@ enditem()
 
 subsect(Shell Emulation)
 startitem()
-pindex(APPEND_CREATE
+pindex(APPEND_CREATE)
 pindex(NO_APPEND_CREATE)
 pindex(APPENDCREATE)
 pindex(NOAPPENDCREATE)
