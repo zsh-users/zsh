@@ -3315,7 +3315,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    fil = -1;
 		else if (IS_APPEND_REDIR(fn->type))
 		    fil = open(unmeta(fn->name),
-			       (unset(CLOBBER) && !IS_CLOBBER_REDIR(fn->type)) ?
+			       ((unset(CLOBBER) && unset(APPENDCREATE)) &&
+				!IS_CLOBBER_REDIR(fn->type)) ?
 			       O_WRONLY | O_APPEND | O_NOCTTY :
 			       O_WRONLY | O_APPEND | O_CREAT | O_NOCTTY, 0666);
 		else

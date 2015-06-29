@@ -81,6 +81,7 @@ static struct optname optns[] = {
 {{NULL, "allexport",	      OPT_EMULATE},		 ALLEXPORT},
 {{NULL, "alwayslastprompt",   OPT_ALL},			 ALWAYSLASTPROMPT},
 {{NULL, "alwaystoend",	      0},			 ALWAYSTOEND},
+{{NULL, "appendcreate",	      OPT_EMULATE|OPT_BOURNE},	 APPENDCREATE},
 {{NULL, "appendhistory",      OPT_ALL},			 APPENDHISTORY},
 {{NULL, "autocd",	      OPT_EMULATE},		 AUTOCD},
 {{NULL, "autocontinue",	      0},			 AUTOCONTINUE},

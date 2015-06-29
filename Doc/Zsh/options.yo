@@ -1094,10 +1094,12 @@ pindex(NOCLOBBER)
 cindex(clobbering, of files)
 cindex(file clobbering, allowing)
 item(tt(CLOBBER) (tt(PLUS()C), ksh: tt(PLUS()C)) <D>)(
-Allows `tt(>)' redirection to truncate existing files,
-and `tt(>>)' to create files.
-Otherwise `tt(>!)' or `tt(>|)' must be used to truncate a file,
-and `tt(>>!)' or `tt(>>|)' to create a file.
+Allows `tt(>)' redirection to truncate existing files.
+Otherwise `tt(>!)' or `tt(>|)' must be used to truncate a file.
+
+If the option is not set, and the option tt(APPEND_CREATE) is also
+not set, `tt(>>!)' or `tt(>>|)' must be used to create a file.
+If either option is set, `tt(>>)' may be used.
 )
 pindex(CORRECT)
 pindex(NO_CORRECT)
@@ -1792,6 +1794,21 @@ enditem()
 
 subsect(Shell Emulation)
 startitem()
+pindex(APPEND_CREATE
+pindex(NO_APPEND_CREATE)
+pindex(APPENDCREATE)
+pindex(NOAPPENDCREATE)
+cindex(clobbering, POSIX compatibility)
+cindex(file clobbering, POSIX compatibility)
+cindex(no clobber, POSIX compatible)
+item(tt(APPEND_CREATE) <K> <S>)(
+This option only applies when tt(NO_CLOBBER) (-tt(C)) is in effect.
+
+If this option is not set, the shell will report an error when a
+append redirection (tt(>>)) is used on a file that does not already
+exists (the traditional zsh behaviour of tt(NO_CLOBBER)).  If the option
+is set, no error is reported (POSIX behaviour).
+)
 pindex(BASH_REMATCH)
 pindex(NO_BASH_REMATCH)
 pindex(BASHREMATCH)
