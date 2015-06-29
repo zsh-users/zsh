@@ -14,8 +14,6 @@ This theme works best with a dark background.
 Recommended fonts for this theme: nexus or vga or similar.  If you
 don't have any of these, then specify the `plain' option to use 7-bit
 replacements for the 8-bit characters.
-
-And you probably thought adam1 was overkill.
 EOF
 }
 
@@ -27,8 +25,9 @@ prompt_adam1_setup () {
   base_prompt="%K{$prompt_adam1_color1}%n@%m%k "
   post_prompt="%b%f%k"
 
-  base_prompt_no_color=$(echo "$base_prompt" | perl -pe "s/%(K{.*?}|k)//g")
-  post_prompt_no_color=$(echo "$post_prompt" | perl -pe "s/%(K{.*?}|k)//g")
+  setopt localoptions extendedglob
+  base_prompt_no_color="${base_prompt//(%K{[^\\\}]#\}|%k)/}"
+  post_prompt_no_color="${post_prompt//(%K{[^\\\}]#\}|%k)/}"
 
   add-zsh-hook precmd prompt_adam1_precmd
 }

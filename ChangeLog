@@ -1,3 +1,7 @@
+2015-06-28  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 35660: Functions/Prompts/prompt_adam1_setup: avoid perl, fix help
+
 2015-06-29  Oliver Kiddle  <opk@zsh.org>
 
 	* 35637: Src/Zle/zle.h, Src/Zle/zle_main.c, Src/Zle/zle_tricky.c:
