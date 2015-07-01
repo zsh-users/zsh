@@ -2801,6 +2801,7 @@ struct lex_stack {
     int lex_add_raw;
     char *tokstr_raw;
     struct lexbufstate lexbuf_raw;
+    char *lexbuf_ptr_start;
     int lexstop;
     zlong toklineno;
 };

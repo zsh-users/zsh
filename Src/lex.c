@@ -162,7 +162,7 @@ static int lex_add_raw;
 
 /* variables associated with the above */
 
-static char *tokstr_raw;
+static char *tokstr_raw, *lexbuf_ptr_start;
 static struct lexbufstate lexbuf_raw;
 
 /* text of punctuation tokens */
@@ -229,12 +229,13 @@ lex_context_save(struct lex_stack *ls, int toplevel)
     ls->lex_add_raw = lex_add_raw;
     ls->tokstr_raw = tokstr_raw;
     ls->lexbuf_raw = lexbuf_raw;
+    ls->lexbuf_ptr_start = lexbuf_ptr_start;
     ls->lexstop = lexstop;
     ls->toklineno = toklineno;
 
     tokstr = zshlextext = lexbuf.ptr = NULL;
     lexbuf.siz = 256;
-    tokstr_raw = lexbuf_raw.ptr = NULL;
+    tokstr_raw = lexbuf_raw.ptr = lexbuf_ptr_start = NULL;
     lexbuf_raw.siz = lexbuf_raw.len = lex_add_raw = 0;
 }
 
@@ -257,6 +258,7 @@ lex_context_restore(const struct lex_stack *ls, int toplevel)
     lex_add_raw = ls->lex_add_raw;
     tokstr_raw = ls->tokstr_raw;
     lexbuf_raw = ls->lexbuf_raw;
+    lexbuf_ptr_start = ls->lexbuf_ptr_start;
     lexstop = ls->lexstop;
     toklineno = ls->toklineno;
 }
@@ -1882,7 +1884,7 @@ zshlex_raw_add(int c)
 void
 zshlex_raw_back(void)
 {
-    if (!lex_add_raw)
+    if (!lex_add_raw || lexbuf_raw.ptr == lexbuf_ptr_start)
 	return;
     lexbuf_raw.ptr--;
     lexbuf_raw.len--;
@@ -1993,7 +1995,7 @@ skipcomm(void)
     cmdpop();
     return lexstop;
 #else
-    char *new_tokstr;
+    char *new_tokstr, *new_lexbuf_ptr_start;
     int new_lexstop, new_lex_add_raw;
     struct lexbufstate new_lexbuf;
 
@@ -2040,6 +2042,7 @@ skipcomm(void)
     }
     tokstr_raw = new_tokstr;
     lexbuf_raw = new_lexbuf;
+    lexbuf_ptr_start = lexbuf_raw.ptr;
     lex_add_raw = new_lex_add_raw;
     /*
      * Don't do any ZLE specials down here: they're only needed
@@ -2064,6 +2067,7 @@ skipcomm(void)
      */
     new_tokstr = tokstr_raw;
     new_lexbuf = lexbuf_raw;
+    new_lexbuf_ptr_start = lexbuf_ptr_start;
     /*
      * We're also going to propagate the lexical state:
      * if we couldn't parse the command substitution we
@@ -2079,6 +2083,7 @@ skipcomm(void)
 	 */
 	tokstr_raw = new_tokstr;
 	lexbuf_raw = new_lexbuf;
+	lexbuf_ptr_start = new_lexbuf_ptr_start;
     } else {
 	if (!new_lexstop) {
 	    /* Ignore the ')' added on input */
@@ -2093,6 +2098,7 @@ skipcomm(void)
 	tokstr = new_tokstr;
 	lexbuf = new_lexbuf;
 	lexstop = new_lexstop;
+	lexbuf_ptr_start = (char *)NULL;
 	hist_in_word(0);
     }
 

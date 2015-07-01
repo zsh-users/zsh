@@ -148,3 +148,8 @@
  ) after
 0:Parsing of command substitution with ummatched parentheses: with frills
 >before start Universe began with u and ended with a crunch end after
+
+  alias foo='echo $('
+  eval 'foo echo this just works, OK\?)'
+0:backtracking within command string parsing with alias still pending
+>this just works, OK?

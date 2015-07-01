@@ -1,3 +1,9 @@
+2015-07-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 35667: Src/lex.c, Src/zsh.h, Test/D03procsubst.ztst,
+	Test/D08cmdsubst.ztst: fix command expansion which
+	starts but does not finish within alias.
+
 2015-06-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Doc/Zsh/options.yo: fix formatting typo.

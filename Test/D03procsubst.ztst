@@ -88,6 +88,7 @@
   print something=${:-=(echo 'C,D),(F,G)'}
 1: Graceful handling of bad substitution in enclosed context
 ?(eval):1: unterminated `=(...)'
+# '`
 
   () {
      print -n "first: "
@@ -115,3 +116,8 @@
 0:Process substitution as anonymous function argument
 >Execute a complicated order first
 >This line was brought to you by the letters F and D
+
+  alias foo='cat <('
+  eval 'foo echo this is bound to work)'
+0:backtacking within command string parsing with alias still pending
+>this is bound to work
