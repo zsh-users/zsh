@@ -268,7 +268,10 @@ parse_cmatcher(char *name, char *s)
 
 	    if (!*s || !*++s) {
 		if (name)
-		    zwarnnam(name, "missing line pattern");
+                   if (both)
+                       zwarnnam(name, "missing right anchor");
+                   else
+                       zwarnnam(name, "missing line pattern");
 		return pcm_err;
 	    }
 	} else
@@ -288,6 +291,7 @@ parse_cmatcher(char *name, char *s)
 	if ((fl & CMF_RIGHT) && !fl2 && (!*s || !*++s)) {
 	    if (name)
 		zwarnnam(name, "missing right anchor");
+           return pcm_err;
 	} else if (!(fl & CMF_RIGHT) || fl2) {
 	    if (!*s) {
 		if (name)
@@ -313,8 +317,7 @@ parse_cmatcher(char *name, char *s)
 		return pcm_err;
 	    }
 	    s++;
-	} else
-	    right = NULL;
+       }
 
 	if (*s == '*') {
 	    if (!(fl & (CMF_LEFT | CMF_RIGHT))) {

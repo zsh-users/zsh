@@ -1,5 +1,8 @@
 2015-07-02  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Han Pingtian: 35665: Src/Zle/complete.c: better error handling
+	for command line match processing.
+
 	* Eric Cook: 35663: Completion/Unix/Command/_zpool: fix for
 	changed interface.
 
