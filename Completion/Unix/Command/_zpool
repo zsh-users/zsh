@@ -86,7 +86,7 @@ _zpool() {
 	)
 
 	if [[ $service == "zpool" ]]; then
-		_arguments -C -A "-*" \
+		_arguments -C \
 			'-\?[show help information]' \
 			'1:subcommand:compadd -a subcmds' \
 			'*:: :->subcmd' && return

@@ -1,5 +1,8 @@
 2015-07-02  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Eric Cook: 35663: Completion/Unix/Command/_zpool: fix for
+	changed interface.
+
 	* 35668: Src/input.c, Src/lex.c, Src/zsh.h,
 	Test/D03procsubst.ztst: replacement for 35667:
 	use input flag to stop unwanted backtracking,
