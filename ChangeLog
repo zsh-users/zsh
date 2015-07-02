@@ -1,3 +1,10 @@
+2015-07-02  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35668: Src/input.c, Src/lex.c, Src/zsh.h,
+	Test/D03procsubst.ztst: replacement for 35667:
+	use input flag to stop unwanted backtracking,
+	additional test.
+
 2015-07-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 35667: Src/lex.c, Src/zsh.h, Test/D03procsubst.ztst,

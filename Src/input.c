@@ -591,7 +591,7 @@ inpoptop(void)
 	     * history is before, but they're both pushed onto
 	     * the input stack.
 	     */
-	    if ((inbufflags & (INP_ALIAS|INP_HIST)) == INP_ALIAS)
+	    if ((inbufflags & (INP_ALIAS|INP_HIST|INP_RAW_KEEP)) == INP_ALIAS)
 		zshlex_raw_back();
 	}
     }

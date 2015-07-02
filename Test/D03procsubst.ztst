@@ -121,3 +121,8 @@
   eval 'foo echo this is bound to work)'
 0:backtacking within command string parsing with alias still pending
 >this is bound to work
+
+  alias foo='cat <( print'
+  eval 'foo here is some output)'
+0:full alias expanded when substitution starts in alias
+>here is some output

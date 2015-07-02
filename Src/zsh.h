@@ -425,6 +425,7 @@ enum {
 #define INP_HISTCONT  (1<<5)	/* stack is continued from history expn.   */
 #define INP_LINENO    (1<<6)    /* update line number                      */
 #define INP_APPEND    (1<<7)    /* Append new lines to allow backup        */
+#define INP_RAW_KEEP  (1<<8)    /* Input needed in raw mode even if alias  */
 
 /* Flags for metafy */
 #define META_REALLOC	0
@@ -2801,7 +2802,6 @@ struct lex_stack {
     int lex_add_raw;
     char *tokstr_raw;
     struct lexbufstate lexbuf_raw;
-    char *lexbuf_ptr_start;
     int lexstop;
     zlong toklineno;
 };
