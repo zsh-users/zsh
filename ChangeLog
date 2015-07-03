@@ -1,3 +1,7 @@
+2015-07-03  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 35673: Completion/Zsh/Function/_zargs: Improve _zargs
+
 2015-07-02  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Han Pingtian: 35665: Src/Zle/complete.c: better error handling
