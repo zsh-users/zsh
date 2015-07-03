@@ -1206,6 +1206,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
 	    histline = stackhist;
 	    stackhist = -1;
 	}
+	handleundo();
     }
     /*
      * If main is linked to the viins keymap, we need to register

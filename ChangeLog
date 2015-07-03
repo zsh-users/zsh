@@ -1,3 +1,8 @@
+2015-07-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 35674: Src/Zle/zle_main.c: make an undo event for
+	initial buffer contents
+
 2015-07-03  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 35673: Completion/Zsh/Function/_zargs: Improve _zargs
