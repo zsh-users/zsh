@@ -53,10 +53,12 @@ reverse_strftime(char *nam, char **argv, char *scalar, int quiet)
      * to use the current timezone.  This is probably the best guess;
      * it's the one that will cause dates and times output by strftime
      * without the -r option and without an explicit timezone to be
-     * converted back correctly.
+     * converted back correctly. Additionally, tm_mday is set to 1
+     * as that and not 0 corresponds to the first of the month.
      */
     (void)memset(&tm, 0, sizeof(tm));
     tm.tm_isdst = -1;
+    tm.tm_mday = 1;
     endp = strptime(argv[1], argv[0], &tm);
 
     if (!endp) {

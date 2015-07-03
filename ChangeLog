@@ -1,5 +1,7 @@
 2015-07-03  Oliver Kiddle  <opk@zsh.org>
 
+	* 35681: Src/Modules/datetime.c: fix day of month initialisation
+
 	* 35674: Src/Zle/zle_main.c: make an undo event for
 	initial buffer contents
 
