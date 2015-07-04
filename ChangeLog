@@ -1,3 +1,8 @@
+2015-07-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 35682: Src/text.c, plus Test/A01grammar.ztst: turning case
+	statements parsed as multiple alternatives back into text.
+
 2015-07-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 35681: Src/Modules/datetime.c: fix day of month initialisation

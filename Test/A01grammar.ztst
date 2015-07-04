@@ -695,3 +695,27 @@
 0:Balanced parentheses and spaces with zsh pattern
 >It worked
 >That worked, too
+
+  fn() {
+    typeset ac_file="the else branch"
+    case $ac_file in
+      *.$ac_ext | *.xcoff | *.tds | *.d | *.pdb | *.xSYM | *.bb | *.bbg | *.map | *.inf | *.dSYM | *.o | *.obj ) ;;
+      *.* ) break;;
+      *)
+      ;;
+    esac
+    print Stuff here
+  }
+  which fn
+  fn
+0:Long case with parsed alternatives turned back into text
+>fn () {
+>	typeset ac_file="the else branch" 
+>	case $ac_file in
+>		(*.$ac_ext | *.xcoff | *.tds | *.d | *.pdb | *.xSYM | *.bb | *.bbg | *.map | *.inf | *.dSYM | *.o | *.obj)  ;;
+>		(*.*) break ;;
+>		(*)  ;;
+>	esac
+>	print Stuff here
+>}
+>Stuff here
