@@ -4196,7 +4196,7 @@ cfp_matcher_range(Cmatcher *ms, char *add)
 	    addlen = MB_METACHARLENCONV(add, &addc);
 #ifdef MULTIBYTE_SUPPORT
 	    if (addc == WEOF)
-		addc = (wchar_t)(*p == Meta ? p[1] ^ 32 : *p);
+		addc = (wchar_t)(*add == Meta ? add[1] ^ 32 : *add);
 #endif
 
 	    if (!(m = *mp)) {
