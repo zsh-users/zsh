@@ -7,7 +7,9 @@ if [[ -z $compstate[quote] ]]; then
   bs='\'
 fi
 
-if [[ $PREFIX == *%(-|)<-># ]]; then
+if [[ $PREFIX == *%D$bs\{[^($bs\})]# ]]; then
+  _date_formats zsh
+elif [[ $PREFIX == *%(-|)<-># ]]; then
   specs=(
     'm:hostname up to first .'
     '_:status of parser'
@@ -52,7 +54,7 @@ if [[ $PREFIX == *%(-|)<-># ]]; then
     '*:current time of day, 24-hour format with seconds'
     'w:the date in day-dd format'
     'W:the date in mm/dd/yy format'
-    'D{}:format string like strftime'
+    'D{:format string like strftime'
     'B:start bold'
     'b:stop bold'
     'E:clear to end of line'
@@ -121,6 +123,12 @@ elif [[ $PREFIX == *%[FK]$bs\{[0-9a-z]# ]]; then
     _message -e ansi-color-number "number between 0 and $(( $terminfo[colors] - 1 ))"
   fi
 else
-  _describe -t prompt-format-specifier 'prompt format specifier' '(%)' -S ''
   _default "$@"
+  specs=(%)
+  if compset -P "*%D"; then
+    specs+=(\{)
+  else
+    compset -P "*"
+  fi
+  _describe -t prompt-format-specifier 'prompt format specifier' specs -S ''
 fi

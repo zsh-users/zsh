@@ -3,6 +3,9 @@
 	* 35696: Completion/Unix/Type/_ps1234: complete colors for %F{
 	and %K{
 
+	* 35697: Completion/Unix/Type/_date_formats,
+	Completion/Unix/Type/_ps1234: Complete strftime formats for %D{}
+
 2015-07-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 35441: Etc/zsh-development-guide: Make devs' ChangeLog
