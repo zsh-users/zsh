@@ -1,3 +1,8 @@
+2015-07-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 35688: Src/text.c: Slightly more nearly definitive version of
+	turning wordcode case statements back to text.
+
 2015-07-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 35682: Src/text.c, plus Test/A01grammar.ztst: turning case
