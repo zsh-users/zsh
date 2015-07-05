@@ -1,12 +1,10 @@
 #compdef -value-,PROMPT,-default- -value-,PROMPT2,-default- -value-,PROMPT3,-default- -value-,PROMPT4,-default- -value-,RPROMPT,-default- -value-,RPROMPT2,-default- -value-,PS1,-default- -value-,PS2,-default- -value-,PS3,-default- -value-,PS4,-default- -value-,RPS1,-default- -value-,RPS2,-default- -value-,SPROMPT,-default-
 
 local -a specs
-local expl paren
+local expl bs
 
-if [[ -n $compstate[quote] ]]; then
-  paren='('
-else
-  paren='\('
+if [[ -z $compstate[quote] ]]; then
+  bs='\'
 fi
 
 if [[ $PREFIX == *%(-|)<-># ]]; then
@@ -76,7 +74,7 @@ if [[ $PREFIX == *%(-|)<-># ]]; then
   compset -P "*"
   _describe -t prompt-format-specifier 'prompt format specifier' specs -S ''
   _message -e prompt-format-specifier number
-elif [[ $PREFIX == *%$paren(-|)<-># ]]; then
+elif [[ $PREFIX == *%$bs\((-|)<-># ]]; then
   specs=(
     '!:running with privileges'
     '#:effective uid'
@@ -103,6 +101,25 @@ elif [[ $PREFIX == *%$paren(-|)<-># ]]; then
   compset -P "*"
   _describe -t ternary-prompt-expression 'ternary prompt format test character' specs -S ''
   _message -e ternary-prompt-expression number
+elif [[ $PREFIX == *%[FK]$bs\{[0-9a-z]# ]]; then
+  specs=(
+    black
+    red
+    green
+    yellow
+    blue
+    magenta
+    cyan
+    white
+    default
+  )
+  compset -P "*{"
+  _describe -t ansi-color-name 'ansi color' specs -S $bs\}
+  if compset -P "<->"; then
+    _wanted ansi-color-number expl 'close brace' compadd -S '' \}
+  else
+    _message -e ansi-color-number "number between 0 and $(( $terminfo[colors] - 1 ))"
+  fi
 else
   _describe -t prompt-format-specifier 'prompt format specifier' '(%)' -S ''
   _default "$@"
