@@ -540,7 +540,7 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     dat.match = NULL;
     dat.flags = 0;
     dat.aflags = CAF_MATCH;
-    dat.dummies = 0;
+    dat.dummies = -1;
 
     for (; *argv && **argv ==  '-'; argv++) {
 	if (!(*argv)[1]) {

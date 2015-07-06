@@ -2049,7 +2049,7 @@ addmatches(Cadata dat, char **argv)
     Heap oldheap;
 
     SWITCHHEAPS(oldheap, compheap) {
-        if (dat->dummies)
+        if (dat->dummies >= 0)
             dat->aflags = ((dat->aflags | CAF_NOSORT | CAF_UNIQCON) &
                            ~CAF_UNIQALL);
 
@@ -2534,7 +2534,7 @@ addmatches(Cadata dat, char **argv)
             addmatch("<all>", dat->flags | CMF_ALL, &disp, 1);
 	    hasallmatch = 1;
 	}
-        while (dat->dummies--)
+        while (dat->dummies-- > 0)
             addmatch("", dat->flags | CMF_DUMMY, &disp, 0);
 
     } SWITCHBACKHEAPS(oldheap);

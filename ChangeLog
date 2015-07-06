@@ -1,3 +1,8 @@
+2015-07-06  Oliver Kiddle  <opk@zsh.org>
+
+	* 35704: Doc/Zsh/compwid.yo, Src/Zle/compcore.c, Src/Zle/complete.c;
+	compadd -E 0 should imply -J and -2
+
 2015-07-06  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 35696: Completion/Unix/Type/_ps1234: complete colors for %F{

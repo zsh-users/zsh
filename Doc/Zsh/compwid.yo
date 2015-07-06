@@ -697,7 +697,9 @@ format completion lists and to make explanatory string be shown in
 completion lists (since empty matches can be given display strings
 with the tt(-d) option).  And because all but one empty string would
 otherwise be removed, this option implies the tt(-V) and tt(-2)
-options (even if an explicit tt(-J) option is given).
+options (even if an explicit tt(-J) option is given).  This can be
+important to note as it affects the name space into which matches are
+added.
 )
 xitem(tt(-))
 item(tt(-)tt(-))(
