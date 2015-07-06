@@ -1711,3 +1711,12 @@
 0:Avoid confusion after overloaded characters in braceless substitution in sh
 >13
 >0-1
+
+  a="aaa bab cac"
+  b=d
+  echo $a:gs/a/${b}/
+  a=(aaa bab cac)
+  echo $a:gs/a/${b}/
+0:History modifier works the same for scalar and array substitution
+>ddd bdb cdc
+>ddd bdb cdc

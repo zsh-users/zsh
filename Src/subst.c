@@ -3834,8 +3834,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		y = dupstring(nulstring);
 	    insertlinknode(l, n, (void *) y), incnode(n);
 	}
-	if (eval)
-	    n = on;
+	/* This used to omit restoring of *str and instead test
+	 *   if (eval)
+	 *       n = on;
+	 * but that causes strange behavior of history modifiers when
+	 * applied across all values of an array.  What is magic about
+	 * eval here that *str seemed not to need restoring?
+	 */
+	*str = getdata(n = on);
     } else {
 	/*
 	 * Scalar value.  Handle last minute transformations
