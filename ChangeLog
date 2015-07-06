@@ -1,3 +1,8 @@
+2015-07-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 35441: Etc/zsh-development-guide: Make devs' ChangeLog
+	generator scripts discoverable
+
 2015-07-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 35692: Src/Zle/computil.c: cfp_matcher_range used wrong raw

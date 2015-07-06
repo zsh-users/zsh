@@ -70,6 +70,19 @@ avoided further changes to our workflow.
    a commit to the master repository. Don't create a separate change for
    this: amend the existing commit in your local repository.
 
+   Several developers use scripts to automate part or all of the ChangeLog
+   workflow:
+
+     Subject: helper script for making ChangeLog entries
+     X-Seq: 33835, 33872, 34912
+     http://www.zsh.org/mla/workers/2014/msg01622.html
+     http://www.zsh.org/mla/workers/2014/msg01659.html
+     http://www.zsh.org/mla/workers/2015/msg00836.html
+
+     Subject: Re: _git commit object name completion
+     X-Seq: 35414
+     http://www.zsh.org/mla/workers/2015/msg01338.html
+
  * Do not merge your private feature branches onto the master branch: a
    linear history without merge commits is simpler to follow (and to
    bisect).
