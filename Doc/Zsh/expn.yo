@@ -319,6 +319,19 @@ forms of expansion.
 Note that if a `tt(&)' is used within glob qualifiers an extra backslash
 is needed as a tt(&) is a special character in this case.
 
+Also note that the order of expansions affects the interpretation of
+var(l) and var(r).  When used in a history expansion, which occurs before
+any other expansions, var(l) and var(r) are treated as literal strings
+(except as explained for tt(HIST_SUBST_PATTERN) below).  When used in
+parameter expansion, the replacement of var(r) into the parameter's value
+is done first, and then any additional process, parameter, command,
+arithmetic, or brace references are applied, which may evaluate those
+substitutions and expansions more than once if var(l) appears more than
+once in the starting value.  When used in a glob qualifier, any
+substitutions or expansions are performed once at the time the qualifier
+is parsed, even before the `tt(:s)' expression itself is divided into
+var(l) and var(r) sides.
+
 If the option tt(HIST_SUBST_PATTERN) is set, var(l) is treated as
 a pattern of the usual form described in
 ifzman(the section FILENAME GENERATION below)\
