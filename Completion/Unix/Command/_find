@@ -1,6 +1,7 @@
 #compdef find gfind
 
-local variant args
+local curcontext="$curcontext" state_descr variant
+local -a state line args alts
 
 _pick_variant -r variant gnu=GNU $OSTYPE -version
 
@@ -114,11 +115,11 @@ case $variant in
   ;;
 esac
 
-_arguments $args \
+_arguments -C $args \
   '(-L -P)-H[only follow symlinks when resolving command-line arguments]' \
   '(-H -P)-L[follow symlinks]' \
-  '*-atime:access time (days)' \
-  '*-ctime:inode change time (days)' \
+  '*-atime:access time (days):->times' \
+  '*-ctime:inode change time (days):->times' \
   '*-depth' \
   '*-exec:program: _command_names -e:*\;::program arguments: _normal' \
   '*-follow' \
@@ -128,7 +129,7 @@ _arguments $args \
   '*-links:number of links:' \
   '*-ls' \
   '*-mount' \
-  '*-mtime:modification time (days)' \
+  '*-mtime:modification time (days):->times' \
   '*-name:name pattern' \
   '*-newer:file to compare (modification time):_files' \
   '*-nogroup' \
@@ -143,3 +144,13 @@ _arguments $args \
   '*-xdev' \
   '*-a' '*-o' \
   '*:directory:_files -/'
+
+if [[ $state = times ]]; then
+  if ! compset -P '[+-]' || [[ -prefix '[0-9]' ]]; then
+    disp=( 'before' 'exactly' 'since' )
+    compstate[list]+=' packed'
+    alts=( "senses:sense:compadd -V times -S '' -d disp - + '' -" )
+  fi
+  alts+=( "times:${state_descr}:_dates -f d" )
+  _alternative $alts
+fi

@@ -1,3 +1,8 @@
+2015-07-06  Oliver Kiddle  <opk@zsh.org>
+
+	* 35718: Completion/Unix/Command/_find, Completion/Unix/Type/_dates,
+	Completion/Zsh/Type/_globquals: new calendar style date completion
+
 2015-07-07  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Src/Zle/complete.c: remove compiler warning.

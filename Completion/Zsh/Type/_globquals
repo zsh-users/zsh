@@ -1,7 +1,7 @@
 #autoload
 
 local state=qual expl char delim timespec
-local -a alts
+local -a alts tdisp sdisp
 local -A specmap
 
 while [[ -n $PREFIX ]]; do
@@ -117,14 +117,15 @@ while [[ -n $PREFIX ]]; do
       alts=()
       timespec=$PREFIX[1]
       if ! compset -P '[Mwhmsd]' && [[ -z $PREFIX ]]; then
-        alts+=("time-specifiers:time specifier:\
-((M\:months w\:weeks h\:hours m:\minutes s\:seconds d\:days))")
+	tdisp=( seconds minutes hours days weeks Months )
+        alts+=( "time-specifiers:time specifier:compadd -E 0 -d tdisp -S '' - s m h d w M" )
       fi
       if ! compset -P '[-+]' && [[ -z $PREFIX ]]; then
-        alts+=("senses:sense:((-\:less\ than +\:more\ than))")
+	sdisp=( before exactly since )
+        alts+=("senses:sense:compadd -E 0 -d sdisp -S '' - + '' -")
       fi
       specmap=( M months w weeks h hours m minutes s seconds '(|+|-|d)' days)
-      alts+=('digits:digit ('${${specmap[(K)$timespec]}:-invalid time specifier}'):' )
+      alts+=('digits:digit ('${${specmap[(K)$timespec]}:-invalid time specifier}'):_dates -f ${${timespec/[-+]/d}:-d} -S ""' )
       _alternative $alts
       return
     fi
