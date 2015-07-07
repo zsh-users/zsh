@@ -267,11 +267,12 @@ parse_cmatcher(char *name, char *s)
 		s++;
 
 	    if (!*s || !*++s) {
-		if (name)
+		if (name) {
                    if (both)
                        zwarnnam(name, "missing right anchor");
                    else
                        zwarnnam(name, "missing line pattern");
+		}
 		return pcm_err;
 	    }
 	} else

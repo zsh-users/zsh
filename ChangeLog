@@ -1,3 +1,7 @@
+2015-07-07  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted: Src/Zle/complete.c: remove compiler warning.
+
 2015-07-06  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/expn.yo: alphabetize ${(b)...} flag
