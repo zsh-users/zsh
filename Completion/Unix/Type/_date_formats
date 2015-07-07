@@ -1,80 +1,106 @@
 #autoload
 
-local -a specs
-local exps bs
+local flag
+local -aU specs
+local -A exclusion
 
-if [[ -z $compstate[quote] ]]; then
-  bs='\'
-fi
+exclusion=(
+  'E' '[-_^#cCgGxXyY]'
+  'O' '[-_^#BdeHImMSuUVwWy]'
+  '-' '[OEdegHIjklmMSUz]'
+  '_' '[OEdgHIjmMSUz]'
+  '0' '[Oekl]'
+  '^' '[OEaAbBchP]'
+  '#' '[OEaAbBchpPrXZ]'
+)
 
-false
-if [[ $PREFIX == *%(|[-EO]|<->) ]]; then
-  specs=()
-  if [[ $PREFIX != *<-> ]]; then
+compset -P '(%[0-9EO_\\^#-]#[^0-9%EO_\\^#-]|[^%])#'
+compset -S '%*'
+specs=(
+  'a:abbreviated day name'
+  'A:full day name'
+  'b:abbreviated month name'
+  'B:full month name'
+  'c:preferred locale date and time'
+  'C:2-digit century'
+  'd:day of month (01-31)'
+  'D:american format month/day/year (%m/%d/%y)'
+  'e:day of month ( 1-31)'
+  'E:alternate representation'
+  'F:ISO 8601 year-month-date (%Y-%m-%d)'
+  'G:4-digit ISO 8601 week-based year'
+  'g:2-digit ISO 8601 week-based year'
+  'h:abbreviated month name'
+  'H:hour (00-23)'
+  'I:hour (01-12)'
+  'j:day of year (001-366)'
+  'k:hour ( 1-23)'
+  'l:hour ( 1-12)'
+  'm:month (01-12)'
+  'M:minute (00-59)'
+  'n:newline'
+  'O:alternative format modifier'
+  'p:locale dependent AM/PM'
+  'r:locale dependent a.m. or p.m. time (%I:%M:%S %p)'
+  'R:24-hour notation time (%H:%M)'
+  's:seconds since the epoch'
+  'S:seconds (00-60)'
+  't:tab'
+  'T:24-hour notation with seconds (%H:%M:%S)'
+  'u:day of week (1-7, 1=monday)'
+  'U:week number of current year, sunday based (00-53)'
+  'V:ISO 8601 week number of current year, week 1 has 4 days in current year (01-53)'
+  'w:day of week (0-6, 0=sunday)'
+  'W:week number of current year, monday based (00-53)'
+  'x:locale dependent date representation without time'
+  'X:locale dependent time representation without date'
+  'y:2-digit year (00-99)'
+  'Y:full year'
+  'z:UTC offset'
+  'Z:timezone name'
+  '%:A %'
+)
+
+case $OSTYPE in
+  freebsd*|linux-gnu|solaris2.<11->)
     specs+=(
-      'a:abbreviated day name'
-      'A:full day name'
-      'b:abbreviated month name'
-      'B:full month name'
-      'c:preferred locale date and time'
-      'C:2-digit century'
-      'd:day of month (01-31)'
-      'D:american format month/day/year (%m/%d/%y)'
-      'e:day of month ( 1-31)'
-      'E:alternate representation'
-      'F:ISO 8601 year-month-date (%Y-%m-%d)'
-      'G:4-digit ISO 8601 week-based year'
-      'g:2-digit ISO 8601 week-based year'
-      'h:abbreviated month name'
-      'H:hour (00-23)'
-      'I:hour (01-12)'
-      'j:day of year (001-366)'
-      'k:hour ( 1-23)'
-      'l:hour ( 1-12)'
-      'm:month (01-12)'
-      'M:minute (00-59)'
-      'n:newline'
-      'O:alternative format modifier'
-      'p:locale dependent AM/PM'
+      "-:don't pad numeric values"
+      '#:swap case of alphabetic characters'
+      '0:left pad numeric values with zeroes'
+      '^:convert lowercase characters to uppercase'
+      '_:left pad numeric values with spaces'
+    )
+  ;|
+  linux-gnu|solaris2.<11->)
+    specs+=(
       'P:lower case locale dependent am/pm'
-      'r:locale dependent a.m. or p.m. time (%I:%M:%S %p)'
-      'R:24-hour notation time (%H:%M)'
-      's:seconds since the epoch'
-      'S:seconds (00-60)'
-      't:tab'
-      'T:24-hour notation with seconds (%H:%M:%S)'
-      'u:day of week (1-7, 1=monday)'
-      'U:week number of current year, sunday based (00-53)'
-      'V:ISO 8601 week number of current year, week 1 has 4 days in current year (01-53)'
-      'w:day of week (0-6, 0=sunday)'
-      'W:week number of current year, monday based (00-53)'
-      'x:locale dependent date representation without time'
-      'X:locale dependent time representation without date'
-      'y:2-digit year (00-99)'
-      'Y:full year'
-      'z:UTC offset'
-      'Z:timezone name'
-      '%:A %'
-      '-:strip leading space or zero (gnu extension)'
     )
-    if [[ $1 == zsh ]]; then
-      specs+=(
-        'f:day of month (1-31)'
-        'K:hour (0-23)'
-        'L:hour (0-12)'
-      )
-    fi
-  fi
-  if [[ $1 == zsh ]]; then
-    specs+=(
-      '.:fractional part of seconds since epoch'
-    )
-  fi
-  compset -P "*"
-  _describe -t date-format-specifier 'date format specifier' specs -S ''
-  _message -e date-format-precision 'precision for %%. (1-6)'
-else
-  _default "$@"
-  compset -P "*"
-  _describe -t date-format-specifier 'date format specifier' '(%)' -S ''
+  ;|
+  freebsd*)
+    specs+=( 'v:date in short form (%e-%b-%Y)' )
+  ;|
+  solaris2.<11->|freebsd*)
+    specs+=( '+:localized representation of date and time' )
+  ;;
+  solaris2.<-10>)
+    specs=( ${specs:#[EOs]:*} )
+  ;;
+esac
+
+if [[ $1 == zsh ]]; then
+  specs+=(
+    'f:day of month (1-31)'
+    'K:hour (0-23)'
+    'L:hour (0-12)'
+    '.:fractional part of seconds since epoch'
+    "-:don't pad numeric values"
+  )
 fi
+
+for flag in ${(s..)PREFIX#%}; do
+  (( $+exclusion[$flag] )) && specs=( ${(M)specs:#${~exclusion[$flag]}:*} )
+done
+
+_describe -t date-format-specifier 'date format specifier' specs \
+    -p "${(Q)PREFIX:-%}" -S ''
+_message -e date-format-precision 'precision for %%. (1-6)'
