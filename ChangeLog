@@ -1,4 +1,9 @@
-2015-07-06  Oliver Kiddle  <opk@zsh.org>
+2015-07-08  Oliver Kiddle  <opk@zsh.org>
+
+	* Matthew Martin: 35727: Completion/Unix/Type/_diff_options:
+	support OpenBSD for diff options
+
+2015-07-07  Oliver Kiddle  <opk@zsh.org>
 
 	* 35700: Completion/Unix/Type/_date_formats: complete OS specific
 	date format specifiers and put % in a prefix
