@@ -1,0 +1,52 @@
+#compdef compadd
+
+local curcontext="$curcontext" state line ret=1
+typeset -A opt_args
+
+_arguments -C -s -S -A "-*" \
+  '-P+[specify prefix]:prefix' \
+  '-S+[specify suffix]:suffix' \
+  '-p+[specify hidden prefix]:hidden prefix' \
+  '-s+[specify hidden suffix]:hidden suffix' \
+  '-i+[specify ignored prefix]:ignored prefix' \
+  '-I+[specify ignored suffix]:ignored suffix' \
+  '(-k)-a[matches are elements of specified arrays]' \
+  '(-a)-k[matches are keys of specified associative arrays]' \
+  '-d+[specify display strings]:array:_parameters -g "*array*"' \
+  '-l[list display strings one per line, not in columns]' \
+  '-o[order matches by display string not by match string]' \
+  '(-1 -E)-J+[specify match group]:group' \
+  '-V+[specify unsorted match group]:group' \
+  '(-J -E)-1[remove only consecutive duplicates from group]' \
+  '-2[preserve all duplicates]' \
+  '(-x)-X[specify explanation]:explanation' \
+  '(-X)-x[specify unconditional explanation]:explanation' \
+  '-q[make suffix autoremovable]' \
+  '-r+[specify character class for suffix autoremoval]:character class' \
+  '-R+[specify function for suffix autoremoval]:function:_functions' \
+  '-f[mark matches as being files]' \
+  '-e[mark matches as being parameters]' \
+  '-W[specify location for matches marked as files]' \
+  '-F+[specify array of ignore patterns]:array:_parameters -g "*array*"' \
+  '-Q[disable quoting of matchines]' \
+  '*-M[specify matching specifications]' \
+  '-n[hide matches in completion listing]' \
+  '-U[disable internal matching of completion candidates]' \
+  '-O+[populate array with matches instead of adding them]:array:_parameters -g "*array*"' \
+  '-A+[populate array with expanded matches instead of adding them]:array:_parameters -g "*array*"' \
+  '-D+[delete elements from array corresponding to non-matching candidates]:array:_parameters -g "*array*"' \
+  '-C[add special match that expands to all other matches]' \
+  '(-1 -J)-E+[add specified number of display only matches]:number' \
+  '*:candidate:->candidates' && ret=0
+
+if [[ -n $state ]]; then
+  if (( $+opt_args[-a] )); then
+    _parameters -g "*array*" && ret=0
+  elif (( $+opt_args[-k] )); then
+    _parameters -g "*assoc*" && ret=0
+  else
+    _message -e candidate candidates
+  fi
+fi
+
+return ret

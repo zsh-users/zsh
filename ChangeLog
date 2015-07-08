@@ -1,5 +1,7 @@
 2015-07-08  Oliver Kiddle  <opk@zsh.org>
 
+	* 35729: Completion/Zsh/Command/_compadd: new compadd completion
+
 	* Matthew Martin: 35727: Completion/Unix/Type/_diff_options:
 	support OpenBSD for diff options
 
