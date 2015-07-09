@@ -5,8 +5,8 @@ local -aU specs
 local -A exclusion
 
 exclusion=(
-  'E' '[-_^#cCgGxXyY]'
-  'O' '[-_^#BdeHImMSuUVwWy]'
+  'E' '[cCgGxXyY]'
+  'O' '[BdeHImMSuUVwWy]'
   '-' '[OEdegHIjklmMSUz]'
   '_' '[OEdgHIjmMSUz]'
   '0' '[Oekl]'

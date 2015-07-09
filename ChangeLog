@@ -1,3 +1,8 @@
+2015-07-09  Oliver Kiddle  <opk@zsh.org>
+
+	* 35749: (c.f. Jun T: 35732): Completion/Unix/Type/_date_formats:
+	fix exclusion list for flags/modifiers
+
 2015-07-08  Oliver Kiddle  <opk@zsh.org>
 
 	* 35729: Completion/Zsh/Command/_compadd: new compadd completion
