@@ -1405,6 +1405,10 @@ static struct change *nextchanges, *endnextchanges;
 /**/
 zlong undo_changeno;
 
+/* If positive, don't undo beyond this point */
+
+zlong undo_limitno;
+
 /* If non-zero, the last increment to undo_changeno was for the variable */
 
 static int undo_set_by_variable;
@@ -1418,7 +1422,7 @@ initundo(void)
     curchange->prev = curchange->next = NULL;
     curchange->del = curchange->ins = NULL;
     curchange->dell = curchange->insl = 0;
-    curchange->changeno = undo_changeno = 0;
+    curchange->changeno = undo_changeno = undo_limitno = 0;
     undo_set_by_variable = 0;
     lastline = zalloc((lastlinesz = linesz) * ZLE_CHAR_SIZE);
     ZS_memcpy(lastline, zleline, (lastll = zlell));
@@ -1582,6 +1586,8 @@ undo(char **args)
 	    return 1;
 	if (prev->changeno < last_change)
 	    break;
+	if (prev->changeno < undo_limitno && !*args)
+	    break;
 	if (unapplychange(prev))
 	    curchange = prev;
 	else
@@ -1744,7 +1750,21 @@ get_undo_current_change(UNUSED(Param pm))
      * Increment the number in case a change is in progress;
      * we don't want to back off what's already been done when
      * we return to this change number.  This eliminates any
-     * problem about the point where a change is numbered.
+     * problem about the point where a change is numbered
      */
     return ++undo_changeno;
+}
+
+/**/
+zlong
+get_undo_limit_change(UNUSED(Param pm))
+{
+    return undo_limitno;
+}
+
+/**/
+void
+set_undo_limit_change(UNUSED(Param pm), zlong value)
+{
+    undo_limitno = value;
 }

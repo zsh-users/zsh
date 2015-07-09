@@ -960,6 +960,26 @@ A number representing the state of the undo history.  The only use
 of this is passing as an argument to the tt(undo) widget in order to
 undo back to the recorded point.  Read-only.
 )
+vindex(UNDO_LIMIT_NO)
+item(tt(UNDO_LIMIT_NO) (integer))(
+A number corresponding to an existing change in the undo history;
+compare tt(UNDO_CHANGE_NO).  If this is set to a value greater
+than zero, the tt(undo) command will not allow the line to
+be undone beyond the given change number.  It is still possible
+to use `tt(zle undo) var(change)' in a widget to undo beyond
+that point; in that case, it will not be possible to undo at
+all until tt(UNDO_LIMIT_NO) is reduced.  Set to 0 to disable the limit.
+
+A typical use of this variable in a widget function is as follows:
+
+example(integer save_limit=$UNDO_LIMIT_NO
+UNDO_LIMIT_NO=$UNDO_CHANGE_NO
+{
+  # Perform some form of recursive edit.
+} always {
+  UNDO_LIMIT_NO=save_limit
+})
+)
 vindex(WIDGET)
 item(tt(WIDGET) (scalar))(
 The name of the widget currently being executed; read-only.
@@ -2333,7 +2353,8 @@ item(tt(undo) (tt(^_ ^Xu ^X^U)) (tt(u)) (unbound))(
 Incrementally undo the last text modification.  When called from a
 user-defined widget, takes an optional argument indicating a previous state
 of the undo history as returned by the tt(UNDO_CHANGE_NO) variable;
-modifications are undone until that state is reached.
+modifications are undone until that state is reached, subject to
+any limit imposed by the tt(UNDO_LIMIT_NO) variable.
 
 Note that when invoked from vi command mode, the full prior change made in
 insert mode is reverted, the changes having been merged when command mode was

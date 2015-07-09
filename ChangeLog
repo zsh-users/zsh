@@ -1,3 +1,8 @@
+2015-07-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 35708: Doc/Zsh/zle.yo, Src/Zle/zle_params.c,
+	Src/Zle/zle_utils.c; UNDO_LIMIT_NO.
+
 2015-07-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35751: Src/exec.c, Test/C03traps.ztst: fix ERR_RETURN /

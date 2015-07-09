@@ -95,6 +95,8 @@ static const struct gsu_integer region_active_gsu =
 { get_region_active, set_region_active, zleunsetfn };
 static const struct gsu_integer undo_change_no_gsu =
 { get_undo_current_change, NULL, zleunsetfn };
+static const struct gsu_integer undo_limit_no_gsu =
+{ get_undo_limit_change, set_undo_limit_change, zleunsetfn };
 
 static const struct gsu_array killring_gsu =
 { get_killring, set_killring, unset_killring };
@@ -137,6 +139,7 @@ static struct zleparam {
     { "region_highlight", PM_ARRAY, GSU(region_highlight_gsu), NULL },
     { "UNDO_CHANGE_NO", PM_INTEGER | PM_READONLY, GSU(undo_change_no_gsu),
       NULL },
+    { "UNDO_LIMIT_NO", PM_INTEGER, GSU(undo_limit_no_gsu), NULL },
     { "WIDGET", PM_SCALAR | PM_READONLY, GSU(widget_gsu), NULL },
     { "WIDGETFUNC", PM_SCALAR | PM_READONLY, GSU(widgetfunc_gsu), NULL },
     { "WIDGETSTYLE", PM_SCALAR | PM_READONLY, GSU(widgetstyle_gsu), NULL },
