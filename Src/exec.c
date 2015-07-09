@@ -1351,7 +1351,13 @@ execlist(Estate state, int dont_change_job, int exiting)
 	state->pc--;
 sublist_done:
 
-	noerrexit = oldnoerrexit;
+	/*
+	 * See hairy code near the end of execif() for the
+	 * following.  "noerrexit == 2" only applies until
+	 * we hit execcmd on the way down.  We're now
+	 * on the way back up, so don't restore it.
+	 */
+	noerrexit = (oldnoerrexit == 2) ? 0 : oldnoerrexit;
 
 	if (sigtrapped[SIGDEBUG] && !isset(DEBUGBEFORECMD) && !donedebug) {
 	    /*

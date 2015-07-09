@@ -1,3 +1,8 @@
+2015-07-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35751: Src/exec.c, Test/C03traps.ztst: fix ERR_RETURN /
+	ERR_EXIT in else branch of if.
+
 2015-07-09  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 35745: Src/utils.c, Test/V09datetime.ztst: ztrftime: Pass
