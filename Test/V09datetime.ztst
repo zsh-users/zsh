@@ -1,0 +1,63 @@
+%prep
+
+  if ! (zmodload zsh/datetime >/dev/null 2>/dev/null); then
+    ZTST_unimplemented="can't load the zsh/datetime module for testing"
+  fi
+  setopt multibyte
+  zmodload zsh/datetime
+  unset LC_ALL
+  LC_TIME=C
+  if [[ "$(strftime %04y 1)" = "0070" ]]; then
+    [[ "$(LC_TIME=ja_JP.UTF-8 strftime %OS 1)" = 一 ]] || {
+      print -u $ZTST_fd "Not testing alternate date format extensions (missing ja_JP.UTF-8 locale)"
+      skip_japanese=1
+    }
+  else
+    print -u $ZTST_fd "Skipping strftime extension tests"
+    skip_extensions=1
+  fi
+
+%test
+
+  strftime %y 0
+  strftime %Y 1000000000
+  strftime %x 1200000000
+  strftime %X 1200000001
+0:basic format specifiers
+>70
+>2001
+>01/10/08
+>22:20:01
+
+  strftime %-m_%f_%K_%L 1181000000
+  strftime %6. 0
+0:zsh extensions
+>6_5_1_1
+>000000
+
+  [[ $skip_japanese = 1 ]] && repeat 5; do echo skipped; done || (
+  LC_TIME=ja_JP.UTF-8
+  strftime %Ey 1000000000
+  strftime %Oy 1000000000
+  strftime %Ex 1000000000
+  strftime %OS 1000000000
+  strftime %03Ey 650000000
+  )
+0:alternate format extensions
+*>skipped|13
+>skipped|一
+>skipped|平成13年09月09日
+>skipped|四十
+>skipped|002
+
+  [[ $skip_extensions = 1 ]] && repeat 4; do echo skipped; done || (
+  strftime '%#A' 0
+  strftime '%^_10B' 0
+  strftime %03Ey 650000000
+  strftime %-Oe 0
+  )
+0:various extensions
+*>skipped|THURSDAY
+>skipped|   JANUARY
+>skipped|090
+>skipped|1

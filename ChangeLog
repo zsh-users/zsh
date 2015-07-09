@@ -1,3 +1,8 @@
+2015-07-09  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 35745: Src/utils.c, Test/V09datetime.ztst: ztrftime: Pass
+	everything unhandled to the system strftime()
+
 2015-07-09  Oliver Kiddle  <opk@zsh.org>
 
 	* 35748: Completion/Zsh/Type/_ps1234,

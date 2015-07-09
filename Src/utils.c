@@ -2883,7 +2883,7 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm, long usec)
     int hr12;
 #ifdef HAVE_STRFTIME
     int decr;
-    char tmp[4];
+    char *fmtstart;
 #else
     static char *astr[] =
     {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
@@ -2899,7 +2899,11 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm, long usec)
 	    int strip;
 	    int digs = 3;
 
+#ifdef HAVE_STRFTIME
+	    fmtstart =
+#endif
 	    fmt++;
+
 	    if (*fmt == '-') {
 		strip = 1;
 		fmt++;
@@ -2924,6 +2928,21 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm, long usec)
 	     */
 	    if (ztrftimebuf(&bufsize, 2))
 		return -1;
+#ifdef HAVE_STRFTIME
+	    /* Our internal handling doesn't handle padding and other gnu extensions,
+	     * so here we detect them and pass over to strftime(). We don't want
+	     * to do this unconditionally though, as we have some extensions that
+	     * strftime() doesn't have (%., %f, %L and %K) */
+morefmt:
+	    if (!((fmt - fmtstart == 1) || (fmt - fmtstart == 2 && strip) || *fmt == '.')) {
+		while (*fmt && strchr("OE^#_-0123456789", *fmt))
+		    fmt++;
+		if (*fmt) {
+		    fmt++;
+		    goto strftimehandling;
+		}
+	    }
+#endif
 	    switch (*fmt++) {
 	    case '.':
 		if (ztrftimebuf(&bufsize, digs))
@@ -2939,10 +2958,10 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm, long usec)
 		sprintf(buf, "%0*ld", digs, usec);
 		buf += digs;
 		break;
-	    case 'd':
-		if (tm->tm_mday > 9 || !strip)
-		    *buf++ = '0' + tm->tm_mday / 10;
-		*buf++ = '0' + tm->tm_mday % 10;
+	    case '\0':
+		/* Guard against premature end of string */
+		*buf++ = '%';
+		fmt--;
 		break;
 	    case 'f':
 		strip = 1;
@@ -2983,6 +3002,12 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm, long usec)
 
 		*buf++ = '0' + (hr12 % 10);
 		break;
+#ifndef HAVE_STRFTIME
+	    case 'd':
+		if (tm->tm_mday > 9 || !strip)
+		    *buf++ = '0' + tm->tm_mday / 10;
+		*buf++ = '0' + tm->tm_mday % 10;
+		break;
 	    case 'm':
 		if (tm->tm_mon > 8 || !strip)
 		    *buf++ = '0' + (tm->tm_mon + 1) / 10;
@@ -3003,18 +3028,8 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm, long usec)
 		    *buf++ = '0' + (tm->tm_year / 10) % 10;
 		*buf++ = '0' + tm->tm_year % 10;
 		break;
-	    case '\0':
-		/* Guard against premature end of string */
-		*buf++ = '%';
-		fmt--;
-		break;
-#ifndef HAVE_STRFTIME
 	    case 'Y':
 	    {
-		/*
-		 * Not worth handling this natively if
-		 * strftime has it.
-		 */
 		int year, digits, testyear;
 		year = tm->tm_year + 1900;
 		digits = 1;
@@ -3048,24 +3063,38 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm, long usec)
 		if (fmt[-1] != '%')
 		    *buf++ = fmt[-1];
 #else
+	    case 'E':
+	    case 'O':
+	    case '^':
+	    case '#':
+	    case '_':
+	    case '-':
+	    case '0' ... '9':
+		goto morefmt;
+strftimehandling:
 	    default:
 		/*
 		 * Remember we've already allowed for two characters
 		 * in the accounting in bufsize (but nowhere else).
 		 */
-		*buf = '\1';
-		sprintf(tmp, strip ? "%%-%c" : "%%%c", fmt[-1]);
-		if (!strftime(buf, bufsize + 2, tmp, tm))
 		{
-		    if (*buf) {
-			buf[0] = '\0';
-			return -1;
+		    int size = fmt - fmtstart;
+		    char *tmp = zhalloc(size + 1);
+		    strncpy(tmp, fmtstart, size);
+		    tmp[size] = '\0';
+		    *buf = '\1';
+		    if (!strftime(buf, bufsize + 2, tmp, tm))
+		    {
+			if (*buf) {
+			    buf[0] = '\0';
+			    return -1;
+			}
+			return 0;
 		    }
-		    return 0;
+		    decr = strlen(buf);
+		    buf += decr;
+		    bufsize -= decr - 2;
 		}
-		decr = strlen(buf);
-		buf += decr;
-		bufsize -= decr - 2;
 #endif
 		break;
 	    }
