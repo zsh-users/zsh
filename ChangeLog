@@ -8,6 +8,9 @@
 	* 35745: Src/utils.c, Test/V09datetime.ztst: ztrftime: Pass
 	everything unhandled to the system strftime()
 
+	* unposted: (c.f. Jun T: 35754): Test/V09datetime.ztst: Make
+	V09 set a known timezone
+
 2015-07-09  Oliver Kiddle  <opk@zsh.org>
 
 	* 35748: Completion/Zsh/Type/_ps1234,

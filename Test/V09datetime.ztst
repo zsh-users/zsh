@@ -7,6 +7,7 @@
   zmodload zsh/datetime
   unset LC_ALL
   LC_TIME=C
+  TZ=UTC+0
   if [[ "$(strftime %04y 1)" = "0070" ]]; then
     [[ "$(LC_TIME=ja_JP.UTF-8 strftime %OS 1)" = 一 ]] || {
       print -u $ZTST_fd "Not testing alternate date format extensions (missing ja_JP.UTF-8 locale)"
@@ -27,12 +28,12 @@
 >70
 >2001
 >01/10/08
->22:20:01
+>21:20:01
 
-  strftime %-m_%f_%K_%L 1181000000
+  strftime %-m_%f_%K_%L 1181100000
   strftime %6. 0
 0:zsh extensions
->6_5_1_1
+>6_6_3_3
 >000000
 
   [[ $skip_japanese = 1 ]] && repeat 5; do echo skipped; done || (
