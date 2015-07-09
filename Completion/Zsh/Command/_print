@@ -11,7 +11,7 @@ if [[ $service = print ]]; then
     pflag='(-s -u -z)-p[print arguments to input of coprocess]'
 
   if [[ -n ${words[1,CURRENT][(r)-*P*]} ]]; then
-    rest='*: :_ps1234'
+    rest='*: :->prompt'
   else
     rest='*: :_default'
   fi
@@ -48,16 +48,17 @@ if [[ $state = printf ]]; then
 fi
 
 if [[ $state = printfformat ]]; then
-  if [[ ${(Q)PREFIX} = *%((-|)<->|[-#0 +*.])# ]]; then
+  if [[ ${(Q)PREFIX} = *%[0-9\$#\ +*.\'-]# ]]; then
     local -a specs
       specs=(
         '#:alternate form'
-        '0:zeropad to length n'
+        '0:zero pad to length'
         '-:left adjust result'
         ' :leave one space in front of positive number from signed conversion'
         '+:always place sign before a number from signed conversion'
         '*:field width in next argument'
         '.:precision'
+	"':thousand separators"
         'c:print the first character of the argument'
         's:print the argument as a string'
         {d,i}':signed decimal number or with leading " numeric value of following character'
@@ -73,12 +74,16 @@ if [[ $state = printfformat ]]; then
         'q:as %s but shell quote result'
       )
     compset -P "*"
-    _describe -t print-format-specifier 'print format specifier' specs -S ''
-    _message -e print-format-specifier 'number'
+    _describe -t print-format-specifiers 'print format specifier' specs -S ''
+    _message -e print-format-specifiers 'number'
   else
-    _describe -t print-format-specifier 'print format specifier' '(%)' -S ''
+    _wanted print-format-specifiers expl 'print format specifier' compadd -S '' %
   fi
   ret=0
+elif [[ $state = prompt ]]; then
+  _default && ret=0
+  # complete prompt specifiers without interfering too much with default completion
+  (( $#compstate[unambiguous] <= $#PREFIX || ! $#PREFIX )) && _ps1234 && ret=0
 fi
 
 return ret

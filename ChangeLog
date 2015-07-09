@@ -1,5 +1,9 @@
 2015-07-09  Oliver Kiddle  <opk@zsh.org>
 
+	* 35748: Completion/Zsh/Type/_ps1234,
+	Completion/Zsh/Command/_print: fixes to prompt spec completion
+	where it contains date formats
+
 	* 35749: (c.f. Jun T: 35732): Completion/Unix/Type/_date_formats:
 	fix exclusion list for flags/modifiers
 
@@ -34,7 +38,7 @@
 
 2015-07-06  Oliver Kiddle  <opk@zsh.org>
 
-	* 35704: Doc/Zsh/compwid.yo, Src/Zle/compcore.c, Src/Zle/complete.c;
+	* 35704: Doc/Zsh/compwid.yo, Src/Zle/compcore.c, Src/Zle/complete.c:
 	compadd -E 0 should imply -J and -2
 
 2015-07-06  Mikael Magnusson  <mikachu@gmail.com>
