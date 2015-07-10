@@ -70,7 +70,7 @@
 # the expected status returned by the code when run, or - if it is
 # irrelevant.  An optional set of single-letter flags follows the status
 # or -.  The following are understood:
-#   d   Don't diff stdout against the expected stdout.
+#  . d   Don't diff stdout against the expected stdout.
 #   D   Don't diff stderr against the expected stderr.
 #   q   All redirection lines given in the test script (not the lines
 #       actually produced by the test) are subject to ordinary quoted shell
@@ -93,6 +93,18 @@
 # ones which may arise from the environment rather than from the shell
 # itself.  (The example below isn't particularly useful as errors with
 # `cd' are unusual.)
+#
+# A couple of features aren't used in this file, but are usefuil in cases
+# where features may not be available so should not be tested.  They boh
+# take the form of variables.  Note that to keep the test framework simple
+# there is no magic in setting the variables: the chunk of code being
+# executed needs to avoid executing any test code by appropriate structure
+# (typically "if").  In both cases, the value of the variable is output
+# as a warning that the test was skipped.
+# ZTST_unimplemented: Set this in the %prep phase if the entire test file
+#   is to be skipped.
+# ZTST_skip: Set this in any test case if that single test case is to be
+#   skipped.  Testing resumes ath the next test case in the same file.
  cd cdtst.tmp/sub/fake &&
  pwd &&
  print $PWD
