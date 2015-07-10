@@ -490,8 +490,7 @@
     [[ $'\ua0' =~ $'^\ua0$' ]] && print OK
     [[ $'\ua0'X =~ '^X$' ]] || print OK
   else
-    print -u$ZTST_fd "Regexp test skipped, regexp library not found."
-    print -l OK OK OK
+    ZTST_skip="regexp library not found."
   fi
 0:Ensure no confusion on metafied input to regex module
 >OK

@@ -1,5 +1,7 @@
 2015-07-10  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unpsoted: another ZTST_skip.
+
 	* 35760: Test/A01grammar.ztst, Test/C02cond.ztst,
 	Test/V09datetime.ztst, Test/ztst.zsh: ZTST_skip
 	can be used to skip test case.
