@@ -1,3 +1,8 @@
+2015-07-10  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 35761: Test/V09datetime.ztst: Make sure to skip alternate
+	format extension test properly
+
 2015-07-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unpsoted: another ZTST_skip.
