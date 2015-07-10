@@ -151,14 +151,11 @@
   cat $unmodified
   touch $newnewnew
   if [[ $OSTYPE == "cygwin" ]]; then
-    print -u$ZTST_fd "Warning: not testing [[ -N file ]] (not supported on Cygwin)"
-    true
+    ZTST_skip="[[ -N file ]] not supported on Cygwin"
   elif (( isnfs )); then
-    print -u$ZTST_fd "Warning: not testing [[ -N file ]] (not supported with NFS)"
-    true
+    ZTST_skip="[[ -N file ]] not supported with NFS"
   elif test -f /etc/mtab && { grep $(df . 2>/dev/null| tail -n1 | awk '{print $1}') /etc/mtab | grep -q noatime; }; then
-    print -u$ZTST_fd "Warning: not testing [[ -N file ]] (not supported with noatime file system)"
-    true
+    ZTST_skip="[[ -N file ]] not supported with noatime file system"
   else
     [[ -N $newnewnew && ! -N $unmodified ]]
   fi

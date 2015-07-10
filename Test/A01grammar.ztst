@@ -13,6 +13,19 @@
 #
 # Tests for `Simple Commands and Pipelines'
 #
+
+  # Test skipping early to ensure we run the remainder...
+  if [[ -n $ZTST_test_skip ]]; then
+    ZTST_skip="Test system verification for skipping"
+  else
+    print "This is standard output"
+    print "This is standard error" >&2
+    false
+  fi
+1:Test skipping if ZTST_test_skip is set
+>This is standard output
+?This is standard error
+
   echo foo | cat | sed 's/foo/bar/'
 0:Basic pipeline handling
 >bar

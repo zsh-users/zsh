@@ -343,6 +343,7 @@ ZTST_diff() {
 ZTST_test() {
   local last match mbegin mend found substlines
   local diff_out diff_err
+  local ZTST_skip
 
   while true; do
     rm -f $ZTST_in $ZTST_out $ZTST_err
@@ -426,6 +427,16 @@ $ZTST_curline"
       ZTST_verbose 2 "Input: $ZTST_in, output: $ZTST_out, error: $ZTST_terr"
 
       ZTST_execchunk <$ZTST_in >$ZTST_tout 2>$ZTST_terr
+
+      if [[ -n $ZTST_skip ]]; then
+	ZTST_verbose 0 "Test case skipped: $ZTST_skip"
+	ZTST_skip=
+	if [[ -n $last ]]; then
+	  break
+	else
+	  continue
+	fi
+      fi
 
       # First check we got the right status, if specified.
       if [[ $ZTST_xstatus != - && $ZTST_xstatus != $ZTST_status ]]; then

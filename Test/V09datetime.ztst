@@ -10,11 +10,9 @@
   TZ=UTC+0
   if [[ "$(strftime %04y 1)" = "0070" ]]; then
     [[ "$(LC_TIME=ja_JP.UTF-8 strftime %OS 1)" = 一 ]] || {
-      print -u $ZTST_fd "Not testing alternate date format extensions (missing ja_JP.UTF-8 locale)"
       skip_japanese=1
     }
   else
-    print -u $ZTST_fd "Skipping strftime extension tests"
     skip_extensions=1
   fi
 
@@ -36,29 +34,37 @@
 >6_6_3_3
 >000000
 
-  [[ $skip_japanese = 1 ]] && repeat 5; do echo skipped; done || (
-  LC_TIME=ja_JP.UTF-8
-  strftime %Ey 1000000000
-  strftime %Oy 1000000000
-  strftime %Ex 1000000000
-  strftime %OS 1000000000
-  strftime %03Ey 650000000
-  )
+  if [[ $skip_japanese = 1 ]]; then
+    ZTST_skip="Japanese UTF-8 locale not supported"
+  else
+    (
+    LC_TIME=ja_JP.UTF-8
+    strftime %Ey 1000000000
+    strftime %Oy 1000000000
+    strftime %Ex 1000000000
+    strftime %OS 1000000000
+    strftime %03Ey 650000000
+    )
+  fi
 0:alternate format extensions
-*>skipped|13
->skipped|一
->skipped|平成13年09月09日
->skipped|四十
->skipped|002
+>13
+>一
+>平成13年09月09日
+>四十
+>002
 
-  [[ $skip_extensions = 1 ]] && repeat 4; do echo skipped; done || (
-  strftime '%#A' 0
-  strftime '%^_10B' 0
-  strftime %03Ey 650000000
-  strftime %-Oe 0
-  )
+  if [[ $skip_extensions = 1 ]]; then
+    ZTST_skip="strftime extensions not supported"
+  else
+    (
+      strftime '%#A' 0
+      strftime '%^_10B' 0
+      strftime %03Ey 650000000
+      strftime %-Oe 0
+    )
+  fi
 0:various extensions
-*>skipped|THURSDAY
->skipped|   JANUARY
->skipped|090
->skipped|1
+>THURSDAY
+>   JANUARY
+>090
+>1
