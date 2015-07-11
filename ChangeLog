@@ -1,5 +1,10 @@
 2015-07-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 35775: Doc/Zsh/.vimrc Etc/zsh-development-guide Util/zyodl.vim:
+	New zsh-specific yodl vim syntax highlighting.
+
+2015-07-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
 	* 35769: Functions/Zle/edit-command-line: edit-command-line:
 	Go to the right byte offset
 

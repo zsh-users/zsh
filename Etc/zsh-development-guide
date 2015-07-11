@@ -920,6 +920,9 @@ Documentation
   surrounding text.  No extra newlines after the opening or before the
   closing parenthesis are required.
 
+A syntax highlighting file for Vim is included, just source tt(Doc/Zsh/.vimrc)
+before editing one of the Doc/Zsh/*.yo files.
+
 Module names
 ------------
 
