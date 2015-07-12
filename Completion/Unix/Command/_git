@@ -2923,7 +2923,6 @@ _git-config () {
         (*)
           # TODO: Do we need to set up a _requested/_next_label?
           declare -a action
-          local expl
           _description values expl "$parts[2]"
           eval "action=($parts[4])"
           "$action[1]" "$expl[@]" "${(@)action[2,-1]}" && ret=0

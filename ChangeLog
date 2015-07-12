@@ -1,3 +1,8 @@
+2015-07-13  Daniel Hahler  <zsh@thequod.de>
+
+	* 35779: Completion/Unix/Command/_git: _git-config: remove
+	extraneous "local expl".
+
 2015-07-12  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Test/B01cd.ztst: Typo
