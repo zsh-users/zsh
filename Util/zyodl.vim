@@ -44,7 +44,7 @@ syn region zyodlItem    start="\<xitem(" end=")" contains=zyodlSpecial,@zyodlInl
 syn region zyodlItem    start="\<item("  end=")" contains=zyodlSpecial,@zyodlInline
 syn region zyodlExample start="\<example(" end=")" contains=zyodlSpecial
 syn region zyodlTitle   start="\<\(chapter\|subsect\|sect\)(" end=")" contains=zyodlSpecial,@zyodlInline
-syn match  zyodlTitle   "^texinode\%x28.*$"
+syn match  zyodlTitle   "^texinode(.*$"
 
 syn region zyodlCond    start="\<\(ifzman\|ifnzman\)(" end=")" contains=zyodlRef,zyodlSpecial,@zyodlInline
 syn region zyodlRef     start="\<\(zmanref\|noderef\)(" end=")"
