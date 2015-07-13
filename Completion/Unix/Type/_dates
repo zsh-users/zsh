@@ -13,14 +13,14 @@
 
 local -a disp cand expl
 local userformat format spacer=1 spacing month monstart skip match
-local d day daysecs extra preclude r ri col explain
+local d day daysecs extra preclude r ri col
 local -a starts skips
 local -i start now mult
 local -i columns=$(( (COLUMNS+4) / 32 )) rows=LINES-4 offset=0
 local -a days=( Mo Tu We Th Fr Sa Su )
 local future mlabel mfmt mlabels
 
-zparseopts -D -K -E f:=format F=future X:=explain
+zparseopts -D -K -E f:=format F=future
 (( future = $#future ? 1 : -1 ))
 zstyle -s ':completion:$curcontext:dates' date-format userformat
 format=${userformat:-${format[2]:-%F}}
@@ -33,9 +33,12 @@ done
 (( rows = rows / 8 ))
 zmodload -i zsh/datetime || rows=0
 
-_message -e dates ${explain[2]:-date}
-(( rows )) || return
+_tags dates || return 0
+_comp_mesg=yes
 _description -2V -x dates expl date
+compadd "${@:/-X/-x}" "$expl[@]" -
+[[ -n $PREFIX$SUFFIX ]] && return 0
+(( rows )) || return 0
 compstate[list]='packed rows'
 
 if [[ $WIDGET = _next_tags ]]; then
