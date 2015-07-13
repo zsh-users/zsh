@@ -1587,7 +1587,7 @@ undo(char **args)
 	if (prev->changeno < last_change)
 	    break;
 	if (prev->changeno < undo_limitno && !*args)
-	    break;
+	    return 1;
 	if (unapplychange(prev))
 	    curchange = prev;
 	else

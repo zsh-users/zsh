@@ -1,5 +1,9 @@
 2015-07-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 35737: (tweaked c.f. Peter: 35759): Src/Zle/zle_utils.c,
+	Functions/Zle/read-from-minibuffer: use new undo limit for
+	minibuffer and beep when limit is reached
+
 	* 35756: Completion/Zsh/Type/_ps1234: use the actual
 	colours in the completion list for terminal colours
 

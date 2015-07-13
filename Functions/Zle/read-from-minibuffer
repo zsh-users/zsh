@@ -20,7 +20,7 @@ done
 (( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
 local readprompt="$1" lbuf_init="$2" rbuf_init="$3"
-integer changeno=$UNDO_CHANGE_NO
+integer savelim=$UNDO_LIMIT_NO changeno=$UNDO_CHANGE_NO
 
 {
 # Use anonymous function to make sure special values get restored,
@@ -43,6 +43,8 @@ integer changeno=$UNDO_CHANGE_NO
   else
     local NUMERIC
     unset NUMERIC
+    zle split-undo
+    UNDO_LIMIT_NO=$UNDO_CHANGE_NO
     zle recursive-edit -K main
     stat=$?
     (( stat )) || REPLY=$BUFFER
@@ -52,6 +54,7 @@ integer changeno=$UNDO_CHANGE_NO
   # This removes the edits relating to the read from the undo history.
   # These aren't useful once we get back to the main editing buffer.
   zle undo $changeno
+  UNDO_LIMIT_NO=savelim
 }
 
 return $stat
