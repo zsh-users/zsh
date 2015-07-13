@@ -1,7 +1,8 @@
 #compdef -value-,PROMPT,-default- -value-,PROMPT2,-default- -value-,PROMPT3,-default- -value-,PROMPT4,-default- -value-,RPROMPT,-default- -value-,RPROMPT2,-default- -value-,PS1,-default- -value-,PS2,-default- -value-,PS3,-default- -value-,PS4,-default- -value-,RPS1,-default- -value-,RPS2,-default- -value-,SPROMPT,-default-
 
 local -a specs
-local expl bs suf pre changed=1 ret=1
+local expl grp cols bs suf pre changed=1 ret=1
+local -A ansi
 
 if [[ -z $compstate[quote] ]]; then
   bs='\' # in patterns we use (\\|) widely as print -P handles backslashes first
@@ -24,24 +25,37 @@ done
 
 if compset -P '%[FK]'; then
   # this should use -P but that somehow causes single quotes to be stripped
-  compset -P '(\\|){' || pre=( -p "$bs{" )
-  compset -S '(\\|)}*' || suf=( -S $bs\} )
-  specs=(
-    black
-    red
-    green
-    yellow
-    blue
-    magenta
-    cyan
-    white
-    default
+  compset -P '(\\|){' || pre=( -p '{' )
+  compset -S '(\\|)}*' || suf=( -S "$bs}" )
+  ansi=(
+    black 30
+    red 31
+    green 32
+    yellow 33
+    blue 34
+    magenta 35
+    cyan 36
+    white 37
+    default 39
   )
-  _wanted ansi-colors expl 'ansi color' compadd $suf $pre -a specs && ret=0
-  if (( $#suf )) && compset -P "<->"; then
+
+  _description -V ansi-colors expl 'ansi color'
+  grp="$expl[expl[(i)-V]+1]"
+  _comp_colors+=( ${(ps.\0.)"$(printf "($grp)=%s=%s\0" ${(kv)ansi})"} )
+  compadd "$expl[@]" $suf $pre -k ansi && ret=0
+  if (( $#suf )) && compset -P "(<->|%v)"; then
     _wanted ansi-colors expl 'closing brace' compadd -S '' \} && ret=0
+  elif (( $+terminfo[colors] )); then
+    (( cols = $terminfo[colors] - 1 ))
+    (( cols = cols > 255 ? 255 : cols ))
+    _description -V terminal-colors expl 'terminal color'
+    grp="$expl[expl[(i)-V]+1]"
+    compadd "$expl[@]" $suf $pre {0..$cols}
+    for c in {0..$cols}; do
+      _comp_colors+=( "($grp)=${c}=${${$(print -P "%F{$c}")#?\[}%m}" )
+    done
   else
-    _message -e terminal-colors "number between 0 and $(( $terminfo[colors] - 1 ))"
+    _message -e terminal-colors "number"
   fi
 fi
 

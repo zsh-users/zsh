@@ -1,5 +1,8 @@
 2015-07-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 35756: Completion/Zsh/Type/_ps1234: use the actual
+	colours in the completion list for terminal colours
+
 	* 35774: Completion/Unix/Type/_dates: fix double
 	formatting of date explanation message
 
@@ -24,7 +27,7 @@
 
 2015-07-10  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* unpsoted: another ZTST_skip.
+	* unposted: another ZTST_skip.
 
 	* 35760: Test/A01grammar.ztst, Test/C02cond.ztst,
 	Test/V09datetime.ztst, Test/ztst.zsh: ZTST_skip
