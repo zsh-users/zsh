@@ -1,6 +1,24 @@
 #compdef -redirect-,-default-,-default-
 
-local opts tmp glob pat pats expl tag i def descr end ign ret=1 match tried
+local -a match mbegin mend
+local ret=1
+
+# Look for glob qualifiers. This is duplicated from _path_files because
+# we don't want to complete them multiple times (for each file pattern).
+if _have_glob_qual $PREFIX; then
+  compset -p ${#match[1]}
+  if [[ $_comp_caller_options[extendedglob] == on ]] && compset -P '\#'; then
+    _globflags && ret=0
+  else
+    if [[ $_comp_caller_options[extendedglob] == on ]]; then
+      _describe -t globflags "glob flag" '(\#:introduce\ glob\ flag)' -Q -S '' && ret=0
+    fi
+    _globquals && ret=0
+  fi
+  return ret
+fi
+
+local opts tmp glob pat pats expl tag i def descr end ign tried
 local type sdef ignvars ignvar prepath oprefix rfiles rfile
 
 zparseopts -a opts \

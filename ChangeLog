@@ -1,3 +1,9 @@
+2015-07-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 35789: (tweaked c.f. Bart: 35791) Completion/Unix/Type/_files:
+	duplicate glob qualifier handling from _path_files so it is
+	called once and not for each file pattern
+
 2015-07-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 35790: Util/zyodl.vim: zyodl.vim: Be compatible with Vim 6.
