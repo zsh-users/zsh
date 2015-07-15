@@ -15,7 +15,7 @@ while (( changed )); do
   compset -P '%[DFK](\\|){[^}]#}' && changed=1 # formats with arg: %x{...}
   compset -P '%[0-9-\\]#[^DFK(0-9-<>\\\[]' && changed=1 # normal formats
   compset -P '%[0-9-\\]#(<[^<]#<|>[^>]#>|\[[^\]]#\])' && changed=1 # truncations
-  compset -P '%[0-9-\\]#(\\|)\(??|[^%]' && changed=1 # start of ternary
+  compset -P '%[0-9-\\]#(\\|)\([0-9]#[^0-9]?|[^%]' && changed=1 # start of ternary
   compset -P '[^%]##' && changed=1 # sundry other characters
   # %D/%F/%K without a following { ... }
   [[ $PREFIX = %(-|)<->#[DFK](\\|)[^{\\]* ]] &&
@@ -59,12 +59,12 @@ if compset -P '%[FK]'; then
   fi
 fi
 
-if compset -P '%[0-9-\\]#\(?'; then
+if compset -P '%[0-9-\\]#\([0-9]#[^0-9]'; then
   compset -S '*'
   _delimiters && ret=0
 elif compset -P '%[0-9-\\]#[<>\]]'; then
   _message -e replacements 'replacement string'
-elif compset -P '%[0-9-\\]#(\\|)\('; then
+elif compset -P '%[0-9-\\]#(\\|)\([0-9]#'; then
   compset -S '[.:+/-%]*' || suf=( -S . )
   compset -S '*'
   specs=(

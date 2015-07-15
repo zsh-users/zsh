@@ -1,3 +1,8 @@
+2015-07-15  Mikael Magnusson  <mikachu@gmail.com>
+
+	* unposted: Completion/Zsh/Type/_ps1234: unposted: _ps1234:
+	Fix ternary test char completion
+
 2015-07-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 35789: (tweaked c.f. Bart: 35791) Completion/Unix/Type/_files:
