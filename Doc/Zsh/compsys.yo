@@ -3532,6 +3532,8 @@ This function can be used to give a complete specification for completion
 for a command whose arguments follow standard UNIX option and argument
 conventions.
 
+em(Options overview)
+
 Options to tt(_arguments) itself must be in separate words, i.e. tt(-s -w),
 not tt(-sw).  The options are followed by var(spec)s that describe options and
 arguments of the analyzed command.  var(spec)s that describe option flags must
@@ -3629,6 +3631,8 @@ var(matchspec) is:
 example(tt(r:|[_-]=* r:|=*))
 )
 enditem()
+
+em(var(spec)s: overview)
 
 Each of the following forms is a var(spec) describing individual sets of
 options or arguments on the command line being analyzed.
@@ -3797,6 +3801,8 @@ given by an array, and tt(_arguments) is called repeatedly for more
 specific contexts: on the first call `tt(_arguments $global_options)' is
 used, and on subsequent calls `tt(_arguments !$^global_options)'.
 
+em(var(spec)s: actions)
+
 In each of the forms above the var(action) determines how
 completions should be generated.  Except for the `tt(->)var(string)'
 form below, the var(action) will be executed by calling the
@@ -3949,6 +3955,8 @@ example(local curcontext="$curcontext")
 This is useful where it is not possible for multiple states to be valid
 together.
 
+em(Specifying multiple sets of options)
+
 It is possible to specify multiple sets of options and
 arguments with the sets separated by single hyphens.  The specifications
 before the first hyphen (if any) are shared by all the remaining sets.
@@ -3994,6 +4002,8 @@ set this form of argument is slow and should only be used when necessary.
 A useful alternative is often an option specification with rest-arguments
 (as in `tt(-foo:*:...)'); here the option tt(-foo) swallows up all
 remaining arguments as described by the var(optarg) definitions.
+
+em(Deriving var(spec) forms from the help output)
 
 The option `tt(-)tt(-)' allows tt(_arguments) to work out the names of long
 options that support the `tt(-)tt(-help)' option which is standard in many
@@ -4066,6 +4076,8 @@ as `tt(-)tt(-enable-foo)', but the script also accepts the negated form
 `tt(-)tt(-disable-foo)'.  To allow completion of the second form:
 
 example(_arguments -- -s "LPAR()(#s)--enable- --disable-RPAR()")
+
+em(Miscellaneous notes)
 
 Finally, note that tt(_arguments) generally expects to be the primary
 function handling any completion for which it is used.  It may have side
