@@ -362,6 +362,20 @@
   echo ${unset_var?Not an error})
 0:NO_EXEC should not test for unset variables
 
+  (setopt noexec
+  : ${${string%[aeiou]*}/(#m)?(#e)/${(U)MATCH}}  Rule 1
+  : ${array[4,5][1][2,3]}                        Rule 2
+  : ${${(P)foo[1,6]}[1,3]}                       Rule 3
+  : "${${(@)array}[1,2]}"                        Rule 5
+  : "${(@)${(@)array}[1,2]#?}"                   Rule 6
+  : ${(el.20..X.)${bar}}                         Rule 11 success case)
+0:NO_EXEC handles parameter substitution examples
+
+  (setopt noexec
+  : ${(el.20..X.)$bar}                           Rule 11 failure case)
+1:NO_EXEC does recognize bad substitution syntax
+*?* bad substitution
+
   setopt NO_eval_lineno
   eval 'print $LINENO'
   setopt eval_lineno

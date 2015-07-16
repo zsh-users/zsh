@@ -1,3 +1,7 @@
+2015-07-16  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 35805: Test/E01options.ztst: tests for 35799
+
 2015-07-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 35799: Src/params.c: with NO_EXEC, parse parameter subscript
