@@ -1,3 +1,9 @@
+2015-07-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 35799: Src/params.c: with NO_EXEC, parse parameter subscript
+	expressions to correctly balance enclosing braces, but do not
+	perform the subscripting
+
 2015-07-15  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Completion/Zsh/Type/_ps1234: unposted: _ps1234:

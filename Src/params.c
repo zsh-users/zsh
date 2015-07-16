@@ -1116,14 +1116,12 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
     Patprog pprog = NULL;
 
     /*
-     * If in NO_EXEC mode, the parameters won't be set up
-     * properly, so there's no point even doing any sanity checking.
-     * Just return 0 now.
+     * If in NO_EXEC mode, the parameters won't be set up properly,
+     * so just pretend everything is a hash for subscript parsing
      */
-    if (unset(EXECOPT))
-	return 0;
 
-    ishash = (v->pm && PM_TYPE(v->pm->node.flags) == PM_HASHED);
+    ishash = (unset(EXECOPT) ||
+	      (v->pm && PM_TYPE(v->pm->node.flags) == PM_HASHED));
     if (prevcharlen)
 	*prevcharlen = 1;
     if (nextcharlen)
@@ -1278,8 +1276,18 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
     }
     if (!c)
 	return 0;
-    s = dupstrpfx(s, t - s);
     *str = tt = t;
+
+    /*
+     * If in NO_EXEC mode, the parameters won't be set up properly,
+     * so there's no additional sanity checking we can do.
+     * Just return 0 now.
+     */
+    if (unset(EXECOPT))
+	return 0;
+
+    s = dupstrpfx(s, t - s);
+
     /* If we're NOT reverse subscripting, strip the inull()s so brackets *
      * are not backslashed after parsestr().  Otherwise leave them alone *
      * so that the brackets will be escaped when we patcompile() or when *
