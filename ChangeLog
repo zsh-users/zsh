@@ -1,3 +1,8 @@
+2015-07-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 35807: Functions/Zle/edit-command-line: edit-command-line:
+	Fix for non-7bit-data (after 35769)
+
 2015-07-24  Oliver Kiddle <opk@zsh.org>
 
 	* 35865: Doc/Zsh/prompt.yo: document %^ prompt expansion

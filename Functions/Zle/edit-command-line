@@ -9,9 +9,12 @@
 () {
   exec </dev/tty
 
+  # Compute the cursor's position in bytes, not characters.
+  setopt localoptions nomultibyte
+  integer byteoffset=$(( $#PREBUFFER + $#LBUFFER + 1 ))
+
   # Open the editor, placing the cursor at the right place if we know how.
   local editor=${${VISUAL:-${EDITOR:-vi}}}
-  integer byteoffset=$(( $#PREBUFFER + $#LBUFFER + 1 ))
   case $editor in 
     (*vim*) ${=editor} -c "normal! ${byteoffset}go" -- $1;;
     (*emacs*) ${=editor} $1 -eval "(goto-char ${byteoffset})";;
