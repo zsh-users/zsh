@@ -1,5 +1,10 @@
 2015-07-22  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 35823: Functions/Zle/narrow-to-region: fix handling of MARK
+	and CURSOR, clean up documentary comment
+
+2015-07-22  Barton E. Schaefer  <schaefer@zsh.org>
+
 	* 35582: Test/A06assign.ztst, Test/B02typeset.ztst: test for 35581
 
 	* 35581: Src/params.c: output array assignments with spaces inside

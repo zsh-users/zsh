@@ -5,21 +5,26 @@
 # Optionally accepts exactly two arguments, which are used instead of
 # $CURSOR and $MARK as limits to the range.
 #
+# Upon exit, $MARK is always the start of the edited range and $CURSOR
+# the end of the range, even if they began in the opposite order.
+#
 # Other options:
-#   -p pretext   show `pretext' instead of the buffer text before the region.
-#   -P posttext  show  `posttext' instead of the buffer text after the region.
-# Either or both may be empty.
+#   -p pretext   show "pretext" instead of the buffer text before the region.
+#   -P posttext  show "posttext" instead of the buffer text after the region.
+#                Either or both may be empty.
 #   -n           Only replace the text before or after the region with
 #                the -p or -P options if the text was not empty.
-#   -l lbufvar   ) $lbufvar and $rbufvar will contain the value of $LBUFFER and
-#   -r rbufvar   ) $RBUFFER resulting from any recursive edit (i.e. not with -S or -R)
+#   -l lbufvar   $lbufvar is assigned the value of $LBUFFER and
+#   -r rbufvar   $rbufvar is assigned the value of $RBUFFER
+#                from any recursive edit (i.e. not with -S or -R).  Neither
+#                lbufvar nor rbufvar may begin with the prefix "_ntr_".
 #   -S statevar
 #   -R statevar
-# Save or restore the state in/from the parameter named statevar.  In
-# either case no recursive editing takes place; this will typically be
-# done within the calling function between calls with -S and -R.  The
-# statevar may not begin with the prefix _ntr_ which is reserved for
-# parameters within narrow-to-region.
+#      Save or restore the state in/from the parameter named statevar.  In
+#      either case no recursive editing takes place; this will typically be
+#      done within the calling function between calls with -S and -R.  The
+#      statevar may not begin with the prefix "_ntr_" which is reserved for
+#      parameters within narrow-to-region.
 
 emulate -L zsh
 setopt extendedglob
@@ -55,7 +60,8 @@ while getopts "l:np:P:r:R:S:" _ntr_opt; do
 done
 (( OPTIND > 1 )) && shift $(( OPTIND - 1 ))
 
-if [[ $_ntr_restore = _ntr_* || $_ntr_save = _ntr_* ]]; then
+if [[ $_ntr_restore = _ntr_* || $_ntr_save = _ntr_* ||
+      $_ntr_lbuf_return = _ntr_* || $ntr_rbuf_return = _ntr_* ]]; then
   zle -M "$0: _ntr_ prefix is reserved" >&2
   return 1
 fi
@@ -64,7 +70,7 @@ if [[ -n $_ntr_save || -z $_ntr_restore ]]; then
 
   if (( $# )); then
     if (( $# != 2 )); then
-      zle -M "$0: supply zero or two arguments"
+      zle -M "$0: supply zero or two arguments" >&2
       return 1
     fi
     _ntr_start=$1
@@ -94,39 +100,44 @@ if [[ -n $_ntr_save || -z $_ntr_restore ]]; then
   fi
   PREDISPLAY="$_ntr_predisplay$_ntr_pretext"
   POSTDISPLAY="$_ntr_posttext$_ntr_postdisplay"
+
+  if [[ -n $_ntr_save ]]; then
+    builtin typeset -ga $_ntr_save
+    set -A $_ntr_save "${_ntr_predisplay}" "${_ntr_postdisplay}" \
+	"${_ntr_lbuffer}" "${_ntr_rbuffer}" || return 1
+  fi
+
   BUFFER=${BUFFER[_ntr_start+1,_ntr_end-1]}
   CURSOR=$_ntr_cursor
   MARK=$_ntr_mark
-
-  if [[ -n $_ntr_save ]]; then
-    eval "$_ntr_save=(${(qq)_ntr_predisplay} ${(qq)_ntr_postdisplay}
-${(qq)_ntr_lbuffer} ${(qq)_ntr_rbuffer})" || return 1
-  fi
 fi
 
 if [[ -z $_ntr_save && -z $_ntr_restore ]]; then
   zle recursive-edit
   _ntr_stat=$?
 
-  [[ -n $_ntr_lbuf_return ]] && eval "${_ntr_lbuf_return}=\${LBUFFER}"
-  [[ -n $_ntr_rbuf_return ]] && eval "${_ntr_rbuf_return}=\${RBUFFER}"
+  [[ -n $_ntr_lbuf_return ]] &&
+    builtin typeset -g ${_ntr_lbuf_return}="${LBUFFER}"
+  [[ -n $_ntr_rbuf_return ]] &&
+    builtin typeset -g ${_ntr_rbuf_return}="${RBUFFER}"
 fi
 
 if [[ -n $_ntr_restore || -z $_ntr_save ]]; then
   if [[ -n $_ntr_restore ]]; then
-    if ! eval "_ntr_predisplay=\${${_ntr_restore}[1]}
-_ntr_postdisplay=\${${_ntr_restore}[2]}
-_ntr_lbuffer=\${${_ntr_restore}[3]}
-_ntr_rbuffer=\${${_ntr_restore}[4]}"; then
-      zle -M Failed.
+    if ! { _ntr_predisplay="${${(@P)_ntr_restore}[1]}"
+           _ntr_postdisplay="${${(@P)_ntr_restore}[2]}"
+           _ntr_lbuffer="${${(@P)_ntr_restore}[3]}"
+           _ntr_rbuffer="${${(@P)_ntr_restore}[4]}" }; then
+      zle -M Failed. >&2
       return 1
     fi
   fi
 
   PREDISPLAY=$_ntr_predisplay
   POSTDISPLAY=$_ntr_postdisplay
-  LBUFFER="$_ntr_lbuffer$LBUFFER"
-  RBUFFER="$RBUFFER$_ntr_rbuffer"
+  LBUFFER="$_ntr_lbuffer$BUFFER"
+  RBUFFER="$_ntr_rbuffer"
+  MARK=${#_ntr_lbuffer}
 fi
 
 return $_ntr_stat
