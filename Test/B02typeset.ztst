@@ -703,7 +703,7 @@
   print $array
 0:setting empty array in typeset
 >typeset -a array
->array=('' two '' four)
+>array=( '' two '' four )
 >typeset -a array
->array=(one '' three)
+>array=( one '' three )
 >no really nothing here

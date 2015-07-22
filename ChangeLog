@@ -10,6 +10,8 @@
 
 2015-07-22  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Test/B02typeset.ztst: fix another test for 35581
+	
 	* 35582: Test/A06assign.ztst, Test/B02typeset.ztst: test for 35581
 
 	* 35581: Src/params.c: output array assignments with spaces inside
