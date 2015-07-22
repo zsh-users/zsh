@@ -1,5 +1,9 @@
 2015-07-22  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 35939: Joshua Krusell <js.shirin@gmail.com>:
+	Src/Modules/socket.c, Src/Modules/tcp.c: fix select polling in
+	ztcp and zsocket
+
 	* unposted: Completion/Zsh/Type/_directory_stack: move some more
 	recent code so an old comment is connected to the correct bit of
 	older code

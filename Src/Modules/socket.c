@@ -175,7 +175,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	    tv.tv_sec = 0;
 	    tv.tv_usec = 0;
 	    
-	    if ((ret = select(lfd+1, &rfds, NULL, NULL, &tv))) return 1;
+	    if ((ret = select(lfd+1, &rfds, NULL, NULL, &tv)) == 0) return 1;
 	    else if (ret == -1)
 	    {
 		zwarnnam(nam, "select error: %e", errno);
