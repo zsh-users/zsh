@@ -430,7 +430,7 @@
 0:GLOB_ASSIGN with numeric types
 >typeset -i i=0
 >typeset -a n
->n=(tmpfile1 tmpfile2)
+>n=( tmpfile1 tmpfile2 )
 >typeset x=tmpfile2
 >typeset -E f=4.000000000e+00
 

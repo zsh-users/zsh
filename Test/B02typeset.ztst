@@ -453,7 +453,7 @@
  fn
 1:declare -p shouldn't create scoped values
 >typeset -a array
->array=(foo bar)
+>array=( foo bar )
 ?fn:typeset: no such variable: nonexistent
 
  unsetopt typesetsilent
@@ -504,10 +504,10 @@
   typeset -pm 'r[12]'
 0:readonly -p output
 >typeset -a a1
->a1=(one two)
+>a1=( one two )
 >typeset -ar a1
 >typeset -a a2
->a2=(three four)
+>a2=( three four )
 >typeset -r r1=yes
 >typeset -r r2=no
 

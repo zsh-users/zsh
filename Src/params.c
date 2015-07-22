@@ -5099,8 +5099,10 @@ printparamvalue(Param p, int printflags)
 	break;
     case PM_ARRAY:
 	/* array */
-	if (!(printflags & PRINT_KV_PAIR))
+	if (!(printflags & PRINT_KV_PAIR)) {
 	    putchar('(');
+	    putchar(' ');
+	}
 	u = p->gsu.a->getfn(p);
 	if(*u) {
 	    quotedzputs(*u++, stdout);
@@ -5109,13 +5111,17 @@ printparamvalue(Param p, int printflags)
 		quotedzputs(*u++, stdout);
 	    }
 	}
-	if (!(printflags & PRINT_KV_PAIR))
+	if (!(printflags & PRINT_KV_PAIR)) {
+	    putchar(' ');
 	    putchar(')');
+	}
 	break;
     case PM_HASHED:
 	/* association */
-	if (!(printflags & PRINT_KV_PAIR))
+	if (!(printflags & PRINT_KV_PAIR)) {
 	    putchar('(');
+	    putchar(' ');
+	}
 	{
             HashTable ht = p->gsu.h->getfn(p);
             if (ht)
