@@ -1426,7 +1426,7 @@ sourcehome(char *s)
     char *h;
 
     queue_signals();
-    if (EMULATION(EMULATE_SH|EMULATE_KSH) || !(h = getsparam("ZDOTDIR"))) {
+    if (EMULATION(EMULATE_SH|EMULATE_KSH) || !(h = getsparam_u("ZDOTDIR"))) {
 	h = home;
 	if (!h)
 	    return;

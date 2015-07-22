@@ -2639,6 +2639,15 @@ getsparam(char *s)
     return getstrvalue(v);
 }
 
+/**/
+mod_export char *
+getsparam_u(char *s)
+{
+    if ((s = getsparam(s)))
+	return unmetafy(s, NULL);
+    return s;
+}
+
 /* Retrieve an array parameter */
 
 /**/
@@ -3971,7 +3980,7 @@ setlang(char *x)
     struct localename *ln;
     char *x2;
 
-    if ((x2 = getsparam("LC_ALL")) && *x2)
+    if ((x2 = getsparam_u("LC_ALL")) && *x2)
 	return;
 
     /*
@@ -3985,10 +3994,10 @@ setlang(char *x)
      * from this is meaningless.  So just all $LANG to show through in
      * that case.
      */
-    setlocale(LC_ALL, x ? x : "");
+    setlocale(LC_ALL, x ? unmeta(x) : "");
     queue_signals();
     for (ln = lc_names; ln->name; ln++)
-	if ((x = getsparam(ln->name)) && *x)
+	if ((x = getsparam_u(ln->name)) && *x)
 	    setlocale(ln->category, x);
     unqueue_signals();
 }
@@ -4004,7 +4013,7 @@ lc_allsetfn(Param pm, char *x)
      * that with any LC_* that are set.
      */
     if (!x || !*x) {
-	x = getsparam("LANG");
+	x = getsparam_u("LANG");
 	if (x && *x) {
 	    queue_signals();
 	    setlang(x);
@@ -4012,7 +4021,7 @@ lc_allsetfn(Param pm, char *x)
 	}
     }
     else
-	setlocale(LC_ALL, x);
+	setlocale(LC_ALL, unmeta(x));
 }
 
 /**/
@@ -4020,7 +4029,7 @@ void
 langsetfn(Param pm, char *x)
 {
     strsetfn(pm, x);
-    setlang(x);
+    setlang(unmeta(x));
 }
 
 /**/
@@ -4046,7 +4055,7 @@ lcsetfn(Param pm, char *x)
     if (x && *x) {
 	for (ln = lc_names; ln->name; ln++)
 	    if (!strcmp(ln->name, pm->node.nam))
-		setlocale(ln->category, x);
+		setlocale(ln->category, unmeta(x));
     }
     unqueue_signals();
 }

@@ -566,7 +566,7 @@ dowatch(void)
 	return;
     }
     queue_signals();
-    if (!(fmt = getsparam("WATCHFMT")))
+    if (!(fmt = getsparam_u("WATCHFMT")))
 	fmt = DEFAULT_WATCHFMT;
     while ((uct || wct) && !errflag)
 	if (!uct || (wct && ucmp(uptr, wptr) > 0))

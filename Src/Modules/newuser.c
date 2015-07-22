@@ -67,7 +67,7 @@ check_dotfile(const char *dotdir, const char *fname)
 int
 boot_(UNUSED(Module m))
 {
-    const char *dotdir = getsparam("ZDOTDIR");
+    const char *dotdir = getsparam_u("ZDOTDIR");
     const char *spaths[] = {
 #ifdef SITESCRIPT_DIR
 	SITESCRIPT_DIR,

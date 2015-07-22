@@ -1552,13 +1552,13 @@ makesuffix(int n)
 {
     char *suffixchars;
 
-    if (!(suffixchars = getsparam("ZLE_REMOVE_SUFFIX_CHARS")))
+    if (!(suffixchars = getsparam_u("ZLE_REMOVE_SUFFIX_CHARS")))
 	suffixchars = " \t\n;&|";
 
     addsuffixstring(SUFTYP_POSSTR, 0, suffixchars, n);
 
     /* Do this second so it takes precedence */
-    if ((suffixchars = getsparam("ZLE_SPACE_SUFFIX_CHARS")) && *suffixchars)
+    if ((suffixchars = getsparam_u("ZLE_SPACE_SUFFIX_CHARS")) && *suffixchars)
 	addsuffixstring(SUFTYP_POSSTR, SUFFLAGS_SPACE, suffixchars, n);
 
     suffixlen = n;

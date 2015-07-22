@@ -248,7 +248,7 @@ VA_DCL
 
     VA_START(ap, message);
     VA_GET_ARG(ap, message, const char *);
-    if ((filename = getsparam("ZSH_DEBUG_LOG")) != NULL &&
+    if ((filename = getsparam_u("ZSH_DEBUG_LOG")) != NULL &&
 	(file = fopen(filename, "a")) != NULL) {
 	zerrmsg(file, message, ap);
 	fclose(file);
@@ -1949,7 +1949,8 @@ extern char *_mktemp(char *);
 /* Get a unique filename for use as a temporary file.  If "prefix" is
  * NULL, the name is relative to $TMPPREFIX; If it is non-NULL, the
  * unique suffix includes a prefixed '.' for improved readability.  If
- * "use_heap" is true, we allocate the returned name on the heap. */
+ * "use_heap" is true, we allocate the returned name on the heap.
+ * The string passed as "prefix" is expected to be metafied. */
 
 /**/
 mod_export char *
@@ -1975,6 +1976,9 @@ gettempname(const char *prefix, int use_heap)
 
     return ret;
 }
+
+/* The gettempfile() "prefix" is expected to be metafied, see hist.c
+ * and gettempname(). */
 
 /**/
 mod_export int
@@ -3585,7 +3589,7 @@ zbeep(void)
 {
     char *vb;
     queue_signals();
-    if ((vb = getsparam("ZBEEP"))) {
+    if ((vb = getsparam_u("ZBEEP"))) {
 	int len;
 	vb = getkeystring(vb, &len, GETKEYS_BINDKEY, NULL);
 	write_loop(SHTTY, vb, len);

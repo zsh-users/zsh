@@ -1,5 +1,10 @@
 2015-07-22  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 35826: Src/Modules/newuser.c, Src/Modules/zftp.c,
+	Src/Zle/complist.c, Src/Zle/zle_misc.c, Src/init.c, Src/params.c,
+	Src/utils.c, Src/watch.c: add getsparam_u() to return unmetafied
+	string, use it for a number of references to non-special params
+
 	* 35823: Functions/Zle/narrow-to-region: fix handling of MARK
 	and CURSOR, clean up documentary comment
 

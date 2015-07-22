@@ -731,7 +731,7 @@ zfgetmsg(void)
     stopit = (*ptr++ != '-');
 
     queue_signals();
-    if (!(verbose = getsparam("ZFTP_VERBOSE")))
+    if (!(verbose = getsparam_u("ZFTP_VERBOSE")))
 	verbose = "";
     if (strchr(verbose, lastcodestr[0])) {
 	/* print the whole thing verbatim */
@@ -1785,7 +1785,7 @@ zftp_open(char *name, char **args, int flags)
 	char *hname;
 	alarm(0);
 	queue_signals();
-	if ((hname = getsparam("ZFTP_HOST")) && *hname) 
+	if ((hname = getsparam_u("ZFTP_HOST")) && *hname) 
 	    zwarnnam(name, "timeout connecting to %s", hname);
 	else
 	    zwarnnam(name, "timeout on host name lookup");
@@ -3077,7 +3077,7 @@ bin_zftp(char *name, char **args, UNUSED(Options ops), UNUSED(int func))
     }
 
     queue_signals();
-    if ((prefs = getsparam("ZFTP_PREFS"))) {
+    if ((prefs = getsparam_u("ZFTP_PREFS"))) {
 	zfprefs = 0;
 	for (ptr = prefs; *ptr; ptr++) {
 	    switch (toupper(STOUC(*ptr))) {

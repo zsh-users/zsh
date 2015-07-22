@@ -507,8 +507,8 @@ getcols()
     max_caplen = lr_caplen = 0;
     mcolors.flags = 0;
     queue_signals();
-    if (!(s = getsparam("ZLS_COLORS")) &&
-	!(s = getsparam("ZLS_COLOURS"))) {
+    if (!(s = getsparam_u("ZLS_COLORS")) &&
+	!(s = getsparam_u("ZLS_COLOURS"))) {
 	for (i = 0; i < NUM_COLS; i++)
 	    mcolors.files[i] = filecol("");
 	mcolors.pats = NULL;
