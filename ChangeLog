@@ -1,5 +1,12 @@
 2015-07-22  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Completion/Zsh/Type/_directory_stack: move some more
+	recent code so an old comment is connected to the correct bit of
+	older code
+
+	* users/20324: Completion/Zsh/Type/_directory_stack: add (D) flag
+	for tilde-fied completion listing
+
 	* 35826: Src/Modules/newuser.c, Src/Modules/zftp.c,
 	Src/Zle/complist.c, Src/Zle/zle_misc.c, Src/init.c, Src/params.c,
 	Src/utils.c, Src/watch.c: add getsparam_u() to return unmetafied
