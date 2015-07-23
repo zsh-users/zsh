@@ -1,5 +1,9 @@
 2015-07-23  Oliver Kiddle <opk@zsh.org>
 
+	* 35866: Completion/Unix/Command/_gzip: complete also for pigz
+
+	* 35866: Completion/Unix/Command/_zcat: allow for NetBSD gzip
+
 	* 35824: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list, Src/Zle/zle.h,
 	Src/Zle/zle_misc.c, Src/Zle/zle_refresh.c: allow highlighting of
 	just pasted text, put text from bracketed paste in cut buffers

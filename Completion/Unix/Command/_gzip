@@ -1,37 +1,57 @@
-#compdef gzip gunzip gzcat=gunzip -redirect-,<,gunzip=gunzip -redirect-,>,gzip=gunzip -redirect-,<,gzip=gzip -value-,GZIP,-default-
+#compdef gzip gunzip gzcat=gunzip pigz unpigz -redirect-,<,gunzip=gunzip -redirect-,>,gzip=gunzip -redirect-,<,gzip=gzip -value-,GZIP,-default-
 
 local decompress files expl curcontext="$curcontext" state line ret=1
+local -a pigz
 typeset -A opt_args
+local excl="--decompress --uncompress -1 -2 -3 -4 -5 -6 -7 -8 -9 -11 --best"
 
 files=( '*:files:->files' )
 case "$service" in
+unpigz|pigz)
+  pigz=(
+    '(-K --zip)'{-K,--zip}'[compress to PKWare zip format]'
+    '(-b --blocksize)'{-b+,--blocksize}'[set compression block size]:size (KiB)'
+    '(-p --processes)'{-p,--processes}'[specify number of processes to use]'
+    '(-z --zlib)'{-z,--zlib}'[compress to zlib (.zz) format]'
+    '(-T --no-time)'{-T,--no-time}"[don't store/restore modification time in/from header]"
+  )
+;|
+pigz)
+  pigz+=(
+    '(-i --independent)'{-i,--independent}'[compress blocks independently to allow for damage recovery]'
+    "($excl)-11"
+    '(--rsyncable)-R[make rsync-friendly archive]'
+    "($excl)"{-F,--first}'[do iterations first, before block split]'
+    "($excl)"{-I+,--iterations}'[specify number of iterations for optimization]:iterations [15]'
+    "($excl)"{-M+,--maxsplits}'[specify maximum number of split blocks]:split blocks [15]'
+    "($excl)"{-O,--oneblock}"[don't split into smaller blocks]"
+  )
+;|
 *GZIP*)
   compset -q
   words=( fake "$words[@]" )
   (( CURRENT++ ))
   files=()
   ;&
-gunzip|zcat)
+gunzip|zcat|unpigz)
   decompress=yes
   ;&
-gzip)
+gzip|pigz)
   _arguments -C -s -S \
     '(--to-stdout --stdout)-c[write on standard output]' \
     '(-c --stdout)--to-stdout[write on standard output]' \
     '(-c --to-stdout)--stdout[write on standard output]' \
-    '(--decompress --uncompress)-d[decompress]' \
-    '(-d --uncompress)--decompress[decompress]' \
-    '(-d --decompress)--uncompress[decompress]' \
+    "($excl)"{-d,--decompress,--uncompress}'[decompress]' \
     '(--force)-f[force overwrite]' \
     '(-f)--force[force overwrite]' \
-    '(--help)-h[display help message]' \
-    '(-h)--help[display help message]' \
+    '(- *)'{-h,--help}'[display help message]' \
+    "(--keep)-k[don't delete input files]" \
+    "(-k)--keep[don't delete input files]" \
     '(--list)-l[list compressed file contents]' \
     '(-l)--list[list compressed file contents]' \
-    '(--license)-L[display software license]' \
-    '(-L)--license[display software license]' \
-    '(--no-name)-n[do not save or restore the original name and time stamp]' \
-    '(-n)--no-name[do not save or restore the original name and time stamp]' \
+    '(- *)'{-L,--license}'[display software license]' \
+    "(--no-name)-n[don't save or restore the original name and time stamp]" \
+    "(-n)--no-name[don't save or restore the original name and time stamp]" \
     '(--name)-N[save or restore the original name and time stamp]' \
     '(-N)--name[save or restore the original name and time stamp]' \
     '(--quiet --silent)-q[suppress all warnings]' \
@@ -39,27 +59,16 @@ gzip)
     '(-q --quiet)--silent[suppress all warnings]' \
     '(--recursive)-r[operate recursively on directories]' \
     '(-r)--recursive[operate recursively on directories]' \
-    '--rsyncable[make rsync-friendly archive]' \
+    '(-R)--rsyncable[make rsync-friendly archive]' \
     '(--suffix)-S+[specify suffix for compressed files]:suffix:' \
     '(-S)--suffix=[specify suffix for compressed files]:suffix:' \
     '(--test)-t[test compressed file integrity]' \
     '(-t)--test[test compressed file integrity]' \
     '(--verbose)-v[verbose mode]' \
     '(-v)--verbose[verbose mode]' \
-    '(--version)-V[display version number]' \
-    '(-V)--version[display version number]' \
-    '(       -1 -2 -3 -4 -5 -6 -7 -8 -9 --best)--fast' \
-    '(--fast    -2 -3 -4 -5 -6 -7 -8 -9 --best)-1' \
-    '(--fast -1    -3 -4 -5 -6 -7 -8 -9 --best)-2' \
-    '(--fast -1 -2    -4 -5 -6 -7 -8 -9 --best)-3' \
-    '(--fast -1 -2 -3    -5 -6 -7 -8 -9 --best)-4' \
-    '(--fast -1 -2 -3 -4    -6 -7 -8 -9 --best)-5' \
-    '(--fast -1 -2 -3 -4 -5    -7 -8 -9 --best)-6' \
-    '(--fast -1 -2 -3 -4 -5 -6    -8 -9 --best)-7' \
-    '(--fast -1 -2 -3 -4 -5 -6 -7    -9 --best)-8' \
-    '(--fast -1 -2 -3 -4 -5 -6 -7 -8    --best)-9' \
-    '(--fast -1 -2 -3 -4 -5 -6 -7 -8 -9       )--best' \
-    "$files[@]" && ret=0
+    '(- *)'{-V,--version}'[display version number]' \
+    "($excl)"-{-fast,1,2,3,4,5,6,7,8,9,-best} \
+    "$pigz[@]" "$files[@]" && ret=0
   ;;
 esac
 
