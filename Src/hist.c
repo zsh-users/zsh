@@ -136,6 +136,7 @@ mod_export int hist_skip_flags;
 #define HA_NOINC	(1<<1)	/* Don't store, curhist not incremented */
 #define HA_INWORD       (1<<2)  /* We're inside a word, don't add
 				   start and end markers */
+#define HA_UNGET        (1<<3)  /* Recursively ungetting */
 
 /* Array of word beginnings and endings in current history line. */
 
@@ -904,8 +905,13 @@ ihungetc(int c)
 
     while (!lexstop && !errflag) {
 	if (hptr[-1] != (char) c && stophist < 4 &&
-	    hptr > chline + 1 && hptr[-1] == '\n' && hptr[-2] == '\\')
-	    hungetc('\n'), hungetc('\\');
+	    hptr > chline + 1 && hptr[-1] == '\n' && hptr[-2] == '\\' &&
+	    !(histactive & HA_UNGET)) {
+	    histactive |= HA_UNGET;
+	    hungetc('\n');
+	    hungetc('\\');
+	    histactive &= ~HA_UNGET;
+	}
 
 	if (expanding) {
 	    zlemetacs--;

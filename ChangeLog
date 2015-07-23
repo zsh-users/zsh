@@ -1,5 +1,8 @@
 2015-07-23  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35854: Stc/hist.c: ensure character unget doesn't cause
+	infinite recursion.
+
 	* 35793: Src/zsh.h: avoid undefined behaviour shifting signed
 	number.
 
