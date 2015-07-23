@@ -4,9 +4,7 @@ local -a specs
 local expl grp cols bs suf pre changed=1 ret=1
 local -A ansi
 
-if [[ -z $compstate[quote] ]]; then
-  bs='\' # in patterns we use (\\|) widely as print -P handles backslashes first
-fi
+[[ -z $compstate[quote] ]] && bs='\'
 
 # first strip off any complete prompt specifications leaving only the
 # current, incomplete, one
@@ -15,10 +13,10 @@ while (( changed )); do
   compset -P '%[DFK](\\|){[^}]#}' && changed=1 # formats with arg: %x{...}
   compset -P '%[0-9-\\]#[^DFK(0-9-<>\\\[]' && changed=1 # normal formats
   compset -P '%[0-9-\\]#(<[^<]#<|>[^>]#>|\[[^\]]#\])' && changed=1 # truncations
-  compset -P '%[0-9-\\]#(\\|)\([0-9]#[^0-9]?|[^%]' && changed=1 # start of ternary
+  compset -P '%[0-9-\\]#(\\|)\([0-9-]#[^0-9]?|[^%]' && changed=1 # start of ternary
   compset -P '[^%]##' && changed=1 # sundry other characters
   # %D/%F/%K without a following { ... }
-  [[ $PREFIX = %(-|)<->#[DFK](\\|)[^{\\]* ]] &&
+  [[ $PREFIX = %(-|)<->#[DFK](\\[^{]|[^{\\])* ]] &&
       compset -P '%[0-9\\-]#[DFK]' && changed=1
 done
 [[ $PREFIX = %(-|)<->[FK](#e) ]] && compset -P '*' # F/K with number
@@ -59,12 +57,12 @@ if compset -P '%[FK]'; then
   fi
 fi
 
-if compset -P '%[0-9-\\]#\([0-9]#[^0-9]'; then
+if compset -P '%[0-9-\\]#(\\|)\([0-9-]#[^0-9]'; then
   compset -S '*'
   _delimiters && ret=0
 elif compset -P '%[0-9-\\]#[<>\]]'; then
   _message -e replacements 'replacement string'
-elif compset -P '%[0-9-\\]#(\\|)\([0-9]#'; then
+elif compset -P '%[0-9-\\]#(\\|)\([0-9-]#'; then
   compset -S '[.:+/-%]*' || suf=( -S . )
   compset -S '*'
   specs=(
@@ -90,7 +88,9 @@ elif compset -P '%[0-9-\\]#(\\|)\([0-9]#'; then
     'V:element n of psvar is set and non-empty'
     'w:day of week (Sunday = 0)'
   )
-  _describe -t ternary-prompt-expressions 'ternary prompt format test character' specs $suf && ret=0
+  [[ $IPREFIX != *- ]] && _describe -t ternary-prompt-expressions \
+      'ternary prompt format test character' specs $suf && ret=0
+  _message -e numbers number
 elif compset -P '%D(\\|){'; then
   compset -S '(\\|)}*'
   _date_formats zsh && ret=0
@@ -164,8 +164,7 @@ then
   fi
   _describe -t prompt-format-specifiers 'prompt format specifier' \
       specs -S '' $pre && ret=0
-  (( ! $#pre )) && [[ -prefix '(-|)<->' ]] &&
-      _message -e prompt-format-specifiers number
+  (( ! $#pre )) && _message -e prompt-format-specifiers number
 fi
 
 return ret

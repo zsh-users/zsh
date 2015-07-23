@@ -1,5 +1,8 @@
 2015-07-23  Oliver Kiddle <opk@zsh.org>
 
+	* 35753: Completion/Zsh/Type/_ps1234: allow for numbers after
+	the ( in ternary expressions and fix backslash quoting
+
 	* 35867: Completion/Unix/Command/_patchutils: new completion
 
 	* 35866: Completion/Unix/Command/_gzip: complete also for pigz
