@@ -1,5 +1,7 @@
 2015-07-23  Oliver Kiddle <opk@zsh.org>
 
+	* 35815: Functions/Misc/nslookup: fix for newer nslookup
+
 	* 35814: Src/Zle/zle_main.c: POSTEDIT needs to be unmetafied
 
 2015-07-22  Barton E. Schaefer  <schaefer@zsh.org>

@@ -26,8 +26,7 @@ zstyle -s ':nslookup' pager tmp &&
 
 zpty nslookup command nslookup "${(q)@}"
 
-zpty -r nslookup line '*
-> '
+zpty -r nslookup line '*> '
 print -nr "$line"
 
 while line=''; vared -he "$pmpt[@]" line; do
