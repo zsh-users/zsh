@@ -429,8 +429,9 @@ struct region_highlight {
  * 0: region between point and mark
  * 1: isearch region
  * 2: suffix
+ * 3: pasted text
  */
-#define N_SPECIAL_HIGHLIGHTS	(3)
+#define N_SPECIAL_HIGHLIGHTS	(4)
 
 
 #ifdef MULTIBYTE_SUPPORT

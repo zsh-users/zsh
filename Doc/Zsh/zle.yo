@@ -2510,6 +2510,9 @@ a directory name.  Note that suffix removal is configurable; the
 circumstances under which the suffix will be removed may differ
 for different completions.
 )
+item(tt(paste))(
+Following a command to paste text, the characters that were inserted.
+)
 enditem()
 
 tt(zle_highlight) may contain additional fields for controlling how

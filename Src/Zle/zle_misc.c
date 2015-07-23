@@ -517,10 +517,12 @@ copyregionaskill(char **args)
 
 /*
  * kct: index into kill ring, or -1 for original cutbuffer of yank.
- * yankb, yanke: mark the start and end of last yank in editing buffer.
  * yankcs marks the cursor position preceding the last yank
  */
-static int kct, yankb, yanke, yankcs;
+static int kct, yankcs;
+
+/**/
+int yankb, yanke; /* mark the start and end of last yank in editing buffer. */
 
 /* The original cutbuffer, either cutbuf or one of the vi buffers. */
 static Cutbuffer kctbuf;
@@ -778,10 +780,17 @@ bracketedpaste(char **args)
 	ZLE_STRING_T wpaste;
 	wpaste = stringaszleline((zmult == 1) ? pbuf :
 	    quotestring(pbuf, NULL, QT_BACKSLASH), 0, &n, NULL, NULL);
-	zmult = 1;
-	if (region_active)
-	    killregion(zlenoargs);
-	doinsert(wpaste, n);
+	cuttext(wpaste, n, CUT_REPLACE);
+	if (!(zmod.flags & MOD_VIBUF)) {
+	    kct = -1;
+	    kctbuf = &cutbuf;
+	    zmult = 1;
+	    if (region_active)
+		killregion(zlenoargs);
+	    yankcs = yankb = zlecs;
+	    doinsert(wpaste, n);
+	    yanke = zlecs;
+	}
 	free(pbuf); free(wpaste);
     }
     return 0;

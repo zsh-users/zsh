@@ -318,6 +318,7 @@ zle_set_highlight(void)
     int region_atr_on_set = 0;
     int isearch_atr_on_set = 0;
     int suffix_atr_on_set = 0;
+    int paste_atr_on_set = 0;
     struct region_highlight *rhp;
 
     special_atr_on = default_atr_on = 0;
@@ -337,7 +338,8 @@ zle_set_highlight(void)
 	for (; *atrs; atrs++) {
 	    if (!strcmp(*atrs, "none")) {
 		/* reset attributes for consistency... usually unnecessary */
-		special_atr_on = default_atr_on = 0;
+		special_atr_on = default_atr_on =
+		    paste_atr_on_set = 0;
 		special_atr_on_set = region_atr_on_set =
 		    isearch_atr_on_set = suffix_atr_on_set = 1;
 	    } else if (strpfx("default:", *atrs)) {
@@ -354,6 +356,9 @@ zle_set_highlight(void)
 	    } else if (strpfx("suffix:", *atrs)) {
 		match_highlight(*atrs + 7, &(region_highlights[2].atr));
 		suffix_atr_on_set = 1;
+	    } else if (strpfx("paste:", *atrs)) {
+		match_highlight(*atrs + 6, &(region_highlights[3].atr));
+		paste_atr_on_set = 1;
 	    }
 	}
     }
@@ -367,6 +372,7 @@ zle_set_highlight(void)
 	region_highlights[1].atr = TXTUNDERLINE;
     if (!suffix_atr_on_set)
 	region_highlights[2].atr = TXTBOLDFACE;
+        /* paste defaults to 0 */
 
     allocate_colour_buffer();
 }
@@ -1071,6 +1077,13 @@ zrefresh(void)
 	region_highlights[2].end = zlecs;
     } else {
 	region_highlights[2].start = region_highlights[2].end = -1;
+    }
+
+    if (lastcmd & ZLE_YANK) {
+	region_highlights[3].start = yankb;
+	region_highlights[3].end = yanke;
+    } else {
+	region_highlights[3].start = region_highlights[3].end = -1;
     }
 
     if (clearlist && listshown > 0) {

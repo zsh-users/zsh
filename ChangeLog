@@ -1,12 +1,16 @@
 2015-07-23  Oliver Kiddle <opk@zsh.org>
 
+	* 35824: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list, Src/Zle/zle.h,
+	Src/Zle/zle_misc.c, Src/Zle/zle_refresh.c: allow highlighting of
+	just pasted text, put text from bracketed paste in cut buffers
+
 	* 35815: Functions/Misc/nslookup: fix for newer nslookup
 
 	* 35814: Src/Zle/zle_main.c: POSTEDIT needs to be unmetafied
 
 2015-07-22  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* 35939: Joshua Krusell <js.shirin@gmail.com>:
+	* 35839: Joshua Krusell <js.shirin@gmail.com>:
 	Src/Modules/socket.c, Src/Modules/tcp.c: fix select polling in
 	ztcp and zsocket
 
