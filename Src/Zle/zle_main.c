@@ -1865,7 +1865,7 @@ trashzle(void)
 	    clearflag = listshown = 0;
 	}
 	if (postedit)
-	    fprintf(shout, "%s", postedit);
+	    fprintf(shout, "%s", unmeta(postedit));
 	fflush(shout);
 	resetneeded = 1;
 	if (!(zlereadflags & ZLRF_NOSETTY))
