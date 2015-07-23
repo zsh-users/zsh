@@ -1,3 +1,8 @@
+2015-07-23  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35793: Src/zsh.h: avoid undefined behaviour shifting signed
+	number.
+
 2015-07-23  Oliver Kiddle <opk@zsh.org>
 
 	* 35753: Completion/Zsh/Type/_ps1234: allow for numbers after

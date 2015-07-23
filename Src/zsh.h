@@ -1752,9 +1752,10 @@ struct tieddata {
 				  * necessarily want to match multiple
 				  * elements
 				  */
-#define SCANPM_ISVAR_AT   ((-1)<<15)	/* "$foo[@]"-style substitution
-					 * Only sign bit is significant
-					 */
+/* "$foo[@]"-style substitution
+ * Only sign bit is significant
+ */
+#define SCANPM_ISVAR_AT   ((int)(((unsigned int)-1)<<15))
 
 /*
  * Flags for doing matches inside parameter substitutions, i.e.
