@@ -3047,6 +3047,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    addproc(pid, text, 0, &bgtime);
 	    if (oautocont >= 0)
 		opts[AUTOCONTINUE] = oautocont;
+	    pipecleanfilelist(jobtab[thisjob].filelist, 1);
 	    return;
 	}
 	/* pid == 0 */
@@ -3492,7 +3493,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
 	    if (is_shfunc) {
 		/* It's a shell function */
-		pipecleanfilelist(filelist);
+		pipecleanfilelist(filelist, 0);
 		execshfunc((Shfunc) hn, args);
 	    } else {
 		/* It's a builtin */
@@ -3682,7 +3683,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		DPUTS(varspc,
 		      "BUG: assignment before complex command");
 		list_pipe = 0;
-		pipecleanfilelist(filelist);
+		pipecleanfilelist(filelist, 0);
 		/* If we're forked (and we should be), no need to return */
 		DPUTS(last1 != 1 && !forked, "BUG: not exiting?");
 		DPUTS(type != WC_SUBSH, "Not sure what we're doing.");

@@ -126,3 +126,18 @@
   eval 'foo here is some output)'
 0:full alias expanded when substitution starts in alias
 >here is some output
+
+  if ! (mkfifo test_pipe >/dev/null 2>&1); then
+    ZTST_skip="mkfifo not available"
+  else
+    echo 1 | tee >(cat > test_pipe) | (){
+      local pipein
+      read pipein <test_pipe
+      print $pipein
+      read pipein
+      print $pipein
+    }
+  fi
+0:proc subst fd in forked subshell closed in parent
+>1
+>1

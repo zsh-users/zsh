@@ -1,5 +1,9 @@
 2015-07-23  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35849: Src/exec.c, Src/jobs.c, Test/D03procsubst.ztst: close
+	file descriptors from process substitution in parent after
+	fork.
+
 	* 35854: Stc/hist.c: ensure character unget doesn't cause
 	infinite recursion.
 

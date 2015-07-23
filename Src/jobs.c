@@ -1179,7 +1179,7 @@ addfilelist(const char *name, int fd)
 
 /**/
 void
-pipecleanfilelist(LinkList filelist)
+pipecleanfilelist(LinkList filelist, int proc_subst_only)
 {
     LinkNode node;
 
@@ -1188,7 +1188,9 @@ pipecleanfilelist(LinkList filelist)
     node = firstnode(filelist);
     while (node) {
 	Jobfile jf = (Jobfile)getdata(node);
-	if (jf->is_fd) {
+	if (jf->is_fd &&
+	    (!proc_subst_only ||
+	     fdtable[jf->u.fd] == FDT_PROC_SUBST)) {
 	    LinkNode next = nextnode(node);
 	    zclose(jf->u.fd);
 	    (void)remnode(filelist, node);
@@ -1433,7 +1435,7 @@ zwaitjob(int job, int wait_cmd)
 	     * we can't deadlock on the fact that those still exist, so
 	     * that's not a problem.
 	     */
-	    pipecleanfilelist(jn->filelist);
+	    pipecleanfilelist(jn->filelist, 0);
 	}
 	while (!errflag && jn->stat &&
 	       !(jn->stat & STAT_DONE) &&
@@ -1623,7 +1625,7 @@ spawnjob(void)
 	deletejob(jobtab + thisjob, 0);
     else {
 	jobtab[thisjob].stat |= STAT_LOCKED;
-	pipecleanfilelist(jobtab[thisjob].filelist);
+	pipecleanfilelist(jobtab[thisjob].filelist, 0);
     }
     thisjob = -1;
 }
