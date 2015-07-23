@@ -1,5 +1,7 @@
 2015-07-23  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 35873: Test/D03procsubst.ztst: add original test from 35847:
+
 	* 35872: Src/utils.c: protect against NULL pointers in unmeta().
 
 	* 35849: Src/exec.c, Src/jobs.c, Test/D03procsubst.ztst: close

@@ -141,3 +141,11 @@
 0:proc subst fd in forked subshell closed in parent
 >1
 >1
+
+  if [[ ! -e test_pipe ]]; then
+    ZTST_skip="mkfifo not available"
+  else
+    echo 1 | tee >(cat > test_pipe) | paste - test_pipe
+  fi
+0:proc subst fd in forked subshell closed in parent (external command)
+>1	1
