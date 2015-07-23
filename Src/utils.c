@@ -4401,7 +4401,10 @@ unmeta(const char *file_name)
     char *p;
     const char *t;
     int newsz, meta;
-    
+
+    if (!file_name)
+	return NULL;
+
     meta = 0;
     for (t = file_name; *t; t++) {
 	if (*t == Meta)
