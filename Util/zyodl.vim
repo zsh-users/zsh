@@ -22,8 +22,12 @@
 "   example(print *.c+LPAR()#q:s/#%+LPAR()#b+RPAR()s+LPAR()*+RPAR().c/'S${match[1]}.C'/+RPAR())
 "   ifzman(zmanref(zshmisc))ifnzman(noderef(Redirection))
 "   LPAR()foo 42 foo+RPAR()
+"   chapter(foo (foo) foo)
+"   chapter(foo (foo (foo) foo) foo) bar
 "
-"   chapter(foo (foo) foo) # nested parentheses
+"   sitem(foo)(foo (foo) foo)
+"   sitem(foo)(foo (foo) foo)
+"
 "   sitem(foo)(foo tt(foo) foo) # nested underline
 
 if exists("b:current_syntax")
@@ -33,25 +37,28 @@ endif
 "" Syntax groups:
 syn clear
 syn cluster zyodlInline contains=zyodlTt,zyodlVar,zyodlBold,zyodlEmph,zyodlCond
-syn region zyodlTt      start="\<tt("      end=")" contains=zyodlSpecial
-syn region zyodlVar     start="\<var("     end=")" contains=zyodlSpecial
-syn region zyodlBold    start="\<bf("      end=")" contains=zyodlSpecial
-syn region zyodlEmph    start="\<em("      end=")" contains=zyodlSpecial
+syn region zyodlTt      start="\<tt("      end=")" contains=zyodlSpecial,zyodlParenthetical
+syn region zyodlVar     start="\<var("     end=")" contains=zyodlSpecial,zyodlParenthetical
+syn region zyodlBold    start="\<bf("      end=")" contains=zyodlSpecial,zyodlParenthetical
+syn region zyodlEmph    start="\<em("      end=")" contains=zyodlSpecial,zyodlParenthetical
 syn region zyodlIndex   start="\<.index("  end=")" contains=zyodlSpecial
 syn match  zyodlSpecial "+\?\<\(LPAR\|RPAR\|PLUS\)()"
 syn match  zyodlNumber  "\d\+"
 syn region zyodlItem    start="\<xitem(" end=")" contains=zyodlSpecial,@zyodlInline
 syn region zyodlItem    start="\<item("  end=")" contains=zyodlSpecial,@zyodlInline
 syn region zyodlExample start="\<example(" end=")" contains=zyodlSpecial
-syn region zyodlTitle   start="\<\(chapter\|subsect\|sect\)(" end=")" contains=zyodlSpecial,@zyodlInline
+syn region zyodlTitle   start="\<\(chapter\|subsect\|sect\)(" end=")" contains=zyodlSpecial,@zyodlInline,zyodlParenthetical
 syn match  zyodlTitle   "^texinode(.*$"
+syn region zyodlParenthetical start="\w\@<!(" end=")" transparent contained contains=zyodlParenthetical
 
+" zyodlCond doesn't contain zyodlParenthetical, since section names (probably) don't have parentheticals.
 syn region zyodlCond    start="\<\(ifzman\|ifnzman\)(" end=")" contains=zyodlRef,zyodlSpecial,@zyodlInline
 syn region zyodlRef     start="\<\(zmanref\|noderef\)(" end=")"
 
+" zyodlSItemArg2 should use zyodlParenthetical instead of the 'skip='
 syn keyword zyodlKeyword sitem nextgroup=zyodlSItemArg1
 syn region zyodlSItemArg1 oneline start="(" end=")" contains=zyodlSpecial,@zyodlInline nextgroup=zyodlSItemArg2 contained
-syn region zyodlSItemArg2 start="(" end=")" contains=zyodlSpecial,@zyodlInline contained
+syn region zyodlSItemArg2 start="(" end=")" contains=zyodlSpecial,@zyodlInline contained skip="\w\@<!([^)]*)"
 
 "" Highlight groups:
 hi def link zyodlTt Constant
