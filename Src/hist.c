@@ -906,7 +906,8 @@ ihungetc(int c)
     while (!lexstop && !errflag) {
 	if (hptr[-1] != (char) c && stophist < 4 &&
 	    hptr > chline + 1 && hptr[-1] == '\n' && hptr[-2] == '\\' &&
-	    !(histactive & HA_UNGET)) {
+	    !(histactive & HA_UNGET) &&
+	    (inbufflags & (INP_ALIAS|INP_HIST)) != INP_ALIAS) {
 	    histactive |= HA_UNGET;
 	    hungetc('\n');
 	    hungetc('\\');
