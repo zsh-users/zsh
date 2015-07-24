@@ -28,6 +28,47 @@ system's range), a return status of 1 indicates an error in the
 parameters, and a return status of 2 indicates the error name was
 not recognised (no message is printed for this).
 )
+findex(sysopen)
+redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
+xitem(tt(sysopen) [ tt(-arw) ] [ tt(-m) var(permissions) ] [ tt(-o) var(options) ])
+item(SPACES()[ tt(-u) var(fd) ] var(file))(
+This command opens a file. The tt(-r), tt(-w) and tt(-a) flags indicate
+whether the file should be opened for reading, writing and appending,
+respectively. The tt(-m) option allows the initial permissions to use when
+creating a file to be specified in octal form.  The file descriptor is
+specified with -u. Either an explicit file descriptor in the range 0 to 9 can
+be specified or a variable name can be given to which the file descriptor
+number will be assigned.
+
+The tt(-o) option allows various system specific options to be
+specified as a comma-separated list. The following is a list of possible
+options. Note that, depending on the system, some may not be available.
+startitem()
+item(tt(cloexec))(
+mark file to be closed when other programs are executed
+)
+xitem(tt(create))
+item(tt(creat))(
+create file if it does not exist
+)
+item(tt(excl))(
+create file, error if it already exists
+)
+item(tt(noatime))(
+suppress updating of the file atime
+)
+item(tt(nofollow))(
+fail if var(file) is a symbolic link
+)
+item(tt(sync))(
+request that writes wait until data has been physically written
+)
+xitem(tt(truncate))
+item(tt(trunc))(
+truncate file to size 0
+)
+enditem()
+)
 findex(sysread)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
 xitem(tt(sysread )[ tt(-c) var(countvar) ] [ tt(-i) var(infd) ] [ tt(-o) var(outfd) ])
@@ -88,6 +129,14 @@ indicates end of file.  The parameters are set according to the
 usual rules; no write to var(outfd) is attempted.
 )
 enditem()
+)
+item(tt(sysseek) [ tt(-u) var(fd) ] [ tt(-w) tt(start)|tt(end)|tt(current) ] var(offset))(
+The current file position at which future reads and writes will take place is
+adjusted to the specified byte offset. The var(offset) is evaluated as a math
+expression. The tt(-u) option allows the file descriptor to be specified. By
+default the offset is specified relative to the start or the file but, with the
+tt(-w) option, it is possible to specify that the offset should be relative to
+the current position or the end of the file.
 )
 item(tt(syswrite) [ tt(-c) var(countvar) ] [ tt(-o) var(outfd) ] var(data))(
 The data (a single string of bytes) are written to the file descriptor
@@ -158,6 +207,15 @@ is returned.  Status 1 can indicate one of two things:  var(subcommand)
 is known but not supported by the current operating system, or
 var(subcommand) is not known (possibly because this is an older
 version of the shell before it was implemented).
+)
+enditem()
+
+subsect(Math Functions)
+
+startitem()
+item(tt(systell+LPAR()var(fd)RPAR()))(
+The systell math function returns the current file position for the file
+descriptor passed as an argument.
 )
 enditem()
 

@@ -279,6 +279,183 @@ bin_syswrite(char *nam, char **args, Options ops, UNUSED(int func))
 }
 
 
+static struct { char *name; int oflag; } openopts[] = {
+#ifdef O_CLOEXEC
+    { "cloexec", O_CLOEXEC },
+#else
+# ifdef FD_CLOEXEC
+    { "cloexec", 0  }, /* this needs to be first in the table */
+# endif
+#endif
+#ifdef O_NOFOLLOW
+    { "nofollow", O_NOFOLLOW },
+#endif
+#ifdef O_SYNC
+    { "sync", O_SYNC },
+#endif
+#ifdef O_NOATIME
+    { "noatime", O_NOATIME },
+#endif
+    { "excl", O_EXCL | O_CREAT },
+    { "creat", O_CREAT },
+    { "create", O_CREAT },
+    { "truncate", O_TRUNC },
+    { "trunc", O_TRUNC }
+};
+
+/**/
+static int
+bin_sysopen(char *nam, char **args, Options ops, UNUSED(int func))
+{
+    int read = OPT_ISSET(ops, 'r');
+    int write = OPT_ISSET(ops, 'w');
+    int append = OPT_ISSET(ops, 'a') ? O_APPEND : 0;
+    int flags = O_NOCTTY | append | ((append || write) ?
+	(read ? O_RDWR : O_WRONLY) :
+	(!append || read) ? O_RDONLY : O_WRONLY);
+    char *opt, *ptr, *nextopt, *fdvar;
+    int o, fd, explicit = -1;
+    mode_t perms = 0666;
+#if defined(FD_CLOEXEC) && !defined(O_CLOEXEC)
+    int fdflags;
+#endif
+
+    if (!OPT_ISSET(ops, 'u')) {
+	zwarnnam(nam, "file descriptor not specified");
+	return 1;
+    }
+
+    /* file descriptor, either 0-9 or a variable name */
+    fdvar = OPT_ARG(ops, 'u');
+    if (idigit(*fdvar) && !fdvar[1]) {
+	explicit = atoi(fdvar);
+    } else if (!isident(fdvar)) {
+	zwarnnam(nam, "not an identifier: %s", fdvar);
+	return 1;
+    }
+
+    /* open options */
+    if (OPT_ISSET(ops, 'o')) {
+	opt = OPT_ARG(ops, 'o');
+	while (opt) {
+	    if (!strncasecmp(opt, "O_", 2)) /* ignore initial O_ */
+		opt += 2;
+	    if ((nextopt = strchr(opt, ',')))
+		*nextopt++ = '\0';
+	    for (o = sizeof(openopts)/sizeof(*openopts) - 1; o >= 0 &&
+		strcasecmp(openopts[o].name, opt); o--) {}
+	    if (o < 0) {
+		zwarnnam(nam, "unsupported option: %s\n", opt);
+		return 1;
+	    }
+#if defined(FD_CLOEXEC) && !defined(O_CLOEXEC)
+	    if (!openopts[o].oflag)
+		fdflags = FD_CLOEXEC;
+#endif
+	    flags |= openopts[o].oflag;
+	    opt = nextopt;
+	}
+    }
+
+    /* -m: permissions or mode for created files */
+    if (OPT_ISSET(ops, 'm')) {
+	ptr = opt = OPT_ARG(ops, 'm');
+	while (*ptr >= '0' && *ptr <= '7') ptr++;
+	if (*ptr || ptr - opt < 3) {
+	    zwarnnam(nam, "invalid mode %s", opt);
+	    return 1;
+	}
+	perms = zstrtol(opt, 0, 8); /* octal number */
+    }
+
+    if (flags & O_CREAT)
+	fd = open(*args, flags, perms);
+    else
+	fd = open(*args, flags);
+
+    if (fd == -1) {
+	zwarnnam(nam, "can't open file %s: %e", *args, errno);
+	return 1;
+    }
+    fd = (explicit > -1) ? redup(fd, explicit) : movefd(fd);
+    if (fd == -1) {
+	zwarnnam(nam, "can't open file %s", *args);
+	return 1;
+    }
+
+#if defined(FD_CLOEXEC) && !defined(O_CLOEXEC)
+    if (fdflags)
+	fcntl(fd, F_SETFD, FD_CLOEXEC);
+#endif
+    if (explicit == -1) {
+	fdtable[fd] = FDT_EXTERNAL;
+	setiparam(fdvar, fd);
+	/* if setting the variable failed, close fd to avoid leak */
+	if (errflag)
+	    zclose(fd);
+    }
+
+    return 0;
+}
+
+
+/*
+ * Return values of bin_sysseek:
+ *	0	Success
+ *	1	Error in parameters to command
+ *	2	Error on seek, ERRNO set by system
+ */
+
+/**/
+static int
+bin_sysseek(char *nam, char **args, Options ops, UNUSED(int func))
+{
+    int w = SEEK_SET, fd = 0;
+    char *whence;
+    off_t pos;
+
+    /* -u:  file descriptor if not stdin */
+    if (OPT_ISSET(ops, 'u')) {
+	fd = getposint(OPT_ARG(ops, 'u'), nam);
+	if (fd < 0)
+	    return 1;
+    }
+
+    /* -w:  whence - starting point of seek */
+    if (OPT_ISSET(ops, 'w')) {
+	whence = OPT_ARG(ops, 'w');
+        if (!(strcasecmp(whence, "current") && strcmp(whence, "1")))
+	    w = SEEK_CUR;
+        else if (!(strcasecmp(whence, "end") && strcmp(whence, "2")))
+	    w = SEEK_END;
+	else if (strcasecmp(whence, "start") && strcmp(whence, "0")) {
+	    zwarnnam(nam, "unknown argument to -w: %s", whence);
+	    return 1;
+	}
+    }
+
+    pos = (off_t)mathevali(*args);
+    return (lseek(fd, pos, w) == -1) ? 2 : 0;
+}
+
+/**/
+static mnumber
+math_systell(UNUSED(char *name), int argc, mnumber *argv, UNUSED(int id))
+{
+    int fd = (argv->type == MN_INTEGER) ? argv->u.l : (int)argv->u.d;
+    mnumber ret;
+    ret.type = MN_INTEGER;
+    ret.u.l = 0;
+
+    if (fd < 0) {
+	zerr("file descriptor out of range");
+	return ret;
+    }
+    ret.u.l = lseek(fd, 0, SEEK_CUR);
+    return ret;
+}
+
+
 /*
  * Return values of bin_syserror:
  *	0	Successfully processed error
@@ -542,6 +719,8 @@ static struct builtin bintab[] = {
     BUILTIN("syserror", 0, bin_syserror, 0, 1, 0, "e:p:", NULL),
     BUILTIN("sysread", 0, bin_sysread, 0, 1, 0, "c:i:o:s:t:", NULL),
     BUILTIN("syswrite", 0, bin_syswrite, 1, 1, 0, "c:o:", NULL),
+    BUILTIN("sysopen", 0, bin_sysopen, 1, 1, 0, "rwau:o:m:", NULL),
+    BUILTIN("sysseek", 0, bin_sysseek, 1, 1, 0, "u:w:", NULL),
     BUILTIN("zsystem", 0, bin_zsystem, 1, -1, 0, NULL, NULL)
 };
 
@@ -611,6 +790,9 @@ scanpmsysparams(UNUSED(HashTable ht), ScanFunc func, int flags)
     func(&spm.node, flags);
 }
 
+static struct mathfunc mftab[] = {
+    NUMMATHFUNC("systell", math_systell, 1, 1, 0)
+};
 
 static struct paramdef partab[] = {
     SPECIALPMDEF("errnos", PM_ARRAY|PM_READONLY,
@@ -622,7 +804,7 @@ static struct paramdef partab[] = {
 static struct features module_features = {
     bintab, sizeof(bintab)/sizeof(*bintab),
     NULL, 0,
-    NULL, 0,
+    mftab, sizeof(mftab)/sizeof(*mftab),
     partab, sizeof(partab)/sizeof(*partab),
     0
 };

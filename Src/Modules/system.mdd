@@ -2,7 +2,7 @@ name=zsh/system
 link=dynamic
 load=no
 
-autofeatures="b:sysread b:syswrite b:syserror p:errnos"
+autofeatures="b:sysread b:syswrite b:sysopen b:sysseek b:syserror p:errnos f:systell"
 
 objects="system.o errnames.o"
 
