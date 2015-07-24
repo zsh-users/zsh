@@ -126,6 +126,7 @@ Chapter 3:  How to get various things to work
 3.25. How do I get coloured prompts on my colour xterm?
 3.26. Why is my output duplicated with `tt(foo 2>&1 >foo.out | bar)'?
 3.27. What are these `^' and `~' pattern characters, anyway?
+3.28. How do I edit the input buffer in $EDITOR?
 
 Chapter 4:  The mysteries of completion
 4.1. What is completion?
@@ -1922,6 +1923,22 @@ label(327)
      mytt((../)#.cvsignore) finds the file tt(.cvsignore) if it exists
      in the current directory or any parent.)
   )
+
+
+sect(How do I edit the input buffer in $EDITOR?)
+label(328)
+
+  When typing a long command interactively, it's possible to edit it in $EDITOR
+  before execution by using the tt(edit-command-line) ZLE widget.  For example,
+  after putting
+  verb(
+    autoload -U edit-command-line; 
+    zle -N edit-command-line; 
+    bindkey '^Fc' edit-command-line;
+  )
+  in your tt(~/.zshrc), typing mytt(^F c) will open the entered-so-far
+  command-line for editing.  The command will not be automatically executed;
+  quitting the editor will only return to zsh's command-line editing mode.
 
 
 chapter(The mysteries of completion)

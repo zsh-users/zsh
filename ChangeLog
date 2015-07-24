@@ -1,5 +1,7 @@
 2015-07-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 35810: Etc/FAQ.yo: FAQ += edit-command-line
+
 	* 35809: Util/zyodl.vim: zyodl.vim: Fix nested parentheses
 
 	* 35807: Functions/Zle/edit-command-line: edit-command-line:
