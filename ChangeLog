@@ -1,5 +1,7 @@
 2015-07-24  Oliver Kiddle <opk@zsh.org>
 
+	* 35865: Doc/Zsh/prompt.yo: document %^ prompt expansion
+
 	* 35864: Doc/Zsh/mod_system.yo, Src/Modules/system.c,
 	Src/Modules/system.mdd: add sysopen, sysseek and systell to
 	system module

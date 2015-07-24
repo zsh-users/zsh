@@ -92,6 +92,10 @@ print as many as there are.  This is most useful in prompts tt(PS2) for
 continuation lines and tt(PS4) for debugging with the tt(XTRACE) option; in
 the latter case it will also work non-interactively.
 )
+item(tt(%^))(
+The status of the parser in reverse. This is the same as `tt(%_)' other than
+the order of strings.  It is often used in tt(RPS2).
+)
 xitem(tt(%d))
 item(tt(%/))(
 Current working directory.  If an integer follows the `tt(%)',
