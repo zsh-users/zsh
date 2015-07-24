@@ -1,3 +1,8 @@
+2015-07-24  Oliver Kiddle <opk@zsh.org>
+
+	* 35879: Eric Cook: Completion/Linux/Command/_btrfs: fix for
+	subcommands that don't have a second subcommand
+
 2015-07-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 35883: Src/hist.c: Don't attempt to back up over history if
