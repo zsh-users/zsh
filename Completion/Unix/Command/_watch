@@ -1,0 +1,9 @@
+#compdef watch
+
+# watch(1) has completely different semantics on freebsd compared to linux, hence:
+case $OSTYPE in
+  (freebsd*|dragonfly*) _watch-snoop "$@";;
+  (*)           _default;;
+esac
+
+# NOTREACHED

@@ -1,3 +1,9 @@
+2015-07-26  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 35274 (plus tweaks): Completion/BSD/Command/_watch-snoop
+	Completion/Unix/Command/_watch: completion: Add FreeBSD's
+	watch(1)
+
 2015-07-26  Oliver Kiddle <opk@zsh.org>
 
 	* 35901: Completion/X/Type/_x_font: complete full names as removing
