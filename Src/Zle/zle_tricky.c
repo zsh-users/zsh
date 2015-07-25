@@ -721,11 +721,12 @@ docomplete(int lst)
 		    }
 		}
 	    }
-	    if (lst == COMP_EXPAND_COMPLETE)
+	    if (lst == COMP_EXPAND_COMPLETE) {
 		do {
 		    /* Check if there is a parameter expression. */
 		    for (; *q && *q != String; q++);
-		    if (*q == String && q[1] != Inpar && q[1] != Inbrack) {
+		    if (*q == String && q[1] != Inpar && q[1] != Inparmath &&
+			q[1] != Inbrack) {
 			if (*++q == Inbrace) {
 			    if (! skipparens(Inbrace, Outbrace, &q) &&
 				q == s + zlemetacs - wb)
@@ -769,6 +770,7 @@ docomplete(int lst)
 		    } else
 			break;
 		} while (q < s + zlemetacs - wb);
+	    }
 	    if (lst == COMP_EXPAND_COMPLETE) {
 		/* If it is still not clear if we should use expansion or   *
 		 * completion and there is a `$' or a backtick in the word, *

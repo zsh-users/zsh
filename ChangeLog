@@ -1,3 +1,8 @@
+2015-07-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 35908: Src/ZLe/zle_tricky.c: fix $((...)) completion
+	by expand-or-complete widget.
+
 2015-07-24  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 35896: Doc/Zsh/params.yo, Doc/Zsh/zle.yo: index zle_highlight
