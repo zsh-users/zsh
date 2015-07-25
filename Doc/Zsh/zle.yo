@@ -29,6 +29,7 @@ line editor. See
 ifzman(em(Parameters Used By The Shell) in zmanref(zshparam))\
 ifnzman(noderef(Parameters Used By The Shell)).
 
+vindex(zle_highlight, use of)
 The parameter tt(zle_highlight) is also used by the line editor; see
 ifzman(em(Character Highlighting) below)\
 ifnzman(noderef(Character Highlighting)).  Highlighting
@@ -2457,6 +2458,7 @@ enditem()
 texinode(Character Highlighting)()(Zle Widgets)(Zsh Line Editor)
 sect(Character Highlighting)
 
+vindex(zle_highlight, setting)
 The line editor has the ability to highlight characters or regions
 of the line that have a particular significance.  This is controlled
 by the array parameter tt(zle_highlight), if it has been set by the user.

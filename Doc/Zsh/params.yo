@@ -1659,6 +1659,12 @@ enable bracketed paste when ZLE is active and disable it at other times.
 Unsetting the parameter has the effect of ensuring that bracketed paste
 remains disabled.
 )
+vindex(zle_highlight)
+item(tt(zle_highlight))(
+An array describing contexts in which ZLE should highlight the input text.
+See ifzman(em(Character Highlighting) in zmanref(zshzle))\
+ifnzman(noderef(Character Highlighting)).
+)
 vindex(ZLE_LINE_ABORTED)
 item(tt(ZLE_LINE_ABORTED))(
 This parameter is set by the line editor when an error occurs.  It

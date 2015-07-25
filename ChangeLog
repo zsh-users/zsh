@@ -1,5 +1,7 @@
 2015-07-24  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 35896: Doc/Zsh/params.yo, Doc/Zsh/zle.yo: index zle_highlight
+
 	* 35882: Src/Zle/iwidgets.list: read-command has ZLE_NOTCOMMAND
 
 2015-07-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
