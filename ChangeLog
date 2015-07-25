@@ -1,5 +1,8 @@
 2015-07-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 35909: Src/utils.c: fix $((...) completion in _expand by
+	normalising quoting of the math expression containing tokens.
+
 	* 35908: Src/ZLe/zle_tricky.c: fix $((...)) completion
 	by expand-or-complete widget.
 

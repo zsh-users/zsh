@@ -5551,7 +5551,25 @@ quotestring(const char *s, char **e, int instring)
 		/* Needs to be passed straight through. */
 		if (dobackslash)
 		    *v++ = '\\';
-		*v++ = *u++;
+		if (*u == Inparmath) {
+		    /*
+		     * Already syntactically quoted: don't
+		     * add more.
+		     */
+		    int inmath = 1;
+		    *v++ = *u++;
+		    for (;;) {
+			char uc = *u;
+			*v++ = *u++;
+			if (uc == '\0')
+			    break;
+			else if (uc == Outparmath && !--inmath)
+			    break;
+			else if (uc == Inparmath)
+			    ++inmath;
+		    }
+		} else
+		    *v++ = *u++;
 		continue;
 	    }
 
