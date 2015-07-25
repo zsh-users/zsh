@@ -48,9 +48,13 @@ prompt_bart_help () {
 	When RPS1 (RPROMPT) is set before this prompt is selected and a
 	fifth color is specified, that color is turned on before RPS1 is
 	displayed and reset after it.  Other color changes within RPS1, if
-	any, remain in effect.
+	any, remain in effect.  This also applies to RPS2 (RPROMPT2).
+	If a fifth color is specified and there is no RPS2, PS2 (PROMPT2)
+	is colored and moved to RPS2.  Changes to RPS1/RPS2 are currently
+	not reverted when the theme is switched off.  These work best with
+	the TRANSIENT_RPROMPT option, which must be set separately.
 
-	This prompt hijacks psvar[7] through [9] to avoid having to reset
+	This theme hijacks psvar[7] through [9] to avoid having to reset
 	the entire PS1 string on every command.  It uses TRAPWINCH to set
 	the position of the upper right prompt on a window resize, so the
 	prompt may not match the window width until the next command.
@@ -107,9 +111,9 @@ prompt_bart_precmd () {
     ((PSCOL == 1)) || { PSCOL=1 ; prompt_bart_ps1 }
     if [[ -o promptcr ]]
     then
-        # Emulate the 4.3.x promptsp option if it isn't available
-        eval '[[ -o promptsp ]] 2>/dev/null' ||
-            print -nP "${(l.COLUMNS.. .)}\e[s${(pl.COLUMNS..\b.)}%E\e[u" >$TTY
+	# Emulate the 4.3.x promptsp option if it isn't available
+	eval '[[ -o promptsp ]] 2>/dev/null' ||
+	    print -nP "${(l.COLUMNS.. .)}\e[s${(pl.COLUMNS..\b.)}%E\e[u" >$TTY
     else IFS='[;' read -s -d R escape\?$'\e[6n' lineno PSCOL <$TTY
     fi
     ((PSCOL == 1)) || prompt_bart_ps1
@@ -146,7 +150,7 @@ prompt_bart_ps1 () {
     # Assemble the new prompt
     ps1=( ${(f)PS1} )		# Split the existing prompt at newlines
     ps1=(
-        "%$[COLUMNS-PSCOL]>..>"	# Begin truncation (upper left prompt)
+	"%$[COLUMNS-PSCOL]>..>"	# Begin truncation (upper left prompt)
 	"$host"
 	"$hist1"		# Empty when too wide for one line
 	"$dir"
@@ -176,8 +180,8 @@ prompt_bart_setup () {
     # A few extra niceties ...
     repeat 1 case "$1:l" in
       (off|disable)
-        add-zsh-hook -D precmd "prompt_*_precmd"
-        add-zsh-hook -D preexec "prompt_*_preexec"
+	add-zsh-hook -D precmd "prompt_*_precmd"
+	add-zsh-hook -D preexec "prompt_*_preexec"
 	functions[TRAPWINCH]="${functions[TRAPWINCH]//prompt_bart_winch}"
 	[[ $prompt_theme[1] = bart ]] && PS1=${${(f)PS1}[-1]}
 	return 1
@@ -201,9 +205,22 @@ prompt_bart_setup () {
 
     prompt_bart_ps1
 
-    # No RPS1 by default because prompt_off_setup doesn't fix it.
-    (($#RPS1 && $# > 4)) && RPS1="%F{$5}$RPS1%f"
-
+    if (($# > 4))
+    then
+	# No RPS1 by default because prompt_off_setup doesn't fix it.
+	if (($#RPS1))
+	then
+	    RPS1="%F{$5}$RPS1%f"
+	fi
+	# RPS2 is less obvious so don't mind that it's not restored.
+	if (($#RPS2))
+	then
+	    RPS2="%F{$5}$RPS2%f"
+	else
+	    RPS2="%F{$5}<${${PS2//\%_/%^}%> }%f"
+	    PS2=''
+	fi
+    fi
     # Paste our special commands into precmd and TRAPWINCH
     
     add-zsh-hook precmd prompt_bart_precmd

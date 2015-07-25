@@ -1,3 +1,8 @@
+2015-07-25  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: Functions/Prompts/prompt_bart_setup: add RPS2 handling,
+	update help text, clean up indentation whitespace
+
 2015-07-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 35910: Src/input.c: Don't add to raw lex buffer if lex
