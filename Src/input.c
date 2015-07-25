@@ -222,7 +222,8 @@ ingetc(void)
 	if (inputline())
 	    break;
     }
-    zshlex_raw_add(lastc);
+    if (!lexstop)
+	zshlex_raw_add(lastc);
     return lastc;
 }
 
