@@ -24,6 +24,8 @@
 	* 36118: Completion/Unix/Command/_imagemagick: complete all
 	files if image files didn't match
 
+	* 36120: Completion/Unix/Command/_sort: Fix syntax error
+
 2015-08-11  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36108: NEWS: list of major changes so far since 5.0.8

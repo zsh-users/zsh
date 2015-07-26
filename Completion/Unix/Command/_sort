@@ -55,7 +55,7 @@ case $variant in
   netbsd*|dragonfly*)
     args+=(
       "${ordering}-l[sort by string length of field]"
-      "(-s)-S[don't use stable sort"
+      "(-s)-S[don't use stable sort]"
     )
   ;|
   openbsd*)
