@@ -1,3 +1,8 @@
+2015-07-26  Oliver Kiddle <opk@zsh.org>
+
+	* 35901: Completion/X/Type/_x_font: complete full names as removing
+	later components was broken for aliases and unwanted in any case
+
 2015-07-26  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* Antony Lee: 35899: Completion/Unix/Type/_python_modules:
