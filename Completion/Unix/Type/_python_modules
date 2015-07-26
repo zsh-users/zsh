@@ -26,10 +26,8 @@ _python_modules () {
   if ( [[ ${(P)+array_name} -eq 0 ]] || _cache_invalid $cache_id ) &&
       ! _retrieve_cache $cache_id; then
 
-    local script='import sys, pydoc
-def f(p,m,d):
-    if m.find(".") < 0: sys.stdout.write(m+"\n")
-pydoc.ModuleScanner().run(f)'
+   local script='import pkgutil
+for importer, name, ispkg in pkgutil.iter_modules(): print(name)'
 
     typeset -agU $array_name
     set -A $array_name \

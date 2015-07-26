@@ -1,3 +1,8 @@
+2015-07-26  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* Antony Lee: 35899: Completion/Unix/Type/_python_modules:
+	faster method of generating list of python modules
+
 2015-07-25  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Prompts/prompt_bart_setup: add RPS2 handling,
