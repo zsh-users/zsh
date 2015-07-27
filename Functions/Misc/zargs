@@ -73,7 +73,7 @@
 emulate -L zsh || return 1
 local -a opts eof n s l P i
 
-local ZARGS_VERSION="1.4"
+local ZARGS_VERSION="1.5"
 
 if zparseopts -a opts -D -- \
 	-eof::=eof e::=eof \
@@ -254,7 +254,7 @@ then
     bg='&'
     if zmodload -i zsh/parameter 2>/dev/null
     then
-	wait='wait %${(k)^jobstates[(R)running:*]}'
+	wait='wait ${${jobstates[(R)running:*]/#*:/}/%=*/}'
     else
 	wait='wait'
     fi
