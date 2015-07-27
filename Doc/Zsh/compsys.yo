@@ -3530,37 +3530,109 @@ xitem(SPACES()[ tt(:) ] var(spec) ...)
 item(tt(_arguments) [ var(opt) ... ] tt(-)tt(-) [ tt(-i) var(pats) ] [ tt(-s) var(pair) ] [ var(helpspec) ... ])(
 This function can be used to give a complete specification for completion
 for a command whose arguments follow standard UNIX option and argument
-conventions.  Options to tt(_arguments) itself must be in separate words,
-i.e. tt(-s -w), not tt(-sw).
+conventions.
 
-When calling tt(_arguments), all var(spec)s that describe options of the
-analyzed command line must precede all var(spec)s that describe non-option
-(aka "normal") arguments of the analyzed line.  To avoid ambiguity, all
+em(Options overview)
+
+Options to tt(_arguments) itself must be in separate words, i.e. tt(-s -w),
+not tt(-sw).  The options are followed by var(spec)s that describe options and
+arguments of the analyzed command.  var(spec)s that describe option flags must
+precede var(spec)s that describe non-option ("positional" or "normal")
+arguments of the analyzed line.  To avoid ambiguity, all
 options to tt(_arguments) itself may be separated from the var(spec) forms
 by a single colon.
 
-The tt(-s -w -W -A) and tt(-S) options describe how parsing of the command
-line should proceed, and are discussed in context below.  The `tt(-)tt(-)'
+The `tt(-)tt(-)'
 form is used to intuit var(spec) forms from the help output of the command
 being analyzed, and is described in detail below.  The var(opts) for the
 `tt(-)tt(-)' form are otherwise the same options as the first form.  Note
 that `tt(-s)' following `tt(-)tt(-)' has a distinct meaning from `tt(-s)'
 preceding `tt(-)tt(-)', and both may appear.
 
-With the option tt(-n), tt(_arguments) sets the parameter tt(NORMARG)
+The option switches tt(-s), tt(-S), tt(-A), tt(-w), and tt(-W) affect how
+tt(_arguments) parses the analyzed command line's options.  These switches are
+useful for commands with standard argument parsing.
+
+The options of tt(_arguments) have the following meanings:
+
+startitem()
+item(tt(-n))(
+With this option, tt(_arguments) sets the parameter tt(NORMARG)
 to the position of the first normal argument in the tt($words) array,
 i.e. the position after the end of the options.  If that argument
 has not been reached, tt(NORMARG) is set to tt(-1).  The caller
 should declare `tt(integer NORMARG)' if the tt(-n) option is passed;
 otherwise the parameter is not used.
+)
+item(tt(-s))(
+Enable em(option stacking) for single-letter options, whereby multiple
+single-letter options may be combined into a single word.  For example,
+the two options `tt(-)var(x)' and `tt(-)var(y)' may be combined into
+a single word `tt(-)var(xy)'.  By default, every word corresponds to a single
+option name (the `tt(-xy)' option).
 
-The option `tt(-M) var(matchspec)' sets a match specification to use to
-completion option names and values.  The default var(matchspec) is:
+Options beginning with a single hyphen or plus sign are eligible for stacking;
+words beginning with two hyphens are not.
 
+Note that tt(-s) after tt(-)tt(-) has a different meaning, which is documented
+in the segment entitled `Deriving var(spec) forms from the help output'.
+)
+item(tt(-w))(
+In combination with tt(-s), allow option stacking
+even if one or more of the options take
+arguments.  For example, if tt(-x) takes an argument, with no
+tt(-s), `tt(-xy)' is considered as a single (unhandled) option; with
+tt(-s), tt(-xy) is an option with the argument `tt(y)'; with both tt(-s)
+and tt(-w), tt(-xy) may be the option tt(-x) and the option tt(-y) with
+arguments still to come.
+)
+item(tt(-W))(
+This option takes tt(-w) a stage further:  it is possible to
+complete single-letter options even after an argument that occurs in the
+same word.  However, it depends on the action performed whether options
+will really be completed at this point.  For more control, use a
+utility function like tt(_guard) as part of the action.
+)
+item(tt(-C))(
+Modify the tt(curcontext) parameter for an action of the form `tt(->)var(state)'.
+This is discussed in detail below.
+)
+item(tt(-R))(
+Return status 300 instead of zero when a tt($state) is to
+be handled, in the `tt(->)var(string)' syntax.
+)
+item(tt(-S))(
+Do not complete options after a `tt(-)tt(-)' appearing on the line,
+and ignore the `tt(-)tt(-)'.  For example, with tt(-S), in the line
+
+example(foobar -x -- -y)
+
+the `tt(-x)' is considered an option, the `tt(-y)' is considered an
+argument, and the `tt(-)tt(-)' is considered to be neither.
+)
+item(tt(-A) var(pat))(
+Do not complete options after the first non-option
+argument on the line.  var(pat) is a pattern matching
+all strings which are not to be taken as arguments.  For example, to make
+tt(_arguments) stop completing options after the first normal argument, but
+ignoring all strings starting with a hyphen even if they are not described
+by one of the var(optspec)s, the form is `tt(-A "-*")'.
+)
+item(tt(-O) var(name))(
+Pass the elements of the array var(name) as arguments to functions called to
+execute var(action)s.
+This is discussed in detail below.
+)
+item(tt(-M) var(matchspec))(
+Use the match specification var(matchspec) for completing option names and values.
+The default var(matchspec) allows partial word completion after `tt(_)' and
+`tt(-)', such as completing `tt(-f-b)' to `tt(-foo-bar)'.  The default
+var(matchspec) is:
 example(tt(r:|[_-]=* r:|=*))
+)
+enditem()
 
-This allows partial word completion after `tt(_)' and `tt(-)', for example
-`tt(-f-b)' can be completed to `tt(-foo-bar)'.
+em(var(spec)s: overview)
 
 Each of the following forms is a var(spec) describing individual sets of
 options or arguments on the command line being analyzed.
@@ -3600,26 +3672,6 @@ item(var(optspec)tt(:)var(...))(
 This describes an option.  The colon indicates handling for one or more
 arguments to the option; if it is not present, the option is assumed to
 take no arguments.
-
-By default, options are multi-character name, one `tt(-)var(word)' per
-option.  With tt(-s), options may be single characters, with more than
-one option per word, although words starting with two hyphens, such as
-`tt(-)tt(-prefix)', are still considered complete option names.  This is
-suitable for standard GNU options.
-
-The combination of tt(-s) with tt(-w) allows single-letter options to be
-combined in a single word even if one or more of the options take
-arguments.  For example, if tt(-x) takes an argument, with no
-tt(-s) `tt(-xy)' is considered as a single (unhandled) option; with
-tt(-s) tt(-xy) is an option with the argument `tt(y)'; with both tt(-s)
-and tt(-w), tt(-xy) may be the option tt(-x) and the option tt(-y) with
-arguments still to come.
-
-The option tt(-W) takes this a stage further:  it is possible to
-complete single-letter options even after an argument that occurs in the
-same word.  However, it depends on the action performed whether options
-will really be completed at this point.  For more control, use a
-utility function like tt(_guard) as part of the action.
 
 The following forms are available for the initial var(optspec), whether
 or not the option has arguments.
@@ -3682,23 +3734,6 @@ enditem()
 It is possible for options with a literal `tt(PLUS())' or `tt(=)' to
 appear, but that character must be quoted, for example `tt(-\+)'.
 
-The options tt(-S) and tt(-A) are available to simplify the specifications
-for commands with standard option parsing.  With tt(-S), no option will be
-completed after a `tt(-)tt(-)' appearing on its own on the line; this
-argument will otherwise be ignored; hence in the line
-
-example(foobar -x -- -y)
-
-the `tt(-x)' is considered an option but the `tt(-y)' is considered an
-argument, while the `tt(-)tt(-)' is considered to be neither.
-
-With tt(-A), no options will be completed after the first non-option
-argument on the line.  The tt(-A) must be followed by a pattern matching
-all strings which are not to be taken as arguments.  For example, to make
-tt(_arguments) stop completing options after the first normal argument, but
-ignoring all strings starting with a hyphen even if they are not described
-by one of the var(optspec)s, the form is `tt(-A "-*")'.
-
 Each var(optarg) following an var(optspec) must take one of the
 following forms:
 
@@ -3719,7 +3754,7 @@ xitem(tt(:*)var(pattern)tt(::)var(message)tt(:)var(action))
 item(tt(:*)var(pattern)tt(:::)var(message)tt(:)var(action))(
 This describes multiple arguments.  Only the last var(optarg) for
 an option taking multiple arguments may be
-given in this form.  If the var(pattern) is empty (i.e., tt(:*:)), all
+given in this form.  If the var(pattern) is empty (i.e. tt(:*:)), all
 the remaining words on the line are to be completed as described by the
 var(action); otherwise, all the words up to and including a word matching
 the var(pattern) are to be completed using the var(action).
@@ -3766,15 +3801,17 @@ given by an array, and tt(_arguments) is called repeatedly for more
 specific contexts: on the first call `tt(_arguments $global_options)' is
 used, and on subsequent calls `tt(_arguments !$^global_options)'.
 
+em(var(spec)s: actions)
+
 In each of the forms above the var(action) determines how
 completions should be generated.  Except for the `tt(->)var(string)'
 form below, the var(action) will be executed by calling the
 tt(_all_labels) function to process all tag labels.  No special handling
 of tags is needed unless a function call introduces a new one.
 
-The option `tt(-O) var(name)' specifies the name of an array whose elements
-will be passed as arguments to functions called to execute var(action)s.
-For example, this can be used to pass the same set of options for the
+The functions called to execute var(action)s will be called with the the
+elements of the array named by the `tt(-O) var(name)' option as arguments.
+This can be used, for example, to pass the same set of options for the
 tt(compadd) builtin to all var(action)s.
 
 The forms for var(action) are as follows.
@@ -3918,6 +3955,8 @@ example(local curcontext="$curcontext")
 This is useful where it is not possible for multiple states to be valid
 together.
 
+em(Specifying multiple sets of options)
+
 It is possible to specify multiple sets of options and
 arguments with the sets separated by single hyphens.  The specifications
 before the first hyphen (if any) are shared by all the remaining sets.
@@ -3963,6 +4002,8 @@ set this form of argument is slow and should only be used when necessary.
 A useful alternative is often an option specification with rest-arguments
 (as in `tt(-foo:*:...)'); here the option tt(-foo) swallows up all
 remaining arguments as described by the var(optarg) definitions.
+
+em(Deriving var(spec) forms from the help output)
 
 The option `tt(-)tt(-)' allows tt(_arguments) to work out the names of long
 options that support the `tt(-)tt(-help)' option which is standard in many
@@ -4035,6 +4076,8 @@ as `tt(-)tt(-enable-foo)', but the script also accepts the negated form
 `tt(-)tt(-disable-foo)'.  To allow completion of the second form:
 
 example(_arguments -- -s "LPAR()(#s)--enable- --disable-RPAR()")
+
+em(Miscellaneous notes)
 
 Finally, note that tt(_arguments) generally expects to be the primary
 function handling any completion for which it is used.  It may have side
