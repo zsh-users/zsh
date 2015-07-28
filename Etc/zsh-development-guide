@@ -751,7 +751,7 @@ the other things that can be defined by modules:
 
   /**/
   int
-  boot_foo(Module m)
+  boot_(Module m)
   {
     int ret;
 
@@ -761,7 +761,7 @@ the other things that can be defined by modules:
   ...
   /**/
   int
-  cleanup_foo(Module m)
+  cleanup_(Module m)
   {
     deletehookdefs(m->nam, foohooks, sizeof(foohooks)/sizeof(*foohooks));
     ...
@@ -802,14 +802,37 @@ The definition is simple:
   };
 
 The macro `WRAPDEF(...)' gets the C-function as its only argument.
-This function should be defined like:
+The `boot_()' function must install wrappers by calling `addwrapper()'
+like so:
+
+  /**/
+  int
+  boot_(Module m)
+  {
+    int ret;
+
+    ret = addwrapper(m, wrapper);
+    ...
+  }
+
+The `cleanup_()' function should then remove the wrappers again:
+
+  /**/
+  int
+  cleanup_(Module m)
+  {
+    deletewrapper(m, wrapper);
+    ...
+  }
+
+The wrapper function should be defined like:
 
   /**/
   static int
-  ex_wrapper(List list, FuncWrap w, char *name)
+  ex_wrapper(Eprog prog, FuncWrap w, char *name)
   {
     ...
-    runshfunc(list, w, name);
+    runshfunc(prog, w, name);
     ...
     return 0;
   }
@@ -828,11 +851,11 @@ finished:
 
   /**/
   static int
-  ex_wrapper(List list, FuncWrap w, char *name)
+  ex_wrapper(Eprog prog, FuncWrap w, char *name)
   {
     if (wrapper_need_to_run) {
       ...
-      runshfunc(list, w, name);
+      runshfunc(prog, w, name);
       ...
       return 0;
     }

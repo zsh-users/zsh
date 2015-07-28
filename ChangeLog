@@ -1,3 +1,8 @@
+2015-07-28  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 35947: Etc/zsh-development-guide: update discussion of module
+	wrappers, some examples
+
 2015-07-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 35937: Functions/Misc/zargs: wait for process IDs instead of
