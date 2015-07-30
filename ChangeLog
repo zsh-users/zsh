@@ -26,6 +26,9 @@
 
 	* 36120: Completion/Unix/Command/_sort: Fix syntax error
 
+	* 36119: Completion/Zsh/Command/_strftime: Add completion for
+	zsh/datetime's strftime builtin
+
 2015-08-11  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36108: NEWS: list of major changes so far since 5.0.8
