@@ -1,3 +1,8 @@
+2015-07-29  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 35953: Src/lex.c, Test/A01grammar.ztst: fix handling of command
+	substitution in math context, particularly in "for ((...))"
+
 2015-07-28  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 35947: Etc/zsh-development-guide: update discussion of module

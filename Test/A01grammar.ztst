@@ -182,6 +182,12 @@
 >1
 >2
 
+  for (( $(true); ; )); do break; done
+  for (( ; $(true); )); do break; done
+  for (( ; ; $(true) )); do break; done
+  for (( ; $((1)); )); do break; done
+0:regression test, nested cmdsubst in arithmetic `for' loop
+
   for keyvar valvar in key1 val1 key2 val2; do
      print key=$keyvar val=$valvar
   done

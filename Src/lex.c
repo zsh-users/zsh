@@ -1388,7 +1388,7 @@ dquote_parse(char endchar, int sub)
 {
     int pct = 0, brct = 0, bct = 0, intick = 0, err = 0;
     int c;
-    int math = endchar == ')' || endchar == ']';
+    int math = endchar == ')' || endchar == ']' || infor;
     int zlemath = math && zlemetacs > zlemetall + addedx - inbufct;
 
     while (((c = hgetc()) != endchar || bct ||
@@ -1995,8 +1995,10 @@ skipcomm(void)
 #else
     char *new_tokstr;
     int new_lexstop, new_lex_add_raw;
+    int save_infor = infor;
     struct lexbufstate new_lexbuf;
 
+    infor = 0;
     cmdpush(CS_CMDSUBST);
     SETPARBEGIN
     add(Inpar);
@@ -2065,6 +2067,7 @@ skipcomm(void)
      * the recursive parsing.
      */
     lexflags &= ~LEXFLAGS_ZLE;
+    dbparens = 0;	/* restored by zcontext_restore_partial() */
 
     if (!parse_event(OUTPAR) || tok != OUTPAR)
 	lexstop = 1;
@@ -2111,6 +2114,7 @@ skipcomm(void)
     if (!lexstop)
 	SETPAREND
     cmdpop();
+    infor = save_infor;
 
     return lexstop;
 #endif
