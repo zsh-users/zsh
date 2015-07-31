@@ -27,11 +27,11 @@ case $variant in
       '*-print0'
     )
   ;|
+  solaris*|freebsd*|dragonfly*|darwin*|gnu)
+    args+=( '*-mount' )
+  ;|
   netbsd*|freebsd*|dragonfly*|darwin*|gnu)
     args+=( '(-H -L)-P[never follow symlinks]' )
-  ;|
-  netbsd*|freebsd*|dragonfly*|openbsd*|darwin*|gnu)
-    args+=( '-d[depth first traversal]' )
   ;|
   darwin*|freebsd*|gnu)
     args+=(
@@ -40,11 +40,13 @@ case $variant in
       '*-Btime:birth time (hours)'
     )
   ;|
-  freebsd*|dragonfly*|darwin*|openbsd*|gnu)
+  netbsd*|freebsd*|dragonfly*|openbsd*|darwin*|gnu)
     args+=(
+      '-d[depth first traversal]'
       '*-anewer:file to compare (access time):_files'
       '*-cnewer:file to compare (inode change time):_files'
-      '*-mnewer:file to compare (modification time):_files'
+      '*-empty'
+      '*-execdir:program: _command_names -e:*\;::program arguments: _normal'
       '*-maxdepth:maximum search depth'
       '*-mindepth:minimum search depth'
       '*-path:path pattern to search:'
@@ -53,8 +55,6 @@ case $variant in
   freebsd*|dragonfly*|darwin*|gnu)
     args+=(
       '*-delete'
-      '*-empty'
-      '*-execdir:program: _command_names -e:*\;::program arguments: _normal'
       '*-gid:numeric group ID'
       '*-uid:numeric user ID'
       '*-noleaf'
@@ -66,6 +66,7 @@ case $variant in
       '*-wholename:full path pattern to search' \
       '*-iwholename:full path pattern to search (case insensitive)'
       '*-ignore_readdir_race'
+      '*-mnewer:file to compare (modification time):_files'
       '*-noignore_readdir_race'
       '*-okdir:program: _command_names -e:*\;::program arguments: _normal'
       '*-samefile:file to compare inode:_files' \
@@ -80,9 +81,13 @@ case $variant in
   netbsd*|freebsd*|dragonfly*|darwin*)
     args+=(
       '-E[use extended regular expressions with -regex/-iregex]'
+      '-s[traverse directories in sorted order]'
+    )
+  ;|
+  netbsd*|freebsd*|dragonfly*|openbsd*|darwin*)
+    args+=(
       '-X[warn if filename contains characters special to xargs]'
       '-f[specify file hierarchy to traverse]:path:_directories'
-      '-s[traverse directories in sorted order]'
       "-x[don't span filesystems]"
       '*-flags:flags:_chflags'
     )
@@ -128,7 +133,6 @@ _arguments -C $args \
   '*-inum:inode number:' \
   '*-links:number of links:' \
   '*-ls' \
-  '*-mount' \
   '*-mtime:modification time (days):->times' \
   '*-name:name pattern' \
   '*-newer:file to compare (modification time):_files' \

@@ -1,3 +1,8 @@
+2015-07-31  Oliver Kiddle <opk@zsh.org>
+
+	* Matthew Martin: 35960 (tweaked): Completion/Unix/Command/_find:
+	complete correct options for OpenBSD's find
+
 2015-07-29  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 35953: Src/lex.c, Test/A01grammar.ztst: fix handling of command
