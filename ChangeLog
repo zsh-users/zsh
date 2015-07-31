@@ -1,5 +1,8 @@
 2015-07-31  Oliver Kiddle <opk@zsh.org>
 
+	* 35963: Src/Modules/system.c: simplify condition found by
+	coverity scan to include tautology
+
 	* Matthew Martin: 35960 (tweaked): Completion/Unix/Command/_find:
 	complete correct options for OpenBSD's find
 

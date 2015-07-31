@@ -311,8 +311,7 @@ bin_sysopen(char *nam, char **args, Options ops, UNUSED(int func))
     int write = OPT_ISSET(ops, 'w');
     int append = OPT_ISSET(ops, 'a') ? O_APPEND : 0;
     int flags = O_NOCTTY | append | ((append || write) ?
-	(read ? O_RDWR : O_WRONLY) :
-	(!append || read) ? O_RDONLY : O_WRONLY);
+	(read ? O_RDWR : O_WRONLY) : O_RDONLY);
     char *opt, *ptr, *nextopt, *fdvar;
     int o, fd, explicit = -1;
     mode_t perms = 0666;
