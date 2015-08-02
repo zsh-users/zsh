@@ -192,7 +192,7 @@ elif compset -P '*:([\|\*\^]|\^\^)'; then
 elif compset -P '*:'; then
     flags=(
       '-:substitute alternate value if parameter is null'
-      '+:susbtitute alternate value if parameter is non-null'
+      '+:substitute alternate value if parameter is non-null'
       '=:substitute and assign alternate value if parameter is null'
       '\:=:unconditionally assign value to parameter'
       '?:print error if parameter is set and non-null'

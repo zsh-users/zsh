@@ -922,7 +922,7 @@ _git-grep () {
   # TODO: Need to implement -<num> as a shorthand for -C<num>
   _arguments -C -A '-*' \
     '(-O --open-files-in-pager --no-index)--cached[search blobs registered in index file instead of working tree]' \
-    '(--cached)--no-index[search files in current directory, not just treacked files]' \
+    '(--cached)--no-index[search files in current directory, not just tracked files]' \
     '(--exclude-standard)--no-exclude-standard[also search in ignored files]' \
     '(--no-exclude-standard)--exclude-standard[exclude files standard ignore mechanisms]' \
     '--untracked[search in untracked files]' \
@@ -948,7 +948,7 @@ _git-grep () {
     '(-z --null)'{-z,--null}'[output \0 after filenames]' \
     '(-c --count)'{-c,--count}'[show number of matching lines in files]' \
     '(        --no-color)--color=-[color matches]:: :__git_color_whens' \
-    '(--color           )---no-color[do not color matches]' \
+    '(--color           )--no-color[do not color matches]' \
     '--break[prefix the line number to matching lines]' \
     '--heading[show the filename above the matches]' \
     '(-A --after-context)'{-A,--after-context=}'[show <num> trailing lines, and separate groups of matches]: :__git_guard_number lines' \
