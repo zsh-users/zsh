@@ -1,3 +1,8 @@
+2015-08-01  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 35957: Completion/Unix/Command/_make: fix _make-expandVars(),
+	and use variables set in the command line and environment.
+
 2015-07-31  Oliver Kiddle <opk@zsh.org>
 
 	* 35963: Src/Modules/system.c: simplify condition found by

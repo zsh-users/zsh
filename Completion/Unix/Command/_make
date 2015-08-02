@@ -4,58 +4,68 @@
 # are used in those targets and their dependencies.
 
 _make-expandVars() {
-  local open close var val front ret tmp=$1
+  local open close var val front='' rest=$1
 
-  front=${tmp%%\$*}
-  case $tmp in
-    (\(*) # Variable of the form $(foobar)
-    open='('
-    close=')'
-    ;;
+  while [[ $rest == (#b)[^$]#($)* ]]; do
+    front=$front${rest[1,$mbegin[1]-1]}
+    rest=${rest[$mbegin[1],-1]}
 
-    ({*) # ${foobar}
-    open='{'
-    close='}'
-    ;;
+    case $rest[2] in
+      ($)	    # '$$'. may not appear in target and variable's value
+	front=$front\$\$
+	rest=${rest[3,-1]}
+	continue
+	;;
+      (\()	    # Variable of the form $(foobar)
+	open='('
+	close=')'
+	;;
+      ({)	    # ${foobar}
+	open='{'
+	close='}'
+	;;
+      ([[:alpha:]]) # $foobar. This is exactly $(f)oobar.
+	open=''
+	close=''
+	var=$rest[2]
+	;;
+      (*)	    # bad parameter name
+	print -- $front$rest
+	return 1
+	;;
+    esac
 
-    ([[:alpha:]]*) # $foobar. This is exactly $(f)oobar.
-    open=''
-    close=''
-    var=${(s::)var[1]}
-    ;;
+    if [[ -n $open ]]; then
+      if [[ $rest == \$$open(#b)([[:alnum:]_]##)(#B)$close* ]]; then
+	var=$match
+      else  # unmatched () or {}, or bad parameter name
+	print -- $front$rest
+	return 1
+      fi
+    fi
 
-    (\$*) # Escaped $.
-    print -- "${front}\$$(_make-expandVars ${tmp#\$})"
-    return
-    ;;
+    val=''
+    if [[ -n ${VAR_ARGS[(i)$var]} ]]; then
+      val=${VAR_ARGS[$var]}
+    else
+      if [[ -n $opt_args[(I)(-e|--environment-overrides)] ]]; then
+	if [[ $parameters[$var] == scalar-export* ]]; then
+	  val=${(P)var}
+	elif [[ -n ${VARIABLES[(i)$var]} ]]; then
+	  val=${VARIABLES[$var]}
+	fi
+      else
+	if [[ -n ${VARIABLES[(i)$var]} ]]; then
+	  val=${VARIABLES[$var]}
+	elif [[ $parameters[$var] == scalar-export* ]]; then
+	  val=${(P)var}
+	fi
+      fi
+    fi
+    rest=${rest//\$$open$var$close/$val}
+  done
 
-    (*) # Nothing left to substitute.
-    print -- $tmp
-    return
-    ;;
-  esac
-
-  if [[ -n $open ]]
-  then
-    var=${tmp#$open}
-    var=${var%%$close*}
-  fi
-
-  case $var in
-    ([[:alnum:]_]#)
-    val=${VARIABLES[$var]}
-    ret=${ret//\$$open$var$close/$val}
-    ;;
-
-    (*)
-    # Improper variable name. No replacement.
-    # I'm not sure if this is desired behavior.
-    front+="\$$open$var$close"
-    ret=${ret/\$$open$var$close/}
-    ;;
-  esac
-
-  print -- "${front}$(_make-expandVars ${ret})"
+  print -- ${front}${rest}
 }
 
 _make-parseMakefile () {
@@ -84,16 +94,9 @@ _make-parseMakefile () {
 
       # TARGET: dependencies
       # TARGET1 TARGET2 TARGET3: dependencies
-      ([[:alnum:]][^$TAB:=]#:[^=]*)
-      input=$(_make-expandVars $input)
-      target=${input%%:*}
-      dep=${input#*:}
-      dep=${(z)dep}
-      dep="$dep"
-      for tmp in ${(z)target}
-      do
-        TARGETS[$tmp]=$dep
-      done
+      ([[*?[:alnum:]$][^$TAB:=%]#:[^=]*)
+      target=$(_make-expandVars ${input%%:*})
+      TARGETS+=( ${(z)target} )
       ;;
 
       # Include another makefile
@@ -150,8 +153,17 @@ _make() {
   local prev="$words[CURRENT-1]" file expl tmp is_gnu dir incl match
   local context state state_descr line
   local -a option_specs
-  local -A TARGETS VARIABLES opt_args
+  local -A VARIABLES VAR_ARGS opt_args
+  local -aU TARGETS keys
   local ret=1
+
+  # VAR=VAL on the current command line
+  for tmp in $words; do
+    if [[ $tmp == (#b)([[:alnum:]_]##)=(*) ]]; then
+      VAR_ARGS[${tmp[$mbegin[1],$mend[1]]}]=${(e)tmp[$mbegin[2],$mend[2]]}
+    fi
+  done
+  keys=( ${(k)VAR_ARGS} ) # to be used in 'compadd -F keys'
 
   _pick_variant -r is_gnu gnu=GNU unix -v -f
 
@@ -275,9 +287,9 @@ _make() {
       while _tags
       do
         _requested targets expl 'make targets' \
-          compadd -- ${(k)TARGETS} && ret=0
+          compadd -Q -- $TARGETS && ret=0
         _requested variables expl 'make variables' \
-          compadd -S '=' -- ${(k)VARIABLES} && ret=0
+          compadd -S '=' -F keys -- ${(k)VARIABLES} && ret=0
       done
     fi
   esac
