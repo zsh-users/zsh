@@ -2360,7 +2360,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    on = pm->node.flags;
 	} else {
 	    zerrnam(cname,
-		    "%s: i1;nconsistent array element or slice assignment", pname);
+		    "%s: inconsistent array element or slice assignment", pname);
 	    return NULL;
 	}
     }
