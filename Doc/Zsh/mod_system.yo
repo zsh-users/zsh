@@ -31,12 +31,12 @@ not recognised (no message is printed for this).
 findex(sysopen)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
 xitem(tt(sysopen) [ tt(-arw) ] [ tt(-m) var(permissions) ] [ tt(-o) var(options) ])
-item(SPACES()[ tt(-u) var(fd) ] var(file))(
+item(SPACES()tt(-u) var(fd) var(file))(
 This command opens a file. The tt(-r), tt(-w) and tt(-a) flags indicate
 whether the file should be opened for reading, writing and appending,
 respectively. The tt(-m) option allows the initial permissions to use when
 creating a file to be specified in octal form.  The file descriptor is
-specified with -u. Either an explicit file descriptor in the range 0 to 9 can
+specified with tt(-u). Either an explicit file descriptor in the range 0 to 9 can
 be specified or a variable name can be given to which the file descriptor
 number will be assigned.
 

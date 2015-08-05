@@ -1,3 +1,7 @@
+2015-08-08  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 35954: Doc/Zsh/mod_system.yo: sysopen -u is not optional
+
 2015-08-09  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 35929: Src/jobs.c: protect FDT_PROC_SUBST by #ifdef
