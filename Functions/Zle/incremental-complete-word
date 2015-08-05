@@ -69,7 +69,7 @@ incremental-complete-word() {
            '#key' -ne '#\\C-g' ]]; do
     twid=$wid
     if [[ "$key" = ${~stop} ]]; then
-      zle -U "$key"
+      zle -U - "$key"
       return
     elif [[ "$key" = ${~brk} ]]; then
       return
