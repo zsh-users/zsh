@@ -1,0 +1,83 @@
+#compdef vmstat
+
+local -a specs
+case $OSTYPE in
+  *linux*)
+    specs=(
+      '(-a --active)'{-a,--active}'[active/inactive memory]'
+      '(-f --forks)'{-f,--forks}'[number of forks since boot]'
+      '(-m --slabs)'{-m,--slabs}'[slabinfo]'
+      '(-n --one-header)'{-n,--one-header}'[do not redisplay header]'
+      '(-s --stats)'{-s,--stats}'[event counter statistics]'
+      '(-d --disk)'{-d,--disk}'[disk statistics]'
+      '(-D --disk-sum)'{-D,--disk-sum}'[summarize disk statistics]'
+      '(-p --partition)'{-p,--partition}'[partition specific statistics]:partition:_files'
+      '(-S --unit)'{-S+,--unit}'[define display unit]:unit prefix:(( k\:1000 K\:1024 m\:1000000 M\:1048576 ))'
+      '(-w --wide)'{-w,--wide}'[wide output]'
+      '(-t --timestamp)'{-t,--timestamp}'[show timestamp]'
+      '1:delay' '2:count'
+    )
+  ;;
+  freebsd*)
+    specs=(
+      '-a[include statistics about all interrupts]'
+      '-c[number of times to refresh the display]:count'
+      '-f[report on the number fork syscalls since boot and pages of virtual memory for each]'
+      '-h[human readable memory columns output]'
+      '-H[scriptable memory columns output]'
+      '-i[report the number of interrupts taken by devices since boot]'
+      '-M[source file to extract values associated with the name list from]:core:_files'
+      '-N[source file to extract the name list from]:system:_files'
+      '-m[report on the usage of kernel dynamic memory allocated using malloc(9) by type]'
+      '-n[change the maximum number of disks to display]:number of disks to display'
+      '-P[report per-cpu system/user/idle cpu statistics]'
+      '-p[specify which types of devices to display]: :->devices'
+      '-s[display the contents of the SUM structure]:sum'
+      '-w[delay N seconds between each display]:delay'
+      '-z[report on memory used by the kernel zone allocator, uma(9), by zone]'
+      '*:disks:_files'
+    )
+  ;;
+  openbsd*)
+    specs=(
+      '-c[number of times to refresh the display]:count'
+      '-f[report on the number fork syscalls since boot and pages of virtual memory for each]'
+      '-i[report the number of interrupts taken by devices since boot]'
+      '-M[source file to extract values associated with the name list from]:core:_files'
+      '-m[report usage of kernel dynamic memory listed first by size of allocation then type of usage]'
+      '-N[source file to extract the name list from]:system:_files'
+      '-s[display the contents of the UVMEXP structure]:uvmexp'
+      '-t[report on the number of page in and page reclaims since boot]'
+      '-v[print more verbose information]'
+      '-w[delay N seconds between each display]:delay'
+      '-z[include statistics about all interrupts]'
+      '*:disks:_files'
+    )
+  ;;
+esac
+
+if (( $#specs )); then
+  local curcontext=$curcontext state state_descr line ret=1
+  typeset -A {opt,val}_args
+
+  _arguments -C -s -w -A '-*' : "$specs[@]" && ret=0
+
+  if [[ $state == devices ]]; then
+    local -a types
+    types=(
+      'da[direct access devices]' 'sa[sequential access devices]'
+      'printer[printers]' 'proc[processor devices]'
+      'worm[write once read multiple devices]' 'cd[CD devices]'
+      'scanner[scanner devices]' 'optical[optical memory devices]'
+      'changer[medium changer devices]' 'comm[communication devices]'
+      'array[storage array devices]' 'enclosure[enclosure services devices]'
+      'floppy[floppy devices]' 'IDE[Integrated Drive Electronics devices]'
+      'SCSI[Small Computer System Interface devices]'
+      'other[any other device interface]' 'pass[passthrough devices]'
+    )
+    _values -C -s , 'device type' "$types[@]" && ret=0
+  fi
+  return ret
+fi
+
+_default
