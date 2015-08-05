@@ -1,5 +1,8 @@
 2015-08-05  Oliver Kiddle <opk@zsh.org>
 
+	* Christian Hesse: 35986: Completion/Unix/Command/_ssh:
+	add ssh option UpdateHostKeys
+
 	* unposted (c.f. 35902): Functions/Zle/incremental-complete-word:
 	use - after zle -U in case $key starts with -
 

@@ -425,6 +425,7 @@ _ssh () {
                 TCPKeepAlive \
                 Tunnel \
                 TunnelDevice \
+                UpdateHostKeys \
                 UsePrivilegedPort \
                 User \
                 UserKnownHostsFile \
