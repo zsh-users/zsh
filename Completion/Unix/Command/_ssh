@@ -383,7 +383,7 @@ _ssh () {
       else
         # old options are after the empty "\"-line
         _wanted values expl 'configure file option' \
-            compadd -M 'm:{a-z}={A-Z}' -S '=' - \
+            compadd -M 'm:{a-z}={A-Z}' -q -S '=' - \
                 AddressFamily \
                 BatchMode \
                 BindAddress \

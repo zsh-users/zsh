@@ -2,6 +2,9 @@
 
 	* 35989: Completion/Unix/Command/_ssh: update to 6.9
 
+	* unposted: Completion/Unix/Command/_ssh: use -q for the
+	option suffix
+
 2015-08-05  Oliver Kiddle <opk@zsh.org>
 
 	* Eric Cook: 35973: Completion/BSD/Command/_systat,
