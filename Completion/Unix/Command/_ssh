@@ -574,8 +574,8 @@ _ssh_hosts () {
     config="$HOME/.ssh/config"
   fi
   if [[ -r $config ]]; then
-    local IFS=$'\t ' key hosts host
-    while read key hosts; do
+    local key hosts host
+    while IFS=$'=\t ' read -r key hosts; do
       if [[ "$key" == (#i)host ]]; then
          for host in ${(z)hosts}; do
             case $host in

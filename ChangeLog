@@ -1,5 +1,8 @@
 2015-08-05  Oliver Kiddle <opk@zsh.org>
 
+	* Eric Cook: 35972: Completion/Unix/Command/_ssh: allow for
+	Directive=Value format in .ssh/config
+
 	* Christian Hesse: 35986: Completion/Unix/Command/_ssh:
 	add ssh option UpdateHostKeys
 
