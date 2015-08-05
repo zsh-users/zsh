@@ -1,6 +1,6 @@
 #compdef ssh slogin=ssh scp ssh-add ssh-agent ssh-keygen sftp ssh-copy-id
 
-# Completions currently based on OpenSSH 6.0 (released on 2012-04-22).
+# Completions currently based on OpenSSH 6.9 (released on 2015-06-30).
 #
 # TODO: update ssh-keygen (not based on 5.9)
 # TODO: sshd, ssh-keyscan, ssh-keysign
@@ -148,16 +148,28 @@ _ssh () {
     option)
       if compset -P '*='; then
         case "$IPREFIX" in
-        *(#i)(afstokenpassing|batchmode|challengeresponseauthentication|checkhostip|clearallforwardings|compression|enablesshkeysign|exitonforwardfailure|fallbacktorsh|forward(agent|x11)|forwardx11trusted|gatewayports|gssapiauthentication|gssapidelegatecredentials|gssapitrustdns|hashknownhosts|hostbasedauthentication|identitiesonly|kbdinteractiveauthentication|(tcp|)keepalive|nohostauthenticationforlocalhost|passwordauthentication|permitlocalcommand|pubkeyauthentication|rhosts(|rsa)authentication|rsaauthentication|usersh|kerberos(authentication|tgtpassing)|useprivilegedport|visualhostkey)=*)
+        (#i)(afstokenpassing|batchmode|canonicalizefallbacklocal|challengeresponseauthentication|checkhostip|clearallforwardings|compression|enablesshkeysign|exitonforwardfailure|fallbacktorsh|forward(agent|x11)|forwardx11trusted|gatewayports|gssapiauthentication|gssapidelegatecredentials|gssapitrustdns|hashknownhosts|hostbasedauthentication|identitiesonly|kbdinteractiveauthentication|(tcp|)keepalive|nohostauthenticationforlocalhost|passwordauthentication|permitlocalcommand|proxyusefdpass|pubkeyauthentication|rhosts(|rsa)authentication|rsaauthentication|streamlocalbindunlink|usersh|kerberos(authentication|tgtpassing)|useprivilegedport|visualhostkey)=*)
           _wanted values expl 'truth value' compadd yes no && ret=0
           ;;
-        *(#i)addressfamily=*)
+        (#i)addressfamily=*)
           _wanted values expl 'address family' compadd any inet inet6 && ret=0
           ;;
-        *(#i)bindaddress=*)
+        (#i)bindaddress=*)
           _wanted bind-addresses expl 'bind address' _bind_addresses && ret=0
           ;;
-        *(#i)ciphers=*)
+        (#i)canonicaldomains=*)
+          _message -e 'canonical domains (space separated)' && ret=0
+          ;;
+        (#i)canonicalizehostname=*)
+          _wanted values expl 'truthish value' compadd yes no always && ret=0
+          ;;
+        (#i)canonicalizemaxdots=*)
+          _message -e 'number of dots' && ret=0
+          ;;
+        (#i)canonicalizepermittedcnames=*)
+          _message -e 'CNAME rule list (source_domain_list:target_domain_list, each pattern list comma separated)' && ret=0
+          ;;
+        (#i)ciphers=*)
           _values -s , 'encryption cipher' \
               '3des-cbc' \
               'aes128-cbc' \
@@ -178,48 +190,48 @@ _ssh () {
               'rijndael-cbc@lysator.liu.se' \
               && ret=0
           ;;
-        *(#i)cipher=*)
+        (#i)cipher=*)
           _wanted values expl 'encryption cipher (protocol version 1)' \
               compadd blowfish 3des des idea arcfour tss none && ret=0
           ;;
-        *(#i)compressionlevel=*)
+        (#i)compressionlevel=*)
           _values 'compression level' {1..9} && ret=0
           ;;
-        *(#i)connectionattempts=*)
+        (#i)connectionattempts=*)
           _message -e 'connection attempts' && ret=0
           ;;
-        *(#i)connecttimeout=*)
+        (#i)connecttimeout=*)
           _message -e 'connection timeout' && ret=0
           ;;
-        *(#i)controlmaster=*)
+        (#i)controlmaster=*)
           _wanted values expl 'truthish value' compadd yes no auto autoask && ret=0
           ;;
-        *(#i)controlpath=*)
+        (#i)controlpath=*)
           _description files expl 'path to control socket'
           _files "$expl[@]" && ret=0
           ;;
-        *(#i)controlpersist=*)
+        (#i)controlpersist=*)
           _message -e 'timeout'
           ret=0
           _wanted values expl 'truth value' compadd yes no && ret=0
           ;;
-        *(#i)escapechar=*)
+        (#i)escapechar=*)
           _message -e 'escape character (or `none'\'')'
           ret=0
           ;;
-        *(#i)forwardx11timeout=*)
+        (#i)forwardx11timeout=*)
           _message -e 'timeout'
           ret=0
           ;;
-        *(#i)globalknownhostsfile=*)
+        (#i)globalknownhostsfile=*)
           _description files expl 'global file with known hosts'
           _files "$expl[@]" && ret=0
           ;;
-        *(#i)hostname=*)
+        (#i)hostname=*)
           _wanted hosts expl 'real host name to log into' _ssh_hosts && ret=0
           ;;
-        *(#i)hostkeyalgorithms=*)
-          _values -s , 'host key algorithms' \
+        (#i)(hostbasedkeytypes|hostkeyalgorithms)=*)
+          _values -s , 'key types' \
               'ecdsa-sha2-nistp256-cert-v01@openssh.com' \
               'ecdsa-sha2-nistp384-cert-v01@openssh.com' \
               'ecdsa-sha2-nistp521-cert-v01@openssh.com' \
@@ -235,11 +247,14 @@ _ssh () {
               'ssh-rsa' \
               'ssh-dss' && ret=0
           ;;
-        *(#i)identityfile=*)
+        (#i)identityfile=*)
           _description files expl 'SSH identity file'
           _files "$expl[@]" && ret=0
           ;;
-        *(#i)ipqos=*)
+        (#i)ignoreunknown=*)
+          _message -e 'pattern list' && ret=0
+          ;;
+        (#i)ipqos=*)
           local descr
           if [[ $PREFIX = *\ *\ * ]]; then return 1; fi
           if compset -P '* '; then
@@ -252,105 +267,115 @@ _ssh () {
               'cs0' 'cs1' 'cs2' 'cs3' 'cs4' 'cs5' 'cs6' 'cs7' 'ef' \
               'lowdelay' 'throughput' 'reliability' && ret=0
           ;;
-        *(#i)(local|remote)forward=*)
+        (#i)(local|remote)forward=*)
           state=forward
           ;;
-        *(#i)dynamicforward=*)
+        (#i)dynamicforward=*)
           state=dynforward
           ;;
-        *(#i)kbdinteractivedevices=*)
+        (#i)kbdinteractivedevices=*)
           _values -s , 'keyboard-interactive authentication methods' \
               'bsdauth' 'pam' 'skey' && ret=0
           ;;
-        *(#i)kexalgorithms=*)
+        (#i)kexalgorithms=*)
           _values -s , 'KEX algorithms' \
               ecdh-sha2-nistp256 ecdh-sha2-nistp384 ecdh-sha2-nistp521 \
               diffie-hellman-group-exchange-sha256 \
               diffie-hellman-group-exchange-sha1 \
               diffie-hellman-group14-sha1 diffie-hellman-group1-sha1 && ret=0
           ;;
-        *(#i)localcommand=*)
+        (#i)localcommand=*)
           _description commands expl 'run command locally after connecting'
           _command_names && ret=0
           ;;
-        *(#i)loglevel=*)
+        (#i)loglevel=*)
           _values 'log level' QUIET FATAL ERROR INFO VERBOSE\
               DEBUG DEBUG1 DEBUG2 DEBUG3 && ret=0
           ;;
-        *(#i)macs=*)
+        (#i)macs=*)
           state=macs
           ;;
-        *(#i)numberofpasswordprompts=*)
+        (#i)numberofpasswordprompts=*)
           _message -e 'number of password prompts'
           ret=0
           ;;
-        *(#i)pkcs11provider=*)
+        (#i)pkcs11provider=*)
           _description files expl 'PKCS#11 shared library'
           _files -g '*.so' "$expl[@]" && ret=0
           ;;
-        *(#i)port=*)
+        (#i)port=*)
           _message -e 'port number on remote host'
           ret=0
           ;;
-        *(#i)preferredauthentications=*)
+        (#i)preferredauthentications=*)
           _values -s , 'authentication method' gssapi-with-mic \
               hostbased publickey keyboard-interactive password && ret=0
           ;;
-        *(#i)protocol=*)
+        (#i)protocol=*)
           _values -s , 'protocol version' \
               '1' \
               '2' && ret=0
           ;;
-        *(#i)proxycommand=*)
+        (#i)proxycommand=*)
           compset -q
           shift 1 words
           (( CURRENT-- ))
           _normal && ret=0
           ;;
-        *(#i)rekeylimit=*)
+        (#i)rekeylimit=*)
           _message -e 'maximum number of bytes transmitted before renegotiating session key'
           ret=0
           ;;
-        *(#i)requesttty=*)
+        (#i)requesttty=*)
           _values 'request a pseudo-tty' \
               'no[never request a TTY]' \
               'yes[always request a TTY when stdin is a TTY]' \
               'force[always request a TTY]' \
               'auto[request a TTY when opening a login session]' && ret=0
           ;;
-        *(#i)sendenv=*)
+        (#i)revokedhostkeys=*)
+          _description files expl 'revoked host keys file'
+          _files "$expl[@]" && ret=0
+          ;;
+        (#i)sendenv=*)
           _wanted envs expl 'environment variable' _parameters -g 'scalar*export*' && ret=0
           ;;
-        *(#i)serveralivecountmax=*)
+        (#i)serveralivecountmax=*)
           _message -e 'number of alive messages without replies before disconnecting'
           ret=0
           ;;
-        *(#i)serveraliveinterval=*)
+        (#i)serveraliveinterval=*)
           _message -e 'timeout in seconds since last data was received to send alive message'
           ret=0
           ;;
-        *(#i)(stricthostkeychecking|verifyhostkeydns)=*)
-          _wanted values expl 'checking type' compadd yes no ask && ret=0
+        (#i)streamlocalbindmask=*)
+          _message -e 'octal mask' && ret=0
           ;;
-        *(#i)tunnel=*)
+        (#i)(stricthostkeychecking|verifyhostkeydns|updatehostkeys)=*)
+          _wanted values expl 'truthish value' compadd yes no ask && ret=0
+          ;;
+        (#i)transport=*)
+          _values 'transport protocol' TCP SCTP && ret=0
+          ;;
+        (#i)tunnel=*)
           _values 'request device forwarding' \
               'yes' \
               'point-to-point' \
               'ethernet' \
               'no' && ret=0
           ;;
-        *(#i)tunneldevice=*)
+        (#i)tunneldevice=*)
           _message -e 'local_tun[:remote_tun] (integer or "any")'
           ret=0
           ;;
-        *(#i)userknownhostsfile=*)
+        (#i)userknownhostsfile=*)
           _description files expl 'user file with known hosts'
           _files "$expl[@]" && ret=0
           ;;
-        *(#i)user=*)
+        (#i)user=*)
           _wanted users expl 'user to log in as' _ssh_users && ret=0
           ;;
-        *(#i)xauthlocation=*)
+        (#i)xauthlocation=*)
           _description files expl 'xauth program'
           _files "$expl[@]" -g '*(-*)' && ret=0
           ;;
@@ -362,6 +387,11 @@ _ssh () {
                 AddressFamily \
                 BatchMode \
                 BindAddress \
+                CanonicalDomains \
+                CanonicalizeFallbackLocal \
+                CanonicalizeHostname \
+                CanonicalizeMaxDots \
+                CanonicalizePermittedCNAMEs \
                 ChallengeResponseAuthentication \
                 CheckHostIP \
                 Cipher \
@@ -390,11 +420,13 @@ _ssh () {
                 HashKnownHosts \
                 Host \
                 HostbasedAuthentication \
+                HostbasedKeyTypes \
                 HostKeyAlgorithms \
                 HostKeyAlias \
                 HostName \
                 IdentitiesOnly \
                 IdentityFile \
+                IgnoreUnknown \
                 IPQoS \
                 KbdInteractiveAuthentication \
                 KbdInteractiveDevices \
@@ -412,17 +444,22 @@ _ssh () {
                 PreferredAuthentications \
                 Protocol \
                 ProxyCommand \
+                ProxyUseFdpass \
                 PubkeyAuthentication \
                 RekeyLimit \
                 RemoteForward \
                 RequestTTY \
+                RevokedHostKeys \
                 RhostsRSAAuthentication \
                 RSAAuthentication \
                 SendEnv \
                 ServerAliveCountMax \
                 ServerAliveInterval \
+                StreamLocalBindMask \
+                StreamLocalBindUnlink \
                 StrictHostKeyChecking \
                 TCPKeepAlive \
+                Transport \
                 Tunnel \
                 TunnelDevice \
                 UpdateHostKeys \
