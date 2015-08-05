@@ -5,6 +5,9 @@
 	* unposted: Completion/Unix/Command/_ssh: use -q for the
 	option suffix
 
+	* Christian Hesse: 35991: Completion/Unix/Command/_ssh: add ssh
+	option FingerprintHash
+
 2015-08-05  Oliver Kiddle <opk@zsh.org>
 
 	* Eric Cook: 35973: Completion/BSD/Command/_systat,

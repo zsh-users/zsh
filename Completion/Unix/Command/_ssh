@@ -219,6 +219,10 @@ _ssh () {
           _message -e 'escape character (or `none'\'')'
           ret=0
           ;;
+        (#i)fingerprinthash=*)
+          _values 'fingerprint hash algorithm' \
+              md5 ripemd160 sha1 sha256 sha384 sha512 && ret=0
+          ;;
         (#i)forwardx11timeout=*)
           _message -e 'timeout'
           ret=0
@@ -408,6 +412,7 @@ _ssh () {
                 EnableSSHKeysign \
                 EscapeChar \
                 ExitOnForwardFailure \
+                FingerprintHash \
                 ForwardAgent \
                 ForwardX11 \
                 ForwardX11Timeout \
