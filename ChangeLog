@@ -1,3 +1,9 @@
+2015-08-08  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 35928: Src/utils.c, Doc/Zsh/prompt.yo: date/time format such
+	as '%-m' should work even if strftime(3) doesn't support it.
+	Also clarify document.
+
 2015-08-05  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 35989: Completion/Unix/Command/_ssh: update to 6.9

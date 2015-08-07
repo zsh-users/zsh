@@ -3006,7 +3006,6 @@ morefmt:
 
 		*buf++ = '0' + (hr12 % 10);
 		break;
-#ifndef HAVE_STRFTIME
 	    case 'd':
 		if (tm->tm_mday > 9 || !strip)
 		    *buf++ = '0' + tm->tm_mday / 10;
@@ -3032,6 +3031,7 @@ morefmt:
 		    *buf++ = '0' + (tm->tm_year / 10) % 10;
 		*buf++ = '0' + tm->tm_year % 10;
 		break;
+#ifndef HAVE_STRFTIME
 	    case 'Y':
 	    {
 		int year, digits, testyear;
