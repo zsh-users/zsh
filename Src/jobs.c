@@ -1189,8 +1189,11 @@ pipecleanfilelist(LinkList filelist, int proc_subst_only)
     while (node) {
 	Jobfile jf = (Jobfile)getdata(node);
 	if (jf->is_fd &&
-	    (!proc_subst_only ||
-	     fdtable[jf->u.fd] == FDT_PROC_SUBST)) {
+	    (!proc_subst_only
+#ifdef FDT_PROC_SUBST
+	     || fdtable[jf->u.fd] == FDT_PROC_SUBST
+#endif
+		)) {
 	    LinkNode next = nextnode(node);
 	    zclose(jf->u.fd);
 	    (void)remnode(filelist, node);

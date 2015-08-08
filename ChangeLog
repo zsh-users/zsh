@@ -1,3 +1,7 @@
+2015-08-09  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 35929: Src/jobs.c: protect FDT_PROC_SUBST by #ifdef
+
 2015-08-08  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 35928: Src/utils.c, Doc/Zsh/prompt.yo: date/time format such
