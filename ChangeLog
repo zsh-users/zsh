@@ -1,3 +1,8 @@
+2015-08-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 36008: Src/builtin.c: trap: Fix listing of traps created
+	under non-alias non-canonical signal spelling
+
 2015-08-08  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 35954: Doc/Zsh/mod_system.yo: sysopen -u is not optional

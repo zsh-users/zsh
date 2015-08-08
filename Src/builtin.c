@@ -6565,8 +6565,14 @@ bin_trap(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    zwarnnam(name, "undefined signal: %s", *argv);
 	    break;
 	}
-	if (!strcmp(sigs[sig], *argv))
+	if (idigit(**argv) ||
+	    !strcmp(sigs[sig], *argv) ||
+	    (!strncmp("SIG", *argv, 3) && !strcmp(sigs[sig], *argv+3))) {
+	    /* The signal was specified by number or by canonical name (with
+	     * or without SIG prefix).
+	     */
 	    flags = 0;
+	}
 	else {
 	    /*
 	     * Record that the signal is used under an assumed name.
