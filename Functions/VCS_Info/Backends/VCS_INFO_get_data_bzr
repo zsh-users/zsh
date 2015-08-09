@@ -6,7 +6,7 @@
 setopt localoptions noksharrays extendedglob NO_shwordsplit
 local bzrbase bzrbr bzr_changes bzr_type
 local -a bzrinfo
-local -xA hook_com bzr_info
+local -A hook_com bzr_info
 
 VCS_INFO_bzr_get_info() {
     bzrinfo=( ${(s.:.)$( ${vcs_comm[cmd]} version-info --custom \

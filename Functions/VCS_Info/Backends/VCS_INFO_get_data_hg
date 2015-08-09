@@ -16,7 +16,7 @@ local -a hgid_args defrevformat defbranchformat \
     hgbmarks mqpatches mqseries mqguards mqunapplied hgmisc \
     i_patchguards i_negguards i_posguards
 
-local -xA hook_com
+local -A hook_com
 
 hgbase=${vcs_comm[basedir]}
 rrn=${hgbase:t}

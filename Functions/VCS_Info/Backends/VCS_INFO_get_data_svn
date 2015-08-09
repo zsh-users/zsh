@@ -8,7 +8,7 @@ setopt localoptions noksharrays extendedglob NO_shwordsplit
 local svnbase svnbranch a b rrn
 local -i rc
 local -A svninfo parentinfo cwdinfo
-local -xA hook_com
+local -A hook_com
 
 svnbase=".";
 svninfo=()

@@ -6,7 +6,7 @@
 setopt localoptions extendedglob
 local p4base a b
 local -A p4info
-local -xA hook_com
+local -A hook_com
 
 ${vcs_comm[cmd]} info | while IFS=: read a b; do p4info[${a// /_}]="${b## #}"; done
 p4base=${vcs_comm[basedir]}

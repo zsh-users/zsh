@@ -5,7 +5,7 @@
 emulate -L zsh
 
 local -i i
-local -ix maxexports
+local -i maxexports
 
 VCS_INFO_maxexports
 for i in {0..$((maxexports - 1))} ; do

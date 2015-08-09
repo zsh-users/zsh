@@ -1,3 +1,18 @@
+2015-08-12  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 36077: Functions/VCS_Info/Backends/VCS_INFO_get_data_bzr,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_p4,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_svk,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_svn,
+	Functions/VCS_Info/VCS_INFO_formats,
+	Functions/VCS_Info/VCS_INFO_hook,
+	Functions/VCS_Info/VCS_INFO_quilt,
+	Functions/VCS_Info/VCS_INFO_set, Functions/VCS_Info/vcs_info,
+	Functions/VCS_Info/vcs_info_lastmsg,
+	Functions/VCS_Info/vcs_info_printsys: vcs_info: stop exporting
+	everything
+
 2015-08-11  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36108: NEWS: list of major changes so far since 5.0.8

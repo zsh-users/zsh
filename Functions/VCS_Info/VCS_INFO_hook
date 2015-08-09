@@ -3,8 +3,8 @@
 ## Distributed under the same BSD-ish license as zsh itself.
 
 local hook static func
-local -x context hook_name
-local -xi ret
+local context hook_name
+local -i ret
 local -a hooks tmp
 local -i debug
 

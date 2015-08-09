@@ -5,7 +5,7 @@
 setopt localoptions noksharrays NO_shwordsplit
 local msg tmp
 local -i i
-local -xA hook_com
+local -A hook_com
 # The _origs are needed because hooks can change values and there would
 # be no way to get the originals back for later hooks (a hook is run for
 # each message, that's being created).
@@ -68,7 +68,7 @@ if [[ -n ${hook_com[unstaged]} ]] ; then
 fi
 
 if [[ ${quiltmode} != 'standalone' ]] && VCS_INFO_hook "pre-addon-quilt"; then
-    local -x REPLY
+    local REPLY
     VCS_INFO_quilt addon
     hook_com[quilt]="${REPLY}"
     unset REPLY

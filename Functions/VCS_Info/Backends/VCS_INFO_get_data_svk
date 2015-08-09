@@ -4,7 +4,7 @@
 
 setopt localoptions NO_shwordsplit
 local svkbranch svkbase
-local -xA hook_com
+local -A hook_com
 
 svkbase=${vcs_comm[basedir]}
 rrn=${svkbase:t}

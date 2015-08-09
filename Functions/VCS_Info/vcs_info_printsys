@@ -7,7 +7,7 @@ setopt extendedglob
 
 local sys
 local -a disabled enabled
-local -Ax vcs_comm
+local -A vcs_comm
 
 zstyle -a ":vcs_info:-init-:${1:-default}:-all-" "enable" enabled
 (( ${#enabled} == 0 )) && enabled=( all )

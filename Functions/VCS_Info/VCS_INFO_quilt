@@ -86,9 +86,9 @@ function VCS_INFO_quilt() {
     local mode="$1"
     local patches pc tmp qstring root
     local -i ret
-    local -x context
+    local context
     local -a applied unapplied all applied_string unapplied_string quiltcommand quilt_env
-    local -Ax hook_com
+    local -A hook_com
 
     context=":vcs_info:${vcs}.quilt-${mode}:${usercontext}:${rrn}"
     zstyle -t "${context}" use-quilt || return 1
@@ -183,7 +183,7 @@ function VCS_INFO_quilt() {
         VCS_INFO_set
         ;;
     (addon)
-        # When VCS_INFO_quilt() is called with "addon" a "local -x REPLY" variable
+        # When VCS_INFO_quilt() is called with "addon" a "local REPLY" variable
         # should be in place. That variable can be unset after it's being used.
         REPLY="${qstring}"
         ;;
