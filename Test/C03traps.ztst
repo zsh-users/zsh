@@ -64,6 +64,17 @@
 0:EXIT traps on a script
 >Exited.
 
+  trap -
+  trap
+  trap int INT
+  trap sigterm SIGTERM
+  trap quit 3
+  trap
+0: Outputting traps correctly
+>trap -- int INT
+>trap -- quit QUIT
+>trap -- sigterm TERM
+
   fn1() {
     trap -
     trap
