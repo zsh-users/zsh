@@ -3149,9 +3149,11 @@ zftp_cleanup(void)
 	zfclose(zfsess != cursess);
     }
     zsfree(lastmsg);
+    lastmsg = NULL;
     zfunsetparam("ZFTP_SESSION");
     freelinklist(zfsessions, (FreeFunc) freesession);
     zfree(zfstatusp, sizeof(int)*zfsesscnt);
+    zfstatusp = NULL;
 }
 
 static int

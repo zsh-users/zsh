@@ -16,6 +16,9 @@
 
 2015-08-09  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 36026: Src/Modules/zftp.c: zero freed pointers in cleanup_()
+	in case the module is re-loaded after unloading.
+
 	* 36022: Src/loop.c: fix bug that some loop constructs could
 	not be interrupted if all they did was variable assignments or
 	math expressions
