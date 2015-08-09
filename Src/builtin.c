@@ -2674,7 +2674,9 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    && (locallevel == pm->level || !(on & PM_LOCAL))) {
 	    if (pm->node.flags & PM_TIED) {
 		unqueue_signals();
-		if (!strcmp(asg->name, pm->ename)) {
+		if (PM_TYPE(pm->node.flags) != PM_SCALAR) {
+		    zwarnnam(name, "already tied as non-scalar: %s", asg0.name);
+		} else if (!strcmp(asg->name, pm->ename)) {
 		    /*
 		     * Already tied in the fashion requested.
 		     */

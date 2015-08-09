@@ -1,5 +1,8 @@
 2015-08-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 26027: Src/builtin.c: fix retying variables in opposite
+	order (should be an error).
+
 	* 36025:Src/Zle/zle_tricky.c: Catch another case of context in
 	get_comp_string():  after "foo=bar; setopt " we didn't recognise
 	"setopt" as the command.  Attempt to do this without actually

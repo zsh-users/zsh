@@ -1069,6 +1069,11 @@
 >a:b a b
 >x:y:z
 
+  typeset -T tied1 tied2 +
+  typeset -T tied2 tied1 +
+1:Attempts to swap tied variables are safe but futile
+?(eval):typeset:2: already tied as non-scalar: tied2
+
   string='look for a match in here'
   if [[ ${string%%(#b)(match)*} = "look for a " ]]; then
     print $match[1] $mbegin[1] $mend[1] $string[$mbegin[1],$mend[1]]
