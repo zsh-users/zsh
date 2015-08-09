@@ -1175,9 +1175,19 @@ get_comp_string(void)
     do {
         qsub = noword = 0;
 
-	lincmd = ((incmdpos && !ins && !incond) ||
-		  (oins == 2 && wordpos == 2) ||
-		  (ins == 3 && wordpos == 1));
+	/*
+	 * pws: added cmdtok == NULLTOK test as fallback for detecting
+	 * we haven't had a command yet.  This is a cop out: it's needed
+	 * after SEPER because of bizarre and incomprehensible dance
+	 * that we otherwise do involving the "ins" flag when you might
+	 * have thought we'd just reset everything because we're now
+	 * considering a new command.  Consequently, although this looks
+	 * relatively harmless by itself, it's probably incomplete.
+	 */
+	lincmd = (incmdpos && !ins && !incond) ||
+	    (oins == 2 && wordpos == 2) ||
+	    (ins == 3 && wordpos == 1) ||
+	    (cmdtok == NULLTOK && !incond);
 	linredir = (inredir && !ins);
 	oins = ins;
 	/* Get the next token. */
