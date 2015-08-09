@@ -1207,6 +1207,8 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	}
     }
 
+    queue_signals();	/* Any time we manage memory or global state */
+
     intrap++;
     *sigtr |= ZSIG_IGNORED;
 
@@ -1244,7 +1246,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 
 	sfcontext = SFC_SIGNAL;
 	incompfunc = 0;
-	doshfunc((Shfunc)sigfn, args, 1);
+	doshfunc((Shfunc)sigfn, args, 1);	/* manages signal queueing */
 	sfcontext = osc;
 	incompfunc= old_incompfunc;
 	freelinklist(args, (FreeFunc) NULL);
@@ -1254,7 +1256,7 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
 	trap_state = TRAP_STATE_PRIMED;
 	trapisfunc = isfunc = 0;
 
-	execode((Eprog)sigfn, 1, 0, "trap");
+	execode((Eprog)sigfn, 1, 0, "trap");	/* manages signal queueing */
     }
     runhookdef(AFTERTRAPHOOK, NULL);
 
@@ -1321,6 +1323,8 @@ dotrapargs(int sig, int *sigtr, void *sigfn)
     if (*sigtr != ZSIG_IGNORED)
 	*sigtr &= ~ZSIG_IGNORED;
     intrap--;
+
+    unqueue_signals();
 }
 
 /* Standard call to execute a trap for a given signal. */

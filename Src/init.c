@@ -105,6 +105,7 @@ loop(int toplevel, int justonce)
     Eprog prog;
     int err, non_empty = 0;
 
+    queue_signals();
     pushheap();
     if (!toplevel)
 	zcontext_save();
@@ -126,7 +127,9 @@ loop(int toplevel, int justonce)
 		 * no matter what.
 		 */
 		errflag = 0;
+		unqueue_signals();
 		preprompt();
+		queue_signals();
 		if (stophist != 3)
 		    hbegin(1);
 		else
@@ -218,6 +221,7 @@ loop(int toplevel, int justonce)
 	if (((!interact || sourcelevel) && errflag) || retflag)
 	    break;
 	if (isset(SINGLECOMMAND) && toplevel) {
+	    dont_queue_signals();
 	    if (sigtrapped[SIGEXIT])
 		dotrap(SIGEXIT);
 	    exit(lastval);
@@ -229,6 +233,7 @@ loop(int toplevel, int justonce)
     if (!toplevel)
 	zcontext_restore();
     popheap();
+    unqueue_signals();
 
     if (err)
 	return LOOP_ERROR;

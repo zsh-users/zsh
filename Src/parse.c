@@ -456,6 +456,8 @@ init_parse_status(void)
 void
 init_parse(void)
 {
+    queue_signals();
+
     if (ecbuf) zfree(ecbuf, eclen);
 
     ecbuf = (Wordcode) zalloc((eclen = EC_INIT_SIZE) * sizeof(wordcode));
@@ -466,6 +468,8 @@ init_parse(void)
     ecnfunc = 0;
 
     init_parse_status();
+
+    unqueue_signals();
 }
 
 /* Build eprog. */
@@ -487,6 +491,8 @@ bld_eprog(int heap)
 {
     Eprog ret;
     int l;
+
+    queue_signals();
 
     ecadd(WCB_END());
 
@@ -510,6 +516,8 @@ bld_eprog(int heap)
 
     zfree(ecbuf, eclen);
     ecbuf = NULL;
+
+    unqueue_signals();
 
     return ret;
 }

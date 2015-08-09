@@ -14,6 +14,16 @@
 	understanding what the command context code is attempting to do
 	after a command separator.
 
+2015-08-09  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36022: Src/loop.c: fix bug that some loop constructs could
+	not be interrupted if all they did was variable assignments or
+	math expressions
+
+	* 36022: Src/exec.c, Src/init.c, Src/input.c, Src/parse.c,
+	Src/signals.c: revise signal queueing to better control the
+	circumtances in which trap handlers are executed
+
 2015-08-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 36008: Src/builtin.c: trap: Fix listing of traps created

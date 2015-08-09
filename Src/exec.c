@@ -1121,10 +1121,14 @@ execsimple(Estate state)
 	    fflush(xtrerr);
 	}
 	lv = (errflag ? errflag : cmdoutval);
-    } else if (code == WC_FUNCDEF) {
-	lv = execfuncdef(state, NULL);
     } else {
-	lv = (execfuncs[code - WC_CURSH])(state, 0);
+	int q = queue_signal_level();
+	dont_queue_signals();
+	if (code == WC_FUNCDEF)
+	    lv = execfuncdef(state, NULL);
+	else
+	    lv = (execfuncs[code - WC_CURSH])(state, 0);
+	restore_queue_signals(q);
     }
 
     thisjob = otj;
@@ -1157,6 +1161,8 @@ execlist(Estate state, int dont_change_job, int exiting)
      * noerrexit here if the sublist is not of type END.
      */
     int oldnoerrexit = noerrexit;
+
+    queue_signals();
 
     cj = thisjob;
     old_pline_level = pline_level;
@@ -1428,6 +1434,8 @@ sublist_done:
 	/* Make sure this doesn't get executed again. */
 	sigtrapped[SIGEXIT] = 0;
     }
+
+    unqueue_signals();
 }
 
 /* Execute a pipeline.                                                *
@@ -1456,6 +1464,14 @@ execpline(Estate state, wordcode slcode, int how, int last1)
     else if (slflags & WC_SUBLIST_NOT)
 	last1 = 0;
 
+    /* If trap handlers are allowed to run here, they may start another
+     * external job in the middle of us starting this one, which can
+     * result in jobs being reaped before their job table entries have
+     * been initialized, which in turn leads to waiting forever for
+     * jobs that no longer exist.  So don't do that.
+     */
+    queue_signals();
+
     pj = thisjob;
     ipipe[0] = ipipe[1] = opipe[0] = opipe[1] = 0;
     child_block();
@@ -1468,6 +1484,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
      */
     if ((thisjob = newjob = initjob()) == -1) {
 	child_unblock();
+	unqueue_signals();
 	return 1;
     }
     if (how & Z_TIMED)
@@ -1523,6 +1540,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 	else
 	    spawnjob();
 	child_unblock();
+	unqueue_signals();
 	/* Executing background code resets shell status */
 	return lastval = 0;
     } else {
@@ -1580,15 +1598,18 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		}
 		if (!(jn->stat & STAT_LOCKED)) {
 		    updated = hasprocs(thisjob);
-		    waitjobs();
+		    waitjobs();		/* deals with signal queue */
 		    child_block();
 		} else
 		    updated = 0;
 		if (!updated &&
 		    list_pipe_job && hasprocs(list_pipe_job) &&
 		    !(jobtab[list_pipe_job].stat & STAT_STOPPED)) {
+		    int q = queue_signal_level();
 		    child_unblock();
+		    dont_queue_signals();
 		    child_block();
+		    restore_queue_signals(q);
 		}
 		if (list_pipe_child &&
 		    jn->stat & STAT_DONE &&
@@ -1672,6 +1693,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    break;
 	    }
 	    child_unblock();
+	    unqueue_signals();
 
 	    if (list_pipe && (lastval & 0200) && pj >= 0 &&
 		(!(jn->stat & STAT_INUSE) || (jn->stat & STAT_DONE))) {
@@ -3391,6 +3413,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    fflush(xtrerr);
 	}
     } else if (isset(EXECOPT) && !errflag) {
+	int q = queue_signal_level();
 	/*
 	 * We delay the entersubsh() to here when we are exec'ing
 	 * the current shell (including a fake exec to run a builtin then
@@ -3431,11 +3454,14 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    } else
 		redir_prog = NULL;
 
+	    dont_queue_signals();
 	    lastval = execfuncdef(state, redir_prog);
+	    restore_queue_signals(q);
 	}
 	else if (type >= WC_CURSH) {
 	    if (last1 == 1)
 		do_exec = 1;
+	    dont_queue_signals();
 	    if (type == WC_AUTOFN) {
 		/*
 		 * We pre-loaded this to get any redirs.
@@ -3444,6 +3470,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		lastval =  execautofn_basic(state, do_exec);
 	    } else
 		lastval = (execfuncs[type - WC_CURSH])(state, do_exec);
+	    restore_queue_signals(q);
 	} else if (is_builtin || is_shfunc) {
 	    LinkList restorelist = 0, removelist = 0;
 	    /* builtin or shell function */
@@ -3610,7 +3637,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    }
 		    state->pc = opc;
 		}
+		dont_queue_signals();
 		lastval = execbuiltin(args, assigns, (Builtin) hn);
+		restore_queue_signals(q);
 		fflush(stdout);
 		if (save[1] == -2) {
 		    if (ferror(stdout)) {
@@ -4820,11 +4849,9 @@ execshfunc(Shfunc shf, LinkList args)
     if ((osfc = sfcontext) == SFC_NONE)
 	sfcontext = SFC_DIRECT;
     xtrerr = stderr;
-    unqueue_signals();
 
     doshfunc(shf, args, 0);
 
-    queue_signals();
     sfcontext = osfc;
     free(cmdstack);
     cmdstack = ocs;
@@ -5038,6 +5065,8 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 #ifdef MAX_FUNCTION_DEPTH
     static int funcdepth;
 #endif
+
+    queue_signals();	/* Lots of memory and global state changes coming */
 
     pushheap();
 
@@ -5261,6 +5290,8 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     }
     popheap();
 
+    unqueue_signals();
+
     /*
      * Exit with a tidy up.
      * Only leave if we're at the end of the appropriate function ---
@@ -5299,6 +5330,8 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
     int cont, ouu;
     char *ou;
 
+    queue_signals();
+
     ou = zalloc(ouu = underscoreused);
     if (ou)
 	memcpy(ou, zunderscore, underscoreused);
@@ -5320,12 +5353,14 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
 	wrap = wrap->next;
     }
     startparamscope();
-    execode(prog, 1, 0, "shfunc");
+    execode(prog, 1, 0, "shfunc");	/* handles signal unqueueing */
     if (ou) {
 	setunderscore(ou);
 	zfree(ou, ouu);
     }
     endparamscope();
+
+    unqueue_signals();
 }
 
 /* Search fpath for an undefined function.  Finds the file, and returns the *

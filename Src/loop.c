@@ -56,6 +56,10 @@ execfor(Estate state, int do_exec)
     char *name, *str, *cond = NULL, *advance = NULL;
     zlong val = 0;
     LinkList vars = NULL, args = NULL;
+    int old_simple_pline = simple_pline;
+
+    /* See comments in execwhile() */
+    simple_pline = 1;
 
     end = state->pc + WC_FOR_SKIP(code);
 
@@ -69,10 +73,12 @@ execfor(Estate state, int do_exec)
 	    fprintf(xtrerr, "%s\n", str2);
 	    fflush(xtrerr);
 	}
-	if (!errflag)
+	if (!errflag) {
 	    matheval(str);
+	}
 	if (errflag) {
 	    state->pc = end;
+	    simple_pline = old_simple_pline;
 	    return 1;
 	}
 	cond = ecgetstr(state, EC_NODUP, &ctok);
@@ -85,12 +91,14 @@ execfor(Estate state, int do_exec)
 
 	    if (!(args = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok))) {
 		state->pc = end;
+		simple_pline = old_simple_pline;
 		return 0;
 	    }
 	    if (htok) {
 		execsubst(args);
 		if (errflag) {
 		    state->pc = end;
+		    simple_pline = old_simple_pline;
 		    return 1;
 		}
 	    }
@@ -198,6 +206,7 @@ execfor(Estate state, int do_exec)
     popheap();
     cmdpop();
     loops--;
+    simple_pline = old_simple_pline;
     state->pc = end;
     return lastval;
 }
@@ -214,6 +223,10 @@ execselect(Estate state, UNUSED(int do_exec))
     FILE *inp;
     size_t more;
     LinkList args;
+    int old_simple_pline = simple_pline;
+
+    /* See comments in execwhile() */
+    simple_pline = 1;
 
     end = state->pc + WC_FOR_SKIP(code);
     name = ecgetstr(state, EC_NODUP, NULL);
@@ -229,18 +242,21 @@ execselect(Estate state, UNUSED(int do_exec))
 
 	if (!(args = ecgetlist(state, *state->pc++, EC_DUPTOK, &htok))) {
 	    state->pc = end;
+	    simple_pline = old_simple_pline;
 	    return 0;
 	}
 	if (htok) {
 	    execsubst(args);
 	    if (errflag) {
 		state->pc = end;
+		simple_pline = old_simple_pline;
 		return 1;
 	    }
 	}
     }
     if (!args || empty(args)) {
 	state->pc = end;
+	simple_pline = old_simple_pline;
 	return 0;
     }
     loops++;
@@ -315,6 +331,7 @@ execselect(Estate state, UNUSED(int do_exec))
     popheap();
     fclose(inp);
     loops--;
+    simple_pline = old_simple_pline;
     state->pc = end;
     return lastval;
 }
@@ -382,6 +399,7 @@ execwhile(Estate state, UNUSED(int do_exec))
     Wordcode end, loop;
     wordcode code = state->pc[-1];
     int olderrexit, oldval, isuntil = (WC_WHILE_TYPE(code) == WC_WHILE_UNTIL);
+    int old_simple_pline = simple_pline;
 
     end = state->pc + WC_WHILE_SKIP(code);
     olderrexit = noerrexit;
@@ -396,8 +414,6 @@ execwhile(Estate state, UNUSED(int do_exec))
         /* This is an empty loop.  Make sure the signal handler sets the
         * flags and then just wait for someone hitting ^C. */
 
-        int old_simple_pline = simple_pline;
-
         simple_pline = 1;
 
         while (!breaks)
@@ -409,7 +425,14 @@ execwhile(Estate state, UNUSED(int do_exec))
         for (;;) {
             state->pc = loop;
             noerrexit = 1;
+
+	    /* In case the test condition is a functional no-op,
+	     * make sure signal handlers recognize ^C to end the loop. */
+	    simple_pline = 1;
+
             execlist(state, 1, 0);
+
+	    simple_pline = old_simple_pline;
             noerrexit = olderrexit;
             if (!((lastval == 0) ^ isuntil)) {
                 if (breaks)
@@ -421,7 +444,14 @@ execwhile(Estate state, UNUSED(int do_exec))
                 lastval = oldval;
                 break;
             }
+
+	    /* In case the loop body is also a functional no-op,
+	     * make sure signal handlers recognize ^C as above. */
+	    simple_pline = 1;
+
             execlist(state, 1, 0);
+
+	    simple_pline = old_simple_pline;
             if (breaks) {
                 breaks--;
                 if (breaks || !contflag)
@@ -452,6 +482,10 @@ execrepeat(Estate state, UNUSED(int do_exec))
     wordcode code = state->pc[-1];
     int count, htok = 0;
     char *tmp;
+    int old_simple_pline = simple_pline;
+
+    /* See comments in execwhile() */
+    simple_pline = 1;
 
     end = state->pc + WC_REPEAT_SKIP(code);
 
@@ -484,6 +518,7 @@ execrepeat(Estate state, UNUSED(int do_exec))
     cmdpop();
     popheap();
     loops--;
+    simple_pline = old_simple_pline;
     state->pc = end;
     return lastval;
 }
