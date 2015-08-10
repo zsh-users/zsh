@@ -756,7 +756,7 @@ revision number. This style lets you modify how that string should look.
 )
 kindex(nvcsformats)
 item(tt(nvcsformats))(
-These "formats" are exported when we didn't detect a version control system
+These "formats" are set when we didn't detect a version control system
 for the current directory or tt(vcs_info) was disabled. This is useful if
 you want tt(vcs_info) to completely take over the generation of your
 prompt. You would do something like tt(PS1='${vcs_info_msg_0_}') to
@@ -775,7 +775,7 @@ behavior using hooks.
 kindex(max-exports)
 item(tt(max-exports))(
 Defines the maximum number of
-tt(vcs_info_msg_*_) variables tt(vcs_info) will export.
+tt(vcs_info_msg_*_) variables tt(vcs_info) will set.
 )
 kindex(enable)
 item(tt(enable))(
@@ -1224,16 +1224,15 @@ All functions named tt(VCS_INFO_*) are for internal use only.
 subsect(Variable Description)
 
 startitem()
-item(tt(${vcs_info_msg_)var(N)tt(_)}) (Note the trailing underscore))
-(
+item(tt(${vcs_info_msg_)var(N)tt(_}) (Note the trailing underscore))(
 Where var(N) is an integer, e.g., tt(vcs_info_msg_0_). These variables
 are the storage for the informational message the last tt(vcs_info) call
 has assembled. These are strongly connected to the tt(formats),
 tt(actionformats) and tt(nvcsformats) styles described above. Those styles
 are lists. The first member of that list gets expanded into
 tt(${vcs_info_msg_0_}), the second into tt(${vcs_info_msg_1_})
-and the Nth into tt(${vcs_info_msg_N-1_}). These parameters are
-exported into the environment. (See the tt(max-exports) style above.)
+and the Nth into tt(${vcs_info_msg_N-1_}). (See the tt(max-exports)
+style above.)
 )
 enditem()
 
