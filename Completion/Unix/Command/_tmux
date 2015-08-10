@@ -215,7 +215,7 @@ function _tmux-capture-pane() {
     args=(
         '-a[use alternate screen]'
         '-b[choose target buffer]:target buffer:__tmux-buffers'
-        '-C[escape non-printable characters as octal \ooo]'
+        '-C[escape non-printable characters as octal \\ooo]'
         '-e[include escape sequences for attributes etc]'
         '-E[specify last line to capture. - means last line of pane]'
         '-J[join wrapped lines and preserver trailing space]'
