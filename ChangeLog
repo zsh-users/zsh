@@ -38,6 +38,9 @@
 	* 36047: Completion/Unix/Command/_tmux: _tmux: Fix options with
 	changed scope
 
+	* 36051: Completion/Unix/Command/_tmux: _tmux: Remove support for
+	old options
+
 2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36045: Test/A05execution.ztst: make effect of failures
