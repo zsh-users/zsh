@@ -1605,7 +1605,7 @@ function _tmux() {
     local curcontext="${curcontext}"
     local mode state ret=1
     local -a args
-    local -x tmuxcommand
+    local tmuxcommand
     local tmux_describe=
 
     args=(
@@ -1665,7 +1665,7 @@ function _tmux() {
 # description generation follows; only done on 1st _tmux call.
 local f desc
 local -A rev
-local -x tmux_describe
+local tmux_describe
 tmux_describe='yes, please'
 for f in ${(k)_tmux_aliasmap} ; do
     rev+=( ${_tmux_aliasmap[$f]} $f )
