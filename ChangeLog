@@ -1,3 +1,8 @@
+2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 35885: Doc/Zsh/mod_system.zo: document how to close
+	fd's opened with sysopen.
+
 2015-08-09  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36033: Src/glob.c, Src/pattern.c: a few more queue_signals()

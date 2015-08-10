@@ -68,6 +68,11 @@ item(tt(trunc))(
 truncate file to size 0
 )
 enditem()
+
+To close the file, use one of the following:
+
+example(tt(exec {)var(fd)tt(}<&-)
+tt(exec {)var(fd)tt(}>&-))
 )
 findex(sysread)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
