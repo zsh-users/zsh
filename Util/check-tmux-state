@@ -40,6 +40,10 @@ differences=none
 # information. For that, we need to put a few stubs into place so sourcing the
 # file doesn't blow up in our face.
 
+# We need to disable the new "local" keyword to make our data retrieval trick
+# work:
+disable -r local
+
 function _arguments () { }
 function _describe () { }
 function local () { }
