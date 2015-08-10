@@ -1,5 +1,8 @@
 2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* not quite posted: Src/Modules/socket.c, Src/Modules/tcp.c:
+	check for error return before testing for EINTR.
+
 	* Joshua Krusell: 36039: Src/Modules/socket.c,
 	Src/Modules/tcp.c: Restart socket commands on EINTR.
 

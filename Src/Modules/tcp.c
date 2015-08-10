@@ -538,7 +538,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	len = sizeof(sess->peer.in);
 	do {
 	    rfd = accept(lfd, (struct sockaddr *)&sess->peer.in, &len);
-	} while (errno == EINTR && !errflag);
+	} while (rfd < 0 && errno == EINTR && !errflag);
 
 	if (rfd == -1) {
 	    zwarnnam(nam, "could not accept connection: %e", errno);
