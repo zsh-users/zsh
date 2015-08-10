@@ -75,7 +75,7 @@
 	* 36069: Completion/Unix/Command/_tmux: _tmux: Fix \ooo display in
 	completion list
 
-	* 36075: Util/check-tmux-state: Disable ‘local’ keyword in
+	* 36075: Util/check-tmux-state: Disable "local" keyword in
 	script to make data retrieval work
 
 2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
