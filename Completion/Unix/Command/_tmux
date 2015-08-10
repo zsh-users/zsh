@@ -58,6 +58,8 @@ _tmux_aliasmap=(
     attach      attach-session
     detach      detach-client
     has         has-session
+    lockc       lock-client
+    locks       lock-session
     lsc         list-clients
     lscm        list-commands
     ls          list-sessions
@@ -90,6 +92,7 @@ _tmux_aliasmap=(
     next        next-window
     pipep       pipe-pane
     prev        previous-window
+    prevl       previous-layout
     renamew     rename-window
     resizep     resize-pane
     respawnp    respawn-pane
