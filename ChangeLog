@@ -11,6 +11,9 @@
 
 	* 36063: Completion/Unix/Command/_tmux: _tmux: Remove dead code
 
+	* 36050: Completion/Unix/Command/_tmux: _tmux: Don't unset, set
+	empty in local scope
+
 2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36045: Test/A05execution.ztst: make effect of failures

@@ -1606,7 +1606,7 @@ function _tmux() {
     local mode state ret=1
     local -a args
     local -x tmuxcommand
-    unset tmux_describe
+    local tmux_describe=
 
     args=(
         '-2[force using 256 colours]'
