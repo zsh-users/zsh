@@ -1305,8 +1305,12 @@ function __tmux-option-guard() {
             'buffer-limit:'${int_guard}
             'default-terminal:MSG:terminal string'
             'escape-time:'${int_guard}
+            'exit-unattached:DESC:on off'
+            'focus-events:DESC:on off'
+            'history-file:_path-files -g "*(-.)"'
             'message-limit:'${int_guard}
             'quiet:DESC:on off'
+            'set-clipboard:DESC:on off'
             'terminal-overrides:MSG:overrides string'
         )
     else
@@ -1452,8 +1456,12 @@ function __tmux-server-options() {
         'buffer-limit:number of buffers kept per session'
         'default-terminal:default terminal definition string'
         'escape-time:set timeout to detect single escape characters (in msecs)'
+        'exit-unattached:make server exit if it has no attached clients'
+        'focus-events:request focus events from terminal'
+        'history-file:tmux command history file name'
         'message-limit:set size of message log per client'
         'quiet:enable/disable the display of various informational messages'
+        'set-clipboard:use esc sequences to set terminal clipboard'
         'terminal-overrides:override terminal descriptions'
     )
     _describe -t tmux-server-options 'tmux server option' tmux_server_options
