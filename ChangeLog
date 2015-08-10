@@ -1,3 +1,8 @@
+2015-08-10  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 36046: Completion/Unix/Command/_tmux: _tmux: Update command line
+	options
+
 2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36045: Test/A05execution.ztst: make effect of failures
