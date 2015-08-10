@@ -487,6 +487,12 @@ wait_for_processes(void)
 	    break;
 	}
 
+	/* This is necessary to be sure queueing_enabled > 0 when
+	 * we enter printjob() from update_job(), so that we don't
+	 * decrement to zero in should_report_time() and improperly
+	 * run other handlers in the middle of processing this one */
+	queue_signals();
+
 	/*
 	 * Find the process and job containing this pid and
 	 * update it.
@@ -536,6 +542,8 @@ wait_for_processes(void)
 		    WEXITSTATUS(status)));
 	    addbgstatus(pid, val);
 	}
+
+	unqueue_signals();
     }
 }
 
