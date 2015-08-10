@@ -47,6 +47,9 @@
 	* 36055: Completion/Unix/Command/_tmux: _tmux: Add support for new
 	server options
 
+	* 36061: Completion/Unix/Command/_tmux: _tmux: Add support for new
+	window options
+
 2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36045: Test/A05execution.ztst: make effect of failures

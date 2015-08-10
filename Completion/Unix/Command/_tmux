@@ -1316,8 +1316,10 @@ function __tmux-option-guard() {
     else
         options=(
             'aggressive-resize:DESC:on off'
+            'allow-rename:DESC:on off'
             'alternate-screen:DESC:on off'
             'automatic-rename:DESC:on off'
+            'automatic-rename-format:DESC:__tmux-format'
             'clock-mode-colour:__tmux-colours'
             'clock-mode-style:DESC:12 24'
             'force-height:'${int_guard}
@@ -1325,12 +1327,28 @@ function __tmux-option-guard() {
             'main-pane-height:'${int_guard}
             'main-pane-width:'${int_guard}
             'mode-keys:DESC:vi emacs'
+            'mode-style:__tmux-style'
             'monitor-activity:DESC:on off'
+            'monitor-silence:DESC:on off'
+            'other-pane-height:'${int_guard}
+            'other-pane-width:'${int_guard}
+            'pane-active-border-style:__tmux-style'
+            'pane-base-index:'${int_guard}
+            'pane-border-style:__tmux-style'
             'remain-on-exit:DESC:on off'
             'synchronize-panes:DESC:on off'
             'utf8:DESC:on off'
+            'window-active-style:__tmux-style'
+            'window-status-activity-style:__tmux-style'
+            'window-status-bell-style:__tmux-style'
             'window-status-current-format:MSG:status format string'
+            'window-status-current-style:__tmux-style'
             'window-status-format:MSG:status format string'
+            'window-status-last-style:__tmux-style'
+            'window-status-separator:MSG:separator string'
+            'window-status-style:__tmux-style'
+            'window-style:__tmux-style'
+            'wrap-seach:DESC:on off'
             'xterm-keys:DESC:on off'
         )
     fi
@@ -1491,8 +1509,10 @@ function __tmux-window-options() {
     local -a tmux_window_options
     tmux_window_options=(
         'aggressive-resize:aggressively resize windows'
+        'allow-rename:allow programs to change window titles'
         'alternate-screen:allow alternate screen feature to be used'
         'automatic-rename:attempt to automatically rename windows'
+        'automatic-rename-format:format for automatic renames'
         'clock-mode-colour:set clock colour'
         'clock-mode-style:set clock hour format (12/24)'
         'force-height:force a windows to a certain height'
@@ -1500,12 +1520,28 @@ function __tmux-window-options() {
         'main-pane-height:set height for main-* layouts'
         'main-pane-width:set width for main-* layouts'
         'mode-keys:mode to use in copy and choice modes (vi/emacs)'
+        'mode-style:set window modes style'
         'monitor-activity:monitor window activity'
+        'monitor-silence:monitor window for inactivity'
+        'other-pane-height:height of other panes'
+        'other-pane-width:width of other panes'
+        'pane-active-border-style:style of border of active pane'
+        'pane-base-index:integer at which to start indexing panes'
+        'pane-border-style:style of border pane'
         'remain-on-exit:do not destroy windows after the program exits'
         'synchronize-panes:send input to all panes of a window'
         'utf8:assume UTF-8 sequences to appear in a window'
+        'window-active-style:style of active window'
+        'window-status-activity-style:style of status bar activity tag'
+        'window-status-bell-style:style of status bar bell tag'
         'window-status-current-format:set status line format for active window'
+        'window-status-current-style:style of current window in status bar'
         'window-status-format:set status line format for all but the active window'
+        'window-status-last-style:style of last window in status bar'
+        'window-status-separator:separator drawn between windows in status line'
+        'window-status-style:general status bar style'
+        'window-style:style of window'
+        'wrap-search:search wrap around at the end of a pane'
         'xterm-keys:generate xterm-style function key sequences'
     )
     _describe -t tmux-window-options 'tmux window option' tmux_window_options
