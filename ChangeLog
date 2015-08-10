@@ -17,6 +17,9 @@
 	* 36058: Completion/Unix/Command/_tmux: _tmux: No need to unset
 	local variables
 
+	* 36057: Completion/Unix/Command/_tmux: _tmux: Replay all
+	arguments when dispatching to new _tmux()
+
 2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36045: Test/A05execution.ztst: make effect of failures
