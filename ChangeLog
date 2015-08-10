@@ -23,6 +23,9 @@
 	* 36054: Completion/Unix/Command/_tmux: _tmux: "local -x" serves
 	no purpose
 
+	* 36049: Completion/Unix/Command/_tmux: _tmux: options =>
+	session_options
+
 2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36045: Test/A05execution.ztst: make effect of failures

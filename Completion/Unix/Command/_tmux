@@ -1423,9 +1423,9 @@ function __tmux-option-guard() {
     esac
 }
 
-function __tmux-options() {
-    local -a tmux_options
-    tmux_options=(
+function __tmux-session-options() {
+    local -a tmux_session_options
+    tmux_session_options=(
         'base-index:define where to start numbering'
         'bell-action:set action on window bell'
         'buffer-limit:number of buffers kept per session'
@@ -1479,7 +1479,7 @@ function __tmux-options() {
         'visual-bell:use visual bell instead of audible'
         'visual-content:display status line messages upon content changes'
     )
-    _describe -t tmux-options 'tmux option' tmux_options
+    _describe -t tmux-options 'tmux session option' tmux_session_options
 }
 
 function __tmux-options-complete() {
@@ -1488,7 +1488,7 @@ function __tmux-options-complete() {
     case ${state} in
         name_or_value)
             if (( CURRENT == 1 )) && [[ ${mode} == 'session' ]]; then
-                __tmux-options
+                __tmux-session-options
             elif (( CURRENT == 1 )) && [[ ${mode} == 'server' ]]; then
                 __tmux-server-options
             elif (( CURRENT == 1 )) && [[ ${mode} == 'window' ]]; then
