@@ -1254,10 +1254,14 @@ function __tmux-option-guard() {
     int_guard='_guard "[0-9]#" "'${opt}': numeric value"'
     if [[ ${mode} == 'session' ]]; then
         options=(
+            'assume-paste-time:'${int_guard}
             'base-index:'${int_guard}
             'bell-action:DESC:any none current'
+            'bell-on-alert:DESC:on off'
             'default-command:MSG:command string'
             'default-shell:MSG:shell executable'
+            'destroy-unattached:DESC:on off'
+            'detach-on-destroy:DESC:on off'
             'display-panes-colour:__tmux-colours'
             'display-panes-active-colour:__tmux-colours'
             'display-panes-time:'${int_guard}
@@ -1266,7 +1270,13 @@ function __tmux-option-guard() {
             'lock-after-time:'${int_guard}
             'lock-command:MSG:command string'
             'lock-server:DESC:on off'
+            'message-command-style:__tmux-style'
+            'message-style:__tmux-style'
+            'mouse:DESC:on off'
+            'mouse-utf8:DESC:on off'
             'prefix:MSG:comma-seperated key list'
+            'prefix2:MSG:secondary prefix key'
+            'renumber-windows:DESC:on off'
             'repeat-time:'${int_guard}
             'set-remain-on-exit:DESC:on off'
             'set-titles:DESC:on off'
@@ -1277,12 +1287,18 @@ function __tmux-option-guard() {
             'status-keys:DESC:vi emacs'
             'status-left:MSG:format string'
             'status-left-length:'${int_guard}
+            'status-left-style:__tmux-style'
+            'status-position:DESC:top bottom'
             'status-right:MSG:format string'
             'status-right-length:'${int_guard}
+            'status-right-style:__tmux-style'
+            'status-style:__tmux-style'
             'status-utf8:DESC:on off'
             'update-environment:MSG:string listing env. variables'
             'visual-activity:DESC:on off'
             'visual-bell:DESC:on off'
+            'visual-silence:DESC:on off'
+            'word-separators:MSG:separator string'
         )
     elif [[ ${mode} == 'server' ]]; then
         options=(
@@ -1340,10 +1356,14 @@ function __tmux-option-guard() {
 function __tmux-session-options() {
     local -a tmux_session_options
     tmux_session_options=(
+        'assume-paste-time:assume keys are pasted instead of typed if this fast'
         'base-index:define where to start numbering'
         'bell-action:set action on window bell'
+        'bell-on-alert:ring the terminal bell when an alert occurs'
         'default-command:default command for new windows'
         'default-shell:default shell executable'
+        'destroy-unattached:destroy session if no client is attached'
+        'detach-on-destroy:detach client if attached session is destroyed'
         'display-panes-colour:colour used for display-panes'
         'display-panes-active-colour:colour for active pane in display-panes'
         'display-panes-time:time (in msecs) of display-panes output'
@@ -1352,7 +1372,13 @@ function __tmux-session-options() {
         'lock-after-time:lock sessions after N seconds'
         'lock-command:command to run for locking a client'
         'lock-server:make lock-after-time lock the server instead of sessions'
+        'message-command-style:status line message command style'
+        'message-style:status line message style'
+        'mouse:enable mouse support'
+        'mouse-utf8:request utf8 mouse support'
         'prefix:comma seperated line of keys accepted as prefix key'
+        'prefix2:secondary prefix key'
+        'renumber-windows:renumber windows if a window is closed'
         'repeat-time:time for multiple commands without prefix-key presses'
         'set-remain-on-exit:set remain-on-exit window option'
         'set-titles:try to set xterm window titles'
@@ -1363,12 +1389,18 @@ function __tmux-session-options() {
         'status-keys:mode to use in status bar modes (vi/emacs)'
         'status-left:format to use left in status bar'
         'status-left-length:maximum length of the left part of the status bar'
+        'status-left-style:style of left part of status line'
+        'status-position:status line position'
         'status-right:format to use right in status bar'
         'status-right-length:maximum length of the right part of the status bar'
+        'status-right-style:style of right part of status line'
+        'status-style:style status line'
         'status-utf8:assume UTF-8 sequences to appear in status bar'
         'update-environment:list of variables to be copied to a session'\''s environment'
         'visual-activity:display status line messages upon activity'
         'visual-bell:use visual bell instead of audible'
+        'visual-silence:print a message if monitor-silence is on'
+        'word-separators:string of characters considered word separators'
     )
     _describe -t tmux-options 'tmux session option' tmux_session_options
 }
@@ -1441,6 +1473,10 @@ function __tmux-socket-name() {
     zstyle -s ":completion:${curcontext}:sockets" socketdir sdir || sdir="/tmp/tmux-${UID}"
     socks=(${sdir}/*(=:t))
     _wanted socket expl 'socket name' compadd ${expl} -- ${socks}
+}
+
+function __tmux-style() {
+    _message 'not implemented yet'
 }
 
 function __tmux-window-options() {

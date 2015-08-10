@@ -41,6 +41,9 @@
 	* 36051: Completion/Unix/Command/_tmux: _tmux: Remove support for
 	old options
 
+	* 36059: Completion/Unix/Command/_tmux: _tmux: Add new session
+	options
+
 2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36045: Test/A05execution.ztst: make effect of failures
