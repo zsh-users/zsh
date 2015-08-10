@@ -1,5 +1,8 @@
 2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Joshua Krusell: 36039: Src/Modules/socket.c,
+	Src/Modules/tcp.c: Restart socket commands on EINTR.
+
 	* 35885: Doc/Zsh/mod_system.zo: document how to close
 	fd's opened with sysopen.
 

@@ -191,8 +191,11 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 
 	len = sizeof(soun);
-	if ((rfd = accept(lfd, (struct sockaddr *)&soun, &len)) == -1)
-	{
+	do {
+	    rfd = accept(lfd, (struct sockaddr *)&soun, &len);
+	} while (errno == EINTR && !errflag);
+
+	if (rfd == -1) {
 	    zwarnnam(nam, "could not accept connection: %e", errno);
 	    return 1;
 	}

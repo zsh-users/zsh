@@ -536,8 +536,11 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	sess = zts_alloc(ZTCP_INBOUND);
 
 	len = sizeof(sess->peer.in);
-	if ((rfd = accept(lfd, (struct sockaddr *)&sess->peer.in, &len)) == -1)
-	{
+	do {
+	    rfd = accept(lfd, (struct sockaddr *)&sess->peer.in, &len);
+	} while (errno == EINTR && !errflag);
+
+	if (rfd == -1) {
 	    zwarnnam(nam, "could not accept connection: %e", errno);
 	    tcp_close(sess);
 	    return 1;
