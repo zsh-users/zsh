@@ -266,9 +266,11 @@ F:anonymous function, and a descriptor leak when backgrounding a pipeline
   wait $two
   print $?
   wait $one
-1:The status of recently exited background jobs is recorded
+  print $?
+0:The status of recently exited background jobs is recorded
 >3
 >2
+>1
 
 # Regression test for workers/34060 (patch in 34065)
   setopt ERR_EXIT NULL_GLOB

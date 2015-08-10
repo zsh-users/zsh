@@ -1,5 +1,8 @@
 2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 36045: Test/A05execution.ztst: make effect of failures
+	in wait test cleare.
+
 	* not quite posted: Src/Modules/socket.c, Src/Modules/tcp.c:
 	check for error return before testing for EINTR.
 
