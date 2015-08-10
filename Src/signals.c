@@ -528,8 +528,14 @@ wait_for_processes(void)
 	 * and is not equal to the current foreground job.
 	 */
 	if (jn && !(jn->stat & (STAT_CURSH|STAT_BUILTIN)) &&
-	    jn - jobtab != thisjob)
-	    addbgstatus(pid, (int)lastval2);
+	    jn - jobtab != thisjob) {
+	    int val = (WIFSIGNALED(status) ?
+		   0200 | WTERMSIG(status) :
+		   (WIFSTOPPED(status) ?
+		    0200 | WEXITSTATUS(status) :
+		    WEXITSTATUS(status)));
+	    addbgstatus(pid, val);
+	}
     }
 }
 
