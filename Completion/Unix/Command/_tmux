@@ -40,6 +40,21 @@
 #
 # The configuration for subcommand completions may be done in
 # this context: ':completion:*:*:tmux-<sub-command>:*:*'
+#
+# TODO:
+#
+# Missing sub-commands:
+#
+#   - choose-tree
+#   - last-pane
+#   - move-pane
+#   - respawn-pane
+#   - choose-buffer
+#   - wait-for
+#
+# In addition, the way options (set/show etc) are handled needs to be reviewed.
+# For example, set-option can set every type of option now. I hope this is
+# rather simple to improve.
 
 # Global variables; setup the first time _tmux is called.
 # For $_tmux_commands[] generation, see the very end of this file.
@@ -154,6 +169,7 @@ function _tmux-attach-session() {
     local -a args
 
     args=(
+        '-c[specify working directory for the session]:directory:_path_files -g "*(-/)"'
         '-d[detach other clients attached to target session]'
         '-r[put the client into read-only mode]'
         '-t[choose a target session]:target session:__tmux-sessions'
@@ -189,6 +205,8 @@ function _tmux-break-pane() {
     local -a args
     args=(
         '-d[do not make the new window become the active one]'
+        '-F[specify format of output]:format:__tmux-format'
+        '-P[print information of new window after it has been created]'
         '-t[choose a target pane]:panes:__tmux-panes'
     )
     _arguments ${args}
@@ -198,7 +216,16 @@ function _tmux-capture-pane() {
     [[ -n ${tmux_describe} ]] && print "Capture the contents of a pane to a buffer" && return
     local -a args
     args=(
+        '-a[use alternate screen]'
         '-b[choose target buffer]:target buffer:__tmux-buffers'
+        '-C[escape non-printable characters as octal \ooo]'
+        '-e[include escape sequences for attributes etc]'
+        '-E[specify last line to capture. - means last line of pane]'
+        '-J[join wrapped lines and preserver trailing space]'
+        '-q[ignore errors when trying to access alternate screen]'
+        '-p[print data to stdout]'
+        '-P[only capture that is the beginning of an as-yet incomplete esc seq]'
+        '-S[specify start line to capture. - means first line of scrollback]'
         '-t[choose source pane]:source pane:__tmux-panes'
     )
     _arguments ${args}
@@ -206,17 +233,35 @@ function _tmux-capture-pane() {
 
 function _tmux-choose-client() {
     [[ -n ${tmux_describe} ]] && print "Put a window into client choice mode" && return
-    __tmux-choose-stuff
+    local -a args
+    args=(
+        '-F[specify format of output]:format:__tmux-format'
+        '-t[choose a target window]:sessions:__tmux-windows'
+        '*:: :->tmpl'
+    )
+    _arguments ${args} && return
 }
 
 function _tmux-choose-session() {
     [[ -n ${tmux_describe} ]] && print "Put a window into session choice mode" && return
-    __tmux-choose-stuff
+    local -a args
+    args=(
+        '-F[specify format of output]:format:__tmux-format'
+        '-t[choose a target window]:sessions:__tmux-windows'
+        '*:: :->tmpl'
+    )
+    _arguments ${args} && return
 }
 
 function _tmux-choose-window() {
     [[ -n ${tmux_describe} ]] && print "Put a window into window choice mode" && return
-    __tmux-choose-stuff
+    local -a args
+    args=(
+        '-F[specify format of output]:format:__tmux-format'
+        '-t[choose a target window]:sessions:__tmux-windows'
+        '*:: :->tmpl'
+    )
+    _arguments ${args} && return
 }
 
 function _tmux-clear-history() {
@@ -238,6 +283,7 @@ function _tmux-command-prompt() {
     local state
     local -a args
     args=(
+        '-I[comma separated list of initial inputs]:initial-text:->ilist'
         '-p[list of prompts]:prompts:->plist'
         '-t[choose a target client]:clients:__tmux-clients'
         '*:: :->tmpl'
@@ -245,6 +291,9 @@ function _tmux-command-prompt() {
     _arguments -C ${args} && return
     if [[ ${state} == 'plist' ]]; then
         _message "comma seperated list of prompts"
+        return
+    elif [[ ${state} == 'ilist' ]]; then
+        _message "comma seperated list of initial text"
         return
     fi
     __tmux-lastarg ${state} 'tmpl' 1 "command template"
@@ -255,10 +304,15 @@ function _tmux-confirm-before() {
     local state
     local -a args
     args=(
+        '-p[specify prompt]:prompt:->prompt'
         '-t[choose a target client]:clients:__tmux-clients'
         '*:: :->command_and_args'
     )
     _arguments -C ${args} && return
+    if [[ ${state} == 'prompt' ]]; then
+        _message 'prompt string'
+        return
+    fi
     __tmux-lastarg ${state} 'command_and_args' 1 "command string"
 }
 
@@ -309,39 +363,20 @@ function _tmux-copy-mode() {
 
 function _tmux-delete-buffer() {
     [[ -n ${tmux_describe} ]] && print "Delete a paste buffer" && return
-    local state session
     local -a args
-    local -ax bopts
-
-    args=(
-        '-b[choose a target buffer index]:panes:->buffer'
-        '-t[choose a target session]:panes:->session'
-    )
-    _arguments ${args}
-
-    case ${state} in
-        (session)
-            __tmux-sessions
-            return
-            ;;
-        (buffer)
-            session="$(__tmux-get-optarg -t "${words[@]}")"
-            ;;
-        (*) return ;;
-    esac
-    if [[ -n ${session} ]]; then
-        bopts=( -t ${session} )
-        __tmux-buffers
-        return
-    fi
-    bopts=()
-    __tmux-buffers
+    args=('-b[choose a target buffer index]:buffers:__tmux-buffers')
+    _arguments ${args} && return
 }
 
 function _tmux-detach-client() {
     [[ -n ${tmux_describe} ]] && print "Detach a client from the server" && return
     local -a args
-    args=('-t[choose a target client]:clients:__tmux-clients')
+    args=(
+        '-a[kill all clients except for the named by -t]'
+        '-P[send SIGHUP to parent process]'
+        '-s[choose a target session and kill its clients]:sessions:__tmux-sessions'
+        '-t[choose a target client]:clients:__tmux-clients'
+    )
     _arguments ${args}
 }
 
@@ -349,6 +384,7 @@ function _tmux-display-message() {
     [[ -n ${tmux_describe} ]] && print "Display a message in the status line" && return
     local -a args
     args=(
+        '-c[choose a target client]:clients:__tmux-clients'
         '-p[print message to stdout]'
         '-t[choose a target client]:clients:__tmux-clients'
         '*:: :->msg'
@@ -376,6 +412,10 @@ function _tmux-find-window() {
     local curcontext="${curcontext}" state
     local -a args
     args=(
+        '-C[match visible contents]'
+        '-F[specify format of output]:format:__tmux-format'
+        '-N[match window name]'
+        '-T[match window title]'
         '-t[choose a target window]:windows:__tmux-windows'
         '*:: :->pattern'
     )
@@ -394,6 +434,8 @@ function _tmux-if-shell() {
     [[ -n ${tmux_describe} ]] && print "Execute a tmux command if a shell-command succeeded" && return
     local -a args
     args=(
+        '-b[run shell command in background]'
+        '-F[do not execute shell command but use it as a string-value]'
         '1:shell command:'
         '2:tmux command:'
     )
@@ -404,6 +446,7 @@ function _tmux-join-pane() {
     [[ -n ${tmux_describe} ]] && print "Split a pane and move an existing one into the new space" && return
     local -a args
     args=(
+        '-b[join source pane left of or above target pane]'
         '-d[do not make the new window become the active one]'
         '-h[split horizontally]'
         '-v[split vertically]'
@@ -419,7 +462,7 @@ function _tmux-kill-pane() {
     [[ -n ${tmux_describe} ]] && print "Destroy a given pane" && return
     local -a args
     args=(
-        '-a[kill all panes, except current]'
+        '-a[kill all panes except the one specified by -t]'
         '-t[choose a target pane]:panes:__tmux-panes'
     )
     _arguments ${args}
@@ -433,14 +476,20 @@ function _tmux-kill-server() {
 function _tmux-kill-session() {
     [[ -n ${tmux_describe} ]] && print "Destroy a given session" && return
     local -a args
-    args=('-t[choose a target session]:sessions:__tmux-sessions')
+    args=(
+        '-a[kill all session except the one specified by -t]'
+        '-t[choose a target session]:sessions:__tmux-sessions'
+    )
     _arguments ${args}
 }
 
 function _tmux-kill-window() {
     [[ -n ${tmux_describe} ]] && print "Destroy a given window" && return
     local -a args
-    args=('-t[choose a target window]:windows:__tmux-windows')
+    args=(
+        '-a[kill all windows except the one specified by -t]'
+        '-t[choose a target window]:windows:__tmux-windows'
+    )
     _arguments ${args}
 }
 
@@ -466,13 +515,18 @@ function _tmux-link-window() {
 function _tmux-list-buffers() {
     [[ -n ${tmux_describe} ]] && print "List paste buffers of a session" && return
     local -a args
-    args=('-t[choose a session]:sessions:__tmux-sessions')
+    args=('-F[specify format of output]:format:__tmux-format')
     _arguments ${args} && return
 }
 
 function _tmux-list-clients() {
     [[ -n ${tmux_describe} ]] && print "List clients attached to server" && return
-    __tmux-nothing-else
+    local -a args
+    args=(
+        '-F[specify format of output]:format:__tmux-format'
+        '-t[choose a session]:sessions:__tmux-sessions'
+    )
+    _arguments ${args} && return
 }
 
 function _tmux-list-commands() {
@@ -490,52 +544,43 @@ function _tmux-list-keys() {
 function _tmux-list-panes() {
     [[ -n ${tmux_describe} ]] && print "List panes of a window" && return
     local -a args
-    args=('-t[choose a window]:windows:__tmux-windows')
+    args=(
+        '-a[list all panes the server possesses]'
+        '-F[specify format of output]:format:__tmux-format'
+        '-s[if specified, -t chooses a session]'
+        # TODO: Use __tmux-windows or __tmux-sessions depending on -s.
+        '-t[choose a window]:windows:__tmux-windows'
+    )
     _arguments ${args} && return
 }
 
 function _tmux-list-sessions() {
     [[ -n ${tmux_describe} ]] && print "List sessions managed by server" && return
-    __tmux-nothing-else
+    local -a args
+    args=('-F[specify format of output]:format:__tmux-format')
+    _arguments ${args} && return
 }
 
 function _tmux-list-windows() {
     [[ -n ${tmux_describe} ]] && print "List windows of a session" && return
     local -a args
-    args=('-t[choose a session]:sessions:__tmux-sessions')
+    args=(
+        '-a[list all windows the tmux server possesses]'
+        '-F[specify format of output]:format:__tmux-format'
+        '-t[choose a session]:sessions:__tmux-sessions'
+    )
     _arguments ${args} && return
 }
 
 function _tmux-load-buffer() {
     [[ -n ${tmux_describe} ]] && print "Load a file into a paste buffer" && return
-    local state session
     local -a args
-    local -ax bopts
 
     args=(
-        '-b[choose a target buffer index]:panes:->buffer'
-        '-t[choose a target session]:panes:->session'
+        '-b[choose a target buffer index]:panes:__tmux-buffers'
         '1:file name:_files -g "*(-.)"'
     )
-    _arguments ${args}
-
-    case ${state} in
-        (session)
-            __tmux-sessions
-            return
-            ;;
-        (buffer)
-            session="$(__tmux-get-optarg -t "${words[@]}")"
-            ;;
-        (*) return ;;
-    esac
-    if [[ -n ${session} ]]; then
-        bopts=( -t ${session} )
-        __tmux-buffers
-        return
-    fi
-    bopts=()
-    __tmux-buffers
+    _arguments ${args} && return
 }
 
 function _tmux-lock-client() {
@@ -562,7 +607,9 @@ function _tmux-move-window() {
     local -a args
     args=(
         '-d[do not make the new window become the active one]'
+        '-k[kill the target window if it exists]'
         '-s[choose source window]:window:__tmux-windows'
+        '-r[renumber windows in session in sequential order]'
         '-t[choose destination window]:window:__tmux-windows'
     )
     _arguments ${args}
@@ -572,11 +619,17 @@ function _tmux-new-session() {
     [[ -n ${tmux_describe} ]] && print "Create a new session" && return
     local -a args
     args=(
-        '-d[do not attach new session to current terminal]'
         '-A[attach to existing session if it already exists]'
+        '-c[specify working directory for the session]:directory:_path_files -g "*(-/)"'
+        '-d[do not attach new session to current terminal]'
+        '-D[in case of -A behave like attach-session'\''s -d]'
+        '-F[specify format of output]:format:__tmux-format'
         '-n[name the initial window]:window name'
+        '-P[print information about new session after it is created]'
         '-s[name the session]:session name:__tmux-sessions'
         '-t[specify target session]:sessions:__tmux-sessions'
+        '-x[specify width]:width:_guard "[0-9]#" "numeric value"'
+        '-y[specify height]:height:_guard "[0-9]#" "numeric value"'
         '*:: :_command'
     )
     _arguments -s ${args}
@@ -586,9 +639,13 @@ function _tmux-new-window() {
     [[ -n ${tmux_describe} ]] && print "Create a new window" && return
     local -a args
     args=(
+        '-a[insert new window at next free index from -t]'
+        '-c[specify working directory for the session]:directory:_path_files -g "*(-/)"'
         '-d[do not make the new window become the active one]'
+        '-F[specify format of output]:format:__tmux-format'
         '-k[destroy it if the specified window exists]'
         '-n[specify a window name]:window name:'
+        '-P[print information about new window after it is created]'
         '-t[specify target window]:windows:__tmux-windows'
         '*:: :_command'
     )
@@ -606,7 +663,7 @@ function _tmux-next-window() {
     [[ -n ${tmux_describe} ]] && print "Move to the next window in a session" && return
     local -a args
     args=(
-        '-a[move to the next window with activity]'
+        '-a[move to the next window with an alert]'
         '-t[choose target session]:session:__tmux-sessions'
     )
     _arguments ${args}
@@ -616,9 +673,11 @@ function _tmux-paste-buffer() {
     [[ -n ${tmux_describe} ]] && print "Insert a paste buffer into the window" && return
     local -a args
     args=(
-        '-d[remove buffer from stack after pasting]'
-        '-r[do not replace LF with CR when pasting]'
         '-b[choose buffer]:source buffer:__tmux-buffers'
+        '-d[remove buffer from stack after pasting]'
+        '-p[use bracketed paste mode if the application requested it]'
+        '-r[do not replace LF with CR when pasting]'
+        '-s[specify separator]:separator:'
         '-t[choose target window]:window:__tmux-windows'
     )
     _arguments ${args}
@@ -647,7 +706,7 @@ function _tmux-previous-window() {
     [[ -n ${tmux_describe} ]] && print "Move to the previous window in a session" && return
     local -a args
     args=(
-        '-a[move to the previous window with activity]'
+        '-a[move to the previous window with an alert]'
         '-t[choose target session]:session:__tmux-sessions'
     )
     _arguments ${args}
@@ -656,7 +715,10 @@ function _tmux-previous-window() {
 function _tmux-refresh-client() {
     [[ -n ${tmux_describe} ]] && print "Refresh a client" && return
     local -a args
-    args=('-t[choose target client]:client:__tmux-clients')
+    args=(
+        '-S[Only update the client'\''s status bar]'
+        '-t[choose target client]:client:__tmux-clients'
+    )
     _arguments ${args}
 }
 
@@ -690,6 +752,9 @@ function _tmux-resize-pane() {
         '-R[resize to the right]'
         '-U[resize upward]'
         '-t[choose target pane]:pane:__tmux-panes'
+        '-x[specify width]:width:_guard "[0-9]#" "numeric value"'
+        '-y[specify height]:height:_guard "[0-9]#" "numeric value"'
+        '-Z[toggle zoom of pane]'
         '1::adjustment (defaults to one):_guard "[0-9]#" "numeric value"'
     )
     _arguments ${args}
@@ -719,43 +784,31 @@ function _tmux-rotate-window() {
 
 function _tmux-run-shell() {
     [[ -n ${tmux_describe} ]] && print "Execute a command without creating a new window" && return
-    _command
+    local -a args
+    args=(
+        '-b[run shell command in background]'
+        '-t[choose target pane]:pane:__tmux-panes'
+        '*::command:_command'
+    )
+    _arguments ${args}
 }
 
 function _tmux-save-buffer() {
     [[ -n ${tmux_describe} ]] && print "Save a paste buffer to a file" && return
-    local state session
     local -a args
-    local -ax bopts
 
     args=(
-        '-b[choose a target buffer index]:buffer:->buffer'
-        '-t[choose a target session]:buffer:->session'
+        '-a[append to rather than overwriting file]'
+        '-b[choose a target buffer index]:buffer:__tmux-buffers'
     )
-    _arguments ${args}
-
-    case ${state} in
-        (session)
-            __tmux-sessions
-            return
-            ;;
-        (buffer)
-            session="$(__tmux-get-optarg -t "${words[@]}")"
-            ;;
-        (*) return ;;
-    esac
-    if [[ -n ${session} ]]; then
-        bopts=( -t ${session} )
-        __tmux-buffers
-        return
-    fi
-    bopts=()
-    __tmux-buffers
+    _arguments ${args} && return
 }
 
 function _tmux-select-layout() {
     [[ -n ${tmux_describe} ]] && print "Choose a layout for a window" && return
     args=(
+        '-n[behave like next-layout]'
+        '-p[behave like previous-layout]'
         '-t[choose a target window]:target window:__tmux-windows'
         '*::layout name:__tmux-layouts'
     )
@@ -765,7 +818,16 @@ function _tmux-select-layout() {
 function _tmux-select-pane() {
     [[ -n ${tmux_describe} ]] && print "Make a pane the active one in the window" && return
     local -a args
-    args=('-t[choose a target pane]:panes:__tmux-panes')
+    args=(
+        '-D[Move to the pane down of this]'
+        '-d[disable input to the pane]'
+        '-e[enable input to the pane]'
+        '-l[behave like last-pane]'
+        '-L[Move to the pane left of this]'
+        '-R[Move to the pane right of this]'
+        '-U[Move to the pane above this]'
+        '-t[choose a target pane]:panes:__tmux-panes'
+    )
     _arguments ${args} && return
 }
 
@@ -779,7 +841,13 @@ function _tmux-select-prompt() {
 function _tmux-select-window() {
     [[ -n ${tmux_describe} ]] && print "Select a window" && return
     local -a args
-    args=('-t[choose a target window]:windows:__tmux-windows')
+    args=(
+        '-l[behave like last-window]'
+        '-n[behave like next-window]'
+        '-p[behave like previous-window]'
+        '-T[if selected window is the current behave like last-window]'
+        '-t[choose a target window]:windows:__tmux-windows'
+    )
     _arguments ${args} && return
 }
 
@@ -788,6 +856,8 @@ function _tmux-send-keys() {
     local curcontext="${curcontext}" state
     local -a args
     args=(
+        '-l[disable key name lookup and send data literally]'
+        '-R[reset terminal state]'
         '-t[choose a target pane]:panes:__tmux-panes'
         '*:: :->key'
     )
@@ -798,7 +868,10 @@ function _tmux-send-keys() {
 function _tmux-send-prefix() {
     [[ -n ${tmux_describe} ]] && print "Send the prefix key to a window" && return
     local -a args
-    args=('-t[choose a target pane]:panes:__tmux-panes')
+    args=(
+        '-2[send secondary prefix key]'
+        '-t[choose a target pane]:panes:__tmux-panes'
+    )
     _arguments ${args}
 }
 
@@ -809,33 +882,16 @@ function _tmux-server-info() {
 
 function _tmux-set-buffer() {
     [[ -n ${tmux_describe} ]] && print "Set contents of a paster buffer" && return
-    local state session
+    local state
     local -a args
-    local -ax bopts
-
     args=(
-        '-b[choose a target buffer index]:panes:->buffer'
-        '-t[choose a target session]:panes:->session'
+        '-a[append to rather than overwriting target buffer]'
+        '-b[choose a target buffer index]:panes:__tmux-buffer'
+        '-n[specify new buffer name]:buffer-name:'
+        '*:: :->data'
     )
-    _arguments ${args}
-
-    case ${state} in
-        (session)
-            __tmux-sessions
-            return
-            ;;
-        (buffer)
-            session="$(__tmux-get-optarg -t "${words[@]}")"
-            ;;
-        (*) return ;;
-    esac
-    if [[ -n ${session} ]]; then
-        bopts=( -t ${session} )
-        __tmux-buffers
-        return
-    fi
-    bopts=()
-    __tmux-buffers
+    _arguments ${args} && return
+    __tmux-lastarg ${state} 'data' 1 "data"
 }
 
 function _tmux-set-environment() {
@@ -904,33 +960,9 @@ function _tmux-set-window-option() {
 
 function _tmux-show-buffer() {
     [[ -n ${tmux_describe} ]] && print "Display the contents of a paste buffer" && return
-    local state session
     local -a args
-    local -ax bopts
-
-    args=(
-        '-b[choose a target buffer index]:panes:->buffer'
-        '-t[choose a target session]:panes:->session'
-    )
-    _arguments ${args}
-
-    case ${state} in
-        (session)
-            __tmux-sessions
-            return
-            ;;
-        (buffer)
-            session="$(__tmux-get-optarg -t "${words[@]}")"
-            ;;
-        (*) return ;;
-    esac
-    if [[ -n ${session} ]]; then
-        bopts=( -t ${session} )
-        __tmux-buffers
-        return
-    fi
-    bopts=()
-    __tmux-buffers
+    args=('-b[choose a target buffer index]:panes:->buffer')
+    _arguments ${args} && return
 }
 
 function _tmux-show-environment() {
@@ -945,7 +977,13 @@ function _tmux-show-environment() {
 
 function _tmux-show-messages() {
     [[ -n ${tmux_describe} ]] && print "Show client"\'"s message log" && return
-    args=('-t[choose target client]:client:__tmux-clients')
+    local -a args
+    args=(
+        '-I[show debugging information about the tmux server]'
+        '-J[show debugging information about running jobs]'
+        '-T[show debugging information about involved terminals]'
+        '-t[choose target client]:client:__tmux-clients'
+    )
     _arguments ${args}
 }
 
@@ -978,12 +1016,14 @@ function _tmux-split-window() {
     [[ -n ${tmux_describe} ]] && print "Splits a pane into two" && return
     local -a args
     args=(
+        '-b[create new pane left of or above target pane]'
         '-d[do not make the new window become the active one]'
+        '-F[specify format of output]:format:__tmux-format'
         '-h[split horizontally]'
         '-v[split vertically]'
         '-l[define new pane'\''s size]: :_guard "[0-9]#" "numeric value"'
         '-p[define new pane'\''s size in percent]: :_guard "[0-9]#" "numeric value"'
-        # Yes, __tmux_pane is correct here. The behaviour was changed
+        # Yes, __tmux-panes is correct here. The behaviour was changed
         # in recent tmux versions and makes more sense. Except that
         # changing the command's name might annoy users. So it stays like
         # this.
@@ -1034,6 +1074,10 @@ function _tmux-switch-client() {
     local -a args
     args=(
         '-c[choose a target client]:client:__tmux-clients'
+        '-l[move client to last session]'
+        '-n[move client to next session]'
+        '-p[move client to previous session]'
+        '-r[toggle read-only flag of client]'
         '-t[choose a target window]:window:__tmux-windows'
     )
     _arguments ${args}
@@ -1046,6 +1090,7 @@ function _tmux-unbind-key() {
 
     ow=( "${words[@]}" )
     args=(
+        '-a[Remove all key bindings]'
         '-c[kill the window if it is only in one session]'
         '-n[remove a non-prefix binding]'
         '-t[choose a key table]:key table:__tmux-key-tables'
@@ -1127,6 +1172,10 @@ function __tmux-clients() {
     local -a clients
     clients=( ${${(f)"$(command tmux 2> /dev/null list-clients)"}/:[ $'\t']##/:} )
     _describe -t clients 'clients' clients
+}
+
+function __tmux-format() {
+    _message 'not implemented yet'
 }
 
 function __tmux-colours() {
