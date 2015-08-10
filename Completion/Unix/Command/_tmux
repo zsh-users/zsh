@@ -1256,11 +1256,9 @@ function __tmux-option-guard() {
         options=(
             'base-index:'${int_guard}
             'bell-action:DESC:any none current'
-            'buffer-limit:'${int_guard}
             'default-command:MSG:command string'
             'default-path:MSG:path name'
             'default-shell:MSG:shell executable'
-            'default-terminal:MSG:terminal string'
             'display-panes-colour:__tmux-colours'
             'display-panes-active-colour:__tmux-colours'
             'display-panes-time:'${int_guard}
@@ -1272,7 +1270,6 @@ function __tmux-option-guard() {
             'message-attr:__tmux-attributes'
             'message-bg:__tmux-colours'
             'message-fg:__tmux-colours'
-            'message-limit:'${int_guard}
             'mouse-select-pane:DESC:on off'
             'pane-border-bg:__tmux-colours'
             'pane-border-fg:__tmux-colours'
@@ -1301,7 +1298,6 @@ function __tmux-option-guard() {
             'status-right-fg:__tmux-colours'
             'status-right-length:'${int_guard}
             'status-utf8:DESC:on off'
-            'terminal-overrides:MSG:overrides string'
             'update-environment:MSG:string listing env. variables'
             'visual-activity:DESC:on off'
             'visual-bell:DESC:on off'
@@ -1309,8 +1305,12 @@ function __tmux-option-guard() {
         )
     elif [[ ${mode} == 'server' ]]; then
         options=(
+            'buffer-limit:'${int_guard}
+            'default-terminal:MSG:terminal string'
             'escape-time:'${int_guard}
+            'message-limit:'${int_guard}
             'quiet:DESC:on off'
+            'terminal-overrides:MSG:overrides string'
         )
     else
         options=(
@@ -1372,11 +1372,9 @@ function __tmux-session-options() {
     tmux_session_options=(
         'base-index:define where to start numbering'
         'bell-action:set action on window bell'
-        'buffer-limit:number of buffers kept per session'
         'default-command:default command for new windows'
         'default-path:default working directory'
         'default-shell:default shell executable'
-        'default-terminal:default terminal definition string'
         'display-panes-colour:colour used for display-panes'
         'display-panes-active-colour:colour for active pane in display-panes'
         'display-panes-time:time (in msecs) of display-panes output'
@@ -1388,7 +1386,6 @@ function __tmux-session-options() {
         'message-attr:set status line message attributes'
         'message-bg:set status line message background colour'
         'message-fg:set status line message foreground colour'
-        'message-limit:set size of message log per client'
         'mouse-select-pane:make mouse clicks select window panes'
         'pane-border-bg:set pane border foreground colour'
         'pane-border-fg:set pane border background colour'
@@ -1417,7 +1414,6 @@ function __tmux-session-options() {
         'status-right-fg:foreground colour of the right part of the status bar'
         'status-right-length:maximum length of the right part of the status bar'
         'status-utf8:assume UTF-8 sequences to appear in status bar'
-        'terminal-overrides:override terminal descriptions'
         'update-environment:list of variables to be copied to a session'\''s environment'
         'visual-activity:display status line messages upon activity'
         'visual-bell:use visual bell instead of audible'
@@ -1470,8 +1466,12 @@ function __tmux-panes() {
 function __tmux-server-options() {
     local -a tmux_server_options
     tmux_server_options=(
+        'buffer-limit:number of buffers kept per session'
+        'default-terminal:default terminal definition string'
         'escape-time:set timeout to detect single escape characters (in msecs)'
+        'message-limit:set size of message log per client'
         'quiet:enable/disable the display of various informational messages'
+        'terminal-overrides:override terminal descriptions'
     )
     _describe -t tmux-server-options 'tmux server option' tmux_server_options
 }
