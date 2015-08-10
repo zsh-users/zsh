@@ -1,5 +1,7 @@
 2015-08-10  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 36084: Src/glob.c, Src/text.c: use zrealloc() consistently
+
 	* 36079: Src/signals.c: do not allow update_job() and its helpers
 	to run the signal queue while we are processing a job exit.
 

@@ -257,7 +257,7 @@ addpath(char *s, int l)
 {
     DPUTS(!pathbuf, "BUG: pathbuf not initialised");
     while (pathpos + l + 1 >= pathbufsz)
-	pathbuf = realloc(pathbuf, pathbufsz *= 2);
+	pathbuf = zrealloc(pathbuf, pathbufsz *= 2);
     while (l--)
 	pathbuf[pathpos++] = *s++;
     pathbuf[pathpos++] = '/';

@@ -77,7 +77,7 @@ taddpending(char *str1, char *str2)
      */
     if (tpending) {
 	int oldlen = strlen(tpending);
-	tpending = realloc(tpending, len + oldlen);
+	tpending = zrealloc(tpending, len + oldlen);
 	sprintf(tpending + oldlen, "%s%s", str1, str2);
     } else {
 	tpending = (char *)zalloc(len);
@@ -110,7 +110,7 @@ taddchr(int c)
 	    tptr--;
 	    return;
 	}
-	tbuf = realloc(tbuf, tsiz *= 2);
+	tbuf = zrealloc(tbuf, tsiz *= 2);
 	tlim = tbuf + tsiz;
 	tptr = tbuf + tsiz / 2;
     }
@@ -130,7 +130,7 @@ taddstr(char *s)
 
 	if (!tbuf)
 	    return;
-	tbuf = realloc(tbuf, tsiz *= 2);
+	tbuf = zrealloc(tbuf, tsiz *= 2);
 	tlim = tbuf + tsiz;
 	tptr = tbuf + x;
     }
