@@ -26,6 +26,9 @@
 	* 36049: Completion/Unix/Command/_tmux: _tmux: options =>
 	session_options
 
+	* 36056: Util/check-tmux-state: Add helper script to check state
+	of _tmux completion
+
 2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36045: Test/A05execution.ztst: make effect of failures
