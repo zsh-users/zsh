@@ -1231,18 +1231,6 @@ function __tmux-bound-keys() {
     _describe -t keys 'keys' keys
 }
 
-function __tmux-choose-stuff() {
-    # choose-{client,session,window} accept exactly the same arguments, so...
-    local curcontext="${curcontext}" state
-    local -a args
-    args=(
-        '-t[choose a target pane]:panes:__tmux-panes'
-        '*:: :->tmpl'
-    )
-    _arguments ${args} && return
-    __tmux-lastarg ${state} 'tmpl' 1 "tmux command template"
-}
-
 function __tmux-clients() {
     local expl
     local -a clients
