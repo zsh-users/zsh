@@ -29,6 +29,9 @@
 	* 36056: Util/check-tmux-state: Add helper script to check state
 	of _tmux completion
 
+	* 36052: Completion/Unix/Command/_tmux: _tmux: Remove old
+	sub-commands and their aliases
+
 2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36045: Test/A05execution.ztst: make effect of failures

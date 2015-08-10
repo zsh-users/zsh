@@ -74,7 +74,6 @@ _tmux_aliasmap=(
     breakp      break-pane
     capturep    capture-pane
     displayp    display-panes
-    downp       down-pane
     findw       find-window
     joinp       join-pane
     killp       kill-pane
@@ -103,7 +102,6 @@ _tmux_aliasmap=(
     swapp       swap-pane
     swapw       swap-window
     unlinkw     unlink-window
-    upp         up-pane
 
     # key bindings
     bind        bind-key
@@ -127,7 +125,6 @@ _tmux_aliasmap=(
 
     # buffers
     clearhist   clear-history
-    copyb       copy-buffer
     deleteb     delete-buffer
     lsb         list-buffers
     loadb       load-buffer
@@ -340,41 +337,6 @@ function _tmux-confirm-before() {
     __tmux-lastarg ${state} 'command_and_args' 1 "command string"
 }
 
-function _tmux-copy-buffer() {
-    [[ -n ${tmux_describe} ]] && print "Copy session paste buffers" && return
-    local state session
-    local -a args
-    local -ax bopts
-
-    args=(
-        '-a[choose a source buffer index]:buffer:->srcbuf'
-        '-b[choose a destination buffer index]:buffer:->dstbuf'
-        '-s[choose a source session]:session:->srcsession'
-        '-t[choose a destination session]:session:->dstsession'
-    )
-    _arguments ${args}
-
-    case ${state} in
-        ((src|dst)session)
-            __tmux-sessions
-            return
-            ;;
-        (srcbuf)
-            session="$(__tmux-get-optarg -s "${words[@]}")"
-            ;;
-        (srcbuf)
-            session="$(__tmux-get-optarg -t "${words[@]}")"
-            ;;
-    esac
-    if [[ -n ${session} ]]; then
-        bopts=( -t ${session} )
-        __tmux-buffers
-        return
-    fi
-    bopts=()
-    __tmux-buffers
-}
-
 function _tmux-copy-mode() {
     [[ -n ${tmux_describe} ]] && print "Enter copy mode" && return
     local -a args
@@ -421,13 +383,6 @@ function _tmux-display-panes() {
     [[ -n ${tmux_describe} ]] && print "Display an indicator for each visible pane" && return
     local -a args
     args=('-t[choose a target client]:clients:__tmux-clients')
-    _arguments ${args}
-}
-
-function _tmux-down-pane() {
-    [[ -n ${tmux_describe} ]] && print "Move down a pane" && return
-    local -a args
-    args=('-t[choose a target pane]:panes:__tmux-panes')
     _arguments ${args}
 }
 
@@ -893,13 +848,6 @@ function _tmux-select-pane() {
     _arguments ${args} && return
 }
 
-function _tmux-select-prompt() {
-    [[ -n ${tmux_describe} ]] && print "Open a prompt to enter a window index" && return
-    local -a args
-    args=('-t[choose a target client]:clients:__tmux-clients')
-    _arguments ${args} && return
-}
-
 function _tmux-select-window() {
     [[ -n ${tmux_describe} ]] && print "Select a window" && return
     local -a args
@@ -1175,13 +1123,6 @@ function _tmux-unlink-window() {
         '-k[kill the window if it is only in one session]'
         '-t[choose a target window]:target window:__tmux-windows'
     )
-    _arguments ${args}
-}
-
-function _tmux-up-pane() {
-    [[ -n ${tmux_describe} ]] && print "Move up a pane" && return
-    local -a args
-    args=('-t[choose a target pane]:panes:__tmux-panes')
     _arguments ${args}
 }
 
