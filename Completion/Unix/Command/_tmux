@@ -1257,7 +1257,7 @@ function __tmux-option-guard() {
         options=(
             'assume-paste-time:'${int_guard}
             'base-index:'${int_guard}
-            'bell-action:DESC:any none current'
+            'bell-action:DESC:any none current other'
             'bell-on-alert:DESC:on off'
             'default-command:MSG:command string'
             'default-shell:MSG:shell executable'
@@ -1275,7 +1275,7 @@ function __tmux-option-guard() {
             'message-style:__tmux-style'
             'mouse:DESC:on off'
             'mouse-utf8:DESC:on off'
-            'prefix:MSG:comma-seperated key list'
+            'prefix:MSG:primary prefix key'
             'prefix2:MSG:secondary prefix key'
             'renumber-windows:DESC:on off'
             'repeat-time:'${int_guard}
@@ -1399,7 +1399,7 @@ function __tmux-session-options() {
         'message-style:status line message style'
         'mouse:enable mouse support'
         'mouse-utf8:request utf8 mouse support'
-        'prefix:comma seperated line of keys accepted as prefix key'
+        'prefix:primary prefix key'
         'prefix2:secondary prefix key'
         'renumber-windows:renumber windows if a window is closed'
         'repeat-time:time for multiple commands without prefix-key presses'
