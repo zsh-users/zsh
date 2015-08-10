@@ -1675,6 +1675,5 @@ for f in ${(M)${(k)functions}:#_tmux-*} ; do
     _tmux_commands+=( "${f#_tmux-}${desc:+:$desc}" )
     [[ -n ${rev[${f#_tmux-}]} ]] && _tmux_aliases+=( "${rev[${f#_tmux-}]}${desc:+:$desc}" )
 done
-unset desc f rev tmux_describe
 
 _tmux
