@@ -1,3 +1,8 @@
+2015-08-09  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36033: Src/glob.c, Src/pattern.c: a few more queue_signals()
+	to protect global state changes
+
 2015-08-09  Mikael Magnusson  <mikachu@gmail.com>
 
 	* unposted: Test/C03traps.ztst: add tests for outputting traps

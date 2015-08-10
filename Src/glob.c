@@ -216,22 +216,26 @@ static struct globdata curglobdata;
 
 #define save_globstate(N) \
   do { \
+    queue_signals(); \
     memcpy(&(N), &curglobdata, sizeof(struct globdata)); \
     (N).gd_pathpos = pathpos; \
     (N).gd_pathbuf = pathbuf; \
     (N).gd_glob_pre = glob_pre; \
     (N).gd_glob_suf = glob_suf; \
     pathbuf = NULL; \
+    unqueue_signals(); \
   } while (0)
 
 #define restore_globstate(N) \
   do { \
+    queue_signals(); \
     zfree(pathbuf, pathbufsz); \
     memcpy(&curglobdata, &(N), sizeof(struct globdata)); \
     pathpos = (N).gd_pathpos; \
     pathbuf = (N).gd_pathbuf; \
     glob_pre = (N).gd_glob_pre; \
     glob_suf = (N).gd_glob_suf; \
+    unqueue_signals(); \
   } while (0)
 
 /* pathname component in filename patterns */

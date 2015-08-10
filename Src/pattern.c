@@ -520,6 +520,8 @@ patcompile(char *exp, int inflags, char **endexp)
     char *lng, *strp = NULL;
     Patprog p;
 
+    queue_signals();
+
     startoff = sizeof(struct patprog);
     /* Ensure alignment of start of program string */
     startoff = (startoff + sizeof(union upat) - 1) & ~(sizeof(union upat) - 1);
@@ -582,8 +584,10 @@ patcompile(char *exp, int inflags, char **endexp)
 	if (!strp || (*strp && *strp != '/')) {
 	    /* No, do normal compilation. */
 	    strp = NULL;
-	    if (patcompswitch(0, &flags) == 0)
+	    if (patcompswitch(0, &flags) == 0) {
+		unqueue_signals();
 		return NULL;
+	    }
 	} else {
 	    /*
 	     * Yes, copy the string, and skip compilation altogether.
@@ -715,6 +719,8 @@ patcompile(char *exp, int inflags, char **endexp)
 
     if (endexp)
 	*endexp = patparse;
+
+    unqueue_signals();
     return p;
 }
 
