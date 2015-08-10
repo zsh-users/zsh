@@ -2685,6 +2685,8 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 		    tdp->joinchar = joinchar;
 		    if (asg0.value.scalar)
 			setsparam(asg0.name, ztrdup(asg0.value.scalar));
+		    else if (asg->value.array)
+			setaparam(asg->name, zlinklist2array(asg->value.array));
 		    return 0;
 		} else {
 		    zwarnnam(name, "can't tie already tied scalar: %s",

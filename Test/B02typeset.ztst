@@ -467,9 +467,12 @@
  print $tied_array
  typeset -T TIED_SCALAR=goo:car tied_array
  print $tied_array
+ typeset -T TIED_SCALAR tied_array=(poo par)
+ print $TIED_SCALAR
 0:retying arrays to same array works
 >foo bar
 >goo car
+>poo:par
 
  (
    setopt POSIXBUILTINS

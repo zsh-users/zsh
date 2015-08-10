@@ -1,3 +1,8 @@
+2015-08-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 36083: Src/builtin.c, Test/B02typeset.ztst: set array value
+	when consistently retying scalar and array.
+
 2015-08-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36074: Src/signals.c: Don't rely on implicit value for
