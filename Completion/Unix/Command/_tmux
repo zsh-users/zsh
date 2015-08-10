@@ -43,10 +43,11 @@
 #
 # TODO:
 #
-#   The way options (set/show etc) are handled needs to be reviewed.
-#   For example, set-option can set every type of option now. I hope
-#   this is rather simple to improve. Also, there are new options that
-#   need to be supported.
+#   - Implement __tmux-format
+#   - Implement __tmux-style (possibly using existing helpers like
+#     __tmux-attributes and __tmux-colours)
+#   - in _tmux-list-panes, use __tmux-windows or __tmux-sessions
+#     depending on -s is among the sub-commands current command line.
 
 # Global variables; setup the first time _tmux is called.
 # For $_tmux_commands[] generation, see the very end of this file.
@@ -201,7 +202,7 @@ function _tmux-break-pane() {
     local -a args
     args=(
         '-d[do not make the new window become the active one]'
-        '-F[specify format of output]:format:__tmux-format'
+        '-F[specify format of output]:format:__tmux-format__tmux-format'
         '-P[print information of new window after it has been created]'
         '-t[choose a target pane]:panes:__tmux-panes'
     )
