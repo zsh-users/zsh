@@ -463,6 +463,8 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 #endif
 	    errno == EINTR));
 
+    setiparam("REPLY", master);
+
     return 0;
 }
 
