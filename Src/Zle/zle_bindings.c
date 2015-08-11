@@ -317,7 +317,7 @@ int vicmdbind[128] = {
     /* ^X */ z_undefinedkey,
     /* ^Y */ z_undefinedkey,
     /* ^Z */ z_undefinedkey,
-    /* ^[ */ z_undefinedkey,
+    /* ^[ */ z_beep,
     /* ^\ */ z_undefinedkey,
     /* ^] */ z_undefinedkey,
     /* ^^ */ z_undefinedkey,
