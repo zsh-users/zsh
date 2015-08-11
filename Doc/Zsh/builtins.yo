@@ -716,11 +716,11 @@ Also when listing,
 startsitem()
 sitem(tt(-d))(prints timestamps for each event)
 sitem(tt(-f))(prints full time-date stamps in the US
-`var(MM)tt(/)var(DD)tt(/)var(YY) var(hh):var(mm)' format)
+`var(MM)tt(/)var(DD)tt(/)var(YY) var(hh)tt(:)var(mm)' format)
 sitem(tt(-E))(prints full time-date stamps in the European
-`var(dd)tt(.)var(mm)tt(.)var(yyyy) var(hh):var(mm)' format)
+`var(dd)tt(.)var(mm)tt(.)var(yyyy) var(hh)tt(:)var(mm)' format)
 sitem(tt(-i))(prints full time-date stamps in ISO8601
-`var(yyyy)tt(-)var(mm)tt(-)var(dd) var(hh):var(mm)' format)
+`var(yyyy)tt(-)var(mm)tt(-)var(dd) var(hh)tt(:)var(mm)' format)
 sitem(tt(-t) var(fmt))(prints time and date stamps in the given format;
 var(fmt) is formatted with the strftime function with the zsh extensions
 described for the tt(%D{)var(string)tt(}) prompt format in
@@ -1727,10 +1727,10 @@ cindex(parameters, declaring)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
 xitem(tt(typeset )[ {tt(PLUS())|tt(-)}tt(AHUaghlmprtux) ] \
 [ {tt(PLUS())|tt(-)}tt(EFLRZi) [ var(n) ] ])
-xitem(SPACES()[ tt(+) | var(name)[tt(=)var(value)] ... ])
+xitem(SPACES()[ tt(+) ] [ var(name)[tt(=)var(value)] ... ])
 xitem(tt(typeset )tt(-T) [ {tt(PLUS())|tt(-)}tt(Uglprux) ] [ {tt(PLUS())|tt(-)}tt(LRZ) [ var(n) ] ])
-xitem(SPACES()[ tt(+) | var(SCALAR)[tt(=)var(value)] var(array)[tt(=)LPAR()var(value)RPAR()] [ var(sep) ] ])
-item(tt(typeset) tt(-f) [ {tt(PLUS())|tt(-)}tt(TUkmtuz) ] [ tt(+) | var(name) ... ])(
+xitem(SPACES()[ tt(+) | var(SCALAR)[tt(=)var(value)] var(array)[tt(=LPAR())var(value) ...tt(RPAR())] [ var(sep) ] ])
+item(tt(typeset) tt(-f) [ {tt(PLUS())|tt(-)}tt(TUkmtuz) ] [ tt(+) ] [ var(name) ... ])(
 Set or display attributes and values for shell parameters.
 
 A parameter is created for each var(name) that does not already refer
@@ -1760,7 +1760,7 @@ example(# Reserved word parsing
 typeset svar=$(echo one word) avar=(several words))
 
 The above creates a scalar parameter tt(svar) and an array
-parameter tt(var) as if the assignments had been
+parameter tt(avar) as if the assignments had been
 
 example(svar="one word"
 avar=(several words))
@@ -1879,7 +1879,7 @@ the current state, readonly specials (whose values cannot be
 changed) are not shown and assignments to arrays are shown before
 the tt(typeset) rendering the array readonly.
 )
-item(tt(-T) [ var(scalar)[tt(=)var(value)] var(array)[tt(=)LPAR()var(value)...RPAR()] [ var(sep) ] ])(
+item(tt(-T) [ var(scalar)[tt(=)var(value)] var(array)[tt(=LPAR())var(value) ...tt(RPAR())] [ var(sep) ] ])(
 This flag has a different meaning when used with tt(-f); see below.
 Otherwise the tt(-T) option requires zero, two, or three arguments to be
 present.  With no arguments, the list of parameters created in this

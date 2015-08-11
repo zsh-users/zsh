@@ -2311,8 +2311,8 @@ be local to the calling function.
 
 The options tt(-l) var(lbufvar) and tt(-r) var(rbufvar) may be used to
 specify parameters where the widget will store the resulting text from
-the operation.  The parameter var(lbufvar) will contain var(LBUFFER)
-and var(rbufvar) will contain var(RBUFFER).  Neither of these two options
+the operation.  The parameter var(lbufvar) will contain tt(LBUFFER)
+and var(rbufvar) will contain tt(RBUFFER).  Neither of these two options
 may be used with tt(-S) or tt(-R).
 
 tt(narrow-to-region-invisible) is a simple widget which calls
@@ -3756,7 +3756,7 @@ the difference in function between tt(zargs) and tt(xargs)) or run
 tt(zargs) with the tt(-)tt(-help) option.
 )
 findex(zed)
-xitem(tt(zed) [ tt(-f) [ tt(-x) var(num) ] var(name))
+xitem(tt(zed) [ tt(-f) [ tt(-x) var(num) ] ] var(name))
 item(tt(zed -b))(
 This function uses the ZLE editor to edit a file or function.
 

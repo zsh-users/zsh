@@ -3567,9 +3567,9 @@ otherwise the parameter is not used.
 item(tt(-s))(
 Enable em(option stacking) for single-letter options, whereby multiple
 single-letter options may be combined into a single word.  For example,
-the two options `tt(-)var(x)' and `tt(-)var(y)' may be combined into
-a single word `tt(-)var(xy)'.  By default, every word corresponds to a single
-option name (the `tt(-xy)' option).
+the two options `tt(-x)' and `tt(-y)' may be combined into
+a single word `tt(-xy)'.  By default, every word corresponds to a single
+option name (`tt(-xy)' is a single option named `tt(xy)').
 
 Options beginning with a single hyphen or plus sign are eligible for stacking;
 words beginning with two hyphens are not.

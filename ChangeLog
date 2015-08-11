@@ -1,3 +1,8 @@
+2015-08-11  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 36067: Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo,
+	Doc/Zsh/contrib.yo, Doc/Zsh/expn.yo: fix typo and format
+
 2015-08-10  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36084: Src/glob.c, Src/text.c: use zrealloc() consistently

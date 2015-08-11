@@ -942,7 +942,7 @@ characters by tt(GLOB_SUBST).  In other words,
 example(pattern=${(q)str}
 [[ $str = ${~pattern} ]])
 
-works if tt($str) is tt('a*b') but not if it is tt('a b'), whereas
+works if tt($str) is `tt(a*b)' but not if it is `tt(a b)', whereas
 
 example(pattern=${(b)str}
 [[ $str = ${~pattern} ]])
