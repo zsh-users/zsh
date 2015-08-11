@@ -1,3 +1,7 @@
+2015-08-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Kamil Dudka: 36106: Src/Zle/zle_keymap.c: fix const parameter.
+
 2015-08-12  Oliver Kiddle <opk@zsh.org>
 
 	* 36127: Completion/Zsh/Context/_brace_parameter,

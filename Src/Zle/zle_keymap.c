@@ -540,7 +540,7 @@ reselectkeymap(void)
 
 /**/
 mod_export int
-bindkey(Keymap km, char *seq, Thingy bind, char *str)
+bindkey(Keymap km, const char *seq, Thingy bind, char *str)
 {
     Key k;
     int f = seq[0] == Meta ? STOUC(seq[1])^32 : STOUC(seq[0]);
