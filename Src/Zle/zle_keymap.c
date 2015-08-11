@@ -1363,6 +1363,7 @@ default_bindings(void)
     }
     /* escape in operator pending cancels the operation */
     bindkey(oppmap, "\33", refthingy(t_vicmdmode), NULL);
+    bindkey(vismap, "\33", refthingy(t_deactivateregion), NULL);
     bindkey(vismap, "o", refthingy(t_exchangepointandmark), NULL);
     bindkey(vismap, "p", refthingy(t_putreplaceselection), NULL);
     bindkey(vismap, "x", refthingy(t_videlete), NULL);

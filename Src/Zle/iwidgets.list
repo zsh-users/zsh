@@ -35,6 +35,7 @@
 "copy-prev-word", copyprevword, ZLE_KEEPSUFFIX
 "copy-prev-shell-word", copyprevshellword, ZLE_KEEPSUFFIX
 "copy-region-as-kill", copyregionaskill, ZLE_KEEPSUFFIX
+"deactivate-region", deactivateregion, 0
 "delete-char", deletechar, ZLE_KEEPSUFFIX
 "delete-char-or-list", deletecharorlist, ZLE_MENUCMP | ZLE_KEEPSUFFIX | ZLE_ISCOMP
 "delete-word", deleteword, ZLE_KEEPSUFFIX

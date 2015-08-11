@@ -555,6 +555,13 @@ visuallinemode(UNUSED(char **args))
     return 0;
 }
 
+/**/
+int
+deactivateregion(UNUSED(char **args))
+{
+    region_active = 0;
+    return 0;
+}
 
 /**/
 int
