@@ -1,5 +1,7 @@
 2015-08-11  Oliver Kiddle <opk@zsh.org>
 
+	* 36096: Src/Zle/zle_move.c: special . mark in vi mode
+
 	* 36044: Doc/Zsh/zle.yo, Src/Zle/iwidgets.list, Src/Zle/zle_keymap.c,
 	Src/Zle/zle_move.c: deactivate-region widget for escape in visual mode
 
