@@ -98,7 +98,7 @@ _svn () {
           (mergeinfo)
             args[(r)--show-revs:arg:]=( '--show-revs=:revisions:(merged eligible)' )
           ;;
-	  (propget|propedit)
+	  (propget|propedit|propdel)
 	    args+=(
 		'1:property name:_svn_props'
 		'2:target: _alternative "files:file:_files" "urls:URL:_svn_urls"'
