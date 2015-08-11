@@ -1,3 +1,7 @@
+2015-08-11  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36090: Src/init.c: keep signals queued for preprompt()
+
 2015-08-11  Oliver Kiddle <opk@zsh.org>
 
 	* 36096: Src/Zle/zle_move.c: special . mark in vi mode

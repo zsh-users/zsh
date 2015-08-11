@@ -127,9 +127,7 @@ loop(int toplevel, int justonce)
 		 * no matter what.
 		 */
 		errflag = 0;
-		unqueue_signals();
 		preprompt();
-		queue_signals();
 		if (stophist != 3)
 		    hbegin(1);
 		else
