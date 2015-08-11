@@ -1607,8 +1607,8 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    !(jobtab[list_pipe_job].stat & STAT_STOPPED)) {
 		    int q = queue_signal_level();
 		    child_unblock();
-		    dont_queue_signals();
 		    child_block();
+		    dont_queue_signals();
 		    restore_queue_signals(q);
 		}
 		if (list_pipe_child &&

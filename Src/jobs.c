@@ -1420,9 +1420,9 @@ zwaitjob(int job, int wait_cmd)
     int q = queue_signal_level();
     Job jn = jobtab + job;
 
-    dont_queue_signals();
     child_block();		 /* unblocked during signal_suspend() */
     queue_traps(wait_cmd);
+    dont_queue_signals();
     if (jn->procs || jn->auxprocs) { /* if any forks were done         */
 	jn->stat |= STAT_LOCKED;
 	if (jn->stat & STAT_CHANGED)
@@ -1478,9 +1478,9 @@ zwaitjob(int job, int wait_cmd)
 	pipestats[0] = lastval;
 	numpipestats = 1;
     }
+    restore_queue_signals(q);
     unqueue_traps();
     child_unblock();
-    restore_queue_signals(q);
 
     return 0;
 }
