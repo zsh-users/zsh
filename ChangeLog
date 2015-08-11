@@ -1,5 +1,7 @@
 2015-08-11  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 36108: NEWS: list of major changes so far since 5.0.8
+
 	* 36104: Src/exec.c, Src/jobs.c: change order of child_block()
 	and dont_queue_signals() to resolve yet another race condition
 
