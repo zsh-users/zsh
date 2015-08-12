@@ -38,5 +38,5 @@ _arguments -C \
   "-e:compile and run <source> (implies -run)" \
   "-M-:import <module>.*; for -e" \
   "-v[display version info]" \
-  ":program file:_files -g '*.clay'"
+  ":program file:_files -g '*.clay(-.)'"
 

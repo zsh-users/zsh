@@ -1,5 +1,13 @@
 2015-08-12  Oliver Kiddle <opk@zsh.org>
 
+	* 36127: Completion/Zsh/Context/_brace_parameter,
+	Completion/Unix/Command/_git, Completion/Unix/Command/_ifconfig,
+	Completion/Unix/Command/_kvno, Completion/Unix/Command/_mh,
+	Completion/Unix/Command/_rm, Completion/Unix/Command/_ssh,
+	Completion/Unix/Command/_stty, Completion/Unix/Command/_vim,
+	Completion/Unix/Type/_pdf, Completion/Unix/Command/_clay:
+	assorted minor completion function changes
+
 	* 36125: Src/Zle/zle_hist.c: don't set history context in get-line
 
 	* 35834 (tweaked): Src/Zle/zle_misc.c: strip a final newline from

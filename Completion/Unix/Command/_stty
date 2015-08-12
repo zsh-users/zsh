@@ -14,5 +14,5 @@ else
 	      parmrk inpck istrip inlcr igncr icrnl iuclc ixon ixany ixoff \
               imaxbel isig icanon xcase echo echoe echok echonl noflsh \
               tostop echoctl echoprt echoke flusho pending iexten opost \
-	      olcuc onlcr ocrnl onocr onlret ofill ofdel 
+	      olcuc onlcr ocrnl onocr onlret ofill ofdel raw sane
 fi

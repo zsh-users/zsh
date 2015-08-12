@@ -105,7 +105,7 @@ _ssh () {
     ;;
   ssh-keygen)
     cmds=( -p -i -e -y -c -l -B -D -U )
-    _arguments \
+    _arguments -s \
       '-q[silence ssh-keygen]' \
       "($cmds -P)-b[specify number of bits in key]:bits in key" \
       "($cmds -P)-t[specify the type of the key to create]:key type:(rsa1 rsa dsa ecdsa ed25519)" \

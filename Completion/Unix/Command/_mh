@@ -1,4 +1,4 @@
-#compdef ali anno burst comp dist flist flists folder folders forw inc mark mhlist mhmail mhn mhparam mhpath mhshow mhstore msgchk next packf pick prev refile repl rmf rmm scan show sortm whom
+#compdef ali anno burst comp dist flist flists fmttest folder folders forw fnext fprev inc mark mhfixmsg mhlist mhmail mhn mhparam mhpath mhshow mhstore msgchk new next packf pick prev refile repl rmf rmm scan show sortm whom
 
 if [[ -z $commands[mhpath] ]]; then
   _message "MH commands are not available"
@@ -73,7 +73,9 @@ elif [[ $service = mhparam ]]; then
 elif [[ $service = ali ]]; then
   _email_addresses -n MH
 elif compset -P '*:'; then
-  _message -e number 'number of messages'
+  _alternative \
+    'sequences:sub-sequence:(first last cur prev next)'
+    'number: : _message -e number "number of messages"'
 else
   # Generate sequences.
   local foldnam folddir f sequences mhneg ret=1
@@ -95,6 +97,7 @@ else
   sequences=( ${${(f)"$(mark $foldnam 2>/dev/null)"}%%:*} )
   mhneg="$(mhparam Sequence-Negation)" && sequences=( {,$mhneg}$^sequences )
   sequences+=( all first last prev next )
+  [[ $service = mhpath ]] && sequences+=( new )
   _tags sequences
   while _tags; do
     while _next_label sequences expl sequence; do

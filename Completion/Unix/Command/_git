@@ -5188,7 +5188,7 @@ _git_commands () {
   local -a aliases
   __git_extract_aliases
   local cmdtype len dup sep
-  local -a allcmds allmatching alts disp
+  local -a allcmds allmatching alts disp expl
 
   zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
   for cmdtype in $cmdtypes aliases; do
@@ -5202,7 +5202,8 @@ _git_commands () {
     allcmds+=( ${(P)${:-${cmdtype}_m}} )
   done
   zstyle -T ":completion:${curcontext}:" verbose && disp=(-ld '${cmdtype}_d')
-  compadd -O allmatching -a allcmds
+  _description '' expl '' # get applicable matchers
+  compadd "$expl[@]" -O allmatching -a allcmds
   len=${#${(O)allmatching//?/.}[1]} # length of longest match
   for cmdtype in aliases $cmdtypes; do
     local -a ${cmdtype}_d

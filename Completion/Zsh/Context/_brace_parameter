@@ -152,7 +152,7 @@ if [[ $PREFIX = *'${('[^\)]# ]]; then
     "F:join arrays with newlines"
     "g:process echo array sequences (needs options)"
     "i:sort case-insensitively"
-    "k:subsitute keys of associative arrays"
+    "k:substitute keys of associative arrays"
     "L:lower case all letters"
     "n:sort decimal integers numerically"
     "o:sort in ascending order (lexically if no other sort option)"

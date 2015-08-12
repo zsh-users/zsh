@@ -1,4 +1,4 @@
-#compdef vim exim gvim gex gview nvim rvim rview rgvim rgview evim eview vimdiff gvimdiff
+#compdef vim gvim gex gview nvim rvim rview rgvim rgview evim eview vimdiff gvimdiff
 
 (( $+functions[_vim_files] )) ||
 _vim_files () {

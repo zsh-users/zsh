@@ -65,7 +65,7 @@ esac
 
 _arguments -C "$args[@]" \
   '-a[apply to all interfaces]' \
-  '1:network interface:_net_interfaces' \
+  '1:network interface:_net_interfaces -r ": \t\n\-"' \
   '::address family:(atalk ether inet inet6 ax25 ddp ipx netrom)' \
   '*:option:->options' && ret=0
   
