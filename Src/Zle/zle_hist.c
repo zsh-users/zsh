@@ -894,10 +894,8 @@ zgetline(UNUSED(char **args))
 	free(s);
 	free(lineadd);
 	clearlist = 1;
-	if (stackhist != -1) {
-	    histline = stackhist;
-	    stackhist = -1;
-	}
+	/* not restoring stackhist as we're inserting into current line */
+	stackhist = -1;
     }
     return 0;
 }
