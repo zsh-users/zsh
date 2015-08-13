@@ -1,5 +1,9 @@
 2015-08-13  Oliver Kiddle <opk@zsh.org>
 
+	* 36131: Functions/Zle/narrow-to-region, Src/Zle/zle_utils.c:
+	make use of undo limits; call mkundoent() when $UNDO_CHANGE_NO is
+	referenced for a clear change number marking the current state
+
 	* Eric Cook: 36113: Completion/Unix/Type/_find_net_interfaces:
 	ip(8) may add suffixes which is not good for completion matches
 
