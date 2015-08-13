@@ -4973,8 +4973,8 @@ __git_is_treeish () {
 (( $+functions[__git_is_committish_range] )) ||
 __git_is_committish_range () {
   [[ $1 == *..(.|)* ]] || return 1
-  local first=$(__git_committish_range_first $1)
-  local last=$(__git_committish_range_last $1)
+  local first="$(__git_committish_range_first $1)"
+  local last="$(__git_committish_range_last $1)"
   [[ $first != *..* && $last != *..* ]] && \
     __git_is_committish $first && \
     __git_is_committish $last
