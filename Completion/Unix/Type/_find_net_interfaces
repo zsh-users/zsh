@@ -21,22 +21,15 @@ case $OSTYPE in
   ;;
   darwin*|freebsd*|dragonfly*) net_intf_list=( $(ifconfig -l) ) ;;
   irix*) net_intf_list=( ${${${(f)"$(/usr/etc/netstat -i)"}%% *}[2,-1]} ) ;;
-  *linux*)
-    if (( $+commands[ip] )); then
-      net_intf_list=( ${${(m)${(f)"$(ip -o link)"}#*: }%%: *} )
-    fi
-  ;&
-
   *)
-  if [[ ${#net_intf_list} -eq 0 ]]; then
     # linux's deprecated ifconfig may truncate long interface names
-    net_intf_list=( $(ifconfig -a 2>/dev/null | sed -n 's/^\([^ 	:]*\).*/\1/p') )
-    if [[ -d /proc/sys/net/ipv4/conf ]]; then
-      # On linux we used to use the following as the default.
-      # However, we now use ip or ifconfig since it finds additional devices such
+    net_intf_list=( $(_call_program interfaces "ifconfig -a 2>/dev/null | sed -n 's/^\([^ 	:]*\).*/\1/p'") )
+    if (( ${#net_intf_list} == 0 )) && [[ -d /proc/sys/net/ipv4/conf ]]; then
+      # On linux we used to use the following as the default, without /sys/class/net/*.
+      # However, we now use ifconfig since it finds additional devices such
       # as tunnels.  So only do this if that didn't work.
-      net_intf_list=( /proc/sys/net/ipv4/conf/*~*(all|default)(N:t) )
+      typeset -gU net_intf_list
+      net_intf_list=( /proc/sys/net/ipv4/conf/*~*(all|default)(N:t) /sys/class/net/*(N:t) )
     fi
-  fi
   ;;
 esac
