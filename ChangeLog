@@ -1,3 +1,8 @@
+2015-08-15  Mikael Magnusson  <mikachu@gmail.com>
+
+	* Eric Cook: 36091: Completion/Unix/Command/_ncftp: search
+	XDG_DATA_HOME for bookmarks saved by lftp
+
 2015-08-14  Oliver Kiddle <opk@zsh.org>
 
 	* 36146: Completion/Zsh/Type/_command_names,
