@@ -1,3 +1,8 @@
+2015-08-17  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 36172: Completion/Unix/Command/_imagemagick: Use $formats a
+	bit more correctly
+
 2015-08-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted (cf. 36200): Completion/Base/Completer/_expand: back out
