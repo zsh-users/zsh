@@ -17,9 +17,7 @@ defs=(
 )
 
 [[ -n "$path[(r).]" || $PREFIX = */* ]] &&
-  defs=( "$defs[@]"
-         'executables:executable file or directory:_path_files -/g \*\(-\*\)'
-  )
+    defs+=( 'executables:executable file:_files -g \*\(-\*\)' )
 
 if [[ "$1" = -e ]]; then
   shift
