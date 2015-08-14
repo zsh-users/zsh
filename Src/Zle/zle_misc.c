@@ -787,8 +787,8 @@ bracketedpaste(char **args)
 	    zmult = 1;
 	    if (region_active)
 		killregion(zlenoargs);
-	    /* chop a final newline if it's insertion would be hard to
-	     * distinguish by the user from the line being accepted */
+	    /* Chop a final newline if its insertion would be hard to
+	     * distinguish by the user from the line being accepted. */
 	    else if (n > 1 && zlecontext != ZLCON_VARED &&
 		    (zlecs + (insmode ? 0 : n - 1)) >= zlell &&
 		    wpaste[n-1] == ZWC('\n'))

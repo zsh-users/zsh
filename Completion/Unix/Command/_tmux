@@ -1577,7 +1577,7 @@ function _tmux() {
         '-2[force using 256 colours]'
         '-8[force using 88 colours]'
         '-c[execute a shell command]:command name:_command_names'
-        '-C[start tmux in contol mode. -CC disables echo]'
+        '-C[start tmux in control mode. -CC disables echo]'
         '-f[specify configuration file]:tmux config file:_files -g "*(-.)"'
         '-l[behave like a login shell]'
         '-L[specify socket name]:socket name:__tmux-socket-name'
