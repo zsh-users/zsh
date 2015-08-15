@@ -2,8 +2,9 @@
 
 local expl ret=1
 local -a onopts offopts
-onopts=( ${(k)_comp_caller_options[(R)on]} )
-offopts=( ${(k)_comp_caller_options[(R)off]} )
+onopts=( ${(k)_comp_caller_options[(R)on]} printexitvalue )
+offopts=( ${(k)_comp_caller_options[(R)off]} printexitvalue )
+typeset -U onopts offopts
 case $service in
   setopt) onopts=(no$onopts) ;;
   unsetopt) offopts=(no$offopts) ;;

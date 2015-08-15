@@ -1,3 +1,8 @@
+2015-08-17  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 36177: Completion/Zsh/Command/_setopt: complete printexitvalue
+	both ways
+
 2015-08-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36180: Src/jobs.c: avoid infinite job stop/continue loop on
