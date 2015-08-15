@@ -1384,10 +1384,17 @@ waitforpid(pid_t pid, int wait_cmd)
     dont_queue_signals();
     child_block();		/* unblocked in signal_suspend() */
     queue_traps(wait_cmd);
+
+    /* This function should never be called with a pid that is not a
+     * child of the current shell.  Consequently, if kill(0, pid)
+     * fails here with ESRCH, the child has already been reaped.  In
+     * the loop body, we expect this to happen in signal_suspend()
+     * via zhandler(), after which this test terminates the loop.
+     */
     while (!errflag && (kill(pid, 0) >= 0 || errno != ESRCH)) {
 	if (first)
 	    first = 0;
-	else
+	else if (!wait_cmd)
 	    kill(pid, SIGCONT);
 
 	last_signal = -1;
