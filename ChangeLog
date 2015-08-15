@@ -1,5 +1,8 @@
 2015-08-17  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Completion/Linux/Command/_sshfs: _sshfs: Fix
+	completion of options with values
+
 	* 36158: Completion/Linux/Command/_sshfs: _sshfs: Fix completion
 	of and after -o
 
