@@ -3,6 +3,8 @@
 	* 36177: Completion/Zsh/Command/_setopt: complete printexitvalue
 	both ways
 
+	* 36183: Completion/Unix/Command/_ssh: update to 7.0
+
 2015-08-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36180: Src/jobs.c: avoid infinite job stop/continue loop on
