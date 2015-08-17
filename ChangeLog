@@ -1,3 +1,10 @@
+2015-08-17  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 36177: Completion/Zsh/Command/_setopt: complete printexitvalue
+	both ways
+
+	* 36183: Completion/Unix/Command/_ssh: update to 7.0
+
 2015-08-16  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* 36195, 36196: Functions/Zle/bracketed-paste-magic: wrapper of
