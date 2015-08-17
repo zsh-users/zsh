@@ -1702,11 +1702,17 @@ sect(What's wrong with cut and paste on my xterm?)
      already active, and needs to be turned off when the first command is
      executed.  The shell doesn't even know if the remaining text is input
      to a command or for the shell, so there's simply nothing it can do.
+
      However, if you have problems you can trick it: type `tt({)' on a line
      by itself, then paste the input, then type `tt(})' on a line by
      itself.  The shell will not execute anything until the final brace is
      read; all input is read as continuation lines (this may require the
      fixes referred to above in order to be reliable).
+
+     As of 5.0.9, this trick is not necessary on terminal emulators that
+     support the em(bracketed paste) feature (this includes most modern
+     terminal emulators).  See the description of tt($zle_bracketed_paste)
+     in the tt(zshparam) manual page for details.
   )
 
 

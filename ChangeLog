@@ -1,3 +1,7 @@
+2015-08-17  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 36186: Etc/FAQ.yo: FAQ (3.24): Update for bracketed paste
+
 2015-08-17  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 36172: Completion/Unix/Command/_imagemagick: Use $formats a
