@@ -8,6 +8,12 @@
 #       autoload -Uz url-quote-magic
 #       zle -N self-insert url-quote-magic
 
+# As of zsh-5.0.9, the following may also be necessary in order to apply
+# quoting to copy-pasted URLs:
+#       autload -Uz bracketed-paste-magic
+#       zle -N bracketed-paste bracketed-paste-magic
+# See also backward-extend-paste in bracketed-paste-magic source file.
+
 # A number of zstyles may be set to control the quoting behavior.
 #
 # url-metas
