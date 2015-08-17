@@ -33,6 +33,8 @@ if (( $tmp[(I)-g*] )); then
   # add `#q' to the beginning of any glob qualifier if not there already
   [[ "$glob" = (#b)(*\()([^\|\~]##\)) && $match[2] != \#q* ]] &&
       glob="${match[1]}#q${match[2]}"
+elif [[ $type = */* ]]; then
+  glob="*(-/)"
 fi
 tmp=$opts[(I)-F]
 if (( tmp )); then
@@ -51,59 +53,21 @@ else
 fi
 
 if zstyle -a ":completion:${curcontext}:" file-patterns tmp; then
-  [[ "$type" = */* ]] && glob="$glob,*(-/)"
   pats=()
 
   for i in ${tmp//\%p/${${glob:-\*}//:/\\:}}; do
     if [[ $i = *[^\\]:* ]]; then
-      pats=( "$pats[@]" " $i " )
+      pats+=( " $i " )
     else
-      pats=( "$pats[@]" " ${i}:files " )
+      pats+=( " ${i}:files " )
     fi
   done
 elif zstyle -t ":completion:${curcontext}:" list-dirs-first; then
-  if [[ "$type" = *g* ]]; then
-
-    # add `^-/' after `#q' glob qualifier if not there already
-    if [[ "$glob" = (#b)(*\(\#q)(*\)) ]]; then
-      [[ $match[2] != \^-/* ]] &&
-      glob="${match[1]}^-/,${match[2]}"
-    else
-      glob="$glob(#q^-/)"
-    fi
-
-    pats=( " *(-/):directories:directories ${glob//:/\\:}:globbed-files" )
-  elif [[ "$type" = */* ]] then
-    pats=( '*(-/):directories ' '*:all-files ' )
-  else
-    pats=( '*(-/):directories:directories *(^-/):other-files ' )
-  fi
+  pats=( " *(-/):directories:directory ${${glob:-*}//:/\\:}(#q^-/):globbed-files" '*:all-files' )
 else
-  if [[ "$type" = *g* ]]; then
-
   # People prefer to have directories shown on first try as default.
   # Even if the calling function didn't use -/.
-  #
-  # if [[ "$type" = */* ]]; then
-
-    pats=( " ${glob//:/\\:}:globbed-files *(-/):directories" '*:all-files '
-
-    ### We could allow _next_tags to offer only globbed-files or directories
-    ### by adding:
-    ###   " ${glob//:/\\:}:only-globbed-files " ' *(-/):only-directories '
-
-      )
-
-  # else
-  #   pats=( " ${glob//:/\\:}:globbed-files "
-  #          '*(-/):directories ' '*:all-files ' )
-  # fi
-
-  elif [[ "$type" = */* ]]; then
-    pats=( '*(-/):directories ' '*:all-files ' )
-  else
-    pats=( '*:all-files ' )
-  fi
+  pats=( "${${glob:-*}//:/\\:}:globbed-files *(-/):directories" '*:all-files ' )
 fi
 
 tried=()

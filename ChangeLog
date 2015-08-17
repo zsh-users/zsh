@@ -1,3 +1,8 @@
+2015-08-17  Oliver Kiddle <opk@zsh.org>
+
+	* 36165: Completion/Unix/Type/_files: simplify file-patterns
+	default to a single pattern
+
 2015-08-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Zle/url-quote-magic: mention
