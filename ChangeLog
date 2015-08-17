@@ -1,3 +1,8 @@
+2015-08-19  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 36208: Completion/Unix/Command/_subversion: _subversion:
+	Complete a few more option switches
+
 2015-08-18  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36232: Src/compat.c: Unmeta an additional chdir().
