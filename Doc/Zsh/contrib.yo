@@ -3834,7 +3834,12 @@ The pattern is always treated as an tt(EXTENDED_GLOB) pattern.  Any file
 whose name is not changed by the substitution is simply ignored.  Any
 error (a substitution resulted in an empty string, two substitutions gave
 the same result, the destination was an existing regular file and tt(-f)
-was not given) causes the entire function to abort without doing anything.
+was not given) causes the entire function to abort without doing
+anything.
+
+In addition to pattern replacement, the variable tt($f) can be referrred
+to in the second (replacement) argument.  This makes it possible to
+use variable substitution to alter the argument; see examples below.
 
 Options:
 
@@ -3882,6 +3887,10 @@ example(zmv -v '(* *)' '${1// /_}')
 
 For any file in the current directory with at least one space in the name,
 replace every space by an underscore and display the commands executed.
+
+example(zmv -v '* *' '${f// /_}')
+
+This does exactly the same by referring to the file name stored in tt($f).
 
 For more complete examples and other implementation details, see the
 tt(zmv) source file, usually located in one of the directories named in

@@ -1,3 +1,7 @@
+2015-08-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Doc/Zsh/contrib.yo: use of $f in zmv.
+
 2015-08-17  Oliver Kiddle <opk@zsh.org>
 
 	* 36165: Completion/Unix/Type/_files: simplify file-patterns
