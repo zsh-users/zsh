@@ -1,3 +1,8 @@
+2015-08-18  brian m. carlson  <sandals@crustytoothpaste.net>
+
+	* 36209: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info: avoid grep error message when file is missing
+
 2015-08-17  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Completion/Linux/Command/_sshfs: _sshfs: Fix

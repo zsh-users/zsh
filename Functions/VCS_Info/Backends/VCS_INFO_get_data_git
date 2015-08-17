@@ -210,7 +210,9 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
         # remove action
         git_patches_applied+=("${${(s: :)p}[2,-1]}")
     done
-    git_patches_unapplied=(${(f)"$(grep -v '^$' "${patchdir}/git-rebase-todo" | grep -v '^#')"})
+    if [[ -f "${patchdir}/git-rebase-todo" ]] ; then
+        git_patches_unapplied=(${(f)"$(grep -v '^$' "${patchdir}/git-rebase-todo" | grep -v '^#')"})
+    fi
     VCS_INFO_git_handle_patches
 elif [[ -d "${gitdir}/rebase-apply" ]]; then
     # Fake patch names for all but current patch
