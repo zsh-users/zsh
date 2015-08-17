@@ -1,3 +1,8 @@
+2015-08-17  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted (cf. 36200): Completion/Base/Completer/_expand: back out
+	backslash handling change from 34961.
+
 2015-08-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Doc/Zsh/contrib.yo: use of $f in zmv.
