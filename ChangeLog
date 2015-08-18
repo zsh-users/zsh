@@ -1,6 +1,6 @@
 2015-08-18  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* Doc/Zsh/zle.yo: Simpler saving of UNDON_LIMT_NO.
+	* 36216: Doc/Zsh/zle.yo: Simpler saving of UNDO_LIMT_NO.
 
 2015-08-17  Barton E. Schaefer  <schaefer@zsh.org>
 
