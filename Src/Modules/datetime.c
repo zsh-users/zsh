@@ -140,7 +140,8 @@ output_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
     if (scalar) {
 	setsparam(scalar, metafy(buffer, -1, META_DUP));
     } else {
-	printf("%s\n", buffer);
+	zputs(buffer, stdout);
+	putchar('\n');
     }
     zfree(buffer, bufsize);
 
