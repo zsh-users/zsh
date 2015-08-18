@@ -971,14 +971,12 @@ to use `tt(zle undo) var(change)' in a widget to undo beyond
 that point; in that case, it will not be possible to undo at
 all until tt(UNDO_LIMIT_NO) is reduced.  Set to 0 to disable the limit.
 
-A typical use of this variable in a widget function is as follows:
+A typical use of this variable in a widget function is as follows (note
+the additional function scope is required):
 
-example(integer save_limit=$UNDO_LIMIT_NO
-UNDO_LIMIT_NO=$UNDO_CHANGE_NO
-{
+example(LPAR()RPAR() {
+  local UNDO_LIMIT_NO=$UNDO_CHANGE_NO
   # Perform some form of recursive edit.
-} always {
-  UNDO_LIMIT_NO=save_limit
 })
 )
 vindex(WIDGET)
