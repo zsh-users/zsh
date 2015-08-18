@@ -1,5 +1,7 @@
 2015-08-18  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 36232: Src/compat.c: Unmeta an additional chdir().
+
 	* 36227: Src/Builtins/sched.c, Src/Modules/datetime.c,
 	Src/Modules/stat.c, Src/builtin.c, Src/prompt.c, Src/utils.c,
 	Src/watch.c: real fix for metafication problem in ztrftime:

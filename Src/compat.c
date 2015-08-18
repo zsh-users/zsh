@@ -465,7 +465,7 @@ zchdir(char *dir)
     int currdir = -2;
 
     for (;;) {
-	if (!*dir || chdir(dir) == 0) {
+	if (!*dir || chdir(unmeta(dir)) == 0) {
 #ifdef HAVE_FCHDIR
            if (currdir >= 0)
                close(currdir);
