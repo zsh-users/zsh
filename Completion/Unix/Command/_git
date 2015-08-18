@@ -1093,11 +1093,11 @@ _git-log () {
   case $state in
     (first-commit-ranges-or-files)
       if [[ -n ${opt_args[(I)--]} ]]; then
-	__git_cached_files && ret=0
+	__git_tree_files ${PREFIX:-.} HEAD && ret=0
       else
 	_alternative \
 	  'commit-ranges::__git_commit_ranges' \
-	  'cached-files::__git_cached_files' && ret=0
+	  'cached-files::__git_tree_files ${PREFIX:-.} HEAD' && ret=0
       fi
     ;;
     (commit-ranges-or-files)
@@ -1109,7 +1109,7 @@ _git-log () {
       elif __git_is_committish $line[1]; then
 	__git_tree_files ${PREFIX:-.} $line[1] && ret=0
       else
-	__git_cached_files && ret=0
+	__git_tree_files ${PREFIX:-.} HEAD && ret=0
       fi
     ;;
   esac
