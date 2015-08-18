@@ -15,7 +15,7 @@
 	* 36218: Src/files.c: use unmetafied file name for mkdir()
 	system call.
 
-	* 36216: Doc/Zsh/zle.yo: Simpler saving of UNDO_LIMT_NO.
+	* 36216: Doc/Zsh/zle.yo: Simpler saving of UNDO_LIMIT_NO.
 
 2015-08-17  Barton E. Schaefer  <schaefer@zsh.org>
 
