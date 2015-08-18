@@ -1,5 +1,11 @@
 2015-08-18  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 36227: Src/Builtins/sched.c, Src/Modules/datetime.c,
+	Src/Modules/stat.c, Src/builtin.c, Src/prompt.c, Src/utils.c,
+	Src/watch.c: real fix for metafication problem in ztrftime:
+	unmetafy fmt on input and metafy return value with correct
+	length.
+
 	* unposted: revert 36222, not the correct fix.
 
 	* 36222: Src/Modules/datetime.c: unmetafy output from strftime.

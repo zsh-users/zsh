@@ -1783,9 +1783,12 @@ fclist(FILE *f, Options ops, zlong first, zlong last,
 	       command, if required */
 	    if (tdfmt != NULL) {
 		struct tm *ltm;
+		int len;
 		ltm = localtime(&ent->stim);
-		if (ztrftime(timebuf, 256, tdfmt, ltm, 0L))
-		    fprintf(f, "%s  ", timebuf);
+		if ((len = ztrftime(timebuf, 256, tdfmt, ltm, 0L)) >= 0) {
+		    fwrite(timebuf, 1, len, f);
+		    fprintf(f, "  ");
+		}
 	    }
 	    /* display the time taken by the command, if required */
 	    if (OPT_ISSET(ops,'D')) {

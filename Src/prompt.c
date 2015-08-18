@@ -271,7 +271,7 @@ static int
 putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 {
     char *ss, *hostnam;
-    int t0, arg, test, sep, j, numjobs;
+    int t0, arg, test, sep, j, numjobs, len;
     struct tm *tm;
     struct timezone dummy_tz;
     struct timeval tv;
@@ -673,12 +673,14 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		     */
 		    for(j = 0, t0 = strlen(tmfmt)*8; j < 3; j++, t0*=2) {
 			addbufspc(t0);
-			if (ztrftime(bv->bp, t0, tmfmt, tm, tv.tv_usec) >= 0)
+			if ((len = ztrftime(bv->bp, t0, tmfmt, tm, tv.tv_usec))
+			    >= 0)
 			    break;
 		    }
 		    /* There is enough room for this because addbufspc(t0)
 		     * allocates room for t0 * 2 bytes. */
-		    metafy(bv->bp, -1, META_NOALLOC);
+		    if (len >= 0)
+			metafy(bv->bp, len, META_NOALLOC);
 		    bv->bp += strlen(bv->bp);
 		    zsfree(tmbuf);
 		    break;

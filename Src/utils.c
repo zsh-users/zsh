@@ -2878,6 +2878,10 @@ ztrftimebuf(int *bufsizeptr, int decr)
  * not enough memory --- and return -1.  Not guaranteed to be portable,
  * since the strftime() interface doesn't make any guarantees about
  * the state of the buffer if it returns zero.
+ *
+ * fmt is metafied, but we need to unmetafy it on the fly to
+ * pass into strftime / combine with the output from strftime.
+ * The return value in buf is not metafied.
  */
 
 /**/
@@ -2898,8 +2902,14 @@ ztrftime(char *buf, int bufsize, char *fmt, struct tm *tm, long usec)
     char *origbuf = buf;
 
 
-    while (*fmt)
-	if (*fmt == '%') {
+    while (*fmt) {
+	if (*fmt == Meta) {
+	    int chr = fmt[1] ^ 32;
+	    if (ztrftimebuf(&bufsize, 1))
+		return -1;
+	    *buf++ = chr;
+	    fmt += 2;
+	} else if (*fmt == '%') {
 	    int strip;
 	    int digs = 3;
 
@@ -3083,8 +3093,21 @@ strftimehandling:
 		 */
 		{
 		    int size = fmt - fmtstart;
-		    char *tmp = zhalloc(size + 1);
+		    char *tmp, *last;
+		    tmp = zhalloc(size + 1);
 		    strncpy(tmp, fmtstart, size);
+		    last = fmt-1;
+		    if (*last == Meta) {
+			/*
+			 * This is for consistency in counting:
+			 * a metafiable character isn't actually
+			 * a valid strftime descriptor.
+			 *
+			 * Previous characters were explicitly checked,
+			 * so can't be metafied.
+			 */
+			*last = *++fmt ^ 32;
+		    }
 		    tmp[size] = '\0';
 		    *buf = '\1';
 		    if (!strftime(buf, bufsize + 2, tmp, tm))
@@ -3107,6 +3130,7 @@ strftimehandling:
 		return -1;
 	    *buf++ = *fmt++;
 	}
+    }
     *buf = '\0';
     return buf - origbuf;
 }

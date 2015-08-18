@@ -220,7 +220,8 @@ bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 		endstr = "-- ";
 	    else
 		endstr = "";
-	    printf("%3d %s %s%s%s\n", sn, tbuf, flagstr, endstr, sch->cmd);
+	    printf("%3d %s %s%s%s\n", sn, tbuf, flagstr, endstr,
+		   unmeta(sch->cmd));
 	}
 	return 0;
     } else if (!argptr[1]) {

@@ -98,7 +98,7 @@ reverse_strftime(char *nam, char **argv, char *scalar, int quiet)
 static int
 output_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
 {
-    int bufsize, x;
+    int bufsize, x, len;
     char *endptr = NULL, *scalar = NULL, *buffer;
     time_t secs;
     struct tm *t;
@@ -131,16 +131,19 @@ output_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
     bufsize = strlen(argv[0]) * 8;
     buffer = zalloc(bufsize);
 
+    len = 0;
     for (x=0; x < 4; x++) {
-        if (ztrftime(buffer, bufsize, argv[0], t, 0L) >= 0)
+        if ((len = ztrftime(buffer, bufsize, argv[0], t, 0L)) >= 0)
 	    break;
 	buffer = zrealloc(buffer, bufsize *= 2);
     }
+    DPUTS(len < 0, "bad output from ztrftime");
 
     if (scalar) {
-	setsparam(scalar, metafy(buffer, -1, META_DUP));
+	setsparam(scalar, metafy(buffer, len, META_DUP));
     } else {
-	printf("%s\n", buffer);
+	fwrite(buffer, 1, len, stdout);
+	putchar('\n');
     }
     zfree(buffer, bufsize);
 
