@@ -1,3 +1,8 @@
+2015-08-17  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36212: Functions/Zle/narrow-to-region: save and restore HISTNO
+	along with other editor state, for sanity of "zle undo"
+
 2015-08-18  brian m. carlson  <sandals@crustytoothpaste.net>
 
 	* 36209: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:

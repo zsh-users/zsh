@@ -32,7 +32,7 @@ setopt localoptions noshwordsplit noksharrays
 
 local _ntr_newbuf _ntr_lbuf_return _ntr_rbuf_return
 local _ntr_predisplay=$PREDISPLAY _ntr_postdisplay=$POSTDISPLAY
-integer _ntr_savelim=UNDO_LIMIT_NO _ntr_changeno
+integer _ntr_savelim=UNDO_LIMIT_NO _ntr_changeno _ntr_histno=HISTNO
 integer _ntr_start _ntr_end _ntr_swap _ntr_cursor=$CURSOR _ntr_mark=$MARK
 integer _ntr_stat
 
@@ -108,7 +108,7 @@ if [[ -n $_ntr_save || -z $_ntr_restore ]]; then
     builtin typeset -ga $_ntr_save
     set -A $_ntr_save "${_ntr_predisplay}" "${_ntr_postdisplay}" \
 	"${_ntr_savelim}" "${_ntr_changeno}" \
-	"${_ntr_start}" "${_ntr_end}" || return 1
+	"${_ntr_start}" "${_ntr_end}" "${_ntr_histno}" || return 1
   fi
 
   BUFFER=${BUFFER[_ntr_start+1,_ntr_end]}
@@ -135,13 +135,15 @@ if [[ -n $_ntr_restore || -z $_ntr_save ]]; then
 	   _ntr_savelim="${${(@P)_ntr_restore}[3]}"
 	   _ntr_changeno="${${(@P)_ntr_restore}[4]}"
 	   _ntr_start="${${(@P)_ntr_restore}[5]}"
-	   _ntr_end="${${(@P)_ntr_restore}[6]}" }; then
+	   _ntr_end="${${(@P)_ntr_restore}[6]}"
+	   _ntr_histno="${${(@P)_ntr_restore}[7]}" }; then
       zle -M Failed. >&2
       return 1
     fi
   fi
 
   _ntr_newbuf="$BUFFER"
+  HISTNO=_ntr_histno
   zle undo $_ntr_changeno
   PREDISPLAY=$_ntr_predisplay
   POSTDISPLAY=$_ntr_postdisplay
