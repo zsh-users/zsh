@@ -131,7 +131,7 @@ domkdir(char *nam, char *path, mode_t mode, int p)
 	    return 0;
     }
     oumask = umask(0);
-    err = mkdir(path, mode) ? errno : 0;
+    err = mkdir(rpath, mode) ? errno : 0;
     umask(oumask);
     if(!err)
 	return 0;

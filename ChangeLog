@@ -1,5 +1,8 @@
 2015-08-18  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 36218: Src/files.c: use unmetafied file name for mkdir()
+	system call.
+
 	* 36216: Doc/Zsh/zle.yo: Simpler saving of UNDO_LIMT_NO.
 
 2015-08-17  Barton E. Schaefer  <schaefer@zsh.org>
