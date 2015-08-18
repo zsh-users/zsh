@@ -1,5 +1,7 @@
 2015-08-18  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: revert 36222, not the correct fix.
+
 	* 36222: Src/Modules/datetime.c: unmetafy output from strftime.
 
 	* 36218: Src/files.c: use unmetafied file name for mkdir()
