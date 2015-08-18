@@ -1101,6 +1101,11 @@ _git-log () {
       fi
     ;;
     (commit-ranges-or-files)
+      # Multiple revspecs are permitted.
+      if [[ -z ${opt_args[(I)--]} ]]; then
+        __git_commit_ranges "$@" && ret=0
+      fi
+
       # TODO: Write a wrapper function that checks whether we have a
       # committish range or comittish and calls __git_tree_files
       # appropriately.
