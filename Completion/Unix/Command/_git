@@ -5740,7 +5740,7 @@ __git_tree_ishs () {
 __git_objects () {
   compset -P '*:'
   if [[ -n $IPREFIX ]]; then
-    __git_tree_files "$PREFIX" "${IPREFIX%:}"
+    __git_tree_files --root-relative "$PREFIX" "${IPREFIX%:}"
   else
     _alternative \
       'revisions::__git_revisions' \
@@ -5985,12 +5985,23 @@ __git_changed_files () {
     'changed-in-working-tree-files::__git_changed-in-working-tree_files'
 }
 
+#     __git_tree_files [--root-relative] FSPATH TREEISH [TREEISH...] [COMPADD OPTIONS]
+#
+# Complete [presently: a single level of] repository files under FSPATH.
+# FSPATH is interpreted as a directory path within each TREEISH.
+# FSPATH is relative to cwd, unless --root-relative is specified, in
+# which case it is relative to the repository root.
 (( $+functions[__git_tree_files] )) ||
 __git_tree_files () {
   local multi_parts_opts
   local tree Path
   integer at_least_one_tree_added
   local -a tree_files compadd_opts
+  local -a extra_args
+
+  if [[ $1 == --root-relative ]]; then
+    extra_args+=(--full-tree)
+  fi
 
   zparseopts -D -E -a compadd_opts V: J: 1 2 n f X: M: P: S: r: R: q F:
 
@@ -5998,7 +6009,7 @@ __git_tree_files () {
   shift
   (( at_least_one_tree_added = 0 ))
   for tree in $*; do
-    tree_files+=(${(ps:\0:)"$(_call_program tree-files git ls-tree --name-only -z $tree $Path 2>/dev/null)"})
+    tree_files+=(${(ps:\0:)"$(_call_program tree-files git ls-tree $extra_args --name-only -z $tree $Path 2>/dev/null)"})
     __git_command_successful $pipestatus && (( at_least_one_tree_added = 1 ))
   done
 
