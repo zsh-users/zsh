@@ -65,3 +65,7 @@
 >   JANUARY
 >090
 >1
+
+  print ${(V)"$(strftime $'%Y\0%m\0%d' 100000000)"}
+0:Embedded nulls
+>1973^@03^@03
