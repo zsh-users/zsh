@@ -1087,33 +1087,31 @@ _git-log () {
     $revision_options \
     '-L+[trace the evolution of a line range or regex within a file]:range' \
     '(-)--[start file arguments]' \
-    '*:: :->commit-range-or-file' && ret=0
+    '1: :->first-commit-ranges-or-files' \
+    '*: :->commit-ranges-or-files' && ret=0
 
   case $state in
-    (commit-range-or-file)
-      case $CURRENT in
-        (1)
-          if [[ -n ${opt_args[(I)--]} ]]; then
-            __git_cached_files && ret=0
-          else
-            _alternative \
-              'commit-ranges::__git_commit_ranges' \
-              'cached-files::__git_cached_files' && ret=0
-          fi
-          ;;
-        (*)
-          # TODO: Write a wrapper function that checks whether we have a
-          # committish range or comittish and calls __git_tree_files
-          # appropriately.
-          if __git_is_committish_range $line[1]; then
-            __git_tree_files ${PREFIX:-.} $(__git_committish_range_last $line[1]) && ret=0
-          elif __git_is_committish $line[1]; then
-            __git_tree_files ${PREFIX:-.} $line[1] && ret=0
-          else
-            __git_cached_files && ret=0
-          fi
-          ;;
-      esac
+    (first-commit-ranges-or-files)
+      if [[ -n ${opt_args[(I)--]} ]]; then
+	__git_cached_files && ret=0
+      else
+	_alternative \
+	  'commit-ranges::__git_commit_ranges' \
+	  'cached-files::__git_cached_files' && ret=0
+      fi
+    ;;
+    (commit-ranges-or-files)
+      # TODO: Write a wrapper function that checks whether we have a
+      # committish range or comittish and calls __git_tree_files
+      # appropriately.
+      if __git_is_committish_range $line[1]; then
+	__git_tree_files ${PREFIX:-.} $(__git_committish_range_last $line[1]) && ret=0
+      elif __git_is_committish $line[1]; then
+	__git_tree_files ${PREFIX:-.} $line[1] && ret=0
+      else
+	__git_cached_files && ret=0
+      fi
+    ;;
   esac
 
   return ret

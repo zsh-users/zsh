@@ -1,3 +1,8 @@
+2015-08-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 36148: Completion/Unix/Command/_git: _git-log: Complete flags
+	after positional argument
+
 2015-08-19  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36241: Test/V09datetime.ztst: Test for 36227.
