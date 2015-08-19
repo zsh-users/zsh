@@ -5740,7 +5740,11 @@ __git_tree_ishs () {
 __git_objects () {
   compset -P '*:'
   if [[ -n $IPREFIX ]]; then
-    __git_tree_files --root-relative "$PREFIX" "${IPREFIX%:}"
+    if compset -P ./ ; then
+      __git_tree_files                 "$PREFIX" "${IPREFIX%:./}"
+    else
+      __git_tree_files --root-relative "$PREFIX" "${IPREFIX%:}"
+    fi
   else
     _alternative \
       'revisions::__git_revisions' \
