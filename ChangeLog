@@ -1,3 +1,8 @@
+2015-08-20  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 36243: Completion/Unix/Type/_pids: fix a few problems of
+	"_pids -m pattern"
+
 2015-08-19  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 36247: Completion/Unix/Command/_git: __git_objects: Complete
