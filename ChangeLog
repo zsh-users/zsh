@@ -1,5 +1,14 @@
 2015-08-21  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 36268: Test/C04funcdef.ztst: test for 36265.
+
+	* 36265 plus FAQ: fix alias expansion after "function"
+	Names after the first were treated as command words so had
+	non-global aliases expanded. Add an FAQ note that use of the
+	function keyword works around other alias problems.  Also
+	fixes problem that "function { ... }" didn't work with
+	IGNORE_BRACES set.
+
 	* 36264: Src/glob.c: pathbuf is apparently metafied; document
 	this and unmetafy for system calls.
 

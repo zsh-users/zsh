@@ -295,6 +295,19 @@
 >}
 >This is the correct output.
 
+ unfunction command_not_found_handler # amusing but unhelpful
+ alias first='firstfn1 firstfn2' second='secondfn1 secondfn2'
+ function first second { print This is function $0; }
+ first
+ second
+ firstfn1
+ secondfn1
+127:No alias expansion after "function" keyword
+>This is function first
+>This is function second
+?(eval):6: command not found: firstfn1
+?(eval):7: command not found: secondfn1
+
 %clean
 
  rm -f file.in file.out
