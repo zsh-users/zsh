@@ -5,6 +5,9 @@
 
 2015-08-21  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 36266: Functions/Zle/bracketed-paste-magic: preserve emulation
+	and setopt context for init and finish functions, handle vi modes
+
 	* 36256: Src/builtin.c: local options should remain in effect
 	for "emulate -L" even if additional option settings are applied
 
