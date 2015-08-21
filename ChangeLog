@@ -1,5 +1,8 @@
 2015-08-21  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 36264: Src/glob.c: pathbuf is apparently metafied; document
+	this and unmetafy for system calls.
+
 	* unposted: README, Etc/FAQ.yo: update latest release from 5.0.8
 	to 5.1 in descriptive text.
 

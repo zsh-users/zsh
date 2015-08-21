@@ -102,8 +102,14 @@ int badcshglob;
 /**/
 int pathpos;		/* position in pathbuf (needed by pattern code) */
 
+/*
+ * pathname buffer (needed by pattern code).
+ * It is currently believed the string in here is stored metafied and is
+ * unmetafied temporarily as needed by system calls.
+ */
+
 /**/
-char *pathbuf;		/* pathname buffer (needed by pattern code) */
+char *pathbuf;
 
 typedef struct stat *Statptr;	 /* This makes the Ultrix compiler happy.  Go figure. */
 
@@ -495,7 +501,7 @@ scanner(Complist q, int shortcircuit)
 
 	    if (l >= PATH_MAX)
 		return;
-	    err = lchdir(pathbuf + pathbufcwd, &ds, 0);
+	    err = lchdir(unmeta(pathbuf + pathbufcwd), &ds, 0);
 	    if (err == -1)
 		return;
 	    if (err) {
@@ -517,7 +523,7 @@ scanner(Complist q, int shortcircuit)
 		    else if (!strcmp(str, "..")) {
 			struct stat sc, sr;
 
-			add = (stat("/", &sr) || stat(pathbuf, &sc) ||
+			add = (stat("/", &sr) || stat(unmeta(pathbuf), &sc) ||
 			       sr.st_ino != sc.st_ino ||
 			       sr.st_dev != sc.st_dev);
 		    }
@@ -564,7 +570,7 @@ scanner(Complist q, int shortcircuit)
 
 		    DPUTS(pathpos == pathbufcwd,
 			  "BUG: filename longer than PATH_MAX");
-		    err = lchdir(pathbuf + pathbufcwd, &ds, 0);
+		    err = lchdir(unmeta(pathbuf + pathbufcwd), &ds, 0);
 		    if (err == -1)
 			break;
 		    if (err) {
