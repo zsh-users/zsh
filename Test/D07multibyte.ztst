@@ -496,3 +496,15 @@
 >OK
 >OK
 >OK
+
+  () {
+     emulate -L zsh
+     setopt errreturn
+     local cdpath=(.)
+     mkdir ホ
+     cd ホ
+     cd ..
+     cd ./ホ
+     cd ..
+  }
+0:cd with special characters

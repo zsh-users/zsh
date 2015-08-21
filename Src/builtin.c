@@ -1163,7 +1163,7 @@ cd_try_chdir(char *pfix, char *dest, int hard)
      * or a parent directory is renamed in the interim.
      */
     if (lchdir(buf, NULL, hard) &&
-	(pfix || *dest == '/' || lchdir(dest, NULL, hard))) {
+	(pfix || *dest == '/' || lchdir(unmeta(dest), NULL, hard))) {
 	free(buf);
 	return NULL;
     }

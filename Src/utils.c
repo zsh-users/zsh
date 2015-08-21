@@ -6440,10 +6440,15 @@ init_dirsav(Dirsav d)
     d->dirfd = d->level = -1;
 }
 
-/* Change directory, without following symlinks.  Returns 0 on success, -1 *
- * on failure.  Sets errno to ENOTDIR if any symlinks are encountered.  If *
- * fchdir() fails, or the current directory is unreadable, we might end up *
- * in an unwanted directory in case of failure.                            */
+/*
+ * Change directory, without following symlinks.  Returns 0 on success, -1
+ * on failure.  Sets errno to ENOTDIR if any symlinks are encountered.  If
+ * fchdir() fails, or the current directory is unreadable, we might end up
+ * in an unwanted directory in case of failure.
+ *
+ * path is an unmetafied but null-terminated string, as needed by system
+ * calls.
+ */
 
 /**/
 mod_export int

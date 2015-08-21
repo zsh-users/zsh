@@ -454,8 +454,13 @@ zgetcwd(void)
     return ret;
 }
 
-/* chdir with arbitrary long pathname.  Returns 0 on success, -1 on normal *
- * failure and -2 when chdir failed and the current directory is lost.  */
+/*
+ * chdir with arbitrary long pathname.  Returns 0 on success, -1 on normal *
+ * failure and -2 when chdir failed and the current directory is lost.
+ *
+ * This is to be treated as if at system level, so dir is unmetafied but
+ * terminated by a NULL.
+ */
 
 /**/
 mod_export int
@@ -465,7 +470,7 @@ zchdir(char *dir)
     int currdir = -2;
 
     for (;;) {
-	if (!*dir || chdir(unmeta(dir)) == 0) {
+	if (!*dir || chdir(dir) == 0) {
 #ifdef HAVE_FCHDIR
            if (currdir >= 0)
                close(currdir);

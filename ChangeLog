@@ -1,5 +1,9 @@
 2015-08-21  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 36262: Src/builin.c, Src/compat.c, Src/utils.c,
+	Test/D07multibyte.ztst: replace 36232: the unmeta()
+	was needed at a place higher up.  Add test.
+
 	* 36250, tweaked: README, NEWS: highlight bracketed paste mode;
 	next version will be 5.1 rather than 5.0.9.
 
