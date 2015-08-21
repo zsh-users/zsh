@@ -1,5 +1,8 @@
 2015-08-21  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: README, Etc/FAQ.yo: update latest release from 5.0.8
+	to 5.1 in descriptive text.
+
 	* 36262: Src/builin.c, Src/compat.c, Src/utils.c,
 	Test/D07multibyte.ztst: replace 36232: the unmeta()
 	was needed at a place higher up.  Add test.

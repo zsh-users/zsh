@@ -5,11 +5,10 @@ THE Z SHELL (ZSH)
 Version
 -------
 
-This is version 5.0.8 of the shell.  This is a stable release.
-There are no significant new features since 5.0.7, but there
-are many bugfixes and some significant internal improvements, notably
-a more predictable effect for keyboard interrupts and proper parsing
-of $(...) expressions.
+This is version 5.1 of the shell.  This is a stable release.  There are
+a few visible improvements since 5.0.8 as well as many bugfixes.  Note
+in particular the two changes highlighted under "Incompatibilites
+between 5.0.8 and 5.1" below.  See NEWS for more information.
 
 Installing Zsh
 --------------
