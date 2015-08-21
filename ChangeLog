@@ -1,3 +1,7 @@
+2015-08-21  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 36250, tweaked: README: highlight bracketed paste mode.
+
 2015-08-20  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 36243: Completion/Unix/Type/_pids: fix a few problems of

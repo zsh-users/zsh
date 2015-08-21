@@ -4,8 +4,8 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
-Changes from 5.0.8 to 5.0.9
----------------------------
+Changes from 5.0.8 to 5.1
+-------------------------
 
 The builtins declare, export, local, readonly and typeset
 now have corresponding reserved words.  When used in

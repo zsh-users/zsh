@@ -30,8 +30,17 @@ Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
 
-Incompatibilites between 5.0.8 and 5.0.9
-----------------------------------------
+Incompatibilites between 5.0.8 and 5.1
+--------------------------------------
+
+The default behaviour when text is pasted into an X Windows terminal has
+changed significantly (unless you are using a very old terminal emulator
+that doesn't support this mode).  Now, the new "bracketed paste mode"
+treats all the pasted text as literal characters.  This means, in
+particular, that a newline is simply inserted as a visible newline; you
+need to hit Return on the keyboard to execute the pasted text in one go.
+See the description of zle_bracketed_paste in the zshparams manual for
+more.  "unset zle_bracketed_paste" restores the previous behaviour.
 
 As noted in NEWS, the builtins declare, export, float, integer, local,
 readonly and typeset now have corresponding reserved words that provide
