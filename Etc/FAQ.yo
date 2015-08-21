@@ -778,6 +778,27 @@ label(23)
   mytt(function) to define a function, which doesn't expand aliases.  It is
   possible to argue for extra warnings somewhere in this mess.
 
+  One workaround for this is to use the "function" keyword instead:
+  verb(
+    alias l='/bin/ls -F'
+    function l { /bin/ls -la "$@" | more }
+  )
+  The mytt(l) after mytt(function) is not expanded.  Note you don't need
+  the mytt(LPAR()RPAR()) in this case, although it's harmless.
+
+  You need to be careful if you are defining a function with multiple
+  names; most people don't need to do this, so it's an unusual problem,
+  but in case you do you should be aware that in versions of the shell
+  before 5.1 names after the first em(were) expanded:
+  verb(
+    function a b c { ... }
+  )
+  Here, mytt(b) and mytt(c), but not mytt(a), have aliases expanded.
+  This oddity was fixed in version 5.1.
+
+  The rest of this item assumes you use the (more common,
+  but equivalent) mytt(LPAR()RPAR()) definitions.
+
   Bart Schaefer's rule is:  Define first those aliases you expect to
   use in the body of a function, but define the function first if the
   alias has the same name as the function.

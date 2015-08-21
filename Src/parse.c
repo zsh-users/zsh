@@ -1600,9 +1600,9 @@ par_funcdef(int *cmplx)
     p = ecadd(0);
     ecadd(0);
 
-    incmdpos = 1;
     while (tok == STRING) {
-	if (*tokstr == Inbrace && !tokstr[1]) {
+	if ((*tokstr == Inbrace || *tokstr == '{') &&
+	    !tokstr[1]) {
 	    tok = INBRACE;
 	    break;
 	}
@@ -1615,6 +1615,7 @@ par_funcdef(int *cmplx)
     ecadd(0);
 
     nocorrect = 0;
+    incmdpos = 1;
     if (tok == INOUTPAR)
 	zshlex();
     while (tok == SEPER)
