@@ -154,7 +154,8 @@ getptycmd(char *name)
     return NULL;
 }
 
-#ifdef USE_DEV_PTMX
+/* posix_openpt() seems to have some problem on OpenBSD */
+#if defined(USE_DEV_PTMX) && !defined(__OpenBSD__)
 
 #ifdef HAVE_SYS_STROPTS_H
 #include <sys/stropts.h>

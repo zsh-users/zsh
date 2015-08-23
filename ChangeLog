@@ -1,3 +1,8 @@
+2015-08-23  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* users/20455: Src/Modules/zpty.c: do not use posix_openpt()
+	on OpenBSD
+
 2015-08-22  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36274: Src/Zle/zle_vi.c: clear virangeflag when getvirange()
