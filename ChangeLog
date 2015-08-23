@@ -1,5 +1,8 @@
 2015-08-22  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 36274: Src/Zle/zle_vi.c: clear virangeflag when getvirange()
+	has an error (the next keystroke is not a motion/selection).
+
 	* 36273: Src/Zle/zle_move.c: teach endofline() and endoflinehist()
 	about invicmdmode() cursor placement.
 
