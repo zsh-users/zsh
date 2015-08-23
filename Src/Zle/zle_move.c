@@ -344,6 +344,8 @@ endofline(char **args)
 	    zlecs = zlell;
 	    return 0;
 	}
+	if ((zlecs += invicmdmode()) == zlell)
+	    break;
 	if (zleline[zlecs] == '\n')
 	    if (++zlecs == zlell)
 		return 0;
@@ -414,6 +416,8 @@ endoflinehist(char **args)
 	    zlecs = zlell;
 	    break;
 	}
+	if ((zlecs += invicmdmode()) == zlell)
+	    break;
 	if (zleline[zlecs] == '\n')
 	    if (++zlecs == zlell)
 		break;

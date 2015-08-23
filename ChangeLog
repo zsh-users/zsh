@@ -1,3 +1,8 @@
+2015-08-22  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36273: Src/Zle/zle_move.c: teach endofline() and endoflinehist()
+	about invicmdmode() cursor placement.
+
 2015-08-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk, Src/parse.c, Src/Zle/zle_misc.c:
