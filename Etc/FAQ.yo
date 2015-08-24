@@ -1730,7 +1730,7 @@ sect(What's wrong with cut and paste on my xterm?)
      read; all input is read as continuation lines (this may require the
      fixes referred to above in order to be reliable).
 
-     As of 5.0.9, this trick is not necessary on terminal emulators that
+     As of 5.1, this trick is not necessary on terminal emulators that
      support the em(bracketed paste) feature (this includes most modern
      terminal emulators).  See the description of tt($zle_bracketed_paste)
      in the tt(zshparam) manual page for details.

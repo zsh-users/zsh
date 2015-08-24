@@ -1,3 +1,7 @@
+2015-08-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted: Etc/FAQ.yo: replace 5.0.9 with 5.1.
+
 2015-08-23  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* users/20455: Src/Modules/zpty.c: do not use posix_openpt()
