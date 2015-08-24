@@ -738,7 +738,7 @@ yankpop(UNUSED(char **args))
 }
 
 /**/
-char *
+mod_export char *
 bracketedstring(void)
 {
     static const char endesc[] = "\033[201~";

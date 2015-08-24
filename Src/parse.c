@@ -66,7 +66,7 @@ int infor;
 /* != 0 if parsing arguments of typeset etc. */
 
 /**/
-int intypeset;
+mod_export int intypeset;
 
 /* list of here-documents */
 

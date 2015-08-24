@@ -5465,8 +5465,8 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
 
     /* with single argument set current emulation */
     if (!argv[1]) {
-	emulate(shname, OPT_ISSET(ops,'R'), &emulation, opts);
-	if (OPT_ISSET(ops,'L'))
+	emulate(shname, opt_R, &emulation, opts);
+	if (opt_L)
 	    opts[LOCALOPTIONS] = opts[LOCALTRAPS] = opts[LOCALPATTERNS] = 1;
 	clearpatterndisables();
 	return 0;
@@ -5476,7 +5476,7 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
     memcpy(saveopts, opts, sizeof(opts));
     memcpy(new_opts, opts, sizeof(opts));
     savehackchar = keyboardhackchar;
-    emulate(shname, OPT_ISSET(ops,'R'), &new_emulation, new_opts);
+    emulate(shname, opt_R, &new_emulation, new_opts);
     optlist = newlinklist();
     if (parseopts("emulate", &argv, new_opts, &cmd, optlist)) {
 	ret = 1;
@@ -5508,8 +5508,11 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
 	    goto restore2;
 	}
 	*--argv = cmd;	/* on stack, never free()d, see execbuiltin() */
-    } else
+    } else {
+	if (opt_L)
+	    opts[LOCALOPTIONS] = opts[LOCALTRAPS] = opts[LOCALPATTERNS] = 1;
 	return 0;
+    }
 
     save_sticky = sticky;
     sticky = hcalloc(sizeof(*sticky));

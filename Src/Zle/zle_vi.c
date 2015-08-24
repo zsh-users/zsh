@@ -224,6 +224,7 @@ getvirange(int wf)
 	    ZS_memcpy(zleline, lastline, zlell = lastll);
 	    zlecs = pos;
 	    mark = mpos;
+	    virangeflag = 0;
 	    return -1;
 	}
 
@@ -232,6 +233,7 @@ getvirange(int wf)
 	if (!zlell || (zlecs == pos && (mark == -1 || mark == zlecs) &&
 		    virangeflag != 2) || ret == -1) {
 	    mark = mpos;
+	    virangeflag = 0;
 	    return -1;
 	}
 	virangeflag = 0;
