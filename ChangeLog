@@ -1,3 +1,8 @@
+2015-08-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 36277: Completion/Unix/Command/_git: _git: Updated for
+	git-clone 2.4.5.
+
 2015-08-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Etc/FAQ.yo: replace 5.0.9 with 5.1.

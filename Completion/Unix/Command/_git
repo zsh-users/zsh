@@ -581,13 +581,14 @@ _git-clone () {
 
   # TODO: Argument to -o should be a remote name.
   # TODO: Argument to -b should complete branch names in the repository being
-  # cloned.
+  # cloned (see __git_references())
   _arguments -w -C -S -s \
     '(-l --local --no-local)'{-l,--local}'[clone locally, hardlink refs and objects if possible]' \
     '(-l --local --no-local)--no-local[override --local, as if file:/// URL was given]' \
     '--no-hardlinks[copy files instead of hardlinking when doing a local clone]' \
     '(-s --shared)'{-s,--shared}'[share the objects with the source repository (warning: see man page)]' \
     '--reference[reference repository]:repository:_directories' \
+    '--dissociate[make the newly-created repository independent of the --reference repository]' \
     '(-q --quiet)'{-q,--quiet}'[operate quietly]' \
     '(-v --verbose)'{-v,--verbose}'[always display the progressbar]' \
     '--progress[output progress even if stderr is not a terminal]' \
@@ -600,8 +601,10 @@ _git-clone () {
     '--template=[directory to use as a template for the object database]: :_directories' \
     '*'{-c,--config}'[<key>=<value> set a configuration variable in the newly created repository]' \
     '--depth[create a shallow clone, given number of revisions deep]: :__git_guard_number depth' \
-    '--single-branch[clone only history leading up to the main branch or the one specified by -b]' \
+    '(--no-single-branch)--single-branch[clone only history leading up to the main branch or the one specified by -b]' \
+    '(--single-branch)--no-single-branch[clone history leading up to each branch]' \
     '--recursive[initialize all contained submodules]' \
+    '--separate-git-dir[place .git dir outside worktree]:path to .git dir:_path_files -/' \
     ': :->repository' \
     ': :_directories' && ret=0
 
