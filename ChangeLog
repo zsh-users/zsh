@@ -1,3 +1,7 @@
+2015-08-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk: 5.0.8-test-3.
+
 2015-08-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 36277: Completion/Unix/Command/_git: _git: Updated for
