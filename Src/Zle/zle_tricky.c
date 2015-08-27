@@ -1185,7 +1185,7 @@ get_comp_string(void)
 	 * relatively harmless by itself, it's probably incomplete.
 	 */
 	linredir = (inredir && !ins);
-	lincmd = !linredir &&
+	lincmd = !inredir &&
 	    ((incmdpos && !ins && !incond) ||
 	     (oins == 2 && wordpos == 2) ||
 	     (ins == 3 && wordpos == 1) ||

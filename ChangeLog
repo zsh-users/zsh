@@ -1,5 +1,8 @@
 2015-08-26  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 36288: Src/Zle/zle_tricky.c: refine 36825, slightly different
+	test for redirect context
+
 	* 36285: Src/Zle/zle_tricky.c: update 36025, context cannot be
 	command and redirect at the same time, redirect wins
 
