@@ -1,3 +1,7 @@
+2015-08-28  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 36302: Src/Modules/attr.c: Fix compilation with libcap 2.24
+
 2015-08-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Completion/Unix/Command/_subversion: _subversion:

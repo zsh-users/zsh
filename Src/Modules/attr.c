@@ -27,11 +27,11 @@
  *
  */
 
-#include "attr.mdh"
-#include "attr.pro"
-
 #include <sys/types.h>
 #include <sys/xattr.h>
+
+#include "attr.mdh"
+#include "attr.pro"
 
 static ssize_t
 xgetxattr(const char *path, const char *name, void *value, size_t size, int symlink)
