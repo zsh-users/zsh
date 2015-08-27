@@ -6008,6 +6008,7 @@ __git_tree_files () {
 
   if [[ $1 == --root-relative ]]; then
     extra_args+=(--full-tree)
+    shift
   fi
 
   zparseopts -D -E -a compadd_opts V: J: 1 2 n f X: M: P: S: r: R: q F:
