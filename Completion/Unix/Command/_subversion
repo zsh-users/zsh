@@ -4,6 +4,20 @@ _svn () {
   local curcontext="$curcontext" state line expl ret=1
   typeset -A opt_args
 
+  # Colons in values must be escaped.
+  local -A show_item_keys=(
+     kind                  "the kind of TARGET (file or dir)"
+     url                   "the URL of TARGET in the repository"
+     relative-url          "the repository-relative URL"
+     repos-root-url        "the repository root URL"
+     repos-uuid            "the repository UUID"
+     revision              "the revision of TARGET"
+     last-changed-revision "the most recent revision in which TARGET was changed"
+     last-changed-date     "the date of the last-changed revision"
+     last-changed-author   "the author of the last-changed revision"
+     wc-root               "the working copy root path"
+  )
+
   local update_policy
   zstyle -s ":completion:*:*:$service:*" cache-policy update_policy
   if [[ -z "$update_policy" ]]; then
@@ -70,6 +84,10 @@ _svn () {
           done
           while (( idx=$args[(I)*--trust-server-cert-failures:arg:] )); do
             args[(I)*--trust-server-cert-failures:arg:]=( --trust-server-cert-failures':failures:_values -s , "certificate failures to ignore" "unknown-ca[unknown authority]" "cn-mismatch[hostname mismatch]" "expired[certificate expired]" "not-yet-valid[certificate not yet valid]" "other[all other failures]"' )
+          done
+          while (( idx=$args[(I)*--show-item:arg:] )); do
+            # (q) to quote the parentheses in the value
+            args[(I)*--show-item:arg:]=( --show-item':item key:(('"`for i j in ${(kv)show_item_keys}; do print -rn - $i\\\\:"${(q)j}" ""; done`"'))' )
           done
 	  _store_cache svn-${cmd}-args args
 	fi
