@@ -1,5 +1,8 @@
 2015-08-26  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 36285: Src/Zle/zle_tricky.c: update 36025, context cannot be
+	command and redirect at the same time, redirect wins
+
 	* 36282: Test/A05execution.ztst: discard stderr of "hang" test
 
 2015-08-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>

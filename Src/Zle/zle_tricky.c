@@ -1184,11 +1184,12 @@ get_comp_string(void)
 	 * considering a new command.  Consequently, although this looks
 	 * relatively harmless by itself, it's probably incomplete.
 	 */
-	lincmd = (incmdpos && !ins && !incond) ||
-	    (oins == 2 && wordpos == 2) ||
-	    (ins == 3 && wordpos == 1) ||
-	    (cmdtok == NULLTOK && !incond);
 	linredir = (inredir && !ins);
+	lincmd = !linredir &&
+	    ((incmdpos && !ins && !incond) ||
+	     (oins == 2 && wordpos == 2) ||
+	     (ins == 3 && wordpos == 1) ||
+	     (cmdtok == NULLTOK && !incond));
 	oins = ins;
 	/* Get the next token. */
 	if (linarr)
