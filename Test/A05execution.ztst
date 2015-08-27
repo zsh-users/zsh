@@ -207,7 +207,7 @@ F:This similar test was triggering a reproducible failure with pipestatus.
   coproc { read -et 5 || { print -u $ZTST_fd KILLED; kill -HUP -$$ } }
   print -u $ZTST_fd 'This test takes 5 seconds to fail...'
   { printf "%d\n" {1..20000} } | ( read -e )
-  hang(){ printf "%d\n" {2..20000} | cat }; hang | ( read -e )
+  hang(){ printf "%d\n" {2..20000} | cat }; hang 2>/dev/null | ( read -e )
   print -p done
   read -et 6 -p
 0:Bug regression: piping a shell construct to an external process may hang
