@@ -206,7 +206,7 @@ F:This similar test was triggering a reproducible failure with pipestatus.
   { unsetopt MONITOR } 2>/dev/null
   coproc { read -et 5 || { print -u $ZTST_fd KILLED; kill -HUP -$$ } }
   print -u $ZTST_fd 'This test takes 5 seconds to fail...'
-  { printf "%d\n" {1..20000} } | ( read -e )
+  { printf "%d\n" {1..20000} } 2>/dev/null | ( read -e )
   hang(){ printf "%d\n" {2..20000} | cat }; hang 2>/dev/null | ( read -e )
   print -p done
   read -et 6 -p

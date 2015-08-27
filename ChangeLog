@@ -1,3 +1,8 @@
+2015-08-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted (cf. Axel Beckert 36292): Test/A05execution.ztst:
+	discard even more extraneous stderr in "hang" test
+
 2015-08-26  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36288: Src/Zle/zle_tricky.c: refine 36825, slightly different
