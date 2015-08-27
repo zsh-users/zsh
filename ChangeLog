@@ -1,5 +1,8 @@
 2015-08-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Completion/Unix/Command/_subversion: _subversion:
+	Avoid SHORT_LOOPS
+
 	* 36304: Completion/Unix/Command/_git: _git-cat-file: Fix
 	regression in 36237
 

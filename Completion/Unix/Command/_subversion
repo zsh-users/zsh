@@ -51,7 +51,7 @@ _svn () {
 	    ${=${${${(M)${(f)"$(_comp_locale; _call_program options svn help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)(-##)([[:alpha:]]##) \[--([a-z-]##)\](:arg:)#/(--$match[3])$match[1]$match[2]$match[4] ($match[1]$match[2])--$match[3]$match[4]}
 	  )
           while (( idx=$args[(I)*--accept:arg:] )); do
-            args[(I)*--accept:arg:]=( --accept':automatic conflict resolution action:((working\:working base\:base '"`for i j in p postpone mc mine-conflict tc theirs-conflict mf mine-full tf theirs-full e edit l launch; print -rn $i\\\\:$j $j\\\\:$j "" `"'))' )
+            args[(I)*--accept:arg:]=( --accept':automatic conflict resolution action:((working\:working base\:base '"`for i j in p postpone mc mine-conflict tc theirs-conflict mf mine-full tf theirs-full e edit l launch; do print -rn $i\\\\:$j $j\\\\:$j ""; done `"'))' )
           done
           while (( idx=$args[(I)*--c(l|hangelist):arg:] )); do
             args[(I)*--c(l|hangelist):arg:]=( \*{--cl,--changelist}':change list:_svn_changelists' )
