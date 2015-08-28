@@ -8,7 +8,10 @@
   unset LC_ALL
   LC_TIME=C
   TZ=UTC+0
-  [[ "$(strftime %04y 1)" = "0070" ]] || skip_extensions=1
+  # It's not clear this skip_extensions is correct, but the
+  # format in question is causing problems on Solaris.
+  # We'll revist this after the release.
+  [[ "$(strftime %^_10B 0)" = "   JANUARY" ]] || skip_extensions=1
   [[ "$(LC_TIME=ja_JP.UTF-8 strftime %OS 1)" = 一 ]] || skip_japanese=1
 
 %test

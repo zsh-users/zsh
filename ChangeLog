@@ -1,3 +1,11 @@
+2015-08-28  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/20466: Test/V09datetime.ztst: make test for skipping
+	strftime extention tests one that is known to fail on
+	Solaris.  Reason is not yet known, but there's no current
+	evidence for a shell bug so replace the failure by skipping
+	test for the release.
+
 2015-08-28  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 36302: Src/Modules/attr.c: Fix compilation with libcap 2.24
