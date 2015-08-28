@@ -339,9 +339,13 @@ previous working directory from a list maintained automatically.  It is
 similar in concept to the directory stack controlled by the tt(pushd),
 tt(popd) and tt(dirs) builtins, but is more configurable, and as it stores
 all entries in files it is maintained across sessions and (by default)
-between terminal emulators in the current session.  (The tt(pushd)
-directory stack is not actually modified or used by tt(cdr) unless you
-configure it to do so as described in the configuration section below.)
+between terminal emulators in the current session.  Duplicates are
+automatically removed, so that the list reflects the single most recent
+use of each directory.
+
+Note that the tt(pushd) directory stack is not actually modified or used
+by tt(cdr) unless you configure it to do so as described in the
+configuration section below.
 
 subsect(Installation)
 

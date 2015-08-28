@@ -1,5 +1,8 @@
 2015-08-28  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* users/20475: Doc/Zsh/contrib.yo: mention that cdr mechanism
+	keeps unique list with most recent use first.
+
 	* users/20466: Test/V09datetime.ztst: make test for skipping
 	strftime extention tests one that is known to fail on
 	Solaris.  Reason is not yet known, but there's no current
