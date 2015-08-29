@@ -1,3 +1,8 @@
+2015-08-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 36321: Completion/Debian/Command/_debcheckout: _debcheckout:
+	New completion.
+
 2015-08-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 36306: Completion/Unix/Command/_subversion: _subversion:
