@@ -493,6 +493,8 @@ _git-checkout () {
 
 (( $+functions[_git-cherry-pick] )) ||
 _git-cherry-pick () {
+  local -a git_commit_opts
+  git_commit_opts=(--all --not HEAD --not)
   _arguments \
     '(- :)--quit[end revert or cherry-pick sequence]' \
     '(- :)--continue[resume revert or cherry-pick sequence]' \
@@ -509,7 +511,7 @@ _git-cherry-pick () {
     '*'{-s,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
     '*'{-X,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]' \
     '(-e --edit -x -n --no-commit -s --signoff)--ff[fast forward, if possible]' \
-    ': :__git_commit_ranges'
+    ': : __git_commit_ranges -O expl:git_commit_opts'
 }
 
 (( $+functions[_git-citool] )) ||
@@ -5556,20 +5558,31 @@ __git_remote_branch_names_noprefix () {
 
 (( $+functions[__git_commit_objects_prefer_recent] )) ||
 __git_commit_objects_prefer_recent () {
-  __git_recent_commits || __git_commit_objects
+  local -a argument_array_names
+  zparseopts -D -E O:=argument_array_names
+
+  __git_recent_commits $argument_array_names || __git_commit_objects
 }
 
 (( $+functions[__git_commits] )) ||
 __git_commits () {
+  local -a argument_array_names
+  zparseopts -D -E O:=argument_array_names
+  # Turn (-O foo:bar) to (foo bar)
+  (( $#argument_array_names )) && argument_array_names=( "${(@s/:/)argument_array_names[2]}" )
+  set -- "${(@P)argument_array_names[1]}"
+  local commit_opts__argument_name=$argument_array_names[2]
+
   # TODO: deal with things that __git_heads and __git_tags has in common (i.e.,
   # if both exists, they need to be completed to heads/x and tags/x.
-  local -a sopts ropt
+  local -a sopts ropt expl
   zparseopts -E -a sopts S: r:=ropt R: q
   sopts+=( $ropt:q )
+  expl=( "$@" )
   _alternative \
     "heads::__git_heads $sopts" \
     "commit-tags::__git_commit_tags $sopts" \
-    'commit-objects::__git_commit_objects_prefer_recent'
+    'commit-objects:: __git_commit_objects_prefer_recent -O expl:$commit_opts__argument_name'
 }
 
 (( $+functions[__git_heads] )) ||
@@ -5624,29 +5637,44 @@ __git_commit_objects () {
 (( $+functions[__git_recent_commits] )) ||
 __git_recent_commits () {
   local gitdir expl start
-  declare -a descr tags heads commits
+  declare -a descr tags heads commits argument_array_names commit_opts
   local i j k ret
   integer distance_from_head
+  local label
+
+  zparseopts -D -E O:=argument_array_names
+  # Turn (-O foo:bar) to (foo bar)
+  (( $#argument_array_names )) && argument_array_names=( "${(@s/:/)argument_array_names[2]}" )
+  (( $#argument_array_names > 1 )) && && ${(P)+argument_array_names[2]} &&
+    commit_opts=( "${(@P)argument_array_names[2]}" )
 
   # Careful: most %d will expand to the empty string.  Quote properly!
   # NOTE: we could use %D directly, but it's not available in git 1.9.1 at least.
-  commits=("${(f)"$(_call_program commits git --no-pager log -20 --format='%h%n%d%n%s\ \(%cr\)')"}")
+  commits=("${(f)"$(_call_program commits git --no-pager log $commit_opts -20 --format='%h%n%d%n%s\ \(%cr\)')"}")
   __git_command_successful $pipestatus || return 1
 
   for i j k in "$commits[@]" ; do
     # Note: the after-the-colon part must be unique across the entire array;
     # see workers/34768
-    if (( distance_from_head == 0 )); then
-      descr+=($i:"[HEAD]    $k")
+    if (( $#commit_opts )); then
+      # $commit_opts is set, so the commits we receive might not be in order,
+      # or might not be ancestors of HEAD.  However, we must make the
+      # description unique (due to workers/34768), which we do by including the
+      # hash.  Git always prints enough hash digits to make the output unique.)
+      label="[$i]"
+    elif (( distance_from_head == 0 )); then
+      label="[HEAD]   "
     elif (( distance_from_head == 1 )); then
-      descr+=($i:"[HEAD^]   $k")
+      label="[HEAD^]  "
     elif (( distance_from_head == 2 )); then
-      descr+=($i:"[HEAD^^]  $k")
+      label="[HEAD^^] "
     elif (( distance_from_head < 10 )); then
-      descr+=($i:"[HEAD~$distance_from_head]  $k")
+      label="[HEAD~$distance_from_head] "
     else
-      descr+=($i:"[HEAD~$distance_from_head] $k")
+      label="[HEAD~$distance_from_head]"
     fi
+    # label is now 9 bytes, so the descriptions ($k) will be aligned.
+    descr+=($i:"${label} $k")
     (( ++distance_from_head ))
 
     j=${${j# \(}%\)} # strip leading ' (' and trailing ')'
@@ -5713,13 +5741,23 @@ __git_commits2 () {
 
 (( $+functions[__git_commit_ranges] )) ||
 __git_commit_ranges () {
+  local -a argument_array_names
+  zparseopts -D -E O:=argument_array_names
+  # Turn (-O foo:bar) to (foo bar)
+  (( $#argument_array_names )) && argument_array_names=( "${(@s/:/)argument_array_names[2]}" )
+  set -- "${(@P)argument_array_names[1]}"
+  local commit_opts__argument_name=$argument_array_names[2]
+
   local -a suf
+  local -a expl
   if compset -P '*..(.|)'; then
-    __git_commits $*
+    expl=( $* )
   else
     compset -S '..*' || suf=( -S .. -r '.@~ ^:\t\n\-' )
-    __git_commits $* $suf
+    expl=( $* $suf )
   fi
+
+  __git_commits -O expl:$commit_opts__argument_name
 }
 
 (( $+functions[__git_commit_ranges2] )) ||
