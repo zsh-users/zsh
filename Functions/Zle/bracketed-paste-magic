@@ -1,4 +1,4 @@
-# Starting with zsh-5.0.9, ZLE began to recognize the "bracketed paste"
+# Starting with zsh-5.1, ZLE began to recognize the "bracketed paste"
 # capability of terminal emulators, that is, the sequences $'\e[200~' to
 # start a paste and $'\e[201~' to indicate the end of the pasted text.
 # Pastes are handled by the bracketed-paste widget and insert literally
