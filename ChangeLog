@@ -1,3 +1,10 @@
+2015-09-01  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 36380: Src/utils.c: Avoid gcc case syntax
+
+	* 36347: Src/params.c, Test/A06assign.ztst: Fix appending empty
+	array to associations
+
 2015-09-01  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36376: Src/utils.c: handle signals during read1char() so it is

@@ -3312,9 +3312,12 @@ arrhashsetfn(Param pm, char **val, int augment)
 	zerr("bad set of key/value pairs for associative array");
 	return;
     }
-    if (alen)
-    	if (!(augment && (ht = paramtab = pm->gsu.h->getfn(pm))))
-	    ht = paramtab = newparamtable(17, pm->node.nam);
+    if (augment) {
+	ht = paramtab = pm->gsu.h->getfn(pm);
+    }
+    if (alen && (!augment || !paramtab)) {
+	ht = paramtab = newparamtable(17, pm->node.nam);
+    }
     while (*aptr) {
 	/* The parameter name is ztrdup'd... */
 	v->pm = createparam(*aptr, PM_SCALAR|PM_UNSET);

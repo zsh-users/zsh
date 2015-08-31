@@ -249,6 +249,14 @@
 >2
 >3
 
+ typeset -A h
+ h=(a 1 b 2)
+ h+=()
+ print -l $h
+0:add empty array to association
+>1
+>2
+
 # tests of var[range]+=scalar
 
  s=sting
