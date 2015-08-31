@@ -1041,6 +1041,7 @@ zrefresh(void)
     }
 
     if ((initthingy = rthingy_nocreate("zle-line-pre-redraw"))) {
+	int lastcmd_prev = lastcmd;
 	char *args[2];
 	Thingy lbindk_save = lbindk, bindk_save = bindk;
 	refthingy(lbindk_save);
@@ -1055,6 +1056,9 @@ zrefresh(void)
 	unrefthingy(bindk);
 	lbindk = lbindk_save;
 	bindk = bindk_save;
+	/* we can't set ZLE_NOTCOMMAND since it's not a legit widget, so
+	 * restore lastcmd manually so that we don't mess up the global state */
+	lastcmd = lastcmd_prev;
     }
 
     /* this will create region_highlights if it's still NULL */
