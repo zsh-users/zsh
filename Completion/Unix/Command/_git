@@ -5645,7 +5645,7 @@ __git_recent_commits () {
   zparseopts -D -E O:=argument_array_names
   # Turn (-O foo:bar) to (foo bar)
   (( $#argument_array_names )) && argument_array_names=( "${(@s/:/)argument_array_names[2]}" )
-  (( $#argument_array_names > 1 )) && && ${(P)+argument_array_names[2]} &&
+  (( $#argument_array_names > 1 )) && (( ${(P)+argument_array_names[2]} )) &&
     commit_opts=( "${(@P)argument_array_names[2]}" )
 
   # Careful: most %d will expand to the empty string.  Quote properly!

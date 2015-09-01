@@ -1,3 +1,8 @@
+2015-09-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 36353: Completion/Unix/Command/_git: _git: Unbreak after
+	previous.
+
 2015-08-30  Mateusz Karbowy  <mateusz.karbowy@gmail.com>
 
 	* 36328 + 36340: Completion/Unix/Command/_git: _git-cherry-pick:
