@@ -1,6 +1,9 @@
 2015-09-01  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* unposted: Config/versino.mk: update version to 5.1-dev-0 to
+	* 36365: Src/Zle/zle_tricky.c: magic-space removed the reset of
+	the line if the lexer found something complicated.
+
+	* unposted: Config/version.mk: update version to 5.1-dev-0 to
 	avoid clash with 5.1 release.
 
 2015-09-01  Daniel Shahaf  <d.s@daniel.shahaf.name>

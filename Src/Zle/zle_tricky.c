@@ -2812,6 +2812,8 @@ doexpandhist(void)
     do {
 	ctxtlex();
     } while (tok != ENDINPUT && tok != LEXERR);
+    if (tok == LEXERR)
+	lexstop = 0;
     while (!lexstop)
 	hgetc();
     /* We have to save errflags because it's reset in zcontext_restore. Since  *
