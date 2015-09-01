@@ -1,3 +1,8 @@
+2015-09-01  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36376: Src/utils.c: handle signals during read1char() so it is
+	possible to interrupt correct/correctall prompts
+
 2015-09-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36365: Src/Zle/zle_tricky.c: magic-space removed the reset of
