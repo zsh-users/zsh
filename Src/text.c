@@ -77,8 +77,8 @@ taddpending(char *str1, char *str2)
      */
     if (tpending) {
 	int oldlen = strlen(tpending);
-	tpending = zrealloc(tpending, len + oldlen);
-	sprintf(tpending + oldlen, "%s%s", str1, str2);
+	tpending = zrealloc(tpending, len + oldlen + 1);
+	sprintf(tpending + oldlen, "\n%s%s", str1, str2);
     } else {
 	tpending = (char *)zalloc(len);
 	sprintf(tpending, "%s%s", str1, str2);

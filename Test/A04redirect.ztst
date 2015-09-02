@@ -555,3 +555,34 @@
 0:Assignment with exec used for redirection: POSIX_BUILTINS
 >x=And this
 ?This should appear, too
+
+  fn-two-heres() {
+# tabs below
+    cat <<-x <<-y
+	foo
+	x
+	bar
+	y
+  }
+  which -x2 fn-two-heres
+  fn-two-heres
+  eval "$(which -x2 fn-two-heres)"
+  fn-two-heres
+  print $functions[fn-two-heres]
+0:Two here-documents in a line are shown correctly.
+>fn-two-heres () {
+>  cat <<x <<y
+>foo
+>x
+>bar
+>y
+>}
+>foo
+>bar
+>foo
+>bar
+>	cat <<x <<y
+>foo
+>x
+>bar
+>y

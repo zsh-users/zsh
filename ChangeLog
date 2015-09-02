@@ -1,3 +1,8 @@
+2015-09-02  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 36399: Src/text.c, Test/A04redirect.ztst: shell code with
+	multiple here documents wasn't shown properly.
+
 2015-09-01  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 36380: Src/utils.c: Avoid gcc case syntax
