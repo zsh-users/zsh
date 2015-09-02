@@ -1,3 +1,8 @@
+2015-09-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 36378: Src/exec.c: skip directories when looking for autoload
+	files.
+
 2015-09-02  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36399: Src/text.c, Test/A04redirect.ztst: shell code with

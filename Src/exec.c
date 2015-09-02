@@ -5392,7 +5392,9 @@ getfpfunc(char *s, int *ksh, char **fname)
 	}
 	unmetafy(buf, NULL);
 	if (!access(buf, R_OK) && (fd = open(buf, O_RDONLY | O_NOCTTY)) != -1) {
-	    if ((len = lseek(fd, 0, 2)) != -1) {
+	    struct stat st;
+	    if (!fstat(fd, &st) && S_ISREG(st.st_mode) &&
+		(len = lseek(fd, 0, 2)) != -1) {
 		d = (char *) zalloc(len + 1);
 		lseek(fd, 0, 0);
 		if ((rlen = read(fd, d, len)) >= 0) {
