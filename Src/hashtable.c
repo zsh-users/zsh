@@ -1234,7 +1234,10 @@ printaliasnode(HashNode hn, int printflags)
     }
 
     if (printflags & PRINT_WHENCE_WORD) {
-	printf("%s: alias\n", a->node.nam);
+	if (a->node.flags & ALIAS_SUFFIX)
+	    printf("%s: suffix alias\n", a->node.nam);
+	else
+	    printf("%s: alias\n", a->node.nam);
 	return;
     }
 

@@ -91,5 +91,8 @@
 0:unalias -a
 
   alias -s foo=print
+  type bar.foo; type -w bar.foo
   unalias -as
 0:unalias -as
+>foo is a suffix alias for print
+>foo: suffix alias
