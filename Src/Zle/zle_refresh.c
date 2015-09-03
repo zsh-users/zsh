@@ -1761,7 +1761,8 @@ singlelineout:
 	inlist = 1;
 	listmatches();
 	inlist = 0;
-	zrefresh();
+	if (!errflag)
+	    zrefresh();
     }
     if (showinglist == -1)
 	showinglist = nlnct;

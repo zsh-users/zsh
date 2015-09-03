@@ -1183,6 +1183,11 @@ getzlequery(void)
 
     /* get a character from the tty and interpret it */
     c = getfullchar(0);
+    /*
+     * We'll interpret an interruption here as only interrupting the
+     * query, not the line editor.
+     */
+    errflag &= ~ERRFLAG_INT;
     if (c == ZWC('\t'))
 	c = ZWC('y');
     else if (ZC_icntrl(c) || c == ZLEEOF)
