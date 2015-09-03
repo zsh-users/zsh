@@ -1,3 +1,9 @@
+2015-09-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 36410: Doc/Zsh/contrib.yo
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git: vcs_info git:
+	Present merge heads as patches
+
 2015-09-04  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36421: Src/pattern.c: can't-get-the-staff fix for idiocy in

@@ -231,6 +231,23 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
     git_patches_unapplied=($(seq $cur $(< "${patchdir}/last")))
 
     VCS_INFO_git_handle_patches
+elif [[ -f "${gitdir}/MERGE_HEAD" ]]; then
+    # This is 'git merge --no-commit'
+    local -a heads=( ${(@f)"$(<"${gitdir}/MERGE_HEAD")"} )
+    local subject;
+    IFS='' read -r subject < "${gitdir}/MERGE_MSG"
+    # $subject is the subject line of the would-be commit
+    # Maybe we can get the subject lines of MERGE_HEAD's commits cheaply?
+
+    local p
+    for p in $heads[@]; do
+      git_patches_applied+=("$p $subject")
+    done
+    unset p
+
+    # Not touching git_patches_unapplied
+
+    VCS_INFO_git_handle_patches
 else
     gitmisc=''
 fi
