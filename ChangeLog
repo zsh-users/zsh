@@ -1,5 +1,7 @@
 2015-09-02  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Test/A05execution.ztst: test for 36393
+
 	* 36393: Src/signals.c: process queued signals during dotrap()
 
 2015-09-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
