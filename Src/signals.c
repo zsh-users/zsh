@@ -1348,6 +1348,7 @@ void
 dotrap(int sig)
 {
     void *funcprog;
+    int q = queue_signal_level();
 
     if (sigtrapped[sig] & ZSIG_FUNC) {
 	HashNode hn = gettrapnode(sig, 0);
@@ -1370,5 +1371,9 @@ dotrap(int sig)
     if ((sigtrapped[sig] & ZSIG_IGNORED) || !funcprog || errflag)
 	return;
 
+    dont_queue_signals();
+
     dotrapargs(sig, sigtrapped+sig, funcprog);
+
+    restore_queue_signals(q);
 }

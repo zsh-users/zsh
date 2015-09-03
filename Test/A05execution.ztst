@@ -288,3 +288,12 @@ F:anonymous function, and a descriptor leak when backgrounding a pipeline
 >0
 >0
 >0
+
+# Regression test for workers/36392
+  print -u $ZTST_fd 'This test takes 3 seconds and hangs the shell when it fails...'
+  callfromchld() { true && { print CHLD } }
+  TRAPCHLD() { callfromchld }
+  sleep 2 & sleep 3; print OK
+0:Background job exit does not affect reaping foreground job
+>CHLD
+>OK
