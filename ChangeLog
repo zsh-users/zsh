@@ -20,7 +20,7 @@
 	* 36416: Src/Zle/zle_refresh.c, Src/Zle/zle_utils.c: If
 	keyboard interrupt during getzlequery(), don't propagate further,
 	just redraw the line.  Also handle logical error that we
-	attempted to redware the line partially if an error or interrupt
+	attempted to redraw the line partially if an error or interrupt
 	was propagated.
 
 2015-09-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
