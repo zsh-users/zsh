@@ -61,8 +61,6 @@ menu(The Zsh Web Page)
 menu(The Zsh Userguide)
 menu(See Also)
 
-Roadmap
-
 Invocation
 
 menu(Compatibility)
@@ -107,12 +105,10 @@ menu(Single Letter Options)
 
 Zsh Line Editor
 
-menu(Movement)
-menu(History Control)
-menu(Modifying Text)
-menu(Arguments)
-menu(Completion)
-menu(Miscellaneous)
+menu(Keymaps)
+menu(Zle Builtins)
+menu(Zle Widgets)
+menu(Character Highlighting)
 
 Completion Widgets
 
@@ -143,6 +139,14 @@ Zsh Modules
 
 includefile(Zsh/manmodmenu.yo)
 
+Calendar Function System
+
+menu(Calendar File and Date Formats)
+menu(Calendar System User Functions)
+menu(Calendar Styles)
+menu(Calendar Utility Functions)
+menu(Calendar Bugs)
+
 TCP Function System
 
 menu(TCP Functions)
@@ -159,8 +163,14 @@ menu(Miscellaneous Features)
 User Contributions
 
 menu(Utilities)
+menu(Recent Directories)
+menu(Version Control Information)
 menu(Prompt Themes)
 menu(ZLE Functions)
+menu(Exception Handling)
+menu(MIME Functions)
+menu(Mathematical Functions)
+menu(User Configuration Functions)
 menu(Other Functions)
 
 endmenu()
