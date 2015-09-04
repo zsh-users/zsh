@@ -508,3 +508,20 @@
      cd ..
   }
 0:cd with special characters
+
+  test_array=(
+  '[[ \xcc = \xcc ]]'
+  '[[ \xcc != \xcd ]]'
+  '[[ \xcc != \ucc ]]'
+  '[[ \ucc = \ucc ]]'
+  '[[ \ucc = [\ucc] ]]'
+  '[[ \xcc != [\ucc] ]]'
+  # Not clear how useful the following is...
+  '[[ \xcc = [\xcc] ]]'
+  )
+  for test in $test_array; do
+    if ! eval ${(g::)test} ; then
+      print -rl "Test $test failed" >&2
+    fi
+  done
+0:Invalid characters in pattern matching

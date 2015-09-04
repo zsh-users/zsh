@@ -1,3 +1,11 @@
+2015-09-04  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 36415: Src/pattern.c, Test/D07multibyte.ztst: remap bytes from
+	invalid multibyte characters to 0xDC00 + index which is invalid
+	in Unicode.  Strictly this only works if whcar_t is
+	ISO-10646-compliant, however it ought to be at least as good as
+	the current fudge in any case.
+
 2015-09-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36416: Src/Zle/zle_refresh.c, Src/Zle/zle_utils.c: If

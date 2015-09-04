@@ -224,6 +224,22 @@ typedef zlong zrange_t;
 typedef unsigned long zrange_t;
 #endif
 
+#ifdef MULTIBYTE_SUPPORT
+/*
+ * Handle a byte that's not part of a valid character.
+ *
+ * This range in Unicode is recommended for purposes of this
+ * kind as it corresponds to invalid characters.
+ *
+ * Note that this strictly only works if wchar_t represents
+ * Unicode code points, which isn't necessarily true; however,
+ * converting an invalid character into an unknown format is
+ * a bit tricky...
+ */
+#define WCHAR_INVALID(ch)			\
+    ((wchar_t) (0xDC00 + STOUC(ch)))
+#endif /* MULTIBYTE_SUPPORT */
+
 /*
  * Array of characters corresponding to zpc_chars enum, which it must match.
  */
@@ -353,10 +369,10 @@ metacharinc(char **x)
 	return wc;
     }
 
-    /* Error.  Treat as single byte. */
+    /* Error. */
     /* Reset the shift state for next time. */
     memset(&shiftstate, 0, sizeof(shiftstate));
-    return (wchar_t) STOUC(*(*x)++);
+    return WCHAR_INVALID(*(*x)++);
 }
 
 #else
@@ -1867,10 +1883,10 @@ charref(char *x, char *y)
     ret = mbrtowc(&wc, x, y-x, &shiftstate);
 
     if (ret == MB_INVALID || ret == MB_INCOMPLETE) {
-	/* Error.  Treat as single byte. */
+	/* Error. */
 	/* Reset the shift state for next time. */
 	memset(&shiftstate, 0, sizeof(shiftstate));
-	return (wchar_t) STOUC(*x);
+	return WCHAR_INVALID(*x);
     }
 
     return wc;
@@ -1913,7 +1929,7 @@ charrefinc(char **x, char *y, int *z)
     size_t ret;
 
     if (!(patglobflags & GF_MULTIBYTE) || !(STOUC(**x) & 0x80))
-	return (wchar_t) STOUC(*(*x)++);
+	return WCHAR_INVALID(*(*x)++);
 
     ret = mbrtowc(&wc, *x, y-*x, &shiftstate);
 
@@ -1922,7 +1938,7 @@ charrefinc(char **x, char *y, int *z)
 	*z = 1;
 	/* Reset the shift state for next time. */
 	memset(&shiftstate, 0, sizeof(shiftstate));
-	return (wchar_t) STOUC(*(*x)++);
+	return WCHAR_INVALID(*(*x)++);
     }
 
     /* Nulls here are normal characters */
