@@ -1,3 +1,8 @@
+2015-09-04  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 36421: Src/pattern.c: can't-get-the-staff fix for idiocy in
+	36415.
+
 2015-09-04  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 36417: Doc/Zsh/manual.yo: fix/update top level texinfo menu

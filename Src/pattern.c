@@ -1929,7 +1929,7 @@ charrefinc(char **x, char *y, int *z)
     size_t ret;
 
     if (!(patglobflags & GF_MULTIBYTE) || !(STOUC(**x) & 0x80))
-	return WCHAR_INVALID(*(*x)++);
+	return (wchar_t) STOUC(*(*x)++);
 
     ret = mbrtowc(&wc, *x, y-*x, &shiftstate);
 
