@@ -2386,7 +2386,7 @@ domenuselect(Hookdef dummy, Chdata dat)
      * to be metafied locally in a couple of places.
      * It's horrifically difficult to work out where the line
      * is metafied, so I've resorted to the following.
-     * Unfortunately we need to unmetatfy in zrefresh() when
+     * Unfortunately we need to unmetafy in zrefresh() when
      * we want to display something.  Maybe this function can
      * be done better.
      */
