@@ -1,5 +1,8 @@
 2015-09-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Doc/Zsh/params.yo Doc/Zsh/zle.yo: Minor documentation
+	tweaks.
+
 	* 36410: Doc/Zsh/contrib.yo
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_git: vcs_info git:
 	Present merge heads as patches

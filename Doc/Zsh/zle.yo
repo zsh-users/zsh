@@ -34,7 +34,8 @@ The parameter tt(zle_highlight) is also used by the line editor; see
 ifzman(em(Character Highlighting) below)\
 ifnzman(noderef(Character Highlighting)).  Highlighting
 of special characters and the region between the cursor and the
-mark (as set with tt(set-mark-command) in Emacs mode) is enabled
+mark (as set with tt(set-mark-command) in Emacs mode, or by tt(visual-mode)
+in Vi mode) is enabled
 by default; consult this reference for more information.  Irascible
 conservatives will wish to know that all highlighting may be disabled by
 the following setting:
@@ -43,7 +44,7 @@ example(zle_highlight=(none))
 
 In many places, references are made to the tt(numeric argument).  This can
 by default be entered in emacs mode by holding the alt key and typing
-a number, or pressing escape before each number, and in vi command mode
+a number, or pressing escape before each digit, and in vi command mode
 by typing the number before entering a command.  Generally the numeric
 argument causes the next command entered to be repeated the specified
 number of times, unless otherwise noted below. See also

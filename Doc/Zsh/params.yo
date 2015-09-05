@@ -60,7 +60,7 @@ When the integer attribute, tt(-i), or a floating point attribute, tt(-E)
 or tt(-F), is set for var(name), the var(value) is subject to arithmetic
 evaluation.  Furthermore, by replacing `tt(=)' with `tt(+=)', a parameter
 can be incremented or appended to.  See noderef(Array Parameters) and
-ifzman(em(Arithmetic Evaluation) LPAR()in zmanref(zshexpn)RPAR())\
+ifzman(em(Arithmetic Evaluation) LPAR()in zmanref(zshmisc)RPAR())\
 ifnzman(noderef(Arithmetic Evaluation))
 for additional forms of assignment.
 
