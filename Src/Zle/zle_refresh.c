@@ -994,7 +994,6 @@ zrefresh(void)
     int remetafy;		/* flag that zle line is metafied	     */
     int txtchange;		/* attributes set after prompts              */
     int rprompt_off = 1;	/* Offset of rprompt from right of screen    */
-    int old_incompfunc = incompfunc;
     struct rparams rpms;
 #ifdef MULTIBYTE_SUPPORT
     int width;			/* width of wide character		     */
@@ -1038,27 +1037,6 @@ zrefresh(void)
 	tmpcs = zlecs;
 	tmpll = zlell;
 	tmpalloced = 0;
-    }
-
-    if ((initthingy = rthingy_nocreate("zle-line-pre-redraw"))) {
-	int lastcmd_prev = lastcmd;
-	char *args[2];
-	Thingy lbindk_save = lbindk, bindk_save = bindk;
-	refthingy(lbindk_save);
-	refthingy(bindk_save);
-	args[0] = initthingy->nam;
-	args[1] = NULL;
-	incompfunc = 0;
-	execzlefunc(initthingy, args, 0);
-	incompfunc = old_incompfunc;
-	unrefthingy(initthingy);
-	unrefthingy(lbindk);
-	unrefthingy(bindk);
-	lbindk = lbindk_save;
-	bindk = bindk_save;
-	/* we can't set ZLE_NOTCOMMAND since it's not a legit widget, so
-	 * restore lastcmd manually so that we don't mess up the global state */
-	lastcmd = lastcmd_prev;
     }
 
     /* this will create region_highlights if it's still NULL */
