@@ -591,6 +591,80 @@ vigotocolumn(UNUSED(char **args))
 
 /**/
 int
+matchbracket(char **args)
+{
+    int ocs = zlecs, dir, ct;
+    unsigned char oth, me;
+
+    if (*args) {
+	char *end = NULL;
+        zlecs = zstrtol(*args, &end, 10);
+	if (end && end != *args && *end == '\0')
+	    args++;
+	else
+	    zlecs = ocs;
+    }
+
+    if (zlecs == zlell || zleline[zlecs] == '\n') {
+	zlecs = ocs;
+	return 1;
+    }
+    switch (me = zleline[zlecs]) {
+    case '{':
+	dir = 1;
+	oth = '}';
+	break;
+    case /*{*/ '}':
+	dir = -1;
+	oth = '{'; /*}*/
+	break;
+    case '(':
+	dir = 1;
+	oth = ')';
+	break;
+    case ')':
+	dir = -1;
+	oth = '(';
+	break;
+    case '[':
+	dir = 1;
+	oth = ']';
+	break;
+    case ']':
+	dir = -1;
+	oth = '[';
+	break;
+    default:
+	zlecs = ocs;
+	return 1;
+    }
+    ct = 1;
+    while (zlecs >= 0 && zlecs < zlell && ct) {
+	if (dir < 0)
+	    DECCS();
+	else
+	    INCCS();
+	if (zleline[zlecs] == oth)
+	    ct--;
+	else if (zleline[zlecs] == me)
+	    ct++;
+    }
+    if (zlecs < 0 || zlecs >= zlell) {
+	zlecs = ocs;
+	return 1;
+    }
+
+    if (*args) {
+	char digs[100];
+	sprintf(digs, "%d", zlecs);
+	zlecs = ocs;
+	setsparam(*args, ztrdup(digs));
+    }
+    return 0;
+}
+
+/**/
+int
 vimatchbracket(UNUSED(char **args))
 {
     int ocs = zlecs, dir, ct;
