@@ -1025,6 +1025,31 @@ getrestchar(int inchar, char *outstr, int *outcount)
 /**/
 #endif
 
+static void redrawhook()
+{
+    Thingy initthingy;
+    if ((initthingy = rthingy_nocreate("zle-line-pre-redraw"))) {
+	int lastcmd_prev = lastcmd;
+	int old_incompfunc = incompfunc;
+	char *args[2];
+	Thingy lbindk_save = lbindk, bindk_save = bindk;
+	refthingy(lbindk_save);
+	refthingy(bindk_save);
+	args[0] = initthingy->nam;
+	args[1] = NULL;
+	incompfunc = 0;
+	execzlefunc(initthingy, args, 0);
+	incompfunc = old_incompfunc;
+	unrefthingy(initthingy);
+	unrefthingy(lbindk);
+	unrefthingy(bindk);
+	lbindk = lbindk_save;
+	bindk = bindk_save;
+	/* we can't set ZLE_NOTCOMMAND since it's not a legit widget, so
+	 * restore lastcmd manually so that we don't mess up the global state */
+	lastcmd = lastcmd_prev;
+    }
+}
 
 /**/
 void
@@ -1085,28 +1110,7 @@ zlecore(void)
 	    break;
 	}
 
-	Thingy initthingy;
-	if ((initthingy = rthingy_nocreate("zle-line-pre-redraw"))) {
-	    int lastcmd_prev = lastcmd;
-	    int old_incompfunc = incompfunc;
-	    char *args[2];
-	    Thingy lbindk_save = lbindk, bindk_save = bindk;
-	    refthingy(lbindk_save);
-	    refthingy(bindk_save);
-	    args[0] = initthingy->nam;
-	    args[1] = NULL;
-	    incompfunc = 0;
-	    execzlefunc(initthingy, args, 0);
-	    incompfunc = old_incompfunc;
-	    unrefthingy(initthingy);
-	    unrefthingy(lbindk);
-	    unrefthingy(bindk);
-	    lbindk = lbindk_save;
-	    bindk = bindk_save;
-	    /* we can't set ZLE_NOTCOMMAND since it's not a legit widget, so
-	     * restore lastcmd manually so that we don't mess up the global state */
-	    lastcmd = lastcmd_prev;
-	}
+	redrawhook();
 #ifdef HAVE_POLL
 	if (baud && !(lastcmd & ZLE_MENUCMP)) {
 	    struct pollfd pfd;
@@ -1818,6 +1822,7 @@ recursiveedit(UNUSED(char **args))
 {
     int locerror;
 
+    redrawhook();
     zrefresh();
     zlecore();
 
