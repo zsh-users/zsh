@@ -2679,7 +2679,7 @@ If tt(zle_highlight) is not set or no value applies to a particular
 context, the defaults applied are equivalent to
 
 example(zle_highlight=LPAR()region:standout special:standout
-suffix:bold isearch:underline+RPAR())
+suffix:bold isearch:underline paste:standout+RPAR())
 
 i.e. both the region and special characters are shown in standout mode.
 

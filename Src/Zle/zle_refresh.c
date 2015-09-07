@@ -372,7 +372,8 @@ zle_set_highlight(void)
 	region_highlights[1].atr = TXTUNDERLINE;
     if (!suffix_atr_on_set)
 	region_highlights[2].atr = TXTBOLDFACE;
-        /* paste defaults to 0 */
+    if (!paste_atr_on_set)
+	region_highlights[3].atr = TXTSTANDOUT;
 
     allocate_colour_buffer();
 }
