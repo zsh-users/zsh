@@ -1,3 +1,8 @@
+2015-09-07  James Clarke  <jrtc27@jrtc27.com>
+
+	* 36441: Completion/Unix/Command/_git: _git: Fixed typo in
+	--author-date-order description
+
 2015-09-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/versiom.mk, Etc/FAQ.yo, NEWS, README: make

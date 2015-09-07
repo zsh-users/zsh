@@ -6436,7 +6436,7 @@ __git_setup_revision_options () {
     '(--full-history --dense --sparse --simplify-merges                )--ancestry-path[only display commits that exists directly on ancestry chains]'
     '(             --date-order --author-date-order)--topo-order[display commits in topological order]'
     '(--topo-order              --author-date-order)--date-order[display commits in date order]'
-    '(--topo-order --date-order                    )--author-date-order[display commits in auhor date order]'
+    '(--topo-order --date-order                    )--author-date-order[display commits in author date order]'
     '(-g --walk-reflogs)--reverse[display commits in reverse order]'
     '(          --objects-edge)--objects[display object ids of objects referenced by listed commits]'
     '(--objects               )--objects-edge[display object ids of objects referenced by listed and excluded commits]'
