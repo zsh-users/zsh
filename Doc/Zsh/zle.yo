@@ -1018,7 +1018,7 @@ The substrings are sorted in alphabetical order so that if you want to
 test for two specific substrings in a future-proof way, you can do match
 by doing:
 
-example(if [[ $ZLE_STATE == *insert*globalhistory* ]]; then ...; fi)
+example(if [[ $ZLE_STATE == *globalhistory*insert* ]]; then ...; fi)
 )
 enditem()
 
