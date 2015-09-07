@@ -955,6 +955,11 @@ any predisplay string should be highlighted in bold.
 
 Note that the effect of tt(region_highlight) is not saved and disappears
 as soon as the line is accepted.
+
+The final highlighting on the command line depends on both tt(region_highlight)
+and tt(zle_highlight); see
+ifzman(the section CHARACTER HIGHLIGHTING below)\
+ifnzman(noderef(Character Highlighting)) for details.
 )
 vindex(UNDO_CHANGE_NO)
 item(tt(UNDO_CHANGE_NO) (integer))(
@@ -2520,6 +2525,12 @@ item(tt(paste))(
 Following a command to paste text, the characters that were inserted.
 )
 enditem()
+
+When tt(region_highlight) is set, the contexts that describe a region DASH()-
+tt(isearch), tt(region), tt(suffix), and tt(paste) DASH()-
+are applied first, then tt(region_highlight) is applied, then the remaining
+tt(zle_highlight) contexts are applied.  If a particular character is
+affected by multiple specifications, the last specification wins.
 
 tt(zle_highlight) may contain additional fields for controlling how
 terminal sequences to change colours are output.  Each of the following is

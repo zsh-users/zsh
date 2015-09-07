@@ -431,6 +431,8 @@ struct region_highlight {
  * 2: suffix
  * 3: pasted text
  */
+/* If you change this, update the documentation of zle_highlight/region_highlight
+ * interaction in Doc/Zsh/zle.yo. */
 #define N_SPECIAL_HIGHLIGHTS	(4)
 
 
