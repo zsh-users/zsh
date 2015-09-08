@@ -448,7 +448,7 @@ zgetcwd(void)
     }
 #endif /* HAVE_GETCWD */
     if (!ret)
-	ret = pwd;
+	ret = unmeta(pwd);
     if (!ret)
 	ret = dupstring(".");
     return ret;
