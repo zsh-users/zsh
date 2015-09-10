@@ -97,6 +97,12 @@ static const struct gsu_integer undo_change_no_gsu =
 { get_undo_current_change, NULL, zleunsetfn };
 static const struct gsu_integer undo_limit_no_gsu =
 { get_undo_limit_change, set_undo_limit_change, zleunsetfn };
+static const struct gsu_integer yankstart_gsu =
+{ get_yankstart, NULL, zleunsetfn };
+static const struct gsu_integer yankend_gsu =
+{ get_yankend, NULL, zleunsetfn };
+static const struct gsu_integer yankactive_gsu =
+{ get_yankactive, NULL, zleunsetfn };
 
 static const struct gsu_array killring_gsu =
 { get_killring, set_killring, unset_killring };
@@ -143,6 +149,9 @@ static struct zleparam {
     { "WIDGET", PM_SCALAR | PM_READONLY, GSU(widget_gsu), NULL },
     { "WIDGETFUNC", PM_SCALAR | PM_READONLY, GSU(widgetfunc_gsu), NULL },
     { "WIDGETSTYLE", PM_SCALAR | PM_READONLY, GSU(widgetstyle_gsu), NULL },
+    { "YANK_START", PM_INTEGER | PM_READONLY, GSU(yankstart_gsu), NULL },
+    { "YANK_END", PM_INTEGER | PM_READONLY, GSU(yankend_gsu), NULL },
+    { "YANK_ACTIVE", PM_INTEGER | PM_READONLY, GSU(yankactive_gsu), NULL },
     { "ZLE_STATE", PM_SCALAR | PM_READONLY, GSU(zle_state_gsu), NULL },
     { NULL, 0, NULL, NULL }
 };
@@ -474,6 +483,27 @@ static zlong
 get_pending(UNUSED(Param pm))
 {
     return noquery(0);
+}
+
+/**/
+static zlong
+get_yankstart(UNUSED(Param pm))
+{
+    return yankb;
+}
+
+/**/
+static zlong
+get_yankend(UNUSED(Param pm))
+{
+    return yanke;
+}
+
+/**/
+static zlong
+get_yankactive(UNUSED(Param pm))
+{
+    return lastcmd & ZLE_YANK;
 }
 
 /**/

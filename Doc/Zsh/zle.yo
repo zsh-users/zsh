@@ -1005,6 +1005,18 @@ executed; the second argument that followed tt(zle -C) when the widget was
 defined.  This is the name of a builtin completion widget.  For widgets
 defined with tt(zle -N) this is set to the empty string.  Read-only.
 )
+vindex(YANK_ACTIVE)
+vindex(YANK_START)
+vindex(YANK_END)
+xitem(tt(YANK_ACTIVE) (integer))
+xitem(tt(YANK_START) (integer))
+item(tt(YANK_END) (integer))(
+These three parameters indicate whether text has just been yanked (pasted)
+into the buffer.  tt(YANK_START) and tt(YANK_END) are in the same unit sas
+tt(CURSOR), and are only valid when tt(YANK_ACTIVE) is non-zero.
+
+All three are read-only.
+)
 vindex(ZLE_STATE)
 item(tt(ZLE_STATE) (scalar))(
 Contains a set of space-separated words that describe the current tt(zle)
