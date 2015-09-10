@@ -995,7 +995,7 @@
   print this is bar >bar
   fn() {
     local NULLCMD=cat READNULLCMD=cat
-    echo hello | >foo
+    { echo hello | >foo } 2>/dev/null
     cat foo
     <bar
   }
