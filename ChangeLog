@@ -1,3 +1,8 @@
+2015-09-10  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36470: Src/Zle/zle_main.c: Auxiliary to 36468, return an empty
+	buffer from zleread() if a widget exits
+
 2015-09-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36468: Src/hist.c: Infinite loop if we tried to exit from a
