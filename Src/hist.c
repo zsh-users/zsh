@@ -390,6 +390,12 @@ ihgetc(void)
 {
     int c = ingetc();
 
+    if (exit_pending)
+    {
+	lexstop = 1;
+	errflag |= ERRFLAG_ERROR;
+	return ' ';
+    }
     qbang = 0;
     if (!stophist && !(inbufflags & INP_ALIAS)) {
 	/* If necessary, expand history characters. */

@@ -1,5 +1,9 @@
 2015-09-10  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 36468: Src/hist.c: Infinite loop if we tried to exit from a
+	Zle widget but the lexer thought the current lexical expression
+	needed finishing.
+
 	* 36460: Test/E01options.ztst: Discard benign error on failure
 	to write to pipe with no one reading.
 
