@@ -202,8 +202,9 @@ struct cpattern {
  * TODO: this will change.
  */
 #ifdef MULTIBYTE_SUPPORT
-#define PATMATCHRANGE(r, c, ip, mtp)	mb_patmatchrange(r, c, ip, mtp)
-#define PATMATCHINDEX(r, i, cp, mtp)	mb_patmatchindex(r, i, cp, mtp)
+#define PATMATCHRANGE(r, c, ip, mtp)		\
+    mb_patmatchrange(r, c, ZMB_VALID, ip, mtp)
+#define PATMATCHINDEX(r, i, cp, mtp)    mb_patmatchindex(r, i, cp, mtp)
 #define CONVCAST(c)			((wchar_t)(c))
 #define CHR_INVALID			(WEOF)
 #else

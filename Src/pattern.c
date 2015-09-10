@@ -145,7 +145,7 @@ typedef union upat *Upat;
  *
  *  P_ANY, P_ANYOF:  the operand is a null terminated
  *    string.  Normal characters match as expected.  Characters
- *    in the range Meta+PP_ALPHA..Meta+PP_UNKNWN do the appropriate
+ *    in the range Meta+PP_ALPHA..Meta+PP_UNKWN do the appropriate
  *    Posix range tests.  This relies on imeta returning true for these
  *    characters.  We treat unknown POSIX ranges as never matching.
  *    PP_RANGE means the next two (possibly metafied) characters form
@@ -1119,7 +1119,7 @@ patgetglobflags(char **strp, long *assertp, int *ignore)
 static const char *colon_stuffs[]  = {
     "alpha", "alnum", "ascii", "blank", "cntrl", "digit", "graph", 
     "lower", "print", "punct", "space", "upper", "xdigit", "IDENT",
-    "IFS", "IFSSPACE", "WORD", NULL
+    "IFS", "IFSSPACE", "WORD", "INCOMPLETE", "INVALID", NULL
 };
 
 /*
@@ -1870,9 +1870,9 @@ static int globdots;			/* Glob initial dots? */
 #ifdef MULTIBYTE_SUPPORT
 
 /* Get a character from the start point in a string */
-#define CHARREF(x, y)	charref((x), (y))
+#define CHARREF(x, y)	charref((x), (y), (int *)NULL)
 static wchar_t
-charref(char *x, char *y)
+charref(char *x, char *y, int *zmb_ind)
 {
     wchar_t wc;
     size_t ret;
@@ -1886,9 +1886,13 @@ charref(char *x, char *y)
 	/* Error. */
 	/* Reset the shift state for next time. */
 	memset(&shiftstate, 0, sizeof(shiftstate));
+	if (zmb_ind)
+	    *zmb_ind = (ret == MB_INVALID) ? ZMB_INVALID : ZMB_INCOMPLETE;
 	return WCHAR_INVALID(*x);
     }
 
+    if (zmb_ind)
+	*zmb_ind = ZMB_VALID;
     return wc;
 }
 
@@ -2580,10 +2584,11 @@ patmatch(Upat prog)
 		fail = 1;
 	    else {
 #ifdef MULTIBYTE_SUPPORT
-		wchar_t cr = CHARREF(patinput, patinend);
+		int zmb_ind;
+		wchar_t cr = charref(patinput, patinend, &zmb_ind);
 		char *scanop = (char *)P_OPERAND(scan);
 		if (patglobflags & GF_MULTIBYTE) {
-		    if (mb_patmatchrange(scanop, cr, NULL, NULL) ^
+		    if (mb_patmatchrange(scanop, cr, zmb_ind, NULL, NULL) ^
 			(P_OP(scan) == P_ANYOF))
 			fail = 1;
 		    else
@@ -3351,6 +3356,9 @@ patmatch(Upat prog)
  * The null-terminated specification is in range; the test
  * character is in ch.
  *
+ * zmb is one of the enum defined above charref(), for indicating
+ * incomplete or invalid multibyte characters.
+ *
  * indptr is used by completion matching, which is why this
  * function is exported.  If indptr is not NULL we set *indptr
  * to the index of the character in the range string, adjusted
@@ -3367,7 +3375,7 @@ patmatch(Upat prog)
 
 /**/
 mod_export int
-mb_patmatchrange(char *range, wchar_t ch, wint_t *indptr, int *mtp)
+mb_patmatchrange(char *range, wchar_t ch, int zmb_ind, wint_t *indptr, int *mtp)
 {
     wchar_t r1, r2;
 
@@ -3476,6 +3484,14 @@ mb_patmatchrange(char *range, wchar_t ch, wint_t *indptr, int *mtp)
 		    *indptr += r2 - r1;
 		}
 		break;
+	    case PP_INCOMPLETE:
+		if (zmb_ind == ZMB_INCOMPLETE)
+		    return 1;
+		break;
+	    case PP_INVALID:
+		if (zmb_ind == ZMB_INVALID)
+		    return 1;
+		break;
 	    case PP_UNKWN:
 		DPUTS(1, "BUG: unknown posix range passed through.\n");
 		break;
@@ -3545,6 +3561,8 @@ mb_patmatchindex(char *range, wint_t ind, wint_t *chr, int *mtp)
 	    case PP_IFS:
 	    case PP_IFSSPACE:
 	    case PP_WORD:
+	    case PP_INCOMPLETE:
+	    case PP_INVALID:
 		if (!ind) {
 		    *mtp = swtype;
 		    return 1;
@@ -3698,6 +3716,10 @@ patmatchrange(char *range, int ch, int *indptr, int *mtp)
 		if (indptr && r1 < r2)
 		    *indptr += r2 - r1;
 		break;
+	    case PP_INCOMPLETE:
+	    case PP_INVALID:
+		/* Never true if not in multibyte mode */
+		break;
 	    case PP_UNKWN:
 		DPUTS(1, "BUG: unknown posix range passed through.\n");
 		break;
@@ -3768,6 +3790,8 @@ patmatchindex(char *range, int ind, int *chr, int *mtp)
 	    case PP_IFS:
 	    case PP_IFSSPACE:
 	    case PP_WORD:
+	    case PP_INCOMPLETE:
+	    case PP_INVALID:
 		if (!ind) {
 		    *mtp = swtype;
 		    return 1;
@@ -3851,9 +3875,10 @@ static int patrepeat(Upat p, char *charstart)
     case P_ANYBUT:
 	while (scan < patinend) {
 #ifdef MULTIBYTE_SUPPORT
-	    wchar_t cr = CHARREF(scan, patinend);
+	    int zmb_ind;
+	    wchar_t cr = charref(scan, patinend, &zmb_ind);
 	    if (patglobflags & GF_MULTIBYTE) {
-		if (mb_patmatchrange(opnd, cr, NULL, NULL) ^
+		if (mb_patmatchrange(opnd, cr, zmb_ind, NULL, NULL) ^
 		    (P_OP(p) == P_ANYOF))
 		    break;
 	    } else if (patmatchrange(opnd, (int)cr, NULL, NULL) ^

@@ -1,3 +1,9 @@
+2015-09-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 36478: Src/pattern.c, Src/zsh.h, Src/Zle/comp.h,
+	Doc/Zsh/expn.yo, Test/D07multibyte.ztst: add [[:INCOMPLETE:]] and
+	[[:INVALID:]] pattern tests.
+
 2015-09-10  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36470: Src/Zle/zle_main.c: Auxiliary to 36468, return an empty

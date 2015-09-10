@@ -1956,6 +1956,20 @@ ifzman(the zmanref(zshparam) manual page)\
 ifnzman(noderef(Parameters Used By The Shell))\
 .
 )
+item(tt([:INCOMPLETE:]))(
+Matches a byte that starts an incomplete multibyte character.
+Note that there may be a sequence of more than one bytes that
+taken together form the prefix of a multibyte character.  To
+test for a potentially incomplete byte sequence, use the pattern
+`tt([[:INCOMPLETE:]]*)'.  This will never match a sequence starting
+with a valid multibyte character.
+)
+item(tt([:INVALID:]))(
+Matches a byte that does not start a valid multibyte character.
+Note this may be a continuation byte of an incomplete multibyte
+character as any part of a multibyte string consisting of invalid and
+incomplete multibyte characters is treated as single bytes.
+)
 item(tt([:WORD:]))(
 The character is treated as part of a word; this test is sensitive
 to the value of the tt(WORDCHARS) parameter

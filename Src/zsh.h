@@ -1562,13 +1562,15 @@ typedef struct zpc_disables_save *Zpc_disables_save;
 #define PP_IFS    15
 #define PP_IFSSPACE   16
 #define PP_WORD   17
+#define PP_INCOMPLETE 18
+#define PP_INVALID 19
 /* Special value for last definition */
-#define PP_LAST   17
+#define PP_LAST   19
 
 /* Unknown type.  Not used in a valid token. */
-#define PP_UNKWN  18
+#define PP_UNKWN  20
 /* Range: token followed by the (possibly multibyte) start and end */
-#define PP_RANGE  19
+#define PP_RANGE  21
 
 /* Globbing flags: lower 8 bits gives approx count */
 #define GF_LCMATCHUC	0x0100
@@ -1576,6 +1578,15 @@ typedef struct zpc_disables_save *Zpc_disables_save;
 #define GF_BACKREF	0x0400
 #define GF_MATCHREF	0x0800
 #define GF_MULTIBYTE	0x1000	/* Use multibyte if supported by build */
+
+enum {
+    /* Valid multibyte character from charref */
+    ZMB_VALID,
+    /* Incomplete multibyte character from charref */
+    ZMB_INCOMPLETE,
+    /* Invalid multibyte character charref */
+    ZMB_INVALID
+};
 
 /* Dummy Patprog pointers. Used mainly in executable code, but the
  * pattern code needs to know about it, too. */

@@ -525,3 +525,9 @@
     fi
   done
 0:Invalid characters in pattern matching
+
+  [[ $'\xe3' == [[:INCOMPLETE:]] ]] || print fail 1
+  [[ $'\xe3\x83' == [[:INCOMPLETE:]][[:INVALID:]] ]] || print fail 2
+  [[ $'\xe3\x83\x9b' != [[:INCOMPLETE:][:NVALID:]] ]] || print fail 3
+  [[ $'\xe3\x83\x9b' = ? ]] || print fail 4
+0:Testing incomplete and invalid multibyte character components
