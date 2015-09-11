@@ -10,7 +10,8 @@ a few visible improvements since 5.0.8 as well as many bugfixes.  Note
 in particular the two changes highlighted under "Incompatibilites
 between 5.0.8 and 5.1" below.  See NEWS for more information.
 
-There are only bug fixes between 5.1 and 5.1.1.
+There are mostly bug fixes between 5.1 and 5.1.1; however, a fewer minor
+features useful in resolving problems with shell functions were added.
 
 Installing Zsh
 --------------

@@ -4,7 +4,18 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
-There are no significant changes between 5.1 and 5.1.1.
+Changes from 5.1 to 5.1.1
+-------------------------
+
+5.1.1 is primarily a bug fix release; however, a few minor features were
+added.
+
+The ZLE variables YANK_ACTIVE, YANK_START and YANK_END have been added
+and are useful for managing highlighting.
+
+The zsh-specific pattern match range tests have been supplemented with
+[:INCOMPLETE:] and [:INVALID:] to help detect the state of partially
+read multibyte character strings.
 
 Changes from 5.0.8 to 5.1
 -------------------------
