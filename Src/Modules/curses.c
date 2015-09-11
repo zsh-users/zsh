@@ -339,7 +339,7 @@ zcurses_colorget(const char *nam, char *colorpair)
 	return NULL;
 
     if (zc_color_phase==1 ||
-	!(cpn = (Colorpairnode) gethashnode(zcurses_colorpairs, colorpair))) {
+	!(cpn = (Colorpairnode) gethashnode2(zcurses_colorpairs, colorpair))) {
 	zc_color_phase = 2;
 	cp = ztrdup(colorpair);
 

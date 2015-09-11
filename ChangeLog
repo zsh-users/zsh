@@ -1,5 +1,8 @@
 2015-09-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	*  Sebastian Gniazdowski: 36489: Src/Modules/curses.c: fix bug
+	with hash table for colours.
+
 	* 36483: Functions/Zle/bracketed-paste-magic: use
 	[[:INCOMPLETE:]] to get rest of multibyte character.
 
