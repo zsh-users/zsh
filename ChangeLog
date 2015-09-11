@@ -1,3 +1,7 @@
+2015-09-11  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 36443: Revert 35834.
+
 2015-09-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 36496 (plus tweak for key buffer length): Src/Zle/zle_hist.c,
@@ -438,6 +442,7 @@
 
 	* 35834 (tweaked): Src/Zle/zle_misc.c: strip a final newline from
 	pasted text: inserting is hard to tell apart from accepting it
+	[reverted in 36443]
 
 2015-08-12  Mikael Magnusson  <mikachu@gmail.com>
 
