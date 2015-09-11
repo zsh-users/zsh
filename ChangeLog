@@ -1,5 +1,7 @@
 2015-09-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Config/version.mk: 5.1.1
+
 	*  Sebastian Gniazdowski: 36489: Src/Modules/curses.c: fix bug
 	with hash table for colours.
 
