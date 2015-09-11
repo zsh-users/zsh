@@ -1643,7 +1643,7 @@ doisearch(char **args, int dir, int pattern)
 	    } else if (cmd == Th(z_selfinsert)) {
 #ifdef MULTIBYTE_SUPPORT
 		if (!lastchar_wide_valid)
-		    if (getrestchar(lastchar) == WEOF) {
+		    if (getrestchar(lastchar, NULL, NULL) == WEOF) {
 			handlefeep(zlenoargs);
 			continue;
 		    }
@@ -1877,7 +1877,7 @@ getvisrchstr(void)
 	    } else {
 #ifdef MULTIBYTE_SUPPORT
 		if (!lastchar_wide_valid)
-		    if (getrestchar(lastchar) == WEOF) {
+		    if (getrestchar(lastchar, NULL, NULL) == WEOF) {
 			handlefeep(zlenoargs);
 			continue;
 		    }

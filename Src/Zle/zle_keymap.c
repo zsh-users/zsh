@@ -1501,6 +1501,20 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 	     * they wait till a key is pressed for the movement anyway      */
 	    timeout = !(!virangeflag && !region_active && f && f->widget &&
 		    f->widget->flags & ZLE_VIOPER);
+#ifdef MULTIBYTE_SUPPORT
+	    if ((f == Th(z_selfinsert) || f == Th(z_selfinsertunmeta)) &&
+		!lastchar_wide_valid) {
+		int len;
+		VARARR(char, mbc, MB_CUR_MAX);
+		ZLE_INT_T inchar = getrestchar(lastchar, mbc, &len);
+		if (inchar != WEOF && len) {
+		    char *ptr = mbc;
+		    while (len--)
+			addkeybuf(STOUC(*ptr++));
+		    lastlen = keybuflen;
+		}
+	    }
+#endif
 	}
 	if (!ispfx)
 	    break;
@@ -1519,6 +1533,20 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
     *funcp = func;
     *strp = str;
     return keybuf;
+}
+
+/**/
+static void
+addkeybuf(int c)
+{
+    if(keybuflen + 3 > keybufsz)
+	keybuf = realloc(keybuf, keybufsz *= 2);
+    if(imeta(c)) {
+	keybuf[keybuflen++] = Meta;
+	keybuf[keybuflen++] = c ^ 32;
+    } else
+	keybuf[keybuflen++] = c;
+    keybuf[keybuflen] = 0;
 }
 
 /*
@@ -1542,14 +1570,7 @@ getkeybuf(int w)
 
     if(c < 0)
 	return EOF;
-    if(keybuflen + 3 > keybufsz)
-	keybuf = realloc(keybuf, keybufsz *= 2);
-    if(imeta(c)) {
-	keybuf[keybuflen++] = Meta;
-	keybuf[keybuflen++] = c ^ 32;
-    } else
-	keybuf[keybuflen++] = c;
-    keybuf[keybuflen] = 0;
+    addkeybuf(c);
     return c;
 }
 

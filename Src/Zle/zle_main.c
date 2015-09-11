@@ -933,7 +933,7 @@ getfullchar(int do_keytmout)
     int inchar = getbyte((long)do_keytmout, NULL);
 
 #ifdef MULTIBYTE_SUPPORT
-    return getrestchar(inchar);
+    return getrestchar(inchar, NULL, NULL);
 #else
     return inchar;
 #endif
@@ -951,7 +951,7 @@ getfullchar(int do_keytmout)
 
 /**/
 mod_export ZLE_INT_T
-getrestchar(int inchar)
+getrestchar(int inchar, char *outstr, int *outcount)
 {
     char c = inchar;
     wchar_t outchar;
@@ -965,6 +965,8 @@ getrestchar(int inchar)
      */
     lastchar_wide_valid = 1;
 
+    if (outcount)
+	*outcount = 0;
     if (inchar == EOF) {
 	/* End of input, so reset the shift state. */
 	memset(&mbs, 0, sizeof mbs);
@@ -1013,6 +1015,10 @@ getrestchar(int inchar)
 		return lastchar_wide = WEOF;
 	}
 	c = inchar;
+	if (outstr) {
+	    *outstr++ = c;
+	    (*outcount)++;
+	}
     }
     return lastchar_wide = (ZLE_INT_T)outchar;
 }

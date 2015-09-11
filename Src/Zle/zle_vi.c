@@ -151,7 +151,7 @@ vigetkey(void)
 #ifdef MULTIBYTE_SUPPORT
     if (!lastchar_wide_valid)
     {
-	getrestchar(lastchar);
+	getrestchar(lastchar, NULL, NULL);
     }
 #endif
     return LASTFULLCHAR;

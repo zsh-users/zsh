@@ -1,5 +1,10 @@
 2015-09-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 36496 (plus tweak for key buffer length): Src/Zle/zle_hist.c,
+	Src/Zle/zle_keymap.c, Src/Zle/zle_main.c, Src/Zle/zle_misc.c,
+	Src/Zle/zle_vi.c: Read full multibyte string early for
+	self-insert.
+
 	* unposted: Config/version.mk: Update internal build to
 	5.1.1-dev-0
 

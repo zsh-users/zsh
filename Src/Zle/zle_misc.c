@@ -115,9 +115,7 @@ selfinsert(UNUSED(char **args))
     ZLE_CHAR_T tmp;
 
 #ifdef MULTIBYTE_SUPPORT
-    if (!lastchar_wide_valid)
-	if (getrestchar(lastchar) == WEOF)
-	    return 1;
+    DPUTS(!lastchar_wide_valid, "keybuf did not read full wide character");
 #endif
     tmp = LASTFULLCHAR;
     doinsert(&tmp, 1);
@@ -1431,7 +1429,7 @@ executenamedcommand(char *prmt)
 		else {
 #ifdef MULTIBYTE_SUPPORT
 		    if (!lastchar_wide_valid)
-			getrestchar(lastchar);
+			getrestchar(lastchar, NULL, NULL);
 		    if (lastchar_wide == WEOF)
 			feep = 1;
 		    else
