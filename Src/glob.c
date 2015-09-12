@@ -2491,17 +2491,17 @@ get_match_ret(char *s, int b, int e, int fl, char *replstr,
 	ll += 1 + (l - (e - b));
     if (fl & SUB_BIND) {
 	/* position of start of matched portion */
-	sprintf(buf, "%d ", b + 1);
+	sprintf(buf, "%d ", MB_METASTRLEN2END(s, 0, s+b) + 1);
 	ll += (bl = strlen(buf));
     }
     if (fl & SUB_EIND) {
 	/* position of end of matched portion */
-	sprintf(buf + bl, "%d ", e + 1);
+	sprintf(buf + bl, "%d ", MB_METASTRLEN2END(s, 0, s+e) + 1);
 	ll += (bl = strlen(buf));
     }
     if (fl & SUB_LEN) {
 	/* length of matched portion */
-	sprintf(buf + bl, "%d ", e - b);
+	sprintf(buf + bl, "%d ", MB_METASTRLEN2END(s+b, 0, s+e));
 	ll += (bl = strlen(buf));
     }
     if (bl)
