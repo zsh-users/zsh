@@ -466,7 +466,7 @@ bin_zle_mesg(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 static int
 bin_zle_unget(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 {
-    char *b = *args, *p = b + strlen(b);
+    char *b = unmeta(*args), *p = b + strlen(b);
 
     if (!zleactive) {
 	zwarnnam(name, "can only be called from widget function");
