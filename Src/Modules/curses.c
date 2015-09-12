@@ -370,7 +370,7 @@ zcurses_colorget(const char *nam, char *colorpair)
 	    return NULL;
 	}
 
-	cpn = (Colorpairnode)zalloc(sizeof(struct colorpairnode));
+	cpn = (Colorpairnode)zshcalloc(sizeof(struct colorpairnode));
 	
 	if (!cpn) {
 	    zsfree(cp);
@@ -462,7 +462,7 @@ zccmd_init(const char *nam, char **args)
 	    use_default_colors();
 #endif
 	    /* Initialise the default color pair, always 0 */
-	    cpn = (Colorpairnode)zalloc(sizeof(struct colorpairnode));
+	    cpn = (Colorpairnode)zshcalloc(sizeof(struct colorpairnode));
 	    if (cpn) {
 		cpn->colorpair = 0;
 		addhashnode(zcurses_colorpairs,

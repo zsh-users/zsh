@@ -1,3 +1,8 @@
+2015-09-12  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36509: Src/Modules/curses.c: allocate hash table nodes with
+	zshcalloc() to avoid garbage flag values
+
 2015-09-12  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 36491: Src/glob.c, Test/D07multibyte.ztst: Multibyte
