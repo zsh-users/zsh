@@ -164,25 +164,17 @@ bracketed-paste-magic() {
 	integer bpm_limit=$UNDO_LIMIT_NO bpm_undo=$UNDO_CHANGE_NO
 	UNDO_LIMIT_NO=$UNDO_CHANGE_NO
 
-	local mbchar
-	integer ismb
 	while [[ -n $PASTED ]] && zle .read-command; do
-	    mbchar=$KEYS
-	    ismb=0
-	    while [[ $mbchar = [[:INCOMPLETE:]]* ]] && zle .read-command; do
-		mbchar+=$KEYS
-		ismb=1
-	    done
-	    PASTED=${PASTED#$mbchar}
-	    if [[ ismb -ne 0 || $mbchar = ${(~j:|:)${(b)bpm_inactive}} ]]; then
-		LBUFFER+=$mbchar
+	    PASTED=${PASTED#$KEYS}
+	    if [[ $KEYS = ${(~j:|:)${(b)bpm_inactive}} ]]; then
+		zle .self-insert-unmeta
 	    else
 		case $REPLY in
 		    (${~bpm_active}) function () {
 			emulate -L $bpm_emulate; set -$bpm_opts
 			zle $REPLY
 		    };;
-		    (*) LBUFFER+=$mbchar;
+		    (*) zle .self-insert-unmeta;;
 		esac
 	    fi
 	done
@@ -221,7 +213,7 @@ bracketed-paste-magic() {
     zle .split-undo
 
     # Arrange to display highlighting if necessary
-    if [[ -n ${(M)zle_highlight:#paste:*} ]]; then
+    if [[ -z $zle_highlight || -n ${(M)zle_highlight:#paste:*} ]]; then
 	zle -R
 	zle .read-command && zle -U - $KEYS
     fi

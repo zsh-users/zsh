@@ -1,5 +1,9 @@
 2015-09-12  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Functions/Zle/bracketed-paste-magic: revert 36483 as
+	multibyte is now handled by "zle .read-command"; adapt to new
+	default behavior of zle_highlight for paste
+
 	* 36522: Src/Zle/zle_thingy.c: unmetafy the argument of "zle -U"
 
 	* 36509: Src/Modules/curses.c: allocate hash table nodes with
