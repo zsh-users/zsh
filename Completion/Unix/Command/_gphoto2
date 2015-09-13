@@ -32,7 +32,7 @@ _arguments -s \
   '--get-all-raw-data[get all raw data from folder]' \
   '--get-audio-data[get audio data given in range]:range' \
   '--get-all-audio-data[get all audio data from folder]' \
-  '--delete-files[delete files given in range]:range' \
+  '--delete-file[delete files given in range]:range' \
   '--delete-all-files[delete all files in folder]' \
   '(-u --upload-file)'{-u,--upload-file}'[upload a file to camera]:file:_files' \
   '--capture-preview[capture a quick preview]' \

@@ -1,3 +1,8 @@
+2015-09-13  Axel Beckert  <abe@deuxchevaux.org>
+
+	* 36523: Thue Janus Kristensen: Completion/Unix/Command/_gphoto2:
+	Replace --delete-files with --delete-file.
+
 2015-09-12  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Zle/bracketed-paste-magic: revert 36483 as
