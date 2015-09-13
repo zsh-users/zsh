@@ -115,7 +115,10 @@ selfinsert(UNUSED(char **args))
     ZLE_CHAR_T tmp;
 
 #ifdef MULTIBYTE_SUPPORT
-    DPUTS(!lastchar_wide_valid, "keybuf did not read full wide character");
+    /* may be redundant with getkeymapcmd(), but other widgets call here too */
+    if (!lastchar_wide_valid)
+	if (getrestchar(lastchar, NULL, NULL) == WEOF)
+	    return 1;
 #endif
     tmp = LASTFULLCHAR;
     doinsert(&tmp, 1);

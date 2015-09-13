@@ -5,6 +5,10 @@
 
 2015-09-12  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 36525: Src/Zle/zle_misc.c: revert only the selfinsert() bit of
+	36496 because selfinsert() may be called with incomplete wide
+	character processing from places other than getkeymapcmd()
+
 	* unposted: Functions/Zle/bracketed-paste-magic: revert 36483 as
 	multibyte is now handled by "zle .read-command"; adapt to new
 	default behavior of zle_highlight for paste
