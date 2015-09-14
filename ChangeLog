@@ -1,3 +1,7 @@
+2015-09-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Doc/Zsh/zle.yo README: docs: Typo fixes
+
 2015-09-13  Axel Beckert  <abe@deuxchevaux.org>
 
 	* 36523: Thue Janus Kristensen: Completion/Unix/Command/_gphoto2:

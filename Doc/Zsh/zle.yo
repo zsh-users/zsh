@@ -1012,7 +1012,7 @@ xitem(tt(YANK_ACTIVE) (integer))
 xitem(tt(YANK_START) (integer))
 item(tt(YANK_END) (integer))(
 These three parameters indicate whether text has just been yanked (pasted)
-into the buffer.  tt(YANK_START) and tt(YANK_END) are in the same unit sas
+into the buffer.  tt(YANK_START) and tt(YANK_END) are in the same units as
 tt(CURSOR), and are only valid when tt(YANK_ACTIVE) is non-zero.
 
 All three are read-only.
