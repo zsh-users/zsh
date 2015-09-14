@@ -25,8 +25,9 @@
 
 2015-09-11  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
-	* 36443: Doc/Zsh/zle.yo Src/Zle/zle_refresh.c: Set
-	zle_highlight=(paste:standout) by default.
+	* 36443: Doc/Zsh/zle.yo Src/Zle/zle_refresh.c: 
+	Highlight pasted/yanked text as standout by default (i.e., when
+	$zle_highlight doesn't specify otherwise).
 
 	* 36443: Revert 35834.
 
