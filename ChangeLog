@@ -1,3 +1,8 @@
+2015-09-22  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 36538: Han Pingtian: Doc/Zsh/compwid.yo: tweak code for match
+	anchors to get correct difference between b and B.
+
 2015-09-22  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 36578: Doc/Zsh/compsys.yo: option in a mutually exclusive set

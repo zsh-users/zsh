@@ -899,8 +899,8 @@ var(lanchor), the var(ranchor) only needs to match the trial
 completion string.
 
 The tt(b) and tt(B) forms are similar to tt(l) and tt(L) with an empty 
-anchor, but need to match only the beginning of the trial completion
-or the word on the command line, respectively.
+anchor, but need to match only the beginning of the word on the command line
+or trial completion, respectively.
 )
 xitem(tt(r:)var(lpat)tt(|)var(ranchor)tt(=)var(tpat))
 xitem(tt(R:)var(lpat)tt(|)var(ranchor)tt(=)var(tpat))
