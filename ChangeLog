@@ -1,3 +1,8 @@
+2015-09-18  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted (cf. users/20586): Doc/Zsh/builtins.yo: clean up
+	cross-references to the "Autoloading Functions" section.
+
 2015-09-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Test/D04parameter.ztst: test for 36552

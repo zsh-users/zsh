@@ -144,8 +144,12 @@ findex(autoload)
 cindex(functions, autoloading)
 cindex(autoloading functions)
 item(tt(autoload) [ {tt(PLUS())|tt(-)}tt(TUXkmtz) ] [ tt(-w) ] [ var(name) ... ])(
+vindex(fpath, searching)
 Equivalent to tt(functions -u), with the exception of tt(-X)/tt(+X) and
-tt(-w).
+tt(-w).  See the section `Autoloading Functions' in ifzman(zmanref(zshmisc))\
+ifnzman(noderef(Functions)) for full details.  The tt(fpath) parameter
+will be searched to find the function definition when the function is
+first referenced.
 
 The flag tt(-X) may be used only inside a shell function, and may not be
 followed by a var(name).  It causes the calling function to be marked for
@@ -170,7 +174,8 @@ pattern are loaded.
 
 With the tt(-w) flag, the var(name)s are taken as names of files compiled
 with the tt(zcompile) builtin, and all functions defined in them are
-marked for autoloading.
+marked for autoloading.  Note this does not otherwise change the search
+order for 
 
 The flags tt(-z) and tt(-k) mark the function to be autoloaded using the
 zsh or ksh style, as if the option tt(KSH_AUTOLOAD) were unset or were
@@ -1981,12 +1986,8 @@ for this function; the flag tt(-T) does the same, but turns off tracing
 on any function called from the present one, unless that function also
 has the tt(-t) or tt(-T) flag.  The tt(-u) and tt(-U) flags cause the
 function to be marked for autoloading; tt(-U) also causes alias
-expansion to be suppressed when the function is loaded.  The tt(fpath)
-parameter will be searched to find the function definition when the
-function is first referenced; see noderef(Functions). The tt(-k) and
-tt(-z) flags make the function be loaded using ksh-style or zsh-style
-autoloading respectively. If neither is given, the setting of the
-tt(KSH_AUTOLOAD) option determines how the function is loaded.
+expansion to be suppressed when the function is loaded.  See the
+description of the `tt(autoload)' builtin for details.
 
 Note that the builtin tt(functions) provides the same basic capabilities
 as tt(typeset -f) but gives access to a few extra options.
@@ -2338,6 +2339,7 @@ noderef(Functions)
 for a description of how autoloaded functions are searched.  The
 extension tt(.zwc) stands for `zsh word code'.
 
+vindex(fpath, with zcompile)
 If there is at least one var(name) argument, all the named files
 are compiled into the output var(file) given as the first argument.  If
 var(file) does not end in tt(.zwc), this extension is automatically
