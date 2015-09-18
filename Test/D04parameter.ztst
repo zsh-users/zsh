@@ -413,6 +413,10 @@
 >$'playing \'stupid\' "games" \\w\\i\\t\\h $quoting.'
 >'playing '\'stupid\'' "games" \w\i\t\h $quoting.'
 
+  print -r ${(qqqq):-""}
+0:workers/36551: literal empty string in ${(qqqq)...}
+>$''
+
   x=( a '' '\b' 'c d' '$e' )
   print -r ${(q)x}
   print -r ${(q-)x}

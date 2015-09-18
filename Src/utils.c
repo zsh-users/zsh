@@ -5385,6 +5385,12 @@ quotestring(const char *s, char **e, int instring)
     u = s;
     if (instring == QT_DOLLARS) {
 	/*
+	 * The only way to get Nularg here is when
+	 * it is placeholding for the empty string?
+	 */
+	if (inull(*u))
+	    *u++;
+	/*
 	 * As we test for printability here we need to be able
 	 * to look for multibyte characters.
 	 */
