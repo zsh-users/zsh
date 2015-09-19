@@ -220,8 +220,10 @@ typedef union upat *Upat;
 #if defined(ZSH_64_BIT_TYPE) || defined(LONG_IS_64_BIT)
 typedef zlong zrange_t;
 #define ZRANGE_T_IS_SIGNED	(1)
+#define ZRANGE_MAX ZLONG_MAX
 #else
 typedef unsigned long zrange_t;
+#define ZRANGE_MAX ULONG_MAX
 #endif
 
 #ifdef MULTIBYTE_SUPPORT
@@ -2641,19 +2643,30 @@ patmatch(Upat prog)
 	    start = compend = patinput;
 	    comp = 0;
 	    while (patinput < patinend && idigit(*patinput)) {
-		if (comp)
-		    comp *= 10;
-		comp += *patinput - '0';
+		int out_of_range = 0;
+		int digit = *patinput - '0';
+		if (comp > ZRANGE_MAX / (zlong)10) {
+		    out_of_range = 1;
+		} else {
+		    zrange_t c10 = comp ? comp * 10 : 0;
+		    if (ZRANGE_MAX - c10 < digit) {
+			out_of_range = 1;
+		    } else {
+			comp = c10;
+			comp += digit;
+		    }
+		}
 		patinput++;
 		compend++;
 
-		if (comp & ((zrange_t)1 << (sizeof(comp)*8 -
+		if (out_of_range ||
+		    (comp & ((zrange_t)1 << (sizeof(comp)*8 -
 #ifdef ZRANGE_T_IS_SIGNED
 					    2
 #else
 					    1
 #endif
-				))) {
+				)))) {
 		    /*
 		     * Out of range (allowing for signedness, which
 		     * we need if we are using zlongs).

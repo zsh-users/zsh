@@ -1,5 +1,8 @@
 2015-09-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 36559: Src/pattern.c: test earlier for overflow in pattern
+	range.
+
 	* unposted: Test/D07multibyte.ztst: fix typo.
 
 2015-09-18  Barton E. Schaefer  <schaefer@zsh.org>
