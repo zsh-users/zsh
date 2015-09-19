@@ -5389,7 +5389,7 @@ quotestring(const char *s, char **e, int instring)
 	 * it is placeholding for the empty string?
 	 */
 	if (inull(*u))
-	    *u++;
+	    u++;
 	/*
 	 * As we test for printability here we need to be able
 	 * to look for multibyte characters.
