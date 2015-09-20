@@ -2321,7 +2321,7 @@ item(tt(zcompile -t) var(file) [ var(name) ... ])(
 This builtin command can be used to compile functions or scripts,
 storing the compiled form in a file, and to examine files containing
 the compiled form.  This allows faster autoloading of functions and
-execution of scripts by avoiding parsing of the text when the files
+sourcing of scripts by avoiding parsing of the text when the files
 are read.
 
 The first form (without the tt(-c), tt(-a) or tt(-t) options) creates a

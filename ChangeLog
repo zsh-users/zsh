@@ -1,5 +1,8 @@
 2015-09-19  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Doc/Zsh/builtins.yo: zcompile prepares scripts for
+	sourcing, not for execution
+
 	* 36566: Src/parse.c: check for regular file before lseek()
 
 	* 36562: Src/utils.c: sanitize $PWD on import, per POSIX
