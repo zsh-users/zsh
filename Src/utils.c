@@ -692,9 +692,23 @@ ispwd(char *s)
 {
     struct stat sbuf, tbuf;
 
-    if (stat(unmeta(s), &sbuf) == 0 && stat(".", &tbuf) == 0)
-	if (sbuf.st_dev == tbuf.st_dev && sbuf.st_ino == tbuf.st_ino)
-	    return 1;
+    /* POSIX: environment PWD must be absolute */
+    if (*s != '/')
+	return 0;
+
+    if (stat((s = unmeta(s)), &sbuf) == 0 && stat(".", &tbuf) == 0)
+	if (sbuf.st_dev == tbuf.st_dev && sbuf.st_ino == tbuf.st_ino) {
+	    /* POSIX: No element of $PWD may be "." or ".." */
+	    while (*s) {
+		if (s[0] == '.' &&
+		    (!s[1] || s[1] == '/' ||
+		     (s[1] == '.' && (!s[2] || s[2] == '/'))))
+		    break;
+		while (*s++ != '/' && *s)
+		    continue;
+	    }
+	    return !*s;
+	}
     return 0;
 }
 
