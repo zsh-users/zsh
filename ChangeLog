@@ -1,5 +1,7 @@
 2015-09-19  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 36566: Src/parse.c: check for regular file before lseek()
+
 	* 36562: Src/utils.c: sanitize $PWD on import, per POSIX
 
 2015-09-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>

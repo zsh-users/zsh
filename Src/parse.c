@@ -3227,6 +3227,8 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
     noaliases = ali;
 
     for (hlen = FD_PRELEN, tlen = 0; *files; files++) {
+	struct stat st;
+
 	if (!strcmp(*files, "-k")) {
 	    flags = (flags & ~(FDHF_KSHLOAD | FDHF_ZSHLOAD)) | FDHF_KSHLOAD;
 	    continue;
@@ -3235,6 +3237,7 @@ build_dump(char *nam, char *dump, char **files, int ali, int map, int flags)
 	    continue;
 	}
 	if ((fd = open(*files, O_RDONLY)) < 0 ||
+	    fstat(fd, &st) != 0 || !S_ISREG(st.st_mode) ||
 	    (flen = lseek(fd, 0, 2)) == -1) {
 	    if (fd >= 0)
 		close(fd);
