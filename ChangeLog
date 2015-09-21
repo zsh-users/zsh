@@ -1,3 +1,7 @@
+2015-09-21  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted: Src/zsh.h: typo in 36559.
+
 2015-09-19  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/builtins.yo: zcompile prepares scripts for
