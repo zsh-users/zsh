@@ -1,14 +1,28 @@
 #compdef losetup
+# based on util-linux 2.26.2
 
-local cyphers
-cyphers=( /proc/crypto/cipher/*(N:t) )
-cyphers="${cyphers[@]%-*}"
-
-_arguments -S \
+_arguments -S -A '-*' \
+  '(-l --list)'{-l,--list}'[list currently used loop devices]' \
+  '(-n --noheadings)'{-n,--noheadings}'[do not print heading for --list output]' \
+  '(-d --delete --detach -o --offset -a --all)'{-o,--offset}'+[specify data start is offset]:offset (bytes)' \
+  '(-O --output)'{-O,--output}'[specify columns to be printed with --list]:column: _values -s , column name sizelimit offset autoclear ro back-file' \
+  '(-P --partscan)'{-P,--partscan}'[scan the partition table of newly created loop devices]' \
+  '--raw[raw output format]' \
+  '(-r --read-only)'{-r,--read-only}'[set up a read-only loop device]' \
+  '(-v --verbose)'{-v,--verbose}'[verbose mode]' \
+  '(-V --version)'{-V,--version}'[display version information]' \
+  '(-h --help)'{-h,--help}'[display help]' \
+  '1:device:_files -g "/dev/loop<->"' \
+  '(-d --delete --detach)2:file:_files' \
+  - '(set1)' \
+  '(-o --offset)'{-a,--all}'[show the status of all loop devices]' \
+  - '(set2)' \
+  {-c,--set-capacity}'[reread  the size of the file associated with the loop device]' \
+  - '(set3)' \
   '(- 2)'{--delete,--detach,-d}'[detach from specified loop device]' \
-  '(-d --delete --detach -e --encryption)'{-e,--encryption}"+[enable encryption]:cypher:( $cyphers )" \
-  '(-d --delete --detach -o --offset)'{-o,--offset}'+[specify data start is offset]:offset (bytes)' \
-  '(-d --delete --detach -p --pass-fd)'{-p,--pass-fd}'+[read passphrase from specified file descriptor]:file descriptor:_file_descriptors' \
-  '(-d --delete --detach -k --keybits)'{-k,--keybits}'+[set the number of bits to use in key]:key size:(64 128 160 192 256)' \
-  '1:device:_files -g "loop*(-.)"' \
-  '(-d --delete --detach)2:file:_files'
+  - '(set4)' \
+  '(-D --detach-all)'{-D,--detach-all}'[detach all associated loop devices]' \
+  - '(set5)' \
+  {-f,--find}'[find the first unused loop device]' \
+  - '(set6)' \
+  {-j,--associated}'[show the status of all loop devices associated with an file]: : _files'

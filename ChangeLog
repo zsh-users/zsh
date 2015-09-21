@@ -1,3 +1,9 @@
+2015-09-23  Mikael Magnusson  <mikachu@gmail.com>
+
+	* Eric Cook: 36571: Completion/Linux/Command/_losetup,
+	Completion/Zsh/Command/_zsocket: Completion for zsocket and
+	updated losetup's completion
+
 2015-09-22  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36587: Functions/Zle/edit-command-line: use +LINE:COLUMN to
