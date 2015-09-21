@@ -338,8 +338,15 @@ add_match_str(Cmatcher m, char *l, char *w, int wl, int sfx)
 	    char *buf;
 
 	    buf = (char *) zalloc(blen);
-	    memcpy(buf, matchbuf, matchbuflen);
-	    zfree(matchbuf, matchbuflen);
+	    if (matchbuf) {
+		memcpy(buf, matchbuf, matchbuflen);
+		zfree(matchbuf, matchbuflen);
+	    }
+#ifdef DEBUG
+	    else {
+		DPUTS(matchbuflen, "matchbuflen with no matchbuf");
+	    }
+#endif
 	    matchbuf = buf;
 	    matchbuflen = blen;
 	}

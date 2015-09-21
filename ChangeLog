@@ -1,3 +1,8 @@
+2015-09-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 36580: Src/Zle/compmatch.c: don't copy empty buffer and check
+	size is consistent.
+
 2015-09-21  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 36575: Completion/Unix/Command/_tmux: _tmux: ‘lock-server’
