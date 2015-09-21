@@ -1079,9 +1079,15 @@ main() { return sizeof(ino_t) < 8; }
 fi
 AH_TEMPLATE([ZLONG_IS_LONG_LONG],
 [Define to 1 if the zlong type uses long long int.])
+AH_TEMPLATE([ZLONG_IS_LONG_64],
+[Define to 1 if the zlong type uses 64-bit long int.])
 if test "$zsh_cv_64_bit_type" = "long long"; then
   dnl Remember this so we can get (s)printf output right.
   AC_DEFINE(ZLONG_IS_LONG_LONG)
+else
+  if test "$zsh_cv_64_bit_type" = "long"; then
+      AC_DEFINE(ZLONG_IS_LONG_64)
+  fi
 fi
 
 dnl We'll blithely assume (f)printf supports the same types as sprintf.

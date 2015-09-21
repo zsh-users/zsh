@@ -16,6 +16,9 @@
 
 2015-09-21  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 36577: configure.ac, Src/zsh.h: supplement 36559 to
+	use LONG_MAX for 64-bit long.
+
 	* unposted: Src/zsh.h: typo in 36559.
 
 2015-09-19  Barton E. Schaefer  <schaefer@zsh.org>
