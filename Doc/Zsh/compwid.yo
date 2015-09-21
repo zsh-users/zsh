@@ -911,7 +911,7 @@ item(tt(E:)var(lpat)tt(=)var(tpat))(
 As tt(l), tt(L), tt(b) and tt(B), with the difference that the command
 line and trial completion patterns are anchored on the right side.
 Here an empty var(ranchor) and the tt(e) and tt(E) forms force the
-match to the end of the trial completion or command line string.
+match to the end of the command line or trial completion string.
 )
 enditem()
 

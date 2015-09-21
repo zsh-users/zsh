@@ -1,6 +1,12 @@
 2015-09-22  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* 36538: Han Pingtian: Doc/Zsh/compwid.yo: tweak code for match
+	* 36586: Han Pingtian: Src/Zle/compmatch.c: tweak to completion
+	matching with right anchor.
+
+	* 36545: Han Pingtian: Doc/Zsh/compwid.yo: tweak doc for match
+	anchors e and E.
+
+	* 36538: Han Pingtian: Doc/Zsh/compwid.yo: tweak doc for match
 	anchors to get correct difference between b and B.
 
 2015-09-22  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
