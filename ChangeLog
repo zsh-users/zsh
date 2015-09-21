@@ -3,6 +3,9 @@
 	* 36575: Completion/Unix/Command/_tmux: _tmux: ‘lock-server’
 	option is gone in tmux.git
 
+	* 36576: Completion/Unix/Command/_tmux: _tmux: Fix tmux homepage
+	URI
+
 2015-09-21  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 36574: Completion/Unix/Command/_lldb: new completion for

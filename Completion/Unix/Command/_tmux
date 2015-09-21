@@ -1,6 +1,6 @@
 #compdef tmux
 
-# tmux <http://tmux.sf.net> completion for zsh <http://zsh.sf.net>.
+# tmux <http://tmux.github.io> completion for zsh <http://zsh.sf.net>.
 #
 # Configuration:
 #
