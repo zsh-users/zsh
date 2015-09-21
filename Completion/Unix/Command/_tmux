@@ -1270,7 +1270,6 @@ function __tmux-option-guard() {
             'history-limit:'${int_guard}
             'lock-after-time:'${int_guard}
             'lock-command:MSG:command string'
-            'lock-server:DESC:on off'
             'message-command-style:__tmux-style'
             'message-style:__tmux-style'
             'mouse:DESC:on off'
@@ -1394,7 +1393,6 @@ function __tmux-session-options() {
         'history-limit:number of copy-mode lines per window'
         'lock-after-time:lock sessions after N seconds'
         'lock-command:command to run for locking a client'
-        'lock-server:make lock-after-time lock the server instead of sessions'
         'message-command-style:status line message command style'
         'message-style:status line message style'
         'mouse:enable mouse support'

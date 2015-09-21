@@ -1,3 +1,8 @@
+2015-09-21  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 36575: Completion/Unix/Command/_tmux: _tmux: ‘lock-server’
+	option is gone in tmux.git
+
 2015-09-21  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 36574: Completion/Unix/Command/_lldb: new completion for
