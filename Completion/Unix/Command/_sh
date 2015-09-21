@@ -24,6 +24,6 @@ fi
 
 local ret=$?
 
-[[ $service == zsh ]] && _arguments -S -s -- '*:' && ret=0
+[[ $service == zsh ]] && _arguments -S -s -- && ret=0
 
 return ret

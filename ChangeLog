@@ -1,3 +1,11 @@
+2015-09-21  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 36574: Completion/Unix/Command/_lldb: new completion for
+	the lldb debugger
+
+	* 36556: Completion/Unix/Command/_sh: remove unnecessary
+	helpspec to '_argument --'
+
 2015-09-21  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Src/zsh.h: typo in 36559.
