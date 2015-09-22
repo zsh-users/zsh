@@ -3982,6 +3982,11 @@ possible completions.  When it contains `tt(-d)' or an argument, the
 option `tt(-c)' will not be considered.  However, after `tt(-a)'
 both sets will still be considered valid.
 
+If an option in a set appears on the command line, it is stored in the
+associative array `tt(opt_args)' with 'var(set)tt(-)var(option)'
+as a key.  In the example above, a key `tt(set1--c)' is used if the option
+`tt(-c)' is on the command line.
+
 If the name given for one of the mutually exclusive sets is of the form
 `tt(LPAR())var(name)tt(RPAR())' then only one value from each set will ever
 be completed; more formally, all specifications are mutually

@@ -1,3 +1,8 @@
+2015-09-22  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 36578: Doc/Zsh/compsys.yo: option in a mutually exclusive set
+	has key "set-opt" in $opt_args
+
 2015-09-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 36580: Src/Zle/compmatch.c: don't copy empty buffer and check
