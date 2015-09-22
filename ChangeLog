@@ -1,3 +1,8 @@
+2015-09-22  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36587: Functions/Zle/edit-command-line: use +LINE:COLUMN to
+	place the cursor when invoking emacs variants, for emacsclient
+
 2015-09-22  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36586: Han Pingtian: Src/Zle/compmatch.c: tweak to completion
