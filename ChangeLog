@@ -26,7 +26,7 @@
 
 2015-09-21  Frank Terbeck  <ft@bewatermyfriend.org>
 
-	* 36575: Completion/Unix/Command/_tmux: _tmux: ‘lock-server’
+	* 36575: Completion/Unix/Command/_tmux: _tmux: 'lock-server'
 	option is gone in tmux.git
 
 	* 36576: Completion/Unix/Command/_tmux: _tmux: Fix tmux homepage
