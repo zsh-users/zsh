@@ -820,11 +820,11 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 			    continue;
 			else if (mp->right)
 			    t = pattern_match(mp->right,
-					      //tl + mp->llen - mp->ralen,
+					      /* tl + mp->llen - mp->ralen, */
 					      tl + mp->llen,
 					      NULL, NULL) &&
 				pattern_match(mp->right,
-					      //tw + mp->wlen - mp->ralen,
+					      /* tw + mp->wlen - mp->ralen, */
 					      tw + mp->wlen,
 					      NULL, NULL) &&
 				(!mp->lalen ||
