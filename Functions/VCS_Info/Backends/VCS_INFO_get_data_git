@@ -217,18 +217,21 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
 elif [[ -d "${gitdir}/rebase-apply" ]]; then
     # Fake patch names for all but current patch
     patchdir="${gitdir}/rebase-apply"
-    local cur=$(< "${patchdir}/next")
-    local p subject
-    for p in $(seq $(($cur - 1))); do
-        git_patches_applied+=("$(printf "%04d" $p) ?")
-    done
-    subject="${$(< "${patchdir}/msg-clean")[(f)1]}"
-    if [[ -f "${patchdir}/original-commit" ]]; then
-        git_patches_applied+=("$(< ${patchdir}/original-commit) $subject")
-    else
-        git_patches_applied+=("? $subject")
+    local next="${patchdir}/next"
+    if [[ -f $next ]]; then
+	local cur=$(< $next)
+	local p subject
+	for p in $(seq $(($cur - 1))); do
+	    git_patches_applied+=("$(printf "%04d" $p) ?")
+	done
+	subject="${$(< "${patchdir}/msg-clean")[(f)1]}"
+	if [[ -f "${patchdir}/original-commit" ]]; then
+	    git_patches_applied+=("$(< ${patchdir}/original-commit) $subject")
+	else
+	    git_patches_applied+=("? $subject")
+	fi
+	git_patches_unapplied=($(seq $cur $(< "${patchdir}/last")))
     fi
-    git_patches_unapplied=($(seq $cur $(< "${patchdir}/last")))
 
     VCS_INFO_git_handle_patches
 elif [[ -f "${gitdir}/MERGE_HEAD" ]]; then
