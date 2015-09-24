@@ -52,7 +52,7 @@ while getopts ":tqp" opt; do
     fi
   esac
 done
-shift OPTIND-${#tmp:-1}
+shift OPTIND-${#tmp}-1
 
 if [[ -n $check ]]; then
   ret=1
