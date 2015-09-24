@@ -163,21 +163,21 @@ _hg_revrange() {
 }
 
 _hg_tags_internal() {
-  local expl
+  local -a expl
   typeset -a hgtags
   hgtags=( ${(f)"$(_hg_cmd tags -q 2>/dev/null)"} )
   _wanted tags expl 'tags' compadd -a - hgtags
 }
 
 _hg_bookmarks_internal() {
-  local expl
+  local -a expl
   typeset -a hgbookmarks
   hgbookmarks=( ${(f)"$(_hg_cmd bookmarks -q 2>/dev/null)"} )
   _wanted bookmarks expl 'bookmarks' compadd -a - hgbookmarks
 }
 
 _hg_branches_internal() {
-  local expl
+  local -a expl
   typeset -a hgbranches
   hgbranches=( ${(f)"$(_hg_cmd branches -q 2>/dev/null)"} )
   _wanted branches expl 'branches' compadd -a - hgbranches

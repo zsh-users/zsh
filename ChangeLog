@@ -1,3 +1,8 @@
+2015-09-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Completion/Unix/Command/_hg: _hg: Declare $expl as
+	an array
+
 2015-09-24  Christoph Mathys  <eraserix@gmail.com>
 
 	* 36613: Completion/Unix/Command/_hg: _hg: extend completion
