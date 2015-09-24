@@ -176,6 +176,13 @@ _hg_bookmarks_internal() {
   _wanted bookmarks expl 'bookmarks' compadd -a - hgbookmarks
 }
 
+_hg_branches_internal() {
+  local expl
+  typeset -a hgbranches
+  hgbranches=( ${(f)"$(_hg_cmd branches -q 2>/dev/null)"} )
+  _wanted branches expl 'branches' compadd -a - hgbranches
+}
+
 _hg_tags() {
   _alternative \
     'bookmarks:bookmark:_hg_bookmarks_internal' \
@@ -659,6 +666,10 @@ _hg_cmd_push() {
   _arguments -s -w : $_hg_global_opts $_hg_remote_opts \
   '(--force -f)'{-f,--force}'[force push]' \
   '(--rev -r)'{-r+,--rev}'[a specific revision you would like to push]:revision:_hg_tags' \
+  '*'{-B,--bookmark=}'[bookmark to push]:bookmark:_hg_bookmarks_internal' \
+  '*'{-b,--branch=}'[branch to push]:branch:_hg_branches_internal' \
+  '--insecure[do not verify server certificate]' \
+  '--new-branch[allow pushing a new branch]' \
   ':destination:_hg_remote'
 }
 

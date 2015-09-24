@@ -1,3 +1,8 @@
+2015-09-24  Christoph Mathys  <eraserix@gmail.com>
+
+	* 36613: Completion/Unix/Command/_hg: _hg: extend completion
+	for hg push to support branch and bookmark
+
 2015-09-23  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36604: Functions/Misc/zrecompile: fix getopts+shift calculation
