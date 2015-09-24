@@ -1,12 +1,15 @@
+2015-09-24  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 36603: Src/glob.c: fix dirfd leak during Y shortcut qualifier
+
 2015-09-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
-	* unposted: Completion/Unix/Command/_hg: _hg: Declare $expl as
-	an array
+	* unposted: Completion/Unix/Command/_hg: Declare $expl as an array
 
 2015-09-24  Christoph Mathys  <eraserix@gmail.com>
 
-	* 36613: Completion/Unix/Command/_hg: _hg: extend completion
-	for hg push to support branch and bookmark
+	* 36613: Completion/Unix/Command/_hg: extend completion for hg
+	push to support branch and bookmark
 
 2015-09-23  Barton E. Schaefer  <schaefer@zsh.org>
 

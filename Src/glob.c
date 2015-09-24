@@ -634,8 +634,10 @@ scanner(Complist q, int shortcircuit)
 		} else {
 		    /* if the last filename component, just add it */
 		    insert(fn, 1);
-		    if (shortcircuit && shortcircuit == matchct)
+		    if (shortcircuit && shortcircuit == matchct) {
+			closedir(lock);
 			return;
+		    }
 		}
 	    }
 	}
