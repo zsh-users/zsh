@@ -460,6 +460,16 @@ _hg_cmd_bisect() {
   '(--command -c --noupdate -U)'{-U,--noupdate}'[do not update to target]'
 }
 
+_hg_cmd_bookmarks() {
+  _arguments -s : $_hg_global_opts \
+  '(--force -f)'{-f,--force}'[force]' \
+  '(--rev -r)'{-r+,--rev=}'[set bookmark at revision]:revision:_hg_tags' \
+  '(--delete -d)'{-d,--delete}'[delete a given bookmark]' \
+  '(--rename -m)'{-m+,--rename}'[rename given bookmark]:bookmark:_hg_bookmarks_internal' \
+  '(--inactive -i)'{-i,--inactive}'[mark a bookmark inactive]' \
+  ':bookmark:_hg_bookmarks_internal'
+}
+
 _hg_cmd_branch() {
   _arguments -s -w : $_hg_global_opts \
   '(--force -f)'{-f,--force}'[set branch name even if it shadows an existing branch]' \
