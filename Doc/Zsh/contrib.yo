@@ -1705,7 +1705,10 @@ item(tt(select-word-style), tt(match-word-context), tt(match-words-by-style))(
 The eight `tt(-match)' functions are drop-in replacements for the
 builtin widgets without the suffix.  By default they behave in a similar
 way.  However, by the use of styles and the function tt(select-word-style),
-the way words are matched can be altered.
+the way words are matched can be altered.  For comparison, the widgets
+described in ifzman(zmanref(zshzle) under Text Objects)\
+ifnzman(noderef(Text Objects)) use fixed definitions of words, compatible
+with the tt(vim) editor.
 
 The simplest way of configuring the functions is to use
 tt(select-word-style), which can either be called as a normal function with
@@ -1894,6 +1897,100 @@ extract the command argument around the cursor.
 The tt(word-context) style is implemented by the function
 tt(match-word-context).  This should not usually need to be called
 directly.
+)
+tindex(bracketed-paste-magic)
+item(bracketed-paste-magic)(
+The tt(bracketed-paste) widget (see ifzman(subsection Miscellaneous in
+zmanref(zshzle))ifnzman(noderef(Miscellaneous) in noderef(Zle Widgets)))
+inserts pasted text literally into the editor buffer rather than interpret
+it as keystrokes.  This disables some common usages where the self-insert
+widget is replaced in order to accomplish some extra processing.  An
+example is the contributed tt(url-quote-magic) widget described below.
+
+The tt(bracketed-paste-magic) widget is meant to replace tt(bracketed-paste)
+with a wrapper that re-enables these self-insert actions, and other
+actions as selected by zstyles.  Therefore this widget is installed with
+ifzman()
+example(autoload -Uz bracketed-paste-magic
+zle -N bracketed-paste bracketed-paste-magic)
+
+Other than enabling some widget processing, tt(bracketed-paste-magic)
+attempts to replicate tt(bracketed-paste) as faithfully as possible.
+
+The following zstyles may be set to control processing of pasted text.
+All are looked up in the context `tt(:bracketed-paste-magic)'.
+
+startitem()
+item(tt(active-widgets))(
+A list of patterns matching widget names that should be activated during
+the paste.  All other key sequences are processed as self-insert-unmeta.
+The default is `tt(self-*)' so any user-defined widgets named with that
+prefix are active along with the builtin self-insert.
+
+If this style is not set (explicitly deleted) or set to an empty value,
+no widgets are active and the pasted text is inserted literally.  If the
+value includes `tt(undefined-key)', any unknown sequences are discarded
+from the pasted text.
+)
+item(tt(inactive-keys))(
+The inverse of tt(active-widgets), a list of key sequences that always use
+tt(self-insert-unmeta) even when bound to an active widget.  Note that
+this is a list of literal key sequences, not patterns.
+)
+item(tt(paste-init))(
+A list of function names, called in widget context (but not as widgets).
+The functions are called in order until one of them returns a non-zero
+status.  The parameter `tt(PASTED)' contains the initial state of the
+pasted text.  All other ZLE parameters such as `tt(BUFFER)' have their
+normal values and side-effects, and full history is available, so for
+example tt(paste-init) functions may move words from tt(BUFFER) into
+tt(PASTED) to make those words visible to the tt(active-widgets).
+
+A non-zero return from a tt(paste-init) function does em(not) prevent the
+paste itself from proceeding.
+
+Loading tt(bracketed-paste-magic) defines tt(backward-extend-paste), a
+helper function for use in tt(paste-init).
+
+example(zstyle :bracketed-paste-magic paste-init \ 
+       backward-extend-paste)
+
+When a paste would insert into the middle of a word or append text to a
+word already on the line, tt(backward-extend-paste) moves the prefix
+from tt(LBUFFER) into tt(PASTED) so that the tt(active-widgets) see the
+full word so far.  This may be useful with tt(url-quote-magic).
+)
+item(tt(paste-finish))(
+Another list of function names called in order until one returns non-zero.
+These functions are called em(after) the pasted text has been processed
+by the tt(active-widgets), but em(before) it is inserted into `tt(BUFFER)'.
+ZLE parameters have their normal values and side-effects.
+
+A non-zero return from a tt(paste-finish) function does em(not) prevent
+the paste itself from proceeding.
+
+Loading tt(bracketed-paste-magic) also defines tt(quote-paste), a helper
+function for use in tt(paste-finish).
+
+example(zstyle :bracketed-paste-magic paste-finish \ 
+       quote-paste
+zstyle :bracketed-paste-magic:finish quote-style \ 
+       qqq)
+
+When the pasted text is inserted into tt(BUFFER), it is quoted per the
+tt(quote-style) value.  To forcibly turn off the built-in numeric prefix
+quoting of tt(bracketed-paste), use:
+
+example(zstyle :bracketed-paste-magic:finish quote-style \ 
+       none)
+)
+enditem()
+
+em(Important:) During tt(active-widgets) processing of the paste (after
+tt(paste-init) and before tt(paste-finish)), tt(BUFFER) starts empty and
+history is restricted, so cursor motions, etc., may not pass outside of
+the pasted content.  Text assigned to tt(BUFFER) by the active widgets
+is copied back into tt(PASTED) before tt(paste-finish).
 )
 tindex(copy-earlier-word)
 item(tt(copy-earlier-word))(
@@ -2556,6 +2653,69 @@ cursor.  These two lines are transposed and the cursor moved to the
 start of the previous line.  Using a numeric argument less than -1
 has the effect of moving the line above the cursor up by minus that
 number of lines.
+)
+tindex(url-quote-magic)
+item(tt(url-quote-magic))(
+This widget replaces the built-in tt(self-insert) to make it easier to
+type URLs as command line arguments.  As you type, the input character is
+analyzed and, if it may need quoting, the current word is checked for a
+URI scheme.  If one is found and the current word is not already in
+quotes, a backslash is inserted before the input character.
+
+Styles to control quoting behavior:
+
+startitem()
+item(tt(url-metas))(
+This style is looked up in the context `tt(:url-quote-magic:)var(scheme)'
+(where var(scheme) is that of the current URL, e.g. "tt(ftp)").  The value
+is a string listing the characters to be treated as globbing
+metacharacters when appearing in a URL using that scheme.  The default is
+to quote all zsh extended globbing characters, excluding 'tt(<)' and
+'tt(>)' but including braces (as in brace expansion).  See also
+tt(url-seps).
+)
+item(tt(url-seps))(
+Like tt(url-metas), but lists characters that should be considered command
+separators, redirections, history references, etc.  The default is to
+quote the standard set of shell separators, excluding those that overlap
+with the extended globbing characters, but including 'tt(<)' and
+'tt(>)' and the first character of tt($histchars).
+)
+item(tt(url-globbers))(
+This style is looked up in the context `tt(:url-quote-magic)'.  The values
+form a list of command names that are expected to do their own globbing
+on the URL string.  This implies that they are aliased to use the
+`tt(noglob)' modifier.  When the first word on the line matches one of the
+values em(and) the URL refers to a local file (see tt(url-local-schema)),
+only the tt(url-seps) characters are quoted; the tt(url-metas) are left
+alone, allowing them to affect command-line parsing, completion, etc.  The
+default values are a literal `tt(noglob)' plus (when the tt(zsh/parameter)
+module is available) any commands aliased to the helper function
+`tt(urlglobber)' or its alias `tt(globurl)'.
+)
+item(tt(url-local-schema))(
+This style is always looked up in the context `tt(:urlglobber)', even
+though it is used by both url-quote-magic and urlglobber.  The values form
+a list of URI schema that should be treated as referring to local files by
+their real local path names, as opposed to files which are specified
+relative to a web-server-defined document root.  The defaults are
+"tt(ftp)" and "tt(file)".
+)
+item(tt(url-other-schema))(
+Like tt(url-local-schema), but lists all other URI schema upon which
+tt(urlglobber) and tt(url-quote-magic) should act.  If the URI on the
+command line does not have a scheme appearing either in this list or in
+tt(url-local-schema), it is not magically quoted.  The default values are
+"tt(http)", "tt(https)", and "tt(ftp)".  When a scheme appears both here
+and in tt(url-local-schema), it is quoted differently depending on whether
+the command name appears in tt(url-globbers).
+)
+enditem()
+
+Loading tt(url-quote-magic) also defines a helper function `tt(urlglobber)'
+and aliases `tt(globurl)' to `tt(noglob urlglobber)'.  This function takes
+a local URL apart, attempts to pattern-match the local file portion of the
+URL path, and then puts the results back into URL format again.
 )
 tindex(which-command)
 item(tt(which-command))(

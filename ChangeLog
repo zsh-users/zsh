@@ -1,3 +1,8 @@
+2015-09-24  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36623: Doc/Zsh/contrib.yo: document bracketed-paste-magic and
+	url-quote-magic; add cross-reference to vim text object widgets
+
 2015-09-24  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 36603: Src/glob.c: fix dirfd leak during Y shortcut qualifier
