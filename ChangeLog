@@ -1,3 +1,8 @@
+2015-09-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 36630: Doc/Zsh/contrib.yo, Doc/Zsh/manual.yo,
+	Functions/Chpwd/zsh_directory_name_generic: new helper function.
+
 2015-09-24  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36623: Doc/Zsh/contrib.yo: document bracketed-paste-magic and
