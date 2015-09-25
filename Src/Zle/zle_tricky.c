@@ -2952,6 +2952,9 @@ getcurcmd(void)
     return s;
 }
 
+/* Run '$WIDGET $commandword' and then restore the command-line using push-line.
+ */
+
 /**/
 int
 processcmd(UNUSED(char **args))

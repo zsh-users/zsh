@@ -166,13 +166,13 @@ zlecharasstring(ZLE_CHAR_T inchar, char *buf)
 }
 
 /*
- * Input a line in internal zle format, possibly using wide characters,
+ * Input: a line in internal zle format, possibly using wide characters,
  * possibly not, together with its length and the cursor position.
  * The length must be accurate and includes all characters (no NULL
  * termination is expected).  The input cursor position is only
  * significant if outcs is non-NULL.
  *
- * Output an ordinary NULL-terminated string, using multibyte characters
+ * Output: an ordinary NULL-terminated string, using multibyte characters
  * instead of wide characters where appropriate and with the contents
  * metafied.
  *
