@@ -3300,7 +3300,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 			    int len;
 
 			    memset(&mbs, 0, sizeof(mbs));
-			    len = wcrtomb(s, lastchar_wide, &mbs);
+			    len = wcrtomb(toins, lastchar_wide, &mbs);
 			    if (len < 0)
 				len = 0;
 			    insert[len] = '\0';

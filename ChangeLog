@@ -1,3 +1,8 @@
+2015-09-26  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36641: Src/Modules/complist.c: fix multibyte handling in
+	incremental search during menu selection
+
 2015-09-26  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted (see 36633): Completion/Unix/Command/_hg: _hg:
