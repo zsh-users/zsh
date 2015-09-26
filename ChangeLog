@@ -1,3 +1,8 @@
+2015-09-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 36651: Doc/Zsh/options.yo Src/exec.c Src/math.c
+	Test/E01options.ztst: WARN_CREATE_GLOBAL += math expressions
+
 2015-09-27  Matthew Martin  <phy1729@gmail.com>
 
 	* 36653: Completion/Unix/Command/_user_admin: OpenBSD's usermod

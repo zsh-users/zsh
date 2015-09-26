@@ -1110,11 +1110,15 @@
       foo3=bar6
     }
     foo4=bar7 =true
+    (( foo5=8 ))
+    integer foo6=9
+    (( foo6=10 ))
   }
   fn
 0:WARN_CREATE_GLOBAL option
 ?fn:3: scalar parameter foo1 created globally in function
 ?fn:5: scalar parameter foo1 created globally in function
+?fn:15: math parameter foo5 created globally in function fn
 
 # This really just tests if XTRACE is egregiously broken.
 # To test it properly would need a full set of its own.

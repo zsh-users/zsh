@@ -746,7 +746,8 @@ pindex(NOWARNCREATEGLOBAL)
 cindex(parameters, warning when created globally)
 item(tt(WARN_CREATE_GLOBAL))(
 Print a warning message when a global parameter is created in a function
-by an assignment.  This often indicates that a parameter has not been
+by an assignment or in math context.
+This often indicates that a parameter has not been
 declared local when it should have been.  Parameters explicitly declared
 global from within a function using tt(typeset -g) do not cause a warning.
 Note that there is no warning when a local parameter is assigned to in

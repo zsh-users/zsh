@@ -176,7 +176,8 @@ mod_export int sfcontext;
 /**/
 struct execstack *exstack;
 
-/* Stack with names of functions currently active. */
+/* Stack with names of function calls, 'source' calls, and 'eval' calls
+ * currently active. */
 
 /**/
 mod_export Funcstack funcstack;
