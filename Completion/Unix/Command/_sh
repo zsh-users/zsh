@@ -1,13 +1,4 @@
-#compdef sh ksh bash zsh csh tcsh rc
-
-if [[ $service == zsh ]]; then
-  # try a bit harder
-  if [[ ${words[CURRENT-1]} == -o ]]; then
-    _options
-    # no other possibilities
-    return
-  fi
-fi
+#compdef sh ksh bash csh tcsh rc
 
 if (( CURRENT == ${words[(i)-c]} + 1 )); then
   _cmdstring
@@ -21,9 +12,3 @@ else
   fi
   _default
 fi
-
-local ret=$?
-
-[[ $service == zsh ]] && _arguments -S -s -- && ret=0
-
-return ret

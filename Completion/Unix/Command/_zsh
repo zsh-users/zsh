@@ -1,0 +1,8 @@
+#compdef zsh
+
+_arguments -S -s : \
+  '*-o+[set named option]:option:_options' \
+  '*+o+[unset named option]:option:_options' \
+  '(1 -)-c[run a command]:command:_cmdstring' \
+  '(-)1:script file:_files' \
+  '*:command arguments' --

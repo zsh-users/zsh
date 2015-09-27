@@ -1,3 +1,8 @@
+2015-09-28  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 36631: Completion/Unix/Command/_sh,
+	Completion/Unix/Command/_zsh: separate _zsh from _sh	
+
 2015-09-26  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36641: Src/Modules/complist.c: fix multibyte handling in
