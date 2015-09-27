@@ -44,8 +44,8 @@ if [[ $service = user* ]]; then
 	"(-U -p)-L[lock user's password]"
 	"(-L -p)-U[unlock user's password]"
     )
+    [[ $OSTYPE = openbsd* ]] || args+=('-a[append groups]')
     args+=(
-      '-a[append groups]'
       '-l[specify new user name]:new username'
       ':username:_users'
     )

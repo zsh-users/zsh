@@ -1,3 +1,8 @@
+2015-09-27  Matthew Martin  <phy1729@gmail.com>
+
+	* 36653: Completion/Unix/Command/_user_admin: OpenBSD's usermod
+	has no -a flag
+
 2015-09-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36663: Src/mkmakemod.sh, Src/zsh.mdd: replace obsolete
