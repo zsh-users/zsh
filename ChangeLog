@@ -1,3 +1,8 @@
+2015-09-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36661: Src/Modules/curses.mdd: replace obsolete "autobins"
+	setting with "autofeatures"
+
 2015-09-28  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 36631: Completion/Unix/Command/_sh,
