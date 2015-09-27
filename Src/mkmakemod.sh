@@ -21,12 +21,8 @@
 #   moddeps         modules on which this module depends (default none)
 #   nozshdep        non-empty indicates no dependence on the `zsh/main' pseudo-module
 #   alwayslink      if non-empty, always link the module into the executable
-#   autobins        builtins defined by the module, for autoloading
-#   autoinfixconds  infix condition codes defined by the module, for
-#                   autoloading (without the leading `-')
-#   autoprefixconds like autoinfixconds, but for prefix condition codes
-#   autoparams      parameters defined by the module, for autoloading
-#   automathfuncs   math functions defined by the module, for autoloading
+#   autofeatures    features defined by the module, for autoloading
+#   autofeatures_emu As autofeatures, but for non-zsh emulation modes
 #   objects         .o files making up this module (*must* be defined)
 #   proto           .syms files for this module (default generated from $objects)
 #   headers         extra headers for this module (default none)
@@ -189,7 +185,7 @@ if $first_stage; then
     for mddname in $here_mddnames; do
 
 	unset name moddeps nozshdep alwayslink hasexport
-	unset autobins autoinfixconds autoprefixconds autoparams automathfuncs
+	unset autofeatures autofeatures_emu
 	unset objects proto headers hdrdeps otherincs
 	. $top_srcdir/$the_subdir/${mddname}.mdd
 	q_name=`echo $name | sed 's,Q,Qq,g;s,_,Qu,g;s,/,Qs,g'`

@@ -1,5 +1,8 @@
 2015-09-27  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 36663: Src/mkmakemod.sh, Src/zsh.mdd: replace obsolete
+	"autobins" commentary with "autofeatures"
+
 	* 36661: Src/Modules/curses.mdd: replace obsolete "autobins"
 	setting with "autofeatures"
 

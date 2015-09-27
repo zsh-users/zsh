@@ -7,7 +7,7 @@ functions='Functions/Chpwd/* Functions/Exceptions/* Functions/Misc/* Functions/M
 nozshdep=1
 alwayslink=1
 
-# autobins not specified because of alwayslink
+# autofeatures not specified because of alwayslink
 
 objects="builtin.o compat.o cond.o context.o \
 exec.o glob.o hashtable.o hashnameddir.o \
