@@ -572,6 +572,12 @@
 >echo
 >three
 
+  print -rl - ${(z):-":;(( echo 42 "}
+0:${(z)} with incomplete math expressions
+>:
+>;
+>(( echo 42 
+
   psvar=(dog)
   setopt promptsubst
   foo='It shouldn'\''t $(happen) to a %1v.'
