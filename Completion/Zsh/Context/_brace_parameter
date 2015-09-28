@@ -31,7 +31,7 @@ if [[ $PREFIX = *'${('[^\)]# ]]; then
       ([gIjsZ_])
       # Single delimited argument.
       if [[ -z $PREFIX ]]; then
-	_delimiters qualifer-$char
+	_delimiters qualifier-$char
 	return
       elif ! _globqual_delims; then
 	# still completing argument
@@ -46,7 +46,7 @@ if [[ $PREFIX = *'${('[^\)]# ]]; then
 	  _message 'integer expression'
 	  ;;
 
-	  (js)
+	  ([js])
 	  _message "separator"
 	  ;;
 
@@ -71,7 +71,7 @@ if [[ $PREFIX = *'${('[^\)]# ]]; then
       ([lr])
       # One compulsory argument, two optional.
       if [[ -z $PREFIX ]]; then
-	_delimiters qualifer-$char
+	_delimiters qualifier-$char
 	return
       else
 	delim=$PREFIX[1]

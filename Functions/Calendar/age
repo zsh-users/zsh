@@ -1,4 +1,4 @@
-# Match the age of a file, for use as a glob qualifer.  Can
+# Match the age of a file, for use as a glob qualifier.  Can
 # take one or two arguments, which can be supplied by one of two
 # ways (always the same for both arguments):
 #

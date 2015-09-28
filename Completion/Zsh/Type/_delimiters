@@ -1,6 +1,6 @@
 #autoload
 
-# Simple function to offer delimiters for modifiers and qualifers.
+# Simple function to offer delimiters for modifiers and qualifiers.
 # Single argument is tag to use.
 
 local expl

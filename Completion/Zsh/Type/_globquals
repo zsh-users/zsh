@@ -47,7 +47,7 @@ while [[ -n $PREFIX ]]; do
     (e)
     # complete/skip delimited command line
     if [[ -z $PREFIX ]]; then
-      _delimiters qualifer-e
+      _delimiters qualifier-e
       return
     elif ! _globqual_delims; then
       # still completing command to eval
