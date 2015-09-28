@@ -1,3 +1,9 @@
+2015-09-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 36682: Src/glob.c, Src/pattern.c, Src/zsh.h,
+	Src/Zle/complist,c, Src/Zle/zle_hist.c: expand pattern interface
+	to allow unmetafying trial string once for reuse.
+
 2015-09-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Test/D04parameter.ztst: Test for 36669

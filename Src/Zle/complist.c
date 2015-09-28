@@ -868,7 +868,7 @@ putmatchcol(char *group, char *n)
 	nrefs = MAX_POS - 1;
 
 	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
-	    pattryrefs(pc->pat, n, -1, -1, 0, &nrefs, begpos, endpos)) {
+	    pattryrefs(pc->pat, n, -1, -1, NULL, 0, &nrefs, begpos, endpos)) {
 	    if (pc->cols[1]) {
 		patcols = pc->cols;
 
@@ -900,7 +900,8 @@ putfilecol(char *group, char *filename, mode_t m, int special)
 	nrefs = MAX_POS - 1;
 
 	if ((!pc->prog || !group || pattry(pc->prog, group)) &&
-	    pattryrefs(pc->pat, filename, -1, -1, 0, &nrefs, begpos, endpos)) {
+	    pattryrefs(pc->pat, filename, -1, -1, NULL,
+		       0, &nrefs, begpos, endpos)) {
 	    if (pc->cols[1]) {
 		patcols = pc->cols;
 

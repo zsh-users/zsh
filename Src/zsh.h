@@ -491,6 +491,7 @@ typedef struct options	 *Options;
 typedef struct optname   *Optname;
 typedef struct param     *Param;
 typedef struct paramdef  *Paramdef;
+typedef struct patstralloc  *Patstralloc;
 typedef struct patprog   *Patprog;
 typedef struct prepromptfn *Prepromptfn;
 typedef struct process   *Process;
@@ -1468,6 +1469,15 @@ struct patprog {
     int			flags;	   /* PAT_* flags */
     int			patnpar;   /* number of active parentheses */
     char		patstartch;
+};
+
+struct patstralloc {
+    int unmetalen;		/* Unmetafied length of trial string */
+    int unmetalenp;		/* Unmetafied length of path prefix.
+				   If 0, no path prefix. */
+    char *alloced;		/* Allocated string, may be NULL */
+    char *progstrunmeta;	/* Unmetafied pure string in pattern, cached */
+    int progstrunmetalen;	/* Length of the foregoing */
 };
 
 /* Flags used in pattern matchers (Patprog) and passed down to patcompile */

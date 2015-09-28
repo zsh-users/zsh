@@ -1306,8 +1306,8 @@ doisearch(char **args, int dir, int pattern)
 			     * this mode.
 			     */
 			    if (!skip_pos &&
-				pattryrefs(patprog, zt, -1, -1, 0, NULL, NULL,
-					   &end_pos))
+				pattryrefs(patprog, zt, -1, -1, NULL, 0,
+					   NULL, NULL, &end_pos))
 				t = zt;
 			} else {
 			    if (!matchlist && !skip_pos) {
