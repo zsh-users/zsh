@@ -77,7 +77,9 @@ avoided further changes to our workflow.
      X-Seq: 33835, 33872, 34912
      http://www.zsh.org/mla/workers/2014/msg01622.html
      http://www.zsh.org/mla/workers/2014/msg01659.html
+     -> https://github.com/ft/zsh-am
      http://www.zsh.org/mla/workers/2015/msg00836.html
+     -> https://github.com/danielshahaf/zsh-dev
 
      Subject: Re: _git commit object name completion
      X-Seq: 35414
