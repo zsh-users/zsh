@@ -783,6 +783,15 @@ gettok(void)
 		     */
 		    tokstr = NULL;
 		    return INPAR;
+		    
+		case CMD_OR_MATH_ERR:
+		    /*
+		     * LEXFLAGS_ACTIVE means we came from bufferwords(),
+		     * so we treat as an incomplete math expression
+		     */
+		    if (lexflags & LEXFLAGS_ACTIVE)
+			tokstr = dyncat("((", tokstr ? tokstr : "");
+		    /* fall through */
 
 		default:
 		    return LEXERR;

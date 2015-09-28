@@ -1,3 +1,8 @@
+2015-09-28  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36669: Src/lex.c: fix ${(z)...} of an an incomplete math
+	expression by restoring "((" at the front of the token
+
 2015-09-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Etc/zsh-development-guide: Update link to my
