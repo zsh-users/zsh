@@ -404,6 +404,7 @@ xitem(tt(zle) tt(-l) [ tt(-L) | tt(-a) ] [ var(string) ... ])
 xitem(tt(zle) tt(-D) var(widget) ...)
 xitem(tt(zle) tt(-A) var(old-widget) var(new-widget))
 xitem(tt(zle) tt(-N) var(widget) [ var(function) ])
+xitem(tt(zle) tt(-f) var(flag) [ var(flag)... ])
 xitem(tt(zle) tt(-C) var(widget) var(completion-widget) var(function))
 xitem(tt(zle) tt(-R) [ tt(-c) ] [ var(display-string) ] [ var(string) ... ])
 xitem(tt(zle) tt(-M) var(string))
@@ -463,6 +464,21 @@ the same name as the widget.  For further information, see
 ifzman(the section `Widgets' below)\
 ifnzman(noderef(Zle Widgets))\
 .
+)
+item(tt(-f) var(flag) [ var(flag)... ])(
+Set various flags on the running widget.  Possible values for var(flag) are:
+
+tt(yank) for indicating that the widget has yanked text into the buffer.
+If the widget is wrapping an existing internal widget, no further
+action is necessary, but if it has inserted the text manually, then it
+should also take care to set tt(YANK_START) and tt(YANK_END) correctly.
+tt(yankbefore) does the same but is used when the yanked text appears
+after the cursor.
+
+tt(kill) for indicating that text has been killed into the cutbuffer.
+When repeatedly invoking a kill widget, text is appended to the cutbuffer
+instead of replacing it, but when wrapping such widgets, it is necessary
+to call `tt(zle -f kill)' to retain this effect.
 )
 cindex(completion widgets, creating)
 item(tt(-C) var(widget) var(completion-widget) var(function))(
@@ -1011,11 +1027,14 @@ vindex(YANK_END)
 xitem(tt(YANK_ACTIVE) (integer))
 xitem(tt(YANK_START) (integer))
 item(tt(YANK_END) (integer))(
-These three parameters indicate whether text has just been yanked (pasted)
-into the buffer.  tt(YANK_START) and tt(YANK_END) are in the same units as
-tt(CURSOR), and are only valid when tt(YANK_ACTIVE) is non-zero.
+tt(YANK_ACTIVE) indicates whether text has just been yanked (pasted)
+into the buffer.  tt(YANK_START) and tt(YANK_END) give the location of
+the pasted text and are in the same units as tt(CURSOR).  They are only
+valid for reading when tt(YANK_ACTIVE) is non-zero.  They can also be
+assigned by widgets that insert text in a yank-like fashion, for example
+wrappers of tt(bracketed-paste).  See also tt(zle -f).
 
-All three are read-only.
+tt(YANK_ACTIVE) is read-only.
 )
 vindex(ZLE_STATE)
 item(tt(ZLE_STATE) (scalar))(
