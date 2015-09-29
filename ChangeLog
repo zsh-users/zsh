@@ -1,5 +1,8 @@
 2015-09-30  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Matthew Martin: 36693: Doc/Zsh/arith.yo: arithmetic rounds
+	towards zero.
+
 	* 36711: Src/glob.c, Src/pattern.c: Memory for early unmetafied
 	pattern trial string is on the heap.
 

@@ -215,7 +215,7 @@ findex(integer, use of)
 Arithmetic evaluation is performed on the value of each
 assignment to a named parameter declared integer
 in this manner.  Assigning a floating point number to an integer results in
-rounding down to the next integer.
+rounding towards zero.
 
 cindex(parameters, floating point)
 cindex(floating point parameters)
@@ -230,16 +230,16 @@ format.
 
 Promotion of integer to floating point values is performed where
 necessary.  In addition, if any operator which requires an integer
-(`tt(~)', `tt(&)', `tt(|)', `tt(^)', `tt(%)', `tt(<<)', `tt(>>)' and their
-equivalents with assignment) is given a floating point argument, it will be
-silently rounded down to the next integer.
+(`tt(&)', `tt(|)', `tt(^)', `tt(<<)', `tt(>>)' and their equivalents with
+assignment) is given a floating point argument, it will be silently rounded
+towards zero except for `tt(~)' which rounds down.
 
 Users should beware that, in common with many other programming
 languages but not software designed for calculation, the evaluation of
 an expression in zsh is taken a term at a time and promotion of integers
 to floating point does not occur in terms only containing integers.  A
 typical result of this is that a division such as tt(6/8) is truncated,
-in this being rounded down to 0.  The tt(FORCE_FLOAT) shell option can
+in this being rounded towards 0.  The tt(FORCE_FLOAT) shell option can
 be used in scripts or functions where floating point evaluation is
 required throughout.
 
