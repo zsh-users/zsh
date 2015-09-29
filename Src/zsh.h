@@ -480,6 +480,7 @@ typedef struct heap      *Heap;
 typedef struct heapstack *Heapstack;
 typedef struct histent   *Histent;
 typedef struct hookdef   *Hookdef;
+typedef struct imatchdata *Imatchdata;
 typedef struct jobfile   *Jobfile;
 typedef struct job       *Job;
 typedef struct linkedmod *Linkedmod;
@@ -1592,6 +1593,31 @@ typedef struct zpc_disables_save *Zpc_disables_save;
 #define PP_UNKWN  20
 /* Range: token followed by the (possibly multibyte) start and end */
 #define PP_RANGE  21
+
+/*
+ * Argument to get_match_ret() in glob.c
+ */
+struct imatchdata {
+    /* Metafied trial string */
+    char *mstr;
+    /* Its length */
+    int mlen;
+    /* Unmetafied string */
+    char *ustr;
+    /* Its length */
+    int ulen;
+    /* Flags (SUB_*) */
+    int flags;
+    /* Replacement string (metafied) */
+    char *replstr;
+    /*
+     * List of bits of matches to concatenate with replacement string.
+     * The data is a struct repldata.  It is not used in cases like
+     * ${...//#foo/bar} even though SUB_GLOBAL is set, since the match
+     * is anchored.  It goes on the heap.
+     */
+    LinkList repllist;
+};
 
 /* Globbing flags: lower 8 bits gives approx count */
 #define GF_LCMATCHUC	0x0100

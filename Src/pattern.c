@@ -2204,7 +2204,10 @@ pattrylen(Patprog prog, char *string, int len, int unmetalen,
  * the pattern module) at which we are trying to match.
  * This is added in to the positions recorded in patbeginp and patendp
  * when we are looking for substrings.  Currently this only happens
- * in the parameter substitution code.
+ * in the parameter substitution code.  It refers to a real character
+ * offset, i.e. is already in the form ready for presentation to the
+ * general public --- this is necessary as we don't have the
+ * information to convert it down here.
  *
  * Note this is a character offset, i.e. a single possibly metafied and
  * possibly multibyte character counts as 1.
@@ -2292,7 +2295,8 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	     */
 	    if (!patstralloc->progstrunmeta)
 	    {
-		patstralloc->progstrunmeta = dupstring(progstr);
+		patstralloc->progstrunmeta =
+		    dupstrpfx(progstr, (int)prog->patmlen);
 		unmetafy(patstralloc->progstrunmeta,
 			 &patstralloc->progstrunmetalen);
 	    }
@@ -2346,7 +2350,7 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 		 * In the orignal structure, but it might be unmetafied
 		 * for use with an unmetafied test string.
 		 */
-		patinlen = (int)prog->patmlen;
+		patinlen = pstrlen;
 		/* if matching files, must update globbing flags */
 		patglobflags = prog->globend;
 
@@ -2360,7 +2364,7 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 			 * Unmetafied: pstrlen contains unmetafied
 			 * length in bytes.
 			 */
-			str = metafy(patinstart, pstrlen, META_ALLOC);
+			str = metafy(patinstart, pstrlen, META_DUP);
 			mlen = CHARSUB(patinstart, patinstart + pstrlen);
 		    } else {
 			str = ztrduppfx(patinstart, patinlen);
@@ -2454,8 +2458,8 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	    /*
 	     * Optimization: if we didn't find any Meta characters
 	     * to begin with, we don't need to look for them now.
-	     * Only do this if we did the unmetfication internally,
-	     * since otherwise it's too hard to work out.
+	     *
+	     * For patstralloc pased in, we want the unmetafied length.
 	     */
 	    if (patstralloc == &patstralloc_struct &&
 		patstralloc->unmetalen != origlen) {
@@ -2588,7 +2592,9 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 
 /*
  * Return length of previous succesful match.  This is
- * in metafied bytes, i.e. includes a count of Meta characters.
+ * in metafied bytes, i.e. includes a count of Meta characters,
+ * unless the match was done on an unmetafied string using
+ * a patstralloc stuct, in which case it, too is unmetafed.
  * Unusual and futile attempt at modular encapsulation.
  */
 
