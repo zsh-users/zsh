@@ -2482,7 +2482,7 @@ get_match_ret(Imatchdata imd, int b, int e)
 	if (imeta(*p))
 	    add++;
 
-    /* Everything now refers to meatfied lengths. */
+    /* Everything now refers to metafied lengths. */
     if (replstr || (fl & SUB_LIST)) {
 	if (fl & SUB_DOSUBST) {
 	    replstr = dupstring(replstr);
