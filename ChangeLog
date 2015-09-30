@@ -1,6 +1,10 @@
 2015-09-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 36725: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: Compute %b correctly when "git am"-ing onto
+	detached heads.
+
+	* 36725: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	vcs_info git: Compute %b correctly when rebasing detached heads.
 
 	* 36725: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
