@@ -2028,8 +2028,8 @@ pattrystart(void)
  *
  * Unmetafy a trial string for use in pattern matching, if needed.
  *
- * If it is needed, returns a zalloc()'d string; if not needed, returns
- * NULL.
+ * If it is needed, returns a heap allocated string; if not needed,
+ * returns NULL.
  *
  * prog is the pattern to be executed.
  * string is the metafied trial string.
@@ -2046,7 +2046,7 @@ pattrystart(void)
  *  unmetalenp is the umetafied length of a path segment preceeding
  *    the trial string needed for file mananagement; it is calculated as
  *    needed so does not need to be initialised.
- *  alloced is the memory allocated --- same as return value from
+ *  alloced is the memory allocated on the heap --- same as return value from
  *    function.
  */
 /**/
@@ -2097,7 +2097,7 @@ char *patallocstr(Patprog prog, char *string, int stringlen, int unmetalen,
 	int i, icopy, ncopy;
 
 	dst = patstralloc->alloced =
-	    zalloc(patstralloc->unmetalen + patstralloc->unmetalenp);
+	    zhalloc(patstralloc->unmetalen + patstralloc->unmetalenp);
 
 	if (needfullpath) {
 	    /* loop twice, copy path buffer first time */
@@ -2130,20 +2130,6 @@ char *patallocstr(Patprog prog, char *string, int stringlen, int unmetalen,
     }
 
     return patstralloc->alloced;
-}
-
-
-/*
- * Free memory allocated by patallocstr().
- */
-
-/**/
-mod_export
-void patfreestr(Patstralloc patstralloc)
-{
-    if (patstralloc->alloced)
-	zfree(patstralloc->alloced,
-	      patstralloc->unmetalen + patstralloc->unmetalenp);
 }
 
 
@@ -2189,8 +2175,9 @@ pattrylen(Patprog prog, char *string, int len, int unmetalen,
  * done if there is no path prefix (pathpos == 0) as otherwise the path
  * buffer and unmetafied string may not match.  To do this,
  * patallocstr() is callled (use force = 1 to ensure it is alway
- * unmetafied); paststralloc points to existing storage.  When all
- * pattern matching is done, patfreestr() is called.
+ * unmetafied); paststralloc points to existing storage. Memory is
+ * on the heap.
+ *
  * patstralloc->alloced and patstralloc->unmetalen contain the
  * unmetafied string and its length.  In that case, the rules for the
  * earlier arguments change:
@@ -2387,8 +2374,6 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	    }
 	}
 
-	if (patstralloc == &patstralloc_struct)
-	    patfreestr(patstralloc);
 	return ret;
     } else {
 	int q = queue_signal_level();
@@ -2425,8 +2410,6 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	    }
 	}
 	if (!ret) {
-	    if (patstralloc == &patstralloc_struct)
-		patfreestr(patstralloc);
 	    return 0;
 	}
 
@@ -2582,9 +2565,6 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	    ret = 0;
 
 	restore_queue_signals(q);
-
-	if (patstralloc == &patstralloc_struct)
-	    patfreestr(patstralloc);
 
 	return ret;
     }

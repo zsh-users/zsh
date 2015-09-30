@@ -2478,9 +2478,6 @@ get_match_ret(Imatchdata imd, int b, int e)
 	if (imeta(*p))
 	    add++;
     e += add;
-    for (; p < imd->ustr + imd->ulen; p++)
-	if (imeta(*p))
-	    add++;
 
     /* Everything now refers to metafied lengths. */
     if (replstr || (fl & SUB_LIST)) {
@@ -2808,7 +2805,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	    imd.replstr = NULL;
 	}
 	*sp = get_match_ret(&imd, 0, umltot);
-	patfreestr(&patstralloc);
 	if (! **sp && (((fl & SUB_MATCH) && !i) || ((fl & SUB_REST) && i)))
 	    return 0;
 	return 1;
@@ -2856,7 +2852,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 		    }
 		}
 		*sp = get_match_ret(&imd, 0, mlen);
-		patfreestr(&patstralloc);
 		return 1;
 	    }
 	    break;
@@ -2884,13 +2879,11 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	    }
 	    if (tmatch) {
 		*sp = get_match_ret(&imd, tmatch - s, umltot);
-		patfreestr(&patstralloc);
 		return 1;
 	    }
 	    if (!(fl & SUB_START) && pattrylen(p, s + umltot, 0, 0,
 					       &patstralloc, ioff)) {
 		*sp = get_match_ret(&imd, umltot, umltot);
-		patfreestr(&patstralloc);
 		return 1;
 	    }
 	    break;
@@ -2904,7 +2897,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 		set_pat_start(p, t-s);
 		if (pattrylen(p, t, umlen, 0, &patstralloc, ioff)) {
 		    *sp = get_match_ret(&imd, t-s, umltot);
-		    patfreestr(&patstralloc);
 		    return 1;
 		}
 		if (fl & SUB_START)
@@ -2914,7 +2906,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	    if (!(fl & SUB_START) && pattrylen(p, send, 0, 0,
 					       &patstralloc, ioff)) {
 		*sp = get_match_ret(&imd, umltot, umltot);
-		patfreestr(&patstralloc);
 		return 1;
 	    }
 	    break;
@@ -2926,7 +2917,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 		pattrylen(p, send, 0, 0, &patstralloc, 0) &&
 		!--n) {
 		*sp = get_match_ret(&imd, 0, 0);
-		patfreestr(&patstralloc);
 		return 1;
 	    } /* fall through */
 	case (SUB_SUBSTR|SUB_LONG):
@@ -2984,7 +2974,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 				umlen -= iincchar(&t, send - t);
 				continue;
 			    } else {
-				patfreestr(&patstralloc);
 				return 1;
 			    }
 			}
@@ -3011,7 +3000,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	    if ((fl & (SUB_LONG|SUB_GLOBAL)) == SUB_LONG &&
 		pattrylen(p, send, 0, 0, &patstralloc, 0) && !--n) {
 		*sp = get_match_ret(&imd, 0, 0);
-		patfreestr(&patstralloc);
 		return 1;
 	    }
 	    break;
@@ -3024,7 +3012,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 		if (pattrylen(p, send, 0, 0, &patstralloc, umltot) &&
 		    !--n) {
 		    *sp = get_match_ret(&imd, umltot, umltot);
-		    patfreestr(&patstralloc);
 		    return 1;
 		}
 	    }
@@ -3081,7 +3068,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 		    }
 		}
 		*sp = get_match_ret(&imd, tmatch-s, mpos-s);
-		patfreestr(&patstralloc);
 		return 1;
 	    }
 	    set_pat_start(p, l);
@@ -3089,7 +3075,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 					     &patstralloc, umltot) &&
 		!--n) {
 		*sp = get_match_ret(&imd, umltot, umltot);
-		patfreestr(&patstralloc);
 		return 1;
 	    }
 	    break;
@@ -3134,11 +3119,9 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	    start[lleft] = '\0';
 	    *sp = (char *)start;
 	}
-	patfreestr(&patstralloc);
 	return 1;
     }
     if (fl & SUB_LIST) {	/* safety: don't think this can happen */
-	patfreestr(&patstralloc);
 	return 0;
     }
 
@@ -3146,7 +3129,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
     imd.replstr = NULL;
     imd.repllist = NULL;
     *sp = get_match_ret(&imd, 0, 0);
-    patfreestr(&patstralloc);
     return (fl & SUB_RETFAIL) ? 0 : 1;
 }
 
@@ -3244,7 +3226,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 		    }
 		}
 		*sp = get_match_ret(&imd, 0, mlen);
-		patfreestr(&patstralloc);
 		return 1;
 	    }
 	    break;
@@ -3357,7 +3338,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	    if ((fl & (SUB_LONG|SUB_GLOBAL)) == SUB_LONG &&
 		pattrylen(p, send, 0, 0, &patstralloc, 0) && !--n) {
 		*sp = get_match_ret(&imd, 0, 0);
-		patfreestr(&patstralloc);
 		return 1;
 	    }
 	    break;
@@ -3369,7 +3349,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 		set_pat_start(p, l);
 		if (pattrylen(p, send, 0, 0, &patstralloc, uml) && !--n) {
 		    *sp = get_match_ret(&imd, uml, uml);
-		    patfreestr(&patstralloc);
 		    return 1;
 		}
 	    }
@@ -3394,7 +3373,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 			}
 		    }
 		    *sp = get_match_ret(&imd, t-s, mpos-s);
-		    patfreestr(&patstralloc);
 		    return 1;
 		}
 	    }
@@ -3403,7 +3381,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 					     &patstralloc, uml) &&
 		!--n) {
 		*sp = get_match_ret(&imd, uml, uml);
-		patfreestr(&patstralloc);
 		return 1;
 	    }
 	    break;
@@ -3445,7 +3422,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	memcpy(t, s + i, l - i);
 	start[lleft] = '\0';
 	*sp = (char *)start;
-	patfreestr(&patstralloc);
 	return 1;
     }
 
@@ -3453,7 +3429,6 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
     imd.replstr = NULL;
     imd.repllist = NULL;
     *sp = get_match_ret(&imd, 0, 0);
-    patfreestr(&patstralloc);
     return 1;
 }
 

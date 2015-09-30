@@ -1,3 +1,8 @@
+2015-09-30  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 36711: Src/glob.c, Src/pattern.c: Memory for early unmetafied
+	pattern trial string is on the heap.
+
 2015-09-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 36682: Src/glob.c, Src/pattern.c, Src/zsh.h,
