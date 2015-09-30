@@ -8,15 +8,33 @@ local oldcontext="$curcontext" hasopts rawret optarg singopt alwopt
 local setnormarg start rest
 local -a match mbegin mend
 
+subopts=()
+singopt=()
+while [[ "$1" = -([AMO]*|[CRSWnsw]) ]]; do
+  case "$1" in
+  -C)  usecc=yes; shift ;;
+  -O)  subopts=( "${(@P)2}" ); shift 2 ;;
+  -O*) subopts=( "${(@P)${1[3,-1]}}" ); shift ;;
+  -R)  rawret=yes; shift;;
+  -n)  setnormarg=yes; NORMARG=-1; shift;;
+  -w)  optarg=yes; shift;;
+  -W)  alwopt=arg; shift;;
+  -[Ss])  singopt+=( $1 ); shift;;
+  -[AM])  singopt+=( $1 $2 ); shift 2 ;;
+  -[AM]*) singopt+=( $1 ); shift ;;
+  esac
+done
+
+[[ $1 = ':' ]] && shift
+singopt+=( ':' )  # always end with ':' to indicate the end of options
+
+[[ "$PREFIX" = [-+] ]] && alwopt=arg
+
 long=$argv[(I)--]
 if (( long )); then
   local name tmp tmpargv
 
-  if [[ long -eq 1 ]]; then
-    tmpargv=()
-  else
-    tmpargv=( "${(@)argv[1,long-1]}" )
-  fi
+  tmpargv=( "${(@)argv[1,long-1]}" )  # optspec's before --, if any
 
   name=${~words[1]}
   [[ "$name" = [^/]*/* ]] && name="$PWD/$name"
@@ -289,23 +307,6 @@ if (( long )); then
   fi
   set -- "$tmpargv[@]" "${(@P)name}"
 fi
-
-subopts=()
-singopt=()
-while [[ "$1" = -(O*|[CRWnsw]) ]]; do
-  case "$1" in
-  -C)  usecc=yes; shift ;;
-  -O)  subopts=( "${(@P)2}" ); shift 2 ;;
-  -O*) subopts=( "${(@P)${1[3,-1]}}" ); shift ;;
-  -R)  rawret=yes; shift;;
-  -n)  setnormarg=yes; NORMARG=-1; shift;;
-  -w)  optarg=yes; shift;;
-  -s)  singopt=(-s); shift;;
-  -W)  alwopt=arg; shift;;
-  esac
-done
-
-[[ "$PREFIX" = [-+] ]] && alwopt=arg
 
 zstyle -s ":completion:${curcontext}:options" auto-description autod
 

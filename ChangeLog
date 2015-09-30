@@ -1,3 +1,8 @@
+2015-09-30  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 36697: Completion/Base/Utility/_arguments: handle options
+	of _arguments correctly
+
 2015-09-30  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36711: Src/glob.c, Src/pattern.c: Memory for early unmetafied
