@@ -1,3 +1,9 @@
+2015-09-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 36725: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: Compute %b correctly when merging to detached
+	heads.
+
 2015-09-30  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 36697: Completion/Base/Utility/_arguments: handle options
