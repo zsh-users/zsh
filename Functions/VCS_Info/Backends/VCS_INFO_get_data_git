@@ -94,6 +94,10 @@ VCS_INFO_git_getbranch () {
 
     elif [[ -d "${gitdir}/rebase-merge" ]] ; then
         gitbranch="$(< ${gitdir}/rebase-merge/head-name)"
+        if [[ $gitbranch == 'detached HEAD' ]]; then
+            # get a sha1
+            gitbranch="$(< ${gitdir}/rebase-merge/orig-head)"
+        fi
 
     elif [[ -d "${gitdir}/.dotest-merge" ]] ; then
         gitbranch="$(< ${gitdir}/.dotest-merge/head-name)"
