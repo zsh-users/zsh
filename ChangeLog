@@ -1,5 +1,8 @@
 2015-10-01  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 36737: Src/pattern.c: Ensure we are not dereferencing
+	zero-length unterminated string.
+
 	* 36735: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: ~/.zcalcrc.
 
 	* Andrew Janke: 36729: MACHINES, NEWS, README: fix some typos.

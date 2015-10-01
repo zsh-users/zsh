@@ -2224,8 +2224,10 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	maxnpos = *nump;
 	*nump = 0;
     }
-    /* inherited from domatch, but why, exactly? */
-    if (*string == Nularg) {
+    /*
+     * Special signalling of empty tokenised string.
+     */
+    if ((!patstralloc || stringlen > 0) && *string == Nularg) {
 	string++;
 	if (unmetalenin > 0)
 	    unmetalenin--;
@@ -2233,8 +2235,10 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	    stringlen--;
     }
 
-    if (stringlen < 0)
+    if (stringlen < 0) {
+	DPUTS(patstralloc != NULL, "length needed with patstralloc");
 	stringlen = strlen(string);
+    }
     origlen = stringlen;
 
     if (patstralloc) {
