@@ -120,6 +120,10 @@ autoload -Uz zmathfuncdef
 float PI E
 (( PI = 4 * atan(1), E = exp(1) ))
 
+if [[ -f "${ZDOTDIR:-$HOME}/.zcalcrc" ]]; then
+  . "${ZDOTDIR:-$HOME}/.zcalcrc" || return 1
+fi
+
 # Process command line
 while [[ -n $1 && $1 = -(|[#-]*|f|e) ]]; do
   optlist=${1[2,-1]}

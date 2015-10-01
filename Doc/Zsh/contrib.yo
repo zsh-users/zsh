@@ -3657,6 +3657,14 @@ integer arithmetic, which is not how an ordinary desk calculator
 operates.  To force floating point operation, pass the option tt(-f);
 see further notes below.
 
+If the file tt(~/.zcalcrc) exists it will be sourced inside the function
+once it is set up and about to process the command line.  This
+can be used, for example, to set shell options; tt(emulate -L zsh)
+and tt(setopt extendedglob) are in effect at this point.  Any
+failure to source the file if it exists is treated as fatal.
+As with other initialisation files, the directory tt($ZDOTDIR) is used
+instead of tt($HOME) if it is set.
+
 The mathematical library tt(zsh/mathfunc) will be loaded if it is
 available; see
 ifzman(the section `The zsh/mathfunc Module' in zmanref(zshmodules))\
