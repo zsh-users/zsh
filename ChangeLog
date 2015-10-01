@@ -10,6 +10,8 @@
 
 2015-09-30  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* users/20672: Src/text.c: missing "do" in gettext2() for "select"
+	
 	* 36707: Src/exec.c, Src/loop.c: distinguish ERR_RETURN value
 	of retflag so that execif() can ignore it in the test sublist
 
