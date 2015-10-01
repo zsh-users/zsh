@@ -632,8 +632,10 @@ gettext2(Estate state)
 		    taddstr(" in ");
 		    taddlist(state, *state->pc++);
 		}
-		tindent++;
 		taddnl(0);
+		taddstr("do");
+		taddnl(0);
+		tindent++;
 		tpush(code, 1);
 	    } else {
 		dec_tindent();

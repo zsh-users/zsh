@@ -1,3 +1,40 @@
+2015-10-01  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 36709: Doc/Zsh/zle.yo, Functions/Zle/bracketed-paste-url-magic,
+	Src/Zle/zle_main.c, Src/Zle/zle_params.c, Src/Zle/zle_thingy.c:
+	zle -f from inside widget to set flags and make yank start/end
+	zle params writable.
+
+	* 36692: Functions/Zle/bracketed-paste-url-magic: simpler
+	alternative for handling pasted urls
+
+2015-09-30  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* users/20672: Src/text.c: missing "do" in gettext2() for "select"
+	
+	* 36707: Src/exec.c, Src/loop.c: distinguish ERR_RETURN value
+	of retflag so that execif() can ignore it in the test sublist
+
+	* cf. 36690: Doc/Zsh/builtins.yo: remove sentence fragment
+
+2015-09-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 36725: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: Compute %b correctly when "git am"-ing onto
+	detached heads.
+
+	* 36725: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: Compute %b correctly when rebasing detached heads.
+
+	* 36725: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: Compute %b correctly when merging to detached
+	heads.
+
+2015-09-30  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 36697: Completion/Base/Utility/_arguments: handle options
+	of _arguments correctly
+
 2015-09-30  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Matthew Martin: 36693: Doc/Zsh/arith.yo: arithmetic rounds

@@ -87,13 +87,18 @@ VCS_INFO_git_getbranch () {
         gitbranch="$(${(z)gitsymref} 2> /dev/null)"
         [[ -z ${gitbranch} ]] && [[ -r ${actiondir}/head-name ]] \
             && gitbranch="$(< ${actiondir}/head-name)"
+        [[ -z ${gitbranch} ]] && gitbranch="$(< ${gitdir}/ORIG_HEAD)"
 
     elif [[ -f "${gitdir}/MERGE_HEAD" ]] ; then
         gitbranch="$(${(z)gitsymref} 2> /dev/null)"
-        [[ -z ${gitbranch} ]] && gitbranch="$(< ${gitdir}/MERGE_HEAD)"
+        [[ -z ${gitbranch} ]] && gitbranch="$(< ${gitdir}/ORIG_HEAD)"
 
     elif [[ -d "${gitdir}/rebase-merge" ]] ; then
         gitbranch="$(< ${gitdir}/rebase-merge/head-name)"
+        if [[ $gitbranch == 'detached HEAD' ]]; then
+            # get a sha1
+            gitbranch="$(< ${gitdir}/rebase-merge/orig-head)"
+        fi
 
     elif [[ -d "${gitdir}/.dotest-merge" ]] ; then
         gitbranch="$(< ${gitdir}/.dotest-merge/head-name)"

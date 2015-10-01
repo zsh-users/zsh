@@ -1408,7 +1408,7 @@ sublist_done:
 			exit(lastval);
 		}
 		if (errreturn) {
-		    retflag = 1;
+		    retflag = 2;
 		    breaks = loops;
 		}
 	    }
