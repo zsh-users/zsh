@@ -10,6 +10,9 @@
 
 2015-09-30  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 36707: Src/exec.c, Src/loop.c: distinguish ERR_RETURN value
+	of retflag so that execif() can ignore it in the test sublist
+
 	* cf. 36690: Doc/Zsh/builtins.yo: remove sentence fragment
 
 2015-09-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
