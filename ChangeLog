@@ -8,6 +8,10 @@
 	* 36692: Functions/Zle/bracketed-paste-url-magic: simpler
 	alternative for handling pasted urls
 
+2015-09-30  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* cf. 36690: Doc/Zsh/builtins.yo: remove sentence fragment
+
 2015-09-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 36725: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:

@@ -174,8 +174,7 @@ pattern are loaded.
 
 With the tt(-w) flag, the var(name)s are taken as names of files compiled
 with the tt(zcompile) builtin, and all functions defined in them are
-marked for autoloading.  Note this does not otherwise change the search
-order for 
+marked for autoloading.
 
 The flags tt(-z) and tt(-k) mark the function to be autoloaded using the
 zsh or ksh style, as if the option tt(KSH_AUTOLOAD) were unset or were
