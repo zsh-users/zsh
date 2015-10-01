@@ -5753,7 +5753,14 @@ __git_commit_ranges () {
   if compset -P '*..(.|)'; then
     expl=( $* )
   else
-    compset -S '..*' || suf=( -S .. -r '.@~ ^:\t\n\-' )
+    if ! compset -S '..*'; then
+      local match mbegin mend
+      if [[ ${PREFIX} = (#b)((\\|)\^)* ]]; then
+	compset -p ${#match[1]}
+      else
+	suf=( -S .. -r '.@~ ^:\t\n\-' )
+      fi
+    fi
     expl=( $* $suf )
   fi
 

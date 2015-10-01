@@ -1,3 +1,8 @@
+2015-10-01  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 36722: Completion/Unix/Command/_git: allow range to complete
+	after ^, taking acoount of backslash quoting.
+
 2015-10-01  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 36709: Doc/Zsh/zle.yo, Functions/Zle/bracketed-paste-url-magic,
