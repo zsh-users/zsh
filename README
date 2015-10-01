@@ -48,7 +48,7 @@ As noted in NEWS, the builtins declare, export, float, integer, local,
 readonly and typeset now have corresponding reserved words that provide
 true assignment semantics instead of an approximation by means of normal
 command line arguments.  It is hoped that this additional consistency
-provides a more natural interface.  However, compatbility with older
+provides a more natural interface.  However, compatibility with older
 versions of zsh can be obtained by turning off the reserved word
 interface, exposing the builtin interface:
 
@@ -392,7 +392,7 @@ Doc/Zsh/*.yo	The master source for the zsh documentation is written in
 		It is not required by zsh but it is a nice program so you
 		might want to get it anyway, especially if you are a zsh
 		developer.  It can be downloaded from
-		ftp://yodl.sourceforge.net/
+		https://fbb-git.github.io/yodl/
 
 Doc/zsh*.1	Man pages in nroff format.  These will be installed
 		by "make install.man" or "make install".  By default,

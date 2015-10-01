@@ -47,7 +47,7 @@ and an array "array" containing the words "several"
 - Improved (though still not perfect) POSIX compatibility for getopts
   builtin when POSIX_BUILTINS is set.
 
-- New setopt APPEND_CREATE for POSIX-compatible NO_CLOBBER behavior.
+- New setopt APPEND_CREATE for POSIX-compatible NO_CLOBBER behaviour.
 
 - Completion of date values now displays in a calendar format when
   the complist module is available.  Controllable by zstyle.
@@ -929,7 +929,7 @@ Parameter and expansion changes:
   - expansion of ~ and other globbing flags via ${~param} do not depend
     upon EXTENDED_GLOB (bug fix).
   - nested parameter substitutions require braces (this was always the
-    documented behavior, but previous parsers didn't enforce it).
+    documented behaviour, but previous parsers didn't enforce it).
   - quote only nested expansion, e.g. ${(f)"$(<file)"} reads complete
     `file', then splits lines into array.
 
@@ -954,7 +954,7 @@ Other changes:
 Debugging enhancements:
   - LINENO is now very much more useful in scripts and functions and is
     reported correctly in most error messages.
-  - ERREXIT behavior is now consistent with newer Bourne-like shells,
+  - ERREXIT behaviour is now consistent with newer Bourne-like shells,
     e.g. with respect to `if' tests that fail.
 
 Configuration changes:
