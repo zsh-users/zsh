@@ -2,8 +2,10 @@
 # paste exactly starts with a url, eg no spaces or other characters precede it
 #
 # If the numeric argument is provided (eg, pressing alt-0 or alt-1 in emacs mode,
-# or just the number by itself in vi command mode), then override the url detection
-# and if it was 0, never quote, and if it was 1, always quote.
+# or just the number by itself in vi command mode), then
+# 0 is the default and means auto detect urls
+# 1 means always quote
+# any other value means never quote
 #
 # To use this widget, put this in your startup files (eg, .zshrc)
 #
@@ -25,13 +27,13 @@ local start=$#LBUFFER
 
 zle .$WIDGET -N content
 
-if ! (( $wantquote )); then
+if (( $wantquote == 0 )); then
   if [[ $content = (${(~j:|:)schema})://* ]]; then
     wantquote=1
   fi
 fi
 
-if (( $wantquote )); then
+if (( $wantquote == 1 )); then
   content=${(q-)content}
 fi
 
