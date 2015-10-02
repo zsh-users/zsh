@@ -626,6 +626,23 @@ bin_zle_complete(char *name, char **args, UNUSED(Options ops), UNUSED(char func)
 
 /**/
 static int
+zle_usable()
+{
+    return zleactive && !incompctlfunc && !incompfunc
+#if 0
+	/*
+	 * PWS experiment: commenting this out allows zle widgets
+	 * in signals, hooks etc.  I'm not sure if this has a down side;
+	 * it ought to be that zleactive is good enough to test whether
+	 * widgets are callable.
+	 */
+	&& sfcontext == SFC_WIDGET
+#endif
+	   ;
+}
+
+/**/
+static int
 bin_zle_flags(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 {
     int ret = 0;
@@ -664,23 +681,6 @@ bin_zle_flags(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 	}
     }
     return ret;
-}
-
-/**/
-static int
-zle_usable()
-{
-    return zleactive && !incompctlfunc && !incompfunc
-#if 0
-	/*
-	 * PWS experiment: commenting this out allows zle widgets
-	 * in signals, hooks etc.  I'm not sure if this has a down side;
-	 * it ought to be that zleactive is good enough to test whether
-	 * widgets are callable.
-	 */
-	&& sfcontext == SFC_WIDGET
-#endif
-	   ;
 }
 
 /**/
