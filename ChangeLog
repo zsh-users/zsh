@@ -1,3 +1,9 @@
+2015-10-03  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 36754: Functions/TCP/tcp_open, Functions/TCP/tcp_read,
+	Functions/TCP/tcp_send, Functions/TCP/tcp_shoot: Tweak some
+	usage output in the tcp_* functions
+
 2015-10-02  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 36732: Completion/Unix/Command/_zsh: support -s and -b,

@@ -4,8 +4,8 @@ setopt extendedglob
 local REPLY tfd
 
 if [[ $# -ne 2 ]]; then
-    print "Usage: tcp_dump host port
-Connect to the given host and port; send standard input.">&2
+    print "Usage: $0 host port
+Connect to the given host and port; send standard input." >&2
     return 1
 fi
 

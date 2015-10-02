@@ -152,7 +152,7 @@ fi
 
 if (( $# )); then
   print "Usage: $0 [-z] [-a fd | -f fd | host port [ session ] ]
-  $0 [-z] [ -s session | -l sesslist ] ..." >&2
+       $0 [-z] [ -s session | -l sesslist ] ..." >&2
   return 1
 fi
 

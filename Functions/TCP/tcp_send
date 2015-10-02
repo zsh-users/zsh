@@ -29,7 +29,7 @@ while getopts "acl:nqs:" opt; do
 	    fi
 	    sessions+=($OPTARG)
 	    ;;
-	(*) [[ $opt != '?' ]] && print Unhandled option, complain: $opt >&2
+	(*) [[ $opt != '?' ]] && print "Unhandled option, complain: $opt" >&2
             return 1
 	    ;;
     esac

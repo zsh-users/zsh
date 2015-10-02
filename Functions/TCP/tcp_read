@@ -116,7 +116,7 @@ while getopts "abdl:qs:t:T:u:" opt; do
 	  read_fds[$((read_fd))]=1
 	done
 	;;
-    (*) [[ $opt != \? ]] && print Unhandled option, complain: $opt >&2
+    (*) [[ $opt != \? ]] && print "Unhandled option, complain: $opt" >&2
 	return 1
        ;;
   esac
