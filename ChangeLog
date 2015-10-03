@@ -1,3 +1,8 @@
+2015-10-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 36760: Src/pattern.c: ensure we don't do anything untoward
+	with an already metafied pattern trial match.
+
 2015-10-03  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 36754: Functions/TCP/tcp_open, Functions/TCP/tcp_read,

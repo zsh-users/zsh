@@ -2023,6 +2023,39 @@ pattrystart(void)
 }
 
 /*
+ * Fix up string length stuff.
+ *
+ * If we call patallocstr() with "force" to set things up early, it's
+ * done there, else it's done in pattryrefs().  The reason for the
+ * difference is in the latter case we may not be relying on
+ * patallocstr() having an effect.
+ */
+
+/**/
+static void
+patmungestring(char **string, int *stringlen, int *unmetalenin)
+{
+    /*
+     * Special signalling of empty tokenised string.
+     */
+    if (*stringlen > 0 && **string == Nularg) {
+	(*string)++;
+	/*
+	 * If we don't have an unmetafied length
+	 * and need it (we may not) we'll get it later.
+	 */
+	if (*unmetalenin > 0)
+	    (*unmetalenin)--;
+	if (*stringlen > 0)
+	    (*stringlen)--;
+    }
+
+    /* Ensure we have a metafied length */
+    if (*stringlen < 0)
+	*stringlen = strlen(*string);
+}
+
+/*
  * Allocate memeory for pattern match.  Note this is specific to use
  * of pattern *and* trial string.
  *
@@ -2039,7 +2072,8 @@ pattrystart(void)
  * force is 1 if we always unmetafy: this is useful if we are going
  *   to try again with different versions of the string.  If this is
  *   called from pattryrefs() we don't force unmetafication as it won't
- *   be optimal.
+ *   be optimal.  This option should be used if the resulting
+ *   patstralloc is going to be passed to pattrylen() / pattryrefs().
  * In patstralloc (supplied by caller, must last until last pattry is done)
  *  unmetalen is the unmetafied length of the string; it will be
  *    calculated if the input value is negative.
@@ -2055,6 +2089,9 @@ char *patallocstr(Patprog prog, char *string, int stringlen, int unmetalen,
 		  int force, Patstralloc patstralloc)
 {
     int needfullpath;
+
+    if (force)
+	patmungestring(&string, &stringlen, &unmetalen);
 
     /*
      * For a top-level ~-exclusion, we will need the full
@@ -2224,21 +2261,9 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	maxnpos = *nump;
 	*nump = 0;
     }
-    /*
-     * Special signalling of empty tokenised string.
-     */
-    if ((!patstralloc || stringlen > 0) && *string == Nularg) {
-	string++;
-	if (unmetalenin > 0)
-	    unmetalenin--;
-	if (stringlen > 0)
-	    stringlen--;
-    }
 
-    if (stringlen < 0) {
-	DPUTS(patstralloc != NULL, "length needed with patstralloc");
-	stringlen = strlen(string);
-    }
+    if (!patstralloc)
+	patmungestring(&string, &stringlen, &unmetalenin);
     origlen = stringlen;
 
     if (patstralloc) {
