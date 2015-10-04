@@ -1,3 +1,8 @@
+2015-10-04  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36773: Src/utils.c: limit CORRECT / CORRECT_ALL to directory
+	names in cases where it is obvious that a directory is expected
+
 2015-10-03  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted (cf. 36696): Test/C03traps.ztst: test case for 36766

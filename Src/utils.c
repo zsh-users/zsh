@@ -2812,7 +2812,7 @@ spckword(char **s, int hist, int cmd, int ask)
 		     * as used in spscan(), so that an autocd is chosen *
 		     * only when it is better than anything so far, and *
 		     * so we prefer directories earlier in the cdpath.  */
-		    if ((thisdist = mindist(*pp, *s, bestcd)) < d) {
+		    if ((thisdist = mindist(*pp, *s, bestcd, 1)) < d) {
 			best = dupstring(bestcd);
 			d = thisdist;
 		    }
@@ -4057,7 +4057,8 @@ spname(char *oldname)
 	    thresh = 3;
 	else if (thresh > 100)
 	    thresh = 100;
-	if ((thisdist = mindist(newname, spnameguess, spnamebest)) >= thresh) {
+	thisdist = mindist(newname, spnameguess, spnamebest, *old == '/');
+	if (thisdist >= thresh) {
 	    /* The next test is always true, except for the first path    *
 	     * component.  We could initialize bestdist to some large     *
 	     * constant instead, and then compare to that constant here,  *
@@ -4082,42 +4083,52 @@ spname(char *oldname)
 
 /**/
 static int
-mindist(char *dir, char *mindistguess, char *mindistbest)
+mindist(char *dir, char *mindistguess, char *mindistbest, int wantdir)
 {
     int mindistd, nd;
     DIR *dd;
     char *fn;
     char *buf;
+    struct stat st;
+    size_t dirlen;
 
     if (dir[0] == '\0')
 	dir = ".";
     mindistd = 100;
 
-    buf = zalloc(strlen(dir) + strlen(mindistguess) + 2);
+    if (!(buf = zalloc((dirlen = strlen(dir)) + strlen(mindistguess) + 2)))
+	return 0;
     sprintf(buf, "%s/%s", dir, mindistguess);
 
-    if (access(unmeta(buf), F_OK) == 0) {
+    if (stat(unmeta(buf), &st) == 0 && (!wantdir || S_ISDIR(st.st_mode))) {
 	strcpy(mindistbest, mindistguess);
 	free(buf);
 	return 0;
     }
-    free(buf);
 
-    if (!(dd = opendir(unmeta(dir))))
-	return mindistd;
-    while ((fn = zreaddir(dd, 0))) {
-	if (spnamepat && pattry(spnamepat, fn))
-	    continue;
-	nd = spdist(fn, mindistguess,
-		    (int)strlen(mindistguess) / 4 + 1);
-	if (nd <= mindistd) {
-	    strcpy(mindistbest, fn);
-	    mindistd = nd;
-	    if (mindistd == 0)
-		break;
+    if ((dd = opendir(unmeta(dir)))) {
+	while ((fn = zreaddir(dd, 0))) {
+	    if (spnamepat && pattry(spnamepat, fn))
+		continue;
+	    nd = spdist(fn, mindistguess,
+			(int)strlen(mindistguess) / 4 + 1);
+	    if (nd <= mindistd) {
+		if (wantdir) {
+		    if (!(buf = zrealloc(buf, dirlen + strlen(fn) + 2)))
+			continue;
+		    sprintf(buf, "%s/%s", dir, fn);
+		    if (stat(unmeta(buf), &st) != 0 || !S_ISDIR(st.st_mode))
+			continue;
+		}
+		strcpy(mindistbest, fn);
+		mindistd = nd;
+		if (mindistd == 0)
+		    break;
+	    }
 	}
+	closedir(dd);
     }
-    closedir(dd);
+    free(buf);
     return mindistd;
 }
 
