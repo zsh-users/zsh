@@ -1364,7 +1364,8 @@ sublist_done:
 	 * we hit execcmd on the way down.  We're now
 	 * on the way back up, so don't restore it.
 	 */
-	noerrexit = (oldnoerrexit == 2) ? 0 : oldnoerrexit;
+	if (oldnoerrexit != 2)
+	    noerrexit = oldnoerrexit;
 
 	if (sigtrapped[SIGDEBUG] && !isset(DEBUGBEFORECMD) && !donedebug) {
 	    /*

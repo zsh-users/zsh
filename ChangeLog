@@ -1,3 +1,8 @@
+2015-10-03  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36766: Src/exec.c: fix incorrect reset of noerrexit during
+	"if" conditions
+
 2015-10-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 36760: Src/pattern.c: ensure we don't do anything untoward
