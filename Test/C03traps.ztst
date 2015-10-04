@@ -450,6 +450,20 @@
   fn
 1:ERRRETURN in "else" branch (regression test)
 
+  $ZTST_testdir/../Src/zsh -f =(<<<"
+  if false; then
+    :
+  else
+    if [[ -n '' ]]; then
+        a=2  
+    fi
+    print Yes
+  fi
+  ")
+0:ERRRETURN when false "if" is the first statement in an "else" (regression)
+>Yes
+F:Must be tested with a top-level script rather than source or function
+
 %clean
 
   rm -f TRAPEXIT

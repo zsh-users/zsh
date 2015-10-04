@@ -552,12 +552,8 @@ execif(Estate state, int do_exec)
 	    run = 1;
 	    break;
 	}
-	if (retflag) {
-	    if (retflag == 2)
-		retflag = 0; /* Never ERR_RETURN here */
-	    else
-		break;
-	}
+	if (retflag)
+	    break;
 	s = 1;
 	state->pc = next;
     }

@@ -1,5 +1,9 @@
 2015-10-03  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted (cf. 36696): Test/C03traps.ztst: test case for 36766
+
+	* unposted: Src/exec.c, Src/loop.c: back out 36707, fixed by 36766
+
 	* 36766: Src/exec.c: fix incorrect reset of noerrexit during
 	"if" conditions
 
