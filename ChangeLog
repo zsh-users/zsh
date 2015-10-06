@@ -1,3 +1,8 @@
+2015-10-06  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 36780: Src/params.c: ensure HOME parameter is unset if
+	corresponding internal variable is null.
+
 2015-10-04  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36773: Src/utils.c: limit CORRECT / CORRECT_ALL to directory
