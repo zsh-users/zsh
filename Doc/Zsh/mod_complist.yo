@@ -150,8 +150,8 @@ containing the codes for ANSI terminals (see
 ifzman(the section `Other Functions' in zmanref(zshcontrib))\
 ifnzman(noderef(Other Functions))\
 ).  For example, after loading tt(colors), one could use
-`tt($colors[red])' to get the code for foreground color red and
-`tt($colors[bg-green])' for the code for background color green.
+`tt($color[red])' to get the code for foreground color red and
+`tt($color[bg-green])' for the code for background color green.
 
 If the completion system invoked by compinit is used, these
 parameters should not be set directly because the system controls them 
