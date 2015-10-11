@@ -224,18 +224,28 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
     patchdir="${gitdir}/rebase-apply"
     local next="${patchdir}/next"
     if [[ -f $next ]]; then
-	local cur=$(< $next)
-	local p subject
-	for p in $(seq $(($cur - 1))); do
-	    git_patches_applied+=("$(printf "%04d" $p) ?")
-	done
-	subject="${$(< "${patchdir}/msg-clean")[(f)1]}"
-	if [[ -f "${patchdir}/original-commit" ]]; then
-	    git_patches_applied+=("$(< ${patchdir}/original-commit) $subject")
-	else
-	    git_patches_applied+=("? $subject")
-	fi
-	git_patches_unapplied=($(seq $cur $(< "${patchdir}/last")))
+        local cur=$(< $next)
+        local p subject
+        for p in $(seq $(($cur - 1))); do
+            git_patches_applied+=("$(printf "%04d" $p) ?")
+        done
+        if [[ -f "${patchdir}/msg-clean" ]]; then
+            subject="${$(< "${patchdir}/msg-clean")[(f)1]}"
+        fi
+        if [[ -f "${patchdir}/original-commit" ]]; then
+            if [[ -n $subject ]]; then
+                git_patches_applied+=("$(< ${patchdir}/original-commit) $subject")
+            else
+                git_patches_applied+=("$(< ${patchdir}/original-commit)")
+            fi
+        else
+            if [[ -n $subject ]]; then
+                git_patches_applied+=("? $subject")
+            else
+                git_patches_applied+=("?")
+            fi
+        fi
+        git_patches_unapplied=($(seq $cur $(< "${patchdir}/last")))
     fi
 
     VCS_INFO_git_handle_patches

@@ -1,3 +1,8 @@
+2015-10-11  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 36830: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info: Silence an error message with new git versions
+
 2015-10-06  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36780: Src/params.c: ensure HOME parameter is unset if
