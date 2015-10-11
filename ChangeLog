@@ -3,6 +3,9 @@
 	* 36830: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	vcs_info: Silence an error message with new git versions
 
+	* 36832: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info: Remove dependency on "seq"
+
 2015-10-06  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36780: Src/params.c: ensure HOME parameter is unset if

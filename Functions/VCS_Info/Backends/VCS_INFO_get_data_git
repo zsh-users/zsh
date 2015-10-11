@@ -226,7 +226,7 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
     if [[ -f $next ]]; then
         local cur=$(< $next)
         local p subject
-        for p in $(seq $(($cur - 1))); do
+        for ((p = 1; p < cur; p++)); do
             git_patches_applied+=("$(printf "%04d" $p) ?")
         done
         if [[ -f "${patchdir}/msg-clean" ]]; then
@@ -245,7 +245,8 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
                 git_patches_applied+=("?")
             fi
         fi
-        git_patches_unapplied=($(seq $cur $(< "${patchdir}/last")))
+        local last="$(< "${patchdir}/last")"
+        git_patches_unapplied=( {$cur..$last} )
     fi
 
     VCS_INFO_git_handle_patches
