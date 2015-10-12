@@ -1,6 +1,9 @@
 2015-10-11  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* 36834: Src/mem.c: freeheap preserves last allocated heap
+	* 36836: Src/mem.c: zhalloc() avoids re-scanning all heaps when
+	the last known heap with free space does not have enough space
+
+	* 36834: Src/mem.c: freeheap() preserves last allocated heap
 
 2015-10-11  Frank Terbeck  <ft@bewatermyfriend.org>
 

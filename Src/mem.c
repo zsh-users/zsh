@@ -582,10 +582,14 @@ zhalloc(size_t size)
 
     /* find a heap with enough free space */
 
-    for (h = ((fheap && ARENA_SIZEOF(fheap) >= (size + fheap->used))
-	      ? fheap : heaps);
-	 h; h = h->next) {
-	hp = h;
+    /*
+     * This previously assigned:
+     *   h = ((fheap && ARENA_SIZEOF(fheap) >= (size + fheap->used))
+     *	      ? fheap : heaps);
+     * but we think that nothing upstream of fheap has more free space,
+     * so why start over at heaps just because fheap has too little?
+     */
+    for (h = (fheap ? fheap : heaps); h; h = h->next) {
 	if (ARENA_SIZEOF(h) >= (n = size + h->used)) {
 	    void *ret;
 
