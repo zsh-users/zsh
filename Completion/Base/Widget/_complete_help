@@ -6,12 +6,15 @@ _complete_help() {
   local _sort_tags=_help_sort_tags text i j k tmp
   typeset -A help_funcs help_tags help_sfuncs help_styles
 
+  local -H _help_scan_funcstack="main_complete|complete|approximate|normal"
+  local -H _help_filter_funcstack="alternative|call_function|describe|dispatch|wanted|requested|all_labels|next_label"
+
   {
     compadd() { return 1 }
     zstyle() {
-      local _f="${${(@)${(@)funcstack[2,(i)_(main_complete|complete|approximate|normal)]}:#_(dispatch|wanted|requested|all_labels|next_label)}% *}"
+      local _f="${${(@)${(@)funcstack[2,(i)_($~_help_scan_funcstack)]}:#(_($~_help_filter_funcstack)|\((eval|anon)\))}% *}"
   
-      [[ -z "$_f" ]] && _f="${${(@)funcstack[2,(i)_(main_complete|complete|approximate|normal)]}:#_(dispatch|wanted|requested|all_labels|next_label)}"
+      [[ -z "$_f" ]] && _f="${${(@)funcstack[2,(i)_($~_help_scan_funcstack)]}:#(_($~_help_filter_funcstack)|\((eval|anon)\))}"
   
       if [[ "$help_sfuncs[$2]" != *${_f}* ||
             "$help_styles[${2}${_f}]" != *${3}* ]]; then
@@ -73,7 +76,7 @@ _complete_help() {
 }
 
 _help_sort_tags() {
-  local f="${${(@)${(@)funcstack[3,(i)_(main_complete|complete|approximate|normal)]}:#(_(dispatch|wanted|requested|all_labels|next_label)|\(eval\))}% *}"
+  local f="${${(@)${(@)funcstack[3,(i)_($~_help_scan_funcstack)]}:#(_($~_help_filter_funcstack)|\((eval|anon)\))}% *}"
 
   if [[ "$help_funcs[$curcontext]" != *${f}* ||
         "$help_tags[${curcontext}${f}]" != *(${(j:|:)~argv})* ]]; then
