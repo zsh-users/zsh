@@ -386,6 +386,8 @@ freeheap(void)
 	    VALGRIND_MEMPOOL_TRIM((char *)h, (char *)arena(h), h->used);
 #endif
 	} else {
+	    if (fheap == h)
+		fheap = NULL;
 	    if (h->next) {
 		/* We want to cut this out of the arena list if we can */
 		if (h == heaps)
@@ -404,8 +406,6 @@ freeheap(void)
 		fheap = hl = h;
 		break;
 	    }
-	    if (fheap == h)
-		fheap = NULL;
 #ifdef USE_MMAP
 	    munmap((void *) h, h->size);
 #else
@@ -590,6 +590,7 @@ zhalloc(size_t size)
      * so why start over at heaps just because fheap has too little?
      */
     for (h = (fheap ? fheap : heaps); h; h = h->next) {
+	hp = h;
 	if (ARENA_SIZEOF(h) >= (n = size + h->used)) {
 	    void *ret;
 
