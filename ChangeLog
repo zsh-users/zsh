@@ -1,3 +1,7 @@
+2015-10-11  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36834: Src/mem.c: freeheap preserves last allocated heap
+
 2015-10-11  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 36830: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
