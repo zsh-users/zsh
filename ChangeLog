@@ -1,3 +1,8 @@
+2015-10-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 36856: Doc/Zsh/contrib.yo, Functions/Chpwd/cdr: add -p and -P
+	options to cdr for pruning the directory list.
+
 2015-10-11  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36841: Completion/Base/Widget/_complete_help: factor out and

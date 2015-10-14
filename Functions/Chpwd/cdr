@@ -51,6 +51,13 @@
 # (and only /).  Usually the first entry should be left as the current
 # directory.
 #
+# "cdr -p 'pattern'" prunes anything matching the given extended glob
+# pattern from the directory list.  The match is against the fully
+# expanded directory path and the full string must match (use wildcards
+# at the ends if needed).  If output is going to a terminal, the
+# function will print the new list for the user to confrim; this can be
+# skipped by giving -P instead of -p.
+#
 # Details of directory handling
 # =============================
 #
@@ -217,11 +224,11 @@ setopt extendedglob
 
 autoload -Uz chpwd_recent_filehandler chpwd_recent_add
 
-integer list set_reply i bad edit
-local opt dir
+integer list set_reply i bad edit force_prune
+local opt dir prune
 local -aU dirs
 
-while getopts "elr" opt; do
+while getopts "elp:P:r" opt; do
   case $opt in
     (e)
     edit=1
@@ -229,6 +236,12 @@ while getopts "elr" opt; do
 
     (l)
     list=1
+    ;;
+
+    ([pP])
+    prune=$OPTARG
+    edit=1
+    [[ $opt = P ]] && force_prune=1
     ;;
 
     (r)
@@ -278,10 +291,22 @@ if [[ $PWD != $reply[1] ]]; then
 fi
 
 if (( edit )); then
-  local compcontext='directories:directory:_path_files -/'
-IFS='
+  if [[ -n $prune ]]; then
+    reply=(${reply:#$~prune})
+    if [[ force_prune -eq 0 && -t 1 ]]; then
+      print -nrl "New list:" $reply 'Accept? '
+      if ! read -q; then
+	print
+	return 1
+      fi
+      print
+    fi
+  else
+    local compcontext='directories:directory:_path_files -/'
+    IFS='
 ' vared reply || return 1
-chpwd_recent_filehandler $reply
+  fi
+  chpwd_recent_filehandler $reply
 fi
 
 # Skip current directory if present (may have been pruned).

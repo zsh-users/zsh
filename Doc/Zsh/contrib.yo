@@ -415,6 +415,18 @@ newlines, where I have in any case no sympathy); directories are in
 unabbreviated from and contain an absolute path, i.e. they start with tt(/).
 Usually the first entry should be left as the current directory.
 )
+item(tt(-p ')var(pattern)tt('))(
+Prunes any items in the directory list that match the given extended glob
+pattern; the pattern needs to be quoted from immediate expansion on the
+command line.  The pattern is matched against each completely expanded
+file name in the list; the full string must match, so wildcards at the
+end (e.g. tt('*removeme*')) are needed to remove entries with a given
+substring.
+
+If output is to a terminal, then the function will print the new list
+after pruning and prompt for confirmation by the user.  This output and
+confirmation step can be skipped by using tt(-P) instead of tt(-p).
+)
 enditem()
 
 subsect(Configuration)
