@@ -1,3 +1,9 @@
+2015-10-15  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 36864: Completion/Unix/Command/_nm,
+	Completion/Unix/Command/_objdump: new objdump completion plus
+	tweak to _nm.
+
 2015-10-14  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36853: Src/exec.c: replace pushheap/popheap by NEWHEAPS/OLDHEAPS

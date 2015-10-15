@@ -1,0 +1,8 @@
+#compdef objdump
+
+# borrowed from _nm_object_file
+_objdump_object_file() {
+  [[ -x $REPLY || $REPLY = *.([ao]|so|elf) ]]
+}
+
+_arguments -- '*:object file:_files -g "*(-.e,_objdump_object_file,)"'
