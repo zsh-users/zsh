@@ -1,3 +1,8 @@
+2015-10-14  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36853: Src/exec.c: replace pushheap/popheap by NEWHEAPS/OLDHEAPS
+	in doshfunc() to optimize memory management
+
 2015-10-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36856: Doc/Zsh/contrib.yo, Functions/Chpwd/cdr: add -p and -P

@@ -5067,230 +5067,230 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 #ifdef MAX_FUNCTION_DEPTH
     static int funcdepth;
 #endif
+    Heap funcheap;
 
     queue_signals();	/* Lots of memory and global state changes coming */
 
-    pushheap();
+    NEWHEAPS(funcheap) {
+	oargv0 = NULL;
+	obreaks = breaks;
+	ocontflag = contflag;
+	oloops = loops;
+	if (trap_state == TRAP_STATE_PRIMED)
+	    trap_return--;
+	oldlastval = lastval;
+	oldnumpipestats = numpipestats;
+	if (noreturnval) {
+	    /*
+	     * Easiest to use the heap here since we're bracketed
+	     * immediately by a pushheap/popheap pair.
+	     */
+	    size_t bytes = sizeof(int)*numpipestats;
+	    oldpipestats = (int *)zhalloc(bytes);
+	    memcpy(oldpipestats, pipestats, bytes);
+	}
 
-    oargv0 = NULL;
-    obreaks = breaks;
-    ocontflag = contflag;
-    oloops = loops;
-    if (trap_state == TRAP_STATE_PRIMED)
-	trap_return--;
-    oldlastval = lastval;
-    oldnumpipestats = numpipestats;
-    if (noreturnval) {
+	starttrapscope();
+	startpatternscope();
+
+	pptab = pparams;
+	if (!(flags & PM_UNDEFINED))
+	    scriptname = dupstring(name);
+	oldzoptind = zoptind;
+	oldoptcind = optcind;
+	if (!isset(POSIXBUILTINS)) {
+	    zoptind = 1;
+	    optcind = 0;
+	}
+
+	/* We need to save the current options even if LOCALOPTIONS is *
+	 * not currently set.  That's because if it gets set in the    *
+	 * function we need to restore the original options on exit.   */
+	memcpy(saveopts, opts, sizeof(opts));
+	saveemulation = emulation;
+	save_sticky = sticky;
+
+	if (sticky_emulation_differs(shfunc->sticky)) {
+	    /*
+	     * Function is marked for sticky emulation.
+	     * Enable it now.
+	     *
+	     * We deliberately do not do this if the sticky emulation
+	     * in effect is the same as that requested.  This enables
+	     * option setting naturally within emulation environments.
+	     * Note that a difference in EMULATE_FULLY (emulate with
+	     * or without -R) counts as a different environment.
+	     *
+	     * This propagates the sticky emulation to subfunctions.
+	     */
+	    sticky = sticky_emulation_dup(shfunc->sticky, 1);
+	    emulation = sticky->emulation;
+	    restore_sticky = 1;
+	    installemulation(emulation, opts);
+	    if (sticky->n_on_opts) {
+		OptIndex *onptr;
+		for (onptr = sticky->on_opts;
+		     onptr < sticky->on_opts + sticky->n_on_opts;
+		     onptr++)
+		    opts[*onptr] = 1;
+	    }
+	    if (sticky->n_off_opts) {
+		OptIndex *offptr;
+		for (offptr = sticky->off_opts;
+		     offptr < sticky->off_opts + sticky->n_off_opts;
+		     offptr++)
+		    opts[*offptr] = 0;
+	    }
+	    /* All emulations start with pattern disables clear */
+	    clearpatterndisables();
+	} else
+	    restore_sticky = 0;
+
+	if (flags & (PM_TAGGED|PM_TAGGED_LOCAL))
+	    opts[XTRACE] = 1;
+	else if (oflags & PM_TAGGED_LOCAL)
+	    opts[XTRACE] = 0;
+	ooflags = oflags;
 	/*
-	 * Easiest to use the heap here since we're bracketed
-	 * immediately by a pushheap/popheap pair.
+	 * oflags is static, because we compare it on the next recursive
+	 * call.  Hence also we maintain ooflags for restoring the previous
+	 * value of oflags after the call.
 	 */
-	size_t bytes = sizeof(int)*numpipestats;
-	oldpipestats = (int *)zhalloc(bytes);
-	memcpy(oldpipestats, pipestats, bytes);
-    }
+	oflags = flags;
+	opts[PRINTEXITVALUE] = 0;
+	if (doshargs) {
+	    LinkNode node;
 
-    starttrapscope();
-    startpatternscope();
-
-    pptab = pparams;
-    if (!(flags & PM_UNDEFINED))
-	scriptname = dupstring(name);
-    oldzoptind = zoptind;
-    oldoptcind = optcind;
-    if (!isset(POSIXBUILTINS)) {
-	zoptind = 1;
-	optcind = 0;
-    }
-
-    /* We need to save the current options even if LOCALOPTIONS is *
-     * not currently set.  That's because if it gets set in the    *
-     * function we need to restore the original options on exit.   */
-    memcpy(saveopts, opts, sizeof(opts));
-    saveemulation = emulation;
-    save_sticky = sticky;
-
-    if (sticky_emulation_differs(shfunc->sticky)) {
-	/*
-	 * Function is marked for sticky emulation.
-	 * Enable it now.
-	 *
-	 * We deliberately do not do this if the sticky emulation
-	 * in effect is the same as that requested.  This enables
-	 * option setting naturally within emulation environments.
-	 * Note that a difference in EMULATE_FULLY (emulate with
-	 * or without -R) counts as a different environment.
-	 *
-	 * This propagates the sticky emulation to subfunctions.
-	 */
-	sticky = sticky_emulation_dup(shfunc->sticky, 1);
-	emulation = sticky->emulation;
-	restore_sticky = 1;
-	installemulation(emulation, opts);
-	if (sticky->n_on_opts) {
-	    OptIndex *onptr;
-	    for (onptr = sticky->on_opts;
-		 onptr < sticky->on_opts + sticky->n_on_opts;
-		 onptr++)
-		opts[*onptr] = 1;
+	    node = firstnode(doshargs);
+	    pparams = x = (char **) zshcalloc(((sizeof *x) *
+					       (1 + countlinknodes(doshargs))));
+	    if (isset(FUNCTIONARGZERO)) {
+		oargv0 = argzero;
+		argzero = ztrdup(getdata(node));
+	    }
+	    /* first node contains name regardless of option */
+	    node = node->next;
+	    for (; node; node = node->next, x++)
+		*x = ztrdup(getdata(node));
+	} else {
+	    pparams = (char **) zshcalloc(sizeof *pparams);
+	    if (isset(FUNCTIONARGZERO)) {
+		oargv0 = argzero;
+		argzero = ztrdup(argzero);
+	    }
 	}
-	if (sticky->n_off_opts) {
-	    OptIndex *offptr;
-	    for (offptr = sticky->off_opts;
-		 offptr < sticky->off_opts + sticky->n_off_opts;
-		 offptr++)
-		opts[*offptr] = 0;
-	}
-	/* All emulations start with pattern disables clear */
-	clearpatterndisables();
-    } else
-	restore_sticky = 0;
-
-    if (flags & (PM_TAGGED|PM_TAGGED_LOCAL))
-	opts[XTRACE] = 1;
-    else if (oflags & PM_TAGGED_LOCAL)
-	opts[XTRACE] = 0;
-    ooflags = oflags;
-    /*
-     * oflags is static, because we compare it on the next recursive
-     * call.  Hence also we maintain ooflags for restoring the previous
-     * value of oflags after the call.
-     */
-    oflags = flags;
-    opts[PRINTEXITVALUE] = 0;
-    if (doshargs) {
-	LinkNode node;
-
-	node = firstnode(doshargs);
-	pparams = x = (char **) zshcalloc(((sizeof *x) *
-					 (1 + countlinknodes(doshargs))));
-	if (isset(FUNCTIONARGZERO)) {
-	    oargv0 = argzero;
-	    argzero = ztrdup(getdata(node));
-	}
-	/* first node contains name regardless of option */
-	node = node->next;
-	for (; node; node = node->next, x++)
-	    *x = ztrdup(getdata(node));
-    } else {
-	pparams = (char **) zshcalloc(sizeof *pparams);
-	if (isset(FUNCTIONARGZERO)) {
-	    oargv0 = argzero;
-	    argzero = ztrdup(argzero);
-	}
-    }
 #ifdef MAX_FUNCTION_DEPTH
-    if(++funcdepth > MAX_FUNCTION_DEPTH)
-    {
-        zerr("maximum nested function level reached");
-	goto undoshfunc;
-    }
+	if(++funcdepth > MAX_FUNCTION_DEPTH)
+	    {
+		zerr("maximum nested function level reached");
+		goto undoshfunc;
+	    }
 #endif
-    fstack.name = dupstring(name);
-    /*
-     * The caller is whatever is immediately before on the stack,
-     * unless we're at the top, in which case it's the script
-     * or interactive shell name.
-     */
-    fstack.caller = funcstack ? funcstack->name :
-	dupstring(oargv0 ? oargv0 : argzero);
-    fstack.lineno = lineno;
-    fstack.prev = funcstack;
-    fstack.tp = FS_FUNC;
-    funcstack = &fstack;
-
-    fstack.flineno = shfunc->lineno;
-    fstack.filename = dupstring(shfunc->filename);
-
-    prog = shfunc->funcdef;
-    if (prog->flags & EF_RUN) {
-	Shfunc shf;
-
-	prog->flags &= ~EF_RUN;
-
-	runshfunc(prog, NULL, fstack.name);
-
-	if (!(shf = (Shfunc) shfunctab->getnode(shfunctab,
-						(name = fname)))) {
-	    zwarn("%s: function not defined by file", name);
-	    if (noreturnval)
-		errflag |= ERRFLAG_ERROR;
-	    else
-		lastval = 1;
-	    goto doneshfunc;
-	}
-	prog = shf->funcdef;
-    }
-    runshfunc(prog, wrappers, fstack.name);
- doneshfunc:
-    funcstack = fstack.prev;
-#ifdef MAX_FUNCTION_DEPTH
- undoshfunc:
-    --funcdepth;
-#endif
-    if (retflag) {
-	retflag = 0;
-	breaks = obreaks;
-    }
-    freearray(pparams);
-    if (oargv0) {
-	zsfree(argzero);
-	argzero = oargv0;
-    }
-    pparams = pptab;
-    if (!isset(POSIXBUILTINS)) {
-	zoptind = oldzoptind;
-	optcind = oldoptcind;
-    }
-    scriptname = oldscriptname;
-    oflags = ooflags;
-
-    endpatternscope();		/* before restoring old LOCALPATTERNS */
-
-    if (restore_sticky) {
+	fstack.name = dupstring(name);
 	/*
-	 * If we switched to an emulation environment just for
-	 * this function, we interpret the option and emulation
-	 * switch as being a firewall between environments.
+	 * The caller is whatever is immediately before on the stack,
+	 * unless we're at the top, in which case it's the script
+	 * or interactive shell name.
 	 */
-	memcpy(opts, saveopts, sizeof(opts));
-	emulation = saveemulation;
-	sticky = save_sticky;
-    } else if (isset(LOCALOPTIONS)) {
-	/* restore all shell options except PRIVILEGED and RESTRICTED */
-	saveopts[PRIVILEGED] = opts[PRIVILEGED];
-	saveopts[RESTRICTED] = opts[RESTRICTED];
-	memcpy(opts, saveopts, sizeof(opts));
-	emulation = saveemulation;
-    } else {
-	/* just restore a couple. */
-	opts[XTRACE] = saveopts[XTRACE];
-	opts[PRINTEXITVALUE] = saveopts[PRINTEXITVALUE];
-	opts[LOCALOPTIONS] = saveopts[LOCALOPTIONS];
-	opts[LOCALLOOPS] = saveopts[LOCALLOOPS];
-    }
+	fstack.caller = funcstack ? funcstack->name :
+	    dupstring(oargv0 ? oargv0 : argzero);
+	fstack.lineno = lineno;
+	fstack.prev = funcstack;
+	fstack.tp = FS_FUNC;
+	funcstack = &fstack;
 
-    if (opts[LOCALLOOPS]) {
-	if (contflag)
-	    zwarn("`continue' active at end of function scope");
-	if (breaks)
-	    zwarn("`break' active at end of function scope");
-	breaks = obreaks;
-	contflag = ocontflag;
-	loops = oloops;
-    }
+	fstack.flineno = shfunc->lineno;
+	fstack.filename = dupstring(shfunc->filename);
 
-    endtrapscope();
+	prog = shfunc->funcdef;
+	if (prog->flags & EF_RUN) {
+	    Shfunc shf;
 
-    if (trap_state == TRAP_STATE_PRIMED)
-	trap_return++;
-    ret = lastval;
-    if (noreturnval) {
-	lastval = oldlastval;
-	numpipestats = oldnumpipestats;
-	memcpy(pipestats, oldpipestats, sizeof(int)*numpipestats);
-    }
-    popheap();
+	    prog->flags &= ~EF_RUN;
+
+	    runshfunc(prog, NULL, fstack.name);
+
+	    if (!(shf = (Shfunc) shfunctab->getnode(shfunctab,
+						    (name = fname)))) {
+		zwarn("%s: function not defined by file", name);
+		if (noreturnval)
+		    errflag |= ERRFLAG_ERROR;
+		else
+		    lastval = 1;
+		goto doneshfunc;
+	    }
+	    prog = shf->funcdef;
+	}
+	runshfunc(prog, wrappers, fstack.name);
+    doneshfunc:
+	funcstack = fstack.prev;
+#ifdef MAX_FUNCTION_DEPTH
+    undoshfunc:
+	--funcdepth;
+#endif
+	if (retflag) {
+	    retflag = 0;
+	    breaks = obreaks;
+	}
+	freearray(pparams);
+	if (oargv0) {
+	    zsfree(argzero);
+	    argzero = oargv0;
+	}
+	pparams = pptab;
+	if (!isset(POSIXBUILTINS)) {
+	    zoptind = oldzoptind;
+	    optcind = oldoptcind;
+	}
+	scriptname = oldscriptname;
+	oflags = ooflags;
+
+	endpatternscope();	/* before restoring old LOCALPATTERNS */
+
+	if (restore_sticky) {
+	    /*
+	     * If we switched to an emulation environment just for
+	     * this function, we interpret the option and emulation
+	     * switch as being a firewall between environments.
+	     */
+	    memcpy(opts, saveopts, sizeof(opts));
+	    emulation = saveemulation;
+	    sticky = save_sticky;
+	} else if (isset(LOCALOPTIONS)) {
+	    /* restore all shell options except PRIVILEGED and RESTRICTED */
+	    saveopts[PRIVILEGED] = opts[PRIVILEGED];
+	    saveopts[RESTRICTED] = opts[RESTRICTED];
+	    memcpy(opts, saveopts, sizeof(opts));
+	    emulation = saveemulation;
+	} else {
+	    /* just restore a couple. */
+	    opts[XTRACE] = saveopts[XTRACE];
+	    opts[PRINTEXITVALUE] = saveopts[PRINTEXITVALUE];
+	    opts[LOCALOPTIONS] = saveopts[LOCALOPTIONS];
+	    opts[LOCALLOOPS] = saveopts[LOCALLOOPS];
+	}
+
+	if (opts[LOCALLOOPS]) {
+	    if (contflag)
+		zwarn("`continue' active at end of function scope");
+	    if (breaks)
+		zwarn("`break' active at end of function scope");
+	    breaks = obreaks;
+	    contflag = ocontflag;
+	    loops = oloops;
+	}
+
+	endtrapscope();
+
+	if (trap_state == TRAP_STATE_PRIMED)
+	    trap_return++;
+	ret = lastval;
+	if (noreturnval) {
+	    lastval = oldlastval;
+	    numpipestats = oldnumpipestats;
+	    memcpy(pipestats, oldpipestats, sizeof(int)*numpipestats);
+	}
+    } OLDHEAPS;
 
     unqueue_signals();
 
