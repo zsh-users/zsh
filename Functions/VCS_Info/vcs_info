@@ -11,6 +11,7 @@
 setopt localoptions noksharrays extendedglob NO_shwordsplit
 local file func sys
 local -a static_functions
+local -i maxexports
 
 static_functions=(
     VCS_INFO_adjust
@@ -38,6 +39,7 @@ for func in ${static_functions} ; do
 done
 
 [[ -n ${(Mk)parameters:#vcs_info_msg_<->_} ]] && unset ${parameters[(I)vcs_info_msg_<->_]}
+VCS_INFO_maxexports
 VCS_INFO_set --nvcs '-preinit-'
 vcs_info_setsys
 

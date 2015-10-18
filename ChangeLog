@@ -1,3 +1,8 @@
+2015-10-18  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 36888: Functions/VCS_Info/vcs_info: vcs_info: Prevent
+	warn_create_global warning with '-preinit-' state
+
 2015-10-15  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36864: Completion/Unix/Command/_nm,
