@@ -1,5 +1,8 @@
 2015-10-19  Oliver Kiddle  <opk@zsh.org>
 
+	* 36642: Eric Cook: Completion/Unix/Command/_zfs:
+	complete jail/unjail subcommands on freebsd
+
 	* 36646: Eric Cook: Completion/Unix/Type/_zfs_dataset,
 	Completion/Unix/Command/_zpool, Completion/Unix/Command/_zfs:
 	solaris/openzfs differences; only use -t share solaris

@@ -20,6 +20,8 @@ _zfs() {
 		"diff" "key" "help"
 	)
 
+  [[ $OSTYPE == freebsd<7->.* ]] && subcmds+=(jail unjail)
+
 	share_nfs_ro_properties=(
 		"share.nfs.all"
 	)
@@ -531,6 +533,12 @@ _zfs() {
 			'-c[Change the encryption key]' \
 			'-o[Change a property]:property:_zfs_keysource_props' \
 			':filesystem or volume:_zfs_dataset -t fs -t vol'
+		;;
+
+	("jail"|"unjail")
+		_arguments \
+			'1: : _jails' \
+			'2:filesystem:_zfs_dataset -t fs'
 		;;
 
 	("help")
