@@ -2,8 +2,10 @@
 # Synced with the S11U1 man page
 
 _zpool() {
-	local context state line expl
+	local context state line expl implementation
 	local -a subcmds fields ro_props rw_props versions create_properties_dataset
+
+	_pick_variant -r implementation -c 'zpool upgrade -v' openzfs='This system supports ZFS pool feature flags' solaris
 
 	subcmds=(
 		create destroy add remove list iostat status online

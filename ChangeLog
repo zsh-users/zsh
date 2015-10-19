@@ -1,5 +1,9 @@
 2015-10-19  Oliver Kiddle  <opk@zsh.org>
 
+	* 36646: Eric Cook: Completion/Unix/Type/_zfs_dataset,
+	Completion/Unix/Command/_zpool, Completion/Unix/Command/_zfs:
+	solaris/openzfs differences; only use -t share solaris
+
 	* 36889: Eric Cook: Completion/BSD/Command/_sockstat:
 	completion of system specific sockstat options
 

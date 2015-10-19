@@ -34,6 +34,8 @@ if [[ ${#rsrc} -gt 0 ]]; then
 		typearg=( -t snapshot )
 	elif [[ -n $words[(r)-p] ]]; then
 		typearg=( -t filesystem,volume )
+	elif [[ $implementation == openzfs ]]; then
+		typearg=( -t filesystem,snapshot,volume )
 	else
 		typearg=( -t filesystem,share,snapshot,volume )
 	fi
@@ -50,13 +52,13 @@ if [[ ${#rdst} -gt 0 ]]; then
 	else
 		# The parent dataset must be a filesystem, and can't rename
 		# a dataset into another pool.  Plus we hardcode the expl.
-		typearg=( -t fs -r ${${words[CURRENT - 1]}%%/*} )
+		typearg=( -t filesystem -r ${${words[CURRENT - 1]}%%/*} )
 		expl_type_arr=( -e "parent dataset" )
 	fi
 fi
 
 if [[ -n $type[(r)clone] ]]; then
-	datasetlist=( ${="$(zfs list -H -o name,origin -t fs | awk "\$2 != \"-\" {print \$1}")":#no cloned filesystems available} )
+	datasetlist=( ${="$(zfs list -H -o name,origin -t filesystem | awk "\$2 != \"-\" {print \$1}")":#no cloned filesystems available} )
 else
 	datasetlist=( ${="$(zfs list -H -o name $typearg)":#no datasets available} )
 fi

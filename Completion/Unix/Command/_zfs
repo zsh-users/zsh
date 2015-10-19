@@ -2,13 +2,15 @@
 # Synced with the S11U1 man page
 
 _zfs() {
-	local context state line expl
+	local context state line expl implementation
 	typeset -A opt_args
 	local -a subcmds rw_properties rw_propnames ro_properties create_properties
 	local -a share_nfs_ro_properties share_nfs_rw_properties
 	local -a share_smb_ro_properties share_nfs_rw_properties
 	local -a share_ro_properties share_rw_properties
 	local -a difffields delegatable_perms
+
+	_pick_variant -r implementation -c 'zpool upgrade -v' openzfs='This system supports ZFS pool feature flags' solaris
 
 	subcmds=(
 		"create" "destroy" "clone" "promote" "rename" "snapshot"
