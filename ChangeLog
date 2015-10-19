@@ -1,5 +1,8 @@
 2015-10-19  Oliver Kiddle  <opk@zsh.org>
 
+	* 36889: Eric Cook: Completion/BSD/Command/_sockstat:
+	completion of system specific sockstat options
+
 	* 36869: Matthew Martin: Completion/Unix/Command/_ssh: use
 	permissions to limit files completed for ssh identity files
 

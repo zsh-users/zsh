@@ -1,23 +1,35 @@
 #compdef sockstat
+local -a args
 
-local tmp_proto protocols proto
+case $OSTYPE in
+  *bsd*)
+    args=(
+      '-4[show AF_INET (IPv4) sockets]'
+      '-6[show AF_INET6 (IPv6) sockets]'
+      '-c[show connected sockets]'
+      '-l[show listening sockets]'
+      '*-p[specify port number]:port numbers (comma delimited)'
+      '-u[show AF_LOCAL (UNIX) sockets]'
+    )
+  ;|
+  freebsd*)
+    args+=(
+      '*-j[show sockets belonging to JID]: : _jails -0 -o jid'
+      '-L[exclude loopback]'
+      '*-P[specify protocol]: :_sequence -s , _ports'
+    )
+  ;;
+  netbsd*)
+    args+=(
+      '*-f[only show specified address family]:address family:(inet inet6 local unix)'
+      '-n[no symbolic names for addresses/ports]'
+    )
+  ;;
+esac
 
-tmp_proto=(${${(M)${(f)"$(</etc/protocols)"}##[a-z0-9]*}})
-for proto ($tmp_proto) {
-	case $proto in
-	*\#*)
-		protocols=($protocols ${${(j: :)${=proto}}// *\# /:})
-		;;
-	*)
-		protocols=($protocols ${${(j: :)${=proto}}// */})
-	esac
-}
+if (( $#args )); then
+  _arguments -s -w $args
+  return
+fi
 
-_arguments -s \
-	'-4[show AF_INET (IPv4) sockets]' \
-	'-6[show AF_INET6 (IPv6) sockets]' \
-	'-c[show connected sockets]' \
-	'-l[show listening sockets]' \
-	'-u[show AF_LOCAL (UNIX) sockets]' \
-	'-p[only show Internet sockets if the port number is on the specified list]' \
-	'-P[only show sockets of the specified protocols]:protocols:(($protocols))'
+_default
