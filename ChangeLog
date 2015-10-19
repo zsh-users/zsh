@@ -1,3 +1,8 @@
+2015-10-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 36869: Matthew Martin: Completion/Unix/Command/_ssh: use
+	permissions to limit files completed for ssh identity files
+
 2015-10-18  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 36888: Functions/VCS_Info/vcs_info: vcs_info: Prevent

@@ -18,7 +18,7 @@ _ssh () {
     # for protocol version 2, this can be a comma-separated list
     '-c+[select encryption cipher]:encryption cipher:(idea des 3des blowfish arcfour tss none)'
     '-F+[specify alternate config file]:config file:_files'
-    '*-i+[select identity file]:SSH identity file:_files'
+    '*-i+[select identity file]:SSH identity file:_files -g "*(-.^AR)"'
     '*-o+[specify extra options]:option string:->option'
   )
   common_transfer=(
