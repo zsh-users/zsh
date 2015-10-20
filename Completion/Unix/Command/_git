@@ -5487,12 +5487,21 @@ __git_signoff_file () {
 (( $+functions[__git_stashes] )) ||
 __git_stashes () {
   local expl
+  declare -a interleaved
   declare -a stashes
+  declare -a descriptions
 
-  stashes=(${(f)"$(_call_program stashes git stash list --pretty=format:%gd 2>/dev/null)"})
+  interleaved=(${(ps:\0:)"$(_call_program stashes git stash list -z --pretty='format:%gd%x00%s%x00\(%cr\)' 2>/dev/null)"})
   __git_command_successful $pipestatus || return 1
+  () {
+    local i j k
+    for i j k in $interleaved; do
+      stashes+=($i)
+      descriptions+=("$i: $j $k")
+    done
+  }
 
-  _wanted stashes expl stash compadd "$@" -a - stashes
+  _wanted stashes expl 'stash' compadd -Vx -d descriptions -a - stashes
 }
 
 (( $+functions[__git_svn_revisions] )) ||
