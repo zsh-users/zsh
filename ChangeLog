@@ -1,5 +1,7 @@
 2015-10-21  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Src/math.c: strdup should be ztrdup
+
 	* 36909: Src/hist.c: in getargs(), sanity-check the offsets for
 	start and end of the requested words, in case of overflow
 
