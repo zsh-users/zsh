@@ -145,6 +145,36 @@ function VCS_INFO_quilt() {
         unapplied=()
     fi
 
+    if [[ -n $patches ]]; then
+      () {
+        local i line
+        for ((i=1; i<=$#applied; i++)); do
+          if [[ -f "$patches/$applied[$i]" ]] &&
+             read -r line < "$patches/$applied[$i]" &&
+             [[ $line != (#b)(---|Index:)* ]] &&
+             true
+            ;
+          then
+            applied[$i]+=" $line"
+          else
+            applied[$i]+=" ?"
+          fi
+        done
+        for ((i=1; i<=$#unapplied; i++)); do
+          if [[ -f "$patches/$unapplied[$i]" ]] &&
+             read -r line < "$patches/$unapplied[$i]" &&
+             [[ $line != (#b)(---|Index:)* ]] &&
+             true
+            ;
+          then
+            unapplied[$i]+=" $line"
+          else
+            unapplied[$i]+=" ?"
+          fi
+        done
+      }
+    fi
+
     all=( ${(Oa)applied} ${unapplied} )
 
     if VCS_INFO_hook 'gen-applied-string' "${applied[@]}"; then

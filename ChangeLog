@@ -1,5 +1,8 @@
 2015-10-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 36913 + 36945: Functions/VCS_Info/VCS_INFO_quilt: vcs_info quilt:
+	Pass patch subject lines to gen-applied-string
+
 	* 36912: Functions/VCS_Info/VCS_INFO_quilt: vcs_info quilt:
 	Tolerate being in child of .pc's parent
 
