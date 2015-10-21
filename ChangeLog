@@ -1,3 +1,8 @@
+2015-10-21  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36871: Functions/Zle/bracketed-paste-magic: move initial call
+	to "zle .bracketed-paste-magic" to occur earlier in the function
+
 2015-10-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 36900: Completion/Unix/Command/_git: _git: stash names

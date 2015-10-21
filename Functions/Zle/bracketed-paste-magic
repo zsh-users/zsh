@@ -116,10 +116,14 @@ quote-paste() {
 # Now the actual function
 
 bracketed-paste-magic() {
-    # Fast exit in the vi-mode cut-buffer context
     if [[ "$LASTWIDGET" = *vi-set-buffer ]]; then
+	# Fast exit in the vi-mode cut-buffer context
 	zle .bracketed-paste
 	return
+    else
+	# Capture the pasted text in $PASTED
+	local PASTED
+	zle .bracketed-paste PASTED
     fi
 
     # Really necessary to go to this much effort?
@@ -127,10 +131,9 @@ bracketed-paste-magic() {
 
     emulate -L zsh
     local -a bpm_hooks bpm_inactive
-    local PASTED bpm_func bpm_active bpm_keymap=$KEYMAP
+    local bpm_func bpm_active bpm_keymap=$KEYMAP
 
-    # Set PASTED and run the paste-init functions
-    zle .bracketed-paste PASTED
+    # Run the paste-init functions
     if zstyle -a :bracketed-paste-magic paste-init bpm_hooks; then
 	for bpm_func in $bpm_hooks; do
 	    if (( $+functions[$bpm_func] )); then
