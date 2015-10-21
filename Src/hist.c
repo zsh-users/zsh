@@ -2254,7 +2254,7 @@ static char *
 getargs(Histent elist, int arg1, int arg2)
 {
     short *words = elist->words;
-    int pos1, nwords = elist->nwords;
+    int pos1, pos2, nwords = elist->nwords;
 
     if (arg2 < arg1 || arg1 >= nwords || arg2 >= nwords) {
 	/* remember, argN is indexed from 0, nwords is total no. of words */
@@ -2263,8 +2263,22 @@ getargs(Histent elist, int arg1, int arg2)
 	return NULL;
     }
 
+    /* optimization for accessing entire history event */
+    if (arg1 == 0 && arg2 == nwords - 1)
+	return dupstring(elist->node.nam);
+
     pos1 = words[2*arg1];
-    return dupstrpfx(elist->node.nam + pos1, words[2*arg2+1] - pos1);
+    pos2 = words[2*arg2+1];
+
+    /* a word has to be at least one character long, so if the position
+     * of a word is less than its index, we've overflowed our signed
+     * short integer word range and the recorded position is garbage. */
+    if (pos1 < 0 || pos1 < arg1 || pos2 < 0 || pos2 < arg2) {
+	herrflush();
+	zerr("history event too long, can't index requested words");
+	return NULL;
+    }
+    return dupstrpfx(elist->node.nam + pos1, pos2 - pos1);
 }
 
 /**/

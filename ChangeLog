@@ -1,5 +1,8 @@
 2015-10-21  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 36909: Src/hist.c: in getargs(), sanity-check the offsets for
+	start and end of the requested words, in case of overflow
+
 	* 36871: Functions/Zle/bracketed-paste-magic: move initial call
 	to "zle .bracketed-paste-magic" to occur earlier in the function
 
