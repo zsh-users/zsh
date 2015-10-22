@@ -1332,7 +1332,7 @@ otherwise would be something like `svn' or `cvs') will be set to
 identifier is the second element. tt(vcs_info) will have filled in a proper
 value for the "repository's" root directory and the string containing the
 information about quilt's state will be available as the `misc' replacement
-(and tt(%Q) for compatibility with `addon' mode.
+(and tt(%Q) for compatibility with `addon' mode).
 
 What is left to discuss is how `standalone' mode is detected. The detection
 itself is a series of searches for directories. You can have this detection
