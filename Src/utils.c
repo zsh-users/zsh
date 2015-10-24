@@ -1901,7 +1901,7 @@ redup(int x, int y)
  * it will not be closed automatically or by normal shell syntax.
  *
  * FDT_MODULE: as FDT_EXTERNAL, but it can only be closed by the module
- * (which should included zclose() as part of the sequence, not by
+ * (which should included zclose() as part of the sequence), not by
  * the standard shell syntax for closing file descriptors.
  *
  * FDT_INTERNAL: fd is treated like others created by the shell for
