@@ -1,5 +1,8 @@
 2015-10-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Completion/Unix/Command/_beep: _beep completion:
+	Actually hook it for the 'beep' command.
+
 	* 36913 + 36945: Functions/VCS_Info/VCS_INFO_quilt: vcs_info quilt:
 	Pass patch subject lines to gen-applied-string
 
