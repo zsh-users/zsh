@@ -406,25 +406,32 @@ enum {
  */
 #define FDT_EXTERNAL		2
 /*
+ * Entry visible to other processes but controlled by a module.
+ * The difference from FDT_EXTERNAL is that closing this using
+ * standard fd syntax will fail as there is some tidying up that
+ * needs to be done by the module's own mechanism.
+ */
+#define FDT_MODULE		3
+/*
  * Entry used by output from the XTRACE option.
  */
-#define FDT_XTRACE		3
+#define FDT_XTRACE		4
 /*
  * Entry used for file locking.
  */
-#define FDT_FLOCK		4
+#define FDT_FLOCK		5
 /*
  * As above, but the fd is not marked for closing on exec,
  * so the shell can still exec the last process.
  */
-#define FDT_FLOCK_EXEC		5
+#define FDT_FLOCK_EXEC		6
 #ifdef PATH_DEV_FD
 /*
  * Entry used by a process substition.
  * This marker is not tested internally as we associated the file
  * descriptor with a job for closing.
  */
-#define FDT_PROC_SUBST		6
+#define FDT_PROC_SUBST		7
 #endif
 
 /* Flags for input stack */

@@ -236,6 +236,8 @@ tcp_socket(int domain, int type, int protocol, int ztflags)
     if (!sess) return NULL;
 
     sess->fd = socket(domain, type, protocol);
+    /* We'll check failure and tidy up in caller */
+    addmodulefd(sess->fd, FALSE);
     return sess;
 }
 
@@ -298,7 +300,7 @@ tcp_close(Tcp_session sess)
     {  
 	if (sess->fd != -1)
 	{
-	    err = close(sess->fd);
+	    err = zclose(sess->fd);
 	    if (err)
 		zwarn("connection close failed: %e", errno);
 	}
@@ -545,6 +547,9 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    tcp_close(sess);
 	    return 1;
 	}
+
+	/* redup expects fd is already registered */
+	addmodulefd(rfd, FALSE);
 
 	if (targetfd) {
 	    sess->fd = redup(rfd, targetfd);
