@@ -1,4 +1,4 @@
-#compdef _beep
+#compdef beep
 
 # beep  [--verbose | --debug] [-e device | --device device] [-f N] [-l N]
 #       [-r N] [-d N] [-D N] [-s] [-c]

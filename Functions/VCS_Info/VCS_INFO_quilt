@@ -119,6 +119,7 @@ function VCS_INFO_quilt() {
             applied=()
         fi
         patches=$(<$pc/.quilt_patches)
+        patches=`builtin cd -q "${pc:h}" && print -r - ${patches:A}`
     fi
     if zstyle -t "${context}" get-unapplied; then
         # This zstyle call needs to be moved further up if `quilt' needs
@@ -142,6 +143,36 @@ function VCS_INFO_quilt() {
         unapplied=( ${unapplied:#} )
     else
         unapplied=()
+    fi
+
+    if [[ -n $patches ]]; then
+      () {
+        local i line
+        for ((i=1; i<=$#applied; i++)); do
+          if [[ -f "$patches/$applied[$i]" ]] &&
+             read -r line < "$patches/$applied[$i]" &&
+             [[ $line != (#b)(---|Index:)* ]] &&
+             true
+            ;
+          then
+            applied[$i]+=" $line"
+          else
+            applied[$i]+=" ?"
+          fi
+        done
+        for ((i=1; i<=$#unapplied; i++)); do
+          if [[ -f "$patches/$unapplied[$i]" ]] &&
+             read -r line < "$patches/$unapplied[$i]" &&
+             [[ $line != (#b)(---|Index:)* ]] &&
+             true
+            ;
+          then
+            unapplied[$i]+=" $line"
+          else
+            unapplied[$i]+=" ?"
+          fi
+        done
+      }
     fi
 
     all=( ${(Oa)applied} ${unapplied} )
