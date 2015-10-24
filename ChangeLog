@@ -1,3 +1,8 @@
+2015-10-24  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36943 (with updated comment): Src/mem.c: restore scan for
+	reclaimable blocks in freeheap() [had been removed by 36834]
+
 2015-10-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Src/utils.c: small typo.

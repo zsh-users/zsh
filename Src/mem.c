@@ -340,9 +340,15 @@ freeheap(void)
      * and performance goes to hell.
      *
      * Therefore, we defer freeing the most recently allocated arena until
-     * we reach popheap().  This may fail to reclaim some space in earlier
-     * arenas.
+     * we reach popheap().
      *
+     * However, if the arena to which fheap points is unused, we want to
+     * reclaim space in earlier arenas, so we have no choice but to do the
+     * sweep for a new fheap.
+     */
+    if (fheap && !fheap->sp)
+       fheap = NULL;   /* We used to do this unconditionally */
+    /*
      * In other cases, either fheap is already correct, or it has never
      * been set and this loop will do it, or it'll be reset from scratch
      * on the next popheap().  So all that's needed here is to pick up
