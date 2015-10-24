@@ -1905,7 +1905,7 @@ redup(int x, int y)
  * the standard shell syntax for closing file descriptors.
  *
  * FDT_INTERNAL: fd is treated like others created by the shell for
- * internall use; it can be closed and will be closed by the shell if it
+ * internal use; it can be closed and will be closed by the shell if it
  * exec's or performs an exec with a fork optimised out.
  *
  * Safe if fd is -1 to indicate failure.

@@ -1,5 +1,7 @@
 2015-10-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Src/utils.c: small typo.
+
 	* 36944: Src/utils.c, Src/Modules/tcp.c, Src/Modules/socket.c:
 	extend the previous to zsocket, although this needs to allow the
 	fd to be closed explicitly.
