@@ -28,6 +28,11 @@ will be taken as the target file descriptor for the
 connection.
 
 In order to elicit more verbose output, use tt(-v).
+
+File descriptors can be closed with normal shell syntax when no longer
+needed, for example:
+
+example(exec {REPLY}>&-)
 )
 enditem()
 

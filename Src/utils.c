@@ -1894,24 +1894,29 @@ redup(int x, int y)
 /*
  * Add an fd opened ithin a module.
  *
- * If is_internal is FALSE, the fd can be used within the shell for
- * normal I/O but it will not be closed automatically or by normal shell
- * syntax; it can only be closed by the module (which should included
- * zclose() as part of the sequence).
+ * fdt is the type of the fd; see the FDT_ definitions in zsh.h.
+ * The most likely falures are:
  *
- * If is_internal is TRUE the fd is treated like others created by the
- * shell for internall use; it can be closed and will be closed by the
- * shell if it exec's or performs an exec with a fork optimised out.
- *.
+ * FDT_EXTERNAL: the fd can be used within the shell for normal I/O but
+ * it will not be closed automatically or by normal shell syntax.
+ *
+ * FDT_MODULE: as FDT_EXTERNAL, but it can only be closed by the module
+ * (which should included zclose() as part of the sequence, not by
+ * the standard shell syntax for closing file descriptors.
+ *
+ * FDT_INTERNAL: fd is treated like others created by the shell for
+ * internall use; it can be closed and will be closed by the shell if it
+ * exec's or performs an exec with a fork optimised out.
+ *
  * Safe if fd is -1 to indicate failure.
  */
 /**/
 mod_export void
-addmodulefd(int fd, bool is_internal)
+addmodulefd(int fd, int fdt)
 {
     if (fd >= 0) {
 	check_fd_table(fd);
-	fdtable[fd] = is_internal ? FDT_INTERNAL : FDT_MODULE;
+	fdtable[fd] = fdt;
     }
 }
 

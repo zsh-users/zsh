@@ -1,5 +1,9 @@
 2015-10-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 36944: Src/utils.c, Src/Modules/tcp.c, Src/Modules/socket.c:
+	extend the previous to zsocket, although this needs to allow the
+	fd to be closed explicitly.
+
 	* 36941: Src/utils.c, Src/zsh.h, Src/Modules/tcp.c: ensure shell
 	knows about file descriptiors used by ztcp and allow such file
 	descriptors to be marked as internal if needed (not yet used).

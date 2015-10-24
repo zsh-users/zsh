@@ -237,7 +237,7 @@ tcp_socket(int domain, int type, int protocol, int ztflags)
 
     sess->fd = socket(domain, type, protocol);
     /* We'll check failure and tidy up in caller */
-    addmodulefd(sess->fd, FALSE);
+    addmodulefd(sess->fd, FDT_MODULE);
     return sess;
 }
 
@@ -549,7 +549,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	}
 
 	/* redup expects fd is already registered */
-	addmodulefd(rfd, FALSE);
+	addmodulefd(rfd, FDT_MODULE);
 
 	if (targetfd) {
 	    sess->fd = redup(rfd, targetfd);
