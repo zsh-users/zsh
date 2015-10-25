@@ -5695,13 +5695,14 @@ __git_recent_commits () {
       else
         label="[HEAD~$distance_from_head]"
       fi
+      descr+=("@~${distance_from_head}":"${label} $k") # CROSSREF: use the same label as below
 
       # Prepare for the next first-parent-ancestry commit.
       (( ++distance_from_head ))
       next_first_parent_ancestral_line_commit=${parents%% *}
     fi
     # label is now 9 bytes, so the descriptions ($k) will be aligned.
-    descr+=($i:"${label} $k")
+    descr+=($i:"${label} $k") # CROSSREF: use the same label as above
 
     j=${${j# \(}%\)} # strip leading ' (' and trailing ')'
     j=${j/ ->/,}  # Convert " -> master, origin/master".

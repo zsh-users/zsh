@@ -1,5 +1,8 @@
 2015-10-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 36959: Completion/Unix/Command/_git: _git: Offer @~$n as
+	completion of recent commits.
+
 	* 36958: Completion/Unix/Command/_git: _git: Fix recent commit
 	completion descriptions.
 
