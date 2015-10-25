@@ -1,5 +1,8 @@
 2015-10-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 36964: Completion/Unix/Command/_git: _git: Complete remotes
+	branch names with slashes correctly.
+
 	* 36960: Completion/Unix/Command/_git: _git: Enable slash matcher
 	for more branch and tag completions, include 'git branch <TAB>'
 	and 'git tag <TAB>'.
