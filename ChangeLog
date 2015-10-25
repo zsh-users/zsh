@@ -1,3 +1,8 @@
+2015-10-25  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 36911: Src/Zle/computil.c: '-optarg' should not match
+	optspec '-opt='
+
 2015-10-24  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36943 (with updated comment): Src/mem.c: restore scan for
