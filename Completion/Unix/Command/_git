@@ -5540,7 +5540,7 @@ __git_branch_names () {
   branch_names=(${${(f)"$(_call_program branchrefs git for-each-ref --format='"%(refname)"' refs/heads 2>/dev/null)"}#refs/heads/})
   __git_command_successful $pipestatus || return 1
 
-  _wanted branch-names expl branch-name compadd "$@" -a - branch_names
+  _wanted branch-names expl branch-name compadd -M 'r:|/=**' "$@" -a - branch_names
 }
 
 (( $+functions[__git_remote_branch_names] )) ||
@@ -5848,7 +5848,7 @@ __git_tags () {
   tags=(${${(f)"$(_call_program tagrefs git for-each-ref --format='"%(refname)"' refs/tags 2>/dev/null)"}#refs/tags/})
   __git_command_successful $pipestatus || return 1
 
-  _wanted tags expl tag compadd "$@" -a - tags
+  _wanted tags expl tag compadd -M 'r:|/=**' "$@" -a - tags
 }
 
 (( $+functions[__git_commit_tags] )) ||
@@ -5871,7 +5871,7 @@ __git_tags_of_type () {
   tags=(${${(M)${(f)"$(_call_program $type-tag-refs "git for-each-ref --format='%(*objecttype)%(objecttype) %(refname)' refs/tags 2>/dev/null")"}:#$type(tag|) *}#$type(tag|) refs/tags/})
   __git_command_successful $pipestatus || return 1
 
-  _wanted $type-tags expl "$type tag" compadd "$@" -a - tags
+  _wanted $type-tags expl "$type tag" compadd -M 'r:|/=**' "$@" -a - tags
 }
 
 # Reference Argument Types
