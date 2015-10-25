@@ -1,5 +1,8 @@
 2015-10-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 36962: Completion/Unix/Command/_git: _git: Fix completion of
+	RHS of refspecs.
+
 	* 36964: Completion/Unix/Command/_git: _git: Complete remotes
 	branch names with slashes correctly.
 

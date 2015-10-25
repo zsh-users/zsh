@@ -5313,7 +5313,8 @@ __git_remotes () {
 __git_ref_specs () {
   # TODO: This needs to deal with a lot more types of things.
   if compset -P '*:'; then
-    __git_heads
+    # TODO: have the caller supply the correct remote name, restrict to refs/remotes/${that_remote}/* only
+    __git_remote_branch_names_noprefix
   else
     compset -P '+'
     if compset -S ':*'; then
