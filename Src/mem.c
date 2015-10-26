@@ -79,9 +79,16 @@
 
 #include <sys/mman.h>
 
+#if 0
+/*
+ * This change was designed to enable use of memory mapping on MacOS.
+ * However, performance tests indicate that MacOS mapped regions are
+ * significantly slower to allocate than memory from malloc().
+ */
 #if defined(MAP_ANON) && !defined(MAP_ANONYMOUS)
 #define MAP_ANONYMOUS MAP_ANON
 #endif
+#endif /* 0 */
 
 #if defined(MAP_ANONYMOUS) && defined(MAP_PRIVATE)
 

@@ -1,3 +1,7 @@
+2015-10-26  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36956: Src/mem.c: revert 34451, mmap() is too slow on MacOS
+
 2015-10-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* users/20825: Src/Zle/zle_utils.c: get_undo_current_change()
