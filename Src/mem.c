@@ -1668,8 +1668,13 @@ realloc(MALLOC_RET_T p, MALLOC_ARG_T size)
     int i, l = 0;
 
     /* some system..., see above */
-    if (!p && size)
-	return (MALLOC_RET_T) malloc(size);
+    if (!p && size) {
+	queue_signals();
+	r = malloc(size);
+	unqueue_signals();
+	return (MALLOC_RET_T) r;
+    }
+
     /* and some systems even do this... */
     if (!p || !size)
 	return (MALLOC_RET_T) p;

@@ -1,5 +1,8 @@
 2015-10-26  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 36906: Kamil Dudka <kdudka@redhat.com>: Src/mem.c:
+	quite_signals() in ZSH_MEM realloc()
+
 	* 36968: Src/Modules/db_gdbm.c: use addmodulefd() to tell the
 	shell about the descriptor of the dbm file
 
