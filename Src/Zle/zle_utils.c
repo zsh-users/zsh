@@ -1739,9 +1739,26 @@ zlecallhook(char *name, char *arg)
 zlong
 get_undo_current_change(UNUSED(Param pm))
 {
+    int remetafy;
+
+    /*
+     * Yuk: we call this from within the completion system,
+     * so we need to convert back to the form which can be
+     * copied into undo entries.
+     */
+    if (zlemetaline != NULL) {
+	unmetafy_line();
+	remetafy = 1;
+    } else
+	remetafy = 0;
+
     /* add entry for any pending changes */
     mkundoent();
     setlastline();
+
+    if (remetafy)
+	metafy_line();
+
     return undo_changeno;
 }
 
