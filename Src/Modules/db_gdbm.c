@@ -106,7 +106,9 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
     }
 
     dbf = gdbm_open(resource_name, 0, read_write, 0666, 0);
-    if(!dbf) {
+    if(dbf)
+	addmodulefd(gdbm_fdesc(dbf), FDT_INTERNAL);
+    else {
 	zwarnnam(nam, "error opening database file %s", resource_name);
 	return 1;
     }
@@ -114,6 +116,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
     if (!(tied_param = createspecialhash(pmname, &getgdbmnode, &scangdbmkeys,
 					 pmflags))) {
         zwarnnam(nam, "cannot create the requested parameter %s", pmname);
+	fdtable[gdbm_fdesc(dbf)] = FDT_UNUSED;
 	gdbm_close(dbf);
 	return 1;
     }
@@ -319,8 +322,10 @@ gdbmuntie(Param pm)
     GDBM_FILE dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
     HashTable ht = pm->u.hash;
 
-    if (dbf) /* paranoia */
+    if (dbf) { /* paranoia */
+	fdtable[gdbm_fdesc(dbf)] = FDT_UNUSED;
 	gdbm_close(dbf);
+    }
 
     ht->tmpdata = NULL;
 
