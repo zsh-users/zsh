@@ -530,7 +530,7 @@ empty_eprog(Eprog p)
 }
 
 static void
-clear_hdocs()
+clear_hdocs(void)
 {
     struct heredocs *p, *n;
 

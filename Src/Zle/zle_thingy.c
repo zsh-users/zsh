@@ -626,7 +626,7 @@ bin_zle_complete(char *name, char **args, UNUSED(Options ops), UNUSED(char func)
 
 /**/
 static int
-zle_usable()
+zle_usable(void)
 {
     return zleactive && !incompctlfunc && !incompfunc
 #if 0

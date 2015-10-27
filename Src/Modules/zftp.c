@@ -409,7 +409,7 @@ zfalarm(int tmout)
 
 /**/
 static void
-zfpipe()
+zfpipe(void)
 {
     /* Just ignore SIGPIPE and rely on getting EPIPE from the write. */
     signal(SIGPIPE, SIG_IGN);
@@ -450,7 +450,7 @@ zfunalarm(void)
 
 /**/
 static void
-zfunpipe()
+zfunpipe(void)
 {
     if (sigtrapped[SIGPIPE]) {
 	if (siglists[SIGPIPE] || (sigtrapped[SIGPIPE] & ZSIG_FUNC))
@@ -1298,7 +1298,7 @@ zfstarttrans(char *nam, int recv, off_t sz)
 
 /**/
 static void
-zfendtrans()
+zfendtrans(void)
 {
     zfunsetparam("ZFTP_SIZE");
     zfunsetparam("ZFTP_FILE");
@@ -2834,7 +2834,7 @@ newsession(char *nm)
 /* Save the existing session: this just means saving the parameters. */
 
 static void
-savesession()
+savesession(void)
 {
     char **ps, **pd, *val;
 

@@ -499,7 +499,7 @@ filecol(char *col)
  */
 
 static void
-getcols()
+getcols(void)
 {
     char *s;
     int i, l;
@@ -602,7 +602,7 @@ zcoff(void)
 
 
 static void
-initiscol()
+initiscol(void)
 {
     int i;
 
@@ -1909,7 +1909,7 @@ singlecalc(int *cp, int l, int *lcp)
 }
 
 static void
-singledraw()
+singledraw(void)
 {
     Cmgroup g;
     int mc1, mc2, ml1, ml2, md1, md2, mcc1, mcc2, lc1, lc2, t1, t2;

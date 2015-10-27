@@ -185,7 +185,7 @@ cd_group(int maxg)
  * descriptions. */
 
 static void
-cd_calc()
+cd_calc(void)
 {
     Cdset set;
     Cdstr str;
@@ -236,7 +236,7 @@ cd_sort(const void *a, const void *b)
 }
 
 static int
-cd_prep()
+cd_prep(void)
 {
     Cdrun run, *runp;
     Cdset set;
