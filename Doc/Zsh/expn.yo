@@ -2192,6 +2192,16 @@ inclusive.  The form tt(LPAR()#c)var(N)tt(RPAR()) requires exactly tt(N)
 matches; tt(LPAR()#c,)var(M)tt(RPAR()) is equivalent to specifying var(N)
 as 0; tt(LPAR()#c)var(N)tt(,RPAR()) specifies that there is no maximum
 limit on the number of matches.
+
+Note that if the previous group of characters contains wildcards,
+results can be unpredictable to the point of being logically incorrect.
+It is recommended that the pattern be trimmed to match the minimum
+possible.  For example, to match a string of the form `tt(1_2_3_)', use
+a pattern of the form `tt(LPAR()[[:digit:]]##_+RPAR()LPAR()#c3+RPAR())', not
+`tt(LPAR()*_+RPAR()LPAR()#c3+RPAR())'.  This arises from the
+complicated interaction between attempts to match a number of
+repetitions of the whole pattern and attempts to match the wildcard
+`tt(*)'.
 )
 vindex(MATCH)
 vindex(MBEGIN)

@@ -1,5 +1,8 @@
 2015-10-27  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 36977: Doc/Zsh/expn.yo: note about complications of pattern
+	repetitions (#cN).
+
 	* 36974: Src/Modules/zftp.c, Src/Zle/complist.c,
 	Src/Zle/computil.c, Src/Zle/zle_thingy.c, Src/parse.c: fix empty
 	argument lists.
