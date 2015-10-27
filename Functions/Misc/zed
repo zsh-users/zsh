@@ -69,10 +69,10 @@ fi
 setopt localoptions nobanghist
 
 if ((fun)) then
-  var="$(functions $expand $1)"
+  var="$(functions $expand -- $1)"
   # If function is undefined but autoloadable, load it
   if [[ $var = *\#\ undefined* ]] then
-    var="$(autoload +X $1; functions $1)"
+    var="$(autoload +X $1; functions -- $1)"
   elif [[ -z $var ]] then
     var="$1() {
 }"
