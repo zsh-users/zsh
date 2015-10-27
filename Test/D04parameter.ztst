@@ -1735,3 +1735,12 @@
 0:History modifier works the same for scalar and array substitution
 >ddd bdb cdc
 >ddd bdb cdc
+
+ a=1_2_3_4_5_6
+ print ${a#(*_)(#c2)}
+ print ${a#(*_)(#c5)}
+ print ${a#(*_)(#c7)}
+0:Complicated backtracking with match counts
+>3_4_5_6
+>6
+>1_2_3_4_5_6

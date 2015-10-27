@@ -1,5 +1,9 @@
 2015-10-27  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 36982: Doc/Zsh/expn.yo, Src/pattern.c, Test/D02glob.ztst,
+	Test/D04parameter.ztst: fix actual bug with (#cN) and back off
+	previous change.
+
 	* 36977: Doc/Zsh/expn.yo: note about complications of pattern
 	repetitions (#cN).
 

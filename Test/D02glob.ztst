@@ -574,3 +574,11 @@
 0:Optimisation to squeeze multiple *'s used as ordinary glob wildcards.
 >glob.tmp/ra=1.0_et=3.5
 >glob.tmp/ra=1.0_et=3.5
+
+  [[ 1_2_ = (*_)(#c1) ]] && print 1 OK  # because * matches 1_2
+  [[ 1_2_ = (*_)(#c2) ]] && print 2 OK
+  [[ 1_2_ = (*_)(#c3) ]] || print 3 OK
+0:Some more complicated backtracking with match counts.
+>1 OK
+>2 OK
+>3 OK

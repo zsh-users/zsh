@@ -3376,6 +3376,7 @@ patmatch(Upat prog)
 		    scan[P_CT_CURRENT].l = cur + 1;
 		    if (patmatch(scan + P_CT_OPERAND))
 			return 1;
+		    scan[P_CT_CURRENT].l = cur;
 		    patinput = patinput_thistime;
 		}
 		if (cur < min)
