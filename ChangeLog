@@ -1,3 +1,9 @@
+2015-10-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 36994: Functions/Zle/bracketed-paste-magic: declare local REPLY
+	for use with "zle .read-command"; use .self-insert instead of
+	.self-insert-unmeta
+
 2015-10-27  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36982: Doc/Zsh/expn.yo, Src/pattern.c, Test/D02glob.ztst,

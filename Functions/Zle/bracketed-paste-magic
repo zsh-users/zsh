@@ -122,7 +122,7 @@ bracketed-paste-magic() {
 	return
     else
 	# Capture the pasted text in $PASTED
-	local PASTED
+	local PASTED REPLY
 	zle .bracketed-paste PASTED
     fi
 
@@ -170,14 +170,14 @@ bracketed-paste-magic() {
 	while [[ -n $PASTED ]] && zle .read-command; do
 	    PASTED=${PASTED#$KEYS}
 	    if [[ $KEYS = ${(~j:|:)${(b)bpm_inactive}} ]]; then
-		zle .self-insert-unmeta
+		zle .self-insert
 	    else
 		case $REPLY in
 		    (${~bpm_active}) function () {
 			emulate -L $bpm_emulate; set -$bpm_opts
 			zle $REPLY
 		    };;
-		    (*) zle .self-insert-unmeta;;
+		    (*) zle .self-insert;;
 		esac
 	    fi
 	done
