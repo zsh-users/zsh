@@ -1,3 +1,8 @@
+2015-10-29  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 36983 (with fix from 36990): Completion/Unix/Command/_head,
+	Completion/Unix/Command/_tail: new completions for head and tail
+
 2015-10-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 36994: Functions/Zle/bracketed-paste-magic: declare local REPLY
