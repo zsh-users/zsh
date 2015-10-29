@@ -2695,6 +2695,37 @@ gethkparam(char *s)
 }
 
 /**/
+static void
+check_warn_create(Param pm, const char *pmtype)
+{
+    Funcstack i;
+    const char *name;
+
+    if (pm->level != 0)
+	return;
+
+    name = NULL;
+    for (i = funcstack; i; i = i->prev) {
+	if (i->tp == FS_FUNC) {
+	    DPUTS(!i->name, "funcstack entry with no name");
+	    name = i->name;
+	    break;
+	}
+    }
+
+    if (name)
+    {
+	zwarn("%s parameter %s created globally in function %s",
+	      pmtype, pm->node.nam, name);
+    }
+    else
+    {
+	zwarn("%s parameter %s created globally in function",
+	      pmtype, pm->node.nam);
+    }
+}
+
+/**/
 mod_export Param
 assignsparam(char *s, char *val, int flags)
 {
@@ -2747,9 +2778,8 @@ assignsparam(char *s, char *val, int flags)
 	zsfree(val);
 	return NULL;
     }
-    if ((flags & ASSPM_WARN_CREATE) && v->pm->level == 0)
-	zwarn("scalar parameter %s created globally in function",
-	      v->pm->node.nam);
+    if (flags & ASSPM_WARN_CREATE)
+	check_warn_create(v->pm, "scalar");
     if (flags & ASSPM_AUGMENT) {
 	if (v->start == 0 && v->end == -1) {
 	    switch (PM_TYPE(v->pm->node.flags)) {
@@ -2898,9 +2928,8 @@ assignaparam(char *s, char **val, int flags)
 	    return NULL;
 	}
 
-    if ((flags & ASSPM_WARN_CREATE) && v->pm->level == 0)
-	zwarn("array parameter %s created globally in function",
-	      v->pm->node.nam);
+    if (flags & ASSPM_WARN_CREATE)
+	check_warn_create(v->pm, "array");
     if (flags & ASSPM_AUGMENT) {
     	if (v->start == 0 && v->end == -1) {
 	    if (PM_TYPE(v->pm->node.flags) & PM_ARRAY) {
@@ -2958,9 +2987,8 @@ sethparam(char *s, char **val)
     queue_signals();
     if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING))) {
 	createparam(t, PM_HASHED);
-	if (isset(WARNCREATEGLOBAL) && locallevel > 0 && v->pm->level == 0)
-	    zwarn("associative array parameter %s created globally in function",
-		  v->pm->node.nam);
+	if (isset(WARNCREATEGLOBAL) && locallevel > 0)
+	    check_warn_create(v->pm, "associative array");
     } else if (!(PM_TYPE(v->pm->node.flags) & PM_HASHED) &&
 	     !(v->pm->node.flags & PM_SPECIAL)) {
 	unsetparam(t);
@@ -3032,10 +3060,8 @@ setnparam(char *s, mnumber val)
 	}
 	v = getvalue(&vbuf, &t, 1);
 	DPUTS(!v, "BUG: value not found for new parameter");
-	if (!was_unset && isset(WARNCREATEGLOBAL) && locallevel > 0 &&
-	    v->pm->level == 0)
-	    zwarn("numeric parameter %s created globally in function",
-		  v->pm->node.nam);
+	if (!was_unset && isset(WARNCREATEGLOBAL) && locallevel > 0)
+	    check_warn_create(v->pm, "numeric parameter");
     }
     setnumvalue(v, val);
     unqueue_signals();

@@ -1,5 +1,8 @@
 2015-10-29  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 37018: Src/math.c, Src/params.c, Test/E01options.ztst: make
+	WARNCREATEGLOBAL consistent in all cases, outputting file name.
+
 	* unposted: .giignore: ignore .orig files.
 
 	* 37014: Functions/MIME/zsh-mime-setup,

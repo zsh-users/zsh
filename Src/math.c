@@ -893,25 +893,6 @@ getcvar(char *s)
     return mn;
 }
 
-
-/* If script execution is inside a function call that hasn't returned,
- * return the name of that function.  Else return NULL.
- */
-
-/**/
-static const char *
-in_function_call(void)
-{
-    Funcstack i;
-    for (i = funcstack; i; i = i->prev)
-	if (i->tp == FS_FUNC) {
-	    DPUTS(!i->name, "funcstack entry with no name");
-	    return i->name;
-	}
-
-    return NULL;
-}
-
 /**/
 static mnumber
 setmathvar(struct mathvalue *mvp, mnumber v)
@@ -947,13 +928,6 @@ setmathvar(struct mathvalue *mvp, mnumber v)
     if (noeval)
 	return v;
     untokenize(mvp->lval);
-    if (isset(WARNCREATEGLOBAL)) {
-	const char *function_name;
-	if (!paramtab->getnode(paramtab, mvp->lval) &&
-	    (function_name = in_function_call()))
-	    zwarn("math parameter %s created globally in function %s",
-		  mvp->lval, function_name);
-    }
     pm = setnparam(mvp->lval, v);
     if (pm) {
 	/*
