@@ -1,5 +1,7 @@
 2015-10-29  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: .giignore: ignore .orig files.
+
 	* 37014: Functions/MIME/zsh-mime-setup,
 	Functions/Misc/add-zsh-hook, Src/Modules/socket.c,
 	Src/Modules/tcp.c, Src/Modules/zpty.c, Src/builtin.c,
