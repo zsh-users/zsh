@@ -3,6 +3,7 @@ tags
 TAGS
 *.o
 *.o.c
+*.orig
 *.a
 *.so
 *.dll
