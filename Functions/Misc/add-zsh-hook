@@ -82,9 +82,11 @@ if (( del )); then
 else
   if (( ${(P)+hook} )); then
     if (( ${${(P)hook}[(I)$fn]} == 0 )); then
+      typeset -ga $hook
       set -A $hook ${(P)hook} $fn
     fi
   else
+    typeset -ga $hook
     set -A $hook $fn
   fi
   autoload $autoopts -- $fn

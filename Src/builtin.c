@@ -2090,7 +2090,9 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 			tc = 0;	/* but don't do a normal conversion */
 		    }
 		} else if (!setsecondstype(pm, on, off)) {
-		    if (asg->value.scalar && !(pm = setsparam(pname, ztrdup(asg->value.scalar))))
+		    if (asg->value.scalar &&
+			!(pm = assignsparam(
+			      pname, ztrdup(asg->value.scalar), 0)))
 			return NULL;
 		    usepm = 1;
 		    err = 0;
@@ -2202,12 +2204,13 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    } else if (pm->env && !(pm->node.flags & PM_HASHELEM))
 		delenv(pm);
 	    DPUTS(ASG_ARRAYP(asg), "BUG: typeset got array value where scalar expected");
-	    if (asg->value.scalar && !(pm = setsparam(pname, ztrdup(asg->value.scalar))))
+	    if (asg->value.scalar &&
+		!(pm = assignsparam(pname, ztrdup(asg->value.scalar), 0)))
 		return NULL;
 	} else if (asg->is_array) {
-	    if (!(pm = setaparam(pname, asg->value.array ?
+	    if (!(pm = assignaparam(pname, asg->value.array ?
 				 zlinklist2array(asg->value.array) :
-				 mkarray(NULL))))
+				 mkarray(NULL), 0)))
 		return NULL;
 	}
 	pm->node.flags |= (on & PM_READONLY);
@@ -2347,16 +2350,18 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	     * creating a stray parameter along the way via createparam(),
 	     * now called below in the isident() branch.
 	     */
-	    if (!(pm = setsparam(pname, ztrdup(asg->value.scalar ? asg->value.scalar : ""))))
+	    if (!(pm = assignsparam(
+		      pname,
+		      ztrdup(asg->value.scalar ? asg->value.scalar : ""), 0)))
 		return NULL;
 	    dont_set = 1;
 	    asg->is_array = 0;
 	    keeplocal = 0;
 	    on = pm->node.flags;
 	} else if (PM_TYPE(on) == PM_ARRAY && ASG_ARRAYP(asg)) {
-	    if (!(pm = setaparam(pname, asg->value.array ?
-				 zlinklist2array(asg->value.array) :
-				 mkarray(NULL))))
+	    if (!(pm = assignaparam(pname, asg->value.array ?
+				    zlinklist2array(asg->value.array) :
+				    mkarray(NULL), 0)))
 		return NULL;
 	    dont_set = 1;
 	    keeplocal = 0;
@@ -2433,13 +2438,13 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	Param ipm = pm;
 	if (pm->node.flags & (PM_ARRAY|PM_HASHED)) {
 	    DPUTS(!ASG_ARRAYP(asg), "BUG: inconsistent scalar value for array");
-	    if (!(pm=setaparam(pname, asg->value.array ?
-			       zlinklist2array(asg->value.array) :
-			       mkarray(NULL))))
+	    if (!(pm=assignaparam(pname, asg->value.array ?
+				  zlinklist2array(asg->value.array) :
+				  mkarray(NULL), 0)))
 		return NULL;
 	} else {
 	    DPUTS(ASG_ARRAYP(asg), "BUG: inconsistent array value for scalar");
-	    if (!(pm = setsparam(pname, ztrdup(asg->value.scalar))))
+	    if (!(pm = assignsparam(pname, ztrdup(asg->value.scalar), 0)))
 		return NULL;
 	}
 	if (pm != ipm) {
@@ -2687,9 +2692,10 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 		    /* Update join character */
 		    tdp->joinchar = joinchar;
 		    if (asg0.value.scalar)
-			setsparam(asg0.name, ztrdup(asg0.value.scalar));
+			assignsparam(asg0.name, ztrdup(asg0.value.scalar), 0);
 		    else if (asg->value.array)
-			setaparam(asg->name, zlinklist2array(asg->value.array));
+			assignaparam(
+			    asg->name, zlinklist2array(asg->value.array), 0);
 		    return 0;
 		} else {
 		    zwarnnam(name, "can't tie already tied scalar: %s",
@@ -2750,9 +2756,9 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	    zsfree(apm->ename);
 	apm->ename = ztrdup(asg0.name);
 	if (asg->value.array)
-	    setaparam(asg->name, zlinklist2array(asg->value.array));
+	    assignaparam(asg->name, zlinklist2array(asg->value.array), 0);
 	else if (oldval)
-	    setsparam(asg0.name, oldval);
+	    assignsparam(asg0.name, oldval, 0);
 	unqueue_signals();
 
 	return 0;

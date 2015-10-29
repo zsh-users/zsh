@@ -464,7 +464,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 #endif
 	    errno == EINTR));
 
-    setiparam("REPLY", master);
+    setiparam_no_convert("REPLY", (zlong)master);
 
     return 0;
 }

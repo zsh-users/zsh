@@ -461,7 +461,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    return 1;
 	}
 
-	setiparam("REPLY", sess->fd);
+	setiparam_no_convert("REPLY", (zlong)sess->fd);
 
 	if (verbose)
 	    printf("%d listener is on fd %d\n", ntohs(sess->sock.in.sin_port), sess->fd);
@@ -562,7 +562,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 	    sess->fd = rfd;
 	}
 
-	setiparam("REPLY", sess->fd);
+	setiparam_no_convert("REPLY", (zlong)sess->fd);
 
 	if (verbose)
 	    printf("%d is on fd %d\n", ntohs(sess->peer.in.sin_port), sess->fd);
@@ -681,7 +681,7 @@ bin_ztcp(char *nam, char **args, Options ops, UNUSED(int func))
 		}
 	    }
 
-	    setiparam("REPLY", sess->fd);
+	    setiparam_no_convert("REPLY", (zlong)sess->fd);
 
 	    if (verbose)
 		printf("%s:%d is now on fd %d\n",

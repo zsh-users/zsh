@@ -1,7 +1,7 @@
 emulate -L zsh
 setopt extendedglob cbases
 
-local opt o_verbose o_list
+local opt o_verbose o_list i
 
 autoload -Uz zsh-mime-handler
 

@@ -2828,6 +2828,15 @@ assignsparam(char *s, char *val, int flags)
 
 /**/
 mod_export Param
+setsparam(char *s, char *val)
+{
+    return assignsparam(
+	s, val, isset(WARNCREATEGLOBAL) && locallevel > 0 ?
+	ASSPM_WARN_CREATE : 0);
+}
+
+/**/
+mod_export Param
 assignaparam(char *s, char **val, int flags)
 {
     struct value vbuf;
@@ -2914,6 +2923,16 @@ assignaparam(char *s, char **val, int flags)
     return v->pm;
 }
 
+
+/**/
+mod_export Param
+setaparam(char *s, char **aval)
+{
+    return assignaparam(
+	s, aval, isset(WARNCREATEGLOBAL) && locallevel >0 ?
+	ASSPM_WARN_CREATE : 0);
+}
+
 /**/
 mod_export Param
 sethparam(char *s, char **val)
@@ -2937,11 +2956,15 @@ sethparam(char *s, char **val)
     if (unset(EXECOPT))
 	return NULL;
     queue_signals();
-    if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING)))
+    if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING))) {
 	createparam(t, PM_HASHED);
-    else if (!(PM_TYPE(v->pm->node.flags) & PM_HASHED) &&
+	if (isset(WARNCREATEGLOBAL) && locallevel > 0 && v->pm->level == 0)
+	    zwarn("associative array parameter %s created globally in function",
+		  v->pm->node.nam);
+    } else if (!(PM_TYPE(v->pm->node.flags) & PM_HASHED) &&
 	     !(v->pm->node.flags & PM_SPECIAL)) {
 	unsetparam(t);
+	/* no WARNCREATEGLOBAL check here as parameter already existed */
 	createparam(t, PM_HASHED);
 	v = NULL;
     }
@@ -2968,6 +2991,7 @@ setnparam(char *s, mnumber val)
     Value v;
     char *t = s, *ss;
     Param pm;
+    int was_unset = 0;
 
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
@@ -2987,6 +3011,7 @@ setnparam(char *s, mnumber val)
 	 */
 	unset(KSHARRAYS) && !ss) {
 	unsetparam_pm(v->pm, 0, 1);
+	was_unset = 1;
 	s = t;
 	v = NULL;
     }
@@ -3007,6 +3032,10 @@ setnparam(char *s, mnumber val)
 	}
 	v = getvalue(&vbuf, &t, 1);
 	DPUTS(!v, "BUG: value not found for new parameter");
+	if (!was_unset && isset(WARNCREATEGLOBAL) && locallevel > 0 &&
+	    v->pm->level == 0)
+	    zwarn("numeric parameter %s created globally in function",
+		  v->pm->node.nam);
     }
     setnumvalue(v, val);
     unqueue_signals();
@@ -3025,6 +3054,26 @@ setiparam(char *s, zlong val)
     return setnparam(s, mnval);
 }
 
+/*
+ * Set an integer parameter without forcing creation of an integer type.
+ * This is useful if the integer is going to be set to a parmaeter which
+ * would usually be scalar but may not exist.
+ */
+
+/**/
+mod_export Param
+setiparam_no_convert(char *s, zlong val)
+{
+    /*
+     * If the target is already an integer, thisgets converted
+     * back.  Low technology rules.
+     */
+    char buf[BDIGBUFSIZE];
+    convbase(buf, val, 10);
+    return assignsparam(
+	s, ztrdup(buf),
+	isset(WARNCREATEGLOBAL) && locallevel > 0 ? ASSPM_WARN_CREATE : 0);
+}
 
 /* Unset a parameter */
 

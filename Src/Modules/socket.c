@@ -132,7 +132,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	/* allow to be closed explicitly */
 	fdtable[sfd] = FDT_EXTERNAL;
 
-	setiparam("REPLY", sfd);
+	setiparam_no_convert("REPLY", (zlong)sfd);
 
 	if (verbose)
 	    printf("%s listener is on fd %d\n", soun.sun_path, sfd);
@@ -220,7 +220,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 	    sfd = rfd;
 	}
 
-	setiparam("REPLY", sfd);
+	setiparam_no_convert("REPLY", (zlong)sfd);
 
 	if (verbose)
 	    printf("new connection from %s is on fd %d\n", soun.sun_path, sfd);
@@ -261,7 +261,7 @@ bin_zsocket(char *nam, char **args, Options ops, UNUSED(int func))
 		fdtable[sfd] = FDT_EXTERNAL;
 	    }
 
-	    setiparam("REPLY", sfd);
+	    setiparam_no_convert("REPLY", (zlong)sfd);
 
 	    if (verbose)
 		printf("%s is now on fd %d\n", soun.sun_path, sfd);

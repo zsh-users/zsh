@@ -1939,9 +1939,6 @@ struct paramdef {
     { name, flags | PM_SPECIAL | PM_HIDE | PM_HIDEVAL, \
 	    NULL, gsufn, getfn, scanfn, NULL }
 
-#define setsparam(S,V) assignsparam(S,V,0)
-#define setaparam(S,V) assignaparam(S,V,0)
-
 /*
  * Flags for assignsparam and assignaparam.
  */

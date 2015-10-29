@@ -1,3 +1,14 @@
+2015-10-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37014: Functions/MIME/zsh-mime-setup,
+	Functions/Misc/add-zsh-hook, Src/Modules/socket.c,
+	Src/Modules/tcp.c, Src/Modules/zpty.c, Src/builtin.c,
+	Src/params.c,Src/zsh.h: improved internal parameter setting.
+	Enhance WARNCREATEGLOBAL to work in many more cases.  Don't
+	create REPLY as an integer if it didn't previously exist as one,
+	even if the value to be set is integral, as this is likely to
+	mess up later uses of REPLY.
+
 2015-10-29  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 36983 (with fix from 36990): Completion/Unix/Command/_head,
