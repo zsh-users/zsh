@@ -14,7 +14,7 @@
 	* 37018: Src/math.c, Src/params.c, Test/E01options.ztst: make
 	WARNCREATEGLOBAL consistent in all cases, outputting file name.
 
-	* unposted: .giignore: ignore .orig files.
+	* unposted: .gitignore: ignore .orig files.
 
 	* 37014: Functions/MIME/zsh-mime-setup,
 	Functions/Misc/add-zsh-hook, Src/Modules/socket.c,
