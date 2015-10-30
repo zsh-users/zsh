@@ -1118,7 +1118,7 @@
 0:WARN_CREATE_GLOBAL option
 ?fn:3: scalar parameter foo1 created globally in function fn
 ?fn:5: scalar parameter foo1 created globally in function fn
-?fn:15: numeric parameter parameter foo5 created globally in function fn
+?fn:15: numeric parameter foo5 created globally in function fn
 
 # This really just tests if XTRACE is egregiously broken.
 # To test it properly would need a full set of its own.

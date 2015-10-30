@@ -3061,7 +3061,7 @@ setnparam(char *s, mnumber val)
 	v = getvalue(&vbuf, &t, 1);
 	DPUTS(!v, "BUG: value not found for new parameter");
 	if (!was_unset && isset(WARNCREATEGLOBAL) && locallevel > 0)
-	    check_warn_create(v->pm, "numeric parameter");
+	    check_warn_create(v->pm, "numeric");
     }
     setnumvalue(v, val);
     unqueue_signals();
