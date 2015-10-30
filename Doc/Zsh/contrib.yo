@@ -2016,9 +2016,10 @@ matched against each var(pattern) in turn until one matches; if it does,
 the context is extended by a colon and the corresponding var(subcontext).
 Note that the test is made against the original word on the line, with no
 stripping of quotes.  Special handling is done between words: the current
-context is examined and if it contains the string tt(back), the word before
-the cursor is considered, else the word after cursor is considered. Some
-examples are given below.
+context is examined and if it contains the string tt(between) the word
+is set to a single space; else if it is contains the string tt(back),
+the word before the cursor is considered, else the word after cursor is
+considered. Some examples are given below.
 
 The style tt(skip-whitespace-first) is only used with the
 tt(forward-word) widget.  If it is set to true, then tt(forward-word)
