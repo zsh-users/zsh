@@ -534,6 +534,21 @@ cindex(globbing, of . files)
 item(tt(GLOB_DOTS) (tt(-4)))(
 Do not require a leading `tt(.)' in a filename to be matched explicitly.
 )
+pindex(GLOB_STAR_SHORT)
+pindex(NO_GLOB_STAR_SHORT)
+pindex(GLOBSTARSHORT)
+pindex(NOGLOBSTARSHORT)
+cindex(globbing, short forms)
+cindex(globbing, ** special)
+item(tt(GLOB_STAR_SHORT))(
+When this option is set and the default zsh-style globbing is in
+effect, the pattern `tt(**/*)' can be abbreviated to `tt(**)' and the
+pattern `tt(***/*)' can be abbreviated to tt(***).  Hence `tt(**.c)'
+finds a file ending in tt(.c) in any subdirectory, and `tt(***.c)' does
+the same while also following symbolic links.  A tt(/) immediately
+after the `tt(**)' or `tt(***)' forces the pattern to be treated as the
+unabbreviated form.
+)
 pindex(GLOB_SUBST)
 pindex(NO_GLOB_SUBST)
 pindex(GLOBSUBST)

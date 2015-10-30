@@ -2381,6 +2381,18 @@ follow symbolic links; the alternative form `tt(***/)' does, but is
 otherwise identical.  Neither of these can be combined with other forms of
 globbing within the same path segment; in that case, the `tt(*)'
 operators revert to their usual effect.
+
+Even shorter forms are available when the option tt(GLOB_STAR_SHORT) is
+set.  In that case if no tt(/) immediately follows a tt(**) or tt(***)
+they are treated as if both a tt(/) plus a further tt(*) are present.
+Hence:
+
+example(setopt GLOBSTARSHORT
+ls **.c)
+
+is equivalent to
+
+example(ls **/*.c)
 subsect(Glob Qualifiers)
 cindex(globbing, qualifiers)
 cindex(qualifiers, globbing)

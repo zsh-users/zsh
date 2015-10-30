@@ -682,25 +682,32 @@ parsecomplist(char *instr)
     char *str;
     int compflags = gf_noglobdots ? (PAT_FILE|PAT_NOGLD) : PAT_FILE;
 
-    if (instr[0] == Star && instr[1] == Star &&
-        (instr[2] == '/' || (instr[2] == Star && instr[3] == '/'))) {
-	/* Match any number of directories. */
-	int follow;
+    if (instr[0] == Star && instr[1] == Star) {
+	int shortglob = 0;
+        if (instr[2] == '/' || (instr[2] == Star && instr[3] == '/')
+	    || (shortglob = isset(GLOBSTARSHORT))) {
+	    /* Match any number of directories. */
+	    int follow;
 
-	/* with three stars, follow symbolic links */
-	follow = (instr[2] == Star);
-	instr += (3 + follow);
+	    /* with three stars, follow symbolic links */
+	    follow = (instr[2] == Star);
+	    /*
+	     * With GLOBSTARSHORT, leave a star in place for the
+	     * pattern inside the directory.
+	     */
+	    instr += ((shortglob ? 1 : 3) + follow);
 
-	/* Now get the next path component if there is one. */
-	l1 = (Complist) zhalloc(sizeof *l1);
-	if ((l1->next = parsecomplist(instr)) == NULL) {
-	    errflag |= ERRFLAG_ERROR;
-	    return NULL;
+	    /* Now get the next path component if there is one. */
+	    l1 = (Complist) zhalloc(sizeof *l1);
+	    if ((l1->next = parsecomplist(instr)) == NULL) {
+		errflag |= ERRFLAG_ERROR;
+		return NULL;
+	    }
+	    l1->pat = patcompile(NULL, compflags | PAT_ANY, NULL);
+	    l1->closure = 1;		/* ...zero or more times. */
+	    l1->follow = follow;
+	    return l1;
 	}
-	l1->pat = patcompile(NULL, compflags | PAT_ANY, NULL);
-	l1->closure = 1;		/* ...zero or more times. */
-	l1->follow = follow;
-	return l1;
     }
 
     /* Parse repeated directories such as (dir/)# and (dir/)## */

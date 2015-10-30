@@ -1,3 +1,9 @@
+2015-10-30  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37022: Doc/Zsh/expn.yo, Doc/Zsh/options.yo, Src/glob.c,
+	Src/options.c, Src/zsh.h: add GLOB_STAR_SHORT option to
+	allow shorthand ** for **/* and *** for ***/*.
+
 2015-10-29  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37018: Src/math.c, Src/params.c, Test/E01options.ztst: make
