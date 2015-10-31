@@ -38,12 +38,8 @@ else
 	'-a[delay opening files listed with w function]'
       )
     ;|
-    darwin*|freebsd*|netbsd*)
-      args+=(
-        '-i'$inplace
-	'-l[make output line buffered]'
-      )
-    ;|
+    darwin*|freebsd*|netbsd*|openbsd*)  args+=( '-i'$inplace ) ;|
+    darwin*|freebsd*|netbsd*) args+=( '-l[make output line buffered]' ) ;|
     freebsd*) args+=( '-u[disable data buffering]' ) ;|
     freebsd*|netbsd*)
       args+=(

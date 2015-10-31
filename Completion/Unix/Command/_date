@@ -1,6 +1,6 @@
 #compdef date gdate
 
-local -a args
+local -a args alts
 
 if _pick_variant gnu="Free Software Foundation" unix --version; then
   args=(
@@ -20,16 +20,27 @@ else
     solaris*)
       args=( '-a:adjustment' )
     ;;
+    darwin*|dragonfly*|netbsd*|openbsd*)
+      args+=( '-r[specify reference time]:seconds since epoch' )
+    ;|
     freebsd*|darwin*|dragonfly*|netbsd*|openbsd*)
       args=(
 	'-n[only set time on current machine]'
 	'-d:daylight saving time value'
 	'-j[do not try to set date]'
-	'-r:seconds since epoch'
 	'-t:minutes west of GMT'
       )
     ;|
-    freebsd*) args+=( '-R[RFC2822 format]' ) ;|
+    freebsd*)
+      alts=(
+	'seconds:sec:_guard "(0x[0-9a-fA-F]#|[0-9]#)" "seconds since epoch"'
+	'files:file:_files'
+      )
+      args+=(
+	'-r[reference time: file modification or literal time]:reference: _alternative $alts'
+	'-R[RFC2822 format]'
+      )
+    ;|
     freebsd*|dragonfly*|darwin*)
       args+=( '-f:parsing format' '-v:adjustment value' )
     ;;

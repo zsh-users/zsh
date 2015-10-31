@@ -1,5 +1,9 @@
 2015-10-31  Oliver Kiddle  <opk@zsh.org>
 
+	* 37029: Completion/Unix/Command/_date,
+	Completion/Unix/Command/_sed, Completion/Unix/Command/_tail,
+	Completion/Unix/Command/_tr: update options and new tr completion
+
 	* 37028: Completion/Redhat/Command/_scl: new completion
 
 	* 36993: Eric Cook: Functions/Misc/zed: fix argument parsing

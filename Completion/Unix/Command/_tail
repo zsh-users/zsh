@@ -1,6 +1,6 @@
 #compdef tail
 
-local curcontext=$curcontext state state_descr line expl opts args ret=1
+local curcontext=$curcontext state state_descr line opts args ret=1
 typeset -A opt_args
 
 if _pick_variant gnu=GNU unix --version; then
@@ -27,9 +27,13 @@ else
     '(-F -r)-f[wait for new data to be appended to the file]'
   )
   case $OSTYPE in
-    (freebsd*|darwin*|dragonfly*|netbsd*|openbsd*)
+    (freebsd*|darwin*|dragonfly*|netbsd*|openbsd*|solaris*)
       args+=(
 	'(-f -F)-r[display the file in reverse order]'
+      )
+    ;|
+    (freebsd*|darwin*|dragonfly*|netbsd*|openbsd*)
+      args+=(
 	'(-c -n)-b+[start at the specified block (512-byte)]:blocks relative to the end (with +, beginning) of file'
       )
       ;|
@@ -42,14 +46,14 @@ else
   esac
 fi
 
-_arguments -C -s -S $opts : $args '*:file:_files' && return 0
+_arguments -C -s -S $opts : $args '*:file:_files' && return
 
 case $state in
   (number)
     local mlt sign digit
-    mlt='multiplier:multiplier:((b\:512 K\:1024 KB\:1000 M\:1024\^2'
+    mlt='multipliers:multiplier:((b\:512 K\:1024 KB\:1000 M\:1024\^2'
     mlt+=' MB\:1000\^2 G\:1024\^3 GB\:1000\^3 T\:1024\^4 TB\:1000\^4))'
-    sign='sign:sign:((+\:"start at the specified byte/line"'
+    sign='signs:sign:((+\:"start at the specified byte/line"'
     sign+=' -\:"output the last specified bytes/lines (default)"))'
     digit='digits:digit:(0 1 2 3 4 5 6 7 8 9)'
     if compset -P '*[0-9]'; then
