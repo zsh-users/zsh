@@ -1,3 +1,8 @@
+2015-10-31  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted (cf. 36998,36999): Src/mem.c: undo 36956 / restore 34451
+	with expanded comment about the flip-flopping
+
 2015-10-31  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 37032: Completion/Unix/Command/_git: Temporarily revert 36959.
