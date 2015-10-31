@@ -6,31 +6,20 @@
 # Use ^X^W to save, ^C to abort.
 # Option -f: edit shell functions.  (Also if called as fned.)
 
-local var opt zed_file_name
+local var opts zed_file_name
 # We do not want timeout while we are editing a file
 integer TMOUT=0 okargs=1 fun bind
 local -a expand
 
-while getopts "fbx:" opt; do
-  case $opt in
-    (f)
-    fun=1
-    ;;
-
-    (b)
-    bind=1
-    ;;
-
-    (x)
-    if [[ $OPTARG != <-> ]]; then
-      print -r "Integer expected after -x: $OPTARG" >&2
-      return 1
-    fi
-    expand=(-x $OPTARG)
-    ;;
-  esac
-done
-shift $(( OPTIND - 1 ))
+zparseopts -D -A opts f b x:
+fun=$+opts[-f]
+bind=$+opts[-b]
+if [[ $opts[-x] == <-> ]]; then
+  expand=(-x $opts[-x])
+elif (( $+opts[-x] )); then
+  print -r "Integer expected after -x: $opts[-x]" >&2
+  return 1
+fi
 
 [[ $0 = fned ]] && fun=1
 (( bind )) && okargs=0

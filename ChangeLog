@@ -1,3 +1,7 @@
+2015-10-31  Oliver Kiddle  <opk@zsh.org>
+
+	* 36993: Eric Cook: Functions/Misc/zed: fix argument parsing
+
 2015-10-31  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted (cf. 36998,36999): Src/mem.c: undo 36956 / restore 34451
