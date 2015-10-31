@@ -1,5 +1,8 @@
 2015-11-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37031: Completion/Unix/Command/_git: _git-merge: Exclude
+	ancestors of HEAD from recent commit completion
+
 	* 37025: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	vcs_info git: Add a cherry-pick patch-format
 

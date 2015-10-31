@@ -1131,6 +1131,7 @@ _git-log () {
 _git-merge () {
   local -a merge_options
   __git_setup_merge_options
+  local -a git_commit_opts=(--all --not HEAD --not)
 
   _arguments -w -S -s \
     $merge_options \
@@ -1138,7 +1139,7 @@ _git-merge () {
     '(                    --no-rerere-autoupdate)--rerere-autoupdate[allow the rerere mechanism to update the index]' \
     '(--rerere-autoupdate                       )--no-rerere-autoupdate[do not allow the rerere mechanism to update the index]' \
     '--abort[restore the original branch and abort the merge operation]' \
-    '*: :__git_commits'
+    '*: : __git_commits -O expl:git_commit_opts'
 }
 
 (( $+functions[_git-mv] )) ||
