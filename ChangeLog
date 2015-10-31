@@ -1,5 +1,7 @@
 2015-10-31  Oliver Kiddle  <opk@zsh.org>
 
+	* 37028: Completion/Redhat/Command/_scl: new completion
+
 	* 36993: Eric Cook: Functions/Misc/zed: fix argument parsing
 
 2015-10-31  Barton E. Schaefer  <schaefer@zsh.org>
