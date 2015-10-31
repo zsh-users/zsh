@@ -5696,7 +5696,10 @@ __git_recent_commits () {
       else
         label="[HEAD~$distance_from_head]"
       fi
-      descr+=("@~${distance_from_head}":"${label} $k") # CROSSREF: use the same label as below
+      ## Disabled because _describe renders the output unhelpfuly when this function
+      ## is called twice during a single completion operation, and list-grouped is
+      ## in its default setting (enabled).
+      #descr+=("@~${distance_from_head}":"${label} $k") # CROSSREF: use the same label as below
 
       # Prepare for the next first-parent-ancestry commit.
       (( ++distance_from_head ))
