@@ -1,3 +1,8 @@
+2015-11-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 37038: Doc/Zsh/builtins.yo, Src/builtin.c, Src/options.c: add
+	-l option to emulate.
+
 2015-10-31  Oliver Kiddle  <opk@zsh.org>
 
 	* 37029: Completion/Unix/Command/_date,

@@ -902,3 +902,33 @@ printoptionlist_printequiv(int optno)
     optno *= (isneg ? -1 : 1);
     printf("  equivalent to --%s%s\n", isneg ? "no-" : "", optns[optno-1].node.nam);
 }
+
+/**/
+static char *print_emulate_opts;
+
+/**/
+static void
+print_emulate_option(HashNode hn, int fully)
+{
+    Optname on = (Optname) hn;
+
+    if (!(on->node.flags & OPT_ALIAS) &&
+	((fully && !(on->node.flags & OPT_SPECIAL)) ||
+	 (on->node.flags & OPT_EMULATE)))
+    {
+	if (!print_emulate_opts[on->optno])
+	    fputs("no", stdout);
+	puts(on->node.nam);
+    }
+}
+
+/*
+ * List the settings of options associated with an emulation
+ */
+
+/**/
+void list_emulate_options(char *cmdopts, int fully)
+{
+    print_emulate_opts = cmdopts;
+    scanhashtable(optiontab, 1, 0, 0, print_emulate_option, fully);
+}

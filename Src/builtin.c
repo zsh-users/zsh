@@ -58,7 +58,7 @@ static struct builtin builtins[] =
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmprs", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
     BUILTIN("echo", BINF_SKIPINVALID, bin_print, 0, -1, BIN_ECHO, "neE", "-"),
-    BUILTIN("emulate", 0, bin_emulate, 0, -1, 0, "LR", NULL),
+    BUILTIN("emulate", 0, bin_emulate, 0, -1, 0, "lLR", NULL),
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmprs", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
     BUILTIN("exit", BINF_PSPECIAL, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
@@ -5425,10 +5425,11 @@ eval(char **argv)
 
 /**/
 int
-bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
+bin_emulate(char *nam, char **argv, Options ops, UNUSED(int func))
 {
     int opt_L = OPT_ISSET(ops, 'L');
     int opt_R = OPT_ISSET(ops, 'R');
+    int opt_l = OPT_ISSET(ops, 'l');
     int saveemulation, savehackchar;
     int ret = 1, new_emulation;
     unsigned int savepatterns;
@@ -5443,7 +5444,7 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
     /* without arguments just print current emulation */
     if (!shname) {
 	if (opt_L || opt_R) {
-	    zwarnnam("emulate", "not enough arguments");
+	    zwarnnam(nam, "not enough arguments");
 	    return 1;
 	}
 
@@ -5471,11 +5472,27 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
 
     /* with single argument set current emulation */
     if (!argv[1]) {
-	emulate(shname, opt_R, &emulation, opts);
+	char *cmdopts;
+	if (opt_l) {
+	    cmdopts = (char *)zhalloc(OPT_SIZE);
+	    memcpy(cmdopts, opts, OPT_SIZE);
+	} else
+	    cmdopts = opts;
+	emulate(shname, opt_R, &emulation, cmdopts);
 	if (opt_L)
-	    opts[LOCALOPTIONS] = opts[LOCALTRAPS] = opts[LOCALPATTERNS] = 1;
+	    cmdopts[LOCALOPTIONS] = cmdopts[LOCALTRAPS] =
+		cmdopts[LOCALPATTERNS] = 1;
+	if (opt_l) {
+	    list_emulate_options(cmdopts, opt_R);
+	    return 0;
+	}
 	clearpatterndisables();
 	return 0;
+    }
+
+    if (opt_l) {
+	zwarnnam(nam, "too many arguments for -l");
+	return 1;
     }
 
     argv++;
@@ -5484,14 +5501,14 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
     savehackchar = keyboardhackchar;
     emulate(shname, opt_R, &new_emulation, new_opts);
     optlist = newlinklist();
-    if (parseopts("emulate", &argv, new_opts, &cmd, optlist)) {
+    if (parseopts(nam, &argv, new_opts, &cmd, optlist)) {
 	ret = 1;
 	goto restore;
     }
 
     /* parseopts() has consumed anything that looks like an option */
     if (*argv) {
-	zwarnnam("emulate", "unknown argument %s", *argv);
+	zwarnnam(nam, "unknown argument %s", *argv);
 	goto restore;
     }
 
@@ -5510,7 +5527,7 @@ bin_emulate(UNUSED(char *nam), char **argv, Options ops, UNUSED(int func))
      */
     if (cmd) {
 	if (opt_L) {
-	    zwarnnam("emulate", "option -L incompatible with -c");
+	    zwarnnam(nam, "option -L incompatible with -c");
 	    goto restore2;
 	}
 	*--argv = cmd;	/* on stack, never free()d, see execbuiltin() */

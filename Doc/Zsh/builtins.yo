@@ -477,7 +477,7 @@ cindex(compatibility, csh)
 cindex(sh, compatibility)
 cindex(ksh, compatibility)
 cindex(csh, compatibility)
-item(tt(emulate) [ tt(-LR) ] [ {tt(zsh)|tt(sh)|tt(ksh)|tt(csh)} [ var(flags) ... ] ])(
+item(tt(emulate) [ tt(-lLR) ] [ {tt(zsh)|tt(sh)|tt(ksh)|tt(csh)} [ var(flags) ... ] ])(
 Without any argument print current emulation mode.
 
 With single argument set up zsh options to emulate the specified shell
@@ -517,6 +517,14 @@ the immediately surrounding shell
 function, if any; normally these options are turned off in all emulation
 modes except tt(ksh). The tt(-L) switch is mutually exclusive with the
 use of tt(-c) in var(flags).
+
+If there is a single argument and the tt(-l) switch is given, the
+options that would be set or unset (the latter indicated with the prefix
+`tt(no)') are listed.  tt(-l) can be combined with tt(-L) or tt(-R) and
+the list will be modified in the appropriate way.  Note the list does
+not depend on the current setting of options, i.e. it includes all
+options that may in principle change, not just those that would actually
+change.
 
 The var(flags) may be any of the invocation-time flags described in
 ifnzman(noderef(Invocation))\
