@@ -1,5 +1,6 @@
 #compdef sockstat
-local -a args
+local -a args protocols
+local proto
 
 case $OSTYPE in
   *bsd*)
@@ -8,27 +9,37 @@ case $OSTYPE in
       '-6[show AF_INET6 (IPv6) sockets]'
       '-c[show connected sockets]'
       '-l[show listening sockets]'
-      '*-p[specify port number]:port numbers (comma delimited)'
+      '*-p+[specify port number]:port numbers (comma delimited)'
       '-u[show AF_LOCAL (UNIX) sockets]'
     )
   ;|
   freebsd*)
+    for proto in ${${(M)${(f)"$(</etc/protocols)"}##[a-z0-9]*}}; do
+      case $proto in
+        *\#*)
+          protocols+=(${${${(j: :)${(q)=proto}}// *\# /\[}/%/\]})
+        ;;
+        *)
+          protocols+=(${${(j: :)${=proto}}// */})
+      esac
+    done
+
     args+=(
       '*-j[show sockets belonging to JID]: : _jails -0 -o jid'
       '-L[exclude loopback]'
-      '*-P[specify protocol]: :_sequence -s , _ports'
+      '*-P+[specify protocol]: : _values -s , protocols $protocols'
     )
   ;;
   netbsd*)
     args+=(
-      '*-f[only show specified address family]:address family:(inet inet6 local unix)'
+      '*-f+[only show specified address family]:address family:(inet inet6 local unix)'
       '-n[no symbolic names for addresses/ports]'
     )
   ;;
 esac
 
 if (( $#args )); then
-  _arguments -s -w $args
+  _arguments -s -w : $args
   return
 fi
 
