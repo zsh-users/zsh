@@ -1,3 +1,8 @@
+2015-11-02  Daniel Hahler  <zsh@thequod.de>
+
+	* 35303: Completion/Unix/Command/_systemd: remove it in favour of the
+	one from upstream.
+
 2015-11-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 37038: Doc/Zsh/builtins.yo, Src/builtin.c, Src/options.c: add
