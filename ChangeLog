@@ -1,3 +1,9 @@
+2015-11-04  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37062: Completion/Unix/Command/_git: allow verbose
+	descriptions of commits and branches using git log.  Mechanism
+	for turning this on subject to change.
+
 2015-11-02  Daniel Hahler  <zsh@thequod.de>
 
 	* 35303: Completion/Unix/Command/_systemd: remove it in favour of the

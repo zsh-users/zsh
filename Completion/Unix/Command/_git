@@ -5004,6 +5004,33 @@ __git_is_in_middle_of_merge () {
   [[ -f $gitdir/MERGE_HEAD ]]
 }
 
+(( $+functions[__git_describe_branch] )) ||
+__git_describe_branch () {
+  local __commits_in=$1
+  local __tag=$2
+  local __desc=$3
+  shift 3
+
+  integer maxverbose
+  if zstyle -s :completion:$curcontext max-verbose maxverbose &&
+    (( ${compstate[nmatches]} <= maxverbose )); then
+    local __c
+    local -a __commits
+    for __c in ${(P)__commits_in}; do
+      __commits+=("${__c}:${$(_call_program describe git log -1 --oneline $__c)//:/\\:}")
+    done
+    _describe -t $__tag $__desc __commits "$@"
+  else
+    local expl
+    _wanted $__tag expl $__desc compadd "$@" -a - $__commits_in
+  fi
+}
+
+(( $+functions[__git_describe_commit] )) ||
+__git_describe_commit () {
+  __git_describe_branch $1 $2 $3 -M 'r:|/=**' "${(@)argv[4,-1]}"
+}
+
 # Completion Wrappers
 
 (( $+functions[__git_ignore_line] )) ||
@@ -5541,29 +5568,27 @@ __git_branch_names () {
   branch_names=(${${(f)"$(_call_program branchrefs git for-each-ref --format='"%(refname)"' refs/heads 2>/dev/null)"}#refs/heads/})
   __git_command_successful $pipestatus || return 1
 
-  _wanted branch-names expl branch-name compadd -M 'r:|/=**' "$@" -a - branch_names
+  __git_describe_commit branch_names branch-names 'branch name' "$@"
 }
 
 (( $+functions[__git_remote_branch_names] )) ||
 __git_remote_branch_names () {
-  local expl
   declare -a branch_names
 
   branch_names=(${${(f)"$(_call_program remote-branch-refs git for-each-ref --format='"%(refname)"' refs/remotes 2>/dev/null)"}#refs/remotes/})
   __git_command_successful $pipestatus || return 1
 
-  _wanted remote-branch-names expl 'remote branch name' compadd -M 'r:|/=**' "$@" -a - branch_names
+  __git_describe_commit branch_names remote-branch-names 'remote branch name' "$@"
 }
 
 (( $+functions[__git_remote_branch_names_noprefix] )) ||
 __git_remote_branch_names_noprefix () {
-  local expl
   declare -a heads
 
   branch_names=(${${${${(f)"$(_call_program remote-branch-refs-noprefix git for-each-ref --format='"%(refname)"' refs/remotes 2>/dev/null)"}#refs/remotes/}#*/}:#HEAD})
   __git_command_successful $pipestatus || return 1
 
-  _wanted remote-branch-names-noprefix expl 'remote branch name' compadd -M 'r:|/=**' "$@" -a - branch_names
+  __git_describe_commit branch_names remote-branch-names-noprefix 'remote branch name' "$@"
 }
 
 (( $+functions[__git_commit_objects_prefer_recent] )) ||
@@ -5603,7 +5628,7 @@ __git_heads () {
 
 (( $+functions[__git_heads_local] )) ||
 __git_heads_local () {
-  local gitdir expl start
+  local gitdir
   declare -a heads
 
   heads=(${(f)"$(_call_program headrefs git for-each-ref --format='"%(refname:short)" refs/heads' 2>/dev/null)"})
@@ -5615,17 +5640,16 @@ __git_heads_local () {
     [[ -f $gitdir/refs/stash ]] && heads+=stash
   fi
 
-  _wanted heads-local expl "local head" compadd -M 'r:|/=**' "$@" -a - heads
+  __git_describe_commit heads heads-local "local head" "$@"
 }
 
 (( $+functions[__git_heads_remote] )) ||
 __git_heads_remote () {
-  local gitdir expl start
   declare -a heads
 
   heads=(${(f)"$(_call_program headrefs git for-each-ref --format='"%(refname:short)" refs/remotes' 2>/dev/null)"})
 
-  _wanted heads-remote expl "remote head" compadd -M 'r:|/=**' "$@" -a - heads
+  __git_describe_commit heads heads-remote "remote head" "$@"
 }
 
 (( $+functions[__git_commit_objects] )) ||
