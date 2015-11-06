@@ -1,3 +1,9 @@
+2015-11-06  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37073: Src/subst.c, Test/D04parameter.ztst: fix case of
+	SH_WORD_SPLIT with string before parameter substitution and
+	nested string that starts with a space e.g. x${:- y}.
+
 2015-11-04  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37062: Completion/Unix/Command/_git: allow verbose

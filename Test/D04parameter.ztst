@@ -1744,3 +1744,57 @@
 >3_4_5_6
 >6
 >1_2_3_4_5_6
+
+ (setopt shwordsplit
+ do_test() {
+   print $#: "$@"
+ }
+ foo=bar
+ foo2="bar bar"
+ do_test ${:- foo}
+ do_test ${:- foo bar}
+ do_test ${:- $foo}
+ do_test ${:- $foo2}
+ do_test x${:- foo}
+ do_test x${:- foo bar}
+ do_test x${:- $foo}
+ do_test x${:- $foo2}
+ do_test x${foo:+ $foo}
+ )
+0:We Love SH_WORD_SPLIT Day celebrated with space at start of internal subst
+>1: foo
+>2: foo bar
+>1: bar
+>2: bar bar
+>2: x foo
+>3: x foo bar
+>2: x bar
+>3: x bar bar
+>2: x bar
+
+ (unsetopt shwordsplit # default, for clarity
+ do_test() {
+   print $#: "$@"
+ }
+ foo=bar
+ foo2="bar bar"
+ do_test ${:- foo}
+ do_test ${:- foo bar}
+ do_test ${:- $foo}
+ do_test ${:- $foo2}
+ do_test x${:- foo}
+ do_test x${:- foo bar}
+ do_test x${:- $foo}
+ do_test x${:- $foo2}
+ do_test x${foo:+ $foo}
+ )
+0:We Love NO_SH_WORD_SPLIT Even More Day celebrated as sanity check
+>1:  foo
+>1:  foo bar
+>1:  bar
+>1:  bar bar
+>1: x foo
+>1: x foo bar
+>1: x bar
+>1: x bar bar
+>1: x bar
