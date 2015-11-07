@@ -420,6 +420,22 @@ singsub(char **s)
     DPUTS(nonempty(&foo), "BUG: singsub() produced more than one word!");
 }
 
+/*
+ * Bit flags passed back from multsub() to paramsubst().
+ */
+enum {
+    /*
+     * Set if the string had whitespace at the start
+     * that should cause word splitting against any preceeding string.
+     */
+    WS_AT_START = 1,
+    /*
+     * Set if the string had whitespace at the end
+     * that should cause word splitting against any following string.
+     */
+    WS_AT_END = 2
+};
+
 /* Perform substitution on a single word, *s. Unlike with singsub(), the
  * result can be more than one word. If split is non-zero, the string is
  * first word-split using IFS, but only for non-quoted "whitespace" (as
@@ -432,14 +448,13 @@ singsub(char **s)
  * NULL to use IFS).  The return value is true iff the expansion resulted
  * in an empty list.
  *
- * *ws_at_start is set to 1 if the string had whitespace at thes start
- * that should cause word splitting against any preceeding string.
+ * *ws_at_start is set to bits in the enum above as neeed.
  */
 
 /**/
 static int
 multsub(char **s, int pf_flags, char ***a, int *isarr, char *sep,
-	int *ws_at_start)
+	int *ws_sub)
 {
     int l;
     char **r, **p, *x = *s;
@@ -455,7 +470,7 @@ multsub(char **s, int pf_flags, char ***a, int *isarr, char *sep,
 	    l++;
 	    if (!iwsep(STOUC(c)))
 		break;
-	    *ws_at_start = 1;
+	    *ws_sub |= WS_AT_START;
 	}
     }
 
@@ -487,8 +502,10 @@ multsub(char **s, int pf_flags, char ***a, int *isarr, char *sep,
 			if (!WC_ZISTYPE(c, ISEP))
 			    break;
 		    }
-		    if (!*x)
+		    if (!*x) {
+			*ws_sub |= WS_AT_END;
 			break;
+		    }
 		    insertlinknode(&foo, n, (void *)x), incnode(n);
 		}
 	    }
@@ -1730,7 +1747,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
      * whitespace.  However, if there's no "x" the whitespace is
      * simply removed.
      */
-    int ws_at_start = 0;
+    int ws_sub = 0;
 
     *s++ = '\0';
     /*
@@ -2280,7 +2297,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	 * necessary, when we handle (P) lower down.
 	 */
 	if (multsub(&val, 0, (aspar ? NULL : &aval), &isarr, NULL,
-		    &ws_at_start) && quoted) {
+		    &ws_sub) && quoted) {
 	    /* Empty quoted string --- treat as null string, not elided */
 	    isarr = -1;
 	    aval = (char **) hcalloc(sizeof(char *));
@@ -2751,7 +2768,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		    split_flags = PREFORK_NOSHWORDSPLIT;
 		}
 		multsub(&val, split_flags, (aspar ? NULL : &aval),
-			&isarr, NULL, &ws_at_start);
+			&isarr, NULL, &ws_sub);
 		copied = 1;
 		spbreak = 0;
 		/* Leave globsubst on if forced */
@@ -2780,14 +2797,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		     * behavior on caller choice of PREFORK_SHWORDSPLIT. */
 		    multsub(&val,
 			    spbreak ? PREFORK_SINGLE : PREFORK_NOSHWORDSPLIT,
-			    NULL, &isarr, NULL, &ws_at_start);
+			    NULL, &isarr, NULL, &ws_sub);
 		} else {
 		    if (spbreak)
 			split_flags = PREFORK_SPLIT|PREFORK_SHWORDSPLIT;
 		    else
 			split_flags = PREFORK_NOSHWORDSPLIT;
 		    multsub(&val, split_flags, &aval, &isarr, NULL,
-			    &ws_at_start);
+			    &ws_sub);
 		    spbreak = 0;
 		}
 		if (arrasg) {
@@ -3319,7 +3336,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	}
 	if (haserr || errflag)
 	    return NULL;
-	ws_at_start = 0;
+	ws_sub = 0;
     }
     /*
      * This handles taking a length with ${#foo} and variations.
@@ -3358,7 +3375,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	sprintf(buf, "%ld", len);
 	val = dupstring(buf);
 	isarr = 0;
-	ws_at_start = 0;
+	ws_sub = 0;
     }
     /* At this point we make sure that our arrayness has affected the
      * arrayness of the linked list.  Then, we can turn our value into
@@ -3388,7 +3405,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	if (isarr) {
 	    val = sepjoin(aval, sep, 1);
 	    isarr = 0;
-	    ws_at_start = 0;
+	    ws_sub = 0;
 	}
 	if (!ssub && (spbreak || spsep)) {
 	    aval = sepsplit(val, spsep, 0, 1);
@@ -3673,9 +3690,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
      * If a multsub result had whitespace at the start and we're
      * splitting and there's a previous string, now's the time to do so.
      */
-    if (ws_at_start && aptr > ostr) {
+    if ((ws_sub & WS_AT_START) && aptr > ostr) {
 	insertlinknode(l, n, dupstrpfx(ostr, aptr - ostr)), incnode(n);
 	ostr = aptr;
+    }
+    /* Likewise at the end */
+    if ((ws_sub & WS_AT_END) && *fstr) {
+	insertlinknode(l, n, dupstring(fstr)); /* appended, no incnode */
+	*fstr = '\0';
     }
     if (isarr) {
 	char *x;

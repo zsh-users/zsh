@@ -1,3 +1,8 @@
+2015-11-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 37074: Src/subst.c, Test/D04parameter.ztst: extend previous
+	fix to cover whitespace at end of substitution.
+
 2015-11-06  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37073: Src/subst.c, Test/D04parameter.ztst: fix case of
