@@ -503,7 +503,9 @@ arguments are:
   - the options the builtin accepts, given as a string containing the
     option characters (the above example makes the builtin accept the
     options `f', `l', `a', `g', and `s').  Passing NULL here disables
-    all flag handling, i.e. even "--".
+    all flag handling, i.e. even "--".  Each option letter may be
+    followed by one of ":" (argument must follow), "::" (optional
+    argument may follow), or ":%" (optional numeric argument).
   - and finally a optional string containing option characters that
     will always be reported as set when calling the C-function (this,
     too, can be used when using one C-function to implement multiple
