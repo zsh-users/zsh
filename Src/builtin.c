@@ -2334,7 +2334,8 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	} else if ((on & PM_LOCAL) && locallevel) {
 	    *subscript = 0;
 	    pm = (Param) (paramtab == realparamtab ?
-			  gethashnode2(paramtab, pname) :
+			  /* getnode2() to avoid autoloading */
+			  paramtab->getnode2(paramtab, pname) :
 			  paramtab->getnode(paramtab, pname));
 	    *subscript = '[';
 	    if (!pm || pm->level != locallevel) {
@@ -2825,11 +2826,12 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
     /* Take arguments literally.  Don't glob */
     while ((asg = getasg(&argv, assigns))) {
 	HashNode hn = (paramtab == realparamtab ?
-		       gethashnode2(paramtab, asg->name) :
+		       /* getnode2() to avoid autoloading */
+		       paramtab->getnode2(paramtab, asg->name) :
 		       paramtab->getnode(paramtab, asg->name));
 	if (OPT_ISSET(ops,'p')) {
 	    if (hn)
-		printparamnode(hn, printflags);
+		paramtab->printnode(hn, printflags);
 	    else {
 		zwarnnam(name, "no such variable: %s", asg->name);
 		returnval = 1;
@@ -3319,7 +3321,8 @@ bin_unset(char *name, char **argv, Options ops, int func)
 	    *ss = 0;
 	}
 	pm = (Param) (paramtab == realparamtab ?
-		      gethashnode2(paramtab, s) :
+		      /* getnode2() to avoid autoloading */
+		      paramtab->getnode2(paramtab, s) :
 		      paramtab->getnode(paramtab, s));
 	/*
 	 * Unsetting an unset variable is not an error.

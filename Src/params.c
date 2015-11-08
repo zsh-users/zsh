@@ -447,7 +447,7 @@ newparamtable(int size, char const *name)
     ht->cmpnodes    = strcmp;
     ht->addnode     = addhashnode;
     ht->getnode     = getparamnode;
-    ht->getnode2    = getparamnode;
+    ht->getnode2    = gethashnode2;
     ht->removenode  = removehashnode;
     ht->disablenode = NULL;
     ht->enablenode  = NULL;
@@ -869,6 +869,7 @@ createparam(char *name, int flags)
 
     if (name != nulstring) {
 	oldpm = (Param) (paramtab == realparamtab ?
+			 /* gethashnode2() for direct table read */
 			 gethashnode2(paramtab, name) :
 			 paramtab->getnode(paramtab, name));
 
@@ -3111,7 +3112,8 @@ unsetparam(char *s)
 
     queue_signals();
     if ((pm = (Param) (paramtab == realparamtab ?
-		       gethashnode2(paramtab, s) :
+		       /* getnode2() to avoid autoloading */
+		       paramtab->getnode2(paramtab, s) :
 		       paramtab->getnode(paramtab, s))))
 	unsetparam_pm(pm, 0, 1);
     unqueue_signals();

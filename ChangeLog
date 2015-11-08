@@ -1,5 +1,8 @@
 2015-11-08  Barton E. Schaefer  <schaefer@brasslantern.com>
 
+	* 37080: Src/builtin.c, Src/params.c: use paramtab abstraction more
+	consistently, add explanatory comments
+
 	* 37079: Etc/zsh-development-guide: better description of "optstr"
 	field in struct builtin as used in BUILTIN() macro
 
