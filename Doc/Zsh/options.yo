@@ -1568,13 +1568,13 @@ ifnzman(noderef(Arithmetic Evaluation))\
 ifzman(the section ARITHMETIC EVALUATION in zmanref(zshmisc))
 has an explicit list.
 )
-pindex(DEBUG_BEFORE_CMD <D>)
-pindex(NO_DEBUG_BEFORE_CMD <D>)
-pindex(DEBUGBEFORECMD <D>)
-pindex(NODEBUGBEFORECMD <D>)
+pindex(DEBUG_BEFORE_CMD)
+pindex(NO_DEBUG_BEFORE_CMD)
+pindex(DEBUGBEFORECMD)
+pindex(NODEBUGBEFORECMD)
 cindex(traps, DEBUG, before or after command)
 cindex(DEBUG trap, before or after command)
-item(tt(DEBUG_BEFORE_CMD))(
+item(tt(DEBUG_BEFORE_CMD) <D>)(
 Run the tt(DEBUG) trap before each command; otherwise it is run after
 each command.  Setting this option mimics the behaviour of ksh 93; with
 the option unset the behaviour is that of ksh 88.

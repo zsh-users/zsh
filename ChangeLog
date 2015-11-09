@@ -1,3 +1,8 @@
+2015-11-09  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 37085: Doc/Zsh/options.yo: DEBUG_BEFORE_CMD is set by default.
+	Also fix entries in the option index.
+
 2015-11-08  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* 37081: Doc/Makefile.in, Doc/Zsh/mod_private.yo,
