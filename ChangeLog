@@ -1,4 +1,8 @@
-2015-11-08  Barton E. Schaefer  <schaefer@brasslantern.com>
+2015-11-09  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted (cf. Jun T.: 37083): Doc/Zsh/mod_private.yo: proofreading
+
+2015-11-08  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 37081: Doc/Makefile.in, Doc/Zsh/mod_private.yo,
 	Src/Modules/param_private.c, Src/Modules/param_private.mdd,

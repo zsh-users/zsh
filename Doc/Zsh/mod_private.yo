@@ -41,7 +41,7 @@ also adds the option `tt(-P)' to the `tt(local)' builtin to declare private
 parameters.
 
 For example, this construction fails if tt(zsh/param/private) has not yet
-been loaded when `tt(failing)' is defined:
+been loaded when `tt(bad_declaration)' is defined:
 example(bad_declaration+LPAR()RPAR() {
   zmodload zsh/param/private
   private array=LPAR() one two three RPAR()
