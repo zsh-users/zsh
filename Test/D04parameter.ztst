@@ -1798,3 +1798,52 @@
 >1: x bar y
 >1: x bar bar y
 >1: x bar y
+
+  testfn() {
+    local scalar=obfuscation
+    local -a array=(alpha bravo charlie delta echo foxtrot)
+    local -A assoc=(one eins two zwei three drei four vier)
+    local name subscript
+    for name subscript in scalar 3 array 5 assoc three; do
+      print ${${(P)name}[$subscript]}
+    done
+  }
+  testfn
+0:${(P)...} with normal subscripting
+>f
+>echo
+>drei
+
+  testfn() {
+    local s1=foo s2=bar
+    local -a val=(s1)
+    print ${${(P)val}[1,3]}
+    val=(s1 s2)
+    print ${${(P)val}[1,3]}
+  }
+  testfn
+1:${(P)...} with array as name
+>foo
+?testfn:5: parameter name reference used with array
+
+  testfn() {
+    local -A assoc=(one buckle two show three knock four door)
+    local name='assoc[two]'
+    print ${${(P)name}[2,3]}
+  }
+  testfn
+0:${(P)...} with internal subscripting
+>ho
+
+  testfn() {
+    local one=two
+    local two=three
+    local three=four
+    local -a four=(all these worlds belong to foo)
+    print ${${(P)${(P)${(P)one}}}}
+    print ${${(P)${(P)${(P)one}}}[3]}
+  }
+  testfn
+0:nested parameter name references
+>all these worlds belong to foo
+>worlds

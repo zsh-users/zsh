@@ -2315,7 +2315,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	     * substitution.
 	     */
 	    if (isarr) {
-		if (aval[1]) {
+		if (aval[0] && aval[1]) {
 		    zerr("parameter name reference used with array");
 		    return NULL;
 		}
@@ -2324,7 +2324,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    }
 	    s = dyncat(val, s);
 	    /* Now behave po-faced as if it was always like that... */
-	    subexp = aspar = 0;
+	    subexp = 0;
 	}
 	v = (Value) NULL;
     } else if (aspar) {
@@ -2360,7 +2360,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      * far has just yielded us a parameter name to be processed
      * with (P).
      */
-    else if (!subexp || aspar) {
+    if (!subexp || aspar) {
 	char *ov = val;
 
 	/*
