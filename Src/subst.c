@@ -44,15 +44,23 @@ char nulstring[] = {Nularg, '\0'};
  *  - Brace expansion
  *  - Tilde and equals substitution
  *
- * PREFORK_* flags are defined in zsh.h
+ * "flag"s contains PREFORK_* flags, defined in zsh.h.
+ *
+ * "ret_flags" is used to return values from nested parameter
+ * substitions.  It may be NULL in which case PREFORK_SUBEXP
+ * must not appear in flags; any return value from below
+ * will be discarded.
  */
 
 /**/
 mod_export void
-prefork(LinkList list, int flags)
+prefork(LinkList list, int flags, int *ret_flags)
 {
     LinkNode node, stop = 0;
     int keep = 0, asssub = (flags & PREFORK_TYPESET) && isset(KSHTYPESET);
+    int ret_flags_local = 0;
+    if (!ret_flags)
+	ret_flags = &ret_flags_local; /* will be discarded */
 
     queue_signals();
     for (node = firstnode(list); node; incnode(node)) {
@@ -75,10 +83,8 @@ prefork(LinkList list, int flags)
 	    setdata(node, cptr);
 	}
 	if (!(node = stringsubst(list, node,
-				 flags & (PREFORK_SINGLE|PREFORK_SPLIT|
-					  PREFORK_SHWORDSPLIT|
-					  PREFORK_NOSHWORDSPLIT),
-				 asssub))) {
+				 flags & ~(PREFORK_TYPESET|PREFORK_ASSIGN),
+				 ret_flags, asssub))) {
 	    unqueue_signals();
 	    return;
 	}
@@ -149,7 +155,8 @@ stringsubstquote(char *strstart, char **pstrdpos)
 
 /**/
 static LinkNode
-stringsubst(LinkList list, LinkNode node, int pf_flags, int asssub)
+stringsubst(LinkList list, LinkNode node, int pf_flags, int *ret_flags,
+	    int asssub)
 {
     int qt;
     char *str3 = (char *)getdata(node);
@@ -235,7 +242,8 @@ stringsubst(LinkList list, LinkNode node, int pf_flags, int asssub)
 		    pf_flags |= PREFORK_SHWORDSPLIT;
 		node = paramsubst(
 		    list, node, &str, qt,
-		    pf_flags & (PREFORK_SINGLE|PREFORK_SHWORDSPLIT));
+		    pf_flags & (PREFORK_SINGLE|PREFORK_SHWORDSPLIT|
+				PREFORK_SUBEXP), ret_flags);
 		if (errflag || !node)
 		    return NULL;
 		str3 = (char *)getdata(node);
@@ -413,28 +421,12 @@ singsub(char **s)
 
     init_list1(foo, *s);
 
-    prefork(&foo, PREFORK_SINGLE);
+    prefork(&foo, PREFORK_SINGLE, NULL);
     if (errflag)
 	return;
     *s = (char *) ugetnode(&foo);
     DPUTS(nonempty(&foo), "BUG: singsub() produced more than one word!");
 }
-
-/*
- * Bit flags passed back from multsub() to paramsubst().
- */
-enum {
-    /*
-     * Set if the string had whitespace at the start
-     * that should cause word splitting against any preceeding string.
-     */
-    WS_AT_START = 1,
-    /*
-     * Set if the string had whitespace at the end
-     * that should cause word splitting against any following string.
-     */
-    WS_AT_END = 2
-};
 
 /* Perform substitution on a single word, *s. Unlike with singsub(), the
  * result can be more than one word. If split is non-zero, the string is
@@ -448,13 +440,13 @@ enum {
  * NULL to use IFS).  The return value is true iff the expansion resulted
  * in an empty list.
  *
- * *ws_at_start is set to bits in the enum above as neeed.
+ * *ms_flags is set to bits in the enum above as neeed.
  */
 
 /**/
 static int
 multsub(char **s, int pf_flags, char ***a, int *isarr, char *sep,
-	int *ws_sub)
+	int *ms_flags)
 {
     int l;
     char **r, **p, *x = *s;
@@ -470,7 +462,7 @@ multsub(char **s, int pf_flags, char ***a, int *isarr, char *sep,
 	    l++;
 	    if (!iwsep(STOUC(c)))
 		break;
-	    *ws_sub |= WS_AT_START;
+	    *ms_flags |= MULTSUB_WS_AT_START;
 	}
     }
 
@@ -503,7 +495,7 @@ multsub(char **s, int pf_flags, char ***a, int *isarr, char *sep,
 			    break;
 		    }
 		    if (!*x) {
-			*ws_sub |= WS_AT_END;
+			*ms_flags |= MULTSUB_WS_AT_END;
 			break;
 		    }
 		    insertlinknode(&foo, n, (void *)x), incnode(n);
@@ -532,7 +524,7 @@ multsub(char **s, int pf_flags, char ***a, int *isarr, char *sep,
 	}
     }
 
-    prefork(&foo, pf_flags);
+    prefork(&foo, pf_flags, ms_flags);
     if (errflag) {
 	if (isarr)
 	    *isarr = 0;
@@ -1517,7 +1509,8 @@ check_colon_subscript(char *str, char **endp)
 
 /**/
 static LinkNode
-paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
+paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
+	   int *ret_flags)
 {
     char *aptr = *str, c, cc;
     char *s = aptr, *fstr, *idbeg, *idend, *ostr = (char *) getdata(n);
@@ -1747,7 +1740,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
      * whitespace.  However, if there's no "x" the whitespace is
      * simply removed.
      */
-    int ws_sub = 0;
+    int ms_flags = 0;
 
     *s++ = '\0';
     /*
@@ -2296,8 +2289,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	 * remove the aspar test and extract a value from an array, if
 	 * necessary, when we handle (P) lower down.
 	 */
-	if (multsub(&val, 0, (aspar ? NULL : &aval), &isarr, NULL,
-		    &ws_sub) && quoted) {
+	if (multsub(&val, PREFORK_SUBEXP, (aspar ? NULL : &aval), &isarr, NULL,
+		    &ms_flags) && quoted) {
 	    /* Empty quoted string --- treat as null string, not elided */
 	    isarr = -1;
 	    aval = (char **) hcalloc(sizeof(char *));
@@ -2311,6 +2304,28 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	 */
 	while (inull(*s))
 	    s++;
+	if (ms_flags & MULTSUB_PARAM_NAME) {
+	    /*
+	     * Downbelow has told us this is a parameter name, e.g.
+	     * ${${(P)name}...}.  We're going to behave as if
+	     * we have exactly that name followed by the rest of
+	     * the parameter for subscripting etc.
+	     *
+	     * See below for where we set the flag in the nested
+	     * substitution.
+	     */
+	    if (isarr) {
+		if (aval[1]) {
+		    zerr("parameter name reference used with array");
+		    return NULL;
+		}
+		val = aval[0];
+		isarr = 0;
+	    }
+	    s = dyncat(val, s);
+	    /* Now behave po-faced as if it was always like that... */
+	    subexp = aspar = 0;
+	}
 	v = (Value) NULL;
     } else if (aspar) {
 	/*
@@ -2328,13 +2343,24 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	} else
 	    vunset = 1;
     }
+    if (aspar && (pf_flags & PREFORK_SUBEXP)) {
+	/*
+	 * This is the inner handling for the case referred to above
+	 * where we have something like ${${(P)name}...}.
+	 *
+	 * Treat this as as a normal value here; all transformations on
+	 * result are in outer instance.
+	 */
+	aspar = 0;
+	*ret_flags |= MULTSUB_PARAM_NAME;
+    }
     /*
      * We need to retrieve a value either if we haven't already
      * got it from a subexpression, or if the processing so
      * far has just yielded us a parameter name to be processed
      * with (P).
      */
-    if (!subexp || aspar) {
+    else if (!subexp || aspar) {
 	char *ov = val;
 
 	/*
@@ -2768,7 +2794,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		    split_flags = PREFORK_NOSHWORDSPLIT;
 		}
 		multsub(&val, split_flags, (aspar ? NULL : &aval),
-			&isarr, NULL, &ws_sub);
+			&isarr, NULL, &ms_flags);
 		copied = 1;
 		spbreak = 0;
 		/* Leave globsubst on if forced */
@@ -2797,14 +2823,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 		     * behavior on caller choice of PREFORK_SHWORDSPLIT. */
 		    multsub(&val,
 			    spbreak ? PREFORK_SINGLE : PREFORK_NOSHWORDSPLIT,
-			    NULL, &isarr, NULL, &ws_sub);
+			    NULL, &isarr, NULL, &ms_flags);
 		} else {
 		    if (spbreak)
 			split_flags = PREFORK_SPLIT|PREFORK_SHWORDSPLIT;
 		    else
 			split_flags = PREFORK_NOSHWORDSPLIT;
 		    multsub(&val, split_flags, &aval, &isarr, NULL,
-			    &ws_sub);
+			    &ms_flags);
 		    spbreak = 0;
 		}
 		if (arrasg) {
@@ -3336,7 +3362,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	}
 	if (haserr || errflag)
 	    return NULL;
-	ws_sub = 0;
+	ms_flags = 0;
     }
     /*
      * This handles taking a length with ${#foo} and variations.
@@ -3375,7 +3401,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	sprintf(buf, "%ld", len);
 	val = dupstring(buf);
 	isarr = 0;
-	ws_sub = 0;
+	ms_flags = 0;
     }
     /* At this point we make sure that our arrayness has affected the
      * arrayness of the linked list.  Then, we can turn our value into
@@ -3405,7 +3431,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 	if (isarr) {
 	    val = sepjoin(aval, sep, 1);
 	    isarr = 0;
-	    ws_sub = 0;
+	    ms_flags = 0;
 	}
 	if (!ssub && (spbreak || spsep)) {
 	    aval = sepsplit(val, spsep, 0, 1);
@@ -3690,12 +3716,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
      * If a multsub result had whitespace at the start and we're
      * splitting and there's a previous string, now's the time to do so.
      */
-    if ((ws_sub & WS_AT_START) && aptr > ostr) {
+    if ((ms_flags & MULTSUB_WS_AT_START) && aptr > ostr) {
 	insertlinknode(l, n, dupstrpfx(ostr, aptr - ostr)), incnode(n);
 	ostr = aptr;
     }
     /* Likewise at the end */
-    if ((ws_sub & WS_AT_END) && *fstr) {
+    if ((ms_flags & MULTSUB_WS_AT_END) && *fstr) {
 	insertlinknode(l, n, dupstring(fstr)); /* appended, no incnode */
 	*fstr = '\0';
     }
@@ -3777,7 +3803,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags)
 
 	    *--fstr = Marker;
 	    init_list1(tl, fstr);
-	    if (!eval && !stringsubst(&tl, firstnode(&tl), ssub, 0))
+	    if (!eval && !stringsubst(&tl, firstnode(&tl), ssub, ret_flags, 0))
 		return NULL;
 	    *str = aptr;
 	    tn = firstnode(&tl);

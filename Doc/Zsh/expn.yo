@@ -1033,7 +1033,16 @@ var(name) used in this fashion.
 If used with a nested parameter or command substitution, the result of that
 will be taken as a parameter name in the same way.  For example, if you
 have `tt(foo=bar)' and `tt(bar=baz)', the strings tt(${(P)foo}),
-tt(${(P)${foo}}), and tt(${(P)$(echo bar)}) will be expanded to `tt(baz)'.
+tt(${(P)${foo}}), and tt(${(P)$(echo bar)}) will be expanded to
+`tt(baz)'.
+
+Likewise, if the reference is itself nested, the expression with the
+flag is treated as if it were directly replaced by the parameter name.
+It is an error if this nested substitution produces an array with more
+than one word.  For example, if `tt(name=assoc)' where the parameter
+tt(assoc) is an associative array, then
+`tt(${${(P)name}[elt]})' refers to the element of the associative
+subscripted `tt(elt)'.
 )
 item(tt(q))(
 Quote characters that are special to the shell in the resulting words with

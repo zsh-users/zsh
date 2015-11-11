@@ -1866,18 +1866,45 @@ enum {
 };
 
 /* Flags as the second argument to prefork */
-/* argument handled like typeset foo=bar */
-#define PREFORK_TYPESET	        0x01
-/* argument handled like the RHS of foo=bar */
-#define PREFORK_ASSIGN	        0x02
-/* single word substitution */
-#define PREFORK_SINGLE	        0x04
-/* explicitly split nested substitution */
-#define PREFORK_SPLIT           0x08
-/* SHWORDSPLIT in parameter expn */
-#define PREFORK_SHWORDSPLIT     0x10
-/* SHWORDSPLIT forced off in nested subst */
-#define PREFORK_NOSHWORDSPLIT   0x20
+enum {
+    /* argument handled like typeset foo=bar */
+    PREFORK_TYPESET       = 0x01,
+    /* argument handled like the RHS of foo=bar */
+    PREFORK_ASSIGN        = 0x02,
+    /* single word substitution */
+    PREFORK_SINGLE        = 0x04,
+    /* explicitly split nested substitution */
+    PREFORK_SPLIT         = 0x08,
+    /* SHWORDSPLIT in parameter expn */
+    PREFORK_SHWORDSPLIT   = 0x10,
+    /* SHWORDSPLIT forced off in nested subst */
+    PREFORK_NOSHWORDSPLIT = 0x20,
+    /* Prefork is part of a parameter subexpression */
+    PREFORK_SUBEXP        = 0x40
+};
+
+/*
+ * Bit flags passed back from multsub() to paramsubst().
+ * Some flags go from a nested parmsubst() through the enclosing
+ * stringsubst() and prefork().
+ */
+enum {
+    /*
+     * Set if the string had whitespace at the start
+     * that should cause word splitting against any preceeding string.
+     */
+    MULTSUB_WS_AT_START = 1,
+    /*
+     * Set if the string had whitespace at the end
+     * that should cause word splitting against any following string.
+     */
+    MULTSUB_WS_AT_END   = 2,
+    /*
+     * Set by nested paramsubst() to indicate the return
+     * value is a parameter name, rather than a value.
+     */
+    MULTSUB_PARAM_NAME  = 4
+};
 
 /*
  * Structure for adding parameters in a module.

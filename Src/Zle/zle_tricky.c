@@ -2223,7 +2223,7 @@ doexpansion(char *s, int lst, int olst, int explincmd)
         else if (*ts == '\'')
             *ts = Snull;
     addlinknode(vl, ss);
-    prefork(vl, 0);
+    prefork(vl, 0, NULL);
     if (errflag)
 	goto end;
     if (lst == COMP_LIST_EXPAND || lst == COMP_EXPAND) {

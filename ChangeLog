@@ -1,5 +1,10 @@
 2015-11-11  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 37092: Doc/Zsh/expn.yo, Src/Zle/compctl.c,
+	Src/Zle/zle_tricky.c, Src/cond.c, Src/exec.c, Src/glob.c,
+	Src/subst.c, Src/zsh.h: make a ${(P)name} subexpression properly
+	refer to a parameter name.
+
 	* 37091: Src/Zle/zle_utils.c: clear lastline and lastlinesz when
 	freeing.
 

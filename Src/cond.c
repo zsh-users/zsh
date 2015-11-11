@@ -43,7 +43,7 @@ static void cond_subst(char **strp, int glob_ok)
 	checkglobqual(*strp, strlen(*strp), 1, NULL)) {
 	LinkList args = newlinklist();
 	addlinknode(args, *strp);
-	prefork(args, 0);
+	prefork(args, 0, NULL);
 	while (!errflag && args && nonempty(args) &&
 	       has_token((char *)peekfirst(args)))
 	    zglob(args, firstnode(args), 0);

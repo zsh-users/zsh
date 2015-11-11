@@ -2290,7 +2290,7 @@ addvars(Estate state, Wordcode pc, int addflags)
 
 	if (vl && htok) {
 	    prefork(vl, (isstr ? (PREFORK_SINGLE|PREFORK_ASSIGN) :
-			 PREFORK_ASSIGN));
+			 PREFORK_ASSIGN), NULL);
 	    if (errflag) {
 		state->pc = opc;
 		return;
@@ -2416,7 +2416,7 @@ void
 execsubst(LinkList strs)
 {
     if (strs) {
-	prefork(strs, esprefork);
+	prefork(strs, esprefork, NULL);
 	if (esglob && !errflag) {
 	    LinkList ostrs = strs;
 	    globlist(strs, 0);
@@ -2721,7 +2721,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
     /* Do prefork substitutions */
     esprefork = (assign || isset(MAGICEQUALSUBST)) ? PREFORK_TYPESET : 0;
     if (args && htok)
-	prefork(args, esprefork);
+	prefork(args, esprefork, NULL);
 
     if (type == WC_SIMPLE || type == WC_TYPESET) {
 	int unglobbed = 0;
@@ -3558,7 +3558,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 				 */
 				/* Unused dummy value for name */
 				(void)ecgetstr(state, EC_DUPTOK, &htok);
-				prefork(&svl, PREFORK_TYPESET);
+				prefork(&svl, PREFORK_TYPESET, NULL);
 				if (errflag) {
 				    state->pc = opc;
 				    break;
@@ -3584,7 +3584,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 				}
 				continue;
 			    }
-			    prefork(&svl, PREFORK_SINGLE);
+			    prefork(&svl, PREFORK_SINGLE, NULL);
 			    name = empty(&svl) ? "" :
 				(char *)getdata(firstnode(&svl));
 			}
@@ -3600,7 +3600,9 @@ execcmd(Estate state, int input, int output, int how, int last1)
 			    } else {
 				if (htok) {
 				    init_list1(svl, val);
-				    prefork(&svl, PREFORK_SINGLE|PREFORK_ASSIGN);
+				    prefork(&svl,
+					    PREFORK_SINGLE|PREFORK_ASSIGN,
+					    NULL);
 				    if (errflag) {
 					state->pc = opc;
 					break;
@@ -3622,7 +3624,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 					  EC_DUPTOK, &htok);
 			    if (asg->value.array)
 			    {
-				prefork(asg->value.array, PREFORK_ASSIGN);
+				prefork(asg->value.array, PREFORK_ASSIGN, NULL);
 				if (errflag) {
 				    state->pc = opc;
 				    break;

@@ -2116,7 +2116,7 @@ getreal(char *str)
 
     noerrs = 1;
     addlinknode(l, dupstring(str));
-    prefork(l, 0);
+    prefork(l, 0, NULL);
     noerrs = ne;
     if (!errflag && nonempty(l) &&
 	((char *) peekfirst(l)) && ((char *) peekfirst(l))[0])
@@ -3728,7 +3728,7 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	errflag &= ~ERRFLAG_ERROR;
 	zcontext_restore();
 	/* Fine, now do full expansion. */
-	prefork(foo, 0);
+	prefork(foo, 0, NULL);
 	if (!errflag) {
 	    globlist(foo, 0);
 	    if (!errflag)
