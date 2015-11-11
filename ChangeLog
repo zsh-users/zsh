@@ -1,3 +1,8 @@
+2015-11-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37091: Src/Zle/zle_utils.c: clear lastline and lastlinesz when
+	freeing.
+
 2015-11-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37084: Test/V10private.ztst: add check for zsh/param/private
