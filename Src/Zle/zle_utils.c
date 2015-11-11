@@ -1436,6 +1436,8 @@ freeundo(void)
     freechanges(changes);
     freechanges(nextchanges);
     zfree(lastline, lastlinesz);
+    lastline = NULL;
+    lastlinesz = 0;
 }
 
 /**/
