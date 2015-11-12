@@ -2274,6 +2274,7 @@ the command line or key bindings temporarily.
 
 
 The following widget, tt(caps-lock), serves as an example.
+
 example(self-insert-ucase+LPAR()RPAR() {
   LBUFFER+=${(U)KEYS[-1]}
 }
@@ -2293,8 +2294,8 @@ zle -D save-caps-lock
 
 (( stat )) && zle send-break
 
-return $stat
-)
+return $stat)
+
 This causes typed letters to be inserted capitalised until either
 tt(accept-line) (i.e. typically the return key) is typed or the
 tt(caps-lock) widget is invoked again; the later is handled by saving

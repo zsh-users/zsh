@@ -558,8 +558,7 @@ For example:
 
 example(emulate sh -c 'fni+LPAR()RPAR() { setopt cshnullglob; }
 fno+LPAR()RPAR() { fni; }'
-fno
-)
+fno)
 
 The two functions tt(fni) and tt(fno) are defined with sticky tt(sh)
 emulation.  tt(fno) is then executed, causing options associated

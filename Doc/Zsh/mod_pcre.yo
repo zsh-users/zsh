@@ -54,8 +54,7 @@ used to implement the "find all non-overlapping matches" functionality.
 
 A simple example of "find all non-overlapping matches":
 
-example(
-string="The following zip codes: 78884 90210 99513"
+example(string="The following zip codes: 78884 90210 99513"
 pcre_compile -m "\d{5}"
 accum=()
 pcre_match -b -- $string
@@ -64,10 +63,7 @@ while [[ $? -eq 0 ]] do
     accum+=$MATCH
     pcre_match -b -n $b[2] -- $string
 done
-print -l $accum
-
-
-)
+print -l $accum)
 )
 enditem()
 

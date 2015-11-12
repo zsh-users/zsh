@@ -111,8 +111,7 @@ arguments, at the end.
 For example, suppose the autoload file tt(func) contains
 
 example(func+LPAR()RPAR() { print This is func; }
-print func is initialized
-)
+print func is initialized)
 
 then `tt(func; func)' with tt(KSH_AUTOLOAD) set will produce both messages
 on the first call, but only the message `tt(This is func)' on the second

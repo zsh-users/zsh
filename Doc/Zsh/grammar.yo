@@ -421,8 +421,7 @@ works, but
 
 example(if true {  # Does not work!
   print yes
-}
-)
+})
 
 does em(not), since the test is not suitably delimited.
 )

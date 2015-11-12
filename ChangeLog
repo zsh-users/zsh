@@ -3,6 +3,10 @@
 	* 37090: Doc/zman.yo, Doc/ztexi.yo: handle blank lines correctly
 	in yodl macro example()
 
+	* unposted: Doc/Zsh/builtins.yo, Doc/Zsh/contrib.yo,
+	Doc/Zsh/func.yo, Doc/Zsh/grammar.yo, Doc/Zsh/mod_pcre.yo,
+	Doc/Zsh/params.yo, Doc/Zsh/zle.yo: cosmetic format fix
+
 2015-11-12  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37096: Src/subst.c, Test/D04parameter.ztst: make top-level

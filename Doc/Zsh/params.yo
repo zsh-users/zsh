@@ -383,9 +383,7 @@ as part of an arithmetic expression in an ordinary subscript.
 To avoid subscript parsing limitations in assignments to associative array
 elements, use the append syntax:
 
-example(
-   aa+=('key with "*strange*" characters' 'value string')
-)
+example(aa+=('key with "*strange*" characters' 'value string'))
 
 The basic rule to remember when writing a subscript expression is that all
 text between the opening `tt([)' and the closing `tt(])' is interpreted
