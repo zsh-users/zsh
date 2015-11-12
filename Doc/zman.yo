@@ -174,9 +174,11 @@ def(itemiz)(1)(\
 COMMENT(--- special effects ---)
 
 def(example)(1)(\
+  undef(PARAGRAPH)\
   NOTRANS(.RS)+NL()NOTRANS(.nf)+NL()\
   NOTRANS(\fB)ARG1+NOTRANS(\fP)\
   +NL()NOTRANS(.fi)+NL()NOTRANS(.RE)\
+  STDPAR()\
 )
 
 def(nofill)(1)(\

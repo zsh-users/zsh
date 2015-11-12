@@ -225,9 +225,11 @@ def(nofill)(1)(\
 )
 
 def(example)(1)(\
+  undef(PARAGRAPH)\
   NOTRANS(@example)+NL()\
   ARG1\
   +NL()NOTRANS(@end example)\
+  STDPAR()\
 )
 
 def(indent)(1)(\
