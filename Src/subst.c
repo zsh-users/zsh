@@ -1741,6 +1741,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      * simply removed.
      */
     int ms_flags = 0;
+    /*
+     * We need to do an extra fetch to honour the (P) flag.
+     * Complicated by the use of subexpressions that may have
+     * nested (P) flags.
+     */
+    int fetch_needed;
 
     *s++ = '\0';
     /*
@@ -2325,9 +2331,18 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    s = dyncat(val, s);
 	    /* Now behave po-faced as if it was always like that... */
 	    subexp = 0;
-	}
+	    /*
+	     * If this is a (P) (first test) and at the top level
+	     * (second test) we can't rely on the caller fetching
+	     * the result from the pending aspar.  So do it below.
+	     */
+	    fetch_needed = aspar && !(pf_flags & PREFORK_SUBEXP);
+	} else
+	    fetch_needed = 0; 	/* any initial aspar fetch already done */
 	v = (Value) NULL;
-    } else if (aspar) {
+    } else
+	fetch_needed = aspar;	/* aspar fetch still needed */
+    if (fetch_needed) {
 	/*
 	 * No subexpression, but in any case the value is going
 	 * to give us the name of a parameter on which we do

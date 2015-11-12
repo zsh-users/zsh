@@ -1840,7 +1840,7 @@
     local two=three
     local three=four
     local -a four=(all these worlds belong to foo)
-    print ${${(P)${(P)${(P)one}}}}
+    print ${(P)${(P)${(P)one}}}
     print ${${(P)${(P)${(P)one}}}[3]}
   }
   testfn

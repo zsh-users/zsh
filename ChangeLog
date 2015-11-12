@@ -1,3 +1,11 @@
+2015-11-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37096: Src/subst.c, Test/D04parameter.ztst: make top-level
+	${(P)...} with nested ${(P)...} to the right thing.
+
+	* 37094: Src/subst.c, Test/D04parameter.ztst: Further tweaks to
+	parameter name references: array safety; nested parameters; tests.
+
 2015-11-11  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37092: Doc/Zsh/expn.yo, Src/Zle/compctl.c,
