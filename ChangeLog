@@ -1,3 +1,8 @@
+2015-11-26  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Matthew Martin: 37100: Completion/Unix/Command/_sysctl:
+	updates.
+
 2015-11-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk: 5.1.1-test-2
