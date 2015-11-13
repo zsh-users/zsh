@@ -1,5 +1,8 @@
 2015-11-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Src/Zle/zle_tricky.c: Make $EDITOR's
+	jump-to-matching-brace happy.
+
 	* 37031: Completion/Unix/Command/_git: _git-merge: Exclude
 	ancestors of HEAD from recent commit completion
 

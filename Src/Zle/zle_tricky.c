@@ -1878,6 +1878,7 @@ get_comp_string(void)
 
     if (!isset(IGNOREBRACES)) {
 	/* Try and deal with foo{xxx etc. */
+	/*}*/
 	char *curs = s + (isset(COMPLETEINWORD) ? offs : (int)strlen(s));
 	char *predup = dupstring(s), *dp = predup;
 	char *bbeg = NULL, *bend = NULL, *dbeg = NULL;
@@ -1889,6 +1890,7 @@ get_comp_string(void)
 	     * we try to get braces after a parameter expansion right,
 	     * but this may fail sometimes. sorry.
 	     */
+	    /*}*/
 	    if (*p == String || *p == Qstring) {
 		if (p[1] == Inbrace || p[1] == Inpar || p[1] == Inbrack) {
 		    char *tp = p + 1;
