@@ -1399,17 +1399,18 @@ substitution then applies the modifier tt(:h) and takes the directory part
 of the path.)
 )
 item(tt(2.) em(Internal parameter flags))(
-Any parameter flags set by one of the tt(typeset) family of commands,
-in particular the tt(L), tt(R), tt(Z), tt(u) and tt(l) flags for padding
-and capitalization, are applied directly to the parameter value.
-Note these flags are options to the command, e.g. `tt(typeset -Z)';
-they are not the same as the flags used within parameter substitutions.
+Any parameter flags set by one of the tt(typeset) family of commands, in
+particular the tt(-L), tt(-R), tt(-Z), tt(-u) and tt(-l) options for
+padding and capitalization, are applied directly to the parameter value.
+Note these flags are options to the command, e.g. `tt(typeset -Z)'; they
+are not the same as the flags used within parameter substitutions.
 
-At the outermost level of substitution, the `tt((P))' flag ignores these
-transformations and uses the unmodified value of the parameter as the name
-to be replaced.  This is usually the desired behavior because padding may
-make the value syntactically illegal as a parameter name, but if
-capitalization changes are desired, use the tt(${${(P)foo}}) form.
+At the outermost level of substitution, the `tt((P))' flag (rule tt(4.))
+ignores these transformations and uses the unmodified value of the
+parameter as the name to be replaced.  This is usually the desired
+behavior because padding may make the value syntactically illegal as a
+parameter name, but if capitalization changes are desired, use the
+tt(${${(P)foo}}) form (rule tt(25.)).
 )
 item(tt(3.) em(Parameter subscripting))(
 If the value is a raw parameter reference with a subscript, such as
@@ -1420,21 +1421,25 @@ subscript.  Thus if tt(var) is an array, tt(${var[1][2]}) is the second
 character of the first word, but tt(${var[2,4][2]}) is the entire third
 word (the second word of the range of words two through four of the
 original array).  Any number of subscripts may appear.  Flags such as
-tt((k)) and tt((v)) which alter the result of subscripting are applied.
+`tt((k))' and `tt((v))' which alter the result of subscripting are applied.
 )
 item(tt(4.) em(Parameter name replacement))(
-At the outermost level of nesting only, the effect of any tt((P)) flag,
-which treats the value so far as a parameter name and replaces it with the
-corresponding value, is applied.  This replacement occurs later if the
-tt((P)) flag appears in a nested substitution.
+At the outermost level of nesting only, the `tt((P))' flag is applied.  This
+treats the value so far as a parameter name (which may include a subscript
+expression) and replaces that with the corresponding value.  This
+replacement occurs later if the `tt((P))' flag appears in a nested
+substitution.
+
+If the value so far names a parameter that has internal flags (rule tt(2.)),
+those internal flags are applied to the new value after replacement.
 )
 item(tt(5.) em(Double-quoted joining))(
 If the value after this process is an array, and the substitution
-appears in double quotes, and neither an tt((@)) flag nor a tt(#)
+appears in double quotes, and neither an `tt((@))' flag nor a `tt(#)'
 length operator is present at the current level, then words of the
 value are joined with the first character of the parameter tt($IFS),
 by default a space, between each word (single word arrays are not
-modified).  If the tt((j)) flag is present, that is used for joining
+modified).  If the `tt((j))' flag is present, that is used for joining
 instead of tt($IFS).
 )
 item(tt(6.) em(Nested subscripting))(
@@ -1448,22 +1453,22 @@ returns a scalar because of the quotes).
 )
 item(tt(7.) em(Modifiers))(
 Any modifiers, as specified by a trailing `tt(#)', `tt(%)', `tt(/)'
-(possibly doubled) or by a set of modifiers of the form tt(:...) (see
+(possibly doubled) or by a set of modifiers of the form `tt(:...)' (see
 noderef(Modifiers) in noderef(History Expansion)), are applied to the words
 of the value at this level.
 )
 item(tt(8.) em(Character evaluation))(
-Any tt((#)) flag is applied, evaluating the result so far numerically
+Any `tt((#))' flag is applied, evaluating the result so far numerically
 as a character.
 )
 item(tt(9.) em(Length))(
-Any initial tt(#) modifier, i.e. in the form tt(${#)var(var)tt(}), is
+Any initial `tt(#)' modifier, i.e. in the form tt(${#)var(var)tt(}), is
 used to evaluate the length of the expression so far.
 )
 item(tt(10.) em(Forced joining))(
 If the `tt((j))' flag is present, or no `tt((j))' flag is present but
 the string is to be split as given by rule tt(11.), and joining
-did not take place at step tt(5.), any words in the value are joined
+did not take place at rule tt(5.), any words in the value are joined
 together using the given string or the first character of tt($IFS) if none.
 Note that the `tt((F))' flag implicitly supplies a string for joining in this
 manner.
@@ -1480,22 +1485,22 @@ occurrences of any of the characters in tt($IFS).  Note this step, too,
 takes place at all levels of a nested substitution.
 )
 item(tt(12.) em(Case modification))(
-Any case modification from one of the flags tt((L)), tt((U)) or tt((C))
+Any case modification from one of the flags `tt((L))', `tt((U))' or `tt((C))'
 is applied.
 )
 item(tt(13.) em(Escape sequence replacement))(
-First any replacements from the tt((g)) flag are performed, then any
-prompt-style formatting from the tt((%)) family of flags is applied.
+First any replacements from the `tt((g))' flag are performed, then any
+prompt-style formatting from the `tt((%))' family of flags is applied.
 )
 item(tt(14.) em(Quote application))(
-Any quoting or unquoting using tt((q)) and tt((Q)) and related flags
+Any quoting or unquoting using `tt((q))' and `tt((Q))' and related flags
 is applied.
 )
 item(tt(15.) em(Directory naming))(
-Any directory name substitution using tt((D)) flag is applied.
+Any directory name substitution using `tt((D))' flag is applied.
 )
 item(tt(16.) em(Visibility enhancement))(
-Any modifications to make characters visible using the tt((V)) flag
+Any modifications to make characters visible using the `tt((V))' flag
 are applied.
 )
 item(tt(17.) em(Lexical word splitting))(
@@ -1533,7 +1538,7 @@ In contexts where expansion semantics requires a single word to
 result, all words are rejoined with the first character of tt(IFS)
 between.  So in `tt(${LPAR()P)tt(RPAR()${LPAR()f)tt(RPAR()lines}})'
 the value of tt(${lines}) is split at newlines, but then must be
-joined again before the tt(P) flag can be applied.
+joined again before the `tt((P))' flag can be applied.
 
 If a single word is not required, this rule is skipped.
 )
@@ -1546,10 +1551,11 @@ Strictly speaking, the removal happens later as the same happens with
 other forms of substitution; the point to note here is simply that
 it occurs after any of the above parameter operations.
 )
-item(tt(25.) em(Parameter name replacement))(
-If the `tt((P))' flag is present and this has not yet been done, the value
-so far is looked up as a parameter name.  Errors may occur if the value is
-neither a valid identifier nor an identifier plus subscript expression.
+item(tt(25.) em(Nested parameter name replacement))(
+If the `tt((P))' flag is present and rule tt(4.) has not applied, the
+value so far is treated as a parameter name (which may include a subscript
+expression) and replaced with the corresponding value, with internal flags
+(rule tt(2.)) applied to the new value.
 )
 enditem()
 

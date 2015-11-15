@@ -1,3 +1,7 @@
+2015-11-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37119: Doc/Zsh/expn.yo: further "Rules" clarifications
+
 2015-11-14  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 37115: Completion/Unix/Commmand/_git, Doc/Zsh/expn.yo: update
