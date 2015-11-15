@@ -1,3 +1,8 @@
+2015-11-14  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37115: Completion/Unix/Commmand/_git, Doc/Zsh/expn.yo: update
+	for changes in ${(P)...} evaluation.
+
 2015-11-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Src/Zle/zle_tricky.c: Make $EDITOR's

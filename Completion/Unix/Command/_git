@@ -5244,7 +5244,7 @@ _git_commands () {
   for cmdtype in aliases $cmdtypes; do
     local -a ${cmdtype}_d
     (( $#disp )) && set -A ${cmdtype}_d \
-        ${${(Pr.COLUMNS-4.)cmdtype/(#s)(#m)[^:]##:/${(r.len.)MATCH[1,-2]} $sep }%% #}
+        ${${(r.COLUMNS-4.)${(P)cmdtype}/(#s)(#m)[^:]##:/${(r.len.)MATCH[1,-2]} $sep }%% #}
     alts+=( "${cmdtype//_/-}:${${cmdtype//_/ }%%(e|)s}:compadd ${(e)disp} -a ${cmdtype}_m" )
   done
 

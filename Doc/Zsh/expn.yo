@@ -1380,9 +1380,13 @@ outermost.  The flags are not propagated up to enclosing
 substitutions; the nested substitution will return either a scalar or an
 array as determined by the flags, possibly adjusted for quoting.  All the
 following steps take place where applicable at all levels of substitution.
-Note that, unless the `tt((P))' flag is present, the flags and any subscripts
-apply directly to the value of the nested substitution; for example, the
-expansion tt(${${foo}}) behaves exactly the same as tt(${foo}).
+
+Note that, unless the `tt((P))' flag is present, the flags and any
+subscripts apply directly to the value of the nested substitution; for
+example, the expansion tt(${${foo}}) behaves exactly the same as
+tt(${foo}).  When the `tt((P))' flag is present in a nested substitution,
+the other substitution rules are applied to the value em(before) it is
+interpreted as a name, so tt(${${(P)foo}}) may differ from tt(${(P)foo}).
 
 At each nested level of substitution, the substituted words undergo all
 forms of single-word substitution (i.e. not filename generation), including
@@ -1400,6 +1404,12 @@ in particular the tt(L), tt(R), tt(Z), tt(u) and tt(l) flags for padding
 and capitalization, are applied directly to the parameter value.
 Note these flags are options to the command, e.g. `tt(typeset -Z)';
 they are not the same as the flags used within parameter substitutions.
+
+At the outermost level of substitution, the `tt((P))' flag ignores these
+transformations and uses the unmodified value of the parameter as the name
+to be replaced.  This is usually the desired behavior because padding may
+make the value syntactically illegal as a parameter name, but if
+capitalization changes are desired, use the tt(${${(P)foo}}) form.
 )
 item(tt(3.) em(Parameter subscripting))(
 If the value is a raw parameter reference with a subscript, such as
@@ -1413,8 +1423,10 @@ original array).  Any number of subscripts may appear.  Flags such as
 tt((k)) and tt((v)) which alter the result of subscripting are applied.
 )
 item(tt(4.) em(Parameter name replacement))(
-The effect of any tt((P)) flag, which treats the value so far as a
-parameter name and replaces it with the corresponding value, is applied.
+At the outermost level of nesting only, the effect of any tt((P)) flag,
+which treats the value so far as a parameter name and replaces it with the
+corresponding value, is applied.  This replacement occurs later if the
+tt((P)) flag appears in a nested substitution.
 )
 item(tt(5.) em(Double-quoted joining))(
 If the value after this process is an array, and the substitution
@@ -1533,6 +1545,11 @@ is elided from the list of arguments inserted into the command line.
 Strictly speaking, the removal happens later as the same happens with
 other forms of substitution; the point to note here is simply that
 it occurs after any of the above parameter operations.
+)
+item(tt(25.) em(Parameter name replacement))(
+If the `tt((P))' flag is present and this has not yet been done, the value
+so far is looked up as a parameter name.  Errors may occur if the value is
+neither a valid identifier nor an identifier plus subscript expression.
 )
 enditem()
 
