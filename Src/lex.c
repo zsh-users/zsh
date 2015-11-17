@@ -1617,7 +1617,7 @@ parsestrnoerr(char **s)
 mod_export char *
 parse_subscript(char *s, int sub, int endchar)
 {
-    int l = strlen(s), err;
+    int l = strlen(s), err, toklen;
     char *t;
 
     if (!*s || *s == endchar)
@@ -1626,18 +1626,34 @@ parse_subscript(char *s, int sub, int endchar)
     untokenize(t = dupstring(s));
     inpush(t, 0, NULL);
     strinbeg(0);
+    /*
+     * Warning to Future Generations:
+     *
+     * This way of passing the subscript through the lexer is brittle.
+     * Code above this for several layers assumes that when we tokenise
+     * the input it goes into the same place as the original string.
+     * However, the lexer may overwrite later bits of the string or
+     * reallocate it, in particular when expanding aliaes.  To get
+     * around this, we copy the string and then copy it back.  This is a
+     * bit more robust but still relies on the underlying assumption of
+     * length preservation.
+     */
     lexbuf.len = 0;
-    lexbuf.ptr = tokstr = s;
+    lexbuf.ptr = tokstr = dupstring(s);
     lexbuf.siz = l + 1;
     err = dquote_parse(endchar, sub);
+    toklen = (int)(lexbuf.ptr - tokstr);
+    DPUTS(toklen > l, "Bad length for parsed subscript");
+    memcpy(s, tokstr, toklen);
     if (err) {
-	err = *lexbuf.ptr;
-	*lexbuf.ptr = '\0';
+	char *strend = s + toklen;
+	err = *strend;
+	*strend = '\0';
 	untokenize(s);
-	*lexbuf.ptr = err;
+	*strend = err;
 	s = NULL;
     } else {
-	s = lexbuf.ptr;
+	s += toklen;
     }
     strinend();
     inpop();

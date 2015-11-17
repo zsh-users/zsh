@@ -249,3 +249,20 @@
   string[0]=!
 1:Can't set only element zero of string
 ?(eval):1: string: assignment to invalid subscript range
+
+  typeset -A assoc=(leader topcat officer dibble sidekick choochoo)
+  alias myind='echo leader' myletter='echo 1' myletter2='echo 4'
+  print ${assoc[$(myind)]}
+  print $assoc[$(myind)]
+  print ${assoc[$(myind)][$(myletter)]}${assoc[$(myind)][$(myletter2)]}
+  assoc[$(myind)]='of the gang'
+  print ${assoc[$(myind)]}
+  print $assoc[$(myind)]
+  print $assoc[leader]
+0: Parsing subscript with non-trivial tokenisation
+>topcat
+>topcat
+>tc
+>of the gang
+>of the gang
+>of the gang
