@@ -1,3 +1,8 @@
+2015-11-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37127 (minor tweak): Doc/Zsh/params.yo: document indexing of
+	$signals.
+
 2015-11-16  Mikael Magnusson  <mikachu@gmail.com>
 
 	* Eric Cook: 36986: Functions/Misc/zed: Add -- to the `functions'

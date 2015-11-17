@@ -771,7 +771,13 @@ Incremented by one each time a new shell is started.
 )
 vindex(signals)
 item(tt(signals))(
-An array containing the names of the signals.
+An array containing the names of the signals.  Note that with
+the standard zsh numbering of array indices, where the first element
+has index 1, the signals are offset by 1 from the signal number
+used by the operating system.  For example, on typical Unix-like systems
+tt(HUP) is signal number 1, but is referred to as tt($signals[2]).  This
+is because of tt(EXIT) at position 1 in the array, which is used
+internally by zsh but is not known to the operating system.
 )
 vindex(TRY_BLOCK_ERROR)
 item(tt(TRY_BLOCK_ERROR) <S>)(
