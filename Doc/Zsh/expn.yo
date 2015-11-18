@@ -410,6 +410,12 @@ are only expanded when first parsing command or assignment arguments.
 Process substitutions may be used following redirection operators; in this
 case, the substitution must appear with no trailing string.
 
+Note that `tt(<<LPAR())var(list)tt(RPAR())' is not a special syntax; it
+is equivalent to `tt(< <LPAR())var(list)tt(RPAR())', redirecting
+standard input from the result of process substitution.  Hence all
+the following documentation applies.  The second form (with the space)
+is recommended for clarity.
+
 In the case of the tt(<) or tt(>) forms, the shell runs the commands in
 var(list) as a subprocess of the job executing the shell command line.
 If the system supports the tt(/dev/fd)
