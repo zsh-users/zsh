@@ -2022,7 +2022,9 @@ skipcomm(void)
     int new_lexstop, new_lex_add_raw;
     int save_infor = infor;
     struct lexbufstate new_lexbuf;
+    int noalias = noaliases;
 
+    noaliases = 1;
     infor = 0;
     cmdpush(CS_CMDSUBST);
     SETPARBEGIN
@@ -2140,6 +2142,7 @@ skipcomm(void)
 	SETPAREND
     cmdpop();
     infor = save_infor;
+    noaliases = noalias;
 
     return lexstop;
 #endif

@@ -1,3 +1,8 @@
+2015-11-18  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37145: Src/lex.c: suppress alias expansion in skipcomm() to
+	defer parsing aliases in $(...) et al. into the subshell
+
 2015-11-18  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37140: Doc/Zsh/expn.yo: note that <<(...) is < <(...).
