@@ -5623,8 +5623,8 @@ __git_commits () {
 
 (( $+functions[__git_heads] )) ||
 __git_heads () {
-  __git_heads_local
-  __git_heads_remote
+  __git_heads_local "$@"
+  __git_heads_remote "$@"
 }
 
 (( $+functions[__git_heads_local] )) ||
@@ -5815,7 +5815,7 @@ __git_commit_ranges () {
       if [[ ${PREFIX} = (#b)((\\|)\^)* ]]; then
 	compset -p ${#match[1]}
       else
-	suf=( -S .. -r '.@~ ^:\t\n\-' )
+	suf=( -S .. -r '@~ \^:\t\n\-' )
       fi
     fi
     expl=( $* $suf )

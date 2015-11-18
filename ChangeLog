@@ -1,5 +1,8 @@
 2015-12-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37150: Completion/Unix/Command/_git: _git: Autocomplete .. for
+	commit ranges
+
 	* 36957: Completion/Unix/Command/_git: _git: Apply matchspecs to
 	filename completion such as 'git log f/b<TAB>' → 'foo/bar.txt's
 
