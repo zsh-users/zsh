@@ -32,8 +32,16 @@ Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
 
-Incompatibilites between 5.0.8 and 5.1
---------------------------------------
+Incompatibilities between 5.1 and 5.2
+-------------------------------------
+
+The behaviour of the parameter flag (P) has changed when it appears
+in a nested parameter group, in order to make it more useful in
+such cases.  A (P) in the outermost parameter group behaves as
+before.  See NEWS for more.
+
+Incompatibilities between 5.0.8 and 5.1
+---------------------------------------
 
 The default behaviour when text is pasted into an X Windows terminal has
 changed significantly (unless you are using a very old terminal emulator

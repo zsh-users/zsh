@@ -4,6 +4,36 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes from 5.1.1 to 5.2
+-------------------------
+
+The new module zsh/param/private can be loaded to allow the shell
+to define parameters that are private to a function scope (i.e. are
+not propagated to nested functions called within this function).
+
+The parameter flag ${(P)...} is now more useful when it appears in
+a nested expansion.  For example,
+
+  typeset -A assoc=(one un two deux three trois)
+  name=assoc
+  print ${${(P)name}[one]}
+
+now prints "un".  In previous versions of the shell the value of the
+substitution was fully expanded on return from ${(P)name}, making
+associative array subscripting difficult.  As a side effect, flags
+for formatting appearing in the inner substitution now affect the
+substitution of the name (into "assoc" in this case), which is not
+normally useful: flags that should apply to the value must be in the
+outer substitution.
+
+The GLOB_STAR_SHORT option allows the pattern **/* to be shortened to
+just ** if no / follows. so **.c searches recursively for a file whose
+name has the suffix ".c".
+
+The effect of the WARN_CREATE_GLOBAL option has been significantly
+extended, so expect it to cause additional warning messages about
+parameters created globally within function scope.
+
 Changes from 5.1 to 5.1.1
 -------------------------
 

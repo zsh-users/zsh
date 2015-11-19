@@ -1,5 +1,7 @@
 2015-11-19  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 37159: NEWS, README: update for next version.
+
 	* unposted: Doc/Zsh/params.yo: describe separators between
 	values in array assignment.
 
@@ -63,7 +65,7 @@
 2015-11-12  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37096: Src/subst.c, Test/D04parameter.ztst: make top-level
-	${(P)...} with nested ${(P)...} to the right thing.
+	${(P)...} with nested ${(P)...} do the right thing.
 
 	* 37094: Src/subst.c, Test/D04parameter.ztst: Further tweaks to
 	parameter name references: array safety; nested parameters; tests.
