@@ -99,6 +99,11 @@ the syntax:
 ifzman()
 indent(var(name)tt(+=LPAR())var(value) ...tt(RPAR()))
 
+Within the parentheses on the right hand side of either form of the
+assignment, newlines and semicolons are treated the same as white space,
+separating individual var(value)s.  Any consecutive sequence of such
+characters has the same effect.
+
 Ordinary array parameters may also be explicitly declared with:
 findex(typeset, use of)
 ifzman()
