@@ -1,3 +1,8 @@
+2015-11-20  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 37161: Src/init.c: Disable the heuristic setting RPROMPT_INDENT
+	to 0
+
 2015-11-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37170: Functions/Zle/smart-insert-last-word: suppress

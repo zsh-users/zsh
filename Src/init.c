@@ -790,8 +790,10 @@ init_term(void)
 	    tcstr[TCCLEARSCREEN] = ztrdup("\14");
 	    tclen[TCCLEARSCREEN] = 1;
 	}
-	/* This might work, but there may be more to it */
-	rprompt_indent = ((hasam && !hasbw) || hasye || !tccan(TCLEFT));
+	rprompt_indent = 1;
+	/* The following is an attempt at a heuristic,
+	 * but it fails in some cases */
+	/* rprompt_indent = ((hasam && !hasbw) || hasye || !tccan(TCLEFT)); */
     }
     return 1;
 }
