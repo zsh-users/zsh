@@ -60,7 +60,7 @@ then
     lcursor=$_ilw_lcursor
 else
     NUMERIC=1
-    _ilw_lcursor=$lcursor
+    typeset -g _ilw_lcursor=$lcursor
 fi
 # Handle the up to three arguments of .insert-last-word
 if (( $+1 ))
@@ -73,8 +73,8 @@ then
     (( NUMERIC )) || LBUFFER[lcursor+1,cursor+1]=''
     numeric=$((-(${2:--numeric})))
 fi
-_ilw_hist=$HISTNO
-_ilw_count=$NUMERIC
+typeset -g _ilw_hist=$HISTNO
+typeset -g _ilw_count=$NUMERIC
 
 if [[ -z "$numeric" ]]
 then
@@ -119,7 +119,7 @@ fi
 (( NUMERIC > $#lastcmd )) && return 1
 
 LBUFFER[lcursor+1,cursor+1]=$lastcmd[-NUMERIC]
-_ilw_cursor=$CURSOR
+typeset -g _ilw_cursor=$CURSOR
 
 # This is necessary to update UNDO_CHANGE_NO immediately
-zle split-undo && _ilw_changeno=$UNDO_CHANGE_NO
+zle split-undo && typeset -g _ilw_changeno=$UNDO_CHANGE_NO
