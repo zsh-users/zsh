@@ -5639,6 +5639,7 @@ __git_heads_local () {
       [[ -f $gitdir/$f ]] && heads+=$f
     done
     [[ -f $gitdir/refs/stash ]] && heads+=stash
+    [[ -f $gitdir/refs/bisect/bad ]] && heads+=bisect/bad
   fi
 
   __git_describe_commit heads heads-local "local head" "$@"
