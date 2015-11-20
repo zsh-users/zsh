@@ -1,3 +1,8 @@
+2015-11-20  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: Doc/Zsh/mod_paramter.yo: document order of entries
+	for $history and $historywords
+
 2015-11-20  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 37161: Src/init.c: Disable the heuristic setting RPROMPT_INDENT

@@ -123,10 +123,14 @@ directory, the current working directory.
 vindex(history)
 item(tt(history))(
 This associative array maps history event numbers to the full history lines.
+Although it is presented as an associative array, the array of all values
+(tt(${history[@]})) is guaranteed to be returned in order from most recent
+to oldest history event, that is, by decreasing history event number.
 )
 vindex(historywords)
 item(tt(historywords))(
-A special array containing the words stored in the history.
+A special array containing the words stored in the history.  These also
+appear in most to least recent order.
 )
 vindex(jobdirs)
 item(tt(jobdirs))(
