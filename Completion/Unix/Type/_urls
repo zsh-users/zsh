@@ -1,4 +1,4 @@
-#compdef curl -value-,WWW_HOME,-default- -P -value-,(ftp|http(|s))_proxy,-default-
+#compdef -value-,WWW_HOME,-default- -P -value-,(ftp|http(|s))_proxy,-default-
 
 # Configuration styles used:
 #

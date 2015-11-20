@@ -1,5 +1,8 @@
 2015-11-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37163: Completion/Unix/Command/_curl,
+	Completion/Unix/Type/_urls: Remove curl completion
+
 	* 37215: Completion/Base/Utility/_regex_words: _regex_words:
 	Don't add mismatched parentheses
 
