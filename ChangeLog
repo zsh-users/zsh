@@ -1,5 +1,8 @@
 2015-11-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37164: Completion/Unix/Command/_tmux: _tmux: Complete external
+	commands
+
 	* 37149: Completion/Unix/Command/_git: _git: Complete
 	'bisect/bad' ref
 

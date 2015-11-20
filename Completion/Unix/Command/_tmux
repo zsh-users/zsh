@@ -640,7 +640,7 @@ function _tmux-new-session() {
         '-t[specify target session]:sessions:__tmux-sessions'
         '-x[specify width]:width:_guard "[0-9]#" "numeric value"'
         '-y[specify height]:height:_guard "[0-9]#" "numeric value"'
-        '*:: :_command'
+        '*:: :_cmdstring'
     )
     _arguments -s ${args}
 }
@@ -657,7 +657,7 @@ function _tmux-new-window() {
         '-n[specify a window name]:window name:'
         '-P[print information about new window after it is created]'
         '-t[specify target window]:windows:__tmux-windows'
-        '*:: :_command'
+        '*:: :_cmdstring'
     )
     _arguments ${args}
 }
@@ -776,7 +776,7 @@ function _tmux-respawn-pane() {
     args=(
         '-k[kill window if it is in use]'
         '-t[choose target pane]:window:__tmux-pane'
-        '*::command:_command'
+        '*::command:_cmdstring'
     )
     _arguments ${args}
 }
@@ -787,7 +787,7 @@ function _tmux-respawn-window() {
     args=(
         '-k[kill window if it is in use]'
         '-t[choose target window]:window:__tmux-windows'
-        '*::command:_command'
+        '*::command:_cmdstring'
     )
     _arguments ${args}
 }
@@ -809,7 +809,7 @@ function _tmux-run-shell() {
     args=(
         '-b[run shell command in background]'
         '-t[choose target pane]:pane:__tmux-panes'
-        '*::command:_command'
+        '*::command:_cmdstring'
     )
     _arguments ${args}
 }
@@ -1042,7 +1042,7 @@ function _tmux-split-window() {
         # changing the command's name might annoy users. So it stays like
         # this.
         '-t[choose target pane]:window:__tmux-panes'
-        '*:: :_command'
+        '*:: :_cmdstring'
     )
     _arguments ${args} && return
 }
