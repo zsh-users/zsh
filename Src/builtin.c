@@ -2438,10 +2438,26 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
     if (ASG_VALUEP(asg) && !dont_set) {
 	Param ipm = pm;
 	if (pm->node.flags & (PM_ARRAY|PM_HASHED)) {
-	    DPUTS(!ASG_ARRAYP(asg), "BUG: inconsistent scalar value for array");
-	    if (!(pm=assignaparam(pname, asg->value.array ?
-				  zlinklist2array(asg->value.array) :
-				  mkarray(NULL), 0)))
+	    char **arrayval;
+	    if (!ASG_ARRAYP(asg)) {
+		/*
+		 * Attempt to assign a scalar value to an array.
+		 * This can happen if the array is special.
+		 * We'll be lenient and guess what the user meant.
+		 * This is how normal assigment works.
+		 */
+		if (*asg->value.scalar) {
+		    /* Array with one value */
+		    arrayval = mkarray(ztrdup(asg->value.scalar));
+		} else {
+		    /* Empty array */
+		    arrayval = mkarray(NULL);
+		}
+	    } else if (asg->value.array)
+		arrayval = zlinklist2array(asg->value.array);
+	    else
+		arrayval = mkarray(NULL);
+	    if (!(pm=assignaparam(pname, arrayval, 0)))
 		return NULL;
 	} else {
 	    DPUTS(ASG_ARRAYP(asg), "BUG: inconsistent array value for scalar");

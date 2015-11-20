@@ -1847,3 +1847,22 @@
 0:nested parameter name references
 >all these worlds belong to foo
 >worlds
+
+  (
+  path=(/random /value)
+  testfn1() {
+    local path=
+    print $#path
+  }
+  testfn1
+  testfn2() {
+    local path=/somewhere
+    print $#path $path
+  }
+  testfn2
+  print $#path $path
+  )
+0:Local special variables with loose typing
+>0
+>1 /somewhere
+>2 /random /value

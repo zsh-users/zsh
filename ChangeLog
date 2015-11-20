@@ -1,3 +1,8 @@
+2015-11-20  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 20974: Src/builtin.c, Test/D04parameter.ztst: fix bug
+	when scalar value assigned to special array in typeset.
+
 2015-11-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 37164: Completion/Unix/Command/_tmux: _tmux: Complete external
