@@ -1,5 +1,7 @@
 2015-11-20  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 37168: Src/params.c: no WARN_CREATE_GLOBAL on special parameters.
+
 	* 20974: Src/builtin.c, Test/D04parameter.ztst: fix bug
 	when scalar value assigned to special array in typeset.
 

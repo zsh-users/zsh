@@ -2702,7 +2702,7 @@ check_warn_create(Param pm, const char *pmtype)
     Funcstack i;
     const char *name;
 
-    if (pm->level != 0)
+    if (pm->level != 0 || (pm->node.flags & PM_SPECIAL))
 	return;
 
     name = NULL;
