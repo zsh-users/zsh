@@ -1,3 +1,8 @@
+2015-11-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk, Etc/FAQ.yo, README: make
+	5.1.1-test-1 in preparation for 5.2.
+
 2015-11-20  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Doc/Zsh/mod_paramter.yo: document order of entries
