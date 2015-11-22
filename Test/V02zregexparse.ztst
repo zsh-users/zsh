@@ -2,7 +2,9 @@
 
 %prep
 
-  zmodload zsh/zutil
+ if ! zmodload zsh/zutil 2>/dev/null; then
+   ZTST_unimplemented="can't load the zsh/zutil module for testing"
+ fi
 
 %test
 

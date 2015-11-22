@@ -52,7 +52,7 @@
 >zmodload zsh/main
 >zmodload zsh/parameter
 
-# You use to need zmodload -i to avoid an error.
+# You used to need zmodload -i to avoid an error.
 # That has been deemed pointless, so now an attempt
 # to load a loaded module should succeed.
  zmodload zsh/main
@@ -64,7 +64,7 @@
 
  for m in $mods
  do
-   zmodload -i $m || mods[(r)$m]=()
+   zmodload $m || mods[(r)$m]=()
  done
 0d:Test loading of all compiled modules
 
@@ -74,7 +74,7 @@
 # Now check for proper failure conditions by trying some operations on
 # a nonexistent module.
 
- zmodload -i bogus/notamodule
+ zmodload bogus/notamodule
 1D:Check that loading a nonexistent module fails
 
  zmodload -u bogus/notamodule

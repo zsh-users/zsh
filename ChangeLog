@@ -1,3 +1,13 @@
+2015-11-21  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37181: Test/C02cond.ztst, Test/D07multibyte.ztst,
+	Test/V01zmodload.ztst, Test/V02zregexparse.ztst,
+	Test/V03mathfunc.ztst, Test/V04features.ztst, Test/V05styles.ztst,
+	Test/V09datetime.ztst, Test/V10private.ztst, Test/X02zlevi.ztst,
+	Test/Y01completion.ztst, Test/Y02compmatch.ztst,
+	Test/Y03arguments.ztst, Test/comptest, Test/ztst.zsh: consistent
+	use of zmodload and corresponding ZTST_unimplemented or ZTST_skip
+
 2015-11-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk, Etc/FAQ.yo, README: make

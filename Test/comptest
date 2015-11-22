@@ -5,7 +5,7 @@ comptestinit () {
           $ZTST_srcdir/../Completion
           $ZTST_srcdir/../Completion/*/*~*/CVS(/) )
 
-  zmodload -i zsh/zpty || return $?
+  zmodload zsh/zpty || return $?
 
   comptest_zsh=${ZSH:-zsh}
   comptest_keymap=e

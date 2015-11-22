@@ -500,7 +500,7 @@
 # aren't quite double width, but the arithmetic is correct.
 # It appears just to be an effect of the font.
 
-  if zmodload -i zsh/regex 2>/dev/null; then
+  if zmodload zsh/regex 2>/dev/null; then
     [[ $'\ua0' =~ '^.$' ]] && print OK
     [[ $'\ua0' =~ $'^\ua0$' ]] && print OK
     [[ $'\ua0'X =~ '^X$' ]] || print OK

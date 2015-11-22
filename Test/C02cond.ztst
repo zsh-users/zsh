@@ -257,7 +257,7 @@ F:Failures in these cases do not indicate a problem in the shell.
 >status = 1
 
 # core dumps on failure
-  if zmodload -i zsh/regex 2>/dev/null; then
+  if zmodload zsh/regex 2>/dev/null; then
      echo >regex_test.sh 'if [[ $# = 1 ]]; then
 	if [[ $1 =~ /?[^/]+:[0-9]+:$ ]]; then
 	  :
@@ -268,7 +268,8 @@ F:Failures in these cases do not indicate a problem in the shell.
   fi
 0:regex tests shouldn't crash
 
-  (if zmodload -i zsh/regex 2>/dev/null; then
+  if zmodload zsh/regex 2>/dev/null; then
+   ( # subshell in case coredump test failed
     string="this has stuff in it"
     bad_regex=0
     if [[ $string =~ "h([a-z]*) s([a-z]*) " ]]; then
@@ -295,23 +296,26 @@ F:Failures in these cases do not indicate a problem in the shell.
     else
       print -r "regex failed to match '$string'"
     fi
+   )
   else
     # if it didn't load, tough, but not a test error
-    print OK
-  fi)
+    ZTST_skip="regexp library not found."
+  fi
 0:MATCH, MBEGIN, MEND, match, mbegin, mend
 >OK
 
-  (if zmodload -i zsh/regex 2>/dev/null; then
+  if zmodload zsh/regex 2>/dev/null; then
+   ( # subshell because regex module may dump core, see above
     if [[ a =~ a && b == b ]]; then
       print OK
     else
       print "regex =~ inverted following test"
     fi
+   )
   else
     # not a test error
-    print OK
-  fi)
+    ZTST_skip="regexp library not found."
+  fi
 0:regex infix operator should not invert following conditions
 >OK
 

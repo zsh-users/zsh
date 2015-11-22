@@ -7,7 +7,8 @@
 # We use zsh/datetime because it has a list of features that is short
 # but contains two types.
 
-  if ! (zmodload zsh/datetime >/dev/null 2>/dev/null); then
+  # Subshell for prep test so we can load individual features later
+  if ! (zmodload zsh/datetime 2>/dev/null); then
     ZTST_unimplemented="can't load the zsh/datetime module for testing"
   fi
 

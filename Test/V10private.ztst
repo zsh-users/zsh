@@ -2,10 +2,9 @@
 
 %prep
 
- if ! (zmodload zsh/param/private >/dev/null 2>/dev/null); then
+ if ! zmodload zsh/param/private 2>/dev/null; then
    ZTST_unimplemented="can't load the zsh/param/private module for testing"
  fi
- zmodload zsh/param/private
 
 %test
 

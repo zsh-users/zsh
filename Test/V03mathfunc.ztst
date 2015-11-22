@@ -1,9 +1,7 @@
 # Tests for the module zsh/mathfunc
 
 %prep
-  if ( zmodload -i zsh/mathfunc ) >/dev/null 2>&1; then
-    zmodload -i zsh/mathfunc
-  else
+  if ! zmodload zsh/mathfunc 2>/dev/null; then
     ZTST_unimplemented="The module zsh/mathfunc is not available."
   fi
 
@@ -112,7 +110,6 @@ F:This test fails if your math library doesn't have erand48().
   float -F f sum sumsq max max2 av sd
   typeset -a randoms
   randoms=('f = RANDOM' 'f = rand48()')
-  zmodload -i zsh/mathfunc
   for isource in 1 2; do
     (( sum = sumsq = max = 0 ))
     repeat $N; do

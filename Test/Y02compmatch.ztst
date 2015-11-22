@@ -13,7 +13,7 @@
 %prep
   if [[ $OSTYPE = cygwin ]]; then
     ZTST_unimplemented="the zsh/zpty module does not work on Cygwin"
-  elif ( zmodload -i zsh/zpty ) >/dev/null 2>&1; then
+  elif ( zmodload zsh/zpty 2>/dev/null ); then
     . $ZTST_srcdir/comptest
     mkdir match.tmp
     cd match.tmp

@@ -2,9 +2,7 @@
 
 # Test the use of styles, if the zsh/zutil module is available.
 
-  if (zmodload zsh/zutil >/dev/null 2>/dev/null); then
-    zmodload zsh/zutil
-  else
+  if ! zmodload zsh/zutil 2>/dev/null; then
     ZTST_unimplemented="can't load the zsh/zutil module for testing"
   fi
 
