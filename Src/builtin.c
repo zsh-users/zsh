@@ -3712,6 +3712,7 @@ bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
 		zwarnnam(name, "bad pattern : %s", *argv);
 		returnval = 1;
 	    }
+	    argv++;
             continue;
 	}
         if (!(asg = getasg(&argv, NULL))) {

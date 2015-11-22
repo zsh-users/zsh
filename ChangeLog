@@ -1,5 +1,7 @@
 2015-11-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 3787: Src/builtin.c: infinite loop in "hash -m".
+
 	* 37186: Functions/VCS_Info/VCS_INFO_nvcsformats,
 	Src/Zle/zle_main.c: a couple of WARN_CREATE_GLOBAL fixes.
 
