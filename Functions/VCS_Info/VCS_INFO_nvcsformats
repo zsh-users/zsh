@@ -4,6 +4,7 @@
 
 setopt localoptions noksharrays NO_shwordsplit
 local c v rr
+local -a msgs
 
 if [[ $1 == '-preinit-' ]] ; then
     c='default'

@@ -2045,7 +2045,8 @@ setup_(UNUSED(Module m))
     bpaste = zshcalloc(3*sizeof(char *));
     bpaste[0] = ztrdup("\033[?2004h");
     bpaste[1] = ztrdup("\033[?2004l");
-    setaparam("zle_bracketed_paste", bpaste);
+    /* Intended to be global, no WARNCREATEGLOBAL check. */
+    assignaparam("zle_bracketed_paste", bpaste, 0);
 
     return 0;
 }

@@ -1,3 +1,8 @@
+2015-11-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 37186: Functions/VCS_Info/VCS_INFO_nvcsformats,
+	Src/Zle/zle_main.c: a couple of WARN_CREATE_GLOBAL fixes.
+
 2015-11-21  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 37181: Test/C02cond.ztst, Test/D07multibyte.ztst,
