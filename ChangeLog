@@ -1,5 +1,8 @@
 2015-11-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 37191: Src/utils.c: some locales prduce valid empty output for
+	strtfime escapes %p and %P.
+
 	* 37188: Test/B09hash.ztst: new test.
 
 	* 37187: Src/builtin.c: infinite loop in "hash -m".

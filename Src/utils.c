@@ -3143,6 +3143,7 @@ strftimehandling:
 		 * in the accounting in bufsize (but nowhere else).
 		 */
 		{
+		    char origchar = fmt[-1];
 		    int size = fmt - fmtstart;
 		    char *tmp, *last;
 		    tmp = zhalloc(size + 1);
@@ -3163,11 +3164,17 @@ strftimehandling:
 		    *buf = '\1';
 		    if (!strftime(buf, bufsize + 2, tmp, tm))
 		    {
-			if (*buf) {
-			    buf[0] = '\0';
-			    return -1;
+			/*
+			 * Some locales don't have strings for
+			 * AM/PM, so empty output is valid.
+			 */
+			if (*buf || (origchar != 'p' && origchar != 'P')) {
+			    if (*buf) {
+				buf[0] = '\0';
+				return -1;
+			    }
+			    return 0;
 			}
-			return 0;
 		    }
 		    decr = strlen(buf);
 		    buf += decr;
