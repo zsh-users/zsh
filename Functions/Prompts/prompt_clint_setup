@@ -38,12 +38,13 @@ prompt_clint_setup () {
   [[ -n "$WINDOW" ]] && p_win="$pc['\(']%F{$pcc[4]}$WINDOW$pc['\)']"
 
   p_userpwd="$pc['<']%F{$pcc[3]}%n@%m$p_win%F{$pcc[5]}:%F{$pcc[4]}%~$pc['>']"
-  p_vcs="%(2v.%U%2v%u.)"
+  local p_vcs="%(2v.%U%2v%u.)"
 
   p_shlvlhist="%fzsh%(2L./$SHLVL.) %B%h%b "
   p_rc="%(?..[%?%1v] )"
   p_end="%f%B%#%b "
 
+  typeset -ga zle_highlight
   zle_highlight[(r)default:*]=default:$pcc[2]
 
   prompt="$p_date$p_tty$p_plat$p_ver

@@ -20,6 +20,7 @@ EOF
 
 prompt_adam2_setup () {
   # Some can't be local
+  setopt localoptions nowarncreateglobal
   local prompt_gfx_tlc prompt_gfx_mlc prompt_gfx_blc
 
   if [[ $1 == '8bit' ]]; then
@@ -73,7 +74,7 @@ prompt_adam2_setup () {
 }
 
 prompt_adam2_precmd() {
-  setopt noxtrace localoptions extendedglob
+  setopt localoptions extendedglob noxtrace nowarncreateglobal
   local prompt_line_1
 
   prompt_adam2_choose_prompt

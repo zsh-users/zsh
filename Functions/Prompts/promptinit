@@ -160,7 +160,7 @@ Use prompt -h <theme> for help on specific themes.'
        for hook in chpwd precmd preexec periodic zshaddhistory zshexit; do
          add-zsh-hook -D "${hook}" "prompt_*_${hook}"
        done
-       set -A zle_highlight ${zle_highlight:#default:*}
+       typeset -ga zle_highlight=( ${zle_highlight:#default:*} )
        (( ${#zle_highlight} )) || unset zle_highlight
 
        prompt_$1_setup "$@[2,-1]" && prompt_theme=( "$@" )

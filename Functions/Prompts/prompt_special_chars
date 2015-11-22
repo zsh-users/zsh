@@ -19,6 +19,7 @@ if [[ ${LC_ALL:-${LC_CTYPE:-$LANG}} = *(UTF-8|utf8)* ]]; then
   schars[261]=$'\xe2\x96\x92'
   schars[260]=$'\xe2\x96\x91'
 else
+  local code
   for code in 300 304 332 333 371 372 262 261 260; do
     eval "schars[$code]=\$'\\$code'"
   done

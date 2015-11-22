@@ -1,3 +1,13 @@
+2015-11-22  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37192: Functions/Prompts/prompt_adam1_setup,
+	Functions/Prompts/prompt_adam2_setup,
+	Functions/Prompts/prompt_bart_setup,
+	Functions/Prompts/prompt_clint_setup,
+	Functions/Prompts/prompt_oliver_setup,
+	Functions/Prompts/prompt_special_chars,
+	Functions/Prompts/promptinit: silence WARN_CREATE_GLOBAL
+
 2015-11-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 37191: Src/utils.c: some locales prduce valid empty output for

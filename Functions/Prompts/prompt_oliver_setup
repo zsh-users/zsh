@@ -37,6 +37,8 @@ prompt_oliver_setup() {
 
   PS1="$pcolr$user$host%~%"'$((COLUMNS-12))'"(l.$prompt_newline. )[%h%1(j.%%%j.)%0(?..:%?)]%# %b%f%k"  RPS2='<%^'
   PS2=''
+
+  typeset -ga zle_highlight
   zle_highlight[(r)default:*]=default:$tcolr
 }
 

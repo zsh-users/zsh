@@ -18,6 +18,7 @@ EOF
 }
 
 prompt_adam1_setup () {
+  setopt localoptions nowarncreateglobal
   prompt_adam1_color1=${1:-'blue'}
   prompt_adam1_color2=${2:-'cyan'}
   prompt_adam1_color3=${3:-'green'}
@@ -33,7 +34,7 @@ prompt_adam1_setup () {
 }
 
 prompt_adam1_precmd () {
-  setopt noxtrace localoptions
+  setopt localoptions noxtrace nowarncreateglobal
   local base_prompt_expanded_no_color base_prompt_etc
   local prompt_length space_left
 
