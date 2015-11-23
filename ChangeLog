@@ -1,3 +1,7 @@
+2015-11-23  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37205: Test/B01cd.ztst: update documentary comment
+
 2015-11-23  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37203: Src/params.c: WARN_CREATE_GLOBAL test in wrong place
