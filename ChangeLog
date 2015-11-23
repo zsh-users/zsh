@@ -1,5 +1,10 @@
 2015-11-22  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* Matthew Martin: 37201: Completion/Unix/Type/_groups: change
+	quoting to handle group names with spaces
+
+2015-11-22  Barton E. Schaefer  <schaefer@zsh.org>
+
 	* 37192: Functions/Prompts/prompt_adam1_setup,
 	Functions/Prompts/prompt_adam2_setup,
 	Functions/Prompts/prompt_bart_setup,

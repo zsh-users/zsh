@@ -13,9 +13,9 @@ if ! zstyle -a ":completion:${curcontext}:" groups groups; then
           : ${(A)_cache_groups:=${${(M)${(f)"$(_call_program groups dscacheutil -q group)"}:#name*}##*: }}
         fi
       elif (( ${+commands[getent]} )); then
-        : ${(A)_cache_groups:=${${(s: :)$(_call_program groups getent group 2>/dev/null)}%%:*}}
+        : ${(A)_cache_groups:=${${(f)"$(_call_program groups getent group 2>/dev/null)"}%%:*}}
       else
-        : ${(A)_cache_groups:=${${${(s: :)$(</etc/group)}%%:*}:#+}}
+        : ${(A)_cache_groups:=${${${(f)"$(</etc/group)"}%%:*}:#+}}
 	if (( ${+commands[ypcat]} )) &&
 	    tmp=$(_call_program groups ypcat group.byname 2>/dev/null); then
           _cache_groups+=( ${${(f)tmp}%%:*} ) # If you use YP
