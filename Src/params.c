@@ -2970,6 +2970,7 @@ sethparam(char *s, char **val)
     struct value vbuf;
     Value v;
     char *t = s;
+    int checkcreate = 0;
 
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
@@ -2988,8 +2989,7 @@ sethparam(char *s, char **val)
     queue_signals();
     if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING))) {
 	createparam(t, PM_HASHED);
-	if (isset(WARNCREATEGLOBAL) && locallevel > 0)
-	    check_warn_create(v->pm, "associative array");
+	checkcreate = isset(WARNCREATEGLOBAL) && locallevel > 0;
     } else if (!(PM_TYPE(v->pm->node.flags) & PM_HASHED) &&
 	     !(v->pm->node.flags & PM_SPECIAL)) {
 	unsetparam(t);
@@ -3002,6 +3002,8 @@ sethparam(char *s, char **val)
 	    unqueue_signals();
 	    return NULL;
 	}
+    if (checkcreate)
+	check_warn_create(v->pm, "associative array");
     setarrvalue(v, val);
     unqueue_signals();
     return v->pm;
