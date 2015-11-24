@@ -11,6 +11,11 @@
  (zmodload -u zsh/param/private && zmodload zsh/param/private)
 0:unload and reload the module without crashing
 
+ $ZTST_exe +Z -f $ZTST_srcdir/ztst.zsh $ZTST_srcdir/B02typeset.ztst
+0:typeset still works with zsh/param/private module loaded
+*>*
+*>*
+
  typeset scalar_test=toplevel
  () {
   print $scalar_test
@@ -237,7 +242,7 @@ F:note "typeset" rather than "private" in output from outer
   }
   print Y ${(kv)hash_test} Z $array_test
  }
- print ${(kv)hash_test}
+ print ${(kv)hash_test} ${(t)array_test}
 0:privates are not visible in anonymous functions, part 3
 >X top level
 >Y in function Z in function
