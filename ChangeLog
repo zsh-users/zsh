@@ -1,5 +1,7 @@
 2015-11-23  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37206: Src/subst.c: fix ${(t)param} for "typeset -H param"
+
 	* 37205: Test/B01cd.ztst: update documentary comment
 
 2015-11-23  Peter Stephenson  <p.stephenson@samsung.com>
