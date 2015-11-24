@@ -1,5 +1,10 @@
 2015-11-23  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37208: Src/params.c: check for restricted parameter before
+	changing from unset to set; return NULL from setnparam() on
+	failure to retrieve value (avoids null-pointer dereference);
+	add some expository comments
+
 	* 37208: Test/V10parameter.ztst: re-run the "typeset" tests with
 	the private module loaded
 
