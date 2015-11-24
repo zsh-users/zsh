@@ -1,5 +1,9 @@
 2015-11-23  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37208: Src/Modules/param_private.c: assignment in a nested scope
+	should not change private parameters in the outer scope from unset
+	to set; bug remains that the attempt does not generate a warning
+
 	* 37206: Src/subst.c: fix ${(t)param} for "typeset -H param"
 
 	* 37205: Test/B01cd.ztst: update documentary comment

@@ -218,8 +218,10 @@ setfn_error(Param pm)
  * The unsetfn family compare locallevel and restore the old GSU before
  * calling the original unsetfn.  This assures that if the old unsetfn
  * wants to use its getfn or setfn, they're unconditionally present.
+ * The "explicit" flag indicates that "unset" was called, if zero the
+ * parameter is going out of scope (see params.c).
  *
- */ 
+ */
 
 /**/
 static char *
@@ -248,13 +250,15 @@ pps_setfn(Param pm, char *x)
 
 /**/
 static void
-pps_unsetfn(Param pm, int x)
+pps_unsetfn(Param pm, int explicit)
 {
     struct gsu_closure *c = (struct gsu_closure *)(pm->gsu.s);
     GsuScalar gsu = (GsuScalar)(c->g);
     pm->gsu.s = gsu;
     if (locallevel <= pm->level)
-	gsu->unsetfn(pm, x);
+	gsu->unsetfn(pm, explicit);
+    if (explicit)
+	pm->gsu.s = (GsuScalar)c;
 }
 
 /**/
@@ -283,13 +287,15 @@ ppi_setfn(Param pm, zlong x)
 
 /**/
 static void
-ppi_unsetfn(Param pm, int x)
+ppi_unsetfn(Param pm, int explicit)
 {
     struct gsu_closure *c = (struct gsu_closure *)(pm->gsu.i);
     GsuInteger gsu = (GsuInteger)(c->g);
     pm->gsu.i = gsu;
     if (locallevel <= pm->level)
-	gsu->unsetfn(pm, x);
+	gsu->unsetfn(pm, explicit);
+    if (explicit)
+	pm->gsu.i = (GsuInteger)c;
 }
 
 /**/
@@ -318,13 +324,15 @@ ppf_setfn(Param pm, double x)
 
 /**/
 static void
-ppf_unsetfn(Param pm, int x)
+ppf_unsetfn(Param pm, int explicit)
 {
     struct gsu_closure *c = (struct gsu_closure *)(pm->gsu.f);
     GsuFloat gsu = (GsuFloat)(c->g);
     pm->gsu.f = gsu;
     if (locallevel <= pm->level)
-	gsu->unsetfn(pm, x);
+	gsu->unsetfn(pm, explicit);
+    if (explicit)
+	pm->gsu.f = (GsuFloat)c;
 }
 
 /**/
@@ -354,13 +362,15 @@ ppa_setfn(Param pm, char **x)
 
 /**/
 static void
-ppa_unsetfn(Param pm, int x)
+ppa_unsetfn(Param pm, int explicit)
 {
     struct gsu_closure *c = (struct gsu_closure *)(pm->gsu.a);
     GsuArray gsu = (GsuArray)(c->g);
     pm->gsu.a = gsu;
     if (locallevel <= pm->level)
-	gsu->unsetfn(pm, x);
+	gsu->unsetfn(pm, explicit);
+    if (explicit)
+	pm->gsu.a = (GsuArray)c;
 }
 
 static HashTable emptytable;
@@ -391,13 +401,15 @@ pph_setfn(Param pm, HashTable x)
 
 /**/
 static void
-pph_unsetfn(Param pm, int x)
+pph_unsetfn(Param pm, int explicit)
 {
     struct gsu_closure *c = (struct gsu_closure *)(pm->gsu.h);
     GsuHash gsu = (GsuHash)(c->g);
     pm->gsu.h = gsu;
     if (locallevel <= pm->level)
-	gsu->unsetfn(pm, x);
+	gsu->unsetfn(pm, explicit);
+    if (explicit)
+	pm->gsu.h = (GsuHash)c;
 }
 
 /*
@@ -425,9 +437,13 @@ scopeprivate(HashNode hn, int onoff)
 		pm->node.flags |= PM_NORESTORE;
 	    else
 		pm->node.flags |= PM_UNSET;
-	else if (!(pm->node.flags & PM_NORESTORE))
-	    pm->node.flags &= ~PM_UNSET;
-	pm->node.flags &= ~PM_NORESTORE;
+	else {
+	    if (pm->node.flags & PM_NORESTORE)
+		pm->node.flags |= PM_UNSET;	/* createparam() may frob */
+	    else
+		pm->node.flags &= ~PM_UNSET;
+	    pm->node.flags &= ~PM_NORESTORE;
+	}
     }
 }
 
