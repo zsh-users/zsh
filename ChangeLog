@@ -1,5 +1,8 @@
 2015-11-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37214: Functions/Prompts/prompt_walters_setup: 'prompt
+	walters': Don't export PS1
+
 	* 37163: Completion/Unix/Command/_curl,
 	Completion/Unix/Type/_urls: Remove curl completion
 
