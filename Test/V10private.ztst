@@ -6,12 +6,17 @@
    ZTST_unimplemented="can't load the zsh/param/private module for testing"
  fi
 
+ # Do not use .tmp here, ztst.zsh will remove it too soon (see %cleanup)
+ mkdir private.TMP
+ sed '/^%prep/a \
+  zmodload zsh/param/private' < $ZTST_srcdir/B02typeset.ztst > private.TMP/B02
+
 %test
 
  (zmodload -u zsh/param/private && zmodload zsh/param/private)
 0:unload and reload the module without crashing
 
- $ZTST_exe +Z -f $ZTST_srcdir/ztst.zsh $ZTST_srcdir/B02typeset.ztst
+ ZTST_verbose=0 $ZTST_exe +Z -f $ZTST_srcdir/ztst.zsh private.TMP/B02
 0:typeset still works with zsh/param/private module loaded
 *>*
 *>*
@@ -270,3 +275,7 @@ F:note "typeset" rather than "private" in output from outer
 
  () { private -h SECONDS }
 0:private parameter may hide a special parameter
+
+%clean
+
+  rm -r private.TMP
