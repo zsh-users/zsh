@@ -4,7 +4,7 @@
 
 # Equivalences:
 #  declare	typeset
-#  export	typeset -x		and typeset -x implies -g
+#  export	typeset -x
 #  float	typeset -E
 #  functions	typeset -f
 #  integer	typeset -i

@@ -1,3 +1,7 @@
+2015-11-26  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37224: Test/B02typeset.ztst: delete obsolete comment
+
 2015-11-26  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Matthew Martin: 37100: Completion/Unix/Command/_sysctl:
