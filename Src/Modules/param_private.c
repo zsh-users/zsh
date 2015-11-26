@@ -170,11 +170,15 @@ static int
 bin_private(char *nam, char **args, LinkList assigns, Options ops, int func)
 {
     int from_typeset = 1;
+    int ofake = fakelevel;	/* paranoia in case of recursive call */
     makeprivate_error = 0;
 
-    if (!OPT_ISSET(ops, 'P'))
-	return bin_typeset(nam, args, assigns, ops, func);
-    else if (OPT_ISSET(ops, 'T')) {
+    if (!OPT_ISSET(ops, 'P')) {
+	fakelevel = 0;
+	from_typeset = bin_typeset(nam, args, assigns, ops, func);
+	fakelevel = ofake;
+	return from_typeset;
+    } else if (OPT_ISSET(ops, 'T')) {
 	zwarn("bad option: -T");
 	return 1;
     }
@@ -193,7 +197,7 @@ bin_private(char *nam, char **args, LinkList assigns, Options ops, int func)
     from_typeset = bin_typeset("private", args, assigns, ops, func);
     scanhashtable(paramtab, 0, 0, 0, makeprivate, 0);
     endparamscope();
-    fakelevel = 0;
+    fakelevel = ofake;
     unqueue_signals();
 
     return makeprivate_error | from_typeset;
@@ -419,11 +423,20 @@ pph_unsetfn(Param pm, int explicit)
  * at this locallevel.  Any that we find are marked PM_UNSET.  If they are
  * already unset, they are also marked as PM_NORESTORE.
  *
- * On exit from the scope, we find the same parameters again and remove
+ * The same game is played with PM_READONLY and PM_RESTRICTED, so private
+ * parameters are always read-only at deeper locallevel.  This is possible
+ * because there is no builtin-command interface to set PM_RESTRICTED, so
+ * only parameters "known to the shell" can otherwise be restricted.
+ *
+ * On exit from the scope, we find the same parameters again and reset
  * the PM_UNSET and PM_NORESTORE flags as appropriate.  We're guaraneed
  * by makeprivate() that PM_NORESTORE won't conflict with anything here.
+ * Similarly, PM_READONLY and PM_RESTRICTED are also reset.
  *
  */
+
+#define PM_WAS_UNSET PM_NORESTORE
+#define PM_WAS_RONLY PM_RESTRICTED
 
 static void
 scopeprivate(HashNode hn, int onoff)
@@ -432,17 +445,25 @@ scopeprivate(HashNode hn, int onoff)
     if (pm->level == locallevel) {
 	if (!is_private(pm))
 	    return;
-	if (onoff == PM_UNSET)
+	if (onoff == PM_UNSET) {
 	    if (pm->node.flags & PM_UNSET)
-		pm->node.flags |= PM_NORESTORE;
+		pm->node.flags |= PM_WAS_UNSET;
 	    else
 		pm->node.flags |= PM_UNSET;
-	else {
-	    if (pm->node.flags & PM_NORESTORE)
+	    if (pm->node.flags & PM_READONLY)
+		pm->node.flags |= PM_WAS_RONLY;
+	    else
+		pm->node.flags |= PM_READONLY;
+	} else {
+	    if (pm->node.flags & PM_WAS_UNSET)
 		pm->node.flags |= PM_UNSET;	/* createparam() may frob */
 	    else
 		pm->node.flags &= ~PM_UNSET;
-	    pm->node.flags &= ~PM_NORESTORE;
+	    if (pm->node.flags & PM_WAS_RONLY)
+		pm->node.flags |= PM_READONLY;	/* paranoia / symmetry */
+	    else
+		pm->node.flags &= ~PM_READONLY;
+	    pm->node.flags &= ~(PM_WAS_UNSET|PM_WAS_RONLY);
 	}
     }
 }
@@ -478,8 +499,24 @@ getprivatenode(HashTable ht, const char *nam)
     HashNode hn = getparamnode(ht, nam);
     Param pm = (Param) hn;
 
-    while (!fakelevel && pm && locallevel > pm->level && is_private(pm))
+    while (!fakelevel && pm && locallevel > pm->level && is_private(pm)) {
+	if (!(pm->node.flags & PM_UNSET)) {
+	    /*
+	     * private parameters are always marked PM_UNSET before we
+	     * increment locallevel, so the only way we get here is
+	     * when createparam() wants a new parameter that is not at
+	     * the current locallevel and it has therefore cleared the
+	     * PM_UNSET flag.
+	     */
+	    DPUTS(pm->old, "BUG: PM_UNSET cleared in wrong scope");
+	    setfn_error(pm);
+	    /*
+	     * TODO: instead of throwing an error here, create a global
+	     * parameter, insert as pm->old, handle WARN_CREATE_GLOBAL.
+	     */
+	}
 	pm = pm->old;
+    }
     return (HashNode)pm;
 }
 

@@ -8,7 +8,7 @@
 
  # Do not use .tmp here, ztst.zsh will remove it too soon (see %cleanup)
  mkdir private.TMP
- sed '/^%prep/a \
+ sed '/^%prep/a\
   zmodload zsh/param/private' < $ZTST_srcdir/B02typeset.ztst > private.TMP/B02
 
 %test
@@ -243,15 +243,38 @@ F:note "typeset" rather than "private" in output from outer
   () {
    print X ${(kv)hash_test}
    hash_test=(even deeper)
-   array_test+=(${(kv)hash_test})
+   {
+     array_test+=(${(kv)hash_test})
+   } always {
+     print ${array_test-array_test not set} ${(t)array_test}
+   }
   }
   print Y ${(kv)hash_test} Z $array_test
  }
  print ${(kv)hash_test} ${(t)array_test}
-0:privates are not visible in anonymous functions, part 3
+1:privates are not visible in anonymous functions, part 3
+>X top level
+>array_test not set
+?(anon):4: array_test: attempt to assign private in nested scope
+F:future revision will create a global with this assignment
+
+ typeset -a array_test
+ typeset -A hash_test=(top level)
+ () {
+  local -Pa array_test=(in function)
+  local -PA hash_test=($array_test)
+  () {
+   print X ${(kv)hash_test}
+   hash_test=(even deeper)
+   array_test+=(${(kv)hash_test})
+  }
+  print Y ${(kv)hash_test} Z $array_test
+ }
+ print ${(kv)hash_test} $array_test
+0:privates are not visible in anonymous functions, part 4
 >X top level
 >Y in function Z in function
->even deeper
+>even deeper even deeper
 
  typeset -A hash_test=(top level)
  () {
@@ -263,7 +286,7 @@ F:note "typeset" rather than "private" in output from outer
   print Y ${(kv)hash_test}
  }
  print ${(t)hash_test} ${(kv)hash_test}
-0:privates are not visible in anonymous functions, part 4
+0:privates are not visible in anonymous functions, part 5
 >X top level
 >Y in function
 >

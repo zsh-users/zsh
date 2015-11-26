@@ -1,5 +1,10 @@
 2015-11-26  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37229: Src/Modules/param_private.c, Test/V10private.ztst: non-
+	local assignment to a parameter name whose outermost declaration
+	is private, is an error rather than a silent no-op.  Fix %prep
+	from 37225 for Solaris.
+
 	* unposted (cf. 37226): Test/B02typeset.ztst: export == typeset -xg
 
 	* 37225: Test/V10private.ztst: fix test from 37208
