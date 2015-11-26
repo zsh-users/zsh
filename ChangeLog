@@ -1,5 +1,7 @@
 2015-11-26  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted (cf. 37226): Test/B02typeset.ztst: export == typeset -xg
+
 	* 37225: Test/V10private.ztst: fix test from 37208
 
 	* 37224: Test/B02typeset.ztst: delete obsolete comment
