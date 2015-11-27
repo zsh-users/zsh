@@ -114,7 +114,9 @@ forms=( '%2$g' '%.*g' '%.*f' '%.*E' '')
 zmodload -i zsh/mathfunc 2>/dev/null
 autoload -Uz zmathfuncdef
 
-: ${ZCALCPROMPT="%1v> "}
+if (( ! ${+ZCALCPROMPT} )); then
+  typeset -g ZCALCPROMPT="%1v> "
+fi
 
 # Supply some constants.
 float PI E

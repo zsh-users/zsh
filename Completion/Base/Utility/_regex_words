@@ -20,7 +20,13 @@ local tag=$1
 local desc=$2
 shift 2
 
-reply=(\()
+if (( $# )); then
+  reply=(\()
+else
+  # ### Is this likely to happen in callers?  Should we warn?
+  reply=()
+  return
+fi
 
 integer i
 local -a wds

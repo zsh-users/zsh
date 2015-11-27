@@ -7,6 +7,21 @@
 	problems with inserting a line into B02, instead add a placeholder
 	and substitute for it.
 
+2015-11-27  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted: Functions/Misc/zcalc: ZCALCPROMPT created globally.
+
+2015-11-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 37214: Functions/Prompts/prompt_walters_setup: 'prompt
+	walters': Don't export PS1
+
+	* 37163: Completion/Unix/Command/_curl,
+	Completion/Unix/Type/_urls: Remove curl completion
+
+	* 37215: Completion/Base/Utility/_regex_words: _regex_words:
+	Don't add mismatched parentheses
+
 2015-11-26  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 37229: Src/Modules/param_private.c, Test/V10private.ztst: non-
