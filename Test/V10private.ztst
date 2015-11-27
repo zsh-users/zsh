@@ -4,12 +4,11 @@
 
  if ! zmodload zsh/param/private 2>/dev/null; then
    ZTST_unimplemented="can't load the zsh/param/private module for testing"
+ else
+   # Do not use .tmp here, ztst.zsh will remove it too soon (see %cleanup)
+   mkdir private.TMP
+   sed -e 's,# test_zsh_param_private,zmodload zsh/param/private,' < $ZTST_srcdir/B02typeset.ztst > private.TMP/B02
  fi
-
- # Do not use .tmp here, ztst.zsh will remove it too soon (see %cleanup)
- mkdir private.TMP
- sed '/^%prep/a\
-  zmodload zsh/param/private' < $ZTST_srcdir/B02typeset.ztst > private.TMP/B02
 
 %test
 

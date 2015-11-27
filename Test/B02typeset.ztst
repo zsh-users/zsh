@@ -21,6 +21,7 @@
 #  Assorted illegal flag combinations
 
 %prep
+  # test_zsh_param_private
 
   mkdir typeset.tmp && cd typeset.tmp
 
