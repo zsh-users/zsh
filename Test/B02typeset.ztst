@@ -21,6 +21,7 @@
 #  Assorted illegal flag combinations
 
 %prep
+  ## Do not remove the next line, it's used by V10private.ztst
   # test_zsh_param_private
 
   mkdir typeset.tmp && cd typeset.tmp
