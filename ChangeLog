@@ -1,3 +1,7 @@
+2015-11-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted; Config/version.mk: 5.1.1-test-3.
+
 2015-11-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted (after 37243): Test/B02typeset.ztst: Explain the
