@@ -1,3 +1,8 @@
+2015-11-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 37250: Src/params.c: No functional change: rename local
+	variables.
+
 2015-11-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted; Config/version.mk: 5.1.1-test-3.
