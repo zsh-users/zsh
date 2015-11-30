@@ -1,5 +1,9 @@
 2015-11-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37252: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: Compute %b correctly with "rebase --onto" of
+	detached heads. (Follow-up to 36725.)
+
 	* 37254: Src/params.c: No functional change: change code layout
 	in preparation for 37253.
 
