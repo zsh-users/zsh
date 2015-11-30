@@ -2552,18 +2552,20 @@ setarrvalue(Value v, char **val)
 	     v->pm->node.nam);
 	return;
     } else {
-	char **old, **new, **p, **q, **r;
-	int pre_assignment_length;
+	char **const old = v->pm->gsu.a->getfn(v->pm);
+	char **new;
+	char **p, **q, **r; /* index variables */
+	const int pre_assignment_length = arrlen(old);
 	int post_assignment_length;
 	int i;
+
+	q = old;
 
 	if ((v->flags & VALFLAG_INV) && unset(KSHARRAYS)) {
 	    if (v->start > 0)
 		v->start--;
 	    v->end--;
 	}
-	q = old = v->pm->gsu.a->getfn(v->pm);
-	pre_assignment_length = arrlen(old);
 	if (v->start < 0) {
 	    v->start += pre_assignment_length;
 	    if (v->start < 0)

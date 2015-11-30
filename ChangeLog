@@ -1,5 +1,7 @@
 2015-12-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37253: Src/params.c: Constify two local variables.
+
 	* unposted: Completion/Unix/Command/_getent,
 	Completion/Unix/Command/_mtools,
 	Completion/Unix/Type/_mime_types,
