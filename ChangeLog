@@ -1,5 +1,8 @@
 2015-11-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37254: Src/params.c: No functional change: change code layout
+	in preparation for 37253.
+
 	* 37250: Src/params.c: No functional change: rename local
 	variables.
 

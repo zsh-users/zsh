@@ -2537,6 +2537,7 @@ setarrvalue(Value v, char **val)
 	freearray(val);
 	return;
     }
+
     if (v->start == 0 && v->end == -1) {
 	if (PM_TYPE(v->pm->node.flags) == PM_HASHED)
 	    arrhashsetfn(v->pm, val, 0);
@@ -2545,18 +2546,17 @@ setarrvalue(Value v, char **val)
     } else if (v->start == -1 && v->end == 0 &&
     	    PM_TYPE(v->pm->node.flags) == PM_HASHED) {
     	arrhashsetfn(v->pm, val, 1);
+    } else if ((PM_TYPE(v->pm->node.flags) == PM_HASHED)) {
+	freearray(val);
+	zerr("%s: attempt to set slice of associative array",
+	     v->pm->node.nam);
+	return;
     } else {
 	char **old, **new, **p, **q, **r;
 	int pre_assignment_length;
 	int post_assignment_length;
 	int i;
 
-	if ((PM_TYPE(v->pm->node.flags) == PM_HASHED)) {
-	    freearray(val);
-	    zerr("%s: attempt to set slice of associative array",
-		 v->pm->node.nam);
-	    return;
-	}
 	if ((v->flags & VALFLAG_INV) && unset(KSHARRAYS)) {
 	    if (v->start > 0)
 		v->start--;
