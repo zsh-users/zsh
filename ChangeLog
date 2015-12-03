@@ -1,5 +1,7 @@
 2015-12-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37296: Src/utils.c: Avoid needless calloc().
+
 	* 37295: Functions/Zle/backward-kill-word-match,
 	Functions/Zle/kill-word-match: Join kills
 

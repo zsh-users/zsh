@@ -2861,11 +2861,12 @@ spckword(char **s, int hist, int cmd, int ask)
 		if (strncmp(guess, best, preflen))
 		    return;
 		/* replace the temporarily expanded prefix with the original */
-		u = (char *) hcalloc(t - *s + strlen(best + preflen) + 1);
+		u = (char *) zhalloc(t - *s + strlen(best + preflen) + 1);
 		strncpy(u, *s, t - *s);
 		strcpy(u + (t - *s), best + preflen);
 	    } else {
-		u = (char *) hcalloc(strlen(best) + 2);
+		u = (char *) zhalloc(strlen(best) + 2);
+		*u = '\0';
 		strcpy(u + 1, best);
 	    }
 	    best = u;
@@ -3204,7 +3205,7 @@ zjoin(char **arr, int delim, int heap)
 	len += strlen(*s) + 1 + (imeta(delim) ? 1 : 0);
     if (!len)
 	return heap? "" : ztrdup("");
-    ptr = ret = (heap ? (char *) hcalloc(len) : (char *) zshcalloc(len));
+    ptr = ret = (char *) (heap ? zhalloc(len) : zalloc(len));
     for (s = arr; *s; s++) {
 	strucpy(&ptr, *s);
 	    if (imeta(delim)) {
@@ -3290,7 +3291,8 @@ spacesplit(char *s, int allownull, int heap, int quote)
     int l = sizeof(*ret) * (wordcount(s, NULL, -!allownull) + 1);
     char *(*dup)(const char *) = (heap ? dupstring : ztrdup);
 
-    ptr = ret = (heap ? (char **) hcalloc(l) : (char **) zshcalloc(l));
+    /* ### TODO: s/calloc/alloc/ */
+    ptr = ret = (char **) (heap ? hcalloc(l) : zshcalloc(l));
 
     if (quote) {
 	/*
@@ -3320,8 +3322,8 @@ spacesplit(char *s, int allownull, int heap, int quote)
 	t = s;
 	(void)findsep(&s, NULL, quote);
 	if (s > t || allownull) {
-	    *ptr = (heap ? (char *) hcalloc((s - t) + 1) :
-		    (char *) zshcalloc((s - t) + 1));
+	    *ptr = (char *) (heap ? zhalloc((s - t) + 1) :
+		                     zalloc((s - t) + 1));
 	    ztrncpy(*ptr++, t, s - t);
 	} else
 	    *ptr++ = dup(nulstring);
@@ -3511,7 +3513,7 @@ sepjoin(char **s, char *sep, int heap)
     }
     sl = strlen(sep);
     for (t = s, l = 1 - sl; *t; l += strlen(*t) + sl, t++);
-    r = p = (heap ? (char *) hcalloc(l) : (char *) zshcalloc(l));
+    r = p = (char *) (heap ? zhalloc(l) : zalloc(l));
     t = s;
     while (*t) {
 	strucpy(&p, *t);
@@ -3538,14 +3540,14 @@ sepsplit(char *s, char *sep, int allownull, int heap)
 
     sl = strlen(sep);
     n = wordcount(s, sep, 1);
-    r = p = (heap ? (char **) hcalloc((n + 1) * sizeof(char *)) :
-	     (char **) zshcalloc((n + 1) * sizeof(char *)));
+    r = p = (char **) (heap ? zhalloc((n + 1) * sizeof(char *)) :
+	                       zalloc((n + 1) * sizeof(char *)));
 
     for (t = s; n--;) {
 	tt = t;
 	(void)findsep(&t, sep, 0);
-	*p = (heap ? (char *) hcalloc(t - tt + 1) :
-	      (char *) zshcalloc(t - tt + 1));
+	*p = (char *) (heap ? zhalloc(t - tt + 1) :
+	                       zalloc(t - tt + 1));
 	strncpy(*p, tt, t - tt);
 	(*p)[t - tt] = '\0';
 	p++;
