@@ -32,4 +32,6 @@ while (( count-- )); do
   done=1
 done
 
+zle -f 'kill'
+
 return 0
