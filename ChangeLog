@@ -1,5 +1,11 @@
 2015-12-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Completion/Unix/Command/_getent,
+	Completion/Unix/Command/_mtools,
+	Completion/Unix/Type/_mime_types,
+	Completion/X/Command/_kfmclient, Completion/Zsh/Command/_zed:
+	Remove uneeded executability bits.
+
 	* 37296: Src/utils.c: Avoid needless calloc().
 
 	* 37295: Functions/Zle/backward-kill-word-match,
