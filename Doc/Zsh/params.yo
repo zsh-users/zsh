@@ -933,6 +933,11 @@ tt(zsh/zutil) module.
 )
 enditem()
 )
+vindex(ZSH_EXECUTION_STRING)
+item(tt(ZSH_EXECUTION_STRING))(
+If the shell was started with the option tt(-c), this contains
+the argument passed to the option.  Otherwise it is not set.
+)
 vindex(ZSH_NAME)
 item(tt(ZSH_NAME))(
 Expands to the basename of the command used to invoke this instance
