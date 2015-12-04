@@ -5182,9 +5182,6 @@ printparamvalue(Param p, int printflags)
     }
     if (printflags & PRINT_KV_PAIR)
 	putchar(' ');
-    else if ((printflags & PRINT_TYPESET) &&
-	     (PM_TYPE(p->node.flags) == PM_ARRAY || PM_TYPE(p->node.flags) == PM_HASHED))
-	printf("%s=", p->node.nam);
     else
 	putchar('=');
 
@@ -5255,7 +5252,6 @@ mod_export void
 printparamnode(HashNode hn, int printflags)
 {
     Param p = (Param) hn;
-    int array_typeset;
 
     if (p->node.flags & PM_UNSET) {
 	if (isset(POSIXBUILTINS) && (p->node.flags & PM_READONLY) &&
@@ -5280,28 +5276,8 @@ printparamnode(HashNode hn, int printflags)
 	     */
 	    return;
 	}
-	/*
-	 * Printing the value of array: this needs to be on
-	 * a separate line so more care is required.
-	 */
-	array_typeset = (PM_TYPE(p->node.flags) == PM_ARRAY ||
-			 PM_TYPE(p->node.flags) == PM_HASHED) &&
-	    !(printflags & PRINT_NAMEONLY);
-	if (array_typeset && (p->node.flags & PM_READONLY)) {
-	    /*
-	     * We need to create the array before making it
-	     * readonly.
-	     */
-	    printf("typeset -a ");
-	    zputs(p->node.nam, stdout);
-	    putchar('\n');
-	    printparamvalue(p, printflags);
-	    printflags |= PRINT_NAMEONLY;
-	}
 	printf("typeset ");
     }
-    else
-	array_typeset = 0;
 
     /* Print the attributes of the parameter */
     if (printflags & (PRINT_TYPE|PRINT_TYPESET)) {
@@ -5349,8 +5325,6 @@ printparamnode(HashNode hn, int printflags)
     } else {
 	quotedzputs(p->node.nam, stdout);
 
-	if (array_typeset)
-	    putchar('\n');
 	printparamvalue(p, printflags);
     }
 }

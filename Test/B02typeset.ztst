@@ -454,8 +454,7 @@
  fn() { typeset -p array nonexistent; }
  fn
 1:declare -p shouldn't create scoped values
->typeset -a array
->array=( foo bar )
+>typeset -a array=( foo bar )
 ?fn:typeset: no such variable: nonexistent
 
  unsetopt typesetsilent
@@ -508,11 +507,8 @@
   typeset -pm 'a[12]'
   typeset -pm 'r[12]'
 0:readonly -p output
->typeset -a a1
->a1=( one two )
->typeset -ar a1
->typeset -a a2
->a2=( three four )
+>typeset -ar a1=( one two )
+>typeset -a a2=( three four )
 >typeset -r r1=yes
 >typeset -r r2=no
 
@@ -707,8 +703,6 @@
   fn
   print $array
 0:setting empty array in typeset
->typeset -a array
->array=( '' two '' four )
->typeset -a array
->array=( one '' three )
+>typeset -a array=( '' two '' four )
+>typeset -a array=( one '' three )
 >no really nothing here

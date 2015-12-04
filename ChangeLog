@@ -1,5 +1,9 @@
 2015-12-04  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 37305: Src/params.c, Test/A06assign.ztst,
+	Test/B02typeset.ztst, Test/V10private.ztst: typeset -p
+	can now output arrays on one line.
+
 	* unposted: Src/exec.c, Src/init.c: fix up init_io() calls
 	in previous change.
 
