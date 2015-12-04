@@ -93,7 +93,7 @@ bin_clone(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	/* Clear mygrp so that acquire_pgrp() gets the new process group.
 	 * (acquire_pgrp() is called from init_io()) */
 	mypgrp = 0;
-	init_io();
+	init_io(NULL);
 	setsparam("TTY", ztrdup(ttystrname));
     }
     close(ttyfd);

@@ -3225,7 +3225,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		 * not terminal, unless `file' is a terminal. */
 		if (nullexec == 1 && fn->fd1 == 0 &&
 		    isset(SHINSTDIN) && interact && !zleactive)
-		    init_io();
+		    init_io(NULL);
 		break;
 	    case REDIR_CLOSE:
 		if (fn->varid) {

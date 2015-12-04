@@ -1,5 +1,8 @@
 2015-12-04  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Src/exec.c, Src/init.c: fix up init_io() calls
+	in previous change.
+
 	* 37294: Doc/Zsh/params.yo, Src/init.c: Add $ZSH_EXECUTION_STRING
 	to give argument to shell -c option.
 

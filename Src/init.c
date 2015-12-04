@@ -519,6 +519,8 @@ init_io(char *cmd)
 	for (i = 3; i < 10; i++)
 	    close(i);
     }
+#else
+    (void)cmd;
 #endif
 
     if (shout) {

@@ -399,7 +399,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	close(master);
 	close(coprocin);
 	close(coprocout);
-	init_io();
+	init_io(NULL);
 	setsparam("TTY", ztrdup(ttystrname));
 
 	opts[INTERACTIVE] = 0;
