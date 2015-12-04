@@ -2264,7 +2264,7 @@ addvars(Estate state, Wordcode pc, int addflags)
      * is implicitly scoped.
      */
     flags = (!(addflags & ADDVAR_RESTORE) &&
-	     locallevel > 0 && isset(WARNCREATEGLOBAL)) ?
+	     locallevel > forklevel && isset(WARNCREATEGLOBAL)) ?
 	ASSPM_WARN_CREATE : 0;
     xtr = isset(XTRACE);
     if (xtr) {

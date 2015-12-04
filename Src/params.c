@@ -2868,7 +2868,7 @@ mod_export Param
 setsparam(char *s, char *val)
 {
     return assignsparam(
-	s, val, isset(WARNCREATEGLOBAL) && locallevel > 0 ?
+	s, val, isset(WARNCREATEGLOBAL) && locallevel > forklevel ?
 	ASSPM_WARN_CREATE : 0);
 }
 
@@ -2966,7 +2966,7 @@ mod_export Param
 setaparam(char *s, char **aval)
 {
     return assignaparam(
-	s, aval, isset(WARNCREATEGLOBAL) && locallevel >0 ?
+	s, aval, isset(WARNCREATEGLOBAL) && locallevel > forklevel ?
 	ASSPM_WARN_CREATE : 0);
 }
 
@@ -2997,7 +2997,7 @@ sethparam(char *s, char **val)
     if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING))) {
 	DPUTS(!v, "BUG: assigning to undeclared associative array");
 	createparam(t, PM_HASHED);
-	checkcreate = isset(WARNCREATEGLOBAL) && locallevel > 0;
+	checkcreate = isset(WARNCREATEGLOBAL) && locallevel > forklevel;
     } else if (!(PM_TYPE(v->pm->node.flags) & PM_HASHED) &&
 	     !(v->pm->node.flags & PM_SPECIAL)) {
 	unsetparam(t);
@@ -3075,7 +3075,7 @@ setnparam(char *s, mnumber val)
 	    /* errflag |= ERRFLAG_ERROR; */
 	    return NULL;
 	}
-	if (!was_unset && isset(WARNCREATEGLOBAL) && locallevel > 0)
+	if (!was_unset && isset(WARNCREATEGLOBAL) && locallevel > forklevel)
 	    check_warn_create(v->pm, "numeric");
     }
     setnumvalue(v, val);
@@ -3113,7 +3113,8 @@ setiparam_no_convert(char *s, zlong val)
     convbase(buf, val, 10);
     return assignsparam(
 	s, ztrdup(buf),
-	isset(WARNCREATEGLOBAL) && locallevel > 0 ? ASSPM_WARN_CREATE : 0);
+	isset(WARNCREATEGLOBAL) && locallevel > forklevel ?
+	ASSPM_WARN_CREATE : 0);
 }
 
 /* Unset a parameter */
