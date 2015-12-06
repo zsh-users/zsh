@@ -5179,6 +5179,17 @@ mb_metastrlenend(char *ptr, int width, char *eptr)
 	ret = mbrtowc(&wc, &inchar, 1, &mb_shiftstate);
 
 	if (ret == MB_INCOMPLETE) {
+	    /*
+	     * "num_in_char" is only used for incomplete characters.  The
+	     * assumption is that we will output this ocatet as a single
+	     * character (of single width) if we don't get a complete
+	     * character; if we do get a complete character, num_in_char
+	     * becomes irrelevant and is set to zero.
+	     *
+	     * This is in contrast to "num" which counts the characters
+	     * or widths in complete characters.  The two are summed,
+	     * so we don't count characters twice.
+	     */
 	    num_in_char++;
 	} else {
 	    if (ret == MB_INVALID) {

@@ -1,5 +1,8 @@
 2015-12-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 37326: Src/utils.c: comment how counting for multibyte string
+	lengths and widths is supposed to work.
+
 	* 37314: Src/utils.c, Src/zsh.h: upgrade quotedzputs() to use
 	nicechar() where necessary.  Regularise nicechar() etc. to prodduce
 	$'...' compatible output.
