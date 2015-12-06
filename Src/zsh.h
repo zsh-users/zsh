@@ -3051,6 +3051,12 @@ enum {
 #define AFTERTRAPHOOK  (zshhooks + 2)
 
 #ifdef MULTIBYTE_SUPPORT
+/* Final argument to mb_niceformat() */
+enum {
+    NICEFLAG_HEAP = 1,		/* Heap allocation where needed */
+    NICEFLAG_QUOTE = 2,		/* Result will appear in $'...' */
+};
+
 /* Metafied input */
 #define nicezputs(str, outs)	(void)mb_niceformat((str), (outs), NULL, 0)
 #define MB_METACHARINIT()	mb_charinit()

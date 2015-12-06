@@ -411,7 +411,7 @@ putshout(int c)
 mod_export char *
 nicechar(int c)
 {
-    static char buf[6];
+    static char buf[10];
     char *s = buf;
     c &= 0xff;
     if (ZISPRINT(c))
@@ -427,7 +427,9 @@ nicechar(int c)
 	    goto done;
     }
     if (c == 0x7f) {
-	*s++ = '^';
+	*s++ = '\\';
+	*s++ = 'C';
+	*s++ = '-';
 	c = '?';
     } else if (c == '\n') {
 	*s++ = '\\';
@@ -436,7 +438,9 @@ nicechar(int c)
 	*s++ = '\\';
 	c = 't';
     } else if (c < 0x20) {
-	*s++ = '^';
+	*s++ = '\\';
+	*s++ = 'C';
+	*s++ = '-';
 	c += 0x40;
     }
     done:
@@ -453,6 +457,22 @@ nicechar(int c)
 	*s++ = c;
     *s = 0;
     return buf;
+}
+
+/*
+ * Return 1 if nicechar() would reformat this character.
+ */
+
+/**/
+mod_export int
+is_nicechar(int c)
+{
+    c &= 0xff;
+    if (ZISPRINT(c))
+	return 0;
+    if (c & 0x80)
+	return !isset(PRINTEIGHTBIT);
+    return (c == 0x7f || c == '\n' || c == '\t' || c < 0x20);
 }
 
 /**/
@@ -532,7 +552,9 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
     s = buf;
     if (!iswprint(c) && (c < 0x80 || !isset(PRINTEIGHTBIT))) {
 	if (c == 0x7f) {
-	    *s++ = '^';
+	    *s++ = '\\';
+	    *s++ = 'C';
+	    *s++ = '-';
 	    c = '?';
 	} else if (c == L'\n') {
 	    *s++ = '\\';
@@ -541,7 +563,9 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
 	    *s++ = '\\';
 	    c = 't';
 	} else if (c < 0x20) {
-	    *s++ = '^';
+	    *s++ = '\\';
+	    *s++ = 'C';
+	    *s++ = '-';
 	    c += 0x40;
 	} else if (c >= 0x80) {
 	    ret = -1;
@@ -609,6 +633,23 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
     }
     *s = 0;
     return buf;
+}
+
+/*
+ * Return 1 if wcs_nicechar() would reformat this character for display.
+ */
+
+/**/
+mod_export int is_wcs_nicechar(wchar_t c)
+{
+    if (!iswprint(c) && (c < 0x80 || !isset(PRINTEIGHTBIT))) {
+	if (c == 0x7f || c == L'\n' || c == L'\t' || c < 0x20)
+	    return 1;
+	if (c >= 0x80) {
+	    return (c >= 0x100);
+	}
+    }
+    return 0;
 }
 
 /**/
@@ -4834,12 +4875,15 @@ niceztrlen(char const *s)
  * If outstrp is not NULL, set *outstrp to a zalloc'd version of
  * the output (still metafied).
  *
- * If "heap" is non-zero, use the heap for *outstrp, else zalloc.
+ * If flags contains NICEFLAG_HEAP, use the heap for *outstrp, else
+ * zalloc.
+ * If flags contsins NICEFLAG_QUOTE, the output is going to be within
+ * $'...', so quote "'" with a backslash.
  */
 
 /**/
 mod_export size_t
-mb_niceformat(const char *s, FILE *stream, char **outstrp, int heap)
+mb_niceformat(const char *s, FILE *stream, char **outstrp, int flags)
 {
     size_t l = 0, newl;
     int umlen, outalloc, outleft, eol = 0;
@@ -4886,7 +4930,10 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp, int heap)
 	    cnt = 1;
 	    /* FALL THROUGH */
 	default:
-	    fmt = wcs_nicechar(c, &newl, NULL);
+	    if (c == L'\'' && (flags & NICEFLAG_QUOTE))
+		fmt = "\\'";
+	    else
+		fmt = wcs_nicechar(c, &newl, NULL);
 	    break;
 	}
 
@@ -4920,11 +4967,69 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp, int heap)
     if (outstrp) {
 	*outptr = '\0';
 	/* Use more efficient storage for returned string */
-	*outstrp = heap ? dupstring(outstr) : ztrdup(outstr);
+	*outstrp = (flags & NICEFLAG_HEAP) ? dupstring(outstr) : ztrdup(outstr);
 	free(outstr);
     }
 
     return l;
+}
+
+/*
+ * Return 1 if mb_niceformat() would reformat this string, else 0.
+ */
+
+/**/
+mod_export int
+is_mb_niceformat(const char *s)
+{
+    int umlen, eol = 0, ret = 0;
+    wchar_t c;
+    char *ums, *ptr;
+    mbstate_t mbs;
+
+    ums = ztrdup(s);
+    untokenize(ums);
+    ptr = unmetafy(ums, &umlen);
+
+    memset(&mbs, 0, sizeof mbs);
+    while (umlen > 0) {
+	size_t cnt = eol ? MB_INVALID : mbrtowc(&c, ptr, umlen, &mbs);
+
+	switch (cnt) {
+	case MB_INCOMPLETE:
+	    eol = 1;
+	    /* FALL THROUGH */
+	case MB_INVALID:
+	    /* The byte didn't convert, so output it as a \M-... sequence. */
+	    if (is_nicechar(*ptr))  {
+		ret = 1;
+		break;
+	    }
+	    cnt = 1;
+	    /* Get mbs out of its undefined state. */
+	    memset(&mbs, 0, sizeof mbs);
+	    break;
+	case 0:
+	    /* Careful:  converting '\0' returns 0, but a '\0' is a
+	     * real character for us, so we should consume 1 byte. */
+	    cnt = 1;
+	    /* FALL THROUGH */
+	default:
+	    if (is_wcs_nicechar(c))
+		ret = 1;
+	    break;
+	}
+
+	if (ret)
+	    break;
+
+	umlen -= cnt;
+	ptr += cnt;
+    }
+
+    free(ums);
+
+    return ret;
 }
 
 /* ztrdup multibyte string with nice formatting */
@@ -4935,7 +5040,7 @@ nicedup(const char *s, int heap)
 {
     char *retstr;
 
-    (void)mb_niceformat(s, NULL, &retstr, heap);
+    (void)mb_niceformat(s, NULL, &retstr, heap ? NICEFLAG_HEAP : 0);
 
     return retstr;
 }
@@ -5717,22 +5822,35 @@ quotestring(const char *s, char **e, int instring)
 /* Unmetafy and output a string, quoted if it contains special characters. */
 
 /**/
-mod_export int
+mod_export void
 quotedzputs(char const *s, FILE *stream)
 {
     int inquote = 0, c;
 
     /* check for empty string */
-    if(!*s)
-	return fputs("''", stream);
+    if(!*s) {
+	fputs("''", stream);
+	return;
+    }
 
-    if (!hasspecial(s))
-	return zputs(s, stream);
+#ifdef MULTIBYTE_SUPPORT
+    if (is_mb_niceformat(s)) {
+	fputs("$'", stream);
+	mb_niceformat(s, stream, NULL, NICEFLAG_QUOTE);
+	fputc('\'', stream);
+	return;
+    }
+#endif /* MULTIBYTE_SUPPORT */
+
+    if (!hasspecial(s)) {
+	zputs(s, stream);
+	return;
+    }
 
     if (isset(RCQUOTES)) {
 	/* use rc-style quotes-within-quotes for the whole string */
 	if(fputc('\'', stream) < 0)
-	    return EOF;
+	    return;
 	while(*s) {
 	    if (*s == Meta)
 		c = *++s ^ 32;
@@ -5741,16 +5859,16 @@ quotedzputs(char const *s, FILE *stream)
 	    s++;
 	    if (c == '\'') {
 		if(fputc('\'', stream) < 0)
-		    return EOF;
+		    return;
 	    } else if(c == '\n' && isset(CSHJUNKIEQUOTES)) {
 		if(fputc('\\', stream) < 0)
-		    return EOF;
+		    return;
 	    }
 	    if(fputc(c, stream) < 0)
-		return EOF;
+		return;
 	}
 	if(fputc('\'', stream) < 0)
-	    return EOF;
+	    return;
     } else {
 	/* use Bourne-style quoting, avoiding empty quoted strings */
 	while(*s) {
@@ -5762,31 +5880,30 @@ quotedzputs(char const *s, FILE *stream)
 	    if (c == '\'') {
 		if(inquote) {
 		    if(fputc('\'', stream) < 0)
-			return EOF;
+			return;
 		    inquote=0;
 		}
 		if(fputs("\\'", stream) < 0)
-		    return EOF;
+		    return;
 	    } else {
 		if (!inquote) {
 		    if(fputc('\'', stream) < 0)
-			return EOF;
+			return;
 		    inquote=1;
 		}
 		if(c == '\n' && isset(CSHJUNKIEQUOTES)) {
 		    if(fputc('\\', stream) < 0)
-			return EOF;
+			return;
 		}
 		if(fputc(c, stream) < 0)
-		    return EOF;
+		    return;
 	    }
 	}
 	if (inquote) {
 	    if(fputc('\'', stream) < 0)
-		return EOF;
+		return;
 	}
     }
-    return 0;
 }
 
 /* Double-quote a metafied string. */

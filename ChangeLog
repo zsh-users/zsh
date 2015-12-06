@@ -1,3 +1,9 @@
+2015-12-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 37314: Src/utils.c, Src/zsh.h: upgrade quotedzputs() to use
+	nicechar() where necessary.  Regularise nicechar() etc. to prodduce
+	$'...' compatible output.
+
 2015-12-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 37150: Completion/Unix/Command/_git: _git: Autocomplete .. for
