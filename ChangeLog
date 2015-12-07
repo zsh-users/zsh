@@ -1,7 +1,7 @@
 2015-12-07  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37335: Test/D04parameter.ztst, Test/V09datetime.ztst: fix
-	* 37335: Test/D04tests after 37314.
+	tests after 37314.
 
 	* 37310: Doc/Zsh/builtins.yo: effect of disabling typeset
 	reserved word.
