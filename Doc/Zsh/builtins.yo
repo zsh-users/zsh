@@ -1812,7 +1812,10 @@ this means.
 Note that each interface to any of the commands my be disabled
 separately.  For example, `tt(disable -r typeset)' disables the reserved
 word interface to tt(typeset), exposing the builtin interface, while
-`tt(disable typeset)' disables the builtin.
+`tt(disable typeset)' disables the builtin.  Note that disabling the
+reserved word interface for tt(typeset) may cause problems with the
+output of `tt(typeset -p)', which assumes the reserved word interface is
+available in order to restore array and associative array values.
 
 If the shell option tt(TYPESET_SILENT) is not set, for each remaining
 var(name) that refers to a parameter that is already set, the name and

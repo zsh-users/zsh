@@ -1,3 +1,8 @@
+2015-12-07  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37310: Doc/Zsh/builtins.yo: effect of disabling typeset
+	reserved word.
+
 2015-12-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 37326: Src/utils.c: comment how counting for multibyte string
