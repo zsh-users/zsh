@@ -5180,11 +5180,15 @@ mb_metastrlenend(char *ptr, int width, char *eptr)
 
 	if (ret == MB_INCOMPLETE) {
 	    /*
-	     * "num_in_char" is only used for incomplete characters.  The
-	     * assumption is that we will output this ocatet as a single
+	     * "num_in_char" is only used for incomplete characters.
+	     * The assumption is that we will output all trailing octets
+	     * that form part of an incomplete character as a single
 	     * character (of single width) if we don't get a complete
-	     * character; if we do get a complete character, num_in_char
-	     * becomes irrelevant and is set to zero.
+	     * character.  This is purely pragmatic --- I'm not aware
+	     * of a standard way of dealing with incomplete characters.
+	     *
+	     * If we do get a complete character, num_in_char
+	     * becomes irrelevant and is set to zero
 	     *
 	     * This is in contrast to "num" which counts the characters
 	     * or widths in complete characters.  The two are summed,
@@ -5216,8 +5220,8 @@ mb_metastrlenend(char *ptr, int width, char *eptr)
 	}
     }
 
-    /* If incomplete, treat remainder as trailing single bytes */
-    return num + num_in_char;
+    /* If incomplete, treat remainder as trailing single character */
+    return num + (num_in_char ? 1 : 0);
 }
 
 /*
