@@ -396,9 +396,9 @@
 >Instead Here I Am Stuck By The Computer
 
   foo=$'\x7f\x00'
-  print ${(V)foo}
+  print -r -- ${(V)foo}
 0:${(V)...}
->^?^@
+>\C-?\C-@
 
   foo='playing '\''stupid'\'' "games" \w\i\t\h $quoting.'
   print -r ${(q)foo}
