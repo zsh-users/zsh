@@ -2,7 +2,7 @@
 ## Written by Frank Terbeck <ft@bewatermyfriend.org>
 ## Distributed under the same BSD-ish license as zsh itself.
 
-setopt localoptions noksharrays NO_shwordsplit
+setopt localoptions noksharrays NO_shwordsplit unset
 local -i i j
 
 if [[ $1 == '--nvcs' ]] ; then

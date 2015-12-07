@@ -1,3 +1,9 @@
+2015-12-23  Philip Sequeira  <phsequei@gmail.com>
+
+	* 37345: Functions/VCS_Info/VCS_INFO_maxexports,
+	Functions/VCS_Info/VCS_INFO_set: VCS_INFO functions break with
+	setopt no_unset
+
 2015-12-19  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/21082 (expanded): Functions/Misc/is-at-least: do a more

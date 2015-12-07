@@ -2,7 +2,7 @@
 ## Written by Frank Terbeck <ft@bewatermyfriend.org>
 ## Distributed under the same BSD-ish license as zsh itself.
 
-setopt localoptions NO_shwordsplit
+setopt localoptions NO_shwordsplit unset
 
 zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" "max-exports" maxexports || maxexports=2
 if [[ ${maxexports} != <-> ]] || (( maxexports < 1 )); then
