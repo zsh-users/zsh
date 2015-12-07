@@ -1,5 +1,8 @@
 2015-12-07  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 37337: Src/Zle/zle.h, Src/Zle/zle_main.c,
+	Src/Zle/zle_thingy.c: Delay freeing widget until not in use.
+
 	* 37335: Test/D04parameter.ztst, Test/V09datetime.ztst: fix
 	tests after 37314.
 

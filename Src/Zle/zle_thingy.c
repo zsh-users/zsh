@@ -253,9 +253,14 @@ unbindwidget(Thingy t, int override)
 /* Free a widget. */
 
 /**/
-static void
+void
 freewidget(Widget w)
 {
+    if (w->flags & WIDGET_INUSE) {
+	w->flags |= WIDGET_FREE;
+	return;
+    }
+
     if (w->flags & WIDGET_NCOMP) {
 	zsfree(w->u.comp.wid);
 	zsfree(w->u.comp.func);

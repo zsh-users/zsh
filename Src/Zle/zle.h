@@ -213,6 +213,8 @@ struct widget {
 #define ZLE_KEEPSUFFIX	(1<<9)	/* DON'T remove added suffix */
 #define ZLE_NOTCOMMAND  (1<<10)	/* widget should not alter lastcmd */
 #define ZLE_ISCOMP      (1<<11)	/* usable for new style completion */
+#define WIDGET_INUSE    (1<<12) /* widget is in use */
+#define WIDGET_FREE     (1<<13) /* request to free when no longer in use */
 
 /* thingies */
 

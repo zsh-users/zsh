@@ -1344,6 +1344,8 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	    eofsent = 1;
 	    ret = 1;
 	} else {
+	    int inuse = wflags & WIDGET_INUSE;
+	    w->flags |= WIDGET_INUSE;
 	    if(!(wflags & ZLE_KEEPSUFFIX))
 		removesuffix();
 	    if(!(wflags & ZLE_MENUCMP)) {
@@ -1367,6 +1369,12 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 		ret = w->u.fn(args);
 		unqueue_signals();
 	    }
+	    if (!inuse) {
+		if (w->flags & WIDGET_FREE)
+		    freewidget(w);
+		else
+		    w->flags &= ~WIDGET_INUSE;
+	    }
 	    if (!(wflags & ZLE_NOTCOMMAND))
 		lastcmd = wflags;
 	}
@@ -1387,6 +1395,8 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	    int osc = sfcontext, osi = movefd(0);
 	    int oxt = isset(XTRACE);
 	    LinkList largs = NULL;
+	    int inuse = w->flags & WIDGET_INUSE;
+	    w->flags |= WIDGET_INUSE;
 
 	    if (*args) {
 		largs = newlinklist();
@@ -1402,8 +1412,15 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	    opts[XTRACE] = oxt;
 	    sfcontext = osc;
 	    endparamscope();
-	    lastcmd = w->flags;
-	    w->flags = 0;
+	    lastcmd = w->flags & ~(WIDGET_INUSE|WIDGET_FREE);
+	    if (inuse) {
+		w->flags &= WIDGET_INUSE|WIDGET_FREE;
+	    } else {
+		if (w->flags & WIDGET_FREE)
+		    freewidget(w);
+		else
+		    w->flags = 0;
+	    }
 	    r = 1;
 	    redup(osi, 0);
 	}
