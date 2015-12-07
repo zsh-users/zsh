@@ -1,5 +1,10 @@
 2015-12-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 37344: Doc/Zsh/expn.yo, Src/subst.c, Src/utils.c, Src/zsh.h,
+	Test/D04parameter.ztst, Test/V09datetime.ztst: restore old
+	printable quoting of characters when not used from quotedzputs()
+	and add ${(q+)...} to output the new form.
+
 	* 37331: Src/utils.c: use a single character to represent an
 	MB_INCOMPLETE string even if multiple octets.
 

@@ -398,7 +398,7 @@
   foo=$'\x7f\x00'
   print -r -- ${(V)foo}
 0:${(V)...}
->\C-?\C-@
+>^?^@
 
   foo='playing '\''stupid'\'' "games" \w\i\t\h $quoting.'
   print -r ${(q)foo}

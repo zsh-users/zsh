@@ -272,7 +272,12 @@ enum {
     /*
      * As QT_BACKSLASH, but a NULL string is shown as ''.
      */
-    QT_BACKSLASH_SHOWNULL
+    QT_BACKSLASH_SHOWNULL,
+    /*
+     * Quoting as produced by quotedzputs(), used for human
+     * readability of parameter values.
+     */
+    QT_QUOTEDZPUTS
 };
 
 #define QT_IS_SINGLE(x)	((x) == QT_SINGLE || (x) == QT_SINGLE_OPTIONAL)
@@ -3055,6 +3060,7 @@ enum {
 enum {
     NICEFLAG_HEAP = 1,		/* Heap allocation where needed */
     NICEFLAG_QUOTE = 2,		/* Result will appear in $'...' */
+    NICEFLAG_NODUP = 4,         /* Leave allocated */
 };
 
 /* Metafied input */

@@ -1887,12 +1887,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    if (quotetype == QT_DOLLARS ||
 			quotetype == QT_BACKSLASH_PATTERN)
 			goto flagerr;
-		    if (s[1] == '-') {
+		    if (s[1] == '-' || s[1] == '+') {
 			if (quotemod)
 			    goto flagerr;
 			s++;
 			quotemod = 1;
-			quotetype = QT_SINGLE_OPTIONAL;
+			quotetype = (*s == '-') ? QT_SINGLE_OPTIONAL :
+			    QT_QUOTEDZPUTS;
 		    } else {
 			if (quotetype == QT_SINGLE_OPTIONAL) {
 			    /* extra q's after '-' not allowed */
@@ -3583,7 +3584,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    ap = aval;
 
 	    if (quotemod > 0) {
-		if (quotetype > QT_BACKSLASH) {
+		if (quotetype == QT_QUOTEDZPUTS) {
+		    for (; *ap; ap++)
+			*ap = quotedzputs(*ap, NULL);
+		} else if (quotetype > QT_BACKSLASH) {
 		    int sl;
 		    char *tmp;
 
@@ -3626,7 +3630,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    if (!copied)
 		val = dupstring(val), copied = 1;
 	    if (quotemod > 0) {
-		if (quotetype > QT_BACKSLASH) {
+		if (quotetype == QT_QUOTEDZPUTS) {
+		    val = quotedzputs(val, NULL);
+		} else if (quotetype > QT_BACKSLASH) {
 		    int sl;
 		    char *tmp;
 		    tmp = quotestring(val, NULL, quotetype);

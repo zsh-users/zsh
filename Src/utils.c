@@ -387,6 +387,7 @@ putshout(int c)
     return 0;
 }
 
+#ifdef MULTIBYTE_SUPPORT
 /*
  * Turn a character into a visible representation thereof.  The visible
  * string is put together in a static buffer, and this function returns
@@ -406,6 +407,73 @@ putshout(int c)
  * use it as a fallback in case we couldn't identify a wide character
  * in a multibyte string.
  */
+
+/**/
+mod_export char *
+nicechar_sel(int c, int quotable)
+{
+    static char buf[10];
+    char *s = buf;
+    c &= 0xff;
+    if (ZISPRINT(c))
+	goto done;
+    if (c & 0x80) {
+	if (isset(PRINTEIGHTBIT))
+	    goto done;
+	*s++ = '\\';
+	*s++ = 'M';
+	*s++ = '-';
+	c &= 0x7f;
+	if(ZISPRINT(c))
+	    goto done;
+    }
+    if (c == 0x7f) {
+	if (quotable) {
+	    *s++ = '\\';
+	    *s++ = 'C';
+	    *s++ = '-';
+	} else
+	    *s++ = '^';
+	c = '?';
+    } else if (c == '\n') {
+	*s++ = '\\';
+	c = 'n';
+    } else if (c == '\t') {
+	*s++ = '\\';
+	c = 't';
+    } else if (c < 0x20) {
+	if (quotable) {
+	    *s++ = '\\';
+	    *s++ = 'C';
+	    *s++ = '-';
+	} else
+	    *s++ = '^';
+	c += 0x40;
+    }
+    done:
+    /*
+     * The resulting string is still metafied, so check if
+     * we are returning a character in the range that needs metafication.
+     * This can't happen if the character is printed "nicely", so
+     * this results in a maximum of two bytes total (plus the null).
+     */
+    if (imeta(c)) {
+	*s++ = Meta;
+	*s++ = c ^ 32;
+    } else
+	*s++ = c;
+    *s = 0;
+    return buf;
+}
+
+/**/
+mod_export char *
+nicechar(int c)
+{
+    return nicechar_sel(c, 0);
+}
+
+#else /* MULTIBYTE_SUPPORT */
 
 /**/
 mod_export char *
@@ -458,6 +526,8 @@ nicechar(int c)
     *s = 0;
     return buf;
 }
+
+#endif /* MULTIBYTE_SUPPORT */
 
 /*
  * Return 1 if nicechar() would reformat this character.
@@ -527,7 +597,7 @@ mb_charinit(void)
 
 /**/
 mod_export char *
-wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
+wcs_nicechar_sel(wchar_t c, size_t *widthp, char **swidep, int quotable)
 {
     static char *buf;
     static int bufalloc = 0, newalloc;
@@ -552,9 +622,12 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
     s = buf;
     if (!iswprint(c) && (c < 0x80 || !isset(PRINTEIGHTBIT))) {
 	if (c == 0x7f) {
-	    *s++ = '\\';
-	    *s++ = 'C';
-	    *s++ = '-';
+	    if (quotable) {
+		*s++ = '\\';
+		*s++ = 'C';
+		*s++ = '-';
+	    } else
+		*s++ = '^';
 	    c = '?';
 	} else if (c == L'\n') {
 	    *s++ = '\\';
@@ -563,9 +636,12 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
 	    *s++ = '\\';
 	    c = 't';
 	} else if (c < 0x20) {
-	    *s++ = '\\';
-	    *s++ = 'C';
-	    *s++ = '-';
+	    if (quotable) {
+		*s++ = '\\';
+		*s++ = 'C';
+		*s++ = '-';
+	    } else
+		*s++ = '^';
 	    c += 0x40;
 	} else if (c >= 0x80) {
 	    ret = -1;
@@ -633,6 +709,13 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
     }
     *s = 0;
     return buf;
+}
+
+/**/
+mod_export char *
+wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
+{
+    return wcs_nicechar_sel(c, widthp, swidep, 0);
 }
 
 /*
@@ -4918,7 +5001,7 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp, int flags)
 	    /* FALL THROUGH */
 	case MB_INVALID:
 	    /* The byte didn't convert, so output it as a \M-... sequence. */
-	    fmt = nicechar(*ptr);
+	    fmt = nicechar_sel(*ptr, flags & NICEFLAG_QUOTE);
 	    newl = strlen(fmt);
 	    cnt = 1;
 	    /* Get mbs out of its undefined state. */
@@ -4933,7 +5016,7 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp, int flags)
 	    if (c == L'\'' && (flags & NICEFLAG_QUOTE))
 		fmt = "\\'";
 	    else
-		fmt = wcs_nicechar(c, &newl, NULL);
+		fmt = wcs_nicechar_sel(c, &newl, NULL, flags & NICEFLAG_QUOTE);
 	    break;
 	}
 
@@ -4967,8 +5050,13 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp, int flags)
     if (outstrp) {
 	*outptr = '\0';
 	/* Use more efficient storage for returned string */
-	*outstrp = (flags & NICEFLAG_HEAP) ? dupstring(outstr) : ztrdup(outstr);
-	free(outstr);
+	if (flags & NICEFLAG_NODUP)
+	    *outstrp = outstr;
+	else {
+	    *outstrp = (flags & NICEFLAG_HEAP) ? dupstring(outstr) :
+		ztrdup(outstr);
+	    free(outstr);
+	}
     }
 
     return l;
@@ -5834,38 +5922,76 @@ quotestring(const char *s, char **e, int instring)
     return v;
 }
 
-/* Unmetafy and output a string, quoted if it contains special characters. */
+/*
+ * Unmetafy and output a string, quoted if it contains special
+ * characters.
+ *
+ * If stream is NULL, return the same output with any allocation on the
+ * heap.
+ */
 
 /**/
-mod_export void
+mod_export char *
 quotedzputs(char const *s, FILE *stream)
 {
     int inquote = 0, c;
+    char *outstr, *ptr;
 
     /* check for empty string */
     if(!*s) {
+	if (!stream)
+	    return "''";
 	fputs("''", stream);
-	return;
+	return NULL;
     }
 
 #ifdef MULTIBYTE_SUPPORT
     if (is_mb_niceformat(s)) {
-	fputs("$'", stream);
-	mb_niceformat(s, stream, NULL, NICEFLAG_QUOTE);
-	fputc('\'', stream);
-	return;
+	if (stream) {
+	    fputs("$'", stream);
+	    mb_niceformat(s, stream, NULL, NICEFLAG_QUOTE);
+	    fputc('\'', stream);
+	    return NULL;
+	} else {
+	    char *substr;
+	    mb_niceformat(s, NULL, &substr, NICEFLAG_QUOTE|NICEFLAG_NODUP);
+	    outstr = (char *)zhalloc(4 + strlen(substr));
+	    sprintf(outstr, "$'%s'", substr);
+	    free(substr);
+	    return outstr;
+	}
     }
 #endif /* MULTIBYTE_SUPPORT */
 
     if (!hasspecial(s)) {
-	zputs(s, stream);
-	return;
+	if (stream) {
+	    zputs(s, stream);
+	    return NULL;
+	} else {
+	    return dupstring(s);
+	}
     }
 
+    if (!stream) {
+	const char *cptr;
+	int l = strlen(s) + 2;
+	for (cptr = s; *cptr; cptr++) {
+	    if (*cptr == Meta)
+		cptr++;
+	    else if (*cptr == '\'')
+		l += isset(RCQUOTES) ? 1 : 3;
+	}
+	ptr = outstr = zhalloc(l + 1);
+    } else {
+	ptr = outstr = NULL;
+    }
     if (isset(RCQUOTES)) {
 	/* use rc-style quotes-within-quotes for the whole string */
-	if(fputc('\'', stream) < 0)
-	    return;
+	if (stream) {
+	    if (fputc('\'', stream) < 0)
+		return NULL;
+	} else
+	    *ptr++ = '\'';
 	while(*s) {
 	    if (*s == Meta)
 		c = *++s ^ 32;
@@ -5873,52 +5999,98 @@ quotedzputs(char const *s, FILE *stream)
 		c = *s;
 	    s++;
 	    if (c == '\'') {
-		if(fputc('\'', stream) < 0)
-		    return;
-	    } else if(c == '\n' && isset(CSHJUNKIEQUOTES)) {
-		if(fputc('\\', stream) < 0)
-		    return;
+		if (stream) {
+		    if (fputc('\'', stream) < 0)
+			return NULL;
+		} else
+		    *ptr++ = '\'';
+	    } else if (c == '\n' && isset(CSHJUNKIEQUOTES)) {
+		if (stream) {
+		    if (fputc('\\', stream) < 0)
+			return NULL;
+		} else
+		    *ptr++ = '\\';
 	    }
-	    if(fputc(c, stream) < 0)
-		return;
+	    if (stream) {
+		if (fputc(c, stream) < 0)
+		    return NULL;
+	    } else {
+		if (imeta(c)) {
+		    *ptr++ = Meta;
+		    *ptr++ = c ^ 32;
+		} else
+		    *ptr++ = c;
+	    }
 	}
-	if(fputc('\'', stream) < 0)
-	    return;
+	if (stream) {
+	    if (fputc('\'', stream) < 0)
+		return NULL;
+	} else
+	    *ptr++ = '\'';
     } else {
 	/* use Bourne-style quoting, avoiding empty quoted strings */
-	while(*s) {
+	while (*s) {
 	    if (*s == Meta)
 		c = *++s ^ 32;
 	    else
 		c = *s;
 	    s++;
 	    if (c == '\'') {
-		if(inquote) {
-		    if(fputc('\'', stream) < 0)
-			return;
+		if (inquote) {
+		    if (stream) {
+			if (putc('\'', stream) < 0)
+			    return NULL;
+		    } else
+			*ptr++ = '\'';
 		    inquote=0;
 		}
-		if(fputs("\\'", stream) < 0)
-		    return;
+		if (stream) {
+		    if (fputs("\\'", stream) < 0)
+			return NULL;
+		} else {
+		    *ptr++ = '\\';
+		    *ptr++ = '\'';
+		}
 	    } else {
 		if (!inquote) {
-		    if(fputc('\'', stream) < 0)
-			return;
+		    if (stream) {
+			if (fputc('\'', stream) < 0)
+			    return NULL;
+		    } else
+			*ptr++ = '\'';
 		    inquote=1;
 		}
-		if(c == '\n' && isset(CSHJUNKIEQUOTES)) {
-		    if(fputc('\\', stream) < 0)
-			return;
+		if (c == '\n' && isset(CSHJUNKIEQUOTES)) {
+		    if (stream) {
+			if (fputc('\\', stream) < 0)
+			    return NULL;
+		    } else
+			*ptr++ = '\\';
 		}
-		if(fputc(c, stream) < 0)
-		    return;
+		if (stream) {
+		    if (fputc(c, stream) < 0)
+			return NULL;
+		} else {
+		    if (imeta(c)) {
+			*ptr++ = Meta;
+			*ptr++ = c ^ 32;
+		    } else
+			*ptr++ = c;
+		}
 	    }
 	}
 	if (inquote) {
-	    if(fputc('\'', stream) < 0)
-		return;
+	    if (stream) {
+		if (fputc('\'', stream) < 0)
+		    return NULL;
+	    } else
+		*ptr++ = '\'';
 	}
     }
+    if (!stream)
+	*ptr++ = '\0';
+
+    return outstr;
 }
 
 /* Double-quote a metafied string. */
