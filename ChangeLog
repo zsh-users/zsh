@@ -1,3 +1,9 @@
+2015-12-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/21071: Src/Zle/zle_keymap.c: Multibyte key sequences
+	couldn't be bound if the initial byte was the start of any
+	self-insert sequence.
+
 2015-12-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 37344: Doc/Zsh/expn.yo, Src/subst.c, Src/utils.c, Src/zsh.h,

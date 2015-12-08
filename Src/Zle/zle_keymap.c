@@ -1503,7 +1503,7 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 		    f->widget->flags & ZLE_VIOPER);
 #ifdef MULTIBYTE_SUPPORT
 	    if ((f == Th(z_selfinsert) || f == Th(z_selfinsertunmeta)) &&
-		!lastchar_wide_valid) {
+		!lastchar_wide_valid && !ispfx) {
 		int len;
 		VARARR(char, mbc, MB_CUR_MAX);
 		ZLE_INT_T inchar = getrestchar(lastchar, mbc, &len);
