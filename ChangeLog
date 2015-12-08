@@ -1,5 +1,8 @@
 2015-12-08  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 37347: Functions/VCS_Info/VCS_INFO_nvcsformats: msgs
+	shouldn't be local here, but in caller (where it already is).
+
 	* users/21071: Src/Zle/zle_keymap.c: Multibyte key sequences
 	couldn't be bound if the initial byte was the start of any
 	self-insert sequence.
