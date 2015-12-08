@@ -1,5 +1,9 @@
 2015-12-08  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 37348: Src/utils.c, Test/D04parameter.ztst,
+	Test/D07multibyte.ztst: tests for ${(q+)...} and extra
+	dupstring() needed for empty string case.
+
 	* 37347: Functions/VCS_Info/VCS_INFO_nvcsformats: msgs
 	shouldn't be local here, but in caller (where it already is).
 

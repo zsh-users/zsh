@@ -546,3 +546,10 @@
   [[ $'\xe3\x83\x9b' != [[:INCOMPLETE:][:INVALID:]] ]] || print fail 3
   [[ $'\xe3\x83\x9b' = ? ]] || print fail 4
 0:Testing incomplete and invalid multibyte character components
+
+  print -r -- ${(q+):-ホ}
+  foo='She said "ホ".  I said "You can'\''t '\''ホ'\'' me!'
+  print -r -- ${(q+)foo}
+0:${(q+)...} with printable multibyte characters
+>ホ
+>'She said "ホ".  I said "You can'\''t '\''ホ'\'' me!'

@@ -1866,3 +1866,17 @@
 >0
 >1 /somewhere
 >2 /random /value
+
+  print -r -- ${(q+):-}
+  print -r -- ${(q+)IFS}
+  print -r -- ${(q+):-oneword}
+  print -r -- ${(q+):-two words}
+  print -r -- ${(q+):-three so-called \'words\'}
+  (setopt rcquotes; print -r -- ${(q+):-three so-called \'words\'})
+0:${(q+)...}
+>''
+>$' \t\n\C-@'
+>oneword
+>'two words'
+>'three so-called '\''words'\'
+>'three so-called ''words'''

@@ -5940,7 +5940,7 @@ quotedzputs(char const *s, FILE *stream)
     /* check for empty string */
     if(!*s) {
 	if (!stream)
-	    return "''";
+	    return dupstring("''");
 	fputs("''", stream);
 	return NULL;
     }
