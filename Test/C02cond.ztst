@@ -389,6 +389,18 @@ F:Failures in these cases do not indicate a problem in the shell.
 >Not zero 5
 >Not zero 6
 
+  [ '(' = ')' ] || print OK 1
+  [ '((' = '))' ] || print OK 2
+  [ '(' = '(' ] && print OK 3
+  [ '(' non-empty-string ')' ] && echo OK 4
+  [ '(' '' ')' ] || echo OK 5
+0:yet more old-fashioned test fix ups: prefer comparison to parentheses
+>OK 1
+>OK 2
+>OK 3
+>OK 4
+>OK 5
+
 %clean
   # This works around a bug in rm -f in some versions of Cygwin
   chmod 644 unmodish

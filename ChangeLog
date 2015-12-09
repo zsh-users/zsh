@@ -1,3 +1,9 @@
+2015-12-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37364: Src/builtin.c, Src/text.c, Test/C02cond.ztst: "test"
+	and "[" need to prefer binary operators to parentheses in
+	three-argument expressions.
+
 2015-12-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37348: Src/utils.c, Test/D04parameter.ztst,

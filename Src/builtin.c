@@ -6463,7 +6463,13 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
     nargs = arrlen(argv);
     if (nargs == 3 || nargs == 4)
     {
-	if (*argv[0] == '(' && *argv[nargs-1] == ')') {
+	/*
+	 * As parentheses are an extension, we need to be careful ---
+	 * if this is a three-argument expression that could
+	 * be a binary operator, prefer that.
+	 */
+	if (!strcmp(argv[0], "(") && !strcmp(argv[nargs-1],")") &&
+	    (nargs != 3 || !is_cond_binary_op(argv[1]))) {
 	    argv[nargs-1] = NULL;
 	    argv++;
 	}

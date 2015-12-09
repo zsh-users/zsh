@@ -40,8 +40,31 @@
 /**/
 int text_expand_tabs;
 
+/*
+ * Binary operators in conditions.
+ * There order is tied to the order of the definitions COND_STREQ
+ * et seq. in zsh.h.
+ */
+static const char *cond_binary_ops[] = {
+    "=", "!=", "<", ">", "-nt", "-ot", "-ef", "-eq",
+    "-ne", "-lt", "-gt", "-le", "-ge", "=~"
+};
+
 static char *tptr, *tbuf, *tlim, *tpending;
 static int tsiz, tindent, tnewlins, tjob;
+
+/**/
+int
+is_cond_binary_op(const char *str)
+{
+    const char **op;
+    for (op = cond_binary_ops; *op; op++)
+    {
+	if (!strcmp(str, *op))
+	    return 1;
+    }
+    return 0;
+}
 
 static void
 dec_tindent(void)
@@ -120,7 +143,7 @@ taddchr(int c)
 
 /**/
 static void
-taddstr(char *s)
+taddstr(const char *s)
 {
     int sl = strlen(s);
     char c;
@@ -822,11 +845,6 @@ gettext2(Estate state)
 	    break;
 	case WC_COND:
 	    {
-		static char *c1[] = {
-		    "=", "!=", "<", ">", "-nt", "-ot", "-ef", "-eq",
-		    "-ne", "-lt", "-gt", "-le", "-ge", "=~"
-		};
-
 		int ctype;
 
 		if (!s) {
@@ -912,7 +930,7 @@ gettext2(Estate state)
 			    /* Binary test: `a = b' etc. */
 			    taddstr(ecgetstr(state, EC_NODUP, NULL));
 			    taddstr(" ");
-			    taddstr(c1[ctype - COND_STREQ]);
+			    taddstr(cond_binary_ops[ctype - COND_STREQ]);
 			    taddstr(" ");
 			    taddstr(ecgetstr(state, EC_NODUP, NULL));
 			    if (ctype == COND_STREQ ||
