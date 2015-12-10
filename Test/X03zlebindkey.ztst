@@ -1,0 +1,45 @@
+# Tests of the vi mode of ZLE
+
+%prep
+  mb_ok=
+  langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
+	 $(locale -a 2>/dev/null | egrep 'utf8|UTF-8'))
+  for LANG in $langs; do
+    if [[ é = ? ]]; then
+      ZSH_TEST_LANG=$LANG
+      mb_ok=1
+      break;
+    fi
+  done
+  if [[ $OSTYPE = cygwin ]]; then
+    ZTST_unimplemented="the zsh/zpty module does not work on Cygwin"
+  elif ( zmodload zsh/zpty 2>/dev/null ); then
+    . $ZTST_srcdir/comptest
+    comptestinit -z $ZTST_testdir/../Src/zsh
+  else
+    ZTST_unimplemented="the zsh/zpty module is not available"
+  fi
+
+%test
+
+  zpty_run 'bindkey -s "\C-xy" foo'
+  zletest $'\C-xy'
+  zpty_run 'bindkey -r "\C-xy"'
+0:bindkey -s
+>BUFFER: foo
+>CURSOR: 3
+
+  if [[ -z $mb_ok ]]; then
+    ZTST_skip="bindkey multibyte test skipped"
+  else
+    zpty_run 'alias unbind="bindkey -r ホ"'
+    zpty_run 'bindkey -s ホ bar'
+    zletest 'ホ'
+    zpty_run unbind
+    zletest 'ホ'
+  fi
+0:bindkey -s multibyte characters
+>BUFFER: bar
+>CURSOR: 3
+>BUFFER: ホ
+>CURSOR: 1

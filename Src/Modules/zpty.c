@@ -614,14 +614,23 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)
 		break;
 	}
 	if (cmd->read != -1 || (ret = read(cmd->fd, buf + used, 1)) == 1) {
+	    int readchar;
 	    if (cmd->read != -1) {
 		ret = 1;
-		buf[used] = (char) cmd->read;
+		readchar = cmd->read;
 		cmd->read = -1;
-	    }
+	    } else
+		readchar = STOUC(buf[used]);
+	    if (imeta(readchar)) {
+		buf[used++] = Meta;
+		buf[used++] = (char) (readchar ^ 32);
+	    } else
+		buf[used++] = (char) readchar;
 	    seen = 1;
-	    if (++used == blen) {
+	    if (used >= blen-1) {
 		if (!*args) {
+		    buf[used] = '\0';
+		    unmetafy(buf, &used);
 		    write_loop(1, buf, used);
 		    used = 0;
 		} else {
@@ -633,7 +642,8 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)
 	buf[used] = '\0';
 
 	if (!prog) {
-	    if (ret <= 0 || (*args && buf[used - 1] == '\n'))
+	    if (ret <= 0 || (*args && buf[used - 1] == '\n' &&
+			     (used < 2 || buf[used-2] != Meta)))
 		break;
 	} else {
 	    if (ret < 0
@@ -666,9 +676,11 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)
 	return 1;
     }
     if (*args)
-	setsparam(*args, ztrdup(metafy(buf, used, META_HREALLOC)));
-    else if (used)
+	setsparam(*args, ztrdup(buf));
+    else if (used) {
+	unmetafy(buf, &used);
 	write_loop(1, buf, used);
+    }
 
     if (seen && (!prog || matchok || !mustmatch))
 	return 0;

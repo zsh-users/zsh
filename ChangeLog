@@ -1,3 +1,9 @@
+2015-12-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37378: Src/Modules/zpty.c, Test/X03zlebindkey.ztst,
+	Test/comptest: New bindkey tests; also fix Meta bug with pattern
+	match on zpty -r.
+
 2015-12-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37364: Src/builtin.c, Src/text.c, Test/C02cond.ztst: "test"
