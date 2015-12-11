@@ -2,10 +2,6 @@
 
 local -a args
 
-_elf_file() {
-  [[ -x $REPLY || $REPLY = (core*|*.([ao]|so|elf)) ]]
-}
-
 args=(
   '-c[dump section header information]'
   '-d[dump .dynamic section]'
@@ -38,7 +34,7 @@ case $OSTYPE in
       '-l[show long section names without truncation]'
       '-O[specify osabi to apply]:osabi'
       '-P[use alternative section header]'
-      "*:elf file:_files -g '*(-.e:_elf_file:)'"
+      "*:elf file:_object_files"
     )
   ;;
   freebsd*) args+=( '-a[dump all information]' ) ;;

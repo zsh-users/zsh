@@ -1,5 +1,10 @@
 2015-12-11  Oliver Kiddle  <opk@zsh.org>
 
+	* 37383: Matthew Martin: Completion/Unix/Command/_elfdump,
+	Completion/Unix/Command/_nm, Completion/Unix/Command/_objdump,
+	Completion/Unix/Command/_readelf, Completion/Unix/Type/_object_files:
+	add completion type for object files
+
 	* 37260: Simon Hafner: Completion/X/Command/_mplayer:
 	add opus to mplayer audio completions
 

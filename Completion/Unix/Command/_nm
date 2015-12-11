@@ -2,11 +2,7 @@
 
 local args files variant
 
-_nm_object_file() {
-  [[ -x $REPLY || $REPLY = *.([ao]|so|elf) ]]
-}
-
-files="*:object file:_files -g '*(-.e,_nm_object_file,)'"
+files="*:object file:_object_files"
 args=(
   '(-A -o --print-file-name)'{-A,-o,--print-file-name}'[print name of input file on each line]'
   '(--demangle)-C[decode symbol names]'

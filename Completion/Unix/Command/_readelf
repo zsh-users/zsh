@@ -2,10 +2,6 @@
 
 local variant args sections
 
-_elf_file() {
-  [[ -x $REPLY || $REPLY = (core*|*.([ao]|so|elf)) ]]
-}
-
 sections=( .bss .data .dynamic .dynsym .got .interp .shstrtab .symtab .text )
 _pick_variant -r variant elftoolchain=elftoolchain elfutils=elfutils binutils --version
 
@@ -29,7 +25,7 @@ args=(
   '(-W --wide)'{-W,--wide}'[allow output width to exceed 80 characters]'
   '(- *)'{-H,--help}'[display help information]'
   '(- *)'{-v,--version}'[display version information]'
-  "*:elf file:_files -g '*(-.e:_elf_file:)'"
+  "*:elf file:_object_files"
 )
 
 case $variant in
