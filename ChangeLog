@@ -1,3 +1,8 @@
+2015-12-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Functions/Zle/url-quote-magic: match, mbegin, mend should be
+	locally.
+
 2015-12-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 37383: Matthew Martin: Completion/Unix/Command/_elfdump,

@@ -115,7 +115,7 @@ alias globurl='noglob urlglobber '
 function url-quote-magic {
     setopt localoptions noksharrays extendedglob
     local qkey="${(q)KEYS}"
-    local -a reply
+    local -a reply match mbegin mend
     if [[ "$KEYS" != "$qkey" ]]
     then
 	local lbuf="$LBUFFER$qkey"
