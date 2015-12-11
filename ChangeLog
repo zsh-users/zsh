@@ -1,5 +1,8 @@
 2015-12-11  Oliver Kiddle  <opk@zsh.org>
 
+	* 37260: Simon Hafner: Completion/X/Command/_mplayer:
+	add opus to mplayer audio completions
+
 	* users/20873: Functions/Zle/edit-command-line: disable bracketed
 	paste while running external editor from zle
 
