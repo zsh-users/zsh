@@ -1,3 +1,8 @@
+2015-12-11  Oliver Kiddle  <opk@zsh.org>
+
+	* users/20873: Functions/Zle/edit-command-line: disable bracketed
+	paste while running external editor from zle
+
 2015-12-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37378: Src/Modules/zpty.c, Test/X03zlebindkey.ztst,

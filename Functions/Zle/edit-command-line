@@ -1,8 +1,8 @@
 # Edit the command line using your usual editor.
-# Binding this to 'v' in the vi command mode map,
+# Binding this to '!' in the vi command mode map,
 #   autoload -Uz edit-command-line
 #   zle -N edit-command-line
-#   bindkey -M vicmd v edit-command-line
+#   bindkey -M vicmd '!' edit-command-line
 # will give ksh-like behaviour for that key,
 # except that it will handle multi-line buffers properly.
 
@@ -10,7 +10,9 @@
   exec </dev/tty
 
   # Compute the cursor's position in bytes, not characters.
-  setopt localoptions nomultibyte
+  setopt localoptions nomultibyte noksharrays
+
+  (( $+zle_bracketed_paste )) && print -n $zle_bracketed_paste[2]
 
   # Open the editor, placing the cursor at the right place if we know how.
   local editor=${${VISUAL:-${EDITOR:-vi}}}
@@ -23,6 +25,8 @@
       ${=editor} +${#lines}:$((${#lines[-1]} + 1)) $1;;
     (*) ${=editor} $1;;
   esac
+
+  (( $+zle_bracketed_paste )) && print -n $zle_bracketed_paste[1]
 
   # Replace the buffer with the editor output.
   print -Rz - "$(<$1)" 
