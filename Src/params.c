@@ -27,6 +27,8 @@
  *
  */
 
+#include <assert.h>
+
 #include "zsh.mdh"
 #include "params.pro"
 
@@ -1453,6 +1455,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    if (!ta || !*ta)
 		return !down;
 	    len = v->pm->length;
+	    assert(len == arrlen(ta));
 	    if (beg < 0)
 		beg += len;
 	    if (down) {
@@ -1476,6 +1479,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	} else if (word) {
 	    ta = sepsplit(d = s = getstrvalue(v), sep, 1, 1);
 	    len = v->pm->length;
+	    assert(len == arrlen(ta));
 	    if (beg < 0)
 		beg += len;
 	    if (down) {
@@ -2025,6 +2029,7 @@ getstrvalue(Value v)
 	if (v->isarr)
 	    s = sepjoin(ss, NULL, 1);
 	else {
+	    assert(v->pm->length == arrlen(ss));
 	    if (v->start < 0)
 		v->start += v->pm->length;
 	    s = (v->start >= v->pm->length || v->start < 0) ?
@@ -2222,6 +2227,7 @@ getarrvalue(Value v)
     s = getvaluearr(v);
     if (v->start == 0 && v->end == -1)
 	return s;
+    assert(v->pm->length == arrlen(s));
     if (v->start < 0)
 	v->start += v->pm->length;
     if (v->end < 0)
@@ -2559,6 +2565,7 @@ setarrvalue(Value v, char **val)
 	int post_assignment_length;
 	int i;
 
+	assert(v->pm->length == arrlen(old));
 	q = old;
 
 	if ((v->flags & VALFLAG_INV) && unset(KSHARRAYS)) {
@@ -2668,9 +2675,10 @@ getaparam(char *s, int *len)
     if (!idigit(*s) && (v = getvalue(&vbuf, &s, 0)) &&
 	PM_TYPE(v->pm->node.flags) == PM_ARRAY)
     {
-	if (len)
+	if (len) {
 	    *len = v->pm->length;
-	    //*len = arrlen(v->pm->gsu.a->getfn(v->pm));
+	    assert (*len == arrlen(v->pm->gsu.a->getfn(v->pm)));
+	}
 	//fprintf(stderr, "%i %i\n", v->pm->length, arrlen(v->pm->gsu.a->getfn(v->pm)));
 	return v->pm->gsu.a->getfn(v->pm);
     }
@@ -2938,6 +2946,7 @@ assignaparam(char *s, char **val, int flags)
     if (flags & ASSPM_AUGMENT) {
     	if (v->start == 0 && v->end == -1) {
 	    if (PM_TYPE(v->pm->node.flags) & PM_ARRAY) {
+		assert(v->pm->length == arrlen(v->pm->gsu.a->getfn(v->pm)));
 	    	v->start = 
 		    //arrlen(v->pm->gsu.a->getfn(v->pm));
 		    v->pm->length;
@@ -2948,6 +2957,7 @@ assignaparam(char *s, char **val, int flags)
 	    if (v->end > 0)
 		v->start = v->end--;
 	    else if (PM_TYPE(v->pm->node.flags) & PM_ARRAY) {
+		assert(v->pm->length == arrlen(v->pm->gsu.a->getfn(v->pm)));
 		v->end 
 		    //= arrlen(v->pm->gsu.a->getfn(v->pm)) + v->end;
 		    += v->pm->length;

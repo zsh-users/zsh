@@ -30,6 +30,8 @@
 /* this is defined so we get the prototype for open_memstream */
 #define _GNU_SOURCE 1
 
+#include <assert.h>
+
 #include "zsh.mdh"
 #include "builtin.pro"
 
@@ -3404,6 +3406,7 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		    } else {
 			/* start is after the element for reverse index */
 			int start = vbuf.start - !!(vbuf.flags & VALFLAG_INV);
+			assert(vbuf.pm->length == arrlen(vbuf.pm->u.arr));
 			if (start < vbuf.pm->length) {
 			    char *arr[2];
 			    arr[0] = "";
