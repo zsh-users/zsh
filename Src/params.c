@@ -1452,7 +1452,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		ta = getarrvalue(v);
 	    if (!ta || !*ta)
 		return !down;
-	    len = arrlen(ta);
+	    len = v->pm->length;
 	    if (beg < 0)
 		beg += len;
 	    if (down) {
@@ -1475,7 +1475,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    }
 	} else if (word) {
 	    ta = sepsplit(d = s = getstrvalue(v), sep, 1, 1);
-	    len = arrlen(ta);
+	    len = v->pm->length;
 	    if (beg < 0)
 		beg += len;
 	    if (down) {
@@ -2026,8 +2026,8 @@ getstrvalue(Value v)
 	    s = sepjoin(ss, NULL, 1);
 	else {
 	    if (v->start < 0)
-		v->start += arrlen(ss);
-	    s = (v->start >= arrlen(ss) || v->start < 0) ?
+		v->start += v->pm->length;
+	    s = (v->start >= v->pm->length || v->start < 0) ?
 		(char *) hcalloc(1) : ss[v->start];
 	}
 	return s;
@@ -2223,16 +2223,16 @@ getarrvalue(Value v)
     if (v->start == 0 && v->end == -1)
 	return s;
     if (v->start < 0)
-	v->start += arrlen(s);
+	v->start += v->pm->length;
     if (v->end < 0)
-	v->end += arrlen(s) + 1;
-    if (v->start > arrlen(s) || v->start < 0)
+	v->end += v->pm->length + 1;
+    if (v->start > v->pm->length || v->start < 0)
 	s = arrdup(nular);
     else
 	s = arrdup(s + v->start);
     if (v->end <= v->start)
 	s[0] = NULL;
-    else if (v->end - v->start <= arrlen(s))
+    else if (v->end - v->start <= v->pm->length)
 	s[v->end - v->start] = NULL;
     return s;
 }
@@ -2555,7 +2555,7 @@ setarrvalue(Value v, char **val)
 	char **const old = v->pm->gsu.a->getfn(v->pm);
 	char **new;
 	char **p, **q, **r; /* index variables */
-	const int pre_assignment_length = arrlen(old);
+	const int pre_assignment_length = v->pm->length;
 	int post_assignment_length;
 	int i;
 
@@ -2810,7 +2810,7 @@ assignsparam(char *s, char *val, int flags)
 		return v->pm; /* avoid later setstrvalue() call */
 	    case PM_ARRAY:
 	    	if (unset(KSHARRAYS)) {
-		    v->start = arrlen(v->pm->gsu.a->getfn(v->pm));
+		    v->start = v->pm->length;
 		    v->end = v->start + 1;
 		} else {
 		    /* ksh appends scalar to first element */
@@ -2938,7 +2938,9 @@ assignaparam(char *s, char **val, int flags)
     if (flags & ASSPM_AUGMENT) {
     	if (v->start == 0 && v->end == -1) {
 	    if (PM_TYPE(v->pm->node.flags) & PM_ARRAY) {
-	    	v->start = arrlen(v->pm->gsu.a->getfn(v->pm));
+	    	v->start = 
+		    //arrlen(v->pm->gsu.a->getfn(v->pm));
+		    v->pm->length;
 	    	v->end = v->start + 1;
 	    } else if (PM_TYPE(v->pm->node.flags) & PM_HASHED)
 	    	v->start = -1, v->end = 0;
@@ -2946,7 +2948,9 @@ assignaparam(char *s, char **val, int flags)
 	    if (v->end > 0)
 		v->start = v->end--;
 	    else if (PM_TYPE(v->pm->node.flags) & PM_ARRAY) {
-		v->end = arrlen(v->pm->gsu.a->getfn(v->pm)) + v->end;
+		v->end 
+		    //= arrlen(v->pm->gsu.a->getfn(v->pm)) + v->end;
+		    += v->pm->length;
 		v->start = v->end + 1;
 	    }
 	}

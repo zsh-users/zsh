@@ -3404,7 +3404,7 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		    } else {
 			/* start is after the element for reverse index */
 			int start = vbuf.start - !!(vbuf.flags & VALFLAG_INV);
-			if (start < arrlen(vbuf.pm->u.arr)) {
+			if (start < vbuf.pm->length) {
 			    char *arr[2];
 			    arr[0] = "";
 			    arr[1] = 0;
