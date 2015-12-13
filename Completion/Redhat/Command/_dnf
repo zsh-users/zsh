@@ -1,278 +1,198 @@
-#compdef dnf
+#compdef dnf dnf-2 dnf-3
 
-# Main dispatcher
+_dnf_helper() {
+  compadd $($python_exec $helper "$@" -d 0 -q -C 2>/dev/null)
+}
+
+_dnf_query_db() {
+  sqlite3 -batch -init /dev/null "$cache_file" "$1"
+}
+
+_dnf_disabled_repos() {
+  _dnf_helper repolist disabled ""
+}
+
+_dnf_enabled_repos() {
+  _dnf_helper repolist enabled ""
+}
+
+_dnf_available_packages() {
+  if [ -r $cache_file ]; then
+    compadd $(_dnf_query_db "select pkg from available WHERE pkg LIKE \"$1%\"")
+  else
+    _dnf_helper install "$1"
+  fi
+}
+
+_dnf_installed_packages() {
+  if [ -r $cache_file ]; then
+    compadd $(_dnf_query_db "select pkg from installed WHERE pkg LIKE \"$1%\"")
+  else
+    _dnf_helper remove "$1"
+  fi
+}
+
+_dnf_local_packages() {
+  _files -/ -g '(#i)*.rpm(-.)'
+}
+
 _dnf() {
+  if [[ "$(readlink /usr/bin/dnf)" == "dnf-2" ]]; then
+    local python_exec="python2"
+  else
+    local python_exec="python3"
+  fi
+  local helper=$(${python_exec} -c "import dnf.cli; print('{}/completion_helper.py'.format(dnf.cli.__path__[0]))")
+  local cache_file="/var/cache/dnf/packages.db"
+
   _arguments -s \
     '(- *)'{-h,--help}'[show the help message]' \
-    '(-t --tolerant)'{-t,--tolerant}'[be tolerant of errors]' \
+    '--version[show dnf version]' \
+    '(-v --verbose)'{-v,--verbose}'[set verbose, show debug messages]' \
+    '(-q --quiet)'{-q,--quiet}'[show just the relevant content]' \
+    '--allowerasing[allow erasing of installed  packages]' \
+    '(-y --assumeyes)'{-y,--assumeyes}'[answer yes for all questions]' \
     '(-C --cacheonly)'{-C,--cacheonly}'[run entirely from cache]' \
     '(-c --config)'{-c,--config=}'[config file location]:config file:_files' \
     '(-R --randomwait)'{-R,--randomwait=}'[maximum command wait time (in minutes)]:max wait time' \
-    '(-d --debuglevel)'{-d,--debuglevel=}'[debug level (0-10)]:debug level' \
-    '(-e --errorlevel)'{-e,--errorlevel=}'[error level (0-10)]:error level' \
-    '(-y --assumeyes)'{-y,--assumeyes}'[answer yes for all questions]' \
+    '--releasever=[configure DNF for another release]:release' \
+    '--refresh[set metadata as expired before running the command]' \
+    '--nogpgcheck[skip checking GPG signatures on package]' \
     '--installroot=[set install root]:install root:_files -/' \
-    '*--enablerepo=[enable or or more repositories]:repos to enable:_dnf_disabled_repos_list' \
-    '*--disablerepo=[disable one or more repositories]:disable repos:_dnf_enabled_repos_list' \
-    {*-x,*--exclude=}'[exclude package(s) by name or glob]:exclude packages' \
-    '--version[show dnf version]' \
-    '--obsoletes[enable obsoletes processing during updates]' \
-    '--nogpgcheck[disable gpg signature checking]' \
-    '--noplugins[disable dnf plugins]' \
-    '--disablepresto[disable Presto plugin and don''''t download any deltarpms]' \
+    '*--enablerepo=[enable one or more repositories]:repos to enable:_dnf_disabled_repos' \
+    '*--disablerepo=[disable one or more repositories]:disable repos:_dnf_enabled_repos' \
     '*::dnf command:_dnf_command'
 }
 
-(( $+functions[_dnf_command] )) || _dnf_command() {
+_dnf_command() {
   local -a _dnf_cmds
   _dnf_cmds=(
-    "install:install the latest version of a package or group of packages"
-    "erase:remove an installed package (with its dependencies)"
-    "remove:remove an installed package (with its dependencies)"
-    "clean:clean local dnf cache"
-    "check-update:check if any updates are available"
-    "info:get description of available packages"
-    "list:is used to list various information about packages"
-    "groupinfo:get info on package groups"
-    "groupinstall:install a package group or groups"
-    "groupremove:remove a package group or groups"
-    "grouplist:list package groups"
-    "groupupdate:update a package group or groups"
-    "localinstall:install packages with local rpm files"
-    "localupdate:update packages with local rpm files"
-    "makecache:makes a local dnf cache"
-    "provides:find out which package provides some feature or file"
-    "whatprovides:find out which package provides some feature or file"
-    "search:find any packages matching pattern"
-    "shell:enter the 'dnf shell'"
-    "update:update one or more packages"
-    "upgrade:upgrade one or more packages"
+    "autoremove:automatically remove no longer required packages"
+    "check-update:check for available package upgrades"
+    "clean:remove cached data"
+    "distro-sync:synchronize installed packages to the latest available versions"
+    "downgrade:downgrade a package"
+    "erase:deprecated alias for remove"
+    "group:display, or use, the groups information"
+    "help:display a helpful usage message"
+    "history:display, or use, the transaction history"
+    "info:display details about a package or group of packages"
+    "install:install a package or packages on your system"
+    "list:list a package or groups of packages"
+    "makecache:generate the metadata cache"
+    "mark:mark or unmark installed packages as installed by user"
+    "provides:find what package provides the given value"
+    "reinstall:reinstall a package"
+    "remove:remove a package or packages from your system"
+    "repolist:display the configured software repositories"
+    "repository-packages:run commands on top of all packages in given repository"
+    "search:search package details for the given string"
+    "update:deprecated alias for upgrade"
+    "updateinfo:display advisories about packages"
+    "upgrade:upgrade a package or packages on your system"
+    "upgrade-to:upgrade a package on your system to the specified version"
   )
 
   if (( CURRENT == 1 )); then
     _describe -t commands 'dnf command' _dnf_cmds || compadd "$@"
   else
-    local curcontext="$curcontext"
-
-    cmd="${${_dnf_cmds[(r)$words[1]:*]%%:*}}"
+    local command="${${_dnf_cmds[(r)$words[1]:*]%%:*}}"
     # Deal with any aliases
-    case $cmd in
-      remove) cmd="erase";;
-      whatprovides) cmd="provides";;
-      upgrade) cmd="update";;
+    case $command in
+      erase) command="remove";;
+      whatprovides) command="provides";;
+      update) command="upgrade";;
     esac
 
-    if (( $#cmd )); then
-      curcontext="${curcontext%:*:*}:dnf-${cmd}:"
+    _is_path() {
+      [[ "$1" == *\/* ]] || [[ "$1" == \~* ]]
+    }
 
-      local update_policy
-      zstyle -s ":completion:${curcontext}:" cache-policy update_policy
-      if [[ -z "$update_policy" ]]; then
-	zstyle ":completion:${curcontext}:" cache-policy _dnf_caching_policy
-      fi
+    local cur=$words[CURRENT]
+    local prev=""
+    [[ $CURRENT > 2 ]] && prev=$words[$((CURRENT - 1))]
 
-      _call_function ret _dnf_$cmd || _message 'no more arguments'
-    else
-      _message "unknown dnf command: $words[1]"
-    fi
-    return ret
-  fi
-}
-
-# Fills the all pkg cache
-_dnf_all_pkgs() {
-  if ( [[ ${+_all_pkgs} -eq 0 ]] || _cache_invalid ALL ) &&
-    ! _retrieve_cache ALL;
-  then
-    _all_pkgs=( $(dnf -C list all | sed 's/\s.*//' | grep '\.' 2>/dev/null) )
-    _store_cache ALL _all_pkgs
-  fi
-}
-
-# Fills the installed pkg cache
-_dnf_installed_pkgs() {
-  if ( [[ ${+_installed_pkgs} -eq 0 ]] || _cache_invalid INSTALLED ) &&
-    ! _retrieve_cache INSTALLED;
-  then
-    _installed_pkgs=( $(dnf -C list installed | sed 's/\s.*//' | grep '\.' 2>/dev/null) )
-    _store_cache INSTALLED _installed_pkgs
-  fi
-}
-
-# Fills the available pkg cache
-_dnf_available_pkgs() {
-  if ( [[ ${+_available_pkgs} -eq 0 ]] || _cache_invalid AVAILABLE ) &&
-    ! _retrieve_cache AVAILABLE;
-  then
-    _available_pkgs=( $(dnf -C list available | sed 's/\s.*//' | grep '\.' 2>/dev/null) )
-    _store_cache AVAILABLE _available_pkgs
-  fi
-}
-
-# Fills the upgrade pkg cache
-_dnf_upgrade_pkgs()
-{
-  if ( [[ ${+_upgrade_pkgs} -eq 0 ]] || _cache_invalid UPGRADE ) &&
-    ! _retrieve_cache UPGRADE;
-  then
-    _upgrade_pkgs=( $(dnf -C list upgrade | sed 's/\s.*//' | grep '\.' 2>/dev/null) )
-    _store_cache UPGRADE _upgrade_pkgs
-  fi
-}
-
-# Gets the list of defined repos
-__dnf_repos() {
-  local trepo
-  local -a tarray
-  tarray=( $(egrep -h '(^\[.*\]|^enabled.*=)' /etc/dnf.repos.d/*.repo /etc/dnf.conf 2>/dev/null | sed -e 's/ //g' | sed -e 's/\[//g' | sed -e 's/\].*$//g' 2>/dev/null) )
-  local -i eindex=0
-  local -i dindex=0
-  for line in $tarray; do
-    if [[ "$line" = "enabled=1" ]]; then
-      enabled_dnf_repos+=($trepo)
-    elif [[ "$line" = "enabled=0" ]]; then
-      disabled_dnf_repos+=($trepo)
-    elif [[ "$line" != "main" ]]; then
-      trepo=$line
-    fi
-  done
-}
-
-(( $+functions[_dnf_disabled_repos_list] )) || _dnf_disabled_repos_list() {
-  local -a enabled_dnf_repos disabled_dnf_repos
-  __dnf_repos
-  _sequence compadd "$@" - -a disabled_dnf_repos
-}
-
-(( $+functions[_dnf_enabled_repos_list] )) || _dnf_enabled_repos_list() {
-  local -a enabled_dnf_repos disabled_dnf_repos
-  __dnf_repos
-  _sequence compadd "$@" - -a enabled_dnf_repos
-}
-
-# Completion function for erase|remove
-(( $+functions[_dnf_erase] )) || _dnf_erase() {
-  _dnf_installed_pkgs
-  compadd "$@" -a -- _installed_pkgs
-}
-
-# Completion function for install
-(( $+functions[_dnf_install] )) || _dnf_install() {
-  if ! [[ $PREFIX == */* ]]; then
-    _dnf_available_pkgs
-  fi
-
-  local ret=1
-  _tags files packages
-  while _tags; do
-    if _requested files; then
-      compadd "$@" -a -- _available_pkgs
-    fi
-    if _requested packages; then
-      _call_function - _dnf_localinstall
-    fi
-    (( ret )) || break
-  done
-  return ret
-}
-
-# Completion function for localinstall
-(( $+functions[_dnf_localinstall] )) || _dnf_localinstall() {
-  _files -/ -g '(#i)*.rpm(-.)'
-}
-
-# Completion function for localupdate
-(( $+functions[_dnf_localupdate] )) || _dnf_localupdate() {
-  _files -/ -g '(#i)*.rpm(-.)'
-}
-
-# Completion function for update/upgrade
-(( $+functions[_dnf_update] )) || _dnf_update() {
-  _dnf_upgrade_pkgs
-  compadd "$@" -a -- _upgrade_pkgs
-}
-
-_dnf_all() {
-  _dnf_all_pkgs
-  compadd "$@" -a -- _all_pkgs
-}
-
-_dnf_list_or_info() {
-  local -a listlist
-  listlist=(
-    "all:all packages in repositories"
-    "available:packages available in repositories"
-    "updates:packages with updates available"
-    "installed:installed packages"
-    "extras:packages installed that are not available in any dnf repository"
-    "obsoletes:packages installed that are obsoleted"
-    "recent:packages recently added to repositories"
-  )
-
-  if (( CURRENT == 2 )); then
-    _describe -t dnf-list-subcmds "dnf info/list sub-commands" listlist || _dnf_all
-  else
-    local subcmd
-    subcmd="${${listlist[(r)$words[2]:*]%%:*}}"
-    # offer packages selected by the subcommand
-    case $subcmd in
-      all) _dnf_all;;
-      installed) _dnf_erase;;
-      available) _dnf_install;;
-      updates) _dnf_update;;
+    case $command in
+      install|upgrade|reinstall|info|check-update|distro-sync)
+        if ! _is_path "$cur"; then
+          _dnf_available_packages "$cur"
+        else
+          _dnf_local_packages
+        fi
+        ;;
+      remove|downgrade)
+        if ! _is_path "$cur"; then
+          _dnf_installed_packages "$cur"
+        elif [[ "$command" == downgrade ]]; then
+          _dnf_local_packages
+        fi
+        ;;
+      list|clean)
+        _dnf_helper $command "$prev" "$cur"
+        ;;
+      group)
+        local -a _dnf_group_cmds
+        _dnf_group_cmds=(
+          "summary:display groups overview"
+          "info:display package lists of a group"
+          "install:install packages from a group"
+          "list:list all matching groups"
+          "remove:mark the group removed"
+          "upgrade:upgrades the group and its packages"
+          "mark:mark a group for installation or removal"
+        )
+        if (( CURRENT == 2 )); then
+          _describe -t commands 'dnf group command' _dnf_group_cmds
+        fi
+        ;;
+      help)
+        if (( CURRENT == 2 )); then
+          _dnf_helper '_cmds' ''
+        fi
+        ;;
+      history)
+        local -a _dnf_history_cmds
+        _dnf_history_cmds=(
+          "list:list transactions"
+          "info:describe the given transactions"
+          "redo:repeat the specified transaction"
+          "rollback:undo all since the given transaction"
+          "undo:undo transactions"
+          "userinstalled:list names of all packages installed by a user"
+        )
+        if (( CURRENT == 2 )); then
+          _describe -t commands 'dnf history command' _dnf_history_cmds
+        else
+          _dnf_helper $command "$prev" "$cur"
+        fi
+        ;;
+      makecache)
+        if (( CURRENT == 2 )); then
+          _values 'make cache' 'timer'
+        fi
+        ;;
+      mark)
+        if (( CURRENT == 2 )); then
+          _values 'mark' 'install' 'remove'
+        else
+          _dnf_installed_packages "$cur"
+        fi
+        ;;
+      provides)
+        _files
+        ;;
+      repolist)
+        if (( CURRENT == 2 )); then
+          _values 'repolist' 'enabled' 'disabled' 'all'
+        fi
+        ;;
+      search)
+        if (( CURRENT == 2 )); then
+          _values 'search' 'all'
+        fi
+        ;;
     esac
   fi
-}
-
-# Completion function for list
-(( $+functions[_dnf_list] )) || _dnf_list() {
-  _dnf_list_or_info
-}
-
-# Completion function for info
-(( $+functions[_dnf_info] )) || _dnf_info() {
-  _dnf_list_or_info
-}
-
-# Completion function for provides|whatprovides
-(( $+functions[_dnf_provides] )) || _dnf_provides() {
-  _files
-}
-
-# Completion function for clean
-(( $+functions[_dnf_clean] )) || _dnf_clean() {
-  local -a cleanlist
-  cleanlist=(
-    "all:all cache"
-    "cache:all cache"
-    "dbcache:DB cache"
-    "headers:cache headers"
-    "packages:cache packages"
-    "metadata:cache meta-data"
-  )
-
-  if (( CURRENT == 2 )); then
-    _describe -t dnf-clean-subcmds "dnf clean sub-commands" cleanlist
-  fi
-}
-
-_dnf_caching_policy() {
-  local _dnfrepomds
-  local -a oldp
-
-  # rebuild if cache is more than a week old
-  oldp=( "$1"(mw+1) )
-  (( $#oldp )) && return 0
-
-  _dnfrepomds=( /var/cache/dnf/**/repomd.xml )
-
-  if (( $#_dnfrepomds )); then
-    for repo in $_dnfrepomds; do
-      [[ "$repo" -nt "$1" ]] && return 0
-    done
-  fi
-
-  return 1
 }
 
 _dnf "$@"
