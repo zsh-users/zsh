@@ -1952,7 +1952,7 @@ get_user_var(char *nam)
 	char **arr = NULL, *val;
 
 	queue_signals();
-	if ((arr = getaparam(nam)) || (arr = gethparam(nam)))
+	if ((arr = getaparam(nam, NULL)) || (arr = gethparam(nam)))
 	    arr = (incompfunc ? arrdup(arr) : arr);
 	else if ((val = getsparam(nam))) {
 	    arr = (char **) zhalloc(2*sizeof(char *));

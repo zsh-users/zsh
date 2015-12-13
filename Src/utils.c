@@ -1483,7 +1483,7 @@ callhookfunc(char *name, LinkList lnklst, int arrayp, int *retval)
 	memcpy(arrnam, name, namlen);
 	memcpy(arrnam + namlen, HOOK_SUFFIX, HOOK_SUFFIX_LEN);
 
-	if ((arrptr = getaparam(arrnam))) {
+	if ((arrptr = getaparam(arrnam, NULL))) {
 	    arrptr = arrdup(arrptr);
 	    for (; *arrptr; arrptr++) {
 		if ((shfunc = getshfunc(*arrptr))) {
@@ -3748,7 +3748,7 @@ subst_string_by_func(Shfunc func, char *arg1, char *orig)
     if (doshfunc(func, l, 1))
 	ret = NULL;
     else
-	ret = getaparam("reply");
+	ret = getaparam("reply", NULL);
 
     sfcontext = osc;
     stopmsg = osm;
@@ -3780,7 +3780,7 @@ subst_string_by_hook(char *name, char *arg1, char *orig)
 	memcpy(arrnam, name, namlen);
 	memcpy(arrnam + namlen, HOOK_SUFFIX, HOOK_SUFFIX_LEN);
 
-	if ((arrptr = getaparam(arrnam))) {
+	if ((arrptr = getaparam(arrnam, NULL))) {
 	    /* Guard against internal modification of the array */
 	    arrptr = arrdup(arrptr);
 	    for (; *arrptr; arrptr++) {

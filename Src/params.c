@@ -2658,14 +2658,20 @@ getsparam_u(char *s)
 
 /**/
 mod_export char **
-getaparam(char *s)
+getaparam(char *s, int *len)
 {
     struct value vbuf;
     Value v;
 
     if (!idigit(*s) && (v = getvalue(&vbuf, &s, 0)) &&
 	PM_TYPE(v->pm->node.flags) == PM_ARRAY)
+    {
+	if (len)
+	    *len = v->pm->length;
+	    //*len = arrlen(v->pm->gsu.a->getfn(v->pm));
+	//fprintf(stderr, "%i %i\n", v->pm->length, arrlen(v->pm->gsu.a->getfn(v->pm)));
 	return v->pm->gsu.a->getfn(v->pm);
+    }
     return NULL;
 }
 

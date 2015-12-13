@@ -672,11 +672,9 @@ bin_set(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
     if (array) {
 	/* create an array with the specified elements */
 	char **a = NULL, **y;
-	int len = arrlen(args);
+	int len = arrlen(args), al;
 
-	if (array < 0 && (a = getaparam(arrayname))) {
-	    int al = arrlen(a);
-
+	if (array < 0 && (a = getaparam(arrayname, &al))) {
 	    if (al > len)
 		len = al;
 	}
@@ -5012,7 +5010,7 @@ bin_shift(char *name, char **argv, Options ops, UNUSED(int func))
 
     /* optional argument can be either numeric or an array */
     queue_signals();
-    if (*argv && !getaparam(*argv))
+    if (*argv && !getaparam(*argv, NULL))
         num = mathevali(*argv++);
 
     if (num < 0) {
@@ -5022,9 +5020,10 @@ bin_shift(char *name, char **argv, Options ops, UNUSED(int func))
     }
 
     if (*argv) {
+	int len = 0;
         for (; *argv; argv++)
-            if ((s = getaparam(*argv))) {
-                if (num > arrlen(s)) {
+            if ((s = getaparam(*argv, &len))) {
+                if (num > len) {
 		    zwarnnam(name, "shift count must be <= $#");
 		    ret++;
 		    continue;
@@ -5032,7 +5031,7 @@ bin_shift(char *name, char **argv, Options ops, UNUSED(int func))
 		if (OPT_ISSET(ops,'p')) {
 		    char **s2, **src, **dst;
 		    int count;
-		    l = arrlen(s);
+		    l = len;
 		    src = s;
 		    dst = s2 = (char **)zalloc((l - num + 1) * sizeof(char *));
 		    for (count = l - num; count; count--)

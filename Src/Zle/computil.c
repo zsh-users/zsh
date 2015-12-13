@@ -870,7 +870,7 @@ bin_compdescribe(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
         } else {
             char **opts;
 
-            if (!(opts = getaparam(args[4]))) {
+            if (!(opts = getaparam(args[4], NULL))) {
 		zwarnnam(nam, "unknown parameter: %s", args[4]);
 		return 1;
             }
@@ -4838,16 +4838,16 @@ bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		return 1;
 	    }
 	    queue_signals();
-	    if (!(tmp = getaparam(args[1]))) {
+	    if (!(tmp = getaparam(args[1], NULL))) {
 		zwarnnam(nam, "unknown parameter: %s", args[1]);
 		return 0;
 	    }
 	    for (l = newlinklist(); *tmp; tmp++)
 		addlinknode(l, *tmp);
 	    set_list_array(args[1], cf_pats((args[0][1] == 'P'), !!args[0][2],
-					    l, getaparam(args[2]), args[3],
+					    l, getaparam(args[2], NULL), args[3],
 					    args[4], args[5],
-					    getaparam(args[6]), args + 7));
+					    getaparam(args[6], NULL), args + 7));
 	    unqueue_signals();
 	    return 0;
 	}
@@ -4868,12 +4868,12 @@ bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		return 1;
 	    }
 	    queue_signals();
-	    tmp = getaparam(args[2]);
+	    tmp = getaparam(args[2], NULL);
 	    l = newlinklist();
 	    if (tmp)
 		for (; *tmp; tmp++)
 		    addlinknode(l, *tmp);
-	    if (!(tmp = getaparam(args[1]))) {
+	    if (!(tmp = getaparam(args[1], NULL))) {
 		unqueue_signals();
 		zwarnnam(nam, "unknown parameter: %s", args[1]);
 		return 0;
@@ -4898,7 +4898,7 @@ bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		return 1;
 	    }
 	    queue_signals();
-	    if (!(tmp = getaparam(args[1]))) {
+	    if (!(tmp = getaparam(args[1], NULL))) {
 		unqueue_signals();
 		zwarnnam(nam, "unknown parameter: %s", args[1]);
 		return 0;

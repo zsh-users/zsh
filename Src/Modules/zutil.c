@@ -42,11 +42,11 @@ savematch(MatchData *m)
     char **a;
 
     queue_signals();
-    a = getaparam("match");
+    a = getaparam("match", NULL);
     m->match = a ? zarrdup(a) : NULL;
-    a = getaparam("mbegin");
+    a = getaparam("mbegin", NULL);
     m->mbegin = a ? zarrdup(a) : NULL;
-    a = getaparam("mend");
+    a = getaparam("mend", NULL);
     m->mend = a ? zarrdup(a) : NULL;
     unqueue_signals();
 }
@@ -402,7 +402,7 @@ evalstyle(Stypat p)
     errflag = ef | (errflag & ERRFLAG_INT);
 
     queue_signals();
-    if ((ret = getaparam("reply")))
+    if ((ret = getaparam("reply", NULL)))
 	ret = arrdup(ret);
     else if ((str = getsparam("reply"))) {
 	ret = (char **) hcalloc(2 * sizeof(char *));
@@ -1329,7 +1329,7 @@ rmatch(RParseResult *sm, char *subj, char *var1, char *var2, int comp)
 		int len;
 
 		queue_signals();
-		mend = getaparam("mend");
+		mend = getaparam("mend", NULL);
 		len = atoi(mend[0]);
 		unqueue_signals();
 
