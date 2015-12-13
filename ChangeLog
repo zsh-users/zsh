@@ -1,3 +1,8 @@
+2015-12-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 37397: Adrien Vergé: Completion/Redhat/Command/_dnf: update
+	with optimisations.
+
 2015-12-11  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Functions/Zle/url-quote-magic: match, mbegin, mend should be
