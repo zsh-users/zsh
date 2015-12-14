@@ -36,7 +36,7 @@ for elt in $stylevals; do
     break
     ;;
 
-    (*($what|all|true|1|yes)[^=]#)
+    ([^=]#($what|all|true|1|yes)[^=]#)
     # always use long format
     (( ok = 1 ))
     break
