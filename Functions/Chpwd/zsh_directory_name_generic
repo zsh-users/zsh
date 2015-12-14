@@ -16,7 +16,7 @@ zmodload -i zsh/parameter
 zstyle -s ":zdn:${funcstack[2]}:" mapping _zdn_topvar || _zdn_topvar=zdn_top
 
 if (( ! ${(P)#_zdn_topvar} )); then
-  print -r -- "$0: $_zdn_topver is not set" >&2
+  print -r -- "$0: $_zdn_topvar is not set" >&2
   return 1
 fi
 
@@ -43,7 +43,7 @@ if [[ $1 = n ]]; then
 
     if [[ -z $_zdn_cpt ]]; then
       # If top level component, just try another expansion
-      if [[ $_zdn_var != $_zdn_top ]]; then
+      if [[ $_zdn_var != $_zdn_topvar ]]; then
 	# Committed to this expansion, so report failure.
 	print -r -- "$0: no expansion for directory name \`$_zdn_name'" >&2
       fi

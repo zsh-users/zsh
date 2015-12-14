@@ -1,3 +1,8 @@
+2015-12-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37400: Functions/Chpwd/zsh_directory_name_generic: fix typo
+	that caused unwanted error message.
+
 2015-12-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 37397: Adrien Vergé: Completion/Redhat/Command/_dnf: update
