@@ -1,13 +1,12 @@
 # Tests of the vi mode of ZLE
 
 %prep
-  mb_ok=
+  ZSH_TEST_LANG=
   langs=(en_{US,GB}.{UTF-,utf}8 en.UTF-8
 	 $(locale -a 2>/dev/null | egrep 'utf8|UTF-8'))
   for LANG in $langs; do
     if [[ é = ? ]]; then
       ZSH_TEST_LANG=$LANG
-      mb_ok=1
       break;
     fi
   done
@@ -29,7 +28,7 @@
 >BUFFER: foo
 >CURSOR: 3
 
-  if [[ -z $mb_ok ]]; then
+  if [[ -z $ZSH_TEST_LANG ]]; then
     ZTST_skip="bindkey multibyte test skipped"
   else
     zpty_run 'alias unbind="bindkey -r ホ"'
@@ -37,9 +36,17 @@
     zletest 'ホ'
     zpty_run unbind
     zletest 'ホ'
+    zpty_run 'bindkey ホ self-insert'
+    zletest 'ホ'
+    zpty_run unbind
+    zletest 'ホ'
   fi
 0:bindkey -s multibyte characters
 >BUFFER: bar
 >CURSOR: 3
+>BUFFER: ホ
+>CURSOR: 1
+>BUFFER: ホ
+>CURSOR: 1
 >BUFFER: ホ
 >CURSOR: 1

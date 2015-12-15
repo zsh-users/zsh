@@ -1,3 +1,9 @@
+2015-12-15  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37405: Src/Zle/zle_keymap.c, Test/X03zlebindkey.ztst: fix
+	binding of self-insert to full or partial multibyte sequences
+	longer than a one byte prefix and add test.
+
 2015-12-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37401: Completion/Unix/Type/_list_files: fix pattern error

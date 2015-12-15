@@ -1449,6 +1449,104 @@ default_bindings(void)
 /*************************/
 /* reading key sequences */
 /*************************/
+/**/
+#ifdef MULTIBYTE_SUPPORT
+/*
+ * Get the remainder of a character if we support multibyte
+ * input strings.  It may not require any more input, but
+ * we haven't yet checked.  What's read in so far is available
+ * in keybuf; if we read more we will top keybuf up.
+ *
+ * This version is used when we are still resolving the input key stream
+ * into bindings.  Once that has been done this function shouldn't be
+ * used: instead, see getrestchar() in zle_main.c.
+ *
+ * This supports a self-insert binding at any stage of a key sequence.
+ * Typically we handle 8-bit characters by having only the first byte
+ * bound to self insert; then we immediately get here and read in as
+ * many further bytes as necessary.  However, it's possible that any set
+ * of bytes up to full character is bound to self-insert; then we get
+ * here later and read as much as possible, which could be a complete
+ * character, from keybuf before attempting further input.
+ *
+ * At the end of the process, the full multibyte character is available
+ * in keybuf, so the return value may be superfluous.
+ */
+
+/**/
+mod_export ZLE_INT_T
+getrestchar_keybuf(void)
+{
+    char c;
+    wchar_t outchar;
+    int inchar, timeout, bufind = 0, buflen = keybuflen;
+    static mbstate_t mbs;
+    size_t cnt;
+
+    /*
+     * We are guaranteed to set a valid wide last character,
+     * although it may be WEOF (which is technically not
+     * a wide character at all...)
+     */
+    lastchar_wide_valid = 1;
+    memset(&mbs, 0, sizeof mbs);
+
+    /*
+     * Return may be zero if we have a NULL; handle this like
+     * any other character.
+     */
+    while (1) {
+	if (bufind < buflen) {
+	    c = STOUC(keybuf[bufind++]);
+	    if (c == Meta) {
+		DPUTS(bufind == buflen, "Meta at end of keybuf");
+		c = STOUC(keybuf[bufind++]) ^ 32;
+	    }
+	} else {
+	    /*
+	     * Always apply KEYTIMEOUT to the remains of the input
+	     * character.  The parts of a multibyte character should
+	     * arrive together.  If we don't do this the input can
+	     * get stuck if an invalid byte sequence arrives.
+	     */
+	    inchar = getbyte(1L, &timeout);
+	    /* getbyte deliberately resets lastchar_wide_valid */
+	    lastchar_wide_valid = 1;
+	    if (inchar == EOF) {
+		memset(&mbs, 0, sizeof mbs);
+		if (timeout)
+		{
+		    /*
+		     * This case means that we got a valid initial byte
+		     * (since we tested for EOF above), but the followup
+		     * timed out.  This probably indicates a duff character.
+		     * Return a '?'.
+		     */
+		    lastchar = '?';
+		    return lastchar_wide = L'?';
+		}
+		else
+		    return lastchar_wide = WEOF;
+	    }
+	    c = inchar;
+	    addkeybuf(inchar);
+	}
+
+	cnt = mbrtowc(&outchar, &c, 1, &mbs);
+	if (cnt == MB_INVALID) {
+	    /*
+	     * Invalid input.  Hmm, what's the right thing to do here?
+	     */
+	    memset(&mbs, 0, sizeof mbs);
+	    return lastchar_wide = WEOF;
+	}
+	if (cnt != MB_INCOMPLETE)
+	    break;
+    }
+    return lastchar_wide = (ZLE_INT_T)outchar;
+}
+/**/
+#endif
 
 /* read a sequence of keys that is bound to some command in a keymap */
 
@@ -1504,15 +1602,8 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 #ifdef MULTIBYTE_SUPPORT
 	    if ((f == Th(z_selfinsert) || f == Th(z_selfinsertunmeta)) &&
 		!lastchar_wide_valid && !ispfx) {
-		int len;
-		VARARR(char, mbc, MB_CUR_MAX);
-		ZLE_INT_T inchar = getrestchar(lastchar, mbc, &len);
-		if (inchar != WEOF && len) {
-		    char *ptr = mbc;
-		    while (len--)
-			addkeybuf(STOUC(*ptr++));
-		    lastlen = keybuflen;
-		}
+		(void)getrestchar_keybuf();
+		lastlen = keybuflen;
 	    }
 #endif
 	}
