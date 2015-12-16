@@ -1,3 +1,7 @@
+2015-12-16  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37411: Test/X03zlebindkey.ztst: more bindkey tests.
+
 2015-12-15  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37405: Src/Zle/zle_keymap.c, Test/X03zlebindkey.ztst: fix

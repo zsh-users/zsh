@@ -1,4 +1,6 @@
-# Tests of the vi mode of ZLE
+# Tests of the bindkey command.
+# This concentrates on the command itself and also resolving keystrokes
+# into bindings.  The latter is particularly tricky with multibyte sequences.
 
 %prep
   ZSH_TEST_LANG=
@@ -28,8 +30,81 @@
 >BUFFER: foo
 >CURSOR: 3
 
+  zpty_run 'bindkey -s "\C-xy" foo'
+  zpty_run 'bindkey -s "\C-x\C-y" bar'
+  zletest $'\C-xy\C-x\C-y'
+  zpty_run 'bindkey -r "\C-xy"'
+  zpty_run 'bindkey -r "\C-x\C-y"'
+0:bindkey with multiple definitions associated with prefix
+>BUFFER: foobar
+>CURSOR: 6
+
+  bindkey -s '\C-xy' bar
+  bindkey '\C-xy'
+  bindkey -r '\C-xy'
+  bindkey '\C-xy'
+0:bindkey output
+>"^Xy" "bar"
+>"^Xy" undefined-key
+
+# As we're only looking at definitions here, we don't
+# bother using the pseudo-terminal; just test in the normal fashion.
+  bindkey -s '\C-xy' foo
+  bindkey -N testmap emacs
+  bindkey -M testmap '\C-xy'
+  bindkey -s -M testmap '\C-xy' bar
+  bindkey -M testmap '\C-xy'
+  bindkey '\C-xy'
+  bindkey -A testmap main
+  bindkey '\C-xy'
+  bindkey -A emacs main
+  bindkey '\C-xy'
+0:creating keymaps from existing keymaps
+>"^Xy" "foo"
+>"^Xy" "bar"
+>"^Xy" "foo"
+>"^Xy" "bar"
+>"^Xy" "foo"
+
+# Depends on the keymap created in the previous test.
+  bindkey -l
+  bindkey -D testmap
+  print Deleted...
+  bindkey -l
+0:deleting keymaps
+>.safe
+>command
+>emacs
+>isearch
+>main
+>testmap
+>vicmd
+>viins
+>viopp
+>visual
+>Deleted...
+>.safe
+>command
+>emacs
+>isearch
+>main
+>vicmd
+>viins
+>viopp
+>visual
+
+# This \M... style display of 8-bit characters is a bit
+# dated in multibyte mode, but no one's complained...
   if [[ -z $ZSH_TEST_LANG ]]; then
-    ZTST_skip="bindkey multibyte test skipped"
+    ZTST_skip="multibyte not available for bindkey test"
+  else
+    bindkey | grep '\\M.*self-insert'
+  fi
+0:in multibyte mode all bytes with bit 7 set start self-insert
+>"\M-^@"-"\M-^?" self-insert
+
+  if [[ -z $ZSH_TEST_LANG ]]; then
+    ZTST_skip="multibyte not available for bindkey test"
   else
     zpty_run 'alias unbind="bindkey -r ホ"'
     zpty_run 'bindkey -s ホ bar'
