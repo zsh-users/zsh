@@ -1087,6 +1087,11 @@ widget:
 example(zle-isearch-exit+LPAR()RPAR() { zle -M ""; }
 zle -N zle-isearch-exit)
 )
+tindex(zle-line-pre-redraw)
+item(tt(zle-line-pre-redraw))(
+Executed whenever the input line is about to be redrawn, providing an
+opportunity to update the region_highlight array.
+)
 tindex(zle-line-init)
 item(tt(zle-line-init))(
 Executed every time the line editor is started to read a new line

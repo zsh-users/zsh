@@ -1025,6 +1025,31 @@ getrestchar(int inchar, char *outstr, int *outcount)
 /**/
 #endif
 
+static void redrawhook()
+{
+    Thingy initthingy;
+    if ((initthingy = rthingy_nocreate("zle-line-pre-redraw"))) {
+	int lastcmd_prev = lastcmd;
+	int old_incompfunc = incompfunc;
+	char *args[2];
+	Thingy lbindk_save = lbindk, bindk_save = bindk;
+	refthingy(lbindk_save);
+	refthingy(bindk_save);
+	args[0] = initthingy->nam;
+	args[1] = NULL;
+	incompfunc = 0;
+	execzlefunc(initthingy, args, 0);
+	incompfunc = old_incompfunc;
+	unrefthingy(initthingy);
+	unrefthingy(lbindk);
+	unrefthingy(bindk);
+	lbindk = lbindk_save;
+	bindk = bindk_save;
+	/* we can't set ZLE_NOTCOMMAND since it's not a legit widget, so
+	 * restore lastcmd manually so that we don't mess up the global state */
+	lastcmd = lastcmd_prev;
+    }
+}
 
 /**/
 void
@@ -1084,6 +1109,8 @@ zlecore(void)
 	    errflag |= ERRFLAG_ERROR;
 	    break;
 	}
+
+	redrawhook();
 #ifdef HAVE_POLL
 	if (baud && !(lastcmd & ZLE_MENUCMP)) {
 	    struct pollfd pfd;
@@ -1113,6 +1140,7 @@ zlecore(void)
 		zrefresh();
 
 	freeheap();
+
     }
 
     region_active = 0;
@@ -1191,7 +1219,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     vistartchange = -1;
     zleline = (ZLE_STRING_T)zalloc(((linesz = 256) + 2) * ZLE_CHAR_SIZE);
     *zleline = ZWC('\0');
-    virangeflag = lastcmd = done = zlecs = zlell = mark = 0;
+    virangeflag = lastcmd = done = zlecs = zlell = mark = yankb = yanke = 0;
     vichgflag = 0;
     viinsbegin = 0;
     statusline = NULL;
@@ -1812,6 +1840,7 @@ recursiveedit(UNUSED(char **args))
 {
     int locerror;
 
+    redrawhook();
     zrefresh();
     zlecore();
 

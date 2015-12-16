@@ -1,3 +1,8 @@
+2015-12-19  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 36650: Doc/Zsh/zle.yo, Src/Zle/zle_main.c: Add
+	zle-line-pre-redraw hook for highlighting
+
 2015-12-19  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted (after users/20873): Functions/Zle/edit-command-line:
