@@ -477,3 +477,15 @@
 >first second
 >first
 >second
+
+ typeset -aU unique_array=(first second)
+ unique_array[1]=second
+ print $unique_array
+0:assignment to unique array
+>second
+
+ typeset -a array=(first)
+ array[1,3]=(FIRST)
+ print $array
+0:slice beyond length of array
+>FIRST
