@@ -12,7 +12,7 @@
   # Compute the cursor's position in bytes, not characters.
   setopt localoptions nomultibyte noksharrays
 
-  (( $+zle_bracketed_paste )) && print -n $zle_bracketed_paste[2]
+  (( $+zle_bracketed_paste )) && print -r -n - $zle_bracketed_paste[2]
 
   # Open the editor, placing the cursor at the right place if we know how.
   local editor=${${VISUAL:-${EDITOR:-vi}}}
@@ -26,7 +26,7 @@
     (*) ${=editor} $1;;
   esac
 
-  (( $+zle_bracketed_paste )) && print -n $zle_bracketed_paste[1]
+  (( $+zle_bracketed_paste )) && print -r -n - $zle_bracketed_paste[1]
 
   # Replace the buffer with the editor output.
   print -Rz - "$(<$1)" 

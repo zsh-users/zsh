@@ -1,5 +1,9 @@
 2015-12-19  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted (after users/20873): Functions/Zle/edit-command-line:
+	Theoretical fix: don't parse print/echo escape sequences in
+	$zle_bracketed_paste.
+
 	* 37257 (in part): Test/A06assign.ztst: Add array assignment tests.
 
 2015-12-16  Peter Stephenson  <p.stephenson@samsung.com>
