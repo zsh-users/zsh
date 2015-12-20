@@ -1,3 +1,8 @@
+2015-12-19  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* users/21068: Functions/Newuser/zsh-newuser-install: use emacs
+	keymap in vared by default (less surprising than vi modes)
+
 2015-12-19  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 36650: Doc/Zsh/zle.yo, Src/Zle/zle_main.c: Add

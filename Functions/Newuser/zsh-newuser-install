@@ -512,7 +512,7 @@ $default_options[$match[2]])
 	fi
 	print -r "Edit a value.  If it is left blank, nothing will be saved:"
 	edval=$match[2]
-	if vared -p "$match[1]> " -h edval; then
+	if vared -M emacs -p "$match[1]> " -h edval; then
 	  # check this assignment doesn't produce multiple words
 	  # e.g. "HISTFILE=never rm -f ~" does produce multiple words...
 	  # this isn't perfect, e.g. "(this would get split on assignment)",
