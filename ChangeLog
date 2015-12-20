@@ -1,5 +1,9 @@
 2015-12-19  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* users/21082 (expanded): Functions/Misc/is-at-least: do a more
+	complete job of sorting version strings that are not in the form
+	of zsh version numbers; additional explanatory comment
+
 	* unposted (cf. 37387): Src/options.c: emulate turns off
 	WARN_CREATE_GLOBAL
 
