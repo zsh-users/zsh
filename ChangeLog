@@ -1,5 +1,8 @@
 2015-12-19  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted (cf. 37387): Src/options.c: emulate turns off
+	WARN_CREATE_GLOBAL
+
 	* users/21068: Functions/Newuser/zsh-newuser-install: use emacs
 	keymap in vared by default (less surprising than vi modes)
 
