@@ -1,3 +1,8 @@
+2015-12-25  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37434: Src/exec.c: POSIXBUILTINS "command" should prevent shell
+	exit on errors from special builtins
+
 2015-12-23  Philip Sequeira  <phsequei@gmail.com>
 
 	* 37345: Functions/VCS_Info/VCS_INFO_maxexports,
