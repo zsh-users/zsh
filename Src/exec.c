@@ -471,9 +471,10 @@ zexecve(char *pth, char **argv, char **newenvp)
 	if ((fd = open(pth, O_RDONLY|O_NOCTTY)) >= 0) {
 	    argv0 = *argv;
 	    *argv = pth;
+	    execvebuf[0] = '\0';
 	    ct = read(fd, execvebuf, POUNDBANGLIMIT);
 	    close(fd);
-	    if (ct > 0) {
+	    if (ct >= 0) {
 		if (execvebuf[0] == '#') {
 		    if (execvebuf[1] == '!') {
 			for (t0 = 0; t0 != ct; t0++)

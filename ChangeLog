@@ -1,5 +1,8 @@
 2015-12-25  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37435 (+ fix typo): Src/exec.c: allow execution of empty files
+	as "sh" scripts
+
 	* 37434: Src/exec.c: POSIXBUILTINS "command" should prevent shell
 	exit on errors from special builtins
 
