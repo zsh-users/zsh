@@ -407,10 +407,12 @@ _apt-cmd () {
     /$'install\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \
     /$'[^\0/]#/'/ /$'[^\0/]#\0'/ ':release name::_apt_releases' \) \| \
     /$'remove\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
+    /$'purge\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'upgrade\0'/ \| \
+    /$'autoremove\0'/ \| \
     /$'full-upgrade\0'/ \| \
     /$'edit-sources\0'/ \| \
-    /"[]"/	':argument-1::compadd "$expl_action[@]" list search show update install remove upgrade full-upgrade edit-sources'
+    /"[]"/	':argument-1::compadd "$expl_action[@]" list search show update install remove upgrade full-upgrade edit-sources autoremove purge'
 
   _apt-cmd () {
     local expl_action expl_packages
