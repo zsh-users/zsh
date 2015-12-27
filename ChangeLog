@@ -1,3 +1,8 @@
+2015-12-27  Axel Beckert  <abe@deuxchevaux.org>
+
+	* 37438: Completion/Debian/Command/_aptitude: Also parse --help/-h
+	output of aptitude 0.7.5 and later.
+
 2015-12-26  Axel Beckert  <abe@deuxchevaux.org>
 
 	* 37436: Felipe Sateler: Completion/Debian/Command/_apt:
