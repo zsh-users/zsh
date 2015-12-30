@@ -1,3 +1,8 @@
+2015-12-30  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 37451: Functions/VCS_Info/vcs_info: vcs_info: Declare "msgs" in
+	early context
+
 2015-12-27  Axel Beckert  <abe@deuxchevaux.org>
 
 	* 37438: Completion/Debian/Command/_aptitude: Also parse --help/-h

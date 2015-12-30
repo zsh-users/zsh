@@ -10,7 +10,7 @@
 
 setopt localoptions noksharrays extendedglob NO_shwordsplit
 local file func sys
-local -a static_functions
+local -a static_functions msgs
 local -i maxexports
 
 static_functions=(
