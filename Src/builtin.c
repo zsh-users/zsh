@@ -99,8 +99,8 @@ static struct builtin builtins[] =
 #endif
 
     BUILTIN("popd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 1, BIN_POPD, "q", NULL),
-    BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "abcC:Df:ilmnNoOpPrRsSu:x:X:z-", NULL),
-    BUILTIN("printf", 0, bin_print, 1, -1, BIN_PRINTF, NULL, NULL),
+    BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "abcC:Df:ilmnNoOpPrRsSu:v:x:X:z-", NULL),
+    BUILTIN("printf", 0, bin_print, 1, -1, BIN_PRINTF, "v:", NULL),
     BUILTIN("pushd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_PUSHD, "qsPL", NULL),
     BUILTIN("pushln", 0, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),
@@ -4032,6 +4032,11 @@ bin_print(char *name, char **args, Options ops, int func)
     zulong zulongval;
     char *stringval;
 
+    if (OPT_ISSET(ops, 'z') + OPT_ISSET(ops, 's') + OPT_ISSET(ops, 'v') > 1) {
+	zwarnnam(name, "only one of -z, -s, or -v allowed");
+	return 1;
+    }
+
     if (func == BIN_PRINTF) {
         if (!strcmp(*args, "--") && !*++args) {
             zwarnnam(name, "not enough arguments");
@@ -4157,8 +4162,8 @@ bin_print(char *name, char **args, Options ops, int func)
     if ((OPT_HASARG(ops,'u') || OPT_ISSET(ops,'p')) &&
 	/* rule out conflicting options -- historical precedence */
 	((!fmt && (OPT_ISSET(ops,'c') || OPT_ISSET(ops,'C'))) ||
-	!(OPT_ISSET(ops, 'z') ||
-	  OPT_ISSET(ops, 's') || OPT_ISSET(ops, 'S')))) {
+	 !(OPT_ISSET(ops, 'z') || OPT_ISSET(ops, 'v') ||
+	   OPT_ISSET(ops, 's') || OPT_ISSET(ops, 'S')))) {
 	int fdarg, fd;
 
 	if (OPT_ISSET(ops, 'p')) {
@@ -4359,7 +4364,8 @@ bin_print(char *name, char **args, Options ops, int func)
 
     /* normal output */
     if (!fmt) {
-	if (OPT_ISSET(ops, 'z') || OPT_ISSET(ops, 's')) {
+	if (OPT_ISSET(ops, 'z') || OPT_ISSET(ops, 's') ||
+	    OPT_ISSET(ops, 'v')) {
 	    /*
 	     * We don't want the arguments unmetafied after all.
 	     */
@@ -4367,6 +4373,13 @@ bin_print(char *name, char **args, Options ops, int func)
 		metafy(args[n], len[n], META_NOALLOC);
 	}
 
+	/* -v option -- store the arguments in the named parameter */
+	if (OPT_ISSET(ops,'v')) {
+	    queue_signals();
+	    assignsparam(OPT_ARG(ops, 'v'), sepjoin(args, NULL, 0), 0);
+	    unqueue_signals();
+	    return 0;
+	}
 	/* -z option -- push the arguments onto the editing buffer stack */
 	if (OPT_ISSET(ops,'z')) {
 	    queue_signals();
@@ -4474,7 +4487,7 @@ bin_print(char *name, char **args, Options ops, int func)
      * special cases of printing to a ZLE buffer or the history, however.
      */
 
-    if (OPT_ISSET(ops,'z') || OPT_ISSET(ops,'s')) {
+    if (OPT_ISSET(ops,'z') || OPT_ISSET(ops,'s') || OPT_ISSET(ops, 'v')) {
 #ifdef HAVE_OPEN_MEMSTREAM
     	if ((fout = open_memstream(&buf, &mcount)) == NULL)
 	    zwarnnam(name, "open_memstream failed");
@@ -4853,7 +4866,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	/* if there are remaining args, reuse format string */
     } while (*argp && argp != first && !fmttrunc && !OPT_ISSET(ops,'r'));
 
-    if (OPT_ISSET(ops,'z') || OPT_ISSET(ops,'s')) {
+    if (OPT_ISSET(ops,'z') || OPT_ISSET(ops,'s') || OPT_ISSET(ops,'v')) {
 #ifdef HAVE_OPEN_MEMSTREAM
 	putc(0, fout);
 	fclose(fout);
@@ -4865,11 +4878,14 @@ bin_print(char *name, char **args, Options ops, int func)
 	buf[count] = '\0';
 #endif
 	queue_signals();
+	stringval = metafy(buf, -1, META_REALLOC);
 	if (OPT_ISSET(ops,'z')) {
-	    zpushnode(bufstack, buf);
+	    zpushnode(bufstack, stringval);
+	} else if (OPT_ISSET(ops,'v')) {
+	    assignsparam(OPT_ARG(ops, 'v'), stringval, 0);
 	} else {
 	    ent = prepnexthistent();
-	    ent->node.nam = buf;
+	    ent->node.nam = stringval;
 	    ent->stim = ent->ftim = time(NULL);
 	    ent->node.flags = 0;
 	    ent->words = (short *)NULL;

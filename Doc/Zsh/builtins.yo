@@ -1124,7 +1124,7 @@ tt(popd) that do not change the environment seen by an interactive user.
 )
 findex(print)
 xitem(tt(print )[ tt(-abcDilmnNoOpPrsSz) ] [ tt(-u) var(n) ] [ tt(-f) var(format) ] [ tt(-C) var(cols) ])
-item(SPACES()[ tt(-xX) var(tab-stop) ] [ tt(-R) [ tt(-en) ]] [ var(arg) ... ])(
+item(SPACES()[ tt(-v) var(name) ] [ tt(-xX) var(tabstop) ] [ tt(-R) [ tt(-en) ]] [ var(arg) ... ])(
 With the `tt(-f)' option the arguments are printed as described by tt(printf).
 With no flags or with the flag `tt(-)', the arguments are printed on
 the standard output as described by tt(echo), with the following differences:
@@ -1219,6 +1219,9 @@ tt(HIST_LEX_WORDS) option active.
 item(tt(-u) var(n))(
 Print the arguments to file descriptor var(n).
 )
+item(tt(-v) var(name))(
+Store the printed arguments as the value of the parameter var(name).
+)
 item(tt(-x) var(tab-stop))(
 Expand leading tabs on each line of output in the printed string
 assuming a tab stop every var(tab-stop) characters.  This is appropriate
@@ -1250,7 +1253,7 @@ If any of `tt(-m)', `tt(-o)' or `tt(-O)' are used in combination with
 case of `tt(-m)') then nothing is printed.
 )
 findex(printf)
-item(tt(printf) var(format) [ var(arg) ... ])(
+item(tt(printf) [ -v var(name) ] var(format) [ var(arg) ... ])(
 Print the arguments according to the format specification. Formatting
 rules are the same as used in C. The same escape sequences as for tt(echo)
 are recognised in the format. All C conversion specifications ending in
@@ -1279,6 +1282,9 @@ until all arguments have been consumed. With the tt(print) builtin, this
 can be suppressed by using the tt(-r) option. If more arguments are
 required by the format than have been specified, the behaviour is as if
 zero or an empty string had been specified as the argument.
+
+The tt(-v) option causes the output to be stored as the value of the
+parameter var(name), instead of printed.
 )
 findex(pushd)
 pindex(PUSHD_TO_HOME, use of)

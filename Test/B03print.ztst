@@ -301,3 +301,12 @@
 >one two three   four
 >    one two three   four
 >        one     two     three       four
+
+ unset foo
+ print -v foo once more
+ print -r -- $foo
+ printf -v foo "%s-" into the breach
+ print -r -- $foo
+0:print and printf into a variable
+>once more
+>into-the-breach-

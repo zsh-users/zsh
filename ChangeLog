@@ -1,3 +1,8 @@
+2015-12-31  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37467: Doc/Zsh/builtins.yo, Src/builtin.c, Test/B03print.ztst:
+	add "print -v var" / "printf -v var"
+
 2015-12-31  Oliver Kiddle  <opk@zsh.org>
 
 	* 37453 (with Bart, started by Baptiste Daroussin, 37315)
