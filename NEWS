@@ -34,6 +34,13 @@ The effect of the WARN_CREATE_GLOBAL option has been significantly
 extended, so expect it to cause additional warning messages about
 parameters created globally within function scope.
 
+Paste highlighting (added in 5.1) is now enabled by default to signal
+that accept-line hasn't occurred.  Paste highlighting may be disabled
+via
+  zle_highlight+=(paste:none)
+.  Disabling paste highlighting will retain the "bracketed paste"
+behaviour, unless that is separately disabled via zle_bracketed_paste.
+
 Changes from 5.1 to 5.1.1
 -------------------------
 

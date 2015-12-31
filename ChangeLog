@@ -1,5 +1,7 @@
 2015-12-31  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: NEWS: Document how to disable paste highlighting.
+
 	* 37456: Src/Zle/zle_refresh.c: Have zle_highlight=(none)
 	disable paste highlighting
 
