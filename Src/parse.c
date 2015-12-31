@@ -2348,7 +2348,9 @@ par_cond_2(void)
 	 * We fall through here on any non-numeric infix operator
 	 * or any other time there are at least two arguments.
 	 */
-    }
+    } else
+	while (tok == SEPER)
+	    condlex();
     if (tok == BANG) {
 	/*
 	 * In "test" compatibility mode, "! -a ..." and "! -o ..."
@@ -2385,7 +2387,7 @@ par_cond_2(void)
 	/* Check first argument for [[ STRING ]] re-interpretation */
 	if (s1 /* tok != DOUTBRACK && tok != DAMPER && tok != DBAR */
 	    && tok != LEXERR && (!dble || n_testargs)) {
-	    condlex();
+	    do condlex(); while (tok == SEPER && condlex != testlex);
 	    return par_cond_double(dupstring("-n"), s1);
 	} else
 	    YYERROR(ecused);
@@ -2398,14 +2400,16 @@ par_cond_2(void)
 	 * checked it does have a string representation).
 	 */
 	tok = STRING;
-    }
+    } else
+	while (tok == SEPER && condlex != testlex)
+	    condlex();
     if (tok == INANG || tok == OUTANG) {
 	enum lextok xtok = tok;
-	condlex();
+	do condlex(); while (tok == SEPER && condlex != testlex);
 	if (tok != STRING)
 	    YYERROR(ecused);
 	s3 = tokstr;
-	condlex();
+	do condlex(); while (tok == SEPER && condlex != testlex);
 	ecadd(WCB_COND((xtok == INANG ? COND_STRLT : COND_STRGTR), 0));
 	ecstr(s1);
 	ecstr(s3);
@@ -2428,11 +2432,11 @@ par_cond_2(void)
     if (!n_testargs)
 	dble = (s2 && *s2 == '-' && !s2[2]);
     incond++;			/* parentheses do globbing */
-    condlex();
+    do condlex(); while (tok == SEPER && condlex != testlex);
     incond--;			/* parentheses do grouping */
     if (tok == STRING && !dble) {
 	s3 = tokstr;
-	condlex();
+	do condlex(); while (tok == SEPER && condlex != testlex);
 	if (tok == STRING) {
 	    LinkList l = newlinklist();
 
@@ -2441,7 +2445,7 @@ par_cond_2(void)
 
 	    while (tok == STRING) {
 		addlinknode(l, tokstr);
-		condlex();
+		do condlex(); while (tok == SEPER && condlex != testlex);
 	    }
 	    return par_cond_multi(s1, l);
 	} else
