@@ -49,6 +49,7 @@
 
 # As we're only looking at definitions here, we don't
 # bother using the pseudo-terminal; just test in the normal fashion.
+  bindkey -e
   bindkey -s '\C-xy' foo
   bindkey -N testmap emacs
   bindkey -M testmap '\C-xy'

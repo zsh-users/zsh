@@ -1,3 +1,8 @@
+2015-12-30  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37460: Test/X03zlebindkey.ztst: make sure the default keymap is
+	emacs before using that keymap to test bindings
+
 2015-12-31  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: NEWS: Document how to disable paste highlighting.
