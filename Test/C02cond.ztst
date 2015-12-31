@@ -154,7 +154,7 @@
     ZTST_skip="[[ -N file ]] not supported on Cygwin"
   elif (( isnfs )); then
     ZTST_skip="[[ -N file ]] not supported with NFS"
-  elif test -f /etc/mtab && { grep $(df . 2>/dev/null| tail -n1 | awk '{print $1}') /etc/mtab | grep -q noatime; }; then
+  elif { df -k -- ${$({mount || /sbin/mount} | awk '/noatime/ {print $1,$3}'):-""} | tr -s ' ' | fgrep "$(df -k . | tail -1 | tr -s ' ')" } >&/dev/null; then
     ZTST_skip="[[ -N file ]] not supported with noatime file system"
   else
     [[ -N $newnewnew && ! -N $unmodified ]]

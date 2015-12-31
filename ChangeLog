@@ -1,5 +1,8 @@
 2015-12-31  Oliver Kiddle  <opk@zsh.org>
 
+	* 37453 (with Bart, started by Baptiste Daroussin, 37315)
+	Test/C02cond.ztst: try to improve detection of noatime filesystem
+
 	* users/21114: Completion/Unix/Command/_dig: new completion
 
 2015-12-30  Barton E. Schaefer  <schaefer@zsh.org>
