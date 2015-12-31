@@ -1,5 +1,8 @@
 2015-12-31  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37469: Src/parse.c: do NOT allow semicolons in place of line breaks
+	in conditionals
+
 	* unposted:  Src/builtin.c: enable WARN_CREATE_GLOBAL for print -v
 
 	* 37468: Src/parse.c: allow line breaks in more places in [[ ... ]]

@@ -2252,6 +2252,8 @@ void (*condlex) _((void)) = zshlex;
  * cond	: cond_1 { SEPER } [ DBAR { SEPER } cond ]
  */
 
+#define COND_SEP() (tok == SEPER && condlex != testlex && *zshlextext != ';')
+
 /**/
 static int
 par_cond(void)
@@ -2259,11 +2261,11 @@ par_cond(void)
     int p = ecused, r;
 
     r = par_cond_1();
-    while (tok == SEPER)
+    while (COND_SEP())
 	condlex();
     if (tok == DBAR) {
 	condlex();
-	while (tok == SEPER)
+	while (COND_SEP())
 	    condlex();
 	ecispace(p, 1);
 	par_cond();
@@ -2284,11 +2286,11 @@ par_cond_1(void)
     int r, p = ecused;
 
     r = par_cond_2();
-    while (tok == SEPER)
+    while (COND_SEP())
 	condlex();
     if (tok == DAMPER) {
 	condlex();
-	while (tok == SEPER)
+	while (COND_SEP())
 	    condlex();
 	ecispace(p, 1);
 	par_cond_1();
@@ -2349,7 +2351,7 @@ par_cond_2(void)
 	 * or any other time there are at least two arguments.
 	 */
     } else
-	while (tok == SEPER)
+	while (COND_SEP())
 	    condlex();
     if (tok == BANG) {
 	/*
@@ -2368,10 +2370,10 @@ par_cond_2(void)
 	int r;
 
 	condlex();
-	while (tok == SEPER)
+	while (COND_SEP())
 	    condlex();
 	r = par_cond();
-	while (tok == SEPER)
+	while (COND_SEP())
 	    condlex();
 	if (tok != OUTPAR)
 	    YYERROR(ecused);
@@ -2387,7 +2389,7 @@ par_cond_2(void)
 	/* Check first argument for [[ STRING ]] re-interpretation */
 	if (s1 /* tok != DOUTBRACK && tok != DAMPER && tok != DBAR */
 	    && tok != LEXERR && (!dble || n_testargs)) {
-	    do condlex(); while (tok == SEPER && condlex != testlex);
+	    do condlex(); while (COND_SEP());
 	    return par_cond_double(dupstring("-n"), s1);
 	} else
 	    YYERROR(ecused);
@@ -2401,15 +2403,15 @@ par_cond_2(void)
 	 */
 	tok = STRING;
     } else
-	while (tok == SEPER && condlex != testlex)
+	while (COND_SEP())
 	    condlex();
     if (tok == INANG || tok == OUTANG) {
 	enum lextok xtok = tok;
-	do condlex(); while (tok == SEPER && condlex != testlex);
+	do condlex(); while (COND_SEP());
 	if (tok != STRING)
 	    YYERROR(ecused);
 	s3 = tokstr;
-	do condlex(); while (tok == SEPER && condlex != testlex);
+	do condlex(); while (COND_SEP());
 	ecadd(WCB_COND((xtok == INANG ? COND_STRLT : COND_STRGTR), 0));
 	ecstr(s1);
 	ecstr(s3);
@@ -2432,11 +2434,11 @@ par_cond_2(void)
     if (!n_testargs)
 	dble = (s2 && *s2 == '-' && !s2[2]);
     incond++;			/* parentheses do globbing */
-    do condlex(); while (tok == SEPER && condlex != testlex);
+    do condlex(); while (COND_SEP());
     incond--;			/* parentheses do grouping */
     if (tok == STRING && !dble) {
 	s3 = tokstr;
-	do condlex(); while (tok == SEPER && condlex != testlex);
+	do condlex(); while (COND_SEP());
 	if (tok == STRING) {
 	    LinkList l = newlinklist();
 
@@ -2445,7 +2447,7 @@ par_cond_2(void)
 
 	    while (tok == STRING) {
 		addlinknode(l, tokstr);
-		do condlex(); while (tok == SEPER && condlex != testlex);
+		do condlex(); while (COND_SEP());
 	    }
 	    return par_cond_multi(s1, l);
 	} else
