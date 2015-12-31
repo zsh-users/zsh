@@ -338,9 +338,9 @@ zle_set_highlight(void)
 	for (; *atrs; atrs++) {
 	    if (!strcmp(*atrs, "none")) {
 		/* reset attributes for consistency... usually unnecessary */
-		special_atr_on = default_atr_on =
-		    paste_atr_on_set = 0;
-		special_atr_on_set = region_atr_on_set =
+		special_atr_on = default_atr_on = 0;
+		special_atr_on_set = 1;
+		paste_atr_on_set = region_atr_on_set =
 		    isearch_atr_on_set = suffix_atr_on_set = 1;
 	    } else if (strpfx("default:", *atrs)) {
 		match_highlight(*atrs + 8, &default_atr_on);
