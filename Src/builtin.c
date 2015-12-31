@@ -4376,7 +4376,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	/* -v option -- store the arguments in the named parameter */
 	if (OPT_ISSET(ops,'v')) {
 	    queue_signals();
-	    assignsparam(OPT_ARG(ops, 'v'), sepjoin(args, NULL, 0), 0);
+	    setsparam(OPT_ARG(ops, 'v'), sepjoin(args, NULL, 0));
 	    unqueue_signals();
 	    return 0;
 	}
@@ -4882,7 +4882,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	if (OPT_ISSET(ops,'z')) {
 	    zpushnode(bufstack, stringval);
 	} else if (OPT_ISSET(ops,'v')) {
-	    assignsparam(OPT_ARG(ops, 'v'), stringval, 0);
+	    setsparam(OPT_ARG(ops, 'v'), stringval);
 	} else {
 	    ent = prepnexthistent();
 	    ent->node.nam = stringval;

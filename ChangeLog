@@ -1,5 +1,7 @@
 2015-12-31  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted:  Src/builtin.c: enable WARN_CREATE_GLOBAL for print -v
+
 	* 37468: Src/parse.c: allow line breaks in more places in [[ ... ]]
 
 	* 37467: Doc/Zsh/builtins.yo, Src/builtin.c, Test/B03print.ztst:
