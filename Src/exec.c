@@ -2785,6 +2785,11 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		     * arguments before and no command substitution
 		     * has provided a status.
 		     */
+		    if (badcshglob == 1) {
+			zerr("no match");
+			lastval = 1;
+			return;
+		    }
 		    cmdoutval = use_cmdoutval ? lastval : 0;
 		    if (varspc)
 			addvars(state, varspc, 0);
