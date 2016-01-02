@@ -3802,13 +3802,16 @@ qualsheval(char *name, UNUSED(struct stat *buf), UNUSED(off_t days), char *str)
 
     if ((prog = parse_string(str, 0))) {
 	int ef = errflag, lv = lastval, ret;
+	int cshglob = badcshglob;
 
 	unsetparam("reply");
 	setsparam("REPLY", ztrdup(name));
+	badcshglob = 0;
 
 	execode(prog, 1, 0, "globqual");
 
-	ret = lastval;
+	if ((ret = lastval))
+	    badcshglob |= cshglob;
 	/* Retain any user interrupt error status */
 	errflag = ef | (errflag & ERRFLAG_INT);
 	lastval = lv;

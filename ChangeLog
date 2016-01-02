@@ -1,5 +1,8 @@
 2016-01-01  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37483: Src/glob.c: save and possibly restore cshnullglob failure
+	state around each evaluation of an (e:...:) glob qualifier.
+
 	* 37473: Src/exec.c: check for cshnullglob in command position.
 
 2015-12-31  Barton E. Schaefer  <schaefer@zsh.org>
