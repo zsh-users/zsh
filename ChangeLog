@@ -1,3 +1,8 @@
+2016-01-02  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37493: Doc/Zsh/builtins.yo, Src/builtin.c, Src/hashtable.h,
+	Test/B02typeset.ztst: readonly + POSIX_BUILTINS == typeset -gr
+
 2016-01-01  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 37483: Src/glob.c: save and possibly restore cshnullglob failure

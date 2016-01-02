@@ -1465,7 +1465,10 @@ cancels both tt(-p) and tt(-u).
 The tt(-c) or tt(-l) flags cancel any and all of tt(-kpquz).
 )
 cindex(parameters, marking readonly)
-alias(readonly)(typeset -r)
+item(tt(readonly))(
+Same as tt(typeset -r).  With the tt(POSIX_BUILTINS) option set, same
+as tt(typeset -gr).
+)
 alias(rehash)(hash -r)
 findex(return)
 cindex(functions, returning from)

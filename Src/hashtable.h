@@ -53,7 +53,7 @@
 #define BIN_LOGOUT   19
 #define BIN_TEST     20
 #define BIN_BRACKET  21
-#define BIN_EXPORT   22
+#define BIN_READONLY 22
 #define BIN_ECHO     23
 #define BIN_DISABLE  24
 #define BIN_ENABLE   25

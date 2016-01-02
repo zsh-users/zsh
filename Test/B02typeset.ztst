@@ -479,12 +479,12 @@
    setopt POSIXBUILTINS
    readonly pbro
    print ${+pbro} >&2
-   (typeset pbro=3)
+   (typeset -g pbro=3)
    (pbro=4)
-   readonly -p | grep pbro >&2  # shows up as "readonly" although unset
-   typeset -r pbro        # idempotent (no error)...
+   readonly -p pbro >&2   # shows up as "readonly" although unset
+   typeset -gr pbro       # idempotent (no error)...
    print ${+pbro} >&2     # ...so still readonly...
-   typeset +r pbro        # ...can't turn it off
+   typeset -g +r pbro     # ...can't turn it off
  )
 1:readonly with POSIX_BUILTINS
 ?0
