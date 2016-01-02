@@ -4872,17 +4872,20 @@ bin_print(char *name, char **args, Options ops, int func)
 
     if (OPT_ISSET(ops,'z') || OPT_ISSET(ops,'s') || OPT_ISSET(ops,'v')) {
 #ifdef HAVE_OPEN_MEMSTREAM
-	putc(0, fout);
+	putc(0, fout);		/* not needed?  open_memstream() maintains? */
 	fclose(fout);
 	fout = NULL;
+	rcount = mcount;	/* now includes the trailing NUL we added */
 #else
 	rewind(fout);
 	buf = (char *)zalloc(count + 1);
-	fread(buf, count, 1, fout);
-	buf[count] = '\0';
+	rcount = fread(buf, count, 1, fout);
+	if (rcount < count)
+	    zwarnnam(name, "i/o error: %e", errno);
+	buf[rcount] = '\0';
 #endif
 	queue_signals();
-	stringval = metafy(buf, -1, META_REALLOC);
+	stringval = metafy(buf, rcount - 1, META_REALLOC);
 	if (OPT_ISSET(ops,'z')) {
 	    zpushnode(bufstack, stringval);
 	} else if (OPT_ISSET(ops,'v')) {

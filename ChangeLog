@@ -1,5 +1,7 @@
 2016-01-02  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37497: Src/builtin.c: handle NUL bytes in "printf -v".
+
 	* 37493: Doc/Zsh/builtins.yo, Src/builtin.c, Src/hashtable.h,
 	Test/B02typeset.ztst: readonly + POSIX_BUILTINS == typeset -gr
 
