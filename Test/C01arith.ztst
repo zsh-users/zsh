@@ -409,3 +409,14 @@
 >2
 >(eval):6: bad math expression: unexpected ')'
 >(eval):7: bad math expression: unexpected ')'
+
+  unset number
+  (( number = 3 ))
+  print ${(t)number}
+  unset number
+  (setopt posix_identifiers
+  (( number = 3 ))
+  print ${(t)number})
+0:type of variable when created in arithmetic context
+>integer
+>scalar

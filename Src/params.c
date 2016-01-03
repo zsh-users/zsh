@@ -3061,6 +3061,7 @@ setnparam(char *s, mnumber val)
 	if (ss)
 	    *ss = '\0';
 	pm = createparam(t, ss ? PM_ARRAY :
+			 isset(POSIXIDENTIFIERS) ? PM_SCALAR :
 			 (val.type & MN_INTEGER) ? PM_INTEGER : PM_FFLOAT);
 	if (!pm)
 	    pm = (Param) paramtab->getnode(paramtab, t);

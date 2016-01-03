@@ -2098,6 +2098,12 @@ When it is unset, zsh allows expressions of the form tt($#)var(name)
 to refer to the length of tt($)var(name), even for special variables,
 for example in expressions such as tt($#-) and tt($#*).
 
+Another difference is that with the option set assignment to an
+unset variable in arithmetic context causes the variable to be created
+as a scalar rather than a numeric type.  So after `tt(unset t; (( t = 3
+)))'. without tt(POSIX_IDENTIFIERS) set tt(t) has integer type, while with
+it set it has scalar type.
+
 When the option is unset and multibyte character support is enabled (i.e. it
 is compiled in and the option tt(MULTIBYTE) is set), then additionally any
 alphanumeric characters in the local character set may be used in
