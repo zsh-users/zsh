@@ -1,3 +1,8 @@
+2016-01-04  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Jun T. (+ revise test): 37501: Src/builtin.c, Test/B03print.ztst:
+	correct byte counts when simulating memstream via temp file
+
 2016-01-02  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 37497: Src/builtin.c: handle NUL bytes in "printf -v".

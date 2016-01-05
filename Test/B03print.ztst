@@ -304,9 +304,9 @@
 
  unset foo
  print -v foo once more
- print -r -- $foo
- printf -v foo "%s-" into the breach
- print -r -- $foo
+ typeset -p foo
+ printf -v foo "%s\0%s-" into the breach
+ typeset -p foo
 0:print and printf into a variable
->once more
->into-the-breach-
+>typeset foo='once more'
+>typeset foo=$'into\C-@the-breach\C-@-'

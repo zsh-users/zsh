@@ -4879,10 +4879,10 @@ bin_print(char *name, char **args, Options ops, int func)
 #else
 	rewind(fout);
 	buf = (char *)zalloc(count + 1);
-	rcount = fread(buf, count, 1, fout);
+	rcount = fread(buf, 1, count, fout);
 	if (rcount < count)
 	    zwarnnam(name, "i/o error: %e", errno);
-	buf[rcount] = '\0';
+	buf[rcount++] = '\0';
 #endif
 	queue_signals();
 	stringval = metafy(buf, rcount - 1, META_REALLOC);
