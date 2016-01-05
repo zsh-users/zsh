@@ -4036,9 +4036,45 @@ bin_print(char *name, char **args, Options ops, int func)
     zulong zulongval;
     char *stringval;
 
-    if (OPT_ISSET(ops, 'z') + OPT_ISSET(ops, 's') + OPT_ISSET(ops, 'v') > 1) {
-	zwarnnam(name, "only one of -z, -s, or -v allowed");
+    /* Error check option combinations and option arguments */
+
+    if (OPT_ISSET(ops, 'z') +
+	OPT_ISSET(ops, 's') + OPT_ISSET(ops, 'S') +
+	OPT_ISSET(ops, 'v') > 1) {
+	zwarnnam(name, "only one of -s, -S, -v, or -z allowed");
 	return 1;
+    }
+    if ((OPT_ISSET(ops, 'z') | OPT_ISSET(ops, 's') | OPT_ISSET(ops, 'S')) +
+	(OPT_ISSET(ops, 'c') | OPT_ISSET(ops, 'C')) > 1) {
+	zwarnnam(name, "-c or -C not allowed with -s, -S, or -z");
+	return 1;
+    }
+    if ((OPT_ISSET(ops, 'z') | OPT_ISSET(ops, 'v') |
+         OPT_ISSET(ops, 's') | OPT_ISSET(ops, 'S')) +
+	(OPT_ISSET(ops, 'p') | OPT_ISSET(ops, 'u')) > 1) {
+	zwarnnam(name, "-p or -u not allowed with -s, -S, -v, or -z");
+	return 1;
+    }
+    /*
+    if (OPT_ISSET(ops, 'f') &&
+	(OPT_ISSET(ops, 'S') || OPT_ISSET(ops, 'c') || OPT_ISSET(ops, 'C'))) {
+	zwarnnam(name, "-f not allowed with -c, -C, or -S");
+	return 1;
+    }
+    */
+
+    /* -C -- number of columns */
+    if (!fmt && OPT_ISSET(ops,'C')) {
+	char *eptr, *argptr = OPT_ARG(ops,'C');
+	nc = (int)zstrtol(argptr, &eptr, 10);
+	if (*eptr) {
+	    zwarnnam(name, "number expected after -%c: %s", 'C', argptr);
+	    return 1;
+	}
+	if (nc <= 0) {
+	    zwarnnam(name, "invalid number of columns: %s", argptr);
+	    return 1;
+	}
     }
 
     if (func == BIN_PRINTF) {
@@ -4105,7 +4141,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	    }
 	}
 	/* -P option -- interpret as a prompt sequence */
-	if(OPT_ISSET(ops,'P')) {
+	if (OPT_ISSET(ops,'P')) {
 	    /*
 	     * promptexpand uses permanent storage: to avoid
 	     * messy memory management, stick it on the heap
@@ -4119,13 +4155,13 @@ bin_print(char *name, char **args, Options ops, int func)
 	    free(str);
 	}
 	/* -D option -- interpret as a directory, and use ~ */
-	if(OPT_ISSET(ops,'D')) {
+	if (OPT_ISSET(ops,'D')) {
 	    Nameddir d;
 
 	    queue_signals();
 	    /* TODO: finddir takes a metafied file */
 	    d = finddir(args[n]);
-	    if(d) {
+	    if (d) {
 		int dirlen = strlen(d->dir);
 		char *arg = zhalloc(len[n] - dirlen + strlen(d->node.nam) + 2);
 		sprintf(arg, "~%s%s", d->node.nam, args[n] + dirlen);
@@ -4146,20 +4182,6 @@ bin_print(char *name, char **args, Options ops, int func)
 	if (OPT_ISSET(ops,'O'))
 	    flags |= SORTIT_BACKWARDS;
 	strmetasort(args, flags, len);
-    }
-
-    /* -C -- number of columns */
-    if (!fmt && OPT_ISSET(ops,'C')) {
-	char *eptr, *argptr = OPT_ARG(ops,'C');
-	nc = (int)zstrtol(argptr, &eptr, 10);
-	if (*eptr) {
-	    zwarnnam(name, "number expected after -%c: %s", 'C', argptr);
-	    return 1;
-	}
-	if (nc <= 0) {
-	    zwarnnam(name, "invalid number of columns: %s", argptr);
-	    return 1;
-	}
     }
 
     /* -u and -p -- output to other than standard output */
@@ -4188,8 +4210,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	    } else {
 		fdarg = (int)zstrtol(argptr, &eptr, 10);
 		if (*eptr) {
-		    zwarnnam(name, "number expected after -%c: %s", 'u',
-			     argptr);
+		    zwarnnam(name, "number expected after -u: %s", argptr);
 		    return 1;
 		}
 	    }
@@ -4358,8 +4379,8 @@ bin_print(char *name, char **args, Options ops, int func)
 	    fputc(OPT_ISSET(ops,'N') ? '\0' : '\n', fout);
 	}
 	/* Testing EBADF special-cases >&- redirections */
-	if ((fout != stdout) ? (fclose(fout) != 0) :
-	    (fflush(fout) != 0 && errno != EBADF)) {
+	if ((fout == stdout) ? (fflush(fout) != 0 && errno != EBADF) :
+	    (fclose(fout) != 0)) {
             zwarnnam(name, "write error: %e", errno);
             ret = 1;
 	}
@@ -4368,8 +4389,8 @@ bin_print(char *name, char **args, Options ops, int func)
 
     /* normal output */
     if (!fmt) {
-	if (OPT_ISSET(ops, 'z') || OPT_ISSET(ops, 's') ||
-	    OPT_ISSET(ops, 'v')) {
+	if (OPT_ISSET(ops, 'z') || OPT_ISSET(ops, 'v') ||
+	    OPT_ISSET(ops, 's') || OPT_ISSET(ops, 'S')) {
 	    /*
 	     * We don't want the arguments unmetafied after all.
 	     */
@@ -4477,8 +4498,8 @@ bin_print(char *name, char **args, Options ops, int func)
 	if (!(OPT_ISSET(ops,'n') || nnl))
 	    fputc(OPT_ISSET(ops,'N') ? '\0' : '\n', fout);
 	/* Testing EBADF special-cases >&- redirections */
-	if ((fout != stdout) ? (fclose(fout) != 0) :
-	    (fflush(fout) != 0 && errno != EBADF)) {
+	if ((fout == stdout) ? (fflush(fout) != 0 && errno != EBADF) :
+	    (fclose(fout) != 0)) {
             zwarnnam(name, "write error: %e", errno);
             ret = 1;
 	}
@@ -4769,8 +4790,8 @@ bin_print(char *name, char **args, Options ops, int func)
 		zwarnnam(name, "%s: invalid directive", start);
 		if (*c) c[1] = save;
 		/* Testing EBADF special-cases >&- redirections */
-		if ((fout != stdout) ? (fclose(fout) != 0) :
-		    (fflush(fout) != 0 && errno != EBADF)) {
+		if ((fout == stdout) ? (fflush(fout) != 0 && errno != EBADF) :
+		    (fclose(fout) != 0)) {
 		    zwarnnam(name, "write error: %e", errno);
 		}
 #ifdef HAVE_OPEN_MEMSTREAM
@@ -4886,6 +4907,7 @@ bin_print(char *name, char **args, Options ops, int func)
 #endif
 	queue_signals();
 	stringval = metafy(buf, rcount - 1, META_REALLOC);
+	buf = NULL;
 	if (OPT_ISSET(ops,'z')) {
 	    zpushnode(bufstack, stringval);
 	} else if (OPT_ISSET(ops,'v')) {
@@ -4911,6 +4933,8 @@ bin_print(char *name, char **args, Options ops, int func)
 	    zwarnnam(name, "write error: %e", errno);
 	    ret = 1;
 	}
+	if (buf)
+	    free(buf);
     }
     return ret;
 }
