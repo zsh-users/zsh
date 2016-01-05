@@ -1,5 +1,8 @@
 2016-01-04  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37504: Src/builtin.c: refactor code using/simulating memstream
+	to capture output for "print -v"
+
 	* 37503: Src/builtin.c: detect incompatible "print" options, fix
 	metafication and possible memory leak, miscellaneous cosmetics
 
