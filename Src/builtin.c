@@ -4028,7 +4028,7 @@ bin_print(char *name, char **args, Options ops, int func)
     size_t mcount;
 #define ASSIGN_MSTREAM(BUF,FOUT) \
     do { \
-        if ((fout = open_memstream(&BUF, &mcount)) == NULL) { \
+        if ((FOUT = open_memstream(&BUF, &mcount)) == NULL) { \
             zwarnnam(name, "open_memstream failed"); \
             return 1; \
         } \
@@ -4039,8 +4039,8 @@ bin_print(char *name, char **args, Options ops, int func)
      * to the buffer at the wrong position.  Therefore we must fclose()
      * before reading.
      */
-#define READ_MSTREAM(BUF,COUNT,FOUT) \
-    (fclose(FOUT) == 0 ? (COUNT = mcount) : -1)
+#define READ_MSTREAM(BUF,FOUT) \
+    ((fclose(FOUT) == 0) ? mcount : (size_t)-1)
 #define CLOSE_MSTREAM(FOUT) 0
 
 #else /* simulate HAVE_OPEN_MEMSTREAM */
@@ -4049,17 +4049,21 @@ bin_print(char *name, char **args, Options ops, int func)
     do { \
         int tempfd; \
         char *tmpf; \
-        if ((tempfd = gettempfile(NULL, 1, &tmpf)) < 0 || \
-            (fout = fdopen(tempfd, "w+")) == NULL) { \
+        if ((tempfd = gettempfile(NULL, 1, &tmpf)) < 0) { \
             zwarnnam(name, "can't open temp file: %e", errno); \
             return 1; \
         } \
         unlink(tmpf); \
+        if ((fout = fdopen(tempfd, "w+")) == NULL) { \
+            close(tempfd); \
+            zwarnnam(name, "can't open temp file: %e", errno); \
+            return 1; \
+        } \
     } while (0)
-#define READ_MSTREAM(BUF,COUNT,FOUT) \
+#define READ_MSTREAM(BUF,FOUT) \
     ((((count = ftell(FOUT)), (BUF = (char *)zalloc(count + 1))) && \
       ((fseek(FOUT, 0L, SEEK_SET) == 0) && !(BUF[count] = '\0')) && \
-      ((COUNT = fread(BUF, 1, count, FOUT)) == count)) ? count : -1)
+      ((count = fread(BUF, 1, count, FOUT)) == count)) ? count : (size_t)-1)
 #define CLOSE_MSTREAM(FOUT) fclose(FOUT)
 
 #endif
@@ -4428,7 +4432,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	    }
 	    fputc(OPT_ISSET(ops,'N') ? '\0' : '\n', fout);
 	}
-	if (IS_MSTREAM(fout) && READ_MSTREAM(buf,rcount,fout) < 0)
+	if (IS_MSTREAM(fout) && (rcount = READ_MSTREAM(buf,fout)) == -1)
 	    ret = 1;
 	if (!CLOSE_CLEANLY(fout) || ret) {
             zwarnnam(name, "write error: %e", errno);
@@ -4550,7 +4554,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	}
 	if (!(OPT_ISSET(ops,'n') || OPT_ISSET(ops, 'v') || nnl))
 	    fputc(OPT_ISSET(ops,'N') ? '\0' : '\n', fout);
-	if (IS_MSTREAM(fout) && READ_MSTREAM(buf,rcount,fout) < 0)
+	if (IS_MSTREAM(fout) && (rcount = READ_MSTREAM(buf,fout)) == -1)
 	    ret = 1;
 	if (!CLOSE_CLEANLY(fout) || ret) {
             zwarnnam(name, "write error: %e", errno);
@@ -4940,7 +4944,7 @@ bin_print(char *name, char **args, Options ops, int func)
 
     if (IS_MSTREAM(fout)) {
 	queue_signals();
-	if (READ_MSTREAM(buf,rcount,fout) < 0) {
+	if ((rcount = READ_MSTREAM(buf,fout)) == -1) {
 	    zwarnnam(name, "i/o error: %e", errno);
 	    if (buf)
 		free(buf);
