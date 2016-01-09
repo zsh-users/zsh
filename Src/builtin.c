@@ -4063,7 +4063,7 @@ bin_print(char *name, char **args, Options ops, int func)
 #define READ_MSTREAM(BUF,FOUT) \
     ((((count = ftell(FOUT)), (BUF = (char *)zalloc(count + 1))) && \
       ((fseek(FOUT, 0L, SEEK_SET) == 0) && !(BUF[count] = '\0')) && \
-      ((count = fread(BUF, 1, count, FOUT)) == count)) ? count : (size_t)-1)
+      (fread(BUF, 1, count, FOUT) == count)) ? count : (size_t)-1)
 #define CLOSE_MSTREAM(FOUT) fclose(FOUT)
 
 #endif
