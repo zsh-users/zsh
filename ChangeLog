@@ -1,5 +1,8 @@
 2016-01-08  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* Jun T.: 37515: Src/Modules/pcre.c, Test/V07pcre.ztst: multibyte
+	handling as per 35448.
+
 	* unposted (cf. Jun T.: 37516): Src/builtin.c: refine READ_MSTREAM
 	to avoid unsequenced evaluation
 

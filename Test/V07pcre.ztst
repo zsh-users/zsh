@@ -37,6 +37,17 @@
 >o→b
 >→
 
+  unset match mend
+  s=$'\u00a0'
+  [[ $s =~ '^.$' ]] && print OK
+  [[ A${s}B =~ .(.). && $match[1] == $s ]] && print OK
+  [[ A${s}${s}B =~ A([^[:ascii:]]*)B && $mend[1] == 3 ]] && print OK
+  unset s
+0:Raw IMETA characters in input string
+>OK
+>OK
+>OK
+
   [[ foo =~ f.+ ]] ; print $?
   [[ foo =~ x.+ ]] ; print $?
   [[ ! foo =~ f.+ ]] ; print $?

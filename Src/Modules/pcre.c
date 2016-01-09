@@ -190,18 +190,25 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar,
 	if (want_begin_end) {
 	    char *ptr = arg;
 	    zlong offs = 0;
+	    int clen, leftlen;
 
 	    /* Count the characters before the match */
-	    MB_METACHARINIT();
-	    while (ptr < arg + ovec[0]) {
+	    MB_CHARINIT();
+	    leftlen = ovec[0];
+	    while (leftlen) {
 		offs++;
-		ptr += MB_METACHARLEN(ptr);
+		clen = MB_CHARLEN(ptr, leftlen);
+		ptr += clen;
+		leftlen -= clen;
 	    }
 	    setiparam("MBEGIN", offs + !isset(KSHARRAYS));
 	    /* Add on the characters in the match */
-	    while (ptr < arg + ovec[1]) {
+	    leftlen = ovec[1] - ovec[0];
+	    while (leftlen) {
 		offs++;
-		ptr += MB_METACHARLEN(ptr);
+		clen = MB_CHARLEN(ptr, leftlen);
+		ptr += clen;
+		leftlen -= clen;
 	    }
 	    setiparam("MEND", offs + !isset(KSHARRAYS) - 1);
 	    if (nelem) {
@@ -219,17 +226,23 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar,
 		    ptr = arg;
 		    offs = 0;
 		    /* Find the start offset */
-		    MB_METACHARINIT();
-		    while (ptr < arg + ipair[0]) {
+		    MB_CHARINIT();
+		    leftlen = ipair[0];
+		    while (leftlen) {
 			offs++;
-			ptr += MB_METACHARLEN(ptr);
+			clen = MB_CHARLEN(ptr, leftlen);
+			ptr += clen;
+			leftlen -= clen;
 		    }
 		    convbase(buf, offs + !isset(KSHARRAYS), 10);
 		    *bptr = ztrdup(buf);
 		    /* Continue to the end offset */
-		    while (ptr < arg + ipair[1]) {
+		    leftlen = ipair[1] - ipair[0];
+		    while (leftlen) {
 			offs++;
-			ptr += MB_METACHARLEN(ptr);
+			clen = MB_CHARLEN(ptr, leftlen);
+			ptr += clen;
+			leftlen -= clen;
 		    }
 		    convbase(buf, offs + !isset(KSHARRAYS) - 1, 10);
 		    *eptr = ztrdup(buf);
