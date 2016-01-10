@@ -1,3 +1,7 @@
+2016-01-10  Eric Cook <llua@gmx.com>
+	* 37534: Matthew Martin: Completion/BSD/Command/_cu,
+	Completion/BSD/Command/_fw_update, Completion/BSD/Command/_rcctl
+
 2016-01-08  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Jun T.: 37515: Src/Modules/pcre.c, Test/V07pcre.ztst: multibyte
