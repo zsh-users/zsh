@@ -387,7 +387,7 @@ execbuiltin(LinkList args, LinkList assigns, Builtin bn)
 		if (*arg) {
 		    if(*arg == Meta)
 			*++arg ^= 32;
-		    zwarn("bad option: -%c", *arg);
+		    zwarnnam(name, "bad option: -%c", *arg);
 		    return 1;
 		}
 		arg = *++argv;

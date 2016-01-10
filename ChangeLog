@@ -1,3 +1,8 @@
+2016-01-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 37551: Src/builtin.c: Include the builtin's name in a "bad
+	option" error message.
+
 2016-01-10  Eric Cook <llua@gmx.com>
 	* 37534: Matthew Martin: Completion/BSD/Command/_cu,
 	Completion/BSD/Command/_fw_update, Completion/BSD/Command/_rcctl
