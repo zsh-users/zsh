@@ -1,3 +1,9 @@
+2016-01-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 37550: Completion/BSD/Command/_cu: _cu: Support Linux
+	line-device names; fail gracefully on OSes matching no known
+	line-device name pattern.
+
 2016-01-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 37551: Src/builtin.c: Include the builtin's name in a "bad
