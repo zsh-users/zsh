@@ -1,5 +1,8 @@
 2016-01-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37591: Src/hashtable.c, Test/A02alias.ztst: 37591: 'alias -L':
+	skip with a warning aliases with '=' in their LHS
+
 	* 37550: Completion/BSD/Command/_cu: _cu: Support Linux
 	line-device names; fail gracefully on OSes matching no known
 	line-device name pattern.

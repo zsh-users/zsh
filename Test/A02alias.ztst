@@ -96,3 +96,11 @@
 0:unalias -as
 >foo is a suffix alias for print
 >foo: suffix alias
+
+  aliases[x=y]=z
+  alias -L | grep x=y
+  echo $pipestatus[1]
+0:printing invalid aliases warns
+>0
+?(eval):2: invalid alias 'x=y' encountered while printing aliases
+# Currently, 'alias -L' returns 0 in this case.  Perhaps it should return 1.

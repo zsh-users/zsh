@@ -1276,6 +1276,15 @@ printaliasnode(HashNode hn, int printflags)
     }
 
     if (printflags & PRINT_LIST) {
+	/* Fast fail on unrepresentable values. */
+	if (strchr(a->node.nam, '=')) {
+	    zwarn("invalid alias '%s' encountered while printing aliases", 
+		  a->node.nam);
+	    /* ### TODO: Return an error status to the C caller */
+	    return;
+	}
+
+	/* Normal path. */
 	printf("alias ");
 	if (a->node.flags & ALIAS_SUFFIX)
 	    printf("-s ");
