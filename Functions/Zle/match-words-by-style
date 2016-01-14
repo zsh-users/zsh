@@ -111,20 +111,20 @@ done
 case $wordstyle in
   (*shell*) local bufwords
 	  # This splits the line into words as the shell understands them.
-	  bufwords=(${(z)LBUFFER})
+	  bufwords=(${(Z:n:)LBUFFER})
 	  nwords=${#bufwords}
 	  wordpat1="${(q)bufwords[-1]}"
 
 	  # Take substring of RBUFFER to skip over $skip characters
 	  # from the cursor position.
-	  bufwords=(${(z)RBUFFER[1+$skip,-1]})
+	  bufwords=(${(Z:n:)RBUFFER[1+$skip,-1]})
 	  wordpat2="${(q)bufwords[1]}"
 	  spacepat='[[:space:]]#'
 
 	  # Assume the words are at the top level, i.e. if we are inside
 	  # 'something with spaces' then we need to ignore the embedded
 	  # spaces and consider the whole word.
-	  bufwords=(${(z)BUFFER})
+	  bufwords=(${(Z:n:)BUFFER})
 	  if (( ${#bufwords[$nwords]} > ${#wordpat1} )); then
 	    # Yes, we're in the middle of a shell word.
 	    # Find out what's in front.

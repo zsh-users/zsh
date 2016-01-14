@@ -3,6 +3,11 @@
 	* 37590: Src/Zle/zle_hist.c, Src/Zle/zle_main.c: Invoke
 	zle-line-pre-redraw during isearch.
 
+2016-01-13  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37567: Functions/Zle/match-words-by-style: use (Z:n:) to split
+	the buffer into words so line breaks are treated as whitespace
+
 2016-01-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 37591: Src/hashtable.c, Test/A02alias.ztst: 37591: 'alias -L':
