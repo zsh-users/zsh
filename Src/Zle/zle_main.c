@@ -1025,7 +1025,8 @@ getrestchar(int inchar, char *outstr, int *outcount)
 /**/
 #endif
 
-static void redrawhook()
+/**/
+void redrawhook(void)
 {
     Thingy initthingy;
     if ((initthingy = rthingy_nocreate("zle-line-pre-redraw"))) {
