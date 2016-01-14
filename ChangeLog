@@ -5,6 +5,9 @@
 
 2016-01-13  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37570: Functions/Zle/transpose-words-match: give truth to the
+	doc assertion this is a drop-in replacement for	transpose-words
+
 	* 37567: Functions/Zle/match-words-by-style: use (Z:n:) to split
 	the buffer into words so line breaks are treated as whitespace
 

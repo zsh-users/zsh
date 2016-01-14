@@ -11,13 +11,22 @@
 # on X would be turned into `barXfoo' with the cursor still on the X,
 # regardless of what the character X is.
 
+emulate -L zsh
 autoload -Uz match-words-by-style
 
-local curcontext=":zle:$WIDGET" skip
+local curcontext=":zle:$WIDGET"
 local -a matched_words
 integer count=${NUMERIC:-1} neg
 
 (( count < 0 )) && (( count = -count, neg = 1 ))
+
+if [[ $WIDGET == transpose-words ]]; then
+  # default is to be a drop-in replacement, check styles for change
+  zstyle -m $curcontext skip-chars \* ||
+  zstyle -m $curcontext word-style '*subword*' ||
+  { [[ $LBUFFER[-1] != [[:space:]] && $RBUFFER[1] != [[:space:]] ||
+       -z ${RBUFFER//[[:space:]]/} ]] && zle backward-word }
+fi
 
 while (( count-- > 0 )); do
     match-words-by-style
