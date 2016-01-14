@@ -54,6 +54,12 @@
 	* Jun T. (+ revise test): 37501: Src/builtin.c, Test/B03print.ztst:
 	correct byte counts when simulating memstream via temp file
 
+2016-01-03  Peter Stephenson <p.w.stephenson@ntlworld.com>
+
+	* 37489, tweaked: Doc/Zsh/options.yo, Src/params.c,
+	Test/C01arith.ztst: with POSIX_IDENTIFIERS create math var as
+	scalar
+
 2016-01-02  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 37497: Src/builtin.c: handle NUL bytes in "printf -v".
