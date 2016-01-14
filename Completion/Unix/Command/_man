@@ -37,7 +37,10 @@ _man() {
 
   mrd=(${^_manpath/\%L/${LANG:-En_US.ASCII}}/mandb(N))
 
-  local sect
+  # $sect is from the command line, the "3p" in "man 3p memcpy"
+  # $sect_dirname is from the filesystem, the "3" in "/usr/share/man/man3"
+  # These are used by _man_pages
+  local sect sect_dirname
   if [[ $OSTYPE = solaris* ]]; then
     sect=${${words[(R)-s*]#-s}:-$words[$words[(i)-s]+1]}
   elif [[ -n ${sect:=$words[$words[(i)-S]+1]} || -n ${sect:=$MANSECT} ]]; then
@@ -69,8 +72,8 @@ _man() {
 
     _tags manuals.${^sects}
     while _tags; do
-      for sect in $sects; do
-        _requested manuals.$sect expl "manual page, section $sect" _man_pages &&
+      for sect_dirname in $sects; do
+        _requested manuals.$sect_dirname expl "manual page, section $sect_dirname" _man_pages &&
             ret=0
       done
       (( ret )) || return 0
@@ -78,7 +81,7 @@ _man() {
 
     return 1
   else
-    sect=
+    sect_dirname=
     _wanted manuals expl 'manual page' _man_pages
   fi
 }
@@ -107,8 +110,8 @@ _man_pages() {
     matcher=
   fi
 
-  pages=( ${(M)dirs:#*$sect/} )
-  compfiles -p pages '' '' "$matcher" '' dummy '*'
+  pages=( ${(M)dirs:#*$sect_dirname/} )
+  compfiles -p pages '' '' "$matcher" '' dummy "*"
   pages=( ${^~pages}(N:t) )
 
   (($#mrd)) && pages[$#pages+1]=($(awk $awk $mrd))
@@ -119,11 +122,11 @@ _man_pages() {
 
   [[ $OSTYPE = solaris* ]] && sopt='-s '
   if ((CURRENT > 2)) ||
-      ! zstyle -t ":completion:${curcontext}:manuals.$sect" insert-sections
+      ! zstyle -t ":completion:${curcontext}:manuals.$sect_dirname" insert-sections
   then
     compadd "$@" - ${pages%$~suf}
   else
-    compadd "$@" -P "$sopt$sect " - ${pages%$~suf}
+    compadd "$@" -P "$sopt$sect_dirname " - ${pages%$~suf}
   fi
 }
 
