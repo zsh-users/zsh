@@ -52,7 +52,7 @@ _man() {
   fi
 
   if [[ $sect = (<->*|1M|l|n) || $sect = \(*\|*\) ]]; then
-    dirs=( $^_manpath/(sman|man|cat)${~sect}/ )
+    dirs=( $^_manpath/(sman|man|cat)${~sect%%[^0-9]#}/ )
     awk="\$2 == \"$sect\" {print \$1}"
   else
     dirs=( $^_manpath/(sman|man|cat)*/ )
@@ -111,7 +111,7 @@ _man_pages() {
   fi
 
   pages=( ${(M)dirs:#*$sect_dirname/} )
-  compfiles -p pages '' '' "$matcher" '' dummy "*"
+  compfiles -p pages '' '' "$matcher" '' dummy "*${(b)sect}*"
   pages=( ${^~pages}(N:t) )
 
   (($#mrd)) && pages[$#pages+1]=($(awk $awk $mrd))
