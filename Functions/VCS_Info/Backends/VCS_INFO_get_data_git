@@ -247,7 +247,9 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
             fi
         fi
         local last="$(< "${patchdir}/last")"
-        git_patches_unapplied=( {$cur..$last} )
+        if (( cur+1 <= last )); then
+          git_patches_unapplied=( {$((cur+1))..$last} )
+        fi
     fi
 
     VCS_INFO_git_handle_patches
