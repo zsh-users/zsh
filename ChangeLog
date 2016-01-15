@@ -1,5 +1,8 @@
 2016-01-15  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 37643: Src/Zle/complist.c: Reset interrupt after getkeycmd()
+	in menu selection.
+
 	* 37512: Src/params.c: overeager WARN_CREATE_GLOBAL with
 	strftime.
 

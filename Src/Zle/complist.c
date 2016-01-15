@@ -2584,6 +2584,12 @@ domenuselect(Hookdef dummy, Chdata dat)
     	if (!do_last_key) {
 	    zmult = 1;
 	    cmd = getkeycmd();
+	    /*
+	     * On interrupt, we'll exit due to cmd being empty.
+	     * Don't propagate the interrupt any further, which
+	     * can screw up redrawing.
+	     */
+	    errflag &= ~ERRFLAG_INT;
 	    if (mtab_been_reallocated) {
 		do_last_key = 1;
 		continue;
