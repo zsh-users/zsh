@@ -2213,6 +2213,8 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 				 mkarray(NULL), 0)))
 		return NULL;
 	}
+	if (errflag)
+	    return NULL;
 	pm->node.flags |= (on & PM_READONLY);
 	if (OPT_ISSET(ops,'p'))
 	    paramtab->printnode(&pm->node, PRINT_TYPESET);
