@@ -1,5 +1,8 @@
 2016-01-15  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Functions/VCS_Info/Backends/VCS_INFO_detect_p4:
+	Fix typo in comment.
+
 	* 37612: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	vcs_info git: Set $git_patches_unapplied correctly for
 	'rebase-apply' case.

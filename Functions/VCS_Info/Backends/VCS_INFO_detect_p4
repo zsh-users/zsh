@@ -2,7 +2,7 @@
 ## perforce support by: Phil Pennock
 ## Distributed under the same BSD-ish license as zsh itself.
 
-# If user-server is true in the :vcs_info:p4:... context, contact the
+# If use-server is true in the :vcs_info:p4:... context, contact the
 # server to decide whether the directory is handled by Perforce.  This can
 # cause a delay if the network times out, in particular if looking up the
 # server name failed.  Hence this is not the default.  If a timeout
@@ -10,7 +10,7 @@
 # vcs_info_p4_dead_servers and the server is never contacted again.  The
 # array must be edited by hand to remove it.
 #
-# If user-server is false or not set, the function looks to see if there is
+# If use-server is false or not set, the function looks to see if there is
 # a file $P4CONFIG somewhere above in the hierarchy.  This is far from
 # foolproof; in fact it relies on you using the particular working practice
 # of having such files in all client root directories and nowhere above.
