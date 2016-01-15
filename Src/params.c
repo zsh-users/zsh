@@ -2705,29 +2705,17 @@ static void
 check_warn_create(Param pm, const char *pmtype)
 {
     Funcstack i;
-    const char *name;
 
     if (pm->level != 0 || (pm->node.flags & PM_SPECIAL))
 	return;
 
-    name = NULL;
     for (i = funcstack; i; i = i->prev) {
 	if (i->tp == FS_FUNC) {
 	    DPUTS(!i->name, "funcstack entry with no name");
-	    name = i->name;
+	    zwarn("%s parameter %s created globally in function %s",
+		  pmtype, pm->node.nam, i->name);
 	    break;
 	}
-    }
-
-    if (name)
-    {
-	zwarn("%s parameter %s created globally in function %s",
-	      pmtype, pm->node.nam, name);
-    }
-    else
-    {
-	zwarn("%s parameter %s created globally in function",
-	      pmtype, pm->node.nam);
     }
 }
 

@@ -1,3 +1,8 @@
+2016-01-15  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37512: Src/params.c: overeager WARN_CREATE_GLOBAL with
+	strftime.
+
 2016-01-15  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Src/utils.c: Extend docstring of callhookfunc().
