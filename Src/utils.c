@@ -1450,6 +1450,9 @@ time_t lastwatch;
  * If "retval" is not NULL, the return value of the first hook function to
  * return non-zero is stored in *"retval".  The return value is not otherwise
  * available as the calling context is restored.
+ *
+ * Returns 0 if at least one function was called (regardless of that function's
+ * exit status), and 1 otherwise.
  */
 
 /**/

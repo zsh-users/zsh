@@ -1,5 +1,7 @@
 2016-01-15  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Src/utils.c: Extend docstring of callhookfunc().
+
 	* unposted: Functions/VCS_Info/Backends/VCS_INFO_detect_p4:
 	Fix typo in comment.
 
