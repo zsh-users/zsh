@@ -82,6 +82,9 @@ if [[ -n $need_desc ]]; then
 else
   _wanted commands expl 'external command' compadd "$@" -k commands && ret=0
 fi
+# TODO: this is called from '_command_names -e' which is typically used in
+# contexts (such as _env) that don't accept directory names.  Should this
+# 'if' block move up to the "_command_names -" branch of _command_names?
 if [[ -o path_dirs ]]; then
   local -a path_dirs
   path_dirs=(${^path}/*(/N:t))

@@ -4203,6 +4203,12 @@ All arguments after the required field name are passed to
 tt(compadd) when generating matches from the style value, or to 
 the functions for the fields if they are called.
 )
+findex(_command_names)
+item(tt(_command_names) [ tt(-e) | tt(-) ])(
+This function completes words that are valid at command position: names of
+aliases, builtins, hashed commands, functions, and so on.  With the tt(-e)
+flag, only hashed commands are completed.  The tt(-) flag is ignored.
+)
 findex(_describe)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ @ @ ))ifnztexi(          )))
 xitem(tt(_describe )[tt(-12JVx)] [ tt(-oO) | tt(-t) var(tag) ] var(descr) var(name1) [ var(name2) ] [ var(opt) ... ])
