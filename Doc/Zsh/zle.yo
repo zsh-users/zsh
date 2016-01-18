@@ -802,7 +802,7 @@ item(tt(cont))(
 A continuation to a command line (at prompt tt(PS2)).
 )
 item(tt(select))(
-In a tt(select) loop.
+In a tt(select) loop (at prompt tt(PS3)).
 )
 item(tt(vared))(
 Editing a variable in tt(vared).
