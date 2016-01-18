@@ -3461,6 +3461,12 @@ completion has been tried.  A function will only be called once unless
 it explicitly reinserts itself into the array.
 
 startitem()
+findex(_absolute_command_paths)
+item(tt(_absolute_command_paths))(
+This function completes external commands as absolute paths (unlike
+tt(_command_names -e) which completes their basenames).  It takes no
+arguments.
+)
 findex(_all_labels)
 item(tt(_all_labels) [ tt(-x) ] [ tt(-12VJ) ] var(tag) var(name) var(descr) [ var(command) var(arg) ... ])(
 This is a convenient interface to the tt(_next_label) function below,

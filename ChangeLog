@@ -1,5 +1,9 @@
 2016-01-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37665: Completion/Unix/Command/_git,
+	Completion/Unix/Type/_absolute_command_paths, Doc/Zsh/compsys.yo:
+	Completion: New helper _absolute_command_paths.
+
 	* 37664: Completion/Unix/Type/_path_commands, Doc/Zsh/compsys.yo:
 	docs: Document the completion function _command_names.
 
