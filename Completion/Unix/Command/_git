@@ -3710,7 +3710,7 @@ _git-send-email () {
     '--smtp-encryption=[specify encryption method to use]: :__git_sendemail_smtpencryption_values' \
     '--smtp-domain=[specify FQDN used in HELO/EHLO]: :_domains' \
     '--smtp-pass=[specify password to use for SMTP-AUTH]::password' \
-    '--smtp-server=[specify SMTP server to connect to]:smtp server:_hosts' \
+    '--smtp-server=[specify SMTP server to connect to, or sendmail command]: : __git_sendmail_smtpserver_values' \
     '--smtp-server-port=[specify port to connect to SMTP server on]:smtp port:_ports' \
     '--smtp-server-option=[specify the outgoing SMTP server option to use]:SMPT server option' \
     '--smtp-ssl-cert-path=[path to ca-certificates (directory or file)]:ca certificates path:_files' \
@@ -6857,6 +6857,11 @@ __git_sendemail_suppresscc_values () {
     tocmd:'avoid running --to-cmd' \
     body:'equivalent to sob + bodycc' \
     all:'avoid all auto Cc values'
+}
+
+(( $+functions[__git_sendmail_smtpserver_values] )) ||
+__git_sendmail_smtpserver_values() {
+  _alternative "smtp hosts:host:_hosts" "sendmail command: :_absolute_command_paths"
 }
 
 (( $+functions[__git_colors] )) ||
