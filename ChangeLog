@@ -1,5 +1,7 @@
 2016-01-19  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 37693: Src/glob.c: turn Dash into '-' in glob qualifiers.
+
 	* 37689: README, Src/glob.c, Src/lex.c, Src/pattern.c,
 	Src/zsh.h, Test/D02glob.ztst: also ! and ^ need to be tokenised
 	in character set.

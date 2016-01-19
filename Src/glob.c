@@ -1230,7 +1230,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 	char *s;
 	int sense, qualsfound;
 	off_t data;
-	char *sdata, *newcolonmod;
+	char *sdata, *newcolonmod, *ptr;
 	int (*func) _((char *, Statptr, off_t, char *));
 
 	/*
@@ -1273,6 +1273,9 @@ zglob(LinkList list, LinkNode np, int nountok)
 	*s++ = 0;
 	if (qualsfound == 2)
 	    s += 2;
+	for (ptr = s; *ptr; ptr++)
+	    if (*ptr == Dash)
+		*ptr = '-';
 	while (*s && !newcolonmod) {
 	    func = (int (*) _((char *, Statptr, off_t, char *)))0;
 	    if (idigit(*s)) {
