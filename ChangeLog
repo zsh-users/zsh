@@ -6,6 +6,11 @@
 	Src/zsh.h, Test/D02glob.ztst: also ! and ^ need to be tokenised
 	in character set.
 
+2016-01-18  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37682: Src/lex.c: when SH_GLOB is set (e.g. in "sh" emulation)
+	do not parse bare parentheses in arguments as a pattern grouping.
+
 2016-01-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 37678: Src/glob.c, Src/lex.c, Src/pattern.c, Src/utils.c,

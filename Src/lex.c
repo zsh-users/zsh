@@ -803,7 +803,7 @@ gettok(void)
 	    return INOUTPAR;
 	hungetc(d);
 	lexstop = 0;
-	if (!(incond == 1 || incmdpos))
+	if (!(isset(SHGLOB) || incond == 1 || incmdpos))
 	    break;
 	return INPAR;
     case LX1_OUTPAR:
