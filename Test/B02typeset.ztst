@@ -706,3 +706,8 @@
 >typeset -a array=( '' two '' four )
 >typeset -a array=( one '' three )
 >no really nothing here
+
+  readonly isreadonly=yes
+  typeset isreadonly=still
+1:typeset returns status 1 if setting readonly variable
+?(eval):2: read-only variable: isreadonly
