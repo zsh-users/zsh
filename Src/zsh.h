@@ -192,24 +192,30 @@ struct mathfunc {
 #define Tilde		((char) 0x98)
 #define Qtick		((char) 0x99)
 #define Comma		((char) 0x9a)
+#define Dash            ((char) 0x9b) /* Only in patterns */
+/*
+ * Marks the last of the group above.
+ * Remaining tokens are even more special.
+ */
+#define LAST_NORMAL_TOK Dash
 /*
  * Null arguments: placeholders for single and double quotes
  * and backslashes.
  */
-#define Snull		((char) 0x9b)
-#define Dnull		((char) 0x9c)
-#define Bnull		((char) 0x9d)
+#define Snull		((char) 0x9c)
+#define Dnull		((char) 0x9d)
+#define Bnull		((char) 0x9e)
 /*
  * Backslash which will be returned to "\" instead of being stripped
  * when we turn the string into a printable format.
  */
-#define Bnullkeep       ((char) 0x9e)
+#define Bnullkeep       ((char) 0x9f)
 /*
  * Null argument that does not correspond to any character.
  * This should be last as it does not appear in ztokens and
  * is used to initialise the IMETA type in inittyptab().
  */
-#define Nularg		((char) 0x9f)
+#define Nularg		((char) 0xa0)
 
 /*
  * Take care to update the use of IMETA appropriately when adding
@@ -220,7 +226,7 @@ struct mathfunc {
  * Also used in pattern character arrays as guaranteed not to
  * mark a character in a string.
  */
-#define Marker		((char) 0xa0)
+#define Marker		((char) 0xa1)
 
 /* chars that need to be quoted if meant literally */
 

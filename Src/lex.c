@@ -35,7 +35,7 @@
 /* tokens */
 
 /**/
-mod_export char ztokens[] = "#$^*(())$=|{}[]`<>>?~`,'\"\\\\";
+mod_export char ztokens[] = "#$^*(())$=|{}[]`<>>?~`,-'\"\\\\";
 
 /* parts of the current token */
 
@@ -394,8 +394,9 @@ ctxtlex(void)
 #define LX2_DQUOTE 15
 #define LX2_BQUOTE 16
 #define LX2_COMMA 17
-#define LX2_OTHER 18
-#define LX2_META 19
+#define LX2_DASH 18
+#define LX2_OTHER 19
+#define LX2_META 20
 
 static unsigned char lexact1[256], lexact2[256], lextok2[256];
 
@@ -405,7 +406,7 @@ initlextabs(void)
 {
     int t0;
     static char *lx1 = "\\q\n;!&|(){}[]<>";
-    static char *lx2 = ";)|$[]~({}><=\\\'\"`,";
+    static char *lx2 = ";)|$[]~({}><=\\\'\"`,-";
 
     for (t0 = 0; t0 != 256; t0++) {
 	lexact1[t0] = LX1_OTHER;
@@ -919,7 +920,7 @@ gettok(void)
 static enum lextok
 gettokstr(int c, int sub)
 {
-    int bct = 0, pct = 0, brct = 0, fdpar = 0;
+    int bct = 0, pct = 0, brct = 0, seen_brct = 0, fdpar = 0;
     int intpos = 1, in_brace_param = 0;
     int inquote, unmatched = 0;
     enum lextok peek;
@@ -1033,8 +1034,10 @@ gettokstr(int c, int sub)
 	    }
 	    break;
 	case LX2_INBRACK:
-	    if (!in_brace_param)
+	    if (!in_brace_param) {
 		brct++;
+		seen_brct = 1;
+	    }
 	    c = Inbrack;
 	    break;
 	case LX2_OUTBRACK:
@@ -1345,6 +1348,21 @@ gettokstr(int c, int sub)
 	    }
 	    c = Tick;
 	    SETPAREND
+	    break;
+	case LX2_DASH:
+	    /*
+	     * - shouldn't be treated as a special character unless
+	     * we're in a pattern.  Howeve,simply  counting "[" doesn't
+	     * work as []a-z] is a valid expression and we don't know
+	     * down here what this "[" is for as $foo[stuff] is valid
+	     * in zsh.  So just detect an opening [, which is enough
+	     * to turn this into a pattern; the Dash will be harmlessly
+	     * untokenised if not wanted.
+	     */
+	    if (seen_brct)
+		c = Dash;
+	    else
+		c = '-';
 	    break;
 	}
 	add(c);

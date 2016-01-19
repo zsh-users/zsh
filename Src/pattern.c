@@ -1459,7 +1459,7 @@ patcomppiece(int *flagp, int paren)
 		charstart = patparse;
 		METACHARINC(patparse);
 
-		if (*patparse == '-' && patparse[1] &&
+		if (*patparse == Dash && patparse[1] &&
 		    patparse[1] != Outbrack) {
 		    patadd(NULL, STOUC(Meta)+PP_RANGE, 1, PA_NOALIGN);
 		    if (itok(*charstart)) {
@@ -1468,7 +1468,7 @@ patcomppiece(int *flagp, int paren)
 		    } else {
 			patadd(charstart, 0, patparse-charstart, PA_NOALIGN);
 		    }
-		    charstart = ++patparse;	/* skip ASCII '-' */
+		    charstart = ++patparse;	/* skip Dash token */
 		    METACHARINC(patparse);
 		}
 		if (itok(*charstart)) {

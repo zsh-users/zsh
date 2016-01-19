@@ -582,3 +582,43 @@
 >1 OK
 >2 OK
 >3 OK
+
+  [[ foo = 'f'\o"o" ]]
+0:Stripping of quotes from patterns (1)
+
+  [[ foo = 'f'('o'|'a')('o'|'b') ]]
+0:Stripping of quotes from patterns (2)
+
+  [[ fob = 'f'('o'|'a')('o'|'b') ]]
+0:Stripping of quotes from patterns (3)
+
+  [[ fab = 'f'('o'|'a')('o'|'b') ]]
+0:Stripping of quotes from patterns (4)
+
+  [[ fib != 'f'('o'|'a')('o'|'b') ]]
+0:Stripping of quotes from patterns (4)
+
+  [[ - != [a-z] ]]
+0:- is a special character in ranges
+
+  [[ - = ['a-z'] ]]
+0:- is not a special character in ranges if quoted
+
+  [[ b-1 = [a-z]-[0-9] ]]
+0:- untokenized following a bracketed subexpression
+
+  [[ b-1 = []a-z]-[]0-9] ]]
+0:- "]" after "[" is normal range character and - still works
+
+  headremove="bcdef"
+  print ${headremove#[a-z]}
+0:active - works in pattern in parameter
+>cdef
+
+  headremove="bcdef"
+  print ${headremove#['a-z']}
+  headremove="-cdef"
+  print ${headremove#['a-z']}
+0:quoted - works in pattern in parameter
+>bcdef
+>cdef

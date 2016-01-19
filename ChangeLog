@@ -1,5 +1,9 @@
 2016-01-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37678: Src/glob.c, Src/lex.c, Src/pattern.c, Src/utils.c,
+	Src/zsh.h, Test/D02glob.ztst: Now possible to quote "-" in
+	a pattern range.
+
 	* 37634: Completion/Unix/Command/_man: _man: Support subsection
 	names such as '3p'.
 
