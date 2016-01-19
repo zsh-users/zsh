@@ -3476,7 +3476,7 @@ static void
 zshtokenize(char *s, int flags)
 {
     char *t;
-    int bslash = 0, seen_brct = 0;
+    int bslash = 0;
 
     for (; *s; s++) {
       cont:
@@ -3507,20 +3507,6 @@ zshtokenize(char *s, int flags)
 	    *t = Inang;
 	    *s = Outang;
 	    break;
-	case '[':
-	    if (bslash)
-		s[-1] = (flags & ZSHTOK_SUBST) ? Bnullkeep : Bnull;
-	    else {
-		seen_brct = 1;
-		*s = Inbrack;
-	    }
-	    break;
-	case '-':
-	    if (bslash)
-		s[-1] = (flags & ZSHTOK_SUBST) ? Bnullkeep : Bnull;
-	    else if (seen_brct) /* see corresonding code in lex.c */
-		*s = Dash;
-	    break;
 	case '(':
 	case '|':
 	case ')':
@@ -3531,10 +3517,13 @@ zshtokenize(char *s, int flags)
 	case '^':
 	case '#':
 	case '~':
+	case '[':
 	case ']':
 	case '*':
 	case '?':
 	case '=':
+	case '-':
+	case '!':
 	    for (t = ztokens; *t; t++) {
 		if (*t == *s) {
 		    if (bslash)

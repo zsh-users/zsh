@@ -247,7 +247,7 @@ typedef unsigned long zrange_t;
  */
 static const char zpc_chars[ZPC_COUNT] = {
     '/', '\0', Bar, Outpar, Tilde, Inpar, Quest, Star, Inbrack, Inang,
-    Hat, Pound, Bnullkeep, Quest, Star, '+', '!', '@'
+    Hat, Pound, Bnullkeep, Quest, Star, '+', Bang, '!', '@'
 };
 
 /*
@@ -257,7 +257,7 @@ static const char zpc_chars[ZPC_COUNT] = {
 /**/
 mod_export const char *zpc_strings[ZPC_COUNT] = {
    NULL, NULL, "|", NULL, "~", "(", "?", "*", "[", "<",
-   "^", "#", NULL, "?(", "*(", "+(", "!(", "@("
+   "^", "#", NULL, "?(", "*(", "+(", "!(", "\\!(", "@("
 };
 
 /*
@@ -481,7 +481,7 @@ patcompcharsset(void)
 	 */
 	zpc_special[ZPC_KSH_QUEST] = zpc_special[ZPC_KSH_STAR] =
 	    zpc_special[ZPC_KSH_PLUS] = zpc_special[ZPC_KSH_BANG] =
-	    zpc_special[ZPC_KSH_AT] = Marker;
+	    zpc_special[ZPC_KSH_BANG2] = zpc_special[ZPC_KSH_AT] = Marker;
     }
     /*
      * Note that if we are using KSHGLOB, then we test for a following
@@ -1268,6 +1268,8 @@ patcomppiece(int *flagp, int paren)
 		kshchar = STOUC('+');
 	    else if (*patparse == zpc_special[ZPC_KSH_BANG])
 		kshchar = STOUC('!');
+	    else if (*patparse == zpc_special[ZPC_KSH_BANG2])
+		kshchar = STOUC('!');
 	    else if (*patparse == zpc_special[ZPC_KSH_AT])
 		kshchar = STOUC('@');
 	    else if (*patparse == zpc_special[ZPC_KSH_STAR])
@@ -1424,7 +1426,7 @@ patcomppiece(int *flagp, int paren)
 	    DPUTS(zpc_special[ZPC_INBRACK] == Marker,
 		  "Treating '[' as pattern character although disabled");
 	    flags |= P_SIMPLE;
-	    if (*patparse == Hat || *patparse == '^' || *patparse == '!') {
+	    if (*patparse == Hat || *patparse == Bang) {
 		patparse++;
 		starter = patnode(P_ANYBUT);
 	    } else
@@ -4245,7 +4247,8 @@ haswilds(char *str)
 		     ((str[-1] == Quest && !zpc_disables[ZPC_KSH_QUEST]) ||
 		      (str[-1] == Star && !zpc_disables[ZPC_KSH_STAR]) ||
 		      (str[-1] == '+' && !zpc_disables[ZPC_KSH_PLUS]) ||
-		      (str[-1] == '!' && !zpc_disables[ZPC_KSH_BANG]) ||
+		      (str[-1] == Bang && !zpc_disables[ZPC_KSH_BANG]) ||
+		      (str[-1] == '!' && !zpc_disables[ZPC_KSH_BANG2]) ||
 		      (str[-1] == '@' && !zpc_disables[ZPC_KSH_AT]))))
 		    return 1;
 		break;

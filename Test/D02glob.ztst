@@ -622,3 +622,36 @@
 0:quoted - works in pattern in parameter
 >bcdef
 >cdef
+
+  [[ a != [^a] ]]
+0:^ active in character class if not quoted
+
+  [[ a = ['^a'] ]]
+0:^ not active in character class if quoted
+
+  [[ a != [!a] ]]
+0:! active in character class if not quoted
+
+  [[ a = ['!a'] ]]
+0:! not active in character class if quoted
+
+  # Actually, we don't need the quoting here,
+  # c.f. the next test.  This just makes it look
+  # more standard.
+  cset="^a-z"
+  [[ "^" = ["$cset"] ]] || print Fail 1
+  [[ "a" = ["$cset"] ]] || print Fail 2
+  [[ "-" = ["$cset"] ]] || print Fail 3
+  [[ "z" = ["$cset"] ]] || print Fail 4
+  [[ "1" != ["$cset"] ]] || print Fail 5
+  [[ "b" != ["$cset"] ]] || print Fail 6
+0:character set specified as quoted variable
+
+  cset="^a-z"
+  [[ "^" = [$~cset] ]] || print Fail 1
+  [[ "a" != [$~cset] ]] || print Fail 2
+  [[ "-" = [$~cset] ]] || print Fail 3
+  [[ "z" != [$~cset] ]] || print Fail 4
+  [[ "1" = [$~cset] ]] || print Fail 5
+  [[ "b" != [$~cset] ]] || print Fail 6
+0:character set specified as active variabe
