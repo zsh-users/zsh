@@ -1026,8 +1026,10 @@ gettokstr(int c, int sub)
 		    c = Inbrace;
 		    ++bct;
 		    cmdpush(CS_BRACEPAR);
-		    if (!in_brace_param)
-			in_brace_param = bct;
+		    if (!in_brace_param) {
+			if ((in_brace_param = bct))
+			    seen_brct = 0;
+		    }
 		} else {
 		    hungetc(e);
 		    lexstop = 0;

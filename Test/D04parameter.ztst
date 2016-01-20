@@ -1880,3 +1880,9 @@
 >'two words'
 >'three so-called '\''words'\'
 >'three so-called ''words'''
+
+  array=(one two three)
+  array[1]=${nonexistent:-foo}
+  print $array
+0:"-" works after "[" in same expression (Dash problem)
+>foo two three
