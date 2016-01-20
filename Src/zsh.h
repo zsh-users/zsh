@@ -2921,6 +2921,7 @@ struct parse_stack {
     int incasepat;
     int isnewlin;
     int infor;
+    int inrepeat_;
     int intypeset;
 
     int eclen, ecused, ecnpats;

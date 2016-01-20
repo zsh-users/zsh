@@ -63,6 +63,12 @@ int isnewlin;
 /**/
 int infor;
 
+/* != 0 if we are after a repeat keyword; if it's nonzero it's a 1-based index
+ * of the current token from the last-seen command position */
+
+/**/
+int inrepeat_; /* trailing underscore because of name clash with Zle/zle_vi.c */
+
 /* != 0 if parsing arguments of typeset etc. */
 
 /**/
@@ -271,6 +277,7 @@ parse_context_save(struct parse_stack *ps, int toplevel)
     ps->incasepat = incasepat;
     ps->isnewlin = isnewlin;
     ps->infor = infor;
+    ps->inrepeat_ = inrepeat_;
     ps->intypeset = intypeset;
 
     ps->hdocs = hdocs;
@@ -305,6 +312,7 @@ parse_context_restore(const struct parse_stack *ps, int toplevel)
     incasepat = ps->incasepat;
     isnewlin = ps->isnewlin;
     infor = ps->infor;
+    inrepeat_ = ps->inrepeat_;
     intypeset = ps->intypeset;
 
     hdocs = ps->hdocs;
@@ -447,6 +455,7 @@ init_parse_status(void)
      * using the lexical analyser for strings as well as here.
      */
     incasepat = incond = inredir = infor = intypeset = 0;
+    inrepeat_ = 0;
     incmdpos = 1;
 }
 
@@ -1482,6 +1491,7 @@ par_while(int *cmplx)
 static void
 par_repeat(int *cmplx)
 {
+    /* ### what to do about inrepeat_ here? */
     int oecused = ecused, p;
 
     p = ecadd(0);

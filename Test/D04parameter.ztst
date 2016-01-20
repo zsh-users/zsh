@@ -479,6 +479,8 @@
     '(( 3 + 1 == 8 / 2 ))'
     'for (( i = 1 ; i < 10 ; i++ ))'
     '((0.25542 * 60) - 15)*60'
+    'repeat 3 (x)'
+    'repeat 3 (echo foo; echo bar)'
   )
   for string in $strings; do
     array=(${(z)string})
@@ -514,6 +516,20 @@
 >8:15:
 >9:):
 >10:*60:
+>1:repeat:
+>2:3:
+>3:(:
+>4:x:
+>5:):
+>1:repeat:
+>2:3:
+>3:(:
+>4:echo:
+>5:foo:
+>6:;:
+>7:echo:
+>8:bar:
+>9:):
 
 
   line=$'A line with # someone\'s comment\nanother line # (1 more\nanother one'

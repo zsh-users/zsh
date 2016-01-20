@@ -267,9 +267,13 @@ zshlex(void)
 {
     if (tok == LEXERR)
 	return;
-    do
+    do {
+	if (inrepeat_)
+	    ++inrepeat_;
+	if (inrepeat_ == 3 && isset(SHORTLOOPS))
+	    incmdpos = 1;
 	tok = gettok();
-    while (tok != ENDINPUT && exalias());
+    } while (tok != ENDINPUT && exalias());
     nocorrect &= 1;
     if (tok == NEWLIN || tok == ENDINPUT) {
 	while (hdocs) {
@@ -1899,6 +1903,7 @@ exalias(void)
 		  zshlextext[0] == '}' && !zshlextext[1])) &&
 		(rw = (Reswd) reswdtab->getnode(reswdtab, zshlextext))) {
 		tok = rw->token;
+		inrepeat_ = (tok == REPEAT);
 		if (tok == DINBRACK)
 		    incond = 1;
 	    } else if (incond && !strcmp(zshlextext, "]]")) {
