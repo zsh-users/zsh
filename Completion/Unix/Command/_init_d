@@ -1,6 +1,7 @@
 #compdef -p */(init|rc[0-9S]#).d/*
 
 local cmds script
+local -a flags
 
 _compskip=all
 
@@ -41,6 +42,23 @@ if [[ $OSTYPE = freebsd* ]]; then
 
     return 0
   }
+elif [[ $OSTYPE = openbsd* ]]; then
+  (( $+functions[_init_d_fullpath] )) ||
+  _init_d_fullpath() {
+    echo /etc/rc.d/$1
+    return 0
+  }
+
+  (( $+functions[_init_d_get_cmds] )) ||
+  _init_d_get_cmds() {
+    local -a cmds disabled
+
+    cmds=(start stop reload restart check)
+    disabled=(${${${(M)${(f)"$(< $script)"}:#rc_(${(~j:|:)cmds})=NO}#rc_}%=NO})
+    echo ${cmds:|disabled}
+  }
+
+  flags=('-d[print debug information]' '-f[forcibly start the daemon]')
 else
   (( $+functions[_init_d_fullpath] )) ||
   _init_d_fullpath() {
@@ -90,4 +108,4 @@ cmds=( $(_init_d_get_cmds) ) || return
 (( $#cmds )) || zstyle -a ":completion:${curcontext}:commands" commands cmds ||
     cmds=(start stop)
 
-_sub_commands $cmds
+_arguments -s -A "-*" $flags ':init.d command:_sub_commands $cmds'
