@@ -1,4 +1,12 @@
+2016-01-21  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37722: Src/builtin.c, Test/C02cond.zts: test builtin should
+	return status 2 on syntax error.
+
 2016-01-20  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37705: Src/lex.c, Test/D04parameter.ztst: don't turn - to
+	Dash after start of brace parameter.
 
 	* unspoted: Config/version.mk: incremented version to 5.2-dev-1
 	because of parsing change.

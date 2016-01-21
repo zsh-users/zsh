@@ -6531,7 +6531,7 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
 	for (s = argv; *s; s++);
 	if (s == argv || strcmp(s[-1], "]")) {
 	    zwarnnam(name, "']' expected");
-	    return 1;
+	    return 2;
 	}
 	s[-1] = NULL;
     }
@@ -6574,19 +6574,19 @@ bin_test(char *name, char **argv, UNUSED(Options ops), int func)
     if (errflag) {
 	errflag &= ~ERRFLAG_ERROR;
 	zcontext_restore();
-	return 1;
+	return 2;
     }
 
     if (!prog || tok == LEXERR) {
 	zwarnnam(name, tokstr ? "parse error" : "argument expected");
 	zcontext_restore();
-	return 1;
+	return 2;
     }
     zcontext_restore();
 
     if (*curtestarg) {
 	zwarnnam(name, "too many arguments");
-	return 1;
+	return 2;
     }
 
     /* syntax is OK, so evaluate */

@@ -223,27 +223,27 @@ F:Failures in these cases do not indicate a problem in the shell.
 0:substitution in `[' builtin
 
   [ -n foo scrimble ]
-1:argument checking for [ builtin
+2:argument checking for [ builtin
 ?(eval):[:1: too many arguments
 
   test -n foo scramble
-1:argument checking for test builtin
+2:argument checking for test builtin
 ?(eval):test:1: too many arguments
 
   [ -n foo scrimble scromble ]
-1:argument checking for [ builtin
+2:argument checking for [ builtin
 ?(eval):[:1: too many arguments
 
   test -n foo scramble scrumble
-1:argument checking for test builtin
+2:argument checking for test builtin
 ?(eval):test:1: too many arguments
 
   [ -n foo -a -n bar scrimble ]
-1:argument checking for [ builtin
+2:argument checking for [ builtin
 ?(eval):[:1: too many arguments
 
   test -n foo -a -z "" scramble
-1:argument checking for test builtin
+2:argument checking for test builtin
 ?(eval):test:1: too many arguments
 
   fn() {
