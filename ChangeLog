@@ -1,5 +1,7 @@
 2016-01-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37797: StartupFiles/zshrc: StartupFiles/zshrc += run-help
+
 	* 37752: Test/D04parameter.ztst: More tests for the previous
 	patch.
 
