@@ -3142,15 +3142,33 @@ bin_functions(char *name, char **argv, Options ops, int func)
 
 	queue_signals();
 	if (OPT_MINUS(ops,'X')) {
-	    if ((shf = (Shfunc) shfunctab->getnode(shfunctab, scriptname))) {
-		DPUTS(!shf->funcdef,
-		      "BUG: Calling autoload from empty function");
-	    } else {
-		shf = (Shfunc) zshcalloc(sizeof *shf);
-		shfunctab->addnode(shfunctab, ztrdup(scriptname), shf);
+	    Funcstack fs;
+	    char *funcname = NULL;
+	    for (fs = funcstack; fs; fs = fs->prev) {
+		if (fs->tp == FS_FUNC) {
+		    /*
+		     * dupstring here is paranoia but unlikely to be
+		     * problematic
+		     */
+		    funcname = dupstring(fs->name);
+		    break;
+		}
 	    }
-	    shf->node.flags = on;
-	    ret = eval_autoload(shf, scriptname, ops, func);
+	    if (!funcname)
+	    {
+		zerrnam(name, "bad autoload");
+		ret = 1;
+	    } else {
+		if ((shf = (Shfunc) shfunctab->getnode(shfunctab, funcname))) {
+		    DPUTS(!shf->funcdef,
+			  "BUG: Calling autoload from empty function");
+		} else {
+		    shf = (Shfunc) zshcalloc(sizeof *shf);
+		    shfunctab->addnode(shfunctab, ztrdup(funcname), shf);
+		}
+		shf->node.flags = on;
+		ret = eval_autoload(shf, funcname, ops, func);
+	    }
 	} else {
 	    if (OPT_ISSET(ops,'U') && !OPT_ISSET(ops,'u'))
 		on &= ~PM_UNDEFINED;

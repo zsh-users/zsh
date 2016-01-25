@@ -1,5 +1,8 @@
 2016-01-25  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 37765: Src/builtin.c, Test/C04funcdef.ztst: Use FS_FUNC on
+	funcstack to find autoload -X target rather than scriptname.
+
 	* 37776: Src/utils.c: set errflag before calling zwarning() to
 	avoid recursive error messages.
 

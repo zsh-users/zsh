@@ -308,6 +308,19 @@
 ?(eval):6: command not found: firstfn1
 ?(eval):7: command not found: secondfn1
 
+  (
+    fpath=(.)
+    print  "print oops was successfully autoloaded" >oops
+    oops() { eval autoload -X }
+    oops
+    which -x2 oops
+  )
+0:autoload containing eval
+>oops was successfully autoloaded
+>oops () {
+>  print oops was successfully autoloaded
+>}
+
 %clean
 
  rm -f file.in file.out
