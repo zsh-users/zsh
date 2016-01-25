@@ -1,3 +1,8 @@
+2016-01-25  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37776: Src/utils.c: set errflag before calling zwarning() to
+	avoid recursive error messages.
+
 2016-01-23  Matthew Martin  <phy1729@gmail.com>
 
 	* 37725: Completion/Unix/Command/_init_d: Completion: _init_d:

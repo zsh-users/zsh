@@ -169,12 +169,12 @@ VA_DCL
 	    errflag |= ERRFLAG_ERROR;
 	return;
     }
+    errflag |= ERRFLAG_ERROR;
 
     VA_START(ap, fmt);
     VA_GET_ARG(ap, fmt, const char *);
     zwarning(NULL, fmt, ap);
     va_end(ap);
-    errflag |= ERRFLAG_ERROR;
 }
 
 /**/
@@ -188,13 +188,13 @@ VA_DCL
 
     if (errflag || noerrs)
 	return;
+    errflag |= ERRFLAG_ERROR;
 
     VA_START(ap, fmt);
     VA_GET_ARG(ap, cmd, const char *);
     VA_GET_ARG(ap, fmt, const char *);
     zwarning(cmd, fmt, ap);
     va_end(ap);
-    errflag |= ERRFLAG_ERROR;
 }
 
 /**/
