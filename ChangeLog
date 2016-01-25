@@ -7,6 +7,9 @@
 
 2016-01-25  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 37780: Kamil Dudka: Src/utils.c: Careful in case both argzero
+	and scriptname are null in zerr().
+
 	* 37765: Src/builtin.c, Test/C04funcdef.ztst: Use FS_FUNC on
 	funcstack to find autoload -X target rather than scriptname.
 

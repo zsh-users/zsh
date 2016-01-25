@@ -133,9 +133,11 @@ zwarning(const char *cmd, const char *fmt, va_list ap)
     if (isatty(2))
 	zleentry(ZLE_CMD_TRASH);
 
+    char *prefix = scriptname ? scriptname : (argzero ? argzero : "");
+
     if (cmd) {
 	if (unset(SHINSTDIN) || locallevel) {
-	    nicezputs(scriptname ? scriptname : argzero, stderr);
+	    nicezputs(prefix, stderr);
 	    fputc((unsigned char)':', stderr);
 	}
 	nicezputs(cmd, stderr);
@@ -147,8 +149,7 @@ zwarning(const char *cmd, const char *fmt, va_list ap)
 	 * program/script is running.  It's also set in shell functions,
 	 * so test locallevel, too.
 	 */
-	nicezputs((isset(SHINSTDIN) && !locallevel) ? "zsh" :
-		  scriptname ? scriptname : argzero, stderr);
+	nicezputs((isset(SHINSTDIN) && !locallevel) ? "zsh" : prefix, stderr);
 	fputc((unsigned char)':', stderr);
     }
 
