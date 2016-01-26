@@ -481,6 +481,9 @@
     '((0.25542 * 60) - 15)*60'
     'repeat 3 (x)'
     'repeat 3 (echo foo; echo bar)'
+    'repeat $(( 2 + 4 )) (x)'
+    'repeat $( : foo bar; echo 4) (x)'
+    'repeat "1"'\''2'\''$(( 3 + 0 ))$((echo 4);)\ 5 (x)'
   )
   for string in $strings; do
     array=(${(z)string})
@@ -530,6 +533,21 @@
 >7:echo:
 >8:bar:
 >9:):
+>1:repeat:
+>2:$(( 2 + 4 )):
+>3:(:
+>4:x:
+>5:):
+>1:repeat:
+>2:$( : foo bar; echo 4):
+>3:(:
+>4:x:
+>5:):
+>1:repeat:
+>2:"1"'2'$(( 3 + 0 ))$((echo 4);)\ 5:
+>3:(:
+>4:x:
+>5:):
 
 
   line=$'A line with # someone\'s comment\nanother line # (1 more\nanother one'
