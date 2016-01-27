@@ -5258,7 +5258,8 @@ printparamnode(HashNode hn, int printflags)
 
     if (printflags & PRINT_TYPESET) {
 	if ((p->node.flags & (PM_READONLY|PM_SPECIAL)) ==
-	    (PM_READONLY|PM_SPECIAL)) {
+	    (PM_READONLY|PM_SPECIAL) ||
+	    (p->node.flags & PM_AUTOLOAD)) {
 	    /*
 	     * It's not possible to restore the state of
 	     * these, so don't output.
