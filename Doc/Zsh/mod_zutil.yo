@@ -179,13 +179,14 @@ item(tt(zregexparse))(
 This implements some internals of the tt(_regex_arguments) function.
 )
 findex(zparseopts)
-item(tt(zparseopts) [ tt(-DKME) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] var(spec) ...)(
+item(tt(zparseopts) [ tt(-D) tt(-K) tt(-M) tt(-E) ] [ tt(-a) var(array) ] [ tt(-A) var(assoc) ] var(spec) ...)(
 This builtin simplifies the parsing of options in positional parameters,
 i.e. the set of arguments given by tt($*).  Each var(spec) describes one
 option and must be of the form `var(opt)[tt(=)var(array)]'.  If an option
 described by var(opt) is found in the positional parameters it is copied
 into the var(array) specified with the tt(-a) option; if the optional
-`tt(=)var(array)' is given, it is instead copied into that array.
+`tt(=)var(array)' is given, it is instead copied into that array, which
+should be declared as a normal array and never as an associative array.
 
 Note that it is an error to give any var(spec) without an
 `tt(=)var(array)' unless one of the tt(-a) or tt(-A) options is used.
@@ -232,7 +233,10 @@ first colon.
 )
 enditem()
 
-The options of tt(zparseopts) itself are:
+The options of tt(zparseopts) itself cannot be stacked because, for
+example, the stack `tt(-DEK)' is indistinguishable from a var(spec) for
+the GNU-style long option `tt(--DEK)'.  The options of tt(zparseopts)
+itself are:
 
 startitem()
 item(tt(-a) var(array))(
