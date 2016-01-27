@@ -5,6 +5,11 @@
 
 2016-01-26  Barton E. Schaefer  <schaefer@brasslantern.com>
 
+	* 37802: Doc/Zsh/mod_zutil.yo: Clarify zparseopts description.
+
+	* 37802: Src/Modules/zutil.c: zparseopts "X::" specifier should
+	also look for the optional argument in the word after "-X".
+
 	* 37785: Src/params.c: skip autoload parameters for "typeset -p"
 
 2016-01-25  Barton E. Schaefer  <schaefer@zsh.org>

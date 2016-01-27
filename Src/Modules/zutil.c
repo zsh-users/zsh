@@ -1833,7 +1833,8 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    if (o[1]) {
 			add_opt_val(d, o + 1);
 			break;
-		    } else if (!(d->flags & ZOF_OPT)) {
+		    } else if (!(d->flags & ZOF_OPT) ||
+			       (pp[1] && pp[1][0] != '-')) {
 			if (!pp[1]) {
 			    zwarnnam(nam, "missing argument for option: %s",
 				    d->name);
@@ -1859,7 +1860,8 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
 		if (*e)
 		    add_opt_val(d, e);
-		else if (!(d->flags & ZOF_OPT)) {
+		else if (!(d->flags & ZOF_OPT) ||
+			 (pp[1] && pp[1][0] != '-')) {
 		    if (!pp[1]) {
 			zwarnnam(nam, "missing argument for option: %s",
 				d->name);
