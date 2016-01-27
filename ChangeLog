@@ -1,3 +1,8 @@
+2016-01-28  Eric Cook  <llua@gmx.com>
+
+	* 37814: Kamil Dudka: Functions/Misc/run-help-ip: use /bin/zsh
+	as the shebang.
+
 2016-01-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 37804 (plus error return per 37816): Src/loop.c: first word

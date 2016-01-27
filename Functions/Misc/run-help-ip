@@ -1,4 +1,4 @@
-#! zsh -f
+#!/bin/zsh -f
 #
 # Install this function by placing it in your FPATH and then
 # adding to your .zshrc the line if you use run-help function:
