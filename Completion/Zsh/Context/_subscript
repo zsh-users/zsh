@@ -81,8 +81,8 @@ elif compset -P '\('; then
 elif [[ ${(Pt)${compstate[parameter]}} = assoc* ]]; then
   local suf MATCH MBEGIN MEND
   local -a keys
-  keys=(${${(kP)compstate[parameter]}//(#m)[\$\\\[\]\(\)\[\{\}]/\\$MATCH})
-  keys=(${keys//#%(#m)[*@]/(e)$MATCH})
+  keys=("${(@)${(@k)${(P)compstate[parameter]}}//(#m)[\$\\\[\]\(\)\[\{\}]/\\$MATCH}")
+  keys=("${(@)keys//#%(#m)[*@]/(e)$MATCH}")
   [[ "$RBUFFER" != (|\\)\]* ]] && suf="$osuf"
 
   _wanted association-keys expl 'association key' \
