@@ -493,7 +493,9 @@ execrepeat(Estate state, UNUSED(int do_exec))
     tmp = ecgetstr(state, EC_DUPTOK, &htok);
     if (htok)
 	singsub(&tmp);
-    count = atoi(tmp);
+    count = mathevali(tmp);
+    if (errflag)
+	return 1;
     pushheap();
     cmdpush(CS_REPEAT);
     loops++;

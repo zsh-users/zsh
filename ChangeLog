@@ -1,5 +1,8 @@
 2016-01-27  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37804 (plus error return per 37816): Src/loop.c: first word
+	following "repeat" should be evaluated as math, to match docs
+
 	* 37819: Src/hist.c: zshaddhistory hook is intended to work for
 	any history file write, even upon keyboard interrupt
 
