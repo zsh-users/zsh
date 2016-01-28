@@ -1,9 +1,14 @@
+2016-01-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37810: Src/Modules/zutil.c: repair handling of backslashes and
+	of names starting with "+"/":"/"=" in zparseopts option specs
+
 2016-01-26  Eric Cook  <llua@gmx.com>
 
 	* 37788: Completion/Zsh/Context/_subscript: fix completion of
 	associative array keys
 
-2016-01-26  Barton E. Schaefer  <schaefer@brasslantern.com>
+2016-01-26  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 37802: Doc/Zsh/mod_zutil.yo: Clarify zparseopts description.
 

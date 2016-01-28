@@ -1745,13 +1745,15 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	for (p = o; *p; p++) {
 	    if (*p == '\\' && p[1])
 		p++;
-	    else if (*p == '+') {
-		f |= ZOF_MULT;
-		*p = '\0';
-		p++;
-		break;
-	    } else if (*p == ':' || *p == '=')
-		break;
+	    else if (p > o) {	/* At least one character of option name */
+		if (*p == '+') {
+		    f |= ZOF_MULT;
+		    *p = '\0';
+		    p++;
+		    break;
+		} else if (*p == ':' || *p == '=')
+		    break;
+	    }
 	}
 	if (*p == ':') {
 	    f |= ZOF_ARG;
@@ -1789,6 +1791,7 @@ bin_zparseopts(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		p++;
 	    *n++ = *p;
 	}
+	*n = '\0';
 	if (get_opt_desc(o)) {
 	    zwarnnam(nam, "option defined more than once: %s", o);
 	    return 1;
