@@ -1378,7 +1378,6 @@ should_ignore_line(Eprog prog)
 mod_export int
 hend(Eprog prog)
 {
-    LinkList hookargs = newlinklist();
     int flag, hookret, stack_pos = histsave_stack_pos;
     /*
      * save:
@@ -1418,9 +1417,17 @@ hend(Eprog prog)
 	DPUTS(hptr < chline, "History end pointer off start of line");
 	*hptr = '\0';
     }
-    addlinknode(hookargs, "zshaddhistory");
-    addlinknode(hookargs, chline);
-    callhookfunc("zshaddhistory", hookargs, 1, &hookret);
+    {
+	LinkList hookargs = newlinklist();
+	int save_errflag = errflag;
+	errflag = 0;
+
+	addlinknode(hookargs, "zshaddhistory");
+	addlinknode(hookargs, chline);
+	callhookfunc("zshaddhistory", hookargs, 1, &hookret);
+
+	errflag |= save_errflag;
+    }
     /* For history sharing, lock history file once for both read and write */
     hf = getsparam("HISTFILE");
     if (isset(SHAREHISTORY) && !lockhistfile(hf, 0)) {

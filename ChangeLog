@@ -1,5 +1,8 @@
 2016-01-27  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37819: Src/hist.c: zshaddhistory hook is intended to work for
+	any history file write, even upon keyboard interrupt
+
 	* 37810: Src/Modules/zutil.c: repair handling of backslashes and
 	of names starting with "+"/":"/"=" in zparseopts option specs
 
