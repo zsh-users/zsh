@@ -1826,6 +1826,23 @@ reserved word interface for tt(typeset) may cause problems with the
 output of `tt(typeset -p)', which assumes the reserved word interface is
 available in order to restore array and associative array values.
 
+Unlike parameter assignment statements, tt(typeset)'s exit status on an
+assignment that involves a command substitution does not reflect the exit
+status of the command substitution.  Therefore, to test for an error in
+a command substitution, separate the declaration of the parameter from its
+initialization:
+
+example(# WRONG
+typeset var1=$(exit 1) || echo "Trouble with var1"
+
+# RIGHT
+typeset var1 && var1=$(exit 1) || echo "Trouble with var1"
+)
+
+To initialize a parameter var(param) to a command output and mark it readonly,
+use tt(typeset -r )var(param) or tt(readonly )var(param) after the parameter
+assignment statement.
+
 If the shell option tt(TYPESET_SILENT) is not set, for each remaining
 var(name) that refers to a parameter that is already set, the name and
 value of the parameter are printed in the form of an assignment.
