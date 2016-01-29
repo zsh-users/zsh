@@ -32,7 +32,7 @@ details, see the documentation.
 Incompatibilities between 5.2 and 5.3
 -------------------------------------
 
-In character classes delimited by "[" and "]" within patterns, whether
+1) In character classes delimited by "[" and "]" within patterns, whether
 used for filename generation (globbing) or other forms of pattern
 matching, it used not to be possible to quote "-" when used for a range,
 or "^" and "!" when used for negating a character set.  The characters can
@@ -57,6 +57,11 @@ of this change is that variables that should have active ranges need
 The "~" causes the "-" character to be active.  In sh emulation the
 "~" is unncessary in this example and double quotes must be used to
 suppress the range behaviour of the "-".
+
+2) The first argument to 'repeat' is now evaluated as an arithmetic
+expression.  It was always documented to be an arithmetic expression, but
+until now the decimal integer at the start of the value was used and the
+remainder of the value discarded.
 
 Incompatibilities between 5.0.8 and 5.2
 ---------------------------------------
