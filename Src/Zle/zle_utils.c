@@ -1678,7 +1678,7 @@ viundochange(char **args)
 
 /**/
 int
-splitundo(char **args)
+splitundo(UNUSED(char **args))
 {
     if (vistartchange >= 0) {
 	mergeundo();

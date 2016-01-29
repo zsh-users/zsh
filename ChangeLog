@@ -1,3 +1,16 @@
+2016-01-30  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 37838: Src/Builtins/rlimits.c, Src/Builtins/sched.c,
+	Src/Modules/curses.c, Src/Modules/datetime.c, Src/Modules/db_gdbm.c,
+	Src/Modules/files.c, Src/Modules/langinfo.c, Src/Modules/mapfile.c,
+	Src/Modules/mathfunc.c, Src/Modules/newuser.c, Src/Modules/parameter.c,
+	Src/Modules/pcre.c, Src/Modules/regex.c, Src/Modules/socket.c,
+	Src/Modules/stat.c, Src/Modules/system.c, Src/Modules/tcp.c,
+	Src/Modules/termcap.c, Src/Modules/terminfo.c, Src/Modules/zpty.c,
+	Src/Modules/zselect.c, Src/Modules/zutil.c, Src/Zle/compctl.c,
+	Src/Zle/computil.c, Src/Zle/zle_utils.c, Src/Zle/zle_word.c,
+	Src/hashtable.c, Src/hist.c: use UNUSED() consistently
+
 2016-01-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 37833: README: Document 37804 in README.

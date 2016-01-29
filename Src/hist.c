@@ -468,7 +468,7 @@ herrflush(void)
 
 /**/
 static int
-getsubsargs(char *subline, int *gbalp, int *cflagp)
+getsubsargs(UNUSED(char *subline), int *gbalp, int *cflagp)
 {
     int del, follow;
     char *ptr1, *ptr2;

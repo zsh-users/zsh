@@ -498,7 +498,7 @@ boot_(UNUSED(Module m))
 
 /**/
 int
-cleanup_(UNUSED(Module m))
+cleanup_(Module m)
 {
     return setfeatureenables(m, &module_features, NULL);
 }

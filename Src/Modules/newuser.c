@@ -41,14 +41,14 @@ setup_(UNUSED(Module m))
 
 /**/
 int
-features_(Module m, char ***features)
+features_(UNUSED(Module m), UNUSED(char ***features))
 {
     return 1;
 }
 
 /**/
 int
-enables_(Module m, int **enables)
+enables_(UNUSED(Module m), UNUSED(int **enables))
 {
     return 0;
 }

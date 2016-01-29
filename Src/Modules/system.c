@@ -439,7 +439,7 @@ bin_sysseek(char *nam, char **args, Options ops, UNUSED(int func))
 
 /**/
 static mnumber
-math_systell(UNUSED(char *name), int argc, mnumber *argv, UNUSED(int id))
+math_systell(UNUSED(char *name), UNUSED(int argc), mnumber *argv, UNUSED(int id))
 {
     int fd = (argv->type == MN_INTEGER) ? argv->u.l : (int)argv->u.d;
     mnumber ret;
@@ -834,7 +834,7 @@ enables_(Module m, int **enables)
 
 /**/
 int
-boot_(Module m)
+boot_(UNUSED(Module m))
 {
     return 0;
 }

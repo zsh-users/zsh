@@ -3992,7 +3992,7 @@ enables_(Module m, int **enables)
 
 /**/
 int
-boot_(Module m)
+boot_(UNUSED(Module m))
 {
     addhookfunc("compctl_make", (Hookfn) ccmakehookfn);
     addhookfunc("compctl_cleanup", (Hookfn) cccleanuphookfn);

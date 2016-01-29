@@ -153,7 +153,7 @@ emacsforwardword(char **args)
 
 /**/
 int
-viforwardblankwordend(UNUSED(char **args))
+viforwardblankwordend(char **args)
 {
     int n = zmult;
 

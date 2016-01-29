@@ -299,7 +299,7 @@ zcurses_free_window(ZCWin w)
 }
 
 static struct zcurses_namenumberpair *
-zcurses_attrget(WINDOW *w, char *attr)
+zcurses_attrget(UNUSED(WINDOW *w), char *attr)
 {
     struct zcurses_namenumberpair *zca;
 
@@ -419,7 +419,7 @@ freecolorpairnode(HashNode hn)
  *************/
 
 static int
-zccmd_init(const char *nam, char **args)
+zccmd_init(UNUSED(const char *nam), UNUSED(char **args))
 {
     LinkNode stdscr_win = zcurses_getwindowbyname("stdscr");
 
@@ -808,7 +808,7 @@ zccmd_border(const char *nam, char **args)
 
 
 static int
-zccmd_endwin(const char *nam, char **args)
+zccmd_endwin(UNUSED(const char *nam), UNUSED(char **args))
 {
     LinkNode stdscr_win = zcurses_getwindowbyname("stdscr");
 
@@ -1496,7 +1496,7 @@ zccmd_touch(const char *nam, char **args)
 
 /**/
 static int
-bin_zcurses(char *nam, char **args, Options ops, UNUSED(int func))
+bin_zcurses(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     char **saargs;
     struct zcurses_subcommand *zcsc;
@@ -1693,7 +1693,7 @@ enables_(Module m, int **enables)
 
 /**/
 int
-boot_(Module m)
+boot_(UNUSED(Module m))
 {
     zcurses_windows = znewlinklist();
 

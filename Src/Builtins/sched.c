@@ -411,7 +411,7 @@ enables_(Module m, int **enables)
 
 /**/
 int
-boot_(Module m)
+boot_(UNUSED(Module m))
 {
     addprepromptfn(&checksched);
     return 0;
