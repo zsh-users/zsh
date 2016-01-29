@@ -1,3 +1,8 @@
+2016-01-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Completion/Unix/Command/_init_d: _init_d: Report
+	failure to caller.
+
 2016-01-28  Eric Cook  <llua@gmx.com>
 
 	* 37814: Kamil Dudka: Functions/Misc/run-help-ip: use /bin/zsh

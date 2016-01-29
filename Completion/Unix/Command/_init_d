@@ -103,7 +103,7 @@ fi
 script=$words[1]
 [[ $script = */* ]] || script="$(_init_d_fullpath "$script")"
 
-cmds=( $(_init_d_get_cmds) ) || return
+cmds=( $(_init_d_get_cmds) ) || return 1
 
 (( $#cmds )) || zstyle -a ":completion:${curcontext}:commands" commands cmds ||
     cmds=(start stop)
