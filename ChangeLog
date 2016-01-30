@@ -1,3 +1,8 @@
+2016-01-30  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37844: Doc/Zsh/builtins.yo: reorder typeset introduction to keep
+	related concepts together.
+
 2016-01-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 37831: Doc/Zsh/builtins.yo: typeset: Document exit status

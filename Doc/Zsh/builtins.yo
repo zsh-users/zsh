@@ -1763,18 +1763,31 @@ ifnzman(noderef(Local Parameters))\
 retain their special attributes when made local.
 
 For each var(name)tt(=)var(value) assignment, the parameter
-var(name) is set to var(value).  All forms of the command
-handle scalar assignment.
+var(name) is set to var(value).
 
-If any of the reserved words tt(declare), tt(export), tt(float),
+If the shell option tt(TYPESET_SILENT) is not set, for each remaining
+var(name) that refers to a parameter that is already set, the name and
+value of the parameter are printed in the form of an assignment.
+Nothing is printed for newly-created parameters, or when any attribute
+flags listed below are given along with the var(name).  Using
+`tt(PLUS())' instead of minus to introduce an attribute turns it off.
+
+If no var(name) is present, the names and values of all parameters are
+printed.  In this case the attribute flags restrict the display to only
+those parameters that have the specified attributes, and using `tt(PLUS())'
+rather than `tt(-)' to introduce the flag suppresses printing of the values
+of parameters when there is no parameter name.
+
+All forms of the command handle scalar assignment.  Array assignment is
+possible if any of the reserved words tt(declare), tt(export), tt(float),
 tt(integer), tt(local), tt(readonly) or tt(typeset) is matched when the
-line is parsed (N.B. not when it is executed) the shell will try to parse
-arguments as assignments, except that the `tt(+=)' syntax and the
-tt(GLOB_ASSIGN) option are not supported.  This has two major differences
-from normal command line argument parsing: array assignment is possible,
-and scalar values after tt(=) are not split further into words even if
-expanded (regardless of the setting of the tt(KSH_TYPESET) option; this
-option is obsolete).  Here is an example:
+line is parsed (N.B. not when it is executed).  In this case the arguments
+are parsed as assignments, except that the `tt(+=)' syntax and the
+tt(GLOB_ASSIGN) option are not supported, and scalar values after tt(=)
+are em(not) split further into words, even if expanded (regardless of the
+setting of the tt(KSH_TYPESET) option; this option is obsolete).
+
+Examples of the differences between command and reserved word parsing:
 
 example(# Reserved word parsing
 typeset svar=$(echo one word) avar=(several words))
@@ -1842,19 +1855,6 @@ typeset var1 && var1=$(exit 1) || echo "Trouble with var1"
 To initialize a parameter var(param) to a command output and mark it readonly,
 use tt(typeset -r )var(param) or tt(readonly )var(param) after the parameter
 assignment statement.
-
-If the shell option tt(TYPESET_SILENT) is not set, for each remaining
-var(name) that refers to a parameter that is already set, the name and
-value of the parameter are printed in the form of an assignment.
-Nothing is printed for newly-created parameters, or when any attribute
-flags listed below are given along with the var(name).  Using
-`tt(PLUS())' instead of minus to introduce an attribute turns it off.
-
-If no var(name) is present, the names and values of all parameters are
-printed.  In this case the attribute flags restrict the display to only
-those parameters that have the specified attributes, and using `tt(PLUS())'
-rather than `tt(-)' to introduce the flag suppresses printing of the values
-of parameters when there is no parameter name.
 
 If no attribute flags are given, and either no var(name) arguments are
 present or the flag tt(+m) is used, then each parameter name printed is
