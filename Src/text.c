@@ -47,7 +47,7 @@ int text_expand_tabs;
  */
 static const char *cond_binary_ops[] = {
     "=", "!=", "<", ">", "-nt", "-ot", "-ef", "-eq",
-    "-ne", "-lt", "-gt", "-le", "-ge", "=~"
+    "-ne", "-lt", "-gt", "-le", "-ge", "=~", NULL
 };
 
 static char *tptr, *tbuf, *tlim, *tpending;
