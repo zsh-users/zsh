@@ -1,5 +1,9 @@
 2016-01-30  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37845: Doc/Zsh/builtins.yo: Forward-reference typeset instances
+	where no parameter is created, and remove the obsolete statement
+	about array assignments separated from typeset command on -p.
+
 	* 37844: Doc/Zsh/builtins.yo: reorder typeset introduction to keep
 	related concepts together.
 
