@@ -1970,9 +1970,9 @@ struct bgstatus {
 };
 typedef struct bgstatus *Bgstatus;
 /* The list of those entries */
-LinkList bgstatus_list;
+static LinkList bgstatus_list;
 /* Count of entries.  Reaches value of _SC_CHILD_MAX and stops. */
-long bgstatus_count;
+static long bgstatus_count;
 
 /*
  * Remove and free a bgstatus entry.
@@ -2372,7 +2372,7 @@ bin_fg(char *name, char **argv, Options ops, int func)
     return retval;
 }
 
-const struct {
+static const struct {
     const char *name;
     int num;
 } alt_sigs[] = {

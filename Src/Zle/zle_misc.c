@@ -1497,7 +1497,7 @@ struct suffixset {
 };
 
 /* The list of suffix structures */
-struct suffixset *suffixlist;
+static struct suffixset *suffixlist;
 
 /* Shell function to call to remove the suffix. */
 

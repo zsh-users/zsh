@@ -1831,7 +1831,7 @@ struct colour_sequences {
     char *end;			/* Escape sequence terminator */
     char *def;			/* Code to reset default colour */
 };
-struct colour_sequences fg_bg_sequences[2];
+static struct colour_sequences fg_bg_sequences[2];
 
 /*
  * We need a buffer for colour sequence composition.  It may

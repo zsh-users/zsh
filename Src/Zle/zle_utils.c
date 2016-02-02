@@ -587,7 +587,7 @@ struct zle_position {
 };
 
 /* LIFO stack of positions */
-struct zle_position *zle_positions;
+static struct zle_position *zle_positions;
 
 /*
  * Save positions including cursor, end-of-line and
@@ -1412,7 +1412,7 @@ zlong undo_changeno;
 
 /* If positive, don't undo beyond this point */
 
-zlong undo_limitno;
+static zlong undo_limitno;
 
 /**/
 void

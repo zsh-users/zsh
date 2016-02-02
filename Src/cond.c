@@ -30,7 +30,8 @@
 #include "zsh.mdh"
 #include "cond.pro"
 
-int tracingcond;
+/**/
+int tracingcond;    /* updated by execcond() in exec.c */
 
 static char *condstr[COND_MOD] = {
     "!", "&&", "||", "==", "!=", "<", ">", "-nt", "-ot", "-ef", "-eq",

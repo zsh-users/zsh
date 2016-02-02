@@ -416,7 +416,7 @@ IPDEF10("pipestatus", pipestatus_gsu),
  * and $@, this is not readonly.  This parameter is not directly
  * visible in user space.
  */
-initparam argvparam_pm = IPDEF9F("", &pparams, NULL, \
+static initparam argvparam_pm = IPDEF9F("", &pparams, NULL, \
 				 PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT);
 
 #undef BR

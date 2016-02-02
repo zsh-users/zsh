@@ -1,3 +1,11 @@
+2016-02-03  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 37868: Src/Modules/curses.c, Src/Modules/param_private.c,
+	Src/Modules/tcp.c, Src/Modules/termcap.c, Src/Modules/zftp.c,
+	Src/Zle/complist.c, Src/Zle/zle_misc.c, Src/Zle/zle_utils.c,
+	Src/cond.c, Src/exec.c, Src/glob.c, Src/jobs.c, Src/params.c,
+	Src/prompt.c, Src/utils.c: add 'static' to file local variables.
+
 2016-01-31  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 37859: Src/text.c: NULL-terminate cond_binary_ops static array.

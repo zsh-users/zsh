@@ -4518,8 +4518,6 @@ spawnpipes(LinkList l, int nullexec)
     }
 }
 
-extern int tracingcond;
-
 /* evaluate a [[ ... ]] */
 
 /**/

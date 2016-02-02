@@ -208,7 +208,7 @@ freehostent(UNUSED(struct hostent *ptr))
 /**/
 #endif /* !HAVE_GETIPNODEBYNAME */
 
-LinkList ztcp_sessions;
+static LinkList ztcp_sessions;
 
 /* "allocate" a tcp_session */
 static Tcp_session

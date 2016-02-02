@@ -202,7 +202,7 @@ static const struct zcurses_mouse_event zcurses_mouse_map[] = {
     { 0, 0, 0 }
 };
 
-mmask_t zcurses_mouse_mask = ALL_MOUSE_EVENTS;
+static mmask_t zcurses_mouse_mask = ALL_MOUSE_EVENTS;
 
 #endif
 

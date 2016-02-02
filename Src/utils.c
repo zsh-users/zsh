@@ -56,12 +56,12 @@ typedef struct widechar_array *Widechar_array;
  * The wordchars variable turned into a wide character array.
  * This is much more convenient for testing.
  */
-struct widechar_array wordchars_wide;
+static struct widechar_array wordchars_wide;
 
 /*
  * The same for the separators (IFS) array.
  */
-struct widechar_array ifs_wide;
+static struct widechar_array ifs_wide;
 
 /* Function to set one of the above from the multibyte array */
 

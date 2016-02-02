@@ -306,7 +306,7 @@ statfullpath(const char *s, struct stat *st, int l)
 /* This may be set by qualifier functions to an array of strings to insert
  * into the list instead of the original string. */
 
-char **inserts;
+static char **inserts;
 
 /* add a match to the list */
 

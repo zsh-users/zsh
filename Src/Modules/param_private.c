@@ -42,19 +42,19 @@ struct gsu_closure {
     void *g;
 };
 
-const struct gsu_scalar scalar_private_gsu =
+static const struct gsu_scalar scalar_private_gsu =
 { pps_getfn, pps_setfn, pps_unsetfn };
 
-const struct gsu_integer integer_private_gsu =
+static const struct gsu_integer integer_private_gsu =
 { ppi_getfn, ppi_setfn, ppi_unsetfn };
 
-const struct gsu_float float_private_gsu =
+static const struct gsu_float float_private_gsu =
 { ppf_getfn, ppf_setfn, ppf_unsetfn };
 
-const struct gsu_array array_private_gsu =
+static const struct gsu_array array_private_gsu =
 { ppa_getfn, ppa_setfn, ppa_unsetfn };
 
-const struct gsu_hash hash_private_gsu =
+static const struct gsu_hash hash_private_gsu =
 { pph_getfn, pph_setfn, pph_unsetfn };
 
 /*

@@ -295,7 +295,7 @@ scantermcap(UNUSED(HashTable ht), ScanFunc func, int flags)
     }
 }
 
-struct paramdef partab[] = {
+static struct paramdef partab[] = {
     SPECIALPMDEF("termcap", PM_READONLY, NULL, gettermcap, scantermcap)
 };
 

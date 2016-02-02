@@ -344,10 +344,10 @@ static int zfsesscnt;
  */
 
 /* flags for alarm set, alarm gone off */
-int zfalarmed, zfdrrrring;
+static int zfalarmed, zfdrrrring;
 /* remember old alarm status */
-time_t oaltime;
-unsigned int oalremain;
+static time_t oaltime;
+static unsigned int oalremain;
 
 /*
  * Where to jump to when the alarm goes off.  This is much
@@ -357,7 +357,7 @@ unsigned int oalremain;
  *
  * gcc -O gives apparently spurious `may be clobbered by longjmp' warnings.
  */
-jmp_buf zfalrmbuf;
+static jmp_buf zfalrmbuf;
 
 /* The signal handler itself */
 

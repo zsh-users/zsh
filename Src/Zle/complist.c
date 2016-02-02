@@ -113,7 +113,7 @@ static Cmgroup *mgtab, *mgtabp;
  * Allow us to keep track of pointer arithmetic for mgtab; could
  * just as well have been for mtab but wasn't.
  */
-int mgtabsize;
+static int mgtabsize;
 #endif
 
 /*
