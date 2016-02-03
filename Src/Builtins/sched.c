@@ -58,7 +58,7 @@ static int schedcmdtimed;
 
 /**/
 static void
-schedaddtimed(time_t t)
+schedaddtimed(void)
 {
     /*
      * The following code shouldn't be necessary and indicates
@@ -140,7 +140,7 @@ checksched(void)
 	     */
 	    DPUTS(timedfns && firstnode(timedfns),
 		  "BUG: already timed fn (1)");
-	    schedaddtimed(schedcmds->time);
+	    schedaddtimed();
 	}
     }
 }
@@ -180,7 +180,7 @@ bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 		schedcmds = sch->next;
 		if (schedcmds) {
 		    DPUTS(timedfns && firstnode(timedfns), "BUG: already timed fn (2)");
-		    schedaddtimed(schedcmds->time);
+		    schedaddtimed();
 		}
 	    }
 	    zsfree(sch->cmd);
@@ -317,7 +317,7 @@ bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    sch->next = schedcmds;
 	    schedcmds = sch;
 	    DPUTS(timedfns && firstnode(timedfns), "BUG: already timed fn (3)");
-	    schedaddtimed(t);
+	    schedaddtimed();
 	} else {
 	    for (sch2 = schedcmds;
 		 sch2->next && sch2->next->time < sch->time;
@@ -330,7 +330,7 @@ bin_sched(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	sch->next = NULL;
 	schedcmds = sch;
 	DPUTS(timedfns && firstnode(timedfns), "BUG: already timed fn (4)");
-	schedaddtimed(t);
+	schedaddtimed();
     }
     return 0;
 }

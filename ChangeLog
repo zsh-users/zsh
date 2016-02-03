@@ -1,3 +1,7 @@
+2016-02-04  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 37874: Src/Builtins/sched.c: remove unused function argument.
+
 2016-02-03  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 37868: Src/Modules/curses.c, Src/Modules/param_private.c,
