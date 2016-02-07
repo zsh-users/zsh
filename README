@@ -61,7 +61,9 @@ suppress the range behaviour of the "-".
 2) The first argument to 'repeat' is now evaluated as an arithmetic
 expression.  It was always documented to be an arithmetic expression, but
 until now the decimal integer at the start of the value was used and the
-remainder of the value discarded.
+remainder of the value discarded.  This could lead to different behaviour
+if the argument contains non-numeric characters, or if the argument has
+leading zeroes and the OCTAL_ZEROES option is set.
 
 Incompatibilities between 5.0.8 and 5.2
 ---------------------------------------
