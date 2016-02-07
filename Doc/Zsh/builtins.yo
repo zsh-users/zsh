@@ -81,6 +81,10 @@ then commands are read from that file instead of var(file).
 If any arguments var(arg) are given,
 they become the positional parameters; the old positional
 parameters are restored when the var(file) is done executing.
+However, if no arguments are given,
+the positional parameters remain those of the calling context,
+and no restoring is done.
+
 If var(file) was not found the return status is 127; if var(file) was found
 but contained a syntax error the return status is 126; else the return
 status is the exit status of the last command executed.
