@@ -813,6 +813,7 @@ createparamtable(void)
     setsparam("TTY", ztrdup_metafy(ttystrname));
     setsparam("VENDOR", ztrdup_metafy(VENDOR));
     setsparam("ZSH_NAME", ztrdup_metafy(zsh_name));
+    setsparam("ZSH_SCRIPT", ztrdup(posixzero));
     setsparam("ZSH_VERSION", ztrdup_metafy(ZSH_VERSION));
     setsparam("ZSH_PATCHLEVEL", ztrdup_metafy(ZSH_PATCHLEVEL));
     setaparam("signals", sigptr = zalloc((SIGCOUNT+4) * sizeof(char *)));
