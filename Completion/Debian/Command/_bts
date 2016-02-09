@@ -42,7 +42,7 @@ case "$words[1]" in
     if [[ CURRENT -eq 2 ]]; then
       _alternative \
 	'packages:package:_deb_packages avail' \
-        "emails:package maintainer:compadd $DEBEMAIL"
+        'emails:package maintainer:compadd $DEBEMAIL'
     else
       _wanted sep expl 'separator' compadd -S ' ' , .
     fi
@@ -51,7 +51,7 @@ case "$words[1]" in
     if [[ CURRENT -eq 2 ]]; then
       _message -e bugnum 'bug number'
     elif [[ CURRENT -eq 3 ]]; then
-      _wanted submitter expl 'new submitter' compadd $DEBEMAIL
+      _wanted submitter expl 'new submitter' compadd -- $DEBEMAIL
     else
       _wanted sep expl 'separator' compadd -S ' ' , .
     fi

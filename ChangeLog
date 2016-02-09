@@ -1,5 +1,8 @@
 2016-02-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37923: Completion/Debian/Command/_bts: Completion: _bts:
+	Fix quoting of $DEBEMAIL.
+
 	* 37922: Util/zyodl.vim: zyodl.vim: Add alternative installation
 	instructions.
 
