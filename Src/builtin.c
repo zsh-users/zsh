@@ -3350,15 +3350,24 @@ bin_unset(char *name, char **argv, Options ops, int func)
     /* do not glob -- unset the given parameter */
     queue_signals();
     while ((s = *argv++)) {
-	char *ss = strchr(s, '[');
-	char *sse = ss;
+	char *ss = strchr(s, '['), *subscript = 0;
 	if (ss) {
-	    if (skipparens('[', ']', &sse) || *sse) {
-		zerrnam(name, "%s: invalid parameter name", s);
-		returnval = 1;
-		continue;
-	    }
+	    char *sse;
 	    *ss = 0;
+	    if ((sse = parse_subscript(ss+1, 1, ']'))) {
+		*sse = 0;
+		subscript = dupstring(ss+1);
+		*sse = ']';
+		remnulargs(subscript);
+		untokenize(subscript);
+	    }
+	}
+	if ((ss && !subscript) || !isident(s)) {
+	    if (ss)
+		*ss = '[';
+	    zerrnam(name, "%s: invalid parameter name", s);
+	    returnval = 1;
+	    continue;
 	}
 	pm = (Param) (paramtab == realparamtab ?
 		      /* getnode2() to avoid autoloading */
@@ -3376,11 +3385,8 @@ bin_unset(char *name, char **argv, Options ops, int func)
 	} else if (ss) {
 	    if (PM_TYPE(pm->node.flags) == PM_HASHED) {
 		HashTable tht = paramtab;
-		if ((paramtab = pm->gsu.h->getfn(pm))) {
-		    *--sse = 0;
-		    unsetparam(ss+1);
-		    *sse = ']';
-		}
+		if ((paramtab = pm->gsu.h->getfn(pm)))
+		    unsetparam(subscript);
 		paramtab = tht;
 	    } else if (PM_TYPE(pm->node.flags) == PM_SCALAR ||
 		       PM_TYPE(pm->node.flags) == PM_ARRAY) {

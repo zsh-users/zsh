@@ -15,6 +15,12 @@
 	* unposted: ChangeLog: Move the 37678 entry to the correct
 	location (and author).
 
+2016-02-08  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37914: Src/builtin.c, Test/E01options.ztst: reparse associative
+	array subscripts in "unset" so keys with "[" or "]" may be
+	backslash-escaped.  Fix erroneous test case this revealed.
+
 2016-02-07  Dominik Ritter  <dritter03@googlemail.com>
 
 	* unposted: Doc/Zsh/mod_complist.yo: complist module docs:

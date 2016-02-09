@@ -776,7 +776,7 @@
   unsetopt pathdirs
   pathtestdir/findme
   path=($oldpath)
-  unset $oldpath
+  unset oldpath
   rm -rf pdt_topdir pathtestdir
 0:PATH_DIRS option
 >File in upper dir
