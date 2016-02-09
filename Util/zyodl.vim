@@ -10,6 +10,8 @@
 " 2. Create ~/.vim/filetype.vim as explained in ":help new-filetype" case C.
 " 3. Add the following command to ~/.vim/filetype.vim:
 "      autocmd BufRead,BufNewFile **/Doc/Zsh/*.yo setfiletype zyodl
+" Or alternatively:
+" 1. Append the contents of Doc/Zsh/.vimrc to your .vimrc, changing «<sfile>» to «%».
 
 "" Test case:
 "   texinode()()()()

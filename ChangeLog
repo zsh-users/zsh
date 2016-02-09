@@ -1,5 +1,8 @@
 2016-02-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 37922: Util/zyodl.vim: zyodl.vim: Add alternative installation
+	instructions.
+
 	* 37896: Doc/Zsh/builtins.yo: zshbuiltins: Document argv
 	behaviour of 'source' without arguments
 
