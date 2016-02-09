@@ -2001,6 +2001,11 @@ item(tt(-U))(
 For arrays (but not for associative arrays), keep only the first
 occurrence of each duplicated value.  This may also be set for
 colon-separated special parameters like tt(PATH) or tt(FIGNORE), etc.
+Note the flag takes effect on assignment, and the type of the
+variable being assigned to is determinative; for variables with
+shared values it is therefore recommended to set the flag for
+all interfaces, e.g. `tt(typeset -U PATH path)'.
+
 This flag has a different meaning when used with tt(-f); see below.
 )
 item(tt(-Z) [ var(n) ])(
