@@ -406,7 +406,7 @@ _git-check-ignore () {
     '-z[make output format machine-parseable and treat input-paths as NUL-separated with --stdin]' \
     '(-n --non-matching)'{-n,--non-matching}'[show given paths which do not match any pattern]' \
     '--no-index[do not look in the index when undertaking the checks]' \
-    '*:: :->file' && ret=0
+    '*:: :_files'
 }
 
 (( $+functions[_git-check-mailmap] )) ||
