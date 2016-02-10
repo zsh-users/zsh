@@ -26,6 +26,11 @@
 	array subscripts in "unset" so keys with "[" or "]" may be
 	backslash-escaped.  Fix erroneous test case this revealed.
 
+2016-02-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 37895: Src/params.c, Doc/Zsh/parmas.yo: add ZSH_SCRIPT as
+	always available form of POISX $0.
+
 2016-02-07  Dominik Ritter  <dritter03@googlemail.com>
 
 	* unposted: Doc/Zsh/mod_complist.yo: complist module docs:
