@@ -12,6 +12,11 @@
 	* 37946: Src/utils.c: make rm * warnings more informative about
 	files being deleted.
 
+2016-02-10  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37927: Src/Zle/complist.c: recreate local keymaps as necessary
+	in case the user has deleted them
+
 2016-02-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37893: Doc/Zsh/builtins.yo: document behaviour of typeset -U

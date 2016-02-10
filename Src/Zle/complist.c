@@ -989,6 +989,7 @@ asklistscroll(int ml)
 
     fflush(shout);
     zsetterm();
+    menuselect_bindings();	/* sanity in case deleted by user */
     selectlocalmap(lskeymap);
     if (!(cmd = getkeycmd()) || cmd == Th(z_sendbreak))
 	ret = 1;
@@ -2433,6 +2434,7 @@ domenuselect(Hookdef dummy, Chdata dat)
     unqueue_signals();
     mhasstat = (mstatus && *mstatus);
     fdat = dat;
+    menuselect_bindings();	/* sanity in case deleted by user */
     selectlocalmap(mskeymap);
     noselect = 1;
     while ((menuacc &&
@@ -3486,6 +3488,37 @@ enables_(Module m, int **enables)
 }
 
 /**/
+static void
+menuselect_bindings(void)
+{
+    if (!(mskeymap = openkeymap("menuselect"))) {
+	mskeymap = newkeymap(NULL, "menuselect");
+	linkkeymap(mskeymap, "menuselect", 1);
+	bindkey(mskeymap, "\t", refthingy(t_completeword), NULL);
+	bindkey(mskeymap, "\n", refthingy(t_acceptline), NULL);
+	bindkey(mskeymap, "\r", refthingy(t_acceptline), NULL);
+	bindkey(mskeymap, "\33[A",  refthingy(t_uplineorhistory), NULL);
+	bindkey(mskeymap, "\33[B",  refthingy(t_downlineorhistory), NULL);
+	bindkey(mskeymap, "\33[C",  refthingy(t_forwardchar), NULL);
+	bindkey(mskeymap, "\33[D",  refthingy(t_backwardchar), NULL);
+	bindkey(mskeymap, "\33OA",  refthingy(t_uplineorhistory), NULL);
+	bindkey(mskeymap, "\33OB",  refthingy(t_downlineorhistory), NULL);
+	bindkey(mskeymap, "\33OC",  refthingy(t_forwardchar), NULL);
+	bindkey(mskeymap, "\33OD",  refthingy(t_backwardchar), NULL);
+    }
+    if (!(lskeymap = openkeymap("listscroll"))) {
+	lskeymap = newkeymap(NULL, "listscroll");
+	linkkeymap(lskeymap, "listscroll", 1);
+	bindkey(lskeymap, "\t", refthingy(t_completeword), NULL);
+	bindkey(lskeymap, " ", refthingy(t_completeword), NULL);
+	bindkey(lskeymap, "\n", refthingy(t_acceptline), NULL);
+	bindkey(lskeymap, "\r", refthingy(t_acceptline), NULL);
+	bindkey(lskeymap, "\33[B",  refthingy(t_downlineorhistory), NULL);
+	bindkey(lskeymap, "\33OB",  refthingy(t_downlineorhistory), NULL);
+    }
+}
+
+/**/
 int
 boot_(Module m)
 {
@@ -3503,27 +3536,7 @@ boot_(Module m)
     }
     addhookfunc("comp_list_matches", (Hookfn) complistmatches);
     addhookfunc("menu_start", (Hookfn) domenuselect);
-    mskeymap = newkeymap(NULL, "menuselect");
-    linkkeymap(mskeymap, "menuselect", 1);
-    bindkey(mskeymap, "\t", refthingy(t_completeword), NULL);
-    bindkey(mskeymap, "\n", refthingy(t_acceptline), NULL);
-    bindkey(mskeymap, "\r", refthingy(t_acceptline), NULL);
-    bindkey(mskeymap, "\33[A",  refthingy(t_uplineorhistory), NULL);
-    bindkey(mskeymap, "\33[B",  refthingy(t_downlineorhistory), NULL);
-    bindkey(mskeymap, "\33[C",  refthingy(t_forwardchar), NULL);
-    bindkey(mskeymap, "\33[D",  refthingy(t_backwardchar), NULL);
-    bindkey(mskeymap, "\33OA",  refthingy(t_uplineorhistory), NULL);
-    bindkey(mskeymap, "\33OB",  refthingy(t_downlineorhistory), NULL);
-    bindkey(mskeymap, "\33OC",  refthingy(t_forwardchar), NULL);
-    bindkey(mskeymap, "\33OD",  refthingy(t_backwardchar), NULL);
-    lskeymap = newkeymap(NULL, "listscroll");
-    linkkeymap(lskeymap, "listscroll", 1);
-    bindkey(lskeymap, "\t", refthingy(t_completeword), NULL);
-    bindkey(lskeymap, " ", refthingy(t_completeword), NULL);
-    bindkey(lskeymap, "\n", refthingy(t_acceptline), NULL);
-    bindkey(lskeymap, "\r", refthingy(t_acceptline), NULL);
-    bindkey(lskeymap, "\33[B",  refthingy(t_downlineorhistory), NULL);
-    bindkey(lskeymap, "\33OB",  refthingy(t_downlineorhistory), NULL);
+    menuselect_bindings();
     return 0;
 }
 
