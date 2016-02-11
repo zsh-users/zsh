@@ -2634,13 +2634,36 @@ zsleep_random(long max_us, time_t end_time)
 int
 checkrmall(char *s)
 {
+    DIR *rmd;
+    int count = 0;
     if (!shout)
 	return 1;
-    fprintf(shout, "zsh: sure you want to delete all the files in ");
     if (*s != '/') {
-	nicezputs(pwd[1] ? pwd : "", shout);
-	fputc('/', shout);
+	if (pwd[1])
+	    s = zhtricat(pwd, "/", s);
+	else
+	    s = dyncat("/", s);
     }
+    const int max_count = 100;
+    if ((rmd = opendir(unmeta(s)))) {
+	int ignoredots = !isset(GLOBDOTS);
+	while (zreaddir(rmd, ignoredots)) {
+	    count++;
+	    if (count > max_count)
+		break;
+	}
+	closedir(rmd);
+    }
+    if (count > max_count)
+	fprintf(shout, "zsh: sure you want to delete more than %d files in ",
+		max_count);
+    else if (count == 1)
+	fprintf(shout, "zsh: sure you want to delete the only file in ");
+    else if (count > 0)
+	fprintf(shout, "zsh: sure you want to delete all %d files in ",
+		count);
+    else
+	fprintf(shout, "zsh: sure you want to delete all the files in ");
     nicezputs(s, shout);
     if(isset(RMSTARWAIT)) {
 	fputs("? (waiting ten seconds)", shout);

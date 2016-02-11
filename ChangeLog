@@ -1,3 +1,8 @@
+2016-02-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 37946: Src/utils.c: make rm * warnings more informative about
+	files being deleted.
+
 2016-02-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37893: Doc/Zsh/builtins.yo: document behaviour of typeset -U
