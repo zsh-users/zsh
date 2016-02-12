@@ -1,0 +1,10 @@
+#compdef htop
+
+_arguments -S : \
+  '(-d --delay)'{-d+,--delay=}'[update frequency]:duration' \
+  '(-C --no-color --no-colour)'{-C,--no-colo{,u}r}'[monochrome mode]' \
+  '(-h --help)'{-h,--help}'[display help]' \
+  '(-p --pid)'{-p+,--pid=}'[show given pids]: : _sequence -n ${$(</proc/sys/kernel/pid_max)\:-32768} _pids' \
+  '(-s --sort-key)'{-s+,--sort-key=}'[sort by key]:key:( ${(f)"$($service --sort-key help)"} )' \
+  '(-u --user)'{-u+,--user=}'[show processes of user]: : _users' \
+  '(-v --version)'{-v,--version}'[print version information]'

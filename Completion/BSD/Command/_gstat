@@ -1,0 +1,11 @@
+#compdef gstat
+
+_arguments -s -w : \
+  '-a[only display providers that are at least 0.1% busy]' \
+  '-b[batch mode]' \
+  '-c[enable the display geom(4) consumers]' \
+  '-d[enable the display delete operations]' \
+  '-f[filter by regex]:regex' \
+  '-o[enable the display for other operations]' \
+  '-I[display refresh rate]:interval' \
+  '-p[only display physical providers]'

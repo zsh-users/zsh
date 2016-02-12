@@ -1,0 +1,77 @@
+#compdef sysrc
+_sysrc_caching_policy() {
+  local -a oldp
+  oldp=( "$1"(Nm+1) )
+  (( $#oldp ))
+}
+
+
+_sysrc() {
+  _arguments -A '-*' : \
+    '-c[check only, return success if vars are set]' \
+    '-d[print variable(s) description]' \
+    '-D[print default value(s) only]' \
+    '-e[print variables as sh(1) compatible syntax]' \
+    '*-f[operate on specified file(s), not \`rc_conf_files'\'']: : _files' \
+    '-F[print only the last rc.conf(5) file each directive is in]' \
+    '-h[print short usage message]' \
+    '--help[print full usage message]' \
+    '-i[ignore unknown variables]' \
+    '-j[jail to operate within]:jails:_jails' \
+    '-n[print only variable values]' \
+    '-N[print only variable names]' \
+    '-q[quiet mode]' \
+    '-R[specify an alternative root]:alternative root:_files -/' \
+    '-v[verbose mode]' \
+    '--version[print version information]' \
+    '-x[remove specified variables from specified file(s)]' \
+    '*:configuration variable:->confvars' \
+    - set1 \
+    '-a[list all non-default configuration variables]' \
+    - set2 \
+    '-A[list all configuration variables]'
+
+  if [[ $state  == confvars ]]; then
+    local k v opt curcontext="${curcontext%:*}:values"; local -a rc_conf_vars
+    if [[ -prefix *=* ]]; then
+      # do you really want to go down this hole?
+      _message -e values value
+    else
+      if zstyle -T ":completion:${curcontext%:*}:values" verbose; then
+        opt=d
+      else
+        opt=N
+      fi
+      
+      if ! zstyle -m ":completion:${curcontext%:*}:values" cache-policy '*'; then
+        zstyle ":completion:${curcontext%:*}:values" cache-policy _sysrc_caching_policy
+      fi
+
+      if _cache_invalid sysrc/rc_conf_vars ||
+         ! _retrieve_cache sysrc/rc_conf_vars; then
+ 
+        _call_program sysrc-cmd sysrc -A$opt | while read -r k v; do
+          [[ $k = DEBUG* ]] && continue
+          if [[ -z $v ]]; then
+            rc_conf_vars+=( ${k%:} )
+          else
+            rc_conf_vars+=( "${k%:}[${${v//]/\\]}//:/\\:}]" )
+          fi
+          v=
+        done
+
+        _store_cache sysrc/rc_conf_vars rc_conf_vars
+      fi
+
+      if (( $#rc_conf_vars )); then
+        if [[ $opt == N ]]; then
+          _values -w -C variable ${^rc_conf_vars%%\[*}'::value'
+        else
+          _values -w -C variable ${^rc_conf_vars}'::value'
+        fi
+      fi
+    fi
+  fi
+}
+
+_sysrc "$@"

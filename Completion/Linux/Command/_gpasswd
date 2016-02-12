@@ -1,0 +1,21 @@
+#compdef gpasswd
+local curcontext=$curcontext state state_descr line
+typeset -A opt_args
+
+_arguments -C -w -s \
+  '(-a --add -d --delete)'{-a,--add}'[add user to group]: : _users' \
+  '(-d --delete -a --add)'{-d,--delete}'[remove user from group]: : _users' \
+  '(-h --help)'{-h,--help}'[display help]' \
+  '(-Q --root)'{-Q,--root}'[directory to chroot into]: : _files -/' \
+  '(-r --remove-password)'{-r,--remove-password}'[remove the group password]' \
+  '(-R --restrict)'{-R,--restrict}'[restrict access to GROUP to its members]' \
+  '(-M --members -A --administrators)'{-M,--members}'[set the list of members of GROUP]: :->users' \
+  '(-A --administrators -M --members)'{-A,--administrators}'[set the list of admins for GROUP]: :->users' \
+  '1: : _groups'
+
+if [[ $state == users ]]; then
+  local -a ignore
+  compset -P '*,'; compset -S ',*'
+  ignore=( ${(s:,:)IPREFIX} ${(s:,:)ISUFFIX} )
+  _users -F ignore -qS ,
+fi

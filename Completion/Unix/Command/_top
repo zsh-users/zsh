@@ -1,0 +1,101 @@
+#compdef top
+
+local specs fields
+
+case $OSTYPE in
+  *linux*)
+    fields=(
+      '%CPU:CPU usage' '%MEM:memory usage (res)' 'CGROUPS:control groups'
+      'CODE:code size' 'COMMAND:Commane name/line' 'DATA:data + stack size'
+      'ENVIRON:environment variables' 'Flags:task flags' 'GID:group id'
+      'GROUP:group name' 'NI:nice value' 'P:last used CPU (SMP)'
+      'PGRP:process group id' 'PID:process id' 'PPID:parent pid' 'PR:priority'
+      'RES:resident memory size' 'RUID:real user id' 'RUSER:real uid'
+      'S:process status' 'SHR:shared memory size' 'SID:session id'
+      'SUID:saved uid' 'SUPGIDS:supplementary gids'
+      'SUPGRPS:supplementary group names' 'SUSER:saved username'
+      'SWAP:swapped sized' 'TGID:thread gid' 'TIME:CPU time'
+      'TIME+:CPU time (hundredths)' 'TPGID:TTY gid' 'TTY:controlling TTY'
+      'UID:user id' 'USED:memory in use' 'USER:user name'
+      'VIRT:virtual memory size' 'WCHAN:sleeping in function'
+      'nDRT:dirty pages count' 'nMaj:major page count' 'nMin:minor page count'
+      'nTH:number of threads' 'nsIPC:IPC namespace' 'nsMNT:MNT namespace'
+      'nsNET:NET namespace' 'nsPID:PID namespace' 'nsUSER:USER namespace'
+      'nsUTS:UTS namespace' 'vMj:major page fault count delta'
+      'vMn:minor page fault count delta'
+    )
+    specs=(
+      '(-v -h)-'{h,v}'[show version and usage]'
+      '-b[batch mode]'
+      '-c[command line/program name toggle]'
+      '-d[delay time interval]:interval'
+      '-H[threads mode operation]'
+      '-i[idle process toggle]'
+      '-n[number of iterations]:number of iterations'
+      '-o[override sort field]:fieldname:(( $fields ))'
+      '-O[output field names]'
+      '*-p[monitor pids]: :_pids'
+      '-s[secure mode operation]'
+      '-S[cumulative time toggle]'
+      '(-U)-u[effective user filter mode]: :_users'
+      '(-u)-U[user filter mode]: :_users'
+      '-w[output width override]:number'
+    );;
+  freebsd*)
+    specs=(
+      '-C[CPU display mode]'
+      '-S[show system processes]'
+      '-a[display command names via argv]'
+      '-b[batch mode]'
+      '-H[display individual threads]'
+      '-i[interactive mode]'
+      '-I[do not display idle processes]'
+      '-j[display the jail ID]'
+      '-t[do not display the top process]'
+      '-m+[statistic type]:type:(( cpu\:default io ))'
+      '-n[non-interactive mode]'
+      '-P[per-cpu CPU usage statistics]'
+      '-q[renice top to -20]'
+      '-u[do not translate uid to name]'
+      '-v[write version number]'
+      '-z[no not display system idle process]'
+      '-d+[number of iterations]:count:'
+      '-s+[set delay interval]:interval:'
+      '-o+[sort process display by field]:field:(
+        cpu size res time pri threads total read 
+        write fault vcsw ivcsw jid pid
+      )'
+      '-J+[show processes owned by jail]:jail:_jails -0'
+      '-U+[show processes owned by username]: :_users'
+      '1: : _message "top number of processes"'
+    );;
+  openbsd*)
+    specs=(
+      '-1[combine CPU statistic into one line]'
+      '-b[batch mode]'
+      '-C[show command arguments as well and process name]'
+      '-d[number of iterations]:number of iterations'
+      '-g[filter processes by string]:string'
+      '-H[display process threads]'
+      '-I[do not display idle processes]'
+      '-i[interactive mode]'
+      '-n[non-interactive mode]'
+      '-o[sort display by field]:field:(
+        cpu size res time pri pid command
+      )'
+      '-p[filter by pid]: :_pids'
+      '-q[renice top to -20]'
+      '-S[show system processes]'
+      '-s[delay time interval]:interval'
+      '-U[filter processes by user]: :_users -M "L\:|-="'
+      '-u[do not map uid to usernames]'
+      '1: : _message "top number of processes"'
+    );;
+esac
+
+if (( $#specs )); then
+  _arguments -s -w : "$specs[@]"
+  return
+fi
+
+_normal

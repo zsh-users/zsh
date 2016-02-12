@@ -1,3 +1,12 @@
+2016-02-11  Eric Cook  <llua@gmx.com>
+
+	* 37913: Completion/BSD/Command/_gstat,
+	Completion/BSD/Command/_sysrc, Completion/Linux/Command/_gpasswd,
+	Completion/Linux/Command/_htop,	Completion/Linux/Command/_kpartx,
+	Completion/Unix/Command/_top,	Completion/Unix/Command/_tput,
+	Completion/Unix/Command/_zpool: new completers and improvement
+	for _zpool.
+
 2016-02-11  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 37946: Src/utils.c: make rm * warnings more informative about

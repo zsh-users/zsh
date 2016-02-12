@@ -13,6 +13,10 @@ _zpool() {
 		upgrade history get set split help
 	)
 
+	if [[ $implementation = openzfs ]] && [[ $OSTYPE != solaris* ]]; then
+		subcmds+=(labelclear)
+	fi
+
 	versions=(
 		${${${(M)"${(f)$(_call_program versions zpool upgrade -v)}":#[[:space:]]#<->*}##[[:space:]]}%%[[:space:]]*}
 	)
@@ -162,6 +166,12 @@ _zpool() {
 			'*::pool name:_zfs_pool' \
 			'::interval:' \
 			'::count:'
+		;;
+
+	(labelclear)
+		_arguments -A "-*" \
+			'-f[treat exported or foreign devices as inactive]' \
+			'*:virtual device:_files'
 		;;
 
 	(status)
