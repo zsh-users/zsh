@@ -1293,7 +1293,7 @@ __ci_do_insertion() {
 2.   In completers which correct what you have typed, keep what you
      originally typed as one of the list of possible completions.
 
-q.   Return with saving.
+q.   Return without saving.
 0.   Done setting options for insertion.
 "
     read -k key'?-- Hit selection --- '
