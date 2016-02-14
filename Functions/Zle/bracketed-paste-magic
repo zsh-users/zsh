@@ -175,7 +175,7 @@ bracketed-paste-magic() {
 		case $REPLY in
 		    (${~bpm_active}) function () {
 			emulate -L $bpm_emulate; set -$bpm_opts
-			zle $REPLY
+			zle $REPLY -w
 		    };;
 		    (*) zle .self-insert;;
 		esac
@@ -184,7 +184,7 @@ bracketed-paste-magic() {
 	PASTED=$BUFFER
 
 	# Reset the undo state
-	zle undo $bpm_undo
+	zle .undo $bpm_undo
 	UNDO_LIMIT_NO=$bpm_limit
 
 	zle -K $bpm_keymap

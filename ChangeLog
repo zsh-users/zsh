@@ -1,5 +1,9 @@
 2016-02-14  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37971 (cf. users/21284: Eric Freese):
+	Functions/Zle/bracketed-paste-magic: fix potential issues when
+	interacting with user-defined widgets
+	
 	* 37961: Src/Zle/complist.c: in interactive menuselection, use of
 	"compadd -x" (e.g. the "warnings" zstyle) may have replaced the
 	completion list, so skip highlighting of the current selection
