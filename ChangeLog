@@ -1,5 +1,7 @@
 2016-02-14  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37898: Completion/Unix/Command/_gcc: complete linker options
+	
 	* 37972: Completion/Base/Utility/_arguments,
 	Completion/Base/Widget/_correct_filename,
 	Completion/Base/Widget/_most_recent_file,
