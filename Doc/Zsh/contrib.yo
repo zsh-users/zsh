@@ -3796,6 +3796,23 @@ enditem()
 
 See the comments in the function for a few extra tips.
 )
+findex(max)
+findex(min)
+findex(sum)
+findex(zmathfunc)
+xitem(tt(min+LPAR())var(arg)tt(, ...+RPAR()))
+xitem(tt(max+LPAR())var(arg)tt(, ...+RPAR()))
+xitem(tt(sum+LPAR())var(arg)tt(, ...+RPAR()))
+item(tt(zmathfunc))(
+The function tt(zmathfunc) defines the three mathematical functions
+tt(min), tt(max), and tt(sum).  The functions tt(min) and tt(max) take
+one or more arguments.  The function tt(sum) takes zero or more arguments.
+Arguments can be of different types (ints and floats).
+
+Not to be confused with the tt(zsh/mathfunc) module, described in
+ifzman(the section `The zsh/mathfunc Module' in zmanref(zshmodules))\
+ifnzman(noderef(The zsh/mathfunc Module)).
+)
 findex(zmathfuncdef)
 item(tt(zmathfuncdef) [ var(mathfunc) [ var(body) ] ])(
 A convenient front end to tt(functions -M).

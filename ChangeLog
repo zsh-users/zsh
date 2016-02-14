@@ -1,3 +1,10 @@
+2016-02-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* users/21256 + workers/37965: Doc/Zsh/contrib.yo,
+	Doc/Zsh/mod_mathfunc.yo, Src/zsh.mdd: New math functions
+	min(), max(), sum(), provided by a new autoloadable function
+	'zmathfunc'.
+
 2016-02-15  Eric Cook  <llua@gmx.com>
 
 	* 37975: Completion/Unix/Command/_php: allow completion after

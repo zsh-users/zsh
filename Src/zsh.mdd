@@ -2,7 +2,7 @@ name=zsh/main
 link=static
 load=yes
 # load=static should replace use of alwayslink
-functions='Functions/Chpwd/* Functions/Exceptions/* Functions/Misc/* Functions/MIME/* Functions/Prompts/* Functions/VCS_Info/* Functions/VCS_Info/Backends/*'
+functions='Functions/Chpwd/* Functions/Exceptions/* Functions/Math/* Functions/Misc/* Functions/MIME/* Functions/Prompts/* Functions/VCS_Info/* Functions/VCS_Info/Backends/*'
 
 nozshdep=1
 alwayslink=1
