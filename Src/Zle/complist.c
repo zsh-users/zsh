@@ -34,8 +34,9 @@
 /* Information about the list shown. */
 
 /*
- * noselect: 1 if complistmatches indicated we shouldn't do selection.
- *           Tested in domenuselect.
+ * noselect: 1 if complistmatches indicated we shouldn't do selection;
+ *           -1 if interactive mode needs to reset the selection list.
+ *           Tested in domenuselect, and in complistmatches to skip redraw.
  * mselect:  Local copy of the index of the currently selected match.
  *           Initialised to the gnum entry of the current match for
  *           each completion.
@@ -1980,7 +1981,8 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
     }
 #endif
 
-    noselect = 0;
+    if (noselect > 0)
+	noselect = 0;
 
     if ((minfo.asked == 2 && mselect < 0) || nlnct >= zterm_lines) {
 	showinglist = 0;
@@ -2078,9 +2080,11 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
     last_cap = (char *) zhalloc(max_caplen + 1);
     *last_cap = '\0';
 
-    if (!mnew && inselect && onlnct == nlnct && mlbeg >= 0 && mlbeg == molbeg)
-        singledraw();
-    else if (!compprintlist(mselect >= 0) || !clearflag)
+    if (!mnew && inselect &&
+	onlnct == nlnct && mlbeg >= 0 && mlbeg == molbeg) {
+	if (!noselect)
+	    singledraw();
+    } else if (!compprintlist(mselect >= 0) || !clearflag)
 	noselect = 1;
 
     onlnct = nlnct;
@@ -2093,7 +2097,7 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
     popheap();
     opts[EXTENDEDGLOB] = extendedglob;
 
-    return noselect;
+    return (noselect < 0 ? 0 : noselect);
 }
 
 static int
@@ -2547,14 +2551,23 @@ domenuselect(Hookdef dummy, Chdata dat)
         } else {
             statusline = NULL;
         }
+	if (noselect < 0) {
+	    showinglist = clearlist = 0;
+	    clearflag = 1;
+	}
         zrefresh();
 	statusline = NULL;
         inselect = 1;
+	selected = 1;
         if (noselect) {
+	    if (noselect < 0) {
+		/* no selection until after processing keystroke */
+		noselect = 0;
+		goto getk;
+	    }
             broken = 1;
             break;
         }
-	selected = 1;
 	if (!i) {
 	    i = mcols * mlines;
 	    while (i--)
@@ -2752,6 +2765,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 		if (nmessages) {
 		    showinglist = -2;
 		    zrefresh();
+		    noselect = -1;
 		} else {
 		    trashzle();
 		    zsetterm();
