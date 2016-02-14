@@ -1,5 +1,14 @@
 2016-02-14  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 37972: Completion/Base/Utility/_arguments,
+	Completion/Base/Widget/_correct_filename,
+	Completion/Base/Widget/_most_recent_file,
+	Completion/Unix/Command/_devtodo, Completion/Unix/Command/_make,
+	Completion/Unix/Command/_ssh, Completion/Unix/Command/_tar,
+	Completion/Unix/Command/_zip,
+	Completion/Unix/Type/_canonical_paths: Redirect stderr to
+	/dev/null in cases where ${~param} might generate errors
+
 	* 37971 (cf. users/21284: Eric Freese):
 	Functions/Zle/bracketed-paste-magic: fix potential issues when
 	interacting with user-defined widgets

@@ -79,7 +79,7 @@ else
     tf=${~words[tmp+1]}
     _tar_cmd="f$_tar_cmd"
   fi
-fi
+fi 2>/dev/null
 
 # See if we should use a path prefix.  We have to use eval as the dir can
 # be any unevaluated thing which appears on the command line, including a

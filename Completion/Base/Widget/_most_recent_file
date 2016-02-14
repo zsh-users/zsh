@@ -11,7 +11,7 @@
 local file tilde etilde
 if [[ $PREFIX = \~*/* ]]; then
   tilde=${PREFIX%%/*}
-  etilde=${~tilde}
+  etilde=${~tilde} 2>/dev/null
   # PREFIX and SUFFIX have full command line quoting in, but we want
   # any globbing characters which are quoted to stay quoted.
   eval "file=($PREFIX*$SUFFIX(om[${NUMERIC:-1}]N))"

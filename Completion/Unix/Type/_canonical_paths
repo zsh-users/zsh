@@ -61,7 +61,7 @@ _canonical_paths_get_canonical_path() {
 _canonical_paths_add_paths () {
   local origpref=$1 expref rltrim curpref canpref subdir
   [[ $2 != add ]] && matches=()
-  expref=${~origpref}
+  expref=${~origpref} 2>/dev/null
   [[ $origpref == (|*/). ]] && rltrim=.
   curpref=${${expref%$rltrim}:-./}
   if zstat $curpref >&/dev/null; then

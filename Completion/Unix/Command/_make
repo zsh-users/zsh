@@ -129,7 +129,7 @@ _make-findBasedir () {
   do
     if [[ $@[index] == -C ]]
     then
-      file=${~@[index+1]};
+      file=${~@[index+1]} 2>/dev/null
       if [[ -z $file ]]
       then
         # make returns with an error if an empty arg is given

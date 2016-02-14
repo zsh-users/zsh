@@ -28,7 +28,7 @@ fi
 
 if [[ $file = \~*/* ]]; then
   tilde=${file%%/*}
-  etilde=${~tilde}
+  etilde=${~tilde} 2>/dev/null
   file=${file/#$tilde/$etilde}
 fi
 

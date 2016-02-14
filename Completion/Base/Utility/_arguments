@@ -36,7 +36,7 @@ if (( long )); then
 
   tmpargv=( "${(@)argv[1,long-1]}" )  # optspec's before --, if any
 
-  name=${~words[1]}
+  name=${~words[1]} 2>/dev/null
   [[ "$name" = [^/]*/* ]] && name="$PWD/$name"
 
   name="_args_cache_${name}"

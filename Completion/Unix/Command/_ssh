@@ -622,7 +622,7 @@ _ssh_hosts () {
       ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@" && return
   fi
   if (( ind = ${words[(I)-F]} )); then
-    config=${~words[ind+1]}
+    config=${~words[ind+1]} 2>/dev/null
   else
     config="$HOME/.ssh/config"
   fi

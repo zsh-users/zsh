@@ -9,7 +9,7 @@ typeset expl
 
 for ((i=2; i <= $#words; i++)) {
 	if [[ $words[$i] == '--database' ]]; then
-		todo_opts+=(--database ${~words[$((++i))]})
+		todo_opts+=(--database ${~words[$((++i))]}) 2>/dev/null
 	elif [[ $words[$i] == '--sort' ]]; then
 		todo_opts+=(--sort ${words[$((++i))]})
 	fi
