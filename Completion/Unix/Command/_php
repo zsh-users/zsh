@@ -43,7 +43,7 @@ args+=(
   '(-)*::script argument: _normal'
 )
 
-_arguments -C -s -S -A "-*" "$args[@]" && return 0
+_arguments -C -s -S "$args[@]" && return 0
 
 case $state in
   directive)

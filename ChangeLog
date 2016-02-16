@@ -1,3 +1,8 @@
+2016-02-15  Eric Cook  <llua@gmx.com>
+
+	* 37975: Completion/Unix/Command/_php: allow completion after
+	the first non-option argument.
+
 2016-02-14  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 37898: Completion/compinstall: fix typo in completer menu
