@@ -2424,6 +2424,7 @@ clearscreen(UNUSED(char **args))
     tcoutclear(TCCLEARSCREEN);
     resetneeded = 1;
     clearflag = 0;
+    reexpandprompt();
     return 0;
 }
 

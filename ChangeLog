@@ -13,6 +13,8 @@
 
 2016-02-16  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 38001: Src/Zle/zle_refresh.c: clear-screen re-expands prompts
+
 	* 37988: Src/params.c: $0 becomes read-only under POSIXARGZERO
 
 2016-02-15  Eric Cook  <llua@gmx.com>
