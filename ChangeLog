@@ -11,6 +11,10 @@
 	min(), max(), sum(), provided by a new autoloadable function
 	'zmathfunc'.
 
+2016-02-16  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 37988: Src/params.c: $0 becomes read-only under POSIXARGZERO
+
 2016-02-15  Eric Cook  <llua@gmx.com>
 
 	* 37975: Completion/Unix/Command/_php: allow completion after

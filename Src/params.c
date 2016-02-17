@@ -4158,7 +4158,9 @@ static void
 argzerosetfn(UNUSED(Param pm), char *x)
 {
     if (x) {
-	if (!isset(POSIXARGZERO)) {
+	if (isset(POSIXARGZERO))
+	    zerr("read-only variable: 0");
+	else {
 	    zsfree(argzero);
 	    argzero = ztrdup(x);
 	}
