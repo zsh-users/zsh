@@ -399,6 +399,26 @@
 >}
 >No, really exited
 
+   (cd ..; $ZTST_exe -fc 'unsetopt posixtraps;
+   echo start program
+   emulate sh -c '\''testfn() {
+     echo start function
+     set -o | grep posixtraps
+     trap "echo EXIT TRAP TRIGGERED" EXIT
+     echo end function
+   }'\''
+   testfn
+   echo program continuing
+   echo end of program')
+0:POSIX_TRAPS effect on EXIT trap is sticky
+>start program
+>start function
+>noposixtraps          off
+>end function
+>program continuing
+>end of program
+>EXIT TRAP TRIGGERED
+
    (set -e
     printf "a\nb\n" | while read line
     do

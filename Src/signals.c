@@ -55,6 +55,15 @@ mod_export Eprog siglists[VSIGCOUNT];
 /**/
 mod_export int nsigtrapped;
 
+/*
+ * Flag that exit trap has been set in POSIX mode.
+ * The setter's expectation is therefore that it is run
+ * on programme exit, not function exit.
+ */
+
+/**/
+static int exit_trap_posix;
+
 /* Variables used by signal queueing */
 
 /**/
@@ -755,7 +764,7 @@ killjb(Job jn, int sig)
  * at once, so just use a linked list.
  */
 struct savetrap {
-    int sig, flags, local;
+    int sig, flags, local, posix;
     void *list;
 };
 
@@ -774,6 +783,7 @@ dosavetrap(int sig, int level)
     st = (struct savetrap *)zalloc(sizeof(*st));
     st->sig = sig;
     st->local = level;
+    st->posix = (sig == SIGEXIT) ? exit_trap_posix : 0;
     if ((st->flags = sigtrapped[sig]) & ZSIG_FUNC) {
 	/*
 	 * Get the old function: this assumes we haven't added
@@ -873,6 +883,10 @@ settrap(int sig, Eprog l, int flags)
      * works just the same.
      */
     sigtrapped[sig] |= (locallevel << ZSIG_SHIFT) | flags;
+    if (sig == SIGEXIT) {
+	/* Make POSIX behaviour of EXIT trap sticky */
+	exit_trap_posix = isset(POSIXTRAPS);
+    }
     unqueue_signals();
     return 0;
 }
@@ -908,7 +922,7 @@ removetrap(int sig)
      * already one at the current locallevel we just overwrite it.
      */
     if (!dontsavetrap &&
-	(sig == SIGEXIT ? !isset(POSIXTRAPS) : isset(LOCALTRAPS)) &&
+	(sig == SIGEXIT ? !exit_trap_posix : isset(LOCALTRAPS)) &&
 	locallevel &&
 	(!trapped || locallevel > (sigtrapped[sig] >> ZSIG_SHIFT)))
 	dosavetrap(sig, locallevel);
@@ -935,6 +949,8 @@ removetrap(int sig)
 #endif
              sig != SIGCHLD)
         signal_default(sig);
+    if (sig == SIGEXIT)
+	exit_trap_posix = 0;
 
     /*
      * At this point we free the appropriate structs.  If we don't
@@ -978,7 +994,7 @@ starttrapscope(void)
      * so give it the next higher one. dosavetrap() is called
      * automatically where necessary.
      */
-    if (sigtrapped[SIGEXIT] && !isset(POSIXTRAPS)) {
+    if (sigtrapped[SIGEXIT] && !exit_trap_posix) {
 	locallevel++;
 	unsettrap(SIGEXIT);
 	locallevel--;
@@ -1005,7 +1021,7 @@ endtrapscope(void)
      * Don't do this inside another trap.
      */
     if (!intrap &&
-	!isset(POSIXTRAPS) && (exittr = sigtrapped[SIGEXIT])) {
+	!exit_trap_posix && (exittr = sigtrapped[SIGEXIT])) {
 	if (exittr & ZSIG_FUNC) {
 	    exitfn = removehashnode(shfunctab, "TRAPEXIT");
 	} else {
@@ -1031,7 +1047,9 @@ endtrapscope(void)
 		if (st->flags & ZSIG_FUNC)
 		    settrap(sig, NULL, ZSIG_FUNC);
 		else
-		    settrap(sig, (Eprog) st->list, 0);
+			settrap(sig, (Eprog) st->list, 0);
+		if (sig == SIGEXIT)
+		    exit_trap_posix = st->posix;
 		dontsavetrap--;
 		/*
 		 * counting of nsigtrapped should presumably be handled
@@ -1042,16 +1060,26 @@ endtrapscope(void)
 		if ((sigtrapped[sig] = st->flags) & ZSIG_FUNC)
 		    shfunctab->addnode(shfunctab, ((Shfunc)st->list)->node.nam,
 				       (Shfunc) st->list);
-	    } else if (sigtrapped[sig])
-		unsettrap(sig);
+	    } else if (sigtrapped[sig]) {
+		/*
+		 * Don't restore the old state if someone has set a
+		 * POSIX-style exit trap --- allow this to propagate.
+		 */
+		if (sig != SIGEXIT || !exit_trap_posix)
+		    unsettrap(sig);
+	    }
 
 	    zfree(st, sizeof(*st));
 	}
     }
 
     if (exittr) {
-	if (!isset(POSIXTRAPS))
-	    dotrapargs(SIGEXIT, &exittr, exitfn);
+	/*
+	 * We already made sure this wasn't set as a POSIX exit trap.
+	 * We respect the user's intention when the trap in question
+	 * was set.
+	 */
+	dotrapargs(SIGEXIT, &exittr, exitfn);
 	if (exittr & ZSIG_FUNC)
 	    shfunctab->freenode((HashNode)exitfn);
 	else

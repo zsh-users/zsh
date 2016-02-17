@@ -65,6 +65,20 @@ remainder of the value discarded.  This could lead to different behaviour
 if the argument contains non-numeric characters, or if the argument has
 leading zeroes and the OCTAL_ZEROES option is set.
 
+3) For some time the shell has had a POSIX_TRAPS option which determines
+whether the EXIT trap has POSIX behaviour (the trap is only run at shell
+exit) or traditional zsh behaviour (the trap is run once and discarded
+when the enclosing fuction or shell exits, whichever happens first).
+The use of this option has now been made "sticky" on the EXIT trap ---
+in other words, the setting of the option at the point where the trap is
+set now determines whether the trap has POSIX or traditional zsh
+behaviour.  This means that changing the option after the trap was set
+no longer has any effect.
+
+Other aspects of EXIT trap handling have not changed --- there is still
+only one EXIT trap at any point in a programme, so it is not generally
+useful to combine POSIX and non-POSIX behaviour in the same script.
+
 Incompatibilities between 5.0.8 and 5.2
 ---------------------------------------
 
