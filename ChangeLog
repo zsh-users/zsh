@@ -563,7 +563,7 @@
 	lengths and widths is supposed to work.
 
 	* 37314: Src/utils.c, Src/zsh.h: upgrade quotedzputs() to use
-	nicechar() where necessary.  Regularise nicechar() etc. to prodduce
+	nicechar() where necessary.  Regularise nicechar() etc. to produce
 	$'...' compatible output.
 
 2015-12-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
@@ -594,7 +594,7 @@
 	Completion/Unix/Command/_mtools,
 	Completion/Unix/Type/_mime_types,
 	Completion/X/Command/_kfmclient, Completion/Zsh/Command/_zed:
-	Remove uneeded executability bits.
+	Remove unneeded executability bits.
 
 	* 37296: Src/utils.c: Avoid needless calloc().
 
