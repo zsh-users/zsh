@@ -77,7 +77,8 @@ In most cases multiple versions (releases) of commands are not
 supported. The functions are merely updated to reflect the latest stable
 version. Exceptions to this can be made where are particular version
 continues to be commonly distributed. Where there is more than one variant
-of the same command however, the separate variants should be supported.
+of the same command however (e.g., the command takes different options
+different platforms), the separate variants should be supported.
 
 Contexts, tags and all that
 ---------------------------
