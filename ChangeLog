@@ -1,3 +1,8 @@
+2016-02-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Stephane: 38020: fix problems with fractions of a second in
+	$SECONDS.
+
 2016-02-25  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 38024: Src/signals.c, Test/C03traps.ztst: improve 37999 to

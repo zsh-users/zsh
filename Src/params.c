@@ -3804,8 +3804,8 @@ intsecondsgetfn(UNUSED(Param pm))
 
     gettimeofday(&now, &dummy_tz);
 
-    return (zlong)(now.tv_sec - shtimer.tv_sec) +
-	(zlong)(now.tv_usec - shtimer.tv_usec) / (zlong)1000000;
+    return (zlong)(now.tv_sec - shtimer.tv_sec -
+		  (now.tv_usec < shtimer.tv_usec ? 1 : 0));
 }
 
 /* Function to set value of special parameter `SECONDS' */
@@ -3823,7 +3823,7 @@ intsecondssetfn(UNUSED(Param pm), zlong x)
     shtimer.tv_sec = diff;
     if ((zlong)shtimer.tv_sec != diff)
 	zwarn("SECONDS truncated on assignment");
-    shtimer.tv_usec = 0;
+    shtimer.tv_usec = now.tv_usec;
 }
 
 /**/
