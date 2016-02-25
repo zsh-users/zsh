@@ -419,6 +419,23 @@
 >end of program
 >EXIT TRAP TRIGGERED
 
+   (cd ..; $ZTST_exe -fc '
+     echo entering program
+     emulate sh -c '\''trap "echo POSIX exit trap triggered" EXIT'\''
+     fn() {
+        trap "echo native zsh function-local exit trap triggered" EXIT
+        echo entering native zsh function
+     }
+     fn
+     echo exiting program
+   ')
+0:POSX EXIT trap can have nested native mode EXIT trap
+>entering program
+>entering native zsh function
+>native zsh function-local exit trap triggered
+>exiting program
+>POSIX exit trap triggered
+
    (set -e
     printf "a\nb\n" | while read line
     do

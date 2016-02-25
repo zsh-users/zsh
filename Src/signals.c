@@ -920,9 +920,14 @@ removetrap(int sig)
      * Note that we save the trap here even if there isn't an existing
      * one, to aid in removing this one.  However, if there's
      * already one at the current locallevel we just overwrite it.
+     *
+     * Note we save EXIT traps based on the *current* setting of
+     * POSIXTRAPS --- so if there is POSIX EXIT trap set but
+     * we are in native mode it can be saved, replaced by a function
+     * trap, and then restored.
      */
     if (!dontsavetrap &&
-	(sig == SIGEXIT ? !exit_trap_posix : isset(LOCALTRAPS)) &&
+	(sig == SIGEXIT ? !isset(POSIXTRAPS) : isset(LOCALTRAPS)) &&
 	locallevel &&
 	(!trapped || locallevel > (sigtrapped[sig] >> ZSIG_SHIFT)))
 	dosavetrap(sig, locallevel);
