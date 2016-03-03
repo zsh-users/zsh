@@ -925,7 +925,7 @@ fi
 if test x$enable_pcre = xyes; then
 dnl pcre-config should probably be employed here
 dnl AC_SEARCH_LIBS(pcre_compile, pcre)
-  LIBS="`pcre-config --libs` $LIBS"
+  LIBS="`$ac_cv_prog_PCRECONF --libs` $LIBS"
 fi
 
 dnl ---------------------

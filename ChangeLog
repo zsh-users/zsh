@@ -1,3 +1,8 @@
+2016-03-04  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 38084: Baruch Siach: configure.ac: use the pcre-config we
+	found earlier for determining libs.
+
 2016-03-03  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 38048: Src/zle_refresh.c: fix "zle redisplay" when called while
