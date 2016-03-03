@@ -2435,8 +2435,8 @@ redisplay(UNUSED(char **args))
     moveto(0, 0);
     zputc(&zr_cr);		/* extra care */
     tc_upcurs(lprompth - 1);
-    resetneeded = 1;
-    clearflag = 0;
+    resetneeded = !showinglist;
+    clearflag = showinglist;
     return 0;
 }
 

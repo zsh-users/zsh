@@ -1,5 +1,8 @@
 2016-03-03  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 38048: Src/zle_refresh.c: fix "zle redisplay" when called while
+	a listing is below the prompt (e.g., from interrupt handler)
+
 	* 38039: Src/options.c: POSIXy behavior for "set +o"
 
 2016-02-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
