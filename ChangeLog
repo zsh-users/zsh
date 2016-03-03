@@ -1,3 +1,7 @@
+2016-03-03  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38039: Src/options.c: POSIXy behavior for "set +o"
+
 2016-02-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Stephane: 38020: fix problems with fractions of a second in

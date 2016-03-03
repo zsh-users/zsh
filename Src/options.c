@@ -847,9 +847,10 @@ printoptionnodestate(HashNode hn, int hadplus)
     int optno = on->optno;
 
     if (hadplus) {
-        if (defset(on, emulation) != isset(optno))
-	    printf("set -o %s%s\n", defset(on, emulation) ?
-		   "no" : "", on->node.nam);
+	printf("set %co %s%s\n",
+	       defset(on, emulation) != isset(optno) ? '-' : '+',
+	       defset(on, emulation) ? "no" : "",
+	       on->node.nam);
     } else {
 	if (defset(on, emulation))
 	    printf("no%-19s %s\n", on->node.nam, isset(optno) ? "off" : "on");
