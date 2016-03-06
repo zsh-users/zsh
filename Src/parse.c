@@ -1413,7 +1413,7 @@ par_if(int *cmplx)
 	}
     }
     cmdpop();
-    if (xtok == ELSE) {
+    if (xtok == ELSE || tok == ELSE) {
 	pp = ecadd(0);
 	cmdpush(CS_ELSE);
 	while (tok == SEPER)

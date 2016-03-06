@@ -1,5 +1,7 @@
 2016-03-06  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 38106: Src/parse.c: if...then if...else should be a parse error.
+
 	* Greg Klanderman: 38086: Doc/Zsh/params.yo, Src/init.c,
 	Src/params.c: shuffle init code to localize a global, add
 	$ZSH_ARGZERO, refine $ZSH_SCRIPT
