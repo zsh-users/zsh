@@ -933,6 +933,13 @@ tt(zsh/zutil) module.
 )
 enditem()
 )
+vindex(ZSH_ARGZERO)
+item(tt(ZSH_ARGZERO))(
+If zsh was invoked to run a script, this is the name of the script.
+Otherwise, it is the name used to invoke the current shell.  This is
+the same as the value of tt($0) when the tt(POSIX_ARGZERO) option is
+set, but is always available.
+)
 vindex(ZSH_EXECUTION_STRING)
 item(tt(ZSH_EXECUTION_STRING))(
 If the shell was started with the option tt(-c), this contains
@@ -951,16 +958,14 @@ track of versions of the shell during development between releases;
 hence most users should not use it and should instead rely on
 tt($ZSH_VERSION).
 )
-vindex(ZSH_SCRIPT)
-item(tt(ZSH_SCRIPT))(
-If zsh was invoked to run a script, this is the name of the script.
-Otherwise, it is the name used to invoke the current shell.  This is
-the same as the value of tt($0) when the tt(POSIX_ARGZERO) option is
-set, but is always available.
-)
 item(tt(zsh_scheduled_events))(
 See ifzman(the section `The zsh/sched Module' in zmanref(zshmodules))\
 ifnzman(noderef(The zsh/sched Module)).
+)
+vindex(ZSH_SCRIPT)
+item(tt(ZSH_SCRIPT))(
+If zsh was invoked to run a script, this is the name of the script,
+otherwise it is unset.
 )
 vindex(ZSH_SUBSHELL <S>)
 item(tt(ZSH_SUBSHELL))(

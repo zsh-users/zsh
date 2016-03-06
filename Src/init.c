@@ -802,7 +802,7 @@ init_term(void)
 
 /**/
 void
-setupvals(char *cmd)
+setupvals(char *cmd, char *runscript, char *zsh_name)
 {
 #ifdef USE_GETPWUID
     struct passwd *pswd;
@@ -1089,6 +1089,9 @@ setupvals(char *cmd)
 
     if (cmd)
 	setsparam("ZSH_EXECUTION_STRING", ztrdup(cmd));
+    if (runscript)
+        setsparam("ZSH_SCRIPT", ztrdup(runscript));
+    setsparam("ZSH_NAME", ztrdup(zsh_name)); /* NOTE: already metafied early in zsh_main() */
 }
 
 /*
@@ -1270,7 +1273,7 @@ run_init_scripts(void)
 
 /**/
 void
-init_misc(char *cmd)
+init_misc(char *cmd, char *zsh_name)
 {
 #ifndef RESTRICTED_R
     if ( restricted )
@@ -1606,7 +1609,7 @@ mod_export int use_exit_printed;
 mod_export int
 zsh_main(UNUSED(int argc), char **argv)
 {
-    char **t, *runscript = NULL;
+    char **t, *runscript = NULL, *zsh_name;
     char *cmd;			/* argument to -c */
     int t0;
 #ifdef USE_LOCALE
@@ -1660,14 +1663,14 @@ zsh_main(UNUSED(int argc), char **argv)
 
     SHTTY = -1;
     init_io(cmd);
-    setupvals(cmd);
+    setupvals(cmd, runscript, zsh_name);
 
     init_signals();
     init_bltinmods();
     init_builtins();
     run_init_scripts();
     setupshin(runscript);
-    init_misc(cmd);
+    init_misc(cmd, zsh_name);
 
     for (;;) {
 	/*

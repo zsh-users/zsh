@@ -1,3 +1,9 @@
+2016-03-06  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Greg Klanderman: 38086: Doc/Zsh/params.yo, Src/init.c,
+	Src/params.c: shuffle init code to localize a global, add
+	$ZSH_ARGZERO, refine $ZSH_SCRIPT
+
 2016-03-04  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 38084: Baruch Siach: configure.ac: use the pcre-config we
@@ -124,7 +130,7 @@
 2016-02-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 37895: Src/params.c, Doc/Zsh/parmas.yo: add ZSH_SCRIPT as
-	always available form of POISX $0.
+	always available form of POSIX $0.
 
 2016-02-07  Dominik Ritter  <dritter03@googlemail.com>
 
@@ -5516,7 +5522,7 @@
 
 2014-08-01  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* 32932: Src/glob.c, Src/utils.c: add hmkarray() and
+	* 32932: Src/subst.c, Src/utils.c: add hmkarray() and
 	use to fix leak.
 
 2014-07-31  Barton E. Schaefer  <schaefer@zsh.org>
