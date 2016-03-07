@@ -1,3 +1,9 @@
+2016-03-07  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 38094: Src/signals.c, Test/C03traps.ztst: POSIX exit traps
+	aren't local so local level should be 0 so they don't
+	get trashed if defined in a function.
+
 2016-03-06  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 38106: Src/parse.c: if...then if...else should be a parse error.

@@ -877,16 +877,21 @@ settrap(int sig, Eprog l, int flags)
             sig != SIGCHLD)
             install_handler(sig);
     }
+    sigtrapped[sig] |= flags;
     /*
      * Note that introducing the locallevel does not affect whether
      * sigtrapped[sig] is zero or not, i.e. a test without a mask
      * works just the same.
      */
-    sigtrapped[sig] |= (locallevel << ZSIG_SHIFT) | flags;
     if (sig == SIGEXIT) {
 	/* Make POSIX behaviour of EXIT trap sticky */
 	exit_trap_posix = isset(POSIXTRAPS);
+	/* POSIX exit traps are not local. */
+	if (!exit_trap_posix)
+	    sigtrapped[sig] |= (locallevel << ZSIG_SHIFT);
     }
+    else
+	sigtrapped[sig] |= (locallevel << ZSIG_SHIFT);
     unqueue_signals();
     return 0;
 }
