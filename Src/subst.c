@@ -145,8 +145,12 @@ stringsubstquote(char *strstart, char **pstrdpos)
 	    strret = dyncat(strstart, strsub);
     } else if (strdpos[len])
 	strret = dyncat(strsub, strdpos + len);
-    else
+    else if (*strsub)
 	strret = strsub;
+    else {
+	/* This ensures a $'' doesn't get elided. */
+	strret = dupstring(nulstring);
+    }
 
     *pstrdpos = strret + (strdpos - strstart) + strlen(strsub);
 

@@ -1,5 +1,8 @@
 2016-03-07  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* users/21352: Src/subst.c, Test/A03quoting.ztst: use nulstring
+	to ensure $'' isn't elided.
+
 	* 38094: Src/signals.c, Test/C03traps.ztst: POSIX exit traps
 	aren't local so local level should be 0 so they don't
 	get trashed if defined in a function.
