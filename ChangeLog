@@ -1,3 +1,9 @@
+2016-03-07  Oliver Kiddle  <opk@zsh.org>
+
+	* 38043: Src/Zle/compcore.c, Src/Zle/complist.c,
+	Src/Zle/zle_tricky.c: allow any completion widget to cycle matches
+	for menu completion to fix reverse menu completion
+
 2016-03-07  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 38111: Src/parse.c: remove redundant return values from

@@ -30,10 +30,6 @@
 #include "complete.mdh"
 #include "compcore.pro"
 
-/* The last completion widget called. */
-
-static Widget lastcompwidget;
-
 /* Flags saying what we have to do with the result. */
 
 /**/
@@ -471,8 +467,7 @@ before_complete(UNUSED(Hookdef dummy), int *lst)
 
     /* If we are doing a menu-completion... */
 
-    if (minfo.cur && menucmp && *lst != COMP_LIST_EXPAND && 
-	(menucmp != 1 || !compwidget || compwidget == lastcompwidget)) {
+    if (minfo.cur && menucmp && *lst != COMP_LIST_EXPAND) {
 	do_menucmp(*lst);
 	return 1;
     }
@@ -481,7 +476,6 @@ before_complete(UNUSED(Hookdef dummy), int *lst)
 	onlyexpl = listdat.valid = 0;
 	return 1;
     }
-    lastcompwidget = compwidget;
 
     /* We may have to reset the cursor to its position after the   *
      * string inserted by the last completion. */

@@ -3399,7 +3399,7 @@ domenuselect(Hookdef dummy, Chdata dat)
 	do_single(*(minfo.cur));
     }
     if (wasnext || broken) {
-	menucmp = 2;
+	menucmp = 1;
 	showinglist = ((validlist && !nolist) ? -2 : 0);
 	minfo.asked = 0;
 	if (!noselect) {

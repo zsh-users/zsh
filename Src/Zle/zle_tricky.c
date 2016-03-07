@@ -100,8 +100,7 @@ mod_export int usemenu, useglob;
 /**/
 mod_export int wouldinstab;
 
-/* != 0 if we are in the middle of a menu completion. May be == 2 to force *
- * menu completion even if using different widgets.                        */
+/* != 0 if we are in the middle of a menu completion. */
 
 /**/
 mod_export int menucmp;
