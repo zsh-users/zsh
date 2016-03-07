@@ -718,7 +718,7 @@ set_sublist_code(int p, int type, int flags, int skip, int cmplx)
  */
 
 /**/
-static int
+static void
 par_list(int *cmplx)
 {
     int p, lp = -1, c;
@@ -747,19 +747,15 @@ par_list(int *cmplx)
 	    goto rec;
 	} else
 	    set_list_code(p, (Z_SYNC | Z_END), c);
-	return 1;
     } else {
 	ecused--;
-	if (lp >= 0) {
+	if (lp >= 0)
 	    ecbuf[lp] |= wc_bdata(Z_END);
-	    return 1;
-	}
-	return 0;
     }
 }
 
 /**/
-static int
+static void
 par_list1(int *cmplx)
 {
     int p = ecadd(0), c = 0;
@@ -767,11 +763,8 @@ par_list1(int *cmplx)
     if (par_sublist(&c)) {
 	set_list_code(p, (Z_SYNC | Z_END), c);
 	*cmplx |= c;
-	return 1;
-    } else {
+    } else
 	ecused--;
-	return 0;
-    }
 }
 
 /*

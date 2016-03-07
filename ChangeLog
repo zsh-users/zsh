@@ -1,5 +1,8 @@
 2016-03-07  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 38111: Src/parse.c: remove redundant return values from
+	par_list() and par_list1().
+
 	* users/21352: Src/subst.c, Test/A03quoting.ztst: use nulstring
 	to ensure $'' isn't elided.
 
