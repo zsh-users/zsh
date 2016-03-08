@@ -1377,7 +1377,11 @@ _git-reset () {
       if [[ -n $line[1] ]] && __git_is_committish $line[1]; then
         commit=$line[1]
       fi
-      __git_tree_files ${PREFIX:-.} $commit && ret=0
+      if [[ $commit == HEAD ]]; then
+	__git_ignore_line __git_staged_files && ret=0
+      else
+	__git_ignore_line __git_tree_files ${PREFIX:-.} $commit && ret=0
+      fi
       ;;
   esac
 
@@ -6129,6 +6133,29 @@ __git_tree_files () {
 
   local expl
   _wanted files expl 'tree file' _multi_parts -f $compadd_opts -- / tree_files
+}
+
+(( $+functions[__git_staged_files] )) ||
+__git_staged_files () {
+  local -a slist staged_files
+  local item expl i
+
+  slist=(${(0)"$(_call_program staged-files git status -z -uno 2>/dev/null)"})
+  __git_command_successful $pipestatus || return 1
+
+  for (( i = 1; i <= $#slist; ++i )) do
+    item=$slist[i]
+    if [[ $item == (DD|AA|U|?U)* ]]; then
+      continue	  #XXX skip unmerged files
+    elif [[ $item == R* ]]; then
+      staged_files+=( $item[4,-1] $slist[++i] )
+    elif [[ $item == [ACDM]* ]]; then
+      staged_files+=( $item[4,-1] )
+    fi
+  done
+  staged_files=( ${(0)"$(__git_files_relative ${(pj:\0:)staged_files})"} )
+
+  _wanted staged-files expl 'staged file' compadd "$@" -a - staged_files
 }
 
 # Repository Argument Types
