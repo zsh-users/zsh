@@ -994,9 +994,18 @@ entersubsh(int flags)
     if ((flags & ESUB_REVERTPGRP) && getpid() == mypgrp)
 	release_pgrp();
     shout = NULL;
-    if (!job_control_ok) {
+    if (flags & ESUB_NOMONITOR) {
 	/*
-	 * If this process is not goign to be doing job control,
+	 * Allowing any form of interactive signalling here is
+	 * actively harmful as we are in a context where there is no
+	 * control over the process.
+	 */
+	signal_ignore(SIGTTOU);
+	signal_ignore(SIGTTIN);
+	signal_ignore(SIGTSTP);
+    } else if (!job_control_ok) {
+	/*
+	 * If this process is not going to be doing job control,
 	 * we don't want to do special things with the corresponding
 	 * signals.  If it is, we need to keep the special behaviour:
 	 * see note about attachtty() above.

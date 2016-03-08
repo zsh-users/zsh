@@ -1,3 +1,8 @@
+2016-03-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 38114: Src/exec.c: In substitutions involving subshells, disable
+	signals that require interactive handling.
+
 2016-03-09  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* unposted: .gitignore: update for 38108
