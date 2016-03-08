@@ -39,9 +39,11 @@ LN_S            = @LN_S@
 @DEFS_MK@
 
 MAKEINFO = makeinfo
-TEXI2DVI = texi2dvi
+TEXI2DVI = @TEXI2DVI@
 DVIPS = dvips
+TEXI2PDF  = @TEXI2PDF@
 TEXI2HTML = @TEXI2HTML@
+PAPERSIZE = @PAPERSIZE@
 
 .SUFFIXES: .yo .1
 
@@ -86,33 +88,41 @@ Zsh/seealso.yo Zsh/tcpsys.yo Zsh/zftpsys.yo Zsh/zle.yo
 all: man $(runhelp) texi ../META-FAQ
 .PHONY: all
 
-everything: all dvi html pdf info
+everything: all html info zsh_a4.dvi zsh_us.dvi zsh_a4.pdf zsh_us.pdf \
+            intro.a4.pdf intro.us.pdf
 .PHONY: everything
 
 dvi: zsh.dvi
 .PHONY: dvi
 
-zsh.dvi: $(sdir)/zsh.texi
-	$(TEXI2DVI) $(sdir)/zsh.texi
+zsh.dvi zsh_a4.dvi zsh_us.dvi: $(sdir)/zsh.texi
+	if test $@ = zsh_us.dvi || \
+	  { test $@ = zsh.dvi && test "$(PAPERSIZE)" = us; }; then \
+	  $(TEXI2DVI) -o $@ $(sdir)/zsh.texi; \
+	else \
+	  $(TEXI2DVI) -o $@ -t @afourpaper $(sdir)/zsh.texi; \
+	fi
 
-pdf: zsh.pdf intro.a4.pdf intro.us.pdf
+pdf: zsh.pdf intro.pdf
 .PHONY: pdf
 
-zsh.pdf: $(sdir)/zsh.texi
-	if [ x$(TEXI2PDF) != x ]; then \
-	  $(TEXI2PDF) $(sdir)/zsh.texi; \
+zsh.pdf zsh_a4.pdf zsh_us.pdf: $(sdir)/zsh.texi
+	if test $@ = zsh_us.pdf || \
+	  { test $@ = zsh.pdf && test "$(PAPERSIZE)" = us; }; then \
+	  $(TEXI2PDF) -o $@ $(sdir)/zsh.texi; \
 	else \
-	  PDFTEX=$(PDFETEX) $(TEXI2DVI) --pdf $(sdir)/zsh.texi; \
+	  $(TEXI2PDF) -o $@ -t @afourpaper $(sdir)/zsh.texi; \
 	fi
 
 # Use roff2ps / ps2pdf because pdfroff produces doubled output.
-intro.a4.pdf: $(sdir)/intro.ms
-	roff2ps -ms -P-pa4 < $(sdir)/intro.ms > intro.a4.ps
-	ps2pdf intro.a4.ps
-
-intro.us.pdf: $(sdir)/intro.ms
-	roff2ps -ms -P-pletter < $(sdir)/intro.ms > intro.us.ps
-	ps2pdf intro.us.ps
+intro.pdf intro.a4.pdf intro.us.pdf: $(sdir)/intro.ms
+	if test $@ = intro.us.pdf || \
+	  { test $@ = intro.pdf && test "$(PAPERSIZE)" = us; }; then \
+	  roff2ps -ms -P-pletter < $(sdir)/intro.ms > intro.ps; \
+	else \
+	  roff2ps -ms -P-pa4 < $(sdir)/intro.ms > intro.ps; \
+	fi; \
+	ps2pdf -sOutputFile=$@ intro.ps
 
 texi: $(sdir)/zsh.texi
 .PHONY: texi
@@ -149,14 +159,14 @@ ps: us_ps a4_ps
 us_ps: zsh_us.ps
 .PHONY: us_ps
 
-zsh_us.ps: zsh.dvi
-	$(DVIPS) -t letter -o $@ zsh.dvi
+zsh_us.ps: zsh_us.dvi
+	$(DVIPS) -t letter -o $@ zsh_us.dvi
 
 a4_ps: zsh_a4.ps
 .PHONY: a4_ps
 
-zsh_a4.ps: zsh.dvi
-	$(DVIPS) -t a4 -o $@ zsh.dvi
+zsh_a4.ps: zsh_a4.dvi
+	$(DVIPS) -t a4 -o $@ zsh_a4.dvi
 
 html: zsh_toc.html
 .PHONY: html

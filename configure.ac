@@ -632,13 +632,23 @@ if test "x$ac_cv_prog_YODL" = xyodl; then
 fi
 AC_SUBST(YODL_OPTIONS)
 
-AC_CHECK_PROGS([PDFETEX], [pdfetex], [: pdfetex])
-AC_CHECK_PROGS([TEXI2PDF], [texi2pdf], [])
+AC_CHECK_PROGS([TEXI2DVI], [texi2dvi], [: texi2dvi])
+AC_CHECK_PROGS([TEXI2PDF], [texi2pdf], [: texi2pdf])
 AC_CHECK_PROGS([TEXI2HTML], [texi2any texi2html], [: texi2html])
+
+if test x"$TEXI2PDF" != xtexi2pdf && test x"$TEXI2DVI" = xtexi2dvi; then
+  TEXI2PDF='texi2dvi --pdf'
+fi
 
 if test x"$TEXI2HTML" = xtexi2any; then
   TEXI2HTML='texi2any -c TEXI2HTML=1'
 fi
+
+case "$LC_PAPER" in
+  ??_US*) PAPERSIZE=us ;;
+  *)      PAPERSIZE=a4 ;;
+esac
+AC_SUBST(PAPERSIZE)
 
 AC_CHECK_PROGS([ANSI2KNR], [ansi2knr], [: ansi2knr])
 

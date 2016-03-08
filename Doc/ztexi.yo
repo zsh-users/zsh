@@ -53,7 +53,6 @@ def(texinfo)(2)(\
   NOTRANS(\input texinfo.tex)+NL()\
   NOTRANS(@c %**start of header)+NL()\
   NOTRANS(@iftex)+NL()\
-  NOTRANS(@afourpaper)+NL()\
   NOTRANS(@setchapternewpage off)+NL()\
   NOTRANS(@end iftex)+NL()\
   NOTRANS(@setfilename )ARG1+NL()\

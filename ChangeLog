@@ -1,3 +1,11 @@
+2016-03-08  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 38074: Completion/Unix/Command/_git: _git reset HEAD:
+	complete only staged files
+
+	* 38108: Config/defs.mk.in, Doc/Makefile.in, Doc/ztexi.yo,
+	configure.ac: enable to create both zsh_{a4,us}.pdf
+
 2016-03-07  Oliver Kiddle  <opk@zsh.org>
 
 	* 38043: Src/Zle/compcore.c, Src/Zle/complist.c,
