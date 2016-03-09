@@ -1,3 +1,8 @@
+2016-03-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 38120: Completion/Unix/Command/_git: Document the internal
+	helper function __git_ignore_line.
+
 2016-03-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 38114: Src/exec.c: In substitutions involving subshells, disable

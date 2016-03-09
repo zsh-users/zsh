@@ -5038,6 +5038,16 @@ __git_describe_commit () {
 
 # Completion Wrappers
 
+# '__git_ignore_line $callee "${callee_args[@]}" "${callee_compadd_args[@]}"'
+# invokes '$callee "${callee_args[@]}" "${callee_compadd_args[@]}"' with
+# callee_compadd_args modified to exclude positional parameters to the completed
+# command from being completed.  This causes 'git add foo <TAB>' not to offer
+# 'foo' again.
+#
+# Note: This function can't be used to wrap bare 'compadd' calls that use a '--'
+# argument terminator.  It can wrap functions of the form
+#     f() { shift $N; compadd "$@" -a - mymatches }
+# .
 (( $+functions[__git_ignore_line] )) ||
 __git_ignore_line () {
   declare -a ignored
