@@ -1373,16 +1373,11 @@ _git-reset () {
 
   case $state in
     (file)
-      local commit=HEAD
-      if [[ -n $line[1] ]] && __git_is_committish $line[1]; then
-        commit=$line[1]
+      local tree=HEAD
+      if [[ -n $line[1] ]] && __git_is_treeish $line[1]; then
+        tree=$line[1]
       fi
-      if [[ $commit == HEAD ]]; then
-	__git_ignore_line __git_staged_files && ret=0
-      else
-	__git_ignore_line __git_tree_files ${PREFIX:-.} $commit && ret=0
-      fi
-      ;;
+      __git_ignore_line __git_treeish-to-index_files $tree && ret=0
   esac
 
   return ret
@@ -6077,16 +6072,28 @@ __git_killed_files () {
   __git_files --killed killed-files 'killed file' $*
 }
 
-(( $+functions[__git_changed-in-index_files] )) ||
-__git_changed-in-index_files () {
+(( $+functions[__git_diff-index_files] )) ||
+__git_diff-index_files () {
+  local tree=$1 description=$2 tag=$3; shift 3
   local files expl
 
-  files=$(_call_program files git diff-index -z --name-only --no-color --cached HEAD 2>/dev/null)
+  files=$(_call_program files git diff-index -z --name-only --no-color --cached $tree 2>/dev/null)
   __git_command_successful $pipestatus || return 1
   files=(${(0)"$(__git_files_relative $files)"})
   __git_command_successful $pipestatus || return 1
 
-  _wanted changed-in-index-files expl 'changed in index file' _multi_parts $@ - / files
+  _wanted $tag expl $description _multi_parts $@ - / files
+}
+
+(( $+functions[__git_changed-in-index_files] )) ||
+__git_changed-in-index_files () {
+  __git_diff-index_files HEAD 'changed in index file' changed-in-index-files "$@"
+}
+
+(( $+functions[__git_treeish-to-index_files] )) ||
+__git_treeish-to-index_files () {
+  local tree=$1; shift
+  __git_diff-index_files $tree "files different between ${(qq)tree} and the index" treeish-to-index-files "$@"
 }
 
 (( $+functions[__git_changed-in-working-tree_files] )) ||
@@ -6143,29 +6150,6 @@ __git_tree_files () {
 
   local expl
   _wanted files expl 'tree file' _multi_parts -f $compadd_opts -- / tree_files
-}
-
-(( $+functions[__git_staged_files] )) ||
-__git_staged_files () {
-  local -a slist staged_files
-  local item expl i
-
-  slist=(${(0)"$(_call_program staged-files git status -z -uno 2>/dev/null)"})
-  __git_command_successful $pipestatus || return 1
-
-  for (( i = 1; i <= $#slist; ++i )) do
-    item=$slist[i]
-    if [[ $item == (DD|AA|U|?U)* ]]; then
-      continue	  #XXX skip unmerged files
-    elif [[ $item == R* ]]; then
-      staged_files+=( $item[4,-1] $slist[++i] )
-    elif [[ $item == [ACDM]* ]]; then
-      staged_files+=( $item[4,-1] )
-    fi
-  done
-  staged_files=( ${(0)"$(__git_files_relative ${(pj:\0:)staged_files})"} )
-
-  _wanted staged-files expl 'staged file' compadd "$@" -a - staged_files
 }
 
 # Repository Argument Types
