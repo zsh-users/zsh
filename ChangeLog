@@ -1,3 +1,7 @@
+2016-03-09  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* unposted: .gitignore: update for 38108
+
 2016-03-08  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 38074: Completion/Unix/Command/_git: _git reset HEAD:

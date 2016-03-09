@@ -35,6 +35,8 @@ Doc/help
 Doc/help.txt
 Doc/help/[_a-zA-Z0-9]*
 
+Doc/intro.pdf
+Doc/intro.ps
 Doc/intro.a4.pdf
 Doc/intro.a4.ps
 Doc/intro.us.pdf
@@ -59,6 +61,8 @@ Doc/zsh.vr
 Doc/zsh.vrs
 Doc/zsh.log
 Doc/zsh.dvi
+Doc/zsh_a4.dvi
+Doc/zsh_us.dvi
 Doc/zsh.tp
 Doc/zsh.tps
 Doc/zsh.idx
