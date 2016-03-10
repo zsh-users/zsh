@@ -4956,7 +4956,7 @@ __git_committish_range_last () {
 
 (( $+functions[__git_pattern_escape] )) ||
 __git_pattern_escape () {
-  print -r -n ${1//(#m)[\[\]()\\*?#<>~\^]/\\$MATCH}
+  print -r -n - ${(b)1}
 }
 
 (( $+functions[__git_is_type] )) ||
@@ -5048,9 +5048,9 @@ __git_ignore_line () {
   declare -a ignored
   ignored=()
   ((CURRENT > 1)) &&
-    ignored+=(${line[1,CURRENT-1]//(#m)[\[\]()\\*?#<>~\^]/\\$MATCH})
+    ignored+=(${(bQ)line[1,CURRENT-1]})
   ((CURRENT < $#line)) &&
-    ignored+=(${line[CURRENT+1,-1]//(#m)[\[\]()\\*?#<>~\^]/\\$MATCH})
+    ignored+=(${(bQ)line[CURRENT+1,-1]})
   $* -F ignored
 }
 
