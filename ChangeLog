@@ -1,5 +1,8 @@
 2016-03-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38128: Completion/Unix/Command/_git: Fix completion of diffs
+	against the index when treeish isn't shell-safe
+
 	* 38123 (after 38074): Completion/Unix/Command/_git: _git reset
 	$treeish: complete only staged files
 

@@ -6077,7 +6077,8 @@ __git_diff-index_files () {
   local tree=$1 description=$2 tag=$3; shift 3
   local files expl
 
-  files=$(_call_program files git diff-index -z --name-only --no-color --cached $tree 2>/dev/null)
+  # $tree needs to be escaped for _call_program; matters for $tree = "HEAD^"
+  files=$(_call_program files git diff-index -z --name-only --no-color --cached ${(q)tree} 2>/dev/null)
   __git_command_successful $pipestatus || return 1
   files=(${(0)"$(__git_files_relative $files)"})
   __git_command_successful $pipestatus || return 1
