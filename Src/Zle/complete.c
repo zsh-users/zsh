@@ -704,15 +704,18 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    }
 	    if (sp) {
 		if (p[1]) {
+		    /* Pasted argument: -Xfoo. */
 		    if (!*sp)
 			*sp = p + 1;
 		    p = "" - 1;
 		} else if (argv[1]) {
+		    /* Argument in a separate word: -X foo. */
 		    argv++;
 		    if (!*sp)
 			*sp = *argv;
 		    p = "" - 1;
 		} else {
+		    /* Missing argument: argv[N] == "-X", argv[N+1] == NULL. */
 		    zwarnnam(name, e, *p);
 		    zsfree(mstr);
 		    return 1;

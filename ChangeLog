@@ -1,5 +1,8 @@
 2016-03-11  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38135: Src/Zle/complete.c: internal: bin_compadd: Add a
+	few comments.
+
 	* 38129: Completion/Unix/Command/_git: Fix __git_ignore_line's
 	treatment of shell and pattern metacaracters.
 
