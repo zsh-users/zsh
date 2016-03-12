@@ -537,8 +537,13 @@ patcompile(char *exp, int inflags, char **endexp)
     Upat pscan;
     char *lng, *strp = NULL;
     Patprog p;
+    int savpatflags, savpatglobflags;
 
     queue_signals();
+
+    /* In case called from a signal handler before queuing */
+    savpatflags = patflags;
+    savpatglobflags = patglobflags;
 
     startoff = sizeof(struct patprog);
     /* Ensure alignment of start of program string */
@@ -603,6 +608,8 @@ patcompile(char *exp, int inflags, char **endexp)
 	    /* No, do normal compilation. */
 	    strp = NULL;
 	    if (patcompswitch(0, &flags) == 0) {
+		patflags = savpatflags;
+		patglobflags = savpatglobflags;
 		unqueue_signals();
 		return NULL;
 	    }
@@ -738,6 +745,8 @@ patcompile(char *exp, int inflags, char **endexp)
     if (endexp)
 	*endexp = patparse;
 
+    patflags = savpatflags;
+    patglobflags = savpatglobflags;
     unqueue_signals();
     return p;
 }
@@ -2259,6 +2268,9 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
     char *progstr = (char *)prog + prog->startoff;
     struct patstralloc patstralloc_struct;
 
+    /* In case called from a signal handler */
+    int savpatflags = patflags, savpatglobflags = patglobflags;
+
     if (nump) {
 	maxnpos = *nump;
 	*nump = 0;
@@ -2302,7 +2314,7 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	 * Either we are testing against a pure string,
 	 * or we can match anything at all.
 	 */
-	int ret, pstrlen;
+	int pstrlen;
 	char *pstr;
 	if (patstralloc->alloced)
 	{
@@ -2404,8 +2416,6 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 		}
 	    }
 	}
-
-	return ret;
     } else {
 	int q = queue_signal_level();
 
@@ -2441,6 +2451,8 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	    }
 	}
 	if (!ret) {
+	    patflags = savpatflags;
+	    patglobflags = savpatglobflags;
 	    return 0;
 	}
 
@@ -2596,9 +2608,11 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	    ret = 0;
 
 	restore_queue_signals(q);
-
-	return ret;
     }
+
+    patflags = savpatflags;
+    patglobflags = savpatglobflags;
+    return ret;
 }
 
 /*
