@@ -1,5 +1,8 @@
 2016-03-15  m0viefreak  <m0viefreak.cm@googlemail.com>
 
+	* 38151: Completion/Unix/Command/_git: fix tag name of remote
+	branches
+
 	* 38148: Completion/Unix/Command/_git: reflog: complete
 	references next to commands
 

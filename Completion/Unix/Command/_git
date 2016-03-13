@@ -457,7 +457,7 @@ _git-checkout () {
       if (( CURRENT == 1 )) && [[ -z $opt_args[(I)--] ]]; then
         # TODO: Allow A...B
         local branch_arg='' \
-              remote_branch_noprefix_arg='remote branches::__git_remote_branch_names_noprefix' \
+              remote_branch_noprefix_arg='remote-branch-names-noprefix::__git_remote_branch_names_noprefix' \
               tree_ish_arg='tree-ishs::__git_tree_ishs' \
               file_arg='modified-files::__git_modified_files'
 
