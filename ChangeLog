@@ -1,3 +1,8 @@
+2016-03-15  m0viefreak  <m0viefreak.cm@googlemail.com>
+
+	* 38148: Completion/Unix/Command/_git: reflog: complete
+	references next to commands
+
 2016-03-11  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 38135: Src/Zle/complete.c: internal: bin_compadd: Add a

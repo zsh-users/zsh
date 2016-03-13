@@ -3069,7 +3069,9 @@ _git-reflog () {
           'delete:delete entries from reflog'
           'show:show log of ref')
 
-        _describe -t commands command commands && ret=0
+        _alternative \
+          'commands:: _describe -t commands command commands' \
+          'references:: __git_references' && ret=0
         ;;
       (option-or-argument)
         curcontext=${curcontext%:*}-$line[1]:
