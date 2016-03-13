@@ -103,6 +103,18 @@ static const struct gsu_integer yankend_gsu =
 { get_yankend, set_yankend, zleunsetfn };
 static const struct gsu_integer yankactive_gsu =
 { get_yankactive, NULL, zleunsetfn };
+static const struct gsu_integer isearchstart_gsu =
+{ get_isearchstart, NULL, zleunsetfn };
+static const struct gsu_integer isearchend_gsu =
+{ get_isearchend, NULL, zleunsetfn };
+static const struct gsu_integer isearchactive_gsu =
+{ get_isearchactive, NULL, zleunsetfn };
+static const struct gsu_integer suffixstart_gsu =
+{ get_suffixstart, NULL, zleunsetfn };
+static const struct gsu_integer suffixend_gsu =
+{ get_suffixend, NULL, zleunsetfn };
+static const struct gsu_integer suffixactive_gsu =
+{ get_suffixactive, NULL, zleunsetfn };
 
 static const struct gsu_array killring_gsu =
 { get_killring, set_killring, unset_killring };
@@ -152,6 +164,12 @@ static struct zleparam {
     { "YANK_START", PM_INTEGER, GSU(yankstart_gsu), NULL },
     { "YANK_END", PM_INTEGER, GSU(yankend_gsu), NULL },
     { "YANK_ACTIVE", PM_INTEGER | PM_READONLY, GSU(yankactive_gsu), NULL },
+    { "ISEARCH_START", PM_INTEGER, GSU(isearchstart_gsu), NULL },
+    { "ISEARCH_END", PM_INTEGER, GSU(isearchend_gsu), NULL },
+    { "ISEARCH_ACTIVE", PM_INTEGER | PM_READONLY, GSU(isearchactive_gsu), NULL },
+    { "SUFFIX_START", PM_INTEGER, GSU(suffixstart_gsu), NULL },
+    { "SUFFIX_END", PM_INTEGER, GSU(suffixend_gsu), NULL },
+    { "SUFFIX_ACTIVE", PM_INTEGER | PM_READONLY, GSU(suffixactive_gsu), NULL },
     { "ZLE_STATE", PM_SCALAR | PM_READONLY, GSU(zle_state_gsu), NULL },
     { NULL, 0, NULL, NULL }
 };
@@ -518,6 +536,48 @@ static void
 set_yankend(UNUSED(Param pm), zlong i)
 {
     yanke = i;
+}
+
+/**/
+static zlong
+get_isearchstart(UNUSED(Param pm))
+{
+    return isearch_startpos;
+}
+
+/**/
+static zlong
+get_isearchend(UNUSED(Param pm))
+{
+    return isearch_endpos;
+}
+
+/**/
+static zlong
+get_isearchactive(UNUSED(Param pm))
+{
+    return isearch_active;
+}
+
+/**/
+static zlong
+get_suffixstart(UNUSED(Param pm))
+{
+    return zlecs - suffixlen;
+}
+
+/**/
+static zlong
+get_suffixend(UNUSED(Param pm))
+{
+    return zlecs;
+}
+
+/**/
+static zlong
+get_suffixactive(UNUSED(Param pm))
+{
+    return suffixlen;
 }
 
 /**/

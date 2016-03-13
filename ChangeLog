@@ -1,3 +1,8 @@
+2016-03-21  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* m0viefreak: 38145: Doc/Zsh/zle.yo, Src/Zle/zle_params.c: Make
+	isearch and completion suffix variables visible as parameters.
+
 2016-03-19  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 38186: Completion/Unix/Command/_adb: fix remote file completion,

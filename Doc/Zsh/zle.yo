@@ -835,6 +835,19 @@ which always gives the number of the history line being added to the main
 shell's history.  tt(HISTNO) refers to the line being retrieved within
 zle.
 )
+vindex(ISEARCH_ACTIVE)
+vindex(ISEARCH_START)
+vindex(ISEARCH_END)
+xitem(tt(ISEARCH_ACTIVE) (integer))
+xitem(tt(ISEARCH_START) (integer))
+item(tt(ISEARCH_END) (integer))(
+tt(ISEARCH_ACTIVE) indicates whether an incremental search minibuffer
+is active. tt(ISEARCH_START) and tt(ISEARCH_END) give the location of
+the matched pattern and are in the same units as tt(CURSOR). They are
+only valid for reading when tt(ISEARCH_ACTIVE) is non-zero.
+
+All parameters are read-only.
+)
 vindex(KEYMAP)
 item(tt(KEYMAP) (scalar))(
 The name of the currently selected keymap; read-only.
@@ -976,6 +989,19 @@ The final highlighting on the command line depends on both tt(region_highlight)
 and tt(zle_highlight); see
 ifzman(the section CHARACTER HIGHLIGHTING below)\
 ifnzman(noderef(Character Highlighting)) for details.
+)
+vindex(SUFFIX_ACTIVE)
+vindex(SUFFIX_START)
+vindex(SUFFIX_END)
+xitem(tt(SUFFIX_ACTIVE) (integer))
+xitem(tt(SUFFIX_START) (integer))
+item(tt(SUFFIX_END) (integer))(
+tt(SUFFIX_ACTIVE) indicates whether an auto-removable completion suffix
+is currently active. tt(SUFFIX_START) and tt(SUFFIX_END) give the
+location of the suffix and are in the same units as tt(CURSOR). They are
+only valid for reading when tt(SUFFIX_ACTIVE) is non-zero.
+
+All parameters are read-only.
 )
 vindex(UNDO_CHANGE_NO)
 item(tt(UNDO_CHANGE_NO) (integer))(
