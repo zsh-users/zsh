@@ -610,15 +610,17 @@ bin_limit(char *nam, char **argv, Options ops, UNUSED(int func))
 		return 1;
 	    }
 	} else {
-	    /* memory-type resource -- `k' and `M' modifiers are permitted,
-	    meaning (respectively) 2^10 and 2^20. */
+	    /* memory-type resource -- `k', `M' and `G' modifiers are permitted,
+	    meaning (respectively) 2^10, 2^20 and 2^30. */
 	    val = zstrtorlimt(s, &s, 10);
 	    if (!*s || ((*s == 'k' || *s == 'K') && !s[1])) {
 		if (val != RLIM_INFINITY)
 		    val *= 1024L;
-	    } else if ((*s == 'M' || *s == 'm') && !s[1])
+	    } else if ((*s == 'M' || *s == 'm') && !s[1]) {
 		val *= 1024L * 1024;
-	    else {
+	    } else if ((*s == 'G' || *s == 'g') && !s[1]) {
+		val *= 1024L * 1024 * 1024;
+	    } else {
 		zwarnnam(nam, "unknown scaling factor: %s", s);
 		return 1;
 	    }
