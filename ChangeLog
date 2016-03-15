@@ -1,3 +1,8 @@
+2016-03-16  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 38161: Completion/Unix/Command/_tmux: _tmux: Use a colon to
+	terminate options to _arguments itself
+
 2016-03-15  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 38155: Doc/Zsh/compsys.yo: docs: compsys: Clarify documentation
