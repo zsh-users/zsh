@@ -1554,7 +1554,8 @@ of the links themselves.
 )
 kindex(filter, completion style)
 item(tt(filter))(
-This is used by the LDAP plugin for e-mail address completion to specify
+The tt(ldap) plugin of email address completion (see tt(_email_addresses)) uses
+this style to specify
 the attributes to match against when filtering entries.  So for example, if
 the style is set to `tt(sn)', matching is done against surnames.  Standard
 LDAP filtering is used so normal completion matching is bypassed.  If this

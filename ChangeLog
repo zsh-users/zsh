@@ -1,3 +1,8 @@
+2016-03-15  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 38155: Doc/Zsh/compsys.yo: docs: compsys: Clarify documentation
+	of the 'filter' style.
+
 2016-03-15  m0viefreak  <m0viefreak.cm@googlemail.com>
 
 	* 38151: Completion/Unix/Command/_git: fix tag name of remote
