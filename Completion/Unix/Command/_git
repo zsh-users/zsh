@@ -5474,10 +5474,10 @@ __git_reflog_entries () {
   local expl
   declare -a reflog_entries
 
-  reflog_entries=(${${${(f)"$(_call_program reflog-entries git reflog 2>/dev/null)"}#* }%%:*})
+  reflog_entries=(${(f)"$(_call_program reflog-entries "git reflog -1000 --pretty='%gD:[%h] %gs'" 2>/dev/null)"})
   __git_command_successful $pipestatus || return 1
 
-  _wanted reflog-entries expl 'reflog entry' _multi_parts @ reflog_entries
+  _describe -Vx -t reflog-entries 'reflog entry' reflog_entries
 }
 
 (( $+functions[__git_ref_sort_keys] )) ||
