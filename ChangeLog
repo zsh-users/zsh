@@ -1,3 +1,8 @@
+2016-03-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Doc/Zsh/contrib.yo: Document run-help-* helper
+	functions.
+
 2016-03-18  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 38179: Completion/Unix/Command/_adb: Fix completion by mostly

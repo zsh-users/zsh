@@ -4047,12 +4047,29 @@ your search path, in order to be found and used by tt(run-help).
 
 startitem()
 findex(run-help-git)
+findex(run-help-ip)
+findex(run-help-openssl)
+findex(run-help-p4)
+findex(run-help-sudo)
 findex(run-help-svk)
 findex(run-help-svn)
-xitem(tt(run-help-git))
-xitem(tt(run-help-svk))
+xitem(run-help-git)
+xitem(run-help-ip)
+xitem(run-help-openssl)
+xitem(run-help-p4)
+xitem(run-help-sudo)
+xitem(run-help-svk)
 item(tt(run-help-svn))(
-Assistant functions for the tt(git), tt(svk), and tt(svn) commands.
+Assistant functions for the
+tt(git),
+tt(ip),
+tt(openssl),
+tt(p4),
+tt(sudo),
+tt(svk),
+and 
+tt(svn),
+commands.
 )
 enditem()
 )
