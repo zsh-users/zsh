@@ -5474,7 +5474,9 @@ __git_reflog_entries () {
   local expl
   declare -a reflog_entries
 
-  reflog_entries=(${(f)"$(_call_program reflog-entries "git reflog -1000 --pretty='%gD:[%h] %gs'" 2>/dev/null)"})
+  # Repeat the %gD on the RHS due to uniquify the matches, to avoid bad
+  # completion list layout.  (Compare workers/34768)
+  reflog_entries=(${(f)"$(_call_program reflog-entries "git reflog -1000 --pretty='%gD:[%h] %gs (%gD)'" 2>/dev/null)"})
   reflog_entries=( ${reflog_entries/HEAD@$'\x7b'/@$'\x7b'} )
   __git_command_successful $pipestatus || return 1
 
@@ -5671,8 +5673,13 @@ __git_commit_objects () {
   local gitdir expl start
   declare -a commits
 
-  # Abort if the argument does not match a commit hash (including empty).
-  [[ "$PREFIX$SUFFIX" == [[:xdigit:]](#c1,40) ]] || return 1
+  if [[ -n $PREFIX[(r)@] ]] || [[ -n $SUFFIX[(r)@] ]]; then
+    # doesn't match a commit hash, but might be a reflog entry
+    __git_reflog_entries; return $?
+  elif ! [[ "$PREFIX$SUFFIX" == [[:xdigit:]](#c1,40) ]]; then
+    # Abort if the argument does not match a commit hash (including empty).
+    return 1
+  fi
 
   # Note: the after-the-colon part must be unique across the entire array;
   # see workers/34768
