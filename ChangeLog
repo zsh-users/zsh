@@ -1,3 +1,8 @@
+2016-03-18  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 38179: Completion/Unix/Command/_adb: Fix completion by mostly
+	reverting 35531
+
 2016-03-16  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 38161: Completion/Unix/Command/_tmux: _tmux: Use a colon to

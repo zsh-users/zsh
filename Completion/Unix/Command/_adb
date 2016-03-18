@@ -37,34 +37,45 @@ _adb() {
 
   local -a ALL_ADB_COMMANDS
   ALL_ADB_COMMANDS=(
-          "connect"
-          "disconnect"
-          "shell"
-          "wait-for-device"
-          "push"
-          "pull"
-          "logcat"
-          "jdwp"
+          "backup"
           "bugreport"
-          "version"
-          "forward"
-          "install"
-          "uninstall"
-          "help"
-          "start-server"
-          "kill-server"
+          "connect"
           "devices"
-          "get-state"
+          "disable-verity"
+          "disconnect"
+          "emu"
+          "enable-verity"
+          "forward"
+          "get-devpath"
           "get-serialno"
-          "status-window"
-          "remount"
+          "get-state"
+          "help"
+          "install"
+          "install-multiple"
+          "jdwp"
+          "keygen"
+          "kill-server"
+          "logcat"
+          "ppp"
+          "pull"
+          "push"
           "reboot"
           "reboot-bootloader"
+          "remount"
+          "restore"
+          "reverse"
           "root"
-          "usb"
-          "tcpip"
+          "shell"
           "sideload"
-          "ppp"
+          "start-server"
+          "status-window"
+          "sync"
+          "tcpip"
+          "uninstall"
+          "unroot"
+          "usb"
+          "version"
+          "wait-for-device"
   )
 
   (( $+functions[_adb_device_specification] )) && _adb_device_specification
@@ -100,28 +111,29 @@ _adb_dispatch_command () {
   fi
 
   case ${curcontext} in
-    (*:adb-shell)
+    (*:adb:shell)
       (( $+functions[_adb_dispatch_shell] )) && _adb_dispatch_shell
       ;;
-    (*:adb-connect|*:adb-disconnect)
+    (*:adb:connect|*:adb:disconnect)
       (( $+functions[_adb_dispatch_connection_handling] )) && _adb_dispatch_connection_handling
       ;;
-    (*:adb-logcat)
+    (*:adb:logcat)
       (( $+functions[_adb_dispatch_logcat] )) && _adb_dispatch_logcat
       ;;
-    (*:adb-push)
+    (*:adb:push)
       (( $+functions[_adb_dispatch_push] )) && _adb_dispatch_push
       ;;
-    (*:adb-pull)
+    (*:adb:pull)
       (( $+functions[_adb_dispatch_pull] )) && _adb_dispatch_pull
       ;;
-    (*:adb-install)
+    (*:adb:install)
       (( $+functions[_adb_dispatch_install] )) && _adb_dispatch_install
       ;;
-    (*:adb-uninstall)
+    (*:adb:uninstall)
       (( $+functions[_adb_dispatch_uninstall] )) && _adb_dispatch_uninstall
       ;;
-    (*:adb-*)
+    (*:adb:(${(~j:|:)ALL_ADB_COMMANDS}))
+      # subcommand not handled
       _default
       ;;
     (*)
@@ -147,7 +159,7 @@ _adb_sanitize_context () {
   done
   ##expand unquoted to remove sparse elements
   mywords=( ${mywords[@]} )
-  (( $#mywords )) && curcontext="${curcontext%:*}-${mywords[-1]}:"
+  curcontext="${curcontext}${mywords[-1]}"
 }
 
 (( $+functions[_adb_device_specification] )) ||
