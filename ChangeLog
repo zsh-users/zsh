@@ -1,5 +1,8 @@
 2016-03-21  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38181: Completion/Unix/Command/_git: _git reflog: Complete
+	'@{N}' instead of 'HEAD@{N}'.
+
 	* 38180: Completion/Unix/Command/_git: Improve reflog completion.
 
 2016-03-21  Peter Stephenson  <p.stephenson@samsung.com>

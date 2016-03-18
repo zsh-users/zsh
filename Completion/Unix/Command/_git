@@ -5475,6 +5475,7 @@ __git_reflog_entries () {
   declare -a reflog_entries
 
   reflog_entries=(${(f)"$(_call_program reflog-entries "git reflog -1000 --pretty='%gD:[%h] %gs'" 2>/dev/null)"})
+  reflog_entries=( ${reflog_entries/HEAD@$'\x7b'/@$'\x7b'} )
   __git_command_successful $pipestatus || return 1
 
   _describe -Vx -t reflog-entries 'reflog entry' reflog_entries
