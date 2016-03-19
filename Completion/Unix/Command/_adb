@@ -87,7 +87,7 @@ _adb() {
 	'(-d -e   )-s[serial]: :_adb_device_serial' \
 	'(   -e -s)-d[device]' \
 	'(-d    -s)-e[emulator]' \
-	'1:"options":_adb_options_handler' \
+	'1:options:_adb_options_handler' \
 	'*: : _default'
       
       return;
@@ -111,37 +111,36 @@ _adb_dispatch_command () {
   fi
 
   case ${curcontext} in
-    (*:adb:shell)
+    (*:adb-shell:)
       (( $+functions[_adb_dispatch_shell] )) && _adb_dispatch_shell
       ;;
-    (*:adb:connect|*:adb:disconnect)
+    (*:adb-connect:|*:adb-disconnect:)
       (( $+functions[_adb_dispatch_connection_handling] )) && _adb_dispatch_connection_handling
       ;;
-    (*:adb:logcat)
+    (*:adb-logcat:)
       (( $+functions[_adb_dispatch_logcat] )) && _adb_dispatch_logcat
       ;;
-    (*:adb:push)
+    (*:adb-push:)
       (( $+functions[_adb_dispatch_push] )) && _adb_dispatch_push
       ;;
-    (*:adb:pull)
+    (*:adb-pull:)
       (( $+functions[_adb_dispatch_pull] )) && _adb_dispatch_pull
       ;;
-    (*:adb:install)
+    (*:adb-install:)
       (( $+functions[_adb_dispatch_install] )) && _adb_dispatch_install
       ;;
-    (*:adb:uninstall)
+    (*:adb-uninstall:)
       (( $+functions[_adb_dispatch_uninstall] )) && _adb_dispatch_uninstall
       ;;
-    (*:adb:(${(~j:|:)ALL_ADB_COMMANDS}))
-      # subcommand not handled
+    (*:adb-*)
       _default
       ;;
     (*)
       _arguments \
-	'(-d -e)-s["serial"]: :_adb_device_serial' \
-	'(-s -e)-d["device"]' \
-	'(-d -s)-e["emulator"]' \
-	'*:"options":_adb_options_handler'
+	'(-d -e)-s[serial]: :_adb_device_serial' \
+	'(-s -e)-d[device]' \
+	'(-d -s)-e[emulator]' \
+	'*:options:_adb_options_handler'
       ;;
   esac
 }
@@ -159,7 +158,7 @@ _adb_sanitize_context () {
   done
   ##expand unquoted to remove sparse elements
   mywords=( ${mywords[@]} )
-  curcontext="${curcontext}${mywords[-1]}"
+  (( $#mywords )) && curcontext="${curcontext%:*}-${mywords[-1]}:"
 }
 
 (( $+functions[_adb_device_specification] )) ||
@@ -203,7 +202,7 @@ _adb_dispatch_shell () {
       (( $+functions[_adb_package_manager_handler] )) && _adb_package_manager_handler
       ;;
     (*)
-      _arguments '*:adb_remote_folder:_adb_remote_folder'
+      _arguments '*: :_adb_remote_folder'
       ;;
   esac
 }
@@ -328,8 +327,8 @@ _adb_dispatch_uninstall () {
   fi
 
   _arguments \
-	'-k["keep data and cache"]' \
-        '*:"installed package":_adb_installed_packages'
+	'-k[keep data and cache]' \
+        '*:installed package:_adb_installed_packages'
 }
 
 (( $+functions[_adb_dispatch_install] )) ||
@@ -342,10 +341,10 @@ _adb_dispatch_install () {
   fi
 
   _arguments \
-	'-l["forward lock"]' \
-	'-r["reinstall"]' \
-	'-s["install on sd"]' \
-	'*:"select apk file":_path_files -g "*(/)|*.apk"'
+	'-l[forward lock]' \
+	'-r[reinstall]' \
+	'-s[install on sd]' \
+	'*:apk file:_path_files -g "*(/)|*.apk"'
 }
 
 (( $+functions[_adb_dispatch_push] )) ||
@@ -357,9 +356,9 @@ _adb_dispatch_push () {
   fi 
   if [[ ${#words} -gt 2 ]]
   then
-    _arguments '*:adb_remote_folder:_adb_remote_folder'
+    _arguments '*: :_adb_remote_folder'
   else
-    _arguments '*:"local file/folder":_files'
+    _arguments '*:local file/folder:_files'
   fi
 }
 
@@ -372,9 +371,9 @@ _adb_dispatch_pull () {
   fi 
   if [[ ${#words} -gt 2 ]]
   then
-    _arguments '*:"local file/folder":_files'
+    _arguments '*:local file/folder:_files'
   else
-    _arguments '*:adb_remote_folder:_adb_remote_folder'
+    _arguments '*: :_adb_remote_folder'
   fi
 }
 
@@ -465,11 +464,6 @@ _adb_shell_commands_handler() {
   _wanted adb_shell_commands expl 'adb shell commands' compadd ls pm am mkdir rmdir rm cat 
 }
 
-(( $+functions[_adb_any_device_available] )) ||
-_adb_any_device_available() {
-  _any_device_available=${#$(adb devices | sed -n 's/^\([^[:space:]]*\)\t.*$/\1/p')}
-}
-
 (( $+functions[_adb_device_available] )) ||
 _adb_device_available() {
   [[ $(adb ${=ADB_DEVICE_SPECIFICATION} get-state 2>&1) == "device" ]] && return 0
@@ -478,22 +472,16 @@ _adb_device_available() {
 
 (( $+functions[_adb_full_folder_scan] )) ||
 _adb_full_folder_scan() {
-  local -a rv;
-  rv=( ${$(adb ${=ADB_DEVICE_SPECIFICATION} shell 'for i in $(ls -d /*)
+  filesystem_content=( ${${(f)"$(adb ${=ADB_DEVICE_SPECIFICATION} shell 'cd /;for i in *
       do
         case $i in
-          /proc|/sys|/acct)
+          proc|sys|acct)
             ;;
           *)
-            ls -R $i
+            find $i 2> /dev/null
             ;;
         esac
-      done' )//'$\r'/} )
-  for line in ${rv[@]};
-  do
-    [[ ${line[1]} == '/' ]] && folder="${line%:}" && adb_device_folders+=$folder && continue;
-    adb_device_folders+=$folder/$line;
-  done
+      done' )"}%$'\r'} )
 }
 
 (( $+functions[_adb_remote_folder] )) ||
@@ -503,14 +491,11 @@ _adb_remote_folder () {
   if [[ -z "$update_policy" ]]; then
     zstyle ":completion:${curcontext}:" cache-policy _adb_cache_policy_daily
   fi
-  local cacheid=package_cache_${$(adb ${=ADB_DEVICE_SPECIFICATION} get-serialno)}
+  local cacheid=folder_cache_${$(adb ${=ADB_DEVICE_SPECIFICATION} get-serialno)}
   typeset -a filesystem_content
   if _cache_invalid "$cacheid" || ! _retrieve_cache "$cacheid"
   then
-    local -a adb_device_folders
     _adb_full_folder_scan
-    # remove any duplicates and the initial slash => should still remove bare folders from it when it has children
-    filesystem_content=( ${(u)adb_device_folders#/} )
     _store_cache "$cacheid" filesystem_content
   fi
   _adb_device_available && \
