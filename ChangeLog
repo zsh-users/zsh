@@ -3,6 +3,9 @@
 	* 38186: Completion/Unix/Command/_adb: fix remote file completion,
 	various fixes, restore 35531 again with fix from 38185
 
+	* 38187: Completion/Unix/Command/_adb: Just check current dir
+	instead of recursively
+
 2016-03-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Doc/Zsh/contrib.yo: Document run-help-* helper

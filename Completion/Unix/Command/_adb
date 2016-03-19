@@ -470,40 +470,26 @@ _adb_device_available() {
   return 1
 }
 
-(( $+functions[_adb_full_folder_scan] )) ||
-_adb_full_folder_scan() {
-  filesystem_content=( ${${(f)"$(adb ${=ADB_DEVICE_SPECIFICATION} shell 'cd /;for i in *
-      do
-        case $i in
-          proc|sys|acct)
-            ;;
-          *)
-            find $i 2> /dev/null
-            ;;
-        esac
-      done' )"}%$'\r'} )
-}
-
 (( $+functions[_adb_remote_folder] )) ||
 _adb_remote_folder () {
-  local expl
-  zstyle -s ":completion:${curcontext}:" cache-policy update_policy
-  if [[ -z "$update_policy" ]]; then
-    zstyle ":completion:${curcontext}:" cache-policy _adb_cache_policy_daily
+  typeset -a files dirs
+  local pref=${PREFIX}
+  if [[ $pref != */* ]]; then
+    pref=
+  elif [[ $pref != */ ]]; then
+    pref=${pref%/*}/
   fi
-  local cacheid=folder_cache_${$(adb ${=ADB_DEVICE_SPECIFICATION} get-serialno)}
-  typeset -a filesystem_content
-  if _cache_invalid "$cacheid" || ! _retrieve_cache "$cacheid"
-  then
-    _adb_full_folder_scan
-    _store_cache "$cacheid" filesystem_content
-  fi
+  # yes, this ls is sickening to look at, but android doesn't have printf or find
+  files=(${${(f)"$(adb ${=ADB_DEVICE_SPECIFICATION} shell 'ls -d 2> /dev/null '$pref'*/ '$pref'*')"}%$'\r'})
+  dirs=(${${(M)files:#*/}%/})
+  files=(${${files:|dirs}:#*\*(/|)})
   _adb_device_available && \
-    _wanted adb_remote_folder expl 'file/folder on device' _multi_parts $@ -i / filesystem_content
+    _wanted adb_remote_folder expl 'file/folder on device' _multi_parts $@ / files
 }
 
 (( $+functions[_adb_installed_packages] )) ||
 _adb_installed_packages() {
+  local update_policy
   zstyle -s ":completion:${curcontext}:" cache-policy update_policy
   if [[ -z "$update_policy" ]]; then
     zstyle ":completion:${curcontext}:" cache-policy _adb_cache_policy_single_command
