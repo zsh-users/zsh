@@ -1856,6 +1856,7 @@ void
 reexpandprompt(void)
 {
     static int reexpanding;
+    static int looping;
 
     if (!reexpanding++) {
 	/*
@@ -1866,15 +1867,33 @@ reexpandprompt(void)
 	int local_lastval = lastval;
 	lastval = pre_zle_status;
 
-	free(lpromptbuf);
-	lpromptbuf = promptexpand(raw_lp ? *raw_lp : NULL, 1, NULL, NULL,
-				  &pmpt_attr);
-	rpmpt_attr = pmpt_attr;
-	free(rpromptbuf);
-	rpromptbuf = promptexpand(raw_rp ? *raw_rp : NULL, 1, NULL, NULL,
-				  &rpmpt_attr);
+	do {
+	    /* A new SIGWINCH may arrive while in promptexpand(), causing
+	     * looping to increment.  This only happens when a command
+	     * substitution is used in a PROMPT_SUBST prompt, but
+	     * nevertheless keep trying until we see no more changes.
+	     */
+	    char *new_lprompt, *new_rprompt;
+	    looping = reexpanding;
+
+	    new_lprompt = promptexpand(raw_lp ? *raw_lp : NULL, 1, NULL, NULL,
+				       &pmpt_attr);
+	    free(lpromptbuf);
+	    lpromptbuf = new_lprompt;
+
+	    if (looping != reexpanding)
+		continue;
+
+	    rpmpt_attr = pmpt_attr;
+	    new_rprompt = promptexpand(raw_rp ? *raw_rp : NULL, 1, NULL, NULL,
+				       &rpmpt_attr);
+	    free(rpromptbuf);
+	    rpromptbuf = new_rprompt;
+	} while (looping != reexpanding);
+
 	lastval = local_lastval;
-    }
+    } else
+	looping = reexpanding;
     reexpanding--;
 }
 

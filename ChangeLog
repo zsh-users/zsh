@@ -15,6 +15,13 @@
 
 2016-03-20  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 38191: Src/Zle/zle_main.c: in reexpandprompt(), do not free global
+	pointers until after promptexpand() in case they are referenced from
+	signal handlers, and do additional re-entrancy checks in case of
+	window size changes during promptexpand().
+
+2016-03-20  Barton E. Schaefer  <schaefer@zsh.org>
+
 	* 38188: Src/pattern.c: signal re-entrancy, maybe
 
 2016-03-19  Mikael Magnusson  <mikachu@gmail.com>
