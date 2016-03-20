@@ -537,13 +537,8 @@ patcompile(char *exp, int inflags, char **endexp)
     Upat pscan;
     char *lng, *strp = NULL;
     Patprog p;
-    int savpatflags, savpatglobflags;
 
     queue_signals();
-
-    /* In case called from a signal handler before queuing */
-    savpatflags = patflags;
-    savpatglobflags = patglobflags;
 
     startoff = sizeof(struct patprog);
     /* Ensure alignment of start of program string */
@@ -608,8 +603,6 @@ patcompile(char *exp, int inflags, char **endexp)
 	    /* No, do normal compilation. */
 	    strp = NULL;
 	    if (patcompswitch(0, &flags) == 0) {
-		patflags = savpatflags;
-		patglobflags = savpatglobflags;
 		unqueue_signals();
 		return NULL;
 	    }
@@ -745,8 +738,6 @@ patcompile(char *exp, int inflags, char **endexp)
     if (endexp)
 	*endexp = patparse;
 
-    patflags = savpatflags;
-    patglobflags = savpatglobflags;
     unqueue_signals();
     return p;
 }
@@ -1847,7 +1838,8 @@ pattail(long p, long val)
 /* do pattail, but on operand of first argument; nop if operandless */
 
 /**/
-static void patoptail(long p, long val)
+static void
+patoptail(long p, long val)
 {
     Upat ptr = (Upat)patout + p;
     int op = P_OP(ptr);
@@ -1863,19 +1855,34 @@ static void patoptail(long p, long val)
 /*
  * Run a pattern.
  */
-static char *patinstart;	/* Start of input string */
-static char *patinend;		/* End of input string */
-static char *patinput;		/* String input pointer */
-static char *patinpath;		/* Full path for use with ~ exclusions */
-static int   patinlen;		/* Length of last successful match.
+struct rpat {
+    char *patinstart;		/* Start of input string */
+    char *patinend;		/* End of input string */
+    char *patinput;		/* String input pointer */
+    char *patinpath;		/* Full path for use with ~ exclusions */
+    int   patinlen;		/* Length of last successful match.
 				 * Includes count of Meta characters.
 				 */
 
-static char *patbeginp[NSUBEXP];	/* Pointer to backref beginnings */
-static char *patendp[NSUBEXP];		/* Pointer to backref ends */
-static int parsfound;			/* parentheses (with backrefs) found */
+    char *patbeginp[NSUBEXP];	/* Pointer to backref beginnings */
+    char *patendp[NSUBEXP];	/* Pointer to backref ends */
+    int parsfound;		/* parentheses (with backrefs) found */
 
-static int globdots;			/* Glob initial dots? */
+    int globdots;		/* Glob initial dots? */
+};
+
+static struct rpat pattrystate;
+
+#define patinstart	(pattrystate.patinstart)
+#define patinend	(pattrystate.patinend)
+#define patinput	(pattrystate.patinput)
+#define patinpath	(pattrystate.patinpath)
+#define patinlen	(pattrystate.patinlen)
+#define patbeginp	(pattrystate.patbeginp)
+#define patendp		(pattrystate.patendp)
+#define parsfound	(pattrystate.parsfound)
+#define globdots	(pattrystate.globdots)
+
 
 /*
  * Character functions operating on unmetafied strings.
@@ -2268,9 +2275,6 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
     char *progstr = (char *)prog + prog->startoff;
     struct patstralloc patstralloc_struct;
 
-    /* In case called from a signal handler */
-    int savpatflags = patflags, savpatglobflags = patglobflags;
-
     if (nump) {
 	maxnpos = *nump;
 	*nump = 0;
@@ -2417,8 +2421,6 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	    }
 	}
     } else {
-	int q = queue_signal_level();
-
 	/*
 	 * Test for a `must match' string, unless we're scanning for a match
 	 * in which case we don't need to do this each time.
@@ -2450,11 +2452,8 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 		    ret = 0;
 	    }
 	}
-	if (!ret) {
-	    patflags = savpatflags;
-	    patglobflags = savpatglobflags;
+	if (!ret)
 	    return 0;
-	}
 
 	patglobflags = prog->globflags;
 	if (!(patflags & PAT_FILE)) {
@@ -2465,8 +2464,6 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	parsfound = 0;
 
 	patinput = patinstart;
-
-	dont_queue_signals();
 
 	if (patmatch((Upat)progstr)) {
 	    /*
@@ -2606,12 +2603,8 @@ pattryrefs(Patprog prog, char *string, int stringlen, int unmetalenin,
 	    ret = 1;
 	} else
 	    ret = 0;
-
-	restore_queue_signals(q);
     }
 
-    patflags = savpatflags;
-    patglobflags = savpatglobflags;
     return ret;
 }
 
@@ -2688,6 +2681,26 @@ patmatch(Upat prog)
     int savglobflags, op, no, min, fail = 0, saverrsfound;
     zrange_t from, to, comp;
     patint_t nextch;
+    int q = queue_signal_level();
+
+    /*
+     * To avoid overhead of saving state if there are no queued signals
+     * waiting, we pierce the signals.h veil and examine queue state.
+     */
+#define check_for_signals() do if (queue_front != queue_rear) { \
+	    int savpatflags = patflags, savpatglobflags = patglobflags; \
+            char *savexactpos = exactpos, *savexactend = exactend; \
+	    struct rpat savpattrystate = pattrystate; \
+	    dont_queue_signals(); \
+	    restore_queue_signals(q); \
+	    exactpos = savexactpos; \
+	    exactend = savexactend; \
+	    patflags = savpatflags; \
+	    patglobflags = savpatglobflags; \
+	    pattrystate = savpattrystate; \
+	} while (0)
+
+    check_for_signals();
 
     while  (scan && !errflag) {
 	next = PATNEXT(scan);
@@ -3522,6 +3535,9 @@ patmatch(Upat prog)
 	}
 
 	scan = next;
+
+	/* Allow handlers to run once per loop */
+	check_for_signals();
     }
 
     return 0;

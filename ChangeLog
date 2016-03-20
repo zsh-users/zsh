@@ -13,6 +13,10 @@
 	* m0viefreak: 38145: Doc/Zsh/zle.yo, Src/Zle/zle_params.c: Make
 	isearch and completion suffix variables visible as parameters.
 
+2016-03-20  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38188: Src/pattern.c: signal re-entrancy, maybe
+
 2016-03-19  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 38186: Completion/Unix/Command/_adb: fix remote file completion,
@@ -48,10 +52,6 @@
 
 	* 38148: Completion/Unix/Command/_git: reflog: complete
 	references next to commands
-
-2016-03-12  Barton E. Schaefer  <schaefer@zsh.org>
-
-	* 38142: Src/pattern.c: signal re-entrancy, maybe
 
 2016-03-11  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
