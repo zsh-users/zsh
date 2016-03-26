@@ -1083,6 +1083,7 @@ startsitem()
 sitem(var(n)tt(h))(hours)
 sitem(var(n)tt(k))(kilobytes (default))
 sitem(var(n)tt(m))(megabytes or minutes)
+sitem(var(n)tt(g))(gigabytes)
 sitem([var(mm)tt(:)]var(ss))(minutes and seconds)
 endsitem()
 

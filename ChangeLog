@@ -1,3 +1,7 @@
+2016-03-26  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Dmitry Marakasov: 38162: accept G for gigabytes in limit command
+
 2016-03-21  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 38182: Completion/Unix/Command/_git: Invoke reflog completion
