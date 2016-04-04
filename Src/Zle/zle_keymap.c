@@ -1672,7 +1672,7 @@ getkeybuf(int w)
 mod_export void
 ungetkeycmd(void)
 {
-    ungetbytes(keybuf, keybuflen);
+    ungetbytes_unmeta(keybuf, keybuflen);
 }
 
 /* read a command from the current keymap, with widgets */
@@ -1690,17 +1690,12 @@ getkeycmd(void)
     if(!*seq)
 	return NULL;
     if(!func) {
-	int len;
-	char *pb;
-
 	if (++hops == 20) {
 	    zerr("string inserting another one too many times");
 	    hops = 0;
 	    return NULL;
 	}
-	pb = unmetafy(ztrdup(str), &len);
-	ungetbytes(pb, len);
-	zfree(pb, strlen(str) + 1);
+	ungetbytes_unmeta(str, strlen(str));
 	goto sentstring;
     }
     if (func == Th(z_executenamedcmd) && !statusline) {

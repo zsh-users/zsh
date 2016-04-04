@@ -357,6 +357,21 @@ ungetbytes(char *s, int len)
 	ungetbyte(*--s);
 }
 
+/**/
+void
+ungetbytes_unmeta(char *s, int len)
+{
+    s += len;
+    while (len--) {
+	if (len && s[-2] == Meta) {
+	    ungetbyte(*--s ^ 32);
+	    len--;
+	    s--;
+	} else
+	    ungetbyte(*--s);
+    }
+}
+
 #if defined(pyr) && defined(HAVE_SELECT)
 static int
 breakread(int fd, char *buf, int n)
