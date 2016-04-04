@@ -234,6 +234,25 @@ example(date >foo | cat)
 
 writes the date to the file `tt(foo)', and also pipes it to cat.
 
+Note also that redirections are always expanded in order.  This happens
+regardless of the setting of the tt(MULTIOS) option, but with the option
+in effect there are additional consequences. For example,
+the meaning of the expression tt(>&1) will change after a previous
+redirection:
+
+example(date >&1 >output)
+
+In the case above, the tt(>&1) refers to the standard output at the
+start of the line; the result is similar to the tt(tee) command.
+However, consider:
+
+exmaple(date >output >&1)
+
+As redirections are evaluated in order, when the tt(>&1) is encountered
+the standard output is set to the file tt(output) and another copy of
+the output is therefore sent to that file.  This is unlikely to be what
+is intended.
+
 If the tt(MULTIOS)
 option is set, the word after a redirection operator is also subjected
 to filename generation (globbing).  Thus
