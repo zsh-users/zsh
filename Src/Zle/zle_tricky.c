@@ -1849,8 +1849,12 @@ get_comp_string(void)
 		    ocs = zlemetacs;
 		    zlemetacs = i;
 		    foredel(skipchars, CUT_RAW);
-		    if ((zlemetacs = ocs) > --i)
+		    if ((zlemetacs = ocs) > --i) {
 			zlemetacs -= skipchars;
+			/* do not skip past the beginning of the word */
+			if (wb > zlemetacs)
+			    zlemetacs = wb;
+		    }
 		    we -= skipchars;
 		}
 	    } else {
@@ -1861,6 +1865,9 @@ get_comp_string(void)
 		    zlemetacs = we - skipchars;
 		else
 		    zlemetacs = ocs;
+		/* do not skip past the beginning of the word */
+		if (wb > zlemetacs)
+		    zlemetacs = wb;
 		we -= skipchars;
 	    }
 	    /* we need to get rid of all the quotation bits... */

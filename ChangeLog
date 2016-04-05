@@ -1,3 +1,8 @@
+2016-04-03  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38229: Src/Zle/zle_tricky.c: fix cursor placement calculation
+	when completing in empty double quotes
+
 2016-03-26  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Dmitry Marakasov: 38162: accept G for gigabytes in limit command
