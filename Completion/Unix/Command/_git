@@ -100,7 +100,7 @@ _git-am () {
   # undocumented (and not implemented here).
   _arguments -S \
     '(-s --signoff)'{-s,--signoff}'[add Signed-off-by: line to the commit message]' \
-    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=}'[GPG-sign the commit]::key id' \
+    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=-}'[GPG-sign the commit]::key id' \
     '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
     '(-k --keep)'{-k,--keep}'[pass -k to git mailinfo]' \
     '--keep-non-patch[pass -b to git mailinfo]' \
@@ -327,7 +327,7 @@ _git-branch () {
     "($l $m $d $e -f --force)"{-f,--force}"[force the creation of a new branch]" \
     "($l $m $d $e -t --track)"{-t,--track}"[set up configuration so that pull merges from the start point]" \
     "($l $m $d $e)--no-track[override the branch.autosetupmerge configuration variable]" \
-    "($l $m $d $e -u --set-upstream --set-upstream-to --unset-upstream)"{-u,--set-upstream-to=}"[set up configuration so that pull merges]:remote-branches:__git_remote_branch_names" \
+    "($l $m $d $e -u --set-upstream --set-upstream-to --unset-upstream)"{-u+,--set-upstream-to=}"[set up configuration so that pull merges]:remote-branches:__git_remote_branch_names" \
     "($l $m $d $e -u --set-upstream --set-upstream-to --unset-upstream)--unset-upstream[remove upstream configuration]" \
     "($l $m $d $e)--contains=[only list branches which contain the specified commit]: :__git_committishs" \
     "($l $m $d $e)--merged=[only list branches which are fully contained by HEAD]: :__git_committishs" \
@@ -433,13 +433,13 @@ _git-checkout () {
     '(-f --force -m --merge --conflict --patch)'{-f,--force}'[force branch switch/ignore unmerged entries]' \
     '(-q --quiet        --theirs --patch)--ours[check out stage #2 for unmerged paths]' \
     '(-q --quiet --ours          --patch)--theirs[check out stage #3 for unmerged paths]' \
-    '(   -B --orphan --ours --theirs --conflict --patch --detach)-b[create a new branch based at given commit]: :__git_branch_names' \
-    '(-b    --orphan --ours --theirs --conflict --patch --detach)-B[create or update branch based at given commit]: :__git_branch_names' \
+    '(   -B --orphan --ours --theirs --conflict --patch --detach)-b+[create a new branch based at given commit]: :__git_branch_names' \
+    '(-b    --orphan --ours --theirs --conflict --patch --detach)-B+[create or update branch based at given commit]: :__git_branch_names' \
     '(-t --track --orphan --patch --detach)'{-t,--track}'[set up configuration so pull merges from the base commit]' \
     '(--patch)--no-track[override the branch.autosetupmerge configuration variable]' \
     $new_branch_reflog_opt \
     '(-b -B -t --track --patch --orphan)--detach[detach the HEAD at named commit]' \
-    '(-b -B -t --track --patch --detach)--orphan[create a new orphan branch based at given commit]: :__git_branch_names' \
+    '(-b -B -t --track --patch --detach)--orphan=[create a new orphan branch based at given commit]: :__git_branch_names' \
     '--ignore-skip-worktree-bits[ignores patterns and adds back any files in <paths>]' \
     '(-q --quiet -f --force -m --merge --conflict --patch)'{-m,--merge}'[3way merge current branch, working tree and new branch]' \
     '(-q --quiet -f --force -m --merge --patch)--conflict=[same as --merge, using given merge style]:style:(merge diff3)' \
@@ -503,13 +503,13 @@ _git-cherry-pick () {
     '--keep-redundant-commits[keep cherry-picked commits that will become empty]' \
     '(-e --edit --ff)'{-e,--edit}'[edit commit before committing the revert]' \
     '(--ff)-x[append information about what commit was cherry-picked]' \
-    '(-m --mainline)'{-m,--mainline}'[specify mainline when cherry-picking a merge commit]:parent number' \
+    '(-m --mainline)'{-m+,--mainline=}'[specify mainline when cherry-picking a merge commit]:parent number' \
     '(-n --no-commit --ff)'{-n,--no-commit}'[do not make the actually commit]' \
     '(-s --signoff --ff)'{-s,--signoff}'[add Signed-off-by line at the end of the commit message]' \
-    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=}'[GPG-sign the commit]::key id' \
+    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=-}'[GPG-sign the commit]::key id' \
     '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
-    '*'{-s,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
-    '*'{-X,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]' \
+    '*'{-s+,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
+    '*'{-X+,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]' \
     '(-e --edit -x -n --no-commit -s --signoff)--ff[fast forward, if possible]' \
     ': : __git_commit_ranges -O expl:git_commit_opts'
 }
@@ -530,7 +530,7 @@ _git-clean () {
     '(-i --interactive)'{-i,--interactive}'[show what would be done and clean files interactively]' \
     '(-n --dry-run)'{-n,--dry-run}'[only show what would and what would not be removed]' \
     '(-q --quiet)'{-q,--quiet}'[only report errors]' \
-    '*'{-e,--exclude=}'[skip files matching specified pattern]:pattern' \
+    '*'{-e+,--exclude=}'[skip files matching specified pattern]:pattern' \
     '(-X   )-x[also remove ignored files]' \
     '(   -x)-X[remove only ignored files]' \
     '*: :->file' && ret=0
@@ -597,9 +597,9 @@ _git-clone () {
     '(-n --no-checkout)'{-n,--no-checkout}'[do not checkout HEAD after clone is complete]' \
     '(-o --origin)--bare[make a bare GIT repository]' \
     '(--bare)--mirror[clone refs into refs/* instead of refs/remotes/origin/*]' \
-    '(-o --origin --bare)'{-o,--origin}'[use given remote name instead of "origin"]: :__git_guard_branch-name' \
-    '(-b --branch)'{-b,--branch}'[point HEAD to the given branch]: :__git_guard_branch-name' \
-    '(-u --upload-pack)'{-u,--upload-pack=}'[specify path to git-upload-pack on remote side]:remote path' \
+    '(-o --origin --bare)'{-o+,--origin=}'[use given remote name instead of "origin"]: :__git_guard_branch-name' \
+    '(-b --branch)'{-b+,--branch=}'[point HEAD to the given branch]: :__git_guard_branch-name' \
+    '(-u --upload-pack)'{-u+,--upload-pack=}'[specify path to git-upload-pack on remote side]:remote path' \
     '--template=[directory to use as a template for the object database]: :_directories' \
     '*'{-c,--config}'[<key>=<value> set a configuration variable in the newly created repository]' \
     '--depth[create a shallow clone, given number of revisions deep]: :__git_guard_number depth' \
@@ -673,7 +673,7 @@ _git-commit () {
     '--no-post-rewrite[bypass the post-rewrite hook]' \
     '(-a --all --interactive -o --only -i --include)'{-i,--include}'[update the given files and commit the whole index]' \
     '(-a --all --interactive -o --only -i --include)'{-o,--only}'[commit only the given files]' \
-    '(-u --untracked-files)'{-u-,--untracked-files=}'[show files in untracked directories]::mode:((no\:"show no untracked files"
+    '(-u --untracked-files)'{-u-,--untracked-files=-}'[show files in untracked directories]::mode:((no\:"show no untracked files"
                                                                                                   normal\:"show untracked files and directories"
                                                                                                   all\:"show individual files in untracked directories"))' \
     '(-q --quiet -v --verbose)'{-v,--verbose}'[show unified diff of all file changes]' \
@@ -687,11 +687,11 @@ _git-commit () {
     $amend_opt \
     '*: :__git_ignore_line_inside_arguments __git_changed_files' \
     - '(message)' \
-      {-C,--reuse-message=}'[use existing commit object with same log message]: :__git_commits' \
-      {-c,--reedit-message=}'[use existing commit object and edit log message]: :__git_commits' \
-      {-F,--file=}'[read commit message from given file]: :_files' \
-      {-m,--message=}'[use the given message as the commit message]:message' \
-      {-t,--template=}'[use file as a template commit message]:template:_files'
+      {-C+,--reuse-message=}'[use existing commit object with same log message]: :__git_commits' \
+      {-c+,--reedit-message=}'[use existing commit object and edit log message]: :__git_commits' \
+      {-F+,--file=}'[read commit message from given file]: :_files' \
+      {-m+,--message=}'[use the given message as the commit message]:message' \
+      {-t+,--template=}'[use file as a template commit message]:template:_files'
 }
 
 (( $+functions[_git-describe] )) ||
@@ -853,7 +853,7 @@ _git-format-patch () {
   _arguments -w -C -S -s \
     $diff_options \
     '--[limit the number of patches to prepare]: :__git_guard_number "number of patches to prepare"' \
-    '(-o --output-directory --stdout)'{-o,--output-directory}'[store resulting files in given directory]: :_directories' \
+    '(-o --output-directory --stdout)'{-o+,--output-directory=}'[store resulting files in given directory]: :_directories' \
     '(-n --numbered -N --no-numbered -k --keep-subject)'{-n,--numbered}'[name output in \[PATCH n/m\] format]' \
     '(-n --numbered -N --no-numbered -k --keep-subject)'{-N,--no-numbered}'[name output in \[PATCH\] format]' \
     '--start-number=[start numbering patches at given number]: :__git_guard_number "patch number"' \
@@ -869,7 +869,7 @@ _git-format-patch () {
     '(--thread            )--no-thread[do not thread messages]' \
     '--in-reply-to=[make the first mail a reply to the given message]:message id' \
     '--ignore-if-in-upstream[do not include a patch that matches a commit in the given range]' \
-    '(-v --reroll-count)'{-v,--reroll-count=}'[mark the series as the <n>-th iteration of the topic]: :__git_guard_number iteration' \
+    '(-v --reroll-count)'{-v+,--reroll-count=}'[mark the series as the <n>-th iteration of the topic]: :__git_guard_number iteration' \
     '(-k --keep-subject)--subject-prefix=[use the given prefix instead of \[PATCH\]]:prefix' \
     '*--to=[add To: header to email headers]: :_email_addresses' \
     '*--cc=[add Cc: header to email headers]: :_email_addresses' \
@@ -949,20 +949,20 @@ _git-grep () {
     '(-n --line-number)'{-n,--line-number}'[prefix the line number to matching lines]' \
     '(-l --files-with-matches -L --files-without-match --name-only)'{-l,--files-with-matches,--name-only}'[show only names of matching files]' \
     '(-l --files-with-matches -L --files-without-match)'{-L,--files-without-match}'[show only names of non-matching files]' \
-    '(--cached -O --open-files-in-pager)'{-O,--open-files-in-pager=}'-[open matching files in pager]:pager:_cmdstring' \
+    '(--cached -O --open-files-in-pager)'{-O+,--open-files-in-pager=}'-[open matching files in pager]:pager:_cmdstring' \
     '(-z --null)'{-z,--null}'[output \0 after filenames]' \
     '(-c --count)'{-c,--count}'[show number of matching lines in files]' \
     '(        --no-color)--color=-[color matches]:: :__git_color_whens' \
     '(--color           )--no-color[do not color matches]' \
     '--break[prefix the line number to matching lines]' \
     '--heading[show the filename above the matches]' \
-    '(-A --after-context)'{-A,--after-context=}'[show <num> trailing lines, and separate groups of matches]: :__git_guard_number lines' \
-    '(-B --before-context)'{-B,--before-context=}'[show <num> leading lines, and separate groups of matches]: :__git_guard_number lines' \
-    '(-A --after-context -B --before-context -C --context)'{-C,--context=}'[show <num> leading and trailing lines, and separate groups of matches]: :__git_guard_number lines' \
+    '(-A --after-context)'{-A+,--after-context=}'[show <num> trailing lines, and separate groups of matches]: :__git_guard_number lines' \
+    '(-B --before-context)'{-B+,--before-context=}'[show <num> leading lines, and separate groups of matches]: :__git_guard_number lines' \
+    '(-A --after-context -B --before-context -C --context)'{-C+,--context=}'[show <num> leading and trailing lines, and separate groups of matches]: :__git_guard_number lines' \
     '(-p --show-function)'{-p,--show-function}'[show preceding line containing function name of match]' \
     '(-W --function-context)'{-W,--function-context}'[show whole function where a match was found]' \
-    '(1)*-f[read patterns from given file]:pattern file:_files' \
-    '(1)*-e[use the given pattern for matching]:pattern' \
+    '(1)*-f+[read patterns from given file]:pattern file:_files' \
+    '(1)*-e+[use the given pattern for matching]:pattern' \
     $pattern_operators \
     '--all-match[all patterns must match]' \
     ':pattern' \
@@ -1135,7 +1135,7 @@ _git-merge () {
 
   _arguments -w -S -s \
     $merge_options \
-    '-m[set the commit message to be used for the merge commit]:merge message' \
+    '-m+[set the commit message to be used for the merge commit]:merge message' \
     '(                    --no-rerere-autoupdate)--rerere-autoupdate[allow the rerere mechanism to update the index]' \
     '(--rerere-autoupdate                       )--no-rerere-autoupdate[do not allow the rerere mechanism to update the index]' \
     '--abort[restore the original branch and abort the merge operation]' \
@@ -1204,10 +1204,10 @@ _git-notes () {
           # TODO: Only complete commits that don't have notes already, unless
           # -f or --force has been given.
           _arguments -w -S -s \
-            '*'{-m,--message=}'[use given note message]:message' \
-            '*'{-F,--file=}'[take note message from given file]:note message file:_files' \
-            '(-C --reuse-message)'{-C,--reuse-message=}'[take note message from given blob object]: :__git_blobs' \
-            '(-c --reedit-message)'{-c,--reedit-message=}'[take note message from given blob object and edit it]: :__git_blobs' \
+            '*'{-m+,--message=}'[use given note message]:message' \
+            '*'{-F+,--file=}'[take note message from given file]:note message file:_files' \
+            '(-C --reuse-message)'{-C+,--reuse-message=}'[take note message from given blob object]: :__git_blobs' \
+            '(-c --reedit-message)'{-c+,--reedit-message=}'[take note message from given blob object and edit it]: :__git_blobs' \
             '(-f --force)'{-f,--force}'[overwrite existing note]' \
             ': :__git_commits' && ret=0
           ;;
@@ -1231,10 +1231,10 @@ _git-notes () {
           ;;
         (append)
           _arguments -w -S -s \
-            '*'{-m,--message=}'[use given note message]:message' \
-            '*'{-F,--file=}'[take note message from given file]:note message file:_files' \
-            '(-C --reuse-message)'{-C,--reuse-message=}'[take note message from given blob object]: :__git_blobs' \
-            '(-c --reedit-message)'{-c,--reedit-message=}'[take note message from given blob object and edit it]: :__git_blobs' \
+            '*'{-m+,--message=}'[use given note message]:message' \
+            '*'{-F+,--file=}'[take note message from given file]:note message file:_files' \
+            '(-C --reuse-message)'{-C+,--reuse-message=}'[take note message from given blob object]: :__git_blobs' \
+            '(-c --reedit-message)'{-c+,--reedit-message=}'[take note message from given blob object and edit it]: :__git_blobs' \
             ': :__git_commits' && ret=0
           ;;
         (*)
@@ -1327,10 +1327,10 @@ _git-rebase () {
     '--keep-empty[keep empty commits in the result]' \
     '(- :)--skip[skip the current patch]' \
     '(-m --merge)'{-m,--merge}'[use merging strategies to rebase]' \
-    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=}'[GPG-sign the commit]::key id' \
+    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=-}'[GPG-sign the commit]::key id' \
     '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
-    '*'{-s,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
-    '*'{-X,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]' \
+    '*'{-s+,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
+    '*'{-X+,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]' \
     '(-q --quiet -v --verbose --stat -n --no-stat)'{-q,--quiet}'[suppress all output]' \
     '(-q --quiet -v --verbose --stat -n --no-stat)'{-v,--verbose}'[output additional information]' \
     '--no-verify[bypass the pre-rebase hook]' \
@@ -1342,7 +1342,7 @@ _git-rebase () {
     '(-i --interactive --ignore-whitespace --whitespace --committer-date-is-author-date)'{-i,--interactive}'[make a list of commits to be rebased and open in $EDITOR]' \
     '--edit-todo[edit interactive instruction sheet in an editor]' \
     '(-p --preserve-merges --interactive)'{-p,--preserve-merges}'[try to recreate merges instead of ignoring them]' \
-    {-x,--exec=}'[with -i\: append "exec <cmd>" after each line]:command:_command_names -e' \
+    {-x+,--exec=}'[with -i\: append "exec <cmd>" after each line]:command:_command_names -e' \
     '(1)--root[rebase all reachable commits]' \
     $autosquash_opts \
     '(--autostash --no-autostash)--autostash[stash uncommitted changes before rebasing and apply them afterwards]' \
@@ -1394,7 +1394,7 @@ _git-revert () {
     '(-m --mainline)'{-m+,--mainline=}'[pick which parent is mainline]:parent number' \
     '(-n --no-commit)'{-n,--no-commit}'[do not commit the reversion]' \
     '(-s --signoff)'{-s,--signoff}'[add Signed-off-by line at the end of the commit message]' \
-    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=}'[GPG-sign the commit]::key id' \
+    '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=-}'[GPG-sign the commit]::key id' \
     '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
     ': :__git_commits'
 }
@@ -1707,7 +1707,7 @@ _git-submodule () {
             '(-q --quiet)'{-q,--quiet}'[suppress all output]' \
             '--cached[use commit stored in the index]' \
             '--files[compare commit in index with submodule HEAD commit]' \
-            '(-n --summary-limit)'{-n,--summary-limit}'[limit summary size]: :__git_guard_number "limit"' \
+            '(-n --summary-limit)'{-n,--summary-limit=}'[limit summary size]: :__git_guard_number "limit"' \
             '(-)--[start submodule arguments]' \
             '*:: :->commit-or-submodule' && ret=0
 
@@ -1760,7 +1760,7 @@ _git-tag () {
     - creation \
       '(   -s -u --local-user)-a[create an unsigned, annotated tag]' \
       '(-a    -u --local-user)-s[create an signed and annotated tag]' \
-      '(-a -s)'{-u,--local-user}'[create a tag, annotated and signed with the given key]: :__git_gpg_secret_keys' \
+      '(-a -s)'{-u+,--local-user=}'[create a tag, annotated and signed with the given key]: :__git_gpg_secret_keys' \
       '-f[replace existing tag]' \
       '--cleanup=[cleanup message]:mode:((verbatim\:"no cleanup" whitespace\:"remove leading and trailing whitespace" strip\:"remove leading and trailing whitespace and comments"))' \
       $message_opts \

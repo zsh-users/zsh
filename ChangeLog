@@ -1,3 +1,7 @@
+2016-04-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 38255: Completion/Unix/Command/_git: Fix argument pastedness.
+
 2016-04-07  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 38248: Src/Zle/zle_tricky.c: fix word position calculation
