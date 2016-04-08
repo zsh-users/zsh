@@ -1161,6 +1161,7 @@ get_comp_string(void)
     inpush(dupstrspace(linptr), 0, NULL);
     strinbeg(0);
     wordpos = cp = rd = ins = oins = linarr = parct = ia = redirpos = 0;
+    we = wb = zlemetacs;
     tt0 = NULLTOK;
 
     /* This loop is possibly the wrong way to do this.  It goes through *
@@ -1238,6 +1239,20 @@ get_comp_string(void)
 	    /* Record if we haven't had the command word yet */
 	    if (wordpos == redirpos)
 		redirpos++;
+	    if (zlemetacs < (zlemetall - inbufct) &&
+		zlemetacs >= wordbeg && wb == we) {
+		/* Cursor is in the middle of a redirection, treat as a word */
+		we = zlemetall - (inbufct + addedx);
+		if (addedx && we > wb) {
+		    /* Assume we are in {param}> form, wb points at "{" */
+		    wb++;
+		    /* Should complete parameter names here */
+		} else {
+		    /* In "2>" form, zlemetacs points at "2" */
+		    wb = zlemetacs;
+		    /* Should insert a space under cursor here */
+		}
+	    }
         }
 	if (tok == DINPAR)
 	    tokstr = NULL;

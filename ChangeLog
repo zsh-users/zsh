@@ -1,3 +1,9 @@
+2016-04-07  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38248: Src/Zle/zle_tricky.c: fix word position calculation
+	when completing on or just before a redirection operator; the
+	completion result is still in need of some repair
+
 2016-04-03  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 38229: Src/Zle/zle_tricky.c: fix cursor placement calculation

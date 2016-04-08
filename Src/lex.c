@@ -1789,9 +1789,13 @@ parse_subst_string(char *s)
 static void
 gotword(void)
 {
-    we = zlemetall + 1 - inbufct + (addedx == 2 ? 1 : 0);
-    if (zlemetacs <= we) {
-	wb = zlemetall - wordbeg + addedx;
+    int nwe = zlemetall + 1 - inbufct + (addedx == 2 ? 1 : 0);
+    if (zlemetacs <= nwe) {
+	int nwb = zlemetall - wordbeg + addedx;
+	if (zlemetacs >= nwb) {
+	    wb = nwb;
+	    we = nwe;
+	}
 	lexflags = 0;
     }
 }
