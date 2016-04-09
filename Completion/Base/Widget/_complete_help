@@ -11,6 +11,7 @@ _complete_help() {
 
   {
     compadd() { return 1 }
+    compcall() { _help_sort_tags use-compctl }
     zstyle() {
       local _f="${${(@)${(@)funcstack[2,(i)_($~_help_scan_funcstack)]}:#(_($~_help_filter_funcstack)|\((eval|anon)\))}% *}"
   
@@ -42,7 +43,7 @@ _complete_help() {
 
     ${1:-_main_complete}
   } always {
-    unfunction compadd zstyle
+    unfunction compadd compcall zstyle
   }
 
   for i in "${(@ok)help_funcs}"; do
