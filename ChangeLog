@@ -1,3 +1,8 @@
+2016-04-23  m0viefreak  <m0viefreak.cm@googlemail.com>
+
+	* 38291: Doc/Zsh/zle.yo, Src/Zle/zle_params.c: Change names of
+	ISEARCH_* parameters to ISEARCHMATCH_*
+
 2016-04-23  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Mikael Berthe: 38307: Src/Modules/pcre.c: PCRE segfault when

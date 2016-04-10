@@ -835,17 +835,17 @@ which always gives the number of the history line being added to the main
 shell's history.  tt(HISTNO) refers to the line being retrieved within
 zle.
 )
-vindex(ISEARCH_ACTIVE)
-vindex(ISEARCH_START)
-vindex(ISEARCH_END)
-xitem(tt(ISEARCH_ACTIVE) (integer))
-xitem(tt(ISEARCH_START) (integer))
-item(tt(ISEARCH_END) (integer))(
-tt(ISEARCH_ACTIVE) indicates whether a part of the tt(BUFFER) is
-currently matched by an incremental search pattern. tt(ISEARCH_START)
-and tt(ISEARCH_END) give the location of the matched part and are
+vindex(ISEARCHMATCH_ACTIVE)
+vindex(ISEARCHMATCH_START)
+vindex(ISEARCHMATCH_END)
+xitem(tt(ISEARCHMATCH_ACTIVE) (integer))
+xitem(tt(ISEARCHMATCH_START) (integer))
+item(tt(ISEARCHMATCH_END) (integer))(
+tt(ISEARCHMATCH_ACTIVE) indicates whether a part of the tt(BUFFER) is
+currently matched by an incremental search pattern. tt(ISEARCHMATCH_START)
+and tt(ISEARCHMATCH_END) give the location of the matched part and are
 in the same units as tt(CURSOR). They are only valid for reading
-when tt(ISEARCH_ACTIVE) is non-zero.
+when tt(ISEARCHMATCH_ACTIVE) is non-zero.
 
 All parameters are read-only.
 )

@@ -103,12 +103,12 @@ static const struct gsu_integer yankend_gsu =
 { get_yankend, set_yankend, zleunsetfn };
 static const struct gsu_integer yankactive_gsu =
 { get_yankactive, NULL, zleunsetfn };
-static const struct gsu_integer isearchstart_gsu =
-{ get_isearchstart, NULL, zleunsetfn };
-static const struct gsu_integer isearchend_gsu =
-{ get_isearchend, NULL, zleunsetfn };
-static const struct gsu_integer isearchactive_gsu =
-{ get_isearchactive, NULL, zleunsetfn };
+static const struct gsu_integer isearchmatchstart_gsu =
+{ get_isearchmatchstart, NULL, zleunsetfn };
+static const struct gsu_integer isearchmatchend_gsu =
+{ get_isearchmatchend, NULL, zleunsetfn };
+static const struct gsu_integer isearchmatchactive_gsu =
+{ get_isearchmatchactive, NULL, zleunsetfn };
 static const struct gsu_integer suffixstart_gsu =
 { get_suffixstart, NULL, zleunsetfn };
 static const struct gsu_integer suffixend_gsu =
@@ -164,9 +164,9 @@ static struct zleparam {
     { "YANK_START", PM_INTEGER, GSU(yankstart_gsu), NULL },
     { "YANK_END", PM_INTEGER, GSU(yankend_gsu), NULL },
     { "YANK_ACTIVE", PM_INTEGER | PM_READONLY, GSU(yankactive_gsu), NULL },
-    { "ISEARCH_START", PM_INTEGER, GSU(isearchstart_gsu), NULL },
-    { "ISEARCH_END", PM_INTEGER, GSU(isearchend_gsu), NULL },
-    { "ISEARCH_ACTIVE", PM_INTEGER | PM_READONLY, GSU(isearchactive_gsu), NULL },
+    { "ISEARCHMATCH_START", PM_INTEGER, GSU(isearchmatchstart_gsu), NULL },
+    { "ISEARCHMATCH_END", PM_INTEGER, GSU(isearchmatchend_gsu), NULL },
+    { "ISEARCHMATCH_ACTIVE", PM_INTEGER | PM_READONLY, GSU(isearchmatchactive_gsu), NULL },
     { "SUFFIX_START", PM_INTEGER, GSU(suffixstart_gsu), NULL },
     { "SUFFIX_END", PM_INTEGER, GSU(suffixend_gsu), NULL },
     { "SUFFIX_ACTIVE", PM_INTEGER | PM_READONLY, GSU(suffixactive_gsu), NULL },
@@ -540,21 +540,21 @@ set_yankend(UNUSED(Param pm), zlong i)
 
 /**/
 static zlong
-get_isearchstart(UNUSED(Param pm))
+get_isearchmatchstart(UNUSED(Param pm))
 {
     return isearch_startpos;
 }
 
 /**/
 static zlong
-get_isearchend(UNUSED(Param pm))
+get_isearchmatchend(UNUSED(Param pm))
 {
     return isearch_endpos;
 }
 
 /**/
 static zlong
-get_isearchactive(UNUSED(Param pm))
+get_isearchmatchactive(UNUSED(Param pm))
 {
     return isearch_active;
 }
