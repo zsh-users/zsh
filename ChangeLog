@@ -1,5 +1,8 @@
 2016-04-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 38287: Src/Zle/zle_vi.c: fix position for the end of a visual
+	selection range for the cursor on an empty last line in the buffer
+
 	* 38286: Src/Zle/zle_misc.c: cursor correction following
 	yank-pop is only applicable to vi command mode
 

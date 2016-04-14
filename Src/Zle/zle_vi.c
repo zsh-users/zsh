@@ -255,7 +255,7 @@ getvirange(int wf)
     }
 
     /* visual selection mode needs to include additional position */
-    if (visual == 1 && invicmdmode())
+    if (visual == 1 && pos < zlell && invicmdmode())
 	INCPOS(pos);
 
     /* Was it a line-oriented move?  If so, the command will have set *
