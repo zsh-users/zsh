@@ -1,3 +1,6 @@
+	* Christian Neukirchen: 37847: Completion/Unix/Command/_du:
+	update du arguments up to GNU du 8.25
+
 2016-04-10  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* m0viefreak: 38264: Doc/Zsh/zle.yo: improve doc for 38145

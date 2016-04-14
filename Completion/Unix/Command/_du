@@ -18,16 +18,17 @@ if _pick_variant gnu=Free\ Soft unix --version /dummy/no-such-file; then
     '(-l --count-links)'{-l,--count-links}'[count sizes many times if hard linked]' \
     '(-L --dereference -H -D --dereference-args -P --no-dereference)'{-L,--dereference}'[dereference all symlinks]' \
     '(-S --separate-dirs)'{-S,--separate-dirs}'[do not include size of subdirectories]' \
-    '(-s --summarize --max-depth -a --all)'{-s,--summarize}'[only report total for each argument]' \
+    '(-s --summarize --max-depth -d -a --all)'{-s,--summarize}'[only report total for each argument]' \
     '(-x --one-file-system)'{-x,--one-file-system}'[skip directories on different filesystems]' \
     '(-0 --null)'{-0,--null}'[end each output line with NUL instead of newline]' \
     \*{-X+,--exclude-from=}'[exclude files matching any pattern in file]:file:_files' \
     '*--exclude=[exclude files matching pattern]:pattern' \
-    '(-s --summarize)--max-depth=[maximum levels to recurse]:levels' \
+    '(-s --summarize -d --max-depth)'{-d+,--max-depth=}'[maximum levels to recurse]:levels' \
     '--files0-from=[use NUL-terminated list of files from file]:file:_files' \
     '--time-style=[show times using given style, +FORMAT for strftime formatted args]:style:->timestyle' \
     '--time=-[show time of last modification of any file in the directory]:property:(atime access use ctime status)' \
     '(-t --threshold)'{-t+,--threshold=}'[report only entries for which size exceeds threshold]:threshold' \
+    '--inodes[list inode usage information instead of block usage]' \
     '(* -)--help[display help information]' \
     '(* -)--version[display version information]' \
     '*:file:_files' && ret=0
