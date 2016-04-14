@@ -597,7 +597,7 @@ static void pastebuf(Cutbuffer buf, int mult, int position)
 	    zlecs += cc;
 	}
 	yanke = zlecs;
-	if (zlecs)
+	if (zlecs && invicmdmode())
 	    DECCS();
     }
 }

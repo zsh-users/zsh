@@ -1,3 +1,8 @@
+2016-04-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 38286: Src/Zle/zle_misc.c: cursor correction following
+	yank-pop is only applicable to vi command mode
+
 	* Christian Neukirchen: 37847: Completion/Unix/Command/_du:
 	update du arguments up to GNU du 8.25
 
