@@ -1,5 +1,8 @@
 2016-04-14  Oliver Kiddle  <opk@zsh.org>
 
+	* Han Pingtian: 38219: Completion/Zsh/Context/_subscript:
+	remove redundant left square bracket
+
 	* 38287: Src/Zle/zle_vi.c: fix position for the end of a visual
 	selection range for the cursor on an empty last line in the buffer
 
