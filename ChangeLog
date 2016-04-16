@@ -1,3 +1,8 @@
+2016-04-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38289: Completion/compinit: "builtin enable" in $_comp_setup
+	to avoid accidentally invoking external command of the same name
+
 2016-04-14  Oliver Kiddle  <opk@zsh.org>
 
 	* Han Pingtian: 38219: Completion/Zsh/Context/_subscript:
