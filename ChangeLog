@@ -1,3 +1,8 @@
+2016-04-22  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38306: Src/builtin.c: in printf formats, treat a missing
+	precision as zero rather than as unlimited
+
 2016-04-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 38289: Completion/compinit: "builtin enable" in $_comp_setup

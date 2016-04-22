@@ -4736,7 +4736,8 @@ bin_print(char *name, char **args, Options ops, int func)
 		} else if (idigit(*c)) {
 		    prec = strtoul(c, &endptr, 0);
 		    c = endptr;
-		}
+		} else
+		    prec = 0;
 		if (prec >= 0) *d++ = '.', *d++ = '*';
 	    }
 
