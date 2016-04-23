@@ -1,3 +1,10 @@
+2016-04-23  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Mikael Berthe: 38307: Src/Modules/pcre.c: PCRE segfault when
+	parenthesized group matches nothing (cf. 37515)
+
+	* unposted: Test/V07pcre.ztst: regression test for 38307
+
 2016-04-22  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 38306: Src/builtin.c: in printf formats, treat a missing

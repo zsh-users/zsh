@@ -228,7 +228,7 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar,
 		    /* Find the start offset */
 		    MB_CHARINIT();
 		    leftlen = ipair[0];
-		    while (leftlen) {
+		    while (leftlen > 0) {
 			offs++;
 			clen = MB_CHARLEN(ptr, leftlen);
 			ptr += clen;
