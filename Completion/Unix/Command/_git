@@ -1350,7 +1350,7 @@ _git-rebase () {
     '--no-ff[cherry-pick all rebased commits with --interactive, otherwise synonymous to --force-rebase]' \
     '--onto=[start new branch with HEAD equal to given revision]:newbase:__git_revisions' \
     ':upstream branch:__git_revisions' \
-    '::working branch:__git_branch_names'
+    '::working branch:__git_revisions'
 }
 
 (( $+functions[_git-reset] )) ||
