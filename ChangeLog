@@ -1,3 +1,8 @@
+2016-04-26  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38350 (cf. Glenn Smith: 38348): Src/exec.c: Remove-all warning
+	should warn about the root directory as well
+
 2016-04-23  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 38316: Completion/Unix/Command/_git: _git-rebase: Complete

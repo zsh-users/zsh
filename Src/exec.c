@@ -2902,11 +2902,11 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    if (s[0] == Star && !s[1]) {
 		if (!checkrmall(pwd))
 		    uremnode(args, node);
-	    } else if (l > 2 && s[l - 2] == '/' && s[l - 1] == Star) {
+	    } else if (l >= 2 && s[l - 2] == '/' && s[l - 1] == Star) {
 		char t = s[l - 2];
 
 		s[l - 2] = 0;
-		if (!checkrmall(s))
+		if (!checkrmall(*s ? s : "/"))
 		    uremnode(args, node);
 		s[l - 2] = t;
 	    }
