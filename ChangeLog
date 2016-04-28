@@ -1,3 +1,8 @@
+2016-04-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Sebastian: 39354: Src/Modules/curses.c: alter internal return
+	code so as not to mask curses error code.
+
 2016-04-26  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 38350 (cf. Glenn Smith: 38348): Src/exec.c: Remove-all warning

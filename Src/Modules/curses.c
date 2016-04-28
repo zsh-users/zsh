@@ -324,7 +324,7 @@ zcurses_color(const char *color)
 	    return (short)zc->number;
 	}
 
-    return (short)-1;
+    return (short)-2;
 }
 
 static Colorpairnode
@@ -353,10 +353,10 @@ zcurses_colorget(const char *nam, char *colorpair)
 	f = zcurses_color(cp);
 	b = zcurses_color(bg+1);
 
-	if (f==-1 || b==-1) {
-	    if (f == -1)
+	if (f==-2 || b==-2) {
+	    if (f == -2)
 		zwarnnam(nam, "foreground color `%s' not known", cp);
-	    if (b == -1)
+	    if (b == -2)
 		zwarnnam(nam, "background color `%s' not known", bg+1);
 	    *bg = '/';
 	    zsfree(cp);
