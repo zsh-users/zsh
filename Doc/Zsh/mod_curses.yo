@@ -111,7 +111,11 @@ Each var(fg_col)tt(/)var(bg_col) attribute (to be read as
 for character output.  The color tt(default) is sometimes available
 (in particular if the library is ncurses), specifying the foreground
 or background color with which the terminal started.  The color pair
-tt(default/default) is always available.
+tt(default/default) is always available. To use more than the 8 named
+colors (red, green, etc.) construct the var(fg_col)tt(/)var(bg_col)
+pairs where var(fg_col) and var(bg_col) are decimal integers, e.g
+tt(128/200).  The maximum color value is 254 if the terminal supports
+256 colors.
 
 tt(bg) overrides the color and other attributes of all characters in the
 window.  Its usual use is to set the background initially, but it will

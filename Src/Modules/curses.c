@@ -350,8 +350,20 @@ zcurses_colorget(const char *nam, char *colorpair)
 	}
 
 	*bg = '\0';        
-	f = zcurses_color(cp);
-	b = zcurses_color(bg+1);
+
+        // cp/bg can be {number}/{number} or {name}/{name}
+
+        if( cp[0] >= '0' && cp[0] <= '9' ) {
+            f = atoi(cp);
+        } else {
+            f = zcurses_color(cp);
+        }
+
+        if( (bg+1)[0] >= '0' && (bg+1)[0] <= '9' ) {
+            b = atoi(bg+1);
+        } else {
+            b = zcurses_color(bg+1);
+        }
 
 	if (f==-2 || b==-2) {
 	    if (f == -2)
