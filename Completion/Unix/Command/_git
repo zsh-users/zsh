@@ -389,7 +389,7 @@ _git-bundle () {
         (list-heads|unbundle)
           _arguments \
             ':bundle:_files' \
-            '*: :__git_ref_specs' && ret=0
+            '*: :__git_references' && ret=0
           ;;
       esac
       ;;
@@ -826,7 +826,7 @@ _git-fetch () {
   case $state in
     (repository-or-group-or-refspec)
       if (( CURRENT > 1 )) && [[ -z ${opt_args[(I)--multiple]} ]]; then
-        __git_ref_specs && ret=0
+        __git_ref_specs_fetchy && ret=0
       else
         _alternative \
           'remotes::__git_remotes' \
@@ -1262,7 +1262,7 @@ _git-pull () {
     '(-r --rebase            )--no-rebase[do not perform a rebase after fetching]' \
     $fetch_options \
     ': :__git_any_repositories' \
-    '*: :__git_ref_specs'
+    '*: :__git_ref_specs_fetchy'
 }
 
 (( $+functions[_git-push] )) ||
@@ -1296,7 +1296,7 @@ _git-push () {
     '--recurse-submodules=[submodule handling]:submodule handling:((check\:"refuse pushing of supermodule if submodule commit cannot be found on the remote"
                                                                     on-demand\:"push all changed submodules"))' \
     ': :__git_any_repositories' \
-    '*: :__git_ref_specs' && ret=0
+    '*: :__git_ref_specs_pushy' && ret=0
 
   case $state in
     (lease)
@@ -1936,7 +1936,7 @@ _git-config () {
     branch.autosetupmerge:'set up new branches for git pull::->bool:true'
     branch.autosetuprebase:'rebase new branches of merge for autosetupmerge::->branch.autosetuprebase:never'
     'branch.*.remote:what remote git fetch and git push should fetch form/push to::__git_remotes'
-    'branch.*.merge:default refspec to be marked for merging::__git_ref_specs'
+    'branch.*.merge:default refspec to be marked for merging::__git_remote_references'
     'branch.*.mergeoptions:default options for merging::->branch.mergeoptions'
     'branch.*.pushremote:what remote git push should push to::__git_remotes'
     'branch.*.rebase:rebase on top of fetched branch::->bool:false'
@@ -2236,8 +2236,8 @@ _git-config () {
     'remote.*.pushurl:push URL of a remote repository::__git_any_repositories'
     'remote.*.proxy:URL of proxy to use for a remote repository::_urls'
     'remote.*.prune:remove any remote tracking branches that no longer exist remotely::->bool:false'
-    'remote.*.fetch:default set of refspecs for git fetch::__git_ref_specs'
-    'remote.*.push:default set of refspecs for git push::__git_ref_specs'
+    'remote.*.fetch:default set of refspecs for git fetch::__git_ref_specs_fetchy'
+    'remote.*.push:default set of refspecs for git push::__git_ref_specs_pushy'
     'remote.*.mirror:push with --mirror::->bool:false'
     'remote.*.skipDefaultUpdate:skip this remote by default::->bool:false'
     'remote.*.skipFetchAll:skip this remote by default::->bool:false'
@@ -2330,7 +2330,7 @@ _git-config () {
     'svn-remote.*.rewriteUUID:remap URLs and UUIDs for mirrors manually::->bool:false'
     'svn-remote.*.ignore-paths:regular expression of paths to not check out:regular expression:->string'
     'svn-remote.*.url:URL to connect to::_urls'
-    'svn-remote.*.fetch:fetch specification::__git_ref_specs'
+    'svn-remote.*.fetch:fetch specification::__git_ref_specs_fetchy' # ### undocumented
     'svn-remote.*.pushurl:URL to push to::_urls'
     'svn-remote.*.branches:branch mappings:branch mapping:->string'
     'svn-remote.*.tags:tag mappings:tag mapping:->string'
@@ -5349,8 +5349,8 @@ __git_remotes () {
   _wanted remotes expl remote compadd "$@" -a - remotes
 }
 
-(( $+functions[__git_ref_specs] )) ||
-__git_ref_specs () {
+(( $+functions[__git_ref_specs_pushy] )) ||
+__git_ref_specs_pushy () {
   # TODO: This needs to deal with a lot more types of things.
   if compset -P '*:'; then
     # TODO: have the caller supply the correct remote name, restrict to refs/remotes/${that_remote}/* only
@@ -5365,6 +5365,20 @@ __git_ref_specs () {
        'heads::__git_heads -qS :'
     fi
   fi
+}
+
+(( $+functions[__git_ref_specs_fetchy] )) ||
+__git_ref_specs_fetchy () {
+  # TODO: this is wrong
+  __git_ref_specs_pushy "$@"
+}
+
+(( $+functions[__git_ref_specs] )) ||
+__git_ref_specs () {
+  # Backwards compatibility: define this function to support user dotfiles that
+  # define custom _git-${subcommand} completions in terms of this function.
+  # ### We may want to warn here "use _pushy() or _fetchy()".
+  __git_ref_specs_pushy "$@"
 }
 
 (( $+functions[__git_color_whens] )) ||
