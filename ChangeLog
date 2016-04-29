@@ -1,5 +1,7 @@
 2016-04-29  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Src/builtin.c: silence spurious compiler warning
+
 	* 38358: Test/C02cond.ztst: "fgrep --" for noatime check in case
 	a mount point is named "-" as in Fedora mock environment
 
