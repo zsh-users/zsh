@@ -1,3 +1,8 @@
+2016-04-29  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38358: Test/C02cond.ztst: "fgrep --" for noatime check in case
+	a mount point is named "-" as in Fedora mock environment
+
 2016-04-29  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Sebastian: 38356: Src/Modules/curses.c, Doc/Zsh/mod_curses.yo:
