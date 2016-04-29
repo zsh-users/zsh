@@ -388,6 +388,7 @@ _git-bundle () {
           ;;
         (list-heads|unbundle)
           _arguments \
+            ':bundle:_files' \
             '*: :__git_ref_specs' && ret=0
           ;;
       esac
