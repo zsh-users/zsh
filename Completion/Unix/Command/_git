@@ -5638,8 +5638,7 @@ __git_commits () {
 
 (( $+functions[__git_heads] )) ||
 __git_heads () {
-  __git_heads_local "$@"
-  __git_heads_remote "$@"
+  _alternative 'heads-local::__git_heads_local' 'heads-remote::__git_heads_remote'
 }
 
 (( $+functions[__git_heads_local] )) ||
