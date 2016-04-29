@@ -5369,8 +5369,19 @@ __git_ref_specs_pushy () {
 
 (( $+functions[__git_ref_specs_fetchy] )) ||
 __git_ref_specs_fetchy () {
-  # TODO: this is wrong
-  __git_ref_specs_pushy "$@"
+  # TODO: This needs to deal with a lot more types of things.
+  if compset -P '*:'; then
+    __git_heads_local
+  else
+    compset -P '+'
+    if compset -S ':*'; then
+      # TODO: have the caller supply the correct remote name, restrict to refs/remotes/${that_remote}/* only
+      __git_remote_branch_names_noprefix
+    else
+      # TODO: have the caller supply the correct remote name, restrict to refs/remotes/${that_remote}/* only
+      __git_remote_branch_names_noprefix -qS :
+    fi
+  fi
 }
 
 (( $+functions[__git_ref_specs] )) ||
