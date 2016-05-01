@@ -102,6 +102,6 @@ case "$service" in
       '(-s --source)'{-s,--source}'[query for source packages rather than binary]' \
       '(-v --version)'{-v,--version}'[show version]' \
       "$_rb_commonargs[@]" \
-      '*:package:_deb_packages avail'
+      '*:a package name or bug numbers:_deb_packages avail'
   ;;
 esac
