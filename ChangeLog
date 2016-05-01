@@ -1,3 +1,7 @@
+2016-05-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Completion/Zsh/Command/_compadd: Fix typo.
+
 2016-05-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Doc/Zsh/redirect.yo: typo.

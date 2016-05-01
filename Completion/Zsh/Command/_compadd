@@ -28,7 +28,7 @@ _arguments -C -s -S -A "-*" \
   '-e[mark matches as being parameters]' \
   '-W[specify location for matches marked as files]' \
   '-F+[specify array of ignore patterns]:array:_parameters -g "*array*"' \
-  '-Q[disable quoting of matchines]' \
+  '-Q[disable quoting of possible completions]' \
   '*-M[specify matching specifications]' \
   '-n[hide matches in completion listing]' \
   '-U[disable internal matching of completion candidates]' \
