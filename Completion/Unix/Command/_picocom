@@ -1,0 +1,80 @@
+#compdef picocom
+
+# The following function uses a generated list; first find out where the B*
+# macros are defined:
+#
+#   grep -r B115200 /usr/include
+#
+# Then generate the actual list:
+#
+#   sed -ne '/^[ \t]*#define[ \t]*B[0-9][0-9]*/s,^.*B\([0-9][0-9]*\).*,\1,p' \
+#           < /usr/include/asm-generic/termbits.h
+#
+# This one was generated on a Debian Stretch system, leaving out the "0" rate,
+# which is synonymous to "hang-up".
+function _picocom_baudrate () {
+    local expl
+    local -a rates
+    rates=( 50 75 110 134 150 200 300 600
+            1200 1800 2400 4800 9600
+            19200 38400 57600
+            115200 230400 460800 500000 576000 921600
+            1000000 1152000 1500000 2000000 2500000 3000000 3500000 4000000 )
+    # -1V removes dupes (which there shouldn't be) and otherwise leaves the
+    # order in the $rates array intact.
+    _wanted -1V baud-rate expl 'baud rate' compadd -a $expl -- rates
+}
+
+function _picocom_flowcontrol () {
+    local expl
+    local -a modes
+    modes=( x h n )
+    _wanted flow-ctrl-mode expl 'flow control mode' compadd -a $expl -- modes
+}
+
+function _picocom_paritymode () {
+    local expl
+    local -a modes
+    modes=( o e n )
+    _wanted parity-mode expl 'parity mode' compadd -a $expl -- modes
+}
+
+function _picocom_databits () {
+    local expl
+    local -a widths
+    widths=( 5 6 7 8 )
+    _wanted data-bits expl 'data bits' compadd -a $expl -- widths
+}
+
+function _picocom_escape () {
+    setopt localoptions braceccl
+    local expl
+    local -a ctrlchars
+    ctrlchars=( {a-z} _ '?' '[' '\' ']' '@' '^' )
+    _wanted escape-key expl 'escape key' compadd -a $expl -- ctrlchars
+}
+
+function _picocom () {
+    local -a args
+
+    args=( '(--baud -b)'{--baud,-b}'[define baud-rate to set the terminal to]:baud rate:_picocom_baudrate'
+           '(--flow -f)'{--flow,-f}'[define type of flow control to use]:flow control:_picocom_flowcontrol'
+           '(--parity -p)'{--parity,-p}'[define type of parity to use]:parity mode:_picocom_paritymode'
+           '(--databits -d)'{--databits,-d}'[define the number of databits per word]:data bits:_picocom_databits'
+           '(--escape -e)'{--escape,-e}'[define command mode character]:escape character:_picocom_escape'
+           '(--echo -c)'{--echo,-c}'[enable local echo]'
+           '(--noinit -i)'{--noinit,-i}'[do not initialise serial port]'
+           '(--noreset -r)'{--noreset,-r}'[do not reset serial port]'
+           '(--nolock -l)'{--nolock,-l}'[do not lock serial port]'
+           '(--send-cmd -s)'{--send-cmd,-s}'[define file send command]:file send command:_cmdstring'
+           '(--receive-cmd -v)'{--receive-cmd,-v}'[define file receive command]:file receive command:_cmdstring'
+           '--imap[define input character map]:input character map:'
+           '--omap[define output character map]:output character map:'
+           '--emap[define local echo character map]:local echo character map:'
+           '(--help -h)'{--help,-h}'[display help message]'
+           '*:device:_files -g "*(%c)"' )
+
+    _arguments -C : "${args[@]}"
+}
+
+_picocom "$@"

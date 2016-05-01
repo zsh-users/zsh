@@ -1,3 +1,8 @@
+2016-05-01  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 38381: Completion/Unix/Command/_picocom: Add completion for
+	picocom utility
+
 2016-04-29  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/builtin.c: silence spurious compiler warning
