@@ -246,7 +246,7 @@ In the case above, the tt(>&1) refers to the standard output at the
 start of the line; the result is similar to the tt(tee) command.
 However, consider:
 
-exmaple(date >output >&1)
+example(date >output >&1)
 
 As redirections are evaluated in order, when the tt(>&1) is encountered
 the standard output is set to the file tt(output) and another copy of
