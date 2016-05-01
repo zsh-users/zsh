@@ -3,7 +3,7 @@
 _arguments \
   '-asis[characters with codes >127 will be displayed non-inverted]' \
   '-backpath[backup file directory]:backup file directory:_files -/' \
-  '-baud[inserts delays for baud rates below 19200]:baud rate:(57600 38400 19200 9600 4800 2400 1200 300)' \
+  '-baud[inserts delays for baud rates below 19200]:baud rate:_baudrate' \
   '-beep[beep on command errors or when cursor goes past extremes]' \
   '-columns[sets the number of screen columns]:num of columns' \
   '-csmode[continued search mode]' \

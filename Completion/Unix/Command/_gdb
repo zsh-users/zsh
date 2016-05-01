@@ -37,9 +37,7 @@ else
   (-[csx]) _files && return 0 ;;
   (-e)     _description files expl executable
            _files "$expl[@]" -g '*(-*)' && return 0 ;;
-  (-b)     _wanted -V values expl 'baud rate' \
-               compadd 0 50 75 110 134 150 200 300 600 1200 1800 2400 4800 \
-		       9600 19200 38400 57600 115200 230400 && return 0 ;;
+  (-b)     _baudrate && return 0 ;;
   esac
 
   w=( "${(@)words[2,-1]}" )

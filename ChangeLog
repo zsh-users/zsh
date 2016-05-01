@@ -1,3 +1,10 @@
+2016-05-02  Frank Terbeck  <ft@bewatermyfriend.org>
+
+	* 38388: Completion/BSD/Command/_cu, Completion/Unix/Command/_gdb,
+	Completion/Unix/Command/_joe, Completion/Unix/Command/_picocom,
+	Completion/Unix/Command/_screen, Completion/Unix/Type/_baudrate:
+	Refactor baud rate completion
+
 2016-05-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Completion/Debian/Command/_bug: _querybts: Fix

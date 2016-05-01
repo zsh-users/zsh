@@ -1,0 +1,84 @@
+#autoload
+
+# Offer a list of baud-rates. Usage:
+#
+#   _baudrate [OPTION(s)...]
+#
+# Available options:
+#
+#     -u LIMIT     Upper limit. LIMIT is the maximum value the offered list
+#                  will contain, if the complete list includes LIMIT exactly.
+#
+#     -l LIMIT     Lower limit. Like -u but for the lower boundary.
+#
+#     -f FUNCTION  If given FUNCION is used as a predicate to filter the
+#                  value in the complete list to generate an arbitrary
+#                  sub-set.
+#
+#     -t TAG       Use TAG as the tag value in _wanted call.
+#
+#     -d DESC      Use DESC as the description value in _wanted call.
+#
+# The default complete list of available baud rates is also configurable via
+# the 'baud-rates' style:
+#
+#   zstyle ':completion:*' baud-rates 23 42 666
+#
+# It is also possible to override the arguments to -f, -u and -l via styles in
+# a similar fashion:
+#
+#   zstyle ':completion:*:*:screen:*' max-baud-rate 9600
+#   zstyle ':completion:*:*:screen:*' min-baud-rate 1200
+#   zstyle ':completion:*:*:screen:*' baud-rate-filter some_function_name
+
+local -A opts
+local expl tag desc tmp
+local -a rates
+
+zparseopts -E -A opts u: l: f: d: t:
+
+# The following uses a generated list; first find out where the B* macros are
+# defined:
+#
+#   grep -r B115200 /usr/include
+#
+# Then generate the actual list:
+#
+#   sed -ne '/^[ \t]*#define[ \t]*B[0-9][0-9]*/s,^.*B\([0-9][0-9]*\).*,\1,p' \
+#           < /usr/include/asm-generic/termbits.h
+#
+# This one was generated on a Debian Stretch system, leaving out the "0" rate,
+# which is synonymous to "hang-up".
+
+zstyle -a ":completion:${curcontext}:" baud-rates rates ||
+    rates=( 50 75 110 134 150 200 300 600
+            1200 1800 2400 4800 9600
+            19200 38400 57600
+            115200 230400 460800 500000 576000 921600
+            1000000 1152000 1500000 2000000 2500000 3000000 3500000 4000000 )
+
+zstyle -s ":completion:${curcontext}:" max-baud-rate tmp && opts[-u]=$tmp
+zstyle -s ":completion:${curcontext}:" min-baud-rate tmp && opts[-l]=$tmp
+zstyle -s ":completion:${curcontext}:" baud-rate-filter tmp && opts[-f]=$tmp
+
+if (( ${+opts[-u]} )) || (( ${+opts[-l]} )); then
+    local -i min max
+    min=${opts[-l]:-0}
+    max=${opts[-u]:-${${(On)rates}[1]}}
+    rates=( ${(M)rates:#${~:-<$min-$max>}} )
+fi
+
+if (( ${+opts[-f]} )); then
+    set -- $rates
+    rates=( )
+    for item; do
+        ${opts[-f]} $item && rates+=( $item )
+    done
+fi
+
+tag=${opts[-t]:-baud-rate}
+desc=${opts[-d]:-baud rate}
+
+# -1V removes dupes (which there shouldn't be) and otherwise leaves the
+# order in the $rates array intact.
+_wanted -1V $tag expl $desc compadd -a $expl -- rates

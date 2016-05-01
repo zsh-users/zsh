@@ -3,5 +3,5 @@
 _arguments -s -A '-*' \
   '-d[do not block waiting for a carrier to be detected]' \
   '-l[line to use]:line:(/dev/(cuaU#<->|ttyS<->)(N%c))' \
-  '-s[line speed]:line speed:(75 110 300 1200 2400 4800 9600 19200 38400 57600 115200)' \
+  '-s[line speed]:line speed:_baudrate -d "line speed"' \
   '(-*)1:host:'

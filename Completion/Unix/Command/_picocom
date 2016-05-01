@@ -1,30 +1,5 @@
 #compdef picocom
 
-# The following function uses a generated list; first find out where the B*
-# macros are defined:
-#
-#   grep -r B115200 /usr/include
-#
-# Then generate the actual list:
-#
-#   sed -ne '/^[ \t]*#define[ \t]*B[0-9][0-9]*/s,^.*B\([0-9][0-9]*\).*,\1,p' \
-#           < /usr/include/asm-generic/termbits.h
-#
-# This one was generated on a Debian Stretch system, leaving out the "0" rate,
-# which is synonymous to "hang-up".
-function _picocom_baudrate () {
-    local expl
-    local -a rates
-    rates=( 50 75 110 134 150 200 300 600
-            1200 1800 2400 4800 9600
-            19200 38400 57600
-            115200 230400 460800 500000 576000 921600
-            1000000 1152000 1500000 2000000 2500000 3000000 3500000 4000000 )
-    # -1V removes dupes (which there shouldn't be) and otherwise leaves the
-    # order in the $rates array intact.
-    _wanted -1V baud-rate expl 'baud rate' compadd -a $expl -- rates
-}
-
 function _picocom_flowcontrol () {
     local expl
     local -a modes
@@ -57,7 +32,7 @@ function _picocom_escape () {
 function _picocom () {
     local -a args
 
-    args=( '(--baud -b)'{--baud,-b}'[define baud-rate to set the terminal to]:baud rate:_picocom_baudrate'
+    args=( '(--baud -b)'{--baud,-b}'[define baud-rate to set the terminal to]:baud rate:_baudrate'
            '(--flow -f)'{--flow,-f}'[define type of flow control to use]:flow control:_picocom_flowcontrol'
            '(--parity -p)'{--parity,-p}'[define type of parity to use]:parity mode:_picocom_paritymode'
            '(--databits -d)'{--databits,-d}'[define the number of databits per word]:data bits:_picocom_databits'
