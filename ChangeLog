@@ -7,6 +7,22 @@
 	* 38381: Completion/Unix/Command/_picocom: Add completion for
 	picocom utility
 
+2016-05-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 38369: Completion/Unix/Command/_git: Complete fetchy refspecs
+	correctly.
+
+	* 38368: Completion/Unix/Command/_git: Bifurcate __git_ref_specs.
+
+	* 38367: Completion/Unix/Command/_git: Fix an apparent typo
+	in __git_heads().
+
+	* 38366: Completion/Unix/Command/_git: Offer alternatives
+	properly.
+
+	* 38365: Completion/Unix/Command/_git: _git-bundle: Complete
+	required file argument to 'git bundle' correctly.
+
 2016-04-29  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/builtin.c: silence spurious compiler warning
