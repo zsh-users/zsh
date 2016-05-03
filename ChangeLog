@@ -1,3 +1,8 @@
+2016-05-03  Russell Currey  <ruscur@russell.cc>
+
+	* 38393: Completion/Unix/Command/_git: Fix typo in completion of
+	'--minimal'
+
 2016-05-02  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 38375 (tweaked per 38384): Test/C02cond.ztst: try harder to

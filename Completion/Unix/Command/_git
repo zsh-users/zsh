@@ -6320,7 +6320,7 @@ __git_setup_diff_options () {
     $diff_types'--raw[generate default raw diff output]'
     $diff_types'--patch-with-raw[generate patch but also keep the default raw diff output]'
     $diff_types{-s,--no-patch}'[suppress diff output]'
-    '(--minimal --patience --histogram --diff-algorithm)--minimal[spend extra time to make sure the smallest possible diff is producedm]'
+    '(--minimal --patience --histogram --diff-algorithm)--minimal[spend extra time to make sure the smallest possible diff is produced]'
     '(--minimal --patience --histogram --diff-algorithm)--patience[generate diffs with patience algorithm]'
     '(--minimal --patience --histogram --diff-algorithm)--histogram[generate diffs with histogram algorithm]'
     '(--minimal --patience --histogram --diff-algorithm)--diff-algorithm=[choose a diff algorithm]:diff algorithm:((default\:"basic greedy diff algorithm"
