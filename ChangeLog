@@ -1,3 +1,8 @@
+2016-05-02  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38375 (tweaked per 38384): Test/C02cond.ztst: try harder to
+	detect noatime filesystems.
+
 2016-05-02  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 38388: Completion/BSD/Command/_cu, Completion/Unix/Command/_gdb,
