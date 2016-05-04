@@ -1,3 +1,8 @@
+2016-05-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 38401: Completion/Debian/Type/_deb_packages: New completion
+	for source packages.
+
 2016-05-06  Axel Beckert  <abe@deuxchevaux.org>
 
 	* unposted: Doc/Zsh/builtins.yo: Fix typo.

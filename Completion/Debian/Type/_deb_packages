@@ -1,6 +1,6 @@
 #autoload
 
-# Usage: _deb_packages expl... avail|installed|uninstalled
+# Usage: _deb_packages expl...  (installed|deinstalled|xinstalled|held|uninstalled|avail|available|source)
 
 _deb_packages_update_avail () {
   if ( [[ ${+_deb_packages_cache_avail} -eq 0 ]] ||
@@ -80,6 +80,21 @@ _deb_packages_update_uninstalled () {
   cachevar=_deb_packages_cache_uninstalled
 }
 
+_deb_packages_update_source () {
+  if ( [[ ${+_deb_packages_cache_source} -eq 0 ]] ||
+      _cache_invalid DEBS_source ) && ! _retrieve_cache DEBS_source;
+  then
+    _deb_packages_cache_source=(
+      # requires apt >= 1.1.8
+      # if dpkg --compare-versions "$(dpkg-query --show --showformat '${Version}\n' apt)" '>=' '1.1.8' ; then ...; else ...; fi
+      ${(f)"$(/usr/lib/apt/apt-helper cat-file $(apt-get indextargets --format '$(FILENAME)' 'Created-By: Sources' 2>/dev/null) 2>/dev/null | sed -ne 's/^Package: //p' | uniq)"}
+    )
+
+    _store_cache DEBS_source _deb_packages_cache_source
+  fi
+  cachevar=_deb_packages_cache_source
+}
+
 _deb_packages () {
   local command="$argv[$#]" expl cachevar pkgset update_policy
 
@@ -88,14 +103,14 @@ _deb_packages () {
     zstyle ":completion:*:*:$service:*" cache-policy _debs_caching_policy
   fi
 
-  [[ "$command" = (installed|deinstalled|xinstalled|held|uninstalled|avail|available) ]] || {
+  [[ "$command" = (installed|deinstalled|xinstalled|held|uninstalled|avail|available|source) ]] || {
     _message "unknown command: $command"
     return
   }
 
   zstyle -s ":completion:${curcontext}:" packageset pkgset
 
-  [[ "$pkgset" = (installed|deinstalled|xinstalled|held|uninstalled|avail|available) ]] || {
+  [[ "$pkgset" = (installed|deinstalled|xinstalled|held|uninstalled|avail|available|source) ]] || {
     pkgset="$command"
   }
 
