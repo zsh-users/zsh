@@ -103,5 +103,6 @@ case "$service" in
       '(-v --version)'{-v,--version}'[show version]' \
       "$_rb_commonargs[@]" \
       '*:a package name or bug numbers:_deb_packages avail'
+    # TODO: could call _debbugs_bugnumber here.
   ;;
 esac

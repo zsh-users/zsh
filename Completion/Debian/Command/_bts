@@ -33,7 +33,7 @@ fi
 case "$words[1]" in
   (close|unmerge|notforwarded|noowner|reportspam)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     else
       _wanted sep expl 'separator' compadd -S ' ' , .
     fi
@@ -49,7 +49,7 @@ case "$words[1]" in
   ;;
   reopen)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     elif [[ CURRENT -eq 3 ]]; then
       _wanted submitter expl 'new submitter' compadd -- $DEBEMAIL
     else
@@ -58,7 +58,7 @@ case "$words[1]" in
   ;;
   retitle)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     elif [[ CURRENT -eq 3 ]]; then
      _message -e submitter 'new title'
     else
@@ -67,7 +67,7 @@ case "$words[1]" in
   ;;
   reassign)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     elif [[ CURRENT -eq 3 ]]; then
      _wanted submitter expl 'new package' _deb_packages avail
     else
@@ -75,14 +75,14 @@ case "$words[1]" in
     fi
   ;;
   merge)
-    _message -e bugnum 'bug number'
+    _debbugs_bugnumber
     if [[ CURRENT -gt 2 ]]; then
      _wanted sep expl 'separator' compadd -S ' ' , .
     fi
   ;;
   tags#)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     elif [[ CURRENT -eq 3 ]]; then
       _wanted operator expl 'operator' compadd - '+' '-' '='
     elif [[ CURRENT -eq 4 ]]; then
@@ -104,7 +104,7 @@ case "$words[1]" in
   ;;
   severity)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     elif [[ CURRENT -eq 3 ]]; then
       _wanted severity expl 'severity' \
 	  compadd wishlist minor normal serious important critical grave
@@ -114,7 +114,7 @@ case "$words[1]" in
   ;;
   forwarded)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     elif [[ CURRENT -eq 3 ]]; then
      _wanted upstream expl 'upstream email' _email_addresses -c
     else
@@ -123,7 +123,7 @@ case "$words[1]" in
   ;;
   (clone)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     elif [[ CURRENT -eq 3 || -prefix [-] ]]; then
      _wanted newid expl 'new ID' compadd -- -{1..9}
     else
@@ -132,17 +132,17 @@ case "$words[1]" in
   ;;
   (submitter)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     else
      _alternative \
-       'bugnum:bug number:' \
+       'bugnum:bug number:_debbugs_bugnumber' \
        'email:email address:_email_addresses -c' \
        'bang:bang:compadd \!'
     fi
   ;;
   (owner|subscribe|unsubscribe)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     elif [[ CURRENT -eq 3 ]]; then
       _alternative \
         'email:email address:_email_addresses -c' \
@@ -153,7 +153,7 @@ case "$words[1]" in
   ;;
   (found|notfound|fixed|notfixed)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     elif [[ CURRENT -eq 3 ]]; then
       _message -e version 'version'
     else
@@ -162,12 +162,12 @@ case "$words[1]" in
   ;;
   (block|unblock)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     elif [[ CURRENT -eq 3 ]]; then
       _wanted prep expl 'preposition' compadd by with
     else
      _alternative \
-       'bugnum:bug number:' \
+       'bugnum:bug number:_debbugs_bugnumber' \
        'separator:separator:compadd -S " " , .'
     fi
   ;;
@@ -180,7 +180,7 @@ case "$words[1]" in
   ;;
   (usertags#)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     elif [[ CURRENT -eq 3 ]]; then
       _wanted operator expl 'operator' compadd - '+' '-' '='
     elif [[ CURRENT -eq 4 ]]; then
@@ -211,7 +211,7 @@ case "$words[1]" in
   ;;
   (claim|unclaim)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     elif [[ CURRENT -eq 3 ]]; then
       _alternative \
         'email:email address:_email_addresses -c' \
@@ -222,7 +222,7 @@ case "$words[1]" in
   ;;
   (affects)
     if [[ CURRENT -eq 2 ]]; then
-      _message -e bugnum 'bug number'
+      _debbugs_bugnumber
     elif [[ CURRENT -eq 3 ]]; then
       _wanted operator expl 'operator' compadd - '+' '-' '='
     else

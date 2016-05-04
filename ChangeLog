@@ -1,3 +1,10 @@
+2016-05-04  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 38399: Completion/Debian/Command/_bts,
+	Completion/Debian/Command/_bug,
+	Completion/Debian/Type/_debbugs_bugnumber: _bts: Complete
+	debbugs bug numbers from `bts cache`.
+
 2016-05-03  Russell Currey  <ruscur@russell.cc>
 
 	* 38393: Completion/Unix/Command/_git: Fix typo in completion of
