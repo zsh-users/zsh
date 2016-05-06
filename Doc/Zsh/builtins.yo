@@ -1810,7 +1810,7 @@ example(# Normal builtin interface
 builtin typeset svar=$(echo two words))
 
 The tt(builtin) keyword causes the above to use the standard builtin
-interface to tt(typeset) in which argument parsing is perfomed in the same
+interface to tt(typeset) in which argument parsing is performed in the same
 way as for other commands.  This example creates a scalar tt(svar)
 containing the value tt(two) and another scalar parameter tt(words) with
 no value.  An array value in this case would either cause an error or be
