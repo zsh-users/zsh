@@ -3,6 +3,9 @@
 	* 38422: Completion/Unix/Type/_baudrate,
 	Completion/Unix/Type/_baudrates: _baudrate -> _baudrates
 
+	* 38426: Completion/Unix/Type/_baudrates: _baudrates: Use 2 space
+	indentation
+
 2016-05-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 38401: Completion/Debian/Type/_deb_packages: New completion

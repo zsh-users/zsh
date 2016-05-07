@@ -51,29 +51,29 @@ zparseopts -E -A opts u: l: f: d: t:
 # which is synonymous to "hang-up".
 
 zstyle -a ":completion:${curcontext}:" baud-rates rates ||
-    rates=( 50 75 110 134 150 200 300 600
-            1200 1800 2400 4800 9600
-            19200 38400 57600
-            115200 230400 460800 500000 576000 921600
-            1000000 1152000 1500000 2000000 2500000 3000000 3500000 4000000 )
+  rates=( 50 75 110 134 150 200 300 600
+          1200 1800 2400 4800 9600
+          19200 38400 57600
+          115200 230400 460800 500000 576000 921600
+          1000000 1152000 1500000 2000000 2500000 3000000 3500000 4000000 )
 
 zstyle -s ":completion:${curcontext}:" max-baud-rate tmp && opts[-u]=$tmp
 zstyle -s ":completion:${curcontext}:" min-baud-rate tmp && opts[-l]=$tmp
 zstyle -s ":completion:${curcontext}:" baud-rate-filter tmp && opts[-f]=$tmp
 
 if (( ${+opts[-u]} )) || (( ${+opts[-l]} )); then
-    local -i min max
-    min=${opts[-l]:-0}
-    max=${opts[-u]:-${${(On)rates}[1]}}
-    rates=( ${(M)rates:#${~:-<$min-$max>}} )
+  local -i min max
+  min=${opts[-l]:-0}
+  max=${opts[-u]:-${${(On)rates}[1]}}
+  rates=( ${(M)rates:#${~:-<$min-$max>}} )
 fi
 
 if (( ${+opts[-f]} )); then
-    set -- $rates
-    rates=( )
-    for item; do
-        ${opts[-f]} $item && rates+=( $item )
-    done
+  set -- $rates
+  rates=( )
+  for item; do
+    ${opts[-f]} $item && rates+=( $item )
+  done
 fi
 
 tag=${opts[-t]:-baud-rate}
