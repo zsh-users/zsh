@@ -15,10 +15,6 @@
 #                  value in the complete list to generate an arbitrary
 #                  sub-set.
 #
-#     -t TAG       Use TAG as the tag value in _wanted call.
-#
-#     -d DESC      Use DESC as the description value in _wanted call.
-#
 # The default complete list of available baud rates is also configurable via
 # the 'baud-rates' style:
 #
@@ -31,11 +27,11 @@
 #   zstyle ':completion:*:*:screen:*' min-baud-rate 1200
 #   zstyle ':completion:*:*:screen:*' baud-rate-filter some_function_name
 
+local tmp
+local -a expl rates
 local -A opts
-local expl tag desc tmp
-local -a rates
 
-zparseopts -E -A opts u: l: f: d: t:
+zparseopts -E -A opts u: l: f:
 
 # The following uses a generated list; first find out where the B* macros are
 # defined:
@@ -76,9 +72,7 @@ if (( ${+opts[-f]} )); then
   done
 fi
 
-tag=${opts[-t]:-baud-rate}
-desc=${opts[-d]:-baud rate}
-
 # -1V removes dupes (which there shouldn't be) and otherwise leaves the
 # order in the $rates array intact.
-_wanted -1V $tag expl $desc compadd -a $expl -- rates
+_description -1V baud-rates expl 'baud rate'
+compadd "${(@)argv/#-J/-V}" "$expl[@]" -- "${rates[@]}"

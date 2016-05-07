@@ -11,6 +11,9 @@
 	Completion/Unix/Command/_screen: Use _baudrates helper instead of
 	_baudrate
 
+	* 38421: Completion/Unix/Type/_baudrates: _baudrates: Fit better
+	into the general completion framework
+
 2016-05-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 38401: Completion/Debian/Type/_deb_packages: New completion
