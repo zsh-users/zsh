@@ -14,6 +14,9 @@
 	* 38421: Completion/Unix/Type/_baudrates: _baudrates: Fit better
 	into the general completion framework
 
+	* 38425: Completion/BSD/Command/_cu: _cu: Remove old -d option of
+	_baudrates
+
 2016-05-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 38401: Completion/Debian/Type/_deb_packages: New completion
