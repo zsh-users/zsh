@@ -6,6 +6,11 @@
 	* 38426: Completion/Unix/Type/_baudrates: _baudrates: Use 2 space
 	indentation
 
+	* 38424: Completion/BSD/Command/_cu, Completion/Unix/Command/_gdb,
+	Completion/Unix/Command/_joe, Completion/Unix/Command/_picocom,
+	Completion/Unix/Command/_screen: Use _baudrates helper instead of
+	_baudrate
+
 2016-05-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 38401: Completion/Debian/Type/_deb_packages: New completion

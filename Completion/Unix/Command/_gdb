@@ -37,7 +37,7 @@ else
   (-[csx]) _files && return 0 ;;
   (-e)     _description files expl executable
            _files "$expl[@]" -g '*(-*)' && return 0 ;;
-  (-b)     _baudrate && return 0 ;;
+  (-b)     _baudrates && return 0 ;;
   esac
 
   w=( "${(@)words[2,-1]}" )

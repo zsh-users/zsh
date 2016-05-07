@@ -32,7 +32,7 @@ function _picocom_escape () {
 function _picocom () {
     local -a args
 
-    args=( '(--baud -b)'{--baud,-b}'[define baud-rate to set the terminal to]:baud rate:_baudrate'
+    args=( '(--baud -b)'{--baud,-b}'[define baud-rate to set the terminal to]:baud rate:_baudrates'
            '(--flow -f)'{--flow,-f}'[define type of flow control to use]:flow control:_picocom_flowcontrol'
            '(--parity -p)'{--parity,-p}'[define type of parity to use]:parity mode:_picocom_paritymode'
            '(--databits -d)'{--databits,-d}'[define the number of databits per word]:data bits:_picocom_databits'

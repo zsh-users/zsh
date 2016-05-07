@@ -99,7 +99,7 @@ if [[ -n $state ]]; then
       if (( CURRENT == 1 )) && [[ $PREFIX == /dev/* ]]; then
 	  _path_files -g '*(%)'
       elif (( CURRENT == 2 )) && [[ ${words[1]} == /dev/* ]]; then
-	  _baudrate
+	  _baudrates
       elif (( CURRENT > 2 )) && [[ ${words[1]} == /dev/* ]]; then
 	  _message "no more parameters"
       else
