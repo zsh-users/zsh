@@ -23,9 +23,9 @@
 # It is also possible to override the arguments to -f, -u and -l via styles in
 # a similar fashion:
 #
-#   zstyle ':completion:*:*:screen:*' max-baud-rate 9600
-#   zstyle ':completion:*:*:screen:*' min-baud-rate 1200
-#   zstyle ':completion:*:*:screen:*' baud-rate-filter some_function_name
+#   zstyle ':completion:*:*:screen:*:baud-rates' max-value 9600
+#   zstyle ':completion:*:*:screen:*:baud-rates' min-value 1200
+#   zstyle ':completion:*:*:screen:*:baud-rates' filter some_function_name
 
 local tmp
 local -a expl rates
@@ -53,9 +53,9 @@ zstyle -a ":completion:${curcontext}:" baud-rates rates ||
           115200 230400 460800 500000 576000 921600
           1000000 1152000 1500000 2000000 2500000 3000000 3500000 4000000 )
 
-zstyle -s ":completion:${curcontext}:" max-baud-rate tmp && opts[-u]=$tmp
-zstyle -s ":completion:${curcontext}:" min-baud-rate tmp && opts[-l]=$tmp
-zstyle -s ":completion:${curcontext}:" baud-rate-filter tmp && opts[-f]=$tmp
+zstyle -s ":completion:${curcontext}:baud-rates" max-value tmp && opts[-u]=$tmp
+zstyle -s ":completion:${curcontext}:baud-rates" min-value tmp && opts[-l]=$tmp
+zstyle -s ":completion:${curcontext}:baud-rates" filter tmp && opts[-f]=$tmp
 
 if (( ${+opts[-u]} )) || (( ${+opts[-l]} )); then
   local -i min max
