@@ -2,7 +2,7 @@
 
 # Offer a list of baud-rates. Usage:
 #
-#   _baudrate [OPTION(s)...]
+#   _baudrates [OPTION(s)...]
 #
 # Available options:
 #
