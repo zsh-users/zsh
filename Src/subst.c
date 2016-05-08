@@ -35,6 +35,8 @@
 /**/
 char nulstring[] = {Nularg, '\0'};
 
+int arrcachelen(Param pm);
+    
 /* Do substitutions before fork. These are:
  *  - Process substitution: <(...), >(...), =(...)
  *  - Parameter substitution
@@ -2548,7 +2550,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		 * necessary joining of arrays until this point
 		 * to avoid the multsub() horror.
 		 */
-		int tmplen = arrlen(v->pm->gsu.a->getfn(v->pm));
+		int tmplen;
+		if (v->pm->node.flags & PM_CACHELEN)
+		    tmplen = arrcachelen(v->pm);
+		else
+		    tmplen = arrlen(v->pm->gsu.a->getfn(v->pm));
 
 		if (v->start < 0)
 		    v->start += tmplen + ((v->flags & VALFLAG_INV) ? 1 : 0);

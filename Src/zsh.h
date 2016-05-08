@@ -1791,6 +1791,7 @@ struct tieddata {
 
 #define PM_KSHSTORED	(1<<17) /* function stored in ksh form              */
 #define PM_ZSHSTORED	(1<<18) /* function stored in zsh form              */
+#define PM_CACHELEN     (1<<19) /* length is cached */
 
 /* Remaining flags do not correspond directly to command line arguments */
 #define PM_LOCAL	(1<<21) /* this parameter will be made local        */
@@ -1809,7 +1810,7 @@ struct tieddata {
 #define PM_NAMEDDIR     (1<<30) /* has a corresponding nameddirtab entry    */
 
 /* The option string corresponds to the first of the variables above */
-#define TYPESET_OPTSTR "aiEFALRZlurtxUhHTkz"
+#define TYPESET_OPTSTR "aiEFALRZlurtxUhHTkzc"
 
 /* These typeset options take an optional numeric argument */
 #define TYPESET_OPTNUM "LRZiEF"
