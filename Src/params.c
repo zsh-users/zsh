@@ -28,7 +28,6 @@
  */
 
 #include <assert.h>
-//#define assert(x)
 
 #include "zsh.mdh"
 #include "params.pro"
@@ -1470,7 +1469,8 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		return !down;
 	    if (v->pm->node.flags & PM_CACHELEN) {
 		len = arrcachelen(v->pm);
-		assert(len == arrlen(ta));
+		if (v->pm->node.flags & PM_CHECKLEN)
+		    assert(len == arrlen(ta));
 	    } else
 		len = arrlen(ta);
 	    if (beg < 0)
@@ -1497,7 +1497,8 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    ta = sepsplit(d = s = getstrvalue(v), sep, 1, 1);
 	    if (v->pm->node.flags & PM_CACHELEN) {
 		len = arrcachelen(v->pm);
-		assert(len == arrlen(ta));
+		if (v->pm->node.flags & PM_CHECKLEN)
+		    assert(len == arrlen(ta));
 	    } else
 		len = arrlen(ta);
 	    if (beg < 0)
@@ -2051,7 +2052,8 @@ getstrvalue(Value v)
 	else {
 	    if (v->pm->node.flags & PM_CACHELEN) {
 		int len = arrcachelen(v->pm);
-		assert(v->pm->length == arrlen(ss));
+		if (v->pm->node.flags & PM_CHECKLEN)
+		    assert(v->pm->length == arrlen(ss));
 		if (v->start < 0)
 		    v->start += len;
 		s = (v->start >= len || v->start < 0) ?
@@ -2258,7 +2260,8 @@ getarrvalue(Value v)
 	return s;
     if (v->pm->node.flags & PM_CACHELEN) {
 	int len = arrcachelen(v->pm);
-	assert(v->pm->length == arrlen(s));
+	if (v->pm->node.flags & PM_CHECKLEN)
+	    assert(v->pm->length == arrlen(s));
 	if (v->start < 0)
 	    v->start += v->pm->length;
 	if (v->end < 0)
@@ -2612,9 +2615,10 @@ setarrvalue(Value v, char **val)
 	int post_assignment_length;
 	int i;
 
-	if (v->pm->node.flags & PM_CACHELEN)
-	    assert(v->pm->length == arrlen(old));
-	else
+	if (v->pm->node.flags & PM_CACHELEN) {
+	    if (v->pm->node.flags & PM_CHECKLEN)
+		assert(v->pm->length == arrlen(old));
+	} else
 	    pre_assignment_length = arrlen(old);
 	q = old;
 
@@ -2728,7 +2732,8 @@ getaparam(char *s, int *len)
 	if (len) {
 	    if (v->pm->node.flags & PM_CACHELEN) {
 		*len = arrcachelen(v->pm);
-		assert (*len == arrlen(v->pm->gsu.a->getfn(v->pm)));
+		if (v->pm->node.flags & PM_CHECKLEN)
+		    assert (*len == arrlen(v->pm->gsu.a->getfn(v->pm)));
 	    } else
 		*len = arrlen(v->pm->gsu.a->getfn(v->pm));
 	}
@@ -3006,7 +3011,8 @@ assignaparam(char *s, char **val, int flags)
 		    v->start = 
 			//arrlen(v->pm->gsu.a->getfn(v->pm));
 			arrcachelen(v->pm);
-		    assert(v->pm->length == arrlen(v->pm->gsu.a->getfn(v->pm)));
+		    if (v->pm->node.flags & PM_CHECKLEN)
+			assert(v->pm->length == arrlen(v->pm->gsu.a->getfn(v->pm)));
 		} else {
 		    v->start = 
 			arrlen(v->pm->gsu.a->getfn(v->pm));
@@ -3022,7 +3028,8 @@ assignaparam(char *s, char **val, int flags)
 		    v->end 
 			//= arrlen(v->pm->gsu.a->getfn(v->pm)) + v->end;
 			+= arrcachelen(v->pm);
-		    assert(v->pm->length == arrlen(v->pm->gsu.a->getfn(v->pm)));
+		    if (v->pm->node.flags & PM_CHECKLEN)
+			assert(v->pm->length == arrlen(v->pm->gsu.a->getfn(v->pm)));
 		} else {
 		    v->end 
 			= arrlen(v->pm->gsu.a->getfn(v->pm)) + v->end;

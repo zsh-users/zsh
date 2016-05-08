@@ -27,6 +27,8 @@
  *
  */
 
+#include <assert.h>
+
 #include "zsh.mdh"
 #include "subst.pro"
 
@@ -2551,9 +2553,11 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		 * to avoid the multsub() horror.
 		 */
 		int tmplen;
-		if (v->pm->node.flags & PM_CACHELEN)
+		if (v->pm->node.flags & PM_CACHELEN) {
 		    tmplen = arrcachelen(v->pm);
-		else
+		    if (v->pm->node.flags & PM_CHECKLEN)
+			assert(tmplen == arrlen(v->pm->gsu.a->getfn(v->pm)));
+		} else
 		    tmplen = arrlen(v->pm->gsu.a->getfn(v->pm));
 
 		if (v->start < 0)
