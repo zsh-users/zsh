@@ -1,3 +1,8 @@
+2016-05-09  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: Functions/Zle/bracketed-paste-magic: update documentary
+	comments to remove references to self-insert-unmeta.
+
 2016-05-09  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 38422: Completion/Unix/Type/_baudrate,
