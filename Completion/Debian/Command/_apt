@@ -592,8 +592,10 @@ _apt_releases_update () {
   if ( [[ ${+_apt_releases} -eq 0 ]] ||
       _cache_invalid APT_releases ) && ! _retrieve_cache APT_releases;
   then
+    local -a tmp=("${(f)$(apt-cache policy)}")
     _apt_releases=(
-${${${${(M)${(f)"$(apt-cache policy)"}:#*release*}#*a=}%%,*}:#now}
+${${${${(M)tmp:#*release*}#*a=}%%,*}:#now}
+${${${${(M)tmp:#*release*n=*}#*n=}%%,*}:#now}
     )
     typeset -U _apt_releases
     _store_cache APT_releases _apt_releases

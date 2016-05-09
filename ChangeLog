@@ -1,5 +1,8 @@
 2016-05-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38452: Completion/Debian/Command/_apt: Complete releases by
+	codename ('jessie', 'sid', etc).
+
 	* 38451: Completion/Debian/Command/_apt: Complete 'apt-get
 	download'.
 
