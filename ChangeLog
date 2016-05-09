@@ -1,5 +1,8 @@
 2016-05-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38453: Completion/Debian/Command/_apt: Complete
+	${package}/${release} for 'source' and 'build-dep', too.
+
 	* 38452: Completion/Debian/Command/_apt: Complete releases by
 	codename ('jessie', 'sid', etc).
 
