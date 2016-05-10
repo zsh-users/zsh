@@ -1322,15 +1322,15 @@ default_bindings(void)
 	amap->first[i] = refthingy(t_undefinedkey);
 
     /* safe fallback keymap:
-     *   0-255  self-insert, except: *
-     *    '\n'  accept-line          *
-     *    '\r'  accept-line          */
+     *   0-255  .self-insert, except: *
+     *    '\n'  .accept-line          *
+     *    '\r'  .accept-line          */
     for (i = 0; i < 256; i++)
-	smap->first[i] = refthingy(t_selfinsert);
-    unrefthingy(t_selfinsert);
-    unrefthingy(t_selfinsert);
-    smap->first['\n'] = refthingy(t_acceptline);
-    smap->first['\r'] = refthingy(t_acceptline);
+	smap->first[i] = refthingy(t_Dselfinsert);
+    unrefthingy(t_Dselfinsert);
+    unrefthingy(t_Dselfinsert);
+    smap->first['\n'] = refthingy(t_Dacceptline);
+    smap->first['\r'] = refthingy(t_Dacceptline);
 
     /* vt100 arrow keys are bound by default, for historical reasons. *
      * Both standard and keypad modes are supported.                  */

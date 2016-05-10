@@ -1,3 +1,7 @@
+2016-05-10  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38463: Src/Zle/zle_keymap.c: use immortal widgets in .safe keymap
+
 2016-05-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Functions/Math/.distfiles, Functions/Math/zmathfunc:
