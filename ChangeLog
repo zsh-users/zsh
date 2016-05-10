@@ -1,5 +1,8 @@
 2016-05-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Functions/Math/.distfiles, Functions/Math/zmathfunc:
+	Commit forgotten part of users/21256.
+
 	* 38453: Completion/Debian/Command/_apt: Complete
 	${package}/${release} for 'source' and 'build-dep', too.
 
