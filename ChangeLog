@@ -4,6 +4,8 @@
 	on a file touched by the -N test, so it must always be touched even
 	when the filesystem is noatime
 
+	* 38432: Src/zsh_system.h: avoid nonstandard setenv() on __APPLE__
+
 2016-05-09  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Zle/bracketed-paste-magic: update documentary

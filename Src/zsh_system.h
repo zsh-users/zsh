@@ -728,7 +728,7 @@ extern char **environ;
  * We always need setenv and unsetenv in pairs, because
  * we don't know how to do memory management on the values set.
  */
-#if defined(HAVE_SETENV) && defined(HAVE_UNSETENV)
+#if defined(HAVE_SETENV) && defined(HAVE_UNSETENV) && !defined(__APPLE__)
 # define USE_SET_UNSET_ENV
 #endif
 
