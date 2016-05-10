@@ -1,3 +1,8 @@
+2016-03-10  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* Marko Myllynen: 38458: Doc/Zsh/compsys.yo: mention the option
+	-i of _multi_parts
+
 2016-05-09  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Jun T.: 38445 (+tweak): Test/C02cond.ztst: subsequent tests rely

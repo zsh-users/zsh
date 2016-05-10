@@ -4416,7 +4416,7 @@ the time this function is called, tt(compstate[insert]) is cleared, so
 additional matches generated later are not inserted on the command line.
 )
 findex(_multi_parts)
-item(tt(_multi_parts) var(sep) var(array))(
+item(tt(_multi_parts) [ tt(-i) ] var(sep) var(array))(
 The argument var(sep) is a separator character.
 The var(array) may be either the
 name of an array parameter or a literal array in the form
