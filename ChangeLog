@@ -1,5 +1,11 @@
 2016-05-09  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* Jun T.: 38445 (+tweak): Test/C02cond.ztst: subsequent tests rely
+	on a file touched by the -N test, so it must always be touched even
+	when the filesystem is noatime
+
+2016-05-09  Barton E. Schaefer  <schaefer@zsh.org>
+
 	* unposted: Functions/Zle/bracketed-paste-magic: update documentary
 	comments to remove references to self-insert-unmeta.
 

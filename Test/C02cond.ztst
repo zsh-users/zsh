@@ -152,23 +152,24 @@
     unmodified_ls="$(ls -lu $unmodified)"
     print -u $ZTST_fd 'This test takes up to 60 seconds...'
   fi
+  sleep 2
+  touch $newnewnew
   if [[ $OSTYPE == "cygwin" ]]; then
     ZTST_skip="[[ -N file ]] not supported on Cygwin"
   elif (( isnfs )); then
     ZTST_skip="[[ -N file ]] not supported with NFS"
   elif { (( ! $+unmodified_ls )) &&
-         { sleep 2; cat $unmodified } &&
+         cat $unmodified &&
          { df -k -- ${$(print -r -- "$mtab" |
                         awk '/noatime/ {print $1,$3}'):-""} | tr -s ' ' |
            fgrep -- "$(df -k . | tail -1 | tr -s ' ')" } >&/dev/null } ||
        { (( $+unmodified_ls )) && SECONDS=0 &&
-         ! until (( SECONDS >= 60 )); do
+         ! until (( SECONDS >= 58 )); do
              ZTST_hashmark; sleep 2; cat $unmodified
              [[ $unmodified_ls != "$(ls -lu $unmodified)" ]] && break
 	   done }; then
     ZTST_skip="[[ -N file ]] not supported with noatime file system"
   else
-    touch $newnewnew
     [[ -N $newnewnew && ! -N $unmodified ]]
   fi
 0:-N cond
