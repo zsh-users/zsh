@@ -1795,6 +1795,10 @@ gotword(void)
 	if (zlemetacs >= nwb) {
 	    wb = nwb;
 	    we = nwe;
+	} else {
+	    wb = zlemetacs + addedx;
+	    if (we < wb)
+		we = wb;
 	}
 	lexflags = 0;
     }

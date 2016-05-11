@@ -1,5 +1,8 @@
 2016-05-10  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 38468: Src/lex.c: wb,we values in gotword() needed assignment in
+	additional case to avoid core dump (bug introduced by 38248)
+
 	* 38463: Src/Zle/zle_keymap.c: use immortal widgets in .safe keymap
 
 2016-05-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
@@ -200,9 +203,9 @@
 
 2016-04-07  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* 38248: Src/Zle/zle_tricky.c: fix word position calculation
-	when completing on or just before a redirection operator; the
-	completion result is still in need of some repair
+	* 38248: Src/lex.c, Src/Zle/zle_tricky.c: fix word position
+	calculation when completing on or just before a redirection
+	operator; the completion result is still in need of some repair
 
 2016-04-03  Barton E. Schaefer  <schaefer@zsh.org>
 
