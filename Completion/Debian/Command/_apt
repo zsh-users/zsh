@@ -399,7 +399,7 @@ _apt-cmd () {
     -o,--option:arbitem \
     -t,--target-release:release \
     -- \
-    /$'list\0'/ \| \
+    /$'list\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \
     /$'search\0'/ /$'[^\0]#\0'/ ':strings:pattern:' \| \
     /$'show\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \
     /$'update\0'/ \| \

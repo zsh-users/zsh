@@ -1,3 +1,8 @@
+2015-05-12  Clint Adams  <clint@zsh.org>
+
+	* 38482: Completion/Debian/Command/_apt: complete available packages
+	for apt list.
+
 2016-05-10  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 38468: Src/lex.c: wb,we values in gotword() needed assignment in
