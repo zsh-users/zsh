@@ -95,7 +95,7 @@ _vserver_cache_cfgdir() {
 _vserver_cache_vsnames() {
   if [[ "$_cache_vserver_vsnames_initialized" != true ]]; then
     typeset -ga _cache_vserver_vsnames
-    _cache_vserver_vsnames=( $(ls -d $_cache_vserver_cfgdir/*/ | sed -e s,$_cache_vserver_cfgdir,, | tr -d '/') )
+    _cache_vserver_vsnames=( $_cache_vserver_cfgdir/*(/:t) )
     _cache_vserver_vsnames_initialized=true
   fi
 }

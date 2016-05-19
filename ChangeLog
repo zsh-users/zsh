@@ -1,6 +1,10 @@
 2016-05-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
-	* 38513: Matthew Martin: cast time to long long where possible.
+	* 38514: Matthew Martin: Completion/Linux/Command/_vserver:
+	remove unnecessary ls.
+
+	* 38513: Matthew Martin: Src/Builtins/sched.c: cast time to long
+	long where possible.
 
 2015-05-12  Clint Adams  <clint@zsh.org>
 
