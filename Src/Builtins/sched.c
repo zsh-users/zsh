@@ -353,7 +353,11 @@ schedgetfn(UNUSED(Param pm))
 	time_t t;
 
 	t = sch->time;
-	sprintf(tbuf, "%ld", t);
+#if defined(PRINTF_HAS_LLD)
+	sprintf(tbuf, "%lld", (long long)t);
+#else
+	sprintf(tbuf, "%ld", (long)t);
+#endif
 	if (sch->flags & SCHEDFLAG_TRASH_ZLE)
 	    flagstr = "-o";
 	else

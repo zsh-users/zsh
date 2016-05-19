@@ -1,3 +1,7 @@
+2016-05-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 38513: Matthew Martin: cast time to long long where possible.
+
 2015-05-12  Clint Adams  <clint@zsh.org>
 
 	* 38482: Completion/Debian/Command/_apt: complete available packages
