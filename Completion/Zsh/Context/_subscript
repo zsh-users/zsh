@@ -99,10 +99,9 @@ elif [[ ${(Pt)${compstate[parameter]}} = array* ]]; then
         list=()
         for i in "$ind[@]"; do
           if [[ "$i" = ${PREFIX}*${SUFFIX} ]]; then
-              list=( "$list[@]" 
-	             "${i}:$(print -D ${(P)${compstate[parameter]}[$i]})" )
+              list+=( "${i}:$(print -D -- ${(P)${compstate[parameter]}[$i]})" )
 	  else
-	      list=( "$list[@]" '' )
+	      list+=( '' )
 	  fi
         done
         zstyle -s ":completion:${curcontext}:indexes" list-separator sep || sep=--
