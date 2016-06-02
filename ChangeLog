@@ -1,3 +1,8 @@
+2016-06-02  Oliver Kiddle  <opk@zsh.org>
+
+	* 38540: Src/Zle/zle_utils.c: fix undo problem by not moving
+	the current change when only undoing a history line change
+
 2016-06-02  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/21603: Src/utils.c: Don't do second attempt at read/poll

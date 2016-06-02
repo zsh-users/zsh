@@ -1589,9 +1589,14 @@ undo(char **args)
 	    break;
 	if (prev->changeno <= undo_limitno && !*args)
 	    return 1;
-	if (!unapplychange(prev) && last_change >= 0)
-	    unapplychange(prev);
-	curchange = prev;
+	if (!unapplychange(prev)) {
+	    if (last_change >= 0) {
+		unapplychange(prev);
+		curchange = prev;
+	    }
+	} else {
+	    curchange = prev;
+	}
     } while (last_change >= (zlong)0 || (curchange->flags & CH_PREV));
     setlastline();
     return 0;
