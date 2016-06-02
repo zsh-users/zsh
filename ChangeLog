@@ -1,3 +1,10 @@
+2016-06-02  Eric Cook <llua@gmx.com>
+	* 38567: Marko Myllynen: Completion/Unix/Command/_locale:
+	completion for locale(1)
+
+	* 38440: Marko Myllynen: Completion/Linux/Command/_iconvconfig:
+	completion for linux's iconvconfig(8)
+
 2016-06-02  Oliver Kiddle  <opk@zsh.org>
 
 	* 38540: Src/Zle/zle_utils.c: fix undo problem by not moving
