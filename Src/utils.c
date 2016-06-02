@@ -2534,7 +2534,7 @@ read_poll(int fd, int *readchar, int polltty, zlong microseconds)
 #endif
 #endif
 
-    if (fd >= 0 && ret < 0) {
+    if (fd >= 0 && ret < 0 && !errflag) {
 	/*
 	 * Final attempt: set non-blocking read and try to read a character.
 	 * Praise Bill, this works under Cygwin (nothing else seems to).

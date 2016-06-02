@@ -1,3 +1,8 @@
+2016-06-02  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/21603: Src/utils.c: Don't do second attempt at read/poll
+	from terminal if interrupted.
+
 2016-05-22  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 38515: Matthew Martin: Completion/Zsh/Context/_subscript:
