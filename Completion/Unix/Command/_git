@@ -7022,7 +7022,7 @@ declare -gUa _git_third_party_commands
 _git_third_party_commands=()
 
 local file
-for file in ${^fpath}/_git-*~(*~|*.zwc)(.N); do
+for file in ${^fpath}/_git-*~(*~|*.zwc)(-.N); do
   local name=${${file:t}#_git-}
   if (( $+_git_third_party_commands[$name] )); then
     continue
