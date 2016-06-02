@@ -8,12 +8,15 @@
 #
 # A `-' or `--' as the first argument is ignored.
 
-local expl last minus pre sigs
+local expl minus pre sigs
+local first last # keep these as strings for -z/-n tests
 
 zparseopts -D -K -E 'p=minus' 'a=last' 's=pre'
 if [[ -z "$last" ]]; then
+  first=2
   last=-3
 else
+  first=1
   last=-1
 fi
 [[ -n "$minus" ]] && minus='-'
@@ -26,20 +29,20 @@ if [[ -z "$minus" ]] ||
   local disp tmp
 
   if zstyle -t ":completion:${curcontext}:signals" prefix-hidden; then
-    tmp=( "${(@)signals[1,last]}" )
+    tmp=( "${(@)signals[first,last]}" )
     disp=(-d tmp)
   else
     disp=()
   fi
 
   if [[ -n "$pre" && $PREFIX = ${minus}S* ]]; then
-    sigs=( "${minus}SIG${(@)^signals[1,last]}" )
-    (( $#disp )) && tmp=( "$tmp[@]" "${(@)signals[1,last]}" )
+    sigs=( "${minus}SIG${(@)^signals[first,last]}" )
+    (( $#disp )) && tmp=( "$tmp[@]" "${(@)signals[first,last]}" )
   else
     sigs=()
   fi
 
   _wanted signals expl signal \
       compadd "$@" "$disp[@]" -M 'm:{a-z}={A-Z}' - \
-              "${minus}${(@)^signals[1,last]}" "$sigs[@]"
+              "${minus}${(@)^signals[first,last]}" "$sigs[@]"
 fi

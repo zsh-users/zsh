@@ -1,5 +1,8 @@
 2016-06-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38577: Completion/Unix/Type/_signals: Don't complete SIGEXIT
+	from _kill.
+
 	* 38576: Completion/Unix/Command/_git: Also detect
 	_git-${thirdparty} functions in $fpath that are symlinks.
 
