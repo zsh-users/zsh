@@ -273,7 +273,7 @@ if [[ "$pre" = [^][*?#^\|\<\>\\]#(\`[^\`]#\`|\$)*/* && "$compstate[quote]" != \'
   orig="${orig[1,(in:i:)/][1,-2]}"
   donepath=
   prepaths=( '' )
-elif [[ "$pre[1]" = \~ && -z "$compstate[quote]" ]]; then
+elif [[ "$pre[1]" = \~ && "$compstate[quote]" = (|\`) ]]; then
 
   # It begins with `~', so remember anything before the first slash to be able
   # to report it to the completion code. Also get an expanded version of it
