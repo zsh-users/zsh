@@ -4015,6 +4015,19 @@ arithsubst(char *a, char **bptr, char *rest)
     return t;
 }
 
+/* This function implements colon modifiers.
+ *
+ * STR is an in/out parameter.  On entry it is the string (e.g., path)
+ * to modified.  On return it is the modified path.
+ *
+ * PTR is an in/out parameter.  On entry it contains the string of colon
+ * modifiers.  On return it points past the last recognised modifier.
+ *
+ * Example:
+ *     ENTRY:   *str is "."   *ptr is ":AN"
+ *     RETURN:  *str is "/home/foobar" (equal to $PWD)   *ptr points to the "N"
+ */
+
 /**/
 void
 modify(char **str, char **ptr)
