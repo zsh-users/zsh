@@ -1,4 +1,5 @@
 2016-06-02  Eric Cook <llua@gmx.com>
+
 	* 38567: Marko Myllynen: Completion/Unix/Command/_locale:
 	completion for locale(1)
 
