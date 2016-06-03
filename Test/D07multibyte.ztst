@@ -553,3 +553,12 @@
 0:${(q+)...} with printable multibyte characters
 >ホ
 >'She said "ホ".  I said "You can'\''t '\''ホ'\'' me!'
+
+#  This will silently succeed if zsh/parameter isn't available
+  (zmodload zsh/parameter >/dev/null 2>&1
+  f() {
+    : $(:)
+    "↓"
+  }
+  : $functions)
+0:Multibtye handled of functions parameter

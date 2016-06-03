@@ -487,11 +487,6 @@ scanfunctions(UNUSED(HashTable ht), ScanFunc func, int flags, int dis)
 			    strcat(pm.u.str, " \"$@\"");
 			} else
 			    pm.u.str = dyncat(start, t);
-			/*
-			 * TBD: Is this unmetafy correct?  Surely as this
-			 * is a parameter value it stays metafied?
-			 */
-			unmetafy(pm.u.str, NULL);
 			zsfree(t);
 
 			if (shf->redir) {
