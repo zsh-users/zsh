@@ -1,3 +1,8 @@
+2016-06-04  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 38593: Doc/Zsh/compsys.yo: _describe: Make documentation
+	more greppable.
+
 2016-06-04  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 38599: Src/subst.c: skip the "no such named directory" warning
