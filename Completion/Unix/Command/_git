@@ -2371,7 +2371,9 @@ _git-config () {
 
       if compset -P '[^.]##.*.'; then
         declare -a match mbegin mend
+        # When completing 'remote.foo.<TAB>', offer 'bar' if $git_options_static contains 'remote.foo.bar'.
         options+=(${${${${(M)git_options_static:#(#i)${IPREFIX}[^.:]##:*}#(#i)${IPREFIX}}/#(#b)([^:]##:)([^\\:]#(\\?[^\\:]#)#:[^\\:]#(\\?[^\\:]#)#:->bool)/$match[1]whether or not to $match[2]}/#(#b)([^:]##:([^\\:]#(\\?[^\\:]#)#))*/$match[1]})
+        # When completing 'remote.foo.<TAB>', offer 'bar' if $git_options_static contains 'remote.*.bar'.
         options+=(${${${${(M)git_options_static:#(#i)${IPREFIX%%.*}.\*.[^.:]##:*}#(#i)${IPREFIX%%.*}.\*.}/#(#b)([^:]##:)([^\\:]#(\\?[^\\:]#)#:[^\\:]#(\\?[^\\:]#)#:->bool)/$match[1]whether or not to $match[2]}/#(#b)([^:]##:([^\\:]#(\\?[^\\:]#)#))*/$match[1]})
 
         declare -a labels
@@ -2420,6 +2422,7 @@ _git-config () {
           'gitcvs.ext:ext-connection-method-specific options'
           'gitcvs.pserver:pserver-connection-method-specific options'
           'notes.rewrite:commands to copy notes from original for when rewriting commits')
+        # Set $sections to the applicable subsection names (e.g., 'decorate:...' if $IPREFIX == "color.")
         sections+=(${${(M)subsections:#${IPREFIX}[^.:]##(.|):*}#${IPREFIX}})
 
         # TODO: Is it fine to use functions like this before _describe below,
