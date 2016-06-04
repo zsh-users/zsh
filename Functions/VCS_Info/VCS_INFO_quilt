@@ -80,6 +80,23 @@ function VCS_INFO_quilt-dirfind() {
     return ${ret}
 }
 
+# This function takes as an argument a filename of a patch and sets $REPLY to
+# a single-line "subject", or unsets it if no subject could be extracted.
+function VCS_INFO_quilt-patch2subject() {
+    local line
+    if [[ -f "$1" ]] && read -r line < "$1"; then
+        if [[ $line != (#b)(---|Index:)* ]]; then
+            REPLY=$line
+        else
+            unset REPLY
+            return 0
+        fi
+    else
+        unset REPLY
+        return 1
+    fi
+}
+
 function VCS_INFO_quilt() {
     emulate -L zsh
     setopt extendedglob
@@ -147,27 +164,19 @@ function VCS_INFO_quilt() {
 
     if [[ -n $patches ]]; then
       () {
-        local i line
+        local i
         for ((i=1; i<=$#applied; i++)); do
-          if [[ -f "$patches/$applied[$i]" ]] &&
-             read -r line < "$patches/$applied[$i]" &&
-             [[ $line != (#b)(---|Index:)* ]] &&
-             true
-            ;
+          if VCS_INFO_quilt-patch2subject "$patches/$applied[$i]" && (( $+REPLY ))
           then
-            applied[$i]+=" $line"
+            applied[$i]+=" $REPLY"
           else
             applied[$i]+=" ?"
           fi
         done
         for ((i=1; i<=$#unapplied; i++)); do
-          if [[ -f "$patches/$unapplied[$i]" ]] &&
-             read -r line < "$patches/$unapplied[$i]" &&
-             [[ $line != (#b)(---|Index:)* ]] &&
-             true
-            ;
+          if VCS_INFO_quilt-patch2subject "$patches/$unapplied[$i]" && (( $+REPLY ))
           then
-            unapplied[$i]+=" $line"
+            unapplied[$i]+=" $REPLY"
           else
             unapplied[$i]+=" ?"
           fi
