@@ -1,5 +1,8 @@
 2016-06-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38610: Functions/VCS_Info/VCS_INFO_quilt: vcs_info quilt:
+	Extract a patch subject, 2.0.
+
 	* 38609: Functions/VCS_Info/VCS_INFO_quilt: vcs_info quilt:
 	Factor out a helper function. No functional change.
 
