@@ -691,7 +691,7 @@ filesubstr(char **namptr, int assign)
 		return 0;
 	    *ptr = 0;
 	    if (!(hom = getnameddir(++str))) {
-		if (isset(NOMATCH))
+		if (isset(NOMATCH) && isset(EXECOPT))
 		    zerr("no such user or named directory: %s", str);
 		*ptr = save;
 		return 0;
