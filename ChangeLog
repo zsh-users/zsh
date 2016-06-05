@@ -5,6 +5,8 @@
 
 2016-06-04  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted (cf. 38612): Src/params.c: remove overeager DPUTS()
+
 	* 38599: Src/subst.c: skip the "no such named directory" warning
 	when NO_EXEC is in effect
 

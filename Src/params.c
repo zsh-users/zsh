@@ -2982,7 +2982,6 @@ sethparam(char *s, char **val)
 	return NULL;
     queue_signals();
     if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING))) {
-	DPUTS(!v, "BUG: assigning to undeclared associative array");
 	createparam(t, PM_HASHED);
 	checkcreate = isset(WARNCREATEGLOBAL) && locallevel > forklevel;
     } else if (!(PM_TYPE(v->pm->node.flags) & PM_HASHED) &&
