@@ -101,9 +101,10 @@ bindkey |
 print >> $_d_file
 
 
-# Autoloads: look for all functions beginning with `_'.
+# Autoloads: look for all defined functions beginning with `_' (that also
+# exists in fpath: see workers/38547).
 
-_d_als=(${(o)$(typeset +fm '_*')})
+_d_als=($^fpath/(${(o~j.|.)$(typeset +fm '_*')})(N:t))
 
 # print them out:  about five to a line looks neat
 
