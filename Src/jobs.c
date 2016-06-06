@@ -2527,6 +2527,10 @@ bin_kill(char *nam, char **argv, UNUSED(Options ops), UNUSED(int func))
 	argv++;
     }
 
+    /* Discard the standard "-" and "--" option breaks */
+    if (*argv && (*argv)[0] == '-' && (!(*argv)[1] || (*argv)[1] == '-'))
+	argv++;
+
     if (!*argv) {
     	zwarnnam(nam, "not enough arguments");
 	return 1;

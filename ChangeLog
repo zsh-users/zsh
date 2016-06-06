@@ -1,4 +1,9 @@
+2016-06-05  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38622: Src/jobs.c: consistent handling of "--" in "kill" builtin
+
 2016-06-04  Eric Cook <llua@gmx.com>
+
 	* 38547: Completion/compdump: only autoload functions
 	when they exist in fpath.
 
