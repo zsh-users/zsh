@@ -1,3 +1,7 @@
+2016-06-07  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38630: Src/builtin.c: fix infinite loop of "hash ="
+
 2016-06-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 38610: Functions/VCS_Info/VCS_INFO_quilt: vcs_info quilt:

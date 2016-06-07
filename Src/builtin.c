@@ -3748,6 +3748,7 @@ bin_hash(char *name, char **argv, Options ops, UNUSED(int func))
         if (!(asg = getasg(&argv, NULL))) {
 	    zwarnnam(name, "bad assignment");
 	    returnval = 1;
+	    break;
         } else if (ASG_VALUEP(asg)) {
 	    if(isset(RESTRICTED)) {
 		zwarnnam(name, "restricted: %s", asg->value.scalar);
