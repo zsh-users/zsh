@@ -5645,30 +5645,15 @@ __git_commit_objects_prefer_recent () {
 (( $+functions[__git_recent_branches__names] )) ||
 __git_recent_branches__names()
 {
-  local -a reflog
-  local reflog_subject
-  local new_head
-  local -A seen
-  reply=()
-
-  reflog=(${(ps:\0:)"$(_call_program reflog git reflog -1000 -z --grep-reflog='\^checkout:\ moving\ from\ ' --pretty='%gs' 2>/dev/null)"})
-  for reflog_subject in $reflog; do
-    new_head=${${=reflog_subject}[4]}
-
-    # Skip values added in previous iterations.
-    if (( ${+seen[$new_head]} )); then
-      continue
-    fi
-    seen[$new_head]="" # value is ignored
-
-    # Filter out hashes, to leave only ref names.
-    if [[ $new_head =~ '^[0-9a-f]{40}$' ]]; then
-      continue
-    fi
-
-    # All checks passed.  Add it.
-    reply+=( $new_head )
-  done
+  # This parameter expansion does the following:
+  # 1. Obtains the last 1000 'checkout' operations from the reflog
+  # 2. Extracts the move-source from each
+  # 3. Eliminates duplicates
+  # 4. Eliminates commit hashes (leaving only ref names)
+  #
+  # See workers/38592 for an equivalent long-hand implementation, and the rest
+  # of that thread for why this implementation was chosen instead.
+  reply=(${${(u)${${(0)"$(_call_program reflog git reflog -1000 -z --grep-reflog='\^checkout:\ moving\ from\ ' --pretty='%gs')"}#checkout: moving from }%% *}:#[[:xdigit:]](#c40)})
 }
 
 (( $+functions[__git_recent_branches] )) ||
