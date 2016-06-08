@@ -1,4 +1,4 @@
-#compdef installpkg upgradepkg removepkg pkgtool explodepkg makepkg 
+#compdef installpkg upgradepkg removepkg pkgtool explodepkg makepkg
 
 local expl
 

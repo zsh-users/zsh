@@ -8,6 +8,9 @@
 
 2016-06-07  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 38632: Completion/Linux/Command/_pkgtool: remove trailing space
+	on #compdef line for compinit parsing
+
 	* 38630: Src/builtin.c: fix infinite loop of "hash ="
 
 2016-06-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
