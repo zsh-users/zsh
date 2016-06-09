@@ -2,79 +2,86 @@
 
 local -A opt_args
 local -a args context state line expl
-local shell=${words[(i)(-s|--shell=*)]} first='1:user name:_users'
-local usr=root
+local first='(-)${norm}:user name:_users'
+integer norm=1 strip
+local shell usr
 
-if _pick_variant gnu="Free Software Foundation" unix --version; then
-  args=(
-    '(--command)-c[pass command to shell]:command string:->command'
-    '(-c)--command=-[pass command to shell]:command string:->command'
-    '-f[pass -f to shell (csh)]'
-    '(--login)-l[use a login shell]'
-    '(-l)--login[use a login shell]'
-    '(-p --preserve-environment)-m[do not reset environment]'
-    '(-m --preserve-environment)-p[do not reset environment]'
-    '(-m -p)--preserve-environment[do not reset environment]'
-    '(--shell)-s[run the specified shell]:shell:->shell'
-    '(-s)--shell=-[run the specified shell]:shell:->shell'
-  )
-else
-  args=(
-    '-l[use a login shell]'
-    '-s[run the specified shell]:shell:->shell'
-  )
-  case $OSTYPE in
-  freebsd*)
-    args=(
+(( $words[(i)-(l|-login)] < CURRENT )) || args=( '-[use a login shell]' )
+case $OSTYPE in
+  linux*)
+    args=( -S $args
+      '(-c --command --session-command *)'{-c,--command=}'[pass command to shell]:command string:_cmdstring'
+      "(-c --command *)--session-command=[pass command to shell and don't create a new session]:command string:_cmdstring"
+      '(--fast -f)'{-f,--fast}'[pass -f to shell]'
+      '(-l --login -m -p --preserve-environment)'{-l,--login}'[use a login shell]'
+      '(-l --login -m -p --preserve-environment)'{-m,-p,--preserve-environment}"[don't reset environment]"
+      '(-s --shell)'{-s,--shell=}'[run the specified shell]:shell:->shells'
+      '(-)--help[display help information]'
+      '(-)--version[display version information]'
+    )
+    (( EUID )) || args+=(
+      '(-g --group)'{-g,--group=}'[specify primary group]:group:_groups'
+      \*{-G,--supp-group=}'[specify supplemental group]:group:_groups'
+    )
+    first="(--help --version)${first#???}"
+  ;;
+  *bsd*|dragonfly*)
+    args+=(
       '-c[use settings from specified login class]:class'
       '-f[if the invoked shell is csh, prevent it from reading .cshrc]'
-      '-l[use a login shell]'
-      '-m[do not reset environment]'
-      '-s[set the MAC label]'
+      '(-m)-l[use a login shell]'
+      "(-l)-m[don't reset environment]"
+    )
+  ;|
+  freebsd*) args+=( '-s[set the MAC label]' ) ;;
+  openbsd*)
+    args+=(
+      '(-K)-a[specify authentication type]:authentication type'
+      '(-a)-K[shorthand for -a passwd]'
+      '-s[run the specified shell]:shell:->shells'
+      '-L[loop until login succeeds]'
     )
   ;;
-  *) args+=( '-c[pass command to shell]:command string:->command' ) ;;
-  esac
+  netbsd*)
+    args+=(
+      '-d[use a login shell but retain current directory]'
+      "-K[don't use Kerberos]"
+    )
+  ;;
+esac
+
+if (( $words[(i)-] < CURRENT )); then
+  args=( ${args:#*-(-login|l|)\[*} '1:-' )
+  norm=2
 fi
 
-if [[ $#words -ge 2 && $words[2] != -* && CURRENT -ne 2 ]]; then
-    usr=$words[2]
-    first=
-fi
+_arguments $args ${(e)first} "*:shell arguments:= ->rest" && return
 
-[[ $words[shell] == -s ]] && ((shell++))
-
-if [[ CURRENT -ne shell && -n ${words[shell]} ]]; then
-    shell=${words[shell]#*=}
+usr=${line[norm]/--/root}
+if (( $#opt_args[(i)-(s|-shell)] )); then
+  shell=${(v)opt_args[(i)-(s|-shell)]}
+elif (( ${+commands[getent]} )); then
+  shell="${$(_call_program shells getent passwd $usr)##*:}"
 else
-    shell="${${(M@)${(@f)$(</etc/passwd)}:#$usr*}##*:}"
+  shell="${${(M@)${(@f)$(</etc/passwd)}:#$usr*}##*:}"
 fi
-
-[[ -z $first ]] && compset -n 2
-
-_arguments : $args[@] $first "*:${shell:t} arguments:->rest" && return
 
 case $state in
-    (command)
-        compset -q
-        _normal
-        return
-        ;;
-    (shell)
-        _wanted -C $context shells expl shell compadd ${(f)^"$(</etc/shells)"}(N)
-        return
-        ;;
-    (rest)
-        if [[ -z $shell || $shell = */(nologin|false) ]]; then
-            _arguments "-s[run the specified shell, $usr has no shell]" ||
-                _message "-s option required, $usr has no shell"
-            compstate[insert]=
-        else
-            # Something wrong here: doubles the file listing sometimes
-            _dispatch ${service}:${context} $shell $shell:t -default-
-            return
-        fi
-        ;;
+  shells)
+    _wanted -C $context shells expl shell compadd ${(f)^"$(</etc/shells)"}(N)
+    return
+  ;;
+  rest)
+    if [[ -z $shell || $shell = */(nologin|false) ]]; then
+      _message "-s option required, $usr has no shell"
+    else
+      (( strip = $#words - $#line + norm ))
+      (( CURRENT -= strip - 1 ))
+      words[2,strip]=()
+      _dispatch ${service}:${context} $shell $shell:t -default-
+      return
+    fi
+  ;;
 esac
 
 return 1
