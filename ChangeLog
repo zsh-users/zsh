@@ -1,5 +1,8 @@
 2016-06-09  Oliver Kiddle  <opk@zsh.org>
 
+	* 38579: Functions/Zle/bracketed-paste-magic: simplify saving
+	and restoring of state
+
 	* 38641: Completion/Base/Utility/_values: allow for values which
 	resemble compadd options
 
