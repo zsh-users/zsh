@@ -3,7 +3,7 @@
 local subopts opt usecc garbage
 
 subopts=()
-zparseopts -D -E -a garbage C=usecc O:=subopts M: J: V: 1 2 n F: X:
+zparseopts -D -a garbage C=usecc O:=subopts M: J: V: 1 2 n F: X:
 
 (( $#subopts )) && subopts=( "${(@P)subopts[2]}" )
 

@@ -1,5 +1,8 @@
 2016-06-09  Oliver Kiddle  <opk@zsh.org>
 
+	* 38641: Completion/Base/Utility/_values: allow for values which
+	resemble compadd options
+
 	* 38639: Completion/Unix/Command/_su: fix username completion
 	after -, update options and get user shell with getent
 
