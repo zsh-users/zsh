@@ -1,3 +1,8 @@
+2016-06-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 38652: Test/ztst.zsh: test harness: Emit unified diffs instead
+	of context diffs
+
 2016-06-22  Oliver Kiddle  <opk@zsh.org>
 
 	* 38749: Functions/Zle/surround, Functions/Zle/select-bracketed:

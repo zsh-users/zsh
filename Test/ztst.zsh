@@ -333,7 +333,7 @@ ZTST_diff() {
     diff_out=$(diff "$@")
     diff_ret="$?"
     if [[ "$diff_ret" != "0" ]]; then
-      print -r "$diff_out"
+      print -r -- "$diff_out"
     fi
   fi
 
@@ -458,7 +458,7 @@ $(<$ZTST_terr)"
 	rm -rf $ZTST_out
 	print -r -- "${(e)substlines}" >$ZTST_out
       fi
-      if [[ $ZTST_flags != *d* ]] && ! ZTST_diff $diff_out -c $ZTST_out $ZTST_tout; then
+      if [[ $ZTST_flags != *d* ]] && ! ZTST_diff $diff_out -u $ZTST_out $ZTST_tout; then
 	ZTST_testfailed "output differs from expected as shown above for:
 $ZTST_code${$(<$ZTST_terr):+
 Error output:
@@ -470,7 +470,7 @@ $(<$ZTST_terr)}"
 	rm -rf $ZTST_err
 	print -r -- "${(e)substlines}" >$ZTST_err
       fi
-      if [[ $ZTST_flags != *D* ]] && ! ZTST_diff $diff_err -c $ZTST_err $ZTST_terr; then
+      if [[ $ZTST_flags != *D* ]] && ! ZTST_diff $diff_err -u $ZTST_err $ZTST_terr; then
 	ZTST_testfailed "error output differs from expected as shown above for:
 $ZTST_code"
 	return 1
