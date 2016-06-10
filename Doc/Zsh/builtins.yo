@@ -2028,7 +2028,8 @@ The names refer to functions rather than parameters.  No assignments
 can be made, and the only other valid flags are tt(-t), tt(-T), tt(-k),
 tt(-u), tt(-U) and tt(-z).  The flag tt(-t) turns on execution tracing
 for this function; the flag tt(-T) does the same, but turns off tracing
-on any function called from the present one, unless that function also
+for any named (not anonymous) function called from the present one,
+unless that function also
 has the tt(-t) or tt(-T) flag.  The tt(-u) and tt(-U) flags cause the
 function to be marked for autoloading; tt(-U) also causes alias
 expansion to be suppressed when the function is loaded.  See the

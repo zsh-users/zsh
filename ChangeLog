@@ -1,5 +1,9 @@
 2016-06-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38653 + 38657: Doc/Zsh/builtins.yo, Src/exec.c,
+	Test/E02xtrace.ztst: 'functions -T' tracing: recurse into
+	anonymous functions.
+
 	* 38651: Completion/Unix/Command/_git: Escape parameter arguments
 	to _call_program.
 

@@ -4615,6 +4615,8 @@ exectime(Estate state, UNUSED(int do_exec))
 
 /* Define a shell function */
 
+static const char *const ANONYMOUS_FUNCTION_NAME = "(anon)";
+
 /**/
 static int
 execfuncdef(Estate state, Eprog redir_prog)
@@ -4732,7 +4734,7 @@ execfuncdef(Estate state, Eprog redir_prog)
 
 	    if (!args)
 		args = newlinklist();
-	    shf->node.nam = "(anon)";
+	    shf->node.nam = (char *) ANONYMOUS_FUNCTION_NAME;
 	    pushnode(args, shf->node.nam);
 
 	    execshfunc(shf, args);
@@ -5165,8 +5167,12 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 
 	if (flags & (PM_TAGGED|PM_TAGGED_LOCAL))
 	    opts[XTRACE] = 1;
-	else if (oflags & PM_TAGGED_LOCAL)
-	    opts[XTRACE] = 0;
+	else if (oflags & PM_TAGGED_LOCAL) {
+	    if (shfunc->node.nam == ANONYMOUS_FUNCTION_NAME /* pointer comparison */)
+		flags |= PM_TAGGED_LOCAL;
+	    else
+		opts[XTRACE] = 0;
+	}
 	ooflags = oflags;
 	/*
 	 * oflags is static, because we compare it on the next recursive

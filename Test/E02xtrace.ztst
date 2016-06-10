@@ -127,3 +127,20 @@
 ?+(eval):2> [[ 'f o' == f\ x* || 'b r' != z\ o && 'squashy sound' < 'squishy sound' ]]
 ?+(eval):3> [[ -e nonexistentfile || -z '' && -t 3 ]]
 ?+(eval):4> set +x
+
+  # Part 1: Recurses into nested anonymous functions
+  fn() {
+    () { () { true } }
+  }
+  functions -T fn
+  fn
+  # Part 2: Doesn't recurse into named functions
+  gn() { true }
+  fn() { gn }
+  functions -T fn
+  fn
+0:tracing recurses into anonymous functions
+?+fn:1> '(anon)'
+?+(anon):0> '(anon)'
+?+(anon):0> true
+?+fn:0> gn
