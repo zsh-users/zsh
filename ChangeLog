@@ -1,5 +1,8 @@
 2016-06-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38651: Completion/Unix/Command/_git: Escape parameter arguments
+	to _call_program.
+
 	* 38665: Completion/Unix/Command/_git: config option completion:
 	Quote properly.
 

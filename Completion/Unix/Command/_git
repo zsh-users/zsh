@@ -2567,7 +2567,7 @@ _git-config () {
       __git_config_sections -b '(|)' -a '(|)' '^color\.[^.]+\..*$' gettable-color-options option && ret=0
       ;;
     (value)
-      local current=${${(0)"$(_call_program current "git config $opt_args[(I)--system|--global|--local] ${(kv)opt_args[(I)-f|--file]} -z --get ${(q)line[1]}")"}#*$'\n'}
+      local current=${${(0)"$(_call_program current "git config $opt_args[(I)--system|--global|--local]" ${(kv)opt_args[(I)-f|--file]} "-z --get ${(q)line[1]}")"}#*$'\n'}
       case $line[1] in
         (alias.*)
           if [[ -n $current ]]; then
@@ -5777,7 +5777,7 @@ __git_recent_commits () {
 
   # Careful: most %d will expand to the empty string.  Quote properly!
   # NOTE: we could use %D directly, but it's not available in git 1.9.1 at least.
-  commits=("${(f)"$(_call_program commits git --no-pager log $commit_opts -20 --format='%h%n%d%n%s\ \(%cr\)%n%p')"}")
+  commits=("${(f)"$(_call_program commits git --no-pager log ${(q)commit_opts} -20 --format='%h%n%d%n%s\ \(%cr\)%n%p')"}")
   __git_command_successful $pipestatus || return 1
 
   for i j k parents in "$commits[@]" ; do
@@ -5987,7 +5987,7 @@ __git_tags_of_type () {
 
   type=$1; shift
 
-  tags=(${${(M)${(f)"$(_call_program $type-tag-refs "git for-each-ref --format='%(*objecttype)%(objecttype) %(refname)' refs/tags 2>/dev/null")"}:#$type(tag|) *}#$type(tag|) refs/tags/})
+  tags=(${${(M)${(f)"$(_call_program ${(q)type}-tag-refs "git for-each-ref --format='%(*objecttype)%(objecttype) %(refname)' refs/tags 2>/dev/null")"}:#$type(tag|) *}#$type(tag|) refs/tags/})
   __git_command_successful $pipestatus || return 1
 
   _wanted $type-tags expl "$type tag" compadd -M 'r:|/=**' "$@" -a - tags
@@ -6099,12 +6099,12 @@ __git_files () {
   local pref=$gitcdup$gitprefix$PREFIX
 
   # First allow ls-files to pattern-match in case of remote repository
-  files=(${(0)"$(_call_program files git ls-files -z --exclude-standard $opts -- ${pref:+$pref\\\*} 2>/dev/null)"})
+  files=(${(0)"$(_call_program files git ls-files -z --exclude-standard ${(q)opts} -- ${(q)${pref:+$pref\\\*}} 2>/dev/null)"})
   __git_command_successful $pipestatus || return
 
   # If ls-files succeeded but returned nothing, try again with no pattern
   if [[ -z "$files" && -n "$pref" ]]; then
-    files=(${(0)"$(_call_program files git ls-files -z --exclude-standard $opts -- 2>/dev/null)"})
+    files=(${(0)"$(_call_program files git ls-files -z --exclude-standard ${(q)opts} -- 2>/dev/null)"})
     __git_command_successful $pipestatus || return
   fi
 
@@ -6221,7 +6221,7 @@ __git_tree_files () {
   shift
   (( at_least_one_tree_added = 0 ))
   for tree in $*; do
-    tree_files+=(${(ps:\0:)"$(_call_program tree-files git ls-tree -r $extra_args --name-only -z $tree 2>/dev/null)"})
+    tree_files+=(${(ps:\0:)"$(_call_program tree-files git ls-tree -r ${(q)extra_args} --name-only -z ${(q)tree} 2>/dev/null)"})
     __git_command_successful $pipestatus && (( at_least_one_tree_added = 1 ))
   done
 
@@ -6292,7 +6292,7 @@ __git_guard () {
 
 __git_guard_branch-name () {
   if [[ -n $PREFIX$SUFFIX ]]; then
-    _call_program check-ref-format git check-ref-format "refs/heads/$PREFIX$SUFFIX" &>/dev/null
+    _call_program check-ref-format git check-ref-format "refs/heads/"${(q)PREFIX}${(q)SUFFIX} &>/dev/null
     (( ${#pipestatus:#0} > 0 )) && return 1
   fi
 
