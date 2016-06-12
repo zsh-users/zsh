@@ -2567,7 +2567,7 @@ _git-config () {
       __git_config_sections -b '(|)' -a '(|)' '^color\.[^.]+\..*$' gettable-color-options option && ret=0
       ;;
     (value)
-      local current=${${(0)"$(_call_program current "git config $opt_args[(I)--system|--global|--local] ${(kv)opt_args[(I)-f|--file]} -z --get '$line[1]'")"}#*$'\n'}
+      local current=${${(0)"$(_call_program current "git config $opt_args[(I)--system|--global|--local] ${(kv)opt_args[(I)-f|--file]} -z --get ${(q)line[1]}")"}#*$'\n'}
       case $line[1] in
         (alias.*)
           if [[ -n $current ]]; then
@@ -6706,7 +6706,7 @@ __git_config_get_regexp () {
   [[ -n $opts[-a] ]] || opts[-a]='.[^.]##'
   [[ $1 == -- ]] && shift
 
-  set -A $2 ${${${(0)"$(_call_program ${3:-$2} "git config -z --get-regexp -- '$1'")"}#${~opts[-b]}}%%${~opts[-a]}$'\n'*}
+  set -A $2 ${${${(0)"$(_call_program ${3:-$2} "git config -z --get-regexp -- ${(q)1}")"}#${~opts[-b]}}%%${~opts[-a]}$'\n'*}
 }
 
 (( $+functions[__git_config_sections] )) ||
