@@ -884,37 +884,62 @@ should_report_time(Job j)
     struct value vbuf;
     Value v;
     char *s = "REPORTTIME";
-    zlong reporttime;
+    zlong reporttime = -1;
+#ifdef HAVE_GETRUSAGE
+    char *sm = "REPORTMEMORY";
+    zlong reportmemory = -1;
+#endif
 
     /* if the time keyword was used */
     if (j->stat & STAT_TIMED)
 	return 1;
 
     queue_signals();
-    if (!(v = getvalue(&vbuf, &s, 0)) ||
-	(reporttime = getintvalue(v)) < 0) {
-	unqueue_signals();
-	return 0;
-    }
+    if ((v = getvalue(&vbuf, &s, 0)))
+	reporttime = getintvalue(v);
+#ifdef HAVE_GETRUSAGE
+    if ((v = getvalue(&vbuf, &sm, 0)))
+	reportmemory = getintvalue(v);
+#endif
     unqueue_signals();
+    if (reporttime < 0
+#ifdef HAVE_GETRUSAGE
+	&& reportmemory < 0
+#endif
+	)
+	return 0;
     /* can this ever happen? */
     if (!j->procs)
 	return 0;
     if (zleactive)
 	return 0;
 
-#ifdef HAVE_GETRUSAGE
-    reporttime -= j->procs->ti.ru_utime.tv_sec + j->procs->ti.ru_stime.tv_sec;
-    if (j->procs->ti.ru_utime.tv_usec +
-	j->procs->ti.ru_stime.tv_usec >= 1000000)
-	reporttime--;
-    return reporttime <= 0;
-#else
+    if (reporttime >= 0)
     {
-	clktck = get_clktck();
-	return ((j->procs->ti.ut + j->procs->ti.st) / clktck >= reporttime);
-    }
+#ifdef HAVE_GETRUSAGE
+	reporttime -= j->procs->ti.ru_utime.tv_sec +
+	    j->procs->ti.ru_stime.tv_sec;
+	if (j->procs->ti.ru_utime.tv_usec +
+	    j->procs->ti.ru_stime.tv_usec >= 1000000)
+	    reporttime--;
+	if (reporttime <= 0)
+	    return 1;
+#else
+	{
+	    clktck = get_clktck();
+	    if ((j->procs->ti.ut + j->procs->ti.st) / clktck >= reporttime)
+		return 1;
+	}
 #endif
+    }
+
+#ifdef HAVE_GETRUSAGE
+    if (reportmemory >= 0 &&
+	j->procs->ti.ru_maxrss / 1024 > reportmemory)
+	return 1;
+#endif
+
+    return 0;
 }
 
 /* !(lng & 3) means jobs    *

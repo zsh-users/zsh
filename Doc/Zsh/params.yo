@@ -1390,6 +1390,20 @@ item(tt(READNULLCMD) <S>)(
 The command name to assume if a single input redirection
 is specified with no command.  Defaults to tt(more).
 )
+vindex(REPORTMEMORY)
+item(tt(REPORTMEMORY))(
+If nonnegative, commands whose maximum resident set size (roughly
+speaking, main memory usage) in megabytes is greater than this
+value have timing statistics reported.  The format used to output
+statistics is the value of the tt(TIMEFMT) parameter, which is the same
+as for the tt(REPORTTIME) variable and the tt(time) builtin; note that
+by default this does not output memory usage.  Appending
+tt(" max RSS %M") to the value of tt(TIMEFMT) causes it to output the
+value that triggered the report.  If tt(REPORTTIME) is also in use,
+at most a single report is printed for both triggers.  This feature
+requires the tt(getrusage()) system call, commonly supported by modern
+Unix-like systems.
+)
 vindex(REPORTTIME)
 item(tt(REPORTTIME))(
 If nonnegative, commands whose combined user and system execution times

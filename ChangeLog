@@ -1,3 +1,8 @@
+2016-06-13  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/21632: Doc/Zsh/params.yo, Src/jobs.c: REPORTMEMORY
+	parameter gives minimum size to trigger usage report.
+
 2016-06-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 38653 + 38657: Doc/Zsh/builtins.yo, Src/exec.c,
