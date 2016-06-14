@@ -1,3 +1,7 @@
+2016-06-14  Doug Kearns  <dougkearns@gmail.com>
+
+	* unposted: Completion/Unix/Command/_cvs: remove unused parameter
+
 2016-06-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* users/21632: Doc/Zsh/params.yo, Src/jobs.c: REPORTMEMORY

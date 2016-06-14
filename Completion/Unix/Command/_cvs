@@ -3,10 +3,7 @@
 # redefine _cvs.
 
 _cvs() {
-  local extra
-
   # "+Qqrwtnlvb:T:e:d:Hfz:s:xa"
-
   _arguments -s \
     '-R[read only access]' \
     '-a[authenticate]' \
