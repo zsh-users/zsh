@@ -1,3 +1,11 @@
+2016-06-14  Eric Cook  <llua@gmx.com>
+
+	* 38676: Marko Myllynen: Completion/Linux/Command/_pidof:
+	Completion for pidof(1)
+
+	* 38680: Marko Myllynen: Completion/Unix/Command/_localedef:
+	Completion for localedef(1)
+
 2016-06-14  Doug Kearns  <dougkearns@gmail.com>
 
 	* unposted: Completion/Unix/Command/_cvs: remove unused parameter
