@@ -345,7 +345,7 @@ tt(zle-isearch-exit), etc.
 var(widgetname) is the name of a ZLE widget.  If no options are given this
 is added to the array of widgets to be invoked in the given hook context.
 Note that the hooks are called as widgets, that is, with
-`tt(zle var(widgetname) -Nw)' rather than as a function call.
+`tt(zle )var(widgetname)tt( -Nw)' rather than as a function call.
 
 The arrays of var(widgetname) are maintained in several tt(zstyle)
 contexts, one for each var(hook) context, with a style of `tt(widgets)'.
@@ -365,7 +365,7 @@ array, it is assumed that a shell function also named var(widgetname) is
 meant to provide the implementation of the widget.  This name is therefore
 marked for autoloading, and the options tt(-U), tt(-z) and tt(-k) are
 passed as arguments to tt(autoload) as with tt(add-zsh-hook).  The
-widget is also created with `tt(zle -N var(widgetname))' to cause the
+widget is also created with `tt(zle -N )var(widgetname)' to cause the
 corresponding function to be loaded the first time the hook is called.
 
 In addition, var(widgetname) may be of the form var(index)tt(:)var(name).
@@ -2146,7 +2146,7 @@ tt(match-word-context).  This should not usually need to be called
 directly.
 )
 tindex(bracketed-paste-magic)
-item(bracketed-paste-magic)(
+item(tt(bracketed-paste-magic))(
 The tt(bracketed-paste) widget (see ifzman(subsection Miscellaneous in
 zmanref(zshzle))ifnzman(noderef(Miscellaneous) in noderef(Zle Widgets)))
 inserts pasted text literally into the editor buffer rather than interpret
