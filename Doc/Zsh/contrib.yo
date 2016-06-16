@@ -2993,6 +2993,9 @@ the variable tt(ZCALC_AUTO_INSERT_PREFIX).
 Hence, for example, typing `tt(PLUS()12)' followed by return adds 12
 to the previous result.
 
+If zcalc is in RPN mode (tt(-r) option) the effect of this binding is
+automatically suppressed as operators alone on a line are meaningful.
+
 When not in zcalc, the key simply inserts the symbol itself.
 )
 enditem()
@@ -3706,7 +3709,7 @@ sect(Mathematical Functions)
 
 startitem()
 findex(zcalc)
-item(tt(zcalc) [ tt(-ef) ] [ var(expression) ... ])(
+item(tt(zcalc) [ tt(-erf) ] [ var(expression) ... ])(
 A reasonably powerful calculator based on zsh's arithmetic evaluation
 facility.  The syntax is similar to that of formulae in most programming
 languages; see
@@ -3771,6 +3774,39 @@ interactively line by line.
 If the option `tt(-f)' is set, all numbers are treated as floating
 point, hence for example the expression `tt(3/4)' evaluates to 0.75
 rather than 0.  Options must appear in separate words.
+
+If the option `tt(-r)' is set, RPN (Reverse Polish Notation) mode is
+entered.  This has various additional properties:
+startitem()
+item(Stack)(
+Evaluated values are maintained in a stack; this is contained in
+an array named tt(stack) with the most recent value in tt(${stack[1]}).
+)
+item(Operators and functions)(
+If the line entered matches an operator (tt(+), tt(-), tt(*),
+tt(/), tt(**), tt(^), tt(|) or tt(&)) or a function supplied by the
+tt(zsh/mathfunc) library, the bottom element or elements of the stack
+are popped to use as the argument or arguments.  The higher elements
+of stack (least recent) are used as earlier arguments.  The result is
+then pushed into tt(${stack[1]}).
+)
+item(Expressions)(
+Other expressions are evaluated normally, printed, and added to the
+stack as numeric values.  The syntax within expressions on a single line
+is normal shell arithmetic (not RPN).
+)
+item(Stack listing)(
+If an integer follows the option tt(-r) with no space, then
+on every evaluation that many elements of the stack, where available,
+are printed instead of just the most recent result.  Hence, for example,
+tt(zcalc -r4) shows tt($stack[4]) to tt($stack[1]) each time results
+are printed.
+)
+item(Duplication)(
+The pseudo-operator tt(=) causes the most recent element of
+the stack to be duplicated onto the stack.
+)
+enditem()
 
 The prompt is configurable via the parameter tt(ZCALCPROMPT), which
 undergoes standard prompt expansion.  The index of the current entry is
@@ -3843,6 +3879,10 @@ just to display the raw number in the given base.  Bases themselves are
 always specified in decimal. `tt([#])' restores the normal output format.
 Note that setting an output base suppresses floating point output; use
 `tt([#])' to return to normal operation.
+)
+item(tt($)var(var))(
+Print out the value of var literally; does not affect the calculation.
+To use the value of var, omit the leading `tt($)'.
 )
 enditem()
 

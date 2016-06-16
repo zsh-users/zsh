@@ -96,6 +96,20 @@
 emulate -L zsh
 setopt extendedglob
 
+zcalc_show_value() {
+  if [[ -n $base ]]; then
+    print -- $(( $base $1 ))
+  elif [[ $1 = *.* ]] || (( outdigits )); then
+    if [[ -z $forms[outform] ]]; then
+      print -- $(( $1 ))
+    else
+      printf "$forms[outform]\n" $outdigits $1
+    fi
+  else
+    printf "%d\n" $1
+  fi
+}
+
 # For testing in ZLE functions.
 local ZCALC_ACTIVE=1
 
@@ -103,15 +117,20 @@ local ZCALC_ACTIVE=1
 # begin with _.
 local line ans base defbase forms match mbegin mend psvar optlist opt arg
 local compcontext="-zcalc-line-"
-integer num outdigits outform=1 expression_mode
-local -a expressions
+integer num outdigits outform=1 expression_mode rpn_mode matched show_stack i
+integer max_stack
+local -a expressions stack match mbegin mend
 
 # We use our own history file with an automatic pop on exit.
 history -ap "${ZDOTDIR:-$HOME}/.zcalc_history"
 
 forms=( '%2$g' '%.*g' '%.*f' '%.*E' '')
 
-zmodload -i zsh/mathfunc 2>/dev/null
+local mathfuncs
+if zmodload -i zsh/mathfunc 2>/dev/null; then
+  zmodload -P mathfuncs -FL zsh/mathfunc
+  mathfuncs="("${(j.|.)${mathfuncs##f:}}")"
+fi
 autoload -Uz zmathfuncdef
 
 if (( ! ${+ZCALCPROMPT} )); then
@@ -127,7 +146,7 @@ if [[ -f "${ZDOTDIR:-$HOME}/.zcalcrc" ]]; then
 fi
 
 # Process command line
-while [[ -n $1 && $1 = -(|[#-]*|f|e) ]]; do
+while [[ -n $1 && $1 = -(|[#-]*|f|e|r(<->|)) ]]; do
   optlist=${1[2,-1]}
   shift
   [[ $optlist = (|-) ]] && break
@@ -157,6 +176,14 @@ while [[ -n $1 && $1 = -(|[#-]*|f|e) ]]; do
 	    ;;
         (e) # Arguments are expressions
 	    (( expression_mode = 1 ));
+	    ;;
+        (r) # RPN mode.
+	    (( rpn_mode = 1 ))
+	    ZCALC_ACTIVE=rpn
+	    if [[ $optlist = (#b)(<->)* ]]; then
+	       (( show_stack = ${match[1]} ))
+               optlist=${optlist[${#match[1]}+1,-2]}
+	    fi
 	    ;;
     esac
   done
@@ -281,30 +308,95 @@ while (( expression_mode )) ||
     continue
     ;;
 
+    (\$[[:IDENT:]]##)
+    # Display only, no calculation
+    line=${line##\$}
+    print -r -- ${(P)line}
+    line=
+    continue
+    ;;
+
     (*)
-      # Latest value is stored as a string, because it might be floating
-      # point or integer --- we don't know till after the evaluation, and
-      # arrays always store scalars anyway.
-      #
-      # Since it's a string, we'd better make sure we know which
-      # base it's in, so don't change that until we actually print it.
-      eval "ans=\$(( $line ))"
-      # on error $ans is not set; let user re-edit line
-      [[ -n $ans ]] || continue
+      line=${${line##[[:blank:]]##}%%[[:blank:]]##}
+      if (( rpn_mode )); then
+	matched=1
+	case $line in
+	  (=)
+	  if (( ${#stack} < 1 )); then
+	    print -r -- "${line}: not enough values on stack" >&2
+	    line=
+	    continue
+	  fi
+	  ans=${stack[1]}
+	  ;;
+
+	  (+|-|\^|\||\&|\*|\*\*|/)
+	  # Operators with two arguments
+	  if (( ${#stack} < 2 )); then
+	    print -r -- "${line}: not enough values on stack" >&2
+	    line=
+	    continue
+	  fi
+	  eval "(( ans = \${stack[2]} $line \${stack[1]} ))"
+	  shift 2 stack
+	  ;;
+
+	  (ldexp|jn|yn|scalb)
+	  # Functions with two arguments
+	  if (( ${#stack} < 2 )); then
+	    print -r -- "${line}: not enough values on stack" >&2
+	    line=
+	    continue
+	  fi
+	  eval "(( ans = ${line}(\${stack[2]},\${stack[1]}) ))"
+	  shift 2 stack
+	  ;;
+
+	  (${~mathfuncs})
+	  # Functions with a single argument.
+	  # This is actually a superset, but we should have matched
+	  # any that shouldn't be in it in previous cases.
+	  if (( ${#stack} < 1 )); then
+	    print -r -- "${line}: not enough values on stack" >&2
+	    line=
+	    continue
+	  fi
+	  eval "(( ans = ${line}(\${stack[1]}) ))"
+	  shift stack
+	  ;;
+
+	  (*)
+	  # Treat as expression evaluating to new value to go on stack.
+	  matched=0
+	  ;;
+	esac
+      else
+	matched=0
+      fi
+      if (( ! matched )); then
+	# Latest value is stored` as a string, because it might be floating
+	# point or integer --- we don't know till after the evaluation, and
+	# arrays always store scalars anyway.
+	#
+	# Since it's a string, we'd better make sure we know which
+	# base it's in, so don't change that until we actually print it.
+	eval "ans=\$(( $line ))"
+	# on error $ans is not set; let user re-edit line
+	[[ -n $ans ]] || continue
+      fi
       argv[num++]=$ans
       psvar[1]=$num
+      stack=($ans $stack)
     ;;
   esac
-  if [[ -n $base ]]; then
-    print -- $(( $base $ans ))
-  elif [[ $ans = *.* ]] || (( outdigits )); then
-    if [[ -z $forms[outform] ]]; then
-      print -- $(( $ans ))
-    else
-      printf "$forms[outform]\n" $outdigits $ans
-    fi
+  if (( show_stack )); then
+    (( max_stack = (show_stack > ${#stack}) ? ${#stack} : show_stack ))
+    for (( i = max_stack; i > 0; i-- )); do
+      printf "%3d: " $i
+      zcalc_show_value ${stack[i]}
+    done
   else
-    printf "%d\n" $ans
+    zcalc_show_value $ans
   fi
   line=
 done

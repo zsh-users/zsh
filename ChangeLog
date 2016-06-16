@@ -1,5 +1,8 @@
 2016-06-16  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 38693: Doc/Zsh/contrib.yo, Functions/Misc/zcalc,
+	Functions/Zle/zcalc-auto-insert: Add RPN mode to zcalc.
+
 	* unposted: Doc/Zsh/params.yo: fix parentheses for getrusage().
 
 2016-06-16  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
