@@ -1401,8 +1401,8 @@ by default this does not output memory usage.  Appending
 tt(" max RSS %M") to the value of tt(TIMEFMT) causes it to output the
 value that triggered the report.  If tt(REPORTTIME) is also in use,
 at most a single report is printed for both triggers.  This feature
-requires the tt(getrusage()) system call, commonly supported by modern
-Unix-like systems.
+requires the tt(getrusage+LPAR()RPAR()) system call, commonly supported by
+modern Unix-like systems.
 )
 vindex(REPORTTIME)
 item(tt(REPORTTIME))(

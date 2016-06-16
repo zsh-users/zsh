@@ -1,3 +1,7 @@
+2016-06-16  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted: Doc/Zsh/params.yo: fix parentheses for getrusage().
+
 2016-06-16  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 38684: Doc/Zsh/contrib.yo: fix format
