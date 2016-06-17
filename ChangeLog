@@ -1,3 +1,7 @@
+2016-06-18  Oliver Kiddle  <opk@zsh.org>
+
+	* 38703: Completion/Unix/Command/_su: support su options on macOS
+
 2016-06-16  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 38693: Doc/Zsh/contrib.yo, Functions/Misc/zcalc,

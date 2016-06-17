@@ -25,7 +25,7 @@ case $OSTYPE in
     )
     first="(--help --version)${first#???}"
   ;;
-  *bsd*|dragonfly*)
+  *bsd*|darwin*|dragonfly*)
     args+=(
       '-c[use settings from specified login class]:class'
       '-f[if the invoked shell is csh, prevent it from reading .cshrc]'
