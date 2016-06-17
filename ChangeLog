@@ -1,5 +1,9 @@
 2016-06-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 38707: Completion/Zsh/Type/_globquals,
+	Completion/Unix/Type/_files, Completion/Unix/Type/_path_files:
+	strip suffix for glob qualifier completion
+
 	* 38703: Completion/Unix/Command/_su: support su options on macOS
 
 2016-06-16  Peter Stephenson  <p.stephenson@samsung.com>

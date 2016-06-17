@@ -7,6 +7,7 @@ local ret=1
 # we don't want to complete them multiple times (for each file pattern).
 if _have_glob_qual $PREFIX; then
   compset -p ${#match[1]}
+  compset -S '[^\)\|\~]#(|\))'
   if [[ $_comp_caller_options[extendedglob] == on ]] && compset -P '\#'; then
     _globflags && ret=0
   else

@@ -125,7 +125,7 @@ while [[ -n $PREFIX ]]; do
         alts+=("senses:sense:compadd -E 0 -d sdisp -S '' - + '' -")
       fi
       specmap=( M months w weeks h hours m minutes s seconds '(|+|-|d)' days)
-      alts+=('digits:digit ('${${specmap[(K)$timespec]}:-invalid time specifier}'):_dates -f ${${timespec/[-+]/d}:-d} -S ""' )
+      alts+=('digits:digit ('${${specmap[(K)${timespec:-d}]}:-invalid time specifier}'):_dates -f ${${timespec/[-+]/d}:-d} -S ""' )
       _alternative $alts
       return
     fi
