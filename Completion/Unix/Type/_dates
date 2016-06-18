@@ -9,7 +9,7 @@
 #   max-matches-length : maximum number or percentage of lines to use for
 #                        completion listing, if both are specified, the
 #                        lowest takes precedence.
-#   format             : override date format
+#   date-format        : override date format
 
 local -a disp cand expl
 local userformat format spacer=1 spacing month monstart skip match
@@ -37,6 +37,7 @@ _tags dates || return 0
 _comp_mesg=yes
 _description -2V -x dates expl date
 compadd "${@:/-X/-x}" "$expl[@]" -
+[[ -z $MENUSELECT && $WIDGET != menu-select ]] && return
 [[ -n $PREFIX$SUFFIX ]] && return 0
 (( rows )) || return 0
 compstate[list]='packed rows'
