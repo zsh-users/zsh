@@ -1929,7 +1929,8 @@ Emulate bf(ksh) array handling as closely as possible.  If this option
 is set, array elements are numbered from zero, an array parameter
 without subscript refers to the first element instead of the whole array,
 and braces are required to delimit a subscript (`tt(${path[2]})' rather
-than just `tt($path[2])').
+than just `tt($path[2])') or to apply modifiers to any parameter
+(`tt(${PWD:h})' rather than `tt($PWD:h)').
 )
 pindex(KSH_AUTOLOAD)
 pindex(NO_KSH_AUTOLOAD)

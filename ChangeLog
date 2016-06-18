@@ -2,6 +2,9 @@
 
 	* unposted: Functions/Misc/zed: localoptions noksharrays
 
+	* unposted: Doc/Zsh/options.yo: when ksharrays is set, braces are
+	required for all parameter expansions with colon-modifiers
+
 2016-06-18  Oliver Kiddle  <opk@zsh.org>
 
 	* 38713: Completion/Unix/Type/_dates: don't add calendar matches
