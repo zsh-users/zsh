@@ -1,3 +1,7 @@
+2016-06-18  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: Functions/Misc/zed: localoptions noksharrays
+
 2016-06-18  Oliver Kiddle  <opk@zsh.org>
 
 	* 38713: Completion/Unix/Type/_dates: don't add calendar matches

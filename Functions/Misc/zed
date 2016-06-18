@@ -6,6 +6,8 @@
 # Use ^X^W to save, ^C to abort.
 # Option -f: edit shell functions.  (Also if called as fned.)
 
+setopt localoptions noksharrays
+
 local var opts zed_file_name
 # We do not want timeout while we are editing a file
 integer TMOUT=0 okargs=1 fun bind
