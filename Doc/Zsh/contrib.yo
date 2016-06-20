@@ -345,14 +345,16 @@ tt(zle-isearch-exit), etc.
 var(widgetname) is the name of a ZLE widget.  If no options are given this
 is added to the array of widgets to be invoked in the given hook context.
 Note that the hooks are called as widgets, that is, with
-`tt(zle )var(widgetname)tt( -Nw)' rather than as a function call.
+example(tt(zle )var(widgetname)tt( -Nw "$@"))
+rather than as a function call.
 
-The arrays of var(widgetname) are maintained in several tt(zstyle)
-contexts, one for each var(hook) context, with a style of `tt(widgets)'.
-If the tt(-L) option is given, this set of styles is listed with
-`tt(zstyle -L)'.  These styles may be updated directly with tt(zstyle)
-commands, but the special widgets that refer to the styles are created
-only if tt(add-zle-hook-widget) is called to add at least one widget.
+In typical usage, var(widgetname) has the form var(index)tt(:)var(name).
+In this case var(index) is an integer which determines the order in which
+the widget var(name) will be called relative to other widgets in the
+array.  Widgets having the same var(index) are called in unspecified
+order.  However, var(widgetname) may omit the index, in which case an
+index is computed for it to arrange for it to be called in the order
+in which it was added to the array.
 
 If the option tt(-d) is given, the var(widgename) is removed from
 the array of widgets to be executed.
@@ -368,12 +370,14 @@ passed as arguments to tt(autoload) as with tt(add-zsh-hook).  The
 widget is also created with `tt(zle -N )var(widgetname)' to cause the
 corresponding function to be loaded the first time the hook is called.
 
-In addition, var(widgetname) may be of the form var(index)tt(:)var(name).
-In this case var(index) is an integer which determines the order in
-which the widget var(name) will be called relative to other widgets in
-the array.  Widgets having the same var(index) are called in unspecified
-order, and all widgets declared with an index are called before any
-widgets that have no index.
+
+The arrays of var(widgetname) are currently maintained in tt(zstyle)
+contexts, one for each var(hook) context, with a style of `tt(widgets)'.
+If the tt(-L) option is given, this set of styles is listed with
+`tt(zstyle -L)'.  This implementation may change, and the special widgets
+that refer to the styles are created only if tt(add-zle-hook-widget) is
+called to add at least one widget, so if this function is used for any
+hooks, then all hooks should be managed only via this function.
 )
 enditem()
 

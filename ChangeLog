@@ -1,3 +1,9 @@
+2016-06-19  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* 38715: Doc/Zsh/contrib.yo, Functions/Zle/add-zle-hook-widget:
+	assorted ksharrays fixes; assign an index to any hook that is
+	added without one, to preserve append ordering
+
 2016-06-18  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Misc/zed: localoptions noksharrays
