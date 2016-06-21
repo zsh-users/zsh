@@ -1,37 +1,81 @@
-#compdef rdesktop
+#compdef rdesktop xfreerdp
 
-local curcontext="$curcontext" state line expl redir ret=1
+local curcontext="$curcontext" state line expl args redir ret=1
 typeset -A opt_args
 
-_arguments -C -s \
+case $service in
+  rdesktop)
+    args=(
+      '(-5)-4[use RDP version 4]'
+      '(-4)-5[use RDP version 5]'
+      '-b[force server to use bitmaps for screen updates]'
+      '-B[use X server backing store]'
+      '-E[disable encryption]'
+      "-m[don't send mouse motion events]"
+      '-C[use private colormap]'
+      '-S[single application mode]'
+      '-N[enable numlock synchronisation]'
+      '-P[enable bitmap caching]'
+      '*-r[device redirection]: :->redirection'
+    )
+  ;;
+  xfreerdp)
+    args=(
+      '(-)'{-h,--help}'[display help information]'
+      "-o[don't redirect audio to client]"
+      '-s[set startup-shell]:shell'
+      '-t[connect to specified port]:port:_ports'
+      '--app[RemoteApp connection]'
+      '--ext[load an extension]:extension'
+      '--no-auth[disable authentication]'
+      '--authonly[authentication only, no UI]'
+      '--from-stdin[prompt for username, password, domain and hostname]'
+      '--no-fastpath[disable fast-path]'
+      '--gdi[graphics rendering]:backend:(hw sw)'
+      "--no-motion[don't send mouse motion events]"
+      '--no-osb[disable offscreen bitmaps]'
+      '--no-bmp-cache[disable bitmap cache]'
+      '--plugin[load a virtual channel plugin]:(cliprdr drdynvc rdpsnd rail rdpdbg rdpdr)'
+      '--rfx[enable RemoteFX]'
+      '--rfx-mode[RemoteFX operational flags]:mode:((v\:video i\:image))'
+      '--nsc[enable NSCodec]'
+      '--disable-wallpaper'
+      '--composition[enable desktop composition]'
+      '--disable-full-window-drag'
+      '--disable-menu-animations'
+      '--disable-theming'
+      '--kbd-list[list all keyboard layout ids used by -k]'
+      '--no-rdp[disable Standard RDP encryption]'
+      '--no-tls[disable TLS encryption]'
+      '--no-nla[disable network level authentication]'
+      '--ntlm[force NTLM authentication protocol version]:version:(1 2)'
+      '--certificate-name[specify logon certificate]:certificate'
+      '--ignore-certificate[ignore verification of logon certificate]'
+      '--sec[force protocol security]:security:(rdp tls nla)'
+      '--secure-checksum[use salted checksums with Standard RDP encryption]'
+      '--version[print version information]'
+    )
+  ;;
+esac
+
+_arguments -C -s $args \
   '-u[username]:username:_users' \
   '-d[domain]:domain' \
   '-s[shell]:startup shell' \
   '-c[working directory]:directory:_directories' \
   '-p[password]:password' \
-  '-n[hostname]:host:_hosts' \
+  '-n[set reported client hostname]:client hostname:_hosts' \
   '-k[keyboard map]:keyboard map' \
   '(-f)-g[geometry]:geometry (WxH)' \
   '(-g)-f[fullscreen mode]' \
-  '-b[force server to use bitmaps for screen updates]' \
-  '-B[use X server backing store]' \
-  '-E[disable encryption]' \
-  "-m[don't send mouse motion events]" \
-  '-C[use private colormap]' \
   '-D[hide window decorations]' \
   '-K[do not override window manager key bindings]' \
-  '-S[single application mode]' \
   '-T[set window title]:title' \
-  '-N[enable numlock synchronisation]' \
   '-X[embed in another window]:window:_x_window' \
-  '-a[colour depth]:depth:(8 15 16 24)' \
+  '-a[colour depth]:depth:(8 15 16 24 32)' \
   '-z[enable compression]' \
   '-x[bandwidth performance behaviour]:experience:((b\:broadband l\:lan m\:modem))' \
-  '-P[enable bitmap caching]' \
-  '*-r[device redirection]: :->redirection' \
   '-0[attach to server console]' \
-  '(-5)-4[use RDP version 4]' \
-  '(-4)-5[use RDP version 5]' \
   ':server:->hostsport' && ret=0
 
 case $state in
