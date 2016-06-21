@@ -3806,9 +3806,22 @@ are printed instead of just the most recent result.  Hence, for example,
 tt(zcalc -r4) shows tt($stack[4]) to tt($stack[1]) each time results
 are printed.
 )
-item(Duplication)(
+item(Duplication: tt(=))(
 The pseudo-operator tt(=) causes the most recent element of
 the stack to be duplicated onto the stack.
+)
+item(tt(pop))(
+The pseudo-function tt(pop) causes the most recent element of
+the stack to be popped.  A `tt(<)' on its own has the same effect.
+)
+item(tt(<)var(ident))(
+The expression tt(<) followed (with no space) by a shell identifier
+causes the most recent element of the stack to be popped and
+assigned to the identifier.
+)
+item(Exchange: tt(xy))(
+The pseudo-function tt(xy) causes the most recent two elements of
+the stack to be exchanged.
 )
 enditem()
 
@@ -3872,7 +3885,13 @@ Note that tt(zcalc) takes care of all quoting.  Hence for example:
 
 example(:f cube $1 * $1 * $1)
 
-defines a function to cube the sole argument.
+defines a function to cube the sole argument.  Functions so defined, or
+indeed any functions defined directly or indirectly using tt(functions
+-M), are available to execute by typing only the name on the line in RPN
+mode; this pops the appropriate number of arguments off the stack
+to pass to the function, i.e. 1 in the case of the example tt(cube)
+function.  If there are optional arguments only the mandatory
+arguments are supplied by this means.
 )
 item(tt([#)var(base)tt(]))(
 This is not a special command, rather part of normal arithmetic

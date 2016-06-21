@@ -100,7 +100,8 @@ zcalc_show_value() {
   if [[ -n $base ]]; then
     print -- $(( $base $1 ))
   elif [[ $1 = *.* ]] || (( outdigits )); then
-    if [[ -z $forms[outform] ]]; then
+    # With normal output, ensure trailing "." doesn't get lost.
+    if [[ -z $forms[outform] || ($outform -eq 1 && $1 = *.) ]]; then
       print -- $(( $1 ))
     else
       printf "$forms[outform]\n" $outdigits $1
@@ -115,10 +116,10 @@ local ZCALC_ACTIVE=1
 
 # TODO: make local variables that shouldn't be visible in expressions
 # begin with _.
-local line ans base defbase forms match mbegin mend psvar optlist opt arg
+local line ans base defbase forms match mbegin mend psvar optlist opt arg tmp
 local compcontext="-zcalc-line-"
-integer num outdigits outform=1 expression_mode rpn_mode matched show_stack i
-integer max_stack
+integer num outdigits outform=1 expression_mode rpn_mode matched show_stack i n
+integer max_stack push
 local -a expressions stack match mbegin mend
 
 # We use our own history file with an automatic pop on exit.
@@ -131,6 +132,13 @@ if zmodload -i zsh/mathfunc 2>/dev/null; then
   zmodload -P mathfuncs -FL zsh/mathfunc
   mathfuncs="("${(j.|.)${mathfuncs##f:}}")"
 fi
+local -A userfuncs
+for line in ${(f)"$(functions -M)"}; do
+  match=(${=line})
+  # get minimum number of arguments
+  userfuncs[${match[3]}]=${match[4]}
+done
+line=
 autoload -Uz zmathfuncdef
 
 if (( ! ${+ZCALCPROMPT} )); then
@@ -298,6 +306,7 @@ while (( expression_mode )) ||
 
     ((function|:f(unc(tion|)|))[[:blank:]]##(#b)([^[:blank:]]##)(|[[:blank:]]##([^[:blank:]]*)))
       zmathfuncdef $match[1] $match[3]
+      userfuncs[$match[1]]=${$(functions -Mm $match[1])[4]}
       line=
       continue
     ;;
@@ -318,19 +327,38 @@ while (( expression_mode )) ||
 
     (*)
       line=${${line##[[:blank:]]##}%%[[:blank:]]##}
-      if (( rpn_mode )); then
+      if [[ rpn_mode -ne 0 && $line != '' ]]; then
+	push=1
 	matched=1
 	case $line in
-	  (=)
+	  (\=|pop|\<[[:IDENT:]]#)
 	  if (( ${#stack} < 1 )); then
 	    print -r -- "${line}: not enough values on stack" >&2
 	    line=
 	    continue
 	  fi
-	  ans=${stack[1]}
+	  case $line in
+	    (=)
+	    ans=${stack[1]}
+	    ;;
+	    (pop|\<)
+	    push=0
+	    shift stack
+	    ;;
+	    (\<[[:IDENT:]]##)
+	    (( ${line##\<} = ${stack[1]} ))
+	    push=0
+	    shift stack
+	    ;;
+	    (*)
+	    print "BUG in special RPN functions" >&2
+	    line=
+	    continue
+	    ;;
+	  esac
 	  ;;
 
-	  (+|-|\^|\||\&|\*|\*\*|/)
+	  (+|-|\^|\||\&|\*|/|\*\*|\>\>|\<\</)
 	  # Operators with two arguments
 	  if (( ${#stack} < 2 )); then
 	    print -r -- "${line}: not enough values on stack" >&2
@@ -341,15 +369,22 @@ while (( expression_mode )) ||
 	  shift 2 stack
 	  ;;
 
-	  (ldexp|jn|yn|scalb)
+	  (ldexp|jn|yn|scalb|xy)
 	  # Functions with two arguments
 	  if (( ${#stack} < 2 )); then
 	    print -r -- "${line}: not enough values on stack" >&2
 	    line=
 	    continue
 	  fi
-	  eval "(( ans = ${line}(\${stack[2]},\${stack[1]}) ))"
-	  shift 2 stack
+	  if [[ $line = xy ]]; then
+	    tmp=${stack[1]}
+	    stack[1]=${stack[2]}
+	    stack[2]=$tmp
+	    push=0
+	  else
+	    eval "(( ans = ${line}(\${stack[2]},\${stack[1]}) ))"
+	    shift 2 stack
+	  fi
 	  ;;
 
 	  (${~mathfuncs})
@@ -363,6 +398,25 @@ while (( expression_mode )) ||
 	  fi
 	  eval "(( ans = ${line}(\${stack[1]}) ))"
 	  shift stack
+	  ;;
+
+	  (${(kj.|.)~userfuncs})
+	  # Get minimum number of arguments to user function
+	  n=${userfuncs[$line]}
+	  if (( ${#stack} < n )); then
+	    print -r -- "${line}: not enough vlaues ($n) on stack" >&2
+	    line=
+	    continue
+	  fi
+	  line+="("
+	  # least recent elements on stack are earlier arguments
+	  for (( i = n; i > 0; i-- )); do
+	    line+=${stack[i]}
+	    (( i > 1 )) && line+=","
+	  done
+	  line+=")"
+	  shift $n stack
+	  eval "(( ans = $line ))"
 	  ;;
 
 	  (*)
@@ -386,7 +440,7 @@ while (( expression_mode )) ||
       fi
       argv[num++]=$ans
       psvar[1]=$num
-      stack=($ans $stack)
+      (( push )) && stack=($ans $stack)
     ;;
   esac
   if (( show_stack )); then

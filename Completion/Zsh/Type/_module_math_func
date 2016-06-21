@@ -6,4 +6,4 @@ local -a funcs
 funcs=(${${${(f)"$(zmodload -Fl zsh/mathfunc 2>/dev/null)"}:#^+f:*}##+f:})
 
 _wanted module-math-functions expl 'math function from zsh/mathfunc' \
-    compadd -S '(' "$@" -a funcs
+    compadd -S '(' -q "$@" -a funcs

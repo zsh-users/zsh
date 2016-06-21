@@ -6,4 +6,4 @@ local -a funcs
 funcs=(${${${(f)"$(functions -M)"}##functions -M }%% *})
 
 _wanted user-math-functions expl 'user math function' \
-    compadd -S '(' "$@" -a funcs
+    compadd -S '(' -q "$@" -a funcs

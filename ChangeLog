@@ -1,5 +1,9 @@
 2016-06-21  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 38736: Completion/Zsh/Type/_module_math_func,
+	Completion/Zsh/Type/_user_math_func, Doc/Zsh/contrib.yo,
+	Functions/Misc/zcalc: various RPN mode enhancments for zcalc.
+
 	* 38734: Src/loop.c, Test/A01grammar.ztst: fix final case
 	clauses terminating with ;&.
 
