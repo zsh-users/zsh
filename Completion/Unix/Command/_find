@@ -1,7 +1,7 @@
 #compdef find gfind
 
-local curcontext="$curcontext" state_descr variant
-local -a state line args alts
+local curcontext="$curcontext" state_descr variant default
+local -a state line args alts disp smatch
 
 _pick_variant -r variant gnu=GNU $OSTYPE -version
 
@@ -101,7 +101,7 @@ case $variant in
       '-D[print diagnostics]:debug option:(help tree search stat rates opt exec)'
       '-O+[enable query optimisation]:level:(1 2 3)'
       '*-daystart'
-      '-regextype:regexp syntax:(emacs posix-awk posix-basic posix-egrep posix-extended)'
+      '-regextype:regexp syntax:(help findutils-default awk egrep ed emacs gnu-awk grep posix-awk posix-basic posix-egrep posix-extended posix-minimal-basic sed)'
       '*-warn'
       '*-nowarn'
       '*-xautofs'
@@ -147,13 +147,21 @@ _arguments -C $args \
   '*-user:user:_users' \
   '*-xdev' \
   '*-a' '*-o' \
-  '*:directory:_files -/'
+  '(-D -E -H -L -O -P -f -s -x --help --version)*:directory:_files -/'
 
 if [[ $state = times ]]; then
   if ! compset -P '[+-]' || [[ -prefix '[0-9]' ]]; then
-    disp=( 'before' 'exactly' 'since' )
     compstate[list]+=' packed'
-    alts=( "senses:sense:compadd -V times -S '' -d disp - + '' -" )
+    if zstyle -t ":completion:${curcontext}:senses" verbose; then
+      zstyle -s ":completion:${curcontext}:senses" list-separator sep || sep=--
+      default=" [default exactly]"
+      disp=( "- $sep before" "+ $sep since" )
+      smatch=( - + )
+    else
+      disp=( before exactly since )
+      smatch=( - '' + )
+    fi
+    alts=( "senses:sense${default}:compadd -V times -S '' -d disp -a smatch" )
   fi
   alts+=( "times:${state_descr}:_dates -f d" )
   _alternative $alts

@@ -1,5 +1,9 @@
 2016-06-22  Oliver Kiddle  <opk@zsh.org>
 
+	* 38735: Completion/Unix/Command/_find,
+	Completion/Zsh/Type/_globquals: support verbose style to allow
+	clearer but less compact descriptions for time specifiers
+
 	* 38733: Completion/X/Command/_rdesktop: completion for xfreerdp
 
 2016-06-21  Peter Stephenson  <p.stephenson@samsung.com>

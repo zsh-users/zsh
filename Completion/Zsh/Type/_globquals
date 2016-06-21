@@ -1,7 +1,7 @@
 #autoload
 
-local state=qual expl char delim timespec
-local -a alts tdisp sdisp
+local state=qual expl char delim timespec default
+local -a alts tdisp sdisp tmatch smatch
 local -A specmap
 
 while [[ -n $PREFIX ]]; do
@@ -118,11 +118,27 @@ while [[ -n $PREFIX ]]; do
       timespec=$PREFIX[1]
       if ! compset -P '[Mwhmsd]' && [[ -z $PREFIX ]]; then
 	tdisp=( seconds minutes hours days weeks Months )
-        alts+=( "time-specifiers:time specifier:compadd -E 0 -d tdisp -S '' - s m h d w M" )
+	tmatch=( s m h d w M )
+	if zstyle -t ":completion:${curcontext}:time-specifiers" verbose; then
+	  zstyle -s ":completion:${curcontext}:time-specifiers" list-separator sep || sep=--
+          print -v tdisp -f "%s ${sep//(#m)[%\\]/$MATCH$MATCH} %s\0" ${tmatch:^^tdisp}
+	  tdisp=( ${(0)tdisp} )
+	fi
+	alts+=( "time-specifiers:time specifier:compadd -E 0 -d tdisp -S '' -a tmatch" )
       fi
       if ! compset -P '[-+]' && [[ -z $PREFIX ]]; then
 	sdisp=( before exactly since )
-        alts+=("senses:sense:compadd -E 0 -d sdisp -S '' - + '' -")
+	smatch=( - '' + )
+	if zstyle -t ":completion:${curcontext}:senses" verbose; then
+	  zstyle -s ":completion:${curcontext}:senses" list-separator sep || sep=--
+	  default=" [default exactly]"
+	  sdisp=( "- $sep before" "+ $sep since" )
+	  smatch=( - + )
+	else
+	  sdisp=( before exactly since )
+	  smatch=( - '' + )
+	fi
+        alts+=( "senses:sense${default}:compadd -E 0 -d sdisp -S '' -a smatch" )
       fi
       specmap=( M months w weeks h hours m minutes s seconds '(|+|-|d)' days)
       alts+=('digits:digit ('${${specmap[(K)${timespec:-d}]}:-invalid time specifier}'):_dates -f ${${timespec/[-+]/d}:-d} -S ""' )
