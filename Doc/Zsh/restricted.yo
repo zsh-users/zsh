@@ -10,11 +10,11 @@ restricted mode:
 
 startitemize()
 itemiz(changing directories with the tt(cd) builtin)
-itemiz(changing or unsetting the tt(PATH), tt(path), tt(MODULE_PATH),
-tt(module_path), tt(SHELL), tt(HISTFILE), tt(HISTSIZE), tt(GID), tt(EGID),
-tt(UID), tt(EUID), tt(USERNAME), tt(LD_LIBRARY_PATH),
-tt(LD_AOUT_LIBRARY_PATH), tt(LD_PRELOAD) and  tt(LD_AOUT_PRELOAD)
-parameters)
+itemiz(changing or unsetting the tt(EGID), tt(EUID), tt(GID),
+tt(HISTFILE), tt(HISTSIZE), tt(IFS), tt(LD_AOUT_LIBRARY_PATH),
+tt(LD_AOUT_PRELOAD), tt(LD_LIBRARY_PATH), tt(LD_PRELOAD),
+tt(MODULE_PATH), tt(module_path), tt(PATH), tt(path), tt(SHELL),
+tt(UID) and tt(USERNAME) parameters)
 itemiz(specifying command names containing tt(/))
 itemiz(specifying command pathnames using tt(hash))
 itemiz(redirecting output to files)
