@@ -1,5 +1,8 @@
 2016-06-21  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 38734: Src/loop.c, Test/A01grammar.ztst: fix final case
+	clauses terminating with ;&.
+
 	* 38692: Doc/Zsh/restricted.yo, Src/params.c: IFS can't be
 	changed in restricted mode.
 

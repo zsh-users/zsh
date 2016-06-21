@@ -283,6 +283,14 @@
 >2
 >3
 
+  case whatever in
+  (*) print yeah, right ;&
+  esac
+  print but well
+0:'case', redundant final ";&"
+>yeah, right
+>but well
+
 ## Select now reads from stdin if the shell is not interactive.
 ## Its own output goes to stderr.
   (COLUMNS=80 LINES=3

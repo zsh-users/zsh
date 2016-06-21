@@ -660,7 +660,7 @@ execcase(Estate state, int do_exec)
 	    execlist(state, 1, ((WC_CASE_TYPE(code) == WC_CASE_OR) &&
 				do_exec));
 	    while (!retflag && wc_code(code) == WC_CASE &&
-		   WC_CASE_TYPE(code) == WC_CASE_AND) {
+		   WC_CASE_TYPE(code) == WC_CASE_AND && state->pc < end) {
 		state->pc = next;
 		code = *state->pc++;
 		next = state->pc + WC_CASE_SKIP(code);
