@@ -913,6 +913,13 @@ line and trial completion patterns are anchored on the right side.
 Here an empty var(ranchor) and the tt(e) and tt(E) forms force the
 match to the end of the command line or trial completion string.
 )
+item(tt(x:))(
+This form is used to mark the end of matching specifications:
+subsequent specifications are ignored. In a single standalone list
+of specifications this has no use but where matching specifications
+are accumulated, such as from nested function calls, it can allow one
+function to override another.
+)
 enditem()
 
 Each var(lpat), var(tpat) or var(anchor) is either an empty string or

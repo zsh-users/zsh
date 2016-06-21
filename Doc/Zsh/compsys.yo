@@ -2023,8 +2023,9 @@ only be performed with the `tt(*)' inserted.
 kindex(matcher, completion style)
 item(tt(matcher))(
 This style is tested separately for each tag valid in the current
-context.  Its value is tried before any match specifications given by the 
-tt(matcher-list) style.  It should be in the form described in
+context.  Its value is placed before any match specifications given by the
+tt(matcher-list) style so can override them via the use of an tt(x:)
+specification.  The value should be in the form described in
 ifzman(the section `Completion Matching Control' in zmanref(zshcompwid))\
 ifnzman(noderef(Completion Matching Control))\
 .  For examples of this, see the description of the tt(tag-order) style.

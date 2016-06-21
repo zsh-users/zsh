@@ -1,5 +1,9 @@
 2016-06-22  Oliver Kiddle  <opk@zsh.org>
 
+	* 38714: Src/Zle/complete.c, Doc/Zsh/compsys.yo,
+	Doc/Zsh/compwid.yo: add x: syntax to match specs to make it
+	possible to disable match specs hardcoded in completion functions
+
 	* 38735: Completion/Unix/Command/_find,
 	Completion/Zsh/Type/_globquals: support verbose style to allow
 	clearer but less compact descriptions for time specifiers

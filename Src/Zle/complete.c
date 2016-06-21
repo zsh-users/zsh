@@ -241,6 +241,7 @@ parse_cmatcher(char *name, char *s)
 	case 'E': fl2 = CMF_INTER;
 	case 'R': fl = CMF_RIGHT | CMF_LINE; break;
 	case 'M': fl = CMF_LINE; break;
+	case 'x': break;
 	default:
 	    if (name)
 		zwarnnam(name, "unknown match specification character `%c'",
@@ -251,6 +252,15 @@ parse_cmatcher(char *name, char *s)
 	    if (name)
 		zwarnnam(name, "missing `:'");
 	    return pcm_err;
+	}
+	if (*s == 'x') {
+	    if (s[2] && !inblank(s[2])) {
+		if (name)
+		    zwarnnam(name,
+			"unexpected pattern following x: specification");
+		return pcm_err;
+	    }
+	    return ret;
 	}
 	s += 2;
 	if (!*s) {
