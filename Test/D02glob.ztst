@@ -654,4 +654,27 @@
   [[ "z" != [$~cset] ]] || print Fail 4
   [[ "1" = [$~cset] ]] || print Fail 5
   [[ "b" != [$~cset] ]] || print Fail 6
-0:character set specified as active variabe
+0:character set specified as active variable
+
+ () { print -l -- $@:a } / /..{,/} /1 /nonexistent/..{,/} /deeper/nonexistent/..{,/}
+0:modifier ':a' doesn't require existence
+>/
+>/
+>/
+>/1
+>/
+>/
+>/deeper
+>/deeper
+
+ () { set -- ${PWD}/$^@; print -l -- $@:A } glob.tmp/nonexistent/foo/bar/baz
+0:modifier ':A' doesn't require existence
+*>*/glob.tmp/nonexistent/foo/bar/baz
+
+ ln -s dir3/subdir glob.tmp/link
+ () {
+   print ${1:A} | grep glob.tmp
+ } glob.tmp/link/../../hello
+ rm glob.tmp/link
+0:modifier ':A' resolves '..' components before symlinks
+# There should be no output

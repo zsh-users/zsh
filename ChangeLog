@@ -1,3 +1,8 @@
+2016-07-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 38728: Test/D02glob.ztst: Tests: Add tests for the ':a' and
+	':A' modifiers.
+
 2016-07-04  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 38783: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: tweaks for
