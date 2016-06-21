@@ -97,14 +97,14 @@ emulate -L zsh
 setopt extendedglob
 
 zcalc_show_value() {
-  if [[ -n $base ]]; then
-    print -- $(( $base $1 ))
-  elif [[ $1 = *.* ]] || (( outdigits )); then
+  if [[ -n $_base ]]; then
+    print -- $(( $_base $1 ))
+  elif [[ $1 = *.* ]] || (( _outdigits )); then
     # With normal output, ensure trailing "." doesn't get lost.
-    if [[ -z $forms[outform] || ($outform -eq 1 && $1 = *.) ]]; then
+    if [[ -z $_forms[_outform] || ($_outform -eq 1 && $1 = *.) ]]; then
       print -- $(( $1 ))
     else
-      printf "$forms[outform]\n" $outdigits $1
+      printf "$_forms[_outform]\n" $_outdigits $1
     fi
   else
     printf "%d\n" $1
@@ -116,29 +116,31 @@ local ZCALC_ACTIVE=1
 
 # TODO: make local variables that shouldn't be visible in expressions
 # begin with _.
-local line ans base defbase forms match mbegin mend psvar optlist opt arg tmp
+local _line ans _base _defbase _forms match mbegin mend
+local psvar _optlist _opt _arg _tmp
 local compcontext="-zcalc-line-"
-integer num outdigits outform=1 expression_mode rpn_mode matched show_stack i n
-integer max_stack push
-local -a expressions stack match mbegin mend
+integer _num _outdigits _outform=1 _expression_mode
+integer _rpn_mode _matched _show_stack _i _n
+integer _max_stack _push
+local -a _expressions stack
 
 # We use our own history file with an automatic pop on exit.
 history -ap "${ZDOTDIR:-$HOME}/.zcalc_history"
 
-forms=( '%2$g' '%.*g' '%.*f' '%.*E' '')
+_forms=( '%2$g' '%.*g' '%.*f' '%.*E' '')
 
-local mathfuncs
+local _mathfuncs
 if zmodload -i zsh/mathfunc 2>/dev/null; then
-  zmodload -P mathfuncs -FL zsh/mathfunc
-  mathfuncs="("${(j.|.)${mathfuncs##f:}}")"
+  zmodload -P _mathfuncs -FL zsh/mathfunc
+  _mathfuncs="("${(j.|.)${_mathfuncs##f:}}")"
 fi
-local -A userfuncs
-for line in ${(f)"$(functions -M)"}; do
-  match=(${=line})
+local -A _userfuncs
+for _line in ${(f)"$(functions -M)"}; do
+  match=(${=_line})
   # get minimum number of arguments
-  userfuncs[${match[3]}]=${match[4]}
+  _userfuncs[${match[3]}]=${match[4]}
 done
-line=
+_line=
 autoload -Uz zmathfuncdef
 
 if (( ! ${+ZCALCPROMPT} )); then
@@ -155,118 +157,118 @@ fi
 
 # Process command line
 while [[ -n $1 && $1 = -(|[#-]*|f|e|r(<->|)) ]]; do
-  optlist=${1[2,-1]}
+  _optlist=${1[2,-1]}
   shift
-  [[ $optlist = (|-) ]] && break
-  while [[ -n $optlist ]]; do
-    opt=${optlist[1]}
-    optlist=${optlist[2,-1]}
-    case $opt in
+  [[ $_optlist = (|-) ]] && break
+  while [[ -n $_optlist ]]; do
+    _opt=${_optlist[1]}
+    _optlist=${_optlist[2,-1]}
+    case $_opt in
       ('#') # Default base
-            if [[ -n $optlist ]]; then
-	       arg=$optlist
-	       optlist=
+            if [[ -n $_optlist ]]; then
+	       _arg=$_optlist
+	       _optlist=
 	    elif [[ -n $1 ]]; then
-	       arg=$1
+	       _arg=$1
 	       shift
 	    else
 	       print -- "-# requires an argument" >&2
 	       return 1
 	    fi
-	    if [[ $arg != (|\#)[[:digit:]]## ]]; then
+	    if [[ $_arg != (|\#)[[:digit:]]## ]]; then
 	      print -- "-# requires a decimal number as an argument" >&2
 	      return 1
 	    fi
-            defbase="[#${arg}]"
+            _defbase="[#${_arg}]"
 	    ;;
 	(f) # Force floating point operation
 	    setopt forcefloat
 	    ;;
         (e) # Arguments are expressions
-	    (( expression_mode = 1 ));
+	    (( _expression_mode = 1 ));
 	    ;;
         (r) # RPN mode.
-	    (( rpn_mode = 1 ))
+	    (( _rpn_mode = 1 ))
 	    ZCALC_ACTIVE=rpn
-	    if [[ $optlist = (#b)(<->)* ]]; then
-	       (( show_stack = ${match[1]} ))
-               optlist=${optlist[${#match[1]}+1,-2]}
+	    if [[ $_optlist = (#b)(<->)* ]]; then
+	       (( _show_stack = ${match[1]} ))
+               _optlist=${_optlist[${#match[1]}+1,-2]}
 	    fi
 	    ;;
     esac
   done
 done
 
-if (( expression_mode )); then
-  expressions=("$@")
+if (( _expression_mode )); then
+  _expressions=("$@")
   argv=()
 fi
 
-for (( num = 1; num <= $#; num++ )); do
+for (( _num = 1; _num <= $#; _num++ )); do
   # Make sure all arguments have been evaluated.
   # The `$' before the second argv forces string rather than numeric
   # substitution.
-  (( argv[$num] = $argv[$num] ))
-  print "$num> $argv[$num]"
+  (( argv[$_num] = $argv[$_num] ))
+  print "$_num> $argv[$_num]"
 done
 
-psvar[1]=$num
-local prev_line cont_prompt
-while (( expression_mode )) ||
-  vared -cehp "${cont_prompt}${ZCALCPROMPT}" line; do
-  if (( expression_mode )); then
-    (( ${#expressions} )) || break
-    line=$expressions[1]
-    shift expressions
+psvar[1]=$_num
+local _prev_line _cont_prompt
+while (( _expression_mode )) ||
+  vared -cehp "${_cont_prompt}${ZCALCPROMPT}" _line; do
+  if (( _expression_mode )); then
+    (( ${#_expressions} )) || break
+    _line=$_expressions[1]
+    shift _expressions
   fi
-  if [[ $line = (|*[^\\])('\\')#'\' ]]; then
-    prev_line+=$line[1,-2]
-    cont_prompt="..."
-    line=
+  if [[ $_line = (|*[^\\])('\\')#'\' ]]; then
+    _prev_line+=$_line[1,-2]
+    _cont_prompt="..."
+    _line=
     continue
   fi
-  line="$prev_line$line"
-  prev_line=
-  cont_prompt=
+  _line="$_prev_line$_line"
+  _prev_line=
+  _cont_prompt=
   # Test whether there are as many open as close
-  # parentheses in the line so far.
-  if [[ ${#line//[^\(]} -gt ${#line//[^\)]} ]]; then
-      prev_line+=$line
-      cont_prompt="..."
-      line=
+  # parentheses in the _line so far.
+  if [[ ${#_line//[^\(]} -gt ${#_line//[^\)]} ]]; then
+      _prev_line+=$_line
+      _cont_prompt="..."
+      _line=
       continue
   fi
-  [[ -z $line ]] && break
+  [[ -z $_line ]] && break
   # special cases
   # Set default base if `[#16]' or `[##16]' etc. on its own.
   # Unset it if `[#]' or `[##]'.
-  if [[ $line = (#b)[[:blank:]]#('[#'(\#|)((<->|)(|_|_<->))']')[[:blank:]]#(*) ]]; then
+  if [[ $_line = (#b)[[:blank:]]#('[#'(\#|)((<->|)(|_|_<->))']')[[:blank:]]#(*) ]]; then
     if [[ -z $match[6] ]]; then
       if [[ -z $match[3] ]]; then
-	defbase=
+	_defbase=
       else
-	defbase=$match[1]
+	_defbase=$match[1]
       fi
-      print -s -- $line
-      print -- $(( ${defbase} ans ))
-      line=
+      print -s -- $_line
+      print -- $(( ${_defbase} ans ))
+      _line=
       continue
     else
-      base=$match[1]
+      _base=$match[1]
     fi
   else
-    base=$defbase
+    _base=$_defbase
   fi
 
-  print -s -- $line
+  print -s -- $_line
 
-  line="${${line##[[:blank:]]#}%%[[:blank:]]#}"
-  case "$line" in
+  _line="${${_line##[[:blank:]]#}%%[[:blank:]]#}"
+  case "$_line" in
     # Escapes begin with a colon
     (:(\\|)\!*)
     # shell escape: handle completion's habit of quoting the !
-    eval ${line##:(\\|)\![[:blank:]]#}
-    line=
+    eval ${_line##:(\\|)\![[:blank:]]#}
+    _line=
     continue
     ;;
 
@@ -276,83 +278,83 @@ while (( expression_mode )) ||
     ;;
 
     ((:|)norm) # restore output format to default
-      outform=1
+      _outform=1
     ;;
 
     ((:|)sci[[:blank:]]#(#b)(<->)(#B))
-      outdigits=$match[1]
-      outform=2
+      _outdigits=$match[1]
+      _outform=2
     ;;
 
     ((:|)fix[[:blank:]]#(#b)(<->)(#B))
-      outdigits=$match[1]
-      outform=3
+      _outdigits=$match[1]
+      _outform=3
     ;;
 
     ((:|)eng[[:blank:]]#(#b)(<->)(#B))
-      outdigits=$match[1]
-      outform=4
+      _outdigits=$match[1]
+      _outform=4
     ;;
 
     (:raw)
-    outform=5
+    _outform=5
     ;;
 
     ((:|)local([[:blank:]]##*|))
-      eval $line
-      line=
+      eval $_line
+      _line=
       continue
     ;;
 
     ((function|:f(unc(tion|)|))[[:blank:]]##(#b)([^[:blank:]]##)(|[[:blank:]]##([^[:blank:]]*)))
       zmathfuncdef $match[1] $match[3]
-      userfuncs[$match[1]]=${$(functions -Mm $match[1])[4]}
-      line=
+      _userfuncs[$match[1]]=${$(functions -Mm $match[1])[4]}
+      _line=
       continue
     ;;
 
     (:*)
     print "Unrecognised escape"
-    line=
+    _line=
     continue
     ;;
 
     (\$[[:IDENT:]]##)
     # Display only, no calculation
-    line=${line##\$}
-    print -r -- ${(P)line}
-    line=
+    _line=${_line##\$}
+    print -r -- ${(P)_line}
+    _line=
     continue
     ;;
 
     (*)
-      line=${${line##[[:blank:]]##}%%[[:blank:]]##}
-      if [[ rpn_mode -ne 0 && $line != '' ]]; then
-	push=1
-	matched=1
-	case $line in
+      _line=${${_line##[[:blank:]]##}%%[[:blank:]]##}
+      if [[ _rpn_mode -ne 0 && $_line != '' ]]; then
+	_push=1
+	_matched=1
+	case $_line in
 	  (\=|pop|\<[[:IDENT:]]#)
 	  if (( ${#stack} < 1 )); then
-	    print -r -- "${line}: not enough values on stack" >&2
-	    line=
+	    print -r -- "${_line}: not enough values on stack" >&2
+	    _line=
 	    continue
 	  fi
-	  case $line in
+	  case $_line in
 	    (=)
 	    ans=${stack[1]}
 	    ;;
 	    (pop|\<)
-	    push=0
+	    _push=0
 	    shift stack
 	    ;;
 	    (\<[[:IDENT:]]##)
-	    (( ${line##\<} = ${stack[1]} ))
-	    push=0
+	    (( ${_line##\<} = ${stack[1]} ))
+	    _push=0
 	    shift stack
 	    ;;
 	    (*)
 	    print "BUG in special RPN functions" >&2
-	    line=
+	    _line=
 	    continue
 	    ;;
 	  esac
@@ -361,98 +363,101 @@ while (( expression_mode )) ||
 	  (+|-|\^|\||\&|\*|/|\*\*|\>\>|\<\</)
 	  # Operators with two arguments
 	  if (( ${#stack} < 2 )); then
-	    print -r -- "${line}: not enough values on stack" >&2
-	    line=
+	    print -r -- "${_line}: not enough values on stack" >&2
+	    _line=
 	    continue
 	  fi
-	  eval "(( ans = \${stack[2]} $line \${stack[1]} ))"
+	  eval "(( ans = \${stack[2]} $_line \${stack[1]} ))"
 	  shift 2 stack
 	  ;;
 
 	  (ldexp|jn|yn|scalb|xy)
 	  # Functions with two arguments
 	  if (( ${#stack} < 2 )); then
-	    print -r -- "${line}: not enough values on stack" >&2
-	    line=
+	    print -r -- "${_line}: not enough values on stack" >&2
+	    _line=
 	    continue
 	  fi
-	  if [[ $line = xy ]]; then
-	    tmp=${stack[1]}
+	  if [[ $_line = xy ]]; then
+	    _tmp=${stack[1]}
 	    stack[1]=${stack[2]}
-	    stack[2]=$tmp
-	    push=0
+	    stack[2]=$_tmp
+	    _push=0
 	  else
-	    eval "(( ans = ${line}(\${stack[2]},\${stack[1]}) ))"
+	    eval "(( ans = ${_line}(\${stack[2]},\${stack[1]}) ))"
 	    shift 2 stack
 	  fi
 	  ;;
 
-	  (${~mathfuncs})
+	  (${~_mathfuncs})
 	  # Functions with a single argument.
 	  # This is actually a superset, but we should have matched
 	  # any that shouldn't be in it in previous cases.
 	  if (( ${#stack} < 1 )); then
-	    print -r -- "${line}: not enough values on stack" >&2
-	    line=
+	    print -r -- "${_line}: not enough values on stack" >&2
+	    _line=
 	    continue
 	  fi
-	  eval "(( ans = ${line}(\${stack[1]}) ))"
+	  eval "(( ans = ${_line}(\${stack[1]}) ))"
 	  shift stack
 	  ;;
 
-	  (${(kj.|.)~userfuncs})
+	  (${(kj.|.)~_userfuncs})
 	  # Get minimum number of arguments to user function
-	  n=${userfuncs[$line]}
-	  if (( ${#stack} < n )); then
-	    print -r -- "${line}: not enough vlaues ($n) on stack" >&2
-	    line=
+	  _n=${_userfuncs[$_line]}
+	  if (( ${#stack} < n_ )); then
+	    print -r -- "${_line}: not enough values ($_n) on stack" >&2
+	    _line=
 	    continue
 	  fi
-	  line+="("
+	  _line+="("
 	  # least recent elements on stack are earlier arguments
-	  for (( i = n; i > 0; i-- )); do
-	    line+=${stack[i]}
-	    (( i > 1 )) && line+=","
+	  for (( _i = _n; _i > 0; _i-- )); do
+	    _line+=${stack[_i]}
+	    (( _i > 1 )) && _line+=","
 	  done
-	  line+=")"
-	  shift $n stack
-	  eval "(( ans = $line ))"
+	  _line+=")"
+	  shift $_n stack
+	  eval "(( ans = $_line ))"
 	  ;;
 
 	  (*)
 	  # Treat as expression evaluating to new value to go on stack.
-	  matched=0
+	  _matched=0
 	  ;;
 	esac
       else
-	matched=0
+	_matched=0
       fi
-      if (( ! matched )); then
+      if (( ! _matched )); then
 	# Latest value is stored` as a string, because it might be floating
 	# point or integer --- we don't know till after the evaluation, and
 	# arrays always store scalars anyway.
 	#
 	# Since it's a string, we'd better make sure we know which
 	# base it's in, so don't change that until we actually print it.
-	eval "ans=\$(( $line ))"
-	# on error $ans is not set; let user re-edit line
+	if ! eval "ans=\$(( $_line ))"; then
+	  _line=
+	  continue
+	fi
+	# on error $ans is not set; let user re-edit _line
 	[[ -n $ans ]] || continue
       fi
-      argv[num++]=$ans
-      psvar[1]=$num
-      (( push )) && stack=($ans $stack)
+      argv[_num++]=$ans
+      psvar[1]=$_num
+      (( _push )) && stack=($ans $stack)
     ;;
   esac
-  if (( show_stack )); then
-    (( max_stack = (show_stack > ${#stack}) ? ${#stack} : show_stack ))
-    for (( i = max_stack; i > 0; i-- )); do
-      printf "%3d: " $i
-      zcalc_show_value ${stack[i]}
+  if (( _show_stack )); then
+    (( _max_stack = (_show_stack > ${#stack}) ? ${#stack} : _show_stack ))
+    for (( _i = _max_stack; _i > 0; _i-- )); do
+      printf "%3d: " $_i
+      zcalc_show_value ${stack[_i]}
     done
   else
     zcalc_show_value $ans
   fi
-  line=
+  _line=
 done
 
 return 0

@@ -3764,8 +3764,14 @@ first few positional parameters.  A visual indication of this is given when
 the calculator starts.
 
 The constants tt(PI) (3.14159...) and tt(E) (2.71828...) are provided.
-Parameter assignment is possible, but note that all parameters will be put
-into the global namespace.
+Parameter assignment is possible, but note that all parameters will be
+put into the global namespace unless the tt(:local) special command is
+used.  The function creates local variables whose names start with
+tt(_), so users should avoid doing so.  The variables tt(ans) (the last
+answer) and tt(stack) (the stack in RPN mode) may be referred to
+directly; tt(stack) is an array but elements of it are numeric.  Various
+other special variables are used locally with their standard meaning,
+for example tt(compcontext), tt(match), tt(mbegin), tt(mend), tt(psvar).
 
 The output base can be initialised by passing the option `tt(-#)var(base)',
 for example `tt(zcalc -#16)' (the `tt(#)' may have to be quoted, depending
@@ -3831,6 +3837,10 @@ stored locally in the first element of the array tt(psvar), which can be
 referred to in tt(ZCALCPROMPT) as `tt(%1v)'.  The default prompt is
 `tt(%1v> )'.
 
+The variable tt(ZCALC_ACTIVE) is set within the function and can
+be tested by nested functions; it has the value tt(rpn) if RPN mode is
+active, else 1.
+
 A few special commands are available; these are introduced by a colon.
 For backward compatibility, the colon may be omitted for certain
 commands.  Completion is available if tt(compinit) has been run.
@@ -3870,8 +3880,7 @@ is executed in the context of the function, i.e. with local variables.
 Space is optional after tt(:!).
 )
 item(tt(:local) var(arg) ...)(
-Declare variables local to the function.  Note that certain variables
-are used by the function for its own purposes.  Other variables
+Declare variables local to the function.  Other variables
 may be used, too, but they will be taken from or put into the global
 scope.
 )
