@@ -1,5 +1,8 @@
 2016-06-22  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Src/lex.c: remove unused and no longer defined flag
+	from experiments for previous fix.
+
 	* 38746: Src/lex.c, Test/A02alias.ztst: Delay marking
 	a suffix alias as free until the last minute.
 
