@@ -1,3 +1,8 @@
+2016-06-22  Oliver Kiddle  <opk@zsh.org>
+
+	* 38749: Functions/Zle/surround, Functions/Zle/select-bracketed:
+	fixes for case at start of a line and for ksharrays
+
 2016-06-22  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Src/lex.c: remove unused and no longer defined flag

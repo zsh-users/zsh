@@ -12,6 +12,8 @@
 #	done
 #     done
 
+setopt localoptions noksharrays
+
 local style=${${1:-$KEYS}[1]} matching="(){}[]<>bbBB"
 local -i find=${NUMERIC:-1} idx=${matching[(I)[${${1:-$KEYS}[2]}]]}%9
 (( idx )) || return 1 # no corresponding closing bracket

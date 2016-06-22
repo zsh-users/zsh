@@ -69,7 +69,11 @@ case $WIDGET in
       before="${(k)matching[(r)[$before:q]]}"
     fi
     CUTBUFFER="$before$CUTBUFFER$after"
-    zle .vi-put-after -n 1
+    if [[ CURSOR -eq 0 || $BUFFER[CURSOR] = $'\n' ]]; then
+      zle .vi-put-before -n 1
+    else
+      zle .vi-put-after -n 1
+    fi
     CUTBUFFER="$save_cut" CURSOR="$save_cur"
   ;;
 esac
