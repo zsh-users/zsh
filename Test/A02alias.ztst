@@ -104,3 +104,9 @@
 >0
 ?(eval):2: invalid alias 'x=y' encountered while printing aliases
 # Currently, 'alias -L' returns 0 in this case.  Perhaps it should return 1.
+
+  alias -s mysuff='print -r "You said it.";'
+  eval 'thingummy.mysuff'
+127:No endless loop with suffix alias in command position
+>You said it.
+?(eval):1: command not found: thingummy.mysuff

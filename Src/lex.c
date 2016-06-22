@@ -1842,10 +1842,11 @@ checkalias(void)
 	if ((suf = strrchr(zshlextext, '.')) && suf[1] &&
 	    suf > zshlextext && suf[-1] != Meta &&
 	    (an = (Alias)sufaliastab->getnode(sufaliastab, suf+1)) &&
-	    !an->inuse && incmdpos) {
-	    inpush(dupstring(zshlextext), INP_ALIAS, NULL);
+	    !an->inuse && incmdpos &&
+	    !(inbufflags & INP_ALSUFF)) {
+	    inpush(dupstring(zshlextext), INP_ALIAS, an);
 	    inpush(" ", INP_ALIAS, NULL);
-	    inpush(an->text, INP_ALIAS, an);
+	    inpush(an->text, INP_ALIAS, NULL);
 	    lexstop = 0;
 	    return 1;
 	}

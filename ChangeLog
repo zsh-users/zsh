@@ -1,3 +1,8 @@
+2016-06-22  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 38746: Src/lex.c, Test/A02alias.ztst: Delay marking
+	a suffix alias as free until the last minute.
+
 2016-06-22  Oliver Kiddle  <opk@zsh.org>
 
 	* 38714: Src/Zle/complete.c, Doc/Zsh/compsys.yo,
