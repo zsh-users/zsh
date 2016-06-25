@@ -1,3 +1,9 @@
+2016-06-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 38760: Completion/Unix/Command/_git: _git-config: Stop trying
+	to execute the empty string command name upon completing values
+	for an unknown option.
+
 2016-06-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Completion/Unix/Command/_git: _git-config: Document

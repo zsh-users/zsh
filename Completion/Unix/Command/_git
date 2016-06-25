@@ -2603,7 +2603,7 @@ _git-config () {
       if (( $#parts < 2 )) && [[ $line[1] == [^.]##.*.[^.]## ]]; then
         parts=("${(S@0)${git_options_static[(r)(#i)${line[1]%%.*}.\*.${line[1]##*.}:*]}//(#b)(*[^\\]|):/$match[1]$z}")
       fi
-      (( $#parts > 0 )) || return ret
+      (( $#parts >= 4 )) || return ret
       case $parts[4] in
         ('->'*)
           case ${parts[4]#->} in
