@@ -3633,6 +3633,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 		}
 	    }
 	    if (!informed && (wd || v || csh)) {
+		/* this is information and not an error so, as in csh, use stdout */
 		zputs(*argv, stdout);
 		puts(wd ? ": none" : " not found");
 		returnval = 1;
@@ -3652,7 +3653,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 	    }
 	    informed = 1;
 	} else {
-	    /* Not found at all. */
+	    /* Not found at all. That's not an error as such so this goes to stdout */
 	    if (v || csh || wd)
 		zputs(*argv, stdout), puts(wd ? ": none" : " not found");
 	    returnval = 1;
