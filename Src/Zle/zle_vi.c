@@ -731,6 +731,52 @@ vioperswapcase(UNUSED(char **args))
 
 /**/
 int
+viupcase(UNUSED(char **args))
+{
+    int oldcs, c2, ret = 1;
+
+    /* get the range */
+    startvichange(1);
+    if ((c2 = getvirange(0)) != -1) {
+	oldcs = zlecs;
+	/* covert the case of all letters within range */
+	while (zlecs < c2) {
+	    zleline[zlecs] = ZC_toupper(zleline[zlecs]);
+	    INCCS();
+	}
+	/* go back to the first line of the range */
+	zlecs = oldcs;
+	ret = 0;
+    }
+    vichgflag = 0;
+    return ret;
+}
+
+/**/
+int
+vidowncase(UNUSED(char **args))
+{
+    int oldcs, c2, ret = 1;
+
+    /* get the range */
+    startvichange(1);
+    if ((c2 = getvirange(0)) != -1) {
+	oldcs = zlecs;
+	/* convert the case of all letters within range */
+	while (zlecs < c2) {
+	    zleline[zlecs] = ZC_tolower(zleline[zlecs]);
+	    INCCS();
+	}
+	/* go back to the first line of the range */
+	zlecs = oldcs;
+	ret = 0;
+    }
+    vichgflag = 0;
+    return ret;
+}
+
+/**/
+int
 virepeatchange(UNUSED(char **args))
 {
     /* make sure we have a change to repeat */

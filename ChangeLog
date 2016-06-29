@@ -1,5 +1,9 @@
 2016-06-29  Oliver Kiddle  <opk@zsh.org>
 
+	* 38770: Src/Zle/zle_keymap.c, Src/Zle/zle_vi.c, Doc/Zsh/zle.yo,
+	Doc/Zsh/contrib.yo, Functions/Zle/vi-pipe: vi upper/lowercase
+	widgets and shell widget example that reads a vi movement
+
 	* 38752: Src/builtin.c: add comments to explain use of stdout
 	instead of stderr for the which builtin
 

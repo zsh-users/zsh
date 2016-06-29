@@ -2968,6 +2968,17 @@ and aliases `tt(globurl)' to `tt(noglob urlglobber)'.  This function takes
 a local URL apart, attempts to pattern-match the local file portion of the
 URL path, and then puts the results back into URL format again.
 )
+tindex(vi-pipe)
+item(tt(vi-pipe))(
+This function reads a movement command from the keyboard and then
+prompts for an external command. The part of the buffer covered by
+the movement is piped to the external command and then replaced by
+the command's output. If the movement command is bound to vi-pipe,
+the current line is used.
+
+The function serves as an example for reading a vi movement command
+from within a user-defined widget.
+)
 tindex(which-command)
 item(tt(which-command))(
 This function is a drop-in replacement for the builtin widget

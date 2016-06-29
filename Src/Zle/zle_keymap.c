@@ -1374,8 +1374,11 @@ default_bindings(void)
     bindkey(amap, "ge", refthingy(t_vibackwardwordend), NULL);
     bindkey(amap, "gE", refthingy(t_vibackwardblankwordend), NULL);
     bindkey(amap, "gg", refthingy(t_beginningofbufferorhistory), NULL);
-    bindkey(amap, "g~", refthingy(t_vioperswapcase), NULL);
+    bindkey(amap, "gu", refthingy(t_vidowncase), NULL);
+    bindkey(amap, "gU", refthingy(t_viupcase), NULL);
     bindkey(amap, "g~~", NULL, "g~g~");
+    bindkey(amap, "guu", NULL, "gugu");
+    bindkey(amap, "gUU", NULL, "gUgU");
 
     /* emacs mode: arrow keys */ 
     add_cursor_key(emap, TCUPCURSOR, t_uplineorhistory, 'A');

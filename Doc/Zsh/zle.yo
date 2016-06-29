@@ -1781,6 +1781,13 @@ tindex(down-case-word)
 item(tt(down-case-word) (tt(ESC-L ESC-l)) (unbound) (unbound))(
 Convert the current word to all lowercase and move past it.
 )
+tindex(vi-down-case)
+item(tt(vi-down-case)) ((unbound) (tt(gu)) (unbound))(
+Read a movement command from the keyboard, and convert all characters
+from the cursor position to the endpoint of the movement to lowercase.
+If the movement command is tt(vi-down-case), swap the case of all
+characters on the current line.
+)
 tindex(kill-word)
 item(tt(kill-word) (tt(ESC-D ESC-d)) (unbound) (unbound))(
 Kill the current word.
@@ -1945,6 +1952,13 @@ Exchange the current word with the one before it.
 tindex(vi-unindent)
 item(tt(vi-unindent) (unbound) (tt(<)) (unbound))(
 Unindent a number of lines.
+)
+tindex(vi-up-case)
+item(tt(vi-up-case)) ((unbound) (tt(gU)) (unbound))(
+Read a movement command from the keyboard, and convert all characters
+from the cursor position to the endpoint of the movement to lowercase.
+If the movement command is tt(vi-up-case), swap the case of all
+characters on the current line.
 )
 tindex(up-case-word)
 item(tt(up-case-word) (tt(ESC-U ESC-u)) (unbound) (unbound))(

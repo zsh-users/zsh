@@ -143,6 +143,7 @@
 "vi-delete", videlete, ZLE_KEEPSUFFIX | ZLE_LASTCOL | ZLE_VIOPER
 "vi-delete-char", videletechar, ZLE_KEEPSUFFIX
 "vi-digit-or-beginning-of-line", vidigitorbeginningofline, 0
+"vi-down-case", vidowncase, ZLE_LASTCOL | ZLE_VIOPER
 "vi-down-line-or-history", vidownlineorhistory, ZLE_LINEMOVE
 "vi-end-of-line", viendofline, ZLE_LASTCOL
 "vi-fetch-history", vifetchhistory, ZLE_LINEMOVE
@@ -188,6 +189,7 @@
 "vi-swap-case", viswapcase, ZLE_LASTCOL
 "vi-undo-change", viundochange, ZLE_KEEPSUFFIX
 "vi-unindent", viunindent, ZLE_LASTCOL | ZLE_VIOPER
+"vi-up-case", viupcase, ZLE_LASTCOL | ZLE_VIOPER
 "vi-up-line-or-history", viuplineorhistory, ZLE_LINEMOVE
 "vi-yank", viyank, ZLE_LASTCOL | ZLE_VIOPER
 "vi-yank-eol", viyankeol, 0
