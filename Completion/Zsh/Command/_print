@@ -33,6 +33,7 @@ if [[ $service = print ]]; then
     '(-n -l -N -f -C -s -z)-c[print arguments in columns]' \
     '(-n -l -N -f -c -s -z)-C+[print arguments in specified number of columns]:columns' \
     '(-s -p -z)-u+[specify file descriptor to print arguments to]:file descriptor:_file_descriptors' \
+    '-v[store output in named parameter]:parameter:_parameters' \
     '(-s -p -u)-z[push arguments onto editing buffer stack]' \
     '-D[substitute any arguments which are named directories using ~ notation]' \
     '-P[perform prompt expansion]' \
@@ -43,6 +44,7 @@ fi
 
 if [[ $state = printf ]]; then
   _arguments -C -s -S \
+    '-v[store output in named parameter]:parameter:_parameters' \
     '1:format:->printfformat' \
     '*: :_default' && ret=0
 fi

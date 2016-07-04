@@ -1,3 +1,7 @@
+2016-07-18  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 38785 (plus tweak): Completion/Zsh/Command/_print: add -v
+
 2016-07-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Misc/add-zle-hook-widget:  Move from Zle/.
