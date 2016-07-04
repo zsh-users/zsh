@@ -94,7 +94,7 @@
 # sequentially just as if read automatically.
 
 emulate -L zsh
-setopt extendedglob
+setopt extendedglob typesetsilent
 
 zcalc_show_value() {
   if [[ -n $_base ]]; then
@@ -301,7 +301,7 @@ while (( _expression_mode )) ||
     ;;
 
     ((:|)local([[:blank:]]##*|))
-      eval $_line
+      eval ${_line##:}
       _line=
       continue
     ;;
@@ -333,7 +333,11 @@ while (( _expression_mode )) ||
 	_push=1
 	_matched=1
 	case $_line in
-	  (\=|pop|\<[[:IDENT:]]#)
+	  (\<[[:IDENT:]]##)
+	  ans=${(P)${_line##\<}}
+	  ;;
+
+	  (\=|pop|\>[[:IDENT:]]#)
 	  if (( ${#stack} < 1 )); then
 	    print -r -- "${_line}: not enough values on stack" >&2
 	    _line=
@@ -343,12 +347,18 @@ while (( _expression_mode )) ||
 	    (=)
 	    ans=${stack[1]}
 	    ;;
-	    (pop|\<)
+	    (pop|\>)
 	    _push=0
 	    shift stack
 	    ;;
-	    (\<[[:IDENT:]]##)
-	    (( ${_line##\<} = ${stack[1]} ))
+	    (\>[[:IDENT:]]##)
+	    if [[ ${_line##\>} = (_*|stack|ans|PI|E) ]]; then
+	      print "${_line##\>}: reserved variable" >&2
+	      _line=
+	      continue
+	    fi
+	    local ${_line##\>}
+	    (( ${_line##\>} = ${stack[1]} ))
 	    _push=0
 	    shift stack
 	    ;;
@@ -371,14 +381,14 @@ while (( _expression_mode )) ||
 	  shift 2 stack
 	  ;;
 
-	  (ldexp|jn|yn|scalb|xy)
+	  (ldexp|jn|yn|scalb|xy|\<\>)
 	  # Functions with two arguments
 	  if (( ${#stack} < 2 )); then
 	    print -r -- "${_line}: not enough values on stack" >&2
 	    _line=
 	    continue
 	  fi
-	  if [[ $_line = xy ]]; then
+	  if [[ $_line = (xy|\<\>) ]]; then
 	    _tmp=${stack[1]}
 	    stack[1]=${stack[2]}
 	    stack[2]=$_tmp

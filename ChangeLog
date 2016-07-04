@@ -1,3 +1,8 @@
+2016-07-04  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 38783: Doc/Zsh/contrib.yo, Functions/Misc/zcalc: tweaks for
+	variable and stack interation in RPN mode.
+
 2016-06-29  Oliver Kiddle  <opk@zsh.org>
 
 	* 38770: Src/Zle/zle_keymap.c, Src/Zle/zle_vi.c, Doc/Zsh/zle.yo,

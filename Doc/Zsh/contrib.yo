@@ -3829,16 +3829,24 @@ the stack to be duplicated onto the stack.
 )
 item(tt(pop))(
 The pseudo-function tt(pop) causes the most recent element of
-the stack to be popped.  A `tt(<)' on its own has the same effect.
+the stack to be popped.  A `tt(>)' on its own has the same effect.
+)
+item(tt(>)var(ident))(
+The expression tt(>) followed (with no space) by a shell identifier
+causes the most recent element of the stack to be popped and
+assigned to the variable with that name.  The variable is
+local to the tt(zcalc) function.
 )
 item(tt(<)var(ident))(
 The expression tt(<) followed (with no space) by a shell identifier
-causes the most recent element of the stack to be popped and
-assigned to the identifier.
+causes the value of the variable with that name to be pushed
+onto the stack.  var(ident) may be an integer, in which
+case the previous result with that number (as shown before
+the tt(>) in th standard standard tt(zcalc) prompt) is put on the stack.
 )
 item(Exchange: tt(xy))(
 The pseudo-function tt(xy) causes the most recent two elements of
-the stack to be exchanged.
+the stack to be exchanged.  `tt(<>)' has the same effect.
 )
 enditem()
 
