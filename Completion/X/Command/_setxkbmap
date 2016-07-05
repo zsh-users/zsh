@@ -1,4 +1,4 @@
-# compdef setxkbmap
+#compdef setxkbmap
 
 # TODO:
 # model, option, symbols and types suggestions
@@ -90,7 +90,7 @@ _setxkbmap_variant () {
     fi
 
     lines=("${(f)$(< ${file})}")
-    variants=(${${${(M)lines:#*xkb_symbols*\"([[:alnum:]])##\"*}##*xkb_symbols([^\"])##\"}%%\"*})
+    variants=(${${${(M)lines:#*xkb_symbols*\"([^\"])##\"*}##*xkb_symbols([^\"])##\"}%%\"*})
     
     _wanted variant expl 'variant' compadd -a variants
 

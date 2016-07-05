@@ -1,5 +1,8 @@
 2016-07-05  Oliver Kiddle  <opk@zsh.org>
 
+	* arno: 38780: Completion/X/Command/_setxkbmap: include
+	variants containing non alphanumeric symbols in completion
+
 	* Jordan Klassen: users/21551 (tweaked per users/21560):
 	Completion/Unix/Command/_git: new git subtree completion
 
