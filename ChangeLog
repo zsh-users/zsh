@@ -1,3 +1,8 @@
+2016-07-05  Oliver Kiddle  <opk@zsh.org>
+
+	* Jordan Klassen: users/21551 (tweaked per users/21560):
+	Completion/Unix/Command/_git: new git subtree completion
+
 2016-07-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 38728: Test/D02glob.ztst: Tests: Add tests for the ':a' and

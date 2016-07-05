@@ -1747,6 +1747,91 @@ _git-submodule () {
   return ret
 }
 
+(( $+functions[_git-subtree] )) ||
+_git-subtree () {
+  local curcontext="$curcontext" state state_descr line ret=1
+  declare -A opt_args
+
+  # TODO: -P should only complete paths inside the current repository.
+  _arguments -C \
+    '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
+    '(-P --prefix)'{-P,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+    '-d[show debug messages]' \
+    ': :->command' \
+    '*::: := ->option-or-argument' && ret=0
+
+  case $state in
+    (command)
+      declare -a commands
+
+      commands=(
+        add:'create the subtree by importing its contents'
+        merge:'merge recent changes up to specified commit into the subtree'
+        pull:'fetch from remote repository and merge recent changes into the subtree'
+        push:'does a split and `git push`'
+        split:'extract a new synthetic project history from a subtree')
+
+      _describe -t commands command commands && ret=0
+    ;;
+    (option-or-argument)
+      curcontext=${curcontext%:*}-$line[1]:
+      case $line[1] in
+        (add)
+          _arguments \
+            '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
+            '(-m --message)'{-m,--message}'[use the given message as the commit message for the merge commit]' \
+            '(-P --prefix)'{-P,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+            '--squash[import only a single commit from the subproject]' \
+            ': :__git_any_repositories_or_references' \
+            ':: :__git_ref_specs' && ret=0
+	;;
+        (merge)
+          _arguments -S \
+            '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
+            '(-P --prefix)'{-P,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+            '(-m --message)'{-m,--message}'[use the given message as the commit message for the merge commit]' \
+            '--squash[import only a single commit from the subproject]' \
+            ': :__git_references' && ret=0
+	;;
+        (pull)
+          _arguments -S \
+            '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
+            '(-P --prefix)'{-P,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+            '(-m --message)'{-m,--message}'[use the given message as the commit message for the merge commit]' \
+            '--squash[import only a single commit from the subproject]' \
+            ': :__git_any_repositories' \
+            ':: :__git_ref_specs' && ret=0
+	;;
+        (push)
+          _arguments -S \
+            '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
+            '(-P --prefix)'{-P,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+            '(-m --message)'{-m,--message}'[use the given message as the commit message for the merge commit]' \
+            ': :__git_any_repositories' \
+            ':: :__git_ref_specs' && ret=0
+	;;
+        (split)
+          _arguments -S \
+            '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
+            '(-P --prefix)'{-P,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+            '(-b --branch)'{-b,--branch=}'[create a new branch]' \
+            '--onto=[try connecting new tree to an existing one]: :__git_ref_specs' \
+            '(-m --message)'{-m,--message}'[use the given message as the commit message for the merge commit]' \
+            '--ignore-joins[ignore prior --rejoin commits]' \
+            '--onto=[try connecting new tree to an existing one]: :__git_ref_specs' \
+            '--rejoin[use the given message as the commit message for the merge commit]' \
+            '*: :__git_references' && ret=0
+	;;
+        (*)
+          _default && ret=0
+	;;
+      esac
+    ;;
+  esac
+
+  return ret
+}
+
 (( $+functions[_git-tag] )) ||
 _git-tag () {
   local -a message_opts
@@ -6272,6 +6357,13 @@ __git_any_repositories () {
     'local-repositories::__git_local_repositories' \
     'remotes: :__git_remotes' \
     'remote-repositories::__git_remote_repositories'
+}
+
+(( $+functions[__git_any_repositories_or_references] )) ||
+__git_any_repositories_or_references () {
+  _alternative \
+    'repositories::__git_any_repositories' \
+    'references::__git_references'
 }
 
 # Common Guards
