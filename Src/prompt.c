@@ -523,8 +523,6 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		break;
 	    case 'b':
 		txtchangeset(txtchangep, TXTNOBOLDFACE, TXTBOLDFACE);
-		txtchangeset(txtchangep, TXTNOSTANDOUT, TXTSTANDOUT);
-		txtchangeset(txtchangep, TXTNOUNDERLINE, TXTUNDERLINE);
 		txtunset(TXTBOLDFACE);
 		tsetcap(TCALLATTRSOFF, TSC_PROMPT|TSC_DIRTY);
 		break;
@@ -542,7 +540,8 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		arg = parsecolorchar(arg, 1);
 		if (arg >= 0 && !(arg & TXTNOFGCOLOUR)) {
 		    txtchangeset(txtchangep, arg & TXT_ATTR_FG_ON_MASK,
-				 TXTNOFGCOLOUR);
+				 TXTNOFGCOLOUR | TXT_ATTR_FG_COL_MASK);
+		    txtunset(TXT_ATTR_FG_COL_MASK);
 		    txtset(arg & TXT_ATTR_FG_ON_MASK);
 		    set_colour_attribute(arg, COL_SEQ_FG, TSC_PROMPT);
 		    break;
@@ -557,7 +556,8 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		arg = parsecolorchar(arg, 0);
 		if (arg >= 0 && !(arg & TXTNOBGCOLOUR)) {
 		    txtchangeset(txtchangep, arg & TXT_ATTR_BG_ON_MASK,
-				 TXTNOBGCOLOUR);
+				 TXTNOBGCOLOUR | TXT_ATTR_BG_COL_MASK);
+		    txtunset(TXT_ATTR_BG_COL_MASK);
 		    txtset(arg & TXT_ATTR_BG_ON_MASK);
 		    set_colour_attribute(arg, COL_SEQ_BG, TSC_PROMPT);
 		    break;
@@ -1041,6 +1041,10 @@ tsetcap(int cap, int flags)
 		tsetcap(TCSTANDOUTBEG, flags);
 	    if (txtisset(TXTUNDERLINE))
 		tsetcap(TCUNDERLINEBEG, flags);
+	    if (txtisset(TXTFGCOLOUR))
+		set_colour_attribute(txtattrmask, COL_SEQ_FG, TSC_PROMPT);
+	    if (txtisset(TXTBGCOLOUR))
+		set_colour_attribute(txtattrmask, COL_SEQ_BG, TSC_PROMPT);
 	}
     }
 }

@@ -1143,8 +1143,7 @@ zrefresh(void)
 	tsetcap(TCALLATTRSOFF, 0);
 	tsetcap(TCSTANDOUTEND, 0);
 	tsetcap(TCUNDERLINEEND, 0);
-	/* cheat on attribute unset */
-	txtunset(TXTBOLDFACE|TXTSTANDOUT|TXTUNDERLINE);
+	txtattrmask = 0;
 
 	if (trashedzle && !clearflag)
 	    reexpandprompt(); 

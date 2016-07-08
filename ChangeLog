@@ -1,5 +1,9 @@
 2016-07-08  Oliver Kiddle  <opk@zsh.org>
 
+	* 38809: Src/zsh.h, Src/prompt.c, Src/Zle/zle_refresh.c:
+	fix tracking of colour attributes and restore them when
+	turning bold off
+
 	* unposted: Doc/Zsh/builtins.yo, Doc/Zsh/compsys.yo,
 	Doc/Zsh/options.yo, Doc/Zsh/zle.yo: fix duplicated words
 

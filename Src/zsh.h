@@ -2567,7 +2567,7 @@ struct ttyinfo {
 
 #define txtchangeisset(T,X)	((T) & (X))
 #define txtchangeget(T,A)	(((T) & A ## _MASK) >> A ## _SHIFT)
-#define txtchangeset(T, X, Y)	((void)(T && (*T |= (X), *T &= ~(Y))))
+#define txtchangeset(T, X, Y)	((void)(T && (*T &= ~(Y), *T |= (X))))
 
 /*
  * For outputting sequences to change colour: specify foreground
