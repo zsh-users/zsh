@@ -202,7 +202,7 @@ if [[ $wordstyle = *subword* ]]; then
   # followed by a lower case letter, or an upper case letter at
   # the start of a group of upper case letters.  To make
   # it easier to be consistent, we just use anything that
-  # isn't an upper case characer instead of a lower case
+  # isn't an upper case character instead of a lower case
   # character.
   # Here the initial "*" will match greedily, so we get the
   # last such match, as we want.
@@ -237,6 +237,12 @@ if [[ $wordstyle = *subword* ]]; then
 	  -n $match[2] ]]; then
     # Yes, so the last one is new word boundary.
     (( epos = ${#match[1]} - 1 ))
+    # Otherwise, are we in the middle of a word?
+    # In other, er, words, we've got something on the left with no
+    # white space following and something that doesn't start a word here.
+  elif [[ -n $word1 && -z $ws1 && -z $ws2 && \
+    $word2 = (#b)([^${~subwordrange}]##)* ]]; then
+    (( epos = ${#match[1]} ))
     # Otherwise, do we have upper followed by non-upper not
     # at the start?  Ignore the initial character, we already
     # know it's a word boundary so it can be an upper case character
