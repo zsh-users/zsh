@@ -3817,7 +3817,7 @@ form below, the var(action) will be executed by calling the
 tt(_all_labels) function to process all tag labels.  No special handling
 of tags is needed unless a function call introduces a new one.
 
-The functions called to execute var(action)s will be called with the the
+The functions called to execute var(action)s will be called with the
 elements of the array named by the `tt(-O) var(name)' option as arguments.
 This can be used, for example, to pass the same set of options for the
 tt(compadd) builtin to all var(action)s.

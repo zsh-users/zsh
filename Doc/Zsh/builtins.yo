@@ -656,7 +656,7 @@ An EOF condition will also cause the shell to exit, unless
 the tt(IGNORE_EOF) option is set.
 
 See notes at the end of
-ifzman(the section JOBS in in zmanref(zshmisc))\
+ifzman(the section JOBS in zmanref(zshmisc))\
 ifnzman(noderef(Jobs & Signals)) for some possibly unexpected interactions
 of the tt(exit) command with jobs.
 )
@@ -697,7 +697,7 @@ specifies the most recent event beginning with the given string.  All
 substitutions var(old)tt(=)var(new), if any, are then performed on the
 text of the events.
 
-In addition to the the number range,
+In addition to the number range,
 startsitem()
 sitem(tt(-I))(restricts to only internal events (not from tt($HISTFILE)))
 sitem(tt(-L))(restricts to only local events (not from other shells, see

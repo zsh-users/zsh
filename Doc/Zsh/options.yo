@@ -1598,7 +1598,7 @@ skipped.  The option is restored after the trap exits.
 
 Exiting due to tt(ERR_EXIT) has certain interactions with asynchronous
 jobs noted in
-ifzman(the section JOBS in in zmanref(zshmisc))\
+ifzman(the section JOBS in zmanref(zshmisc))\
 ifnzman(noderef(Jobs & Signals)).
 )
 pindex(ERR_RETURN)

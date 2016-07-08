@@ -896,7 +896,7 @@ vindex(MARK)
 item(tt(MARK) (integer))(
 Like tt(CURSOR), but for the mark. With vi-mode operators that wait for
 a movement command to select a region of text, setting tt(MARK) allows
-the selection to extend in both directions from the the initial cursor
+the selection to extend in both directions from the initial cursor
 position.
 )
 vindex(NUMERIC)
