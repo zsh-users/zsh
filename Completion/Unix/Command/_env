@@ -1,13 +1,46 @@
 #compdef env
 
-if _pick_variant gnu=Free\ Soft unix --version; then
-  _arguments \
-    '(--ignore-environment -i)'{-i,--ignore-environment}'[start with empty environment]' \
-    '*'{-u,--unset=}'[remove variable from the environment]:env var to remove:compadd ${(k)parameters[(R)*export*]}' \
-    '--help[help]' \
-    '--version[version]' \
-    '(-):command: _command_names -e' \
-    '*::arguments: _normal'
-else
-  _precommand
+local context state line variant args ret=1
+
+_pick_variant -r variant gnu=Free\ Soft $OSTYPE --version
+case $variant in
+  gnu)
+    args=(
+      '(-)'{-i,--ignore-environment}'[start with empty environment]'
+      '(--ignore-environment -i --help --version)*'{-u,--unset=}'[remove variable from the environment]:env var to remove:_parameters -g "*export*"'
+      '(- *)--help[display help information]'
+      '(- *)--version[display version information]'
+    )
+  ;;
+  freebsd*)
+    args=(
+      '(-i)*-u[remove variable from the environment]:env var to remove:_parameters -g "*export*"'
+      '-P[specify alternate executable search PATH]:path:_dir_list'
+      '-S[perform word splitting]'
+      '*-v[verbose output]'
+    )
+  ;&
+  *)
+    if (( $words[(i)-] < CURRENT )); then
+      words[(i)-]=()
+      (( CURRENT-- ))
+    else
+      args+=(
+	'(-i)'{-,-i}'[start with empty environment]'
+      )
+    fi
+  ;;
+esac
+
+_arguments $args \
+  '*::arguments:->normal' && ret=0
+
+if [[ -n $state ]]; then
+  while [[ $words[1] = *=* ]]; do
+    shift words
+    (( CURRENT-- ))
+  done
+  _normal && ret=0
 fi
+
+return ret

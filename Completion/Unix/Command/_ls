@@ -1,6 +1,6 @@
 #compdef ls gls
 
-local arguments is_gnu
+local arguments is_gnu datef
 
 if ! _pick_variant gnu=gnu unix --help; then
   arguments=(
@@ -70,6 +70,7 @@ if ! _pick_variant gnu=gnu unix --help; then
     )
   fi
 else
+  [[ $PREFIX = *+* ]] && datef='formats:format: _date_formats'
   arguments=(
     '(--all -a -A --almost-all)'{--all,-a}'[list entries starting with .]'
     '(--almost-all -A -a --all)'{--almost-all,-A}'[list all except . and ..]'
@@ -89,6 +90,7 @@ else
 
     '(--format -l -g -o -1 -C -m -x)-l[long listing]'
     '(--format -l -1 -C -m -x)-g[long listing but without owner information]'
+    --group-directories-first
     '(--format -l --no-group -G -1 -C -m -x)-o[no group, long]'
     '(--format -l -g -o -C -m -x)-1[single column output]'
     '(--format -l -g -o -1 -m -x)-C[list entries in columns sorted vertically]'
@@ -101,7 +103,7 @@ else
     '(--time -u)-c[status change time]'
     '(--time -c)-u[access time]'
     '(-c -u)--time=[specify time to show]:time:(ctime status use atime access)'
-    '--time-style=[show times using specified style]:time style:(full-iso long-iso iso locale)'
+    '--time-style=[show times using specified style]:style: _alternative "time-styles\:time style\:(full-iso long-iso iso locale)" $datef'
 
     '(-a --all -U -l --format -s --size -t --sort --full-time)-f[unsorted, all, short list]'
     '(--reverse)'{--reverse,-r}'[reverse sort order]'
@@ -114,10 +116,10 @@ else
     '(-S -t -U -v -X)--sort=:sort:(size time none version extension)'
 
     '--color=-[control use of color]:color:(never always auto)'
-
+    "--hide=[don't list entries matching pattern]:pattern"
     '(--classify -F --indicator-style -p --file-type)'{--classify,-F}'[append file type indicators]'
     '(--file-type -p --indicator-style -F --classify)'{--file-type,-p}'[append file type indicators except *]'
-    '(-F --classify -p --file-type)--indicator-style=:indicator style:(none file-type classify)'
+    '(-F --classify -p --file-type)--indicator-style=:indicator style:(none file-type classify slash)'
 
     '(-f)--full-time[list both full date and full time]'
 
@@ -139,6 +141,11 @@ else
     '(- :)--version[display version information]'
     '*:files:_files'
   )
+  if [[ $OSTYPE = linux* ]]; then
+    arguments+=(
+      '(-Z --context)'{-Z,--context}'[print any security context of each file]'
+    )
+  fi
 fi
 
 _arguments -s $arguments

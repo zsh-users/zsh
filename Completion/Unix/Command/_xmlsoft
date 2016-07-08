@@ -1,7 +1,7 @@
 #compdef xsltproc xmllint -value-,XML_CATALOG_FILES,-default-
 
-# xmllint: using libxml version 20707
-# xsltproc: using libxml 20707, libxslt 10126 and libexslt 815
+# xmllint: using libxml version 20904
+# xsltproc: using libxml 20904, libxslt 10129 and libexslt 817
 
 local -a encoding
 
@@ -38,7 +38,9 @@ case $service in
       '--nodtdattr[do not default attributes from the DTD]' \
       '--noout[do not dump the result]' \
       '--maxdepth[increase the maximum depth]:depth' \
+      '--maxvars[increase the maximum variables]:variables' \
       '--maxparserdepth[increase the maximum parser depth]:depth' \
+      '--seed-rand[initialise random number generator]:seed' \
       '--html[input document is an HTML file]' \
       '--encoding[the input document character encoding]:encoding:(${encoding[@]})' \
       '*--param[pass a parameter,value pair]:name::value (xpath expression)' \
@@ -87,6 +89,7 @@ case $service in
       '--xmlout[use the XML serializer when using --html]' \
       '--nodefdtd[do not default HTML doctype]' \
       '--push[use the push mode of the parser]' \
+      '--pushsmall[use the push mode of the parser using tiny increments]' \
       '--memory[parse from memory]' \
       '--maxmem[limit memory allocation]:bytes' \
       '--nowarning[do not emit warnings from parser/validator]' \

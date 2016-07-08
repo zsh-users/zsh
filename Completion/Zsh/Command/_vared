@@ -6,6 +6,8 @@ _arguments -s -A "-*" \
   "-c[create parameter or change type]" \
   '-p+[specify left prompt]:prompt' \
   '-r+[specify right prompt]:right prompt' \
+  '-i+[specify initialisation widget]:widget:compadd -M "r\:|-=* r\:|=*" -k widgets' \
+  '-f+[specify finish widget]:widget:compadd -M "r\:|-=* r\:|=*" -k widgets' \
   '-h[allow access to history]' \
   '-e[exit on EOF (^D)]' \
   '1:parameter spec:_vars'

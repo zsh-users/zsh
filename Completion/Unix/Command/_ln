@@ -38,6 +38,7 @@ if [[ $variant == gnu ]]; then
     '(-L --logical)'{-L,--logical}'[create hard links to symbolic link references]'
     '(-n --no-dereference)'{-n,--no-dereference}'[treat destination symbolic link to a directory as if it were a normal file]'
     '(-P --physical)'{-P,--physical}'[create hard links directly to symbolic links]'
+    '(-r --relative)'{-r,--relative}'[create symbolic links relative to link location]'
     '(-s --symbolic)'{-s,--symbolic}'[create symbolic links instead of hard links]'
     '(-S --suffix)'{-S,--suffix=}'[override default backup suffix]:suffix'
     '(-t --target-directory)'{-t,--target-directory=}'[specify directory in which to create the links]: :_directories'

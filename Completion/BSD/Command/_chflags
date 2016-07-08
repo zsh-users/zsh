@@ -1,6 +1,6 @@
 #compdef chflags
 
-local flags own='-g *(-u$EUID)'
+local flags args own='-g *(-u$EUID)'
 
 flags=(
   '(noopaque)opaque[set the opaque flag]'
@@ -14,7 +14,7 @@ flags=(
 )
 
 if (( ! EUID )); then
-  flags=( $flags[@]
+  flags+=(
     '(noarch)arch[set the archived flag]'
     '(arch)noarch[unset the archived flag]'
     '(nosappnd)sappnd[set the system append-only flag]'
@@ -26,19 +26,39 @@ if (( ! EUID )); then
 fi
 
 if [[ $OSTYPE = (freebsd|dragonfly|darwin)* ]]; then
-  flags=( $flags[@]
+  flags+=(
     '(nouunlnk)uunlnk[set the user undeletable flag]'
     '(uunlnk)nouunlnk[unset the user undeletable flag]'
     '(nohidden)hidden[set the hidden flag]'
     '(hidden)nohidden[unset the hidden flag]'
   )
-  (( EUID )) || flags=( $flags[@]
+  [[ $OSTYPE = freebsd* ]] && flags+=(
+    '(uoffline)offline[set the offline attribute]'
+    '(offline)uoffline[unset the offline attribute]'
+    '(urdonly)rdonly[set readonly flag]'
+    '(rdonly)urdonly[unset readonly flag]'
+    '(usparse)sparse[set the sparse attribute]'
+    '(sparse)usparse[unset the sparse attribute]'
+    '(usystem)system[set system flag]'
+    '(system)usystem[unset system flag]'
+    '(ureparse)reparse[set the Windows reparse point attribute]'
+    '(reparse)ureparse[unset the Windows reparse point attribute]'
+    '(uunlnk)unlnk[set undeletable flag]'
+    '(unlnk)uunlnk[unset undeletable flag]'
+  )
+
+  (( EUID )) || flags+=(
     '(nosunlnk)sunlnk[set the system undeletable flag]'
     '(sunlnk)nosunlnk[unset the system undeletable flag]'
   )
+  args=(
+    "-f[don't display diagnostic messages]"
+    '-h[act on symlinks]'
+    '-v[verbose output]'
+  )
 fi
 
-_arguments -s -A "-*" \
+_arguments -s -A "-*" $args \
   '(-L -P)-H[follow symlinks on the command line (specify with -R)]' \
   '(-H -P)-L[follow all symlinks (specify with -R)]' \
   '(-L -H)-P[do not follow symlinks (specify with -R)]' \

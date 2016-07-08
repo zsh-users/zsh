@@ -1,4 +1,4 @@
-#compdef xdpyinfo xwininfo xkill xfontsel xfd xev xhost xon xsetroot xwd xwud xrdb xprop xlsatoms
+#compdef xdpyinfo xwininfo xkill xfontsel xfd xev xhost xon xsetroot xwd xwud xrdb xprop xlsatoms xlsclients
 
 local curcontext="$curcontext" state line expl ret=1
 
@@ -37,6 +37,12 @@ xlsatoms)
     '*-range[atom values to list]:[num]-[num]' \
     '*-name[name of single atom to print]:atom:->atoms'
   ;;
+xlsclients)
+  _x_arguments -C \
+    '-a[list all clients on all screens]' \
+    '-l[long format adding window/icon names and class hints]' \
+    '-m[maximum characters of command to include]:characters'
+ ;;
 xkill)
   _x_arguments \
     -version \

@@ -1,5 +1,13 @@
 2016-07-08  Oliver Kiddle  <opk@zsh.org>
 
+	* 38812: Completion/BSD/Command/_chflags,
+	Completion/Unix/Command/_dmesg, Completion/Unix/Command/_env,
+	Completion/Unix/Command/_ln, Completion/Unix/Command/_xmlsoft,
+	Completion/Unix/Command/_ls, Completion/Unix/Command/_service,
+	Completion/Unix/Command/_touch, Completion/Unix/Command/_script,
+	Completion/X/Command/_x_utils, Completion/Zsh/Command/_vared:
+	a few new completions and update some command options
+
 	* 38810: Src/Zle/textobjects.c: fix cursor positioning
 	and repeated invocations when widgets used from emacs mode
 
