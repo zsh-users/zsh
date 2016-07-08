@@ -1,5 +1,5 @@
 /*
- * textobjects.c - ZLE module implementing Vim style text objects
+ * textobjects.c - ZLE widgets implementing Vim style text objects
  *
  * This file is part of zsh, the Z shell.
  *
@@ -54,11 +54,7 @@ selectword(UNUSED(char **args))
     int sclass = viclass(zleline[zlecs]);
     int doblanks = all && sclass;
 
-    if (!invicmdmode()) {
-	region_active = 1;
-	mark = zlecs;
-    }
-    if (!region_active || zlecs == mark) {
+    if (!region_active || zlecs == mark || mark == -1) {
 	/* search back to first character of same class as the start position
 	 * also stop at the beginning of the line */
 	mark = zlecs;
@@ -207,8 +203,12 @@ selectword(UNUSED(char **args))
     /* Adjustment: vi operators don't include the cursor position, in insert
      * or emacs mode the region also doesn't but for vi visual mode it is
      * included. */
-    if (zlecs && zlecs > mark && !virangeflag)
-	DECCS();
+    if (!virangeflag) {
+	if (!invicmdmode())
+	    region_active = 1;
+	else if (zlecs && zlecs > mark)
+	    DECCS();
+    }
 
     return 0;
 }
@@ -315,7 +315,7 @@ selectargument(UNUSED(char **args))
     }
 
     /* Adjustment: vi operators don't include the cursor position */
-    if (!virangeflag)
+    if (!virangeflag && invicmdmode())
        DECCS();
 
     return 0;

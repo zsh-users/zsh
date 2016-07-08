@@ -1,5 +1,8 @@
 2016-07-08  Oliver Kiddle  <opk@zsh.org>
 
+	* 38810: Src/Zle/textobjects.c: fix cursor positioning
+	and repeated invocations when widgets used from emacs mode
+
 	* 38809: Src/zsh.h, Src/prompt.c, Src/Zle/zle_refresh.c:
 	fix tracking of colour attributes and restore them when
 	turning bold off
