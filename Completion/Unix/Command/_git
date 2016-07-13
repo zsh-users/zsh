@@ -1755,7 +1755,7 @@ _git-subtree () {
   # TODO: -P should only complete paths inside the current repository.
   _arguments -C \
     '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
-    '(-P --prefix)'{-P,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+    '(-P --prefix)'{-P+,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
     '-d[show debug messages]' \
     ': :->command' \
     '*::: := ->option-or-argument' && ret=0
@@ -1779,8 +1779,8 @@ _git-subtree () {
         (add)
           _arguments \
             '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
-            '(-m --message)'{-m,--message}'[use the given message as the commit message for the merge commit]' \
-            '(-P --prefix)'{-P,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+            '(-m --message)'{-m+,--message=}'[use the given message as the commit message for the merge commit]:message' \
+            '(-P --prefix)'{-P+,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
             '--squash[import only a single commit from the subproject]' \
             ': :__git_any_repositories_or_references' \
             ':: :__git_ref_specs' && ret=0
@@ -1788,16 +1788,16 @@ _git-subtree () {
         (merge)
           _arguments -S \
             '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
-            '(-P --prefix)'{-P,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
-            '(-m --message)'{-m,--message}'[use the given message as the commit message for the merge commit]' \
+            '(-P --prefix)'{-P+,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+            '(-m --message)'{-m+,--message=}'[use the given message as the commit message for the merge commit]:message' \
             '--squash[import only a single commit from the subproject]' \
             ': :__git_references' && ret=0
 	;;
         (pull)
           _arguments -S \
             '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
-            '(-P --prefix)'{-P,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
-            '(-m --message)'{-m,--message}'[use the given message as the commit message for the merge commit]' \
+            '(-P --prefix)'{-P+,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+            '(-m --message)'{-m+,--message=}'[use the given message as the commit message for the merge commit]:message' \
             '--squash[import only a single commit from the subproject]' \
             ': :__git_any_repositories' \
             ':: :__git_ref_specs' && ret=0
@@ -1805,18 +1805,18 @@ _git-subtree () {
         (push)
           _arguments -S \
             '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
-            '(-P --prefix)'{-P,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
-            '(-m --message)'{-m,--message}'[use the given message as the commit message for the merge commit]' \
+            '(-P --prefix)'{-P+,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+            '(-m --message)'{-m+,--message=}'[use the given message as the commit message for the merge commit]:message' \
             ': :__git_any_repositories' \
             ':: :__git_ref_specs' && ret=0
 	;;
         (split)
           _arguments -S \
             '(-q --quiet)'{-q,--quiet}'[suppress progress output]' \
-            '(-P --prefix)'{-P,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
+            '(-P --prefix)'{-P+,--prefix=}'[the path to the subtree in the repository to manipulate]: :_directories' \
             '(-b --branch)'{-b,--branch=}'[create a new branch]' \
             '--onto=[try connecting new tree to an existing one]: :__git_ref_specs' \
-            '(-m --message)'{-m,--message}'[use the given message as the commit message for the merge commit]' \
+            '(-m --message)'{-m+,--message=}'[use the given message as the commit message for the merge commit]:message' \
             '--ignore-joins[ignore prior --rejoin commits]' \
             '--onto=[try connecting new tree to an existing one]: :__git_ref_specs' \
             '--rejoin[use the given message as the commit message for the merge commit]' \
