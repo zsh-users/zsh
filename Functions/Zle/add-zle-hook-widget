@@ -1,18 +1,15 @@
 # Add to HOOK the given WIDGET
 # 
 # HOOK is one of isearch-exit, isearch-update, line-pre-redraw, line-init,
-# line-finish, history-line-set, keymap-select (the zle- prefix is not
-# required).
+# line-finish, history-line-set, keymap-select (the zle- prefix is allowed
+# but not required).  If a widget corresponding to HOOK already exists, it
+# is preserved and called first in the new set of HOOK widgets.
 #
-# WIDGET may be of the form INDEX:NAME in which case the INDEX determines
-# the order in which the widget executes relative to other hook widgets.
-# Othewise the widget is assigned an index that appends it to the array.
-# 
-# With -d, remove the widget from the hook instead; delete the hook
-# variable if it is empty.
+# With -d, remove the WIDGET from the hook instead; deletes the hook
+# linkage if it is empty.
 #
-# -D behaves like -d, but pattern characters are active in the
-# widget name, so any matching widget will be deleted from the hook.
+# -D behaves like -d, but pattern characters are active in WIDGET, so
+# any matching widget will be deleted from the hook.
 #
 # Without -d, if the WIDGET is not already defined, a function having the
 # same name is marked for autoload; -U is passed down to autoload if that
@@ -47,16 +44,15 @@ do
       # and we run them in number order
       zstyle -a $WIDGET widgets hook_widgets
       for hook in "${(@)${(@on)hook_widgets[@]}#<->:}"; do
-	  zle "$hook" -Nw "$@" || return
+	  if [[ "$hook" = user:* ]]; then
+	      # Preserve $WIDGET within the renamed widget
+	      zle "$hook" -N "$@"
+	  else
+	      zle "$hook" -Nw "$@"
+	  fi || return
       done
       return 0
   }
-  # Check for an existing widget, add it as the first hook
-  if [[ ${widgets[$hook]} = user:* ]]; then
-      zle -A "$hook" "${widgets[$hook]}"
-      zstyle -- "$hook" widgets 0:"${widgets[$hook]}"
-      zle -N "$hook" azhw:"$hook"
-  fi
 done
 
 # Redefine ourself with the setup left out
@@ -133,17 +129,19 @@ function add-zle-hook-widget {
     else
 	integer i=${#options[ksharrays]}-2
 	zstyle -g extant_hooks "$hook" widgets
-	if [[ "$fn" != <->:* ]]; then
-	    if [[ -z ${(M)extant_hooks[@]:#(<->:|)$fn} ]]; then
-	        # no index and not already hooked
-		# assign largest existing index plus 10
-		i=${${(On@)${(@M)extant_hooks[@]#<->:}%:}[i]}+10
-	    else
-		return 0
-	    fi
+        # Check for an existing widget, add it as the first hook
+	if [[ ${widgets[$hook]} != "user:azhw:$hook" ]]; then
+	    zle -A "$hook" "${widgets[$hook]}"
+	    extant_hooks=(0:"${widgets[$hook]}" "${extant_hooks[@]}")
+	    zle -N "$hook" azhw:"$hook"
+	fi
+	# Add new widget only if not already in the hook list
+	if [[ -z ${(M)extant_hooks[@]:#(<->:|)$fn} ]]; then
+       	    # no index and not already hooked
+            # assign largest existing index plus 1
+	    i=${${(On@)${(@M)extant_hooks[@]#<->:}%:}[i]}+1
 	else
-	    i=${${(M)fn#<->:}%:}
-	    fn=${fn#<->:}
+	    return 0
 	fi
 	extant_hooks+=("${i}:${fn}")
 	zstyle -- "$hook" widgets "${extant_hooks[@]}"
@@ -157,7 +155,17 @@ function add-zle-hook-widget {
     fi
 }
 
-# Handle zsh autoloading conventions
-if [[ "$zsh_eval_context" = *loadautofunc && ! -o kshautoload ]]; then
-    add-zle-hook-widget "$@"
-fi
+# Handle zsh autoloading conventions:
+# - "file" appears last in zsh_eval_context when "source"-ing
+# - "evalautofunc" appears with kshautoload set or autoload -k
+# - "loadautofunc" appears with kshautoload unset or autoload -z
+# - use of autoload +X cannot reliably be detected, use best guess
+case "$zsh_eval_context" in
+*file) ;;
+*evalautofunc) ;;
+*loadautofunc) add-zle-hook-widget "$@";;
+*) [[ -o kshautoload ]] || add-zle-hook-widget "$@";;
+esac
+# Note fallback here is equivalent to the usual best-guess used by
+# functions written for zsh before $zsh_eval_context was available
+# so this case-statement is backward-compatible.

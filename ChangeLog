@@ -1,3 +1,9 @@
+2016-07-13  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38850: Functions/Zle/add-zle-hook-widget: Simplify indexing
+	scheme to store hooks strictly in the order they are added;
+	better handling of edge cases and autoloading/sourcing file.
+
 2016-07-13  Eric Cook  <llua@gmx.com>
 
 	* 38833: Completion/Unix/Command/_iostat
