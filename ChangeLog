@@ -1,3 +1,8 @@
+2016-07-13  Eric Cook  <llua@gmx.com>
+
+	* 38833: Completion/Unix/Command/_iostat
+	separate iostat completion from Completion/Linux/Command/_sysstat
+
 2016-07-08  Oliver Kiddle  <opk@zsh.org>
 
 	* 38812: Completion/BSD/Command/_chflags,

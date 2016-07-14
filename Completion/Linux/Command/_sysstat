@@ -1,4 +1,4 @@
-#compdef -P mpstat (|cifs)iostat isag sadf sar pidstat
+#compdef mpstat cifsiostat isag sadf sar pidstat
 # -V can appear with other options, so (- *) isn't needed.
 #TODO:
 # sysstat-nfsiostat - there seems to be two nfsiostat(1)s. one from oracle and one by redhat.
@@ -10,24 +10,8 @@ _mpstat() {
     '-P[specify processor number]:processor: _values -s "," processor ON ALL {1..$(_call_program processors getconf _NPROCESSORS_ONLN)}' \
     '-u[report CPU utilization]' \
     '-V[print version number]' \
-    '1:interval' \
-    '2:count'
-}
-
-_iostat() {
-  _arguments : \
-    '-c[display CPU utilization report]' \
-    '-d[display device utilization report]' \
-    '-T[only display global statistics for group_name]' \
-    '-g[display statistics for a group of devices]:group name' \
-    '-h[human readable device utilization report]' \
-    '-j[display persistent device name]' \
-    '(-m)-k[display statistics in kB/s]' \
-    '(-k)-m[display statistics in MB/s]' \
-    '-N[display registered device mapper names]' \
-    '::device:_files -W /dev -g "*(-%)"' \
-    ': :_guard "[0-9]#" "interval"' \
-    ':count'
+    '1: : _guard "^-*" interval' \
+    '2: : _guard "^-*" count'
 }
 
 _cifsiostat() {
@@ -37,8 +21,8 @@ _cifsiostat() {
     '(-k)-m[display statistics in MB/s]' \
     '-t[print timestamp for each report]' \
     '-V[print version number]' \
-    '1:interval' \
-    '2:count'
+    '1: : _guard "^-*" interval' \
+    '2: : _guard "^-*" count'
 }
 
 _isag() {
@@ -68,8 +52,8 @@ _sadf() {
       '(-t -T)-U[display in seconds since epoch (UTC)]' \
       '-V[print version number]' \
       '(-j -d -p)-x[output file in XML]' \
-      '1:interval' \
-      '2:count' \
+      '1: : _guard "^-*" interval' \
+      '2: : _guard "^-*" count' \
       '3:data file:_files' && ret=0
   else
     _arguments : '*::sar: _sar' && ret=0
@@ -107,8 +91,8 @@ _sar() {
     '-W[report swapping statistics]' \
     '-w[report task creation and system switching activity]' \
     '-y[report TTY device activity]' \
-    '1:interval' \
-    '2:count'
+    '1: : _guard "^-*" interval' \
+    '2: : _guard "^-*" count'
 }
 
 _pidstat() {
@@ -128,7 +112,8 @@ _pidstat() {
     '-V[print version number]' \
     '-v[display values from kernel table]' \
     '-w[report task switching activity]' \
-    ':interval' ':count'
+    '1: : _guard "^-*" interval' \
+    '2: : _guard "^-*" count'
 }
 
 _sysstat() {
