@@ -1784,6 +1784,10 @@ _git-subtree () {
             '--squash[import only a single commit from the subproject]' \
             ': :__git_any_repositories_or_references' \
             ':: :__git_ref_specs' && ret=0
+          # TODO: the use of __git_ref_specs isn't quite right: it will
+          # complete "foo:bar" values which git-subtree(1) doesn't take.  What
+          # we should complete here is what's on *one* side of the colon in
+          # __git_ref_specs.
 	;;
         (merge)
           _arguments -S \

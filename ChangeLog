@@ -1,5 +1,8 @@
 2016-07-17  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted (cf. users/21737):: Completion/Unix/Command/_git:
+	_git-subtree: Record technical debt in comment.
+
 	* users/21750 (after users/21551): Completion/Unix/Command/_git:
 	_git-subtree: Tweak -m,-P completions
 
