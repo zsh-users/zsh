@@ -18,6 +18,8 @@
 #
 # The -L option lists the hooks and their associated widgets.
 
+() { # Preserve caller global option settings
+
 emulate -L zsh
 
 # This is probably more safeguarding than necessary
@@ -35,25 +37,23 @@ local -a hooktypes=( zle-isearch-exit zle-isearch-update
 # Stash in zstyle to make it global
 zstyle zle-hook types ${hooktypes#zle-}
 
-for hook in $hooktypes
-do
-  function azhw:$hook {
-      local -a hook_widgets
-      local hook
-      # Values of these styles look like number:name
-      # and we run them in number order
-      zstyle -a $WIDGET widgets hook_widgets
-      for hook in "${(@)${(@on)hook_widgets[@]}#<->:}"; do
-	  if [[ "$hook" = user:* ]]; then
-	      # Preserve $WIDGET within the renamed widget
-	      zle "$hook" -N "$@"
-	  else
-	      zle "$hook" -Nw "$@"
-	  fi || return
-      done
-      return 0
-  }
-done
+# Relying on multifuncdef option here
+function azhw:${^hooktypes} {
+    local -a hook_widgets
+    local hook
+    # Values of these styles look like number:name
+    # and we run them in number order
+    zstyle -a $WIDGET widgets hook_widgets
+    for hook in "${(@)${(@on)hook_widgets[@]}#<->:}"; do
+	if [[ "$hook" = user:* ]]; then
+	    # Preserve $WIDGET within the renamed widget
+	    zle "$hook" -N "$@"
+	else
+	    zle "$hook" -Nw "$@"
+	fi || return
+    done
+    return 0
+}
 
 # Redefine ourself with the setup left out
 
@@ -127,12 +127,25 @@ function add-zle-hook-widget {
 	    fi
 	fi
     else
+	# Check whether attempting to add a widget named for the hook
+	if [[ "$fn" = "$hook" ]]; then
+	    if [[ -n "${widgets[$fn]}" ]]; then
+		print -u2 "Cannot hook $fn to itself"
+		return 1
+	    fi
+	    # No point in building the array until another is added
+	    autoload "${autoopts[@]}" -- "$fn"
+	    zle -N "$fn"
+	    return 0
+	fi
 	integer i=${#options[ksharrays]}-2
 	zstyle -g extant_hooks "$hook" widgets
         # Check for an existing widget, add it as the first hook
 	if [[ ${widgets[$hook]} != "user:azhw:$hook" ]]; then
-	    zle -A "$hook" "${widgets[$hook]}"
-	    extant_hooks=(0:"${widgets[$hook]}" "${extant_hooks[@]}")
+	    if [[ -n ${widgets[$hook]} ]]; then
+		zle -A "$hook" "${widgets[$hook]}"
+		extant_hooks=(0:"${widgets[$hook]}" "${extant_hooks[@]}")
+	    fi
 	    zle -N "$hook" azhw:"$hook"
 	fi
 	# Add new widget only if not already in the hook list
@@ -154,6 +167,8 @@ function add-zle-hook-widget {
 	fi
     fi
 }
+
+} "$@" # Resume caller global options
 
 # Handle zsh autoloading conventions:
 # - "file" appears last in zsh_eval_context when "source"-ing

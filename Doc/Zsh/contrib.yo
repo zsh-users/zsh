@@ -340,23 +340,20 @@ those additional widgets.
 var(hook) is one of tt(isearch-exit), tt(isearch-update),
 tt(line-pre-redraw), tt(line-init), tt(line-finish), tt(history-line-set),
 or tt(keymap-select), corresponding to each of the special widgets
-tt(zle-isearch-exit), etc.
+tt(zle-isearch-exit), etc.  The special widget names are also accepted
+as the var(hook) argument.
 
 var(widgetname) is the name of a ZLE widget.  If no options are given this
 is added to the array of widgets to be invoked in the given hook context.
 Note that the hooks are called as widgets, that is, with
 example(tt(zle )var(widgetname)tt( -Nw "$@"))
-rather than as a function call.
 
-In typical usage, var(widgetname) has the form var(index)tt(:)var(name).
-In this case var(index) is an integer which determines the order in which
-the widget var(name) will be called relative to other widgets in the
-array.  Widgets having the same var(index) are called in unspecified
-order.  However, var(widgetname) may omit the index, in which case an
-index is computed for it to arrange for it to be called in the order
-in which it was added to the array.
+vindex(WIDGET, in hooks)
+Note that this means that the `tt(WIDGET)' special parameter tracks the
+var(widgetname) when the widget function is called, rather than tracking
+the name of the corresponding special hook widget.
 
-If the option tt(-d) is given, the var(widgename) is removed from
+If the option tt(-d) is given, the var(widgetname) is removed from
 the array of widgets to be executed.
 
 If the option tt(-D) is given, the var(widgetname) is treated as a pattern
@@ -369,7 +366,6 @@ marked for autoloading, and the options tt(-U), tt(-z) and tt(-k) are
 passed as arguments to tt(autoload) as with tt(add-zsh-hook).  The
 widget is also created with `tt(zle -N )var(widgetname)' to cause the
 corresponding function to be loaded the first time the hook is called.
-
 
 The arrays of var(widgetname) are currently maintained in tt(zstyle)
 contexts, one for each var(hook) context, with a style of `tt(widgets)'.

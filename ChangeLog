@@ -1,3 +1,11 @@
+2016-07-17  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38866: Doc/Zsh/contrib.yo: update add-zle-hook-widget for 38850.
+
+	* 38866 (+ tweak 38872): Functions/Zle/add-zle-hook-widget: fix
+	edge case handling, wrap in anonymous function for kshautoload
+	management.
+
 2016-07-17  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* users/21752: Doc/Zsh/mod_zleparameter.yo: Extend
