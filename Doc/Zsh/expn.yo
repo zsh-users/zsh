@@ -224,10 +224,15 @@ Note that the transformation takes place even if the file or any
 intervening directories do not exist.
 )
 item(tt(A))(
-As `tt(a)', but also resolve use of symbolic links where possible.
-Note that resolution of `tt(..)' occurs em(before) resolution of symbolic
-links.  This call is equivalent to tt(a) unless your system has the
-tt(realpath) system call (modern systems do).
+Turn a file name into an absolute path as the `tt(a)' modifier does, and
+em(then) pass the result through the tt(realpath+LPAR()3+RPAR()) library
+function to resolve symbolic links.
+
+Note: on systems that do not have a tt(realpath+LPAR()3+RPAR()) library
+function, symbolic links are not resolved, so on those systems `tt(a)' and
+`tt(A)' are equivalent.
+
+Note: tt(foo:A) and tt(realpath+LPAR()foo+RPAR()) are different on some inputs.
 )
 item(tt(c))(
 Resolve a command name into an absolute path by searching the command
