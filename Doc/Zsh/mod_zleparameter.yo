@@ -15,14 +15,16 @@ This array contains the names of the keymaps currently defined.
 )
 vindex(widgets)
 item(tt(widgets))(
-This associative array contains one entry per widget defined. The name 
+This associative array contains one entry per widget. The name 
 of the widget is the key and the value gives information about the
-widget. It is either the string `tt(builtin)' for builtin widgets, a
-string of the form `tt(user:)var(name)' for user-defined widgets,
-where var(name) is the name of the shell function implementing the
-widget, or it is a string of the form
-`tt(completion:)var(type)tt(:)var(name)', for completion widgets. In
-the last case var(type) is the name of the builtin widgets the
+widget. It is either
+  the string `tt(builtin)' for builtin widgets,
+  a string of the form `tt(user:)var(name)' for user-defined widgets,
+    where var(name) is the name of the shell function implementing the widget,
+  a string of the form `tt(completion:)var(type)tt(:)var(name)'
+    for completion widgets,
+  or a null value if the widget is not yet fully defined.
+In the penultimate case, var(type) is the name of the builtin widget the
 completion widget imitates in its behavior and var(name) is the name
 of the shell function implementing the completion widget.
 )
