@@ -1,5 +1,10 @@
 2016-07-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 38867: Completion/Linux/Command/_ltrace,
+	Completion/Linux/Command/_strace, Completion/Unix/Command/_truss,
+	Completion/Unix/Type/_sys_calls: update strace completion
+	factoring out system calls and new truss and ltrace completions
+
 	* Marko Myllynen: 38837 (tweaked c.f. 38826):
 	Completion/Unix/Command/_libvirt: new virsh completion
 

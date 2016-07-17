@@ -1,119 +1,101 @@
-#compdef strace
+#compdef strace strace64
 
-# TODO:
-#	- make _sys_calls system-dependent
-#	- allow negated calls (e.g. -e!write)
-_sys_calls () {
-	local expl
-	local -a sys_calls
+local curcontext="$curcontext" state line root expl ret=1
+typeset -A opt_args
 
-	sys_calls=(_llseek _newselect _sysctl accept access acct
-		adjtimex afs_syscall alarm bdflush bind break brk cacheflush
-		capget capset chdir chmod chown chown32 chroot clone close connect
-		creat create_module delete_module dup dup2 execve exit fchdir
-		fchmod fchown fchown32 fcntl fcntl64 fdatasync flock fork fstat
-		fstat64 fstatfs fsync ftime ftruncate ftruncate64 get_kernel_syms
-		getcwd getdents getdents64 getegid getegid32 geteuid geteuid32
-		getgid getgid32 getgroups getgroups32 getitimer getpagesize getpeername
-		getpmsg getpgid getpgrp getpid getppid getpriority getresgid getresgid32
-		getresuid getresuid32 getrlimit getrusage getsid getsockname getsockopt
-		gettid gettimeofday getuid getuid32 gtty idle init_module ioctl ioperm
-		iopl ipc kill lchown lchown32 link listen lock lseek lstat lstat64
-		madvise mincore mkdir mknod mlock mlockall mmap modify_ldt mount mprotect
-		mpx mremap msync munlock munlockall munmap nanosleep nfsservctl nice
-		oldfstat oldlstat oldolduname oldstat oldumount olduname open pause
-		personality phys pipe pivot_root poll prctl pread prof profil ptrace
-		putpmsg pwrite query_module quotactl read readahead readdir readlink
-		readv reboot recv recvfrom recvmsg rename rmdir rt_sigaction
-		rt_sigpending rt_sigprocmask rt_sigqueueinfo rt_sigreturn rt_sigsuspend
-		rt_sigtimedwait sched_get_priority_max sched_get_priority_min
-		sched_getparam sched_getscheduler sched_rr_get_interval sched_setparam
-		sched_setscheduler sched_yield security select sendfile send sendmsg sendto
-		setdomainname setfsgid setfsgid32 setfsuid setfsuid32 setgid setgid32
-		setgroups setgroups32 sethostname setitimer setpgid setpriority setregid
-		setregid32 setresgid setresgid32 setresuid setresuid32 setreuid setreuid32
-		setrlimit setsid setsockopt settimeofday setuid setuid32 setup sgetmask
-		shutdown sigaction sigaltstack signal sigpending sigprocmask sigreturn
-		sigsuspend socket socketcall socketpair ssetmask stat stat64 statfs stime
-		stty swapoff swapon symlink sync sysfs sysinfo syslog time times truncate
-		truncate64 ulimit umask umount uname unlink uselib ustat utime vfork vhangup
-		vm86 vm86old wait4 waitpid write writev)
+(( EUID )) && root='!'
 
-	for t in ${(s:,:)${PREFIX}}; do
-		sys_calls=( ${sys_calls:#$t} )
-	done
-	compset -P '*,'
-	_wanted sys_calls expl 'System calls' compadd -qS , -a sys_calls
-}
+_arguments -C -s \
+  '-a+[align return values in a specific column]:column number [40]' \
+  '(-c)-i[print instruction pointer at time of syscall]' \
+  '-o+[write the trace output to the file]:output file:->file-pipe' \
+  '-q[suppress messages about attaching, detaching etc.]' \
+  '(-q)-qq[suppress messages about process exit status]' \
+  '(-c)-r[print a relative timestamp upon entry to each system call]' \
+  '-s+[specify the maximum string size to print]:maximum string size [32]' \
+  '(-c -ttt)-t[prefix each line of the trace with the time of day]' \
+  '(-c -ttt -tt)-tt[prefix each line of the trace with the time of day including the microseconds]' \
+  '(-c -tt -t)-ttt[prefix each line of the trace with the number of seconds and microseconds since the epoch]' \
+  '(-c)-T[show the time spent in system calls]' \
+  '(-xx)-x[print all non-ASCII strings in hexadecimal string format]' \
+  '(-x)-xx[print all strings in hexadecimal string format]' \
+  '(-c -yy)-y[print paths associated with file descriptor arguments]' \
+  '(-c -y)-yy[print protocol specific information associated with socket file descriptors]' \
+  '(-C -i -k -r -ff -t -tt -ttt -T -y -yy)-c[count time, calls, and errors for each system call and report a summary]' \
+  '(-c)-C[count time, calls, and errors for each system call and report a summary in addition to regular output]' \
+  '-O+[overhead for tracing system calls]:overhead (microseconds)' \
+  '-S+[sort the output of the histogram (-c option) by the specified criterion]:sort criterion:(time calls name nothing)' \
+  '-w[summarise syscall latency]' \
+  '*-e+[select events to trace or how to trace]:system call:->expressions' \
+  '*-P+[trace only system calls accessing given path]:path:_files' \
+  '-b+[detach from process on specified syscall]:syscall:(execve)' \
+  '-f[trace child processes as they are created by currently traced processes]' \
+  '(-c -C)-ff[write each process trace to <filename>.<pid> (when using -o <filename>]' \
+  '-D[run tracer as detached grandchild, keeping traced process as direct child of calling process]' \
+  '-I+[when strace can be interrupted by signals]:interruptible:((1\:"no signals are blocked" 2\:"fatal signals are blocked while decoding syscall (default)" 3\:"fatal signals are always blocked (default with -o)" 4\:"fatal signals and SIGTSTP are always blocked"))' \
+  '*-E+[set or remove exported environment variable]:variable:->envars' \
+  "${root}-u+[run as specified user]:user:_users" \
+  '(:)*-p+[attach to the process with specified process ID and begin tracing]:process ID:_pids' \
+  '-d[show debug output of strace itself on standard error]' \
+  '-v[print unabbreviated versions of environment, stat, termios, etc. calls]' \
+  '(- 1 *)-h[display help information]' \
+  '(- 1 *)-V[display version information]' \
+  '(-c)-k[obtain stack trace between each syscall]' \
+  '(-):command name: _command_names -e' \
+  '*::arguments:_normal' && ret=0
 
-_sets () {
-	_alternative \
-		'special:special values:(all none)' \
-		'calls::_sys_calls'
-}
+case $state in
+  expressions)
+    _values -C -S = 'qualifying expression' \
+      'trace[trace specified set of system calls only]:system calls:->syscalls' \
+      'abbrev[abbreviate the output from printing each member of large structures]:system call:_sequence _sys_calls -a -n' \
+      'verbose[dereference structures for the specified set of system calls]:system call:_sequence _sys_calls -a -n' \
+      'raw[print raw, undecoded arguments for the specified set of system calls]:system call:_sequence _sys_calls -a -n' \
+      'signal[trace only the specified subset of signals]:signal:_sequence _signals -s -M "B\:!="' \
+      'read[perform a full hex and ASCII dump of all the data read from listed file descriptors]:file descriptor:_sequence _file_descriptors' \
+      'write[perform a full hex and ASCII dump of all the data written to listed file descriptors]:file descriptor:_sequence _file_descriptors' && ret=0
+    if [[ $words[CURRENT] != *=* || $state = syscalls ]]; then
+      local dedup sets suf="-qS,"
+      compset -P '!'
+      dedup=( ${(Ms.,.)PREFIX##*,} ${(Ms.,.)SUFFIX%%,*} )
+      compset -S ',*' || suf=""
+      compset -P '*,'
+      sets=(
+	'file:trace all system calls which take a file name as an argument'
+	'process:trace all system calls which involve process management'
+	'network:trace all the network related system calls'
+	'signal:trace all signal related system calls'
+	'ipc:trace all IPC related system calls'
+	'desc:trace all file descriptor related system calls'
+	'memory:trace all memory mapping related system calls'
+      )
+      _alternative \
+	"related system call:sets: _describe -t traces 'related system call' sets -F dedup $suf" \
+	"system call:syscalls:_sys_calls -a -n $suf -F dedup" && ret=0
+    fi
+  ;;
+  file-pipe)
+    compset -P '\\'
+    if (( ! $+opt_args[-ff] )) && compset -P '(!|\|)'; then
+      compset -q
+      if (( CURRENT == 1 )); then
+	_command_names -e && ret=0
+      else
+	_normal && ret=0
+      fi
+    else
+      _files && ret=0
+    fi
+  ;;
+  envars)
+    if [[ -prefix *=* ]]; then
+      compstate[parameter]="${PREFIX%%\=*}"
+      compset -P 1 '*='
+      _value && ret=0
+    else
+      _parameters -qS= -g "*export*" && ret=0
+    fi
+  ;;
+esac
 
-_traces () {
-	local expl
-	traces=('file:trace all system calls which take a file name as an argument'
-		'process:trace all system calls which involve process management'
-		'network:trace all the network related system calls'
-		'signal:trace all signal related system calls'
-		'ipc:trace all IPC related system calls'
-		'desc:trace all file descriptor related system calls')
-	compset -P '*,'
-	_describe -t traces 'Related system calls' traces -qS ,
-}
-
-_traces_sets () {
-	_alternative \
-		'traces::_traces' \
-		'sets::_sets'
-}
-
-_expression () {
-	_values -S = "Qualifying expression" \
-		'trace[trace specified set of system calls only]:system calls:_traces_sets' \
-		'abbrev[abbreviate the output from printing each member of large structures]:system calls:_sets' \
-		'verbose[dereference structures for the specified set of system calls]:system calls:_sets' \
-		'raw[print raw, undecoded arguments for the specified set of system calls]:system calls:_sets' \
-		'signal[trace only the specified subset of signals]:signal:{compset -P "*,"; _signals -s -qS ,}' \
-		'read[perform a full hex and ASCII dump of all the data read from listed file descriptors]:file descriptors:{compset -P "*,"; _file_descriptors -qS ,}' \
-		'write[perform a full hex and ASCII dump of all the data written to listed file descriptors]:file descriptors:{compset -P "*,"; _file_descriptors -qS ,}'
-	if [[ -z "$words[CURRENT]" || -n "${words[CURRENT]:#*=*}" ]]; then
-		_traces_sets
-	fi
-}
-
-_arguments \
-	'()-c[count time, calls, and errors for each system call and report a summary]' \
-	'()-C[count time, calls, and errors for each system call and report a summary in addition to regular output]' \
-	'-d[show some debugging output of strace itself on the standard error]' \
-	'-D[run tracer as detached grandchild, keeping traced process as direct child of calling process]' \
-	'-f[trace child processes as they are created by currently traced processes]' \
-	'-ff[write each process trace to <filename>.<pid> (when using -o <filename>]' \
-	'(-c -d -f -ff -i -q -r -t -tt -ttt -T -v -V -x -xx -a -e -o -O -p -s -S -u -E)-h[print help]' \
-	'-i[print the instruction pointer at the time of the system call]' \
-	'-q[suppress messages about attaching, detaching etc.]' \
-	'-r[print a relative timestamp upon entry to each system call]' \
-	'(-ttt)-t[prefix each line of the trace with the time of day]' \
-	'(-ttt -tt)-tt[prefix each line of the trace with the time of day including the microseconds]' \
-	'(-tt -t)-ttt[prefix each line of the trace with the number of seconds and microseconds since the epoch]' \
-	'-T[show the time spent in system calls]' \
-	'-y[print paths associated with file descriptor arguments]' \
-	'-v[print unabbreviated versions of environment, stat, termios, etc. calls]' \
-	'(-c -d -f -ff -h -i -q -r -t -tt -ttt -T -v -x -xx -a -e -o -O -p -s -S -u -E)-V[print the version number of strace]' \
-	'(-xx)-x[print all non-ASCII strings in hexadecimal string format]' \
-	'(-x)-xx[print all strings in hexadecimal string format]' \
-	'-I+[when strace can be interrupted by signals]:interruptible:((1\:"no signals are blocked" 2\:"fatal signals are blocked while decoding syscall (default)" 3\:"fatal signals are always blocked (default if '\''-o FILE PROG'\''" 4\:"fatal signals and SIGTSTP are always blocked"))' \
-	'*-P+[trace only system calls accessing given path]:path:_files' \
-	'-a+[align return values in a specific column (default 40)]:column number' \
-	'*-e+[select events to trace or how to trace]:system call:_expression' \
-	'-o+[write the trace output to the file]:output file:_files' \
-	'-O+[overhead for tracing system calls]:overhead microseconds' \
-	'(:)-p+[attach to the process with specified process ID and begin tracing]:process ID:_pids' \
-	'-s+[specify the maximum string size to print (default 32)]:maximum string size' \
-	'-S+[sort the output of the histogram (-c option) by the specified criterion]:sort by:(time calls name nothing)' \
-	'-u+[run as specified user]:user:_users' \
-	'*-E+[remove variable from the inherited list of environment or define a value]:variable:_printenv' \
-	'(-):command name: _command_names -e' \
-	'*::arguments:_normal'
+return ret
