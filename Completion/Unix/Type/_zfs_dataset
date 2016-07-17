@@ -58,14 +58,14 @@ if [[ ${#rdst} -gt 0 ]]; then
 fi
 
 if [[ -n $type[(r)clone] ]]; then
-	datasetlist=( ${="$(zfs list -H -o name,origin -t filesystem | awk "\$2 != \"-\" {print \$1}")":#no cloned filesystems available} )
+	datasetlist=( ${="$(zfs list -H -o name,origin -t filesystem 2>/dev/null | awk "\$2 != \"-\" {print \$1}")":#no cloned filesystems available} )
 else
-	datasetlist=( ${="$(zfs list -H -o name $typearg)":#no datasets available} )
+	datasetlist=( ${="$(zfs list -H -o name $typearg 2>/dev/null)":#no datasets available} )
 fi
 
 expl_type=${typearg[2,-1]//,/\/}
 if [[ -n $type[(r)mtpt] ]]; then
-	mlist=( ${="$(zfs list -H -o mountpoint $typearg)":#no mountpoints available} )
+	mlist=( ${="$(zfs list -H -o mountpoint $typearg 2>/dev/null)":#no mountpoints available} )
 	datasetlist=( $datasetlist $mlist )
 	expl_type="$expl_type/mountpoint"
 fi

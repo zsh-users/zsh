@@ -1,5 +1,15 @@
 2016-07-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 38868: Completion/BSD/Command/_freebsd-update,
+	Completion/BSD/Command/_bsdconfig, Completion/BSD/Command/_fetch,
+	Completion/BSD/Command/_fstat, Completion/BSD/Command/_gstat,
+	Completion/BSD/Command/_jexec, Completion/BSD/Command/_kld,
+	Completion/BSD/Command/_procstat, Completion/BSD/Command/_sysrc,
+	Completion/BSD/Command/_systat, Completion/Unix/Command/_cat,
+	Completion/Unix/Command/_sysctl, Completion/Unix/Command/_vmstat,
+	Completion/Unix/Command/_zfs, Completion/Unix/Type/_zfs_dataset:
+	update completions for new options on FreeBSD
+
 	* 38867: Completion/Linux/Command/_ltrace,
 	Completion/Linux/Command/_strace, Completion/Unix/Command/_truss,
 	Completion/Unix/Type/_sys_calls: update strace completion

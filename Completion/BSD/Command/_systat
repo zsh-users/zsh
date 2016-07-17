@@ -1,12 +1,13 @@
 #compdef systat
 
-local -a screens args opts
+local -a screens opts
 local pre
 case $OSTYPE in
   freebsd*)
     pre=-
     screens=(
       'pigs:processes consuming the most CPU time'
+      'sctp:SCTP statistics'
       icmp{6,}':ICMP statistics'
       ip{6,}':IP and UDP statistics'
       'tcp:TCP statistics'

@@ -18,40 +18,38 @@ case $OSTYPE in
       '1:delay' '2:count'
     )
   ;;
-  freebsd*)
+  freebsd*|openbsd*)
     specs=(
-      '-a[include statistics about all interrupts]'
       '-c[number of times to refresh the display]:count'
       '-f[report on the number fork syscalls since boot and pages of virtual memory for each]'
-      '-h[human readable memory columns output]'
-      '-H[scriptable memory columns output]'
       '-i[report the number of interrupts taken by devices since boot]'
       '-M[source file to extract values associated with the name list from]:core:_files'
       '-N[source file to extract the name list from]:system:_files'
+      '-w[specify delay between each display]:delay (seconds)'
+      '*:disk:_files'
+    )
+  ;|
+  freebsd*)
+    specs+=(
+      '-a[include statistics about all interrupts]'
+      '-h[human readable memory columns output]'
+      '-H[scriptable memory columns output]'
       '-m[report on the usage of kernel dynamic memory allocated using malloc(9) by type]'
       '-n[change the maximum number of disks to display]:number of disks to display'
+      '-o[list virtual memory objects]'
       '-P[report per-cpu system/user/idle cpu statistics]'
       '-p[specify which types of devices to display]: :->devices'
       '-s[display the contents of the SUM structure]:sum'
-      '-w[delay N seconds between each display]:delay'
       '-z[report on memory used by the kernel zone allocator, uma(9), by zone]'
-      '*:disks:_files'
     )
   ;;
   openbsd*)
-    specs=(
-      '-c[number of times to refresh the display]:count'
-      '-f[report on the number fork syscalls since boot and pages of virtual memory for each]'
-      '-i[report the number of interrupts taken by devices since boot]'
-      '-M[source file to extract values associated with the name list from]:core:_files'
+    specs+=(
       '-m[report usage of kernel dynamic memory listed first by size of allocation then type of usage]'
-      '-N[source file to extract the name list from]:system:_files'
       '-s[display the contents of the UVMEXP structure]:uvmexp'
       '-t[report on the number of page in and page reclaims since boot]'
       '-v[print more verbose information]'
-      '-w[delay N seconds between each display]:delay'
       '-z[include statistics about all interrupts]'
-      '*:disks:_files'
     )
   ;;
 esac

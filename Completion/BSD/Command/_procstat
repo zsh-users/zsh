@@ -1,17 +1,24 @@
 #compdef procstat
 
-local pids
-#get list of pids and associated process name as comment
-pids=(${${${(f)"$(/usr/bin/procstat -ah)"}/[[:space:]]#/}/[[:space:]]*[[:space:]](ELF[[:digit:]]#[[:space:]]|-[[:space:]]#)/:})
-
-_arguments -s \
-'-b[display binary information for the process]' \
-'-c[display command line arguments for the process]' \
-'-f[display file descriptor information for the process]' \
-'-k[display the stacks of kernel threads in the process]' \
-'-s[display security credential information for the process]' \
-'-t[display thread information for the process]' \
-'-v[display virtual memory mappings for the process]' \
-'-h[suppress table headers]' \
-'-a[all processes]' \
-':process id:(($pids))'
+_arguments -s -A "-*" -S \
+  '-b[show binary information]' \
+  '-c[show command line arguments]' \
+  '-e[show environment variables]' \
+  '-f[show file descriptor information]' \
+  '-i[show signal pending and disposition]' \
+  '-k[show stacks of kernel threads]' \
+  '-l[show resource limits]' \
+  '-r[show resource usage]' \
+  '-s[show security credential information]' \
+  '-S[show cpuset information]' \
+  '-t[show thread information]' \
+  '-v[show virtual memory mappings]' \
+  '-x[show ELF auxiliary vector]' \
+  '-h[suppress table headers]' \
+  '(1)-a[all processes]' \
+  '-w+[repeat information after specified interval]:delay (seconds)' \
+  '-C[print additional capability information for file descriptors]' \
+  '-H[statistics per-thread rather than per-process]' \
+  '-n[numeric form for signals]' \
+  '1::core file:_path_files -g "*core*(-.)"' \
+  '*:process id:_pids'

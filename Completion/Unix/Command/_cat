@@ -30,6 +30,9 @@ elif [[ "$OSTYPE" == (freebsd|dragonfly|darwin)* ]]; then
     '-v[display non-printing chars as ^X or M-a]'
     '(-)*:files:_files'
   )
+  [[ $OSTYPE = freebsd* ]] && args+=(
+    '-l[set a lock on the stdout file descriptor]'
+  )
 
 else
   # POSIX reqires '-u', and most OSes may support '-n'

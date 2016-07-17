@@ -149,7 +149,7 @@ _zfs() {
 		"atime:value:(on off)"
 		"canmount:value:(on off noauto)"
 		"checksum:value:(on off fletcher2 fletcher4 sha256 sha256+mac)"
-		"compression:value:(on off lzjb gzip gzip-{1..9} zle)"
+		"compression:value:(on off lzjb lz4 gzip gzip-{1..9} zle)"
 		"copies:value:(1 2 3)"
 		"dedup:value:(on off verify sha256 sha256,verify)"
 		"devices:value:(on off)"
@@ -247,7 +247,7 @@ _zfs() {
 			':filesystem/volume/snapshot:_zfs_dataset -t fs -t vol'
 		;;
 
-	("snapshot")
+	(snap(|shot))
 		_arguments -A "-*" \
 			'-r[Recursively snapshot all descendant datasets]' \
 			'*-o[Set property]:property:_values -s , "property" $create_properties' \
@@ -418,30 +418,16 @@ _zfs() {
 
 	("allow")
 		_arguments -A "-*" \
-			- set1 \
-			':filesystem/volume:_zfs_dataset -t fs -t vol' \
-			- set2 \
-			'(-g)-u[User]:user:_users' \
-			'(-u)-g[Group]:group:_groups' \
-			'-l[Allow for named dataset]' \
-			'-d[Allow for descendent datasets]' \
+			'(1 -g -e -c -s)-u[delegate to user]:user:_users' \
+			'(1 -u -e -c -s)-g[delegate to group]:group:_groups' \
+			'(1 -g -u -c -s)-e[delegate to everyone]' \
+			'(1 -u -g -e -l -d -s)-c[set permissions for newly-created descendant filesystems]' \
+			'(1 -u -g -e -l -d -c)-s[define or modify permission sets]:permission set' \
+			'(1 -c -s)-l[allow for named dataset]' \
+			'(1 -c -s)-d[allow for descendent datasets]' \
+			'1::filesystem/volume:_zfs_dataset -t fs -t vol' \
 			':permissions or sets:_values -s , "permission or set" $delegatable_perms' \
 			':filesystem/volume:_zfs_dataset -t fs -t vol' \
-			- set3 \
-			'-e[Everyone]' \
-			'-l[Allow for named dataset]' \
-			'-d[Allow for descendent datasets]' \
-			':permissions or sets:_values -s , "permission or set" $delegatable_perms' \
-			':filesystem/volume:_zfs_dataset -t fs -t vol' \
-			- set4 \
-			'-c[Create-time permissions]' \
-			':permissions or sets:_values -s , "permission or set" $delegatable_perms' \
-			':filesystem/volume:_zfs_dataset -t fs -t vol' \
-			- set5 \
-			'-s[Define or modify permission sets]' \
-			':setname:' \
-			':permissions or sets:_values -s , "permission or set" $delegatable_perms' \
-			':filesystem/volume:_zfs_dataset -t fs -t vol'
 		;;
 
 	("unallow")

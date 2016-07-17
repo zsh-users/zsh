@@ -2,6 +2,7 @@
 
 local -a shortcuts
 shortcuts=(
+  api
   'console:utilities to customize the behavior of the system console'
   'defaultrouter:default router/gateway'
   'diskmgmt:manage disk partitions and/or labels using sade(8)'
@@ -12,6 +13,7 @@ shortcuts=(
   'groupedit:edit/view groups'
   'groupmgmt:utilities to add/change/view/delete group accounts'
   'hostname:set hostname/domainname'
+  includes
   'kern_securelevel:set kern.securelevel variable'
   'mouse:utilities for configuring, exploring, and enabling console mouse support'
   'mouse_disable:disable mouse support'
@@ -43,13 +45,19 @@ shortcuts=(
   'userdel:delete users'
   'useredit:edit/view users'
   'usermgmt:utilities to add/edit/view/delete user accounts'
+  vt_font
+  vt_keymap
+  vt_repeat
+  vt_saver
+  vt_screenmap
+  vt_ttys
 )
 
 _arguments -s -w -A '-*' : \
   '-d[debug mode]' \
   '-D[send debug info to file]: :{ compset -P 1 +; _files }' \
   '-f[load file as script then exit]: : _files' \
-  '-h[print usage then exit]' \
+  '-h[display help information]' \
   '-S[secure X11 mode]' \
   '-X[use Xdialog(1)]' \
-  '1:bsdconfig(8) menus:(( $shortcuts ))'
+  '1:bsdconfig(8) menu:(( $shortcuts ))'

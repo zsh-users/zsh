@@ -1,21 +1,39 @@
 #compdef sysctl
 
+local -a args
+
 case $OSTYPE in
+  freebsd<10->.*)
+    args+=(
+      '-f+[specify file of name/value pairs to process first]:file:_files'
+      '-T[display only variables that are setable via loader]'
+      '-W[display only writable variables that are not statistical]'
+    )
+  ;|
+  dragonfly*|freebsd<8->.*)
+    args+=( "-i[silently exit if variable doesn't exist]" )
+  ;|
   *freebsd<5->.*|freebsd4.[4-9]*)
     local -a sysctlvars
     sysctlvars=( $(_call_program sysctl-variables sysctl -aN) )
-    _arguments -s -A "-*" \
+    _arguments -s -S -A "-*" $args \
+      '(-a -o *)-A[equivalent to -o -a (for compatibility)]' \
       '(*)-a[list all]' \
       '-b[binary output]' \
+      '-d[print the description of the variable instead of its value]' \
+      '(-N -n)-e[separate name and value with =]' \
+      '-h[format output for human readability]' \
       '(-n)-N[show only variable names]' \
       '(-N)-n[show only variable values]' \
       '(-x)-o[show opaques as well (values suppressed)]' \
+      '-q[suppress some warnings]' \
+      '(* -o)-X[equivalent to -x -a (for compatibility)]' \
       '(-o)-x[show opaques as well (entire values)]' \
       '(-a)*:sysctl variable:_multi_parts -i . sysctlvars'
   ;;
   freebsd[0-4].*|darwin*|dragonfly*)
     : ${(A)_cache_sysctlvars:=${${$(sysctl -A 2>/dev/null):#[^a-z]*}%%:*}}
-    _arguments -s -A "-*" \
+    _arguments -s -A "-*" $args \
       '(-w -X *)-a[list all]' \
       '(-w -X *)-A[show all opaques (values suppressed)]' \
       '(-w)-b[binary output]' \
