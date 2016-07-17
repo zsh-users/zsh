@@ -2571,15 +2571,14 @@ When one of the incremental history search widgets is active, the
 area of the command line matched by the search string or pattern.
 )
 item(tt(region))(
-The region between the cursor (point) and the mark as set with
-tt(set-mark-command).  The region is only highlighted if it is active,
-which is the case if tt(set-mark-command) or tt(exchange-point-and-mark)
-has been called and the line has not been subsequently modified.  The
-region can be deactivated by calling tt(set-mark-command) with a
-negative numeric argument, or reactivated by calling
-tt(exchange-point-and-mark) with a zero numeric argument.  Note
-that whether or not the region is active has no effect on its
-use within widgets, it simply determines whether it is highlighted.
+The currently selected text. In emacs terminology, this is referred to as
+the region and is bounded by the cursor (point) and the mark. The region
+is only highlighted if it is active, which is the case after the mark
+is modified with tt(set-mark-command) or tt(exchange-point-and-mark).
+Note that whether or not the region is active has no effect on its
+use within emacs style widgets, it simply determines whether it is
+highlighted. In vi mode, the region corresponds to selected text in
+visual mode.
 )
 cindex(special characters, highlighting)
 cindex(highlighting, special characters)

@@ -1,3 +1,9 @@
+2016-07-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 38845: Src/Zle/zle_main.c, Doc/Zsh/zle.yo: reset region_active
+	before entering zle - it was on exit but before zle-line-finish
+	Also reword documentation on region to better cover vi mode
+
 2016-07-13  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 38850: Functions/Zle/add-zle-hook-widget: Simplify indexing

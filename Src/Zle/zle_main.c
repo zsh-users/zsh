@@ -1159,7 +1159,6 @@ zlecore(void)
 
     }
 
-    region_active = 0;
     popheap();
 }
 
@@ -1292,6 +1291,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     lastcol = -1;
     initmodifier(&zmod);
     prefixflag = 0;
+    region_active = 0;
 
     zrefresh();
 
