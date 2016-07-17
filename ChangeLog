@@ -1,5 +1,7 @@
 2016-07-17  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Functions/Misc/add-zle-hook-widget:  Move from Zle/.
+	
 	* 38866: Doc/Zsh/contrib.yo: update add-zle-hook-widget for 38850.
 
 	* 38866 (+ tweak 38872): Functions/Zle/add-zle-hook-widget: fix
