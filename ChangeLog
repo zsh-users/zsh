@@ -1,5 +1,8 @@
 2016-07-17  Oliver Kiddle  <opk@zsh.org>
 
+	* Marko Myllynen: 38837 (tweaked c.f. 38826):
+	Completion/Unix/Command/_libvirt: new virsh completion
+
 	* 38845: Src/Zle/zle_main.c, Doc/Zsh/zle.yo: reset region_active
 	before entering zle - it was on exit but before zle-line-finish
 	Also reword documentation on region to better cover vi mode

@@ -1,0 +1,55 @@
+#compdef virsh
+
+local curcontext="$curcontext" state line expl ret=1
+
+case $service in
+  virsh)
+    if (( ! $+_cache_virsh_cmds )); then
+      _cache_virsh_cmds=( ${${${${(f):-"$(_call_program options virsh help)"}:#*:}/# ##}/ *} )
+    fi
+    if (( ! $+_cache_virsh_cmdopts )); then
+      typeset -gA _cache_virsh_cmdopts
+    fi
+    _arguments -A "-*" -C -S -s -w \
+      '(- *)'{-h,--help}'[print help information and exit]' \
+      '(- *)'{-v,--version=short}'[print short version information and exit]' \
+      '(- *)'{-V,--version=long}'[print long version information and exit]' \
+      '(-c --connect)'{-c+,--connect}'[specify connection URI]:URI:_hosts' \
+      '(-d --debug)'{-d+,--debug}'[set debug level]:level:(0 1 2 3 4)' \
+      '(-e --escape)'{-e+,--escape}'[set escape sequence for console]:sequence' \
+      '(-k --keepalive-interval)'{-k+,--keepalive-interval}'[set keepalive interval]:interval' \
+      '(-K --keepalive-count)'{-K+,--keepalive-count}'[set keepalive count]:count' \
+      '(-l --log)'{-l+,--log}'[specify log file]:file:_files' \
+      '(-q --quiet)'{-q,--quiet}'[quiet mode]' \
+      '(-r --readonly)'{-r,--readonly}'[connect readonly]' \
+      '(-t --timing)'{-t,--timing}'[print timing information]' \
+      '1:command:->virsh_cmds' \
+      '*:cmdopt:->virsh_cmdopts' && return
+      # We accept only virsh command options after the first non-option argument
+      # (i.e., the virsh command itself), this makes it so with the -A "-*" above
+      [[ -z $state ]] && state=virsh_cmdopts
+  ;;
+esac
+
+case $state in
+  virsh_cmds)
+    _wanted commands expl 'virsh command' compadd -a _cache_virsh_cmds && ret=0
+  ;;
+  virsh_cmdopts)
+    local cmd
+    if [[ $words[-1] == /* || $words[-1] == ./* ]]; then
+      _default
+      return
+    fi
+    for (( i = 2; i <= $#words; i++ )); do
+      [[ -n "${_cache_virsh_cmds[(r)$words[$i]]}" ]] && cmd=$words[$i] && break
+    done
+    [[ -z $cmd ]] && return 1
+    if [[ -z $_cache_virsh_cmdopts[$cmd] ]]; then
+      _cache_virsh_cmdopts[$cmd]=${(M)${${${${=${(f)"$(_call_program virsh virsh help $cmd 2>&1)"}}/\[}/\]}/\;}:#-[-0-9A-Za-z]*}
+    fi
+    _values -w options ${=_cache_virsh_cmdopts[$cmd]} && ret=0
+  ;;
+esac
+
+return ret
