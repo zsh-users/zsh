@@ -41,7 +41,10 @@
 typedef struct gmatch *Gmatch;
 
 struct gmatch {
+    /* Metafied file name */
     char *name;
+    /* Unmetafied file name; embedded nulls can't occur in file names */
+    char *uname;
     /*
      * Array of sort strings:  one for each GS_EXEC sort type in
      * the glob qualifiers.
@@ -911,7 +914,8 @@ gmatchcmp(Gmatch a, Gmatch b)
     for (i = gf_nsorts, s = gf_sortlist; i; i--, s++) {
 	switch (s->tp & ~GS_DESC) {
 	case GS_NAME:
-	    r = zstrcmp(b->name, a->name, gf_numsort ? SORTIT_NUMERICALLY : 0);
+	    r = zstrcmp(b->uname, a->uname,
+			gf_numsort ? SORTIT_NUMERICALLY : 0);
 	    break;
 	case GS_DEPTH:
 	    {
@@ -1859,6 +1863,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 	int nexecs = 0;
 	struct globsort *sortp;
 	struct globsort *lastsortp = gf_sortlist + gf_nsorts;
+	Gmatch gmptr;
 
 	/* First find out if there are any GS_EXECs, counting them. */
 	for (sortp = gf_sortlist; sortp < lastsortp; sortp++)
@@ -1907,6 +1912,29 @@ zglob(LinkList list, LinkNode np, int nountok)
 
 		    iexec++;
 		}
+	    }
+	}
+
+	/*
+	 * Where necessary, create unmetafied version of names
+	 * for comparison.  If no Meta characters just point
+	 * to original string.  All on heap.
+	 */
+	for (gmptr = matchbuf; gmptr < matchptr; gmptr++)
+	{
+	    char *nptr;
+	    for (nptr = gmptr->name; *nptr; nptr++)
+	    {
+		if (*nptr == Meta)
+		    break;
+	    }
+	    if (*nptr == Meta)
+	    {
+		int dummy;
+		gmptr->uname = dupstring(gmptr->name);
+		unmetafy(gmptr->uname, &dummy);
+	    } else {
+		gmptr->uname = gmptr->name;
 	    }
 	}
 

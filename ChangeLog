@@ -1,3 +1,9 @@
+2016-07-18  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 38879: Src/glob.c, Test/D07multibyte.ztst: Ensure file names
+	are sorted unmetafied.  Test using Polish UTF-8 collation
+	sequence.
+
 2016-07-18  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 38785 (plus tweak): Completion/Zsh/Command/_print: add -v

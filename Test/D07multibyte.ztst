@@ -562,3 +562,20 @@
   }
   : $functions)
 0:Multibtye handled of functions parameter
+
+  if [[ -n ${$(locale -a 2>/dev/null)[(R)pl_PL.utf8]} ]]; then
+  (
+    export LC_ALL=pl_PL.UTF-8
+    local -a names=(a b c d e f $'\u0105' $'\u0107' $'\u0119')
+    print -o $names
+    mkdir -p plchars
+    cd plchars
+    touch $names
+    print ?
+  )
+  else
+    ZTST_skip="No Polish UTF-8 local found, skipping sort test"
+  fi
+0:Sorting of metafied Polish characters
+>a ą b c ć d e ę f
+>a ą b c ć d e ę f
