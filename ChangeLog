@@ -1,3 +1,8 @@
+2016-07-19  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 38862: Src/Modules/datetime.c: strptime(3) requires _XOPEN_SOURCE
+	on Cygwin (newlib-2.4 or later)
+
 2016-07-18  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 38879: Src/glob.c, Test/D07multibyte.ztst: Ensure file names
