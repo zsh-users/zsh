@@ -1922,13 +1922,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 	 */
 	for (gmptr = matchbuf; gmptr < matchptr; gmptr++)
 	{
-	    char *nptr;
-	    for (nptr = gmptr->name; *nptr; nptr++)
-	    {
-		if (*nptr == Meta)
-		    break;
-	    }
-	    if (*nptr == Meta)
+	    if (strchr(gmptr->name, Meta))
 	    {
 		int dummy;
 		gmptr->uname = dupstring(gmptr->name);
