@@ -1,8 +1,5 @@
 #compdef add-zsh-hook
 
-local context state state_descr line
-typeset -A opt_args
-
 _add-zsh-hook_hooks() {
   if (( $+opt_args[-d] )); then
     _wanted functions expl "installed hooks" compadd -a - "$line[1]_functions" && return 0
@@ -13,6 +10,8 @@ _add-zsh-hook_hooks() {
 }
 
 _add-zsh-hook() {
+  local context state state_descr line
+  typeset -A opt_args
   _arguments -s -w -S : \
     '(-D)-d[remove HOOK from the array]' \
     '(-d)-D[interpret HOOK as pattern to remove from the array]' \
