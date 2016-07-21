@@ -1,5 +1,10 @@
 2016-07-21  Oliver Kiddle  <opk@zsh.org>
 
+	* 38904: Completion/Base/Core/_normal,
+	Completion/Unix/Command/_iostat, Completion/Unix/Command/_top:
+	fix return status in _normal and functions erroneously using
+	it for default completion
+
 	* 38894: Marko Myllynen: Completion/Unix/Command/_libvirt:
 	completion for virt-admin and libvirt client/server IDs/names
 

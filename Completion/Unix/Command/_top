@@ -98,4 +98,4 @@ if (( $#specs )); then
   return
 fi
 
-_normal
+_default

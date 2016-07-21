@@ -30,9 +30,9 @@ if [[ CURRENT -eq 1 ]]; then
   curcontext="${curcontext%:*:*}:-command-:"
 
   comp="$_comps[-command-]"
-  [[ -n "$comp" ]] && eval "$comp" && ret=0
+  [[ -n "$comp" ]] && eval "$comp" && return
 
-  return ret
+  return 1
 fi
 
 _set_command
