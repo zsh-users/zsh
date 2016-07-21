@@ -1,3 +1,8 @@
+2016-07-21  Oliver Kiddle  <opk@zsh.org>
+
+	* 38894: Marko Myllynen: Completion/Unix/Command/_libvirt:
+	completion for virt-admin and libvirt client/server IDs/names
+
 2016-07-21  Felipe Sateler  <fsateler@debian.org>
 
 	* 38901: Completion/Debian/Command/_schroot: Add -r/--run-session

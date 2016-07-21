@@ -1,33 +1,83 @@
-#compdef virsh
+#compdef virsh virt-admin virt-host-validate virt-pki-validate virt-xml-validate
 
 local curcontext="$curcontext" state line expl ret=1
+
+local exargs="-h --help -V -v --version=short --version=long"
+local -a common_opts interact_cmds
+common_opts=(
+  '(- *)'{-h,--help}'[print help information and exit]'
+  '(- *)'{-v,--version=short}'[print short version information and exit]'
+  '(- *)'{-V,--version=long}'[print long version information and exit]'
+  "(-c --connect $exargs)"{-c+,--connect=}'[specify connection URI]:URI:_hosts'
+  "(-d --debug -q --quiet $exargs)"{-d+,--debug=}'[set debug level]:level:(0 1 2 3 4)'
+  "(-l --log $exargs)"{-l+,--log=}'[specify log file]:file:_files'
+  "(-q --quiet -d --debug $exargs)"{-q,--quiet}'[quiet mode]'
+)
+interact_cmds=(cd echo exit quit connect)
 
 case $service in
   virsh)
     if (( ! $+_cache_virsh_cmds )); then
       _cache_virsh_cmds=( ${${${${(f):-"$(_call_program options virsh help)"}:#*:}/# ##}/ *} )
+      local icmd
+      for icmd in $interact_cmds; do
+        _cache_virsh_cmds[$_cache_virsh_cmds[(i)$icmd]]=()
+      done
     fi
     if (( ! $+_cache_virsh_cmdopts )); then
       typeset -gA _cache_virsh_cmdopts
     fi
     _arguments -A "-*" -C -S -s -w \
-      '(- *)'{-h,--help}'[print help information and exit]' \
-      '(- *)'{-v,--version=short}'[print short version information and exit]' \
-      '(- *)'{-V,--version=long}'[print long version information and exit]' \
-      '(-c --connect)'{-c+,--connect}'[specify connection URI]:URI:_hosts' \
-      '(-d --debug)'{-d+,--debug}'[set debug level]:level:(0 1 2 3 4)' \
-      '(-e --escape)'{-e+,--escape}'[set escape sequence for console]:sequence' \
-      '(-k --keepalive-interval)'{-k+,--keepalive-interval}'[set keepalive interval]:interval' \
-      '(-K --keepalive-count)'{-K+,--keepalive-count}'[set keepalive count]:count' \
-      '(-l --log)'{-l+,--log}'[specify log file]:file:_files' \
-      '(-q --quiet)'{-q,--quiet}'[quiet mode]' \
-      '(-r --readonly)'{-r,--readonly}'[connect readonly]' \
-      '(-t --timing)'{-t,--timing}'[print timing information]' \
+      "$common_opts[@]" \
+      "(-e --escape $exargs)"{-e+,--escape=}'[set escape sequence for console]:sequence' \
+      "(-k --keepalive-interval $exargs)"{-k+,--keepalive-interval=}'[set keepalive interval]:interval' \
+      "(-K --keepalive-count $exargs)"{-K+,--keepalive-count=}'[set keepalive count]:count' \
+      "(-r --readonly $exargs)"{-r,--readonly}'[connect readonly]' \
+      "(-t --timing $exargs)"{-t,--timing}'[print timing information]' \
       '1:command:->virsh_cmds' \
       '*:cmdopt:->virsh_cmdopts' && return
       # We accept only virsh command options after the first non-option argument
       # (i.e., the virsh command itself), this makes it so with the -A "-*" above
       [[ -z $state ]] && state=virsh_cmdopts
+  ;;
+  virt-admin)
+    if (( ! $+_cache_virt_admin_cmds )); then
+      _cache_virt_admin_cmds=( ${${${${(f):-"$(_call_program options virt-admin help)"}:#*:}/# ##}/ *} )
+      local icmd
+      for icmd in $interact_cmds; do
+        _cache_virt_admin_cmds[$_cache_virt_admin_cmds[(i)$icmd]]=()
+      done
+    fi
+    if (( ! $+_cache_virt_admin_cmdopts )); then
+      typeset -gA _cache_virt_admin_cmdopts
+    fi
+    _arguments -A "-*" -C -S -s -w \
+      "$common_opts[@]" \
+      '1:command:->virt_admin_cmds' \
+      '*:cmdopt:->virt_admin_cmdopts' && return
+      # Same as with virsh above
+      [[ -z $state ]] && state=virt_admin_cmdopts
+  ;;
+  virt-host-validate)
+    _arguments -A "-*" -S \
+      '(- *)'{-h,--help}'[print help information and exit]' \
+      '(- *)'{-v,--version}'[print version information and exit]' \
+      '(- *)'{-q,--quiet}'[quiet mode]' \
+      '1:hv-type:(qemu lxc)' && return
+  ;;
+  virt-pki-validate)
+    _arguments -A "-*" -S \
+      '(- *)'{-h,--help}'[print help information and exit]' \
+      '(- *)'{-V,--version}'[print version information and exit]' \
+      && return
+  ;;
+  virt-xml-validate)
+    _arguments -A "-*" -S \
+      '(- *)'{-h,--help}'[print help information and exit]' \
+      '(- *)'{-V,--version}'[print version information and exit]' \
+      '1:file:_files -g "*.xml(-.)"' \
+      '2:schema:(domainsnapshot domain network storagepool storagevol nodedev capability nwfilter secret interface)' \
+      && return
   ;;
 esac
 
@@ -50,6 +100,33 @@ case $state in
     fi
     _values -w options ${=_cache_virsh_cmdopts[$cmd]} && ret=0
   ;;
+  virt_admin_cmds)
+    _wanted commands expl 'virt-admin command' compadd -a _cache_virt_admin_cmds && ret=0
+  ;;
+  virt_admin_cmdopts)
+    local cmd
+    for (( i = 2; i <= $#words; i++ )); do
+      [[ -n "${_cache_virt_admin_cmds[(r)$words[$i]]}" ]] && cmd=$words[$i] && break
+    done
+    [[ -z $cmd ]] && return 1
+    if [[ $words[-2] == --server ]]; then
+      _values servers ${=${(S)${${(f)$(sudo virt-admin srv-list)}##*--- }//[0-9]* }} && return 0
+    fi
+    if [[ $words[-2] == --client ]]; then
+      local srv
+      for (( i = 2; i <= $#words; i++ )); do
+        [[ $words[$i] == --server ]] && srv=$words[$i+1] && break
+      done
+      [[ -z $srv ]] && return 1
+      _values servers ${=${${(f):-"$(sudo virt-admin srv-clients-list --server $srv)"}/ [a-z]*}//[^0-9]} && return 0
+    fi
+    if [[ -z $_cache_virt_admin_cmdopts[$cmd] ]]; then
+      _cache_virt_admin_cmdopts[$cmd]=${(M)${${${${=${(f)"$(_call_program virt-admin virt-admin help $cmd 2>&1)"}}/\[}/\]}/\;}:#-[-0-9A-Za-z]*}
+    fi
+    [[ -n $_cache_virt_admin_cmdopts[$cmd] ]] && \
+      _values -w options ${=_cache_virt_admin_cmdopts[$cmd]} && ret=0
+  ;;
+
 esac
 
 return ret
