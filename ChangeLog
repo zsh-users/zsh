@@ -1,3 +1,7 @@
+2016-07-21  Felipe Sateler  <fsateler@debian.org>
+
+	* 38901: Completion/Debian/Command/_schroot: Add -r/--run-session
+
 2016-07-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 38853: Src/glob.c: use strchr().

@@ -20,6 +20,7 @@ _arguments -S \
        '(-v --verbose)'{-v,--verbose}'[verbose]' \
        '(-V --version)'{-V,--version}'[version]' \
        '(-b --begin-session)'{-b,--begin-session}'[begin a session; returns a session ID]' \
+       '(-r --run-session)'{-r,--run-session}'[run an existing session]' \
        '--recover-session[recover an existing session]' \
        '(-e --end-session)'{-e,--end-session}'[end an existing session]' \
        '(-f --force)'{-f,--force}'[force operation]' \
