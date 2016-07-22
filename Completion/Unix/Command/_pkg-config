@@ -20,7 +20,7 @@ arguments=(
       "--libs-only-l[print the -l part of \"--libs\"]"
       "--libs-only-other[output other libs]"
       "--list-all[list all known packages]"
-      "--variable=[return the value of the specified variable]:variable"
+      "--variable=[return the value of the specified variable]:variable:->variable"
       "--define-variable=[set the global value for a variable]:name value pair"
       "--uninstalled[return success if any \"-uninstalled\" packages are being used]"
       "--exists[test whether the package exists or not]"
@@ -33,11 +33,23 @@ arguments=(
       "*: :->packages"
 )
 
-_arguments -C $arguments && ret=0
+_arguments -C -S : $arguments && ret=0
 
-if [[ -n $state ]] ; then
-  packages=( ${${(f)"$(_call_program packages pkg-config --list-all)"}%% *} )
-  _wanted packages expl 'package' compadd -a - packages && ret=0
-fi
+case $state in
+  (packages)
+    packages=( ${${(f)"$(_call_program packages pkg-config --list-all)"}%% *} )
+    _wanted packages expl 'package' compadd -a - packages && ret=0
+  ;;
+
+  (variable)
+    if [[ $line[1] != '-' ]]; then
+      local -a variables=( ${${(f)"$(_call_program variables "pkg-config --print-variables -- ${(q)line[1]}")"}} )
+      _wanted variables expl 'variable' compadd -a - variables && ret=0
+    else
+      _message "variable"
+    fi
+    ;;
+
+esac
 
 return ret

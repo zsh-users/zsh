@@ -1,5 +1,8 @@
 2016-07-23  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38913: Completion/Unix/Command/_pkg-config: Complete variables
+	for --variable.
+
 	* 38911: Doc/Zsh/compsys.yo: _arguments: Clarify documentation of
 	'-s -w' switch
 
