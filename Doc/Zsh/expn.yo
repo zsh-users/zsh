@@ -219,9 +219,12 @@ noted.
 startitem()
 item(tt(a))(
 Turn a file name into an absolute path:  prepends the current directory,
-if necessary, and resolves any use of `tt(..)' and `tt(.)' in the path.
-Note that the transformation takes place even if the file or any
-intervening directories do not exist.
+if necessary; remove `tt(.)' path segments; and remove `tt(..)' path segments
+and the segments that immediately precede them.
+
+This transformation is agnostic of the filesystem: `tt(/foo/bar/../baz)' shall
+always be transformed to `tt(/foo/baz)', regardless of whether `tt(/foo)'
+exists or what kind of object (dir, file, symlink, etc.) it is.
 )
 item(tt(A))(
 Turn a file name into an absolute path as the `tt(a)' modifier does, and
