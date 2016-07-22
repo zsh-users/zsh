@@ -1,3 +1,8 @@
+2016-07-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 38914 (tweaked): Completion/Unix/Command/_pkg-config: Add
+	options, complete *.pc files for positional arguments.
+
 2016-07-26  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 38945: Doc/Zsh/expn.yo: additional notes on :a behaviour.
