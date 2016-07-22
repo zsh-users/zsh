@@ -3591,8 +3591,9 @@ even if one or more of the options take
 arguments.  For example, if tt(-x) takes an argument, with no
 tt(-s), `tt(-xy)' is considered as a single (unhandled) option; with
 tt(-s), tt(-xy) is an option with the argument `tt(y)'; with both tt(-s)
-and tt(-w), tt(-xy) may be the option tt(-x) and the option tt(-y) with
-arguments still to come.
+and tt(-w), tt(-xy) is the option tt(-x) and the option tt(-y) with
+arguments to tt(-x) (and to tt(-y), if it takes arguments) still to come
+in subsequent words.
 )
 item(tt(-W))(
 This option takes tt(-w) a stage further:  it is possible to
