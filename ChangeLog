@@ -1,3 +1,9 @@
+2016-07-23  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 38923 (plus expanded comment): Src/jobs.c: zwaitjob() continues
+	waiting for children that may have ignored the interrupt signal,
+	even if the current shell has been interrupted.
+
 2016-07-22  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* users/21779: Doc/Zsh/expn.yo: Clarify documentation of the

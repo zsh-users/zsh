@@ -1472,7 +1472,7 @@ zwaitjob(int job, int wait_cmd)
 	     */
 	    pipecleanfilelist(jn->filelist, 0);
 	}
-	while (!errflag && jn->stat &&
+	while (!(errflag & ERRFLAG_ERROR) && jn->stat &&
 	       !(jn->stat & STAT_DONE) &&
 	       !(interact && (jn->stat & STAT_STOPPED))) {
 	    signal_suspend(SIGCHLD, wait_cmd);
@@ -1493,6 +1493,13 @@ zwaitjob(int job, int wait_cmd)
 	      to remove ERRFLAG_ERROR and leave ERRFLAG_INT set, since
 	      that's the one related to ^C.  But that doesn't work.
 	      There's something more here we don't understand.  --pws
+
+	      The change above to ignore ERRFLAG_INT in the loop test
+	      solves a problem wherein child processes that ignore the
+	      INT signal were never waited-for.  Clearing the flag here
+	      still seems the wrong thing, but perhaps ERRFLAG_INT
+	      should be saved and restored around signal_suspend() to
+	      prevent it being lost within a signal trap?  --Bart
 
            errflag = 0; */
 
