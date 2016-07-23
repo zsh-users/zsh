@@ -973,7 +973,7 @@ _git-grep () {
   # don't complete treeishs.
   case $state in
     (tree-or-file)
-      integer first_tree last_tree start end
+      integer first_tree last_tree start end i
 
       (( start = words[(I)(-f|-e)] > 0 ? 1 : 2 ))
       (( end = $#line - 1 ))

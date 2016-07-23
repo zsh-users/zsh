@@ -1,5 +1,8 @@
 2016-07-23  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Completion/Unix/Command/_git: _git-grep: Stop
+	leaking the parameter $i.
+
 	* unposted: Completion/Debian/Type/_deb_packages: Minor
 	optimization.
 
