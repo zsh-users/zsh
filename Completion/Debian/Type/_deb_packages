@@ -122,7 +122,7 @@ _deb_packages () {
 
   typeset -gH $cachevar
 
-  _tags packages && compadd "$expl[@]" - "${(@P)cachevar}"
+  _tags packages && compadd "$expl[@]" -a - $cachevar
 }
 
 _debs_caching_policy () {

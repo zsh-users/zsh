@@ -1,5 +1,8 @@
 2016-07-23  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Completion/Debian/Type/_deb_packages: Minor
+	optimization.
+
 	* 38913: Completion/Unix/Command/_pkg-config: Complete variables
 	for --variable.
 
