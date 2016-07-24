@@ -1,29 +1,65 @@
-#compdef info tkinfo install-info makeinfo texi2dvi texindex
+#compdef info tkinfo install-info makeinfo texi2any texi2dvi pdftexi2dvi texi2pdf texindex
 
-local curcontext="$curcontext" state line ret=1
-local -A opt_args
-local -a info
+_info_nodes_caching_policy() {
+  local dir oldp
+  for dir in $^infopath/usr/share/info}/dir(.N); do
+    # rebuild if any dir file is newer than cache
+    [[ $dir -nt $1 ]] && return
+  done
+  # and if we didn't find a dir file, rebuild if cache older than a month
+  if [[ -z $dir ]]; then
+    oldp=( "$1"(mM+1) )
+    (( $#oldp )) && return
+  fi
+  return 1
+}
+
+_info_retrieve_nodes() {
+  # expects $cmd, $hash and $infopath to be set
+  local update_policy
+  zstyle -s ":completion:${curcontext}:" cache-policy update_policy
+  if [[ -z "$update_policy" ]]; then
+    zstyle ":completion:${curcontext}:" cache-policy \
+      _info_nodes_caching_policy
+  fi
+
+  if _cache_invalid info-nodes-$hash || ! _retrieve_cache info-nodes-$hash; then
+    set -A _cache_info_nodes_$hash \
+      ${${${${(f)"$(INFOPATH="${(j.:.)infopath}" _call_program info-nodes $cmd -k '')"}%%\" --*}#??}/\)/:}
+    _store_cache info-nodes-$hash _cache_info_nodes_$hash
+  fi
+}
+
+local curcontext="$curcontext" state line cmd ret=1
+local -A opt_args infodirs
 
 case $service in
   info)
-    info=( _call_program info ${words[1]} )
+    cmd=${words[1]}
     _arguments -C -s \
-      '(: -)--apropos=[look up string in indices]:search string: ' \
-      '(-f --file)'{\*-d,\*--directory=}'[add directory to infopath]:info dir:_files -/' \
+      '(-a --all)'{-a,--all}'[use all matching manuals]' \
+      '(: -)'{-k+,--apropos=}'[look up string in indices]:search string: ' \
+      \*{-d+,--directory=}'[add directory to infopath]:info dir:_files -/' \
       '--dribble=[record keystrokes]:file with keystrokes:_files' \
-      '(-f --file -d --directory)'{-f,--file=}'[info file to show]:info file:_files -g "*.info(|.gz|.bz2)(-.)"' \
+      '(-f --file 1)'{-f+,--file=}'[specify Info manual to visit]:info manual:->infofiles' \
       '(: - -h --help)'{-h,--help}'[display usage]' \
       '(-o --output -O)--index-search=[go directly to node if found]:search string: ' \
-      '(--index-search -o --output -O)'{-o,--output=}'[dump selected nodes to filename]:filename:_files -g "*(-.)"' \
-      '(-R --raw-escapes)'{-R,--raw-escapes}'[do not remove ANSI escapes from man pages]' \
+      '(--index-search -o --output -O)'{-o+,--output=}'[dump selected nodes to filename]:filename:_files -g "*(-.)"' \
+      '(-n --node)'{-n+,--node=}'[specify nodes in first visited Info file]:node:->nodes' \
+      '--no-raw-escapes[output escapes as literal text]' \
       '--restore=[read keystrokes from file]:filename:_files -g "*(-.)"' \
       '(--index-search -o --output -O --show-options --usage)'{-O,--show-options,--usage}'[go to command-line options node]' \
+      '--strict-node-location[(for debugging) use Info file pointers as-is]' \
       '--subnodes[recursively output menu items]' \
+      \*{-v,--variable}'[assign to Info variable]:variable' \
       '--vi-keys[use Vi-like key bindings]' \
       '(: -)--version[display version information]' \
-      '(--apropos -h --help -O --output --version)*::menu item:->item' && ret=0
+      '(-w --where --location)'{-w,--where,--location}'[print physical location of Info file]' \
+      '(-x --debug)'{-x+,--debug=}'[set debugging level]:number' \
+      '1:menu item:->infomanuals' \
+      '2:node:->nodes' && ret=0
 
-    info=( $info {(kv)opt_args[(I)(-d|--directory|-f|--file)]} )
+    infodirs=( "${(@Qkv)opt_args[(I)(-d|--directory)]}" )
   ;;
   install-info)
     if _pick_variant debian=Debian gnu --version; then
@@ -41,131 +77,216 @@ case $service in
         '--description=[specify description for menu entry]:description' \
         '--menuentry=[specify the menu entry for dir file]:menu entry' \
         '--keep-old=[inhibit replacement of existing entries/removal of empty sections]' \
-        '--test[do not update dir file]' \
+        "--test[don't update dir file]" \
         '--debug[enable debugging]' \
         '*:info file:_files -g "*.info(-.)"'
 	return
     else
       _arguments \
+	'--add-once[add only to first matching section]' \
+	'--align=[specify minimum indentation for description]:indentation' \
+	'--calign=[specify minimum indentation for continuation lines of description]:indentation' \
+        '--debug[report what is being done]' \
         '(--delete --remove)'{--delete,--remove}'[delete existing entries]' \
+        '--description=[specify description for menu entry]:description' \
         '(2)--dir-file=[specify dir file]:dir file:_files -g "dir(-.)"' \
+	'(--test --dry-run)'{--dry-run,--test}"[don't update dir file]" \
         \*{--entry,--info}'[specify directory entry to add]:text' \
+	'--defsection=[like --section, but only use text if no sections present in info file]:text' \
+	{--maxwidth,--max-width}'=[specify maximum width of dir file]:width' \
         '(- 1 2)--help[display help information]' \
         '(1)--info-file=[specify info file to install in the directory]:info file:_files -g "*.info(-.)"' \
         '(2)--info-dir=[specify directory containing dir file]:info directory:_files -/' \
+        '--keep-old=[inhibit replacement of existing entries/removal of empty sections]' \
+	'(--name --menuentry)'{--name,--menuentry}'=[specify the menu entry for dir file]:menu entry' \
+	"--no-indent[don't format new entries in the DIR file]"
         '--quiet[suppress warnings]' \
-        '(--delete --remove)--section=[put new entries in specified section]' \
+	'--regex=[specify sections for file entries using a regex]:regex' \
+        '(--delete --remove)--section=[put new entries in specified section]:section' \
+        '--silent[no output except errors]' \
         '(- 1 2)--version[display version information]' \
         '1:info file:_files -g "*.info(-.)"' \
         '2:dir file:_files -g "dir(-.)"'
 	return
     fi
   ;;
-  makeinfo)
+  makeinfo|texi2any)
     _arguments -s \
-      '--error-limit=[specify number of errors to quit after]:number' \
+      '--error-limit=[specify number of errors to quit after]:number [100]' \
+      '--document-language=[specify locale to use in translating Texinfo keywords]:locale [C]:_locales' \
       '--force[preserve output even if errors]' \
       '(* -)--help[display help]' \
       '--no-validate[suppress node cross-reference validation]' \
       '--no-warn[suppress warnings]' \
-      '--reference-limit=[warn about at most specified number of references]:number' \
+      '--conf-dir=[specify additional directory for configuration files]:directory:_directories' \
+      '--init-file=[specify initialisation file]:file:_files' \
+      \*{-c+,--set-customization-variable=}'[set customization variable]:variable' \
       '(-v --verbose)'{-v,--verbose}'[explain what is being done]' \
       '(* -)--version[display version info]' \
-      '(--html --xml)--docbook[output in DocBook format]' \
-      '(--docbook --xml)--html[output in HTML format]' \
+      '(--html --xml --plaintext)--docbook[output in DocBook XML format]' \
+      '(--docbook --xml --plaintext)--html[output in HTML format]' \
       '--no-headers[suppress node separators and menus]' \
-      '(--docbook --html)--xml[output in XML (TexinfoML) format]' \
+      '(--docbook --html --plaintext)--xml[output in XML (TexinfoML) format]' \
+      '(--docbook --html --xml)--plaintext[output in plain text format]' \
+      '--dvi[output in dvi format]' \
+      '--dvipdf[output in pdf format]' \
+      '--ps[output in ps format]' \
+      '--pdf[output in pdf format]' \
       '(-E --macro-expand)'{-E,--macro-expand}'[output macro-expanded source to specified file]:file:_files' \
       '(--docbook --xml)--no-split[suppress splitting of output]' \
-      '--number-sections[output chapter and section numbers]' \
+      '--no-number-sections[output chapter and section numbers]' \
       '(-o --output=)'{-o,--output}'[specify output file]:output file:_files' \
-      '(--docbook --html --xml)--enable-encoding[output special characters]' \
+      '(--docbook --html --xml)--disable-encoding[output special characters]' \
       '(--docbook --html --xml)--fill-column=[specify width to break lines at]:width' \
       '(--docbook --html --xml)--footnote-style=[specify style for output of footnotes]:((separate\:in\ own\ node end\:at\ end\ of\ node))' \
       '(--docbook --html --xml)--paragraph-indent=[specify spaces to indent paragraphs by]' \
-      '(--docbook --html --xml)--split-size=[split Info files at specified size]:size' \
-      '--commands-in-node-names[allow @ commands in node names]' \
+      '(--docbook --html --xml)--split-size=[split Info files at specified size]:size [300000]' \
+      '(--docbook --xml --plaintext)--css-include=[specify file in include in HTML <style> output]:file:_files' \
+      '(--docbook --xml --plaintext)--css-ref=[generate reference to a CSS file]:URL:_urls' \
+      '(--docbook --xml --plaintext)--internal-links=[produce list of internal links in a file]:file:_files' \
+      '(--docbook --xml --plaintext)--split=[split output at specified boundary]:split boundary:(chapter section node)' \
+      '(--docbook --xml --plaintext)--transliterate-file-names[produce file names in ASCII transliteration]' \
+      '(--docbook --xml --plaintext)--node-files[produce redirection files for nodes]' \
+      '-Xopt=[specify option to texi2dvi]:options' \
       '-D[define variable]:variable' \
       '-I[specify directory to append to @include search path]:directory:_files -/' \
       '-P[specify directory to prepend to @include search path]:directory:_files -/' \
       '-U[undefine variable]:variable' \
+      '(--docbook --no-ifdocbook)--ifdocbook[process @ifdocbook and @docbook even when not generating Docbook]' \
       '(--html --no-ifhtml)--ifhtml[process @ifhtml and @html when not generating HTML]' \
       '(--no-ifinfo)--ifinfo[process @ifinfo even when not generating Info]' \
+      '(--plaintext --no-ifplaintext)--ifplaintext[process @ifplaintext even when not generating plain text]' \
       '(--no-iftex)--iftex[process @iftex and @tex text]' \
-      '(--no-ifplaintext)--ifplaintext[process @ifplaintext even when not generating plain text]' \
-      '(--ifhtml)--no-ifhtml[do not process @ifhtml and @html text]' \
-      '(--ifinfo)--no-ifinfo[do not process @ifinfo text]' \
-      '(--ifplaintext)--no-ifplaintext[do not process @ifplaintext text]' \
-      '(--iftex)--no-iftex[do not process @iftex and @tex text]' \
+      '(--xml --no-ifxml)--ifxml[process @ifxml and @xml]' \
+      "(--ifdocbook --html --xml --plaintext)--no-ifdocbook[don't process @ifdocbook and @docbook text]" \
+      "(--ifhtml --docbook --xml --plaintext)--no-ifhtml[don't process @ifhtml and @html text]" \
+      "(--ifinfo --docbook --html --xml --plaintext)--no-ifinfo[don't process @ifinfo text]" \
+      "(--ifplaintext --docbook --html --xml)--no-ifplaintext[don't process @ifplaintext text]" \
+      "(--iftex --docbook --html --xml --plaintext)--no-iftex[don't process @iftex and @tex text]" \
+      "(--ifxml --docbook --html --xml --plaintext)--no-ifxml[don't process @ifxml and @xml text]" \
       '*:texinfo file:_texi'
       return
   ;;
-  texi2dvi)
+  (pdf|)texi2(dvi|pdf))
     _arguments -s \
       '(-b --batch)'{-b,--batch}'[no interaction]' \
-      '(-c --clean)'{-c,--clean}'[remove all auxiliary files]' \
       '(-D --debug)'{-D,--debug}'[turn on shell debugging (set -x)]' \
       '(- *)'{-h,--help}'[display help information]' \
       '(-o --output)'{-o,--output=}'[specify output file]:output file:_files' \
       '(-q -s --quiet --silent -V --verbose)'{-q,-s,--silent,--quiet}'[no output except errors]' \
       '(-q -s --quiet --silent -V --verbose)'{-V,--verbose}'[report on what is done]' \
       '(- *)'{-v,--version}'[display version information]' \
+      "--max-iterations=[don't process files more than specified times]:iterations [7]" \
+      '--mostly-clean[remove the auxiliary files and directories]' \
       '-@[use @input instead of \input; for preloaded Texinfo]' \
-      '(-e --expand)'{-e,--expand}'[force macro expansion using makeinfo]' \
+      '(-p --pdf --dvipdf --html --info --ps --text)--dvi[output a DVI file]' \
+      '(-p --pdf --dvi --html --info --ps --text)--dvipdf[output a PDF file via DVI]' \
+      '(-p --pdf --dvi --dvipdf --info --ps --text)--html[output an HTML file]' \
+      '(-p --pdf --dvi --dvipdf --html --ps --text)--info[output an Info file]' \
+      '(-p --pdf --dvi --dvipdf --html --info --ps --text)'{-p,--pdf}'[use pdftex or pdflatex for processing]' \
+      '(-p --pdf --dvi --dvipdf --html --info --text)--ps[output a PostScript file]' \
+      '(-p --pdf --dvi --dvipdf --html --info --ps)--text[output a plain text file]' \
+      '(-e -E --expand)'{-e,-E,--expand}'[force macro expansion using makeinfo]' \
       '-I[specify search dir for texinfo files]:directory:_files -/' \
       '(-l --language)'{-l,--language}'[specify language of input file]:language:(LaTeX Texinfo)' \
-      '(-p --pdf)'{-p,--pdf}'[use pdftex or pdflatex for processing]' \
-      \*{-t,--texinfo}'[specify command to insert after @setfilename]:command' \
+      "--no-line-error[don't pass --file-line-error to TeX]" \
+      '--shell-escape[pass --shell-escape to TeX]' \
+      '--src-specials[pass --src-specials to TeX]' \
+      \*{-t,--command,--texinfo}'[specify command to insert after @setfilename]:command' \
+      '--translate-file=[use given charset translation file for TeX]:file:_files' \
+      '(--tidy -c --clean)--build=[specify build mode]:build mode:(local tidy clean)' \
+      '(--tidy -c --clean --build)--tidy[same as --build=tidy]' \
+      '(--tidy -c --clean --build)'{--tidy,-c,--clean}'[same as --build=clean]' \
+      '--build-dir=[specify build directory]:directory:_directories' \
       '*:file:_texi'
       return
   ;;
   texindex)
-    _arguments \
+    _arguments -S \
       '(* -)--help[display help]' \
       '(* -)--version[display version info]' \
-      '(--no-keep)--keep[keep temporary files around after processing]' \
-      '(--keep)--no-keep[do not keep temporary files (default)]' \
-      '(-o --output)'{-o,--output=}'[specify output file]:file:_files' \
       '*:texinfo file:_texi'
       return
   ;;
   tkinfo)
+    cmd=$commands[info]
     _x_arguments -C \
+      '(-)--help' \
       '-+'{headers,buttons,balloons,scrollthrough,pagesep,showdir} \
       '-linklook:menu display:(color font underline)' \
       '-highlight:link display:(color inverse underline)' \
       '-searchlook:search match display:(color inverse underline)' \
       '-iconic' \
       '-dir:info path:_dir_list' \
-      '-file:info file:_files -g "*.info(|.gz|.bz2)(-.)"' \
-      '-node:info node:->item' \
-      '*::menu items:->item' && ret=0
-    info=( _call_program info info ${(kv)opt_args[(I)-file]/-file/-f} )
+      '-file:info file:->infofiles' \
+      '-node:info node:->nodes' \
+      '*::menu items:->infomanuals' && ret=0
+    info=( info ${(kv)opt_args[(I)-file]/-file/-f} )
   ;;
 esac
 
-case $state in
-  item )
-    local -a items tags expl infopath
-    (( $#INFOPATH )) && infopath=( -W ${s/:/INFOPATH} )
+if [[ -n $state ]]; then
+  local chr cache file q
+  local -a suf tags
+  local -i36 hash=5381
+  local -aU infopath=( /usr/share/info ${commands[info]:h:h}/share/info ${(s.:.)INFOPATH} $infodirs )
+  infopath=( $^infopath(N) )
+  # run simple hash function on infopath
+  for chr in "${(s..)infopath}"; do
+    (( hash += (hash << 5) + ##$chr ))
+  done
+  typeset +i -l hash=${hash#*\#}
+  cache=_cache_info_nodes_$hash
+  typeset -gHU $cache
 
-    tags=(items)
-    if [[ $CURRENT -eq 1 ]]; then
-	tags+=files
+  if [[ $state = infomanuals ]]; then
+    [[ -z $compstate[quote] ]] && q='\\'
+    if compset -P "${q}\("; then
+      if [[ -prefix *\) ]]; then
+	file="${PREFIX%%\)*}"
+	compset -P 1 '*\)'
+	state=nodes
+      else
+	compset -S "${q}\)*" || suf=( -S "${q[1]})" )
+	state=infofiles
+      fi
     fi
+  fi
 
-    _tags $tags
-    while _tags; do
-	if _requested files expl 'info file'; then
-	    _files "$expl[@]" $infopath -g '*.info(-.)' && ret=0
-	fi
-	if _requested items; then
-	    items=(${${(M)${${(f)"$(${info} --output - ${words[1,CURRENT-1]} 2>/dev/null)"}[1,(r)[[:space:]]#--- The Detailed Node Listing ---[[:space:]]#]}:#\* *~\* Menu:*}:/(#b)\*[[:space:]]##([^:]##):(#B)( \(?##\)[^.]#.|(:|))[[:space:]]#(#b)(*)[[:space:]]#/$match[1]${match[2]:+:}$match[2]})
+  [[ -z $file ]] && file=${opt_args[-f]:-$line[1]}
+  if [[ $state = info* ]]; then
+    local -aU files=( $^infopath/*.info(|.gz|.bz2)(-.:t:s/.gz//:s/.bz2//:r) )
+    local items
+    if (( ! $#files )); then
+      _info_retrieve_nodes
+      files=( ${(P)cache%%:*} )
+    fi
+    items=( ${${${(M)${(f)"$(_call_program menu-items info -o-)"}:#(#s)\* *: \(*}#??}%%\)*} )
+    files+=( ${items##*\(} )
+    tags=( info-files )
+    if [[ $state != infofiles ]]; then
+      tags+=( menu-items )
+      items=( ${items%:*} )
+    fi
+  elif [[ $state = nodes ]]; then
+    tags=( menu-items )
+    if [[ -n $file ]]; then
+      _info_retrieve_nodes
+      nodes=( ${(@PM)cache:#${file}:*} )
+      tags+=( info-nodes )
+    fi
+    items=( ${${${(M)${(f)"$(_call_program menu-items info -o- $file)"}:#(#s)\* *::*}%%::*}#??} )
+  fi
 
-	    _describe -t items "menu item" items && ret=0
-	fi
-    done
-  ;;
-esac
+  _tags $tags
+
+  while _tags; do
+    _requested info-files expl 'info file' compadd $suf -M 'm:{a-zA-Z}={A-Za-z}' -a files && ret=0
+    _requested menu-items expl 'menu item' compadd -M 'm:{a-zA-Z}={A-Za-z}' -a items && ret=0
+    _requested info-nodes expl 'node' compadd -M 'm:{a-zA-Z}={A-Za-z}' ${nodes#*:} && ret=0
+
+    (( ret )) || break
+  done
+fi
 
 return ret

@@ -1,5 +1,8 @@
 2016-07-24  Oliver Kiddle  <opk@zsh.org>
 
+	* 38943: Completion/Unix/Command/_texinfo: update options
+	and improve completion of Info files, nodes and menu items
+
 	* 38939: Completion/Unix/Command/_git: add missing options,
 	in particular those for GPG signing a push
 
