@@ -1940,6 +1940,8 @@ tindex(transpose-words-match)
 tindex(capitalize-word-match)
 tindex(up-case-word-match)
 tindex(down-case-word-match)
+tindex(delete-whole-word-match)
+tindex(select-word-match)
 tindex(select-word-style)
 tindex(match-word-context)
 tindex(match-words-by-style)
@@ -1947,12 +1949,14 @@ xitem(tt(forward-word-match), tt(backward-word-match))
 xitem(tt(kill-word-match), tt(backward-kill-word-match))
 xitem(tt(transpose-words-match), tt(capitalize-word-match))
 xitem(tt(up-case-word-match), tt(down-case-word-match))
+xitem(tt(delete-whole-word-match), tt(select-word-match))
 item(tt(select-word-style), tt(match-word-context), tt(match-words-by-style))(
-The eight `tt(-match)' functions are drop-in replacements for the
+The first eight `tt(-match)' functions are drop-in replacements for the
 builtin widgets without the suffix.  By default they behave in a similar
 way.  However, by the use of styles and the function tt(select-word-style),
-the way words are matched can be altered.  For comparison, the widgets
-described in ifzman(zmanref(zshzle) under Text Objects)\
+the way words are matched can be altered. tt(select-word-match) is intended
+to be used as a text object in vi mode but with custom word styles. For
+comparison, the widgets described in ifzman(zmanref(zshzle) under Text Objects)\
 ifnzman(noderef(Text Objects)) use fixed definitions of words, compatible
 with the tt(vim) editor.
 
@@ -1960,7 +1964,7 @@ The simplest way of configuring the functions is to use
 tt(select-word-style), which can either be called as a normal function with
 the appropriate argument, or invoked as a user-defined widget that will
 prompt for the first character of the word style to be used.  The first
-time it is invoked, the eight tt(-match) functions will automatically
+time it is invoked, the first eight tt(-match) functions will automatically
 replace the builtin versions, so they do not need to be loaded explicitly.
 
 The word styles available are as follows.  Only the first character

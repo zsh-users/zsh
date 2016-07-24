@@ -1,5 +1,8 @@
 2016-07-24  Oliver Kiddle  <opk@zsh.org>
 
+	* 38929: Doc/Zsh/contrib.yo, Functions/Zle/select-word-match:
+	new vim style text object using match-words-by-style mechanism
+
 	* 38935: Matthew Martin: Completion/Unix/Command/_tcpdump:
 	update for Free and Open BSD
 
