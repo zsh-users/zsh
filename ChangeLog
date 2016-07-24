@@ -1,5 +1,8 @@
 2016-07-24  Oliver Kiddle  <opk@zsh.org>
 
+	* 38939: Completion/Unix/Command/_git: add missing options,
+	in particular those for GPG signing a push
+
 	* 38936: Functions/Zle/vi-pipe: fix for option compatibility
 
 	* 38929: Doc/Zsh/contrib.yo, Functions/Zle/select-word-match:

@@ -510,7 +510,7 @@ _git-cherry-pick () {
     '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=-}'[GPG-sign the commit]::key id' \
     '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
     '*'{-s+,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
-    '*'{-X+,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]' \
+    '*'{-X+,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]:option' \
     '(-e --edit -x -n --no-commit -s --signoff)--ff[fast forward, if possible]' \
     ': : __git_commit_ranges -O expl:git_commit_opts'
 }
@@ -1149,6 +1149,7 @@ _git-mv () {
   declare -A opt_args
 
   _arguments -w -C -S -s \
+    '(-v --verbose)'{-v,--verbose}'[output additional information]' \
     '(-f --force)'{-f,--force}'[rename/move even if targets exist]' \
     '-k[skip rename/move that would lead to errors]' \
     '(-n --dry-run)'{-n,--dry-run}'[only show what would happen]' \
@@ -1278,7 +1279,7 @@ _git-push () {
     '--mirror[push all refs under refs/heads/ and refs/tags/ and delete non-existing refs]' \
     '(-n --dry-run)'{-n,--dry-run}'[do everything except actually send the updates]' \
     '--porcelain[produce machine-readable output]' \
-    '--delete[delete all listed refs from the remote repository]' \
+    '(-d --delete)'{-d,--delete}'[delete all listed refs from the remote repository]' \
     '--tags[all tags under refs/tags are pushed]' \
     '--follow-tags[also push missing annotated tags reachable from the pushed refs]' \
     '(--receive-pack --exec)'{--receive-pack=-,--exec=-}'[path to git-receive-pack on remote]:remote git-receive-pack:_files' \
@@ -1295,6 +1296,12 @@ _git-push () {
     '(--verify)--no-verify[bybass the pre-push hook]' \
     '--recurse-submodules=[submodule handling]:submodule handling:((check\:"refuse pushing of supermodule if submodule commit cannot be found on the remote"
                                                                     on-demand\:"push all changed submodules"))' \
+    '(--no-signed --signed)--sign=[GPG sign the push]:signing enabled:(yes no if-asked)' \
+    '(--no-signed --sign)--signed[GPG sign the push]' \
+    "(--sign --sign)--no-signed[don't GPG sign the push]" \
+    '--atomic[request atomic transaction on remote side]' \
+    '(-4 --ipv4 -6 --ipv6)'{-4,--ipv4}'[use IPv4 addresses only]' \
+    '(-4 --ipv4 -6 --ipv6)'{-6,--ipv6}'[use IPv6 addresses only]' \
     ': :__git_any_repositories' \
     '*: :__git_ref_specs_pushy' && ret=0
 
@@ -1323,17 +1330,21 @@ _git-rebase () {
   fi
 
   _arguments -A '-*' \
-    '(- :)--continue[continue after resolving merge conflict]' \
-    '(- :)--abort[abort current rebase]' \
-    '--keep-empty[keep empty commits in the result]' \
-    '(- :)--skip[skip the current patch]' \
+    - actions \
+    '(-)--continue[continue after resolving merge conflict]' \
+    '(-)--abort[abort current rebase]' \
+    '(-)--edit-todo[edit interactive instruction sheet in an editor]' \
+    '(-)--skip[skip the current patch]' \
+    - options \
+    "--keep-empty[keep empty commits in the result]" \
     '(-m --merge)'{-m,--merge}'[use merging strategies to rebase]' \
     '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=-}'[GPG-sign the commit]::key id' \
     '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
     '*'{-s+,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
-    '*'{-X+,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]' \
+    '*'{-X+,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]:option' \
     '(-q --quiet -v --verbose --stat -n --no-stat)'{-q,--quiet}'[suppress all output]' \
     '(-q --quiet -v --verbose --stat -n --no-stat)'{-v,--verbose}'[output additional information]' \
+    '--rerere-autoupdate[allow rerere to update index with resolved conflicts' \
     '--no-verify[bypass the pre-rebase hook]' \
     '-C-[ensure that given lines of surrounding context match]: :__git_guard_number "lines of context"' \
     '(-f --force-rebase)'{-f,--force-rebase}'[force rebase even if current branch descends from commit rebasing onto]' \
@@ -1341,13 +1352,13 @@ _git-rebase () {
     '(-i --interactive)--whitespace=-[detect a new or modified line that has whitespace errors]: :__git_apply_whitespace_strategies' \
     '(-i --interactive)--committer-date-is-author-date[use author date as committer date]' \
     '(-i --interactive --ignore-whitespace --whitespace --committer-date-is-author-date)'{-i,--interactive}'[make a list of commits to be rebased and open in $EDITOR]' \
-    '--edit-todo[edit interactive instruction sheet in an editor]' \
     '(-p --preserve-merges --interactive)'{-p,--preserve-merges}'[try to recreate merges instead of ignoring them]' \
     {-x+,--exec=}'[with -i\: append "exec <cmd>" after each line]:command:_command_names -e' \
     '(1)--root[rebase all reachable commits]' \
     $autosquash_opts \
     '(--autostash --no-autostash)--autostash[stash uncommitted changes before rebasing and apply them afterwards]' \
     '(--autostash --no-autostash)--no-autostash[do not stash uncommitted changes before rebasing and apply them afterwards]' \
+    '--ignore-date[use current timestamp for author date]' \
     '--no-ff[cherry-pick all rebased commits with --interactive, otherwise synonymous to --force-rebase]' \
     '--onto=[start new branch with HEAD equal to given revision]:newbase:__git_revisions' \
     ':upstream branch:__git_revisions' \
@@ -1395,6 +1406,8 @@ _git-revert () {
     '(-m --mainline)'{-m+,--mainline=}'[pick which parent is mainline]:parent number' \
     '(-n --no-commit)'{-n,--no-commit}'[do not commit the reversion]' \
     '(-s --signoff)'{-s,--signoff}'[add Signed-off-by line at the end of the commit message]' \
+    '--strategy=[use given merge strategy]:merge strategy:__git_merge_strategies' \
+    '*'{-X,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]:option'
     '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=-}'[GPG-sign the commit]::key id' \
     '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
     ': :__git_commits'
@@ -1842,15 +1855,16 @@ _git-tag () {
 
   if (( words[(I)-[asu]] )); then
     message_opts=(
-      '(   -F)-m+[specify tag message]:message'
-      '(-m   )-F+[read tag message from given file]:message file:_files')
+      '(-m --message -F --file)'{-m+,--message=}'[specify tag message]:message'
+      '(-m --message -F --file)'{-F+,--file=}'[read tag message from given file]:message file:_files'
+    )
   fi
 
   _arguments -A '-*' \
     - creation \
-      '(   -s -u --local-user)-a[create an unsigned, annotated tag]' \
-      '(-a    -u --local-user)-s[create an signed and annotated tag]' \
-      '(-a -s)'{-u+,--local-user=}'[create a tag, annotated and signed with the given key]: :__git_gpg_secret_keys' \
+      '(-a --annotate -s --sign -u --local-user)'{-a,--annotate}'[create an unsigned, annotated tag]' \
+      '(-a --annotate -s --sign -u --local-user)'{-s,--sign}'[create an signed and annotated tag]' \
+      '(-a --annotate -s --sign)'{-u+,--local-user=}'[create a tag, annotated and signed with the given key]: :__git_gpg_secret_keys' \
       '-f[replace existing tag]' \
       '--cleanup=[cleanup message]:mode:((verbatim\:"no cleanup" whitespace\:"remove leading and trailing whitespace" strip\:"remove leading and trailing whitespace and comments"))' \
       $message_opts \
@@ -3129,6 +3143,7 @@ _git-prune () {
   _arguments -S \
     '(-n --dry-run)'{-n,--dry-run}'[do not remove anything; just report what would be removed]' \
     '(-v --verbose)'{-v,--verbose}'[report all removed objects]' \
+    '--progress[show progress]' \
     '--expire[only expire loose objects older than given date]: :__git_datetimes' \
     '*:: :__git_heads'
 }
@@ -3258,7 +3273,7 @@ _git-remote () {
             '(--tags          )--no-tags[tell git fetch to not import every tag from remote repository]' \
             '*'{-t,--track=}'[track given branch instead of default glob refspec]: :__git_branch_names' \
             '(-m --master)'{-m,--master=}'[set HEAD of remote to point to given master branch]: :__git_branch_names' \
-            '--mirror[do not use separate remotes]' \
+	    '--mirror[do not use separate remotes]::mirror type:(fetch pull)' \
             ':name:__git_remotes' \
             ':repository:->repository' && ret=0
 	  case $state in
@@ -4786,19 +4801,23 @@ _git-http-backend () {
 
 (( $+functions[_git-send-pack] )) ||
 _git-send-pack () {
-  # TODO: --mirror is undocumented.
-  # TODO: --stateless-rpc is undocumented.
-  # TODO: --helper-status is undocumented.
   _arguments -A '-*' \
+    '(-v --verbose)'{-v,--verbose}'[produce verbose output]' \
+    '(-q --quiet)'{-q,--quiet}'[be more quiet]' \
     '(--receive-pack --exec)'{--receive-pack=-,--exec=-}'[specify path to git-receive-pack on remote side]:remote path' \
+    '--remote[specify remote name]:remote' \
     '--all[update all refs that exist locally]' \
-    '--dry-run[do everything except actually sending the updates]' \
-    '--force[update remote orphaned refs]' \
-    '-v[produce verbose output]' \
+    '(-n --dry-run)'{-n,--dry-run}'[do everything except actually sending the updates]' \
+    '--mirror[mirror all refs]' \
+    '(-f --force)'{-f,--force}'[update remote orphaned refs]' \
+    '(--no-signed --signed)--sign=[GPG sign the push]:signing enabled:(yes no if-asked)' \
+    '(--no-signed --sign)--signed[GPG sign the push]' \
+    "(--sign --sign)--no-signed[don't GPG sign the push]" \
     '--thin[send a thin pack]' \
-    '--mirror[undocumented]' \
-    '--stateless-rpc[undocumented]' \
-    '--helper-status[undocumented]' \
+    '--atomic[request atomic transaction on remote side]' \
+    '--stateless-rpc[use stateless RPC protocol]' \
+    '--helper-status[print status from remote helper]' \
+    '--force-with-lease=[require old value of ref to be at specified value]:refname\:expect' \
     ': :__git_any_repositories' \
     '*: :__git_remote_references'
 }
@@ -6746,7 +6765,7 @@ __git_setup_merge_options () {
     '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=}'[GPG-sign the commit]::key id' \
     '(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[do not GPG-sign the commit]' \
     '*'{-s,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies'
-    '*'{-X,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]'
+    '*'{-X,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]:option'
     '(--verify-signatures)--verify-signatures[verify the commits being merged or abort]'
     '(--no-verify-signatures)--no-verify-signatures[do not verify the commits being merged]'
     '(-q --quiet -v --verbose)'{-q,--quiet}'[suppress all output]'
