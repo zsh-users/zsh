@@ -9,26 +9,56 @@ _interfaces () {
 }
 
 _esp_secrets () {
-	_values -S : 'ESP algorithm' \
-		'des-cbc:secret' \
-		'3des-cbc:secret' \
-		'blowfish-cbc:secret' \
-		'rc3-cbc:secret' \
-		'cast128-cbc:secret' \
-		none
+  if [[ $OSTYPE = openbsd* ]]; then
+    _values -S : 'ESP algorithm' \
+      aes128:secret \
+      aes128-hmac96:secret \
+      blowfish:secret \
+      blowfish-hmac96:secret \
+      cast:secret \
+      cast-hmac96:secret \
+      des3:secret \
+      des3-hmac96:secret \
+      des:secret \
+      des-hmac96:secret
+  else
+    _values -S : 'ESP algorithm' \
+      'des-cbc:secret' \
+      '3des-cbc:secret' \
+      'blowfish-cbc:secret' \
+      'rc3-cbc:secret' \
+      'cast128-cbc:secret' \
+      none
+  fi
 }
 
 _packet_types () {
-	_values 'Packets type' \
-		'aodv[Ad-hoc On-demand Distance Vector protocol]' \
-		'cnfp[Cisco NetFlow protocol]' \
-		'rpc[Remote Procedure Call]' \
-		'rtp[Real-Time  Applications  protocol]' \
-		'rtcp[Real-Time Applications control protocol]' \
-		'snmp[Simple Network Management Protocol]' \
-		'tftp[Trivial File Transfer Protocol]' \
-		'vat[Visual Audio Tool]' \
-		'wb[distributed White Board]'
+  types=(
+    'cnfp[Cisco NetFlow protocol]'
+    'rpc[Remote Procedure Call]'
+    'rtp[Real-Time Applications protocol]'
+    'rtcp[Real-Time Applications control protocol]'
+    'vat[Visual Audio Tool]'
+    'wb[distributed White Board]'
+  )
+  if [[ $OSTYPE = openbsd* ]]; then
+    types+=(
+      'sack[RFC 2018 TCP Selective Acknowledgements Options]'
+      'vrrp[Virtual Router Redundancy Protocol]'
+      'tcp[Transmission Control Protocol]'
+    )
+  else
+    types+=(
+      'aodv[Ad-hoc On-demand Distance Vector protocol]'
+      'carp[Common Address Redundancy Protocol]'
+      'radius[RADIUS]'
+      'snmp[Simple Network Management Protocol]'
+      'tftp[Trivial File Transfer Protocol]'
+      'vxlan[Virtual eXtensible Local Area Network]'
+      'zmtpl[ZeroMQ Message Transport Protocol]'
+    )
+  fi
+  _values 'Packets type' $types
 }
 
 _data_link_types () {
@@ -45,48 +75,81 @@ _data_link_types () {
 _bpf_filter () {
 }
 
-_arguments \
-  '()-A[print each packet in ASCII]' \
-  -c'[exit after receiving specified number of packets]:number of packets' \
-  -C'[specify output file size in MB (10e6 bytes)]:output file size' \
-  '(-ddd)-d[dump the compiled packet-matching code in a human readable form]' \
-  '(-ddd)-dd[dump packet-matching code as a C program fragment]' \
-  '(-d -dd)-ddd[dump packet-matching code as decimal numbers (preceded with a count)]' \
-  '(-A -c -C -d -dd -ddd -e -E -f -F -i -l -L -m -M -n -N -O -p -q -R -r -S -s -T -t -tt -ttt -tttt -u -U -v -vv -vvv -w -W -x -xx -X -XX -y -Z *)'-D'[print the list of the network interfaces available on the system]' \
-  -e'[print the link-level header on each dump line]' \
-  -E"[decrypting IPsec ESP packets]:spi@ipaddr::algo\:secret:_esp_secrets" \
-  -f"[print 'foreign' IPv4 addresses numerically]" \
-  -F'[input file for the filter expression]:filter expression file:_files' \
-  -i'[interface]:interface:_interfaces' \
-  -l'[make stdout line buffered]' \
-  '(-A -c -C -d -dd -ddd -e -E -f -F -l -D -m -M -n -N -O -p -q -R -r -S -s -T -t -tt -ttt -tttt -u -U -v -vv -vvv -w -W -x -xx -X -XX -y -Z *)'-L'[list the known data link types for the interface]' \
-  '*-m[load SMI MIB module definitions]:SMI MIB module definitions:_files' \
-  -M'[shared secret for validating the digests in TCP segments with the TCP-MD5 option]:secret' \
-  -n"[don't convert addresses to names]" \
-  -N"[don't print domain name qualification of host names]" \
-  -O"[don't run the packet-matching code optimizer]" \
-  -p"[don't put the interface into promiscuous mode]" \
-  -q'[quick (quiet?) output]' \
-  -R'[assume ESP/AH packets to be based on old specification (RFC1825 to RFC1829)]' \
-  -r'[read packets from file]:input file:_files' \
-  -S'[print absolute TCP sequence numbers]' \
-  -s'[specify number of bytes of data to snarf from each packet]:number of bytes to snap' \
-  -T'[interpret captured packets as specified type]:packet type:_packet_types' \
-  "(-tttt)-t[don't print a timestamp on each dump line]" \
-  '(-ttt -tttt)-tt[print an unformatted timestamp on each dump line]' \
-  '(-tt -tttt)-ttt[print a delta (in micro-seconds) between current and previous line on each dump line]' \
-  '(-t -tt -ttt)-tttt[print a timestamp in default format proceeded by date on each dump line]' \
-  -u'[print undecoded NFS handles]' \
-  -U'[make output packet-buffered when saving to file (-w)]' \
-  '(-vvv)-v[slightly more verbose output]' \
-  '(-vvv)-vv[more verbose output]' \
-  '(-v -vv)-vvv[most verbose output]' \
-  -w'[write the raw packets to file]:output file:_files' \
-  -W'[limit the number of created files (-C)]:number of files' \
-  -x'[print each packet (minus its link level header) in hex]' \
-  '(-x)-xx[print each packet, including its link level header, in hex]' \
-  -X'[print each packet (minus its link level header) in hex and ASCII]' \
-  '(-X)-XX[print each packet, including its link level header, in hex and ASCII]' \
-  -y'[set the data link type to use while capturing packets]:data link type:_data_link_types' \
-  -Z'[drops privileges (if root) and changes user ID (along with primary group)]:user:_users' \
+args=(
+  '-A[print each packet in ASCII]'
+  '-c[exit after receiving specified number of packets]:number of packets'
+  '(-ddd)-d[dump the compiled packet-matching code in a human readable form]'
+  '(-ddd)-dd[dump packet-matching code as a C program fragment]'
+  '(-d -dd)-ddd[dump packet-matching code as decimal numbers (preceded with a count)]'
+  "-E[decrypting IPsec ESP packets]:spi@ipaddr::algo\:secret:_esp_secrets"
+  '-e[print the link-level header on each dump line]'
+  '-F[input file for the filter expression]:filter expression file:_files'
+  "-f[print 'foreign' IPv4 addresses numerically]"
+  '-l[make stdout line buffered]'
+  "-N[don't print domain name qualification of host names]"
+  "-n[don't convert addresses to names]"
+  "-O[don't run the packet-matching code optimizer]"
+  "-p[don't put the interface into promiscuous mode]"
+  '-q[quick (quiet?) output]'
+  '-r[read packets from file]:input file:_files'
+  '-S[print absolute TCP sequence numbers]'
+  '-s[specify number of bytes of data to snarf from each packet]:number of bytes to snap'
+  '-T[interpret captured packets as specified type]:packet type:_packet_types'
+  "(-tt -ttt -tttt -ttttt)-t[don't print a timestamp on each dump line]"
+  '(-t -ttt -tttt -ttttt)-tt[print an unformatted timestamp on each dump line]'
+  '(-vv -vvv)-v[slightly more verbose output]'
+  '(-v -vvv)-vv[more verbose output]'
+  '-w[write the raw packets to file]:output file:_files'
+  '-X[print each packet (minus its link level header) in hex and ASCII]'
+  '-x[print each packet (minus its link level header) in hex]'
+  '-y[set the data link type to use while capturing packets]:data link type:_data_link_types'
   '*:BPF filter:_bpf_filter'
+)
+
+if [[ $OSTYPE = openbsd* ]]; then
+  args+=(
+    '(-n)-a[attempt to convert network and broadcast addresses to names]'
+    '-D[select packet flowing in specified direction]:direction:(in out)'
+    '-I[print the interface on each dump line]'
+    '-o[print a guess of the possible operating system(s)]'
+    '(-t -tt -tttt -ttttt)-ttt[print day and month in timestamp]'
+    '(-t -tt -ttt -ttttt)-tttt[print timestamp difference between packets]'
+    '(-t -tt -ttt -tttt)-ttttt[print timestamp difference since the first packet]'
+  )
+else
+  args+=(
+    '-B[specify the capture buffer size in KiB]:capture buffer size'
+    '-b[print the AS number in BGP packets in ASDOT notation]'
+    '-C[specify output file size in MB (10e6 bytes)]:output file size'
+    '(-* *)'-D'[print the list of the network interfaces available on the system]'
+    '-G[specify the interval to rotate the dump file in seconds]:dump file rotate seconds'
+    '-H[attempt to detect 802.11s draft mesh headers]'
+    '(-* *)-h[print version strings and a usage message]'
+    '-I[put the interface in monitor mode]'
+    '(-* *)-J[list the supported timestamp types]'
+    '-j[set the timestamp type]:timestamp type'
+    "-K[don't attempt to verify checksums]"
+    '*-m[load SMI MIB module definitions]:SMI MIB module definitions:_files'
+    '-M[shared secret for validating the digests in TCP segments with the TCP-MD5 option]:secret'
+    '-R[assume ESP/AH packets to be based on old specification (RFC1825 to RFC1829)]'
+    '(-t -tt -tttt)-ttt[print a delta (in micro-seconds) between current and previous line on each dump line]'
+    '(-t -tt -ttt)-tttt[print a timestamp in default format proceeded by date on each dump line]'
+    '(-t -tt -ttt -tttt)-ttttt[print a delta (micro-second resolution) since the first line on each dump line]'
+    '-U[make output packet-buffered when saving to file (-w)]'
+    '-u[print undecoded NFS handles]'
+    '-V[Read a list of filenames from file]:file:_files'
+    '(-v -vv)-vvv[most verbose output]'
+    '-W[limit the number of created files (-C)]:number of files'
+    '(-X)-XX[print each packet, including its link level header, in hex and ASCII]'
+    '(-x)-xx[print each packet, including its link level header, in hex]'
+    '-Z[drops privileges (if root) and changes user ID (along with primary group)]:user:_users'
+    '-z[command to run after file rotation]:command:_command_names'
+  )
+fi
+
+_arguments : \
+  '-i[interface]:interface:_interfaces' \
+  - optL \
+  '-L[list the known data link types for the interface]' \
+  - default \
+  $args

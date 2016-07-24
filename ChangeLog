@@ -1,3 +1,8 @@
+2016-07-24  Oliver Kiddle  <opk@zsh.org>
+
+	* 38935: Matthew Martin: Completion/Unix/Command/_tcpdump:
+	update for Free and Open BSD
+
 2016-07-23  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Completion/Unix/Command/_git: _git-grep: Stop
