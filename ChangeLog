@@ -1,5 +1,7 @@
 2016-07-24  Oliver Kiddle  <opk@zsh.org>
 
+	* 38936: Functions/Zle/vi-pipe: fix for option compatibility
+
 	* 38929: Doc/Zsh/contrib.yo, Functions/Zle/select-word-match:
 	new vim style text object using match-words-by-style mechanism
 

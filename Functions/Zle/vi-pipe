@@ -7,16 +7,21 @@
 #   autoload -Uz vi-pipe
 #   bindkey -a '!' vi-pipe
 
+setopt localoptions noksharrays
+
 autoload -Uz read-from-minibuffer
 local _save_cut="$CUTBUFFER" REPLY
 
-# Use the standard vi-delete to accept a vi motion.
-zle .vi-delete || return
+# force movement to default to line mode
+zle -U V
+# Use the standard vi-change to accept a vi motion.
+zle .vi-change || return
 read-from-minibuffer "!"
+zle .vi-cmd-mode
 local _save_cur=$CURSOR
 
 # cut buffer contains the deleted text and can be modified
-CUTBUFFER="$(eval $REPLY <<<$CUTBUFFER)"
+CUTBUFFER=$(eval "$REPLY" <<<"$CUTBUFFER")
 
 # put the modified text back in position.
 if [[ CURSOR -eq 0 || $BUFFER[CURSOR] = $'\n' ]]; then
