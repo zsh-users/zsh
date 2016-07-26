@@ -222,9 +222,13 @@ Turn a file name into an absolute path:  prepends the current directory,
 if necessary; remove `tt(.)' path segments; and remove `tt(..)' path segments
 and the segments that immediately precede them.
 
-This transformation is agnostic of the filesystem: `tt(/foo/bar/../baz)' shall
-always be transformed to `tt(/foo/baz)', regardless of whether `tt(/foo)'
-exists or what kind of object (dir, file, symlink, etc.) it is.
+This transformation is agnostic about what is in the filesystem, i.e. is
+on the logical, not the physical directory.  It takes place in the same
+manner as when changing directories when neither of the options
+tt(CHASE_DOTS) or tt(CHASE_LINKS) is set.  For example,
+`tt(/before/here/../after)' is always transformed to
+`tt(/before/after)', regardless of whether `tt(/before/here)' exists or what
+kind of object (dir, file, symlink, etc.) it is.
 )
 item(tt(A))(
 Turn a file name into an absolute path as the `tt(a)' modifier does, and
