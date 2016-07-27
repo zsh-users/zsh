@@ -1344,7 +1344,7 @@ _git-rebase () {
     '*'{-X+,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]:option' \
     '(-q --quiet -v --verbose --stat -n --no-stat)'{-q,--quiet}'[suppress all output]' \
     '(-q --quiet -v --verbose --stat -n --no-stat)'{-v,--verbose}'[output additional information]' \
-    '--rerere-autoupdate[allow rerere to update index with resolved conflicts' \
+    '--rerere-autoupdate[allow rerere to update index with resolved conflicts]' \
     '--no-verify[bypass the pre-rebase hook]' \
     '-C-[ensure that given lines of surrounding context match]: :__git_guard_number "lines of context"' \
     '(-f --force-rebase)'{-f,--force-rebase}'[force rebase even if current branch descends from commit rebasing onto]' \
