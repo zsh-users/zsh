@@ -25,7 +25,7 @@ emulate -L zsh
 # This is probably more safeguarding than necessary
 zmodload -e zsh/zle || return 1
 { zmodload zsh/parameter && zmodload zsh/zleparameter } || {
-    print -u2 "Need parameter modules for zle hooks"
+    print -u2 "add-zle-hook-widget: Need parameter modules for zle hooks"
     return 1
 }
 
@@ -130,7 +130,7 @@ function add-zle-hook-widget {
 	# Check whether attempting to add a widget named for the hook
 	if [[ "$fn" = "$hook" ]]; then
 	    if [[ -n "${widgets[$fn]}" ]]; then
-		print -u2 "Cannot hook $fn to itself"
+		print -u2 "${0}: Cannot hook $fn to itself"
 		return 1
 	    fi
 	    # No point in building the array until another is added
