@@ -1054,7 +1054,7 @@ void redrawhook(void)
 	args[0] = initthingy->nam;
 	args[1] = NULL;
 	incompfunc = 0;
-	execzlefunc(initthingy, args, 0);
+	execzlefunc(initthingy, args, 1);
 	incompfunc = old_incompfunc;
 	unrefthingy(initthingy);
 	unrefthingy(lbindk);
