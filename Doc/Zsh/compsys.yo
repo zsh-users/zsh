@@ -5046,6 +5046,16 @@ Like tt(_tags) this function supports the tt(-C) option to give a
 different name for the argument context field.  The tt(-x) option has
 the same meaning as for tt(_description).
 )
+findex(_widgets)
+item(tt(_widgets) [ tt(-g) var(pattern) ])(
+This function completes names of zle widgets (see
+ifzman(the section `Widgets' in zmanref(zshzle))\
+ifnzman(noderef(Zle Widgets))\
+).  The var(pattern), if present, is matched against values of the tt($widgets)
+special parameter, documented in 
+ifzman(the section `The zsh/zleparameter Module' in zmanref(zshmodules))\
+ifnzman(noderef(The zsh/zleparameter Module)).
+)
 enditem()
 
 texinode(Completion Directories)()(Completion Functions)(Completion System)
