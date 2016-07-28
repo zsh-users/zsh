@@ -2132,6 +2132,17 @@ non-word characters following that word (7) the remainder of the line.  Any
 of the elements may be an empty string; the calling function should test
 for this to decide whether it can perform its function.
 
+If the variable tt(matched_words) is defined by the caller to
+tt(match-words-by-style) as an associative array (tt(local -A
+matched_words)), then the seven values given above should be retrieved
+from it as elements named tt(start), tt(word-before-cursor),
+tt(ws-before-cursor), tt(ws-after-cursor), tt(word-after-cursor),
+tt(ws-after-word), and tt(end).  In addition the element
+tt(is-word-start) is 1 if the cursor is on the start of a word or
+subword, or on white space before it (the cases can be distinguished by
+testing the tt(ws-after-cursor) element) and 0 otherwise.  This form is
+recommended for future compatibility.
+
 It is possible to pass options with arguments to tt(match-words-by-style)
 to override the use of styles.  The options are:
 startsitem()

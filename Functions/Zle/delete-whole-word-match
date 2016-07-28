@@ -12,30 +12,29 @@ emulate -L zsh
 setopt extendedglob
 
 local curcontext=:zle:$WIDGET
-local -a matched_words
+local -A matched_words
 # Start and end of range of characters to remove.
 integer pos1 pos2
 
 autoload -Uz match-words-by-style
 match-words-by-style
 
-if [[ -n "${matched_words[3]}" ]]; then
-    # There's whitespace before the cursor, so the word we are deleting
-    # starts at the cursor position.
+if (( ${matched_words[is-word-start]} )); then
+    # The word we are deleting starts at the cursor position.
     pos1=$CURSOR
 else
-    # No whitespace before us, so delete any wordcharacters there.
-    pos1="${#matched_words[1]}"
+    # Not, so delete any wordcharacters before, too
+    pos1="${#matched_words[start]}"
 fi
 
-if [[ -n "${matched_words[4]}" ]]; then
+if [[ -n "${matched_words[ws-after-cursor]}" ]]; then
     # There's whitespace at the cursor position, so only delete
     # up to the cursor position.
     (( pos2 = CURSOR + 1 ))
 else
     # No whitespace at the cursor position, so delete the
     # current character and any following wordcharacters.
-    (( pos2 = CURSOR + ${#matched_words[5]} + 1 ))
+    (( pos2 = CURSOR + ${#matched_words[word-after-cursor]} + 1 ))
 fi
 
 # Move the cursor then delete the block in one go for the

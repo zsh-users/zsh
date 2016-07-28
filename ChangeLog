@@ -1,5 +1,10 @@
 2016-07-28  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 38953: Doc/Zsh/contrib.yo,
+	Functions/Zle/delete-whole-word-match,
+	Functions/Zle/match-words-by-style: Fix some problems with
+	match-words-by-style and add keyword retrieval of matched data.
+
 	* users/21793: README, Src/glob.c: remove ancient undocumented
 	pre-"f" glob qualifer feature that unqualified integers were
 	treated as octal file mode.
