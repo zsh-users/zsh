@@ -62,7 +62,7 @@ function add-zle-hook-widget {
     zstyle -a zle-hook types hooktypes
 
     # This part copied from add-zsh-hook
-    local usage="Usage: $0 hook widgetname\nValid hooks are:\n  $hooktypes"
+    local usage="Usage: $funcstack[1] hook widgetname\nValid hooks are:\n  $hooktypes"
 
     local opt
     local -a autoopts
@@ -130,7 +130,7 @@ function add-zle-hook-widget {
 	# Check whether attempting to add a widget named for the hook
 	if [[ "$fn" = "$hook" ]]; then
 	    if [[ -n "${widgets[$fn]}" ]]; then
-		print -u2 "${0}: Cannot hook $fn to itself"
+		print -u2 "$funcstack[1]: Cannot hook $fn to itself"
 		return 1
 	    fi
 	    # No point in building the array until another is added

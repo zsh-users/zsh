@@ -19,7 +19,7 @@ hooktypes=(
   chpwd precmd preexec periodic zshaddhistory zshexit
   zsh_directory_name
 )
-local usage="Usage: $0 hook function\nValid hooks are:\n  $hooktypes"
+local usage="Usage: add-zsh-hook hook function\nValid hooks are:\n  $hooktypes"
 
 local opt
 local -a autoopts
