@@ -213,7 +213,7 @@ _svnadmin () {
           ${=${${${(M)${(f)"$(_comp_locale; _call_program options svnadmin help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}
         )
         if [[ $usage == *REPOS_PATH* ]]; then
-          args+=( ":path:_files -/" )
+          args+=( ":repository path:_files -/" )
         elif [[ $cmd = help ]]; then
           args+=( "*:subcommand:_svnadmin_commands" )
         fi

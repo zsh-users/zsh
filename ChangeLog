@@ -1,3 +1,8 @@
+2016-07-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Completion/Unix/Command/_subversion: _svnadmin:
+	Tweak state description.
+
 2016-07-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 38927: Src/Zle/zle_main.c: zle-line-pre-redraw: Set $WIDGET
