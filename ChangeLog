@@ -1,5 +1,11 @@
 2016-07-28  Oliver Kiddle  <opk@zsh.org>
 
+	* 38956: Completion/Zsh/Command/_bindkey,
+	Completion/Zsh/Command/_vared, Completion/Zsh/Command/_zle,
+	Completion/Zsh/Function/_add-zle-hook-widget,
+	Completion/Zsh/Type/_widgets: factor out zle widget completion
+	into its own function
+
 	* unposted: Functions/Zle/vi-pipe: fix for visual mode
 
 2016-07-28  Peter Stephenson  <p.stephenson@samsung.com>
