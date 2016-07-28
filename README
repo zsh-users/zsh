@@ -79,6 +79,14 @@ Other aspects of EXIT trap handling have not changed --- there is still
 only one EXIT trap at any point in a programme, so it is not generally
 useful to combine POSIX and non-POSIX behaviour in the same script.
 
+4) There was an undocumented feature dating from the early days of zsh
+that glob qualifiers consisting only of the digits 0 to 7 were treated
+as an octal file mode to "and" with the modes of files being tested.
+This has been removed in order to be more sensitive to syntax errors.
+The "f" qualifier has for many years been the documented way of testing
+file modes; it allows the "and" test ("*(f+1)" is the documented
+equivalent of "*(1)") as well as many other forms.
+
 Incompatibilities between 5.0.8 and 5.2
 ---------------------------------------
 

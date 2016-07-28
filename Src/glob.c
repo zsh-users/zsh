@@ -1282,14 +1282,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 		*ptr = '-';
 	while (*s && !newcolonmod) {
 	    func = (int (*) _((char *, Statptr, off_t, char *)))0;
-	    if (idigit(*s)) {
-		/* Store numeric argument for qualifier */
-		func = qualflags;
-		data = 0;
-		sdata = NULL;
-		while (idigit(*s))
-		    data = data * 010 + (*s++ - '0');
-	    } else if (*s == ',') {
+	    if (*s == ',') {
 		/* A comma separates alternative sets of qualifiers */
 		s++;
 		sense = 0;
