@@ -13,7 +13,7 @@ autoload -Uz read-from-minibuffer
 local _save_cut="$CUTBUFFER" REPLY
 
 # force movement to default to line mode
-zle -U V
+(( REGION_ACTIVE )) || zle -U V
 # Use the standard vi-change to accept a vi motion.
 zle .vi-change || return
 read-from-minibuffer "!"

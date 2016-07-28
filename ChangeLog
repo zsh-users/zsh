@@ -1,3 +1,7 @@
+2016-07-28  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Functions/Zle/vi-pipe: fix for visual mode
+
 2016-07-28  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 38953: Doc/Zsh/contrib.yo,
