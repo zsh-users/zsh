@@ -486,9 +486,10 @@ _git-checkout () {
           _alternative $tree_ish_arg $file_arg && ret=0
         else
           _alternative \
-            $remote_branch_noprefix_arg \
+            $file_arg \
             $tree_ish_arg \
-            $file_arg && ret=0
+            $remote_branch_noprefix_arg \
+            && ret=0
         fi
 
       elif [[ -n ${opt_args[(I)-b|-B|-t|--track|--orphan|--detach]} ]]; then
