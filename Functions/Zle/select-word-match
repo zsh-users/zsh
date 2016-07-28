@@ -12,7 +12,7 @@ emulate -L zsh
 setopt extendedglob
 
 local curcontext=:zle:$WIDGET
-local -a matched_words
+local -A matched_words
 # Start and end of range of characters
 integer pos1 pos2 num=${NUMERIC:-1}
 local style word
@@ -28,10 +28,10 @@ while (( num-- )); do
   if (( MARK > CURSOR )); then
     # if cursor is at the start of the selection, just move back a word
     match-words-by-style
-    if [[ $style = i && -n $matched_words[3] ]]; then
-      word=$matched_words[3]
+    if [[ $style = i && -n $matched_words[ws-before-cursor] ]]; then
+      word=$matched_words[ws-before-cursor]
     else
-      word=$matched_words[2]$matched_words[3]
+      word=$matched_words[word-before-cursor]$matched_words[ws-before-cursor]
     fi
     if [[ -n $word ]]; then
       (( CURSOR -= ${#word} ))
@@ -43,41 +43,40 @@ while (( num-- )); do
     (( CURSOR+1 == $#BUFFER )) && return 1
     (( CURSOR++ ))
     match-words-by-style
-    if [[ -n $matched_words[4] ]]; then
+    if [[ -n $matched_words[ws-after-cursor] ]]; then
       if [[ $style = i ]]; then
 	# just skip the whitespace
-	word=$matched_words[4]
+	word=$matched_words[ws-after-cursor]
       else
 	# skip the whitespace plus word
-	word=$matched_words[4]$matched_words[5]
+	word=$matched_words[ws-after-cursor]$matched_words[word-after-cursor]
       fi
     else
       if [[ $style = i ]]; then
 	# skip the word
-	word=$matched_words[5]
+	word=$matched_words[word-after-cursor]
       else
 	# skip word and following whitespace
-	word=$matched_words[5]$matched_words[6]
+	word=$matched_words[word-after-cursor]$matched_words[ws-after-word]
       fi
     fi
     (( CURSOR += ${#word} - 1 ))
   else
     match-words-by-style
 
-    if [[ -n "${matched_words[3]}" ]]; then
-      # There's whitespace before the cursor, so the word we are selecting
-      # starts at the cursor position.
+    if (( ${matched_words[is-word-start]} )); then
+      # The word we are selecting starts at the cursor position.
       pos1=$CURSOR
     else
       # No whitespace before us, so select any wordcharacters there.
-      pos1="${#matched_words[1]}"
+      pos1="${#matched_words[start]}"
     fi
 
-    if [[ -n "${matched_words[4]}" ]]; then
-      if [[ -n "${matched_words[3]}" ]] || (( CURSOR == 0 )); then
+    if [[ -n "${matched_words[ws-after-cursor]}" ]]; then
+      if [[ -n "${matched_words[ws-before-cursor]}" ]] || (( CURSOR == 0 )); then
         # whitespace either side, select it
-	(( pos1 = CURSOR - ${#matched_words[3]} ))
-	(( pos2 = CURSOR + ${#matched_words[4]} ))
+	(( pos1 = CURSOR - ${#matched_words[ws-before-cursor]} ))
+	(( pos2 = CURSOR + ${#matched_words[ws-after-cursor]} ))
       else
 	# There's whitespace at the cursor position, so only select
 	# up to the cursor position.
@@ -86,28 +85,28 @@ while (( num-- )); do
     else
       # No whitespace at the cursor position, so select the
       # current character and any following wordcharacters.
-      (( pos2 = CURSOR + ${#matched_words[5]} ))
+      (( pos2 = CURSOR + ${#matched_words[word-after-cursor]} ))
     fi
 
     if [[ $style = a ]]; then
-      if [[ -n "${matched_words[4]}"  && ( -n "${matched_words[3]}" || CURSOR -eq 0 ) ]]; then
+      if [[ -n "${matched_words[ws-after-cursor]}"  && ( -n "${matched_words[ws-before-cursor]}" || CURSOR -eq 0 ) ]]; then
 	# in the middle of whitespace so grab a word
-	if [[ -n "${matched_words[5]}" ]]; then
-	  (( pos2 += ${#matched_words[5]} )) # preferably the one after
+	if [[ -n "${matched_words[word-after-cursor]}" ]]; then
+	  (( pos2 += ${#matched_words[word-after-cursor]} )) # preferably the one after
 	else
-	  (( pos1 -= ${#matched_words[2]} )) # otherwise the one before
+	  (( pos1 -= ${#matched_words[word-before-cursor]} )) # otherwise the one before
 	fi
-      elif [[ -n "${matched_words[6]}" ]]; then
-	(( pos2 += ${#matched_words[6]} ))
-      elif [[ -n "${matched_words[3]}" ]]; then
+      elif [[ -n "${matched_words[ws-after-word]}" ]]; then
+	(( pos2 += ${#matched_words[ws-after-word]} ))
+      elif [[ -n "${matched_words[ws-before-cursor]}" ]]; then
 	# couldn't grab whitespace forwards so try backwards
-	(( pos1 -= ${#matched_words[3]} ))
+	(( pos1 -= ${#matched_words[ws-before-cursor]} ))
       elif (( pos1 > 0 )); then
 	# There might have been whitespace before the word
 	(( CURSOR = pos1 ))
 	match-words-by-style
-	if [[ -n "${matched_words[3]}" ]]; then
-	  (( pos1 -= ${#matched_words[3]} ))
+	if [[ -n "${matched_words[ws-before-cursor]}" ]]; then
+	  (( pos1 -= ${#matched_words[ws-before-cursor]} ))
 	fi
       fi
     fi

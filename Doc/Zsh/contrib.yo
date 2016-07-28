@@ -2105,7 +2105,7 @@ Here are some examples of use of the tt(word-context) style to extend
 the context.
 
 example(zstyle ':zle:*' word-context \ 
-       "*/*" file "[[:space:]]" whitespace
+       "*/*" filename "[[:space:]]" whitespace
 zstyle ':zle:transpose-words:whitespace' word-style shell
 zstyle ':zle:transpose-words:filename' word-style normal
 zstyle ':zle:transpose-words:filename' word-chars '')

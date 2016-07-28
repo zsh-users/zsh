@@ -173,6 +173,7 @@ styles=(
   url-seps               e:
   whence                 e:
   word-chars             e:
+  word-class             e:
   word-style             e:word-style
   word-context           e:
 
@@ -241,11 +242,13 @@ while (( $#state )); do
   case "$state[1]" in
     (contexts)
       if [[ ! -prefix :*: ]]; then
-	_wanted contexts expl context compadd -P : -qS : completion vcs_info zftp
+	_wanted contexts expl context compadd -P : -qS : chpwd completion vcs_info zftp zle
       elif compset -P :completion:; then
         contexts=( functions _completers cmdorcont argument tag )
       elif compset -P :vcs_info:; then
         contexts=( vcs-string user-context repo-root-name )
+      elif compset -P :zle:; then
+	_wanted widgets expl widget _widgets -qS :
       fi
       if (( $#contexts )); then
         for ostate in $contexts; do
@@ -521,7 +524,7 @@ while (( $#state )); do
       ;;
 
     (word-style)
-      _wanted word-styles expl 'word style' compadd normal shell space
+      _wanted word-styles expl 'word style' compadd {normal,specified,unspecified,shell,whitespace}-subword
       ;;
 
     (vcs-string)
