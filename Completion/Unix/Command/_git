@@ -2701,11 +2701,16 @@ _git-config () {
           ;;
       esac
       local z=$'\0'
+
+      # Set $parts to the $git_options_static element that corresponds to $line[1]
+      # (the option name whose value is currently being completed).  The elements
+      # of $parts are the colon-separated elements of the $git_options_static element.
       declare -a parts
       parts=("${(S@0)${git_options_static[(r)(#i)${line[1]}:*]}//(#b)(*[^\\]|):/$match[1]$z}")
       if (( $#parts < 2 )) && [[ $line[1] == [^.]##.*.[^.]## ]]; then
         parts=("${(S@0)${git_options_static[(r)(#i)${line[1]%%.*}.\*.${line[1]##*.}:*]}//(#b)(*[^\\]|):/$match[1]$z}")
       fi
+
       (( $#parts >= 4 )) || return ret
       case $parts[4] in
         ('->'*)

@@ -1,5 +1,8 @@
 2016-07-31  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38962: Completion/Unix/Command/_git: _git-config: Document
+	more line noise.
+
 	* 38959: Doc/Zsh/compsys.yo: Document 38956 (_widgets).
 
 2016-07-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
