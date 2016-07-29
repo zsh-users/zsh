@@ -221,6 +221,18 @@ _svnadmin () {
             (freeze)
               args+=( "*:arguments:->normal" )
               ;;
+            (hotcopy)
+              args+=( ":new repository:_files -/" )
+              ;;
+            (setlog)
+              args+=( ": :_files" )
+              ;;
+            (setrevprop)
+              args+=( ":property name" ":property value file:_files" )
+              ;;
+            (delrevprop)
+              args+=( ":property name" )
+              ;;
           esac
         elif [[ $cmd = help ]]; then
           args+=( "*:subcommand:_svnadmin_commands" )

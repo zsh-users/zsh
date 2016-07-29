@@ -1,5 +1,9 @@
 2016-07-31  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38966: Completion/Unix/Command/_subversion: _svnadmin: Complete
+	positional arguments for 'hotcopy', 'setlog', 'setrevprop',
+	'delrevprop'.
+
 	* 38965: Completion/Unix/Command/_subversion: _svnadmin: Complete
 	'freeze' as a precommand.
 
