@@ -183,6 +183,9 @@ _svn () {
 
 _svnadmin () {
   local curcontext="$curcontext" state line ret=1
+  integer NORMARG
+  local context state_descr
+  typeset -A opt_args
 
   _arguments -C \
     '(-)--help[print help information]' \
@@ -214,11 +217,36 @@ _svnadmin () {
         )
         if [[ $usage == *REPOS_PATH* ]]; then
           args+=( ":repository path:_files -/" )
+          case $cmd in
+            (freeze)
+              args+=( "*:arguments:->normal" )
+              ;;
+          esac
         elif [[ $cmd = help ]]; then
           args+=( "*:subcommand:_svnadmin_commands" )
         fi
 
-        _arguments "$args[@]" && ret=0
+        _arguments -n -s -S : "$args[@]" && ret=0
+
+        case $state in
+          # Test cases:
+          #   svnadmin freeze . rsync --<TAB> offers --file
+          #   svnadmin freeze -- . rsync -<TAB> offers rsync's options
+          #
+          # Note: the NORMARG calculations here include one positional argument
+          # (the '.') before the command.
+          (normal)
+            if (( ${words[(i)--]} < CURRENT )); then
+              words[1,NORMARG]=()
+              (( CURRENT -= NORMARG ))
+              _normal && ret=0
+            elif (( NORMARG+1 == CURRENT )); then
+              # ### don't allow --options in this case
+              # TODO: this should just use '_normal -F "(-*)"', but _normal ignores its arguments.
+              _command_names -e && ret=0
+            fi
+            ;;
+        esac
       else
         _message "unknown svnadmin command: $words[1]"
       fi

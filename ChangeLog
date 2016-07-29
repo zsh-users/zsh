@@ -1,5 +1,8 @@
 2016-07-31  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38965: Completion/Unix/Command/_subversion: _svnadmin: Complete
+	'freeze' as a precommand.
+
 	* 38962: Completion/Unix/Command/_git: _git-config: Document
 	more line noise.
 
