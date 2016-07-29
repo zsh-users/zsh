@@ -2459,6 +2459,39 @@ _git-config () {
     ${${${(0)"$(_call_program gettable-options git config -z --list)"}%%$'\n'*}//:/\\:}
   )
 
+  # Add to $git_options options from the config file that aren't already in $git_options.
+  () {
+    local -a -U sections_that_permit_arbitrary_subsection_names=(
+      alias
+      pager
+      pretty
+      remotes
+      ${(u)${(M)${git_options%%:*}:#*[.][*][.]*}%%.*}
+    )
+    local key
+    for key in $git_present_options ; do
+      if (( ${+git_options[(r)(#i)${(b)key}:*]} )); then
+        # $key is already in git_options
+        continue 
+      elif (( ${+sections_that_permit_arbitrary_subsection_names[(r)${(b)key%%.*}]} )); then
+        if [[ $key == *.*.* ]]; then
+          # If $key isn't an instance of a known foo.*.bar:baz $git_options entry...
+          if ! (( ${+git_options[(r)(#i)${(b)key%%.*}.[*].${(b)key##*.}:*]} )); then
+            # ... then add it.
+            git_options+="${key}:unknown option name"
+          fi
+        else
+          # $key is of the form "foo.bar" where 'foo' is known
+          # No need to add it; "foo.<TAB>' will find 'bar' via another codepath later
+          # ### TODO: that "other codepath" will probably run git config -z again, redundantly.
+          continue
+        fi
+      else
+        git_options+="${key}:unknown option name"
+      fi
+    done
+  }
+
   case $state in
     (section)
       __git_config_sections -b '(|)' '^' section-names 'section name' $* && ret=0
@@ -2539,6 +2572,8 @@ _git-config () {
         # following functions don't generate any output in the case of
         # multi-level options.
         case $IPREFIX in
+          # Note: If you add a branch to this 'case' statement,
+          # update $sections_that_permit_arbitrary_subsection_names.
           (alias.)
             __git_aliases && ret=0
             ;;
@@ -2595,6 +2630,10 @@ _git-config () {
             ;;
           (svn-remote.)
             __git_svn-remotes -S . && ret=0
+            ;;
+          (*.)
+            local -a existing_subsections=( ${${${(M)git_present_options:#${IPREFIX}*.*}#${IPREFIX}}%.*} )
+            _describe -t existing-subsections "existing subsections" existing_subsections -S . && ret=0
             ;;
         esac
       else
@@ -2658,6 +2697,13 @@ _git-config () {
           web:'web options'
           svn:'git svn options'
           svn-remote:'git svn remotes')
+        () {
+          local i
+          for i in ${(u)git_present_options%%.*}; do
+            (( ${+sections[(r)(#i)${(b)i}:*]} )) ||
+              sections+="${i}:unknown section name"
+          done
+        }
       fi
 
       # TODO: Add equivalent of -M 'r:|.=* r:|=*' here so that we can complete
