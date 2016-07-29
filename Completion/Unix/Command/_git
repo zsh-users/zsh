@@ -1959,8 +1959,8 @@ _git-config () {
   # TODO: Add support for merge.*. (merge driver), diff.*. (diff driver), and filter.*. (filter driver) options
   # (see gitattributes(5)).
   # TODO: .path options should take absolute paths.
-  declare -a git_options_static
-  git_options_static=(
+  declare -a git_options
+  git_options=(
     advice.pushNonFastForward:'show advice when git push refuses non-fast-forward refs::->bool:true'
     advice.pushUpdateRejected:'combined setting for advice.push*::->bool:true'
     advice.pushNonFFCurrent:'show advice when git push fails due to a non-fast-forward update to the current branch::->bool:true'
@@ -2474,10 +2474,10 @@ _git-config () {
 
       if compset -P '[^.]##.*.'; then
         declare -a match mbegin mend
-        # When completing 'remote.foo.<TAB>', offer 'bar' if $git_options_static contains 'remote.foo.bar'.
-        options+=(${${${${(M)git_options_static:#(#i)${IPREFIX}[^.:]##:*}#(#i)${IPREFIX}}/#(#b)([^:]##:)([^\\:]#(\\?[^\\:]#)#:[^\\:]#(\\?[^\\:]#)#:->bool)/$match[1]whether or not to $match[2]}/#(#b)([^:]##:([^\\:]#(\\?[^\\:]#)#))*/$match[1]})
-        # When completing 'remote.foo.<TAB>', offer 'bar' if $git_options_static contains 'remote.*.bar'.
-        options+=(${${${${(M)git_options_static:#(#i)${IPREFIX%%.*}.\*.[^.:]##:*}#(#i)${IPREFIX%%.*}.\*.}/#(#b)([^:]##:)([^\\:]#(\\?[^\\:]#)#:[^\\:]#(\\?[^\\:]#)#:->bool)/$match[1]whether or not to $match[2]}/#(#b)([^:]##:([^\\:]#(\\?[^\\:]#)#))*/$match[1]})
+        # When completing 'remote.foo.<TAB>', offer 'bar' if $git_options contains 'remote.foo.bar'.
+        options+=(${${${${(M)git_options:#(#i)${IPREFIX}[^.:]##:*}#(#i)${IPREFIX}}/#(#b)([^:]##:)([^\\:]#(\\?[^\\:]#)#:[^\\:]#(\\?[^\\:]#)#:->bool)/$match[1]whether or not to $match[2]}/#(#b)([^:]##:([^\\:]#(\\?[^\\:]#)#))*/$match[1]})
+        # When completing 'remote.foo.<TAB>', offer 'bar' if $git_options contains 'remote.*.bar'.
+        options+=(${${${${(M)git_options:#(#i)${IPREFIX%%.*}.\*.[^.:]##:*}#(#i)${IPREFIX%%.*}.\*.}/#(#b)([^:]##:)([^\\:]#(\\?[^\\:]#)#:[^\\:]#(\\?[^\\:]#)#:->bool)/$match[1]whether or not to $match[2]}/#(#b)([^:]##:([^\\:]#(\\?[^\\:]#)#))*/$match[1]})
 
         declare -a labels
         labels=(
@@ -2511,8 +2511,8 @@ _git-config () {
       elif compset -P '[^.]##.'; then
         local opt
         declare -a match mbegin mend
-        for opt in ${${${${(M)git_options_static:#(#i)${IPREFIX}[^.:]##:*}#(#i)${IPREFIX}}/#(#b)([^:]##:)([^\\:]#(\\?[^\\:]#)#:[^\\:]#(\\?[^\\:]#)#:->bool)/$match[1]whether or not to $match[2]}/#(#b)([^:]##:([^\\:]#(\\?[^\\:]#)#))*/$match[1]}; do
-          if (( ${git_options_static[(I)${opt%%:*}.*]} )); then
+        for opt in ${${${${(M)git_options:#(#i)${IPREFIX}[^.:]##:*}#(#i)${IPREFIX}}/#(#b)([^:]##:)([^\\:]#(\\?[^\\:]#)#:[^\\:]#(\\?[^\\:]#)#:->bool)/$match[1]whether or not to $match[2]}/#(#b)([^:]##:([^\\:]#(\\?[^\\:]#)#))*/$match[1]}; do
+          if (( ${git_options[(I)${opt%%:*}.*]} )); then
             sections_and_options+=$opt
           else
             options+=$opt
@@ -2702,13 +2702,13 @@ _git-config () {
       esac
       local z=$'\0'
 
-      # Set $parts to the $git_options_static element that corresponds to $line[1]
+      # Set $parts to the $git_options element that corresponds to $line[1]
       # (the option name whose value is currently being completed).  The elements
-      # of $parts are the colon-separated elements of the $git_options_static element.
+      # of $parts are the colon-separated elements of the $git_options element.
       declare -a parts
-      parts=("${(S@0)${git_options_static[(r)(#i)${line[1]}:*]}//(#b)(*[^\\]|):/$match[1]$z}")
+      parts=("${(S@0)${git_options[(r)(#i)${line[1]}:*]}//(#b)(*[^\\]|):/$match[1]$z}")
       if (( $#parts < 2 )) && [[ $line[1] == [^.]##.*.[^.]## ]]; then
-        parts=("${(S@0)${git_options_static[(r)(#i)${line[1]%%.*}.\*.${line[1]##*.}:*]}//(#b)(*[^\\]|):/$match[1]$z}")
+        parts=("${(S@0)${git_options[(r)(#i)${line[1]%%.*}.\*.${line[1]##*.}:*]}//(#b)(*[^\\]|):/$match[1]$z}")
       fi
 
       (( $#parts >= 4 )) || return ret
