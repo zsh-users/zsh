@@ -45,13 +45,22 @@ if ! zstyle -a ":completion:${curcontext}:hosts" hosts _hosts; then
 
         # known_hosts syntax supports the host being in the form [hostname]:port
         # The filter below extracts the hostname from lines using this format.
-        khosts=($(for host ($khosts); do
-          if [[ $host =~ "\[(.*)\]:\d*" ]]; then
-            echo $match
-          else
-            echo $host
-          fi
-        done))
+        #
+        # known_hosts syntax supports wildcards.  The filter below removes wildcard
+        # entries.
+        () {
+          local host
+          khosts=()
+          for host; do
+            if [[ $host == *[*?]* ]]; then
+              continue
+            elif [[ $host =~ "\[(.*)\]:\d*" ]]; then
+              khosts+=$match
+            else
+              khosts+=$host
+            fi
+          done
+        } "$khosts[@]"
 
         if [[ -z $useip ]]; then
           khosts=(${${khosts:#(#s)[0-9]##.[0-9]##.[0-9]##.[0-9]##(#e)}:#(#s)[0-9a-f:]##(#e)})

@@ -1,5 +1,8 @@
 2016-07-31  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38967: Completion/Unix/Type/_hosts: Don't complete wildcard
+	entries from ~/.ssh/known_hosts.
+
 	* 38966: Completion/Unix/Command/_subversion: _svnadmin: Complete
 	positional arguments for 'hotcopy', 'setlog', 'setrevprop',
 	'delrevprop'.
