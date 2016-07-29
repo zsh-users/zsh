@@ -2454,6 +2454,11 @@ _git-config () {
     user.signingkey:'default GPG key to use when creating signed tags::__git_gpg_secret_keys'
     web.browser:'web browser to use::__git_browsers')
 
+  declare -a git_present_options # 'present' is an adjective
+  git_present_options=(
+    ${${${(0)"$(_call_program gettable-options git config -z --list)"}%%$'\n'*}//:/\\:}
+  )
+
   case $state in
     (section)
       __git_config_sections -b '(|)' '^' section-names 'section name' $* && ret=0
@@ -2663,8 +2668,7 @@ _git-config () {
         options -M 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' && ret=0
       ;;
     (gettable-option)
-      _wanted git-options expl option compadd -M 'r:|.=* r:|=*' - \
-        ${${${(0)"$(_call_program gettable-options git config -z --list)"}%%$'\n'*}//:/\\:} && ret=0
+      _wanted git-options expl option compadd -M 'r:|.=* r:|=*' -a - git_present_options && ret=0
       ;;
     (gettable-colorbool-option)
       __git_config_sections -b '(|)' -a '(|)' '^color\.[^.]+$' gettable-colorbool-options option && ret=0

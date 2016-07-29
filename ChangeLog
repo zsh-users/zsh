@@ -1,5 +1,8 @@
 2016-08-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38963: Completion/Unix/Command/_git: _git-config: Run
+	gettable-options earlier and in all codepaths.
+
 	* 38961: Completion/Unix/Command/_git: _git-config: No functional
 	change: rename $git_options_static to $git_options in preparation
 	for the after-next commit.
