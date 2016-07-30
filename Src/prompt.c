@@ -395,11 +395,11 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 			test = 1;
 		    break;
 		case 'v':
-		    if (arrlen(psvar) >= arg)
+		    if (arrlen_ge(psvar, arg))
 			test = 1;
 		    break;
 		case 'V':
-		    if (arrlen(psvar) >= arg) {
+		    if (arrlen_ge(psvar, arg)) {
 			if (*psvar[(arg ? arg : 1) - 1])
 			    test = 1;
 		    }
@@ -736,7 +736,7 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		    arg = 1;
 		else if (arg < 0)
 		    arg += arrlen(psvar) + 1;
-		if (arg > 0 && arrlen(psvar) >= arg)
+		if (arg > 0 && arrlen_ge(psvar, arg))
 		    stradd(psvar[arg - 1]);
 		break;
 	    case 'E':

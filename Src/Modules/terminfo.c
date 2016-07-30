@@ -99,7 +99,7 @@ bin_echoti(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	return 1;
     }
     /* check that the number of arguments provided is not too high */
-    if (arrlen(argv) > 9) {
+    if (arrlen_gt(argv, 9)) {
         zwarnnam(name, "too many arguments");
         return 1;
     }

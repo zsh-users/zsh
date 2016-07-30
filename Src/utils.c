@@ -1157,7 +1157,7 @@ finddir(char *s)
     scanhashtable(nameddirtab, 0, 0, 0, finddir_scan, 0);
 
     ares = subst_string_by_hook("zsh_directory_name", "d", finddir_full);
-    if (ares && arrlen(ares) >= 2 &&
+    if (ares && arrlen_ge(ares, 2) &&
 	(len = (int)zstrtol(ares[1], NULL, 10)) > finddir_best) {
 	/* better duplicate this string since it's come from REPLY */
 	finddir_last = (Nameddir)hcalloc(sizeof(struct nameddir));

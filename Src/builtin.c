@@ -3406,7 +3406,7 @@ bin_unset(char *name, char **argv, Options ops, int func)
 		    } else {
 			/* start is after the element for reverse index */
 			int start = vbuf.start - !!(vbuf.flags & VALFLAG_INV);
-			if (start < arrlen(vbuf.pm->u.arr)) {
+			if (arrlen_gt(vbuf.pm->u.arr, start)) {
 			    char *arr[2];
 			    arr[0] = "";
 			    arr[1] = 0;
@@ -5026,7 +5026,7 @@ bin_shift(char *name, char **argv, Options ops, UNUSED(int func))
     if (*argv) {
         for (; *argv; argv++)
             if ((s = getaparam(*argv))) {
-                if (num > arrlen(s)) {
+                if (arrlen_lt(s, num)) {
 		    zwarnnam(name, "shift count must be <= $#");
 		    ret++;
 		    continue;
@@ -5095,7 +5095,7 @@ bin_getopts(UNUSED(char *name), char **argv, UNUSED(Options ops), UNUSED(int fun
 	zoptind = 1;
 	optcind = 0;
     }
-    if(zoptind > arrlen(args))
+    if (arrlen_lt(args, zoptind))
 	/* no more options */
 	return 1;
 

@@ -1,5 +1,9 @@
 2016-08-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38971: Src/Modules/terminfo.c, Src/Modules/zutil.c,
+	Src/builtin.c, Src/params.c, Src/prompt.c, Src/utils.c: Start
+	using the new arrlen_ge() / arrlen_le() helpers.
+
 	* 38973: Src/params.c, Src/subst.c, Src/utils.c: Optimize
 	indexing array parameters.
 
