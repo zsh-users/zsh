@@ -3477,7 +3477,7 @@ will ensure that any files found in that area will be executed as MIME
 types even if they are executable.  As this example shows, the complete
 file name is matched against the pattern, regardless of how the file
 was passed to the handler.  The file is resolved to a full path using
-the tt(:A) modifier described in
+the tt(:P) modifier described in
 ifzman(the subsection Modifiers in zmanref(zshexpn))\
 ifnzman(noderef(Modifiers));
 this means that symbolic links are resolved where possible, so that

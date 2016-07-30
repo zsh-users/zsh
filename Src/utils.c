@@ -801,9 +801,9 @@ findpwd(char *s)
     char *t;
 
     if (*s == '/')
-	return xsymlink(s);
+	return xsymlink(s, 0);
     s = tricat((pwd[1]) ? pwd : "", "/", s);
-    t = xsymlink(s);
+    t = xsymlink(s, 0);
     zsfree(s);
     return t;
 }
@@ -969,11 +969,13 @@ xsymlinks(char *s, int full)
 /*
  * expand symlinks in s, and remove other weird things:
  * note that this always expands symlinks.
+ *
+ * 'heap' indicates whether to malloc() or allocate on the heap.
  */
 
 /**/
 char *
-xsymlink(char *s)
+xsymlink(char *s, int heap)
 {
     if (*s != '/')
 	return NULL;
@@ -981,8 +983,8 @@ xsymlink(char *s)
     if (xsymlinks(s + 1, 1) < 0)
 	zwarn("path expansion failed, using root directory");
     if (!*xbuf)
-	return ztrdup("/");
-    return ztrdup(xbuf);
+	return heap ? dupstring("/") : ztrdup("/");
+    return heap ? dupstring(xbuf) : ztrdup(xbuf);
 }
 
 /**/
@@ -1260,7 +1262,7 @@ getnameddir(char *name)
 	/* Retrieve an entry from the password table/database for this user. */
 	struct passwd *pw;
 	if ((pw = getpwnam(name))) {
-	    char *dir = isset(CHASELINKS) ? xsymlink(pw->pw_dir)
+	    char *dir = isset(CHASELINKS) ? xsymlink(pw->pw_dir, 0)
 		: ztrdup(pw->pw_dir);
 	    if (dir) {
 		adduserdir(name, dir, ND_USERNAME, 1);

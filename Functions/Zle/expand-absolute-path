@@ -10,7 +10,7 @@ autoload -Uz modify-current-argument
 if (( ! ${+functions[glob-expand-absolute-path]} )); then
   glob-expand-absolute-path() {
     local -a files
-    files=(${~1}(N:A))
+    files=(${~1}(N:P))
     (( ${#files} )) || return
     REPLY=${(D)files[1]}
   }

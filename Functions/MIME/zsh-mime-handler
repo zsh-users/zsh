@@ -127,7 +127,7 @@ for pattern in $exec_asis; do
   files=(${dirpref}${~pattern})
   if [[ -n ${files[(r)$1]} ]]; then
     for pattern in $exec_never; do
-      [[ ${1:A} = ${~pattern} ]] && break 2
+      [[ ${1:P} = ${~pattern} ]] && break 2
     done
     if (( list )); then
       for (( i = 1; i <= $#; i++ )); do

@@ -22,7 +22,7 @@ case $OSTYPE in
     )
   ;;
   linux*)
-    dirs=( /proc/${^$(pidof zsh):#$$}/cwd(N:A) )
+    dirs=( /proc/${^$(pidof zsh):#$$}/cwd(N:P) )
     dirs=( $^dirs(N^@) )
   ;;
   *)

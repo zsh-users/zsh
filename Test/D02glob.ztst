@@ -678,3 +678,11 @@
  rm glob.tmp/link
 0:modifier ':A' resolves '..' components before symlinks
 # There should be no output
+
+ ln -s dir3/subdir glob.tmp/link
+ () {
+   print ${1:P}
+ } glob.tmp/link/../../hello/world
+ rm glob.tmp/link
+0:modifier ':P' resolves symlinks before '..' components
+*>*glob.tmp/hello/world

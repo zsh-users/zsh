@@ -170,7 +170,7 @@ function VCS_INFO_quilt() {
             applied=()
         fi
         patches=$(<$pc/.quilt_patches)
-        patches=`builtin cd -q "${pc:h}" && print -r - ${patches:A}`
+        patches=`builtin cd -q "${pc:h}" && print -r - ${patches:P}`
     fi
     if zstyle -t "${context}" get-unapplied; then
         # This zstyle call needs to be moved further up if `quilt' needs

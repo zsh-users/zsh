@@ -240,6 +240,7 @@ function, symbolic links are not resolved, so on those systems `tt(a)' and
 `tt(A)' are equivalent.
 
 Note: tt(foo:A) and tt(realpath+LPAR()foo+RPAR()) are different on some inputs.
+For tt(realpath+LPAR()foo+RPAR()) semantics, see the `tt(P)` modifier.
 )
 item(tt(c))(
 Resolve a command name into an absolute path by searching the command
@@ -264,6 +265,14 @@ Convert the words to all lowercase.
 item(tt(p))(
 Print the new command but do not execute it.  Only works with history
 expansion.
+)
+item(tt(P))(
+Turn a file name into an absolute path, like tt(realpath+LPAR()3+RPAR()).
+The resulting path will be absolute, have neither `tt(.)' nor `tt(..)' components,
+and refer to the same directory entry as the input filename.
+
+Unlike tt(realpath+LPAR()3+RPAR()), non-existent trailing components are
+permitted and preserved.
 )
 item(tt(q))(
 Quote the substituted words, escaping further substitutions.  Works

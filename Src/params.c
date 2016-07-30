@@ -4336,7 +4336,7 @@ void
 homesetfn(UNUSED(Param pm), char *x)
 {
     zsfree(home);
-    if (x && isset(CHASELINKS) && (home = xsymlink(x)))
+    if (x && isset(CHASELINKS) && (home = xsymlink(x, 0)))
 	zsfree(x);
     else
 	home = x ? x : ztrdup("");

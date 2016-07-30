@@ -64,8 +64,8 @@ while true; do
       )
     if (( ! global )); then
       list+=(
-	"a:absolute path"
-	"A:absolute path resolving symbolic links"
+	"a:absolute path, resolve '..' lexically"
+	"A:as ':a', then resolve symlinks"
 	"c:PATH search for command"
 	"g:globally apply s or &"
 	"h:head - strip trailing path element"
@@ -73,6 +73,7 @@ while true; do
 	"r:root - strip suffix"
 	"e:leave only extension"
 	"Q:strip quotes"
+	"P:realpath, resolve '..' physically"
 	"l:lower case all words"
 	"u:upper case all words"
 	)

@@ -4,6 +4,17 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes from 5.2 to 5.3
+-----------------------
+
+The new word modifier ':P' computes the physical path of the argument.
+It is different from the existing ':a' modifier which always resolves
+'/before/here/../after' to '/before/after', and differs from the
+existing ':A' modifier which resolves symlinks only after 'here/..' is
+removed, even when /before/here is itself a symbolic link.  It is
+recommended to review uses of ':A' and, if appropriate, convert them
+to ':P' as soon as compatibility with 5.2 is no longer a requirement.
+
 Changes from 5.1.1 to 5.2
 -------------------------
 

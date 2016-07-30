@@ -1,3 +1,13 @@
+2016-08-22  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 39046 + 39061: Completion/Base/Completer/_external_pwds,
+	Completion/Zsh/Type/_history_modifiers, Doc/Zsh/contrib.yo,
+	Doc/Zsh/expn.yo, Functions/MIME/zsh-mime-handler,
+	Functions/VCS_Info/VCS_INFO_quilt,
+	Functions/Zle/expand-absolute-path, NEWS, Src/params.c,
+	Src/subst.c, Src/utils.c, Test/D02glob.ztst: New :P history
+	modifier.
+
 2016-08-20  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 39064: configure.ac, Src/Modules/mathfuc.c: use scalbn() instead

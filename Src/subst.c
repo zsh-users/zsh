@@ -4081,6 +4081,7 @@ modify(char **str, char **ptr)
 	    case 'u':
 	    case 'q':
 	    case 'Q':
+	    case 'P':
 		c = **ptr;
 		break;
 
@@ -4287,6 +4288,12 @@ modify(char **str, char **ptr)
 			    untokenize(copy);
 			}
 			break;
+		    case 'P':
+			if (*copy != '/') {
+			    copy = zhtricat(metafy(zgetcwd(), -1, META_HEAPDUP), "/", copy);
+			}
+			copy = xsymlink(copy, 1);
+			break;
 		    }
 		    tc = *tt;
 		    *tt = '\0';
@@ -4362,6 +4369,12 @@ modify(char **str, char **ptr)
 			remnulargs(*str);
 			untokenize(*str);
 		    }
+		    break;
+		case 'P':
+		    if (**str != '/') {
+			*str = zhtricat(metafy(zgetcwd(), -1, META_HEAPDUP), "/", *str);
+		    }
+		    *str = xsymlink(*str, 1);
 		    break;
 		}
 	    }
