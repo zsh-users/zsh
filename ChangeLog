@@ -1,5 +1,8 @@
 2016-07-31  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Completion/Unix/Command/_git: Clean up superfluous
+	and missing backslashes.
+
 	* 38967: Completion/Unix/Type/_hosts: Don't complete wildcard
 	entries from ~/.ssh/known_hosts.
 
