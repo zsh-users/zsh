@@ -2548,12 +2548,19 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		 * necessary joining of arrays until this point
 		 * to avoid the multsub() horror.
 		 */
-		int tmplen = arrlen(v->pm->gsu.a->getfn(v->pm));
 
-		if (v->start < 0)
+		/* arrlen() is expensive, so only compute it if needed. */
+		int tmplen = -1;
+
+		if (v->start < 0) {
+		    tmplen = arrlen(v->pm->gsu.a->getfn(v->pm));
 		    v->start += tmplen + ((v->flags & VALFLAG_INV) ? 1 : 0);
-		if (!(v->flags & VALFLAG_INV) &&
-		    (v->start >= tmplen || v->start < 0))
+		}
+		if (!(v->flags & VALFLAG_INV))
+		    if (v->start < 0 ||
+			(tmplen != -1
+			 ? v->start >= tmplen
+			 : arrlen_le(v->pm->gsu.a->getfn(v->pm), v->start)))
 		    vunset = 1;
 	    }
 	    if (!vunset) {

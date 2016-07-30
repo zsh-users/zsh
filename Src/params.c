@@ -2026,7 +2026,7 @@ getstrvalue(Value v)
 	else {
 	    if (v->start < 0)
 		v->start += arrlen(ss);
-	    s = (v->start >= arrlen(ss) || v->start < 0) ?
+	    s = (arrlen_le(ss, v->start) || v->start < 0) ?
 		(char *) hcalloc(1) : ss[v->start];
 	}
 	return s;

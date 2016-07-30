@@ -2280,6 +2280,46 @@ arrlen(char **s)
     return count;
 }
 
+/* Return TRUE iff arrlen(s) >= lower_bound, but more efficiently. */
+
+/**/
+mod_export char
+arrlen_ge(char **s, unsigned lower_bound)
+{
+    while (lower_bound--)
+	if (!*s++)
+	    return 0 /* FALSE */;
+
+    return 1 /* TRUE */;
+}
+
+/* Return TRUE iff arrlen(s) > lower_bound, but more efficiently. */
+
+/**/
+mod_export char
+arrlen_gt(char **s, unsigned lower_bound)
+{
+    return arrlen_ge(s, 1+lower_bound);
+}
+
+/* Return TRUE iff arrlen(s) <= upper_bound, but more efficiently. */
+
+/**/
+mod_export char
+arrlen_le(char **s, unsigned upper_bound)
+{
+    return arrlen_lt(s, 1+upper_bound);
+}
+
+/* Return TRUE iff arrlen(s) < upper_bound, but more efficiently. */
+
+/**/
+mod_export char
+arrlen_lt(char **s, unsigned upper_bound)
+{
+    return !arrlen_ge(s, upper_bound);
+}
+
 /* Skip over a balanced pair of parenthesis. */
 
 /**/
