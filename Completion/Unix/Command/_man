@@ -44,15 +44,21 @@ _man() {
   if [[ $OSTYPE = solaris* ]]; then
     sect=${${words[(R)-s*]#-s}:-$words[$words[(i)-s]+1]}
   elif [[ -n ${sect:=$words[$words[(i)-S]+1]} || -n ${sect:=$MANSECT} ]]; then
-    if [[ $sect != ${sect::="${sect//:/|}"} ]]; then
-      sect="($sect)"
-    fi
+    sect="${sect//:/|}"
+    sect="${sect//,/|}"
   elif (( CURRENT > 2 )); then
     sect=$words[2]
   fi
 
-  if [[ $sect = (<->*|1M|l|n) || $sect = \(*\|*\) ]]; then
-    dirs=( $^_manpath/(sman|man|cat)${~sect%%[^0-9]#}/ )
+  if [[ $sect = (<->*|1M|l|n) || $sect = *\|* ]]; then
+    () {
+      local -a sects=( ${(s.|.)sect} )
+      if [[ $sect != (l|n) ]]; then
+        sects=( ${sects%%[^0-9]#} )
+      fi
+      dirs=( $^_manpath/(sman|man|cat)${^sects}*/ )
+    }
+    if [[ $sect == *\|* ]]; then sect="($sect)"; fi
     awk="\$2 == \"$sect\" {print \$1}"
   else
     dirs=( $^_manpath/(sman|man|cat)*/ )
