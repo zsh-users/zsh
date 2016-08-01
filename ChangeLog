@@ -1,3 +1,8 @@
+2016-08-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Han Pingtian: 38983: Src/Zle/zle_word.c: make transpose-words
+	handle numeric arguments sensibly.
+
 2016-08-12  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 39028: Src/subst.c, Test/D04parameter.ztst: more join/split

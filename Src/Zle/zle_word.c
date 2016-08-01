@@ -678,46 +678,54 @@ killword(char **args)
 int
 transposewords(UNUSED(char **args))
 {
-    int p1, p2, p3, p4, len, x = zlecs, pos;
+    int p1, p2, p3, p4, pt, len, x = zlecs, pos;
     ZLE_STRING_T temp, pp;
     int n = zmult;
     int neg = n < 0, ocs = zlecs;
 
     if (neg)
 	n = -n;
-    while (n--) {
-	while (x != zlell && zleline[x] != ZWC('\n') && !ZC_iword(zleline[x]))
-	    INCPOS(x);
-	if (x == zlell || zleline[x] == ZWC('\n')) {
-	    x = zlecs;
-	    while (x) {
-		if (ZC_iword(zleline[x]))
-		    break;
-		pos = x;
-		DECPOS(pos);
-		if (zleline[pos] == ZWC('\n'))
-		    break;
-		x = pos;
-	    }
-	    if (!x)
-		return 1;
+
+    while (x != zlell && zleline[x] != ZWC('\n') && !ZC_iword(zleline[x]))
+	INCPOS(x);
+
+    if (x == zlell || zleline[x] == ZWC('\n')) {
+	x = zlecs;
+	while (x) {
+	    if (ZC_iword(zleline[x]))
+		break;
 	    pos = x;
 	    DECPOS(pos);
 	    if (zleline[pos] == ZWC('\n'))
-		return 1;
-	}
-	for (p4 = x; p4 != zlell && ZC_iword(zleline[p4]); INCPOS(p4))
-	    ;
-	for (p3 = p4; p3; ) {
-	    pos = p3;
-	    DECPOS(pos);
-	    if (!ZC_iword(zleline[pos]))
 		break;
-	    p3 = pos;
+	    x = pos;
 	}
-	if (!p3)
+	if (!x)
 	    return 1;
-	for (p2 = p3; p2; ) {
+	pos = x;
+	DECPOS(pos);
+	if (zleline[pos] == ZWC('\n'))
+	    return 1;
+    }
+
+    for (p4 = x; p4 != zlell && ZC_iword(zleline[p4]); INCPOS(p4))
+	;
+
+    for (p3 = p4; p3; ) {
+	pos = p3;
+	DECPOS(pos);
+	if (!ZC_iword(zleline[pos]))
+	    break;
+	p3 = pos;
+    }
+
+    if (!p3)
+	return 1;
+
+    pt = p3;
+
+    while (n--) {
+	for (p2 = pt; p2; ) {
 	    pos = p2;
 	    DECPOS(pos);
 	    if (ZC_iword(zleline[pos]))
@@ -733,20 +741,24 @@ transposewords(UNUSED(char **args))
 		break;
 	    p1 = pos;
 	}
-	pp = temp = (ZLE_STRING_T)zhalloc((p4 - p1)*ZLE_CHAR_SIZE);
-	len = p4 - p3;
-	ZS_memcpy(pp, zleline + p3, len);
-	pp += len;
-	len = p3 - p2;
-	ZS_memcpy(pp, zleline + p2, len);
-	pp += len;
-	ZS_memcpy(pp, zleline + p1, p2 - p1);
-
-	ZS_memcpy(zleline + p1, temp, p4 - p1);
-
-	zlecs = p4;
+	pt = p1;
     }
+
+    pp = temp = (ZLE_STRING_T)zhalloc((p4 - p1)*ZLE_CHAR_SIZE);
+    len = p4 - p3;
+    ZS_memcpy(pp, zleline + p3, len);
+    pp += len;
+    len = p3 - p2;
+    ZS_memcpy(pp, zleline + p2, len);
+    pp += len;
+    ZS_memcpy(pp, zleline + p1, p2 - p1);
+
+    ZS_memcpy(zleline + p1, temp, p4 - p1);
+
     if (neg)
 	zlecs = ocs;
+    else
+	zlecs = p4;
+
     return 0;
 }
