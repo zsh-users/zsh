@@ -1,5 +1,8 @@
 2016-08-01  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Andy Spencer: 38982: Completion/Linux/Command/_cpupower: move
+	to correct folder.
+
 	* Andy Spencer: 38976: Completion/Linux/_cpupower: new
 	completion.
 
