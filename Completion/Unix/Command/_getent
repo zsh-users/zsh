@@ -29,6 +29,8 @@ case $state in
       databases=( "${(@)${(@f)$(_call_program databases $words[1] --help \
                    2>/dev/null)}[(r)Supported*,-1]}" )
       databases=( "${=${(@)databases[2,${(@)databases[(i)]}-1]}}" )
+    elif [[ $OSTYPE = freebsd* ]]; then
+      databases=( ${=${(f)"$(_call_program databases $words[1] 2>&1)"}[-1]} )
     else
       databases=( passwd group hosts ipnodes services protocols ethers networks netmasks )
     fi

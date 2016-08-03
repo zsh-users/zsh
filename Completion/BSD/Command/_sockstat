@@ -28,6 +28,7 @@ case $OSTYPE in
       '*-j[show sockets belonging to JID]: : _jails -0 -o jid'
       '-L[exclude loopback]'
       '*-P+[specify protocol]: : _values -s , protocols $protocols'
+      '-s[display protocol state if applicable]'
     )
   ;;
   netbsd*)

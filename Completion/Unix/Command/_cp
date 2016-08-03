@@ -57,7 +57,8 @@ else
     '(dragonfly|freebsd)*' '-l[link files instead of copying]' \
     '(darwin|dragonfly|freebsd|netbsd)*' '-v[show file names as they are copied]' \
     'darwin*' "-X[don't copy extended attributes or resource forks]" \
-    '(dragonfly|freebsd)*' "-x[don't traverse file systems]"
+    '(dragonfly|freebsd)*' "-x[don't traverse file systems]" \
+    'freebsd<10->.*' '-s[make symbolic links instead of copies of non-directories]'
   do
     [[ $OSTYPE = $~pattern ]] && args+=( $arg )
   done

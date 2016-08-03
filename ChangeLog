@@ -1,5 +1,9 @@
 2016-08-03  Oliver Kiddle  <opk@zsh.org>
 
+	* 38989: Completion/BSD/Command/_freebsd-update,
+	Completion/BSD/Command/_sockstat, Completion/Unix/Command/_cp,
+	Completion/Unix/Command/_getent: minor completion updates for BSD
+
 	* 38986: Completion/Unix/Command/_gsettings: new completion
 
 2016-08-01  Daniel Shahaf  <d.s@daniel.shahaf.name>

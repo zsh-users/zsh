@@ -20,4 +20,4 @@ _arguments \
   '-s[fetch files from the specified server or server pool]:server:_hosts' \
   '-t[mail output of cron command, if any, to address]:address' \
   '--currently-running[assume specified release as current]:release' \
-  ':command:_values -S " " -w "commands" $flags[@]'
+  '*:command:_values -S " " -w "commands" $flags[@]'
