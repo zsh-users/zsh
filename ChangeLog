@@ -1,3 +1,7 @@
+2016-08-03  Oliver Kiddle  <opk@zsh.org>
+
+	* 38986: Completion/Unix/Command/_gsettings: new completion
+
 2016-08-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 38981: Completion/Unix/Command/_man: Followup to 37634:
