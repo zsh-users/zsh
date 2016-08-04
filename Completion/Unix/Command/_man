@@ -103,7 +103,7 @@ _man() {
 }
 
 _man_pages() {
-  local matcher pages dummy sopt
+  local pages sopt
 
   # What files corresponding to manual pages can end in.
   local suf='.((?|<->*)(|.gz|.bz2|.Z|.lzma))'
@@ -121,17 +121,8 @@ _man_pages() {
     return $?
   fi
 
-  zparseopts -E M+:=matcher
-
-  if (( $#matcher )); then
-    matcher=( ${matcher:#-M} )
-    matcher="$matcher"
-  else
-    matcher=
-  fi
-
   pages=( ${(M)dirs:#*$sect_dirname/} )
-  compfiles -p pages '' '' "$matcher" '' dummy "*${sect}*"
+  pages=( ${^pages}/"*$sect${sect:+"*"}" );
   pages=( ${^~pages}(N:t) )
 
   (($#mrd)) && pages[$#pages+1]=($(awk $awk $mrd))

@@ -1,5 +1,7 @@
 2016-08-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38996: Completion/Unix/Command/_man: Support _correct_word.
+
 	* 38994: Completion/Unix/Command/_man: Fix two bugs when
 	completing manpage filenames in separate-sections mode.
 
