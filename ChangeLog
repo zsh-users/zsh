@@ -1,5 +1,8 @@
 2016-08-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* workers/38995 (in part): Src/Zle/computil.c: compfiles:
+	Add reverse-engineered documentation breadcrumbs.
+
 	* 38996: Completion/Unix/Command/_man: Support _correct_word.
 
 	* 38994: Completion/Unix/Command/_man: Fix two bugs when

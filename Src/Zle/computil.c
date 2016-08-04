@@ -4480,6 +4480,10 @@ cfp_matcher_pats(char *matcher, char *add)
     return add;
 }
 
+/*
+ * ### This function call is skipped by _approximate, so "opt" probably means "optimize".
+ */
+
 static void
 cfp_opt_pats(char **pats, char *matcher)
 {
@@ -4810,6 +4814,17 @@ cf_remove_other(char **names, char *pre, int *amb)
     }
     return NULL;
 }
+
+/*
+ * SYNOPSIS:
+ *     1. compfiles -p  parnam1 parnam2 skipped matcher sdirs parnam3 varargs [..varargs]
+ *     2. compfiles -p- parnam1 parnam2 skipped matcher sdirs parnam3 varargs [..varargs]
+ *     3. compfiles -P  parnam1 parnam2 skipped matcher sdirs parnam3 
+ *
+ *     1. Set parnam1 to an array of patterns....
+ *     2. Like #1 but without calling cfp_opt_pats().  (This is only used by _approximate.)
+ *     3. Like #1 but varargs is implicitly set to  char *varargs[2] = { "*(-/)", NULL };.
+ */
 
 static int
 bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
