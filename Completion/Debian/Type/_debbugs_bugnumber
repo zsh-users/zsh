@@ -1,4 +1,9 @@
 #autoload
 # TODO: use _describe with some basic metadata (e.g., bug title/package/version)
-[[ $PREFIX$SUFFIX == [0-9]# ]] &&
-_wanted -x bugnum expl 'bug number' compadd ~/.devscripts_cache/bts/<->.(html|mbox)(N:t:r)
+
+[[ $PREFIX$SUFFIX == [0-9]# ]] || return 1
+
+# The cache directory moved; try both locations.
+# ### TODO: Use 'bts listcachedbugs'?
+local -a cachedirs=( ~/.devscripts_cache/bts ~/.cache/devscripts/bts )
+_wanted -x bugnum expl 'bug number' compadd -- $^cachedirs/<->.(html|mbox)(N:t:r)
