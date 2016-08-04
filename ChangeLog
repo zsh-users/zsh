@@ -1,3 +1,7 @@
+2016-08-04  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* unposted: Doc/Zsh/zle.yo: fix format
+
 2016-08-03  Oliver Kiddle  <opk@zsh.org>
 
 	* 38989: Completion/BSD/Command/_freebsd-update,
