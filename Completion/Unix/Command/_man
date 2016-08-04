@@ -87,6 +87,13 @@ _man() {
       done
       (( ret )) || return 0
     done
+    ## To fall back to other sections' manpages when completing filenames, like
+    ## the 'else' codepath does:
+    #
+    # if (( ret )) && [[ $PREFIX$SUFFIX == */* ]]; then
+    #   sect_dirname=
+    #   _wanted manuals expl 'manual page' _man_pages && return
+    # fi
 
     return 1
   else
@@ -105,9 +112,13 @@ _man_pages() {
     # Easy way to test for versions of man that allow file names.
     # This can't be a normal man page reference.
     # Try to complete by glob first.
-    _path_files -g "*$suf" && return
-    _path_files
-    return
+    if [[ -n $sect_dirname ]]; then
+      _path_files -g "*.*$sect_dirname*(|.gz|.bz2|.Z|.lzma)" "$expl[@]"
+    else
+      _path_files -g "*$suf" "$expl[@]" && return
+      _path_files "$expl[@]"
+    fi
+    return $?
   fi
 
   zparseopts -E M+:=matcher

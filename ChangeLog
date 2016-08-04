@@ -1,5 +1,8 @@
 2016-08-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38994: Completion/Unix/Command/_man: Fix two bugs when
+	completing manpage filenames in separate-sections mode.
+
 	* 38993: Completion/Unix/Command/_man: Drop (b): it's incorrect
 	when $sect contains '|'.
 
