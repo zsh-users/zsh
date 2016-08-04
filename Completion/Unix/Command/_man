@@ -37,7 +37,10 @@ _man() {
 
   mrd=(${^_manpath/\%L/${LANG:-En_US.ASCII}}/mandb(N))
 
-  # $sect is from the command line, the "3p" in "man 3p memcpy"
+  # $sect is from the command line, the "3p" in "man 3p memcpy".
+  #   It may also be a |-joined (and later in the code "()"-enclosed) list of
+  #   section names.
+  #   TODO: disentangle this to always be an array.
   # $sect_dirname is from the filesystem, the "3" in "/usr/share/man/man3"
   # These are used by _man_pages
   local sect sect_dirname
@@ -117,7 +120,7 @@ _man_pages() {
   fi
 
   pages=( ${(M)dirs:#*$sect_dirname/} )
-  compfiles -p pages '' '' "$matcher" '' dummy "*${(b)sect}*"
+  compfiles -p pages '' '' "$matcher" '' dummy "*${sect}*"
   pages=( ${^~pages}(N:t) )
 
   (($#mrd)) && pages[$#pages+1]=($(awk $awk $mrd))

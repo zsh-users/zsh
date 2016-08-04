@@ -1,5 +1,8 @@
 2016-08-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38993: Completion/Unix/Command/_man: Drop (b): it's incorrect
+	when $sect contains '|'.
+
 	* 38991: Src/exec.c, Test/C04funcdef.ztst: Make 'whence -v
 	autoloaded-function' shows the defining filename.
 
