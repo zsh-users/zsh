@@ -1,5 +1,8 @@
 2016-08-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 38991: Src/exec.c, Test/C04funcdef.ztst: Make 'whence -v
+	autoloaded-function' shows the defining filename.
+
 	* 38990: Completion/Debian/Type/_debbugs_bugnumber: Track bts's
 	data dir migration.
 

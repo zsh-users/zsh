@@ -321,6 +321,16 @@
 >  print oops was successfully autoloaded
 >}
 
+  (
+    fpath=(.)
+    printf '%s\n' 'oops(){}' 'ninjas-earring(){}' 'oops "$@"' >oops
+    autoload oops
+    oops
+    whence -v oops
+  )
+0:whence -v of zsh-style autoload
+>oops is a shell function from ./oops
+
 %clean
 
  rm -f file.in file.out

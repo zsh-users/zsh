@@ -4915,7 +4915,8 @@ execautofn_basic(Estate state, UNUSED(int do_exec))
 
     oldscriptname = scriptname;
     oldscriptfilename = scriptfilename;
-    scriptname = scriptfilename = dupstring(shf->node.nam);
+    scriptname = dupstring(shf->node.nam);
+    scriptfilename = dupstring(shf->filename);
     execode(shf->funcdef, 1, 0, "loadautofunc");
     scriptname = oldscriptname;
     scriptfilename = oldscriptfilename;
