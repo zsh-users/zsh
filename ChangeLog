@@ -1,5 +1,7 @@
 2016-08-06  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Src/Zle/zle_thingy.c: fix typo in comment
+
 	* unposted: Etc/zsh-development-guide: fix formatting in module
 	discussion; add mention of widgets and keymaps for modules.
 

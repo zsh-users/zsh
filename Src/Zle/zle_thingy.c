@@ -269,7 +269,7 @@ freewidget(Widget w)
     zfree(w, sizeof(*w));
 }
 
-/* Add am internal widget provided by a module.  The name given is the  *
+/* Add an internal widget provided by a module.  The name given is the  *
  * canonical one, which must not begin with a dot.  The widget is first *
  * bound to the dotted canonical name; if that name is already taken by *
  * an internal widget, failure is indicated.  The same widget is then   *
