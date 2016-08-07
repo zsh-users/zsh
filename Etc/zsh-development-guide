@@ -327,22 +327,23 @@ in.
 
 The next pair are `features_' and `enables_' and deal with enabling module
 features.  Ensure you are familiar with the description of features under
-`zmodload -F'.  The function features_ takes an argument `char
-***featuresp'; *featuresp is to be set to a NULL-terminated array
-containing a list of all the features.  It should then return zero.
-It may return one to indicate features are not supported, but this is
-not recommended.  The function featuresarray conveniently interrogates
-the module's feature structures for all standard features; space
-is left for abstract features at the end of the array and the names
-must be added by the module.  Note that heap memory should
-be used for this (zhalloc, etc.) as memory for the features array is not
-freed; note also the pointers for the abstract features are not
-initialised so setting them is mandatory any time there are any present.
+`zmodload -F'.
 
-A structure "struct features" should
-be used to contain all standard features as well as the number of
-abstract features (those only understood by the module itself).
-See below.
+The function features_ takes an argument `char ***featuresp'; *featuresp
+is to be set to a NULL-terminated array containing a list of all the
+features.  It should then return zero.  It may return one to indicate
+features are not supported, but this is not recommended.  The function
+featuresarray conveniently interrogates the module's feature structures
+for all standard features; space is left for abstract features at the end
+of the array and the names must be added by the module.  Note that heap
+memory should be used for this (zhalloc, etc.) as memory for the features
+array is not freed; note also the pointers for the abstract features are
+not initialised so setting them is mandatory any time there are any
+present.
+
+A structure "struct features" should be used to contain all standard
+features as well as the number of abstract features (those only understood
+by the module itself).  See below.
 
 enables_ takes an argument `int **enablesp'.  If *enablesp is NULL, it
 should be set to an array of the same length as *featuresp without the
@@ -712,6 +713,24 @@ union looking like:
 
 The `type' field should be set to `MN_INTEGER' or `MN_FLOAT' and
 depending on its value either `u.l' or `u.d' contains the value.
+
+Widgets
+-------
+
+As of this writing, widgets are not managed by the features mechanism.
+Modules can add builtin widgets by calling `addzlefunction' as defined
+in Src/Zle/zle_thingy.c.  Typically this is called from the `boot_'
+routine.  Any widgets so added should be removed by `deletezlefunction'
+called from the `cleanup_' routine.
+
+Keymaps
+-------
+Keymaps are created with `newkeymap' and exposed for use with bindkey
+by `linkkeymap', both defined in Src/Zle/zle_keymap.c.  Typically the
+same name is used both to create and link the keymap.  As with widgets,
+there is currently no features mechanism for keymaps, and they should
+be initialized in the `boot_' function.  In `cleanup_', first remove
+linkage with `unlinkkeymap' and then discard with `deletehashtable'.
 
 Hooks
 -----
