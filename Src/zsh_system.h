@@ -882,6 +882,10 @@ extern short ospeed;
 # endif
 #endif
 
+#ifdef HAVE_SRAND_DETERMINISTIC
+# define srand srand_deterministic
+#endif
+
 #ifdef ZSH_VALGRIND
 # include "valgrind/valgrind.h"
 # include "valgrind/memcheck.h"

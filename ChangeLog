@@ -1,3 +1,8 @@
+2016-08-10  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 39014: Src/zsh_system.h, configure.ac: Use special OpenBSD
+	interface to get correct rand() behavior
+
 2016-08-06  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/Zle/zle_thingy.c: fix typo in comment
