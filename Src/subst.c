@@ -3454,13 +3454,22 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      * exception is that ${name:-word} and ${name:+word} will have already
      * done any requested splitting of the word value with quoting preserved.
      */
-    if (ssub || (spbreak && isarr >= 0) || spsep || sep) {
+    if (ssub || spbreak || spsep || sep) {
+	int force_split = !ssub && (spbreak || spsep);
 	if (isarr) {
-	    val = sepjoin(aval, sep, 1);
-	    isarr = 0;
-	    ms_flags = 0;
+	    if (nojoin == 0) {
+		val = sepjoin(aval, sep, 1);
+		isarr = 0;
+		ms_flags = 0;
+	    } else if (force_split && nojoin == 2) {
+		/* Hack to simulate splitting individual elements:
+		 * first join on what we later use to split
+		 */
+		val = sepjoin(aval, spsep, 1);
+		isarr = 0;
+	    }
 	}
-	if (!ssub && (spbreak || spsep)) {
+	if (force_split && !isarr) {
 	    aval = sepsplit(val, spsep, 0, 1);
 	    if (!aval || !aval[0])
 		val = dupstring("");
@@ -3527,7 +3536,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	}
 	/*
 	 * TODO:  It would be really quite nice to abstract the
-	 * isarr and !issarr code into a function which gets
+	 * isarr and !isarr code into a function which gets
 	 * passed a pointer to a function with the effect of
 	 * the promptexpand bit.  Then we could use this for
 	 * a lot of stuff and bury val/aval/isarr inside a structure

@@ -1,3 +1,9 @@
+2016-08-10  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39019 (cf. PWS 39013): Src/subst.c, Test/D04parameter.ztst:
+	fix SHWORDSPLIT regression introduced by workers/29313; add
+	test cases for more join/split combinations.
+
 2016-08-10  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 39014: Src/zsh_system.h, configure.ac: Use special OpenBSD
