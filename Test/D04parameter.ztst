@@ -1920,3 +1920,58 @@
   print $array
 0:"-" works after "[" in same expression (Dash problem)
 >foo two three
+
+  (
+  setopt shwordsplit
+  set -- whim:wham:whom
+  IFS=:
+  print -l $@
+  )
+0:Splitting of $@ on IFS: single element
+>whim
+>wham
+>whom
+
+  (
+  setopt shwordsplit
+  set -- one:two bucklemy:shoe
+  IFS=:
+  print -l $@
+  )
+0:Splitting of $@ on IFS: multiple elements
+# No forced joining in this case
+>one
+>two
+>bucklemy
+>shoe
+
+  (
+  set -- one:two bucklemy:shoe
+  print -l ${(s.:.)@}
+  )
+0:Splitting of $@ on (s): multiple elements
+# Forced joining in this case
+>one
+>two bucklemy
+>shoe
+
+  (
+  set -- one:two bucklemy:shoe
+  print -l ${(@s.:.)@}
+  )
+0:Splitting of $@ on (@s): multiple elements
+# Forced non-joining in this case
+>one
+>two
+>bucklemy
+>shoe
+
+  (
+  set -- one:two bucklemy:shoe
+  IFS=
+  setopt shwordsplit
+  print -l ${@}
+  )
+0:Joining of $@ does not happen when IFS is empty
+>one:two
+>bucklemy:shoe
