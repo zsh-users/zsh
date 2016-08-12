@@ -82,6 +82,11 @@
 >wasnull2d
 >wasnull2d
 
+  unset array
+  print ${#${(A)=array=word}}
+0:${#${(A)=array=word}} counts array elements
+>1
+
   (print ${set1:?okhere}; print ${unset1:?exiting1}; print not reached;)
   (print ${null1?okhere}; print ${null1:?exiting2}; print not reached;)
 1:${...:?...}, ${...?...}

@@ -2897,6 +2897,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 			    aval = paramvalarr(pm->gsu.h->getfn(pm), hkeys|hvals);
 		    } else
 			setaparam(idbeg, a);
+		    isarr = 1;
 		} else {
 		    untokenize(val);
 		    setsparam(idbeg, ztrdup(val));
