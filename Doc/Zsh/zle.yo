@@ -1948,6 +1948,12 @@ to the left.
 tindex(transpose-words)
 item(tt(transpose-words) (tt(ESC-T ESC-t)) (unbound) (unbound))(
 Exchange the current word with the one before it.
+
+With a positive numeric argument em(N), the word before the cursor is
+transposed with the following em(N) words.
+
+With a negative numeric argument em(-N), the word after the cursor
+is transposed with the preceding em(N) words.
 )
 tindex(vi-unindent)
 item(tt(vi-unindent) (unbound) (tt(<)) (unbound))(
