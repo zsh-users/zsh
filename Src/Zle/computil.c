@@ -2167,9 +2167,11 @@ ca_parse_line(Cadef d, int multi, int first)
 #endif
 		   )
 	    return 1;
-	else if (state.arg && (!napat || !pattry(napat, line))) {
+	else if (state.arg &&
+		 (!napat || cur <= compcurrent || !pattry(napat, line))) {
 	    /* Otherwise it's a normal argument. */
-	    if (napat && ca_inactive(d, NULL, cur + 1, 1, NULL))
+	    if (napat && cur <= compcurrent &&
+		    ca_inactive(d, NULL, cur + 1, 1, NULL))
 		return 1;
 
 	    arglast = 1;

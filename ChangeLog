@@ -1,3 +1,8 @@
+2016-08-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 39026: Src/Zle/computil.c: pattern specified with _arguments'
+	-A option shouldn't be checked against words after the cursor
+
 2016-08-12  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 39035: Src/subst.c, Test/D04parameter.ztst: ${(A)name=word}
