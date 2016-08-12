@@ -1,5 +1,8 @@
 2016-08-12  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 39031: Src/Zle/zle_word.c: Ensure variables are initialised in
+	transpose-words.
+
 	* 39029: Doc/Zsh/zle.yo: document previous change.
 
 	* Han Pingtian: 38983: Src/Zle/zle_word.c: make transpose-words

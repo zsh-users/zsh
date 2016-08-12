@@ -722,7 +722,7 @@ transposewords(UNUSED(char **args))
     if (!p3)
 	return 1;
 
-    pt = p3;
+    p1 = p2 = pt = p3;
 
     while (n--) {
 	for (p2 = pt; p2; ) {
