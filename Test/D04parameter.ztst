@@ -1970,8 +1970,14 @@
   set -- one:two bucklemy:shoe
   IFS=
   setopt shwordsplit
-  print -l ${@}
+  print -l ${@} ${(s.:.)*} ${(s.:.j.-.)*}
   )
-0:Joining of $@ does not happen when IFS is empty
+0:Joining of $@ does not happen when IFS is empty, but splitting $* does
 >one:two
 >bucklemy:shoe
+>one
+>twobucklemy
+>shoe
+>one
+>two-bucklemy
+>shoe

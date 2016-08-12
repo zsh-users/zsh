@@ -3461,11 +3461,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		val = sepjoin(aval, sep, 1);
 		isarr = 0;
 		ms_flags = 0;
-	    } else if (force_split && nojoin == 2) {
+	    } else if (force_split && (spsep || nojoin == 2)) {
 		/* Hack to simulate splitting individual elements:
-		 * first join on what we later use to split
+		 * forced joining as previously determined, or
+		 * join on what we later use to forcibly split
 		 */
-		val = sepjoin(aval, spsep, 1);
+		val = sepjoin(aval, (nojoin == 1 ? sep : spsep), 1);
 		isarr = 0;
 	    }
 	}
