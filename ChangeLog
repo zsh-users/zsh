@@ -1,5 +1,7 @@
 2016-08-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 39036: Completion/Unix/Command/_git: update up to git 2.9.2
+
 	* 39026: Src/Zle/computil.c: pattern specified with _arguments'
 	-A option shouldn't be checked against words after the cursor
 
