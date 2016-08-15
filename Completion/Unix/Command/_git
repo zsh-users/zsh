@@ -753,7 +753,7 @@ _git-diff () {
   _arguments -C -s \
     $* \
     $diff_options \
-    '(--exit-code)--quiet[disable all output]'
+    '(--exit-code)--quiet[disable all output]' \
     $diff_stage_options \
     '(--cached --staged)'{--cached,--staged}'[show diff between index and named commit]' \
     '(-)--[start file arguments]' \
@@ -849,7 +849,7 @@ _git-fetch () {
 
   _arguments -C -S -s \
     $fetch_options \
-    '(-n --no-tags -t --tags)'{-n,--no-tags}'[disable automatic tag following]'
+    '(-n --no-tags -t --tags)'{-n,--no-tags}'[disable automatic tag following]' \
     '(--all -m --multiple)'{-m,--multiple}'[fetch from multiple remotes]' \
     '*:: :->repository-or-group-or-refspec' && ret=0
 
