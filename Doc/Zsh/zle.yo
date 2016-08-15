@@ -1949,11 +1949,14 @@ tindex(transpose-words)
 item(tt(transpose-words) (tt(ESC-T ESC-t)) (unbound) (unbound))(
 Exchange the current word with the one before it.
 
-With a positive numeric argument em(N), the word before the cursor is
-transposed with the following em(N) words.
+With a positive numeric argument em(N), the word around the cursor, or
+following it if the cursor is between words, is transposed with the
+preceding em(N) words.  The cursor is put at the end of the resulting
+group of words.
 
-With a negative numeric argument em(-N), the word after the cursor
-is transposed with the preceding em(N) words.
+With a negative numeric argument em(-N), the effect is the same as using
+a positive argument em(N) except that the original cursor position is
+retained, regardless of how the words are rearranged.
 )
 tindex(vi-unindent)
 item(tt(vi-unindent) (unbound) (tt(<)) (unbound))(

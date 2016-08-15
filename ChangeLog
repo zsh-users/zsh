@@ -1,3 +1,7 @@
+2016-08-15  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39039: Doc/Zsh/zle.yo: fix documentation for transpose-words.
+
 2016-08-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 39036: Completion/Unix/Command/_git: update up to git 2.9.2
