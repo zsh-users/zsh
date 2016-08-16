@@ -1,3 +1,8 @@
+2016-08-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 39044 (in part, see thread): Doc/Zsh/compsys.yo: Document
+	_canonical_paths in the manual, too.
+
 2016-08-15  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39039: Doc/Zsh/zle.yo: fix documentation for transpose-words.

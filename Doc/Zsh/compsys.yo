@@ -2978,6 +2978,21 @@ widgets to find out if the command line hasn't changed since the last
 time completion was tried.  Only then are the tt(_ignored),
 tt(_correct) and tt(_approximate) completers called.
 )
+findex(_canonical_paths)
+item(tt(_canonical_paths) [ tt(-A) var(var) ] [ tt(-N) ] [ tt(-MJV12nfX) ] var(tag) var(descr) [ var(paths) ... ])(
+This completion function completes all paths given to it, and also tries to
+offer completions which point to the same file as one of the paths given
+(relative path when an absolute path is given, and vice versa; when tt(..)'s
+are present in the word to be completed; and some paths got from symlinks).
+
+tt(-A), if specified, takes the paths from the array variable specified. Paths can
+also be specified on the command line as shown above.  tt(-N), if specified,
+prevents canonicalizing the paths given before using them for completion, in
+case they are already so. The options tt(-M), tt(-J), tt(-V), tt(-1), tt(-2),
+tt(-n), tt(-F), tt(-X) are passed to tt(compadd).
+
+See tt(_description) for a description of var(tag) and var(descr).
+)
 findex(_complete)
 item(tt(_complete))(
 This completer generates all possible completions in a context-sensitive
