@@ -3,9 +3,9 @@
 # This completion function completes all paths given to it, and also tries to
 # offer completions which point to the same file as one of the paths given
 # (relative path when an absolute path is given, and vice versa; when ..'s are
-# present in the word to be completed, and some paths got from symlinks.
+# present in the word to be completed, and some paths got from symlinks).
 
-# Usage: _canonical_paths [-A var] [-N] [-MJV12nfX] tag desc paths...
+# Usage: _canonical_paths [-A var] [-N] [-MJV12nfX] tag desc [paths...]
 
 # -A, if specified, takes the paths from the array variable specified. Paths can
 # also be specified on the command line as shown above. -N, if specified,
