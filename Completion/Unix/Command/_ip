@@ -285,7 +285,7 @@ local -a neigh_add_cmds
 _regex_words neigh-add-commands "neighbour add command" \
   't*o:add new neighbour IP address:$subcmd_ipaddr' \
   'dev:specify network device:$subcmd_dev' \
-  'l*ladr:specify link layer (MAC) address or null:$subcmd_lladdr' \
+  'l*laddr:specify link layer (MAC) address or null:$subcmd_lladdr' \
   'n*ud:specify neighbour unreachability detection state:$subcmd_nud'
 # to-address without keyword can appear first
 neigh_add_cmds=( "(" $subcmd_ipaddr "|" ")" "$reply[@]" "#")
