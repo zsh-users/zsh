@@ -249,11 +249,7 @@ _git-bisect () {
               ;;
           esac
           ;;
-        (${(j.|.)~good})
-          _arguments \
-            ': :__git_commits' && ret=0
-          ;;
-        (${(j.|.)~good}|skip)
+        (${(j.|.)~bad}|${(j.|.)~good}|skip)
           # TODO: skip can take revlists.
           _arguments \
             '*: :__git_commits' && ret=0
@@ -991,7 +987,7 @@ _git-grep () {
     '(-A --after-context)'{-A+,--after-context=}'[show <num> trailing lines, and separate groups of matches]: :__git_guard_number lines' \
     '(-B --before-context)'{-B+,--before-context=}'[show <num> leading lines, and separate groups of matches]: :__git_guard_number lines' \
     '(-A --after-context -B --before-context -C --context)'{-C+,--context=}'[show <num> leading and trailing lines, and separate groups of matches]: :__git_guard_number lines' \
-    '--threads=[use specified number of threads]:threads' \
+    '--threads=[use specified number of threads]:number of threads' \
     '(-p --show-function)'{-p,--show-function}'[show preceding line containing function name of match]' \
     '(-W --function-context)'{-W,--function-context}'[show whole function where a match was found]' \
     '(1)*-f+[read patterns from given file]:pattern file:_files' \
@@ -1926,7 +1922,7 @@ _git-tag () {
   _arguments -A '-*' \
     - creation \
       '(-a --annotate -s --sign -u --local-user)'{-a,--annotate}'[create an unsigned, annotated tag]' \
-      '(-a --annotate -s --sign -u --local-user)'{-s,--sign}'[create an signed and annotated tag]' \
+      '(-a --annotate -s --sign -u --local-user)'{-s,--sign}'[create a signed and annotated tag]' \
       '(-a --annotate -s --sign)'{-u+,--local-user=}'[create a tag, annotated and signed with the given key]: :__git_gpg_secret_keys' \
       '(-f --force)'{-f,--force}'[replace existing tag]' \
       '--create-reflog[create a reflog]' \
@@ -4452,7 +4448,7 @@ _git-index-pack () {
     '--stdin[read pack from stdin and instead write to specified file]' \
     $stdin_opts \
     '--strict[die if the pack contains broken objects or links]' \
-    '--threads=[specify number of threads to use]:threads' \
+    '--threads=[specify number of threads to use]:number of threads' \
     ':pack file:_files -g "*.pack(-.)"'
 }
 

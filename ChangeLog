@@ -1,5 +1,7 @@
 2016-08-19  Oliver Kiddle  <opk@zsh.org>
 
+	* 39072: Completion/Unix/Command/_git: minor tweaks
+
 	* 39071: Completion/Solaris/Command/_beadm,
 	Completion/Solaris/Command/_svcs, Completion/Unix/Command/_sort
 	Completion/Solaris/Command/_coreadm,
