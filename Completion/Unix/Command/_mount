@@ -965,8 +965,8 @@ udevordir)
 
   _alternative \
     'device-labels:device label:compadd -a dev_tmp' \
-    'device-paths: device path:_canonical_paths -A dpath_tmp -N device-paths device\ path' \
-    'directories:mount point:_canonical_paths -A mp_tmp -N directories mount\ point' && ret=0
+    'device-paths: device path:_canonical_paths -A dpath_tmp -N -M "r:|/=* r:|=*" device-paths device\ path' \
+    'directories:mount point:_canonical_paths -A mp_tmp -N -M "r:|/=* r:|=*" directories mount\ point' && ret=0
   ;;
 labels)
   _wanted labels expl 'disk label' compadd /dev/disk/by-label/*(:t) && ret=0

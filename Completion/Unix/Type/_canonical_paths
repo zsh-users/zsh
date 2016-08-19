@@ -59,6 +59,11 @@ _canonical_paths_get_canonical_path() {
 }
 
 _canonical_paths_add_paths () {
+  # origpref = original prefix
+  # expref = expanded prefix
+  # curpref = current prefix
+  # canpref = canonical prefix
+  # rltrim = suffix to trim and readd
   local origpref=$1 expref rltrim curpref canpref subdir
   [[ $2 != add ]] && matches=()
   expref=${~origpref} 2>/dev/null
@@ -73,13 +78,34 @@ _canonical_paths_add_paths () {
   [[ $curpref == */ && $canpref == *[^/] ]] && canpref+=/
   canpref+=$rltrim
   [[ $expref == *[^/] && $canpref == */ ]] && origpref+=/
-  matches+=(${${(M)files:#$canpref*}/$canpref/$origpref})
+
+  # Append to $matches the subset of $files that matches $canpref.
+  if [[ $canpref == $origpref ]]; then
+    # This codepath honours any -M matchspec parameters.
+    () {
+      local -a tmp_buffer
+      compadd -A tmp_buffer "$__gopts[@]" -a files
+      matches+=( "${(@)tmp_buffer/$canpref/$origpref}" )
+    }
+  else
+    # ### Ideally, this codepath would do what the 'if' above does,
+    # ### but telling compadd to pretend the "word on the command line"
+    # ### is ${"the word on the command line"/$origpref/$canpref}.
+    matches+=(${${(M)files:#$canpref*}/$canpref/$origpref})
+  fi
+
   for subdir in $expref?*(@); do
     _canonical_paths_add_paths ${subdir/$expref/$origpref} add
   done
 }
 
 _canonical_paths() {
+  # The following parameters are used by callee functions:
+  #    __gopts
+  #    matches
+  #    files
+  #    (possibly others)
+
   local __index
   typeset -a __gopts __opts
 
