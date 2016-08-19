@@ -1,41 +1,18 @@
 #compdef flowadm
-# Synced with the S11U1 build 19 man page
-
-_flowadm() {
 
 local -a subcmds tr props
 local expl
 
 _flowadm_flow(){
-	compadd "$@" - $(flowadm show-flow -p -o flow)
-}
-
-_flowadm_flow_int(){
-	compadd "$@" - $(flowadm show-flow -p -o flow)
-	compadd "$@" - $(dladm show-phys -p -o device)
+  compadd "$@" - $(_call_program flows flowadm show-flow -p -o flow)
 }
 
 subcmds=(
-	"help"
-	"show-flow"
-	"add-flow"
-	"remove-flow"
-	"set-flowprop"
-	"reset-flowprop"
-	"show-flowprop"
+  help show-flow add-flow match-flow remove-flow set-flowprop
+  reset-flowprop show-flowprop
 )
-	
-tr=(
-	"tcp"
-	"udp"
-	"sctp"
-	"icmp"
-	"icmpv6"
-)
-
-props=(
-	"maxbw"
-)
+tr=( tcp udp sctp icmp icmpv6 )
+props=( maxbw )
 
 if [[ $service == "flowadm" ]]; then
 	_arguments -C -A "-*" \
@@ -46,7 +23,7 @@ if [[ $service == "flowadm" ]]; then
 		return
 	fi
 	service="$words[1]"
-	curcontext="${curcontext%:*}=$service:"
+	curcontext="${curcontext%:*}-$service:"
 fi
 case $service in
 
@@ -63,6 +40,16 @@ case $service in
 		'-l[display information for link]:link or flow:_net_interfaces' \
 		- set2 \
 		':flow:_flowadm_flow' \
+	;;
+
+	(match-flow)
+	_arguments -A "-*" \
+		'-o[specify field to display]:field:(flow link ipaddr proto port dsfield)' \
+		'-p[parsable output]' \
+		'-P[persistent flow property information]' \
+		'-a[specify attribute]:attribute:(local_ip= remote_ip= transport=$tr local_port= dsfield=)' \
+		'(:)-l[display information for link]:link or flow:_net_interfaces' \
+		'(-l):flow:_flowadm_flow' \
 	;;
 
 	("add-flow")
@@ -110,6 +97,3 @@ case $service in
 	;;
 
 esac
-}
-
-_flowadm "$@"

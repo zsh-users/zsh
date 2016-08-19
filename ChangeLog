@@ -1,5 +1,13 @@
 2016-08-19  Oliver Kiddle  <opk@zsh.org>
 
+	* 39071: Completion/Solaris/Command/_beadm,
+	Completion/Solaris/Command/_svcs, Completion/Unix/Command/_sort
+	Completion/Solaris/Command/_coreadm,
+	Completion/Solaris/Command/_dladm,
+	Completion/Solaris/Command/_dumpadm,
+	Completion/Solaris/Command/_flowadm,
+	Completion/Solaris/Command/_fmadm: update for Solaris 11u3
+
 	* 39067: Completion/Unix/Type/_diff_options:
 	Completion/Linux/Command/_gpasswd, Completion/Linux/Command/_ss,
 	Completion/Redhat/Command/_scl, Completion/Unix/Command/_arping,

@@ -1,9 +1,10 @@
 #compdef beadm
 
-local cmd expl args
+local cmd expl args cmds
 
 if (( CURRENT == 2 )); then
-  _wanted subcommands expl 'subcommand' compadd \
+  [[ $OSTYPE = solaris* ]] && cmds=( set-policy )
+  _wanted subcommands expl 'subcommand' compadd $cmds \
       activate create destroy list mount rename unmount
   return
 fi
@@ -24,15 +25,16 @@ case $cmd in
       '*-o[property]:zfs property'
       '-p[create new BE in specified zfs pool]:zfs pool:_zfs_pool'
     )
-    _arguments -A "-*" $args \
+    _arguments -A "-*" -s $args \
       '-e[base BE]:BE name or snapshot:_be_name -t all' \
       ':new BE name:'
   ;;
   destroy)
     [[ $OSTYPE = solaris* ]] && args=(
       '-f[unmount BE if necessary]'
+      '(:)-O[destroy all orphaned boot environments]'
     )
-    _arguments -A "-*" \
+    _arguments -A "-*" $args \
       "-F[don't prompt for verification]" \
       ':BE or BE snapshot:_be_name'
   ;;
@@ -42,14 +44,16 @@ case $cmd in
     elif [[ $OSTYPE = freebsd* ]]; then
       args=( '-D[display space usage of boot environment]' )
     fi
-    _arguments -A "-*" \
+    _arguments -A "-*" -s $args \
       '-a[list subordinate filesystems and snapshots]' \
       '-s[list snapshots]' \
       '-H[parseable format]' \
       ':boot environment:_be_name'
   ;;
   mount)
-    _arguments -A "-*" \
+    [[ $OSTYPE = solaris* ]] &&
+        args=( '-b[mount associated boot pool dataset]' )
+    _arguments -A "-*" $args \
       ':BE name:_be_name' \
       ':mountpoint:_path_files -/'
   ;;
@@ -57,6 +61,11 @@ case $cmd in
     _arguments -A "-*" \
       ':existing boot environment name:_be_name' \
       ':new boot environment:'
+  ;;
+  set-policy)
+    _arguments -A "-*" \
+      '*-n[specify policy]:policy:(static -static noevict -noevict)' \
+      '*:BE name:_be_name'
   ;;
   u(n|)mount)
     _arguments -A "-*" \
