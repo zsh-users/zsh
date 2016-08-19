@@ -5,8 +5,10 @@ local args
 args=(
   '(-c --count)'{-c,--count}'[prefix lines by the number of occurrences]'
   '(-d --repeated)'{-d,--repeated}'[only print duplicate lines]'
-  '(-D --all-repeated)'{-D,--all-repeated=}'[print all duplicate lines]:delimit method:(none prepend separate)'
+  '(--all-repeated)-D-[print all duplicate lines]'
+  '(-D)--all-repeated=-[print all duplicate lines]::delimit method [none]:(none prepend separate)'
   '(-f --skip-fields)'{-f,--skip-fields=}'[avoid comparing initial fields]:number of fields'
+  '--group=-[show all items]::group separation [separate]:(separate prepend append both)'
   '(-i --ignore-case)'{-i,--ignore-case}'[ignore differences in case when comparing]'
   '(-s --skip-chars)'{-s,--skip-chars=}'[avoid comparing initial characters]:number of characters'
   '(-t --separator)'{-t,--separator=}'[specify field delimiter]:separator'

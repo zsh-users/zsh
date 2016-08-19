@@ -46,7 +46,7 @@ case $variant in
       '--batch-size=[maximum inputs to merge]:number'
       '--compress-program=[specify program to compress temporary files with]:program:(gzip bzip2 lzop xz)'
       '--debug[annotate the of the line used to sort]'
-      '--files0-from=[read input files from file]:file:_files'
+      '(*)--files0-from=[read input files from file]:file:_files'
       '(-S --buffer-size)'{-S+,--buffer-size=}'[specify size for main memory buffer]:size'
       '(- *)--help[display help and exit]'
       '(- *)--version[output version information and exit]'

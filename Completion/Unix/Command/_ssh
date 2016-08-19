@@ -1,12 +1,10 @@
 #compdef ssh slogin=ssh scp ssh-add ssh-agent ssh-keygen sftp ssh-copy-id
 
-# Completions currently based on OpenSSH 7.0 (released on 2015-08-11).
-#
-# TODO: update ssh-keygen (not based on 5.9)
 # TODO: sshd, ssh-keyscan, ssh-keysign
 
 _ssh () {
-  local curcontext="$curcontext" state line expl common tmp cmds suf ret=1
+  local curcontext="$curcontext" state line expl suf ret=1
+  local args common tmp p1 file cmn cmds sdesc
   typeset -A opt_args
 
   common=(
@@ -44,6 +42,7 @@ _ssh () {
       '-g[allow remote hosts to connect to local forwarded ports]' \
       '-G[output configuration and exit]' \
       '-I+[specify smartcard device]:device:_files' \
+      '-J+[connect via a jump host]: :->userhost' \
       '-K[enable GSSAPI-based authentication and forwarding]' \
       '-k[disable forwarding of GSSAPI credentials]' \
       '*-L[specify local port forwarding]:local port forwarding:->forward' \
@@ -84,6 +83,7 @@ _ssh () {
       '-c[identity is subject to confirmation via SSH_ASKPASS]' \
       '-D[delete all identities]' \
       '-d[remove identity]' \
+      '-E[specify hash algorithm for fingerprints]:algorithm:(md5 sha256)' \
       '-e[remove keys provided by the PKCS#11 shared library]:library:' \
       '-k[load plain private keys only and skip certificates]' \
       '-L[lists public key parameters of all identities in the agent]'\
@@ -107,32 +107,83 @@ _ssh () {
     return
     ;;
   ssh-keygen)
-    cmds=( -p -i -e -y -c -l -B -D -U )
-    _arguments -s \
-      '-q[silence ssh-keygen]' \
-      "($cmds -P)-b[specify number of bits in key]:bits in key" \
-      "($cmds -P)-t[specify the type of the key to create]:key type:(rsa1 rsa dsa ecdsa ed25519)" \
-      "(${cmds#-p })-N[provide new passphrase]:new passphrase" \
-      "($cmds -b -t)-C[provide new comment]:new comment" \
-      '(-D)-f[key file]:key file:_files' \
-      '('${(j. .)cmds:#-[pc]}' -t -b)-P[provide old passphrase]:old passphrase' \
-      "($cmds -q -b -t -C)-p[change passphrase of private key file]" \
-      "($cmds -q -b -t -N -C -P)-i[import key to OpenSSH format]" \
-      "($cmds -q -b -t -N -C -P)-e[export key to SECSH file format]" \
-      "($cmds -q -b -t -N -C -P)-y[get public key from private key]" \
-      "($cmds -q -b -t -N)-c[change comment in private and public key files]" \
-      "($cmds -q -b -t -N -C -P)-l[show fingerprint of key file]" \
-      "($cmds -q -b -t -N -C -P)-B[show the bubblebabble digest of key]" \
-      "($cmds -q -b -t -N -C -P -f)-D[download key stored in smartcard reader]:reader" \
-      "($cmds -q -b -t -N -C -P)-U[upload key to smartcard reader]:reader"
+    # options can be in any order but use ! to limit those shown for the first argument
+    (( CURRENT == 2 )) && p1='!'
+    args=( '!-z:number' )
+    sdesc='certify keys with CA key'
+    (( $+words[(r)-s] )) && args=( '-z[specify serial number]:serial number' )
+    (( $+words[(r)-[ku]] )) && args=( '-z[specify version number]:version number' ) &&
+        sdesc='specify CA public key file'
+    file=key
+    (( $+words[(r)-[HR]] )) && file=known_hosts
+    (( $+words[(r)-T] )) && file=input
+    if (( $+words[(r)-[kQ]] )); then
+      file=krl
+      args+=( '*:file:_files' )
+    fi
+    cmds=( -p -i -e -y -c -l -B -D -H -R -r -G -T -s -L -A -k -Q ) # basic commands
+    cmn=( -b -P -N -C -m -v ) # options common to many basic commands (except -f which is common to most)
+    cms=( -E -q -t -g -M -S -a -J -j -K -W -I -h -n -O -V -u ) # options specific to one basic command
+    _arguments -s $args \
+      "(${${(@)cmds:#-G}} -P -m ${${(@)cms:#-[MS]}})-b[specify number of bits in key]:bits in key" \
+      "$p1(${${(@)cmds:#-[pc]}} -b -C $cms)-P[provide old passphrase]:old passphrase" \
+      "(${${(@)cmds:#-p}} -m -v ${${(@)cms:#-[qt]}})-N[provide new passphrase]:new passphrase" \
+      "(${${(@)cmds:#-c}} -m -v $cms)-C[provide new comment]:new comment" \
+      "(-D -G -M -S -I -h -n -O -V -A)-f[$file file]:$file file:_files" \
+      "$p1(${${(@)cmds:#-[ie]}})-m[specify conversion format]:format:(PEM PKCS7 RFC4716)" \
+      "(${${(@)cmds:#-[lGT]}} ${${(@)cmn:#-[bv]}} -f)*-v[verbose mode]" \
+      - '(commands)' \
+      "(-b -P -C -v)-p[change passphrase of private key file]" \
+      '(-b -P -N -C -v)-i[import key to OpenSSH format]' \
+      '(-b -P -N -C -v)-e[export key to SECSH file format]' \
+      "($cmn)-y[get public key from private key]" \
+      '(-b -N -m -v)-c[change comment in private and public key files]' \
+      "($cmn)-B[show the bubblebabble digest of key]" \
+      "(-)-D[download key stored in smartcard reader]:reader" \
+      "($cmn)-H[hash names in known_hosts file]" \
+      "($cmn)-R[remove host from known_hosts file]:host:_ssh_hosts" \
+      "($cmn)-L[print the contents of a certificate]" \
+      "(-)-A[generate host keys for all key types]" \
+      "($cmn)-Q[test whether keys have been revoked in a KRL]" \
+      - finger \
+      "($cmn)-l[show fingerprint of key file]" \
+      "$p1($cmn)-E[specify hash algorithm for displayed fingerprints]:hash algorithim:(md5 sha256)" \
+      - create \
+      '(-P -m)-q[silence ssh-keygen]' \
+      "(-P -m)-t[specify the type of the key to create]:key type:(rsa1 rsa dsa ecdsa ed25519)" \
+      - dns \
+      "($cmn)-r[print DNS resource record]:hostname:_hosts" \
+      "$p1($cmn)-g[use generic DNS format]" \
+      - primes \
+      "(-P -N -C -m -f)-G[generate candidates for DH-GEX moduli]" \
+      "$p1(-P -N -C -m -f)-M[specify amount of memory to use for generating DH-GEX moduli]:memory (MB)" \
+      "$p1(-P -N -C -m -f)-S[specify start point]:start point (hex)" \
+      - screen \
+      "(${${(@)cmn:#-v}})-T[screen candidates for DH-GEX moduli]:output file:_files" \
+      "${p1}(${${(@)cmn:#-v}})-a[specify number of rounds]:rounds" \
+      "${p1}(${${(@)cmn:#-v}})-J[exit after screening specified number of lines]" \
+      "${p1}(${${(@)cmn:#-v}})-j[start screening at the specified line number]:line number" \
+      "${p1}(${${(@)cmn:#-v}})-K[write the last line processed to file]:file:_files" \
+      "${p1}(${${(@)cmn:#-v}})-W[specify desired generator]:generator" \
+      - certify \
+      "($cmn)-s[$sdesc]:CA key:_files" \
+      "$p1($cmn -f -u)-I[specify key identifier to include in certificate]:key id" \
+      "$p1($cmn -f -u)-h[generate host certificate instead of a user certificate]" \
+      "$p1($cmn -f -u)-n[specify user/host principal names to include in certificate]:principals" \
+      "$p1($cmn -f -u)-O[specify a certificate option]:option" \
+      "$p1($cmn -f -u)-V[specify certificate validity interval]:interval" \
+      "($cmn -I -h -n -O -V)-k[generate a KRL file]" \
+      "$p1($cmn -I -h -n -O -V)-u[update a KRL]"
     return
     ;;
   sftp)
     _arguments -C -s \
-      '-B+[specify buffer size]:buffer size in bytes (default\: 32768):' \
+      '-a[attempt to continue interrupted transfers]' \
+      '-B+[specify buffer size]:buffer size (bytes) [32768]' \
       '-b+[specify batch file to read]:batch file:_files' \
-      '-D[connect directly to a local sftp server]:sftp server path:' \
-      '-R[specify number of outstanding requests]:number of requests (default\: 64):' \
+      '-D[connect directly to a local sftp server]:sftp server path' \
+      '-f[request that files be flushed immediately after transfer]' \
+      '-R[specify number of outstanding requests]:number of requests [64]' \
       '-s[SSH2 subsystem or path to sftp server on the remote host]' \
       '1:file:->rfile' '*:file:->file' "$common[@]" "$common_transfer[@]" && ret=0
     ;;
@@ -398,6 +449,7 @@ _ssh () {
         # old options are after the empty "\"-line
         _wanted values expl 'configure file option' \
             compadd -M 'm:{a-z}={A-Z}' -q -S '=' - \
+	        AddKeysToAgent \
                 AddressFamily \
                 BatchMode \
                 BindAddress \
@@ -406,6 +458,7 @@ _ssh () {
                 CanonicalizeHostname \
                 CanonicalizeMaxDots \
                 CanonicalizePermittedCNAMEs \
+		CertificateFile \
                 ChallengeResponseAuthentication \
                 CheckHostIP \
                 Cipher \
@@ -440,6 +493,7 @@ _ssh () {
                 HostKeyAlias \
                 HostName \
                 IdentitiesOnly \
+		IdentityAgent \
                 IdentityFile \
                 IgnoreUnknown \
                 IPQoS \
@@ -459,6 +513,7 @@ _ssh () {
                 PreferredAuthentications \
                 Protocol \
                 ProxyCommand \
+		ProxyJump \
                 ProxyUseFdpass \
                 PubkeyAcceptedKeyTypes \
                 PubkeyAuthentication \

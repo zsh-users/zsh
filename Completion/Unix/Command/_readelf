@@ -51,6 +51,7 @@ case $variant in
       '--elf-section[used specified section as ELF input data]::section'
       '(-e --exception)'{-e,--exception}'[show sections for exception handling]'
       '(-N --numeric-addresses)'{-N,--numeric-addresses}"[don't find symbol names for addresses in DWARF data]"
+      '(-z --decompress)'{-z,--decompress}'[show compression information; decompress before dumping data]'
     )
   ;;
 esac

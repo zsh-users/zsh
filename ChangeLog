@@ -1,3 +1,19 @@
+2016-08-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 39067: Completion/Unix/Type/_diff_options:
+	Completion/Linux/Command/_gpasswd, Completion/Linux/Command/_ss,
+	Completion/Redhat/Command/_scl, Completion/Unix/Command/_arping,
+	Completion/Unix/Command/_augeas, Completion/Unix/Command/_dbus,
+	Completion/Unix/Command/_grep, Completion/Unix/Command/_less,
+	Completion/Unix/Command/_make, Completion/Unix/Command/_mutt,
+	Completion/Unix/Command/_rsync, Completion/Unix/Command/_wget,
+	Completion/Unix/Command/_sed, Completion/Unix/Command/_sort,
+	Completion/Unix/Command/_ssh, Completion/Unix/Command/_tmux,
+	Completion/Unix/Command/_tree, Completion/Unix/Command/_uniq,
+	Completion/Unix/Command/_user_admin,
+	Completion/Unix/Command/_xargs, Completion/Unix/Command/_zip,
+	Completion/Unix/Command/_readelf: update options
+
 2016-08-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Completion/Unix/Type/_canonical_paths: Port docstring

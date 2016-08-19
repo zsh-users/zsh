@@ -26,8 +26,9 @@ elif _pick_variant gnu=GNU unix --version; then
     '(-r --regexp-extended)'{-r,--regexp-extended}$extended
     '(-s --separate)'{-s,--separate}'[consider files separately instead of as a combined stream]'
     '(-u --unbuffered)'{-u,--unbuffered}'[disable data buffering]'
+    '(-z --null-data)'{-z,--null-data}'[separate lines by NUL characters]'
     '(- 1 :)--help[print program usage]'
-    '(- 1 :)'{-V,--version}'[print program version]'
+    '(- 1 :)--version[print program version]'
   )
 else
   args=( "${(@)args:#(|\(*\))(|\*)--*}" )

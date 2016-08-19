@@ -186,7 +186,8 @@ _make() {
       '(-l --load-average --max-load)'{-l,--load-average=,--max-load}"[don't start multiple jobs unless load is below N]:load"
       '(-L --check-symlik-times)'{-L,--check-symlink-times}'[use the latest mtime between symlinks and target]'
       '(-n --just-print --dry-run --recon)'{-n,--just-print,--dry-run,--recon}"[don't actually run any recipe; just print them]"
-      '*'{-o,--old-file=,--assume-old=}"[consider FILE to be very old and don't remake it]:file not to remake:->file"
+      '*'{-o,--old-file=,--assume-old=}"[consider specified file to be old and don't remake it]:file not to remake:->file"
+      '(-O --output-sync)'{-O-,--output-sync=-}'[synchronize output of parallel jobs]::granularity for grouping output:compadd -E 0 none line target recurse'
       '(-p --print-data-base)'{-p,--print-data-base}'[print makes internal database]'
       '(-q --question)'{-q,--question}'[run no recipe; exit status says if up to date]'
       '(-r --no-builtin-rules)'{-r,--no-builtin-rules}'[disable the built-in implicit rules]'

@@ -9,6 +9,8 @@ _arguments -C -s \
   '(-n --new)'{-n,--new}'[leave files untouched but save changes with a .augnew extension]' \
   '(-r --root)'{-r,--root=}'[specify filesystem root]:root directory:_files -/' \
   \*{-I+,--include=}'[add directory containing lenses to search path]:directory:_files -/' \
+  \*{-t+,--transform=}'[add a file transform]:xfm' \
+  '(-l --load-file)'{-l+,--load-file=}'[load individual file in the tree]:file:_files' \
   '(-f --file *)'{-f+,--file=}'[read commands from specified file]:file:_files' \
   '(-i --interactive)'{-i,--interactive}'[read commands from the terminal]' \
   '(-e --echo)'{-e,--echo}'[echo commands read from a file or stdin]' \
@@ -17,6 +19,7 @@ _arguments -C -s \
   '(-L --noload)'{-L,--noload}'[do not load any files into the tree on startup]' \
   '(-A --noautoload)'{-A,--noautoload}'[do not autoload modules from the search path]' \
   '--span[load span positions for nodes related to a file]' \
+  '--timing[after executing each command, show how long it took]' \
   '(- *)--version[print version information]' \
   '(-)'{-h,--help}'[print help information]' \
   '*:: :->subcommands' && ret=0
@@ -25,7 +28,7 @@ _arguments -C -s \
 
 if [[ CURRENT -eq 1 || $words[1] == help ]]; then
   local -a subcmds
-  subcmds=( ${${${(f)"$(_call_program subcommands augtool help 2>/dev/null)"}[2,-2]## #}// #- /:} )
+  subcmds=( ${${${(M)${(f)"$(_call_program subcommands augtool help 2>/dev/null)"}:#  *}## #}// #- /:} )
   _describe -t subcommands "augtool command" subcmds && ret=0
   return ret
 fi

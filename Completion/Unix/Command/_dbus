@@ -13,16 +13,19 @@ case $service in
       '--print-reply=-::format:(literal)' \
       '--reply-timeout=-:timeout (ms)' \
       '--type=-:type:(method_call signal)' \
+      '(* -)--help' \
       ':object path:->objectpaths' \
       ':message name:->methods' \
       ':content:->contents' && ret=0
   ;;
   dbus-monitor)
     _arguments -A "--*" -C \
-      '(--session)--system' '(--system)--session' \
+      '*:watch expression:->expressions' \
+      - '(bus)' \
+      --system --session
       '--address=-:bus address:->addresses' \
-      '(--profile)--monitor' '(--monitor)--profile' \
-      '*:watch expression:->expressions' && ret=0
+      - '(format)' \
+      --monitor --profile --pcap --binary && ret=0
   ;;
 esac
 
@@ -30,7 +33,7 @@ case $state in
   addresses)
     compset -P '*;'
     if compset -P '*='; then
-      _files  && ret=0
+      _files && ret=0
     else
       _message -e addresses address
     fi

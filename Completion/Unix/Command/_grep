@@ -1,4 +1,4 @@
-#compdef grep egrep fgrep bsdgrep zgrep, zegrep, zfgrep -value-,GREP_OPTIONS,-default-
+#compdef grep egrep fgrep bsdgrep zgrep zegrep zfgrep -value-,GREP_OPTIONS,-default-
 # Ulrik Haugen 2001
 
 local arguments matchers command
@@ -9,14 +9,16 @@ if [[ $service = *GREP_OPT* ]]; then
   (( CURRENT++ ))
   command=grep
 else
-  arguments=(
-    '(-e --regexp -f --file)1: :_guard "^--*" pattern'
-    '*:files:_files'
-  )
+  arguments=( '(-e --regexp -f --file)1: :_guard "^--*" pattern' )
+  if [[ $service = z* ]]; then
+    arguments+=( '*:files:_files -g "*.gz(-.)"' )
+  else
+    arguments+=( '*:files:_files' )
+  fi
   command="$words[1]"
 fi
 
-if [[ $service != [ef]grep ]]; then
+if [[ $service != (|z)[ef]grep ]]; then
   matchers='(--extended-regexp --fixed-strings --basic-regexp --perl-regexp -E -F -G -P)'
   arguments+=(
     $matchers{--extended-regexp,-E}'[use extended regular expression]'
@@ -26,15 +28,18 @@ if [[ $service != [ef]grep ]]; then
   )
 fi
 
-arguments=( $arguments[@]
+arguments+=(
   '(--after-context -A)'{--after-context=,-A+}'[specify lines of trailing context]:lines'
   '(--text -a --binary-files -I)'{--text,-a}'[process binary file as if it were text]'
   '(--before-context -B)'{--before-context=,-B+}'[specify lines of leading context]:lines'
   '(--context,-C)'{--context=,-C-}'[specify lines of context]:lines'
   '(--color --colour)--'{color,colour}'=-[distinguish matching string]::when:(always never auto)'
+  '(--no-group-separator)--group-separator=[specify separator between blocks of context]:separator [--]'
+  "(--group-separator)--no-group-separator[don't separate context blocks]"
   '(--byte-offset -b -c)'{--byte-offset,-b}'[print the byte offset with output lines]'
   '(--text -a -I)--binary-files=[specify type to assume for binary files]:file type:(binary without-match text)'
   '(--count -c --byte-offset -b --line-number -n)'{--count,-c}'[only print a count of matching lines]'
+  '(-T --initial-tab)'{-T,--initial-tab}'[make tabs line up (if needed)]'
   '(--directories -d -r --recursive)'{--directories=,-d+}'[specify handling of directories]:action on directory:(read skip recurse)'
   '(--devices -D)'{--devices=,-D+}'[specify handling of devices, FIFOs and sockets]:action on device:(read skip)'
   '(1)*'{--regexp=,-e+}'[specify pattern]:pattern'
@@ -51,7 +56,8 @@ arguments=( $arguments[@]
   '(--line-number -n -c)'{--line-number,-n}'[prefix output with line numbers]'
   '(--only-matching -o)'{--only-matching,-o}'[show only matching part of line]'
   '(--quiet --silent -q)'{--quiet,--silent,-q}'[suppress normal output]'
-  '(--recursive -r -R -d --directories)'{--recursive,-r,-R}'[recurse subdirectories]'
+  '(--recursive -r --dereference-recursive -R -d --directories)'{--recursive,-r}'[recurse subdirectories]'
+  '(--recursive -r --dereference-recursive -R -d --directories)'{--dereference-recursive,-R}'[recurse subdirectories, following symlinks]'
   '*--include=[examine files matching specified pattern]:file pattern'
   '*--exclude=[skip files matching specified pattern]:file pattern'
   '*--exclude-from=[skip files matching pattern in specified file]:file:_files'
@@ -63,7 +69,6 @@ arguments=( $arguments[@]
   '(--line-regexp -x --word-regexp -w)'{--line-regexp,-x}'[force pattern to match only whole lines]'
   '(--null -Z --no-filename -h)'{--null,-Z}'[print 0 byte after FILE name]'
   '--help[display help]'
-  '--mmap[memory map input]'
 )
 
 # remove long options?

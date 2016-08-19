@@ -32,7 +32,8 @@ fi
 
 _arguments -S -s -A "[-+]*"  \
   '(-? --help)'{-\?,--help}'[display summary of less commands]' \
-  '(-a --search-skip-screen)'{-a,--search-skip-screen}'[begin forward searches after last displayed line]' \
+  '(-a --search-skip-screen)'{-a,--search-skip-screen}'[skip current screen in searches]' \
+  '(-A --SEARCH-SKIP-SCREEN)'{-A,--SEARCH-SKIP-SCREEN}"[start searches just after target line]" \
   '(-b --buffers)'{-b+,--buffers=}'[specify amount of buffer space used for each file]:buffer space (kilobytes)' \
   '(-B --auto-buffers)'{-B,--auto-buffers}"[don't automatically allocate buffers for pipes]" \
   '(-C --CLEAR-SCREEN -c --clear-screen)'{-c,--clear-screen}'[repaint screen instead of scrolling]' \
@@ -44,12 +45,14 @@ _arguments -S -s -A "[-+]*"  \
   '(-F --quit-if-one-screen)'{-F,--quit-if-one-screen}'[exit if entire file fits on first screen]' \
   '(-G --HILITE-SEARCH -g --hilite-search)'{-g,--hilite-search}'[highlight only one match for searches]' \
   '(-g --hilite-search -G --HILITE-SEARCH)'{-G,--HILITE-SEARCH}'[disable highlighting of search matches]' \
+  '--old-bot[revert to the old bottom of screen behavior]' \
   '(-h --max-back-scroll)'{-h+,--max-back-scroll=}'[specify backward scroll limit]:backward scroll limit (lines)' \
   '(-I --IGNORE-CASE -i --ignore-case)'{-i,--ignore-case}'[ignore case in searches that lack uppercase]' \
   '(-i --ignore-case -I --IGNORE-CASE)'{-I,--IGNORE-CASE}'[ignore case in all searches]' \
   '(-j --jump-target)'{-j+,--jump-target}'[specify screen position of target lines]:position (line)' \
   '(-J --status-column)'{-J,--status-column}'[display status column on the left]' \
   \*{-k+,--lesskey-file=}'[use specified lesskey file]:lesskey file:_files' \
+  '(-K --quit-on-intr)'{-K,--quit-on-intr}'[exit less in response to ctrl-c]' \
   '(-L --no-lessopen)'{-L,--no-lessopen}'[ignore the LESSOPEN environment variable]' \
   '(-M --LONG-PROMPT -m --long-prompt)'{-m,--long-prompt}'[prompt verbosely]' \
   '(-m --long-prompt -M --LONG-PROMPT)'{-M,--LONG-PROMPT}'[prompt very verbosely]' \
@@ -80,6 +83,8 @@ _arguments -S -s -A "[-+]*"  \
   '(-\" --quotes)'{-\"+,--quotes=}'[change quoting character]:quoting characters' \
   '(-~ --tilde)'{-~,--tilde}"[don't display tildes after end of file]" \
   '(-\# --shift)'{-\#+,--shift=}"[specify amount to move when scrolling horizontally]:number" \
+  '--follow-name[the F command changes file if the input file is renamed]' \
+  '--use-backslash[subsequent options use backslash as escape char]' \
   "$files[@]" && ret=0
 
 

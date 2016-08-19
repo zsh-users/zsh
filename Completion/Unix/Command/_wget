@@ -127,7 +127,6 @@ _arguments -C -s \
   '--trust-server-names' \
   '(--exclude-directories -X)'{--exclude-directories=,-X+}'[exclude directories]:excluded directories' \
   '(-np --no-parent)'{-np,--no-parent}"[don't ascend to parent directory]" \
-  '--no-host-lookup' \
   '--no-verbose' \
   '--no-clobber' \
   '--no-directories' \
