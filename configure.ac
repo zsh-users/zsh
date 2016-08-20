@@ -1305,6 +1305,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       setlocale \
 	       uname \
 	       signgam tgamma \
+	       scalbn \
 	       putenv getenv setenv unsetenv xw\
 	       brk sbrk \
 	       pathconf sysconf \

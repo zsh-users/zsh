@@ -411,7 +411,11 @@ math_func(char *name, int argc, mnumber *argv, int id)
       break;
 
   case MF_SCALB:
+#ifdef HAVE_SCALBN
+      retd = scalbn(argd, argi);
+#else
       retd = scalb(argd, argi);
+#endif
       break;
 
 #ifdef HAVE_SIGNGAM
