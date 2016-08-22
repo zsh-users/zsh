@@ -1,5 +1,8 @@
 2016-08-22  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Completion/Unix/Command/_git: _git-config:
+	sendemail.smtpserver: Correct tags.
+
 	* 39046 + 39061: Completion/Base/Completer/_external_pwds,
 	Completion/Zsh/Type/_history_modifiers, Doc/Zsh/contrib.yo,
 	Doc/Zsh/expn.yo, Functions/MIME/zsh-mime-handler,

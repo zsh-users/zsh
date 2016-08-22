@@ -7372,7 +7372,7 @@ __git_sendemail_suppresscc_values () {
 
 (( $+functions[__git_sendmail_smtpserver_values] )) ||
 __git_sendmail_smtpserver_values() {
-  _alternative "smtp hosts:host:_hosts" "sendmail command: :_absolute_command_paths"
+  _alternative "hosts:smtp host:_hosts" "commands: :_absolute_command_paths"
 }
 
 (( $+functions[__git_colors] )) ||
