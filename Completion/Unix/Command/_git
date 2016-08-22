@@ -194,8 +194,8 @@ _git-bisect () {
   declare -A opt_args
   local good bad
 
-  if good=$(_call_program commands git terms --term-good); then
-    bad=$(_call_program commands git terms --term-bad)
+  if good=$(_call_program commands git bisect terms --term-good); then
+    bad=$(_call_program commands git bisect terms --term-bad)
   else
     good=( good old ) bad=( new bad )
   fi
@@ -249,7 +249,7 @@ _git-bisect () {
               ;;
           esac
           ;;
-        (${(j.|.)~bad}|${(j.|.)~good}|skip)
+        (${(~j.|.)bad}|${(~j.|.)good}|skip)
           # TODO: skip can take revlists.
           _arguments \
             '*: :__git_commits' && ret=0

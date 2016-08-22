@@ -1,3 +1,8 @@
+2016-08-22  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted (c.f. Mikael: 39078): Completion/Unix/Command/_git:
+	fix for git blame terms
+
 2016-08-22  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Completion/Unix/Command/_git: _git-config:
