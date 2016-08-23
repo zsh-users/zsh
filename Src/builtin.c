@@ -1610,7 +1610,7 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 		unqueue_signals();
 		if (fcedit(editor, fil)) {
 		    if (stuff(fil))
-			zwarnnam("fc", "%e: %s", errno, s);
+			zwarnnam("fc", "%e: %s", errno, fil);
 		    else {
 			loop(0,1);
 			retval = lastval;

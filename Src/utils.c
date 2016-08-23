@@ -5082,8 +5082,10 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp, int flags)
 	    cnt = 1;
 	    /* FALL THROUGH */
 	default:
-	    if (c == L'\'' && (flags & NICEFLAG_QUOTE))
+	    if (c == L'\'' && (flags & NICEFLAG_QUOTE)) {
 		fmt = "\\'";
+		newl = 2;
+	    }
 	    else
 		fmt = wcs_nicechar_sel(c, &newl, NULL, flags & NICEFLAG_QUOTE);
 	    break;
