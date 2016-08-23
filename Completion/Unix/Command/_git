@@ -2597,7 +2597,7 @@ _git-config () {
           # If $key isn't an instance of a known foo.*.bar:baz $git_options entry...
           if ! (( ${+git_options[(r)(#i)${(b)key%%.*}.[*].${(b)key##*.}:*]} )); then
             # ... then add it.
-            git_options+="${key}:unknown option name"
+            git_options+="${key}:unknown option name::->unknown"
           fi
         else
           # $key is of the form "foo.bar" where 'foo' is known
@@ -2606,7 +2606,7 @@ _git-config () {
           continue
         fi
       else
-        git_options+="${key}:unknown option name"
+        git_options+="${key}:unknown option name::->unknown"
       fi
     done
   }
@@ -3206,6 +3206,10 @@ _git-config () {
               _alternative \
                 'values:value:(user)' \
                 'umasks: :__git_guard_number umask' && ret=0
+              ;;
+            (unknown)
+              _message "$line[1] option value"
+              compadd - $current && ret=0
               ;;
           esac
           ;;

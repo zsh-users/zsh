@@ -1,3 +1,8 @@
+2016-08-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 39094: Completion/Unix/Command/_git: _git-config: When an
+	option is unknown, complete its value to the set value.
+
 2016-08-23  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 39087: Src/builtin.c, Src/utils.c: fix 'conditionally
