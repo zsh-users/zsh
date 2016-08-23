@@ -1,3 +1,7 @@
+2016-08-23  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 39086: Src/mem.c: declare file local variables as 'static'
+
 2016-08-22  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted (c.f. Mikael: 39078): Completion/Unix/Command/_git:

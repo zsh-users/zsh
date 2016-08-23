@@ -157,13 +157,13 @@ mod_export Heapid last_heap_id;
  * Assumes old_heaps() will come along and restore it later
  * (outputs an error if old_heaps() is called out of sequence).
  */
-LinkList heaps_saved;
+static LinkList heaps_saved;
 
 /*
  * Debugging verbosity.  This must be set from a debugger.
  * An 'or' of bits from the enum heap_debug_verbosity.
  */
-volatile int heap_debug_verbosity;
+static volatile int heap_debug_verbosity;
 
 /*
  * Generate a heap identifier that's unique up to unsigned integer wrap.
