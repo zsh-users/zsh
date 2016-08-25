@@ -16,7 +16,13 @@ _hashed_absolute_command_paths() {
 # This function completes absolute pathnames of executables, e.g., /etc/rc.local
 _typed-in_absolute_command_paths() {
   # TODO: the description "full path to an executable" and tag in the caller are ignored by _path_files
-  _path_files -/ -g '*(-*)' -P / -W /
+  if [[ -z $PREFIX ]]; then
+    _path_files -/ -g '*(-*)' -P / -W /
+  elif [[ $PREFIX[1] == / ]]; then
+    _path_files -/ -g '*(-*)' -W /
+  else
+    return 1
+  fi
 }
 
 _absolute_command_paths() {
