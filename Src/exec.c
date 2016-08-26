@@ -772,7 +772,7 @@ findcmd(char *arg0, int docopy)
     Cmdnam cn;
 
     cn = (Cmdnam) cmdnamtab->getnode(cmdnamtab, arg0);
-    if (!cn && isset(HASHCMDS))
+    if (!cn && isset(HASHCMDS) && !isrelative(arg0))
 	cn = hashcmd(arg0, path);
     if ((int) strlen(arg0) > PATH_MAX)
 	return NULL;
