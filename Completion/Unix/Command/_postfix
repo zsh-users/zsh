@@ -1,4 +1,4 @@
-#compdef postsuper
+#compdef postqueue postsuper
 
 _postfix_queue_id() {
   compadd "$@" -- ${${(M)${(f)"$(_call_program mailq 'mailq')"}:#(#s)([0-9A-F]##)*}/(#s)(#b)([0-9A-F]##)*/$match[1]}
@@ -6,15 +6,25 @@ _postfix_queue_id() {
 
 case $service in
 	(postsuper)
-	_arguments -C \
+	_arguments -C -s : \
 	'-p[purge old tempfiles]' \
 	'-s[structure check and repair]' \
-	'-v[verbose]' \
+	'*-v[verbose]' \
 	'-c[configdir]:config dir:_files -/' \
 	'-d[delete]:queue id:_postfix_queue_id' \
 	'-h[hold]:queue id:_postfix_queue_id' \
 	'-H[release]:queue id:_postfix_queue_id' \
-	'-r[requeue]:queue id:_postfix_queue_id' \
+	'*-r[requeue]:queue id, or "ALL":_postfix_queue_id' \
 	'1:queue:(hold incoming active deferred)'
 	;;
+        (postqueue)
+        _arguments -C -s : \
+          '*-v[enable verbose logging]' \
+          '-c[configdir]:config dir:_files -/' \
+          '(-f -i -j -p -s)-f[flush the queue]' \
+          '(-f -i -j -p -s)-i[immediately deliver one message]:queue id:_postfix_queue_id' \
+          '(-f -i -j -p -s)-j[print the queue in json]' \
+          '(-f -i -j -p -s)-p[print the queue in traditional format]' \
+          '(-f -i -j -p -s)-s[immediately deliver messages to specified site]:site:_hosts' 
+        ;;
 esac

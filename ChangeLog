@@ -1,5 +1,8 @@
 2016-08-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39107: Completion/Unix/Command/_postfix: Complete
+	'postqueue'. Also minor tweaks to 'postsuper'.
+
 	* 39109: Completion/Unix/Command/_postfix: Use mailq to obtain
 	queue id's.
 
