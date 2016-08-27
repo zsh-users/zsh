@@ -1,5 +1,8 @@
 2016-08-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39108: Completion/Unix/Command/_postfix: Support
+	$enable_long_queue_ids.
+
 	* 39110: Completion/Unix/Command/_postfix: Complete 'postconf'.
 
 	* 39107: Completion/Unix/Command/_postfix: Complete

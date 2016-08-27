@@ -7,7 +7,13 @@ typeset -A opt_args
 integer NORMARG
 
 _postfix_queue_id() {
-  compadd "$@" -- ${${(M)${(f)"$(_call_program mailq 'mailq')"}:#(#s)([0-9A-F]##)*}/(#s)(#b)([0-9A-F]##)*/$match[1]}
+  local -a lines=( ${(f)"$(_call_program mailq 'mailq')"} )
+
+  # $enable_long_queue_ids = no
+  compadd "$@" -- ${${(M)lines:#(#s)([0-9A-F]## )*}/(#s)(#b)([0-9A-F]##)*/$match[1]}
+
+  # $enable_long_queue_ids = yes
+  compadd "$@" -- ${${${(M)lines:#(#s)[0-9bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ](#c10)z*}%% *}%[*!]}
 }
 
 _postfix_main_cf_parameter() {
