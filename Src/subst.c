@@ -3458,7 +3458,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
     if (ssub || spbreak || spsep || sep) {
 	int force_split = !ssub && (spbreak || spsep);
 	if (isarr) {
-	    if (nojoin == 0) {
+	    /* sep non-null here means F or j flag, force join */
+	    if (nojoin == 0 || sep) {
 		val = sepjoin(aval, sep, 1);
 		isarr = 0;
 		ms_flags = 0;
@@ -3467,7 +3468,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		 * forced joining as previously determined, or
 		 * join on what we later use to forcibly split
 		 */
-		val = sepjoin(aval, (nojoin == 1 ? sep : spsep), 1);
+		val = sepjoin(aval, (nojoin == 1 ? NULL : spsep), 1);
 		isarr = 0;
 	    }
 	}

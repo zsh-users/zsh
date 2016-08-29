@@ -1986,3 +1986,12 @@
 >one
 >two-bucklemy
 >shoe
+
+  (
+  set -- "one two" "bucklemy shoe"
+  IFS=
+  setopt shwordsplit rcexpandparam
+  print -l "X${(@j.-.)*}"
+  )
+0:Use of @ does not prevent forced join with j
+>Xone two-bucklemy shoe
