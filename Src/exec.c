@@ -3694,12 +3694,15 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		restore_params(restorelist, removelist);
 
 	} else {
-	    if (!forked)
-		setiparam("SHLVL", --shlvl);
-	    if (do_exec) {
+	    if (!subsh) {
+	        /* for either implicit or explicit "exec", decrease $SHLVL
+		 * as we're now done as a shell */
+		if (!forked)
+		    setiparam("SHLVL", --shlvl);
+
 		/* If we are exec'ing a command, and we are not *
 		 * in a subshell, then save the history file.   */
-		if (!subsh && isset(RCS) && interact && !nohistsave)
+		if (do_exec && isset(RCS) && interact && !nohistsave)
 		    savehistfile(NULL, 1, HFILE_USE_OPTIONS);
 	    }
 	    if (type == WC_SIMPLE || type == WC_TYPESET) {
