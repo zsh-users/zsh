@@ -6070,7 +6070,14 @@ __git_recent_branches() {
   #    (We must do this because #3 would otherwise croak on them.)
   __git_recent_branches__names; branches=( ${(@)reply:*valid_ref_names_munged} )
 
-  # 3. Obtain log messages for all of them in one shot.
+  # 3. Early out if no matches.
+  if ! (( $+branches[1] )); then
+    # This can happen in a fresh repository (immediately after 'clone' or 'init') before
+    # any 'checkout' commands were run in it.
+    return 1
+  fi
+
+  # 4. Obtain log messages for all of them in one shot.
   descriptions=( ${(f)"$(_call_program all-descriptions git --no-pager log --no-walk=unsorted --pretty=%s ${(q)branches} --)"} )
 
   if (( $#branches != $#descriptions )); then
@@ -6079,7 +6086,7 @@ __git_recent_branches() {
     return 1
   fi
 
-  # 4. Synthesize the data structure _describe wants.
+  # 5. Synthesize the data structure _describe wants.
   local -a branches_colon_descriptions
   local branch description
   for branch description in ${branches:^descriptions} ; do
