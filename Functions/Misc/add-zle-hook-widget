@@ -18,16 +18,16 @@
 #
 # The -L option lists the hooks and their associated widgets.
 
-() { # Preserve caller global option settings
-
-emulate -L zsh
-
 # This is probably more safeguarding than necessary
 zmodload -e zsh/zle || return 1
 { zmodload zsh/parameter && zmodload zsh/zleparameter } || {
     print -u2 "add-zle-hook-widget: Need parameter modules for zle hooks"
     return 1
 }
+
+() { # Preserve caller global option settings
+
+emulate -L zsh
 
 # Setup - create the base functions for hook widgets that call the others
 
