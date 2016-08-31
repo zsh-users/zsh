@@ -1,5 +1,8 @@
 2016-08-31  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 39141: Test/D04parameter.ztst: use zsh in SHLVL test to remove
+	ambiguous behaviour of sh.
+
 	* Stephane: 39125: Src/exec.c, Test/D04parameter.ztst: More care
 	decrementing SHLVL on exec; not needed in subshells.
 

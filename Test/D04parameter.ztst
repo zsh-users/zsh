@@ -1718,23 +1718,25 @@
 >2
 >2
 
+  # SHLVL is incremented twice and decremented once in between.
   SHLVL=1
-  $ZTST_testdir/../Src/zsh -fc 'sh -c "echo \$SHLVL"'
-  $ZTST_testdir/../Src/zsh -fc '(sh -c "echo \$SHLVL")'
-  $ZTST_testdir/../Src/zsh -fc '( (sh -c "echo \$SHLVL"))'
+  $ZTST_testdir/../Src/zsh -fc $ZTST_testdir/../Src/zsh' -fc "echo \$SHLVL"'
+  $ZTST_testdir/../Src/zsh -fc '('$ZTST_testdir/../Src/zsh' -fc "echo \$SHLVL")'
+  $ZTST_testdir/../Src/zsh -fc '( ('$ZTST_testdir/../Src/zsh' -fc "echo \$SHLVL"))'
 0:SHLVL decremented upon implicit exec optimisation
->1
->1
->1
+>2
+>2
+>2
 
+  # SHLVL is incremented twice with no decrement in between.
   SHLVL=1
-  $ZTST_testdir/../Src/zsh -fc '(sh -c "echo \$SHLVL"); exit'
-  $ZTST_testdir/../Src/zsh -fc '(exec sh -c "echo \$SHLVL"); exit'
-  $ZTST_testdir/../Src/zsh -fc '( (sh -c "echo \$SHLVL"); exit)'
+  $ZTST_testdir/../Src/zsh -fc '('$ZTST_testdir/../Src/zsh' -fc "echo \$SHLVL"); exit'
+  $ZTST_testdir/../Src/zsh -fc '(exec '$ZTST_testdir/../Src/zsh' -fc "echo \$SHLVL"); exit'
+  $ZTST_testdir/../Src/zsh -fc '( ('$ZTST_testdir/../Src/zsh' -fc "echo \$SHLVL"); exit)'
 0:SHLVL not decremented upon exec in subshells
->2
->2
->2
+>3
+>3
+>3
 
 # The following tests the return behaviour of parsestr/parsestrnoerr
   alias param-test-alias='print $'\''\x45xpanded in substitution'\' 
