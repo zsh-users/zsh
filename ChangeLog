@@ -1,3 +1,8 @@
+2016-08-31  Oliver Kiddle  <opk@zsh.org>
+
+	* Marko Myllynen: 39118: Completion/Unix/Command/_libvirt:
+	(almost) complete virsh completions
+
 2016-08-31  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39141: Test/D04parameter.ztst: use zsh in SHLVL test to remove
