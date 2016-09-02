@@ -1,5 +1,9 @@
 2016-09-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Completion/Unix/Command/_postfix: _postfix_queue_id:
+	Unbreak completion of short queue ids of held/active messages,
+	broken in 39108.
+
 	* 39154: Completion/Unix/Type/_files: -/ with list-dirs-first
 	resulted in a bad pattern, thus aborting completion partway.
 
@@ -28,7 +32,7 @@
 
 2016-08-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
-	* 39108: Completion/Unix/Command/_postfix: Support
+	* 39108 (tweaked): Completion/Unix/Command/_postfix: Support
 	$enable_long_queue_ids.
 
 	* 39110: Completion/Unix/Command/_postfix: Complete 'postconf'.
