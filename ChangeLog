@@ -1,3 +1,8 @@
+2016-09-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 39154: Completion/Unix/Type/_files: -/ with list-dirs-first
+	resulted in a bad pattern, thus aborting completion partway.
+
 2016-08-31  Oliver Kiddle  <opk@zsh.org>
 
 	* Marko Myllynen: 39118: Completion/Unix/Command/_libvirt:

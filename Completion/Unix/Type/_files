@@ -35,7 +35,7 @@ if (( $tmp[(I)-g*] )); then
   [[ "$glob" = (#b)(*\()([^\|\~]##\)) && $match[2] != \#q* ]] &&
       glob="${match[1]}#q${match[2]}"
 elif [[ $type = */* ]]; then
-  glob="*(-/)"
+  glob="*(#q-/)"
 fi
 tmp=$opts[(I)-F]
 if (( tmp )); then
