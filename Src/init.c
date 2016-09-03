@@ -712,7 +712,7 @@ init_term(void)
     if (tgetent(termbuf, term) != TGETENT_SUCCESS)
 #endif
     {
-	if (isset(INTERACTIVE))
+	if (interact)
 	    zerr("can't find terminal definition for %s", term);
 	errflag &= ~ERRFLAG_ERROR;
 	termflags |= TERM_BAD;
@@ -1205,19 +1205,22 @@ run_init_scripts(void)
 	if (islogin)
 	    source("/etc/profile");
 	if (unset(PRIVILEGED)) {
-	    char *s = getsparam("ENV");
 	    if (islogin)
 		sourcehome(".profile");
-	    noerrs = 2;
-	    if (s) {
-		s = dupstring(s);
-		if (!parsestr(&s)) {
-		    singsub(&s);
-		    noerrs = 0;
-		    source(s);
+
+	    if (interact) {
+		noerrs = 2;
+		char *s = getsparam("ENV");
+		if (s) {
+		    s = dupstring(s);
+		    if (!parsestr(&s)) {
+			singsub(&s);
+			noerrs = 0;
+			source(s);
+		    }
 		}
+		noerrs = 0;
 	    }
-	    noerrs = 0;
 	} else
 	    source("/etc/suid_profile");
     } else {
@@ -1227,7 +1230,7 @@ run_init_scripts(void)
 
 	if (isset(RCS) && unset(PRIVILEGED))
 	{
-	    if (isset(INTERACTIVE)) {
+	    if (interact) {
 		/*
 		 * Always attempt to load the newuser module to perform
 		 * checks for new zsh users.  Don't care if we can't load it.

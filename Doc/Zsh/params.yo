@@ -1059,7 +1059,8 @@ If the tt(ENV) environment variable is set when zsh is invoked as tt(sh)
 or tt(ksh), tt($ENV) is sourced after the profile scripts.  The value of
 tt(ENV) is subjected to parameter expansion, command substitution, and
 arithmetic expansion before being interpreted as a pathname.  Note that
-tt(ENV) is em(not) used unless zsh is emulating bf(sh) or bf(ksh).
+tt(ENV) is em(not) used unless the shell is interactive and zsh is
+emulating bf(sh) or bf(ksh).
 )
 vindex(FCEDIT)
 item(tt(FCEDIT))(
