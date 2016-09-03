@@ -1,33 +1,46 @@
 #compdef espeak
 
-#TODO: complete non-existing filenames for -w and --phonout
-#TODO: describe special cases for -k
-#TODO: complete --punct better?
+local curcontext="$curcontext" state line expl ret=1
+typeset -A opt_args
 
-_arguments \
-    '-h[help]' \
-    '-f[file to speak]:text file:_files' \
-    '--stdin[speak from stdin]' \
-    '-q[quiet, no sound output]' \
-    '-a[amplitude]:integer:(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
-18 19 20)' \
-    '-l[line length]:integer: ' \
-    '-p[pitch]:integer:(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
-19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42
-43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66
-67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90
-91 92 93 94 95 96 97 98 99)' \
-    '-s[speed]:words per minute: ' \
-    '-v[voice]:voice name:(afrikaans bosnian catalan czech welsh-test danish-test german greek default en-scottish english lancashire english_rp english_wmids english-us en-westindies esperanto spanish spanish-latin-american finnish french french greek-ancient hindi-test croatian hungarian armenian armenian-west indonesian-test icelandic-test italian test/jbo kurdish latin latvian macedonian-test dutch-test norwegian-test test/pap polish brazil portugal romanian russian_test slovak albanian serbian swedish swahihi-test tamil turkish vietnam-test Mandarin cantonese-test)' \
-    '-b[8-bit text]' \
-    '-m[SSML or other XML text]' \
-    '-w[wav output]:filename: ' \
-    '-x[output phoneme mnemonics]' \
-    '-X[output phoneme mnemonics and translation trace]' \
-    '--stdout[output speech to stdout]' \
-    '-k[capital letter indication]:integer:' \
-    '--punct=-::characters: ' \
-    '--voices=-[list available voices]::language code:(af bs ca cs cy da de el en en-sc en-uk en-uk-north en-uk-rp en-uk-wmids en-us en-wi eo es es-la fi fr fr-be grc hi hr hu hy hy id is it jbo ku la lv mk nl no pap pl pt pt-pt ro ru sk sq sr sv sw ta tr vi zh zh-yue)' \
-    '--path=-[espeak-data path]:path:_files -/' \
-    '--compile=-[compile]::voicename or debug: ' \
-    '--phonout=-[output filename for -x/-X]:filename: ' 
+_arguments -C \
+  '(1 --stdin)-f+[specify file to speak]:text file:_files' \
+  '(1 -f)--stdin[speak from stdin]' \
+  '(-q)-a+[specify amplitude]:amplitude (0-200) [100]' \
+  '(-q)-g+[specify pause between words]:pause (10ms) [1]' \
+  '-k[capital letter indication]:integer:((1\:sound 2\:the\ word\ "capitals"))' \
+  '-l[specify line length below which clause is ended]:length' \
+  '(-q)-p+[specify pitch adjustment]:adjustment (0-99)' \
+  '(-q)-s+[specify speed]:speed (words per minute) [175]' \
+  '(-q)-v+[voice]:voice name:->voices' \
+  '(--stdout -q)-w+[write speech to wav file]:wav file:_files -g "*.wav(-.)"' \
+  '-b+[specify input encoding]:encoding:((1\:UTF-8 2\:8-bit 3\:16-bit))' \
+  '-m[interpret SSML markup, ignore other XML]' \
+  '(-a -g -p -s -v -w -z --split --stdout)-q[quiet, no sound output]' \
+  '(-x --ipa)-x[output phoneme mnemonics]' \
+  '(-X --ipa)-X[output phoneme mnemonics and translation trace]' \
+  '(-q)-z[suppress final sentence pause at the end of the text]' \
+  '--compile=-[compile pronunciation rules and dictionary]::voicename or debug' \
+  '(-x -X)--ipa=-[output phonemes using International Phonetic Alphabet]::options:((1\:use\ ties 2\:use\ ZWJ 3\:separate\ with\ _))' \
+  '--path=[specify espeak-data path]:path:_files -/' \
+  '--pho[output mbrola phoneme data]' \
+  '--phonout=[output filename for -x/-X/--ipa]:filename:_files' \
+  '--punct=-[speak names of punctuation characters]::characters' \
+  '(-q --stdout)--split=[periodically start new wav file]:period (minutes)' \
+  '(-w -q --split)--stdout[output speech to stdout]' \
+  '--voices=-[list available voices]::language code:->languages' \
+  '(-)'{-h,--help}'[display help information]' \
+  '(-)--version[display version information]' && ret=0
+
+case $state in
+  voices)
+    _wanted voices expl voice compadd \
+        ${${${(f)"$(_call_program voices $words[1] --voices)"}[2,-1]#?(#c22)}%% *} && ret=0
+  ;;
+  languages)
+    _wanted languages expl language compadd \
+        ${${${(f)"$(_call_program voices $words[1] --voices)"}[2,-1]#?(#c4)}%% *} && ret=0
+  ;;
+esac
+
+return ret

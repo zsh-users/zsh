@@ -5,10 +5,11 @@ _arguments -S \
   '(-c --check)'{-c,--check}'[read MD5 sums from the FILEs and check them]' \
   '--tag[create a BSD-style checksum]' \
   '(-t --text)'{-t,--text}'[read in text mode]' \
+  "--ignore-missing[don't fail or report status for missing files]" \
   '(-q --quiet)'{-q,--quiet}"[don't print OK for each successfully verified file]" \
   '--status[no output, status code shows success]' \
   '--strict[exit non-zero for improperly formatted checksum lines]' \
   '(-w --warn)'{-w,--warn}'[warn about improperly formatted checksum lines]' \
-  '--help[display help and exit]' \
-  '--version[output version information and exit]' \
+  '(-)--help[display help and exit]' \
+  '(-)--version[output version information and exit]' \
   '*:files:_files'

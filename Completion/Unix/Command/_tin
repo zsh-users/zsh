@@ -3,6 +3,8 @@
 local newshosts expl state line curcontext="$curcontext" ret=1
 
 _arguments -C -s \
+  '(-6)-4[force connecting via IPv4]' \
+  '(-4)-6[force connecting via IPv6]' \
   '-a[toggle color flag]' \
   '-A[force authentication on connect]' \
   '-c[mark all news as read in subscribed groups]' \

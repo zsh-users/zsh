@@ -9,8 +9,7 @@ if (( ! $+_patch_args )); then
   [[ "$help" = *--[^h]* || "$help" = *\[-c\|-e\|-n\]* ]] && arg=+
 
   optionmap=(
-    '*\[-p\[strip-count\]\]*' '(--strip)-p-[number of path prefix components to strip]:number of path prefix components to strip:'"{$comp_p}"
-    '*( -p NUM[, ]|\[-p num\])*' '(--strip)-p+[number of path prefix components to strip]:number of path prefix components to strip:'"{$comp_p}"
+    '*( -p NUM[, ]|\[-p (num|strip-count)\])*' '(--strip)-p+[number of path prefix components to strip]:number of path prefix components to strip:'"{$comp_p}"
     '*\[--strip\[=strip-count\]\]*' '(-p)--strip=-[number of path prefix components to strip]:number of path prefix components to strip:'"{$comp_p}"
     '* --strip=NUM[, ]*' '(-p)--strip=[number of path prefix components to strip]:number of path prefix components to strip:'"{$comp_p}"
 
@@ -35,8 +34,8 @@ if (( ! $+_patch_args )); then
     '*(\[-[a-zA-Z]#R[a-zA-Z]#\]| -R[, ])*' '(--reverse)-R[reverse mode]'
     '*(\[--reverse\]| --reverse[, ])*' '(-R)--reverse[reverse mode]'
 
-    '*(\[-i patchfile\]| -i PATCHFILE[, ])*' '(--input)-i+[patch file]:patch file:_files'
-    '* --input=PATCHFILE[, ]*' '(-i)--input=[patch file]:patch file:_files'
+    '*(\[-i patchfile\]| -i PATCHFILE[, ])*' '*-i+[specify input patch file]:patch file:_files'
+    '* --input=PATCHFILE[, ]*' '*--input=[specify input patch file]:patch file:_files'
 
     '*(\[-o out-file\]| -o FILE[, ]|\[-o outfile\])*' "(--output)-o${arg}[output file]:output file:_files"
     '*(\[--output=out-file\]| --output=FILE[, ])*' '(-o)--output=[output file]:output file:_files'
@@ -45,6 +44,8 @@ if (( ! $+_patch_args )); then
 
     '*(\[-D symbol\]| -D NAME[, ]|\[-D define\])*' '(--ifdef)-D+[cpp symbol]:symbol:'
     '*(\[--ifdef=symbol\]| --ifdef=NAME[, ])*' '(-D)--ifdef=[cpp symbol]:symbol:'
+
+    '* --merge*' '(--reject-file --reject-format -r)--merge[merge using conflict markers instead of creating reject files]'
 
     '*(\[-[a-zA-Z]#E[a-zA-Z]#\]| -E[, ])*' '(--remove-empty-files)-E[remove empty files]'
     '*(\[--remove-empty-files\]| --remove-empty-files[, ])*' '(-E)--remove-empty-files[remove empty files]'
@@ -62,6 +63,7 @@ if (( ! $+_patch_args )); then
     '* --no-backup-if-mismatch[, ]*' '(--backup-if-mismatch)--no-backup-if-mismatch[back up only if otherwise requested]'
 
     '*(\[-V {numbered,existing,simple}\]| -V STYLE[, ])*' "(--version-control)-V${arg}[backup method]:backup method:(numbered existing simple)"
+    '*\[-V t \| nil \| never\]*' '(-B)-V+[specify backup method]:backup method:((t\:numbered nil\:existing never\:simple))'
     '*(\[--version-control={numbered,existing,simple}\]| --version-control=STYLE[, ])*' '(-V)--version-control=[backup method]:backup method:(numbered existing simple)'
 
     '*(\[-B backup-prefix\]| -B PREFIX[, ])*' "(--prefix)-B${arg}[specify backup prefix]:backup prefix:"
@@ -69,6 +71,7 @@ if (( ! $+_patch_args )); then
     '* -Y PREFIX[, ]*' '(--basename-prefix)-Y+[specify backup basename prefix]:backup basename prefix:'
     '* --basename-prefix=PREFIX[, ]*' '(-Y)--basename-prefix=[specify backup basename prefix]:backup basename prefix:'
     '*\[-b backup-ext\]*'                              "(   -z --suffix)-b${arg}[specify backup suffix]:backup suffix:(.bak)"
+    '*\[-z backup-ext\]*' '(--suffix)-z+[specify backup suffix]:backup suffix [.orig]:(.bak)'
     '* -z SUFFIX[, ]*'                                 '(-b    --suffix)-z+[specify backup suffix]:backup suffix:(.bak)'
     '*(\[--suffix=backup-ext\]| --suffix=SUFFIX[, ])*' '(-b -z         )--suffix=[specify backup suffix]:backup suffix:(.bak)'
 
@@ -90,23 +93,27 @@ if (( ! $+_patch_args )); then
     '*(\[--silent\]|--silent[, ])*'        '(-s --quiet         )--silent[silent mode]'
 
     '* --verbose[, ]*' '--verbose[verbose mode]'
-    '* --dry-run[, ]*' '--dry-run[don'\''t actually change files]'
-    '* --posix[, ]*' '--posix[POSIX mode]'
+
+    '*(\[-[a-zA-Z]#C[a-zA-Z]#\])*' '(--check)-C[only check that the patch would apply cleanly]'
+    '*\[--check\]*' '(-C)--check[only check that the patch would apply cleanly]'
+    '* --dry-run[, ]*' '--dry-run[only check that the patch would apply cleanly]'
+
+    '*--posix*' '--posix[POSIX mode]'
 
     '*(\[-d directory\]| -d DIR[, ]|\[-d dir\])*' '(--directory)-d+[change the working directory]:chdir to:_files -/'
     '*(\[--directory=directory\]| --directory=DIR[, ])*' '(-d)--directory=[change the working directory]:chdir to:_files -/'
 
+    '* --reject-format=*' '--reject-format=[specify format of rejects]:format:(context unified)'
+    '* --read-only=*' '--read-only=[specify how to handle read-only input files]:behaviour [warn]: (ignore warn fail)'
+
     '* --binary[, ]*' '--binary[binary mode]'
 
-    '*(\[-[a-zA-Z]#v[a-zA-Z]#\]| -v[, ])*' '(--version)-v[print version]'
-    '*(\[--version\]| --version[, ])*' '(-v)--version[print version]'
-    '* --help[, ]*' '--help[print help message]'
+    '*(\[-[a-zA-Z]#v[a-zA-Z]#\]| -v[, ])*' '(-)-v[print version]'
+    '*(\[--version\]| --version[, ])*' '(-)--version[print version]'
+    '* --help[, ]*' '(-)--help[print help message]'
 
     '*\[-[a-zA-Z]#S[a-zA-Z]#\]*' '*-S[ignore this patch]'
     '*\[--skip\]*' '*--skip[ignore this patch]'
-
-    '*(\[-[a-zA-Z]#C[a-zA-Z]#\])*' '(--check)-C[check only]'
-    '*\[--check\]*' '(-C)--check[check only]'
 
     '*\[--index-first\]*' '--index-first[take Index: line precedence]'
 

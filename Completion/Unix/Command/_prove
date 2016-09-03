@@ -7,7 +7,7 @@
 _arguments \
   '(- *)'{-h,--help}'[display help and exit]' \
   '(- *)'{-H,--man}'[display longer help and exit]' \
-  '(- *)--version[display version and exit]' \
+  '(- *)'{-V,--version}'[display version and exit]' \
   '(--quiet -q -Q --QUIET)'{-v,--verbose}'[print all test lines]' \
   {-l,--lib}'[add lib to path]' \
   {-b,--blib}'[add blib to path]' \

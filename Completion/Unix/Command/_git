@@ -1353,6 +1353,7 @@ _git-push () {
     '(--no-signed --sign)--signed[GPG sign the push]' \
     "(--sign --signed)--no-signed[don't GPG sign the push]" \
     '--atomic[request atomic transaction on remote side]' \
+    '(-o --push-option)'{-o+,--push-option=}'[transmit string to server to pass to pre/post-receive hooks]:string' \
     '(-4 --ipv4 -6 --ipv6)'{-4,--ipv4}'[use IPv4 addresses only]' \
     '(-4 --ipv4 -6 --ipv6)'{-6,--ipv6}'[use IPv6 addresses only]' \
     ': :__git_any_repositories' \
@@ -1767,6 +1768,7 @@ _git-submodule () {
 	    '(--merge --rebase)--checkout[checkout commit recorded in the superproject in the submodule on a detached HEAD]' \
 	    '(--checkout --rebase)--merge[merge commit recorded in superproject into current branch of submodule]' \
 	    '(--checkout --merge)--rebase[rebase current branch onto commit recorded in superproject]' \
+	    '--no-recommend-shallow[ignore submodule.<name>.shallow from .gitmodules]' \
             '--reference=[remote repository to clone]: :__git_any_repositories' \
             '--recursive[traverse submodules recursively]' \
             '--remote[use the status of the submodule''s remote-tracking branch]' \
@@ -1968,6 +1970,8 @@ _git-worktree() {
         add:'create a new working tree'
         prune:'prune working tree information'
         list:'list details of each worktree'
+	lock:'prevent a working tree from being pruned'
+	unlock:'allow working tree to be pruned, moved or deleted'
       )
 
       _describe -t commands command commands && ret=0
@@ -1986,6 +1990,7 @@ _git-worktree() {
 	    '(-B --detach)-b+[create a new branch]: :__git_branch_names' \
 	    '(-b --detach)-B+[create or reset a branch]: :__git_branch_names' \
 	    '(-b -B)--detach[detach HEAD at named commit]' \
+	    '--no-checkout[suppress file checkout in new worktree]' \
 	    ':path:_files' $args && ret=0
 	;;
         (prune)
@@ -1996,6 +2001,14 @@ _git-worktree() {
 	;;
         (list)
 	  _arguments '--porcelain[machine-readable output]' && ret=0
+	;;
+	(lock)
+	  _arguments -C '--reason=[specify reason for locking]:reason' ': :->worktrees' && ret=0
+	  [[ -z $state ]] && return ret
+	;&
+	(unlock)
+	  _wanted directories expl 'working tree' compadd -S ' ' -f -M 'r:|/=* r:|=*' \
+	      ${${(M)${(f)"$(_call_program directories git worktree list --porcelain)"}:#worktree*}#* }
 	;;
       esac
     ;;
@@ -3539,8 +3552,8 @@ _git-remote () {
 _git-repack () {
   # TODO: --quiet is undocumented.
   _arguments -s \
-    '(-A)-a[pack all objects into a single pack]' \
-    '(-a)-A[pack all objects into a single pack, but unreachable objects become loose]' \
+    '(-A --unpack-unreachable)-a[pack all objects into a single pack]' \
+    '(-a -k --keep-unreachable)-A[pack all objects into a single pack, but unreachable objects become loose]' \
     '-d[remove redundant packs after packing]' \
     "--unpack-unreachable=[with -A, don't loosen objects older than specified date]:date" \
     '-f[pass --no-reuse-delta option to git pack-objects]' \
@@ -3550,6 +3563,7 @@ _git-repack () {
     '(-l --local)'{-l,--local}'[pass --local option to git pack-objects]' \
     '(-b --write-bitmap-index)'{-b,--write-bitmap-index}'[write a bitmap index]' \
     "--unpack-unreachable=[with -A, don't loosen objects older than specified time]:time" \
+    '(-k --keep-unreachable)'{-k,--keep-unreachable}'[with -a, repack unreachable objects]' \
     '--window=[number of objects to consider when doing delta compression]:number of objects' \
     '--window-memory=[scale window size dynamically to not use more than specified amount of memory]: : __git_guard_bytes' \
     '--depth=[maximum delta depth]:maximum delta depth' \
@@ -3678,6 +3692,7 @@ _git-fsck () {
     '(-v --verbose)'{-v,--verbose}'[output additional information]' \
     '--lost-found[write dangling objects into .git/lost-found]' \
     '--progress[show progress]' \
+    '--name-objects[show verbose names for reachable objects]' \
     '*: :__git_objects'
 }
 
@@ -4548,6 +4563,7 @@ _git-pack-objects () {
     '(: --max-pack-size)--stdout[output pack to stdout]' \
     '--include-tag[include unasked-for annotated tags if object they reference is included]' \
     '(--unpack-unreachable)--keep-unreachable[keep unreachable ]' \
+    '--pack-loose-unreachable[pack loose unreachable objects]' \
     '(--keep-unreachable)--unpack-unreachable=-[unpack unreachable objects newer than specified time]::time' \
     '--include-tag[include tag objects that refer to objects to be packed]' \
     $thin_opt \
@@ -5205,12 +5221,11 @@ _git-upload-archive () {
 
 (( $+functions[_git-upload-pack] )) ||
 _git-upload-pack () {
-  # TODO: --advertise-refs is undocumented.
-  # TODO: --stateless-rpc is undocumented.
   _arguments -S -A '-*' \
+    '--stateless-rpc[quit after a single request/response exchange]' \
+    '--advertise-refs[exit immediately after initial ref advertisement]' \
     "--strict[don't try <directory>/.git/ if <directory> is not a git directory]" \
-    '--timeout=-[interrupt transfer after given number of seconds of inactivity]: :__git_guard_number "inactivity timeout"' \
-    --advertise-refs --stateless-rpc \
+    '--timeout=-[interrupt transfer after period of inactivity]: :__git_guard_number "inactivity timeout (seconds)"' \
     ': :_directories'
 }
 
