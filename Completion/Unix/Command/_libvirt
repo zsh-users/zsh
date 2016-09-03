@@ -28,7 +28,7 @@ dom_opts=(
   screenshot " "
   send-key " "
   shutdown --state-running
-  start --state-shutoff
+  start --inactive
   suspend --state-running
   ttyconsole " "
   undefine --inactive
@@ -116,6 +116,8 @@ esac
 local -a conn_opt
 if [[ -n ${(v)opt_args[(I)-c|--connect]} ]]; then
   local uri=${(v)opt_args[(I)-c|--connect]}
+  # For the libvirt remote URI syntax, see:
+  # https://libvirt.org/guide/html/Application_Development_Guide-Architecture-Remote_URIs.html
   [[ -z ${(Q)uri//([[:alnum:]]|+|:|\/|@|-|\.|\?|=)} ]] && \
     conn_opt=( -c $uri )
 fi
@@ -135,68 +137,68 @@ case $state in
     done
     [[ -z $cmd ]] && return 1
     local -a values
-    case $words[-2] in
+    case $words[CURRENT-1] in
       --domain)
-        values=( $(_call_program domains "virsh ${(Q)conn_opt} list ${dom_opts[$cmd]:-"--all"} --name") )
-        [[ -n $values ]] && _values domain ${=values} && return 0
+        values=( $(_call_program domains "virsh $conn_opt list ${dom_opts[$cmd]:-"--all"} --name") )
+        [[ -n $values ]] && _wanted domains expl domain compadd ${=values} && return 0
         return 1
       ;;
       --interface)
-        values=( ${${${${(f):-"$(_call_program interfaces "virsh ${(Q)conn_opt} iface-list ${iface_opts[$cmd]:-"--all"}")"}/ Name*/}:#---*}/  */} )
-        [[ -n $values ]] && _values interface ${=values} && return 0
+        values=( ${${${${(f):-"$(_call_program interfaces "virsh $conn_opt iface-list ${iface_opts[$cmd]:-"--all"}")"}/ Name*/}:#---*}/  */} )
+        [[ -n $values ]] && _wanted interfaces expl interface compadd ${=values} && return 0
         return 1
       ;;
       --network)
-        values=( $(_call_program networks "virsh ${(Q)conn_opt} net-list ${net_opts[$cmd]:-"--all"} --name") )
-        [[ -n $values ]] && _values network ${=values} && return 0
+        values=( $(_call_program networks "virsh $conn_opt net-list ${net_opts[$cmd]:-"--all"} --name") )
+        [[ -n $values ]] && _wanted networks expl network compadd ${=values} && return 0
         return 1
       ;;
       --device)
-        values; values=( $(_call_program nodedevs "virsh ${(Q)conn_opt} nodedev-list") )
-        [[ -n $values ]] && _values device ${=values} && return 0
+        values; values=( $(_call_program nodedevs "virsh $conn_opt nodedev-list") )
+        [[ -n $values ]] && _wanted devices expl device compadd ${=values} && return 0
         return 1
       ;;
       --nwfilter)
-        values=( ${${${${(f):-"$(_call_program nwfilters "virsh ${(Q)conn_opt} nwfilter-list")"}/ UUID*/}:#---*}/  */} )
-        [[ -n $values ]] && _values nwfilter ${=values} && return 0
+        values=( ${${${${(f):-"$(_call_program nwfilters "virsh $conn_opt nwfilter-list")"}/ UUID*/}:#---*}/  */} )
+        [[ -n $values ]] && _wanted nwfilters expl nwfilter compadd ${=values} && return 0
         return 1
       ;;
       --pool)
-        values=( ${${${${(f):-"$(_call_program pools "virsh ${(Q)conn_opt} pool-list ${pool_opts[$cmd]:-"--all"}")"}/ Name*/}:#---*}/  */} )
-        [[ -n $values ]] && _values pool ${=values} && return 0
+        values=( ${${${${(f):-"$(_call_program pools "virsh $conn_opt pool-list ${pool_opts[$cmd]:-"--all"}")"}/ Name*/}:#---*}/  */} )
+        [[ -n $values ]] && _wanted pools expl pool compadd ${=values} && return 0
         return 1
       ;;
       --secret)
-        values=( ${${${${(f):-"$(_call_program secrets "virsh ${(Q)conn_opt} secret-list")"}/ UUID*/}:#---*}/  */} )
-        [[ -n $values ]] && _values secret ${=values} && return 0
+        values=( ${${${${(f):-"$(_call_program secrets "virsh $conn_opt secret-list")"}/ UUID*/}:#---*}/  */} )
+        [[ -n $values ]] && _wanted secrets expl secret compadd ${=values} && return 0
         return 1
       ;;
       --snapshotname)
-        local dom ; [[ ${(k)words[(I)--domain]} -gt 0 ]] && dom=${words[1+${(k)words[(I)--domain]}]}
+        local dom ; (( ${(k)words[(I)--domain]} > 0 )) && dom=${words[1+${(k)words[(I)--domain]}]}
         [[ -z $dom ]] && return 1
-        values=( ${${${${(f):-"$(_call_program snapshots "virsh ${(Q)conn_opt} snapshot-list --domain $dom 2>/dev/null")"}/ Name*/}:#---*}/  */} )
-        [[ -n $values ]] && _values snapshot ${=values} && return 0
+        values=( ${${${${(f):-"$(_call_program snapshots "virsh $conn_opt snapshot-list --domain ${(q)dom} 2>/dev/null")"}/ Name*/}:#---*}/  */} )
+        [[ -n $values ]] && _wanted snapshots expl snapshot compadd ${=values} && return 0
         return 1
       ;;
       --vol)
-        local pool ; [[ ${(k)words[(I)--pool]} -gt 0 ]] && pool=${words[1+${(k)words[(I)--pool]}]}
+        local pool ; (( ${(k)words[(I)--pool]} > 0 )) && pool=${words[1+${(k)words[(I)--pool]}]}
         [[ -z $pool ]] && return 1
-        values=( ${${${${(f):-"$(_call_program volumes "virsh ${(Q)conn_opt} vol-list --pool $pool 2>/dev/null")"}/ Name*/}:#---*}/  */} )
-        [[ -n $values ]] && _values volume ${=values} && return 0
+        values=( ${${${${(f):-"$(_call_program volumes "virsh $conn_opt vol-list --pool ${(q)pool} 2>/dev/null")"}/ Name*/}:#---*}/  */} )
+        [[ -n $values ]] && _wanted volumes expl volume compadd ${=values} && return 0
         return 1
       ;;
     esac
     if [[ $cmd == help ]]; then
-      [[ $words[-1] == -* ]] && _values -w -- --command && return 0
+      [[ $words[-1] == -* ]] && _values -w option --command && return 0
       if [[ $words[-2] == help || $words[-2] == --command ]]; then
-        _values commands ${=_cache_virsh_cmds} && return 0
+        _wanted commands expl command compadd ${=_cache_virsh_cmds} && return 0
       fi
       return 1
     fi
     [[ -z $_cache_virsh_cmd_opts[$cmd] ]] && \
       _cache_virsh_cmd_opts[$cmd]=${(M)${${${${=${(f)"$(_call_program virsh virsh help $cmd 2>&1)"}}/\[}/\]}/\;}:#-[-0-9A-Za-z]*}
     [[ -n ${=_cache_virsh_cmd_opts[$cmd]} ]] && \
-      _values -w options ${=_cache_virsh_cmd_opts[$cmd]} && ret=0
+      _values -w option ${(u)=_cache_virsh_cmd_opts[$cmd]} && ret=0
   ;;
   virt_admin_cmds)
     _wanted commands expl 'virt-admin command' compadd -a _cache_virt_admin_cmds && ret=0
@@ -208,18 +210,18 @@ case $state in
     done
     [[ -z $cmd ]] && return 1
     if [[ $words[-2] == --server ]]; then
-      _values servers ${=${(S)${${(f)$(sudo virt-admin ${(Q)conn_opt} srv-list)}##*--- }//[0-9]* }} && return 0
+      _wanted servers expl server compadd ${=${(S)${${(f)$(sudo virt-admin ${(Q)conn_opt} srv-list)}##*--- }//[0-9]* }} && return 0
     fi
     if [[ $words[-2] == --client ]]; then
-      local srv ; [[ ${(k)words[(I)--server]} -gt 0 ]] && srv=${words[1+${(k)words[(I)--server]}]}
+      local srv ; (( ${(k)words[(I)--server]} > 0 )) && srv=${words[1+${(k)words[(I)--server]}]}
       [[ -z $srv ]] && return 1
       [[ -n ${srv//[[:alnum:]]} ]] && return 1
-      _values servers ${=${${(f):-"$(sudo virt-admin ${(Q)conn_opt} srv-clients-list --server $srv 2>/dev/null)"}/ [a-z]*}//[^0-9]} && return 0
+      _wanted clients expl client compadd ${=${${(f):-"$(sudo virt-admin ${(Q)conn_opt} srv-clients-list --server $srv 2>/dev/null)"}/ [a-z]*}//[^0-9]} && return 0
     fi
     [[ -z $_cache_virt_admin_cmd_opts[$cmd] ]] && \
       _cache_virt_admin_cmd_opts[$cmd]=${(M)${${${${=${(f)"$(_call_program virt-admin virt-admin help $cmd 2>&1)"}}/\[}/\]}/\;}:#-[-0-9A-Za-z]*}
     [[ -n $_cache_virt_admin_cmd_opts[$cmd] ]] && \
-      _values -w options ${=_cache_virt_admin_cmd_opts[$cmd]} && ret=0
+      _values -w option ${(u)=_cache_virt_admin_cmd_opts[$cmd]} && ret=0
   ;;
 
 esac

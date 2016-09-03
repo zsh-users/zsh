@@ -1,5 +1,8 @@
 2016-09-03  Oliver Kiddle  <opk@zsh.org>
 
+	* Marko Myllynen: 39158: Completion/Unix/Command/_libvirt:
+	cleanup following review comments of function
+
 	* 39165: Completion/Unix/Command/_dmidecode,
 	Completion/Unix/Command/_ant, Completion/Linux/Command/_ss,
 	Completion/Unix/Command/_espeak, Completion/Unix/Command/_git,
