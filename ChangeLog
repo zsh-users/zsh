@@ -1,3 +1,8 @@
+2016-09-04  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Src/Zle/comp.h, Src/Zle/complete.c: internals:
+	Document zshcompwid(1) parameter implementations.
+
 2016-09-03  Oliver Kiddle  <opk@zsh.org>
 
 	* Marko Myllynen: 39158: Completion/Unix/Command/_libvirt:

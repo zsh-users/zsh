@@ -72,8 +72,26 @@ char *compiprefix,
      *compoldins,
      *compvared;
 
+/*
+ * An array of Param structures for compsys special parameters;
+ * see 'comprparams' below.  An entry for $compstate is added
+ * by makecompparams().
+ *
+ * See CP_REALPARAMS.
+ */
+
 /**/
-Param *comprpms, *compkpms;
+Param *comprpms;
+
+/* 
+ * An array of Param structures for elemens of $compstate; see
+ * 'compkparams' below.
+ *
+ * See CP_KEYPARAMS.
+ */
+
+/**/
+Param *compkpms;
 
 /**/
 mod_export void

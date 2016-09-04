@@ -367,7 +367,7 @@ typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int);
 #define CP_QISUFFIX    (1 <<  CPN_QISUFFIX)
 #define CPN_COMPSTATE  9
 #define CP_COMPSTATE   (1 <<  CPN_COMPSTATE)
-
+/* See comprpms */
 #define CP_REALPARAMS  10
 #define CP_ALLREALS    ((unsigned int) 0x3ff)
 
@@ -424,7 +424,7 @@ typedef void (*CLPrintFunc)(Cmgroup, Cmatch *, int, int, int, int);
 #define CP_QUOTES      (1 << CPN_QUOTES)
 #define CPN_IGNORED    25
 #define CP_IGNORED     (1 << CPN_IGNORED)
-
+/* See compkpms */
 #define CP_KEYPARAMS   26
 #define CP_ALLKEYS     ((unsigned int) 0x3ffffff)
 
