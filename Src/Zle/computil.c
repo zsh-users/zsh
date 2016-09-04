@@ -2310,7 +2310,10 @@ ca_parse_line(Cadef d, int multi, int first)
     return 0;
 }
 
-/* Build a colon-list from a list. */
+/* Build a colon-list from a list.
+ *
+ * This is only used to populate values of $opt_args.
+ */
 
 static char *
 ca_colonlist(LinkList l)
@@ -2320,16 +2323,19 @@ ca_colonlist(LinkList l)
 	int len = 0;
 	char *p, *ret, *q;
 
+	/* Compute the length to be allocated. */
 	for (n = firstnode(l); n; incnode(n)) {
 	    len++;
 	    for (p = (char *) getdata(n); *p; p++)
-		len += (*p == ':' ? 2 : 1);
+		len += (*p == ':' || *p == '\\') ? 2 : 1;
 	}
 	ret = q = (char *) zalloc(len);
 
+	/* Join L into RET, joining with colons and escaping colons and
+	 * backslashes. */
 	for (n = firstnode(l); n;) {
 	    for (p = (char *) getdata(n); *p; p++) {
-		if (*p == ':')
+		if (*p == ':' || *p == '\\')
 		    *q++ = '\\';
 		*q++ = *p;
 	    }

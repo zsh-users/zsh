@@ -87,6 +87,15 @@ The "f" qualifier has for many years been the documented way of testing
 file modes; it allows the "and" test ("*(f+1)" is the documented
 equivalent of "*(1)") as well as many other forms.
 
+5) The completion helper function _arguments now escapes both backslashes
+and colons in the values of option arguments when populating the $opt_args
+associative array.  Previously, colons were escaped with a backslash but
+backslashes were not themselves escaped with a backslash, which lead to
+ambiguity: if the -x option took two arguments (as in
+    _arguments : -x:foo:${action}:bar:$action
+), it would be impossible to tell from $opt_args whether the command-line
+was '-x foo\:bar' or '-x foo\\ bar'.
+
 Incompatibilities between 5.0.8 and 5.2
 ---------------------------------------
 
