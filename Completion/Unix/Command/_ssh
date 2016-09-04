@@ -382,10 +382,7 @@ _ssh () {
               '2' && ret=0
           ;;
         (#i)proxycommand=*)
-          compset -q
-          shift 1 words
-          (( CURRENT-- ))
-          _normal && ret=0
+          _cmdstring && ret=0
           ;;
         (#i)rekeylimit=*)
           _message -e 'maximum number of bytes transmitted before renegotiating session key'
