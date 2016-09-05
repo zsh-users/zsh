@@ -1,3 +1,8 @@
+2016-09-06  Marko Myllynen  <myllynen@redhat.com>
+
+	* 39179 (plus tweak): Completion/Unix/Command/_libvirt: More
+	_libvirt (virsh) completion tweaks
+
 2016-09-05  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Teubel György: 39167: Src/init.c, Doc/Zsh/params.yo: Make $ENV
