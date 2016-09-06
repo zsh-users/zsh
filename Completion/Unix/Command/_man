@@ -46,6 +46,7 @@ _man() {
   local sect sect_dirname
   if [[ $OSTYPE = solaris* ]]; then
     sect=${${words[(R)-s*]#-s}:-$words[$words[(i)-s]+1]}
+    sect="${sect//,/|}"
   elif [[ -n ${sect:=$words[$words[(i)-S]+1]} || -n ${sect:=$MANSECT} ]]; then
     sect="${sect//:/|}"
     sect="${sect//,/|}"
@@ -67,6 +68,8 @@ _man() {
     dirs=( $^_manpath/(sman|man|cat)*/ )
     awk='{print $1}'
   fi
+  # Solaris 11 and on have a man-index directory that doesn't contain manpages
+  dirs=( ${dirs:#*/man-index/} )
   if [[ $OSTYPE = solaris* && ( $words[CURRENT] = -s* || $words[CURRENT-1] == -s ) ]]; then
     [[ $words[CURRENT] = -s* ]] && compset -P '-s'
     sects=( ${(o)${dirs##*(man|cat)}%/} )

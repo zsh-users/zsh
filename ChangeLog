@@ -1,3 +1,8 @@
+2016-09-07  Danek Duvall  <duvall@comfychair.org>
+
+	* 39194: Completion/Unix/Command/_man: _man (Solaris): Ignore
+	man-index. Support multiple sections in the -s flag's argument.
+
 2016-09-07  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Unix/Command/_rm: fix to use ;|
