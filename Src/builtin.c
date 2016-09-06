@@ -2266,6 +2266,10 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    zerrnam(cname, "%s: restricted", pname);
 	    return pm;
 	}
+	if (pm->node.flags & PM_SINGLE) {
+	    zerrnam(cname, "%s: can only have a single instance", pname);
+	    return pm;
+	}
 	/*
 	 * For specials, we keep the same struct but zero everything.
 	 * Maybe it would be easier to create a new struct but copy

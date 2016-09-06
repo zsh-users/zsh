@@ -1,3 +1,8 @@
+2016-09-06  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39181: Src/builtin.c, Src/zsh.h, Src/Zle/complete.c: Add
+	PM_SINGLE for single instance and use for compstate.
+
 2016-09-06  Marko Myllynen  <myllynen@redhat.com>
 
 	* 39179 (plus tweak): Completion/Unix/Command/_libvirt: More

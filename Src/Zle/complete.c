@@ -1238,8 +1238,9 @@ makecompparams(void)
 
     addcompparams(comprparams, comprpms);
 
-    if (!(cpm = createparam(COMPSTATENAME,
-			    PM_SPECIAL|PM_REMOVABLE|PM_LOCAL|PM_HASHED)))
+    if (!(cpm = createparam(
+	      COMPSTATENAME,
+	      PM_SPECIAL|PM_REMOVABLE|PM_SINGLE|PM_LOCAL|PM_HASHED)))
 	cpm = (Param) paramtab->getnode(paramtab, COMPSTATENAME);
     DPUTS(!cpm, "param not set in makecompparams");
 
