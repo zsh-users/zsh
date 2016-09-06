@@ -1,3 +1,8 @@
+2016-09-06  Marko Myllynen  <myllynen@redhat.com>
+
+	* unposted: Completion/Unix/Command/_libvirt: Fix leakage of
+	$word (after 39179).
+
 2016-09-06  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39181: Src/builtin.c, Src/zsh.h, Src/Zle/complete.c: Add

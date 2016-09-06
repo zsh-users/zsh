@@ -131,7 +131,7 @@ case $state in
       _default
       return 0
     fi
-    local cmd
+    local cmd word
     for word in ${words:1}; do
       [[ -n "${_cache_virsh_cmds[(r)$word]}" ]] && cmd=$word && break
     done
@@ -211,7 +211,7 @@ case $state in
     _wanted commands expl 'virt-admin command' compadd -a _cache_virt_admin_cmds && ret=0
   ;;
   virt_admin_cmd_opts)
-    local cmd
+    local cmd word
     for word in ${words:1}; do
       [[ -n "${_cache_virt_admin_cmds[(r)$word]}" ]] && cmd=$word && break
     done
