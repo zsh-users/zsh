@@ -116,6 +116,7 @@ esac
 local -a conn_opt
 if [[ -n ${(v)opt_args[(I)-c|--connect]} ]]; then
   local uri=${(v)opt_args[(I)-c|--connect]}
+  uri=${uri//(#m)\\([\\:])/${MATCH[2]}} # opt_args elements are colon-escaped
   # For the libvirt remote URI syntax, see:
   # https://libvirt.org/guide/html/Application_Development_Guide-Architecture-Remote_URIs.html
   [[ -z ${(Q)uri//([[:alnum:]]|+|:|\/|@|-|\.|\?|=)} ]] && \

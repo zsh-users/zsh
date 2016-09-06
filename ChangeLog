@@ -1,5 +1,8 @@
 2016-09-06  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39171: Completion/Unix/Command/_libvirt: Apply
+	$opt_args-unescaping.
+
 	* unposted: Completion/Unix/Command/_libvirt: Escape $words
 	elements to avoid their interpretation as a pattern against
 	$_cache_virsh_cmds.
