@@ -133,7 +133,7 @@ case $state in
     fi
     local cmd word
     for word in ${words:1}; do
-      [[ -n "${_cache_virsh_cmds[(r)$word]}" ]] && cmd=$word && break
+      [[ -n "${_cache_virsh_cmds[(r)${(b)word}]}" ]] && cmd=$word && break
     done
     [[ -z $cmd ]] && return 1
     local -a values
@@ -213,7 +213,7 @@ case $state in
   virt_admin_cmd_opts)
     local cmd word
     for word in ${words:1}; do
-      [[ -n "${_cache_virt_admin_cmds[(r)$word]}" ]] && cmd=$word && break
+      [[ -n "${_cache_virt_admin_cmds[(r)${(b)word}]}" ]] && cmd=$word && break
     done
     [[ -z $cmd ]] && return 1
     if [[ $words[CURRENT-1] == --server ]]; then
