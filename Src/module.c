@@ -3350,6 +3350,8 @@ setfeatureenables(Module m, Features f, int *e)
     if (f->mf_size) {
 	if (setmathfuncs(m->node.nam, f->mf_list, f->mf_size, e))
 	    ret = 1;
+	if (e)
+	    e += f->mf_size;
     }
     if (f->pd_size) {
 	if (setparamdefs(m->node.nam, f->pd_list, f->pd_size, e))

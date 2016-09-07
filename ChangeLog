@@ -1,5 +1,8 @@
 2016-09-07  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 39218: Src/module.c: fix feature enables with math functions
+	present.  This caused parameters to be miscounted.
+
 	* 39217: Src/Modules/system.mdd: adapt zsh.mdd to avoid problems
 	with GCC preprocessor in error names.
 
