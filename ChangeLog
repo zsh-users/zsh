@@ -1,5 +1,11 @@
 2016-09-07  Oliver Kiddle  <opk@zsh.org>
 
+	39208: Matthew Martin: Completion/BSD/Command/_chflags:
+	Update flags
+
+	39223: Matthew Martin: Completion/BSD/Command/_chflags:
+	Introduce addflags function to reduce redundancy
+
 	39193: Completion/Unix/Type/_remote_files: don't pass options
 	from after -- on to compadd
 

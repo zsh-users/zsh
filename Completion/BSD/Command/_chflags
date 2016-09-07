@@ -15,32 +15,48 @@ addflags() {
 }
 
 addflags \
-  nodump nodump \
-  opaque opaque \
   uappnd 'user append-only' \
   uchg 'user immutable'
 
 if (( ! EUID )); then
   addflags \
     arch archived \
+    nodump nodump \
     sappnd 'system append-only' \
     schg 'system immutable'
   unset own
 fi
 
-if [[ $OSTYPE = (freebsd|dragonfly|darwin)* ]]; then
-  addflags \
-    hidden hidden \
-    uunlnk 'user undeletable'
+if [[ $OSTYPE = (darwin|dragonfly|freebsd|netbsd)* ]]; then
+  addflags opaque opaque
+
+  if [[ $OSTYPE = darwin* ]]; then
+    addflags hidden hidden
+  fi
+
+  if [[ $OSTYPE = (dragonfly|freebsd)* ]]; then
+    addlfags uunlnk 'user undeletable'
+    (( EUID )) || addflags sunlnk 'system undeletable'
+  fi
+
+  [[ $OSTYPE = dragonflybsd* ]] && {
+    addflags \
+      cache XXX \
+      nouhistory 'user nohistory'
+
+    (( EUID )) || addflags \
+      noscache XXX \
+      noshistory 'system nohistory'
+  }
 
   [[ $OSTYPE = freebsd* ]] && addflags \
-    offline offline \
-    rdonly readonly \
-    reparse 'Windows reparse point' \
-    sparse 'sparse file' \
-    system system
-
-  (( EUID )) || addflags sunlnk 'system undeletable'
+    uarch archive \
+    uhidden hidden \
+    uoffline offline \
+    urdonly 'DOS, Windows and CIFS readonly' \
+    ureparse 'Windows reparse point' \
+    usparse 'sparse file' \
+    usystem 'DOS, Windows and CIFS system'
 
   args=(
     "-f[don't display diagnostic messages]"
