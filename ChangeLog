@@ -1,3 +1,8 @@
+2016-09-07  Oliver Kiddle  <opk@zsh.org>
+
+	39193: Completion/Unix/Type/_remote_files: don't pass options
+	from after -- on to compadd
+
 2016-09-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 39185: Src/lex.c: wordbeg only set for ZLE if not alias.

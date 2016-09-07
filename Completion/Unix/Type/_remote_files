@@ -28,16 +28,19 @@
 
 
 # There should be coloring based on all the different ls -F classifiers.
-local expl rempat remfiles remdispf remdispd args cmd cmd_args suf ret=1
+local expl rempat remfiles remdispf remdispd args cmd suf ret=1
+local -a args cmd_args
 local glob host
 
 if zstyle -T ":completion:${curcontext}:files" remote-access; then
 
   # Parse options to _remote_files. Stops at the first "--".
   zparseopts -D -E -a args / g:=glob h:=host
-  shift
   (( $#host)) && shift host || host="${IPREFIX%:}"
 
+  args=( ${argv[1,(I)--]} )
+  shift ${#args}
+  args[-1]=()
   # Command to run on the remote system.
   cmd="$1"
   shift
@@ -45,9 +48,9 @@ if zstyle -T ":completion:${curcontext}:files" remote-access; then
   # Handle arguments to ssh.
   if [[ $cmd == ssh ]]; then
     zparseopts -D -E -a cmd_args p: 1 2 4 6 F:
-    cmd_args="-o BatchMode=yes $cmd_args -a -x"
+    cmd_args=( -o BatchMode=yes "$cmd_args[@]" -a -x )
   else
-    cmd_args="$@"
+    cmd_args=( "$@" )
   fi
 
   if [[ -z $QIPREFIX ]]
@@ -74,8 +77,8 @@ if zstyle -T ":completion:${curcontext}:files" remote-access; then
   while _tags; do
     while _next_label files expl ${suf:-remote directory}; do
       [[ -n $suf ]] &&
-          compadd "$@" "$expl[@]" -d remdispf ${(q)remdispf%[*=|]} && ret=0
-      compadd ${suf:+-S/} -r "/ \t\n\-" "$@" "$expl[@]" -d remdispd \
+          compadd "$args[@]" "$expl[@]" -d remdispf ${(q)remdispf%[*=|]} && ret=0
+      compadd ${suf:+-S/} -r "/ \t\n\-" "$args[@]" "$expl[@]" -d remdispd \
 	${(q)remdispd%/} && ret=0
     done
     (( ret )) || return 0
