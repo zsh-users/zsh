@@ -1,5 +1,8 @@
 2016-09-07  Oliver Kiddle  <opk@zsh.org>
 
+	39209: Matthew Martin: Completion/BSD/Command/_chflags:
+	Update options
+
 	39208: Matthew Martin: Completion/BSD/Command/_chflags:
 	Update flags
 

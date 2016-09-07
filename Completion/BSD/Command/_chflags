@@ -58,17 +58,22 @@ if [[ $OSTYPE = (darwin|dragonfly|freebsd|netbsd)* ]]; then
     usparse 'sparse file' \
     usystem 'DOS, Windows and CIFS system'
 
+fi
+
+if [[ $OSTYPE = (darwin|dragonfly|freebsd)* ]]; then
   args=(
     "-f[don't display diagnostic messages]"
-    '-h[act on symlinks]'
     '-v[verbose output]'
   )
 fi
 
-_arguments -s -A "-*" $args \
+_arguments -s -A "-*" : $args \
+  - opth \
+  '-h[act on symlinks]' \
+  - optR \
+  '-R[recurse directories]' \
   '(-L -P)-H[follow symlinks on the command line (specify with -R)]' \
   '(-H -P)-L[follow all symlinks (specify with -R)]' \
   '(-L -H)-P[do not follow symlinks (specify with -R)]' \
-  '-R[recurse directories]' \
   ':file flag:_values -s , "file flags" $flags[@]' \
   '*:file:_files "$own"'
