@@ -15,7 +15,12 @@ errnames.c: errnames1.awk errnames2.awk $(dir_top)/config.h @ERRNO_H@
 		touch errtmp.out; \
 	   else \
 		$(AWK) -f $(sdir)/errnames1.awk @ERRNO_H@ >errtmp.c; \
-		$(CPP) errtmp.c >errtmp.out; \
+		case "`$(CPP) --version </dev/null 2>&1`" in \
+		*"Free Software Foundation"*) \
+		$(CPP) -P errtmp.c >errtmp.out;; \
+		*) \
+		$(CPP) errtmp.c >errtmp.out;; \
+		esac; \
 	   fi
 	   $(AWK) -f $(sdir)/errnames2.awk errtmp.out > $@
 	   rm -f errtmp.c errtmp.out

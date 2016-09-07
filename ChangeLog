@@ -1,3 +1,8 @@
+2016-09-07  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39217: Src/Modules/system.mdd: adapt zsh.mdd to avoid problems
+	with GCC preprocessor in error names.
+
 2016-09-06  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* m0viefreak: 38153 (cf. 39135): Completion/Base/Utility/_arguments:
