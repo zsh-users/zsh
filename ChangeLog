@@ -1,5 +1,8 @@
 2016-09-07  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Matthew Martin: 39221: Completion/Unix/Command/_rm: update for
+	BSD.
+
 	* 39218: Src/module.c: fix feature enables with math functions
 	present.  This caused parameters to be miscounted.
 
