@@ -105,7 +105,10 @@ if (( long )); then
 	 continue
        else
 	 # Still no comment, add the previous options anyway.
-	 lopts+=("${tmp[@]}")
+         # Add a ':' after the option anyways, to make the the matching of
+         # the options lateron work as intended.
+         # It will be removed again later.
+	 lopts+=("${^tmp[@]}":)
 	 tmp=()
        fi
      fi
@@ -147,7 +150,7 @@ if (( long )); then
    done
    # Tidy up any remaining uncommented options.
    if (( ${#tmp} )); then
-     lopts+=("${tmp[@]}")
+     lopts+=("${^tmp[@]}":)
    fi
 
     # Remove options also described by user-defined specs.
@@ -220,19 +223,22 @@ if (( long )); then
 
       # Ignore :descriptions at the ends of lopts for matching this;
       # they aren't in the patterns.
-      tmp=("${(@M)lopts:##$~pattern(|:*)}")
-      lopts=("${(@)lopts:##$~pattern(|:*)}")
+      tmp=("${(@M)lopts:##$~pattern:*}")
+      lopts=("${(@)lopts:##$~pattern:*}")
 
       (( $#tmp )) || continue
 
       opt=''
 
+      # Clean suffix ':' added earlier
+      tmp=("${(@)tmp%:}")
+
       # If there are option strings with a `[=', we take these to get an
       # optional argument.
 
-      tmpo=("${(@M)tmp:#*\[\=*}")
+      tmpo=("${(@M)tmp:#[^:]##\[\=*}")
       if (( $#tmpo )); then
-        tmp=("${(@)tmp:#*\[\=*}")
+        tmp=("${(@)tmp:#[^:]##\[\=*}")
 
 	for opt in "$tmpo[@]"; do
 	  # Look for --option:description and turn it into
@@ -263,9 +269,9 @@ if (( long )); then
       # Basically the same as the foregoing.
       # TODO: could they be combined?
 
-      tmpo=("${(@M)tmp:#*\=*}")
+      tmpo=("${(@M)tmp:#[^:]##\=*}")
       if (( $#tmpo )); then
-        tmp=("${(@)tmp:#*\=*}")
+        tmp=("${(@)tmp:#[^:]##\=*}")
 
 	for opt in "$tmpo[@]"; do
 	  if [[ $opt = (#b)(*):([^:]#) ]]; then
