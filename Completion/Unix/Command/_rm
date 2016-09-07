@@ -29,14 +29,14 @@ else
         '-d[remove directories as well]'
         '-P[overwrite files before deleting them]'
       )
-    ;;
+    ;|
     dragonfly*|freebsd*|netbsd*)
       args+=(
         '-v[explain what is being done]'
         '-W[attempt to undelete named files]'
         "-x[don't cross file systems when removing a hierarchy]"
       )
-    ;;
+    ;|
     dragonfly*|freebsd*)
       args+=(
         '(-i)-I[prompt when removing many files]'
