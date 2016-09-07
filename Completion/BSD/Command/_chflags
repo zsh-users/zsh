@@ -2,55 +2,46 @@
 
 local flags args own='-g *(-u$EUID)'
 
-flags=(
-  '(noopaque)opaque[set the opaque flag]'
-  '(opaque)noopaque[unset the opaque flag]'
-  '(dump)nodump[set the nodump flag]'
-  '(nodump)dump[unset the nodump flag]'
-  '(nouappnd)uappnd[set the user append-only flag]'
-  '(uappnd)nouappnd[unset the user append-only flag]'
-  '(nouchg)uchg[set the user immutable flag]'
-  '(uchg)nouchg[unset the user immutable flag]'
-)
+addflags() {
+  for 1 2; do
+    if [[ $1 = no* ]]; then
+      flags+=("(${1#no})$1[set the $2 flag]"
+               "($1)${1#no}[unset the $2 flag]")
+    else
+      flags+=("(no$1)$1[set the $2 flag]"
+               "($1)no$1[unset the $2 flag]")
+    fi
+  done
+}
+
+addflags \
+  nodump nodump \
+  opaque opaque \
+  uappnd 'user append-only' \
+  uchg 'user immutable'
 
 if (( ! EUID )); then
-  flags+=(
-    '(noarch)arch[set the archived flag]'
-    '(arch)noarch[unset the archived flag]'
-    '(nosappnd)sappnd[set the system append-only flag]'
-    '(sappnd)nosappnd[unset the system append-only flag]'
-    '(noschg)schg[set the system immutable flag]'
-    '(schg)noschg[unset the system immutable flag]'
-  )
+  addflags \
+    arch archived \
+    sappnd 'system append-only' \
+    schg 'system immutable'
   unset own
 fi
 
 if [[ $OSTYPE = (freebsd|dragonfly|darwin)* ]]; then
-  flags+=(
-    '(nouunlnk)uunlnk[set the user undeletable flag]'
-    '(uunlnk)nouunlnk[unset the user undeletable flag]'
-    '(nohidden)hidden[set the hidden flag]'
-    '(hidden)nohidden[unset the hidden flag]'
-  )
-  [[ $OSTYPE = freebsd* ]] && flags+=(
-    '(uoffline)offline[set the offline attribute]'
-    '(offline)uoffline[unset the offline attribute]'
-    '(urdonly)rdonly[set readonly flag]'
-    '(rdonly)urdonly[unset readonly flag]'
-    '(usparse)sparse[set the sparse attribute]'
-    '(sparse)usparse[unset the sparse attribute]'
-    '(usystem)system[set system flag]'
-    '(system)usystem[unset system flag]'
-    '(ureparse)reparse[set the Windows reparse point attribute]'
-    '(reparse)ureparse[unset the Windows reparse point attribute]'
-    '(uunlnk)unlnk[set undeletable flag]'
-    '(unlnk)uunlnk[unset undeletable flag]'
-  )
+  addflags \
+    hidden hidden \
+    uunlnk 'user undeletable'
 
-  (( EUID )) || flags+=(
-    '(nosunlnk)sunlnk[set the system undeletable flag]'
-    '(sunlnk)nosunlnk[unset the system undeletable flag]'
-  )
+  [[ $OSTYPE = freebsd* ]] && addflags \
+    offline offline \
+    rdonly readonly \
+    reparse 'Windows reparse point' \
+    sparse 'sparse file' \
+    system system
+
+  (( EUID )) || addflags sunlnk 'system undeletable'
+
   args=(
     "-f[don't display diagnostic messages]"
     '-h[act on symlinks]'
