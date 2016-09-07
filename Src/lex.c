@@ -613,7 +613,7 @@ gettok(void)
     if (lexstop)
 	return (errflag) ? LEXERR : ENDINPUT;
     isfirstln = 0;
-    if ((lexflags & LEXFLAGS_ZLE))
+    if ((lexflags & LEXFLAGS_ZLE) && !(inbufflags & INP_ALIAS))
 	wordbeg = inbufct - (qbang && c == bangchar);
     hwbegin(-1-(qbang && c == bangchar));
     /* word includes the last character read and possibly \ before ! */

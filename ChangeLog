@@ -1,3 +1,8 @@
+2016-09-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 39185: Src/lex.c: wordbeg only set for ZLE if not alias.
+	Fixes crash on completion in some obscure alias expansions.
+
 2016-09-07  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Matthew Martin: 39221: Completion/Unix/Command/_rm: update for
