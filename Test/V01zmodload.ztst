@@ -271,6 +271,80 @@
 0:Listing feature autoloads includes unloaded modules
 >zmodload -Fa zsh/zftp b:zftp
 
+  if ! zmodload zsh/system >/dev/null 2>&1; then
+    ZTST_skip="zsh/system module not available"
+  else
+    zmodload -lF zsh/system
+    zmodload -F zsh/system -p:errnos
+    print ${+errnos}
+    zmodload -lF zsh/system
+    zmodload -F zsh/system +p:errnos
+    print ${+errnos}
+    zmodload -lF zsh/system
+  fi
+0:Regression tests for index bug with math functions.
+>+b:syserror
+>+b:sysread
+>+b:syswrite
+>+b:sysopen
+>+b:sysseek
+>+b:zsystem
+>+f:systell
+>+p:errnos
+>+p:sysparams
+>0
+>+b:syserror
+>+b:sysread
+>+b:syswrite
+>+b:sysopen
+>+b:sysseek
+>+b:zsystem
+>+f:systell
+>-p:errnos
+>+p:sysparams
+>1
+>+b:syserror
+>+b:sysread
+>+b:syswrite
+>+b:sysopen
+>+b:sysseek
+>+b:zsystem
+>+f:systell
+>+p:errnos
+>+p:sysparams
+
+  if ! zmodload zsh/system >/dev/null 2>&1; then
+    ZTST_skip="zsh/system module not available"
+  else
+    zmodload -F zsh/system -f:systell
+    zmodload -lF zsh/system
+    (print $(( systell(-1) )))
+    zmodload -F zsh/system +f:systell
+    zmodload -lF zsh/system
+    (print $(( systell(-1) )))
+  fi
+1:Module Features for math functions
+>+b:syserror
+>+b:sysread
+>+b:syswrite
+>+b:sysopen
+>+b:sysseek
+>+b:zsystem
+>-f:systell
+>+p:errnos
+>+p:sysparams
+>+b:syserror
+>+b:sysread
+>+b:syswrite
+>+b:sysopen
+>+b:sysseek
+>+b:zsystem
+>+f:systell
+>+p:errnos
+>+p:sysparams
+?(eval):6: unknown function: systell
+?(eval):9: file descriptor out of range
+
 %clean
 
  eval "$deps"
