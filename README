@@ -91,10 +91,15 @@ equivalent of "*(1)") as well as many other forms.
 and colons in the values of option arguments when populating the $opt_args
 associative array.  Previously, colons were escaped with a backslash but
 backslashes were not themselves escaped with a backslash, which lead to
-ambiguity: if the -x option took two arguments (as in
+ambiguity: '-x foo\:bar' (one argument with a backslashed colon) and
+'-x foo\\ bar' (two arguments, and the first one ends in a backslash) would
+both set $opt_args[-x] to the same value.  This example assumes the -x
+option's spec declared two arguments, as in:
     _arguments : -x:foo:${action}:bar:$action
-), it would be impossible to tell from $opt_args whether the command-line
-was '-x foo\:bar' or '-x foo\\ bar'.
+
+For the more common case of non-repeatable options that take a single
+argument, completion functions now have to unescape not only colons but
+also backslashes when obtaining the option's argument from $opt_args.
 
 Incompatibilities between 5.0.8 and 5.2
 ---------------------------------------

@@ -1,3 +1,8 @@
+2016-09-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 39236 (plus typo fix): Doc/Zsh/compsys.yo, README: docs: Tweak
+	_arguments $opt_args documentation added in 39173.
+
 2016-09-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39222: Test/V01zmodload.ztst: test use of module loaded math

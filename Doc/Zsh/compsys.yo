@@ -3949,9 +3949,7 @@ arguments.  Options are stored in the associative array
 `tt(opt_args)' with option names as keys and their arguments as
 the values.  For options that have more than one argument these are
 given as one string, separated by colons.  All colons and backslashes
-in the original arguments are preceded with backslashes.  (Note:
-Zsh 5.2 and older did not escape backslashes in the original string;
-see the tt(NEWS) file for details.)
+in the original arguments are preceded with backslashes.
 
 The parameter `tt(context)' is set when returning to the calling function
 to perform an action of the form `tt(->)var(string)'.  It is set to an
