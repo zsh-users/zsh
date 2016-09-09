@@ -1,3 +1,8 @@
+2016-09-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Test/D04parameter.ztst: Add tests for ${(q)} being
+	aware of the EQUALS option.
+
 2016-09-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 39236 (plus typo fix): Doc/Zsh/compsys.yo, README: docs: Tweak
