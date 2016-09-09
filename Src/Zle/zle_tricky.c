@@ -424,8 +424,8 @@ mod_export int instring, inbackt;
  * This uses the instring variable above.
  */
 
-#define quotename(s, e) \
-quotestring(s, e, instring == QT_NONE ? QT_BACKSLASH : instring)
+#define quotename(s) \
+quotestring(s, instring == QT_NONE ? QT_BACKSLASH : instring)
 
 /* Check if the given string is the name of a parameter and if this *
  * parameter is one worth expanding.                                */
@@ -2004,11 +2004,11 @@ get_comp_string(void)
 
 			new->next = NULL;
 			new->str = dupstrpfx(bbeg, len);
-			new->str = ztrdup(quotename(new->str, NULL));
+			new->str = ztrdup(quotename(new->str));
 			untokenize(new->str);
 			new->pos = begi;
 			*dbeg = '\0';
-			new->qpos = strlen(quotename(predup, NULL));
+			new->qpos = strlen(quotename(predup));
 			*dbeg = '{';
 			i -= len;
 			boffs -= len;
@@ -2067,11 +2067,11 @@ get_comp_string(void)
 			lastbrbeg = new;
 
 			new->str = dupstrpfx(bbeg, len);
-			new->str = ztrdup(quotename(new->str, NULL));
+			new->str = ztrdup(quotename(new->str));
 			untokenize(new->str);
 			new->pos = begi;
 			*dbeg = '\0';
-			new->qpos = strlen(quotename(predup, NULL));
+			new->qpos = strlen(quotename(predup));
 			*dbeg = '{';
 			i -= len;
 			boffs -= len;
@@ -2117,7 +2117,7 @@ get_comp_string(void)
 		    brend = new;
 
 		    new->str = dupstrpfx(bbeg, len);
-		    new->str = ztrdup(quotename(new->str, NULL));
+		    new->str = ztrdup(quotename(new->str));
 		    untokenize(new->str);
 		    new->pos = dp - predup - len + 1;
 		    new->qpos = len;
@@ -2146,11 +2146,11 @@ get_comp_string(void)
 		lastbrbeg = new;
 
 		new->str = dupstrpfx(bbeg, len);
-		new->str = ztrdup(quotename(new->str, NULL));
+		new->str = ztrdup(quotename(new->str));
 		untokenize(new->str);
 		new->pos = begi;
 		*dbeg = '\0';
-		new->qpos = strlen(quotename(predup, NULL));
+		new->qpos = strlen(quotename(predup));
 		*dbeg = '{';
 		boffs -= len;
 		memmove(dbeg, dbeg + len, 1+strlen(dbeg+len));
@@ -2165,7 +2165,7 @@ get_comp_string(void)
 		    p = bp->pos;
 		    l = bp->qpos;
 		    bp->pos = strlen(predup + p + l);
-		    bp->qpos = strlen(quotename(predup + p + l, NULL));
+		    bp->qpos = strlen(quotename(predup + p + l));
 		    memmove(predup + p, predup + p + l, 1+bp->pos);
 		}
 	    }
@@ -2288,7 +2288,7 @@ doexpansion(char *s, int lst, int olst, int explincmd)
     foredel(we - wb, CUT_RAW);
     while ((ss = (char *)ugetnode(vl))) {
 	ret = 0;
-	ss = quotename(ss, NULL);
+	ss = quotename(ss);
 	untokenize(ss);
 	inststr(ss);
 	if (nonempty(vl) || !first) {
@@ -2997,7 +2997,7 @@ processcmd(UNUSED(char **args))
     inststr(" ");
     untokenize(s);
 
-    inststr(quotename(s, NULL));
+    inststr(quotename(s));
 
     zsfree(s);
     done = 1;

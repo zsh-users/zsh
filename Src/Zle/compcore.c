@@ -1055,7 +1055,7 @@ multiquote(char *s, int ign)
 		p += ign;
 	    while (*p) {
 		if (ign >= 0 || p[1])
-		    s = quotestring(s, NULL, *p);
+		    s = quotestring(s, *p);
 		p++;
 	    }
 	}

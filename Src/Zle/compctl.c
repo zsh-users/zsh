@@ -1400,7 +1400,7 @@ printcompctl(char *s, Compctl cc, int printflags, int ispat)
 	    untokenize(p);
 	    quotedzputs(p, stdout);
 	} else
-	    quotedzputs(quotestring(s, NULL, QT_BACKSLASH), stdout);
+	    quotedzputs(quotestring(s, QT_BACKSLASH), stdout);
     }
 
     /* loop through flags w/o args that are set, printing them if so */
@@ -1536,7 +1536,7 @@ printcompctl(char *s, Compctl cc, int printflags, int ispat)
 		char *p = dupstring(s);
 
 		untokenize(p);
-		quotedzputs(quotestring(p, NULL, QT_BACKSLASH), stdout);
+		quotedzputs(quotestring(p, QT_BACKSLASH), stdout);
 	    }
 	}
 	putchar('\n');
@@ -1740,8 +1740,8 @@ static int addwhat;
  * This uses the instring variable exported from zle_tricky.c.
  */
 
-#define quotename(s, e) \
-quotestring(s, e, instring == QT_NONE ? QT_BACKSLASH : instring)
+#define quotename(s) \
+quotestring(s, instring == QT_NONE ? QT_BACKSLASH : instring)
 
 /* Hook functions */
 
@@ -3153,10 +3153,10 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     lpre = zhalloc(lpl + 1);
     memcpy(lpre, s, lpl);
     lpre[lpl] = '\0';
-    qlpre = quotename(lpre, NULL);
+    qlpre = quotename(lpre);
     lsuf = dupstring(s + offs);
     lsl = strlen(lsuf);
-    qlsuf = quotename(lsuf, NULL);
+    qlsuf = quotename(lsuf);
 
     /* First check for ~.../... */
     if (ic == Tilde) {
@@ -3175,11 +3175,11 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
     rpre = (*p || *lpre == Tilde || *lpre == Equals) ?
 	(noreal = 0, getreal(tt)) :
 	dupstring(tt);
-    qrpre = quotename(rpre, NULL);
+    qrpre = quotename(rpre);
 
     for (p = lsuf; *p && *p != String && *p != Tick; p++);
     rsuf = *p ? (noreal = 0, getreal(lsuf)) : dupstring(lsuf);
-    qrsuf = quotename(rsuf, NULL);
+    qrsuf = quotename(rsuf);
 
     /* Check if word is a pattern. */
 
@@ -3315,10 +3315,10 @@ makecomplistflags(Compctl cc, char *s, int incmd, int compadd)
 	/* And get the file prefix. */
 	fpre = dupstring(((s1 == s || s1 == rpre || ic) &&
 			  (*s != '/' || zlemetacs == wb)) ? s1 : s1 + 1);
-	qfpre = quotename(fpre, NULL);
+	qfpre = quotename(fpre);
 	/* And the suffix. */
 	fsuf = dupstrpfx(rsuf, s2 - rsuf);
-	qfsuf = quotename(fsuf, NULL);
+	qfsuf = quotename(fsuf);
 
 	if (comppatmatch && *comppatmatch && (ispattern & 2)) {
 	    int t2;

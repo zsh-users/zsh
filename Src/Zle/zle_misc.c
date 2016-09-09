@@ -780,7 +780,7 @@ bracketedpaste(char **args)
 	int n;
 	ZLE_STRING_T wpaste;
 	wpaste = stringaszleline((zmult == 1) ? pbuf :
-	    quotestring(pbuf, NULL, QT_SINGLE_OPTIONAL), 0, &n, NULL, NULL);
+	    quotestring(pbuf, QT_SINGLE_OPTIONAL), 0, &n, NULL, NULL);
 	cuttext(wpaste, n, CUT_REPLACE);
 	if (!(zmod.flags & MOD_VIBUF)) {
 	    kct = -1;

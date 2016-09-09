@@ -1047,9 +1047,9 @@ substnamedir(char *s)
     Nameddir d = finddir(s);
 
     if (!d)
-	return quotestring(s, NULL, QT_BACKSLASH);
+	return quotestring(s, QT_BACKSLASH);
     return zhtricat("~", d->node.nam, quotestring(s + strlen(d->dir),
-						  NULL, QT_BACKSLASH));
+						  QT_BACKSLASH));
 }
 
 
@@ -5649,10 +5649,6 @@ addunprintable(char *v, const char *u, const char *uend)
 /*
  * Quote the string s and return the result as a string from the heap.
  *
- * If e is non-zero, the
- * pointer it points to may point to a position in s and in e the position
- * of the corresponding character in the quoted string is returned.
- * 
  * The last argument is a QT_ value defined in zsh.h other than QT_NONE.
  *
  * Most quote styles other than backslash assume the quotes are to
@@ -5665,13 +5661,13 @@ addunprintable(char *v, const char *u, const char *uend)
 
 /**/
 mod_export char *
-quotestring(const char *s, char **e, int instring)
+quotestring(const char *s, int instring)
 {
     const char *u;
     char *v;
     int alloclen;
     char *buf;
-    int sf = 0, shownull = 0;
+    int shownull = 0;
     /*
      * quotesub is used with QT_SINGLE_OPTIONAL.
      * quotesub = 0:  mechanism not active
@@ -5742,10 +5738,6 @@ quotestring(const char *s, char **e, int instring)
 	while (*u) {
 	    uend = u + MB_METACHARLENCONV(u, &cc);
 
-	    if (e && !sf && *e <= u) {
-		*e = v;
-		sf = 1;
-	    }
 	    if (
 #ifdef MULTIBYTE_SUPPORT
 		cc != WEOF &&
@@ -5772,11 +5764,6 @@ quotestring(const char *s, char **e, int instring)
 	}
     } else if (instring == QT_BACKSLASH_PATTERN) {
 	while (*u) {
-	    if (e && !sf && *e == u) {
-		*e = v;
-		sf = 1;
-	    }
-
 	    if (ipattern(*u))
 		*v++ = '\\';
 	    *v++ = *u++;
@@ -5795,8 +5782,6 @@ quotestring(const char *s, char **e, int instring)
 	 */
 	while (*u) {
 	    int dobackslash = 0;
-	    if (e && *e == u)
-		*e = v, sf = 1;
 	    if (*u == Tick || *u == Qtick) {
 		char c = *u++;
 
@@ -5983,10 +5968,6 @@ quotestring(const char *s, char **e, int instring)
     if (quotesub == 2)
 	*v++ = '\'';
     *v = '\0';
-
-    if (e && *e == u)
-	*e = v, sf = 1;
-    DPUTS(e && !sf, "BUG: Wild pointer *e in quotestring()");
 
     v = dupstring(buf);
     zfree(buf, alloclen);

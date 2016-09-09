@@ -1068,11 +1068,11 @@ getredirs(LinkList redirs)
 		     */
 		    if (!has_token(f->name)) {
 			taddchr('\'');
-			taddstr(quotestring(f->name, NULL, QT_SINGLE));
+			taddstr(quotestring(f->name, QT_SINGLE));
 			taddchr('\'');
 		    } else {
 			taddchr('"');
-			taddstr(quotestring(f->name, NULL, QT_DOUBLE));
+			taddstr(quotestring(f->name, QT_DOUBLE));
 			taddchr('"');
 		    }
 		    if (sav)

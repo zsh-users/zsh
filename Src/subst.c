@@ -3615,7 +3615,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    char *tmp;
 
 		    for (; *ap; ap++) {
-			tmp = quotestring(*ap, NULL, quotetype);
+			tmp = quotestring(*ap, quotetype);
 			sl = strlen(tmp);
 			*ap = (char *) zhalloc(pre + sl + post + 1);
 			strcpy((*ap) + pre, tmp);
@@ -3628,7 +3628,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    }
 		} else
 		    for (; *ap; ap++)
-			*ap = quotestring(*ap, NULL, QT_BACKSLASH_SHOWNULL);
+			*ap = quotestring(*ap, QT_BACKSLASH_SHOWNULL);
 	    } else {
 		int one = noerrs, oef = errflag, haserr = 0;
 
@@ -3658,7 +3658,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		} else if (quotetype > QT_BACKSLASH) {
 		    int sl;
 		    char *tmp;
-		    tmp = quotestring(val, NULL, quotetype);
+		    tmp = quotestring(val, quotetype);
 		    sl = strlen(tmp);
 		    val = (char *) zhalloc(pre + sl + 2);
 		    strcpy(val + pre, tmp);
@@ -3669,7 +3669,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    if (quotetype == QT_DOLLARS)
 		      val[0] = '$';
 		} else
-		    val = quotestring(val, NULL, QT_BACKSLASH_SHOWNULL);
+		    val = quotestring(val, QT_BACKSLASH_SHOWNULL);
 	    } else {
 		int one = noerrs, oef = errflag, haserr;
 
@@ -4274,7 +4274,7 @@ modify(char **str, char **ptr)
 			    subst(&copy, hsubl, hsubr, gbal);
 			break;
 		    case 'q':
-			copy = quotestring(copy, NULL, QT_BACKSLASH_SHOWNULL);
+			copy = quotestring(copy, QT_BACKSLASH_SHOWNULL);
 			break;
 		    case 'Q':
 			{
@@ -4356,7 +4356,7 @@ modify(char **str, char **ptr)
 			subst(str, hsubl, hsubr, gbal);
 		    break;
 		case 'q':
-		    *str = quotestring(*str, NULL, QT_BACKSLASH);
+		    *str = quotestring(*str, QT_BACKSLASH);
 		    break;
 		case 'Q':
 		    {
