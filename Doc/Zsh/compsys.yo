@@ -91,6 +91,7 @@ menu(Control Functions)
 menu(Bindable Commands)
 menu(Completion Functions)
 menu(Completion Directories)
+menu(Completion System Variables)
 endmenu()
 
 texinode(Initialization)(Completion System Configuration)()(Completion System)

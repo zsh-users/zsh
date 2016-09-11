@@ -1,3 +1,8 @@
+2016-09-11  Vin Shelton  <ethersoft@gmail.com>
+
+	* 39284: Doc/Zsh/compsys.yo:
+	Added Completion System Variables as a menu item
+
 2016-09-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 39261 (tweaked cf. Daniel: 39275): Doc/Zsh/compsys.yo:
@@ -17,6 +22,7 @@
 
 	* 39252: Src/Zle/compcore.c, Src/Zle/compctl.c,
 	Src/Zle/computil.c, Src/Zle/zle_misc.c, Src/Zle/zle_tricky.c,
+
 	Src/builtin.c, Src/subst.c, Src/text.c, Src/utils.c: internal:
 	quotestring: Drop the 'e' parameter, which no caller uses.
 
