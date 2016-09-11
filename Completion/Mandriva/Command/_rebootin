@@ -2,7 +2,7 @@
 
 local context state line expl
 typeset -A opt_args
-local loader=$(sudo detectloader -q)
+local loader=${$(_call_program -p entries detectloader -q):-GRUB}
 
 _arguments -s \
     '-n[no immediate reboot just set the flags for next reboot]' \

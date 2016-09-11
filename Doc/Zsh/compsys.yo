@@ -1842,6 +1842,15 @@ In the case of the tt(_match) completer, the style may also be set to
 the string `tt(pattern)'.  Then the pattern on the line is left
 unchanged if it does not match unambiguously.
 )
+kindex(gain-privileges, completion style)
+item(tt(gain-privileges))(
+If set to tt(true), this style enables the use of commands like tt(sudo)
+or tt(doas) to gain extra privileges when retrieving information for
+completion. This is only done when a command such as tt(sudo) appears on
+the command-line. To force the use of, e.g. tt(sudo) or to override any
+prefix that might be added due to tt(gain-privileges), the tt(command)
+style can be used with a value that begins with a hyphen.
+)
 kindex(keep-prefix, completion style)
 item(tt(keep-prefix))(
 This style is used by the tt(_expand) completer.  If it is `true', the
@@ -3471,12 +3480,6 @@ generating matches all follow the convention of returning status zero if they
 generated completions and non-zero if no matching completions could be 
 added.
 
-Two more features are offered by the tt(_main_complete) function.  The
-arrays tt(compprefuncs) and tt(comppostfuncs) may contain
-names of functions that are to be called immediately before or after
-completion has been tried.  A function will only be called once unless
-it explicitly reinserts itself into the array.
-
 startitem()
 findex(_absolute_command_paths)
 item(tt(_absolute_command_paths))(
@@ -4173,7 +4176,7 @@ The return status of tt(_call_function) itself is zero if the function
 var(name) exists and was called and non-zero otherwise.
 )
 findex(_call_program)
-item(tt(_call_program) var(tag) var(string) ...)(
+item(tt(_call_program) [ tt(-p) ] var(tag) var(string) ...)(
 This function provides a mechanism for the user to override the use of an
 external command.  It looks up the tt(command) style with the supplied
 var(tag).  If the style is set, its value is used as the command to
@@ -4181,6 +4184,13 @@ execute.  The var(string)s from the call to tt(_call_program), or from the
 style if set, are concatenated with spaces between them and the resulting
 string is evaluated.  The return status is the return status of the command
 called.
+
+If the option `tt(-p)' is supplied it indicates that the command
+output is influenced by the permissions it is run with. If the
+tt(gain-privileges) style is set to true, tt(_call_program) will make
+use of commands such as tt(sudo), if present on the command-line, to
+match the permissions to whatever the final command is likely to run
+under.
 )
 findex(_combination)
 item(tt(_combination) [ tt(-s) var(pattern) ] var(tag) var(style) var(spec) ... var(field) var(opts) ...)(
@@ -5073,7 +5083,40 @@ ifnzman(noderef(The zsh/zleparameter Module)).
 )
 enditem()
 
-texinode(Completion Directories)()(Completion Functions)(Completion System)
+texinode(Completion System Variables)(Completion Directories)(Completion Functions)(Completion System)
+sect(Completion System Variables)
+cindex(completion system, variables)
+
+There are some standard variables, initialised by the tt(_main_complete)
+function and then used from other functions.
+
+The standard variables are:
+
+startitem()
+item(tt(_comp_caller_options))(
+The completion system uses tt(setopt) to set a number of options. This
+allows functions to be written without concern for compatibility with
+every possible combination of user options. However, sometimes completion
+needs to know what the user's option preferences are. These are saved
+in the tt(_comp_caller_options) associative array. Option names, spelled
+in lowercase without underscores, are mapped to one or other of the
+strings `tt(on)' and `tt(off)'.
+)
+
+item(tt(_comp_priv_prefix))(
+Completion functions such as tt(_sudo) can set the tt(_comp_priv_prefix)
+array to a command prefix that may then be used by tt(_call_program) to
+match the privileges when calling programs to generate matches.
+)
+enditem()
+
+Two more features are offered by the tt(_main_complete) function.  The
+arrays tt(compprefuncs) and tt(comppostfuncs) may contain
+names of functions that are to be called immediately before or after
+completion has been tried.  A function will only be called once unless
+it explicitly reinserts itself into the array.
+
+texinode(Completion Directories)()(Completion System Variables)(Completion System)
 sect(Completion Directories)
 cindex(completion system, directory structure)
 

@@ -38,6 +38,7 @@ local func funcs ret=1 tmp _compskip format nm call match min max i num\
       _saved_colors="$ZLS_COLORS" \
       _saved_colors_set=${+ZLS_COLORS} \
       _ambiguous_color=''
+local -a _comp_priv_prefix
 
 # _precommand sets this to indicate we are following a precommand modifier
 local -a precommands

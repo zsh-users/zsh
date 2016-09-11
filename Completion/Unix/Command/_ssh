@@ -605,6 +605,7 @@ _ssh () {
           hmac-sha2-256-96 hmac-sha2-512 hmac-sha2-512-96 && ret=0
       ;;
     command)
+      local -a _comp_priv_prefix
       shift 1 words
       (( CURRENT-- ))
       _normal

@@ -2,6 +2,7 @@
 
 local expl context state line
 typeset -A opt_args
+local -a _comp_priv_prefix
 
 _arguments -S \
        '(-h --help)'{-h,--help}'[help]' \

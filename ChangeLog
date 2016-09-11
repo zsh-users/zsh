@@ -1,3 +1,18 @@
+2016-09-11  Oliver Kiddle  <opk@zsh.org>
+
+	* 39261 (tweaked cf. Daniel: 39275): Doc/Zsh/compsys.yo:
+	Completion/Base/Core/_main_complete,
+	Completion/Base/Utility/_call_program,
+	Completion/Debian/Command/_dchroot,
+	Completion/Debian/Command/_dchroot-dsa,
+	Completion/Debian/Command/_schroot,
+	Completion/Solaris/Command/_pfexec,
+	Completion/Solaris/Command/_zlogin, Completion/Unix/Command/_dsh,
+	Completion/Unix/Command/_fsh, Completion/Unix/Command/_libvirt,
+	Completion/Unix/Command/_mosh, Completion/Unix/Command/_rlogin,
+	Completion/Unix/Command/_ssh, Completion/Unix/Command/_sudo:
+	don't unconditionally gain privileges with sudo for completion
+
 2016-09-11  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 39252: Src/Zle/compcore.c, Src/Zle/compctl.c,

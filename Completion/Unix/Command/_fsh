@@ -1,6 +1,7 @@
 #compdef fsh
 
 local curcontext="$curcontext" state line ret=1
+local -a _comp_priv_prefix
 
 _arguments -C \
   '(- : *)'{-h,--help}'[display help information]' \

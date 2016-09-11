@@ -155,7 +155,7 @@ case $state in
         return 1
       ;;
       --device)
-        values; values=( $(_call_program nodedevs "virsh $conn_opt nodedev-list") )
+        values; values=( $(_call_program devices "virsh $conn_opt nodedev-list") )
         [[ -n $values ]] && _wanted devices expl device compadd ${=values} && return 0
         return 1
       ;;
@@ -204,7 +204,7 @@ case $state in
       fi
     fi
     [[ -z $_cache_virsh_cmd_opts[$cmd] ]] && \
-      _cache_virsh_cmd_opts[$cmd]=${(M)${${${${=${(f)"$(_call_program virsh virsh help $cmd 2>&1)"}}/\[}/\]}/\;}:#-[-0-9A-Za-z]*}
+      _cache_virsh_cmd_opts[$cmd]=${(M)${${${${=${(f)"$(_call_program options virsh help $cmd 2>&1)"}}/\[}/\]}/\;}:#-[-0-9A-Za-z]*}
     [[ -n ${=_cache_virsh_cmd_opts[$cmd]} ]] && \
       _values -w option ${(u)=_cache_virsh_cmd_opts[$cmd]} && ret=0
   ;;
@@ -218,16 +218,16 @@ case $state in
     done
     [[ -z $cmd ]] && return 1
     if [[ $words[CURRENT-1] == --server ]]; then
-      _wanted servers expl server compadd ${=${(S)${${(f)$(sudo virt-admin ${(Q)conn_opt} srv-list)}##*--- }//[0-9]* }} && return 0
+      _wanted servers expl server compadd ${=${(S)${${(f)$(_call_program -p servers virt-admin ${(Q)conn_opt} srv-list)}##*--- }//[0-9]* }} && return 0
     fi
     if [[ $words[CURRENT-1] == --client ]]; then
       local srv ; (( ${(k)words[(I)--server]} > 0 )) && srv=${words[1+${(k)words[(I)--server]}]}
       [[ -z $srv ]] && return 1
       [[ -n ${srv//[[:alnum:]]} ]] && return 1
-      _wanted clients expl client compadd ${=${${(f):-"$(sudo virt-admin ${(Q)conn_opt} srv-clients-list --server $srv 2>/dev/null)"}/ [a-z]*}//[^0-9]} && return 0
+      _wanted clients expl client compadd ${=${${(f):-"$(_call_program -p clients virt-admin ${(Q)conn_opt} srv-clients-list --server $srv 2>/dev/null)"}/ [a-z]*}//[^0-9]} && return 0
     fi
     [[ -z $_cache_virt_admin_cmd_opts[$cmd] ]] && \
-      _cache_virt_admin_cmd_opts[$cmd]=${(M)${${${${=${(f)"$(_call_program virt-admin virt-admin help $cmd 2>&1)"}}/\[}/\]}/\;}:#-[-0-9A-Za-z]*}
+      _cache_virt_admin_cmd_opts[$cmd]=${(M)${${${${=${(f)"$(_call_program options virt-admin help $cmd 2>&1)"}}/\[}/\]}/\;}:#-[-0-9A-Za-z]*}
     [[ -n $_cache_virt_admin_cmd_opts[$cmd] ]] && \
       _values -w option ${(u)=_cache_virt_admin_cmd_opts[$cmd]} && ret=0
   ;;

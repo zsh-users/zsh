@@ -1,6 +1,7 @@
 #compdef mosh
 
 local curcontext="$curcontext" state line
+local -a _comp_priv_prefix
 
 _arguments -C \
   '(-)--help[display help information]' \

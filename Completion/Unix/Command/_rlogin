@@ -12,6 +12,7 @@ _rlogin () {
   rsh|remsh)
     local context state line ret=1
     typeset -A opt_args
+    local -a _comp_priv_prefix
 
     _arguments -s \
       '-n[ignore stdin]' \
