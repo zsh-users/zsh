@@ -1,3 +1,8 @@
+2016-09-12  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39297: Doc/Zsh/compsys.yo: more of 39284, it's painful to add
+	texi nodes in yodl
+
 2016-09-12  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39255: Doc/Zsh/cond.yo: = in conditions is not actually going
@@ -10,8 +15,8 @@
 
 2016-09-11  Vin Shelton  <ethersoft@gmail.com>
 
-	* 39284: Doc/Zsh/compsys.yo:
-	Added Completion System Variables as a menu item
+	* 39284: Doc/Zsh/compsys.yo: Added Completion System Variables as
+	a menu item
 
 2016-09-11  Oliver Kiddle  <opk@zsh.org>
 
@@ -734,7 +739,7 @@
 	* 38692: Doc/Zsh/restricted.yo, Src/params.c: IFS can't be
 	changed in restricted mode.
 
-2016-06-19  Barton E. Schaefer  <schaefer@brasslantern.com>
+2016-06-19  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 38715: Doc/Zsh/contrib.yo, Functions/Zle/add-zle-hook-widget:
 	assorted ksharrays fixes; assign an index to any hook that is

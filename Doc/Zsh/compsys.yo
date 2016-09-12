@@ -3468,7 +3468,7 @@ emacs and vi respectively.
 )
 enditem()
 
-texinode(Completion Functions)(Completion Directories)(Bindable Commands)(Completion System)
+texinode(Completion Functions)(Completion System Variables)(Bindable Commands)(Completion System)
 sect(Utility Functions)
 cindex(completion system, utility functions)
 
