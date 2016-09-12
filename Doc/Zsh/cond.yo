@@ -103,8 +103,10 @@ true if var(file1) and var(file2) exist and refer to the same file.
 xitem(var(string) tt(=) var(pattern))
 item(var(string) tt(==) var(pattern))(
 true if var(string) matches var(pattern).
-The `tt(==)' form is the preferred one.  The `tt(=)' form is for
-backward compatibility and should be considered obsolete.
+The two forms are exactly equivalent.  The `tt(=)' form is
+the traditional shell syntax (and hence the only one generally used
+with the tt(test) and tt([) builtins); the `tt(==)' form provides
+compatibility with other sorts of computer language.
 )
 item(var(string) tt(!=) var(pattern))(
 true if var(string) does not match var(pattern).
