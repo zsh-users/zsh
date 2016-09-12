@@ -1,3 +1,8 @@
+2016-09-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39255: Doc/Zsh/cond.yo: = in conditions is not actually going
+	to be removed.
+
 2016-09-11  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 39268: Src/Modules/system.c: "zsystem flock -t 0 ..." tries only
