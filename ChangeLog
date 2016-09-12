@@ -1,5 +1,8 @@
 2016-09-12  Oliver Kiddle  <opk@zsh.org>
 
+	* 39295: Completion/Unix/Type/_remote_files: allow '--' to
+	appear in the command line passed as an argument
+
 	* 39287: Completion/Unix/Command/_graphicsmagick,
 	Completion/Unix/Command/_imagemagick, Completion/X/Command/_okular:
 	add .tif as a valid extension for TIFF files
