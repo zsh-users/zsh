@@ -1,5 +1,8 @@
 2016-09-12  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Doc/Zsh/mod_sched.yo: reference use of widgets to
+	effect editor changes from a sched command
+
 	* 39297: Doc/Zsh/compsys.yo: more of 39284, it's painful to add
 	texi nodes in yodl
 

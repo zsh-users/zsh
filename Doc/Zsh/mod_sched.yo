@@ -40,6 +40,11 @@ afterwards.  This should be used with any scheduled event that produces
 visible output to the terminal; it is not needed, for example, with
 output that updates a terminal emulator's title bar.
 
+To effect changes to the editor buffer when an event executes, use the
+`tt(zle)' command with no arguments to test whether the editor is active,
+and if it is, then use `tt(zle )var(widget)' to access the editor via
+the named var(widget).
+
 The tt(sched) builtin is not made available by default when the shell
 starts in a mode emulating another shell.  It can be made available
 with the command `tt(zmodload -F zsh/sched b:sched)'.
