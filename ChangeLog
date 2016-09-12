@@ -1,3 +1,8 @@
+2016-09-11  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39268: Src/Modules/system.c: "zsystem flock -t 0 ..." tries only
+	once to flock and immediately returns success or failure
+
 2016-09-11  Vin Shelton  <ethersoft@gmail.com>
 
 	* 39284: Doc/Zsh/compsys.yo:

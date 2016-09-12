@@ -521,7 +521,7 @@ static int
 bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 {
     int cloexec = 1, unlock = 0, readlock = 0;
-    time_t timeout = 0;
+    zlong timeout = -1;
     char *fdvar = NULL;
 #ifdef HAVE_FCNTL_H
     struct flock lck;
@@ -573,7 +573,7 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		} else {
 		    optarg = *args++;
 		}
-		timeout = (time_t)mathevali(optarg);
+		timeout = mathevali(optarg);
 		break;
 
 	    case 'u':
@@ -650,7 +650,7 @@ bin_zsystem_flock(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    sleep(1);
 	}
     } else {
-	while (fcntl(flock_fd, F_SETLKW, &lck) < 0) {
+	while (fcntl(flock_fd, timeout == 0 ? F_SETLK : F_SETLKW, &lck) < 0) {
 	    if (errflag)
 		return 1;
 	    if (errno == EINTR)
