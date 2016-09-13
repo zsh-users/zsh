@@ -4034,7 +4034,7 @@ gethere(char **strp, int typ)
 
 	parsestr(&buf);
 
-	if (!errflag) {
+	if (!(errflag & ERRFLAG_ERROR)) {
 	    /* Retain any user interrupt error */
 	    errflag = ef | (errflag & ERRFLAG_INT);
 	}

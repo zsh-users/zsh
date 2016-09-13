@@ -1,3 +1,8 @@
+2016-09-13  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39305: Src/exec.c: error handling on substitution for here
+	document was illogical.
+
 2016-09-12  Oliver Kiddle  <opk@zsh.org>
 
 	* 39295: Completion/Unix/Type/_remote_files: allow '--' to
