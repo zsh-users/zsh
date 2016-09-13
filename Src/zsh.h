@@ -622,27 +622,34 @@ struct timedfn {
 /* (1<<4) is used for Z_END, see the wordcode definitions */
 /* (1<<5) is used for Z_SIMPLE, see the wordcode definitions */
 
-/* Condition types. */
+/*
+ * Condition types.
+ *
+ * Careful when changing these: both cond_binary_ops in text.c and
+ * condstr in cond.c depend on these.  (The zsh motto is "two instances
+ * are better than one".  Or something.)
+ */
 
 #define COND_NOT    0
 #define COND_AND    1
 #define COND_OR     2
 #define COND_STREQ  3
-#define COND_STRNEQ 4
-#define COND_STRLT  5
-#define COND_STRGTR 6
-#define COND_NT     7
-#define COND_OT     8
-#define COND_EF     9
-#define COND_EQ    10
-#define COND_NE    11
-#define COND_LT    12
-#define COND_GT    13
-#define COND_LE    14
-#define COND_GE    15
-#define COND_REGEX 16
-#define COND_MOD   17
-#define COND_MODI  18
+#define COND_STRDEQ 4
+#define COND_STRNEQ 5
+#define COND_STRLT  6
+#define COND_STRGTR 7
+#define COND_NT     8
+#define COND_OT     9
+#define COND_EF    10
+#define COND_EQ    11
+#define COND_NE    12
+#define COND_LT    13
+#define COND_GT    14
+#define COND_LE    15
+#define COND_GE    16
+#define COND_REGEX 17
+#define COND_MOD   18
+#define COND_MODI  19
 
 typedef int (*CondHandler) _((char **, int));
 

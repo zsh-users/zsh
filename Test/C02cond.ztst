@@ -414,6 +414,13 @@ F:Failures in these cases do not indicate a problem in the shell.
 >OK 4
 >OK 5
 
+  fn() { [[ 'a' == 'b' || 'b' = 'c' || 'c' != 'd' ]] }
+  which -x2 fn
+0: = and == appear as input
+>fn () {
+>  [[ 'a' == 'b' || 'b' = 'c' || 'c' != 'd' ]]
+>}
+
 %clean
   # This works around a bug in rm -f in some versions of Cygwin
   chmod 644 unmodish

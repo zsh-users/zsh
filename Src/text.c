@@ -46,7 +46,7 @@ int text_expand_tabs;
  * et seq. in zsh.h.
  */
 static const char *cond_binary_ops[] = {
-    "=", "!=", "<", ">", "-nt", "-ot", "-ef", "-eq",
+    "=", "==", "!=", "<", ">", "-nt", "-ot", "-ef", "-eq",
     "-ne", "-lt", "-gt", "-le", "-ge", "=~", NULL
 };
 
@@ -934,6 +934,7 @@ gettext2(Estate state)
 			    taddstr(" ");
 			    taddstr(ecgetstr(state, EC_NODUP, NULL));
 			    if (ctype == COND_STREQ ||
+				ctype == COND_STRDEQ ||
 				ctype == COND_STRNEQ)
 				state->pc++;
 			} else {

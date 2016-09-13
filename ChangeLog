@@ -1,5 +1,11 @@
 2016-09-13  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 39292: Config/version.mk, Src/cond.c, Src/parse.c, Src/text.c,
+	Src/zsh.h, Test/C02cond.ztst, Test/D01prompt.ztst,
+	Test/E02xtrace.ztst: Distinguish "=" and "==" tests in output to
+	avoid confusion.  Update version number to 5.2-dev-2 (unposted:
+	update date, too).
+
 	* 39305: Src/exec.c: error handling on substitution for here
 	document was illogical.
 

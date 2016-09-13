@@ -196,8 +196,8 @@
 ?+zsh_directory_name:1> emulate -L zsh
 ?+zsh_directory_name:2> setopt extendedglob
 ?+zsh_directory_name:3> local -a match mbegin mend
-?+zsh_directory_name:4> [[ d == n ]]
-?+zsh_directory_name:12> [[ <parent>/very_long_directory_name == (#b)(*)/very_long_directory_name ]]
+?+zsh_directory_name:4> [[ d = n ]]
+?+zsh_directory_name:12> [[ <parent>/very_long_directory_name = (#b)(*)/very_long_directory_name ]]
 ?+zsh_directory_name:14> return 0
 ?+fn:7> local d='~[<parent>:l]'
 ?+fn:8> print '~[<parent>:l]'

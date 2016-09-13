@@ -2498,9 +2498,14 @@ par_cond_triple(char *a, char *b, char *c)
 {
     int t0;
 
-    if ((b[0] == Equals || b[0] == '=') &&
-	(!b[1] || ((b[1] == Equals || b[1] == '=') && !b[2]))) {
+    if ((b[0] == Equals || b[0] == '=') && !b[1]) {
 	ecadd(WCB_COND(COND_STREQ, 0));
+	ecstr(a);
+	ecstr(c);
+	ecadd(ecnpats++);
+    } else if ((b[0] == Equals || b[0] == '=') &&
+	       (b[1] == Equals || b[1] == '=') && !b[2]) {
+	ecadd(WCB_COND(COND_STRDEQ, 0));
 	ecstr(a);
 	ecstr(c);
 	ecadd(ecnpats++);
