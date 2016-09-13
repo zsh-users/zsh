@@ -1,5 +1,8 @@
 2016-09-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 39307: Completion/Unix/Command/_vim,
+	Completion/Unix/Command/_xxd: update options up to vim 8
+
 	* 39299: Completion/Base/Completer/_external_pwds: better
 	Freebsd support in _external_pwds using procstat
 

@@ -22,21 +22,23 @@ local arguments
 
 arguments=(
   # output options
-  '(-b -bits            -i -include -p -postscript -plain -ps -r -reverse -u -uppercase)'{-b,-bits}'[output in binary digits, rather than hex]'
-  '(         -E -EBCDIC -i -include -p -postscript -plain -ps -r -reverse              )'{-E,-EBCDIC}'[print human-readable part in EBCDIC rather than ASCII]'
-  '(-b -bits -E -EBCDIC -i -include -p -postscript -plain -ps -r -reverse              )'{-i,-include}'[output in C include file style]'
-  '(-b -bits -E -EBCDIC -i -include -p -postscript -plain -ps                          )'{-p,-postscript,-plain,-ps}'[read or write a plain hexdump (no line numbers or ASCII rendering)]'
+  '(-b -bits            -i -include -p -postscript -plain -ps -r -revert -u -uppercase)'{-b,-bits}'[output in binary digits, rather than hex]'
+  '(         -E -EBCDIC -i -include -p -postscript -plain -ps -r -revert              )'{-E,-EBCDIC}'[print human-readable part in EBCDIC rather than ASCII]'
+  '(-i -include -p -postscript -plain -ps -r -revert)'{-e,-endian}'[little-endian dump]'
+  '(-b -bits -E -EBCDIC -i -include -p -postscript -plain -ps -r -revert              )'{-i,-include}'[output in C include file style]'
+  '(-b -bits -E -EBCDIC -i -include -p -postscript -plain -ps                         )'{-p,-postscript,-plain,-ps}'[read or write a plain hexdump (no line numbers or ASCII rendering)]'
 
-  '(-b -bits -E -EBCDIC -i -include                           -r -reverse -u -uppercase)'{-r,-reverse}'[reverse mode\: read a hex dump and output binary data]'
-  '(-b -bits                                                  -r -reverse -u -uppercase)'{-u,-uppercase}'[output upper-case hex digits]'
+  '(-b -bits -E -EBCDIC -i -include                           -r -revert -u -uppercase)'{-r,-revert}'[reverse mode\: read a hex dump and output binary data]'
+  '(-b -bits                                                  -r -revert -u -uppercase)'{-u,-uppercase}'[output upper-case hex digits]'
 
-  {-h,-help}'[display usage message]'
-  {-v,-version}'[show program version]'
+  '(- :)'{-h,-help}'[display usage message]'
+  '(- :)'{-v,-version}'[show program version]'
   '*'{-a,-autoskip}"[a single '*' replaces runs of NUL (toggleable)]"
 
   {-c+,-cols}'[specify number of octets per line]: :_guard "[0-9a-fA-Fx]#" "number of octets per line"'
   {-g+,-groupsize}'[specify the number of octets per group]: :_guard "[0-9]#" "number of octets per group"'
   {-l+,-len}'[specify number of octets to output]: :_guard "[0-9]#" "number of octets to output"'
+  {-o+,-offset}'[add specified offset to displayed file position]:offset'
   {-s,-skip,-seek}'[specify file offset to dump from]: :_guard "[0-9]#" "file offset to dump from (absolute or relative)"'
 
   ':files:_files'
