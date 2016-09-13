@@ -22,8 +22,12 @@ case $OSTYPE in
     )
   ;;
   linux*)
-    dirs=( /proc/${^$(pidof zsh):#$$}/cwd(N:P) )
+    dirs=( /proc/${^$(pidof -- -zsh zsh):#$$}/cwd(N:P) )
     dirs=( $^dirs(N^@) )
+  ;;
+  freebsd*)
+    dirs=( $(pgrep -U $UID -x zsh) )
+    dirs=( $(procstat -h -f $dirs|awk '{if ($3 == "cwd") print $NF}') )
   ;;
   *)
     if (( $+commands[lsof] )); then
