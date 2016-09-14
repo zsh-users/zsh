@@ -623,9 +623,9 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		     */
 		    int alen;
 		    /*
-		     * ### These two are related: they're set symmetrically.
+		     * ### Related to 'zoff', which was removed in 2016.
 		     */
-		    int zoff, moff;
+		    int moff;
 		    /*
 		     * ### These two are related.
 		     */
@@ -665,14 +665,14 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 			continue;
 
 		    if (mp->flags & CMF_LEFT) {
-			ap = mp->left; zoff = 0; moff = alen; aop = mp->right;
+			ap = mp->left; moff = alen; aop = mp->right;
 			if (sfx) {
 			    both = 0; loff = -llen; aoff = -(llen + alen);
 			} else {
 			    both = 1; loff = alen; aoff = 0;
 			}
 		    } else {
-			ap = mp->right; zoff = alen; moff = 0; aop = mp->left;
+			ap = mp->right; moff = 0; aop = mp->left;
 			if (sfx) {
 			    both = 1; loff = -(llen + alen); aoff = -alen;
 			} else {
@@ -698,8 +698,8 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 
 		    /* Fine, now we call ourselves recursively to find the
 		     * string matched by the `*'. */
-		    if (sfx && (savl = l[-(llen + zoff)]))
-			l[-(llen + zoff)] = '\0';
+		    if (sfx && (savl = l[-(llen + alen)]))
+			l[-(llen + alen)] = '\0';
 		    for (t = 0, tp = w, ct = 0, ict = lw - alen + 1;
 			 ict;
 			 tp += add, ct++, ict--) {
@@ -721,12 +721,12 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 				!match_parts(l + aoff , tp - moff, alen, part))
 				break;
 			    if (sfx) {
-				if ((savw = tp[-zoff]))
-				    tp[-zoff] = '\0';
+				if ((savw = tp[-alen]))
+				    tp[-alen] = '\0';
 				t = match_str(l - ll, w - lw,
 					      NULL, 0, NULL, 1, 2, part);
 				if (savw)
-				    tp[-zoff] = savw;
+				    tp[-alen] = savw;
 			    } else
 				t = match_str(l + llen + moff, tp + moff,
 					      NULL, 0, NULL, 0, 1, part);
@@ -736,7 +736,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    }
 		    ict = ct;
 		    if (sfx && savl)
-			l[-(llen + zoff)] = savl;
+			l[-(llen + alen)] = savl;
 
 		    /* Have we found a position in w where the rest of l
 		     * matches? */
