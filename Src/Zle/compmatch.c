@@ -641,7 +641,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		     * the temporal lobe.  Reward promised for its safe return.
 		     * Contact zsh-workers@zsh.org.
 		     */
-		    char *tp, savl = '\0', savw;
+		    char *tp, savl = '\0';
 		    /*
 		     * The anchor on this end.
 		     */
@@ -721,15 +721,18 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 				!match_parts(l + aoff , tp - moff, alen, part))
 				break;
 			    if (sfx) {
+				/* Call ourselves recursively with the
+				 * anchor removed. */
+				char savw;
 				if ((savw = tp[-alen]))
 				    tp[-alen] = '\0';
 				t = match_str(l - ll, w - lw,
-					      NULL, 0, NULL, 1, 2, part);
+					      NULL, 0, NULL, sfx, 2, part);
 				if (savw)
 				    tp[-alen] = savw;
 			    } else
 				t = match_str(l + llen + moff, tp + moff,
-					      NULL, 0, NULL, 0, 1, part);
+					      NULL, 0, NULL, sfx, 1, part);
 			    if (t || (mp->wlen == -1 && !both))
 				break;
 			}
