@@ -569,8 +569,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	bslash = 0;
 	if (!sfx && lw && (!part || test) &&
 	    (l[ind] == w[ind] ||
-	     (bslash = (lw > 1 && w[ind] == '\\' &&
-			(ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {
+	     (bslash = (lw > 1 && w[ind] == '\\' && w[ind+1] == l[0])))) {
 	    /* No matcher could be used, but the strings have the same
 	     * character here, skip over it. */
 	    l += add; w += (bslash ? (add + add) : add);
@@ -855,8 +854,10 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 
 		    if (!llen && !alen) {
 			lm = mp;
-			if (he)
+			if (he) {
+			    /* Signal the outer for loop to continue. */
 			    mp = NULL;
+			}
 			else
 			    he = 1;
 		    } else {
@@ -996,8 +997,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	bslash = 0;
 	if ((!test || sfx) && lw &&
 	    (l[ind] == w[ind] ||
-	     (bslash = (lw > 1 && w[ind] == '\\' &&
-			(ind ? (w[0] == l[0]) : (w[1] == l[0])))))) {
+	     (bslash = (lw > 1 && w[ind] == '\\' && w[ind+1] == l[0])))) {
 	    /* No matcher could be used, but the strings have the same
 	     * character here, skip over it. */
 	    l += add; w += (bslash ? (add + add ) : add);
