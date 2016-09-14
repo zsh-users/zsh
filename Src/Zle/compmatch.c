@@ -498,14 +498,17 @@ add_match_sub(Cmatcher m, char *l, int ll, char *w, int wl)
 /**/
 int
 match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
-	  int sfx, int test, int part)
+	  const int sfx, int test, int part)
 {
     int ll = strlen(l), lw = strlen(w), oll = ll, olw = lw, exact = 0, wexact = 0;
-    int il = 0, iw = 0, t, ind, add, he = 0, bpc, obc = bc, bslash;
+    int il = 0, iw = 0, t, he = 0, bpc, bslash;
     char *ow;
-    Cmlist ms;
+    Cmlist ms; /* loop variable */
     Cmatcher mp, lm = NULL;
     Brinfo bp = NULL;
+    const int obc = bc;
+    const int ind = (sfx ? -1 : 0);
+    const int add = (sfx ? -1 : 1);
 
     if (!test) {
 	start_match();
@@ -516,9 +519,6 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 
     if (sfx) {
 	l += ll; w += lw;
-	ind = -1; add = -1;
-    } else {
-	ind = 0; add = 1;
     }
     /* ow will always point to the beginning (or end) of that sub-string
      * in w that wasn't put in the match-variables yet. */
