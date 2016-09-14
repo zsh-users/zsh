@@ -198,15 +198,15 @@ _tmux-capture-pane() {
   [[ -n ${tmux_describe} ]] && print "capture the contents of a pane to a buffer" && return
   _arguments -s \
     '-a[use alternate screen]' \
-    '-b+[choose target buffer]:target buffer:__tmux-buffers' \
+    '(-p)-b+[choose target buffer]:target buffer:__tmux-buffers' \
     '-C[escape non-printable characters as octal \\ooo]' \
     '-e[include escape sequences for attributes etc]' \
-    '-E[specify last line to capture. - means last line of pane]' \
-    '-J[join wrapped lines and preserver trailing space]' \
+    '-E[specify last line to capture]:line number (- means last line)' \
+    '-J[join wrapped lines and preserve trailing space]' \
     '-q[ignore errors when trying to access alternate screen]' \
-    '-p[print data to stdout]' \
-    '-P[only capture that is the beginning of an as-yet incomplete esc seq]' \
-    '-S[specify start line to capture. - means first line of scrollback]' \
+    '(-b)-p[print data to stdout]' \
+    '-P[only capture beginnings of as-yet incomplete escape sequences]' \
+    '-S[specify start line to capture]:first line (- means start of scrollback)' \
     '-t+[choose source pane]:source pane:__tmux-panes'
 }
 
