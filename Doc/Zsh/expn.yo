@@ -745,7 +745,7 @@ character of tt($foo) if the substitution would otherwise return a scalar,
 or the array starting at the fourth element if tt($foo) would return an
 array.  Note that with the option tt(KSH_ARRAYS) tt($foo) always returns
 a scalar (regardless of the use of the offset syntax) and a form
-such as tt($foo[*]:3) is required to extract elements of an array named
+such as tt(${foo[*]:3}) is required to extract elements of an array named
 tt(foo).
 
 If var(offset) is negative, the tt(-) may not appear immediately
@@ -761,8 +761,8 @@ expression tt(${var: offs}) does work, retrieving the offset from
 tt($offs).
 
 For further compatibility with other shells there is a special case
-for array offset 0.  This usually accesses to the
-first element of the array.  However, if the substitution refers the
+for array offset 0.  This usually accesses the
+first element of the array.  However, if the substitution refers to the
 positional parameter array, e.g. tt($@) or tt($*), then offset 0
 instead refers to tt($0), offset 1 refers to tt($1), and so on.  In
 other words, the positional parameter array is effectively extended by

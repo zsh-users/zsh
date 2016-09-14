@@ -1,5 +1,7 @@
 2016-09-14  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Doc/Zsh/expn.yo: small documentation tweaks.
+
 	* zsh-users/21903: Src/subst.c, Src/zsh.h,
 	Test/D04parameter.ztst: ${...?...} in interactive shell should
 	abort to top level, not just current command.
