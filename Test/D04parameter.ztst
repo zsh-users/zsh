@@ -95,6 +95,20 @@
 ?(eval):1: unset1: exiting1
 ?(eval):2: null1: exiting2
 
+  PROMPT="" $ZTST_testdir/../Src/zsh -fis <<<'
+  unsetopt PROMPT_SP
+  PS2="" PS3="" PS4="" RPS1="" RPS2=""
+  foo() {
+      print ${1:?no arguments given}
+      print not reached
+  }
+  foo
+  print reached
+  '
+0:interactive shell returns to top level on ${...?...} error
+?foo:1: 1: no arguments given
+>reached
+
   print ${set1:+word1} ${set1+word2} ${null1:+word3} ${null1+word4}
   print ${unset1:+word5} ${unset1+word6}
 0:${...:+...}, ${...+...}

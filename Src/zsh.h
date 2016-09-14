@@ -2807,7 +2807,14 @@ enum errflag_bits {
     /*
      * User interrupt.
      */
-    ERRFLAG_INT = 2
+    ERRFLAG_INT = 2,
+    /*
+     * Hard error --- return to top-level prompt in interactive
+     * shell.  In non-interactive shell we'll typically already
+     * have exited.  This is reset by "errflag = 0" in
+     * loop(toplevel = 1, ...).
+     */
+    ERRFLAG_HARD = 4
 };
 
 /***********/

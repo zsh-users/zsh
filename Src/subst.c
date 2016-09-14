@@ -2922,6 +2922,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
                 if (isset(EXECOPT)) {
                     *idend = '\0';
                     zerr("%s: %s", idbeg, *s ? s : "parameter not set");
+                    /*
+                     * In interactive shell we need to return to
+                     * top-level prompt --- don't clear this error
+                     * after handling a command as we do with
+                     * most errors.
+                     */
+                    errflag |= ERRFLAG_HARD;
                     if (!interact) {
                         if (mypid == getpid()) {
                             /*
