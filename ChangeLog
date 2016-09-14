@@ -1,5 +1,8 @@
 2016-09-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39310/0009: Src/Zle/compmatch.c: internals: match_str:
+	Downscope local variable 't'.
+
 	* 39310/0008: Src/Zle/compmatch.c: internals: match_str:
 	Document several local variables.
 

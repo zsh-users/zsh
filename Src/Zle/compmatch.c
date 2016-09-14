@@ -509,7 +509,6 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
     int exact = 0, wexact = 0;
     int he = 0;
     int bslash;
-    int t;
     char *ow;
     Cmlist ms; /* loop variable */
     Cmatcher mp, lm = NULL;
@@ -594,7 +593,6 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	/* First try the matchers. Err... see above. */
 	for (mp = NULL, ms = mstack; !mp && ms; ms = ms->next) {
 	    for (mp = ms->matcher; mp; mp = mp->next) {
-		t = 1;
 		if ((lm && lm == mp) ||
 		    ((original_ll == ll || original_lw == lw) &&
 		     (test == 1 || (test && !mp->left && !mp->right)) &&
@@ -604,6 +602,12 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    continue;
 
 		if (mp->wlen < 0) {
+		    /* `*'-pattern. */
+		    /*
+		     * Similar to the identically-named variable in the 'else'
+		     * block.
+		     */
+		    int t;
 		    /* 
 		     * 1 iff the anchor and the word are on the same side of
 		     * the line pattern; that is: if either
@@ -861,6 +865,11 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    break;
 		} else if (ll >= mp->llen && lw >= mp->wlen) {
 		    /* Non-`*'-pattern. */
+		    /*
+		     * Similar to the identically-named variable in the 'if'
+		     * block.
+		     */
+		    int t = 1;
 		    char *tl, *tw;
 		    int tll, tlw, til, tiw;
 
