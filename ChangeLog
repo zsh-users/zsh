@@ -1,5 +1,8 @@
 2016-09-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39310/0001: Src/Zle/compmatch.c: internals: match_str:
+	Document some local variables. See 39123.
+
 	* 39311: Completion/Unix/Command/_tmux: _tmux-capture-pane:
 	Tweak specifications of -S/-E and description strings.
 

@@ -593,9 +593,63 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    continue;
 
 		if (mp->wlen < 0) {
-		    int both, loff, aoff, llen, alen, zoff, moff, ct, ict, aol;
+		    /* 
+		     * 1 iff the anchor and the word are on the same side of
+		     * the line pattern; that is: if either
+		     * - the anchor is on the left and we are matching
+		     *   a prefix; or
+		     * - the anchor is on the right and we are matching
+		     *   a suffix.
+		     */
+		    int both;
+		    /*
+		     * Offset from the line pattern pointer ('l') to the start
+		     * of the line pattern.
+		     */
+		    int loff;
+		    /*
+		     * Offset from the line pattern pointer ('l') to the start
+		     * of the anchor.
+		     */
+		    int aoff;
+		    /*
+		     * The length of the line pattern.
+		     */
+		    int llen;
+		    /*
+		     * The length of the anchor.
+		     *
+		     * SEE: ap; aol, aop
+		     */
+		    int alen;
+		    /*
+		     * ### These two are related: they're set symmetrically.
+		     */
+		    int zoff, moff;
+		    /*
+		     * ### These two are related.
+		     */
+		    int ct, ict;
+		    /*
+		     * The length of the OTHER anchor: the left anchor when
+		     * we're anchored on the right, and of the right anchor
+		     * when we're anchored on the left.
+		     */
+		    int aol;
+		    /*
+		     * LOST: Documentation comment.  Last seen 10 years ago in
+		     * the temporal lobe.  Reward promised for its safe return.
+		     * Contact zsh-workers@zsh.org.
+		     */
 		    char *tp, savl = '\0', savw;
-		    Cpattern ap, aop;
+		    /*
+		     * The anchor on this end.
+		     */
+		    Cpattern ap;
+		    /*
+		     * The anchor on the other end.
+		     */
+		    Cpattern aop;
 
 		    /* This is for `*' patterns, first initialise some
 		     * local variables. */
