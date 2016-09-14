@@ -1,5 +1,8 @@
 2016-09-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39310/0004: Src/Zle/compmatch.c: internals: match_str: Document
+	'savl'.
+
 	* 39310/0003: Src/Zle/compmatch.c: internals: match_str: Document
 	'savw'. Avoid magic number.
 

@@ -641,7 +641,22 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		     * the temporal lobe.  Reward promised for its safe return.
 		     * Contact zsh-workers@zsh.org.
 		     */
-		    char *tp, savl = '\0';
+		    char *tp;
+		    /* 
+		     * Temporary variable.  Used as temporary storage for a
+		     *
+		     *     {
+		     *         () {
+		     *           local foo="$foo"
+		     *           foo[1]=bar
+		     *           ...
+		     *         }
+		     *         (use original $foo here)
+		     *     }
+		     *
+		     * operation.  Similar to savw.
+		     */
+		    char savl;
 		    /*
 		     * The anchor on this end.
 		     */
