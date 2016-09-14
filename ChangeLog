@@ -1,3 +1,8 @@
+2016-09-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Completion/Unix/Command/_git: Permit multiple
+	-c options.
+
 2016-09-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 39307: Completion/Unix/Command/_vim,

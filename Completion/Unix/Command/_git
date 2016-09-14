@@ -7462,7 +7462,7 @@ _git() {
       '(- :)--version[display version information]' \
       '(- :)--help[display help message]' \
       '-C[run as if git was started in given path]: :_directories' \
-      '-c[pass configuration parameter to command]:parameter' \
+      '*-c[pass configuration parameter to command]:parameter' \
       '--exec-path=-[path containing core git-programs]:: :_directories' \
       '(: -)--man-path[print the manpath for the man pages for this version of Git and exit]' \
       '(: -)--info-path[print the path where the info files are installed and exit]' \
