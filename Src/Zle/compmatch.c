@@ -500,7 +500,7 @@ int
 match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	  const int sfx, int test, int part)
 {
-    int ll = strlen(l), lw = strlen(w), oll = ll, olw = lw, exact = 0, wexact = 0;
+    int ll = strlen(l), lw = strlen(w), exact = 0, wexact = 0;
     int il = 0, iw = 0, t, he = 0, bslash;
     char *ow;
     Cmlist ms; /* loop variable */
@@ -509,6 +509,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
     const int obc = bc;
     const int ind = (sfx ? -1 : 0);
     const int add = (sfx ? -1 : 1);
+    const int original_ll = ll, original_lw = lw;
 
     if (!test) {
 	start_match();
@@ -585,7 +586,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	    for (mp = ms->matcher; mp; mp = mp->next) {
 		t = 1;
 		if ((lm && lm == mp) ||
-		    ((oll == ll || olw == lw) &&
+		    ((original_ll == ll || original_lw == lw) &&
 		     (test == 1 || (test && !mp->left && !mp->right)) &&
 		     mp->wlen < 0))
 		    /* If we were called recursively, don't use `*' patterns

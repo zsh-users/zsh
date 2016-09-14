@@ -1,5 +1,8 @@
 2016-09-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39310/0007: Src/Zle/compmatch.c: internals: match_str: Rename
+	and constify local variables 'oll', 'olw'.
+
 	* 39310/0006: Src/Zle/compmatch.c: internals: match_str:
 	Downscope local variable 'bpc'.
 
