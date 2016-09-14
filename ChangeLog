@@ -1,5 +1,8 @@
 2016-09-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39310/0006: Src/Zle/compmatch.c: internals: match_str:
+	Downscope local variable 'bpc'.
+
 	* 39310/0005: Src/Zle/compmatch.c: internals: match_str:
 	Constify some local variables.
 

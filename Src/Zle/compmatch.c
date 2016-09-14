@@ -501,7 +501,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	  const int sfx, int test, int part)
 {
     int ll = strlen(l), lw = strlen(w), oll = ll, olw = lw, exact = 0, wexact = 0;
-    int il = 0, iw = 0, t, he = 0, bpc, bslash;
+    int il = 0, iw = 0, t, he = 0, bslash;
     char *ow;
     Cmlist ms; /* loop variable */
     Cmatcher mp, lm = NULL;
@@ -824,12 +824,14 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    bc += llen;
 		    exact = 0;
 
-		    if (!test)
+		    if (!test) {
+			int bpc;
 			while (bp &&
 			       bc >= (bpc = (useqbr ? bp->qpos : bp->pos))) {
 			    bp->curpos = matchbufadded + bpc - bc + obc;
 			    bp = bp->next;
 			}
+		    }
 		    ow = w;
 
 		    if (!llen && !alen) {
@@ -947,12 +949,14 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    bc += mp->llen;
 		    exact = 0;
 
-		    if (!test)
+		    if (!test) {
+			int bpc;
 			while (bp &&
 			       bc >= (bpc = (useqbr ? bp->qpos : bp->pos))) {
 			    bp->curpos = matchbufadded + bpc - bc + obc;
 			    bp = bp->next;
 			}
+		    }
 		    ow = w;
 		    lm = NULL;
 		    he = 0;
