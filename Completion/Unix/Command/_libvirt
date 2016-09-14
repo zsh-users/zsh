@@ -218,7 +218,7 @@ case $state in
     done
     [[ -z $cmd ]] && return 1
     if [[ $words[CURRENT-1] == --server ]]; then
-      _wanted servers expl server compadd ${=${(S)${${(f)$(_call_program -p servers virt-admin ${(Q)conn_opt} srv-list)}##*--- }//[0-9]* }} && return 0
+      _wanted servers expl server compadd ${=${(S)${${(f)$(_call_program -p servers noglob virt-admin ${(Q)conn_opt} srv-list)}##*--- }//[0-9]* }} && return 0
     fi
     if [[ $words[CURRENT-1] == --client ]]; then
       local srv ; (( ${(k)words[(I)--server]} > 0 )) && srv=${words[1+${(k)words[(I)--server]}]}
