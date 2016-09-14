@@ -1,5 +1,8 @@
 2016-09-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39312 (tweaked): Completion/Unix/Command/_postfix: _postfix
+	(postconf): Complete only applicable parameters for -X and -#.
+
 	* 39310/0010: Src/Zle/compmatch.c: internals: match_str:
 	Simplify expression.
 

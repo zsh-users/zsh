@@ -16,11 +16,31 @@ _postfix_queue_id() {
   compadd "$@" -- ${${${(M)lines:#(#s)[0-9bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ](#c10)z*}%% *}%[*!]}
 }
 
+# The first argument must be either 'd' or 'n', to complete parameters in
+# `postconf -d -H` or `postconf -n -H` output, respectively.
 _postfix_main_cf_parameter() {
-  local expl
-  # Note for the future: if $mail_version >= 3.1, we can pass -H instead of
-  # stripping the = signs by hand.
-  _wanted parameters expl 'main.cf parameter' compadd "$@" -- ${${(f)"$(_call_program postconf-defaults "${(q)words[1]} -d")"}%% =*}
+  local -a expl
+  local kind
+
+  kind=$1; shift
+  case $kind in
+    (d)
+      # Note for the future: if $mail_version >= 3.1, we can pass -H instead of
+      # stripping the = signs by hand.
+      #
+      # don't bother to add -c in this case: the defaults don't depend on the config dir.
+      _wanted parameters expl 'main.cf parameter' compadd "$@" -- \
+        ${${(f)"$(_call_program postconf_-d "${(q)words[1]} -$kind")"}%% =*}
+      ;;
+    (n)
+      # Show the values too.
+      local -a kv=( ${${(f)"$(_call_program postconf_-n "${(q)words[1]} ${opt_args[-c]+"-c ${(q)opt_args[-c]}"} -$kind")"}/ = /:} )
+      _describe -t parameters 'main.cf parameter' kv
+      ;;
+    (*)
+      return 1 # can't happen due to the guard above
+      ;;
+  esac
 }
 
 _postfix_main_cf_parameter_and_value() {
@@ -33,7 +53,7 @@ _postfix_main_cf_parameter_and_value() {
     local value="`_call_program postconf-get-value-at-dir "${(q)words[1]} ${opt_args[-c]+"-c ${(q)opt_args[-c]}"} -h -- ${(q)IPREFIX%=}"`"
     [[ -n $value ]] && compadd "$@" -- $value
   else
-    _postfix_main_cf_parameter -S=
+    _postfix_main_cf_parameter d -S=
   fi
 }
 
@@ -130,8 +150,10 @@ case $service in
               elif (( $+opt_args[-p] )); then
                 if (( $+opt_args[-e] )); then
                   _postfix_main_cf_parameter_and_value
+                elif [[ -n $opt_args[(i)(-X|-[#])] ]]; then
+                  _postfix_main_cf_parameter n
                 else
-                  _postfix_main_cf_parameter
+                  _postfix_main_cf_parameter d
                 fi
               else # one of the master.cf modes: -M -F -P
                 _message "arguments for $opt_args[(i)${(j.|.)modes}] mode"
