@@ -1,5 +1,8 @@
 2016-09-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39199: Completion/Unix/Command/_libvirt: Support libvirt URLs
+	that contain a literal question mark under noglob.
+
 	* unposted: Completion/Unix/Command/_git: Permit multiple
 	-c options.
 
