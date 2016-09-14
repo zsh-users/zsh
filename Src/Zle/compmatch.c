@@ -500,8 +500,16 @@ int
 match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 	  const int sfx, int test, int part)
 {
-    int ll = strlen(l), lw = strlen(w), exact = 0, wexact = 0;
-    int il = 0, iw = 0, t, he = 0, bslash;
+    /* How many characters from the line string and from the word string are
+     * yet to be matched. */
+    int ll = strlen(l), lw = strlen(w);
+    /* Number of characters from the line string and word string matched. */
+    int il = 0, iw = 0;
+    /* How many characters were matched exactly in the line and in the word. */
+    int exact = 0, wexact = 0;
+    int he = 0;
+    int bslash;
+    int t;
     char *ow;
     Cmlist ms; /* loop variable */
     Cmatcher mp, lm = NULL;
@@ -510,6 +518,8 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
     const int ind = (sfx ? -1 : 0);
     const int add = (sfx ? -1 : 1);
     const int original_ll = ll, original_lw = lw;
+
+    /* INVARIANT: il+ll == original_ll; iw+lw == original_lw */
 
     if (!test) {
 	start_match();
@@ -629,6 +639,10 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		    int moff;
 		    /*
 		     * ### These two are related.
+		     *
+		     * ### They may have a relation similar to that of lw/iw
+		     * ### (q.v.), at least during the 'for' loop.  They may be
+		     * ### overloaded/repurposed after it.
 		     */
 		    int ct, ict;
 		    /*
