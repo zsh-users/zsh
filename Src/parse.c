@@ -309,7 +309,6 @@ parse_context_restore(const struct parse_stack *ps, int toplevel)
     incond = ps->incond;
     inredir = ps->inredir;
     incasepat = ps->incasepat;
-    incasepat = ps->incasepat;
     isnewlin = ps->isnewlin;
     infor = ps->infor;
     inrepeat_ = ps->inrepeat_;
