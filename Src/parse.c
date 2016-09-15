@@ -2385,7 +2385,7 @@ par_cond_2(void)
     s1 = tokstr;
     dble = (s1 && *s1 == '-'
 	    && (!n_testargs
-		|| strspn(s1+1, "abcdefghknoprstuwxzLONGS") == 1)
+		|| strspn(s1+1, "abcdefghknoprstuvwxzLONGS") == 1)
 	    && !s1[2]);
     if (tok != STRING) {
 	/* Check first argument for [[ STRING ]] re-interpretation */
@@ -2464,7 +2464,7 @@ par_cond_double(char *a, char *b)
 {
     if (a[0] != '-' || !a[1])
 	COND_ERROR("parse error: condition expected: %s", a);
-    else if (!a[2] && strspn(a+1, "abcdefgknoprstuwxzhLONGS") == 1) {
+    else if (!a[2] && strspn(a+1, "abcdefgknoprstuvwxzhLONGS") == 1) {
 	ecadd(WCB_COND(a[1], 0));
 	ecstr(b);
     } else {

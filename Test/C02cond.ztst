@@ -269,6 +269,25 @@ F:Failures in these cases do not indicate a problem in the shell.
 0:-nt shouldn't abort on non-existent files
 >status = 1
 
+  str='string' empty=''
+  [[ -v IFS && -v str && -v empty && ! -v str[3] && ! -v not_a_variable ]]
+0:-v cond
+
+  arr=( 1 2 3 4 ) empty=()
+  [[ -v arr && -v arr[1,4] && -v arr[1] && -v arr[4] && -v arr[-4] &&
+    -v arr[(i)3] && ! -v arr[(i)x] &&
+    ! -v arr[0] && ! -v arr[5] && ! -v arr[-5] && ! -v arr[2][1] &&
+    ! -v arr[3]extra && -v empty && ! -v empty[1] ]]
+0:-v cond with array
+
+  typeset -A assoc=( key val num 4 )
+  [[ -v assoc && -v assoc[key] && -v assoc[(i)*] && -v assoc[(I)*] &&
+    ! -v assoc[x] && ! -v assoc[key][1] ]]
+0:-v cond with association
+
+  () { [[ -v 0 && -v 1 && -v 2 && ! -v 3 ]] } arg ''
+0:-v cond with positional parameters
+
 # core dumps on failure
   if zmodload zsh/regex 2>/dev/null; then
      echo >regex_test.sh 'if [[ $# = 1 ]]; then

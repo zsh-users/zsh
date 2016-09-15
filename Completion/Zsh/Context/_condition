@@ -8,6 +8,8 @@ elif [[ "$prev" = -([a-hkprsuwxLOGSN]|[no]t|ef) ]]; then
   _tags -C "$prev" files && _files
 elif [[ "$prev" = -t ]]; then
   _file_descriptors
+elif [[ "$prev" = -v ]]; then
+  _parameters -r "\= \t\n\[\-"
 else
   if [[ "$PREFIX" = -* ]] ||
      ! zstyle -T ":completion:${curcontext}:options" prefix-needed; then
@@ -30,6 +32,7 @@ else
 	           -s:non-empty\ file
 	           -t:terminal\ file\ descriptor
 	           -u:setuid\ bit
+		   -v:set\ variable
 	           -w:writable\ file
 	           -x:executable\ file
 	           -z:empty\ string

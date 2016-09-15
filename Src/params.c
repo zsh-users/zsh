@@ -626,6 +626,36 @@ getvaluearr(Value v)
 	return NULL;
 }
 
+/* Return whether the variable is set         *
+ * checks that array slices are within range  *
+ * used for [[ -v ... ]] condition test       */
+
+/**/
+int
+issetvar(char *name)
+{
+    struct value vbuf;
+    Value v;
+    int slice;
+    char **arr;
+
+    if (!(v = getvalue(&vbuf, &name, 1)) || *name)
+	return 0; /* no value or more chars after the variable name */
+    if (v->isarr & ~SCANPM_ARRONLY)
+	return v->end > 1; /* for extracted elements, end gives us a count */
+
+    slice = v->start != 0 || v->end != -1;
+    if (PM_TYPE(v->pm->node.flags) != PM_ARRAY || !slice)
+	return !slice && !(v->pm->node.flags & PM_UNSET);
+
+    if (!v->end) /* empty array slice */
+	return 0;
+    /* get the array and check end is within range */
+    if (!(arr = getvaluearr(v)))
+	return 0;
+    return arrlen_ge(arr, v->end < 0 ? - v->end : v->end);
+}
+
 /*
  * Split environment string into (name, value) pair.
  * this is used to avoid in-place editing of environment table

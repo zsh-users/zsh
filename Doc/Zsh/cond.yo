@@ -63,6 +63,9 @@ is open and associated with a terminal device.
 item(tt(-u) var(file))(
 true if var(file) exists and has its setuid bit set.
 )
+item(tt(-v) var(varname))(
+true if shell variable var(varname) is set.
+)
 item(tt(-w) var(file))(
 true if var(file) exists and is writable by current process.
 )

@@ -351,6 +351,8 @@ evalcond(Estate state, char *fromtest)
 	return (!S_ISSOCK(dostat(left)));
     case 'u':
 	return (!(dostat(left) & S_ISUID));
+    case 'v':
+	return (!issetvar(left));
     case 'w':
 	return (!doaccess(left, W_OK));
     case 'x':
