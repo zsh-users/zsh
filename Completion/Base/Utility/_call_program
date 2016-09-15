@@ -1,12 +1,15 @@
 #autoload +X
 
-local tmp err_fd=-1
+local curcontext="${curcontext}" tmp err_fd=-1
 local -a prefix
 
 if [[ "$1" = -p ]]; then
   shift
-  zstyle -t ":completion:${curcontext}:${1}" gain-privileges &&
-      prefix=( $_comp_priv_prefix )
+  if (( $#_comp_priv_prefix )); then
+    curcontext="${curcontext%:*}/${${(@M)_comp_priv_prefix:#^*[^\\]=*}[1]}:"
+    zstyle -t ":completion:${curcontext}:${1}" gain-privileges &&
+	prefix=( $_comp_priv_prefix )
+  fi
 fi
 
 if (( ${debug_fd:--1} > 2 )) || [[ ! -t 2 ]]

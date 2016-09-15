@@ -1,5 +1,10 @@
 2016-09-15  Oliver Kiddle  <opk@zsh.org>
 
+	* 39333: Completion/Base/Utility/_call_program,
+	Doc/Zsh/compsys.yo, Completion/Solaris/Command/_pfexec,
+	Completion/Unix/Command/_sudo: include name of command used to
+	gain priviliges in context for command and gain-priviliges styles
+
 	* 39332: Doc/Zsh/cond.yo, Src/cond.c, Src/params.c, Src/parse.c,
 	Completion/Zsh/Context/_condition, Test/C02cond.ztst: support
 	ksh's [[ -v varname ]] condition for checking if variables are set

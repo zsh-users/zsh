@@ -4191,7 +4191,9 @@ output is influenced by the permissions it is run with. If the
 tt(gain-privileges) style is set to true, tt(_call_program) will make
 use of commands such as tt(sudo), if present on the command-line, to
 match the permissions to whatever the final command is likely to run
-under.
+under. When looking up the tt(gain-privileges) and tt(command) styles,
+the command component of the zstyle context will end with a slash
+(`tt(/)') followed by the command that would be used to gain privileges.
 )
 findex(_combination)
 item(tt(_combination) [ tt(-s) var(pattern) ] var(tag) var(style) var(spec) ... var(field) var(opts) ...)(
