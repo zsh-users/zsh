@@ -983,7 +983,8 @@ struct jobfile {
 
 struct job {
     pid_t gleader;		/* process group leader of this job  */
-    pid_t other;		/* subjob id or subshell pid         */
+    pid_t other;		/* subjob id (SUPERJOB)
+				 * or subshell pid (SUBJOB) */
     int stat;                   /* see STATs below                   */
     char *pwd;			/* current working dir of shell when *
 				 * this job was spawned              */
@@ -1015,6 +1016,8 @@ struct job {
 #define STAT_SUBLEADER  (0x2000) /* is super-job, but leader is sub-shell */
 
 #define STAT_BUILTIN    (0x4000) /* job at tail of pipeline is a builtin */
+#define STAT_SUBJOB_ORPHANED (0x8000)
+                                 /* STAT_SUBJOB with STAT_SUPERJOB exited */
 
 #define SP_RUNNING -1		/* fake status for jobs currently running */
 

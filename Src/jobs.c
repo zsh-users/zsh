@@ -128,7 +128,7 @@ makerunning(Job jn)
     Process pn;
 
     jn->stat &= ~STAT_STOPPED;
-    for (pn = jn->procs; pn; pn = pn->next)
+    for (pn = jn->procs; pn; pn = pn->next) {
 #if 0
 	if (WIFSTOPPED(pn->status) && 
 	    (!(jn->stat & STAT_SUPERJOB) || pn->next))
@@ -136,6 +136,7 @@ makerunning(Job jn)
 #endif
         if (WIFSTOPPED(pn->status))
 	    pn->status = SP_RUNNING;
+    }
 
     if (jn->stat & STAT_SUPERJOB)
 	makerunning(jobtab + jn->other);
@@ -236,7 +237,7 @@ handle_sub(int job, int fg)
     if ((sj->stat & STAT_DONE) || (!sj->procs && !sj->auxprocs)) {
 	struct process *p;
 		    
-	for (p = sj->procs; p; p = p->next)
+	for (p = sj->procs; p; p = p->next) {
 	    if (WIFSIGNALED(p->status)) {
 		if (jn->gleader != mypgrp && jn->procs->next)
 		    killpg(jn->gleader, WTERMSIG(p->status));
@@ -246,6 +247,7 @@ handle_sub(int job, int fg)
 		kill(sj->other, WTERMSIG(p->status));
 		break;
 	    }
+	}
 	if (!p) {
 	    int cp;
 
@@ -1315,6 +1317,11 @@ deletejob(Job jn, int disowning)
     if (jn->stat & STAT_ATTACH) {
 	attachtty(mypgrp);
 	adjustwinsize(0);
+    }
+    if (jn->stat & STAT_SUPERJOB) {
+	Job jno = jobtab + jn->other;
+	if (jno->stat & STAT_SUBJOB)
+	    jno->stat |= STAT_SUBJOB_ORPHANED;
     }
 
     freejob(jn, 1);

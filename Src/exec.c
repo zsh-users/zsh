@@ -1570,6 +1570,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 
 	    if (nowait) {
 		if(!pline_level) {
+		    int jobsub;
 		    struct process *pn, *qn;
 
 		    curjob = newjob;
@@ -1582,6 +1583,20 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    if (!jn->procs->next || lpforked == 2) {
 			jn->gleader = list_pipe_pid;
 			jn->stat |= STAT_SUBLEADER;
+			/*
+			 * Pick up any subjob that's still lying around
+			 * as it's now our responsibility.
+			 * If we find it we're a SUPERJOB.
+			 */
+			for (jobsub = 1; jobsub <= maxjob; jobsub++) {
+			    Job jnsub = jobtab + jobsub;
+			    if (jnsub->stat & STAT_SUBJOB_ORPHANED) {
+				jn->other = jobsub;
+				jn->stat |= STAT_SUPERJOB;
+				jnsub->stat &= ~STAT_SUBJOB_ORPHANED;
+				jnsub->other = list_pipe_pid;
+			    }
+			}
 		    }
 		    for (pn = jobtab[jn->other].procs; pn; pn = pn->next)
 			if (WIFSTOPPED(pn->status))
@@ -1593,7 +1608,8 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    }
 
 		    jn->stat &= ~(STAT_DONE | STAT_NOPRINT);
-		    jn->stat |= STAT_STOPPED | STAT_CHANGED | STAT_LOCKED;
+		    jn->stat |= STAT_STOPPED | STAT_CHANGED | STAT_LOCKED |
+			STAT_INUSE;
 		    printjob(jn, !!isset(LONGLISTJOBS), 1);
 		}
 		else if (newjob != list_pipe_job)
@@ -1669,6 +1685,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			    jobtab[list_pipe_job].stat |= STAT_SUPERJOB;
 			    jn->stat |= STAT_SUBJOB | STAT_NOPRINT;
 			    jn->other = pid;
+			    jn->gleader = jobtab[list_pipe_job].gleader;
 			}
 			if ((list_pipe || last1) && hasprocs(list_pipe_job))
 			    killpg(jobtab[list_pipe_job].gleader, SIGSTOP);
