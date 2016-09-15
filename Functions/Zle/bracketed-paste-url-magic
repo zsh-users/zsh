@@ -19,7 +19,7 @@
 # The default can be seen just below.
 
 local -a schema
-zstyle -a :bracketed-paste-url-magic schema schema || schema=(http https ftp ftps file ssh sftp)
+zstyle -a :bracketed-paste-url-magic schema schema || schema=(http:// https:// ftp:// ftps:// file:// ssh:// sftp:// magnet:)
 
 local wantquote=${NUMERIC:-0}
 local content
@@ -28,7 +28,7 @@ local start=$#LBUFFER
 zle .$WIDGET -N content
 
 if (( $wantquote == 0 )); then
-  if [[ $content = (${(~j:|:)schema})://* ]]; then
+  if [[ $content = (${(~j:|:)schema})* ]]; then
     wantquote=1
   fi
 fi
