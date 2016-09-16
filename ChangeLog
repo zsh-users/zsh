@@ -1,5 +1,8 @@
 2016-09-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Completion/Unix/Command/_postfix: Correct quoting
+	in _call_program invocations.
+
 	* 39312 (tweaked): Completion/Unix/Command/_postfix: _postfix
 	(postconf): Complete only applicable parameters for -X and -#.
 

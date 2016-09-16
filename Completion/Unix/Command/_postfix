@@ -30,11 +30,11 @@ _postfix_main_cf_parameter() {
       #
       # don't bother to add -c in this case: the defaults don't depend on the config dir.
       _wanted parameters expl 'main.cf parameter' compadd "$@" -- \
-        ${${(f)"$(_call_program postconf_-d "${(q)words[1]} -$kind")"}%% =*}
+        ${${(f)"$(_call_program postconf_-d "${words[1]} -$kind")"}%% =*}
       ;;
     (n)
       # Show the values too.
-      local -a kv=( ${${(f)"$(_call_program postconf_-n "${(q)words[1]} ${opt_args[-c]+"-c ${(q)opt_args[-c]}"} -$kind")"}/ = /:} )
+      local -a kv=( ${${(f)"$(_call_program postconf_-n "${words[1]} ${opt_args[-c]+"-c ${opt_args[-c]}"} -$kind")"}/ = /:} )
       _describe -t parameters 'main.cf parameter' kv
       ;;
     (*)
@@ -50,7 +50,7 @@ _postfix_main_cf_parameter_and_value() {
   # completing «postconf foo=bar=<TAB>» would change main.cf.  So, don't remove
   # it.
   if compset -P 1 '*='; then
-    local value="`_call_program postconf-get-value-at-dir "${(q)words[1]} ${opt_args[-c]+"-c ${(q)opt_args[-c]}"} -h -- ${(q)IPREFIX%=}"`"
+    local value="`_call_program postconf-get-value-at-dir "${words[1]} ${opt_args[-c]+"-c ${opt_args[-c]}"} -h -- ${(q)IPREFIX%=}"`"
     [[ -n $value ]] && compadd "$@" -- $value
   else
     _postfix_main_cf_parameter d -S=
