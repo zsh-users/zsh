@@ -2,40 +2,6 @@
 KNOWN BUGS IN ZSH
 -----------------
 
-On some terminals, display of lines with exactly 80 characters is
-problematic.  zsh assumes that the terminal does not print an extra
-newline in this case, but some terminals (e.g. aixterm) do.
-------------------------------------------------------------------------
-When interrupting code like the following with ^C:
-  while true; do
-    sh -c '...'
-  done
-if the `sh' is executing, zsh does not know that the sh received a ^C and
-continues with the next iteration.  This happens for any program which
-handles the interrupt, then exits after tidying up; it does not happen for
-zsh, which exits directly from the signal handler.  The workaround is to
-use ^Z which forks the shell and makes the loop a separate job, then kill
-the suspended loop.
-------------------------------------------------------------------------
-If you suspend "man", zle seems to get into cooked mode.  It works ok
-for plain "less".
-It is not specific neither to man nor to zsh.
-E.g. call the following program foo:
-#include <sys/wait.h>
-#include <unistd.h>
-
-int main(int argc, char *argv[])
-{
-    int status;
-
-    if (!fork())	/* child */
-	execvp(argv[1], argv + 1);
-    else		/* parent */
-	wait(&status);
-}
-Then if you suspend
-% foo less something
-from zsh/bash, zle/readline gets into cooked mode.
 ------------------------------------------------------------------------
 The pattern %?* matches names beginning with %? instead of names with at
 least two characters beginning with %. This is a hack to allow %?foo job
@@ -45,4 +11,7 @@ such patterns unchanged if they do not match regardless of the state of
 the nonomatch and nullglob options.
 ------------------------------------------------------------------------
 It is currently impossible to time builtins.
+------------------------------------------------------------------------
+The comp* completion-related builtins (compadd, compset, etc) are run with
+$_comp_options in effect, rather than the user's options.
 ------------------------------------------------------------------------
