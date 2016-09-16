@@ -1,3 +1,8 @@
+2016-09-16  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 39362: Src/exec.c: forked zsh in pipeline handling always
+	starts a new process group, avoiding double STOP.
+
 2016-09-16  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39359: Src/exec.c, Src/jobs.c, Src/signals.c: Further fix on

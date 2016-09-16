@@ -1710,39 +1710,23 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			break;
 		    }
 		    else {
-			Job pjn = jobtab + list_pipe_job;
 			close(synch[0]);
 			entersubsh(ESUB_ASYNC);
 			/*
 			 * At this point, we used to attach this process
 			 * to the process group of list_pipe_job (the
 			 * new superjob) any time that was still available.
-			 * That caused problems when the fork happened
-			 * early enough that the subjob is in that
-			 * process group, since then we will stop this
-			 * job when we signal the subjob, and we have
-			 * no way here to know that we shouldn't also
-			 * send STOP to itself, resulting in two stops.
-			 * So don't do that if the original
-			 * list_pipe_job has exited.
+			 * That caused problems in at least two
+			 * cases because this forked shell was then
+			 * suspended with the right hand side of the
+			 * pipeline, and the SIGSTOP below suspended
+			 * it a second time when it was continued.
 			 *
-			 * The choice here needs to match the assumption
-			 * made when handling SUBLEADER above that the
-			 * process group is our own PID.  I'm not sure
-			 * if there's a potential race for that.  But
-			 * setting up a new process group if the
-			 * superjob is still functioning seems the wrong
-			 * thing to do.
+			 * It's therefore not clear entirely why you'd ever
+			 * do anything other than the following, but no
+			 * doubt we'll find out...
 			 */
-			if (pjn->procs &&
-			    (pjn->stat & STAT_INUSE) &&
-			    !(pjn->stat & STAT_DONE)) {
-			    if (setpgrp(0L, mypgrp = jobtab[list_pipe_job].gleader)
-				== -1) {
-				setpgrp(0L, mypgrp = getpid());
-			    }
-			} else
-			    setpgrp(0L, mypgrp = getpid());
+			setpgrp(0L, mypgrp = getpid());
 			close(synch[1]);
 			kill(getpid(), SIGSTOP);
 			list_pipe = 0;
