@@ -1652,7 +1652,13 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		    int synch[2];
 		    struct timeval bgtime;
 
+		    /*
+		     * A pipeline with the shell handling the right
+		     * hand side was stopped.  We'll fork to allow
+		     * it to continue.
+		     */
 		    if (pipe(synch) < 0 || (pid = zfork(&bgtime)) == -1) {
+			/* Failure */
 			if (pid < 0) {
 			    close(synch[0]);
 			    close(synch[1]);
@@ -1666,6 +1672,18 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			thisjob = newjob;
 		    }
 		    else if (pid) {
+			/*
+			 * Parent: job control is here.  If the job
+			 * started for the RHS of the pipeline is still
+			 * around, then its a SUBJOB and the job for
+			 * earlier parts of the pipeeline is its SUPERJOB.
+			 * The newly forked shell isn't recorded as a
+			 * separate job here, just as list_pipe_pid.
+			 * If the superjob exits (it may already have
+			 * done so, see child branch below), we'll use
+			 * list_pipe_pid to form the basis of a
+			 * replacement job --- see SUBLEADER code above.
+			 */
 			char dummy;
 
 			lpforked =
@@ -1692,9 +1710,33 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			break;
 		    }
 		    else {
+			Job pjn = jobtab + list_pipe_job;
 			close(synch[0]);
 			entersubsh(ESUB_ASYNC);
-			if (jobtab[list_pipe_job].procs) {
+			/*
+			 * At this point, we used to attach this process
+			 * to the process group of list_pipe_job (the
+			 * new superjob) any time that was still available.
+			 * That caused problems when the fork happened
+			 * early enough that the subjob is in that
+			 * process group, since then we will stop this
+			 * job when we signal the subjob, and we have
+			 * no way here to know that we shouldn't also
+			 * send STOP to itself, resulting in two stops.
+			 * So don't do that if the original
+			 * list_pipe_job has exited.
+			 *
+			 * The choice here needs to match the assumption
+			 * made when handling SUBLEADER above that the
+			 * process group is our own PID.  I'm not sure
+			 * if there's a potential race for that.  But
+			 * setting up a new process group if the
+			 * superjob is still functioning seems the wrong
+			 * thing to do.
+			 */
+			if (pjn->procs &&
+			    (pjn->stat & STAT_INUSE) &&
+			    !(pjn->stat & STAT_DONE)) {
 			    if (setpgrp(0L, mypgrp = jobtab[list_pipe_job].gleader)
 				== -1) {
 				setpgrp(0L, mypgrp = getpid());

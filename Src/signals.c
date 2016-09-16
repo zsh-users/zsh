@@ -723,7 +723,7 @@ killjb(Job jn, int sig)
 {
     Process pn;
     int err = 0;
- 
+
     if (jobbing) {
         if (jn->stat & STAT_SUPERJOB) {
             if (sig == SIGCONT) {
@@ -731,11 +731,21 @@ killjb(Job jn, int sig)
                     if (killpg(pn->pid, sig) == -1)
 			if (kill(pn->pid, sig) == -1 && errno != ESRCH)
 			    err = -1;
- 
+
+		/*
+		 * Note this does not kill the last process,
+		 * which is assumed to be the one controlling the
+		 * subjob, i.e. the forked zsh that was originally
+		 * list_pipe_pid...
+		 */
                 for (pn = jn->procs; pn->next; pn = pn->next)
                     if (kill(pn->pid, sig) == -1 && errno != ESRCH)
 			err = -1;
 
+		/*
+		 * ...we only continue that once the external processes
+		 * currently associated with the subjob are finished.
+		 */
 		if (!jobtab[jn->other].procs && pn)
 		    if (kill(pn->pid, sig) == -1 && errno != ESRCH)
 			err = -1;
@@ -744,7 +754,7 @@ killjb(Job jn, int sig)
             }
             if (killpg(jobtab[jn->other].gleader, sig) == -1 && errno != ESRCH)
 		err = -1;
-		
+
 	    if (killpg(jn->gleader, sig) == -1 && errno != ESRCH)
 		err = -1;
 

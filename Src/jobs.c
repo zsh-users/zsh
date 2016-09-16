@@ -232,11 +232,12 @@ super_job(int sub)
 static int
 handle_sub(int job, int fg)
 {
+    /* job: superjob; sj: subjob. */
     Job jn = jobtab + job, sj = jobtab + jn->other;
 
     if ((sj->stat & STAT_DONE) || (!sj->procs && !sj->auxprocs)) {
 	struct process *p;
-		    
+
 	for (p = sj->procs; p; p = p->next) {
 	    if (WIFSIGNALED(p->status)) {
 		if (jn->gleader != mypgrp && jn->procs->next)

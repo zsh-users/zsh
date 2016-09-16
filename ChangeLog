@@ -1,5 +1,9 @@
 2016-09-16  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 39359: Src/exec.c, Src/jobs.c, Src/signals.c: Further fix on
+	top of 39331 for remaining race.  Ensure process group of forked
+	superjob is sane.
+
 	* 39331: Src/exec.c, Src/jobs.c, Src/zsh.h: Partially fix problem
 	occurring when a subjop in the RHS of a pipeline needs to be
 	picked up by a forked zsh after ^Z when the original superjob
