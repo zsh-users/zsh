@@ -1,3 +1,8 @@
+2016-09-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 39372: Src/Zle/compcore.c: compadd: Match -P prefix
+	all-or-nothing rather than greedily.
+
 2016-09-19  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 39381: Src/exec.c: handle save/restore of variable values when

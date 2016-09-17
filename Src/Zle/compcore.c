@@ -2029,7 +2029,7 @@ addmatches(Cadata dat, char **argv)
     char **aign = NULL, **dparr = NULL, *oaq = autoq, *oppre = dat->ppre;
     char *oqp = qipre, *oqs = qisuf, qc, **disp = NULL, *ibuf = NULL;
     char **arrays = NULL;
-    int lpl, lsl, pl, sl, bcp = 0, bcs = 0, bpadd = 0, bsadd = 0;
+    int lpl, lsl, sl, bcp = 0, bcs = 0, bpadd = 0, bsadd = 0;
     int ppl = 0, psl = 0, ilen = 0;
     int llpl = 0, llsl = 0, nm = mnum, gflags = 0, ohp = haspattern;
     int isexact, doadd, ois = instring, oib = inbackt;
@@ -2193,9 +2193,12 @@ addmatches(Cadata dat, char **argv)
 
 	    /* Test if there is an existing -P prefix. */
 	    if (dat->pre && *dat->pre) {
-		pl = pfxlen(dat->pre, lpre);
-		llpl -= pl;
-		lpre += pl;
+		int prefix_length = pfxlen(dat->pre, lpre);
+		if (dat->pre[prefix_length] == '\0') {
+		    /* $compadd_args[-P] is a prefix of ${PREFIX}. */
+		    llpl -= prefix_length;
+		    lpre += prefix_length;
+		}
 	    }
 	}
 	/* Now duplicate the strings we have from the command line. */
