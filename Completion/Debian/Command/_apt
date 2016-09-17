@@ -464,7 +464,11 @@ _apt-get () {
     \( \
     /$'install\0'\|$'download\0'\|$'source\0'\|$'build-dep\0'/ \
       /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \
-    /$'[^\0/]#/'/ /$'[^\0/]#\0'/ ':release name::_apt_releases' \) \| \
+       \( \
+       /$'[^\0/]#/'/ /$'[^\0/]#\0'/ ':release name::_apt_releases' \| \
+       /$'[^\0=]#='/ /$'[^\0=]#\0'/ ':package version::_apt_versions_of_binary_package' \
+       \)  \
+    \) \| \
     /$'remove\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'purge\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'dist-upgrade\0'/ \| \
@@ -612,6 +616,41 @@ _apt_releases () {
   _apt_releases_update
 
   _tags apt-releases && compadd -a _apt_releases
+}
+
+# Complete versions of the package named in $match[1].
+#
+# Interpret the package name as a binary package (even if there is
+# a source package by that name, too).
+_apt_versions_of_binary_package() {
+  local package_name=${match[1]%=} # $match was set by _regex_arguments
+  local line
+  local name version source
+  local -a kv
+
+  for line in ${(f)"$(_call_program versions-of-package "apt-cache madison $package_name")"}; do
+    # If $package_name is a source package name, we'll have lines of the form
+    #   $package_name | $version | ...Sources
+    #
+    # If $package_name is a binary package name, we'll have lines of the form
+    #   $package_name | $version | ...Packages
+    #   $src_package_name | $version | ...Sources
+    for name version source in "${(@s. | .)line}"; do
+      # Remove leading/trailing whitespace
+      name=${name// }
+      version=${version// }
+      source=${${source# ##}% ##}
+
+      # Skip source packages
+      if [[ $name != $package_name ]] || [[ $source != *Packages* ]]; then
+        continue
+      fi
+
+      kv+=( "${version//:/\\:}:$source" )
+    done
+  done
+
+  _describe -t apt-package-versions "package versions" kv "$@"
 }
 
 _apt_caching_policy () {
