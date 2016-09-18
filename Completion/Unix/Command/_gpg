@@ -62,7 +62,7 @@ fi
   '--desig-revoke[generate a designated revocation certificate]'
   '--export[export all key from all keyrings]'
   '--send-keys[send keys to a keyserver]:key attachment:->public-keyids'
-  '--export-secret-keys:key attahment:->secret-keys'
+  '--export-secret-keys:key attachment:->secret-keys'
   '--export-secret-subkeys:key attachment:->secret-keys'
   '--import[import a gpg key from a file]:_files attachment:_files'
   '--fast-import[import a file without build trustdb]:_files attachment:_files'
