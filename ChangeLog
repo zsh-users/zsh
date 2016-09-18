@@ -1,3 +1,7 @@
+2016-09-22  Adam Gibbins  <adam@adamgibbins.com>
+
+	* unposted: Completion/Unix/Command/_gpg: Correct typo
+
 2016-09-21  Barton E. Schaefer  <schaefer@brasslantern.com>
 
 	* unposted: Completion/Darwin/Type/_retrieve_mac_apps: add
