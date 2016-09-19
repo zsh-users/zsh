@@ -3543,7 +3543,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		     * if it's got "command" in front.
 		     * If it's a normal command --- save.
 		     */
-		    if (is_shfunc || (hn->flags & BINF_PSPECIAL))
+		    if (is_shfunc || (hn->flags & (BINF_PSPECIAL|BINF_ASSIGN)))
 			do_save = (orig_cflags & BINF_COMMAND);
 		    else
 			do_save = 1;
@@ -3552,7 +3552,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		     * Save if it's got "command" in front or it's
 		     * not a magic-equals assignment.
 		     */
-		    if ((cflags & BINF_COMMAND) || !assign)
+		    if ((cflags & (BINF_COMMAND|BINF_ASSIGN)) || !assign)
 			do_save = 1;
 		}
 		if (do_save && varspc)

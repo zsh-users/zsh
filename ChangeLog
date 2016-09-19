@@ -1,3 +1,8 @@
+2016-09-19  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39381: Src/exec.c: handle save/restore of variable values when
+	"typeset"-related reserved words are prefixed by an assignment
+
 2016-09-19  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 39351: Functions/Zle/bracketed-paste-url-magic: Handle magnet
