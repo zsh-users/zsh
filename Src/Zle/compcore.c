@@ -2194,8 +2194,10 @@ addmatches(Cadata dat, char **argv)
 	    /* Test if there is an existing -P prefix. */
 	    if (dat->pre && *dat->pre) {
 		int prefix_length = pfxlen(dat->pre, lpre);
-		if (dat->pre[prefix_length] == '\0') {
-		    /* $compadd_args[-P] is a prefix of ${PREFIX}. */
+		if (dat->pre[prefix_length] == '\0' ||
+		    lpre[prefix_length] == '\0') {
+		    /* $compadd_args[-P] is a prefix of ${PREFIX}, or
+		     * vice-versa. */
 		    llpl -= prefix_length;
 		    lpre += prefix_length;
 		}

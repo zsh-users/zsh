@@ -1,5 +1,9 @@
 2016-09-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39383: Src/Zle/compcore.c: compadd: Restrict previous patch
+	to the case where $PREFIX includes characters both from the -P
+	prefix and from the (unprefixed) candidate completion word.
+
 	* 39372: Src/Zle/compcore.c: compadd: Match -P prefix
 	all-or-nothing rather than greedily.
 
