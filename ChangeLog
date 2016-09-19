@@ -1,5 +1,8 @@
 2016-09-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39385: Completion/Debian/Command/_bts: Complete more argument
+	types for 'cache' and 'show'.
+
 	* 39383: Src/Zle/compcore.c: compadd: Restrict previous patch
 	to the case where $PREFIX includes characters both from the -P
 	prefix and from the (unprefixed) candidate completion word.

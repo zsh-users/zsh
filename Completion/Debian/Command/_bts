@@ -41,8 +41,9 @@ case "$words[1]" in
   (show|bugs)
     if [[ CURRENT -eq 2 ]]; then
       _alternative \
-	'packages:package:_deb_packages avail' \
-        'emails:package maintainer:compadd $DEBEMAIL'
+        'packages:package:_deb_packages avail' \
+        'emails:package maintainer:compadd $DEBEMAIL' \
+        'bugnum:bug number:_debbugs_bugnumber'
     else
       _wanted sep expl 'separator' compadd -S ' ' , .
     fi
@@ -199,8 +200,10 @@ case "$words[1]" in
   ;;
   (cache)
      _alternative \
-       'package:package:_deb_packages avail' \
-       'email:email address:_email_addresses -c' \
+       'source-packages:source package:_deb_packages -P "src:" source' \
+       'package:binary package:_deb_packages avail' \
+       'email:email address:_email_addresses -c -P "from:"' \
+       'bugnum:bug number:_debbugs_bugnumber' \
        'rc:rc:compadd release-critical'
   ;;
   (cleancache)
