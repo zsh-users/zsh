@@ -1,3 +1,8 @@
+2016-09-21  Oliver Kiddle  <opk@zsh.org>
+
+	* 39407: Completion/Linux/Command/_cpupower: cleanup minor
+	issues; updated through to version 4.8
+
 2016-09-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 39385: Completion/Debian/Command/_bts: Complete more argument
