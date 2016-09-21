@@ -1051,7 +1051,7 @@ tt(:vcs_info:-init-:*:-all-) context.
 
 Say, tt(~/.zsh) is a directory under version control, in which you do
 not want tt(vcs_info) to be active, do:
-example(zstyle ':vcs_info:*' disable-patterns "$HOME/.zsh+LPAR()|/*+RPAR()")
+example(zstyle ':vcs_info:*' disable-patterns "${+LPAR()b+RPAR()HOME}/.zsh+LPAR()|/*+RPAR()")
 )
 kindex(use-quilt)
 item(tt(use-quilt))(
@@ -1070,7 +1070,7 @@ tt(Quilt Support) for details.
 )
 kindex(quiltcommand)
 item(tt(quiltcommand))(
-When tt(quilt) itself is called in quilt support the value of this style
+When tt(quilt) itself is called in quilt support, the value of this style
 is used as the command name.
 )
 kindex(check-for-changes)

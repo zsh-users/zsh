@@ -1115,14 +1115,14 @@ tt(default) tag.  The most notable styles of this type are tt(menu),
 tt(list-colors) and styles controlling completion listing such as 
 tt(list-packed) and tt(last-prompt).  When tested for the tt(default)
 tag, only the var(function) field of the context will be set so that
-a style using the default tag will normally be defined along the lines of:
+a style using the tt(default) tag will normally be defined along the lines of:
 
 example(zstyle ':completion:*:default' menu ...)
 
 startitem()
 kindex(accept-exact, completion style)
 item(tt(accept-exact))(
-This is tested for the default tag in addition to the tags valid for
+This is tested for the tt(default) tag in addition to the tags valid for
 the current context.  If it is set to `true' and any of the trial
 matches is the same as the string on the command line, this match will
 immediately be accepted (even if it would otherwise be considered
@@ -3252,6 +3252,7 @@ for the current context; remember that the context for completers is less
 specific than that for contextual completion as the full context has not
 yet been determined.  Elements of the array may have one of the following
 forms:
+
 startsitem()
 sitem(tt($)var(hash))(
 var(hash) is the name of an associative array.  Note this is not a full
@@ -5013,7 +5014,7 @@ particular tag is to be tried, the tt(_requested) function should be
 called (see above).
 
 If `tt(-C) var(name)' is given, var(name) is temporarily stored in the
-argument field (the fifth) of the context in the tt(curcontext) parameter
+var(argument) field (the fifth) of the context in the tt(curcontext) parameter
 during the call to tt(_tags); the field is restored on exit.  This
 allows tt(_tags) to use a more 
 specific context without having to change and reset the
