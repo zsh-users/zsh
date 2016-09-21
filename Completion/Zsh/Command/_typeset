@@ -57,7 +57,7 @@ case ${service} in
   ;;
   integer)
     use="Hghilprtux"
-    allargs[i]='-i[specify arithmetic base for output]' \
+    allargs[i]='-i+[specify arithmetic base for output]:: :_guard "[0-9]#" base' \
   ;;
   readonly) use="${use/r/}" ;;
   local) use="${use/[fkz]/}" ;&

@@ -45,6 +45,8 @@ case "$state[1]" in
     _arguments \
       '(-N)-n[numeric prefix]:number:' \
       '(-n)-N[reset numeric prefix]' \
+      '-K[specify temporary keymap]:keymap:compadd -a keymaps' \
+      '-w[set $WIDGET to reflect widget being called]' \
       '(-)*:widget arguments: ' && ret=0
     ;;
   (widget*)

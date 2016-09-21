@@ -1,5 +1,9 @@
 2016-09-21  Oliver Kiddle  <opk@zsh.org>
 
+	* 39370: Completion/Zsh/Command/_typeset,
+	Completion/Zsh/Command/_zle: complete -w and -K options to zle
+	following the widget name and numeric base to integer
+
 	* 39407: Completion/Linux/Command/_cpupower: cleanup minor
 	issues; updated through to version 4.8
 
