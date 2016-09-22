@@ -1,5 +1,8 @@
 2016-09-21  Barton E. Schaefer  <schaefer@brasslantern.com>
 
+	* unposted: Completion/Darwin/Type/_retrieve_mac_apps: add
+	missing final colon in zstyle context lookup
+
 	* users/21955: Completion/Base/Completer/_user_expand: add
 	missing final colon in zstyle context lookup; allow a single
 	unique match to appear in "expansions" tag

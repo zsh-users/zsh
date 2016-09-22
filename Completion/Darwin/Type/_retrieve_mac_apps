@@ -85,7 +85,7 @@ _retrieve_mac_apps() {
 
     # Get root directories to search applications
     typeset -a app_dir_root
-    if ! zstyle -a ":completion:${curcontext}" application-path app_dir_root
+    if ! zstyle -a ":completion:${curcontext}:" application-path app_dir_root
     then
       if [[ $retrieve = _mac_apps_old_retrieve ]]; then
         app_dir_root=( {,/Developer,/Network,"$HOME"}/{Applications*(N),Desktop} )
