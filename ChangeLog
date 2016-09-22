@@ -1,3 +1,9 @@
+2016-09-23  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 39412: Src/Zle/computil.c: Fix directory completion when
+	$PWD:h contains parentheses, which are interpreted as globbing
+	metacharacters.
+
 2016-09-22  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 39410: Completion/Darwin/Type/_retrieve_mac_apps,

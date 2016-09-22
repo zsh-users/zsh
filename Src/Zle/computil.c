@@ -4830,8 +4830,11 @@ cf_remove_other(char **names, char *pre, int *amb)
  *     3. compfiles -P  parnam1 parnam2 skipped matcher sdirs parnam3 
  *
  *     1. Set parnam1 to an array of patterns....
+ *        ${(P)parnam1} is an in/out parameter.
  *     2. Like #1 but without calling cfp_opt_pats().  (This is only used by _approximate.)
  *     3. Like #1 but varargs is implicitly set to  char *varargs[2] = { "*(-/)", NULL };.
+ *
+ *     parnam2 has to do with the accept-exact style (see cfp_test_exact()).
  */
 
 static int
@@ -4866,7 +4869,7 @@ bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		return 0;
 	    }
 	    for (l = newlinklist(); *tmp; tmp++)
-		addlinknode(l, *tmp);
+		addlinknode(l, quotestring(*tmp, QT_BACKSLASH_PATTERN));
 	    set_list_array(args[1], cf_pats((args[0][1] == 'P'), !!args[0][2],
 					    l, getaparam(args[2]), args[3],
 					    args[4], args[5],
