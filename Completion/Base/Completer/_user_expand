@@ -27,7 +27,7 @@ exp=("$word")
 
 # Now look for user completions.
 
-zstyle -a ":completion:${curcontext}" user-expand specs || return 1
+zstyle -a ":completion:${curcontext}:" user-expand specs || return 1
 
 for spec in $specs; do
   REPLY=
@@ -95,7 +95,7 @@ if [[ -z "$compstate[insert]" ]] ;then
 else
   _tags all-expansions expansions original
 
-  if [[ $#exp -gt 1 ]] && _requested expansions; then
+  if [[ $#exp -ge 1 ]] && _requested expansions; then
     local i j normal space dir
 
     if [[ "$sort" = menu ]]; then
