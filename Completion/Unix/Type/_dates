@@ -22,10 +22,10 @@ local future mlabel mfmt mlabels
 
 zparseopts -D -K -E f:=format F=future
 (( future = $#future ? 1 : -1 ))
-zstyle -s ':completion:$curcontext:dates' date-format userformat
+zstyle -s ":completion:${curcontext}:dates" date-format userformat
 format=${userformat:-${format[2]:-%F}}
 
-zstyle -a ':completion:$curcontext:dates' max-matches-length r
+zstyle -a ":completion:${curcontext}:dates" max-matches-length r
 for ri in $r; do
   [[ $ri = [0-9]##% ]] && (( ri = LINES * .${ri%%%} ))
   (( ri < rows )) && (( rows=ri ))

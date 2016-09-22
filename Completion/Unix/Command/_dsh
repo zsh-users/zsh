@@ -25,7 +25,7 @@ _arguments -s -C -S \
   '*::args: _normal' && return
 
 if [[ $state = groups ]]; then
-  if ! zstyle -s ":completion:$curcontext:dsh-groups" dsh-groups grp; then
+  if ! zstyle -s ":completion:${curcontext}:dsh-groups" dsh-groups grp; then
     [[ -e ~/.dsh/group ]] && grp="~/.dsh/group" || return 1
   fi
   _path_files -W ~/.dsh/group && return

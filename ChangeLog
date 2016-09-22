@@ -1,3 +1,9 @@
+2016-09-22  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 39410: Completion/Darwin/Type/_retrieve_mac_apps,
+	Completion/Unix/Command/_dsh, Completion/Unix/Type/_dates:
+	Fix unintentional history modifiers.
+
 2016-09-22  Adam Gibbins  <adam@adamgibbins.com>
 
 	* unposted: Completion/Unix/Command/_gpg: Correct typo

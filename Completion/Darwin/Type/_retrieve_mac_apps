@@ -71,7 +71,7 @@ _retrieve_mac_apps() {
 
     # Get application search method
     typeset retrieve
-    if ! zstyle -s ":completion:*:*:$service:commands" search-method retrieve
+    if ! zstyle -s ":completion:*:*:${service}:commands" search-method retrieve
     then
       if [[ -d /.Spotlight-V100 ]]; then
         # / is indexed to use Spotlight
@@ -80,7 +80,7 @@ _retrieve_mac_apps() {
         # Fall back to the old way
         retrieve=_mac_apps_old_retrieve 
       fi
-      zstyle ":completion:*:*:$service:commands" search-method $retrieve
+      zstyle ":completion:*:*:${service}:commands" search-method $retrieve
     fi
 
     # Get root directories to search applications
