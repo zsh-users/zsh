@@ -213,8 +213,12 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
     local p
     [[ -f "${patchdir}/done" ]] &&
     for p in ${(f)"$(< "${patchdir}/done")"}; do
-        # remove action
-        git_patches_applied+=("${${(s: :)p}[2,-1]}")
+        # pick/edit/fixup/squash/reword: Add "$hash $subject" to $git_patches_applied.
+        # exec: Add "exec ${command}" to $git_patches_applied.
+        # (anything else): As 'exec'.
+        p=${p/(#s)(p|pick|e|edit|r|reword|f|fixup|s|squash) /}
+        p=${p/(#s)x /exec }
+        git_patches_applied+=("$p")
     done
     if [[ -f "${patchdir}/git-rebase-todo" ]] ; then
         git_patches_unapplied=(${(f)"$(grep -v '^$' "${patchdir}/git-rebase-todo" | grep -v '^#')"})

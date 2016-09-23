@@ -1,3 +1,9 @@
+2016-09-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 39423: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: Produce nicer applied-string messages for 'exec'
+	actions.
+
 2016-09-23  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 39412: Src/Zle/computil.c: Fix directory completion when
