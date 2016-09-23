@@ -1,5 +1,8 @@
 2016-09-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39423: Completion/Zsh/Command/_zed: Support the '--'
+	end-of-options mark.
+
 	* 39423: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	vcs_info git: Produce nicer applied-string messages for 'exec'
 	actions.
