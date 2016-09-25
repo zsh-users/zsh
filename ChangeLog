@@ -1,5 +1,8 @@
 2016-09-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 39436: Src/exec.c, Src/signals.c: Don't execute builtin if
+	interrupted; set lastval to 128 + SIGINT on interrupt.
+
 	* 39435: Src/exec.c: Don't set gleader of SUBJOB immediately if
 	SUPERJOB has no processes.
 

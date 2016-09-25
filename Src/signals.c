@@ -646,6 +646,7 @@ zhandler(int sig)
 		inerrflush();
 		check_cursh_sig(SIGINT);
             }
+	    lastval = 128 + SIGINT;
         }
         break;
 

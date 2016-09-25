@@ -3701,7 +3701,8 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		    state->pc = opc;
 		}
 		dont_queue_signals();
-		lastval = execbuiltin(args, assigns, (Builtin) hn);
+		if (!errflag)
+		    lastval = execbuiltin(args, assigns, (Builtin) hn);
 		if (do_save & BINF_COMMAND)
 		    errflag &= ~ERRFLAG_ERROR;
 		restore_queue_signals(q);
