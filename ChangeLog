@@ -1,3 +1,8 @@
+2016-09-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 39435: Src/exec.c: Don't set gleader of SUBJOB immediately if
+	SUPERJOB has no processes.
+
 2016-09-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 39423: Completion/Zsh/Command/_zed: Support the '--'
