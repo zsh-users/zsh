@@ -289,6 +289,8 @@ execselect(Estate state, UNUSED(int do_exec))
 	    	}
 	    } else
 		str = (char *)getlinknode(bufstack);
+            if (!str && !errflag)
+                setsparam("REPLY", ztrdup("")); /* EOF (user pressed Ctrl+D) */
 	    if (!str || errflag) {
 		if (breaks)
 		    breaks--;
