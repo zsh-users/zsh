@@ -1,3 +1,9 @@
+2016-09-30  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 39452 + comment from 39432: Src/Zle/zle_main.c: Call the
+	pre-redraw hook if there is text in the buffer on init (from
+	popping or zle-line-init setting $BUFFER)
+
 2016-09-30  Oliver Kiddle  <opk@zsh.org>
 
 	* 39514: Completion/Unix/Command/_git: handle --git-dir

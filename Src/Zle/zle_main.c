@@ -1162,7 +1162,16 @@ zlecore(void)
     popheap();
 }
 
-/* Read a line.  It is returned metafied. */
+/* Read a line.  It is returned metafied.
+ *
+ * Parameters:
+ * - lp: left prompt, e.g., $PS1
+ * - rp: right prompt, e.g., $RPS1
+ * - flags: ZLRF_* flags (I think), see zlereadflags
+ * - context: ZLCON_* flags (I think), see zlecontext
+ * - init: "zle-line-init"
+ * - finish: "zle-line-finish"
+ */
 
 /**/
 char *
@@ -1298,6 +1307,9 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     unqueue_signals();	/* Should now be safe to acknowledge SIGWINCH */
 
     zlecallhook(init, NULL);
+
+    if (zleline && *zleline)
+	redrawhook();
 
     if ((bracket = getaparam("zle_bracketed_paste")) && arrlen(bracket) == 2)
 	fputs(*bracket, shout);
