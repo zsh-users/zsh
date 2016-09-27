@@ -1,3 +1,9 @@
+2016-09-27  Oliver Kiddle  <opk@zsh.org>
+
+	* 39369 (tweaked cf 39371): Src/Zle/zle_thingy.c: when calling
+	an internal widget, set bindk because some widgets use it to
+	determine how they should act
+
 2016-09-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 39437: Src/exec.c: use list_pipe_pid in assignment for clarity

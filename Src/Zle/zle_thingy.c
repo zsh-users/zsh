@@ -756,6 +756,10 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
     }
 
     t = rthingy(wname);
+    /* for internal widgets we set bindk except for when getting
+     * a vi range to detect a repeated key */
+    setbindk = setbindk ||
+	(t->widget && (t->widget->flags & (WIDGET_INT | ZLE_VIOPER)) == WIDGET_INT));
     ret = execzlefunc(t, args, setbindk);
     unrefthingy(t);
     if (saveflag)
