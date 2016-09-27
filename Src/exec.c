@@ -1702,7 +1702,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 			    jobtab[list_pipe_job].other = newjob;
 			    jobtab[list_pipe_job].stat |= STAT_SUPERJOB;
 			    jn->stat |= STAT_SUBJOB | STAT_NOPRINT;
-			    jn->other = pid;
+			    jn->other = list_pipe_pid;	/* see zsh.h */
 			    if (hasprocs(list_pipe_job))
 				jn->gleader = jobtab[list_pipe_job].gleader;
 			}
