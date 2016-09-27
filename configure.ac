@@ -2035,6 +2035,8 @@ AC_CACHE_VAL(zsh_cv_cs_path,
   zsh_cv_cs_path=`getconf _CS_PATH`
 elif getconf CS_PATH >/dev/null 2>&1; then
   zsh_cv_cs_path=`getconf CS_PATH`
+elif getconf PATH >/dev/null 2>&1; then
+  zsh_cv_cs_path=`getconf PATH`
 else
   zsh_cv_cs_path="/bin:/usr/bin"
 fi])
