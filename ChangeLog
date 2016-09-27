@@ -1,5 +1,8 @@
 2016-09-27  Oliver Kiddle  <opk@zsh.org>
 
+	* Marko Myllynen: 39453: Completion/Unix/Command/_openstack:
+	new openstack completions
+
 	* 39369 (tweaked cf 39371): Src/Zle/zle_thingy.c: when calling
 	an internal widget, set bindk because some widgets use it to
 	determine how they should act

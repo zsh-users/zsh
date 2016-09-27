@@ -1,0 +1,192 @@
+#compdef openstack aodh barbican ceilometer cinder cloudkitty designate glance gnocchi heat ironic keystone magnum manila mistral monasca murano neutron nova sahara senlin swift trove
+
+# https://wiki.openstack.org/wiki/OpenStackClients
+# http://docs.openstack.org/user-guide/common/cli-install-openstack-command-line-clients.html
+
+local curcontext="$curcontext" state line expl ret=1
+
+local -a clnts_compl_new clnts_compl_old clnts_swift_like
+
+#
+# We support three different client categories:
+#  1) Clients with new style complete command where output is like:
+#
+#    cmds='alarm alarm-history capabilities complete help'
+#    cmds_alarm='create delete list show update'
+#    cmds_alarm_history='search show'
+#    cmds_alarm_history_search='-h --help -f --format -c --column --max-width --noindent --quote --query'
+#
+#  2) Clients with old style bash-completion command which does
+#     not separate options and commands:
+#
+#    --tenant_id floatingip-delete bgp-peer-delete --default-prefixlen net-create [...]
+#
+#  3) Swift, slightly different from 2)
+#
+clnts_compl_new=( aodh barbican designate gnocchi openstack )
+clnts_compl_old=( ceilometer cinder cloudkitty glance heat ironic keystone magnum manila mistral monasca murano neutron nova sahara senlin trove )
+clnts_swift_like=( swift )
+
+# Python clients take quite some time to start up and some (openstack(1))
+# even go over the network for completions so we cache things pretty hard
+if (( ! $+_cache_openstack_clnt_opts )); then
+  typeset -gA _cache_openstack_clnt_outputs
+  typeset -gA _cache_openstack_clnt_opts
+  typeset -gA _cache_openstack_clnt_cmds
+  typeset -gA _cache_openstack_clnt_cmds_opts
+  typeset -gA _cache_openstack_clnt_cmds_subcmds
+  typeset -gA _cache_openstack_clnt_cmds_subcmd_opts
+fi
+
+local -a conn_opts
+local opt arg word
+# Only openstack(1) requires parameters to provide completion info
+if [[ $service == openstack && -n ${words[(r)--os-*]} ]]; then
+  if (( ! $+_cache_openstack_conn_opts )); then
+    _cache_openstack_conn_opts=( ${(M)${=${(f)"$($service help 2>/dev/null)"}}:#--os-*} )
+  fi
+  # --os-tenant-id --os-tenant-name are deprecated but still widely used
+  for opt in ${=_cache_openstack_conn_opts} --os-tenant-id --os-tenant-name; do
+    arg=
+    for word in ${words:1}; do
+      [[ $word == $opt ]] && arg=$word && break
+    done
+    [[ -n $arg && -n ${arg##-*} ]] && conn_opts=( $conn_opts $opt $arg )
+  done
+fi
+
+# New style clients
+if [[ -n ${clnts_compl_new[(r)$service]} ]]; then
+  if [[ -z $_cache_openstack_clnt_cmds[$service] ]]; then
+    # Populate caches - clnt_outputs is command raw output used later
+    _cache_openstack_clnt_outputs[$service]=${:-"$($service ${(Q)conn_opts} complete 2>/dev/null)"}
+    _cache_openstack_clnt_opts[$service]=${${${${(M)${${${${=${(f)"$($service help 2>/dev/null)"}}/\[}/\]}/\;}:#-[-0-9A-Za-z]*}/,}/\.}%--os-}
+    _cache_openstack_clnt_cmds[$service]=${${${${_cache_openstack_clnt_outputs[$service]}/* cmds=\'}/\'*}/complete}
+  fi
+  local cmd subcmd
+  # Determine the command
+  for word in ${words:1}; do
+    local s=${_cache_openstack_clnt_cmds[$service]}
+    [[ $s[(wI)$word] -gt 0 ]] && cmd=$word && break
+  done
+  # Populate the subcommand cache
+  if [[ -n $cmd && -z $_cache_openstack_clnt_cmds_subcmds[$service$cmd] ]]; then
+      local t=cmds_${cmd//-/_}
+      _cache_openstack_clnt_cmds_subcmds[$service$cmd]=${${${_cache_openstack_clnt_outputs[$service]}/* $t=\'}/\'*}
+  fi
+  # Determine the subcommand
+  if [[ -n $cmd ]]; then
+    for word in ${words:2}; do
+      local s=${_cache_openstack_clnt_cmds_subcmds[$service$cmd]}
+      [[ $s[(wI)$word] -gt 0 ]] && subcmd=$word && break
+    done
+    # Populate subcommand option cache
+    if [[ -n $subcmd && -z $_cache_openstack_clnt_cmds_subcmd_opts[$service${cmd}--$subcmd] ]]; then
+      local t=cmds_${cmd//-/_}_${subcmd//-/_}
+      _cache_openstack_clnt_cmds_subcmd_opts[$service${cmd}--$subcmd]=${${${_cache_openstack_clnt_outputs[$service]}/* $t=\'}/\'*}
+    fi
+  fi
+  # Special treatment for the help command
+  if [[ $cmd == help ]]; then
+      if [[ $words[CURRENT-1] == $cmd && $words[CURRENT] != -* ]]; then
+        # Offer commands
+        [[ -n $_cache_openstack_clnt_cmds[$service] ]] && _values -w option ${(u)=_cache_openstack_clnt_cmds[$service]} && ret=0
+      elif [[ $words[CURRENT-2] == $cmd && $words[CURRENT-1] != -* && $words[CURRENT] != -* ]]; then
+        # Offer subcommands
+        local cmd=$words[CURRENT-1]
+        local t=cmds_${cmd//-/_}
+        [[ -z $_cache_openstack_clnt_cmds_subcmds[$service$cmd] ]] && _cache_openstack_clnt_cmds_subcmds[$service$cmd]=${${${_cache_openstack_clnt_outputs[$service]}/* $t=\'}/\'*}
+        [[ -n $_cache_openstack_clnt_cmds_subcmds[$service$cmd] ]] && _values -w option ${(u)=_cache_openstack_clnt_cmds_subcmds[$service$cmd]} && ret=0
+      else
+        # Handle help<TAB> properly
+        _values -w option help && ret=0
+      fi
+  # Client options
+  elif [[ -z $cmd && $words[CURRENT] == -* ]]; then
+    _values -w option ${(u)=_cache_openstack_clnt_opts[$service]} && ret=0
+  # Commands
+  elif [[ -z $cmd ]]; then
+    if [[ -z $_cache_openstack_clnt_cmds[$service] ]]; then
+      _message "missing authentication options"
+    else
+      _values -w option ${(u)=_cache_openstack_clnt_cmds[$service]} && ret=0
+    fi
+  # Subcommands
+  elif [[ -z $subcmd ]]; then
+    [[ -n $_cache_openstack_clnt_cmds_subcmds[$service$cmd] ]] && _values -w option ${(u)=_cache_openstack_clnt_cmds_subcmds[$service$cmd]} && ret=0
+  # Subcommand options
+  else
+    { ! zstyle -T ":completion:${curcontext}:options" prefix-needed || [[ -prefix - ]] } && \
+      [[ -n $_cache_openstack_clnt_cmds_subcmd_opts[$service${cmd}--$subcmd] ]] && _values -w option ${(u)=_cache_openstack_clnt_cmds_subcmd_opts[$service${cmd}--$subcmd]//\:/\\\:} && ret=0
+  fi
+
+# Old style clients
+elif [[ -n ${clnts_compl_old[(r)$service]} ]]; then
+  if [[ -z $_cache_openstack_clnt_cmds[$service] ]]; then
+    # Populate caches
+    _cache_openstack_clnt_opts[$service]=${${${(M)${${${${=${(f)"$($service help 2>/dev/null)"}}/\[}/\]}/\;}:#-[-0-9A-Za-z]*}/,}/\.}
+    _cache_openstack_clnt_cmds[$service]=${${(M)${=${(f)"$($service bash-completion 2>/dev/null)"}}:#[A-Za-z]*}/bash-completion}
+  fi
+  local cmd
+  # Determine the command
+  for word in ${words:1}; do
+    local s=${_cache_openstack_clnt_cmds[$service]}
+    [[ $s[(wI)$word] -gt 0 ]] && cmd=$word && break
+  done
+  # Populate command option cache
+  # Mostly no options for help, prevent consecutive calls with help here
+  if [[ -n $cmd && $cmd != help && -z $_cache_openstack_clnt_cmds_opts[$service$cmd] ]]; then
+    _cache_openstack_clnt_cmds_opts[$service$cmd]=${${${(M)${${${${=${(f)"$($service help $cmd 2>/dev/null)"}}/\[}/\]}/\;}:#-[-0-9A-Za-z]*}/,}/\.}
+  fi
+  # Special treatment for the help command
+  if [[ $cmd == help ]]; then
+      if [[ $words[CURRENT-1] == help && $words[CURRENT] != -* ]]; then
+        _values -w option ${(u)=_cache_openstack_clnt_cmds[$service]} && ret=0
+      else
+        _values -w option help && ret=0
+      fi
+  # Client options
+  elif [[ -z $cmd && $words[CURRENT] == -* ]]; then
+    _values -w option ${(u)=_cache_openstack_clnt_opts[$service]} && ret=0
+  # Commands
+  elif [[ -z $cmd ]]; then
+    _values -w option ${(u)=_cache_openstack_clnt_cmds[$service]} && ret=0
+  # Command options
+  else
+    { ! zstyle -T ":completion:${curcontext}:options" prefix-needed || [[ -prefix - ]] } && \
+      [[ -n $_cache_openstack_clnt_cmds_opts[$service$cmd] ]] && _values -w option ${(u)=_cache_openstack_clnt_cmds_opts[$service$cmd]//\:/\\\:} && ret=0
+  fi
+
+# Swift like clients
+elif [[ -n ${clnts_swift_like[(r)$service]} ]]; then
+  if [[ -z $_cache_openstack_clnt_cmds[$service] ]]; then
+    # Populate caches - clnt_outputs is command raw output used later
+    _cache_openstack_clnt_outputs[$service]=${(f)"$($service --help 2>/dev/null)"}
+    _cache_openstack_clnt_opts[$service]=${${${${(M)${${${${=_cache_openstack_clnt_outputs[$service]}/\[}/\]}/\;}:#-[-0-9A-Za-z]*}/,}/\.}/=*}
+    _cache_openstack_clnt_cmds[$service]=${=${(M)${(M)${(f)_cache_openstack_clnt_outputs[$service]}:#    [a-z]*}/ [A-Z]*}}
+  fi
+  local cmd
+  # Determine the command
+  for word in ${words:1}; do
+    local s=${_cache_openstack_clnt_cmds[$service]}
+    [[ $s[(wI)$word] -gt 0 ]] && cmd=$word && break
+  done
+  # Populate command option cache
+  if [[ -n $cmd && -z $_cache_openstack_clnt_cmds_opts[$service$cmd] ]]; then
+    _cache_openstack_clnt_cmds_opts[$service$cmd]=${${${(M)${${${${=${(f)"$($service $cmd --help 2>/dev/null)"}}/\[}/\]}/\;}:#-[-0-9A-Za-z]*}/,}/\.}
+  fi
+  # Client options
+  if [[ -z $cmd && $words[CURRENT] == -* ]]; then
+    _values -w option ${(u)=_cache_openstack_clnt_opts[$service]} && ret=0
+  # Commands
+  elif [[ -z $cmd ]]; then
+    _values -w option ${(u)=_cache_openstack_clnt_cmds[$service]} && ret=0
+  # Command options
+  else
+    { ! zstyle -T ":completion:${curcontext}:options" prefix-needed || [[ -prefix - ]] } && \
+      [[ -n $_cache_openstack_clnt_cmds_opts[$service$cmd] ]] && _values -w option ${(u)=_cache_openstack_clnt_cmds_opts[$service$cmd]//\:/\\\:} && ret=0
+  fi
+
+fi
+
+return ret
