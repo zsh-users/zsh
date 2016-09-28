@@ -298,7 +298,7 @@ _rpm () {
 	  ${(f)"$(_call_program capabilities rpm -qa --queryformat '%\{requirename}\\n' 2>/dev/null)"} && ret=0
       ;;
     relocate)
-      if compset -P '*='; then
+      if compset -P 1 '*='; then
 	_description directories expl 'new path'
       else
 	_description directories expl 'old path'

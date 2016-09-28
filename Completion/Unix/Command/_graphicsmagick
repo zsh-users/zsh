@@ -360,7 +360,7 @@ case "$words[2]" in
       '*:picture file:_imagemagick' && return
 
     if [[ "$state" = profile ]]; then
-      if compset -P '*:'; then
+      if compset -P 1 '*:'; then
 	_files
       else
 	_wanted prefixes expl 'profile type' compadd icc: iptc:

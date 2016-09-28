@@ -595,7 +595,7 @@ _cvs_tempdir() {
 
 (( $+functions[_cvs_user_variable] )) ||
 _cvs_user_variable() {
-  if compset -P '*='; then
+  if compset -P 1 '*='; then
     _default
   else
     _message -e variables "variable"

@@ -58,11 +58,14 @@ if compset -P '%[FK]'; then
 fi
 
 if compset -P '%[0-9-\\]#(\\|)\([0-9-]#[^0-9]'; then
+  # ternary conditional: first delimiter
   compset -S '*'
   _delimiters && ret=0
 elif compset -P '%[0-9-\\]#[<>\]]'; then
+  # truncation
   _message -e replacements 'replacement string'
 elif compset -P '%[0-9-\\]#(\\|)\([0-9-]#'; then
+  # ternary conditional: condition character
   compset -S '[.:+/-%]*' || suf=( -S . )
   compset -S '*'
   specs=(

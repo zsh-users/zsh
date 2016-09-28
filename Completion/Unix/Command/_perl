@@ -56,7 +56,7 @@ _perl_normal() {
 _perl_m_opt () {
   compset -P '-'
 
-  if compset -P '*='; then
+  if compset -P 1 '*='; then
     _message -e module-arguments 'module arguments, comma separated'
   else
     _perl_modules -S= -q

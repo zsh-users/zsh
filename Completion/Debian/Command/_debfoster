@@ -26,10 +26,10 @@ _arguments -C \
   && ret=0
 
 if [[ -n "$state" ]]; then
-  if compset -P '*='; then
+  if compset -P 1 '*='; then
     case "$IPREFIX" in
     *(#i)(install|remove|info)cmd*)
-      _wanted values expl 'command string' _command && ret=0
+      _wanted values expl 'command string' _cmdstring && ret=0
       ;;
     *(#i)(keeperfile|dpkg(status|available))*)
       _wanted values expl 'metadata file' _files && ret=0

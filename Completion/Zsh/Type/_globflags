@@ -1,5 +1,8 @@
 #autoload
 
+# Complete 'globbing flags', i.e., '(#x)'; everything up to the '#' will
+# have been "compset -P"'d by the caller.
+
 local ret=1
 local -a flags
 

@@ -106,10 +106,10 @@ fi
 _arguments -C -s "$args[@]" && ret=0
 
 if [[ $state = afile ]]; then
-  if compset -P '*:'; then
-    # TODO: doesn't need to be rsh.
-    _wanted files expl 'remote files' \
-       compadd $(rsh ${words[CURRENT]%:*} echo ${words[CURRENT]#*:}\*) && ret=0
+  if [[ $ig != gnu ]]; then
+    _files && ret=0
+  elif compset -P 1 '*:'; then
+    _remote_files -- ssh && ret=0
   elif compset -P '*@'; then
     _wanted hosts expl 'remote host name' _hosts && ret=0
   else

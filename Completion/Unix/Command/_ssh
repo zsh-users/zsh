@@ -200,7 +200,7 @@ _ssh () {
 
     case "$lstate" in
     option)
-      if compset -P '*='; then
+      if compset -P 1 '*='; then
         case "${IPREFIX#-o}" in
           (#i)(ciphers|macs|kexalgorithms|hostkeyalgorithms|pubkeyacceptedkeytypes|hostbasedkeytypes)=)
           if ! compset -P +; then
@@ -628,9 +628,9 @@ _ssh () {
       fi
       ;;
     file)
-      if compset -P '[^./][^/]#:'; then
+      if compset -P 1 '[^./][^/]#:'; then
         _remote_files -- ssh ${(kv)~opt_args[(I)-[FP1246]]/-P/-p} && ret=0
-      elif compset -P '*@'; then
+      elif compset -P 1 '*@'; then
         suf=( -S '' )
         compset -S ':*' || suf=( -r: -S: )
         _wanted hosts expl 'remote host name' _ssh_hosts $suf && ret=0
@@ -642,9 +642,9 @@ _ssh () {
       fi
       ;;
     rfile)
-      if compset -P '*:'; then
+      if compset -P 1 '*:'; then
         _remote_files -- ssh && ret=0
-      elif compset -P '*@'; then
+      elif compset -P 1 '*@'; then
         _wanted hosts expl host _ssh_hosts -r: -S: && ret=0
       else
         _alternative \

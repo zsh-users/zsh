@@ -856,7 +856,7 @@ fsopt)
 devordir)
   local dev_tmp mp_tmp mline
 
-  if compset -P '*:'; then
+  if compset -P 1 '*:'; then
     _wanted exports expl 'exported path' compadd \
 	${${(f)"$(path+=( {/usr,}/sbin(N) ) _call_program exports \
 	showmount -e ${IPREFIX%:} 2>/dev/null)"}[2,-1]%% *} && ret=0

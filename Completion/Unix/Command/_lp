@@ -44,7 +44,7 @@ _lp_job_options()
 
   # The program specified by the style list-printer-options should list jobs in
   # the same style as lpoptions -l.
-  if compset -P '*='; then
+  if compset -P 1 '*='; then
     # List values for the option
     case ${IPREFIX%=} in
       (media)

@@ -69,8 +69,9 @@ case "$state" in
       "F $sep Append a \`*' for executable files"
       "G $sep Inhibit display of group information"
       "Q $sep Enclose file names in double quotes" )
+    # The "Z" on the next line is sentinel to prevent the character class from being empty.
     disp=( ${disp[@]:#[Z$PREFIX]*} )
-    compset -P '[FGQ]*'
+    compset -P '[FGQ]#'
     compadd -d disp - ${disp[@]%% *} && ret=0
   ;;
 esac

@@ -123,7 +123,7 @@ _modutils() {
 	    ;;
 
 	params)
-	    if compset -P '*='; then
+	    if compset -P 1 '*='; then
 		_message -e value 'parameter value'
 	    else
 		local params

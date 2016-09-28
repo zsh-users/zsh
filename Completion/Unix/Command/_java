@@ -578,7 +578,7 @@ encoding)
   ;;
 
 property)
-  if compset -P '*='; then
+  if compset -P 1 '*='; then
     _default && return
   else
     _message -e property-names 'property name'

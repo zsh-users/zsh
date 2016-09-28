@@ -38,9 +38,9 @@ _rlogin () {
       '*:files:->files' && ret=0
 
     if [[ -n "$state" ]]; then
-      if compset -P '*:'; then
+      if compset -P 1 '*:'; then
 	_remote_files -- rsh && ret=0
-      elif compset -P '*@'; then
+      elif compset -P 1 '*@'; then
         _wanted hosts expl host _rlogin_hosts -S: && ret=0
       else
         _alternative \

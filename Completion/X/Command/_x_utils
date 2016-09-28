@@ -82,12 +82,16 @@ xev)
 xhost)
   local type tmp match
 
+  if [[ -z $PREFIX ]]; then
+    _describe prefixes '(-:disallow +:allow)' -S '' -r ''
+  fi
+
   if compset -P '-'; then
     tmp=(${(f)"$(xhost)"})
     shift tmp
     tmp=(${tmp:#LOCAL:|<*>})
     if [[ "$tmp" = *:* ]]; then
-      if compset -P '(#b)(*):'; then
+      if compset -P 1 '(#b)(*):'; then
 	type="$match[1]"
 	_tags displays
 	while _tags; do
@@ -118,7 +122,7 @@ xhost)
 
     if [[ "$PREFIX" = *:* ]]; then
       type="${(L)PREFIX%%:*}"
-      compset -P '*:'
+      compset -P 1 '*:'
 
       case "$type" in
       inet) _hosts && ret=0;;

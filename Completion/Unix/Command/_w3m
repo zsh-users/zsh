@@ -90,7 +90,7 @@ case "$state" in
   option)
     local -a options
     options=( ${${(M)${(f)"$(_call_program options $words[1] -show-option 2>/dev/null)"}:#    -o *}/(#b)    -o (*)=[^ ]#[[:blank:]]##(*)/$match[1]:${match[2]:l}} )
-    if compset -P '*='; then
+    if compset -P 1 '*='; then
       _message -e values 'value'
     else
       compset -S '=*' || suf=( -S '=' )
@@ -98,7 +98,7 @@ case "$state" in
     fi
   ;;
   pauth)
-    if compset -P '*:'; then
+    if compset -P 1 '*:'; then
       _message -e passwords 'password'
     else
       compset -S ':*' || suf=( -S ':' )

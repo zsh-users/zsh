@@ -1,7 +1,7 @@
 #compdef getopts unset
 
 # This will handle completion of keys of associative arrays, e.g. at
-# `vared foo[<TAB>'.
+# `vared foo[<TAB>' could complete to `vared foo[key]'.
 
 local ret=1
 

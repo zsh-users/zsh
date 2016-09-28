@@ -32,7 +32,7 @@ else
     fi
     ;;
   sname)
-    if compset -P '*='; then
+    if compset -P 1 '*='; then
       case "$IPREFIX" in
       *DEVICE\=)
         _wanted devices expl 'ghostscript device' \

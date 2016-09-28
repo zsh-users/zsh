@@ -1,3 +1,28 @@
+2016-10-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 39479 + 39481 minus _path_files hunk (see
+	39489): Completion/Debian/Command/_debfoster,
+	Completion/Linux/Command/_modutils,
+	Completion/Redhat/Command/_rpm, Completion/Unix/Command/_ant,
+	Completion/Unix/Command/_cpio, Completion/Unix/Command/_cvs,
+	Completion/Unix/Command/_dbus, Completion/Unix/Command/_git,
+	Completion/Unix/Command/_graphicsmagick,
+	Completion/Unix/Command/_growisofs, Completion/Unix/Command/_gs,
+	Completion/Unix/Command/_gsettings,
+	Completion/Unix/Command/_head,
+	Completion/Unix/Command/_imagemagick,
+	Completion/Unix/Command/_java, Completion/Unix/Command/_lp,
+	Completion/Unix/Command/_lzop, Completion/Unix/Command/_mount,
+	Completion/Unix/Command/_perl, Completion/Unix/Command/_php,
+	Completion/Unix/Command/_rlogin, Completion/Unix/Command/_ssh,
+	Completion/Unix/Command/_tail, Completion/Unix/Command/_w3m,
+	Completion/X/Command/_rdesktop, Completion/X/Command/_x_utils,
+	Completion/Zsh/Command/_fc, Completion/Zsh/Type/_arrays,
+	Completion/Zsh/Type/_globflags, Completion/Zsh/Type/_ps1234,
+	Completion/Zsh/Type/_vars: Completion: audit 'compset -P'
+	calls to use shortest match where applicable, plus random
+	drive-by tweaks.
+
 2016-10-06  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Julien Cretin: 39579: Src/subst.c: position of \0

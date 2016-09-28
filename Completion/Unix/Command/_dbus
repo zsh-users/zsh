@@ -32,7 +32,7 @@ esac
 case $state in
   addresses)
     compset -P '*;'
-    if compset -P '*='; then
+    if compset -P 1 '*='; then
       _files && ret=0
     else
       _message -e addresses address

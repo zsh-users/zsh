@@ -68,7 +68,7 @@ esac
 
 if [[ -n $state ]]; then
   zstyle -s ":completion:${curcontext}:" list-separator sep || sep=--
-  if [[ -z ${line:#*=*} ]] && compset -P '*='; then
+  if [[ -z ${line:#*=*} ]] && compset -P 1 '*='; then
     _message -e replacements 'replacement'
   elif [[ -prefix [0-9] ]]; then
     events=( ${(0)"$(printf "%-${#HISTNO}.${#HISTNO}s $sep %s\0" "${(kv)history[@]}")"} )

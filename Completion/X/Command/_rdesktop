@@ -89,9 +89,8 @@ case $state in
   ;;
   redirection)
     redir="${PREFIX%%:*}"
-    if compset -P '*='; then
+    if compset -P 1 '*='; then
       curcontext="${curcontext%:*}:$redir"
-      compset -P '*='
       case $redir in
 	comport|lptport) _wanted devices expl device _files -g '*(-%)' && ret=0 ;;
 	disk) _directories && ret=0 ;;

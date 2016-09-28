@@ -116,7 +116,7 @@ _mkisofs_sparc_boot_images () {
 _mkisofs_pathspec () {
   local sep
   if (( $words[(I)-graft-points] )); then
-    if ! compset -P '*[^\\]\='; then
+    if ! compset -P 1 '*[^\\]\='; then
       sep='-qS='
     fi
   fi
@@ -335,7 +335,7 @@ else
 
     case "$state" in
       (devimg)
-      if compset -P \*=; then
+      if compset -P 1 '*='; then
         _files
       else
         _files -g "*(%,@)"

@@ -50,7 +50,7 @@ case $state in
     local -a directives suf
     local code='foreach (ini_get_all() as $k => $v) { echo "$k\n"; }'
     directives=( $(_call_program directives $words[1] -r ${(q)code} 2>/dev/null) )
-    if compset -P '*='; then
+    if compset -P 1 '*='; then
       _default && return 0
     else
       compset -S '=*' || suf=( -qS '=' )

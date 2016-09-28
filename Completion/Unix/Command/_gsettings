@@ -31,7 +31,7 @@ case $state in
     state=''
   ;;
   schemata)
-    if compset -P '*:'; then
+    if compset -P 1 '*:'; then
       _directories && ret=0
     else
       _wanted schemata expl 'schema' compadd -M 'r:|.=* r:|=*' \
