@@ -1,3 +1,9 @@
+2016-09-28  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39460: Src/params.c, Src/zsh.h: don't import PS4 if running as
+	root.  Currently no known exploit with this in zsh as xtrace
+	needs an explicit option setting, so this is just precautionary.
+
 2016-09-27  Oliver Kiddle  <opk@zsh.org>
 
 	* Marko Myllynen: 39453: Completion/Unix/Command/_openstack:

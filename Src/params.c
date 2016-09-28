@@ -333,6 +333,7 @@ IPDEF6("TRY_BLOCK_ERROR", &try_errflag, varinteger_gsu),
 IPDEF6("TRY_BLOCK_INTERRUPT", &try_interrupt, varinteger_gsu),
 
 #define IPDEF7(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
+#define IPDEF7R(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_DONTIMPORT_ROOT},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
 #define IPDEF7U(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
 IPDEF7("OPTARG", &zoptarg),
 IPDEF7("NULLCMD", &nullcmd),
@@ -345,7 +346,7 @@ IPDEF7("PS2", &prompt2),
 IPDEF7U("RPS2", &rprompt2),
 IPDEF7U("RPROMPT2", &rprompt2),
 IPDEF7("PS3", &prompt3),
-IPDEF7("PS4", &prompt4),
+IPDEF7R("PS4", &prompt4),
 IPDEF7("SPROMPT", &sprompt),
 
 #define IPDEF8(A,B,C,D) {{NULL,A,D|PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(colonarr_gsu),0,0,NULL,C,NULL,0}
@@ -689,7 +690,28 @@ split_env_string(char *env, char **name, char **value)
     } else
 	return 0;
 }
-    
+
+/**
+ * Check parameter flags to see if parameter shouldn't be imported
+ * from environment at start.
+ *
+ * return 1: don't import: 0: ok to import.
+ */
+static int dontimport(int flags)
+{
+    /* If explicitly marked as don't export */
+    if (flags & PM_DONTIMPORT)
+	return 1;
+    /* If value already exported */
+    if (flags & PM_EXPORTED)
+	return 1;
+    /* If security issue when exporting as root */
+    if ((flags & PM_DONTIMPORT_ROOT) && (!getuid() || !geteuid()))
+	return 1;
+    /* OK to import */
+    return 0;
+}
+
 /* Set up parameter hash table.  This will add predefined  *
  * parameter entries as well as setting up parameter table *
  * entries for environment variables we inherit.           */
@@ -781,8 +803,13 @@ createparamtable(void)
 	    envp2 = environ; *envp2; envp2++) {
 	if (split_env_string(*envp2, &iname, &ivalue)) {
 	    if (!idigit(*iname) && isident(iname) && !strchr(iname, '[')) {
+		/*
+		 * Parameters that aren't already in the parameter table
+		 * aren't special to the shell, so it's always OK to
+		 * import.  Otherwise, check parameter flags.
+		 */
 		if ((!(pm = (Param) paramtab->getnode(paramtab, iname)) ||
-		     !(pm->node.flags & PM_DONTIMPORT || pm->node.flags & PM_EXPORTED)) &&
+		     !dontimport(pm->node.flags)) &&
 		    (pm = assignsparam(iname, metafy(ivalue, -1, META_DUP),
 				       ASSPM_ENV_IMPORT))) {
 		    pm->node.flags |= PM_EXPORTED;
