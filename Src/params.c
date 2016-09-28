@@ -827,7 +827,7 @@ createparamtable(void)
     }
     popheap();
 #ifndef USE_SET_UNSET_ENV
-    *envp = '\0';
+    *envp = NULL;
 #endif
     opts[ALLEXPORT] = oae;
 
