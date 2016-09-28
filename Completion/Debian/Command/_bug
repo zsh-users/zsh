@@ -7,7 +7,6 @@ _bug_commonargs=(
   '-m[maintainer-only]'
   '-p[print to stdout instead of mail]'
   '-h[help]'
-  '*:package:_deb_packages installed'
 )
 
 _rb_commonargs=(
@@ -29,6 +28,7 @@ case "$service" in
       '-v[version]' \
       '-x[do not cc submitter]' \
       '-z[send configs verbatim]' \
+      '*:package:_deb_packages installed' \
       "$_bug_commonargs[@]"
   ;;
   reportbug)
@@ -92,6 +92,7 @@ case "$service" in
       '(--paranoid)--no-paranoid' \
       '--body=:message body string' \
       '--body-file=:message body file:_files' \
+      '*:package: _alternative "packages::_deb_packages installed" "files::{ [[ \$PREFIX[1] == / ]] && _files }"' \
       "$_bug_commonargs[@]" \
       "$_rb_commonargs[@]"
   ;;
