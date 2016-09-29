@@ -3643,7 +3643,15 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 		returnval = 1;
 	    }
 	    popheap();
-	} else if ((cnam = findcmd(*argv, 1))) {
+	} else if (func == BIN_COMMAND &&
+		   (hn = builtintab->getnode(builtintab, *argv))) {
+	    /*
+	     * Special case for "command -p[vV]" which needs to
+	     * show a builtin in preference to an external command.
+	     */
+	    builtintab->printnode(hn, printflags);
+	    informed = 1;
+	} else if ((cnam = findcmd(*argv, 1, func == BIN_COMMAND))) {
 	    /* Found external command. */
 	    if (wd) {
 		printf("%s: command\n", *argv);

@@ -1,3 +1,10 @@
+2016-09-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39493: Src/builtin.c, Src/exec.c, Src/subst.c,
+	Test/A01grammar.ztst: make "command" with multiple options work
+	better and ensure "command -p" with "-v" or "-V" checks for a
+	builtin and then using the system default command path.
+
 2016-09-28  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Martijn Dekker: 39463: configure.ac: another way of getting

@@ -627,7 +627,7 @@ equalsubstr(char *str, int assign, int nomatch)
     cmdstr = dupstrpfx(str, pp-str);
     untokenize(cmdstr);
     remnulargs(cmdstr);
-    if (!(cnam = findcmd(cmdstr, 1))) {
+    if (!(cnam = findcmd(cmdstr, 1, 0))) {
 	if (nomatch)
 	    zerr("%s not found", cmdstr);
 	return NULL;

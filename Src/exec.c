@@ -207,7 +207,7 @@ static int (*execfuncs[WC_COUNT-WC_CURSH]) _((Estate, int)) = {
 
 /* structure for command builtin for when it is used with -v or -V */
 static struct builtin commandbn =
-    BUILTIN(0, 0, bin_whence, 0, -1, BIN_COMMAND, "vV", NULL);
+    BUILTIN("command", 0, bin_whence, 0, -1, BIN_COMMAND, "pvV", NULL);
 
 /* parse string into a list */
 
@@ -575,6 +575,41 @@ commandnotfound(char *arg0, LinkList args)
     return doshfunc(shf, args, 1);
 }
 
+/*
+ * Search the default path for cmd.
+ * pbuf of length plen is the buffer to use.
+ * Return NULL if not found.
+ */
+
+static char *
+search_defpath(char *cmd, char *pbuf, int plen)
+{
+    char *ps = DEFAULT_PATH, *pe = NULL, *s;
+
+    for (ps = DEFAULT_PATH; ps; ps = pe ? pe+1 : NULL) {
+	pe = strchr(ps, ':');
+	if (*ps == '/') {
+	    s = pbuf;
+	    if (pe) {
+		if (pe - ps >= plen)
+		    continue;
+		struncpy(&s, ps, pe-ps);
+	    } else {
+		if (strlen(ps) >= plen)
+		    continue;
+		strucpy(&s, ps);
+	    }
+	    *s++ = '/';
+	    if ((s - pbuf) + strlen(cmd) >= plen)
+		continue;
+	    strucpy(&s, cmd);
+	    if (iscom(pbuf))
+		return pbuf;
+	}
+    }
+    return NULL;
+}
+
 /* execute an external command */
 
 /**/
@@ -663,27 +698,10 @@ execute(LinkList args, int flags, int defpath)
 
     /* for command -p, search the default path */
     if (defpath) {
-	char *s, pbuf[PATH_MAX];
-	char *dptr, *pe, *ps = DEFAULT_PATH;
+	char pbuf[PATH_MAX];
+	char *dptr;
 
-	for(;ps;ps = pe ? pe+1 : NULL) {
-	    pe = strchr(ps, ':');
-	    if (*ps == '/') {
-		s = pbuf;
-		if (pe)
-		    struncpy(&s, ps, pe-ps);
-		else
-		    strucpy(&s, ps);
-		*s++ = '/';
-		if ((s - pbuf) + strlen(arg0) >= PATH_MAX)
-		    continue;
-		strucpy(&s, arg0);
-		if (iscom(pbuf))
-		    break;
-	    }
-	}
-
-	if (!ps) {
+	if (!search_defpath(arg0, pbuf, PATH_MAX)) {
 	    if (commandnotfound(arg0, args) == 0)
 		_exit(0);
 	    zerr("command not found: %s", arg0);
@@ -760,17 +778,26 @@ execute(LinkList args, int flags, int defpath)
 /*
  * Get the full pathname of an external command.
  * If the second argument is zero, return the first argument if found;
- * if non-zero, return the path using heap memory.  (RET_IF_COM(X), above).
+ * if non-zero, return the path using heap memory.  (RET_IF_COM(X),
+ * above).
+ * If the third argument is non-zero, use the system default path
+ * instead of the current path.
  */
 
 /**/
 mod_export char *
-findcmd(char *arg0, int docopy)
+findcmd(char *arg0, int docopy, int default_path)
 {
     char **pp;
     char *z, *s, buf[MAXCMDLEN];
     Cmdnam cn;
 
+    if (default_path)
+    {
+	if (search_defpath(arg0, buf, MAXCMDLEN))
+	    return docopy ? dupstring(buf) : arg0;
+	return NULL;
+    }
     cn = (Cmdnam) cmdnamtab->getnode(cmdnamtab, arg0);
     if (!cn && isset(HASHCMDS) && !isrelative(arg0))
 	cn = hashcmd(arg0, path);
@@ -2662,24 +2689,76 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    }
 	    checked = 0;
 	    if ((cflags & BINF_COMMAND) && nextnode(firstnode(args))) {
-		/* check for options to command builtin */
-		char *next = (char *) getdata(nextnode(firstnode(args)));
+		/*
+		 * Check for options to "command".
+		 * If just -p, this is handled here: use the default
+		 * path to execute.
+		 * If -v or -V, possibly with -p, dispatch to bin_whence
+		 * but with flag to indicate special handling of -p.
+		 * Otherwise, just leave marked as BINF_COMMAND
+		 * modifier with no additional action.
+		 */
+		LinkNode argnode = nextnode(firstnode(args));
+		char *argdata = (char *) getdata(argnode);
 		char *cmdopt;
-		if (next && *next == '-' && strlen(next) == 2 &&
-		        (cmdopt = strchr("pvV", next[1])))
-		{
-		    if (*cmdopt == 'p') {
-			uremnode(args, firstnode(args));
-			use_defpath = 1;
-			if (nextnode(firstnode(args)))
-			    next = (char *) getdata(nextnode(firstnode(args)));
-		    } else {
-			hn = &commandbn.node;
-			is_builtin = 1;
+		int has_p = 0, has_vV = 0, has_other = 0;
+		while (*argdata == '-') {
+		    /* Just to be definite, stop on single "-", too, */
+		    if (!argdata[1] || (argdata[1] == '-' && !argdata[2]))
+			break;
+		    for (cmdopt = argdata+1; *cmdopt; cmdopt++) {
+			switch (*cmdopt) {
+			case 'p':
+			    /*
+			     * If we've got this multiple times (command
+			     * -p -p) we'll treat the second -p as a
+			     * command because we only remove one below.
+			     * Don't think that's a big issue, and it's
+			     * also traditional behaviour.
+			     */
+			    has_p = 1;
+			    break;
+			case 'v':
+			case 'V':
+			    has_vV = 1;
+			    break;
+			default:
+			    has_other = 1;
+			    break;
+			}
+		    }
+		    if (has_other) {
+			/* Don't know how to handle this, so don't */
+			has_p = has_vV = 0;
 			break;
 		    }
+
+		    argnode = nextnode(argnode);
+		    if (!argnode)
+			break;
+		    argdata = (char *) getdata(argnode);
 		}
-		if (!strcmp(next, "--"))
+		if (has_vV) {
+		    /* Leave everything alone, dispatch to whence */
+		    hn = &commandbn.node;
+		    is_builtin = 1;
+		    break;
+		} else if (has_p) {
+		    /* Use default path; absorb command and option. */
+		    uremnode(args, firstnode(args));
+		    use_defpath = 1;
+		    if ((argnode = nextnode(firstnode(args))))
+			argdata = (char *) getdata(argnode);
+		}
+		/*
+		 * Else just absorb command and any trailing
+		 * end-of-options marker.  This can only occur
+		 * if we just had -p or something including more
+		 * than just -p, -v and -V, in which case we behave
+		 * as if this is command [non-option-stuff].  This
+		 * isn't a good place for standard option handling.
+		 */
+		if (!strcmp(argdata, "--"))
 		     uremnode(args, firstnode(args));
 	    }
 	    if ((cflags & BINF_EXEC) && nextnode(firstnode(args))) {

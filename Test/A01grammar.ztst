@@ -113,6 +113,16 @@
 <External command cat executed
 >External command cat executed
 
+  command -pv cat
+  command -pv echo
+  command -p -V cat
+  command -p -V -- echo
+0:command -p in combination
+*>*/cat
+>echo
+>cat is /*/cat
+>echo is a shell builtin
+
   cd() { echo Not cd at all; }
   builtin cd . && unfunction cd
 0:`builtin' precommand modifier
