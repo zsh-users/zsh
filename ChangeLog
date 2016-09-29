@@ -1,5 +1,8 @@
 2016-09-29  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 39502: Src/exec.c, Test/A01grammar.ztst: need to fork for
+	assignment in LHS of pipeline.
+
 	* unposted: Src/Zle/compctl.c, Src/Zle/zle_tricky.c: update
 	findcmd() call here, too.
 

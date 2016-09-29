@@ -756,3 +756,10 @@
 >	print Stuff here
 >}
 >Stuff here
+
+  x=1
+  x=2 | echo $x
+  echo $x
+0:Assignment-only current shell commands in LHS of pipelin
+>1
+>1
