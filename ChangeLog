@@ -1,5 +1,8 @@
 2016-09-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39495: Doc/Zsh/contrib.yo, Functions/Misc/add-zle-hook-widget:
+	add-zle-hook-widget: Add end-of-options guard to hook invocation.
+
 	* 39480: Completion/Debian/Command/_bug: _reportbug: Complete
 	absolute filenames, too.
 
