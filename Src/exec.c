@@ -4421,6 +4421,15 @@ getoutputfile(char *cmd, char **eptr)
 	if (!s)
 	    child_unblock();
 	return NULL;
+    } else {
+	char *suffix = getsparam("TMPSUFFIX");
+	if (suffix && *suffix && !strstr(suffix, "/")) {
+	    suffix = dyncat(nam, unmeta(suffix));
+	    if (link(nam, suffix) == 0) {
+		addfilelist(nam, 0);
+		nam = ztrdup(suffix);
+	    }
+	}
     }
     addfilelist(nam, 0);
 
