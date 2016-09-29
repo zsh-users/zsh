@@ -1965,7 +1965,7 @@ addmatch(char *s, char *t)
 	if (!ms)
 	    return;
 
-	if (addwhat == -7 && !findcmd(s, 0))
+	if (addwhat == -7 && !findcmd(s, 0, 0))
 	    return;
 	isfile = CMF_FILE;
     } else if (addwhat == CC_QUOTEFLAG || addwhat == -2  ||
@@ -2469,7 +2469,7 @@ makecomplistcmd(char *os, int incmd, int flags)
     /* If the command string starts with `=', try the path name of the *
      * command. */
     if (cmdstr && cmdstr[0] == Equals) {
-	char *c = findcmd(cmdstr + 1, 1);
+	char *c = findcmd(cmdstr + 1, 1, 0);
 
 	if (c) {
 	    zsfree(cmdstr);
@@ -2509,7 +2509,8 @@ makecomplistpc(char *os, int incmd)
     int ret = 0;
 
     s = ((shfunctab->getnode(shfunctab, cmdstr) ||
-	  builtintab->getnode(builtintab, cmdstr)) ? NULL : findcmd(cmdstr, 1));
+	  builtintab->getnode(builtintab, cmdstr)) ? NULL :
+	 findcmd(cmdstr, 1, 0));
 
     for (pc = patcomps; pc; pc = pc->next) {
 	if ((pat = patcompile(pc->pat, PAT_STATIC, NULL)) &&

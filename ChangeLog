@@ -1,5 +1,8 @@
 2016-09-29  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Src/Zle/compctl.c, Src/Zle/zle_tricky.c: update
+	findcmd() call here, too.
+
 	* 39493: Src/builtin.c, Src/exec.c, Src/subst.c,
 	Test/A01grammar.ztst: make "command" with multiple options work
 	better and ensure "command -p" with "-v" or "-V" checks for a

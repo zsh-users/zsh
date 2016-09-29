@@ -709,7 +709,8 @@ docomplete(int lst)
 			for (t0 = cmdnamtab->hsize - 1; t0 >= 0; t0--)
 			    for (hn = cmdnamtab->nodes[t0]; hn;
 				 hn = hn->next) {
-				if (strpfx(q, hn->nam) && findcmd(hn->nam, 0))
+				if (strpfx(q, hn->nam) &&
+				    findcmd(hn->nam, 0, 0))
 				    n++;
 				if (n == 2)
 				    break;
@@ -3027,7 +3028,7 @@ expandcmdpath(UNUSED(char **args))
 	return 1;
     }
 
-    str = findcmd(s, 1);
+    str = findcmd(s, 1, 0);
     zsfree(s);
     if (!str)
 	return 1;
