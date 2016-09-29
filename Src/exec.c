@@ -4412,11 +4412,17 @@ getoutputfile(char *cmd, char **eptr)
 	    untokenize(s);
     }
 
-    addfilelist(nam, 0);
+    if (!s)             /* Unclear why we need to do this before open() */
+	child_block();  /* but it has been so for a long time: leave it */
 
-    if (!s)
-	child_block();
-    fd = open(nam, O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY, 0600);
+    if ((fd = open(nam, O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY, 0600)) < 0) {
+	zerr("process substitution failed: %e", errno);
+	free(nam);
+	if (!s)
+	    child_unblock();
+	return NULL;
+    }
+    addfilelist(nam, 0);
 
     if (s) {
 	/* optimised here-string */
@@ -4427,7 +4433,7 @@ getoutputfile(char *cmd, char **eptr)
 	return nam;
     }
 
-    if (fd < 0 || (cmdoutpid = pid = zfork(NULL)) == -1) {
+    if ((cmdoutpid = pid = zfork(NULL)) == -1) {
 	/* fork or open error */
 	child_unblock();
 	return nam;

@@ -1,3 +1,9 @@
+2016-09-29  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39470: Src/exec.c, Src/utils.c: failure to open a supposedly
+	unique temp file name should result in an error; band-aid for
+	signal-related race conditions in temp file name generation
+
 2016-09-29  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39502: Src/exec.c, Test/A01grammar.ztst: need to fork for

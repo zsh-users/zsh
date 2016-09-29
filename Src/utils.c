@@ -2164,6 +2164,7 @@ gettempfile(const char *prefix, int use_heap, char **tempname)
 #if HAVE_MKSTEMP
     char *suffix = prefix ? ".XXXXXX" : "XXXXXX";
 
+    queue_signals();
     if (!prefix && !(prefix = getsparam("TMPPREFIX")))
 	prefix = DEFAULT_TMPPREFIX;
     if (use_heap)
@@ -2180,6 +2181,7 @@ gettempfile(const char *prefix, int use_heap, char **tempname)
 #else
     int failures = 0;
 
+    queue_signals();
     do {
 	if (!(fn = gettempname(prefix, use_heap))) {
 	    fd = -1;
@@ -2193,6 +2195,8 @@ gettempfile(const char *prefix, int use_heap, char **tempname)
     } while (errno == EEXIST && ++failures < 16);
 #endif
     *tempname = fn;
+
+    unqueue_signals();
     return fd;
 }
 
