@@ -1,3 +1,9 @@
+2016-10-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 39500: Src/Zle/computil.c: compdescribe: perform
+	on-screen-width computation using the "nice" length, since the
+	matches are rendered by nice*() functions by compadd
+
 2016-10-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 39624: Completion/Unix/Command/_yafc: remove space before

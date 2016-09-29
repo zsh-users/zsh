@@ -199,11 +199,11 @@ cd_calc(void)
             set->count++;
             if ((l = strlen(str->str)) > cd_state.pre)
                 cd_state.pre = l;
-            if ((l = MB_METASTRWIDTH(str->str)) > cd_state.premaxw)
+            if ((l = ZMB_nicewidth(str->str)) > cd_state.premaxw)
                 cd_state.premaxw = l;
             if (str->desc) {
                 set->desc++;
-                if ((l = strlen(str->desc)) > cd_state.suf)
+                if ((l = strlen(str->desc)) > cd_state.suf) /* ### strlen() assumes no \n */
                     cd_state.suf = l;
             }
         }
@@ -490,7 +490,7 @@ cd_init(char *nam, char *hide, char *mlen, char *sep,
     setp = &(cd_state.sets);
     cd_state.sep = ztrdup(sep);
     cd_state.slen = strlen(sep);
-    cd_state.swidth = MB_METASTRWIDTH(sep);
+    cd_state.swidth = ZMB_nicewidth(sep);
     cd_state.sets = NULL;
     cd_state.showd = disp;
     cd_state.maxg = cd_state.groups = cd_state.descs = 0;
@@ -526,7 +526,8 @@ cd_init(char *nam, char *hide, char *mlen, char *sep,
             str->other = NULL;
             str->set = set;
 
-            for (tmp = *ap; *tmp && *tmp != ':'; tmp++)
+	    /* Advance tmp to the first unescaped colon. */
+	    for (tmp = *ap; *tmp && *tmp != ':'; tmp++)
                 if (*tmp == '\\' && tmp[1])
                     tmp++;
 
@@ -537,7 +538,7 @@ cd_init(char *nam, char *hide, char *mlen, char *sep,
             *tmp = '\0';
             str->str = str->match = ztrdup(rembslash(*ap));
             str->len = strlen(str->str);
-            str->width = MB_METASTRWIDTH(str->str);
+            str->width = ZMB_nicewidth(str->str);
 	    str->sortstr = NULL;
         }
         if (str)
@@ -692,7 +693,7 @@ cd_get(char **params)
 			 * end of screen as safety margin
 			 */
 			d = str->desc;
-			w = MB_METASTRWIDTH(d);
+			w = ZMB_nicewidth(d);
 			if (w <= remw)
 			    strcpy(p, d);
 			else {
@@ -701,7 +702,7 @@ cd_get(char **params)
 				l = MB_METACHARLEN(d);
 				memcpy(pp, d, l);
 				pp[l] = '\0';
-				w = MB_METASTRWIDTH(pp);
+				w = ZMB_nicewidth(pp);
 				if (w > remw) {
 				    *pp = '\0';
 				    break;
@@ -792,7 +793,7 @@ cd_get(char **params)
 			cd_state.swidth - CM_SPACE;
 		    p = pp = dbuf + cd_state.slen;
 		    d = str->desc;
-		    w = MB_METASTRWIDTH(d);
+		    w = ZMB_nicewidth(d);
 		    if (w <= remw) {
 			strcpy(p, d);
 			remw -= w;
@@ -802,7 +803,7 @@ cd_get(char **params)
 			    l = MB_METACHARLEN(d);
 			    memcpy(pp, d, l);
 			    pp[l] = '\0';
-			    w = MB_METASTRWIDTH(pp);
+			    w = ZMB_nicewidth(pp);
 			    if (w > remw) {
 				*pp = '\0';
 				break;
