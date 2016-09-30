@@ -1273,7 +1273,23 @@ fixdir(char *src)
 #ifdef __CYGWIN__
     char *s0 = src;
 #endif
-    int ret = 0;
+    /* This function is always called with n path containing at
+     * least one slash, either because one was input by the user or
+     * because the caller has prepended either pwd or a cdpath dir.
+     * If asked to make a relative change and pwd is set to ".",
+     * the current directory has been removed out from under us,
+     * so force links to be chased.
+     *
+     * Ordinarily we can't get here with "../" as the first component
+     * but handle the silly special case of ".." in cdpath.
+     *
+     * Order of comparisons here looks funny, but it short-circuits
+     * most rapidly in the event of a false condition.  Set to 2
+     * here so we still obey the (lack of) CHASEDOTS option after
+     * the first "../" is preserved (test chasedots > 1 below).
+     */
+    int chasedots = (src[0] == '.' && pwd[0] == '.' && pwd[1] == '\0' &&
+		     (src[1] == '/' || (src[1] == '.' && src[2] == '/'))) * 2;
 
 /*** if have RFS superroot directory ***/
 #ifdef HAVE_SUPERROOT
@@ -1305,12 +1321,12 @@ fixdir(char *src)
 	    while (dest > d0 + 1 && dest[-1] == '/')
 		dest--;
 	    *dest = '\0';
-	    return ret;
+	    return chasedots;
 	}
 	if (src[0] == '.' && src[1] == '.' &&
 	    (src[2] == '\0' || src[2] == '/')) {
-	    if (isset(CHASEDOTS)) {
-		ret = 1;
+	    if (isset(CHASEDOTS) || chasedots > 1) {
+		chasedots = 1;
 		/* and treat as normal path segment */
 	    } else {
 		if (dest > d0 + 1) {
@@ -1348,6 +1364,7 @@ fixdir(char *src)
 		    dest[-1] = *src++ ^ 32;
 	}
     }
+    /* unreached */
 }
 
 /**/
