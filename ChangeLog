@@ -1,5 +1,8 @@
 2016-09-30  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Doc/Zsh/builtins.yo: update or remove references to
+	typeset behavior obsoleted by 35586.
+
 	* 39509: Src/builtins.c: in the event the current directory has
 	been removed, use chasedots semantics for "cd ..".
 
