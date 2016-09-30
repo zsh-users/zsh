@@ -1,5 +1,8 @@
 2016-09-30  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 39519: Src/params.c: setting PM_EXPORT was missing in
+	USE_SET_UNSET_ENV case.
+
 	* 39517: back off 39502, this isn't a robust fix.
 
 	* 39498: Src/parmas.c,Src/zsh.h: use PRIVILEGED option to

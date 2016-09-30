@@ -4727,6 +4727,7 @@ addenv(Param pm, char *value)
      if (pm->env)
          zsfree(pm->env);
      pm->env = newenv;
+     pm->node.flags |= PM_EXPORTED;
 #else
     /*
      * Under Cygwin we must use putenv() to maintain consistency.
