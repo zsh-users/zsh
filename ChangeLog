@@ -1,5 +1,7 @@
 2016-09-30  Oliver Kiddle  <opk@zsh.org>
 
+	* 39514: Completion/Unix/Command/_git: handle --git-dir
+
 	* 39513: Completion/Unix/Command/_doas: new doas completion
 
 	* 39464: Completion/Solaris/Command/_fmadm: fix where lack

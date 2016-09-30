@@ -7484,7 +7484,7 @@ _git() {
         ;;
       (option-or-argument)
         curcontext=${curcontext%:*:*}:git-$words[1]:
-
+	(( $+opt_args[--git-dir] )) && local -x GIT_DIR=$opt_args[--git-dir]
 	if ! _call_function ret _git-$words[1]; then
 	  if zstyle -T :completion:$curcontext: use-fallback; then
 	    _default && ret=0
