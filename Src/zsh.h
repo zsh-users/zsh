@@ -1802,7 +1802,7 @@ struct tieddata {
 #define PM_ZSHSTORED	(1<<18) /* function stored in zsh form              */
 
 /* Remaining flags do not correspond directly to command line arguments */
-#define PM_DONTIMPORT_ROOT (1<<19) /* do not import if running as root */
+#define PM_DONTIMPORT_SUID (1<<19) /* do not import if running setuid */
 #define PM_SINGLE       (1<<20) /* special can only have a single instance  */
 #define PM_LOCAL	(1<<21) /* this parameter will be made local        */
 #define PM_SPECIAL	(1<<22) /* special builtin parameter                */

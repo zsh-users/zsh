@@ -333,7 +333,7 @@ IPDEF6("TRY_BLOCK_ERROR", &try_errflag, varinteger_gsu),
 IPDEF6("TRY_BLOCK_INTERRUPT", &try_interrupt, varinteger_gsu),
 
 #define IPDEF7(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
-#define IPDEF7R(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_DONTIMPORT_ROOT},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
+#define IPDEF7R(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_DONTIMPORT_SUID},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
 #define IPDEF7U(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
 IPDEF7("OPTARG", &zoptarg),
 IPDEF7("NULLCMD", &nullcmd),
@@ -705,8 +705,8 @@ static int dontimport(int flags)
     /* If value already exported */
     if (flags & PM_EXPORTED)
 	return 1;
-    /* If security issue when exporting as root */
-    if ((flags & PM_DONTIMPORT_ROOT) && (!getuid() || !geteuid()))
+    /* If security issue when importing and running with some privilege */
+    if ((flags & PM_DONTIMPORT_SUID) && isset(PRIVILEGED))
 	return 1;
     /* OK to import */
     return 0;
