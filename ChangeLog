@@ -1,5 +1,8 @@
 2016-10-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39522: Doc/Zsh/contrib.yo: add-zsh-hook/add-zle-hook-widget:
+	Promise append semantics.
+
 	* 39489: Completion/Unix/Type/_path_files: Interpret -P as
 	literally, rather than as a pattern.
 
