@@ -43,6 +43,7 @@ _arguments -C -A "-*" \
   '1:fmadm subcommand:compadd -M "r:|-=* r:|=*" -a subcmds' \
   '*::command:->subcmd' && ret=0
 
+[[ -z $state ]] && return ret
 service="$words[1]"
 curcontext="${curcontext%:*}-$service:"
 
@@ -59,14 +60,14 @@ case $service in
     )
   ;|
 
-  (faulty)
+  (list|faulty)
     _arguments -A "-*" $args \
       '-a[display all faults]' \
       '-g[group faults]' \
-      '-n[limit output to n entries]:number'
+      '-n[limit output to specified number of entries]:number'
   ;;
 
-  (list|list-alert|list-defect|list-fault)
+  (list-alert|list-defect|list-fault)
     _arguments -A "-*" $args \
       '-a[display all resources]'
   ;;
