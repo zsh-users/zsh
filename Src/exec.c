@@ -1844,7 +1844,7 @@ execpline2(Estate state, wordcode pcode,
 	/* if we are doing "foo | bar" where foo is a current *
 	 * shell command, do foo in a subshell and do the     *
 	 * rest of the pipeline in the current shell.         */
-	if ((wc_code(code) >= WC_CURSH || wc_code(code) == WC_ASSIGN)
+	if ((wc_code(code) >= WC_CURSH)
 	    && (how & Z_SYNC)) {
 	    int synch[2];
 	    struct timeval bgtime;
