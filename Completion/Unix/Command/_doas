@@ -1,0 +1,18 @@
+#compdef doas
+
+local environ e cmd
+
+zstyle -a ":completion:${curcontext}:" environ environ
+
+for e in "${environ[@]}"
+do local -x "$e"
+done
+
+cmd="$words[1]"
+_arguments -s -S \
+  '(-n -s)-C+[check config file and report on command matching]:config:_files' \
+  '(-C)-n[non-interactive: fail rather than prompt for a password]' \
+  '-a+[specify authentication style]:authentication style' \
+  '(-C)-s[run a shell]' \
+  '-u+[run command as specified user]:user:_users' \
+  '*::arguments:{ _comp_priv_prefix=( $cmd -n ${(kv)opt_args[-u]} ) ; _normal }'
