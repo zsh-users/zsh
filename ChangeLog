@@ -1,3 +1,8 @@
+2016-10-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 39533: Matthew Martin: Completion/Unix/Command/_doas:
+	add the new -L option, sort options and add some exclusions
+
 2016-10-11  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 36108: Src/builtin.c: command -[vV] assumed -p.
