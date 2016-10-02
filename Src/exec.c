@@ -1226,6 +1226,7 @@ execlist(Estate state, int dont_change_job, int exiting)
     }
     while (wc_code(code) == WC_LIST && !breaks && !retflag && !errflag) {
 	int donedebug;
+	int this_noerrexit = 0;
 
 	ltype = WC_LIST_TYPE(code);
 	csp = cmdsp;
@@ -1309,9 +1310,12 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    goto sublist_done;
 	}
 	while (wc_code(code) == WC_SUBLIST) {
+	    int isend = (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END);
 	    next = state->pc + WC_SUBLIST_SKIP(code);
 	    if (!oldnoerrexit)
-		noerrexit = (WC_SUBLIST_TYPE(code) != WC_SUBLIST_END);
+		noerrexit = !isend;
+	    if ((WC_SUBLIST_FLAGS(code) & WC_SUBLIST_NOT) && isend)
+		this_noerrexit = 1;
 	    switch (WC_SUBLIST_TYPE(code)) {
 	    case WC_SUBLIST_END:
 		/* End of sublist; just execute, ignoring status. */
@@ -1427,7 +1431,7 @@ sublist_done:
 	/* Check whether we are suppressing traps/errexit *
 	 * (typically in init scripts) and if we haven't  *
 	 * already performed them for this sublist.       */
-	if (!noerrexit && !donetrap) {
+	if (!noerrexit && !this_noerrexit && !donetrap) {
 	    if (sigtrapped[SIGZERR] && lastval) {
 		dotrap(SIGZERR);
 		donetrap = 1;

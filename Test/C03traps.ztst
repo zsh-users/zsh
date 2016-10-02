@@ -519,6 +519,43 @@
 >Yes
 F:Must be tested with a top-level script rather than source or function
 
+  fn() {
+      emulate -L zsh
+      setopt errreturn
+      print before
+      false
+      print after
+  }
+  fn
+1:ERRRETURN, basic case
+>before
+
+  fn() {
+      emulate -L zsh
+      setopt errreturn
+      print before
+      ! true
+      ! false
+      print after
+  }
+  fn
+0:ERRETURN with "!"
+>before
+>after
+
+  fn() {
+      emulate -L zsh
+      setopt errreturn
+      print before
+      ! true
+      ! false
+      false
+      print after
+  }
+  fn
+1:ERRETURN with "!" and a following false
+>before
+
 %clean
 
   rm -f TRAPEXIT
