@@ -82,8 +82,6 @@
 
 #define MAX_QUEUE_SIZE 128
 
-#define queue_signals()    (queueing_enabled++)
-
 #define run_queued_signals() do { \
     while (queue_front != queue_rear) {      /* while signals in queue */ \
 	sigset_t oset; \
@@ -94,12 +92,35 @@
     } \
 } while (0)
 
+#ifdef DEBUG
+
+#define queue_signals()    (queue_in++, queueing_enabled++)
+
 #define unqueue_signals()  do { \
     DPUTS(!queueing_enabled, "BUG: unqueue_signals called but not queueing"); \
+    --queue_in; \
     if (!--queueing_enabled) run_queued_signals(); \
 } while (0)
 
-#define queue_signal_level() queueing_enabled
+#define dont_queue_signals() do { \
+    queue_in = queueing_enabled; \
+    queueing_enabled = 0; \
+    run_queued_signals(); \
+} while (0)
+
+#define restore_queue_signals(q) do { \
+    DPUTS2(queueing_enabled && queue_in != q, \
+         "BUG: q = %d != queue_in = %d", q, queue_in); \
+    queue_in = (queueing_enabled = (q)); \
+} while (0)
+
+#else /* !DEBUG */
+
+#define queue_signals()    (queueing_enabled++)
+
+#define unqueue_signals()  do { \
+    if (!--queueing_enabled) run_queued_signals(); \
+} while (0)
 
 #define dont_queue_signals() do { \
     queueing_enabled = 0; \
@@ -107,6 +128,10 @@
 } while (0)
 
 #define restore_queue_signals(q) (queueing_enabled = (q))
+
+#endif /* DEBUG */
+
+#define queue_signal_level() queueing_enabled
 
 #ifdef BSD_SIGNALS
 #define signal_block(S) sigblock(S)

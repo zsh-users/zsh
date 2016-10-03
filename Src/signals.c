@@ -72,6 +72,10 @@ mod_export int queueing_enabled, queue_front, queue_rear;
 mod_export int signal_queue[MAX_QUEUE_SIZE];
 /**/
 mod_export sigset_t signal_mask_queue[MAX_QUEUE_SIZE];
+#ifdef DEBUG
+/**/
+mod_export int queue_in;
+#endif
 
 /* Variables used by trap queueing */
 
