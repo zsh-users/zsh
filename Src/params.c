@@ -2803,6 +2803,7 @@ assignsparam(char *s, char *val, int flags)
 		zerr("read-only variable: %s", v->pm->node.nam);
 		*ss = '[';
 		zsfree(val);
+		unqueue_signals();
 		return NULL;
 	    }
 	    flags &= ~ASSPM_WARN_CREATE;
@@ -3117,6 +3118,7 @@ setnparam(char *s, mnumber val)
 	if (!(v = getvalue(&vbuf, &t, 1))) {
 	    DPUTS(!v, "BUG: value not found for new parameter");
 	    /* errflag |= ERRFLAG_ERROR; */
+	    unqueue_signals();
 	    return NULL;
 	}
 	if (!was_unset && isset(WARNCREATEGLOBAL) && locallevel > forklevel)

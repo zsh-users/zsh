@@ -1631,6 +1631,7 @@ bin_vared(char *name, char **args, Options ops, UNUSED(int func))
 	return 1;
     } else if (v) {
 	if (*s) {
+	    unqueue_signals();
 	    zwarnnam(name, "not an identifier: `%s'", args[0]);
 	    return 1;
 	}

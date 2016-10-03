@@ -491,8 +491,10 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 		if (!arg)
 		    arg++;
 		queue_signals();
-		if (!(hostnam = getsparam("HOST")))
+		if (!(hostnam = getsparam("HOST"))) {
+		    unqueue_signals();
 		    break;
+		}
 		if (arg < 0) {
 		    for (ss = hostnam + strlen(hostnam); ss > hostnam; ss--)
 			if (ss[-1] == '.' && !++arg)

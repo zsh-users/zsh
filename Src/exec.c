@@ -1795,6 +1795,8 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 		deletejob(jn, 0);
 	    thisjob = pj;
 	}
+	else
+	    unqueue_signals();
 	if ((slflags & WC_SUBLIST_NOT) && !errflag)
 	    lastval = !lastval;
     }
@@ -5556,6 +5558,7 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
 	if (!cont) {
 	    if (ou)
 		zfree(ou, ouu);
+	    unqueue_signals();
 	    return;
 	}
 	wrap = wrap->next;

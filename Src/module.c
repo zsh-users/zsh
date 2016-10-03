@@ -2242,6 +2242,7 @@ load_module(char const *name, Feature_enables enablesarr, int silent)
 	return 0;
     }
     if (m->node.flags & MOD_BUSY) {
+	unqueue_signals();
 	zerr("circular dependencies for module ;%s", name);
 	return 1;
     }

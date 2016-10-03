@@ -653,6 +653,7 @@ histsubchar(int c)
 		(c == '}' ||  c == ';' || c == '\'' || c == '"' || c == '`')) {
 	      /* Neither event nor word designator, no expansion */
 	      safeinungetc(c);
+	      unqueue_signals();
 	      return bangchar;
 	    }
 	    *ptr = 0;

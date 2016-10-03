@@ -1442,8 +1442,10 @@ sourcehome(char *s)
     queue_signals();
     if (EMULATION(EMULATE_SH|EMULATE_KSH) || !(h = getsparam_u("ZDOTDIR"))) {
 	h = home;
-	if (!h)
+	if (!h) {
+	    unqueue_signals();
 	    return;
+	}
     }
 
     {

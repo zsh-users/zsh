@@ -1489,6 +1489,7 @@ bin_fc(char *nam, char **argv, Options ops, int func)
     }
 
     if (zleactive) {
+	unqueue_signals();
 	zwarnnam(nam, "no interactive history within ZLE");
 	return 1;
     }
@@ -2808,6 +2809,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	return 0;
     }
     if (off & PM_TIED) {
+	unqueue_signals();
 	zerrnam(name, "use unset to remove tied variables");
 	return 1;
     }
@@ -3138,6 +3140,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    queue_signals();
 	    for (q = mathfuncs; q; q = q->next) {
 		if (!strcmp(q->name, funcname)) {
+		    unqueue_signals();
 		    zwarnnam(name, "-M %s: function already exists",
 			     funcname);
 		    zsfree(p->name);

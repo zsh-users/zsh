@@ -4865,6 +4865,7 @@ bin_compfiles(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    }
 	    queue_signals();
 	    if (!(tmp = getaparam(args[1]))) {
+		unqueue_signals();
 		zwarnnam(nam, "unknown parameter: %s", args[1]);
 		return 0;
 	    }

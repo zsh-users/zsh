@@ -1,5 +1,10 @@
 2016-10-03  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 39545: Src/builtin.c, Src/exec.c, Src/hist.c, Src/init.c,
+	Src/mem.c, Src/module.c, Src/params.c, Src/prompt.c,
+	Src/Zle/computil.c, Src/Zle/zle_main.c: Add some missing
+	unqueue_signals().
+
 	* 39521: Src/exec.c, Src/zsh.h, Test/A01grammar.ztst: Refactor
 	start of execcmd().  This allows execpline2() easier access to
 	the state at the start of execuation.
