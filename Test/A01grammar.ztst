@@ -757,12 +757,9 @@
 >}
 >Stuff here
 
-## This problem is hard to fix without significant changes to how
-## the shell forks for a pipeline.
-#
-#   x=1
-#   x=2 | echo $x
-#   echo $x
-# 0:Assignment-only current shell commands in LHS of pipelin
-# >1
-# >1
+  x=1
+  x=2 | echo $x
+  echo $x
+0:Assignment-only current shell commands in LHS of pipelin
+>1
+>1

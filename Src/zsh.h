@@ -489,6 +489,7 @@ typedef struct complist  *Complist;
 typedef struct conddef   *Conddef;
 typedef struct dirsav    *Dirsav;
 typedef struct emulation_options *Emulation_options;
+typedef struct execcmd_params *Execcmd_params;
 typedef struct features  *Features;
 typedef struct feature_enables  *Feature_enables;
 typedef struct funcstack *Funcstack;
@@ -1390,6 +1391,21 @@ struct builtin {
  * assignment structures.
  */
 #define BINF_ASSIGN		(1<<19)
+
+/**
+ * Parameters passed to execcmd().
+ * These are not opaque --- they are also used by the pipeline manager.
+ */
+struct execcmd_params {
+    LinkList args;		/* All command prefixes, arguments & options */
+    LinkList redir;		/* Redirections */
+    Wordcode beg;		/* The code at the start of the command */
+    Wordcode varspc;		/* The code for assignment parsed as such */
+    Wordcode assignspc;		/* The code for assignment parsed as typeset */
+    int type;			/* The WC_* type of the command */
+    int postassigns;		/* The number of assignspc assiguments */
+    int htok;			/* tokens in parameter list */
+};
 
 struct module {
     struct hashnode node;

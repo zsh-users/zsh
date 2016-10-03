@@ -1812,6 +1812,7 @@ execpline2(Estate state, wordcode pcode,
 {
     pid_t pid;
     int pipes[2];
+    struct execcmd_params eparams;
 
     if (breaks || retflag)
 	return;
@@ -1829,17 +1830,16 @@ execpline2(Estate state, wordcode pcode,
 	else
 	    list_pipe_text[0] = '\0';
     }
-    if (WC_PIPE_TYPE(pcode) == WC_PIPE_END)
-	execcmd(state, input, output, how, last1 ? 1 : 2);
-    else {
+    if (WC_PIPE_TYPE(pcode) == WC_PIPE_END) {
+	execcmd_analyse(state, &eparams);
+	execcmd_exec(state, &eparams, input, output, how, last1 ? 1 : 2);
+    } else {
 	int old_list_pipe = list_pipe;
 	int subsh_close = -1;
-	Wordcode next = state->pc + (*state->pc), pc;
-	wordcode code;
+	Wordcode next = state->pc + (*state->pc), start_pc;
 
-	state->pc++;
-	for (pc = state->pc; wc_code(code = *pc) == WC_REDIR;
-	     pc += WC_REDIR_WORDS(code));
+	start_pc = ++state->pc;
+	execcmd_analyse(state, &eparams);
 
 	if (mpipe(pipes) < 0) {
 	    /* FIXME */
@@ -1848,7 +1848,7 @@ execpline2(Estate state, wordcode pcode,
 	/* if we are doing "foo | bar" where foo is a current *
 	 * shell command, do foo in a subshell and do the     *
 	 * rest of the pipeline in the current shell.         */
-	if ((wc_code(code) >= WC_CURSH)
+	if ((eparams.type >= WC_CURSH || !eparams.args)
 	    && (how & Z_SYNC)) {
 	    int synch[2];
 	    struct timeval bgtime;
@@ -1867,7 +1867,7 @@ execpline2(Estate state, wordcode pcode,
 	    } else if (pid) {
 		char dummy, *text;
 
-		text = getjobtext(state->prog, state->pc);
+		text = getjobtext(state->prog, start_pc);
 		addproc(pid, text, 0, &bgtime);
 		close(synch[1]);
 		read_loop(synch[0], &dummy, 1);
@@ -1878,14 +1878,14 @@ execpline2(Estate state, wordcode pcode,
 		entersubsh(((how & Z_ASYNC) ? ESUB_ASYNC : 0)
 			   | ESUB_PGRP | ESUB_KEEPTRAP);
 		close(synch[1]);
-		execcmd(state, input, pipes[1], how, 1);
+		execcmd_exec(state, &eparams, input, pipes[1], how, 1);
 		_exit(lastval);
 	    }
 	} else {
 	    /* otherwise just do the pipeline normally. */
 	    addfilelist(NULL, pipes[0]);
 	    subsh_close = pipes[0];
-	    execcmd(state, input, pipes[1], how, 0);
+	    execcmd_exec(state, &eparams, input, pipes[1], how, 0);
 	}
 	zclose(pipes[1]);
 	state->pc = next;
@@ -2541,55 +2541,51 @@ resolvebuiltin(const char *cmdarg, HashNode hn)
     return hn;
 }
 
+/*
+ * We are about to execute a command at the lowest level of the
+ * hierarchy.  Analyse the parameters from the wordcode.
+ */
+
 /**/
 static void
-execcmd(Estate state, int input, int output, int how, int last1)
+execcmd_analyse(Estate state, Execcmd_params eparams)
 {
-    HashNode hn = NULL;
-    LinkList args, filelist = NULL;
-    LinkNode node;
-    Redir fn;
-    struct multio *mfds[10];
-    char *text;
-    int save[10];
-    int fil, dfil, is_cursh, type, do_exec = 0, redir_err = 0, i, htok = 0;
-    int nullexec = 0, assign = 0, forked = 0, postassigns = 0;
-    int is_shfunc = 0, is_builtin = 0, is_exec = 0, use_defpath = 0;
-    /* Various flags to the command. */
-    int cflags = 0, orig_cflags = 0, checked = 0, oautocont = -1;
-    LinkList redir;
     wordcode code;
-    Wordcode beg = state->pc, varspc, assignspc = (Wordcode)0;
-    FILE *oxtrerr = xtrerr, *newxtrerr = NULL;
+    int i;
 
-    doneps4 = 0;
-    redir = (wc_code(*state->pc) == WC_REDIR ? ecgetredirs(state) : NULL);
+    eparams->beg = state->pc;
+    eparams->redir =
+	(wc_code(*state->pc) == WC_REDIR ? ecgetredirs(state) : NULL);
     if (wc_code(*state->pc) == WC_ASSIGN) {
 	cmdoutval = 0;
-	varspc = state->pc;
+	eparams->varspc = state->pc;
 	while (wc_code((code = *state->pc)) == WC_ASSIGN)
 	    state->pc += (WC_ASSIGN_TYPE(code) == WC_ASSIGN_SCALAR ?
 			  3 : WC_ASSIGN_NUM(code) + 2);
     } else
-	varspc = NULL;
+	eparams->varspc = NULL;
 
     code = *state->pc++;
 
-    type = wc_code(code);
+    eparams->type = wc_code(code);
+    eparams->postassigns = 0;
 
     /* It would be nice if we could use EC_DUPTOK instead of EC_DUP here.
      * But for that we would need to check/change all builtins so that
      * they don't modify their argument strings. */
-    switch (type) {
+    switch (eparams->type) {
     case WC_SIMPLE:
-	args = ecgetlist(state, WC_SIMPLE_ARGC(code), EC_DUP, &htok);
+	eparams->args = ecgetlist(state, WC_SIMPLE_ARGC(code), EC_DUP,
+				  &eparams->htok);
+	eparams->assignspc = NULL;
 	break;
 
     case WC_TYPESET:
-	args = ecgetlist(state, WC_TYPESET_ARGC(code), EC_DUP, &htok);
-	postassigns = *state->pc++;
-	assignspc = state->pc;
-	for (i = 0; i < postassigns; i++) {
+	eparams->args = ecgetlist(state, WC_TYPESET_ARGC(code), EC_DUP,
+				  &eparams->htok);
+	eparams->postassigns = *state->pc++;
+	eparams->assignspc = state->pc;
+	for (i = 0; i < eparams->postassigns; i++) {
 	    code = *state->pc;
 	    DPUTS(wc_code(code) != WC_ASSIGN,
 		  "BUG: miscounted typeset assignments");
@@ -2599,8 +2595,45 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	break;
 
     default:
-	args = NULL;
+	eparams->args = NULL;
+	eparams->assignspc = NULL;
+	eparams->htok = 0;
+	break;
     }
+}
+
+/*
+ * Execute a command at the lowest level of the hierarchy.
+ */
+
+/**/
+static void
+execcmd_exec(Estate state, Execcmd_params eparams,
+	     int input, int output, int how, int last1)
+{
+    HashNode hn = NULL;
+    LinkList filelist = NULL;
+    LinkNode node;
+    Redir fn;
+    struct multio *mfds[10];
+    char *text;
+    int save[10];
+    int fil, dfil, is_cursh, do_exec = 0, redir_err = 0, i;
+    int nullexec = 0, assign = 0, forked = 0;
+    int is_shfunc = 0, is_builtin = 0, is_exec = 0, use_defpath = 0;
+    /* Various flags to the command. */
+    int cflags = 0, orig_cflags = 0, checked = 0, oautocont = -1;
+    FILE *oxtrerr = xtrerr, *newxtrerr = NULL;
+    /*
+     * Retrieve parameters for quick reference (they are unique
+     * to us so we can modify the structure if we want).
+     */
+    LinkList args = eparams->args;
+    LinkList redir = eparams->redir;
+    Wordcode varspc = eparams->varspc;
+    int type = eparams->type;
+
+    doneps4 = 0;
 
     /*
      * If assignment but no command get the status from variable
@@ -2858,7 +2891,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 
     /* Do prefork substitutions */
     esprefork = (assign || isset(MAGICEQUALSUBST)) ? PREFORK_TYPESET : 0;
-    if (args && htok)
+    if (args && eparams->htok)
 	prefork(args, esprefork, NULL);
 
     if (type == WC_SIMPLE || type == WC_TYPESET) {
@@ -3003,7 +3036,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
     /* Get the text associated with this command. */
     if ((how & Z_ASYNC) ||
 	(!sfcontext && !sourcelevel && (jobbing || (how & Z_TIMED))))
-	text = getjobtext(state->prog, beg);
+	text = getjobtext(state->prog, eparams->beg);
     else
 	text = NULL;
 
@@ -3262,7 +3295,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    forked = 1;
     }
 
-    if ((esglob = !(cflags & BINF_NOGLOB)) && args && htok) {
+    if ((esglob = !(cflags & BINF_NOGLOB)) && args && eparams->htok) {
 	LinkList oargs = args;
 	globlist(args, 0);
 	args = oargs;
@@ -3576,7 +3609,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	}
 	if (type == WC_FUNCDEF) {
 	    Eprog redir_prog;
-	    if (!redir && wc_code(*beg) == WC_REDIR)  {
+	    if (!redir && wc_code(*eparams->beg) == WC_REDIR)  {
 		/*
 		 * We're not using a redirection from the currently
 		 * parsed environment, which is what we'd do for an
@@ -3586,7 +3619,7 @@ execcmd(Estate state, int input, int output, int how, int last1)
 		struct estate s;
 
 		s.prog = state->prog;
-		s.pc = beg;
+		s.pc = eparams->beg;
 		s.strs = state->prog->strs;
 
 		/*
@@ -3670,13 +3703,15 @@ execcmd(Estate state, int input, int output, int how, int last1)
 	    } else {
 		/* It's a builtin */
 		LinkList assigns = (LinkList)0;
+		int postassigns = eparams->postassigns;
 		if (forked)
 		    closem(FDT_INTERNAL);
 		if (postassigns) {
 		    Wordcode opc = state->pc;
-		    state->pc = assignspc;
+		    state->pc = eparams->assignspc;
 		    assigns = newlinklist();
 		    while (postassigns--) {
+			int htok;
 			wordcode ac = *state->pc++;
 			char *name = ecgetstr(state, EC_DUPTOK, &htok);
 			Asgment asg;
