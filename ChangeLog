@@ -1,3 +1,7 @@
+2016-10-03  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39547: Src/Zle/zle_main.c: handle zero delta in calc_timeout()
+
 2016-10-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39545: Src/builtin.c, Src/exec.c, Src/hist.c, Src/init.c,

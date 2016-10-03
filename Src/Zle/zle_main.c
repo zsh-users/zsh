@@ -471,7 +471,7 @@ calc_timeout(struct ztmout *tmoutp, long do_keytmout)
 
 	    tfdat = (Timedfn)getdata(tfnode);
 	    diff = tfdat->when - time(NULL);
-	    if (diff < 0) {
+	    if (diff <= 0) {
 		/* Already due; call it and rescan. */
 		tfdat->func();
 		continue;
