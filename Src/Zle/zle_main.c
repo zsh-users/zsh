@@ -1868,10 +1868,16 @@ int
 recursiveedit(UNUSED(char **args))
 {
     int locerror;
+    int q = queue_signal_level();
+
+    /* zlecore() expects to be entered with signal queue disabled */
+    dont_queue_signals();
 
     redrawhook();
     zrefresh();
     zlecore();
+
+    restore_queue_signals(q);
 
     locerror = errflag ? 1 : 0;
     errflag = done = eofsent = 0;

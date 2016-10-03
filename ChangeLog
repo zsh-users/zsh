@@ -1,5 +1,7 @@
 2016-10-03  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 39550: Src/Zle/zle_main.c: reset signal queue in recursiveedit()
+
 	* 39548: Src/signals.c, Src/signals.h: DEBUG for queueing_enabled
 
 	* 39547: Src/Zle/zle_main.c: handle zero delta in calc_timeout()
