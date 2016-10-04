@@ -918,16 +918,21 @@ memory_validate(Heapid heap_id)
     if (heaps_saved) {
 	for (node = firstnode(heaps_saved); node; incnode(node)) {
 	    for (h = (Heap)getdata(node); h; h = h->next) {
-		if (h->heap_id == heap_id)
+		if (h->heap_id == heap_id) {
+		    unqueue_signals();
 		    return 0;
+		}
 		for (hs = heaps->sp; hs; hs = hs->next) {
-		    if (hs->heap_id == heap_id)
+		    if (hs->heap_id == heap_id) {
+			unqueue_signals();
 			return 0;
+		    }
 		}
 	    }
 	}
     }
 
+    unqueue_signals();
     return 1;
 }
 /**/

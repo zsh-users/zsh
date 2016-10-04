@@ -1,3 +1,7 @@
+2016-10-04  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39561: Src/mem.c: missing unqueue_signals() when ZSH_HEAP_DEBUG
+
 2016-10-03  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 39550: Src/Zle/zle_main.c: reset signal queue in recursiveedit()
