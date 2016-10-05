@@ -568,11 +568,14 @@ commandnotfound(char *arg0, LinkList args)
     Shfunc shf = (Shfunc)
 	shfunctab->getnode(shfunctab, "command_not_found_handler");
 
-    if (!shf)
-	return 127;
+    if (!shf) {
+	lastval = 127;
+	return 1;
+    }
 
     pushnode(args, arg0);
-    return doshfunc(shf, args, 1);
+    lastval = doshfunc(shf, args, 1);
+    return 0;
 }
 
 /*
@@ -703,7 +706,7 @@ execute(LinkList args, int flags, int defpath)
 
 	if (!search_defpath(arg0, pbuf, PATH_MAX)) {
 	    if (commandnotfound(arg0, args) == 0)
-		_exit(0);
+		_exit(lastval);
 	    zerr("command not found: %s", arg0);
 	    _exit(127);
 	}
@@ -767,7 +770,7 @@ execute(LinkList args, int flags, int defpath)
     if (eno)
 	zerr("%e: %s", eno, arg0);
     else if (commandnotfound(arg0, args) == 0)
-	_exit(0);
+	_exit(lastval);
     else
 	zerr("command not found: %s", arg0);
     _exit((eno == EACCES || eno == ENOEXEC) ? 126 : 127);

@@ -28,10 +28,11 @@ not handle this executable format in the kernel.
 
 If no external command is found but a function tt(command_not_found_handler)
 exists the shell executes this function with all
-command line arguments.  The function should return status zero if it
-successfully handled the command, or non-zero status if it failed.
-In the latter case the standard handling is applied: `command not
-found' is printed to standard error and the shell exits with status 127.
-Note that the handler is executed in a subshell forked to execute
-an external command, hence changes to directories, shell parameters,
-etc. have no effect on the main shell.
+command line arguments.  The return status of the function becomes the
+status of the command.  If the function wishes to mimic the
+behaviour of the shell when the command is not found, it should
+print the message `tt(command not found:) var(cmd)' to standard error
+and return status 127.  Note that the handler is executed in a
+subshell forked to execute an external command, hence changes to
+directories, shell parameters, etc. have no effect on the main shell.
+

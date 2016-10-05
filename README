@@ -101,6 +101,15 @@ For the more common case of non-repeatable options that take a single
 argument, completion functions now have to unescape not only colons but
 also backslashes when obtaining the option's argument from $opt_args.
 
+6) Previously, if the function command_not_found_handler was run
+in place of a command-not-found error, and the function returned
+non-zero status, zsh set the status to 127 and printed an error message
+anyway.  Now, the status from the handler is retained and no additional
+message is printed.  The main reasons for this change are that it was not
+possible to return a non-zero status to the parent shell from a command
+executed as a replacement, and the new implementation is more consistent
+with other shells.
+
 Incompatibilities between 5.0.8 and 5.2
 ---------------------------------------
 

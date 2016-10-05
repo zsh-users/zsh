@@ -120,14 +120,13 @@
      print "Your command:" >&2
      print "$1" >&2
      print "has gone down the tubes.  Sorry." >&2
-     return 1
+     return 42
   }
   ThisCommandDoesNotExistEither
-127:Command not found handler, failure
+42:Command not found handler, failure
 ?Your command:
 ?ThisCommandDoesNotExistEither
 ?has gone down the tubes.  Sorry.
-?(eval):7: command not found: ThisCommandDoesNotExistEither
 
   local variable=outside
   print "I am $variable"
