@@ -1229,7 +1229,7 @@ execlist(Estate state, int dont_change_job, int exiting)
     }
     while (wc_code(code) == WC_LIST && !breaks && !retflag && !errflag) {
 	int donedebug;
-	int this_noerrexit = 0;
+	int this_noerrexit = 0, this_donetrap = 0;
 
 	ltype = WC_LIST_TYPE(code);
 	csp = cmdsp;
@@ -1353,10 +1353,10 @@ execlist(Estate state, int dont_change_job, int exiting)
 			/* We've skipped to the end of the list, not executing *
 			 * the final pipeline, so don't perform error handling *
 			 * for this sublist.                                   */
-			donetrap = 1;
+			this_donetrap = 1;
 			goto sublist_done;
 		    } else if (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END) {
-			donetrap = 1;
+			this_donetrap = 1;
 			/*
 			 * Treat this in the same way as if we reached
 			 * the end of the sublist normally.
@@ -1386,10 +1386,10 @@ execlist(Estate state, int dont_change_job, int exiting)
 			/* We've skipped to the end of the list, not executing *
 			 * the final pipeline, so don't perform error handling *
 			 * for this sublist.                                   */
-			donetrap = 1;
+			this_donetrap = 1;
 			goto sublist_done;
 		    } else if (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END) {
-			donetrap = 1;
+			this_donetrap = 1;
 			/*
 			 * Treat this in the same way as if we reached
 			 * the end of the sublist normally.
@@ -1439,7 +1439,7 @@ sublist_done:
 	/* Check whether we are suppressing traps/errexit *
 	 * (typically in init scripts) and if we haven't  *
 	 * already performed them for this sublist.       */
-	if (!noerrexit && !this_noerrexit && !donetrap) {
+	if (!noerrexit && !this_noerrexit && !donetrap && !this_donetrap) {
 	    if (sigtrapped[SIGZERR] && lastval) {
 		dotrap(SIGZERR);
 		donetrap = 1;

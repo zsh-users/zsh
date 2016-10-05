@@ -476,7 +476,7 @@
     fi
   }
   fn
-0:ERRRETURN not triggered in if condition
+0:ERR_RETURN not triggered in if condition
 >Oh, yes
 
   fn() {
@@ -490,7 +490,7 @@
     fi
   }
   fn
-1:ERRRETURN in "if"
+1:ERR_RETURN in "if"
 
   fn() {
     emulate -L zsh
@@ -503,7 +503,7 @@
     fi
   }
   fn
-1:ERRRETURN in "else" branch (regression test)
+1:ERR_RETURN in "else" branch (regression test)
 
   $ZTST_testdir/../Src/zsh -f =(<<<"
   if false; then
@@ -515,7 +515,7 @@
     print Yes
   fi
   ")
-0:ERRRETURN when false "if" is the first statement in an "else" (regression)
+0:ERR_RETURN when false "if" is the first statement in an "else" (regression)
 >Yes
 F:Must be tested with a top-level script rather than source or function
 
@@ -527,7 +527,7 @@ F:Must be tested with a top-level script rather than source or function
       print after
   }
   fn
-1:ERRRETURN, basic case
+1:ERR_RETURN, basic case
 >before
 
   fn() {
@@ -539,7 +539,7 @@ F:Must be tested with a top-level script rather than source or function
       print after
   }
   fn
-0:ERRETURN with "!"
+0:ERR_RETURN with "!"
 >before
 >after
 
@@ -553,7 +553,7 @@ F:Must be tested with a top-level script rather than source or function
       print after
   }
   fn
-1:ERRETURN with "!" and a following false
+1:ERR_RETURN with "!" and a following false
 >before
 
   fn() {
@@ -566,7 +566,7 @@ F:Must be tested with a top-level script rather than source or function
       print after
   }
   fn
-0:ERRETURN with "!" suppressed inside complex structure
+0:ERR_RETURN with "!" suppressed inside complex structure
 >before
 >after
 
@@ -580,8 +580,21 @@ F:Must be tested with a top-level script rather than source or function
       print after
   }
   fn
-1:ERRETURN with no "!" suppression (control case)
+1:ERR_RETURN with no "!" suppression (control case)
 >before
+
+  (setopt err_return
+    fn() {
+      print before-in
+      false && false
+    }
+    print before-out
+    fn
+    print after-out
+  )
+1:ERR_RETURN with "&&" in function (regression test)
+>before-out
+>before-in
 
 %clean
 

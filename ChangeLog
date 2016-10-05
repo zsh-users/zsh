@@ -1,5 +1,8 @@
 2016-10-05  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 39571: Src/exec.c, Test/C03traps.ztst: "&&" inside a shell
+	function could mess up ERR_EXIT outside.
+
 	* 39568: Src/exec.c, Test/C03traps.ztst: "! <complex-command>"
 	should suppress ERR_EXIT inside the complex command.
 
