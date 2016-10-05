@@ -1317,8 +1317,13 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    next = state->pc + WC_SUBLIST_SKIP(code);
 	    if (!oldnoerrexit)
 		noerrexit = !isend;
-	    if ((WC_SUBLIST_FLAGS(code) & WC_SUBLIST_NOT) && isend)
-		this_noerrexit = 1;
+	    if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_NOT) {
+		/* suppress errexit for "! this_command" */
+		if (isend)
+		    this_noerrexit = 1;
+		/* suppress errexit for ! <list-of-shell-commands> */
+		noerrexit = 1;
+	    }
 	    switch (WC_SUBLIST_TYPE(code)) {
 	    case WC_SUBLIST_END:
 		/* End of sublist; just execute, ignoring status. */

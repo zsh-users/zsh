@@ -1,5 +1,8 @@
 2016-10-05  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 39568: Src/exec.c, Test/C03traps.ztst: "! <complex-command>"
+	should suppress ERR_EXIT inside the complex command.
+
 	* 39566: README, Doc/Zsh/exec.yo, Src/exec.c,
 	Test/C04funcdef.ztst: change the behaviour of
 	command_not_found_handler to make it easier to handle a non-zero

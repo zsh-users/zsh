@@ -556,6 +556,33 @@ F:Must be tested with a top-level script rather than source or function
 1:ERRETURN with "!" and a following false
 >before
 
+  fn() {
+      emulate -L zsh
+      setopt errreturn
+      print before
+      ! if true; then
+        false
+      fi
+      print after
+  }
+  fn
+0:ERRETURN with "!" suppressed inside complex structure
+>before
+>after
+
+  fn() {
+      emulate -L zsh
+      setopt errreturn
+      print before
+      if true; then
+        false
+      fi
+      print after
+  }
+  fn
+1:ERRETURN with no "!" suppression (control case)
+>before
+
 %clean
 
   rm -f TRAPEXIT
