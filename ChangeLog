@@ -1,3 +1,10 @@
+2016-10-05  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39566: README, Doc/Zsh/exec.yo, Src/exec.c,
+	Test/C04funcdef.ztst: change the behaviour of
+	command_not_found_handler to make it easier to handle a non-zero
+	return status naturally.
+
 2016-10-04  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 39561: Src/mem.c: missing unqueue_signals() when ZSH_HEAP_DEBUG
