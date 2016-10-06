@@ -596,6 +596,36 @@ F:Must be tested with a top-level script rather than source or function
 >before-out
 >before-in
 
+  (setopt err_return
+    fn() {
+      print before-in
+      false && false
+      print after-in
+    }
+    print before-out
+    fn
+    print after-out
+  )
+0:ERR_RETURN not triggered on LHS of "&&" in function
+>before-out
+>before-in
+>after-in
+>after-out
+
+  (setopt err_return
+    fn() {
+      print before-in
+      true && false
+      print after-in
+    }
+    print before-out
+    fn
+    print after-out
+  )
+1:ERR_RETURN triggered on RHS of "&&" in function
+>before-out
+>before-in
+
 %clean
 
   rm -f TRAPEXIT
