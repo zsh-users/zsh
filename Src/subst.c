@@ -3629,7 +3629,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 			if (pre)
 			    ap[0][pre - 1] = ap[0][pre + sl] =
 				(quotetype != QT_DOUBLE ? '\'' : '"');
-			ap[0][pre + sl + 1] = '\0';
+			ap[0][pre + sl + post] = '\0';
 			if (quotetype == QT_DOLLARS)
 			  ap[0][0] = '$';
 		    }
@@ -3667,12 +3667,12 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    char *tmp;
 		    tmp = quotestring(val, quotetype);
 		    sl = strlen(tmp);
-		    val = (char *) zhalloc(pre + sl + 2);
+		    val = (char *) zhalloc(pre + sl + post + 1);
 		    strcpy(val + pre, tmp);
 		    if (pre)
 			val[pre - 1] = val[pre + sl] =
 			    (quotetype != QT_DOUBLE ? '\'' : '"');
-		    val[pre + sl + 1] = '\0';
+		    val[pre + sl + post] = '\0';
 		    if (quotetype == QT_DOLLARS)
 		      val[0] = '$';
 		} else

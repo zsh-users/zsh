@@ -1,5 +1,9 @@
 2016-10-06  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Julien Cretin: 39579: Src/subst.c: position of \0
+	with optional quoting in parameter substitution was wrongly
+	calculated.
+
 	* 39578: Test/C03traps.ztst: Test some more ERR_RETURN cases
 	involving "&&" and functions.
 
