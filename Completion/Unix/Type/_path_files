@@ -69,7 +69,7 @@ fi
 pats=( "${(@)pats:# #}" )
 
 if (( $#pfx )); then
-  compset -P "$pfx[2]" || pfxsfx=( "$pfx[@]" "$pfxsfx[@]" )
+  compset -P "${(b)pfx[2]}" || pfxsfx=( "$pfx[@]" "$pfxsfx[@]" )
 fi
 
 if (( $#prepaths )); then
