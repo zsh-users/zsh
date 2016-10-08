@@ -1191,6 +1191,7 @@ do_single(Cmatch m)
 	if (menucmp)
 	    minfo.cur = &m;
 	runhookdef(INSERTMATCHHOOK, (void *) &dat);
+	redrawhook();
 	minfo.cur = om;
     }
 }
