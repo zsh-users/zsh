@@ -592,7 +592,6 @@ execcase(Estate state, int do_exec)
     word = ecgetstr(state, EC_DUP, NULL);
     singsub(&word);
     untokenize(word);
-    lastval = 0;
 
     cmdpush(CS_CASE);
     while (state->pc < end) {

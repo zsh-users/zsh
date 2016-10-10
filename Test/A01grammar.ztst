@@ -757,6 +757,14 @@
 >}
 >Stuff here
 
+  (exit 37)
+  case $? in
+    (37) echo $?
+    ;;
+  esac
+0:case retains exit status for execution of cases
+>37
+
   x=1
   x=2 | echo $x
   echo $x
