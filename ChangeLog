@@ -1,3 +1,7 @@
+2016-10-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 36108: Src/builtin.c: command -[vV] assumed -p.
+
 2016-10-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39599: Src/loop.c, Test/A01grammar.ztst: Don't reset status

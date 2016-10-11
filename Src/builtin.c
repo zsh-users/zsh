@@ -3663,7 +3663,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 		returnval = 1;
 	    }
 	    popheap();
-	} else if (func == BIN_COMMAND &&
+	} else if (func == BIN_COMMAND && OPT_ISSET(ops,'p') &&
 		   (hn = builtintab->getnode(builtintab, *argv))) {
 	    /*
 	     * Special case for "command -p[vV]" which needs to
@@ -3671,7 +3671,9 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 	     */
 	    builtintab->printnode(hn, printflags);
 	    informed = 1;
-	} else if ((cnam = findcmd(*argv, 1, func == BIN_COMMAND))) {
+	} else if ((cnam = findcmd(*argv, 1,
+				   func == BIN_COMMAND &&
+				   OPT_ISSET(ops,'p')))) {
 	    /* Found external command. */
 	    if (wd) {
 		printf("%s: command\n", *argv);
