@@ -2158,7 +2158,8 @@ ca_parse_line(Cadef d, int multi, int first)
 		state.opt = 0;
 	    else
 		state.curopt = NULL;
-	} else if (multi && (*line == '-' || *line == '+') && cur != compcurrent
+	} else if (multi && (*line == '-' || *line == '+') && cur != compcurrent &&
+		ca_get_opt(d, line, 0, NULL)
 #if 0
 		   /**** Ouch. Using this will disable the mutual exclusion
 			 of different sets. Not using it will make the -A

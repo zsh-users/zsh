@@ -1,5 +1,8 @@
 2016-10-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 39611: Src/Zle/computil.c: with _arguments sets completion
+	stopped if one of the rest arguments starts with a dash
+
 	* 39533: Matthew Martin: Completion/Unix/Command/_doas:
 	add the new -L option, sort options and add some exclusions
 
