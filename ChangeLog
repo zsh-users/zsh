@@ -1,5 +1,8 @@
 2016-10-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 39622: Test/Y03arguments.ztst: add test cases for recent
+	_arguments fixes, exclusion lists and -A/-S
+
 	* 39611: Src/Zle/computil.c: with _arguments sets completion
 	stopped if one of the rest arguments starts with a dash
 

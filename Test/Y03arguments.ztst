@@ -119,6 +119,11 @@
 0:opt_args
 >line: {tst -ab 1 }{}
 
+ tst_arguments '-a:one: :two' ':descr:{compadd -Q - $opt_args[-a]}'
+ comptest $'tst -a 1:x \\2 \t'
+0:opt_args with multiple arguments and quoting of colons and backslashes
+>line: {tst -a 1:x \2 1\:x:\\2 }{}
+
  tst_arguments '-a' '*::rest:{compadd - -b}'
  comptest $'tst arg -\t'
 0:rest arguments
@@ -149,6 +154,94 @@
 >DESCRIPTION:{words}
 >NO:{abyyy}
 >NO:{abzzz}
+
+ tst_arguments -x :word
+ comptest $'tst -- -\t'
+0:option after --
+>line: {tst -- -x }{}
+
+ tst_arguments -S -x ':word:()'
+ comptest $'tst -- -\t'
+0:disallowed option after --
+>line: {tst -- -}{}
+
+ tst_arguments -S -x ':word:()'
+ comptest $'tst - --\eB\C-b\t'
+0:allowed option before --
+>line: {tst -x }{ --}
+
+ tst_arguments -x :word
+ comptest $'tst word -\t'
+0:option after a word
+>line: {tst word -x }{}
+
+ tst_arguments -A '-*' -x :word
+ comptest $'tst word -\t'
+0:option after word that doesn't match -A pattern
+>line: {tst word -}{}
+>MESSAGE:{no more arguments}
+
+ tst_arguments -A '-*' -x ':word:(-word)'
+ comptest $'tst  word\eB\C-b-\t'
+0:option before a word that doesn't match -A pattern
+>line: {tst -}{ word}
+>DESCRIPTION:{word}
+>NO:{-word}
+>DESCRIPTION:{option}
+>NO:{-x}
+
+ tst_arguments -A '-*' -h -V -a '*: :(-x more)'
+ comptest $'tst -a -x m\t'
+0:continue completion after rest argument that looks like an option
+>line: {tst -a -x more }{}
+
+ tst_arguments -A '-*' - help -h -V - other -a '*: :(-x more)'
+ comptest $'tst -a -x m\t'
+0:continue completion after rest argument that looks like an option (with sets)
+>line: {tst -a -x more }{}
+
+ tst_arguments '(-v)-a' '(set1--m -a)-b' - '(set1)' -m -n - set2 -v -w
+ comptest $'tst -a -\t' $'\C-w\C-w-'{b,m,v}$' -\t'
+0:exclusion lists
+>line: {tst -a -}{}
+>DESCRIPTION:{option}
+>NO:{-b}
+>NO:{-m}
+>NO:{-n}
+>NO:{-w}
+>line: {tst -b -}{}
+>DESCRIPTION:{option}
+>NO:{-n}
+>NO:{-v}
+>NO:{-w}
+>line: {tst -m -}{}
+>DESCRIPTION:{option}
+>NO:{-a}
+>NO:{-b}
+>NO:{-v}
+>NO:{-w}
+>line: {tst -v -}{}
+>DESCRIPTION:{option}
+>NO:{-a}
+>NO:{-b}
+>NO:{-m}
+>NO:{-n}
+>NO:{-w}
+
+ tst_arguments '(-)-h' -a -b -c
+ comptest $'tst -h -\t'
+0:exclude all other options
+>line: {tst -h -}{}
+>MESSAGE:{no arguments}
+
+# this would ideally not offer -b as it is already on the command-line
+ tst_arguments -a '(-a)-b'
+ comptest $'tst - -b\C-b\C-b\C-b\t'
+0:exclusion only applies to later words
+>line: {tst -}{ -b}
+>DESCRIPTION:{option}
+>NO:{-a}
+>NO:{-b}
 
 %clean
 
