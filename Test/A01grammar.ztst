@@ -765,6 +765,23 @@
 0:case retains exit status for execution of cases
 >37
 
+  false
+  case stuff in
+    (nomatch) foo
+    ;;
+  esac
+  echo $?
+0:case sets exit status to zero if no patterns are matched
+>0
+
+  case match in
+    (match) true; false; (exit 37)
+    ;;
+  esac
+  echo $?
+0:case keeps exit status of last command executed in compound-list
+>37
+
   x=1
   x=2 | echo $x
   echo $x

@@ -1,3 +1,8 @@
+2016-10-13  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39625: Martijn Dekker: Src/loop.c, Test/A01grammar.ztst: case
+	needs to reset lastval if no pattern matched.
+
 2016-10-13  Oliver Kiddle  <opk@zsh.org>
 
 	* 39622: Test/Y03arguments.ztst: add test cases for recent

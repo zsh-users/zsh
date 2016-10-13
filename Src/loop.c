@@ -584,7 +584,7 @@ execcase(Estate state, int do_exec)
     Wordcode end, next;
     wordcode code = state->pc[-1];
     char *word, *pat;
-    int npat, save, nalts, ialt, patok;
+    int npat, save, nalts, ialt, patok, anypatok;
     Patprog *spprog, pprog;
 
     end = state->pc + WC_CASE_SKIP(code);
@@ -592,6 +592,7 @@ execcase(Estate state, int do_exec)
     word = ecgetstr(state, EC_DUP, NULL);
     singsub(&word);
     untokenize(word);
+    anypatok = 0;
 
     cmdpush(CS_CASE);
     while (state->pc < end) {
@@ -648,7 +649,7 @@ execcase(Estate state, int do_exec)
 		    *spprog = pprog;
 	    }
 	    if (pprog && pattry(pprog, word))
-		patok = 1;
+		patok = anypatok = 1;
 	    state->pc += 2;
 	    nalts--;
 	}
@@ -678,6 +679,9 @@ execcase(Estate state, int do_exec)
     cmdpop();
 
     state->pc = end;
+
+    if (!anypatok)
+	lastval = 0;
 
     return lastval;
 }
