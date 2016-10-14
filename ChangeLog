@@ -1,3 +1,7 @@
+2016-10-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 39623: Completion/X/Command/_evince: new completion
+
 2016-10-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39625: Martijn Dekker: Src/loop.c, Test/A01grammar.ztst: case
