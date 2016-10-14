@@ -1,5 +1,8 @@
 2016-10-13  Oliver Kiddle  <opk@zsh.org>
 
+	* 39624: Completion/Unix/Command/_yafc: remove space before
+	compdef that prevents function being used plus other tweaks
+
 	* 39623: Completion/X/Command/_evince: new completion
 
 2016-10-13  Peter Stephenson  <p.stephenson@samsung.com>
