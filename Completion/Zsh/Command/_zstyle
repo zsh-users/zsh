@@ -4,22 +4,6 @@ local state context ostate line expl ctop suf
 local nm=$compstate[nmatches] taglist patterns pstyles contexts
 typeset -A opt_args styles
 
-(( $+functions[_completers] )) ||
-_completers() {
-  # option: -p - needs a `_' prefix
-  local us
-  local -a disp list expl
-
-  list=( complete approximate correct match expand list menu oldlist
-         ignored prefix history )
-  zparseopts -D -K -E 'p=us'
-  [[ -n "$us" ]] && us='_'
-  zstyle -t ":completion:${curcontext}:completers" prefix-hidden &&
-      disp=(-d list)
-  _wanted completers expl 'completer' \
-      compadd "$@" "$disp[@]" - "$us${^list[@]}"
-}
-
 _vcs_info_hooks() {
   compadd - ${functions[(I)+vi-*]#+vi-}
 }
