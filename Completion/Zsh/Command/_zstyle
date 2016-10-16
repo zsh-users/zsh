@@ -1,7 +1,7 @@
 #compdef zstyle
 
 local state context ostate line expl ctop suf
-local nm=$compstate[nmatches] taglist patterns pstyles contexts
+local nm=$compstate[nmatches] taglist patterns contexts
 typeset -A opt_args styles
 
 _vcs_info_hooks() {
@@ -216,17 +216,27 @@ taglist=(
   email-address ${(k)functions[(I)_email-*]#_}
 )
 
+# Be careful with the context arguments here.  They like to masquerade.
 _arguments -C \
-  '(-)-L[output in form of zstyle commands]' \
-  '(: -)-d[delete style definitions]:context pattern:->patterns:*:styles:->pstyles' \
-  '(-)-e[value is evaluated when style is looked up]' \
-  ':context:->contexts' ':style:->styles' '*:argument:->style-arg'
+  '(: -)-L[output in form of zstyle commands]:pattern for context patterns:->metapatterns:style:->metastyles' \
+  '(: -)-d[delete style definitions]:verbatim context pattern:->patterns:*:styles:->pstyles' \
+  '(: -)-e[value is evaluated when style is looked up]:context pattern:->contexts:style:->styles:*:command:_cmdstring' \
+  '(: -)-g[retrieve style definition]:array parameter:_parameters -g "*array*":verbatim context pattern:->patterns:styles:->pstyles' \
+  '(: -)-s[retrieve style value as string]:context name:->contexts:style:->styles:scalar parameter:_parameters -g "*scalar*":separator: ' \
+  '(: -)-b[retrieve style value as boolean]:context name:->contexts:style:->styles:scalar parameter:_parameters -g "*scalar*"' \
+  '(: -)-a[retrieve style value as array]:context name:->contexts:style:->styles:array parameter:_parameters -g "*array*"' \
+  '(: -)-t[test a style, returning false if it'\''s undefined]:context name:->contexts:style:->styles:*:strings to test presence of: ' \
+  '(: -)-T[test a style, returning true if it'\''s undefined]:context name:->contexts:style:->styles:*:strings to test presence of: ' \
+  '(: -)-m[pattern-match values of a style]:context name:->contexts:style:->styles:pattern: ' \
+  '(-):context pattern:->contexts' '(-):style:->styles' '(-)*:argument:->style-arg'
 
 while (( $#state )); do
   case "$state[1]" in
+    # 'contexts' completes either full context names (for -t/-s/-a), or context
+    # patterns (for 'zstyle :foo bar' and -e).
     (contexts)
       if [[ ! -prefix :*: ]]; then
-	_wanted contexts expl context compadd -P : -qS : chpwd completion vcs_info zftp zle
+	_wanted contexts expl "$state_descr"  compadd -P : -qS : chpwd completion vcs_info zftp zle
       elif compset -P :completion:; then
         contexts=( functions _completers cmdorcont argument tag )
       elif compset -P :vcs_info:; then
@@ -250,19 +260,80 @@ while (( $#state )); do
       fi
       ;;
 
+    # 'patterns' completes context patterns that are set, for -d/-g.
     (patterns)
       zstyle -g patterns
-      _wanted contexts expl 'context pattern' compadd -a patterns
+      _wanted contexts expl "$state_descr" compadd -a patterns
       ;;
 
+    # 'metapatterns': patterns that are are matched not against contexts, but
+    # against patterns.
+    (metapatterns)
+      zstyle -g patterns
+      patterns=( "${(@b)patterns}" )
+      _wanted contexts expl "$state_descr" compadd -a patterns
+      ;;
+
+    # 'metastyles': styles that are set on context patterns matching the given
+    # metapattern.
+    (metastyles)
+      # Anonymous function to shadow the global $styles assoc
+      () { 
+        local metapattern=${(Q)${${opt_args[-L]%:*}//(#m)\\([\\:])/${MATCH[2]}}}
+        local -a metastyles styles
+        local pattern
+        zstyle -g patterns
+        for pattern in "${(@M)patterns:#${~metapattern}}"; do
+          zstyle -g styles $pattern
+          metastyles+=( "${styles[@]}" )
+        done
+        _wanted styles expl "$state_descr" compadd -a metastyles
+        unset pattern
+        unset metastyles
+      }
+      ;;
+
+    # 'pstyles': complete styles that are set for the verbatim context pattern
+    # specified on the command line.  (If the user has set no zstyles, this
+    # will complete nothing.)
     (pstyles)
-      zstyle -g pstyles ${(Q)${(M)opt_args[-d]#*[^\\]:}%:}
+      local -a pstyles
+      local pattern
+      if (( $+opt_args[-d] )); then
+        pattern=${opt_args[-d]}
+        pattern=${pattern%":${(b)PREFIX}"} # remove style
+        pattern=${pattern//(#m)\\([\\:])/${MATCH[2]}} # undo _arguments escaping
+        pattern=${(Q)pattern} # undo command-line escaping (assumes no noglob)
+        zstyle -g pstyles $pattern
+      elif (( $+opt_args[-g] )); then
+        pattern=${opt_args[-g]}
+        pattern=${pattern%":${(b)PREFIX}"} # remove style
+        pattern=${pattern#*:} # remove array name
+        pattern=${pattern//(#m)\\([\\:])/${MATCH[2]}} # undo _arguments escaping
+        pattern=${(Q)pattern} # undo command-line escaping (assumes no noglob)
+        zstyle -g pstyles $pattern
+      fi
       _wanted styles expl style compadd -a pstyles
+      unset pattern
+      unset pstyles
     ;;
 
+    # 'styles': complete all styles that may be set in the context given on the
+    # command line.  This is independent of what styles are set.
     (styles)
       # Get the top-level context we're completing for, if any.
-      case ${(Q)line[1]} in
+      if [[ -n $line[1] ]]; then
+        # zstyle :something <TAB>
+        local the_context=$line[1]
+      else
+        # zstyle -x :something <TAB>
+        local joined_value=${(v)opt_args[(i)(-e|-s|-b|-a|-t|-T|-m)]}
+        local the_context=${(Q)joined_value[0, ${joined_value[(i)[^\\]:]}-2 ]}
+      fi
+      # Note: for 'zstyle :something <TAB>' and for 'zstyle -e :something <TAB>',
+      # $the_context is a context pattern; for -s,-b,-a,-t,-T,-m, it is a context
+      # name.  We currently draw no distinction between these two cases.
+      case $the_context in
 	(:completion:*)
 	ctop=c
 	;;

@@ -1,5 +1,8 @@
 2016-10-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39657: Completion/Zsh/Command/_zstyle: Complete the -g,
+	-s,-b,-a, -t,-T, -m options.
+
 	* 39657: Completion/Zsh/Command/_zstyle: When completing a
 	style for an unrecognised context, complete all known styles.
 
