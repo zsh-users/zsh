@@ -1,5 +1,9 @@
 2016-10-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39654: Completion/Unix/Command/_make: (based on patch by
+	Baptiste Daroussin) Better support bmake, FreeBSD's default
+	make(1) implementation.
+
 	* 39657: Completion/Zsh/Command/_zstyle: Complete the -g,
 	-s,-b,-a, -t,-T, -m options.
 

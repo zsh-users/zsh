@@ -263,17 +263,20 @@ _make() {
 
     if [[ -n "$file" ]]
     then
-      if [[ $is_gnu == gnu ]] && zstyle -t ":completion:${curcontext}:targets" call-command
+      if [[ $is_gnu == gnu ]] 
       then
-        _make-parseMakefile $PWD < <(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null)
-      else
-        case "$OSTYPE" in
-          freebsd*)
-          _make-parseMakefile $PWD < <(_call_program targets "$words[1]" -nsp -f "$file" .PHONY 2> /dev/null)
-    ;;
-    *)
+        if zstyle -t ":completion:${curcontext}:targets" call-command; then
+          _make-parseMakefile $PWD < <(_call_program targets "$words[1]" -nsp --no-print-directory -f "$file" .PHONY 2> /dev/null)
+        else
           _make-parseMakefile $PWD < $file
-        esac
+        fi
+      else
+        if [[ $OSTYPE == (freebsd|dragonfly|netbsd)* || /$words[1] == */bmake* ]]; then
+          TARGETS+=(${=${(f)"$(_call_program targets "$words[1]" -s -f "$file" -V.ALLTARGETS 2> /dev/null)"}})
+          _make-parseMakefile $PWD < <(_call_program targets "$words[1]" -nsdg1Fstdout -f "$file" .PHONY 2> /dev/null)
+        else
+          _make-parseMakefile $PWD < $file
+        fi
       fi
     fi
 
