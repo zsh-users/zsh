@@ -530,7 +530,7 @@ _git-cherry-pick () {
     '*'{-s+,--strategy=}'[use given merge strategy]:merge strategy:__git_merge_strategies' \
     '*'{-X+,--strategy-option=}'[pass merge-strategy-specific option to merge strategy]:option' \
     '(-e --edit -x -n --no-commit -s --signoff)--ff[fast forward, if possible]' \
-    ': : __git_commit_ranges -O expl:git_commit_opts'
+    '*: : __git_commit_ranges -O expl:git_commit_opts'
 }
 
 (( $+functions[_git-citool] )) ||
