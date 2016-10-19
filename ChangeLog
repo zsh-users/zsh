@@ -1,3 +1,8 @@
+2016-10-19  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39678: Src/builtin.c, Test/D07multibyte.ztst: printf %q
+	argument needs metafying and result unmetafying.
+
 2016-10-18  m0viefreak  <m0viefreak.cm@googlemail.com>
 
 	* 39590: Src/Zle/compresult.c: zle: Call zle-line-pre-redraw

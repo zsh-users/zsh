@@ -4874,9 +4874,10 @@ bin_print(char *name, char **args, Options ops, int func)
 		break;
 	    case 'q':
 		stringval = curarg ?
-		    quotestring(curarg, QT_BACKSLASH_SHOWNULL) : &nullstr;
+		    quotestring(metafy(curarg, curlen, META_USEHEAP),
+				QT_BACKSLASH_SHOWNULL) : &nullstr;
 		*d = 's';
-		print_val(stringval);
+		print_val(unmetafy(stringval, &curlen));
 		break;
 	    case 'd':
 	    case 'i':

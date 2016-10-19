@@ -579,3 +579,7 @@
 0:Sorting of metafied Polish characters
 >a ą b c ć d e ę f
 >a ą b c ć d e ę f
+
+  printf '%q%q\n' 你你
+0:printf %q and quotestring and general metafy / token madness
+>你你
