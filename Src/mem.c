@@ -497,7 +497,8 @@ popheap(void)
 		    continue;
 		}
 		h->next = NULL;
-	    }
+	    } else if (hl == h)	/* This is the last arena of all */
+		hl = NULL;
 #ifdef USE_MMAP
 	    munmap((void *) h, h->size);
 #else
