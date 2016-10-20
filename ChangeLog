@@ -1,3 +1,8 @@
+2016-10-20  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39683: Src/pattern.c: Update scan pointer in pattern after
+	possible reallocation for meta handling.
+
 2016-10-19  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 39680: Src/mem.c: correctly handle case of popping last arena

@@ -669,12 +669,16 @@ patcompile(char *exp, int inflags, char **endexp)
 				nmeta++;
 			if (nmeta) {
 			    char *oldpatout = patout;
+			    ptrdiff_t pd;
 			    patadd(NULL, 0, nmeta, 0);
 			    /*
 			     * Yuk.
 			     */
 			    p = (Patprog)patout;
-			    opnd = patout + (opnd - oldpatout);
+			    pd = patout - oldpatout;
+			    opnd += pd;
+			    pscan += pd;
+			    next += pd;
 			    dst = patout + startoff;
 			}
 
