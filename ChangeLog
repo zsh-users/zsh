@@ -1,5 +1,8 @@
 2016-10-20  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 39688: Src/pattern.c: Alternative fix: next pointer is
+	irrelevant anyway as there's only one P_EXACTLY in a P_PURES.
+
 	* 39683: Src/pattern.c: Update scan pointer in pattern after
 	possible reallocation for meta handling.
 

@@ -677,8 +677,6 @@ patcompile(char *exp, int inflags, char **endexp)
 			    p = (Patprog)patout;
 			    pd = patout - oldpatout;
 			    opnd += pd;
-			    pscan += pd;
-			    next += pd;
 			    dst = patout + startoff;
 			}
 
@@ -690,6 +688,8 @@ patcompile(char *exp, int inflags, char **endexp)
 				*dst++ = *opnd++;
 			    }
 			}
+			/* Only one string in a PAT_PURES, so now done. */
+			break;
 		    }
 		}
 		p->size = dst - patout;
