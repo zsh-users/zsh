@@ -53,6 +53,7 @@ _yum()
 		"shell:enter the 'yum shell'"
 		"update:update one or more packages"
 		"upgrade:upgrade one or more packages"
+    "history:view past transactions"
   	)
 
   	if (( CURRENT == 1 )); then
@@ -83,6 +84,15 @@ _yum()
     	fi
     	return ret
   	fi
+}
+
+# Expand next argument after 'yum history'
+_yum_history() {
+  if (( CURRENT == 2 )); then
+    local -a historycommands
+    historycommands=('info' 'list' 'packages-list' 'packages-info' 'summary' 'addon-info' 'redo' 'undo' 'roll-back' 'new' 'sync' 'stats')
+    _describe -t commands 'yum history command' historycommands
+  fi
 }
 
 # Fills the all pkg cache
