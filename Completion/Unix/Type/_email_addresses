@@ -5,6 +5,8 @@
 # -s sep    - complete a list of addresses separated by specified character
 # -c        - e-mail address must be of form user@host (no comments or aliases)
 #
+# TODO: with -n, have the named plugin complete not only aliases but also addresses?
+# 
 # Plugins are written as separate functions with names starting `_email-'.
 # They should either do their own completion or return the addresses in the
 # reply array in the form 'alias:address' and return 300. The -c option is

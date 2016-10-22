@@ -826,6 +826,10 @@ kindex(domains, completion tag)
 item(tt(domains))(
 for network domains
 )
+kindex(email-*, completion tag)
+item(tt(email-)var(plugin))(
+for email addresses from the `tt(_email-)var(plugin)' backend of tt(_email_addresses)
+)
 kindex(expansions, completion tag)
 item(tt(expansions))(
 used by the tt(_expand) completer for individual words (as opposed to
@@ -4386,6 +4390,44 @@ The function sets the parameter
 tt($service) to the var(string) being tried, and sets
 the var(context/command) field (the fourth) of the tt($curcontext)
 parameter to the var(context) given as the first argument.
+)
+findex(_email_addresses)
+item(tt(_email_addresses) [ tt(-c) ] [ tt(-n) var(plugin) ])(
+Complete email addresses.  Addresses are provided by plugins.
+
+startitem()
+item(tt(-c))(
+Complete bare tt(localhost@domain.tld) addresses, without a name part or
+a comment.
+Without this option, RFC822 `var(Firstname Lastname) tt(<)var(address)tt(>)'
+strings are completed.
+)
+item(tt(-n) var(plugin))(
+Complete aliases from var(plugin).  
+)
+COMMENT(Intentionally leaving tt(-s) undocumented: new code should use
+tt(_sequence) instead.)\
+enditem()
+
+The following plugins are available by default:
+tt(_email-ldap) (see the tt(filter) style),
+tt(_email-local) (completes var(user)tt(@)var(hostname) Unix addresses),
+tt(_email-mail) (completes aliases from tt(~/.mailrc)),
+tt(_email-mush),
+tt(_email-mutt),
+and
+tt(_email-pine).
+
+Addresses from the tt(_email-)var(foo) plugin are added under the
+tag `tt(email-)var(foo)'.
+
+em(Writing plugins)
+
+Plugins are written as separate functions with names starting with `tt(_email-)'.
+They are invoked with the tt(-c) option and tt(compadd) options.
+They should either do their own completion or
+set the tt($reply) array to a list of `var(alias)tt(:)var(address)' elements and return tt(300).
+New plugins will be picked up and run automatically.
 )
 findex(_files)
 item(tt(_files))(

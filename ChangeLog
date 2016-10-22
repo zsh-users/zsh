@@ -1,5 +1,8 @@
 2016-10-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39708: Completion/Unix/Type/_email_addresses,
+	Doc/Zsh/compsys.yo: Document _email_addresses.
+
 	* 39707: Doc/Zsh/compsys.yo: Document _dir_list.
 
 2016-10-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
