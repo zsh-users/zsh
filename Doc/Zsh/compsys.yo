@@ -4357,6 +4357,21 @@ matches.  Almost all calls to tt(compadd) within the completion system use
 a similar format; this ensures that user-specified styles are correctly
 passed down to the builtins which implement the internals of completion.
 )
+findex(_dir_list)
+item(tt(_dir_list) [ tt(-s) var(sep) ] [ tt(-S) ])(
+Complete a list of directory names separated by colons
+(the same format as tt($PATH)).
+
+startitem()
+item(tt(-s) var(sep))(
+Use var(sep) as separator between items.
+var(sep) defaults to a colon (`tt(:)').
+)
+item(tt(-S))(
+Add var(sep) instead of slash (`tt(/)') as an autoremoveable suffix.
+)
+enditem()
+)
 findex(_dispatch)
 item(tt(_dispatch) var(context string) ...)(
 This sets the current context to var(context) and looks for completion
