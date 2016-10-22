@@ -5019,6 +5019,12 @@ allows tt(_tags) to use a more
 specific context without having to change and reset the
 tt(curcontext) parameter (which has the same effect).
 )
+findex(_tilde_files)
+item(tt(_tilde_files))(
+Like tt(_files), but resolve leading tildes according to the rules of
+filename expansion, so the suggested completions don't start with
+a `tt(~)' even if the filename on the command-line does.
+)
 findex(_values)
 item(tt(_values) [ tt(-O) var(name) ] [ tt(-s) var(sep) ] [ tt(-S) var(sep) ] [ tt(-wC) ] var(desc) var(spec) ...)(
 This is used to complete arbitrary keywords (values) and their arguments,

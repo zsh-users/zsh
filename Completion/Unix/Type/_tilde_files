@@ -30,7 +30,8 @@ case "$PREFIX" in
   ;;
 \~*)
   compset -P '?'
-  _users "$@"
+  local -a expl=( "$@" )
+  _alternative -O expl users:user:_users named-directories:'named directory':'compadd -k nameddirs'
   ;;
 *)
   _files "$@"

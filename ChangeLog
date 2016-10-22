@@ -1,5 +1,8 @@
 2016-10-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39706: Completion/Unix/Type/_tilde_files, Doc/Zsh/compsys.yo:
+	_tilde_files: Offer named directories. Document.
+
 	* 39708: Completion/Unix/Type/_email_addresses,
 	Doc/Zsh/compsys.yo: Document _email_addresses.
 
