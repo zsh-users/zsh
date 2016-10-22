@@ -1,3 +1,8 @@
+2016-11-12  Oliver Kiddle  <opk@zsh.org>
+
+	* Paul Seyfert: 39920: Completion/Redhat/Command/_yum:
+	extend yum completion to cover more yum commands
+
 2016-11-10  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 39893: Src/params.c: use arrdup_max() to show explicitly the
