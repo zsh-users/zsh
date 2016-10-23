@@ -57,6 +57,10 @@ _yum()
   "help:produce help for all or given command"
   "load-transaction:load a saved transaction from a textfile"
   "load-ts:load a saved transaction from a textfile"
+  "check:Check for problems in the rpmdb"
+  "reinstall:reinstall a package"
+  "downgrade:downgrade a package"
+  "repolist:Display the configured software repositories"
   )
 
   if (( CURRENT == 1 )); then
@@ -98,6 +102,28 @@ _yum()
     fi
     return ret
   fi
+}
+
+# Expand next argument after 'yum check'
+_yum_check() {
+  if (( CURRENT == 2 )); then
+    local -a chkargs
+    #chkargs=("dependencies" "duplicates" "obsoletes" "provides" "all") # according to man page
+    #chkargs=("dependencies" "duplicates" "all") # according to help
+    chkargs=("dependencies" "duplicates" "provides" "all") # what works for me
+    _describe -t arguments 'check arguments' chkargs
+  fi
+  return 0
+}
+
+# Expand next argument after 'yum repolist'
+_yum_repolist() {
+  if (( CURRENT == 2 )); then
+    local -a suggests
+    suggests=("all" "enabled" "disabled")
+    _describe -t arguments 'repolist arguments' suggests
+  fi
+  return 0
 }
 
 # Expand next argument after 'yum history'
@@ -233,11 +259,28 @@ yum_repos() {
 	compadd "$@" -a -- enabled_yum_repos
 }
 
+# Suggest installed packages
+_yum_act_on_installed_pkgs() {
+	_yum_installed_pkgs
+	compadd "$@" -a -- _installed_pkgs
+}
+
 # Completion function for erase|remove
 (( $+functions[_yum_erase] )) || _yum_erase()
 {
-	_yum_installed_pkgs
-	compadd "$@" -a -- _installed_pkgs
+  _yum_act_on_installed_pkgs
+}
+
+# Completion function for downgrade
+(( $+functions[_yum_downgrade] )) || _yum_downgrade()
+{
+  _yum_act_on_installed_pkgs
+}
+
+# Completion function for reinstall
+(( $+functions[_yum_reinstall] )) || _yum_reinstall()
+{
+  _yum_act_on_installed_pkgs
 }
 
 # Completion function for install
