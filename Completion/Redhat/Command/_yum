@@ -93,7 +93,51 @@ _yum_history() {
     historycommands=('info' 'list' 'packages-list' 'packages-info' 'summary' 'addon-info' 'redo' 'undo' 'roll-back' 'new' 'sync' 'stats')
     _describe -t commands 'yum history command' historycommands
   fi
+  if (( CURRENT == 3 )); then
+    local -a ID_commands
+    local -a ID_range_commands
+    local -a package_commands
+    local -a suggests
+    local description
+    description=""
+    suggests=()
+    ID_commands=('summary' 'info' 'list' 'stats' 'addon-info')
+    ID_range_commands=('summary' 'info' 'list' 'stats')
+    package_commands=('summary' 'info' 'list' 'stats' 'packages-list' 'packages-info')
+    # packages-list, packages-info   : needs package name
+    # summary, info, list, stats     : ID, ID range, package name
+    # addon-info                     : ID
+    # redo, undo, roll-back, sync    : unknown
+    if [[ -n "${ID_commands[(r)$words[2]]}" ]]; then
+      description+="IDs"
+      suggests+=('last' 'all' 1 2 3)
+    fi
+    if [[ -n "${ID_range_commands[(r)$words[2]]}" ]]; then
+      if [[ -n $description ]] ; then description+=", "; fi
+      description+="ID ranges"
+      suggests+=('1..2' '2..3' '1..3')
+    fi
+    if [[ -n "${package_commands[(r)$words[2]]}" ]]; then
+      if [[ -n $description ]] ; then description+=", "; fi
+      description+="packages"
+      _yum_installed_pkgs
+      suggests+=($_installed_pkgs)
+    fi
+    if [[ ! -n $description ]] ; then
+      _message "unknown expansion for: yum history $words[2]"
+    else
+      _describe $description suggests
+    fi
+  fi
+  if (( CURRENT == 4 )); then
+    if [ "$words[2]" = "addon-info" ]; then
+      local -a historyargs
+      historyargs=(saved_tx)
+      _describe 'additional option' historyargs
+    fi
+  fi
 }
+
 
 # Fills the all pkg cache
 _yum_all_pkgs()
