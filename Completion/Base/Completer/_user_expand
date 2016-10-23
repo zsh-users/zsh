@@ -121,9 +121,14 @@ else
     (( $#space ))  && compadd "$expl[@]" -UQ -qS " " -a space
     (( $#normal )) && compadd "$expl[@]" -UQ -qS "" -a normal
   fi
-  if _requested all-expansions expl "all expansions${REPLY:+: $REPLY}"; then
+  if _requested all-expansions; then
     local disp dstr
 
+    if [[ "$sort" = menu ]]; then
+      _description all-expansions expl "all expansions${REPLY:+: $REPLY}" "o:$word"
+    else
+      _description -V all-expansions expl "all expansions${REPLY:+: $REPLY}" "o:$word"
+    fi
     if [[ "${#${exp}}" -ge COLUMNS ]]; then
       disp=( -ld dstr )
       dstr=( "${(r:COLUMNS-5:)exp} ..." )

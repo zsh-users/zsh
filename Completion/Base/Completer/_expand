@@ -181,7 +181,7 @@ if [[ -z "$compstate[insert]" ]] ;then
 else
   _tags all-expansions expansions original
 
-  if [[ $#exp -gt 1 ]] && _requested expansions; then
+  if [[ $#exp -ge 1 ]] && _requested expansions; then
     local i j normal space dir
 
     if [[ "$sort" = menu ]]; then
@@ -207,9 +207,14 @@ else
     (( $#space ))  && compadd "$expl[@]" -UQ -qS " " -a space
     (( $#normal )) && compadd "$expl[@]" -UQ -qS "" -a normal
   fi
-  if _requested all-expansions expl 'all expansions'; then
+  if _requested all-expansions; then
     local disp dstr
 
+    if [[ "$sort" = menu ]]; then
+      _description all-expansions expl 'all expansions' "o:$word"
+    else
+      _description -V all-expansions expl 'all expansions' "o:$word"
+    fi
     if [[ "${#${exp}}" -ge COLUMNS ]]; then
       disp=( -ld dstr )
       dstr=( "${(r:COLUMNS-5:)exp} ..." )

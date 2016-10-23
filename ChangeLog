@@ -1,3 +1,10 @@
+2016-10-22  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39710 (cf. Alex George: 39709): Completion/Base/Completer/_expand,
+	Completion/Base/Completer/_user_expand: handle the %o format in the
+	"all-expansions" tag; allow a single unique match to appear in the
+	"expansions" tag (cf. users/21955).
+
 2016-10-20  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39688: Src/pattern.c: Alternative fix: next pointer is
