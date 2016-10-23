@@ -662,7 +662,9 @@ clprintfmt(char *p, int ml)
 
     initiscol();
 
-    for (; *p; p++) {
+    while (*p) {
+	convchar_t chr;
+	int chrlen = MB_METACHARLENCONV(p, &chr);
 	doiscol(i++);
 	cc++;
 	if (*p == '\n') {
@@ -673,11 +675,16 @@ clprintfmt(char *p, int ml)
 	if (ml == mlend - 1 && (cc % zterm_columns) == zterm_columns - 1)
 	    return 0;
 
-	if (*p == Meta) {
+	while (chrlen) {
+	    if (*p == Meta) {
+		p++;
+		chrlen--;
+		putc(*p ^ 32, shout);
+	    } else
+		putc(*p, shout);
+	    chrlen--;
 	    p++;
-	    putc(*p ^ 32, shout);
-	} else
-	    putc(*p, shout);
+	}
 	if ((beg = !(cc % zterm_columns)))
 	    ml++;
 	if (mscroll && !(cc % zterm_columns) &&
