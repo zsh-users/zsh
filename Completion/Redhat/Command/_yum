@@ -53,6 +53,8 @@ _yum()
   "shell:enter the 'yum shell'"
   "update:update one or more packages"
   "upgrade:upgrade one or more packages"
+  "update-to:update one or more packages taking obsoletes into account"
+  "upgrade-to:upgrade one or more packages taking obsoletes into account"
   "history:view past transactions"
   "help:produce help for all or given command"
   "load-transaction:load a saved transaction from a textfile"
@@ -61,6 +63,8 @@ _yum()
   "reinstall:reinstall a package"
   "downgrade:downgrade a package"
   "repolist:Display the configured software repositories"
+  "distribution-synchronization:Synchronize installed packages to the latest available versions"
+  "distro-sync:Synchronize installed packages to the latest available versions"
   )
 
   if (( CURRENT == 1 )); then
@@ -74,7 +78,10 @@ _yum()
       remove) cmd="erase";;
       whatprovides) cmd="provides";;
       upgrade) cmd="update";;
+      upgrade-to) cmd="update";;
+      update-to) cmd="update";;
       load-ts) cmd="load-transaction";;
+      distro-sync) cmd="distribution-synchronization";;
     esac
 
     if (( $#cmd )); then
@@ -263,6 +270,12 @@ yum_repos() {
 _yum_act_on_installed_pkgs() {
 	_yum_installed_pkgs
 	compadd "$@" -a -- _installed_pkgs
+}
+
+# Completion function for distribution-synchronization|distro-sync
+(( $+functions[_yum_distribution-synchronization] )) || _yum_distribution-synchronization()
+{
+  _yum_act_on_installed_pkgs
 }
 
 # Completion function for erase|remove
