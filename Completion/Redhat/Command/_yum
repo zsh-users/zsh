@@ -28,62 +28,69 @@ _yum()
 
 (( $+functions[_yum_command] )) || _yum_command() 
 {
-  	local -a _yum_cmds
-  	_yum_cmds=(
-		"install:install the latest version of a package or group of packages"
-		"erase:remove an installed package (with its dependencies)"
-		"remove:remove an installed package (with its dependencies)"
-		"clean:clean local yum cache"
-		"deplist:gives a list of all dependencies for a package"
-		"check-update:check if any updates are available"
-		"info:get description of available packages"
-		"list:is used to list various information about packages"
-		"groupinfo:get info on package groups"
-		"groupinstall:install a package group or groups"
-		"groupremove:remove a package group or groups"
-		"grouplist:list package groups"
-		"groupupdate:update a package group or groups"
-		"localinstall:install packages with local rpm files"
-		"localupdate:update packages with local rpm files"
-		"makecache:makes a local yum cache"
-		"provides:find out which package provides some feature or file"
-		"whatprovides:find out which package provides some feature or file"
-		"resolvedep:list packages providing the specified dependencies"
-		"search:find any packages matching pattern"
-		"shell:enter the 'yum shell'"
-		"update:update one or more packages"
-		"upgrade:upgrade one or more packages"
-    "history:view past transactions"
-  	)
+  local -a _yum_cmds
+  _yum_cmds=(
+  "install:install the latest version of a package or group of packages"
+  "erase:remove an installed package (with its dependencies)"
+  "remove:remove an installed package (with its dependencies)"
+  "clean:clean local yum cache"
+  "deplist:gives a list of all dependencies for a package"
+  "check-update:check if any updates are available"
+  "info:get description of available packages"
+  "list:is used to list various information about packages"
+  "groupinfo:get info on package groups"
+  "groupinstall:install a package group or groups"
+  "groupremove:remove a package group or groups"
+  "grouplist:list package groups"
+  "groupupdate:update a package group or groups"
+  "localinstall:install packages with local rpm files"
+  "localupdate:update packages with local rpm files"
+  "makecache:makes a local yum cache"
+  "provides:find out which package provides some feature or file"
+  "whatprovides:find out which package provides some feature or file"
+  "resolvedep:list packages providing the specified dependencies"
+  "search:find any packages matching pattern"
+  "shell:enter the 'yum shell'"
+  "update:update one or more packages"
+  "upgrade:upgrade one or more packages"
+  "history:view past transactions"
+  "help:produce help for all or given command"
+  )
 
-  	if (( CURRENT == 1 )); then
-		_describe -t commands 'yum command' _yum_cmds || compadd "$@"
-  	else
-    	local curcontext="$curcontext"
+  if (( CURRENT == 1 )); then
+    _describe -t commands 'yum command' _yum_cmds || compadd "$@"
+  else
+    local curcontext="$curcontext"
 
-	    cmd="${${_yum_cmds[(r)$words[1]:*]%%:*}}"
-		# Deal with any aliases
-		case $cmd in
-			remove) cmd="erase";;
-			whatprovides) cmd="provides";;
-			upgrade) cmd="update";;
-		esac
-		
-    	if (( $#cmd )); then
-    		curcontext="${curcontext%:*:*}:yum-${cmd}:"
-	
-	      	local update_policy
-		  	zstyle -s ":completion:${curcontext}:" cache-policy update_policy
-		  	if [[ -z "$update_policy" ]]; then
-				zstyle ":completion:${curcontext}:" cache-policy _yum_caching_policy
-	  		fi
+    cmd="${${_yum_cmds[(r)$words[1]:*]%%:*}}"
+    # Deal with any aliases
+    case $cmd in
+      remove) cmd="erase";;
+      whatprovides) cmd="provides";;
+      upgrade) cmd="update";;
+    esac
 
-      		_call_function ret _yum_$cmd || _message 'no more arguments'
-    	else
-      		_message "unknown yum command: $words[1]"
-    	fi
-    	return ret
-  	fi
+    if (( $#cmd )); then
+      curcontext="${curcontext%:*:*}:yum-${cmd}:"
+
+      local update_policy
+      zstyle -s ":completion:${curcontext}:" cache-policy update_policy
+      if [[ -z "$update_policy" ]]; then
+        zstyle ":completion:${curcontext}:" cache-policy _yum_caching_policy
+      fi
+
+      if [[ "$cmd" -eq "help" && CURRENT -eq 2 ]]; then
+        local -a _yum_cmd_names
+        _yum_cmd_names=(${_yum_cmds%%:*})
+        _describe -t commands 'commands' _yum_cmd_names
+      else
+        _call_function ret _yum_$cmd || _message 'no more arguments'
+      fi
+    else
+      _message "unknown yum command: $words[1]"
+    fi
+    return ret
+  fi
 }
 
 # Expand next argument after 'yum history'
