@@ -110,6 +110,11 @@ possible to return a non-zero status to the parent shell from a command
 executed as a replacement, and the new implementation is more consistent
 with other shells.
 
+7) The output of "typeset -p" (and synonyms) now takes into account the
+function scope and export state of each parameter.  Exported parameters
+are output as "export" commands unless the parameter is also local, and
+other parameters not local to the scope are output with the "-g" option.
+
 Incompatibilities between 5.0.8 and 5.2
 ---------------------------------------
 

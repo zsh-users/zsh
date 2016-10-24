@@ -454,7 +454,7 @@
  fn() { typeset -p array nonexistent; }
  fn
 1:declare -p shouldn't create scoped values
->typeset -a array=( foo bar )
+>typeset -g -a array=( foo bar )
 ?fn:typeset: no such variable: nonexistent
 
  unsetopt typesetsilent
@@ -490,7 +490,7 @@
 ?0
 ?(eval):5: read-only variable: pbro
 ?(eval):6: read-only variable: pbro
-?typeset -r pbro
+?typeset -g -r pbro
 ?0
 ?(eval):10: read-only variable: pbro
 

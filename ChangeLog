@@ -1,3 +1,12 @@
+2016-10-24  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: NEWS, README: update for 39704.
+	
+	* 39704: Src/params.c, Test/B02typeset.ztst, Test/B03print.ztst,
+	Test/V10private.ztst: the output of "typeset -p" uses "export"
+	commands or the "-g" option for parameters that are not local to
+	the current scope.
+
 2016-10-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 39706: Completion/Unix/Type/_tilde_files, Doc/Zsh/compsys.yo:

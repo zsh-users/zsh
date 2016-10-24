@@ -129,7 +129,7 @@
 0:private hides value from surrounding scope in nested scope
 >typeset -a hash_test=( top level )
 >typeset -A hash_test=( in function )
->typeset -a hash_test=( top level )
+>typeset -g -a hash_test=( top level )
 >array-local top level
 >top level
 F:note "typeset" rather than "private" in output from outer

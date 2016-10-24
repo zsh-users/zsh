@@ -5225,7 +5225,7 @@ printparamvalue(Param p, int printflags)
 {
     char *t, **u;
 
-    if (p->node.flags & PM_AUTOLOAD) {
+    if ((p->node.flags & PM_EXPORTED) && !p->env) {
 	putchar('\n');
 	return;
     }
@@ -5312,9 +5312,13 @@ printparamnode(HashNode hn, int printflags)
 	     */
 	    printflags |= PRINT_NAMEONLY;
 	}
+	else if (p->node.flags & PM_EXPORTED)
+	    printflags |= PRINT_NAMEONLY;
 	else
 	    return;
     }
+    if (p->node.flags & PM_AUTOLOAD)
+	printflags |= PRINT_NAMEONLY;
 
     if (printflags & PRINT_TYPESET) {
 	if ((p->node.flags & (PM_READONLY|PM_SPECIAL)) ==
@@ -5326,7 +5330,14 @@ printparamnode(HashNode hn, int printflags)
 	     */
 	    return;
 	}
-	printf("typeset ");
+	if (locallevel && p->level >= locallevel) {
+	    printf("typeset ");	    /* printf("local "); */
+	} else if (p->node.flags & PM_EXPORTED) {
+	    printf("export ");
+	} else if (locallevel) {
+	    printf("typeset -g ");
+	} else
+	    printf("typeset ");
     }
 
     /* Print the attributes of the parameter */
@@ -5339,7 +5350,9 @@ printparamnode(HashNode hn, int printflags)
 	    if (pmptr->flags & PMTF_TEST_LEVEL) {
 		if (p->level)
 		    doprint = 1;
-	    } else if (p->node.flags & pmptr->binflag)
+	    } else if ((pmptr->binflag != PM_EXPORTED ||
+			((p->node.flags & PM_LOCAL) || p->level)) &&
+		       (p->node.flags & pmptr->binflag))
 		doprint = 1;
 
 	    if (doprint) {
@@ -5351,9 +5364,8 @@ printparamnode(HashNode hn, int printflags)
 			}
 			putchar(pmptr->typeflag);
 		    }
-		} else {
+		} else
 		    printf("%s ", pmptr->string);
-		}
 		if ((pmptr->flags & PMTF_USE_BASE) && p->base) {
 		    printf("%d ", p->base);
 		    doneminus = 0;
