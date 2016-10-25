@@ -3499,6 +3499,10 @@ zshtokenize(char *s, int flags)
     for (; *s; s++) {
       cont:
 	switch (*s) {
+	case Meta:
+	    /* skip both Meta and following character */
+	    s++;
+	    break;
 	case Bnull:
 	case Bnullkeep:
 	case '\\':

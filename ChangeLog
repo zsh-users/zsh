@@ -1,3 +1,9 @@
+2016-10-25  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39723: Src/Zle/complist.c, Src/glob.c: metafy string to be
+	used in pattern for complist.  Also skip metafied characters
+	when tokenizing (typically this has no effect, however).
+
 2016-10-24  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: NEWS, README: update for 39704.

@@ -415,6 +415,7 @@ getcoldef(char *s)
 		break;
 	    *s++ = '\0';
 	}
+	p = metafy(p, strlen(p), META_USEHEAP);
 	tokenize(p);
 	if ((prog = patcompile(p, 0, NULL))) {
 	    Patcol pc, po;
