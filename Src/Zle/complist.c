@@ -347,9 +347,10 @@ getcoldef(char *s)
 	    char sav = p[1];
 
 	    p[1] = '\0';
+	    s = metafy(s, -1, META_USEHEAP);
 	    tokenize(s);
 	    gprog = patcompile(s, 0, NULL);
-	    p[1]  =sav;
+	    p[1] = sav;
 
 	    s = p + 1;
 	}
@@ -415,7 +416,7 @@ getcoldef(char *s)
 		break;
 	    *s++ = '\0';
 	}
-	p = metafy(p, strlen(p), META_USEHEAP);
+	p = metafy(p, -1, META_USEHEAP);
 	tokenize(p);
 	if ((prog = patcompile(p, 0, NULL))) {
 	    Patcol pc, po;

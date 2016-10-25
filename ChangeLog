@@ -1,3 +1,7 @@
+2016-10-25  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39725: Src/Zle/complist.c: more metafication of patterns.
+
 2016-10-25  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39723: Src/Zle/complist.c, Src/glob.c: metafy string to be
