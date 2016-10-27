@@ -16,7 +16,8 @@ recommended to review uses of ':A' and, if appropriate, convert them
 to ':P' as soon as compatibility with 5.2 is no longer a requirement.
 
 The output of "typeset -p" uses "export" commands or the "-g" option
-for parameters that are not local to the current scope.
+for parameters that are not local to the current scope.  Previously,
+all output was in the form of "typeset" commands, never using "-g".
 
 Changes from 5.1.1 to 5.2
 -------------------------

@@ -114,6 +114,7 @@ with other shells.
 function scope and export state of each parameter.  Exported parameters
 are output as "export" commands unless the parameter is also local, and
 other parameters not local to the scope are output with the "-g" option.
+Previously, only "typeset" commands were output, never using "-g".
 
 Incompatibilities between 5.0.8 and 5.2
 ---------------------------------------
