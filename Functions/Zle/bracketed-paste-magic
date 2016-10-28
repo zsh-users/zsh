@@ -162,7 +162,7 @@ bracketed-paste-magic() {
 
 	# There are active widgets.  Reprocess $PASTED as keystrokes.
 	NUMERIC=1
-	zle -U - $PASTED
+	zle -U - "$PASTED"
 
 	# Just in case there are active undo widgets
 
@@ -206,7 +206,7 @@ bracketed-paste-magic() {
 
     # Reprocess $PASTED as an actual paste this time
     zle -U - $PASTED$'\e[201~'	# append paste-end marker
-    zle .bracketed-paste
+    zle .bracketed-paste "$@"
     zle .split-undo
 
     # Arrange to display highlighting if necessary

@@ -3,6 +3,11 @@
 	* users/22036: Doc/Zsh/zle.yo: bracketed-paste: Document
 	cutbuffer behaviour; clarify.
 
+2016-10-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: Functions/Zle/bracketed-paste-magic: handle empty
+	pastes and "zle bracketed-paste variablename" form.
+
 2016-10-27  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Doc/Zsh/compsys.yo, Doc/Zsh/contrib.yo: Minor
