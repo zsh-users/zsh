@@ -940,7 +940,10 @@ createparam(char *name, int flags)
 		zerr("%s: restricted", name);
 		return NULL;
 	    }
-	    if (!(oldpm->node.flags & PM_UNSET) || (oldpm->node.flags & PM_SPECIAL)) {
+	    if (!(oldpm->node.flags & PM_UNSET) ||
+		(oldpm->node.flags & PM_SPECIAL) ||
+		/* POSIXBUILTINS horror: we need to retain 'export' flags */
+		(isset(POSIXBUILTINS) && (oldpm->node.flags & PM_EXPORTED))) {
 		oldpm->node.flags &= ~PM_UNSET;
 		if ((oldpm->node.flags & PM_SPECIAL) && oldpm->ename) {
 		    Param altpm =
@@ -5225,10 +5228,6 @@ printparamvalue(Param p, int printflags)
 {
     char *t, **u;
 
-    if ((p->node.flags & PM_EXPORTED) && !p->env) {
-	putchar('\n');
-	return;
-    }
     if (printflags & PRINT_KV_PAIR)
 	putchar(' ');
     else
@@ -5332,7 +5331,8 @@ printparamnode(HashNode hn, int printflags)
 	}
 	if (locallevel && p->level >= locallevel) {
 	    printf("typeset ");	    /* printf("local "); */
-	} else if (p->node.flags & PM_EXPORTED) {
+	} else if ((p->node.flags & PM_EXPORTED) &&
+		   !(p->node.flags & (PM_ARRAY|PM_HASHED))) {
 	    printf("export ");
 	} else if (locallevel) {
 	    printf("typeset -g ");
@@ -5350,8 +5350,8 @@ printparamnode(HashNode hn, int printflags)
 	    if (pmptr->flags & PMTF_TEST_LEVEL) {
 		if (p->level)
 		    doprint = 1;
-	    } else if ((pmptr->binflag != PM_EXPORTED ||
-			((p->node.flags & PM_LOCAL) || p->level)) &&
+	    } else if ((pmptr->binflag != PM_EXPORTED || p->level ||
+			(p->node.flags & (PM_LOCAL|PM_ARRAY|PM_HASHED))) &&
 		       (p->node.flags & pmptr->binflag))
 		doprint = 1;
 

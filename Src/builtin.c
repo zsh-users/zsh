@@ -2008,11 +2008,12 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
      * handled in createparam().  Here we just avoid using it for the
      * present tests if it's unset.
      *
-     * POSIXBUILTINS horror: we need to retain the 'readonly' flag
-     * of an unset parameter.
+     * POSIXBUILTINS horror: we need to retain the 'readonly' or 'export'
+     * flags of an unset parameter.
      */
     usepm = pm && (!(pm->node.flags & PM_UNSET) ||
-		   (isset(POSIXBUILTINS) && (pm->node.flags & PM_READONLY)));
+		   (isset(POSIXBUILTINS) &&
+		    (pm->node.flags & (PM_READONLY|PM_EXPORTED))));
 
     /*
      * We need to compare types with an existing pm if special,
@@ -2135,7 +2136,8 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	/*
 	 * Stricter rules about retaining readonly attribute in this case.
 	 */
-	if ((on & PM_READONLY) && (!usepm || (pm->node.flags & PM_UNSET)) &&
+	if ((on & (PM_READONLY|PM_EXPORTED)) &&
+	    (!usepm || (pm->node.flags & PM_UNSET)) &&
 	    !ASG_VALUEP(asg))
 	    on |= PM_UNSET;
 	else if (usepm && (pm->node.flags & PM_READONLY) &&
@@ -2143,6 +2145,10 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    zerr("read-only variable: %s", pm->node.nam);
 	    return NULL;
 	}
+	/* This is handled by createparam():
+	if (usepm && (pm->node.flags & PM_EXPORTED) && !(off & PM_EXPORTED))
+	    on |= PM_EXPORTED;
+	*/
     }
 
     /*

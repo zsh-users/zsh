@@ -1,3 +1,11 @@
+2016-10-29  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39758: Src/builtin.c, Src/params.c: revise 39704 to output
+	"typeset" for array and hash parameters, even when exported; for
+	POSIXBUILTINS, "export var" does not implicitly set $var, and its
+	export state is preserved when assigned (but not when explicitly
+	unset).
+
 2016-10-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* users/22036: Doc/Zsh/zle.yo: bracketed-paste: Document
