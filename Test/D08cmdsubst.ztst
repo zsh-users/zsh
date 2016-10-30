@@ -153,3 +153,17 @@
   eval 'foo echo this just works, OK\?)'
 0:backtracking within command string parsing with alias still pending
 >this just works, OK?
+
+  (
+    set errexit
+    show_nargs() { print $#; }
+    print a $() b
+    print c "$()" d
+  )
+0:Empty $() is a valid empty substitution.
+>a b
+>c  d
+
+  empty=$() && print "'$empty'"
+0:Empty $() is a valid assignment
+>''

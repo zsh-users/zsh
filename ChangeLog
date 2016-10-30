@@ -1,3 +1,8 @@
+2016-10-30  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 39777: Src/parse.c, Test/D08cmdsubst.ztst: $() is a valid
+	empty command substitution.
+
 2016-10-29  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 39758: Src/builtin.c, Src/params.c: revise 39704 to output

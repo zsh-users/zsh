@@ -594,7 +594,7 @@ par_event(int endtok)
     if (tok == ENDINPUT)
 	return 0;
     if (tok == endtok)
-	return 0;
+	return 1;
 
     p = ecadd(0);
 
