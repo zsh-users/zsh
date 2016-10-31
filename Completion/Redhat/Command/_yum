@@ -133,6 +133,28 @@ _yum_repolist() {
   return 0
 }
 
+_ids() {
+  # the last argument will be the first valid transaction ID to be suggested
+  # all other arguments are forwarded to compadd
+  #
+  # maxid is the last transaction ID known to yum
+  # minusone is the number of arguments provided to _ids minus one
+  local maxid
+  local minusone
+
+  maxid=$(yum history stats | grep Transactions | sed "s/.*: //")
+  ((minusone=$#-1))
+  compadd "${(@)@[1,$minusone]}" $(echo {$@[$#]..$maxid})
+}
+
+_ranges() {
+  if compset -P '*..'; then
+    _ids ${(S)IPREFIX#..}
+  else
+    _ids -S '..' 1
+  fi
+}
+
 # Expand next argument after 'yum history'
 _yum_history() {
   if (( CURRENT == 2 )); then
@@ -145,37 +167,33 @@ _yum_history() {
     local -a ID_range_commands
     local -a package_commands
     local -a suggests
-    local description
-    description=""
     suggests=()
-    ID_commands=('summary' 'info' 'list' 'stats' 'addon-info')
+    #ID_commands=('summary' 'info' 'list' 'stats' 'addon-info')
+    ID_commands=('addon-info')
     ID_range_commands=('summary' 'info' 'list' 'stats')
     package_commands=('summary' 'info' 'list' 'stats' 'packages-list' 'packages-info')
+    #package_commands=('packages-list' 'packages-info')
     # packages-list, packages-info   : needs package name
     # summary, info, list, stats     : ID, ID range, package name
     # addon-info                     : ID
     # redo, undo, roll-back, sync    : unknown
     if [[ -n "${ID_commands[(r)$words[2]]}" ]]; then
-      description+="IDs"
-      # FIXME: hard coded IDs just a draft
-      suggests+=('last' 'all' 1 2 3)
+      suggests+=(':special IDs:(last)')
+      suggests+=(':IDs:_ids 1')
     fi
     if [[ -n "${ID_range_commands[(r)$words[2]]}" ]]; then
-      if [[ -n $description ]] ; then description+=", "; fi
-      description+="ID ranges"
-      # FIXME: hard coded IDs just a draft
-      suggests+=('1..2' '2..3' '1..3')
+      suggests+=(':transaction ranges:_ranges')
+      suggests+=(':all transactions:(all)')
     fi
     if [[ -n "${package_commands[(r)$words[2]]}" ]]; then
-      if [[ -n $description ]] ; then description+=", "; fi
-      description+="packages"
       _yum_installed_pkgs
-      suggests+=($_installed_pkgs)
+      #suggests+=(":packages:($_installed_pkgs)")
+      suggests+=(":packages:_yum_act_on_installed_pkgs")
     fi
-    if [[ ! -n $description ]] ; then
+    if [[ 0 -eq ${#suggests} ]] ; then
       _message "unknown expansion for: yum history $words[2]"
     else
-      _describe $description suggests
+      _alternative $suggests
     fi
   fi
   if (( CURRENT == 4 )); then
