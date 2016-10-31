@@ -16,11 +16,13 @@
 _canonical_paths_pwd() {
   # Get the canonical directory name by changing to it.
   integer chaselinks
+  local oldpwd=$OLDPWD
   [[ -o chaselinks ]] && (( chaselinks = 1 ))
-  setopt localoptions nopushdignoredups chaselinks
+  setopt localoptions nopushdignoredups chaselinks noautopushd
   if builtin pushd -q -- $1 2>/dev/null; then
     REPLY=$PWD
     (( chaselinks )) || unsetopt chaselinks
+    [[ -n $oldpwd && -d $oldpwd ]] && builtin cd -q $oldpwd	# For "cd -"
     builtin popd -q
   else
     REPLY=$1

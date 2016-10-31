@@ -1,5 +1,8 @@
 2016-10-31  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 39795: Completion/Unix/Type/_canonical_paths: preserve "cd -"
+	behavior around directory shuffling in _canonical_paths_pwd
+
 	* 39792: Completion/Unix/Type/_canonical_paths: improve handling
 	of relative paths in _canonical_paths_add_paths
 
