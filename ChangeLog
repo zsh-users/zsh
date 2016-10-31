@@ -1,3 +1,8 @@
+2016-10-31  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39792: Completion/Unix/Type/_canonical_paths: improve handling
+	of relative paths in _canonical_paths_add_paths
+
 2016-10-31  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 39786: Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,
