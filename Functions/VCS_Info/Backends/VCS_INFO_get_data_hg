@@ -40,9 +40,10 @@ VCS_INFO_adjust
 # Disabled by default anyway, so no harm done.
 if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" get-revision ; then
     if zstyle -t ":vcs_info:${vcs}:${usercontext}:${rrn}" use-simple \
-            && ( VCS_INFO_check_com hexdump ) && [[ -r ${dirstatefile} ]] ; then
-        # Calling hexdump is (much) faster than hg but doesn't get the local rev
-        r_csetid=$(hexdump -n 20 -e '1/1 "%02x"' ${dirstatefile})
+            && VCS_INFO_hexdump ${dirstatefile} 20 ; then
+        # Calling VCS_INFO_hexdump is (much) faster than hg but doesn't get
+        # the local rev
+        r_csetid=$REPLY
     else
         # Settling for a short (but unique!) hash because getting the full
         # 40-char hash in addition to all the other info we want isn't

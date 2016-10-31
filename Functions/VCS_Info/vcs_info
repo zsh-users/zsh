@@ -19,6 +19,7 @@ static_functions=(
     VCS_INFO_check_com
     VCS_INFO_formats
     VCS_INFO_get_cmd
+    VCS_INFO_hexdump
     VCS_INFO_hook
     VCS_INFO_maxexports
     VCS_INFO_nvcsformats
