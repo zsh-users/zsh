@@ -77,6 +77,16 @@ F:regression test workers/32182
 >FI:{file2}
 F:regression test workers/31611
 
+  {
+    mkdir 'A(B)' 'A(B)/C'
+    comptesteval 'cd "A(B)/C"'
+    comptest $'cd ../\t'
+  } always {
+    rmdir 'A(B)/C' 'A(B)'
+  }
+0:directory name is not a glob qualifier
+>line: {cd ../C/}{}
+
 %clean
 
   zmodload -ui zsh/zpty
