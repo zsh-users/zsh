@@ -1,5 +1,7 @@
 2016-11-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39803: Src/Zle/complete.c: internal: Document bin_compadd().
+
 	* 39802: Src/Zle/compcore.c, Src/Zle/complete.c: internal:
 	Document and simplify multiquote().
 

@@ -555,8 +555,8 @@ static int
 bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 {
     struct cadata dat;
-    char *p, **sp, *e, *m = NULL, *mstr = NULL;
-    int dm;
+    char *mstr = NULL; /* argument of -M options, accumulated */
+    int added; /* return value */
     Cmatcher match = NULL;
 
     if (incompfunc != 1) {
@@ -572,14 +572,16 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     dat.dummies = -1;
 
     for (; *argv && **argv ==  '-'; argv++) {
+	char *p; /* loop variable, points into argv */
 	if (!(*argv)[1]) {
 	    argv++;
 	    break;
 	}
 	for (p = *argv + 1; *p; p++) {
-	    sp = NULL;
-	    e = NULL;
-	    dm = 0;
+	    char *m = NULL; /* argument of -M option (this one only) */
+	    char **sp = NULL; /* the argument to an option should be copied
+				 to *sp. */
+	    const char *e; /* error message */
 	    switch (*p) {
 	    case 'q':
 		dat.flags |= CMF_REMOVE;
@@ -661,7 +663,6 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    case 'M':
 		sp = &m;
 		e = "matching specification expected after -%c";
-		dm = 1;
 		break;
 	    case 'X':
 		sp = &(dat.exp);
@@ -748,14 +749,13 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 		    zsfree(mstr);
 		    return 1;
 		}
-		if (dm) {
+		if (m) {
 		    if (mstr) {
 			char *tmp = tricat(mstr, " ", m);
 			zsfree(mstr);
 			mstr = tmp;
 		    } else
 			mstr = ztrdup(m);
-		    m = NULL;
 		}
 	    }
 	}
@@ -774,10 +774,10 @@ bin_compadd(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	return 1;
 
     dat.match = match = cpcmatcher(match);
-    dm = addmatches(&dat, argv);
+    added = addmatches(&dat, argv);
     freecmatcher(match);
 
-    return dm;
+    return added;
 }
 
 #define CVT_RANGENUM 0
