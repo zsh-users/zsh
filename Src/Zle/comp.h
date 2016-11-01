@@ -160,9 +160,15 @@ struct cmatcher {
     int ralen;			/* length of right anchor */
 };
 
+/* Flags for cmatcher::flags */
+/* Upon match, insert the string from the line rather than the string
+ * from the trial completion ("word"). */
 #define CMF_LINE  1
+/* Match with an anchor on the left. */
 #define CMF_LEFT  2
+/* Match with an anchor on the right. */
 #define CMF_RIGHT 4
+/* ... */
 #define CMF_INTER 8
 
 /*

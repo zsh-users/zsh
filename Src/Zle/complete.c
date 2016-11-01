@@ -249,14 +249,14 @@ parse_cmatcher(char *name, char *s)
 	if (!*s) break;
 
 	switch (*s) {
-	case 'b': fl2 = CMF_INTER;
+	case 'b': fl2 = CMF_INTER; /* FALLTHROUGH */
 	case 'l': fl = CMF_LEFT; break;
-	case 'e': fl2 = CMF_INTER;
+	case 'e': fl2 = CMF_INTER; /* FALLTHROUGH */
 	case 'r': fl = CMF_RIGHT; break;
 	case 'm': fl = 0; break;
-	case 'B': fl2 = CMF_INTER;
+	case 'B': fl2 = CMF_INTER; /* FALLTHROUGH */
 	case 'L': fl = CMF_LEFT | CMF_LINE; break;
-	case 'E': fl2 = CMF_INTER;
+	case 'E': fl2 = CMF_INTER; /* FALLTHROUGH */
 	case 'R': fl = CMF_RIGHT | CMF_LINE; break;
 	case 'M': fl = CMF_LINE; break;
 	case 'x': break;
