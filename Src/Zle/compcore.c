@@ -1043,6 +1043,13 @@ makecomplist(char *s, int incmd, int lst)
     }
 }
 
+/*
+ * Quote 's' according to compqstack, aka $compstate[all_quotes].
+ *
+ * If 'ign' is 1, skip the innermost quoting level.  Otherwise 'ign'
+ * must be 0.
+ */
+
 /**/
 mod_export char *
 multiquote(char *s, int ign)
@@ -1050,12 +1057,11 @@ multiquote(char *s, int ign)
     if (s) {
 	char *os = s, *p = compqstack;
 
-	if (p && *p && (ign < 1 || p[ign])) {
-	    if (ign > 0)
-		p += ign;
+	if (p && *p && (ign == 0 || p[1])) {
+	    if (ign)
+		p++;
 	    while (*p) {
-		if (ign >= 0 || p[1])
-		    s = quotestring(s, *p);
+		s = quotestring(s, *p);
 		p++;
 	    }
 	}
@@ -1064,6 +1070,12 @@ multiquote(char *s, int ign)
     DPUTS(1, "BUG: null pointer in multiquote()");
     return NULL;
 }
+
+/*
+ * tildequote(s, ign): Equivalent to multiquote(s, ign), except that if
+ * compqstack[0] == QT_BACKSLASH and s[0] == '~', then that tilde is not
+ * quoted.
+ */
 
 /**/
 mod_export char *

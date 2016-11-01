@@ -52,7 +52,7 @@ char **compwords,
      *compqiprefix,
      *compqisuffix,
      *compquote,
-     *compqstack,
+     *compqstack,      /* compstate[all_quotes] */
      *comppatmatch,
      *complastprompt;
 /**/
