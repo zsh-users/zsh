@@ -10,6 +10,10 @@
 
 2016-10-31  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 39797: Completion/Unix/Type/_canonical_paths: obsolete the
+	helper functions fixed by the previous two changes, replacing
+	them with the new ${var:P} modifier.
+
 	* 39795: Completion/Unix/Type/_canonical_paths: preserve "cd -"
 	behavior around directory shuffling in _canonical_paths_pwd
 
