@@ -125,7 +125,7 @@ struct cmatch {
 #define CMF_REMOVE   (1<< 1)	/* remove the suffix */
 #define CMF_ISPAR    (1<< 2)	/* is paramter expansion */
 #define CMF_PARBR    (1<< 3)	/* paramter expansion with a brace */
-#define CMF_PARNEST  (1<< 4)	/* nested paramter expansion */
+#define CMF_PARNEST  (1<< 4)	/* nested parameter expansion */
 #define CMF_NOLIST   (1<< 5)	/* should not be listed */
 #define CMF_DISPLINE (1<< 6)	/* display strings one per line */
 #define CMF_HIDE     (1<< 7)	/* temporarily hide this one */
@@ -235,7 +235,6 @@ struct cpattern {
  * the anchor. */
 
 typedef struct cline *Cline;
-typedef struct clsub Clsub;
 
 struct cline {
     Cline next;
@@ -291,14 +290,14 @@ struct menuinfo {
 
 /* Flags for compadd and addmatches(). */
 
-#define CAF_QUOTE    1
-#define CAF_NOSORT   2
-#define CAF_MATCH    4
-#define CAF_UNIQCON  8
-#define CAF_UNIQALL 16
-#define CAF_ARRAYS  32
-#define CAF_KEYS    64
-#define CAF_ALL    128
+#define CAF_QUOTE    1    /* compadd -Q: positional arguments already quoted */
+#define CAF_NOSORT   2    /* compadd -V: don't sort */
+#define CAF_MATCH    4    /* compadd without -U: do matching */
+#define CAF_UNIQCON  8    /* compadd -2: don't deduplicate */
+#define CAF_UNIQALL 16    /* compadd -1: deduplicate */
+#define CAF_ARRAYS  32    /* compadd -a or -k: array/assoc parameter names */
+#define CAF_KEYS    64    /* compadd -k: assoc parameter names */
+#define CAF_ALL    128    /* compadd -C: _all_matches */
 
 /* Data for compadd and addmatches() */
 

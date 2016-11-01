@@ -1976,6 +1976,11 @@ get_user_var(char *nam)
     }
 }
 
+/*
+ * If KEYS, then NAME is an associative array; return its keys.
+ * Else, NAME is a plain array; return its elements.
+ */
+
 static char **
 get_data_arr(char *name, int keys)
 {
@@ -2037,16 +2042,17 @@ addmatch(char *str, int flags, char ***dispp, int line)
 int
 addmatches(Cadata dat, char **argv)
 {
+    /* ms: "match string" - string to use as completion.
+     * Overloaded at one place as a temporary. */
     char *s, *ms, *lipre = NULL, *lisuf = NULL, *lpre = NULL, *lsuf = NULL;
     char **aign = NULL, **dparr = NULL, *oaq = autoq, *oppre = dat->ppre;
     char *oqp = qipre, *oqs = qisuf, qc, **disp = NULL, *ibuf = NULL;
     char **arrays = NULL;
-    int lpl, lsl, sl, bcp = 0, bcs = 0, bpadd = 0, bsadd = 0;
+    int lpl, lsl, bcp = 0, bcs = 0, bpadd = 0, bsadd = 0;
     int ppl = 0, psl = 0, ilen = 0;
     int llpl = 0, llsl = 0, nm = mnum, gflags = 0, ohp = haspattern;
     int isexact, doadd, ois = instring, oib = inbackt;
     Cline lc = NULL, pline = NULL, sline = NULL;
-    Cmatch cm;
     struct cmlist mst;
     Cmlist oms = mstack;
     Patprog cp = NULL, *pign = NULL;
@@ -2424,6 +2430,7 @@ addmatches(Cadata dat, char **argv)
 	if (dat->psuf)
 	    psl = strlen(dat->psuf);
 	for (; (s = *argv); argv++) {
+	    int sl;
 	    bpl = obpl;
 	    bsl = obsl;
 	    if (disp) {
@@ -2484,6 +2491,7 @@ addmatches(Cadata dat, char **argv)
 		goto next_array;
 	    }
 	    if (doadd) {
+		Cmatch cm;
 		Brinfo bp;
 
 		for (bp = obpl; bp; bp = bp->next)
