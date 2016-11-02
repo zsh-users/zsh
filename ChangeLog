@@ -1,5 +1,7 @@
 2016-11-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39806: Src/Zle/zle_vi.c: internal: Document zle's vichgbuf.
+
 	* 39805: Src/Zle/comp.h, Src/Zle/compcore.c: internal: Document
 	some compadd internals.
 

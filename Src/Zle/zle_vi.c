@@ -47,10 +47,19 @@ int vilinerange;
 
 /* last vi change buffer, for vi change repetition */
 
+/*
+ * vichgbufsz: Allocated size of vichgbuf.
+ * vichgbufptr: Length in use.
+ * vichgflag: true whilst inputting a vi normal mode; causes it to be
+ *   accumulated in vichgbuf, incrementing vichgbufptr.
+ */
+
 /**/
 int vichgbufsz, vichgbufptr, vichgflag;
 
 /*
+ * The bytes that make up the current vi command.  See vichgbuf* above.
+ *
  * Examination of the code suggests vichgbuf is consistently tied
  * to raw byte input, so it is left as a character array rather
  * than turned into wide characters.  In particular, when we replay
