@@ -1,3 +1,8 @@
+2016-11-02  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39811: Src/Zle/zle_vi.c: vi-repeat-change must not be the
+	"motion" of vi-change, lest it infinitely repeat itself.
+
 2016-11-01  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 39731: Completion/Unix/Command/_awk: add support for gawk

@@ -780,7 +780,7 @@ int
 virepeatchange(UNUSED(char **args))
 {
     /* make sure we have a change to repeat */
-    if (!vichgbuf || vichgflag)
+    if (!vichgbuf || vichgflag || virangeflag)
 	return 1;
     /* restore or update the saved count and buffer */
     if (zmod.flags & MOD_MULT) {
