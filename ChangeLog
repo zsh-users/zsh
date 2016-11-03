@@ -4,6 +4,9 @@
 
 2016-11-03  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Completion/Unix/Type/_remote_files: fix typo that
+	was causing handling of "--" argument to fail
+
 	* 39820: Src/Zle/zle_vi.c: vi-repeat handles multi-key bindings
 
 2016-11-03  Peter Stephenson  <p.stephenson@samsung.com>
