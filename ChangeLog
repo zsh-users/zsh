@@ -2,6 +2,10 @@
 	* 39822: Completion/Unix/Command/_git: remove "-A '-*'" with
 	_arguments for some commands.
 
+2016-11-03  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39820: Src/Zle/zle_vi.c: vi-repeat handles multi-key bindings
+
 2016-11-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39815: Src/lex.c, Test/D04parameter.ztst: read input to end

@@ -71,7 +71,7 @@ static int inrepeat, vichgrepeat;
  * im: >= 0: is an insertmode
  *    -1: skip setting insert mode
  *    -2: entering viins at start of editing from clean --- don't use
- *        inrepeat or lastchar, synthesise an i to enter insert mode.
+ *        inrepeat or keybuf, synthesise an entry to insert mode.
  */
 
 /**/
@@ -91,14 +91,16 @@ startvichange(int im)
 	lastmod = zmod;
 	if (vichgbuf)
 	    free(vichgbuf);
-	vichgbuf = (char *)zalloc(vichgbufsz = 16);
+	vichgbuf = (char *)zalloc(vichgbufsz = 16 + keybuflen);
 	if (im == -2) {
 	    vichgbuf[0] =
 		zlell ? (insmode ? (zlecs < zlell ? 'i' : 'a') : 'R') : 'o';
+	    vichgbuf[1] = '\0';
+	    vichgbufptr = 1;
 	} else {
-	    vichgbuf[0] = lastchar;
+	    strcpy(vichgbuf, keybuf);
+	    unmetafy(vichgbuf, &vichgbufptr);
 	}
-	vichgbufptr = 1;
 	vichgrepeat = 0;
     }
 }
