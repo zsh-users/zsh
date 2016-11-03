@@ -1383,7 +1383,7 @@ _git-rebase () {
       '(--autosquash                )--no-autosquash[do not check for auto-squash boundaries]')
   fi
 
-  _arguments -A '-*' \
+  _arguments \
     - actions \
     '(-)--continue[continue after resolving merge conflict]' \
     '(-)--abort[abort current rebase]' \
@@ -1921,7 +1921,7 @@ _git-tag () {
     )
   fi
 
-  _arguments -A '-*' \
+  _arguments \
     - creation \
       '(-a --annotate -s --sign -u --local-user)'{-a,--annotate}'[create an unsigned, annotated tag]' \
       '(-a --annotate -s --sign -u --local-user)'{-s,--sign}'[create a signed and annotated tag]' \
@@ -4539,7 +4539,7 @@ _git-pack-objects () {
   fi
 
   # NOTE: --index-version is only used by the Git test suite.
-  _arguments -A '-*' \
+  _arguments \
     '(-q --quiet)'{-q,--quiet}"[don't report progress]" \
     '(-q --quiet --all-progress)--progress[show progress meter]' \
     '(-q --quiet --progress --all-progress-implied)--all-progress[show progress meter during object writing phase]' \
@@ -4876,7 +4876,7 @@ _git-ls-files () {
 (( $+functions[_git-ls-remote] )) ||
 _git-ls-remote () {
   # TODO: repository needs fixing
-  _arguments -A '-*' \
+  _arguments \
     '(-q --quiet)'{-q,--quiet}"[don't print remote URL]" \
     '--upload-pack=[specify path to git-upload-pack on remote side]:remote path' \
     '(-h --heads)'{-h,--heads}'[show only refs under refs/heads]' \
@@ -5007,7 +5007,7 @@ _git-show-ref () {
 
 (( $+functions[_git-unpack-file] )) ||
 _git-unpack-file () {
-  _arguments -A '-*' \
+  _arguments \
     '(:)-h[display usage information]' \
     '(-): :__git_blobs'
 }
