@@ -959,9 +959,9 @@ udevordir)
   esac
 
   local MATCH MBEGIN MEND
-  mp_tmp=("${(@qg::)mp_tmp}")
-  dpath_tmp=( "${(@Mqg::)dev_tmp:#/*}" )
-  dev_tmp=( "${(@qg::)dev_tmp:#/*}" )
+  mp_tmp=("${(@g::)mp_tmp}")
+  dpath_tmp=( "${(@Mg::)dev_tmp:#/*}" )
+  dev_tmp=( "${(@g::)dev_tmp:#/*}" )
 
   _alternative \
     'device-labels:device label:compadd -a dev_tmp' \

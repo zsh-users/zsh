@@ -1,3 +1,8 @@
+2016-12-06  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 40107: Completion/Linux/Command/_fusermount,
+	Completion/Unix/Command/_mount: fix quoting
+
 2016-12-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk: 5.2-test-2.

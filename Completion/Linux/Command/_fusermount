@@ -20,7 +20,7 @@ case "$state" in
     _files -/
   else
     mtpts=(${${${"${(f)$(< /etc/mtab)}"}#* }%% *})
-    _canonical_paths mounted 'mounted filesystem' $mtpts
+    _canonical_paths mounted 'mounted filesystem' "${(@g::)mtpts}"
   fi
   ;;
 esac
