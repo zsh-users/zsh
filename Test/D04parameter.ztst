@@ -631,6 +631,14 @@
 >;
 >(( echo 42 
 
+  # From parse error on it's not possible to split.
+  # Just check we get the complete string.
+  foo='echo $(|||) bar'
+  print -rl ${(z)foo}
+0:$($(z)} with parse error in command substitution.
+>echo
+>$(|||) bar
+
   psvar=(dog)
   setopt promptsubst
   foo='It shouldn'\''t $(happen) to a %1v.'

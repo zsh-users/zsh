@@ -2138,8 +2138,17 @@ skipcomm(void)
     lexflags &= ~LEXFLAGS_ZLE;
     dbparens = 0;	/* restored by zcontext_restore_partial() */
 
-    if (!parse_event(OUTPAR) || tok != OUTPAR)
-	lexstop = 1;
+    if (!parse_event(OUTPAR) || tok != OUTPAR) {
+	if (strin) {
+	    /*
+	     * Get the rest of the string raw since we don't
+	     * know where this token ends.
+	     */
+	    while (!lexstop)
+		(void)ingetc();
+	} else
+	    lexstop = 1;
+    }
      /* Outpar lexical token gets added in caller if present */
 
     /*

@@ -1,3 +1,8 @@
+2016-11-03  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39815: Src/lex.c, Test/D04parameter.ztst: read input to end
+	on parse error in $(...) inside a string.
+
 2016-11-02  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 39811: Src/Zle/zle_vi.c: vi-repeat-change must not be the
