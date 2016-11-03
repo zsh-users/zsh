@@ -135,7 +135,10 @@ mod_export HashTable keymapnamtab;
 /**/
 char *keybuf;
 
-static int keybuflen, keybufsz = 20;
+/**/
+int keybuflen;
+
+static int keybufsz = 20;
 
 /* last command executed with execute-named-command */
 
@@ -1622,7 +1625,7 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 	ungetbytes(keybuf+lastlen, keybuflen);
 	if(vichgflag)
 	    vichgbufptr -= keybuflen;
-	keybuf[lastlen] = 0;
+	keybuf[keybuflen = lastlen] = 0;
     }
     *funcp = func;
     *strp = str;
