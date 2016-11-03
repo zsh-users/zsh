@@ -244,6 +244,14 @@
 >BUFFER: binging
 >CURSOR: 3
 
+  print -u $ZTST_fd 'This test may hang the shell when it fails...'
+  zletest $'worm\erdhd..'
+0:use of vi-repeat as the motion and repeat after a failed change
+>BUFFER: word
+>CURSOR: 2
+F:For vi compatibility, "." should repeat the "rd" change after "d."
+F:Update result to ">BUFFER: wodd" if compatibility is repaired.
+
   zpty_run 'bindkey "^_" undo'
   zletest $'undoc\037e'
 0:use of undo in vi insert mode

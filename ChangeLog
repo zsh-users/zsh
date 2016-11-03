@@ -1,3 +1,7 @@
+2016-11-03  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39824: Test/X02zlevi.ztst: test case for 39811
+
 2016-11-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Src/Zle/zle_keymap.c: comment explaining putting
@@ -22,6 +26,7 @@
 	to specify a vi register. (after users/22036)
 
 2016-11-03  Daniel Hahler  <zsh@thequod.de>
+
 	* 39822: Completion/Unix/Command/_git: remove "-A '-*'" with
 	_arguments for some commands.
 
