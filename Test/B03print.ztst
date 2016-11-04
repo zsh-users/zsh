@@ -310,3 +310,9 @@
 0:print and printf into a variable
 >typeset -g foo='once more'
 >typeset -g foo=$'into\C-@the-breach\C-@-'
+
+ typeset -a foo
+ print -f '%2$d %4s' -v foo one 1 two 2 three 3
+ typeset -p foo
+0:printf into an array variable
+>typeset -a foo=( '1  one' '2  two' '3 three' )

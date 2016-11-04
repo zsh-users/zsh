@@ -1,14 +1,17 @@
 #compdef print printf
 
-local state expl line eflag pflag rest ret=1
+local state expl line eflag pflag rflag rest ret=1
 
 if [[ $service = print ]]; then
   # -e flag available only after -R 
   eflag="${words[1,CURRENT-1][(r)-*R*]:+-e[enable escapes]}"
+  rflag='-r[ignore escape conventions of echo]'
 
   # -p flag only relevant if we have a coprocess
   (:>&p) 2>/dev/null &&
     pflag='(-s -u -z)-p[print arguments to input of coprocess]'
+
+  [[ -n ${words[(r)-*f]} ]] && rflag='-r[disable reuse of format string]'
 
   if [[ -n ${words[1,CURRENT][(r)-*P*]} ]]; then
     rest='*: :->prompt'
@@ -17,11 +20,11 @@ if [[ $service = print ]]; then
   fi
 
   _arguments -C -s -A "-*" -S \
-    '(-f)-r[ignore escape conventions of echo]' \
+    '-r[ignore escape conventions of echo]' \
     '(-r -b -f -m -s -l -N -o -O -i -c -u -p -z -D -P)-R[emulate BSD echo (no escapes, -n & -e flags only)]' \
     '-b[recognise bindkey escape sequences]' \
-    '-m[remove arguments matching specified pattern]' \
-    '(-r -n -R -l -N -c)-f+[print arguments as for the printf builtin]:format:->printfformat' \
+    '-m[remove arguments not matching specified pattern]:pattern' \
+    '(-n -R -l -N -c)-f+[print arguments as for the printf builtin]:format:->printfformat' \
     '(-u -p -z)-s[place results in the history list]' \
     '(-c -f)-n[do not add a newline to the result]' \
     '(-N -c -f)-l[print arguments separated by newlines]' \
@@ -33,11 +36,13 @@ if [[ $service = print ]]; then
     '(-n -l -N -f -C -s -z)-c[print arguments in columns]' \
     '(-n -l -N -f -c -s -z)-C+[print arguments in specified number of columns]:columns' \
     '(-s -p -z)-u+[specify file descriptor to print arguments to]:file descriptor:_file_descriptors' \
-    '-v[store output in named parameter]:parameter:_parameters' \
+    '(-s -z -p -u)-v[store output in named parameter]:parameter:_parameters' \
     '(-s -p -u)-z[push arguments onto editing buffer stack]' \
     '-D[substitute any arguments which are named directories using ~ notation]' \
     '-P[perform prompt expansion]' \
-    $pflag $eflag $rest && ret=0
+    '(-X -f -a -C -c -z)-x+[expand leading tabs]:tab width' \
+    '(-x -f -a -C -c -z)-X+[expand all tabs]:tab width' \
+    $pflag $eflag $rflag $rest && ret=0
 elif [[ $service = printf ]]; then
   state=printf
 fi

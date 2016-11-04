@@ -1289,7 +1289,9 @@ required by the format than have been specified, the behaviour is as if
 zero or an empty string had been specified as the argument.
 
 The tt(-v) option causes the output to be stored as the value of the
-parameter var(name), instead of printed.
+parameter var(name), instead of printed. If var(name) is an array and
+the format string is reused when consuming arguments then one
+array element will be used for each use of the format string.
 )
 findex(pushd)
 pindex(PUSHD_TO_HOME, use of)

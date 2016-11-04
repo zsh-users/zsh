@@ -1,3 +1,10 @@
+2016-11-04  Oliver Kiddle  <opk@zsh.org>
+
+	* 39389: Src/builtin.c, Test/B03print.ztst, Doc/Zsh/builtins.yo,
+	Completion/Zsh/Type/_globquals, Completion/Zsh/Command/_print:
+	when printf -v is used with an array use separate elements each
+	time the format is reused
+
 2016-11-04  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* users/22080: Doc/Zsh/zle.yo: bracketed-paste: Third time's

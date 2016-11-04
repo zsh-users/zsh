@@ -4087,10 +4087,11 @@ bin_print(char *name, char **args, Options ops, int func)
 {
     int flen, width, prec, type, argc, n, narg, curlen = 0;
     int nnl = 0, fmttrunc = 0, ret = 0, maxarg = 0, nc = 0;
-    int flags[6], *len;
+    int flags[6], *len, visarr = 0;
     char *start, *endptr, *c, *d, *flag, *buf = NULL, spec[14], *fmt = NULL;
     char **first, **argp, *curarg, *flagch = "'0+- #", save = '\0', nullstr = '\0';
     size_t rcount = 0, count = 0;
+    size_t *cursplit, *splits = 0;
     FILE *fout = stdout;
 #ifdef HAVE_OPEN_MEMSTREAM
     size_t mcount;
@@ -4122,7 +4123,7 @@ bin_print(char *name, char **args, Options ops, int func)
             return 1; \
         } \
         unlink(tmpf); \
-        if ((fout = fdopen(tempfd, "w+")) == NULL) { \
+        if ((FOUT = fdopen(tempfd, "w+")) == NULL) { \
             close(tempfd); \
             zwarnnam(name, "can't open temp file: %e", errno); \
             return 1; \
@@ -4647,11 +4648,23 @@ bin_print(char *name, char **args, Options ops, int func)
      * special cases of printing to a ZLE buffer or the history, however.
      */
 
+    if (OPT_ISSET(ops,'v')) {
+	struct value vbuf;
+	char* s = OPT_ARG(ops,'v');
+	Value v = getvalue(&vbuf, &s, 0);
+	visarr = v && PM_TYPE(v->pm->node.flags) == PM_ARRAY;
+    }
     /* printf style output */
     *spec = '%';
     argp = args;
     do {
     	rcount = count;
+	if (argp > args && visarr) { /* reusing format string */
+	    if (!splits)
+		cursplit = splits = (size_t *)zhalloc(sizeof(size_t) *
+			(arrlen(args) / (argp - args) + 1));
+	    *cursplit++ = count;
+	}
     	if (maxarg) {
 	    first += maxarg;
 	    argc -= maxarg;
@@ -5019,18 +5032,30 @@ bin_print(char *name, char **args, Options ops, int func)
 	    if (buf)
 		free(buf);
 	} else {
-	    stringval = metafy(buf, rcount, META_REALLOC);
-	    if (OPT_ISSET(ops,'z')) {
-		zpushnode(bufstack, stringval);
-	    } else if (OPT_ISSET(ops,'v')) {
-		setsparam(OPT_ARG(ops, 'v'), stringval);
+	    if (visarr) {
+		char **arrayval = zshcalloc((cursplit - splits + 2) * sizeof(char *));
+		for (;cursplit >= splits; cursplit--) {
+		    int start = cursplit == splits ? 0 : cursplit[-1];
+		    arrayval[cursplit - splits] =
+			    metafy(buf + start, count - start, META_DUP);
+		    count = start;
+		}
+		setaparam(OPT_ARG(ops, 'v'), arrayval);
+		free(buf);
 	    } else {
-		ent = prepnexthistent();
-		ent->node.nam = stringval;
-		ent->stim = ent->ftim = time(NULL);
-		ent->node.flags = 0;
-		ent->words = (short *)NULL;
-		addhistnode(histtab, ent->node.nam, ent);
+		stringval = metafy(buf, rcount, META_REALLOC);
+		if (OPT_ISSET(ops,'z')) {
+		    zpushnode(bufstack, stringval);
+		} else if (OPT_ISSET(ops,'v')) {
+		    setsparam(OPT_ARG(ops, 'v'), stringval);
+		} else {
+		    ent = prepnexthistent();
+		    ent->node.nam = stringval;
+		    ent->stim = ent->ftim = time(NULL);
+		    ent->node.flags = 0;
+		    ent->words = (short *)NULL;
+		    addhistnode(histtab, ent->node.nam, ent);
+		}
 	    }
 	}
 	unqueue_signals();

@@ -121,8 +121,7 @@ while [[ -n $PREFIX ]]; do
 	tmatch=( s m h d w M )
 	if zstyle -t ":completion:${curcontext}:time-specifiers" verbose; then
 	  zstyle -s ":completion:${curcontext}:time-specifiers" list-separator sep || sep=--
-          print -v tdisp -f "%s ${sep//(#m)[%\\]/$MATCH$MATCH} %s\0" ${tmatch:^^tdisp}
-	  tdisp=( ${(0)tdisp} )
+          print -v tdisp -f "%s ${sep//(#m)[%\\]/$MATCH$MATCH} %s" ${tmatch:^^tdisp}
 	fi
 	alts+=( "time-specifiers:time specifier:compadd -E 0 -d tdisp -S '' -a tmatch" )
       fi
