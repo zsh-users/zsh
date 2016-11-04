@@ -1,3 +1,8 @@
+2016-11-04  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Sebastian: 39825: Src/utils.c: Optimise mb_metastrlenend() for
+	the common case of 7-bit character.
+
 2016-11-04  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 39818 (Oliver Kiddle): Completion/Unix/Command/_awk: add nawk
