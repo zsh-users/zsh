@@ -1,4 +1,4 @@
-#compdef awk gawk
+#compdef awk gawk nawk
 
 # For gawk ver.3 and 4, in addition to POSIX.
 #
