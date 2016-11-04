@@ -1,5 +1,9 @@
 2016-11-04  Oliver Kiddle  <opk@zsh.org>
 
+	* 39829: Src/Zle/compcore.c: when compstate[insert] is emptied
+	by the completion function and AUTO_MENU is set, start menu
+	completion on the second tab press rather than the third
+
 	* 39834: Src/builtin.c, Completion/Zsh/Command/_print,
 	Completion/Zsh/Command/_fc, Completion/Zsh/Type/_ps1234:
 	when print used with -v and -l, include a final
@@ -3363,7 +3367,7 @@
 
 2015-09-11  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
-	* 36443: Doc/Zsh/zle.yo Src/Zle/zle_refresh.c: 
+	* 36443: Doc/Zsh/zle.yo Src/Zle/zle_refresh.c:
 	Highlight pasted/yanked text as standout by default (i.e., when
 	$zle_highlight doesn't specify otherwise).
 

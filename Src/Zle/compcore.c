@@ -835,6 +835,7 @@ callcompfunc(char *s, char *fn)
 	endparamscope();
 	lastcmd = 0;
 	incompfunc = icf;
+	startauto = 0;
 
 	if (!complist)
 	    uselist = 0;
@@ -882,8 +883,13 @@ callcompfunc(char *s, char *fn)
 		useline = 1, usemenu = 1;
 	    else if (strpfx("auto", compinsert))
 		useline = 1, usemenu = 2;
-	    else
+	    else {
 		useline = usemenu = 0;
+		/* if compstate[insert] was emptied, no unambiguous prefix
+		 * ever gets inserted so allow the next tab to already start
+		 * menu completion */
+		startauto = lastambig = isset(AUTOMENU);
+	    }
 
 	    if (useline && (p = strchr(compinsert, ':'))) {
 		insmnum = atoi(++p);
@@ -896,7 +902,7 @@ callcompfunc(char *s, char *fn)
 #endif
 	    }
 	}
-	startauto = ((compinsert &&
+	startauto = startauto || ((compinsert &&
 		      !strcmp(compinsert, "automenu-unambiguous")) ||
 		     (bashlistfirst && isset(AUTOMENU) &&
                       (!compinsert || !*compinsert)));
