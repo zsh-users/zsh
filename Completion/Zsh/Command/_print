@@ -21,27 +21,28 @@ if [[ $service = print ]]; then
 
   _arguments -C -s -A "-*" -S \
     '-r[ignore escape conventions of echo]' \
-    '(-r -b -f -m -s -l -N -o -O -i -c -u -p -z -D -P)-R[emulate BSD echo (no escapes, -n & -e flags only)]' \
+    '(-r -b -f -m -s -S -l -N -o -O -i -c -u -p -z -D -P)-R[emulate BSD echo (no escapes, -n & -e flags only)]' \
     '-b[recognise bindkey escape sequences]' \
     '-m[remove arguments not matching specified pattern]:pattern' \
-    '(-n -R -l -N -c)-f+[print arguments as for the printf builtin]:format:->printfformat' \
-    '(-u -p -z)-s[place results in the history list]' \
+    '(-n -R -l -N -c -S)-f+[print arguments as for the printf builtin]:format:->printfformat' \
+    '(-u -p -z -S)-s[place results in the history list]' \
+    '(-a -f -c -C -i -l -o -O -N -u -p -v -z -s -x -X)-S[place results in the history list, after splitting argument into words]' \
     '(-c -f)-n[do not add a newline to the result]' \
-    '(-N -c -f)-l[print arguments separated by newlines]' \
-    '(-n -l -c -f)-N[print arguments separated and terminated by nulls]' \
-    '(-O)-o[sort arguments in ascending order]' \
-    '(-o)-O[sort arguments in descending order]' \
-    '-i[case-insensitive sorting]' \
-    '(-n -l -N -f -s -z)-a[with -c/-C, print arguments across before down]' \
-    '(-n -l -N -f -C -s -z)-c[print arguments in columns]' \
-    '(-n -l -N -f -c -s -z)-C+[print arguments in specified number of columns]:columns' \
-    '(-s -p -z)-u+[specify file descriptor to print arguments to]:file descriptor:_file_descriptors' \
-    '(-s -z -p -u)-v[store output in named parameter]:parameter:_parameters' \
-    '(-s -p -u)-z[push arguments onto editing buffer stack]' \
+    '(-N -c -f -S)-l[print arguments separated by newlines]' \
+    '(-n -l -c -f -S)-N[print arguments separated and terminated by nulls]' \
+    '(-O -S)-o[sort arguments in ascending order]' \
+    '(-o -S)-O[sort arguments in descending order]' \
+    '(-S)-i[case-insensitive sorting]' \
+    '(-n -l -N -f -s -S -z)-a[with -c/-C, print arguments across before down]' \
+    '(-n -l -N -f -C -s -S -z)-c[print arguments in columns]' \
+    '(-n -l -N -f -c -s -S -z)-C+[print arguments in specified number of columns]:columns' \
+    '(-s -S -p -z)-u+[specify file descriptor to print arguments to]:file descriptor:_file_descriptors' \
+    '(-s -S -z -p -u)-v[store output in named parameter]:parameter:_parameters' \
+    '(-s -S -p -u)-z[push arguments onto editing buffer stack]' \
     '-D[substitute any arguments which are named directories using ~ notation]' \
     '-P[perform prompt expansion]' \
-    '(-X -f -a -C -c -z)-x+[expand leading tabs]:tab width' \
-    '(-x -f -a -C -c -z)-X+[expand all tabs]:tab width' \
+    '(-X -f -a -C -c -s -S -z)-x+[expand leading tabs]:tab width' \
+    '(-x -f -a -C -c -s -S -z)-X+[expand all tabs]:tab width' \
     $pflag $eflag $rflag $rest && ret=0
 elif [[ $service = printf ]]; then
   state=printf

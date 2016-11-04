@@ -1,6 +1,6 @@
 #compdef -value-,PROMPT,-default- -value-,PROMPT2,-default- -value-,PROMPT3,-default- -value-,PROMPT4,-default- -value-,RPROMPT,-default- -value-,RPROMPT2,-default- -value-,PS1,-default- -value-,PS2,-default- -value-,PS3,-default- -value-,PS4,-default- -value-,RPS1,-default- -value-,RPS2,-default- -value-,SPROMPT,-default-
 
-local -a specs
+local -a specs ccol
 local expl grp cols bs suf pre changed=1 ret=1
 local -A ansi
 
@@ -39,7 +39,8 @@ if compset -P '%[FK]'; then
 
   _description -V ansi-colors expl 'ansi color'
   grp="$expl[expl[(i)-V]+1]"
-  _comp_colors+=( ${(ps.\0.)"$(printf "($grp)=%s=%s\0" ${(kv)ansi})"} )
+  print -v ccol -f "($grp)=%s=%s" ${(kv)ansi}
+  _comp_colors+=( $ccol )
   compadd "$expl[@]" $suf $pre -k ansi && ret=0
   if (( $#suf )) && compset -P "(<->|%v)"; then
     _wanted ansi-colors expl 'closing brace' compadd -S '' \} && ret=0

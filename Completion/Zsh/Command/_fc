@@ -1,7 +1,8 @@
 #compdef fc history r
 
 local curcontext="$curcontext" state state_descr line ret=1
-local events num cmd sep
+local num cmd sep
+local -a events
 typeset -A opt_args
 local fc_common fc_hist fc_r
 
@@ -71,7 +72,7 @@ if [[ -n $state ]]; then
   if [[ -z ${line:#*=*} ]] && compset -P 1 '*='; then
     _message -e replacements 'replacement'
   elif [[ -prefix [0-9] ]]; then
-    events=( ${(0)"$(printf "%-${#HISTNO}.${#HISTNO}s $sep %s\0" "${(kv)history[@]}")"} )
+    print -v events -f "%-${#HISTNO}.${#HISTNO}s $sep %s" "${(kv)history[@]}"
     _wanted -2V events expl "$state_descr" compadd -M "B:0=" -ld events - \
         "${events[@]%% *}"
   elif [[ -prefix - ]]; then

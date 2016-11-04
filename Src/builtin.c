@@ -4621,7 +4621,8 @@ bin_print(char *name, char **args, Options ops, int func)
 			  OPT_ISSET(ops,'N') ? '\0' : ' ', fout);
 	    }
 	}
-	if (!(OPT_ISSET(ops,'n') || OPT_ISSET(ops, 'v') || nnl))
+	if (!(OPT_ISSET(ops,'n') || nnl ||
+	    (OPT_ISSET(ops, 'v') && !OPT_ISSET(ops, 'l'))))
 	    fputc(OPT_ISSET(ops,'N') ? '\0' : '\n', fout);
 	if (IS_MSTREAM(fout) && (rcount = READ_MSTREAM(buf,fout)) == -1)
 	    ret = 1;

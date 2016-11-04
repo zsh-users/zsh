@@ -1,5 +1,11 @@
 2016-11-04  Oliver Kiddle  <opk@zsh.org>
 
+	* 39834: Src/builtin.c, Completion/Zsh/Command/_print,
+	Completion/Zsh/Command/_fc, Completion/Zsh/Type/_ps1234:
+	when print used with -v and -l, include a final
+	newline; complete print -S option and make further use
+	of the new printf to an array feature
+
 	* 39389: Src/builtin.c, Test/B03print.ztst, Doc/Zsh/builtins.yo,
 	Completion/Zsh/Type/_globquals, Completion/Zsh/Command/_print:
 	when printf -v is used with an array use separate elements each
