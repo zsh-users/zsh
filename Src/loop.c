@@ -570,7 +570,8 @@ execif(Estate state, int do_exec)
 	cmdpop();
     } else {
 	noerrexit = olderrexit;
-	lastval = 0;
+	if (!retflag)
+	    lastval = 0;
     }
     state->pc = end;
 

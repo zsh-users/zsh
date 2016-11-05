@@ -1,5 +1,7 @@
 2016-11-05  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 39839: Src/loop.c: fix "return" from "if" condition
+
 	* 39838: Src/builtin.c: another missing unqueue_signals()
 
 2016-11-04  Oliver Kiddle  <opk@zsh.org>
