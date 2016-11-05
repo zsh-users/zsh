@@ -4552,6 +4552,7 @@ bin_print(char *name, char **args, Options ops, int func)
 		    short *words;
 		    if (nwords > 1) {
 			zwarnnam(name, "option -S takes a single argument");
+			unqueue_signals();
 			return 1;
 		    }
 		    words = NULL;

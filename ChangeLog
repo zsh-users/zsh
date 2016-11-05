@@ -1,3 +1,7 @@
+2016-11-05  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39838: Src/builtin.c: another missing unqueue_signals()
+
 2016-11-04  Oliver Kiddle  <opk@zsh.org>
 
 	* 39829: Src/Zle/compcore.c: when compstate[insert] is emptied
