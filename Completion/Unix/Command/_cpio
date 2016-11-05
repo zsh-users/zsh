@@ -1,6 +1,7 @@
 #compdef cpio
 
-local args ig curcontext="$curcontext" state line
+local -a args
+local ig curcontext="$curcontext" state line
 local expl ret=1
 local fmts='(bar bin odc newc crc tar ustar hpbin hpodc)'
 
