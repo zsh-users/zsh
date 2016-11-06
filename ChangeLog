@@ -3,6 +3,9 @@
 	* 39847: Util/check-tmux-state: Update helper function name
 	pattern
 
+	* 39848: Completion/Unix/Command/_tmux: _tmux: Update options to
+	latest tmux
+
 2016-11-05  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Completion/compaudit: tweak replacement getent
