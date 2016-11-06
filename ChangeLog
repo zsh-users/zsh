@@ -1,5 +1,11 @@
 2016-11-05  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Completion/compaudit: tweak replacement getent
+	to handle /etc/hosts format.
+
+	* Thomas Bereknyei, Mic92: 39831: Completion/compaudit: find
+	"getent" by the usual command search, not just /usr/bin/.
+
 	* unposted: Test/A05execution.ztst:  tests for 39839, 39844
 
 	* 39844: Src/loop.c: fix "while" condition as per 39839

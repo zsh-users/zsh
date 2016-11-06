@@ -15,8 +15,10 @@ compaudit() {                           # Define and then call
 emulate -L zsh
 setopt extendedglob
 
-[[ -x /usr/bin/getent ]] || getent() {
-  if [[ $2 = <-> ]]; then
+[[ -n $commands[getent] ]] || getent() {
+  if [[ $1 = hosts ]]; then
+    sed 's/#.*//' /etc/$1 | grep -w $2
+  elif [[ $2 = <-> ]]; then
     grep ":$2:[^:]*$" /etc/$1
   else
     grep "^$2:" /etc/$1
