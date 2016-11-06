@@ -284,6 +284,7 @@ F:anonymous function, and a descriptor leak when backgrounding a pipeline
   select x; do :; done; echo $?
   select x in; do :; done; echo $?
   select x in _*_; do :; done; echo $?
+  unsetopt ERR_EXIT NULL_GLOB
 0:The status of "select" is zero when the loop body does not execute
 >0
 >0
@@ -297,3 +298,15 @@ F:anonymous function, and a descriptor leak when backgrounding a pipeline
 0:Background job exit does not affect reaping foreground job
 >CHLD
 >OK
+
+# Regression test for workers/39839 and workers/39844
+  () { if return 11; then :; fi }; echo $?
+  () { while return 13; do :; done }; echo $?
+  () { until return 17; do :; done }; echo $?
+  () { until false; do return 19; done }; echo $?
+0:"return" in "if" or "while" conditional
+>11
+>13
+>17
+>19
+

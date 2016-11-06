@@ -1,5 +1,7 @@
 2016-11-05  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Test/A05execution.ztst:  tests for 39839, 39844
+
 	* 39844: Src/loop.c: fix "while" condition as per 39839
 
 	* 39839: Src/loop.c: fix "return" from "if" condition
