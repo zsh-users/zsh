@@ -58,7 +58,7 @@ __tmux-window-options
 # Subcommand helper functions are defined like "function _tmux-foo() {"
 # in the _tmux function definition file.
 typeset -a supported_commands
-supported_commands=( $( grep 'function *\<_tmux-' $func |
+supported_commands=( $( grep '^_tmux-[^(]*() *{$' $func |
                         sed -e 's,^.*\<_tmux-,,' -e 's,(.*$,,' ) )
 
 # Ask tmux for available commands:
