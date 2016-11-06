@@ -1048,7 +1048,6 @@ function __tmux-option-guard() {
             'prefix2:MSG:secondary prefix key'
             'renumber-windows:DESC:on off'
             'repeat-time:'${int_guard}
-            'set-remain-on-exit:DESC:on off'
             'set-titles:DESC:on off'
             'set-titles-string:MSG:title format string'
             'status:DESC:on off'
@@ -1171,7 +1170,6 @@ function __tmux-session-options() {
         'prefix2:secondary prefix key'
         'renumber-windows:renumber windows if a window is closed'
         'repeat-time:time for multiple commands without prefix-key presses'
-        'set-remain-on-exit:set remain-on-exit window option'
         'set-titles:try to set xterm window titles'
         'set-titles-string:format used by set-titles'
         'status:show or hide the status bar'
