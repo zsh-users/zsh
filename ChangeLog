@@ -1,5 +1,7 @@
 2016-11-05  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 39844: Src/loop.c: fix "while" condition as per 39839
+
 	* 39839: Src/loop.c: fix "return" from "if" condition
 
 	* 39838: Src/builtin.c: another missing unqueue_signals()
