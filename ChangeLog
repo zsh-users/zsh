@@ -6,7 +6,7 @@
 2016-11-07  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 39849: Completion/Unix/Command/_tmux: _tmux: Remove
-	set-remain-on exit
+	set-remain-on-exit
 
 2016-11-06  Frank Terbeck  <ft@bewatermyfriend.org>
 
