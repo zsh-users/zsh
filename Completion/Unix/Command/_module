@@ -85,7 +85,7 @@ _module_available_modules()
 {
   if [[ -n $MODULEPATH ]] && [[ ${+_available_modules} -eq 0 ]]
   then
-    _available_modules=(${$(find ${(e)=MODULEPATH//:/ } -xtype f -print 2>/dev/null | grep -v \\.version | sed -e 's,\('${${(e)=MODULEPATH//:/\/\\\|}%\\\|}'\),,g' -e 's,^/*,,g'):#*\~})
+    _available_modules=(${$(find -L ${(e)=MODULEPATH//:/ } -type f -print 2>/dev/null | grep -v \\.version | sed -e 's,\('${${(e)=MODULEPATH//:/\/\\\|}%\\\|}'\),,g' -e 's,^/*,,g'):#*\~})
   fi
 }
 
@@ -93,14 +93,14 @@ _module_available_modules()
 (( $+functions[_module_help] )) || _module_help()
 {
   _module_available_modules
-  compadd "$@" -a -- _available_modules
+  _multi_parts / "($_available_modules)"
 }
 
 # Completion function for load|add
 (( $+functions[_module_load] )) || _module_load()
 {
   _module_available_modules
-  compadd "$@" -a -- _available_modules
+  _multi_parts / "($_available_modules)"
 }
 
 # Completion function for unload|rm
@@ -114,14 +114,14 @@ _module_available_modules()
 {
   # Actually first argument could be a loaded module
   _module_available_modules
-  compadd "$@" -a -- _available_modules
+  _multi_parts / "($_available_modules)"
 }
 
 # Completion function for display|show
 (( $+functions[_module_display] )) || _module_display()
 {
   _module_available_modules
-  compadd "$@" -a -- _available_modules
+  _multi_parts / "($_available_modules)"
 }
 
 # Completion function for avail
@@ -145,35 +145,35 @@ _module_available_modules()
 (( $+functions[_module_whatis] )) || _module_whatis()
 {
   _module_available_modules
-  compadd "$@" -a -- _available_modules
+  _multi_parts / "($_available_modules)"
 }
 
 # Completion function for initadd
 (( $+functions[_module_initadd] )) || _module_initadd()
 {
   _module_available_modules
-  compadd "$@" -a -- _available_modules
+  _multi_parts / "($_available_modules)"
 }
 
 # Completion function for initprepend
 (( $+functions[_module_initprepend] )) || _module_initprepend()
 {
   _module_available_modules
-  compadd "$@" -a -- _available_modules
+  _multi_parts / "($_available_modules)"
 }
 
 # Completion function for initrm
 (( $+functions[_module_initrm] )) || _module_initrm()
 {
   _module_available_modules
-  compadd "$@" -a -- _available_modules
+  _multi_parts / "($_available_modules)"
 }
 
 # Completion function for initswitch
 (( $+functions[_module_initswitch] )) || _module_initswitch()
 {
   _module_available_modules
-  compadd "$@" -a -- _available_modules
+  _multi_parts / "($_available_modules)"
 }
 
 _module "$@"

@@ -1,5 +1,8 @@
 2016-11-07  Peter Stephenson  <p.stephenson@samsung.com>
 
+	*  Felix Neumärker: Completion/Unix/Command/_module: follow
+	symbolic links and use _multi_parts for paths.
+
 	* zsh-users/22083: Doc/Zsh/expn.yo: attempt to explain a bit
 	better what a "word" is in parameter substitution.
 
