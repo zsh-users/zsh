@@ -572,6 +572,18 @@ noderef(Modifiers) in noderef(History Expansion) can be
 applied:  for example, tt(${i:s/foo/bar/}) performs string
 substitution on the expansion of parameter tt($i).
 
+In the following descriptions, `word' refers to a single word
+substituted on the command line, not necessarily a space delimited word.
+With default options, after the assignments:
+
+example(array=("first word" "second word")
+scalar="only word")
+
+then tt($array) substitutes two words, `tt(first word)' and `tt(second
+word)', and tt($scalar) substitutes a single word `tt(only word)'.  This
+may be modified by explicit or implicit word-splitting, however.  The
+full rules are complicated and are noted at the end.
+
 startitem()
 item(tt(${)var(name)tt(}))(
 The value, if any, of the parameter var(name) is substituted.

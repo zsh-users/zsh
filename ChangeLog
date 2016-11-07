@@ -1,3 +1,8 @@
+2016-11-07  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* zsh-users/22083: Doc/Zsh/expn.yo: attempt to explain a bit
+	better what a "word" is in parameter substitution.
+
 2016-11-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 39840: Completion/Unix/Command/_cpio: Declare variable's
