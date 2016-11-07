@@ -65,30 +65,33 @@ _svn () {
 	    ${=${${${(M)${(f)"$(_comp_locale; _call_program options svn help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)(-##)([[:alpha:]]##) \[--([a-z-]##)\](:arg:)#/(--$match[3])$match[1]$match[2]$match[4] ($match[1]$match[2])--$match[3]$match[4]}
 	  )
           while (( idx=$args[(I)*--accept:arg:] )); do
-            args[(I)*--accept:arg:]=( --accept':automatic conflict resolution action:((working\:working base\:base '"`for i j in p postpone mc mine-conflict tc theirs-conflict mf mine-full tf theirs-full e edit l launch; do print -rn $i\\\\:$j $j\\\\:$j ""; done `"'))' )
+            args[(I)*--accept:arg:]=( --accept'=:automatic conflict resolution action:((working\:working base\:base '"`for i j in p postpone mc mine-conflict tc theirs-conflict mf mine-full tf theirs-full e edit l launch; do print -rn $i\\\\:$j $j\\\\:$j ""; done `"'))' )
           done
           while (( idx=$args[(I)*--c(l|hangelist):arg:] )); do
-            args[(I)*--c(l|hangelist):arg:]=( \*{--cl,--changelist}':change list:_svn_changelists' )
+            args[(I)*--c(l|hangelist):arg:]=( \*{--cl,--changelist}'=:change list:_svn_changelists' )
           done
           while (( idx=$args[(I)*--config-dir:arg:] )); do
-            args[(I)*--config-dir:arg:]=( --config-dir':config dir:_directories' )
+            args[(I)*--config-dir:arg:]=( --config-dir'=:config dir:_directories' )
           done
           while (( idx=$args[(I)*--depth:arg:] )); do
-            args[(I)*--depth:arg:]=( --depth':operation depth (how far to recurse):(empty files immediates infinity)' )
+            args[(I)*--depth:arg:]=( --depth'=:operation depth (how far to recurse):(empty files immediates infinity)' )
           done
           while (( idx=$args[(I)*(-F|--file):arg:] )); do
-            args[(I)*(-F|--file):arg:]=( '(-F --file)'{-F,--file}':log message file:_files' )
+            args[(I)*(-F|--file):arg:]=( '(-F --file)'{-F+,--file=}':log message file:_files' )
           done
           while (( idx=$args[(I)*--set-depth:arg:] )); do
-            args[(I)*--set-depth:arg:]=( --set-depth'[make working copy deeper or shallower]:new depth:(exclude empty files immediates infinity)' )
+            args[(I)*--set-depth:arg:]=( --set-depth'=[make working copy deeper or shallower]:new depth:(exclude empty files immediates infinity)' )
           done
           while (( idx=$args[(I)*--trust-server-cert-failures:arg:] )); do
-            args[(I)*--trust-server-cert-failures:arg:]=( --trust-server-cert-failures':failures:_values -s , "certificate failures to ignore" "unknown-ca[unknown authority]" "cn-mismatch[hostname mismatch]" "expired[certificate expired]" "not-yet-valid[certificate not yet valid]" "other[all other failures]"' )
+            args[(I)*--trust-server-cert-failures:arg:]=( --trust-server-cert-failures'=:failures:_values -s , "certificate failures to ignore" "unknown-ca[unknown authority]" "cn-mismatch[hostname mismatch]" "expired[certificate expired]" "not-yet-valid[certificate not yet valid]" "other[all other failures]"' )
           done
           while (( idx=$args[(I)*--show-item:arg:] )); do
             # (q) to quote the parentheses in the value
-            args[(I)*--show-item:arg:]=( --show-item':item key:(('"`for i j in ${(kv)show_item_keys}; do print -rn - $i\\\\:"${(q)j}" ""; done`"'))' )
+            args[(I)*--show-item:arg:]=( --show-item'=:item key:(('"`for i j in ${(kv)show_item_keys}; do print -rn - $i\\\\:"${(q)j}" ""; done`"'))' )
           done
+          # All other options get {-x+,--long-x=}
+          args=( ${args/(#b)(--[A-Za-z0-9-]##):arg:/$match[1]=:arg:} )
+          args=( ${args/(#b)([^=]):arg:/$match[1]+:arg:} )
 	  _store_cache svn-${cmd}-args args
 	fi
 
@@ -215,6 +218,9 @@ _svnadmin () {
         args=(
           ${=${${${(M)${(f)"$(_comp_locale; _call_program options svnadmin help $cmd)"#(*Valid options:|(#e))}:#* :*}%% #:*}/ (arg|ARG)/:arg:}/(#b)-([[:alpha:]]) \[--([a-z-]##)\](:arg:)#/(--$match[2])-$match[1]$match[3] (-$match[1])--$match[2]$match[3]}
         )
+        # All options get {-x+,--long-x=}
+        args=( ${args/(#b)(--[A-Za-z0-9-]##):arg:/$match[1]=:arg:} )
+        args=( ${args/(#b)([^=]):arg:/$match[1]+:arg:} )
         if [[ $usage == *REPOS_PATH* ]]; then
           args+=( ":repository path:_files -/" )
           case $cmd in

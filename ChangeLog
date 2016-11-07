@@ -1,3 +1,8 @@
+2016-11-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 39853: Completion/Unix/Command/_subversion: Accept long
+	options in the '--foo=bar' syntax.
+
 2016-11-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Sebastian: 39871: cut down number of strlen()s in getstrvalue().
