@@ -27,9 +27,6 @@
  *
  */
 
-#ifdef __CYGWIN__
-#define _XOPEN_SOURCE
-#endif
 #include "datetime.mdh"
 #include "datetime.pro"
 #include <time.h>
