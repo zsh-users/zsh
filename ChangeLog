@@ -13,6 +13,8 @@
 	* 39728: Src/zsh_system.h, Src/Modules/datetime.c: define
 	_GNU_SOURCE on Cygwin
 
+	* 39855: Completion/BSD/Command/_jot: new completion
+
 2016-11-07  Frank Terbeck  <ft@bewatermyfriend.org>
 
 	* 39849: Completion/Unix/Command/_tmux: _tmux: Remove
