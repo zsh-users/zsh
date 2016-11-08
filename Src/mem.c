@@ -976,18 +976,10 @@ zalloc(size_t size)
 mod_export void *
 zshcalloc(size_t size)
 {
-    void *ptr;
-
+    void *ptr = zalloc(size);
     if (!size)
 	size = 1;
-    queue_signals();
-    if (!(ptr = (void *) malloc(size))) {
-	zerr("fatal error: out of memory");
-	exit(1);
-    }
-    unqueue_signals();
     memset(ptr, 0, size);
-
     return ptr;
 }
 

@@ -1,5 +1,8 @@
 2016-11-11  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39874/0002 plus size=0 handling: Src/mem.c: zshcalloc: Remove
+	code duplication. No functional change.
+
 	* 39874/0001: Src/params.c: setarrvalue: Remove needless
 	initialization.
 
