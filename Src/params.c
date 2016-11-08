@@ -2060,6 +2060,7 @@ getstrvalue(Value v)
 {
     char *s, **ss;
     char buf[BDIGBUFSIZE];
+    int len = -1;
 
     if (!v)
 	return hcalloc(1);
@@ -2237,22 +2238,30 @@ getstrvalue(Value v)
 	return s;
 
     if (v->start < 0) {
-	v->start += strlen(s);
+	len = strlen(s);
+	v->start += len;
 	if (v->start < 0)
 	    v->start = 0;
     }
     if (v->end < 0) {
-	v->end += strlen(s);
+	if (len < 0)
+	    len = strlen(s);
+	v->end += len;
 	if (v->end >= 0) {
 	    char *eptr = s + v->end;
 	    if (*eptr)
 		v->end += MB_METACHARLEN(eptr);
 	}
     }
-    s = (v->start > (int)strlen(s)) ? dupstring("") : dupstring(s + v->start);
+
+    if (len < 0)
+	len = strlen(s);
+    s = (v->start > len) ? dupstring("") :
+	dupstring_wlen(s + v->start, len - v->start);
+
     if (v->end <= v->start)
 	s[0] = '\0';
-    else if (v->end - v->start <= (int)strlen(s))
+    else if (v->end - v->start <= len - v->start)
 	s[v->end - v->start] = '\0';
 
     return s;

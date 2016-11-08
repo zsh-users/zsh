@@ -1,3 +1,7 @@
+2016-11-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Sebastian: 39871: cut down number of strlen()s in getstrvalue().
+
 2016-11-08  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 39857: Completion/Unix/Command/_top: add support for darwin,
@@ -5,8 +9,8 @@
 
 2016-11-08  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* Src/builtin.c, Test/C03traps.ztst: ensure exit trap can always
-	run.
+	* 39870: Src/builtin.c, Test/C03traps.ztst: ensure exit trap can
+	always run.
 
 	* unposted: Src/utils.c: follow up to 39867: don't need test
 	against zero any more.
