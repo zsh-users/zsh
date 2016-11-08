@@ -5435,6 +5435,11 @@ zexit(int val, int from_where)
 	}
     }
     lastval = val;
+    /*
+     * Now we are committed to exiting any previous state
+     * is irrelevant.  Ensure trap can run.
+     */
+    errflag = intrap = 0;
     if (sigtrapped[SIGEXIT])
 	dotrap(SIGEXIT);
     callhookfunc("zshexit", NULL, 1, NULL);

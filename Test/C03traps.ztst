@@ -626,6 +626,21 @@ F:Must be tested with a top-level script rather than source or function
 >before-out
 >before-in
 
+  if zmodload zsh/system 2>/dev/null; then
+  (
+    trap 'echo TERM; exit 2' TERM
+    trap 'echo EXIT' EXIT
+    kill -s TERM "$sysparams[pid]"
+    echo 'FATAL: we should never get here!' 1>&2
+    exit 1
+  )
+  else
+    ZTST_skip="zsh/system library not found."
+  fi
+2:EXIT trap from TERM trap
+>TERM
+>EXIT
+
 %clean
 
   rm -f TRAPEXIT
