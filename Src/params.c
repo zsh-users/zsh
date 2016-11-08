@@ -2657,8 +2657,8 @@ setarrvalue(Value v, char **val)
 	if (v->end <= pre_assignment_length)
 	    post_assignment_length += pre_assignment_length - v->end + 1;
 
-	p = new = (char **) zshcalloc(sizeof(char *)
-		                      * (post_assignment_length + 1));
+	p = new = (char **) zalloc(sizeof(char *)
+		                   * (post_assignment_length + 1));
 
 	for (i = 0; i < v->start; i++)
 	    *p++ = i < pre_assignment_length ? ztrdup(*q++) : ztrdup("");
