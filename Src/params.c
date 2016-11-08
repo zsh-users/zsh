@@ -2647,15 +2647,20 @@ setarrvalue(Value v, char **val)
 
 	for (i = 0; i < v->start; i++)
 	    *p++ = i < pre_assignment_length ? ztrdup(*q++) : ztrdup("");
-	for (r = val; *r;)
-	    *p++ = ztrdup(*r++);
+	for (r = val; *r;) {
+            /* Give away ownership of the string */
+	    *p++ = *r++;
+	}
 	if (v->end < pre_assignment_length)
 	    for (q = old + v->end; *q;)
 		*p++ = ztrdup(*q++);
 	*p = NULL;
 
 	v->pm->gsu.a->setfn(v->pm, new);
-	freearray(val);
+
+        /* Ownership of all strings has been
+         * given away, can plainly free */
+	free(val);
     }
 }
 

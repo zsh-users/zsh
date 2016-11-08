@@ -1,5 +1,8 @@
 2016-11-08  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Sebastian: 39869: can transfer ownership of core of array when
+	assigning.
+
 	* 39867: Src/utils.c: cast to unsigned char to compare against
 	0x7f.
 
