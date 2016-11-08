@@ -1,3 +1,8 @@
+2016-11-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39867: Src/utils.c: cast to unsigned char to compare against
+	0x7f.
+
 2016-11-07  Peter Stephenson  <p.stephenson@samsung.com>
 
 	*  Felix Neumärker: Completion/Unix/Command/_module: follow

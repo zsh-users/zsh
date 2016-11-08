@@ -5341,7 +5341,7 @@ mb_metastrlenend(char *ptr, int width, char *eptr)
 	    inchar = *ptr;
 	ptr++;
 
-	if (complete && (inchar >= 0 && inchar <= 0x7f)) {
+	if (complete && (inchar >= 0 && STOUC(inchar) <= STOUC(0x7f))) {
 	    /*
 	     * We rely on 7-bit US-ASCII as a subset, so skip
 	     * multibyte handling if we have such a character.
