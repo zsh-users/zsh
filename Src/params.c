@@ -2432,8 +2432,8 @@ assignstrvalue(Value v, char *val, int flags)
 	    char *z, *x;
 	    int zlen;
 
-	    z = dupstring(v->pm->gsu.s->getfn(v->pm));
-	    zlen = strlen(z);
+	    z = dupstring_glen(v->pm->gsu.s->getfn(v->pm), (unsigned*) &zlen);
+
 	    if ((v->flags & VALFLAG_INV) && unset(KSHARRAYS))
 		v->start--, v->end--;
 	    if (v->start < 0) {

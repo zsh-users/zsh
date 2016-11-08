@@ -1,3 +1,8 @@
+2016-11-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Sebastian: 39875: Src/params.c, Src/string.c: add
+	dupstring_glen() to avoid redundant strlen() calls.
+
 2016-11-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 39853: Completion/Unix/Command/_subversion: Accept long

@@ -41,6 +41,8 @@ dupstring(const char *s)
     return t;
 }
 
+/* Duplicate string on heap when length is known */
+
 /**/
 mod_export char *
 dupstring_wlen(const char *s, unsigned len)
@@ -50,6 +52,21 @@ dupstring_wlen(const char *s, unsigned len)
     if (!s)
 	return NULL;
     t = (char *) zhalloc(len + 1);
+    strcpy(t, s);
+    return t;
+}
+
+/* Duplicate string on heap, returning length of string */
+
+/**/
+mod_export char *
+dupstring_glen(const char *s, unsigned *len_ret)
+{
+    char *t;
+
+    if (!s)
+	return NULL;
+    t = (char *) zhalloc((*len_ret = strlen((char *)s)) + 1);
     strcpy(t, s);
     return t;
 }
