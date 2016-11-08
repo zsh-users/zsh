@@ -1,5 +1,8 @@
 2016-11-08  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Src/utils.c: follow up to 39867: don't need test
+	against zero any more.
+
 	* Sebastian: 39869: can transfer ownership of core of array when
 	assigning.
 
