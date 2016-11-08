@@ -1,3 +1,8 @@
+2016-11-08  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 39857: Completion/Unix/Command/_top: add support for darwin,
+	with improvements on linux etc.
+
 2016-11-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Src/utils.c: follow up to 39867: don't need test
