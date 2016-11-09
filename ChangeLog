@@ -1,5 +1,8 @@
 2016-11-09  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 39887: Src/params.c: no need to conditionalise assignment of
+	strlen in getstrvalue().
+
 	* 39886 based on 39877 (Sebastian): Src/params.c, Src/utils.c:
 	add arrdup_max() so as not to duplicate entire arrays unnecessarily.
 

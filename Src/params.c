@@ -2060,7 +2060,7 @@ getstrvalue(Value v)
 {
     char *s, **ss;
     char buf[BDIGBUFSIZE];
-    int len = -1;
+    int len;
 
     if (!v)
 	return hcalloc(1);
@@ -2237,15 +2237,13 @@ getstrvalue(Value v)
     if (v->start == 0 && v->end == -1)
 	return s;
 
+    len = strlen(s);
     if (v->start < 0) {
-	len = strlen(s);
 	v->start += len;
 	if (v->start < 0)
 	    v->start = 0;
     }
     if (v->end < 0) {
-	if (len < 0)
-	    len = strlen(s);
 	v->end += len;
 	if (v->end >= 0) {
 	    char *eptr = s + v->end;
@@ -2254,8 +2252,6 @@ getstrvalue(Value v)
 	}
     }
 
-    if (len < 0)
-	len = strlen(s);
     s = (v->start > len) ? dupstring("") :
 	dupstring_wlen(s + v->start, len - v->start);
 
