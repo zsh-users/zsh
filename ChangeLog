@@ -1,5 +1,9 @@
 2016-11-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Guillaume Maudoux: 39900 (doc slightly tweaked): Src/params.c,
+	Doc/Zsh/params.yo: Add TERMINFO_DIRS special colon-separated
+	array, not tied.
+
 	* 39995 (from 39977): Src/params.c, Test/A06assign.ztst:
 	optimisation of string assignment if length is unchanged.
 

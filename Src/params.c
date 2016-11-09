@@ -87,6 +87,7 @@ char *ifs,		/* $IFS         */
      *postedit,		/* $POSTEDIT    */
      *term,		/* $TERM        */
      *zsh_terminfo,     /* $TERMINFO    */
+     *zsh_terminfodirs, /* $TERMINFO_DIRS */
      *ttystrname,	/* $TTY         */
      *pwd;		/* $PWD         */
 
@@ -208,6 +209,8 @@ static const struct gsu_scalar term_gsu =
 { termgetfn, termsetfn, stdunsetfn };
 static const struct gsu_scalar terminfo_gsu =
 { terminfogetfn, terminfosetfn, stdunsetfn };
+static const struct gsu_scalar terminfodirs_gsu =
+{ terminfodirsgetfn, terminfodirssetfn, stdunsetfn };
 static const struct gsu_scalar wordchars_gsu =
 { wordcharsgetfn, wordcharssetfn, stdunsetfn };
 static const struct gsu_scalar ifs_gsu =
@@ -283,6 +286,7 @@ IPDEF2("histchars", histchars_gsu, PM_DONTIMPORT),
 IPDEF2("HOME", home_gsu, PM_UNSET),
 IPDEF2("TERM", term_gsu, PM_UNSET),
 IPDEF2("TERMINFO", terminfo_gsu, PM_UNSET),
+IPDEF2("TERMINFO_DIRS", terminfodirs_gsu, PM_UNSET),
 IPDEF2("WORDCHARS", wordchars_gsu, 0),
 IPDEF2("IFS", ifs_gsu, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF2("_", underscore_gsu, PM_DONTIMPORT),
@@ -4548,6 +4552,33 @@ terminfosetfn(Param pm, char *x)
     term_reinit_from_pm();
 }
 
+/* Function to get value of special parameter `TERMINFO_DIRS' */
+
+/**/
+char *
+terminfodirsgetfn(UNUSED(Param pm))
+{
+    return zsh_terminfodirs ? zsh_terminfodirs : dupstring("");
+}
+
+/* Function to set value of special parameter `TERMINFO_DIRS' */
+
+/**/
+void
+terminfodirssetfn(Param pm, char *x)
+{
+    zsfree(zsh_terminfodirs);
+    zsh_terminfodirs = x;
+
+    /*
+     * terminfo relies on the value being exported before
+     * we reinitialise the terminal.  This is a bit inefficient.
+     */
+    if ((pm->node.flags & PM_EXPORTED) && x)
+	addenv(pm, x);
+
+    term_reinit_from_pm();
+}
 /* Function to get value for special parameter `pipestatus' */
 
 /**/

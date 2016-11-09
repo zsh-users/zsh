@@ -1493,10 +1493,20 @@ take effect.
 )
 vindex(TERMINFO)
 item(tt(TERMINFO) <S>)(
-A reference to a compiled description of the terminal, used by the
-`terminfo' library when the system has it; see manref(terminfo)(5).
-If set, this causes the shell to reinitialise the terminal, making
-the workaround `tt(TERM=$TERM)' unnecessary.
+A reference to your terminfo database, used by the `terminfo' library when the
+system has it; see manref(terminfo)(5).
+If set, this causes the shell to reinitialise the terminal, making the
+workaround `tt(TERM=$TERM)' unnecessary.
+)
+vindex(TERMINFO_DIRS)
+item(tt(TERMINFO_DIRS) <S>)(
+A colon-seprarated list of terminfo databases, used by the `terminfo' library
+when the system has it; see manref(terminfo)(5). This variable is only
+used by certain terminal libraries, in particular ncurses; see
+manref(terminfo)(5) to check support on your system.  If set, this
+causes the shell to reinitialise the terminal, making the workaround
+`tt(TERM=$TERM)' unnecessary.  Note that unlike other colon-separated
+arrays this is not tied to a zsh array.
 )
 vindex(TIMEFMT)
 item(tt(TIMEFMT))(
