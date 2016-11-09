@@ -1,5 +1,8 @@
 2016-11-09  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 39886 based on 39877 (Sebastian): Src/params.c, Src/utils.c:
+	add arrdup_max() so as not to duplicate entire arrays unnecessarily.
+
 	* Sebastian: 39875: Src/params.c, Src/string.c: add
 	dupstring_glen() to avoid redundant strlen() calls.
 

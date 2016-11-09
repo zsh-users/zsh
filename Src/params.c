@@ -2294,14 +2294,24 @@ getarrvalue(Value v)
 	v->start += arrlen(s);
     if (v->end < 0)
 	v->end += arrlen(s) + 1;
-    if (arrlen_lt(s, v->start) || v->start < 0)
+
+    /* Null if 1) array too short, 2) index still negative */
+    if (arrlen_lt(s, v->start) || v->start < 0) {
 	s = arrdup(nular);
-    else
-	s = arrdup(s + v->start);
-    if (v->end <= v->start)
-	s[0] = NULL;
-    else if (arrlen_ge(s, v->end - v->start))
-	s[v->end - v->start] = NULL;
+    } else if (v->end <= v->start) {
+        s = arrdup_max(s, 1);
+        s[0] = NULL;
+    } else {
+        /* Copy to a point before the end of the source array:
+         * arrdup_max will copy at most v->end - v->start elements,
+         * starting from v->start element. Original code said:
+	 *  s[v->end - v->start] = NULL
+         * which means that there are exactly the same number of
+         * elements as the value of the above *0-based* index.
+         */
+	s = arrdup_max(s + v->start, v->end - v->start);
+    }
+
     return s;
 }
 

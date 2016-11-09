@@ -4229,6 +4229,31 @@ arrdup(char **s)
     return y;
 }
 
+/* Duplicate at most max elements of the array s with heap memory */
+
+/**/
+mod_export char **
+arrdup_max(char **s, unsigned max)
+{
+    char **x, **y, **send;
+    int len;
+
+    len = arrlen(s);
+
+    /* Limit has sense only if not equal to len */
+    if (max > len)
+        max = len;
+
+    y = x = (char **) zhalloc(sizeof(char *) * (max + 1));
+
+    send = s + max;
+    while (s < send)
+	*x++ = dupstring(*s++);
+    *x = NULL;
+
+    return y;
+}
+
 /**/
 mod_export char **
 zarrdup(char **s)
