@@ -1,3 +1,8 @@
+2016-11-09  Oliver Kiddle  <opk@zsh.org>
+
+	* 39884: Functions/Zle/history-beginning-search-menu:
+	fix for history lines containing a pipe character
+
 2016-11-09  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 39882: Doc/Zsh/expn.yo: mention ${name:/pattern/replacement}

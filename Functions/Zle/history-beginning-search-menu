@@ -112,7 +112,7 @@ fi
 # go to the last one.  This allows accept-line-and-down-history etc.
 # to work.
 local -a lines
-local matchq=${matches[$chars]//(#m)[\][()\\*?#<>~^]/\\$MATCH}
+local matchq=${matches[$chars]//(#m)[\][|()\\*?#<>~^]/\\$MATCH}
 lines=(${(kon)history[(R)$matchq]})
 HISTNO=$lines[-1]
 
