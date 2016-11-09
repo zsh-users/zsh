@@ -153,12 +153,12 @@ _tmux_aliasmap=(
 # Another thing, the description generation needs, is handling of
 # $tmux_describe: If that parameter is non-empty, the sub-command function
 # should only print a description of the sub-command it handles and return
-# immidiately after doing so.
+# immediately after doing so.
 #
 # To add support for a new sub-command, you only have to add a new
 # _tmux-<foo>() function below (preferably alphabetically sorted), that
 # behaves like described above; and add a alias->command pair in the
-# _tmux_aliasmap associative array above (if the comand in fact has an
+# _tmux_aliasmap associative array above (if the command in fact has an
 # alias). The rest should just work[tm].
 
 _tmux-attach-session() {
@@ -179,6 +179,7 @@ _tmux-bind-key() {
     '-n[make the binding work without the need for the prefix key]' \
     '-r[the key may repeat]' \
     '-t+[specify mode table for the binding]:mode table:__tmux-mode-tables' \
+    '-R+[specify repeat count]:repeat count' \
     '-T+[specify key table for the binding]:key table' \
     '1:key' \
     '*:::template:_tmux'
@@ -427,8 +428,8 @@ _tmux-list-clients() {
 }
 
 _tmux-list-commands() {
-    [[ -n ${tmux_describe} ]] && print "list supported sub-commands" && return
-    __tmux-nothing-else
+  [[ -n ${tmux_describe} ]] && print "list supported sub-commands" && return
+  _arguments '-F+[specify format]:format'
 }
 
 _tmux-list-keys() {
@@ -837,8 +838,10 @@ _tmux-show-window-options() {
 }
 
 _tmux-source-file() {
-    [[ -n ${tmux_describe} ]] && print "execute tmux commands from a file" && return
-    _files
+  [[ -n ${tmux_describe} ]] && print "execute tmux commands from a file" && return
+  _arguments \
+    "-q[don't report error if path doesn't exist]" \
+    '*:path:_directories'
 }
 
 _tmux-split-window() {
@@ -939,7 +942,7 @@ _tmux-wait-for() {
 }
 
 # --- Utility functions ---
-# They should be called __tmux-*() and kept seperate from the
+# They should be called __tmux-*() and kept separate from the
 # sub-command functions.
 
 function __tmux-attributes() {
@@ -1117,7 +1120,7 @@ function __tmux-option-guard() {
             'window-status-separator:MSG:separator string'
             'window-status-style:__tmux-style'
             'window-style:__tmux-style'
-            'wrap-seach:DESC:on off'
+            'wrap-search:DESC:on off'
             'xterm-keys:DESC:on off'
         )
     fi

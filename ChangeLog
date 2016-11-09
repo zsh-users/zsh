@@ -1,5 +1,7 @@
 2016-11-09  Oliver Kiddle  <opk@zsh.org>
 
+	* 39888: Completion/Unix/Command/_tmux: update for tmux 2.3
+
 	* 39884: Functions/Zle/history-beginning-search-menu:
 	fix for history lines containing a pipe character
 
