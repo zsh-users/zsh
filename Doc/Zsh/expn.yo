@@ -782,12 +782,14 @@ prepending tt($0).  Hence tt(${*:0:1}) substitutes tt($0) and
 tt(${*:1:1}) substitutes tt($1).
 )
 xitem(tt(${)var(name)tt(/)var(pattern)tt(/)var(repl)tt(}))
-item(tt(${)var(name)tt(//)var(pattern)tt(/)var(repl)tt(}))(
+xitem(tt(${)var(name)tt(//)var(pattern)tt(/)var(repl)tt(}))
+item(tt(${)var(name)tt(:/)var(pattern)tt(/)var(repl)tt(}))(
 Replace the longest possible match of var(pattern) in the expansion of
 parameter var(name) by string var(repl).  The first form
-replaces just the first occurrence, the second form all occurrences.
+replaces just the first occurrence, the second form all occurrences,
+and the third form replaces only if var(pattern) matches the entire string.
 Both var(pattern) and var(repl) are subject to double-quoted substitution,
-so that expressions like tt(${name/$opat/$npat}) will work, but note the
+so that expressions like tt(${name/$opat/$npat}) will work, but obey the
 usual rule that pattern characters in tt($opat) are not treated specially
 unless either the option tt(GLOB_SUBST) is set, or tt($opat) is instead
 substituted as tt(${~opat}).
@@ -803,8 +805,8 @@ single backslash; this is not necessary if the
 `tt(%)' and `tt(#%) are not active if they occur inside a substituted
 parameter, even at the start.
 
-The first `tt(/)' may be preceded by a `tt(:)', in which case the match
-will only succeed if it matches the entire word.  Note also the
+If, after quoting rules apply, tt(${)var(name)tt(}) expands to an array,
+the replacements act on each element individually.  Note also the
 effect of the tt(I) and tt(S) parameter expansion flags below; however,
 the flags tt(M), tt(R), tt(B), tt(E) and tt(N) are not useful.
 

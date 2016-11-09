@@ -1,3 +1,8 @@
+2016-11-09  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39882: Doc/Zsh/expn.yo: mention ${name:/pattern/replacement}
+	in the itemized synopsis with the related forms; clarify doc.
+
 2016-11-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39887: Src/params.c: no need to conditionalise assignment of
