@@ -14,7 +14,7 @@ _arguments \
   '(--color)--color=-[color matches]::color:(always auto never)' \
   '(-d --definition)'{-d,--definition}'[print locations of definitions]' \
   '(-e --regexp :)'{-e,--regexp}'[specify pattern]:pattern:_global_tags' \
-  '(--encode-path)--encode-path=-[encode path charcters in hexadecimal representation]:format' \
+  '(--encode-path)--encode-path=-[encode path characters in hexadecimal representation]:format' \
   '(-F --first-match)'{-f,--first-match}'[stop searching if tag is found in current tag file]' \
   '(--from-here)--from-here=-[decide tag type by context]:line_path:' \
   '(-G --basic-regexp :)'{-G,--basic-regexp}'[specify basic regexp to use]:word:_global_tags' \
@@ -23,9 +23,9 @@ _arguments \
   '(-i --ignore-case)'{-i,--ignore-case}'[ignore case in patterns]' \
   '(-L --file-list)'{-L,--file-list}'[obtain files from file in addition to the arguments]:file:_files' \
   '(-l --local)'{-l,--local}'[print just objects which exist under the current directory]' \
-  '(--literal)--literal[use leteral search instead of regexp search]' \
+  '(--literal)--literal[use literal search instead of regexp search]' \
   '(-M --match-case)'{-m,--match-case}'[enable case sensitive search]' \
-  '(--match-part)--match-part=-[speficy how path name completion should match]::part:(first last all)' \
+  '(--match-part)--match-part=-[specify how path name completion should match]::part:(first last all)' \
   '(-n --nofilter)'{-n,--nofilter}'[suppress sort filter and path conversion filter]' \
   '(-O --only-other)'{-O,--only-other}'[search only text files]' \
   '(-o --other)'{-o,--other}'[search in other files, not just source files (with -g)]' \

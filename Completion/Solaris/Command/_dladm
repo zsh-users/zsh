@@ -682,7 +682,7 @@ _dladm() {
       '(-f --force)'{-f,--force}'[force partition creation]' \
       '(-l --link)'{-l,--link}'[IP-over-IB physical link name]:IB link:_dladm_iblinks' \
       '(-p --prop)'{-p,--prop}'[set link properties]:link property:_values -s , "property" ${(M)linkprops_nonvlanvnic\:#*\:*} ${(M)linkprops_general\:#*\:*}' \
-      '(-P --pkey)'{-P,--pkey}'[set parition key]:hex number:' \
+      '(-P --pkey)'{-P,--pkey}'[set partition key]:hex number' \
       ':partition link name:'
   ;;
 

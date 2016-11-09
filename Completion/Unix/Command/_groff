@@ -27,7 +27,7 @@ _arguments \
 	'-I[add search dir for soelim]:directory:_files -/' \
 	'-l[send output to spooler program for printing]' \
 	'*-L[pass arg to spooler program]:spooler argument:' \
-	'-N[do not allow newlines within eqn delimeters]' \
+	"-N[don't allow newlines within eqn delimiters]" \
 	'-p[preprocess with pic]' \
 	'*-P[pass option to postprocessor]:option:' \
         '-R[preprocess with refer]' \

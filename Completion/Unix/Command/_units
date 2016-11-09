@@ -13,12 +13,12 @@ typeset -A opt_args
 _arguments -C -s -S \
   '(-c --check --check-verbose)'{-c,--check}'[check units are reducible]' \
   '(-c --check)--check-verbose[verbosely check units are reducible]' \
-  '(-o --output-format)'{-o,--output-format}'[specify output format]:printf formt: ' \
+  '(-o --output-format)'{-o,--output-format}'[specify output format]:printf format' \
   '(-f --file)'{-f,--file}'[specify file with units]:units file:_files' \
   '(-m --minus)'{-m,--minus}'[- is subtraction]' \
   '(-p --product)'{-p,--product}'[binary - is product]' \
   '(-q --quiet --silent)'{-q,--quiet,--silent}'[suppress prompts and statistics]' \
-  '(-s --strict)'{-s,--strict}'[suppress conversion to reciprocals units]' \
+  '(-s --strict)'{-s,--strict}'[suppress conversion to reciprocal units]' \
   '(-t --terse)'{-t,--terse}'[make conversion output briefer]' \
   '(-v --verbose)'{-v,--verbose}'[make output more verbose]' \
   '(- *)'{-h,--help}'[show help information and exit]' \

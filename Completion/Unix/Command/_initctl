@@ -4,7 +4,7 @@
 
 typeset -g -a -U _initctl_events_list _initctl_eventargs_list
 
-# run show-config -e and if possible parse out all events and KEY= argumnts
+# run show-config -e and if possible parse out all events and KEY= arguments
 # otherwise provide some common values
 _initctl_fillarray_events_args ()
 {
@@ -169,7 +169,7 @@ _initctl()
   # define fallback completion function
   local cmd_completion_default=basic
 
-  # depending on which command was used, call different completion funtions
+  # depending on which command was used, call different completion functions
   case $service in
     initctl)
       _arguments "${common_args[@]}" '*::Initctl Commands:_initctl_command'

@@ -1,5 +1,26 @@
 2016-11-09  Oliver Kiddle  <opk@zsh.org>
 
+	* 39890: Completion/Debian/Command/_git-buildpackage,
+	Completion/Debian/Command/_lintian,
+	Completion/Debian/Command/_make-kpkg,
+	Completion/Linux/Command/_iwconfig,
+	Completion/Debian/Command/_dcut, Completion/Linux/Command/_mdadm,
+	Completion/Solaris/Command/_dladm, Completion/Unix/Command/_adb,
+	Completion/Unix/Command/_attr, Completion/Unix/Command/_awk,
+	Completion/Unix/Command/_bzr, Completion/Unix/Command/_cdrdao,
+	Completion/Unix/Command/_devtodo, Completion/Unix/Command/_feh,
+	Completion/Unix/Command/_global, Completion/Unix/Command/_groff,
+	Completion/Unix/Command/_growisofs,
+	Completion/Unix/Command/_initctl, Completion/Unix/Command/_iostat,
+	Completion/Unix/Command/_ip, Completion/Unix/Command/_java,
+	Completion/Unix/Command/_localedef, Completion/Unix/Command/_make,
+	Completion/Unix/Command/_mencal, Completion/Unix/Command/_module,
+	Completion/Unix/Command/_nkf, Completion/Unix/Command/_nmap,
+	Completion/Unix/Command/_pbm, Completion/Unix/Command/_rar,
+	Completion/Unix/Command/_sisu, Completion/Unix/Command/_sqsh,
+	Completion/Unix/Command/_surfraw, Completion/Unix/Command/_units,
+	Completion/Unix/Command/_wiggle: fix typos and spellings
+
 	* 39888: Completion/Unix/Command/_tmux: update for tmux 2.3
 
 	* 39884: Functions/Zle/history-beginning-search-menu:

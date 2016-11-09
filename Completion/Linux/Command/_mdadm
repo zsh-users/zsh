@@ -56,15 +56,15 @@ _layouts () {
         	                'f9[far copies]'
 			;;
 		faulty)
-			_values -S \  "Failure mode" \
+			_values -S \  "failure mode" \
 				{write-transient,wt}'[write-transient]' \
 				{read-transient,rt}'[read-transient]' \
-				{write-presistent,wp}'[write-presistent]' \
-				{read-presistent,rp}'[read-presistent]' \
+				{write-persistent,wp}'[write-persistent]' \
+				{read-persistent,rp}'[read-persistent]' \
 				write-all'[write-all]' \
 				{read-fixable,rf}'[read-fixable]' \
 				{clear,none}'[remove any pending or periodic failure modes]' \
-				flush'[clear any persistant faults]'
+				flush'[clear any persistent faults]'
 	esac
 }
 

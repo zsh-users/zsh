@@ -375,7 +375,7 @@ case $cmd in
 (gannotate|gblame|gpraise)
     args+=(
 	'--all[show annotations on all lines]'
-	'--plain[do not hightlight annotation lines]'
+	"--plain[don't highlight annotation lines]"
 	'*:files:_bzr_versionedFiles'
 	)
     ;;

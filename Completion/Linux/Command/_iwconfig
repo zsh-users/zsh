@@ -50,7 +50,7 @@ if [[ -n "$state" ]]; then
       	'essid[set the network name]' \
 	'(nwid domain)'{nwid,domain}'[set the network ID]' \
 	'(freq channel)'{freq,channel}'[set the operating frequency or channel]' \
-	'sens[set the sensitivity threhold]' \
+	'sens[set the sensitivity threshold]' \
       	'mode[set operating mode]' \
 	'ap[register with given access point]' \
 	'(nick nickname)'nick{,name}'[set the nickname]' \
@@ -62,7 +62,7 @@ if [[ -n "$state" ]]; then
 	'txpower[set transmit power]' \
 	'retry[set number of retries]' \
 	'modu[force a specific set of modulations]' \
-	'commit[apply changes imediately]' && ret=0
+	'commit[apply changes immediately]' && ret=0
     ;;
   esac
 fi

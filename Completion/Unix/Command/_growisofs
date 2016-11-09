@@ -218,7 +218,7 @@ else
     '-check-session[check old session for compliance against current rules]' \
     '-copyright[specify the path and file-name of the copyright file]' \
     '-d[omit trailing period from files that do not have a period]' \
-    '-D[do not use deep directory-realocation]' \
+    "-D[don't use deep directory-reallocation]" \
     '-dir-mode[specify the mode of directories]' \
     '-dvd-video[generate a DVD-Video compliant UDF file-system]' \
     '-f[follow symbolic links when generating the file system]' \
@@ -250,7 +250,7 @@ else
     {-nobak,-no-bak}'[do not include backup files on the ISO9660 file-system]' \
     '-force-rr[do not use the automatic Rock Ridge attribute-recognition for previous sessions]' \
     '-no-rr[do not use use the Rock Ridge attributes from previous sessions]' \
-    '-no-split-symlink-components[do not split the symbolic-link compontents]' \
+    "-no-split-symlink-components[don't split the symbolic-link components]" \
     '-no-split-symlink-fields[do not split the symbolic-link fields]' \
     '-o[output the ISO9660-file-system image to the given file]:ISO9660 image:_files' \
     '-pad[pad the end of the image by 150 sectors]' \

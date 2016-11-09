@@ -23,7 +23,7 @@ _arguments -s -C -M 'r:|[_-]=* r:|=*' \
   '(--convert --to -C)-I[texinfo output, not maintained]' \
   '(--convert --to -C)-L[print license info]' \
   '(--convert --to -C)-M[maintenance mode, retain intermediate processing files]' \
-  '(--convert --to -C)-m[create intermediate markup file, metaverse, assumed for most output instuctions]' \
+  '(--convert --to -C)-m[create intermediate markup file, metaverse, assumed for most output instructions]' \
   '(--convert --to -C)-N[document content certificate, output document digests]' \
   '(--convert --to -C)-n[skip intermediate markup, skip -m]' \
   '(--convert --to -C)-o[Open Document text format output]' \

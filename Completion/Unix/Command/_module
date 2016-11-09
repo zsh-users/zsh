@@ -41,7 +41,7 @@ _module()
     "purge:unload all loaded modules"
     "refresh:refresh all non-persistent components of loaded modules"
     "whatis:display module information"
-    "appropos:search for a given keyword in modules"
+    "apropos:search for a given keyword in modules"
     "keyword:search for a given keyword in modules"
     "initadd:add or append a module to the user's shell init file"
     "initprepend:add or prepend a module to the user's shell init files"

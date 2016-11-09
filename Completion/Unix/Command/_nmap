@@ -5,7 +5,7 @@ local curcontext="$curcontext" state line suf ret=1
 _arguments -C \
   '!-sI:zombie host:_hosts' \
   '!-P'{T,S,U}'+:port list' \
-  '*-s-[specify scan type]:scan type:((S\:TCP\ SYN\ scan T\:TCP\ connect\(\)\ scan F\:stealth\ FIN\ scan X\:stealth\ Xmas\ tree\ scan N\:stealth\ null\ scan P\:ping\ scanning U\:UDP\ scan O\:IP\ prototocol\ scan I\:idle\ scan A\:ACK\ scan W\:window\ scan R\:RPC\ scan L\:list\ scan V\:version\ detection))' \
+  '*-s-[specify scan type]:scan type:((S\:TCP\ SYN\ scan T\:TCP\ connect\(\)\ scan F\:stealth\ FIN\ scan X\:stealth\ Xmas\ tree\ scan N\:stealth\ null\ scan P\:ping\ scanning U\:UDP\ scan O\:IP\ protocol\ scan I\:idle\ scan A\:ACK\ scan W\:window\ scan R\:RPC\ scan L\:list\ scan V\:version\ detection))' \
   '-b[specify ftp relay host]:ftp relay host:_hosts' \
   '*-P-[specify probe types and options]:probe type/options:->probe-opts' \
   '-A[enable OS detection and version scanning]' \
@@ -29,7 +29,7 @@ _arguments -C \
   '--data_length[add random data to packets]:data length' \
   '(-R)-n[skip reverse DNS to speed things up]' \
   '(-n)-R[always do reverse DNS on targets]' \
-  '-r[do not ramdomize order in which ports are scanned]' \
+  "-r[don't randomize order in which ports are scanned]" \
   '-ttl[specify IPv4 time to live for sent packets]' \
   '--randomize_hosts[scan hosts in random order]' \
   '-M[specify maximum number of parallel TCP connects]:maximum TCP connects' \

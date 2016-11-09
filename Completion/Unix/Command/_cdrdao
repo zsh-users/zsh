@@ -211,7 +211,7 @@ __cdrdao-simulate-or-write () {
     $_cdrdao_common_toc_device_args \
     $_cdrdao_speed_arg \
     '--multi[do not close the session after successful write]' \
-    '--overburn[allow overburing of medium]' \
+    '--overburn[allow overburning of medium]' \
     '--full-burn[force burning to the outer disk edge]' \
     $_cdrdao_capacity_arg \
     $_cdrdao_eject_arg \

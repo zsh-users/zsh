@@ -4,7 +4,7 @@
 _arguments \
   '--version[show program version number and exit]' \
   '--help[show help message and exit]' \
-  '--git-ignore-new[build with uncommited changes in the source tree]' \
+  '--git-ignore-new[build with uncommitted changes in the source tree]' \
   '--git-no-ignore-new[negates --git-ignore-new]' \
   '--git-verbose[verbose command execution]' \
   '--git-tag[create a tag after a successful build]' \
@@ -40,4 +40,4 @@ _arguments \
   '--git-dont-purge[retain exported package build directory]' \
   '--git-overlay[extract orig tarball when using export-dir option]' \
   '--git-no-overlay[negates --git-overlay]' \
-  '*:Other options:_dpkg-buildpackage'
+  '*:other options:_dpkg-buildpackage'

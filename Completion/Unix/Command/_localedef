@@ -62,7 +62,7 @@ else
   [[ $OSTYPE == (freebsd*|dragonfly*) ]] && bsd_opts=(
       '-D[create BSD-style output]' \
       '-U[ignore undefined character symbols]' \
-      '-v[verbose deguggin output]' \
+      '-v[verbose debug output]' \
       '-w+[specify width file]:width file:_files' \
     )
 

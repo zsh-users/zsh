@@ -40,7 +40,7 @@ _arguments -C \
         build\:"compiles the kernel" \
         modules\:"build all add-on modules" \
         modules-config\:"configure all add-on modules" \
-        modules-image\:"build all add-on modules, but wirhou source and diff files" \
+        modules-image\:"build all add-on modules, but without source and diff files" \
         modules-clean\:"clean add-on modules" \
         configure\:"configure the kernel" \
         debian\:"creates the debian/ directory" \

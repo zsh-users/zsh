@@ -106,7 +106,7 @@ function _dcut() {
     (rm)
       # dcut rm arguments
       opts=(
-        '--searchdirs[search in all directores for the given files]'
+        '--searchdirs[search in all directories for the given files]'
         '1::file to be deleted:_files'
       )
       ;;
@@ -128,7 +128,7 @@ function _dcut() {
       opts=(
         '--uid[full name and address or GPG fingerprint of the Debian Maintainer]'
         '*--allow[grant permission to upload a source package]:source package'
-        '*--deny[remove permission to upload a source pckage]:source package'
+        '*--deny[remove permission to upload a source package]:source package'
       )
       ;;
     (reschedule)
@@ -142,7 +142,7 @@ function _dcut() {
       # dcut rm arguments
       opts=(
         '*'{-f,--filename}'[file name to be removed]:file name:_files'
-        '--searchdirs[search in all directores for the given files]'
+        '--searchdirs[search in all directories for the given files]'
       )
       ;;
     (upload)

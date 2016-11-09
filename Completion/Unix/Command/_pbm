@@ -698,7 +698,7 @@ ppmtoacad)
 ppmtobmp)
   _arguments \
     '(-windows)-os2' '(-os2)-windows' \
-    '-bpp[secify bits per pixel for BMP file]:bits per pixel:(1 4 8 24)' \
+    '-bpp[specify bits per pixel for BMP file]:bits per pixel:(1 4 8 24)' \
     ':file:_pbm'
   ;;
 

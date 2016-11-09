@@ -118,7 +118,7 @@ case $state in
       deblists)
         _arguments $args \
           '-shelp[go to search help page]' \
-          '-results=-[specifiy number of results to return]:number' \
+          '-results=-[specify number of results to return]:number' \
           '-dates=-[quarters to search]:date' \
           '-case[use case sensitive search]' \
           '-errors=-[specify errors allowed]:errors:(0 1 2 best)' \

@@ -21,11 +21,11 @@ case $service in
       '(-d --dump -n --name)'{-n+,--name=}'[dump the value of the named extended attribute]' \
       '(-n --name -d --dump)'{-d,--dump}'[dump the values of all extended attributes]' \
       '(-e --encoding)'{-e+,--encoding=}'[encode values after retrieving them]:encoding:(text hex base64)' \
-      '(-h --no-derference)'{-h,--no-dereference}'[do not follow symbolic links]' \
+      '(-h --no-dereference)'{-h,--no-dereference}"[don't follow symbolic links]" \
       '(-m --match)'{-m+,--match=}'[only include attributes with names matching regex]:regular expression' \
-      '--absolute-names[do not string leasing slash characters]' \
+      "--absolute-names[don't strip leading slash characters]" \
       '--only-values[dump only attribute values]' \
-      '(-R --recursive)'{-R,--recursive}'[list attributes of all files and directories recurively]' \
+      '(-R --recursive)'{-R,--recursive}'[list attributes of all files and directories recursively]' \
       '(-P --physical -L --logical)'{-L,--logical}'[follow all symbolic links]' \
       '(-L --logical -P --physical)'{-P,--physical}'[skip all symbolic links]' \
       '(* -)--version[display version information]' \
@@ -39,7 +39,7 @@ case $service in
       '(-v --value)'{-v+,--value=}'[specify value for the attribute]' \
       '(-x --remove)'{-x+,--remove=}'[remove specified extended attribute]' \
       '(-n --name -v --value)--restore[restore extended attributes from dump file]:dump file:_files' \
-      '(-h --no-derference)'{-h,--no-dereference}'[do not follow symbolic links]' \
+      '(-h --no-dereference)'{-h,--no-dereference}"[don't follow symbolic links]" \
       '(* -)--version[display version information]' \
       '(* -)--help[display help information]' \
       '*:file:_files'

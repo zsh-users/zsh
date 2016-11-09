@@ -22,7 +22,7 @@ common=(
   '-ow[save or restore file owner and group]'
   '-p+:password'
   '-p\-[do not query password]'
-  '-r[recurse subdirectorie]'
+  '-r[recurse subdirectories]'
   '-ta+[process files modified after a date]:date (YYYYMMDDHHMMSS)'
   '-tb+[process files modified before a date]:date (YYYYMMDDHHMMSS)'
   '-tn+[process files newer than a specified time]:time'

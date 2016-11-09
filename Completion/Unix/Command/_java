@@ -71,7 +71,7 @@ java)
     '-verbose\:gc[print gc information]' \
     '-verbose\:jni[print JNI information]' \
     '(- 1)-version[print version]' \
-    '-showversion[print version and contrinue]' \
+    '-showversion[print version and continue]' \
     '(- 1)-'{\?,help}'[print help message]' \
     '(- 1)-X-[non-standard java option]:option' \
     '(- 1)-jar[specify a program encapsulated as jar]:jar:_files -g \*.jar\(-.\)' \

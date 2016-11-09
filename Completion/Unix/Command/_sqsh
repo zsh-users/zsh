@@ -17,7 +17,7 @@ _sybase_server() {
 _arguments : \
     '-A[adjust TDS packet size (512)]:packet size (bytes):(512 1024 1536 2048)' \
     '-B[turn off file buffering on startup]' \
-    '-C[send sql statment to server]:sql' \
+    '-C[send sql statement to server]:sql' \
     '-D[change database context on startup]:database' \
     '-E[replace default editor (vi)]:editor' \
     '-H[set the client hostname]:reported hostname' \

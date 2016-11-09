@@ -217,7 +217,7 @@ _adb_pm_list () {
     (permissions)
       _arguments -s '-g[organize by group]' \
       		    '-f[print all information]' \
-      		    '-d[only list dangerous pemissions]' \
+		    '-d[only list dangerous permissions]' \
       		    '-u[only list user visible permissions]' \
       		    '-s[short summary]' \
       		    ':'
@@ -282,7 +282,7 @@ _adb_activity_manager_handler () {
       _arguments -s '-r[print raw results]' \
       		    '-e[set argument NAME to VALUE]:<NAME> <VALUE>:' \
       		    '-p[write profiling data to FILE]:<FILE>:' \
-      		    '-w[wait for instrumenation to finish]' \
+		    '-w[wait for instrumentation to finish]' \
       		    ':'
       ;;
     (profile)
@@ -307,7 +307,7 @@ _adb_package_manager_handler () {
       (( $+functions[_adb_installed_packages] )) && _adb_installed_packages
       ;;
     (setInstallLocation)
-      _wanted set_installlcation expl 'install location' compadd -d "(0:auto 1:internal 2:external)" 0 1 2
+      _wanted install-locations expl 'install location' compadd -d "(0:auto 1:internal 2:external)" 0 1 2
       ;;
     (getInstallLocation)
       ;;

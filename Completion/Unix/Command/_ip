@@ -98,7 +98,7 @@ subcmd_lockmtu=("(" /$'lock\0'/ ":lock:lock:(lock)" "|" ")" $subcmd_number )
 local -a subcmd_nexthop
 _regex_words nexthop 'nexthop route keyword' \
     'via:specify nexthop router:$subcmd_ipaddr' \
-    'dev:sepcify output device:$subcmd_dev' \
+    'dev:specify output device:$subcmd_dev' \
     'weight:specify relative quality of route:$subcmd_number'
 subcmd_nexthop=("$reply[@]" "#")
 
@@ -107,7 +107,7 @@ _regex_words rtprotocol 'route protocol' \
   'redirect:installed from ICMP redirect' \
   'kernel:installed automatically by kernel' \
   'boot:installed during boot sequence' \
-  'static:installed by adminstrator' \
+  'static:installed by administrator' \
   'ra:installed by Router Discovery protocol'
 subcmd_rtprotocol=("$reply[@]")
 
@@ -175,7 +175,7 @@ _regex_words \
   'do*wn:change state do down' \
   'ar*p:change ARP flag on device:$subcmd_onoff' \
   'mu*lticast:change MULTICAST flag on device:$subcmd_onoff' \
-  'pr*omisc:set promiscious mode:$subcmd_onoff' \
+  'pr*omisc:set promiscuous mode:$subcmd_onoff' \
   'dy*namic:change DYNAMIC flag on device:$subcmd_onoff' \
   'n*ame:change name of device:$subcmd_string' \
   'txq*ueuelen:specify length of transmit queue:$subcmd_number' \
@@ -490,7 +490,7 @@ maddr_cmds=("$reply[@]")
 # mroute
 #
 local -a mroute_show_cmds
-_regex_words mroute-show-comnands "mroute show command" \
+_regex_words mroute-show-commands "mroute show command" \
   'to:select destination prefix:$subcmd_ipaddr' \
   'iif:select input interface (device):$subcmd_dev' \
   'from:select source prefix:$subcmd_ipaddr'

@@ -3,7 +3,7 @@
 # For gawk ver.3 and 4, in addition to POSIX.
 #
 # gawk's options '-W ...' (such as '-W help') are not supported.
-# gawk3 has some synomyms for long options (e.g., --compat is a synomym
+# gawk3 has some synonyms for long options (e.g., --compat is a synonym
 # for --traditional). These are not supported either.
 #
 # 'gawk -f<TAB>' will complete files in AWKPATH in addition to those in
@@ -33,7 +33,7 @@ case $variant in
       {-e,--source}'[pass program text in arg]:program text:'
       '(1)'{-E+,--exec}'[like -f, but safer for CGI]:program file:->script'
       '(- : *)'{-h,--help}'[print usage message and exit]'
-      {-L-,--lint=-}'[warn about dubious or non-portable constructs]::flag:((fatal\:"treat warnings as fatal error" invalid\:"warn only about thigs that are actually invalid"))'
+      {-L-,--lint=-}'[warn about dubious or non-portable constructs]::flag:((fatal\:"treat warnings as fatal error" invalid\:"warn only about things that are actually invalid"))'
       {-n,--non-decimal-data}'[auto-detect octal/hexadecimal values in input]'
       {-N,--use-lc-numeric}"[force use of locale's decimal point character]"
       {-O,--optimize}'[enable optimization]'
