@@ -1888,6 +1888,10 @@ execpline2(Estate state, wordcode pcode,
 		entersubsh(((how & Z_ASYNC) ? ESUB_ASYNC : 0)
 			   | ESUB_PGRP | ESUB_KEEPTRAP);
 		close(synch[1]);
+		if (sigtrapped[SIGEXIT])
+		{
+		    unsettrap(SIGEXIT);
+		}
 		execcmd_exec(state, &eparams, input, pipes[1], how, 1);
 		_exit(lastval);
 	    }

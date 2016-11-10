@@ -1,3 +1,8 @@
+2016-11-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39901: Src/exec.c, Test/C03traps.ztst: Exiting the left hand
+	side of a pipeline shouldn't trigger EXIT trap.
+
 2016-11-09  Oliver Kiddle  <opk@zsh.org>
 
 	* 39890: Completion/Debian/Command/_git-buildpackage,

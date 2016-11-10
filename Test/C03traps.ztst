@@ -641,6 +641,23 @@ F:Must be tested with a top-level script rather than source or function
 >TERM
 >EXIT
 
+  # Should not get "hello" in the single quotes.
+  (
+    trap "echo hello" EXIT;
+    { :; } | { read line; print "'$line'"; }
+  )
+0:EXIT trap not called in LHS of pipeline: Shell construct on LHS
+>''
+>hello
+
+  (
+    trap "echo hello" EXIT;
+    cat </dev/null | { read line; print "'$line'"; }
+  )
+0:EXIT trap not called in LHS of pipeline: External command on LHS
+>''
+>hello
+
 %clean
 
   rm -f TRAPEXIT
