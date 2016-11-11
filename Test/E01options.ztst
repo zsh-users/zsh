@@ -784,6 +784,10 @@
 >unsetting option...
 ?(eval):14: no such file or directory: pathtestdir/findme
 
+  (setopt pathdirs; path+=( /usr/bin ); type ./env)
+1:whence honours PATH_DIRS option
+>./env not found
+
   setopt posixbuiltins
   PATH= command -v print
   PATH= command -V print

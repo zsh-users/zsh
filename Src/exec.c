@@ -806,14 +806,13 @@ findcmd(char *arg0, int docopy, int default_path)
 	cn = hashcmd(arg0, path);
     if ((int) strlen(arg0) > PATH_MAX)
 	return NULL;
-    for (s = arg0; *s; s++)
-	if (*s == '/') {
-	    RET_IF_COM(arg0);
-	    if (arg0 == s || unset(PATHDIRS)) {
-		return NULL;
-	    }
-	    break;
+    if ((s = strchr(arg0, '/'))) {
+	RET_IF_COM(arg0);
+	if (arg0 == s || unset(PATHDIRS) || !strncmp(arg0, "./", 2) ||
+	    !strncmp(arg0, "../", 3)) {
+	    return NULL;
 	}
+    }
     if (cn) {
 	char nn[PATH_MAX];
 
@@ -848,6 +847,11 @@ findcmd(char *arg0, int docopy, int default_path)
     return NULL;
 }
 
+/*
+ * Return TRUE if the given path denotes an executable regular file, or a
+ * symlink to one.
+ */
+
 /**/
 int
 iscom(char *s)
@@ -876,6 +880,11 @@ isreallycom(Cmdnam cn)
     }
     return iscom(fullnam);
 }
+
+/*
+ * Return TRUE if the given path contains a dot or dot-dot component
+ * and does not start with a slash.
+ */
 
 /**/
 int
