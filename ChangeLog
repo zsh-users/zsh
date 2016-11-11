@@ -1,3 +1,8 @@
+2016-11-10  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39893: Src/params.c: use arrdup_max() to show explicitly the
+	difference in two code branches; no functional change
+
 2016-11-11  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 39874/0002 plus size=0 handling: Src/mem.c: zshcalloc: Remove
