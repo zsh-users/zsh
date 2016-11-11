@@ -2031,7 +2031,7 @@ _tig () {
 (( $+functions[_git-config] )) ||
 _git-config () {
   local name_arg value_arg
-  local curcontext=$curcontext state line expl ret=1
+  local curcontext=$curcontext state line ret=1
   declare -A opt_args
 
   if (( words[(I)--get-regexp] )); then
@@ -2087,6 +2087,38 @@ _git-config () {
       '(-e --edit --bool --int --bool-or-int --path -z --null --name-only --show-origin)'{-e,--edit}'[open config file for editing]' \
       '(2 3 --bool --int --bool-or-int --path -z --null --name-only --show-origin)--get-color[find color setting]: :->gettable-color-option' \
       '(2 3 --bool --int --bool-or-int --path -z --null --name-only --show-origin)--get-colorbool[check if color should be used]: :->gettable-colorbool-option' && ret=0
+  __git_config_option-or-value "$@" && ret=0
+  return ret
+}
+
+(( $+functions[__git_config_option] )) ||
+__git_config_option () {
+  local -A opt_args=()
+  local -a line=( ${words[CURRENT]%%=*} )
+  local state=option
+  __git_config_option-or-value "$@"
+}
+
+(( $+functions[__git_config_value] )) ||
+__git_config_value () {
+  local -A opt_args=()
+  local -a line=( ${words[CURRENT]%%=*} ${words[CURRENT]#*=} )
+  local state=value
+  __git_config_option-or-value "$@"
+}
+
+# Helper to _git-config().  May be called by other functions, too, provided
+# that The caller has set $line, $state, and $opt_args as _git-config() would
+# set them:
+# 
+# - set $line[1] to the option name being completed (even if completing an
+#   option value).
+# - set $opt_args to git-config(1) options, as set by _arguments in
+#   _git-config().
+# - set $state as _arguments in _git-config() would set it.
+(( $+functions[__git_config_option-or-value] )) ||
+__git_config_option-or-value () {
+  local expl ret
 
   # TODO: Add support for merge.*. (merge driver), diff.*. (diff driver), and filter.*. (filter driver) options
   # (see gitattributes(5)).
@@ -2843,7 +2875,7 @@ _git-config () {
       _describe -t option-names $label \
         sections -M 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' -S . -- \
         sections_and_options -M 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' -qS . -- \
-        options -M 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' && ret=0
+        options -M 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' "$@" && ret=0
       ;;
     (gettable-option)
       _wanted git-options expl option compadd -M 'r:|.=* r:|=*' -a - git_present_options && ret=0
@@ -7459,7 +7491,7 @@ _git() {
       '(- :)--version[display version information]' \
       '(- :)--help[display help message]' \
       '-C[run as if git was started in given path]: :_directories' \
-      '*-c[pass configuration parameter to command]:parameter' \
+      '*-c[pass configuration parameter to command]: :->configuration' \
       '--exec-path=-[path containing core git-programs]:: :_directories' \
       '(: -)--man-path[print the manpath for the man pages for this version of Git and exit]' \
       '(: -)--info-path[print the path where the info files are installed and exit]' \
@@ -7488,6 +7520,18 @@ _git() {
 	  else
 	    _message "unknown sub-command: $words[1]"
 	  fi
+        fi
+        ;;
+      (configuration)
+        if compset -P 1 '*='; then
+          __git_config_value && ret=0
+        else
+          if compset -S '=*'; then
+            __git_config_option && ret=0 # don't move cursor if we completed just the "foo." in "foo.bar.baz=value"
+            compstate[to_end]=''
+          else
+            __git_config_option -S '=' && ret=0
+          fi
         fi
         ;;
     esac
