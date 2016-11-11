@@ -1,5 +1,8 @@
 2016-11-17  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 39917: Completion/Zsh/Command/_precommand: Complete setsid(1)
+	as a precommand
+
 	* 39915: Src/exec.c, Test/E01options.ztst: whence: Honor
 	PATH_DIRS option for arguments that start with './' or '../'.
 
