@@ -6079,7 +6079,7 @@ __git_recent_branches() {
   local -a branches
   local -A descriptions
   local -a reply
-  local -aU valid_ref_names_munged=( ${"${(f)"$(_call_program valid-ref-names 'git for-each-ref --format="%(refname)" refs/heads/ refs/tags/')"}"#refs/(heads|tags)/} )
+  local -aU valid_ref_names_munged=( ${"${(f)"$(_call_program valid-ref-names 'git for-each-ref --format="%(refname)" refs/heads/')"}"#refs/heads/} )
 
   # 1. Obtain names of recently-checked-out branches from the reflog.
   # 2. Remove ref names that that no longer exist from the list.
@@ -6096,13 +6096,13 @@ __git_recent_branches() {
   # 4. Obtain log messages for all of them in one shot.
   # TODO: we'd really like --sort=none here...  but git doesn't support such a thing.
   # The \n removal is because for-each-ref prints a \n after each entry.
-  descriptions=( ${(0)"$(_call_program all-descriptions "git --no-pager for-each-ref --format='%(refname)%00%(subject)%00'" refs/heads/${(q)^branches} refs/tags/${(q)^branches} "--")"//$'\n'} )
+  descriptions=( ${(0)"$(_call_program all-descriptions "git --no-pager for-each-ref --format='%(refname)%00%(subject)%00'" refs/heads/${(q)^branches} "--")"//$'\n'} )
 
   # 5. Synthesize the data structure _describe wants.
   local -a branches_colon_descriptions
   local branch
   for branch in ${branches} ; do
-    branches_colon_descriptions+="${branch//:/\:}:${(v)descriptions[(I)(refs/heads/|refs/tags/)${(b)branch}]}"
+    branches_colon_descriptions+="${branch//:/\:}:${descriptions[refs/heads/${(b)branch}]}"
   done
 
   _describe -V -t recent-branches "recent branches" branches_colon_descriptions
