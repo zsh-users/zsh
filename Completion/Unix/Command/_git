@@ -6076,7 +6076,8 @@ __git_recent_branches__names()
 
 (( $+functions[__git_recent_branches] )) ||
 __git_recent_branches() {
-  local -a branches descriptions
+  local -a branches
+  local -A descriptions
   local -a reply
   local -aU valid_ref_names_munged=( ${"${(f)"$(_call_program valid-ref-names 'git for-each-ref --format="%(refname)" refs/heads/ refs/tags/')"}"#refs/(heads|tags)/} )
 
@@ -6093,19 +6094,15 @@ __git_recent_branches() {
   fi
 
   # 4. Obtain log messages for all of them in one shot.
-  descriptions=( ${(f)"$(_call_program all-descriptions git --no-pager log --no-walk=unsorted --pretty=%s ${(q)branches} --)"} )
-
-  if (( $#branches != $#descriptions )); then
-    # ### Trouble...
-    zle -M "__git_recent_branches: \$#branches != \$#descriptions"
-    return 1
-  fi
+  # TODO: we'd really like --sort=none here...  but git doesn't support such a thing.
+  # The \n removal is because for-each-ref prints a \n after each entry.
+  descriptions=( ${(0)"$(_call_program all-descriptions "git --no-pager for-each-ref --format='%(refname)%00%(subject)%00'" refs/heads/${(q)^branches} refs/tags/${(q)^branches} "--")"//$'\n'} )
 
   # 5. Synthesize the data structure _describe wants.
   local -a branches_colon_descriptions
-  local branch description
-  for branch description in ${branches:^descriptions} ; do
-    branches_colon_descriptions+="${branch//:/\:}:${description}"
+  local branch
+  for branch in ${branches} ; do
+    branches_colon_descriptions+="${branch//:/\:}:${(v)descriptions[(I)(refs/heads/|refs/tags/)${(b)branch}]}"
   done
 
   _describe -V -t recent-branches "recent branches" branches_colon_descriptions
