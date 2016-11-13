@@ -2224,8 +2224,12 @@ point and mark are not swapped.
 )
 tindex(execute-named-cmd)
 item(tt(execute-named-cmd) (tt(ESC-x)) (tt(:)) (unbound))(
-Read the name of an editor command and
-execute it.  A restricted set of editing functions is available in the
+Read the name of an editor command and execute it.  Aliasing this
+widget with `tt(zle -A)' or replacing it with `tt(zle -N)' has no
+effect when interpreting key bindings, but `tt(zle execute-named-cmd)'
+will invoke such an alias or replacement.
+
+A restricted set of editing functions is available in the
 mini-buffer.  Keys are looked up in the special
 tt(command) keymap, and if not found there in the main keymap.
 An interrupt signal, as defined by the stty setting, will
@@ -2266,7 +2270,8 @@ tindex(execute-last-named-cmd)
 item(tt(execute-last-named-cmd) (tt(ESC-z)) (unbound) (unbound))(
 Redo the last function executed with tt(execute-named-cmd).
 
-Currently this command may not be redefined or called by name.
+Like tt(execute-named-cmd), this command may not be redefined,
+but it may be called by name.
 )
 tindex(get-line)
 item(tt(get-line) (tt(ESC-G ESC-g)) (unbound) (unbound))(

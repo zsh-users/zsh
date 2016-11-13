@@ -1,3 +1,7 @@
+2016-11-13  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 39929: Doc/Zsh/zle.yo: clarify execute{,-last}-named-cmd
+
 2016-11-12  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Etc/zsh-development-guide: add list of standard
