@@ -1,3 +1,8 @@
+2016-11-12  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: Etc/zsh-development-guide: add list of standard
+	module hooks with corresponding macro names
+
 2016-11-12  Oliver Kiddle  <opk@zsh.org>
 
 	* Paul Seyfert: 39920: Completion/Redhat/Command/_yum:
