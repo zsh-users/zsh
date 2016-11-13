@@ -1,5 +1,8 @@
 2016-11-13  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 39934: Src/Zle/zle_main.c: if a widget execution fails, try to
+	execute a corresponding immortal widget instead.
+
 	* 39933: Src/Zle/zle_main.c: more of zlecallhook() in redrawhook(),
 	add commentary on some of the differences
 

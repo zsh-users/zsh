@@ -1368,6 +1368,16 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     return s;
 }
 
+/**/
+static int
+execimmortal(Thingy func, char **args)
+{
+    Thingy immortal = rthingy_nocreate(dyncat(".", func->nam));
+    if (immortal)
+	return execzlefunc(immortal, args, 0);
+    return 1;
+}
+
 /*
  * Execute a widget.  The third argument indicates that the global
  * variable bindk should be set temporarily so that WIDGET etc.
@@ -1389,7 +1399,7 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	remetafy = 1;
     }
 
-    if(func->flags & DISABLED) {
+    if (func->flags & DISABLED) {
 	/* this thingy is not the name of a widget */
 	char *nm = nicedup(func->nam, 0);
 	char *msg = tricat("No such widget `", nm, "'");
@@ -1397,7 +1407,7 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	zsfree(nm);
 	showmsg(msg);
 	zsfree(msg);
-	ret = 1;
+	ret = execimmortal(func, args);
     } else if((w = func->widget)->flags & (WIDGET_INT|WIDGET_NCOMP)) {
 	int wflags = w->flags;
 
@@ -1461,7 +1471,7 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	    zsfree(nm);
 	    showmsg(msg);
 	    zsfree(msg);
-	    ret = 1;
+	    ret = execimmortal(func, args);
 	} else {
 	    int osc = sfcontext, osi = movefd(0);
 	    int oxt = isset(XTRACE);
@@ -1483,6 +1493,8 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	    opts[XTRACE] = oxt;
 	    sfcontext = osc;
 	    endparamscope();
+	    if (errflag == ERRFLAG_ERROR && !(ret = execimmortal(func, args)))
+		errflag &= ~ERRFLAG_ERROR;
 	    lastcmd = w->flags & ~(WIDGET_INUSE|WIDGET_FREE);
 	    if (inuse) {
 		w->flags &= WIDGET_INUSE|WIDGET_FREE;
