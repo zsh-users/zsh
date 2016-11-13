@@ -813,7 +813,7 @@ like their counterparts.
 The following hooks are defined by the standard set of modules and may be
 referenced by other modules.  Each has a corresponding macro name that
 points into the definition structure, to avoid repeating the hook names
-as strings:
+as strings.
 
    zsh/main
      after_trap           AFTERTRAPHOOK
@@ -821,19 +821,22 @@ as strings:
      exit                 EXITHOOK
 
    zsh/complete
-     compctl_make         COMPCTLMAKEHOOK
-     compctl_cleanup      COMPCTLCLEANUPHOOK
-     insert_match         INSERTMATCHHOOK
-     comp_list_matches    COMPLISTMATCHESHOOK
-     menu_start           MENUSTARTHOOK
+     compctl_make       *  COMPCTLMAKEHOOK
+     compctl_cleanup    *  COMPCTLCLEANUPHOOK
+     insert_match          INSERTMATCHHOOK
+     comp_list_matches  *  COMPLISTMATCHESHOOK
+     menu_start            MENUSTARTHOOK
 
    zsh/zle
-     before_complete      BEFORECOMPHOOK
-     complete             COMPLETEHOOK
-     after_complete       AFTERCOMPHOOK
-     accept_completion    ACCEPTCOMPHOOK
-     list_matches         LISTMATCHESHOOK
-     invalidate_list      INVALIDATELISTHOOK
+     before_complete    *  BEFORECOMPHOOK
+     complete           *  COMPLETEHOOK
+     after_complete     *  AFTERCOMPHOOK
+     accept_completion  *  ACCEPTCOMPHOOK
+     list_matches       *  LISTMATCHESHOOK
+     invalidate_list    *  INVALIDATELISTHOOK
+
+Hooks marked with "*" do not use the HOOKF_ALL flag and so are replaced if
+another module adds a function to the hook.  Use with caution.
 
 Wrappers
 --------
