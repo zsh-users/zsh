@@ -1041,28 +1041,43 @@ getrestchar(int inchar, char *outstr, int *outcount)
 #endif
 
 /**/
-void redrawhook(void)
+void
+redrawhook(void)
 {
     Thingy initthingy;
     if ((initthingy = rthingy_nocreate("zle-line-pre-redraw"))) {
+	/* Duplicating most of zlecallhook() to save additional state */
+	int saverrflag = errflag, savretflag = retflag;
 	int lastcmd_prev = lastcmd;
 	int old_incompfunc = incompfunc;
 	char *args[2];
 	Thingy lbindk_save = lbindk, bindk_save = bindk;
+
 	refthingy(lbindk_save);
 	refthingy(bindk_save);
 	args[0] = initthingy->nam;
 	args[1] = NULL;
+
+	/* The generic redraw hook cannot be a completion function, so
+	 * temporarily reset state for special variable handling etc.
+	 */
 	incompfunc = 0;
 	execzlefunc(initthingy, args, 1);
 	incompfunc = old_incompfunc;
+
+	/* Restore errflag and retflag as zlecallhook() does */
+	errflag = saverrflag | (errflag & ERRFLAG_INT);
+	retflag = savretflag;
+
 	unrefthingy(initthingy);
 	unrefthingy(lbindk);
 	unrefthingy(bindk);
 	lbindk = lbindk_save;
 	bindk = bindk_save;
+
 	/* we can't set ZLE_NOTCOMMAND since it's not a legit widget, so
-	 * restore lastcmd manually so that we don't mess up the global state */
+	 * restore lastcmd manually so that we don't mess up the global state
+	 */
 	lastcmd = lastcmd_prev;
     }
 }

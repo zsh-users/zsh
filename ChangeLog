@@ -1,5 +1,8 @@
 2016-11-13  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 39933: Src/Zle/zle_main.c: more of zlecallhook() in redrawhook(),
+	add commentary on some of the differences
+
 	* 39929: Doc/Zsh/zle.yo: clarify execute{,-last}-named-cmd
 
 2016-11-12  Barton E. Schaefer  <schaefer@zsh.org>
