@@ -1,3 +1,8 @@
+2016-11-15  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 39937: Src/params.c: fix a problem introduced by 39886.
+	$a[i,j] should become an empty array if i>j.
+
 2016-11-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39906: Src/utils.c: More optimisation of multibyte handling
