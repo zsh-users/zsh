@@ -1,5 +1,8 @@
 2016-11-13  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Src/Zle/zle_utils.c: comment in zlecallhook() points
+	to redrawhook() just in case
+
 	* 39934: Src/Zle/zle_main.c: if a widget execution fails, try to
 	execute a corresponding immortal widget instead.
 

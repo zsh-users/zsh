@@ -1725,6 +1725,8 @@ zlecallhook(char *name, char *arg)
     if (!thingy)
 	return;
 
+    /* If anything here needs changing, see also redrawhook() */
+
     saverrflag = errflag;
     savretflag = retflag;
 
