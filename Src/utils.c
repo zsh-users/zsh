@@ -84,7 +84,15 @@ set_widearray(char *mb_array, Widechar_array wca)
 
 	mb_charinit();
 	while (*mb_array) {
-	    int mblen = mb_metacharlenconv(mb_array, &wci);
+	    int mblen;
+
+	    if (STOUC(*mb_array) <= 0x7f) {
+		mb_array++;
+		*wcptr++ = (wchar_t)*mb_array;
+		continue;
+	    }
+
+	    mblen = mb_metacharlenconv(mb_array, &wci);
 
 	    if (!mblen)
 		break;
@@ -5249,6 +5257,12 @@ mb_metacharlenconv_r(const char *s, wint_t *wcp, mbstate_t *mbsp)
     const char *ptr;
     wchar_t wc;
 
+    if (STOUC(*s) <= 0x7f) {
+	if (wcp)
+	    *wcp = (wint_t)*s;
+	return 1;
+    }
+
     for (ptr = s; *ptr; ) {
 	if (*ptr == Meta) {
 	    inchar = *++ptr ^ 32;
@@ -5301,7 +5315,7 @@ mb_metacharlenconv_r(const char *s, wint_t *wcp, mbstate_t *mbsp)
 mod_export int
 mb_metacharlenconv(const char *s, wint_t *wcp)
 {
-    if (!isset(MULTIBYTE)) {
+    if (!isset(MULTIBYTE) || STOUC(*s) <= 0x7f) {
 	/* treat as single byte, possibly metafied */
 	if (wcp)
 	    *wcp = (wint_t)(*s == Meta ? s[1] ^ 32 : *s);
@@ -5442,6 +5456,12 @@ mb_charlenconv_r(const char *s, int slen, wint_t *wcp, mbstate_t *mbsp)
     const char *ptr;
     wchar_t wc;
 
+    if (slen && STOUC(*s) <= 0x7f) {
+	if (wcp)
+	    *wcp = (wint_t)*s;
+	return 1;
+    }
+
     for (ptr = s; slen;  ) {
 	inchar = *ptr;
 	ptr++;
@@ -5477,7 +5497,7 @@ mb_charlenconv_r(const char *s, int slen, wint_t *wcp, mbstate_t *mbsp)
 mod_export int
 mb_charlenconv(const char *s, int slen, wint_t *wcp)
 {
-    if (!isset(MULTIBYTE)) {
+    if (!isset(MULTIBYTE) || STOUC(*s) <= 0x7f) {
 	if (wcp)
 	    *wcp = (wint_t)*s;
 	return 1;

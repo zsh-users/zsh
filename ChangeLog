@@ -1,3 +1,8 @@
+2016-11-14  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39906: Src/utils.c: More optimisation of multibyte handling
+	for US-ASCII along existing lines.
+
 2016-11-13  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/Zle/zle_utils.c: comment in zlecallhook() points
