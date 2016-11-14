@@ -4252,9 +4252,10 @@ mod_export char **
 arrdup_max(char **s, unsigned max)
 {
     char **x, **y, **send;
-    int len;
+    int len = 0;
 
-    len = arrlen(s);
+    if (max)
+	len = arrlen(s);
 
     /* Limit has sense only if not equal to len */
     if (max > len)
