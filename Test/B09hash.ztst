@@ -69,3 +69,11 @@
 >one=/first/directory
 >two=/directory/the/second
 >three=/noch/ein/verzeichnis
+
+  hash -d t-t=/foo
+  i="~t-t"
+  print ~t-t/bar
+  print ${~i}/rab
+0:Dashes are untokenized in directory hash names
+>/foo/bar
+>/foo/rab

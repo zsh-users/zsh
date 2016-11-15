@@ -684,19 +684,19 @@ filesubstr(char **namptr, int assign)
 	    *namptr = dyncat(ds, ptr);
 	    return 1;
 	} else if ((ptr = itype_end(str+1, IUSER, 0)) != str+1) {   /* ~foo */
-	    char *hom, save;
+	    char *untok, *hom;
 
-	    save = *ptr;
-	    if (!isend(save))
+	    if (!isend(*ptr))
 		return 0;
-	    *ptr = 0;
-	    if (!(hom = getnameddir(++str))) {
+	    untok = dupstring(++str);
+	    untok[ptr-str] = 0;
+	    untokenize(untok);
+
+	    if (!(hom = getnameddir(untok))) {
 		if (isset(NOMATCH) && isset(EXECOPT))
-		    zerr("no such user or named directory: %s", str);
-		*ptr = save;
+		    zerr("no such user or named directory: %s", untok);
 		return 0;
 	    }
-	    *ptr = save;
 	    *namptr = dyncat(hom, ptr);
 	    return 1;
 	}

@@ -3959,7 +3959,7 @@ inittyptab(void)
 #endif
     /* typtab['.'] |= IIDENT; */ /* Allow '.' in variable names - broken */
     typtab['_'] = IIDENT | IUSER;
-    typtab['-'] = typtab['.'] = IUSER;
+    typtab['-'] = typtab['.'] = typtab[STOUC(Dash)] = IUSER;
     typtab[' '] |= IBLANK | INBLANK;
     typtab['\t'] |= IBLANK | INBLANK;
     typtab['\n'] |= INBLANK;
@@ -4157,42 +4157,50 @@ itype_end(const char *ptr, int itype, int once)
 	(itype != IIDENT || !isset(POSIXIDENTIFIERS))) {
 	mb_charinit();
 	while (*ptr) {
-	    wint_t wc;
-	    int len = mb_metacharlenconv(ptr, &wc);
-
-	    if (!len)
-		break;
-
-	    if (wc == WEOF) {
-		/* invalid, treat as single character */
-		int chr = STOUC(*ptr == Meta ? ptr[1] ^ 32 : *ptr);
-		/* in this case non-ASCII characters can't match */
-		if (chr > 127 || !zistype(chr,itype))
-		    break;
-	    } else if (len == 1 && isascii(*ptr)) {
-		/* ASCII: can't be metafied, use standard test */
+	    int len;
+	    if (itok(*ptr)) {
+		/* Not untokenised yet --- can happen in raw command line */
+		len = 1;
 		if (!zistype(*ptr,itype))
 		    break;
 	    } else {
-		/*
-		 * Valid non-ASCII character.
-		 */
-		switch (itype) {
-		case IWORD:
-		    if (!iswalnum(wc) &&
-			!wmemchr(wordchars_wide.chars, wc,
-				 wordchars_wide.len))
-			return (char *)ptr;
+		wint_t wc;
+		len = mb_metacharlenconv(ptr, &wc);
+
+		if (!len)
 		    break;
 
-		case ISEP:
-		    if (!wmemchr(ifs_wide.chars, wc, ifs_wide.len))
-			return (char *)ptr;
-		    break;
+		if (wc == WEOF) {
+		    /* invalid, treat as single character */
+		    int chr = STOUC(*ptr == Meta ? ptr[1] ^ 32 : *ptr);
+		    /* in this case non-ASCII characters can't match */
+		    if (chr > 127 || !zistype(chr,itype))
+			break;
+		} else if (len == 1 && isascii(*ptr)) {
+		    /* ASCII: can't be metafied, use standard test */
+		    if (!zistype(*ptr,itype))
+			break;
+		} else {
+		    /*
+		     * Valid non-ASCII character.
+		     */
+		    switch (itype) {
+		    case IWORD:
+			if (!iswalnum(wc) &&
+			    !wmemchr(wordchars_wide.chars, wc,
+				     wordchars_wide.len))
+			    return (char *)ptr;
+			break;
 
-		default:
-		    if (!iswalnum(wc))
-			return (char *)ptr;
+		    case ISEP:
+			if (!wmemchr(ifs_wide.chars, wc, ifs_wide.len))
+			    return (char *)ptr;
+			break;
+
+		    default:
+			if (!iswalnum(wc))
+			    return (char *)ptr;
+		    }
 		}
 	    }
 	    ptr += len;

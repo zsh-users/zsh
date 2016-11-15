@@ -1,5 +1,9 @@
 2016-11-15  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 39949: Src/subst.c, Src/utils.c, Test/B09hash.ztst: "-" is
+	allowed in named directories, so needs a special case when
+	sh-tokenized for possible ranges.
+
 	* 39947: Test/D04parameter.ztst: Test out-of-rantge multiple
 	array subscripts with and without (@).
 
