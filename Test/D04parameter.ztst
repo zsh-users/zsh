@@ -2041,3 +2041,11 @@
   () { print -r -- "${(q)1}" "${(b)1}" "${(qq)1}" } '=foo'
 0:(q) and (b) quoting deal with the EQUALS option
 >\=foo =foo '=foo'
+
+  args() { print $#; }
+  a=(foo)
+  args "${a[3,-1]}"
+  args "${(@)a[3,-1]}"
+0:Out-of-range multiple array subscripts with quoting, with and without (@)
+>1
+>0

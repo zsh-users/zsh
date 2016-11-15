@@ -1,3 +1,8 @@
+2016-11-15  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 39947: Test/D04parameter.ztst: Test out-of-rantge multiple
+	array subscripts with and without (@).
+
 2016-11-15  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 39937: Src/params.c: fix a problem introduced by 39886.
