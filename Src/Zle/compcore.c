@@ -425,6 +425,7 @@ do_completion(UNUSED(Hookdef dummy), Compldat dat)
 	}
     } else {
 	invalidatelist();
+	lastambig = isset(BASHAUTOLIST);
 	if (forcelist)
 	    clearlist = 1;
 	zlemetacs = 0;

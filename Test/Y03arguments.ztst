@@ -243,6 +243,67 @@
 >NO:{-a}
 >NO:{-b}
 
+ tst_arguments --abc --aah :arg:
+ comptesteval 'setopt bashautolist automenu'
+ comptest $'tst --a\t\t\t'
+0:with message and bashautolist, a third tab will get menu completion
+>line: {tst --a}{}
+>line: {tst --a}{}
+>DESCRIPTION:{arg}
+>DESCRIPTION:{option}
+>NO:{--aah}
+>NO:{--abc}
+>line: {tst --aah}{}
+
+ tst_arguments --abc --aah :arg:
+ comptesteval 'setopt bashautolist noautomenu'
+ comptest $'tst --a\t\t\t'
+0:with message and bashautolist, a third tab is needed to display the list
+>line: {tst --a}{}
+>line: {tst --a}{}
+>DESCRIPTION:{arg}
+>DESCRIPTION:{option}
+>NO:{--aah}
+>NO:{--abc}
+>line: {tst --a}{}
+
+ tst_arguments --abc --aah :arg:
+ comptesteval 'setopt nobashautolist noautomenu'
+ comptest $'tst --\t\t'
+0:with message and noautomenu second tab redisplays the list
+>line: {tst --}{}
+>DESCRIPTION:{arg}
+>DESCRIPTION:{option}
+>NO:{--aah}
+>NO:{--abc}
+>line: {tst --}{}
+>DESCRIPTION:{arg}
+>DESCRIPTION:{option}
+>NO:{--aah}
+>NO:{--abc}
+
+ tst_arguments --abc --aah :arg:
+ comptesteval 'setopt nobashautolist automenu'
+ comptest $'tst --\t\t'
+0:with message two tabs will start menu completion
+>line: {tst --}{}
+>DESCRIPTION:{arg}
+>DESCRIPTION:{option}
+>NO:{--aah}
+>NO:{--abc}
+>line: {tst --aah}{}
+
+ tst_arguments --abc --aah :arg:
+ comptesteval 'zstyle ":completion:*::::" completer _oldlist _complete'
+ comptest $'tst --\t\t'
+0:with message and _oldlist, two tabs will start menu completion
+>line: {tst --}{}
+>DESCRIPTION:{arg}
+>DESCRIPTION:{option}
+>NO:{--aah}
+>NO:{--abc}
+>line: {tst --aah}{}
+
 %clean
 
   zmodload -ui zsh/zpty

@@ -1,3 +1,9 @@
+2016-11-16  Oliver Kiddle  <opk@zsh.org>
+
+	* 39945: Src/Zle/compcore.c, Completion/Base/Core/_message,
+	Test/Y03arguments.ztst: allow further tab presses to move on
+	to menu completion even when compstate[insert] is emptied
+
 2016-11-15  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 39949: Src/subst.c, Src/utils.c, Test/B09hash.ztst: "-" is
