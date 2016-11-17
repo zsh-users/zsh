@@ -1369,6 +1369,8 @@ default_bindings(void)
     bindkey(vismap, "\33", refthingy(t_deactivateregion), NULL);
     bindkey(vismap, "o", refthingy(t_exchangepointandmark), NULL);
     bindkey(vismap, "p", refthingy(t_putreplaceselection), NULL);
+    bindkey(vismap, "u", refthingy(t_vidowncase), NULL);
+    bindkey(vismap, "U", refthingy(t_viupcase), NULL);
     bindkey(vismap, "x", refthingy(t_videlete), NULL);
     bindkey(vismap, "~", refthingy(t_vioperswapcase), NULL);
 
@@ -1379,6 +1381,7 @@ default_bindings(void)
     bindkey(amap, "gg", refthingy(t_beginningofbufferorhistory), NULL);
     bindkey(amap, "gu", refthingy(t_vidowncase), NULL);
     bindkey(amap, "gU", refthingy(t_viupcase), NULL);
+    bindkey(amap, "g~", refthingy(t_vioperswapcase), NULL);
     bindkey(amap, "g~~", NULL, "g~g~");
     bindkey(amap, "guu", NULL, "gugu");
     bindkey(amap, "gUU", NULL, "gUgU");

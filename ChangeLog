@@ -1,5 +1,8 @@
 2016-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 39962: Src/Zle/zle_keymap.c: bind vi case conversion widgets
+	u/U in visual mode and g~ from normal mode
+
 	* 39959: Src/Zle/zle_vi.c, Test/X02zlevi.ztst: when repeating
 	vi changes advance through the numbered killring registers.
 	Also fix numeric arguments with vi-repeat-change.
