@@ -73,7 +73,13 @@ char *vichgbuf;
 /**/
 int viinsbegin;
 
+/* value of zmod associated with vi change */
 static struct modifier lastmod;
+
+/*
+ * inrepeat: current widget is the vi change being repeated
+ * vichgrepeat: nested widget call within a repeat
+ */
 static int inrepeat, vichgrepeat;
 
 /**
@@ -81,6 +87,7 @@ static int inrepeat, vichgrepeat;
  *    -1: skip setting insert mode
  *    -2: entering viins at start of editing from clean --- don't use
  *        inrepeat or keybuf, synthesise an entry to insert mode.
+ * Note that zmult is updated so this should be called before zmult is used.
  */
 
 /**/
@@ -402,9 +409,10 @@ videlete(UNUSED(char **args))
 int
 videletechar(char **args)
 {
-    int n = zmult;
+    int n;
 
     startvichange(-1);
+    n = zmult;
 
     /* handle negative argument */
     if (n < 0) {
@@ -451,9 +459,10 @@ vichange(UNUSED(char **args))
 int
 visubstitute(UNUSED(char **args))
 {
-    int n = zmult;
+    int n;
 
     startvichange(1);
+    n = zmult;
     if (n < 0)
 	return 1;
     /* it is an error to be on the end of line */
@@ -547,9 +556,10 @@ int
 viyankwholeline(UNUSED(char **args))
 {
     int bol = findbol(), oldcs = zlecs;
-    int n = zmult;
+    int n;
 
     startvichange(-1);
+    n = zmult;
     if (n < 1)
 	return 1;
     while(n--) {
@@ -591,8 +601,10 @@ int
 vireplacechars(UNUSED(char **args))
 {
     ZLE_INT_T ch;
-    int n = zmult, fail = 0, newchars = 0;
+    int n, fail = 0, newchars = 0;
 
+    startvichange(1);
+    n = zmult;
     if (n > 0) {
 	if (region_active) {
 	    int a, b;
@@ -629,7 +641,7 @@ vireplacechars(UNUSED(char **args))
 	    n = pos - zlecs;
 	}
     }
-    startvichange(1);
+
     /* check argument range */
     if (n < 1 || fail) {
 	if(vichgrepeat)
@@ -802,7 +814,9 @@ virepeatchange(UNUSED(char **args))
 	lastmod.vibuf = zmod.vibuf;
 	lastmod.flags = (lastmod.flags & ~MOD_VIAPP) |
 	    MOD_VIBUF | (zmod.flags & MOD_VIAPP);
-    }
+    } else if (lastmod.flags & MOD_VIBUF &&
+	    lastmod.vibuf >= 27 && lastmod.vibuf <= 34)
+	lastmod.vibuf++; /* for "1 to "8 advance to next buffer */
     /* repeat the command */
     inrepeat = 1;
     ungetbytes(vichgbuf, vichgbufptr);
@@ -885,12 +899,13 @@ viunindent(UNUSED(char **args))
 int
 vibackwarddeletechar(char **args)
 {
-    int n = zmult;
+    int n;
 
     if (invicmdmode())
 	startvichange(-1);
 
     /* handle negative argument */
+    n = zmult;
     if (n < 0) {
 	int ret;
 	zmult = -n;
@@ -930,10 +945,11 @@ int
 vijoin(UNUSED(char **args))
 {
     int x, pos;
-    int n = zmult;
+    int n;
     int visual = region_active;
 
     startvichange(-1);
+    n = zmult;
     if (n < 1)
 	return 1;
     if (visual && zlecs > mark) {
@@ -972,9 +988,10 @@ vijoin(UNUSED(char **args))
 int
 viswapcase(UNUSED(char **args))
 {
-    int eol, n = zmult;
+    int eol, n;
 
     startvichange(-1);
+    n = zmult;
     if (n < 1)
 	return 1;
     eol = findeol();

@@ -130,6 +130,16 @@
 >long
 >CURSOR: 0
 
+  zletest $'one two\e03rX$.'
+0:repeat replace chars at the end of the line consumes the replace char
+>BUFFER: XXX two
+>CURSOR: 6
+
+  zletest $'one two three\e02rxw3.w.'
+0:numeric argument to repeat replaces change count
+>BUFFER: xxe xxx xxxee
+>CURSOR: 10
+
   zletest $'yankee doodle\ebhDyy0"1P'
 0:paste register 1 to get last deletion
 >BUFFER:  doodleyankee
@@ -176,6 +186,11 @@
 0:retrieve unnamed register after appending
 >BUFFER: second
 >
+>CURSOR: 0
+
+  zletest $'123456789\exxxxxxxxx"1P.........'
+0:repeat advances to next killring register
+>BUFFER: 9987654321
 >CURSOR: 0
 
   zletest $'Z\exayankee doodle\e"_db0"_yeP'

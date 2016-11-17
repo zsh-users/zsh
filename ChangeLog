@@ -1,5 +1,9 @@
 2016-11-17  Oliver Kiddle  <opk@zsh.org>
 
+	* 39959: Src/Zle/zle_vi.c, Test/X02zlevi.ztst: when repeating
+	vi changes advance through the numbered killring registers.
+	Also fix numeric arguments with vi-repeat-change.
+
 	* 39952: Src/Zle/zle_params.c, Doc/Zsh/zle.yo: add registers
 	special parameter to provide access to the vi register
 	buffers from a zle widget function
