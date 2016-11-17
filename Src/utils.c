@@ -845,7 +845,7 @@ ispwd(char *s)
     return 0;
 }
 
-static char xbuf[PATH_MAX*2];
+static char xbuf[PATH_MAX*2+1];
 
 /**/
 static char **
@@ -884,7 +884,7 @@ static int
 xsymlinks(char *s, int full)
 {
     char **pp, **opp;
-    char xbuf2[PATH_MAX*3], xbuf3[PATH_MAX*2];
+    char xbuf2[PATH_MAX*3+1], xbuf3[PATH_MAX*2+1];
     int t0, ret = 0;
     zulong xbuflen = strlen(xbuf);
 
@@ -1003,7 +1003,7 @@ print_if_link(char *s, int all)
 	*xbuf = '\0';
 	if (all) {
 	    char *start = s + 1;
-	    char xbuflink[PATH_MAX];
+	    char xbuflink[PATH_MAX+1];
 	    for (;;) {
 		if (xsymlinks(start, 0) > 0) {
 		    printf(" -> ");
@@ -1140,7 +1140,7 @@ finddir(char *s)
 	if(homenode.diff==1)
 	    homenode.diff = 0;
 	if(!finddir_full)
-	    finddir_full = zalloc(ffsz = PATH_MAX);
+	    finddir_full = zalloc(ffsz = PATH_MAX+1);
 	finddir_full[0] = 0;
 	return finddir_last = NULL;
     }
@@ -1644,7 +1644,7 @@ checkmailpath(char **s)
 	} else if (S_ISDIR(st.st_mode)) {
 	    LinkList l;
 	    DIR *lock = opendir(unmeta(*s));
-	    char buf[PATH_MAX * 2], **arr, **ap;
+	    char buf[PATH_MAX * 2 + 1], **arr, **ap;
 	    int ct = 1;
 
 	    if (lock) {
@@ -6916,7 +6916,7 @@ strsfx(char *s, char *t)
 static int
 upchdir(int n)
 {
-    char buf[PATH_MAX];
+    char buf[PATH_MAX+1];
     char *s;
     int err = -1;
 

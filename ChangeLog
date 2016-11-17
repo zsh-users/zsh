@@ -1,3 +1,9 @@
+2016-11-17  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 39958: Src/Zle/compctl.c, Src/builtin.c, Src/compat.c,
+	Src/exec.c, Src/glob.c, Src/hist.c, Src/utils.c: Add spare byte
+	to PATH_MAX allocation to allow for possible null.
+
 2016-11-17  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 39921: Completion/Unix/Command/_git: __git_recent_branches:

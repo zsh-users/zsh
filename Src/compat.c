@@ -270,7 +270,7 @@ zgetdir(struct dirsav *d)
     int len;
 #endif
 
-    buf = zhalloc(bufsiz = PATH_MAX);
+    buf = zhalloc(bufsiz = PATH_MAX+1);
     pos = bufsiz - 1;
     buf[pos] = '\0';
     strcpy(nbuf, "../");
@@ -439,11 +439,11 @@ zgetcwd(void)
 	    free(cwd);
 	}
 #else
-	char *cwdbuf = zalloc(PATH_MAX);
+	char *cwdbuf = zalloc(PATH_MAX+1);
 	ret = getcwd(cwdbuf, PATH_MAX);
 	if (ret)
 	    ret = dupstring(ret);
-	zfree(cwdbuf, PATH_MAX);
+	zfree(cwdbuf, PATH_MAX+1);
 #endif /* GETCWD_CALLS_MALLOC */
     }
 #endif /* HAVE_GETCWD */

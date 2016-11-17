@@ -973,7 +973,7 @@ cd_do_chdir(char *cnam, char *dest, int hard)
      * Normalize path under Cygwin to avoid messing with
      * DOS style names with drives in them
      */
-    static char buf[PATH_MAX];
+    static char buf[PATH_MAX+1];
 #ifdef HAVE_CYGWIN_CONV_PATH
     cygwin_conv_path(CCP_WIN_A_TO_POSIX | CCP_RELATIVE, dest, buf,
 		     PATH_MAX);

@@ -2135,7 +2135,7 @@ gen_matches_files(int dirs, int execs, int all)
 {
     DIR *d;
     struct stat buf;
-    char *n, p[PATH_MAX], *q = NULL, *e, *pathpref;
+    char *n, p[PATH_MAX+1], *q = NULL, *e, *pathpref;
     LinkList l = NULL;
     int ns = 0, ng = opts[NULLGLOB], test, aw = addwhat, pathpreflen;
 

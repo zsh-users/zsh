@@ -1843,7 +1843,7 @@ chrealpath(char **junkptr)
 # ifdef REALPATH_ACCEPTS_NULL
     char *lastpos, *nonreal, *real;
 # else
-    char *lastpos, *nonreal, pathbuf[PATH_MAX];
+    char *lastpos, *nonreal, pathbuf[PATH_MAX+1];
     char *real = pathbuf;
 # endif
 #endif

@@ -283,7 +283,7 @@ addpath(char *s, int l)
 static int
 statfullpath(const char *s, struct stat *st, int l)
 {
-    char buf[PATH_MAX];
+    char buf[PATH_MAX+1];
 
     DPUTS(strlen(s) + !*s + pathpos - pathbufcwd >= PATH_MAX,
 	  "BUG: statfullpath(): pathname too long");
@@ -779,7 +779,7 @@ parsepat(char *str)
 
     /* Now there is no (#X) in front, we can check the path. */
     if (!pathbuf)
-	pathbuf = zalloc(pathbufsz = PATH_MAX);
+	pathbuf = zalloc(pathbufsz = PATH_MAX+1);
     DPUTS(pathbufcwd, "BUG: glob changed directory");
     if (*str == '/') {		/* pattern has absolute path */
 	str++;

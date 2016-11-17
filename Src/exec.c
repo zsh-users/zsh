@@ -437,7 +437,7 @@ static int
 zexecve(char *pth, char **argv, char **newenvp)
 {
     int eno;
-    static char buf[PATH_MAX * 2];
+    static char buf[PATH_MAX * 2+1];
     char **eep;
 
     unmetafy(pth, NULL);
@@ -620,7 +620,7 @@ static void
 execute(LinkList args, int flags, int defpath)
 {
     Cmdnam cn;
-    char buf[MAXCMDLEN], buf2[MAXCMDLEN];
+    char buf[MAXCMDLEN+1], buf2[MAXCMDLEN+1];
     char *s, *z, *arg0;
     char **argv, **pp, **newenvp = NULL;
     int eno = 0, ee;
@@ -701,7 +701,7 @@ execute(LinkList args, int flags, int defpath)
 
     /* for command -p, search the default path */
     if (defpath) {
-	char pbuf[PATH_MAX];
+	char pbuf[PATH_MAX+1];
 	char *dptr;
 
 	if (!search_defpath(arg0, pbuf, PATH_MAX)) {
@@ -721,7 +721,7 @@ execute(LinkList args, int flags, int defpath)
     } else {
 
 	if ((cn = (Cmdnam) cmdnamtab->getnode(cmdnamtab, arg0))) {
-	    char nn[PATH_MAX], *dptr;
+	    char nn[PATH_MAX+1], *dptr;
 
 	    if (cn->node.flags & HASHED)
 		strcpy(nn, cn->u.cmd);
@@ -814,7 +814,7 @@ findcmd(char *arg0, int docopy, int default_path)
 	}
     }
     if (cn) {
-	char nn[PATH_MAX];
+	char nn[PATH_MAX+1];
 
 	if (cn->node.flags & HASHED)
 	    strcpy(nn, cn->u.cmd);
@@ -905,7 +905,7 @@ mod_export Cmdnam
 hashcmd(char *arg0, char **pp)
 {
     Cmdnam cn;
-    char *s, buf[PATH_MAX];
+    char *s, buf[PATH_MAX+1];
     char **pq;
 
     for (; *pp; pp++)
@@ -5602,7 +5602,7 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
 Eprog
 getfpfunc(char *s, int *ksh, char **fname)
 {
-    char **pp, buf[PATH_MAX];
+    char **pp, buf[PATH_MAX+1];
     off_t len;
     off_t rlen;
     char *d;
@@ -5732,7 +5732,7 @@ cancd(char *s)
     char *t;
 
     if (*s != '/') {
-	char sbuf[PATH_MAX], **cp;
+	char sbuf[PATH_MAX+1], **cp;
 
 	if (cancd2(s))
 	    return s;
