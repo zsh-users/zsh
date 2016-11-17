@@ -991,6 +991,12 @@ and tt(zle_highlight); see
 ifzman(the section CHARACTER HIGHLIGHTING below)\
 ifnzman(noderef(Character Highlighting)) for details.
 )
+vindex(registers)
+item(tt(registers) (associative array))(
+The contents of each of the `named' vi register buffers. These are
+typically set using tt(vi-set-buffer) followed by a delete, change or
+yank command.
+)
 vindex(SUFFIX_ACTIVE)
 vindex(SUFFIX_START)
 vindex(SUFFIX_END)

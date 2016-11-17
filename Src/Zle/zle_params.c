@@ -118,6 +118,12 @@ static const struct gsu_integer suffixactive_gsu =
 
 static const struct gsu_array killring_gsu =
 { get_killring, set_killring, unset_killring };
+
+static const struct gsu_scalar register_gsu =
+{ strgetfn, set_register, unset_register };
+static const struct gsu_hash registers_gsu =
+{ hashgetfn, set_registers, zleunsetfn };
+
 /* implementation is in zle_refresh.c */
 static const struct gsu_array region_highlight_gsu =
 { get_region_highlight, set_region_highlight, unset_region_highlight };
@@ -181,6 +187,7 @@ mod_export void
 makezleparams(int ro)
 {
     struct zleparam *zp;
+    Param reg_param;
 
     for(zp = zleparams; zp->name; zp++) {
 	Param pm = createparam(zp->name, (zp->type |PM_SPECIAL|PM_REMOVABLE|
@@ -206,6 +213,11 @@ makezleparams(int ro)
 	if ((zp->type & PM_UNSET) && (zmod.flags & (MOD_MULT|MOD_TMULT)))
 	    pm->node.flags &= ~PM_UNSET;
     }
+
+    reg_param = createspecialhash("registers", get_registers, &scan_registers,
+	    PM_LOCAL|PM_REMOVABLE);
+    reg_param->gsu.h = &registers_gsu;
+    reg_param->level = locallevel + 1;
 }
 
 /* Special unset function for ZLE special parameters: act like the standard *
@@ -710,6 +722,93 @@ unset_killring(Param pm, int exp)
 	set_killring(pm, NULL);
 	stdunsetfn(pm, exp);
     }
+}
+
+/**/
+static void
+set_register(Param pm, char *value)
+{
+    int n = 0;
+
+    if (!pm->node.nam || *pm->node.nam < 'a' || *pm->node.nam > 'z' ||
+	    pm->node.nam[1]) {
+	zerr("invalid zle register: %s", pm->node.nam);
+	return;
+    }
+
+    Cutbuffer reg = &vibuf[*pm->node.nam - 'a'];
+    if (*value)
+	reg->buf = stringaszleline(value, 0, &n, NULL, NULL);
+    reg->len = n;
+}
+
+/**/
+static void
+unset_register(Param pm, UNUSED(int exp))
+{
+    set_register(pm, "");
+}
+
+/**/
+static void
+scan_registers(UNUSED(HashTable ht), ScanFunc func, int flags)
+{
+    int i;
+    struct param pm;
+
+    memset((void *)&pm, 0, sizeof(struct param));
+    pm.node.flags = PM_SCALAR | PM_READONLY;
+    pm.gsu.s = &nullsetscalar_gsu;
+
+    for (i = 0; i < 26; i++) {
+	pm.node.nam = zhalloc(2);
+	*pm.node.nam = 'a' + i;
+	pm.node.nam[1] = '\0';
+	pm.u.str = zlelineasstring(vibuf[i].buf, vibuf[i].len, 0, NULL, NULL, 1);
+	func(&pm.node, flags);
+    }
+}
+
+/**/
+static HashNode
+get_registers(UNUSED(HashTable ht), const char *name)
+{
+    Param pm = (Param) hcalloc(sizeof(struct param));
+    pm->node.nam = dupstring(name);
+    pm->node.flags = PM_SCALAR;
+    pm->gsu.s = &register_gsu;
+
+    if (*name < 'a' || *name > 'z' || name[1]) {
+	pm->u.str = dupstring("");
+	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
+    } else {
+	int reg = *name - 'a';
+	pm->u.str = zlelineasstring(vibuf[reg].buf, vibuf[reg].len, 0, NULL, NULL, 1);
+    }
+    return &pm->node;
+}
+
+/**/
+static void
+set_registers(UNUSED(Param pm), HashTable ht)
+{
+    int i;
+    HashNode hn;
+
+    if (!ht)
+        return;
+
+    for (i = 0; i < ht->hsize; i++)
+        for (hn = ht->nodes[i]; hn; hn = hn->next) {
+            struct value v;
+            v.isarr = v.flags = v.start = 0;
+            v.end = -1;
+            v.arr = NULL;
+            v.pm = (Param) hn;
+
+	    set_register(v.pm, getstrvalue(&v));
+        }
+    deleteparamtable(ht);
 }
 
 static void

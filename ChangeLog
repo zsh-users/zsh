@@ -1,3 +1,9 @@
+2016-11-17  Oliver Kiddle  <opk@zsh.org>
+
+	* 39952: Src/Zle/zle_params.c, Doc/Zsh/zle.yo: add registers
+	special parameter to provide access to the vi register
+	buffers from a zle widget function
+
 2016-11-16  Oliver Kiddle  <opk@zsh.org>
 
 	* 39945: Src/Zle/compcore.c, Completion/Base/Core/_message,
