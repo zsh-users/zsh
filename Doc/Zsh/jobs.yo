@@ -74,8 +74,8 @@ or by one of the following:
 
 startsitem()
 sitem(tt(%)var(number))(The job with the given number.)
-sitem(tt(%)var(string))(Any job whose command line begins with var(string).)
-sitem(tt(%?)var(string))(Any job whose command line contains var(string).)
+sitem(tt(%)var(string))(The last job whose command line begins with var(string).)
+sitem(tt(%?)var(string))(The last job whose command line contains var(string).)
 sitem(tt(%%))(Current job.)
 sitem(tt(%PLUS()))(Equivalent to `tt(%%)'.)
 sitem(tt(%-))(Previous job.)

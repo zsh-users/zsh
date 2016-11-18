@@ -1,3 +1,8 @@
+2016-11-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Mikel Ward: 39978: Doc/Zsh/jobs.yo: more accurate
+	documentation of searching for job by string.
+
 2016-11-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 39992: Src/params.c: setarrvalue: Allocate a correctly-sized
