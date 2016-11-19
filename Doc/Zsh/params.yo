@@ -1458,6 +1458,14 @@ The prompt used for spelling correction.  The sequence
 `tt(%R)' expands to the string which presumably needs spelling
 correction, and `tt(%r)' expands to the proposed correction.
 All other prompt escapes are also allowed.
+
+The actions available at the prompt are tt([nyae]):
+startsitem()
+sitem(tt(n) +LPAR()`no'+RPAR() +LPAR()default+RPAR())(Discard the correction and run the command.)
+sitem(tt(y) +LPAR()`yes'+RPAR())(Make the correction and run the command.)
+sitem(tt(a) +LPAR()`abort'+RPAR())(Discard the entire command line without running it.)
+sitem(tt(e) +LPAR()`edit'+RPAR())(Resume editing the command line.)
+endsitem()
 )
 vindex(STTY)
 item(tt(STTY))(
