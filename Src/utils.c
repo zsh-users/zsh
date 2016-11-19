@@ -2944,9 +2944,7 @@ mod_export void
 spckword(char **s, int hist, int cmd, int ask)
 {
     char *t, *correct_ignore;
-    int x;
     char ic = '\0';
-    int ne;
     int preflen = 0;
     int autocd = cmd && isset(AUTOCD) && strcmp(*s, ".") && strcmp(*s, "..");
 
@@ -3015,6 +3013,7 @@ spckword(char **s, int hist, int cmd, int ask)
     } else {
 	guess = *s;
 	if (*guess == Tilde || *guess == String) {
+	    int ne;
 	    ic = *guess;
 	    if (!*++t)
 		return;
@@ -3059,6 +3058,7 @@ spckword(char **s, int hist, int cmd, int ask)
     if (errflag)
 	return;
     if (best && (int)strlen(best) > 1 && strcmp(best, guess)) {
+	int x;
 	if (ic) {
 	    char *u;
 	    if (preflen) {
@@ -3088,14 +3088,14 @@ spckword(char **s, int hist, int cmd, int ask)
 		free(pptbuf);
 		fflush(shout);
 		zbeep();
-		x = getquery("nyae \t", 0);
+		x = getquery("nyae", 0);
 		if (cmd && x == 'n')
 		    pathchecked = path;
 	    } else
 		x = 'n';
 	} else
 	    x = 'y';
-	if (x == 'y' || x == ' ' || x == '\t') {
+	if (x == 'y') {
 	    *s = dupstring(best);
 	    if (hist)
 		hwrep(best);

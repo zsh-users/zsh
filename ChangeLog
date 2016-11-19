@@ -1,3 +1,8 @@
+2016-11-24  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 39982: README, Src/utils.c: $SPROMPT: Don't accept a spelling
+	correction at space/tab.
+
 2016-11-23  Bart Schaefer  <schaefer@zsh.org>
 
 	* unposted: Src/Zle/zle_main.c: clear ERRFLAG_ERROR before

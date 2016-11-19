@@ -116,6 +116,11 @@ are output as "export" commands unless the parameter is also local, and
 other parameters not local to the scope are output with the "-g" option.
 Previously, only "typeset" commands were output, never using "-g".
 
+8) At spelling-correction prompt ($SPROMPT), where the choices offered are
+[nyae], previously <Enter> would be accepted to mean [N] and <Space> and
+<Tab> would be accepted to mean [Y].  Now <Space> and <Tab> are invalid
+choices: typing either of them remains at the prompt.
+
 Incompatibilities between 5.0.8 and 5.2
 ---------------------------------------
 
