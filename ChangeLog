@@ -1,3 +1,8 @@
+2016-11-21  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 39981: Src/Zle/compresult.c: Make compstate[to_end] skip
+	suffix and hidden suffix, but not ignored suffix.
+
 2016-11-20  Oliver Kiddle  <opk@zsh.org>
 
 	* 39986, 39989: Src/Zle/zle.h, Src/Zle/zle_keymap.c,

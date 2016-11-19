@@ -1174,6 +1174,10 @@ do_single(Cmatch m)
 	zlemetacs = minfo.end;
 	if (zlemetacs + m->qisl == lastend)
 	    zlemetacs += minfo.insc;
+
+	/* Advance CURSOR past compadd -s/-S suffixes. */
+	zlemetacs += strlen(psuf);
+	zlemetacs += m->suf ? strlen(m->suf) : 0;
     }
     {
 	Cmatch *om = minfo.cur;
