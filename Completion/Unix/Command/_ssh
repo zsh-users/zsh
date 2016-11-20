@@ -84,11 +84,11 @@ _ssh () {
       '-D[delete all identities]' \
       '-d[remove identity]' \
       '-E[specify hash algorithm for fingerprints]:algorithm:(md5 sha256)' \
-      '-e[remove keys provided by the PKCS#11 shared library]:library:' \
+      '-e[remove keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
       '-k[load plain private keys only and skip certificates]' \
       '-L[lists public key parameters of all identities in the agent]'\
       '-l[list all identities]' \
-      '-s[add keys provided by the PKCS#11 shared library]:library:' \
+      '-s[add keys provided by the PKCS#11 shared library]:library:_files -g "*.(so|dylib)(|.<->)(-.)"' \
       '-t[set maximum lifetime for identity]:maximum lifetime (in seconds or time format):' \
       '-X[unlock the agent]' \
       '-x[lock the agent with a password]' \
@@ -366,7 +366,7 @@ _ssh () {
           ;;
         (#i)pkcs11provider=*)
           _description files expl 'PKCS#11 shared library'
-          _files -g '*.so' "$expl[@]" && ret=0
+          _files -g '*.(so|dylib)(|.<->)(-.)' "$expl[@]" && ret=0
           ;;
         (#i)port=*)
           _message -e 'port number on remote host'

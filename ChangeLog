@@ -1,3 +1,8 @@
+2016-11-20  Oliver Kiddle  <opk@zsh.org>
+
+	* 39974: Completion/Unix/Command/_ssh: complete shared
+	libraries for -e and -s options to ssh-add
+
 2016-11-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* Guillaume Maudoux: 39900 (doc slightly tweaked): Src/params.c,
