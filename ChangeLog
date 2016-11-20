@@ -1,3 +1,7 @@
+2016-11-21  Oliver Kiddle  <okiddle@yahoo.co.uk>
+
+	* 39993: Test/Y01completion.ztst: Tests for 39981.
+
 2016-11-21  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 39981: Src/Zle/compresult.c: Make compstate[to_end] skip
