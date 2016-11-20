@@ -2654,8 +2654,13 @@ setarrvalue(Value v, char **val)
 	    v->end = v->start;
 
 	post_assignment_length = v->start + arrlen(val);
-	if (v->end <= pre_assignment_length)
-	    post_assignment_length += pre_assignment_length - v->end + 1;
+	if (v->end < pre_assignment_length) {
+	    /* 
+	     * Allocate room for array elements between the end of the slice `v'
+	     * and the original array's end.
+	     */
+	    post_assignment_length += pre_assignment_length - v->end;
+	}
 
 	p = new = (char **) zalloc(sizeof(char *)
 		                   * (post_assignment_length + 1));
@@ -2670,6 +2675,9 @@ setarrvalue(Value v, char **val)
 	    for (q = old + v->end; *q;)
 		*p++ = ztrdup(*q++);
 	*p = NULL;
+
+	DPUTS2(p - new != post_assignment_length, "setarrvalue: wrong allocation: %d 1= %lu",
+	       post_assignment_length, (unsigned long)(p - new));
 
 	v->pm->gsu.a->setfn(v->pm, new);
 
