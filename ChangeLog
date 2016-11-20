@@ -1,5 +1,8 @@
 2016-11-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted (after 39952): Src/Zle/zle_params.c: Restore C89
+	compatibility.
+
 	* 39985: Doc/Zsh/params.yo: Document the [nyae] answers to the
 	spelling correction prompt, $SPROMPT.
 

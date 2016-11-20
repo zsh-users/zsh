@@ -729,6 +729,7 @@ static void
 set_register(Param pm, char *value)
 {
     int n = 0;
+    Cutbuffer reg;
 
     if (!pm->node.nam || *pm->node.nam < 'a' || *pm->node.nam > 'z' ||
 	    pm->node.nam[1]) {
@@ -736,7 +737,7 @@ set_register(Param pm, char *value)
 	return;
     }
 
-    Cutbuffer reg = &vibuf[*pm->node.nam - 'a'];
+    reg = &vibuf[*pm->node.nam - 'a'];
     if (*value)
 	reg->buf = stringaszleline(value, 0, &n, NULL, NULL);
     reg->len = n;
