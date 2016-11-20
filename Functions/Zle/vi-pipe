@@ -12,6 +12,9 @@ setopt localoptions noksharrays
 autoload -Uz read-from-minibuffer
 local _save_cut="$CUTBUFFER" REPLY
 
+# mark this widget as a vi change so it can be repeated as a whole
+zle -f vichange
+
 # force movement to default to line mode
 (( REGION_ACTIVE )) || zle -U V
 # Use the standard vi-change to accept a vi motion.

@@ -924,13 +924,13 @@ getbyte(long do_keytmout, int *timeout)
 	ret = STOUC(cc);
     }
     /*
-     * vichgbuf is raw bytes, not wide characters, so is dealt
+     * curvichg.buf is raw bytes, not wide characters, so is dealt
      * with here.
      */
     if (vichgflag) {
-	if (vichgbufptr == vichgbufsz)
-	    vichgbuf = realloc(vichgbuf, vichgbufsz *= 2);
-	vichgbuf[vichgbufptr++] = ret;
+	if (curvichg.bufptr == curvichg.bufsz)
+	    curvichg.buf = realloc(curvichg.buf, curvichg.bufsz *= 2);
+	curvichg.buf[curvichg.bufptr++] = ret;
     }
     errno = old_errno;
     return lastchar = ret;
@@ -1260,6 +1260,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     *zleline = ZWC('\0');
     virangeflag = lastcmd = done = zlecs = zlell = mark = yankb = yanke = 0;
     vichgflag = 0;
+    viinrepeat = 0;
     viinsbegin = 0;
     statusline = NULL;
     selectkeymap("main", 1);
@@ -1389,6 +1390,8 @@ int
 execzlefunc(Thingy func, char **args, int set_bindk)
 {
     int r = 0, ret = 0, remetafy = 0;
+    int nestedvichg = vichgflag;
+    int isrepeat = (viinrepeat == 3);
     Widget w;
     Thingy save_bindk = bindk;
 
@@ -1398,6 +1401,8 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	unmetafy_line();
 	remetafy = 1;
     }
+    if (isrepeat)
+	viinrepeat = 2;
 
     if (func->flags & DISABLED) {
 	/* this thingy is not the name of a widget */
@@ -1523,6 +1528,25 @@ execzlefunc(Thingy func, char **args, int set_bindk)
     CCRIGHT();
     if (remetafy)
 	metafy_line();
+
+    /* if this widget constituted the vi change, end it */
+    if (vichgflag == 2 && !nestedvichg) {
+	if (invicmdmode()) {
+	    if (ret) {
+		free(curvichg.buf);
+	    } else {
+		if (lastvichg.buf)
+		    free(lastvichg.buf);
+		lastvichg = curvichg;
+	    }
+	    vichgflag = 0;
+	    curvichg.buf = NULL;
+	} else
+	    vichgflag = 1; /* vi change continues while in insert mode */
+    }
+    if (isrepeat)
+        viinrepeat = !invicmdmode();
+
     return ret;
 }
 
@@ -2230,7 +2254,7 @@ finish_(UNUSED(Module m))
     cleanup_keymaps();
     deletehashtable(thingytab);
 
-    zfree(vichgbuf, vichgbufsz);
+    zfree(lastvichg.buf, lastvichg.bufsz);
     zfree(kungetbuf, kungetsz);
     free_isrch_spots();
     if (rdstrs)

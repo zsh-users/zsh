@@ -479,6 +479,13 @@ tt(kill) for indicating that text has been killed into the cutbuffer.
 When repeatedly invoking a kill widget, text is appended to the cutbuffer
 instead of replacing it, but when wrapping such widgets, it is necessary
 to call `tt(zle -f kill)' to retain this effect.
+
+tt(vichange) for indicating that the widget represents a vi change that
+can be repeated as a whole with `tt(vi-repeat-change)'. The flag should be set
+early in the function before inspecting the value of tt(NUMERIC) or invoking
+other widgets. This has no effect for a widget invoked from insert mode. If
+insert mode is active when the widget finishes, the change extends until next
+returning to command mode.
 )
 cindex(completion widgets, creating)
 item(tt(-C) var(widget) var(completion-widget) var(function))(

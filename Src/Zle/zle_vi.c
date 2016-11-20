@@ -45,46 +45,41 @@ int wordflag;
 /**/
 int vilinerange;
 
-/* last vi change buffer, for vi change repetition */
-
 /*
- * vichgbufsz: Allocated size of vichgbuf.
- * vichgbufptr: Length in use.
- * vichgflag: true whilst inputting a vi normal mode; causes it to be
- *   accumulated in vichgbuf, incrementing vichgbufptr.
+ * lastvichg: last vi change buffer, for vi change repetition
+ * curvichg: current incomplete vi change
  */
 
 /**/
-int vichgbufsz, vichgbufptr, vichgflag;
+struct vichange lastvichg, curvichg;
 
 /*
- * The bytes that make up the current vi command.  See vichgbuf* above.
- *
- * Examination of the code suggests vichgbuf is consistently tied
- * to raw byte input, so it is left as a character array rather
- * than turned into wide characters.  In particular, when we replay
- * it we use ungetbytes().
+ * true whilst a vi change is active causing keys to be
+ * accumulated in curvichg.buf
+ * first set to 2 and when the initial widget finishes, reduced to 1 if
+ * in insert mode implying that the change continues until returning to
+ * normal mode
  */
+
 /**/
-char *vichgbuf;
+int vichgflag;
+
+/*
+ * analogous to vichgflag for a repeated change with the value following
+ * a similar pattern (is 3 until first repeated widget starts)
+ */
+
+/**/
+int viinrepeat;
 
 /* point where vi insert mode was last entered */
 
 /**/
 int viinsbegin;
 
-/* value of zmod associated with vi change */
-static struct modifier lastmod;
-
-/*
- * inrepeat: current widget is the vi change being repeated
- * vichgrepeat: nested widget call within a repeat
- */
-static int inrepeat, vichgrepeat;
-
 /**
  * im: >= 0: is an insertmode
- *    -1: skip setting insert mode
+ *    -1: skip setting insert/overwrite mode
  *    -2: entering viins at start of editing from clean --- don't use
  *        inrepeat or keybuf, synthesise an entry to insert mode.
  * Note that zmult is updated so this should be called before zmult is used.
@@ -94,30 +89,27 @@ static int inrepeat, vichgrepeat;
 void
 startvichange(int im)
 {
-    if (im != -1) {
-	vichgflag = 1;
-	if (im > -1)
-	    insmode = im;
-    }
-    if (inrepeat && im != -2) {
-	zmod = lastmod;
-	inrepeat = vichgflag = 0;
-	vichgrepeat = 1;
-    } else {
-	lastmod = zmod;
-	if (vichgbuf)
-	    free(vichgbuf);
-	vichgbuf = (char *)zalloc(vichgbufsz = 16 + keybuflen);
+    if (im > -1)
+	insmode = im;
+    if (viinrepeat && im != -2) {
+	zmod = lastvichg.mod;
+	vichgflag = 0;
+    } else if (!vichgflag) {
+	curvichg.mod = zmod;
+	if (curvichg.buf)
+	    free(curvichg.buf);
+	curvichg.buf = (char *)zalloc(curvichg.bufsz = 16 + keybuflen);
 	if (im == -2) {
-	    vichgbuf[0] =
+	    vichgflag = 1;
+	    curvichg.buf[0] =
 		zlell ? (insmode ? (zlecs < zlell ? 'i' : 'a') : 'R') : 'o';
-	    vichgbuf[1] = '\0';
-	    vichgbufptr = 1;
+	    curvichg.buf[1] = '\0';
+	    curvichg.bufptr = 1;
 	} else {
-	    strcpy(vichgbuf, keybuf);
-	    unmetafy(vichgbuf, &vichgbufptr);
+	    vichgflag = 2;
+	    strcpy(curvichg.buf, keybuf);
+	    unmetafy(curvichg.buf, &curvichg.bufptr);
 	}
-	vichgrepeat = 0;
     }
 }
 
@@ -226,10 +218,13 @@ getvirange(int wf)
 	     */
 	    if ((k2 == bindk) ? dovilinerange() : execzlefunc(k2, zlenoargs, 1))
 		ret = -1;
-	    if(vichgrepeat)
+	    if (viinrepeat)
 		zmult = mult1;
-	    else
+	    else {
 		zmult = mult1 * zmod.tmult;
+		if (vichgflag == 2)
+		    curvichg.mod.mult = zmult;
+            }
 	} while(prefixflag && !ret);
 	wordflag = 0;
 	selectlocalmap(NULL);
@@ -401,7 +396,6 @@ videlete(UNUSED(char **args))
 	    vifirstnonblank(zlenoargs);
 	}
     }
-    vichgflag = 0;
     return ret;
 }
 
@@ -518,7 +512,6 @@ viyank(UNUSED(char **args))
 	cut(zlecs, c2 - zlecs, CUT_YANK);
 	ret = 0;
     }
-    vichgflag = 0;
     /* cursor now at the start of the range yanked. For line mode
      * restore the column position */
     if (vilinerange && lastcol != -1) {
@@ -593,8 +586,7 @@ vireplace(UNUSED(char **args))
  * a change, we always read the argument normally, even if the count    *
  * was bad.  When recording a change for repeating, and a bad count is  *
  * given, we squash the repeat buffer to avoid repeating the partial    *
- * command; we've lost the previous change, but that can't be avoided   *
- * without a rewrite of the repeat code.                                */
+ * command.                                                             */
 
 /**/
 int
@@ -644,18 +636,12 @@ vireplacechars(UNUSED(char **args))
 
     /* check argument range */
     if (n < 1 || fail) {
-	if(vichgrepeat)
+	if (viinrepeat)
 	    vigetkey();
-	if(vichgflag) {
-	    free(vichgbuf);
-	    vichgbuf = NULL;
-	    vichgflag = 0;
-	}
 	return 1;
     }
     /* get key */
     if((ch = vigetkey()) == ZLEEOF) {
-	vichgflag = 0;
 	return 1;
     }
     /* do change */
@@ -682,7 +668,6 @@ vireplacechars(UNUSED(char **args))
 	    zleline[zlecs++] = ch;
 	zlecs--;
     }
-    vichgflag = 0;
     return 0;
 }
 
@@ -693,7 +678,16 @@ vicmdmode(UNUSED(char **args))
     if (invicmdmode() || selectkeymap("vicmd", 0))
 	return 1;
     mergeundo();
-    vichgflag = 0;
+    insmode = unset(OVERSTRIKE);
+    if (vichgflag == 1) {
+	vichgflag = 0;
+	if (lastvichg.buf)
+	    free(lastvichg.buf);
+	lastvichg = curvichg;
+	curvichg.buf = NULL;
+    }
+    if (viinrepeat == 1)
+        viinrepeat = 0;
     if (zlecs != findbol())
 	DECCS();
     return 0;
@@ -748,7 +742,6 @@ vioperswapcase(UNUSED(char **args))
 	vifirstnonblank();
 #endif
     }
-    vichgflag = 0;
     return ret;
 }
 
@@ -771,7 +764,6 @@ viupcase(UNUSED(char **args))
 	zlecs = oldcs;
 	ret = 0;
     }
-    vichgflag = 0;
     return ret;
 }
 
@@ -794,7 +786,6 @@ vidowncase(UNUSED(char **args))
 	zlecs = oldcs;
 	ret = 0;
     }
-    vichgflag = 0;
     return ret;
 }
 
@@ -803,23 +794,23 @@ int
 virepeatchange(UNUSED(char **args))
 {
     /* make sure we have a change to repeat */
-    if (!vichgbuf || vichgflag || virangeflag)
+    if (!lastvichg.buf || vichgflag || virangeflag)
 	return 1;
     /* restore or update the saved count and buffer */
     if (zmod.flags & MOD_MULT) {
-	lastmod.mult = zmod.mult;
-	lastmod.flags |= MOD_MULT;
+	lastvichg.mod.mult = zmod.mult;
+	lastvichg.mod.flags |= MOD_MULT;
     }
     if (zmod.flags & MOD_VIBUF) {
-	lastmod.vibuf = zmod.vibuf;
-	lastmod.flags = (lastmod.flags & ~MOD_VIAPP) |
+	lastvichg.mod.vibuf = zmod.vibuf;
+	lastvichg.mod.flags = (lastvichg.mod.flags & ~MOD_VIAPP) |
 	    MOD_VIBUF | (zmod.flags & MOD_VIAPP);
-    } else if (lastmod.flags & MOD_VIBUF &&
-	    lastmod.vibuf >= 27 && lastmod.vibuf <= 34)
-	lastmod.vibuf++; /* for "1 to "8 advance to next buffer */
+    } else if (lastvichg.mod.flags & MOD_VIBUF &&
+	    lastvichg.mod.vibuf >= 27 && lastvichg.mod.vibuf <= 34)
+	lastvichg.mod.vibuf++; /* for "1 to "8 advance to next buffer */
     /* repeat the command */
-    inrepeat = 1;
-    ungetbytes(vichgbuf, vichgbufptr);
+    viinrepeat = 3;
+    ungetbytes(lastvichg.buf, lastvichg.bufptr);
     return 0;
 }
 
@@ -835,10 +826,8 @@ viindent(UNUSED(char **args))
 	region_active = 2;
     /* get the range */
     if ((c2 = getvirange(0)) == -1) {
-	vichgflag = 0;
 	return 1;
     }
-    vichgflag = 0;
     /* must be a line range */
     if (!vilinerange) {
 	zlecs = oldcs;
@@ -873,10 +862,8 @@ viunindent(UNUSED(char **args))
 	region_active = 2;
     /* get the range */
     if ((c2 = getvirange(0)) == -1) {
-	vichgflag = 0;
 	return 1;
     }
-    vichgflag = 0;
     /* must be a line range */
     if (!vilinerange) {
 	zlecs = oldcs;

@@ -284,6 +284,20 @@ struct change {
 #define CH_NEXT (1<<0)   /* next structure is also part of this change */
 #define CH_PREV (1<<1)   /* previous structure is also part of this change */
 
+/* vi change handling for vi-repeat-change */
+
+/*
+ * Examination of the code suggests vichgbuf is consistently tied
+ * to raw byte input, so it is left as a character array rather
+ * than turned into wide characters.  In particular, when we replay
+ * it we use ungetbytes().
+ */
+struct vichange {
+    struct modifier mod; /* value of zmod associated with vi change */
+    char *buf;           /* bytes for keys that make up the vi command */
+    int bufsz, bufptr;   /* allocated and in use sizes of buf */
+};
+
 /* known thingies */
 
 #define Th(X) (&thingies[X])

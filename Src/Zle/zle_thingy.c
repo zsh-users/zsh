@@ -678,7 +678,16 @@ bin_zle_flags(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		else if (!strcmp(*flag, "keepsuffix"))
 		    w->flags |= ZLE_KEEPSUFFIX;
 		*/
-		else {
+	        else if (!strcmp(*flag, "vichange")) {
+		    if (invicmdmode()) {
+			startvichange(-1);
+			if (zmod.flags & (MOD_MULT|MOD_TMULT)) {
+			    Param pm = (Param) paramtab->getnode(paramtab, "NUMERIC");
+			    if (pm && pm->node.flags & PM_SPECIAL)
+				pm->node.flags &= ~PM_UNSET;
+			}
+		    }
+		} else {
 		    zwarnnam(name, "invalid flag `%s' given to zle -f", *flag);
 		    ret = 1;
 		}

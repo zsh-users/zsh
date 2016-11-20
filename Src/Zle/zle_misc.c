@@ -609,8 +609,10 @@ viputbefore(UNUSED(char **args))
     int n = zmult;
 
     startvichange(-1);
-    if (n < 0 || zmod.flags & MOD_NULL)
+    if (n < 0)
 	return 1;
+    if (zmod.flags & MOD_NULL)
+	return 0;
     if (zmod.flags & MOD_VIBUF)
 	kctbuf = &vibuf[zmod.vibuf];
     else
@@ -630,8 +632,10 @@ viputafter(UNUSED(char **args))
     int n = zmult;
 
     startvichange(-1);
-    if (n < 0 || zmod.flags & MOD_NULL)
+    if (n < 0)
 	return 1;
+    if (zmod.flags & MOD_NULL)
+	return 0;
     if (zmod.flags & MOD_VIBUF)
 	kctbuf = &vibuf[zmod.vibuf];
     else

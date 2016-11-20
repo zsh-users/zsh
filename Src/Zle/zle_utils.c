@@ -1704,6 +1704,7 @@ mergeundo(void)
 	current->flags |= CH_PREV;
 	current->prev->flags |= CH_NEXT;
     }
+    vistartchange = -1;
 }
 
 /*

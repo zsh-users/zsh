@@ -1,5 +1,12 @@
 2016-11-20  Oliver Kiddle  <opk@zsh.org>
 
+	* 39986, 39989: Src/Zle/zle.h, Src/Zle/zle_keymap.c,
+	Src/Zle/zle_main.c, Src/Zle/zle_misc.c, Src/Zle/zle_thingy.c,
+	Src/Zle/zle_utils.c, Src/Zle/zle_vi.c, Test/X02zlevi.ztst,
+	Doc/Zsh/zle.yo, Functions/Zle/vi-pipe: make vi-repeat-change
+	work better with shell based widgets and save old change
+	when recording a new change in case the new one fails
+
 	* 39974: Completion/Unix/Command/_ssh: complete shared
 	libraries for -e and -s options to ssh-add
 

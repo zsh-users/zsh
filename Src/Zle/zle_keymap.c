@@ -1634,7 +1634,7 @@ getkeymapcmd(Keymap km, Thingy *funcp, char **strp)
 	unmetafy(keybuf + lastlen, &keybuflen);
 	ungetbytes(keybuf+lastlen, keybuflen);
 	if(vichgflag)
-	    vichgbufptr -= keybuflen;
+	    curvichg.bufptr -= keybuflen;
 	keybuf[keybuflen = lastlen] = 0;
     }
     *funcp = func;

@@ -140,6 +140,12 @@
 >BUFFER: xxe xxx xxxee
 >CURSOR: 10
 
+  zletest $'one two three four five six seven eight\e.03d2wk.1.'
+0:numeric args to both action and movement are multiplied (and saved for any repeat)
+>BUFFER: eight
+>seven eight
+>CURSOR: 0
+
   zletest $'yankee doodle\ebhDyy0"1P'
 0:paste register 1 to get last deletion
 >BUFFER:  doodleyankee
@@ -262,10 +268,8 @@
   print -u $ZTST_fd 'This test may hang the shell when it fails...'
   zletest $'worm\erdhd..'
 0:use of vi-repeat as the motion and repeat after a failed change
->BUFFER: word
+>BUFFER: wodd
 >CURSOR: 2
-F:For vi compatibility, "." should repeat the "rd" change after "d."
-F:Update result to ">BUFFER: wodd" if compatibility is repaired.
 
   zpty_run 'bindkey "^_" undo'
   zletest $'undoc\037e'
