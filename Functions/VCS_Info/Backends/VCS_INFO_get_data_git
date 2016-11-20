@@ -236,6 +236,15 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
         done
         if [[ -f "${patchdir}/msg-clean" ]]; then
             subject="${$(< "${patchdir}/msg-clean")[(f)1]}"
+        elif [[ -f "${patchdir}/${(l:4::0:)cur}" ]]; then
+            local maxlines=10 line
+            while IFS= read -r line;  do
+                if [[ "$line" == "Subject:"* ]]; then
+                    subject=${line/(#s)Subject: /}
+                    break
+                fi
+                (( --maxlines )) || break
+            done < "${patchdir}/${(l:4::0:)cur}"
         fi
         if [[ -f "${patchdir}/original-commit" ]]; then
             if [[ -n $subject ]]; then
