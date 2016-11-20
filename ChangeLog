@@ -1,5 +1,8 @@
 2016-11-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 39995 (from 39977): Src/params.c, Test/A06assign.ztst:
+	optimisation of string assignment if length is unchanged.
+
 	* Mikel Ward: 39978: Doc/Zsh/jobs.yo: more accurate
 	documentation of searching for job by string.
 

@@ -489,3 +489,143 @@
  print $array
 0:slice beyond length of array
 >FIRST
+
+# tests of string assignments
+
+ a="abc"
+ a[1]=x
+ print $a
+0:overwrite first character in string
+>xbc
+
+ a="abc"
+ a[2]="x"
+ print $a
+0:overwrite middle character in string
+>axc
+
+ a="abc"
+ a[3]="x"
+ print $a
+0:overwrite last character in string
+>abx
+
+ a="abc"
+ a[-1]="x"
+ print $a
+0:overwrite -1 character in string
+>abx
+
+ a="abc"
+ a[-2]="x"
+ print $a
+0:overwrite -2 character (middle) in string
+>axc
+
+ a="ab"
+ a[-2]="x"
+ print $a
+0:overwrite -2 character (first) in string
+>xb
+
+ a="abc"
+ a[-3]="x"
+ print $a
+0:overwrite -3 character (first) in string
+>xbc
+
+ a="abc"
+ a[-4]="x"
+ print $a
+0:overwrite -4 character (before first) in string
+>xabc
+
+ a="abc"
+ a[-5]="x"
+ print $a
+0:overwrite -5 character (before-before first) in string
+>xabc
+
+ a="abc"
+ a[-4,0]="x"
+ print $a
+0:overwrite [-4,0] characters (before first) in string
+>xabc
+
+ a="abc"
+ a[-4,-4]="x"
+ print $a
+0:overwrite [-4,-4] character (before first) in string
+>xabc
+
+ a="abc"
+ a[-40,-30]="x"
+ print $a
+0:overwrite [-40,-30] characters (far before first) in string
+>xabc
+
+ a="abc"
+ a[-40,1]="x"
+ print $a
+0:overwrite [-40,1] characters in short string
+>xbc
+
+ a="abc"
+ a[-40,40]="x"
+ print $a
+0:overwrite [-40,40] characters in short string
+>x
+
+ a="abc"
+ a[2,40]="x"
+ print $a
+0:overwrite [2,40] characters in short string
+>ax
+
+ a="abc"
+ a[2,-1]="x"
+ print $a
+0:overwrite [2,-1] characters in short string
+>ax
+
+ a="abc"
+ a[-2,-1]="x"
+ print $a
+0:overwrite [-2,-1] characters in short string
+>ax
+
+ a="a"
+ a[-1]="xx"
+ print $a
+0:overwrite [-1] character with "xx"
+>xx
+
+ a="a"
+ a[-2]="xx"
+ print $a
+0:overwrite [-2] character (before first) with "xx"
+>xxa
+
+ a="a"
+ a[2]="xx"
+ print $a
+0:overwrite [2] character (after last) with "xx"
+>axx
+
+ a=""
+ a[1]="xx"
+ print $a
+0:overwrite [1] character (string: "") with "xx"
+>xx
+
+ a=""
+ a[-1]="xx"
+ print $a
+0:overwrite [-1] character (string: "") with "xx"
+>xx
+
+ a=""
+ a[2]="xx"
+ print $a
+0:overwrite [2] character (string: "") with "xx"
+>xx

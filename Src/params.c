@@ -2436,9 +2436,10 @@ assignstrvalue(Value v, char *val, int flags)
 		v->pm->width = strlen(val);
 	} else {
 	    char *z, *x;
-	    int zlen;
+            int zlen, vlen, newsize;
 
-	    z = dupstring_glen(v->pm->gsu.s->getfn(v->pm), (unsigned*) &zlen);
+            z = v->pm->gsu.s->getfn(v->pm);
+            zlen = strlen(z);
 
 	    if ((v->flags & VALFLAG_INV) && unset(KSHARRAYS))
 		v->start--, v->end--;
@@ -2469,12 +2470,34 @@ assignstrvalue(Value v, char *val, int flags)
 	    }
 	    else if (v->end > zlen)
 		v->end = zlen;
-	    x = (char *) zalloc(v->start + strlen(val) + zlen - v->end + 1);
-	    strncpy(x, z, v->start);
-	    strcpy(x + v->start, val);
-	    strcat(x + v->start, z + v->end);
-	    v->pm->gsu.s->setfn(v->pm, x);
-	    zsfree(val);
+
+            vlen = strlen(val);
+            /* Characters preceding start index +
+               characters of what is assigned +
+               characters following end index */
+            newsize = v->start + vlen + (zlen - v->end);
+
+            /* Does new size differ? */
+            if (newsize != zlen || v->pm->gsu.s->setfn != strsetfn) {
+                x = (char *) zalloc(newsize + 1);
+                strncpy(x, z, v->start);
+                strcpy(x + v->start, val);
+                strcat(x + v->start, z + v->end);
+                v->pm->gsu.s->setfn(v->pm, x);
+            } else {
+		Param pm = v->pm;
+                /* Size doesn't change, can limit actions to only
+                 * overwriting bytes in already allocated string */
+                strncpy(z + v->start, val, vlen);
+		/* Implement remainder of strsetfn */
+		if (!(pm->node.flags & PM_HASHELEM) &&
+		    ((pm->node.flags & PM_NAMEDDIR) ||
+		     isset(AUTONAMEDIRS))) {
+		    pm->node.flags |= PM_NAMEDDIR;
+		    adduserdir(pm->node.nam, z, 0, 0);
+		}
+            }
+            zsfree(val);
 	}
 	break;
     case PM_INTEGER:
