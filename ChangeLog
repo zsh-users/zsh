@@ -24,8 +24,8 @@
 
 2016-11-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
-	* 39992: Src/params.c: setarrvalue: Allocate a correctly-sized
-	array.
+	* Sebastian: 39992: Src/params.c: setarrvalue: Allocate
+	a correctly-sized array.
 
 	* unposted (after 39952): Src/Zle/zle_params.c: Restore C89
 	compatibility.
