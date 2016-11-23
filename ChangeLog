@@ -1,5 +1,7 @@
 2016-11-23  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Test/Y03arguments.ztst: partial match test case
+
 	* unposted: Src/builtin.c, Test/B03print.ztst: fix printf -v
 	to an array without format string reuse
 

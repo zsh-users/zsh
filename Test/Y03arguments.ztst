@@ -304,6 +304,12 @@
 >NO:{--abc}
 >line: {tst --aah}{}
 
+ tst_arguments '--prefix=: :(one two)' '--prop=: :(three four)' --pre
+ comptest $'tst --pre=o\t --=\t'
+0:partial completion of option with an argument
+>line: {tst --prefix=one }{}
+>line: {tst --prefix=one --prop=}{}
+
 %clean
 
   zmodload -ui zsh/zpty
