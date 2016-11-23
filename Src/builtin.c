@@ -5034,7 +5034,7 @@ bin_print(char *name, char **args, Options ops, int func)
 	    if (buf)
 		free(buf);
 	} else {
-	    if (visarr) {
+	    if (visarr && splits) {
 		char **arrayval = zshcalloc((cursplit - splits + 2) * sizeof(char *));
 		for (;cursplit >= splits; cursplit--) {
 		    int start = cursplit == splits ? 0 : cursplit[-1];

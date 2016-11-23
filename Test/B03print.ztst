@@ -316,3 +316,9 @@
  typeset -p foo
 0:printf into an array variable
 >typeset -a foo=( '1  one' '2  two' '3 three' )
+
+ typeset -a foo
+ print -f '%s' -v foo string
+ typeset -p foo
+0:printf to an array variable without format string reuse
+>typeset foo=string
