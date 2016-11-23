@@ -594,7 +594,7 @@ for prepath in "$prepaths[@]"; do
     # There are more components, so skip over the next components and make a
     # slash be added.
 
-    tmp1=( ${tmp1//(#b)([][()|*?^#~<>\\=])/\\${match[1]}} )
+    #tmp1=( ${tmp1//(#b)([][()|*?^#~<>\\=])/\\${match[1]}} )
     tmp2="${(M)tpre##${~skips}}"
     if [[ -n "$tmp2" ]]; then
       skipped="/$tmp2"

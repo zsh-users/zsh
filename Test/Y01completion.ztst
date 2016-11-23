@@ -80,12 +80,15 @@ F:regression test workers/31611
 
   {
     mkdir 'A(B)' 'A(B)/C'
+    comptest $'cd "A(B)\t\t'
     comptesteval 'cd "A(B)/C"'
     comptest $'cd ../\t'
   } always {
     rmdir 'A(B)/C' 'A(B)'
   }
 0:directory name is not a glob qualifier
+>line: {cd "A(B)/}{}
+>line: {cd "A(B)/C/}{}
 >line: {cd ../C/}{}
 
   comptesteval "_tst() { compadd -U -s : -S / -I . word; compstate[to_end]= }"
