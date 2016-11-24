@@ -729,15 +729,22 @@ static void
 set_register(Param pm, char *value)
 {
     int n = 0;
+    int offset = -1;
     Cutbuffer reg;
 
-    if (!pm->node.nam || *pm->node.nam < 'a' || *pm->node.nam > 'z' ||
-	    pm->node.nam[1]) {
+    if (!pm->node.nam || pm->node.nam[1])
+	;
+    else if (*pm->node.nam >= '0' && *pm->node.nam <= '9')
+	offset = '0' - 26;
+    else if (*pm->node.nam >= 'a' && *pm->node.nam <= 'z')
+	offset = 'a';
+
+    if (offset == -1) {
 	zerr("invalid zle register: %s", pm->node.nam);
 	return;
     }
 
-    reg = &vibuf[*pm->node.nam - 'a'];
+    reg = &vibuf[*pm->node.nam - offset];
     if (*value)
 	reg->buf = stringaszleline(value, 0, &n, NULL, NULL);
     reg->len = n;
@@ -755,18 +762,21 @@ static void
 scan_registers(UNUSED(HashTable ht), ScanFunc func, int flags)
 {
     int i;
+    char ch;
     struct param pm;
 
     memset((void *)&pm, 0, sizeof(struct param));
     pm.node.flags = PM_SCALAR | PM_READONLY;
     pm.gsu.s = &nullsetscalar_gsu;
 
-    for (i = 0; i < 26; i++) {
+    for (i = 0, ch = 'a'; i < 36; i++) {
 	pm.node.nam = zhalloc(2);
-	*pm.node.nam = 'a' + i;
+	*pm.node.nam = ch;
 	pm.node.nam[1] = '\0';
 	pm.u.str = zlelineasstring(vibuf[i].buf, vibuf[i].len, 0, NULL, NULL, 1);
 	func(&pm.node, flags);
+	if (ch++ == 'z')
+	    ch = '0';
     }
 }
 
@@ -775,17 +785,24 @@ static HashNode
 get_registers(UNUSED(HashTable ht), const char *name)
 {
     Param pm = (Param) hcalloc(sizeof(struct param));
+    int reg = -1;
     pm->node.nam = dupstring(name);
     pm->node.flags = PM_SCALAR;
     pm->gsu.s = &register_gsu;
 
-    if (*name < 'a' || *name > 'z' || name[1]) {
+    if (name[1])
+       ;
+    else if (*name >= '0' && *name <= '9')
+	reg = *name - '0' + 26;
+    else if (*name >= 'a' && *name <= 'z')
+	reg = *name - 'a';
+
+    if (reg == -1) {
 	pm->u.str = dupstring("");
 	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
-    } else {
-	int reg = *name - 'a';
+    } else
 	pm->u.str = zlelineasstring(vibuf[reg].buf, vibuf[reg].len, 0, NULL, NULL, 1);
-    }
+
     return &pm->node;
 }
 

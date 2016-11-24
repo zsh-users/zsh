@@ -1,3 +1,6 @@
+	* 40003: Src/Zle/zle_params.c, Doc/Zsh/zle.yo: include "0-"9
+	vi buffers in the registers associative array
+
 2016-11-24  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 40005: Completion/Unix/Command/_date,

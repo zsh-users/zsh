@@ -1000,7 +1000,7 @@ ifnzman(noderef(Character Highlighting)) for details.
 )
 vindex(registers)
 item(tt(registers) (associative array))(
-The contents of each of the `named' vi register buffers. These are
+The contents of each of the vi register buffers. These are
 typically set using tt(vi-set-buffer) followed by a delete, change or
 yank command.
 )
