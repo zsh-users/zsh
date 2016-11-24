@@ -19,18 +19,16 @@ compset -S '%*'
 specs=(
   'a:abbreviated day name'
   'A:full day name'
-  'b:abbreviated month name'
+  {b,h}':abbreviated month name'
   'B:full month name'
   'c:preferred locale date and time'
   'C:2-digit century'
   'd:day of month (01-31)'
   'D:american format month/day/year (%m/%d/%y)'
   'e:day of month ( 1-31)'
-  'E:alternate representation'
   'F:ISO 8601 year-month-date (%Y-%m-%d)'
   'G:4-digit ISO 8601 week-based year'
   'g:2-digit ISO 8601 week-based year'
-  'h:abbreviated month name'
   'H:hour (00-23)'
   'I:hour (01-12)'
   'j:day of year (001-366)'
@@ -39,7 +37,6 @@ specs=(
   'm:month (01-12)'
   'M:minute (00-59)'
   'n:newline'
-  'O:alternative format modifier'
   'p:locale dependent AM/PM'
   'r:locale dependent a.m. or p.m. time (%I:%M:%S %p)'
   'R:24-hour notation time (%H:%M)'
@@ -62,24 +59,26 @@ specs=(
 )
 
 case $OSTYPE in
-  freebsd*|linux-gnu|solaris2.<11->)
+  freebsd*|dragonfly*|darwin*|linux-gnu|solaris2.<11->)
     specs+=(
+      'E:alternate representation'
+      'O:alternative format modifier'
       "-:don't pad numeric values"
-      '#:swap case of alphabetic characters'
       '0:left pad numeric values with zeroes'
-      '^:convert lowercase characters to uppercase'
       '_:left pad numeric values with spaces'
     )
   ;|
   linux-gnu|solaris2.<11->)
     specs+=(
+      '#:swap case of alphabetic characters'
+      '^:convert lowercase characters to uppercase'
       'P:lower case locale dependent am/pm'
     )
   ;|
-  freebsd*)
+  freebsd*|dragonfly*|darwin*|openbsd*|netbsd*)
     specs+=( 'v:date in short form (%e-%b-%Y)' )
   ;|
-  solaris2.<11->|freebsd*)
+  solaris2.<11->|freebsd*|dragonfly*|darwin*|openbsd*)
     specs+=( '+:localized representation of date and time' )
   ;;
   solaris2.<-10>)
