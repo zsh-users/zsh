@@ -730,7 +730,7 @@ set_register(Param pm, char *value)
 {
     int n = 0;
     int offset = -1;
-    Cutbuffer reg;
+    Cutbuffer vbuf;
 
     if (!pm->node.nam || pm->node.nam[1])
 	;
@@ -744,10 +744,10 @@ set_register(Param pm, char *value)
 	return;
     }
 
-    reg = &vibuf[*pm->node.nam - offset];
+    vbuf = &vibuf[*pm->node.nam - offset];
     if (*value)
-	reg->buf = stringaszleline(value, 0, &n, NULL, NULL);
-    reg->len = n;
+	vbuf->buf = stringaszleline(value, 0, &n, NULL, NULL);
+    vbuf->len = n;
 }
 
 /**/
@@ -785,7 +785,7 @@ static HashNode
 get_registers(UNUSED(HashTable ht), const char *name)
 {
     Param pm = (Param) hcalloc(sizeof(struct param));
-    int reg = -1;
+    int vbuf = -1;
     pm->node.nam = dupstring(name);
     pm->node.flags = PM_SCALAR;
     pm->gsu.s = &register_gsu;
@@ -793,15 +793,15 @@ get_registers(UNUSED(HashTable ht), const char *name)
     if (name[1])
        ;
     else if (*name >= '0' && *name <= '9')
-	reg = *name - '0' + 26;
+	vbuf = *name - '0' + 26;
     else if (*name >= 'a' && *name <= 'z')
-	reg = *name - 'a';
+	vbuf = *name - 'a';
 
-    if (reg == -1) {
+    if (vbuf == -1) {
 	pm->u.str = dupstring("");
 	pm->node.flags |= (PM_UNSET|PM_SPECIAL);
     } else
-	pm->u.str = zlelineasstring(vibuf[reg].buf, vibuf[reg].len, 0, NULL, NULL, 1);
+	pm->u.str = zlelineasstring(vibuf[vbuf].buf, vibuf[vbuf].len, 0, NULL, NULL, 1);
 
     return &pm->node;
 }

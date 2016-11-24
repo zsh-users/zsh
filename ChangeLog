@@ -1,3 +1,8 @@
+2016-11-24  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Src/Zle/zle_params.c: fix to compile on Solaris where
+	curses.h has a #define for reg to register
+
 	* 40003: Src/Zle/zle_params.c, Doc/Zsh/zle.yo: include "0-"9
 	vi buffers in the registers associative array
 
