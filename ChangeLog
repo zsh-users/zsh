@@ -1,5 +1,8 @@
 2016-11-24  Oliver Kiddle  <opk@zsh.org>
 
+	* 40004 (tweaked): Completion/Redhat/Command/_yum: fix cache
+	mechanism, complete groups and other minor improvements
+
 	* unposted: Src/Zle/zle_params.c: fix to compile on Solaris where
 	curses.h has a #define for reg to register
 
