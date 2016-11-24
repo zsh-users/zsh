@@ -1,5 +1,8 @@
 2016-11-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted: Completion/Zsh/Context/_subscript: Complete the
+	$foo[(f)] flag.
+
 	* unposted: Completion/Unix/Command/_git: _git-config: Fix
 	user.email completion to complete only bare email addresses.
 

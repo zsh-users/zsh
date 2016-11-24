@@ -62,6 +62,7 @@ elif compset -P '\('; then
       'e[interpret * or @ as a single key]'
     );;
     (|scalar*)) flags=(
+      'f[make subscripting work on lines of scalar]'
       'w[make subscripting work on words of scalar]'
       's[specify word separator]'
       'p[recognise escape sequences in subsequent s flag]'
