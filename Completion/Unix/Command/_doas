@@ -1,6 +1,7 @@
 #compdef doas
 
 local environ e cmd
+local -a _comp_priv_prefix
 
 zstyle -a ":completion:${curcontext}:" environ environ
 

@@ -4,6 +4,7 @@ setopt localoptions extended_glob
 
 local environ e cmd
 local -a args
+local -a _comp_priv_prefix
 
 zstyle -a ":completion:${curcontext}:" environ environ
 

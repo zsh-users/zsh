@@ -1,9 +1,8 @@
 #compdef zlogin
 # Synced with the Nevada build 162 man page
 
-local -a _comp_priv_prefix
-
 _zlogin() {
+        local -a _comp_priv_prefix
 	_arguments -s \
 		'-E[Disable escape character]' \
 		'-e[Specify escape character]:character:' \

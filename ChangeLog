@@ -1,5 +1,13 @@
 2016-11-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40011: Completion/Base/Core/_main_complete,
+	Completion/Solaris/Command/_pfexec,
+	Completion/Solaris/Command/_zlogin,
+	Completion/Unix/Command/_chown, Completion/Unix/Command/_doas,
+	Completion/Unix/Command/_sudo: Make $_comp_priv_prefix only
+	declared when required, and use that to have chgrp offer all
+	groups under doas, ssh, etc as well.
+
 	* 40010: Src/builtin.c, Test/A02alias.ztst: builtins: Say
 	'bad option: +x', not 'bad option: -x', when +x was passed.
 

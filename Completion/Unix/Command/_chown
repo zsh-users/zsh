@@ -45,8 +45,8 @@ _arguments -C -s "$args[@]" '*:files:->files' && ret=0
 case $state in
   owner)
     if [[ $service = chgrp ]] || compset -P '*[:.]'; then
-      if (( EGID && $+commands[groups] && ! $+funcstack[(r)_sudo] )); then  # except for root
-       _wanted groups expl 'group' compadd $(groups) && return 0
+      if (( EGID && $+commands[groups] && ! $+_comp_priv_prefix )); then  # except for sudo
+       _wanted groups expl 'group' compadd -- $(groups) && return 0
       fi
       _groups && ret=0
     else
