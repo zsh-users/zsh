@@ -1498,8 +1498,12 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	    opts[XTRACE] = oxt;
 	    sfcontext = osc;
 	    endparamscope();
-	    if (errflag == ERRFLAG_ERROR && !(ret = execimmortal(func, args)))
+	    if (errflag == ERRFLAG_ERROR) {
+		int saverr = errflag;
 		errflag &= ~ERRFLAG_ERROR;
+		if ((ret = execimmortal(func, args)) != 0)
+		    errflag |= saverr;
+	    }
 	    lastcmd = w->flags & ~(WIDGET_INUSE|WIDGET_FREE);
 	    if (inuse) {
 		w->flags &= WIDGET_INUSE|WIDGET_FREE;

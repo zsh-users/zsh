@@ -1,3 +1,8 @@
+2016-11-23  Bart Schaefer  <schaefer@zsh.org>
+
+	* unposted: Src/Zle/zle_main.c: clear ERRFLAG_ERROR before
+	invoking immortal widget (cf. 39934)
+
 2016-11-23  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Test/Y03arguments.ztst: partial match test case
