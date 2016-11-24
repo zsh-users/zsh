@@ -1,3 +1,8 @@
+2016-11-29  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Completion/Unix/Command/_git: _git-config: Fix
+	user.email completion to complete only bare email addresses.
+
 2016-11-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 40011: Completion/Base/Core/_main_complete,

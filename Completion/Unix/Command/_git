@@ -2613,7 +2613,7 @@ __git_config_option-or-value () {
     uploadarchive.allowUnreachable:'allow git-upload-archive to accept an archive requests that ask for unreachable objects::->bool:false'
     'url.*.insteadOf:string to start URLs with:prefix:->string'
     'url.*.pushInsteadOf:string to start URLs to push to with:prefix:->string'
-    user.email:'email address used for commits::_email_addresses'
+    user.email:'email address used for commits::_email_addresses -c'
     user.name:'full name used for commits:name:->string'
     user.signingkey:'default GPG key to use when creating signed tags::__git_gpg_secret_keys'
     web.browser:'web browser to use::__git_browsers')
