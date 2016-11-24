@@ -1,5 +1,7 @@
 2016-11-24  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_date: fix typo (=+ to +=)
+
 	* 40004 (tweaked): Completion/Redhat/Command/_yum: fix cache
 	mechanism, complete groups and other minor improvements
 

@@ -67,7 +67,7 @@ else
     freebsd*|dragonfly*)
       args+=( '-R[display in RFC2822 format]' )
     ;|
-    openbsd*|netbsd*) args=+( '-a[gradually skew]' )
+    openbsd*|netbsd*) args+=( '-a[gradually skew]' )
     ;|
     openbsd*)
       args+=( '-z[specify timezone for output]:time zone:_time_zone')
