@@ -249,7 +249,7 @@ int
 execbuiltin(LinkList args, LinkList assigns, Builtin bn)
 {
     char *pp, *name, *optstr;
-    int flags, sense, argc, execop, xtr = isset(XTRACE);
+    int flags, argc, execop, xtr = isset(XTRACE);
     struct options ops;
 
     /* initialise options structure */
@@ -294,6 +294,7 @@ execbuiltin(LinkList args, LinkList assigns, Builtin bn)
 	/* Sort out the options. */
 	if (optstr) {
 	    char *arg = *argv;
+	    int sense; /* 1 for -x, 0 for +x */
 	    /* while arguments look like options ... */
 	    while (arg &&
 		   /* Must begin with - or maybe + */
@@ -387,7 +388,7 @@ execbuiltin(LinkList args, LinkList assigns, Builtin bn)
 		if (*arg) {
 		    if(*arg == Meta)
 			*++arg ^= 32;
-		    zwarnnam(name, "bad option: -%c", *arg);
+		    zwarnnam(name, "bad option: %c%c", "+-"[sense], *arg);
 		    return 1;
 		}
 		arg = *++argv;

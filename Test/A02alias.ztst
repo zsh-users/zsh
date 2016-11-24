@@ -110,3 +110,8 @@
 127:No endless loop with suffix alias in command position
 >You said it.
 ?(eval):1: command not found: thingummy.mysuff
+
+  alias +x; alias -z
+1:error message has the correct sign
+?(eval):alias:1: bad option: +x
+?(eval):alias:1: bad option: -z
