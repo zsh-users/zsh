@@ -1,3 +1,8 @@
+2016-11-25  Laurent Arnoud  <laurent@spkdev.net>
+
+	* 40018 + 40019: Completion/Debian/Command/_apt: Add missing
+	commands to Debian apt completion
+
 2016-11-24  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Unix/Command/_date: fix typo (=+ to +=)

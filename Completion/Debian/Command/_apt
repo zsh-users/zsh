@@ -399,20 +399,32 @@ _apt-cmd () {
     -o,--option:arbitem \
     -t,--target-release:release \
     -- \
-    /$'list\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \
+    /$'list\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'search\0'/ /$'[^\0]#\0'/ ':strings:pattern:' \| \
-    /$'show\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \
+    /$'showsrc\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
+    /$'show\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
+    /$'depends\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
+    /$'rdepends\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
+    /$'policy\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'update\0'/ \| \
     \( \
-    /$'install\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \
-    /$'[^\0/]#/'/ /$'[^\0/]#\0'/ ':release name::_apt_releases' \) \| \
+    /$'install\0'\|$'download\0'\|$'source\0'\|$'build-dep\0'/ \
+      /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \
+       \( \
+       /$'[^\0/]#/'/ /$'[^\0/]#\0'/ ':release name::_apt_releases' \| \
+       /$'[^\0=]#='/ /$'[^\0=]#\0'/ ':package version::_apt_versions_of_binary_package' \
+       \)  \
+    \) \| \
     /$'remove\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'purge\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" installed' \# \| \
     /$'upgrade\0'/ \| \
+    /$'autoclean\0'/ \| \
+    /$'changelog\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'autoremove\0'/ \| \
     /$'full-upgrade\0'/ \| \
+    /$'dist-upgrade\0'/ \| \
     /$'edit-sources\0'/ \| \
-    /"[]"/	':argument-1::compadd "$expl_action[@]" list search show update install remove upgrade full-upgrade edit-sources autoremove purge'
+    /"[]"/	':argument-1::compadd "$expl_action[@]" list search showsrc show depends rdepends policy update install download source build-dep remove upgrade full-upgrade dist-upgrade edit-sources autoclean changelog autoremove purge'
 
   _apt-cmd () {
     local expl_action expl_packages
