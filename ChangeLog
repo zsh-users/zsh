@@ -1,5 +1,7 @@
 2016-11-25  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Functions/Zle/surround: set new vichange flag
+
 	* 40020: Completion/Unix/Command/_cscope: new completion
 
 2016-11-25  Laurent Arnoud  <laurent@spkdev.net>

@@ -19,6 +19,7 @@ local before after
 local -A matching
 matching=( \( \) \{ \} \< \> \[ \] )
 
+zle -f vichange
 case $WIDGET in
   change-*)
     local MARK="$MARK" CURSOR="$CURSOR" call
