@@ -1,3 +1,9 @@
+2016-11-24  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 40013: Completion/Unix/Type/_date_formats,
+	Completion/Zsh/Command/_strftime: process zsh-specific time
+	format extensions correctly
+
 2016-11-25  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Functions/Zle/surround: set new vichange flag

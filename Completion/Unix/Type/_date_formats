@@ -32,7 +32,7 @@ specs=(
   'H:hour (00-23)'
   'I:hour (01-12)'
   'j:day of year (001-366)'
-  'k:hour ( 1-23)'
+  'k:hour ( 0-23)'
   'l:hour ( 1-12)'
   'm:month (01-12)'
   'M:minute (00-59)'
@@ -102,4 +102,4 @@ done
 
 _describe -t date-format-specifier 'date format specifier' specs \
     -p "${(Q)PREFIX:-%}" -S ''
-_message -e date-format-precision 'precision for %%. (1-6)'
+[[ $1 == zsh ]] && _message -e date-format-precision 'precision for %%. (1-6)'
