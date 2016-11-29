@@ -17,7 +17,7 @@ _arguments -A "-*" \
   '(--no-conf --noconf)*'{--no-conf,--noconf}'[do not read any config files]' \
   '*:subcommand and args:->subcmds' && return 0
 
-compset -N '-[^0-9]#' && first=0
+compset -N '-[^0-9]##' && first=0
 compset -N '[,.]' && first=0
 [[ $first -eq 0 ]] || compset -n 2
 
