@@ -1,5 +1,8 @@
 2016-11-29  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 40037: Joshua Rubin: Unicode 9 character width support.
+	Needs enabling with --enable-unicode9.
+
 	* 40035: Eitan Adler: Cosmetic fixes mostly for duplication in
 	comments and documentation.
 

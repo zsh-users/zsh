@@ -2591,6 +2591,18 @@ wmemcpy wmemmove wmemset; do
 ])
 AH_TEMPLATE([MULTIBYTE_SUPPORT],
 [Define to 1 if you want support for multibyte character sets.])
+
+dnl
+dnl unicode9 support
+dnl
+AH_TEMPLATE([ENABLE_UNICODE9],
+[Define to 1 if you want use unicode9 character widths.])
+AC_ARG_ENABLE(unicode9,
+AC_HELP_STRING([--enable-unicode9], [compile with unicode9 character widths]),
+[if test x$enableval = xyes; then
+  AC_DEFINE(ENABLE_UNICODE9)
+fi])
+
 AH_TEMPLATE([BROKEN_WCWIDTH],
 [Define to 1 if the wcwidth() function is present but broken.])
 AH_TEMPLATE([BROKEN_ISPRINT],

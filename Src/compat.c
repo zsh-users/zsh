@@ -635,7 +635,18 @@ strtoul(nptr, endptr, base)
 #endif /* HAVE_STRTOUL */
 
 /**/
-#if defined(BROKEN_WCWIDTH) && (defined(__STDC_ISO_10646__) || defined(__APPLE__))
+#ifdef ENABLE_UNICODE9
+#include "./wcwidth9.h"
+int
+mk_wcwidth(wchar_t ucs)
+{
+  int w = wcwidth9(ucs);
+  if (w < -1)
+    return 1;
+  return w;
+}
+
+#elif defined(BROKEN_WCWIDTH) && (defined(__STDC_ISO_10646__) || defined(__APPLE__))
 
 /*
  * This is an implementation of wcwidth() and wcswidth() (defined in

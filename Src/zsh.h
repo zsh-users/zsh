@@ -3131,7 +3131,9 @@ typedef wint_t convchar_t;
  * much what the definition tells us.  However, we happen to know this
  * works on MacOS which doesn't define that.
  */
-#if defined(BROKEN_WCWIDTH) && (defined(__STDC_ISO_10646__) || defined(__APPLE__))
+#ifdef ENABLE_UNICODE9
+#define WCWIDTH(wc)	mk_wcwidth(wc)
+#elif defined(BROKEN_WCWIDTH) && (defined(__STDC_ISO_10646__) || defined(__APPLE__))
 #define WCWIDTH(wc)	mk_wcwidth(wc)
 #else
 #define WCWIDTH(wc)	wcwidth(wc)
