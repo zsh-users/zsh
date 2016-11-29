@@ -1174,7 +1174,7 @@ checkglobqual(char *str, int sl, int nobareglob, char **sp)
 }
 
 /* Main entry point to the globbing code for filename globbing. *
- * np points to a node in the list list which will be expanded  *
+ * np points to a node in the list which will be expanded  *
  * into a series of nodes.                                      */
 
 /**/

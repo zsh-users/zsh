@@ -4,7 +4,7 @@ local -a type expl_type_arr rsrc rdst paths_allowed
 local -a typearg datasetlist expl mlist
 local expl_type
 
-# -e takes an argument which is passed as as the "descr" argument to _wanted
+# -e takes an argument which is passed as the "descr" argument to _wanted
 # -p indicates that filesystem paths, not just dataset names, are allowed
 # -r1 indicates that we're completing the source of a rename
 # -r2 indicates that we're completing the destination of a rename

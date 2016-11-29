@@ -4,7 +4,7 @@ local arguments eofstr pos=$((CURRENT)) numeofs=0 ret=1 cmdpos=1
 
 #this doesn't handle '--' on the command line, only --
 #it also by extension doesn't handle eofstr being the empty string
-#it also also doesn't handle eofstr being -e or --eof, and everything will
+#it also doesn't handle eofstr being -e or --eof, and everything will
 # probably also be confused if the command at the end takes a -e, --eof= or --
 eofstr=${${${${words[(r)(--eof=*|-e*)]}#--eof=}#-e}:---}
 while {

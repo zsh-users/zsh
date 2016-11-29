@@ -3854,7 +3854,7 @@ The expression tt(<) followed (with no space) by a shell identifier
 causes the value of the variable with that name to be pushed
 onto the stack.  var(ident) may be an integer, in which
 case the previous result with that number (as shown before
-the tt(>) in th standard standard tt(zcalc) prompt) is put on the stack.
+the tt(>) in the standard tt(zcalc) prompt) is put on the stack.
 )
 item(Exchange: tt(xy))(
 The pseudo-function tt(xy) causes the most recent two elements of

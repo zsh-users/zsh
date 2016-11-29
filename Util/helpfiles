@@ -19,7 +19,7 @@
 # This script is called automatically during `make install'
 # unless specified otherwise.
 
-# For usage and and more information see zshcontrib(1).
+# For usage and more information see zshcontrib(1).
 
 sub Usage {
     print(STDERR "Usage: helpfiles zshbuiltins.1 dest-dir [link-file]\n");

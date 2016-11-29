@@ -1,5 +1,8 @@
 2016-11-29  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 40035: Eitan Adler: Cosmetic fixes mostly for duplication in
+	comments and documentation.
+
 	* 40026: Src/Zle/zle_tricky.c: More care with redirection
 	completion.  Fixes for completion after > in "!> ." that
 	should add to sanity.
@@ -3523,7 +3526,7 @@
 
 2015-09-28  Barton E. Schaefer  <schaefer@zsh.org>
 
-	* 36669: Src/lex.c: fix ${(z)...} of an an incomplete math
+	* 36669: Src/lex.c: fix ${(z)...} of an incomplete math
 	expression by restoring "((" at the front of the token
 
 2015-09-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
@@ -9517,7 +9520,7 @@
 2013-07-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 31545: Src/exec.c, Src/parse.c: if FD_CLOEXEC is available,
-	so mark dump file file descriptors, avoiding possible
+	so mark dump file descriptors, avoiding possible
 	multiple use of file descriptors.
 
 2013-07-19  Peter Stephenson  <p.w.stephenson@ntlworld.com>

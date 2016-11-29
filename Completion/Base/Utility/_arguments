@@ -105,7 +105,7 @@ if (( long )); then
 	 continue
        else
 	 # Still no comment, add the previous options anyway.
-         # Add a ':' after the option anyways, to make the the matching of
+         # Add a ':' after the option anyways, to make the matching of
          # the options lateron work as intended.
          # It will be removed again later.
 	 lopts+=("${^tmp[@]}":)

@@ -946,7 +946,7 @@ addmultiword(REFRESH_ELEMENT *base, ZLE_STRING_T tptr, int ichars)
 
 /*
  * Swap the old and new video buffers, plus any associated multiword
- * buffers.  The new buffer becomes the old one; the new new buffer
+ * buffers.  The new buffer becomes the old one; the new buffer
  * will be filled with the command line next time.
  */
 static void

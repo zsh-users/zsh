@@ -2368,7 +2368,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	 * This is the inner handling for the case referred to above
 	 * where we have something like ${${(P)name}...}.
 	 *
-	 * Treat this as as a normal value here; all transformations on
+	 * Treat this as a normal value here; all transformations on
 	 * result are in outer instance.
 	 */
 	aspar = 0;

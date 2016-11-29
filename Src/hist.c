@@ -1038,7 +1038,7 @@ hbegin(int dohist)
     /*
      * pws: We used to test for "|| (inbufflags & INP_ALIAS)"
      * in this test, but at this point we don't have input
-     * set up up so this can trigger unnecessarily.
+     * set up so this can trigger unnecessarily.
      * I don't see how the test at this point could ever be
      * useful, since we only get here when we're initialising
      * the history mechanism, before we've done any input.

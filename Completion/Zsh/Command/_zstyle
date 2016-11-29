@@ -266,7 +266,7 @@ while (( $#state )); do
       _wanted contexts expl "$state_descr" compadd -a patterns
       ;;
 
-    # 'metapatterns': patterns that are are matched not against contexts, but
+    # 'metapatterns': patterns that are matched not against contexts, but
     # against patterns.
     (metapatterns)
       zstyle -g patterns

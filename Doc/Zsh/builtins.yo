@@ -570,7 +570,7 @@ with emulations to be set to their values in tt(sh).  tt(fno) then
 calls tt(fni); because tt(fni) is also marked for sticky tt(sh)
 emulation, no option changes take place on entry to or exit from it.
 Hence the option tt(cshnullglob), turned off by tt(sh) emulation, will
-be turned on within tt(fni) and remain on on return to tt(fno).  On exit
+be turned on within tt(fni) and remain on return to tt(fno).  On exit
 from tt(fno), the emulation mode and all options will be restored to the
 state they were in before entry to the temporary emulation.
 
