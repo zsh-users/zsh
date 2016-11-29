@@ -1305,8 +1305,12 @@ get_comp_string(void)
 	    zsfree(cmdstr);
 	    cmdstr = ztrdup(tokstr);
 	    cmdtok = tok;
-	    /* If everything before is a redirection, don't reset the index */
-	    if (wordpos != redirpos)
+	    /*
+	     * If everything before is a redirection, or anything
+	     * complicated enough that we've seen the word the
+	     * cursor is on, don't reset the index.
+	     */
+	    if (wordpos != redirpos && clwpos == -1)
 		wordpos = redirpos = 0;
 	} else if (tok == SEPER) {
 	    /*
@@ -1414,9 +1418,17 @@ get_comp_string(void)
 	/* If this is the word the cursor is in and we added a `x', *
 	 * remove it.                                               */
 	if (clwpos == wordpos++ && addedx) {
+	    int chuck_at, word_diff;
 	    zlemetacs_qsub = zlemetacs - qsub;
-	    chuck(&clwords[wordpos - 1][((zlemetacs_qsub - wb) >= sl) ?
-				 (sl - 1) : (zlemetacs_qsub - wb)]);
+	    word_diff = zlemetacs_qsub - wb;
+	    /* Ensure we chuck within the word... */
+	    if (word_diff >= sl)
+		chuck_at = sl -1;
+	    else if (word_diff < 0)
+		chuck_at = 0;
+	    else
+		chuck_at = word_diff;
+	    chuck(&clwords[wordpos - 1][chuck_at]);
 	}
     } while (tok != LEXERR && tok != ENDINPUT &&
 	     (tok != SEPER || (lexflags && tt0 == NULLTOK)));
@@ -1464,7 +1476,9 @@ get_comp_string(void)
 	t0 = STRING;
     } else if (t0 == STRING || t0 == TYPESET) {
 	/* We found a simple string. */
-	s = ztrdup(clwords[clwpos]);
+	s = clwords[clwpos];
+	DPUTS(!s, "Completion word has disappeared!");
+	s = ztrdup(s ? s : "");
     } else if (t0 == ENVSTRING) {
 	char sav;
 	/* The cursor was inside a parameter assignment. */
