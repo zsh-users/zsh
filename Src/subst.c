@@ -411,7 +411,9 @@ globlist(LinkList list, int nountok)
 	next = nextnode(node);
 	zglob(list, node, nountok);
     }
-    if (badcshglob == 1)
+    if (noerrs)
+	badcshglob = 0;
+    else if (badcshglob == 1)
 	zerr("no match");
 }
 

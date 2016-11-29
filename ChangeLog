@@ -1,5 +1,7 @@
 2016-11-29  Barton E. Schaefer  <schaefer@brasslantern.com>
 
+	* 40034: Src/subst.c: clear badcshglob when ignoring errors
+
 	* unposted: README: example describing 40032
 
 	* 40032: Src/params.c: consistency in handling of subscript
