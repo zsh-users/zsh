@@ -121,6 +121,45 @@ Previously, only "typeset" commands were output, never using "-g".
 <Tab> would be accepted to mean [Y].  Now <Space> and <Tab> are invalid
 choices: typing either of them remains at the prompt.
 
+9) The $ary[i,j] subscript syntax to take a slice of an array behaves
+differently when both i and j are larger than the number of elements in
+the array.  When i == j, such a slice always yields an empty array, and
+when i < j it always yields an array of one empty string element.  The
+following example illustrates how this differs from past versions.
+
+     nargs() { print $# }
+     a=(one two)
+     for i in 1 2 3 4; do
+      for j in 1 2 3 4 5; do
+       print -n "$i $j => "
+       nargs "${(@)a[i,j]}"
+      done
+     done
+     
+     5.2       |  5.3 **
+     ----------+----------
+     1 1 => 1  |  1 1 => 1
+     1 2 => 2  |  1 2 => 2
+     1 3 => 2  |  1 3 => 2
+     1 4 => 2  |  1 4 => 2
+     1 5 => 2  |  1 5 => 2
+     2 1 => 0  |  2 1 => 0
+     2 2 => 1  |  2 2 => 1
+     2 3 => 1  |  2 3 => 1
+     2 4 => 1  |  2 4 => 1
+     2 5 => 1  |  2 5 => 1
+     3 1 => 0  |  3 1 => 0
+     3 2 => 0  |  3 2 => 0
+     3 3 => 0  |  3 3 => 0
+     3 4 => 0  |  3 4 => 1   **
+     3 5 => 0  |  3 5 => 1   **
+     4 1 => 0  |  4 1 => 0
+     4 2 => 0  |  4 2 => 0
+     4 3 => 0  |  4 3 => 0
+     4 4 => 1  |  4 4 => 0   **
+     4 5 => 1  |  4 5 => 1
+
+
 Incompatibilities between 5.0.8 and 5.2
 ---------------------------------------
 

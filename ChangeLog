@@ -1,3 +1,10 @@
+2016-11-29  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* unposted: README: example describing 40032
+
+	* 40032: Src/params.c: consistency in handling of subscript
+	slices outside the bounds of an array parameter
+
 2016-11-29  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40037: Joshua Rubin: Unicode 9 character width support.

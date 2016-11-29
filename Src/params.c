@@ -2299,9 +2299,16 @@ getarrvalue(Value v)
     if (v->end <= v->start) {
 	s = arrdup_max(nular, 0);
     }
-    else if (arrlen_lt(s, v->start) || v->start < 0) {
+    else if (v->start < 0) {
 	s = arrdup_max(nular, 1);
-    } else {
+    }
+    else if (arrlen_le(s, v->start)) {
+	/* Handle $ary[i,i] consistently for any $i > $#ary
+	 * and $ary[i,j] consistently for any $j > $i > $#ary
+	 */
+	s = arrdup_max(nular, v->end - (v->start + 1));
+    }
+    else {
         /* Copy to a point before the end of the source array:
          * arrdup_max will copy at most v->end - v->start elements,
          * starting from v->start element. Original code said:
