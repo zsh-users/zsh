@@ -1,3 +1,7 @@
+2016-12-01  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 40050: Src/compat.c: prepend /**/ to global functions and #ifdefs
+
 2016-11-30  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40049: NEWS: notes on Unicode 9 (40037).

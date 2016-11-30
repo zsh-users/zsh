@@ -33,7 +33,10 @@
 /* Return pointer to first occurence of string t *
  * in string s.  Return NULL if not present.     */
 
+/**/
 #ifndef HAVE_STRSTR
+
+/**/
 char *
 strstr(const char *s, const char *t)
 {
@@ -48,10 +51,15 @@ strstr(const char *s, const char *t)
     }
     return NULL;
 }
+
+/**/
 #endif
 
 
+/**/
 #ifndef HAVE_GETHOSTNAME
+
+/**/
 int
 gethostname(char *name, size_t namelen)
 {
@@ -65,10 +73,15 @@ gethostname(char *name, size_t namelen)
     strcpy(name, uts.nodename);
     return 0;
 }
+
+/**/
 #endif
 
 
+/**/
 #ifndef HAVE_GETTIMEOFDAY
+
+/**/
 int
 gettimeofday(struct timeval *tv, struct timezone *tz)
 {
@@ -76,20 +89,28 @@ gettimeofday(struct timeval *tv, struct timezone *tz)
     tv->tv_sec = (long)time((time_t) 0);
     return 0;
 }
+
+/**/
 #endif
 
 
 /* compute the difference between two calendar times */
 
+/**/
 #ifndef HAVE_DIFFTIME
+
+/**/
 double
 difftime(time_t t2, time_t t1)
 {
     return ((double)t2 - (double)t1);
 }
+
+/**/
 #endif
 
 
+/**/
 #ifndef HAVE_STRERROR
 extern char *sys_errlist[];
 
@@ -97,11 +118,14 @@ extern char *sys_errlist[];
  * error number, and returns a pointer to that string.    *
  * This is not a particularly robust version of strerror. */
 
+/**/
 char *
 strerror(int errnum)
 {
     return (sys_errlist[errnum]);
 }
+
+/**/
 #endif
 
 
@@ -186,6 +210,7 @@ zpathmax(char *dir)
 }
 #endif /* 0 */
 
+/**/
 #ifdef HAVE_SYSCONF
 /*
  * This is replaced by a macro from system.h if not HAVE_SYSCONF.
@@ -230,6 +255,8 @@ zopenmax(void)
 
     return (max_zsh_fd > openmax) ? max_zsh_fd : openmax;
 }
+
+/**/
 #endif
 
 /*
@@ -532,6 +559,7 @@ output64(zlong val)
 /**/
 #endif /* ZSH_64_BIT_TYPE */
 
+/**/
 #ifndef HAVE_STRTOUL
 
 /*
@@ -569,6 +597,8 @@ output64(zlong val)
  * Ignores `locale' stuff.  Assumes that the upper and lower case
  * alphabets and digits are each contiguous.
  */
+
+/**/
 unsigned long
 strtoul(nptr, endptr, base)
 	const char *nptr;
@@ -632,11 +662,15 @@ strtoul(nptr, endptr, base)
 		*endptr = any ? s - 1 : nptr;
 	return (acc);
 }
+
+/**/
 #endif /* HAVE_STRTOUL */
 
 /**/
 #ifdef ENABLE_UNICODE9
 #include "./wcwidth9.h"
+
+/**/
 int
 mk_wcwidth(wchar_t ucs)
 {
@@ -646,6 +680,7 @@ mk_wcwidth(wchar_t ucs)
   return w;
 }
 
+/**/
 #elif defined(BROKEN_WCWIDTH) && (defined(__STDC_ISO_10646__) || defined(__APPLE__))
 
 /*
