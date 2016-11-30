@@ -7,6 +7,13 @@ Note also the list of incompatibilities in the README file.
 Changes from 5.2 to 5.3
 -----------------------
 
+It is possible to enable character width support for Unicode 9 by
+configuring with `--enable-unicode9'; this compiles in some additional
+tables.  At some point this support may move into a module, in which
+case the configure option will be changed to cause the module to be
+permanently loaded.  This option is not useful unless your terminal also
+supports Unicode 9.
+
 The new word modifier ':P' computes the physical path of the argument.
 It is different from the existing ':a' modifier which always resolves
 '/before/here/../after' to '/before/after', and differs from the

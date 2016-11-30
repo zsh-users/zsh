@@ -1,5 +1,7 @@
 2016-11-30  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 40049: NEWS: notes on Unicode 9 (40037).
+
 	* 40043: Src/Zle/computil.c: fix indentation (recent gcc warns
 	about this).
 
