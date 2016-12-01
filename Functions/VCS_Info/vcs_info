@@ -23,6 +23,7 @@ static_functions=(
     VCS_INFO_hook
     VCS_INFO_maxexports
     VCS_INFO_nvcsformats
+    VCS_INFO_patch2subject
     VCS_INFO_quilt
     VCS_INFO_realpath
     VCS_INFO_reposub
