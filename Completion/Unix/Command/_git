@@ -610,6 +610,7 @@ _git-clone () {
     '(-s --shared)'{-s,--shared}'[share the objects with the source repository (warning: see man page)]' \
     '(-j --jobs)'{-j+,--jobs=}'[specify number of submodules cloned in parallel]:jobs' \
     '--reference[reference repository]:repository:_directories' \
+    '--reference-if-able[reference repository]:repository:_directories' \
     '--dissociate[make the newly-created repository independent of the --reference repository]' \
     '(-q --quiet)'{-q,--quiet}'[operate quietly]' \
     '(-v --verbose)'{-v,--verbose}'[always display the progressbar]' \
@@ -623,6 +624,8 @@ _git-clone () {
     '--template=[directory to use as a template for the object database]: :_directories' \
     '*'{-c,--config}'[<key>=<value> set a configuration variable in the newly created repository]' \
     '--depth[create a shallow clone, given number of revisions deep]: :__git_guard_number depth' \
+    '--shallow-since=[shallow clone since a specific time]:time' \
+    '*--shallow-exclude=[shallow clone excluding commits reachable from specified remote revision]:revision' \
     '(--no-single-branch)--single-branch[clone only history leading up to the main branch or the one specified by -b]' \
     '(--single-branch)--no-single-branch[clone history leading up to each branch]' \
     '--shallow-submodules[any cloned submodules will be shallow]' \
@@ -845,6 +848,9 @@ _git-fetch () {
 
   _arguments -C -S -s \
     $fetch_options \
+    '--shallow-since=[deepen history of shallow repository based on time]:time' \
+    '*--shallow-exclude=[deepen history of shallow clone by excluding revision]:revision' \
+    '--deepen[deepen history of shallow clone]:number of commits' \
     '(-n --no-tags -t --tags)'{-n,--no-tags}'[disable automatic tag following]' \
     '(--all -m --multiple)'{-m,--multiple}'[fetch from multiple remotes]' \
     '*:: :->repository-or-group-or-refspec' && ret=0
@@ -885,7 +891,7 @@ _git-format-patch () {
     '(-n --numbered -N --no-numbered -k --keep-subject)'{-N,--no-numbered}'[name output in \[PATCH\] format]' \
     '--start-number=[start numbering patches at given number]: :__git_guard_number "patch number"' \
     '--numbered-files[use only number for file name]' \
-    '(-n --numbered -N --no-numbered -k --keep-subject --subject-prefix)'{-k,--keep-subject}'[do not strip/add \[PATCH\] from the first line of the commit message]' \
+    '(-n --numbered -N --no-numbered -k --keep-subject --rfc --subject-prefix)'{-k,--keep-subject}"[don't strip/add \[PATCH\] from the first line of the commit message]" \
     '(-s --signoff)'{-s,--signoff}'[add Signed-off-by: line to the commit message]' \
     '(-o --output-directory)--stdout[output the generated mbox on standard output (implies --mbox)]' \
     '(         --no-attach --inline)--attach=-[create attachments instead of inlining patches]::boundary' \
@@ -897,7 +903,8 @@ _git-format-patch () {
     '--in-reply-to=[make the first mail a reply to the given message]:message id' \
     '--ignore-if-in-upstream[do not include a patch that matches a commit in the given range]' \
     '(-v --reroll-count)'{-v+,--reroll-count=}'[mark the series as the <n>-th iteration of the topic]: :__git_guard_number iteration' \
-    '(-k --keep-subject)--subject-prefix=[use the given prefix instead of \[PATCH\]]:prefix' \
+    '(-k --keep-subject --subject-prefix)--rfc[use \[RFC PATCH\] instead of \[PATCH\]]' \
+    '(-k --keep-subject --rfc)--subject-prefix=[use the given prefix instead of \[PATCH\]]:prefix' \
     '*--to=[add To: header to email headers]: :_email_addresses' \
     '*--cc=[add Cc: header to email headers]: :_email_addresses' \
     '--from=[add From: header to email headers]: :_email_addresses' \
@@ -1688,7 +1695,7 @@ _git-status () {
   _arguments -S -s \
     '(-s --short --column --no-column)'{-s,--short}'[output in short format]' \
     $branch_opts \
-    '(-s --short)--porcelain[produce machine-readable output]' \
+    '(-s --short)--porcelain=-[produce machine-readable output]:version:(v1)' \
     '(-u --untracked-files)'{-u-,--untracked-files=-}'[show untracked files]::mode:((no\:"show no untracked files" \
                                                                                      normal\:"show untracked files and directories" \
                                                                                      all\:"also show untracked files in untracked directories (default)"))' \
@@ -3352,6 +3359,7 @@ _git-mergetool () {
     '--tool-help[print a list of merge tools that may be used with "--tool"]' \
     '(-y --no-prompt --prompt)'{-y,--no-prompt}'[do not prompt before invocation of merge resolution program]' \
     '(-y --no-prompt)--prompt[prompt before invocation of merge resolution program]' \
+    '-O-[process files in the order specified in file]:order file:_files' \
     '*:conflicted file:_files'
 }
 
@@ -3652,6 +3660,8 @@ _git-blame () {
     '(-n --show-number)'{-n,--show-number}'[show the line number in the original commit]' \
     '-s[suppress author name and timestamp]' \
     '-w[ignore whitespace when finding lines]' \
+    '--indent-heuristic[use indent-based heuristic to improve diffs]' \
+    '--compaction-heuristic[use blank-line-based heuristic to improve diffs]' \
     $revision_options \
     ':: :__git_revisions' \
     ': :__git_cached_files' && ret=0
@@ -4752,18 +4762,23 @@ _git-write-tree () {
 (( $+functions[_git-cat-file] )) ||
 _git-cat-file () {
   _arguments -S -s \
-    '(- 1)-t[show type of given object]' \
-    '(- 1)-s[show size of given object]' \
-    '(- 1)-e[exit with zero status if object exists]' \
-    '(- 1)-p[pretty-print given object]' \
-    '(- 1)--textconv[show content as transformed by a textconv filter]' \
-    '--allow-unknown-type[allow -s and -t to work with broken/corrupt objects]' \
-    '(- :)--batch=-[print SHA1, type, size and contents (or in specified format)]::format' \
-    '(- :)--batch-check=-[print SHA1, type and size (or in specified format)]::format' \
+    '(-t -s -e -p --allow-unknown-type 1)--textconv[show content as transformed by a textconv filter]' \
+    '(-t -s -e -p --allow-unknown-type 1)--filters[show content as transformed by filters]' \
+    '(-t -s -e -p --allow-unknown-type 1)--path=[use a specific path for --textconv/--filters]:path:_directories' \
+    - query \
+    '(-s -e -p --textconv --filters 1)-t[show type of given object]' \
+    '(-t -e -p --textconv --filters 1)-s[show size of given object]' \
+    '(-e -p --textconv --filters 1)--allow-unknown-type[allow query of broken/corrupt objects of unknown type]' \
+    '(-t -s -p -textconv --filters --allow-unknown-type 1)-e[exit with zero status if object exists]' \
+    '(-t -s -e -textconv --filters --allow-unknown-type 1)-p[pretty-print given object]' \
+    '(-):object type:(blob commit tag tree)' \
+    ': :__git_objects' \
+    - batch \
+    '(--batch-check)--batch=-[print SHA1, type, size and contents (or in specified format)]::format' \
+    '(--batch)--batch-check=-[print SHA1, type and size (or in specified format)]::format' \
     '--follow-symlinks[follow in-tree symlinks (used with --batch or --batch-check)]' \
     '--batch-all-objects[show all objects with --batch or --batch-check]' \
-    '(-):object type:(blob commit tag tree)' \
-    ': :__git_objects'
+    '--buffer[disable flushing of output after each object]'
 }
 
 (( $+functions[_git-diff-files] )) ||
@@ -4900,6 +4915,7 @@ _git-ls-files () {
     '(-s --stage -u --unmerged)--with-tree=[treat paths removed since given tree-ish as still present]: :__git_tree_ishs' \
     '-v[identify each files status (hmrck?)]' \
     '--full-name[force paths to be output relative to the project top directory]' \
+    '--recurse-submodules[recurse through submodules]' \
     '--abbrev=[set minimum SHA1 display-length]: :__git_guard_number length' \
     '--debug[show debugging data]' \
     '*:: :_files'

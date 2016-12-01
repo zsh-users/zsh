@@ -1,5 +1,7 @@
 2016-12-01  Oliver Kiddle  <opk@zsh.org>
 
+	* 40055: Completion/Unix/Command/_git: update for git 2.11.0
+
 	* 40053: Completion/Base/Completer/_external_pwds: exclude
 	current directory of active zsh from completion matches
 
