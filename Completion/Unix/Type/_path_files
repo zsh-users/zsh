@@ -380,6 +380,7 @@ for prepath in "$prepaths[@]"; do
     # to ask why).
     tmp1=${match[1]}
     tpre=${match[2]}
+    tmp2=$tmp1
     tmp1=${tmp1//(#b)\\(?)/$match[1]}
     tpre=${tpre//(#b)\\([^\\\]\[\^\~\(\)\#\*\?])/$match[1]}
     # Theory: donepath needs the quoting of special characters
@@ -388,7 +389,7 @@ for prepath in "$prepaths[@]"; do
     # doing something a bit different.
     tmp3=${donepath//(#b)\\(?)/$match[1]}
     while true; do
-      if [[ -z $path_completion || -d $prepath$realpath$tmp3$tmp1 ]]; then
+      if [[ -z $path_completion || -d $prepath$realpath$tmp3$tmp2 ]]; then
 	tmp3=$tmp3$tmp1/
 	# Now put donepath back the way it should be.  (I think.)
 	donepath=${tmp3//(#b)([\\\]\[\^\~\(\)\#\*\?])/\\$match[1]}
