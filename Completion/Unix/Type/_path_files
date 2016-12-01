@@ -377,11 +377,9 @@ for prepath in "$prepaths[@]"; do
     # on, we need to remove quotes from everything that's not a pattern
     # character, because the code that does the file generation only
     # strips quotes from pattern characters (you know better than
-    # to ask why).  Because we need to test for a real directory,
-    # however, for tmp2 we unquote everything.
+    # to ask why).
     tmp1=${match[1]}
     tpre=${match[2]}
-    tmp2=${(Q)tmp1}
     tmp1=${tmp1//(#b)\\(?)/$match[1]}
     tpre=${tpre//(#b)\\([^\\\]\[\^\~\(\)\#\*\?])/$match[1]}
     # Theory: donepath needs the quoting of special characters
@@ -390,7 +388,7 @@ for prepath in "$prepaths[@]"; do
     # doing something a bit different.
     tmp3=${donepath//(#b)\\(?)/$match[1]}
     while true; do
-      if [[ -z $path_completion || -d $prepath$realpath$tmp3$tmp2 ]]; then
+      if [[ -z $path_completion || -d $prepath$realpath$tmp3$tmp1 ]]; then
 	tmp3=$tmp3$tmp1/
 	# Now put donepath back the way it should be.  (I think.)
 	donepath=${tmp3//(#b)([\\\]\[\^\~\(\)\#\*\?])/\\$match[1]}

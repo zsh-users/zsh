@@ -1,3 +1,9 @@
+2016-12-01  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 40024: Completion/Unix/Type/_path_files: Update _path_files
+	since quoting requirements changed in 39412, this case only
+	triggers when accept-exact-dirs is set.
+
 2016-12-01  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 40050: Src/compat.c: prepend /**/ to global functions and #ifdefs
