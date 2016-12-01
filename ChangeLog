@@ -1,3 +1,8 @@
+2016-12-01  Oliver Kiddle  <opk@zsh.org>
+
+	* 40053: Completion/Base/Completer/_external_pwds: exclude
+	current directory of active zsh from completion matches
+
 2016-12-01  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Functions/VCS_Info/VCS_INFO_patch2subject,

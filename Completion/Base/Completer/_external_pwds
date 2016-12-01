@@ -36,7 +36,7 @@ case $OSTYPE in
     fi
   ;;
 esac
-dirs=( ${(D)dirs} )
+dirs=( ${(D)dirs:#$PWD} )
 
 compstate[pattern_match]='*'
 _wanted directories expl 'current directory from other shell' \
