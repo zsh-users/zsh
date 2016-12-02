@@ -58,7 +58,7 @@ mydit(Archive-Name:) unix-faq/shell/zsh
 mydit(Last-Modified:) 2015/05/31
 mydit(Submitted-By:) email(coordinator@zsh.org (Peter Stephenson))
 mydit(Posting-Frequency:) Monthly
-mydit(Copyright:) (C) P.W. Stephenson, 1995--2015 (see end of document)
+mydit(Copyright:) (C) P.W. Stephenson, 1995--2016 (see end of document)
 )
 
 This document contains a list of frequently-asked (or otherwise
@@ -306,7 +306,7 @@ sect(On what machines will it run?)
 
 sect(What's the latest version?)
 
-  Zsh 5.2 is the latest production version.  For details of all the
+  Zsh 5.3 is the latest production version.  For details of all the
   changes, see the NEWS file in the source distribution.
 
   A beta of the next version is sometimes available.  Development of zsh is

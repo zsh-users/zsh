@@ -1,3 +1,7 @@
+2016-12-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 40066: Etc/FAQ.yo, README: updates for 5.3 release.
+
 2016-12-01  Oliver Kiddle  <opk@zsh.org>
 
 	* 40055: Completion/Unix/Command/_git: update for git 2.11.0
