@@ -1,5 +1,8 @@
 2016-12-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40068: Src/params.c, Test/B02typeset.ztst: Abort execution
+	when setuid/setgid fail.
+
 	* 40067: Src/Zle/comp.h, Src/Zle/complete.c, Src/params.c:
 	internal: Document 'cmatcher', parse_cmatcher(), 'comptoend',
 	unsetparam_pm(), and getindex().

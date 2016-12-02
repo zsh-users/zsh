@@ -4077,7 +4077,7 @@ uidsetfn(UNUSED(Param pm), zlong x)
 {
 #ifdef HAVE_SETUID
     if (setuid((uid_t)x))
-	zwarn("failed to change user ID: %e", errno);
+	zerr("failed to change user ID: %e", errno);
 #endif
 }
 
@@ -4098,7 +4098,7 @@ euidsetfn(UNUSED(Param pm), zlong x)
 {
 #ifdef HAVE_SETEUID
     if (seteuid((uid_t)x))
-	zwarn("failed to change effective user ID: %e", errno);
+	zerr("failed to change effective user ID: %e", errno);
 #endif
 }
 
@@ -4119,7 +4119,7 @@ gidsetfn(UNUSED(Param pm), zlong x)
 {
 #ifdef HAVE_SETUID
     if (setgid((gid_t)x))
-	zwarn("failed to change group ID: %e", errno);
+	zerr("failed to change group ID: %e", errno);
 #endif
 }
 
@@ -4140,7 +4140,7 @@ egidsetfn(UNUSED(Param pm), zlong x)
 {
 #ifdef HAVE_SETEUID
     if (setegid((gid_t)x))
-	zwarn("failed to change effective group ID: %e", errno);
+	zerr("failed to change effective group ID: %e", errno);
 #endif
 }
 

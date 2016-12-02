@@ -711,3 +711,13 @@
   typeset isreadonly=still
 1:typeset returns status 1 if setting readonly variable
 ?(eval):2: read-only variable: isreadonly
+
+  if (( UID )); then
+    UID=$((UID+1)) date; echo "Status is printed, $?"
+  else
+    ZTST_skip="cannot test setuid error when tests run as superuser"
+  fi
+0:when cannot change UID, the command isn't run
+# 'date' did not run.
+>Status is printed, 1
+?(eval):2: failed to change user ID: operation not permitted
