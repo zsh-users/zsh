@@ -67,7 +67,7 @@ char *compiprefix,
      *compexact,
      *compexactstr,
      *comppatinsert,
-     *comptoend,
+     *comptoend,      /* compstate[to_end]; populates 'movetoend' */
      *compoldlist,
      *compoldins,
      *compvared;
@@ -227,7 +227,15 @@ cpcpattern(Cpattern o)
     return r;
 }
 
-/* Parse a string for matcher control, containing multiple matchers. */
+/* 
+ * Parse a string for matcher control, containing multiple matchers.
+ *
+ * 's' is the string to be parsed.
+ *
+ * 'name' is the name of the builtin from which this is called, for errors.
+ *
+ * Return 'pcm_err' on error; a NULL return value means ...
+ */
 
 /**/
 mod_export Cmatcher

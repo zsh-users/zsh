@@ -1,3 +1,9 @@
+2016-12-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 40067: Src/Zle/comp.h, Src/Zle/complete.c, Src/params.c:
+	internal: Document 'cmatcher', parse_cmatcher(), 'comptoend',
+	unsetparam_pm(), and getindex().
+
 2016-12-03  Daniel Hahler  <zsh@thequod.de>
 
 	*  40029: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:

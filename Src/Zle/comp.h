@@ -153,7 +153,9 @@ struct cmatcher {
     Cpattern line;		/* what matches on the line */
     int llen;			/* length of line pattern */
     Cpattern word;		/* what matches in the word */
-    int wlen;			/* length of word pattern */
+    int wlen;			/* length of word pattern, or:
+				    -1: word pattern is one asterisk
+				    -2: word pattern is two asterisks */
     Cpattern left;		/* left anchor */
     int lalen;			/* length of left anchor */
     Cpattern right;		/* right anchor */

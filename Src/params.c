@@ -1761,6 +1761,18 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
     return r;
 }
 
+/*
+ * Parse a subscript.
+ *
+ * pptr: In/Out parameter.  On entry, *ptr points to a "[foo]" string.  On exit
+ * it will point one past the closing bracket.
+ *
+ * v: In/Out parameter.  Its .start and .end members (at least) will be updated
+ * with the parsed indices.
+ *
+ * flags: can be either SCANPM_DQUOTED or zero.  Other bits are not used.
+ */
+
 /**/
 int
 getindex(char **pptr, Value v, int flags)
@@ -3245,7 +3257,11 @@ unsetparam(char *s)
     unqueue_signals();
 }
 
-/* Unset a parameter */
+/* Unset a parameter
+ *
+ * altflag: if true, don't remove pm->ename from the environment
+ * exp: See stdunsetfn()
+ */
 
 /**/
 mod_export int
