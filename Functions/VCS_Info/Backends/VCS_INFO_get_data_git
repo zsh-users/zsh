@@ -232,14 +232,17 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
         local cur=$(< $next)
         local p subject
         for ((p = 1; p < cur; p++)); do
-            git_patches_applied+=("$(printf "%04d" $p) ?")
+            printf -v "git_patches_applied[$p]"  "%04d ?" "$p"
         done
         if [[ -f "${patchdir}/msg-clean" ]]; then
             subject="${$(< "${patchdir}/msg-clean")[(f)1]}"
-        elif [[ -f "${patchdir}/${(l:4::0:)cur}" ]]; then
+        elif local this_patch_file
+             printf -v this_patch_file "%s/%04d" "${patchdir}" "${cur}"
+             [[ -f $this_patch_file ]]
+        then
             () {
               local REPLY
-              VCS_INFO_patch2subject "${patchdir}/${(l:4::0:)cur}"
+              VCS_INFO_patch2subject "${this_patch_file}"
               subject=$REPLY
             }
         fi
