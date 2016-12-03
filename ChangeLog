@@ -1,4 +1,5 @@
 2016-12-03  Daniel Hahler  <zsh@thequod.de>
+
 	*  40029: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	Get subject of current patch in rebase-apply mode
 
