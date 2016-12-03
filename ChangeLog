@@ -1,3 +1,9 @@
+2016-12-04  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 40074: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: rfc822-unfold rebase-apply patch subjects when
+	msg-clean is unavailable.
+
 2016-12-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 40088: Test/D04parameter.ztst: attempt to make output from

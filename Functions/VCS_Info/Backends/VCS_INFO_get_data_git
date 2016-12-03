@@ -237,14 +237,11 @@ elif [[ -d "${gitdir}/rebase-apply" ]]; then
         if [[ -f "${patchdir}/msg-clean" ]]; then
             subject="${$(< "${patchdir}/msg-clean")[(f)1]}"
         elif [[ -f "${patchdir}/${(l:4::0:)cur}" ]]; then
-            local maxlines=10 line
-            while IFS= read -r line;  do
-                if [[ "$line" == "Subject:"* ]]; then
-                    subject=${line/(#s)Subject: /}
-                    break
-                fi
-                (( --maxlines )) || break
-            done < "${patchdir}/${(l:4::0:)cur}"
+            () {
+              local REPLY
+              VCS_INFO_patch2subject "${patchdir}/${(l:4::0:)cur}"
+              subject=$REPLY
+            }
         fi
         if [[ -f "${patchdir}/original-commit" ]]; then
             if [[ -n $subject ]]; then
@@ -270,6 +267,7 @@ elif [[ -f "${gitdir}/MERGE_HEAD" ]]; then
     # This is 'git merge --no-commit'
     local -a heads=( ${(@f)"$(<"${gitdir}/MERGE_HEAD")"} )
     local subject;
+    # TODO: maybe read up to the first blank line
     IFS='' read -r subject < "${gitdir}/MERGE_MSG"
     # $subject is the subject line of the would-be commit
     # Maybe we can get the subject lines of MERGE_HEAD's commits cheaply?
@@ -295,6 +293,7 @@ elif [[ -f "${gitdir}/CHERRY_PICK_HEAD" ]]; then
     # ### be "1".  The %u/%c tuple will assume the values [(1,2), (1,1), (1,0)],
     # ### whereas the correct sequence would be [(1,2), (2,1), (3,0)].
     local subject
+    # TODO: maybe read up to the first blank line
     IFS='' read -r subject < "${gitdir}/MERGE_MSG"
     git_patches_applied=( "$(<${gitdir}/CHERRY_PICK_HEAD) ${subject}" )
     if [[ -f "${gitdir}/sequencer/todo" ]]; then
