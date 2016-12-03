@@ -1,5 +1,7 @@
 2016-12-03  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Test/D04parameter.ztst: regression test for 40071
+
 	* 40071: Src/subst.c: change Dash back to "-" before evaluating
 	named directory expansions
 

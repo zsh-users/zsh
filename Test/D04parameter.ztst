@@ -852,6 +852,7 @@
   foo='b* e*'
   print ${(e)~foo}
   print ${(e)~=foo}
+  setopt nomatch
 0:Rule 10: Re-Evaluation
 >b* e*
 >boringfile evenmoreboringfile
@@ -2049,3 +2050,8 @@
 0:Out-of-range multiple array subscripts with quoting, with and without (@)
 >1
 >0
+
+  a='~-/'; echo $~a
+0:Regression: "-" became Dash in workers/37689, breaking ~- expansion
+*>*
+F:We do not care what $OLDPWD is, as long as it doesn't cause an error
