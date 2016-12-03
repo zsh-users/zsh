@@ -1,3 +1,8 @@
+2016-12-03  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40071: Src/subst.c: change Dash back to "-" before evaluating
+	named directory expansions
+
 2016-12-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 40068: Src/params.c, Test/B02typeset.ztst: Abort execution
@@ -54,7 +59,7 @@
 	* 40036: Completion/Debian/Command/_bts: Complete removal
 	syntaxes correctly.
 
-2016-11-29  Barton E. Schaefer  <schaefer@brasslantern.com>
+2016-11-29  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 40034: Src/subst.c: clear badcshglob when ignoring errors
 

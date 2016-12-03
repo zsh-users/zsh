@@ -650,6 +650,8 @@ filesubstr(char **namptr, int assign)
 	char *ptr, *tmp, *res, *ptr2;
 	int val;
 
+	if (str[1] == Dash)
+	    str[1] = '-';
 	val = zstrtol(str + 1, &ptr, 10);
 	if (isend(str[1])) {   /* ~ */
 	    *namptr = dyncat(home ? home : "", str + 1);
