@@ -97,16 +97,17 @@
 
   PROMPT="" $ZTST_testdir/../Src/zsh -fis <<<'
   unsetopt PROMPT_SP
-  PS2="" PS3="" PS4="" RPS1="" RPS2=""
+  PS1="" PS2="" PS3="" PS4="" RPS1="" RPS2=""
+  exec 2>&1
   foo() {
       print ${1:?no arguments given}
       print not reached
   }
   foo
   print reached
-  '
+  ' 2>/dev/null
 0:interactive shell returns to top level on ${...?...} error
-?foo:1: 1: no arguments given
+*>*foo:1: 1: no arguments given
 >reached
 
   print ${set1:+word1} ${set1+word2} ${null1:+word3} ${null1+word4}
