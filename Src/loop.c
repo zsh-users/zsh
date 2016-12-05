@@ -208,6 +208,7 @@ execfor(Estate state, int do_exec)
     loops--;
     simple_pline = old_simple_pline;
     state->pc = end;
+    this_noerrexit = 1;
     return lastval;
 }
 
@@ -335,6 +336,7 @@ execselect(Estate state, UNUSED(int do_exec))
     loops--;
     simple_pline = old_simple_pline;
     state->pc = end;
+    this_noerrexit = 1;
     return lastval;
 }
 
@@ -472,6 +474,7 @@ execwhile(Estate state, UNUSED(int do_exec))
     popheap();
     loops--;
     state->pc = end;
+    this_noerrexit = 1;
     return lastval;
 }
 
@@ -523,6 +526,7 @@ execrepeat(Estate state, UNUSED(int do_exec))
     loops--;
     simple_pline = old_simple_pline;
     state->pc = end;
+    this_noerrexit = 1;
     return lastval;
 }
 
@@ -573,6 +577,7 @@ execif(Estate state, int do_exec)
 	    lastval = 0;
     }
     state->pc = end;
+    this_noerrexit = 1;
 
     return lastval;
 }
@@ -682,6 +687,7 @@ execcase(Estate state, int do_exec)
 
     if (!anypatok)
 	lastval = 0;
+    this_noerrexit = 1;
 
     return lastval;
 }

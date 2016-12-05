@@ -626,6 +626,76 @@ F:Must be tested with a top-level script rather than source or function
 >before-out
 >before-in
 
+  (setopt err_exit
+  for x in y; do
+    false && true
+  done
+  print OK
+  )
+0:ERR_EXIT not triggered by status 1 at end of for
+>OK
+
+  (setopt err_exit
+  integer x=0
+  while (( ! x++ )); do
+    false && true
+  done
+  print OK
+  )
+0:ERR_EXIT not triggered by status 1 at end of while
+>OK
+
+  (setopt err_exit
+  repeat 1; do
+    false && true
+  done
+  print OK
+  )
+0:ERR_EXIT not triggered by status 1 at end of repeat
+>OK
+
+  (setopt err_exit
+  if true; then
+    false && true
+  fi
+  print OK
+  )
+0:ERR_EXIT not triggered by status 1 at end of if
+>OK
+
+  (setopt err_exit
+  for x in y; do
+    false
+  done
+  print OK
+  )
+1:ERR_EXIT triggered by status 1 within for
+
+  (setopt err_exit
+  integer x=0
+  while (( ! x++ )); do
+    false
+  done
+  print OK
+  )
+1:ERR_EXIT triggered by status 1 within while
+
+  (setopt err_exit
+  repeat 1; do
+    false
+  done
+  print OK
+  )
+1:ERR_EXIT triggered by status 1 within repeat
+
+  (setopt err_exit
+  if true; then
+    false
+  fi
+  print OK
+  )
+1:ERR_EXIT triggered by status 1 within if
+
   if zmodload zsh/system 2>/dev/null; then
   (
     trap 'echo TERM; exit 2' TERM

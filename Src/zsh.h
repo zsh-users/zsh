@@ -1070,6 +1070,7 @@ struct execstack {
     int trapisfunc;
     int traplocallevel;
     int noerrs;
+    int this_noerrexit;
     char *underscore;
 };
 

@@ -46,6 +46,11 @@ enum {
 /**/
 int noerrexit;
 
+/* used to suppress ERREXIT for one occurrence */
+
+/**/
+int this_noerrexit;
+
 /*
  * noerrs = 1: suppress error messages
  * noerrs = 2: don't set errflag on parse error, either
@@ -1238,7 +1243,8 @@ execlist(Estate state, int dont_change_job, int exiting)
     }
     while (wc_code(code) == WC_LIST && !breaks && !retflag && !errflag) {
 	int donedebug;
-	int this_noerrexit = 0, this_donetrap = 0;
+	int this_donetrap = 0;
+	this_noerrexit = 0;
 
 	ltype = WC_LIST_TYPE(code);
 	csp = cmdsp;
@@ -5813,6 +5819,7 @@ execsave(void)
     es->trapisfunc = trapisfunc;
     es->traplocallevel = traplocallevel;
     es->noerrs = noerrs;
+    es->this_noerrexit = this_noerrexit;
     es->underscore = ztrdup(zunderscore);
     es->next = exstack;
     exstack = es;
@@ -5847,6 +5854,7 @@ execrestore(void)
     trapisfunc = en->trapisfunc;
     traplocallevel = en->traplocallevel;
     noerrs = en->noerrs;
+    this_noerrexit = en->this_noerrexit;
     setunderscore(en->underscore);
     zsfree(en->underscore);
     free(en);
