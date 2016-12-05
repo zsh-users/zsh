@@ -1,5 +1,8 @@
 2016-12-05  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 40102: Test/ztst.zsh, Test/C02cond.ztst: create test IO
+	files in newly created temporary directory.
+
 	* 40100: Test/C03traps.ztst: Check ERR_EXIT and ERR_RETURN on
 	anonymous functions: should exit on function return even if
 	suppressed internally.

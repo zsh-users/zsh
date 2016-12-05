@@ -104,19 +104,23 @@ fpath=( $ZTST_srcdir/../Functions/*~*/CVS(/)
         $ZTST_srcdir/../Completion/*/*~*/CVS(/) )
 
 : ${TMPPREFIX:=/tmp/zsh}
+ZTST_tmp=${TMPPREFIX}.ztst.$$
+if ! rm -f $ZTST_tmp || ! mkdir -p $ZTST_tmp || ! chmod go-w $ZTST_tmp; then
+  print "Can't create $ZTST_tmp for exclusive use." >&2
+  exit 1
+fi
 # Temporary files for redirection inside tests.
-ZTST_in=${TMPPREFIX}.ztst.in.$$
+ZTST_in=${ZTST_tmp}/ztst.in
 # hold the expected output
-ZTST_out=${TMPPREFIX}.ztst.out.$$
-ZTST_err=${TMPPREFIX}.ztst.err.$$
+ZTST_out=${ZTST_tmp}/ztst.out
+ZTST_err=${ZTST_tmp}/ztst.err
 # hold the actual output from the test
-ZTST_tout=${TMPPREFIX}.ztst.tout.$$
-ZTST_terr=${TMPPREFIX}.ztst.terr.$$
+ZTST_tout=${ZTST_tmp}/ztst.tout
+ZTST_terr=${ZTST_tmp}/ztst.terr
 
 ZTST_cleanup() {
   cd $ZTST_testdir
-  rm -rf $ZTST_testdir/dummy.tmp $ZTST_testdir/*.tmp(N) \
-    ${TMPPREFIX}.ztst*$$(N)
+  rm -rf $ZTST_testdir/dummy.tmp $ZTST_testdir/*.tmp(N) ${ZTST_tmp}
 }
 
 # This cleanup always gets performed, even if we abort.  Later,

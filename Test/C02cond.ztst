@@ -11,9 +11,9 @@
   typeset -gi isnfs
   [[ "$(find . -prune -fstype nfs 2>/dev/null)" == "." ]] && isnfs=1
   if (( isnfs )) &&
-    (cd -q ${TMPPREFIX:h} >/dev/null 2>&1 &&
+    (cd -q ${ZTST_tmp} >/dev/null 2>&1 &&
      [[ "$(find . -prune -fstype nfs 2>/dev/null)" != "." ]]); then
-    filetmpprefix=${TMPPREFIX}-$$-
+    filetmpprefix=${ZTST_tmp}/condtest-$$-
     isnfs=0
   else
     filetmpprefix=
