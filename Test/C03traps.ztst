@@ -713,6 +713,17 @@ F:Must be tested with a top-level script rather than source or function
   )
 1:ERR_EXIT triggered by status 1 within { }
 
+  (setopt err_exit
+  () {
+     false && true
+     print Still functioning
+     false && true
+  }
+  print OK
+  )
+1:ERR_EXIT triggered by status 1 at end of anon func
+>Still functioning
+
   if zmodload zsh/system 2>/dev/null; then
   (
     trap 'echo TERM; exit 2' TERM

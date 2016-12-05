@@ -1,5 +1,9 @@
 2016-12-05  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 40100: Test/C03traps.ztst: Check ERR_EXIT and ERR_RETURN on
+	anonymous functions: should exit on function return even if
+	suppressed internally.
+
 	* 40097: Src/exec.c, Test/C03traps.ztst: Don't trigger ERR_EXIT
 	or ERR_RETURN on non-zero status after current shell group, either.
 
