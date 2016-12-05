@@ -1,5 +1,8 @@
 2016-12-05  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 40097: Src/exec.c, Test/C03traps.ztst: Don't trigger ERR_EXIT
+	or ERR_RETURN on non-zero status after current shell group, either.
+
 	* 40096: Src/exec.c, Src/loop.c, Src/zsh.h, Test/C03traps.ztst:
 	Don't trigger ERR_EXIT or ERR_RETURN on non-zero status after
 	shell construct.

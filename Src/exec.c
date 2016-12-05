@@ -429,6 +429,7 @@ execcursh(Estate state, int do_exec)
     cmdpop();
 
     state->pc = end;
+    this_noerrexit = 1;
 
     return lastval;
 }

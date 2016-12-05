@@ -664,6 +664,15 @@ F:Must be tested with a top-level script rather than source or function
 >OK
 
   (setopt err_exit
+  {
+    false && true
+  }
+  print OK
+  )
+0:ERR_EXIT not triggered by status 1 at end of { }
+>OK
+
+  (setopt err_exit
   for x in y; do
     false
   done
@@ -695,6 +704,14 @@ F:Must be tested with a top-level script rather than source or function
   print OK
   )
 1:ERR_EXIT triggered by status 1 within if
+
+  (setopt err_exit
+  {
+    false
+  }
+  print OK
+  )
+1:ERR_EXIT triggered by status 1 within { }
 
   if zmodload zsh/system 2>/dev/null; then
   (
