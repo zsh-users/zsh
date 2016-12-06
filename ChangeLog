@@ -1,3 +1,7 @@
+2016-12-06  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk: 5.2-test-2.
+
 2016-12-05  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40102: Test/ztst.zsh, Test/C02cond.ztst: create test IO
