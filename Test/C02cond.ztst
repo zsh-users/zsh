@@ -146,7 +146,7 @@
 
 # can't be bothered with -S
 
-  if [[ ${mtab::="$({mount || /sbin/mount})"} = *[(]?*[)] ]]; then
+  if [[ ${mtab::="$({mount || /sbin/mount || /usr/sbin/mount} 2>/dev/null)"} = *[(]?*[)] ]]; then
     print -u $ZTST_fd 'This test takes two seconds...'
   else
     unmodified_ls="$(ls -lu $unmodified)"

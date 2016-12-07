@@ -1,3 +1,11 @@
+2016-12-06  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40110: Test/B02typeset.ztst: ignore strerror text in test
+	output, it differs by OS
+
+	* 40110: Test/C02cond.ztst: discard stderr when looking for
+	a path to the "mount" command, to avoid spurious test failure
+
 2016-12-06  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 40107: Completion/Linux/Command/_fusermount,
@@ -1921,9 +1929,6 @@
 	Functions/Misc/add-zsh-hook.
 
 2016-06-09  Oliver Kiddle  <opk@zsh.org>
-
-	* 38579: Functions/Zle/bracketed-paste-magic: simplify saving
-	and restoring of state
 
 	* 38641: Completion/Base/Utility/_values: allow for values which
 	resemble compadd options

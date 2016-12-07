@@ -720,4 +720,4 @@
 0:when cannot change UID, the command isn't run
 # 'date' did not run.
 >Status is printed, 1
-?(eval):2: failed to change user ID: operation not permitted
+*?*: failed to change user ID: *
