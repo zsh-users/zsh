@@ -1,5 +1,8 @@
 2016-12-06  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* Zhiming Wang: 40115: Functions/Zle/bracketed-paste-magic:
+	revert 38579 due to bug restoring BUFFER after history search
+
 	* 40110: Test/B02typeset.ztst: ignore strerror text in test
 	output, it differs by OS
 
