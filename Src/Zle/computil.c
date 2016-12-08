@@ -914,7 +914,7 @@ struct cadef {
     int lastt;			/* last time this was used */
     Caopt *single;		/* array of single-letter options */
     char *match;		/* -M spec to use */
-    int argsactive;		/* if arguments are still allowed */
+    int argsactive;		/* if normal arguments are still allowed */
 				/* used while parsing a command line */
     char *set;			/* set name prefix (<name>-), shared */
     char *sname;		/* set name */
@@ -922,7 +922,7 @@ struct cadef {
     char *nonarg;		/* pattern for non-args (-A argument) */
 };
 
-#define CDF_SEP 1
+#define CDF_SEP 1		/* -S was specified: -- terminates options */
 
 /* Description for an option. */
 
@@ -939,11 +939,11 @@ struct caopt {
     int not;			/* don't complete this option (`!...') */
 };
 
-#define CAO_NEXT    1
-#define CAO_DIRECT  2
-#define CAO_ODIRECT 3
-#define CAO_EQUAL   4
-#define CAO_OEQUAL  5
+#define CAO_NEXT    1		/* argument follows in next argument (`-opt:...') */
+#define CAO_DIRECT  2		/* argument follows option directly (`-opt-:...') */
+#define CAO_ODIRECT 3		/* argument may follow option directly (`-opt+:...') */
+#define CAO_EQUAL   4		/* argument follows mandatory equals (`-opt=-:...') */
+#define CAO_OEQUAL  5		/* argument follows optional equals (`-opt=:...') */
 
 /* Description for an argument */
 
@@ -957,7 +957,7 @@ struct caarg {
     char *opt;			/* option name if for an option */
     int num;			/* it's the num'th argument */
     int min;			/* it's also this argument, using opt. args */
-    int direct;			/* number was given directly */
+    int direct;			/* true if argument number was given explicitly */
     int active;			/* still allowed on command line */
     char *set;			/* set name, shared */
 };
@@ -1772,7 +1772,12 @@ ca_get_arg(Cadef d, int n)
     return NULL;
 }
 
-/* Use a xor list, marking options as inactive. */
+/* Mark options as inactive.
+ *   d: option definitions for a set
+ *   pass either:
+ *     xor: a list if exclusions
+ *     opts: if set, all options excluded leaving only nornal/rest arguments
+ * if ca_xor list initialised, exclusions are added to it */
 
 static LinkList ca_xor;
 
@@ -1848,22 +1853,37 @@ ca_inactive(Cadef d, char **xor, int cur, int opts, char *optname)
 
 typedef struct castate *Castate;
 
-/*
- *           **** DOCUMENT ME ****
- *
- * This structure and its use are a nightmare.
- */
+/* Encapsulates details from parsing the current line against a particular set,
+ * Covers positions of options and normal arguments. Used as a linked list
+ * with one state for each set. */
 
 struct castate {
-    Castate snext;
-    Cadef d;
-    int nopts;
-    Caarg def, ddef;
-    Caopt curopt, dopt;
-    int opt, arg, argbeg, optbeg, nargbeg, restbeg, curpos, argend;
-    int inopt, inrest, inarg, nth, doff, singles, oopt, actopts;
-    LinkList args;
-    LinkList *oargs;
+    Castate snext;	/* state for next set */
+    Cadef d;		/* parsed _arguments specs for the set */
+    int nopts;		/* number of specified options (size of oargs) */
+    Caarg def;		/* definition for the current set */
+    Caarg ddef;
+    Caopt curopt;	/* option description corresponding to option found on the command-line */
+    Caopt dopt;
+    int opt;		/* the length of the option up to a maximum of 2 */
+    int arg;		/* completing arguments to an option or rest args */
+    int argbeg;         /* position of first rest argument (+1) */
+    int optbeg;		/* first word after the last option to the left of the cursor:
+			 * in effect the start of any arguments to the current option */
+    int nargbeg;	/* same as optbeg but used during parse */
+    int restbeg;	/* same as argbeg but used during parse */
+    int curpos;		/* current word position */
+    int argend;         /* total number of words */
+    int inopt;		/* set to current word pos if word is a recognised option */
+    int inrest;		/* unused */
+    int inarg;          /* in a normal argument */
+    int nth;		/* number of current normal arg */
+    int doff;		/* length of current option */
+    int singles;	/* argument consists of clumped options */
+    int oopt;
+    int actopts;	/* count of active options */
+    LinkList args;	/* list of non-option args used for populating $line */
+    LinkList *oargs;	/* list of lists used for populating $opt_args */
 };
 
 static struct castate ca_laststate;
@@ -1909,7 +1929,9 @@ ca_opt_arg(Caopt opt, char *line)
     return ztrdup(line);
 }
 
-/* Parse a command line. */
+/* Parse the command line for a particular argument set (d).
+ * Returns 1 if the set should be skipped because it doesn't match
+ * existing options on the line. */
 
 static int
 ca_parse_line(Cadef d, int multi, int first)
@@ -1971,7 +1993,7 @@ ca_parse_line(Cadef d, int multi, int first)
 
 	goto end;
     }
-    if (d->nonarg)
+    if (d->nonarg) /* argument to -A */
 	napat = patcompile(d->nonarg, 0, NULL);
 
     /* Loop over the words from the line. */
@@ -2009,8 +2031,9 @@ ca_parse_line(Cadef d, int multi, int first)
 		return 1;
 	    continue;
 	}
-	/* We've got a definition for an argument, skip to the next. */
 
+	/* We've got a definition for an option/rest argument. For an option,
+	 * this means that we're completing arguments to that option. */
 	if (state.def) {
 	    state.arg = 0;
 	    if (state.curopt)
@@ -2159,8 +2182,7 @@ ca_parse_line(Cadef d, int multi, int first)
 		state.opt = 0;
 	    else
 		state.curopt = NULL;
-	} else if (multi && (*line == '-' || *line == '+') && cur != compcurrent &&
-		ca_get_opt(d, line, 0, NULL)
+	} else if (multi && (*line == '-' || *line == '+') && cur != compcurrent
 #if 0
 		   /**** Ouch. Using this will disable the mutual exclusion
 			 of different sets. Not using it will make the -A
@@ -2177,6 +2199,8 @@ ca_parse_line(Cadef d, int multi, int first)
 		return 1;
 
 	    arglast = 1;
+	    /* if this is the first normal arg after an option, may have been
+	     * earlier normal arguments if they're intermixed with options */
 	    if (state.inopt) {
 		state.inopt = 0;
 		state.nargbeg = cur - 1;
@@ -2526,25 +2550,26 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    if (!(def = get_cadef(nam, args + 1)))
 		return 1;
 
-	    multi = !!def->snext;
+	    multi = !!def->snext; /* if we have sets */
 	    ca_parsed = cap;
 	    ca_xor = (multi ? newlinklist() : NULL);
 
-	    while (def) {
+	    while (def) { /* for each set */
 		use = !ca_parse_line(def, multi, first);
 		nx = ca_xor;
-		ca_xor = NULL;
+		ca_xor = NULL; /* don't want to duplicate the xors in the list */
 		while ((def = def->snext)) {
 		    if (nx) {
 			for (node = firstnode(nx); node; incnode(node)) {
 			    xor[0] = (char *) getdata(node);
 			    if (!strcmp(xor[0], def->sname) ||
 				ca_inactive(def, xor, compcurrent, 0, NULL))
-				break;
+				break; /* exclude this whole set */
 			}
-			if (!node)
+			if (!node) /* continue with this set */
 			    break;
 		    }
+		    /* entire set was excluded, continue to next set */
 		}
 		ca_xor = nx;
 		if (use && def) {
