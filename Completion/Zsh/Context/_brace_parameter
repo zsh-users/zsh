@@ -197,6 +197,7 @@ elif compset -P '*:'; then
       '\:=:unconditionally assign value to parameter'
       '?:print error if parameter is set and non-null'
       '#:filter value matching pattern'
+      '/:replace whole word matching pattern'
       '|:set difference'
       '*:set intersection'
       '^:zip arrays'
