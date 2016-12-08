@@ -1,5 +1,7 @@
 2016-12-08  Oliver Kiddle  <opk@zsh.org>
 
+	* c.f. 40119: Src/zsh.h: correct typo in comment
+
 	* 40114: Completion/Zsh/Context/_brace_parameter: complete
 	:/ with other parameter operators
 

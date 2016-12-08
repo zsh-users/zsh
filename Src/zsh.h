@@ -1589,8 +1589,8 @@ struct zpc_disables_save {
     struct zpc_disables_save *next;
     /*
      * Bit vector of ZPC_COUNT disabled characters.
-     * We'll live dangerously and assumed ZPC_COUNT is no greater
-     * than the number of bits an unsigned int.
+     * We'll live dangerously and assume ZPC_COUNT is no greater
+     * than the number of bits in an unsigned int.
      */
     unsigned int disables;
 };
