@@ -76,7 +76,7 @@ if ((fun)) then
   if [[ $var = *\#\ undefined* ]] then
     var="$(autoload +X $1; functions -- $1)"
   elif [[ -z $var ]] then
-    var="$1() {
+    var="${(q-)1} () {
 }"
   fi
   vared -M zed -m zed-vicmd var && eval function "$var"
