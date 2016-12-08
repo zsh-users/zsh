@@ -26,6 +26,30 @@ The output of "typeset -p" uses "export" commands or the "-g" option
 for parameters that are not local to the current scope.  Previously,
 all output was in the form of "typeset" commands, never using "-g".
 
+vi-repeat-change can repeat user-defined widgets if the widget calls
+zle -f vichange.
+
+The parameter $registers now makes the contents of vi register buffers
+available to user-defined widgets.
+
+New vi-up-case and vi-down-case builtin widgets bound to gU/gu (or U/u
+in visual mode) for doing case conversion.
+
+A new select-word-match function provides vim-style text objects with
+configurable word boundaries using the existing match-words-by-style
+mechanism.
+
+Support for the conditional expression [[ -v var ]] to test if a
+variable is set for compatibility with other shells.
+
+The print and printf builtins have a new option -v to assign the output
+to a variable. This is for bash compatibility but with the additional
+feature that, for an array, a separate element is used each time the
+format is reused.
+
+New x: syntax in completion match specifications make it possible to
+disable match specifications hardcoded in completion functions.
+
 Changes from 5.1.1 to 5.2
 -------------------------
 

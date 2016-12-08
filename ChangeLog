@@ -1,5 +1,7 @@
 2016-12-08  Oliver Kiddle  <opk@zsh.org>
 
+	* 40130: NEWS: mention some changes since 5.2
+
 	* 40129: Src/Zle/computil.c, Test/Y03arguments.ztst:
 	revert 39611, add code comments and test cases for _arguments
 
