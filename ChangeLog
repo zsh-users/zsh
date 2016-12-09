@@ -60,6 +60,12 @@
 	* 54592: Src/Zle/computil.c, Src/module.c: fix two dead
 	assignments reported 15 years ago by clang
 
+2026-05-25  dana  <dana@dana.is>
+
+	* Josh Triplett: unposted: Completion/Debian/Command/_dak,
+	Completion/Debian/Command/_debfoster: completion/debian: Update
+	for new programming language sections
+
 2026-05-23  dana  <dana@dana.is>
 
 	* unposted: Config/version.mk, Etc/FAQ.yo: Test release:

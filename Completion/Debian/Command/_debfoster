@@ -44,10 +44,13 @@ if [[ -n "$state" ]]; then
       ;;
     *(#i)(no|)keepsections*)
       _wanted values expl 'section' compadd \
-	  x11 web utils text tex sound shells science \
-	  otherosfs oldlibs news net misc math mail libs \
-	  interpreters hamradio graphics games electronics \
-	  editors doc devel comm base admin && ret=0
+	  zope xfce x11 web video vcs utils text tex sound shells \
+	  science rust ruby python php perl otherosfs oldlibs ocaml \
+	  news net misc metapackages math mail localization lisp libs \
+	  libdevel kernel kde javascript java introspection \
+	  interpreters httpd haskell hamradio graphics gnustep gnu-r \
+	  gnome games fonts embedded electronics education editors doc \
+	  devel debug database comm cli-mono admin && ret=0
       ;;
     *(#i)guessdepends*)
       _wanted values expl 'name extension' \
