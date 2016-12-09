@@ -51,7 +51,7 @@
  * Note that the input string is itself used as the input buffer: it is not
  * copied, nor is it every written back to, so using a constant string
  * should work.  Consequently, when passing areas of memory from the heap
- * it is necessary that the heap last as long as the operation of reading
+ * it is necessary that that heap last as long as the operation of reading
  * the string.  After the string is read, the stack should be popped with
  * inpop(), which effectively flushes any unread input as well as restoring
  * the previous input state.

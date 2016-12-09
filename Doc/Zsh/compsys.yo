@@ -144,8 +144,8 @@ directory mentioned in the tt(fpath) parameter, and should be autoloaded
 few utility functions, arrange for all the necessary shell functions to be
 autoloaded, and will then re-define all widgets that do completion to use the
 new system.  If you use the tt(menu-select) widget, which is part of the
-tt(zsh/complist) module, you should make sure that the module is loaded
-before the call to tt(compinit) so that the widget is also
+tt(zsh/complist) module, you should make sure that that module is loaded
+before the call to tt(compinit) so that that widget is also
 re-defined.  If completion styles (see below) are set up to perform
 expansion as well as completion by default, and the TAB key is bound to
 tt(expand-or-complete), tt(compinit) will rebind it to tt(complete-word);

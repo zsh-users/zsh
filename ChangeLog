@@ -1,3 +1,8 @@
+2016-12-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 40117: Doc/Zsh/compsys.yo, Src/input.c: Revert a hunk of
+	40035 that changed semantics incorrectly.
+
 2016-12-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Test/D07multibyte.ztst: minor typos.
