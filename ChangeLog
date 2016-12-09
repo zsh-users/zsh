@@ -1,3 +1,9 @@
+2016-12-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 40138: Test/D07multibyte.ztst: Put the regex test last as it
+	has an additional dependency, and note this in a failure
+	message.
+
 2016-12-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 40126: Functions/Misc/zed: zed (fned): When editing a new
