@@ -40,14 +40,13 @@
 >NO:{a}
 >NO:{b}
 
-# it ought to be possible to include the quoted backslash here
- tst_arguments ':desc2:((a\:a\ value b\:other\\value))'
+ tst_arguments ':desc2:((a\:a\ value b\:other\\\\value))'
  comptest $'tst \t'
 0:a and b with descriptions
 >line: {tst }{}
 >DESCRIPTION:{desc2}
 >NO:{a  -- a value}
->NO:{b  -- othervalue}
+>NO:{b  -- other\value}
 
  tst_arguments ':desc1:(arg1)' ':desc2:(arg2)' ':desc3:(arg3)'
  comptest $'tst \t\t\t\C-w\C-w\C-w\C-d'
@@ -430,7 +429,6 @@
 >line: {tst -h -}{}
 >MESSAGE:{no arguments}
 
-# this would ideally not offer -b as it is already on the command-line
  tst_arguments -a '(-a)-b'
  comptest $'tst - -b\C-b\C-b\C-b\t'
 0:exclusion only applies to later words
@@ -438,8 +436,8 @@
 >DESCRIPTION:{option}
 >NO:{-a}
 >NO:{-b}
+F:shouldn't offer -b as it is already on the command-line
 
-# ideally, would handle exclusion within the current word
  tst_arguments -s : '(-d)-a' -b -c -d
  comptest $'tst -ab\t -\t\eb\eb \C-b-\t'
 0:exclusion with clumped options, in, after and before
@@ -454,17 +452,18 @@
 >NO:{-b}
 >NO:{-c}
 >NO:{-d}
+F:the first tab press shouldn't offer -d since -a is on the command line
 
  tst_arguments '-a:arg' -b '(-b)-c'
  comptest $'tst -a -c -\t'
 0:exclusion with option argument that looks like an option
 >line: {tst -a -c -}{}
 >MESSAGE:{no arguments}
-# seems we don't handle this case, ideal result would be as follows
-#>line: {tst -a -c -}{}
-#>DESCRIPTION:{option}
-#>NO:{-b}
-#>NO:{-c}
+F:The current behaviour is wrong; the correct expected output is:
+F:>line: {tst -a -c -}{}
+F:>DESCRIPTION:{option}
+F:>NO:{-b}
+F:>NO:{-c}
 
  tst_arguments --abc --aah :arg:
  comptesteval 'setopt bashautolist automenu'

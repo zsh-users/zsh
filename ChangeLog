@@ -1,5 +1,8 @@
 2016-12-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40139: Test/Y03arguments.ztst: tests: Convert comments to
+	diagnostics; test backslashes. (after 40129)
+
 	* users/22182: Completion/Zsh/Context/_brace_parameter: Propagate
 	22161 docs patch to completion descriptions.
 
