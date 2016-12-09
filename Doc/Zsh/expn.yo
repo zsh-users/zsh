@@ -1394,7 +1394,8 @@ item(tt(B))(
 Include the index of the beginning of the match in the result.
 )
 item(tt(E))(
-Include the index of the end of the match in the result.
+Include the index one character past the end of the match in the result
+(note this is inconsistent with other uses of parameter index).
 )
 item(tt(M))(
 Include the matched portion in the result.
