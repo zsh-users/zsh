@@ -3123,6 +3123,15 @@ completion continues to allow other completers such as tt(_expand) to
 expand the pattern. The standard tt(add-space) and tt(prefix-hidden)
 styles are observed.
 )
+findex(_external_pwds)
+item(tt(_external_pwds))(
+Completes current directories of other zsh processes belonging to the
+current user.
+
+This is intended to be used via tt(_generic), bound to a custom key
+combination. Note that pattern matching is enabled so matching is
+performed similar to how it works with the tt(_match) completer.
+)
 findex(_history)
 item(tt(_history))(
 Complete words from the shell's command  history.  This completer 

@@ -1,3 +1,7 @@
+2016-12-09  Oliver Kiddle  <opk@zsh.org>
+
+	* 40137: Doc/Zsh/compsys.yo: document _external_pwds
+
 2016-12-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk: 5.2-test-3.
