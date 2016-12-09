@@ -37,7 +37,7 @@ case $cmd in
   '(-n --no-action)'{-n,--no-action}'[do not do anything]'
   '(-s --suite)'{-s,--suite=}':suite:_values -s , "suite list" oldstable stable testing unstable experimental'
   ':package:_deb_packages avail'
-  ':section:(admin base comm contrib/admin contrib/comm contrib/devel contrib/doc contrib/games contrib/graphics contrib/interpreters contrib/kde contrib/libdevel contrib/libs contrib/mail contrib/math contrib/misc contrib/net contrib/otherosfs contrib/perl contrib/python contrib/science contrib/sound contrib/tex contrib/text contrib/utils contrib/web contrib/x11 devel doc editors electronics embedded games gnome graphics hamradio interpreters kde libdevel libs mail math misc net news non-free/admin non-free/base non-free/comm non-free/devel non-free/doc non-free/editors non-free/electronics non-free/games non-free/graphics non-free/hamradio non-free/libdevel non-free/libs non-free/mail non-free/math non-free/misc non-free/net non-free/news non-free/otherosfs non-free/python non-free/science non-free/sound non-free/tex non-free/text non-free/utils non-free/web non-free/x11 oldlibs otherosfs perl python science shells sound tex text utils web x11)'
+  ':section:({,contrib/,non-free/}{admin,cli-mono,comm,database,debug,devel,doc,editors,education,electronics,embedded,fonts,games,gnome,gnu-r,gnustep,graphics,hamradio,haskell,httpd,interpreters,introspection,java,javascript,kde,kernel,libdevel,libs,lisp,localization,mail,math,metapackages,misc,net,news,ocaml,oldlibs,otherosfs,perl,php,python,ruby,rust,science,shells,sound,tex,text,utils,vcs,video,web,x11,xfce,zope})'
   ':priority:(extra important optional required standard)'
     )
     ;;

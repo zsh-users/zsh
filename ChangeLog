@@ -1,3 +1,9 @@
+2026-05-25  dana  <dana@dana.is>
+
+	* Josh Triplett: unposted: Completion/Debian/Command/_dak,
+	Completion/Debian/Command/_debfoster: completion/debian: Update
+	for new programming language sections
+
 2026-05-26  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 54615: Src/exec.c: fix ambiguous dangling from 54595
