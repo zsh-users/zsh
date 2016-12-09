@@ -549,7 +549,7 @@
     "↓"
   }
   : $functions)
-0:Multibtye handled of functions parameter
+0:Multibtye handling of functions parameter
 
   if [[ -n ${$(locale -a 2>/dev/null)[(R)pl_PL.utf8]} ]]; then
   (
@@ -562,7 +562,7 @@
     print ?
   )
   else
-    ZTST_skip="No Polish UTF-8 local found, skipping sort test"
+    ZTST_skip="No Polish UTF-8 locale found, skipping sort test"
   fi
 0:Sorting of metafied Polish characters
 >a ą b c ć d e ę f

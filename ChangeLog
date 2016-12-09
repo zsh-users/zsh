@@ -1,5 +1,7 @@
 2016-12-09  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Test/D07multibyte.ztst: minor typos.
+
 	* 40138: Test/D07multibyte.ztst: Put the regex test last as it
 	has an additional dependency, and note this in a failure
 	message.
