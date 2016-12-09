@@ -1,5 +1,7 @@
 2016-12-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Config/version.mk: 5.2-test-3.
+
 	* users/22161: Doc/Zsh/expn.yo: the (E) parameter flag is one
 	after every other use of indexing.
 
