@@ -179,7 +179,7 @@ if [[ $PREFIX = *'${('[^\)]# ]]; then
     "S:search substrings in #, %, / expressions"
     "I:search <argument>th match in #, %, / expressions"
     "B:include index of beginning of match in #, %, / expressions"
-    "E:include index of end of match in #, %, / expressions"
+    "E:include index of one past end of match in #, %, / expressions"
     "M:include matched portion in #, %, / expressions"
     "N:include length of match in #, % expressions"
     "R:include rest (unmatched portion) in #, %, / expressions"
