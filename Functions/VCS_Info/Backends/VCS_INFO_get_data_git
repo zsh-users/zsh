@@ -221,7 +221,7 @@ elif [[ -d "${gitdir}/rebase-merge" ]]; then
         git_patches_applied+=("$p")
     done
     if [[ -f "${patchdir}/git-rebase-todo" ]] ; then
-        git_patches_unapplied=(${(f)"$(grep -v '^$' "${patchdir}/git-rebase-todo" | grep -v '^#')"})
+        git_patches_unapplied=( ${${(f)${"$(<"${patchdir}/git-rebase-todo")"}}:#[#]*} )
     fi
     VCS_INFO_git_handle_patches
 elif [[ -d "${gitdir}/rebase-apply" ]]; then

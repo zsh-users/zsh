@@ -1,5 +1,8 @@
 2016-12-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40149: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: Avoid a fork.
+
 	* 40203: Test/B03print.ztst: Resolve 'printf --' question from
 	grandparent commit (thanks Chet).
 
