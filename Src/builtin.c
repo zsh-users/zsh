@@ -4092,7 +4092,7 @@ bin_print(char *name, char **args, Options ops, int func)
     char *start, *endptr, *c, *d, *flag, *buf = NULL, spec[14], *fmt = NULL;
     char **first, **argp, *curarg, *flagch = "'0+- #", save = '\0', nullstr = '\0';
     size_t rcount = 0, count = 0;
-    size_t *cursplit, *splits = 0;
+    size_t *cursplit = 0, *splits = 0;
     FILE *fout = stdout;
 #ifdef HAVE_OPEN_MEMSTREAM
     size_t mcount;

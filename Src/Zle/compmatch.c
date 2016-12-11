@@ -674,7 +674,7 @@ match_str(char *l, char *w, Brinfo *bpp, int bc, int *rwlp,
 		     *
 		     * operation.  Similar to savw.
 		     */
-		    char savl;
+		    char savl = 0;
 		    /*
 		     * The anchor on this end.
 		     */
