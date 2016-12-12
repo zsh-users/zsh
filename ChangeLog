@@ -1,3 +1,8 @@
+2016-12-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk: update to 5.3-dev-0 to avoid
+	clash with installed 5.3.
+
 2016-12-10  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 40134: Src/builtin.c, Src/Zle/compmatch.c: silence spurious
