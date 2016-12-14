@@ -322,3 +322,17 @@
  typeset -p foo
 0:printf to an array variable without format string reuse
 >typeset foo=string
+
+ printf -
+ printf - -
+ printf --
+ printf -- -
+ printf -- --
+ printf -x -v foo
+ # Final print for newline on stdout
+ print
+0:regression test of printf with assorted ambiguous options or formats
+>------x
+?(eval):printf:3: not enough arguments
+F:There is some question whether "printf --" should be an error as above,
+F:or should treat "--" as the format string.  Bash agrees on the error.

@@ -100,7 +100,7 @@ static struct builtin builtins[] =
 
     BUILTIN("popd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 1, BIN_POPD, "q", NULL),
     BUILTIN("print", BINF_PRINTOPTS, bin_print, 0, -1, BIN_PRINT, "abcC:Df:ilmnNoOpPrRsSu:v:x:X:z-", NULL),
-    BUILTIN("printf", 0, bin_print, 1, -1, BIN_PRINTF, "v:", NULL),
+    BUILTIN("printf", BINF_SKIPINVALID | BINF_SKIPDASH, bin_print, 1, -1, BIN_PRINTF, "v:", NULL),
     BUILTIN("pushd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_PUSHD, "qsPL", NULL),
     BUILTIN("pushln", 0, bin_print, 0, -1, BIN_PRINT, NULL, "-nz"),
     BUILTIN("pwd", 0, bin_pwd, 0, 0, 0, "rLP", NULL),

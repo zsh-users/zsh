@@ -1,3 +1,9 @@
+2016-12-14  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* 40179: Src/builtin.c: fix handling of "printf -" and "printf --"
+
+	* unposted: Test/B03print.ztst: regression for 40179 / 37467
+
 2016-12-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk: update to 5.3-dev-0 to avoid
