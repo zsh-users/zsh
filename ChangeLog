@@ -1,5 +1,8 @@
 2017-01-27  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Zach Whaley: 40200: Completion/Unix/Command/_perforce: update
+	for latest Perforce versions.
+
 	* 40425: configure.ac, Src/watch.c: HAVE_* tests for getutxent
 	etc.
 

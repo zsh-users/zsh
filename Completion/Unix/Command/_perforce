@@ -3,7 +3,7 @@
 # Maintainer: Peter Stephenson <pws@csr.com>.
 
 # Increasingly loosely based on _cvs version 1.17.
-# Completions currently based on Perforce release 2010.2.
+# Completions currently based on Perforce release 2016.1.
 
 # Styles, tags and contexts
 # =========================
@@ -460,7 +460,7 @@ _perforce_call_p4() {
   # This is for our own use for parsing, and we need English output,
   # so...
   local +x P4LANGUAGE
-  _call_program $cp_tag p4 "${_perforce_global_options[@]}" "$@"
+  _call_program $cp_tag command p4 "${_perforce_global_options[@]}" "$@"
 }
 
 
@@ -1656,11 +1656,12 @@ _perforce_variables() {
 (( $+functions[_perforce_cmd_add] )) ||
 _perforce_cmd_add() {
   _arguments -s : \
-    '-c+[select by change]:change:_perforce_changes -tc' \
-    '-d[reopen removed file for add (downgrade)]' \
+    '-c[add files to change]:change:_perforce_changes -tc' \
+    '-d[reopen files for add]' \
     '-f[allow filenames with wild cards]' \
-    '-n[display operation without doing it]' \
-    '-t+[set file type]:file type:_perforce_filetypes' \
+    '-I[do not perform ignore checking]' \
+    '-n[preview add]' \
+    '-t[set file type]:file type:_perforce_filetypes' \
     '*:file:_perforce_files -tu'
 }
 
@@ -1682,15 +1683,15 @@ _perforce_cmd_admin() {
       shift words
       (( CURRENT-- ))
       _arguments -s : \
-	'-z[gzip journal file]' \
-	'1::journal file prefix: '
+        '-z[gzip journal file]' \
+        '1::journal file prefix: '
       ;;
 
       (dbstat)
       shift words
       (( CURRENT -- ))
       _arguments -s : \
-	'-s[show sizes]'
+        '-s[show sizes]'
     esac
   fi
 }
@@ -1701,11 +1702,17 @@ _perforce_cmd_annotate() {
   # New in release 2002.2.
   # -c was new in about 2003.2.
   _arguments -s : \
-    '-a[all, show both added and deleted lines]' \
-    '-c[output change numbers instead of revisions]' \
-    '-i[follow branches (integration records)]' \
-    '-I[follow integrations to get change numbers]' \
-    '-q[quiet, suppress one-line file header]' \
+    '-a[include deleted files and lines]' \
+    '-c[output change numbers]' \
+    '-d-[select whitespace option]:whitespace option:((
+b\:ignore\ whitespace\ changes
+w\:ignore\ whitespace
+l\:ignore\ line\ endings))' \
+    '-i[follow branches]' \
+    '-I[follow all integrations]' \
+    '-q[suppress one-line header]' \
+    '-t[display binary files]' \
+    '-u[output user and date]' \
     '*::file:_perforce_files -tR'
 }
 
@@ -1718,11 +1725,12 @@ _perforce_cmd_attribute() {
   # If -f is present, search unopened files, else don't
   [[ ${words[(I)-f]} -eq 0 ]] && limit=" -to"
   _arguments -s : \
-    '-e[value is in hex]' \
-    '-f[set the attribute on a submitted file]' \
-    '-n[set name of attribute]:attribute: ' \
-    '-p[propagate attribute when opened for edit etc.]' \
-    '-v[set value of attribute]:value: ' \
+    '-n[attribute name]:name: ' \
+    '-v[attribute value]:value: ' \
+    '-e[use hex value]' \
+    '-f[set attribute on submitted file]' \
+    '-p[propagate attribute when opened]' \
+    '(-v)-i[read attribute from standard input]' \
     "*::file:_perforce_files$limit"
 }
 
@@ -1730,10 +1738,12 @@ _perforce_cmd_attribute() {
 (( $+functions[_perforce_cmd_branch] )) ||
 _perforce_cmd_branch() {
   _arguments -s : \
-    '(-o)-f[force operation by superuser]' \
-    '(-o -i)-d[delete branch]' \
-    '(-d -i -f)-o[write specification to standard output]' \
-    '(-d -o)-i[read specification from standard input]' \
+    '(-o -S -P)-f[force operation]' \
+    '(-o -i -S -P)-d[delete branch]' \
+    '(-d -i -f)-o[write branch spec to standard output]' \
+    '(-d -o -S -P)-i[read branch spec from standard input]' \
+    '(-f -d -i)-S[expose internally generated mapping]:stream: ' \
+    '(-f -d -i)-P[treat stream as a child of parent stream]:parent stream: ' \
     '(-i)*::branch name:_perforce_branches'
 }
 
@@ -1741,9 +1751,11 @@ _perforce_cmd_branch() {
 (( $+functions[_perforce_cmd_branches] )) ||
 _perforce_cmd_branches() {
   _arguments -s : \
-    '-e[limit by wildcard]:wildcard on branches: ' \
-    '-u+[select by user]:user:_perforce_users' \
-    '-m+[set maximum to show]:max branches: '
+    '(-E)-e[list branches that match pattern]:pattern: ' \
+    '(-e)-E[list branches that match case-insensitive pattern]:case-insensitive pattern: ' \
+    '-u[list branches owned by user]:user:_perforce_users' \
+    '-m[limit output to max branches]:max branches: ' \
+    '-t[display time and date]'
 }
 
 
@@ -1761,14 +1773,18 @@ _perforce_cmd_change() {
     fi
   fi
   _arguments -s : \
-    '(-o)-f[allow force by superuser]' \
-    '-s[joblist includes the fix status]' \
-    '(-o -i)-d[discard newly created pending change]' \
-    '(-d -i -f)-o[output specification to standard output]' \
-    '(-d -o)-i[read specification from standard input]' \
-    '(-d -o)-u[force change of jobs or description by owner]' \
-    "(-i)1::change:_perforce_changes$ctype" \
-    '-t[specify visibility type]:visibility type:(public restricted)'
+    '-f[force update of change]' \
+    '-s[include fix status in job list]' \
+    '(-u -I -o -i -t -U)-d[delete change]' \
+    '(-u -d -o -i -t -U --serverid)-o[write change spec to the standard output]' \
+    '(-O -I -d -o -i -t -U --serverid)-i[read change spec from the standard input]' \
+    '(-s -d -o -i --serverid)-t[set type of change]:type:(public restricted)' \
+    '-U[set user of empty change]:user:_perforce_users' \
+    '-O[change is original number before submit]' \
+    '-I[change is number of Identity field]' \
+    '-u[force update of submitted change]' \
+    '(-s -u -O -I -o -i -t -U)--serverid[specify server]:server ID: ' \
+    "(-i)1::change:_perforce_changes$ctype"
 }
 
 
@@ -1782,13 +1798,15 @@ _perforce_cmd_changelist() {
 _perforce_cmd_changes() {
   _arguments -s : \
     '-i[include integrated changes]' \
-    '-t[output time as well as date]' \
-    '-l[long output, full change text]' \
-    '-L[long output, truncated change text]' \
-    '-c+[select by client]:client:_perforce_clients' \
-    '-m+[most recent N changes]:max changes: ' \
-    '-s+[select by status]:status:(pending shelved submitted)' \
-    '-u+[select by user]:user:_perforce_users' \
+    '-t[display time and date]' \
+    '-l[display full change text]' \
+    '-L[display truncated change text]' \
+    '-f[view restricted changes]' \
+    '-c[display changes submitted by client]:client:_perforce_clients' \
+    '-e[display changes above this change]:change:_perforce_changes' \
+    '-m[limit to max changes]:max changes: ' \
+    '-s[limit output to changes with status]:status:(pending shelved submitted)' \
+    '-u[display changes owned by user]:user:_perforce_users' \
     '*::file:_perforce_files -tR'
 }
 
@@ -1799,14 +1817,33 @@ _perforce_cmd_changelists() {
 }
 
 
+(( $+functions[_perforce_cmd_clean] )) ||
+_perforce_cmd_clean() {
+  _arguments -s : \
+    '-e[clean modified files]' \
+    '-a[clean added files]' \
+    '-d[clean deleted files]' \
+    '-I[do not perform ignore checking]' \
+    '-l[output relative paths]' \
+    '-n[preview clean]' \
+    '*:file:_perforce_files -tu'
+}
+
+
+
 (( $+functions[_perforce_cmd_client] )) ||
 _perforce_cmd_client() {
   _arguments -s : \
-    '(-o)-f[force modification by superuser]' \
-    '-t[use template]:template client:_perforce_clients' \
-    '(-o -i -t)-d[delete client]' \
-    '(-d -i -f)-o[print to standard output]' \
-    '(-d -o -t)-i[read from standard input]' \
+    '-f[force update of client]' \
+    '-Fs[force delete with shelved changes]' \
+    '(-t -o -S -c -s -i)-d[delete client]' \
+    '(-f -d -Fs -s -i --serverid)-o[write client spec to standard output]' \
+    '(-t -d -Fs -i --serverid)-S[create new client dedicated to stream]:stream: ' \
+    '(-d -Fs -o -c -i --serverid)-s[switch client view without opening editor]' \
+    '(-t -d -Fs -o -S -c -s --serverid)-i[read client spec from standard input]' \
+    '-t[use client as template]:client:_perforce_clients' \
+    '(-f -t -d -Fs -s -i --serverid)-c[yield client spec for stream at moment change was recorded]:change:_perforce_changes -ts' \
+    '--serverid[specify server]:server ID: ' \
     '1::file:_perforce_clients'
 }
 
@@ -1814,34 +1851,59 @@ _perforce_cmd_client() {
 (( $+functions[_perforce_cmd_clients] )) ||
 _perforce_cmd_clients() {
   _arguments -s : \
-    '-e[limit by wildcard]:wildcard on clients: ' \
-    '-u+[select by user]:user:_perforce_users' \
-    '-m+[set maximum to show]:max clients: '
+    '-t[display time and date]' \
+    '-u[list clients owned by user]:user:_perforce_users' \
+    '(-E)-e[list clients that match pattern]:pattern: ' \
+    '(-e)-E[list clients that match case-insensitive pattern]:case-insensitive pattern: ' \
+    '-m[limit to max clients]:max clients: ' \
+    '-S[limit output to clients dedicated to stream]:stream: ' \
+    '-U[list unloaded clients]' \
+    '(-s)-a[display all clients]' \
+    '(-a)-s[display clients dedicated to server]:server ID: '
 }
 
 
 (( $+functions[_perforce_cmd_copy] )) ||
 _perforce_cmd_copy() {
-  local range
-  # If -s is present, the first normal argument can't have revRange.
-  [[ ${words[(I)-s]} -eq 0 ]] && range=" -tR"
+  local -a fileargs
+  if [[ ${words[(I)-b*]} -ne 0 ]]; then
+    if [[ ${words[(I)-*s*]} -eq 0 ]]; then
+      # with -b and no -s, all files are to-files (but -s may come later)
+      fileargs=('*::to file:_perforce_files -tR')
+    else
+      # with -b and -s we have one from-file and any number of to-files
+      fileargs=('*::to file:_perforce_files')
+    fi
+  elif [[ ${words[(I)-(S|P)]} -ne 0 ]]; then
+      fileargs=('*::file:_perforce_files -tR')
+  else
+    # with no -b we have one from-file and one to-file
+    fileargs=('1::from file:_perforce_files -tR'
+              '2::to file:_perforce_files')
+  fi
   _arguments -s : \
-    '-b[select branch]:branch:_perforce_branches' \
-    '-c[select change for copy]:change:_perforce_changes -tc' \
-    '-n[no action, dummy run]' \
-    '-r[reverse direction of copy with branch]' \
-    '-s[select source with -b]:source file:_perforce_files -tR' \
-    '-v[leave newly copied files uncopied till sync]' \
-    "1:file:_perforce_files$range" \
-    '*::file:_perforce_files'
+    '-b[use branch view'\''s source and target]:branch:_perforce_branches' \
+    '-s[select source file, use branch view as target]:source file:_perforce_files -tR' \
+    '-r[reverse direction of copy]' \
+    '-c[open files in change]:change:_perforce_changes -tc' \
+    '-f[force creation of extra revisions]' \
+    '-n[preview copy]' \
+    '-m[limit copy to max files]:max files: ' \
+    '-q[suppress normal output messages]' \
+    '-v[do not modify client files]' \
+    '(-b -s)-S[copy from stream to its parent]:stream: ' \
+    '(-b -s)-P[generate branch view using a parent stream]:parent stream: ' \
+    '(-b -s)-F[copy against stream'\''s expected flow]' \
+    $fileargs
 }
 
 (( $+functions[_perforce_cmd_counter] )) ||
 _perforce_cmd_counter() {
   _arguments -s : \
     '-d[delete counter]' \
-    '-f[force setting of internal counter]' \
-    '-i[increment by one atomically]' \
+    '-f[set or delete internal counter]' \
+    '-i[increment counter by 1]' \
+    '-m[allow multiple operations]' \
     '1:counter:_perforce_counters' \
     '(-d -i)2::numeric value:_perforce_counter_values'
 }
@@ -1849,8 +1911,9 @@ _perforce_cmd_counter() {
 
 (( $+functions[_perforce_cmd_counters] )) ||
 _perforce_cmd_counters() {
-  # No arguments
-  _arguments -s :
+  _arguments -s : \
+    '-e[list counters that match pattern]:pattern: ' \
+    '-m[limit to max counters]:max counters: '
 }
 
 
@@ -1884,8 +1947,10 @@ _perforce_cmd_dbstat() {
 (( $+functions[_perforce_cmd_delete] )) ||
 _perforce_cmd_delete() {
   _arguments -s : \
-    '-c[select change for deletion]:change:_perforce_changes -tc' \
-    '-n[show deletions without doing them]' \
+    '-c[delete files for change]:change:_perforce_changes -tc' \
+    '-n[preview delete]' \
+    '-k[perform delete on server]' \
+    '-v[delete unsynced files]' \
     '*::file:_perforce_files'
 }
 
@@ -1893,9 +1958,11 @@ _perforce_cmd_delete() {
 (( $+functions[_perforce_cmd_depot] )) ||
 _perforce_cmd_depot() {
   _arguments -s : \
-    '-d[delete depot]' \
-    '-o[print to stdout]' \
-    '-i[read name from stdin]' \
+    '(-t -o -i)-d[delete depot]' \
+    '(-t -o -i)-f[force delete]' \
+    '(-d -o -i)-t[insert value into type]:type: ' \
+    '(-t -d -i -f)-o[write depot spec to standard output]' \
+    '(-t -d -o -f)-i[read depot spec from standard input]' \
     '(-i)*::depot name:_perforce_depots'
 }
 
@@ -1910,9 +1977,20 @@ _perforce_cmd_depots() {
 (( $+functions[_perforce_cmd_describe] )) ||
 _perforce_cmd_describe() {
   _arguments -s : \
-    '-d-[select diff option]:diff option:((b\:ignore\ blanks c\:context n\:RCS s\:summary u\:unified w\:ignore\ all\ whitespace))' \
-    '-s[short form]' \
-    '-S[show shelved changes]' \
+    '-d-[diff options]:diff options:((
+n\:RCS
+c\:context
+s\:summary
+u\:unified
+b\:ignore\ whitespace\ changes
+w\:ignore\ whitespace
+l\:ignore\ line\ endings))' \
+    '-s[omit diffs]' \
+    '-S[list shelved files]' \
+    '-f[force display of restricted change]' \
+    '-O[change is original number before submit]' \
+    '-I[change is number of Identity field]' \
+    '-m[limit output to max files]:max files: ' \
     '*::change:_perforce_changes'
 }
 
@@ -1920,17 +1998,27 @@ _perforce_cmd_describe() {
 (( $+functions[_perforce_cmd_diff] )) ||
 _perforce_cmd_diff() {
   local limit
-  [[ ${words[(I)-(f|sd|se)]} -eq 0 ]] && limit=" -to"
+  [[ ${words[(I)-(f|sd|se|sl)]} -eq 0 ]] && limit=" -to"
   _arguments -s : \
-    '-d-[select diff option]:diff option:((b\:ignore\ blanks c\:context l\:ignore\ line\ endings n\:RCS s\:summary u\:unified w\:ignore\ all\ whitespace))' \
+    '-d-[diff options]:diff options:((
+n\:RCS
+c\:context
+s\:summary
+u\:unified
+b\:ignore\ whitespace\ changes
+w\:ignore\ whitespace
+l\:ignore\ line\ endings))' \
     '-f[diff every file]' \
-    '-m+[set maximum files to show]:max files: ' \
-    '(-sd -se -sl -sr)-sa[opened files, different or missing]' \
-    '(-sa -se -sl -sr)-sd[unopened files, missing]' \
-    '(-sa -sd -sl -sr)-se[unopened files, different]' \
-    '(-sa -sd -se -sr)-sl[all unopened files with status]' \
-    '(-sa -sd -se -sl)-sr[opened files, same as depot]' \
-    '-t[include non-text files]' \
+    '-m[limit output to max files]:max files: ' \
+    '-Od[limit output to files that differ]' \
+    '-s-[filter options]:filter options:((
+a\:list\ opened\ files\ that\ differ\ from\ depot
+b\:list\ modified\ integrated\ files
+d\:list\ unopened\ missing\ files
+e\:list\ unopened\ files\ that\ differ\ from\ depot
+l\:list\ all\ unopened\ files\ with\ status
+r\:list\ opened\ files\ that\ do\ not\ differ\ from\ depot))' \
+    '-t[diff binary files]' \
     "*::file:_perforce_files$limit"
 }
 
@@ -1938,22 +2026,33 @@ _perforce_cmd_diff() {
 (( $+functions[_perforce_cmd_diff2] )) ||
 _perforce_cmd_diff2() {
   _arguments -s : \
-    '-b[specify branch view]:branch name:_perforce_branches' \
-    '-d-[select diff option]:diff option:((b\:ignore\ blanks c\:context n\:RCS s\:summary u\:unified w\:ignore\ all\ whitespace))' \
-    '-q[only list different files]' \
-    '-t[include non-text files]' \
-    '-u[use patch-friendly output]' \
-    '1::first file:_perforce_files' \
-    '2::second file:_perforce_files'
+    '-b[use branch view'\''s source and target]:branch:_perforce_branches' \
+    '-d-[diff options]:diff options:((
+n\:RCS
+c\:context
+s\:summary
+u\:unified
+b\:ignore\ whitespace\ changes
+w\:ignore\ whitespace
+l\:ignore\ line\ endings))' \
+    '-Od[limit output to files that differ]' \
+    '-q[omit identical files]' \
+    '-t[diff binary files]' \
+    '-u[use GNU diff -u format]' \
+    '(-b)-S[use generated branch view from stream]:stream: ' \
+    '(-b)-P[use generated branch view from parent stream]:parent stream: ' \
+    '1::from file:_perforce_files' \
+    '2::to file:_perforce_files'
 }
 
 
 (( $+functions[_perforce_cmd_dirs] )) ||
 _perforce_cmd_dirs() {
   _arguments -s : \
-    '-C[only dirs on current client]' \
-    '-D[include dirs with deleted files]' \
-    '-H[only dirs on the `have'\'' list]' \
+    '-C[list only directories in current client]' \
+    '-D[include directories with only deleted files]' \
+    '-H[list directories with synced files]' \
+    '-S[limit output to depot directories mapped to stream'\''s client]:stream: ' \
     '*::directory:_perforce_files -td'
 }
 
@@ -1961,10 +2060,10 @@ _perforce_cmd_dirs() {
 (( $+functions[_perforce_cmd_edit] )) ||
 _perforce_cmd_edit() {
   _arguments -s : \
-    '-c[set change for edit]:change:_perforce_changes -tc' \
-    '-k[no resync from server]' \
-    '-n[show files to edit without opening them]' \
-    '-t[set filetype]:filetype:_perforce_filetypes' \
+    '-c[edit files for change]:change:_perforce_changes -tc' \
+    '-t[specify filetype]:filetype:_perforce_filetypes' \
+    '-n[preview edit]' \
+    '-k[edit files on server]' \
     '*::file:_perforce_files'
 }
 
@@ -1986,14 +2085,15 @@ _perforce_cmd_export() {
 (( $+functions[_perforce_cmd_filelog] )) ||
 _perforce_cmd_filelog() {
   _arguments -s : \
-    '-c[select by changelist]:change:_perforce_changes -ts' \
-    '-h[follow branc/copy from records]' \
-    '-i[follow branches]' \
-    '-l[long output, full change text]' \
-    '-L[long output, truncated change text]' \
-    '-m[set maximum number of revisions to show]:max revisions: ' \
-    '-s[short output]' \
-    '-t[include time with date]' \
+    '-c[display files at change]:change:_perforce_changes -ts' \
+    '-i[include inherited file history]' \
+    '-h[display file content history]' \
+    '-t[display time and date]' \
+    '-l[display full change text]' \
+    '-L[display truncated change text]' \
+    '-m[display max number of revisions]:max revisions: ' \
+    '-p[do not follow content of promoted task streams]' \
+    '-s[display shortened form]' \
     '*::file:_perforce_files'
 }
 
@@ -2001,7 +2101,11 @@ _perforce_cmd_filelog() {
 (( $+functions[_perforce_cmd_files] )) ||
 _perforce_cmd_files() {
   _arguments -s : \
-    '-a[display all revisions in given range]' \
+    '-a[display all revisions in range]' \
+    '-A[display files in archive depots]' \
+    '-e[do not display deleted, purged or archived files]' \
+    '-m[limit output to max files]:max files: ' \
+    '-U[display files in unload depot]' \
     '*::file:_perforce_files -tR'
 }
 
@@ -2024,10 +2128,9 @@ _perforce_cmd_fix() {
   fi
 
   _arguments -s : \
-    '-d[delete the fix]' \
-    '-s[set job status]:status:_perforce_statuses' \
-    '1::-c required:(-c)' \
-    '2::change:_perforce_changes' \
+    '-d[delete fix]' \
+    '-s[set status]:status:_perforce_statuses' \
+    '-c[display jobs fixed by change]:change:_perforce_changes -ts' \
     "*::job:_perforce_jobs$job"
 }
 
@@ -2035,10 +2138,10 @@ _perforce_cmd_fix() {
 (( $+functions[_perforce_cmd_fixes] )) ||
 _perforce_cmd_fixes() {
   _arguments -s : \
+    '-j[list fixes for job]:job:_perforce_jobs' \
+    '-c[list fixes for change]:change:_perforce_changes -tR' \
     '-i[include integrated changes]' \
-    '-j[select by job]:job:_perforce_jobs' \
-    '-c[select by change]:change:_perforce_changes' \
-    '-m[set max fixes to show]:max fixes: ' \
+    '-m[limit output to max fixes]:max fixes: ' \
     '*::fixed file:_perforce_files -tR'
 }
 
@@ -2047,8 +2150,12 @@ _perforce_cmd_fixes() {
 _perforce_cmd_flush() {
   _arguments -s : \
     '-f[force resynchronisation]' \
-    '-k[bypass client file update]' \
-    '-n[show operations but don'\''t perform them]' \
+    '-L[use full depot syntax, including revision number]' \
+    '-n[preview flush]' \
+    '-N[preview flush with summary]' \
+    '-q[suppress normal output messages]' \
+    '-r[reopen moved files in new location]' \
+    '-m[limit sync to max files]:max files: ' \
     '*::file:_perforce_files -tR'
 }
 
@@ -2058,26 +2165,46 @@ _perforce_cmd_fstat() {
   local Oattr Aattr
   if [[ ${_perforce_cmd_list[(r)attribute:*]} != '' ]]; then
     # Unsupported feature, try not to show if not present
-    Oattr=' a\:show\ attributes d\:attributes\ digest e\:attributes\ in\ hex'
+    Oattr=' a\:output\ attributes d\:output\ digest e\:output\ values\ in\ hex'
     Aattr='-A[restrict attributes by pattern]:attribute pattern: '
   fi
   _arguments -s : \
-    '-c+[affected since change]:change:_perforce_changes -ts' \
-    '-e+[affected by change]:change:_perforce_changes -ts' \
-    '-C[select mapped files (-Rc)]' \
-    '-F[pick filter for files]:filter:_perforce_fstat_fields -tv' \
-    '-H[select synced files (-Rh)]' \
-    '-W[select opened files (-Ro)]' \
-    '-l[include fileSize, possibly slow (-Ol)]' \
-    '-m[set max files to show]:max files: ' \
-    "-O-[select output type]:output type:((f\:all\ revisions l\:fileSize p\:client\ path\ format r\:pending\ integrations s\:exclude\ local\ path$Oattr))" \
-    '-P[output clientFile in full Perforce syntax (deprecated: use -Op)]' \
-    '-r[show in reverse order]' \
-    '-R-[restrict selected files]:restriction:((c\:mapped\ in\ client h\:synced\ to\ client n\:not\ synced\ to\ head o\:opened r\:resolved s\:shelved u\:unresolved))' \
-    '-s[shorten, no client-related data (deprecated: use -Os)]' \
-    '-S-[changes sort order]:sort criterion:((t\:filetype d\:date r\:head\ revision h\:have\ revision s\:filesize))' \
-    '-T[select output fields]:output field:_perforce_fstat_fields' \
     $Aattr \
+    '-F[list only files satisfying filter]:filter:_perforce_fstat_fields -tv' \
+    '-L[use full depot syntax, including revision number]' \
+    '-T[return specified fields]:output field:_perforce_fstat_fields' \
+    '-m[limits output to max files]:max files: ' \
+    '-r[sort output in reverse order]' \
+    '-c[display files modified by or after change]:change:_perforce_changes -ts' \
+    '-e[list files modified by change]:change:_perforce_changes -ts' \
+    "-O-[output options]:output options:((
+f\:all\ revisions
+l\:fileSize\ and\ digest
+p\:local\ file\ path
+r\:pending\ integration
+s\:exclude\ local\ path
+$Oattr))" \
+    '-R-[restrict files]:file restrictions:((
+c\:mapped\ in\ client
+h\:synced\ to\ client
+n\:opened\ not\ at\ head\ revision
+o\:opened
+r\:resolved
+s\:shelved
+u\:unresolved))' \
+    '-S-[sort order]:sort by:((
+t\:filetype
+d\:date
+r\:head\ revision
+h\:have\ revision
+s\:filesize))' \
+    '-U[display info about unload files in unload depot]' \
+    '-C[limit output to mapped files (-Rc)]' \
+    '-H[limit output to synced files (-Rh)]' \
+    '-W[limit output to opened files (-Ro)]' \
+    '-l[output fileSize and digest (-Ol)]' \
+    '-P[output local file paths (-Op)]' \
+    '-s[exclude local file paths (-Os)]' \
     '*::file:_perforce_files'
 }
 
@@ -2085,22 +2212,21 @@ _perforce_cmd_fstat() {
 (( $+functions[_perforce_cmd_grep] )) ||
 _perforce_cmd_grep() {
   _arguments -s : \
+    '-e[search pattern]:pattern: ' \
     '-a[search all revisions]' \
     '-i[case insensitive match]' \
-    '-n[display matching line]' \
-    '-v[display file name]' \
-    '-F[interpret as fixed string]' \
-    '-G[interpret as regexp (default)]' \
-    '-L[list non-matching file/revisions]' \
-    '-l[list matching file/revisions]' \
-    '-s[suppresses errors on long lines]' \
-    '-t[treat all files as text]' \
-    '-A[]:trailing context lines: ' \
-    '-V[]:leading context lines: ' \
-    '-C[]:context lines: ' \
-    '1:-e required before pattern:(-e)' \
-    '2:pattern: ' \
-    '*::file:_perforce_files'
+    '-n[display matching line number]' \
+    '-v[display files with non-matching lines]' \
+    '-F[interpret pattern as fixed string]' \
+    '-G[interpret pattern as regexp]' \
+    '-L[display non-matching files]' \
+    '-l[display matching files]' \
+    '-s[suppress errors on long lines]' \
+    '-t[search binary files]' \
+    '-A[display N lines of trailing context]:lines: ' \
+    '-B[display N lines of leading context]:lines: ' \
+    '-C[display N lines of output context]:lines: ' \
+    '*::file:_perforce_files -tR'
 }
 
 
@@ -2108,9 +2234,10 @@ _perforce_cmd_grep() {
 _perforce_cmd_group() {
   _arguments -s : \
     '-d[delete group]' \
-    '-o[output to stdout]' \
-    '-i[read from stdin]' \
-    '(-o)-a[allow non-super owner to modify group]' \
+    '-o[write group spec to standard output]' \
+    '-i[read group spec from standard input]' \
+    '(-o -A)-a[allow owner to modify group]' \
+    '(-a -d)-A[allow admin user to add new group]' \
     '1::perforce group:_perforce_groups'
 }
 
@@ -2118,10 +2245,13 @@ _perforce_cmd_group() {
 (( $+functions[_perforce_cmd_groups] )) ||
 _perforce_cmd_groups() {
   _arguments -s : \
-    '-i[show indirect membership by subgroups]' \
-    '-m[set max groups to show]:max groups: ' \
-    '-v[show summary data]' \
-    '1::user or group name:_perforce_users_or_groups'
+    '-i[display indirect membership by subgroups]' \
+    '-m[limit output to max groups]:max groups: ' \
+    '-v[display group data]' \
+    '(-u -o)-g[display group with name]:group:_perforce_groups' \
+    '(-g -o)-u[display all groups for user]:user:_perforce_users' \
+    '(-g -u)-o[display all groups for owner]:owner:_perforce_users' \
+    '(-g -u -o)1::user or group name:_perforce_users_or_groups'
 }
 
 
@@ -2141,7 +2271,7 @@ _perforce_cmd_help() {
     _perforce_help_list=($_perforce_cmd_list)
     _perforce_call_p4 help help | while read -A hline; do
       if [[ $hline[1] = p4 && $hline[2] = help ]]; then
-	_perforce_help_list+=("$hline[3]:${hline[4,-1]}")
+        _perforce_help_list+=("$hline[3]:${hline[4,-1]}")
       fi
     done
     if [[ -z ${_perforce_help_list[(r)undoc:*]} ]]; then
@@ -2155,7 +2285,7 @@ _perforce_cmd_help() {
 (( $+functions[_perforce_cmd_info] )) ||
 _perforce_cmd_info() {
   _arguments -s : \
-    '-s[don'\''t check for unknown users or clients]'
+    '-s[short output]'
 }
 
 
@@ -2165,24 +2295,26 @@ _perforce_cmd_integrate() {
   # If -s is present, the first normal argument can't have revRange.
   [[ ${words[(I)-s]} -eq 0 ]] && range=" -tR"
   _arguments -s : \
-    '-b[select branch]:branch:_perforce_branches' \
-    '-c[select change for integration]:change:_perforce_changes -tc' \
-    '-f[force reintegration]' \
-    '-d[reintegrate deleted files]' \
-    '-D-[specify allowed deletions]:deletion type:((
-t\:rebranch\ on\ deleted\ file
-s\:delete\ modified\ target\ file
-i\:ignore\ readded\ source\ file
-))' \
-    '-h[integrate to revision had on client]' \
-    '-i[integrate if no common file base]' \
-    '-I[same as -i from 2004.2]' \
-    '-n[no action, dummy run]' \
-    '-o[display base file name for subsequent resolve]' \
-    '-r[reverse direction of integration with branch]' \
-    '-s[select source with -b]:source file:_perforce_files -tR' \
-    '-t[propagate type changes]' \
-    '-v[leave newly branched files uncopied till sync]' \
+    '-b[use branch view'\''s source and target]:branch:_perforce_branches' \
+    '(-r)-s[select source file, use branch view as target]:source file:_perforce_files -tR' \
+    '-f[force integration]' \
+    '-O-[output more information]:output options:((
+b\:show\ base\ revision\ for\ merge
+r\:show\ scheduled\ resolves))' \
+    '-R-[specify resolve schedule]:schedule:((
+b\:branch\ resolves
+d\:delete\ resolves
+s\:skip\ cherry-picked\ revisions\ already\ integrated))' \
+    '-Di[retain revisions of deleted files]' \
+    '-h[leave files at revision currently synced]' \
+    '-m[limit integration to max files]:max files: ' \
+    '-n[preview integration]' \
+    '-q[suppress normal output messages]' \
+    '-c[open in change]:change:_perforce_changes -tc' \
+    '-v[do not modify client files]' \
+    '-r[reverse direction of mapping]' \
+    '-S[use generated branch view from stream]:stream: ' \
+    '-P[use generated branch view from parent stream]:parent stream: ' \
     "1:file:_perforce_files$range" \
     '*::file:_perforce_files'
 }
@@ -2196,8 +2328,8 @@ _perforce_cmd_integ() {
 (( $+functions[_perforce_cmd_integrated] )) ||
 _perforce_cmd_integrated() {
   _arguments -s : \
-    '-r[reverse mapping in branch view with -b]' \
-    '-b[select files integrated via branch]:branch:_perforce_branches' \
+    '-r[reverse mapping in branch view]' \
+    '-b[list files integrated from branch view]:branch:_perforce_branches' \
     '*::file:_perforce_files -ti'
 }
 
@@ -2211,24 +2343,41 @@ _perforce_cmd_interchanges() {
   if [[ ${words[(I)-b*]} -ne 0 ]]; then
     if [[ ${words[(I)-*s*]} -eq 0 ]]; then
       # with -b and no -s, all files are to-files (but -s may come later)
-      fileargs=('-s[specify source file]'
-	        '*::to file:_perforce_files -tR')
+      fileargs=('*::to file:_perforce_files -tR')
     else
       # with -b and -s we have one from-file and any number of to-files
-      fileargs=('1::from file:_perforce_files -tR'
-	        '*::to file:_perforce_files')
+      fileargs=('*::to file:_perforce_files')
     fi
+  elif [[ ${words[(I)-(S|P)]} -ne 0 ]]; then
+      fileargs=('*::file:_perforce_files -tR')
   else
     # with no -b we have one from-file and one to-file
     fileargs=('1::from file:_perforce_files -tR'
               '2::to file:_perforce_files')
   fi
   _arguments -s : \
-    '-f[show individual files]' \
-    '-l[long changelist description]' \
-    '-b[select files integrated via branch]:branch:_perforce_branches' \
-    '-r[reverse branch mapping]' \
+    '-f[list files that require integration]' \
+    '-l[display full change text]' \
+    '-t[display time and date]' \
+    '(-S -P)-b[use branch view'\''s source and target]:branch:_perforce_branches' \
+    '(-S -P)-s[select source file, use branch view as target]:source file:_perforce_files -tR' \
+    '-u[limit files submitted by user]:user:_perforce_users' \
+    '-r[reverse mapping direction]' \
+    '-S[use generated branch view from stream]:stream: ' \
+    '-P[use generated branch view from parent stream]:parent stream: ' \
+    '-F[ignore stream'\''s expected flow]' \
     $fileargs
+}
+
+
+(( $+functions[_perforce_cmd_istat] )) ||
+_perforce_cmd_istat() {
+  _arguments -s : \
+    '-a[show status of integration in both directions]' \
+    '-c[assume cache is stale]' \
+    '-r[show status of integration from parent]' \
+    '-s[show cached state without refreshing stale data]' \
+    '1::stream: '
 }
 
 
@@ -2237,8 +2386,8 @@ _perforce_cmd_job() {
   _arguments -s : \
     '(-d -o -i)-f[force setting of readonly fields]' \
     '(-f -o -i)-d[delete job]' \
-    '(-f -d -i)-o[print to stdout]' \
-    '(-d -o)-i[read from stdin]' \
+    '(-f -d -i)-o[write job spec to standard output]' \
+    '(-d -o)-i[read job spec from standard input]' \
     '(-i)1::job:_perforce_jobs'
 }
 
@@ -2246,12 +2395,12 @@ _perforce_cmd_job() {
 (( $+functions[_perforce_cmd_jobs] )) ||
 _perforce_cmd_jobs() {
   _arguments -s : \
-    '-e[select by jobview]:jobview:_perforce_jobviews' \
-    '-i[included integrated changes]' \
-    '-l[long output, full job descriptions]' \
-    '-r[reverse order of job names]' \
-    '-m[limit to most recent N jobs]:number of most recent jobs: ' \
-    '(-e -i -l -m)-R[rebuild jobs table on upgrade]' \
+    '-e[list jobs matching parameter]::_perforce_jobviews' \
+    '-i[include integrated changes]' \
+    '-l[display full job text]' \
+    '-m[limit output to max jobs]:max jobs: ' \
+    '-r[sort in reverse order]' \
+    '(-e -i -l -m)-R[rebuild jobs table]' \
     '*::file:_perforce_files -tR'
 }
 
@@ -2264,14 +2413,41 @@ _perforce_cmd_jobspec() {
 }
 
 
+(( $+functions[_perforce_cmd_key] )) ||
+_perforce_cmd_key() {
+  local -a keyargs
+  if [[ ${words[(I)-(d|i)]} -ne 0 ]]; then
+    keyargs=('1::name: ')
+  elif [[ ${words[(I)-m]} -ne 0 ]]; then
+    keyargs=('*::name value pairs: ')
+  else
+    keyargs=('1::name: ' '2::value: ')
+  fi
+  _arguments -s : \
+    '(-i -m)-d[delete key]' \
+    '(-d -m)-i[increment key value by 1]' \
+    '(-d -i)-m[allow mulitple operations]' \
+    $keyargs
+}
+
+
+(( $+functions[_perforce_cmd_keys] )) ||
+_perforce_cmd_keys() {
+  _arguments -s : \
+    '-e[list keys that match pattern]:pattern: ' \
+    '-m[limit output to max keys]:max keys: '
+}
+
+
 (( $+functions[_perforce_cmd_label] )) ||
 _perforce_cmd_label() {
   _arguments -s : \
     '-f[force operation]' \
-    '-t+[copy template]:template: ' \
+    '-t[copy view and options from label]:label:_perforce_labels' \
     '(-o -i -t)-d[delete label]' \
-    '(-d -f -i)-o[write to standard output]' \
-    '(-o -d -t)-i[read from standard input]' \
+    '(-d -f -i -g)-o[write label spec to standard output]' \
+    '(-o -d -t)-i[read label spec from standard input]' \
+    '-g[update global label]' \
     '*::label:_perforce_labels'
 }
 
@@ -2279,10 +2455,14 @@ _perforce_cmd_label() {
 (( $+functions[_perforce_cmd_labels] )) ||
 _perforce_cmd_labels() {
   _arguments -s : \
-    '-e[limit by wildcard]:label wildcard: ' \
-    '-m+[set maximum to show]:max labels: ' \
-    '-t[output time as well as date]' \
-    '-u+[select by user]:user:_perforce_users' \
+    '-t[display time and date]' \
+    '-u[list labels owned by user]:user:_perforce_users' \
+    '(-E)-e[list labels that match pattern]:pattern: ' \
+    '(-e)-E[list labels that match case-insensitive pattern]:case-insensitive pattern: ' \
+    '-m[limit output to max labels]:max labels: ' \
+    '(-s)-a[display all labels]' \
+    '(-a)-s[display labels from server]:server ID: ' \
+    '-U[list unloaded labels]' \
     '1::file or revisions which must contain label:_perforce_files -tR'
 }
 
@@ -2290,11 +2470,23 @@ _perforce_cmd_labels() {
 (( $+functions[_perforce_cmd_labelsync] )) ||
 _perforce_cmd_labelsync() {
   _arguments -s : \
+    '-l[specify label]:label:_perforce_labels' \
     '-a[add files to label]' \
     '-d[delete files from label]' \
-    '-n[no effect, dummy run]' \
-    '-l[specify label]:label:_perforce_labels' \
-    '-q[suppress informational messages]' \
+    '-n[preview labelsync]' \
+    '-q[suppress normal output messages]' \
+    '-g[update global label]' \
+    '*::file:_perforce_files -tR'
+}
+
+
+(( $+functions[_perforce_cmd_list] )) ||
+_perforce_cmd_list() {
+  _arguments -s : \
+    '-l[use temporary list name]:list name: ' \
+    '(-C)-d[delete list]' \
+    '-C[limit files to client]' \
+    '-M[forward list to master server]' \
     '*::file:_perforce_files -tR'
 }
 
@@ -2310,7 +2502,8 @@ _perforce_cmd_license() {
 (( $+functions[_perforce_cmd_lock] )) ||
 _perforce_cmd_lock() {
   _arguments -s : \
-    '-c[select by change]:change:_perforce_changes -tc' \
+    '-c[lock files for change]:change:_perforce_changes -tc' \
+    '-g[lock files globally]' \
     '*::file:_perforce_files -to'
 }
 
@@ -2324,8 +2517,8 @@ _perforce_cmd_lockstat() {
 (( $+functions[_perforce_cmd_logger] )) ||
 _perforce_cmd_logger() {
   _arguments -s : \
-    '-c[limit by counter no]:number: ' \
-    '-t[use counter instead of logger]:counter:_perforce_counters'
+    '-c[list events after sequence]:sequence: ' \
+    '-t[list events after counter]:counter:_perforce_counters'
 }
 
 
@@ -2333,9 +2526,11 @@ _perforce_cmd_logger() {
 (( $+functions[_perforce_cmd_login] )) ||
 _perforce_cmd_login() {
   _arguments -s : \
-    '-a[ticket valid on all machines]' \
+    '-a[issue ticket on all host machines]' \
+    '-h[issue ticket on host]:host: ' \
     '-p[display ticket, do not store]' \
-    '-s[show status of ticket]' \
+    '-r[forward login to server]:remote spec: ' \
+    '(-a -p -h)-s[display status of current ticket]' \
     '(-s)1::user:_perforce_users'
 }
 
@@ -2359,6 +2554,27 @@ _perforce_cmd_logtail() {
     '-b[specify block size, default 8192]:block size: ' \
     '-s[specify start offset]:offset: ' \
     '-m[specify max blocks]:max blocks: '
+}
+
+
+(( $+functions[_perforce_cmd_merge] )) ||
+_perforce_cmd_merge() {
+  local -a fileargs
+  if [[ ${words[(I)--from]} -ne 0 ]]; then
+    fileargs=('1:to file:_perforce_files -tR')
+  else
+    fileargs=('1:from file:_perforce_files -tR'
+              '2:to file:_perforce_files')
+  fi
+  _arguments -s : \
+    '-F[merge against stream'\''s expected flow]' \
+    '-Ob[show base revision for merge]' \
+    '-q[suppress normal output messages]' \
+    '--from[merge from stream other than the parent stream]:stream: ' \
+    '-m[limit merge to max files]:max files: ' \
+    '-n[preview merge]' \
+    '-c[open in change]:change:_perforce_changes -tc' \
+    $fileargs
 }
 
 
@@ -2397,25 +2613,25 @@ _perforce_cmd_monitor() {
 (( $+functions[_perforce_cmd_move] )) ||
 _perforce_cmd_move() {
   _arguments -s : \
-    '-c[specify new change list]:change:_perforce_changes -tc' \
-    '-f[force move when already synced]' \
-    '-k[no resync from server]' \
+    '-c[reopen in change]:change:_perforce_changes -tc' \
+    '-f[force move]' \
     '-t[specify new file type]:filetype:_perforce_filetypes' \
-    '-n[show files to move without moving them]' \
-    '1::source file, wildcards allowed:_perforce_files -to' \
-    '2::destination file, wildcards match source:_perforce_files'
+    '-n[preview move]' \
+    '-k[perform move on server]' \
+    '1::from file:_perforce_files -to' \
+    '2::to file:_perforce_files -tu'
 }
 
 
 (( $+functions[_perforce_cmd_obliterate] )) ||
 _perforce_cmd_obliterate() {
     if [[ ${words[(I)-y]} -gt 0 ]]; then
-	_message \
+      _message \
 ": don't complete after -y; run obliterate without, then add the -y"
     else
-	_arguments -s : \
-	    '-y[actually perform the operation]' \
-	    '*::file:_perforce_files -tR'
+      _arguments -s : \
+        '-y[actually perform the operation]' \
+        '*::file:_perforce_files -tR'
     fi
 }
 
@@ -2427,11 +2643,14 @@ _perforce_cmd_opened() {
   # -tp, but currently Perforce doesn't allow that, so -tc is correct.
   # This is true even if -a is also given.
   _arguments -s : \
-    '-a[list for all clients]' \
-    '-c+[select by change]:change:_perforce_changes -tc' \
-    '-C[select by client]:client:_perforce_clients' \
-    '-m[max files to show]:max files: ' \
-    '-u[select by user]:user name:_perforce_users' \
+    '-a[list files for all clients]' \
+    '-c[list files opened in change]:change:_perforce_changes -tc' \
+    '-C[list files open in client]:client:_perforce_clients' \
+    '-u[list files opened by user]:user name:_perforce_users' \
+    '-m[limit output to max files]:max files: ' \
+    '-s[short output]' \
+    '-x[list exclusive files]' \
+    '-g[list files opened on Commit Server]' \
     '*::file:_perforce_files -to'
 }
 
@@ -2458,12 +2677,49 @@ _perforce_cmd_ping() {
 }
 
 
+(( $+functions[_perforce_cmd_populate] )) ||
+_perforce_cmd_populate() {
+  local -a fileargs
+  if [[ ${words[(I)-b*]} -ne 0 ]]; then
+    if [[ ${words[(I)-*s*]} -eq 0 ]]; then
+      # with -b and no -s, all files are to-files (but -s may come later)
+      fileargs=('*::to file:_perforce_files -tR')
+    else
+      # with -b and -s we have one from-file and any number of to-files
+      fileargs=('*::to file:_perforce_files')
+    fi
+  elif [[ ${words[(I)-(S|P)]} -ne 0 ]]; then
+      fileargs=('*::file:_perforce_files -tR')
+  else
+    # with no -b we have one from-file and one to-file
+    fileargs=('1::from file:_perforce_files -tR'
+              '2::to file:_perforce_files')
+  fi
+  _arguments -s : \
+    '(-S -P)-b[use branch view'\''s source and target]:branch:_perforce_branches' \
+    '(-S -P)-s[select source file, use branch view as target]:source file:_perforce_files -tR' \
+    '-r[reverse mapping direction]' \
+    '-S[use generated branch view from stream]:stream: ' \
+    '-P[use generated branch view from parent stream]:parent stream: ' \
+    '-d[description for submitted change]:description: ' \
+    '-f[force deleted files to branch into target]' \
+    '-n[preview populate]' \
+    '-o[display files created by populate]' \
+    '-m[limit max actions]:max actions: ' \
+    $fileargs
+}
+
+
 (( $+functions[_perforce_cmd_print] )) ||
 _perforce_cmd_print() {
   _arguments -s : \
-    '-a[display all revisions in a range]' \
-    '-o[select output file]:output file:_files' \
+    '-a[print all revisions in range]' \
+    '-A[print files in archive depots]' \
+    '-k[suppress keyword expansion]' \
+    '-o[redirect output to file]:file:_files' \
     '-q[suppress header]' \
+    '-m[limit max files]:max files: ' \
+    '-U[print files in unload depot]:unload file:_perforce_files' \
     '*::file:_perforce_files -tR'
 }
 
@@ -2471,20 +2727,28 @@ _perforce_cmd_print() {
 (( $+functions[_perforce_cmd_protect] )) ||
 _perforce_cmd_protect() {
   _arguments -s : \
-    '-o[write spec to stdout]' \
-    '-i[read spec from stdin]'
+    '-o[write protection table to standard output]' \
+    '-i[read protection table from standard input]'
 }
 
 
 (( $+functions[_perforce_cmd_protects] )) ||
 _perforce_cmd_protects() {
   _arguments -s : \
-    '(-g -u)-a[show for all users]' \
-    '(-a -u)-g[select by group]:perforce group:_perforce_groups' \
-    '(-a -g)-u[select by user]:perforce user:_perforce_users' \
-    '-h[limit to host]:host:_perforce_hosts' \
-    '-m[single word summary]' \
+    '(-g -u)-a[display protection lines for all users]' \
+    '(-a -u)-g[display protection lines for group]:perforce group:_perforce_groups' \
+    '(-a -g)-u[display protection lines for user]:perforce user:_perforce_users' \
+    '-h[display protection lines for host]:host:_perforce_hosts' \
+    '-m[report single word summary]' \
     '*:file:_perforce_files'
+}
+
+
+(( $+functions[_perforce_cmd_prune] )) ||
+_perforce_cmd_prune() {
+  _arguments -s : \
+    '-y[execute prune]' \
+    '-S[stream to prune]:stream: '
 }
 
 
@@ -2497,6 +2761,37 @@ _perforce_cmd_pull() {
     '-J[specify prefix for journal file]:journal file prefix: '
 }
 
+
+(( $+functions[_perforce_cmd_reconcile] )) ||
+_perforce_cmd_reconcile() {
+  _arguments -s : \
+    '-n[preview reconcile]' \
+    '-c[open files for change]:change:_perforce_changes -tc' \
+    '-e[open modified files for edit]' \
+    '-a[open new files for add]' \
+    '-d[open removed files for delete]' \
+    '-f[reformat filenames with wildcard characters]' \
+    '-I[do not perform ignore checking]' \
+    '-l[output relative paths]' \
+    '-m[check file modification times]' \
+    '-w[force client files to be updated to match depot]' \
+    '-k[reconcile have list with client]' \
+    '*:file:_perforce_files -tu'
+}
+
+
+(( $+functions[_perforce_cmd_rec] )) ||
+_perforce_cmd_rec() {
+  _perforce_cmd_reconcile "$@"
+}
+
+
+(( $+functions[_perforce_cmd_rename] )) ||
+_perforce_cmd_rename() {
+  _perforce_cmd_move "$@"
+}
+
+
 (( $+functions[_perforce_cmd_reopen] )) ||
 _perforce_cmd_reopen() {
   # Assume user doesn't want to reopen to same changelist.
@@ -2508,8 +2803,8 @@ _perforce_cmd_reopen() {
   fi
 
   _arguments -s : \
-    '-c+[select change to reopen on]:change:_perforce_changes -tc' \
-    '-t+[set file type]:file type:_perforce_filetypes' \
+    '-c[reopen files for change]:change:_perforce_changes -tc' \
+    '-t[specify new file type]:filetype:_perforce_filetypes' \
     '*::file:_perforce_files -to'
 }
 
@@ -2533,13 +2828,32 @@ _perforce_cmd_replicate() {
 (( $+functions[_perforce_cmd_resolve] )) ||
 _perforce_cmd_resolve() {
   _arguments -s : \
-    '-a-[select automatic merge type]:automation type:((f\:force\ acceptance m\:skip\ conflicts s\:safe t\:use\ theirs y\:use\ yours))' \
-    '-d-[select diff option]:diff option:((b\:ignore\ blanks w\:ignore\ all\ whitespace))' \
-    '-f[force re-resolution]' \
-    '-n[no action, just list]' \
+    '-A-[limit resolve attempts]:resolve attempts:((
+a\:resolve\ attributes
+b\:resolve\ file\ branching
+c\:resolve\ file\ content\ changes
+d\:resolve\ file\ deletions
+m\:resolve\ moved\ and\ renamed\ files
+t\:resolve\ filetype\ changes
+Q\:resolve\ charset\ changes
+))' \
+    '-a-[set automatic resolve]:resolve:((
+s\:skip\ files\ that\ need\ merging
+m\:skip\ files\ with\ conflicts
+f\:accept\ merged\ files\ with\ conflicts
+t\:use\ theirs
+y\:use\ yours))' \
+    '-d-[control whitespace merging]:whitespace option:((
+b\:ignore\ whitespace\ changes
+w\:ignore\ whitespace\ altogether
+l\:ignores\ line\ endings))' \
+    '-f[re-resolve files]' \
+    '-n[preview resolve]' \
+    '-N[preview resolve with summary]' \
     '-o[display base file name and revision for merge]' \
-    '-t[force textual merge on binary files]' \
-    '-v[verbose, mark all changes]' \
+    '-t[force textual merge]' \
+    '-v[insert markers for all changes]' \
+    '-c[limit resolve to change]:change:_perforce_changes -tc' \
     '*::file:_perforce_files -to'
 }
 
@@ -2555,10 +2869,12 @@ _perforce_cmd_resolved() {
 (( $+functions[_perforce_cmd_revert] )) ||
 _perforce_cmd_revert() {
   _arguments -s : \
-    '-a[revert unaltered files]' \
-    '-c[limit reversions to change]:change:_perforce_changes -tc' \
-    '-k[bypass client refresh]' \
-    '-n[no action, show effect only]' \
+    '-a[revert open unchanged files]' \
+    '-n[preview revert]' \
+    '-k[mark files as reverted on server]' \
+    '-w[delete new files]' \
+    '-c[revert files opened in change]:change:_perforce_changes -tc' \
+    '-C[specify client]:client:_perforce_clients' \
     '*::file:_perforce_files -to'
 }
 
@@ -2566,15 +2882,16 @@ _perforce_cmd_revert() {
 (( $+functions[_perforce_cmd_review] )) ||
 _perforce_cmd_review() {
   _arguments -s : \
-    '-c[select change for counter]:change:_perforce_changes -ts' \
-    '-t[limit change number by counter]:counter:_perforce_counters'
+    '-c[specify change]:change:_perforce_changes -ts' \
+    '-t[specify counter]:counter:_perforce_counters'
 }
 
 
 (( $+functions[_perforce_cmd_reviews] )) ||
 _perforce_cmd_reviews() {
   _arguments -s : \
-    '-c[show users by change]:change:_perforce_changes -ts' \
+    '-c[limit files submitted in change]:change:_perforce_changes -ts' \
+    '-C[limit files opened in client]:client:_perforce_clients' \
     '*::file:_perforce_files'
 }
 
@@ -2583,8 +2900,9 @@ _perforce_cmd_reviews() {
 _perforce_cmd_set() {
   # Only works under Windoze but maybe we are on Cygwin.
   _arguments -s : \
+    '-q[remove origin]' \
     '-s[set for whole system]' \
-    '-S[set for specified service]:service: ' \
+    '-S[specify service]:service: ' \
     "*::environment variable:_perforce_variables"
 }
 
@@ -2592,23 +2910,77 @@ _perforce_cmd_set() {
 (( $+functions[_perforce_cmd_shelve] )) ||
 _perforce_cmd_shelve() {
   _arguments -s : \
-    '(-i)-c[specify changelist if not default]:change:_perforce_changes -tc' \
-    '(-i -r)-d[delete shelved files]' \
-    '(-r)-f[force by admin user or force to overwrite]' \
-    '(-c)-i[read from standard input]' \
-    '(-d)-r[replace shelved files in changelist]' \
+    '-i[read change spec from standard input]' \
+    '(-i)-c[shelve files in change]:change:_perforce_changes -tc' \
+    '-f[overwrite existing shelved files]' \
+    '-r[replace shelved files in change]' \
+    '-a[handle unchanged files]:option:(submitunchanged leaveunchanged)' \
+    '(-p -a -i -r)-d[delete shelved files]' \
+    '-p[promote shelved change to commit server]' \
     '(-i -r)*::file:_perforce_files -to'
+}
+
+
+(( $+functions[_perforce_cmd_status] )) ||
+_perforce_cmd_status() {
+  _arguments -s : \
+    '-c[list files in change]:change:_perforce_changes -tc' \
+    '-A[list all new, modified, and removed files]' \
+    '-e[list modified files]' \
+    '-a[list new files]' \
+    '-d[list removed files]' \
+    '-f[reformat filenames with wildcard characters]' \
+    '-s[summarize output for new files]' \
+    '-I[do not perform ignore checking]' \
+    '-m[check file modification times]' \
+    '-k[reconcile have list with client]' \
+    '*:file:_perforce_files -tuo'
 }
 
 
 (( $+functions[_perforce_cmd_sizes] )) ||
 _perforce_cmd_sizes() {
   _arguments -s : \
-    '-a[show for all revisions]' \
-    '-b[set blocksize]:blocksize in bytes: ' \
+    '-a[list all revisions in range]' \
+    '-b[specify blocksize]:blocksize in bytes: ' \
+    '(-H)-h[print sizes in human-readable form (GiB)]' \
+    '(-h)-H[print sizes in human-readable form (GB)]' \
+    '-m[limit max files]:max files: ' \
     '-s[sum the file sizes]' \
-    '-S[show sizes of shelved files]' \
+    '-S[display sizes for shelved files]' \
+    '-z[omit lazy copies]' \
+    '(-z -S)-A[display files in archive depots]' \
+    '-U[display sizes for unload files]' \
     '*:file:_perforce_files -tR'
+}
+
+
+# TODO Add more logic for subcommands
+#p4 stream edit
+#p4 stream resolve [-a<flag>] [-n] [-o]
+#p4 stream revert
+(( $+functions[_perforce_cmd_stream] )) ||
+_perforce_cmd_stream() {
+  _arguments -s : \
+    '(-o -v)-d[delete stream]' \
+    '(-f)-o[write stream spec to standard output]' \
+    '(-o -v)-P[insert value into parent field]:parent stream: ' \
+    '(-o -v)-t[insert value into type field]:type: ' \
+    '(-o -v)-i[read stream spec from standard input]' \
+    '(-o -v)-f[force modification]' \
+    '(-f)-v[expose client view]' \
+    '1:stream name: '
+}
+
+
+(( $+functions[_perforce_cmd_streams] )) ||
+_perforce_cmd_streams() {
+  _arguments -s : \
+    '-F[limit files to pattern]:file pattern: ' \
+    '-T[limit fields to list]:field list: ' \
+    '-m[limit max streams]:max streams: ' \
+    '-U[list unloaded task streams]' \
+    '*:stream path: '
 }
 
 
@@ -2623,26 +2995,40 @@ label spec trigger typemap user)"
 }
 
 
+# TODO Figure out how --parallel will work
+#p4 submit -i [-r -s -f option] --parallel=threads=N[,batch=N][,min=N]
 (( $+functions[_perforce_cmd_submit] )) ||
 _perforce_cmd_submit() {
   _arguments -s : \
-    '-r[files open for add or edit remain open]' \
-    '-s[include fix status in list]' \
+    '(-s -d -e -i)-c[submit change]:change:_perforce_changes -tc' \
+    '(-r -s -f -d -c -i --noretransfer)-e[submit shelved change]:change:_perforce_changes -tS' \
+    '(-s -c -e -i --noretransfer)-d[specify description]:description: ' \
+    '(-d -c -e --noretransfer)-i[read change spec from standard input]' \
     '-f[override submit option]:submit option:_perforce_submit_options' \
-    '(-s -i)-c[submit specific change]:change:_perforce_changes -tc' \
-    '(-s -c)-d[specify description on command line]:description: ' \
-    '(-c)-i[read change spec from stdin]' \
+    '-r[reopen submitted files]' \
+    '(-d -c)-s[include fix status in list]' \
+    '--parallel[parallel file transfer options]:parallel options: ' \
+    '--noretransfer[do not re-transfer submitted files]:no re-transfer?:(0 1)' \
     '*::file:_perforce_files -to -tr'
 }
 
 
+# TODO Figure out how --parallel will work
+#--parallel=threads=N[,batch=N][,batchsize=N][,min=N][,minsize=N]
 (( $+functions[_perforce_cmd_sync] )) ||
 _perforce_cmd_sync() {
   _arguments -s : \
     '-f[force resynchronisation]' \
-    '-n[show operations but don'\''t perform them]' \
-    '-k[bypass client file update]' \
-    '-q[suppress informational messages]' \
+    '-L[use full depot syntax]' \
+    '-n[preview sync]' \
+    '-N[preview sync with summary]' \
+    '(-s -p)-k[update server without syncing files]' \
+    '(-f -k -r -s)-p[sync client without updating server]' \
+    '-q[suppress normal output messages]' \
+    '(-s -p)-r[reopen moved files in new location]' \
+    '(-f -k -r -p)-s[do not clobber modified files]' \
+    '-m[limit max files to sync]:max files: ' \
+    '--parallel[parallel file transfer options]:parallel options: ' \
     '*::file:_perforce_files -tR'
 }
 
@@ -2651,7 +3037,9 @@ _perforce_cmd_sync() {
 _perforce_cmd_tag() {
   _arguments -s : \
     '-d[delete association between label and files]' \
-    '-n[show what files would be tagged]' \
+    '-n[preview tag]' \
+    '-g[update global label]' \
+    '-U[create label with autoreload option]' \
     '-l[specify label]:label:_perforce_labels' \
     '*::file:_perforce_files -tR'
 }
@@ -2683,8 +3071,10 @@ _perforce_cmd_typemap() {
 (( $+functions[_perforce_cmd_unlock] )) ||
 _perforce_cmd_unlock() {
   _arguments -s : \
-    '-c[non-default change to unlock]:change:_perforce_changes -tc' \
-    '-f[allow superuser to unlock any file]' \
+    '-s[unlock files from shelved change]:change:_perforce_changes -tS' \
+    '-c[unlock files from change]:change:_perforce_changes -tc' \
+    '-x[unlock exclusive files]' \
+    '-f[unlock files owned by other users]' \
     '*::file:_perforce_files'
 }
 
@@ -2692,21 +3082,37 @@ _perforce_cmd_unlock() {
 (( $+functions[_perforce_cmd_unshelve] )) ||
 _perforce_cmd_unshelve() {
   _arguments -s : \
-    '-s[specify shelving change]:change:_perforce_changes -tS' \
-    '-c[specify change for unshelve]:change:_perforce_changes -tc' \
+    '-s[unshelve files from change]:change:_perforce_changes -tS' \
+    '-c[unshelve files to change]:change:_perforce_changes -tc' \
     '-f[force clobbering of writeable files]' \
     '-n[preview unshelve]' \
+    '-b[use branch view for unshelve]:branch:_perforce_branches' \
+    '-S[use generated branch view from stream]:stream: ' \
+    '-P[use generated branch view from parent stream]:parent stream: ' \
     '*::file, pattern allowed:_perforce_files'
+}
+
+
+(( $+functions[_perforce_cmd_update] )) ||
+_perforce_cmd_update() {
+  _arguments -s : \
+    '-f[force resynchronisation]' \
+    '-L[use full depot syntax]' \
+    '-n[preview update]' \
+    '-N[preview update with summary]' \
+    '-q[suppress normal output messages]' \
+    '-m[limit max files to update]:max files: ' \
+    '*::file:_perforce_files -tR'
 }
 
 
 (( $+functions[_perforce_cmd_user] )) ||
 _perforce_cmd_user() {
   _arguments -s : \
-    '(-o)-f[force edit by superuser]' \
     '(-o -i)-d[delete user]' \
-    '(-o -d)-i[read form from stdin]' \
-    '(-f -i -d)-o[write form to stdout]' \
+    '(-f -i -d)-o[write user spec to standard output]' \
+    '(-o -d)-i[read user spec from standard input]' \
+    '(-o)-f[force edit of user]' \
     '(-i)1::username:_perforce_users'
 }
 
@@ -2714,7 +3120,11 @@ _perforce_cmd_user() {
 (( $+functions[_perforce_cmd_users] )) ||
 _perforce_cmd_users() {
   _arguments -s : \
-    '-m[set max users to show]:max users: ' \
+    '-m[limit output to max users]:max users: ' \
+    '-a[output service and operator users]' \
+    '-l[long output]' \
+    '-r[list only replica users]' \
+    '-c[list only central server users]' \
     '*::username:_perforce_users'
 }
 
