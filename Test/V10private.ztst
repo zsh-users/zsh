@@ -15,11 +15,6 @@
  (zmodload -u zsh/param/private && zmodload zsh/param/private)
 0:unload and reload the module without crashing
 
- ZTST_verbose=0 $ZTST_exe +Z -f $ZTST_srcdir/ztst.zsh private.TMP/B02
-0:typeset still works with zsh/param/private module loaded
-*>*
-*>*
-
  typeset scalar_test=toplevel
  () {
   print $scalar_test
@@ -294,6 +289,15 @@ F:future revision will create a global with this assignment
 
  () { private -h SECONDS }
 0:private parameter may hide a special parameter
+
+ if (( UID )); then
+   ZTST_verbose=0 $ZTST_exe +Z -f $ZTST_srcdir/ztst.zsh private.TMP/B02
+ else
+   ZTST_skip="cannot re-run typeset tests when tests run as superuser"
+ fi
+0:typeset still works with zsh/param/private module loaded
+*>*
+*>*
 
 %clean
 

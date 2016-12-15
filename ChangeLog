@@ -1,4 +1,9 @@
-2016-12-14  Barton E. Schaefer  <schaefer@brasslantern.com>
+2016-12-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40198: Test/V10private.ztst: output of B02typeset differs when
+	(( UID == 0 )) so do not attempt to redo that test in that case
+
+2016-12-14  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 40179: Src/builtin.c: fix handling of "printf -" and "printf --"
 
