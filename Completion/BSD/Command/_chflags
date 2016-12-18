@@ -35,7 +35,7 @@ if [[ $OSTYPE = (darwin|dragonfly|freebsd|netbsd)* ]]; then
   fi
 
   if [[ $OSTYPE = (dragonfly|freebsd)* ]]; then
-    addlfags uunlnk 'user undeletable'
+    addflags uunlnk 'user undeletable'
     (( EUID )) || addflags sunlnk 'system undeletable'
   fi
 
