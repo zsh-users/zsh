@@ -1,3 +1,8 @@
+2016-12-18  Baptiste Daroussin  <bapt@FreeBSD.org>
+
+	* 40210: Completion/Unix/Command/_sysctl: Add support modern
+	FreeBSD and drop support for FreeBSD < 5
+
 2016-12-18  Baptiste Daroussin  <bapt@gandi.net>
 
 	* 40209: Completion/BSD/Command/_chflags: Fix typo in chflags
