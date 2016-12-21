@@ -1,3 +1,8 @@
+2016-12-21  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk, Etc/FAQ.yo, NEWS, README:
+	release 5.3.1:
+
 2016-12-18  Baptiste Daroussin  <bapt@FreeBSD.org>
 
 	* 40210: Completion/Unix/Command/_sysctl: Add support modern
