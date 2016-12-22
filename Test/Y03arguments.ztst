@@ -277,6 +277,11 @@
 >line: {tst j}{}
 >line: {tst -y }{}
 
+ tst_arguments -M 'm:{j}={y}' -y -n - set1 -i - set2 -k
+ comptest $'tst -k -j\t'
+0:matcher in combination with sets (implies separate cadef structure)
+>line: {tst -k -y }{}
+
  tst_arguments -x :word
  comptest $'tst -- -\t'
 0:option after --

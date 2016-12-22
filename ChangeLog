@@ -1,3 +1,8 @@
+2016-12-22  Oliver Kiddle  <opk@zsh.org>
+
+	* 40162: Src/Zle/computil.c, Test/Y03arguments.ztst: _arguments
+	support for a match spec in combination with sets
+
 2016-12-22  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Config/version.mk: Post-release version bump to

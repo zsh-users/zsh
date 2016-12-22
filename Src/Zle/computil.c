@@ -1288,7 +1288,7 @@ parse_cadef(char *nam, char **args)
 		ret->ndopts = ndopts;
 		ret->nodopts = nodopts;
 		set_cadef_opts(ret);
-		ret = ret->snext = alloc_cadef(NULL, single, NULL, nonarg, flags);
+		ret = ret->snext = alloc_cadef(NULL, single, match, nonarg, flags);
 		optp = &(ret->opts);
 		nopts = ndopts = nodopts = 0;
 		anum = 1;
