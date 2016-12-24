@@ -1,3 +1,12 @@
+2016-12-24  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Oliver: 40118: Functions/Zle/bracketed-paste-magic: relocate
+	BUFFER/CURSOR reset to work around "fc -p" issue (alternate fix
+	replacing 40115).
+
+	* unposted: Functions/Zle/bracketed-paste-magic: revert 40115,
+	thus restoring 38579.
+
 2016-12-22  Oliver Kiddle  <opk@zsh.org>
 
 	* 40162: Src/Zle/computil.c, Test/Y03arguments.ztst: _arguments

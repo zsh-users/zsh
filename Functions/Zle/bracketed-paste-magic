@@ -145,27 +145,26 @@ bracketed-paste-magic() {
 	done
     fi
 
-    # Save context, create a clean slate for the paste
-    integer bpm_mark=$MARK bpm_cursor=$CURSOR bpm_region=$REGION_ACTIVE
-    integer bpm_numeric=${NUMERIC:-1}
-    local bpm_buffer=$BUFFER
-    fc -p -a /dev/null 0 0
-    BUFFER=
-
     zstyle -a :bracketed-paste-magic inactive-keys bpm_inactive
     if zstyle -s :bracketed-paste-magic active-widgets bpm_active '|'; then
-        # There are active widgets.  Reprocess $PASTED as keystrokes.
-	NUMERIC=1
-	zle -U - $PASTED
-
+	# Save context, create a clean slate for the paste
+	integer bpm_mark=$MARK bpm_region=$REGION_ACTIVE
+	integer bpm_numeric=${NUMERIC:-1}
+	integer bpm_limit=$UNDO_LIMIT_NO bpm_undo=$UNDO_CHANGE_NO
+	zle .split-undo
+	UNDO_LIMIT_NO=$UNDO_CHANGE_NO
+	BUFFER=
+	CURSOR=1
+	fc -p -a /dev/null 0 0
 	if [[ $bmp_keymap = vicmd ]]; then
 	    zle -K viins
 	fi
 
+	# There are active widgets.  Reprocess $PASTED as keystrokes.
+	NUMERIC=1
+	zle -U - $PASTED
+
 	# Just in case there are active undo widgets
-	zle .split-undo
-	integer bpm_limit=$UNDO_LIMIT_NO bpm_undo=$UNDO_CHANGE_NO
-	UNDO_LIMIT_NO=$UNDO_CHANGE_NO
 
 	while [[ -n $PASTED ]] && zle .read-command; do
 	    PASTED=${PASTED#$KEYS}
@@ -183,20 +182,15 @@ bracketed-paste-magic() {
 	done
 	PASTED=$BUFFER
 
-	# Reset the undo state
+	# Restore state
+	zle -K $bpm_keymap
+	fc -P
+	MARK=$bpm_mark
+	REGION_ACTIVE=$bpm_region
+	NUMERIC=$bpm_numeric
 	zle .undo $bpm_undo
 	UNDO_LIMIT_NO=$bpm_limit
-
-	zle -K $bpm_keymap
     fi
-
-    # Restore state
-    BUFFER=$bpm_buffer
-    MARK=$bpm_mark
-    CURSOR=$bpm_cursor
-    REGION_ACTIVE=$bpm_region
-    NUMERIC=$bpm_numeric
-    fc -P
 
     # PASTED has been updated, run the paste-finish functions
     if zstyle -a :bracketed-paste-magic paste-finish bpm_hooks; then
