@@ -1,3 +1,7 @@
+2016-12-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 40232: configure.ac: Remove SH_USE_BSD_ECHO autoconf test.
+
 2016-12-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted (see users/22287): Completion/compinit: _comp_options

@@ -2309,21 +2309,6 @@ AH_TEMPLATE([HAVE_FIFOS],
 if test x$zsh_cv_sys_fifo = xyes; then
   AC_DEFINE(HAVE_FIFOS)
 fi
-dnl ---------------------
-dnl echo style of /bin/sh
-dnl ---------------------
-AC_CACHE_CHECK(if echo in /bin/sh interprets escape sequences,
-zsh_cv_prog_sh_echo_escape,
-[if test "`/bin/sh -c \"echo '\\n'\"`" = "\\n"; then
-  zsh_cv_prog_sh_echo_escape=no
-else
-  zsh_cv_prog_sh_echo_escape=yes
-fi])
-AH_TEMPLATE([SH_USE_BSD_ECHO],
-[Define to 1 if /bin/sh does not interpret \ escape sequences.])
-if test x$zsh_cv_prog_sh_echo_escape = xno; then
-  AC_DEFINE(SH_USE_BSD_ECHO)
-fi
 
 dnl -----------
 dnl test for whether link() works
