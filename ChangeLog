@@ -1,3 +1,8 @@
+2016-12-27  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted (see users/22287): Completion/compinit: _comp_options
+	needs to disable ERR_RETURN along with ERR_EXIT
+
 2016-12-24  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Oliver: 40118: Functions/Zle/bracketed-paste-magic: relocate

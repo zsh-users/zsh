@@ -142,6 +142,7 @@ _comp_options=(
     NO_cshnullglob
     NO_cshjunkiequotes
     NO_errexit
+    NO_errreturn
     NO_globassign
     NO_globsubst
     NO_histsubstpattern
