@@ -2708,24 +2708,40 @@ setarrvalue(Value v, char **val)
 	    post_assignment_length += pre_assignment_length - v->end;
 	}
 
-	p = new = (char **) zalloc(sizeof(char *)
-		                   * (post_assignment_length + 1));
+	if (pre_assignment_length == post_assignment_length
+	    && v->pm->gsu.a->setfn == arrsetfn
+	    /* ... and isn't something that arrsetfn() treats specially */
+	    && 0 == (v->pm->node.flags & (PM_SPECIAL|PM_UNIQUE))
+	    && NULL == v->pm->ename)
+	{
+	    /* v->start is 0-based */
+	    p = old + v->start;
+	    for (r = val; *r;) {
+		/* Free previous string */
+		zsfree(*p);
+		/* Give away ownership of the string */
+		*p++ = *r++;
+	    }
+	} else {
+	    p = new = (char **) zalloc(sizeof(char *)
+				       * (post_assignment_length + 1));
 
-	for (i = 0; i < v->start; i++)
-	    *p++ = i < pre_assignment_length ? ztrdup(*q++) : ztrdup("");
-	for (r = val; *r;) {
-            /* Give away ownership of the string */
-	    *p++ = *r++;
+	    for (i = 0; i < v->start; i++)
+		*p++ = i < pre_assignment_length ? ztrdup(*q++) : ztrdup("");
+	    for (r = val; *r;) {
+		/* Give away ownership of the string */
+		*p++ = *r++;
+	    }
+	    if (v->end < pre_assignment_length)
+		for (q = old + v->end; *q;)
+		    *p++ = ztrdup(*q++);
+	    *p = NULL;
+
+	    DPUTS2(p - new != post_assignment_length, "setarrvalue: wrong allocation: %d 1= %lu",
+		   post_assignment_length, (unsigned long)(p - new));
+
+	    v->pm->gsu.a->setfn(v->pm, new);
 	}
-	if (v->end < pre_assignment_length)
-	    for (q = old + v->end; *q;)
-		*p++ = ztrdup(*q++);
-	*p = NULL;
-
-	DPUTS2(p - new != post_assignment_length, "setarrvalue: wrong allocation: %d 1= %lu",
-	       post_assignment_length, (unsigned long)(p - new));
-
-	v->pm->gsu.a->setfn(v->pm, new);
 
         /* Ownership of all strings has been
          * given away, can plainly free */
@@ -3485,6 +3501,8 @@ arrsetfn(Param pm, char **x)
     /* Arrays tied to colon-arrays may need to fix the environment */
     if (pm->ename && x)
 	arrfixenv(pm->ename, x);
+    /* If you extend this function, update the list of conditions in
+     * setarrvalue(). */
 }
 
 /* Function to get value of an association parameter */
