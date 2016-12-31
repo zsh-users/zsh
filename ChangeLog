@@ -7,6 +7,11 @@
 	* Paulo Andrade: 40260: Src/prompt.c: Set newly allocated
 	space in prompt buffer to zero as it may be tested.
 
+2016-12-30  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40248: Src/hist.c: suppress errors from zshaddhistoryhook,
+	and do not call it if no history entry will be written
+
 2016-12-28  Sebastian Gniazdowski  <psprint@fastmail.com>
 
 	* 40231: Src/params.c: Optimise setarrvalue().

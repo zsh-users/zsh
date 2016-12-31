@@ -1418,7 +1418,7 @@ hend(Eprog prog)
 	DPUTS(hptr < chline, "History end pointer off start of line");
 	*hptr = '\0';
     }
-    {
+    if (*chline) {
 	LinkList hookargs = newlinklist();
 	int save_errflag = errflag;
 	errflag = 0;
@@ -1427,6 +1427,7 @@ hend(Eprog prog)
 	addlinknode(hookargs, chline);
 	callhookfunc("zshaddhistory", hookargs, 1, &hookret);
 
+	errflag &= ~ERRFLAG_ERROR;
 	errflag |= save_errflag;
     }
     /* For history sharing, lock history file once for both read and write */
