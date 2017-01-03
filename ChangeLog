@@ -1,3 +1,8 @@
+2017-01-03  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Paulo Andrade: 40260: Src/prompt.c: Set newly allocated
+	space in prompt buffer to zero as it may be tested.
+
 2016-12-28  Sebastian Gniazdowski  <psprint@fastmail.com>
 
 	* 40231: Src/params.c: Optimise setarrvalue().
