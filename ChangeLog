@@ -1,5 +1,8 @@
 2017-01-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40264: Completion/Unix/Command/_man: Complete all sections
+	after '-a'.
+
 	* users/22320: Etc/BUGS: Add 40240, label 40106.
 
 2017-01-05  Oliver Kiddle  <opk@zsh.org>

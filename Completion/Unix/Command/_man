@@ -51,7 +51,11 @@ _man() {
     sect="${sect//:/|}"
     sect="${sect//,/|}"
   elif (( CURRENT > 2 )); then
-    sect=$words[2]
+    case $words[2] in
+      (-a) sect='*';;
+      (-*) ;;
+      (*)  sect=$words[2];;
+    esac
   fi
 
   if [[ $sect = (<->*|1M|l|n) || $sect = *\|* ]]; then
