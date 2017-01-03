@@ -7,6 +7,12 @@
 	* Paulo Andrade: 40260: Src/prompt.c: Set newly allocated
 	space in prompt buffer to zero as it may be tested.
 
+2017-01-01  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* users/22319: Src/subst.c: ${ary1:^ary2} should not change
+	the isarr state of the expansion of ary1 unless ary1 is made
+	from a scalar, lest semantics of (@) in double quotes be lost.
+
 2016-12-30  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 40248: Src/hist.c: suppress errors from zshaddhistoryhook,

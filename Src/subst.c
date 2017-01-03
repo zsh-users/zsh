@@ -3066,7 +3066,10 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		if (sval)
 		    zip = hmkarray(sval);
 	    }
-	    if (!isarr) aval = mkarray(val);
+	    if (!isarr) {
+		aval = mkarray(val);
+		isarr = 1;
+	    }
 	    if (zip) {
 		char **out;
 		int alen, ziplen, outlen, i = 0;
@@ -3089,7 +3092,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    out[i*2] = NULL;
 		    aval = out;
 		    copied = 1;
-		    isarr = 1;
 		}
 	    } else {
 		if (unset(UNSET)) {
