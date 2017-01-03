@@ -668,15 +668,9 @@ patcompile(char *exp, int inflags, char **endexp)
 			    if (imeta(*mtest))
 				nmeta++;
 			if (nmeta) {
-			    char *oldpatout = patout;
-			    ptrdiff_t pd;
 			    patadd(NULL, 0, nmeta, 0);
-			    /*
-			     * Yuk.
-			     */
 			    p = (Patprog)patout;
-			    pd = patout - oldpatout;
-			    opnd += pd;
+			    opnd = dupstring_wlen(opnd, oplen);
 			    dst = patout + startoff;
 			}
 

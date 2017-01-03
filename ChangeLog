@@ -1,5 +1,9 @@
 2017-01-03  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 40265: Src/pattern.c: fix continuing problems with Meta characters
+	in pattern that resolves to a string by copying source string.
+	Triggered by string that (correctly) turned Dash into '-'.
+
 	* Paulo Andrade: 40260: Src/prompt.c: Set newly allocated
 	space in prompt buffer to zero as it may be tested.
 
