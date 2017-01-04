@@ -358,26 +358,24 @@
 0:repeatable options
 >line: {tst -v -v }{}
 
-# necessary to exclude the rest arguments for the other set because
-# it is currently any unknown option rather than options from another
-# set that causes a set to be excluded
  tst_arguments -A '-*' - help -h -V - other -a '*: :(-x more)'
  comptest $'tst -a -x m\t'
 0:continue completion after rest argument that looks like an option (with sets)
->line: {tst -a -x m}{}
-#>line: {tst -a -x more }{}
+>line: {tst -a -x more }{}
 
   tst_arguments - '(help)' -h -V - other -a '*:rest:(1 2 3)'
-  comptest $'tst -h \t'
-0:unknown option disables whole set (without -A)
+  comptest $'tst -h \t-a \t'
+0:foreign option disables whole set (without -A)
 >line: {tst -h }{}
 >MESSAGE:{no arguments}
+>line: {tst -h -a }{}
 
   tst_arguments -A "-*" - '(help)' -h -V - other -a '*:rest:(1 2 3)'
-  comptest $'tst -h \t'
-0:unknown option disables whole set (with -A)
+  comptest $'tst -h \t-a \t'
+0:foreign option disables whole set (with -A)
 >line: {tst -h }{}
 >MESSAGE:{no arguments}
+>line: {tst -h -a }{}
 
  tst_arguments '(-C)-a' - set1 -C -v - set2 '(-a)-C' -w
  comptest $'tst -a -\t' $'\C-w\C-w-C -\t'

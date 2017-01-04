@@ -1,5 +1,8 @@
 2017-01-04  Oliver Kiddle  <opk@zsh.org>
 
+	* 40227: Src/Zle/computil.c, Test/Y03arguments.ztst: new approach
+	to 39611 (_arguments sets and rest arguments starting with a dash)
+
 	* 40226: Src/Zle/computil.c, Test/Y03arguments.ztst:
 	tidy up some of the _arguments set code
 

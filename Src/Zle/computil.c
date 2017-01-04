@@ -1741,6 +1741,27 @@ ca_get_sopt(Cadef d, char *line, char **end, LinkList *lp)
     return pp;
 }
 
+/* Search for an option in all sets except the current one.
+ * Return true if found */
+
+static int
+ca_foreign_opt(Cadef curset, Cadef all, char *option)
+{
+    Cadef d;
+    Caopt p;
+
+    for (d = all; d; d = d->snext) {
+	if (d == curset)
+	    continue;
+
+	for (p = d->opts; p; p = p->next) {
+	    if (!strcmp(p->name, option))
+		return 1;
+	}
+    }
+    return 0;
+}
+
 /* Return the n'th argument definition. */
 
 static Caarg
@@ -1917,7 +1938,7 @@ ca_opt_arg(Caopt opt, char *line)
  * existing options on the line. */
 
 static int
-ca_parse_line(Cadef d, int multi, int first)
+ca_parse_line(Cadef d, Cadef all, int multi, int first)
 {
     Caarg adef, ddef;
     Caopt ptr, wasopt = NULL, dopt;
@@ -2163,13 +2184,7 @@ ca_parse_line(Cadef d, int multi, int first)
 	    else
 		state.curopt = NULL;
 	} else if (multi && (*line == '-' || *line == '+') && cur != compcurrent
-#if 0
-		   /**** Ouch. Using this will disable the mutual exclusion
-			 of different sets. Not using it will make the -A
-			 pattern be effectively ignored with multiple sets. */
-		   && (!napat || !pattry(napat, line))
-#endif
-		   )
+		&& (ca_foreign_opt(d, all, line)))
 	    return 1;
 	else if (state.arg &&
 		 (!napat || cur <= compcurrent || !pattry(napat, line))) {
@@ -2515,20 +2530,20 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
          * auto-description string, the optional -s, -S, -A and -M options
          * given to _arguments and the specs. */
 	if (compcurrent > 1 && compwords[0]) {
-	    Cadef def;
+	    Cadef def, all;
 	    int cap = ca_parsed, multi, first = 1, use, ret = 0;
 	    Castate states = NULL, sp;
 
 	    ca_parsed = 0;
 
-	    if (!(def = get_cadef(nam, args + 1)))
+	    if (!(def = all = get_cadef(nam, args + 1)))
 		return 1;
 
 	    multi = !!def->snext; /* if we have sets */
 	    ca_parsed = cap;
 
 	    while (def) { /* for each set */
-		use = !ca_parse_line(def, multi, first);
+		use = !ca_parse_line(def, all, multi, first);
 		def = def->snext;
 		if (use && def) {
 		    /* entry needed so save it into list */
