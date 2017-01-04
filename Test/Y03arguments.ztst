@@ -64,6 +64,20 @@
 >line: {tst arg1 }{}
 >MESSAGE:{no more arguments}
 
+ tst_arguments -a '2:desc2:(arg2)'
+ comptest $'tst a1\t \t'
+0:second argument but no first argument
+>line: {tst a1}{}
+>MESSAGE:{no more arguments}
+>line: {tst a1 arg2 }{}
+
+ tst_arguments '2:desc2:(arg2)' '*:rest:(rest)'
+ comptest $'tst \t\t\t'
+0:second and rest arguments but no first argument
+>line: {tst rest }{}
+>line: {tst rest arg2 }{}
+>line: {tst rest arg2 rest }{}
+
  tst_arguments '-\+[opt]'
  comptest $'tst -\C-d'
 0:-+
@@ -81,6 +95,14 @@
 >line: {tst +o -o }{}
 >line: {tst +o -o }{}
 >MESSAGE:{no arguments}
+
+ tst_arguments +-o
+ comptest $'tst \t'
+0:option beginning with + and -, specified the other way around
+>line: {tst }{}
+>DESCRIPTION:{option}
+>NO:{+o}
+>NO:{-o}
 
  tst_arguments '-o:1:(a):2:(b)'
  comptest $'tst \t\t\t'
@@ -205,6 +227,15 @@
  comptest $'tst -a 1:x \\2 \t'
 0:opt_args with multiple arguments and quoting of colons and backslashes
 >line: {tst -a 1:x \2 1\:x:\\2 }{}
+
+ tst_arguments -a -b
+ comptest $'tst  rest -\t\C-w\eb\C-b-\t'
+0:option completion with rest arguments on the line but not in the specs
+>line: {tst  rest -}{}
+>line: {tst -}{ rest }
+>DESCRIPTION:{option}
+>NO:{-a}
+>NO:{-b}
 
  tst_arguments '-a' '*::rest:{compadd - -b}'
  comptest $'tst arg -\t'
@@ -409,16 +440,7 @@
 0:exclude own set from an option
 >line: {tst -m -a }{}
 
-# the following two tests only verify the current questionable behaviour
  tst_arguments - set1 '(set2)-a' -m -n - set2 -a -t -u
- comptest $'tst -a -\t'
-0:exclude later set from an option common to both
->line: {tst -a -}{}
->DESCRIPTION:{option}
->NO:{-m}
->NO:{-n}
-
- tst_arguments - set2 -a -t -u - set1 '(set2)-a' -m -n
  comptest $'tst -a -\t'
 0:exclude later set from an option common to both
 >line: {tst -a -}{}
@@ -427,6 +449,21 @@
 >NO:{-n}
 >NO:{-t}
 >NO:{-u}
+
+ tst_arguments - set2 -a -t -u - set1 '(set2)-a' -m -n
+ comptest $'tst -a -\t'
+0:exclude earlier set from an option common to both
+>line: {tst -a -}{}
+>DESCRIPTION:{option}
+>NO:{-m}
+>NO:{-n}
+>NO:{-t}
+>NO:{-u}
+
+ tst_arguments -x - '(set1)' -a -b - '(set2)' -m -n
+ comptest $'tst -m -\t'
+0:single option sets are still mutually exclusive
+>line: {tst -m -x }{}
 
  tst_arguments '(-)-h' -a -b -c
  comptest $'tst -h -\t'
@@ -458,6 +495,24 @@ F:shouldn't offer -b as it is already on the command-line
 >NO:{-c}
 >NO:{-d}
 F:the first tab press shouldn't offer -d since -a is on the command line
+
+ tst_arguments -s : -ad '(-d)-a' -b -ca -d
+ comptest $'tst -ad\t-b\t'
+0:option clumping mixed with real option that looks like clump
+>line: {tst -ad }{}
+>line: {tst -ad -b}{}
+>DESCRIPTION:{option}
+>NO:{-a}
+>NO:{-d}
+
+ tst_arguments -s : '(-d)-a+:arg:(b)' '(-c)-b' -c -d
+ comptest $'tst -ab\t-\t'
+0:option clumping mixed with direct argument
+>line: {tst -ab }{}
+>line: {tst -ab -}{}
+>DESCRIPTION:{option}
+>NO:{-b}
+>NO:{-c}
 
  tst_arguments '-a:arg' -b '(-b)-c'
  comptest $'tst -a -c -\t'

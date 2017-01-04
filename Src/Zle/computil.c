@@ -917,7 +917,6 @@ struct cadef {
     int argsactive;		/* if normal arguments are still allowed */
 				/* used while parsing a command line */
     char *set;			/* set name prefix (<name>-), shared */
-    char *sname;		/* set name */
     int flags;			/* see CDF_* below */
     char *nonarg;		/* pattern for non-args (-A argument) */
 };
@@ -956,7 +955,7 @@ struct caarg {
     char *end;			/* end-pattern for ::<pat>:... */
     char *opt;			/* option name if for an option */
     int num;			/* it's the num'th argument */
-    int min;			/* it's also this argument, using opt. args */
+    int min;			/* earliest possible arg pos, given optional args */
     int direct;			/* true if argument number was given explicitly */
     int active;			/* still allowed on command line */
     char *set;			/* set name, shared */
@@ -1020,7 +1019,6 @@ freecadef(Cadef d)
 	s = d->snext;
 	zsfree(d->match);
 	zsfree(d->set);
-	zsfree(d->sname);
 	if (d->defs)
 	    freearray(d->defs);
 
@@ -1147,8 +1145,11 @@ alloc_cadef(char **args, int single, char *match, char *nonarg, int flags)
 	ret->defs = NULL;
 	ret->ndefs = 0;
     }
+    ret->nopts = 0;
+    ret->ndopts = 0;
+    ret->nodopts = 0;
     ret->lastt = time(0);
-    ret->set = ret->sname = NULL;
+    ret->set = NULL;
     if (single) {
 	ret->single = (Caopt *) zalloc(256 * sizeof(Caopt));
 	memset(ret->single, 0, 256 * sizeof(Caopt));
@@ -1184,10 +1185,8 @@ parse_cadef(char *nam, char **args)
     char **orig_args = args, *p, *q, *match = "r:|[_-]=* r:|=*", **xor, **sargs;
     char *adpre, *adsuf, *axor = NULL, *doset = NULL, **setp = NULL;
     char *nonarg = NULL;
-    int single = 0, anum = 1, xnum, nopts, ndopts, nodopts, flags = 0;
+    int single = 0, anum = 1, xnum, flags = 0;
     int state = 0, not = 0;
-
-    nopts = ndopts = nodopts = 0;
 
     /* First string is the auto-description definition. */
 
@@ -1255,8 +1254,6 @@ parse_cadef(char *nam, char **args)
 
     all = ret = alloc_cadef(orig_args, single, match, nonarg, flags);
     optp = &(ret->opts);
-    anum = 1;
-
     sargs = args;
 
     /* Get the definitions. */
@@ -1267,8 +1264,9 @@ parse_cadef(char *nam, char **args)
 		char *p;
 		int l;
 
-		if (setp)
+		if (setp) /* got to first set: skip to ours */
 		    args = setp;
+		/* else we were the first set so don't need to skip */
 		p = *++args;
 		l = strlen(p) - 1;
 		if (*p == '(' && p[l] == ')') {
@@ -1277,20 +1275,15 @@ parse_cadef(char *nam, char **args)
 		} else
 		    axor = NULL;
 		ret->set = doset = tricat(p, "-", "");
-		ret->sname = ztrdup(p);
 		state = 1;
-	    } else {
+	    } else { /* starting new set */
 		setp = args;
 		state = 0;
 		args = sargs - 1;
 		doset = NULL;
-		ret->nopts = nopts;
-		ret->ndopts = ndopts;
-		ret->nodopts = nodopts;
 		set_cadef_opts(ret);
 		ret = ret->snext = alloc_cadef(NULL, single, match, nonarg, flags);
 		optp = &(ret->opts);
-		nopts = ndopts = nodopts = 0;
 		anum = 1;
 	    }
 	    continue;
@@ -1526,13 +1519,13 @@ parse_cadef(char *nam, char **args)
 	    opt->xor = (again == 1 && xor ? zarrdup(xor) : xor);
 	    opt->type = otype;
 	    opt->args = oargs;
-	    opt->num = nopts++;
+	    opt->num = ret->nopts++;
 	    opt->not = not;
 
 	    if (otype == CAO_DIRECT || otype == CAO_EQUAL)
-		ndopts++;
+		ret->ndopts++;
 	    else if (otype == CAO_ODIRECT || otype == CAO_OEQUAL)
-		nodopts++;
+		ret->nodopts++;
 
 	    /* If this is for single-letter option we also store a
 	     * pointer for the definition in the array for fast lookup.
@@ -1584,7 +1577,7 @@ parse_cadef(char *nam, char **args)
 		continue;
 
 	    if ((direct = idigit(*p))) {
-		/* Argment number is given. */
+		/* Argument number is given. */
 		int num = 0;
 
 		while (*p && idigit(*p))
@@ -1630,9 +1623,6 @@ parse_cadef(char *nam, char **args)
 		ret->args = arg;
 	}
     }
-    ret->nopts = nopts;
-    ret->ndopts = ndopts;
-    ret->nodopts = nodopts;
     set_cadef_opts(ret);
 
     return all;
@@ -1776,12 +1766,9 @@ ca_get_arg(Cadef d, int n)
  *   d: option definitions for a set
  *   pass either:
  *     xor: a list if exclusions
- *     opts: if set, all options excluded leaving only nornal/rest arguments
- * if ca_xor list initialised, exclusions are added to it */
+ *     opts: if set, all options excluded leaving only nornal/rest arguments */
 
-static LinkList ca_xor;
-
-static int
+static void
 ca_inactive(Cadef d, char **xor, int cur, int opts, char *optname)
 {
     if ((xor || opts) && cur <= compcurrent) {
@@ -1792,8 +1779,6 @@ ca_inactive(Cadef d, char **xor, int cur, int opts, char *optname)
 	for (; (x = (opts ? "-" : *xor)); xor++) {
             if (optname && optname[0] == x[0] && strcmp(optname, x))
                 continue;
-	    if (ca_xor)
-		addlinknode(ca_xor, x);
 	    set = 0;
 	    if (sl > 0) {
 		if (strpfx(d->set, x)) {
@@ -1846,7 +1831,6 @@ ca_inactive(Cadef d, char **xor, int cur, int opts, char *optname)
 		break;
 	}
     }
-    return 0;
 }
 
 /* State when parsing a command line. */
@@ -1875,7 +1859,6 @@ struct castate {
     int curpos;		/* current word position */
     int argend;         /* total number of words */
     int inopt;		/* set to current word pos if word is a recognised option */
-    int inrest;		/* unused */
     int inarg;          /* in a normal argument */
     int nth;		/* number of current normal arg */
     int doff;		/* length of current option */
@@ -1978,7 +1961,7 @@ ca_parse_line(Cadef d, int multi, int first)
     state.argbeg = state.optbeg = state.nargbeg = state.restbeg = state.actopts =
 	state.nth = state.inopt = state.inarg = state.opt = state.arg = 1;
     state.argend = argend = arrlen(compwords) - 1;
-    state.inrest = state.doff = state.singles = state.oopt = 0;
+    state.doff = state.singles = state.oopt = 0;
     state.curpos = compcurrent;
     state.args = znewlinklist();
     state.oargs = (LinkList *) zalloc(d->nopts * sizeof(LinkList));
@@ -2025,10 +2008,9 @@ ca_parse_line(Cadef d, int multi, int first)
         remnulargs(line);
         untokenize(line);
 
-	if (ca_inactive(d, argxor, cur, 0, NULL) ||
-	    ((d->flags & CDF_SEP) && cur != compcurrent && !strcmp(line, "--"))) {
-	    if (ca_inactive(d, NULL, cur, 1, NULL))
-		return 1;
+	ca_inactive(d, argxor, cur, 0, NULL);
+	if ((d->flags & CDF_SEP) && cur != compcurrent && !strcmp(line, "--")) {
+	    ca_inactive(d, NULL, cur, 1, NULL);
 	    continue;
 	}
 
@@ -2104,9 +2086,8 @@ ca_parse_line(Cadef d, int multi, int first)
 	    if (!state.oargs[state.curopt->num])
 		state.oargs[state.curopt->num] = znewlinklist();
 
-	    if (ca_inactive(d, state.curopt->xor, cur, 0,
-                            (cur == compcurrent ? state.curopt->name : NULL)))
-		return 1;
+	    ca_inactive(d, state.curopt->xor, cur, 0,
+		    (cur == compcurrent ? state.curopt->name : NULL));
 
 	    /* Collect the argument strings. Maybe. */
 
@@ -2159,9 +2140,8 @@ ca_parse_line(Cadef d, int multi, int first)
 		    if (!state.oargs[tmpopt->num])
 			state.oargs[tmpopt->num] = znewlinklist();
 
-		    if (ca_inactive(d, tmpopt->xor, cur, 0,
-                                    (cur == compcurrent ? tmpopt->name : NULL)))
-			return 1;
+		    ca_inactive(d, tmpopt->xor, cur, 0,
+			    (cur == compcurrent ? tmpopt->name : NULL));
 		}
 	    }
 	    if (state.def &&
@@ -2194,9 +2174,8 @@ ca_parse_line(Cadef d, int multi, int first)
 	else if (state.arg &&
 		 (!napat || cur <= compcurrent || !pattry(napat, line))) {
 	    /* Otherwise it's a normal argument. */
-	    if (napat && cur <= compcurrent &&
-		    ca_inactive(d, NULL, cur + 1, 1, NULL))
-		return 1;
+	    if (napat && cur <= compcurrent)
+		ca_inactive(d, NULL, cur + 1, 1, NULL);
 
 	    arglast = 1;
 	    /* if this is the first normal arg after an option, may have been
@@ -2231,7 +2210,6 @@ ca_parse_line(Cadef d, int multi, int first)
 		if (ca_laststate.def)
 		    break;
 
-		state.inrest = 0;
 		state.opt = (cur == state.nargbeg + 1 &&
 			     (!multi || !*line || 
 			      *line == '-' || *line == '+'));
@@ -2539,45 +2517,27 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	if (compcurrent > 1 && compwords[0]) {
 	    Cadef def;
 	    int cap = ca_parsed, multi, first = 1, use, ret = 0;
-	    LinkList cax = ca_xor, nx;
-	    LinkNode node;
 	    Castate states = NULL, sp;
-	    char *xor[2];
 
 	    ca_parsed = 0;
-	    xor[1] = NULL;
 
 	    if (!(def = get_cadef(nam, args + 1)))
 		return 1;
 
 	    multi = !!def->snext; /* if we have sets */
 	    ca_parsed = cap;
-	    ca_xor = (multi ? newlinklist() : NULL);
 
 	    while (def) { /* for each set */
 		use = !ca_parse_line(def, multi, first);
-		nx = ca_xor;
-		ca_xor = NULL; /* don't want to duplicate the xors in the list */
-		while ((def = def->snext)) {
-		    if (nx) {
-			for (node = firstnode(nx); node; incnode(node)) {
-			    xor[0] = (char *) getdata(node);
-			    if (!strcmp(xor[0], def->sname) ||
-				ca_inactive(def, xor, compcurrent, 0, NULL))
-				break; /* exclude this whole set */
-			}
-			if (!node) /* continue with this set */
-			    break;
-		    }
-		    /* entire set was excluded, continue to next set */
-		}
-		ca_xor = nx;
+		def = def->snext;
 		if (use && def) {
+		    /* entry needed so save it into list */
 		    sp = (Castate) zalloc(sizeof(*sp));
 		    memcpy(sp, &ca_laststate, sizeof(*sp));
 		    sp->snext = states;
 		    states = sp;
 		} else if (!use && !def) {
+		    /* final entry not needed */
 		    if (states) {
 			freecastate(&ca_laststate);
 			memcpy(&ca_laststate, states, sizeof(*sp));
@@ -2589,7 +2549,6 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		}
 		first = 0;
 	    }
-	    ca_xor = cax;
 	    ca_parsed = 1;
 	    ca_laststate.snext = states;
 
@@ -2602,7 +2561,7 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
          * things _arguments has to execute at this place on the line (the
          * sub-contexts are used as tags).
          * The return value is particularly important here, it says if 
-         * there are arguments to completely at all. */
+         * there are arguments to complete at all. */
 	{
 	    LinkList descr, act, subc;
 	    Caarg arg;

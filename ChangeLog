@@ -1,3 +1,8 @@
+2017-01-04  Oliver Kiddle  <opk@zsh.org>
+
+	* 40226: Src/Zle/computil.c, Test/Y03arguments.ztst:
+	tidy up some of the _arguments set code
+
 2017-01-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40265: Src/pattern.c: fix continuing problems with Meta characters
