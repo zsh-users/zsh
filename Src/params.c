@@ -3474,6 +3474,8 @@ strsetfn(Param pm, char *x)
 	pm->node.flags |= PM_NAMEDDIR;
 	adduserdir(pm->node.nam, x, 0, 0);
     }
+    /* If you update this function, you may need to update the
+     * `Implement remainder of strsetfn' block in assignstrvalue(). */
 }
 
 /* Function to get value of an array parameter */

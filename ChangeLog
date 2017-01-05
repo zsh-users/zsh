@@ -1,5 +1,8 @@
 2017-01-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40270 (after 39995): Src/params.c: Add cross-reference for
+	robustness.
+
 	* 40264: Completion/Unix/Command/_man: Complete all sections
 	after '-a'.
 
