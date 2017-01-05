@@ -1790,16 +1790,17 @@ ca_get_arg(Cadef d, int n)
  *     opts: if set, all options excluded leaving only nornal/rest arguments */
 
 static void
-ca_inactive(Cadef d, char **xor, int cur, int opts, char *optname)
+ca_inactive(Cadef d, char **xor, int cur, int opts)
 {
     if ((xor || opts) && cur <= compcurrent) {
 	Caopt opt;
 	char *x;
 	int sl = (d->set ? (int)strlen(d->set) : -1), set = 0;
+        /* current word could be a prefix of a longer one so only do
+	 * exclusions for single-letter options (for option clumping) */
+	int single = (cur == compcurrent);
 
 	for (; (x = (opts ? "-" : *xor)); xor++) {
-            if (optname && optname[0] == x[0] && strcmp(optname, x))
-                continue;
 	    set = 0;
 	    if (sl > 0) {
 		if (strpfx(d->set, x)) {
@@ -1809,7 +1810,7 @@ ca_inactive(Cadef d, char **xor, int cur, int opts, char *optname)
 		    Caopt p;
 
 		    for (p = d->opts; p; p = p->next)
-			if (p->set)
+			if (p->set && !(single && *p->name && p->name[1] && p->name[2]))
 			    p->active = 0;
 			
 		    x = ":";
@@ -1831,7 +1832,7 @@ ca_inactive(Cadef d, char **xor, int cur, int opts, char *optname)
 		Caopt p;
 
 		for (p = d->opts; p; p = p->next)
-		    if (!set || p->set)
+		    if ((!set || p->set) && !(single && *p->name && p->name[1] && p->name[2]))
 			p->active = 0;
 	    } else if (x[0] == '*' && !x[1]) {
 		if (d->rest && (!set || d->rest->set))
@@ -1845,7 +1846,8 @@ ca_inactive(Cadef d, char **xor, int cur, int opts, char *optname)
 
 		if (a && a->num == n && (!set || a->set))
 		    a->active = 0;
-	    } else if ((opt = ca_get_opt(d, x, 1, NULL)) && (!set || opt->set))
+	    } else if ((opt = ca_get_opt(d, x, 1, NULL)) && (!set || opt->set) &&
+		    !(single && *opt->name && opt->name[1] && opt->name[2]))
 		opt->active = 0;
 
 	    if (opts)
@@ -2029,9 +2031,9 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
         remnulargs(line);
         untokenize(line);
 
-	ca_inactive(d, argxor, cur, 0, NULL);
+	ca_inactive(d, argxor, cur, 0);
 	if ((d->flags & CDF_SEP) && cur != compcurrent && !strcmp(line, "--")) {
-	    ca_inactive(d, NULL, cur, 1, NULL);
+	    ca_inactive(d, NULL, cur, 1);
 	    continue;
 	}
 
@@ -2107,8 +2109,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 	    if (!state.oargs[state.curopt->num])
 		state.oargs[state.curopt->num] = znewlinklist();
 
-	    ca_inactive(d, state.curopt->xor, cur, 0,
-		    (cur == compcurrent ? state.curopt->name : NULL));
+	    ca_inactive(d, state.curopt->xor, cur, 0);
 
 	    /* Collect the argument strings. Maybe. */
 
@@ -2161,8 +2162,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 		    if (!state.oargs[tmpopt->num])
 			state.oargs[tmpopt->num] = znewlinklist();
 
-		    ca_inactive(d, tmpopt->xor, cur, 0,
-			    (cur == compcurrent ? tmpopt->name : NULL));
+		    ca_inactive(d, tmpopt->xor, cur, 0);
 		}
 	    }
 	    if (state.def &&
@@ -2190,7 +2190,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 		 (!napat || cur <= compcurrent || !pattry(napat, line))) {
 	    /* Otherwise it's a normal argument. */
 	    if (napat && cur <= compcurrent)
-		ca_inactive(d, NULL, cur + 1, 1, NULL);
+		ca_inactive(d, NULL, cur + 1, 1);
 
 	    arglast = 1;
 	    /* if this is the first normal arg after an option, may have been

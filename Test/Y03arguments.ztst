@@ -479,12 +479,9 @@
 F:shouldn't offer -b as it is already on the command-line
 
  tst_arguments -s : '(-d)-a' -b -c -d
- comptest $'tst -ab\t -\t\eb\eb \C-b-\t'
+ comptest $'tst -ab\t\C-h -\t\eb\eb \C-b-\t'
 0:exclusion with clumped options, in, after and before
->line: {tst -ab}{}
->DESCRIPTION:{option}
->NO:{-c}
->NO:{-d}
+>line: {tst -abc}{}
 >line: {tst -ab -c }{}
 >line: {tst -}{ -ab -c}
 >DESCRIPTION:{option}
@@ -492,7 +489,23 @@ F:shouldn't offer -b as it is already on the command-line
 >NO:{-b}
 >NO:{-c}
 >NO:{-d}
-F:the first tab press shouldn't offer -d since -a is on the command line
+
+ tst_arguments -s '(-conf)-c' '-conf' '-f' '(-)--long' --longer
+ comptest $'tst -c\t\C-h-long\t'
+0:don't prematurely exclude option that current word is a prefix of
+>line: {tst -c}{}
+>DESCRIPTION:{option}
+>NO:{-conf}
+>NO:{-f}
+>line: {tst --long}{}
+>DESCRIPTION:{option}
+>NO:{--long}
+>NO:{--longer}
+
+ tst_arguments -s '(set)-c' - set '-conf' '-f'
+ comptest $'tst -c\t'
+0:don't prematurely exclude option that current word is a prefix of (with sets)
+>line: {tst -conf }{}
 
  tst_arguments -s : -ad '(-d)-a' -b -ca -d
  comptest $'tst -ad\t-b\t'
