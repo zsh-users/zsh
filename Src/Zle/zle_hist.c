@@ -1220,13 +1220,12 @@ doisearch(char **args, int dir, int pattern)
 		char *patbuf = ztrdup(sbuf);
 		char *patstring;
 		/*
-		 * Use static pattern buffer since we don't need
-		 * to maintain it and won't call other pattern functions
-		 * meanwhile.
+		 * Do not use static pattern buffer (PAT_STATIC) since we call zle hooks,
+		 * which might call other pattern functions. Use PAT_ZDUP instead.
 		 * Use PAT_NOANCH because we don't need the match
 		 * anchored to the end, even if it is at the start.
 		 */
-		int patflags = PAT_STATIC|PAT_NOANCH;
+		int patflags = PAT_ZDUP|PAT_NOANCH;
 		if (sbuf[0] == '^') {
 		    /*
 		     * We'll handle the anchor later when
@@ -1521,6 +1520,7 @@ doisearch(char **args, int dir, int pattern)
 		    if (only_one || !top_spot || old_sbptr != sbptr)
 			break;
 		}
+		freepatprog(patprog);
 		patprog = NULL;
 		nosearch = 1;
 		skip_pos = 0;
@@ -1632,6 +1632,7 @@ doisearch(char **args, int dir, int pattern)
 	    }
 	    strcpy(sbuf + sbptr, paste);
 	    sbptr += pastelen;
+	    freepatprog(patprog);
 	    patprog = NULL;
 	    free(paste);
 	} else if (cmd == Th(z_acceptsearch)) {
@@ -1682,6 +1683,7 @@ doisearch(char **args, int dir, int pattern)
 	     * always valid at this point.
 	     */
 	    sbptr += zlecharasstring(LASTFULLCHAR, sbuf + sbptr);
+	    freepatprog(patprog);
 	    patprog = NULL;
 	}
 	if (feep)
@@ -1702,6 +1704,7 @@ doisearch(char **args, int dir, int pattern)
     zsfree(okeymap);
     if (matchlist)
 	freematchlist(matchlist);
+    freepatprog(patprog);
     isearch_active = 0;
     /*
      * Don't allow unused characters provided as a string to the

@@ -1,3 +1,9 @@
+2017-01-06  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* m0viefreak: 40285: Src/Zle/zle_hist.c: more care needed
+	managing patterns in history isearch if there are hooks
+	around.
+
 2017-01-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 40270 (after 39995): Src/params.c: Add cross-reference for
