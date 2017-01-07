@@ -51,7 +51,7 @@ _arguments -C \
   '*-listener[add an instance of specified class as a project listener]:class:->class' \
   '-noinput[do not allow interactive input]' \
   '(-f -file -buildfile -s -find)'{-f,-file,-buildfile}'[use specified build file]:build file:_files -g "*.xml(-.)"' \
-  '*-D[specify property with value to use]:property:->property' \
+  '*-D+[specify property with value to use]:property:->property' \
   '(-k -keep-going)'{-keep-going,-k}'[execute all targets that do not depend on failed target(s)]' \
   '-propertyfile[load all properties from specified file with -D properties taking precedence]:property file:_files -g "*.properties(-.)"' \
   '-inputhandler[specify class which will handle input requests]:class:->class' \
