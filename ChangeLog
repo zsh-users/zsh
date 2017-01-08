@@ -1,3 +1,8 @@
+2017-01-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 40302: Completion/Unix/Command/_swaks: New _swaks completion
+	(common options only).
+
 2017-01-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: LICENCE: Update year to $now (2017).

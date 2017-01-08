@@ -1,0 +1,40 @@
+#compdef swaks
+
+_arguments \
+  '(-s --server -p --port)'{-s+,--server=}'[target host[:port\]]:host[\:port]:_hosts' \
+  '(-p --port)'{-p+,--port=}'[target port number]:port number:(25 465 587)' \
+  '--copy-routing[derive target host:port from email address domain part]:email address domain part' \
+  '(-t --to)'{-t+,--to=}':envelope recipient(s):_sequence _email_addresses -c' \
+  '(-f --from)'{-f+,--from=}':envelope sender:_email_addresses -c' \
+  '(--ehlo --lhlo -h --helo)'{-h+,--ehlo,--helo,--lhlo}':HELO string:_hosts' \
+  '(-q --quit-after)'{-q+,--quit-after=}'[stop transaction early]:stop point:((
+      CONNECT\:banner BANNER\:banner
+      FIRST-HELO\:first\ HELO FIRST-EHLO\:first\ HELO
+      XCLIENT\:XCLIENT
+      TLS\:TLS\ negotiation
+      HELO\:second\ HELO EHLO\:second\ HELO
+      AUTH\:authentication
+      MAIL\:MAIL\ FROM FROM\:MAIL\ FROM
+      RCPT\:RCPT\ TO TO\:RCPT\ TO
+      ))' \
+  '--protocol=:protocol variant:((
+      SMTP\:HELO\ 25
+      SSMTP\:EHLO\ 465
+      SSMTPA\:EHLO\ 465\ authenticated
+      SMTPS\:HELO\ 465
+      ESMTP\:EHLO\ 25
+      ESMTPA\:EHLO\ 25\ authenticated
+      ESMTPS\:EHLO\ STARTTLS\ 25
+      ESMTPSA\:EHLO\ STARTTLS\ 25\ authenticated
+      ))' \
+  '-tls[TLS required]' \
+  '(-tlsos --tls-optional-strict)'{-tlsos,--tls-optional-strict}'[TLS iff offered by target]' \
+  '(-tlsc --tls-on-connect)'{-tlsc,--tls-on-connect}'[TLS on connect (port 465)]' \
+  '(-tlsp --tls-protocol)'{-tlsp,--tls-protocol=}':TLS protocol:(sslv2 sslv3 tlsv1 tlsv1_1 tlsv1_2)' \
+  '-tls-cipher:OpenSSL cipher string: ' \
+  '--tls-verify[verify TLS certificates]' \
+  '--tls-ca-path=:OpenSSL CAfile or CAdir:_files' \
+  '--tls-get-peer-cert=-:file to write (omit for STDOUT)' \
+  '(-d --data)'{-d+,--data=}'[specify DATA payload]:filename (or string with tokens):_files' \
+  '*'{-ah,--add-header=}'[add headers]:<Header>\: Value' \
+  '*'{-h,--header=}'[replace headers]:<Header>\: Value'
