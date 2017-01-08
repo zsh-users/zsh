@@ -22,16 +22,18 @@ compset -N '[,.]' && first=0
 [[ $first -eq 0 ]] || compset -n 2
 
 if [[ CURRENT -eq 1 ]]; then
-  _wanted cmd expl 'bts command' compadd show bugs close reopen retitle \
+  _wanted cmd expl 'bts command' compadd show bugs reopen retitle \
       reassign merge unmerge tag tags severity forwarded notforwarded help \
       clone submitter found notfound block unblock user usertag usertags \
       package owner noowner reportspam cache cleancache claim unclaim \
-      subscribe unsubscribe fixed notfixed affects
+      subscribe unsubscribe fixed notfixed affects spamreport status \
+      select done archive unarchive summary forcemerge limit listcachedbugs \
+      version
   return
 fi
 
 case "$words[1]" in
-  (close|unmerge|notforwarded|noowner|reportspam)
+  (unmerge|notforwarded|noowner|reportspam|spamreport|archive|unarchive)
     if [[ CURRENT -eq 2 ]]; then
       _debbugs_bugnumber
     else
@@ -75,7 +77,10 @@ case "$words[1]" in
      _wanted sep expl 'separator' compadd -S ' ' , .
     fi
   ;;
-  merge)
+  (status)
+    # TODO: some additional syntaxes aren't being completed.
+  ;&
+  (merge|forcemerge)
     _debbugs_bugnumber
     if [[ CURRENT -gt 2 ]]; then
      _wanted sep expl 'separator' compadd -S ' ' , .
@@ -208,8 +213,10 @@ case "$words[1]" in
   ;;
   (cleancache)
      _alternative \
-       'package:package:_deb_packages avail' \
-       'email:email address:_email_addresses -c' \
+       'source-packages:source package:_deb_packages -P "src:" source' \
+       'package:binary package:_deb_packages avail' \
+       'email:email address:_email_addresses -c -P "from:"' \
+       'bugnum:bug number:_debbugs_bugnumber' \
        'all:all:compadd ALL'
   ;;
   (claim|unclaim)
@@ -231,6 +238,51 @@ case "$words[1]" in
     else
       _wanted package expl 'package' _deb_packages avail
     fi
+  ;;
+  (summary)
+    case $CURRENT in
+      (2) _debbugs_bugnumber;;
+      (3) _message -e message-number 'message number';&
+      (4) _wanted sep expl 'separator' compadd -S ' ' , .;;
+    esac
+  ;;
+  (close|done)
+    case $CURRENT in
+      (2) _debbugs_bugnumber;;
+      (3) _message -e version 'version';&
+      (4) _wanted sep expl 'separator' compadd -S ' ' , .;;
+    esac
+  ;;
+  (select)
+    _values -S : -w "select field" \
+      '*package[binary package]: :_deb_packages avail' \
+      '*source[source package]: :_deb_packages source' \
+      '*maintainer:email address of the maintainer:_email_addresses -c' \
+      '*submitter:email address of the submitter:_email_addresses -c' \
+      '*severity:severity:(wishlist minor normal important serious grave critical)' \
+      '*tag[tags applied to the bug]:tags:' \
+      '*owner:owner:_email_addresses -c' \
+      '*correspondent:email address of a correspondent:_email_addresses -c' \
+      '*affects:affected package:_deb_packages avail' \
+      '*users:namespaces of usertags:_email_addresses -c' \
+      '*archive:whether to search archived bugs:((0:no 1:yes both:both))'
+      # undocumented: bugs
+    _wanted sep expl 'separator' compadd -S ' ' , .
+  ;;
+  (limit)
+    _values -S : -w "limit field" \
+      '*submitter[email address of the submitter]:submitter:_email_addresses -c' \
+      '*date[bug submission timestamp]:unix timestamp' \
+      '*subject[subject of the bug]:bug subject:' \
+      '*msgid[message-id of the initial bug report]:message-id:' \
+      '*package[binary package]: :_deb_packages avail' \
+      '*source[source package]: :_deb_packages source' \
+      '*tag[tags applied to the bug]:tags:' \
+      '*severity:severity:(wishlist minor normal important serious grave critical)' \
+      '*owner:owner:_email_addresses -c' \
+      '*affects:affected package:_deb_packages avail' \
+      '*archive:whether to search archived bugs:((0:no 1:yes both:both))'
+    _wanted sep expl 'separator' compadd -S ' ' , .
   ;;
   help)
   ;&
