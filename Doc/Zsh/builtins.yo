@@ -453,7 +453,7 @@ tt(echo) recognizes the following escape sequences:
 startsitem()
 sitem(tt(\a))(bell character)
 sitem(tt(\b))(backspace)
-sitem(tt(\c))(suppress final newline)
+sitem(tt(\c))(suppress subsequent characters and final newline)
 sitem(tt(\e))(escape)
 sitem(tt(\f))(form feed)
 sitem(tt(\n))(linefeed (newline))
