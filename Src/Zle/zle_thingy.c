@@ -703,7 +703,7 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 {
     Thingy t;
     struct modifier modsave = zmod;
-    int ret, saveflag = 0, setbindk = 0;
+    int ret, saveflag = 0, setbindk = 0, remetafy;
     char *wname = *args++, *keymap_restore = NULL, *keymap_tmp;
 
     if (!wname)
@@ -714,7 +714,15 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 	return 1;
     }
 
-    UNMETACHECK();
+    /*
+     * zle is callable in traps, so we can't be sure the line is
+     * in its normal state.
+     */
+    if (zlemetaline) {
+	unmetafy_line();
+	remetafy = 1;
+    } else
+	remetafy = 0;
 
     while (*args && **args == '-') {
 	char *num;
@@ -728,6 +736,8 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		num = args[0][1] ? args[0]+1 : args[1];
 		if (!num) {
 		    zwarnnam(name, "number expected after -%c", **args);
+		    if (remetafy)
+			metafy_line();
 		    return 1;
 		}
 		if (!args[0][1])
@@ -745,19 +755,26 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 		keymap_tmp = args[0][1] ? args[0]+1 : args[1];
 		if (!keymap_tmp) {
 		    zwarnnam(name, "keymap expected after -%c", **args);
+		    if (remetafy)
+			metafy_line();
 		    return 1;
 		}
 		if (!args[0][1])
 		    *++args = "" - 1;
 		keymap_restore = dupstring(curkeymapname);
-		if (selectkeymap(keymap_tmp, 0))
+		if (selectkeymap(keymap_tmp, 0)) {
+		    if (remetafy)
+			metafy_line();
 		    return 1;
+		}
 		break;
 	    case 'w':
 		setbindk = 1;
 		break;
 	    default:
 		zwarnnam(name, "unknown option: %s", *args);
+		if (remetafy)
+		    metafy_line();
 		return 1;
 	    }
 	}
@@ -775,6 +792,8 @@ bin_zle_call(char *name, char **args, UNUSED(Options ops), UNUSED(char func))
 	zmod = modsave;
     if (keymap_restore)
 	selectkeymap(keymap_restore, 0);
+    if (remetafy)
+	metafy_line();
     return ret;
 }
 

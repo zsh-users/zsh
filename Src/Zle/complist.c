@@ -1993,7 +1993,8 @@ complistmatches(UNUSED(Hookdef dummy), Chdata dat)
     if (noselect > 0)
 	noselect = 0;
 
-    if ((minfo.asked == 2 && mselect < 0) || nlnct >= zterm_lines) {
+    if ((minfo.asked == 2 && mselect < 0) || nlnct >= zterm_lines ||
+	errflag) {
 	showinglist = 0;
 	amatches = oamatches;
 	return (noselect = 1);

@@ -1245,6 +1245,7 @@ zleread(char **lp, char **rp, int flags, int context, char *init, char *finish)
     resetneeded = 0;
     fetchttyinfo = 0;
     trashedzle = 0;
+    clearflag = 0;
     raw_lp = lp;
     lpromptbuf = promptexpand(lp ? *lp : NULL, 1, NULL, NULL, &pmpt_attr);
     raw_rp = rp;

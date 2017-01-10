@@ -1,5 +1,9 @@
 2017-01-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 40305: Src/Zle/complist.c, Src/Zle/zle_main.c,
+	Src/Zle/zle_refresh.c, Src/Zle/zle_thingy.c: fix some problems
+	redisplaying command line after interrupts.
+
 	* 40306 with documentation additions: Doc/Zsh/options.yo,
 	README, Src/input.c, Src/options.c, Src/parse.c, Src/zsh.h,
 	Test/A02alias.ztst: Add ALIAS_FUNC_DEF option and make
