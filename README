@@ -29,8 +29,31 @@ Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
 
-Incompatibilities between 5.2 and 5.3.1
----------------------------------------
+Incompatibilities since 5.3.1
+-----------------------------
+
+The default behaviour of code like the following has changed:
+
+  alias foo='noglob foo'
+  foo() { print function body; }
+
+When this is encountered in a start-up file, or other place where input
+was read line by line, "foo" is in command position and is expanded as
+an alias before the function definition takes place.  In previous
+versions of the shell, this caused two functions "noglob" and "foo" to
+be defined.  Any expansion of an alias in a function definition is
+nearly always an unintended effect, as well as hard to detect, so has
+been made an error.  (The option setting NO_MULTI_FUNC_DEF turned this
+case into an error, but did not help with other cases and is off by
+default.)  The alternative, of not expanding the alias, was rejected as
+it was more difficult to achieve in the parser and also would silently
+change the shell's behaviur between versions.  A new option,
+ALIAS_FUNC_DEF, has been added, which can be set to make the shell
+behave as in previous versions.  It is in any case recommended to use
+the "function" keyword, as aliases are not expanded afterwards.
+
+Incompatibilities between 5.0.8 and 5.3.1
+-----------------------------------------
 
 1) In character classes delimited by "[" and "]" within patterns, whether
 used for filename generation (globbing) or other forms of pattern
@@ -158,10 +181,6 @@ following example illustrates how this differs from past versions.
      4 3 => 0  |  4 3 => 0
      4 4 => 1  |  4 4 => 0   **
      4 5 => 1  |  4 5 => 1
-
-
-Incompatibilities between 5.0.8 and 5.2
----------------------------------------
 
 The behaviour of the parameter flag (P) has changed when it appears
 in a nested parameter group, in order to make it more useful in

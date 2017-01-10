@@ -2222,6 +2222,7 @@ struct histent {
 enum {
     OPT_INVALID,
     ALIASESOPT,
+    ALIASFUNCDEF,
     ALLEXPORT,
     ALWAYSLASTPROMPT,
     ALWAYSTOEND,

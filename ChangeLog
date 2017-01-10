@@ -1,3 +1,12 @@
+2017-01-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 40306 with documentation additions: Doc/Zsh/options.yo,
+	README, Src/input.c, Src/options.c, Src/parse.c, Src/zsh.h,
+	Test/A02alias.ztst: Add ALIAS_FUNC_DEF option and make
+	the default behaviour to disallow functions where the
+	name is expanded as an alias (unless part of a complete
+	function definition within the alias).
+
 2017-01-10  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 40303: Completion/Debian/Command/_bts: Add more subcommands.

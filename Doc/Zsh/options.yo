@@ -1539,6 +1539,36 @@ enditem()
 
 subsect(Scripts and Functions)
 startitem()
+pindex(ALIAS_FUNC_DEF)
+pindex(NO_ALIAS_FUNC_DEF)
+pindex(ALIASFUNCDEF)
+pindex(NOALIASFUNCDEF)
+cindex(functions, defining with expanded aliases)
+cindex(aliases, expanding in function definition)
+item(tt(ALIAS_FUNC_DEF) <S>)(
+By default, zsh does not allow the definition of functions using
+the `var(name) tt(LPAR()RPAR())' syntax if var(name) was expanded as an
+alias: this causes an error.  This is usually the desired behaviour, as
+otherwise the combination of an alias and a function based on the same
+definition can easily cause problems.
+
+When this option is set, aliases can be used for defining functions.
+
+For example, consider the following definitions as they might
+occur in a startup file.
+
+example(alias foo=bar
+foo+LPAR()RPAR() {
+  print This probably does not do what you expect.
+})
+
+Here, tt(foo) is expanded as an alias to tt(bar) before the
+tt(LPAR()RPAR()) is encountered, so the function defined would be named
+tt(bar).  By default this is instead an error in native mode.  Note that
+quoting any part of the function name, or using the keyword
+tt(function), avoids the problem, so is recommended when the function
+name can also be an alias.
+)
 pindex(C_BASES)
 pindex(NO_C_BASES)
 pindex(CBASES)

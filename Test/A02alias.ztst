@@ -82,6 +82,7 @@
 0:Global aliasing quotes
 > a string S 
 *>*5*echo S a string S "
+# "
 # Note there is a trailing space on the "> a string S " line
 
   (
@@ -115,3 +116,24 @@
 1:error message has the correct sign
 ?(eval):alias:1: bad option: +x
 ?(eval):alias:1: bad option: -z
+
+  # Usual issue that aliases aren't expanded until we
+  # trigger a new parse...
+  (alias badalias=notacommand
+  eval 'badalias() { print does not work; }')
+1:ALIAS_FUNC_DEF off by default.
+?(eval):1: defining function based on alias `badalias'
+?(eval):1: parse error near `()'
+
+  (alias goodalias=isafunc
+  setopt ALIAS_FUNC_DEF
+  eval 'goodalias() { print does now work; }'
+  isafunc)
+0:ALIAS_FUNC_DEF causes the icky behaviour to be avaliable
+>does now work
+
+  (alias thisisokthough='thisworks() { print That worked; }'
+  eval thisisokthough
+  thisworks)
+0:NO_ALIAS_FUNC_DEF works if the alias is a complete definition
+>That worked

@@ -1738,6 +1738,7 @@ par_simple(int *cmplx, int nr)
 {
     int oecused = ecused, isnull = 1, r, argc = 0, p, isfunc = 0, sr = 0;
     int c = *cmplx, nrediradd, assignments = 0, ppost = 0, is_typeset = 0;
+    char *hasalias = input_hasalias();
     wordcode postassigns = 0;
 
     r = ecused;
@@ -1809,6 +1810,8 @@ par_simple(int *cmplx, int nr)
 	} else
 	    break;
 	zshlex();
+	if (!hasalias)
+	    hasalias = input_hasalias();
     }
     if (tok == AMPER || tok == AMPERBANG)
 	YYERROR(oecused);
@@ -1839,6 +1842,8 @@ par_simple(int *cmplx, int nr)
 			char *idstring = dupstrpfx(tokstr+1, eptr-tokstr-1);
 			redir_var = 1;
 			zshlex();
+			if (!hasalias)
+			    hasalias = input_hasalias();
 
 			if (IS_REDIROP(tok) && tokfd == -1)
 			{
@@ -1874,6 +1879,8 @@ par_simple(int *cmplx, int nr)
 		    argc++;
 		}
 		zshlex();
+		if (!hasalias)
+		    hasalias = input_hasalias();
 	    }
 	} else if (IS_REDIROP(tok)) {
 	    *cmplx = c = 1;
@@ -1902,6 +1909,8 @@ par_simple(int *cmplx, int nr)
 	    ecstr(name);
 	    ecstr(str);
 	    zshlex();
+	    if (!hasalias)
+		hasalias = input_hasalias();
 	} else if (tok == ENVARRAY) {
 	    int n, parr;
 
@@ -1936,6 +1945,11 @@ par_simple(int *cmplx, int nr)
 	    /* Error if preceding assignments */
 	    if (assignments || postassigns)
 		YYERROR(oecused);
+	    if (hasalias && !isset(ALIASFUNCDEF) && argc &&
+		hasalias != input_hasalias()) {
+		zwarn("defining function based on alias `%s'", hasalias);
+		YYERROR(oecused);
+	    }
 
 	    *cmplx = c;
 	    lineno = 0;
