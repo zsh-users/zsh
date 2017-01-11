@@ -1,5 +1,8 @@
 2017-01-11  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Src/builtin.c, Src/exec.c: be more careful to free
+	memory when updating filename in struct shfunc.
+
 	* 40327 (with minor fixes): Doc/Zsh/builtins.yo,
 	README,Src/builtin.c, Src/exec.c, Src/hashtable.c, Src/parse.c,
 	Src/zsh.h, Test/C04funcdef.ztst: add ability to autoload

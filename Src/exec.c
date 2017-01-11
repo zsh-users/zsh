@@ -5204,6 +5204,7 @@ loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 	    else
 		shf->funcdef = dupeprog(prog, 0);
 	    shf->node.flags &= ~PM_UNDEFINED;
+	    zsfree(shf->filename);
 	    shf->filename = fname;
 	} else {
 	    VARARR(char, n, strlen(shf->node.nam) + 1);
@@ -5227,6 +5228,7 @@ loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 	else
 	    shf->funcdef = dupeprog(stripkshdef(prog, shf->node.nam), 0);
 	shf->node.flags &= ~PM_UNDEFINED;
+	zsfree(shf->filename);
 	shf->filename = fname;
     }
     popheap();

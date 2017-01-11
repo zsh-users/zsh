@@ -3275,8 +3275,10 @@ bin_functions(char *name, char **argv, Options ops, int func)
 		shf = (Shfunc) zshcalloc(sizeof *shf);
 		shfunctab->addnode(shfunctab, ztrdup(funcname), shf);
 	    }
-	    if (*argv)
+	    if (*argv) {
+		zsfree(shf->filename);
 		shf->filename = ztrdup(*argv);
+	    }
 	    shf->node.flags = on;
 	    ret = eval_autoload(shf, funcname, ops, func);
 	}
