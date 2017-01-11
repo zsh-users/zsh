@@ -949,16 +949,20 @@ printshfuncnode(HashNode hn, int printflags)
 	    zoutputtab(stdout);
 	}
 	if (!t) {
-	    char *fopt = "UtTkz";
+	    char *fopt = "UtTkzc";
 	    int flgs[] = {
 		PM_UNALIASED, PM_TAGGED, PM_TAGGED_LOCAL,
-		PM_KSHSTORED, PM_ZSHSTORED, 0
+		PM_KSHSTORED, PM_ZSHSTORED, PM_CUR_FPATH, 0
 	    };
 	    int fl;;
 
 	    zputs("builtin autoload -X", stdout);
 	    for (fl=0;fopt[fl];fl++)
 		if (f->node.flags & flgs[fl]) putchar(fopt[fl]);
+	    if (f->filename) {
+		putchar(' ');
+		zputs(f->filename, stdout);
+	    }
 	} else {
 	    zputs(t, stdout);
 	    zsfree(t);

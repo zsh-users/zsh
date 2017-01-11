@@ -1233,7 +1233,9 @@ struct cmdnam {
 
 struct shfunc {
     struct hashnode node;
-    char *filename;             /* Name of file located in */
+    char *filename;             /* Name of file located in.
+				   For not yet autoloaded file, name
+				   of explicit directory, if not NULL. */
     zlong lineno;		/* line number in above file */
     Eprog funcdef;		/* function definition    */
     Eprog redir;                /* redirections to apply */
@@ -1811,6 +1813,7 @@ struct tieddata {
 #define PM_UNALIASED	(1<<13)	/* do not expand aliases when autoloading   */
 
 #define PM_HIDE		(1<<14)	/* Special behaviour hidden by local        */
+#define PM_CUR_FPATH    (1<<14) /* (function): can use $fpath with filename */
 #define PM_HIDEVAL	(1<<15)	/* Value not shown in `typeset' commands    */
 #define PM_TIED 	(1<<16)	/* array tied to colon-path or v.v.         */
 #define PM_TAGGED_LOCAL (1<<16) /* (function): non-recursive PM_TAGGED      */

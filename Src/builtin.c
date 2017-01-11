@@ -46,7 +46,7 @@ static struct builtin builtins[] =
     BUILTIN(".", BINF_PSPECIAL, bin_dot, 1, -1, 0, NULL, NULL),
     BUILTIN(":", BINF_PSPECIAL, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("alias", BINF_MAGICEQUALS | BINF_PLUSOPTS, bin_alias, 0, -1, 0, "Lgmrs", NULL),
-    BUILTIN("autoload", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "mktTUwXz", "u"),
+    BUILTIN("autoload", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "dmktrRTUwXz", "u"),
     BUILTIN("bg", 0, bin_fg, 0, -1, BIN_BG, NULL, NULL),
     BUILTIN("break", BINF_PSPECIAL, bin_break, 0, 1, BIN_BREAK, NULL, NULL),
     BUILTIN("bye", 0, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
@@ -2922,9 +2922,59 @@ eval_autoload(Shfunc shf, char *name, Options ops, int func)
     }
 
     return !loadautofn(shf, (OPT_ISSET(ops,'k') ? 2 :
-			     (OPT_ISSET(ops,'z') ? 0 : 1)), 1);
+			     (OPT_ISSET(ops,'z') ? 0 : 1)), 1,
+		       OPT_ISSET(ops,'d'));
 }
 
+/* Helper for bin_functions() for -X and -r options */
+
+/**/
+static int
+check_autoload(Shfunc shf, char *name, Options ops, int func)
+{
+    if (OPT_ISSET(ops,'X'))
+    {
+	return eval_autoload(shf, name, ops, func);
+    }
+    if (OPT_ISSET(ops,'r') || OPT_ISSET(ops,'R'))
+    {
+	char *dir_path;
+	if (shf->filename) {
+	    char *spec_path[2];
+	    spec_path[0] = shf->filename;
+	    spec_path[1] = NULL;
+	    if (getfpfunc(shf->node.nam, NULL, &dir_path, spec_path, 1)) {
+		/* shf->filename is already correct. */
+		return 0;
+	    }
+	    if (!OPT_ISSET(ops,'d')) {
+		if (OPT_ISSET(ops,'R')) {
+		    zerr("%s: function definition file not found",
+			 shf->node.nam);
+		    return 1;
+		}
+		return 0;
+	    }
+	}
+	if (getfpfunc(shf->node.nam, NULL, &dir_path, NULL, 1)) {
+	    zsfree(shf->filename);
+	    if (*dir_path != '/') {
+		dir_path = zhtricat(metafy(zgetcwd(), -1, META_HEAPDUP),
+				    "/", dir_path);
+		dir_path = xsymlink(dir_path, 1);
+	    }
+	    shf->filename = ztrdup(dir_path);
+	    return 0;
+	}
+	if (OPT_ISSET(ops,'R')) {
+	    zerr("%s: function definition file not found",
+		 shf->node.nam);
+	    return 1;
+	}
+	/* with -r, we don't flag an error, just let it be found later. */
+    }
+    return 0;
+}
 
 /* List a user-defined math function. */
 static void
@@ -2961,6 +3011,28 @@ listusermathfunc(MathFunc p)
     putchar('\n');
 }
 
+
+static void
+add_autoload_function(Shfunc shf, char *funcname)
+{
+    char *nam;
+    if (*funcname == '/' && funcname[1] &&
+	(nam = strrchr(funcname, '/')) && nam[1]) {
+	char *dir;
+	nam = strrchr(funcname, '/');
+	if (nam == funcname) {
+	    dir = "/";
+	} else {
+	    *nam++ = '\0';
+	    dir = funcname;
+	}
+	zsfree(shf->filename);
+	shf->filename = ztrdup(dir);
+	shfunctab->addnode(shfunctab, ztrdup(nam), shf);
+    } else {
+	shfunctab->addnode(shfunctab, ztrdup(funcname), shf);
+    }
+}
 
 /* Display or change the attributes of shell functions.   *
  * If called as autoload, it will define a new autoloaded *
@@ -3007,10 +3079,17 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	off |= PM_KSHSTORED;
 	roff |= PM_KSHSTORED;
     }
+    if (OPT_MINUS(ops,'d')) {
+	on |= PM_CUR_FPATH;
+	off |= PM_CUR_FPATH;
+    } else if (OPT_PLUS(ops,'d')) {
+	off |= PM_CUR_FPATH;
+	roff |= PM_CUR_FPATH;
+    }
 
     if ((off & PM_UNDEFINED) || (OPT_ISSET(ops,'k') && OPT_ISSET(ops,'z')) ||
 	(OPT_ISSET(ops,'x') && !OPT_HASARG(ops,'x')) ||
-	(OPT_MINUS(ops,'X') && (OPT_ISSET(ops,'m') || *argv || !scriptname))) {
+	(OPT_MINUS(ops,'X') && (OPT_ISSET(ops,'m') || !scriptname))) {
 	zwarnnam(name, "invalid option(s)");
 	return 1;
     }
@@ -3165,47 +3244,55 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	return returnval;
     }
 
-    /* If no arguments given, we will print functions.  If flags *
-     * are given, we will print only functions containing these  *
-     * flags, else we'll print them all.                         */
-    if (!*argv) {
+    if (OPT_MINUS(ops,'X')) {
+	Funcstack fs;
+	char *funcname = NULL;
+	int ret;
+	if (*argv && argv[1]) {
+	    zwarnnam(name, "-X: too many arguments");
+	    return 1;
+	}
+	queue_signals();
+	for (fs = funcstack; fs; fs = fs->prev) {
+	    if (fs->tp == FS_FUNC) {
+		/*
+		 * dupstring here is paranoia but unlikely to be
+		 * problematic
+		 */
+		funcname = dupstring(fs->name);
+		break;
+	    }
+	}
+	if (!funcname)
+	{
+	    zerrnam(name, "bad autoload");
+	    ret = 1;
+	} else {
+	    if ((shf = (Shfunc) shfunctab->getnode(shfunctab, funcname))) {
+		DPUTS(!shf->funcdef,
+		      "BUG: Calling autoload from empty function");
+	    } else {
+		shf = (Shfunc) zshcalloc(sizeof *shf);
+		shfunctab->addnode(shfunctab, ztrdup(funcname), shf);
+	    }
+	    if (*argv)
+		shf->filename = ztrdup(*argv);
+	    shf->node.flags = on;
+	    ret = eval_autoload(shf, funcname, ops, func);
+	}
+	unqueue_signals();
+	return ret;
+    } else if (!*argv) {
+	/* If no arguments given, we will print functions.  If flags *
+	 * are given, we will print only functions containing these  *
+	 * flags, else we'll print them all.                         */
 	int ret = 0;
 
 	queue_signals();
-	if (OPT_MINUS(ops,'X')) {
-	    Funcstack fs;
-	    char *funcname = NULL;
-	    for (fs = funcstack; fs; fs = fs->prev) {
-		if (fs->tp == FS_FUNC) {
-		    /*
-		     * dupstring here is paranoia but unlikely to be
-		     * problematic
-		     */
-		    funcname = dupstring(fs->name);
-		    break;
-		}
-	    }
-	    if (!funcname)
-	    {
-		zerrnam(name, "bad autoload");
-		ret = 1;
-	    } else {
-		if ((shf = (Shfunc) shfunctab->getnode(shfunctab, funcname))) {
-		    DPUTS(!shf->funcdef,
-			  "BUG: Calling autoload from empty function");
-		} else {
-		    shf = (Shfunc) zshcalloc(sizeof *shf);
-		    shfunctab->addnode(shfunctab, ztrdup(funcname), shf);
-		}
-		shf->node.flags = on;
-		ret = eval_autoload(shf, funcname, ops, func);
-	    }
-	} else {
-	    if (OPT_ISSET(ops,'U') && !OPT_ISSET(ops,'u'))
+	if (OPT_ISSET(ops,'U') && !OPT_ISSET(ops,'u'))
 		on &= ~PM_UNDEFINED;
 	    scanshfunc(1, on|off, DISABLED, shfunctab->printnode,
 		       pflags, expand);
-	}
 	unqueue_signals();
 	return ret;
     }
@@ -3231,8 +3318,8 @@ bin_functions(char *name, char **argv, Options ops, int func)
 				!(shf->node.flags & DISABLED)) {
 				shf->node.flags = (shf->node.flags |
 					      (on & ~PM_UNDEFINED)) & ~off;
-				if (OPT_ISSET(ops,'X') &&
-				    eval_autoload(shf, shf->node.nam, ops, func)) {
+				if (check_autoload(shf, shf->node.nam,
+						   ops, func)) {
 				    returnval = 1;
 				}
 			    }
@@ -3258,8 +3345,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    if (on|off) {
 		/* turn on/off the given flags */
 		shf->node.flags = (shf->node.flags | (on & ~PM_UNDEFINED)) & ~off;
-		if (OPT_ISSET(ops,'X') &&
-		    eval_autoload(shf, shf->node.nam, ops, func))
+		if (check_autoload(shf, shf->node.nam, ops, func))
 		    returnval = 1;
 	    } else
 		/* no flags, so just print */
@@ -3282,7 +3368,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    shf->node.flags = on;
 	    shf->funcdef = mkautofn(shf);
 	    shfunc_set_sticky(shf);
-	    shfunctab->addnode(shfunctab, ztrdup(*argv), shf);
+	    add_autoload_function(shf, *argv);
 
 	    if (signum != -1) {
 		if (settrap(signum, NULL, ZSIG_FUNC)) {
@@ -3293,8 +3379,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 		}
 	    }
 
-	    if (ok && OPT_ISSET(ops,'X') &&
-		eval_autoload(shf, shf->node.nam, ops, func))
+	    if (ok && check_autoload(shf, shf->node.nam, ops, func))
 		returnval = 1;
 	} else
 	    returnval = 1;

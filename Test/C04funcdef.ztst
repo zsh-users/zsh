@@ -330,6 +330,95 @@
 0:whence -v of zsh-style autoload
 >oops is a shell function from ./oops
 
+  (
+    fpath=(.)
+    mkdir extra
+    print 'print "I have been loaded by explicit path."' >extra/spec
+    autoload -Uz $PWD/extra/spec
+    spec
+  )
+0:autoload with explicit path
+>I have been loaded by explicit path.
+
+  (
+    fpath=(.)
+    print 'print "I have been loaded by default path."' >def
+    autoload -Uz $PWD/extra/def
+    def
+  )
+1:autoload with explicit path with function in normal path, no -d
+?(eval):5: def: function definition file not found
+
+  (
+    fpath=(.)
+    autoload -dUz $PWD/extra/def
+    def
+  )
+0:autoload with explicit path with function in normal path, with -d
+>I have been loaded by default path.
+
+  (
+    cd extra
+    fpath=(.)
+    autoload -r spec
+    cd ..
+    spec
+  )
+0:autoload -r
+>I have been loaded by explicit path.
+
+  (
+    cd extra
+    fpath=(.)
+    autoload -r def
+    cd ..
+    def
+  )
+0:autoload -r is permissive
+>I have been loaded by default path.
+
+  (
+    cd extra
+    fpath=(.)
+    autoload -R def
+  )
+1:autoload -R is not permissive
+?(eval):4: def: function definition file not found
+
+  (
+    spec() { autoload -XUz $PWD/extra; }
+    spec
+  )
+0:autoload -X with path
+>I have been loaded by explicit path.
+
+# The line number 1 here and in the next test seems suspect,
+# but this example proves it's not down to the new features
+# being tested here.
+  (
+    fpath=(.)
+    cod() { autoload -XUz; }
+    cod
+  )
+1:autoload -X with no path, failure
+?(eval):1: cod: function definition file not found
+
+  (
+    fpath=(.)
+    def() { autoload -XUz $PWD/extra; }
+    def
+  )
+1:autoload -X with wrong path and no -d
+?(eval):1: def: function definition file not found
+
+  (
+    fpath=(.)
+    def() { autoload -dXUz $PWD/extra; }
+    def
+  )
+0:autoload -dX with path
+>I have been loaded by default path.
+
 %clean
 
  rm -f file.in file.out

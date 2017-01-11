@@ -3338,7 +3338,7 @@ cur_add_func(char *nam, Shfunc shf, LinkList names, LinkList progs,
 	    return 1;
 	}
 	noaliases = (shf->node.flags & PM_UNALIASED);
-	if (!(prog = getfpfunc(shf->node.nam, NULL, NULL)) ||
+	if (!(prog = getfpfunc(shf->node.nam, NULL, NULL, NULL, 0)) ||
 	    prog == &dummy_eprog) {
 	    noaliases = ona;
 	    zwarnnam(nam, "can't load function: %s", shf->node.nam);
@@ -3580,7 +3580,7 @@ load_dump_file(char *dump, struct stat *sbuf, int other, int len)
 
 /**/
 Eprog
-try_dump_file(char *path, char *name, char *file, int *ksh)
+try_dump_file(char *path, char *name, char *file, int *ksh, int test_only)
 {
     Eprog prog;
     struct stat std, stc, stn;
@@ -3589,7 +3589,7 @@ try_dump_file(char *path, char *name, char *file, int *ksh)
 
     if (strsfx(FD_EXT, path)) {
 	queue_signals();
-	prog = check_dump_file(path, NULL, name, ksh);
+	prog = check_dump_file(path, NULL, name, ksh, test_only);
 	unqueue_signals();
 	return prog;
     }
@@ -3608,14 +3608,14 @@ try_dump_file(char *path, char *name, char *file, int *ksh)
     if (!rd &&
 	(rc || std.st_mtime > stc.st_mtime) &&
 	(rn || std.st_mtime > stn.st_mtime) &&
-	(prog = check_dump_file(dig, &std, name, ksh))) {
+	(prog = check_dump_file(dig, &std, name, ksh, test_only))) {
 	unqueue_signals();
 	return prog;
     }
     /* No digest file. Now look for the per-function compiled file. */
     if (!rc &&
 	(rn || stc.st_mtime > stn.st_mtime) &&
-	(prog = check_dump_file(wc, &stc, name, ksh))) {
+	(prog = check_dump_file(wc, &stc, name, ksh, test_only))) {
 	unqueue_signals();
 	return prog;
     }
@@ -3643,7 +3643,7 @@ try_source_file(char *file)
 
     if (strsfx(FD_EXT, file)) {
 	queue_signals();
-	prog = check_dump_file(file, NULL, tail, NULL);
+	prog = check_dump_file(file, NULL, tail, NULL, 0);
 	unqueue_signals();
 	return prog;
     }
@@ -3654,7 +3654,7 @@ try_source_file(char *file)
 
     queue_signals();
     if (!rc && (rn || stc.st_mtime > stn.st_mtime) &&
-	(prog = check_dump_file(wc, &stc, tail, NULL))) {
+	(prog = check_dump_file(wc, &stc, tail, NULL, 0))) {
 	unqueue_signals();
 	return prog;
     }
@@ -3667,7 +3667,8 @@ try_source_file(char *file)
 
 /**/
 static Eprog
-check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh)
+check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh,
+		int test_only)
 {
     int isrec = 0;
     Wordcode d;
@@ -3709,6 +3710,11 @@ check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh)
     if ((h = dump_find_func(d, name))) {
 	/* Found the name. If the file is already mapped, return the eprog,
 	 * otherwise map it and just go up. */
+	if (test_only)
+	{
+	    /* This is all we need.  Just return dummy. */
+	    return &dummy_eprog;
+	}
 
 #ifdef USE_MMAP
 
@@ -3745,7 +3751,7 @@ check_dump_file(char *file, struct stat *sbuf, char *name, int *ksh)
 
 #endif
 
-	    {
+	{
 	    Eprog prog;
 	    Patprog *pp;
 	    int np, fd, po = h->npats * sizeof(Patprog);

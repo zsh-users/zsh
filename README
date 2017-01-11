@@ -32,7 +32,7 @@ details, see the documentation.
 Incompatibilities since 5.3.1
 -----------------------------
 
-The default behaviour of code like the following has changed:
+1) The default behaviour of code like the following has changed:
 
   alias foo='noglob foo'
   foo() { print function body; }
@@ -52,8 +52,18 @@ ALIAS_FUNC_DEF, has been added, which can be set to make the shell
 behave as in previous versions.  It is in any case recommended to use
 the "function" keyword, as aliases are not expanded afterwards.
 
-Incompatibilities between 5.0.8 and 5.3.1
------------------------------------------
+2) It was an undocumented, and largely useless, feature that a function
+autoloaded with an absolute path was searched for along the normal fpath
+(as if the leading / was missing) and, if found, loaded under the full
+name including the leading slash.  This has been replaced with the more
+useful feature that the function is searched for only at the given
+absolute path; the name of the function is the base name of the file.
+Note that functions including a non-leading / behave as before,
+e.g. if `dir/name' is found anywhere under a directory in $fpath it is
+loaded as a function named `dir/name'.
+
+Incompatibilities between 5.0.8 and 5.3
+----------------------------------------
 
 1) In character classes delimited by "[" and "]" within patterns, whether
 used for filename generation (globbing) or other forms of pattern

@@ -147,20 +147,39 @@ ifnzman(noderef(Aliasing)).
 findex(autoload)
 cindex(functions, autoloading)
 cindex(autoloading functions)
-item(tt(autoload) [ {tt(PLUS())|tt(-)}tt(TUXkmtz) ] [ tt(-w) ] [ var(name) ... ])(
+item(tt(autoload) [ {tt(PLUS())|tt(-)}tt(RTUXdkmrtz) ] [ tt(-w) ] [ var(name) ... ])(
 vindex(fpath, searching)
-Equivalent to tt(functions -u), with the exception of tt(-X)/tt(+X) and
-tt(-w).  See the section `Autoloading Functions' in ifzman(zmanref(zshmisc))\
+See the section `Autoloading Functions' in ifzman(zmanref(zshmisc))\
 ifnzman(noderef(Functions)) for full details.  The tt(fpath) parameter
 will be searched to find the function definition when the function is
 first referenced.
 
-The flag tt(-X) may be used only inside a shell function, and may not be
-followed by a var(name).  It causes the calling function to be marked for
-autoloading and then immediately loaded and executed, with the current
-array of positional parameters as arguments.  This replaces the previous
-definition of the function.  If no function definition is found, an error
-is printed and the function remains undefined and marked for autoloading.
+If var(name) consists of an absolute path, the function is defined to
+load from the file given (searching as usual for dump files in the given
+location).  The name of the function is the basename (non-directory
+part) of the file.  It is normally an error if the function is not found
+in the given location; however, if the option tt(-d) is given, searching
+for the function defaults to tt($fpath).
+
+If the option tt(-r) or tt(-R) is given, the function is searched for
+immediately and the location is recorded internally for use when the
+function is executed; a relative path is expanded using the value of
+tt($PWD).  This protects against a change to tt($fpath) after the call
+to tt(autoload).  With tt(-r), if the function is not found, it is
+silently left unresolved until execution; with tt(-R), an error message
+is printed and command processing aborted immediately the search fails,
+i.e. at the tt(autoload) command rather than at function execution..
+
+The flag tt(-X) may be used only inside a shell function.  It causes the
+calling function to be marked for autoloading and then immediately
+loaded and executed, with the current array of positional parameters as
+arguments.  This replaces the previous definition of the function.  If
+no function definition is found, an error is printed and the function
+remains undefined and marked for autoloading.  If an argument is given,
+it is used as a directory (i.e. it does not include the name of the
+function) in which the function is to be found; this may be combined
+with the tt(-d) option to allow the function search to default to tt($fpath)
+if it is not in the given location.
 
 The flag tt(+X) attempts to load each var(name) as an autoloaded function,
 but does em(not) execute it.  The exit status is zero (success) if the
@@ -175,6 +194,13 @@ ksh autoloading behaviour on the first call to the function.
 If the tt(-m) flag is also given each var(name) is treated as a
 pattern and all functions already marked for autoload that match the
 pattern are loaded.
+
+With the tt(-t) flag, turn on execution tracing; with tt(-T), turn on
+execution tracing only for the current function, turning it off on entry
+to any called functions that do not also have tracing enabled.
+
+With the tt(-U) flag, alias expansion is suppressed when the function is
+loaded.
 
 With the tt(-w) flag, the var(name)s are taken as names of files compiled
 with the tt(zcompile) builtin, and all functions defined in them are
@@ -193,6 +219,10 @@ example(emulate zsh -c 'autoload -Uz var(func)')
 
 arranges that when var(func) is loaded the shell is in native tt(zsh)
 emulation, and this emulation is also applied when var(func) is run.
+
+Some of the functions of tt(autoload) are also provided by tt(functions
+-u) or tt(functions -U), but tt(autoload) is a more comprehensive
+interface.
 )
 findex(bg)
 cindex(jobs, backgrounding)
@@ -811,7 +841,8 @@ xitem(tt(functions -M) var(mathfn) [ var(min) [ var(max) [ var(shellfn) ] ] ])
 xitem(tt(functions -M) [ tt(-m) var(pattern) ... ])
 item(tt(functions +M) [ tt(-m) ] var(mathfn) ... )(
 Equivalent to tt(typeset -f), with the exception of the tt(-x) and
-tt(-M) options.
+tt(-M) options.  For tt(functions -u) and tt(functions -U), see
+tt(autoload), which provides additional options.
 
 The tt(-x) option indicates that any functions output will have
 each leading tab for indentation, added by the shell to show syntactic
@@ -2034,7 +2065,9 @@ expansion to be suppressed when the function is loaded.  See the
 description of the `tt(autoload)' builtin for details.
 
 Note that the builtin tt(functions) provides the same basic capabilities
-as tt(typeset -f) but gives access to a few extra options.
+as tt(typeset -f) but gives access to a few extra options; tt(autoload)
+gives further additional options for the case tt(typeset -fu) and
+tt(typeset -fU).
 )
 item(tt(-h))(
 Hide: only useful for special parameters (those marked `<S>' in the table in

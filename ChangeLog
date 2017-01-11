@@ -1,3 +1,11 @@
+2017-01-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 40327 (with minor fixes): Doc/Zsh/builtins.yo,
+	README,Src/builtin.c, Src/exec.c, Src/hashtable.c, Src/parse.c,
+	Src/zsh.h, Test/C04funcdef.ztst: add ability to autoload
+	function from file using full path, with additional related
+	autoload options -r, -R, -d and extension to -X.
+
 2017-01-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 40305: Src/Zle/complist.c, Src/Zle/zle_main.c,

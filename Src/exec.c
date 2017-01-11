@@ -3124,7 +3124,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	if (is_shfunc)
 	    shf = (Shfunc)hn;
 	else {
-	    shf = loadautofn(state->prog->shf, 1, 0);
+	    shf = loadautofn(state->prog->shf, 1, 0, 0);
 	    if (shf)
 		state->prog->shf = shf;
 	    else {
@@ -5142,7 +5142,7 @@ execautofn(Estate state, UNUSED(int do_exec))
 {
     Shfunc shf;
 
-    if (!(shf = loadautofn(state->prog->shf, 1, 0)))
+    if (!(shf = loadautofn(state->prog->shf, 1, 0, 0)))
 	return 1;
 
     state->prog->shf = shf;
@@ -5151,7 +5151,7 @@ execautofn(Estate state, UNUSED(int do_exec))
 
 /**/
 Shfunc
-loadautofn(Shfunc shf, int fksh, int autol)
+loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 {
     int noalias = noaliases, ksh = 1;
     Eprog prog;
@@ -5160,7 +5160,18 @@ loadautofn(Shfunc shf, int fksh, int autol)
     pushheap();
 
     noaliases = (shf->node.flags & PM_UNALIASED);
-    prog = getfpfunc(shf->node.nam, &ksh, &fname);
+    if (shf->filename && shf->filename[0] == '/')
+    {
+	char *spec_path[2];
+	spec_path[0] = dupstring(shf->filename);
+	spec_path[1] = NULL;
+	prog = getfpfunc(shf->node.nam, &ksh, &fname, spec_path, 0);
+	if (prog == &dummy_eprog &&
+	    (current_fpath || (shf->node.flags & PM_CUR_FPATH)))
+	    prog = getfpfunc(shf->node.nam, &ksh, &fname, NULL, 0);
+    }
+    else
+	prog = getfpfunc(shf->node.nam, &ksh, &fname, NULL, 0);
     noaliases = noalias;
 
     if (ksh == 1) {
@@ -5602,12 +5613,18 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
     unqueue_signals();
 }
 
-/* Search fpath for an undefined function.  Finds the file, and returns the *
- * list of its contents.                                                    */
+/*
+ * Search fpath for an undefined function.  Finds the file, and returns the
+ * list of its contents.
+ *
+ * If test_only is 1, don't load function, just test for it:
+ * - Non-null return means function was found
+ * - *fname points to path at which found (not duplicated)
+ */
 
 /**/
 Eprog
-getfpfunc(char *s, int *ksh, char **fname)
+getfpfunc(char *s, int *ksh, char **fname, char **alt_path, int test_only)
 {
     char **pp, buf[PATH_MAX+1];
     off_t len;
@@ -5616,7 +5633,7 @@ getfpfunc(char *s, int *ksh, char **fname)
     Eprog r;
     int fd;
 
-    pp = fpath;
+    pp = alt_path ? alt_path : fpath;
     for (; *pp; pp++) {
 	if (strlen(*pp) + strlen(s) + 1 >= PATH_MAX)
 	    continue;
@@ -5624,9 +5641,9 @@ getfpfunc(char *s, int *ksh, char **fname)
 	    sprintf(buf, "%s/%s", *pp, s);
 	else
 	    strcpy(buf, s);
-	if ((r = try_dump_file(*pp, s, buf, ksh))) {
+	if ((r = try_dump_file(*pp, s, buf, ksh, test_only))) {
 	    if (fname)
-		*fname = ztrdup(buf);
+		*fname = test_only ? *pp : ztrdup(buf);
 	    return r;
 	}
 	unmetafy(buf, NULL);
@@ -5634,6 +5651,11 @@ getfpfunc(char *s, int *ksh, char **fname)
 	    struct stat st;
 	    if (!fstat(fd, &st) && S_ISREG(st.st_mode) &&
 		(len = lseek(fd, 0, 2)) != -1) {
+		if (test_only) {
+		    close(fd);
+		    *fname = *pp;
+		    return &dummy_eprog;
+		}
 		d = (char *) zalloc(len + 1);
 		lseek(fd, 0, 0);
 		if ((rlen = read(fd, d, len)) >= 0) {
@@ -5661,7 +5683,7 @@ getfpfunc(char *s, int *ksh, char **fname)
 		close(fd);
 	}
     }
-    return &dummy_eprog;
+    return test_only ? NULL : &dummy_eprog;
 }
 
 /* Handle the most common type of ksh-style autoloading, when doing a      *
