@@ -1,3 +1,8 @@
+2017-01-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 40332: Completion/Zsh/Command/_typeset: completion for new
+	autoload features.
+
 2017-01-11  Oliver Kiddle  <opk@zsh.org>
 
 	* 40321: Doc/Zsh/compsys.yo, Src/Zle/computil.c,

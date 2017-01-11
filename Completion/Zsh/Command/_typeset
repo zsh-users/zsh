@@ -21,6 +21,7 @@ allargs=(
   X '+X[immediately autoload function]'
   Z "($fopts -A -E -F -i)-Z+[right justify and fill with leading zeros]:width"
   a "($fopts -A -E -F -T -i)-a[specify that arguments refer to arrays]"
+  df "-d[default absolute path autoload to fpath]"
   f "($popts)-f[specify that arguments refer to functions]"
   g "($fopts -T)-+g[do not restrict parameter to local scope]"
   h "($fopts -T)-+h[hide specialness of parameter]"
@@ -31,6 +32,8 @@ allargs=(
   m '(-A -E -F -T -i)-m[treat arguments as patterns]'
   p '-p[output parameters in form of calls to typeset]'
   r '(-f)-+r[mark parameters as readonly]'
+  rf '-r[remember autoload path]'
+  Rf '-R[remember autoload path, error if not found]'
   t '(-T)-+t[tag parameters and turn on execution tracing for functions]'
   tf '(-T)-+t[turn on execution tracing for functions]'
   tp '(-T)-+t[tag parameters]'
@@ -46,7 +49,7 @@ use="AEFHLRTUZafghiklmprtuxz"
 
 case ${service} in
   autoload)
-    use="UTXktwz"
+    use="URTXdkrtwz"
     func=f
   ;;
   float) use="EFHghlprtux";;
@@ -74,7 +77,7 @@ onopts=${(j..)${${words[1,CURRENT-1]:#^-*}##-}}
 offopts=${(j..)${${words[1,CURRENT-1]:#^+*}##+}}
 
 for ((i=1;i<=$#use;++i)); do
-  args+=( ${allargs[${use[$i]}${${(s::)use[$i]}[(r)[UutT]]:+$func}]} )
+  args+=( ${allargs[${use[$i]}${${(s::)use[$i]}[(r)[dUurRtT]]:+$func}]} )
 done
 
 _arguments -C -s -A "-*" -S "${args[@]}" '*::vars:= ->vars_eq'
@@ -90,12 +93,17 @@ if [[ "$state" = vars_eq ]]; then
     elif (( $+opt_args[-w] )); then
       _wanted files expl 'zwc file' _files -g '*.zwc(-.)'
     elif [[ $service = autoload || -n $opt_args[(i)-[uU]] ]]; then
-      args=(${^fpath}/*(-.:t))
-      # Filter out functions already loaded or marked for autoload.
-      local -a funckeys
-      funckeys=(${(k)functions})
-      args=(${args:|funckeys})
-      _wanted functions expl 'shell function' compadd -a args
+      if [[ $PREFIX[1] = / ]]; then
+	# Autoload by absolute path
+	_files
+      else
+	  args=(${^fpath}/*(-.:t))
+	  # Filter out functions already loaded or marked for autoload.
+	  local -a funckeys
+	  funckeys=(${(k)functions})
+	  args=(${args:|funckeys})
+	  _wanted functions expl 'shell function' compadd -a args
+      fi
     elif [[ -n $onopts$offopts ]]; then
       if [[ -n $offopts ]]; then
 	args=(${(f)"$(functions +${offopts//[^UXkmtTuz]/})"})
