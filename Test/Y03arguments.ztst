@@ -463,6 +463,14 @@
 0:single option sets are still mutually exclusive
 >line: {tst -m -x }{}
 
+ tst_arguments '(set-c set-g)-a' '(set)-b' -c + grp -g - set -s
+ comptest $'tst -a -b -\t'
+0:excluding a set doesn't exclude common options as part of the set
+>line: {tst -a -b -}{}
+>DESCRIPTION:{option}
+>NO:{-c}
+>NO:{-g}
+
  tst_arguments '(-)-h' -a -b -c
  comptest $'tst -h -\t'
 0:exclude all other options
@@ -535,6 +543,75 @@ F:>line: {tst -a -c -}{}
 F:>DESCRIPTION:{option}
 F:>NO:{-b}
 F:>NO:{-c}
+
+ tst_arguments + grp1 -a -b - onlyset '(-a grp3--y grp2 grp4--)-m' -n + grp2 -u -v + grp3 -x -y + grp4 -0 ':rest'
+ comptest $'tst -m -\t'
+0:exclude group options
+>line: {tst -m -}{}
+>DESCRIPTION:{rest}
+>DESCRIPTION:{option}
+>NO:{-b}
+>NO:{-n}
+>NO:{-x}
+
+ tst_arguments -x + '(grp1)' -a -b + '(grp2)' -m -n
+ comptest $'tst -m -\t'
+0:single option groups are not mutually exclusive
+>line: {tst -m -}{}
+>DESCRIPTION:{option}
+>NO:{-a}
+>NO:{-b}
+>NO:{-x}
+
+ tst_arguments '(grp1 grp2-2)-a' '(grp1-*)-b' + grp1 ':first' '*:rest' + grp2 ':second'
+ comptest $'tst -a \t\eb\C-w\C-e x y \t'
+0:exclude rest args listed within a group
+>line: {tst -a -b }{}
+>line: {tst -b x y -a }{}
+
+ tst_arguments '(grp--m)-a' + grp '-m:value:(a b c)' + agrp '-m:other:(1 2 3)'
+ comptest $'tst -m \t\C-w-a -m \t'
+0:two forms of same option in different groups
+>line: {tst -m }{}
+>DESCRIPTION:{value}
+>NO:{a}
+>NO:{b}
+>NO:{c}
+>line: {tst -a -m }{}
+>DESCRIPTION:{other}
+>NO:{1}
+>NO:{2}
+>NO:{3}
+F:should offer both sets of arguments in first case
+
+ tst_arguments '(grp--m)-x' + '(grp)' -a -b -c ':val:(1 2 3)'
+ comptest $'tst 1 -\t'
+0:normal argument excludes options in internally mutually exclusive group
+>line: {tst 1 -x }{}
+
+ tst_arguments -s -a - set1 -c -s - set2 -c -t + grp -d
+ comptest $'tst -s\t -\t'
+0:mix sets, groups and option stacking
+>line: {tst -s}{}
+>DESCRIPTION:{option}
+>NO:{-a}
+>NO:{-c}
+>NO:{-d}
+>NO:{-t}
+>line: {tst -s -}{}
+>DESCRIPTION:{option}
+>NO:{-a}
+>NO:{-c}
+>NO:{-d}
+F:shouldn't offer -t in the first case (with stacked options)
+
+ tst_arguments -s '(set-a set--b grp-a grp--b grp-)-a' - set-a -s - set--b -t + grp-a -g + grp--b -h + grp- -i
+ comptest $'tst -a\t'
+0:sets and groups with - in their name
+>line: {tst -a}{}
+>DESCRIPTION:{option}
+>NO:{-h}
+>NO:{-t}
 
  tst_arguments --abc --aah :arg:
  comptesteval 'setopt bashautolist automenu'

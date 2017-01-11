@@ -3573,13 +3573,11 @@ This function can be used to give a complete specification for completion
 for a command whose arguments follow standard UNIX option and argument
 conventions.
 
-em(Options overview)
+em(Options Overview)
 
 Options to tt(_arguments) itself must be in separate words, i.e. tt(-s -w),
 not tt(-sw).  The options are followed by var(spec)s that describe options and
-arguments of the analyzed command.  var(spec)s that describe option flags must
-precede var(spec)s that describe non-option ("positional" or "normal")
-arguments of the analyzed line.  To avoid ambiguity, all
+arguments of the analyzed command.  To avoid ambiguity, all
 options to tt(_arguments) itself may be separated from the var(spec) forms
 by a single colon.
 
@@ -3997,18 +3995,48 @@ example(local curcontext="$curcontext")
 This is useful where it is not possible for multiple states to be valid
 together.
 
-em(Specifying multiple sets of options)
+em(Grouping Options)
 
-It is possible to specify multiple sets of options and
-arguments with the sets separated by single hyphens.  The specifications
-before the first hyphen (if any) are shared by all the remaining sets.
-The first word in every other set provides a name for the
-set which may appear in exclusion lists in specifications,
-either alone or before one of the possible values described above.
-In the second case a `tt(-)' should appear between this name and the
-remainder.
+Options can be grouped to simplify exclusion lists. A group is
+introduced with `tt(PLUS())' followed by a name for the group in the
+subsequent word. Whole groups can then be referenced in an exclusion
+list or a group name can be used to disambiguate between two forms of
+the same option. For example:
 
-For example:
+example(_arguments \ 
+    '(group2--x)-a' \ 
+  PLUS() group1 \ 
+    -m \ 
+    '(group2)-n' \ 
+  PLUS() group2 \ 
+    -x -y)
+
+If the name of a group is specified in the form
+`tt(LPAR())var(name)tt(RPAR())' then only one value from that group
+will ever be completed; more formally, all specifications are mutually
+exclusive to all other specifications in that group. This is useful for
+defining options that are aliases for each other. For example:
+
+example(_arguments \ 
+    -a -b \ 
+  PLUS() '(operation)' \ 
+    {-c,--compress}'[compress]' \ 
+    {-d,--decompress}'[decompress]' \ 
+    {-l,--list}'[list]')
+
+If an option in a group appears on the command line, it is stored in the
+associative array `tt(opt_args)' with 'var(group)tt(-)var(option)'
+as a key.  In the example above, a key `tt(operation--c)' is used if the option
+`tt(-c)' is present on the command line.
+
+em(Specifying Multiple Sets of Arguments)
+
+It is possible to specify multiple sets of options and arguments with
+the sets separated by single hyphens. This differs from groups in that
+sets are considered to be mutually exclusive of each other.
+
+Specifications before the first set and from any group are common to
+all sets. For example:
 
 example(_arguments \ 
     -a \ 
@@ -4024,28 +4052,11 @@ possible completions.  When it contains `tt(-d)' or an argument, the
 option `tt(-c)' will not be considered.  However, after `tt(-a)'
 both sets will still be considered valid.
 
-If an option in a set appears on the command line, it is stored in the
-associative array `tt(opt_args)' with 'var(set)tt(-)var(option)'
-as a key.  In the example above, a key `tt(set1--c)' is used if the option
-`tt(-c)' is on the command line.
+As for groups, the name of a set may appear in exclusion lists, either
+alone or preceding a normal option or argument specification.
 
-If the name given for one of the mutually exclusive sets is of the form
-`tt(LPAR())var(name)tt(RPAR())' then only one value from each set will ever
-be completed; more formally, all specifications are mutually
-exclusive to all other specifications in the same set.  This is
-useful for defining multiple sets of options which are mutually
-exclusive and in which the options are aliases for each other.  For
-example:
-
-example(_arguments \ 
-    -a -b \ 
-  - '(compress)' \ 
-    {-c,--compress}'[compress]' \ 
-  - '(uncompress)' \ 
-    {-d,--decompress}'[decompress]')
-
-As the completion code has to parse the command line separately for each
-set this form of argument is slow and should only be used when necessary.
+The completion code has to parse the command line separately for each
+set. This can be slow so sets should only be used when necessary.
 A useful alternative is often an option specification with rest-arguments
 (as in `tt(-foo:*:...)'); here the option tt(-foo) swallows up all
 remaining arguments as described by the var(optarg) definitions.

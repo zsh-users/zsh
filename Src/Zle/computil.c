@@ -934,7 +934,7 @@ struct caopt {
     Caarg args;			/* option arguments */
     int active;			/* still allowed on command line */
     int num;			/* it's the num'th option */
-    char *set;			/* set name, shared */
+    char *gsname;		/* group or set name, shared */
     int not;			/* don't complete this option (`!...') */
 };
 
@@ -958,7 +958,7 @@ struct caarg {
     int min;			/* earliest possible arg pos, given optional args */
     int direct;			/* true if argument number was given explicitly */
     int active;			/* still allowed on command line */
-    char *set;			/* set name, shared */
+    char *gsname;		/* group or set name, shared */
 };
 
 #define CAA_NORMAL 1
@@ -1096,7 +1096,7 @@ parse_caarg(int mult, int type, int num, int opt, char *oname, char **def,
     ret->type = type;
     ret->opt = ztrdup(oname);
     ret->direct = 0;
-    ret->set = set;
+    ret->gsname = set;
 
     /* Get the description. */
 
@@ -1183,10 +1183,10 @@ parse_cadef(char *nam, char **args)
     Cadef all, ret;
     Caopt *optp;
     char **orig_args = args, *p, *q, *match = "r:|[_-]=* r:|=*", **xor, **sargs;
-    char *adpre, *adsuf, *axor = NULL, *doset = NULL, **setp = NULL;
+    char *adpre, *adsuf, *axor = NULL, *doset = NULL, **pendset = NULL, **curset = NULL;
     char *nonarg = NULL;
     int single = 0, anum = 1, xnum, flags = 0;
-    int state = 0, not = 0;
+    int foreignset = 0, not = 0;
 
     /* First string is the auto-description definition. */
 
@@ -1249,7 +1249,6 @@ parse_cadef(char *nam, char **args)
 
     if (nonarg)
 	tokenize(nonarg = dupstring(nonarg));
-
     /* Looks good. Optimistically allocate the cadef structure. */
 
     all = ret = alloc_cadef(orig_args, single, match, nonarg, flags);
@@ -1258,36 +1257,64 @@ parse_cadef(char *nam, char **args)
 
     /* Get the definitions. */
 
-    for (; *args; args++) {
+    for (; *args || pendset; args++) {
+	if (!*args) {
+	    /* start new set */
+	    args = sargs; /* go back and repeat parse of common options */
+	    doset = NULL;
+	    set_cadef_opts(ret);
+	    ret = ret->snext = alloc_cadef(NULL, single, match, nonarg, flags);
+	    optp = &(ret->opts);
+	    anum = 1;
+	    foreignset = 0;
+	    curset = pendset;
+	    pendset = 0;
+        }
         if (args[0][0] == '-' && !args[0][1] && args[1]) {
-	    if (!state) {
-		char *p;
-		int l;
+	    if ((foreignset = curset && args != curset)) {
+		if (!pendset && args > curset)
+		    pendset = args; /* mark pointer to next pending set */
+		++args;
+	    } else {
+		/* Carrying on: this is the current set */
+		char *p = *++args;
+		int l = strlen(p) - 1;
 
-		if (setp) /* got to first set: skip to ours */
-		    args = setp;
-		/* else we were the first set so don't need to skip */
-		p = *++args;
-		l = strlen(p) - 1;
 		if (*p == '(' && p[l] == ')') {
 		    axor = p = dupstring(p + 1);
 		    p[l - 1] = '\0';
 		} else
 		    axor = NULL;
+		if (!*p) {
+		    freecadef(all);
+		    zwarnnam(nam, "empty set name");
+		    return NULL;
+		}
 		ret->set = doset = tricat(p, "-", "");
-		state = 1;
-	    } else { /* starting new set */
-		setp = args;
-		state = 0;
-		args = sargs - 1;
-		doset = NULL;
-		set_cadef_opts(ret);
-		ret = ret->snext = alloc_cadef(NULL, single, match, nonarg, flags);
-		optp = &(ret->opts);
-		anum = 1;
+		curset = args; /* needed for the first set */
 	    }
 	    continue;
-	}
+	} else if (args[0][0] == '+' && !args[0][1] && args[1]) {
+	    char *p;
+	    int l;
+
+	    foreignset = 0; /* group not in any set, don't want to skip it */
+	    p = *++args;
+	    l = strlen(p) - 1;
+	    if (*p == '(' && p[l] == ')') {
+		axor = p = dupstring(p + 1);
+		p[l - 1] = '\0';
+	    } else
+		axor = NULL;
+	    if (!*p) {
+		freecadef(all);
+		zwarnnam(nam, "empty group name");
+		return NULL;
+	    }
+	    doset = tricat(p, "-", "");
+	    continue;
+	} else if (foreignset) /* skipping over a different set */
+	    continue;
 	p = dupstring(*args);
 	xnum = 0;
 	if ((not = (*p == '!')))
@@ -1499,7 +1526,7 @@ parse_cadef(char *nam, char **args)
 	    optp = &((*optp)->next);
 
 	    opt->next = NULL;
-	    opt->set = doset;
+	    opt->gsname = doset;
 	    opt->name = ztrdup(rembslashcolon(name));
 	    if (descr)
 		opt->descr = ztrdup(descr);
@@ -1795,63 +1822,85 @@ ca_inactive(Cadef d, char **xor, int cur, int opts)
     if ((xor || opts) && cur <= compcurrent) {
 	Caopt opt;
 	char *x;
-	int sl = (d->set ? (int)strlen(d->set) : -1), set = 0;
         /* current word could be a prefix of a longer one so only do
 	 * exclusions for single-letter options (for option clumping) */
 	int single = (cur == compcurrent);
 
 	for (; (x = (opts ? "-" : *xor)); xor++) {
-	    set = 0;
-	    if (sl > 0) {
-		if (strpfx(d->set, x)) {
-		    x += sl;
-		    set = 1;
-		} else if (!strncmp(d->set, x, sl - 1)) {
-		    Caopt p;
+	    int excludeall = 0;
+	    char *grp = NULL;
+	    size_t grplen;
+	    char *next, *sep = x;
 
-		    for (p = d->opts; p; p = p->next)
-			if (p->set && !(single && *p->name && p->name[1] && p->name[2]))
-			    p->active = 0;
-			
-		    x = ":";
-		    set = 1;
+	    while (*sep != '+' && *sep != '-' && *sep != ':' && *sep != '*' && !idigit(*sep)) {
+		if (!(next = strchr(sep, '-')) || !*++next) {
+		    /* exclusion is just the name of a set or group */
+		    excludeall = 1; /* excluding options and args */
+		    sep += strlen(sep);
+		    /* A trailing '-' is included in the various gsname fields but is not
+		     * there for this branch. This is why we add excludeall to grplen
+		     * when checking for the null in a few places below */
+		    break;
 		}
+		sep = next;
 	    }
-	    if (x[0] == ':' && !x[1]) {
-		if (set) {
+	    if (sep > x) { /* exclusion included a set or group name */
+		grp = x;
+		grplen = sep - grp;
+		x = sep;
+	    }
+
+	    if (excludeall || (x[0] == ':' && !x[1])) {
+		if (grp) {
 		    Caarg a;
 
 		    for (a = d->args; a; a = a->next)
-			if (a->set)
+			if (a->gsname && !strncmp(a->gsname, grp, grplen) &&
+				!a->gsname[grplen + excludeall])
 			    a->active = 0;
-		    if (d->rest && (!set || d->rest->set))
+		    if (d->rest && d->rest->gsname &&
+			    !strncmp(d->rest->gsname, grp, grplen) &&
+			    !d->rest->gsname[grplen + excludeall])
 			d->rest->active = 0;
 		} else
 		    d->argsactive = 0;
-	    } else if (x[0] == '-' && !x[1]) {
+	    }
+
+	    if (excludeall || (x[0] == '-' && !x[1])) {
 		Caopt p;
 
 		for (p = d->opts; p; p = p->next)
-		    if ((!set || p->set) && !(single && *p->name && p->name[1] && p->name[2]))
+		    if ((!grp || (p->gsname && !strncmp(p->gsname, grp, grplen) &&
+			    !p->gsname[grplen + excludeall])) &&
+			    !(single && *p->name && p->name[1] && p->name[2]))
 			p->active = 0;
-	    } else if (x[0] == '*' && !x[1]) {
-		if (d->rest && (!set || d->rest->set))
+	    }
+
+	    if (excludeall || (x[0] == '*' && !x[1])) {
+		if (d->rest && (!grp || (d->rest->gsname &&
+			!strncmp(d->rest->gsname, grp, grplen) &&
+			!d->rest->gsname[grplen + excludeall])))
 		    d->rest->active = 0;
-	    } else if (idigit(x[0])) {
-		int n = atoi(x);
-		Caarg a = d->args;
+            }
 
-		while (a && a->num < n)
-		    a = a->next;
+	    if (!excludeall) {
+		if (idigit(x[0])) {
+		    int n = atoi(x);
+		    Caarg a = d->args;
 
-		if (a && a->num == n && (!set || a->set))
-		    a->active = 0;
-	    } else if ((opt = ca_get_opt(d, x, 1, NULL)) && (!set || opt->set) &&
-		    !(single && *opt->name && opt->name[1] && opt->name[2]))
-		opt->active = 0;
+		    while (a && a->num < n)
+			a = a->next;
 
-	    if (opts)
-		break;
+		    if (a && a->num == n && (!grp || (a->gsname &&
+			    !strncmp(a->gsname, grp, grplen))))
+			a->active = 0;
+		} else if ((opt = ca_get_opt(d, x, 1, NULL)) &&
+			(!grp || (opt->gsname && !strncmp(opt->gsname, grp, grplen))) &&
+			!(single && *opt->name && opt->name[1] && opt->name[2]))
+		    opt->active = 0;
+		if (opts)
+		    break;
+	    }
 	}
     }
 }
@@ -2414,19 +2463,19 @@ ca_set_data(LinkList descr, LinkList act, LinkList subc,
 		    restrict_range(ca_laststate.argbeg, ca_laststate.argend);
 	    }
 	    if (arg->opt) {
-		buf = (char *) zhalloc((arg->set ? strlen(arg->set) : 0) +
+		buf = (char *) zhalloc((arg->gsname ? strlen(arg->gsname) : 0) +
 				       strlen(arg->opt) + 40);
 		if (arg->num > 0 && arg->type < CAA_REST)
 		    sprintf(buf, "%soption%s-%d",
-			    (arg->set ? arg->set : ""), arg->opt, arg->num);
+			    (arg->gsname ? arg->gsname : ""), arg->opt, arg->num);
 		else
 		    sprintf(buf, "%soption%s-rest",
-			    (arg->set ? arg->set : ""), arg->opt);
+			    (arg->gsname ? arg->gsname : ""), arg->opt);
 	    } else if (arg->num > 0) {
 		sprintf(nbuf, "argument-%d", arg->num);
-		buf = (arg->set ? dyncat(arg->set, nbuf) : dupstring(nbuf));
+		buf = (arg->gsname ? dyncat(arg->gsname, nbuf) : dupstring(nbuf));
 	    } else
-		buf = (arg->set ? dyncat(arg->set, "argument-rest") :
+		buf = (arg->gsname ? dyncat(arg->gsname, "argument-rest") :
 		       dupstring("argument-rest"));
 
 	    addlinknode(subc, buf);
@@ -2779,7 +2828,7 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    for (s = lstate; s; s = s->snext)
 		for (o = s->d->opts, a = s->oargs; o; o = o->next, a++)
 		    if (*a) {
-			*p++ = (o->set ? tricat(o->set, o->name, "") :
+			*p++ = (o->gsname ? tricat(o->gsname, o->name, "") :
 				ztrdup(o->name));
 			*p++ = ca_colonlist(*a);
 		    }
