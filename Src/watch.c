@@ -87,6 +87,9 @@
 
 #if !defined(WATCH_STRUCT_UTMP) && defined(HAVE_STRUCT_UTMPX) && defined(REAL_UTMPX_FILE)
 # define WATCH_STRUCT_UTMP struct utmpx
+# define setutent setutxent
+# define getutent getutxent
+# define endutent endutxent 
 /*
  * In utmpx, the ut_name field is replaced by ut_user.
  * Howver, on some systems ut_name may already be defined this
@@ -141,9 +144,9 @@ char const * const default_watchfmt = DEFAULT_WATCHFMT;
 #  define WATCH_WTMP_FILE "/dev/null"
 # endif
 
-static int wtabsz;
-static WATCH_STRUCT_UTMP *wtab;
-static time_t lastutmpcheck;
+static int wtabsz = 0;
+static WATCH_STRUCT_UTMP *wtab = NULL;
+static time_t lastutmpcheck = 0;
 
 /* get the time of login/logout for WATCH */
 
@@ -473,34 +476,45 @@ ucmp(WATCH_STRUCT_UTMP *u, WATCH_STRUCT_UTMP *v)
 /* initialize the user List */
 
 /**/
-static void
-readwtab(void)
+static int
+readwtab(WATCH_STRUCT_UTMP **head, int initial_sz)
 {
-    WATCH_STRUCT_UTMP *uptr;
-    int wtabmax = 32;
-    FILE *in;
+    WATCH_STRUCT_UTMP *uptr, *tmp;
+    int wtabmax = initial_sz < 2 ? 32 : initial_sz;
+    int sz = 0;
 
-    wtabsz = 0;
-    if (!(in = fopen(WATCH_UTMP_FILE, "r")))
-	return;
-    uptr = wtab = (WATCH_STRUCT_UTMP *)zalloc(wtabmax * sizeof(WATCH_STRUCT_UTMP));
-    while (fread(uptr, sizeof(WATCH_STRUCT_UTMP), 1, in))
+    uptr = *head = (WATCH_STRUCT_UTMP *)
+	zalloc(wtabmax * sizeof(WATCH_STRUCT_UTMP));
+    setutent();
+    while ((tmp = getutent()) != NULL) {
 # ifdef USER_PROCESS
-	if   (uptr->ut_type == USER_PROCESS)
+	if   (tmp->ut_type == USER_PROCESS)
 # else /* !USER_PROCESS */
-	if   (uptr->ut_name[0])
+	if   (tmp->ut_name[0])
 # endif /* !USER_PROCESS */
 	{
+	    memcpy(uptr, tmp, sizeof (WATCH_STRUCT_UTMP));
 	    uptr++;
-	    if (++wtabsz == wtabmax)
-		uptr = (wtab = (WATCH_STRUCT_UTMP *)realloc((void *) wtab, (wtabmax *= 2) *
-						      sizeof(WATCH_STRUCT_UTMP))) + wtabsz;
+	    if (++sz == wtabmax) {
+		uptr = (WATCH_STRUCT_UTMP *)
+		    realloc(*head, (wtabmax *= 2) * sizeof(WATCH_STRUCT_UTMP));
+		if (uptr == NULL) {
+		    /* memory pressure - so stop consuming and use, what we have
+		     * Other option is to exit() here, as zmalloc does on error */
+		    sz--;
+		    break;
+		}
+		*head = uptr;
+		uptr += sz;
+	    }
 	}
-    fclose(in);
+    }
+    endutent();
 
-    if (wtabsz)
-	qsort((void *) wtab, wtabsz, sizeof(WATCH_STRUCT_UTMP),
+    if (sz)
+	qsort((void *) *head, sz, sizeof(WATCH_STRUCT_UTMP),
 	           (int (*) _((const void *, const void *)))ucmp);
+    return sz;
 }
 
 /* Check for login/logout events; executed before *
@@ -510,55 +524,28 @@ readwtab(void)
 void
 dowatch(void)
 {
-    FILE *in;
     WATCH_STRUCT_UTMP *utab, *uptr, *wptr;
     struct stat st;
     char **s;
     char *fmt;
-    int utabsz = 0, utabmax = wtabsz + 4;
-    int uct, wct;
+    int utabsz, uct, wct;
 
     s = watch;
 
     holdintr();
-    if (!wtab) {
-	readwtab();
-	noholdintr();
-	return;
-    }
+    if (!wtab)
+	wtabsz = readwtab(&wtab, 32);
     if ((stat(WATCH_UTMP_FILE, &st) == -1) || (st.st_mtime <= lastutmpcheck)) {
 	noholdintr();
 	return;
     }
     lastutmpcheck = st.st_mtime;
-    uptr = utab = (WATCH_STRUCT_UTMP *) zalloc(utabmax * sizeof(WATCH_STRUCT_UTMP));
-
-    if (!(in = fopen(WATCH_UTMP_FILE, "r"))) {
-	free(utab);
-	noholdintr();
-	return;
-    }
-    while (fread(uptr, sizeof *uptr, 1, in))
-# ifdef USER_PROCESS
-	if (uptr->ut_type == USER_PROCESS)
-# else /* !USER_PROCESS */
-	if (uptr->ut_name[0])
-# endif /* !USER_PROCESS */
-	{
-	    uptr++;
-	    if (++utabsz == utabmax)
-		uptr = (utab = (WATCH_STRUCT_UTMP *)realloc((void *) utab, (utabmax *= 2) *
-						      sizeof(WATCH_STRUCT_UTMP))) + utabsz;
-	}
-    fclose(in);
+    utabsz = readwtab(&utab, wtabsz + 4);
     noholdintr();
     if (errflag) {
 	free(utab);
 	return;
     }
-    if (utabsz)
-	qsort((void *) utab, utabsz, sizeof(WATCH_STRUCT_UTMP),
-	           (int (*) _((const void *, const void *)))ucmp);
 
     wct = wtabsz;
     uct = utabsz;
@@ -571,13 +558,14 @@ dowatch(void)
     queue_signals();
     if (!(fmt = getsparam_u("WATCHFMT")))
 	fmt = DEFAULT_WATCHFMT;
-    while ((uct || wct) && !errflag)
+    while ((uct || wct) && !errflag) {
 	if (!uct || (wct && ucmp(uptr, wptr) > 0))
 	    wct--, watchlog(0, wptr++, s, fmt);
 	else if (!wct || (uct && ucmp(uptr, wptr) < 0))
 	    uct--, watchlog(1, uptr++, s, fmt);
 	else
 	    uptr++, wptr++, wct--, uct--;
+    }
     unqueue_signals();
     free(wtab);
     wtab = utab;

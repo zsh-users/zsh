@@ -1,3 +1,8 @@
+2017-01-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Jens Elkner: 40333: Src/watch.c: Fix the utmpx interface for
+	watch as otherwise it failed on some OSes.
+
 2017-01-11  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 40332: Completion/Zsh/Command/_typeset: completion for new
