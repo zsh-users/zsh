@@ -2936,10 +2936,11 @@ check_autoload(Shfunc shf, char *name, Options ops, int func)
     {
 	return eval_autoload(shf, name, ops, func);
     }
-    if (OPT_ISSET(ops,'r') || OPT_ISSET(ops,'R'))
+    if ((OPT_ISSET(ops,'r') || OPT_ISSET(ops,'R')) &&
+	(shf->node.flags & PM_UNDEFINED))
     {
 	char *dir_path;
-	if (shf->filename) {
+	if (shf->filename && (shf->node.flags & PM_LOADDIR)) {
 	    char *spec_path[2];
 	    spec_path[0] = shf->filename;
 	    spec_path[1] = NULL;
@@ -2964,6 +2965,7 @@ check_autoload(Shfunc shf, char *name, Options ops, int func)
 		dir_path = xsymlink(dir_path, 1);
 	    }
 	    shf->filename = ztrdup(dir_path);
+	    shf->node.flags |= PM_LOADDIR;
 	    return 0;
 	}
 	if (OPT_ISSET(ops,'R')) {
@@ -3017,7 +3019,8 @@ add_autoload_function(Shfunc shf, char *funcname)
 {
     char *nam;
     if (*funcname == '/' && funcname[1] &&
-	(nam = strrchr(funcname, '/')) && nam[1]) {
+	(nam = strrchr(funcname, '/')) && nam[1] &&
+	(shf->node.flags & PM_UNDEFINED)) {
 	char *dir;
 	nam = strrchr(funcname, '/');
 	if (nam == funcname) {
@@ -3028,6 +3031,7 @@ add_autoload_function(Shfunc shf, char *funcname)
 	}
 	zsfree(shf->filename);
 	shf->filename = ztrdup(dir);
+	shf->node.flags |= PM_LOADDIR;
 	shfunctab->addnode(shfunctab, ztrdup(nam), shf);
     } else {
 	shfunctab->addnode(shfunctab, ztrdup(funcname), shf);
@@ -3278,6 +3282,7 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	    if (*argv) {
 		zsfree(shf->filename);
 		shf->filename = ztrdup(*argv);
+		on |= PM_LOADDIR;
 	    }
 	    shf->node.flags = on;
 	    ret = eval_autoload(shf, funcname, ops, func);

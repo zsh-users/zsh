@@ -419,6 +419,16 @@
 0:autoload -dX with path
 >I have been loaded by default path.
 
+  (
+    fpath=(.)
+    print 'loadthisfunc() { autoload -X }' >loadthisfunc_sourceme
+    print 'print Function was loaded correctly.' >loadthisfunc
+    source $PWD/loadthisfunc_sourceme
+    loadthisfunc
+  )
+0: autoload -X interaction with absolute filename used for source location
+>Function was loaded correctly.
+
 %clean
 
  rm -f file.in file.out

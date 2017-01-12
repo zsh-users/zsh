@@ -5160,7 +5160,8 @@ loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
     pushheap();
 
     noaliases = (shf->node.flags & PM_UNALIASED);
-    if (shf->filename && shf->filename[0] == '/')
+    if (shf->filename && shf->filename[0] == '/' &&
+	(shf->node.flags & PM_LOADDIR))
     {
 	char *spec_path[2];
 	spec_path[0] = dupstring(shf->filename);
@@ -5203,7 +5204,7 @@ loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 		shf->funcdef = prog;
 	    else
 		shf->funcdef = dupeprog(prog, 0);
-	    shf->node.flags &= ~PM_UNDEFINED;
+	    shf->node.flags &= ~(PM_UNDEFINED|PM_LOADDIR);
 	    zsfree(shf->filename);
 	    shf->filename = fname;
 	} else {
@@ -5227,7 +5228,7 @@ loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 	    shf->funcdef = stripkshdef(prog, shf->node.nam);
 	else
 	    shf->funcdef = dupeprog(stripkshdef(prog, shf->node.nam), 0);
-	shf->node.flags &= ~PM_UNDEFINED;
+	shf->node.flags &= ~(PM_UNDEFINED|PM_LOADDIR);
 	zsfree(shf->filename);
 	shf->filename = fname;
     }

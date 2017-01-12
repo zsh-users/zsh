@@ -1,5 +1,9 @@
 2017-01-12  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 40335: Src/builtin.c, Src/exec.c, Src/zsh.h,
+	Test/C04funcdef.ztst: be more careful autoload filename is
+	directory, not source location.
+
 	* Jens Elkner: 40333: Src/watch.c: Fix the utmpx interface for
 	watch as otherwise it failed on some OSes.
 
