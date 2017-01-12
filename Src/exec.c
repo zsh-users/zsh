@@ -4902,6 +4902,7 @@ execfuncdef(Estate state, Eprog redir_prog)
 	shf = (Shfunc) zalloc(sizeof(*shf));
 	shf->funcdef = prog;
 	shf->node.flags = 0;
+	/* No dircache here, not a directory */
 	shf->filename = ztrdup(scriptfilename);
 	shf->lineno = lineno;
 	/*
@@ -4934,7 +4935,7 @@ execfuncdef(Estate state, Eprog redir_prog)
 		    freeeprog(shf->funcdef);
 		    if (shf->redir) /* shouldn't be */
 			freeeprog(shf->redir);
-		    zsfree(shf->filename);
+		    dircache_set(&shf->filename, NULL);
 		    zfree(shf, sizeof(*shf));
 		    state->pc = end;
 		    return 1;
@@ -4965,7 +4966,7 @@ execfuncdef(Estate state, Eprog redir_prog)
 	    freeeprog(shf->funcdef);
 	    if (shf->redir) /* shouldn't be */
 		freeeprog(shf->redir);
-	    zsfree(shf->filename);
+	    dircache_set(&shf->filename, NULL);
 	    zfree(shf, sizeof(*shf));
 	    break;
 	} else {
@@ -4974,7 +4975,7 @@ execfuncdef(Estate state, Eprog redir_prog)
 		(signum = getsignum(s + 4)) != -1) {
 		if (settrap(signum, NULL, ZSIG_FUNC)) {
 		    freeeprog(shf->funcdef);
-		    zsfree(shf->filename);
+		    dircache_set(&shf->filename, NULL);
 		    zfree(shf, sizeof(*shf));
 		    state->pc = end;
 		    return 1;
@@ -5205,7 +5206,8 @@ loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 	    else
 		shf->funcdef = dupeprog(prog, 0);
 	    shf->node.flags &= ~(PM_UNDEFINED|PM_LOADDIR);
-	    zsfree(shf->filename);
+	    dircache_set(&shf->filename, NULL);
+	    /* Full filename, don't use dircache */
 	    shf->filename = fname;
 	} else {
 	    VARARR(char, n, strlen(shf->node.nam) + 1);
@@ -5229,7 +5231,8 @@ loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 	else
 	    shf->funcdef = dupeprog(stripkshdef(prog, shf->node.nam), 0);
 	shf->node.flags &= ~(PM_UNDEFINED|PM_LOADDIR);
-	zsfree(shf->filename);
+	dircache_set(&shf->filename, NULL);
+	/* Full filename, don't use dircache */
 	shf->filename = fname;
     }
     popheap();
@@ -5619,6 +5622,8 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
 /*
  * Search fpath for an undefined function.  Finds the file, and returns the
  * list of its contents.
+ *
+ * If test is 0, load the function; *fname is set to zalloc'ed location.
  *
  * If test_only is 1, don't load function, just test for it:
  * - Non-null return means function was found

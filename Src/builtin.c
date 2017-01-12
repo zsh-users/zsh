@@ -2958,13 +2958,13 @@ check_autoload(Shfunc shf, char *name, Options ops, int func)
 	    }
 	}
 	if (getfpfunc(shf->node.nam, NULL, &dir_path, NULL, 1)) {
-	    zsfree(shf->filename);
+	    dircache_set(&shf->filename, NULL);
 	    if (*dir_path != '/') {
 		dir_path = zhtricat(metafy(zgetcwd(), -1, META_HEAPDUP),
 				    "/", dir_path);
 		dir_path = xsymlink(dir_path, 1);
 	    }
-	    shf->filename = ztrdup(dir_path);
+	    dircache_set(&shf->filename, dir_path);
 	    shf->node.flags |= PM_LOADDIR;
 	    return 0;
 	}
@@ -3029,8 +3029,8 @@ add_autoload_function(Shfunc shf, char *funcname)
 	    *nam++ = '\0';
 	    dir = funcname;
 	}
-	zsfree(shf->filename);
-	shf->filename = ztrdup(dir);
+	dircache_set(&shf->filename, NULL);
+	dircache_set(&shf->filename, dir);
 	shf->node.flags |= PM_LOADDIR;
 	shfunctab->addnode(shfunctab, ztrdup(nam), shf);
     } else {
@@ -3280,8 +3280,8 @@ bin_functions(char *name, char **argv, Options ops, int func)
 		shfunctab->addnode(shfunctab, ztrdup(funcname), shf);
 	    }
 	    if (*argv) {
-		zsfree(shf->filename);
-		shf->filename = ztrdup(*argv);
+		dircache_set(&shf->filename, NULL);
+		dircache_set(&shf->filename, *argv);
 		on |= PM_LOADDIR;
 	    }
 	    shf->node.flags = on;

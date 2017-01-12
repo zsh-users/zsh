@@ -889,7 +889,7 @@ freeshfuncnode(HashNode hn)
 	freeeprog(shf->funcdef);
     if (shf->redir)
 	freeeprog(shf->redir);
-    zsfree(shf->filename);
+    dircache_set(&shf->filename, NULL);
     if (shf->sticky) {
 	if (shf->sticky->n_on_opts)
 	    zfree(shf->sticky->on_opts,
@@ -1440,5 +1440,142 @@ freehistdata(Histent he, int unlink)
 	    he->up->down = he->down;
 	    he->down->up = he->up;
 	}
+    }
+}
+
+
+/***********************************************************************
+ * Directory name cache mechanism
+ *
+ * The idea of this is that there are various shell structures,
+ * notably functions, that record the directories with which they
+ * are associated.  Rather than store the full string each time,
+ * we store a pointer to the same location and count the references.
+ * This is optimised so that retrieval is quick at the expense of
+ * searching the list when setting up the structure, which is a much
+ * rarer operation.
+ *
+ * There is nothing special about the fact that the strings are
+ * directories, except for the assumptions for efficiency that many
+ * structures will point to the same one, and that there are not too
+ * many different directories associated with the shell.
+ **********************************************************************/
+
+struct dircache_entry
+{
+    /* Name of directory in cache */
+    char *name;
+    /* Number of references to it */
+    int refs;
+};
+
+/*
+ * dircache is the cache, of length dircache_size.
+ * dircache_lastentry is the last entry used, an optimisation
+ * for multiple references to the same directory, e.g
+ * "autoload /blah/blah/\*".
+ */
+struct dircache_entry *dircache, *dircache_lastentry;
+int dircache_size;
+
+/*
+ * Set *name to point to a cached version of value.
+ * value is copied so may come from any source.
+ *
+ * If value is NULL, look for the existing value of *name (safe if this
+ * too is NULL) and remove a reference to it from the cache. If it's
+ * not found in the cache, it's assumed to be an allocated string and
+ * freed --- this currently occurs for a shell function that's been
+ * loaded as the filename is now a full path, not just a directory,
+ * though we may one day optimise this to a cached directory plus a
+ * name, too.  Note --- the function does *not* otherwise check
+ * if *name points to something already cached, so this is
+ * necessary any time *name may already be in the cache.
+ */
+
+/**/
+mod_export void
+dircache_set(char **name, char *value)
+{
+    struct dircache_entry *dcptr, *dcnew;
+
+    if (!value) {
+	if (!*name)
+	    return;
+	if (!dircache_size) {
+	    zsfree(*name);
+	    *name = NULL;
+	    return;
+	}
+
+	for (dcptr = dircache; dcptr < dircache + dircache_size; dcptr++)
+	{
+	    /* Must be a pointer much, not a string match */
+	    if (*name == dcptr->name)
+	    {
+		--dcptr->refs;
+		if (!dcptr->refs) {
+		    ptrdiff_t ind = dcptr - dircache;
+		    zsfree(dcptr->name);
+		    --dircache_size;
+
+		    if (!dircache_size) {
+			zfree(dircache, sizeof(*dircache));
+			dircache = NULL;
+			dircache_lastentry = NULL;
+			return;
+		    }
+		    dcnew = (struct dircache_entry *)
+			zalloc(dircache_size * sizeof(*dcnew));
+		    if (ind)
+			memcpy(dcnew, dircache, ind * sizeof(*dcnew));
+		    if (ind < dircache_size)
+			memcpy(dcnew + ind, dcptr + 1,
+			       (dircache_size - ind) * sizeof(*dcnew));
+		    zfree(dircache, (dircache_size+1)*sizeof(*dcnew));
+		    dircache = dcnew;
+		    dircache_lastentry = NULL;
+		}
+		*name = NULL;
+		return;
+	    }
+	}
+	zsfree(*name);
+	*name = NULL;
+    } else {
+	/*
+	 * We'll maintain the cache at exactly the right size rather
+	 * than overallocating.  The rationale here is that typically
+	 * we'll get a lot of functions in a small number of directories
+	 * so the complexity overhead of maintaining a separate count
+	 * isn't really matched by the efficiency gain.
+ 	 */
+	if (dircache_lastentry &&
+	    !strcmp(value, dircache_lastentry->name)) {
+	    *name = dircache_lastentry->name;
+	    ++dircache_lastentry->refs;
+	    return;
+	} else if (!dircache_size) {
+	    dircache_size = 1;
+	    dcptr = dircache =
+		(struct dircache_entry *)zalloc(sizeof(*dircache));
+	} else {
+	    for (dcptr = dircache; dcptr < dircache + dircache_size; dcptr++)
+	    {
+		if (!strcmp(value, dcptr->name)) {
+		    *name = dcptr->name;
+		    ++dcptr->refs;
+		    return;
+		}
+	    }
+	    ++dircache_size;
+	    dircache = (struct dircache_entry *)
+		zrealloc(dircache, sizeof(*dircache) * dircache_size);
+	    dcptr = dircache + dircache_size - 1;
+	}
+	dcptr->name = ztrdup(value);
+	*name = dcptr->name;
+	dcptr->refs = 1;
+	dircache_lastentry = dcptr;
     }
 }

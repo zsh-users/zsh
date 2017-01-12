@@ -429,6 +429,45 @@
 0: autoload -X interaction with absolute filename used for source location
 >Function was loaded correctly.
 
+  (
+    fpath=()
+    mkdir extra2
+    for f in fun2a fun2b; do
+      print "print $f" >extra2/$f
+    done
+    repeat 3; do
+      autoload $PWD/extra2/fun2{a,b} $PWD/extra/spec
+      fun2a
+      fun2b
+      spec
+      unfunction fun2a fun2b spec
+      autoload $PWD/extra2/fun2{a,b} $PWD/extra/spec
+      spec
+      fun2b
+      fun2a
+      unfunction fun2a fun2b spec
+    done
+  )
+0: Exercise the directory name cache for autoloads
+>fun2a
+>fun2b
+>I have been loaded by explicit path.
+>I have been loaded by explicit path.
+>fun2b
+>fun2a
+>fun2a
+>fun2b
+>I have been loaded by explicit path.
+>I have been loaded by explicit path.
+>fun2b
+>fun2a
+>fun2a
+>fun2b
+>I have been loaded by explicit path.
+>I have been loaded by explicit path.
+>fun2b
+>fun2a
+
 %clean
 
  rm -f file.in file.out

@@ -811,6 +811,7 @@ dosavetrap(int sig, int level)
 	    newshf->node.nam = ztrdup(shf->node.nam);
 	    newshf->node.flags = shf->node.flags;
 	    newshf->funcdef = dupeprog(shf->funcdef, 0);
+	    /* Assume this is a real filename, don't use dircache */
 	    newshf->filename = ztrdup(shf->filename);
 	    if (shf->sticky) {
 		newshf->sticky = sticky_emulation_dup(shf->sticky, 0);
