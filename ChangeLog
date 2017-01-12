@@ -1,3 +1,7 @@
+2017-01-12  Oliver Kiddle  <opk@zsh.org>
+
+	* 40344: Completion/Linux/Command/_lsblk: new lsblk completion
+
 2017-01-12  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Src/hashtable.c: one missing *name = NULL.
