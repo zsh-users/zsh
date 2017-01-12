@@ -1523,6 +1523,7 @@ dircache_set(char **name, char *value)
 			zfree(dircache, sizeof(*dircache));
 			dircache = NULL;
 			dircache_lastentry = NULL;
+			*name = NULL;
 			return;
 		    }
 		    dcnew = (struct dircache_entry *)
