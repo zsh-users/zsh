@@ -1,4 +1,6 @@
-2017-01-12  Oliver Kiddle  <opk@zsh.org>
+2017-01-13  Oliver Kiddle  <opk@zsh.org>
+
+	* 40345: Completion/Linux/Command/_lsusb: update lsusb completion
 
 	* 40344: Completion/Linux/Command/_lsblk: new lsblk completion
 
