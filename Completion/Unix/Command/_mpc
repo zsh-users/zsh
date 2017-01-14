@@ -131,7 +131,7 @@ _mpc_helper_songnumbers() {
 (( $+functions[_mpc_helper_playlists] )) ||
 _mpc_helper_playlists() {
   local list expl
-  list=($(mpc lsplaylists))
+  list=(${(f)"$(mpc lsplaylists)"})
   _wanted list expl playlist compadd -M $MPC_PLAYLIST_MATCHER $expl -a list
 }
 
