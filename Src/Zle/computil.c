@@ -3569,8 +3569,8 @@ bin_compvalues(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    Cvval val = cv_get_val(cv_laststate.d, args[1]);
 
 	    if (val && val->arg) {
-		setsparam(args[2], val->arg->descr);
-		setsparam(args[3], val->arg->action);
+		setsparam(args[2], ztrdup(val->arg->descr));
+		setsparam(args[3], ztrdup(val->arg->action));
 
 		if (args[4])
 		    setsparam(args[4], ztrdup(val->name));

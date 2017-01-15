@@ -1,3 +1,9 @@
+2017-01-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 40362: Src/Zle/computil.c: need duplicated values for setting
+	parameter in compvalues.  Was causing obscure but surprisingly
+	rare crashes in value completion.
+
 2017-01-13  Eric Cook  <llua@gmx.com>
 
 	* earnestly: 40355: Completion/Unix/Command/_mpc: improve
