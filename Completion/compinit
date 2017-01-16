@@ -154,6 +154,7 @@ _comp_options=(
     NO_markdirs
     NO_octalzeroes
     NO_posixbuiltins
+    NO_posixidentifiers
     NO_shwordsplit
     NO_shglob
     NO_warncreateglobal
