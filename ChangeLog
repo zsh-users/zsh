@@ -1,5 +1,8 @@
 2017-01-16  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 40369: Src/builtin.c: whence -v should probably quote commands
+	since it quotes functions.
+
 	* 40353 (plus improvement to whence -v): Src/exec.c,
 	Src/hashtable.c, Src/signals.c: use directory cache where
 	possible for all functions loaded from directory including
