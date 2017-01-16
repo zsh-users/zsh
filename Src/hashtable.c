@@ -926,10 +926,13 @@ printshfuncnode(HashNode hn, int printflags)
 	       (f->node.flags & PM_UNDEFINED) ?
 	       " is an autoload shell function" :
 	       " is a shell function");
-	if (f->filename && (printflags & PRINT_WHENCE_VERBOSE) &&
-	    strcmp(f->filename, f->node.nam) != 0) {
+	if ((printflags & PRINT_WHENCE_VERBOSE) && f->filename) {
 	    printf(" from ");
 	    quotedzputs(f->filename, stdout);
+	    if (f->node.flags & PM_LOADDIR) {
+		printf("/");
+		quotedzputs(f->node.nam, stdout);
+	    }
 	}
 	putchar('\n');
 	return;
@@ -959,7 +962,7 @@ printshfuncnode(HashNode hn, int printflags)
 	    zputs("builtin autoload -X", stdout);
 	    for (fl=0;fopt[fl];fl++)
 		if (f->node.flags & flgs[fl]) putchar(fopt[fl]);
-	    if (f->filename) {
+	    if (f->filename && (f->node.flags & PM_LOADDIR)) {
 		putchar(' ');
 		zputs(f->filename, stdout);
 	    }
@@ -1039,6 +1042,24 @@ printshfuncexpand(HashNode hn, int printflags, int expand)
     text_expand_tabs = expand;
     shfunctab->printnode(hn, printflags);
     text_expand_tabs = save_expand;
+}
+
+/*
+ * Get a heap-duplicated name of the shell function, for
+ * use in tracing.
+ */
+
+/**/
+mod_export char *
+getshfuncfile(Shfunc shf)
+{
+    if (shf->node.flags & PM_LOADDIR) {
+	return zhtricat(shf->filename, "/", shf->node.nam);
+    } else if (shf->filename) {
+	return dupstring(shf->filename);
+    } else {
+	return NULL;
+    }
 }
 
 /**************************************/

@@ -1,3 +1,10 @@
+2017-01-16  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 40353 (plus improvement to whence -v): Src/exec.c,
+	Src/hashtable.c, Src/signals.c: use directory cache where
+	possible for all functions loaded from directory including
+	fpath.
+
 2017-01-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 40362: Src/Zle/computil.c: need duplicated values for setting

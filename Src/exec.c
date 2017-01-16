@@ -5124,12 +5124,12 @@ execautofn_basic(Estate state, UNUSED(int do_exec))
      * defined yet.
      */
     if (funcstack && !funcstack->filename)
-	funcstack->filename = dupstring(shf->filename);
+	funcstack->filename = getshfuncfile(shf);
 
     oldscriptname = scriptname;
     oldscriptfilename = scriptfilename;
     scriptname = dupstring(shf->node.nam);
-    scriptfilename = dupstring(shf->filename);
+    scriptfilename = getshfuncfile(shf);
     execode(shf->funcdef, 1, 0, "loadautofunc");
     scriptname = oldscriptname;
     scriptfilename = oldscriptfilename;
@@ -5150,13 +5150,47 @@ execautofn(Estate state, UNUSED(int do_exec))
     return execautofn_basic(state, 0);
 }
 
+/*
+ * Helper function to install the source file name of a shell function
+ * just autoloaded.
+ *
+ * We attempt to do this efficiently as the typical case is the
+ * directory part is a well-known directory, which is cached, and
+ * the non-directory part is the same as the node name.
+ */
+
+/**/
+static void
+loadautofnsetfile(Shfunc shf, char *fdir)
+{
+    /*
+     * If shf->filename is already the load directory ---
+     * keep it as we can still use it to get the load file.
+     * This makes autoload with an absolute path particularly efficient.
+     */
+    if (!(shf->node.flags & PM_LOADDIR) ||
+	strcmp(shf->filename, fdir) != 0) {
+	/* Old directory name not useful... */
+	dircache_set(&shf->filename, NULL);
+	if (fdir) {
+	    /* ...can still cache directory */
+	    shf->node.flags |= PM_LOADDIR;
+	    dircache_set(&shf->filename, fdir);
+	} else {
+	    /* ...no separate directory part to cache, for some reason. */
+	    shf->node.flags &= ~PM_LOADDIR;
+	    shf->filename = ztrdup(shf->node.nam);
+	}
+    }
+}
+
 /**/
 Shfunc
 loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 {
     int noalias = noaliases, ksh = 1;
     Eprog prog;
-    char *fname;
+    char *fdir;			/* Directory path where func found */
 
     pushheap();
 
@@ -5167,13 +5201,13 @@ loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 	char *spec_path[2];
 	spec_path[0] = dupstring(shf->filename);
 	spec_path[1] = NULL;
-	prog = getfpfunc(shf->node.nam, &ksh, &fname, spec_path, 0);
+	prog = getfpfunc(shf->node.nam, &ksh, &fdir, spec_path, 0);
 	if (prog == &dummy_eprog &&
 	    (current_fpath || (shf->node.flags & PM_CUR_FPATH)))
-	    prog = getfpfunc(shf->node.nam, &ksh, &fname, NULL, 0);
+	    prog = getfpfunc(shf->node.nam, &ksh, &fdir, NULL, 0);
     }
     else
-	prog = getfpfunc(shf->node.nam, &ksh, &fname, NULL, 0);
+	prog = getfpfunc(shf->node.nam, &ksh, &fdir, NULL, 0);
     noaliases = noalias;
 
     if (ksh == 1) {
@@ -5192,7 +5226,6 @@ loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 	return NULL;
     }
     if (!prog) {
-	zsfree(fname);
 	popheap();
 	return NULL;
     }
@@ -5205,10 +5238,8 @@ loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 		shf->funcdef = prog;
 	    else
 		shf->funcdef = dupeprog(prog, 0);
-	    shf->node.flags &= ~(PM_UNDEFINED|PM_LOADDIR);
-	    dircache_set(&shf->filename, NULL);
-	    /* Full filename, don't use dircache */
-	    shf->filename = fname;
+	    shf->node.flags &= ~PM_UNDEFINED;
+	    loadautofnsetfile(shf, fdir);
 	} else {
 	    VARARR(char, n, strlen(shf->node.nam) + 1);
 	    strcpy(n, shf->node.nam);
@@ -5220,7 +5251,6 @@ loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 		zwarn("%s: function not defined by file", n);
 		locallevel++;
 		popheap();
-		zsfree(fname);
 		return NULL;
 	    }
 	}
@@ -5230,10 +5260,8 @@ loadautofn(Shfunc shf, int fksh, int autol, int current_fpath)
 	    shf->funcdef = stripkshdef(prog, shf->node.nam);
 	else
 	    shf->funcdef = dupeprog(stripkshdef(prog, shf->node.nam), 0);
-	shf->node.flags &= ~(PM_UNDEFINED|PM_LOADDIR);
-	dircache_set(&shf->filename, NULL);
-	/* Full filename, don't use dircache */
-	shf->filename = fname;
+	shf->node.flags &= ~PM_UNDEFINED;
+	loadautofnsetfile(shf, fdir);
     }
     popheap();
 
@@ -5453,7 +5481,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	funcstack = &fstack;
 
 	fstack.flineno = shfunc->lineno;
-	fstack.filename = dupstring(shfunc->filename);
+	fstack.filename = getshfuncfile(shfunc);
 
 	prog = shfunc->funcdef;
 	if (prog->flags & EF_RUN) {
@@ -5623,16 +5651,17 @@ runshfunc(Eprog prog, FuncWrap wrap, char *name)
  * Search fpath for an undefined function.  Finds the file, and returns the
  * list of its contents.
  *
- * If test is 0, load the function; *fname is set to zalloc'ed location.
+ * If test is 0, load the function.
  *
  * If test_only is 1, don't load function, just test for it:
- * - Non-null return means function was found
- * - *fname points to path at which found (not duplicated)
+ * Non-null return means function was found
+ *
+ * *fdir points to path at which found (as passed in, not duplicated)
  */
 
 /**/
 Eprog
-getfpfunc(char *s, int *ksh, char **fname, char **alt_path, int test_only)
+getfpfunc(char *s, int *ksh, char **fdir, char **alt_path, int test_only)
 {
     char **pp, buf[PATH_MAX+1];
     off_t len;
@@ -5650,8 +5679,8 @@ getfpfunc(char *s, int *ksh, char **fname, char **alt_path, int test_only)
 	else
 	    strcpy(buf, s);
 	if ((r = try_dump_file(*pp, s, buf, ksh, test_only))) {
-	    if (fname)
-		*fname = test_only ? *pp : ztrdup(buf);
+	    if (fdir)
+		*fdir = *pp;
 	    return r;
 	}
 	unmetafy(buf, NULL);
@@ -5661,7 +5690,8 @@ getfpfunc(char *s, int *ksh, char **fname, char **alt_path, int test_only)
 		(len = lseek(fd, 0, 2)) != -1) {
 		if (test_only) {
 		    close(fd);
-		    *fname = *pp;
+		    if (fdir)
+			*fdir = *pp;
 		    return &dummy_eprog;
 		}
 		d = (char *) zalloc(len + 1);
@@ -5677,8 +5707,8 @@ getfpfunc(char *s, int *ksh, char **fname, char **alt_path, int test_only)
 		    r = parse_string(d, 1);
 		    scriptname = oldscriptname;
 
-		    if (fname)
-			*fname = ztrdup(buf);
+		    if (fdir)
+			*fdir = *pp;
 
 		    zfree(d, len + 1);
 
