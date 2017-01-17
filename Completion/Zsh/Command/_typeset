@@ -93,7 +93,7 @@ if [[ "$state" = vars_eq ]]; then
     elif (( $+opt_args[-w] )); then
       _wanted files expl 'zwc file' _files -g '*.zwc(-.)'
     elif [[ $service = autoload || -n $opt_args[(i)-[uU]] ]]; then
-      if [[ $PREFIX[1] = / ]]; then
+      if [[ $PREFIX[1] = [/~] ]]; then
 	# Autoload by absolute path
 	_files
       else

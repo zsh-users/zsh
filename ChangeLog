@@ -1,3 +1,8 @@
+2017-01-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted: Completion/Zsh/Command/_typeset: autoload ~... also
+	completes file.
+
 2017-01-16  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40372: Completion/compinit: turn off POSIX_IDENTIFIERS option
