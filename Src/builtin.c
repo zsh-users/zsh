@@ -3747,7 +3747,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 		    } else {
 			if (v && !csh)
 			    zputs(*argv, stdout), fputs(" is ", stdout);
-			zputs(buf, stdout);
+			quotedzputs(buf, stdout);
 			if (OPT_ISSET(ops,'s') || OPT_ISSET(ops, 'S'))
 			    print_if_link(buf, OPT_ISSET(ops, 'S'));
 			fputc('\n', stdout);
@@ -3779,7 +3779,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 	    } else {
 		if (v && !csh)
 		    zputs(*argv, stdout), fputs(" is ", stdout);
-		zputs(cnam, stdout);
+		quotedzputs(cnam, stdout);
 		if (OPT_ISSET(ops,'s') || OPT_ISSET(ops,'S'))
 		    print_if_link(cnam, OPT_ISSET(ops,'S'));
 		fputc('\n', stdout);
