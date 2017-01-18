@@ -468,6 +468,31 @@
 >fun2b
 >fun2a
 
+  not_trashed() { print This function was not trashed; }
+  autoload -Uz /foo/bar/not_trashed
+  not_trashed
+0:autoload with absolute path doesn't trash loaded function
+>This function was not trashed
+
+  # keep spec from getting loaded in parent shell for simplicity
+  (
+    if whence spec; then print spec already loaded >&2; exit 1; fi
+    autoload -Uz $PWD/spec
+    autoload -Uz $PWD/extra/spec
+    spec
+  )
+0:autoload with absolute path can be overridden if not yet loaded
+>I have been loaded by explicit path.
+
+  (
+    if whence spec; then print spec already loaded >&2; exit 1; fi
+    autoload -Uz $PWD/extra/spec
+    autoload spec
+    spec
+  )
+0:autoload with absolute path not cancelled by bare autoload
+>I have been loaded by explicit path.
+
 %clean
 
  rm -f file.in file.out

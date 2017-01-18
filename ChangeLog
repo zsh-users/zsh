@@ -1,5 +1,8 @@
 2017-01-18  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 43080: Test/C04funcdef.ztst: a few more tests for autoload
+	with absolute path.
+
 	* 40375: Src/builtin.c, Src/subst.c: autoload with explicit path
 	mustn't trash already loaded function.  Also drive-by removal of
 	duplicated duplication in =cmd expansion.
