@@ -1,3 +1,9 @@
+2017-01-18  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 40375: Src/builtin.c, Src/subst.c: autoload with explicit path
+	mustn't trash already loaded function.  Also drive-by removal of
+	duplicated duplication in =cmd expansion.
+
 2017-01-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Completion/Zsh/Command/_typeset: autoload ~... also

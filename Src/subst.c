@@ -622,7 +622,7 @@ filesub(char **namptr, int assign)
 char *
 equalsubstr(char *str, int assign, int nomatch)
 {
-    char *pp, *cnam, *cmdstr, *ret;
+    char *pp, *cnam, *cmdstr;
 
     for (pp = str; !isend2(*pp); pp++)
 	;
@@ -634,10 +634,10 @@ equalsubstr(char *str, int assign, int nomatch)
 	    zerr("%s not found", cmdstr);
 	return NULL;
     }
-    ret = dupstring(cnam);
     if (*pp)
-	ret = dyncat(ret, pp);
-    return ret;
+	return dyncat(cnam, pp);
+    else
+	return cnam;		/* already duplicated */
 }
 
 /**/

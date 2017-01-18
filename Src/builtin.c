@@ -3369,6 +3369,31 @@ bin_functions(char *name, char **argv, Options ops, int func)
 		removetrapnode(signum);
 	    }
 
+	    if (**argv == '/') {
+		char *base = strrchr(*argv, '/') + 1;
+		if (*base &&
+		    (shf = (Shfunc) shfunctab->getnode(shfunctab, base))) {
+		    char *dir;
+		    /* turn on/off the given flags */
+		    shf->node.flags =
+			(shf->node.flags | (on & ~PM_UNDEFINED)) & ~off;
+		    if (shf->node.flags & PM_UNDEFINED) {
+			/* update path if not yet loaded */
+			if (base == *argv + 1)
+			    dir = "/";
+			else {
+			    dir = *argv;
+			    base[-1] = '\0';
+			}
+			dircache_set(&shf->filename, NULL);
+			dircache_set(&shf->filename, dir);
+		    }
+		    if (check_autoload(shf, shf->node.nam, ops, func))
+			returnval = 1;
+		    continue;
+		}
+	    }
+
 	    /* Add a new undefined (autoloaded) function to the *
 	     * hash table with the corresponding flags set.     */
 	    shf = (Shfunc) zshcalloc(sizeof *shf);
