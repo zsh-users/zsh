@@ -1,6 +1,7 @@
 # This function takes as an argument a filename of a patch and sets $REPLY to
 # a single-line "subject", or unsets it if no subject could be extracted.
 {
+    setopt localoptions extendedglob
     integer i
     integer -r LIMIT=10
     local -a lines
@@ -33,6 +34,22 @@
             REPLY=${needle#*: }
         elif [[ ${lines[1]} == '# HG changeset patch' ]] && { needle=${${lines:#([#]*)}[1]}; [[ -n $needle ]] }; then
             # Mercurial patch
+            REPLY=$needle
+        elif [[ ${lines[1]} == "commit "[0-9a-f](#c40) ]] &&
+             [[ ${lines[2]} == "Author:"* && ${lines[3]} == "Date:"* ]] &&
+             (( ! ${+lines[4]} )); then
+            # `git show` output.
+            #
+            # The log message is after the first blank line, so open() the file
+            # again.  Also check whether the following line (second line of the
+            # log message itself) is empty.
+            {
+              repeat 4 { IFS= read -r }
+              IFS= read -r needle; needle=${needle#'    '}
+              if IFS= read -r; REPLY=${REPLY#'    '}; [[ -n $REPLY ]]; then
+                needle+='...'
+              fi
+            } < "$1"
             REPLY=$needle
         elif (( ${+lines[1]} )); then
             # The first line of the file is not part of the diff.
