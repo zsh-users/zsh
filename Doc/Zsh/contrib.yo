@@ -1288,6 +1288,17 @@ to tt(mq) information).  See the tt(get-mq) and tt(get-bookmarks) styles.  Both
 of these styles may be enabled at the same time.  If both are enabled, both
 resulting strings will be shown separated by a semicolon (that cannot currently
 be customized).
+
+The tt(quilt) `standalone' backend sets this expando to the same value as the
+tt(%Q) expando.
+)
+item(tt(%Q))(
+Quilt series information.
+When quilt is used (either in `addon' mode or as a `standalone' backend),
+this expando is set to quilt series' tt(patch-format) string.
+The tt(set-patch-format) hook and tt(nopatch-format) style are honoured.
+
+See tt(Quilt Support) below for details.
 )
 enditem()
 
@@ -1345,6 +1356,10 @@ systems.
 The tt(vcs_info) integration tries to support both ways of using quilt by
 having two slightly different modes of operation: `addon' mode and
 `standalone' mode).
+
+Quilt integration is off by default; to enable it, set the tt(use-quilt) style,
+and add tt(%Q) to your tt(formats) or tt(actionformats) style:
+example(zstyle ':vcs_info:*' use-quilt true)
 
 For `addon' mode to become active tt(vcs_info) must have already detected a
 real version control system controlling the directory. If that is the case,

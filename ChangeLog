@@ -1,5 +1,8 @@
 2017-01-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40396: Doc/Zsh/contrib.yo: vcs_info quilt: More documentation
+	of '%Q' and 'use-quilt'.
+
 	* 40392: Functions/VCS_Info/VCS_INFO_patch2subject: vcs_info
 	patch2subject: Support `git show` output.
 
