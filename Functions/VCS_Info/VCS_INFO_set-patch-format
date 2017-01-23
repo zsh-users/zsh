@@ -4,6 +4,8 @@
 # Parameters:
 # $1 - name of an array parameter to be the argument to gen-applied-string
 # $2 - name of a parameter to store the applied-string in
+# $3 - name of an array parameter to be the argument to gen-unapplied-string
+# $4 - name of a parameter to store the unapplied-string in
 {
     local REPLY
     if VCS_INFO_hook 'gen-applied-string' "${(@P)1}"; then
@@ -16,5 +18,13 @@
         REPLY=${hook_com[applied-string]}
     fi
     : ${(P)2::=$REPLY}
+    hook_com=()
+
+    if VCS_INFO_hook 'gen-unapplied-string' "${(@P)3}"; then
+        REPLY=${(P)#3}
+    else
+        REPLY=${hook_com[unapplied-string]}
+    fi
+    : ${(P)4::=$REPLY}
     hook_com=()
 }
