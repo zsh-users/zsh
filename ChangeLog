@@ -1,5 +1,8 @@
 2017-01-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40401: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
+	vcs_info git: Fix the %c patch-format expando.
+
 	* 40396: Doc/Zsh/contrib.yo: vcs_info quilt: More documentation
 	of '%Q' and 'use-quilt'.
 

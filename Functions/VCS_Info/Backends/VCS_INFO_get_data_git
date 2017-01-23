@@ -136,9 +136,9 @@ VCS_INFO_git_handle_patches () {
     fi
     hook_com=()
     if VCS_INFO_hook 'gen-unapplied-string' "${git_patches_unapplied[@]}"; then
-        git_patches_unapplied=${#git_patches_unapplied}
+        git_unapplied_s=${#git_patches_unapplied}
     else
-        git_patches_unapplied=${hook_com[unapplied-string]}
+        git_unapplied_s=${hook_com[unapplied-string]}
     fi
 
     if (( ${#git_patches_applied} )); then
@@ -146,7 +146,7 @@ VCS_INFO_git_handle_patches () {
     else
         zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" nopatch-format gitmsg || gitmsg="no patch applied"
     fi
-    hook_com=( applied "${git_applied_s}"     unapplied "${git_patches_unapplied}"
+    hook_com=( applied "${git_applied_s}"     unapplied "${git_unapplied_s}"
                applied-n ${#git_patches_applied} unapplied-n ${#git_patches_unapplied} all-n ${git_all} )
     if VCS_INFO_hook 'set-patch-format' "${gitmsg}"; then
         zformat -f gitmisc "${gitmsg}" "p:${hook_com[applied]}" "u:${hook_com[unapplied]}" \
