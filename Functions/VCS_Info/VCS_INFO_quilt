@@ -174,13 +174,9 @@ function VCS_INFO_quilt() {
     all=( ${(Oa)applied} ${unapplied} )
 
     VCS_INFO_set-patch-format 'applied' 'applied_string' \
-                              'unapplied' 'unapplied_string'
+                              'unapplied' 'unapplied_string' \
+                              ${context} qstring
 
-    if (( ${#applied} )); then
-        zstyle -s "${context}" patch-format qstring || qstring="%p (%n applied)"
-    else
-        zstyle -s "${context}" nopatch-format qstring || qstring="no patch applied"
-    fi
     hook_com=( applied "${applied_string}" unapplied "${unapplied_string}"
                applied-n ${#applied}       unapplied-n ${#unapplied}       all-n ${#all} )
     if VCS_INFO_hook 'set-patch-format' ${qstring}; then

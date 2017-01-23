@@ -6,6 +6,8 @@
 # $2 - name of a parameter to store the applied-string in
 # $3 - name of an array parameter to be the argument to gen-unapplied-string
 # $4 - name of a parameter to store the unapplied-string in
+# $5 - context argument for use in zstyle getters
+# $6 - name of a parameter to store a patch-format format string in
 {
     local REPLY
     if VCS_INFO_hook 'gen-applied-string' "${(@P)1}"; then
@@ -27,4 +29,11 @@
     fi
     : ${(P)4::=$REPLY}
     hook_com=()
+
+    if (( ${(P)#1} )); then
+        zstyle -s "${5}" patch-format REPLY || REPLY="%p (%n applied)"
+    else
+        zstyle -s "${5}" nopatch-format REPLY || REPLY="no patch applied"
+    fi
+    : ${(P)6::=$REPLY}
 }

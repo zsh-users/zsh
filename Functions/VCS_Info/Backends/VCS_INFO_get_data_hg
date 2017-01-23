@@ -204,19 +204,12 @@ if zstyle -T ":vcs_info:${vcs}:${usercontext}:${rrn}" get-mq \
     fi
 
     VCS_INFO_set-patch-format 'mqpatches' 'applied_string' \
-                              'mqunapplied' 'unapplied_string'
+                              'mqunapplied' 'unapplied_string' \
+                              ":vcs_info:${vcs}:${usercontext}:${rrn}" hgmqstring
     if VCS_INFO_hook 'gen-mqguards-string' "${mqguards[@]}"; then
         guards_string=${(j:,:)mqguards}
     else
         guards_string=${hook_com[guards-string]}
-    fi
-
-    if (( ${#mqpatches} )); then
-        zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" patch-format \
-            hgmqstring || hgmqstring="%p (%n applied)"
-    else
-        zstyle -s ":vcs_info:${vcs}:${usercontext}:${rrn}" nopatch-format \
-            hgmqstring || hgmqstring="no patch applied"
     fi
 
     hook_com=( applied "${applied_string}" unapplied "${unapplied_string}"
