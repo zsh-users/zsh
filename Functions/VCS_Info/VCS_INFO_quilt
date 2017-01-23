@@ -91,7 +91,7 @@ function VCS_INFO_quilt() {
     local patches pc tmp qstring root
     local -i ret
     local context
-    local -a applied unapplied all applied_string unapplied_string quiltcommand quilt_env
+    local -a applied unapplied applied_string unapplied_string quiltcommand quilt_env
     local -A hook_com
 
     context=":vcs_info:${vcs}.quilt-${mode}:${usercontext}:${rrn}"
@@ -171,17 +171,12 @@ function VCS_INFO_quilt() {
       }
     fi
 
-    all=( ${(Oa)applied} ${unapplied} )
-
     VCS_INFO_set-patch-format 'applied' 'applied_string' \
                               'unapplied' 'unapplied_string' \
                               ${context} qstring
-
-    hook_com=( applied "${applied_string}" unapplied "${unapplied_string}"
-               applied-n ${#applied}       unapplied-n ${#unapplied}       all-n ${#all} )
     if VCS_INFO_hook 'set-patch-format' ${qstring}; then
         zformat -f qstring "${qstring}" "p:${hook_com[applied]}" "u:${hook_com[unapplied]}" \
-                                        "n:${#applied}" "c:${#unapplied}" "a:${#all}"
+                                        "n:${#applied}" "c:${#unapplied}" "a:${hook_com[all-n]}"
     else
         qstring=${hook_com[patch-replace]}
     fi

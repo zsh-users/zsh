@@ -8,6 +8,10 @@
 # $4 - name of a parameter to store the unapplied-string in
 # $5 - context argument for use in zstyle getters
 # $6 - name of a parameter to store a patch-format format string in
+#
+# Output:
+# - $hook_com is overwritten and the keys 'applied', 'applied-n',
+#   'unapplied', 'unapplied-n', 'all-n' are set.
 {
     local REPLY
     if VCS_INFO_hook 'gen-applied-string' "${(@P)1}"; then
@@ -36,4 +40,12 @@
         zstyle -s "${5}" nopatch-format REPLY || REPLY="no patch applied"
     fi
     : ${(P)6::=$REPLY}
+
+    hook_com=(
+      applied-n ${(P)#1}
+      applied ${(P)2}
+      unapplied-n ${(P)#3}
+      unapplied ${(P)4}
+    )
+    hook_com[all-n]=$(( ${hook_com[applied-n]} + ${hook_com[unapplied-n]} ))
 }
