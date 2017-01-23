@@ -768,6 +768,37 @@ global from within a function using tt(typeset -g) do not cause a warning.
 Note that there is no warning when a local parameter is assigned to in
 a nested function, which may also indicate an error.
 )
+pindex(WARN_NESTED_VAR)
+pindex(NO_WARN_NESTED_VAR)
+pindex(WARNNESTEDVAR)
+pindex(NO_WARNNESTEDVAR)
+cindex(parameters, warning when setting in enclosing scope)
+item(tt(WARN_NESTED_VAR))(
+Print a warning message when an existing parameter from an
+enclosing function scope, or global, is set in a function
+by an assignment or in math context.  Assignment to shell
+special parameters does not cause a warning.  This is the companion
+to tt(WARN_CREATE_GLOBAL) as in this case the warning is only
+printed when a parameter is em(not) created.  Where possible,
+use of tt(typeset -g) to set the parameter suppresses the error,
+but note that this needs to be used every time the parameter is set.
+To restrict the effect of this option to a single function scope,
+use `tt(functions -W)'.
+
+For example, the following code produces a warning for the assignment
+inside the function tt(nested) as that overrides the value within
+tt(toplevel)
+
+example(toplevel+LPAR()RPAR() {
+  local foo="in fn"
+  nested
+}
+nested+LPAR()RPAR() {
+     foo="in nested"
+}
+setopt warn_nested_var
+toplevel)
+)
 enditem()
 
 subsect(History)

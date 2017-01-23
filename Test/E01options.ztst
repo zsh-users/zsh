@@ -1118,7 +1118,8 @@
     integer foo6=9
     (( foo6=10 ))
   }
-  fn
+  # don't pollute the test environment with the variables...
+  (fn)
 0:WARN_CREATE_GLOBAL option
 ?fn:3: scalar parameter foo1 created globally in function fn
 ?fn:5: scalar parameter foo1 created globally in function fn
@@ -1132,6 +1133,60 @@
   }
   fn
 0:WARN_CREATE_GLOBAL negative cases
+
+  (
+    foo1=global1 foo2=global2 foo3=global3 foo4=global4
+    integer foo5=5
+    fn_wnv() {
+       # warns
+       foo1=bar1
+       # doesn't warn
+       local foo2=bar3
+       unset foo2
+       # still doesn't warn
+       foo2=bar4
+       # doesn't warn
+       typeset -g foo3=bar5
+       # warns
+       foo3=bar6
+       fn2() {
+          # warns if global option, not attribute
+          foo3=bar6
+       }
+       fn2
+       # doesn't warn
+       foo4=bar7 =true
+       # warns
+       (( foo5=8 ))
+       integer foo6=9
+       # doesn't warn
+       (( foo6=10 ))
+    }
+    print option off >&2
+    fn_wnv
+    print option on >&2
+    setopt warnnestedvar
+    fn_wnv
+    unsetopt warnnestedvar
+    print function attribute on >&2
+    functions -W fn_wnv
+    fn_wnv
+    print all off again >&2
+    functions +W fn_wnv
+    fn_wnv
+  )
+0:WARN_NESTED_VAR option
+?option off
+?option on
+?fn_wnv:2: scalar parameter foo1 set in enclosing scope in function fn_wnv
+?fn_wnv:11: scalar parameter foo3 set in enclosing scope in function fn_wnv
+?fn2:2: scalar parameter foo3 set in enclosing scope in function fn2
+?fn_wnv:20: numeric parameter foo5 set in enclosing scope in function fn_wnv
+?function attribute on
+?fn_wnv:2: scalar parameter foo1 set in enclosing scope in function fn_wnv
+?fn_wnv:11: scalar parameter foo3 set in enclosing scope in function fn_wnv
+?fn_wnv:20: numeric parameter foo5 set in enclosing scope in function fn_wnv
+?all off again
 
 # This really just tests if XTRACE is egregiously broken.
 # To test it properly would need a full set of its own.

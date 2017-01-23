@@ -258,6 +258,7 @@ static struct optname optns[] = {
 {{NULL, "verbose",	      0},			 VERBOSE},
 {{NULL, "vi",		      0},			 VIMODE},
 {{NULL, "warncreateglobal",   OPT_EMULATE},		 WARNCREATEGLOBAL},
+{{NULL, "warnnestedvar",      OPT_EMULATE},		 WARNNESTEDVAR},
 {{NULL, "xtrace",	      0},			 XTRACE},
 {{NULL, "zle",		      OPT_SPECIAL},		 USEZLE},
 {{NULL, "braceexpand",	      OPT_ALIAS}, /* ksh/bash */ -IGNOREBRACES},

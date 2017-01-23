@@ -2849,20 +2849,47 @@ gethkparam(char *s)
     return NULL;
 }
 
+/*
+ * Function behind WARNCREATEGLOBAL and WARNNESTEDVAR option.
+ *
+ * For WARNNESTEDVAR:
+ * Called when the variable is created.
+ * Apply heuristics to see if this variable was just created
+ * globally but in a local context.
+ *
+ * For WARNNESTEDVAR:
+ * Called when the variable already exists and is set.
+ * Apply heuristics to see if this variable is setting
+ * a variable that was created in a less nested function
+ * or globally.
+ */
+
 /**/
 static void
-check_warn_create(Param pm, const char *pmtype)
+check_warn_pm(Param pm, const char *pmtype, int created)
 {
     Funcstack i;
 
-    if (pm->level != 0 || (pm->node.flags & PM_SPECIAL))
+    if (created && isset(WARNCREATEGLOBAL)) {
+	if (locallevel <= forklevel || pm->level != 0)
+	    return;
+    } else if (!created && isset(WARNNESTEDVAR)) {
+	if (pm->level >= locallevel)
+	    return;
+    } else
+	return;
+
+    if (pm->node.flags & PM_SPECIAL)
 	return;
 
     for (i = funcstack; i; i = i->prev) {
 	if (i->tp == FS_FUNC) {
+	    char *msg;
 	    DPUTS(!i->name, "funcstack entry with no name");
-	    zwarn("%s parameter %s created globally in function %s",
-		  pmtype, pm->node.nam, i->name);
+	    msg = created ?
+		"%s parameter %s created globally in function %s" :
+		"%s parameter %s set in enclosing scope in function %s";
+	    zwarn(msg, pmtype, pm->node.nam, i->name);
 	    break;
 	}
     }
@@ -2923,8 +2950,8 @@ assignsparam(char *s, char *val, int flags)
 	/* errflag |= ERRFLAG_ERROR; */
 	return NULL;
     }
-    if (flags & ASSPM_WARN_CREATE)
-	check_warn_create(v->pm, "scalar");
+    if (flags & ASSPM_WARN)
+	check_warn_pm(v->pm, "scalar", flags & ASSPM_WARN_CREATE);
     if (flags & ASSPM_AUGMENT) {
 	if (v->start == 0 && v->end == -1) {
 	    switch (PM_TYPE(v->pm->node.flags)) {
@@ -3005,9 +3032,7 @@ assignsparam(char *s, char *val, int flags)
 mod_export Param
 setsparam(char *s, char *val)
 {
-    return assignsparam(
-	s, val, isset(WARNCREATEGLOBAL) && locallevel > forklevel ?
-	ASSPM_WARN_CREATE : 0);
+    return assignsparam(s, val, ASSPM_WARN);
 }
 
 /**/
@@ -3074,8 +3099,8 @@ assignaparam(char *s, char **val, int flags)
 	    return NULL;
 	}
 
-    if (flags & ASSPM_WARN_CREATE)
-	check_warn_create(v->pm, "array");
+    if (flags & ASSPM_WARN)
+	check_warn_pm(v->pm, "array", flags & ASSPM_WARN_CREATE);
     if (flags & ASSPM_AUGMENT) {
     	if (v->start == 0 && v->end == -1) {
 	    if (PM_TYPE(v->pm->node.flags) & PM_ARRAY) {
@@ -3103,9 +3128,7 @@ assignaparam(char *s, char **val, int flags)
 mod_export Param
 setaparam(char *s, char **aval)
 {
-    return assignaparam(
-	s, aval, isset(WARNCREATEGLOBAL) && locallevel > forklevel ?
-	ASSPM_WARN_CREATE : 0);
+    return assignaparam(s, aval, ASSPM_WARN);
 }
 
 /**/
@@ -3134,7 +3157,7 @@ sethparam(char *s, char **val)
     queue_signals();
     if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING))) {
 	createparam(t, PM_HASHED);
-	checkcreate = isset(WARNCREATEGLOBAL) && locallevel > forklevel;
+	checkcreate = 1;
     } else if (!(PM_TYPE(v->pm->node.flags) & PM_HASHED) &&
 	     !(v->pm->node.flags & PM_SPECIAL)) {
 	unsetparam(t);
@@ -3148,8 +3171,7 @@ sethparam(char *s, char **val)
 	    /* errflag |= ERRFLAG_ERROR; */
 	    return NULL;
 	}
-    if (checkcreate)
-	check_warn_create(v->pm, "associative array");
+    check_warn_pm(v->pm, "associative array", checkcreate);
     setarrvalue(v, val);
     unqueue_signals();
     return v->pm;
@@ -3214,8 +3236,9 @@ setnparam(char *s, mnumber val)
 	    unqueue_signals();
 	    return NULL;
 	}
-	if (!was_unset && isset(WARNCREATEGLOBAL) && locallevel > forklevel)
-	    check_warn_create(v->pm, "numeric");
+	check_warn_pm(v->pm, "numeric", !was_unset);
+    } else {
+	check_warn_pm(v->pm, "numeric", 0);
     }
     setnumvalue(v, val);
     unqueue_signals();
@@ -3250,10 +3273,7 @@ setiparam_no_convert(char *s, zlong val)
      */
     char buf[BDIGBUFSIZE];
     convbase(buf, val, 10);
-    return assignsparam(
-	s, ztrdup(buf),
-	isset(WARNCREATEGLOBAL) && locallevel > forklevel ?
-	ASSPM_WARN_CREATE : 0);
+    return assignsparam(s, ztrdup(buf), ASSPM_WARN);
 }
 
 /* Unset a parameter */

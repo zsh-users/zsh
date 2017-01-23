@@ -1815,6 +1815,7 @@ struct tieddata {
 #define PM_HIDE		(1<<14)	/* Special behaviour hidden by local        */
 #define PM_CUR_FPATH    (1<<14) /* (function): can use $fpath with filename */
 #define PM_HIDEVAL	(1<<15)	/* Value not shown in `typeset' commands    */
+#define PM_WARNNESTED   (1<<15) /* (function): non-recursive WARNNESTEDVAR  */
 #define PM_TIED 	(1<<16)	/* array tied to colon-path or v.v.         */
 #define PM_TAGGED_LOCAL (1<<16) /* (function): non-recursive PM_TAGGED      */
 
@@ -2016,9 +2017,15 @@ struct paramdef {
  * Flags for assignsparam and assignaparam.
  */
 enum {
+    /* Add to rather than override value */
     ASSPM_AUGMENT = 1 << 0,
+    /* Test for warning if creating global variable in function */
     ASSPM_WARN_CREATE = 1 << 1,
-    ASSPM_ENV_IMPORT = 1 << 2
+    /* Test for warning if using nested variable in function */
+    ASSPM_WARN_NESTED = 1 << 2,
+    ASSPM_WARN = (ASSPM_WARN_CREATE|ASSPM_WARN_NESTED),
+    /* Import from environment, so exercise care evaluating value */
+    ASSPM_ENV_IMPORT = 1 << 3,
 };
 
 /* node for named directory hash table (nameddirtab) */
@@ -2400,6 +2407,7 @@ enum {
     VERBOSE,
     VIMODE,
     WARNCREATEGLOBAL,
+    WARNNESTEDVAR,
     XTRACE,
     USEZLE,
     DVORAK,

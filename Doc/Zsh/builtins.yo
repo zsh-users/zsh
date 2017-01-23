@@ -147,7 +147,7 @@ ifnzman(noderef(Aliasing)).
 findex(autoload)
 cindex(functions, autoloading)
 cindex(autoloading functions)
-item(tt(autoload) [ {tt(PLUS())|tt(-)}tt(RTUXdkmrtz) ] [ tt(-w) ] [ var(name) ... ])(
+item(tt(autoload) [ {tt(PLUS())|tt(-)}tt(RTUXdkmrtWz) ] [ tt(-w) ] [ var(name) ... ])(
 vindex(fpath, searching)
 See the section `Autoloading Functions' in ifzman(zmanref(zshmisc))\
 ifnzman(noderef(Functions)) for full details.  The tt(fpath) parameter
@@ -836,18 +836,23 @@ Equivalent to tt(typeset -E), except that options irrelevant to floating
 point numbers are not permitted.
 )
 findex(functions)
-xitem(tt(functions) [ {tt(PLUS())|tt(-)}tt(UkmtTuz) ] [ tt(-x) var(num) ] [ var(name) ... ])
+xitem(tt(functions) [ {tt(PLUS())|tt(-)}tt(UkmtTuWz) ] [ tt(-x) var(num) ] [ var(name) ... ])
 xitem(tt(functions -M) var(mathfn) [ var(min) [ var(max) [ var(shellfn) ] ] ])
 xitem(tt(functions -M) [ tt(-m) var(pattern) ... ])
 item(tt(functions +M) [ tt(-m) ] var(mathfn) ... )(
-Equivalent to tt(typeset -f), with the exception of the tt(-x) and
-tt(-M) options.  For tt(functions -u) and tt(functions -U), see
-tt(autoload), which provides additional options.
+Equivalent to tt(typeset -f), with the exception of the tt(-x),
+tt(-M) and tt(-W) options.  For tt(functions -u) and tt(functions -U),
+see tt(autoload), which provides additional options.
 
 The tt(-x) option indicates that any functions output will have
 each leading tab for indentation, added by the shell to show syntactic
 structure, expanded to the given number var(num) of spaces.  var(num)
 can also be 0 to suppress all indentation.
+
+The tt(-W) option turns on the option tt(WARN_NESTED_VAR) for the named
+function or functions only.  The option is turned off at the start of
+nested functions (apart from anonoymous functions) unless the called
+function also has the tt(-W) attribute.
 
 Use of the tt(-M) option may not be combined with any of the options
 handled by tt(typeset -f).

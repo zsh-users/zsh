@@ -46,7 +46,7 @@ static struct builtin builtins[] =
     BUILTIN(".", BINF_PSPECIAL, bin_dot, 1, -1, 0, NULL, NULL),
     BUILTIN(":", BINF_PSPECIAL, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("alias", BINF_MAGICEQUALS | BINF_PLUSOPTS, bin_alias, 0, -1, 0, "Lgmrs", NULL),
-    BUILTIN("autoload", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "dmktrRTUwXz", "u"),
+    BUILTIN("autoload", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "dmktrRTUwWXz", "u"),
     BUILTIN("bg", 0, bin_fg, 0, -1, BIN_BG, NULL, NULL),
     BUILTIN("break", BINF_PSPECIAL, bin_break, 0, 1, BIN_BREAK, NULL, NULL),
     BUILTIN("bye", 0, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
@@ -72,7 +72,7 @@ static struct builtin builtins[] =
     BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "aAdDe:EfiIlLmnpPrRt:W", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
     BUILTIN("float", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "E:%F:%HL:%R:%Z:%ghlprtux", "E"),
-    BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "kmMtTuUx:z", NULL),
+    BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "kmMtTuUWx:z", NULL),
     BUILTIN("getln", 0, bin_read, 0, -1, 0, "ecnAlE", "zr"),
     BUILTIN("getopts", 0, bin_getopts, 2, -1, 0, NULL, NULL),
     BUILTIN("hash", BINF_MAGICEQUALS, bin_hash, 0, -1, 0, "Ldfmrv", NULL),
@@ -796,8 +796,8 @@ set_pwd_env(void)
 	unsetparam_pm(pm, 0, 1);
     }
 
-    setsparam("PWD", ztrdup(pwd));
-    setsparam("OLDPWD", ztrdup(oldpwd));
+    assignsparam("PWD", ztrdup(pwd), 0);
+    assignsparam("OLDPWD", ztrdup(oldpwd), 0);
 
     pm = (Param) paramtab->getnode(paramtab, "PWD");
     if (!(pm->node.flags & PM_EXPORTED))
@@ -3068,6 +3068,10 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	on |= PM_TAGGED_LOCAL;
     else if (OPT_PLUS(ops,'T'))
 	off |= PM_TAGGED_LOCAL;
+    if (OPT_MINUS(ops,'W'))
+	on |= PM_WARNNESTED;
+    else if (OPT_PLUS(ops,'W'))
+	off |= PM_WARNNESTED;
     roff = off;
     if (OPT_MINUS(ops,'z')) {
 	on |= PM_ZSHSTORED;

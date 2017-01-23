@@ -2379,9 +2379,7 @@ addvars(Estate state, Wordcode pc, int addflags)
      * to be restored after the command, since then the assignment
      * is implicitly scoped.
      */
-    flags = (!(addflags & ADDVAR_RESTORE) &&
-	     locallevel > forklevel && isset(WARNCREATEGLOBAL)) ?
-	ASSPM_WARN_CREATE : 0;
+    flags = !(addflags & ADDVAR_RESTORE) ? ASSPM_WARN : 0;
     xtr = isset(XTRACE);
     if (xtr) {
 	printprompt4();
@@ -5431,6 +5429,14 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	    else
 		opts[XTRACE] = 0;
 	}
+	if (flags & PM_WARNNESTED)
+	    opts[WARNNESTEDVAR] = 1;
+	else if (oflags & PM_WARNNESTED) {
+	    if (shfunc->node.nam == ANONYMOUS_FUNCTION_NAME)
+		flags |= PM_WARNNESTED;
+	    else
+		opts[WARNNESTEDVAR] = 0;
+	}
 	ooflags = oflags;
 	/*
 	 * oflags is static, because we compare it on the next recursive
@@ -5549,6 +5555,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	    opts[PRINTEXITVALUE] = saveopts[PRINTEXITVALUE];
 	    opts[LOCALOPTIONS] = saveopts[LOCALOPTIONS];
 	    opts[LOCALLOOPS] = saveopts[LOCALLOOPS];
+	    opts[WARNNESTEDVAR] = saveopts[WARNNESTEDVAR];
 	}
 
 	if (opts[LOCALLOOPS]) {

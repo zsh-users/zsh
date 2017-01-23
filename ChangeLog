@@ -1,3 +1,11 @@
+2017-01-23  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 40391: Completion/compinit, Doc/Zsh/builtins.yo,
+	Doc/Zsh/options.yo, Src/builtin.c, Src/exec.c, Src/options.c,
+	Src/params.c, Src/zsh.h, Test/E01options.ztst: Add
+	WARN_NESTED_VAR option and functions -W to turn it on similarly
+	to functions -T.
+
 2017-01-23  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Etc/BUGS: Record users/20807 vcs_info quilt issue.
