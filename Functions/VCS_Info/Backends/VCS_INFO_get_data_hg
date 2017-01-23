@@ -203,14 +203,7 @@ if zstyle -T ":vcs_info:${vcs}:${usercontext}:${rrn}" get-mq \
         done < ${mqseriesfile}
     fi
 
-    if VCS_INFO_hook 'gen-applied-string' "${mqpatches[@]}"; then
-        (( ${#mqpatches} )) && applied_string=${mqpatches[1]}
-    else
-        applied_string=${hook_com[applied-string]}
-    fi
-
-    hook_com=()
-
+    VCS_INFO_set-patch-format 'mqpatches' 'applied_string'
     if VCS_INFO_hook 'gen-unapplied-string' "${mqunapplied[@]}"; then
         unapplied_string=${#mqunapplied}
     else

@@ -173,16 +173,7 @@ function VCS_INFO_quilt() {
 
     all=( ${(Oa)applied} ${unapplied} )
 
-    if VCS_INFO_hook 'gen-applied-string' "${applied[@]}"; then
-        if (( ${#applied} )); then
-            applied_string=${applied[1]}
-        else
-            applied_string=""
-        fi
-    else
-        applied_string=${hook_com[applied-string]}
-    fi
-    hook_com=()
+    VCS_INFO_set-patch-format 'applied' 'applied_string' 
     if VCS_INFO_hook 'gen-unapplied-string' "${unapplied[@]}"; then
         unapplied_string="${#unapplied}"
     else

@@ -1,0 +1,20 @@
+# This function is the common guts of the gen-applied-string /
+# gen-unapplied-string / set-patch-format dance of several backends.
+#
+# Parameters:
+# $1 - name of an array parameter to be the argument to gen-applied-string
+# $2 - name of a parameter to store the applied-string in
+{
+    local REPLY
+    if VCS_INFO_hook 'gen-applied-string' "${(@P)1}"; then
+        if (( ${(P)#1} )); then
+            REPLY=${(P)1[1]}
+        else
+            REPLY=""
+        fi
+    else
+        REPLY=${hook_com[applied-string]}
+    fi
+    : ${(P)2::=$REPLY}
+    hook_com=()
+}

@@ -1,5 +1,12 @@
 2017-01-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40403/0001: Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,
+	Functions/VCS_Info/VCS_INFO_quilt,
+	Functions/VCS_Info/VCS_INFO_set-patch-format,
+	Functions/VCS_Info/vcs_info: vcs_info set-patch-format helper:
+	Part #1.
+
 	* 40401: Functions/VCS_Info/Backends/VCS_INFO_get_data_git:
 	vcs_info git: Fix the %c patch-format expando.
 
