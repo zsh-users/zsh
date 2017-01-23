@@ -22,3 +22,8 @@ string '%F{blue}', cause $vcs_info_msg_N_ to be rendered in blue.
 
 40240 has a patch, but 40241 explains why that patch is incomplete.
 ------------------------------------------------------------------------
+users/20807: vcs_info quilt 'addon' mode: hook lookup context specifies
+the underlying VCS but not whether quilt is used.
+
+Workaround: test (( ${+funcstack[(r)VCS_INFO_quilt]} )).
+------------------------------------------------------------------------
