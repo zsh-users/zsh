@@ -549,9 +549,9 @@
     "↓"
   }
   : $functions)
-0:Multibtye handling of functions parameter
+0:Multibyte handling of functions parameter
 
-  if [[ -n ${$(locale -a 2>/dev/null)[(R)pl_PL.utf8]} ]]; then
+  if [[ -n ${$(locale -a 2>/dev/null)[(R)pl_PL.(utf8|UTF-8)]} ]]; then
   (
     export LC_ALL=pl_PL.UTF-8
     local -a names=(a b c d e f $'\u0105' $'\u0107' $'\u0119')

@@ -1,3 +1,8 @@
+2017-01-24  Mikael Magnusson  <mikachu@gmail.com>
+
+	* posted: Test/D07multibyte.ztst: Make D07 recognize more
+	spellings of pl_PL.UTF-8
+
 2017-01-24  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40404: Src/builtin.c: quoting of commands in whence should
