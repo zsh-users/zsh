@@ -1,3 +1,8 @@
+2017-01-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 40404: Src/builtin.c: quoting of commands in whence should
+	only apply to whence -v.
+
 2017-01-23  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40391: Completion/compinit, Doc/Zsh/builtins.yo,

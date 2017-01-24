@@ -3774,9 +3774,11 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 		    if (wd) {
 			printf("%s: command\n", *argv);
 		    } else {
-			if (v && !csh)
+			if (v && !csh) {
 			    zputs(*argv, stdout), fputs(" is ", stdout);
-			quotedzputs(buf, stdout);
+			    quotedzputs(buf, stdout);
+			} else
+			    zputs(buf, stdout);
 			if (OPT_ISSET(ops,'s') || OPT_ISSET(ops, 'S'))
 			    print_if_link(buf, OPT_ISSET(ops, 'S'));
 			fputc('\n', stdout);
@@ -3806,9 +3808,11 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 	    if (wd) {
 		printf("%s: command\n", *argv);
 	    } else {
-		if (v && !csh)
+		if (v && !csh) {
 		    zputs(*argv, stdout), fputs(" is ", stdout);
-		quotedzputs(cnam, stdout);
+		    quotedzputs(cnam, stdout);
+		} else
+		    zputs(cnam, stdout);
 		if (OPT_ISSET(ops,'s') || OPT_ISSET(ops,'S'))
 		    print_if_link(cnam, OPT_ISSET(ops,'S'));
 		fputc('\n', stdout);
