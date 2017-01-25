@@ -2926,7 +2926,11 @@ assignsparam(char *s, char *val, int flags)
 		unqueue_signals();
 		return NULL;
 	    }
-	    flags &= ~ASSPM_WARN_CREATE;
+	    /*
+	     * Parameter defined here is a temporary bogus one.
+	     * Don't warn about anything.
+	     */
+	    flags &= ~ASSPM_WARN;
 	}
 	*ss = '[';
 	v = NULL;

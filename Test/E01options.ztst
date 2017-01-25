@@ -1188,6 +1188,21 @@
 ?fn_wnv:20: numeric parameter foo5 set in enclosing scope in function fn_wnv
 ?all off again
 
+
+  (
+    setopt warnnestedvar
+    () {
+      typeset -A a
+      : ${a[hello world]::=foo}
+      print ${(t)a}
+      key="hello world"
+      print $a[$key]
+    }
+  )
+0:No false positive on parameter used with subscripted assignment
+>association-local
+>foo
+
 # This really just tests if XTRACE is egregiously broken.
 # To test it properly would need a full set of its own.
   fn() { print message; }
