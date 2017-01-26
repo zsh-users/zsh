@@ -2905,7 +2905,7 @@ assignsparam(char *s, char *val, int flags)
     char *ss, *copy, *var;
     size_t lvar;
     mnumber lhs, rhs;
-    int sstart;
+    int sstart, created = 0;
 
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
@@ -2916,9 +2916,10 @@ assignsparam(char *s, char *val, int flags)
     queue_signals();
     if ((ss = strchr(s, '['))) {
 	*ss = '\0';
-	if (!(v = getvalue(&vbuf, &s, 1)))
+	if (!(v = getvalue(&vbuf, &s, 1))) {
 	    createparam(t, PM_ARRAY);
-	else {
+	    created = 1;
+	} else {
 	    if (v->pm->node.flags & PM_READONLY) {
 		zerr("read-only variable: %s", v->pm->node.nam);
 		*ss = '[';
@@ -2935,18 +2936,18 @@ assignsparam(char *s, char *val, int flags)
 	*ss = '[';
 	v = NULL;
     } else {
-	if (!(v = getvalue(&vbuf, &s, 1)))
+	if (!(v = getvalue(&vbuf, &s, 1))) {
 	    createparam(t, PM_SCALAR);
-	else if ((((v->pm->node.flags & PM_ARRAY) && !(flags & ASSPM_AUGMENT)) ||
+	    created = 1;
+	} else if ((((v->pm->node.flags & PM_ARRAY) && !(flags & ASSPM_AUGMENT)) ||
 	    	 (v->pm->node.flags & PM_HASHED)) &&
 		 !(v->pm->node.flags & (PM_SPECIAL|PM_TIED)) && 
 		 unset(KSHARRAYS)) {
 	    unsetparam(t);
 	    createparam(t, PM_SCALAR);
+	    /* not regarded as a new creation */
 	    v = NULL;
 	}
-	else
-	    flags &= ~ASSPM_WARN_CREATE;
     }
     if (!v && !(v = getvalue(&vbuf, &t, 1))) {
 	unqueue_signals();
@@ -2955,7 +2956,7 @@ assignsparam(char *s, char *val, int flags)
 	return NULL;
     }
     if (flags & ASSPM_WARN)
-	check_warn_pm(v->pm, "scalar", flags & ASSPM_WARN_CREATE);
+	check_warn_pm(v->pm, "scalar", created);
     if (flags & ASSPM_AUGMENT) {
 	if (v->start == 0 && v->end == -1) {
 	    switch (PM_TYPE(v->pm->node.flags)) {

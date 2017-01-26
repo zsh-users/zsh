@@ -1203,6 +1203,18 @@
 >association-local
 >foo
 
+  (
+    setopt warnnestedvar
+    () {
+      local var=(one two)
+      () { var=three; }
+      print $var
+    }
+  )
+0:Warn when changing type of nested variable.
+?(anon): scalar parameter var set in enclosing scope in function (anon)
+>three
+
 # This really just tests if XTRACE is egregiously broken.
 # To test it properly would need a full set of its own.
   fn() { print message; }
