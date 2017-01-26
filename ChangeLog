@@ -1,5 +1,8 @@
 2017-01-26  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 40423: Src/params.c, Test/E01options.ztst: similar for type
+	conversion the other way.
+
 	* 40422: Src/params.c, Test/E01options.ztst: more
 	WARN_NESTED_VAR cases that were broken in the original patch.
 

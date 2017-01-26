@@ -3048,6 +3048,7 @@ assignaparam(char *s, char **val, int flags)
     Value v;
     char *t = s;
     char *ss;
+    int created = 0;
 
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
@@ -3058,10 +3059,10 @@ assignaparam(char *s, char **val, int flags)
     queue_signals();
     if ((ss = strchr(s, '['))) {
 	*ss = '\0';
-	if (!(v = getvalue(&vbuf, &s, 1)))
+	if (!(v = getvalue(&vbuf, &s, 1))) {
 	    createparam(t, PM_ARRAY);
-	else
-	    flags &= ~ASSPM_WARN_CREATE;
+	    created = 1;
+	}
 	*ss = '[';
 	if (v && PM_TYPE(v->pm->node.flags) == PM_HASHED) {
 	    unqueue_signals();
@@ -3073,9 +3074,10 @@ assignaparam(char *s, char **val, int flags)
 	}
 	v = NULL;
     } else {
-	if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING)))
+	if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING))) {
 	    createparam(t, PM_ARRAY);
-	else if (!(PM_TYPE(v->pm->node.flags) & (PM_ARRAY|PM_HASHED)) &&
+	    created = 1;
+	} else if (!(PM_TYPE(v->pm->node.flags) & (PM_ARRAY|PM_HASHED)) &&
 		 !(v->pm->node.flags & (PM_SPECIAL|PM_TIED))) {
 	    int uniq = v->pm->node.flags & PM_UNIQUE;
 	    if (flags & ASSPM_AUGMENT) {
@@ -3093,8 +3095,6 @@ assignaparam(char *s, char **val, int flags)
 	    createparam(t, PM_ARRAY | uniq);
 	    v = NULL;
 	}
-	else
-	    flags &= ~ASSPM_WARN_CREATE;
     }
     if (!v)
 	if (!(v = fetchvalue(&vbuf, &t, 1, SCANPM_ASSIGNING))) {
@@ -3105,7 +3105,7 @@ assignaparam(char *s, char **val, int flags)
 	}
 
     if (flags & ASSPM_WARN)
-	check_warn_pm(v->pm, "array", flags & ASSPM_WARN_CREATE);
+	check_warn_pm(v->pm, "array", created);
     if (flags & ASSPM_AUGMENT) {
     	if (v->start == 0 && v->end == -1) {
 	    if (PM_TYPE(v->pm->node.flags) & PM_ARRAY) {

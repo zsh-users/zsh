@@ -1211,9 +1211,21 @@
       print $var
     }
   )
-0:Warn when changing type of nested variable.
+0:Warn when changing type of nested variable: array to scalar.
 ?(anon): scalar parameter var set in enclosing scope in function (anon)
 >three
+
+  (
+    setopt warnnestedvar
+    () {
+      local var=three
+      () { var=(one two); }
+      print $var
+    }
+  )
+0:Warn when changing type of nested variable: scalar to array.
+?(anon): array parameter var set in enclosing scope in function (anon)
+>one two
 
 # This really just tests if XTRACE is egregiously broken.
 # To test it properly would need a full set of its own.
