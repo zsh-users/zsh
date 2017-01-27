@@ -1324,7 +1324,8 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       symlink getcwd \
 	       cygwin_conv_path \
 	       nanosleep \
-	       srand_deterministic)
+	       srand_deterministic \
+	       setutxent getutxent endutxent)
 AC_FUNC_STRCOLL
 
 AH_TEMPLATE([REALPATH_ACCEPTS_NULL],

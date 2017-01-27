@@ -87,9 +87,12 @@
 
 #if !defined(WATCH_STRUCT_UTMP) && defined(HAVE_STRUCT_UTMPX) && defined(REAL_UTMPX_FILE)
 # define WATCH_STRUCT_UTMP struct utmpx
-# define setutent setutxent
-# define getutent getutxent
-# define endutent endutxent 
+# if defined(HAVE_SETUTXENT) && defined(HAVE_GETUTXENT) && defined(HAVE_ENDUTXENT)
+#  define setutent setutxent
+#  define getutent getutxent
+#  define endutent endutxent
+# endif
+
 /*
  * In utmpx, the ut_name field is replaced by ut_user.
  * Howver, on some systems ut_name may already be defined this
