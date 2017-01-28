@@ -1,3 +1,7 @@
+2017-01-28  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40439: Src/zsh.h: PAT_HEAPDUP definition just for clarity
+
 2017-01-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 40440: ../Doc/Zsh/mod_parameter.yo, Modules/parameter.c,

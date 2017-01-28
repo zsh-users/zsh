@@ -1531,6 +1531,7 @@ struct patstralloc {
 
 /* Flags used in pattern matchers (Patprog) and passed down to patcompile */
 
+#define PAT_HEAPDUP	0x0000	/* Dummy flag for default behavior */
 #define PAT_FILE	0x0001	/* Pattern is a file name */
 #define PAT_FILET	0x0002	/* Pattern is top level file, affects ~ */
 #define PAT_ANY		0x0004	/* Match anything (cheap "*") */
