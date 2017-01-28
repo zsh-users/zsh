@@ -1,4 +1,4 @@
-#compdef openstack aodh barbican ceilometer cinder cloudkitty designate glance gnocchi heat ironic keystone magnum manila mistral monasca murano neutron nova sahara senlin swift trove
+#compdef openstack aodh barbican ceilometer cinder cloudkitty designate glance gnocchi heat ironic keystone magnum manila mistral monasca murano neutron nova sahara senlin trove
 
 # https://wiki.openstack.org/wiki/OpenStackClients
 # http://docs.openstack.org/user-guide/common/cli-install-openstack-command-line-clients.html

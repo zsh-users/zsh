@@ -1,3 +1,9 @@
+2017-01-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	*  Zhiming Wang: 40450, 40451: Completion/Unix/Command/_swift,
+	Completion/Unix/Command/_openstack: Add new swift language
+	completion and attempt to resolve against openstack swift command.
+
 2017-01-28  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 40453: Src/Modules/zpty.c, Src/Modules/zutil.c,
