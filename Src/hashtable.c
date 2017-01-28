@@ -1566,6 +1566,15 @@ dircache_set(char **name, char *value)
 	*name = NULL;
     } else {
 	/*
+	 * As the function path has been resolved to a particular
+	 * location, we'll store it as an absolute path.
+	 */
+	if (*value != '/') {
+	    value = zhtricat(metafy(zgetcwd(), -1, META_HEAPDUP),
+			     "/", value);
+	    value = xsymlink(value, 1);
+	}
+	/*
 	 * We'll maintain the cache at exactly the right size rather
 	 * than overallocating.  The rationale here is that typically
 	 * we'll get a lot of functions in a small number of directories

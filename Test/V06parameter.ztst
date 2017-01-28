@@ -1,15 +1,15 @@
 %test
 
   print 'print In sourced file
-  print $LINENO + $functrace + $funcsourcetrace
+  print $LINENO + $functrace + ${funcsourcetrace/#$PWD/CURDIR}
   ' >sourcedfile
   print -r -- 'print Started functrace.zsh
   module_path=(./Modules)
-  print $LINENO + $functrace + $funcsourcetrace
+  print $LINENO + $functrace + ${funcsourcetrace/#$PWD/CURDIR}
   :
   fn() {
     print Inside function $0
-    print $LINENO + $functrace + $funcsourcetrace
+    print $LINENO + $functrace + ${funcsourcetrace/#$PWD/CURDIR}
   }
   :
   fn
@@ -17,7 +17,7 @@
   fpath=(. $fpath)
   :
   echo '\''print Inside $0
-    print $LINENO + $functrace + $funcsourcetrace
+    print $LINENO + $functrace + ${funcsourcetrace/#$PWD/CURDIR}
   '\'' >autofn
   :
   autoload autofn
@@ -32,9 +32,9 @@
 >Inside function fn
 >2 + ./functrace.zsh:10 + ./functrace.zsh:5
 >Inside autofn
->2 + ./functrace.zsh:20 + ./autofn:0
+>2 + ./functrace.zsh:20 + CURDIR/autofn:0
 >Inside autofn
->2 + ./functrace.zsh:21 + ./autofn:0
+>2 + ./functrace.zsh:21 + CURDIR/autofn:0
 >In sourced file
 >2 + ./functrace.zsh:22 + ./sourcedfile:0
 
@@ -66,6 +66,19 @@
 >./rocky3.zsh:13 (eval):2
 >./rocky3.zsh:14 ./rocky3.zsh:14
 
+  (
+    fpath=($PWD)
+    print "print I have been autoloaded" >myfunc
+    autoload $PWD/myfunc
+    print ${functions_source[myfunc]/#$PWD/CURDIR}
+    myfunc
+    print ${functions_source[myfunc]/#$PWD/CURDIR}
+  )
+0: $functions_source
+>CURDIR/myfunc
+>I have been autoloaded
+>CURDIR/myfunc
+
 %clean
 
- rm -f autofn functrace.zsh rocky3.zsh sourcedfile
+ rm -f autofn functrace.zsh rocky3.zsh sourcedfile myfunc

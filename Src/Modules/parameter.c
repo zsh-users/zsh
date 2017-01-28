@@ -515,6 +515,98 @@ scanpmdisfunctions(HashTable ht, ScanFunc func, int flags)
     scanfunctions(ht, func, flags, DISABLED);
 }
 
+/* Functions for the functions_source special parameter. */
+
+/* Retrieve the source file for a function by explicit name */
+
+/**/
+static HashNode
+getfunction_source(UNUSED(HashTable ht), const char *name, int dis)
+{
+    Shfunc shf;
+    Param pm = NULL;
+
+    pm = (Param) hcalloc(sizeof(struct param));
+    pm->node.nam = dupstring(name);
+    pm->node.flags = PM_SCALAR|PM_READONLY;
+    pm->gsu.s = dis ? &pmdisfunction_gsu :  &pmfunction_gsu;
+
+    if ((shf = (Shfunc) shfunctab->getnode2(shfunctab, name)) &&
+	(dis ? (shf->node.flags & DISABLED) : !(shf->node.flags & DISABLED))) {
+	pm->u.str = getshfuncfile(shf);
+	if (!pm->u.str)
+	    pm->u.str = dupstring("");
+    }
+    return &pm->node;
+}
+
+/* Retrieve the source file for functions by scanning the table */
+
+/**/
+static void
+scanfunctions_source(UNUSED(HashTable ht), ScanFunc func, int flags, int dis)
+{
+    struct param pm;
+    int i;
+    HashNode hn;
+
+    memset((void *)&pm, 0, sizeof(struct param));
+    pm.node.flags = PM_SCALAR|PM_READONLY;
+    pm.gsu.s = dis ? &pmdisfunction_gsu : &pmfunction_gsu;
+
+    for (i = 0; i < shfunctab->hsize; i++) {
+	for (hn = shfunctab->nodes[i]; hn; hn = hn->next) {
+	    if (dis ? (hn->flags & DISABLED) : !(hn->flags & DISABLED)) {
+		pm.node.nam = hn->nam;
+		if (func != scancountparams &&
+		    ((flags & (SCANPM_WANTVALS|SCANPM_MATCHVAL)) ||
+		     !(flags & SCANPM_WANTKEYS))) {
+		    pm.u.str = getshfuncfile((Shfunc)hn);
+		    if (!pm.u.str)
+			pm.u.str = dupstring("");
+		}
+		func(&pm.node, flags);
+	    }
+	}
+    }
+}
+
+/* Param table entry for retrieving functions_source element */
+
+/**/
+static HashNode
+getpmfunction_source(HashTable ht, const char *name)
+{
+    return getfunction_source(ht, name, 0);
+}
+
+/* Param table entry for retrieving ds_functions_source element */
+
+/**/
+static HashNode
+getpmdisfunction_source(HashTable ht, const char *name)
+{
+    return getfunction_source(ht, name, 1);
+}
+
+/* Param table entry for scanning functions_source table */
+
+/**/
+static void
+scanpmfunction_source(HashTable ht, ScanFunc func, int flags)
+{
+    scanfunctions_source(ht, func, flags, 0);
+}
+
+/* Param table entry for scanning dis_functions_source table */
+
+/**/
+static void
+scanpmdisfunction_source(HashTable ht, ScanFunc func, int flags)
+{
+    scanfunctions_source(ht, func, flags, 1);
+}
+
 /* Functions for the funcstack special parameter. */
 
 /**/
@@ -2095,6 +2187,8 @@ static struct paramdef partab[] = {
 	    NULL, getpmdisbuiltin, scanpmdisbuiltins),
     SPECIALPMDEF("dis_functions", 0, 
 	    &pmdisfunctions_gsu, getpmdisfunction, scanpmdisfunctions),
+    SPECIALPMDEF("dis_functions_source", PM_READONLY, NULL,
+		 getpmdisfunction_source, scanpmdisfunction_source),
     SPECIALPMDEF("dis_galiases", 0,
 	    &pmdisgaliases_gsu, getpmdisgalias, scanpmdisgaliases),
     SPECIALPMDEF("dis_patchars", PM_ARRAY|PM_READONLY,
@@ -2111,6 +2205,8 @@ static struct paramdef partab[] = {
 	    &funcstack_gsu, NULL, NULL),
     SPECIALPMDEF("functions", 0, &pmfunctions_gsu, getpmfunction,
 		 scanpmfunctions),
+    SPECIALPMDEF("functions_source", PM_READONLY, NULL,
+		 getpmfunction_source, scanpmfunction_source),
     SPECIALPMDEF("functrace", PM_ARRAY|PM_READONLY,
 	    &functrace_gsu, NULL, NULL),
     SPECIALPMDEF("galiases", 0,

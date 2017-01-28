@@ -325,10 +325,10 @@
     printf '%s\n' 'oops(){}' 'ninjas-earring(){}' 'oops "$@"' >oops
     autoload oops
     oops
-    whence -v oops
+    whence -v oops | sed -e "s%$PWD%CURDIR%"
   )
 0:whence -v of zsh-style autoload
->oops is a shell function from ./oops
+>oops is a shell function from CURDIR/oops
 
   (
     fpath=(.)

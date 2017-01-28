@@ -1,3 +1,10 @@
+2017-01-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 40440: ../Doc/Zsh/mod_parameter.yo, Modules/parameter.c,
+	hashtable.c, ../Test/C04funcdef.ztst, ../Test/V06parameter.ztst:
+	Add $functions_source to zsh/parameter to help find where
+	functions where loaded from.
+
 2017-01-27  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Zach Whaley: 40200: Completion/Unix/Command/_perforce: update

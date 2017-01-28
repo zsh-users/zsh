@@ -37,6 +37,30 @@ vindex(dis_functions)
 item(tt(dis_functions))(
 Like tt(functions) but for disabled functions.
 )
+vindex(functions_source)
+item(tt(functions_source))(
+This readonly associative array maps names of enabled functions to the
+name of the file containing the source of the function.
+
+For an autoloaded function that has already been loaded, or marked for
+autoload with an absolute path, or that has had its path resolved with
+`tt(functions -r)', this is the file found for autoloading, resolved
+to an absolute path.
+
+For a function defined within the body of a script or sourced file,
+this is the name of that file.  In this case, this is the exact path
+originally used to that file, which may be a relative path.
+
+For any other function, including any defined at an interactive prompt or
+an autoload function whose path has not yet been resolved, this is
+the empty string.  However, the hash element is reported as defined
+just so long as the function is present:  the keys to this hash are
+the same as those to tt($funcions).
+)
+vindex(dis_functions_source)
+item(tt(dis_functions_source))(
+Like tt(functions_source) but for disabled functions.
+)
 vindex(builtins)
 item(tt(builtins))(
 This associative array gives information about the builtin commands
@@ -202,10 +226,13 @@ defined.  The line number is the line where the `tt(function) var(name)'
 or `var(name) tt(LPAR()RPAR())' started.  In the case of an autoloaded
 function  the line number is reported as zero.
 The format of each element is var(filename)tt(:)var(lineno).
+
 For functions autoloaded from a file in native zsh format, where only the
 body of the function occurs in the file, or for files that have been
 executed by the tt(source) or `tt(.)' builtins, the trace information is
-shown as var(filename)tt(:)var(0), since the entire file is the definition.
+shown as var(filename)tt(:)var(0), since the entire file is the
+definition.  The source file name is resolved to an absolute path when
+the function is loaded or the path to it otherwise resolved.
 
 Most users will be interested in the information in the
 tt(funcfiletrace) array instead.
