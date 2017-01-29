@@ -2866,9 +2866,13 @@ gethkparam(char *s)
 
 /**/
 static void
-check_warn_pm(Param pm, const char *pmtype, int created)
+check_warn_pm(Param pm, const char *pmtype, int created,
+	      int may_warn_about_nested_vars)
 {
     Funcstack i;
+
+    if (!may_warn_about_nested_vars && !created)
+	return;
 
     if (created && isset(WARNCREATEGLOBAL)) {
 	if (locallevel <= forklevel || pm->level != 0)
@@ -2956,7 +2960,7 @@ assignsparam(char *s, char *val, int flags)
 	return NULL;
     }
     if (flags & ASSPM_WARN)
-	check_warn_pm(v->pm, "scalar", created);
+	check_warn_pm(v->pm, "scalar", created, 1);
     if (flags & ASSPM_AUGMENT) {
 	if (v->start == 0 && v->end == -1) {
 	    switch (PM_TYPE(v->pm->node.flags)) {
@@ -3049,6 +3053,7 @@ assignaparam(char *s, char **val, int flags)
     char *t = s;
     char *ss;
     int created = 0;
+    int may_warn_about_nested_vars = 1;
 
     if (!isident(s)) {
 	zerr("not an identifier: %s", s);
@@ -3062,6 +3067,8 @@ assignaparam(char *s, char **val, int flags)
 	if (!(v = getvalue(&vbuf, &s, 1))) {
 	    createparam(t, PM_ARRAY);
 	    created = 1;
+	} else {
+	    may_warn_about_nested_vars = 0;
 	}
 	*ss = '[';
 	if (v && PM_TYPE(v->pm->node.flags) == PM_HASHED) {
@@ -3105,7 +3112,7 @@ assignaparam(char *s, char **val, int flags)
 	}
 
     if (flags & ASSPM_WARN)
-	check_warn_pm(v->pm, "array", created);
+	check_warn_pm(v->pm, "array", created, may_warn_about_nested_vars);
     if (flags & ASSPM_AUGMENT) {
     	if (v->start == 0 && v->end == -1) {
 	    if (PM_TYPE(v->pm->node.flags) & PM_ARRAY) {
@@ -3176,7 +3183,7 @@ sethparam(char *s, char **val)
 	    /* errflag |= ERRFLAG_ERROR; */
 	    return NULL;
 	}
-    check_warn_pm(v->pm, "associative array", checkcreate);
+    check_warn_pm(v->pm, "associative array", checkcreate, 1);
     setarrvalue(v, val);
     unqueue_signals();
     return v->pm;
@@ -3241,9 +3248,9 @@ setnparam(char *s, mnumber val)
 	    unqueue_signals();
 	    return NULL;
 	}
-	check_warn_pm(v->pm, "numeric", !was_unset);
+	check_warn_pm(v->pm, "numeric", !was_unset, 1);
     } else {
-	check_warn_pm(v->pm, "numeric", 0);
+	check_warn_pm(v->pm, "numeric", 0, 1);
     }
     setnumvalue(v, val);
     unqueue_signals();

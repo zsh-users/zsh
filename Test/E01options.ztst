@@ -1137,6 +1137,8 @@
   (
     foo1=global1 foo2=global2 foo3=global3 foo4=global4
     integer foo5=5
+    # skip foo6, defined in fn_wnv
+    foo7=(one two)
     fn_wnv() {
        # warns
        foo1=bar1
@@ -1161,6 +1163,8 @@
        integer foo6=9
        # doesn't warn
        (( foo6=10 ))
+       foo7[3]=three
+       foo7[4]=(four)
     }
     print option off >&2
     fn_wnv
