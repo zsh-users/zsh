@@ -1,5 +1,11 @@
 2017-01-28  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 40453: Src/Modules/zpty.c, Src/Modules/zutil.c,
+	Src/Zle/compctl.c, Src/Zle/complete.c, Src/Zle/computil.c,
+	Src/Zle/zle_hist.c, Src/builtin.c, Src/cond.c, Src/glob.c,
+	Src/loop.c, Src/options.c, Src/parse.c: signal handler safety
+	for callers of patcompile(PAT_STATIC), which is not re-entrant.
+
 	* 40439: Src/zsh.h: PAT_HEAPDUP definition just for clarity
 
 2017-01-28  Peter Stephenson  <p.w.stephenson@ntlworld.com>

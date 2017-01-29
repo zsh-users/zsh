@@ -510,25 +510,33 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    zwarnnam(nam, "too many arguments");
 	    return 1;
 	}
+
+	queue_signals();	/* Protect PAT_STATIC */
+
 	if (context) {
 	    tokenize(context);
 	    zstyle_contprog = patcompile(context, PAT_STATIC, NULL);
 
-	    if (!zstyle_contprog)
+	    if (!zstyle_contprog) {
+		unqueue_signals();
 		return 1;
+	    }
 	} else
 	    zstyle_contprog = NULL;
 
 	if (stylename) {
 	    s = (Style)zstyletab->getnode2(zstyletab, stylename);
-	    if (!s)
+	    if (!s) {
+		unqueue_signals();
 		return 1;
+	    }
 	    zstyletab->printnode(&s->node, list);
 	} else {
 	    scanhashtable(zstyletab, 1, 0, 0,
 			  zstyletab->printnode, list);
 	}
 
+	unqueue_signals();
 	return 0;
     }
     switch (args[0][1]) {
@@ -675,14 +683,20 @@ bin_zstyle(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	    char **vals;
 	    Patprog prog;
 
+	    queue_signals();	/* Protect PAT_STATIC */
+
 	    tokenize(args[3]);
 
 	    if ((vals = lookupstyle(args[1], args[2])) &&
 		(prog = patcompile(args[3], PAT_STATIC, NULL))) {
 		while (*vals)
-		    if (pattry(prog, *vals++))
+		    if (pattry(prog, *vals++)) {
+			unqueue_signals();
 			return 0;
+		    }
 	    }
+
+	    unqueue_signals();
 	    return 1;
 	}
 	break;

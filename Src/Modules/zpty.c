@@ -544,7 +544,8 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)
 	p = dupstring(args[1]);
 	tokenize(p);
 	remnulargs(p);
-	if (!(prog = patcompile(p, PAT_STATIC, NULL))) {
+	/* Signals handlers might stomp PAT_STATIC */
+	if (!(prog = patcompile(p, PAT_ZDUP, NULL))) {
 	    zwarnnam(nam, "bad pattern: %s", args[1]);
 	    return 1;
 	}
@@ -682,9 +683,14 @@ ptyread(char *nam, Ptycmd cmd, char **args, int noblock, int mustmatch)
 	write_loop(1, buf, used);
     }
 
-    if (seen && (!prog || matchok || !mustmatch))
-	return 0;
-    return cmd->fin + 1;
+    {
+	int ret = cmd->fin + 1;
+	if (seen && (!prog || matchok || !mustmatch))
+	    ret = 0;
+	if (prog)
+	    freepatprog(prog);
+	return ret;
+    }
 }
 
 static int

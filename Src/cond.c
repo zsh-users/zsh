@@ -295,6 +295,8 @@ evalcond(Estate state, char *fromtest)
 	    int test, npat = state->pc[1];
 	    Patprog pprog = state->prog->pats[npat];
 
+	    queue_signals();
+
 	    if (pprog == dummy_patprog1 || pprog == dummy_patprog2) {
 		char *opat;
 		int save;
@@ -308,6 +310,7 @@ evalcond(Estate state, char *fromtest)
 		if (!(pprog = patcompile(right, (save ? PAT_ZDUP : PAT_STATIC),
 					 NULL))) {
 		    zwarnnam(fromtest, "bad pattern: %s", right);
+		    unqueue_signals();
 		    return 2;
 		}
 		else if (save)
@@ -315,6 +318,8 @@ evalcond(Estate state, char *fromtest)
 	    }
 	    state->pc += 2;
 	    test = (pprog && pattry(pprog, left));
+
+	    unqueue_signals();
 
 	    return !(ctype == COND_STRNEQ ? !test : test);
 	}

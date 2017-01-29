@@ -647,7 +647,7 @@ bin_setopt(char *nam, char **args, UNUSED(Options ops), int isun)
 
 	    /* Expand the current arg. */
 	    tokenize(s);
-	    if (!(pprog = patcompile(s, PAT_STATIC, NULL))) {
+	    if (!(pprog = patcompile(s, PAT_HEAPDUP, NULL))) {
 		zwarnnam(nam, "bad pattern: %s", *args);
 		continue;
 	    }

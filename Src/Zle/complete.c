@@ -896,6 +896,8 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 	    int i, l = arrlen(compwords), t = 0, b = 0, e = l - 1;
 	    Patprog pp;
 
+	    queue_signals();	/* Protect PAT_STATIC */
+
 	    i = compcurrent - 1;
 	    if (i < 0 || i >= l)
 		return 0;
@@ -930,6 +932,9 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		t = 0;
 	    if (t && mod)
 		restrict_range(b, e);
+
+	    unqueue_signals();
+
 	    return t;
 	}
     case CVT_PRENUM:
@@ -951,6 +956,8 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
     case CVT_SUFPAT:
 	{
 	    Patprog pp;
+
+	    queue_signals();	/* Protect PAT_STATIC */
 
 	    if (!na)
 		return 0;
@@ -1036,6 +1043,9 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 		if (mod)
 		    ignore_suffix(ol - (p - compsuffix));
 	    }
+
+	    unqueue_signals();
+
 	    return 1;
 	}
     }

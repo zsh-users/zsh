@@ -3928,6 +3928,8 @@ bin_comptry(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 		    if (*q) {
 			char *qq, *qqq;
 
+			queue_signals();
+
 			if (c)
 			    *c = '\0';
 
@@ -3999,6 +4001,8 @@ bin_comptry(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 			}
 			if (c)
 			    *c = ':';
+
+			unqueue_signals();
 		    }
 		}
 		if (num) {
@@ -4708,6 +4712,8 @@ cfp_add_sdirs(LinkList final, LinkList orig, char *skipped,
 		if (!*p)
 		    continue;
 
+		queue_signals();	/* Protect PAT_STATIC */
+
 		tokenize(f);
 		pprog = patcompile(f, PAT_STATIC, NULL);
 		untokenize(f);
@@ -4740,6 +4746,8 @@ cfp_add_sdirs(LinkList final, LinkList orig, char *skipped,
 			}
 		    }
 		}
+
+		unqueue_signals();
 	    }
 	}
     }

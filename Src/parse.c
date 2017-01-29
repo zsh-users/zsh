@@ -3413,6 +3413,7 @@ build_cur_dump(char *nam, char *dump, char **names, int match, int map,
 
 	for (; *names; names++) {
 	    tokenize(pat = dupstring(*names));
+	    /* Signal-safe here, caller queues signals */
 	    if (!(pprog = patcompile(pat, PAT_STATIC, NULL))) {
 		zwarnnam(nam, "bad pattern: %s", *names);
 		close(dfd);

@@ -539,18 +539,18 @@ bin_enable(char *name, char **argv, Options ops, int func)
     /* With -m option, treat arguments as glob patterns. */
     if (OPT_ISSET(ops,'m')) {
 	for (; *argv; argv++) {
+	    queue_signals();
+
 	    /* parse pattern */
 	    tokenize(*argv);
-	    if ((pprog = patcompile(*argv, PAT_STATIC, 0))) {
-		queue_signals();
+	    if ((pprog = patcompile(*argv, PAT_STATIC, 0)))
 		match += scanmatchtable(ht, pprog, 0, 0, 0, scanfunc, 0);
-		unqueue_signals();
-	    }
 	    else {
 		untokenize(*argv);
 		zwarnnam(name, "bad pattern : %s", *argv);
 		returnval = 1;
 	    }
+	    unqueue_signals();
 	}
 	/* If we didn't match anything, we return 1. */
 	if (!match)
@@ -3136,9 +3136,9 @@ bin_functions(char *name, char **argv, Options ops, int func)
 	} else if (OPT_ISSET(ops,'m')) {
 	    /* List matching functions. */
 	    for (; *argv; argv++) {
+		queue_signals();
 		tokenize(*argv);
 		if ((pprog = patcompile(*argv, PAT_STATIC, 0))) {
-		    queue_signals();
 		    for (p = mathfuncs, q = NULL; p; q = p) {
 			MathFunc next;
 			do {
@@ -3157,12 +3157,12 @@ bin_functions(char *name, char **argv, Options ops, int func)
 			if (p)
 			    p = p->next;
 		    }
-		    unqueue_signals();
 		} else {
 		    untokenize(*argv);
 		    zwarnnam(name, "bad pattern : %s", *argv);
 		    returnval = 1;
 		}
+		unqueue_signals();
 	    }
 	} else if (OPT_PLUS(ops,'M')) {
 	    /* Delete functions. -m is allowed but is handled above. */
@@ -3312,11 +3312,11 @@ bin_functions(char *name, char **argv, Options ops, int func)
     if (OPT_ISSET(ops,'m')) {
 	on &= ~PM_UNDEFINED;
 	for (; *argv; argv++) {
+	    queue_signals();
 	    /* expand argument */
 	    tokenize(*argv);
 	    if ((pprog = patcompile(*argv, PAT_STATIC, 0))) {
 		/* with no options, just print all functions matching the glob pattern */
-		queue_signals();
 		if (!(on|off) && !OPT_ISSET(ops,'X')) {
 		    scanmatchshfunc(pprog, 1, 0, DISABLED,
 				   shfunctab->printnode, pflags, expand);
@@ -3336,12 +3336,12 @@ bin_functions(char *name, char **argv, Options ops, int func)
 			    }
 		    }
 		}
-		unqueue_signals();
 	    } else {
 		untokenize(*argv);
 		zwarnnam(name, "bad pattern : %s", *argv);
 		returnval = 1;
 	    }
+	    unqueue_signals();
 	}
 	return returnval;
     }
@@ -3469,11 +3469,11 @@ bin_unset(char *name, char **argv, Options ops, int func)
     /* with -m option, treat arguments as glob patterns */
     if (OPT_ISSET(ops,'m')) {
 	while ((s = *argv++)) {
+	    queue_signals();
 	    /* expand */
 	    tokenize(s);
 	    if ((pprog = patcompile(s, PAT_STATIC, NULL))) {
 		/* Go through the parameter table, and unset any matches */
-		queue_signals();
 		for (i = 0; i < paramtab->hsize; i++) {
 		    for (pm = (Param) paramtab->nodes[i]; pm; pm = next) {
 			/* record pointer to next, since we may free this one */
@@ -3486,12 +3486,12 @@ bin_unset(char *name, char **argv, Options ops, int func)
 			}
 		    }
 		}
-		unqueue_signals();
 	    } else {
 		untokenize(s);
 		zwarnnam(name, "bad pattern : %s", s);
 		returnval = 1;
 	    }
+	    unqueue_signals();
 	}
 	/* If we didn't match anything, we return 1. */
 	if (!match)
@@ -3655,6 +3655,7 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 	    pushheap();
 	    matchednodes = newlinklist();
 	}
+	queue_signals();
 	for (; *argv; argv++) {
 	    /* parse the pattern */
 	    tokenize(*argv);
@@ -3664,7 +3665,6 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 		returnval = 1;
 		continue;
 	    }
-	    queue_signals();
 	    if (!OPT_ISSET(ops,'p')) {
 		/* -p option is for path search only.    *
 		 * We're not using it, so search for ... */
@@ -3695,9 +3695,9 @@ bin_whence(char *nam, char **argv, Options ops, int func)
 	    scanmatchtable(cmdnamtab, pprog, 1, 0, 0,
 			   (all ? fetchcmdnamnode : cmdnamtab->printnode),
 			   printflags);
-
-	    unqueue_signals();
+	    run_queued_signals();
 	}
+	unqueue_signals();
 	if (all) {
 	    allmatched = argv = zlinklist2array(matchednodes);
 	    matchednodes = NULL;
@@ -4024,11 +4024,11 @@ bin_unhash(char *name, char **argv, Options ops, int func)
      * "unhash -m '*'" is legal, but not recommended.    */
     if (OPT_ISSET(ops,'m')) {
 	for (; *argv; argv++) {
+	    queue_signals();
 	    /* expand argument */
 	    tokenize(*argv);
 	    if ((pprog = patcompile(*argv, PAT_STATIC, NULL))) {
 		/* remove all nodes matching glob pattern */
-		queue_signals();
 		for (i = 0; i < ht->hsize; i++) {
 		    for (hn = ht->nodes[i]; hn; hn = nhn) {
 			/* record pointer to next, since we may free this one */
@@ -4039,12 +4039,12 @@ bin_unhash(char *name, char **argv, Options ops, int func)
 			}
 		    }
 		}
-		unqueue_signals();
 	    } else {
 		untokenize(*argv);
 		zwarnnam(name, "bad pattern : %s", *argv);
 		returnval = 1;
 	    }
+	    unqueue_signals();
 	}
 	/* If we didn't match anything, we return 1. */
 	if (!match)
@@ -4127,18 +4127,18 @@ bin_alias(char *name, char **argv, Options ops, UNUSED(int func))
      * glob patterns of aliases to display.       */
     if (OPT_ISSET(ops,'m')) {
 	for (; *argv; argv++) {
+	    queue_signals();
 	    tokenize(*argv);  /* expand argument */
 	    if ((pprog = patcompile(*argv, PAT_STATIC, NULL))) {
 		/* display the matching aliases */
-		queue_signals();
 		scanmatchtable(ht, pprog, 1, flags1, flags2,
 			       ht->printnode, printflags);
-		unqueue_signals();
 	    } else {
 		untokenize(*argv);
 		zwarnnam(name, "bad pattern : %s", *argv);
 		returnval = 1;
 	    }
+	    unqueue_signals();
 	}
 	return returnval;
     }
@@ -4348,10 +4348,12 @@ bin_print(char *name, char **args, Options ops, int func)
 	    zwarnnam(name, "no pattern specified");
 	    return 1;
 	}
+	queue_signals();
 	tokenize(*args);
 	if (!(pprog = patcompile(*args, PAT_STATIC, NULL))) {
 	    untokenize(*args);
 	    zwarnnam(name, "bad pattern: %s", *args);
+	    unqueue_signals();
 	    return 1;
 	}
 	for (t = p = ++args; *p; p++)
@@ -4359,6 +4361,7 @@ bin_print(char *name, char **args, Options ops, int func)
 		*t++ = *p;
 	*t = NULL;
 	first = args;
+	unqueue_signals();
 	if (fmt && !*args) return 0;
     }
     /* compute lengths, and interpret according to -P, -D, -e, etc. */

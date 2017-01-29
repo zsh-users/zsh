@@ -2462,13 +2462,20 @@ xpandbraces(LinkList list, LinkNode *np)
 int
 matchpat(char *a, char *b)
 {
-    Patprog p = patcompile(b, PAT_STATIC, NULL);
+    Patprog p;
+    int ret;
 
-    if (!p) {
+    queue_signals();	/* Protect PAT_STATIC */
+
+    if (!(p = patcompile(b, PAT_STATIC, NULL))) {
 	zerr("bad pattern: %s", b);
-	return 0;
-    }
-    return pattry(p, a);
+	ret = 0;
+    } else
+      ret = pattry(p, a);
+
+    unqueue_signals();
+
+    return ret;
 }
 
 /* do the ${foo%%bar}, ${foo#bar} stuff */

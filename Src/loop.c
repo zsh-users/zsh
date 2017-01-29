@@ -620,7 +620,9 @@ execcase(Estate state, int do_exec)
 	    spprog = state->prog->pats + npat;
 	    pprog = NULL;
 	    pat = NULL;
-	
+
+	    queue_signals();
+
 	    if (isset(XTRACE)) {
 		int htok = 0;
 		pat = dupstring(ecrawstr(state->prog, state->pc, &htok));
@@ -657,6 +659,8 @@ execcase(Estate state, int do_exec)
 		patok = anypatok = 1;
 	    state->pc += 2;
 	    nalts--;
+
+	    unqueue_signals();
 	}
 	state->pc += 2 * nalts;
 	if (isset(XTRACE)) {

@@ -1220,10 +1220,12 @@ doisearch(char **args, int dir, int pattern)
 		char *patbuf = ztrdup(sbuf);
 		char *patstring;
 		/*
-		 * Do not use static pattern buffer (PAT_STATIC) since we call zle hooks,
-		 * which might call other pattern functions. Use PAT_ZDUP instead.
-		 * Use PAT_NOANCH because we don't need the match
-		 * anchored to the end, even if it is at the start.
+		 * Do not use static pattern buffer (PAT_STATIC) since we
+		 * call zle hooks, which might call other pattern
+		 * functions.  Use PAT_ZDUP because we re-use the pattern
+		 * in subsequent loops, so we can't pushheap/popheap.
+		 * Use PAT_NOANCH because we don't need the match anchored
+		 * to the end, even if it is at the start.
 		 */
 		int patflags = PAT_ZDUP|PAT_NOANCH;
 		if (sbuf[0] == '^') {

@@ -99,7 +99,7 @@ freecompctlp(HashNode hn)
 }
 
 /**/
-void
+static void
 freecompctl(Compctl cc)
 {
     if (cc == &cc_default ||
@@ -142,7 +142,7 @@ freecompctl(Compctl cc)
 }
 
 /**/
-void
+static void
 freecompcond(void *a)
 {
     Compcond cc = (Compcond) a;
@@ -186,7 +186,7 @@ freecompcond(void *a)
 }
 
 /**/
-int
+static int
 compctlread(char *name, char **args, Options ops, char *reply)
 {
     char *buf, *bptr;
@@ -1564,6 +1564,8 @@ bin_compctl(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     Compctl cc = NULL;
     int ret = 0;
 
+    queue_signals();
+
     /* clear static flags */
     cclist = 0;
     showmask = 0;
@@ -1571,12 +1573,15 @@ bin_compctl(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
     /* Parse all the arguments */
     if (*argv) {
 	/* Let's see if this is a global matcher definition. */
-	if ((ret = get_gmatcher(name, argv)))
+	if ((ret = get_gmatcher(name, argv))) {
+	    unqueue_signals();
 	    return ret - 1;
+	}
 
 	cc = (Compctl) zshcalloc(sizeof(*cc));
 	if (get_compctl(name, &argv, cc, 1, 0, 0)) {
 	    freecompctl(cc);
+	    unqueue_signals();
 	    return 1;
 	}
 
@@ -1604,6 +1609,7 @@ bin_compctl(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	printcompctl((cclist & COMP_LIST) ? "" : "DEFAULT", &cc_default, 0, 0);
  	printcompctl((cclist & COMP_LIST) ? "" : "FIRST", &cc_first, 0, 0);
 	print_gmatcher((cclist & COMP_LIST));
+	unqueue_signals();
 	return ret;
     }
 
@@ -1642,6 +1648,7 @@ bin_compctl(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    printcompctl("", &cc_first, 0, 0);
 	if (cclist & COMP_LISTMATCH)
 	    print_gmatcher(COMP_LIST);
+	unqueue_signals();
 	return ret;
     }
 
@@ -1656,6 +1663,7 @@ bin_compctl(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 	    compctl_process_cc(argv, cc);
     }
 
+    unqueue_signals();
     return ret;
 }
 
@@ -1667,12 +1675,18 @@ bin_compctl(char *name, char **argv, UNUSED(Options ops), UNUSED(int func))
 static int
 bin_compcall(char *name, UNUSED(char **argv), Options ops, UNUSED(int func))
 {
+    int ret;
+
     if (incompfunc != 1) {
 	zwarnnam(name, "can only be called from completion function");
 	return 1;
     }
-    return makecomplistctl((OPT_ISSET(ops,'T') ? 0 : CFN_FIRST) |
-			   (OPT_ISSET(ops,'D') ? 0 : CFN_DEFAULT));
+
+    queue_signals();
+    ret = makecomplistctl((OPT_ISSET(ops,'T') ? 0 : CFN_FIRST) |
+			  (OPT_ISSET(ops,'D') ? 0 : CFN_DEFAULT));
+    unqueue_signals();
+    return ret;
 }
 
 /*
@@ -1755,6 +1769,8 @@ ccmakehookfn(UNUSED(Hookdef dummy), struct ccmakedat *dat)
     char *os = s;
     int onm = nmatches, odm = diffmatches, osi = movefd(0);
     LinkNode n;
+
+    queue_signals();
 
     /* We build a copy of the list of matchers to use to make sure that this
      * works even if a shell function called from the completion code changes
@@ -1883,6 +1899,8 @@ ccmakehookfn(UNUSED(Hookdef dummy), struct ccmakedat *dat)
     }
     redup(osi, 0);
     dat->lst = 1;
+
+    unqueue_signals();
     return 0;
 }
 
@@ -2044,7 +2062,7 @@ maketildelist(void)
 /* This does the check for compctl -x `n' and `N' patterns. */
 
 /**/
-int
+static int
 getcpat(char *str, int cpatindex, char *cpat, int class)
 {
     char *s, *t, *p;
