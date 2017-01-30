@@ -1,3 +1,8 @@
+2017-01-30  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 40465: Test/C04funcdef.ztst, Test/V06parameter.ztst: use
+	method from cd tests to output current directory.
+
 2017-01-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	*  Zhiming Wang: 40450, 40451: Completion/Unix/Command/_swift,

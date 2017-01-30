@@ -2,6 +2,10 @@
 
   mkdir funcdef.tmp
   cd funcdef.tmp
+  setopt chaselinks
+  cd .
+  unsetopt chaselinks
+  mydir=$PWD
 
 %test
 
@@ -325,10 +329,10 @@
     printf '%s\n' 'oops(){}' 'ninjas-earring(){}' 'oops "$@"' >oops
     autoload oops
     oops
-    whence -v oops | sed -e "s%$PWD%CURDIR%"
+    whence -v oops
   )
-0:whence -v of zsh-style autoload
->oops is a shell function from CURDIR/oops
+0q:whence -v of zsh-style autoload
+>oops is a shell function from $mydir/oops
 
   (
     fpath=(.)

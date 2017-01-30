@@ -1,15 +1,22 @@
+%prep
+
+  setopt chaselinks
+  cd .
+  unsetopt chaselinks
+  mydir=$PWD
+
 %test
 
   print 'print In sourced file
-  print $LINENO + $functrace + ${funcsourcetrace/#$PWD/CURDIR}
+  print $LINENO + $functrace + ${funcsourcetrace}
   ' >sourcedfile
   print -r -- 'print Started functrace.zsh
   module_path=(./Modules)
-  print $LINENO + $functrace + ${funcsourcetrace/#$PWD/CURDIR}
+  print $LINENO + $functrace + ${funcsourcetrace}
   :
   fn() {
     print Inside function $0
-    print $LINENO + $functrace + ${funcsourcetrace/#$PWD/CURDIR}
+    print $LINENO + $functrace + ${funcsourcetrace}
   }
   :
   fn
@@ -17,7 +24,7 @@
   fpath=(. $fpath)
   :
   echo '\''print Inside $0
-    print $LINENO + $functrace + ${funcsourcetrace/#$PWD/CURDIR}
+    print $LINENO + $functrace + ${funcsourcetrace}
   '\'' >autofn
   :
   autoload autofn
@@ -26,15 +33,15 @@
   autofn
   . ./sourcedfile' >functrace.zsh
   $ZTST_testdir/../Src/zsh +Z -f ./functrace.zsh
-0:Function tracing
+0q:Function tracing
 >Started functrace.zsh
 >3 + +
 >Inside function fn
 >2 + ./functrace.zsh:10 + ./functrace.zsh:5
 >Inside autofn
->2 + ./functrace.zsh:20 + CURDIR/autofn:0
+>2 + ./functrace.zsh:20 + $mydir/autofn:0
 >Inside autofn
->2 + ./functrace.zsh:21 + CURDIR/autofn:0
+>2 + ./functrace.zsh:21 + $mydir/autofn:0
 >In sourced file
 >2 + ./functrace.zsh:22 + ./sourcedfile:0
 
@@ -70,14 +77,14 @@
     fpath=($PWD)
     print "print I have been autoloaded" >myfunc
     autoload $PWD/myfunc
-    print ${functions_source[myfunc]/#$PWD/CURDIR}
+    print ${functions_source[myfunc]}
     myfunc
-    print ${functions_source[myfunc]/#$PWD/CURDIR}
+    print ${functions_source[myfunc]}
   )
-0: $functions_source
->CURDIR/myfunc
+0q: $functions_source
+>$mydir/myfunc
 >I have been autoloaded
->CURDIR/myfunc
+>$mydir/myfunc
 
 %clean
 
