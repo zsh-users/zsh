@@ -151,8 +151,7 @@ config.modules: $(sdir)/config.h.in config.status config.modules.sh
 	$(SHELL) ./config.modules.sh
 
 $(sdir)/config.h.in: $(sdir)/stamp-h.in
-$(sdir)/stamp-h.in: $(sdir)/configure.ac \
-		$(sdir)/aclocal.m4 $(sdir)/aczsh.m4
+$(sdir)/stamp-h.in: $(sdir)/configure
 	cd $(sdir) && autoheader
 	echo > $(sdir)/stamp-h.in
 

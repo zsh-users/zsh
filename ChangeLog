@@ -1,3 +1,8 @@
+2017-01-31  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 40466: Makefile.in: update depencencies so autoheader is run
+	after autoconf when configuration input files change.
+
 2017-01-30  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 40469: Src/Zle/complete.c: change strategy from 40453 to use
