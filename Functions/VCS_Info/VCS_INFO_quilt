@@ -184,6 +184,7 @@ function VCS_INFO_quilt() {
 
     case ${mode} in
     (standalone)
+        backend_misc[patches]=${qstring}
         VCS_INFO_formats '' '' "${root}" '' '' '' "${qstring}"
         VCS_INFO_set
         ;;

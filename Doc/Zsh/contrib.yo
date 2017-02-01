@@ -1207,6 +1207,8 @@ item(tt(nopatch-format))(
 This pair of styles format the patch information used by the tt(%m) expando in
 formats and actionformats for the tt(git) and tt(hg) backends.  The value is
 subject to certain tt(%)-expansions described below.
+The expanded value is made available in the global tt(backend_misc) array as
+tt(${backend_misc[patches]}) (also if a tt(set-patch-format) hook is used).
 )
 kindex(get-unapplied)
 item(tt(get-unapplied))(
@@ -1612,9 +1614,7 @@ so far in the opposite order, which means that the first argument is the
 top-most patch and so forth.
 
 When setting tt(ret) to non-zero, the string in
-tt(${hook_com[applied-string]}) will be used in the tt(%m) escape in
-tt(formats) and tt(actionformats); it will be available in the global
-tt(backend_misc) array as tt($backend_misc[patches]}); and it will be
+tt(${hook_com[applied-string]}) will be
 available as tt(%p) in the tt(patch-format) and tt(nopatch-format) styles.
 )
 item(tt(gen-unapplied-string))(
