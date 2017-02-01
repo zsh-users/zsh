@@ -8,6 +8,8 @@
 # $4 - name of a parameter to store the unapplied-string in
 # $5 - context argument for use in zstyle getters
 # $6 - name of a parameter to store a patch-format format string in
+# $7 - name of an assoc parameter with extra $hook_com key-value pairs for the
+#      set-patch-format hook invocation, or '' for none
 #
 # Output:
 # - $hook_com is overwritten and the keys 'applied', 'applied-n',
@@ -48,4 +50,5 @@
       unapplied "${(P)4}"
     )
     hook_com[all-n]=$(( ${hook_com[applied-n]} + ${hook_com[unapplied-n]} ))
+    hook_com+=( ${7:+"${(@kvP)7}"} )
 }

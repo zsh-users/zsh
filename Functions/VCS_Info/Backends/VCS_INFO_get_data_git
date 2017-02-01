@@ -126,7 +126,8 @@ VCS_INFO_git_handle_patches () {
 
     VCS_INFO_set-patch-format 'git_patches_applied' 'git_applied_s' \
                               'git_patches_unapplied' 'git_unapplied_s' \
-                              ":vcs_info:${vcs}:${usercontext}:${rrn}" gitmsg
+                              ":vcs_info:${vcs}:${usercontext}:${rrn}" gitmsg \
+                              ''
 
     if VCS_INFO_hook 'set-patch-format' "${gitmsg}"; then
         zformat -f gitmisc "${gitmsg}" "p:${hook_com[applied]}" "u:${hook_com[unapplied]}" \

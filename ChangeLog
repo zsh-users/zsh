@@ -1,5 +1,12 @@
 2017-02-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40479: Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,
+	Functions/VCS_Info/VCS_INFO_quilt,
+	Functions/VCS_Info/VCS_INFO_set-patch-format: vcs_info
+	set-patch-format: Prepare for more code sharing between the
+	callers.
+
 	* 40481: Functions/VCS_Info/Backends/VCS_INFO_get_data_hg:
 	vcs_info hg: Pass arguments to the set-patch-format hook.
 
