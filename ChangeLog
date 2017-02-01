@@ -1,5 +1,11 @@
 2017-02-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40480: Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,
+	Functions/VCS_Info/VCS_INFO_quilt,
+	Functions/VCS_Info/VCS_INFO_set-patch-format: vcs_info
+	set-patch-format: Eliminate the remaining code duplication.
+
 	* 40479: Functions/VCS_Info/Backends/VCS_INFO_get_data_git,
 	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,
 	Functions/VCS_Info/VCS_INFO_quilt,
