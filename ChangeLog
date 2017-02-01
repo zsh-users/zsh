@@ -1,5 +1,8 @@
 2017-02-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40481: Functions/VCS_Info/Backends/VCS_INFO_get_data_hg:
+	vcs_info hg: Pass arguments to the set-patch-format hook.
+
 	* 40478: Functions/VCS_Info/VCS_INFO_set-patch-format: vcs_info
 	set-patch-format: Guard against empty variable elision.
 
