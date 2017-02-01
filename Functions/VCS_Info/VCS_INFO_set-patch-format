@@ -43,9 +43,9 @@
 
     hook_com=(
       applied-n ${(P)#1}
-      applied ${(P)2}
+      applied "${(P)2}"
       unapplied-n ${(P)#3}
-      unapplied ${(P)4}
+      unapplied "${(P)4}"
     )
     hook_com[all-n]=$(( ${hook_com[applied-n]} + ${hook_com[unapplied-n]} ))
 }

@@ -1,5 +1,8 @@
 2017-02-03  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40478: Functions/VCS_Info/VCS_INFO_set-patch-format: vcs_info
+	set-patch-format: Guard against empty variable elision.
+
 	* 40476: Doc/Zsh/contrib.yo, Functions/VCS_Info/VCS_INFO_quilt:
 	vcs_info $backend_misc: Document at the right point, provide
 	in quilt 'standalone' mode.
