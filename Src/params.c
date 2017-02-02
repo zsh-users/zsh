@@ -3192,11 +3192,12 @@ sethparam(char *s, char **val)
 
 /*
  * Set a generic shell number, floating point or integer.
+ * Option to warn on setting.
  */
 
 /**/
-Param
-setnparam(char *s, mnumber val)
+mod_export Param
+assignnparam(char *s, mnumber val, int flags)
 {
     struct value vbuf;
     Value v;
@@ -3248,13 +3249,39 @@ setnparam(char *s, mnumber val)
 	    unqueue_signals();
 	    return NULL;
 	}
-	check_warn_pm(v->pm, "numeric", !was_unset, 1);
+	if (flags & ASSPM_WARN)
+	    check_warn_pm(v->pm, "numeric", !was_unset, 1);
     } else {
-	check_warn_pm(v->pm, "numeric", 0, 1);
+	if (flags & ASSPM_WARN)
+	    check_warn_pm(v->pm, "numeric", 0, 1);
     }
     setnumvalue(v, val);
     unqueue_signals();
     return v->pm;
+}
+
+/*
+ * Set a generic shell number, floating point or integer.
+ * Warn on setting based on option.
+ */
+
+/**/
+mod_export Param
+setnparam(char *s, mnumber val)
+{
+    return assignnparam(s, val, ASSPM_WARN);
+}
+
+/* Simplified interface to assignnparam */
+
+/**/
+mod_export Param
+assigniparam(char *s, zlong val, int flags)
+{
+    mnumber mnval;
+    mnval.type = MN_INTEGER;
+    mnval.u.l = val;
+    return assignnparam(s, mnval, flags);
 }
 
 /* Simplified interface to setnparam */
@@ -3266,7 +3293,7 @@ setiparam(char *s, zlong val)
     mnumber mnval;
     mnval.type = MN_INTEGER;
     mnval.u.l = val;
-    return setnparam(s, mnval);
+    return assignnparam(s, mnval, ASSPM_WARN);
 }
 
 /*

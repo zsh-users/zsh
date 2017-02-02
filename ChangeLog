@@ -1,3 +1,8 @@
+2017-02-02  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 40486: Src/Modules/regex.c, Src/params.c: don't warn on
+	creation of MATCH etc. from regex test as this is implicit.
+
 2017-02-01  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 40483 (cf. Eric Freese: 40482): Src/Modules/zpty.c: Remove zpty

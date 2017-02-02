@@ -111,7 +111,7 @@ zcond_regex_match(char **a, int id)
 		*x = NULL;
 	    }
 	    if (isset(BASHREMATCH)) {
-		setaparam("BASH_REMATCH", arr);
+		assignaparam("BASH_REMATCH", arr, 0);
 	    } else {
 		zlong offs;
 		char *ptr;
@@ -119,7 +119,7 @@ zcond_regex_match(char **a, int id)
 
 		m = matches;
 		s = metafy(lhstr + m->rm_so, m->rm_eo - m->rm_so, META_DUP);
-		setsparam("MATCH", s);
+		assignsparam("MATCH", s, 0);
 		/*
 		 * Count the characters before the match.
 		 */
@@ -133,7 +133,7 @@ zcond_regex_match(char **a, int id)
 		    ptr += clen;
 		    leftlen -= clen;
 		}
-		setiparam("MBEGIN", offs + !isset(KSHARRAYS));
+		assigniparam("MBEGIN", offs + !isset(KSHARRAYS), 0);
 		/*
 		 * Add on the characters in the match.
 		 */
@@ -144,7 +144,7 @@ zcond_regex_match(char **a, int id)
 		    ptr += clen;
 		    leftlen -= clen;
 		}
-		setiparam("MEND", offs + !isset(KSHARRAYS) - 1);
+		assigniparam("MEND", offs + !isset(KSHARRAYS) - 1, 0);
 		if (nelem) {
 		    char **mbegin, **mend, **bptr, **eptr;
 		    bptr = mbegin = (char **)zalloc(sizeof(char *)*(nelem+1));
