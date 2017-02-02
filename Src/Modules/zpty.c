@@ -331,6 +331,7 @@ newptycmd(char *nam, char *pname, char **args, int echo, int nblock)
 	/* This code copied from the clone module, except for getting *
 	 * the descriptor from get_pty() and duplicating it to 0/1/2. */
 
+	deletehookfunc("exit", ptyhook);
 	clearjobtab(0);
 	ppid = getppid();
 	mypid = getpid();
@@ -852,6 +853,7 @@ bin_zpty(char *nam, char **args, Options ops, UNUSED(int func))
     }
 }
 
+/**/
 static int
 ptyhook(UNUSED(Hookdef d), UNUSED(void *dummy))
 {
