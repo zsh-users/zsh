@@ -179,6 +179,7 @@ local patchdir=${gitdir}/patches/${gitbranch}
 if [[ -d $patchdir ]] && [[ -f $patchdir/applied ]] \
    && [[ -f $patchdir/unapplied ]]
 then
+    # stgit
     git_patches_applied=(${(f)"$(< "${patchdir}/applied")"})
     git_patches_unapplied=(${(f)"$(< "${patchdir}/unapplied")"})
     VCS_INFO_git_handle_patches

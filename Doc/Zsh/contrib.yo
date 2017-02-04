@@ -1279,8 +1279,8 @@ A "misc" replacement. It is at the discretion of the backend to
 decide what this replacement expands to.
 
 The tt(hg) and tt(git) backends use this expando to display patch information.
-tt(hg) sources patch information from the tt(mq) extensions; tt(git) from the
-tt(rebase) command and from the and tt(stgit) extension.  The tt(patch-format)
+tt(hg) sources patch information from the tt(mq) extensions; tt(git) from in-progress
+tt(rebase) and tt(cherry-pick) operations and from the tt(stgit) extension.  The tt(patch-format)
 and tt(nopatch-format) styles control the generated string.  The former is used
 when at least one patch from the patch queue has been applied, and the latter
 otherwise.
