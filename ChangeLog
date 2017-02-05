@@ -1,5 +1,10 @@
 2017-02-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40494: Completion/Unix/Command/_git: Use slashes matchspec
+	for references (as already used for branch names).
+
+2017-02-07  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
 	* 40493/0002: Completion/Unix/Command/_git: _git-checkout:
 	Reorder default completions.
 

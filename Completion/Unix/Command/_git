@@ -6481,9 +6481,10 @@ __git_references () {
     _git_refs_cache_pwd=$PWD
   fi
 
-  _wanted references expl 'reference' compadd -a - _git_refs_cache
+  _wanted references expl 'reference' compadd -M 'r:|/=**' -a - _git_refs_cache
 }
 
+# ### currently unused; are some callers of __git_references supposed to call this function?
 (( $+functions[__git_local_references] )) ||
 __git_local_references () {
   local expl
@@ -6494,7 +6495,7 @@ __git_local_references () {
     _git_local_refs_cache_pwd=$PWD
   fi
 
-  _wanted references expl 'reference' compadd -a - _git_local_refs_cache
+  _wanted references expl 'reference' compadd -M 'r:|/=**' -a - _git_local_refs_cache
 }
 
 (( $+functions[__git_remote_references] )) ||
