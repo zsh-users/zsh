@@ -202,6 +202,7 @@ if zstyle -T ":vcs_info:${vcs}:${usercontext}:${rrn}" get-mq \
 
     if VCS_INFO_hook 'gen-mqguards-string' "${mqguards[@]}"; then
         guards_string=${(j:,:)mqguards}
+        # TODO: %-escape extra_zformats[g:...] value
     else
         guards_string=${hook_com[guards-string]}
     fi

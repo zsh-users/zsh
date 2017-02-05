@@ -1,3 +1,10 @@
+2017-02-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 40492: Doc/Zsh/contrib.yo, Etc/BUGS,
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_hg,
+	Functions/VCS_Info/VCS_INFO_set-patch-format, README: vcs_info:
+	Escape '%' signs in payloads.
+
 2017-02-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Completion/Unix/Command/_subversion: _svn: Fix

@@ -15,13 +15,6 @@ It is currently impossible to time builtins.
 40106: The comp* completion-related builtins (compadd, compset, etc) are
 run with $_comp_options in effect, rather than the user's options.
 ------------------------------------------------------------------------
-40240: vcs_info: percent escapes in payloads are interpreted
-
-Example: hg branch names and quilt patch subjects that contain the literal
-string '%F{blue}', cause $vcs_info_msg_N_ to be rendered in blue.
-
-40240 has a patch, but 40241 explains why that patch is incomplete.
-------------------------------------------------------------------------
 users/20807: vcs_info quilt 'addon' mode: hook lookup context specifies
 the underlying VCS but not whether quilt is used.
 

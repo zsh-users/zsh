@@ -1344,6 +1344,12 @@ tt(branchformat), use tt(%%%%b). Sorry for this inconvenience, but it
 cannot be easily avoided. Luckily we do not clash with a lot of prompt
 expansions and this only needs to be done for those.
 
+When one of the tt(gen-applied-string), tt(gen-unapplied-string), and
+tt(set-patch-format) hooks is defined,
+applying tt(%)-escaping (`tt(foo=${foo//'%'/%%})') to the interpolated values
+for use in the prompt is the responsibility of those hooks (jointly);
+when neither of those hooks is defined, tt(vcs_info) handles escaping by itself.
+We regret this coupling, but it was required for backwards compatibility.
 
 subsect(Quilt Support)
 
@@ -1616,6 +1622,9 @@ top-most patch and so forth.
 When setting tt(ret) to non-zero, the string in
 tt(${hook_com[applied-string]}) will be
 available as tt(%p) in the tt(patch-format) and tt(nopatch-format) styles.
+This hook is, in concert with tt(set-patch-format), responsible for
+tt(%)-escaping that value for use in the prompt.
+(See the `Oddities' section.)
 )
 item(tt(gen-unapplied-string))(
 Called in the tt(git) (with tt(stgit) or during rebase), and tt(hg) (with
@@ -1629,6 +1638,9 @@ the patch next-in-line to be applied and so forth.
 When setting tt(ret) to non-zero, the string in
 tt(${hook_com[unapplied-string]}) will be available as tt(%u) in the
 tt(patch-format) and tt(nopatch-format) styles.
+This hook is, in concert with tt(set-patch-format), responsible for
+tt(%)-escaping that value for use in the prompt.
+(See the `Oddities' section.)
 )
 item(tt(gen-mqguards-string))(
 Called in the tt(hg) backend when tt(guards-string) is generated; the
@@ -1706,6 +1718,11 @@ controllable in addition to that.
 If tt(ret) is set to non-zero, the string in tt(${hook_com[patch-replace]})
 will be used unchanged instead of an expanded format from tt(patch-format) or
 tt(nopatch-format).
+
+This hook is, in concert with the tt(gen-applied-string) or
+tt(gen-unapplied-string) hooks if they are defined, responsible for
+tt(%)-escaping the final tt(patch-format) value for use in the prompt.
+(See the `Oddities' section.)
 )
 item(tt(set-message))(
 Called each time before a `tt(vcs_info_msg_)var(N)tt(_)' message is set.

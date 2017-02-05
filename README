@@ -62,6 +62,15 @@ Note that functions including a non-leading / behave as before,
 e.g. if `dir/name' is found anywhere under a directory in $fpath it is
 loaded as a function named `dir/name'.
 
+3) vcs_info: When neither a set-patch-format nor a gen-applied-string
+(resp. gen-unapplied-string) hook is set, vcs_info now '%'-escapes the
+applied-string (resp. unapplied-string) before interpolating it into the
+patch-format string, to prevent literal `%' signs in the interpolated
+value from being interpreted as prompt escape sequences.  If you use
+${vcs_info_msg_0_} in a context other than the shell prompt, you may need
+to undo the escaping with:
+    print -v vcs_info_msg_0_ -Pr -- "${vcs_info_msg_0_}"
+
 Incompatibilities between 5.0.8 and 5.3
 ----------------------------------------
 
