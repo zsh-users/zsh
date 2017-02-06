@@ -43,6 +43,7 @@ case $service in
       '(-F --files)'{-F+,--files=}'[only list files within specified range]:range'
       '--strip=[remove specified number of pathname components before displaying]:components'
       '--addprefix=[insert specified path prefix before displaying path names]:prefix:_directories'
+      '*:diff file:_files'
     )
   ;|
   grepdiff|lsdiff)
@@ -58,7 +59,6 @@ case $service in
       \*{-v,--verbose}'[verbose operation]' 
       '(-H --with-filename -h --no-filename)'{-H,--with-filename}'[print the name of the patch file containing each patch]'
       '!--filter' '!--grep'
-      '*:diff file:_files'
     )
   ;;
   grepdiff|filterdiff)
@@ -71,7 +71,7 @@ case $service in
       '--as-numbered-lines=[display lines of selected hunks]:line numbers:(before after)'
       "--remove-timestamps[don't include timestamps in output]"
     )
-  ;;
+  ;|
   filterdiff)
     args+=(
       '(-X --exclude-from-file)'{-X+,--exclude-from-file=}'[exclude files matching any pattern listed in specified file]:file:_files'
