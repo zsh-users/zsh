@@ -170,7 +170,7 @@ gdbmgetfn(Param pm)
     GDBM_FILE dbf;
 
     key.dptr = pm->node.nam;
-    key.dsize = strlen(key.dptr) + 1;
+    key.dsize = strlen(key.dptr);
 
     dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
     ret = gdbm_exists(dbf, key);
@@ -191,9 +191,9 @@ gdbmsetfn(Param pm, char *val)
     GDBM_FILE dbf;
 
     key.dptr = pm->node.nam;
-    key.dsize = strlen(key.dptr) + 1;
+    key.dsize = strlen(key.dptr);
     content.dptr = val;
-    content.dsize = strlen(content.dptr) + 1;
+    content.dsize = strlen(content.dptr);
 
     dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
     (void)gdbm_store(dbf, key, content, GDBM_REPLACE);
@@ -207,7 +207,7 @@ gdbmunsetfn(Param pm, UNUSED(int um))
     GDBM_FILE dbf;
 
     key.dptr = pm->node.nam;
-    key.dsize = strlen(key.dptr) + 1;
+    key.dsize = strlen(key.dptr);
 
     dbf = (GDBM_FILE)(pm->u.hash->tmpdata);
     (void)gdbm_delete(dbf, key);
@@ -302,12 +302,12 @@ gdbmhashsetfn(Param pm, HashTable ht)
 	    v.pm = (Param) hn;
 
 	    key.dptr = v.pm->node.nam;
-	    key.dsize = strlen(key.dptr) + 1;
+	    key.dsize = strlen(key.dptr);
 
 	    queue_signals();
 
 	    content.dptr = getstrvalue(&v);
-	    content.dsize = strlen(content.dptr) + 1;
+	    content.dsize = strlen(content.dptr);
 
 	    (void)gdbm_store(dbf, key, content, GDBM_REPLACE);	
 
