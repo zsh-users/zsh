@@ -69,7 +69,10 @@ patch-format string, to prevent literal `%' signs in the interpolated
 value from being interpreted as prompt escape sequences.  If you use
 ${vcs_info_msg_0_} in a context other than the shell prompt, you may need
 to undo the escaping with:
+
     print -v vcs_info_msg_0_ -Pr -- "${vcs_info_msg_0_}"
+
+This is also needed if $vcs_info_msg_0_ is used to set $psvar.
 
 Incompatibilities between 5.0.8 and 5.3
 ----------------------------------------

@@ -31,7 +31,7 @@ precmd() {
     psvar=()
 
     vcs_info
-    [[ -n $vcs_info_msg_0_ ]] && psvar[1]="$vcs_info_msg_0_"
+    [[ -n $vcs_info_msg_0_ ]] && print -v 'psvar[1]' -Pr -- "$vcs_info_msg_0_"
 }
 
 # You can now use `%1v' to drop the $vcs_info_msg_0_ contents in your prompt;
