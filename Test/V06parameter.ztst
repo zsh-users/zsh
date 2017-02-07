@@ -86,6 +86,12 @@
 >I have been autoloaded
 >$mydir/myfunc
 
+ functions+=(a 'echo foo'); a
+ functions+=(a 'echo bar'); a
+0:$functions can be appended to twice
+>foo
+>bar
+
 %clean
 
  rm -f autofn functrace.zsh rocky3.zsh sourcedfile myfunc

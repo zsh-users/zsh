@@ -330,7 +330,7 @@ unsetpmfunction(Param pm, UNUSED(int exp))
 
 /**/
 static void
-setfunctions(UNUSED(Param pm), HashTable ht, int dis)
+setfunctions(Param pm, HashTable ht, int dis)
 {
     int i;
     HashNode hn;
@@ -349,7 +349,7 @@ setfunctions(UNUSED(Param pm), HashTable ht, int dis)
 
 	    setfunction(hn->nam, ztrdup(getstrvalue(&v)), dis);
 	}
-    deleteparamtable(ht);
+    hashsetfn(pm, ht);
 }
 
 /**/
