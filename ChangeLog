@@ -1,3 +1,8 @@
+2017-02-10  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/Linux/Command/_lsusb: using a colon in
+	the tag name was not such a good idea
+
 2017-02-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 40510: Misc/vcs_info-examples, README: vcs_info: Update the

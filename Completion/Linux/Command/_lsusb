@@ -30,6 +30,6 @@ if [[ -n $state && ${+_lsusb_vendors} -eq 0 ]]; then
   done
 fi
 
-_wanted vendors:products expl 'vendor ID:product ID' compadd -k _lsusb_devices && ret=0
+_wanted products expl 'vendor ID:product ID' compadd -k _lsusb_devices && ret=0
 
 return ret
