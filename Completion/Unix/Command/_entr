@@ -1,0 +1,9 @@
+#compdef entr
+
+_arguments -s -S \
+  '-c[execute clear before invoking utility]' \
+  '-d[track directories and exit if a new file is added]' \
+  '-p[postpone first execution of the utility]' \
+  '-r[reload a persistent child process]' \
+  '(-):command name:_command_names -e' \
+  '*::arguments:_normal'
