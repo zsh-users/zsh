@@ -3032,8 +3032,44 @@ add_autoload_function(Shfunc shf, char *funcname)
 	dircache_set(&shf->filename, NULL);
 	dircache_set(&shf->filename, dir);
 	shf->node.flags |= PM_LOADDIR;
+	shf->node.flags |= PM_ABSPATH_USED;
 	shfunctab->addnode(shfunctab, ztrdup(nam), shf);
     } else {
+        Shfunc shf2;
+        Funcstack fs;
+        const char *calling_f = NULL;
+        char buf[PATH_MAX+1];
+
+        /* Find calling function */
+        for (fs = funcstack; fs; fs = fs->prev) {
+            if (fs->tp == FS_FUNC && fs->name && (!shf->node.nam || 0 != strcmp(fs->name,shf->node.nam))) {
+                calling_f = fs->name;
+                break;
+            }
+        }
+
+        /* Get its directory */
+        if (calling_f) {
+            /* Should contain load directory, and be loaded via absolute path */
+            if ((shf2 = (Shfunc) shfunctab->getnode2(shfunctab, calling_f))
+                    && (shf2->node.flags & PM_LOADDIR) && (shf2->node.flags & PM_ABSPATH_USED)
+                    && shf2->filename)
+            {
+                if (strlen(shf2->filename) + strlen(funcname) + 1 < PATH_MAX)
+                {
+                    sprintf(buf, "%s/%s", shf2->filename, funcname);
+                    /* Set containing directory if the function file
+                     * exists (do normal FPATH processing otherwise) */
+                    if (!access(buf, R_OK)) {
+                        dircache_set(&shf->filename, NULL);
+                        dircache_set(&shf->filename, shf2->filename);
+                        shf->node.flags |= PM_LOADDIR;
+                        shf->node.flags |= PM_ABSPATH_USED;
+                    }
+                }
+            }
+        }
+
 	shfunctab->addnode(shfunctab, ztrdup(funcname), shf);
     }
 }

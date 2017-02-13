@@ -1807,6 +1807,7 @@ struct tieddata {
 #define PM_READONLY	(1<<10)	/* readonly                                 */
 #define PM_TAGGED	(1<<11)	/* tagged                                   */
 #define PM_EXPORTED	(1<<12)	/* exported                                 */
+#define PM_ABSPATH_USED (1<<12) /* (function): loaded using absolute path   */
 
 /* The following are the same since they *
  * both represent -U option to typeset   */
