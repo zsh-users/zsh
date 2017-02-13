@@ -159,7 +159,10 @@ load from the file given (searching as usual for dump files in the given
 location).  The name of the function is the basename (non-directory
 part) of the file.  It is normally an error if the function is not found
 in the given location; however, if the option tt(-d) is given, searching
-for the function defaults to tt($fpath).
+for the function defaults to tt($fpath).  If a function is loaded by
+absolute path, any functions loaded from it that are marked for
+tt(autoload) without an absolute path have the load path of the parent
+function temporarily prepended to tt($fpath).
 
 If the option tt(-r) or tt(-R) is given, the function is searched for
 immediately and the location is recorded internally for use when the

@@ -1,5 +1,7 @@
 2017-02-13  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 40537: Doc/Zsh/builtins.yo: document the foregoing.
+
 	* Sebastian: 40536: Src/builtin.c, Src/zsh.h: prepend directory
 	of function autoload with absolute path to fpath if loading a
 	function by relative path.
