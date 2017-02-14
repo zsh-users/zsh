@@ -69,7 +69,8 @@ bin_example(char *nam, char **args, Options ops, UNUSED(int func))
     intparam = i;
     zsfree(strparam);
     strparam = ztrdup(*oargs ? *oargs : "");
-    freearray(arrparam);
+    if (arrparam)
+	freearray(arrparam);
     arrparam = zarrdup(oargs);
     return 0;
 }

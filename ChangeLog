@@ -3,6 +3,8 @@
 	* 40539: Fabian Klotzl: Completion/Unix/Command/_gcc: typo in MIPS
 	branch of argument selection
 
+	* 40524: Src/Modules/example.c: do not free a null array
+
 2017-02-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40537: Doc/Zsh/builtins.yo: document the foregoing.
