@@ -1,3 +1,8 @@
+2017-02-13  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40539: Fabian Klotzl: Completion/Unix/Command/_gcc: typo in MIPS
+	branch of argument selection
+
 2017-02-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40537: Doc/Zsh/builtins.yo: document the foregoing.

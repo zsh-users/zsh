@@ -94,7 +94,7 @@ romp)
   ;;
 mips*)
   args=(
-    '-mcpu=:CPU type:(r2000 r3000 r4000 r4400 r4600 r6000_'
+    '-mcpu=:CPU type:(r2000 r3000 r4000 r4400 r4600 r6000)'
     -mabicalls -membedded-data
     -membedded-pic -mfp32 -mfp64 -mgas -mgp32 -mgp64
     -mgpopt -mhalf-pic -mhard-float -mint64 -mips1
