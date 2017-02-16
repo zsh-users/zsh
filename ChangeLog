@@ -1,3 +1,8 @@
+2017-03-01  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Sebastian: 40562: Test/V11db_gdbm.ztst: this was missed out of
+	the previous commit.
+
 2017-02-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 40641: Doc/Zsh/expn.yo, Doc/Zsh/roadmap.yo: docs: patterns:
