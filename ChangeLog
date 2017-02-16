@@ -1,3 +1,9 @@
+2017-02-17  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Sebastian: 40558, 40562: Doc/Zsh/mod_db_gdbm.yo,
+	Src/Modules/db_gdbm.c, Src/Modules/db_gdbm.mdd: General
+	improvements to zsh/db/gdbm module.
+
 2017-02-13  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 40539: Fabian Klotzl: Completion/Unix/Command/_gcc: typo in MIPS

@@ -43,6 +43,17 @@ local scope (function) ends.  Note that a readonly parameter may not be
 explicitly unset, so the only way to unset a global parameter created with
 `tt(ztie -r)' is to use `tt(zuntie -u)'.
 )
+findex(zgdbmpath)
+cindex(database file path, reading)
+item(tt(zgdbmpath) var(parametername))(
+Put path to database file assigned to var(parametername) into tt(REPLY)
+scalar.
+)
+findex(zgdbm_tied)
+cindex(database tied arrays, enumerating)
+item(tt(zgdbm_tied))(
+Array holding names of all tied parameters.
+)
 enditem()
 
 The fields of an associative array tied to GDBM are neither cached nor

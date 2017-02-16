@@ -7,6 +7,6 @@ fi
 '
 load=no
 
-autofeatures="b:ztie b:zuntie"
+autofeatures="b:ztie b:zuntie b:zgdbmpath p:zgdbm_tied"
 
 objects="db_gdbm.o"
