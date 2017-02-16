@@ -1,5 +1,8 @@
 2017-02-17  Peter Stephenson  <p.stephenson@samsung.com>
 
+	*  Øystein Walle: 40568: REMATCH_PCRE option is not enabled by
+	default.
+
 	* Sebastian: 40558, 40562: Doc/Zsh/mod_db_gdbm.yo,
 	Src/Modules/db_gdbm.c, Src/Modules/db_gdbm.mdd: General
 	improvements to zsh/db/gdbm module.
