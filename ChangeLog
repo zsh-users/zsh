@@ -1,3 +1,7 @@
+2017-02-19  Oliver Kiddle  <opk@zsh.org>
+
+	* 40569: Completion/Unix/Command/_gphoto2: update to gphoto2 2.5.11
+
 2017-02-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	*  Øystein Walle: 40568: REMATCH_PCRE option is not enabled by
