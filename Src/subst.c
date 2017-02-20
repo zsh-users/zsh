@@ -3476,7 +3476,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		val = sepjoin(aval, sep, 1);
 		isarr = 0;
 		ms_flags = 0;
-	    } else if (force_split && (spsep || nojoin == 2)) {
+	    } else if (force_split &&
+		       (spsep || nojoin == 2 || (!ifs && isarr < 0))) {
 		/* Hack to simulate splitting individual elements:
 		 * forced joining as previously determined, or
 		 * join on what we later use to forcibly split
