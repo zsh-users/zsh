@@ -1,4 +1,7 @@
-2017-02-20  Barton E. Schaefer  <schaefer@brasslantern.com>
+2017-02-20  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40598: Src/subst.c: paramsubst() should always return scalar
+	when PREFORK_SINGLE was passed in from prefork()
 
 	* Martijn Dekker: 40565 (tweaked): test cases for assigning array
 	to scalar with various combinations of SHWORDSPLIT and IFS

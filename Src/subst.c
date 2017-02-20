@@ -3475,7 +3475,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    if (nojoin == 0 || sep) {
 		val = sepjoin(aval, sep, 1);
 		isarr = 0;
-		ms_flags = 0;
 	    } else if (force_split &&
 		       (spsep || nojoin == 2 || (!ifs && isarr < 0))) {
 		/* Hack to simulate splitting individual elements:
@@ -3485,6 +3484,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		val = sepjoin(aval, (nojoin == 1 ? NULL : spsep), 1);
 		isarr = 0;
 	    }
+	    if (!isarr)
+		ms_flags = 0;
 	}
 	if (force_split && !isarr) {
 	    aval = sepsplit(val, spsep, 0, 1);
@@ -4006,6 +4007,18 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	if (qt && !*y)
 	    y = dupstring(nulstring);
 	setdata(n, (void *) y);
+    }
+    if (isarr && ssub) {
+	/* prefork() wants a scalar, so join no matter what else */
+	LinkNode tn;
+
+	aval = hlinklist2array(l, 0);
+	val = sepjoin(aval, NULL, 1);
+	n = firstnode(l);
+	for (tn = lastnode(l); tn && tn != n; tn = lastnode(l))
+	    uremnode(l, tn);
+	setdata(n, (void *) val);
+	l->list.flags &= ~LF_ARRAY;
     }
     if (eval)
 	*str = (char *) getdata(n);
