@@ -334,7 +334,7 @@ ZTST_diff() {
       diff_ret=1
     fi
   else
-    diff_out=$(diff "$@")
+    diff_out=$(diff -a "$@")
     diff_ret="$?"
     if [[ "$diff_ret" != "0" ]]; then
       print -r -- "$diff_out"

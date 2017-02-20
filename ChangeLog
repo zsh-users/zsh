@@ -1,5 +1,8 @@
 2017-02-20  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Test/ztst.zsh: use "diff -a" in case special characters
+	were written to the test output
+
 	* 40598: Src/subst.c: paramsubst() should always return scalar
 	when PREFORK_SINGLE was passed in from prefork()
 
