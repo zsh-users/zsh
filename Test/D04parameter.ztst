@@ -2056,3 +2056,83 @@
 0:Regression: "-" became Dash in workers/37689, breaking ~- expansion
 *>*
 F:We do not care what $OLDPWD is, as long as it doesn't cause an error
+
+  (
+  set -- one 'two three' four
+  for ifs in default null unset; do
+    for wordsplit in native sh; do
+      print -r -- "--- $ifs IFS, $wordsplit splitting ---"
+      case $ifs in
+      default) IFS=$' \t\n\00' ;;
+      null)    IFS= ;;
+      unset)   unset -v IFS ;;
+      esac
+      case $wordsplit in
+      native)  unsetopt shwordsplit ;;
+      sh)      setopt shwordsplit ;;
+      esac
+      for testcmd in 'var=$@' 'var=$*' 'var="$@"' 'var="$*"'; do
+	print -r -- "> $testcmd"
+        eval "$testcmd"
+	printf '[%s]\n' "${var[@]}"
+      done
+    done
+  done
+  )
+0:Assigning $@, $*, "$@", "$*" to var with various shwordsplit/IFS settings
+>--- default IFS, native splitting ---
+>> var=$@
+>[one two three four]
+>> var=$*
+>[one two three four]
+>> var="$@"
+>[one two three four]
+>> var="$*"
+>[one two three four]
+>--- default IFS, sh splitting ---
+>> var=$@
+>[one two three four]
+>> var=$*
+>[one two three four]
+>> var="$@"
+>[one two three four]
+>> var="$*"
+>[one two three four]
+>--- null IFS, native splitting ---
+>> var=$@
+>[onetwo threefour]
+>> var=$*
+>[onetwo threefour]
+>> var="$@"
+>[onetwo threefour]
+>> var="$*"
+>[onetwo threefour]
+>--- null IFS, sh splitting ---
+>> var=$@
+>[onetwo threefour]
+>> var=$*
+>[onetwo threefour]
+>> var="$@"
+>[onetwo threefour]
+>> var="$*"
+>[onetwo threefour]
+>--- unset IFS, native splitting ---
+>> var=$@
+>[one two three four]
+>> var=$*
+>[one two three four]
+>> var="$@"
+>[one two three four]
+>> var="$*"
+>[one two three four]
+>--- unset IFS, sh splitting ---
+>> var=$@
+>[one two three four]
+>> var=$*
+>[one two three four]
+>> var="$@"
+>[one two three four]
+>> var="$*"
+>[one two three four]
+F:As of this writing, var=$@ and var="$@" with null IFS have unspecified
+F:behavior, see http://austingroupbugs.net/view.php?id=888

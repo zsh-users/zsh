@@ -1,3 +1,8 @@
+2017-02-20  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* Martijn Dekker: 40565 (tweaked): test cases for assigning array
+	to scalar with various combinations of SHWORDSPLIT and IFS
+
 2017-02-19  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 40593: Src/subst.c: SHWORDSPLIT + unset IFS should cause default
