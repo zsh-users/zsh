@@ -975,9 +975,8 @@ entersubsh(int flags)
     int sig, monitor, job_control_ok;
 
     if (!(flags & ESUB_KEEPTRAP))
-	for (sig = 0; sig < VSIGCOUNT; sig++)
-	    if (!(sigtrapped[sig] & ZSIG_FUNC) &&
-		sig != SIGDEBUG && sig != SIGZERR)
+	for (sig = 0; sig < SIGCOUNT; sig++)
+	    if (!(sigtrapped[sig] & ZSIG_FUNC))
 		unsettrap(sig);
     monitor = isset(MONITOR);
     job_control_ok = monitor && (flags & ESUB_JOB_CONTROL) && isset(POSIXJOBS);
@@ -1068,6 +1067,18 @@ entersubsh(int flags)
     }
     if (!(sigtrapped[SIGQUIT] & ZSIG_IGNORED))
 	signal_default(SIGQUIT);
+    /*
+     * sigtrapped[sig] == ZSIG_IGNORED for signals that remain ignored,
+     * but other trapped signals are temporarily blocked when intrap,
+     * and must be unblocked before continuing into the subshell.  This
+     * is orthogonal to what the default handler for the signal may be.
+     *
+     * Start loop at 1 because 0 is SIGEXIT
+     */
+    if (intrap)
+	for (sig = 1; sig < SIGCOUNT; sig++)
+	    if (sigtrapped[sig] && sigtrapped[sig] != ZSIG_IGNORED)
+		signal_unblock(signal_mask(sig));
     if (!job_control_ok)
 	opts[MONITOR] = 0;
     opts[USEZLE] = 0;
