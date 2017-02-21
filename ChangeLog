@@ -1,5 +1,8 @@
 2017-03-04  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted (from Ferenc- via github): Completion/Unix/Command/_gcc:
+	Add newer C++ standard options to gcc completion
+
 	* unposted: Completion/Unix/Command/_tmux: complete 'tiled' layout
 
 	* unposted: Completion/Unix/Command/_xz: fix argument to --format

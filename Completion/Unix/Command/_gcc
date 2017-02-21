@@ -353,7 +353,7 @@ args+=(
   '-print-file-name=-[Display the full path to library <library>]:library:->library'
   '-print-prog-name=-[Display the full path to compiler component <program>]:program:'
   '*-specs=-[Override built-in specs with the contents of <file>]:file:_files'
-  '-std=-[Assume that the input sources are for <standard>]:standard:(c90 c89 c99 c11 gnu90 gnu89 gnu99 gnu11 c++98 c++03 gnu++98 gnu++03 c++11 gnu++11 c++1y gnu++1y)'
+  '-std=-[assume that the input sources are for specified standard]:standard:(c90 c89 c99 c11 gnu90 gnu89 gnu99 gnu11 c++98 c++03 gnu++98 gnu++03 c++11 gnu++11 c++1y gnu++1y c++14 gnu++14 c++1z gnu++1z)'
   '*-include:include file:_files -g \*.h\(-.\)'
   '*-imacros:macro input file:_files -g \*.h\(-.\)'
   '*-idirafter:second include path directory:_files -/'
