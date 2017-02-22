@@ -91,6 +91,9 @@
 #  define setutent setutxent
 #  define getutent getutxent
 #  define endutent endutxent
+#  ifndef HAVE_GETUTENT
+#   define HAVE_GETUTENT 1
+#  endif
 # endif
 
 /*
@@ -482,21 +485,32 @@ ucmp(WATCH_STRUCT_UTMP *u, WATCH_STRUCT_UTMP *v)
 static int
 readwtab(WATCH_STRUCT_UTMP **head, int initial_sz)
 {
-    WATCH_STRUCT_UTMP *uptr, *tmp;
+    WATCH_STRUCT_UTMP *uptr;
     int wtabmax = initial_sz < 2 ? 32 : initial_sz;
     int sz = 0;
+# ifdef HAVE_GETUTENT
+    WATCH_STRUCT_UTMP *tmp;
+# else
+    FILE *in;
+# endif
 
     uptr = *head = (WATCH_STRUCT_UTMP *)
 	zalloc(wtabmax * sizeof(WATCH_STRUCT_UTMP));
+# ifdef HAVE_GETUTENT
     setutent();
     while ((tmp = getutent()) != NULL) {
+	memcpy(uptr, tmp, sizeof (WATCH_STRUCT_UTMP));
+# else
+    if (!(in = fopen(WATCH_UTMP_FILE, "r")))
+	return 0;
+    while (fread(uptr, sizeof(WATCH_STRUCT_UTMP), 1, in)) {
+# endif
 # ifdef USER_PROCESS
-	if   (tmp->ut_type == USER_PROCESS)
+	if (uptr->ut_type == USER_PROCESS)
 # else /* !USER_PROCESS */
-	if   (tmp->ut_name[0])
+	if (uptr->ut_name[0])
 # endif /* !USER_PROCESS */
 	{
-	    memcpy(uptr, tmp, sizeof (WATCH_STRUCT_UTMP));
 	    uptr++;
 	    if (++sz == wtabmax) {
 		uptr = (WATCH_STRUCT_UTMP *)
@@ -512,7 +526,11 @@ readwtab(WATCH_STRUCT_UTMP **head, int initial_sz)
 	    }
 	}
     }
+# ifdef HAVE_GETUTENT
     endutent();
+# else
+    fclose(in);
+# endif
 
     if (sz)
 	qsort((void *) *head, sz, sizeof(WATCH_STRUCT_UTMP),

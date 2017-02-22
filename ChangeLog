@@ -1,3 +1,8 @@
+2017-02-23  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 40604: configure.ac, Src/watch.c: revert to the old method if
+	getutent() is not available
+
 2017-02-21  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Julien Nicoulaud: 40586:
