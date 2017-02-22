@@ -1,3 +1,8 @@
+2017-02-21  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Julien Nicoulaud: 40586:
+	Functions/VCS_Info/Backends/VCS_INFO_get_data_git: discard stderr
+
 2017-02-20  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Test/ztst.zsh: use "diff -a" in case special characters

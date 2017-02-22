@@ -156,7 +156,7 @@ if (( querystaged || queryunstaged )) && \
    [[ "$(${vcs_comm[cmd]} rev-parse --is-inside-work-tree 2> /dev/null)" == 'true' ]] ; then
     # Default: off - these are potentially expensive on big repositories
     if (( queryunstaged )) ; then
-        ${vcs_comm[cmd]} diff --no-ext-diff --ignore-submodules=dirty --quiet --exit-code ||
+        ${vcs_comm[cmd]} diff --no-ext-diff --ignore-submodules=dirty --quiet --exit-code 2> /dev/null ||
             gitunstaged=1
     fi
     if (( querystaged )) ; then
