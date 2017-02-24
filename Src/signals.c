@@ -522,6 +522,11 @@ wait_for_processes(void)
 #if defined(HAVE_WAIT3) && defined(HAVE_GETRUSAGE)
 		struct timezone dummy_tz;
 		gettimeofday(&pn->endtime, &dummy_tz);
+#ifdef WIFCONTINUED
+		if (WIFCONTINUED(status))
+		    pn->status = SP_RUNNING;
+		else
+#endif
 		pn->status = status;
 		pn->ti = ru;
 #else

@@ -1,3 +1,8 @@
+2017-02-23  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40624 (cf. Danek Duvall, 40563): Src/signals.c: conditionally
+	handle WIFCONTINUED to properly set SP_RUNNING process status
+
 2017-02-23  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 40604: configure.ac, Src/watch.c: revert to the old method if
