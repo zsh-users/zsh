@@ -92,6 +92,9 @@
 >foo
 >bar
 
+ options+=(); options+=()
+0:$options can be appended to twice
+
 %clean
 
  rm -f autofn functrace.zsh rocky3.zsh sourcedfile myfunc
