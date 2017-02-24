@@ -955,15 +955,15 @@ This is distinct from em(field splitting) by the tt(f), tt(s)
 or tt(z) flags, which still applies within each array element.
 )
 item(tt(A))(
-Create an array parameter with `tt(${)...tt(=)...tt(})',
+Assign as an array parameter with `tt(${)...tt(=)...tt(})',
 `tt(${)...tt(:=)...tt(})' or `tt(${)...tt(::=)...tt(})'.
-If this flag is repeated (as in `tt(AA)'), create an associative
+If this flag is repeated (as in `tt(AA)'), assign an associative
 array parameter.  Assignment is made before sorting or padding;
 if field splitting is active, the var(word) part is split before
 assignment.  The var(name) part may be a subscripted range for
-ordinary arrays; the var(word) part em(must) be converted to
-an array, for example by using `tt(${(AA)=)var(name)tt(=)...tt(})'
-to activate field splitting, when creating an associative array.
+ordinary arrays; when assigning an associative array, the var(word)
+part em(must) be converted to an array, for example by using
+`tt(${(AA)=)var(name)tt(=)...tt(})' to activate field splitting.
 )
 item(tt(a))(
 Sort in array index order; when combined with `tt(O)' sort in reverse

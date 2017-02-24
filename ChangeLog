@@ -1,5 +1,8 @@
 2017-02-23  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted (cf. 40617): Doc/Zsh/expn.yo: clarify description of
+	the ${(A)name=value} and ${(AA)name=value} parameter flag uses.
+
 	* 40624 (cf. Danek Duvall, 40563): Src/signals.c: conditionally
 	handle WIFCONTINUED to properly set SP_RUNNING process status
 
