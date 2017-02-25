@@ -1,3 +1,8 @@
+2017-02-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 40641: Doc/Zsh/expn.yo, Doc/Zsh/roadmap.yo: docs: patterns:
+	Add '|' to the overview. Clarify that it short-circuits.
+
 2017-02-26  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 40650: Src/Modules/parameter.c: redo 40508 and 40626 with

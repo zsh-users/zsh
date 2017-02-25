@@ -2110,6 +2110,7 @@ Matches either var(x) or var(y).
 This operator has lower precedence than any other.
 The `tt(|)' character
 must be within parentheses, to avoid interpretation as a pipeline.
+The alternatives are tried in order from left to right.
 )
 item(tt(^)var(x))(
 (Requires tt(EXTENDED_GLOB) to be set.)

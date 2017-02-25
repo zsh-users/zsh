@@ -139,6 +139,9 @@ startitem()
 item(tt(**))(
 for matching over multiple directories
 )
+item(tt(|))(
+for matching either of two alternatives
+)
 item(tt(~), tt(^))(
 the ability to exclude patterns from matching when the tt(EXTENDED_GLOB)
 option is set
