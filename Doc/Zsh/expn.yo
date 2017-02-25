@@ -955,15 +955,25 @@ This is distinct from em(field splitting) by the tt(f), tt(s)
 or tt(z) flags, which still applies within each array element.
 )
 item(tt(A))(
-Assign as an array parameter with `tt(${)...tt(=)...tt(})',
+Convert the substitution into an array expression, even if it otherwise
+would be scalar.  This has lower precedence than subscripting, so one
+level of nested expansion is required in order that subscripts apply
+to array elements.  Thus tt(${${LPAR()A)tt(RPAR())var(name)tt(}[1]})
+yields the full value of var(name) when var(name) is scalar.
+
+This assigns an array parameter with `tt(${)...tt(=)...tt(})',
 `tt(${)...tt(:=)...tt(})' or `tt(${)...tt(::=)...tt(})'.
-If this flag is repeated (as in `tt(AA)'), assign an associative
+If this flag is repeated (as in `tt(AA)'), assigns an associative
 array parameter.  Assignment is made before sorting or padding;
 if field splitting is active, the var(word) part is split before
 assignment.  The var(name) part may be a subscripted range for
 ordinary arrays; when assigning an associative array, the var(word)
 part em(must) be converted to an array, for example by using
 `tt(${(AA)=)var(name)tt(=)...tt(})' to activate field splitting.
+
+Surrounding context such as additional nesting or use of the value
+in a scalar assignment may cause the array to be joined back into
+a single string again.
 )
 item(tt(a))(
 Sort in array index order; when combined with `tt(O)' sort in reverse

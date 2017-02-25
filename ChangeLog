@@ -1,3 +1,9 @@
+2017-02-25  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40640 (plus doc typo fixed): Doc/Zsh/expn.yo, Src/subst.c: the
+	(A) parameter flag forces array result even if assignment syntax
+	is not used
+
 2017-02-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Completion/Zsh/Context/_brace_parameter: Port 40617

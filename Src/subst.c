@@ -2902,6 +2902,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    } else
 			setaparam(idbeg, a);
 		    isarr = 1;
+		    arrasg = 0;
 		} else {
 		    untokenize(val);
 		    setsparam(idbeg, ztrdup(val));
@@ -3783,6 +3784,16 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
     if ((ms_flags & MULTSUB_WS_AT_END) && *fstr) {
 	insertlinknode(l, n, dupstring(fstr)); /* appended, no incnode */
 	*fstr = '\0';
+    }
+    if (arrasg && !isarr) {
+	/*
+	 * Caller requested this be forced to an array even if scalar.
+	 * Any point in distinguishing arrasg == 2 (assoc array) here?
+	 */
+	l->list.flags |= LF_ARRAY;
+	aval = hmkarray(val);
+	isarr = 1;
+	DPUTS(!val, "value is NULL in paramsubst, empty array");
     }
     if (isarr) {
 	char *x;
