@@ -141,7 +141,7 @@ if [[ $PREFIX = *'${('[^\)]# ]]; then
   flags+=(
     "#:evaluate as numeric expression"
     "@:double-quoted splitting of scalars"
-    "A:create array parameter"
+    "A:assign as an array parameter"
     "a:sort in array index order (with O to reverse)"
     "b:backslash quote pattern characters only"
     "c:count characters in an array (with \${(c)#...})"
