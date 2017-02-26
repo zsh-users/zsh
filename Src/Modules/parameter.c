@@ -937,7 +937,7 @@ unsetpmoption(Param pm, UNUSED(int exp))
 
 /**/
 static void
-setpmoptions(Param pm, HashTable ht)
+setpmoptions(UNUSED(Param pm), HashTable ht)
 {
     int i;
     HashNode hn;
@@ -962,7 +962,7 @@ setpmoptions(Param pm, HashTable ht)
 			      (val && strcmp(val, "off")), 0, opts))
 		zwarn("can't change option: %s", hn->nam);
 	}
-    hashsetfn(pm, ht);
+    deleteparamtable(ht);
 }
 
 static const struct gsu_scalar pmoption_gsu =
