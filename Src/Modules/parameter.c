@@ -167,7 +167,7 @@ unsetpmcommand(Param pm, UNUSED(int exp))
 
 /**/
 static void
-setpmcommands(UNUSED(Param pm), HashTable ht)
+setpmcommands(Param pm, HashTable ht)
 {
     int i;
     HashNode hn;
@@ -190,7 +190,15 @@ setpmcommands(UNUSED(Param pm), HashTable ht)
 
 	    cmdnamtab->addnode(cmdnamtab, ztrdup(hn->nam), &cn->node);
 	}
-    deleteparamtable(ht);
+    /*
+     * On full-array assignment ht is a temporary hash with the default
+     * get/set functions, whereas pm->u.hash has the special $commands
+     * get/set functions.  Do not assign ht to pm, just delete it.
+     *
+     * On append, ht and pm->u.hash are the same table, don't delete.
+     */
+    if (ht != pm->u.hash)
+	deleteparamtable(ht);
 }
 
 static const struct gsu_scalar pmcommand_gsu =
@@ -349,7 +357,9 @@ setfunctions(Param pm, HashTable ht, int dis)
 
 	    setfunction(hn->nam, ztrdup(getstrvalue(&v)), dis);
 	}
-    hashsetfn(pm, ht);
+    /* See setpmcommands() above */
+    if (ht != pm->u.hash)
+	deleteparamtable(ht);
 }
 
 /**/
@@ -937,7 +947,7 @@ unsetpmoption(Param pm, UNUSED(int exp))
 
 /**/
 static void
-setpmoptions(UNUSED(Param pm), HashTable ht)
+setpmoptions(Param pm, HashTable ht)
 {
     int i;
     HashNode hn;
@@ -962,7 +972,9 @@ setpmoptions(UNUSED(Param pm), HashTable ht)
 			      (val && strcmp(val, "off")), 0, opts))
 		zwarn("can't change option: %s", hn->nam);
 	}
-    deleteparamtable(ht);
+    /* See setpmcommands() above */
+    if (ht != pm->u.hash)
+	deleteparamtable(ht);
 }
 
 static const struct gsu_scalar pmoption_gsu =
@@ -1501,7 +1513,7 @@ unsetpmnameddir(Param pm, UNUSED(int exp))
 
 /**/
 static void
-setpmnameddirs(UNUSED(Param pm), HashTable ht)
+setpmnameddirs(Param pm, HashTable ht)
 {
     int i;
     HashNode hn, next, hd;
@@ -1543,7 +1555,9 @@ setpmnameddirs(UNUSED(Param pm), HashTable ht)
 
     i = opts[INTERACTIVE];
     opts[INTERACTIVE] = 0;
-    deleteparamtable(ht);
+    /* See setpmcommands() above */
+    if (ht != pm->u.hash)
+	deleteparamtable(ht);
     opts[INTERACTIVE] = i;
 }
 
@@ -1724,7 +1738,7 @@ unsetpmsalias(Param pm, UNUSED(int exp))
 
 /**/
 static void
-setaliases(HashTable alht, UNUSED(Param pm), HashTable ht, int flags)
+setaliases(HashTable alht, Param pm, HashTable ht, int flags)
 {
     int i;
     HashNode hn, next, hd;
@@ -1760,7 +1774,9 @@ setaliases(HashTable alht, UNUSED(Param pm), HashTable ht, int flags)
 		alht->addnode(alht, ztrdup(hn->nam),
 			      createaliasnode(ztrdup(val), flags));
 	}
-    deleteparamtable(ht);
+    /* See setpmcommands() above */
+    if (ht != pm->u.hash)
+	deleteparamtable(ht);
 }
 
 /**/

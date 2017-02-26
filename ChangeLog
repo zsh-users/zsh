@@ -1,3 +1,8 @@
+2017-02-26  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40650: Src/Modules/parameter.c: redo 40508 and 40626 with
+	comments explaining what is actually going on
+
 2017-02-25  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 40644: Src/Modules/parameter.c, Test/V06parameter.ztst:
