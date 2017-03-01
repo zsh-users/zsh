@@ -840,7 +840,7 @@ point numbers are not permitted.
 )
 findex(functions)
 xitem(tt(functions) [ {tt(PLUS())|tt(-)}tt(UkmtTuWz) ] [ tt(-x) var(num) ] [ var(name) ... ])
-xitem(tt(functions -M) var(mathfn) [ var(min) [ var(max) [ var(shellfn) ] ] ])
+xitem(tt(functions -M) [tt(-s)] var(mathfn) [ var(min) [ var(max) [ var(shellfn) ] ] ])
 xitem(tt(functions -M) [ tt(-m) var(pattern) ... ])
 item(tt(functions +M) [ tt(-m) ] var(mathfn) ... )(
 Equivalent to tt(typeset -f), with the exception of the tt(-x),
@@ -882,6 +882,13 @@ The result of the last arithmetical expression evaluated
 inside the shell function (even if it is a form that normally only returns
 a status) gives the result of the mathematical function.
 
+If the additional option tt(-s) is given to tt(functions -M), the
+argument to the function is a single string: anything between the
+opening and matching closing parenthesis is passed to the function as a
+single argument, even if it includes commas or white space.  The minimum
+and maximum argument specifiers must therefore be 1 if given.  An empty
+argument list is passed as a zero-length string.
+
 tt(functions -M) with no arguments lists all such user-defined functions in
 the same form as a definition.  With the additional option tt(-m) and
 a list of arguments, all functions whose var(mathfn) matches one of
@@ -898,6 +905,13 @@ For example, the following prints the cube of 3:
 example(zmath_cube+LPAR()RPAR() { (( $1 * $1 * $1 )) }
 functions -M cube 1 1 zmath_cube
 print $(( cube+LPAR()3+RPAR() )))
+
+The following string function takes a single argument, including
+the commas, so prints 11:
+
+example(stringfn+LPAR()RPAR() { (( $#1 )) }
+functions -Ms stringfn
+print $(( stringfn+LPAR()foo,bar,rod+RPAR() )))
 )
 module(getcap)(zsh/cap)
 findex(getln)

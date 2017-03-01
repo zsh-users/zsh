@@ -1,5 +1,9 @@
 2017-03-01  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 40622 (typos fixed): Doc/Zsh/builtins.yo, Src/builtin.c,
+	Src/math.c, Test/C04funcdef.ztst: add functions -Ms for
+	mathematical functions with string arguments.
+
 	* Sebastian: 40562: Test/V11db_gdbm.ztst: this was missed out of
 	the previous commit.
 

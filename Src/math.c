@@ -974,7 +974,7 @@ callmathfunc(char *o)
     a[strlen(a) - 1] = '\0';
 
     if ((f = getmathfunc(n, 1))) {
-	if (f->flags & MFF_STR) {
+	if ((f->flags & (MFF_STR|MFF_USERFUNC)) == MFF_STR) {
 	    return f->sfunc(n, a, f->funcid);
 	} else {
 	    int argc = 0;
@@ -987,22 +987,34 @@ callmathfunc(char *o)
 		addlinknode(l, n);
 	    }
 
-	    while (iblank(*a))
-		a++;
+	    if (f->flags & MFF_STR) {
+		if (!*a) {
+		    addlinknode(l, dupstring(""));
+		    argc++;
+		}
+	    } else {
+		while (iblank(*a))
+		    a++;
+	    }
 	    while (*a) {
 		if (*a) {
 		    argc++;
 		    if (f->flags & MFF_USERFUNC) {
 			/* need to pass strings */
 			char *str;
-			marg = mathevall(a, MPREC_ARG, &a);
-			if (marg.type & MN_FLOAT) {
-			    /* convfloat is off the heap */
-			    str = convfloat(marg.u.d, 0, 0, NULL);
+			if (f->flags & MFF_STR) {
+			    str = dupstring(a);
+			    a = "";
 			} else {
-			    char buf[BDIGBUFSIZE];
-			    convbase(buf, marg.u.l, 10);
-			    str = dupstring(buf);
+			    marg = mathevall(a, MPREC_ARG, &a);
+			    if (marg.type & MN_FLOAT) {
+				/* convfloat is off the heap */
+				str = convfloat(marg.u.d, 0, 0, NULL);
+			    } else {
+				char buf[BDIGBUFSIZE];
+				convbase(buf, marg.u.l, 10);
+				str = dupstring(buf);
+			    }
 			}
 			addlinknode(l, str);
 		    } else {

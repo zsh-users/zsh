@@ -102,6 +102,24 @@
 >4
 >5
 
+  strmathfunc() {
+    if [[ $0 = stralpha ]]; then
+       set -- ${1//[^[:alpha:]]}
+    fi
+    (( $#1 ))
+  }
+  functions -Ms strlen 1 1 strmathfunc
+  functions -Ms stralpha 1 1 strmathfunc
+  print $(( strlen(this, is, a, raw, string) ))
+  print $(( strlen() ))
+  print $(( stralpha(this, is, a, raw, string) ))
+  print $(( stralpha() ))
+0:User-defined math functions, string arguments
+>24
+>0
+>16
+>0
+
   command_not_found_handler() {
     print "Great News!  I've handled the command:"
     print "$1"
