@@ -80,59 +80,60 @@
 >testdata
 
  ztie -r -d db/gdbm -f $dbfile dbase
- print -rl -- "${(kv)dbase[@]}"
+ local -a result=( "${(kv)dbase[@]}" )
+ print -rl -- "${(o)result[@]}"
  zuntie -u dbase
-0:scan read-only tied hash
->testkey
+0:scan read-only tied hash, directly assign local -a
 >testdata
->testkey3
 >testdataxtestdata
+>testkey
+>testkey3
 
  ztie -d db/gdbm -f $dbfile dbase
- local -a arr
- arr=( "${(kv)dbase[@]}" )
- print -rl -- "${arr[@]}"
+ dbase=( a a )
+ print -rl -- "${(kv)dbase[@]}"
  zuntie dbase
-0:different scan, also read-write mode
->testkey
->testdata
->testkey3
->testdataxtestdata
+0:Use scan directly, read-write mode
+>a
+>a
 
  ztie -d db/gdbm -f $dbfile dbase
  dbase=( a b c d )
  zuntie dbase
  ztie -d db/gdbm -f $dbfile dbase
- print -rl -- "${(kv)dbase[@]}"
+ result=( "${(kv)dbase[@]}" )
+ print -rl -- "${(o)result[@]}"
  zuntie dbase
 0:replace hash / database, scan
->c
->d
 >a
 >b
+>c
+>d
 
  ztie -d db/gdbm -f $dbfile dbase
  local -a arr
  arr=( "${dbase[@]}" )
- print -rl -- "${arr[@]}"
+ print -rl -- "${(o)arr[@]}"
  zuntie dbase
 0:scan with no (kv)
->d
 >b
+>d
 
  ztie -d db/gdbm -f $dbfile dbase
- print -rl -- "${(k)dbase[@]}"
+ result=( "${(k)dbase[@]}" )
+ print -rl -- "${(o)result[@]}"
  zuntie dbase
 0:scan with keys only (k)
->c
 >a
+>c
 
  ztie -d db/gdbm -f $dbfile dbase
- print -rl -- "${(v)dbase[@]}"
+ result=( "${(v)dbase[@]}" )
+ print -rl -- "${(o)result[@]}"
  zuntie dbase
 0:scan with keys only explicit (v)
->d
 >b
+>d
 
  rm -f $dbfile
  ztie -r -d db/gdbm -f $dbfile dbase 2>/dev/null
@@ -144,18 +145,21 @@
  zuntie dbase
  ztie -r -d db/gdbm -f $dbfile dbase
  echo $dbase[a]
- print -rl -- "${(kv)dbase[@]}"
+ result=( "${(kv)dbase[@]}" )
+ print -rl -- "${(o)result[@]}"
  zuntie -u dbase
  ztie -d db/gdbm -f $dbfile dbase
  dbase+=( c d )
  echo $dbase[a]
  echo $dbase[c]
- print -rl -- "${(kv)dbase[@]}"
+ result=( "${(kv)dbase[@]}" )
+ print -rl -- "${(o)result[@]}"
  zuntie dbase
  ztie -r -d db/gdbm -f $dbfile dbase
  echo $dbase[a]
  echo $dbase[c]
- print -rl -- "${(kv)dbase[@]}"
+ result=( "${(kv)dbase[@]}" )
+ print -rl -- "${(o)result[@]}"
  zuntie -u dbase
 0:Append with +=( ), also with existing data, also (kv) scan
 >b
@@ -164,16 +168,16 @@
 >b
 >b
 >d
+>a
+>b
 >c
+>d
+>b
 >d
 >a
 >b
->b
->d
 >c
 >d
->a
->b
 
  ztie -d db/gdbm -f $dbfile dbase
  echo ${(t)dbase}
@@ -291,6 +295,13 @@
 >漢字
 
  ztie -d db/gdbm -f $dbfile dbase
+ noglob print -rl ${(okv)dbase[@]}
+ zuntie dbase
+0:Sorted hash scanning and metafication
+>漢字
+>漢字
+
+ ztie -d db/gdbm -f $dbfile dbase
  zgdbmpath dbase
  [[ $REPLY = */Test/db.gdbm ]] && echo correct
  zuntie dbase
@@ -301,6 +312,13 @@
 0:zgdbmpath builtin
 >correct
 >correct
+
+ ztie -d db/gdbm -f $dbfile dbase
+ fun() { while read line; do echo $line; done }
+ eval "dbase[testkey]=value1" | fun
+ echo $dbase[testkey]
+0:Test store in forked Zsh
+>value1
 
 %clean
 

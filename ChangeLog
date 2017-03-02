@@ -1,5 +1,8 @@
 2017-03-07  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Sebastian: 40706: Test/V11db_gdbm.ztst: Fix ordering
+	dependence in gdbm test.
+
 	* 40760: Src/cond.c, Src/exec.c, Src/glob.c, Src/lex.c,
 	Src/math.c, Src/parse.c, Src/pattern.c, Src/subst.c,
 	Src/utils.c, Src/zsh.h, Test/D02glob.ztst: Always tokenise '-'
