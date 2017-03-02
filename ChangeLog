@@ -1,3 +1,8 @@
+2017-03-02  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 40681: Src/Modules/datetime.c: strftime builtin should
+	return 1 if zstrftime() returns -1.
+
 2017-03-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40622 (typos fixed): Doc/Zsh/builtins.yo, Src/builtin.c,

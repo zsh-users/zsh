@@ -133,11 +133,15 @@ output_strftime(char *nam, char **argv, Options ops, UNUSED(int func))
 
     len = 0;
     for (x=0; x < 4; x++) {
-        if ((len = ztrftime(buffer, bufsize, argv[0], t, 0L)) >= 0)
+        if ((len = ztrftime(buffer, bufsize, argv[0], t, 0L)) >= 0 || x==3)
 	    break;
 	buffer = zrealloc(buffer, bufsize *= 2);
     }
-    DPUTS(len < 0, "bad output from ztrftime");
+    if (len < 0) {
+	zwarnnam(nam, "bad/unsupported format: '%s'", argv[0]);
+	zfree(buffer, bufsize);
+	return 1;
+    }
 
     if (scalar) {
 	setsparam(scalar, metafy(buffer, len, META_DUP));
