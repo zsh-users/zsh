@@ -354,6 +354,7 @@ _git-branch () {
     {-q,--quiet}"[be more quiet]" \
     '*--sort=[specify field to sort on]: :__git_ref_sort_keys' \
     '--points-at=[only list tags of the given object]: :__git_commits' \
+    "($c $m $d $e -i --ignore-case)"{-i,--ignore-case}'[sorting and filtering are case-insensitive]' \
     $dependent_deletion_args
 }
 
@@ -685,7 +686,7 @@ _git-commit () {
     '(--reset-author)--author[override the author name used in the commit]:author name' \
     '--date=[override the author date used in the commit]:date' \
     '(-s --signoff)'{-s,--signoff}'[add Signed-off-by line at the end of the commit message]' \
-    '(-n --no-verify)'{-n,--no-verify}'[do not look for suspicious lines the commit introduces]' \
+    '(-n --no-verify)'{-n,--no-verify}'[bypass pre-commit and commit-msg hooks]' \
     '--allow-empty[allow recording an empty commit]' \
     '--allow-empty-message[allow recording a commit with an empty message]' \
     '--cleanup=[specify how the commit message should be cleaned up]:mode:((verbatim\:"do not change the commit message at all"
@@ -962,6 +963,8 @@ _git-grep () {
     '(--cached)--no-index[search files in current directory, not just tracked files]' \
     '(--exclude-standard)--no-exclude-standard[search also in ignored files]' \
     '(--no-exclude-standard)--exclude-standard[exclude files standard ignore mechanisms]' \
+    '--recurse-submodules[recursively search in each submodule]' \
+    "--parent-basename=[prepend parent project's basename to output]:basename" \
     '--untracked[search also in untracked files]' \
     '(-a --text)'{-a,--text}'[process binary files as if they were text]' \
     '(--textconv --no-textconv)--textconv[honor textconv filter settings]' \
@@ -998,7 +1001,7 @@ _git-grep () {
     '(1)*-e+[use the given pattern for matching]:pattern' \
     $pattern_operators \
     '--all-match[all patterns must match]' \
-    ':pattern' \
+    ': :_guard "^-*" pattern' \
     '*:: :->tree-or-file' && ret=0
 
   # TODO: If --cached, --no-index, -O, or --open-files-in-pager was given,
@@ -1172,6 +1175,7 @@ _git-merge () {
     '(                    --no-rerere-autoupdate)--rerere-autoupdate[allow the rerere mechanism to update the index]' \
     '(--rerere-autoupdate                       )--no-rerere-autoupdate[do not allow the rerere mechanism to update the index]' \
     '--abort[restore the original branch and abort the merge operation]' \
+    '--continue[continue the current in-progress merge]' \
     '--progress[force progress reporting]' \
     '*: : __git_commits -O expl:git_commit_opts'
 }
@@ -1352,6 +1356,7 @@ _git-push () {
     '--recurse-submodules=[submodule handling]:submodule handling:((
         check\:"refuse to push if submodule commit not to be found on remote"
         on-demand\:"push all changed submodules"
+	only\:"submodules will be recursively pushed while the superproject is left unpushed"
 	no\:"no submodule handling"))' \
     "(--no-signed --signed)--sign=-[GPG sign the push]::signing enabled:(($^^sign))" \
     '(--no-signed --sign)--signed[GPG sign the push]' \
@@ -1393,6 +1398,7 @@ _git-rebase () {
     '(-)--abort[abort current rebase]' \
     '(-)--edit-todo[edit interactive instruction sheet in an editor]' \
     '(-)--skip[skip the current patch]' \
+    '(-)--quit[abort but keep HEAD where it is]' \
     - options \
     '(-m --merge)'{-m,--merge}'[use merging strategies to rebase]' \
     '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=-}'[GPG-sign the commit]::key id' \
@@ -1726,6 +1732,7 @@ _git-submodule () {
         update:'update a submodule'
         summary:'show commit summary between given commit and working tree/index'
         foreach:'evaluate shell command in each checked-out submodule'
+	absorbgitdirs:'move the git directory of a submodule into its superprojects'
         sync:'synchronize submodule settings')
 
       _describe -t commands command commands && ret=0
@@ -1814,8 +1821,13 @@ _git-submodule () {
             '(-q --quiet)'{-q,--quiet}'[suppress all output]' \
             '*: :__git_ignore_line_inside_arguments __git_submodules' && ret=0
           ;;
+	(absorbgitdirs)
+	  _arguments -S \
+            '(-q --quiet)'{-q,--quiet}'[suppress all output]' \
+	    '*:path:_directories'
+	;;
         (*)
-          _nothing
+          _default
           ;;
       esac
       ;;
@@ -1950,8 +1962,9 @@ _git-tag () {
       '--sort=[specify how the tags should be sorted]:mode:((refname\:"lexicographic order"
                                                              version\\\:refname\:"tag names are treated as version numbers"))' \
       '--points-at=[only list tags of the given object]: :__git_commits' \
-      '--format=[specify format to use for the output]' \
-      '::pattern' \
+      '--format=[specify format to use for the output]:format' \
+      '(-i --ignore-case)'{-i,--ignore-case}'[sorting and filtering are case-insensitive]' \
+      ':: :_guard "^-*" pattern' \
     - verification \
       '(-v --verify)'{-v,--verify}'[verify gpg signutare of tags]' \
       '*:: :__git_ignore_line_inside_arguments __git_tags'
@@ -3658,7 +3671,6 @@ _git-blame () {
     '-s[suppress author name and timestamp]' \
     '-w[ignore whitespace when finding lines]' \
     '--indent-heuristic[use indent-based heuristic to improve diffs]' \
-    '--compaction-heuristic[use blank-line-based heuristic to improve diffs]' \
     $revision_options \
     ':: :__git_revisions' \
     ': :__git_cached_files' && ret=0
@@ -3711,7 +3723,8 @@ _git-difftool () {
     '--tool-help[print a list of diff tools that may be used with --tool]' \
     '(--symlinks)--no-symlinks[make copies of instead of symlinks to the working tree]' \
     '(---no-symlinks)--symlinks[make symlinks to instead of copies of the working tree]' \
-    '(-g --gui)'{-g,--gui}'[use diff.guitool instead of diff.tool]'
+    '(-g --gui)'{-g,--gui}'[use diff.guitool instead of diff.tool]' \
+    '--trust-exit-code[make git-difftool exit when diff tool returns a non-zero exit code]'
 }
 
 (( $+functions[_git-fsck] )) ||
@@ -3946,6 +3959,7 @@ _git-verify-tag () {
   _arguments -S -s \
     '(-v --verbose)'{-v,--verbose}'[print contents of the tag object before validating it]' \
     '--raw[print raw gpg status output]' \
+    '--format=[specify format to use for the output]:format' \
     '*: :__git_tags'
 }
 
@@ -4873,6 +4887,7 @@ _git-for-each-ref () {
     '*--merged=[print only refs that are merged]:object:__git_commits' \
     '*--no-merged=[print only refs that are not merged]:object:__git_commits' \
     '*--contains=[print only refs which contain the commit]:object:__git_commits' \
+    '--ignore-case[sorting and filtering are case-insensitive]' \
     '(-s --shell -p --perl --python --tcl)'{-s,--shell}'[use string literals suitable for sh]' \
     '(-s --shell -p --perl --python --tcl)'{-p,--perl}'[use string literals suitable for Perl]' \
     '(-s --shell -p --perl          --tcl)'--python'[use string literals suitable for Python]' \
@@ -6862,7 +6877,8 @@ __git_setup_diff_options () {
     $diff_types'--name-only[show only names of changed files]'
     $diff_types'--name-status[show only names and status of changed files]'
     '--submodule=-[select output format for submodule differences]::format:((short\:"show pairs of commit names"
-                                                                            log\:"list commits like git submodule does"))'
+									     log\:"list commits like git submodule does"
+									     diff\:"show differences"))'
     '(        --no-color --color-words)--color=-[show colored diff]:: :__git_color_whens'
     '(--color            --color-words)--no-color[turn off colored diff]'
     '--word-diff=-[show word diff]::mode:((color\:"highlight changed words using color"
