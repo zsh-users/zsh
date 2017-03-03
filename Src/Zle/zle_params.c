@@ -85,6 +85,8 @@ static const struct gsu_integer cursor_gsu =
 { get_cursor, set_cursor, zleunsetfn };
 static const struct gsu_integer histno_gsu =
 { get_histno, set_histno, zleunsetfn };
+static const struct gsu_integer keys_queued_count_gsu =
+{ get_keys_queued_count, NULL, zleunsetfn };
 static const struct gsu_integer mark_gsu =
 { get_mark, set_mark, zleunsetfn };
 static const struct gsu_integer numeric_gsu =
@@ -146,6 +148,8 @@ static struct zleparam {
     { "HISTNO", PM_INTEGER, GSU(histno_gsu), NULL },
     { "KEYMAP", PM_SCALAR | PM_READONLY, GSU(keymap_gsu), NULL },
     { "KEYS", PM_SCALAR | PM_READONLY, GSU(keys_gsu), NULL },
+    { "KEYS_QUEUED_COUNT", PM_INTEGER | PM_READONLY, GSU(keys_queued_count_gsu),
+      NULL},
     { "killring", PM_ARRAY, GSU(killring_gsu), NULL },
     { "LASTABORTEDSEARCH", PM_SCALAR | PM_READONLY, GSU(lastabortedsearch_gsu),
       NULL },
@@ -455,6 +459,13 @@ static char *
 get_keys(UNUSED(Param pm))
 {
     return keybuf;
+}
+
+/**/
+static zlong
+get_keys_queued_count(UNUSED(Param pm))
+{
+    return kungetct;
 }
 
 /**/
