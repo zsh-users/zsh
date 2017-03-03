@@ -1,5 +1,8 @@
 2017-03-03  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 40173: Test/V11db_gdbm.ztst: don't report an error if gdbm
+	module doesn't load as this simply causes the test to be skipped.
+
 	* 40702: Doc/Zsh/zle.yo, Src/Zle/zle_params.c: add
 	KEYS_QUEUED_COUNT variable to ZLE parameters.
 

@@ -4,7 +4,7 @@
 
  modname="zsh/db/gdbm"
  dbfile=db.gdbm
- if ! zmodload $modname ; then
+ if ! zmodload $modname 2>/dev/null; then
    ZTST_unimplemented="can't load $modname module for testing"
  fi
  rm -f db.gdbm
