@@ -1,6 +1,12 @@
+2017-03-04  Oliver Kiddle  <opk@zsh.org>
+
+	* 40597: Completion/BSD/Command/_sysrc,
+	Completion/Base/Utility/_values: be flexible about order of
+	options to _values
+
 2017-03-03  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* Sebastain: 40170: Src/Modules/curses.c: Fix up error number
+	* Sebastian: 40170: Src/Modules/curses.c: Fix up error number
 	resetting in curses module.  This appears to resolve an issue
 	mentioned in comments but attributed elsewhere, so remove
 	confusion here.

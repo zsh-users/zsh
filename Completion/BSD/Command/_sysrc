@@ -76,9 +76,9 @@ _sysrc() {
 
       if (( $#rc_conf_vars )); then
         if [[ $opt == N ]]; then
-          _values -w -C variable ${^rc_conf_vars%%\[*}'::value' && ret=0
+          _values -w variable ${^rc_conf_vars%%\[*}'::value' && ret=0
         else
-          _values -w -C variable ${^rc_conf_vars}'::value' && ret=0
+          _values -w variable ${^rc_conf_vars}'::value' && ret=0
         fi
       fi
     fi

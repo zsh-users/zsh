@@ -1,13 +1,14 @@
 #autoload
 
-local subopts opt usecc garbage
+local subopts opt usecc garbage keep
 
 subopts=()
-zparseopts -D -a garbage C=usecc O:=subopts M: J: V: 1 2 n F: X:
+zparseopts -D -a garbage s+:=keep S+:=keep w+=keep C=usecc O:=subopts \
+    M: J: V: 1 2 n F: X:
 
 (( $#subopts )) && subopts=( "${(@P)subopts[2]}" )
 
-if compvalues -i "$@"; then
+if compvalues -i "$keep[@]" "$@"; then
 
   local noargs args opts descr action expl sep argsep subc test='*'
   local oldcontext="$curcontext"
