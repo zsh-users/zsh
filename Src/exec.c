@@ -3996,6 +3996,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	 * classify as a builtin) we treat all errors as fatal.
 	 * The "command" builtin is not special so resets this behaviour.
 	 */
+	forked |= zsh_subshell;
     fatal:
 	if (redir_err || errflag) {
 	    if (!isset(INTERACTIVE)) {

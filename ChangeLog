@@ -1,3 +1,8 @@
+2017-03-04  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40654: Src/exec.c: exit cleanly from special POSIXBUILTINS in
+	subshells
+
 2017-03-04  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted (github): Christoffer Aasted:
