@@ -669,7 +669,7 @@ _tmux-select-layout() {
     '-o[revert to previous layout]' \
     '-p[behave like previous-layout]' \
     '-t+[specify a target window]:target window:__tmux-windows' \
-    ':layout:(even-horizontal even-vertical main-horizontal main-vertical)'
+    ':layout:(even-horizontal even-vertical main-horizontal main-vertical tiled)'
 }
 
 _tmux-select-pane() {

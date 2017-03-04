@@ -1,5 +1,7 @@
 2017-03-04  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_tmux: complete 'tiled' layout
+
 	* unposted: Completion/Unix/Command/_xz: fix argument to --format
 
 	* 40715: Completion/Unix/Command/_git: update for git 2.12.0
