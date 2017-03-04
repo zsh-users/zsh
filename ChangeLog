@@ -1,5 +1,8 @@
 2017-03-04  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* Sebastian: 40781: Src/params.c, Test/A06assign.ztst: optimize
+	array assignment, similar to 39995 for string assignment
+
 	* 40654: Src/exec.c: exit cleanly from special POSIXBUILTINS in
 	subshells
 

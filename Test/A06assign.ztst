@@ -133,6 +133,72 @@
 >1 2 42 43 44 5
 >1 2 42 100 99 5
 
+# (subsection: append to array)
+
+ array=( )
+ array[5,6]=( 1 2 3 )
+ print $array
+ print "${(q@)array}"
+0:Append to empty array by range
+>1 2 3
+>'' '' '' '' 1 2 3
+
+ array=( a )
+ array[5,6]=( 1 2 3 )
+ print $array
+ print "${(q@)array}"
+0:Append to 1-element array by range
+>a 1 2 3
+>a '' '' '' 1 2 3
+
+ array=( a b )
+ array[5,6]=( 1 2 3 )
+ print $array
+ print "${(q@)array}"
+0:Append to 2-element array by range
+>a b 1 2 3
+>a b '' '' 1 2 3
+
+ array=( a b )
+ array[5,5]=( 1 2 3 )
+ print $array
+ print "${(q@)array}"
+0:Append to 2-element array by [a,a] range
+>a b 1 2 3
+>a b '' '' 1 2 3
+
+ array=( a b c d )
+ array[5,6]=( 1 2 3 )
+ print $array
+ print "${(q@)array}"
+0:Append array by range, continuously
+>a b c d 1 2 3
+>a b c d 1 2 3
+
+ array=( a b c d )
+ array[5,5]=( 1 2 3 )
+ print $array
+ print "${(q@)array}"
+0:Append array by [a,a] range, continuously
+>a b c d 1 2 3
+>a b c d 1 2 3
+
+ array=( )
+ array+=( 1 2 3 )
+ print $array
+ print "${(q@)array}"
+0:Append empty array via +=
+>1 2 3
+>1 2 3
+
+ array=( a )
+ array+=( 1 2 3 )
+ print $array
+ print "${(q@)array}"
+0:Append 1-element array via +=
+>a 1 2 3
+>a 1 2 3
+
 # tests of var+=scalar
 
  s+=foo

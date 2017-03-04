@@ -2723,24 +2723,57 @@ setarrvalue(Value v, char **val)
 		*p++ = *r++;
 	    }
 	} else {
-	    p = new = (char **) zalloc(sizeof(char *)
-				       * (post_assignment_length + 1));
+            /* arr+=( ... )
+             * arr[${#arr}+x,...]=( ... ) */
+            if (post_assignment_length > pre_assignment_length &&
+                    pre_assignment_length <= v->start &&
+                    pre_assignment_length > 0 &&
+                    v->pm->gsu.a->setfn == arrsetfn)
+            {
+                p = new = (char **) zrealloc(old, sizeof(char *)
+                                           * (post_assignment_length + 1));
 
-	    for (i = 0; i < v->start; i++)
-		*p++ = i < pre_assignment_length ? ztrdup(*q++) : ztrdup("");
-	    for (r = val; *r;) {
-		/* Give away ownership of the string */
-		*p++ = *r++;
-	    }
-	    if (v->end < pre_assignment_length)
-		for (q = old + v->end; *q;)
-		    *p++ = ztrdup(*q++);
-	    *p = NULL;
+                p += pre_assignment_length; /* after old elements */
+
+                /* Consider 1 < 0, case for a=( 1 ); a[1,..] =
+                 *          1 < 1, case for a=( 1 ); a[2,..] = */
+                if (pre_assignment_length < v->start) {
+                    for (i = pre_assignment_length; i < v->start; i++) {
+                        *p++ = ztrdup("");
+                    }
+                }
+
+                for (r = val; *r;) {
+                    /* Give away ownership of the string */
+                    *p++ = *r++;
+                }
+
+                /* v->end doesn't matter:
+                 * a=( 1 2 ); a[4,100]=( a b ); echo "${(q@)a}"
+                 * 1 2 '' a b */
+                *p = NULL;
+
+                v->pm->u.arr = NULL;
+                v->pm->gsu.a->setfn(v->pm, new);
+            } else {
+                p = new = (char **) zalloc(sizeof(char *)
+                                           * (post_assignment_length + 1));
+                for (i = 0; i < v->start; i++)
+                    *p++ = i < pre_assignment_length ? ztrdup(*q++) : ztrdup("");
+                for (r = val; *r;) {
+                    /* Give away ownership of the string */
+                    *p++ = *r++;
+                }
+                if (v->end < pre_assignment_length)
+                    for (q = old + v->end; *q;)
+                        *p++ = ztrdup(*q++);
+                *p = NULL;
+
+                v->pm->gsu.a->setfn(v->pm, new);
+            }
 
 	    DPUTS2(p - new != post_assignment_length, "setarrvalue: wrong allocation: %d 1= %lu",
 		   post_assignment_length, (unsigned long)(p - new));
-
-	    v->pm->gsu.a->setfn(v->pm, new);
 	}
 
         /* Ownership of all strings has been
