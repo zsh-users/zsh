@@ -42,7 +42,7 @@ case "$service" in
     "${decomp}--no-sparse[do not create sparse files when decompressing]" \
     '(* --files --files0)--files=-[read list of files to process from file]::file:_files' \
     '(* --files --files0)--files0=-[read null terminated list of files to process from file]::file:_files' \
-    '(-F --format)'{-F,--format}'=[specify file format]:format;(auto xz lzma raw)' \
+    '(-F --format)'{-F,--format}'=[specify file format]:format:(auto xz lzma raw)' \
     '(-C --check)'{-C,--check}'=[integrity check type]:check type:(none crc32 crc64 sha256)' \
     '--memlimit-compress=[set memory usage limit for compression]:memory usage' \
     '--memlimit-decompress=[set memory usage limit for decompression]:memory usage' \
