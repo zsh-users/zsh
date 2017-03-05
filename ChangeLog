@@ -1,5 +1,8 @@
 2017-03-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 40745 + 40753: Src/init.c, Src/params.c: Fix 'unset
+	ZLE_RPROMPT_INDENT' not restoring the default behaviour.
+
 	* 40744: Doc/Zsh/grammar.yo: Document the SHORT_LOOPS 'function'
 	syntax.
 

@@ -128,6 +128,11 @@ struct timeval shtimer;
 /**/
 mod_export int termflags;
 
+/* Forward declaration */
+
+static void
+rprompt_indent_unsetfn(Param pm, int exp);
+
 /* Standard methods for get/set/unset pointers in parameters */
 
 /**/
@@ -241,6 +246,9 @@ static const struct gsu_integer argc_gsu =
 static const struct gsu_array pipestatus_gsu =
 { pipestatgetfn, pipestatsetfn, stdunsetfn };
 
+static const struct gsu_integer rprompt_indent_gsu =
+{ intvargetfn, zlevarsetfn, rprompt_indent_unsetfn };
+
 /* Nodes for special parameters for parameter hash table */
 
 #ifdef HAVE_UNION_INIT
@@ -327,7 +335,7 @@ IPDEF4("ZSH_SUBSHELL", &zsh_subshell),
 #define IPDEF5U(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
 IPDEF5("COLUMNS", &zterm_columns, zlevar_gsu),
 IPDEF5("LINES", &zterm_lines, zlevar_gsu),
-IPDEF5U("ZLE_RPROMPT_INDENT", &rprompt_indent, zlevar_gsu),
+IPDEF5U("ZLE_RPROMPT_INDENT", &rprompt_indent, rprompt_indent_gsu),
 IPDEF5("SHLVL", &shlvl, varinteger_gsu),
 
 /* Don't import internal integer status variables. */
@@ -3731,6 +3739,16 @@ zlevarsetfn(Param pm, zlong x)
     *p = x;
     if (p == &zterm_lines || p == &zterm_columns)
 	adjustwinsize(2 + (p == &zterm_columns));
+}
+
+
+/* Implements gsu_integer.unsetfn for ZLE_RPROMPT_INDENT; see stdunsetfn() */
+
+static void
+rprompt_indent_unsetfn(Param pm, int exp)
+{
+    stdunsetfn(pm, exp);
+    rprompt_indent = 1; /* Keep this in sync with init_term() */
 }
 
 /* Function to set value of generic special scalar    *

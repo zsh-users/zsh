@@ -790,7 +790,7 @@ init_term(void)
 	    tcstr[TCCLEARSCREEN] = ztrdup("\14");
 	    tclen[TCCLEARSCREEN] = 1;
 	}
-	rprompt_indent = 1;
+	rprompt_indent = 1; /* If you change this, update rprompt_indent_unsetfn() */
 	/* The following is an attempt at a heuristic,
 	 * but it fails in some cases */
 	/* rprompt_indent = ((hasam && !hasbw) || hasye || !tccan(TCLEFT)); */
