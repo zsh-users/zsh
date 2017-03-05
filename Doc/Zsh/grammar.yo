@@ -461,6 +461,9 @@ item(tt(select) var(name) [ tt(in) var(word) ... var(term) ] var(sublist))(
 where var(term) is at least one newline or tt(;).
 A short form of tt(select).
 )
+item(tt(function) var(word) ... [ tt(+LPAR()+RPAR()) ] [ var(term) ] var(sublist))(
+This is a short form of tt(function).
+)
 enditem()
 texinode(Reserved Words)(Errors)(Alternate Forms For Complex Commands)(Shell Grammar)
 sect(Reserved Words)

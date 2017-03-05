@@ -1,3 +1,8 @@
+2017-03-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 40744: Doc/Zsh/grammar.yo: Document the SHORT_LOOPS 'function'
+	syntax.
+
 2017-03-07  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Sebastian: 40706: Test/V11db_gdbm.ztst: Fix ordering
