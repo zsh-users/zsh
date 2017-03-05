@@ -27,7 +27,8 @@ xitem(tt(zcurses) tt(scroll) var(targetwin) [ tt(on) | tt(off) | [tt(+)|tt(-)]va
 xitem(tt(zcurses) tt(input) var(targetwin) [ var(param) [ var(kparam) [ var(mparam) ] ] ])
 xitem(tt(zcurses) tt(mouse) [ tt(delay) var(num) | [tt(+)|tt(-)]tt(motion) ])
 xitem(tt(zcurses) tt(timeout) var(targetwin) var(intval))
-item(tt(zcurses) tt(querychar) var(targetwin) [ var(param) ])(
+xitem(tt(zcurses) tt(querychar) var(targetwin) [ var(param) ])
+item(tt(zcurses) tt(resize) var(height) var(width) [ tt(endwin) | tt(nosave) | tt(endwin_nosave) ])(
 Manipulate curses windows.  All uses of this command should be
 bracketed by `tt(zcurses init)' to initialise use of curses, and
 `tt(zcurses end)' to end it; omitting `tt(zcurses end)' can cause
@@ -211,6 +212,21 @@ second is the color pair in the usual var(fg_col)tt(/)var(bg_col)
 notation, or tt(0) if color is not supported.  Any attributes other than
 color that apply to the character, as set with the subcommand tt(attr),
 appear as additional elements.
+
+The subcommand tt(resize) resizes tt(stdscr) and all windows to given
+dimensions (windows that stick out from the new dimensions are resized
+down). The underlying curses extension (tt(resize_term call)) can be
+unavailable. To verify, zeroes can be used for var(height) and
+var(width). If the result of the subcommand is tt(0), resize_term is
+available (tt(2) otherwise). Tests show that resizing can be normally
+accomplished by calling tt(zcurses end) and tt(zcurses refresh). The
+tt(resize) subcommand is provided for versatility. Multiple system
+configurations have been checked and tt(zcurses end) and tt(zcurses
+refresh) are still needed for correct terminal state after resize. To
+invoke them with tt(resize), use var(endwin) argument.  Using
+var(nosave) argument will cause new terminal state to not be saved
+internally by tt(zcurses). This is also provided for versatility and
+should normally be not needed.
 )
 enditem()
 

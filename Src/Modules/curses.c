@@ -1490,6 +1490,74 @@ zccmd_touch(const char *nam, char **args)
     return ret;
 }
 
+static int
+zccmd_resize(const char *nam, char **args)
+{
+#ifdef HAVE_RESIZE_TERM
+    int y, x, do_endwin=0, do_save=1;
+    LinkNode stdscr_win = zcurses_getwindowbyname("stdscr");
+
+    if (stdscr_win) {
+        y = atoi(args[0]);
+        x = atoi(args[1]);
+        if (args[2]) {
+            if (0 == strcmp(args[2], "endwin")) {
+                do_endwin=1;
+            } else if (0 == strcmp(args[2], "endwin_nosave")) {
+                do_endwin=1;
+                do_save=0;
+            } else if (0 == strcmp(args[2], "nosave")) {
+                do_save=0;
+            } else {
+                zwarnnam(nam, "`resize' expects `endwin', `nosave' or `endwin_nosave' for third argument, if given");
+            }
+        }
+
+        if (y == 0 && x == 0 && args[2] == NULL) {
+            // Special case to just test that curses has resize_term. #ifdef
+            // HAVE_RESIZE_TERM will result in return value 2 if resize_term
+            // is not available.
+            return 0;
+        } else {
+            // Without this call some window moves are innacurate. Tested on
+            // OS X ncurses 5.4, Homebrew ncursesw 6.0-2, Arch Linux ncursesw
+            // 6.0, Ubuntu 14.04 ncurses 5.9, FreeBSD ncursesw.so.8
+            //
+            // On the other hand, the whole resize goal can be (from tests)
+            // accomplished by calling endwin and refresh. But to secure any
+            // future problems, resize_term is provided, and it is featured
+            // with endwin, so that users have multiple options.
+            if (do_endwin) {
+                endwin();
+            }
+
+            if( resize_term( y, x ) == OK ) {
+                // Things work without this, but we need to get out from
+                // endwin (i.e. call refresh), and in theory store new
+                // curses state (the resize might have changed it), which
+                // should be presented to terminal only after refresh.
+                if (do_endwin || do_save) {
+                    ZCWin w;
+                    w = (ZCWin)getdata(stdscr_win);
+                    wnoutrefresh(w->win);
+                    doupdate();
+                }
+
+                if (do_save) {
+                    gettyinfo(&curses_tty_state);
+                }
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+    } else {
+        return 1;
+    }
+#else
+    return 2;
+#endif
+}
 
 /*********************
   Main builtin handler
@@ -1523,6 +1591,7 @@ bin_zcurses(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	{"mouse", zccmd_mouse, 0, -1},
 	{"querychar", zccmd_querychar, 1, 2},
 	{"touch", zccmd_touch, 1, -1},
+	{"resize", zccmd_resize, 2, 3},
 	{NULL, (zccmd_t)0, 0, 0}
     };
 

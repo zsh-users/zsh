@@ -1,3 +1,8 @@
+2017-03-05  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Sebastian: 40726: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c,
+	configure.ac: add "zcurses resize" for sane terminal size change
+
 2017-03-04  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Sebastian: 40781: Src/params.c, Test/A06assign.ztst: optimize

@@ -1309,7 +1309,7 @@ AC_CHECK_FUNCS(strftime strptime mktime timelocal \
 	       putenv getenv setenv unsetenv xw\
 	       brk sbrk \
 	       pathconf sysconf \
-	       tgetent tigetflag tigetnum tigetstr setupterm initscr \
+	       tgetent tigetflag tigetnum tigetstr setupterm initscr resize_term \
 	       getcchar setcchar waddwstr wget_wch win_wch use_default_colors \
 	       pcre_compile pcre_study pcre_exec \
 	       nl_langinfo \
