@@ -1314,6 +1314,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 		    sense ^= 1;
 		    break;
 		case '-':
+		case Dash:
 		    /* Toggle matching of symbolic links */
 		    sense ^= 2;
 		    break;
@@ -1608,7 +1609,7 @@ zglob(LinkList list, LinkNode np, int nountok)
 			    ++s;
 		    }
 		    /* See if it's greater than, equal to, or less than */
-		    if ((g_range = *s == '+' ? 1 : *s == '-' ? -1 : 0))
+		    if ((g_range = *s == '+' ? 1 : IS_DASH(*s) ? -1 : 0))
 			++s;
 		    data = qgetnum(&s);
 		    break;
@@ -2025,13 +2026,13 @@ hasbraces(char *str)
 		if (bracechardots(str-1, NULL, NULL))
 		    return 1;
 		lbr = str - 1;
-		if (*str == '-')
+		if (IS_DASH(*str))
 		    str++;
 		while (idigit(*str))
 		    str++;
 		if (*str == '.' && str[1] == '.') {
 		    str++; str++;
-		    if (*str == '-')
+		    if (IS_DASH(*str))
 			str++;
 		    while (idigit(*str))
 			str++;
@@ -2040,7 +2041,7 @@ hasbraces(char *str)
 			return 1;
 		    else if (*str == '.' && str[1] == '.') {
 			str++; str++;
-			if (*str == '-')
+			if (IS_DASH(*str))
 			    str++;
 			while (idigit(*str))
 			    str++;
@@ -2123,7 +2124,7 @@ xpandredir(struct redir *fn, LinkList redirtab)
 	fn->name = s;
 	untokenize(s);
 	if (fn->type == REDIR_MERGEIN || fn->type == REDIR_MERGEOUT) {
-	    if (s[0] == '-' && !s[1])
+	    if (IS_DASH(s[0]) && !s[1])
 		fn->type = REDIR_CLOSE;
 	    else if (s[0] == 'p' && !s[1])
 		fn->fd2 = -2;
@@ -2329,12 +2330,14 @@ xpandbraces(LinkList list, LinkNode *np)
 	     * str+1 is the first number in the range, dots+2 the last,
 	     * and dots2+2 is the increment if that's given. */
 	    /* TODO: sorry about this */
-	    int minw = (str[1] == '0' || (str[1] == '-' && str[2] == '0'))
+	    int minw = (str[1] == '0' ||
+			(IS_DASH(str[1]) && str[2] == '0'))
 		       ? wid1
-		       : (dots[2] == '0' || (dots[2] == '-' && dots[3] == '0'))
+		       : (dots[2] == '0' ||
+			  (IS_DASH(dots[2]) && dots[3] == '0'))
 		       ? wid2
 		       : (dots2 && (dots2[2] == '0' ||
-				    (dots2[2] == '-' && dots2[3] == '0')))
+				    (IS_DASH(dots2[2]) && dots2[3] == '0')))
 		       ? wid3
 		       : 0;
 	    if (rincr < 0) {
@@ -2392,7 +2395,7 @@ xpandbraces(LinkList list, LinkNode *np)
 		c2 = ztokens[c2 - STOUC(Pound)];
 	    if ((char) c2 == Meta)
 		c2 = 32 ^ p[1];
-	    if (c1 == '-' && lastch >= 0 && p < str2 && lastch <= (int)c2) {
+	    if (IS_DASH(c1) && lastch >= 0 && p < str2 && lastch <= (int)c2) {
 		while (lastch < (int)c2)
 		    ccl[lastch++] = 1;
 		lastch = -1;
@@ -3528,7 +3531,7 @@ zshtokenize(char *s, int flags)
 	    }
 	    t = s;
 	    while (idigit(*++s));
-	    if (*s != '-')
+	    if (!IS_DASH(*s))
 		goto cont;
 	    while (idigit(*++s));
 	    if (*s != '>')

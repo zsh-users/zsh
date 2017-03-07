@@ -1,3 +1,11 @@
+2017-03-07  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 40760: Src/cond.c, Src/exec.c, Src/glob.c, Src/lex.c,
+	Src/math.c, Src/parse.c, Src/pattern.c, Src/subst.c,
+	Src/utils.c, Src/zsh.h, Test/D02glob.ztst: Always tokenise '-'
+	to Dash to eliminate niggles with range matches in complicated
+	contexts.  Match both - or Dash in contexts that don't care.
+
 2017-03-07  Mikael Magnusson  <mikachu@gmail.com>
 
 	* 40780: Completion/Unix/Command/_mount: Don't use =~ for simple

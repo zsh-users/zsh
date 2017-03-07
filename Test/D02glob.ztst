@@ -686,3 +686,9 @@
  rm glob.tmp/link
 0:modifier ':P' resolves symlinks before '..' components
 *>*glob.tmp/hello/world
+
+ foo=a
+ value="ac"
+ print ${value//[${foo}b-z]/x}
+0:handling of - range in complicated pattern context
+>xx

@@ -463,7 +463,7 @@ lexconstant(void)
     char *nptr;
 
     nptr = ptr;
-    if (*nptr == '-')
+    if (IS_DASH(*nptr))
 	nptr++;
 
     if (*nptr == '0') {
@@ -527,7 +527,7 @@ lexconstant(void)
 	}
 	if (*nptr == 'e' || *nptr == 'E') {
 	    nptr++;
-	    if (*nptr == '+' || *nptr == '-')
+	    if (*nptr == '+' || IS_DASH(*nptr))
 		nptr++;
 	    while (idigit(*nptr) || *nptr == '_')
 		nptr++;
@@ -599,7 +599,8 @@ zzlex(void)
 	    }
 	    return (unary) ? UPLUS : PLUS;
 	case '-':
-	    if (*ptr == '-') {
+	case Dash:
+	    if (IS_DASH(*ptr)) {
 		ptr++;
 		return (unary) ? PREMINUS : POSTMINUS;
 	    }

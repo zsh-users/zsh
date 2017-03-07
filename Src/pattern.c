@@ -1521,7 +1521,7 @@ patcomppiece(int *flagp, int paren)
 		patparse = nptr;
 		len |= 1;
 	    }
-	    DPUTS(*patparse != '-', "BUG: - missing from numeric glob");
+	    DPUTS(!IS_DASH(*patparse), "BUG: - missing from numeric glob");
 	    patparse++;
 	    if (idigit(*patparse)) {
 		to = (zrange_t) zstrtol((char *)patparse,

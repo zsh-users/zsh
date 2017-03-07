@@ -238,6 +238,16 @@ struct mathfunc {
 #define PATCHARS "#^*()|[]<>?~\\"
 
 /*
+ * Check for a possibly tokenized dash.
+ *
+ * A dash only needs to be a token in a character range, [a-z], but
+ * it's difficult in general to ensure that.  So it's turned into
+ * a token at the usual point in the lexer.  However, we need
+ * to check for a literal dash at many points.
+ */
+#define IS_DASH(x) ((x) == '-' || (x) == Dash)
+
+/*
  * Types of quote.  This is used in various places, so care needs
  * to be taken when changing them.  (Oooh, don't you look surprised.)
  * - Passed to quotestring() to indicate style.  This is the ultimate

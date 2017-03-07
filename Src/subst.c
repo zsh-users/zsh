@@ -481,6 +481,8 @@ multsub(char **s, int pf_flags, char ***a, int *isarr, char *sep,
 	for ( ; *x; x += l) {
 	    int rawc = -1;
 	    convchar_t c;
+	    if (*x == Dash)
+		*x = '-';
 	    if (itok(STOUC(*x))) {
 		/* token, can't be separator, must be single byte */
 		rawc = *x;
@@ -1766,7 +1768,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      */
     c = *s;
     if (itype_end(s, IIDENT, 1) == s && *s != '#' && c != Pound &&
-	c != '-' && c != '!' && c != '$' && c != String && c != Qstring &&
+	!IS_DASH(c) &&
+	c != '!' && c != '$' && c != String && c != Qstring &&
 	c != '?' && c != Quest &&
 	c != '*' && c != Star && c != '@' && c != '{' &&
 	c != Inbrace && c != '=' && c != Equals && c != Hat &&
@@ -1895,13 +1898,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		    if (quotetype == QT_DOLLARS ||
 			quotetype == QT_BACKSLASH_PATTERN)
 			goto flagerr;
-		    if (s[1] == '-' || s[1] == '+') {
+		    if (IS_DASH(s[1]) || s[1] == '+') {
 			if (quotemod)
 			    goto flagerr;
 			s++;
 			quotemod = 1;
-			quotetype = (*s == '-') ? QT_SINGLE_OPTIONAL :
-			    QT_QUOTEDZPUTS;
+			quotetype = (*s == '+') ? QT_QUOTEDZPUTS :
+			    QT_SINGLE_OPTIONAL;
 		    } else {
 			if (quotetype == QT_SINGLE_OPTIONAL) {
 			    /* extra q's after '-' not allowed */
@@ -2208,9 +2211,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		     * properly in the first place we wouldn't
 		     * have this nonsense.
 		     */
-		    || ((cc == '#' || cc == Pound) &&
-			s[2] == Outbrace)
-		    || cc == '-' || (cc == ':' && s[2] == '-')
+		    || ((cc == '#' || cc == Pound) && s[2] == Outbrace)
+		    || IS_DASH(cc)
+		    || (cc == ':' && IS_DASH(s[2]))
 		    || (isstring(cc) && (s[2] == Inbrace || s[2] == Inpar)))) {
 	    getlen = 1 + whichlen, s++;
 	    /*
@@ -2605,14 +2608,17 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      * Again, this duplicates tests for characters we're about to
      * examine properly later on.
      */
-    if (inbrace &&
-	(c = *s) != '-' && c != '+' && c != ':' && c != '%'  && c != '/' &&
-	c != '=' && c != Equals &&
-	c != '#' && c != Pound &&
-	c != '?' && c != Quest &&
-	c != '}' && c != Outbrace) {
-	zerr("bad substitution");
-	return NULL;
+    if (inbrace) {
+	c = *s;
+	if (!IS_DASH(c) &&
+	    c != '+' && c != ':' && c != '%'  && c != '/' &&
+	    c != '=' && c != Equals &&
+	    c != '#' && c != Pound &&
+	    c != '?' && c != Quest &&
+	    c != '}' && c != Outbrace) {
+	    zerr("bad substitution");
+	    return NULL;
+	}
     }
     /*
      * Join arrays up if we're in quotes and there isn't some
@@ -2690,8 +2696,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
     /* Check for ${..?..} or ${..=..} or one of those. *
      * Only works if the name is in braces.            */
 
-    if (inbrace && ((c = *s) == '-' ||
-		    c == '+' ||
+    if (inbrace && ((c = *s) == '+' ||
+		    IS_DASH(c) ||
 		    c == ':' ||	/* i.e. a doubled colon */
 		    c == '=' || c == Equals ||
 		    c == '%' ||
@@ -2802,6 +2808,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    vunset = 1;
 	/* Fall Through! */
 	case '-':
+	case Dash:
 	    if (vunset) {
 		int split_flags;
 		val = dupstring(s);

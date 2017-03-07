@@ -2376,7 +2376,7 @@ zstrtol_underscore(const char *s, char **t, int base, int underscore)
     while (inblank(*s))
 	s++;
 
-    if ((neg = (*s == '-')))
+    if ((neg = IS_DASH(*s)))
 	s++;
     else if (*s == '+')
 	s++;
@@ -6118,7 +6118,9 @@ quotedzputs(char const *s, FILE *stream)
 	} else
 	    *ptr++ = '\'';
 	while(*s) {
-	    if (*s == Meta)
+	    if (*s == Dash)
+		c = '-';
+	    else if (*s == Meta)
 		c = *++s ^ 32;
 	    else
 		c = *s;
@@ -6155,7 +6157,9 @@ quotedzputs(char const *s, FILE *stream)
     } else {
 	/* use Bourne-style quoting, avoiding empty quoted strings */
 	while (*s) {
-	    if (*s == Meta)
+	    if (*s == Dash)
+		c = '-';
+	    else if (*s == Meta)
 		c = *++s ^ 32;
 	    else
 		c = *s;

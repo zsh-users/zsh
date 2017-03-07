@@ -138,13 +138,13 @@ evalcond(Estate state, char *fromtest)
 		strs = arrdup(sbuf);
 		l = 2;
 	    }
-	    if (name && name[0] == '-')
+	    if (name && IS_DASH(name[0]))
 		errname = name;
-	    else if (strs[0] && *strs[0] == '-')
+	    else if (strs[0] && IS_DASH(*strs[0]))
 		errname = strs[0];
 	    else
 		errname = "<null>";
-	    if (name && name[0] == '-' &&
+	    if (name && IS_DASH(name[0]) &&
 		(cd = getconddef((ctype == COND_MODI), name + 1, 1))) {
 		if (ctype == COND_MOD &&
 		    (l < cd->min || (cd->max >= 0 && l > cd->max))) {
@@ -171,7 +171,7 @@ evalcond(Estate state, char *fromtest)
 		strs[0] = dupstring(name);
 		name = s;
 
-		if (name && name[0] == '-' &&
+		if (name && IS_DASH(name[0]) &&
 		    (cd = getconddef(0, name + 1, 1))) {
 		    if (l < cd->min || (cd->max >= 0 && l > cd->max)) {
 			zwarnnam(fromtest, "unknown condition: %s",

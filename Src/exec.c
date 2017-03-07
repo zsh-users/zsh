@@ -2779,9 +2779,10 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		char *argdata = (char *) getdata(argnode);
 		char *cmdopt;
 		int has_p = 0, has_vV = 0, has_other = 0;
-		while (*argdata == '-') {
+		while (IS_DASH(*argdata)) {
 		    /* Just to be definite, stop on single "-", too, */
-		    if (!argdata[1] || (argdata[1] == '-' && !argdata[2]))
+		    if (!argdata[1] ||
+			(IS_DASH(argdata[1]) && !argdata[2]))
 			break;
 		    for (cmdopt = argdata+1; *cmdopt; cmdopt++) {
 			switch (*cmdopt) {
@@ -2835,7 +2836,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		 * as if this is command [non-option-stuff].  This
 		 * isn't a good place for standard option handling.
 		 */
-		if (!strcmp(argdata, "--"))
+		if (IS_DASH(argdata[0]) && IS_DASH(argdata[1]) && !argdata[2])
 		     uremnode(args, firstnode(args));
 	    }
 	    if ((cflags & BINF_EXEC) && nextnode(firstnode(args))) {
@@ -2855,7 +2856,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		 * people aren't likely to mix the option style
 		 * with the zsh style.
 		 */
-		while (next && *next == '-' && strlen(next) >= 2) {
+		while (next && IS_DASH(*next) && strlen(next) >= 2) {
 		    if (!firstnode(args)) {
 			zerr("exec requires a command to execute");
 			lastval = 1;
@@ -2863,7 +2864,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			goto done;
 		    }
 		    uremnode(args, firstnode(args));
-		    if (!strcmp(next, "--"))
+		    if (IS_DASH(next[0]) && IS_DASH(next[1]) && !next[2])
 			break;
 		    for (cmdopt = &next[1]; *cmdopt; ++cmdopt) {
 			switch (*cmdopt) {
