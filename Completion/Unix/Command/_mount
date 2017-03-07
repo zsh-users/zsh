@@ -619,7 +619,7 @@ if (( ! $+_fs_any )); then
       'longnames[force Windows 95 long filenames to be visible]'
       'nowin95[completely ignore Windows 95 extended file information]'
     )
-    if [[ "${OSTYPE}" =~ freebsd.* ]]; then
+    if [[ "${OSTYPE}" = freebsd* ]]; then
 	    _fs_msdosfs=( "$_fs_msdos[@]" )
     fi
     ;;

@@ -1,3 +1,8 @@
+2017-03-07  Mikael Magnusson  <mikachu@gmail.com>
+
+	* 40780: Completion/Unix/Command/_mount: Don't use =~ for simple
+	prefix match
+
 2017-03-05  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Sebastian: 40726: Doc/Zsh/mod_curses.yo, Src/Modules/curses.c,
