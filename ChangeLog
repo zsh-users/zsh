@@ -1,3 +1,8 @@
+2017-03-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 40796: Src/exec.c: We don't want magic '=' expansion if we are
+	already parsing a separate variable name and value.
+
 2017-03-08  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 40799: Src/params.c: fix $- expansion partly broken by 40760

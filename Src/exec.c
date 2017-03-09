@@ -2658,7 +2658,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
     char *text;
     int save[10];
     int fil, dfil, is_cursh, do_exec = 0, redir_err = 0, i;
-    int nullexec = 0, assign = 0, forked = 0;
+    int nullexec = 0, magic_assign = 0, forked = 0;
     int is_shfunc = 0, is_builtin = 0, is_exec = 0, use_defpath = 0;
     /* Various flags to the command. */
     int cflags = 0, orig_cflags = 0, checked = 0, oautocont = -1;
@@ -2761,7 +2761,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		/* autoload the builtin if necessary */
 		if (!(hn = resolvebuiltin(cmdarg, hn)))
 		    return;
-		assign = (hn->flags & BINF_MAGICEQUALS);
+		if (type != WC_TYPESET)
+		    magic_assign = (hn->flags & BINF_MAGICEQUALS);
 		break;
 	    }
 	    checked = 0;
@@ -2929,8 +2930,22 @@ execcmd_exec(Estate state, Execcmd_params eparams,
     if (noerrexit == 2 && !is_shfunc)
 	noerrexit = 0;
 
-    /* Do prefork substitutions */
-    esprefork = (assign || isset(MAGICEQUALSUBST)) ? PREFORK_TYPESET : 0;
+    /* Do prefork substitutions.
+     *
+     * Decide if we need "magic" handling of ~'s etc. in
+     * assignment-like arguments.
+     * - If magic_assign is set, we are using a builtin of the
+     *   tyepset family, but did not recognise this as a keyword,
+     *   so need guess-o-matic behaviour.
+     * - Otherwise, if we did recognise the keyword, we never need
+     *   guess-o-matic behaviour as the argument was properly parsed
+     *   as such.
+     * - Otherwise, use the behaviour specified by the MAGIC_EQUAL_SUBST
+     *   option.
+     */
+    esprefork = (magic_assign ||
+		 (isset(MAGICEQUALSUBST) && type != WC_TYPESET)) ?
+		 PREFORK_TYPESET : 0;
     if (args && eparams->htok)
 	prefork(args, esprefork, NULL);
 
@@ -3710,7 +3725,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		     * Save if it's got "command" in front or it's
 		     * not a magic-equals assignment.
 		     */
-		    if ((cflags & (BINF_COMMAND|BINF_ASSIGN)) || !assign)
+		    if ((cflags & (BINF_COMMAND|BINF_ASSIGN)) || !magic_assign)
 			do_save = 1;
 		}
 		if (do_save && varspc)
