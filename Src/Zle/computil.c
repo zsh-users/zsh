@@ -4465,17 +4465,24 @@ cfp_matcher_pats(char *matcher, char *add)
     if (m && m != pcm_err) {
 	char *tmp;
 	int al = strlen(add), zl = ztrlen(add), tl, cl;
-	VARARR(Cmatcher, ms, zl);
+	VARARR(Cmatcher, ms, zl);	/* One Cmatcher per character */
 	Cmatcher *mp;
 	Cpattern stopp;
 	int stopl = 0;
 
+	/* zl >= (number of wide characters) is guaranteed */
 	memset(ms, 0, zl * sizeof(Cmatcher));
 
 	for (; m && *add; m = m->next) {
 	    stopp = NULL;
 	    if (!(m->flags & (CMF_LEFT|CMF_RIGHT))) {
 		if (m->llen == 1 && m->wlen == 1) {
+		    /*
+		     * In this loop and similar loops below we step
+		     * through tmp one (possibly wide) character at a
+		     * time.  pattern_match() compares only the first
+		     * character using unmeta_one() so keep in step.
+		     */
 		    for (tmp = add, tl = al, mp = ms; tl; ) {
 			if (pattern_match(m->line, tmp, NULL, NULL)) {
 			    if (*mp) {
@@ -4485,10 +4492,10 @@ cfp_matcher_pats(char *matcher, char *add)
 			    } else
 				*mp = m;
 			}
-			cl = (*tmp == Meta) ? 2 : 1;
+			(void) unmeta_one(tmp, &cl);
 			tl -= cl;
 			tmp += cl;
-			mp += cl;
+			mp++;
 		    }
 		} else {
 		    stopp = m->line;
@@ -4505,10 +4512,10 @@ cfp_matcher_pats(char *matcher, char *add)
 			    } else
 				*mp = m;
 			}
-			cl = (*tmp == Meta) ? 2 : 1;
+			(void) unmeta_one(tmp, &cl);
 			tl -= cl;
 			tmp += cl;
-			mp += cl;
+			mp++;
 		    }
 		} else if (m->llen) {
 		    stopp = m->line;
@@ -4531,7 +4538,7 @@ cfp_matcher_pats(char *matcher, char *add)
 			al = tmp - add;
 			break;
 		    }
-		    cl = (*tmp == Meta) ? 2 : 1;
+		    (void) unmeta_one(tmp, &cl);
 		    tl -= cl;
 		    tmp += cl;
 		}

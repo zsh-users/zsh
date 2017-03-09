@@ -1,3 +1,11 @@
+2017-03-08  Barton E. Schaefer  <schaefer@brasslantern.com>
+
+	* 40763: Src/Zle/compmatch.c, Src/Zle/computil.c, Src/utils.c:
+	count wide characters and Cmatcher pointers more sanely in
+	cfp_matcher_pats(), and count characters in pattern_match()
+	the same way to stay in sync; might not fix wide-char matching
+	in completion matcher-lists but should avoid wild pointer crash
+
 2017-03-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 40745 + 40753: Src/init.c, Src/params.c: Fix 'unset

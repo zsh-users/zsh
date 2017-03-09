@@ -4788,6 +4788,48 @@ unmeta(const char *file_name)
 }
 
 /*
+ * Unmetafy just one character and store the number of bytes it occupied.
+ */
+/**/
+mod_export convchar_t
+unmeta_one(const char *in, int *sz)
+{
+    convchar_t wc;
+    int newsz;
+#ifdef MULTIBYTE_SUPPORT
+    int ulen;
+    mbstate_t wstate;
+#endif
+
+    if (!sz)
+	sz = &newsz;
+    *sz = 0;
+
+    if (!in || !*in)
+	return 0;
+
+#ifdef MULTIBYTE_SUPPORT
+    memset(&wstate, 0, sizeof(wstate));
+    ulen = mb_metacharlenconv_r(in, &wc, &wstate);
+    while (ulen-- > 0) {
+	if (in[*sz] == Meta)
+	    *sz += 2;
+	else
+	    *sz += 1;
+    }
+#else
+    if (in[0] == Meta) {
+      *sz = 2;
+      wc = STOUC(in[1] ^ 32);
+    } else {
+      *sz = 1;
+      wc = STOUC(in[0]);
+    }
+#endif
+    return wc;
+}
+
+/*
  * Unmetafy and compare two strings, comparing unsigned character values.
  * "a\0" sorts after "a".
  *

@@ -1548,27 +1548,11 @@ pattern_match(Cpattern p, char *s, Cpattern wp, char *ws)
 {
     convchar_t c, wc;
     convchar_t ind, wind;
-    int len = 0, wlen, mt, wmt;
-#ifdef MULTIBYTE_SUPPORT
-    mbstate_t lstate, wstate;
-
-    memset(&lstate, 0, sizeof(lstate));
-    memset(&wstate, 0, sizeof(wstate));
-#endif
+    int len = 0, wlen = 0, mt, wmt;
 
     while (p && wp && *s && *ws) {
 	/* First test the word character */
-#ifdef MULTIBYTE_SUPPORT
-	wlen = mb_metacharlenconv_r(ws, &wc, &wstate);
-#else
-	if (*ws == Meta) {
-	    wc = STOUC(ws[1]) ^ 32;
-	    wlen = 2;
-	} else {
-	    wc = STOUC(*ws);
-	    wlen = 1;
-	}
-#endif
+	wc = unmeta_one(ws, &wlen);
 	wind = pattern_match1(wp, wc, &wmt);
 	if (!wind)
 	    return 0;
@@ -1576,18 +1560,7 @@ pattern_match(Cpattern p, char *s, Cpattern wp, char *ws)
 	/*
 	 * Now the line character.
 	 */
-#ifdef MULTIBYTE_SUPPORT
-	len = mb_metacharlenconv_r(s, &c, &lstate);
-#else
-	/* We have the character itself. */
-	if (*s == Meta) {
-	    c = STOUC(s[1]) ^ 32;
-	    len = 2;
-	} else {
-	    c = STOUC(*s);
-	    len = 1;
-	}
-#endif
+	c = unmeta_one(s, &len);
 	/*
 	 * If either is "?", they match each other; no further tests.
 	 * Apply this even if the character wasn't convertable;
@@ -1627,17 +1600,7 @@ pattern_match(Cpattern p, char *s, Cpattern wp, char *ws)
     }
 
     while (p && *s) {
-#ifdef MULTIBYTE_SUPPORT
-	len = mb_metacharlenconv_r(s, &c, &lstate);
-#else
-	if (*s == Meta) {
-	    c = STOUC(s[1]) ^ 32;
-	    len = 2;
-	} else {
-	    c = STOUC(*s);
-	    len = 1;
-	}
-#endif
+	c = unmeta_one(s, &len);
 	if (!pattern_match1(p, c, &mt))
 	    return 0;
 	p = p->next;
@@ -1645,17 +1608,7 @@ pattern_match(Cpattern p, char *s, Cpattern wp, char *ws)
     }
 
     while (wp && *ws) {
-#ifdef MULTIBYTE_SUPPORT
-	wlen = mb_metacharlenconv_r(ws, &wc, &wstate);
-#else
-	if (*ws == Meta) {
-	    wc = STOUC(ws[1]) ^ 32;
-	    wlen = 2;
-	} else {
-	    wc = STOUC(*ws);
-	    wlen = 1;
-	}
-#endif
+	wc = unmeta_one(ws, &wlen);
 	if (!pattern_match1(wp, wc, &wmt))
 	    return 0;
 	wp = wp->next;
