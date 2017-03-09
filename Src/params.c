@@ -1987,7 +1987,9 @@ fetchvalue(Value v, char **pptr, int bracks, int flags)
 	*s++ = '$';
     else if (c == Star)
 	*s++ = '*';
-    else if (c == '#' || c == '-' || c == '?' || c == '$' ||
+    else if (IS_DASH(c))
+	*s++ = '-';
+    else if (c == '#' || c == '?' || c == '$' ||
 	     c == '!' || c == '@' || c == '*')
 	s++;
     else

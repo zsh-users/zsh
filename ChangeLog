@@ -1,4 +1,6 @@
-2017-03-08  Barton E. Schaefer  <schaefer@brasslantern.com>
+2017-03-08  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40799: Src/params.c: fix $- expansion partly broken by 40760
 
 	* 40763: Src/Zle/compmatch.c, Src/Zle/computil.c, Src/utils.c:
 	count wide characters and Cmatcher pointers more sanely in
