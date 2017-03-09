@@ -640,6 +640,11 @@
 >echo
 >$(|||) bar
 
+  foo=$'\x06ZUI\x1f text-field example: \x1azuitfieldtfield1_1\x1a\'\'\x1a\'\'\x1a1\x1aZUI\\[my_tfield1_width\\]\x1aZUI\\[my_tfield1_start\\]\x1aZUI\\[my_tfield1_data\\]\x1c'
+  print "${#${(z@)foo}}"
+0:Test real-world data that once seemed to fail
+>4
+
   psvar=(dog)
   setopt promptsubst
   foo='It shouldn'\''t $(happen) to a %1v.'
@@ -2055,7 +2060,7 @@
   a='~-/'; echo $~a
 0:Regression: "-" became Dash in workers/37689, breaking ~- expansion
 *>*
-F:We do not care what $OLDPWD is, as long as it doesn't cause an error
+F:We do not care what $OLDPWD is, as long as it does not cause an error
 
   (
   set -- one 'two three' four
@@ -2136,3 +2141,10 @@ F:We do not care what $OLDPWD is, as long as it doesn't cause an error
 >[one two three four]
 F:As of this writing, var=$@ and var="$@" with null IFS have unspecified
 F:behavior, see http://austingroupbugs.net/view.php?id=888
+
+  () {
+    setopt localoptions extendedglob
+    [[ $- = [[:alnum:]]## ]] || print Failed 1
+    [[ ${-} = [[:alnum:]]## ]] || print Failed 2
+  }
+0:$- expansion correctly handles Dash token

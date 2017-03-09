@@ -1,5 +1,13 @@
 2017-03-09  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 40805: (combined with the previous change):
+	Test/D04parameter.ztst: Check that $- and ${-} produce a
+	plausible result.
+
+	* Sebastian: 40803 as modified in 40804 and 40806:
+	Test/D04parameter.ztst: check for the (z) split flag on some
+	partly binary data that might be problematic.
+
 	* 40796: Src/exec.c: We don't want magic '=' expansion if we are
 	already parsing a separate variable name and value.
 
