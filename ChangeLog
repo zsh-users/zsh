@@ -1,5 +1,8 @@
 2017-03-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 40824: Completion/Unix/Command/_grep: completion handling
+	of option deviations between different systems
+
 	* 40823: Completion/Linux/Command/_sshfs: update for sshfs 2.8
 
 2017-03-10  Peter Stephenson  <p.stephenson@samsung.com>

@@ -1,7 +1,6 @@
-#compdef grep egrep fgrep bsdgrep zgrep zegrep zfgrep -value-,GREP_OPTIONS,-default-
-# Ulrik Haugen 2001
+#compdef grep egrep fgrep bsdgrep zgrep zegrep zfgrep ggrep gegrep gfgrep gzgrep gzegrep gzfgrep -value-,GREP_OPTIONS,-default-
 
-local arguments matchers command
+local arguments matchers command variant
 
 if [[ $service = *GREP_OPT* ]]; then
   compset -q
@@ -9,7 +8,7 @@ if [[ $service = *GREP_OPT* ]]; then
   (( CURRENT++ ))
   command=grep
 else
-  arguments=( '(-e --regexp -f --file)1: :_guard "^--*" pattern' )
+  arguments=( '(-e --regexp -f --file)1: :_guard "^-*" pattern' )
   if [[ $service = z* ]]; then
     arguments+=( '*:files:_files -g "*.gz(-.)"' )
   else
@@ -18,13 +17,12 @@ else
   command="$words[1]"
 fi
 
-if [[ $service != (|z)[ef]grep ]]; then
+if [[ $service != (|g)(|z)[ef]grep ]]; then
   matchers='(--extended-regexp --fixed-strings --basic-regexp --perl-regexp -E -F -G -P)'
   arguments+=(
     $matchers{--extended-regexp,-E}'[use extended regular expression]'
     $matchers{--fixed-strings,-F}'[use literal strings]'
     $matchers{--basic-regexp,-G}'[use basic regular expression]'
-    $matchers{--perl-regexp,-P}'[use perl regular expression]'
   )
 fi
 
@@ -34,12 +32,9 @@ arguments+=(
   '(--before-context -B)'{--before-context=,-B+}'[specify lines of leading context]:lines'
   '(--context -C)'{--context=,-C-}'[specify lines of context]:lines'
   '(--color --colour)--'{color,colour}'=-[distinguish matching string]::when:(always never auto)'
-  '(--no-group-separator)--group-separator=[specify separator between blocks of context]:separator [--]'
-  "(--group-separator)--no-group-separator[don't separate context blocks]"
   '(--byte-offset -b -c)'{--byte-offset,-b}'[print the byte offset with output lines]'
   '(--text -a -I)--binary-files=[specify type to assume for binary files]:file type:(binary without-match text)'
   '(--count -c --byte-offset -b --line-number -n)'{--count,-c}'[only print a count of matching lines]'
-  '(-T --initial-tab)'{-T,--initial-tab}'[make tabs line up (if needed)]'
   '(--directories -d -r --recursive)'{--directories=,-d+}'[specify handling of directories]:action on directory:(read skip recurse)'
   '(--devices -D)'{--devices=,-D+}'[specify handling of devices, FIFOs and sockets]:action on device:(read skip)'
   '(1)*'{--regexp=,-e+}'[specify pattern]:pattern'
@@ -50,30 +45,75 @@ arguments+=(
   '--line-buffered[flush output on every line]'
   '(--text -a --binary-files)-I[process binary files as if non-matching]'
   '(--ignore-case -i -y)'{--ignore-case,-i,-y}'[case-insensitive]'
-  '(--files-without-match -L --file-with-matches -l --no-filename -h)'{--files-without-match,-L}"[output non-matching files' names only]"
-  '(--files-with-matches -l --files-without-match -L --no-filename -h)'{--files-with-matches,-l}"[output matching files' names only]"
-  '(--max-count -m)'{--max-count=,-m+}'[stop after specified no of matches]:max number of matches'
+  '(--files-without-match -L --file-with-matches -l --no-filename -h -o --only-matching)'{--files-without-match,-L}"[output non-matching files' names only]"
+  '(--files-with-matches -l --files-without-match -L --no-filename -h -o --only-matching)'{--files-with-matches,-l}"[output matching files' names only]"
+  '(--max-count -m)'{--max-count=,-m+}'[stop after specified no of matches in each file]:max number of matches'
   '(--line-number -n -c)'{--line-number,-n}'[prefix output with line numbers]'
-  '(--only-matching -o)'{--only-matching,-o}'[show only matching part of line]'
+  '(--only-matching -o --files-with-matches -l --files-without-match -L)'{--only-matching,-o}'[show only matching part of line]'
   '(--quiet --silent -q)'{--quiet,--silent,-q}'[suppress normal output]'
   '(--recursive -r --dereference-recursive -R -d --directories)'{--recursive,-r}'[recurse subdirectories]'
-  '(--recursive -r --dereference-recursive -R -d --directories)'{--dereference-recursive,-R}'[recurse subdirectories, following symlinks]'
   '*--include=[examine files matching specified pattern]:file pattern'
   '*--exclude=[skip files matching specified pattern]:file pattern'
-  '*--exclude-from=[skip files matching pattern in specified file]:file:_files'
   '*--exclude-dir=[skip directories matching specified pattern]:directory pattern'
   '(--no-messages -s)'{--no-messages,-s}'[suppress messages about unreadable]'
   '(--version -V)'{--version,-V}'[display version info]'
   '(--invert-match -v)'{--invert-match,-v}'[select non-matching lines]'
   '(--word-regexp -w --line-regexp -x)'{--word-regexp,-w}'[force pattern to match only whole words]'
   '(--line-regexp -x --word-regexp -w)'{--line-regexp,-x}'[force pattern to match only whole lines]'
-  '(--null -Z --no-filename -h)'{--null,-Z}'[print 0 byte after FILE name]'
-  '--help[display help]'
+  '(-)--help[display help information]'
 )
 
-# remove long options?
-_pick_variant -c "$command" gnu=gnu unix --help ||
-    arguments=( ${arguments:#(|*\)(\*|))--*} )
+_pick_variant -r variant -c "$command" gnu=gnu gpl2=2.5.1 unix --version
+case $variant:$OSTYPE in
+  (gnu:*|gpl2:freebsd*))
+    [[ $service != (|g)(|z)[ef]grep ]] && arguments+=(
+      $matchers{--perl-regexp,-P}'[use perl regular expression]'
+    )
+  ;|
+  (gnu:*|gpl2:(free|net)bsd*))
+    arguments+=(
+      '*--exclude-from=[skip files matching pattern in specified file]:file:_files'
+      '(-z --null-data)'{-z,--null-data}'[input data separated by 0 byte, not newline]'
+    )
+  ;|
+  gpl2:freebsd*)
+    arguments+=(
+      '(--null --no-filename -h)--null[print 0 byte after each filename]'
+    )
+  ;|
+  gpl2:(freebsd|darwin)*)
+    arguments+=(
+      '(-Z --decompress -J --bz2decompress)'{-J,--bz2decompress}"[decompress bzip2'ed input before searching]"
+      '(-Z --decompress -J --bz2decompress)'{-Z,--decompress}"[decompress gzip'ed input before searching]"
+    )
+  ;|
+  (gnu:*|gpl2:netbsd*))
+    arguments+=(
+      '(--null -Z --no-filename -h)'{--null,-Z}'[print 0 byte after each filename]'
+    )
+  ;|
+  gnu:*)
+    arguments+=(
+      '(--no-group-separator)--group-separator=[specify separator between blocks of context]:separator [--]'
+      "(--group-separator)--no-group-separator[don't separate context blocks]"
+      '(-T --initial-tab)'{-T,--initial-tab}'[make tabs line up (if needed)]'
+      '(--recursive -r --dereference-recursive -R -d --directories)'{--dereference-recursive,-R}'[recurse subdirectories, following symlinks]'
+    )
+  ;;
+  gpl2:*) arguments=( ${${arguments:#*\)-r}/\)-r/\)-R} ) ;;
+  *:openbsd*)
+    arguments=(
+      ${(M)arguments:#((#s)|*\))--(context|binary-files|line-buffered)*}
+      ${${arguments:#((#s)|*\))(\*|)-[d-]*}/\)-r/\)-R}
+      "-U[search binary files but don't print them]"
+      '-Z[behave as zgrep]'
+    )
+  ;;
+  *)
+    # remove long options and GNU specific short opts, this is right for solaris
+    arguments=( ${arguments:#((#s)|*\))(\*|)-[aABCdDfGHILmorVy-]*} )
+  ;;
+esac
 
 _arguments -S -s $arguments[@]
 
