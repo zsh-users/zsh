@@ -1,3 +1,7 @@
+2017-03-10  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* unposted: Src/Modules/tcp.c: silence compiler warnings on Cygwin
+
 2017-03-09  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Fabian Klotzl: 40808: Completion/Linux/Command/_mdadm,
