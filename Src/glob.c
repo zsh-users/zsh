@@ -2395,7 +2395,8 @@ xpandbraces(LinkList list, LinkNode *np)
 		c2 = ztokens[c2 - STOUC(Pound)];
 	    if ((char) c2 == Meta)
 		c2 = 32 ^ p[1];
-	    if (IS_DASH(c1) && lastch >= 0 && p < str2 && lastch <= (int)c2) {
+	    if (IS_DASH((char)c1) && lastch >= 0 &&
+		p < str2 && lastch <= (int)c2) {
 		while (lastch < (int)c2)
 		    ccl[lastch++] = 1;
 		lastch = -1;

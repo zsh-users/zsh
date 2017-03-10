@@ -1,3 +1,7 @@
+2017-03-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 40819: Src/glob.c: Fix IS_DASH() test in BRACE_CCL handling.
+
 2017-03-10  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* unposted: Src/Modules/tcp.c: silence compiler warnings on Cygwin
