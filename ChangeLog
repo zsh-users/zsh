@@ -1,3 +1,9 @@
+2017-03-09  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40801: Completion/Unix/Command/_mount: turns out that work of
+	art removed by 33963 was necessary after all: re-fix completion
+	of mount points with spaces in the name
+
 2017-03-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40805: (combined with the previous change):

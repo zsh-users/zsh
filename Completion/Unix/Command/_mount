@@ -959,9 +959,15 @@ udevordir)
   esac
 
   local MATCH MBEGIN MEND
-  mp_tmp=("${(@g::)mp_tmp}")
-  dpath_tmp=( "${(@Mg::)dev_tmp:#/*}" )
-  dev_tmp=( "${(@g::)dev_tmp:#/*}" )
+  # The complicated substitution for mount point names is required because
+  # characters in /etc/mtab that might confuse programs reading the names
+  # are encoded as exactly 3 octal digits, like for example \040 for space.
+  # The cleaner-looking ${(g::)mp_tmp} might consume too many digits.
+  # Both mp_tmp and dev_tmp are derived from /etc/mtab or "mount" output.
+  mp_tmp=("${(@)mp_tmp//(#m)\\[0-7](#c3)/${(#)$(( 8#${MATCH[2,-1]} ))}}")
+  dev_tmp=("${(@)dev_tmp//(#m)\\[0-7](#c3)/${(#)$(( 8#${MATCH[2,-1]} ))}}")
+  dpath_tmp=( "${(@M)dev_tmp:#/*}" )
+  dev_tmp=( "${(@)dev_tmp:#/*}" )
 
   _alternative \
     'device-labels:device label:compadd -a dev_tmp' \
