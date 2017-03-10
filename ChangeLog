@@ -2,6 +2,8 @@
 
 	* unposted: Src/Modules/tcp.c: silence compiler warnings on Cygwin
 
+	* unposted: Src/hashtable.c: declare file local variables as static
+
 2017-03-09  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Fabian Klotzl: 40808: Completion/Linux/Command/_mdadm,
