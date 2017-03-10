@@ -6126,12 +6126,13 @@ __git_recent_branches__names()
   # 2. Extracts the move-source from each
   # 3. Eliminates duplicates
   # 4. Eliminates commit hashes (leaving only ref names)
+  #    [This step is done again by the caller.]
   #
   # See workers/38592 for an equivalent long-hand implementation, and the rest
   # of that thread for why this implementation was chosen instead.
   #
   # Note: since we obtain the "from" part of the reflog, we only obtain heads, not tags.
-  reply=(${${(u)${${(0)"$(_call_program reflog git reflog -1000 -z --grep-reflog='\^checkout:\ moving\ from\ ' --pretty='%gs')"}#checkout: moving from }%% *}:#[[:xdigit:]](#c40)})
+  reply=(${${(u)${${(M)${(0)"$(_call_program reflog git reflog -1000 -z --pretty='%gs')"}:#(#s)checkout: moving from *}#checkout: moving from }%% *}:#[0-9a-f](#c40)})
 }
 
 (( $+functions[__git_recent_branches] )) ||
