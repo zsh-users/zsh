@@ -944,11 +944,17 @@ example(:vcs_info:var(vcs-string):var(user-context):var(repo-root-name))
 
 startitem()
 item(var(vcs-string))(
-is one of: bf(git), bf(git-svn), bf(git-p4), bf(hg), bf(hg-git),
-bf(hg-hgsubversion), bf(hg-hgsvn), bf(darcs), bf(bzr), bf(cdv), bf(mtn),
-bf(svn), bf(cvs), bf(svk), bf(tla), bf(p4) or bf(fossil). When hooks are
-active the hooks name is added after a `+'. (See bf(Hooks in vcs_info)
-below.)
+is one of: tt(git), tt(git-svn), tt(git-p4), tt(hg), tt(hg-git),
+tt(hg-hgsubversion), tt(hg-hgsvn), tt(darcs), tt(bzr), tt(cdv), tt(mtn),
+tt(svn), tt(cvs), tt(svk), tt(tla), tt(p4) or tt(fossil).
+This is followed by `tt(.quilt-)var(quilt-mode)' in Quilt mode
+(see bf(Quilt Support) for details)
+and by `tt(+)var(hook-name)' while hooks are active
+(see bf(Hooks in vcs_info) for details).
+
+COMMENT(users/20807)
+Currently, hooks in quilt mode don't add the `tt(.quilt-)var(quilt-mode)' information.
+This may change in the future.
 )
 item(var(user-context))(
 is a freely configurable string, assignable by
@@ -1368,6 +1374,11 @@ having two slightly different modes of operation: `addon' mode and
 Quilt integration is off by default; to enable it, set the tt(use-quilt) style,
 and add tt(%Q) to your tt(formats) or tt(actionformats) style:
 example(zstyle ':vcs_info:*' use-quilt true)
+
+Styles looked up from the Quilt support code include `tt(.quilt-)var(quilt-mode)'
+in the var(vcs-string) part of the context, where var(quilt-mode) is either
+tt(addon) or tt(standalone).
+Example: tt(:vcs_info:git.quilt-addon:default:)var(repo-root-name).
 
 For `addon' mode to become active tt(vcs_info) must have already detected a
 real version control system controlling the directory. If that is the case,

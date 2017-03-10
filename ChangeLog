@@ -1,3 +1,8 @@
+2017-03-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 40822: Doc/Zsh/contrib.yo: vcs_info quilt: Document the
+	'.quilt-foo' zstyle context element. (Compare users/20807.)
+
 2017-03-12  Oliver Kiddle  <opk@zsh.org>
 
 	* Wieland Hoffmann: 40837: Completion/Unix/Command/_pgrep:
