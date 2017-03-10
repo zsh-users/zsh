@@ -476,7 +476,7 @@ _git-checkout () {
         # TODO: Allow A...B
         local \
               remote_branch_noprefix_arg='remote-branch-names-noprefix::__git_remote_branch_names_noprefix' \
-              tree_ish_arg='tree-ishs::__git_tree_ishs' \
+              tree_ish_arg='tree-ishs::__git_commits_prefer_recent' \
               file_arg='modified-files::__git_modified_files'
 
         if [[ -n ${opt_args[(I)-b|-B|--orphan|--detach]} ]]; then
@@ -6169,6 +6169,10 @@ __git_recent_branches() {
   _describe -V -t recent-branches "recent branches" branches_colon_descriptions
 }
 
+(( $+functions[__git_commits_prefer_recent] )) ||
+__git_commits_prefer_recent () {
+  _alternative 'recent-branches::__git_recent_branches' 'commits::__git_commits'
+}
 
 (( $+functions[__git_commits] )) ||
 __git_commits () {
