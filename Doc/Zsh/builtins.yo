@@ -1252,6 +1252,9 @@ Perform prompt expansion (see
 ifzman(EXPANSION OF PROMPT SEQUENCES in zmanref(zshmisc))\
 ifnzman(noderef(Prompt Expansion))\
 ).
+In combination with `tt(-f)',
+prompt escape sequences are parsed only within interpolated arguments,
+not within the format string.
 )
 item(tt(-r))(
 Ignore the escape conventions of tt(echo).

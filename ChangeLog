@@ -1,3 +1,8 @@
+2017-03-12  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 40816: Doc/Zsh/builtins.yo, Test/D01prompt.ztst: Document
+	interaction of 'print -P' and 'print -f'.
+
 2017-03-12  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 40820: Test/V09datetime.ztst: add a few tests of strftime,
