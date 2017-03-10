@@ -125,7 +125,7 @@ case ${service%???}:${(M)service%???}:$OSTYPE in
   ;|
   group:*)
     args+=(
-      '(-g,--gid)'{-g+,--gid=}'[specify gid]:gid'
+      '(-g --gid)'{-g+,--gid=}'[specify gid]:gid'
       '(-o --non-unique)'{-o,--non-unique}'[allow non unique gid]'
     )
   ;|

@@ -78,7 +78,7 @@ if (( $+words[(r)-(A|-assemble)] )); then
 		'(--scan -s)'{--scan,-s}'[scan config file for missing information]'
 		'(--run -R)'{--run,-R}'[try to start the array even if not enough devices for a full array are present]'
 		'(--force -f)'{--force,-f}'[assemble the array even if some superblocks appear out-of-date]'
-		'(--update,-U)'{--update=,-U}'[update superblock]::update the superblock:(sparc2.2 summaries uuid resync byteorder super-minor)'
+		'(--update -U)'{--update=,-U}'[update superblock]::update the superblock:(sparc2.2 summaries uuid resync byteorder super-minor)'
 	)
 fi
 

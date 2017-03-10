@@ -32,7 +32,7 @@ _arguments -C -s \
   '(--timeout -T)--dns-timeout=[set the DNS lookup timeout]:DNS lookup timeout (seconds)' \
   '(--timeout -T)--connect-timeout=[set the connect timeout]:connect timeout (seconds)' \
   '(--timeout -T)--read-timeout=[set the read timeout]:read timeout (seconds)' \
-  '(--wait,-w)'{--wait=,-w+}'[specify wait between retrievals]:time (seconds)' \
+  '(--wait -w)'{--wait=,-w+}'[specify wait between retrievals]:time (seconds)' \
   '(--random-wait)--waitretry=:time (seconds)' \
   '(--waitretry)--random-wait[random wait time between retrievals]' \
   '(--proxy -Y --no-proxy)'{--proxy=,-Y+}'[explicitly turn on proxy]' \

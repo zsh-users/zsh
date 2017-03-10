@@ -22,7 +22,7 @@ _arguments -C -s -S \
   \*{--require,-r}'[require specified module before executing rakefile]:library:->library' \
   '(- *)--rules[trace the rules resolution]' \
   '(--quiet -q --silent -s --verbose -v)'{--silent,-s}"[like --quiet, but also suppresses the 'in directory' announcement]" \
-  '(--system,-g)'{--system,-g}'[using system wide (global) rakefiles (usually '~/.rake/*.rake')]' \
+  '(--system -g)'{--system,-g}'[using system wide (global) rakefiles (usually '~/.rake/*.rake')]' \
   '(- *)'{--tasks,-T}'[display the tasks (matching the specified pattern) with descriptions, then exit]:pattern::' \
   '(--trace -t)'{--trace,-t}'[turn on invoke/execute tracing, enable full backtrace]' \
   '(--quiet -q --silent -s --verbose -v)'{--verbose,-v}'[log message to standard output (default)]' \

@@ -78,7 +78,7 @@ else
     '(--ignore-backups -B)'{--ignore-backups,-B}"[don't list entries ending with ~]"
     '(--directory -d)'{--directory,-d}'[list directory entries instead of contents]'
     '(--dired -D)'{--dired,-D}"[generate output designed for Emacs' dired mode]"
-    '(--ignore,-I)'{--ignore,-I}"[don't list entire matching pattern]:pattern:"
+    '(--ignore -I)'{--ignore,-I}"[don't list entire matching pattern]:pattern:"
     '(--dereference -L --dereference-command-line --dereference-command-line-symlink-to-dir)'{--dereference,-L}'[list referenced file for sym link]'
     '(--dereference -L --dereference-command-line --dereference-command-line-symlink-to-dir)'{--dereference-command-line,--dereference-command-line-symlink-to-dir}
     '(--recursive -R)'{--recursive,-R}'[list subdirectories recursively]'

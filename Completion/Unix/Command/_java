@@ -65,7 +65,7 @@ java)
     '-D-[specify a property]:property:->property' \
     \*{-enableassertions,-ea}-::class \
     \*{-disableassertions,-da}-::class \
-    '(-enablesystemassertions,-esa,-disablesystemassertions,-dsa)'{-enablesystemassertions,-esa,-disablesystemassertions,-dsa} \
+    '(-enablesystemassertions -esa -disablesystemassertions -dsa)'{-enablesystemassertions,-esa,-disablesystemassertions,-dsa} \
     '(-verbose:class)-verbose[print class information]' \
     '(-verbose)-verbose\:class[print class information]' \
     '-verbose\:gc[print gc information]' \

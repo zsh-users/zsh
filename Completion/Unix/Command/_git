@@ -6922,7 +6922,7 @@ __git_setup_diff_options () {
     '(--no-prefix)--dst-prefix=[use given prefix for destination]:prefix'
     '(--src-prefix --dst-prefix)--no-prefix[do not show any source or destination prefix]'
 
-    '(-c,--cc)'{-c,--cc}'[combined diff format for merge commits]'
+    '(-c --cc)'{-c,--cc}'[combined diff format for merge commits]'
 
     # TODO: --output is undocumented.
     '--output[undocumented]:undocumented')

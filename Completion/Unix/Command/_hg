@@ -876,7 +876,7 @@ _hg_cmd_qdiff() {
 
 _hg_cmd_qfold() {
   _arguments -s : $_hg_global_opts $_h_commit_opts \
-  '(--keep,-k)'{-k,--keep}'[keep folded patch files]' \
+  '(--keep -k)'{-k,--keep}'[keep folded patch files]' \
   '*:unapplied patch:_hg_qunapplied'
 }
 

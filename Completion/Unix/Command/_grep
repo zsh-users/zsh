@@ -32,7 +32,7 @@ arguments+=(
   '(--after-context -A)'{--after-context=,-A+}'[specify lines of trailing context]:lines'
   '(--text -a --binary-files -I)'{--text,-a}'[process binary file as if it were text]'
   '(--before-context -B)'{--before-context=,-B+}'[specify lines of leading context]:lines'
-  '(--context,-C)'{--context=,-C-}'[specify lines of context]:lines'
+  '(--context -C)'{--context=,-C-}'[specify lines of context]:lines'
   '(--color --colour)--'{color,colour}'=-[distinguish matching string]::when:(always never auto)'
   '(--no-group-separator)--group-separator=[specify separator between blocks of context]:separator [--]'
   "(--group-separator)--no-group-separator[don't separate context blocks]"

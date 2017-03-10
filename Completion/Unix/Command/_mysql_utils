@@ -212,7 +212,7 @@ _mysql_utils() {
     '--defaults-extra-file=[read specified file after the global files]:defaults file:_files'
     '(-S --socket)'{-S+,--socket=}'[specify socket file to use for connection]:server socket file:_files'
     '(-h --host)'{-h+,--host=}'[specify server hostname]:hostname:_mysql_hosts'
-    '(-P,--port)'{-P+,--port=}'[specify port number for connection]:server port:_mysql_ports'
+    '(-P --port)'{-P+,--port=}'[specify port number for connection]:server port:_mysql_ports'
     '(-u --user)'{-u+,--user=}'[specify username for login]:server username:_mysql_users'
     '(-p --password)'{-p-,--password=}'[specify password to use for connection]:server password'
     '(-C --compress)'{-C,--compress}'[use compression in server/client protocol]'

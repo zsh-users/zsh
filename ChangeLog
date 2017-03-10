@@ -1,5 +1,13 @@
 2017-03-09  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* Fabian Klotzl: 40808: Completion/Linux/Command/_mdadm,
+	Completion/Unix/Command/_git, Completion/Unix/Command/_grep,
+	Completion/Unix/Command/_hg, Completion/Unix/Command/_java,
+	Completion/Unix/Command/_ls, Completion/Unix/Command/_mysql_utils,
+	Completion/Unix/Command/_rake, Completion/Unix/Command/_user_admin,
+	Completion/Unix/Command/_wget, Completion/Unix/Command/_zpool:
+	fix typos where (x,y) should have been (x y) in _arguments syntax
+
 	* 40801: Completion/Unix/Command/_mount: turns out that work of
 	art removed by 33963 was necessary after all: re-fix completion
 	of mount points with spaces in the name

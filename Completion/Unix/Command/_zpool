@@ -237,7 +237,7 @@ _zpool() {
 		_arguments -A "-*" \
 			'-D[Destroyed pools]' \
 			'(-d)*-c[Use cache file]:cache file:_files' \
-			'(-c,-D)*-d[Search for devices or files in directory]:directory:_files -/' \
+			'(-c -D)*-d[Search for devices or files in directory]:directory:_files -/' \
 			'-F[Recovery mode: discard transactions if required]' \
 			'-f[Force import]' \
 			'-l[Display configuration in /dev/chassis location form]' \
