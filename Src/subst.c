@@ -4336,7 +4336,11 @@ modify(char **str, char **ptr)
 			break;
 		    case 'P':
 			if (*copy != '/') {
-			    copy = zhtricat(metafy(zgetcwd(), -1, META_HEAPDUP), "/", copy);
+			    char *here = zgetcwd();
+			    if (here[strlen(here)-1] != '/')
+				copy = zhtricat(metafy(here, -1, META_HEAPDUP), "/", copy);
+			    else
+				copy = dyncat(here, copy);
 			}
 			copy = xsymlink(copy, 1);
 			break;
@@ -4418,7 +4422,11 @@ modify(char **str, char **ptr)
 		    break;
 		case 'P':
 		    if (**str != '/') {
-			*str = zhtricat(metafy(zgetcwd(), -1, META_HEAPDUP), "/", *str);
+			char *here = zgetcwd();
+			if (here[strlen(here)-1] != '/')
+			    *str = zhtricat(metafy(here, -1, META_HEAPDUP), "/", *str);
+			else
+			    *str = dyncat(here, *str);
 		    }
 		    *str = xsymlink(*str, 1);
 		    break;

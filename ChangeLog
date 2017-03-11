@@ -1,3 +1,7 @@
+2017-03-11  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40832: Src/subst.c: fix $x:P when PWD=/
+
 2017-03-11  John Leuenhagen  <john@zlima12.com>
 
 	* unposted (github pull request #15):
