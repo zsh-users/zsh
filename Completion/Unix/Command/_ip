@@ -172,7 +172,7 @@ _regex_words \
   link-set-commands 'link set commands' \
   'dev:specify device:$subcmd_dev' \
   'u*p:change state to up' \
-  'do*wn:change state do down' \
+  'do*wn:change state to down' \
   'ar*p:change ARP flag on device:$subcmd_onoff' \
   'mu*lticast:change MULTICAST flag on device:$subcmd_onoff' \
   'pr*omisc:set promiscuous mode:$subcmd_onoff' \

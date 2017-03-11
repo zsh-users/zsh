@@ -1,3 +1,9 @@
+2017-03-11  John Leuenhagen  <john@zlima12.com>
+
+	* unposted (github pull request #15):
+	Completion/Unix/Command/_ip: fix a small typo in `ip`
+	corrections file
+
 2017-03-10  Oliver Kiddle  <opk@zsh.org>
 
 	* 40824: Completion/Unix/Command/_grep: completion handling
