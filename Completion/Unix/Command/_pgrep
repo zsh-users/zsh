@@ -28,6 +28,7 @@ arguments=('-P[parent process id]:parent process id:->ppid'
      '-q[do not write anything to standard output]'
      '-S[search also in system processes]'
      '-v[negate matching]'
+     '-w[show thread ids instead of pids]'
      '-x[match exactly]'
      '-z[match only in zones]:zone:_zones')
 
@@ -41,7 +42,7 @@ fi
 local optchars
 case "$OSTYPE" in
   linux*)
-    optchars="cflvxdnoPgsuUGt"
+    optchars="cflvxdnoPgsuUGtw"
     ;;
   freebsd*)
     optchars="LSafilnoqvxFGMNPUdgjstu"
