@@ -8,19 +8,21 @@
     # It's not clear this skip_extensions is correct, but the
     # format in question is causing problems on Solaris.
     # We'll revist this after the release.
-    [[ "$(strftime %^_10B 0)" = "   JANUARY" ]] || skip_extensions=1
-    [[ "$(LC_TIME=ja_JP.UTF-8 strftime %OS 1)" = 一 ]] || skip_japanese=1
+    [[ "$(strftime %^_10B 0 2>/dev/null)" = "   JANUARY" ]] || skip_extensions=1
+    [[ "$(LC_TIME=ja_JP.UTF-8 strftime %OS 1 2>/dev/null)" = 一 ]] || skip_japanese=1
   else
     ZTST_unimplemented="can't load the zsh/datetime module for testing"
   fi
 
 %test
 
+  strftime '' 0
   strftime %y 0
   strftime %Y 1000000000
   strftime %x 1200000000
   strftime %X 1200000001
 0:basic format specifiers
+>
 >70
 >2001
 >01/10/08
@@ -61,6 +63,8 @@
       strftime '%^_10B' 0
       strftime %03Ey 650000000
       strftime %-Oe 0
+      # width=400 is too wide and should cause an error
+      strftime %400d 0 2> /dev/null || echo OK
     )
   fi
 0:various extensions
@@ -68,7 +72,13 @@
 >   JANUARY
 >090
 >1
+>OK
 
   print -r -- ${(V)"$(strftime $'%Y\0%m\0%d' 100000000)"}
 0:Embedded nulls
 >1973^@03^@03
+
+# We assume '%@' is not a valid format on any OSs.
+# The result can be '%@' (Linux), '@' (BSDs) or an error (Cygwin).
+  [[ $(strftime '%@' 0 2> /dev/null) == (%|)@ || $? != 0 ]]
+0:bad format specifier

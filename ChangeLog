@@ -1,3 +1,8 @@
+2017-03-12  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 40820: Test/V09datetime.ztst: add a few tests of strftime,
+	related to 40681
+
 2017-03-11  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 40832: Src/subst.c: fix $x:P when PWD=/
