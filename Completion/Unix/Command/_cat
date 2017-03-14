@@ -19,8 +19,9 @@ if _pick_variant gnu=GNU unix --version; then
     '*:files:_files'
   )
 
-elif [[ "$OSTYPE" == (freebsd|dragonfly|darwin)* ]]; then
+elif [[ "$OSTYPE" == (*bsd|dragonfly|darwin)* ]]; then
   args=(
+    -A "-*"
     '(-n)-b[number non-blank output lines]'
     '(-v)-e[display $ at the end of each line (implies -v)]'
     '-n[number all output lines]'
@@ -28,12 +29,27 @@ elif [[ "$OSTYPE" == (freebsd|dragonfly|darwin)* ]]; then
     '(-v)-t[display tab as ^I (implies -v)]'
     '-u[do not buffer output]'
     '-v[display non-printing chars as ^X or M-a]'
-    '(-)*:files:_files'
+    '*:files:_files'
   )
-  [[ $OSTYPE = freebsd* ]] && args+=(
+  [[ $OSTYPE = (free|net)bsd* ]] && args+=(
     '-l[set a lock on the stdout file descriptor]'
   )
-
+  [[ $OSTYPE = netbsd* ]] && args+=(
+    '-B+[read with buffer of specified size]:size (bytes)'
+    '-f[only attempt to display regular files]'
+  )
+elif [[ $OSTYPE = solaris* ]]; then
+  args=(
+    -A "-*"
+    '(-b)-n[number all output lines]'
+    '(-n)-b[number non-blank output lines]'
+    "-u[don't buffer output]"
+    '-s[be silent about non-existent files]'
+    '-v[display non-printing chars as ^X or M-a]'
+    '-e[display $ at the end of each line (requires -v)]'
+    '-t[display tab as ^I and formfeeds and ^L (requires -v)]'
+    '*:files:_files'
+  )
 else
   # POSIX reqires '-u', and most OSes may support '-n'
   args=(
@@ -43,4 +59,4 @@ else
   )
 fi
 
-_arguments -s -S : $args
+_arguments -s -S $args

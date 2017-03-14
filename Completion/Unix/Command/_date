@@ -8,14 +8,15 @@ opts=( -s -w -C )
 
 if _pick_variant gnu="Free Software Foundation" unix --version; then
   local d='(-d --date -f --file -r --reference -s --set)'
-  local f='(-I --iso-8601 -R --rfc-2822 --rfc-3339)'
+  local f='(-I --iso-8601 -R --rfc-email --rfc-3339)'
   args=(
     $d{-d+,--date=}'[output date specified by string]:time string'
+    '--debug[annotate parsed date and warn about questionable usage]'
     $d{-f+,--file=}'[output dates specified in file]:file:_files'
     $d{-r+,--reference=}'[output last modification time of specified file]:file:_files'
     $d{-s+,--set=}'[set time]:time string'
     $f{-I-,--iso-8601=-}'[display in ISO 8601 format]::precision:(date hours minutes seconds ns)'
-    $f{-R,--rfc-2822}'[display in RFC2822 format]'
+    $f{-R,--rfc-email}'[display in RFC5322 format]'
     $f'--rfc-3339=-[display in RFC 3339 format]:precision:(date seconds ns)'
     '(-u --utc --universal)'{-u,--utc,--universal}'[display or set time in UTC]'
     '(- :)--help[output help and exit]'

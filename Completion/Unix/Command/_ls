@@ -131,7 +131,7 @@ else
     '(--width -w)'{--width=,-w+}'[specify screen width]:screen width'
 
     '(--quoting-style -b --escape -N --literal -Q --quote-name)'{--escape,-b}'[print octal escapes for control characters]'
-    '(--quoting-style -b --escape -N --literal -Q --quote-name)'{--literal,-N}'[print raw characters]'
+    '(--quoting-style -b --escape -N --literal -Q --quote-name)'{--literal,-N}'[print entry names without quoting]'
     '(--quoting-style -b --escape -N --literal -Q --quote-name)'{--quote-name,-Q}'[quote names]'
     '(-b --escape -N --literal -Q --quote-name)--quoting-style=:quoting style:(literal shell shell-always c escape clocale locale)'
 

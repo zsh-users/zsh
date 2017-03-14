@@ -16,11 +16,12 @@ if _pick_variant gnu=GNU solaris --version; then
   fi
   args=(
     '(-F --target)'{-F+,--target=}'[object code format to use]:bfd name:->bfdnames'
-    '--help[display usage information and exit]'
-    '--info[display list of architectures and object formats]'
+    '(-)--help[display usage information]'
+    '(-)--info[display list of architectures and object formats]'
     '(-I --input-target)'{-I+,--input-target=}'[object code format of input]:bfd name:->bfdnames'
     '(-O --output-target)'{-I+,--output-target=}'[object code format of output]:bfd name:->bfdnames'
     '*'{-R+,--remove-section=}'[remove given sections]:section name'
+    '--remove-relocations=[remove relocations from specified section]:section'
     '(-s --strip-all)'{-s,--strip-all}'[remove all symbols]'
     '(-g -S -d --strip-debug)'{-g,-S,-d,--strip-debug}'[remove debugging symbols]'
     '--strip-unneeded[remove symbols not needed for relocation processing]'
@@ -33,7 +34,7 @@ if _pick_variant gnu=GNU solaris --version; then
     '(-X --discard-locals)'{-X,--discard-locals}'[remove compiler-generated local symbols]'
     '--keep-file-symbols[retain symbols specifying source file names]'
     '--only-keep-debug[remove everything except debugging information]'
-    '(-V --version)'{-V,--version}'[display version information and exit]'
+    '(-)'{-V,--version}'[display version information and exit]'
     '(-v --verbose)'{-v,--verbose}'[list all object files modified or members of archives]')
 else
   args=(

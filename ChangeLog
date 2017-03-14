@@ -1,3 +1,14 @@
+2017-03-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 40842: Completion/Unix/Command/_basename,
+	Completion/Unix/Command/_cat, Completion/Unix/Command/_date,
+	Completion/Unix/Command/_df, Completion/Unix/Command/_fmt,
+	Completion/Unix/Command/_locate, Completion/Unix/Command/_ls,
+	Completion/Unix/Command/_nm, Completion/Unix/Command/_paste,
+	Completion/Unix/Command/_readelf, Completion/Unix/Command/_sed,
+	Completion/Unix/Command/_strip: update completions for coreutils
+	and similar utilities, also improving BSD and Solaris support
+
 2017-03-14  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 40818: Completion/Unix/Command/_git: _git-checkout: When
