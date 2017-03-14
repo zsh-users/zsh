@@ -35,11 +35,12 @@ opts=(
   '(-n)-p[assume loop like -n but print line also like sed]'
   '-s[enable some switch parsing for switches after script name]'
   '-S[look for the script using PATH environment variable]'
-  '-T-[turn on tainting checks]:taint level:((0\:strings\ from\ streams/environment/ARGV\ are\ tainted 1\:no\ dangerous\ operation\ by\ tainted\ value 2\:process/file\ operations\ prohibited 3\:all\ generated\ objects\ are\ tainted 4\:no\ global\ \(non-tainted\)\ variable\ modification/no\ direct\ output))'
+  '-T-[turn on tainting checks]::taint level [1]:((0\:strings\ from\ streams/environment/ARGV\ are\ tainted 1\:no\ dangerous\ operation\ by\ tainted\ value 2\:process/file\ operations\ prohibited 3\:all\ generated\ objects\ are\ tainted 4\:no\ global\ \(non-tainted\)\ variable\ modification/no\ direct\ output))'
   '(-v --verbose)'{-v,--verbose}'[print version number, then turn on verbose mode]'
   '-x-[strip off text before #!ruby line and perhaps cd to directory]:directory:_files -/'
   '(1 * -)--copyright[print the copyright]'
-  --{en,dis}able-{gems,rubyopt,all}
+  --{en,dis}'able=[enable or disable features]:feature:(gems did_you_mean rubyopt frozen_string_literal all)'
+  \!--{en,dis}able-{gems,rubyopt,all}
   --{external,internal}'-encoding=:charset:->charsets'
   '!'{-y,--yydebug}
   '!--dump=:target:(version copyright usage yydebug syntax parsetree parsetree_with_comment insns)'
@@ -113,7 +114,7 @@ case "$state" in
     charsets=( $(_call_program charsets $RUBY -e 'puts\ Encoding.list' 2>/dev/null) )
     # could also add Encoding.aliases.map(&:first) for aliases
     desc='charset'
-    if [[ $curcontext = *option-E-1 ]]; then
+    if [[ $curcontext = *option-(E|-encoding)-1 ]]; then
       if compset -P '*:'; then
 	desc='internal charset'
       else

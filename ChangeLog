@@ -1,5 +1,8 @@
 2017-03-14  Oliver Kiddle  <opk@zsh.org>
 
+	* 40843: Completion/Unix/Command/_ruby: update options for
+	ruby 2.4.0p0
+
 	* 40842: Completion/Unix/Command/_basename,
 	Completion/Unix/Command/_cat, Completion/Unix/Command/_date,
 	Completion/Unix/Command/_df, Completion/Unix/Command/_fmt,
