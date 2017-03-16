@@ -1,3 +1,8 @@
+2017-03-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 40855: Completion/Unix/Command/_dmidecode: Fix _arguments
+	syntax error.
+
 2017-03-14  Oliver Kiddle  <opk@zsh.org>
 
 	* 40843: Completion/Unix/Command/_ruby: update options for
