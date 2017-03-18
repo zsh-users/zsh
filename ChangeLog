@@ -1,3 +1,8 @@
+2017-03-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Doc/Zsh/contrib.yo: vcs_info quilt: Fix documentation
+	markup typo.
+
 2017-03-16  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 40855: Completion/Unix/Command/_dmidecode: Fix _arguments
