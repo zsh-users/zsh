@@ -862,7 +862,8 @@ sitem(SVK (tt(svk)))(uref(http://svk.bestpractical.com/))
 endsitem()
 
 There is also support for the patch management system tt(quilt)
-(uref(http://savannah.nongnu.org/projects/quilt)). See tt(Quilt Support)
+(uref(http://savannah.nongnu.org/projects/quilt)). See
+ifzman(bf(Quilt Support))ifnzman(noderef(vcs_info Quilt Support))
 below for details.
 
 To load tt(vcs_info):
@@ -872,6 +873,18 @@ example(autoload -Uz vcs_info)
 It can be used in any existing prompt, because it does not require any
 specific tt($psvar) entries to be available.
 
+startmenu()
+menu(vcs_info Quickstart)
+menu(vcs_info Configuration)
+menu(vcs_info Oddities)
+menu(vcs_info Quilt Support)
+menu(vcs_info API)
+menu(vcs_info Variables)
+menu(vcs_info Hooks)
+menu(vcs_info Examples)
+endmenu()
+
+texinode(vcs_info Quickstart)(vcs_info Configuration)()(Version Control Information)
 subsect(Quickstart)
 
 To get this feature working quickly (including colors), you can do the
@@ -935,6 +948,7 @@ That means the detection of these systems is skipped em(completely). No
 wasted time there.
 
 
+texinode(vcs_info Configuration)(vcs_info Oddities)(vcs_info Quickstart)(Version Control Information)
 subsect(Configuration)
 
 The tt(vcs_info) feature can be configured via tt(zstyle).
@@ -948,9 +962,9 @@ is one of: tt(git), tt(git-svn), tt(git-p4), tt(hg), tt(hg-git),
 tt(hg-hgsubversion), tt(hg-hgsvn), tt(darcs), tt(bzr), tt(cdv), tt(mtn),
 tt(svn), tt(cvs), tt(svk), tt(tla), tt(p4) or tt(fossil).
 This is followed by `tt(.quilt-)var(quilt-mode)' in Quilt mode
-(see bf(Quilt Support) for details)
+(see ifzman(bf(Quilt Support))ifnzman(noderef(vcs_info Quilt Support)) for details)
 and by `tt(+)var(hook-name)' while hooks are active
-(see bf(Hooks in vcs_info) for details).
+(see ifzman(bf(Hooks in vcs_info))ifnzman(noderef(vcs_info Hooks)) for details).
 
 COMMENT(users/20807)
 Currently, hooks in quilt mode don't add the `tt(.quilt-)var(quilt-mode)' information.
@@ -1062,17 +1076,17 @@ example(zstyle ':vcs_info:*' disable-patterns "${+LPAR()b+RPAR()HOME}/.zsh+LPAR(
 kindex(use-quilt)
 item(tt(use-quilt))(
 If enabled, the tt(quilt) support code is active in `addon' mode.
-See tt(Quilt Support) for details.
+See ifzman(bf(Quilt Support))ifnzman(noderef(vcs_info Quilt Support)) for details.
 )
 kindex(quilt-standalone)
 item(tt(quilt-standalone))(
 If enabled, `standalone' mode detection is attempted if no VCS is active
-in a given directory. See tt(Quilt Support) for details.
+in a given directory. See ifzman(bf(Quilt Support))ifnzman(noderef(vcs_info Quilt Support)) for details.
 )
 kindex(quilt-patch-dir)
 item(tt(quilt-patch-dir))(
 Overwrite the value of the tt($QUILT_PATCHES) environment variable. See
-tt(Quilt Support) for details.
+ifzman(bf(Quilt Support))ifnzman(noderef(vcs_info Quilt Support)) for details.
 )
 kindex(quiltcommand)
 item(tt(quiltcommand))(
@@ -1203,7 +1217,8 @@ is only used by tt(vcs_info)'s hooks system.
 )
 kindex(hooks)
 item(tt(hooks))(
-A list style that defines hook-function names. See bf(Hooks in vcs_info)
+A list style that defines hook-function names. See ifzman(bf(Hooks in vcs_info))\
+ifnzman(noderef(vcs_info Hooks))
 below for details.
 )
 kindex(patch-format)
@@ -1306,7 +1321,7 @@ When quilt is used (either in `addon' mode or as a `standalone' backend),
 this expando is set to quilt series' tt(patch-format) string.
 The tt(set-patch-format) hook and tt(nopatch-format) style are honoured.
 
-See tt(Quilt Support) below for details.
+See ifzman(tt(Quilt Support))ifnzman(noderef(vcs_info Quilt Support)) below for details.
 )
 enditem()
 
@@ -1340,6 +1355,7 @@ endsitem()
 Not all VCS backends have to support all replacements. For tt(nvcsformats)
 no replacements are performed at all, it is just a string.
 
+texinode(vcs_info Oddities)(vcs_info Quilt Support)(vcs_info Configuration)(Version Control Information)
 subsect(Oddities)
 
 If you want to use the tt(%b) (bold off) prompt expansion in tt(formats),
@@ -1357,6 +1373,7 @@ for use in the prompt is the responsibility of those hooks (jointly);
 when neither of those hooks is defined, tt(vcs_info) handles escaping by itself.
 We regret this coupling, but it was required for backwards compatibility.
 
+texinode(vcs_info Quilt Support)(vcs_info API)(vcs_info Oddities)(Version Control Information)
 subsect(Quilt Support)
 
 bf(Quilt) is not a version control system, therefore this is not implemented
@@ -1400,8 +1417,10 @@ to know which patches of a series are not yet applied, you need to activate
 the tt(get-unapplied) style in the appropriate context.
 
 tt(vcs_info) allows for very detailed control over how the gathered
-information is presented (see the below sections, bf(Styles) and bf(Hooks in
-vcs_info)), all of which are documented below. Note there are a number of
+information is presented (see 
+ifzman(the bf(Configuration) and bf(Hooks in vcs_info) sections)\
+ifnzman(noderef(vcs_info Configuration) and noderef(vcs_info Hooks))),
+all of which are documented below. Note there are a number of
 other patch tracking systems that work on top of a certain version control
 system (like tt(stgit) for bf(git), or tt(mq) for bf(hg)); the configuration
 for systems like that are generally configured the same way as the bf(quilt)
@@ -1455,6 +1474,7 @@ Note, if there is both a function and a variable by the name of
 tt(quilt-standalone), the function will take precedence.
 
 
+texinode(vcs_info API)(vcs_info Variables)(vcs_info Quilt Support)(Version Control Information)
 subsect(Function Descriptions (Public API))
 
 startitem()
@@ -1463,7 +1483,8 @@ item(tt(vcs_info) [var(user-context)])(
 The main function, that runs all backends and assembles all data into
 tt(${vcs_info_msg_*_}). This is the function you want to call from
 tt(precmd) if you want to include up-to-date information in your prompt (see
-tt(Variable description) below). If an argument is given, that string will be
+ifzman(bf(Variable Description))ifnzman(noderef(vcs_info Variables))
+below).  If an argument is given, that string will be
 used instead of tt(default) in the var(user-context) field of the style
 context.
 )
@@ -1472,7 +1493,8 @@ item(tt(vcs_info_hookadd))(
 Statically registers a number of functions to a given hook. The hook needs
 to be given as the first argument; what follows is a list of hook-function
 names to register to the hook. The `tt(+vi-)' prefix needs to be left out
-here. See bf(Hooks in vcs_info) below for details.
+here. See ifzman(bf(Hooks in vcs_info))ifnzman(noderef(vcs_info Hooks))
+below for details.
 )
 findex(vcs_info_hookdel)
 item(tt(vcs_info_hookdel))(
@@ -1481,8 +1503,9 @@ first non-option argument; what follows is a list of hook-function
 names to un-register from the hook. If `tt(-a)' is used as the first
 argument, tt(all) occurrences of the functions are unregistered. Otherwise
 only the last occurrence is removed (if a function was registered to a hook
-more than once) . The `tt(+vi-)' prefix needs to be left out here. See
-bf(Hooks in vcs_info) below for details.
+more than once). The `tt(+vi-)' prefix needs to be left out here.
+See ifzman(bf(Hooks in vcs_info))ifnzman(noderef(vcs_info Hooks))
+below for details.
 )
 findex(vcs_info_lastmsg)
 item(tt(vcs_info_lastmsg))(
@@ -1507,6 +1530,7 @@ enditem()
 
 All functions named tt(VCS_INFO_*) are for internal use only.
 
+texinode(vcs_info Variables)(vcs_info Hooks)(vcs_info API)(Version Control Information)
 subsect(Variable Description)
 
 startitem()
@@ -1524,6 +1548,7 @@ enditem()
 
 All variables named tt(VCS_INFO_*) are for internal use only.
 
+texinode(vcs_info Hooks)(vcs_info Examples)(vcs_info Variables)(Version Control Information)
 subsect(Hooks in vcs_info)
 
 Hooks are places in tt(vcs_info) where you can run your own code. That
@@ -1635,7 +1660,7 @@ tt(${hook_com[applied-string]}) will be
 available as tt(%p) in the tt(patch-format) and tt(nopatch-format) styles.
 This hook is, in concert with tt(set-patch-format), responsible for
 tt(%)-escaping that value for use in the prompt.
-(See the `Oddities' section.)
+(See ifzman(the bf(Oddities) section)ifnzman(noderef(vcs_info Oddities)).)
 )
 item(tt(gen-unapplied-string))(
 Called in the tt(git) (with tt(stgit) or during rebase), and tt(hg) (with
@@ -1651,7 +1676,7 @@ tt(${hook_com[unapplied-string]}) will be available as tt(%u) in the
 tt(patch-format) and tt(nopatch-format) styles.
 This hook is, in concert with tt(set-patch-format), responsible for
 tt(%)-escaping that value for use in the prompt.
-(See the `Oddities' section.)
+(See ifzman(the bf(Oddities) section)ifnzman(noderef(vcs_info Oddities)).)
 )
 item(tt(gen-mqguards-string))(
 Called in the tt(hg) backend when tt(guards-string) is generated; the
@@ -1733,7 +1758,7 @@ tt(nopatch-format).
 This hook is, in concert with the tt(gen-applied-string) or
 tt(gen-unapplied-string) hooks if they are defined, responsible for
 tt(%)-escaping the final tt(patch-format) value for use in the prompt.
-(See the `Oddities' section.)
+(See ifzman(the bf(Oddities) section)ifnzman(noderef(vcs_info Oddities)).)
 )
 item(tt(set-message))(
 Called each time before a `tt(vcs_info_msg_)var(N)tt(_)' message is set.
@@ -1762,10 +1787,12 @@ tt(vcs_info).
 )
 enditem()
 
-If all of this sounds rather confusing, take a look at the bf(Examples)
-section below and also in the tt(Misc/vcs_info-examples) file in the Zsh source.
+If all of this sounds rather confusing, take a look at
+ifzman(the bf(Examples) section below)ifnzman(noderef(vcs_info Examples))
+and also in the tt(Misc/vcs_info-examples) file in the Zsh source.
 They contain some explanatory code.
 
+texinode(vcs_info Examples)(Prompt Themes)(vcs_info Hooks)(Version Control Information)
 subsect(Examples)
 
 Don't use tt(vcs_info) at all (even though it's in your prompt):
