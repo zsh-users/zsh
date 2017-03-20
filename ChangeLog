@@ -1,3 +1,7 @@
+2017-03-20  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted (after 40859): Doc/Zsh/contrib.yo: Fix yodl warning.
+
 2017-03-19  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 40859: Doc/Zsh/contrib.yo: vcs_info docs: Use proper internal

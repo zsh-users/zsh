@@ -1792,7 +1792,7 @@ ifzman(the bf(Examples) section below)ifnzman(noderef(vcs_info Examples))
 and also in the tt(Misc/vcs_info-examples) file in the Zsh source.
 They contain some explanatory code.
 
-texinode(vcs_info Examples)(Prompt Themes)(vcs_info Hooks)(Version Control Information)
+texinode(vcs_info Examples)()(vcs_info Hooks)(Version Control Information)
 subsect(Examples)
 
 Don't use tt(vcs_info) at all (even though it's in your prompt):
