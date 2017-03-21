@@ -1,4 +1,6 @@
-# Tests for the zsh/param/private module
+# Tests for the zsh/db/gdbm module.
+# This contains literal UTF-8 characters; if editing, use
+# UTF-8 mode.
 
 %prep
 
