@@ -1,5 +1,7 @@
 2017-03-21  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 40875 (Martin Krafft): change description of REC_EXACT option.
+
 	* 40821: Test/V11db_gdbm.ztst: Note this contains UTF-8
 	characters and fix name.
 

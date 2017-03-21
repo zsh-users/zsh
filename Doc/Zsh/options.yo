@@ -395,8 +395,9 @@ pindex(RECEXACT)
 pindex(NORECEXACT)
 cindex(completion, exact matches)
 item(tt(REC_EXACT) (tt(-S)))(
-In completion, recognize exact matches even
-if they are ambiguous.
+If the string on the command line exactly matches one of the possible
+completions, it is accepted, even if there is another completion (i.e. that
+string with something else added) that also matches.
 )
 enditem()
 
