@@ -27,7 +27,7 @@ else
 	compadd ${${(M)${(f)"$(stg series 2> /dev/null)"}##[+>] *}#[+>] } \
 		&& ret=0
     ;;
-    (edit|files|goto|rename|log|float|delete|sink|mail|sync|show|pick|hide)
+    (edit|files|goto|rename|log|float|delete|sink|mail|sync|show|pick|hide|squash)
       _wanted -V "patches" expl "patch" \
 	compadd $(stg series --noprefix 2> /dev/null) \
 		&& ret=0

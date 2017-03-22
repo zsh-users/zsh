@@ -1,5 +1,8 @@
 2017-03-24  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Alexandre Rames: 40878: Completion/Unix/Command/_stgit:
+	additional squash command completion.
+
 	* Aaron Schrab: 40892: Functions/Misc/run-help-ip: subcommand
 	matching for ip help.
 
