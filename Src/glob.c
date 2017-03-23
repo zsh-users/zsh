@@ -2969,7 +2969,7 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	    do {
 		/* loop over all matches for global substitution */
 		matched = 0;
-		for (; t < send; ioff++) {
+		for (; t <= send; ioff++) {
 		    /* Find the longest match from this position. */
 		    set_pat_start(p, t-s);
 		    if (pattrylen(p, t, umlen, 0, &patstralloc, ioff)) {
@@ -3018,15 +3018,19 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 			 * which is already marked for replacement.
 			 */
 			matched = 1;
+			if (t == send)
+			    break;
 			while (t < mpos) {
 			    ioff++;
 			    umlen -= iincchar(&t, send - t);
 			}
 			break;
 		    }
+		    if (t == send)
+			break;
 		    umlen -= iincchar(&t, send - t);
 		}
-	    } while (matched);
+	    } while (matched && t < send);
 	    /*
 	     * check if we can match a blank string, if so do it
 	     * at the start.  Goodness knows if this is a good idea

@@ -2148,3 +2148,13 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
     [[ ${-} = [[:alnum:]]## ]] || print Failed 2
   }
 0:$- expansion correctly handles Dash token
+
+  a=(1 "" 3)
+  print -rl -- "${(@)a//*/x}"
+  a=""
+  print -rl -- "${(@)a//*/y}"
+0:Zero-length string match in parameter substitution
+>x
+>x
+>x
+>y

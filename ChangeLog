@@ -1,3 +1,8 @@
+2017-03-23  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 22601: Src/glob.c, Test/D04parameter.ztst: problem matching
+	pattern against zero-length string in parameter substitutions.
+
 2017-03-21  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40875 (Martin Krafft): change description of REC_EXACT option.
