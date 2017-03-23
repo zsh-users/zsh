@@ -2158,3 +2158,13 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >x
 >x
 >y
+
+  a=(1 "" 3)
+  print -rl -- "${(@)a//#%*/x}"
+  a=""
+  print -rl -- "${(@)a//#%*/y}"
+0:Zero-length string match at end
+>x
+>x
+>x
+>y

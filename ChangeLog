@@ -1,6 +1,11 @@
+2017-03-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 40891: Src/glob.c, Test/D04parameter.ztst: another similar fix
+	for zero-length matches at the end of a string.
+
 2017-03-23  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* 22601: Src/glob.c, Test/D04parameter.ztst: problem matching
+	* users/22601: Src/glob.c, Test/D04parameter.ztst: problem matching
 	pattern against zero-length string in parameter substitutions.
 
 2017-03-21  Peter Stephenson  <p.stephenson@samsung.com>

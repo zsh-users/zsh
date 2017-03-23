@@ -2929,13 +2929,15 @@ igetmatch(char **sp, Patprog p, int fl, int n, char *replstr,
 	     * move forward along string until we get a match. *
 	     * Again there's no optimisation.                  */
 	    mb_charinit();
-	    for (ioff = 0, t = s, umlen = umltot; t < send ; ioff++) {
+	    for (ioff = 0, t = s, umlen = umltot; t <= send ; ioff++) {
 		set_pat_start(p, t-s);
 		if (pattrylen(p, t, umlen, 0, &patstralloc, ioff)) {
 		    *sp = get_match_ret(&imd, t-s, umltot);
 		    return 1;
 		}
 		if (fl & SUB_START)
+		    break;
+		if (t == send)
 		    break;
 		umlen -= iincchar(&t, send - t);
 	    }
