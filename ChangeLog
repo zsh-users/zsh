@@ -1,3 +1,8 @@
+2017-03-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Aaron Schrab: 40892: Functions/Misc/run-help-ip: subcommand
+	matching for ip help.
+
 2017-03-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 40891: Src/glob.c, Test/D04parameter.ztst: another similar fix

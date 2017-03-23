@@ -19,8 +19,8 @@ while [[ $# != 0 && $1 == -* ]]; do
 done
 
 case $1 in
-    (addr*) man ip-address ;;
-    (addrlabel) man ip-addrlabel ;;
+    (addrl*) man ip-addrlabel ;;
+    (a*) man ip-address ;;
     (l2*) man ip-l2tp ;;
     (li*) man ip-link ;;
     (ma*) man ip-maddress ;;
