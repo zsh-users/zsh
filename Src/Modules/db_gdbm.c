@@ -154,12 +154,13 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 	    return 1;
     }
 
+    gdbm_errno=0;
     dbf = gdbm_open(resource_name, 0, read_write, 0666, 0);
     if(dbf) {
 	addmodulefd(gdbm_fdesc(dbf), FDT_MODULE);
         append_tied_name(pmname);
     } else {
-	zwarnnam(nam, "error opening database file %s", resource_name);
+	zwarnnam(nam, "error opening database file %s (%s)", resource_name, gdbm_strerror(gdbm_errno));
 	return 1;
     }
 

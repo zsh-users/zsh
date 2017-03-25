@@ -1,3 +1,7 @@
+2017-05-24  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Sebastian: 40898: Src/Modules/db_gdbm.c: fix GDBM error handling.
+
 2017-05-23  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Stephane: 41142: Src/Modules/system.c: ensure close-on-exec is
