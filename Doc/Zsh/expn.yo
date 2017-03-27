@@ -1049,7 +1049,9 @@ If var(name) refers to an associative array, substitute the em(keys)
 (element names) rather than the values of the elements.  Used with
 subscripts (including ordinary arrays), force indices or keys to be
 substituted even if the subscript form refers to values.  However,
-this flag may not be combined with subscript ranges.
+this flag may not be combined with subscript ranges.  With the
+tt(KSH_ARRAYS) option a subscript `tt([*])' or `tt([@])' is needed
+to operate on the whole array, as usual.
 )
 item(tt(L))(
 Convert all letters in the result to lower case.
