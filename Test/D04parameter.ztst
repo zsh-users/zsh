@@ -2168,3 +2168,15 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >x
 >x
 >y
+
+  my_width=6
+  my_index=1
+  my_options=Option1
+  hyperlink=$'\034'"MYID"$'\034'"DATA1"$'\034'"DATA2"$'\034'"DATA3"$'\034'"my_width"$'\034'"my_index"$'\034'"my_options"$'\02'
+  array=( $hyperlink "Regular text" $hyperlink )
+  array=( "${array[@]//(#b)$'\034'[^$'\034']#$'\034'[^$'\034']#$'\034'[^$'\034']#$'\034'[^$'\034']#$'\034'([^$'\034']#)$'\034'([^$'\034']#)$'\034'([^$'\02']#)$'\02'/${(mr:${(P)${(Q)match[1]}}:: :)${(As:;:)${(P)${(Q)match[3]}}}[${(P)${(Q)match[2]}}]}}" )
+  print -rl -- "${array[@]}"
+0:Test substitution that uses P,Q,A,s,r,m flags
+>Option
+>Regular text
+>Option

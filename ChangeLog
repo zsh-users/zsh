@@ -1,3 +1,8 @@
+2017-03-30  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Sebastian: 40909: Test/D04parameter.ztst: stress test for
+	parameter substitution.
+
 2017-03-27  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40906: Doc/Zsh/expn.yo: array subst needs [*] or [@] with
