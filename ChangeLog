@@ -1,5 +1,8 @@
 2017-03-30  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Dag-Erling Smørgrav: 40915: Completion/BSD/Command/_kld: fix
+	breakage.
+
 	* Sebastian: 40909: Test/D04parameter.ztst: stress test for
 	parameter substitution.
 

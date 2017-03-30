@@ -26,7 +26,7 @@ _kld() {
   case "$service" in
     kldload)
       _arguments -s -S -A "-*" \
-        "-n[don't try to load module if already loaded]"
+        "-n[don't try to load module if already loaded]" \
         '-v[be verbose]' \
         '-q[silence any extraneous warnings]' \
         '*:module to load:_kld_module'
