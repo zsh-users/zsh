@@ -1,3 +1,8 @@
+2017-04-01  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* Sebastian: 40782: Completion/Unix/Type/_hosts: avoid dependency
+	on zsh/regex module
+
 2017-03-30  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Dag-Erling Smørgrav: 40915: Completion/BSD/Command/_kld: fix

@@ -50,12 +50,13 @@ if ! zstyle -a ":completion:${curcontext}:hosts" hosts _hosts; then
         # entries.
         () {
           local host
+          local -a match mbegin mend
           khosts=()
           for host; do
             if [[ $host == *[*?]* ]]; then
               continue
-            elif [[ $host =~ "\[(.*)\]:\d*" ]]; then
-              khosts+=$match
+            elif [[ $host = (#b)*\[(*)\]:[[:digit:]]#* ]]; then
+              khosts+=${match[1]}
             else
               khosts+=$host
             fi
