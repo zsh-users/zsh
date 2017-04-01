@@ -896,9 +896,9 @@ the pattern arguments are listed.
 
 tt(function +M) removes the list of mathematical functions; with the
 additional option tt(-m) the arguments are treated as patterns and
-all functions whose tt(mathfn) matches the pattern are removed.  Note
+all functions whose var(mathfn) matches the pattern are removed.  Note
 that the shell function implementing the behaviour is not removed
-(regardless of whether its name coincides with tt(mathfn)).
+(regardless of whether its name coincides with var(mathfn)).
 
 For example, the following prints the cube of 3:
 
