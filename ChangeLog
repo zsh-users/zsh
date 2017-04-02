@@ -1,3 +1,8 @@
+2017-04-02  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40929 (replaces 40598): Src/subst.c: paramsubst() should always
+	return scalar when PREFORK_SINGLE was passed in from prefork()
+
 2017-04-01  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Sebastian: 40782: Completion/Unix/Type/_hosts: avoid dependency

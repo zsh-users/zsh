@@ -446,7 +446,7 @@ singsub(char **s)
  * NULL to use IFS).  The return value is true iff the expansion resulted
  * in an empty list.
  *
- * *ms_flags is set to bits in the enum above as neeed.
+ * *ms_flags is set to bits in the enum above as needed.
  */
 
 /**/
@@ -3779,6 +3779,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      * as a scalar.)
      */
 
+    if (isarr && ssub) {
+	/* prefork() wants a scalar, so join no matter what else */
+	val = sepjoin(aval, NULL, 1);
+	isarr = 0;
+	l->list.flags &= ~LF_ARRAY;
+    }
+
     /*
      * If a multsub result had whitespace at the start and we're
      * splitting and there's a previous string, now's the time to do so.
@@ -4025,18 +4032,6 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	if (qt && !*y)
 	    y = dupstring(nulstring);
 	setdata(n, (void *) y);
-    }
-    if (isarr && ssub) {
-	/* prefork() wants a scalar, so join no matter what else */
-	LinkNode tn;
-
-	aval = hlinklist2array(l, 0);
-	val = sepjoin(aval, NULL, 1);
-	n = firstnode(l);
-	for (tn = lastnode(l); tn && tn != n; tn = lastnode(l))
-	    uremnode(l, tn);
-	setdata(n, (void *) val);
-	l->list.flags &= ~LF_ARRAY;
     }
     if (eval)
 	*str = (char *) getdata(n);
