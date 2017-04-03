@@ -266,3 +266,10 @@
 >of the gang
 >of the gang
 >of the gang
+
+ string='abcde'
+ twoarg() { return $(( $2 - $1 )) }
+ functions -M twoarg
+ print ${string[1,twoarg(1,4)]}
+0:Commas inside parentheses do not confuse subscripts
+>abc

@@ -1183,7 +1183,7 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
        int *prevcharlen, int *nextcharlen)
 {
     int hasbeg = 0, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
-    int keymatch = 0, needtok = 0, arglen, len;
+    int keymatch = 0, needtok = 0, arglen, len, inpar = 0;
     char *s = *str, *sep = NULL, *t, sav, *d, **ta, **p, *tt, c;
     zlong num = 1, beg = 0, r = 0, quote_arg = 0;
     Patprog pprog = NULL;
@@ -1322,8 +1322,9 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
     }
 
     for (t = s, i = 0;
-	 (c = *t) && ((c != Outbrack &&
-		       (ishash || c != ',')) || i); t++) {
+	 (c = *t) &&
+	     ((c != Outbrack && (ishash || c != ',')) || i || inpar);
+	 t++) {
 	/* Untokenize inull() except before brackets and double-quotes */
 	if (inull(c)) {
 	    c = t[1];
@@ -1344,6 +1345,10 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    i++;
 	else if (c == ']' || c == Outbrack)
 	    i--;
+	if (c == '(' || c == Inpar)
+	    inpar++;
+	else if (c == ')' || c == Outpar)
+	    inpar--;
 	if (ispecial(c))
 	    needtok = 1;
     }

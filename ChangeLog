@@ -1,3 +1,8 @@
+2017-04-03  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 40932: Src/params.c, Test/D06subscript.ztst: parameter
+	subscripts need to count parentheses to avoid terminating early.
+
 2017-04-02  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 40929 (replaces 40598): Src/subst.c: paramsubst() should always
