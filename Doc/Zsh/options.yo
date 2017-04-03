@@ -725,7 +725,8 @@ cindex(regexp, PCRE)
 cindex(PCRE, regexp)
 item(tt(REMATCH_PCRE))(
 If set, regular expression matching with the tt(=~) operator will use
-Perl-Compatible Regular Expressions from the PCRE library, if available.
+Perl-Compatible Regular Expressions from the PCRE library.
+(The tt(zsh/pcre) module must be available.)
 If not set, regular expressions will use the extended regexp syntax
 provided by the system libraries.
 )
