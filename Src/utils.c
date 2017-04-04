@@ -1230,13 +1230,13 @@ adduserdir(char *s, char *t, int flags, int always)
 	 * named directory, since these are sometimes used for
 	 * special purposes.
 	 */
-	nd->dir = ztrdup(t);
+	nd->dir = metafy(t, -1, META_DUP);
     } else
-	nd->dir = ztrduppfx(t, eptr - t);
+	nd->dir = metafy(t, eptr - t, META_DUP);
     /* The variables PWD and OLDPWD are not to be displayed as ~PWD etc. */
     if (!strcmp(s, "PWD") || !strcmp(s, "OLDPWD"))
 	nd->node.flags |= ND_NOABBREV;
-    nameddirtab->addnode(nameddirtab, ztrdup(s), nd);
+    nameddirtab->addnode(nameddirtab, metafy(s, -1, META_DUP), nd);
 }
 
 /* Get a named directory: this function can cause a directory name *

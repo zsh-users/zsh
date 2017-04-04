@@ -1,3 +1,8 @@
+2017-04-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Orlov Sergey: 40935: Src/utils.c: User names need metafying as
+	they can contain multibyte characters on some systems.
+
 2017-04-07  Bart Schaefer  <schaefer@zsh.org>
 
 	* 40940: Src/cond.c: untokenize names of condition features
