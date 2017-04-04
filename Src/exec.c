@@ -1859,7 +1859,7 @@ execpline2(Estate state, wordcode pcode,
 	lineno = WC_PIPE_LINENO(pcode) - 1;
 
     if (pline_level == 1) {
-	if ((how & Z_ASYNC) || (!sfcontext && !sourcelevel))
+	if ((how & Z_ASYNC) || !sfcontext)
 	    strcpy(list_pipe_text,
 		   getjobtext(state->prog,
 			      state->pc + (WC_PIPE_TYPE(pcode) == WC_PIPE_END ?
@@ -3090,7 +3090,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 
     /* Get the text associated with this command. */
     if ((how & Z_ASYNC) ||
-	(!sfcontext && !sourcelevel && (jobbing || (how & Z_TIMED))))
+	(!sfcontext && (jobbing || (how & Z_TIMED))))
 	text = getjobtext(state->prog, eparams->beg);
     else
 	text = NULL;

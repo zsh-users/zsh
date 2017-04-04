@@ -1,3 +1,8 @@
+2017-04-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 40933: Src/exec.c: we need job text in sourced files in case
+	of suspending.
+
 2017-04-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40932: Src/params.c, Test/D06subscript.ztst: parameter
