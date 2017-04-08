@@ -139,9 +139,9 @@ evalcond(Estate state, char *fromtest)
 		l = 2;
 	    }
 	    if (name && IS_DASH(name[0]))
-		errname = name;
+		untokenize(errname = name);
 	    else if (strs[0] && IS_DASH(*strs[0]))
-		errname = strs[0];
+		untokenize(errname = strs[0]);
 	    else
 		errname = "<null>";
 	    if (name && IS_DASH(name[0]) &&

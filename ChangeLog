@@ -1,3 +1,9 @@
+2017-04-07  Bart Schaefer  <schaefer@zsh.org>
+
+	* 40940: Src/cond.c: untokenize names of condition features
+	before attempting to look up the definition from a module.
+	Necessary because of 40760 (tokenization of '-' as Dash).
+
 2017-04-05  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* users/22653: Doc/Zsh/options.yo: Clarify REMATCH_PCRE
