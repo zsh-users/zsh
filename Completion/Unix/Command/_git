@@ -6326,11 +6326,11 @@ __git_recent_commits () {
   ret=1
   # Resetting expl to avoid it 'leaking' from one line to the next.
   expl=()
+  _describe -V -t commits 'recent commit object name' descr && ret=0
+  expl=()
   _wanted commit-tags expl 'commit tag' compadd "$@" -a - tags && ret=0
   expl=()
   _wanted heads expl 'head' compadd "$@" -a - heads && ret=0
-  expl=()
-  _describe -V -t commits 'recent commit object name' descr && ret=0
   return $ret
 }
 

@@ -1,3 +1,8 @@
+2017-04-23  Daniel Hahler  <zsh@thequod.de>
+
+	* 40943: Completion/Unix/Command/_git: __git_recent_commits: prefer
+	recent commit objects.
+
 2017-04-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 40995: Src/lex.c, Test/D08cmdsubst.ztst: we need to expand
