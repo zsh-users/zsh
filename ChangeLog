@@ -1,3 +1,8 @@
+2017-04-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 40973: Completion/Unix/Type/_remote_files: Fix completion of
+	remote files that start with a hyphen/minus.
+
 2017-04-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 40977: Src/init.c: "emulate" disallows "--help" and "--version"

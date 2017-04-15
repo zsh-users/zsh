@@ -58,11 +58,13 @@ if zstyle -T ":completion:${curcontext}:files" remote-access; then
     else rempat="${(q)PREFIX%%[^./][^/]#}\*"
   fi
 
+  # remote filenames
   remfiles=(${(M)${(f)"$(_call_program files $cmd $cmd_args $host ls -d1FL -- "$rempat" 2>/dev/null)"}%%[^/]#(|/)})
 
   compset -P '*/'
   compset -S '/*' || (( ${args[(I)-/]} )) || suf='remote file'
 
+  # display strings for remote files and directories
   remdispf=(${remfiles:#*/})
   remdispd=(${(M)remfiles:#*/})
 
@@ -77,9 +79,9 @@ if zstyle -T ":completion:${curcontext}:files" remote-access; then
   while _tags; do
     while _next_label files expl ${suf:-remote directory}; do
       [[ -n $suf ]] &&
-          compadd "$args[@]" "$expl[@]" -d remdispf ${(q)remdispf%[*=|]} && ret=0
+          compadd "$args[@]" "$expl[@]" -d remdispf -- ${(q)remdispf%[*=|]} && ret=0
       compadd ${suf:+-S/} -r "/ \t\n\-" "$args[@]" "$expl[@]" -d remdispd \
-	${(q)remdispd%/} && ret=0
+	-- ${(q)remdispd%/} && ret=0
     done
     (( ret )) || return 0
   done
