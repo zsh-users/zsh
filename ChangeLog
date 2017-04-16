@@ -1,3 +1,7 @@
+2017-04-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 40977: Src/init.c: "emulate" disallows "--help" and "--version"
+
 2017-04-10  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Orlov Sergey: 40935: Src/utils.c: User names need metafying as
