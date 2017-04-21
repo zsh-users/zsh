@@ -1,3 +1,9 @@
+2017-04-21  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 40990: Src/params.c: When starting in sh emulation, don't
+	link PATH-style parameters to array equivalents.  Don't
+	check linkage when exporting colon-separated parameter.
+
 2017-04-18  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 40973: Completion/Unix/Type/_remote_files: Fix completion of

@@ -361,6 +361,17 @@ IPDEF7("PS3", &prompt3),
 IPDEF7R("PS4", &prompt4),
 IPDEF7("SPROMPT", &sprompt),
 
+#define IPDEF9F(A,B,C,D) {{NULL,A,D|PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(vararray_gsu),0,0,NULL,C,NULL,0}
+#define IPDEF9(A,B,C) IPDEF9F(A,B,C,0)
+IPDEF9F("*", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
+IPDEF9F("@", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
+
+/*
+ * This empty row indicates the end of parameters available in
+ * all emulations.
+ */
+{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
+
 #define IPDEF8(A,B,C,D) {{NULL,A,D|PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(colonarr_gsu),0,0,NULL,C,NULL,0}
 IPDEF8("CDPATH", &cdpath, "cdpath", 0),
 IPDEF8("FIGNORE", &fignore, "fignore", 0),
@@ -373,17 +384,6 @@ IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, "zsh_eval_context", PM_READONLY),
 
 /* MODULE_PATH is not imported for security reasons */
 IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_RESTRICTED),
-
-#define IPDEF9F(A,B,C,D) {{NULL,A,D|PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(vararray_gsu),0,0,NULL,C,NULL,0}
-#define IPDEF9(A,B,C) IPDEF9F(A,B,C,0)
-IPDEF9F("*", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
-IPDEF9F("@", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
-
-/*
- * This empty row indicates the end of parameters available in
- * all emulations.
- */
-{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
 
 #define IPDEF10(A,B) {{NULL,A,PM_ARRAY|PM_SPECIAL},BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
 
@@ -419,6 +419,26 @@ IPDEF9F("path", &path, "PATH", PM_RESTRICTED),
 /* These are known to zsh alone. */
 
 IPDEF10("pipestatus", pipestatus_gsu),
+
+{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
+};
+
+/*
+ * Alternative versions of colon-separated path parameters for
+ * sh emulation.  These don't link to the array versions.
+ */
+static initparam special_params_sh[] = {
+IPDEF8("CDPATH", &cdpath, NULL, 0),
+IPDEF8("FIGNORE", &fignore, NULL, 0),
+IPDEF8("FPATH", &fpath, NULL, 0),
+IPDEF8("MAILPATH", &mailpath, NULL, 0),
+IPDEF8("WATCH", &watch, NULL, 0),
+IPDEF8("PATH", &path, NULL, PM_RESTRICTED),
+IPDEF8("PSVAR", &psvar, NULL, 0),
+IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, NULL, PM_READONLY),
+
+/* MODULE_PATH is not imported for security reasons */
+IPDEF8("MODULE_PATH", &module_path, NULL, PM_DONTIMPORT|PM_RESTRICTED),
 
 {{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
 };
@@ -753,9 +773,13 @@ createparamtable(void)
     /* Add the special parameters to the hash table */
     for (ip = special_params; ip->node.nam; ip++)
 	paramtab->addnode(paramtab, ztrdup(ip->node.nam), ip);
-    if (!EMULATION(EMULATE_SH|EMULATE_KSH))
+    if (EMULATION(EMULATE_SH|EMULATE_KSH)) {
+	for (ip = special_params_sh; ip->node.nam; ip++)
+	    paramtab->addnode(paramtab, ztrdup(ip->node.nam), ip);
+    } else {
 	while ((++ip)->node.nam)
 	    paramtab->addnode(paramtab, ztrdup(ip->node.nam), ip);
+    }
 
     argvparam = (Param) &argvparam_pm;
 
@@ -3857,8 +3881,7 @@ colonarrsetfn(Param pm, char *x)
 	*dptr = colonsplit(x, pm->node.flags & PM_UNIQUE);
     else
 	*dptr = mkarray(NULL);
-    if (pm->ename)
-	arrfixenv(pm->node.nam, *dptr);
+    arrfixenv(pm->node.nam, *dptr);
     zsfree(x);
 }
 
