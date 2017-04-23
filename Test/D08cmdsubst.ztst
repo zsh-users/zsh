@@ -167,3 +167,13 @@
   empty=$() && print "'$empty'"
 0:Empty $() is a valid assignment
 >''
+
+  (
+    setopt ignoreclosebraces
+    alias OPEN='{' CLOSE='};'
+    eval '{ OPEN print hi; CLOSE }
+    var=$({ OPEN print bye; CLOSE}) && print $var'
+  )
+0:Alias expansion needed in parsing substituions
+>hi
+>bye

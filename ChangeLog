@@ -1,3 +1,9 @@
+2017-04-23  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 40995: Src/lex.c, Test/D08cmdsubst.ztst: we need to expand
+	aliases when identifiying the end of a command substitution as
+	sometimes we can hit a parse error before.
+
 2017-04-23  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 40994: Src/utils.c: unmeta_one() need not count Meta
