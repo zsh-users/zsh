@@ -4797,7 +4797,6 @@ unmeta_one(const char *in, int *sz)
     convchar_t wc;
     int newsz;
 #ifdef MULTIBYTE_SUPPORT
-    int ulen;
     mbstate_t wstate;
 #endif
 
@@ -4810,13 +4809,7 @@ unmeta_one(const char *in, int *sz)
 
 #ifdef MULTIBYTE_SUPPORT
     memset(&wstate, 0, sizeof(wstate));
-    ulen = mb_metacharlenconv_r(in, &wc, &wstate);
-    while (ulen-- > 0) {
-	if (in[*sz] == Meta)
-	    *sz += 2;
-	else
-	    *sz += 1;
-    }
+    *sz = mb_metacharlenconv_r(in, &wc, &wstate);
 #else
     if (in[0] == Meta) {
       *sz = 2;

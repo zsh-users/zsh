@@ -1,3 +1,7 @@
+2017-04-23  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 40994: Src/utils.c: unmeta_one() need not count Meta
+
 2017-04-21  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 40990: Src/params.c: When starting in sh emulation, don't
