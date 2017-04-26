@@ -103,6 +103,13 @@
 0:`exec' with -a option, no space
 >/bin/SPLOOSH
 
+  (
+    opts=(-a /bin/WHOOOSH)
+    exec $opts /bin/sh -c 'echo $0'
+  )
+0:`exec' with -a option from expansion
+>/bin/WHOOOSH
+
   (export FOO=bar; exec -c /bin/sh -c 'echo x${FOO}x')
 0:`exec' with -c option
 >xx
@@ -118,6 +125,21 @@
   command -p -V cat
   command -p -V -- echo
 0:command -p in combination
+*>*/cat
+>echo
+>cat is /*/cat
+>echo is a shell builtin
+
+  args=(
+  'command -pv cat'
+  'command -pv echo'
+  'command -p -V cat'
+  'command -p -V -- echo'
+  )
+  for arg in $args; do
+    ${=arg}
+  done
+0:command -p in combination, using expansion
 *>*/cat
 >echo
 >cat is /*/cat

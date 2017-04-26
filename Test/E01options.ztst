@@ -804,6 +804,20 @@
 >print is a shell builtin
 ?(eval):8: command not found: print
 
+  (
+     setopt posixbuiltins
+     opts=()
+     command $opts print foo
+     opts=(-v)
+     command $opts print
+     opts=(-V)
+     command $opts print
+  )
+0:command with options from expansion
+>foo
+>print
+>print is a shell builtin
+
   # With non-special command: original value restored
   # With special builtin: new value kept
   # With special builtin preceeded by "command": original value restored.

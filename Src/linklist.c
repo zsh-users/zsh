@@ -348,6 +348,35 @@ newsizedlist(int size)
 }
 
 /*
+ * Join two linked lists.  Neither may be null, though either
+ * may be empty.
+ *
+ * It is assumed the pieces come from the heap, but if not it is
+ * safe to free LinkList second.
+ */
+
+/**/
+mod_export LinkList
+joinlists(LinkList first, LinkList second)
+{
+    LinkNode moveme = firstnode(second);
+    if (moveme) {
+	if (firstnode(first)) {
+	    LinkNode anchor = lastnode(first);
+	    anchor->next = moveme;
+	    moveme->prev = anchor;
+	} else {
+	    first->list.first = moveme;
+	    moveme->prev = &first->node;
+	}
+	first->list.last = second->list.last;
+
+	second->list.first = second->list.last = NULL;
+    }
+    return first;
+}
+
+/*
  * Return the node whose data is the pointer "dat", else NULL.
  * Can be used as a boolean test.
  */
