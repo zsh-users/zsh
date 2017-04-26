@@ -22,7 +22,7 @@ case $service in
     _arguments -A "--*" -C \
       '*:watch expression:->expressions' \
       - '(bus)' \
-      --system --session
+      --system --session \
       '--address=-:bus address:->addresses' \
       - '(format)' \
       --monitor --profile --pcap --binary && ret=0

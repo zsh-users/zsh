@@ -1,5 +1,7 @@
 2017-04-26  Oliver Kiddle  <opk@zsh.org>
 
+	* unposted: Completion/Unix/Command/_dbus: fix syntax on line end
+
 	* 40965 (tweaked c.f. 40968): Completion/BSD/Command/_portmaster,
 	Completion/Debian/Command/_a2utils, Completion/Debian/Command/_apt,
 	Completion/Debian/Command/_lighttpd,
