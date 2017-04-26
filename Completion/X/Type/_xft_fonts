@@ -1,6 +1,6 @@
 #compdef fc-list fc-match
 
-local -a suf
+local -a expl suf
 local font=${${PREFIX//-[0-9]##:/:}%:*}: ret=1
 local attr
 

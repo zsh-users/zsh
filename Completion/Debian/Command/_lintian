@@ -1,6 +1,6 @@
 #compdef lintian lintian-info
 
-local line cmds ret=1
+local curcontext="$curcontext" state line expl cmds ret=1
 
 case "$service" in
    (lintian)
@@ -55,7 +55,7 @@ case "$service" in
         (args)
           case $line[1] in
             -t|--tags)
-              _wanted tag expl 'tag' compadd $(command awk '/^Tag:/ { print $2 }' /usr/share/lintian/checks/*.desc) && ret=0
+              _wanted tags expl 'tag' compadd $(command awk '/^Tag:/ { print $2 }' /usr/share/lintian/checks/*.desc) && ret=0
             ;;
           esac
         ;;

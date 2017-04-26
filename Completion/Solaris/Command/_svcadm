@@ -1,7 +1,7 @@
 #compdef svcadm
 
 _svcadm() {
-	local context state line subcmds
+	local curcontext="$curcontext" state line expl subcmds
 	typeset -A opt_args
 
 	subcmds=( enable disable restart refresh mark delegate clear milestone )

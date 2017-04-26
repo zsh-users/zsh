@@ -24,6 +24,7 @@ else
   if [[ "$compstate[parameter]" != *-* &&
         "$compstate[context]" = *value &&
         "${(Pt)${compstate[parameter]}}" = assoc* ]]; then
+    local expl
     if (( CURRENT & 1 )); then
       _wanted association-keys expl 'association key' \
           compadd -k "$compstate[parameter]"

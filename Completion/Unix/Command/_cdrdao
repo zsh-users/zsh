@@ -262,14 +262,14 @@ _cdrdao-copy () {
 __cdrdao-device () {
   # Use cdrdao scanbus and also check what OS we're running under and provide
   # additional stuff, like devices (/dev/sg0)
-  local -a devices
+  local -a expl devices
   devices=(${${(f)"$(_call_program devices cdrdao scanbus -v 0 2>&1)"}%% :*})
 
   _wanted devices expl 'device' compadd -a devices
 }
 
 __cdrdao-drivers () {
-  local suf
+  local expl suf
   local -Ua drivers
   drivers=(${(f)"$(_call_program drivers cut -d'\|' -f4 /usr/share/cdrdao/drivers -s)"})
   if compset -P \*:; then

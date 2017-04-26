@@ -1,6 +1,6 @@
 #compdef units
 
-local curcontext="$curcontext" state line
+local curcontext="$curcontext" state line expl
 integer ret=1
 typeset -A opt_args
 

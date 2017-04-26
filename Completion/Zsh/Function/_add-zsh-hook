@@ -1,6 +1,7 @@
 #compdef add-zsh-hook
 
 _add-zsh-hook_hooks() {
+  local expl
   if (( $+opt_args[-d] )); then
     _wanted functions expl "installed hooks" compadd -a - "$line[1]_functions" && return 0
   else

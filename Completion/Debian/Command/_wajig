@@ -1,6 +1,6 @@
 #compdef wajig
 
-local curcontext="$curcontext" state line cmds argno ret=1
+local curcontext="$curcontext" state line expl cmds argno ret=1
 
 _arguments -C -s \
   '(- 1 *)'{-h,--help}'[print usage message]' \

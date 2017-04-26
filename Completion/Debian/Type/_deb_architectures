@@ -1,6 +1,6 @@
 #autoload
 
-local extra
+local extra expl
 zparseopts -E -D -a extra a:
 
 _description architectures expl 'architecture'

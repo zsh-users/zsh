@@ -1,3 +1,29 @@
+2017-04-26  Oliver Kiddle  <opk@zsh.org>
+
+	* 40965 (tweaked c.f. 40968): Completion/BSD/Command/_portmaster,
+	Completion/Debian/Command/_a2utils, Completion/Debian/Command/_apt,
+	Completion/Debian/Command/_lighttpd,
+	Completion/Debian/Command/_lintian,
+	Completion/Debian/Command/_wajig,
+	Completion/Debian/Type/_deb_architectures,
+	Completion/Debian/Type/_debbugs_bugnumber,
+	Completion/Linux/Command/_ethtool,
+	Completion/Solaris/Command/_svcadm,
+	Completion/Solaris/Command/_svccfg,
+	Completion/Solaris/Type/_svcs_fmri,
+	Completion/Unix/Command/_cdrdao, Completion/Unix/Command/_darcs,
+	Completion/Unix/Command/_iftop, Completion/Unix/Command/_lha,
+	Completion/Unix/Command/_lsof, Completion/Unix/Command/_pkg-config,
+	Completion/Unix/Command/_rrdtool, Completion/Unix/Command/_stgit,
+	Completion/Unix/Command/_tcpdump, Completion/Unix/Command/_texinfo,
+	Completion/Unix/Command/_units, Completion/Unix/Command/_yafc,
+	Completion/Unix/Type/_absolute_command_paths,
+	Completion/X/Command/_setxkbmap, Completion/X/Type/_xft_fonts,
+	Completion/Zsh/Command/_fc, Completion/Zsh/Context/_value,
+	Completion/Zsh/Function/_add-zle-hook-widget,
+	Completion/Zsh/Function/_add-zsh-hook:
+	fix for missing local declarations of expl
+
 2017-04-26  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41008: Src/exec.c, Src/linklist.c, Test/A01grammar.ztst,

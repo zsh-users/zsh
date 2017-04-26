@@ -1,6 +1,6 @@
 #compdef ethtool
 
-local -a cmds
+local -a expl cmds
 
 if [[ $CURRENT -ge 4 ]]; then
 	case $words[CURRENT-1] in

@@ -1,5 +1,7 @@
 #compdef lha
 
+local expl
+
 if (( CURRENT == 2 )); then
     compset -P -
 

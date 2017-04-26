@@ -1,6 +1,6 @@
 #compdef pkg-config
 
-local arguments packages curcontext="$curcontext" state line ret=1
+local arguments packages curcontext="$curcontext" state line expl ret=1
 declare -A opt_args
 
 # Up-to-date as of pkg-config 0.29-4 (debian package) man page synopsis

@@ -5,7 +5,7 @@ _portmaster_pkgs() {
 }
 
 _portmaster_ports() {
-  local ret=1 _fbsd_ports _fbsd_cat
+  local expl ret=1 _fbsd_ports _fbsd_cat
    _fbsd_cat=(${PORTSDIR:-/usr/ports}/[a-z]*(/:t))
    if [[ $PREFIX != */* ]] ; then
      _wanted cat_packages expl 'category/ports' compadd -S '/' $_fbsd_cat

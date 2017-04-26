@@ -525,7 +525,7 @@ _apt-cache () {
     --installed:bool \
     -- \
     /$'help\0'/ \| \
-    /$'add\0'/ /$'[^\0]#\0'/ ':files:index files:_files "$expl[@]"' \# \| \
+    /$'add\0'/ /$'[^\0]#\0'/ ':files:index files:_files' \# \| \
     /$'gencaches\0'/ \| \
     /$'showpkg\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
     /$'showsrc\0'/ /$'[^\0]#\0'/ ':packages::_deb_packages "$expl_packages[@]" avail' \# \| \
@@ -595,10 +595,10 @@ _apt-config () {
     /$'shell\0'/ \
       \( \
 	/$'[^\0]#\0'/ ':parameters:shell variable to assign:_parameters' \
-	/$'[^\0]#\0'/ ':values:configuration key:compadd "$expl[@]" - ${${(f)"$(apt-config dump 2>&1)"}% *}' \
+	/$'[^\0]#\0'/ ':values:configuration key:compadd - ${${(f)"$(apt-config dump 2>&1)"}% *}' \
       \) \# \| \
     /$'dump\0'/ \| \
-    /"[]"/	':argument-1:action:compadd "$expl[@]" shell dump'
+    /"[]"/	':argument-1:action:compadd shell dump'
 
   _apt-config "$@"
 }

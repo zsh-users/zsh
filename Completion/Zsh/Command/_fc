@@ -1,6 +1,6 @@
 #compdef fc history r
 
-local curcontext="$curcontext" state state_descr line ret=1
+local curcontext="$curcontext" state state_descr line expl ret=1
 local num cmd sep
 local -a events
 typeset -A opt_args

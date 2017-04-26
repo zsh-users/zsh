@@ -1,6 +1,6 @@
 #compdef a2ensite a2dissite a2enmod a2dismod
 
-local -a mods
+local -a expl mods
 
 case "$service" in
     a2ensite)
@@ -21,4 +21,4 @@ case "$service" in
 	;;
 esac
 
-return 0
+return

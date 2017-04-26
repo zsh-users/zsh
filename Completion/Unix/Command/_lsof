@@ -1,6 +1,6 @@
 #compdef lsof
 
-local curcontext="$curcontext" state line fields args
+local curcontext="$curcontext" state line expl fields args
 
 case $OSTYPE in
   linux*) args=( '-X[skip reporting of info on network connections]' ) ;;

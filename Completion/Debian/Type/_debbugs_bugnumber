@@ -1,6 +1,8 @@
 #autoload
 # TODO: use _describe with some basic metadata (e.g., bug title/package/version)
 
+local expl
+
 [[ $PREFIX$SUFFIX == [0-9]# ]] || return 1
 
 # The cache directory moved; try both locations.

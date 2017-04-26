@@ -55,7 +55,7 @@ _setxkbmap_files () {
     local dir="$1"
     local label="$2"
 
-    local -a fullpath shortpath
+    local -a fullpath shortpath expl
 
     fullpath=($sourcedir/$dir/**/*~*README(.))
     shortpath=(${fullpath#$sourcedir\/$dir\/})
@@ -82,7 +82,7 @@ _setxkbmap_geometry () {
 (( $+functions[_setxkbmap_variant] )) ||
 _setxkbmap_variant () {
     local file=$sourcedir/symbols/${1}
-    local -a variants lines
+    local -a variants lines expl
 
     if [ ! -f $file ]; then
         _message "no such layout: ${1}"

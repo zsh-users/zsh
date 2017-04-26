@@ -2,7 +2,7 @@
 
 _svcs_fmri() {
 	local type="$argv[$#]"
-	local fmri_abbrevs m i
+	local fmri_abbrevs m i expl
 	typeset -a -g _smf_fmris
 
 	local update_policy

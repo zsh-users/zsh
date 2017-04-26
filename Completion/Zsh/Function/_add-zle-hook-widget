@@ -11,6 +11,7 @@ _add-zle-hook-widget_types() {
 }
 
 _add-zle-hook-widget_widgets() {
+  local expl
   if (( $+opt_args[-d] )); then
     local -a tmp
     zstyle -g tmp $line[1] widgets

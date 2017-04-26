@@ -2,10 +2,17 @@
 
 typeset -A opt_args
 
-_interfaces () {
-	_wanted interfaces expl 'network interface' \
-		_net_interfaces
-	_values "Pseudo-device that captures on all interfaces" "any"
+_interfaces() {
+  local disp expl sep
+  _description interfaces expl 'network interface'
+  _net_interfaces "$expl[@]"
+  if zstyle -t ":completion:${curcontext}:interfaces" verbose; then
+    zstyle -s ":completion:${curcontext}:interfaces" list-separator sep || sep=--
+    disp=( "any $sep capture on all interfaces" )
+    compadd "$expl[@]" -ld disp any
+  else
+    compadd "$expl[@]" any
+  fi
 }
 
 _esp_secrets () {

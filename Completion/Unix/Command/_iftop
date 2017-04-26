@@ -1,9 +1,16 @@
 #compdef iftop
 
 _interfaces () {
-	_wanted interfaces expl 'network interface' \
-		_net_interfaces
-	_values "Pseudo-device that captures on all interfaces" "any"
+  local disp expl sep
+  _description interfaces expl 'network interface'
+  _net_interfaces "$expl[@]"
+  if zstyle -t ":completion:${curcontext}:interfaces" verbose; then
+    zstyle -s ":completion:${curcontext}:interfaces" list-separator sep || sep=--
+    disp=( "any $sep capture on all interfaces" )
+    compadd "$expl[@]" -ld disp any
+  else
+    compadd "$expl[@]" any
+  fi
 }
 
 _arguments \
@@ -14,7 +21,7 @@ _arguments \
   -P'[turn on port display]' \
   -b"[don't display bar graphs of traffic]" \
   -B'[display bandwidth rates in bytes/sec rather than bits/sec]' \
-  -i'[interface]:network interface:_interfaces' \
-  -f'[filter]:BPF filter' \
-  -F'[net/mask]:network/mask' \
-  -c'[config file]:config file:_files'
+  '-i+[interface]:network interface:_interfaces' \
+  '-f+[filter]:BPF filter' \
+  '-F+[net/mask]:network/mask' \
+  '-c+[config file]:config file:_files'

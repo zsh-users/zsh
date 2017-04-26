@@ -13,6 +13,8 @@
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
 
+local expl
+
 if (($CURRENT == 2)); then
   # We're completing the first word after "darcs" -- the command.
   _wanted command expl 'darcs command' \

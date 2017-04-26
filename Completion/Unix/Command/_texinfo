@@ -227,7 +227,7 @@ esac
 
 if [[ -n $state ]]; then
   local chr cache file q
-  local -a suf tags
+  local -a expl suf tags
   local -i36 hash=5381
   local -aU infopath=( /usr/share/info ${commands[info]:h:h}/share/info ${(s.:.)INFOPATH} $infodirs )
   infopath=( $^infopath(N) )
