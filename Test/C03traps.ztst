@@ -756,6 +756,27 @@ F:Must be tested with a top-level script rather than source or function
 >''
 >hello
 
+  $ZTST_testdir/../Src/zsh -f =(<<<"
+    trap handler EXIT
+    handler() {
+      echoa
+      echo b
+    }
+    echoa() {
+      echo a
+    }
+    exit0() {
+      exit
+    }
+    main() {
+      exit0
+    }
+    main
+  ")
+0:No early exit from nested function in EXIT trap.
+>a
+>b
+
 %clean
 
   rm -f TRAPEXIT

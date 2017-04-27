@@ -5688,8 +5688,11 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
      * the only likely case where we need that second test is
      * when we have an "always" block.  The endparamscope() has
      * already happened, hence the "+1" here.
+     *
+     * If we are in an exit trap, finish it first... we wouldn't set
+     * exit_pending if we were already in one.
      */
-    if (exit_pending && exit_level >= locallevel+1) {
+    if (exit_pending && exit_level >= locallevel+1 && !in_exit_trap) {
 	if (locallevel > forklevel) {
 	    /* Still functions to return: force them to do so. */
 	    retflag = 1;

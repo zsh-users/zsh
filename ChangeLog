@@ -1,3 +1,11 @@
+2017-04-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 41012: Src/builtin.c, Src/exec.c, Src/signals.c,
+	Test/C03traps.ztst: Fix early exit from nested functions in EXIT
+	trap.  Drive-by fix of testing for need to exit if exiting when
+	already in EXIT trap for main shell --- we should just leave
+	immediately.
+
 2017-04-27  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41016: Test/A01grammar.ztst: test that quoted precommand

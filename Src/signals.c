@@ -55,6 +55,11 @@ mod_export Eprog siglists[VSIGCOUNT];
 /**/
 mod_export int nsigtrapped;
 
+/* Running an exit trap? */
+
+/**/
+int in_exit_trap;
+
 /*
  * Flag that exit trap has been set in POSIX mode.
  * The setter's expectation is therefore that it is run
@@ -1435,7 +1440,13 @@ dotrap(int sig)
 
     dont_queue_signals();
 
+    if (sig == SIGEXIT)
+	++in_exit_trap;
+
     dotrapargs(sig, sigtrapped+sig, funcprog);
+
+    if (sig == SIGEXIT)
+	--in_exit_trap;
 
     restore_queue_signals(q);
 }

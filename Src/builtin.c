@@ -5500,7 +5500,7 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	}
 	/*FALLTHROUGH*/
     case BIN_EXIT:
-	if (locallevel > forklevel) {
+	if (locallevel > forklevel && shell_exiting != -1) {
 	    /*
 	     * We don't exit directly from functions to allow tidying
 	     * up, in particular EXIT traps.  We still need to perform
@@ -5509,6 +5509,9 @@ bin_break(char *name, char **argv, UNUSED(Options ops), int func)
 	     *
 	     * If we are forked, we exit the shell at the function depth
 	     * at which we became a subshell, hence the comparison.
+	     *
+	     * If we are already exiting... give this all up as
+	     * a bad job.
 	     */
 	    if (stopmsg || (zexit(0,2), !stopmsg)) {
 		retflag = 1;
@@ -5555,6 +5558,14 @@ checkjobs(void)
     }
 }
 
+/*
+ * -1 if the shell is already committed to exit.
+ * positive if zexit() was already called.
+ */
+
+/**/
+int shell_exiting;
+
 /* exit the shell.  val is the return value of the shell.  *
  * from_where is
  *   1   if zexit is called because of a signal
@@ -5566,10 +5577,8 @@ checkjobs(void)
 mod_export void
 zexit(int val, int from_where)
 {
-    static int in_exit;
-
     /* Don't do anything recursively:  see below */
-    if (in_exit == -1)
+    if (shell_exiting == -1)
 	return;
 
     if (isset(MONITOR) && !stopmsg && from_where != 1) {
@@ -5582,14 +5591,14 @@ zexit(int val, int from_where)
 	}
     }
     /* Positive in_exit means we have been here before */
-    if (from_where == 2 || (in_exit++ && from_where))
+    if (from_where == 2 || (shell_exiting++ && from_where))
 	return;
 
     /*
-     * We're now committed to exiting.  Set in_exit to -1 to
+     * We're now committed to exiting.  Set shell_exiting to -1 to
      * indicate we shouldn't do any recursive processing.
      */
-    in_exit = -1;
+    shell_exiting = -1;
     /*
      * We want to do all remaining processing regardless of preceding
      * errors, even user interrupts.
