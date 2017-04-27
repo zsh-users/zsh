@@ -114,6 +114,12 @@
 0:`exec' with -c option
 >xx
 
+  (\exec /bin/sh -c 'echo Test one'; print Not reached)
+  ('exec' /bin/sh -c 'echo Test two'; print Not reached)
+0:exec with quotes
+>Test one
+>Test two
+
   cat() { echo Function cat executed; }
   command cat && unfunction cat
 0:`command' precommand modifier

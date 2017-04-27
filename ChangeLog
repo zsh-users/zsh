@@ -1,3 +1,8 @@
+2017-04-27  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41016: Test/A01grammar.ztst: test that quoted precommand
+	modifiers now work.
+
 2017-04-26  Oliver Kiddle  <opk@zsh.org>
 
 	* unposted: Completion/Unix/Command/_dbus: fix syntax on line end
