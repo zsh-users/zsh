@@ -2824,7 +2824,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		 * Otherwise, just leave marked as BINF_COMMAND
 		 * modifier with no additional action.
 		 */
-		LinkNode argnode, oldnode;
+		LinkNode argnode, oldnode, pnode = NULL;
 		char *argdata, *cmdopt;
 		int has_p = 0, has_vV = 0, has_other = 0;
 		argnode = firstnode(preargs);
@@ -2845,6 +2845,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			     * also traditional behaviour.
 			     */
 			    has_p = 1;
+			    pnode = argnode;
 			    break;
 			case 'v':
 			case 'V':
@@ -2882,6 +2883,12 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		} else if (has_p) {
 		    /* Use default path */
 		    use_defpath = 1;
+		    /*
+		     * We don't need this node as we're not treating
+		     * "command" as a builtin this time.
+		     */
+		    if (pnode)
+			uremnode(preargs, pnode);
 		}
 		/*
 		 * Else just any trailing

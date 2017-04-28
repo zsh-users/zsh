@@ -116,15 +116,25 @@
 
   (\exec /bin/sh -c 'echo Test one'; print Not reached)
   ('exec' /bin/sh -c 'echo Test two'; print Not reached)
-0:exec with quotes
+  (\exec -c /bin/sh -c 'echo Test three'; print Not reached)
+0:precommand modifiers with quotes
 >Test one
 >Test two
+>Test three
 
   cat() { echo Function cat executed; }
   command cat && unfunction cat
 0:`command' precommand modifier
 <External command cat executed
 >External command cat executed
+
+  (command -p echo this is output)
+  (\command -p echo this is more output)
+  ('command' -p echo this is yet more output)
+0: command -p without -v or -V
+>this is output
+>this is more output
+>this is yet more output
 
   command -pv cat
   command -pv echo

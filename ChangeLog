@@ -1,3 +1,8 @@
+2017-04-28  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41020: Src/exec.c, Test/A01grammar.ztst: "command -p" was
+	broken by 41008, also add more tests for precommand modifiers.
+
 2017-04-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 41012: Src/builtin.c, Src/exec.c, Src/signals.c,
