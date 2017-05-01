@@ -4,6 +4,17 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes from 5.3.1 to 5.4
+-------------------------
+
+The 'exec' and 'command' precommand modifiers, and options to them, are
+now parsed after parameter expansion.  Previously, both the modifier and
+any options to it were parsed between alias expansion and parameter
+expansion (see zshexpn(1)), so they could neither be quoted nor be the
+result of parameter expansion.  Examples: 's=command; $s -V ls' and
+'\command -V ls' now work as expected.
+
+
 Changes from 5.2 to 5.3.1
 -------------------------
 
