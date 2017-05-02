@@ -1,3 +1,8 @@
+2017-05-02  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* unposted: Functions/Zle/insert-unicode-char: use typeset -g to
+	avoid warnnestedvar warning.
+
 2017-04-28  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41020: Src/exec.c, Test/A01grammar.ztst: "command -p" was

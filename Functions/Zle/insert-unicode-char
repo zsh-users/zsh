@@ -12,11 +12,11 @@ then
   local -i 16 -Z 10 arg=$NUMERIC
   # ...and use print to turn this into a Unicode character.
   LBUFFER+="$(print -n "\U${arg##0x}")"
-  _insert_unicode_ready=0
+  integer -g _insert_unicode_ready=0
 else
   # Set the base to 16...
   zle argument-base 16
   # ...wait for user to type hex keys then call this widget again.
   zle universal-argument
-  _insert_unicode_ready=1
+  integer -g _insert_unicode_ready=1
 fi
