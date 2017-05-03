@@ -1,3 +1,8 @@
+2017-05-03  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41043: Src/exec.c: Close pipes in shell if disowning
+	backgrounded job with &!.
+
 2017-05-02  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Functions/Zle/insert-unicode-char: use typeset -g to

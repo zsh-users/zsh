@@ -1612,6 +1612,7 @@ execpline(Estate state, wordcode slcode, int how, int last1)
 	    zclose(opipe[0]);
 	}
 	if (how & Z_DISOWN) {
+	    pipecleanfilelist(jobtab[thisjob].filelist, 0);
 	    deletejob(jobtab + thisjob, 1);
 	    thisjob = -1;
 	}
