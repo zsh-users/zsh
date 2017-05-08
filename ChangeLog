@@ -1,5 +1,8 @@
 2017-05-08  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* users/22688: Src/parse.c, Test/A04redirect.ztst: Allow mixing
+	of redirections and arguments after anonymous functions.
+
 	* 41060: Src/parse.c, Test/A04redirect.ztst: combination
 	of HERE document and |& was broken by miscounting wordcode owing
 	to missing flag.

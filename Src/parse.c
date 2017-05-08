@@ -2030,10 +2030,21 @@ par_simple(int *cmplx, int nr)
 		/* Unnamed function */
 		int parg = ecadd(0);
 		ecadd(0);
-		while (tok == STRING) {
-		    ecstr(tokstr);
-		    argc++;
-		    zshlex();
+		while (tok == STRING || IS_REDIROP(tok)) {
+		    if (tok == STRING)
+		    {
+			ecstr(tokstr);
+			argc++;
+			zshlex();
+		    } else {
+			*cmplx = c = 1;
+			nrediradd = par_redir(&r, NULL);
+			p += nrediradd;
+			if (ppost)
+			    ppost += nrediradd;
+			sr += nrediradd;
+			parg += nrediradd;
+		    }
 		}
 		if (argc > 0)
 		    *cmplx = 1;
