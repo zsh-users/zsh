@@ -1,5 +1,8 @@
 2017-05-08  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 41059: Completion/compinit: use 2>&- to avoid error in
+	restricted shell.
+
 	* 41073: Src/parse.c, Test/A04redirect.ztst: off-by-one error
 	checking for {varid} syntax.
 

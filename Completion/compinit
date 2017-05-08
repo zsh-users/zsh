@@ -171,7 +171,7 @@ typeset -gH _comp_setup='local -A _comp_caller_options;
              _comp_caller_options=(${(kv)options[@]});
              setopt localoptions localtraps localpatterns ${_comp_options[@]};
              local IFS=$'\'\ \\t\\r\\n\\0\'';
-             builtin enable -p \| \~ \( \? \* \[ \< \^ \# 2>/dev/null;
+             builtin enable -p \| \~ \( \? \* \[ \< \^ \# 2>&-;
              exec </dev/null;
              trap - ZERR;
              local -a reply;
