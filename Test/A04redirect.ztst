@@ -165,6 +165,15 @@
 ?About to close a second time
 *?\(eval\):*: failed to close file descriptor *
 
+  eval $'fn-varid() { print {\x18}<<0 }'
+  { which -x2 fn-varid; fn-varid } | tr $'\x18' '?'
+0:Regression test for off-by-one in varid check
+>fn-varid () {
+>  print {?} <<0
+>0
+>}
+>{?}
+
   print foo >&-
 0:'>&-' redirection
 
