@@ -1,3 +1,9 @@
+2017-05-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41060: Src/parse.c, Test/A04redirect.ztst: combination
+	of HERE document and |& was broken by miscounting wordcode owing
+	to missing flag.
+
 2017-05-04  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 41038: NEWS: Document recent, backwards-compatible precommand

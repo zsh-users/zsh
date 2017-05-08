@@ -2143,7 +2143,7 @@ par_redir(int *rp, char *idstring)
 	 * the definition of WC_REDIR_WORDS. */
 	ecispace(r, ncodes);
 	*rp = r + ncodes;
-	ecbuf[r] = WCB_REDIR(type);
+	ecbuf[r] = WCB_REDIR(type | REDIR_FROM_HEREDOC_MASK);
 	ecbuf[r + 1] = fd1;
 
 	/*

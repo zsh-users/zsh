@@ -586,3 +586,18 @@
 >x
 >bar
 >y
+
+  fn-here-pipe() {
+    cat <<-HERE |& cat
+	FOO
+	HERE
+  }
+  fn-here-pipe
+  which fn-here-pipe
+0:Combination of HERE-document and |&
+>FOO
+>fn-here-pipe () {
+>	cat <<HERE 2>&1 | cat
+>FOO
+>HERE
+>}
