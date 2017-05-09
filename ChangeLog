@@ -1,3 +1,8 @@
+2017-05-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Test/D02glob.ztst: Adding comment to test changed
+	line number in output.
+
 2017-05-09  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41081: Src/utils.c, Test/D02glob.ztst: Symlink expansion

@@ -692,7 +692,7 @@
  bad_pwd="/${(l:16000:: :):-}"
  print ${bad_pwd:P}
 0:modifier ':P' with path too long
-?(eval):2: path expansion failed, using root directory
+?(eval):4: path expansion failed, using root directory
 >/
 
  foo=a
