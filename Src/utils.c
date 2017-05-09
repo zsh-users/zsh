@@ -886,7 +886,7 @@ xsymlinks(char *s, int full)
     char **pp, **opp;
     char xbuf2[PATH_MAX*3+1], xbuf3[PATH_MAX*2+1];
     int t0, ret = 0;
-    zulong xbuflen = strlen(xbuf);
+    zulong xbuflen = strlen(xbuf), pplen;
 
     opp = pp = slashsplit(s);
     for (; xbuflen < sizeof(xbuf) && *pp && ret >= 0; pp++) {
@@ -907,10 +907,18 @@ xsymlinks(char *s, int full)
 	    xbuflen--;
 	    continue;
 	}
-	sprintf(xbuf2, "%s/%s", xbuf, *pp);
+	/* Includes null byte. */
+	pplen = strlen(*pp) + 1;
+	if (xbuflen + pplen + 1 > sizeof(xbuf2)) {
+	    *xbuf = 0;
+	    ret = -1;
+	    break;
+	}
+	memcpy(xbuf2, xbuf, xbuflen);
+	xbuf2[xbuflen] = '/';
+	memcpy(xbuf2 + xbuflen + 1, *pp, pplen);
 	t0 = readlink(unmeta(xbuf2), xbuf3, PATH_MAX);
 	if (t0 == -1) {
-	    zulong pplen = strlen(*pp) + 1;
 	    if ((xbuflen += pplen) < sizeof(xbuf)) {
 		strcat(xbuf, "/");
 		strcat(xbuf, *pp);

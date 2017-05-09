@@ -687,6 +687,14 @@
 0:modifier ':P' resolves symlinks before '..' components
 *>*glob.tmp/hello/world
 
+ # This is a bit brittle as it depends on PATH_MAX.
+ # We could use sysconf..
+ bad_pwd="/${(l:16000:: :):-}"
+ print ${bad_pwd:P}
+0:modifier ':P' with path too long
+?(eval):2: path expansion failed, using root directory
+>/
+
  foo=a
  value="ac"
  print ${value//[${foo}b-z]/x}

@@ -1,5 +1,8 @@
 2017-05-09  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 41081: Src/utils.c, Test/D02glob.ztst: Symlink expansion
+	didn't test all buffer length calculations.
+
 	* 41078: Src/prompt.c, Test/D01prompt.ztst: Empty psvar could
 	cause bad reference in prompt expansion.
 
