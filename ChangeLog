@@ -1,3 +1,8 @@
+2017-05-09  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41078: Src/prompt.c, Test/D01prompt.ztst: Empty psvar could
+	cause bad reference in prompt expansion.
+
 2017-05-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41059: Completion/compinit: use 2>&- to avoid error in

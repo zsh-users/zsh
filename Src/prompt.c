@@ -399,7 +399,7 @@ putpromptchar(int doprint, int endchar, unsigned int *txtchangep)
 			test = 1;
 		    break;
 		case 'V':
-		    if (arrlen_ge(psvar, arg)) {
+		    if (psvar && *psvar && arrlen_ge(psvar, arg)) {
 			if (*psvar[(arg ? arg : 1) - 1])
 			    test = 1;
 		    }

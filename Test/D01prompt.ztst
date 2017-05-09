@@ -209,3 +209,7 @@
  print -P -f '%%Sfoo%%s\n' bar
 0:print -P -f
 >%Sfoo%s
+
+  print ${(%U)Y-%(v}
+0:Regression test for test on empty psvar
+>
