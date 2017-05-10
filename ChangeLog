@@ -1,5 +1,8 @@
 2017-05-22  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Marko Myllenen: 41086: Completion/Unix/Command/_libvirt:
+	update completion.
+
 	* Marko Myllenen: 41085: Completion/Unix/Command/_openstack:
 	update completion.
 

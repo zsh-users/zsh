@@ -20,6 +20,7 @@ typeset -A dom_opts
 dom_opts=(
   console " "
   destroy " "
+  edit " "
   managedsave " "
   reboot " "
   reset " "
@@ -95,7 +96,7 @@ case $service in
       '(- *)'{-h,--help}'[print help information and exit]' \
       '(- *)'{-v,--version}'[print version information and exit]' \
       '(- *)'{-q,--quiet}'[quiet mode]' \
-      '1:hv-type:(qemu lxc)' && return
+      '1:hv-type:(qemu lxc bhyve)' && return
   ;;
   virt-pki-validate)
     _arguments -A "-*" -S \
@@ -197,7 +198,7 @@ case $state in
       return 1
     fi
     # Allow passing domain without --domain with few of the most used commands
-    if [[ $cmd == (destroy|reboot|reset|start|shutdown) ]]; then
+    if [[ $cmd == (destroy|edit|reboot|reset|start|shutdown) ]]; then
       if [[ $words[CURRENT-1] == $cmd ]]; then
         values=( $(_call_program domains "noglob virsh $conn_opt list ${dom_opts[$cmd]:-"--all"} --name") )
         [[ -n $values ]] && _wanted domains expl domain compadd ${=values} && return 0
