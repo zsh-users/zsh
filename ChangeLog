@@ -1,3 +1,8 @@
+2017-05-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41096: Src/string.c: Fix dupstring_wlen() for unmetafied
+	string.  It's not safe to assume null termination.
+
 2017-05-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Test/D02glob.ztst: Adding comment to test changed
