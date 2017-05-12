@@ -3625,7 +3625,7 @@ mb_patmatchrange(char *range, wchar_t ch, int zmb_ind, wint_t *indptr, int *mtp)
 		    return 1;
 		break;
 	    case PP_PRINT:
-		if (iswprint(ch))
+		if (WC_ISPRINT(ch))
 		    return 1;
 		break;
 	    case PP_PUNCT:

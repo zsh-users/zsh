@@ -1,3 +1,10 @@
+2017-05-12  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 41090: Src/Zle/zle_refresh.c, Src/compat.c, Src/pattern.c,
+	Src/utils.c, Src/wcwidth9.h, Src/zsh.h, Src/ztype.h,
+	configure.ac: Replace iswprint() if unicode9 support is enabled.
+	Enable unicode9 if wcwidth() and/or iswprint() is broken.
+
 2017-05-11  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41096: Src/string.c: Fix dupstring_wlen() for unmetafied

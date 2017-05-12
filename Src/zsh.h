@@ -3158,9 +3158,7 @@ typedef wint_t convchar_t;
  * works on MacOS which doesn't define that.
  */
 #ifdef ENABLE_UNICODE9
-#define WCWIDTH(wc)	mk_wcwidth(wc)
-#elif defined(BROKEN_WCWIDTH) && (defined(__STDC_ISO_10646__) || defined(__APPLE__))
-#define WCWIDTH(wc)	mk_wcwidth(wc)
+#define WCWIDTH(wc)	u9_wcwidth(wc)
 #else
 #define WCWIDTH(wc)	wcwidth(wc)
 #endif
@@ -3205,15 +3203,7 @@ typedef wint_t convchar_t;
  * sense throughout the shell.  I am not aware of a way of
  * detecting the Unicode trait in standard libraries.
  */
-#ifdef BROKEN_WCWIDTH
-/*
- * We can't be quite sure the wcwidth we've provided is entirely
- * in agreement with the system's, so be extra safe.
- */
-#define IS_COMBINING(wc)	(wc != 0 && WCWIDTH(wc) == 0 && !iswcntrl(wc))
-#else
 #define IS_COMBINING(wc)	(wc != 0 && WCWIDTH(wc) == 0)
-#endif
 /*
  * Test for the base of a combining character.
  *

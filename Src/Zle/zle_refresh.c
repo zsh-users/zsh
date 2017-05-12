@@ -1278,7 +1278,7 @@ zrefresh(void)
 #ifdef __STDC_ISO_10646__
 		 !ZSH_INVALID_WCHAR_TEST(*t) &&
 #endif
-		 iswprint(*t) && (width = WCWIDTH(*t)) > 0) {
+		 WC_ISPRINT(*t) && (width = WCWIDTH(*t)) > 0) {
 	    int ichars;
 	    if (width > rpms.sen - rpms.s) {
 		int started = 0;
@@ -1460,7 +1460,7 @@ zrefresh(void)
 	u = outputline;
 	for (; u < outputline + outll; u++) {
 #ifdef MULTIBYTE_SUPPORT
-	    if (iswprint(*u)) {
+	    if (WC_ISPRINT(*u)) {
 		int width = WCWIDTH(*u);
 		/* Handle wide characters as above */
 		if (width > rpms.sen - rpms.s) {
@@ -2468,7 +2468,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	if (tmpline[t0] == ZWC('\t'))
 	    vsiz = (vsiz | 7) + 2;
 #ifdef MULTIBYTE_SUPPORT
-	else if (iswprint(tmpline[t0]) && ((width = WCWIDTH(tmpline[t0])) > 0)) {
+	else if (WC_ISPRINT(tmpline[t0]) && ((width = WCWIDTH(tmpline[t0])) > 0)) {
 	    vsiz += width;
 	    if (isset(COMBININGCHARS) && IS_BASECHAR(tmpline[t0])) {
 		while (t0 < tmpll-1 && IS_COMBINING(tmpline[t0+1]))
@@ -2556,7 +2556,7 @@ singlerefresh(ZLE_STRING_T tmpline, int tmpll, int tmpcs)
 	    vp->atr = all_atr_on | all_atr_off;
 	    vp++;
 #ifdef MULTIBYTE_SUPPORT
-	} else if (iswprint(tmpline[t0]) &&
+	} else if (WC_ISPRINT(tmpline[t0]) &&
 		   (width = WCWIDTH(tmpline[t0])) > 0) {
 	    int ichars;
 	    if (isset(COMBININGCHARS) && IS_BASECHAR(tmpline[t0])) {

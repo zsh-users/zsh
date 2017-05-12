@@ -629,7 +629,7 @@ wcs_nicechar_sel(wchar_t c, size_t *widthp, char **swidep, int quotable)
     }
 
     s = buf;
-    if (!iswprint(c) && (c < 0x80 || !isset(PRINTEIGHTBIT))) {
+    if (!WC_ISPRINT(c) && (c < 0x80 || !isset(PRINTEIGHTBIT))) {
 	if (c == 0x7f) {
 	    if (quotable) {
 		*s++ = '\\';
@@ -734,7 +734,7 @@ wcs_nicechar(wchar_t c, size_t *widthp, char **swidep)
 /**/
 mod_export int is_wcs_nicechar(wchar_t c)
 {
-    if (!iswprint(c) && (c < 0x80 || !isset(PRINTEIGHTBIT))) {
+    if (!WC_ISPRINT(c) && (c < 0x80 || !isset(PRINTEIGHTBIT))) {
 	if (c == 0x7f || c == L'\n' || c == L'\t' || c < 0x20)
 	    return 1;
 	if (c >= 0x80) {
