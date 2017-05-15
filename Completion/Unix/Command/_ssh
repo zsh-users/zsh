@@ -664,7 +664,9 @@ _ssh_users () {
 
 _ssh_hosts () {
   local -a config_hosts
-  local config
+  local -a config
+  local config_file key args host cfgfile
+  integer cnt
   integer ind
 
   # If users-hosts matches, we shouldn't complete anything else.
@@ -675,26 +677,43 @@ _ssh_hosts () {
       ${opt_args[-l]:+"users=${opt_args[-l]:q}"} hosts "$@" && return
   fi
   if (( ind = ${words[(I)-F]} )); then
-    config=${~words[ind+1]} 2>/dev/null
+    # use custom config file
+    config=(${~words[ind+1]}) 2>/dev/null
   else
-    config="$HOME/.ssh/config"
+    # use the default ssh config file
+    config=("$HOME/.ssh/config")
   fi
-  if [[ -r $config ]]; then
-    local key hosts host
-    while IFS=$'=\t ' read -r key hosts; do
-      if [[ "$key" == (#i)host ]]; then
-         for host in ${(z)hosts}; do
-            case $host in
-            (*[*?]*) ;;
-            (*) config_hosts+=("$host") ;;
-            esac
-         done
-      fi
-    done < "$config"
-    if (( ${#config_hosts} )); then
-      _wanted hosts expl 'remote host name' \
-        compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" $config_hosts
+
+  cnt=1
+  while [ $cnt -le ${#config[@]} ]
+  do
+    config_file=${config[cnt]}
+    if [[ -r "$config_file" ]]; then
+      while IFS=$'=\t ' read -r key args; do
+        if [[ "$key" == (#i)host ]]; then
+        for host in ${(z)args}; do
+           case $host in
+           (*[*?]*) ;;
+           (*) config_hosts+=("$host");;
+           esac
+        done
+        fi
+        # if we find a "include" command, add the referenced file(s) to our array and parse the files later on
+        if [[ "$key" == (#i)include ]]; then
+          for cfgfile in ${(z)args}; do
+            cfgfile=$~cfgfile
+            if [[ -r "$cfgfile" ]]; then
+              config+=("$cfgfile")
+            fi
+          done
+        fi
+      done < "$config_file"
     fi
+    cnt=$((cnt+1))
+  done
+  if (( ${#config_hosts} )); then
+    _wanted hosts expl 'remote host name' \
+    compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" $config_hosts
   fi
 }
 
