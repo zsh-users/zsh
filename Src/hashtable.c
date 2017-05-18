@@ -1448,6 +1448,7 @@ freehistdata(Histent he, int unlink)
     if (!(he->node.flags & (HIST_DUP | HIST_TMPSTORE)))
 	removehashnode(histtab, he->node.nam);
 
+    DPUTS(he->node.nam == chline, "Attempt to free chline in history data");
     zsfree(he->node.nam);
     if (he->nwords)
 	zfree(he->words, he->nwords*2*sizeof(short));

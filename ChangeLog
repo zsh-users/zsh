@@ -1,3 +1,9 @@
+2017-05-18  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41113 (tweaked): Src/hashtable,c, Src/hist.c, Src/zsh.h: Save
+	and restore state of linking of current history line into history
+	ring, to avoid an attempt to free the current history line.
+
 2017-05-12  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 41090: Src/Zle/zle_refresh.c, Src/compat.c, Src/pattern.c,

@@ -87,6 +87,9 @@ mod_export zlong curhist;
 /**/
 struct histent curline;
 
+/***/
+int curline_linked;
+
 /* current line count of allocated history entries */
 
 /**/
@@ -261,6 +264,9 @@ hist_context_save(struct hist_stack *hs, int toplevel)
      */
     hs->cstack = cmdstack;
     hs->csp = cmdsp;
+    hs->curline_linked = curline_linked;
+
+    unlinkcurline();
 
     stophist = 0;
     chline = NULL;
@@ -300,6 +306,9 @@ hist_context_restore(const struct hist_stack *hs, int toplevel)
 	zfree(cmdstack, CMDSTACKSZ);
     cmdstack = hs->cstack;
     cmdsp = hs->csp;
+    unlinkcurline();
+    if (hs->curline_linked)
+	linkcurline();
 }
 
 /*
@@ -990,6 +999,7 @@ nohwe(void)
 
 /* these functions handle adding/removing curline to/from the hist_ring */
 
+/**/
 static void
 linkcurline(void)
 {
@@ -1002,11 +1012,15 @@ linkcurline(void)
 	hist_ring = &curline;
     }
     curline.histnum = ++curhist;
+    curline_linked = 1;
 }
 
+/**/
 static void
 unlinkcurline(void)
 {
+    if (!curline_linked)
+	return;
     curline.up->down = curline.down;
     curline.down->up = curline.up;
     if (hist_ring == &curline) {
@@ -1016,6 +1030,7 @@ unlinkcurline(void)
 	    hist_ring = curline.up;
     }
     curhist--;
+    curline_linked = 0;
 }
 
 /* initialize the history mechanism */
@@ -1035,6 +1050,7 @@ hbegin(int dohist)
 	stophist = (!interact || unset(SHINSTDIN)) ? 2 : 0;
     else
 	stophist = 0;
+    DPUTS(chline != NULL, "chline set at start of history");
     /*
      * pws: We used to test for "|| (inbufflags & INP_ALIAS)"
      * in this test, but at this point we don't have input
@@ -1292,11 +1308,10 @@ putoldhistentryontop(short keep_going)
 Histent
 prepnexthistent(void)
 {
-    Histent he; 
-    int curline_in_ring = hist_ring == &curline;
+    Histent he;
+    int relink_curline = curline_linked;
 
-    if (curline_in_ring)
-	unlinkcurline();
+    unlinkcurline();
     if (hist_ring && hist_ring->node.flags & HIST_TMPSTORE) {
 	curhist--;
 	freehistnode(&hist_ring->node);
@@ -1320,7 +1335,7 @@ prepnexthistent(void)
 	he = hist_ring;
     }
     he->histnum = ++curhist;
-    if (curline_in_ring)
+    if (relink_curline)
 	linkcurline();
     return he;
 }
@@ -1395,8 +1410,7 @@ hend(Eprog prog)
     queue_signals();
     if (histdone & HISTFLAG_SETTY)
 	settyinfo(&shttyinfo);
-    if (!(histactive & HA_NOINC))
-	unlinkcurline();
+    unlinkcurline();
     if (histactive & HA_NOINC) {
 	zfree(chline, hlinesz);
 	zfree(chwords, chwordlen*sizeof(short));
@@ -3624,7 +3638,7 @@ int
 pushhiststack(char *hf, zlong hs, zlong shs, int level)
 {
     struct histsave *h;
-    int curline_in_ring = (histactive & HA_ACTIVE) && hist_ring == &curline;
+    int relink_curline = curline_linked;
 
     if (histsave_stack_pos == histsave_stack_size) {
 	histsave_stack_size += 5;
@@ -3632,8 +3646,7 @@ pushhiststack(char *hf, zlong hs, zlong shs, int level)
 			    histsave_stack_size * sizeof (struct histsave));
     }
 
-    if (curline_in_ring)
-	unlinkcurline();
+    unlinkcurline();
 
     h = &histsave_stack[histsave_stack_pos++];
 
@@ -3668,7 +3681,7 @@ pushhiststack(char *hf, zlong hs, zlong shs, int level)
     savehistsiz = shs;
     inithist(); /* sets histtab */
 
-    if (curline_in_ring)
+    if (relink_curline)
 	linkcurline();
 
     return histsave_stack_pos;
@@ -3680,13 +3693,12 @@ int
 pophiststack(void)
 {
     struct histsave *h;
-    int curline_in_ring = (histactive & HA_ACTIVE) && hist_ring == &curline;
+    int relink_curline = curline_linked;
 
     if (histsave_stack_pos == 0)
 	return 0;
 
-    if (curline_in_ring)
-	unlinkcurline();
+    unlinkcurline();
 
     deletehashtable(histtab);
     zsfree(lasthist.text);
@@ -3709,7 +3721,7 @@ pophiststack(void)
     histsiz = h->histsiz;
     savehistsiz = h->savehistsiz;
 
-    if (curline_in_ring)
+    if (relink_curline)
 	linkcurline();
 
     return histsave_stack_pos + 1;

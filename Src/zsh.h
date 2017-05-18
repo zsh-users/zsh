@@ -2931,6 +2931,7 @@ struct hist_stack {
     void (*addtoline) _((int));
     unsigned char *cstack;
     int csp;
+    int curline_linked;
 };
 
 /*
