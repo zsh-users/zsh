@@ -1158,6 +1158,12 @@ directory is accepted without any attempt to complete it further.
 Hence, in the given example, the path tt(/usr/bin/) is accepted
 immediately and completion tried in that directory.
 
+This style is also useful when completing after directories that
+magically appear when referenced, such as ZFS tt(.zfs) directories
+or NetApp tt(.snapshot) directories.  When the style is set the
+shell does not check for the existence of the directory within the
+parent directory.
+
 If you wish to inhibit this behaviour entirely, set the tt(path-completion)
 style (see below) to `false'.
 )
@@ -1428,9 +1434,10 @@ or colons in var(dir) should be quoted with a backslash to be treated
 literally.
 
 This can be useful on systems that support special file systems whose
-top-level pathnames can not be listed or generated with glob patterns.
-It can also be used for directories for which one does not have read
-permission.
+top-level pathnames can not be listed or generated with glob patterns
+(but see tt(accept-exact-dirs) for a more general way of dealing
+with this problem).  It can also be used for directories for which one
+does not have read permission.
 
 The pattern form can be used to add a certain `magic' entry
 to all directories on a particular file system.

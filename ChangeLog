@@ -1,3 +1,9 @@
+2017-05-19  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* users/22707: Doc/Zsh/compsys.yo: Document use of
+	accept-exact-dirs for allowing completion after "magic"
+	directories.
+
 2017-05-18  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41113 (tweaked): Src/hashtable,c, Src/hist.c, Src/zsh.h: Save
