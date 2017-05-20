@@ -2203,7 +2203,7 @@ matches does not fit on the screen by using the value
 `tt(select=long)'.  To start menu selection even if the current widget
 only performs listing, use the value `tt(select=long-list)'.
 
-To turn on menu completion or menu selection when a there are a certain
+To turn on menu completion or menu selection when there are a certain
 number of matches em(or) the list of matches does not fit on the
 screen, both of `tt(yes=)' and `tt(select=)' may be given twice, once
 with a number and once with `tt(long)' or `tt(long-list)'.
