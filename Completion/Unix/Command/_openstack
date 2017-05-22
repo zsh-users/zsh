@@ -1,4 +1,4 @@
-#compdef openstack aodh barbican ceilometer cinder cloudkitty designate glance gnocchi heat ironic keystone magnum manila mistral monasca murano neutron nova sahara senlin trove
+#compdef openstack aodh barbican ceilometer cinder cloudkitty designate freezer glance gnocchi heat ironic keystone magnum manila mistral monasca murano neutron nova sahara senlin tacker trove vitrage watcher zun
 
 # https://wiki.openstack.org/wiki/OpenStackClients
 # http://docs.openstack.org/user-guide/common/cli-install-openstack-command-line-clients.html
@@ -23,8 +23,8 @@ local -a clnts_compl_new clnts_compl_old clnts_swift_like
 #
 #  3) Swift, slightly different from 2)
 #
-clnts_compl_new=( aodh barbican designate gnocchi openstack )
-clnts_compl_old=( ceilometer cinder cloudkitty glance heat ironic keystone magnum manila mistral monasca murano neutron nova sahara senlin trove )
+clnts_compl_new=( aodh barbican designate freezer gnocchi openstack vitrage watcher )
+clnts_compl_old=( ceilometer cinder cloudkitty glance heat ironic keystone magnum manila mistral monasca murano neutron nova sahara senlin tacker trove zun )
 clnts_swift_like=( swift )
 
 # Python clients take quite some time to start up and some (openstack(1))
