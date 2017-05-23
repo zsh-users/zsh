@@ -1,3 +1,8 @@
+2017-05-23  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Stephane: 41142: Src/Modules/system.c: ensure close-on-exec is
+	applied to moved file descriptor.
+
 2017-05-22  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Marko Myllenen: 41087: Completion/Unix/Command/_kvno: Update
