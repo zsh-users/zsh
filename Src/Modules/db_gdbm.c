@@ -41,7 +41,8 @@
 static Param createhash( char *name, int flags );
 static int append_tied_name( const char *name );
 static int remove_tied_name( const char *name );
-char *unmetafy_zalloc(const char *to_copy, int *new_len);
+static char *unmetafy_zalloc(const char *to_copy, int *new_len);
+static void set_length(char *buf, int size);
 
 /*
  * Make sure we have all the bits I'm using for memory mapping, otherwise
@@ -320,13 +321,15 @@ gdbmgetfn(Param pm)
         pm->u.str = metafy(content.dptr, content.dsize, META_DUP);
 
         /* Free key, restoring its original length */
+        set_length(umkey, umlen);
         zsfree(umkey);
 
         /* Can return pointer, correctly saved inside hash */
         return pm->u.str;
     }
 
-    /* Free key */
+    /* Free key, restoring its original length */
+    set_length(umkey, umlen);
     zsfree(umkey);
 
     /* Can this be "" ? */
@@ -375,12 +378,14 @@ gdbmsetfn(Param pm, char *val)
             (void)gdbm_store(dbf, key, content, GDBM_REPLACE);
 
             /* Free */
+            set_length(umval, umlen);
             zsfree(umval);
         } else {
             (void)gdbm_delete(dbf, key);
         }
 
         /* Free key */
+        set_length(umkey, key.dsize);
         zsfree(umkey);
     }
 }
@@ -519,10 +524,12 @@ gdbmhashsetfn(Param pm, HashTable ht)
 	    content.dsize = umlen;
 	    (void)gdbm_store(dbf, key, content, GDBM_REPLACE);	
 
-            /* Free - thanks to unmetafy_zalloc size of
-             * the strings is exact zalloc size - can
-             * pass to zsfree */
+            /* Free - unmetafy_zalloc allocates exact required
+             * space, however unmetafied string can have zeros
+             * in content, so we must first fill with non-0 bytes */
+            set_length(umval, content.dsize);
             zsfree(umval);
+            set_length(umkey, key.dsize);
             zsfree(umkey);
 
 	    unqueue_signals();
@@ -576,10 +583,6 @@ gdbmhashunsetfn(Param pm, UNUSED(int exp))
 
     pm->node.flags |= PM_UNSET;
 }
-
-#else
-# error no gdbm
-#endif /* have gdbm */
 
 static struct features module_features = {
     bintab, sizeof(bintab)/sizeof(*bintab),
@@ -746,7 +749,7 @@ static int remove_tied_name( const char *name ) {
  *
  * No zsfree()-confusing string will be produced.
  */
-char *unmetafy_zalloc(const char *to_copy, int *new_len) {
+static char *unmetafy_zalloc(const char *to_copy, int *new_len) {
     char *work, *to_return;
     int my_new_len = 0;
 
@@ -767,3 +770,19 @@ char *unmetafy_zalloc(const char *to_copy, int *new_len) {
 
     return to_return;
 }
+
+/*
+ * For zsh-allocator, rest of Zsh seems to use
+ * free() instead of zsfree(), and such length
+ * restoration causes slowdown, but all is this
+ * way strict - correct */
+static void set_length(char *buf, int size) {
+    buf[size]='\0';
+    while ( -- size >= 0 ) {
+        buf[size]=' ';
+    }
+}
+
+#else
+# error no gdbm
+#endif /* have gdbm */
