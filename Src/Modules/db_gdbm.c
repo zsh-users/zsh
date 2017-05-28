@@ -157,10 +157,7 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 
     gdbm_errno=0;
     dbf = gdbm_open(resource_name, 0, read_write, 0666, 0);
-    if(dbf) {
-	addmodulefd(gdbm_fdesc(dbf), FDT_MODULE);
-        append_tied_name(pmname);
-    } else {
+    if(dbf == NULL) {
 	zwarnnam(nam, "error opening database file %s (%s)", resource_name, gdbm_strerror(gdbm_errno));
 	return 1;
     }
@@ -171,6 +168,9 @@ bin_ztie(char *nam, char **args, Options ops, UNUSED(int func))
 	gdbm_close(dbf);
 	return 1;
     }
+
+    addmodulefd(gdbm_fdesc(dbf), FDT_MODULE);
+    append_tied_name(pmname);
 
     tied_param->gsu.h = &gdbm_hash_gsu;
 

@@ -1,5 +1,8 @@
 2017-05-28  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* Sebastian: 41153: Src/Modules/db_gdbm.c: finish module setup
+	only after all error conditions have been checked
+
 	* unposted: Doc/Zsh/mod_complist.yo: clarify ZLS_COLORS pattern
 	matching contexts
 
