@@ -134,7 +134,10 @@ matches beginning with `tt(m)' in groups whose names  begin with
 
 Note also that all patterns are tried in the order in which they
 appear in the parameter value until the first one matches which is
-then used.
+then used.  Patterns may be matched against completions, descriptions
+(possibly with spaces appended for padding), or lines consisting of a
+completion followed by a description.  For consistent coloring it may be
+necessary to use more than one pattern or a pattern with backreferences.
 
 When printing a match, the code prints the value of tt(lc), the value
 for the file-type or the last matching specification with a `tt(*)',

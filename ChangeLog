@@ -1,5 +1,8 @@
 2017-05-28  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* unposted: Doc/Zsh/mod_complist.yo: clarify ZLS_COLORS pattern
+	matching contexts
+
 	* 41159 (tweaked): Completion/Unix/Command/_ssh: handle "Include"
 	and "HostName" lines in ~/.ssh/config
 
