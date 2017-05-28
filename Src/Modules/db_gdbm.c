@@ -645,7 +645,7 @@ static Param createhash( char *name, int flags ) {
     Param pm;
     HashTable ht;
 
-    pm = createparam(name, PM_SPECIAL | PM_HASHED);
+    pm = createparam(name, flags | PM_SPECIAL | PM_HASHED);
     if (!pm) {
         return NULL;
     }
