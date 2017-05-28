@@ -680,17 +680,23 @@ _ssh_hosts () {
     config="$HOME/.ssh/config"
   fi
   if [[ -r $config ]]; then
-    local key hosts host
-    while IFS=$'=\t ' read -r key hosts; do
-      if [[ "$key" == (#i)host ]]; then
-         for host in ${(z)hosts}; do
-            case $host in
-            (*[*?]*) ;;
-            (*) config_hosts+=("$host") ;;
-            esac
-         done
-      fi
-    done < "$config"
+    local key line host
+    local -a lines=("${(@f)$(<"$config")}") 2>/dev/null
+    while (($#lines)); do
+      IFS=$'=\t ' read -r key line <<<"${lines[1]}"
+      case "$key" in
+      ((#i)include)
+        lines[1]=("${(@f)$(cd $HOME/.ssh; cat ${(z)~line})}") 2>/dev/null;;
+      ((#i)host(|name))
+        for host in ${(z)line}; do
+          case $host in
+          (*[*?]*) ;;
+          (*) config_hosts+=("$host") ;;
+          esac
+        done ;&
+      (*) shift lines;;
+      esac
+    done
     if (( ${#config_hosts} )); then
       _wanted hosts expl 'remote host name' \
         compadd -M 'm:{a-zA-Z}={A-Za-z} r:|.=* r:|=*' "$@" $config_hosts
