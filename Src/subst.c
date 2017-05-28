@@ -27,6 +27,8 @@
  *
  */
 
+#include <assert.h>
+
 #include "zsh.mdh"
 #include "subst.pro"
 
@@ -35,6 +37,8 @@
 /**/
 char nulstring[] = {Nularg, '\0'};
 
+int arrcachelen(Param pm);
+    
 /* Do substitutions before fork. These are:
  *  - Process substitution: <(...), >(...), =(...)
  *  - Parameter substitution
@@ -2555,9 +2559,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 		 * necessary joining of arrays until this point
 		 * to avoid the multsub() horror.
 		 */
-
-		/* arrlen() is expensive, so only compute it if needed. */
-		int tmplen = -1;
+		int tmplen;
+		if (v->pm->node.flags & PM_CACHELEN) {
+		    tmplen = arrcachelen(v->pm);
+		    if (v->pm->node.flags & PM_CHECKLEN)
+			assert(tmplen == arrlen(v->pm->gsu.a->getfn(v->pm)));
+		} else
+		    tmplen = -1;
 
 		if (v->start < 0) {
 		    tmplen = arrlen(v->pm->gsu.a->getfn(v->pm));
@@ -3068,11 +3076,14 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    val = dupstring("");
 	} else {
 	    char *sval;
-	    zip = getaparam(s);
+	    int ziplen;
+	    zip = getaparam(s, &ziplen);
 	    if (!zip) {
 		sval = getsparam(s);
 		if (sval)
 		    zip = hmkarray(sval);
+		ziplen = 1;
+		ziplen = !!sval;
 	    }
 	    if (!isarr) {
 		aval = mkarray(val);
@@ -3080,9 +3091,8 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    }
 	    if (zip) {
 		char **out;
-		int alen, ziplen, outlen, i = 0;
+		int alen, outlen, i = 0;
 		alen = arrlen(aval);
-		ziplen = arrlen(zip);
 		outlen = shortest ^ (alen > ziplen) ? alen : ziplen;
 		if (!shortest && (alen == 0 || ziplen == 0)) {
 		    if (ziplen)
@@ -3112,6 +3122,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
     } else if (inbrace && (*s == '|' || *s == Bar ||
 			   *s == '*' || *s == Star)) {
 	int intersect = (*s == '*' || *s == Star);
+	int compare_len;
 	char **compare, **ap, **apsrc;
 	++s;
 	if (*itype_end(s, IIDENT, 0)) {
@@ -3119,9 +3130,9 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	    zerr("not an identifier: %s", s);
 	    return NULL;
 	}
-	compare = getaparam(s);
+	compare = getaparam(s, &compare_len);
 	if (compare) {
-	    HashTable ht = newuniqtable(arrlen(compare)+1);
+	    HashTable ht = newuniqtable(compare_len+1);
 	    int present;
 	    for (ap = compare; *ap; ap++)
 		(void)addhashnode2(ht, *ap, (HashNode)

@@ -3860,7 +3860,7 @@ qualsheval(char *name, UNUSED(struct stat *buf), UNUSED(off_t days), char *str)
 	errflag = ef | (errflag & ERRFLAG_INT);
 	lastval = lv;
 
-	if (!(inserts = getaparam("reply")) &&
+	if (!(inserts = getaparam("reply", NULL)) &&
 	    !(inserts = gethparam("reply"))) {
 	    char *tmp;
 

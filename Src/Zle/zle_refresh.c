@@ -313,7 +313,7 @@ static const REFRESH_ELEMENT zr_start_ellipsis[] = {
 static void
 zle_set_highlight(void)
 {
-    char **atrs = getaparam("zle_highlight");
+    char **atrs = getaparam("zle_highlight", NULL);
     int special_atr_on_set = 0;
     int region_atr_on_set = 0;
     int isearch_atr_on_set = 0;

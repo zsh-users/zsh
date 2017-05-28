@@ -27,6 +27,8 @@
  *
  */
 
+#include <assert.h>
+
 #include "zsh.mdh"
 #include "params.pro"
 
@@ -274,7 +276,7 @@ typedef struct iparam {
 static initparam special_params[] ={
 #define GSU(X) BR((GsuScalar)(void *)(&(X)))
 #define NULL_GSU BR((GsuScalar)(void *)NULL)
-#define IPDEF1(A,B,C) {{NULL,A,PM_INTEGER|PM_SPECIAL|C},BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
+#define IPDEF1(A,B,C) {{NULL,A,PM_INTEGER|PM_SPECIAL|C},BR(NULL),GSU(B),10,0,0,NULL,NULL,NULL,0}
 IPDEF1("#", pound_gsu, PM_READONLY),
 IPDEF1("ERRNO", errno_gsu, PM_UNSET),
 IPDEF1("GID", gid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
@@ -287,7 +289,7 @@ IPDEF1("UID", uid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("EUID", euid_gsu, PM_DONTIMPORT | PM_RESTRICTED),
 IPDEF1("TTYIDLE", ttyidle_gsu, PM_READONLY),
 
-#define IPDEF2(A,B,C) {{NULL,A,PM_SCALAR|PM_SPECIAL|C},BR(NULL),GSU(B),0,0,NULL,NULL,NULL,0}
+#define IPDEF2(A,B,C) {{NULL,A,PM_SCALAR|PM_SPECIAL|C},BR(NULL),GSU(B),0,0,0,NULL,NULL,NULL,0}
 IPDEF2("USERNAME", username_gsu, PM_DONTIMPORT|PM_RESTRICTED),
 IPDEF2("-", dash_gsu, PM_READONLY),
 IPDEF2("histchars", histchars_gsu, PM_DONTIMPORT),
@@ -322,7 +324,7 @@ LCIPDEF("LC_TIME"),
 # endif
 #endif /* USE_LOCALE */
 
-#define IPDEF4(A,B) {{NULL,A,PM_INTEGER|PM_READONLY|PM_SPECIAL},BR((void *)B),GSU(varint_readonly_gsu),10,0,NULL,NULL,NULL,0}
+#define IPDEF4(A,B) {{NULL,A,PM_INTEGER|PM_READONLY|PM_SPECIAL},BR((void *)B),GSU(varint_readonly_gsu),10,0,0,NULL,NULL,NULL,0}
 IPDEF4("!", &lastpid),
 IPDEF4("$", &mypid),
 IPDEF4("?", &lastval),
@@ -331,15 +333,15 @@ IPDEF4("LINENO", &lineno),
 IPDEF4("PPID", &ppid),
 IPDEF4("ZSH_SUBSHELL", &zsh_subshell),
 
-#define IPDEF5(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
-#define IPDEF5U(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
+#define IPDEF5(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL},BR((void *)B),GSU(F),10,0,0,NULL,NULL,NULL,0}
+#define IPDEF5U(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(F),10,0,0,NULL,NULL,NULL,0}
 IPDEF5("COLUMNS", &zterm_columns, zlevar_gsu),
 IPDEF5("LINES", &zterm_lines, zlevar_gsu),
 IPDEF5U("ZLE_RPROMPT_INDENT", &rprompt_indent, rprompt_indent_gsu),
 IPDEF5("SHLVL", &shlvl, varinteger_gsu),
 
 /* Don't import internal integer status variables. */
-#define IPDEF6(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}
+#define IPDEF6(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(F),10,0,0,NULL,NULL,NULL,0}
 IPDEF6("OPTIND", &zoptind, varinteger_gsu),
 IPDEF6("TRY_BLOCK_ERROR", &try_errflag, varinteger_gsu),
 IPDEF6("TRY_BLOCK_INTERRUPT", &try_interrupt, varinteger_gsu),
@@ -420,7 +422,7 @@ IPDEF9F("path", &path, "PATH", PM_RESTRICTED),
 
 IPDEF10("pipestatus", pipestatus_gsu),
 
-{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
+{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,0,NULL,NULL,NULL,0},
 };
 
 /*
@@ -991,7 +993,7 @@ createparam(char *name, int flags)
 	    }
 
 	    pm = oldpm;
-	    pm->base = pm->width = 0;
+	    pm->base = pm->width = pm->length = 0;
 	    oldpm = pm->old;
 	} else {
 	    pm = (Param) zshcalloc(sizeof *pm);
@@ -1104,6 +1106,7 @@ copyparam(Param tpm, Param pm, int fakecopy)
      */
     tpm->node.flags = pm->node.flags;
     tpm->base = pm->base;
+    tpm->length = pm->length;
     tpm->width = pm->width;
     tpm->level = pm->level;
     if (!fakecopy)
@@ -1552,7 +1555,12 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 		ta = getarrvalue(v);
 	    if (!ta || !*ta)
 		return !down;
-	    len = arrlen(ta);
+	    if (v->pm->node.flags & PM_CACHELEN) {
+		len = arrcachelen(v->pm);
+		if (v->pm->node.flags & PM_CHECKLEN)
+		    assert(len == arrlen(ta));
+	    } else
+		len = arrlen(ta);
 	    if (beg < 0)
 		beg += len;
 	    if (down) {
@@ -1575,7 +1583,12 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	    }
 	} else if (word) {
 	    ta = sepsplit(d = s = getstrvalue(v), sep, 1, 1);
-	    len = arrlen(ta);
+	    if (v->pm->node.flags & PM_CACHELEN) {
+		len = arrcachelen(v->pm);
+		if (v->pm->node.flags & PM_CHECKLEN)
+		    assert(len == arrlen(ta));
+	    } else
+		len = arrlen(ta);
 	    if (beg < 0)
 		beg += len;
 	    if (down) {
@@ -2714,10 +2727,15 @@ setarrvalue(Value v, char **val)
 	char **const old = v->pm->gsu.a->getfn(v->pm);
 	char **new;
 	char **p, **q, **r; /* index variables */
-	const int pre_assignment_length = arrlen(old);
+	int pre_assignment_length = arrcachelen(v->pm);
 	int post_assignment_length;
 	int i;
 
+	if (v->pm->node.flags & PM_CACHELEN) {
+	    if (v->pm->node.flags & PM_CHECKLEN)
+		assert(v->pm->length == arrlen(old));
+	} else
+	    pre_assignment_length = arrlen(old);
 	q = old;
 
 	if ((v->flags & VALFLAG_INV) && unset(KSHARRAYS)) {
@@ -2880,14 +2898,25 @@ getsparam_u(char *s)
 
 /**/
 mod_export char **
-getaparam(char *s)
+getaparam(char *s, int *len)
 {
     struct value vbuf;
     Value v;
 
     if (!idigit(*s) && (v = getvalue(&vbuf, &s, 0)) &&
 	PM_TYPE(v->pm->node.flags) == PM_ARRAY)
+    {
+	if (len) {
+	    if (v->pm->node.flags & PM_CACHELEN) {
+		*len = arrcachelen(v->pm);
+		if (v->pm->node.flags & PM_CHECKLEN)
+		    assert (*len == arrlen(v->pm->gsu.a->getfn(v->pm)));
+	    } else
+		*len = arrlen(v->pm->gsu.a->getfn(v->pm));
+	}
+	//fprintf(stderr, "%i %i\n", v->pm->length, arrlen(v->pm->gsu.a->getfn(v->pm)));
 	return v->pm->gsu.a->getfn(v->pm);
+    }
     return NULL;
 }
 
@@ -3061,7 +3090,10 @@ assignsparam(char *s, char *val, int flags)
 		return v->pm; /* avoid later setstrvalue() call */
 	    case PM_ARRAY:
 	    	if (unset(KSHARRAYS)) {
-		    v->start = arrlen(v->pm->gsu.a->getfn(v->pm));
+		    if (v->pm->node.flags & PM_CACHELEN)
+			v->start = arrcachelen(v->pm);
+		    else
+			v->start = arrlen(v->pm->gsu.a->getfn(v->pm));
 		    v->end = v->start + 1;
 		} else {
 		    /* ksh appends scalar to first element */
@@ -3164,6 +3196,8 @@ assignaparam(char *s, char **val, int flags)
 		char **new;
 		int lv = arrlen(val);
 
+		v->pm->length = lv + 1;
+
 		new = (char **) zalloc(sizeof(char *) * (lv + 2));
 		*new = ztrdup(getstrvalue(v));
 		memcpy(new+1, val, sizeof(char *) * (lv + 1));
@@ -3188,7 +3222,16 @@ assignaparam(char *s, char **val, int flags)
     if (flags & ASSPM_AUGMENT) {
     	if (v->start == 0 && v->end == -1) {
 	    if (PM_TYPE(v->pm->node.flags) & PM_ARRAY) {
-	    	v->start = arrlen(v->pm->gsu.a->getfn(v->pm));
+		if (v->pm->node.flags & PM_CACHELEN) {
+		    v->start = 
+			//arrlen(v->pm->gsu.a->getfn(v->pm));
+			arrcachelen(v->pm);
+		    if (v->pm->node.flags & PM_CHECKLEN)
+			assert(v->pm->length == arrlen(v->pm->gsu.a->getfn(v->pm)));
+		} else {
+		    v->start = 
+			arrlen(v->pm->gsu.a->getfn(v->pm));
+		}
 	    	v->end = v->start + 1;
 	    } else if (PM_TYPE(v->pm->node.flags) & PM_HASHED)
 	    	v->start = -1, v->end = 0;
@@ -3196,7 +3239,16 @@ assignaparam(char *s, char **val, int flags)
 	    if (v->end > 0)
 		v->start = v->end--;
 	    else if (PM_TYPE(v->pm->node.flags) & PM_ARRAY) {
-		v->end = arrlen(v->pm->gsu.a->getfn(v->pm)) + v->end;
+		if (v->pm->node.flags & PM_CACHELEN) {
+		    v->end 
+			//= arrlen(v->pm->gsu.a->getfn(v->pm)) + v->end;
+			+= arrcachelen(v->pm);
+		    if (v->pm->node.flags & PM_CHECKLEN)
+			assert(v->pm->length == arrlen(v->pm->gsu.a->getfn(v->pm)));
+		} else {
+		    v->end 
+			= arrlen(v->pm->gsu.a->getfn(v->pm)) + v->end;
+		}
 		v->start = v->end + 1;
 	    }
 	}

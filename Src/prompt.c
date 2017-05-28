@@ -1889,7 +1889,7 @@ allocate_colour_buffer(void)
     if (colseq_buf_allocs++)
 	return;
 
-    atrs = getaparam("zle_highlight");
+    atrs = getaparam("zle_highlight", NULL);
     if (atrs) {
 	for (; *atrs; atrs++) {
 	    if (strpfx("fg_start_code:", *atrs)) {

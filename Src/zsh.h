@@ -1779,6 +1779,7 @@ struct param {
 
     int base;			/* output base or floating point prec    */
     int width;			/* field width                           */
+    int length;                 /* length of array                       */
     char *env;			/* location in environment, if exported  */
     char *ename;		/* name of corresponding environment var */
     Param old;			/* old struct for use with local         */
@@ -1833,6 +1834,8 @@ struct tieddata {
 
 #define PM_KSHSTORED	(1<<17) /* function stored in ksh form              */
 #define PM_ZSHSTORED	(1<<18) /* function stored in zsh form              */
+#define PM_CACHELEN     (1<<19) /* length is cached */
+#define PM_CHECKLEN     (1<<20) /* cached length is checked */
 
 /* Remaining flags do not correspond directly to command line arguments */
 #define PM_DONTIMPORT_SUID (1<<19) /* do not import if running setuid */
@@ -1854,7 +1857,7 @@ struct tieddata {
 #define PM_NAMEDDIR     (1<<30) /* has a corresponding nameddirtab entry    */
 
 /* The option string corresponds to the first of the variables above */
-#define TYPESET_OPTSTR "aiEFALRZlurtxUhHTkz"
+#define TYPESET_OPTSTR "aiEFALRZlurtxUhHTkzcC"
 
 /* These typeset options take an optional numeric argument */
 #define TYPESET_OPTNUM "LRZiEF"
