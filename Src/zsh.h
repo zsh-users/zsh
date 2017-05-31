@@ -1834,8 +1834,8 @@ struct tieddata {
 
 #define PM_KSHSTORED	(1<<17) /* function stored in ksh form              */
 #define PM_ZSHSTORED	(1<<18) /* function stored in zsh form              */
-#define PM_CACHELEN     (1<<19) /* length is cached */
-#define PM_CHECKLEN     (1<<20) /* cached length is checked */
+#define PM_CACHELEN     (1<<17) /* length is cached */
+#define PM_CHECKLEN     (1<<18) /* cached length is checked */
 
 /* Remaining flags do not correspond directly to command line arguments */
 #define PM_DONTIMPORT_SUID (1<<19) /* do not import if running setuid */
