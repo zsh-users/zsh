@@ -2168,10 +2168,20 @@ getstrvalue(Value v)
 	if (v->isarr)
 	    s = sepjoin(ss, NULL, 1);
 	else {
-	    if (v->start < 0)
-		v->start += arrlen(ss);
-	    s = (arrlen_le(ss, v->start) || v->start < 0) ?
-		(char *) hcalloc(1) : ss[v->start];
+	    if (v->pm->node.flags & PM_CACHELEN) {
+		len = arrcachelen(v->pm);
+		if (v->pm->node.flags & PM_CHECKLEN)
+		    assert(v->pm->length == arrlen(ss));
+		if (v->start < 0)
+		    v->start += len;
+		s = (v->start >= len || v->start < 0) ?
+		    (char *) hcalloc(1) : ss[v->start];
+	    } else {
+		if (v->start < 0)
+		    v->start += arrlen(ss);
+		s = (arrlen_le(ss, v->start) || v->start < 0) ?
+		    (char *) hcalloc(1) : ss[v->start];
+	    }
 	}
 	return s;
     case PM_INTEGER:
@@ -2369,10 +2379,20 @@ getarrvalue(Value v)
     s = getvaluearr(v);
     if (v->start == 0 && v->end == -1)
 	return s;
-    if (v->start < 0)
-	v->start += arrlen(s);
-    if (v->end < 0)
-	v->end += arrlen(s) + 1;
+    if (v->pm->node.flags & PM_CACHELEN) {
+	int len = arrcachelen(v->pm);
+	if (v->pm->node.flags & PM_CHECKLEN)
+	    assert(v->pm->length == arrlen(s));
+	if (v->start < 0)
+	    v->start += len;
+	if (v->end < 0)
+	    v->end += len + 1;
+    } else {
+	if (v->start < 0)
+	    v->start += arrlen(s);
+	if (v->end < 0)
+	    v->end += arrlen(s) + 1;
+    }
 
     /* Null if 1) array too short, 2) index still negative */
     if (v->end <= v->start) {
@@ -2381,7 +2401,8 @@ getarrvalue(Value v)
     else if (v->start < 0) {
 	s = arrdup_max(nular, 1);
     }
-    else if (arrlen_le(s, v->start)) {
+    else if ((v->pm->node.flags & PM_CACHELEN) ?
+	     v->start > v->pm->length : arrlen_le(s, v->start)) {
 	/* Handle $ary[i,i] consistently for any $i > $#ary
 	 * and $ary[i,j] consistently for any $j > $i > $#ary
 	 */
@@ -2843,6 +2864,7 @@ setarrvalue(Value v, char **val)
 
                 v->pm->gsu.a->setfn(v->pm, new);
             }
+	    v->pm->length = post_assignment_length;
 
 	    DPUTS2(p - new != post_assignment_length, "setarrvalue: wrong allocation: %d 1= %lu",
 		   post_assignment_length, (unsigned long)(p - new));
