@@ -266,6 +266,7 @@ typedef struct iparam {
     void *gsu;			/* get/set/unset methods */
     int base;			/* output base                           */
     int width;			/* output field width                    */
+    int length;                 /* length of array                       */
     char *env;			/* location in environment, if exported  */
     char *ename;		/* name of corresponding environment var */
     Param old;			/* old struct for use with local         */
@@ -346,9 +347,9 @@ IPDEF6("OPTIND", &zoptind, varinteger_gsu),
 IPDEF6("TRY_BLOCK_ERROR", &try_errflag, varinteger_gsu),
 IPDEF6("TRY_BLOCK_INTERRUPT", &try_interrupt, varinteger_gsu),
 
-#define IPDEF7(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
-#define IPDEF7R(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_DONTIMPORT_SUID},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
-#define IPDEF7U(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(varscalar_gsu),0,0,NULL,NULL,NULL,0}
+#define IPDEF7(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(varscalar_gsu),0,0,0,NULL,NULL,NULL,0}
+#define IPDEF7R(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_DONTIMPORT_SUID},BR((void *)B),GSU(varscalar_gsu),0,0,0,NULL,NULL,NULL,0}
+#define IPDEF7U(A,B) {{NULL,A,PM_SCALAR|PM_SPECIAL|PM_UNSET},BR((void *)B),GSU(varscalar_gsu),0,0,0,NULL,NULL,NULL,0}
 IPDEF7("OPTARG", &zoptarg),
 IPDEF7("NULLCMD", &nullcmd),
 IPDEF7U("POSTEDIT", &postedit),
@@ -363,7 +364,7 @@ IPDEF7("PS3", &prompt3),
 IPDEF7R("PS4", &prompt4),
 IPDEF7("SPROMPT", &sprompt),
 
-#define IPDEF9F(A,B,C,D) {{NULL,A,D|PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(vararray_gsu),0,0,NULL,C,NULL,0}
+#define IPDEF9F(A,B,C,D) {{NULL,A,D|PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(vararray_gsu),0,0,0,NULL,C,NULL,0}
 #define IPDEF9(A,B,C) IPDEF9F(A,B,C,0)
 IPDEF9F("*", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
 IPDEF9F("@", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
@@ -372,9 +373,9 @@ IPDEF9F("@", &pparams, NULL, PM_ARRAY|PM_SPECIAL|PM_DONTIMPORT|PM_READONLY),
  * This empty row indicates the end of parameters available in
  * all emulations.
  */
-{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
+{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,0,NULL,NULL,NULL,0},
 
-#define IPDEF8(A,B,C,D) {{NULL,A,D|PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(colonarr_gsu),0,0,NULL,C,NULL,0}
+#define IPDEF8(A,B,C,D) {{NULL,A,D|PM_SCALAR|PM_SPECIAL},BR((void *)B),GSU(colonarr_gsu),0,0,0,NULL,C,NULL,0}
 IPDEF8("CDPATH", &cdpath, "cdpath", 0),
 IPDEF8("FIGNORE", &fignore, "fignore", 0),
 IPDEF8("FPATH", &fpath, "fpath", 0),
@@ -387,7 +388,7 @@ IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, "zsh_eval_context", PM_READONLY),
 /* MODULE_PATH is not imported for security reasons */
 IPDEF8("MODULE_PATH", &module_path, "module_path", PM_DONTIMPORT|PM_RESTRICTED),
 
-#define IPDEF10(A,B) {{NULL,A,PM_ARRAY|PM_SPECIAL},BR(NULL),GSU(B),10,0,NULL,NULL,NULL,0}
+#define IPDEF10(A,B) {{NULL,A,PM_ARRAY|PM_SPECIAL},BR(NULL),GSU(B),10,0,0,NULL,NULL,NULL,0}
 
 /*
  * The following parameters are not available in sh/ksh compatibility *
@@ -442,7 +443,7 @@ IPDEF8("ZSH_EVAL_CONTEXT", &zsh_eval_context, NULL, PM_READONLY),
 /* MODULE_PATH is not imported for security reasons */
 IPDEF8("MODULE_PATH", &module_path, NULL, PM_DONTIMPORT|PM_RESTRICTED),
 
-{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,NULL,NULL,NULL,0},
+{{NULL,NULL,0},BR(NULL),NULL_GSU,0,0,0,NULL,NULL,NULL,0},
 };
 
 /*
@@ -744,6 +745,20 @@ static int dontimport(int flags)
 	return 1;
     /* OK to import */
     return 0;
+}
+
+/**/
+int
+arrcachelen(Param pm)
+{
+    int len;
+
+    len = pm->length;
+    if (len == 0 && pm->u.arr) {
+       len = arrlen(pm->u.arr);
+       pm->length = len;
+    }
+    return len;
 }
 
 /* Set up parameter hash table.  This will add predefined  *
