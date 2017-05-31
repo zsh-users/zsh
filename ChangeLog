@@ -1,3 +1,8 @@
+2017-05-30  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 41177: Completion/Unix/Command/_nm: add support for macOS
+	and OpenBSD
+
 2017-05-26  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41164: Src/hashtable.c, Src/hist.c, Src/zsh.h: Don't free a
