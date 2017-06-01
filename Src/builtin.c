@@ -2579,6 +2579,17 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	else if (OPT_PLUS(ops,optval))
 	    off |= bit;
     }
+
+    /* Special case, ran out of bit<<1 positions for optstr */
+    if (OPT_MINUS(ops,'c'))
+	on |= PM_CACHELEN;
+    else if (OPT_PLUS(ops,'c'))
+	off |= PM_CACHELEN;
+    if (OPT_MINUS(ops,'C'))
+	on |= PM_CHECKLEN;
+    else if (OPT_PLUS(ops,'C'))
+	off |= PM_CHECKLEN;
+
     roff = off;
 
     /* Sanity checks on the options.  Remove conflicting options. */

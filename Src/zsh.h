@@ -1857,7 +1857,7 @@ struct tieddata {
 #define PM_NAMEDDIR     (1<<30) /* has a corresponding nameddirtab entry    */
 
 /* The option string corresponds to the first of the variables above */
-#define TYPESET_OPTSTR "aiEFALRZlurtxUhHTkzcC"
+#define TYPESET_OPTSTR "aiEFALRZlurtxUhHTkz"
 
 /* These typeset options take an optional numeric argument */
 #define TYPESET_OPTNUM "LRZiEF"
