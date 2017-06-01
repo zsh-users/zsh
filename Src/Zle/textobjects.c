@@ -48,9 +48,10 @@ int
 selectword(UNUSED(char **args))
 {
     int n = zmult;
-    int all = (bindk == t_selectaword || bindk == t_selectablankword);
-    int (*viclass)(ZLE_CHAR_T) = (bindk == t_selectaword ||
-	    bindk == t_selectinword) ? wordclass : blankwordclass;
+    int all = IS_THINGY(bindk, selectaword) ||
+	IS_THINGY(bindk, selectablankword);
+    int (*viclass)(ZLE_CHAR_T) = (IS_THINGY(bindk, selectaword) ||
+	    IS_THINGY(bindk, selectinword)) ? wordclass : blankwordclass;
     int sclass = viclass(zleline[zlecs]);
     int doblanks = all && sclass;
 
@@ -288,7 +289,7 @@ selectargument(UNUSED(char **args))
     free(stringaszleline(linein, wstarts[wcur], &zlecs, &tmpsz, &mark));
     free(linein);
 
-    if (bindk == t_selectinshellword) {
+    if (IS_THINGY(bindk, selectinshellword)) {
 	ZLE_CHAR_T *match = ZWS("`\'\"");
 	ZLE_CHAR_T *lmatch = ZWS("\'({"), *rmatch = ZWS("\')}");
 	ZLE_CHAR_T *ematch = match, *found;

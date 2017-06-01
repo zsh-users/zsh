@@ -230,6 +230,13 @@ struct thingy {
 /* DISABLED is (1<<0) */
 #define TH_IMMORTAL	(1<<1)    /* can't refer to a different widget */
 
+/*
+ * Check if bindk refers to named thingy (a set of bare characters),
+ * also checking the special .thingy widget.
+ */
+#define IS_THINGY(bindk, name)				\
+    ((bindk) == t_ ## name || (bindk) == t_D ## name)
+
 /* command modifier prefixes */
 
 struct modifier {

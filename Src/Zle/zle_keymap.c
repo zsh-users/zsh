@@ -961,7 +961,7 @@ bin_bindkey_meta(char *name, char *kmname, Keymap km, UNUSED(char **argv), UNUSE
 	    m[0] = i;
 	    metafy(m, 1, META_NOALLOC);
 	    fn = keybind(km, m, &str);
-	    if(fn == t_selfinsert || fn == t_undefinedkey)
+	    if(IS_THINGY(fn, selfinsert) || fn == t_undefinedkey)
 		bindkey(km, m, refthingy(Th(metabind[i - 128])), NULL);
 	}
     return 0;
