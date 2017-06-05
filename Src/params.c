@@ -3242,12 +3242,17 @@ sethparam(char *s, char **val)
     if (!(v = fetchvalue(&vbuf, &s, 1, SCANPM_ASSIGNING))) {
 	createparam(t, PM_HASHED);
 	checkcreate = 1;
-    } else if (!(PM_TYPE(v->pm->node.flags) & PM_HASHED) &&
-	     !(v->pm->node.flags & PM_SPECIAL)) {
-	unsetparam(t);
-	/* no WARNCREATEGLOBAL check here as parameter already existed */
-	createparam(t, PM_HASHED);
-	v = NULL;
+    } else if (!(PM_TYPE(v->pm->node.flags) & PM_HASHED)) {
+	if (!(v->pm->node.flags & PM_SPECIAL)) {
+	    unsetparam(t);
+	    /* no WARNCREATEGLOBAL check here as parameter already existed */
+	    createparam(t, PM_HASHED);
+	    v = NULL;
+	} else {
+	    zerr("%s: can't change type of a special parameter", t);
+	    unqueue_signals();
+	    return NULL;
+	}
     }
     if (!v)
 	if (!(v = fetchvalue(&vbuf, &t, 1, SCANPM_ASSIGNING))) {

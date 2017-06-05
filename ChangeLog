@@ -1,3 +1,8 @@
+2017-06-05  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 41225: Src/params.c: sethparam() should not attempt to change
+	special	parameters into hashes
+
 2017-06-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41191: Src/Zle/textobjects.c, Src/Zle/zle.h,
