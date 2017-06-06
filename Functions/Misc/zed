@@ -39,6 +39,24 @@ local curcontext=zed:::
 zstyle -m ":completion:zed:*" insert-tab '*' ||
     zstyle ":completion:zed:*" insert-tab yes
 
+zmodload zsh/terminfo 2>/dev/null
+
+__zed_pg_up()
+{
+    integer count=$(( LINES / 2 - 1 ))
+    while (( count -- )); do
+        zle up-line
+    done
+}
+
+__zed_pg_down()
+{
+    integer count=$(( LINES / 2 - 1 ))
+    while (( count -- )); do
+        zle down-line
+    done
+}
+
 if (( bind )) || ! bindkey -M zed >&/dev/null; then
   # Make the zed keymap a copy of the current main.
   bindkey -N zed main
@@ -53,6 +71,11 @@ if (( bind )) || ! bindkey -M zed >&/dev/null; then
   # a nicety.
   bindkey -M zed '^x^w' accept-line
   bindkey -M zed '^M' self-insert-unmeta
+
+  zle -N __zed_pg_up
+  zle -N __zed_pg_down
+  [[ ${+terminfo} = 1 && -n "$terminfo[kpp]" ]] && bindkey -M zed "$terminfo[kpp]" __zed_pg_up
+  [[ ${+terminfo} = 1 && -n "$terminfo[knp]" ]] && bindkey -M zed "$terminfo[knp]" __zed_pg_down
 
   # Make zed-set-file-name available.
   # Assume it's in fpath; there's no error at this point if it isn't

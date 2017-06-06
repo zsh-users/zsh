@@ -1,3 +1,8 @@
+2017-06-07  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Sebastian: 41232: Functions/Misc/zed: use terminfo to find
+	page up/down keys where available.
+
 2017-06-05  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 41225: Src/params.c: sethparam() should not attempt to change
