@@ -1,5 +1,9 @@
 2017-06-07  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 41239: Src/hist.c, Src/zsh.h: Save and restore default history
+	event on context stack.  This prevents expansions in ZLE from
+	propagating to the command line expansion.
+
 	* Sebastian: 41232: Functions/Misc/zed: use terminfo to find
 	page up/down keys where available.
 

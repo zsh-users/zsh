@@ -2918,6 +2918,7 @@ struct hist_stack {
     int histdone;
     int stophist;
     int hlinesz;
+    zlong defev;
     char *hline;
     char *hptr;
     short *chwords;
