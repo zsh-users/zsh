@@ -20,3 +20,9 @@ the underlying VCS but not whether quilt is used.
 
 Workaround: test (( ${+funcstack[(r)VCS_INFO_quilt]} )).
 ------------------------------------------------------------------------
+41184: 'exec' optimization for last command in a subshell should be
+skipped when STTY=... is set for that command
+------------------------------------------------------------------------
+41203 and others: Make it easier to maintain C modules out of tree.
+(May require defining a stable API for modules, see 41254)
+------------------------------------------------------------------------
