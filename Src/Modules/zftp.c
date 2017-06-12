@@ -3177,7 +3177,7 @@ static struct features module_features = {
 int
 setup_(UNUSED(Module m))
 {
-    return (require_module("zsh/net/tcp", NULL) == 1);
+    return (require_module("zsh/net/tcp", NULL, 0) == 1);
 }
 
 /**/

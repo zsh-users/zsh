@@ -2554,7 +2554,7 @@ zlecmd(zle)
 findex(zmodload)
 cindex(modules, loading)
 cindex(loading modules)
-xitem(tt(zmodload) [ tt(-dL) ] [ ... ])
+xitem(tt(zmodload) [ tt(-dL) ] [ tt(-s) ] [ ... ])
 xitem(tt(zmodload -F) [ tt(-alLme) tt(-P) var(param) ] var(module) [ [tt(PLUS()-)]var(feature) ... ])
 xitem(tt(zmodload -e) [ tt(-A) ] [ ... ])
 xitem(tt(zmodload) [ tt(-a) [ tt(-bcpf) [ tt(-I) ] ] ] [ tt(-iL) ] ...)
@@ -2573,7 +2573,7 @@ printed.  The tt(-L) option causes this list to be in the form of a
 series of tt(zmodload) commands.  Forms with arguments are:
 
 startitem()
-xitem(tt(zmodload) [ tt(-i) ] var(name) ... )
+xitem(tt(zmodload) [ tt(-is) ] var(name) ... )
 item(tt(zmodload) tt(-u) [ tt(-i) ] var(name) ...)(
 In the simplest case, tt(zmodload) loads a binary module.  The module must
 be in a file with a name consisting of the specified var(name) followed by
@@ -2581,9 +2581,7 @@ a standard suffix, usually `tt(.so)' (`tt(.sl)' on HPUX).
 If the module to be loaded is already loaded the duplicate module is
 ignored.  If tt(zmodload) detects an inconsistency, such as an
 invalid module name or circular dependency list, the current code block is 
-aborted.   Hence `tt(zmodload) var(module) tt(2>/dev/null)' is sufficient
-to test whether a module is available.
-If it is available, the module is loaded if necessary, while if it
+aborted.  If it is available, the module is loaded if necessary, while if it
 is not available, non-zero status is silently returned.  The option
 tt(-i) is accepted for compatibility but has no effect.
 
@@ -2595,6 +2593,11 @@ There is no way to prevent the path search.
 If the module supports features (see below), tt(zmodload) tries to
 enable all features when loading a module.  If the module was successfully
 loaded but not all features could be enabled, tt(zmodload) returns status 2.
+
+If the option tt(-s) is given, no error is printed if the module was not
+available (though other errors indicating a problem with the module are
+printed).  The return status indicates if the module was loaded.  This
+is appropriate if the caller considers the module optional.
 
 With tt(-u), tt(zmodload) unloads modules.  The same var(name)
 must be given that was given when the module was loaded, but it is not

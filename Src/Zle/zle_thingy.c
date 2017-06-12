@@ -602,7 +602,7 @@ bin_zle_complete(char *name, char **args, UNUSED(Options ops), UNUSED(char func)
     Thingy t;
     Widget w, cw;
 
-    if (require_module("zsh/complete", NULL) == 1) {
+    if (require_module("zsh/complete", NULL, 0) == 1) {
 	zwarnnam(name, "can't load complete module");
 	return 1;
     }

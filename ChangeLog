@@ -1,3 +1,9 @@
+2017-06-12  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41244: Doc/Zsh/builtins.yo, Src/Modules/zftp.c,
+	Src/Zle/zle_thingy.c, Src/builtin.c, Src/module.c: Add zmodload
+	-s (silent) option by exposing low-level argument to builtin.
+
 2017-06-09  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Etc/BUGS: Add to Etc/BUGS 41184,41203,41254 about
