@@ -1,3 +1,8 @@
+2017-06-13  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41284: Src/builtin.c, Test/B01cd.ztst: fix null dereference on
+	cd with no argument if HOME is not set.
+
 2017-06-12  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41244: Doc/Zsh/builtins.yo, Src/Modules/zftp.c,

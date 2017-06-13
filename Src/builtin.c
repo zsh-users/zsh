@@ -880,8 +880,13 @@ cd_get_dest(char *nam, char **argv, int hard, int func)
 	    dir = nextnode(firstnode(dirstack));
 	if (dir)
 	    zinsertlinknode(dirstack, dir, getlinknode(dirstack));
-	else if (func != BIN_POPD)
+	else if (func != BIN_POPD) {
+	    if (!home) {
+		zwarnnam(nam, "HOME not set");
+		return NULL;
+	    }
 	    zpushnode(dirstack, ztrdup(home));
+	}
     } else if (!argv[1]) {
 	int dd;
 	char *end;
@@ -935,6 +940,10 @@ cd_get_dest(char *nam, char **argv, int hard, int func)
     }
     if (!dir) {
 	dir = firstnode(dirstack);
+    }
+    if (!dir || !getdata(dir)) {
+	DPUTS(1, "Directory not set, not detected early enough");
+	return NULL;
     }
     if (!(dest = cd_do_chdir(nam, getdata(dir), hard))) {
 	if (!target)

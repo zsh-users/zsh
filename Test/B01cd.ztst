@@ -137,6 +137,10 @@ F:something is broken.  But you already knew that.
 0:
 ?(eval):cd:3: not a directory: link_to_nonexistent
 
+ (unset HOME; ARGV0=sh $ZTST_testdir/../Src/zsh -c cd)
+1:Implicit cd with unset HOME.
+?zsh:cd:1: HOME not set
+
 %clean
 # This optional section cleans up after the test, if necessary,
 # e.g. killing processes etc.  This is in addition to the removal of *.tmp
