@@ -10,7 +10,7 @@
 
 # As of zsh-5.1, the following may also be necessary in order to apply
 # quoting to copy-pasted URLs:
-#       autload -Uz bracketed-paste-magic
+#       autoload -Uz bracketed-paste-magic
 #       zle -N bracketed-paste bracketed-paste-magic
 # See also backward-extend-paste in bracketed-paste-magic source file.
 

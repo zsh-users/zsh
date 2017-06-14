@@ -1,5 +1,8 @@
 2017-06-13  Eric Cook  <llua@gmx.com>
 
+	* unposted: Functions/Zle/url-quote-magic: fix typo
+	in the examples
+
 	* Stephane: 41275: Src/Zle/zle_main.c: Leave stdin open
 	when executing widgets.
 
