@@ -750,12 +750,12 @@ sect(User-Defined Widgets)
 cindex(widgets, user-defined)
 User-defined widgets, being implemented as shell functions,
 can execute any normal shell command.  They can also run other widgets
-(whether built-in or user-defined) using the tt(zle) builtin command.
-The standard input of the function is closed to prevent external commands
-from unintentionally blocking ZLE by reading from the terminal, but
-tt(read -k) or tt(read -q) can be used to read characters.  Finally,
-they can examine and edit the ZLE buffer being edited by
-reading and setting the special parameters described below.
+(whether built-in or user-defined) using the tt(zle) builtin command. The
+standard input of the function is redirected from /dev/null to prevent
+external commands from unintentionally blocking ZLE by reading from the
+terminal, but tt(read -k) or tt(read -q) can be used to read characters.
+Finally, they can examine and edit the ZLE buffer being edited by reading
+and setting the special parameters described below.
 
 cindex(parameters, editor)
 cindex(parameters, zle)

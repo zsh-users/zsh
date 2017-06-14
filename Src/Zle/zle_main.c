@@ -1485,6 +1485,13 @@ execzlefunc(Thingy func, char **args, int set_bindk)
 	    int inuse = w->flags & WIDGET_INUSE;
 	    w->flags |= WIDGET_INUSE;
 
+	    if (osi > 0) {
+		/*
+		 * Many commands don't like having a closed stdin, open on
+		 * /dev/null instead
+		 */
+		open("/dev/null", O_RDWR | O_NOCTTY); /* ignore failure */
+	    }
 	    if (*args) {
 		largs = newlinklist();
 		addlinknode(largs, dupstring(w->u.fnnam));

@@ -74,6 +74,12 @@ to undo the escaping with:
 
 This is also needed if $vcs_info_msg_0_ is used to set $psvar.
 
+4) functions executed by ZLE widgets no longer have they standard input
+closed, but is now redirected from /dev/null instead. That still guards
+against user defined widgets inadvertently reading from the tty device,
+and addresses the antisocial behaviour of running a command with its
+stdin closed.
+
 Incompatibilities between 5.0.8 and 5.3
 ----------------------------------------
 

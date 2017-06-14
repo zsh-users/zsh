@@ -14,6 +14,10 @@ expansion (see zshexpn(1)), so they could neither be quoted nor be the
 result of parameter expansion.  Examples: 's=command; $s -V ls' and
 '\command -V ls' now work as expected.
 
+Functions executed by ZLE widgets no longer have they standard input
+closed, but is now redirected from /dev/null instead. That still guards
+against user defined widgets inadvertently reading from the tty device.
+
 
 Changes from 5.2 to 5.3.1
 -------------------------

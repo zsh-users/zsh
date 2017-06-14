@@ -1,3 +1,8 @@
+2017-06-13  Eric Cook  <llua@gmx.com>
+
+	* Stephane: 41275: Src/Zle/zle_main.c: Leave stdin open
+	when executing widgets.
+
 2017-06-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41284: Src/builtin.c, Test/B01cd.ztst: fix null dereference on
