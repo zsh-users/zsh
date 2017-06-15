@@ -1,3 +1,8 @@
+2017-06-22  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Phil: 41308, tweaked: Src/Modules/pcre.c, Test/V07pcre.ztst:
+	Behaviour of PCRE with NULL bytes.
+
 2017-06-19  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* Mikael Magnusson: 41319: Src/cond.c: dupstring a possibly

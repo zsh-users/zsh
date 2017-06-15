@@ -75,7 +75,7 @@ zpcre_utf8_enabled(void)
 static int
 bin_pcre_compile(char *nam, char **args, Options ops, UNUSED(int func))
 {
-    int pcre_opts = 0, pcre_errptr;
+    int pcre_opts = 0, pcre_errptr, target_len;
     const char *pcre_error;
     char *target;
     
@@ -89,15 +89,19 @@ bin_pcre_compile(char *nam, char **args, Options ops, UNUSED(int func))
 	pcre_opts |= PCRE_UTF8;
 
     pcre_hints = NULL;  /* Is this necessary? */
-    
+
     if (pcre_pattern)
 	pcre_free(pcre_pattern);
 
     target = ztrdup(*args);
-    unmetafy(target, NULL);
+    unmetafy(target, &target_len);
+
+    if ((int)strlen(target) != target_len) {
+	zwarnnam(nam, "embedded NULs in PCRE pattern terminate pattern");
+    }
 
     pcre_pattern = pcre_compile(target, pcre_opts, &pcre_error, &pcre_errptr, NULL);
-    
+
     free(target);
 
     if (pcre_pattern == NULL)
@@ -167,7 +171,12 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar,
 	    sprintf(offset_all, "%d %d", ovec[0], ovec[1]);
 	    setsparam("ZPCRE_OP", ztrdup(offset_all));
 	}
-	match_all = metafy(captures[0], -1, META_DUP);
+	/*
+	 * Result strings can contain embedded NULs; the length of each is the
+	 * difference between the two values in each paired entry in ovec.
+	 * ovec is length 2*(1+capture_list_length)
+	 */
+	match_all = metafy(captures[0], ovec[1] - ovec[0], META_DUP);
 	setsparam(matchvar, match_all);
 	/*
 	 * If we're setting match, mbegin, mend we only do
@@ -176,13 +185,16 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar,
 	 */
 	if (!want_begin_end || nelem) {
 	    char **x, **y;
+	    int vec_off;
 	    y = &captures[capture_start];
 	    matches = x = (char **) zalloc(sizeof(char *) * (arrlen(y) + 1));
+	    vec_off = 2;
 	    do {
 		if (*y)
-		    *x++ = metafy(*y, -1, META_DUP);
+		    *x++ = metafy(*y, ovec[vec_off+1]-ovec[vec_off], META_DUP);
 		else
 		    *x++ = NULL;
+		vec_off += 2;
 	    } while (*y++);
 	    setaparam(substravar, matches);
 	}
@@ -318,8 +330,7 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
     ovec = zalloc(ovecsize*sizeof(int));
 
     plaintext = ztrdup(*args);
-    unmetafy(plaintext, NULL);
-    subject_len = (int)strlen(plaintext);
+    unmetafy(plaintext, &subject_len);
 
     if (offset_start > 0 && offset_start >= subject_len)
 	ret = PCRE_ERROR_NOMATCH;
@@ -351,6 +362,7 @@ cond_pcre_match(char **a, int id)
     const char *pcre_err;
     char *lhstr, *rhre, *lhstr_plain, *rhre_plain, *avar=NULL;
     int r = 0, pcre_opts = 0, pcre_errptr, capcnt, *ov, ovsize;
+    int lhstr_plain_len, rhre_plain_len;
     int return_value = 0;
 
     if (zpcre_utf8_enabled())
@@ -362,8 +374,8 @@ cond_pcre_match(char **a, int id)
     rhre = cond_str(a,1,0);
     lhstr_plain = ztrdup(lhstr);
     rhre_plain = ztrdup(rhre);
-    unmetafy(lhstr_plain, NULL);
-    unmetafy(rhre_plain, NULL);
+    unmetafy(lhstr_plain, &lhstr_plain_len);
+    unmetafy(rhre_plain, &rhre_plain_len);
     pcre_pat = NULL;
     ov = NULL;
     ovsize = 0;
@@ -373,6 +385,9 @@ cond_pcre_match(char **a, int id)
 
     switch(id) {
 	 case CPCRE_PLAIN:
+		if ((int)strlen(rhre_plain) != rhre_plain_len) {
+		    zwarn("embedded NULs in PCRE pattern terminate pattern");
+		}
 		pcre_pat = pcre_compile(rhre_plain, pcre_opts, &pcre_err, &pcre_errptr, NULL);
 		if (pcre_pat == NULL) {
 		    zwarn("failed to compile regexp /%s/: %s", rhre, pcre_err);
@@ -381,7 +396,7 @@ cond_pcre_match(char **a, int id)
                 pcre_fullinfo(pcre_pat, NULL, PCRE_INFO_CAPTURECOUNT, &capcnt);
     		ovsize = (capcnt+1)*3;
 		ov = zalloc(ovsize*sizeof(int));
-    		r = pcre_exec(pcre_pat, NULL, lhstr_plain, strlen(lhstr_plain), 0, 0, ov, ovsize);
+    		r = pcre_exec(pcre_pat, NULL, lhstr_plain, lhstr_plain_len, 0, 0, ov, ovsize);
 		/* r < 0 => error; r==0 match but not enough size in ov
 		 * r > 0 => (r-1) substrings found; r==1 => no substrings
 		 */

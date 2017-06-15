@@ -131,6 +131,12 @@
 >78884; ZPCRE_OP: 25 30
 >90210; ZPCRE_OP: 31 36
 
+# Embedded NULs allowed in plaintext, but not in RE (although \0 as two-chars allowed)
+  [[ $'a\0bc\0d' =~ '^(a\0.)(.+)$' ]]
+  print "${#MATCH}; ${#match[1]}; ${#match[2]}"
+0:ensure ASCII NUL passes in and out of matched plaintext
+>6; 3; 3
+
 # Subshell because crash on failure
   ( setopt re_match_pcre
     [[ test.txt =~ '^(.*_)?(test)' ]]
