@@ -3135,7 +3135,9 @@ matchcmp(Cmatch *a, Cmatch *b)
     if ((*b)->disp && !((*b)->flags & CMF_MORDER))
 	return 1;
 
-    return zstrbcmp((*a)->str, (*b)->str);
+    return zstrcmp((*a)->str, (*b)->str, (SORTIT_IGNORING_BACKSLASHES|
+					  (isset(NUMERICGLOBSORT) ?
+					   SORTIT_NUMERICALLY : 0)));
 }
 
 /* This tests whether two matches are equal (would produce the same

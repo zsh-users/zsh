@@ -2407,53 +2407,6 @@ sfxlen(char *s, char *t)
 }
 #endif
 
-/* This is zstrcmp with ignoring backslashes. */
-
-/**/
-mod_export int
-zstrbcmp(const char *a, const char *b)
-{
-    const char *astart = a;
-
-    while (*a && *b) {
-	if (*a == '\\')
-	    a++;
-	if (*b == '\\')
-	    b++;
-	if (*a != *b || !*a)
-	    break;
-	a++;
-	b++;
-    }
-    if (isset(NUMERICGLOBSORT) && (idigit(*a) || idigit(*b))) {
-	for (; a > astart && idigit(a[-1]); a--, b--);
-	if (idigit(*a) && idigit(*b)) {
-	    while (*a == '0')
-		a++;
-	    while (*b == '0')
-		b++;
-	    for (; idigit(*a) && *a == *b; a++, b++);
-	    if (idigit(*a) || idigit(*b)) {
-		int cmp = (int) STOUC(*a) - (int) STOUC(*b);
-
-		while (idigit(*a) && idigit(*b))
-		    a++, b++;
-		if (idigit(*a) && !idigit(*b))
-		    return 1;
-		if (idigit(*b) && !idigit(*a))
-		    return -1;
-
-		return cmp;
-	    }
-	}
-    }
-#ifndef HAVE_STRCOLL
-    return (int)(*a - *b);
-#else
-    return strcoll(a,b);
-#endif
-}
-
 /* This is used to print the strings (e.g. explanations). *
  * It returns the number of lines printed.       */
 
