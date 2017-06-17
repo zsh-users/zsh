@@ -12,7 +12,7 @@ setopt nobadpattern
 
 local key str files
 
-files=( *(N) )
+files=( *(N:q) )
 if (( $#files )); then
   zle -R "files: ${str}_" "$files[@]"
 else
@@ -26,7 +26,7 @@ while [[ '#key' -ne '#\\r' && '#key' -ne '#\\n' &&
   else
     str="$str$key"
   fi
-  eval "files=( \${~str}*(N) )"
+  eval "files=( \${~str}*(N:q) )"
   if (( $#files )); then
     zle -R "files: ${str}_" "$files[@]"
   else
