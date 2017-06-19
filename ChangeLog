@@ -4,7 +4,7 @@
 	queuing/blocking state during shingetline() to improve read speed
 
 	* 41317: Src/exec.c: use heap allocation in getoutputfile() to
-	plug memory leak
+	plug memory leak (cf. Sebastian: 41316)
 
 2017-06-17  Barton E. Schaefer  <schaefer@zsh.org>
 
