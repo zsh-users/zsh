@@ -1,5 +1,8 @@
 2017-06-19  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* Mikael Magnusson: 41319: Src/cond.c: dupstring a possibly
+	readonly string before modifying
+
 	* 41322 + comment: Src/input.c: reduce number of changes in signal
 	queuing/blocking state during shingetline() to improve read speed
 
