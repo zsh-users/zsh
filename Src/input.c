@@ -144,9 +144,10 @@ shingetline(void)
     int q = queue_signal_level();
 
     p = buf;
+    winch_unblock();
+    dont_queue_signals();
     for (;;) {
-	winch_unblock();
-	dont_queue_signals();
+	/* Can't fgets() here because we need to accept '\0' bytes */
 	do {
 	    errno = 0;
 	    c = fgetc(bshin);
@@ -176,7 +177,8 @@ shingetline(void)
 	    ll += p - buf;
 	    line[ll] = '\0';
 	    p = buf;
-	    unqueue_signals();
+	    winch_unblock();
+	    dont_queue_signals();
 	}
     }
 }

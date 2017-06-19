@@ -1,5 +1,8 @@
 2017-06-19  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 41322 + comment: Src/input.c: reduce number of changes in signal
+	queuing/blocking state during shingetline() to improve read speed
+
 	* 41317: Src/exec.c: use heap allocation in getoutputfile() to
 	plug memory leak
 
