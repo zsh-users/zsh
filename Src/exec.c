@@ -4570,7 +4570,7 @@ getoutputfile(char *cmd, char **eptr)
     }
     if (!(prog = parsecmd(cmd, eptr)))
 	return NULL;
-    if (!(nam = gettempname(NULL, 0)))
+    if (!(nam = gettempname(NULL, 1)))
 	return NULL;
 
     if ((s = simple_redir_name(prog, REDIR_HERESTR))) {
@@ -4601,7 +4601,7 @@ getoutputfile(char *cmd, char **eptr)
 	    suffix = dyncat(nam, unmeta(suffix));
 	    if (link(nam, suffix) == 0) {
 		addfilelist(nam, 0);
-		nam = ztrdup(suffix);
+		nam = suffix;
 	    }
 	}
     }
