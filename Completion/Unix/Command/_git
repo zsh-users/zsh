@@ -495,8 +495,8 @@ _git-checkout () {
 
       elif [[ -n ${opt_args[(I)-b|-B|-t|--track|--orphan|--detach]} ]]; then
         _nothing
-      elif [[ -n $line[1] ]] && __git_is_treeish $line[1]; then
-        __git_ignore_line __git_tree_files ${PREFIX:-.} $line[1] && ret=0
+      elif [[ -n $line[1] ]] && __git_is_treeish ${(Q)line[1]}; then
+        __git_ignore_line __git_tree_files ${PREFIX:-.} ${(Q)line[1]} && ret=0
       else
         __git_ignore_line __git_modified_files && ret=0
       fi

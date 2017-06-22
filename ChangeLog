@@ -1,5 +1,8 @@
 2017-06-22  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 41339: Completion/Unix/Command/_git: unquote treeish argument
+	for git checkout completion.
+
 	* Phil: 41308, tweaked: Src/Modules/pcre.c, Test/V07pcre.ztst:
 	Behaviour of PCRE with NULL bytes.
 
