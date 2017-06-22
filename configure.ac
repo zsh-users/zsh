@@ -628,6 +628,7 @@ if test "x$ac_cv_prog_YODL" = xyodl; then
     case `yodl --version` in
       *"version 2."*) YODL_OPTIONS='-k' ;;
       *"version 3."*) YODL_OPTIONS='-k -L' ;;
+      *"version 4."*) YODL_OPTIONS='-k -L' ;;
     esac
 fi
 AC_SUBST(YODL_OPTIONS)

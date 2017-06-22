@@ -1,5 +1,7 @@
 2017-06-22  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Axel: 41342: conigure.ac: check for yodl version 4.
+
 	* 41339: Completion/Unix/Command/_git: unquote treeish argument
 	for git checkout completion.
 
