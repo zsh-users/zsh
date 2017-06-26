@@ -1,3 +1,8 @@
+2017-06-26  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41345: Functions/Prompts/prompt_walters_setup: use consistent
+	versions of the prompt variables in prompt themes.
+
 2017-06-22  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Axel: 41342: conigure.ac: check for yodl version 4.
