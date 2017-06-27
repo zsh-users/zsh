@@ -1867,6 +1867,7 @@ ccmakehookfn(UNUSED(Hookdef dummy), struct ccmakedat *dat)
 	    redup(osi, 0);
 
 	    dat->lst = 0;
+	    unqueue_signals();
 	    return 0;
 	}
 	if (lastmatches) {
@@ -1890,6 +1891,7 @@ ccmakehookfn(UNUSED(Hookdef dummy), struct ccmakedat *dat)
 	    redup(osi, 0);
 
 	    dat->lst = 0;
+	    unqueue_signals();
 	    return 0;
 	}
 	if (!m || !(m = m->next))

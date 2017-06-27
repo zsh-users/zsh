@@ -1,3 +1,7 @@
+2017-06-27  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41368: Src/Zle/compctl.c: missing unqueue_signals().
+
 2017-06-26  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41345: Functions/Prompts/prompt_walters_setup: use consistent
