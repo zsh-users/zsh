@@ -1,3 +1,7 @@
+2017-07-03  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Sebastian: 41375: Src/Modules/db_gdbm.c: GDBM interface bug fixes.
+
 2017-07-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 41386: Src/jobs.c: when backgrounding a STAT_CURSH job, remove
