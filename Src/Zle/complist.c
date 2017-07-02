@@ -2334,11 +2334,6 @@ msearch(Cmatch **ptr, char *ins, int back, int rep, int *wrapp)
             }
         }
         if (x == ex && y == ey) {
-            if (wrap) {
-                msearchstate = MS_FAILED | owrap;
-                break;
-            }
-            msearchstate |= MS_WRAPPED;
 
             if (back) {
                 x = mcols - 1;
@@ -2350,6 +2345,13 @@ msearch(Cmatch **ptr, char *ins, int back, int rep, int *wrapp)
             }
             ex = mcol;
             ey = mline;
+
+            if (wrap || (x == ex && y == ey)) {
+                msearchstate = MS_FAILED | owrap;
+                break;
+            }
+
+            msearchstate |= MS_WRAPPED;
             wrap = 1;
             *wrapp = 1;
         }

@@ -1,3 +1,8 @@
+2017-07-04  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Maxime de Roucy: 41385: Src/Zle/complist.c: Avoid invalid
+	access with isearch in completion list.
+
 2017-07-03  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Sebastian: 41375: Src/Modules/db_gdbm.c: GDBM interface bug fixes.
