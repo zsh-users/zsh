@@ -5417,7 +5417,7 @@ mb_metastrlenend(char *ptr, int width, char *eptr)
     int num, num_in_char, complete;
 
     if (!isset(MULTIBYTE))
-	return ztrlen(ptr);
+	return eptr ? (int)(eptr - ptr) : ztrlen(ptr);
 
     laststart = ptr;
     ret = MB_INVALID;

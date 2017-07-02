@@ -1,3 +1,8 @@
+2017-07-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 22760: Src/utils.c, Test/D04parameter.ztst: NO_MULTIBYTE
+	partial string lengths were reported as full string lengths.
+
 2017-06-27  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41368: Src/Zle/compctl.c: missing unqueue_signals().

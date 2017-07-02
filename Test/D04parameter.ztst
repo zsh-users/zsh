@@ -783,16 +783,36 @@
 0:${(R)...}
 >is the , 
 
+  # Although there's no reliance on multibyte here, the
+  # code exercised is different, so test both paths in the following group.
+  # If the shell isn't multibyte capable the tests are the same;
+  # that's not a problem.
   # This (1) doesn't work with // or /
   #      (2) perhaps ought to be 18, to be consistent with normal zsh
   #          substring indexing and with backreferences.
   print ${(BES)string##white}
+  (unsetopt multibyte; print ${(BES)string##white})
 0:${(BE...)...}
+>14 19
 >14 19
 
   print ${(NS)string##white}
+  (unsetopt multibyte; print ${(NS)string##white})
 0:${(N)...}
 >5
+>5
+
+  fn() {
+    emulate -L zsh
+    local a=abcdef
+    print ${(SNBE)a#abcd}
+    unsetopt multibyte
+    print ${(SNBE)a#abcd}
+  }
+  fn
+0:${(BEN)...} again, with match
+>1 5 4
+>1 5 4
 
   string='abcdefghijklmnopqrstuvwxyz'
   print ${${string%[aeiou]*}/(#m)?(#e)/${(U)MATCH}}
