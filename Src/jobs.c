@@ -2288,8 +2288,10 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	case BIN_FG:
 	case BIN_BG:
 	case BIN_WAIT:
-	    if (func == BIN_BG)
+	    if (func == BIN_BG) {
 		jobtab[job].stat |= STAT_NOSTTY;
+		jobtab[job].stat &= ~STAT_CURSH;
+	    }
 	    if ((stopped = (jobtab[job].stat & STAT_STOPPED))) {
 		makerunning(jobtab + job);
 		if (func == BIN_BG) {
