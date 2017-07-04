@@ -49,6 +49,12 @@ in the parent shell.  Thus the behaviour is different from the case
 where the function was never suspended.  Zsh is different from many
 other shells in this regard.
 
+One additional side effect is that use of tt(disown) with a job
+created by suspending shell code in this fashion is delayed: the
+job can only be disowned once any process started from the parent
+shell has terminated.  At that point, the disowned job disappears
+silently from the job list.
+
 The same behaviour is found when the shell is executing code as the
 right hand side of a pipeline or any complex shell construct such as
 tt(if), tt(for), etc., in order that the entire block of code

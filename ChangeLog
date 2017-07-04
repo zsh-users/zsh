@@ -1,5 +1,8 @@
 2017-07-04  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 41391: Doc/Zsh/jobs.yo, Src/jobs.c, Src/zsh.h: delay disown
+	for superjob.
+
 	* Maxime de Roucy: 41385: Src/Zle/complist.c: Avoid invalid
 	access with isearch in completion list.
 

@@ -277,6 +277,10 @@ handle_sub(int job, int fg)
 		(!jn->procs->next || cp || jn->procs->pid != jn->gleader))
 		attachtty(jn->gleader);
 	    kill(sj->other, SIGCONT);
+	    if (jn->stat & STAT_DISOWN)
+	    {
+		deletejob(jn, 1);
+	    }
 	}
 	curjob = jn - jobtab;
     } else if (sj->stat & STAT_STOPPED) {
@@ -2375,6 +2379,10 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    printjob(job + (oldjobtab ? oldjobtab : jobtab), lng, 2);
 	    break;
 	case BIN_DISOWN:
+	    if (jobtab[job].stat & STAT_SUPERJOB) {
+		jobtab[job].stat |= STAT_DISOWN;
+		continue;
+	    }
 	    if (jobtab[job].stat & STAT_STOPPED) {
 		char buf[20], *pids = "";
 

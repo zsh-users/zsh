@@ -1029,6 +1029,7 @@ struct job {
 #define STAT_BUILTIN    (0x4000) /* job at tail of pipeline is a builtin */
 #define STAT_SUBJOB_ORPHANED (0x8000)
                                  /* STAT_SUBJOB with STAT_SUPERJOB exited */
+#define STAT_DISOWN     (0x10000) /* STAT_SUPERJOB with disown pending */
 
 #define SP_RUNNING -1		/* fake status for jobs currently running */
 
