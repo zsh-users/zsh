@@ -396,6 +396,8 @@ ecstrcode(char *s)
 {
     int l, t = has_token(s);
 
+    unsigned val = hasher(s);
+
     if ((l = strlen(s) + 1) && l <= 4) {
 	wordcode c = (t ? 3 : 2);
 	switch (l) {
@@ -410,8 +412,9 @@ ecstrcode(char *s)
 	int cmp;
 
 	for (pp = &ecstrs; (p = *pp); ) {
-	    if (!(cmp = p->nfunc - ecnfunc) && !(cmp = strcmp(p->str, s)))
+	    if (!(cmp = p->nfunc - ecnfunc) && !(cmp = (((signed)p->hashval) - ((signed)val))) && !(cmp = strcmp(p->str, s))) {
 		return p->offs;
+            }
 	    pp = (cmp < 0 ? &(p->left) : &(p->right));
 	}
 	p = *pp = (Eccstr) zhalloc(sizeof(*p));
@@ -420,6 +423,7 @@ ecstrcode(char *s)
 	p->aoffs = ecsoffs;
 	p->str = s;
 	p->nfunc = ecnfunc;
+        p->hashval = val;
 	ecsoffs += l;
 
 	return p->offs;

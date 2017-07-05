@@ -813,6 +813,7 @@ struct eccstr {
     char *str;
     wordcode offs, aoffs;
     int nfunc;
+    int hashval;
 };
 
 #define EC_NODUP  0
