@@ -1,5 +1,8 @@
 2017-07-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* Sebastian: 41402: Src/parse.c: Delay checking tokens in
+	ecstrcode() as may not be needed.
+
 	* Sebastian: 41402: Src/parse.c, Src/zsh.h: Add hasher to
 	ecstrcode() to reduce string comparisons.
 
