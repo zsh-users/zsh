@@ -49,6 +49,7 @@ case $state in
       "sqlreset:print the DROP TABLE and CREATE TABLE statements for the given app(s)"
       "sqlsequencereset:print the SQL statements for resetting sequences for the given app(s)"
       "startapp:create Django app directory in this project's directory"
+      "startproject:create a Django project directory structure for a given project name"
       "syncdb:create database tables for apps in INSTALLED_APPS where required"
       "test:run the test suite for the specified app, or the entire site"
       "testserver:run a development server with data from the given fixture(s)"
