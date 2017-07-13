@@ -64,7 +64,7 @@ tells _wanted where to put options specifying the `directory' description.
 Where two matches have identical meaning, give them the same
 description so that the completion system can group them together.
 Conventionally a brace expansion of this form is used:
-  '(--context,-C)'{--context=,-C-}'[specify lines of context]:lines'
+  '(--context -C)'{--context=,-C-}'[specify lines of context]:lines'
 You won't need the exclusion list if the option can be specified
 multiple times. It can also be useful to use the same description for
 matches which are completely opposite in their meaning if it shortens

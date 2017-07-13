@@ -756,7 +756,8 @@ _git-diff () {
     $diff_options \
     '(--exit-code)--quiet[disable all output]' \
     $diff_stage_options \
-    '(--cached --staged)'{--cached,--staged}'[show diff between index and named commit]' \
+    '(--cached --staged)--no-index[show diff between two paths on the filesystem]' \
+    '(--cached --staged --no-index)'{--cached,--staged}'[show diff between index and named commit]' \
     '(-)--[start file arguments]' \
     '*:: :->from-to-file' && ret=0
 
@@ -771,6 +772,12 @@ _git-diff () {
         else
           __git_changed-in-working-tree_files && ret=0
         fi
+        return ret
+      fi
+
+      # If "--no-index" was given, only file paths need to be completed.
+      if [[ -n ${opt_args[(I)--no-index]} ]]; then
+        _alternative 'files::_files' && ret=0
         return ret
       fi
 

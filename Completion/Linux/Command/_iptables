@@ -47,7 +47,7 @@ case ${prev[${prev[(I)-p|--protocol]}+1]}; in
 esac
 
 case ${prev[${prev[(I)-j|--jump]}+1]}; in
-  DNAT) args+=( '(--to,--to-destination)'{--to,--to-destination}':address:_users-ports' ) ;;
+  DNAT) args+=( '(--to --to-destination)'{--to,--to-destination}':address:_users-ports' ) ;;
   DSCP)
     args+=(
       '--set-dscp[set the DSCP field]:value'
@@ -67,7 +67,7 @@ case ${prev[${prev[(I)-j|--jump]}+1]}; in
   MARK) args+=( '--set-mark[set fwmark in packet]:number' ) ;;
   REDIRECT|MASQUERADE) args+=( '--to-ports[port (range) to map to]:port range:_ports' ) ;;
   REJECT) args+=( '--reject-with[drop packet and send reply]:reject type:->reject-types' ) ;;
-  SNAT) args+=( '(--to,--to-source)*'{--to,--to-source}'[specify address to map source to]:address:_users-ports' ) ;;
+  SNAT) args+=( '(--to --to-source)*'{--to,--to-source}'[specify address to map source to]:address:_users-ports' ) ;;
   TCPMSS)
     args+=(
       '--set-mss[explicitly set MSS option]:value'
