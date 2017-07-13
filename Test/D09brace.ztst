@@ -112,3 +112,7 @@
   print -r left{[..]}right
 0:{char..char} ranges with tokenized characters
 >left[right left\right left]right
+
+  print -r {1..10}{..
+0:Unmatched braces after matched braces are left alone.
+>1{.. 2{.. 3{.. 4{.. 5{.. 6{.. 7{.. 8{.. 9{.. 10{..

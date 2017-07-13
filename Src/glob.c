@@ -2194,6 +2194,8 @@ bracechardots(char *str, convchar_t *c1p, convchar_t *c2p)
 	pnext[0] != '.' || pnext[1] != '.')
 	return 0;
     pnext += 2;
+    if (!*pnext)
+	return 0;
     if (itok(*pnext)) {
 	if (*pnext == Inbrace)
 	    return 0;
