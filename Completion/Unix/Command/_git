@@ -292,7 +292,7 @@ _git-branch () {
   declare l c m d e
 
   l='--color --no-color -r --remotes -a -v --verbose --abbrev --no-abbrev --list --points-at --sort'
-  c='-l --create-reflog -f --force -t --track --no-track -u --set-upstream --set-upstream-to --unset-upstream --contains --merged --no-merged'
+  c='-l --create-reflog -f --force -t --track --no-track -u --set-upstream --set-upstream-to --unset-upstream --contains --no-contains --merged --no-merged'
   m='-m --move -M'
   d='-d --delete -D'
   e='--edit-description'
@@ -341,9 +341,10 @@ _git-branch () {
     "($l $m $d $e)--no-track[override the branch.autosetupmerge configuration variable]" \
     "($l $m $d $e -u --set-upstream --set-upstream-to --unset-upstream)"{-u+,--set-upstream-to=}"[set up configuration so that pull merges]:remote-branches:__git_remote_branch_names" \
     "($l $m $d $e -u --set-upstream --set-upstream-to --unset-upstream)--unset-upstream[remove upstream configuration]" \
-    "($l $m $d $e)--contains=[only list branches which contain the specified commit]: :__git_committishs" \
-    "($l $m $d $e)--merged=[only list branches which are fully contained by HEAD]: :__git_committishs" \
-    "($l $m $d $e)--no-merged=[don't list branches which are fully contained by HEAD]: :__git_committishs" \
+    "($l $m $d $e)*--contains=[only list branches that contain the specified commit]: :__git_committishs" \
+    "($l $m $d $e)*--no-contains=[only list branches that don't contain the specified commit]: :__git_committishs" \
+    "($l $m $d $e)--merged=[only list branches that are fully contained by HEAD]: :__git_committishs" \
+    "($l $m $d $e)--no-merged=[don't list branches that are fully contained by HEAD]: :__git_committishs" \
     "($c $l $m $d)--edit-description[edit branch description]" \
     $dependent_creation_args \
     "($l $c $d $m $e)"{-m,--move}"[rename a branch and the corresponding reflog]" \
@@ -461,6 +462,7 @@ _git-checkout () {
     '(-)'{-p,--patch}'[interactively select hunks in diff between given tree-ish and working tree]' \
     "--ignore-skip-worktree-bits[don't limit pathspecs to sparse entries only]" \
     "--ignore-other-worktrees[don't check if another worktree is holding the given ref]" \
+    '--recurse-submodules=-[control recursive updating of submodules]::checkout:__git_commits' \
     '(-q --quiet)--progress[force progress reporting]' \
     '(-)--[start file arguments]' \
     '*:: :->branch-or-tree-ish-or-file' && ret=0
@@ -628,7 +630,7 @@ _git-clone () {
     '(--single-branch)--no-single-branch[clone history leading up to each branch]' \
     '--shallow-submodules[any cloned submodules will be shallow]' \
     '--recursive[initialize all contained submodules]' \
-    '--recurse-submodules[initialize submodules in the clone]' \
+    '--recurse-submodules=-[initialize submodules in the clone]::file:__git_files' \
     '--separate-git-dir[place .git dir outside worktree]:path to .git dir:_path_files -/' \
     '(-4 --ipv4 -6 --ipv6)'{-4,--ipv4}'[use IPv4 addresses only]' \
     '(-4 --ipv4 -6 --ipv6)'{-6,--ipv6}'[use IPv6 addresses only]' \
@@ -724,6 +726,7 @@ _git-commit () {
 _git-describe () {
   _arguments -S -s \
     '(*)--dirty=-[describe HEAD, adding mark if dirty]::mark' \
+    '(*)--broken=-[describe HEAD, adding mark if broken]::mark' \
     '--all[use any ref found in "$GIT_DIR/refs/"]' \
     '--tags[use any ref found in "$GIT_DIR/refs/tags"]' \
     '(--tags)--contains[find the tag after the commit instead of before]' \
@@ -732,7 +735,8 @@ _git-describe () {
     '(--candidates              )--exact-match[only output exact matches, same as --candidates=0]' \
     '--debug[display information about the searching strategy]' \
     '(--abbrev)--long[always show full format, even for exact matches]' \
-    '--match=[only consider tags matching glob pattern]:pattern' \
+    '*--match=[only consider tags matching glob pattern]:pattern' \
+    "*--exclude=[don't consider tags matching glob pattern]:pattern" \
     '--always[show uniquely abbreviated commit object as fallback]' \
     '--first-parent[follow only the first parent of merge commits]' \
     '*: :__git_committishs'
@@ -1424,6 +1428,7 @@ _git-rebase () {
     '(--autostash --no-autostash)--no-autostash[do not stash uncommitted changes before rebasing and apply them afterwards]' \
     '--fork-point[use merge-base --fork-point to refine upstream]' \
     '--ignore-date[use current timestamp for author date]' \
+    '--signoff[add Signed-off-by: line to the commit message]' \
     '--no-ff[cherry-pick all rebased commits with --interactive, otherwise synonymous to --force-rebase]' \
     '--onto=[start new branch with HEAD equal to given revision]:newbase:__git_revisions' \
     ':upstream branch:__git_revisions' \
@@ -1609,6 +1614,7 @@ _git-stash () {
 
   _arguments -C \
     '*::: :->args' \
+    '(-m --message)'{-m,--message}'[specify stash description]' \
     ${save_arguments//#\(/(* } && ret=0
 
   if [[ -n $state ]]; then
@@ -1616,7 +1622,7 @@ _git-stash () {
       local -a commands
 
       commands=(
-        save:'save your local modifications to a new stash'
+        {push,save}:'save your local modifications to a new stash'
         list:'list the stashes that you currently have'
         show:'show the changes recorded in the stash as a diff'
         pop:'remove and apply a single stashed state from the stash list'
@@ -1637,6 +1643,12 @@ _git-stash () {
           _arguments -S \
             $save_arguments \
             ':: :_guard "([^-]?#|)" message' && ret=0
+          ;;
+        (push)
+          _arguments -S \
+            $save_arguments \
+	    '(-m --message)'{-m,--message}'[specify stash description]' \
+            ':: :__git_modified_files' && ret=0
           ;;
         (list)
           local -a log_options revision_options
@@ -1956,7 +1968,8 @@ _git-tag () {
       '(-l --list)'{-l,--list}'[list tags matching pattern]' \
       '(--no-column)--column=-[display tag listing in columns]::column.tag option:((always\:"always show in columns" never\:"never show in columns" auto\:"show in columns if the output is to the terminal" column\:"fill columns before rows (default)" row\:"fill rows before columns" plain\:"show in one column" dense\:"make unequal size columns to utilize more space" nodense\:"make equal size columns"))' \
       '(--column)--no-column[do not display in columns]' \
-      '--contains=[only list tags which contain the specified commit]: :__git_commits' \
+      '*--contains=[only list tags that contain the specified commit]: :__git_commits' \
+      "*--no-contains=[only list tags that don't contain the specified commit]: :__git_commits" \
       '--merged=-[print only tags that are merged]:: :__git_commits' \
       '--no-merged=-[print only tags that are not merged]:: :__git_commits' \
       '--sort=[specify how the tags should be sorted]:mode:((refname\:"lexicographic order"
@@ -4672,6 +4685,8 @@ _git-read-tree () {
     $exclude_per_directory_opt \
     '--index-output=[write index in the named file instead of $GIT_INDEX_FILE]: :_files' \
     '--no-sparse-checkout[display sparse checkout support]' \
+    '--debug-unpack[debug unpack-trees]' \
+    '--recurse-submodules=-[control recursive updating of submodules]::checkout:__git_commits' \
     '--empty[instead of reading tree object(s) into the index, just empty it]' \
     '1:first tree-ish to be read/merged:__git_tree_ishs' \
     '2::second tree-ish to be read/merged:__git_tree_ishs' \
@@ -4886,7 +4901,8 @@ _git-for-each-ref () {
     '*--points-at=[print only refs which point at the given object]:object:__git_commits' \
     '*--merged=[print only refs that are merged]:object:__git_commits' \
     '*--no-merged=[print only refs that are not merged]:object:__git_commits' \
-    '*--contains=[print only refs which contain the commit]:object:__git_commits' \
+    '*--contains=[print only refs that contain specified commit]:object:__git_commits' \
+    "*--no-contains=[print only refs that don't contain specified commit]:object:__git_commits" \
     '--ignore-case[sorting and filtering are case-insensitive]' \
     '(-s --shell -p --perl --python --tcl)'{-s,--shell}'[use string literals suitable for sh]' \
     '(-s --shell -p --perl --python --tcl)'{-p,--perl}'[use string literals suitable for Perl]' \
@@ -4992,7 +5008,9 @@ _git-merge-base () {
 _git-name-rev () {
   _arguments -S \
     '--tags[only use tags to name commits]' \
-    '--refs=[only use refs matching given pattern]: :_guard "?#" "shell pattern"' \
+    '*--refs=[only use refs matching given pattern]: :_guard "?#" "shell pattern"' \
+    '--no-refs[clear any previous ref patterns given]' \
+    '*--exclude=[ignore refs matching specified pattern]:pattern' \
     '(--stdin :)--all[list all commits reachable from all refs]' \
     '(--all :)--stdin[read from stdin and append revision-name]' \
     '--name-only[display only name of commits]' \
@@ -5171,6 +5189,7 @@ _git-send-pack () {
     "(--no-signed --signed)--sign=-[GPG sign the push]::signing enabled:(($^^sign))" \
     '(--no-signed --sign)--signed[GPG sign the push]' \
     "(--sign --signed)--no-signed[don't GPG sign the push]" \
+    '--push-option=[specify option to transmit]:option' \
     '--progress[force progress reporting]' \
     '--thin[send a thin pack]' \
     '--atomic[request atomic transaction on remote side]' \
@@ -5306,7 +5325,7 @@ _git-check-attr () {
     {-a,--all}'[list all attributes that are associated with the specified paths]' \
     '--stdin[read file names from stdin instead of from command line]' \
     '--cached[consider .gitattributes in the index only, ignoring the working tree.]' \
-    '-z[make output format machine-parseable and treat input-paths as NUL-separated with --stdin]' \
+    '-z[terminate input and output records by a NUL character]' \
     $z_opt \
     '(-)--[interpret preceding arguments as attributes and following arguments as path names]' \
     '*:: :->attribute-or-file' && ret=0

@@ -1,3 +1,7 @@
+2017-07-14  Oliver Kiddle  <opk@zsh.org>
+
+	* 41419: Completion/Unix/Command/_git: update for git 2.13.2
+
 2017-07-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41420: Src/glob.c, Test/D09brace.ztst: "{.." wasn't checked
