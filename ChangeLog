@@ -1,3 +1,12 @@
+2017-07-15  Oliver Kiddle  <opk@zsh.org>
+
+	* 41431: Completion/Linux/Command/_lsblk,
+	Completion/Linux/Command/_ss, Completion/Linux/Command/_strace,
+	Completion/Unix/Command/_diffstat, Completion/Unix/Command/_dig,
+	Completion/Unix/Command/_dmidecode, Completion/Unix/Command/_irssi,
+	Completion/Unix/Command/_gsettings, Completion/Unix/Command/_ssh,
+	Completion/X/Command/_xclip: update options in assorted completions
+
 2017-07-14  Oliver Kiddle  <opk@zsh.org>
 
 	* Fabian Klötzl: 41414: Completion/Linux/Command/_iptables,

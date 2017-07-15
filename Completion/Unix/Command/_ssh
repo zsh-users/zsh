@@ -51,7 +51,7 @@ _ssh () {
       '(-1)-m+[specify mac algorithms]:mac spec:->macs' \
       '(-1)-N[do not execute a remote command (protocol version 2 only)]' \
       '-n[redirect stdin from /dev/null]' \
-      '-O:multiplex control command:((check\:"check master process is running" exit\:"request the master to exit" forward\:"request forward without command execution" stop\:"request the master to stop accepting further multiplexing requests" cancel\:"cancel existing forwardings with -L and/or -R"))' \
+      '-O[control an active connection multiplexing master process]:multiplex control command:((check\:"check master process is running" exit\:"request the master to exit" forward\:"request forward without command execution" stop\:"request the master to stop accepting further multiplexing requests" cancel\:"cancel existing forwardings with -L and/or -R" proxy))' \
       '-P[use non privileged port]' \
       '-p+[specify port on remote host]:port number on remote host' \
       '(-v)*-q[quiet operation]' \
@@ -150,7 +150,7 @@ _ssh () {
       "$p1($cmn)-E[specify hash algorithm for displayed fingerprints]:hash algorithim:(md5 sha256)" \
       - create \
       '(-P -m)-q[silence ssh-keygen]' \
-      "(-P -m)-t[specify the type of the key to create]:key type:(rsa1 rsa dsa ecdsa ed25519)" \
+      "(-P -m)-t[specify the type of the key to create]:key type:(rsa dsa ecdsa ed25519)" \
       - dns \
       "($cmn)-r[print DNS resource record]:hostname:_hosts" \
       "$p1($cmn)-g[use generic DNS format]" \

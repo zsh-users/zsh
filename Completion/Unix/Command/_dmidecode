@@ -10,4 +10,5 @@ _arguments -s \
   '--dump-bin=[dump DMI data to a binary file]:file:_files' \
   '(-d --dev-mem)--from-dump=[read DMI data from a binary file]:file:_files' \
   "--no-sysfs[don't attempt to read DMI data from sysfs files]" \
+  '--oem-string=[only display the value of the specified OEM string]:OEM string number' \
   '(-)'{-V,--version}'[display version information]'

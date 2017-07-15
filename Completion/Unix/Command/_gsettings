@@ -13,7 +13,7 @@ if [[ $state = subargs ]]; then
   curcontext="${curcontext%:*}-$words[1]:"
   case $words[1] in
     help) state=subcmds;;
-    get|range|reset|writable|monitor)
+    describe|get|range|reset|writable|monitor)
       _arguments ':schema:->schemata' ':key:->keys'
     ;;
     set)

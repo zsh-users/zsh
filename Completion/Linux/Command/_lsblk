@@ -18,6 +18,7 @@ _arguments -C -s -S \
   '*:device:_files -g "*(-%b)" -P / -W /' \
   + fields \
   '(H -D --discard -o --output -O --output-all)'{-D,--discard}'[output discard capabilities]' \
+  '(H -z --zoned -o --output -O --output-all)'{-z,--zoned}'[output zone model]' \
   '(H -f --fs -o --output -O --output-all)'{-f,--fs}'[output info about filesystems]' \
   '(H -m --perms -o --output -O --output-all)'{-m,--perms}'[output info about permissions]' \
   '(H -S --scsi -o --output -O --output-all)'{-S,--scsi}'[output info about SCSI devices]' \

@@ -28,6 +28,7 @@ _arguments -C -s \
   "($info -4 --ipv4 -6 --ipv6)"{-6,--ipv6}'[display only IP version 6 sockets]' \
   "($info -0 --packet)"{-0,--packet}'[display PACKET sockets]' \
   "($info -t --tcp)"{-t,--tcp}'[display TCP sockets]' \
+  "($info -S --sctp)"{-S,--sctp}'[display SCTP sockets]' \
   "($info -u --udp)"{-u,--udp}'[display UDP sockets]' \
   "($info -d --dccp)"{-d,--dccp}'[display DCCP sockets]' \
   "($info -w --raw)"{-w,--raw}'[display RAW sockets]' \
