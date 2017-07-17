@@ -856,8 +856,9 @@ all arguments to be removed.
 Internally, each such expansion is converted into the
 equivalent list for brace expansion.  E.g., tt(${^var}) becomes
 tt({$var[1],$var[2],)...tt(}), and is processed as described in
-noderef(Brace Expansion) below.
-If word splitting is also in effect the
+noderef(Brace Expansion) below: note, however, the expansion
+happens immediately, with any explicit brace expansion
+happening later.  If word splitting is also in effect the
 tt($var[)var(N)tt(]) may themselves be split into different list
 elements.
 )
