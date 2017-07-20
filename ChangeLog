@@ -1,3 +1,8 @@
+2017-07-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 41433: Doc/Zsh/expn.yo: Further clarification about expansion
+	processing.
+
 2017-07-17  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41429: Doc/Zsh/expn.yo: Better documentation of how stages of

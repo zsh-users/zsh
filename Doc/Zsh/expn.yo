@@ -21,9 +21,12 @@ xitem(em(Parameter Expansion))
 xitem(em(Command Substitution))
 xitem(em(Arithmetic Expansion))
 item(em(Brace Expansion))(
-These five are performed in one step in left-to-right fashion.  After
-these expansions, all unquoted occurrences of the characters `tt(\)',
-`tt(')' and `tt(")' are removed.
+These five are performed in left-to-right fashion.  On each argument,
+any of the five steps that are needed are performed one after the other.
+Hence, for example, all the parts of parameter expansion are completed
+before command substitution is started.  After these expansions, all
+unquoted occurrences of the characters `tt(\)',`tt(')' and `tt(")' are
+removed.
 )
 item(em(Filename Expansion))(
 If the tt(SH_FILE_EXPANSION) option is set, the order of expansion is
