@@ -36,7 +36,12 @@ _svn () {
       _svn_cmds=(
 	${=${(f)${${"$(_comp_locale; _call_program commands svn help)"#l#*Available subcommands:}%%Subversion is a tool*}}/(#s)[[:space:]]#(#b)([a-z]##)[[:space:]]#(\([a-z, ?]##\))#/$match[1] :$match[1]${match[2]:+:${${match[2]//[(),]}// /:}}:}
       )
-      _store_cache svn-cmds _svn_cmds
+      if (( $? == 0 )); then
+        _store_cache svn-cmds _svn_cmds
+      else
+        # Ensure we enter this block again on the next <TAB>.
+        unset _svn_cmds
+      fi
     fi
   fi
 
