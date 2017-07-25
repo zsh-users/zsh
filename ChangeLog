@@ -1,3 +1,8 @@
+2017-07-26  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Jim: 41461: Doc/Zsh/seealso.yo: complete list of zsh manual
+	pages in introduction.
+
 2017-07-20  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 41433: Doc/Zsh/expn.yo: Further clarification about expansion
