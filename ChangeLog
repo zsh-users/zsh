@@ -1,5 +1,9 @@
 2017-07-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 41467: Completion/Unix/Command/_tmux,
+	Completion/Unix/Type/_cmdambivalent, Doc/Zsh/compsys.yo:
+	Correct completion of 'tmux new <TAB>'.
+
 	* 41471 (tweaked): Completion/Unix/Command/_subversion: _svn:
 	Complete propvals in 'propset'.
 

@@ -3014,6 +3014,22 @@ tt(-n), tt(-F), tt(-X) are passed to tt(compadd).
 
 See tt(_description) for a description of var(tag) and var(descr).
 )
+findex(_cmdambivalent)
+item(tt(_cmdambivalent))(
+Completes the remaining positional arguments as an external command.
+The external command and its arguments are completed as separate arguments
+(in a manner appropriate for completing tt(/usr/bin/env))
+if there are two or more remaining positional arguments on the command line,
+and as a quoted command string (in the manner of tt(system+LPAR()...+RPAR())) otherwise.
+See also tt(_cmdstring) and tt(_precommand).
+
+This function takes no arguments.
+)
+findex(_cmdstring)
+item(tt(_cmdstring))(
+Completes an external command as a single argument, as for
+tt(system+LPAR()...+RPAR()).
+)
 findex(_complete)
 item(tt(_complete))(
 This completer generates all possible completions in a context-sensitive
@@ -3213,6 +3229,11 @@ the widgets which generate matches.  It uses two styles: tt(old-list) and
 tt(old-menu), see
 ifzman(the section `Completion System Configuration' above)\
 ifnzman(noderef(Completion System Configuration)).
+)
+findex(_precommand)
+item(tt(_precommand))(
+Complete an external command in word-separated arguments, as for
+tt(exec) and tt(/usr/bin/env).
 )
 findex(_prefix)
 item(tt(_prefix))(

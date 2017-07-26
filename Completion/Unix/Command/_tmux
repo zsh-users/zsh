@@ -526,7 +526,7 @@ _tmux-new-session() {
     '-t+[specify target session]:session:__tmux-sessions' \
     '-x[specify width]:width' \
     '-y[specify height]:height' \
-    '*:: :_cmdstring'
+    '*:: :_cmdambivalent'
 }
 
 _tmux-new-window() {
