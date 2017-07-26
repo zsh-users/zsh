@@ -10,7 +10,7 @@ _arguments \
   '(-)'{-h,-help}'[display usage information]' \
   '(-selection)-selection[selection to access]:selection:(primary secondary clipboard buffer-cut)' \
   "-noutf8[operate in legacy, non-Unicode, mode]" \
-  '(-r -rmlastnl)ipq{-r,-rmlastnl}'[remove the last newline character if present]' \
+  '(-r -rmlastnl)'{-r,-rmlastnl}'[remove the last newline character if present]' \
   '(-)-version[display version information]' \
   '(-quiet -verbose)-silent[errors only, run in background]' \
   "(-silent -verbose)-quiet[run in foreground, show what's happening]" \

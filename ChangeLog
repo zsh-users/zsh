@@ -15,6 +15,8 @@
 
 2017-07-15  Oliver Kiddle  <opk@zsh.org>
 
+	* 41432: Completion/Unix/Command/_xz: use option grouping
+
 	* 41431: Completion/Linux/Command/_lsblk,
 	Completion/Linux/Command/_ss, Completion/Linux/Command/_strace,
 	Completion/Unix/Command/_diffstat, Completion/Unix/Command/_dig,
