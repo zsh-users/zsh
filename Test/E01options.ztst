@@ -831,6 +831,20 @@
 >val2
 >val2
 
+  print "Contents of file" >cat_arg
+  (
+     cat() { print Function with argument $1 }
+     print Without
+     (exec cat cat_arg; print Not reached)
+     print With
+     (setopt posixbuiltins; exec cat cat_arg; print Not reached)
+  )
+0:POSIX_BUILTINS and exec
+>Without
+>Function with argument cat_arg
+>With
+>Contents of file
+
 # PRINTEXITVALUE only works if shell input is coming from standard input.
 # Goodness only knows why.
   $ZTST_testdir/../Src/zsh -f <<<'

@@ -1,5 +1,10 @@
 2017-07-26  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 41464, 41466 (modified): Doc/Zsh/builtins.yo,
+	Doc/Zsh/options.yo, Src/exec.c, Test/E01options.ztst:
+	POSIX_BUILTINS stops "exec" finding builtins or shell
+	functions.  Document existing behaviour.
+
 	* Jim: 41461: Doc/Zsh/seealso.yo: complete list of zsh manual
 	pages in introduction.
 

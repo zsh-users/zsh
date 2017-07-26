@@ -2140,6 +2140,10 @@ In addition, various error conditions associated with the above builtins
 or tt(exec) cause a non-interactive shell to exit and an interactive
 shell to return to its top-level processing.
 
+Furthermore, functions and shell builtins are not executed after
+an tt(exec) prefix; the command to be executed must be an external
+command found in the path.
+
 Furthermore, the tt(getopts) builtin behaves in a POSIX-compatible
 fashion in that the associated variable tt(OPTIND) is not made
 local to functions.

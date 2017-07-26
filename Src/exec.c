@@ -2778,6 +2778,12 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		 * Reserved words take precedence over shell functions.
 		 */
 		checked = 1;
+	    } else if (isset(POSIXBUILTINS) && (cflags & BINF_EXEC)) {
+		/*
+		 * POSIX doesn't allow "exec" to operate on builtins
+		 * or shell functions.
+		 */
+		break;
 	    } else {
 		if (!(cflags & (BINF_BUILTIN | BINF_COMMAND)) &&
 		    (hn = shfunctab->getnode(shfunctab, cmdarg))) {
@@ -3123,10 +3129,14 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	     *   - we have determined there are options which would
 	     *     require us to use the "command" builtin); or
 	     * - we aren't using POSIX and so BINF_COMMAND indicates a zsh
-	     *   precommand modifier is being used in place of the builtin
+	     *   precommand modifier is being used in place of the
+	     *   builtin
+	     * - we are using POSIX and this is an EXEC, so we can't
+	     *   execute a builtin or function.
 	     */
 	    if (errflag || checked || is_builtin ||
-		(unset(POSIXBUILTINS) && (cflags & BINF_COMMAND)))
+		(isset(POSIXBUILTINS) ?
+		 (cflags & BINF_EXEC) : (cflags & BINF_COMMAND)))
 		break;
 
 	    cmdarg = (char *) peekfirst(args);

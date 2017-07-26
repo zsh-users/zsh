@@ -667,13 +667,19 @@ if there are no var(args) or they contain no commands (i.e. are
 an empty string or whitespace) the return status is zero.
 )
 item(tt(exec) [ tt(-cl) ] [ tt(-a) var(argv0) ] [ var(command) [ var(arg) ... ] ])(
-Replace the current shell with an external var(command) rather than forking.
+Replace the current shell with var(command) rather than forking.
+If var(command) is a shell builtin command or a shell function,
+the shell executes it, then immediately exits.
+
 With tt(-c) clear the environment; with tt(-l) prepend tt(-) to the
 tt(argv[0]) string of the command executed (to simulate a login shell);
 with tt(-a) var(argv0) set the tt(argv[0]) string of the command
 executed.
 See ifzman(the section `Precommand Modifiers' in zmanref(zshmisc))\
 ifnzman(noderef(Precommand Modifiers)).
+
+If the option tt(POSIX_BUILTINS) is set, var(command) is never
+interpreted as a shell builtin command or shell function.
 
 cindex(redirection, current shell's I/O)
 If var(command) is omitted but any redirections are specified,
