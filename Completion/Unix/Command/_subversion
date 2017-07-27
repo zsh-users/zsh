@@ -150,7 +150,8 @@ _svn () {
 	  ;;
 	  (propset)
 	    args=(
-	    ':propname:(svn:ignore svn:keywords svn:executable svn:eol-style svn:mime-type svn:externals svn:needs-lock)'
+	    ':propname:(svn:ignore svn:keywords svn:executable svn:eol-style svn:mime-type svn:externals svn:needs-lock svn:global-ignores svn:auto-props)'
+	    ':propval:->propset_propval'
 	    ${args/(#b)(*--file*):arg:/$match[1]:file:_files}
 	    '*:path or url: _alternative "files:file:_files" "urls:URL:_svn_urls"'
 	    )
@@ -179,6 +180,28 @@ _svn () {
         esac
 
         _arguments "$args[@]" && ret=0
+        case $state in
+          (propset_propval)
+            case $words[2] in
+              (svn:executable|svn:needs-lock) compadd yes;;
+              (svn:keywords)
+                compset -q
+                # '_values -w' only excludes words in argv[1] or later, so
+                # install a dummy argv[0].  This affects Foo in [[svn propset
+                # svn:keywords 'Foo Bar Baz <TAB>]].
+                words=( dummy $words ); (( ++CURRENT ))
+                _values -s ' ' -w "keywords (or custom)" \
+                  '(URL HeadURL)'{URL,HeadURL}'[URL for the head version of the file]' \
+                  '(Author LastChangedBy)'{Author,LastChangedBy}'[last person to modify the file]' \
+                  '(Date LastChangedDate)'{Date,LastChangedDate}'[date/time the file was last modified]' \
+                  '(Rev Revision LastChangedRevision)'{Rev,Revision,LastChangedRevision}'[last revision the file changed]' \
+                  Id'[compressed summary of URL,Revision,Date,Author]' \
+                  Header"[like 'Id' but includes the full URL]";;
+              (svn:eol-style) compadd - CR LF CRLF native;;
+              (svn:mime-type) _mime_types;;
+              (*) _message 'property value';;
+            esac
+        esac
 
       else
         _message "unknown svn command: $words[1]"
