@@ -1920,8 +1920,9 @@ subsect(Installation)
 You should make sure all the functions from the tt(Functions/Prompts)
 directory of the source distribution are available; they all begin with
 the string `tt(prompt_)' except for the special function`tt(promptinit)'.
-You also need the `tt(colors)' function from tt(Functions/Misc).  All of
-these functions may already have been installed on your system; if not,
+You also need the `tt(colors)' and `tt(add-zsh-hook)' functions from
+tt(Functions/Misc).
+All these functions may already be installed on your system; if not,
 you will need to find them and copy them.  The directory should appear as
 one of the elements of the tt(fpath) array (this should already be the
 case if they were installed), and at least the function tt(promptinit)
@@ -1972,6 +1973,75 @@ tt(prompt) function to install that theme.  This function may define
 other functions as necessary to maintain the prompt, including functions
 used to preview the prompt or provide help for its use.  You should not
 normally call a theme's setup function directly.
+)
+enditem()
+
+subsect(Utility Themes)
+
+startitem()
+item(tt(prompt off))(
+The theme `tt(off)' sets all the prompt variables to minimal values with
+no special effects.
+)
+item(tt(prompt default))(
+The theme `tt(default)' sets all prompt variables to the same state as
+if an interactive zsh was started with no initialization files.
+)
+item(tt(prompt restore))(
+The special theme `tt(restore)' erases all theme settings and sets prompt
+variables to their state before the first time the `tt(prompt)' function
+was run, provided each theme has properly defined its cleanup (see below).
+
+Note that you can undo `tt(prompt off)' and `tt(prompt default)' with
+`tt(prompt restore)', but a second restore does not undo the first.
+)
+enditem()
+
+subsect(Writing Themes)
+
+The first step for adding your own theme is to choose a name for it,
+and create a file `tt(prompt_var(name)_setup)' in a directory in your
+tt(fpath), such as tt(~/myfns) in the example above.  The file should
+at minimum contain assignments for the prompt variables that your
+theme wishes to modify.  By convention, themes use tt(PS1), tt(PS2),
+tt(RPS1), etc., rather than the longer tt(PROMPT) and tt(RPROMPT).
+
+The file is autoloaded as a function in the current shell context, so
+it may contain any necessary commands to customize your theme, including
+defining additional functions.  To make some complex tasks easier, your
+setup function may also do any of the following:
+
+startitem()
+item(Assign tt(prompt_opts))(
+The array tt(prompt_opts) may be assigned any of tt("bang"), tt("cr"),
+tt("percent"), tt("sp"), and/or tt("subst") as values.  The corresponding
+setopts (tt(promptbang), etc.) are turned on, all other prompt-related
+options are turned off.  The tt(prompt_opts) array preserves setopts even
+beyond the scope of tt(localoptions), should your function need that.
+)
+item(Modify precmd and preexec)(
+Use of tt(add-zsh-hook) is recommended.  The tt(precmd) and tt(preexec)
+hooks are automatically adjusted if the prompt theme changes or is
+disabled.
+)
+item(Declare cleanup)(
+If your function makes any other changes that should be undone when the
+theme is disabled, your setup function may call
+example(prompt_cleanup var(command))
+where var(command) should be suitably quoted.  If your theme is ever
+disabled or replaced by another, var(command) is executed with tt(eval).
+You may declare more than one such cleanup hook.
+)
+item(Define preview)(
+Define or autoload a function tt(prompt_var(name)_preview) to display
+a simulated version of your prompt.  A simple default previewer is
+defined by tt(promptinit) for themes that do not define their own.
+This preview function is called by `tt(prompt -p)'.
+)
+item(Provide help)(
+Define or autoload a function tt(prompt_var(name)_help) to display
+documentation or help text for your theme.
+This help function is called by `tt(prompt -h)'.
 )
 enditem()
 

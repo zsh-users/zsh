@@ -1,9 +1,10 @@
 # Very simple prompt
-prompt_off_setup () {
-  PS1="%# "
-  PS2="> "
 
-  prompt_opts=( cr percent )
-}
+prompt_default_setup 2>/dev/null
 
-prompt_off_setup "$@"
+PS1="%# "
+PS2="> "
+PS3='?# '
+PS4='+> '
+
+prompt_opts=( cr percent sp )

@@ -16,9 +16,13 @@ prompt_bart_help () {
 	blue, and the default foreground) are used if no arguments are
 	given.  The defaults look best on a light background.
 
-	The "off" token temporarily disables the theme; "on" restores it.
 	No background colors or hardwired cursor motion escapes are used,
 	and it is not necessary to setopt promptsubst.
+
+	The "off" token temporarily disables the theme; "on" restores it.
+	Note, this does NOT fully reset to the original prompt state, it
+	only hides/reveals the extra lines above the command line and
+	removes	the supporting hooks.
 	EOF
     [[ $(read -sek 1 "?${(%):-%S[press return]%s}") == [Qq] ]] &&
 	print -nP '\r%E' && return
@@ -183,7 +187,7 @@ prompt_bart_setup () {
 	add-zsh-hook -D preexec "prompt_*_preexec"
 	functions[TRAPWINCH]="${functions[TRAPWINCH]//prompt_bart_winch}"
 	[[ $prompt_theme[1] = bart ]] && PS1=${${(f)PS1}[-1]}
-	return 1
+	return 1	# Prevent change of $prompt_theme
 	;;
       (on|enable)
 	shift
@@ -224,6 +228,8 @@ prompt_bart_setup () {
     
     add-zsh-hook precmd prompt_bart_precmd
     add-zsh-hook preexec prompt_bart_preexec
+    prompt_cleanup \
+        'functions[TRAPWINCH]="${functions[TRAPWINCH]//prompt_bart_winch}"'
     functions[TRAPWINCH]="${functions[TRAPWINCH]//prompt_bart_winch}
 	prompt_bart_winch"
 

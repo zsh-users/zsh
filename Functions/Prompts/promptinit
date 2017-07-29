@@ -47,20 +47,36 @@ prompt_preview_safely() {
     return
   fi
 
-  local -a psv; psv=($psvar); local -a +h psvar; psvar=($psv) # Ick
-  local +h PS1=$PS1 PS2=$PS2 PS3=$PS3 PS4=$PS4 RPS1=$RPS1
-  local -a precmd_functions preexec_functions
+  # This handles all the stuff from the default :prompt-theme cleanup
+  local +h PS1=$PS1 PS2=$PS2 PS3=$PS3 PS4=$PS4 RPS1=$RPS1 RPS2=$RPS2
+  local +h PROMPT=$PROMPT RPROMPT=$RPOMPT RPROMPT2=$RPROMPT2 PSVAR=$PSVAR
+  local -a precmd_functions preexec_functions prompt_preview_cleanup
+  local -aLl +h zle_highlight
 
-  # The next line is a bit ugly.  It (perhaps unnecessarily)
-  # runs the prompt theme setup function to ensure that if
-  # the theme has a _preview function that it's been autoloaded.
-  prompt_${1}_setup
+  {
+    # Save and clear current restore-point if any
+    zstyle -g prompt_preview_cleanup :prompt-theme cleanup
+    {
+      zstyle -d :prompt-theme cleanup
 
-  if typeset +f prompt_${1}_preview >&/dev/null; then
-    prompt_${1}_preview "$@[2,-1]"
-  else
-    prompt_preview_theme "$@"
-  fi
+      # The next line is a bit ugly.  It (perhaps unnecessarily)
+      # runs the prompt theme setup function to ensure that if
+      # the theme has a _preview function that it's been autoloaded.
+      prompt_${1}_setup
+
+      if typeset +f prompt_${1}_preview >&/dev/null; then
+        prompt_${1}_preview "$@[2,-1]"
+      else
+        prompt_preview_theme "$@"
+      fi
+    } always {
+      # Run any theme-specific cleanup, then reset restore point
+      zstyle -t :prompt-theme cleanup
+    }
+  } always {
+    (( $#prompt_preview_cleanup )) &&
+      zstyle -e :prompt-theme cleanup "${prompt_preview_cleanup[@]}"
+  }
 }
 
 set_prompt() {
@@ -84,9 +100,9 @@ Use prompt -h <theme> for help on specific themes.'
       setopt localtraps
       if [[ -z "$prompt_theme[1]" ]]; then
         # Not using a prompt theme; save settings
-        local -a psv; psv=($psvar); local -a +h psvar; psvar=($psv) # Ick
-	local +h PS1=$PS1 PS2=$PS2 PS3=$PS3 PS4=$PS4 RPS1=$RPS1
-	local precmd_functions preexec_functions
+        local +h PS1=$PS1 PS2=$PS2 PS3=$PS3 PS4=$PS4 RPS1=$RPS1 RPS2=$RPS2
+        local +h PROMPT=$PROMPT RPROMPT=$RPOMPT RPROMPT2=$RPROMPT2 PSVAR=$PSVAR
+        local -a precmd_functions preexec_functions
       else
         trap 'prompt_${prompt_theme[1]}_setup "${(@)prompt_theme[2,-1]}"' 0
       fi
@@ -104,11 +120,11 @@ Use prompt -h <theme> for help on specific themes.'
        ;;
     h) if [[ -n "$2" && -n $prompt_themes[(r)$2] ]]; then
          if functions prompt_$2_setup >/dev/null; then
-	   # The next line is a bit ugly.  It (perhaps unnecessarily)
-	   # runs the prompt theme setup function to ensure that if
-	   # the theme has a _help function that it's been autoloaded.
-	   prompt_$2_setup
-	 fi
+           # The next line is a bit ugly.  It (perhaps unnecessarily)
+           # runs the prompt theme setup function to ensure that if
+           # the theme has a _help function that it's been autoloaded.
+           prompt_$2_setup
+         fi
          if functions prompt_$2_help >/dev/null; then
            print "Help for $2 theme:\n"
            prompt_$2_help
@@ -168,28 +184,74 @@ Use prompt -h <theme> for help on specific themes.'
   esac
 }
 
-prompt () {
-  local prompt_opts
+prompt_cleanup () {
+  local -a cleanup_hooks
+  if zstyle -g cleanup_hooks :prompt-theme cleanup
+  then
+    cleanup_hooks+=(';' "$@")
+    zstyle -e :prompt-theme cleanup "${cleanup_hooks[@]}"
+  elif (( $+prompt_preview_cleanup == 0 ))
+  then
+    print -u2 "prompt_cleanup: no prompt theme active"
+    return 1
+  fi
+}
 
+prompt () {
+  local -a prompt_opts theme_active
+
+  zstyle -g theme_active :prompt-theme cleanup || {
+    # This is done here rather than in set_prompt so that it
+    # is safe and sane for set_prompt to setopt localoptions,
+    # which will be cleared before we arrive back here again.
+    # This is also why we pass around the prompt_opts array.
+    [[ -o promptbang ]] && prompt_opts+=(bang)
+    [[ -o promptcr ]] && prompt_opts+=(cr)
+    [[ -o promptpercent ]] && prompt_opts+=(percent)
+    [[ -o promptsp ]] && prompt_opts+=(sp)
+    [[ -o promptsubst ]] && prompt_opts+=(subst)
+    zstyle -e :prompt-theme cleanup \
+        'zstyle -d :prompt-theme cleanup;' \
+	'prompt_default_setup;' \
+        ${PS1+PS1="${(q)PS1}"} \
+        ${PS2+PS2="${(q)PS2}"} \
+        ${PS3+PS3="${(q)PS3}"} \
+        ${PS4+PS4="${(q)PS4}"} \
+        ${RPS1+RPS1="${(q)RPS1}"} \
+        ${RPS2+RPS2="${(q)RPS2}"} \
+        ${RPROMPT+RPROMPT="${(q)RPROMPT}"} \
+        ${RPROMPT2+RPROMPT2="${(q)RPROMPT2}"} \
+        ${PSVAR+PSVAR="${(q)PSVAR}"} \
+        "precmd_functions=(${(q)precmd_functions[@]})" \
+        "preexec_functions=(${(q)preexec_functions[@]})" \
+        "prompt_opts=( ${prompt_opts[*]} )" \
+        'reply=(yes)'
+  }
   set_prompt "$@"
 
-  (( $#prompt_opts )) &&
-      setopt noprompt{bang,cr,percent,subst} "prompt${^prompt_opts[@]}"
+  (( ${#prompt_opts} )) &&
+      setopt noprompt{bang,cr,percent,sp,subst} "prompt${^prompt_opts[@]}"
 
   true
 }
 
 prompt_preview_theme () {
   emulate -L zsh
-  local -a psv; psv=($psvar); local -a +h psvar; psvar=($psv) # Ick
-  local +h PS1=$PS1 PS2=$PS2 PS3=$PS3 PS4=$PS4 RPS1=$RPS1
-  local precmd_functions preexec_functions prompt_opts
-  local -aLl +h zle_highlight
 
+  # Check for proper state handling
+  (( $+prompt_preview_cleanup )) || {
+    prompt_preview_safely "$@"
+    return
+  }
+
+  # Minimal preview for prompts that don't supply one
+  local -a prompt_opts
   print -n "$1 theme"
   (( $#* > 1 )) && print -n " with parameters \`$*[2,-1]'"
   print ":"
   prompt_${1}_setup "$@[2,-1]"
+  (( ${#prompt_opts} )) &&
+      setopt noprompt{bang,cr,percent,sp,subst} "prompt${^prompt_opts[@]}"
   [[ -n ${precmd_functions[(r)prompt_${1}_precmd]} ]] &&
     prompt_${1}_precmd
   [[ -o promptcr ]] && print -n $'\r'; :
