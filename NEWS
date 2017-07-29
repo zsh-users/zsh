@@ -14,9 +14,17 @@ expansion (see zshexpn(1)), so they could neither be quoted nor be the
 result of parameter expansion.  Examples: 's=command; $s -V ls' and
 '\command -V ls' now work as expected.
 
-Functions executed by ZLE widgets no longer have they standard input
-closed, but is now redirected from /dev/null instead. That still guards
+Functions executed by ZLE widgets no longer have their standard input
+closed, but redirected from /dev/null instead. That still guards
 against user defined widgets inadvertently reading from the tty device.
+
+There is an option WARN_NESTED_VAR, a companion to the existing
+WARN_CREATE_GLOBAL that causes a warning if a function updates a
+variable from an enclosing scope without using typeset -g.  It can be
+turned on for an individual function with "functions -W".
+
+zmodload now has an option -s to be silent on a failure to find a module
+but still print other errors.
 
 
 Changes from 5.2 to 5.3.1
