@@ -14,8 +14,8 @@ else
     '--buildresult:location:_files -/' \
     '--mirror:URL:_urls' \
     '--othermirror:URL:_urls' \
-    '--distribution:suite:(breezy dapper edgy etch feisty gutsy hardy hoary intrepid jaunty jessie karmic lenny lucid potato sarge sid squeeze warty woody' \
-    '--architecture:architecture:i_deb_architectures' \
+    '--distribution:codename:_deb_codenames' \
+    '--architecture:architecture:_deb_architectures' \
     '--components:component:(main contrib non-free)' \
     '--override-config' \
     '--hookdir:location:_files -/' \
