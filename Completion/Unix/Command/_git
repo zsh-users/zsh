@@ -5515,7 +5515,7 @@ __git_describe_branch () {
   shift 3
 
   integer maxverbose
-  if zstyle -s :completion:$curcontext max-verbose maxverbose &&
+  if zstyle -s :completion:$curcontext: max-verbose maxverbose &&
     (( ${compstate[nmatches]} <= maxverbose )); then
     local __c
     local -a __commits
