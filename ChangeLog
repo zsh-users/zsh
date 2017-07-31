@@ -1,3 +1,9 @@
+2017-08-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 41475: Completion/Unix/Command/_git: Complete files after
+	'reset' when there are no commits, when the 'verbose' style
+	is set.
+
 2017-08-01  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41470: Doc/Zsh/builtins.yo: note that 41464 stops exec finding

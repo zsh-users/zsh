@@ -1462,6 +1462,12 @@ _git-reset () {
   case $state in
     (file)
       local tree=HEAD
+      if zstyle -t :completion:${curcontext}: verbose; then
+        if ! _call_program headed git rev-parse --verify HEAD 2>/dev/null; then
+          # well-known sha1 of the empty tree
+          tree=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+        fi
+      fi
       if [[ -n $line[1] ]] && __git_is_treeish $line[1]; then
         tree=$line[1]
       fi
