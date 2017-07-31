@@ -1,3 +1,7 @@
+2017-07-31  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk: test release 5.3.1-test-2.
+
 2017-07-31  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Completion/Unix/Command/_git: Fix style lookup for
