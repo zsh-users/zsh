@@ -13,6 +13,15 @@
 	* unposted: Completion/Unix/Command/_git: Fix style lookup for
 	'max-verbose'.
 
+2017-07-29  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 41472: Doc/Zsh/contrib.yo, Functions/Prompts/prompt_bart_setup,
+	Functions/Prompts/prompt_default_setup,
+	Functions/Prompts/prompt_off_setup,
+	Functions/Prompts/prompt_restore_setup,
+	Functions/Prompts/promptinit: introduce cleanup hooks default and
+	restore special themes, and update documentation
+
 2017-07-29  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Etc/FAQ.yo, NEWS, README: update in preparation for
