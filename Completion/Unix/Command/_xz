@@ -61,7 +61,7 @@ esac
 case $state in
   files)
     (( $+opt_args[-z] || $+opt_args[--compress] )) && decompress=no
-    [[ -n $opt_args[(i)-([dtl]|-decompress|-test|-list)] ]] && unset decompress
+    [[ -n ${(k)opt_args[(i)decomp*]} ]] && unset decompress
     if [[ -z "$decompress" ]]; then
       _description files expl 'compressed file'
       _files "$expl[@]" -g '*.(xz|txz|lzma|tlz)(-.)' && return
