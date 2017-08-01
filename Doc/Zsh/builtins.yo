@@ -679,7 +679,10 @@ See ifzman(the section `Precommand Modifiers' in zmanref(zshmisc))\
 ifnzman(noderef(Precommand Modifiers)).
 
 If the option tt(POSIX_BUILTINS) is set, var(command) is never
-interpreted as a shell builtin command or shell function.
+interpreted as a shell builtin command or shell function.  This
+means further precommand modifiers such as tt(builtin) and
+tt(noglob) are also not interpreted within the shell.  Hence
+var(command) is always found by searching the command path.
 
 cindex(redirection, current shell's I/O)
 If var(command) is omitted but any redirections are specified,
