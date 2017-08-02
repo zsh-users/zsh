@@ -1,5 +1,9 @@
 2017-08-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 41481: Completion/Unix/Command/_df,
+	Completion/Unix/Command/_mount, Completion/Unix/Type/_umountable:
+	_df: Complete mounted device and mount points.
+
 	* 41486: Completion/Unix/Command/_tmux: Correct completions of
 	new-window, split-window, respawn-window, respawn-pane.
 
