@@ -1,3 +1,8 @@
+2017-08-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Martijn: 41484: Src/utils.c: ${(q+)...} didn't properly
+	quote backslashes.
+
 2017-08-02  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 41479: Completion/Unix/Command/_xz: Complete compressed,

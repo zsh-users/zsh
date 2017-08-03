@@ -5119,7 +5119,7 @@ niceztrlen(char const *s)
  * If flags contains NICEFLAG_HEAP, use the heap for *outstrp, else
  * zalloc.
  * If flags contsins NICEFLAG_QUOTE, the output is going to be within
- * $'...', so quote "'" with a backslash.
+ * $'...', so quote "'" and "\" with a backslash.
  */
 
 /**/
@@ -5173,6 +5173,10 @@ mb_niceformat(const char *s, FILE *stream, char **outstrp, int flags)
 	default:
 	    if (c == L'\'' && (flags & NICEFLAG_QUOTE)) {
 		fmt = "\\'";
+		newl = 2;
+	    }
+	    else if (c == L'\\' && (flags & NICEFLAG_QUOTE)) {
+		fmt = "\\\\";
 		newl = 2;
 	    }
 	    else
