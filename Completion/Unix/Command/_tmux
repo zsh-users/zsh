@@ -540,7 +540,7 @@ _tmux-new-window() {
     '-n+[specify a window name]:window name' \
     '-P[print information about new window after it is created]' \
     '-t+[specify target window]:window:__tmux-windows' \
-    '*:: :_cmdstring'
+    '*:: :_cmdambivalent'
 }
 
 _tmux-next-layout() {
@@ -628,7 +628,7 @@ _tmux-respawn-pane() {
   _arguments -s -A "-*" -S \
     '-k[kill window if it is in use]' \
     '-t+[specify target pane]:pane:__tmux-pane' \
-    ':command:_cmdstring'
+    ':command:_cmdambivalent'
 }
 
 _tmux-respawn-window() {
@@ -636,7 +636,7 @@ _tmux-respawn-window() {
   _arguments -s -A "-*" -S \
     '-k[kill window if it is in use]' \
     '-t+[specify target window]:window:__tmux-windows' \
-    ':command:_cmdstring'
+    ':command:_cmdambivalent'
 }
 
 _tmux-rotate-window() {
@@ -855,7 +855,7 @@ _tmux-split-window() {
     "-l[define new pane's size]:size" \
     "-p[define new pane's size in percent]:size (percentage)" \
     '-t+[specify target pane]:pane:__tmux-panes' \
-    ':command:_cmdstring'
+    ':command:_cmdambivalent'
   # Yes, __tmux-panes is correct here. The behaviour was changed
   # in recent tmux versions and makes more sense. Except that
   # changing the command's name might annoy users. So it stays like
