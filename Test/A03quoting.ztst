@@ -78,3 +78,8 @@
  () { print $# } '' "" $''
 0:$'' should not be elided, in common with other empty quotes
 >3
+
+ foo=$'one\\two\n\'buckle\'\tmy\\shoe\n'
+ print -r ${(q+)foo}
+0:Extended minimal quoting of quotes and backslashes
+>$'one\\two\n\'buckle\'\tmy\\shoe\n'

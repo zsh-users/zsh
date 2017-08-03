@@ -1,5 +1,7 @@
 2017-08-03  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* 41485: Test/A03quoting.ztst: test for previous fix.
+
 	* Martijn: 41484: Src/utils.c: ${(q+)...} didn't properly
 	quote backslashes.
 
