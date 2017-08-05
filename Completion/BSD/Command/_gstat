@@ -2,10 +2,12 @@
 
 _arguments -s : \
   '-a[only display providers that are at least 0.1% busy]' \
-  '-b[batch mode]' \
+  '(-B)-b[batch mode]' \
+  '(-b)-B[endless batch mode]' \
   '-c[enable the display geom(4) consumers]' \
   '-d[enable the display delete operations]' \
   '-f+[filter by regex]:regex' \
   '-o[enable the display for other operations]' \
+  "-s[enable blocks' size statistics]" \
   '-I+[display refresh rate]:interval (ms)' \
   '-p[only display physical providers]'

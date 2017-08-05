@@ -26,6 +26,7 @@ args=(
   '(-r --role)'{-r+,--role=}'[create SELinux security context with specified role]:role'
   '(-S --stdin)'{-S,--stdin}'[read password from standard input]'
   '(-t --type)'{-t+,--type=}'[create SELinux security context with specified type]:type'
+  '(-T --command-timeout)'{-T+,--command-timeout=}'[terminate command after specified time limit]:timeout'
   '(-U --other-user)'{-U+,--other-user=}'[in list mode, display privileges for user]:user:_users'
   '(-u --user)'{-u+,--user=}'[run command (or edit file) as specified user]:user:_users'
   '(-)'{-V,--version}'[display version information and exit]'
