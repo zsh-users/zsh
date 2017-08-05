@@ -628,6 +628,7 @@ _git-clone () {
     '*--shallow-exclude=[shallow clone excluding commits reachable from specified remote revision]:revision' \
     '(--no-single-branch)--single-branch[clone only history leading up to the main branch or the one specified by -b]' \
     '(--single-branch)--no-single-branch[clone history leading up to each branch]' \
+    "--no-tags[don't clone any tags and make later fetches not follow them]" \
     '--shallow-submodules[any cloned submodules will be shallow]' \
     '--recursive[initialize all contained submodules]' \
     '--recurse-submodules=-[initialize submodules in the clone]::file:__git_files' \
@@ -1454,6 +1455,7 @@ _git-reset () {
       '(--soft --mixed        --merge --keep -p --patch -- *)--hard[match the working tree and index to the given tree]' \
       '(--soft --mixed --hard         --keep -p --patch -- *)--merge[reset out of a conflicted merge]' \
       '(--soft --mixed --hard --merge        -p --patch -- *)--keep[like --hard, but keep local working tree changes]' \
+      '--recurse-submodules=-[control recursive updating of submodules]::reset:__git_commits' \
       '(-p --patch)'{-p,--patch}'[select diff hunks to remove from the index]' \
       '(-q --quiet)'{-q,--quiet}'[suppress all output]' \
       '(--soft --mixed --hard --merge --keep):: :__git_commits' \
@@ -1463,7 +1465,7 @@ _git-reset () {
     (file)
       local tree=HEAD
       if zstyle -t :completion:${curcontext}: verbose; then
-        if ! _call_program headed git rev-parse --verify HEAD 2>/dev/null; then
+        if ! tree=$(_call_program headed git rev-parse --verify HEAD); then
           # well-known sha1 of the empty tree
           tree=4b825dc642cb6eb9a060e54bf8d69288fbee4904
         fi
@@ -1721,9 +1723,10 @@ _git-status () {
   fi
 
   _arguments -S -s \
-    '(-s --short --column --no-column)'{-s,--short}'[output in short format]' \
+    '(-s --short --column --no-column --show-stash)'{-s,--short}'[output in short format]' \
     $branch_opts \
     '(-s --short)--porcelain=-[produce machine-readable output]:version:(v1)' \
+    '(-s --short)--show-stash[show stash information]' \
     '(-u --untracked-files)'{-u-,--untracked-files=-}'[show untracked files]::mode:((no\:"show no untracked files" \
                                                                                      normal\:"show untracked files and directories" \
                                                                                      all\:"also show untracked files in untracked directories (default)"))' \
@@ -3372,6 +3375,7 @@ _git-filter-branch () {
   # such.
   # TODO: * should be git-rev-arg and git-rev-list arguments.
   _arguments -S -A '-*' \
+    '--setup[specify one time setup command]: :_cmdstring' \
     '--env-filter[filter for modifying environment in which commit will be performed]: :_cmdstring' \
     '--tree-filter[filter for rewriting tree and its contents]: :_cmdstring' \
     '--index-filter[filter for rewriting index]: :_cmdstring' \
@@ -3643,6 +3647,7 @@ _git-repack () {
     '--window=[number of objects to consider when doing delta compression]:number of objects' \
     '--window-memory=[scale window size dynamically to not use more than specified amount of memory]: : __git_guard_bytes' \
     '--depth=[maximum delta depth]:maximum delta depth' \
+    '--threads=[limit maximum number of threads]:threads' \
     '--max-pack-size=-[maximum size of each output packfile]: : __git_guard_bytes "maximum pack size"' \
     '--pack-kept-objects[repack objects in packs marked with .keep]'
 }

@@ -1,5 +1,8 @@
 2017-08-05  Oliver Kiddle  <opk@zsh.org>
 
+	* 41493: Completion/Unix/Command/_git: fix to not print hash
+	into terminal and update options for git 2.14
+
 	* 41492: Completion/BSD/Command/_gstat,
 	Completion/Unix/Command/_flex, Completion/Unix/Command/_sqlite,
 	Completion/Unix/Command/_sudo: update options in completions
