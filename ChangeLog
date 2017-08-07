@@ -1,5 +1,7 @@
 2017-08-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: version 5.4.
+
 	* 41499 (with one further tweak): Src/utils.c,
 	Doc/Zsh/options.yo, Test/E01options.ztst: With POSIX_STRINGS
 	ignore terminating separator when splitting.
