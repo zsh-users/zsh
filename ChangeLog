@@ -1,3 +1,9 @@
+2017-08-07  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 41499 (with one further tweak): Src/utils.c,
+	Doc/Zsh/options.yo, Test/E01options.ztst: With POSIX_STRINGS
+	ignore terminating separator when splitting.
+
 2017-08-07  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Anthony: 41500: Doc/Zsh/mod_zutil.yo: document '-' to end

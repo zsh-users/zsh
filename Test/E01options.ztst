@@ -1339,3 +1339,44 @@
 ?(anon):4: `break' active at end of function scope
 ?(anon):4: `break' active at end of function scope
 ?(anon):4: `break' active at end of function scope
+
+  for opt in POSIX_STRINGS NO_POSIX_STRINGS; do
+    var="foo bar "
+    (setopt $opt; print -l X "${=var}" Y)
+    var="foo2::bar2:"
+    (setopt $opt; IFS=:; print -l X "${=var}" Y)
+    var="foo3:bar3::"
+    (setopt $opt; IFS=:; print -l X "${=var}" Y)
+  done
+0:POSIX_STRINGS effect on final delimiters
+>X
+>foo
+>bar
+>Y
+>X
+>foo2
+>
+>bar2
+>Y
+>X
+>foo3
+>bar3
+>
+>Y
+>X
+>foo
+>bar
+>
+>Y
+>X
+>foo2
+>
+>bar2
+>
+>Y
+>X
+>foo3
+>bar3
+>
+>
+>Y

@@ -2193,16 +2193,16 @@ cindex(discarding embedded nulls in $'...')
 cindex(embedded nulls, in $'...')
 cindex(nulls, embedded in $'...')
 item(tt(POSIX_STRINGS) <K> <S>)(
-This option affects processing of quoted strings.  Currently it only
-affects the behaviour of null characters, i.e. character 0 in the
-portable character set corresponding to US ASCII.
+This option affects processing of quoted strings, and also
+splitting of strngs.
 
-When this option is not set, null characters embedded within strings
-of the form tt($')var(...)tt(') are treated as ordinary characters. The
-entire string is maintained within the shell and output to files where
-necessary, although owing to restrictions of the library interface
-the string is truncated at the null character in file names, environment
-variables, or in arguments to external programs.
+When this option is not set, null characters (character 0 in the
+portable character set coresponding to US ASCII) that are embedded
+within strings of the form tt($')var(...)tt(') are treated as ordinary
+characters. The entire string is maintained within the shell and output
+to files where necessary, although owing to restrictions of the library
+interface the string is truncated at the null character in file names,
+environment variables, or in arguments to external programs.
 
 When this option is set, the tt($')var(...)tt(') expression is truncated at
 the null character.  Note that remaining parts of the same string
@@ -2211,6 +2211,18 @@ beyond the termination of the quotes are not truncated.
 For example, the command line argument tt(a$'b\0c'd) is treated with
 the option off as the characters tt(a), tt(b), null, tt(c), tt(d),
 and with the option on as the characters tt(a), tt(b), tt(d).
+
+Furthermore, when the option is set, a trailing separator followed by an
+empty strings does not cause extra fields to be produced when the string
+is split.  For example,
+
+example(var="foo bar "
+print -l "${=var}")
+
+outputs a blank line at the end if tt(POSIXSTRINGS) is not set, but
+no blank line if the option is set.  Note that empty elements would in
+any case be removed if quotation marks were not used.  If the separator
+is not white space, only the final separator is ignored in this fashion.
 )
 pindex(POSIX_TRAPS)
 pindex(NO_POSIX_TRAPS)
