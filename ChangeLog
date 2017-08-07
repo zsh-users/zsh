@@ -1,3 +1,8 @@
+2017-08-07  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Anthony: 41500: Doc/Zsh/mod_zutil.yo: document '-' to end
+	zparseopts options.
+
 2017-08-05  Oliver Kiddle  <opk@zsh.org>
 
 	* 41493: Completion/Unix/Command/_git: fix to not print hash
