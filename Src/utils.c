@@ -3500,12 +3500,12 @@ skipwsep(char **s)
 mod_export char **
 spacesplit(char *s, int allownull, int heap, int quote)
 {
-    char *t, **ret, **ptr, **eptr;
+    char *t, **ret, **ptr;
     int l = sizeof(*ret) * (wordcount(s, NULL, -!allownull) + 1);
     char *(*dup)(const char *) = (heap ? dupstring : ztrdup);
 
     /* ### TODO: s/calloc/alloc/ */
-    eptr = ptr = ret = (char **) (heap ? hcalloc(l) : zshcalloc(l));
+    ptr = ret = (char **) (heap ? hcalloc(l) : zshcalloc(l));
 
     if (quote) {
 	/*
@@ -3537,7 +3537,6 @@ spacesplit(char *s, int allownull, int heap, int quote)
 	if (s > t || allownull) {
 	    *ptr = (char *) (heap ? zhalloc((s - t) + 1) :
 		                     zalloc((s - t) + 1));
-	    eptr = ptr;
 	    ztrncpy(*ptr++, t, s - t);
 	} else
 	    *ptr++ = dup(nulstring);
@@ -3546,21 +3545,6 @@ spacesplit(char *s, int allownull, int heap, int quote)
     }
     if (!allownull && t != s)
 	*ptr++ = dup("");
-    if (isset(POSIXSTRINGS) && ptr > eptr + 1) {
-	/*
-	 * Trailing separators do not generate extra fields in POSIX.
-	 * Note this is only the final separator --- if the
-	 * immediately preceding field was null it is still counted.
-	 * So just back up one.
-	 */
-	--ptr;
-	if (!heap) {
-	    char **ret2 = realloc(ret, sizeof(*ret) * (ptr+1-ret));
-	    ptr -= ret-ret2;
-	    free(ret);
-	    ret = ret2;
-	}
-    }
     *ptr = NULL;
     return ret;
 }

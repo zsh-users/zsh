@@ -1,3 +1,8 @@
+2017-08-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: back off 41499 as it has side effects which, while
+	perfectly logical, are not what POSIX expects.
+
 2017-08-08  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41510: Doc/Zsh/params.yo: update doc for $ZSH_PATCHLEVEL.
