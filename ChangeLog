@@ -1,3 +1,7 @@
+2017-08-08  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41510: Doc/Zsh/params.yo: update doc for $ZSH_PATCHLEVEL.
+
 2017-08-08  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 41481: Completion/Unix/Command/_df,

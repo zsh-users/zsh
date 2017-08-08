@@ -952,8 +952,8 @@ of zsh.
 )
 vindex(ZSH_PATCHLEVEL)
 item(tt(ZSH_PATCHLEVEL))(
-The revision string for the version number of the ChangeLog file
-in the zsh distribution.  This is most useful in order to keep
+The output of `tt(git describe --tags --long)' for the zsh repository
+used to build the shell.  This is most useful in order to keep
 track of versions of the shell during development between releases;
 hence most users should not use it and should instead rely on
 tt($ZSH_VERSION).
