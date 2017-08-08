@@ -1,5 +1,7 @@
 2017-08-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Config/version.mk: update to 5.4.1-dev-0.
+
 	* unposted: Config/verson.mk, README, Etc/FAQ.yo: update to version
 	5.4.1.
 
