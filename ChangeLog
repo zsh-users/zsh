@@ -1,5 +1,8 @@
 2017-08-08  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: Config/verson.mk, README, Etc/FAQ.yo: update to version
+	5.4.1.
+
 	* unposted: back off 41499 as it has side effects which, while
 	perfectly logical, are not what POSIX expects.
 
