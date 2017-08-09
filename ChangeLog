@@ -1,5 +1,7 @@
 2017-08-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: README: 5.4,1 typo fixed.
+
 	* 41504: Src/lex.c, Src/parse.c, Test/A01grammar.ztst: make
 	empty strings work in case patterns with no opening
 	parenthesis.
