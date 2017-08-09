@@ -48,7 +48,11 @@ mod_export int incond;
 /**/
 mod_export int inredir;
  
-/* != 0 if we are about to read a case pattern */
+/*
+ * 1 if we are about to read a case pattern
+ * -1 if we are not quite sure
+ * 0 otherwise
+ */
  
 /**/
 int incasepat;
@@ -1194,6 +1198,7 @@ par_case(int *cmplx)
 
     for (;;) {
 	char *str;
+	int skip_zshlex;
 
 	while (tok == SEPER)
 	    zshlex();
@@ -1201,11 +1206,17 @@ par_case(int *cmplx)
 	    break;
 	if (tok == INPAR)
 	    zshlex();
-	if (tok != STRING)
-	    YYERRORV(oecused);
-	if (!strcmp(tokstr, "esac"))
-	    break;
-	str = dupstring(tokstr);
+	if (tok == BAR) {
+	    str = dupstring("");
+	    skip_zshlex = 1;
+	} else {
+	    if (tok != STRING)
+		YYERRORV(oecused);
+	    if (!strcmp(tokstr, "esac"))
+		break;
+	    str = dupstring(tokstr);
+	    skip_zshlex = 0;
+	}
 	type = WC_CASE_OR;
 	pp = ecadd(0);
 	palts = ecadd(0);
@@ -1243,10 +1254,11 @@ par_case(int *cmplx)
 	 * this doesn't affect our ability to match a | or ) as
 	 * these are valid on command lines.
 	 */
-	incasepat = 0;
+	incasepat = -1;
 	incmdpos = 1;
-	for (;;) {
+	if (!skip_zshlex)
 	    zshlex();
+	for (;;) {
 	    if (tok == OUTPAR) {
 		ecstr(str);
 		ecadd(ecnpats++);
@@ -1302,10 +1314,26 @@ par_case(int *cmplx)
 	    }
 
 	    zshlex();
-	    if (tok != STRING)
+	    switch (tok) {
+	    case STRING:
+		/* Normal case */
+		str = dupstring(tokstr);
+		zshlex();
+		break;
+
+	    case OUTPAR:
+	    case BAR:
+		/* Empty string */
+		str = dupstring("");
+		break;
+
+	    default:
+		/* Oops. */
 		YYERRORV(oecused);
-	    str = dupstring(tokstr);
+		break;
+	    }
 	}
+	incasepat = 0;
 	par_save_list(cmplx);
 	if (tok == SEMIAMP)
 	    type = WC_CASE_AND;

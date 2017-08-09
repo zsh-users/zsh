@@ -760,7 +760,7 @@ gettok(void)
 	return AMPER;
     case LX1_BAR:
 	d = hgetc();
-	if (d == '|')
+	if (d == '|' && !incasepat)
 	    return DBAR;
 	else if (d == '&')
 	    return BARAMP;
@@ -1058,7 +1058,7 @@ gettokstr(int c, int sub)
 	    if (isset(SHGLOB)) {
 		if (sub || in_brace_param)
 		    break;
-		if (incasepat && !lexbuf.len)
+		if (incasepat > 0 && !lexbuf.len)
 		    return INPAR;
 		if (!isset(KSHGLOB) && lexbuf.len)
 		    goto brk;
@@ -1859,7 +1859,7 @@ exalias(void)
     Reswd rw;
 
     hwend();
-    if (interact && isset(SHINSTDIN) && !strin && !incasepat &&
+    if (interact && isset(SHINSTDIN) && !strin && incasepat <= 0 &&
 	tok == STRING && !nocorrect && !(inbufflags & INP_ALIAS) &&
 	(isset(CORRECTALL) || (isset(CORRECT) && incmdpos)))
 	spckword(&tokstr, 1, incmdpos, 1);
