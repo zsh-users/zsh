@@ -1,3 +1,8 @@
+2017-08-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* Phil: 41527 (tweak to use heap memory): Src/module.c,
+	Test/V07pcre.ztst: fix [[ ... ]]] conditions passed to modules.
+
 2017-08-09  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: README: 5.4,1 typo fixed.

@@ -649,11 +649,21 @@ getconddef(int inf, const char *name, int autol)
 {
     Conddef p;
     int f = 1;
+    char *lookup, *s;
+
+    /* detokenize the Dash to the form encoded in lookup tables */
+    lookup = dupstring(name);
+    if (!lookup)
+	return NULL;
+    for (s = lookup; *s != '\0'; s++) {
+	if (*s == Dash)
+	    *s = '-';
+    }
 
     do {
 	for (p = condtab; p; p = p->next) {
 	    if ((!!inf == !!(p->flags & CONDF_INFIX)) &&
-		!strcmp(name, p->name))
+		!strcmp(lookup, p->name))
 		break;
 	}
 	if (autol && p && p->module) {
@@ -664,7 +674,7 @@ getconddef(int inf, const char *name, int autol)
 	    if (f) {
 		(void)ensurefeature(p->module,
 				    (p->flags & CONDF_INFIX) ? "C:" : "c:",
-				    (p->flags & CONDF_AUTOALL) ? NULL : name);
+				    (p->flags & CONDF_AUTOALL) ? NULL : lookup);
 		f = 0;
 		p = NULL;
 	    } else {
@@ -674,6 +684,7 @@ getconddef(int inf, const char *name, int autol)
 	} else
 	    break;
     } while (!p);
+
     return p;
 }
 
