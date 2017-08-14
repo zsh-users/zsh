@@ -148,7 +148,7 @@ bin_pcre_study(char *nam, UNUSED(char **args), UNUSED(Options ops), UNUSED(int f
 
 /**/
 static int
-zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar,
+zpcre_get_substrings(char *arg, int *ovec, int captured_count, char *matchvar,
 		     char *substravar, int want_offset_pair, int matchedinarr,
 		     int want_begin_end)
 {
@@ -156,15 +156,13 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar,
     char offset_all[50];
     int capture_start = 1;
 
-    if (matchedinarr)
+    if (matchedinarr) {
+	/* bash-style captures[0] entire-matched string in the array */
 	capture_start = 0;
-    if (matchvar == NULL)
-	matchvar = "MATCH";
-    if (substravar == NULL)
-	substravar = "match";
-    
+    }
+
     /* captures[0] will be entire matched string, [1] first substring */
-    if (!pcre_get_substring_list(arg, ovec, ret, (const char ***)&captures)) {
+    if (!pcre_get_substring_list(arg, ovec, captured_count, (const char ***)&captures)) {
 	int nelem = arrlen(captures)-1;
 	/* Set to the offsets of the complete match */
 	if (want_offset_pair) {
@@ -176,30 +174,43 @@ zpcre_get_substrings(char *arg, int *ovec, int ret, char *matchvar,
 	 * difference between the two values in each paired entry in ovec.
 	 * ovec is length 2*(1+capture_list_length)
 	 */
-	match_all = metafy(captures[0], ovec[1] - ovec[0], META_DUP);
-	setsparam(matchvar, match_all);
+	if (matchvar) {
+	    match_all = metafy(captures[0], ovec[1] - ovec[0], META_DUP);
+	    setsparam(matchvar, match_all);
+	}
 	/*
 	 * If we're setting match, mbegin, mend we only do
 	 * so if there were parenthesised matches, for consistency
-	 * (c.f. regex.c).
+	 * (c.f. regex.c).  That's the next block after this one.
+	 * Here we handle the simpler case where we don't worry about
+	 * Unicode lengths, etc.
+	 * Either !want_begin_end (ie, this is bash) or nelem; if bash
+	 * then we're invoked always, even without nelem results, to
+	 * set the array variable with one element in it, the complete match.
 	 */
-	if (!want_begin_end || nelem) {
+	if (substravar &&
+	    (!want_begin_end || nelem)) {
 	    char **x, **y;
-	    int vec_off;
+	    int vec_off, i;
 	    y = &captures[capture_start];
-	    matches = x = (char **) zalloc(sizeof(char *) * (arrlen(y) + 1));
-	    vec_off = 2;
-	    do {
+	    matches = x = (char **) zalloc(sizeof(char *) * (captured_count+1-capture_start));
+	    for (i = capture_start; i < captured_count; i++, y++) {
+		vec_off = 2*i;
 		if (*y)
 		    *x++ = metafy(*y, ovec[vec_off+1]-ovec[vec_off], META_DUP);
 		else
 		    *x++ = NULL;
-		vec_off += 2;
-	    } while (*y++);
+	    }
+	    *x = NULL;
 	    setaparam(substravar, matches);
 	}
 
 	if (want_begin_end) {
+	    /*
+	     * cond-infix rather than builtin; also not bash; so we set a bunch
+	     * of variables and arrays to values which require handling Unicode
+	     * lengths
+	     */
 	    char *ptr = arg;
 	    zlong offs = 0;
 	    int clen, leftlen;
@@ -306,7 +317,9 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
 	zwarnnam(nam, "no pattern has been compiled");
 	return 1;
     }
-    
+
+    matched_portion = "MATCH";
+    receptacle = "match";
     if(OPT_HASARG(ops,c='a')) {
 	receptacle = OPT_ARG(ops,c);
     }
@@ -318,8 +331,8 @@ bin_pcre_match(char *nam, char **args, Options ops, UNUSED(int func))
 	    return 1;
     }
     /* For the entire match, 'Return' the offset byte positions instead of the matched string */
-    if(OPT_ISSET(ops,'b')) want_offset_pair = 1; 
-    
+    if(OPT_ISSET(ops,'b')) want_offset_pair = 1;
+
     if ((ret = pcre_fullinfo(pcre_pattern, pcre_hints, PCRE_INFO_CAPTURECOUNT, &capcount)))
     {
 	zwarnnam(nam, "error %d in fullinfo", ret);
@@ -360,7 +373,7 @@ cond_pcre_match(char **a, int id)
 {
     pcre *pcre_pat;
     const char *pcre_err;
-    char *lhstr, *rhre, *lhstr_plain, *rhre_plain, *avar=NULL;
+    char *lhstr, *rhre, *lhstr_plain, *rhre_plain, *avar, *svar;
     int r = 0, pcre_opts = 0, pcre_errptr, capcnt, *ov, ovsize;
     int lhstr_plain_len, rhre_plain_len;
     int return_value = 0;
@@ -380,8 +393,13 @@ cond_pcre_match(char **a, int id)
     ov = NULL;
     ovsize = 0;
 
-    if (isset(BASHREMATCH))
-	avar="BASH_REMATCH";
+    if (isset(BASHREMATCH)) {
+	svar = NULL;
+	avar = "BASH_REMATCH";
+    } else {
+	svar = "MATCH";
+	avar = "match";
+    }
 
     switch(id) {
 	 case CPCRE_PLAIN:
@@ -414,7 +432,7 @@ cond_pcre_match(char **a, int id)
 		    break;
 		}
                 else if (r>0) {
-		    zpcre_get_substrings(lhstr_plain, ov, r, NULL, avar, 0,
+		    zpcre_get_substrings(lhstr_plain, ov, r, svar, avar, 0,
 					 isset(BASHREMATCH),
 					 !isset(BASHREMATCH));
 		    return_value = 1;

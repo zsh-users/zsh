@@ -142,9 +142,33 @@
   print $?
   [[ foo -pcre-match ^g..$ ]]
   print $?
+  [[ ! foo -pcre-match ^g..$ ]]
+  print $?
 0:infix -pcre-match works
 >0
 >1
+>0
+
+# Bash mode; note zsh documents that variables not updated on match failure,
+# which remains different from bash
+  setopt bash_rematch
+  [[ "goo" -pcre-match ^f.+$ ]] ; print $?
+  [[ "foo" -pcre-match ^f.+$ ]] ; print -l $? _${^BASH_REMATCH[@]}
+  [[ "foot" -pcre-match ^f([aeiou]+)(.)$ ]]; print -l $? _${^BASH_REMATCH[@]}
+  [[ "foo" -pcre-match ^f.+$ ]] ; print -l $? _${^BASH_REMATCH[@]}
+  [[ ! "goo" -pcre-match ^f.+$ ]] ; print $?
+  unsetopt bash_rematch
+0:bash-compatibility works
+>1
+>0
+>_foo
+>0
+>_foot
+>_oo
+>_t
+>0
+>_foo
+>0
 
 # Subshell because crash on failure
   ( setopt re_match_pcre
