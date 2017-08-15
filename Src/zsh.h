@@ -456,6 +456,18 @@ enum {
 #define FDT_PROC_SUBST		7
 #endif
 
+/*
+ * Mask to get the basic FDT type.
+ */
+#define FDT_TYPE_MASK		15
+
+/*
+ * Bit flag that fd is saved for later restoration.
+ * Currently this is only use with FDT_INTERNAL.  We use this fact so as
+ * not to have to mask checks against other types.
+ */
+#define FDT_SAVED_MASK		16
+
 /* Flags for input stack */
 #define INP_FREE      (1<<0)	/* current buffer can be free'd            */
 #define INP_ALIAS     (1<<1)	/* expanding alias or history              */

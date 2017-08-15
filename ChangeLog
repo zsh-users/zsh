@@ -1,3 +1,9 @@
+2017-08-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* posted twice but has not shown up: Src/exec.c, Src/zsh.h:
+	record file desriptors that remain open to save ones in the
+	range 0 to 9 in fdtable and close them on forking.
+
 2017-08-14  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Phil: 4152: Src/Modules/pcre.c, Test/V07pcre.ztst: fix big

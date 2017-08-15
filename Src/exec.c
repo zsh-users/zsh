@@ -972,7 +972,7 @@ enum {
 static void
 entersubsh(int flags)
 {
-    int sig, monitor, job_control_ok;
+    int i, sig, monitor, job_control_ok;
 
     if (!(flags & ESUB_KEEPTRAP))
 	for (sig = 0; sig < SIGCOUNT; sig++)
@@ -1083,6 +1083,14 @@ entersubsh(int flags)
 	opts[MONITOR] = 0;
     opts[USEZLE] = 0;
     zleactive = 0;
+    /*
+     * If we've saved fd's for later restoring, we're never going
+     * to restore them now, so just close them.
+     */
+    for (i = 10; i <= max_zsh_fd; i++) {
+	if (fdtable[i] & FDT_SAVED_MASK)
+	    zclose(i);
+    }
     if (flags & ESUB_PGRP)
 	clearjobtab(monitor);
     get_usage();
@@ -2318,6 +2326,9 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag,
 			return;
 		    }
 		    save[fd1] = fdN;
+		    DPUTS(fdtable[fdN] != FDT_INTERNAL,
+			  "Saved file descriptor not marked as internal");
+		    fdtable[fdN] |= FDT_SAVED_MASK;
 		}
 	    }
 	}
@@ -3575,7 +3586,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			    }
 			    if (!bad && fn->fd1 <= max_zsh_fd) {
 				if (fn->fd1 >= 10 &&
-				    fdtable[fn->fd1] == FDT_INTERNAL)
+				    (fdtable[fn->fd1] & FDT_TYPE_MASK) ==
+				    FDT_INTERNAL)
 				    bad = 3;
 			    }
 			}
@@ -4270,7 +4282,7 @@ closem(int how)
 
     for (i = 10; i <= max_zsh_fd; i++)
 	if (fdtable[i] != FDT_UNUSED &&
-	    (how == FDT_UNUSED || fdtable[i] == how)) {
+	    (how == FDT_UNUSED || (fdtable[i] & FDT_TYPE_MASK) == how)) {
 	    if (i == SHTTY)
 		SHTTY = -1;
 	    zclose(i);
