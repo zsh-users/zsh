@@ -2027,9 +2027,9 @@ _git-worktree() {
       case $line[1] in
         (add)
 	  if (( $words[(I)--detach] )); then
-	    args=( ':commit:__git_commits' )
-	  else
 	    args=( ':branch:__git_branch_names' )
+	  else
+	    args=( ':commit:__git_commits' )
 	  fi
           _arguments \
 	    '(-f --force)'{-f,--force}'[checkout branch even if already checked out in another worktree]' \

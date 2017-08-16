@@ -1,3 +1,9 @@
+2017-08-16  Oliver Kiddle  <opk@zsh.org>
+
+	* 41552: Completion/Unix/Command/_git: complete only branches
+	after git worktree add --detach because the --detach is
+	superfluous for other commits
+
 2017-08-15  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* posted twice but has not shown up: Src/exec.c, Src/zsh.h:
