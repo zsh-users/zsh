@@ -1,5 +1,8 @@
 2017-08-16  Oliver Kiddle  <opk@zsh.org>
 
+	* Tomasz Pala: users/22834: Completion/Linux/Command/_modutils:
+	fix irritating bug in file glob for Linux kernel modules
+
 	* Tomasz Pala: users/22834: Completion/Unix/Command/_ip:
 	allow completion after -c and a few other new options
 
