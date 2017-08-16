@@ -1,5 +1,9 @@
 2017-08-16  Oliver Kiddle  <opk@zsh.org>
 
+	* 41556: Completion/Solaris/Command/_snoop
+	Completion/Unix/Command/_ngrep, Completion/Unix/Command/_tcpdump,
+	Completion/Unix/Type/_bpf_filters: complete BPF (libpcap) filters
+
 	* 41552: Completion/Unix/Command/_git: complete only branches
 	after git worktree add --detach because the --detach is
 	superfluous for other commits
