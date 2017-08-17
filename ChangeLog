@@ -1,5 +1,9 @@
 2017-08-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 41564: Completion/Unix/Command/_tmux: Complete environment
+	variables and their values for set-environment and
+	show-environment.
+
 	* 41557: Completion/Unix/Command/_tmux: show-environment,
 	set-environment: Make -g,-t mutually exclusive.
 

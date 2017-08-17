@@ -732,12 +732,33 @@ _tmux-set-buffer() {
 
 _tmux-set-environment() {
   [[ -n ${tmux_describe} ]] && print "(un)set an environment variable" && return
-  _arguments -s -A "-*" -S \
+  local mode=session action=add
+  local curcontext="$curcontext" state line ret=1
+  typeset -A opt_args
+  _arguments -C -s -A "-*" -S : \
     '(-t)-g[modify global environment]' \
-    '-r[remove variable before starting new processes]' \
-    '-u[unset a variable]' \
+    '(-u)-r[remove variable before starting new processes]' \
+    '(-r)-u[unset a variable]' \
     '(-g)-t[specify target session]:target session:__tmux-sessions' \
-    ':name' ':value'
+    ': :->name' '(-u -r)2: :->value' && ret=0
+
+  if (( ${+opt_args[-g]} )); then
+      mode=global
+  fi
+  if (( ${+opt_args[-u]} )); then
+      action=unset
+  fi
+  if (( ${+opt_args[-r]} )); then
+      action=remove
+  fi
+
+  # TODO: the exclusion "(-g -r)2:" doesn't work, so simulate it here
+  if [[ $action == (remove|unset) ]] && [[ $state == value ]]; then
+      __tmux-nothing-else
+  else
+      __tmux-environment-variables $mode $state $action && ret=0
+  fi
+  return ret
 }
 
 _tmux-set-option() {
@@ -804,10 +825,21 @@ _tmux-show-buffer() {
 
 _tmux-show-environment() {
   [[ -n ${tmux_describe} ]] && print "display the environment" && return
-  _arguments -s \
+  local mode=session
+  local curcontext="$curcontext" state line ret=1
+  typeset -A opt_args
+  _arguments -C -A "-*" -s : \
     '(-t)-g[show global environment]' \
     '-s[format output as Bourne shell commands]' \
     '(-g)-t+[specify target session]:target session:__tmux-sessions' \
+    '1:: :->name' && ret=0
+
+  if (( ${+opt_args[-g]} )); then
+      mode=global
+  fi
+
+  __tmux-environment-variables $mode $state show && ret=0
+  return ret
 }
 
 _tmux-show-messages() {
@@ -995,6 +1027,63 @@ function __tmux-clients() {
     local -a clients
     clients=( ${${(f)"$(command tmux 2> /dev/null list-clients)"}/:[ $'\t']##/:} )
     _describe -t clients 'clients' clients
+}
+
+function __tmux-environment-variables() {
+    local mode="$1" state="$2" action="$3"
+
+    local -a dash_g
+    case $mode in
+        (global) dash_g=(-g);;
+        (session) dash_g=();;
+        (*) return 1;; # bug in the caller
+    esac
+
+    local hint
+    case $action in
+        (add|remove) hint=" (or specify a new one)";;
+        (unset|show) hint="";;
+        (*) return 1;; # bug in the caller
+    esac
+
+    case ${state} in
+        (name) 
+            local -a vars_and_vals=( ${(@f)"$(command tmux 2>/dev/null show-env $dash_g)"} )
+            local -a descriptions
+            local k_v k v
+            for k_v in $vars_and_vals; do
+                k=${k_v%%=*}
+                if [[ $k == -* ]]; then
+                    k=${k#-}
+                    v='(remove)'
+                else
+                    v=${k_v#*=}
+                fi
+                descriptions+=( "${k//:/\\:}:$v" )
+            done
+            # TODO: this if/else is because '_describe ${hint:+"-x"}' prints the "No matches" error in addition to the message.
+            local msg="${dash_g[1]:+"global "}environment variables${hint}"
+            if _describe -t parameters $msg descriptions; then
+                :
+            elif [[ -n $hint ]]; then
+                _message $msg
+            fi
+            ;;
+        (value)
+            local var_and_val=${(@f)"$(command tmux 2>/dev/null show-env $dash_g -- ${(Q)words[-2]})"}
+            # TODO: this if/else is because '_description -x' prints the "No matches" error in addition to the message.
+            if [[ -n $var_and_val ]]; then
+                local -a expl
+                _description -x parameter-values expl "Value for ${words[-2]}"
+                compadd "$expl[@]" - ${var_and_val#*=}
+            else
+                _message "Value for ${words[-2]}"
+            fi
+            ;;
+        (*)
+            return 1
+            ;;
+    esac
 }
 
 function __tmux-format() {
