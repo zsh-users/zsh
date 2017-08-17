@@ -745,7 +745,7 @@ _tmux-set-option() {
   local mode=session
   local curcontext="$curcontext" state line ret=1
   typeset -A opt_args
-  _arguments -C -s \
+  _arguments -C -s : \
     '-a[append to string options]' \
     '-g[set a global session option]' \
     '-o[prevent setting of an option that is already set]' \
@@ -769,7 +769,7 @@ _tmux-set-window-option() {
   [[ -n ${tmux_describe} ]] && print "set a window option" && return
   local curcontext="$curcontext" state line ret=1
   typeset -A opt_args
-  _arguments -C -s \
+  _arguments -C -s : \
     '-a[append to string options]' \
     '-g[set a global window option]' \
     '-o[prevent setting of an option that is already set]' \
@@ -820,21 +820,38 @@ _tmux-show-messages() {
 
 _tmux-show-options() {
   [[ -n ${tmux_describe} ]] && print "show session options" && return
-  _arguments -s \
+  local mode=session
+  local curcontext="$curcontext" state line ret=1
+  typeset -A opt_args
+  _arguments -C -s : \
     '-g[show global options]' \
     '-q[suppress errors about unknown or ambiguous options]' \
     '-s[show server options]' \
     '-v[show only the option value, not the name]' \
     '-w[show window options]' \
-    '-t+[specify target session]:target session:__tmux-sessions'
+    '-t+[specify target session]:target session:__tmux-sessions' \
+    '*:: :->name_or_value' && ret=0
+
+  if (( ${+opt_args[-w]} )); then
+    mode=window
+  elif (( ${+opt_args[-s]} )); then
+    mode=server
+  fi
+  __tmux-options-complete ${mode} ${state} && ret=0
+  return ret
 }
 
 _tmux-show-window-options() {
   [[ -n ${tmux_describe} ]] && print "show window options" && return
-  _arguments -s \
+  local curcontext="$curcontext" state line ret=1
+  typeset -A opt_args
+  _arguments -C -s : \
     '-g[show global options]' \
     '-v[show only the option value, not the name]' \
-    '-t+[specify target window]:target window:__tmux-windows'
+    '-t+[specify target window]:target window:__tmux-windows' \
+    '*:: :->name_or_value' && ret=0
+  __tmux-options-complete window ${state} && ret=0
+  return ret
 }
 
 _tmux-source-file() {
