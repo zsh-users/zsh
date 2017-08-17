@@ -733,10 +733,10 @@ _tmux-set-buffer() {
 _tmux-set-environment() {
   [[ -n ${tmux_describe} ]] && print "(un)set an environment variable" && return
   _arguments -s -A "-*" -S \
-    '-g[modify global environment]' \
+    '(-t)-g[modify global environment]' \
     '-r[remove variable before starting new processes]' \
     '-u[unset a variable]' \
-    '-t[specify target session]:target session:__tmux-sessions' \
+    '(-g)-t[specify target session]:target session:__tmux-sessions' \
     ':name' ':value'
 }
 
@@ -805,9 +805,9 @@ _tmux-show-buffer() {
 _tmux-show-environment() {
   [[ -n ${tmux_describe} ]] && print "display the environment" && return
   _arguments -s \
-    '-g[show global environment]' \
+    '(-t)-g[show global environment]' \
     '-s[format output as Bourne shell commands]' \
-    '-t+[specify target session]:target session:__tmux-sessions'
+    '(-g)-t+[specify target session]:target session:__tmux-sessions' \
 }
 
 _tmux-show-messages() {
