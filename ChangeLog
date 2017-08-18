@@ -1,5 +1,8 @@
 2017-08-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 41567: Completion/Unix/Command/_tmux: Complete detached
+	sessions first for attach-session.
+
 	* 41566: Completion/Unix/Command/_tmux: Complete only attached
 	sessions for detach-session.
 
