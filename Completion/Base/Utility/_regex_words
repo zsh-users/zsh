@@ -1,6 +1,6 @@
 #autoload
 
-local opt OPTARG
+local opt OPTARG matches end
 local term=$'\0'
 
 while getopts "t:" opt; do
@@ -31,19 +31,22 @@ fi
 integer i
 local -a wds
 
+if [[ $term = $'\0' ]]; then
+  matches=":${tag}:${desc}:(( "
+  end="))"
+else
+  matches=":${tag}:${desc}:_values -s ${(q)term} ${(q)desc}"
+fi
+
 for (( i = 1; i <= $#; i++ )); do
   wds=(${(s.:.)argv[i]})
   reply+=(/${wds[1]//\**/"[^$term]#"}"$term"/)
   if [[ $term = $'\0' ]]; then
-    reply+=(":${tag}:${desc}:(( ${wds[1]//\*}:${wds[2]//(#m)[: \(\)]/\\$MATCH} ))")
+    matches+="${wds[1]//\*}${wds[2]:+\\:${wds[2]//(#m)[: \(\)]/\\$MATCH}} "
   else
-    reply+=(":${tag}:${desc}:_values -s ${(q)term} ${(q)desc} \
-${(q)${${wds[1]//\*}//(#m)[:\[\]]/\\$MATCH}}\\[${(q)${wds[2]//(#m)[:\[\]]/\\$MATCH}}\\]")
+    matches+=" ${(q)${${wds[1]//\*}//(#m)[:\[\]]/\\$MATCH}}\\[${(q)${wds[2]//(#m)[:\[\]]/\\$MATCH}}\\]"
   fi
   eval "reply+=($wds[3])"
-  if (( $i == $# )); then
-    reply+=(\))
-  else
-    reply+=(\|)
-  fi
+  reply+=(\|)
 done
+reply+=( /'[]'/ "${matches}${end}" \) )
