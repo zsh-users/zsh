@@ -1,3 +1,8 @@
+2017-08-18  Oliver Kiddle  <opk@zsh.org>
+
+	* 41560: Completion/Unix/Command/_chsh: cleanup chsh completion
+	for different platforms
+
 2017-08-16  Oliver Kiddle  <opk@zsh.org>
 
 	* Tomasz Pala: users/22834: Completion/Linux/Command/_modutils:

@@ -1,40 +1,67 @@
 #compdef chsh chpass
+
+local variant help=h
+local -a args shells
+
 case $OSTYPE in
-(darwin*|*bsd*)
-  _arguments : \
-      '-s[Specify user login shell]:shell:(${(Z+Cn+)"$(</etc/shells)"})' \
-      "-l[Specify location of user]:node:" \
-      "-u[Specify authentication name]:auth user:" \
-      "1:user name:_users"
+  darwin*|*bsd*)
+    args=( '(-a)-s[specify new login shell]:shell:($shells)' )
+  ;|
+  (free|net|open)bsd*)
+    args+=( '(-s 1)-a[specify user database entry]:passwd entry' )
+  ;|
+  darwin*)
+    args+=(
+      '-l[specify location of user]:location'
+      '-u[specify authentication name]:auth user'
+    )
   ;;
-(linux-gnu)
-  if { =chsh -v } >&/dev/null
-  then
-      local -a opts shells
-      shells=( $(=chsh -l) )
-      _arguments : \
-	  "(-)-s[Specify your login shell]:shell:($shells)" \
-	  "(-)--shell[Specify your login shell]:shell:($shells)" \
-	  "(-)-l[Print shells in /etc/shells]" \
-	  "(-)--list-shells[Print shells in /etc/shells]" \
-	  "(-)-u[Print a usage message and exit]" \
-	  "(-)--help[Print a usage message and exit]" \
-	  "(-)-v[Print version information and exit]" \
-	  "(-)--version[Print version information and exit]" \
-	  "1:user name:_users"
-      return
-  fi
-  # else fall through
-  ;&
-(*)
-  local s=''
-  # Use $s to cause all options to be treated as mutually exclusive
-  [[ $words[CURRENT-1] = -* ]] && s="(-)$words[CURRENT-1]"
-  # This fiddling with $s is a hack to cause "_arguments  : --" to use
-  # the /etc/shells listing for -s or --shell even when the description
-  # of that option has been pulled from the GNU --help output.
-  [[ $words[CURRENT-1] = (-s|--shell) ]] &&
-    s="$s"'[ ]:shell:(${(Z+Cn+)"$(</etc/shells)"})'
-  _arguments : $s "1:user name:_users" --
+  (free|net)bsd*)
+    args+=(
+      '(-y)-l[update only the local password file]'
+      '(-l)-y[force YP database entry to be changed]'
+    )
+  ;|
+  freebsd*)
+    args+=(
+      '-p[specify encrypted password field]:password hash'
+      '-e[change account expire time]:expiry time'
+      '-d[specify NIS domain]:domain'
+      '-h[specify NIS server to query]:NIS server:_hosts'
+      '-o[force use of RPC-based updates]'
+    )
+  ;;
+  (linux-gnu)
+    _pick_variant -r variant util-linux=util-linux suse=pwdutils debian -v
+    args=( -S : '(-)'{-s+,--shell=}'[specify new login shell]:shell:($shells)' )
+    case $variant in
+      suse|util-linux)
+	shells=( $(_call_program shells $words[1] -l) )
+        args+=(
+	  '(-)'{-l,--list-shells}'[print shells in /etc/shells]'
+	  '(-)'{-v,--version}'[display version information]'
+        )
+	help=u
+      ;|
+      util-linux|debian)
+	args+=( '(-)-'{$help,-help}'[display help information]' )
+      ;|
+      suse)
+        args+=(
+	  '(-)'{-u,--usage}'[display short usage message]'
+	  '(-)--help[display help information]'
+	  '(-D --binddn)'{-D+,--binddn=}'[specify LDAP disingushed name to bind]:binddn'
+	  '(-P --path)'{-P+,--path=}'[specify path to search for passwd and shadow files]:path:_directories'
+	  '(-q --quiet)'{-q,--quiet}"[don't be verbose]"
+	  '--service=[use specified name service]:service:(files nis nisplus ldap)'
+	)
+      ;;
+      debian)
+	args+=( '(-R --root)'{-R+,--root=}'[specify directory to chroot into]:directory:_directories' )
+      ;;
+    esac
   ;;
 esac
+
+(( $#shells )) || shells=( ${(Z+Cn+)"$(</etc/shells)"} )
+_arguments $args '1:user name:_users'
