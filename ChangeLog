@@ -1,5 +1,8 @@
 2017-08-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 41568: Completion/Unix/Command/_vmstat: handle vmstat options
+	on NetBSD and Solaris and add some exclusion lists
+
 	* 41563: Completion/Base/Utility/_regex_words: fix completion
 	description alignment with _regex_words
 
