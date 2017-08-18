@@ -302,7 +302,7 @@ _tmux-detach-client() {
   _arguments -s \
     '-a[kill all clients except for the named by -t]' \
     '-P[send SIGHUP to parent process]' \
-    '-s+[specify target session and kill its clients]:session:__tmux-sessions' \
+    '-s+[specify target session and kill its clients]:session:__tmux-sessions-attached' \
     '-t+[specify target client]:client:__tmux-clients'
 }
 
@@ -1364,6 +1364,13 @@ function __tmux-sessions() {
     local -a sessions
     sessions=( ${${(f)"$(command tmux 2> /dev/null list-sessions)"}/:[ $'\t']##/:} )
     _describe -t sessions 'sessions' sessions "$@"
+}
+
+function __tmux-sessions-attached() {
+    local -a sessions
+    sessions=( ${${(f)"$(command tmux 2> /dev/null list-sessions)"}/:[ $'\t']##/:} )
+    sessions=( ${(M)sessions:#*"(attached)"} )
+    _describe -t sessions 'attached sessions' sessions "$@"
 }
 
 function __tmux-socket-name() {
