@@ -1,5 +1,8 @@
 2017-08-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 41561: Completion/Unix/Command/_dhclient: handle Free/OpenBSD
+	and bring options up-to-date for the ISC implementation
+
 	* 41560: Completion/Unix/Command/_chsh: cleanup chsh completion
 	for different platforms
 

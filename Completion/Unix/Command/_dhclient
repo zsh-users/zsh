@@ -2,27 +2,69 @@
 
 local args
 
-if _pick_variant three=V3 two --help; then
-  args=(
-    '-q[quiet]'
-    '-1[only try once to get a lease]'
-    '-r[release the current lease]'
-    '-lf[lease file]:lease file:_files'
-    '-pf[pid file]:pid file:_files'
-    '-cf[config file]:config file:_files'
-    '-sf[script file]:script file:_files'
-    '-e[env vars to pass to child processes]:env var key value pairs:'
-    '-s[transmit to specific target instead of broadcast]:server:_hosts'
-    '-g[force giaddr field]:relay:_hosts'
-    '-n[do not configure any interfaces]'
-    '-nw[daemonize immediately rather than wait for IP acquisition]'
-    '-w[do not exit if there are no interfaces found to configure]'
-  )
-else
-  args=( '-e[exit if configuration failed after a certain time]' )
-fi
+case $OSTYPE in
+  (open|free)bsd*)
+    args+=(
+      '-c+[specify configuration file]:file:_files'
+      '-l+[specify leases file]:file:_files'
+      '-u[reject leases with unknown options]'
+    )
+  ;|
+  freebsd*)
+    args+=(
+      '(-d)-b[immediately move to the background]'
+      '-p+[specify PID file]:file:_files'
+    )
+  ;;
+  openbsd*)
+    args+=(
+      '-i+[ignore values provided by leases for specified options]:options'
+      '-L+[specify file to write option data too]:file:_files'
+    )
+  ;;
+  *) # ISC implementation, used on Linux and NetBSD
+    args=(
+      '!(-6 -S -T -P -D -N)-4'
+      '(-4 -s)-6[use the DHCPv6 protocol]'
+      '-1[only try once to get a lease]'
+      '(-d)-nw[daemonize immediately rather than wait for IP acquisition]'
+      "-m[don't require responding ethernet address of dhcp server to match expectation]"
+      '-v[verbose log messages]'
+      "-w[don't exit if there are no interfaces found to configure]"
+      "-n[don't configure any interfaces]"
+      '-e[specify env vars to pass to child processes]:env var key value pairs'
+      '(-x)-r[release the current lease]'
+      '(-r)-x[stop the running DHCP client without releaseing current lease]'
+      '-p[specify port to transmit to / listen on]:port:_ports'
+      '(-6)-s[transmit to specific target instead of broadcast]:server:_hosts'
+      '-g[force giaddr field]:relay:_hosts'
+      '-i[use a DUID with DHCPv4 clients]'
+      '-I[use the standard DDNS scheme]'
+      '--version[display version number]'
+      '(-4)-S[use Information-request to get only stateless configuration]'
+      '(-4)*-T[ask for IPv6 temporary addresses]'
+      '(-4)-P[enable IPv6 prefix delegation]'
+      '-D[specify DUID selection method]:DUID:((LL\:link-layer LLT\:link-layer\ plus\ timestamp))'
+      '(-4)-N[restore normal address query for IPv6]'
+      '-lf[lease file]:lease file:_files'
+      '(--no-pid)-pf[pid file]:pid file:_files'
+      '(-pf)--no-pid[disable writing pid files]'
+      '-cf[config file]:config file:_files'
+      '-sf[script file]:script file:_files'
+      '-4o6[DHCPv4  over DHCPv6 protocol]:port'
+      "-nc[don't drop capabilities]"
+      '-B[set the BOOTP  broadcast flag in request packets]'
+      '-C[specify dhcp-client-identifier option]:option'
+      '(-F)-H[specify host-name option]:host name:_hosts'
+      '(-H)-F[specify fully qualified hostname option]:host name:_hosts'
+      '-V[specify vendor-class-identifier option]:option'
+      '--request-options[specify list of options the client is to request from the server]:options'
+      '--timeout[specify time after which dhclient will decide that no DHCP servers can be contacted]:timeout'
+    )
+  ;;
+esac
 
-_arguments $args \
-  '-p[port to transmit to / listen on]:_ports' \
-  '-d[force to run in foreground]' \
+_arguments -s -S -A "-*" $args \
+  '-q[quiet]' \
+  '(-b -nw)-d[remain as a foreground process]' \
   ':interface:_net_interfaces'
