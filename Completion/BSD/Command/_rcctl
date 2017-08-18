@@ -23,7 +23,7 @@ case $service in
       ':variable:compadd -a variables'
     ;;
   ls)
-     _arguments ':display a list of services and daemons matching:(all faulty off on started stopped)'
+     _arguments ':display a list of services and daemons matching:(all failed off on started stopped)'
     ;;
   order)
     _arguments \

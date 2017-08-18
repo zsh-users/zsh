@@ -1,5 +1,7 @@
 2017-08-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 41562: Completion/BSD/Command/_rcctl: correct completed word
+
 	* 41561: Completion/Unix/Command/_dhclient: handle Free/OpenBSD
 	and bring options up-to-date for the ISC implementation
 
