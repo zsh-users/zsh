@@ -1070,7 +1070,7 @@ setupvals(char *cmd, char *runscript, char *zsh_name)
     sfcontext = SFC_NONE;
     trap_return = 0;
     trap_state = TRAP_STATE_INACTIVE;
-    noerrexit = -1;
+    noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN | NOERREXIT_SIGNAL;
     nohistsave = 1;
     dirstack = znewlinklist();
     bufstack = znewlinklist();
@@ -1199,7 +1199,7 @@ init_signals(void)
 void
 run_init_scripts(void)
 {
-    noerrexit = -1;
+    noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN | NOERREXIT_SIGNAL;
 
     if (EMULATION(EMULATE_KSH|EMULATE_SH)) {
 	if (islogin)

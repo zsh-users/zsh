@@ -652,7 +652,7 @@ zhandler(int sig)
     case SIGINT:
         if (!handletrap(SIGINT)) {
 	    if ((isset(PRIVILEGED) || isset(RESTRICTED)) &&
-		isset(INTERACTIVE) && noerrexit < 0)
+		isset(INTERACTIVE) && (noerrexit & NOERREXIT_SIGNAL))
 		zexit(SIGINT, 1);
             if (list_pipe || chline || simple_pline) {
                 breaks = loops;

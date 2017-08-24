@@ -41,12 +41,15 @@ enum {
     ADDVAR_RESTORE =  1 << 2
 };
 
-/* used to suppress ERREXIT and trapping of SIGZERR, SIGEXIT. */
+/*
+ * used to suppress ERREXIT and trapping of SIGZERR, SIGEXIT.
+ * Bits from noerrexit_bits.
+ */
 
 /**/
 int noerrexit;
 
-/* used to suppress ERREXIT for one occurrence */
+/* used to suppress ERREXIT or ERRRETURN for one occurrence: 0 or 1 */
 
 /**/
 int this_noerrexit;
@@ -1299,7 +1302,7 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    int oerrexit_opt = opts[ERREXIT];
 	    Param pm;
 	    opts[ERREXIT] = 0;
-	    noerrexit = 1;
+	    noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN;
 	    if (ltype & Z_SIMPLE) /* skip the line number */
 		pc2++;
 	    pm = setsparam("ZSH_DEBUG_CMD", getpermtext(state->prog, pc2, 0));
@@ -1351,13 +1354,13 @@ execlist(Estate state, int dont_change_job, int exiting)
 	    int isend = (WC_SUBLIST_TYPE(code) == WC_SUBLIST_END);
 	    next = state->pc + WC_SUBLIST_SKIP(code);
 	    if (!oldnoerrexit)
-		noerrexit = !isend;
+		noerrexit = isend ? 0 : NOERREXIT_EXIT | NOERREXIT_RETURN;
 	    if (WC_SUBLIST_FLAGS(code) & WC_SUBLIST_NOT) {
 		/* suppress errexit for "! this_command" */
 		if (isend)
 		    this_noerrexit = 1;
 		/* suppress errexit for ! <list-of-shell-commands> */
-		noerrexit = 1;
+		noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN;
 	    }
 	    switch (WC_SUBLIST_TYPE(code)) {
 	    case WC_SUBLIST_END:
@@ -1444,11 +1447,11 @@ sublist_done:
 
 	/*
 	 * See hairy code near the end of execif() for the
-	 * following.  "noerrexit == 2" only applies until
+	 * following.  "noerrexit " only applies until
 	 * we hit execcmd on the way down.  We're now
 	 * on the way back up, so don't restore it.
 	 */
-	if (oldnoerrexit != 2)
+	if (!(oldnoerrexit & NOERREXIT_UNTIL_EXEC))
 	    noerrexit = oldnoerrexit;
 
 	if (sigtrapped[SIGDEBUG] && !isset(DEBUGBEFORECMD) && !donedebug) {
@@ -1458,7 +1461,7 @@ sublist_done:
 	     */
 	    int oerrexit_opt = opts[ERREXIT];
 	    opts[ERREXIT] = 0;
-	    noerrexit = 1;
+	    noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN;
 	    exiting = donetrap;
 	    ret = lastval;
 	    dotrap(SIGDEBUG);
@@ -1474,16 +1477,19 @@ sublist_done:
 	/* Check whether we are suppressing traps/errexit *
 	 * (typically in init scripts) and if we haven't  *
 	 * already performed them for this sublist.       */
-	if (!noerrexit && !this_noerrexit && !donetrap && !this_donetrap) {
-	    if (sigtrapped[SIGZERR] && lastval) {
+	if (!this_noerrexit && !donetrap && !this_donetrap) {
+	    if (sigtrapped[SIGZERR] && lastval &&
+		!(noerrexit & NOERREXIT_EXIT)) {
 		dotrap(SIGZERR);
 		donetrap = 1;
 	    }
 	    if (lastval) {
 		int errreturn = isset(ERRRETURN) &&
-		    (isset(INTERACTIVE) || locallevel || sourcelevel);
-		int errexit = isset(ERREXIT) ||
-		    (isset(ERRRETURN) && !errreturn);
+		    (isset(INTERACTIVE) || locallevel || sourcelevel) &&
+		    !(noerrexit & NOERREXIT_RETURN);
+		int errexit = (isset(ERREXIT) ||
+			       (isset(ERRRETURN) && !errreturn)) &&
+		    !(noerrexit & NOERREXIT_EXIT);
 		if (errexit) {
 		    if (sigtrapped[SIGEXIT])
 			dotrap(SIGEXIT);
@@ -3019,7 +3025,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	preargs = NULL;
 
     /* if we get this far, it is OK to pay attention to lastval again */
-    if (noerrexit == 2 && !is_shfunc)
+    if ((noerrexit & NOERREXIT_UNTIL_EXEC) && !is_shfunc)
 	noerrexit = 0;
 
     /* Do prefork substitutions.
@@ -5462,6 +5468,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     char saveopts[OPT_SIZE], *oldscriptname = scriptname;
     char *name = shfunc->node.nam;
     int flags = shfunc->node.flags, ooflags;
+    int savnoerrexit;
     char *fname = dupstring(name);
     int obreaks, ocontflag, oloops, saveemulation, restore_sticky;
     Eprog prog;
@@ -5484,6 +5491,11 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	    trap_return--;
 	oldlastval = lastval;
 	oldnumpipestats = numpipestats;
+	savnoerrexit = noerrexit;
+	/*
+	 * Suppression of ERR_RETURN is turned off in function scope.
+	 */
+	noerrexit &= ~NOERREXIT_RETURN;
 	if (noreturnval) {
 	    /*
 	     * Easiest to use the heap here since we're bracketed
@@ -5702,6 +5714,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	if (trap_state == TRAP_STATE_PRIMED)
 	    trap_return++;
 	ret = lastval;
+	noerrexit = savnoerrexit;
 	if (noreturnval) {
 	    lastval = oldlastval;
 	    numpipestats = oldnumpipestats;

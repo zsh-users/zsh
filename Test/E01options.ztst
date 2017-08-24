@@ -345,6 +345,36 @@
 >ZERR trapped
 >off after
 
+  (
+    setopt ERR_EXIT
+    () { false; print is executed; } && true
+    () { false; print is not executed; }
+    print is not executed
+  )
+1:ERR_EXIT is suppressed within a function followed by "&&"
+>is executed
+
+  (
+    setopt ERR_RETURN
+    () { false; print is not executed; } || print is executed
+    print is also executed
+  )
+0:ERR_RETURN is not suppressed within a function followed by "||"
+>is executed
+>is also executed
+
+  (
+    setopt ERR_RETURN
+    () {
+      () { false; print Not executed 1; } || true
+      print Executed
+      () { false; print Not executed 2; }
+      print Not executed 3;
+    } && false
+  )
+1:ERR_RETURN with additional levels
+>Executed
+
   (print before; setopt noexec; print after)
 0:NO_EXEC option
 >before

@@ -81,6 +81,19 @@ against user defined widgets inadvertently reading from the tty device,
 and addresses the antisocial behaviour of running a command with its
 stdin closed.
 
+5) [New between 5.4.1 and 5.4.2] In previous versions of the shell, the
+following code:
+
+    () { setopt err_return; false; echo 'oh no' } && true
+
+printed "oh no", as the ERR_RETURN behaviour was suppressed when
+a function was executed on the left hand side of an "&&" list.  This was
+undocumented and inconvenient as it is generally more useful to consider
+execution within a function in isolation from its environment.  The shell
+now returns from the function on executing `false'.  (This is general
+to all functions; an anonymous function is shown here for compactness.)
+
+
 Incompatibilities between 5.0.8 and 5.3
 ----------------------------------------
 

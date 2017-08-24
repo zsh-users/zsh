@@ -2122,6 +2122,17 @@ enum source_return {
     SOURCE_ERROR = 2
 };
 
+enum noerrexit_bits {
+    /* Suppress ERR_EXIT and traps: global */
+    NOERREXIT_EXIT = 1,
+    /* Suppress ERR_RETURN: per function call */
+    NOERREXIT_RETURN = 2,
+    /* NOERREXIT only needed on way down */
+    NOERREXIT_UNTIL_EXEC = 4,
+    /* Force exit on SIGINT */
+    NOERREXIT_SIGNAL = 8
+};
+
 /***********************************/
 /* Definitions for history control */
 /***********************************/
