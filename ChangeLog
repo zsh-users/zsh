@@ -1,5 +1,8 @@
 2017-08-25  Oliver Kiddle  <opk@zsh.org>
 
+	* 41600: Completion/Unix/Command/_mpc: fix quoting of
+	songs for completion and avoid sending errors to stderr
+
 	* 41598: Completion/Unix/Command/_w,
 	Completion/Unix/Command/_who: new who and w completions
 

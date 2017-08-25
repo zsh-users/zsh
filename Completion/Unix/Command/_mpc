@@ -1,4 +1,4 @@
-#compdef mpc
+#compdef mpc -value-,MPD_HOST,-default
 
 local OUT foo MPD_MUSIC_DIR MPC_PLAYLIST_MATCHER MPC_FORMAT_STRING
 
@@ -26,13 +26,17 @@ _mpc_command() {
 
   mpc_cmds=(
     add:"append a song to the end of the current playlist"
+    cdprev:"compact disk player-like previous command"
+    channels:"list the channels that other clients have subscribed to"
     clear:"clear the current playlist"
+    clearerror:"clear the current error"
     crop:"remove all songs except for the currently playing song"
     current:"show the currently playing song"
     crossfade:"set and display crossfade settings"
     del:"remove a song from the current playlist"
-    disable:"disable a output"
-    enable:"enable a output"
+    disable:"disable an output"
+    enable:"enable an output"
+    toggleoutput:"toggle an output"
     idle:"wait until an event occurs"
     idleloop:"loop waiting for events"
     insert:"insert a song after the currently playing song in the playlist"
@@ -40,6 +44,8 @@ _mpc_command() {
     load:"load file as a playlist"
     ls:"list the contents of specified directory"
     lsplaylists:"list currently available playlists"
+    mixrampdb:"set and display mixrampdb settings"
+    mixramdelay:"set and display mixrampdelay settings"
     move:"move song in playlist"
     next:"play the next song in the current playlist"
     outputs:"show the current outputs"
@@ -51,10 +57,14 @@ _mpc_command() {
     repeat:"toggle repeat mode, or specify state"
     single:"toggle single mode, or specify state"
     consume:"toggle consume mode, or specify state"
+    replaygain:"set or display the replay gain mode"
     rm:"remove a playlist"
     save:"save a playlist to file"
     search:"search for a song"
+    searchadd:"search songs and add them to the current playlist"
+    searchplay:"search and play songs from the current playlist"
     find:"search for a song, exact match"
+    findadd:"find songs and add them to the current playlist"
     list:"list all tags of given type"
     seek:"seek to the position specified in percent"
     shuffle:"shuffle the current playlist"
@@ -65,13 +75,18 @@ _mpc_command() {
     version:"report version of MPD"
     volume:"set volume"
     status:"display MPD status"
+    sendmessage:"send a message to the specified channel"
+    waitmessage:"wait for at least one message on the specified channel"
+    subscribe:"subscribe to the specified channel and continuously receive messages"
+    sticker:"sticker management"
   )
 
   if (( CURRENT == 1 )); then
-    _describe -t commands "mpc command" mpc_cmds
+    _describe -t commands "mpc command" mpc_cmds || \
+        _wanted commands expl "mpc command" compadd loadtab tab lstab
   else
     local cmd=$words[1]
-    local curcontext="${curcontext%:*}:mpc-${cmd}" ret=1
+    local curcontext="${curcontext%:*:*}:mpc-${cmd}:" ret=1
     if ! _call_function ret _mpc_$cmd; then
       _default && ret=0
     fi
@@ -100,13 +115,13 @@ _mpc_helper_songnumbers() {
     NM="$compstate[nmatches]"
   fi
 
-  out=("${(@f)$(_call_program song-numbers mpc $foo playlist)}")
+  out=("${(@f)$(_call_program song-numbers $mpccmd $foo playlist)}")
   out=("${(@M)out[@]:#${~MATCH}}")
 
   sn=("${(@)${(@M)out}//(#b)(#s)(\#|[ >]#)([0-9]#)*/$match[2]}")
   list=("${(@Mr:COLUMNS-1:)out}")
 
-  _wanted -V 'song numbers' expl 'song number' \
+  _wanted -V song-numbers expl 'song number' \
       compadd "$@" -ld list "$all[@]" -a sn && ret=0
 
   if [[ -n "$all" ]]; then
@@ -131,8 +146,8 @@ _mpc_helper_songnumbers() {
 (( $+functions[_mpc_helper_playlists] )) ||
 _mpc_helper_playlists() {
   local list expl
-  list=(${(f)"$(mpc lsplaylists)"})
-  _wanted list expl playlist compadd -M $MPC_PLAYLIST_MATCHER $expl -a list
+  list=(${(f)"$(_call_program playlists $mpccmd lsplaylists)"})
+  _wanted playlists expl playlist compadd -M $MPC_PLAYLIST_MATCHER $expl -a list
 }
 
 (( $+functions[_mpc_helper_files] )) ||
@@ -142,12 +157,13 @@ _mpc_helper_files() {
     return
   fi
 
-  local -U list expl
+  local -U list expl prefix=$PREFIX
   if [[ $words[CURRENT] != */* ]]; then
-    list=( ${${(f)"$(mpc listall)"}%%/*})
+    list=( ${${(f)"$(_call_program files $mpccmd listall)"}%%/*})
     _wanted files expl file compadd -qS/ -a list
   else
-    list=(${(f)"$(mpc tab $words[CURRENT])"})
+    [[ $compstate[quote] = [\'\"] ]] && prefix="$compstate[quote]$PREFIX$compstate[quote]"
+    list=(${(f)"$($mpccmd tab -- ${(Q)prefix} 2>/dev/null)"})
     _wanted files expl file _multi_parts / list
   fi
 }
@@ -159,12 +175,13 @@ _mpc_helper_directories() {
     return
   fi
 
-  local -U list expl
+  local -U list expl prefix=$PREFIX
   if [[ $words[CURRENT] != */* ]]; then
-    list=( ${${(M)${(f)"$(mpc listall)"}:#*/*}%%/*})
+    list=( ${${(M)${(f)"$(_call_program directories $mpccmd listall)"}:#*/*}%%/*})
     _wanted directories expl directory compadd -qS/ -a list
   else
-    list=(${(f)"$(mpc lstab $words[CURRENT])"})
+    [[ $compstate[quote] = [\'\"] ]] && prefix="$compstate[quote]$PREFIX$compstate[quote]"
+    list=(${(f)"$($mpccmd lstab -- ${(Q)prefix} 2>/dev/null)"})
     _wanted directories expl directory _multi_parts / list
   fi
 }
@@ -172,7 +189,7 @@ _mpc_helper_directories() {
 (( $+functions[_mpc_helper_outputs] )) ||
 _mpc_helper_outputs() {
   local vals outline
-  vals=(${${${${(M)${(f)"$(mpc outputs 2> /dev/null)"}:#Output * \(*\) is (en|dis)abled}##Output }%%\) is (en|dis)abled}/ \(/:})
+  vals=(${${${${(M)${(f)"$(_call_program outputs $mpccmd outputs)"}:#Output * \(*\) is (en|dis)abled}##Output }%%\) is (en|dis)abled}/ \(/:})
   _describe -t outputs output vals
 }
 
@@ -200,6 +217,10 @@ _mpc_disable() {
   _mpc_helper_outputs
 }
 
+_mpc_toggleoutput() {
+  _mpc_helper_outputs
+}
+
 _mpc_move() {
   if (( $#words <= 3 )); then
     _mpc_helper_songnumbers
@@ -216,7 +237,15 @@ _mpc_ls() {
   _mpc_helper_directories
 }
 
+_mpc_lstab() {
+  _mpc_helper_directories
+}
+
 _mpc_load() {
+  _mpc_helper_playlists
+}
+
+_mpc_loadtab() {
   _mpc_helper_playlists
 }
 
@@ -224,14 +253,25 @@ _mpc_save() {
   _mpc_helper_playlists
 }
 
+_mpc_tab() {
+  _mpc_helper_files
+}
+
 _mpc_rm() {
   _mpc_helper_playlists
 }
 
 _mpc_volume() {
-  local expl
-  compset -P '[-+]'
-  _wanted list expl volume compadd $expl - {0..100}
+  local expl value="${${$(_call_program volume $mpccmd volume)#*:}%\%}" ret=1
+  if [[ -prefix \+ && $value -lt 100 ]]; then
+    _wanted -V volume expl volume compadd $expl - +{1..$((100-value))} && ret=0
+  elif [[ -prefix - && $value -gt 0 ]]; then
+    _wanted -V volume expl volume compadd $expl - -{1..$value} && ret=0
+  else
+    _wanted -V volume expl volume compadd $expl - {0..100} && ret=0
+    compstate[insert]=menu:$((value+1))
+  fi
+  return ret
 }
 
 _mpc_repeat() {
@@ -248,6 +288,10 @@ _mpc_single() {
 
 _mpc_consume() {
   _mpc_helper_bool
+}
+
+_mpc_current() {
+  _arguments --wait
 }
 
 _mpc_search() {
@@ -273,7 +317,28 @@ _mpc_update() {
   _mpc_helper_files
 }
 
-_arguments \
-  '--format[specify the format of song display]:format string' \
-  '--no-status[prevent printing song status on completion]' \
-  '*::mpc command:_mpc_command'
+if [[ $service = *MPD_HOST* ]]; then
+  _hosts
+  return
+fi
+
+local curcontext="$curcontext" state line expl ret=1
+local mpccmd="$words[1]"
+
+_arguments -C \
+  '(-q --quiet --no-status -v --verbose)'{-v,--verbose}'[give verbose output]' \
+  '(-q --quiet --no-status -v --verbose)'{-q,--quiet,--no-status}'[prevent printing song status on completion]' \
+  '(-h --host)'{-h,--host=}'[connect to specified host]:_hosts' \
+  '(-p --port)'{-p,--port=}'[connect to server port]:port' \
+  '(-f --format)'{-f,--format=}'[specify the format of song display]:format string:->formats' \
+  '(-w --wait)'{-w,--wait}'[wait for operation to finish (e.g. database update)]' \
+  '*::mpc command:_mpc_command' && ret=0
+
+if [[ $state = formats ]]; then
+  compset -P '([^%]|%[^%]#%)#'
+  _wanted metadata expl 'metadata delimiter' compadd -p % -S % \
+    artist album albumartist comment composer date disc genre performer title \
+    track time file position mtime mdate && ret=0
+fi
+
+return ret
