@@ -10,7 +10,7 @@
 2017-08-25  Oliver Kiddle  <opk@zsh.org>
 
 	* 41601: Completion/Unix/Command/_arp,
-	Completion/Unix/Command/_route: handle system differenceas
+	Completion/Unix/Command/_route: handle system differences
 	in arp completion and add function for route
 
 	* 41600: Completion/Unix/Command/_mpc: fix quoting of
