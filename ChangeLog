@@ -1,3 +1,8 @@
+2017-08-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 41608 (plus tests): Src/exec.c, Test/C03traps.ztst: ERR_EXIT
+	behaviour restored when executing a function in body of else.
+
 2017-08-29  Андрей Стоцкий (_RuRo_)  <ruro.ruro@ya.ru>
 
 	* 41618: Completion/Unix/Command/_todo.sh: Added some arguments

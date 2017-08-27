@@ -3025,7 +3025,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 	preargs = NULL;
 
     /* if we get this far, it is OK to pay attention to lastval again */
-    if ((noerrexit & NOERREXIT_UNTIL_EXEC) && !is_shfunc)
+    if (noerrexit & NOERREXIT_UNTIL_EXEC)
 	noerrexit = 0;
 
     /* Do prefork substitutions.

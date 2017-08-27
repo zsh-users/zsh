@@ -465,6 +465,41 @@
    )
 1:ERREXIT in loop with simple commands
 
+  (set -e
+  f()
+  {
+    false && false
+  }
+  if false; then
+    :
+  else
+    # ERR_EXIT should trigger on return from function, not in function.
+    f
+    echo Fail 1
+    echo Fail 2
+    f
+    echo Fail 3
+  fi)
+1:ERREXIT with false from inside && within function
+
+  (set -e
+  f()
+  {
+  }
+  if false; then
+    :
+  else
+    f
+    echo Succeed 1
+    echo Succeed 2
+    f
+    echo Succeed 3
+  fi)
+0:ERREXIT not triggered on empty function after false in if.
+>Succeed 1
+>Succeed 2
+>Succeed 3
+
   fn() {
     emulate -L zsh
     setopt errreturn
