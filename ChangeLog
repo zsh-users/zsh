@@ -1,3 +1,7 @@
+2017-08-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* unposted: Config/version.mk: 5.4.2.
+
 2017-08-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 41599: README, Etc/FAQ.yo: updates for 5.4.2.
