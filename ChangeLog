@@ -1,3 +1,7 @@
+2017-08-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Config/version.mk: Post-release version bump.
+
 2017-08-27  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: Config/version.mk: 5.4.2.
