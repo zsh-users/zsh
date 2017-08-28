@@ -1,5 +1,7 @@
 2017-08-29  Oliver Kiddle  <opk@zsh.org>
 
+	* 41617: Completion/Linux/Command/_tracepath: complete new options
+
 	* 41616: Completion/Unix/Command/_entr: update options to 3.8
 
 	* unposted: Completion/Unix/Type/_bpf_filters:
