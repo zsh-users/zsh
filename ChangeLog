@@ -1,3 +1,8 @@
+2017-08-29  Oliver Kiddle  <opk@zsh.org>
+
+	* unposted: Completion/Unix/Type/_bpf_filters:
+	add missing #autoload directive
+
 2017-08-28  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Config/version.mk: Post-release version bump.

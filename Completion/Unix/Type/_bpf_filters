@@ -1,3 +1,5 @@
+#autoload
+
 # spaces are valid instead of word ends, perhaps better to just do compset -q
 
 local -a networks fields dirs protos relop
