@@ -1,3 +1,8 @@
+2017-08-29  Андрей Стоцкий (_RuRo_)  <ruro.ruro@ya.ru>
+
+	* 41618: Completion/Unix/Command/_todo.sh: Added some arguments
+	autocompletion to _todo.sh.
+
 2017-08-29  Oliver Kiddle  <opk@zsh.org>
 
 	* 41617: Completion/Linux/Command/_tracepath: complete new options

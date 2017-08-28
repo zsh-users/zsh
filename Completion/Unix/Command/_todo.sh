@@ -17,12 +17,24 @@ local -a cmdlist itemlist match mbegin mend
 integer NORMARG
 
 _arguments -s -n : \
+  '-@[hide context names]' \
+  '-\+[hide project names]' \
+  '-c[color mode]' \
   '-d[alternate config file]:config file:_files' \
   '-f[force, no confirmation]' \
   '-h[display help]' \
   '-p[plain mode, no colours]' \
+  '-P[hide priority labels]' \
+  "-a[don't auto-archive tasks when done]" \
+  '-A[auto-archive tasks when done]' \
+  '-n[automatically remove blank lines]' \
+  '-N[preserve line numbers]' \
+  '-t[add current date to task on creation]' \
+  "-T[don't add current date to task]" \
   '-v[verbose mode, confirmation messages]' \
+  '-vv[extra verbose (debug)]' \
   '-V[display version etc.]' \
+  '-x[disable final filter]' \
   '1:command:->commands' \
   '*:arguments:->arguments' && return 0
 
