@@ -1,5 +1,8 @@
 2017-09-04  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* 41621: Completion/Unix/Command/_mkdir: Honour the 'command'
+	and 'builtin' precommand modifiers.
+
 	* 41620 (tweaked per 41622): Completion/Unix/Command/_mkdir:
 	Don't offer a linux-specific option in the 'zsh' variant.
 

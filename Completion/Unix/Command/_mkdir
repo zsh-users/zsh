@@ -9,22 +9,21 @@ args=(
   '(-)*: :->directories'
 )
 
-_pick_variant -r variant gnu=gnu zsh='\(eval\)' $OSTYPE --help
 # It can still happen that there is a precommand command or builtin in the line.
 # In such cases, the variant has to be modified suitably, after further checking
 # the variant of the _command_ mkdir.
-
-# I currently don't know of any way to find out what precommands are present on
-# the line. The variant should be modified like this once a way is found out:
-
-# if [[ $variant == zsh ]]; then
-#   if [[ $precommand = *command* ]]; then
-#     _mkdir_command () { command mkdir "$@" }
-#     _pick_variant -c _mkdir_command -r variant gnu=gnu unix --help
-#   fi
-# elif [[ $precommand = *builtin* ]]; then
-#   variant=zsh
-# fi
+# 
+# $precommands is defined in _main_complete
+if (( ${+precommands[(r)command]} )); then
+  _mkdir_command () { command mkdir "$@" }
+  _pick_variant -c _mkdir_command -r variant gnu=gnu unix --help
+  unfunction _mkdir_command
+elif (( ${+precommands[(r)builtin]} )) || (( ${+builtins[mkdir]} )) || [[ "$(type -w mkdir)" == "*: builtin" ]]; then
+  variant=zsh
+else
+  _pick_variant -r variant gnu=gnu zsh='\(eval\)' $OSTYPE --help
+fi
+# Now $variant is set.
 
 case $variant in
   gnu|freebsd*|dragonfly*)
