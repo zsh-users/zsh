@@ -9,14 +9,6 @@ args=(
   '(-)*: :->directories'
 )
 
-case "$OSTYPE" in
-  linux*)
-    args+=(
-      '(-Z --context)'{-Z,--context=}'[set SELinux context]:SELinux context'
-    )
-  ;;
-esac
-
 _pick_variant -r variant gnu=gnu zsh='\(eval\)' $OSTYPE --help
 # It can still happen that there is a precommand command or builtin in the line.
 # In such cases, the variant has to be modified suitably, after further checking
@@ -41,13 +33,17 @@ case $variant in
     )
   ;|
   gnu)
+    if [[ $OSTYPE == linux* ]]; then
+      args+=(
+        '(-Z --context)'{-Z,--context=}'[set SELinux context]:SELinux context'
+      )
+    fi
     args+=(
       '(- :)--help[display help information]'
       '(- :)--version[display version information]'
     )
   ;;
   zsh) # remove all options
-    args=( '*: :->directories' )
   ;;
   *) # non-GNU: remove long options
     args=( ${${${args:#(|*\))--*}//--[^ )]#/}/\( #\)/} )
