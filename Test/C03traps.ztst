@@ -661,6 +661,40 @@ F:Must be tested with a top-level script rather than source or function
 >before-out
 >before-in
 
+  mkdir -p zdotdir
+  print >zdotdir/.zshenv '
+  setopt norcs errreturn
+  fn() {
+    if false; then
+      print Bad
+    else
+      print Good
+    fi
+    print Better
+  }
+  fn
+  print In .zshenv'
+  ZDOTDIR=$PWD/zdotdir $ZTST_testdir/../Src/zsh -c 'true'
+0:ERR_RETURN within initialisation code with special flags
+>Good
+>Better
+>In .zshenv
+
+  fn2() {
+    if false; then
+      print Bad
+    else
+      print Good
+    fi
+  }
+  fn() {
+    setopt err_return
+    fn2 || true
+  }
+  fn
+0:ERR_RETURN in "else" branch in nested function
+>Good
+
   (setopt err_exit
   for x in y; do
     false && true

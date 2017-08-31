@@ -541,8 +541,7 @@ execif(Estate state, int do_exec)
     olderrexit = noerrexit;
     end = state->pc + WC_IF_SKIP(code);
 
-    if (!noerrexit)
-	noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN;
+    noerrexit |= NOERREXIT_EXIT | NOERREXIT_RETURN;
     while (state->pc < end) {
 	code = *state->pc++;
 	if (wc_code(code) != WC_IF ||
@@ -570,9 +569,9 @@ execif(Estate state, int do_exec)
 	if (olderrexit)
 	    noerrexit = olderrexit;
 	else if (lastval)
-	    noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN | NOERREXIT_UNTIL_EXEC;
+	    noerrexit |= NOERREXIT_EXIT | NOERREXIT_RETURN | NOERREXIT_UNTIL_EXEC;
 	else
-	    noerrexit = 0;
+	    noerrexit &= ~ (NOERREXIT_EXIT | NOERREXIT_RETURN);
 	cmdpush(run == 2 ? CS_ELSE : (s ? CS_ELIFTHEN : CS_IFTHEN));
 	execlist(state, 1, do_exec);
 	cmdpop();
