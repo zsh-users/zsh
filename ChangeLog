@@ -1,5 +1,8 @@
 2017-08-31  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Functions/Misc/zed: zstyle -m can set match,
+	mbegin, mend, so declare locally.
+
 	* 41627: Src/loop.c, Test/C03traps.ztst: fix problem with
 	ERR_RETURN in initialisation scripts and also on nested
 	function involving ERR_RETURN suppression in the caller.

@@ -36,6 +36,9 @@ fi
 
 local curcontext=zed:::
 
+# Matching used in zstyle -m: hide result from caller.
+# Variables not used directly here.
+local -a match mbegin mend
 zstyle -m ":completion:zed:*" insert-tab '*' ||
     zstyle ":completion:zed:*" insert-tab yes
 
