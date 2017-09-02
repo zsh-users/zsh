@@ -1,3 +1,7 @@
+2017-09-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 41623: Etc/FAQ.yo: update to align with Yodl 3.
+
 2017-08-31  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Functions/Misc/zed: zstyle -m can set match,
