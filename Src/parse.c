@@ -808,8 +808,13 @@ par_sublist(int *cmplx)
 				 WC_SUBLIST_END),
 			     f, (e - 1 - p), c);
 	    cmdpop();
-	} else
+	} else {
+	    if (tok == AMPER || tok == AMPERBANG) {
+		c = 1;
+		*cmplx |= c;
+	    }		
 	    set_sublist_code(p, WC_SUBLIST_END, f, (e - 1 - p), c);
+	}
 	return 1;
     } else {
 	ecused--;
