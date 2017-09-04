@@ -1,3 +1,8 @@
+2017-09-04  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41637: Marc Aldorasi: Completion/Unix/Command/_objdump:
+	explicit completion instead of generating from _object_files.
+
 2017-09-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 41623: Etc/FAQ.yo: update to align with Yodl 3.

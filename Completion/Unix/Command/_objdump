@@ -1,3 +1,105 @@
-#compdef objdump
+#compdef objdump eu-objdump
 
-_arguments -- '*:object file:_object_files'
+local args files variant context state state_descr line
+typeset -A opt_args
+
+files='*:object file:_object_files'
+
+_pick_variant -r variant binutils=GNU elfutils=elfutils unix --version
+
+args=(
+  "(-d --disassemble)"{-d,--disassemble}"[Display assembler code of executable sections]"
+  "(-r --reloc)"{-r,--reloc}"[Display relocation information]"
+  "(-s --full-contents)"{-s,--full-contents}"[Display the full contents of all sections requested]"
+  "*"{-j+,--section=}"[Only display information for section]:section:(.bss .data .dynamic .dynsym .got .interp .shstrtab .symtab .text)"
+)
+
+case $variant in
+  binutils)
+    args+=(
+    "(-a --archive-headers)"{-a,--archive-headers}"[Display archive header information]"
+    "(-f --file-headers)"{-f,--file-headers}"[Display the contents of the overall file header]"
+    "(-p --private-headers)"{-p,--private-headers}"[Display object format specific file header contents]"
+    "*"{-P,--private=}"[Display object format specific contents]:option"
+    "(-h --section-headers --headers)"{-h,--section-headers,--headers}"[Display the contents of the section headers]"
+    "(-x --all-headers)"{-x,--all-headers}"[Display the contents of all headers]"
+    "(-D --disassemble-all)"{-D,--disassemble-all}"[Display assembler contents of all sections]"
+    "(-S --source)"{-S,--source}"[Intermix source code with disassembly]"
+    "(-g --debugging)"{-g,--debugging}"[Display debug information in object file]"
+    "(-e --debugging-tags)"{-e,--debugging-tags}"[Display debug information using ctags style]"
+    "(-G --stabs)"{-G,--stabs}"[Display (in raw form) any STABS info in the file]"
+
+    "*-W-[Display DWARF info in the file]::dwarf section:->short_dwarf_names"
+    "*--dwarf=-[Display DWARF info in the file]::dwarf section:->dwarf_names"
+
+    "(-t --syms)"{-t,--syms}"[Display the contents of the symbol table(s)]"
+    "(-T --dynamic-syms)"{-T,--dynamic-syms}"[Display the contents of the dynamic symbol table]"
+    "(-R --dynamic-reloc)"{-R,--dynamic-reloc}"[Display the dynamic relocation entries in the file]"
+    #@<file>                  Read options from <file>
+
+    "(- *)"{-v,--version}"[Display this program's version number]"
+    "(- *)"{-i,--info}"[List object formats and architectures supported]"
+    "(- *)"{-H,--help}"[Display this information]"
+  
+    "(-b --target)"{-b+,--target=}"[Specify the target object format]:bfdname:->bfdname"
+    "(-m --architecture)"{-m+,--architecture=}"[Specify the target architecture]:machine:->machine"
+    "*"{-M+,--disassembler-options=}"[Pass text OPT on to the disassembler]:opt:->disassembler_options"
+
+    "(-E --endian)-E+[Assume endianess when disassembling]:endianess:((B\:\"Assume big endian format when disassembling\" L\:\"Assume little endian format when disassembling\"))"
+    "(-E --endian)--endian=[Assume endianess when disassembling]:endianess:((big\:\"Assume big endian format when disassembling\" little\:\"Assume little endian format when disassembling\"))"
+
+    "--file-start-context[Include context from start of file (with -S)]"
+    "*"{-I+,--include=}"[Add directory to search list for source files]:directory:_files -/"
+    "(-l --line-numbers)"{-l,--line-numbers}"[Include line numbers and filenames in output]"
+    "(-F --file-offsets)"{-F,--file-offsets}"[Include file offsets when displaying information]"
+    "(-C --demangle)-C[Decode mangled/processed symbol names]"
+    "(-C --demangle)--demangle=-[Decode mangled/processed symbol names]::style:(auto gnu lucid arm hp edg gnu-v3 java gnat)"
+    "(-w --wide)"{-w,--wide}"[Format output for more than 80 columns]"
+    "(-z --disassemble-zeroes)"{-z,--disassemble-zeroes}"[Do not skip blocks of zeroes when disassembling]"
+
+    "--start-address=[Only process data whose address is >= ADDR]:addr"
+    "--stop-address=[Only process data whose address is <= ADDR]:addr"
+    "--prefix-addresses[Print complete address alongside disassembly]"
+    "(--show-raw-insn --no-show-raw-insn)"--{,no-}show-raw-insn"[Display hex alongside symbolic disassembly]"
+    "--insn-width=[Display WIDTH bytes on a single line for -d]:width"
+    "--adjust-vma=[Add offset to all displayed section addresses]:offset"
+    "--special-syms[Include special symbols in symbol dumps]"
+    "--prefix=[Add prefix to absolute paths for -S]:prefix"
+    "--prefix-strip=[Strip initial directory names for -S]:level"
+    "--dwarf-depth=[Do not display DIEs at depth N or greater]:n"
+    "--dwarf-start=[Display DIEs starting with N, at the same depth or deeper]:n"
+    "--dwarf-check[Make additional dwarf internal consistency checks]"
+    )
+  ;;
+  elfutils)
+    args+=(
+      "--color=-[Colorize the output]::when:(always auto never)"
+      "(- *)"{-\?,--help}"[Display help]"
+      "(- *)--usage[Display usage]"
+      "(- *)"{-V,--version}"[Display program version]"
+
+    )
+  ;;
+esac
+
+_arguments -s -S : "$args[@]" $files
+
+case "$state" in
+  short_dwarf_names)
+    _values -s "" "dwarf section" "l[rawline]" "L[decodedline]" "i[info]" "a[abbrev]" "p[pubnames]" "r[aranges]" "m[macro]" "f[frames]" "F[frames-interp]" "s[str]" "o[loc]" "R[Ranges]" "t[pubtypes]"
+  ;;
+  dwarf_names)
+    _values -s , "dwarf section" rawline decodedline info abbrev pubnames aranges macro frames frames-interp str loc Ranges pubtypes gdb_index trace_info trace_abbrev trace_aranges addr cu_index
+  ;;
+  bfdname)
+    _values "object format" "${(z)${(@M)${(f)$(_call_program targets objdump --help)}##* supported targets:*}##*: }"
+  ;;
+  machine)
+    _values "machine architecture" "${(@)${(z)${(@M)${(f)$(_call_program targets objdump --help)}##* supported architectures:*}##*: }//:/\\:}"
+  ;;
+  disassembler_options)
+    _values -s , "disassembler options" "${(@)${(@)${(@M)${(f)${(ps.-M switch.)$(_call_program targets objdump --help)}[2]}:#  [^ ]*}#  }%% *}"
+  ;;
+esac
+
+ 
