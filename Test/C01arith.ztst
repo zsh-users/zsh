@@ -420,3 +420,16 @@
 0:type of variable when created in arithmetic context
 >integer
 >scalar
+
+  integer a=1
+  print $(( ++a * 2 ))
+  print $(( ++a ))
+  print $(( a++ * 2 ))
+  print $(( a ))
+  print $(( ++a++ * 2 ))
+1: Allow rvalue but not lvalue operations with result of increment
+>4
+>3
+>6
+>4
+?(eval):6: bad math expression: lvalue required

@@ -1,3 +1,8 @@
+2017-09-05  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41641: Src/math.c: more arithmetic operations need to be
+	marked as rvalues, in particular increment and decrement.
+
 2017-09-04  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 41633: Src/parse.c: make sure function definitions including

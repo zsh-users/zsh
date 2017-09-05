@@ -1306,8 +1306,6 @@ op(int what)
 	    spval->type = MN_INTEGER;
 	} else
 	    spval->u.l = !spval->u.l;
-	stack[sp].lval = NULL;
-	stack[sp].pval = NULL;
 	break;
     case COMP:
 	if (spval->type & MN_FLOAT) {
@@ -1315,8 +1313,6 @@ op(int what)
 	    spval->type = MN_INTEGER;
 	} else
 	    spval->u.l = ~spval->u.l;
-	stack[sp].lval = NULL;
-	stack[sp].pval = NULL;
 	break;
     case POSTPLUS:
 	a = *spval;
@@ -1335,16 +1331,12 @@ op(int what)
 	(void)setmathvar(stack + sp, a);
 	break;
     case UPLUS:
-	stack[sp].lval = NULL;
-	stack[sp].pval = NULL;
 	break;
     case UMINUS:
 	if (spval->type & MN_FLOAT)
 	    spval->u.d = -spval->u.d;
 	else
 	    spval->u.l = -spval->u.l;
-	stack[sp].lval = NULL;
-	stack[sp].pval = NULL;
 	break;
     case QUEST:
 	DPUTS(sp < 2, "BUG: math: three shall be the number of the counting.");
@@ -1377,6 +1369,8 @@ op(int what)
 	zerr("bad math expression: out of integers");
 	return;
     }
+    stack[sp].lval = NULL;
+    stack[sp].pval = NULL;
 }
 
 
