@@ -1,3 +1,8 @@
+2017-09-09  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
+
+	* 41628 (plus 41645 by Oliver): Completion/Unix/Command/_ps:
+	update options; do not reset compstate
+
 2017-09-05  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41641: Src/math.c: more arithmetic operations need to be
