@@ -2200,3 +2200,10 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >Option
 >Regular text
 >Option
+
+ (setopt nonomatch
+  print ${(z):-foo-bar*thingy?}
+ )
+0:(z) splitting with remaining tokens
+>foo-bar*thingy?
+ 

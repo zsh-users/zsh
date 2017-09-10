@@ -3747,11 +3747,15 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 
 	if (isarr) {
 	    char **ap;
-	    for (ap = aval; *ap; ap++)
+	    for (ap = aval; *ap; ap++) {
+		untokenize(*ap);
 		list = bufferwords(list, *ap, NULL, shsplit);
+	    }
 	    isarr = 0;
-	} else
+	} else {
+	    untokenize(val);
 	    list = bufferwords(NULL, val, NULL, shsplit);
+	}
 
 	if (!list || !firstnode(list))
 	    val = dupstring("");
