@@ -103,6 +103,12 @@
 0:`exec' with -a option, no space
 >/bin/SPLOOSH
 
+  (exec -a foo* $ZTST_testdir/../Src/zsh -fc 'print -r -- ${(V)0}')
+  (exec -a "" $ZTST_testdir/../Src/zsh -fc 'print -r -- ${(V)0}')
+0:rationalisation of arguments to exec -a
+>foo*
+>
+
   (
     opts=(-a /bin/WHOOOSH)
     exec $opts /bin/sh -c 'echo $0'

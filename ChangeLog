@@ -1,3 +1,11 @@
+2017-09-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 41622: Src/exec., Test/A01grammar.ztst: exec -a arguments
+	weren't sanitised.
+
+	* 41661: Src/subst.c, Test/D04parameter.ztst: need to remove
+	tokens before passing to bufferwords() for (z).
+
 2017-09-09  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 41628 (plus 41645 by Oliver): Completion/Unix/Command/_ps:

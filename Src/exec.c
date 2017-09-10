@@ -3007,6 +3007,9 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		}
 		if (exec_argv0) {
 		    char *str, *s;
+		    exec_argv0 = dupstring(exec_argv0);
+		    remnulargs(exec_argv0);
+		    untokenize(exec_argv0);
 		    size_t sz = strlen(exec_argv0);
 		    str = s = zalloc(5 + 1 + sz + 1);
 		    strcpy(s, "ARGV0=");
