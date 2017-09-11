@@ -1361,6 +1361,14 @@ struct options {
     int argscount, argsalloc;
 };
 
+/* Flags to parseargs() */
+
+enum {
+    PARSEARGS_TOPLEVEL = 0x1,	/* Call to initialise shell */
+    PARSEARGS_LOGIN    = 0x2	/* Shell is login shell */
+};
+
+
 /*
  * Handler arguments are: builtin name, null-terminated argument
  * list excluding command name, option structure, the funcid element from the

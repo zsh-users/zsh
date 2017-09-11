@@ -46,6 +46,20 @@ ifzman(zmanref(zshoptions))\
 ifnzman(noderef(Options))\
 .
 
+The long option `tt(--emulate)' followed (in a separate word) by an
+emulation mode may be passed to the shell.
+The emulation modes are those described for the tt(emulate) builtin,
+see
+ifzman(zmanref(zshbuiltins))\
+ifnzman(noderef(Shell Builtin Commands)).
+The `tt(--emulate)' option must precede any other options (which might
+otherwise be overridden), but following options are honoured, so
+may be used to modify the requested emulation mode.  Note that certain
+extra steps are taken to ensure a smooth emulation when this option
+is used compared with the tt(emulate) command within the shell: for
+example, variables that conflict with POSIX usage such as tt(path) are
+not defined within the shell.
+
 Options may be specified by name using the tt(-o) option.  tt(-o) acts like
 a single-letter option, but takes a following string as the option name.
 For example,

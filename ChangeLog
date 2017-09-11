@@ -1,3 +1,10 @@
+2017-09-11  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41668: Doc/Zsh/invoke.yo, Src/builtin.c, Src/init.c,
+	Src/zsh.h, Test/B07emulate.ztst: Add option --emulate at
+	invocation to start in correct emulation, as the ARGV0 trick
+	doesn't work from other shells.
+
 2017-09-10  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 41622: Src/exec., Test/A01grammar.ztst: exec -a arguments

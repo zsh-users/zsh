@@ -251,3 +251,28 @@
  emulate sh -c '[[ a == a ]]'
 0:regression test for POSIX_ALIASES reserved words
 F:Some reserved tokens are handled in alias expansion
+
+ for mode in ksh bash zsh; do
+   $ZTST_testdir/../Src/zsh --emulate $mode -f -c 'emulate'
+ done
+0:--emulate option
+>ksh
+>sh
+>zsh
+
+ $ZTST_testdir/../Src/zsh -f --emulate sh
+1:--emulate must be first
+*?*: --emulate: must precede other options
+
+ $ZTST_testdir/../Src/zsh --emulate
+1:--emulate needs an argument
+*?*: --emulate: argument required
+
+ for opt in shwordsplit noshwordsplit; do
+   $ZTST_testdir/../Src/zsh --emulate sh -f -o $opt -c '
+     [[ -o shwordsplit ]] && echo yes || echo no
+   '
+ done
+0:--emulate followed by other options
+>yes
+>no

@@ -244,33 +244,24 @@ static int restricted;
 
 /**/
 static void
-parseargs(char **argv, char **runscript, char **cmdptr)
+parseargs(char *zsh_name, char **argv, char **runscript, char **cmdptr)
 {
     char **x;
     LinkList paramlist;
+    int flags = PARSEARGS_TOPLEVEL;
+    if (**argv == '-')
+	flags |= PARSEARGS_LOGIN;
 
     argzero = posixzero = *argv++;
     SHIN = 0;
 
-    /* There's a bit of trickery with opts[INTERACTIVE] here.  It starts *
-     * at a value of 2 (instead of 1) or 0.  If it is explicitly set on  *
-     * the command line, it goes to 1 or 0.  If input is coming from     *
-     * somewhere that normally makes the shell non-interactive, we do    *
-     * "opts[INTERACTIVE] &= 1", so that only a *default* on state will  *
-     * be changed.  At the end of the function, a value of 2 gets        *
-     * changed to 1.                                                     */
-    opts[INTERACTIVE] = isatty(0) ? 2 : 0;
     /*
-     * MONITOR is similar:  we initialise it to 2, and if it's
-     * still 2 at the end, we set it to the value of INTERACTIVE.
+     * parseopts sets up some options after we deal with emulation in
+     * order to be consistent --- the code in parseopts_setemulate() is
+     * matched by code at the end of the present function.
      */
-    opts[MONITOR] = 2;   /* may be unset in init_io() */
-    opts[HASHDIRS] = 2;  /* same relationship to INTERACTIVE */
-    opts[USEZLE] = 1;    /* see below, related to SHINSTDIN */
-    opts[SHINSTDIN] = 0;
-    opts[SINGLECOMMAND] = 0;
 
-    if (parseopts(NULL, &argv, opts, cmdptr, NULL))
+    if (parseopts(zsh_name, &argv, opts, cmdptr, NULL, flags))
 	exit(1);
 
     /*
@@ -334,9 +325,45 @@ parseopts_insert(LinkList optlist, char *base, int optno)
 }
 
 /*
+ * This sets the global emulation plus the options we traditionally
+ * set immediately after that.  This is just for historical consistency
+ * --- I don't think those options actually need to be set here.
+ */
+static void parseopts_setemulate(char *nam, int flags)
+{
+    emulate(nam, 1, &emulation, opts);   /* initialises most options */
+    opts[LOGINSHELL] = ((flags & PARSEARGS_LOGIN) != 0);
+    opts[PRIVILEGED] = (getuid() != geteuid() || getgid() != getegid());
+
+    /* There's a bit of trickery with opts[INTERACTIVE] here.  It starts *
+     * at a value of 2 (instead of 1) or 0.  If it is explicitly set on  *
+     * the command line, it goes to 1 or 0.  If input is coming from     *
+     * somewhere that normally makes the shell non-interactive, we do    *
+     * "opts[INTERACTIVE] &= 1", so that only a *default* on state will  *
+     * be changed.  At the end of the function, a value of 2 gets        *
+     * changed to 1.                                                     */
+    opts[INTERACTIVE] = isatty(0) ? 2 : 0;
+    /*
+     * MONITOR is similar:  we initialise it to 2, and if it's
+     * still 2 at the end, we set it to the value of INTERACTIVE.
+     */
+    opts[MONITOR] = 2;   /* may be unset in init_io() */
+    opts[HASHDIRS] = 2;  /* same relationship to INTERACTIVE */
+    opts[USEZLE] = 1;    /* see below, related to SHINSTDIN */
+    opts[SHINSTDIN] = 0;
+    opts[SINGLECOMMAND] = 0;
+}
+
+/*
  * Parse shell options.
- * If nam is not NULL, this is called from a command; don't
- * exit on failure.
+ *
+ * If (flags & PARSEARGS_TOPLEVEL):
+ * - we are doing shell initilisation
+ * - nam is the name under which the shell was started
+ * - set up emulation and standard options based on that.
+ * Otherwise:
+ * - nam is a command name
+ * - don't exit on failure.
  *
  * If optlist is not NULL, it used to form a list of pointers
  * into new_opts indicating which options have been changed.
@@ -345,23 +372,26 @@ parseopts_insert(LinkList optlist, char *base, int optno)
 /**/
 mod_export int
 parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
-	  LinkList optlist)
+	  LinkList optlist, int flags)
 {
     int optionbreak = 0;
     int action, optno;
     char **argv = *argvp;
+    int toplevel = ((flags & PARSEARGS_TOPLEVEL) != 0u);
+    int emulate_required = toplevel;
+    char *top_emulation = nam;
 
     *cmdp = 0;
 #define WARN_OPTION(F, S)						\
     do {								\
-	if (nam)							\
+	if (!toplevel)							\
 	    zwarnnam(nam, F, S);					\
 	else								\
 	    zerr(F, S);							\
     } while (0)
 #define LAST_OPTION(N)	       \
     do {		       \
-	if (nam) {	       \
+	if (!toplevel) {       \
 	    if (*argv)	       \
 		argv++;	       \
 	    goto doneargv;     \
@@ -381,7 +411,7 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
 		    argv++;
 		    goto doneoptions;
 		}
-		if (nam || *argv != args+1 || **argv != '-')
+		if (!toplevel || *argv != args+1 || **argv != '-')
 		    goto badoptionstring;
 		/* GNU-style long options */
 		++*argv;
@@ -394,6 +424,19 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
 		    printhelp();
 		    LAST_OPTION(0);
 		}
+		if (!strcmp(*argv, "emulate")) {
+		    ++argv;
+		    if (!*argv) {
+			zerr("--emulate: argument required");
+			exit(1);
+		    }
+		    if (!emulate_required) {
+			zerr("--emulate: must precede other options");
+			exit(1);
+		    }
+		    top_emulation = *argv;
+		    break;
+		}
 		/* `-' characters are allowed in long options */
 		for(args = *argv; *args; args++)
 		    if(*args == '-')
@@ -402,9 +445,17 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
 	    }
 
 	    if (unset(SHOPTIONLETTERS) && **argv == 'b') {
+		if (emulate_required) {
+		    parseopts_setemulate(top_emulation, flags);
+		    emulate_required = 0;
+		}
 		/* -b ends options at the end of this argument */
 		optionbreak = 1;
 	    } else if (**argv == 'c') {
+		if (emulate_required) {
+		    parseopts_setemulate(top_emulation, flags);
+		    emulate_required = 0;
+		}
 		/* -c command */
 		*cmdp = *argv;
 		new_opts[INTERACTIVE] &= 1;
@@ -417,15 +468,20 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
 		    return 1;
 		}
 	    longoptions:
+		if (emulate_required) {
+		    parseopts_setemulate(top_emulation, flags);
+		    emulate_required = 0;
+		}
 		if (!(optno = optlookup(*argv))) {
 		    WARN_OPTION("no such option: %s", *argv);
 		    return 1;
-		} else if (optno == RESTRICTED && !nam) {
+		} else if (optno == RESTRICTED && toplevel) {
 		    restricted = action;
-		} else if ((optno == EMACSMODE || optno == VIMODE) && nam) {
+		} else if ((optno == EMACSMODE || optno == VIMODE) && !toplevel) {
 		    WARN_OPTION("can't change option: %s", *argv);
 		} else {
-		    if (dosetopt(optno, action, !nam, new_opts) && nam) {
+		    if (dosetopt(optno, action, toplevel, new_opts) &&
+			!toplevel) {
 			WARN_OPTION("can't change option: %s", *argv);
 		    } else if (optlist) {
 			parseopts_insert(optlist, new_opts, optno);
@@ -442,15 +498,21 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
 		    }
 		break;
 	    } else {
+		if (emulate_required) {
+		    parseopts_setemulate(top_emulation, flags);
+		    emulate_required = 0;
+		}
 	    	if (!(optno = optlookupc(**argv))) {
 		    WARN_OPTION("bad option: -%c", **argv);
 		    return 1;
-		} else if (optno == RESTRICTED && !nam) {
+		} else if (optno == RESTRICTED && toplevel) {
 		    restricted = action;
-		} else if ((optno == EMACSMODE || optno == VIMODE) && nam) {
+		} else if ((optno == EMACSMODE || optno == VIMODE) &&
+			   !toplevel) {
 		    WARN_OPTION("can't change option: %s", *argv);
 		} else {
-		    if (dosetopt(optno, action, !nam, new_opts) && nam) {
+		    if (dosetopt(optno, action, toplevel, new_opts) &&
+			!toplevel) {
 			WARN_OPTION("can't change option: -%c", **argv);
 		    } else if (optlist) {
 			parseopts_insert(optlist, new_opts, optno);
@@ -470,6 +532,10 @@ parseopts(char *nam, char ***argvp, char *new_opts, char **cmdp,
     }
  doneargv:
     *argvp = argv;
+    if (emulate_required) {
+	parseopts_setemulate(top_emulation, flags);
+	emulate_required = 0;
+    }
     return 0;
 }
 
@@ -1660,11 +1726,9 @@ zsh_main(UNUSED(int argc), char **argv)
     fdtable[0] = fdtable[1] = fdtable[2] = FDT_EXTERNAL;
 
     createoptiontable();
-    emulate(zsh_name, 1, &emulation, opts);   /* initialises most options */
-    opts[LOGINSHELL] = (**argv == '-');
-    opts[PRIVILEGED] = (getuid() != geteuid() || getgid() != getegid());
-    /* sets ZLE, INTERACTIVE, SHINSTDIN and SINGLECOMMAND */
-    parseargs(argv, &runscript, &cmd);
+    /* sets emulation, LOGINSHELL, PRIVILEGED, ZLE, INTERACTIVE,
+     * SHINSTDIN and SINGLECOMMAND */ 
+    parseargs(zsh_name, argv, &runscript, &cmd);
 
     SHTTY = -1;
     init_io(cmd);
