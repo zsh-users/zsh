@@ -254,7 +254,12 @@ get_pty(int master, int *retfd)
 #elif defined(__FreeBSD__) || defined(__DragonFly__)
     static char char1[] = "pqrsPQRS";
     static char char2[] = "0123456789abcdefghijklmnopqrstuv";
-#else /* __FreeBSD__ || __DragonFly__ */
+#elif defined(__OpenBSD__)
+    static char char1[] = "pqrstuvwxyzPQRST";
+    static char char2[] = "0123456789"
+                          "abcdefghijklmnopqrstuvwxyz"
+                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+#else /* __FreeBSD__ || __DragonFly__  || __OpenBSD*/
     static char char1[] = "pqrstuvwxyzPQRST";
     static char char2[] = "0123456789abcdef";
 #endif

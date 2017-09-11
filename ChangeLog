@@ -1,5 +1,8 @@
 2017-09-11  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* Thierry Ghelew: 41666: Src/Modules/zpty.c: zpty compatibility
+	for OpenBSD.
+
 	* 41668: Doc/Zsh/invoke.yo, Src/builtin.c, Src/init.c,
 	Src/zsh.h, Test/B07emulate.ztst: Add option --emulate at
 	invocation to start in correct emulation, as the ARGV0 trick
