@@ -4,6 +4,9 @@
 
 2017-09-11  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* unposted: Doc/Zsh/invoke.yo: YODL compatibility fix for
+	--emulate.
+
 	* Thierry Ghelew: 41666: Src/Modules/zpty.c: zpty compatibility
 	for OpenBSD.
 
