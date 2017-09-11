@@ -4947,6 +4947,16 @@ ztrsub(char const *t, char const *s)
     return l;
 }
 
+/*
+ * Wrapper for readdir().
+ *
+ * If ignoredots is true, skip the "." and ".." entries.
+ *
+ * When __APPLE__ is defined, recode dirent names from UTF-8-MAC to UTF-8.
+ *
+ * Return the dirent's name, metafied.
+ */
+
 /**/
 mod_export char *
 zreaddir(DIR *dir, int ignoredots)

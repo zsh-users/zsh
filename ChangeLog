@@ -1,3 +1,7 @@
+2017-09-11  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted: Src/utils.c: internal: Document zreaddir().
+
 2017-09-11  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* Thierry Ghelew: 41666: Src/Modules/zpty.c: zpty compatibility
