@@ -2217,7 +2217,8 @@ bin_fg(char *name, char **argv, Options ops, int func)
 	    return 0;
 	} else {   /* Must be BIN_WAIT, so wait for all jobs */
 	    for (job = 0; job <= maxjob; job++)
-		if (job != thisjob && jobtab[job].stat)
+		if (job != thisjob && jobtab[job].stat &&
+		    !(jobtab[job].stat & STAT_NOPRINT))
 		    retval = zwaitjob(job, 1);
 	    unqueue_signals();
 	    return retval;

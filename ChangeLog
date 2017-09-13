@@ -1,5 +1,8 @@
 2017-09-13  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 41688: Src/jobs.c: "wait" for all active jobs should ignore
+	those marked STAT_NOPRINT.
+
 	* 41679: Doc/Zsh/builtins.yo: slight clarifcation on exec of
 	builtins.
 
