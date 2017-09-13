@@ -669,7 +669,7 @@ an empty string or whitespace) the return status is zero.
 item(tt(exec) [ tt(-cl) ] [ tt(-a) var(argv0) ] [ var(command) [ var(arg) ... ] ])(
 Replace the current shell with var(command) rather than forking.
 If var(command) is a shell builtin command or a shell function,
-the shell executes it, then immediately exits.
+the shell executes it, and exits when the command is complete.
 
 With tt(-c) clear the environment; with tt(-l) prepend tt(-) to the
 tt(argv[0]) string of the command executed (to simulate a login shell);
