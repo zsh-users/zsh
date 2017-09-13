@@ -2389,6 +2389,60 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag,
     }
 }
 
+/* Check for array assignent with entries like [key]=val.
+ *
+ * All entries or none must match this form, else error and return 0.
+ *
+ * Convert list to alternate key / val form, perform
+ * appropriate substitution, and return 1 if found.
+ *
+ * Caller to check errflag.
+ */
+
+/**/
+static int
+keyvalpairarray(LinkList vl, int htok)
+{
+    char *start, *end, *dat;
+    LinkNode ve, next;
+
+    if (vl &&
+	(ve = firstnode(vl)) &&
+	(start = (char *)getdata(ve)) &&
+	start[0] == Inbrack &&
+	(end = strchr(start+1, Outbrack)) &&
+	end[1] == Equals) {
+	for (;;) {
+	    *end = '\0';
+	    next = nextnode(ve);
+
+	    dat = start + 1;
+	    if (htok)
+		singsub(&dat);
+	    untokenize(dat);
+	    setdata(ve, dat);
+	    dat = end + 2;
+	    if (htok)
+		singsub(&dat);
+	    untokenize(dat);
+	    insertlinknode(vl, ve, dat);
+	    ve = next;
+	    if (!ve)
+		break;
+	    if (!(start = (char *)getdata(ve)) ||
+		start[0] != Inbrack ||
+		!(end = strchr(start+1, Outbrack)) ||
+		end[1] != Equals) {
+		zerr("bad array element, expected [key]=value: %s",
+		     start);
+		return 0;
+	    }
+	}
+	return 1;
+    }
+    return 0;
+}
+
 /**/
 static void
 addvars(Estate state, Wordcode pc, int addflags)
@@ -2428,8 +2482,17 @@ addvars(Estate state, Wordcode pc, int addflags)
 	if ((isstr = (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR))) {
 	    init_list1(svl, ecgetstr(state, EC_DUPTOK, &htok));
 	    vl = &svl;
-	} else
+	} else {
 	    vl = ecgetlist(state, WC_ASSIGN_NUM(ac), EC_DUPTOK, &htok);
+	    if (keyvalpairarray(vl, htok)) {
+		myflags |= ASSPM_KEY_VALUE;
+		htok = 0;
+	    }
+	    if (errflag) {
+		state->pc = opc;
+		return;
+	    }
+	}
 
 	if (vl && htok) {
 	    prefork(vl, (isstr ? (PREFORK_SINGLE|PREFORK_ASSIGN) :
@@ -3914,7 +3977,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 				while ((data = ugetnode(&svl))) {
 				    char *ptr;
 				    asg = (Asgment)zhalloc(sizeof(struct asgment));
-				    asg->is_array = 0;
+				    asg->flags = 0;
 				    if ((ptr = strchr(data, '='))) {
 					*ptr++ = '\0';
 					asg->name = data;
@@ -3936,7 +3999,7 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 			asg->name = name;
 			if (WC_ASSIGN_TYPE(ac) == WC_ASSIGN_SCALAR) {
 			    char *val = ecgetstr(state, EC_DUPTOK, &htok);
-			    asg->is_array = 0;
+			    asg->flags = 0;
 			    if (WC_ASSIGN_TYPE2(ac) == WC_ASSIGN_INC) {
 				/* Fake assignment, no value */
 				asg->value.scalar = NULL;
@@ -3961,18 +4024,23 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 				asg->value.scalar = val;
 			    }
 			} else {
-			    asg->is_array = 1;
+			    asg->flags = ASG_ARRAY;
 			    asg->value.array =
 				ecgetlist(state, WC_ASSIGN_NUM(ac),
 					  EC_DUPTOK, &htok);
 			    if (asg->value.array)
 			    {
-				prefork(asg->value.array, PREFORK_ASSIGN, NULL);
-				if (errflag) {
-				    state->pc = opc;
-				    break;
+				if (keyvalpairarray(asg->value.array, 1))
+				    asg->flags |= ASG_KEY_VALUE;
+				else if (!errflag) {
+				    prefork(asg->value.array, PREFORK_ASSIGN,
+					    NULL);
+				    if (errflag) {
+					state->pc = opc;
+					break;
+				    }
+				    globlist(asg->value.array, 0);
 				}
-				globlist(asg->value.array, 0);
 				if (errflag) {
 				    state->pc = opc;
 				    break;

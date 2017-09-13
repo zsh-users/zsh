@@ -2207,3 +2207,71 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 0:(z) splitting with remaining tokens
 >foo-bar*thingy?
  
+ typeset -A keyvalhash
+ keyvalhash=([one]=eins [two]=zwei)
+ keyvalhash+=([three]=drei)
+ for key in ${(ok)keyvalhash}; do
+   print $key $keyvalhash[$key]
+ done
+0:[key]=val for hashes
+>one eins
+>three drei
+>two zwei
+
+  local keyvalarray
+  keyvalarray=([1]=one [3]=three)
+  print -l "${keyvalarray[@]}"
+  keyvalarray+=([2]=two)
+  print -l "${keyvalarray[@]}"
+0:[key]=val for normal arrays
+>one
+>
+>three
+>one
+>two
+>three
+
+ typeset -A keyvalhash
+ touch foo Xnot_globbedX
+ key="another key" val="another value"
+ keyvalhash=([$(echo the key)]=$(echo the value)
+             [$key]=$val
+	     [*]=?not_globbed?)
+ for key in ${(ok)keyvalhash}; do
+   print -l $key $keyvalhash[$key]
+ done
+0:Substitution in [key]=val syntax
+>*
+>?not_globbed?
+>another key
+>another value
+>the key
+>the value
+
+ local keyvalarray
+ keyvalarray=(1 2 3)
+ keyvalarray+=([5]=5 [7]=7)
+ keyvalarray+=([4]=4 [6]=6)
+ print $#keyvalarray
+ print $keyvalarray
+0:append to normal array using [key]=val
+>7
+>1 2 3 4 5 6 7
+
+ local -A keyvalhash
+ keyvalhash=(['1first element!']=first' 'value
+	     ["2second element?"]=second" "value
+	     [$'3third element#']=third$' 'value
+	     [\4\f\o\u\r\t\h\ \e\l\e\m\e\n\t\\]=fourth\ value)
+ for key in ${(ok)keyvalhash}; do
+   print -rl -- $key $keyvalhash[$key]
+ done
+0:quoting in [key]=value syntax
+>1first element!
+>first value
+>2second element?
+>second value
+>3third element#
+>third value
+>4fourth element\
+>fourth value

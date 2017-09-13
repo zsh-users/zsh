@@ -1217,17 +1217,25 @@ struct alias {
 struct asgment {
     struct linknode node;
     char *name;
-    int is_array;
+    int flags;
     union {
 	char *scalar;
 	LinkList array;
     } value;
 };
 
+/* Flags for flags element of asgment */
+enum {
+    /* Array value */
+    ASG_ARRAY = 1,
+    /* Key / value array pair */
+    ASG_KEY_VALUE = 2
+};
+
 /*
  * Assignment is array?
  */
-#define ASG_ARRAYP(asg) ((asg)->is_array)
+#define ASG_ARRAYP(asg) ((asg)->flags & ASG_ARRAY)
 
 /*
  * Assignment has value?
@@ -2060,6 +2068,11 @@ enum {
     ASSPM_WARN = (ASSPM_WARN_CREATE|ASSPM_WARN_NESTED),
     /* Import from environment, so exercise care evaluating value */
     ASSPM_ENV_IMPORT = 1 << 3,
+    /* Array is key / value pairs.
+     * This is normal for associative arrays but variant behaviour for
+     * normal arrays.
+     */
+    ASSPM_KEY_VALUE = 1 << 4
 };
 
 /* node for named directory hash table (nameddirtab) */

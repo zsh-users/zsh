@@ -450,15 +450,35 @@ execbuiltin(LinkList args, LinkList assigns, Builtin bn)
 		    Asgment asg = (Asgment)node;
 		    fputc(' ', xtrerr);
 		    quotedzputs(asg->name, xtrerr);
-		    if (asg->is_array) {
-			LinkNode arrnode;
+		    if (asg->flags & ASG_ARRAY) {
 			fprintf(xtrerr, "=(");
 			if (asg->value.array) {
-			    for (arrnode = firstnode(asg->value.array);
-				 arrnode;
-				 incnode(arrnode)) {
-				fputc(' ', xtrerr);
-				quotedzputs((char *)getdata(arrnode), xtrerr);
+			    if (asg->flags & ASG_KEY_VALUE) {
+				LinkNode keynode, valnode;
+				keynode = firstnode(asg->value.array);
+				for (;;) {
+				    if (!keynode)
+					break;
+				    valnode = nextnode(keynode);
+				    if (!valnode)
+					break;
+				    fputc('[', xtrerr);
+				    quotedzputs((char *)getdata(keynode),
+						xtrerr);
+				    fprintf(stderr, "]=");
+				    quotedzputs((char *)getdata(valnode),
+						xtrerr);
+				    keynode = nextnode(valnode);
+				}
+			    } else {
+				LinkNode arrnode;
+				for (arrnode = firstnode(asg->value.array);
+				     arrnode;
+				     incnode(arrnode)) {
+				    fputc(' ', xtrerr);
+				    quotedzputs((char *)getdata(arrnode),
+						xtrerr);
+				}
 			    }
 			}
 			fprintf(xtrerr, " )");
@@ -1519,7 +1539,7 @@ bin_fc(char *nam, char **argv, Options ops, int func)
 	    asgl = a;
 	}
 	a->name = *argv;
-	a->is_array = 0;
+	a->flags = 0;
 	a->value.scalar = s;
 	a->node.next = a->node.prev = NULL;
 	argv++;
@@ -1910,7 +1930,7 @@ getasg(char ***argvp, LinkList assigns)
 	return NULL;
     }
     asg.name = s;
-    asg.is_array = 0;
+    asg.flags = 0;
 
     /* search for `=' */
     for (; *s && *s != '='; s++);
@@ -2171,7 +2191,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
      *   ii. we are creating a new local parameter
      */
     if (usepm) {
-	if (asg->is_array ?
+	if ((asg->flags & ASG_ARRAY) ?
 	    !(PM_TYPE(pm->node.flags) & (PM_ARRAY|PM_HASHED)) :
 	    (asg->value.scalar && (PM_TYPE(pm->node.flags &
 					   (PM_ARRAY|PM_HASHED))))) {
@@ -2241,10 +2261,11 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	    if (asg->value.scalar &&
 		!(pm = assignsparam(pname, ztrdup(asg->value.scalar), 0)))
 		return NULL;
-	} else if (asg->is_array) {
+	} else if (asg->flags & ASG_ARRAY) {
+	    int flags = (asg->flags & ASG_KEY_VALUE) ? ASSPM_KEY_VALUE : 0;
 	    if (!(pm = assignaparam(pname, asg->value.array ?
 				 zlinklist2array(asg->value.array) :
-				 mkarray(NULL), 0)))
+				 mkarray(NULL), flags)))
 		return NULL;
 	}
 	if (errflag)
@@ -2255,7 +2276,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	return pm;
     }
 
-    if (asg->is_array ?
+    if ((asg->flags & ASG_ARRAY) ?
 	!(on & (PM_ARRAY|PM_HASHED)) :
 	(asg->value.scalar && (on & (PM_ARRAY|PM_HASHED)))) {
 	zerrnam(cname, "%s: inconsistent type for assignment", pname);
@@ -2287,7 +2308,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	 */
 	if (!ASG_VALUEP(asg) && !((pm->node.flags|on) & (PM_ARRAY|PM_HASHED))) {
 	    asg->value.scalar = dupstring(getsparam(pname));
-	    asg->is_array = 0;
+	    asg->flags = 0;
 	}
 	/* pname may point to pm->nam which is about to disappear */
 	pname = dupstring(pname);
@@ -2396,13 +2417,14 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 		      ztrdup(asg->value.scalar ? asg->value.scalar : ""), 0)))
 		return NULL;
 	    dont_set = 1;
-	    asg->is_array = 0;
+	    asg->flags = 0;
 	    keeplocal = 0;
 	    on = pm->node.flags;
 	} else if (PM_TYPE(on) == PM_ARRAY && ASG_ARRAYP(asg)) {
+	    int flags = (asg->flags & ASG_KEY_VALUE) ? ASSPM_KEY_VALUE : 0;
 	    if (!(pm = assignaparam(pname, asg->value.array ?
 				    zlinklist2array(asg->value.array) :
-				    mkarray(NULL), 0)))
+				    mkarray(NULL), flags)))
 		return NULL;
 	    dont_set = 1;
 	    keeplocal = 0;
@@ -2479,6 +2501,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 	Param ipm = pm;
 	if (pm->node.flags & (PM_ARRAY|PM_HASHED)) {
 	    char **arrayval;
+	    int flags = (asg->flags & ASG_KEY_VALUE) ? ASSPM_KEY_VALUE : 0;
 	    if (!ASG_ARRAYP(asg)) {
 		/*
 		 * Attempt to assign a scalar value to an array.
@@ -2497,7 +2520,7 @@ typeset_single(char *cname, char *pname, Param pm, UNUSED(int func),
 		arrayval = zlinklist2array(asg->value.array);
 	    else
 		arrayval = mkarray(NULL);
-	    if (!(pm=assignaparam(pname, arrayval, 0)))
+	    if (!(pm=assignaparam(pname, arrayval, flags)))
 		return NULL;
 	} else {
 	    DPUTS(ASG_ARRAYP(asg), "BUG: inconsistent array value for scalar");
@@ -2750,13 +2773,15 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 		     * Already tied in the fashion requested.
 		     */
 		    struct tieddata *tdp = (struct tieddata*)pm->u.data;
+		    int flags = (asg->flags & ASG_KEY_VALUE) ?
+			ASSPM_KEY_VALUE : 0;
 		    /* Update join character */
 		    tdp->joinchar = joinchar;
 		    if (asg0.value.scalar)
 			assignsparam(asg0.name, ztrdup(asg0.value.scalar), 0);
 		    else if (asg->value.array)
 			assignaparam(
-			    asg->name, zlinklist2array(asg->value.array), 0);
+			    asg->name, zlinklist2array(asg->value.array),flags);
 		    return 0;
 		} else {
 		    zwarnnam(name, "can't tie already tied scalar: %s",
@@ -2778,7 +2803,7 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	 * to be exported properly.
 	 */
 	asg2.name = asg->name;
-	asg2.is_array = 0;
+	asg2.flags = 0;
 	asg2.value.array = (LinkList)0;
 	if (!(apm=typeset_single(name, asg->name,
 				 (Param)paramtab->getnode(paramtab,
@@ -2816,9 +2841,10 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
 	if (apm->ename)
 	    zsfree(apm->ename);
 	apm->ename = ztrdup(asg0.name);
-	if (asg->value.array)
-	    assignaparam(asg->name, zlinklist2array(asg->value.array), 0);
-	else if (oldval)
+	if (asg->value.array) {
+	    int flags = (asg->flags & ASG_KEY_VALUE) ? ASSPM_KEY_VALUE : 0;
+	    assignaparam(asg->name, zlinklist2array(asg->value.array), flags);
+	} else if (oldval)
 	    assignsparam(asg0.name, oldval, 0);
 	unqueue_signals();
 

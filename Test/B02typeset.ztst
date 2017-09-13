@@ -721,3 +721,58 @@
 # 'date' did not run.
 >Status is printed, 1
 *?*: failed to change user ID: *
+
+ typeset -A keyvalhash=([one]=eins [two]=zwei)
+ keyvalhash+=([three]=drei)
+ for key in ${(ok)keyvalhash}; do
+   print $key $keyvalhash[$key]
+ done
+0:[key]=val for hashes
+>one eins
+>three drei
+>two zwei
+
+  local keyvalarray=([1]=one [3]=three)
+  print -l "${keyvalarray[@]}"
+  keyvalarray+=([2]=two)
+  print -l "${keyvalarray[@]}"
+  local keyvalarray=([1]=one [3]=three)
+  print -l "${keyvalarray[@]}"
+0:[key]=val for normal arrays
+>one
+>
+>three
+>one
+>two
+>three
+>one
+>
+>three
+
+ touch foo Xnot_globbedX
+ inkey="another key" val="another value"
+ typeset -A keyvalhash=([$(echo the key)]=$(echo the value)
+                        [$inkey]=$val
+	                [*]=?not_globbed?)
+ for key in ${(ok)keyvalhash}; do
+   print -l $key $keyvalhash[$key]
+ done
+ typeset -A keyvalhash=([$(echo the key)]=$(echo the value)
+                        [$inkey]=$val
+	                [*]=?not_globbed?)
+ for key in ${(ok)keyvalhash}; do
+   print -l $key $keyvalhash[$key]
+ done
+0:Substitution in [key]=val syntax
+>*
+>?not_globbed?
+>another key
+>another value
+>the key
+>the value
+>*
+>?not_globbed?
+>another key
+>another value
+>the key
+>the value

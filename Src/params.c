@@ -3185,6 +3185,72 @@ assignaparam(char *s, char **val, int flags)
 
     if (flags & ASSPM_WARN)
 	check_warn_pm(v->pm, "array", created, may_warn_about_nested_vars);
+
+    if ((flags & ASSPM_KEY_VALUE) && (PM_TYPE(v->pm->node.flags) & PM_ARRAY)) {
+	/*
+	 * This is an ordinary array with key / value pairs.
+	 */
+	int maxlen, origlen;
+	char **aptr, **fullval;
+	zlong *subscripts = (zlong *)zhalloc(arrlen(val) * sizeof(zlong));
+	zlong *iptr = subscripts;
+	if (flags & ASSPM_AUGMENT) {
+	    maxlen = origlen = arrlen(v->pm->gsu.a->getfn(v->pm));
+	} else {
+	    maxlen = origlen = 0;
+	}
+	for (aptr = val; *aptr && aptr[1]; aptr += 2) {
+	    *iptr = mathevali(*aptr);
+	    if (*iptr < 0 ||
+		(!isset(KSHARRAYS) && *iptr == 0)) {
+		unqueue_signals();
+		zerr("bad subscript for direct array assignment: %s", *aptr);
+		return NULL;
+	    }
+	    if (!isset(KSHARRAYS))
+		--*iptr;
+	    if (*iptr + 1 > maxlen)
+		maxlen = *iptr + 1;
+	    ++iptr;
+	}
+	fullval = zshcalloc((maxlen+1) * sizeof(char *));
+	if (!fullval) {
+	    zerr("array too large");
+	    return NULL;
+	}
+	fullval[maxlen] = NULL;
+	if (flags & ASSPM_AUGMENT) {
+	    char **srcptr = v->pm->gsu.a->getfn(v->pm);
+	    for (aptr = fullval; aptr <= fullval + origlen; aptr++) {
+		*aptr = ztrdup(*srcptr); 
+		srcptr++;
+	    }
+	}
+	iptr = subscripts;
+	for (aptr = val; *aptr && aptr[1]; aptr += 2) {
+	    zsfree(*aptr);
+	    fullval[*iptr] = aptr[1];
+	    ++iptr;
+	}
+	if (*aptr) {		/* Shouldn't be possible */
+	    DPUTS(1, "Extra element in key / value array");
+	    zsfree(*aptr);
+	}
+	free(val);
+	for (aptr = fullval; aptr < fullval + maxlen; aptr++) {
+	    /*
+	     * Remember we don't have sparse arrays but and they're null
+	     * terminated --- so any value we don't set has to be an
+	     * empty string.
+	     */
+	    if (!*aptr)
+		*aptr = ztrdup("");
+	}
+	setarrvalue(v, fullval);
+	unqueue_signals();
+	return v->pm;
+    }
+
     if (flags & ASSPM_AUGMENT) {
     	if (v->start == 0 && v->end == -1) {
 	    if (PM_TYPE(v->pm->node.flags) & PM_ARRAY) {

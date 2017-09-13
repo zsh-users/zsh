@@ -91,13 +91,36 @@ cindex(array assignment)
 ifzman()
 indent(tt(set -A) var(name) var(value) ...)
 indent(var(name)tt(=LPAR())var(value) ...tt(RPAR()))
+indent(var(name)tt(=LPAR())tt([)var(key)tt(]=)var(value) ...tt(RPAR()))
+
+In the third form, var(key) is an expression that will be evaluated in
+arithmetic context (in its simplest form, an integer) that gives the
+index of the element to be assigned with var(value).  In this form any
+elements not explicitly mentioned that come before the largest index to
+which a value is assigned will be assigned an empty string. The indices
+may be in any order.  Note that this syntax is strict: tt([) and tt(]=) must
+not be quoted, while var(key) may not consist of the unquoted string
+tt(]=), but is otherwise treated as a simple string.  Furthermore, all
+elements must match this form or an error is genereted; likewise, if the
+first entry does not match this form any later entry that does is taken
+as a simple value rather than a key / value pair. The enhanced forms of
+subscript expression that may be used when directly subscripting a
+variable name, described in the section Array Subscripts below, are not
+available.  Both var(key) and var(value) undergo all forms of expansion
+allowed for single word substitutions (this does not include filename
+generation).
 
 If no parameter var(name) exists, an ordinary array parameter is created.
 If the parameter var(name) exists and is a scalar, it is replaced by a new
 array.  To append to an array without changing the existing values, use
-the syntax:
+one of the following:
 ifzman()
 indent(var(name)tt(+=LPAR())var(value) ...tt(RPAR()))
+indent(var(name)tt(+=LPAR())tt([)var(key)tt(]=)var(value) ...tt(RPAR()))
+
+In the second form var(key) may specify an existing index as well as an
+index off the end of the old array; any existing value is overwritten by
+var(value).
 
 Within the parentheses on the right hand side of either form of the
 assignment, newlines and semicolons are treated the same as white space,
@@ -118,12 +141,14 @@ is interpreted as alternating keys and values:
 ifzman()
 indent(tt(set -A) var(name) var(key) var(value) ...)
 indent(var(name)tt(=LPAR())var(key) var(value) ...tt(RPAR()))
+indent(var(name)tt(=LPAR())tt([)var(key)tt(]=)var(value) ...tt(RPAR()))
 
 Every var(key) must have a var(value) in this case.  Note that this
 assigns to the entire array, deleting any elements that do not appear in
 the list.  The append syntax may also be used with an associative array:
 ifzman()
 indent(var(name)tt(+=LPAR())var(key) var(value) ...tt(RPAR()))
+indent(var(name)tt(+=LPAR())tt([)var(key)tt(]=)var(value) ...tt(RPAR()))
 
 This adds a new key/value pair if the key is not already present, and
 replaces the value for the existing key if it is.
