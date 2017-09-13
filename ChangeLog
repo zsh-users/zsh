@@ -1,5 +1,7 @@
 2017-09-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
+	* unposted: typo in proceeding Doc noticed by Oliver.
+
 	* 41698: Doc/Zsh/params.yo, Src/builtin.c, Src/exec.c,
 	Src/params.c, Src/zsh.h, Test/B02typeset.ztst,
 	Test/D04parameter.ztst: add ([key]=val) assignment syntax.
