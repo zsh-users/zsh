@@ -123,7 +123,7 @@
  print ${(kv)hash_test}
 0:private hides value from surrounding scope in nested scope
 >typeset -a hash_test=( top level )
->typeset -A hash_test=( in function )
+>typeset -A hash_test=( [in]=function )
 >typeset -g -a hash_test=( top level )
 >array-local top level
 >top level

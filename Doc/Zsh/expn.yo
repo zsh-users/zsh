@@ -1025,9 +1025,10 @@ ifnzman(noderef(Filename Expansion))\
 ifzman(the section FILENAME EXPANSION below).
 )
 item(tt(e))(
-Perform em(parameter expansion), em(command substitution) and
-em(arithmetic expansion) on the result. Such expansions can be
-nested but too deep recursion may have unpredictable effects.
+Perform single word shell expansions, namely em(parameter expansion),
+em(command substitution) and em(arithmetic expansion), on the
+result. Such expansions can be nested but too deep recursion may have
+unpredictable effects.
 )
 item(tt(f))(
 Split the result of the expansion at newlines. This is a shorthand

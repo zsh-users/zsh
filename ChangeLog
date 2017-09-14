@@ -1,3 +1,9 @@
+2017-09-14  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Doc/Zsh/expn.yo, Doc/ZSh/params.yo, Src/params.c,
+	Test/B02typeset.ztst, Test/V10private.ztst: typeset -p output
+	for associative arrays and some rephrasings.
+
 2017-09-13  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* unposted: typo in proceeding Doc noticed by Oliver.

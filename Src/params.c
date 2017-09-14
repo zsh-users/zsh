@@ -5564,9 +5564,7 @@ printparamvalue(Param p, int printflags)
 {
     char *t, **u;
 
-    if (printflags & PRINT_KV_PAIR)
-	putchar(' ');
-    else
+    if (!(printflags & PRINT_KV_PAIR))
 	putchar('=');
 
     /* How the value is displayed depends *
@@ -5721,7 +5719,11 @@ printparamnode(HashNode hn, int printflags)
 	zputs(p->node.nam, stdout);
 	putchar('\n');
     } else {
+	if (printflags & PRINT_KV_PAIR)
+	    putchar('[');
 	quotedzputs(p->node.nam, stdout);
+	if (printflags & PRINT_KV_PAIR)
+	    printf("]=");
 
 	printparamvalue(p, printflags);
     }
