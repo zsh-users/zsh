@@ -111,7 +111,7 @@ allowed for single word shell expansions (this does not include filename
 generation); these are as performed by the parameter expansion flag
 tt(LPAR()e+RPAR()) as described in
 ifzman(zmanref(zshparam))\
-ifnzman(nodref(Parameter Expansion)).
+ifnzman(noderef(Parameter Expansion)).
 
 If no parameter var(name) exists, an ordinary array parameter is created.
 If the parameter var(name) exists and is a scalar, it is replaced by a new
