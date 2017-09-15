@@ -1,3 +1,8 @@
+2017-09-18  Oliver Kiddle  <opk@zsh.org>
+
+	* 41724: Completion/Linux/Command/_ethtool: update
+	completion for new options
+
 2017-09-15  Oliver Kiddle  <opk@zsh.org>
 
 	* 41711: Completion/Unix/Command/_dconf: new dconf completion
