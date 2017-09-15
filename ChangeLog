@@ -1,5 +1,7 @@
 2017-09-15  Oliver Kiddle  <opk@zsh.org>
 
+	* 41711: Completion/Unix/Command/_dconf: new dconf completion
+
 	* 41710: Completion/Unix/Command/_smartmontools:
 	new smartctl completion
 
