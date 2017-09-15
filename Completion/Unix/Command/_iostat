@@ -1,6 +1,7 @@
 #compdef iostat
 
-local -a args
+local -a args parser
+parser=( -s -S -A '-*' )
 
 case $OSTYPE:l in
   *bsd*)
@@ -109,23 +110,32 @@ case $OSTYPE:l in
     )
     ;;
   *linux*)
+    parser=( -s )
     args=(
       '-c[display CPU utilization report]'
       '-d[display device utilization report]'
-      '-T[only display global statistics for group_name]'
-      '-g[display statistics for a group of devices]:group name'
-      '-h[human readable device utilization report]'
-      '-j[display persistent device name]'
+      '*-g[display statistics for a group of devices]:group name'
+      '-H[only display global statistics for group]'
+      '(--human)-h[human readable device utilization report]'
+      '--human[print sizes in human readable format]'
+      '-j[display persistent device name]:name type:(ID LABEL PATH UUID)'
       '(-m)-k[display statistics in kB/s]'
       '(-k)-m[display statistics in MB/s]'
       '-N[display registered device mapper names]'
+      '-o[display statistics in JSON]:format:(JSON)'
+      '-p[display statistics for block devices]'
+      '-t[display the time for each report]'
+      '(- *)-V[display version information]'
+      '-x[display extended statistics]'
+      '-y[omit first statistics report following system boot]'
+      '-z[omit output for devices lacking activity]'
       '*::device:_files -W /dev -g "*(-%)"'
     )
     ;;
 esac
 
 if (( $#args )); then
-  _arguments -s -w -A '-*' : $args
+  _arguments $parser : $args
   return
 fi
 

@@ -1,3 +1,8 @@
+2017-09-15  Oliver Kiddle  <opk@zsh.org>
+
+	* 41709: Completion/Linux/Command/_sysstat,
+	Completion/Unix/Command/_iostat: update options in completion
+
 2017-09-15  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* unposted: Doc/Zsh/params.yo: nodref -> noderef.
