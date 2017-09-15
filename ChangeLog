@@ -1,5 +1,8 @@
 2017-09-15  Oliver Kiddle  <opk@zsh.org>
 
+	* 41710: Completion/Unix/Command/_smartmontools:
+	new smartctl completion
+
 	* 41709: Completion/Linux/Command/_sysstat,
 	Completion/Unix/Command/_iostat: update options in completion
 
