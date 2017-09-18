@@ -428,7 +428,7 @@ execwhile(Estate state, UNUSED(int do_exec))
     } else
         for (;;) {
             state->pc = loop;
-            noerrexit = 1;
+            noerrexit = NOERREXIT_EXIT | NOERREXIT_RETURN;
 
 	    /* In case the test condition is a functional no-op,
 	     * make sure signal handlers recognize ^C to end the loop. */
