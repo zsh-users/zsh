@@ -3,47 +3,63 @@
 local curcontext="$curcontext" ret=1
 local -a actions state line expl
 
-_arguments \
+_arguments -s \
   '(-v --verbose)'{-v,--verbose}'[enable verbose mode]' \
   '--debug[enable debug mode]' \
-  '(-h --hash)'{-h,--hash}'[hash algorithm]:hash algorithm' \
-  '(-c --cipher)'{-c,--cipher}'[set cipher]:cipher specification' \
+  '(-c --cipher)'{-c+,--cipher=}'[set cipher]:cipher specification' \
+  '(-h --hash)'{-h+,--hash=}'[hash algorithm]:hash algorithm' \
   '(-y --verify-passphrase)'{-y,--verify-passphrase}'[query for password twice]' \
-  '(-d --key-file)'{-d,--key-file}'[set keyfile]:key file:_files' \
-  '(-l --keyfile-size)'{-l,--keyfile-size}'[set keyfile size]:size (bytes)' \
-  '--new-keyfile-size[set new keyfile size (luksAddKey)]:size (bytes)' \
-  '--master-key-file[set master key]:key file:_files' \
+  '(-d --key-file)'{-d+,--key-file=}'[set keyfile]:key file:_files' \
+  '--master-key-file=[set master key]:key file:_files' \
   '--dump-master-key[dump luks master key]' \
+  '(-s --key-size)'{-s+,--key-size=}'[set key size]:size (bits)' \
+  '(-l --keyfile-size)'{-l+,--keyfile-size=}'[set keyfile size]:size (bytes)' \
+  '--keyfile-offset=[specify number of bytes to skip in keyfile]:offset (bytes)' \
+  '--new-keyfile-size=[set new keyfile size (luksAddKey)]:size (bytes)' \
+  '--new-keyfile-offset=[specify number of bytes to skip in newly added keyfile]:offset (bytes)' \
+  '(-S --key-slot)'{-S+,--key-slot=}'[select key slot]:key slot' \
+  '(-b --size)'{-b+,--size=}'[force device size]:sectors' \
+  '(-o --offset)'{-o+,--offset=}'[set start offset]:sectors' \
+  '(-p --skip)'{-p+,--skip=}'[data to skip at beginning]:sectors' \
+  '(-r --readonly)'{-r,--readonly}'[create a read-only mapping]' \
+  '(-i --iter-time)'{-i+,--iter-time=}'[set password processing duration]:duration (milliseconds)' \
+  '(-q --batch-mode)'{-q,--batch-mode}"[don't ask for confirmation]" \
+  '(-t --timeout)'{-t+,--timeout=}'[set password prompt timeout]:timeout (seconds)' \
+  '(-T --tries)'{-T+,--tries=}'[set maximum number of retries]:number of retries' \
+  '--align-payload=[set payload alignment]:sectors' \
+  '--header-backup-file=[specify file with LUKS header and keyslots backup]:file:_files' \
   '(--use-urandom)--use-random[use /dev/random to generate volume key]' \
   '(--use-random)--use-urandom[use /dev/urandom to generate volume key]' \
-  '(-S --key-slot)'{-S,--key-slot}'[select key slot]:key slot' \
-  '(-s --key-size)'{-s,--key-size}'[set key size]:size (bits)' \
-  '(-b --size)'{-b,--size}'[force device size]:sectors' \
-  '(-o --offset)'{-o,--offset}'[set start offset]:sectors' \
-  '(-p --skip)'{-p,--skip}'[data to skip at beginning]:sectors' \
-  '--readonly[set up read-only mapping]' \
-  '(-i --iter-time)'{-i,--iter-time}'[set password processing duration]:duration (milliseconds)' \
-  '(-q --batch-mode)'{-q,--batch-mode}'[do not ask for confirmation]' \
-  '(-t --timeout)'{-t,--timeout}'[set password prompt timeout]:timeout (seconds)' \
-  '(-T --tries)'{-T,--tries}'[set maximum number of retries]:number of retries' \
-  '--align-payload[set payload alignment]:sectors' \
-  '--uuid[set device UUID]:uuid' \
+  '--shared[share device with another non-overlapping crypt segment]' \
+  '--uuid=[set device UUID]:uuid' \
+  '--allow-discards[allow discards (aka TRIM) requests for device]' \
+  '--header=[device or file with separated LUKS header]:file:_files' \
+  '--test-passphrase[do not activate device, just check passphrase]' \
+  '--tcrypt-hidden[use hidden header (hidden TCRYPT device)]' \
+  '--tcrypt-system[device is system TCRYPT drive (with bootloader)]' \
+  '--tcrypt-backup[use backup (secondary) TCRYPT header]' \
+  '--veracrypt[scan also for VeraCrypt compatible device]' \
+  '(-M --type)'{-M+,--type=}'[specify type of device metadata]:type:(luks plain loopaes tcrypt)' \
+  '--force-password[disable password quality check (if enabled)]' \
+  '--perf-same_cpu_crypt[use dm-crypt same_cpu_crypt performance compatibility option]' \
+  '--perf-submit_from_crypt_cpus[use dm-crypt submit_from_crypt_cpus performance compatibility option]' \
   '(- : *)--version[show version information]' \
+  '(- : *)'{-\?,--help}'[display help information]' \
+  '(- : *)--usage[display brief usage]' \
   ':action:->actions' \
   '*::arguments:->action-arguments' && ret=0
 
 case $state in
   actions)
     actions=(
-      'create:create a mapping'
-      'remove:remove an existing mapping'
+      'open:open device with named mapping'
+      'close:close device (remove mapping)'
       'status:report mapping status'
       'resize:resize an active mapping'
+      'benchmark:benchmark cipher'
+      'repair:try to repair on-disk metadata'
+      'erase:erase all keyslots'
       'luksFormat:initialize a LUKS partition'
-      'luksOpen:open LUKS partition'
-      'luksClose:remove an existing mapping'
-      'luksSuspend:suspend active device'
-      'luksResume:resume suspended device'
       'luksAddKey:add a new key'
       'luksRemoveKey:remove a key'
       'luksChangeKey:change a key'
@@ -51,6 +67,9 @@ case $state in
       'luksUUID:print/change device UUID'
       'isLuks:check if device is a LUKS partition'
       'luksDump:dump header information'
+      'tcryptDump:dump TCRYPT device information'
+      'luksSuspend:suspend LUKS device and wipe key'
+      'luksResume:resume suspended LUKS device'
       'luksHeaderBackup:store binary backup of headers'
       'luksHeaderRestore:restore header backup'
     )
@@ -61,18 +80,21 @@ case $state in
     local mapping=':mapping:_path_files -W /dev/mapper'
     local device=':device:_files'
     case ${words[1]} in
-      create) args=( $mapping $device );;
+      create) args=( $mapping $device '--type=:type' );;
+      open) args=( $device $mapping '--type=:type' );;
+      (plain|luks|loopaes|tcrypt)Open) args=( $device $mapping '--type=:type' );;
+      benchmark) args=( '--cipher=:cipher' );;
       luksKillSlot) args=( $device ':key slot number' );;
-      luksOpen) args=( $device $mapping );;
-      remove|status|resize|luksClose|luksSuspend|luksResume) args=( $mapping );;
-      luks(AddKey|RemoveKey|DelKey|UUID|Dump)|isLuks) args=( $device );;
+      remove|status|resize|*lose|luksSuspend|luksResume) args=( $mapping );;
+      erase|repair|(luks(AddKey|Erase|RemoveKey|DelKey|UUID|Dump)|isLuks))
+	args=( $device )
+      ;;
       luks(Format|AddKey|RemoveKey|ChangeKey))
 	args=( $device ':key file:_files' )
       ;;
       luksHeader*) args=( $device '--header-backup-file:file:_files' );;
       *)
-        _default
-	return
+        _default && ret=0
       ;;
     esac
     _arguments $args && ret=0

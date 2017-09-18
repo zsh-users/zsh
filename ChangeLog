@@ -1,5 +1,8 @@
 2017-09-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 41726: Completion/Linux/Command/_cryptsetup: add + and = to
+	option specs taking arguments and update options to 1.7.5
+
 	* 41720: Completion/Linux/Command/_chrt,
 	Completion/Linux/Command/_ionice,
 	Completion/Linux/Command/_losetup,
