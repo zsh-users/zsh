@@ -66,14 +66,16 @@ _arguments -C \
   '-f-[set flow control]:flow control:((n\:flow\ control\ off a\:flow\ control\ auto \:flow\ control\ on))' \
   '-h[set the size of the scrollback history buffer]:buffer size' \
   '-i[interrupt output sooner when flow control is on]' \
-  '(-l)-ln[login mode off (do not update utmp database)]' \
+  "(-l)-ln[login mode off (don't update utmp database)]" \
   '(-ln)-l[login mode on (update utmp database)]' \
-  '(-)'{-ls,-list}'[list sessions/socket directory]' \
+  '(- *)'{-ls,-list}'[list sessions/socket directory]: :->any-sessions' \
   "-L[terminal's last character can be safely updated]" \
+  '-Logfile[set logfile name]:log file:_files' \
   '-m[ignore $STY variable, do create a new screen session]' \
   '-O[choose optimal output rather than exact vt100 emulation]' \
   '-p[preselect the named window]:window number or name:((\=\:windowlist -\:blank\ window \:window\ number))' \
   '-q[quiet startup, exit with non-zero return code if unsuccessful]' \
+  '-Q[send response to stdout of command qwery process]:screen command:(echo info lastmsg number select time title windows)' \
   '-r[reattach to a detached screen process]: :->detached-sessions' \
   '-Dr: :->any-sessions' \
   '-dr: :->any-sessions' \
@@ -85,12 +87,12 @@ _arguments -C \
   "-t[set title (window's name)]:title" \
   '-T[use term as $TERM for windows, rather than "screen"]:terminal type:_terminals' \
   '-U[tell screen to use UTF-8 encoding]' \
-  '(-)-v[print screen version]' \
-  '(-)-wipe[do nothing, clean up SockDir]' \
+  '(- *)-v[print screen version]' \
+  '(- *)-wipe[do nothing, clean up SockDir]: :->any-sessions' \
   '-x[attach to a not detached screen (multi display mode)]: :->attached-sessions' \
   '-Dx: :->any-sessions' \
   '-dx: :->any-sessions' \
-  '-X[execute command as a screen command in the specified session]:screencmd:(${scr_cmds[@]})' \
+  '-X[execute command as a screen command in the specified session]:screen command:(${scr_cmds[@]})' \
   '*:: :->normal' && ret=0
 
 if [[ -n $state ]]; then

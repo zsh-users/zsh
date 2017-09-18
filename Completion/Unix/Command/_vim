@@ -1,4 +1,4 @@
-#compdef vim gvim gex gview nvim rvim rview rgvim rgview evim eview vimdiff gvimdiff
+#compdef vim gvim gex gview nvim rvim rview rgvim rgview evim eview vimdiff gvimdiff mvim
 
 (( $+functions[_vim_files] )) ||
 _vim_files () {
@@ -99,7 +99,7 @@ if [[ "$state" = server ]]; then
 elif [[ $state = verbosity ]]; then
   _tags numbers files
   while _tags; do
-    _requested numbers && _describe 'verbosity [10]' "(
+    _requested numbers && _describe -V 'verbosity [10]' "(
       0:don\'t' display any messages'
       1:'display when viminfo file is read or written'
       2:'display sourced files'

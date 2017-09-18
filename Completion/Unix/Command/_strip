@@ -25,6 +25,7 @@ if _pick_variant gnu=GNU solaris --version; then
     '(-s --strip-all)'{-s,--strip-all}'[remove all symbols]'
     '(-g -S -d --strip-debug)'{-g,-S,-d,--strip-debug}'[remove debugging symbols]'
     '--strip-unneeded[remove symbols not needed for relocation processing]'
+    "--no-merge-notes[don't attempt to remove redundant notes]"
     '*'{-K+,--keep-symbol=}'[keep given symbol]:symbol name'
     '*'{-N+,--strip-symbol=}'[strip given symbol]:symbol name'
     '(*)-o+[output file]:output file:_files'

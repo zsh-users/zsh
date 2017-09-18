@@ -8,7 +8,7 @@ local -a state line force alts cmd
 
 _arguments -C $force \
   '(- 1)'{-l,--list}'[list installed software collections or packages within a collection]' \
-  '(-l --list)1:action:(enable run load unload list-collections list-packages man register deregister)' \
+  '(-l --list)1:action:(enable run load unload list-collections list-enabled list-packages man register deregister)' \
   '(- *)--help' \
   '(-)*:collections:->collections' && ret=0
 

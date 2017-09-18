@@ -168,6 +168,7 @@ else
 
     '--color=-[control use of color]:color:(never always auto)'
     "*--hide=[like -I, but overridden by -a or -A]:pattern: "
+    '--hyperlink=[output terminal codes to link files using file::// URI]::when:(none auto always)'
     '(--classify -F --indicator-style -p --file-type)'{--classify,-F}'[append file type indicators]'
     '(--file-type -p --indicator-style -F --classify)--file-type[append file type indicators except *]'
     '(--file-type -p --indicator-style -F --classify)-p[append / to directories]'

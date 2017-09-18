@@ -29,7 +29,7 @@ _arguments -s -S \
   '(-P --physical)'{-P,--physical}'[physical walk, do not follow symbolic links]' \
   '--restore=[restore ACLs]:file:_files' \
   '--test[test mode (ACLs are not modified)]' \
-  '--version[print version and exit]' \
-  '--help[this help text]' \
+  '(- *)'{-v,--version}'[display version information]' \
+  '(- *)'{-h,--help}'[display help information]' \
   '*: :_files'
 fi

@@ -38,17 +38,17 @@ fi
 [[ $service = gpg ]] && args+=(
   '--decrypt-files[decrypt multiple files]'
   '(-b --detach-sign)'{-b,--detach-sign}'[make a detached signature]'
-  '--clearsign[make a clear text signature]'
+  --clear{,-}sign'[make a clear text signature]'
   '--store[store only]'
   '--verify[verify a signature]'
   '--verify-files[verify a list of files]'
   '(-f --encrypt-files)'{-f,--encrypt-files}'[encrypt files]'
-  '--list-keys[list all keys]'
+  '(-k --list-keys)'{-k,--list-keys}'[list all keys]'
   '--list-public-keys[list all public keys]'
-  '--list-secret-keys[list all secret keys]'
-  '--list-sigs[lists keys and signatures]:key attachment:->public-keys'
-  '--list-options[modify what the various --list-* commands show]'
-  '--check-sigs[list key, signatures and check them]:key attachment:->public-keys'
+  '(-K --list-secret-keys)'{-K,--list-secret-keys}'[list all secret keys]'
+  --list-sig{,nature}s'[lists keys and signatures]:key attachment:->public-keys'
+  '--list-options[modify what the various --list-* commands show]: :->option-list'
+  --check-sig{,nature}s'[list key, signatures and check them]:key attachment:->public-keys'
   '--fingerprint[list all keys with their fingerprints]:key attachment:->public-keys'
   '--list-packets[list only the sequence of packets]'
   '--gen-key[generate a new pair key]'
@@ -60,6 +60,7 @@ fi
   '--delete-secret-and-public-keys:key attachment:->secret-keys'
   '--gen-revoke[generate a revocation certificate]'
   '--desig-revoke[generate a designated revocation certificate]'
+  '--passwd[change a passphrase]'
   '--export[export all keys from all keyrings]'
   '--send-keys[send keys to a keyserver]:key attachment:->public-keyids'
   '--export-secret-keys:key attachment:->secret-keys'
@@ -67,7 +68,7 @@ fi
   '--import[import a gpg key from a file]:attachment (file):_files'
   '--fast-import[import a file without adding to trustdb]:attachment (file):_files'
   '--fetch-keys[fetch key at URIs]:uri:'
-  '--recv-keys[receive a list of keys from a keyserver]:key attachment:->public-keyids'
+  --rec{eive,v}-keys'[receive a list of keys from a keyserver]:key attachment:->public-keyids'
   '--refresh-keys[update all keys from a keyserver]'
   '--search-keys[search for keys on a key server]'
   '--update-trustdb[update the trust database]'
@@ -79,7 +80,11 @@ fi
   '--enarmor[en-Armor a file or stdin]'
   '--print-md[print message digests]:algorithm:->ciphers::file:_files'
   '--print-mds[print message digests]::file:_files'
-  '--gen-random:count' '--gen-prime'
+  '--tofu-policy:policy:(good unknown bad ask auto):*:keys:->public-keys'
+  '--tofu-default-policy:policy:(good unknown bad ask auto)'
+  '--quick-generate-key:user-id: :algorithm:(default future-default rsa dsa elg ed25519 cv25519): : _values -s , usage - default sign auth encr::expiration'
+  '--quick-add-key:fingerprint: :algorithm:(default future-default rsa dsa elg ed25519 cv25519): : _values -s , usage - default sign auth encr::expiration'
+  '--gen-random:quality level:(0 1 2):count (bytes)' '--gen-prime'
   '--warranty[print warranty info]'
   '(-a --armor)'{-a,--armor}'[create ASCII armored output]'
   '--default-key[specify default user ID for signatures]:key:->secret-keys'
@@ -126,11 +131,11 @@ fi
   '--s2k-mode:value'
   '--compress-algo:compression algorithm:((0\:disable\ compression 1\:zlib 2\:rfc1950))'
   '--personal-'{cipher,digest,compress}'-preferences:string'
-  '--card-edit[present smartcard menu]' '--card-status[show smartcard content]'
+  --{card-edit,edit-card}'[present smartcard menu]' '--card-status[show smartcard content]'
   '--change-pin[present menu to change smartcard pin]'
   '--list-config[display internal configuration parameters]'
   '--hidden-recipient[hidden recipient]:recipient:->public-keys'
-  '--dump-options[show all options]' '--default-preference-list:string'
+  '--default-preference-list:string'
   '--fetch-keys:URIs'
   '--hidden-encrypt-to:recipient:->public-keys'
   '--compress-level:integer'
@@ -139,17 +144,14 @@ fi
   '--max-output[maximum output generated when processing file]:bytes:'
   '--gpg-agent-info[override GPG_AGENT_INFO]:'
   '--primary-keyring:file:_files'
-  '--verify-options:parameters:_multi_parts -q -S, ","
-    "(show-photos show-policy-urls show-notations show-std-notations
-    show-user-notations show-keyserver-urls show-uid-validity show-unusable-uids
-    show-primary-uid-only pka-lookups pka-trust-increase)"'
+  '--verify-options: :->verify-options'
   '--debug:flags:' '--status-file:file:_files'
   '--attribute-file:file:_files' '--load-extension:file:_files'
   '--s2k-count:integer'
   '--sig-notation:name=value:' '--cert-notation:name=value:'
   '--passphrase-file:file:_files' '--passphrase-repeat:integer:'
   '--command-file:file:_files' '--trustdb-name:file:_files'
-  '--trust-model:trust model:((pgp classic direct always auto))'
+  '--trust-model:trust model:(pgp classic tofu tofu+pgp direct always auto)'
   '--sig-policy-url:string:' '--cert-policy-url:string:'
   '--sig-keyserver-url:string:' '--comment[comment]:comment:'
   '--no-comments[disable comments]'
@@ -163,8 +165,8 @@ fi
   '--multifile[process multiple files]'
   '--keyid-format[key id format]:key format:((short 0xshort long 0xlong))'
   '--exit-on-status-write-error[exit immediately on error write]'
-  '--limit-card-insert-tries:integer:'
-  '--reader-port[card reader port]:port:'
+  '--limit-card-insert-tries:integer'
+  '--reader-port[card reader port]:port'
   '--ctapi-driver[file to use to access smartcard reader]:file:_files'
   '--pcsc-driver[file to use to access smartcard reader]:file:_files'
   '--auto-key-locate:parameters'
@@ -176,7 +178,7 @@ extra=( ${allopts:|extra} )
 _arguments -C -s -S -A "-*" $args $extra '*:args:->args' && ret=0
 
 if [[ $state = args ]]; then
-  if (( ${+opt_args[--export]} || ${+opt_args[--list-keys]} || ${+opt_args[--list-public-keys]} )); then
+  if (( ${+opt_args[--export]} || ${+opt_args[-k]} || ${+opt_args[--list-keys]} || ${+opt_args[--list-public-keys]} )); then
     state=public-keys
   elif (( ${+opt_args[--list-secret-keys]} )); then
     state=secret-keys
@@ -205,19 +207,27 @@ fi
 case "$state" in
   public-keys)
     _wanted public-keys expl 'public key' \
-	compadd ${${(Mo)$(_call_program public-keys gpg $needed --list-public-keys --list-options no-show-photos 2>/dev/null):%<*>}//(<|>)/} && return
+	compadd ${${(Mo)$(_call_program public-keys $words[1] $needed --list-public-keys --list-options no-show-photos):%<*>}//(<|>)/} && return
   ;;
   secret-keys)
     _wanted secret-keys expl 'secret key' compadd \
-	${${(Mo)$(_call_program secret-keys gpg $needed --list-secret-keys --list-options no-show-photos 2>/dev/null):%<*>}//(<|>)/} && return
+	${${(Mo)$(_call_program secret-keys $words[1] $needed --list-secret-keys --list-options no-show-photos):%<*>}//(<|>)/} && return
   ;;
   ciphers)
     _wanted ciphers expl cipher compadd \
-        ${${(s.,.)${(M)${(f)"$(_call_program ciphers gpg $needed --version)"}:#Cipher*}#*:}# } && return
+        ${${(s.,.)${(M)${(f)${"$(_call_program ciphers $words[1] $needed --version)"}//,$'\n' #/, }:#Cipher*}#*:}# } && return
   ;;
   (public-keyids)
     _wanted public-keys expl 'public keyid' \
-	compadd ${${${(M)${(f)"$(_call_program public-keyids gpg $needed --list-public-keys --list-options no-show-photos 2>/dev/null)"}:%pub*}#pub */}%% *} && return
+      compadd ${(M)${${(f)"$(_call_program public-keyids $words[1] $needed --list-public-keys --list-options no-show-photos)"}## #}:#[0-9A-F](#c40)} && return
+  ;;
+  (option-list)
+    _sequence _wanted options expl option \
+        compadd - {no-,}show-{photos,usage,policy-urls,{std,user}-notations,keyserver-urls,uid-validity,unusable-{uids,subkeys},keyring,sig-{expire,subpackets}} && return
+  ;;
+  (verify-options)
+    _sequence _wanted options expl option \
+        compadd - {no-,}show-{photos,policy-urls,{std,user}-notations,keyserver-urls,uid-validity,unusable-uids,primary-uid-only} {no-,}pka-{lookups,trust-increase} && return
   ;;
 esac
 

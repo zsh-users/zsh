@@ -15,6 +15,9 @@ args=(
 )
 
 case $OSTYPE in
+  solaris2.<11->)
+    args+=( '(-c)-A[include absolute timestamps in output]' )
+  ;|
   aix*|solaris*)
     args+=(
       '(-c)-E[include delta timestamps of time spent within the system call]'

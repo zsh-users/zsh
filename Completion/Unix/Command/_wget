@@ -1,6 +1,6 @@
 #compdef wget
 
-local curcontext="$curcontext" state line
+local curcontext="$curcontext" state line expl
 typeset -A opt_args
 
 _arguments -C -s \
@@ -19,12 +19,15 @@ _arguments -C -s \
   '(--force-html -F)'{--force-html,-F}'[treat input file as html]' \
   '(--base -B)'{--base=,-B+}'[prepend URL to relative links]:base URL:_urls' \
   '--config=[specify config file]:config file:_files' \
+  '(--config)--no-config' '--rejected-log=:file:_files' \
   '(--tries -t)'{--tries=,-t+}'[set number of retries]:number of retries' \
   '--retry-connrefused[retry even if connection is refused]' \
   '(--output-document -O)'{--output-document=,-O+}'[specify file to write documents to]:output file:_files' \
   '(--continue -c)'{--continue,-c}'[continue getting an existing file]'  \
+  '--start-pos=:offset' '--show-progress' \
   '--progress=[set progress gauge type]:gauge type:->gauge' \
   '(--timestamping -N)'{--timestamping,-N}'[retrieve only files newer than existing]' \
+  '--no-if-modified-since' \
   "--no-use-server-timestamps[don't set the local file's timestamp by the one on the server]" \
   '(--server-response -S)'{--server-response,-S}'[print server response]' \
   "--spider[don't download anything]" \
@@ -49,11 +52,15 @@ _arguments -C -s \
   '(--http-user --ftp-user)--user[set both ftp and http user]:user' \
   '(--http-password --ftp-password)--password[set both ftp and http password]:password' \
   '(--password --http-password --ftp-password)--ask-password:[prompt for passwords]' \
+  '--use-askpass=:command:_command_names -e' \
   '--no-iri[turn off IRI support]' \
   '--local-encoding=[specify local encoding for IRIs]:encoding' \
   '--remote-encoding=[specify default remote encoding]:encoding' \
   '--unlink[remove file before clobber]' \
+  '--no-xattr[turn off storage of metadata in extended file attributes]' \
+  '(-nd --no-directories)'{-nd,--no-directories}"[don't create directories]" \
   '(--force-directories -x)'{--force-directories,-x}'[force creation of directories]' \
+  '(-nH --no-host-directories)'{-nH,--no-host-directories}"[don't create host directories]" \
   '--protocol-directories[use protocol name in directories]' \
   '(--directory-prefix -P)'{--directory-prefix=,-P+}'[specify prefix to save files to]:prefix:_files -/' \
   '--cut-dirs=:number:' \
@@ -92,15 +99,20 @@ _arguments -C -s \
   '--private-key-type=[specify private key type]:key type:key type:(PEM DER)' \
   "--ca-certificate=[specify file with bundle of CA's]:file:_files" \
   "--ca-directory=[specify dir where hash list of CA's are stored]:directory:_directories" \
+  '--crl-file=[specify file with bundle of CRLs]:file:_files' \
+  '--pinnedpubkey=:file:_files' \
   '--random-file[specify file with random data for seeding generator]:file:_files' \
   '--egd-file=[specify filename of EGD socket]:file:_files' \
+  '--no-hsts[disable HSTS]' \
+  '--hsts-file[specify path of HSTS database]:file:_files' \
   '(--user)--ftp-user=:user' \
   '(--password --ask-password)--ftp-password=:password' \
   "--no-remove-listing[don't remove \`.listing' files]" \
   '--no-glob[turn off FTP file name globbing]' \
   '--no-passive-ftp' \
   '--preserve-permissions[preserve remote file permissions with ftp]' \
-  '--retr-symlinks' \
+  --retr-symlinks --ftps-implicit --ftps-resume-ssl \
+  --ftps-clear-data-connection --ftps-fallback-to-ftp \
   '--warc-file=:file:_files' --warc-header=:string --warc-max-size=:number \
   --warc-cdx --warc-dedup=:file:_files --no-warc-compression --no-warc-digests \
   --no-warc-keep-log --warc-tempdir=:directory:_directories \
@@ -108,6 +120,7 @@ _arguments -C -s \
   '(--level -l)'{--level=,-l+}'[specify maximum recursion depth]:level' \
   '--delete-after' \
   '(--convert-links -k)'{--convert-links,-k}'[convert links to be relative]' \
+  --convert-file-only \
   '--backups=:max backups' \
   '(--backup-converted -K)'{--backup-converted,-K}'[backup files before conversion]' \
   '(--mirror -m -r -N -l)'{--mirror,-m}'[mirror (-r -N -l inf --no-remove-listing)]' \
@@ -129,8 +142,6 @@ _arguments -C -s \
   '(-np --no-parent)'{-np,--no-parent}"[don't ascend to parent directory]" \
   '--no-verbose' \
   '--no-clobber' \
-  '--no-directories' \
-  '--no-host-directories' \
   '--no-use-server-timestamps[do not set timestamp to server provided value]' \
   '--htmlify=:htmlify:' \
   '--no:no:->noflags' \
@@ -154,10 +165,15 @@ case "$state" in
     _values -s , 'filename char restriction' \
       '(windows)unix' \
       '(unix)windows' \
-      '(unix windows)nocontrol'
+      '(unix windows)nocontrol' \
+      ascii \
+      '(uppercase)lowercase' \
+      '(lowercase)uppercase'
   ;;
   header)
     local -a headers
+    local suf=': '
+    compquote suf
     headers=(
              Accept{,-{Charset,Encoding,Language,Datetime}}
              Authorization
@@ -191,7 +207,6 @@ case "$state" in
              X-ATT-DeviceId
              X-Wap-Profile
              )
-    headers=($^headers\\:\ )
-    _describe -t header 'HTTP header' headers
+    _wanted headers expl 'HTTP header' compadd -S $suf -a headers
   ;;
 esac

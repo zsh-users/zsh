@@ -60,6 +60,7 @@ case $OSTYPE in
       '-V[specify vendor-class-identifier option]:option'
       '--request-options[specify list of options the client is to request from the server]:options'
       '--timeout[specify time after which dhclient will decide that no DHCP servers can be contacted]:timeout'
+      '--dad-wait-time[specify maximum time to wait for duplicate address detection]:time (seconds)'
     )
   ;;
 esac

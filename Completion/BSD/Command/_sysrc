@@ -44,9 +44,13 @@ _sysrc() {
     local k v opt
     if (( $+opt_args[lista--L] )); then
       _services && ret=0
-    elif [[ -prefix *=* ]]; then
-      # do you really want to go down this hole?
-      _message -e values value
+    elif compset -P 1 '*='; then
+      case $IPREFIX in
+	*_enable=) _wanted values expl value compadd YES NO && ret=0 ;;
+	*_program=) _files -g "*(-*)" && ret=0 ;;
+	*_interface(|s)=) _net_interfaces && ret=0 ;;
+	*) _message -e values value ;;
+      esac
     else
       if zstyle -T ":completion:${curcontext%:*}:values" verbose; then
         opt=d

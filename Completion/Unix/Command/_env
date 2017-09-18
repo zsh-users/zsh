@@ -7,7 +7,8 @@ case $variant in
   gnu)
     args=(
       '(-)'{-i,--ignore-environment}'[start with empty environment]'
-      '(--ignore-environment -i --help --version)*'{-u,--unset=}'[remove variable from the environment]:env var to remove:_parameters -g "*export*"'
+      '(--ignore-environment -i --help --version)*'{-u+,--unset=}'[remove variable from the environment]:env var to remove:_parameters -g "*export*"'
+      '(-C --chdir)'{-C+,--chdir=}'[change working directory]:directory:_directories'
       '(- *)--help[display help information]'
       '(- *)--version[display version information]'
     )

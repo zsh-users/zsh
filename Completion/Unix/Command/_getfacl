@@ -11,19 +11,19 @@ _arguments -s -S \
   '*: :_files'
 else
 _arguments -s -S \
-  '--access[display the file access control list only]' \
+  '(-a --access)'{-a,--access}'[display the file access control list only]' \
   '(-d --default)'{-d,--default}'[display the default access control list only]' \
-  '--omit-header[do not display the comment header]' \
-  '--all-effective[print all effective rights]' \
-  '--no-effective[print no effective rights]' \
-  '--skip-base[skip files that only have the base entries]' \
+  '(-c --omit-header)'{-c,--omit-header}"[don't display the comment header]" \
+  '(-e --all-effective)'{-e,--all-effective}'[print all effective rights]' \
+  '(-E --no-effective)'{-E,--no-effective}'[print no effective rights]' \
+  '(-s --skip-base)'{-s,--skip-base}'[skip files that only have the base entries]' \
   '(-R --recursive)'{-R,--recursive}'[recurse into subdirectories]' \
   '(-L --logical)'{-L,--logical}'[logical walk, follow symbolic links]' \
-  '(-P --physical)'{-P,--physical}'[physical walk, do not follow symbolic links]' \
-  '--tabular[use tabular output format]' \
-  '--numeric[print numeric user/group identifiers]' \
-  '--absolute-names[don'"'"'t strip leading '"'"'/'"'"' in pathnames]' \
-  '--version[print version and exit]' \
-  '--help[this help text]' \
+  '(-P --physical)'{-P,--physical}"[physical walk, don't follow symbolic links]" \
+  '(-t --tabular)'{-t,--tabular}'[use tabular output format]' \
+  '(-n --numeric)'{-n,--numeric}'[print numeric user/group identifiers]' \
+  '(-p --absolute-names)'{-p,--absolute-names}"[don't strip leading '/' in pathnames]" \
+  '(- *)'{-v,--version}'[display version information]' \
+  '(- *)'{-h,--help}'[display help information]' \
   '*: :_files'
 fi
