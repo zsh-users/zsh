@@ -1,5 +1,8 @@
 2017-09-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 41728: Completion/Unix/Command/_flac (was _metaflac): new
+	completion for flac and update options in metaflac completion
+
 	* 41727: Completion/Unix/Command/_tidy: run tidy -xml-config
 	to get HTML options for completion
 
