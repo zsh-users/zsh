@@ -1,0 +1,15 @@
+#compdef wipefs
+
+_arguments -s -S \
+  '(H -a --all)'{-a,--all}'[wipe all magic strings]' \
+  '(H -b --backup)'{-b,--backup}'[create a signature backup in $HOME]' \
+  '(H -f --force)'{-f,--force}'[force erasure]' \
+  '(H -n --no-act)'{-n,--no-act}'[do everything except the actual write() call]' \
+  '(H -o --offset)'{-o+,--offset=}'[specify offset to erase]:offset (bytes)' \
+  '(H -p --parsable)'{-p,--parsable}'[print out in parsable instead of printable format]' \
+  '(H -q --quiet)'{-q,--quiet}'[suppress output messages]' \
+  '(H -t --types)'{-t+,--types=}'[limit the set of filesystem, RAIDs or partition tables]:type:_file_systems' \
+  '(H)*:disk device:_files -g "*(-%)" -P / -W /' \
+  + '(H)' \
+  '(- *)'{-h,--help}'[display help information]' \
+  '(- *)'{-V,--version}'[display version information]'

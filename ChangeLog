@@ -1,5 +1,11 @@
 2017-09-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 41720: Completion/Linux/Command/_chrt,
+	Completion/Linux/Command/_ionice,
+	Completion/Linux/Command/_losetup,
+	Completion/Linux/Command/_wipefs: update completion of options
+	for util-linux 2.30.1
+
 	* 41725: Completion/BSD/Command/_sysrc,
 	Completion/Linux/Command/_mii-tool,
 	Completion/Redhat/Command/_scl, Completion/Unix/Command/_env,
