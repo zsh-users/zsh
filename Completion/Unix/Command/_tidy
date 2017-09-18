@@ -1,43 +1,31 @@
 #compdef tidy
 
-# HTML Tidy for Linux/x86 released on 1st March 2003
+local -a opts
 
-local -a access autobool boolean doctype encoding
+opts=( ${${${(s.</option>.)"$(_call_program options $words[1] -xml-config)"}##*<name>}/<\/name>*<type>/;} )
+opts=( ${opts/;Integer*/:number} )
+opts=( ${opts/;Boolean*/:boolean:(yes no)} )
+opts=( ${opts/;AutoBool*/:value:(auto yes no)} )
+opts=( ${opts/;(String|Tag)*/:value} )
+opts=( ${opts/(#b);(enum|Encoding|DocType)*<default>(*)<*<example>([^<]#)<*/:value [${match[2]%% *}]:(${(j. .)${(@s., .)match[3]}%% *})} )
+opts=( ${(M)opts:#*:*} )
 
-access=( 1 2 3 )
-boolean=( yes no )
-autobool=( auto $boolean )
-doctype=( auto omit strict loose transitional )
-encoding=( ascii latin1 raw utf8 iso2022 mac utf16le utf16be utf16 win1252 ibm858 big5 shiftjis )
-
-_arguments \
+_arguments -s -A "-*" --$^opts \
   '(-indent -i)'{-indent,-i}'[indent element content]' \
   '-wrap[wrap text at the specified <column> (default is 68)]:column:' \
   '(-upper -u)'{-upper,-u}'[force tags to upper case (default is lower case)]' \
   '(-clean -c)'{-clean,-c}'[replace FONT, NOBR and CENTER tags by CSS]' \
   '(-bare -b)'{-bare,-b}'[strip out smart quotes and em dashes, etc.]' \
+  '(-gdoc -g)'{-gdoc,-g}'[produce clean version of html exported by Google Docs]' \
   '(-numeric -n)'{-numeric,-n}'[output numeric rather than named entities]' \
   '(-errors -e)'{-errors,-e}'[only show errors]' \
   '(-quiet -q)'{-quiet,-q}'[suppress nonessential output]' \
-  '-omit[omit optional end tags]' \
+  '-omit[omit optional start and end tags]' \
   '-xml[specify the input is well formed XML]' \
   '(-asxml -asxhtml -ashtml)'{-asxml,-asxhtml}'[convert HTML to well formed XHTML]' \
   '(-asxml -asxhtml)-ashtml[force XHTML to well formed HTML]' \
   '-access[do additional accessibility checks (<level> = 1, 2, 3)]:priority level:(${access[@]})' \
   '-raw[output values above 127 without conversion to entities]' \
-  '(       -latin0 -latin1 -iso2022 -utf8 -mac -win1252 -ibm858 -utf16le -utf16be -utf16 -shiftjis -big5)-ascii[use US-ASCII for output, ISO-8859-1 for input]' \
-  '(-ascii         -latin1 -iso2022 -utf8 -mac -win1252 -ibm858 -utf16le -utf16be -utf16 -shiftjis -big5)-latin0[use US-ASCII for output, ISO-8859-1 for input]' \
-  '(-ascii -latin0         -iso2022 -utf8 -mac -win1252 -ibm858 -utf16le -utf16be -utf16 -shiftjis -big5)-latin1[use ISO-8859-1 for both input and output]' \
-  '(-ascii -latin0 -latin1          -utf8 -mac -win1252 -ibm858 -utf16le -utf16be -utf16 -shiftjis -big5)-iso2022[use ISO-2022 for both input and output]' \
-  '(-ascii -latin0 -latin1 -iso2022       -mac -win1252 -ibm858 -utf16le -utf16be -utf16 -shiftjis -big5)-utf8[use UTF-8 for both input and output]' \
-  '(-ascii -latin0 -latin1 -iso2022 -utf8      -win1252 -ibm858 -utf16le -utf16be -utf16 -shiftjis -big5)-mac[use MacRoman for input, US-ASCII for output]' \
-  '(-ascii -latin0 -latin1 -iso2022 -utf8 -mac          -ibm858 -utf16le -utf16be -utf16 -shiftjis -big5)-win1252[use Windows-1252 for input, US-ASCII for output]' \
-  '(-ascii -latin0 -latin1 -iso2022 -utf8 -mac -win1252         -utf16le -utf16be -utf16 -shiftjis -big5)-ibm858[use IBM-858 (CP850+Euro) for input, US-ASCII for output]' \
-  '(-ascii -latin0 -latin1 -iso2022 -utf8 -mac -win1252 -ibm858          -utf16be -utf16 -shiftjis -big5)-utf16le[use UTF-16LE for both input and output]' \
-  '(-ascii -latin0 -latin1 -iso2022 -utf8 -mac -win1252 -ibm858 -utf16le          -utf16 -shiftjis -big5)-utf16be[use UTF-16BE for both input and output]' \
-  '(-ascii -latin0 -latin1 -iso2022 -utf8 -mac -win1252 -ibm858 -utf16le -utf16be        -shiftjis -big5)-utf16[use UTF-16 for both input and output]' \
-  '(-ascii -latin0 -latin1 -iso2022 -utf8 -mac -win1252 -ibm858 -utf16le -utf16be -utf16           -big5)-shiftjis[use Shift_JIS for both input and output]' \
-  '(-ascii -latin0 -latin1 -iso2022 -utf8 -mac -win1252 -ibm858 -utf16le -utf16be -utf16 -shiftjis      )-big5[use Big5 for both input and output]' \
   '(-out -o)'{-out,-o}'[specify the output markup file]:output file:_files' \
   '-config[set configuration options from the specified <file>]:configuration file:_files' \
   '-f[write errors to the specified <file>]:error file:_files' \
@@ -46,81 +34,25 @@ _arguments \
   '(- *)'{-help,-h,-\?}'[list the command line options]' \
   '(- *)-help-config[list all configuration options]' \
   '(- *)-show-config[list the current configuration settings]' \
-  '--indent-spaces:number of spaces:' \
-  '--wrap:column:' \
-  '--wrap-attributes:boolean:(${boolean[@]})' \
-  '--wrap-script-literals:boolean:(${boolean[@]})' \
-  '--wrap-sections:boolean:(${boolean[@]})' \
-  '--wrap-asp:boolean:(${boolean[@]})' \
-  '--wrap-jste:boolean:(${boolean[@]})' \
-  '--wrap-php:boolean:(${boolean[@]})' \
-  '--literal-attributes:boolean:(${boolean[@]})' \
-  '--tab-size:tab size:' \
-  '--markup:boolean:(${boolean[@]})' \
-  '--quiet:boolean:(${boolean[@]})' \
-  '--tidy-mark:boolean:(${boolean[@]})' \
-  '--indent:boolean:(${autobool[@]})' \
-  '--indent-attributes:boolean:(${boolean[@]})' \
-  '--hide-endtags:boolean:(${boolean[@]})' \
-  '--input-xml:boolean:(${boolean[@]})' \
-  '--output-xml:boolean:(${boolean[@]})' \
-  '--output-xhtml:boolean:(${boolean[@]})' \
-  '--output-html:boolean:(${boolean[@]})' \
-  '--add-xml-pi:boolean:(${boolean[@]})' \
-  '--add-xml-decl:boolean:(${boolean[@]})' \
-  '--assume-xml-procins:boolean:(${boolean[@]})' \
-  '--raw:boolean:(${boolean[@]})' \
-  '--uppercase-tags:boolean:(${boolean[@]})' \
-  '--uppercase-attributes:boolean:(${boolean[@]})' \
-  '--bare:boolean:(${boolean[@]})' \
-  '--clean:boolean:(${boolean[@]})' \
-  '--logical-emphasis:boolean:(${boolean[@]})' \
-  '--word-2000:boolean:(${boolean[@]})' \
-  '--drop-empty-paras:boolean:(${boolean[@]})' \
-  '--drop-font-tags:boolean:(${boolean[@]})' \
-  '--drop-proprietary-attribute:boolean:(${boolean[@]})' \
-  '--enclose-text:boolean:(${boolean[@]})' \
-  '--enclose-block-text:boolean:(${boolean[@]})' \
-  '--alt-text:alternate text:' \
-  '--add-xml-space:boolean:(${boolean[@]})' \
-  '--fix-bad-comments:boolean:(${boolean[@]})' \
-  '--split:boolean:(${boolean[@]})' \
-  '--break-before-br:boolean:(${boolean[@]})' \
-  '--numeric-entities:boolean:(${boolean[@]})' \
-  '--quote-marks:boolean:(${boolean[@]})' \
-  '--quote-nbsp:boolean:(${boolean[@]})' \
-  '--quote-ampersand:boolean:(${boolean[@]})' \
-  '--write-back:boolean:(${boolean[@]})' \
-  '--keep-time:boolean:(${boolean[@]})' \
-  '--show-warnings:boolean:(${boolean[@]})' \
-  '--error-file:error file:_files' \
-  '--output-file:output file:_files' \
-  '--show-body-only:boolean:(${boolean[@]})' \
-  '--slide-style:style sheet file:_files' \
-  '--new-inline-tags:tag names:' \
-  '--new-blocklevel-tags:tag names:' \
-  '--new-empty-tags:tag names:' \
-  '--new-pre-tags:tag names:' \
-  '--char-encoding:encoding:(${encoding[@]})' \
-  '--input-encoding:encoding:(${encoding[@]})' \
-  '--output-encoding:encoding:(${encoding[@]})' \
-  '--doctype:doctype:(${doctype[@]})' \
-  '--fix-backslash:boolean:(${boolean[@]})' \
-  '--gnu-emacs:boolean:(${boolean[@]})' \
-  '--fix-uri:boolean:(${boolean[@]})' \
-  '--lower-literals:boolean:(${boolean[@]})' \
-  '--hide-comments:boolean:(${boolean[@]})' \
-  '--indent-cdata:boolean:(${boolean[@]})' \
-  '--force-output:boolean:(${boolean[@]})' \
-  '--show-errors:maximum number of errors:' \
-  '--ascii-chars:boolean:(${boolean[@]})' \
-  '--join-classes:boolean:(${boolean[@]})' \
-  '--join-styles:boolean:(${boolean[@]})' \
-  '--escape-cdata:boolean:(${boolean[@]})' \
-  '--repeated-attributes:value:(keep-first keep-last)' \
-  '--output-bom:boolean:(${autobool[@]})' \
-  '--replace-color:boolean:(${boolean[@]})' \
-  '--css-prefix:CSS class name:' \
-  '--accessibility-check:priority level:(${access[@]})' \
-  '--newline:newline character:(LF CRLF CR)' \
-  '*:file:_files'
+  "(*)-help-option[show a description of specified configuration option]:config option:(${(@j. .)opts%%:*})" \
+  '(-lang -language)'{-lang,-language}'[set the two-letter language code]:language:_locales' \
+  '-xml-help[list the command line options in XML format]' \
+  '-xml-config[list all configuration options in XML format]' \
+  "-xml-strings[output all of Tidy's strings in XML format]" \
+  '-xml-error-strings[output error constants and strings in XML format]' \
+  '-xml-options-strings[output option descriptions in XML format]' \
+  '*:file:_files' \
+  + '(encoding)' \
+  '-ascii[use US-ASCII for output, ISO-8859-1 for input]' \
+  '-latin0[use US-ASCII for output, ISO-8859-1 for input]' \
+  '-latin1[use ISO-8859-1 for both input and output]' \
+  '-iso2022[use ISO-2022 for both input and output]' \
+  '-utf8[use UTF-8 for both input and output]' \
+  '-mac[use MacRoman for input, US-ASCII for output]' \
+  '-win1252[use Windows-1252 for input, US-ASCII for output]' \
+  '-ibm858[use IBM-858 (CP850+Euro) for input, US-ASCII for output]' \
+  '-utf16le[use UTF-16LE for both input and output]' \
+  '-utf16be[use UTF-16BE for both input and output]' \
+  '-utf16[use UTF-16 for both input and output]' \
+  '-shiftjis[use Shift_JIS for both input and output]' \
+  '-big5[use Big5 for both input and output]'

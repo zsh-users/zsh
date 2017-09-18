@@ -1,3 +1,8 @@
+2017-09-18  Oliver Kiddle  <opk@zsh.org>
+
+	* 41727: Completion/Unix/Command/_tidy: run tidy -xml-config
+	to get HTML options for completion
+
 2017-09-18  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 41723: Src/loop.c: one more case of 41627 in "while" loops.
