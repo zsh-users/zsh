@@ -1,126 +1,181 @@
-#compdef gnutls-cli gnutls-cli-debug certtool srptool
+#compdef gnutls-cli gnutls-cli-debug gnutls-serv certtool srptool
 
-local _gnutls_supported _gnutls_supported_certtypes
-local _gnutls_supported_protocols _gnutls_supported_macs
-local _gnutls_supported_kx _gnutls_supported_comp
-local _gnutls_cli_common_args
+local -a args
 
-_gnutls_cli_common_args=(
-     '(-d --debug)'{-d,--debug}':debug level'
-     '(-p --port)'{-p,--port}':port'
-     '(-h --help)'{-h,--help}'[help]'
+args=(
+  '(- :)'{-h,--help}'[display help information]'
+  '(- :)--version=[display version information]:information:((v\:simple c\:copyright n\:full))'
+  '(- :)-v[display version information]'
+  '(- :)'{-\!,--more-help}'[display help information through a pager]'
+  '(-d --debug)'{-d,--debug}'[enable debugging]:debug level'
+  \*{-V,--verbose}'[more verbose output]'
 )
 
 case "$service" in
-	(gnutls-cli)
-
-_gnutls_supported="$(gnutls-cli --list)"
-_gnutls_supported_certtypes=(${(s:, :)${${(M)${(f)_gnutls_supported}:#Certificate types:*}#Certificate types: }})
-_gnutls_supported_protocols=(${(s:, :)${${(M)${(f)_gnutls_supported}:#Protocols:*}#Protocols: }})
-_gnutls_supported_ciphers=(${(s:, :)${${(M)${(f)_gnutls_supported}:#Ciphers:*}#Ciphers: }})
-_gnutls_supported_macs=(${(s:, :)${${(M)${(f)_gnutls_supported}:#MACs:*}#MACs: }})
-_gnutls_supported_kx=(${(s:, :)${${(M)${(f)_gnutls_supported}:#Key exchange algorithms:*}#Key exchange algorithms: }})
-_gnutls_supported_comp=(${(s:, :)${${(M)${(f)_gnutls_supported}:#Compression methods:*}#Compression methods: }})
-
-_arguments \
-     "$_gnutls_cli_common_args[@]" \
-     '(-r --resume)'{-r,--resume}'[resume session]' \
-     '(-s --starttls)'{-s,--starttls}'[start TLS on EOF or SIGALRM]' \
-     '--crlf[send CR LF instead of LF]' \
-     '--x509fmtder[use DER format for certificates to read from]' \
-     '(-f --fingerprint)'{-f,--fingerprint}'[send the openpgp fingerprint instead of the key]' \
-     '--disable-extensions[disable all the TLS extensions]' \
-     '--xml[print the certificate information in XML format]' \
-     '--print-cert[print the certificate in PEM format]' \
-     '--recordsize:maximum record size to advertise:' \
-     '(-V --verbose)'{-V,--verbose}'[more verbose output]' \
-     '--ciphers:ciphers to enable:('"$_gnutls_supported_ciphers"')' \
-     '--protocols:protocols to enable:('"$_gnutls_supported_protocols"')' \
-     '--comp:compression methods to enable:('"$_gnutls_supported_comp"')' \
-     '--macs:MACs to enable:('"$_gnutls_supported_macs"')' \
-     '--kx:key exchange methods to enable:('"$_gnutls_supported_kx"')' \
-     '--ctypes:certificate types to enable:('"$_gnutls_supported_certtypes"')' \
-     '--x509cafile:certificate file to use:_files' \
-     '--x509crlfile:CRL file to use:_files' \
-     '--pgpkeyfile:PGP key file to use:_files' \
-     '--pgpkeyring:PGP key ring file to use:_files' \
-     '--pgptrustdb:PGP trustdb file to use:_files' \
-     '--pgpcertfile:PGP public key (certificate) file to use:_files' \
-     '--x509keyfile:X.509 key file to use:_files' \
-     '--x509certfile:X.509 certificate file to use:_files' \
-     '--srpusername:SRP username to use' \
-     '--srppasswd:SRP password to use' \
-     '--insecure[do not require server cert validation]' \
-     '(-l --list)'{-l,--list}'[print list of the supported algorithms/modes]' \
-     '(-v --version)'{-v,--version}'[print version number]' \
-     '--copyright[print license]' \
+  gnutls-*)
+    args+=(
+      '(-p --port)'{-p,--port}'[specify port or service to connect to]:port:_ports'
+    )
+  ;|
+  gnutls-cli*)
+    args+=(
+      '(--app-proto --starttls-proto)'{--app-proto,--starttls-proto}"=[specify application protocol to use to obtain the server's certificate]:protocol:(https ftp smtp imap ldap xmpp lmtp pop3 nntp sieve postgres)"
      ':hostname:_hosts'
+    )
+  ;|
+  gnutls-cli|gnutls-serv)
+    args+=(
+      "--sni-hostname=[specify server's hostname for server name indication extension]:hostname"
+      "--noticket[don't accept session tickets]"
+      '(-u --udp)'{-u,--udp}'[use DTLS (datagram TLS) over UDP]'
+      '--mtu=[set MTU for datagram TLS]:mtu'
+      '--srtp-profiles=[offer SRTP profiles]:string'
+      '(-b --heartbeat)'{-b,--heartbeat}'[activate heartbeat support]'
+      '--x509fmtder[use DER format for certificates to read from]'
+      '--priority=[specify TLS algorithms and protocols to enable]:(NORMAL PFS SECURE128 SECURE192 SUITEB128 SUITEB192 LEGACY PERFORMANCE NONE)'
+      '--x509cafile=[specify certificate file to use]:file:_files'
+      '--x509crlfile=[specify CRL file to use]:file:_files'
+      '--pgpkeyfile=[specify PGP key file to use]:file:_files'
+      '--pgpkeyring=[specify PGP key ring file to use]:file:_files'
+      '--pgpcertfile=[specify PGP public key (certificate) file to use]:file:_files'
+      '--x509keyfile=[specify X.509 key file to use]:file:_files'
+      '--x509certfile=[specify X.509 certificate file to use]:file:_files'
+      '--pgpsubkey=[specify PGP subkey to use]:sub key'
+      '(-l --list -p --port)'{-l,--list}'[print list of the supported algorithms/modes]'
+      '--provider=[specify PKCS #11 provider library]:provider:_files'
+    )
+  ;|
 
-     ;;
-	(gnutls-cli-debug)
+  gnutls-cli)
+    args+=(
+      '--tofu[enable trust on first use authentication]' '!--no-tofu'
+      '--strict-tofu[fail to connect if a known certificate has changed]' '!--no-strict-tofu'
+      '--dane[enable DANE certificate verification (DNSSEC)]' '!--no-dane'
+      '--local-dns[use the local DNS server for DNSSEC resolving]' '!--no-local-dna'
+      '--no-ca-verification[disable CA certificate verification]' '!--ca-verification'
+      '--ocsp[enable OCSP certificate verification]' '!--no-oscp'
+      '(-r --resume)'{-r,--resume}'[establish a session and resume]'
+      '(-e --rehandshake)'{-e,--rehandshake}'[connect, establish a session and rehandshake immediately]'
+      '(-s --starttls)'{-s,--starttls}'[start TLS on EOF or SIGALRM]'
+      '--crlf[send CR LF instead of LF]'
+      '--fastopen[enable TCP Fast Open]'
+      '(-f --fingerprint)'{-f,--fingerprint}'[send the openpgp fingerprint instead of the key]'
+      "--print-cert[print peer's certificate in PEM format]"
+      "--save-cert=[save peer's certificate chain in the specified file in PEM format]:file:_files"
+      "--save-ocsp=[save peer's OCSP status response in the provided file]:file:_files"
+      '--dh-bits=[specify minimum number of bits allowed for DH]:bits'
+      '--srpusername[specify SRP username to use]:username'
+      '--srppasswd[specify SRP password to use]:password'
+      '--pskusername[specify PSK username to use]:username'
+      '--pskkey[specify PSK key to use]:key'
+      "--insecure[don't require server cert validation]"
+      '--ranges[use length-hiding padding to prevent traffic analysis]'
+      '--benchmark-ciphers[benchmark individual ciphers]'
+      '--benchmark-soft-ciphers[benchmark individual software ciphers]'
+      '--benchmark-tls-kx[benchmark TLS key exchange methods]'
+      '--benchmark-tls-ciphers[benchmark TLS ciphers]'
+      '--priority-list[print list of the supported priority strings]'
+      '*--alpn=[enable application layer protocol]:string'
+      '--recordsize=[specify maximum record size to advertize]:record size'
+      "--disable-sni[don't send a Server Name]"
+      '--disable-extensions[disable all the TLS extensions]'
+      '--inline-commands[inline commands of the form ^<cmd>^]'
+      '--inline-commands-prefix=[change delimiter used for inline commands]:delimiter [^]'
+      '--fips140-mode[report status of FIPS140-2 mode in gnutls library]'
+    )
+  ;;
 
-_arguments \
-     "$_gnutls_cli_common_args[@]" \
-     '(-v --verbose)'{-v,--verbose}'[more verbose output]' \
-     ':hostname:_hosts'
+  gnutls-serv)
+    args+=(
+      '--sni-hostname-fatal[send fatal alert on sni-hostname mismatch]'
+      '(-g --generate)'{-g,--generate}'[generate Diffie-Hellman parameters]'
+      '(-q --quiet)'{-q,--quiet}'[suppress some messages]'
+      "--nodb[don't use a resumption database]"
+      '--http[act as an HTTP server]'
+      '--echo[act as an Echo server]'
+      '(-a --disable-client-cert)'{-a,--disable-client-cert}"[don't request a client certificate]"
+      '(-r --require-client-cert)'{-r,--require-client-cert}'[require a client certificate]'
+      '--verify-client-cert[if a client certificate is sent then verify it]'
+      '--dhparams=[specify DH params file to use]:file:_files'
+      '--x509dsakeyfile=[specify alternative X.509 key file to use]:file:_files'
+      '--x509dsacertfile=[specify alternative X.509 certificate file to use]:file:_files'
+      '--x509ecckeyfile=[specify alternative X.509 key file to use]:file:_files'
+      '--x509ecccertfile=[specify alternative X.509 certificate file to use]:file:_files'
+      '--srppasswd=[specify SRP password file to use]:file:_files'
+      '--srppasswdconf=[specify SRP password configuration file to use]:file:_files'
+      '--pskpasswd=[specify PSK password file to use]:file:_files'
+      '--pskhint=[specify PSK identity hint to use]:string'
+      '--ocsp-response=[specify OCSP response to send to client]:file:_files'
+    )
+  ;;
 
-     ;;
+  certtool)
+    args+=(
+      '--infile:input file:_files '
+      '--outfile:output file:_files '
+      '(-s --generate-self-signed)'{-s,--generate-self-signed}'[generate a self-signed certificate]'
+      '(-c --generate-certificate)'{-c,--generate-certificate}'[generate a signed certificate]'
+      '--generate-proxy[generate a proxy certificate]'
+      '--generate-crl[generate a CRL]'
+      '(-u --update-certificate)'{-u,--update-certificate}'[update a signed certificate]'
+      '(-p --generate-privkey)'{-p,--generate-privkey}'[generate a private key]'
+      '(-q --generate-request)'{-q,--generate-request}'[generate a PKCS #10 certificate request]'
+      '(-e --verify-chain)'{-e,--verify-chain}'[verify a PEM encoded certificate chain]'
+      '--verify[verify a PEM encoded certificate chain using a trusted list]'
+      '--verify-crl[verify a CRL]'
+      '--generate-dh-params[generate PKCS #3 encoded Diffie Hellman parameters]'
+      '--get-dh-params[get the included PKCS #3 encoded Diffie Hellman parameters]'
+      '--dh-info[print information PKCS #3 encoded Diffie-Hellman parameters]'
+      '--load-privkey:private key file:_files'
+      '--load-pubkey:public key file:_files'
+      '--load-request:certificate request file:_files'
+      '--load-certificate:certificate file:_files'
+      '--load-ca-privkey:certificate authority private key file:_files'
+      '--load-ca-certificate:certificate authority certificate file:_files'
+      '--password:password'
+      '--hex-numbers[big number in an easier format to parse]'
+      '--cprint[prints certain information is C-friendly format]'
+      '--null-password[enforce a NULL password]'
+      '--empty-password[enforce an empty password]'
+      '(-i --certificate-info)'{-i,--certificate-info}'[print information on a certificate]'
+      '--certificate-pubkey[print certificate public key]'
+      '(-l --crl-info)'{-l,--crl-info}'[print information on a CRL]'
+      '--crq-info[print information on a certificate request]'
+      "--no-crq-extensions[don't use extensions in certificate requests]"
+      '--p12-info[print information on a PKCS #12 structure]'
+      '--p7-info[print information on a PKCS #7 structure]'
+      '--smime-to-p7[convert S/MIME to PKCS #7 structure]'
+      '(-k --key-info)'{-k,--key-info}'[print information on a private key]'
+      '--pgp-key-info[print information on a OpenPGP private key]'
+      '--pubkey-info[print information on a public key]'
+      '--fix-key[regenerate the parameters in a private key]'
+      '--to-p12[generate a PKCS #12 structure]'
+      '(-8 --pkcs8)'{-8,--pkcs8}'[use PKCS #8 format for private keys]'
+      '--dsa[use DSA keys]'
+      '--hash:hash algorithm for signing:(MD5 SHA1 RMD160)'
+      '--export-ciphers[use weak encryption algorithms]'
+      '--inder[use DER format for input certificates and private keys]'
+      '--xml[use XML format for output certificates]'
+      '--outder[use DER format for output certificates and private keys]'
+      '--bits:number of bits for key generation'
+      '--sec-param[specify the security level]:security level:(low normal high ultra)'
+      '--disable-quick-random[use /dev/random for key generation, thus increasing the quality of randomness used]'
+      '--template:template file to use for non-interactive operation:_files'
+      '--pkcs-cipher[specify cipher to use for pkcs operations]:cipher:(3des 3des-pkcs12 aes-128 aes-192 aes-256 rc2-40 arcfour)'
+    )
+  ;;
 
-	(certtool)
-_arguments \
-     '(-s --generate-self-signed)'{-s,--generate-self-signed}'[generate a self-signed certificate]' \
-     '(-c --generate-certificate)'{-c,--generate-certificate}'[generate a signed certificate]' \
-     '--generate-crl[generate a CRL]' \
-     '(-u --update-certificate)'{-u,--update-certificate}'[update a signed certificate]' \
-     '(-p --generate-privkey)'{-p,--generate-privkey}'[generate a private key]' \
-     '(-q --generate-request)'{-q,--generate-request}'[generate a PKCS #10 certificate request]' \
-     '(-e --verify-chain)'{-e,--verify-chain}'[verify a PEM encoded certificate chain]' \
-     '--verify-crl[verify a CRL]' \
-     '--generate-dh-params[generate PKCS #3 encoded Diffie Hellman parameters]' \
-     '--get-dh-params[get the included PKCS #3 encoded Diffie Hellman parameters]' \
-     '--load-privkey:private key file:_files' \
-     '--load-request:certificate request file:_files' \
-     '--load-certificate:certificate file:_files' \
-     '--load-ca-privkey:certificate authority private key file:_files' \
-     '--load-ca-certificate:certificate authority certificate file:_files' \
-     '--password:password' \
-     '(-i --certificate-info)'{-i,--certificate-info}'[print information on a certificate]' \
-     '(-l --crl-info)'{-l,--crl-info}'[print information on a CRL]' \
-     '--p12-info[print information on a PKCS #12 structure]' \
-     '--p7-info[print information on a PKCS #7 structure]' \
-     '--smime-to-p7[convert S/MIME to PKCS #7 structure]' \
-     '(-k --key-info)'{-k,--key-info}'[print information on a private key]' \
-     '--fix-key[regenerate the parameters in a private key]' \
-     '--to-p12[generate a PKCS #12 structure]' \
-     '(-8 --pkcs8)'{-8,--pkcs8}'[use PKCS #8 format for private keys]' \
-     '--dsa[use DSA keys]' \
-     '--hash:hash algorithm for signing:(MD5 SHA1 RMD160)' \
-     '--export-ciphers[use weak encryption algorithms]' \
-     '--inder[use DER format for input certificates and private keys]' \
-     '--xml[use XML format for output certificates]' \
-     '--outder[use DER format for output certificates and private keys]' \
-     '--bits:number of bits for key generation' \
-     '--outfile:output file:_files ' \
-     '--infile:input file:_files ' \
-     '--template:template file to use for non-interactive operation:_files' \
-     '(-d --debug)'{-d,--debug}':debug level' \
-     '(-h --help)'{-h,--help}'[show help]' \
-     '(-v --version)'{-v,--version}'[show version]' \
-     '--copyright[shows license]'
-
-     ;;
-	(srptool)
-
-_arguments \
-     '(-u --username)'{-u,--username}':username:_users' \
-     '(-p --passwd)'{-p,--passwd}':password file:_files' \
-     '(-i --index)'{-i,--index}':index of params in tpasswd.conf' \
-     '(-s --salt)'{-s,--salt}':salt size for crypt algorithm' \
-     '--verify[just verify password]' \
-     '(-c --passwd-conf)'{-c,--passwd-conf}':password conf file:_files' \
-     '--create-conf:generate a tpasswd.conf file:_files' \
-     '(-v --version)'{-v,--version}'[show version]' \
-     '(-h --help)'{-h,--help}'[show help]'
-
-     ;;
+  srptool)
+    args+=(
+      '(-i --index)'{-i+,--index=}':index of params in tpasswd.conf'
+      '(-u --username)'{-u+,--username=}':username:_users'
+      '(-p --passwd)'{-p+,--passwd=}':password file:_files'
+      '(-s --salt)'{-s+,--salt=}'[specify salt size]:salt size for crypt algorithm'
+      '--verify[just verify password]'
+      '(-v --passwd-conf)'{-v+,--passwd-conf=}'[generate a password configuration file]:password conf file:_files'
+      '--create-conf=[generate a tpasswd.conf file]:file:_files'
+    )
+    ;;
 esac
+
+_arguments -s -S $args

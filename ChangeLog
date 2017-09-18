@@ -1,5 +1,8 @@
 2017-09-18  Oliver Kiddle  <opk@zsh.org>
 
+	* 41729: Completion/Unix/Command/_gnutls: update options for
+	gnutls plus cleanup and rearrange the function
+
 	* 41728: Completion/Unix/Command/_flac (was _metaflac): new
 	completion for flac and update options in metaflac completion
 
