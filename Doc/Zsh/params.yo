@@ -93,29 +93,42 @@ indent(tt(set -A) var(name) var(value) ...)
 indent(var(name)tt(=LPAR())var(value) ...tt(RPAR()))
 indent(var(name)tt(=LPAR())tt([)var(key)tt(]=)var(value) ...tt(RPAR()))
 
+If no parameter var(name) exists, an ordinary array parameter is created.
+If the parameter var(name) exists and is a scalar, it is replaced by a new
+array.
+
 In the third form, var(key) is an expression that will be evaluated in
 arithmetic context (in its simplest form, an integer) that gives the
 index of the element to be assigned with var(value).  In this form any
 elements not explicitly mentioned that come before the largest index to
-which a value is assigned will be assigned an empty string. The indices
+which a value is assigned are assigned an empty string.  The indices
 may be in any order.  Note that this syntax is strict: tt([) and tt(]=) must
-not be quoted, while var(key) may not consist of the unquoted string
-tt(]=), but is otherwise treated as a simple string.  Furthermore, all
-elements must match this form or an error is generated; likewise, if the
-first entry does not match this form, any later entry that does is taken
-as a simple value rather than a key / value pair. The enhanced forms of
-subscript expression that may be used when directly subscripting a
+not be quoted, and var(key) may not consist of the unquoted string
+tt(]=), but is otherwise treated as a simple string.  The enhanced forms
+of subscript expression that may be used when directly subscripting a
 variable name, described in the section Array Subscripts below, are not
-available.  Both var(key) and var(value) undergo all forms of expansion
+available.
+
+When assigning with this third form, every element must use this syntax or
+an error is generated.  Likewise, if the first entry does not match this
+form, any later entry that does is taken  as a simple value rather than a
+key / value pair.  Both var(key) and var(value) undergo all forms of expansion
 allowed for single word shell expansions (this does not include filename
 generation); these are as performed by the parameter expansion flag
 tt(LPAR()e+RPAR()) as described in
 ifzman(zmanref(zshparam))\
 ifnzman(noderef(Parameter Expansion)).
+Nested parentheses may surround var(value) and are included as part of the
+value, which is joined into a plain string; this differs from ksh which
+allows the values to themselves be arrays.  A future version of zsh may
+support that.  To cause the brackets to be interpreted as a character
+class for filename generation, and therefore to treat the resulting list
+of files as a set of values, quote the equal sign using any form of quoting.
+Example:
+ifzman()
+indent(var(name)tt(=LPAR())tt([a-z]'='*RPAR()))
 
-If no parameter var(name) exists, an ordinary array parameter is created.
-If the parameter var(name) exists and is a scalar, it is replaced by a new
-array.  To append to an array without changing the existing values, use
+To append to an array without changing the existing values, use
 one of the following:
 ifzman()
 indent(var(name)tt(+=LPAR())var(value) ...tt(RPAR()))
