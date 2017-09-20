@@ -4509,7 +4509,12 @@ getoutput(char *cmd, int qt)
     pid_t pid;
     char *s;
 
-    if (!(prog = parse_string(cmd, 0)))
+    int onc = nocomments;
+    nocomments = (interact && unset(INTERACTIVECOMMENTS));
+    prog = parse_string(cmd, 0);
+    nocomments = onc;
+
+    if (!prog)
 	return NULL;
 
     if ((s = simple_redir_name(prog, REDIR_READ))) {

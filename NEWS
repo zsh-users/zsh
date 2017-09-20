@@ -4,6 +4,14 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
+Changes from 5.4 to 5.4.3
+-------------------------
+
+The effect of the NO_INTERACTIVE_COMMENTS option extends into $(...) and
+`...` command substitutions when used on the command line.  Previously,
+comments were always recognized within command substitutions unless the
+comment character "#" was disabled via reset of $histchars.
+
 Changes from 5.3.1 to 5.4
 -------------------------
 

@@ -1,5 +1,7 @@
 2017-09-20  Barton E. Schaefer  <schaefer@zsh.org>
 
+	* 41736: NEWS, Src/exec.c: NO_INTERACTIVE_COMMENTS in $(...)
+
 	* 41731: Doc/Zsh/params.yo: reformat and expand doc for 41698.
 
 2017-09-18  Oliver Kiddle  <opk@zsh.org>
