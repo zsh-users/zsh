@@ -1,3 +1,8 @@
+2017-09-21  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* unposted (cf. 41707): Src/utils.c: internal: Document the
+	count==0 case of checkrmall().
+
 2017-09-20  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 41736: NEWS, Src/exec.c: NO_INTERACTIVE_COMMENTS in $(...)

@@ -2724,8 +2724,10 @@ checkrmall(char *s)
     else if (count > 0)
 	fprintf(shout, "zsh: sure you want to delete all %d files in ",
 		count);
-    else
+    else {
+	/* We don't know how many files the glob will expand to; see 41707. */
 	fprintf(shout, "zsh: sure you want to delete all the files in ");
+    }
     nicezputs(s, shout);
     if(isset(RMSTARWAIT)) {
 	fputs("? (waiting ten seconds)", shout);
