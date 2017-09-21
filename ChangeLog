@@ -1,5 +1,8 @@
 2017-09-21  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
+	* unposted (cf. 41672): Src/utils.c: checkrmall: Record the
+	41672 bug in a TODO.
+
 	* unposted (cf. 41707): Src/utils.c: internal: Document the
 	count==0 case of checkrmall().
 

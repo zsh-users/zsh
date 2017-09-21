@@ -2709,6 +2709,9 @@ checkrmall(char *s)
     const int max_count = 100;
     if ((rmd = opendir(unmeta(s)))) {
 	int ignoredots = !isset(GLOBDOTS);
+	/* ### TODO: Passing ignoredots here is wrong.  See workers/41672
+	   aka <https://bugs.debian.org/875460>.
+	 */
 	while (zreaddir(rmd, ignoredots)) {
 	    count++;
 	    if (count > max_count)
