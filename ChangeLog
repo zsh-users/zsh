@@ -1,5 +1,7 @@
 2017-09-22  Oliver Kiddle  <opk@zsh.org>
 
+	* 41742: Completion/Unix/Command/_mtr: update for mtr 0.92
+
 	* 41743: Completion/Linux/Command/_tune2fs: update options in
 	completion through e2fsprogs 1.43.6
 
