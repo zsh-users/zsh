@@ -1,5 +1,8 @@
 2017-09-22  Oliver Kiddle  <opk@zsh.org>
 
+	* 41743: Completion/Linux/Command/_tune2fs: update options in
+	completion through e2fsprogs 1.43.6
+
 	* 41732: Completion/Unix/Command/_tmux: bring completion in
 	line with tmux 2.5 - removing completion of mode tables
 
