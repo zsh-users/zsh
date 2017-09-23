@@ -35,6 +35,41 @@
 /**/
 char nulstring[] = {Nularg, '\0'};
 
+/* Check for array assignent with entries like [key]=val.
+ *
+ * Insert Marker node, convert following nodes to list to alternate key
+ * / val form, perform appropriate substitution, and return last
+ * inserted (value) node if found.
+ *
+ * Caller to check errflag.
+ */
+
+/**/
+static LinkNode
+keyvalpairelement(LinkList list, LinkNode node)
+{
+    char *start, *end, *dat;
+
+    if ((start = (char *)getdata(node)) &&
+	start[0] == Inbrack &&
+	(end = strchr(start+1, Outbrack)) &&
+	end[1] == Equals) {
+	static char marker[2] = { Marker, '\0' };
+	*end = '\0';
+
+	dat = start + 1;
+	singsub(&dat);
+	untokenize(dat);
+	setdata(node, marker);
+	node = insertlinknode(list, node, dat);
+	dat = end + 2;
+	singsub(&dat);
+	untokenize(dat);
+	return insertlinknode(list, node, dat);
+    }
+    return NULL;
+}
+
 /* Do substitutions before fork. These are:
  *  - Process substitution: <(...), >(...), =(...)
  *  - Parameter substitution
@@ -46,17 +81,16 @@ char nulstring[] = {Nularg, '\0'};
  *
  * "flag"s contains PREFORK_* flags, defined in zsh.h.
  *
- * "ret_flags" is used to return values from nested parameter
- * substitions.  It may be NULL in which case PREFORK_SUBEXP
- * must not appear in flags; any return value from below
- * will be discarded.
+ * "ret_flags" is used to return PREFORK_* values from nested parameter
+ * substitions.  It may be NULL in which case PREFORK_SUBEXP must not
+ * appear in flags; any return value from below will be discarded.
  */
 
 /**/
 mod_export void
 prefork(LinkList list, int flags, int *ret_flags)
 {
-    LinkNode node, stop = 0;
+    LinkNode node, insnode, stop = 0;
     int keep = 0, asssub = (flags & PREFORK_TYPESET) && isset(KSHTYPESET);
     int ret_flags_local = 0;
     if (!ret_flags)
@@ -64,6 +98,14 @@ prefork(LinkList list, int flags, int *ret_flags)
 
     queue_signals();
     for (node = firstnode(list); node; incnode(node)) {
+	if ((flags & (PREFORK_SINGLE|PREFORK_ASSIGN)) == PREFORK_ASSIGN &&
+	    (insnode = keyvalpairelement(list, node))) {
+	    node = insnode;
+	    *ret_flags |= PREFORK_KEY_VALUE;
+	    continue;
+	}
+	if (errflag)
+	    return;
 	if (isset(SHFILEEXPANSION)) {
 	    /*
 	     * Here and below we avoid taking the address
@@ -400,16 +442,31 @@ quotesubst(char *str)
     return str;
 }
 
+/* Glob entries of a linked list.
+ *
+ * flags are from PREFORK_*, but only two are handled:
+ * - PREFORK_NO_UNTOK: pass into zglob() a flag saying do not untokenise.
+ * - PREFORK_KEY_VALUE: look out for Marker / Key / Value list triads
+ *   and don't glob them.  The key and value should already have
+ *   been untokenised as they are not subject to further expansion.
+ */
+
 /**/
 mod_export void
-globlist(LinkList list, int nountok)
+globlist(LinkList list, int flags)
 {
     LinkNode node, next;
 
     badcshglob = 0;
     for (node = firstnode(list); !errflag && node; node = next) {
 	next = nextnode(node);
-	zglob(list, node, nountok);
+	if ((flags & PREFORK_KEY_VALUE) &&
+	    *(char *)getdata(node) == Marker) {
+	    /* Skip key / value pair */
+	    next = nextnode(nextnode(next));
+	} else {
+	    zglob(list, node, (flags & PREFORK_NO_UNTOK) != 0);
+	}
     }
     if (noerrs)
 	badcshglob = 0;

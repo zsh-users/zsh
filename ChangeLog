@@ -1,3 +1,11 @@
+2017-09-24  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 41754: Doc/Zsh/params.yo, NEWS,  README,
+	Src/Zle/zle_tricky.c, Src/exec.c, Src/params.c, Src/subst.c,
+	Src/zsh.h, Test/B02typeset.ztst, Test/D04parameter.ztst:
+	allow mix of [ind]=val and traditional assignment for normal
+	(but not associative) arrays, add tests.
+
 2017-09-22  Oliver Kiddle  <opk@zsh.org>
 
 	* 41742: Completion/Unix/Command/_mtr: update for mtr 0.92
@@ -2305,7 +2313,7 @@
 2016-10-24  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: NEWS, README: update for 39704.
-	
+
 	* 39704: Src/params.c, Test/B02typeset.ztst, Test/B03print.ztst,
 	Test/V10private.ztst: the output of "typeset -p" uses "export"
 	commands or the "-g" option for parameters that are not local to
@@ -3363,7 +3371,7 @@
 2016-07-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Functions/Misc/add-zle-hook-widget:  Move from Zle/.
-	
+
 	* 38866: Doc/Zsh/contrib.yo: update add-zle-hook-widget for 38850.
 
 	* 38866 (+ tweak 38872): Functions/Zle/add-zle-hook-widget: fix
@@ -4122,7 +4130,7 @@
 	* 37971 (cf. users/21284: Eric Freese):
 	Functions/Zle/bracketed-paste-magic: fix potential issues when
 	interacting with user-defined widgets
-	
+
 	* 37961: Src/Zle/complist.c: in interactive menuselection, use of
 	"compadd -x" (e.g. the "warnings" zstyle) may have replaced the
 	completion list, so skip highlighting of the current selection
@@ -5263,7 +5271,7 @@
 2015-09-30  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* users/20672: Src/text.c: missing "do" in gettext2() for "select"
-	
+
 	* 36707: Src/exec.c, Src/loop.c: distinguish ERR_RETURN value
 	of retflag so that execif() can ignore it in the test sublist
 
@@ -5347,7 +5355,7 @@
 2015-09-28  Jun-ichi Takimoto <takimoto-j@kba.biglobe.ne.jp>
 
 	* 36631: Completion/Unix/Command/_sh,
-	Completion/Unix/Command/_zsh: separate _zsh from _sh	
+	Completion/Unix/Command/_zsh: separate _zsh from _sh
 
 2015-09-26  Barton E. Schaefer  <schaefer@zsh.org>
 
@@ -6349,7 +6357,7 @@
 2015-07-22  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Test/B02typeset.ztst: fix another test for 35581
-	
+
 	* 35582: Test/A06assign.ztst, Test/B02typeset.ztst: test for 35581
 
 	* 35581: Src/params.c: output array assignments with spaces inside
@@ -6708,7 +6716,7 @@
 	occur anywhere in a coredump filename
 
 	* 35476: Src/params.c: Allow setting $0 when POSIX_ARGZERO is
-	not set	
+	not set
 
 2015-06-16  Barton E. Schaefer  <schaefer@zsh.org>
 
@@ -7952,7 +7960,7 @@
 	tty_poll().
 
 	* 34369: Daniel Shahaf: document error / warning codes.
-	
+
 	* 34383: Src/utils.c: new ztrdup() shoud be dupstring().
 
 2015-01-25  Oliver Kiddle  <opk@zsh.org>
@@ -8008,7 +8016,7 @@
 2015-01-22  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34344: Test/V07pcre.ztst: fix 34338, builtins need loading too
-	
+
 	* 34338: Test/V07pcre.ztst: check feature availability
 
 2015-01-22  Marc Finet  <m.dreadlock@gmail.com>
@@ -8348,7 +8356,7 @@
 2014-12-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 34002: Src/Zle/zle_keymap.c: zshcalloc() in init_keymaps()
-	
+
 	* 33992: Src/jobs.c: do not attempt attachtty() for process group
 	zero (which is possible in a linux pid namespace)
 

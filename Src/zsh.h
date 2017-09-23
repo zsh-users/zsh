@@ -223,9 +223,14 @@ struct mathfunc {
  * tokens here.
  */
 /*
- * Marker used in paramsubst for rc_expand_param.
- * Also used in pattern character arrays as guaranteed not to
- * mark a character in a string.
+ * Marker is used in the following special circumstances:
+ * - In paramsubst for rc_expand_param.
+ * - In pattern character arrays as guaranteed not to mark a character in
+ *   a string.
+ * - In assignments with the ASSPM_KEY_VALUE flag set in order to
+ *   mark that there is a key / value pair following.
+ * All the above are local uses --- any case where the Marker has
+ * escaped beyond the context in question is an error.
  */
 #define Marker		((char) 0xa2)
 
@@ -1969,7 +1974,14 @@ enum {
     /* SHWORDSPLIT forced off in nested subst */
     PREFORK_NOSHWORDSPLIT = 0x20,
     /* Prefork is part of a parameter subexpression */
-    PREFORK_SUBEXP        = 0x40
+    PREFORK_SUBEXP        = 0x40,
+    /* Prefork detected an assignment list with [key]=value syntax,
+     * Only used on return from prefork, not meaningful passed down.
+     * Also used as flag to globlist.
+     */
+    PREFORK_KEY_VALUE     = 0x80,
+    /* No untokenise: used only as flag to globlist */
+    PREFORK_NO_UNTOK      = 0x100
 };
 
 /*

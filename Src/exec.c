@@ -2389,60 +2389,6 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag,
     }
 }
 
-/* Check for array assignent with entries like [key]=val.
- *
- * All entries or none must match this form, else error and return 0.
- *
- * Convert list to alternate key / val form, perform
- * appropriate substitution, and return 1 if found.
- *
- * Caller to check errflag.
- */
-
-/**/
-static int
-keyvalpairarray(LinkList vl, int htok)
-{
-    char *start, *end, *dat;
-    LinkNode ve, next;
-
-    if (vl &&
-	(ve = firstnode(vl)) &&
-	(start = (char *)getdata(ve)) &&
-	start[0] == Inbrack &&
-	(end = strchr(start+1, Outbrack)) &&
-	end[1] == Equals) {
-	for (;;) {
-	    *end = '\0';
-	    next = nextnode(ve);
-
-	    dat = start + 1;
-	    if (htok)
-		singsub(&dat);
-	    untokenize(dat);
-	    setdata(ve, dat);
-	    dat = end + 2;
-	    if (htok)
-		singsub(&dat);
-	    untokenize(dat);
-	    insertlinknode(vl, ve, dat);
-	    ve = next;
-	    if (!ve)
-		break;
-	    if (!(start = (char *)getdata(ve)) ||
-		start[0] != Inbrack ||
-		!(end = strchr(start+1, Outbrack)) ||
-		end[1] != Equals) {
-		zerr("bad array element, expected [key]=value: %s",
-		     start);
-		return 0;
-	    }
-	}
-	return 1;
-    }
-    return 0;
-}
-
 /**/
 static void
 addvars(Estate state, Wordcode pc, int addflags)
@@ -2484,10 +2430,6 @@ addvars(Estate state, Wordcode pc, int addflags)
 	    vl = &svl;
 	} else {
 	    vl = ecgetlist(state, WC_ASSIGN_NUM(ac), EC_DUPTOK, &htok);
-	    if (keyvalpairarray(vl, htok)) {
-		myflags |= ASSPM_KEY_VALUE;
-		htok = 0;
-	    }
 	    if (errflag) {
 		state->pc = opc;
 		return;
@@ -2495,25 +2437,28 @@ addvars(Estate state, Wordcode pc, int addflags)
 	}
 
 	if (vl && htok) {
+	    int prefork_ret = 0;
 	    prefork(vl, (isstr ? (PREFORK_SINGLE|PREFORK_ASSIGN) :
-			 PREFORK_ASSIGN), NULL);
+			 PREFORK_ASSIGN), &prefork_ret);
 	    if (errflag) {
 		state->pc = opc;
 		return;
 	    }
+	    if (prefork_ret & PREFORK_KEY_VALUE)
+		myflags |= ASSPM_KEY_VALUE;
 	    if (!isstr || (isset(GLOBASSIGN) && isstr &&
 			   haswilds((char *)getdata(firstnode(vl))))) {
-		globlist(vl, 0);
+		globlist(vl, prefork_ret);
 		/* Unset the parameter to force it to be recreated
 		 * as either scalar or array depending on how many
 		 * matches were found for the glob.
 		 */
 		if (isset(GLOBASSIGN) && isstr)
-		    unsetparam(name);
-	    }
-	    if (errflag) {
-		state->pc = opc;
-		return;
+			unsetparam(name);
+		if (errflag) {
+		    state->pc = opc;
+		    return;
+		}
 	    }
 	}
 	if (isstr && (empty(vl) || !nextnode(firstnode(vl)))) {
@@ -4030,16 +3975,17 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 					  EC_DUPTOK, &htok);
 			    if (asg->value.array)
 			    {
-				if (keyvalpairarray(asg->value.array, 1))
-				    asg->flags |= ASG_KEY_VALUE;
-				else if (!errflag) {
+				if (!errflag) {
+				    int prefork_ret = 0;
 				    prefork(asg->value.array, PREFORK_ASSIGN,
-					    NULL);
+					    &prefork_ret);
 				    if (errflag) {
 					state->pc = opc;
 					break;
 				    }
-				    globlist(asg->value.array, 0);
+				    if (prefork_ret & PREFORK_KEY_VALUE)
+					asg->flags |= ASG_KEY_VALUE;
+				    globlist(asg->value.array, prefork_ret);
 				}
 				if (errflag) {
 				    state->pc = opc;

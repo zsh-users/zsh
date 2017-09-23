@@ -2704,7 +2704,7 @@ setarrvalue(Value v, char **val)
 	    v->pm->gsu.a->setfn(v->pm, val);
     } else if (v->start == -1 && v->end == 0 &&
     	    PM_TYPE(v->pm->node.flags) == PM_HASHED) {
-    	arrhashsetfn(v->pm, val, 1);
+    	arrhashsetfn(v->pm, val, ASSPM_AUGMENT);
     } else if ((PM_TYPE(v->pm->node.flags) == PM_HASHED)) {
 	freearray(val);
 	zerr("%s: attempt to set slice of associative array",
@@ -3186,69 +3186,124 @@ assignaparam(char *s, char **val, int flags)
     if (flags & ASSPM_WARN)
 	check_warn_pm(v->pm, "array", created, may_warn_about_nested_vars);
 
-    if ((flags & ASSPM_KEY_VALUE) && (PM_TYPE(v->pm->node.flags) & PM_ARRAY)) {
-	/*
-	 * This is an ordinary array with key / value pairs.
-	 */
-	int maxlen, origlen;
-	char **aptr, **fullval;
-	zlong *subscripts = (zlong *)zhalloc(arrlen(val) * sizeof(zlong));
-	zlong *iptr = subscripts;
-	if (flags & ASSPM_AUGMENT) {
-	    maxlen = origlen = arrlen(v->pm->gsu.a->getfn(v->pm));
-	} else {
-	    maxlen = origlen = 0;
-	}
-	for (aptr = val; *aptr && aptr[1]; aptr += 2) {
-	    *iptr = mathevali(*aptr);
-	    if (*iptr < 0 ||
-		(!isset(KSHARRAYS) && *iptr == 0)) {
-		unqueue_signals();
-		zerr("bad subscript for direct array assignment: %s", *aptr);
+    /*
+     * At this point, we may have array entries consisting of
+     * - a Marker element --- normally allocated array entry but
+     *   with just Marker char and null
+     * - an array index element --- as normal for associative array,
+     *   but non-standard for normal array which we handle now.
+     * - a value for the indexed element.
+     * This only applies if the flag ASSPM_KEY_VALUE is passed in,
+     * indicating prefork() detected this syntax.
+     *
+     * For associative arrays we just junk the Makrer elements.
+     */
+    if (flags & ASSPM_KEY_VALUE) {
+	char **aptr;
+	if (PM_TYPE(v->pm->node.flags) & PM_ARRAY) {
+	    /*
+	     * This is an ordinary array with key / value pairs.
+	     */
+	    int maxlen, origlen, nextind;
+	    char **fullval;
+	    zlong *subscripts = (zlong *)zhalloc(arrlen(val) * sizeof(zlong));
+	    zlong *iptr = subscripts;
+	    if (flags & ASSPM_AUGMENT) {
+		maxlen = origlen = arrlen(v->pm->gsu.a->getfn(v->pm));
+	    } else {
+		maxlen = origlen = 0;
+	    }
+	    nextind = 0;
+	    for (aptr = val; *aptr; ) {
+		if (**aptr == Marker) {
+		    *iptr = mathevali(*++aptr);
+		    if (*iptr < 0 ||
+			(!isset(KSHARRAYS) && *iptr == 0)) {
+			unqueue_signals();
+			zerr("bad subscript for direct array assignment: %s", *aptr);
+			return NULL;
+		    }
+		    if (!isset(KSHARRAYS))
+			--*iptr;
+		    nextind = *iptr + 1;
+		    ++iptr;
+		    aptr += 2;
+		} else {
+		    ++nextind;
+		    ++aptr;
+		}
+		if (nextind > maxlen)
+		    maxlen = nextind;
+	    }
+	    fullval = zshcalloc((maxlen+1) * sizeof(char *));
+	    if (!fullval) {
+		zerr("array too large");
 		return NULL;
 	    }
-	    if (!isset(KSHARRAYS))
-		--*iptr;
-	    if (*iptr + 1 > maxlen)
-		maxlen = *iptr + 1;
-	    ++iptr;
-	}
-	fullval = zshcalloc((maxlen+1) * sizeof(char *));
-	if (!fullval) {
-	    zerr("array too large");
+	    fullval[maxlen] = NULL;
+	    if (flags & ASSPM_AUGMENT) {
+		char **srcptr = v->pm->gsu.a->getfn(v->pm);
+		for (aptr = fullval; aptr <= fullval + origlen; aptr++) {
+		    *aptr = ztrdup(*srcptr); 
+		    srcptr++;
+		}
+	    }
+	    iptr = subscripts;
+	    nextind = 0;
+	    for (aptr = val; *aptr; ++aptr) {
+		if (**aptr == Marker) {
+		    zsfree(*aptr);
+		    zsfree(*++aptr); /* Index, no longer needed */
+		    fullval[*iptr] = *++aptr;
+		    nextind = *iptr + 1;
+		    ++iptr;
+		} else {
+		    fullval[nextind] = *aptr;
+		    ++nextind;
+		}
+		/* aptr now on value in both cases */
+	    }
+	    if (*aptr) {		/* Shouldn't be possible */
+		DPUTS(1, "Extra element in key / value array");
+		zsfree(*aptr);
+	    }
+	    free(val);
+	    for (aptr = fullval; aptr < fullval + maxlen; aptr++) {
+		/*
+		 * Remember we don't have sparse arrays but and they're null
+		 * terminated --- so any value we don't set has to be an
+		 * empty string.
+		 */
+		if (!*aptr)
+		    *aptr = ztrdup("");
+	    }
+	    setarrvalue(v, fullval);
+	    unqueue_signals();
+	    return v->pm;
+	} else if (PM_TYPE(v->pm->node.flags & PM_HASHED)) {
+	    /*
+	     * We strictly enforce [key]=value syntax for associative
+	     * arrays.  Marker can only indicate a Marker / key / value
+	     * triad; it cannot be there by accident.
+	     *
+	     * It's too inefficient to strip Markers here, and they
+	     * can't be there in the other form --- so just ignore
+	     * them willy nilly lower down.
+	     */
+	    for (aptr = val; *aptr; aptr += 3) {
+		if (**aptr != Marker) {
+		    unqueue_signals();
+		    freearray(val);
+		    zerr("bad [key]=value syntax for associative array");
+		    return NULL;
+		}
+	    }
+	} else {
+	    unqueue_signals();
+	    freearray(val);
+	    zerr("invalid use of [key]=value assignment syntax");
 	    return NULL;
 	}
-	fullval[maxlen] = NULL;
-	if (flags & ASSPM_AUGMENT) {
-	    char **srcptr = v->pm->gsu.a->getfn(v->pm);
-	    for (aptr = fullval; aptr <= fullval + origlen; aptr++) {
-		*aptr = ztrdup(*srcptr); 
-		srcptr++;
-	    }
-	}
-	iptr = subscripts;
-	for (aptr = val; *aptr && aptr[1]; aptr += 2) {
-	    zsfree(*aptr);
-	    fullval[*iptr] = aptr[1];
-	    ++iptr;
-	}
-	if (*aptr) {		/* Shouldn't be possible */
-	    DPUTS(1, "Extra element in key / value array");
-	    zsfree(*aptr);
-	}
-	free(val);
-	for (aptr = fullval; aptr < fullval + maxlen; aptr++) {
-	    /*
-	     * Remember we don't have sparse arrays but and they're null
-	     * terminated --- so any value we don't set has to be an
-	     * empty string.
-	     */
-	    if (!*aptr)
-		*aptr = ztrdup("");
-	}
-	setarrvalue(v, fullval);
-	unqueue_signals();
-	return v->pm;
     }
 
     if (flags & ASSPM_AUGMENT) {
@@ -3741,30 +3796,37 @@ nullsethashfn(UNUSED(Param pm), HashTable x)
 /* Function to set value of an association parameter using key/value pairs */
 
 /**/
-mod_export void
-arrhashsetfn(Param pm, char **val, int augment)
+static void
+arrhashsetfn(Param pm, char **val, int flags)
 {
     /* Best not to shortcut this by using the existing hash table,   *
      * since that could cause trouble for special hashes.  This way, *
      * it's up to pm->gsu.h->setfn() what to do.                     */
-    int alen = arrlen(val);
+    int alen = 0;
     HashTable opmtab = paramtab, ht = 0;
-    char **aptr = val;
+    char **aptr;
     Value v = (Value) hcalloc(sizeof *v);
     v->end = -1;
+
+    for (aptr = val; *aptr; ++aptr) {
+	if (**aptr != Marker)
+	    ++alen;
+    }
 
     if (alen % 2) {
 	freearray(val);
 	zerr("bad set of key/value pairs for associative array");
 	return;
     }
-    if (augment) {
+    if (flags & ASSPM_AUGMENT) {
 	ht = paramtab = pm->gsu.h->getfn(pm);
     }
-    if (alen && (!augment || !paramtab)) {
+    if (alen && (!(flags & ASSPM_AUGMENT) || !paramtab)) {
 	ht = paramtab = newparamtable(17, pm->node.nam);
     }
-    while (*aptr) {
+    for (aptr = val; *aptr; ) {
+	if (**aptr == Marker)
+	    zsfree(*aptr++);
 	/* The parameter name is ztrdup'd... */
 	v->pm = createparam(*aptr, PM_SCALAR|PM_UNSET);
 	/*

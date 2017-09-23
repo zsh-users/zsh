@@ -2268,7 +2268,7 @@ doexpansion(char *s, int lst, int olst, int explincmd)
 	int ng = opts[NULLGLOB];
 
 	opts[NULLGLOB] = 1;
-	globlist(vl, 1);
+	globlist(vl, PREFORK_NO_UNTOK);
 	opts[NULLGLOB] = ng;
     }
     if (errflag)

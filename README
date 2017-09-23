@@ -252,6 +252,17 @@ This is also necessary in the unusual eventuality that the builtins are
 to be overridden by shell functions, since reserved words take
 precedence over functions.
 
+10) For compatilibity with other shells, the syntax
+
+array=([index]=value)
+
+can be used with both assoiative arrays and normal arrays.  In the
+unlikely event that you wish to create an array with an entry
+matching a file whose name consists of one of a range of characters
+matched as a [...] expression, followed by an equal sign, followed
+by arbitrary other charaters, it is now necessary to quote the equals
+sign.
+
 Incompatibilites between 5.0.7 and 5.0.8
 ----------------------------------------
 

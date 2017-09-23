@@ -778,3 +778,18 @@
 >the key
 >the value
 >typeset -A keyvalhash=( ['*']='?not_globbed?' ['another key']='another value' ['the key']='the value' )
+
+  local keyvalarray=(first [2]=second third [6]=sixth seventh [5]=fifth new_sixth)
+  print -l "${keyvalarray[@]}"
+0:mixed syntax [key]=val with normal arrays
+>first
+>second
+>third
+>
+>fifth
+>new_sixth
+>seventh
+
+  local -A keyvalhash=(1 one [2]=two 3 three)
+1:Mixed syntax with [key]=val not allowed for hash.
+?(eval):1: bad [key]=value syntax for associative array

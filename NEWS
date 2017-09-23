@@ -4,7 +4,7 @@ CHANGES FROM PREVIOUS VERSIONS OF ZSH
 
 Note also the list of incompatibilities in the README file.
 
-Changes from 5.4 to 5.4.3
+Changes from 5.4.2 to 5.5
 -------------------------
 
 The effect of the NO_INTERACTIVE_COMMENTS option extends into $(...) and
@@ -12,8 +12,17 @@ The effect of the NO_INTERACTIVE_COMMENTS option extends into $(...) and
 comments were always recognized within command substitutions unless the
 comment character "#" was disabled via reset of $histchars.
 
-Changes from 5.3.1 to 5.4
--------------------------
+An alternative assignment syntax for indicating indices for arrays
+and keys for associative arrays:
+
+typeset -a array=([1]=first [2]=second)
+typeset -A assoc=([key1]=val1 [key2]=val2)
+
+is allowed for compatibility with other shells.  In the case of normal
+arrays the new syntax can be mixed with the old.
+
+Changes from 5.3.1 to 5.4.2
+---------------------------
 
 The 'exec' and 'command' precommand modifiers, and options to them, are
 now parsed after parameter expansion.  Previously, both the modifier and

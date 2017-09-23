@@ -109,10 +109,19 @@ of subscript expression that may be used when directly subscripting a
 variable name, described in the section Array Subscripts below, are not
 available.
 
-When assigning with this third form, every element must use this syntax or
-an error is generated.  Likewise, if the first entry does not match this
-form, any later entry that does is taken  as a simple value rather than a
-key / value pair.  Both var(key) and var(value) undergo all forms of expansion
+The syntaxes with and without the explicit key may be mixed.  Any absent
+var(key) is deduced by incrementing the index from the previously
+assigned element.  Note that it is not treated as an error
+if latter assignements in this form overwrite earlier assignments.
+
+For example, assuming the option tt(KSH_ARRAYS) is not set, the following:
+
+example(array=LPAR()one [3]=three four+RPAR())
+
+causes the array variable tt(array) to contain four elements tt(one),
+an empty string, tt(three) and tt(four), in that order.
+
+Both var(key) and var(value) undergo all forms of expansion
 allowed for single word shell expansions (this does not include filename
 generation); these are as performed by the parameter expansion flag
 tt(LPAR()e+RPAR()) as described in
@@ -120,7 +129,7 @@ ifzman(zmanref(zshparam))\
 ifnzman(noderef(Parameter Expansion)).
 Nested parentheses may surround var(value) and are included as part of the
 value, which is joined into a plain string; this differs from ksh which
-allows the values to themselves be arrays.  A future version of zsh may
+allows the values themselves to be arrays.  A future version of zsh may
 support that.  To cause the brackets to be interpreted as a character
 class for filename generation, and therefore to treat the resulting list
 of files as a set of values, quote the equal sign using any form of quoting.
@@ -158,6 +167,10 @@ ifzman()
 indent(tt(set -A) var(name) var(key) var(value) ...)
 indent(var(name)tt(=LPAR())var(key) var(value) ...tt(RPAR()))
 indent(var(name)tt(=LPAR())tt([)var(key)tt(]=)var(value) ...tt(RPAR()))
+
+Note that only one of the two syntaxes above may be used in any
+given assignment; the forms may not be mixed.  This is unlike the case
+of numerically indexed arrays.
 
 Every var(key) must have a var(value) in this case.  Note that this
 assigns to the entire array, deleting any elements that do not appear in
