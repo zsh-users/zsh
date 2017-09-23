@@ -1911,6 +1911,7 @@ struct tieddata {
 				  * necessarily want to match multiple
 				  * elements
 				  */
+#define SCANPM_CHECKING   (1<<10) /* Check if set, no need to create */
 /* "$foo[@]"-style substitution
  * Only sign bit is significant
  */

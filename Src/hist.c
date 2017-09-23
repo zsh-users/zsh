@@ -1083,7 +1083,6 @@ hbegin(int dohist)
     } else
 	histactive = HA_ACTIVE | HA_NOINC;
 
-    hf = getsparam("HISTFILE");
     /*
      * For INCAPPENDHISTORYTIME, when interactive, save the history here
      * as it gives a better estimate of the times of commands.
@@ -1104,8 +1103,10 @@ hbegin(int dohist)
      */
     if (isset(INCAPPENDHISTORYTIME) && !isset(SHAREHISTORY) &&
 	!isset(INCAPPENDHISTORY) &&
-	!(histactive & HA_NOINC) && !strin && histsave_stack_pos == 0)
+	!(histactive & HA_NOINC) && !strin && histsave_stack_pos == 0) {
+	hf = getsparam("HISTFILE");
 	savehistfile(hf, 0, HFILE_USE_OPTIONS | HFILE_FAST);
+    }
 }
 
 /**/

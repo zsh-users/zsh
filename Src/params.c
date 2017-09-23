@@ -1204,7 +1204,7 @@ isident(char *s)
 /**/
 static zlong
 getarg(char **str, int *inv, Value v, int a2, zlong *w,
-       int *prevcharlen, int *nextcharlen)
+       int *prevcharlen, int *nextcharlen, int flags)
 {
     int hasbeg = 0, word = 0, rev = 0, ind = 0, down = 0, l, i, ishash;
     int keymatch = 0, needtok = 0, arglen, len, inpar = 0;
@@ -1407,6 +1407,8 @@ getarg(char **str, int *inv, Value v, int a2, zlong *w,
 	if (ishash) {
 	    HashTable ht = v->pm->gsu.h->getfn(v->pm);
 	    if (!ht) {
+		if (flags & SCANPM_CHECKING)
+		    return isset(KSHARRAYS) ? 1 : 0;
 		ht = newparamtable(17, v->pm->node.nam);
 		v->pm->gsu.h->setfn(v->pm, ht);
 	    }
@@ -1848,7 +1850,8 @@ getindex(char **pptr, Value v, int flags)
 	zlong we = 0, dummy;
 	int startprevlen, startnextlen;
 
-	start = getarg(&s, &inv, v, 0, &we, &startprevlen, &startnextlen);
+	start = getarg(&s, &inv, v, 0, &we, &startprevlen, &startnextlen,
+		       flags);
 
 	if (inv) {
 	    if (!v->isarr && start != 0) {
@@ -1922,7 +1925,7 @@ getindex(char **pptr, Value v, int flags)
 
 	    if ((com = (*s == ','))) {
 		s++;
-		end = getarg(&s, &inv, v, 1, &dummy, NULL, NULL);
+		end = getarg(&s, &inv, v, 1, &dummy, NULL, NULL, flags);
 	    } else {
 		end = we ? we : start;
 	    }

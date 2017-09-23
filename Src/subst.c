@@ -2446,7 +2446,13 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
      */
     if (!subexp || aspar) {
 	char *ov = val;
-
+	int scanflags = hkeys | hvals;
+	if (arrasg)
+	    scanflags |= SCANPM_ASSIGNING;
+	if (qt)
+	    scanflags |= SCANPM_DQUOTED;
+	if (chkset)
+	    scanflags |= SCANPM_CHECKING;
 	/*
 	 * Second argument: decide whether to use the subexpression or
 	 *   the string next on the line as the parameter name.
@@ -2475,9 +2481,7 @@ paramsubst(LinkList l, LinkNode n, char **str, int qt, int pf_flags,
 	if (!(v = fetchvalue(&vbuf, (subexp ? &ov : &s),
 			     (wantt ? -1 :
 			      ((unset(KSHARRAYS) || inbrace) ? 1 : -1)),
-			     hkeys|hvals|
-			     (arrasg ? SCANPM_ASSIGNING : 0)|
-			     (qt ? SCANPM_DQUOTED : 0))) ||
+			     scanflags)) ||
 	    (v->pm && (v->pm->node.flags & PM_UNSET)) ||
 	    (v->flags & VALFLAG_EMPTY))
 	    vunset = 1;
