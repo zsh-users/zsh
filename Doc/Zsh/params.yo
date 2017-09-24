@@ -109,7 +109,7 @@ of subscript expression that may be used when directly subscripting a
 variable name, described in the section Array Subscripts below, are not
 available.
 
-The syntaxes with and without the explicit key may be mixed.  Any absent
+The syntaxes with and without the explicit key may be mixed.  An implicit
 var(key) is deduced by incrementing the index from the previously
 assigned element.  Note that it is not treated as an error
 if latter assignements in this form overwrite earlier assignments.
