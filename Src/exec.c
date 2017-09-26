@@ -3999,8 +3999,15 @@ execcmd_exec(Estate state, Execcmd_params eparams,
 		    state->pc = opc;
 		}
 		dont_queue_signals();
-		if (!errflag)
-		    lastval = execbuiltin(args, assigns, (Builtin) hn);
+		if (!errflag) {
+		    int ret = execbuiltin(args, assigns, (Builtin) hn);
+		    /*
+		     * In case of interruption assume builtin status
+		     * is less useful than what interrupt set.
+		     */
+		    if (!(errflag & ERRFLAG_INT))
+			lastval = ret;
+		}
 		if (do_save & BINF_COMMAND)
 		    errflag &= ~ERRFLAG_ERROR;
 		restore_queue_signals(q);

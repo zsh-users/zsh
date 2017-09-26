@@ -1,3 +1,8 @@
+2017-09-26  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41761: Src/exec.c: Ensure status from interrupt is propagated
+	from builtin.
+
 2017-09-25  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 41747: Sr/hist.c, Src/params.c, Src/subst.c. Src/zsh.h: add
