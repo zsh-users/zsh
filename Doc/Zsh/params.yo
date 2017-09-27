@@ -112,7 +112,7 @@ available.
 The syntaxes with and without the explicit key may be mixed.  An implicit
 var(key) is deduced by incrementing the index from the previously
 assigned element.  Note that it is not treated as an error
-if latter assignements in this form overwrite earlier assignments.
+if latter assignments in this form overwrite earlier assignments.
 
 For example, assuming the option tt(KSH_ARRAYS) is not set, the following:
 
@@ -121,7 +121,11 @@ example(array=LPAR()one [3]=three four+RPAR())
 causes the array variable tt(array) to contain four elements tt(one),
 an empty string, tt(three) and tt(four), in that order.
 
-Both var(key) and var(value) undergo all forms of expansion
+In the forms where only var(value) is specified, full command
+line expansion is performed.
+
+In the tt([)var(key)tt(]=)var(value) form,
+both var(key) and var(value) undergo all forms of expansion
 allowed for single word shell expansions (this does not include filename
 generation); these are as performed by the parameter expansion flag
 tt(LPAR()e+RPAR()) as described in
@@ -145,7 +149,8 @@ indent(var(name)tt(+=LPAR())tt([)var(key)tt(]=)var(value) ...tt(RPAR()))
 
 In the second form var(key) may specify an existing index as well as an
 index off the end of the old array; any existing value is overwritten by
-var(value).
+var(value).  Also, it is possible to use tt([)var(key)tt(]+=)var(value)
+to append to the existing value at that index.
 
 Within the parentheses on the right hand side of either form of the
 assignment, newlines and semicolons are treated the same as white space,
@@ -180,7 +185,11 @@ indent(var(name)tt(+=LPAR())var(key) var(value) ...tt(RPAR()))
 indent(var(name)tt(+=LPAR())tt([)var(key)tt(]=)var(value) ...tt(RPAR()))
 
 This adds a new key/value pair if the key is not already present, and
-replaces the value for the existing key if it is.
+replaces the value for the existing key if it is.  In the second
+form it is also possible to use tt([)var(key)tt(]+=)var(value) to
+append to the existing value at that key.  Expansion is performed
+identically to the corresponding forms for normal arrays, as
+described above.
 
 To create an empty array (including associative arrays), use one of:
 ifzman()

@@ -2302,3 +2302,37 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >KVA2two
 >KVA3three
 >*
+
+  local -a keyvalarray
+  keyvalarray=(1 2 3)
+  keyvalarray+=([1]+=a [2]=b)
+  print $keyvalarray
+0:Append to element(s) of array
+>1a b 3
+
+  local -A keyvalhash
+  keyvalhash=([a]=a [b]=b [c]=c)
+  keyvalhash+=([a]+=yee [b]=ee)
+  local key val
+  for key in "${(ok)keyvalhash[@]}"; do
+    val=${keyvalhash[$key]}
+    print -r -- $key $val
+  done
+0:Append to element(s) of associative array
+>a ayee
+>b ee
+>c c
+
+  local -a keyvalarray
+  keyvalarray=([1]=who [2]=anyway [1]+=is [1]+=that [1]+=mysterious [1]+=man)
+  print -rl -- "${keyvalarray[@]}"
+0:Append to element of associative array on creation
+>whoisthatmysteriousman
+>anyway
+
+  local -A keyvalhash
+  keyvalhash=([one]=hows [one]+=your [one]+=father [one]+=today)
+  print -rl -- ${(kv)keyvalhash}
+0:Append to element of associative array on creation
+>one
+>howsyourfathertoday

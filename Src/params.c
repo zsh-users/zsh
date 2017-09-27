@@ -3208,13 +3208,15 @@ assignaparam(char *s, char **val, int flags)
 	     * This is an ordinary array with key / value pairs.
 	     */
 	    int maxlen, origlen, nextind;
-	    char **fullval;
+	    char **fullval, **origptr;
 	    zlong *subscripts = (zlong *)zhalloc(arrlen(val) * sizeof(zlong));
 	    zlong *iptr = subscripts;
 	    if (flags & ASSPM_AUGMENT) {
-		maxlen = origlen = arrlen(v->pm->gsu.a->getfn(v->pm));
+		origptr = v->pm->gsu.a->getfn(v->pm);
+		maxlen = origlen = arrlen(origptr);
 	    } else {
 		maxlen = origlen = 0;
+		origptr = NULL;
 	    }
 	    nextind = 0;
 	    for (aptr = val; *aptr; ) {
@@ -3245,25 +3247,36 @@ assignaparam(char *s, char **val, int flags)
 	    }
 	    fullval[maxlen] = NULL;
 	    if (flags & ASSPM_AUGMENT) {
-		char **srcptr = v->pm->gsu.a->getfn(v->pm);
+		char **srcptr = origptr;
 		for (aptr = fullval; aptr <= fullval + origlen; aptr++) {
-		    *aptr = ztrdup(*srcptr); 
+		    *aptr = ztrdup(*srcptr);
 		    srcptr++;
 		}
 	    }
 	    iptr = subscripts;
 	    nextind = 0;
 	    for (aptr = val; *aptr; ++aptr) {
+		char *old;
 		if (**aptr == Marker) {
+		    int augment = ((*aptr)[1] == '+');
 		    zsfree(*aptr);
 		    zsfree(*++aptr); /* Index, no longer needed */
-		    fullval[*iptr] = *++aptr;
+		    old = fullval[*iptr];
+		    if (augment && old) {
+			fullval[*iptr] = bicat(old, *++aptr);
+			zsfree(*aptr);
+		    } else {
+			fullval[*iptr] = *++aptr;
+		    }
 		    nextind = *iptr + 1;
 		    ++iptr;
 		} else {
+		    old = fullval[nextind];
 		    fullval[nextind] = *aptr;
 		    ++nextind;
 		}
+		if (old)
+		    zsfree(old);
 		/* aptr now on value in both cases */
 	    }
 	    if (*aptr) {		/* Shouldn't be possible */
@@ -3828,8 +3841,20 @@ arrhashsetfn(Param pm, char **val, int flags)
 	ht = paramtab = newparamtable(17, pm->node.nam);
     }
     for (aptr = val; *aptr; ) {
-	if (**aptr == Marker)
+	int eltflags = 0;
+	if (**aptr == Marker) {
+	    /* Either all elements have Marker or none. Checked in caller. */
+	    if ((*aptr)[1] == '+') {
+		/* Actually, assignstrvalue currently doesn't handle this... */
+		eltflags = ASSPM_AUGMENT;
+		/* ...so we'll use the trick from setsparam(). */
+		v->start = INT_MAX;
+	    } else {
+		v->start = 0;
+	    }
+	    v->end = -1;
 	    zsfree(*aptr++);
+	}
 	/* The parameter name is ztrdup'd... */
 	v->pm = createparam(*aptr, PM_SCALAR|PM_UNSET);
 	/*
@@ -3840,7 +3865,7 @@ arrhashsetfn(Param pm, char **val, int flags)
 	    v->pm = (Param) paramtab->getnode(paramtab, *aptr);
 	zsfree(*aptr++);
 	/* ...but we can use the value without copying. */
-	setstrvalue(v, *aptr++);
+	assignstrvalue(v, *aptr++, eltflags);
     }
     paramtab = opmtab;
     pm->gsu.h->setfn(pm, ht);

@@ -228,7 +228,9 @@ struct mathfunc {
  * - In pattern character arrays as guaranteed not to mark a character in
  *   a string.
  * - In assignments with the ASSPM_KEY_VALUE flag set in order to
- *   mark that there is a key / value pair following.
+ *   mark that there is a key / value pair following.  If this
+ *   comes from [key]=value the Marker is followed by a null;
+ *   if from [key]+=value the Marker is followed by a '+' then a null.
  * All the above are local uses --- any case where the Marker has
  * escaped beyond the context in question is an error.
  */

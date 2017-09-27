@@ -53,16 +53,25 @@ keyvalpairelement(LinkList list, LinkNode node)
     if ((start = (char *)getdata(node)) &&
 	start[0] == Inbrack &&
 	(end = strchr(start+1, Outbrack)) &&
-	end[1] == Equals) {
+	/* ..]=value or ]+=Value */
+	(end[1] == Equals ||
+	 (end[1] == '+' && end[2] == Equals))) {
 	static char marker[2] = { Marker, '\0' };
+	static char marker_plus[3] = { Marker, '+', '\0' };
 	*end = '\0';
 
 	dat = start + 1;
 	singsub(&dat);
 	untokenize(dat);
-	setdata(node, marker);
-	node = insertlinknode(list, node, dat);
-	dat = end + 2;
+	if (end[1] == '+') {
+	    setdata(node, marker_plus);
+	    node = insertlinknode(list, node, dat);
+	    dat = end + 3;
+	} else {
+	    setdata(node, marker);
+	    node = insertlinknode(list, node, dat);
+	    dat = end + 2;
+	}
 	singsub(&dat);
 	untokenize(dat);
 	return insertlinknode(list, node, dat);

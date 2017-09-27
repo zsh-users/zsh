@@ -1,3 +1,9 @@
+2017-09-27  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41764 (test tweaked): Doc/Zsh/params.yo, Src/params.c,
+	Src/subst.c, Src/zsh.h, Test/D04parameter.ztst: allow
+	[key]+=value when modifying array or associative array.
+
 2017-09-26  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41761: Src/exec.c: Ensure status from interrupt is propagated
