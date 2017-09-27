@@ -1,3 +1,8 @@
+2017-09-28  Oliver Kiddle  <opk@zsh.org>
+
+	* 41762: Completion/Zsh/Context/_value: fix for completion
+	in assignment to associative array element
+
 2017-09-27  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 41767: Src/exec.c: preserve nonzero exit status on interrupt

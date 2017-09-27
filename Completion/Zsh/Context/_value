@@ -22,7 +22,7 @@ if [[ "$service" != -value-,* ]]; then
             -value-,{${compstate[parameter]},-default-},${^strs}
 else
   if [[ "$compstate[parameter]" != *-* &&
-        "$compstate[context]" = *value &&
+        "$compstate[context]" = array_value &&
         "${(Pt)${compstate[parameter]}}" = assoc* ]]; then
     local expl
     if (( CURRENT & 1 )); then
