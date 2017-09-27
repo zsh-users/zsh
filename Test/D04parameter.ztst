@@ -2231,6 +2231,20 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >two
 >three
 
+  (setopt KSH_ARRAYS
+  local keyvalarray
+  keyvalarray=([0]=one [2]=three)
+  print -l "${keyvalarray[@]}"
+  keyvalarray+=([1]=two)
+  print -l "${keyvalarray[@]}")
+0:[key]=val for normal arrays with KSH_ARRAYS
+>one
+>
+>three
+>one
+>two
+>three
+
  typeset -A keyvalhash
  touch foo Xnot_globbedX
  key="another key" val="another value"
@@ -2255,6 +2269,17 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
  print $#keyvalarray
  print $keyvalarray
 0:append to normal array using [key]=val
+>7
+>1 2 3 4 5 6 7
+
+ (setopt KSH_ARRAYS
+ local keyvalarray
+ keyvalarray=(1 2 3)
+ keyvalarray+=([4]=5 [6]=7)
+ keyvalarray+=([3]=4 [5]=6)
+ print ${#keyvalarray[*]}
+ print ${keyvalarray[*]})
+0:append to normal array using [key]=val with KSH_ARRAYS
 >7
 >1 2 3 4 5 6 7
 
@@ -2288,6 +2313,19 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >new_sixth
 >seventh
 
+  (setopt KSH_ARRAYS
+  local keyvalarray
+  keyvalarray=(first [1]=second third [5]=sixth seventh [4]=fifth new_sixth)
+  print -l "${keyvalarray[@]}")
+0:mixed syntax [key]=val with normal arrays with KSH_ARRAYS
+>first
+>second
+>third
+>
+>fifth
+>new_sixth
+>seventh
+
   local -A keyvalhash
   keyvalhash=(1 one [2]=two 3 three)
 1:Mixed syntax with [key]=val not allowed for hash.
@@ -2303,11 +2341,30 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 >KVA3three
 >*
 
+  (setopt KSH_ARRAYS
+  touch KVA1one KVA2two KVA3three
+  local keyvalarray
+  keyvalarray=(KVA* [3]=*)
+  print -l "${keyvalarray[@]}")
+0:Globbing in non-[key]=val parts of mixed syntax with KSH_ARRAYS
+>KVA1one
+>KVA2two
+>KVA3three
+>*
+
   local -a keyvalarray
   keyvalarray=(1 2 3)
   keyvalarray+=([1]+=a [2]=b)
   print $keyvalarray
 0:Append to element(s) of array
+>1a b 3
+
+  (setopt KSH_ARRAYS
+  local -a keyvalarray
+  keyvalarray=(1 2 3)
+  keyvalarray+=([0]+=a [1]=b)
+  print ${keyvalarray[*]})
+0:Append to element(s) of array with KSH_ARRAYS
 >1a b 3
 
   local -A keyvalhash
@@ -2326,7 +2383,15 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
   local -a keyvalarray
   keyvalarray=([1]=who [2]=anyway [1]+=is [1]+=that [1]+=mysterious [1]+=man)
   print -rl -- "${keyvalarray[@]}"
-0:Append to element of associative array on creation
+0:Append to element of array on creation
+>whoisthatmysteriousman
+>anyway
+
+  (setopt KSH_ARRAYS
+  local -a keyvalarray
+  keyvalarray=([0]=who [1]=anyway [0]+=is [0]+=that [0]+=mysterious [0]+=man)
+  print -rl -- "${keyvalarray[@]}")
+0:Append to element of array on creation with KSH_ARRAYS
 >whoisthatmysteriousman
 >anyway
 

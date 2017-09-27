@@ -12,6 +12,9 @@
 
 2017-09-27  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* 41773: Test/D04parameter.ztst: Array index assignment tests
+	for KSH_ARRAYS.
+
 	* 41764 (test tweaked): Doc/Zsh/params.yo, Src/params.c,
 	Src/subst.c, Src/zsh.h, Test/D04parameter.ztst: allow
 	[key]+=value when modifying array or associative array.
