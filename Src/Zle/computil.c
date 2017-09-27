@@ -1824,7 +1824,7 @@ ca_inactive(Cadef d, char **xor, int cur, int opts)
 	char *x;
         /* current word could be a prefix of a longer one so only do
 	 * exclusions for single-letter options (for option clumping) */
-	int single = (cur == compcurrent);
+	int single = !opts && (cur == compcurrent);
 
 	for (; (x = (opts ? "-" : *xor)); xor++) {
 	    int excludeall = 0;

@@ -1,5 +1,8 @@
 2017-09-28  Oliver Kiddle  <opk@zsh.org>
 
+	* 41772: Src/Zle/computil.c, Test/Y03arguments.ztst: fix bug
+	in handling of long options with _arguments' -A option
+
 	* 41762: Completion/Zsh/Context/_value: fix for completion
 	in assignment to associative array element
 
