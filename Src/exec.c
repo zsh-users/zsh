@@ -3199,7 +3199,8 @@ execcmd_exec(Estate state, Execcmd_params eparams,
     }
 
     if (errflag) {
-	lastval = 1;
+	if (!lastval)
+	    lastval = 1;
 	if (oautocont >= 0)
 	    opts[AUTOCONTINUE] = oautocont;
 	return;
