@@ -101,6 +101,19 @@ zlong lastval,		/* $?           */
      rprompt_indent,	/* $ZLE_RPROMPT_INDENT */
      ppid,		/* $PPID        */
      zsh_subshell;	/* $ZSH_SUBSHELL */
+
+/* $FUNCNEST    */
+/**/
+mod_export
+zlong zsh_funcnest =
+#ifdef MAX_FUNCTION_DEPTH
+    MAX_FUNCTION_DEPTH
+#else
+    /* Disabled by default but can be enabled at run time */
+    -1
+#endif
+    ;
+
 /**/
 zlong lineno,		/* $LINENO      */
      zoptind,		/* $OPTIND      */
@@ -337,6 +350,7 @@ IPDEF5("COLUMNS", &zterm_columns, zlevar_gsu),
 IPDEF5("LINES", &zterm_lines, zlevar_gsu),
 IPDEF5U("ZLE_RPROMPT_INDENT", &rprompt_indent, rprompt_indent_gsu),
 IPDEF5("SHLVL", &shlvl, varinteger_gsu),
+IPDEF5("FUNCNEST", &zsh_funcnest, varinteger_gsu),
 
 /* Don't import internal integer status variables. */
 #define IPDEF6(A,B,F) {{NULL,A,PM_INTEGER|PM_SPECIAL|PM_DONTIMPORT},BR((void *)B),GSU(F),10,0,NULL,NULL,NULL,0}

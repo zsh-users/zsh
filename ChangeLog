@@ -1,3 +1,10 @@
+2017-10-02  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41787 (minor corrections): configure.ac, README,
+	Doc/Zsh/params.yo, Src/exec.c, Src/parms.c,
+	Test/C04funcdef.ztst: reduce default nested function depth to
+	500 and expose as $FUNCNEST.
+
 2017-10-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
 
 	* 41797 (tweaked): Doc/Zsh/builtins.yo, Src/builtin.c,

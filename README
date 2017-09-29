@@ -30,8 +30,32 @@ Zsh is a shell with lots of features.  For a list of some of these, see the
 file FEATURES, and for the latest changes see NEWS.  For more
 details, see the documentation.
 
-Incompatibilities since 5.3.1
+Incompatibilities since 5.4.2
 -----------------------------
+
+1) The default build-time maximum nested function depth has been
+decreased from 1000 to 500 based on user experience.  However,
+it can now be changed at run time via the variable FUNCNEST.
+If you previously configured the shell to set a different value,
+or to remove the check, this is now reflected in the default
+value of the variable.
+
+2) The syntax
+
+foo=([key]=value)
+
+can be used to set elements of arrays and associative arrays.  In the
+unlikely event that you need to set an array by matching files using a
+pattern that starts with a character range followed by '=', you need to
+quote the '=', e.g.:
+
+foo=([aeiou]\=vowel)
+
+This is only required for array values contained within parentheses;
+command line expansion for normal arguments has not changed.
+
+Incompatibilities between 5.3.1 and 5.4.2
+-----------------------------------------
 
 1) The default behaviour of code like the following has changed:
 

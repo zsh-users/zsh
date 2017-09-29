@@ -5508,9 +5508,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
     struct funcstack fstack;
     static int oflags;
     Emulation_options save_sticky = NULL;
-#ifdef MAX_FUNCTION_DEPTH
     static int funcdepth;
-#endif
     Heap funcheap;
 
     queue_signals();	/* Lots of memory and global state changes coming */
@@ -5640,13 +5638,12 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 		argzero = ztrdup(argzero);
 	    }
 	}
-#ifdef MAX_FUNCTION_DEPTH
-	if(++funcdepth > MAX_FUNCTION_DEPTH)
-	    {
-		zerr("maximum nested function level reached");
-		goto undoshfunc;
-	    }
-#endif
+	++funcdepth;
+	if (zsh_funcnest >= 0 && funcdepth > zsh_funcnest) {
+	    zerr("maximum nested function level reached; increase FUNCNEST?");
+	    lastval = 1;
+	    goto undoshfunc;
+	}
 	fstack.name = dupstring(name);
 	/*
 	 * The caller is whatever is immediately before on the stack,
@@ -5685,10 +5682,8 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	runshfunc(prog, wrappers, fstack.name);
     doneshfunc:
 	funcstack = fstack.prev;
-#ifdef MAX_FUNCTION_DEPTH
     undoshfunc:
 	--funcdepth;
-#endif
 	if (retflag) {
 	    retflag = 0;
 	    breaks = obreaks;

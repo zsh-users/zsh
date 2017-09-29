@@ -515,6 +515,14 @@
 0:autoload with absolute path not cancelled by bare autoload
 >I have been loaded by explicit path.
 
+  (
+    FUNCNEST=0
+    fn() { true; }
+    fn
+  )
+1:
+?fn:4: maximum nested function level reached; increase FUNCNEST?
+
 %clean
 
  rm -f file.in file.out

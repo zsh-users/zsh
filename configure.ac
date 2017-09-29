@@ -415,13 +415,13 @@ ifdef([max_function_depth],[undefine([max_function_depth])])dnl
 AH_TEMPLATE([MAX_FUNCTION_DEPTH],
 [Define for function depth limits])
 AC_ARG_ENABLE(max-function-depth,
-AC_HELP_STRING([--enable-max-function-depth=MAX], [limit function depth to MAX, default 1000]),
+AC_HELP_STRING([--enable-max-function-depth=MAX], [limit function depth to MAX, default 500]),
 [if test x$enableval = xyes; then
-  AC_DEFINE(MAX_FUNCTION_DEPTH, 1000)
+  AC_DEFINE(MAX_FUNCTION_DEPTH, 500)
 elif test x$enableval != xno; then
   AC_DEFINE_UNQUOTED(MAX_FUNCTION_DEPTH, $enableval)
 fi],
-[AC_DEFINE(MAX_FUNCTION_DEPTH, 1000)]
+[AC_DEFINE(MAX_FUNCTION_DEPTH, 500)]
 )
 
 ifdef([default_readnullcmd],[undefine([default_readnullcmd])])dnl

@@ -731,6 +731,16 @@ This value is system dependent and is intended for debugging
 purposes.  It is also useful with the tt(zsh/system) module which
 allows the number to be turned into a name or message.
 )
+vindex(FUNCNEST)
+item(tt(FUNCNEST) <S>)(
+Integer.  If greater than or equal to zero, the maximum nesting depth of
+shell functions.  When it is exceeded, an error is raised at the point
+where a function is called.  The default value is determined when
+the shell is configured, but is typically 500.  Increasing
+the value increases the danger of a runaway function recursion
+causing the shell to crash.  Setting a negative value turns off
+the check.
+)
 vindex(GID)
 item(tt(GID) <S>)(
 The real group ID of the shell process.  If you have sufficient privileges,
