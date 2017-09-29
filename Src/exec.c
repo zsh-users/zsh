@@ -2325,16 +2325,19 @@ addfd(int forked, int *save, struct multio **mfds, int fd1, int fd2, int rflag,
 		     * fd1 may already be closed here, so
 		     * ignore bad file descriptor error
 		     */
-		    if (fdN < 0 && errno != EBADF) {
-			zerr("cannot duplicate fd %d: %e", fd1, errno);
-			mfds[fd1] = NULL;
-			closemnodes(mfds);
-			return;
+		    if (fdN < 0) {
+			if (errno != EBADF) {
+			    zerr("cannot duplicate fd %d: %e", fd1, errno);
+			    mfds[fd1] = NULL;
+			    closemnodes(mfds);
+			    return;
+			}
+		    } else {
+			DPUTS(fdtable[fdN] != FDT_INTERNAL,
+			      "Saved file descriptor not marked as internal");
+			fdtable[fdN] |= FDT_SAVED_MASK;
 		    }
 		    save[fd1] = fdN;
-		    DPUTS(fdtable[fdN] != FDT_INTERNAL,
-			  "Saved file descriptor not marked as internal");
-		    fdtable[fdN] |= FDT_SAVED_MASK;
 		}
 	    }
 	}

@@ -1,3 +1,8 @@
+2017-09-29  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41789: Src/exec.c: Don't try to mark an FD as saved if it
+	couldn't be moved.
+
 2017-09-28  Oliver Kiddle  <opk@zsh.org>
 
 	* 41772: Src/Zle/computil.c, Test/Y03arguments.ztst: fix bug
