@@ -793,3 +793,29 @@
   local -A keyvalhash=(1 one [2]=two 3 three)
 1:Mixed syntax with [key]=val not allowed for hash.
 ?(eval):1: bad [key]=value syntax for associative array
+
+  local -a myarray
+  typeset -p1 myarray
+  myarray=("&" sand '""' "" plugh)
+  typeset -p1 myarray
+0:typeset -p1 output for array
+>typeset -a myarray=()
+>typeset -a myarray=(
+>  '&'
+>  sand
+>  '""'
+>  ''
+>  plugh
+>)
+
+  local -A myhash
+  typeset -p1 myhash
+  myhash=([one]=two [three]= [four]="[]")
+  typeset -p1 myhash
+0:typeset -p1 output for associative array
+>typeset -A myhash=()
+>typeset -A myhash=(
+>  [four]='[]'
+>  [one]=two
+>  [three]=''
+>)

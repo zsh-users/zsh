@@ -1817,10 +1817,10 @@ findex(typeset)
 cindex(parameters, setting)
 cindex(parameters, declaring)
 redef(SPACES)(0)(tt(ifztexi(NOTRANS(@ @ @ @ @ @ @ @ ))ifnztexi(        )))
-xitem(tt(typeset )[ {tt(PLUS())|tt(-)}tt(AHUaghlmprtux) ] \
-[ {tt(PLUS())|tt(-)}tt(EFLRZi) [ var(n) ] ])
+xitem(tt(typeset )[ {tt(PLUS())|tt(-)}tt(AHUaghlmrtux) ] \
+[ {tt(PLUS())|tt(-)}tt(EFLRZip) [ var(n) ] ])
 xitem(SPACES()[ tt(+) ] [ var(name)[tt(=)var(value)] ... ])
-xitem(tt(typeset )tt(-T) [ {tt(PLUS())|tt(-)}tt(Uglprux) ] [ {tt(PLUS())|tt(-)}tt(LRZ) [ var(n) ] ])
+xitem(tt(typeset )tt(-T) [ {tt(PLUS())|tt(-)}tt(Uglrux) ] [ {tt(PLUS())|tt(-)}tt(LRZp) [ var(n) ] ])
 xitem(SPACES()[ tt(+) | var(SCALAR)[tt(=)var(value)] var(array)[tt(=LPAR())var(value) ...tt(RPAR())] [ var(sep) ] ])
 item(tt(typeset) tt(-f) [ {tt(PLUS())|tt(-)}tt(TUkmtuz) ] [ tt(+) ] [ var(name) ... ])(
 Set or display attributes and values for shell parameters.
@@ -1985,6 +1985,11 @@ If the tt(-p) option is given, parameters and values are printed in the
 form of a typeset command with an assignment, regardless of other flags
 and options.  Note that the tt(-H) flag on parameters is respected; no
 value will be shown for these parameters.
+
+tt(-p) may be followed by an optional integer argument.  Currently
+only the value 1 is supported.  In this case arrays and associative
+arrays are printed with newlines between indented elements for
+readability.
 )
 item(tt(-T) [ var(scalar)[tt(=)var(value)] var(array)[tt(=LPAR())var(value) ...tt(RPAR())] [ var(sep) ] ])(
 This flag has a different meaning when used with tt(-f); see below.

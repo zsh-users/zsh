@@ -5682,40 +5682,60 @@ printparamvalue(Param p, int printflags)
 	/* array */
 	if (!(printflags & PRINT_KV_PAIR)) {
 	    putchar('(');
-	    putchar(' ');
+	    if (!(printflags & PRINT_LINE))
+		putchar(' ');
 	}
 	u = p->gsu.a->getfn(p);
 	if(*u) {
+	    if (printflags & PRINT_LINE) {
+		if (printflags & PRINT_KV_PAIR)
+		    printf("  ");
+		else
+		    printf("\n  ");
+	    }
 	    quotedzputs(*u++, stdout);
 	    while (*u) {
-		putchar(' ');
+		if (printflags & PRINT_LINE)
+		    printf("\n  ");
+		else
+		    putchar(' ');
 		quotedzputs(*u++, stdout);
 	    }
+	    if ((printflags & (PRINT_LINE|PRINT_KV_PAIR)) == PRINT_LINE)
+		putchar('\n');
 	}
 	if (!(printflags & PRINT_KV_PAIR)) {
-	    putchar(' ');
+	    if (!(printflags & PRINT_LINE))
+		putchar(' ');
 	    putchar(')');
 	}
 	break;
     case PM_HASHED:
 	/* association */
-	if (!(printflags & PRINT_KV_PAIR)) {
-	    putchar('(');
-	    putchar(' ');
-	}
 	{
-            HashTable ht = p->gsu.h->getfn(p);
+	    HashTable ht;
+	    int found = 0;
+	    if (!(printflags & PRINT_KV_PAIR)) {
+		putchar('(');
+		if (!(printflags & PRINT_LINE))
+		    putchar(' ');
+	    }
+            ht = p->gsu.h->getfn(p);
             if (ht)
-		scanhashtable(ht, 1, 0, PM_UNSET,
-			      ht->printnode, PRINT_KV_PAIR);
+		found = scanhashtable(ht, 1, 0, PM_UNSET,
+				      ht->printnode, PRINT_KV_PAIR |
+				      (printflags & PRINT_LINE));
+	    if (!(printflags & PRINT_KV_PAIR)) {
+		if (found && (printflags & PRINT_LINE))
+		    putchar('\n');
+		putchar(')');
+	    }
 	}
-	if (!(printflags & PRINT_KV_PAIR))
-	    putchar(')');
 	break;
     }
-    if (printflags & PRINT_KV_PAIR)
+    if ((printflags & (PRINT_KV_PAIR|PRINT_LINE)) == PRINT_KV_PAIR)
 	putchar(' ');
-    else
+    else if (!(printflags & PRINT_KV_PAIR))
 	putchar('\n');
 }
 
@@ -5809,8 +5829,11 @@ printparamnode(HashNode hn, int printflags)
 	zputs(p->node.nam, stdout);
 	putchar('\n');
     } else {
-	if (printflags & PRINT_KV_PAIR)
+	if (printflags & PRINT_KV_PAIR) {
+	    if (printflags & PRINT_LINE)
+		printf("\n  ");
 	    putchar('[');
+	}
 	quotedzputs(p->node.nam, stdout);
 	if (printflags & PRINT_KV_PAIR)
 	    printf("]=");

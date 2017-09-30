@@ -158,7 +158,9 @@ prefork(LinkList list, int flags, int *ret_flags)
 		filesub(&cptr, flags & (PREFORK_TYPESET|PREFORK_ASSIGN));
 		setdata(node, cptr);
 	    }
-	} else if (!(flags & PREFORK_SINGLE) && !keep)
+	} else if (!(flags & PREFORK_SINGLE) &&
+		   !(*ret_flags & PREFORK_KEY_VALUE) &&
+		   !keep)
 	    uremnode(list, node);
 	if (errflag) {
 	    unqueue_signals();

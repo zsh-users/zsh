@@ -53,7 +53,7 @@ static struct builtin builtins[] =
     BUILTIN("cd", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_CD, "qsPL", NULL),
     BUILTIN("chdir", BINF_SKIPINVALID | BINF_SKIPDASH | BINF_DASHDASHVALID, bin_cd, 0, 2, BIN_CD, "qsPL", NULL),
     BUILTIN("continue", BINF_PSPECIAL, bin_break, 0, 1, BIN_CONTINUE, NULL, NULL),
-    BUILTIN("declare", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klmprtuxz", NULL),
+    BUILTIN("declare", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klmp:%rtuxz", NULL),
     BUILTIN("dirs", 0, bin_dirs, 0, -1, 0, "clpv", NULL),
     BUILTIN("disable", 0, bin_enable, 0, -1, BIN_DISABLE, "afmprs", NULL),
     BUILTIN("disown", 0, bin_fg, 0, -1, BIN_DISOWN, NULL, NULL),
@@ -62,7 +62,7 @@ static struct builtin builtins[] =
     BUILTIN("enable", 0, bin_enable, 0, -1, BIN_ENABLE, "afmprs", NULL),
     BUILTIN("eval", BINF_PSPECIAL, bin_eval, 0, -1, BIN_EVAL, NULL, NULL),
     BUILTIN("exit", BINF_PSPECIAL, bin_break, 0, 1, BIN_EXIT, NULL, NULL),
-    BUILTIN("export", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "E:%F:%HL:%R:%TUZ:%afhi:%lprtu", "xg"),
+    BUILTIN("export", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "E:%F:%HL:%R:%TUZ:%afhi:%lp:%rtu", "xg"),
     BUILTIN("false", 0, bin_false, 0, -1, 0, NULL, NULL),
     /*
      * We used to behave as if the argument to -e was optional.
@@ -71,7 +71,7 @@ static struct builtin builtins[] =
      */
     BUILTIN("fc", 0, bin_fc, 0, -1, BIN_FC, "aAdDe:EfiIlLmnpPrRt:W", NULL),
     BUILTIN("fg", 0, bin_fg, 0, -1, BIN_FG, NULL, NULL),
-    BUILTIN("float", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "E:%F:%HL:%R:%Z:%ghlprtux", "E"),
+    BUILTIN("float", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "E:%F:%HL:%R:%Z:%ghlp:%rtux", "E"),
     BUILTIN("functions", BINF_PLUSOPTS, bin_functions, 0, -1, 0, "kmMstTuUWx:z", NULL),
     BUILTIN("getln", 0, bin_read, 0, -1, 0, "ecnAlE", "zr"),
     BUILTIN("getopts", 0, bin_getopts, 2, -1, 0, NULL, NULL),
@@ -82,11 +82,11 @@ static struct builtin builtins[] =
 #endif
 
     BUILTIN("history", 0, bin_fc, 0, -1, BIN_FC, "adDEfiLmnpPrt:", "l"),
-    BUILTIN("integer", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "HL:%R:%Z:%ghi:%lprtux", "i"),
+    BUILTIN("integer", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "HL:%R:%Z:%ghi:%lp:%rtux", "i"),
     BUILTIN("jobs", 0, bin_fg, 0, -1, BIN_JOBS, "dlpZrs", NULL),
     BUILTIN("kill", BINF_HANDLES_OPTS, bin_kill, 0, -1, 0, NULL, NULL),
     BUILTIN("let", 0, bin_let, 1, -1, 0, NULL, NULL),
-    BUILTIN("local", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%ahi:%lprtux", NULL),
+    BUILTIN("local", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%ahi:%lp:%rtux", NULL),
     BUILTIN("log", 0, bin_log, 0, 0, 0, NULL, NULL),
     BUILTIN("logout", 0, bin_break, 0, 1, BIN_LOGOUT, NULL, NULL),
 
@@ -120,7 +120,7 @@ static struct builtin builtins[] =
     BUILTIN("trap", BINF_PSPECIAL | BINF_HANDLES_OPTS, bin_trap, 0, -1, 0, NULL, NULL),
     BUILTIN("true", 0, bin_true, 0, -1, 0, NULL, NULL),
     BUILTIN("type", 0, bin_whence, 0, -1, 0, "ampfsSw", "v"),
-    BUILTIN("typeset", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klprtuxmz", NULL),
+    BUILTIN("typeset", BINF_PLUSOPTS | BINF_MAGICEQUALS | BINF_PSPECIAL | BINF_ASSIGN, (HandlerFunc)bin_typeset, 0, -1, 0, "AE:%F:%HL:%R:%TUZ:%afghi:%klp:%rtuxmz", NULL),
     BUILTIN("umask", 0, bin_umask, 0, 1, 0, "S", NULL),
     BUILTIN("unalias", 0, bin_unhash, 0, -1, BIN_UNALIAS, "ams", NULL),
     BUILTIN("unfunction", 0, bin_unhash, 1, -1, BIN_UNFUNCTION, "m", "f"),
@@ -2645,8 +2645,21 @@ bin_typeset(char *name, char **argv, LinkList assigns, Options ops, int func)
     queue_signals();
 
     /* Given no arguments, list whatever the options specify. */
-    if (OPT_ISSET(ops,'p'))
+    if (OPT_ISSET(ops,'p')) {
 	printflags |= PRINT_TYPESET;
+	if (OPT_HASARG(ops,'p')) {
+	    char *eptr;
+	    int pflag = (int)zstrtol(OPT_ARG(ops,'p'), &eptr, 10);
+	    if (pflag == 1 && !*eptr)
+		printflags |= PRINT_LINE;
+	    else if (pflag || *eptr) {
+		zwarnnam(name, "bad argument to -p: %s", OPT_ARG(ops,'p'));
+		unqueue_signals();
+		return 1;
+	    }
+	    /* -p0 treated as -p for consistency */
+	}
+    }
     hasargs = *argv != NULL || (assigns && firstnode(assigns));
     if (!hasargs) {
 	if (!OPT_ISSET(ops,'p')) {

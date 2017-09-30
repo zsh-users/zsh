@@ -1,3 +1,10 @@
+2017-10-01  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* 41797 (tweaked): Doc/Zsh/builtins.yo, Src/builtin.c,
+	Src/params.c, Src/subst.c, Src/zsh.h, Test/B02typeset.ztst:
+	typeset -p1 outputs arrays and associative arrays with newlines
+	and indented elements.
+
 2017-09-29  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41789: Src/exec.c: Don't try to mark an FD as saved if it

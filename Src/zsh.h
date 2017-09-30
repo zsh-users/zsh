@@ -2128,13 +2128,14 @@ typedef groupset *Groupset;
 #define PRINT_KV_PAIR		(1<<3)
 #define PRINT_INCLUDEVALUE	(1<<4)
 #define PRINT_TYPESET		(1<<5)
+#define PRINT_LINE	        (1<<6)
 
 /* flags for printing for the whence builtin */
-#define PRINT_WHENCE_CSH	(1<<6)
-#define PRINT_WHENCE_VERBOSE	(1<<7)
-#define PRINT_WHENCE_SIMPLE	(1<<8)
-#define PRINT_WHENCE_FUNCDEF	(1<<9)
-#define PRINT_WHENCE_WORD	(1<<10)
+#define PRINT_WHENCE_CSH	(1<<7)
+#define PRINT_WHENCE_VERBOSE	(1<<8)
+#define PRINT_WHENCE_SIMPLE	(1<<9)
+#define PRINT_WHENCE_FUNCDEF	(1<<10)
+#define PRINT_WHENCE_WORD	(1<<11)
 
 /* Return values from loop() */
 
