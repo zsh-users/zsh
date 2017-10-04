@@ -41,6 +41,20 @@ enum {
     ADDVAR_RESTORE =  1 << 2
 };
 
+/* Structure in which to save values around shell function call */
+
+struct funcsave {
+    char opts[OPT_SIZE];
+    char *argv0;
+    int zoptind, lastval, optcind, numpipestats;
+    int *pipestats;
+    char *scriptname;
+    int breaks, contflag, loops, emulation, noerrexit, oflags, restore_sticky;
+    Emulation_options sticky;
+    struct funcstack fstack;
+};
+typedef struct funcsave *Funcsave;
+
 /*
  * used to suppress ERREXIT and trapping of SIGZERR, SIGEXIT.
  * Bits from noerrexit_bits.
@@ -5495,34 +5509,36 @@ int sticky_emulation_differs(Emulation_options sticky2)
 mod_export int
 doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 {
-    char **pptab, **x, *oargv0;
-    int oldzoptind, oldlastval, oldoptcind, oldnumpipestats, ret;
-    int *oldpipestats = NULL;
-    char saveopts[OPT_SIZE], *oldscriptname = scriptname;
+    char **pptab, **x;
+    int ret;
     char *name = shfunc->node.nam;
-    int flags = shfunc->node.flags, ooflags;
-    int savnoerrexit;
+    int flags = shfunc->node.flags;
     char *fname = dupstring(name);
-    int obreaks, ocontflag, oloops, saveemulation, restore_sticky;
     Eprog prog;
-    struct funcstack fstack;
     static int oflags;
-    Emulation_options save_sticky = NULL;
     static int funcdepth;
     Heap funcheap;
 
     queue_signals();	/* Lots of memory and global state changes coming */
 
     NEWHEAPS(funcheap) {
-	oargv0 = NULL;
-	obreaks = breaks;
-	ocontflag = contflag;
-	oloops = loops;
+	/*
+	 * Save data in heap rather than on stack to keep recursive
+	 * function cost down --- use of heap memory should be efficient
+	 * at this point.  Saving is not actually massive.
+	 */
+	Funcsave funcsave = zhalloc(sizeof(struct funcsave));
+	funcsave->scriptname = scriptname;
+	funcsave->argv0 = NULL;
+	funcsave->breaks = breaks;
+	funcsave->contflag = contflag;
+	funcsave->loops = loops;
+	funcsave->lastval = lastval;
+	funcsave->pipestats = NULL;
+	funcsave->numpipestats = numpipestats;
+	funcsave->noerrexit = noerrexit;
 	if (trap_state == TRAP_STATE_PRIMED)
 	    trap_return--;
-	oldlastval = lastval;
-	oldnumpipestats = numpipestats;
-	savnoerrexit = noerrexit;
 	/*
 	 * Suppression of ERR_RETURN is turned off in function scope.
 	 */
@@ -5533,8 +5549,8 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	     * immediately by a pushheap/popheap pair.
 	     */
 	    size_t bytes = sizeof(int)*numpipestats;
-	    oldpipestats = (int *)zhalloc(bytes);
-	    memcpy(oldpipestats, pipestats, bytes);
+	    funcsave->pipestats = (int *)zhalloc(bytes);
+	    memcpy(funcsave->pipestats, pipestats, bytes);
 	}
 
 	starttrapscope();
@@ -5543,8 +5559,8 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	pptab = pparams;
 	if (!(flags & PM_UNDEFINED))
 	    scriptname = dupstring(name);
-	oldzoptind = zoptind;
-	oldoptcind = optcind;
+	funcsave->zoptind = zoptind;
+	funcsave->optcind = optcind;
 	if (!isset(POSIXBUILTINS)) {
 	    zoptind = 1;
 	    optcind = 0;
@@ -5553,9 +5569,9 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	/* We need to save the current options even if LOCALOPTIONS is *
 	 * not currently set.  That's because if it gets set in the    *
 	 * function we need to restore the original options on exit.   */
-	memcpy(saveopts, opts, sizeof(opts));
-	saveemulation = emulation;
-	save_sticky = sticky;
+	memcpy(funcsave->opts, opts, sizeof(opts));
+	funcsave->emulation = emulation;
+	funcsave->sticky = sticky;
 
 	if (sticky_emulation_differs(shfunc->sticky)) {
 	    /*
@@ -5572,7 +5588,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	     */
 	    sticky = sticky_emulation_dup(shfunc->sticky, 1);
 	    emulation = sticky->emulation;
-	    restore_sticky = 1;
+	    funcsave->restore_sticky = 1;
 	    installemulation(emulation, opts);
 	    if (sticky->n_on_opts) {
 		OptIndex *onptr;
@@ -5591,7 +5607,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	    /* All emulations start with pattern disables clear */
 	    clearpatterndisables();
 	} else
-	    restore_sticky = 0;
+	    funcsave->restore_sticky = 0;
 
 	if (flags & (PM_TAGGED|PM_TAGGED_LOCAL))
 	    opts[XTRACE] = 1;
@@ -5609,11 +5625,11 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	    else
 		opts[WARNNESTEDVAR] = 0;
 	}
-	ooflags = oflags;
+	funcsave->oflags = oflags;
 	/*
 	 * oflags is static, because we compare it on the next recursive
-	 * call.  Hence also we maintain ooflags for restoring the previous
-	 * value of oflags after the call.
+	 * call.  Hence also we maintain a saved version for restoring
+	 * the previous value of oflags after the call.
 	 */
 	oflags = flags;
 	opts[PRINTEXITVALUE] = 0;
@@ -5624,7 +5640,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	    pparams = x = (char **) zshcalloc(((sizeof *x) *
 					       (1 + countlinknodes(doshargs))));
 	    if (isset(FUNCTIONARGZERO)) {
-		oargv0 = argzero;
+		funcsave->argv0 = argzero;
 		argzero = ztrdup(getdata(node));
 	    }
 	    /* first node contains name regardless of option */
@@ -5634,7 +5650,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	} else {
 	    pparams = (char **) zshcalloc(sizeof *pparams);
 	    if (isset(FUNCTIONARGZERO)) {
-		oargv0 = argzero;
+		funcsave->argv0 = argzero;
 		argzero = ztrdup(argzero);
 	    }
 	}
@@ -5644,21 +5660,21 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	    lastval = 1;
 	    goto undoshfunc;
 	}
-	fstack.name = dupstring(name);
+	funcsave->fstack.name = dupstring(name);
 	/*
 	 * The caller is whatever is immediately before on the stack,
 	 * unless we're at the top, in which case it's the script
 	 * or interactive shell name.
 	 */
-	fstack.caller = funcstack ? funcstack->name :
-	    dupstring(oargv0 ? oargv0 : argzero);
-	fstack.lineno = lineno;
-	fstack.prev = funcstack;
-	fstack.tp = FS_FUNC;
-	funcstack = &fstack;
+	funcsave->fstack.caller = funcstack ? funcstack->name :
+	    dupstring(funcsave->argv0 ? funcsave->argv0 : argzero);
+	funcsave->fstack.lineno = lineno;
+	funcsave->fstack.prev = funcstack;
+	funcsave->fstack.tp = FS_FUNC;
+	funcstack = &funcsave->fstack;
 
-	fstack.flineno = shfunc->lineno;
-	fstack.filename = getshfuncfile(shfunc);
+	funcsave->fstack.flineno = shfunc->lineno;
+	funcsave->fstack.filename = getshfuncfile(shfunc);
 
 	prog = shfunc->funcdef;
 	if (prog->flags & EF_RUN) {
@@ -5666,7 +5682,7 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 
 	    prog->flags &= ~EF_RUN;
 
-	    runshfunc(prog, NULL, fstack.name);
+	    runshfunc(prog, NULL, funcsave->fstack.name);
 
 	    if (!(shf = (Shfunc) shfunctab->getnode(shfunctab,
 						    (name = fname)))) {
@@ -5679,52 +5695,52 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	    }
 	    prog = shf->funcdef;
 	}
-	runshfunc(prog, wrappers, fstack.name);
+	runshfunc(prog, wrappers, funcsave->fstack.name);
     doneshfunc:
-	funcstack = fstack.prev;
+	funcstack = funcsave->fstack.prev;
     undoshfunc:
 	--funcdepth;
 	if (retflag) {
 	    retflag = 0;
-	    breaks = obreaks;
+	    breaks = funcsave->breaks;
 	}
 	freearray(pparams);
-	if (oargv0) {
+	if (funcsave->argv0) {
 	    zsfree(argzero);
-	    argzero = oargv0;
+	    argzero = funcsave->argv0;
 	}
 	pparams = pptab;
 	if (!isset(POSIXBUILTINS)) {
-	    zoptind = oldzoptind;
-	    optcind = oldoptcind;
+	    zoptind = funcsave->zoptind;
+	    optcind = funcsave->optcind;
 	}
-	scriptname = oldscriptname;
-	oflags = ooflags;
+	scriptname = funcsave->scriptname;
+	oflags = funcsave->oflags;
 
 	endpatternscope();	/* before restoring old LOCALPATTERNS */
 
-	if (restore_sticky) {
+	if (funcsave->restore_sticky) {
 	    /*
 	     * If we switched to an emulation environment just for
 	     * this function, we interpret the option and emulation
 	     * switch as being a firewall between environments.
 	     */
-	    memcpy(opts, saveopts, sizeof(opts));
-	    emulation = saveemulation;
-	    sticky = save_sticky;
+	    memcpy(opts, funcsave->opts, sizeof(opts));
+	    emulation = funcsave->emulation;
+	    sticky = funcsave->sticky;
 	} else if (isset(LOCALOPTIONS)) {
 	    /* restore all shell options except PRIVILEGED and RESTRICTED */
-	    saveopts[PRIVILEGED] = opts[PRIVILEGED];
-	    saveopts[RESTRICTED] = opts[RESTRICTED];
-	    memcpy(opts, saveopts, sizeof(opts));
-	    emulation = saveemulation;
+	    funcsave->opts[PRIVILEGED] = opts[PRIVILEGED];
+	    funcsave->opts[RESTRICTED] = opts[RESTRICTED];
+	    memcpy(opts, funcsave->opts, sizeof(opts));
+	    emulation = funcsave->emulation;
 	} else {
 	    /* just restore a couple. */
-	    opts[XTRACE] = saveopts[XTRACE];
-	    opts[PRINTEXITVALUE] = saveopts[PRINTEXITVALUE];
-	    opts[LOCALOPTIONS] = saveopts[LOCALOPTIONS];
-	    opts[LOCALLOOPS] = saveopts[LOCALLOOPS];
-	    opts[WARNNESTEDVAR] = saveopts[WARNNESTEDVAR];
+	    opts[XTRACE] = funcsave->opts[XTRACE];
+	    opts[PRINTEXITVALUE] = funcsave->opts[PRINTEXITVALUE];
+	    opts[LOCALOPTIONS] = funcsave->opts[LOCALOPTIONS];
+	    opts[LOCALLOOPS] = funcsave->opts[LOCALLOOPS];
+	    opts[WARNNESTEDVAR] = funcsave->opts[WARNNESTEDVAR];
 	}
 
 	if (opts[LOCALLOOPS]) {
@@ -5732,9 +5748,9 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 		zwarn("`continue' active at end of function scope");
 	    if (breaks)
 		zwarn("`break' active at end of function scope");
-	    breaks = obreaks;
-	    contflag = ocontflag;
-	    loops = oloops;
+	    breaks = funcsave->breaks;
+	    contflag = funcsave->contflag;
+	    loops = funcsave->loops;
 	}
 
 	endtrapscope();
@@ -5742,11 +5758,11 @@ doshfunc(Shfunc shfunc, LinkList doshargs, int noreturnval)
 	if (trap_state == TRAP_STATE_PRIMED)
 	    trap_return++;
 	ret = lastval;
-	noerrexit = savnoerrexit;
+	noerrexit = funcsave->noerrexit;
 	if (noreturnval) {
-	    lastval = oldlastval;
-	    numpipestats = oldnumpipestats;
-	    memcpy(pipestats, oldpipestats, sizeof(int)*numpipestats);
+	    lastval = funcsave->lastval;
+	    numpipestats = funcsave->numpipestats;
+	    memcpy(pipestats, funcsave->pipestats, sizeof(int)*numpipestats);
 	}
     } OLDHEAPS;
 

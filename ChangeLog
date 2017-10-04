@@ -1,3 +1,9 @@
+2017-10-04  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41802 (minor tweaks): Src/exec.c, Src/parse.c: use heap
+	instead of stack for temporary storage over shell function call,
+	also fix debug message when FUNCNEST increased.
+
 2017-10-02  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41787 (minor corrections): configure.ac, README,
