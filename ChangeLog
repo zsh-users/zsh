@@ -1,3 +1,8 @@
+2017-10-04  Noah Pendleton  <noah.pendleton@gmail.com>
+
+	* 41808: Completion/Unix/Command/_git: _git-cherry-pick:
+	Typo fixes
+
 2017-10-04  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41802 (minor tweaks): Src/exec.c, Src/parse.c: use heap

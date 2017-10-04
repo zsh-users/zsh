@@ -519,11 +519,11 @@ _git-cherry-pick () {
     '--allow-empty[preserve initially empty commits]' \
     '--allow-empty-message[allow replaying a commit with an empty message]' \
     '--keep-redundant-commits[keep cherry-picked commits that will become empty]' \
-    '(-e --edit --ff)'{-e,--edit}'[edit commit before committing the revert]' \
+    '(-e --edit --ff)'{-e,--edit}'[edit commit before committing the cherry-pick]' \
     '(--ff)-x[append information about what commit was cherry-picked]' \
     '(-m --mainline)'{-m+,--mainline=}'[specify mainline when cherry-picking a merge commit]:parent number' \
     '--rerere-autoupdate[update index with reused conflict resolution if possible]' \
-    '(-n --no-commit --ff)'{-n,--no-commit}'[do not make the actually commit]' \
+    '(-n --no-commit --ff)'{-n,--no-commit}'[do not make the actual commit]' \
     '(-s --signoff --ff)'{-s,--signoff}'[add Signed-off-by line at the end of the commit message]' \
     '(-S --gpg-sign --no-gpg-sign)'{-S-,--gpg-sign=-}'[GPG-sign the commit]::key id' \
     "(-S --gpg-sign --no-gpg-sign)--no-gpg-sign[don't GPG-sign the commit]" \
