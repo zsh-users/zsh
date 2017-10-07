@@ -1,5 +1,8 @@
 2017-10-07  Oliver Kiddle  <opk@zsh.org>
 
+	* dana: 41826: Completion/Zsh/Context/_brace_parameter: fix
+	inaccuracies in completion description wording
+
 	* 41824: Src/Zle/computil.c, Test/Y03arguments.ztst: fix to
 	not complete rest args from an _arguments set alongside
 	the argument to and option in a separate set
