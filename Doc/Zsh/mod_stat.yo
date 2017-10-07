@@ -123,7 +123,7 @@ tt(-s) option is implied.
 item(tt(-l))(
 List the names of the type elements (to standard
 output or an array as appropriate) and return immediately;
-options other than tt(-A) and arguments are ignored.
+arguments, and options other than tt(-A), are ignored.
 )
 item(tt(-L))(
 Perform an tt(lstat) (see manref(lstat)(2)) rather than a tt(stat)
