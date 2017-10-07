@@ -4,7 +4,10 @@ local expl ret=1
 
 if [[ "$words[CURRENT-1]" = -[AH] ]]; then
   _arrays
-else
+elif [[ $service == zstat ]] ||
+     (( ${+builtins[stat]} )) || 
+     { (( ! ${+builtins} )) && [[ $(type -w stat) == '*: builtin' ]] }
+then
   _tags files options || return 1
 
   while _tags; do
@@ -17,4 +20,8 @@ else
                       +size +atime +mtime +ctime +blksize +block +link
     (( ret )) || return 0
   done
+else
+  # TODO: system-specific completion
+  # TODO: choose this codepath if 'command stat ...' or '=stat ...' is used
+  _files
 fi

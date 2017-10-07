@@ -1,3 +1,8 @@
+2017-10-11  Daniel Shahaf  <d.s@xxxxxxxxxxxxxxxxxx>
+
+	* 41825/0001: Completion/Zsh/Command/_stat: Only complete 'stat'
+	if it's provided by the zsh/stat builtin.
+
 2017-10-10  Oliver Kiddle  <opk@zsh.org>
 
 	* 41855: Completion/Unix/Command/_dhclient,
