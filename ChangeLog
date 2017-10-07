@@ -1,5 +1,8 @@
 2017-10-07  Oliver Kiddle  <opk@zsh.org>
 
+	* 41827: Completion/Zsh/Context/_brace_parameter: correct
+	sense of description for ${...:?...} expansion
+
 	* dana: 41826: Completion/Zsh/Context/_brace_parameter: fix
 	inaccuracies in completion description wording
 

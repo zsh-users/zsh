@@ -195,7 +195,7 @@ elif compset -P '*:'; then
       '+:substitute alternate value if parameter is non-null'
       '=:substitute and assign alternate value if parameter is null'
       '\:=:unconditionally assign value to parameter'
-      '?:print error if parameter is set and non-null'
+      '?:print error if parameter is null'
       '#:filter value matching pattern'
       '/:replace whole word matching pattern'
       '|:set difference'
