@@ -1,0 +1,19 @@
+#compdef timeout gtimeout
+
+local args
+
+if [[ $service = g* || $OSTYPE != *bsd* ]]; then
+  # GNU coreutils as opposed to Free/NetBSD implementation
+  args=(
+    '(- *)--help[display usage information]'
+    '(- *)--version[display version information]'
+  )
+fi
+
+_arguments -S -A "-" $args \
+  '--preserve-status[always exit with the same status as command even if it times out]' \
+  "--foreground[don't propagate timeout to the command children]" \
+  '(-s --signal)'{-s,--signal}'[specify the signal to send on timeout]:signal:_signals' \
+  '(-k --kill-after)'{-k,--kill-after}'[followup first signal with SIGKILL if command persists after specified time]:time:time' \
+  '1: :_guard "[0-9.]#([smhd]|)" duration' \
+  '*:::command:_normal'

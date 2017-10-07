@@ -55,7 +55,7 @@ else
     'netbsd*' "-N[don't copy file flags]" \
     '(darwin|dragonfly|freebsd|netbsd)*' '-a[archive mode, same as -RpP]' \
     '(dragonfly|freebsd)*' '-l[link files instead of copying]' \
-    '(darwin|dragonfly|freebsd|netbsd)*' '-v[show file names as they are copied]' \
+    '(darwin|dragonfly|*bsd)*' '-v[show file names as they are copied]' \
     'darwin*' "-X[don't copy extended attributes or resource forks]" \
     '(dragonfly|freebsd)*' "-x[don't traverse file systems]" \
     'freebsd<10->.*' '-s[make symbolic links instead of copies of non-directories]'

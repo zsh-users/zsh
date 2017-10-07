@@ -1,4 +1,4 @@
-#compdef unexpand
+#compdef unexpand gunexpand
 
 local all tabs ret=1
 local -a args
@@ -6,21 +6,21 @@ local -a args
 all="convert all whitespace, instead of just initial whitespace"
 tabs="use comma separated list of tab positions"
 args=( 
-    "(--all)-a[$all]"
-    "(--tabs)-t[$tabs]:tablist"
-    "*:file:_files"
+  "(--all)-a[$all]"
+  "(--tabs)-t+[$tabs]:tablist"
+  '*:file:_files'
 )
 
 if _pick_variant gnu="Free Soft" unix --version; then
-    args+=(
-        "(-a)--all[$all]"
-        "--first-only[convert only leading sequences of whitespace]"
-        "(-t)--tabs=[$tabs]:tablist"
-        "(* -)--help[display help message and exit]"
-        "(* -)--version[output version information and exit]"
-    )
+  args+=(
+    "(-a)--all[$all]"
+    '--first-only[convert only leading sequences of whitespace]'
+    "(-t)--tabs=[$tabs]:tablist"
+    '(* -)--help[display usage information]'
+    '(* -)--version[output version information]'
+  )
 fi
 
-_arguments "$args[@]" && ret=0
+_arguments -s -S "$args[@]" && ret=0
 
 return ret
