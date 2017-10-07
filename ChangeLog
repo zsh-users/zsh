@@ -1,5 +1,9 @@
 2017-10-07  Oliver Kiddle  <opk@zsh.org>
 
+	* 41824: Src/Zle/computil.c, Test/Y03arguments.ztst: fix to
+	not complete rest args from an _arguments set alongside
+	the argument to and option in a separate set
+
 	* 41823: Completion/Unix/Command/_expand,
 	Completion/Unix/Command/_mv, Completion/Unix/Command/_numfmt,
 	Completion/Unix/Command/_seq, Completion/Unix/Command/_split,

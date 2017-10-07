@@ -364,6 +364,14 @@
 0:repeatable options
 >line: {tst -v -v }{}
 
+ tst_arguments - set1 '--label=:arg:(a b)' - set2 ':rest:(rest args --label=not)'
+ comptest $'tst --label=\t'
+0:rest arguments from another set not completed after option from first set
+>line: {tst --label=}{}
+>DESCRIPTION:{arg}
+>NO:{a}
+>NO:{b}
+
  tst_arguments -A '-*' - help -h -V - other -a '*: :(-x more)'
  comptest $'tst -a -x m\t'
 0:continue completion after rest argument that looks like an option (with sets)

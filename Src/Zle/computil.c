@@ -1933,7 +1933,6 @@ struct castate {
     int inopt;		/* set to current word pos if word is a recognised option */
     int inarg;          /* in a normal argument */
     int nth;		/* number of current normal arg */
-    int doff;		/* length of current option */
     int singles;	/* argument consists of clumped options */
     int oopt;
     int actopts;	/* count of active options */
@@ -1943,6 +1942,7 @@ struct castate {
 
 static struct castate ca_laststate;
 static int ca_parsed = 0, ca_alloced = 0;
+static int ca_doff; /* no. of chars of ignored prefix (for clumped options or arg to an option) */
 
 static void
 freecastate(Castate s)
@@ -2033,7 +2033,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
     state.argbeg = state.optbeg = state.nargbeg = state.restbeg = state.actopts =
 	state.nth = state.inopt = state.inarg = state.opt = state.arg = 1;
     state.argend = argend = arrlen(compwords) - 1;
-    state.doff = state.singles = state.oopt = 0;
+    state.singles = state.oopt = 0;
     state.curpos = compcurrent;
     state.args = znewlinklist();
     state.oargs = (LinkList *) zalloc(d->nopts * sizeof(LinkList));
@@ -2057,7 +2057,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 	 line; line = compwords[cur++]) {
 	ddef = adef = NULL;
 	dopt = NULL;
-	doff = state.singles = arglast = 0;
+	state.singles = arglast = 0;
 
         oline = line;
 #if 0
@@ -2114,7 +2114,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 		state.opt = 0;
 		state.argbeg = state.optbeg = state.inopt = cur;
 		state.argend = argend;
-		doff = state.doff = 0;
+		doff = 0;
 		state.singles = 1;
 		if (!state.oargs[state.curopt->num])
 		    state.oargs[state.curopt->num] = znewlinklist();
@@ -2287,7 +2287,6 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 		memcpy(&ca_laststate, &state, sizeof(state));
 		ca_laststate.ddef = NULL;
 		ca_laststate.dopt = NULL;
-		ca_laststate.doff = 0;
 		break;
 	    }
 	    zaddlinknode(state.args, ztrdup(line));
@@ -2324,7 +2323,6 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 
 		ca_laststate.ddef = NULL;
 		ca_laststate.dopt = NULL;
-		ca_laststate.doff = 0;
 		break;
 	    }
 	} else if (state.def && state.def->end)
@@ -2338,7 +2336,6 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 	    memcpy(&ca_laststate, &state, sizeof(state));
 	    ca_laststate.ddef = NULL;
 	    ca_laststate.dopt = NULL;
-	    ca_laststate.doff = 0;
 	} else if (cur == compcurrent && !ca_laststate.def) {
 	    if ((ca_laststate.def = ddef)) {
 		ca_laststate.singles = state.singles;
@@ -2349,7 +2346,7 @@ ca_parse_line(Cadef d, Cadef all, int multi, int first)
 		    ca_laststate.opt = 1;
 		    state.curopt->active = 1;
 		} else {
-		    ca_laststate.doff = doff;
+		    ca_doff = doff;
 		    ca_laststate.opt = 0;
 		}
 	    } else {
@@ -2452,11 +2449,16 @@ ca_set_data(LinkList descr, LinkList act, LinkList subc,
 		!strcmp((char *) getdata(anode), arg->action))
 		break;
 
+	/* with an ignored prefix, we're not completing any normal arguments */
+	if (single && !arg->opt)
+	    return;
+
 	if (!dnode) {
 	    addlinknode(descr, arg->descr);
 	    addlinknode(act, arg->action);
 
 	    if (!restr) {
+
 		if ((restr = (arg->type == CAA_RARGS)))
 		    restrict_range(ca_laststate.optbeg, ca_laststate.argend);
 		else if ((restr = (arg->type == CAA_RREST)))
@@ -2493,6 +2495,7 @@ ca_set_data(LinkList descr, LinkList act, LinkList subc,
 	if (arg->type == CAA_NORMAL &&
 	    opt && optdef && optdef->type == CAO_NEXT)
 	    return;
+
 	if (single)
 	    break;
 
@@ -2521,7 +2524,6 @@ ca_set_data(LinkList descr, LinkList act, LinkList subc,
     if (!single && opt && (lopt || ca_laststate.oopt)) {
 	opt = NULL;
 	arg = ca_get_arg(ca_laststate.d, ca_laststate.nth);
-
 	goto rec;
     }
     if (!opt && oopt > 0) {
@@ -2590,6 +2592,7 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
 	    multi = !!def->snext; /* if we have sets */
 	    ca_parsed = cap;
+	    ca_doff = 0;
 
 	    while (def) { /* for each set */
 		use = !ca_parse_line(def, all, multi, first);
@@ -2629,23 +2632,20 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 	{
 	    LinkList descr, act, subc;
 	    Caarg arg;
-	    int ign = 0, ret = 1;
+	    int ret = 1;
 
 	    descr = newlinklist();
 	    act = newlinklist();
 	    subc = newlinklist();
 
+	    ignore_prefix(ca_doff);
 	    while (lstate) {
 		arg = lstate->def;
 
 		if (arg) {
 		    ret = 0;
-		    if (!ign && lstate->doff > 0) {
-			ign = 1;
-			ignore_prefix(lstate->doff);
-		    }
 		    ca_set_data(descr, act, subc, arg->opt, arg,
-				lstate->curopt, (lstate->doff > 0));
+				lstate->curopt, (ca_doff > 0));
 		}
 		lstate = lstate->snext;
 	    }
@@ -2673,7 +2673,7 @@ bin_comparguments(char *nam, char **args, UNUSED(Options ops), UNUSED(int func))
 
 	    for (; lstate; lstate = lstate->snext) {
 		if (lstate->actopts &&
-		    (lstate->opt || (lstate->doff && lstate->def) ||
+		    (lstate->opt || lstate->def ||
 		     (lstate->def && lstate->def->opt &&
 		      (lstate->def->type == CAA_OPT ||
 		       (lstate->def->type >= CAA_RARGS &&
