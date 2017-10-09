@@ -106,15 +106,20 @@ prefork(LinkList list, int flags, int *ret_flags)
 	ret_flags = &ret_flags_local; /* will be discarded */
 
     queue_signals();
-    for (node = firstnode(list); node; incnode(node)) {
+    node = firstnode(list);
+    while (node) {
+	LinkNode nextnode = 0;
 	if ((flags & (PREFORK_SINGLE|PREFORK_ASSIGN)) == PREFORK_ASSIGN &&
 	    (insnode = keyvalpairelement(list, node))) {
 	    node = insnode;
+	    incnode(node);
 	    *ret_flags |= PREFORK_KEY_VALUE;
 	    continue;
 	}
-	if (errflag)
+	if (errflag) {
+	    unqueue_signals();
 	    return;
+	}
 	if (isset(SHFILEEXPANSION)) {
 	    /*
 	     * Here and below we avoid taking the address
@@ -132,6 +137,12 @@ prefork(LinkList list, int flags, int *ret_flags)
 	     * testing if cptr changed...
 	     */
 	    setdata(node, cptr);
+	    /*
+	     * Advance now because we must not expand filenames again
+	     * after string substitution (which may insert new nodes).
+	     */
+	    nextnode = node;
+	    incnode(nextnode);
 	}
 	if (!(node = stringsubst(list, node,
 				 flags & ~(PREFORK_TYPESET|PREFORK_ASSIGN),
@@ -139,6 +150,10 @@ prefork(LinkList list, int flags, int *ret_flags)
 	    unqueue_signals();
 	    return;
 	}
+	if (isset(SHFILEEXPANSION))
+	    node = nextnode;
+	else
+	    incnode(node);
     }
     for (node = firstnode(list); node; incnode(node)) {
 	if (node == stop)

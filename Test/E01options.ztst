@@ -1026,6 +1026,18 @@
 >$lspath $lspath =
 >$lspath
 
+  () {
+    emulate -L sh
+    v='~/one ~/two'
+    print -l -- $v $v
+  }
+0:SH_FILE_EXPANSION option with GLOB_SUBST et al.
+F:Regression test for workers/41811
+>~/one
+>~/two
+>~/one
+>~/two
+
   testpat() {
     if [[ $1 = ${~2} ]]; then print $1 $2 yes; else print $1 $2 no; fi
   }
