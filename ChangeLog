@@ -1,3 +1,7 @@
+2017-10-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 41833 + 41838: Completion/Unix/Command/_jq: New completion.
+
 2017-10-13  Peter Stephenson  <p.stephenson@samsung.com>
 
 	* 41877: Src/subst·c, Test/E01options.ztst: Separate out
