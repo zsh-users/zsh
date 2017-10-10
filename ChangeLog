@@ -1,5 +1,9 @@
 2017-10-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 41849: Completion/Unix/Command/_unexpand: handle both unexpand
+	and expand in a single function: they have some commonalities
+	and it dodges around the clash with the _expand completer
+
 	* 41831: Completion/Unix/Type/_tilde_files,
 	Completion/Unix/Command/_less, Completion/Unix/Command/_vorbis,
 	Completion/Zsh/Type/_globquals: fix compset usage in ogg123

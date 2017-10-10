@@ -1,26 +1,33 @@
-#compdef unexpand gunexpand
+#compdef unexpand gunexpand expand gexpand
 
-local all tabs ret=1
+local all tabs
 local -a args
 
 all="convert all whitespace, instead of just initial whitespace"
-tabs="use comma separated list of tab positions"
-args=( 
-  "(--all)-a[$all]"
-  "(--tabs)-t+[$tabs]:tablist"
-  '*:file:_files'
-)
+tabs="[use comma separated list of tab positions]:list of tab positions"
 
 if _pick_variant gnu="Free Soft" unix --version; then
+  if [[ $service = *un* ]]; then
+    args=(
+      "(-a --help --version)--all[$all]"
+      '(--help --version)--first-only[convert only leading sequences of whitespace]'
+    )
+  else
+    args=(
+      '(-i --initial --help --version)'{-i,--initial}"[don't convert tabs after non blanks]"
+    )
+  fi
+
   args+=(
-    "(-a)--all[$all]"
-    '--first-only[convert only leading sequences of whitespace]'
-    "(-t)--tabs=[$tabs]:tablist"
+    "(-t --help --version)--tabs=${tabs}"
     '(* -)--help[display usage information]'
-    '(* -)--version[output version information]'
+    '(* -)--version[display version information]'
   )
+elif [[ $OSTYPE = (*bsd*|dragonfly*|darwin*) ]]; then
+  args=( -A "-*" )
 fi
+[[ $service = *un* ]] && args+=(  "(--all --help --version)-a[$all]" )
 
-_arguments -s -S "$args[@]" && ret=0
-
-return ret
+_arguments -s -S "$args[@]" \
+  "(--tabs --help)-t+${tabs}" \
+  '*:file:_files'
