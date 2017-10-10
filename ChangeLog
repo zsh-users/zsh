@@ -1,5 +1,8 @@
 2017-10-10  Peter Stephenson  <p.stephenson@samsung.com>
 
+	* uposted, c.f. 41846: Completion/Unix/Command/_expand ->
+	_expand_cmd: rename to avoid clash with completer.
+
 	* 41842: Doc/Zsh/grammar.yo: split alias documentation, adding
 	more on problems.
 
