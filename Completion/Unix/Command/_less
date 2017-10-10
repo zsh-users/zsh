@@ -91,7 +91,7 @@ _arguments -S -s -A "[-+]*"  \
 if [[ -n "$state" ]]; then
   case $state in
     prompts)
-      if compset -P \?; then
+      if compset -p 1; then
 	_message -e prompt
       else
 	_describe 'prompt' '(

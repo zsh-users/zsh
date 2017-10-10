@@ -79,7 +79,7 @@ case $service in
 esac
 
 if [[ $state = devopts ]]; then
-  if compset -p '*:'; then
+  if compset -P '*:'; then
     _message -e value value
   else
     _wanted devopts expl 'device option' \

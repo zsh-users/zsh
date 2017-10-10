@@ -167,7 +167,7 @@ while [[ -n $PREFIX ]]; do
     
     ([oO])
     # complete/skip sort spec
-    if ! compset -P "?"; then
+    if ! compset -p 1; then
       alts=(
         "n:lexical order of name"
         "L:size of file"

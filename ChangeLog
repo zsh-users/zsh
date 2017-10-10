@@ -1,5 +1,10 @@
 2017-10-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 41831: Completion/Unix/Type/_tilde_files,
+	Completion/Unix/Command/_less, Completion/Unix/Command/_vorbis,
+	Completion/Zsh/Type/_globquals: fix compset usage in ogg123
+	completion and tweak where compset -p is a better choice than -P
+
 	* 41835: Src/Zle/complete.c: handle multibyte characters with
 	compset -p and -s
 
