@@ -1,4 +1,4 @@
-#compdef info tkinfo install-info makeinfo texi2any texi2dvi pdftexi2dvi texi2pdf texindex
+#compdef info tkinfo pinfo install-info makeinfo texi2any texi2dvi pdftexi2dvi texi2pdf texindex
 
 _info_nodes_caching_policy() {
   local dir oldp
@@ -45,6 +45,7 @@ case $service in
       '(: - -h --help)'{-h,--help}'[display usage]' \
       '(-o --output -O)--index-search=[go directly to node if found]:search string: ' \
       '(--index-search -o --output -O)'{-o+,--output=}'[dump selected nodes to filename]:filename:_files -g "*(-.)"' \
+      '--init-file=[specify initialisation file]:file:_files' \
       '(-n --node)'{-n+,--node=}'[specify nodes in first visited Info file]:node:->nodes' \
       '--no-raw-escapes[output escapes as literal text]' \
       '--restore=[read keystrokes from file]:filename:_files -g "*(-.)"' \
@@ -91,7 +92,7 @@ case $service in
         '--description=[specify description for menu entry]:description' \
         '(2)--dir-file=[specify dir file]:dir file:_files -g "dir(-.)"' \
 	'(--test --dry-run)'{--dry-run,--test}"[don't update dir file]" \
-        \*{--entry,--info}'[specify directory entry to add]:text' \
+        \*{--entry,--item}'[specify directory entry to add]:text' \
 	'--defsection=[like --section, but only use text if no sections present in info file]:text' \
 	{--maxwidth,--max-width}'=[specify maximum width of dir file]:width' \
         '(- 1 2)--help[display help information]' \
@@ -99,9 +100,10 @@ case $service in
         '(2)--info-dir=[specify directory containing dir file]:info directory:_files -/' \
         '--keep-old=[inhibit replacement of existing entries/removal of empty sections]' \
 	'(--name --menuentry)'{--name,--menuentry}'=[specify the menu entry for dir file]:menu entry' \
-	"--no-indent[don't format new entries in the DIR file]"
+	"--no-indent[don't format new entries in the DIR file]" \
         '--quiet[suppress warnings]' \
 	'--regex=[specify sections for file entries using a regex]:regex' \
+        '--remove-exactly[delete existing entries taking exact entry name]' \
         '(--delete --remove)--section=[put new entries in specified section]:section' \
         '--silent[no output except errors]' \
         '(- 1 2)--version[display version information]' \
@@ -135,11 +137,13 @@ case $service in
       '(-E --macro-expand)'{-E,--macro-expand}'[output macro-expanded source to specified file]:file:_files' \
       '(--docbook --xml)--no-split[suppress splitting of output]' \
       '--no-number-sections[output chapter and section numbers]' \
+      '!(--no-number-sections)--number-sections' \
       '(-o --output=)'{-o,--output}'[specify output file]:output file:_files' \
       '(--docbook --html --xml)--disable-encoding[output special characters]' \
-      '(--docbook --html --xml)--fill-column=[specify width to break lines at]:width' \
+      '!(--disable-encoding)--enable-encoding' \
+      '(--docbook --html --xml)--fill-column=[specify width to break lines at]:width [72]' \
       '(--docbook --html --xml)--footnote-style=[specify style for output of footnotes]:((separate\:in\ own\ node end\:at\ end\ of\ node))' \
-      '(--docbook --html --xml)--paragraph-indent=[specify spaces to indent paragraphs by]' \
+      '(--docbook --html --xml)--paragraph-indent=[specify spaces to indent paragraphs by]:indent [3]' \
       '(--docbook --html --xml)--split-size=[split Info files at specified size]:size [300000]' \
       '(--docbook --xml --plaintext)--css-include=[specify file in include in HTML <style> output]:file:_files' \
       '(--docbook --xml --plaintext)--css-ref=[generate reference to a CSS file]:URL:_urls' \
@@ -222,6 +226,27 @@ case $service in
       '-node:info node:->nodes' \
       '*::menu items:->infomanuals' && ret=0
     info=( info ${(kv)opt_args[(I)-file]/-file/-f} )
+  ;;
+  pinfo)
+    cmd=$commands[info]
+    _arguments -s -S \
+      '(- *)'{-h,--help}'[print usage information]' \
+      '(- *)'{-v,--version}'[print version information]' \
+      {-m,--manual}'[use man page]:*:: := _dispatch man man' \
+      '(-r --raw-filename -f --file)'{-r,--raw-filename,-f,--file}'[use raw filename]' \
+      '(-a --apropos)'{-a,--apropos}'[call apropos if nothing found]' \
+      {-p,--plain-apropos}'[call only apropos]:*:: := _dispatch apropos apropos' \
+      '(-c --cut-man-headers)'{-c,--cut-man-headers}'[cut out repeated man headers]' \
+      '(-l --long-manual-links)'{-l,--long-manual-links}'[use long link names in manuals]' \
+      '(-s --squeeze-manlines)'{-s,--squeeze-manlines}'[cut empty lines from manual pages]' \
+      '(-d --dont-handle-without-tag-table)'{-d,--dont-handle-without-tag-table}"[don't display texinfo pages without tag table]" \
+      '(-t --force-manual-tag-table)'{-t,--force-manual-tag-table}'[force manual detection of tag table]' \
+      '(-l --long-manual-links)'{-l,--long-manual-links}'[use long link names in manuals]' \
+      '(-x --clear-at-exit)'{-x,--clear-at-exit}'[clear screen at exit]' \
+      '--node=[jump directly to specified node]:node:->nodes' \
+      '--rcfile=[use alternate rcfile]:file:_files' \
+      '1:menu item:->infomanuals' && ret=0
+    file=${line[1]}
   ;;
 esac
 

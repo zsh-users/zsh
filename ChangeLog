@@ -1,5 +1,8 @@
 2017-10-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 41853: Completion/Unix/Command/_texinfo: update options for
+	texinfo 6.5 and complete also for the pinfo info reader
+
 	* 41849: Completion/Unix/Command/_unexpand: handle both unexpand
 	and expand in a single function: they have some commonalities
 	and it dodges around the clash with the _expand completer
