@@ -1,3 +1,8 @@
+2017-10-10  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41842: Doc/Zsh/grammar.yo: split alias documentation, adding
+	more on problems.
+
 2017-10-08  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 41830: Test/E01options.ztst: test for 41828.
