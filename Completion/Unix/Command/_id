@@ -16,7 +16,7 @@ if _pick_variant gnu=GNU $OSTYPE --version; then
     '(- :)--version[display version]' \
     ':user:_users'
 else
-  choices="-A -a -c -G -g -M -p -P -u"
+  choices="-A -a -c -G -g -M -p -P -R -u"
   args=(
     "($choices)-g[print only EGID]"
     "($choices -r)-G[print all GIDs]"
@@ -30,6 +30,9 @@ else
         '(-g -G -u -n -r)-a[show user name, user ID and all the groups]'
 	'(-g -G -u -n -r)-p[show project membership]'
       )
+    ;;
+    openbsd*)
+      args+=( '(-)-R[display the routing table of the current process]' )
     ;;
     darwin*|dragonfly*|freebsd*)
       args+=( '(-)-P[print id in the form of a password file entry]' )

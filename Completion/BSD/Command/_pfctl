@@ -1,25 +1,23 @@
 #compdef pfctl
 
 local pfctl_flush_modifiers pfctl_optimizer_level pfctl_show_modifiers pfctl_tables_command pfctl_debug_level
+local -a args
 
 pfctl_flush_modifiers=(
-    'all:flush all'
-    'info:flush the filter information'
-    'nat:flush the NAT rules'
-    'osfp:flush the passive operating system fingerprints'
-    'queue:flush the queue rules'
-    'rules:flush the filter rules'
-    'state:flush the stable table'
-    'Sources:flush the source tracking table'
-    'Tables:flush the tables'
+  'rules:flush the filter rules'
+  'states:flush the stable table'
+  'Sources:flush the source tracking table'
+  'info:flush the filter information'
+  'Tables:flush the tables'
+  'osfp:flush the passive operating system fingerprints'
+  'all:flush all'
 )
 
 pfctl_show_modifiers=(
-    'nat:show the currently loaded NAT rules'
     'queue:show the currently loaded queue rules'
     'rules:show the currently loaded filter rules'
     'Anchors:show the currently loaded anchors directly attached to the main ruleset'
-    'state:show the contents of the state table'
+    'states:show the contents of the state table'
     'Sources:show the contents of the source tracking table'
     'info:show filter information'
     'labels:show per-rule statistics of filter rules with labels'
@@ -36,6 +34,7 @@ pfctl_optimizer_level=(
     'basic:enable basic ruleset optimizations'
     'profile:enable basic ruleset optimizations with profiling'
 )
+
 pfctl_tables_command=(
     'kill:kill a table'
     'flush:flush all addresses of a table'
@@ -48,49 +47,75 @@ pfctl_tables_command=(
     'zero:clear all the statistics of a table'
     'load:load only the table definitions from pf.conf(5)'
 )
-pfctl_debug_level=(
-    "none:don\'t generate debug messages" 
-    'urgent:generate debug messages only for serious errors' 
-    'misc:generate debug messages for various errors' 
-    'loud:generate debug messages for common conditions'
-)
-_iface() {
-    local pfctl_iface
-    pfctl_iface=($(pfctl -s Interfaces))
-    compadd $pfctl_iface
+
+_pf_ifaces() {
+  compadd "$@" - $(_call_program tables pfctl -s Interfaces)
 }
-_tables() {
-    local pfctl_tables
-    pfctl_tables=($(pfctl -s Tables))
-     compadd $pfctl_tables
+
+_pf_tables() {
+  compadd "$@" - $(_call_program tables pfctl -s Tables)
 }
-# TODO:
-# Missing -a
-#
-_arguments -s \
-    '-F[flush the filter parameters specified by modifier]:modifier:(($pfctl_flush_modifiers))' \
-    '-A[load only the queue rules present in the rule file]' \
-    '-D[define macro to be set to value]:macro:' \
-    '-d[disable the packet filter]' \
-    '-e[enable the packet filter]' \
-    '-f[load the rules contained in a file]:configuration file:_files' \
-    '-g[include output helpful for debugging]' \
-    '-h[help]' \
-    '-i[restrict the operation to the given interface]:interface:_iface' \
-    '-K[kill all of the source tracking entries originating from the specified host or network]:host or network:_hosts' \
-    '-k[kill all of the state entries originating from the specified host or network]:host or network:_hosts' \
-    '-m[merge in explicitly given options]' \
-    '-N[load only the NAT rules present in the rule file]' \
-    '-n[do not actually load rules, just parse them]' \
-    '-O[load only the options present in the rule file]' \
-    '-o[control the ruleset optimizer]:level:(($pfctl_optimizer_level))' \
-    '-p[use the device file device instead of the default /dev/pf]:device:_files' \
-    '-q[only print errors and warnings]' \
-    '-R[load only the filter rules present in the rule file]' \
-    '-r[perform reverse DNS lookups on states when displaying them]' \
-    '-s[show the filter parameters specified by modifier]:modifier:(($pfctl_show_modifiers ))' \
-    '-T[specify the command to apply to the table]:command:(($pfctl_tables_command))' \
-    '-t[specify the name of the table]:table:_tables' \
-    '-v[produce more verbose output]' \
-    '-x[set the debug level]:debug level:(($pfctl_debug_level))' \
-    '-z[clear per-rule statistics]'
+
+case $OSTYPE in
+  openbsd*)
+    pfctl_debug_level=(
+      emerg alert crit err warning notice info debug
+    )
+    args=(
+      '-L+[load pf states from specified state file]:file:_files'
+      "-N[don't perform domain name resolution]"
+      '-P[display ports using service names]'
+      '-S+[store pf state table in the specified file]:file:_files'
+      '-V+[select routing domain to be used to kill states]:routing domain'
+    )
+  ;;
+  (free|net)bsd*)
+    pfctl_debug_level=(
+      "none:don\'t generate debug messages"
+      'urgent:generate debug messages only for serious errors'
+      'misc:generate debug messages for various errors'
+      'loud:generate debug messages for common conditions'
+    )
+    pfctl_flush_modifiers+=(
+      'nat:flush the NAT rules'
+      'queue:flush the queue rules'
+    )
+    pfctl_show_modifiers+=(
+      'nat:show the currently loaded NAT rules'
+    )
+    args=(
+      '-A[load only the queue rules present in the rule file]'
+      '-N[load only the NAT rules present in the rule file]'
+      '-O[load only the options present in the rule file]'
+      '-R[load only the filter rules present in the rule file]'
+    )
+  ;|
+  freebsd*)
+    args+=( '-P[display ports numerically]' )
+  ;;
+esac
+
+_arguments -s $args \
+  '-a[apply flags -f, -F, and -s only to the rules in the specified anchor]:anchor' \
+  '-F+[flush the filter parameters specified by modifier]:modifier:(($pfctl_flush_modifiers))' \
+  '-D+[define macro to be set to value]:macro' \
+  '(-e)-d[disable the packet filter]' \
+  '(-D)-e[enable the packet filter]' \
+  '-f+[load the rules contained in a file]:configuration file:_files' \
+  '-g[include output helpful for debugging]' \
+  '(-)-h[display help information]' \
+  '-i[restrict the operation to the given interface]:interface:_pf_ifaces' \
+  '*-K[kill all of the source tracking entries originating from the specified host or network]:host or network:_hosts' \
+  '*-k[kill all of the state entries originating from the specified host or network]:host or network:_hosts' \
+  '-m[merge in explicitly given options without disturbing others]' \
+  "-n[don't actually load rules, just parse them]" \
+  '-o+[control the ruleset optimizer]:level:(($pfctl_optimizer_level))' \
+  '-p+[use the device file device instead of the default /dev/pf]:device:_files' \
+  '-q[only print errors and warnings]' \
+  '-r[perform reverse DNS lookups on states when displaying them]' \
+  '-s+[show the filter parameters specified by modifier]:modifier:(($pfctl_show_modifiers))' \
+  '-T+[specify the command to apply to the table]:command:(($pfctl_tables_command))' \
+  '-t[specify the name of the table]:table:_pf_tables' \
+  '-v[produce more verbose output]' \
+  '-x+[set the debug level]:debug level:(($pfctl_debug_level))' \
+  '-z[clear per-rule statistics]'

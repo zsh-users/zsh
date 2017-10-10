@@ -24,16 +24,20 @@ if _pick_variant gnu=gnu unix --help; then
 else
   args=(${args:#*)--*\[*})
   case $OSTYPE in
-    dragonfly*|freebsd*|netbsd*|openbsd*)
+    darwin*|dragonfly*|freebsd*|netbsd*|openbsd*)
       args+=(
         '-d[remove directories as well]'
         '-P[overwrite files before deleting them]'
+        '-v[explain what is being done]'
+      )
+    ;|
+    darwin*|dragonfly*|freebsd*|netbsd*)
+      args+=(
+        '-W[attempt to undelete named files]'
       )
     ;|
     dragonfly*|freebsd*|netbsd*)
       args+=(
-        '-v[explain what is being done]'
-        '-W[attempt to undelete named files]'
         "-x[don't cross file systems when removing a hierarchy]"
       )
     ;|

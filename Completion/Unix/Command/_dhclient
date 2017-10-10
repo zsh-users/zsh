@@ -7,13 +7,13 @@ case $OSTYPE in
     args+=(
       '-c+[specify configuration file]:file:_files'
       '-l+[specify leases file]:file:_files'
-      '-u[reject leases with unknown options]'
     )
   ;|
   freebsd*)
     args+=(
       '(-d)-b[immediately move to the background]'
       '-p+[specify PID file]:file:_files'
+      '-u[reject leases with unknown options]'
     )
   ;;
   openbsd*)

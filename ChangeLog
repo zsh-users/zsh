@@ -1,7 +1,12 @@
 2017-10-10  Oliver Kiddle  <opk@zsh.org>
 
+	* 41855: Completion/Unix/Command/_dhclient,
+	Completion/BSD/Command/_pfctl, Completion/Unix/Command/_id,
+	Completion/Unix/Command/_rm: completion option updates for
+	OpenBSD 6.2 and handle macOS in rm completion
+
 	* 41854: Completion/Unix/Command/_ping: also complete options
-	for ping on Solaris, Mac OS, NetBSD and OpenBSD and for ping6
+	for ping on Solaris, macOS, NetBSD and OpenBSD and for ping6
 
 	* 41853: Completion/Unix/Command/_texinfo: update options for
 	texinfo 6.5 and complete also for the pinfo info reader
