@@ -934,19 +934,45 @@ do_comp_vars(int test, int na, char *sa, int nb, char *sb, int mod)
 	}
     case CVT_PRENUM:
     case CVT_SUFNUM:
-	if (!na)
-	    return 1;
-	if (na > 0 &&
-	    (int)strlen(test == CVT_PRENUM ? compprefix : compsuffix) >= na) {
-	    if (mod) {
-		if (test == CVT_PRENUM)
-		    ignore_prefix(na);
-		else
-		    ignore_suffix(na);
-		return 1;
-	    }
+	if (na < 0)
 	    return 0;
+	if (na > 0 && mod) {
+#ifdef MULTIBYTE_SUPPORT
+	    if (isset(MULTIBYTE)) {
+		if (test == CVT_PRENUM) {
+		    const char *ptr = compprefix;
+		    int len = 1;
+		    int sum = 0;
+		    while (*ptr && na && len) {
+			wint_t wc;
+			len = mb_metacharlenconv(ptr, &wc);
+			ptr += len;
+			sum += len;
+			na--;
+		    }
+		    if (na)
+			return 0;
+		    na = sum;
+		} else {
+		    char *end = compsuffix + strlen(compsuffix);
+		    char *ptr = end;
+		    while (na-- && ptr > compsuffix)
+			 ptr = backwardmetafiedchar(compsuffix, ptr, NULL);
+		    if (na >= 0)
+			return 0;
+		    na = end - ptr;
+		}
+	    } else
+#endif
+	    if ((int)strlen(test == CVT_PRENUM ? compprefix : compsuffix) >= na)
+		return 0;
+	    if (test == CVT_PRENUM)
+		ignore_prefix(na);
+	    else
+		ignore_suffix(na);
+	    return 1;
 	}
+	return 1;
     case CVT_PREPAT:
     case CVT_SUFPAT:
 	{
