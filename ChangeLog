@@ -1,3 +1,8 @@
+2017-11-02  Peter Stephenson  <p.w.stephenson@ntlworld.com>
+
+	* Martijn: 41866: Src/builtin.c, Src/hashtable.c: no error for
+	unsetting nonexistent function if POSIXBUILTINS.
+
 2017-10-31  Oliver Kiddle  <opk@zsh.org>
 
 	* 41965: Completion/Zsh/Command/_typeset: complete functions -W

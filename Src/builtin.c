@@ -125,7 +125,7 @@ static struct builtin builtins[] =
     BUILTIN("unalias", 0, bin_unhash, 0, -1, BIN_UNALIAS, "ams", NULL),
     BUILTIN("unfunction", 0, bin_unhash, 1, -1, BIN_UNFUNCTION, "m", "f"),
     BUILTIN("unhash", 0, bin_unhash, 1, -1, BIN_UNHASH, "adfms", NULL),
-    BUILTIN("unset", BINF_PSPECIAL, bin_unset, 1, -1, 0, "fmv", NULL),
+    BUILTIN("unset", BINF_PSPECIAL, bin_unset, 1, -1, BIN_UNSET, "fmv", NULL),
     BUILTIN("unsetopt", 0, bin_setopt, 0, -1, BIN_UNSETOPT, NULL, NULL),
     BUILTIN("wait", 0, bin_fg, 0, -1, BIN_WAIT, NULL, NULL),
     BUILTIN("whence", 0, bin_whence, 0, -1, 0, "acmpvfsSwx:", NULL),
@@ -4158,6 +4158,10 @@ bin_unhash(char *name, char **argv, Options ops, int func)
     for (; *argv; argv++) {
 	if ((hn = ht->removenode(ht, *argv))) {
 	    ht->freenode(hn);
+	} else if (func == BIN_UNSET && isset(POSIXBUILTINS)) {
+	    /* POSIX: unset: "Unsetting a variable or function that was *
+	     * not previously set shall not be considered an error."    */
+	    returnval = 0;
 	} else {
 	    zwarnnam(name, "no such hash table element: %s", *argv);
 	    returnval = 1;
