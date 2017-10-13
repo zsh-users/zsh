@@ -1,3 +1,11 @@
+2017-10-13  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* 41877: Src/subst·c, Test/E01options.ztst: Separate out
+	SH_FILE_EXPANSION loop from parameter substitution as the latter
+	can add nodes: SH_FILE_EXPANSION should see following nodes
+	only, but on the next loop parameter substitution needs to see
+	added nodes for further expansion.
+
 2017-10-11  Daniel Shahaf  <d.s@xxxxxxxxxxxxxxxxxx>
 
 	* 41825/0002: Completion/Zsh/Command/_stat: Complete -x options

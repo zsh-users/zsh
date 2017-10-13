@@ -108,7 +108,6 @@ prefork(LinkList list, int flags, int *ret_flags)
     queue_signals();
     node = firstnode(list);
     while (node) {
-	LinkNode nextnode = 0;
 	if ((flags & (PREFORK_SINGLE|PREFORK_ASSIGN)) == PREFORK_ASSIGN &&
 	    (insnode = keyvalpairelement(list, node))) {
 	    node = insnode;
@@ -137,23 +136,31 @@ prefork(LinkList list, int flags, int *ret_flags)
 	     * testing if cptr changed...
 	     */
 	    setdata(node, cptr);
-	    /*
-	     * Advance now because we must not expand filenames again
-	     * after string substitution (which may insert new nodes).
-	     */
-	    nextnode = node;
-	    incnode(nextnode);
 	}
-	if (!(node = stringsubst(list, node,
-				 flags & ~(PREFORK_TYPESET|PREFORK_ASSIGN),
-				 ret_flags, asssub))) {
-	    unqueue_signals();
-	    return;
-	}
-	if (isset(SHFILEEXPANSION))
-	    node = nextnode;
 	else
-	    incnode(node);
+	{
+	    if (!(node = stringsubst(list, node,
+				     flags & ~(PREFORK_TYPESET|PREFORK_ASSIGN),
+				     ret_flags, asssub))) {
+		unqueue_signals();
+		return;
+	    }
+	}
+	incnode(node);
+    }
+    if (isset(SHFILEEXPANSION)) {
+	/*
+	 * stringsubst() may insert new nodes, so doesn't work
+	 * well in the same loop as file expansion.
+	 */
+	for (node = firstnode(list); node; incnode(node)) {
+	    if (!(node = stringsubst(list, node,
+				     flags & ~(PREFORK_TYPESET|PREFORK_ASSIGN),
+				     ret_flags, asssub))) {
+		unqueue_signals();
+		return;
+	    }
+	}
     }
     for (node = firstnode(list); node; incnode(node)) {
 	if (node == stop)

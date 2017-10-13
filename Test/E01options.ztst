@@ -1038,6 +1038,16 @@ F:Regression test for workers/41811
 >~/one
 >~/two
 
+  (
+    setopt shfileexpansion
+    set -- also appearing
+    print -l $*$*
+  )
+0:SH_FILE_EXPANSION interaction with inserting nodes from parameters
+>also
+>appearingalso
+>appearing
+
   testpat() {
     if [[ $1 = ${~2} ]]; then print $1 $2 yes; else print $1 $2 no; fi
   }
