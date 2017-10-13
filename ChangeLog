@@ -1,10 +1,15 @@
+2017-10-13  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 41873: Src/lex.c: temporarily disable effects of ${(Z:n:)...}
+	for parsing $(...) expressions within the parameter value
+
 2017-10-13  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* 41833 + 41838: Completion/Unix/Command/_jq: New completion.
 
 2017-10-13  Peter Stephenson  <p.stephenson@samsung.com>
 
-	* 41877: Src/subst·c, Test/E01options.ztst: Separate out
+	* 41877: Src/subst.c, Test/E01options.ztst: Separate out
 	SH_FILE_EXPANSION loop from parameter substitution as the latter
 	can add nodes: SH_FILE_EXPANSION should see following nodes
 	only, but on the next loop parameter substitution needs to see

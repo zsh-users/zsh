@@ -2128,8 +2128,12 @@ skipcomm(void)
      * function at the history layer --- this is consistent with the
      * intention of maintaining the history and input layers across
      * the recursive parsing.
+     *
+     * Also turn off LEXFLAGS_NEWLINE because this is already skipping
+     * across the entire construct, and parse_event() needs embedded
+     * newlines to be "real" when looking for the OUTPAR token.
      */
-    lexflags &= ~LEXFLAGS_ZLE;
+    lexflags &= ~(LEXFLAGS_ZLE|LEXFLAGS_NEWLINE);
     dbparens = 0;	/* restored by zcontext_restore_partial() */
 
     if (!parse_event(OUTPAR) || tok != OUTPAR) {
