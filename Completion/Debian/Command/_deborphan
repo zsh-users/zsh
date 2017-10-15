@@ -1,0 +1,42 @@
+#compdef deborphan
+
+local keep=/var/lib/deborphan/keep
+_arguments : \
+  {--help,-h}'[help]' \
+  {--status-file,-f}'[statusfile]:file:_files' \
+  {--version,-v}'[version]' \
+  {--show-deps,-d}'[show dependencies for packages that have them]' \
+  {--show-priority,-P}'[show priority of packages found]' \
+  {--show-section,-s}'[show the sections the packages are in]' \
+  --no-show-section'[do not show sections]' \
+  {--show-size,-z}'[show installed size of packages found]' \
+  {--all-packages,-a}'[compare all packages, not just libs]' \
+  {--exclude,-e}'[work as if packages in LIST were not installed]:LIST:' \
+  {--force-hold,-H}'[Ignore hold flags.]' \
+  {--nice-mode,-n}'[Disable checks for "recommends" and "suggests".]' \
+  --ignore-recommends'[Disable checks for recommends.]' \
+  --ignore-suggests'[Disable checks for "suggests".]' \
+  {--priority,-p}'[PRIOR  Select only packages with priority >= PRIOR.]:PRIOR:' \
+  --find-config'[Find "orphaned" configuration files.]' \
+  --libdevel'[Search in libdevel in addition to libs and oldlibs.]' \
+  {--add-keep,-A}'[PKGS.. Never report PKGS.]:*:package:_deb_packages installed' \
+  {--keep-file,-k}'[Use FILE to get/store info about kept packages.]:file:_files' \
+  {--list-keep,-L}'[List the packages that are never reported.]' \
+  {--del-keep,-R}"[PKGS.. Remove PKGS from the 'keep' file.]:*:package:_values package $(< $keep)" \
+  {--zero-keep,-Z}'[Remove all packages from the "keep" file.]' \
+  --guess-common'[Try to report common packages.]' \
+  --guess-data'[Try to report data packages.]' \
+  --guess-debug'[Try to report debugging libraries.]' \
+  --guess-dev'[Try to report development packages.]' \
+  --guess-doc'[Try to report documentation packages.]' \
+  --guess-dummy'[Try to report dummy packages.]' \
+  --guess-kernel'[Try to report kernel modules.]' \
+  --guess-interpreters'[Try to report interpreter libraries.]' \
+  --guess-mono'[Try to report mono libraries.]' \
+  --guess-perl'[Try to report perl libraries.]' \
+  --guess-pike'[Try to report pike libraries.]' \
+  --guess-python'[Try to report python libraries.]' \
+  --guess-ruby'[Try to report ruby libraries.]' \
+  --guess-section'[Try to report libraries in wrong sections.]' \
+  --guess-all'[Try all of the above.]' \
+  --guess-only'[Use --guess options only.]'

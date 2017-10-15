@@ -1,3 +1,8 @@
+2017-10-16  Peter Stephenson  <p.stephenson@samsung.com>
+
+	* gi1242+zsh: 41904: Completion/Debian/Command/_deborphan,
+	Completion/X/Command/_xrandr: new and updated completions.
+
 2017-10-15  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 41898: Functions/Zle/edit-command-line: handle multi-word values

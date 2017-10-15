@@ -58,8 +58,11 @@ case $state in
     esac
   ;;
   outputs)
-    _wanted outputs expl output compadd \
-        ${(uo)${(M)${(f)"$(_call_program outputs xrandr)"}:#* connected*}%% *} && return 0
+    local -a xrandr_output=(${(f)"$(_call_program outputs xrandr)"})
+    _alternative \
+	'connected:connected outputs:('${(j: :)${(uo)${(M)xrandr_output:#* connected*}%% *}}')' \
+	'disconnected:disconnected outputs:('${(j: :)${(uo)${(M)xrandr_output:#* disconnected*}%% *}}')' \
+	&& return 0
   ;;
   modes)
     _wanted modes expl mode compadd \
