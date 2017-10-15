@@ -15,15 +15,15 @@
   (( $+zle_bracketed_paste )) && print -r -n - $zle_bracketed_paste[2]
 
   # Open the editor, placing the cursor at the right place if we know how.
-  local editor=${${VISUAL:-${EDITOR:-vi}}}
+  local editor=( "${(@Q)${(z)${VISUAL:-${EDITOR:-vi}}}}" )
   case $editor in 
     (*vim*)
       integer byteoffset=$(( $#PREBUFFER + $#LBUFFER + 1 ))
-      ${=editor} -c "normal! ${byteoffset}go" -- $1;;
+      "${(@)editor}" -c "normal! ${byteoffset}go" -- $1;;
     (*emacs*)
-      local lines=( ${(f):-"$PREBUFFER$LBUFFER"} )
-      ${=editor} +${#lines}:$((${#lines[-1]} + 1)) $1;;
-    (*) ${=editor} $1;;
+      local lines=( "${(@f):-"$PREBUFFER$LBUFFER"}" )
+      "${(@)editor}" +${#lines}:$((${#lines[-1]} + 1)) $1;;
+    (*) "${(@)editor}" $1;;
   esac
 
   (( $+zle_bracketed_paste )) && print -r -n - $zle_bracketed_paste[1]

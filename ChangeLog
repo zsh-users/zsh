@@ -1,3 +1,8 @@
+2017-10-15  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* 41898: Functions/Zle/edit-command-line: handle multi-word values
+	of $VISUAL et al., and line counting of buffer for emacs startup
+
 2017-10-13  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* 41873: Src/lex.c: temporarily disable effects of ${(Z:n:)...}
