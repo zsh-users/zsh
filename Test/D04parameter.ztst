@@ -2401,3 +2401,24 @@ F:behavior, see http://austingroupbugs.net/view.php?id=888
 0:Append to element of associative array on creation
 >one
 >howsyourfathertoday
+
+  local b=$'a+=(${(o)$(ls -1 \'.*\' | perl -alne \'\nEND{ print " "; }\'\n)})'
+  printf ': %s\n' "${(@Z+cn+)b}"
+0:(Z) flag splitting with $( closed after embedded newline
+>: a+=(
+>: ${(o)$(ls -1 '.*' | perl -alne '
+>END{ print " "; }'
+>)}
+>: )
+
+  local b=$'# \' single\n# \" double\n# ` backtick\nword'
+  (setopt CSH_JUNKIE_QUOTES
+  printf ': %s\n' "${(@Z+n+)b}")
+0:(z) flag with CSH_JUNKIE_QUOTES
+>: #
+>: ' single
+>: #
+>: " double
+>: #
+>: ` backtick
+>: word

@@ -1291,7 +1291,9 @@ gettokstr(int c, int sub)
 		ALLOWHIST
 		if (c != '\'') {
 		    unmatched = '\'';
-		    peek = LEXERR;
+		    /* Not an error when called from bufferwords() */
+		    if (!(lexflags & LEXFLAGS_ACTIVE))
+			peek = LEXERR;
 		    cmdpop();
 		    goto brk;
 		}
@@ -1313,7 +1315,9 @@ gettokstr(int c, int sub)
 	    cmdpop();
 	    if (c) {
 		unmatched = '"';
-		peek = LEXERR;
+		/* Not an error when called from bufferwords() */
+		if (!(lexflags & LEXFLAGS_ACTIVE))
+		    peek = LEXERR;
 		goto brk;
 	    }
 	    c = Dnull;
@@ -1350,7 +1354,9 @@ gettokstr(int c, int sub)
 	    cmdpop();
 	    if (c != '`') {
 		unmatched = '`';
-		peek = LEXERR;
+		/* Not an error when called from bufferwords() */
+		if (!(lexflags & LEXFLAGS_ACTIVE))
+		    peek = LEXERR;
 		goto brk;
 	    }
 	    c = Tick;
@@ -1392,7 +1398,7 @@ gettokstr(int c, int sub)
 	return LEXERR;
     }
     hungetc(c);
-    if (unmatched)
+    if (unmatched && !(lexflags & LEXFLAGS_ACTIVE))
 	zerr("unmatched %c", unmatched);
     if (in_brace_param) {
 	while(bct-- >= in_brace_param)

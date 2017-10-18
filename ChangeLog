@@ -1,3 +1,13 @@
+2017-10-17  Barton E. Schaefer  <schaefer@zsh.org>
+
+	* unposted: Test/D04parameter.ztst: tests for 41902
+
+	* 41902: Src/lex.c: ${(z)...} continues parsing on unmatched
+	quote when CSH_JUNKIE_QUOTES is set.
+
+	* unposted (cf. Sebastian: 41891): Test/D04parameter.ztst:
+	regression test for 41873
+	
 2017-10-17  Daniel Shahaf  <d.s@daniel.shahaf.name>
 
 	* unposted: Doc/Zsh/builtins.yo: Document "typeset -p"'s optional
