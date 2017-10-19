@@ -573,9 +573,7 @@ except history expansion.  Therefore, if an alias is defined for the
 word tt(foo), alias expansion may be avoided by quoting part of the
 word, e.g. tt(\foo).  Any form of quoting works, although there is
 nothing to prevent an alias being defined for the quoted form such as
-tt(\foo) as well.  Also, if a separator such as tt(&&) is aliased,
-tt(\&&) turns into the two tokens tt(\&) and tt(&), each of which may
-have been aliased separately.  Similarly for tt(\<<), tt(\>|), etc.
+tt(\foo) as well.
 
 When tt(POSIX_ALIASES) is set, only plain unquoted strings are eligible
 for aliasing.  The tt(alias) builtin does not reject ineligible aliases,
@@ -610,6 +608,9 @@ It is not presently possible to alias the `tt(LPAR()LPAR())' token that
 introduces arithmetic expressions, because until a full statement has been
 parsed, it cannot be distinguished from two consecutive `tt(LPAR())'
 tokens introducing nested subshells.
+Also, if a separator such as tt(&&) is aliased,
+tt(\&&) turns into the two tokens tt(\&) and tt(&), each of which may
+have been aliased separately.  Similarly for tt(\<<), tt(\>|), etc.
 
 There is a commonly encountered problem with aliases
 illustrated by the following code:

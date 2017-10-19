@@ -1,3 +1,8 @@
+2017-10-30  Daniel Shahaf  <d.s@daniel.shahaf.name>
+
+	* 41939: Doc/Zsh/grammar.yo: docs: Move aliases corner case to
+	the dangerous bends section. (after 41482)
+
 2017-10-29  Oliver Kiddle  <opk@zsh.org>
 
 	* Sebastian: 41960: Completion/Zsh/Command/_zstyle,
