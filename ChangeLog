@@ -1,3 +1,8 @@
+2017-10-20  Christian Brabandt  <cb@256bit.org>
+
+	* 41943: Completion/Unix/Command/_vim: Completion: add --clean for
+	vim
+
 2017-10-17  Barton E. Schaefer  <schaefer@zsh.org>
 
 	* unposted: Test/D04parameter.ztst: tests for 41902

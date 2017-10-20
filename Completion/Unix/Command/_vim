@@ -74,6 +74,7 @@ arguments=(
   '(- *)--version[print version information and exit]'
   '(* -q)-t[edit file where tag is defined]:tag:_complete_tag'
   '(-t -q)*:file:_vim_files'
+  '--clean[start with defaults in non-compatible mode]'
 )
 [[ $service != *g* ]] && arguments+='-g[start with GUI]'
 [[ $service != r* ]] && arguments+='-Z[restricted mode]'
