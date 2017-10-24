@@ -1,3 +1,8 @@
+2017-10-25  Alexey Sokolov  <sokolov@google.com>
+
+	* 41952: Functions/VCS_Info/Backends/VCS_INFO_get_data_hg: Use
+	HGPLAIN instead of HGRCPATH in VCS_INFO_get_data_hg
+
 2017-10-20  Christian Brabandt  <cb@256bit.org>
 
 	* 41943: Completion/Unix/Command/_vim: Completion: add --clean for
