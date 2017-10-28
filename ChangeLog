@@ -1,5 +1,7 @@
 2017-10-28  Oliver Kiddle  <opk@zsh.org>
 
+	* 41957: Completion/Unix/Command/_git: update for git 2.14.3
+
 	* 41927: Completion/Zsh/Command/_typeset: complete
 	"typeset -p"'s optional argument for multi-line output
 

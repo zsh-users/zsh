@@ -1535,7 +1535,7 @@ _git-shortlog () {
     '(: -)'{-h,--help}'[print a short usage message and exit]' \
     '(-n --numbered)'{-n,--numbered}'[sort according to number of commits]' \
     '(-s --summary)'{-s,--summary}'[suppress commit description]' \
-    '(-e --email)'{-e,--email}'[show email addres of each author]' \
+    '(-e --email)'{-e,--email}'[show email address of each author]' \
     '-w-[linewrap the output]:: :->wrap' \
     $revision_options \
     '(-)--[start file arguments]' \
@@ -1545,7 +1545,7 @@ _git-shortlog () {
     (wrap)
       if [[ -prefix [[:digit:]]#,[[:digit:]]#,[[:digit:]]# ]]; then
         compset -P '[[:digit:]]#,[[:digit:]]#,'
-        __git_guard_number 'indent of second and subsquent wrapped lines'
+        __git_guard_number 'indent of second and subsequent wrapped lines'
       elif [[ -prefix [[:digit:]]#,[[:digit:]]# ]]; then
         compset -P '[[:digit:]]#,'
         compset -S ',[[:digit:]]#'
@@ -1992,6 +1992,7 @@ _git-tag () {
                                                              version\\\:refname\:"tag names are treated as version numbers"))' \
       '--points-at=[only list tags of the given object]: :__git_commits' \
       '--format=[specify format to use for the output]:format' \
+      '--color=-[respect any colors specified in the format]::when:(always never auto)' \
       '(-i --ignore-case)'{-i,--ignore-case}'[sorting and filtering are case-insensitive]' \
       ':: :_guard "^-*" pattern' \
     - verification \
@@ -3045,7 +3046,7 @@ __git_config_option-or-value () {
                 never:'never show in columns' \
                 auto:'show in columns if the output is to the terminal' \
                 column:'fill columns before rows (implies "always")' \
-                row:'fill rows before columns (implies "akways")' \
+                row:'fill rows before columns (implies "always")' \
                 plain:'show in one column (implies "always")' && ret=0
               ;;
             (commit.cleanup)
@@ -4916,6 +4917,7 @@ _git-for-each-ref () {
     '--count=[maximum number of refs to iterate over]: :__git_guard_number "maximum number of refs"' \
     '*--sort=[key to sort refs by]: :__git_ref_sort_keys' \
     '--format=-[output format of ref information]:format' \
+    '--color=-[respect any colors specified in the format]::when:(always never auto)' \
     '*--points-at=[print only refs which point at the given object]:object:__git_commits' \
     '*--merged=[print only refs that are merged]:object:__git_commits' \
     '*--no-merged=[print only refs that are not merged]:object:__git_commits' \
@@ -6337,7 +6339,7 @@ __git_recent_commits () {
       else
         label="[HEAD~$distance_from_head]"
       fi
-      ## Disabled because _describe renders the output unhelpfuly when this function
+      ## Disabled because _describe renders the output unhelpfully when this function
       ## is called twice during a single completion operation, and list-grouped is
       ## in its default setting (enabled).
       #descr+=("@~${distance_from_head}":"${label} $k") # CROSSREF: use the same label as below
