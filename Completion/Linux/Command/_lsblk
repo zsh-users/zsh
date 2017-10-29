@@ -29,6 +29,7 @@ _arguments -C -s -S \
   '(H)'{-i,--ascii}'[output ascii characters only]' \
   '(H)'{-J,--json}'[use JSON output format]' \
   '(H)'{-l,--list}'[use list format output]' \
+  '(H)'{-t,--tree}'[use tree format output]' \
   '(H)'{-P,--pairs}'[use key="value" output format]' \
   '(H)'{-r,--raw}'[use raw output format]' \
   + 'H' \

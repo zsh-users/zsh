@@ -18,7 +18,7 @@ _arguments -s -S \
   - 'info' \
   '(-v --verbose)'{-v,--verbose}'[verbose mode]' \
   '(-o --offset -a --all)'{-a,--all}'[show the status of all loop devices]' \
-  '(-O --output)'{-O+,--output=}'[specify columns to be printed with --list]:column:_sequence -s , compadd - name autoclear back-file back-ino back-maj\:min maj\:min offset partscan ro sizelimit dio' \
+  '(-O --output)'{-O+,--output=}'[specify columns to be printed with --list]:column:_sequence -s , compadd - name autoclear back-file back-ino back-maj\:min maj\:min offset partscan ro sizelimit dio log-sec' \
   '(-J --json --raw -O --output -n --noheadings)'{-J,--json}'[use JSON --list output format]' \
   '(-l --list)'{-l,--list}'[list currently used loop devices]' \
   '(-J --json)--raw[raw output format]' \
@@ -36,6 +36,7 @@ _arguments -s -S \
   '(-L --nooverlap)'{-L,--nooverlap}'[avoid possible conflict between devices]' \
   '(-P --partscan)'{-P,--partscan}'[scan the partition table of newly created loop devices]' \
   '--sizelimit[limit device to specified size]:size (bytes)' \
+  '(-b --sector-size)'{-b+,--sector-size=}'[set logical sector size of loop device]:size (bytes)' \
   '--show[print device name after setup]' \
   '(-r --read-only)'{-r,--read-only}'[set up a read-only loop device]' \
   '1:file:_files' \
