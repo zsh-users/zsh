@@ -1,6 +1,7 @@
 #autoload
 
-local state=qual expl char delim timespec default
+local state=qual expl char delim timespec default MATCH
+integer MBEGIN MEND
 local -a alts tdisp sdisp tmatch smatch
 local -A specmap
 

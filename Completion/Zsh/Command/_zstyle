@@ -1,7 +1,8 @@
 #compdef zstyle
 
 local state context ostate line expl ctop suf
-local nm=$compstate[nmatches] taglist patterns contexts
+local nm=$compstate[nmatches] taglist patterns contexts MATCH
+integer MBEGIN MEND
 typeset -A opt_args styles
 
 _vcs_info_hooks() {

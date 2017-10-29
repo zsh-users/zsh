@@ -1,5 +1,8 @@
 2017-10-29  Oliver Kiddle  <opk@zsh.org>
 
+	* Sebastian: 41960: Completion/Zsh/Command/_zstyle,
+	Completion/Zsh/Type/_globquals: declare MATCH, MBEGIN, MEND local
+
 	* 41961: Completion/Unix/Command/_ansible: new ansible completion
 
 	* 41958: Completion/Linux/Command/_losetup,
