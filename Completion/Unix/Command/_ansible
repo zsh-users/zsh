@@ -1,0 +1,281 @@
+#compdef ansible ansible-config ansible-console ansible-doc ansible-galaxy ansible-inventory ansible-playbook ansible-pull ansible-vault
+
+local curcontext="$curcontext" plug plugvar ret=1
+local -a args state line
+local -A opt_args
+
+case $service in
+  ansible|ansible-console|ansible-doc|ansible-playbook)
+    args=(
+      \*{-M+,--module-path=}'[specify path to modules]:module path:_dir_list'
+    )
+  ;|
+  ansible|ansible-console|ansible-playbook|ansible-pull)
+    args+=(
+      '(-K --ask-become-pass)'{-K,--ask-become-pass}'[ask for privilege escalation password]'
+      '(-k --ask-pass)'{-k,--ask-pass}'[ask for connection password]'
+      '(-T --timeout)'{-T+,--timeout=}'[override the connection timeout]:timeout (seconds) [10]'
+      '(-c --connection)'{-c+,--connection=}'[specify connection type]:connection type [smart]:->connect-types'
+      '(-u --user)'{-u+,--user=}'[specify remote user for connection]:remote user:_users'
+      '--private-key=[specify file to use to authenticate the connection]:private key file:_files'
+      '--ssh-common-args=[specify common arguments to pass to sftp/scp/ssh]:ssh option'
+      '--sftp-extra-args=[specify extra arguments to pass to sftp]:sftp option'
+      '--scp-extra-args=[specify extra arguments to pass to scp]:scp option'
+      '--ssh-extra-args=[specify extra arguments to pass to ssh]:ssh option'
+    )
+  ;|
+  ansible|ansible-console|ansible-playbook)
+    args+=(
+      '(-C --check)'{-C,--check}"[don't make any changes]"
+      '(-D --diff)'{-D,--diff}'[show differences when changing small files and templates]'
+      '(-b --become)'{-b,--become}'[escalate privileges on remote system]'
+      '(-f --forks)'{-f+,--forks=}'[specify number of parallel processes to use]:processes [5]'
+      '--become-method=[specify privilege escalation method to use]:method [sudo]:(sudo su pbrun pfexec doas dzdo ksu runas pmrun)'
+      '--become-user=[specify remote user for running operations]:user:_users'
+      "--syntax-check[perform a syntax check on the playbook, but don't execute it]"
+      '!(-R --su-user -U --sudo-user)'{-R,-U,--su-user,--sudo-user}':user [root]:_users'
+    )
+  ;|
+  ansible|ansible-console|ansible-inventory|ansible-playbook|ansible-pull|ansible-vault)
+    args+=(
+      '--ask-vault-pass[ask for vault password]'
+      '--new-vault-id=[specify new vault identity to use for rekey]:vault id'
+      '--new-vault-password-file=[specify new vault password file to use for rekey]:file:_files'
+      '--vault-id=[specify vault identity to use]:vault identity'
+      '--vault-password-file=[specify vault password file]:vault password file:_files'
+    )
+  ;|
+  ansible|ansible-console|ansible-inventory|ansible-playbook|ansible-pull)
+    args+=(
+      '--list-hosts[output list of matching hosts]'
+      '(-i --inventory)'{-i+,--inventory=}'[specify inventory host file]:inventory file:_files'
+      '!(-i --inventory)--inventory-file=:inventory file:_files'
+      '(-l --limit)'{-l+,--limit=}'[further limit hosts to an additional pattern]:host subset:->hosts'
+    )
+  ;|
+  ansible|ansible-playbook|ansible-pull)
+    args+=(
+      '(-e --extra-vars)'{-e+,--extra-vars=}'[set additional variables]:key=value or YAML/JSON'
+    )
+  ;|
+  ansible-playbook|ansible-pull)
+    args+=(
+      '(-t --tags)'{-t,--tags}'[only run plays and tasks tagged with these values]'
+      "--skip-tags[only run plays and tasks whose tags don't match]"
+    )
+  ;|
+  ansible|ansible-pull)
+    args+=(
+      '(-m --module-name)'{-m+,--module-name=}'[specify module]:module:->plugins'
+    )
+  ;|
+  ansible)
+    args+=(
+      '(-a --args)'{-a+,--args=}'[specify command or module arguments]:arguments:->args'
+      '(-B --background)'{-B+,--background=}'[run asynchronously, failing after specified time]:fail timeout (seconds)'
+      '(-o --one-line)'{-o,--one-line}'[condense output]'
+      '(-P --poll)'{-P+,--poll=}'[specify the poll interval if using -B]:interval (seconds) [15]'
+      '(-t --tree)'{-t+,--tree=}'[specify directory for log output]:directory:_directories'
+      '--output[output file name for encrypt or decrypt; use - for stdout]:output file:_files'
+      ':host:->hosts'
+    )
+  ;;
+  ansible-config)
+    args+=(
+      '(-c --config)'{-c+,--config=}'[specify configuration file]:config file:_files'
+      '1:action:((
+        list\:list\ all\ configuration
+	dump\:show\ the\ current\ settings,\ merge\ specified\ configuration
+	view\:display\ the\ current\ config\ file
+      ))'
+    )
+    [[ -n $words[(r)dump] ]] && args+=( '--only-changed[only show configuration that is changed from the default]' )
+  ;;
+  ansible-console)
+    args+=(
+      '--step[one-step-at-a-time: confirm each task before running]'
+    )
+  ;;
+  ansible-doc)
+    args+=(
+      '(-l --list)'{-l,--list}'[list available plugins]'
+      '(-s --snippet)'{-s,--snippet}'[show playbook snippet for specified plugins]'
+      '(-t --type)'{-t+,--type=}'[choose plugin type]:plugin type [module]:(cache callback connection inventory lookup module strategy vars)'
+      '*:plugin:->plugins'
+    )
+  ;;
+  ansible-inventory)
+    args+=(
+      '(-y --yaml)--graph[output inventory graph]'
+      '--host[output specific host information]'
+      '--list[output all hosts information]'
+      '(-y --yaml)--vars[add variables to the graph display]'
+      '(-y --yaml --vars --graph)'{-y,--yaml}'[use YAML format instead of JSON]'
+    )
+  ;;
+  ansible-galaxy)
+    args+=( -A "-*" $args
+      '--list[list integrations]'
+      '(-c --ignore-certs)'{-c,--ignore-certs}'[ignore SSL certificate validation errors]'
+      '(-s --server)'{-s+,--server=}'[specify API server destination]:server destination'
+      '--remove=[remove integration]:integration id'
+      '1:action:(delete import info init install list login remove search setup)'
+      '*::args:->galaxy'
+    )
+  ;;
+  ansible-playbook)
+    args+=(
+      '--flush-cache[clear the fact cache]'
+      '--force-handlers[run handlers even if a task fails]'
+      '--list-tags[list all available tags]'
+      '--list-tasks[list all tasks that would be executed]'
+      '--start-at-task=[start the playbook at specified task]:task'
+      '--key-file=[specify file to use to authenticate the connection]:private key file:_files'
+      '*:playbook:_files -g "(#i)*.y(|a)ml"'
+    )
+  ;;
+  ansible-pull)
+    args+=(
+      "--check[don't make any changes]"
+      '(-d --directory)'{-d+,--directory=}'[specify directory to checkout repository to]:directory:_directories'
+      '--full[do a full instead of a shallow clone]'
+      '--accept-host-key[adds the hostkey for the repo url if not already added]'
+      '--purge[purge checkout after playbook run]'
+      '(-f --force)'{-f,--force}'[run the playbook even if the repository could not be updated]'
+      '(-C --checkout)'{-C,--checkout}'[specify branch/tag/commit to checkout]:branch/tag/commit'
+      '--track-subs[submodules will track the latest changes]'
+      '(-o --only-if-changed)'{-o,--only-if-changed}'[only run the playbook if the repository has been updated]'
+      '(-s --sleep)'{-s+,--sleep=}'[delay for random duration before starting]:max delay (seconds)'
+      '(-U --url)'{-U+,--url=}'[specify URL of the playbook repository]:url:_urls'
+      '--verify-commit[verify GPG signature of checked out commit]'
+      '*:playbook:_files -g "(#i)*.y(|a)ml"'
+    )
+  ;;
+  ansible-vault)
+    args=( -A "-*" $args
+      '*::args:->vault'
+    )
+  ;;
+esac
+
+_arguments -s -S -C $args \
+  '(- :)--version[display version information]' \
+  '(- :)'{-h,--help}'[display usage information]' \
+  \*{-v,--verbose}"[verbose mode (repeat to increase)]" && ret=0
+
+plug=${(v)opt_args[(i)-(t|-type)]:-module}
+case $state in
+  args)
+    case ${(v)opt_args[(I)-(m|module)]} in
+      *) # shell, command or no module specified
+        _cmdstring && ret=0
+      ;;
+    esac
+  ;;
+  hosts)
+    local alts
+    [[ -prefix - ]] && return ret
+    compset -P '*[,:](|[&!~])'
+    compset -S '[:,]*'
+    if compset -P '@'; then
+      _files && ret=0
+    else
+      local -a inventory
+      typeset -ga _ansible_hosts _ansible_groups
+      if (( !$#_ansible_hosts || !$#_ansible_groups )); then
+       	inventory=( ${(f)"$(_call_program groups ansible-inventory --graph)"} )
+       	_ansible_hosts=( ${${(M)inventory%--[^:]#}#--} )
+	_ansible_groups=( ${${${(M)inventory%@*:}%:}#@} )
+      fi
+      [[ $IPREFIX = *[:,] ]] &&
+	alts=( 'operators:operator:_values -S "" operator "![exclude hosts]" "&[intersection of hosts]" "~[regular expression pattern]"' )
+      _alternative $alts \
+	'groups:group:compadd -qS: -a _ansible_groups' \
+	'hosts:host:compadd -qS: -a _ansible_hosts' && ret=0
+    fi
+  ;;
+  connect-types)
+    plug=connection
+  ;&
+  plugins)
+    plugvar=_ansible_${plug}_plugins
+    typeset -ga ${plug}
+    (( ${(P)#plugvar} )) || set -A ${plugvar} \
+        ${${(f)"$(_call_program plugins ansible-doc -t $plug -l)"}/ ##/:}
+    _describe -t plugins "${plug} plugin" $plugvar && ret=0
+  ;;
+  galaxy)
+    curcontext="${curcontext%:*}-${line[1]}:"
+    args=()
+    case $line[1] in
+      info|search|list|remove|install)
+	args=( '(-p --roles-path)'{-p,--roles-path}'[specify location of roles]:path:_directories' )
+      ;|
+      info|init)
+	args+=( "--offline[don't query the galaxy API]" )
+      ;|
+      init|install)
+	args+=( '(-f --force)'{-f,--force}'[force overwriting an existing role]' )
+      ;|
+      search)
+	args+=(
+           '--author=[specify GitHub username]:username'
+           '--galaxy-tags=[specify list of galaxy tags to filter by]:galaxy tags'
+           '--platforms=[specify list of OS platforms to filter by]:platforms'
+	   '*: :_guard "^-*" "search term"'
+	)
+      ;;
+      setup)
+	args=(
+	  '--list[list integrations]'
+	  '--remove=[remove integration]:integration id'
+	)
+      ;;
+      init)
+	args+=(
+	  '--container-enabled[initialize the skeleton role with default contents for a Container Enabled role]'
+          '--init-path=[specify path in which the skeleton role will be created]:path:_directories'
+          '--role-skeleton=[specify path to a role skeleton that the new role should be based upon]'
+	)
+      ;;
+      install)
+	args+=(
+	  '(-n --no-deps)'{-n,--no-deps}"[don’t download roles listed as dependencies]"
+	  '(-i --ignore-errors)'{-i,--ignore-errors}'[ignore errors and continue with the next specified role]'
+	  '(-r --role-file)'{-r+,--role-file=}'[specify file containing a list of roles to be imported]:file:_files'
+        )
+      ;;
+      import)
+	args+=(
+           '--status[check the status of the most recent import request for given github_user/github_repo]'
+           "--no-wait[don’t wait for import results]"
+           '--branch=[specify branch to import]:branch'
+           '--role-name=[specify name the role should have]:role'
+        )
+      ;;
+      login)
+	args+=(
+	  '--github-token=[identify with github token rather than username and password]'
+	)
+      ;;
+    esac
+    _arguments -s -S $args && ret=0
+  ;;
+  vault)
+    curcontext="${curcontext%:*}-${line[1]}:"
+    args=()
+    case $line[1] in
+      (de|en)crypt*) args=( '--output=[specify output file name]:file:_files' ) ;|
+      encrypt_string)
+	args+=(
+	  '(-p --prompt)'{-p,--prompt}'[prompt for the string to encrypt]'
+	  '(-n --name)'{-n+,--name=}'[specify the variable name]:variable'
+	  '--stdin-name=[specify the variable name for stdin]:variable'
+	)
+      ;;
+    esac
+    _arguments -s -S $args && ret=0
+  ;;
+esac
+
+return ret

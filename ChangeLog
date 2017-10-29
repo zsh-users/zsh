@@ -1,5 +1,7 @@
 2017-10-29  Oliver Kiddle  <opk@zsh.org>
 
+	* 41961: Completion/Unix/Command/_ansible: new ansible completion
+
 	* 41958: Completion/Linux/Command/_losetup,
 	Completion/Linux/Command/_lsblk, Completion/Linux/Command/_wipefs,
 	Completion/Unix/Command/_hexdump, Completion/Unix/Command/_last:
