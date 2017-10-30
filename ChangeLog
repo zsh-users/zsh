@@ -1,5 +1,9 @@
 2017-10-31  Oliver Kiddle  <opk@zsh.org>
 
+	* 41965: Completion/Zsh/Command/_typeset: complete functions -W
+
+	* 41965: Completion/Zsh/Command/_zmodload: complete zmodload -s
+
 	* 41963: Completion/Unix/Command/_gnutls: update for gnutls 3.6.1
 
 2017-10-30  Daniel Shahaf  <d.s@daniel.shahaf.name>

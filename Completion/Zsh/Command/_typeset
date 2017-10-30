@@ -41,6 +41,7 @@ allargs=(
   uf '-u[mark function for autoloadling]'
   up '-u[convert the value to uppercase]'
   w '(-k -z)-w[specify that arguments refer to files compiled with zcompile]'
+  W '-+W[turn on WARN_NESTED_VAR for function]'
   x "($fopts)-+x[export parameter]"
   z "($popts -k -w)-+z[mark function for zsh-style autoloading]"
 )
@@ -54,7 +55,7 @@ case ${service} in
   ;;
   float) use="EFHghlprtux";;
   functions)
-    use="UkmTtuzM"
+    use="UkmTtuzMW"
     func=f
     allargs[M]='(-k -t -T -u -U -z -M +M +k +t +z)-+M[define mathematical function]'
   ;;

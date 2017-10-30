@@ -17,6 +17,7 @@ _arguments -n -C -S -s \
   '(-u -b -c -d -p -f -A -R -I)-F[handle features]' \
   '(-u -b -c -d -p -f -A -R -I)-m[treat feature arguments as patterns]' \
   '(-d -e)-i[suppress error if command would do nothing]' \
+  '(-d -e -L)-s[suppress error if module is not available]' \
   '(-b -c -d -p -f -F -P -m)-I[define infix condition names]' \
   '(-u -b -c -d -p -f -A -R)-l[list features]' \
   '(-e -u)-L[output in the form of calls to zmodload]' \
