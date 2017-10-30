@@ -35,14 +35,19 @@ case "$service" in
       '--priority=[specify TLS algorithms and protocols to enable]:(NORMAL PFS SECURE128 SECURE192 SUITEB128 SUITEB192 LEGACY PERFORMANCE NONE)'
       '--x509cafile=[specify certificate file to use]:file:_files'
       '--x509crlfile=[specify CRL file to use]:file:_files'
-      '--pgpkeyfile=[specify PGP key file to use]:file:_files'
-      '--pgpkeyring=[specify PGP key ring file to use]:file:_files'
-      '--pgpcertfile=[specify PGP public key (certificate) file to use]:file:_files'
-      '--x509keyfile=[specify X.509 key file to use]:file:_files'
-      '--x509certfile=[specify X.509 certificate file to use]:file:_files'
-      '--pgpsubkey=[specify PGP subkey to use]:sub key'
+      '*--x509keyfile=[specify X.509 key file to use]:file:_files'
+      '*--x509certfile=[specify X.509 certificate file to use]:file:_files'
       '(-l --list -p --port)'{-l,--list}'[print list of the supported algorithms/modes]'
+    )
+  ;|
+  gnutls-cli|gnutls-serv|certtool)
+    args+=(
       '--provider=[specify PKCS #11 provider library]:provider:_files'
+    )
+  ;|
+  gnutls-cli|certtool)
+    args+=(
+      '--verify-allow-broken[allow broken algorithms, such as MD5 for certificate verification]'
     )
   ;|
 
@@ -59,10 +64,11 @@ case "$service" in
       '(-s --starttls)'{-s,--starttls}'[start TLS on EOF or SIGALRM]'
       '--crlf[send CR LF instead of LF]'
       '--fastopen[enable TCP Fast Open]'
-      '(-f --fingerprint)'{-f,--fingerprint}'[send the openpgp fingerprint instead of the key]'
       "--print-cert[print peer's certificate in PEM format]"
       "--save-cert=[save peer's certificate chain in the specified file in PEM format]:file:_files"
       "--save-ocsp=[save peer's OCSP status response in the provided file]:file:_files"
+      '--save-server-trace=[save the server-side TLS message trace in the provided file]:file:_files'
+      '--save-client-trace=[save the client-side TLS message trace in the provided file]:file:_files'
       '--dh-bits=[specify minimum number of bits allowed for DH]:bits'
       '--srpusername[specify SRP username to use]:username'
       '--srppasswd[specify SRP password to use]:password'
@@ -88,6 +94,8 @@ case "$service" in
   gnutls-serv)
     args+=(
       '--sni-hostname-fatal[send fatal alert on sni-hostname mismatch]'
+      '*--alpn=[specify ALPN protocol to be enabled by the server]:protocol'
+      '--alpn-fatal[send fatal alert on non-matching ALPN name]'
       '(-g --generate)'{-g,--generate}'[generate Diffie-Hellman parameters]'
       '(-q --quiet)'{-q,--quiet}'[suppress some messages]'
       "--nodb[don't use a resumption database]"
@@ -97,10 +105,6 @@ case "$service" in
       '(-r --require-client-cert)'{-r,--require-client-cert}'[require a client certificate]'
       '--verify-client-cert[if a client certificate is sent then verify it]'
       '--dhparams=[specify DH params file to use]:file:_files'
-      '--x509dsakeyfile=[specify alternative X.509 key file to use]:file:_files'
-      '--x509dsacertfile=[specify alternative X.509 certificate file to use]:file:_files'
-      '--x509ecckeyfile=[specify alternative X.509 key file to use]:file:_files'
-      '--x509ecccertfile=[specify alternative X.509 certificate file to use]:file:_files'
       '--srppasswd=[specify SRP password file to use]:file:_files'
       '--srppasswdconf=[specify SRP password configuration file to use]:file:_files'
       '--pskpasswd=[specify PSK password file to use]:file:_files'
@@ -111,18 +115,31 @@ case "$service" in
 
   certtool)
     args+=(
-      '--infile:input file:_files '
+      '(-q --generate-request)--infile:input file:_files '
       '--outfile:output file:_files '
       '(-s --generate-self-signed)'{-s,--generate-self-signed}'[generate a self-signed certificate]'
       '(-c --generate-certificate)'{-c,--generate-certificate}'[generate a signed certificate]'
       '--generate-proxy[generate a proxy certificate]'
       '--generate-crl[generate a CRL]'
       '(-u --update-certificate)'{-u,--update-certificate}'[update a signed certificate]'
+      '--fingerprint[print the fingerprint of the given certificate]'
+      '--key-id[print the key ID of the given certificate]'
+      '--v1[generate an X.509 version 1 certificate (with no extensions)]'
+      '--sign-params=[sign a certificate with a specific signature algorithm]:algorithm:(RSA-PSS)'
       '(-p --generate-privkey)'{-p,--generate-privkey}'[generate a private key]'
-      '(-q --generate-request)'{-q,--generate-request}'[generate a PKCS #10 certificate request]'
+      '(-q --generate-request --infile)'{-q,--generate-request}'[generate a PKCS #10 certificate request]'
       '(-e --verify-chain)'{-e,--verify-chain}'[verify a PEM encoded certificate chain]'
       '--verify[verify a PEM encoded certificate chain using a trusted list]'
       '--verify-crl[verify a CRL]'
+      '(--verify-email)--verify-hostname=[specify hostname to be used for certificate chain verification]:hostname:_hosts'
+      '(--verify-hostname)--verify-email=[specify email to be used for certificate chain verification]:email:_email_addresses'
+      '--verify-purpose=[specify a purpose OID to be used for certificate chain verification]'
+      '--p7-sign[sign using a PKCS #7 structure]'
+      '--p7-detached-sign[sign using a detached PKCS #7 structure]'
+      "--no-p7-include-cert[don't include signer's certificate will in the cert list]"
+      '--p7-time[include a timestamp in the PKCS #7 structure]'
+      '--p7-show-data[show embedded data in the PKCS #7 structure]'
+      '--p7-verify[verify the provided PKCS #7 structure]'
       '--generate-dh-params[generate PKCS #3 encoded Diffie Hellman parameters]'
       '--get-dh-params[get the included PKCS #3 encoded Diffie Hellman parameters]'
       '--dh-info[print information PKCS #3 encoded Diffie-Hellman parameters]'
@@ -132,36 +149,44 @@ case "$service" in
       '--load-certificate:certificate file:_files'
       '--load-ca-privkey:certificate authority private key file:_files'
       '--load-ca-certificate:certificate authority certificate file:_files'
-      '--password:password'
+      '--load-crl=[load the provided CRL]:CRL'
+      '--load-data=[load auxiliary data]:data'
+      '--password=[specify password to use]:password'
       '--hex-numbers[big number in an easier format to parse]'
       '--cprint[prints certain information is C-friendly format]'
       '--null-password[enforce a NULL password]'
       '--empty-password[enforce an empty password]'
+      '--key-type=[specify the key type to use on key generation]:key type'
       '(-i --certificate-info)'{-i,--certificate-info}'[print information on a certificate]'
       '--certificate-pubkey[print certificate public key]'
       '(-l --crl-info)'{-l,--crl-info}'[print information on a CRL]'
       '--crq-info[print information on a certificate request]'
       "--no-crq-extensions[don't use extensions in certificate requests]"
       '--p12-info[print information on a PKCS #12 structure]'
+      '--p12-name=[specify PKCS #12 friendly name to use]:name'
       '--p7-info[print information on a PKCS #7 structure]'
       '--smime-to-p7[convert S/MIME to PKCS #7 structure]'
       '(-k --key-info)'{-k,--key-info}'[print information on a private key]'
-      '--pgp-key-info[print information on a OpenPGP private key]'
+      '--p8-info[print information on a PKCS #8 structure]'
+      '--to-rsa[convert an RSA-PSS key to raw RSA format]'
+      '--bits=[specify number of bits for key generation]:bits'
+      '--curve=[specify the curve used for EC key generation]:curve'
+      '--sec-param=[specify the security level]:security level:(low legacy medium high ultra)'
+      '--to-p8[convert a given key to a PKCS #8 structure]'
+      '--provable[generate a private key or parameters from a seed using a provable method]'
+      '--verify-provable-privkey[verify a private key generated from a seed using a provable method]'
+      '--seed=[when generating a private key use the given seed]:seed (hex-encoded)'
       '--pubkey-info[print information on a public key]'
-      '--fix-key[regenerate the parameters in a private key]'
       '--to-p12[generate a PKCS #12 structure]'
       '(-8 --pkcs8)'{-8,--pkcs8}'[use PKCS #8 format for private keys]'
-      '--dsa[use DSA keys]'
-      '--hash:hash algorithm for signing:(MD5 SHA1 RMD160)'
-      '--export-ciphers[use weak encryption algorithms]'
-      '--inder[use DER format for input certificates and private keys]'
-      '--xml[use XML format for output certificates]'
-      '--outder[use DER format for output certificates and private keys]'
-      '--bits:number of bits for key generation'
-      '--sec-param[specify the security level]:security level:(low normal high ultra)'
-      '--disable-quick-random[use /dev/random for key generation, thus increasing the quality of randomness used]'
-      '--template:template file to use for non-interactive operation:_files'
-      '--pkcs-cipher[specify cipher to use for pkcs operations]:cipher:(3des 3des-pkcs12 aes-128 aes-192 aes-256 rc2-40 arcfour)'
+      '--hash=[specify hash algorithm for signing]:algorithm:(MD5 SHA1 RMD160)'
+      '--salt-size=[specify the RSA-PSS key default salt size]:size'
+      {--inder,--inraw}'[use DER format for input certificates and private keys]'
+      {--outder,--outraw}'[use DER format for output certificates and private keys]'
+      '--template=[specify template file to use for non-interactive operation]:file:_files'
+      '--stdout-info[print information to stdout instead of stderr]'
+      '--ask-pass[enable interaction for entering password when in batch mode]'
+      '--pkcs-cipher=[specify cipher to use for pkcs operations]:cipher:(3des 3des-pkcs12 aes-128 aes-192 aes-256 rc2-40 arcfour)'
     )
   ;;
 
